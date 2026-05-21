@@ -43,7 +43,7 @@ Here we will separate shared change reasons from accidental similarity, then ver
 
 This picture places Removing Duplication inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Removing Duplication is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Extract only duplication that changes for the same reason.
 
 ## Questions this article answers
 
@@ -60,8 +60,6 @@ This picture places Removing Duplication inside an operating flow. The point is 
 Duplication multiplies bugs. Fix one site and you forget the other.
 
 > When the same knowledge lives in two places, they will diverge.
-
-## Concept at a Glance
 
 Extract only when the change reason is shared.
 

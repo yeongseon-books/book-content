@@ -414,4 +414,6 @@ few-shot은 답변 패턴을 예시로 보여 주는 기술이고, chain-of-thou
 - [프롬프트 엔지니어링 기초 — System·User·Assistant 역할](./03-prompt-engineering-basics.md)
 - [툴 호출 — 함수를 모델에 연결하기](../../llm-api-production-101/ko/02-tool-calling.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/llm-app-foundations-101/ko/04-few-shot-and-cot)
+
 Tags: LLM, OpenAI, Prompt Engineering, Python

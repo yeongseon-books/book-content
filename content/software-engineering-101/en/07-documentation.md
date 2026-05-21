@@ -43,8 +43,6 @@ This is post 7 in the Software Engineering 101 series. In this chapter, we split
 
 This picture places Documentation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Documentation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The minimum sections of a useful README
@@ -58,8 +56,6 @@ This picture places Documentation inside an operating flow. The point is not to 
 Without docs, every question routes through a person. The moment a person becomes the bottleneck, team speed depends on their work hours.
 
 > Documentation is the infrastructure of async collaboration.
-
-## Concept at a Glance
 
 Diataxis splits docs by reader intent.
 

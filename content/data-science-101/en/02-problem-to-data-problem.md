@@ -42,7 +42,7 @@ This is post 2 in the Data Science 101 series. In this chapter, we turn problem 
 
 This picture places Turning a Problem into a Data Problem inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Turning a Problem into a Data Problem is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> At its core, Turning a Problem into a Data Problem is about deciding what enters a system, where validation happens, and which signals stay for the next cycle—not about feature names.
 
 ## Questions This Post Answers
 
@@ -67,7 +67,7 @@ A *fuzzy question* gives you *no way to choose* the right data. *Framing* is *ha
 
 > *One precise sentence saves *three weeks* of analysis.*
 
-## Concept at a Glance
+The key boundary in this episode is between the concept itself and how it operates in a real system. You need to know where the data comes in, where the decision happens, and what signal must be recorded.
 
 ## Key Terms
 

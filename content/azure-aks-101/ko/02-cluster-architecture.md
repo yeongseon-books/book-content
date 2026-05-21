@@ -321,4 +321,6 @@ kubectl top nodes
 - [Azure App Service 101](../../azure-app-service-101/ko/) — 노드 개념이 없는 PaaS와 비교할 때
 - [Azure Functions 101](../../azure-functions-101/ko/) — 실행 단위와 스케일 단위가 어떻게 다른지 비교할 때
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-aks-101/ko/02-cluster-architecture)
+
 Tags: Azure, AKS, Kubernetes, Cloud

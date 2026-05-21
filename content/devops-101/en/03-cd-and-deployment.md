@@ -58,8 +58,6 @@ Deployment is *the most dangerous moment*. A good strategy *shrinks the blast ra
 
 > *Deployability* and *feature activation* must be *separated*.
 
-## Concept at a Glance
-
 CD is the practice of *always having deployable code*. Deployment strategies—Rolling, Blue-Green, Canary—are not fancy tricks. They are ways to *reduce blast radius* and *make rollback fast*.
 
 ## Key Terms

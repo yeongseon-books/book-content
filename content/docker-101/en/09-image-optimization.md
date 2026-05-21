@@ -42,15 +42,11 @@ This is post 9 in the Docker 101 series. It walks through multi-stage builds, ca
 
 This picture places Image Optimization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Image Optimization is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Smaller images shorten *pull time = deploy time*. Cleaner images also reduce the *attack surface*.
 
 > *A 1 GB image costs *one minute per deploy* and *100 points of security score*.*
-
-## Concept at a Glance
 
 ## Key Terms
 

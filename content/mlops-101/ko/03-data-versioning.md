@@ -52,6 +52,118 @@ last_reviewed: '2026-05-12'
 
 그래서 데이터 버전이 없으면 실험 추적도 반쪽이 됩니다. 메트릭이 높았던 이유를 설명할 수도 없고, 과거 모델을 다시 만들어 비교할 수도 없습니다.
 
+### Feature Store 아키텍처
+
+Feature Store는 데이터 버전 관리와 함께 가는 개념입니다. 오프라인 저장소와 온라인 저장소로 나눠 훈련과 서빙에서 같은 feature를 재사용합니다.
+
+| 구분 | 저장소 | 지연시간 | 주요 용도 |
+|---|---|---|---|
+| 오프라인 스토어 | Parquet on S3, BigQuery, Snowflake | 분~시간 | 훈련 데이터 준비, 배치 feature 생성 |
+| 온라인 스토어 | Redis, DynamoDB, Cassandra | ms~초 | 실시간 추론 요청 feature 제공 |
+
+훈련할 때는 오프라인 스토어에서 큰 데이터를 단번에 가져오고, 서빙할 때는 온라인 스토어에서 필요한 가장 최신 feature만 빠르게 읽습니다.
+
+### Feast 설정 예시
+
+Feast는 오픈소스 Feature Store입니다. 데이터 버전 관리와 함께 쓰면 훈련과 서빙에서 feature 정의가 일치하게 됩니다.
+
+```yaml
+# feature_repo/feature_store.yaml
+project: mlops_demo
+registry: data/registry.db
+provider: local
+online_store:
+  type: redis
+  connection_string: "localhost:6379"
+offline_store:
+  type: file
+```
+
+Feature 정의 파일:
+
+```python
+# feature_repo/features.py
+from feast import Entity, FeatureView, Field, FileSource
+from feast.types import Float32, Int64
+from datetime import timedelta
+
+user = Entity(name="user_id", join_keys=["user_id"])
+
+user_features_source = FileSource(
+    path="data/user_features.parquet",
+    timestamp_field="event_timestamp",
+)
+
+user_features = FeatureView(
+    name="user_features",
+    entities=[user],
+    ttl=timedelta(days=1),
+    schema=[
+        Field(name="age", dtype=Int64),
+        Field(name="score", dtype=Float32),
+    ],
+    source=user_features_source,
+)
+```
+
+이 설정을 적용하려면 `feast apply`를 실행합니다. 그러면 레지스트리에 feature 정의가 등록되고, 훈련과 서빙 코드에서 같은 이름으로 feature를 불러올 수 있습니다.
+
+### Feature 버전 관리
+
+Feature 정의도 코드와 같이 버전 관리가 필요합니다. Feature 계산 로직이 바뀌면 모델 결과도 달라지기 때문입니다.
+
+#### Feature 이름에 버전 포함
+
+Feature 이름 자체에 버전을 넣으면 변경 이력이 남습니다.
+
+```python
+# 초기 버전
+user_age_v1 = Entity(name="user_age_v1", ...)
+
+# 계산 로직 변경 후
+user_age_v2 = Entity(name="user_age_v2", ...)
+```
+
+#### Git으로 feature 정의 추적
+
+Feature 정의 파일을 git에 커밋하면 코드 버전과 feature 버전을 함께 관리할 수 있습니다.
+
+```bash
+git add feature_repo/features.py
+git commit -m "Add user_age_v2 feature definition"
+```
+
+### 훈련-서빙 스큐 방지
+
+훈련에서는 한 가지 feature를 쓰는데 서빙에서는 다른 feature를 쓰면 모델 성능이 크게 떨어집니다. 이것을 training-serving skew라고 부릅니다.
+
+#### 발생 원인
+
+1. 훈련 코드에서 pandas로 feature를 만들고, 서빙 코드에서 SQL로 다시 만듭니다. 로직이 조금만 달라도 결과가 달라집니다.
+2. 훈련은 batch feature를 쓰는데, 서빙은 실시간 feature를 쓰고 로직이 훈련과 다릅니다.
+3. Feature 버전이 훈련과 서빙에서 달라서 훈련은 v1을 쓰는데 서빙은 v2를 쓰게 됩니다.
+
+#### 방지 방법
+
+1. **Feature Store 사용**: 훈련과 서빙이 같은 feature 정의를 참조합니다.
+2. **Feature 테스트 작성**: 훈련 feature와 서빙 feature를 같은 입력으로 비교하는 테스트를 만듭니다.
+3. **버전 명시**: Feature 이름에 버전을 포함하고, 모델은 특정 feature 버전을 기록합니다.
+
+```python
+# 훈련
+features_train = feast_store.get_historical_features(
+    entity_df=train_entities,
+    features=["user_features:age", "user_features:score"],
+)
+
+# 서빙
+features_online = feast_store.get_online_features(
+    entity_rows=[{"user_id": 123}],
+    features=["user_features:age", "user_features:score"],
+)
+```
+
+Feature Store를 쓰면 같은 feature 이름이 훈련과 서빙에서 자동으로 일치하고, skew 발생 가능성이 크게 줄어듭니다.
 ---
 
 ## 전체 흐름을 먼저 보겠습니다
@@ -199,6 +311,111 @@ print("changed:", new_h != h)
 데이터 버전 관리는 재현성의 전제입니다. 같은 코드를 남기는 것만으로는 충분하지 않고, 같은 데이터를 다시 가져올 수 있어야 같은 모델을 다시 만들 수 있습니다.
 
 이 글에서 기억할 핵심은 하나입니다. **ML 시스템에서 데이터는 입력 파일이 아니라 버전이 붙은 운영 자산입니다.** 다음 글에서는 그 자산을 반복 가능한 단계로 묶는 학습 파이프라인을 다루겠습니다.
+
+
+## DVC 워크플로를 운영 관점으로 정리하기
+
+데이터 버전 관리는 명령어를 아는 것보다 흐름을 이해하는 편이 중요합니다. 아래는 가장 보편적인 DVC 운영 흐름입니다.
+
+1. 원천 데이터나 전처리 결과를 `dvc add`로 추적합니다.
+2. 생성된 `.dvc` 파일과 파이프라인 정의를 git에 커밋합니다.
+3. 실제 데이터 파일은 `dvc push`로 원격 저장소에 업로드합니다.
+4. 다른 환경에서는 `git pull` 후 `dvc pull`로 동일 상태를 복원합니다.
+5. 데이터가 변경되면 동일 절차를 반복해 새 버전을 남깁니다.
+
+이 구조의 장점은 협업자가 "같은 코드 + 같은 데이터" 상태를 기계적으로 복원할 수 있다는 점입니다.
+
+## 자주 쓰는 DVC 명령어 모음
+
+```bash
+# 초기 설정
+pip install dvc[s3]
+dvc init
+dvc remote add -d storage s3://my-bucket/mlops-demo
+
+# 데이터 추적
+dvc add data/raw/train.parquet
+git add data/raw/train.parquet.dvc .gitignore
+git commit -m "Track raw training dataset"
+
+# 원격 동기화
+dvc push
+
+# 다른 환경 복원
+git pull
+dvc pull
+
+# 버전 조회
+git log -- data/raw/train.parquet.dvc
+```
+
+명령 자체는 단순하지만, 실제 팀 운영에서 중요한 것은 커밋 메시지 규약과 데이터 변경 사유를 남기는 습관입니다.
+
+## `.dvc` 파일 구조 읽기
+
+일반적으로 `.dvc` 파일은 아래와 비슷합니다.
+
+```yaml
+outs:
+  - md5: 3f7dd2b9c8a8f6a9e33f0d6b14f7d22a
+    size: 128947221
+    path: data/raw/train.parquet
+```
+
+- `md5`: 파일 내용을 식별하는 해시입니다.
+- `size`: 파일 크기입니다.
+- `path`: 작업 디렉터리 기준 경로입니다.
+
+핵심은 이 파일이 데이터 자체가 아니라 "데이터 상태를 가리키는 포인터"라는 점입니다.
+
+## 파이프라인 정의와 결합하기
+
+데이터 버전 관리는 학습 파이프라인과 연결될 때 가치가 커집니다.
+
+```yaml
+stages:
+  preprocess:
+    cmd: python src/preprocess.py --input data/raw/train.parquet --output data/processed/train.parquet
+    deps:
+      - src/preprocess.py
+      - data/raw/train.parquet
+    outs:
+      - data/processed/train.parquet
+
+  train:
+    cmd: python src/train.py --data data/processed/train.parquet --model artifacts/model.pkl
+    deps:
+      - src/train.py
+      - data/processed/train.parquet
+    outs:
+      - artifacts/model.pkl
+```
+
+이렇게 `deps`와 `outs`를 명시하면 입력 변경 시 필요한 단계만 다시 실행할 수 있어 비용과 시간을 크게 줄일 수 있습니다.
+
+## 운영 정책 제안
+
+| 항목 | 권장 정책 |
+|---|---|
+| 원천 데이터 보존 | 최소 90일 이상 버전 보존 |
+| 재현 보장 | 배포 모델은 학습 당시 데이터 해시를 필수 기록 |
+| 접근 제어 | 원격 저장소 권한을 읽기/쓰기 분리 |
+| 감사 추적 | 모델 승격 시 데이터 버전 링크 필수 |
+
+데이터 버전 관리는 스토리지 관리가 아니라 모델 책임 추적 체계입니다. 이 연결이 있어야 품질 문제 발생 시 원인을 좁힐 수 있습니다.
+
+## 데이터 리니지 추적 표
+
+데이터 버전 관리는 변경 이력 보존에서 끝나지 않고, 어떤 데이터가 어떤 모델 버전으로 이어졌는지 추적 가능해야 완성됩니다.
+
+| 단계 | 추적 항목 | 기록 예시 | 운영 목적 |
+|---|---|---|---|
+| Ingest | 원천 파일 경로, 수집 시각 | `s3://raw/2026-05-12/events.parquet` | 수집 누락/지연 원인 파악 |
+| Validate | 스키마 버전, 품질 점수 | `schema=v3, null_rate=0.7%` | 이상 입력 조기 차단 |
+| Train | 데이터 해시, 모델 버전 | `md5=...`, `model=v42` | 학습 재현성 보장 |
+| Deploy | 승격 모델, 기준 데이터 링크 | `champion=v42, data=v18` | 배포 근거 감사 추적 |
+
+리니지 표를 문서와 레지스트리에 함께 남기면, 성능 저하가 생겼을 때 모델 코드와 데이터 경로를 동시에 역추적할 수 있습니다.
 
 ## 처음 질문으로 돌아가기
 

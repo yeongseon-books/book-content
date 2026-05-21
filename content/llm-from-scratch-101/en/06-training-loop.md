@@ -42,8 +42,6 @@ This is post 6 in the LLM from Scratch 101 series. Here we will build a compact 
 
 This picture places Learning via Gradients inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Learning via Gradients is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 The training loop is the boundary between a static architecture and a working learning system. Everything we built in earlier posts—embeddings, attention, blocks, and the GPT class—only becomes meaningful once it participates in repeated updates against real data.

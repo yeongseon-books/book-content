@@ -51,8 +51,6 @@ Once a URL is public, it is *expensive to change*. A bad resource model warps ev
 
 > If your resources wobble, everything wobbles.
 
-## Concept at a Glance
-
 When the hierarchy is visible from the path alone, docs and debugging get simpler. When everything collapses into flat query parameters, teams start arguing about what the "real" resource even is.
 
 ## Key Terms

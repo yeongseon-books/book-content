@@ -38,10 +38,6 @@ last_reviewed: '2026-05-12'
 
 *pytest 101 1장 흐름 개요*
 
-이 그림에서는 왜 테스트를 작성해야 할까?를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 왜 테스트를 작성해야 할까?의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 이 글이 중요한가
 
 테스트가 없는 상태에서의 변경은 늘 도박에 가깝습니다. 코드가 커질수록 “이 함수 하나만 바꿨는데 왜 전혀 다른 화면이 깨졌지?” 같은 상황이 자주 생기기 때문입니다. 반대로 테스트가 있으면, 변경 직후 기존 동작이 유지되는지 바로 확인할 수 있습니다.
@@ -219,6 +215,94 @@ test_calculator.py::test_divide_by_zero PASSED
 ## 정리 및 다음 글 안내
 
 테스트는 코드 변경에 대한 안전망입니다. pytest는 `assert` 하나로도 충분히 읽기 좋은 테스트를 만들 수 있게 해 줍니다. 다음 글에서는 pytest가 테스트 파일과 함수를 어떻게 자동으로 찾는지부터, 첫 번째 테스트를 실제로 작성하는 과정까지 살펴보겠습니다.
+
+## 실전 패턴 추가: fixture, parametrization, mock을 함께 설계하기
+
+테스트 파일이 커질수록 중요한 것은 개별 문법보다 테스트 경계를 일정하게 유지하는 일입니다. 특히 fixture로 상태를 준비하고, `@pytest.mark.parametrize`로 입력 집합을 확장하고, mock으로 외부 의존성을 분리하는 세 가지를 한 흐름으로 묶으면 테스트 유지보수 비용이 크게 줄어듭니다.
+
+```python
+# tests/test_order_service.py
+from __future__ import annotations
+
+from dataclasses import dataclass
+from unittest.mock import Mock
+
+import pytest
+
+
+@dataclass
+class Order:
+    item: str
+    qty: int
+
+
+class InventoryClient:
+    def reserve(self, item: str, qty: int) -> bool:  # pragma: no cover
+        raise NotImplementedError
+
+
+class OrderService:
+    def __init__(self, client: InventoryClient) -> None:
+        self.client = client
+
+    def place(self, order: Order) -> str:
+        if order.qty <= 0:
+            raise ValueError("qty must be positive")
+        ok = self.client.reserve(order.item, order.qty)
+        return "confirmed" if ok else "rejected"
+
+
+@pytest.fixture
+def inventory_client() -> Mock:
+    return Mock(spec=InventoryClient)
+
+
+@pytest.fixture
+def order_service(inventory_client: Mock) -> OrderService:
+    return OrderService(client=inventory_client)
+
+
+@pytest.mark.parametrize(
+    "order,expected",
+    [
+        (Order("book", 1), "confirmed"),
+        (Order("book", 3), "confirmed"),
+        (Order("book", 5), "rejected"),
+    ],
+)
+def test_place_orders(order_service: OrderService, inventory_client: Mock, order: Order, expected: str) -> None:
+    inventory_client.reserve.return_value = expected == "confirmed"
+    assert order_service.place(order) == expected
+
+
+def test_place_rejects_invalid_quantity(order_service: OrderService) -> None:
+    with pytest.raises(ValueError, match="qty must be positive"):
+        order_service.place(Order("book", 0))
+```
+
+위 구조의 핵심은 테스트 목적별 분리입니다. fixture는 준비, parametrization은 입력 공간, mock은 외부 의존성 제어를 담당합니다. 팀 단위에서는 이 분리를 지켜야 테스트를 고칠 때 영향 범위를 빠르게 읽을 수 있습니다.
+
+또한 fixture scope를 무조건 넓히지 않는 편이 안전합니다. DB 연결이나 임시 디렉터리처럼 생성 비용이 큰 자원만 `module` 또는 `session`으로 올리고, 나머지는 `function` scope로 두어 테스트 독립성을 유지하는 것이 좋습니다.
+
+## 추가 실무 메모: 실패 재현 테스트를 먼저 고정하기
+
+버그 수정에서는 구현보다 재현 테스트를 먼저 고정하는 순서가 중요합니다. 예를 들어 시간대나 경계값 입력처럼 운영에서만 드러나는 문제는 아래처럼 실패 케이스를 테스트로 먼저 기록한 뒤 수정해야 재발을 막을 수 있습니다.
+
+```python
+import pytest
+
+def normalize_hour(hour: int) -> int:
+    if not 0 <= hour <= 23:
+        raise ValueError("hour out of range")
+    return hour
+
+@pytest.mark.parametrize("bad", [-1, 24, 100])
+def test_normalize_hour_rejects_invalid_values(bad: int) -> None:
+    with pytest.raises(ValueError):
+        normalize_hour(bad)
+```
+
+이 방식은 회고 문서보다 강한 운영 기록을 남깁니다. 다음 변경에서도 같은 실패가 자동으로 잡히기 때문입니다.
 
 ## 처음 질문으로 돌아가기
 

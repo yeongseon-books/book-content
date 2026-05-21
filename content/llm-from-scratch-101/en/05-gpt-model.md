@@ -49,8 +49,6 @@ This is the 5th article in the LLM from Scratch 101 series.
 
 This picture places Assembly: Completing the GPT Model Class inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Assembly: Completing the GPT Model Class is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## The Forward Pass at a Glance
 
 The input is a tensor of token IDs with shape `(B, T)`. We add token and position embeddings, then pass them through six blocks sequentially. After a final `ln_f` layer, we project to the vocab dimension via `lm_head` to produce logits of shape `(B, T, vocab_size)`.

@@ -57,8 +57,6 @@ and Azure CNI Overlay keeps Pod IPs on a separate overlay CIDR while the VNet mo
 
 This picture places CNI and Azure CNI Overlay — where Pod IPs come from inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of CNI and Azure CNI Overlay — where Pod IPs come from is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters in real AKS operations
 
 AKS networking is not a one-time cluster-creation checkbox. The chosen model keeps shaping later decisions about new node pools, peering, firewall rules, NAT, private endpoints, and how many Pods the cluster can add before address pressure becomes a production issue.

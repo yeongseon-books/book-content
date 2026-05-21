@@ -43,8 +43,6 @@ In this post, we will define an object first as a bundle of state and behavior, 
 
 This picture places Objects and Prototypes inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Objects and Prototypes is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - What is the simplest way to define an object?
@@ -57,8 +55,6 @@ This picture places Objects and Prototypes inside an operating flow. The point i
 Once you understand the object model precisely, "why is this method being called?" or "why does super behave this way?" becomes a single answer. Knowing both models lets you adapt to any new OOP language fast.
 
 > Object = state + behavior. Classes and prototypes are different tools for making the same kind of bundle.
-
-## Concept at a Glance
 
 Class-based on top, prototype-based below. Same idea: **delegate one level up when not found**.
 

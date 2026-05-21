@@ -41,8 +41,6 @@ Here, we will build a browser chatbot and focus on the boundary between client U
 
 This picture places Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why Next.js and the Vercel AI SDK work well here
 
 The first friction point in AI web features is not intelligence. It is perceived latency and state handling. If a long answer appears only after full completion, the UI feels slower than it really is.

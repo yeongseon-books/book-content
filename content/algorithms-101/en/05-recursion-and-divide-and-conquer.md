@@ -43,8 +43,6 @@ This is post 5 in the Algorithms 101 series. Here we cover the call stack, recur
 
 This picture places Recursion and Divide and Conquer inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Recursion and Divide and Conquer is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The three rules for correct recursion
@@ -57,8 +55,6 @@ This picture places Recursion and Divide and Conquer inside an operating flow. T
 Without comfortable recursion, trees, graphs, divide and conquer, dynamic programming, and backtracking all feel harder than they are. With it, complex problems decompose naturally into smaller versions of themselves.
 
 > Recursion is the second native language of algorithms.
-
-## Concept at a Glance
 
 > A recursive function has a base case, a progress step, and a self-call. Divide and conquer breaks input into a parts of size n/b and combines results in f(n) work. The cost satisfies T(n) = a · T(n/b) + f(n); the master theorem gives the closed form. Mergesort yields O(n log n); binary search yields O(log n).
 

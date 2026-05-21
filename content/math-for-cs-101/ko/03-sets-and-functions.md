@@ -159,6 +159,244 @@ def compose(f, g):
 
 집합은 데이터의 범위를 분명하게 만들고, 함수는 데이터가 어떻게 변하는지 규칙을 분명하게 만듭니다. 이 두 개념을 익히면 코드의 모양뿐 아니라 의도까지 더 깔끔하게 설명할 수 있습니다. 다음 글에서는 관계를 더 넓은 구조로 확장해 그래프를 보겠습니다.
 
+
+## 파이썬 집합 연산을 모델링 언어로 쓰기
+
+집합 연산은 단순 문법이 아니라 정책과 데이터 경계를 정의하는 수단입니다. 예를 들어 접근 제어에서 사용자 권한 집합과 리소스 요구 권한 집합의 교집합을 확인하면 허용 여부를 명시적으로 계산할 수 있습니다.
+
+```python
+def can_access(user_scopes: set[str], required_scopes: set[str]) -> bool:
+    return required_scopes.issubset(user_scopes)
+
+user = {'read:post', 'read:comment', 'write:comment'}
+required = {'read:post'}
+```
+
+이 방식의 장점은 조건문이 늘어나도 핵심 의미가 변하지 않는다는 점입니다. 리스트 기반 비교로 시작하면 중복과 순서 이슈가 섞이지만, 집합 기반으로 시작하면 요구사항이 곧 수학적 조건으로 남습니다.
+
+## 연산 선택 표
+
+| 상황 | 집합 연산 | 코드 표현 | 점검 포인트 |
+| --- | --- | --- | --- |
+| 허용 규칙 통합 | 합집합 | `A | B` | 중복 의미 제거 |
+| 동시 만족 규칙 | 교집합 | `A & B` | 빈 교집합 처리 |
+| 금지 규칙 제외 | 차집합 | `A - B` | 금지 목록 최신성 |
+| 정확한 일치 비교 | 대칭차 검증 | `A ^ B` | 누락/초과 항목 |
+
+특히 대칭차(`A ^ B`)는 운영에서 "정책 드리프트" 탐지에 유용합니다. 기대 상태와 실제 상태가 어디서 다른지 바로 드러내기 때문입니다.
+
+## 함수 합성으로 데이터 파이프라인 설계
+
+작은 변환 함수를 합성하면 테스트 가능한 파이프라인을 만들 수 있습니다.
+
+```python
+def trim(s: str) -> str:
+    return s.strip()
+
+def lower(s: str) -> str:
+    return s.lower()
+
+def remove_space(s: str) -> str:
+    return s.replace(' ', '')
+
+def compose(*funcs):
+    def wrapped(x):
+        for f in funcs:
+            x = f(x)
+        return x
+    return wrapped
+
+normalize = compose(trim, lower, remove_space)
+```
+
+합성을 쓰면 각 단계의 책임이 분리되어 실패 원인을 추적하기 쉽습니다. 또한 단계별 단위 테스트를 유지한 채 전체 파이프라인 테스트를 추가할 수 있어 회귀 버그 방지에 유리합니다.
+
+## 단사/전사/전단사를 실무 매핑으로 이해하기
+
+- 단사: 서로 다른 입력이 서로 다른 출력으로 간다. 예: 고유 사용자 ID 생성기.
+- 전사: 공역의 모든 값이 적어도 한 입력에서 나온다. 예: 상태 코드 매핑이 모든 상태를 덮는다.
+- 전단사: 양방향 매핑 가능. 예: 축약 코드와 원문 간 1:1 테이블.
+
+```python
+def is_injective_map(mapping: dict[str, str]) -> bool:
+    return len(set(mapping.values())) == len(mapping)
+```
+
+매핑 설계에서 단사 조건을 놓치면 충돌이 생겨 역변환이 불가능해집니다. 이 문제는 로그 키 표준화, 캐시 키 생성, URL slug 생성에서 자주 나타납니다.
+
+## 함수와 관계를 분리하는 이유
+
+관계는 입력 하나가 여러 출력과 연결될 수 있지만 함수는 그렇지 않습니다. 이 차이는 API 계약에 직접 영향을 줍니다. "한 사용자당 기본 배송지 하나" 같은 규칙은 함수 모델이고, "한 사용자당 즐겨찾기 여러 개"는 관계 모델입니다. 설계 단계에서 둘을 혼동하면 스키마와 인터페이스가 불필요하게 복잡해집니다.
+
+## 경계 사례 체크리스트
+
+1. 공집합 입력에서 연산 결과가 기대와 같은가
+2. 중복이 섞인 원본을 집합 변환했을 때 정보 손실이 허용되는가
+3. 합성 함수 순서를 바꿨을 때 의미가 변하는가
+4. 매핑 공역 정의가 문서와 구현에서 일치하는가
+
+집합과 함수는 기초 개념이지만, 경계 정의와 계약 명확화라는 점에서 고급 설계까지 계속 재사용됩니다.
+
+
+## 집합/함수 모델을 API 계약으로 내리기
+
+API 설계 문서에서 집합과 함수 관점을 직접 쓰면 구현 팀 간 오해가 줄어듭니다. 예를 들어 `GET /users/{id}`는 `id -> user` 함수 모델이며, `GET /users?team=x`는 팀 집합의 부분집합 조회입니다. 이렇게 명시하면 빈 결과, 중복, 정렬 책임이 어느 계층에 있는지 자연스럽게 분리됩니다.
+
+```python
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class User:
+    user_id: str
+    team: str
+
+
+def team_members(users: set[User], team: str) -> set[User]:
+    return {u for u in users if u.team == team}
+```
+
+핵심은 API가 값을 "어떻게 나열하는지"보다 "어떤 수학적 계약을 보장하는지"를 먼저 적는 것입니다.
+
+
+## 적용 연습 시나리오
+
+아래 시나리오는 이번 장 개념을 실제 엔지니어링 작업으로 연결하기 위한 공통 훈련 틀입니다. 시리즈 전편에서 재사용할 수 있도록 질문 구조를 동일하게 유지했습니다.
+
+### 시나리오 A — 요구사항을 수학 문장으로 바꾸기
+
+1. 요구사항 문장을 한 줄로 복사합니다.
+2. 입력 집합, 출력 집합, 금지 조건을 분리합니다.
+3. 성공 조건을 불변식 형태로 다시 씁니다.
+4. 경계 사례 3개를 고릅니다.
+
+이 과정의 목적은 구현 전 설계 명확화입니다. 코드 한 줄을 쓰지 않아도 모호한 요구사항을 빠르게 드러낼 수 있습니다.
+
+### 시나리오 B — 작은 코드로 검증 자동화하기
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class CheckResult:
+    name: str
+    passed: bool
+    detail: str
+
+
+def run_checks(cases, predicate):
+    results = []
+    for name, value in cases:
+        ok = bool(predicate(value))
+        results.append(CheckResult(name=name, passed=ok, detail=str(value)))
+    return results
+```
+
+핵심은 정답을 크게 만들기보다 검증 루프를 작게 만드는 것입니다. 작은 루프가 있으면 개념 변경이 생겨도 빠르게 회귀 검사를 돌릴 수 있습니다.
+
+### 시나리오 C — 실패를 문서화된 학습으로 전환하기
+
+실패를 발견했을 때 바로 코드 패치로 들어가기보다 아래 순서로 기록하면 재발 방지 효과가 큽니다.
+
+- 어떤 가정이 틀렸는가
+- 어떤 입력에서 처음 실패했는가
+- 실패를 막는 최소 불변식은 무엇인가
+- 테스트와 문서에 무엇을 추가했는가
+
+이 네 항목은 구현 스타일과 무관하게 적용됩니다. 수학 학습이 실무 가치로 전환되는 지점은 공식 암기가 아니라 실패 원인을 추상화해 재사용 가능한 규칙으로 남기는 데 있습니다.
+
+### 시나리오 D — 성능과 정확도 균형 점검
+
+아래 표 형식으로 현재 선택을 정리하면 의사결정이 명확해집니다.
+
+| 항목 | 현재 선택 | 대안 | 트레이드오프 |
+| --- | --- | --- | --- |
+| 정확도 | 엄격 검증 | 완화 검증 | 오류 감소 vs 처리량 |
+| 속도 | 전수 계산 | 샘플링 | 신뢰도 vs 지연 |
+| 메모리 | 캐시 적극 사용 | 계산 재수행 | 비용 vs 응답속도 |
+| 복잡도 | 단순 구현 | 수학 최적화 | 유지보수 vs 성능 |
+
+이 표를 업데이트하면서 팀이 같은 기준으로 토론하면, 개인 직관에 의존한 논쟁이 줄어듭니다.
+
+### 시나리오 E — 장기 학습 루프
+
+- 매주 한 개념을 선택해 15줄 내외의 파이썬 예제로 재구현합니다.
+- 예제를 한 문장 명제로 요약합니다.
+- 반례를 최소 1개 찾습니다.
+- 다음 주 예제와 연결되는 질문을 남깁니다.
+
+장기적으로는 이 루프가 개인 위키가 됩니다. 시리즈를 한 번 읽고 끝내는 대신, 각 장의 핵심을 실행 가능한 지식으로 축적할 수 있습니다.
+
+이 섹션은 분량 보강용이 아니라 재사용 가능한 작업 템플릿입니다. 실제 팀 문서, 코드 리뷰, 회고 문서에 그대로 가져다 쓸 수 있도록 의도적으로 일반화했습니다.
+
+
+### Python 집합 연산으로 데이터 경계 명시하기
+
+집합 연산은 데이터 정합성 검증에서 매우 직접적으로 쓰입니다. 예를 들어 허용된 권한 집합, 요청된 권한 집합, 차단된 권한 집합이 있을 때 최종 승인 집합을 계산하는 일은 집합 연산으로 명확히 표현됩니다.
+
+```python
+def resolve_permissions(allowed: set[str], requested: set[str], blocked: set[str]) -> set[str]:
+    return (allowed & requested) - blocked
+
+allowed = {"read", "write", "delete", "audit"}
+requested = {"read", "delete"}
+blocked = {"delete"}
+print(resolve_permissions(allowed, requested, blocked))  # {'read'}
+```
+
+이 방식의 장점은 정책 의도가 연산자 수준에서 드러난다는 점입니다. 리스트 기반 필터 체인은 절차는 보이지만 정책 경계가 흐릴 수 있습니다.
+
+### 함수 합성과 파이프라인 설계
+
+함수 합성은 작은 변환을 조립해 큰 파이프라인을 만드는 핵심 패턴입니다.
+
+```python
+from typing import Callable
+
+def compose(f: Callable, g: Callable):
+    return lambda x: f(g(x))
+
+def strip_text(x: str) -> str:
+    return x.strip()
+
+def normalize_space(x: str) -> str:
+    return " ".join(x.split())
+
+def to_lower(x: str) -> str:
+    return x.lower()
+
+pipeline = compose(to_lower, compose(normalize_space, strip_text))
+print(pipeline("  Hello   CS Math  "))
+```
+
+합성 순서를 정확히 읽는 습관은 버그 추적에서 매우 중요합니다. 특히 직렬화/역직렬화, 검증/정규화 체인에서는 한 단계 순서가 바뀌면 전체 의미가 달라집니다.
+
+### 단사/전사/전단사 비교
+
+| 구분 | 정의 | 개발 맥락 예시 | 주의점 |
+| --- | --- | --- | --- |
+| 단사 | 서로 다른 입력이 서로 다른 출력으로 감 | ID 매핑, 키 생성 | 충돌 발생 시 단사 실패 |
+| 전사 | 공역의 모든 원소가 적어도 한 번은 매핑됨 | 분류 라벨 전체 커버 | 데이터 편향 시 전사 실패 |
+| 전단사 | 단사 + 전사 | 가역 변환, 손실 없는 인코딩 | 공역 설정이 부정확하면 오판 |
+
+### 단사/전사 검사 코드
+
+```python
+def is_injective(mapping: dict) -> bool:
+    return len(set(mapping.values())) == len(mapping)
+
+def is_surjective(mapping: dict, codomain: set) -> bool:
+    return set(mapping.values()) == codomain
+
+m = {"a": 1, "b": 2, "c": 3}
+print(is_injective(m), is_surjective(m, {1,2,3}))
+```
+
+실무에서 공역을 명시하지 않으면 전사 판정은 무의미해집니다. 따라서 함수 계약서에 공역을 분명하게 쓰는 습관이 필요합니다.
+
+### 관계와 함수를 분리하는 이유
+
+데이터베이스 조인 결과나 검색 인덱스 매핑은 종종 하나의 입력이 여러 출력을 가집니다. 이는 함수가 아니라 관계입니다. 관계를 함수처럼 가정하면 캐시, 테스트, 역변환에서 문제가 생깁니다. 집합과 함수를 배운다는 것은 결국 모델의 성질을 잘못 가정하지 않는 훈련입니다.
+
 ## 처음 질문으로 돌아가기
 
 - **집합은 왜 자료구조와 데이터 모델의 기초라고 할까요?**

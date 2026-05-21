@@ -45,13 +45,13 @@ In this chapter, we compare shared-kernel isolation with hypervisor-based isolat
 
 This picture places Containers vs VMs inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Containers vs VMs is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Containers share the host kernel for speed; VMs run their own kernel for isolation. Neither is universally "better" — the choice depends on your isolation and resource trade-offs.
 
 ## Why It Matters
 
 Choosing *isolation that fits the workload* keeps both *cost* and *security* under control. The two are *complementary*, not competitors.
 
-## Concept at a Glance
+VMs boot a full OS image (slow, GB memory per instance) but achieve strong isolation. Containers run processes directly on the host kernel (fast, MB per instance) but share more surface area. Containers are suited for microservices; VMs are needed when you require different OSes or complete tenant isolation.
 
 ## Key Terms
 

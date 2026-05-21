@@ -42,8 +42,6 @@ This is post 4 in the SRE 101 series. Here we connect SLO math to release policy
 
 This picture places Error Budget inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-
-
 ## Why this topic matters
 
 Speed and stability are not enemies, but they do need a shared decision rule. Otherwise every outage triggers a different reaction depending on who is loudest in the room.

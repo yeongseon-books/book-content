@@ -42,15 +42,11 @@ This is post 8 in the Docker 101 series. It uses PostgreSQL and FastAPI to show 
 
 This picture places Running with a Database inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Running with a Database is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 If the app starts *before* the DB is ready, you get *cold-start incidents*. If migrations are *not automated*, deployments become *manual*.
 
 > *The app-DB seam is the *most common incident site* and the *biggest automation opportunity*.*
-
-## Concept at a Glance
 
 ## Key Terms
 

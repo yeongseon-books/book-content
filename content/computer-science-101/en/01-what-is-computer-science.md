@@ -43,8 +43,6 @@ In this article, we'll define what computer science actually studies, why abstra
 
 This picture places What Is Computer Science? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is Computer Science? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions This Article Answers
 
 - How is computer science different from programming, and what does it actually study?
@@ -67,8 +65,6 @@ Learning a programming language and learning computer science are not the same. 
 > CS = the study of the principles, limits, and applications of computation.
 
 This series walks through the major subjects of a CS curriculum, one at a time, to draw the whole picture.
-
-## Concept at a Glance
 
 > Computer science has three pillars: theory, systems, and applications. Every subject is connected through one shared tool — abstraction.
 

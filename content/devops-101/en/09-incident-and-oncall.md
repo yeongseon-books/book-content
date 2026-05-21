@@ -58,8 +58,6 @@ Incidents are an *organizational* problem more than a *technical* one. Without *
 
 > *Process* is a substitute for *memory*.
 
-## Concept at a Glance
-
 On-call means someone is ready to *respond to failures*. Good on-call systems are *on-duty* (not always awake), *supported* (team responds together), and *learned from* (postmortems prevent repeats).
 
 ## Key Terms

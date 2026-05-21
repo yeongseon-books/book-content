@@ -42,8 +42,6 @@ This is post 5 in the Alembic 101 series. Here we will cover why branches appear
 
 This picture places branches and merges: combining revisions made in parallel inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of branches and merges: combining revisions made in parallel is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 On any team where several people open PRs in parallel, alembic branches happen almost every week. A branch on its own is normal, but the first time you hit `Multiple head revisions are present` and a deploy stops, panic sets in. This post is the calm-merge guide for that moment.

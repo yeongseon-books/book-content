@@ -222,6 +222,64 @@ recall = np.mean([recall_at_k(a, e) for a, e in zip(ivf_results, flat_results)])
 
 다음 글에서는 검색기 뒤에 LLM을 연결해 종단 간 RAG 파이프라인을 평가합니다. 이제부터는 문서를 찾는 것뿐 아니라 답변 자체도 함께 점수화해야 합니다.
 
+### VectorDB 벤치마크 결과 예시
+
+아래 표는 동일한 100k 문서 벡터(384차원), 동일한 top-k=5 조건에서 측정한 예시입니다. 숫자는 환경에 따라 달라지지만, 해석 방법은 그대로 적용할 수 있습니다.
+
+| 후보 | 파라미터 | Recall@5 (vs Flat) | P50 검색 지연(ms) | P95 검색 지연(ms) | 메모리(MB) |
+| --- | --- | ---: | ---: | ---: | ---: |
+| FAISS FlatIP | exact | 1.00 | 18.1 | 24.7 | 382 |
+| FAISS IVFFlat | nlist=316, nprobe=4 | 0.95 | 4.8 | 7.2 | 386 |
+| FAISS IVFFlat | nlist=316, nprobe=8 | 0.99 | 7.6 | 11.4 | 386 |
+| HNSW | M=32, efSearch=64 | 0.98 | 3.9 | 6.0 | 514 |
+
+이 표는 "무조건 가장 빠른 후보"를 고르는 데 쓰는 표가 아닙니다. 제품 요구사항(예: recall 0.97 이상, P95 10ms 이하)을 만족하는 후보를 빠르게 걸러내는 표입니다.
+
+### 연결 설정 예시를 코드로 남기기
+
+벤치마크 리포트에는 인덱스 성능만이 아니라 연결 설정도 함께 남겨야 재현이 가능합니다. 로컬 라이브러리형과 서버형 VectorDB를 함께 쓰는 팀에서는 설정 누락이 가장 흔한 재현 실패 원인입니다.
+
+```python
+# Qdrant client example
+from qdrant_client import QdrantClient
+from qdrant_client.models import Distance, VectorParams
+
+client = QdrantClient(
+    url="http://qdrant:6333",
+    api_key="${QDRANT_API_KEY}",
+    timeout=5.0,
+)
+
+client.recreate_collection(
+    collection_name="rag_docs",
+    vectors_config=VectorParams(size=384, distance=Distance.COSINE),
+)
+```
+
+```python
+# pgvector connection example
+import psycopg
+
+conn = psycopg.connect(
+    "host=pgvector-db port=5432 dbname=rag user=rag_app password=${PG_PASSWORD}"
+)
+with conn.cursor() as cur:
+    cur.execute("CREATE EXTENSION IF NOT EXISTS vector")
+    cur.execute("SELECT 1")
+```
+
+연결 예시를 남길 때는 타임아웃, 인증 방식, 벡터 차원, 거리 함수를 반드시 포함하는 편이 좋습니다. 이 네 가지가 다르면 같은 이름의 벤치마크라도 결과 해석이 달라집니다.
+
+### 결과 해석을 의사결정 규칙으로 변환하기
+
+벤치마크 숫자는 보고서로 끝나기 쉽습니다. 그래서 팀 규칙으로 연결하는 마지막 단계가 필요합니다. 예를 들면 아래처럼 명시할 수 있습니다.
+
+- 검색 SLA가 `P95 <= 12ms`이고 recall 하한이 `0.97`이면 `IVF(nprobe=8)` 또는 `HNSW`만 후보로 유지합니다.
+- 필터링 복잡도와 운영 단순성이 우선이면 `pgvector`를 우선 검토하고, 대규모 고QPS이면 전용 VectorDB를 우선 검토합니다.
+- 모델 차원 변경(384 -> 1024)이 발생하면 기존 벤치마크를 폐기하고 동일 절차로 재측정합니다.
+
+이처럼 선택 규칙을 숫자와 함께 문서화하면 "왜 이 VectorDB를 선택했는가"를 다음 분기에도 설명할 수 있습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **VectorDB는 기능 목록이 아니라 어떤 운영 조건으로 비교해야 할까요?**
@@ -253,5 +311,7 @@ recall = np.mean([recall_at_k(a, e) for a, e in zip(ivf_results, flat_results)])
 - [FAISS getting started](https://github.com/facebookresearch/faiss/wiki/Getting-started)
 - [pgvector](https://github.com/pgvector/pgvector)
 - [Qdrant benchmarks](https://qdrant.tech/benchmarks/)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/rag-benchmark-101/ko/04-vectordb-selection)
 
 Tags: RAG, VectorDB, Benchmarking, LLM

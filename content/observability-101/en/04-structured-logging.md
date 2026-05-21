@@ -58,8 +58,6 @@ To find the responsible line *within five minutes* of an incident, logs must be 
 
 > *A log is *data*, not prose.*
 
-## Concept at a Glance
-
 Observability is the ability to understand a system's internal state from external signals. In a distributed system, you cannot instrument every line of code. You rely on *metrics* (what happened), *logs* (why it happened), and *traces* (where it happened).
 
 ## Key Terms

@@ -330,4 +330,6 @@ AI Safety가 중요한 이유는 모델이 특별히 위험해서가 아니라, 
 - [LLM 앱 운영 101 — LLM 앱 보안](../../llm-apps-ops-101/ko/04-security.md)
 - [LLM 앱 운영 101 — LLM 앱 모니터링과 로깅](../../llm-apps-ops-101/ko/01-monitoring-and-logging.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-safety-guardrails-101/ko/01-why-ai-safety-matters)
+
 Tags: AI Safety, Guardrails, Threat Model, LLM Security

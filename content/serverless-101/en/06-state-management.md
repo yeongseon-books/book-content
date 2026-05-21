@@ -42,8 +42,6 @@ This is post 6 in the Serverless 101 series.
 
 This picture places State Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of State Management is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - the meaning of *stateless*
@@ -57,8 +55,6 @@ This picture places State Management inside an operating flow. The point is not 
 A function instance can disappear at any time, and the next request from the same user may land on a different instance. That makes in-memory or local-disk state look acceptable in a local demo and dangerously unreliable in production.
 
 State management is not a side concern in serverless. It determines where sessions live, how retries become safe, where workflow progress is stored, and how much complexity you keep inside one function versus pushing into a clearer orchestration model.
-
-## Concept at a Glance
 
 This is the core serverless shape: functions do work, but external systems own durable memory. Caches hold short-lived state, databases own long-lived state, and workflow engines track multi-step progress that would be painful to reconstruct from function code alone.
 

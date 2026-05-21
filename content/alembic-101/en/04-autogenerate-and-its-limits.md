@@ -42,8 +42,6 @@ This is post 4 in the Alembic 101 series. Here we will separate what autogenerat
 
 This picture places autogenerate: the line between what it catches and what it misses inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of autogenerate: the line between what it catches and what it misses is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 Autogenerate is alembic's most powerful feature, but the moment you treat it as a "press a button and you're done" tool, production incidents start. Committing a generated file as-is and watching a column rename get expanded into drop+create — losing the data — is a real, common failure.

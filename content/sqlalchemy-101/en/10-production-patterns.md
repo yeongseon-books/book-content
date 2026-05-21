@@ -46,8 +46,6 @@ This is the final article in the SQLAlchemy 101 series.
 
 This picture places Production patterns: pools, observability, migrations, and deploys inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Production patterns: pools, observability, migrations, and deploys is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 Everything so far has been about whether the code is correct. Production adds another layer. The same code falls apart under load if the pool is wrong, you cannot tell what is slow without observability, and a single deploy becomes an incident if the migration order is bad.

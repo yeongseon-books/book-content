@@ -45,8 +45,6 @@ In this post, we focus on deep modules, small public surfaces, and information h
 
 This picture places Modules and Boundaries inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Modules and Boundaries is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - A definition of a module
@@ -60,8 +58,6 @@ This picture places Modules and Boundaries inside an operating flow. The point i
 Module boundaries are walls that contain change. Good walls keep changes on one side from leaking to the other.
 
 > A good boundary permits ignorance.
-
-## Concept at a Glance
 
 Small surface, deep interior.
 

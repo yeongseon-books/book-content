@@ -42,8 +42,6 @@ This is post 7 in the Python Package 101 series. Here we connect `[project.scrip
 
 This picture places CLI Packages inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of CLI Packages is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What you will learn
 
 - How to register a CLI entry point with `[project.scripts]`

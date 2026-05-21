@@ -42,15 +42,11 @@ This is post 7 in the Docker 101 series. It turns a simple FastAPI example into 
 
 This picture places Containerizing a Python App inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Containerizing a Python App is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 *Python in a container* often *fails to receive SIGTERM*, breaking *graceful shutdown*. This is a common cause of *deploy incidents*.
 
 > *PID 1 in a container needs to be a *small init* or a process with *correct signal handling*.*
-
-## Concept at a Glance
 
 ## Key Terms
 

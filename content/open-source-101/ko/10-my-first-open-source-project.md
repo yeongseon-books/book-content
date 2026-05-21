@@ -62,6 +62,20 @@ MVP는 가장 작은 유효 제품입니다. scope는 이번 릴리스에 들어
 
 이 다섯 가지를 이해하면 완벽주의 때문에 공개를 미루는 패턴에서 조금 벗어날 수 있습니다. 처음부터 모든 것을 해결하는 대신, 작게 내고 배우는 구조를 만들 수 있기 때문입니다.
 
+## 메인테이너 번아웃 신호
+
+첫 프로젝트를 공개하면 흥분되지만, 시간이 지나면서 유지보수 부담이 느껴집니다. 메인테이너 번아웃은 갑자기 오는 것이 아니라 신호가 있습니다.
+
+| 신호 | 증상 | 대응 |
+|---|---|---|
+| 응답 지연 | 이슈/PR에 2주 이상 무응답 | 응답 주기 개선 또는 자동화 |
+| 이슈 축적 | 미해결 이슈 100개+ | triage 루틴 강화, 라벨링 |
+| 동기 저하 | 코드 작성에 흥미 상실 | 서브 프로젝트 분리, 휴식 |
+| 불명확한 방향 | 기능 추가를 계속 미룸 | 로드맵 작성, non-goals 명시 |
+
+이 신호들을 방치하면 프로젝트가 서서히 방치됩니다. 번아웃을 느껴다면 부끄러운 것이 아니라 프로젝트 구조를 고쳐야 한다는 신호입니다. 메인테이너 역할을 나누거나, 자동화를 더하거나, 프로젝트 범위를 줄이는 것이 해결책입니다.
+
+첫 프로젝트의 가장 큰 가치는 완성도가 아니라 끝까지 공개했다는 경험 그 자체입니다. 공개하기 전까지는 그저 학습용 코드였지만, 공개하는 순간 책임을 지는 산출물로 바뀝니다.
 ## 생각이 어떻게 바뀌어야 할까
 
 처음에는 아이디어는 있지만 공개할 정도의 프로젝트는 아니라고 느끼기 쉽습니다. 하지만 첫 오픈소스 프로젝트는 거대한 제품일 필요가 없습니다.
@@ -129,6 +143,55 @@ gh release create v0.1.0 --generate-notes
 
 중요한 것은 처음부터 완벽하게 잘 만드는 일이 아닙니다. 작은 범위를 정하고, 문서를 붙이고, 공개하고, 반응을 받아 다음 개선으로 이어 가는 흐름을 직접 한 번 통과하는 일입니다.
 
+## 프로젝트 인수인계
+
+첫 프로젝트를 시작하는 것만큼이나 끝내는 것도 중요합니다. 메인테이너가 더 이상 프로젝트를 지속할 수 없다면 인수인계 절차를 밟아야 합니다.
+
+**1단계: 명확한 공지**
+
+프로젝트를 더 이상 유지하지 않는다는 것을 명확히 공지하는 편이 정직합니다. README 맨 위에 배지를 추가하면 좋습니다.
+
+```markdown
+## Status: Archived
+
+This project is no longer maintained.
+We accept no new issues or pull requests.
+```
+
+**2단계: 후임자 찾기**
+
+프로젝트를 완전히 닫기 전에 후임자를 찾아보는 것도 좋습니다. 정기 기여자 중에서 메인테이너 역할을 넘길 사람을 물어볼 수 있습니다.
+
+```markdown
+## Looking for New Maintainer
+
+I can no longer maintain this project.
+If you are a regular contributor and interested in taking over,
+please open an issue.
+```
+
+**3단계: 포크 권장**
+
+후임자를 찾지 못했다면 fork를 권장하는 것이 더 나은 대안입니다. 오픈소스의 본질은 코드가 계속 살아갈 수 있도록 하는 것입니다.
+
+```markdown
+## Fork Recommended
+
+This project is archived.
+Community members are encouraged to fork and continue development.
+Notable forks:
+- @alice/tinytool (active)
+```
+
+**4단계: GitHub Archive**
+
+공식적으로 프로젝트를 끝냄다면 GitHub의 Archive 기능을 사용할 수 있습니다. 이렇게 하면 저장소는 읽기 전용이 되고, 새 이슈나 PR은 받지 않습니다.
+
+```bash
+# Repository Settings → Archive this repository
+```
+
+프로젝트를 깨끗하게 마무리하는 것도 메인테이너의 책임입니다. 방치하기보다는 명시적으로 끝내고 후임자를 찾거나 fork를 권장하는 편이 커뮤니티에 훨씬 나습니다.
 ## 자주 하는 실수 다섯 가지
 
 1. 완벽해질 때까지 공개를 미룹니다.
@@ -170,6 +233,84 @@ gh release create v0.1.0 --generate-notes
 
 - **프로젝트가 더 이상 관리할 수 없으면 어떻게 해야 할까요?** Archived 상태로 변경하고, 다른 메인테이너를 찾거나 포크를 권장하는 공지를 남기는 것이 정직하고 책임감 있는 대응입니다.
 <!-- toc:begin -->
+
+## 장기 유지보수 자동화
+
+첫 프로젝트를 오래 유지하려면 자동화를 최대한 활용해야 합니다. 특히 라이브러리 의존성을 정기적으로 업데이트하는 일은 Dependabot과 GitHub Actions로 완전히 자동화할 수 있습니다.
+
+**Dependabot 설정**
+
+```yaml
+# .github/dependabot.yml
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+```
+
+Dependabot은 의존성 업데이트 PR을 자동으로 생성합니다. 테스트가 통과하면 병합하기만 하면 됩니다.
+
+**자동 병합 설정 (선택)**
+
+```yaml
+# .github/workflows/auto-merge.yml
+name: Auto Merge Dependabot
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  auto-merge:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Wait for CI
+      run: sleep 60
+    - name: Merge if tests pass
+      run: gh pr merge --auto --squash "${{ github.event.pull_request.number }}"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+**Security Advisory 자동 모니터링**
+
+GitHub Security Advisory는 의존성 취약점을 자동 감지합니다. 이를 활성화하면 Dependabot이 보안 업데이트를 우선적으로 제안합니다.
+
+```markdown
+# Repository Settings → Security & analysis
+- Dependabot alerts: Enabled
+- Dependabot security updates: Enabled
+```
+
+**자동화 결합 예시**
+
+```yaml
+# .github/workflows/ci.yml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    - run: pip install -r requirements.txt
+    - run: pytest
+    - run: ruff check
+```
+
+이런 자동화가 갖춰지면 메인테이너는 의존성 업데이트를 수동으로 할 필요가 없습니다. Dependabot이 PR을 만들고, CI가 테스트하고, 모든 검사가 통과하면 자동 병합됩니다. 메인테이너는 큰 결정만 하면 되므로 번아웃을 크게 줄일 수 있습니다.
 ## 시리즈 목차
 
 - [Open Source 101 (1/10): 오픈소스란 무엇인가](./01-what-is-open-source.md)

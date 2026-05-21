@@ -48,8 +48,6 @@ This picture places Merge and Join inside an operating flow. The point is not to
 
 Real data is *spread across many tables*. *Joining ability* equals *analysis ability*.
 
-## Concept at a Glance
-
 ## Key Terms
 
 - **inner**: keys *present in both*.

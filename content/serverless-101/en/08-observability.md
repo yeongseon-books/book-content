@@ -42,8 +42,6 @@ This is post 8 in the Serverless 101 series.
 
 This picture places Observability inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Observability is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - the *three legs* of observability
@@ -57,8 +55,6 @@ This picture places Observability inside an operating flow. The point is not to 
 In a long-lived server process, one log stream can sometimes carry enough context. In a serverless system, execution hops between environments and often crosses asynchronous boundaries. If you do not preserve correlation across those boundaries, you are left with symptoms but not a path.
 
 Observability is also a cost design problem. What you log, how long you retain it, where you sample traces, and which metrics power alerts all change both your debugging speed and your bill.
-
-## Concept at a Glance
 
 The point is not to collect three disconnected signal types. The point is to connect them so a single slow request can be traced through logs, metrics, and spans without guesswork.
 

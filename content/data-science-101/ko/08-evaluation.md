@@ -40,9 +40,9 @@ last_reviewed: '2026-05-15'
 
 *Data Science 101 8장 흐름 개요*
 
-이 그림에서는 평가를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+평가를 운영 시스템 속에서 올바르게 배치하려면 어떤 경계에서 무엇을 입력받고, 어디에서 검증하며, 어떤 신호를 남겨야 하는지 먼저 봐야 합니다.
 
-> 평가의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+> 평가의 핵심은 기능 이름이 아니라, 입력을 받는 경계에서 결과를 내보내는 경계까지 어떤 기준으로 데이터를 검증하고 처리할 것인가를 명확히 정하는 데 있습니다.
 
 ## 이 글에서 배우는 내용
 
@@ -176,6 +176,103 @@ print("expected cost:", cost)
 ## 정리 및 다음 글
 
 평가는 단순히 점수를 읽는 단계가 아니라, 문제와 모델이 같은 방향을 보고 있는지 확인하는 단계입니다. 어떤 오류가 더 비싼지 지표에 반영해야 결과가 실무 의사결정과 연결됩니다. 다음 글에서는 이렇게 얻은 결과를 어떻게 과장 없이 해석하고 결정으로 옮길지 살펴보겠습니다.
+
+## 실무 확장: 평가 지표 비교와 혼동행렬 기반 해석
+
+평가 단계에서는 지표를 많이 보는 것보다 올바르게 보는 것이 중요합니다. 정확도 하나로 모든 문제를 설명하려고 하면 비즈니스 비용과 실패 유형을 놓치기 쉽습니다. 이 섹션에서는 분류 평가를 중심으로 지표 비교표와 혼동행렬 해석 프레임을 제시합니다.
+
+### 분류 지표 비교표
+
+| 지표 | 질문 | 장점 | 한계 | 적합한 상황 |
+| --- | --- | --- | --- | --- |
+| Accuracy | 전체에서 맞춘 비율은? | 직관적 | 불균형 데이터에 취약 | 클래스 균형 문제 |
+| Precision | 양성 예측 중 진짜 비율은? | 오탐 비용 관리 | 놓침 위험 반영 약함 | 알람 피로 큰 문제 |
+| Recall | 실제 양성 중 잡은 비율은? | 놓침 비용 관리 | 오탐 증가 가능 | 탐지/진단 문제 |
+| F1 | 정밀도-재현율 균형은? | 균형 판단 용이 | 비용 차이 직접 반영 어려움 | 균형형 의사결정 |
+| ROC AUC | 임계값 전반 구분 능력은? | 임계값 의존도 낮음 | 실제 임계값 결정은 별도 필요 | 모델 비교 단계 |
+
+### confusion matrix 해석 루틴
+
+```python
+from sklearn.metrics import confusion_matrix, classification_report
+
+cm = confusion_matrix(y_test, y_pred)
+print(cm)
+print(classification_report(y_test, y_pred, digits=4))
+
+# TN, FP, FN, TP
+TN, FP, FN, TP = cm.ravel()
+print({"false_positive": int(FP), "false_negative": int(FN)})
+```
+
+해석의 핵심은 FP/FN을 비용 관점으로 다시 읽는 것입니다. 예를 들어 의료 스크리닝에서는 FN 비용이 훨씬 크므로 recall 우선 전략이 자연스럽습니다.
+
+### 임계값 조정 예시
+
+```python
+import numpy as np
+from sklearn.metrics import f1_score
+
+proba = model.predict_proba(X_valid)[:, 1]
+thresholds = np.linspace(0.1, 0.9, 17)
+records = []
+for t in thresholds:
+    pred = (proba >= t).astype(int)
+    records.append((t, f1_score(y_valid, pred)))
+
+best_t, best_f1 = max(records, key=lambda x: x[1])
+print("best_threshold:", round(best_t, 2), "best_f1:", round(best_f1, 4))
+```
+
+이 과정은 "모델 점수"와 "운영 정책"을 연결합니다. 임계값을 정하지 않으면 모델은 확률만 내고 행동은 정해지지 않습니다.
+
+### 평가 리포트 템플릿
+
+- 데이터 버전: `churn_v2026_05`
+- 주 지표: Recall@threshold=0.35
+- 가드레일: Precision >= 0.70
+- 비용 함수: `5 * FN + 1 * FP`
+- 배포 판단: 조건 충족/미충족 + 근거
+
+평가는 실험의 끝이 아니라 운영 시작점입니다. 지표를 비용과 연결해야 실제 서비스에서 의미 있는 성능 관리가 가능합니다.
+
+### 보강 메모: 팀 운영 관점에서 꼭 남겨야 할 기록
+
+입문 프로젝트에서는 코드가 돌아가는 것만으로도 큰 성취를 느끼기 쉽습니다. 하지만 실무에서 더 중요한 것은 같은 결과를 팀이 다시 만들 수 있는가입니다. 그래서 본문 실습을 수행한 뒤에는 다음 항목을 반드시 문서로 남기는 습관이 필요합니다.
+
+- 실행 날짜와 데이터 버전
+- 사용한 핵심 컬럼 목록과 정의
+- 주요 가정(제외한 데이터, 임계값, 기간)
+- 결과 해석 시 주의할 제약 조건
+- 다음 반복에서 확인할 질문
+
+이 다섯 가지를 기록하면 다음 사이클에서 같은 논의를 처음부터 반복하지 않아도 됩니다. 특히 모델 점수나 차트 결과처럼 숫자가 좋아 보이는 상황일수록 제약 조건을 함께 적는 것이 중요합니다. 수치의 강점과 약점을 함께 남겨야 팀이 과신하지 않고, 반대로 필요한 행동은 빠르게 실행할 수 있습니다.
+
+### 보강 예시: 재현 가능한 결과 패키지 만들기
+
+```python
+from pathlib import Path
+import json
+import datetime as dt
+
+meta = {
+    "run_at": dt.datetime.utcnow().isoformat(),
+    "dataset": "example_v1",
+    "assumptions": [
+        "trial users excluded",
+        "analysis window = last 30 days",
+        "threshold fixed before final test",
+    ],
+    "next_question": "Which segment shows largest variance next week?",
+}
+
+out = Path("artifacts")
+out.mkdir(exist_ok=True)
+(out / "run_meta.json").write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
+print("saved", out / "run_meta.json")
+```
+
+이 코드는 분석 산출물을 실행 메타데이터와 함께 저장하는 가장 작은 예시입니다. 이렇게 작은 기록이 쌓이면 팀 차원의 학습 속도가 크게 올라갑니다. 프로젝트는 한 번의 정답을 찾는 작업이 아니라 반복을 통해 품질을 높이는 작업이기 때문입니다.
 
 ## 처음 질문으로 돌아가기
 

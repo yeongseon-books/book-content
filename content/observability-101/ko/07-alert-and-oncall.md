@@ -50,6 +50,18 @@ last_reviewed: '2026-05-15'
 
 좋은 경보 설계는 반대로 팀을 보호합니다. 사용자 영향이 분명한 문제만 즉시 깨우고, 나머지는 업무 시간 안에 처리할 수 있게 나누면 사람의 에너지를 중요한 문제에 집중시킬 수 있습니다.
 
+### 알림 심각도 기준
+
+알림은 모두 같은 급으로 취급할 수 없습니다. 즉시 대응해야 하는 것과 내일 아침에 처리해도 되는 것을 나누는 기준이 있어야 온콜이 오래 갑니다.
+
+| 심각도 | 응답 시간 | 에스커레이션 | 예시 |
+|---|---|---|---|
+| P1 (Critical) | 15분 이내 | 30분후 팀장, 1시간후 경영진 | 결제 서비스 중단, 데이터 유출 |
+| P2 (High) | 30분 이내 | 1시간후 팀장 | 특정 API 5xx 5% 이상 |
+| P3 (Medium) | 4시간 이내 | 없음 | 디스크 사용률 80% |
+| P4 (Low) | 업무 시간 내 | 없음 | 로그 용량 증가 추세 |
+
+P1과 P2만 새벽에 사람을 깨우고, P3은 슬랙 채널로 보내고, P4는 일일 티켓으로 발급합니다. 이 기준은 팀의 업무 특성과 SLO에 따라 조정하지만, 기본 틀은 사용자 영향과 비즈니스 손실을 기준으로 삼습니다.
 ## 한눈에 보는 구조
 
 경보의 목표는 인간이 즉시 조치해야 할 진짜 문제만 알리는 것입니다. 위양성이 많으면 팀이 경보를 무시하게 되므로, 신뢰 가능한 기준 설정이 중요합니다.
@@ -129,6 +141,44 @@ The runbook covers: meaning, first 3 actions, escalation, related dashboards.
 
 경보가 울린 뒤 처음 세 행동을 적어 두지 않으면, 받는 사람은 매번 처음부터 생각해야 합니다. 경보 없는 런북도 약하지만, 런북 없는 경보는 더 위험합니다.
 
+### 알림 규칙 의사코드 예시
+
+경보 규칙을 코드로 표현하면 논리가 더 명확해집니다. 아래는 Python 풍 의사코드 예시입니다.
+
+```python
+def evaluate_alert_rule(metrics, threshold, duration):
+    """
+    경보 규칙 평가 로직
+    metrics: 시계열 데이터 포인트 목록
+    threshold: 임계값
+    duration: 지속 시간 (for 절)
+    """
+    breaches = []
+    for point in metrics:
+        if point.value > threshold:
+            breaches.append(point.timestamp)
+        else:
+            breaches.clear()  # 임계 아래로 떨어지면 초기화
+    
+    if len(breaches) > 0:
+        first_breach = breaches[0]
+        last_breach = breaches[-1]
+        if (last_breach - first_breach) >= duration:
+            return "FIRING", first_breach
+    return "OK", None
+
+# 예시 사용
+result, since = evaluate_alert_rule(
+    error_rate_samples,
+    threshold=0.05,
+    duration=timedelta(minutes=10)
+)
+if result == "FIRING":
+    send_alert(severity="page", since=since)
+```
+
+이 로직은 Prometheus 규칙 엔진과 동일한 원리로 작동합니다. 임계를 넘으면 계속 쌓이고, 아래로 떨어지면 초기화되며, `for` 지속 시간이 충족하면 `FIRING` 상태가 됩니다.
+
 ## 경보 품질을 이렇게 확인합니다
 
 새 경보를 넣을 때는 쿼리 정확성보다 먼저 사람이 받을 만한 신호인지 검증해야 합니다. 가장 단순한 점검 순서는 아래와 같습니다.
@@ -146,6 +196,94 @@ Expected output:
 - ticket 등급 경보는 업무 시간 채널로만 전달됩니다.
 - 경보 메시지 안에 summary, runbook, owner 정보가 모두 들어 있습니다.
 ```
+
+### 알림 피로 줄이기
+
+알림 피로는 경보를 받는 사람이 더 이상 경보를 신뢰하지 않게 되는 상태입니다. 이를 줄이는 기법은 크게 세 가지입니다.
+
+**Grouping (묶기)**
+
+비슷한 원인의 경보를 하나의 알림으로 묶습니다. 예를 들어 같은 호스트에서 세 서비스가 동시에 문제가 생기면 알림 세 개가 아니라 하나로 합쳐서 보냅니다. Alertmanager의 `group_by` 기능이 이를 자동화합니다.
+
+```yaml
+route:
+  group_by: ["instance", "severity"]
+  group_wait: 30s
+  group_interval: 5m
+```
+
+**Inhibition (억제)**
+
+상위 장애가 하위 장애를 가립니다. 네트워크가 끊기면 모든 서비스가 다운되었다는 경보가 쏟아지는데, 이때 네트워크 경보가 있으면 나머지는 일시적으로 숨깁니다.
+
+```yaml
+inhibit_rules:
+  - source_match: { alertname: NetworkDown }
+    target_match: { severity: warning }
+    equal: ["instance"]
+```
+
+**Silencing (일시 중지)**
+
+이미 알고 있는 문제나 유지보수 중인 경볰는 수동으로 일시 중지합니다. PagerDuty나 Alertmanager는 시간 범위를 지정해 특정 경보를 안보내게 할 수 있습니다.
+
+```bash
+amtool silence add alertname=DiskFull instance=node01 \
+  --duration=2h \
+  --comment="디스크 정리 작업 중"
+```
+
+세 기법을 함께 쓰면 동일한 오류를 반복해서 받는 피로를 크게 줄일 수 있습니다.
+
+### 온콜 교대 및 보상
+
+온콜은 노동이므로 교대와 보상 체계가 명확해야 합니다. 아래는 실제로 사용하는 정책 예시입니다.
+
+**교대 정책**
+
+- 1차 온콜: 주간 반, 주말 포함 7일
+- 2차 온콜: 1차가 30분 이내 응답 없으면 에스커레이션
+- 인수인계: 매주 금요일 오후 5시 주간 회고 후
+- 휴일: 온콜 주간 다음 주는 휴일
+
+**보상 체계**
+
+- 기본 보상: 주간 온콜 수당 1일 추가 휴가
+- 사고 대응 보상: 1시간 이상 대응 시 0.5일 추가 휴가
+- 야간/주말 보상: 평일 밤 11시 이후 또는 주말 사고는 1.5배
+
+이 정책은 팀마다 다르지만, 공통적으로 "온콜은 노동"이라는 인식이 있어야 합니다. 교대 없이 한 사람이 계속 온콜을 도는 구조는 오래 가지 못합니다.
+
+### 런북 작성 가이드
+
+런북은 경보가 왔을 때 처음 3분 안에 할 행동을 적은 문서입니다. 좋은 런북의 구조는 아래와 같습니다.
+
+```markdown
+# [P1] 결제 API 5xx 5% 초과
+
+## 의미
+결제 API의 5분간 5xx 응답이 전체 요청의 5%를 넘어 사용자 결제가 실패하고 있습니다.
+
+## 즉시 확인할 3가지
+1. Grafana 결제 API 대시보드에서 에러율 패턴 확인
+2. Loki에서 `{app="payment"} |= "error" | json | status >= 500` 쿼리로 에러 로그 확인
+3. 최근 10분 내 배포 여부 확인 (Slack #deploy 채널)
+
+## 1차 조치
+- 5xx가 특정 엔드포인트에 집중되어 있으면 해당 엔드포인트 로그 드릴다운
+- 최근 배포와 시간이 겹치면 롤백 검토
+- DB 연결 풀 고갈이면 connection limit 일시 증가
+
+## 에스컬레이션
+30분 이내 해결 안 되면 결제팀 리드에게 에스컬레이션 (Slack @payment-lead)
+
+## 관련 링크
+- 대시보드: https://grafana/d/payment
+- 로그: https://grafana/explore?loki
+- 포스트모템 템플릿: https://wiki/postmortem
+```
+
+런북은 경보마다 반드시 있어야 하고, 처음 받는 사람도 바로 실행할 수 있을 정도로 구체적이어야 합니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 
@@ -183,6 +321,68 @@ Expected output:
 ## 정리
 
 좋은 경보는 사람을 자주 깨우지 않고도 중요한 문제를 놓치지 않게 만듭니다. 조치 가능성, 사용자 영향, 명확한 소유자가 경보 설계의 핵심입니다. 다음 글에서는 경보의 기준이 되는 수치 약속, 곧 서비스 수준 지표와 목표를 살펴보겠습니다.
+
+## Alertmanager와 PagerDuty 연동 예시
+
+경보 시스템이 성숙하려면 "울린다"에서 끝나면 안 됩니다. 누가 받는지, 몇 분 안에 응답해야 하는지, 실패하면 어디로 승격되는지가 함께 정의되어야 합니다.
+
+```yaml
+route:
+  receiver: slack-default
+  group_by: ["alertname", "service", "severity"]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 2h
+  routes:
+    - matchers:
+        - severity="page"
+      receiver: pagerduty-critical
+    - matchers:
+        - severity="ticket"
+      receiver: opsgenie-warning
+
+receivers:
+  - name: pagerduty-critical
+    pagerduty_configs:
+      - routing_key: "PD_ROUTING_KEY"
+        severity: "critical"
+        description: "{{ .CommonAnnotations.summary }}"
+
+  - name: opsgenie-warning
+    opsgenie_configs:
+      - api_key: "OPS_GENIE_KEY"
+        priority: "P3"
+
+  - name: slack-default
+    slack_configs:
+      - channel: "#ops-alerts"
+        send_resolved: true
+```
+
+이 구성의 핵심은 심각도 라벨이 곧 라우팅 정책이 된다는 점입니다. 코드에서 `severity=page`를 남발하면 사람을 깨우는 비용이 통제되지 않습니다. 반대로 `severity=ticket`만 쓰면 중요한 장애를 놓칩니다.
+
+## 온콜 교대와 승격 정책 표
+
+| 단계 | 응답 시간 | 담당 | 실패 시 다음 단계 |
+| --- | --- | --- | --- |
+| 1차 온콜 | 15분 | 주간 primary | 2차 온콜로 승격 |
+| 2차 온콜 | 20분 | 주간 secondary | 팀 리드 승격 |
+| 팀 리드 | 30분 | 서비스 오너 | 사고 지휘 전환 |
+| 사고 지휘 | 즉시 | incident commander | 비즈니스 커뮤니케이션 시작 |
+
+표준 승격 정책이 없으면 장애가 커졌을 때 책임 경계가 흐려집니다. 특히 야간에는 의사결정권자가 늦게 참여해 복구 시간이 길어지는 경우가 많습니다. 승격 단계는 사람 이름이 아니라 역할 기준으로 관리해야 교대 시에도 정책이 유지됩니다.
+
+## 경보 품질 지표
+
+경보 자체도 품질을 측정해야 개선이 됩니다. 아래 지표를 주간 단위로 리뷰하면 알림 피로를 수치로 관리할 수 있습니다.
+
+1. 페이지 경보 건수(주간): 팀별 목표 상한 설정
+2. 오경보 비율: `false_positive / total_alerts`
+3. MTTA(평균 인지 시간): 경보 발생부터 확인까지
+4. MTTR(평균 복구 시간): 인지부터 복구까지
+5. Runbook 미연결 경보 비율: 0% 목표
+
+오경보 비율이 높으면 규칙이 민감한 것이고, MTTA가 높으면 라우팅이나 승격 체계가 약한 것입니다. 지표를 경보 시스템 자체의 SLO로 관리하면 장기적으로 온콜 피로가 줄어듭니다.
 
 ## 처음 질문으로 돌아가기
 

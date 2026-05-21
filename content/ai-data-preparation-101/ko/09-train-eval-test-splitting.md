@@ -281,4 +281,6 @@ LLM 시대에는 contamination 통제가 여기에 추가됩니다. benchmark가
 - [LLM 파인튜닝 101 — 데이터셋 준비와 전처리](../../llm-finetuning-101/ko/02-dataset.md)
 - [AI Evaluation 101 — LLM-as-Judge — 모델로 모델을 평가하기](../../ai-evaluation-101/ko/04-llm-as-judge.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-data-preparation-101/ko/09-train-eval-test-splitting)
+
 Tags: Train/Test Split, Contamination, Data Leakage, Stratification, Temporal Split, scikit-learn

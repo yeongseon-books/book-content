@@ -43,15 +43,11 @@ Here we compare RPC and message passing as two different contracts: one optimize
 
 This picture places RPC and Message Passing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of RPC and Message Passing is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Once you split services, the next decision is "how do they talk?" That decision drives latency budgets, blast radius, and operational complexity. Picking poorly creates RPC chains that take down the whole system when one node slows, or message flows you cannot trace.
 
 > The communication model decides system coupling.
-
-## Concept at a Glance
 
 RPC is a two-way contract. Message passing is a one-way flow with an intermediary store.
 

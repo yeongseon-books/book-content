@@ -44,8 +44,6 @@ Here, we will frame dependency management as supply-chain control rather than oc
 
 This picture places Managing Dependency Vulnerabilities inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Managing Dependency Vulnerabilities is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions This Chapter Answers
 
 - What *SCA* (Software Composition Analysis) means
@@ -59,8 +57,6 @@ This picture places Managing Dependency Vulnerabilities inside an operating flow
 Log4j, event-stream, ua-parser-js — *supply-chain attacks* succeed with *zero lines* of our code. A library you *don't know you depend on* becomes the *door*.
 
 > *Dependencies are *assets that will leak someday*. Tracking them is the start of defense.*
-
-## Concept at a Glance
 
 ## Key Terms
 

@@ -51,8 +51,6 @@ An API is the *face* of a system. The internals can change freely as long as the
 
 > An API should look more like a *promise that does not change*.
 
-## Concept at a Glance
-
 That is the whole point of an API boundary. The server can change storage, frameworks, or deployment shape underneath, but the public request and response contract must stay stable enough that clients do not need to care.
 
 ## Key Terms

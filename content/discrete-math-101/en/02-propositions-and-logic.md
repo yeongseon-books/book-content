@@ -45,8 +45,6 @@ This is post 2 in the Discrete Math 101 series.
 
 This picture places Propositions and Logic inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Propositions and Logic is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The distinction between propositions and non-propositions
@@ -61,8 +59,6 @@ Every `if` statement is the evaluation of a proposition. Every database query as
 > Propositional logic = a symbolic system for precise reasoning.
 
 This article builds the logical foundation that the next chapter (set theory) extends.
-
-## Concept at a Glance
 
 > Propositions carry truth values, combined by connectives whose meaning is defined by truth tables.
 

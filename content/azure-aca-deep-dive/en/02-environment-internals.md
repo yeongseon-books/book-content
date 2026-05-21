@@ -57,8 +57,6 @@ ACA's internal implementation is not published by Microsoft, so these versions a
 
 This picture places Environment internals — the network, observability, and Dapr scope boundary inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Environment internals — the network, observability, and Dapr scope boundary is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## The environment is the platform's isolation unit
 
 An environment is where ACA starts acting like a platform rather than a single app host.

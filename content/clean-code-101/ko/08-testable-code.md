@@ -41,9 +41,9 @@ last_reviewed: '2026-05-15'
 
 *Clean Code 101 8장 흐름 개요*
 
-이 그림에서는 테스트 가능한 코드를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+이 그림은 테스트 가능성을 질갠릌 단순명—단순 동스턴, 재사용 공곋, 비대추—차 단늵 반복 동스른—과 구리된 동스른 동스른 동스른 동스른 동스른—를 보여 줍니다.
 
-> 테스트 가능한 코드의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+> 숐주되고 멍멠른 먼진이 명넌 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른.
 
 ## 왜 중요한가
 
@@ -215,6 +215,120 @@ python -m pytest -q tests/test_http_adapter.py
 ## 정리 및 다음 단계
 
 테스트 가능성은 설계를 비추는 거울입니다. 다음 글에서는 코드를 안전하게 바꾸는 기술, 즉 리팩토링의 기본 절차를 다룹니다.
+
+
+## 코드 리뷰 체크리스트와 PR 작성 가이드(테스트 관점)
+
+테스트 가능한 코드는 PR 단계에서 더 쉽게 검증됩니다. 아래 체크리스트는 작성자와 리뷰어가 함께 보는 기준입니다.
+
+| 항목 | 작성자 확인 | 리뷰어 확인 | 기준 |
+| --- | --- | --- | --- |
+| 순수 로직 분리 | O | O | IO 없이 계산 검증 가능 |
+| 의존성 주입 | O | O | 시간/HTTP/DB를 외부에서 주입 |
+| 테스트 범위 | O | O | 핵심 분기 최소 1회 이상 검증 |
+| 테스트 속도 | O | O | 단위 테스트는 빠르게 완료 |
+| 경계 테스트 | O | O | 어댑터/통합 테스트 분리 |
+
+체크리스트를 문서화하면 "테스트를 더 써라" 같은 모호한 요청이 줄고, 무엇을 어디까지 검증해야 하는지가 명확해집니다.
+
+## PR 템플릿 예시
+
+```python
+PR_TEMPLATE = {
+    "what": "무엇을 바꿨는지",
+    "why": "왜 바꿨는지",
+    "how_tested": [
+        "unit: tests/test_order_policy.py",
+        "integration: tests/test_payment_adapter.py",
+    ],
+    "risk": "실패 시 영향 범위",
+    "rollback": "되돌림 절차",
+}
+```
+
+실제 PR 본문은 Markdown으로 작성하더라도, 위 필드를 일관되게 채우는 습관이 중요합니다. 리뷰어는 코드 diff를 보기 전에 맥락과 위험을 먼저 파악해야 정확한 피드백을 줄 수 있습니다.
+
+## 테스트 더블 선택 가이드
+
+```python
+class FakePaymentGateway:
+    def __init__(self):
+        self.charges = []
+
+    def charge(self, user_id: str, amount: int) -> dict:
+        self.charges.append((user_id, amount))
+        return {"status": "ok", "amount": amount}
+
+
+class SpyNotifier:
+    def __init__(self):
+        self.messages = []
+
+    def send(self, email: str, body: str) -> None:
+        self.messages.append((email, body))
+```
+
+Fake는 결과를 만들어 주는 대체 구현이고, Spy는 상호작용 기록을 검증하는 도구입니다. 테스트 의도에 맞는 더블을 선택해야 테스트가 읽기 쉬워집니다.
+
+## 테스트 가능성 개선을 위한 PR 분할 전략
+
+1. PR-1: 순수 함수 추출(동작 동일)
+2. PR-2: 의존성 주입 적용(동작 동일)
+3. PR-3: 테스트 추가 및 보강
+4. PR-4: 기능 변경
+
+위 순서를 지키면 리스크가 크게 줄어듭니다. 특히 "구조 변경 + 기능 추가"를 한 PR에 섞지 않는 것이 핵심입니다.
+
+```python
+def classify_test_layer(test_name: str) -> str:
+    if "adapter" in test_name or "integration" in test_name:
+        return "integration"
+    return "unit"
+```
+
+테스트 레이어를 분류해 추세를 보면, 단위 테스트가 부족한지 통합 테스트가 과도한지 빠르게 판단할 수 있습니다.
+
+
+## 실무 적용 메모
+
+아래 메모는 팀 내 합의 문서에 그대로 옮겨 적어도 되는 수준의 운영 규칙입니다.
+
+1. 리뷰는 코드 스타일보다 변경 위험을 먼저 다룹니다.
+2. 규칙 위반은 사람 지적보다 자동화 전환을 우선합니다.
+3. 반복되는 설계 결함은 교육 과제가 아니라 구조 개선 과제로 등록합니다.
+4. 모든 개선은 테스트와 함께 진행하며, 동작 변경 여부를 PR 설명에 명시합니다.
+5. 다음 분기 목표에는 "새 기능 수"와 함께 "변경 비용 감소 지표"를 반드시 포함합니다.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class QualityGate:
+    has_tests: bool
+    has_clear_names: bool
+    has_boundary_error_handling: bool
+    has_small_functions: bool
+    has_review_notes: bool
+
+
+def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
+    missing = []
+    if not gate.has_tests:
+        missing.append("tests")
+    if not gate.has_clear_names:
+        missing.append("naming")
+    if not gate.has_boundary_error_handling:
+        missing.append("error-boundary")
+    if not gate.has_small_functions:
+        missing.append("function-size")
+    if not gate.has_review_notes:
+        missing.append("review-notes")
+    return len(missing) == 0, missing
+```
+
+이 체크 함수는 단순하지만, 품질 기준을 코드로 표현하는 출발점이 됩니다. 팀이 기준을 말로만 합의하면 시간이 지나며 흐려집니다. 반대로 코드와 템플릿과 자동화 규칙으로 남기면 신규 멤버가 들어와도 동일한 기준이 유지됩니다.
+
+또한 개선 활동은 단발성 이벤트가 아니라 루프여야 합니다. 한 번의 대청소보다 매 PR마다 작은 개선을 추가하는 편이 장기적으로 더 강합니다. 이름 하나, 함수 하나, 분기 하나를 매번 더 낫게 만드는 습관이 쌓이면 코드베이스의 평균 품질이 올라가고, 장애 대응 속도도 실제로 빨라집니다.
 
 ## 처음 질문으로 돌아가기
 

@@ -52,8 +52,6 @@ The same move happens in production systems. Sensor readings, response times, us
 
 > A random variable is a function that maps possible outcomes into numbers, and a distribution is the rule that places probability mass or density on those numbers.
 
-## Concept at a Glance
-
 ## Key Terms
 
 - **Random variable X**: a function Ω → ℝ.

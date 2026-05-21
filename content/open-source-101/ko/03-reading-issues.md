@@ -62,11 +62,164 @@ issue는 버그 보고, 기능 제안, 질문, 작업 요청까지 포함하는 
 
 이 다섯 가지를 알고 읽으면 이슈가 막연한 토론 글이 아니라, 해결 가능성을 판단할 수 있는 문서로 바뀝니다.
 
+## Git 브랜치 전략 비교
+
+오픈소스 프로젝트마다 브랜치 전략이 다릅니다. 기여하기 전에 해당 프로젝트가 어떤 브랜치 모델을 사용하는지 파악해야 합니다.
+
+| 전략 | 복잡도 | 적합한 프로젝트 | 특징 |
+|---|---|---|---|
+| GitHub Flow | 낮음 | 작은 팀, 빠른 배포 | `main` + feature 브랜치, PR 머지 |
+| Git Flow | 높음 | 대형 프로젝트, 버전 관리 | `develop`, `release`, `hotfix` 분리 |
+| Trunk Based | 최저 | CI/CD 중심, 단기 브랜치 | `main` 직접 커밋, feature flag |
+
+**GitHub Flow**는 대부분의 오픈소스가 사용하는 가장 단순한 모델입니다. `main` 브랜치는 항상 배포 가능 상태를 유지하고, 모든 작업은 feature 브랜치에서 이루어집니다. PR이 머지되면 바로 배포됩니다.
+
+**Git Flow**는 복잡하지만 버전 관리가 중요한 프로젝트에 적합합니다. `develop`, `release`, `hotfix` 브랜치를 분리해 안정성을 높입니다. 하지만 초보 기여자에게는 진입 장벽이 높습니다.
+
+**Trunk Based Development**는 `main`에 직접 작은 커밋을 자주 하고, feature flag로 기능을 제어합니다. 고도로 CI/CD가 구축된 프로젝트에 적합하지만, 오픈소스에서는 드묽니다.
+
+## Fork → PR 워크플로 전체 명령어 예시
+
+기여 흐름을 전체 명령어로 한 번에 보면 각 단계의 역할이 명확해집니다.
+
+```bash
+# 1. Fork → Clone
+gh repo fork owner/repo --clone
+cd repo
+
+# 2. Upstream 원격 추가
+git remote add upstream https://github.com/owner/repo.git
+git remote -v
+
+# 3. 작업 브랜치 생성
+git checkout -b fix/issue-42
+
+# 4. 변경 사항 구현
+# (edit files)
+
+# 5. Stage + Commit
+git add .
+git commit -m "fix: resolve Safari 15 login issue
+
+Closes #42
+"
+
+# 6. 로컬 테스트
+pytest
+
+# 7. Push to fork
+git push origin fix/issue-42
+
+# 8. PR 생성
+gh pr create \
+  --title "fix: Safari 15 login issue" \
+  --body "Closes #42
+
+## Summary
+- Add cookie handling for Safari 15
+- Update test for cross-browser compatibility
+
+## Testing
+- Tested on Safari 15.1, Chrome 108, Firefox 107
+"
+
+# 9. 리뷰 피드백 반영
+# (edit files based on review)
+git add .
+git commit -m "fix: apply review feedback"
+git push origin fix/issue-42
+
+# 10. 머지 후 브랜치 삭제
+git checkout main
+git pull upstream main
+git branch -d fix/issue-42
+git push origin --delete fix/issue-42
+```
+
+이 흐름에서 가장 자주 놀치는 단계는 두 가지입니다. 하나는 upstream 원격을 추가하지 않아 나중에 동기화가 어려워지는 것이고, 다른 하나는 머지 후 브랜치를 삭제하지 않아 로컬이 엉망이 되는 것입니다.
+
+## rebase vs merge
+
+PR을 통합할 때 `rebase`와 `merge` 중 무엇을 선택할지는 프로젝트 정책에 따라 다릅니다. 두 방식의 차이를 이해하면 메인테이너의 선택을 존중할 수 있습니다.
+
+**merge**
+
+- 변경 사항을 한 덜어리로 통합하고 merge commit을 남깁니다
+- 장점: 히스토리가 온전하게 보존됩니다
+- 단점: 커밋 그래프가 복잡해지고, `git log`가 지저분해집니다
+- 적합: 기능 브랜치 통합, 협업 히스토리 보존
+
+```bash
+git checkout main
+git merge feature-branch
+# Creates a merge commit
+```
+
+**rebase**
+
+- 커밋을 재작성해 선형 히스토리를 만듭니다
+- 장점: 깨끗한 선형 히스토리, `git log`가 읽기 쉬움
+- 단점: 커밋 SHA가 바뀔므로 이미 push한 브랜치에는 위험함
+- 적합: 개인 브랜치 정리, 선형 히스토리 선호 프로젝트
+
+```bash
+git checkout feature-branch
+git rebase main
+# Rewrites commits on top of main
+```
+
+**이슈 우선순위 파악** — 이슈 리스트에서 다음 순서로 확인하면 기여할 이슈를 미리 선별할 수 있습니다: (1) `good-first-issue` 라벨 + 담당자 없음 (2) 최근 7일 이내 활동 (3) 재현 절차 명확 (4) 리포터와 메인테이너가 활발히 다이얼로그 중. 이 조건을 모두 충족하면 기여 성공률이 크게 높아집니다.
+
+**이슈 댓글로 배우기** — 이슈에 바로 코드를 제출하기 전에 댓글로 접근 방법을 물어보는 것이 안전합니다. 예: "이 문제를 `validate_input` 함수에 null 체크를 추가하는 방식으로 해결하려고 합니다. 이 방향이 맞나요?" 메인테이너가 다른 방향을 제시하면 시간 낭비를 막을 수 있고, 동의하면 바로 PR을 작성할 수 있습니다.
+
+**실무 규칙**
+
+- 로컬 브랜치 정리: `rebase` 사용
+- PR 머지: 프로젝트 정책 따르기 (GitHub은 "Squash and merge" 옵션 제공)
+- 이미 push한 커밋: `rebase` 금지 (`--force-push`는 협의 후에만)
+- 팀 협업: `merge` 선호 (conflict 해결이 더 안전)
+
+초보 기여자는 프로젝트의 `CONTRIBUTING.md`를 확인하거나, 메인테이너가 머지 버튼을 누르게 남겨 두는 편이 안전합니다. `git rebase`는 숙련되고 나서 사용해도 늦지 않습니다.
 ## 생각이 어떻게 바뀌어야 할까
 
 처음에는 "이 이슈가 정확히 무엇을 요구하는지 모르겠다"는 느낌이 들기 쉽습니다. 하지만 제목, 본문, 라벨, 댓글 순서로 읽는 습관이 생기면 기여 가능한지부터 판단할 수 있게 됩니다.
 
 이 변화가 중요합니다. 이슈를 보는 관점이 "문제가 있네"에서 끝나지 않고, "내가 이 문제를 안전하게 맡을 수 있나"로 옮겨가기 때문입니다.
+
+**주간 이슈 정리 습관** — 오픈소스 프로젝트는 이슈가 빠르게 쌌입니다. 메인테이너는 주 1-2회 정도 triage 시간을 갖습니다. 다음을 확인합니다: (1) 새 이슈 확인 및 라벨 부여 (2) 재현 불가능 이슈 닫기 (3) 중복 이슈 병합 (4) `good-first-issue` 후보 선정 (5) 담당자 배정. 이 습관은 이슈 탭을 깨끗하게 유지하고 기여자가 적합한 이슈를 빠르게 찾게 해 줍니다.
+
+
+### GitHub 이슈 템플릿 예시
+
+프로젝트에 이슈 템플릿을 두면 보고자가 필요한 정보를 빠트리지 않고 작성합니다. `.github/ISSUE_TEMPLATE/bug_report.md`에 다음처럼 작성합니다.
+
+```markdown
+---
+name: Bug Report
+about: 버그를 보고할 때 사용합니다
+labels: bug
+---
+
+## 환경
+- OS:
+- Browser:
+- Version:
+
+## 재현 단계
+1.
+2.
+3.
+
+## 기대 동작
+
+
+## 실제 동작
+
+
+## 스크린샷 (선택)
+```
+
+이 템플릿이 있으면 메인테이너가 재현 단계를 따로 물어볼 필요가 줄어듭니다. 기능 요청용 템플릿도 별도로 만들면 이슈의 성격이 자동으로 분류됩니다.
 
 ## 직접 따라해 보기: 이슈 분석 절차
 
@@ -139,6 +292,10 @@ reporter: Safari 15.1 on macOS 12
 회사 내부 이슈 트래커도 결국 같은 원리로 움직입니다. 제목은 요약, 본문은 상황 설명, 댓글은 의사결정 기록이라는 구조는 깃허브 이슈와 크게 다르지 않습니다. 그래서 오픈소스 이슈를 잘 읽는 습관은 그대로 실무 triage 감각으로 이어집니다.
 
 시니어 엔지니어는 이슈를 해결 목록이 아니라 합의 문서로 봅니다. 누가 어떤 근거로 우선순위를 정했는지, 왜 이 문제를 지금 고치는지, 수정 범위가 어디까지인지 먼저 읽고 움직입니다. 이 단계가 탄탄하면 구현은 오히려 빨라집니다.
+
+**이슈 자동화 도구** — 대형 프로젝트는 이슈 관리를 자동화합니다. GitHub Actions를 사용해 다음을 자동화할 수 있습니다: (1) 새 이슈에 자동 라벨 부여 (2) 오래된 이슈 자동 닫기 또는 알림 (3) 재현 절차 없는 버그 이슈에 템플릿 댓글 (4) 이슈 번호로 PR 자동 연결. 이런 자동화는 메인테이너의 반복 작업을 줄여 주고, 기여자에게는 빠른 피드백을 제공합니다.
+
+**이슈 템플릿 활용법** — GitHub는 `.github/ISSUE_TEMPLATE/` 디렉토리에 여러 이슈 템플릿을 둘 수 있습니다. 버그 리포트(`bug_report.md`), 기능 요청(`feature_request.md`), 질문(`question.md`)을 분리하면 이슈 품질이 크게 올라갑니다. 각 템플릿에는 필수 입력 항목을 체크박스로 만들고, 예시를 주석으로 달아 두면 신규 기여자도 양질의 이슈를 작성할 수 있습니다.
 
 ## 체크리스트
 

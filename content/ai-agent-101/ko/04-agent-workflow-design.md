@@ -373,4 +373,6 @@ agent workflow 설계는 도구를 나열하는 일이 아니라, 어떤 종류�
 - [LangGraph 101 - 상태와 그래프 흐름](../../langgraph-101/ko/02-state-and-checkpoints.md)
 - [LangGraph 101 - 멀티 에이전트 시스템](../../langgraph-101/ko/05-multi-agent.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-agent-101/ko/04-agent-workflow-design)
+
 Tags: AI Agent, LLM, Tool Use, Python

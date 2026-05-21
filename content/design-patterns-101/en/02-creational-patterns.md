@@ -43,15 +43,11 @@ In this post, we'll look at creational patterns as tools for concentrating const
 
 This picture places Creational Patterns inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Creational Patterns is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 When `new SomeService()` is sprinkled throughout the code, coupling is already locked in. Concentrating construction in one place makes swapping easy.
 
 > Where you build an object matters more than what you build.
-
-## Concept at a Glance
 
 ## Key Terms
 

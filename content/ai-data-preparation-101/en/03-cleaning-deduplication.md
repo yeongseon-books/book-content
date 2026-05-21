@@ -39,8 +39,6 @@ This is post 3 in the AI Data Preparation 101 series. Here we cover the basic cl
 
 This picture places Cleaning and Deduplication inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Cleaning and Deduplication is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## "Is Deduplication Really That Important?"
 
 Anyone who has worked on The Pile, C4, or RedPajama will tell you the same thing: **the dedup stage delivers the biggest single quality improvement**. Lee et al. (2021) showed in "Deduplicating Training Data Makes Language Models Better" that removing as little as 1% of duplicates lowers perplexity meaningfully.

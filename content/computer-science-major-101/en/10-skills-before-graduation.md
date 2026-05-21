@@ -41,7 +41,7 @@ This is the final post in the Computer Science Major 101 series.
 
 This picture places Skills to Have Before Graduation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Skills to Have Before Graduation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Before graduation, you need more than code—you need *judgment*. When to use what technology, and why.
 
 ## Questions This Post Answers
 
@@ -63,7 +63,7 @@ This picture places Skills to Have Before Graduation inside an operating flow. T
 The first few months of your first job matter more than many students expect. That period often sets the baseline for how the rest of your early career unfolds, so a graduation self-check is less about self-esteem and more about strengthening your starting point.
 
 ## Concept at a Glance
-
+Senior engineers are not measured by how much they *know*—they are measured by how well they *decide* and how clearly they *justify*.
 > A graduation self-check is not about counting completed courses. It is about making sure the five practical axes you will use at work are not empty.
 
 These five axes do not stand alone. Fundamentals support systems thinking, systems and data support service building, and collaboration plus writing are what let your results scale inside a real team.

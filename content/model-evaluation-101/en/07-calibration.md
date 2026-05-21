@@ -42,13 +42,9 @@ This is post 7 in the Model Evaluation 101 series. In this post, we separate ran
 
 This picture places Calibration inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Calibration is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Systems that multiply probabilities by costs to make decisions need calibration more than AUC.
-
-## Concept at a Glance
 
 ## Key Terms
 

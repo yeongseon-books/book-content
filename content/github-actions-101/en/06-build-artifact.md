@@ -42,8 +42,6 @@ This is post 6 in the GitHub Actions 101 series. In this post, we will use artif
 
 This picture places Build Artifacts inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Build Artifacts is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - Using *upload-artifact / download-artifact*
@@ -57,8 +55,6 @@ This picture places Build Artifacts inside an operating flow. The point is not t
 A workflow that *throws build outputs away* offers *no reuse, no trace*. Artifacts are *evidence and assets*.
 
 > *Every merge* should leave a *traceable build*.
-
-## Concept at a Glance
 
 ## Key Terms
 

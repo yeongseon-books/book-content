@@ -56,8 +56,6 @@ KEDA installs two main components: the **operator**, which watches `ScaledObject
 
 This picture places KEDA internals — how a ScaledObject builds an HPA inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of KEDA internals — how a ScaledObject builds an HPA is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## The KEDA structure
 
 ---

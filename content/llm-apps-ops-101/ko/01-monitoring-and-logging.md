@@ -187,6 +187,99 @@ if __name__ == "__main__":
 
 목표는 예쁜 로그를 만드는 것이 아닙니다. 나중에 장애, 비용 급증, 모델 이상 동작에 대한 질문이 들어왔을 때, 같은 형태의 레코드 하나로 그 요청을 다시 설명할 수 있게 만드는 것입니다.
 
+### 구조화 로그 스키마를 운영 계약으로 고정하기
+
+초기에는 로그 필드가 자주 바뀝니다. 하지만 운영으로 넘어가면 필드 추가와 제거를 엄격히 관리해야 합니다. 가장 안전한 방법은 요청 단위 스키마를 문서화하고 버전 필드를 넣는 것입니다. 예를 들어 `schema_version`, `service`, `environment`, `provider`, `status`를 고정하면, 대시보드와 알림 규칙이 필드 변경으로 깨지는 일을 크게 줄일 수 있습니다.
+
+```python
+from dataclasses import dataclass, asdict
+from typing import Literal
+
+@dataclass
+class LLMLogRecord:
+    schema_version: str
+    service: str
+    environment: str
+    event: Literal["llm_request", "llm_response", "llm_error"]
+    request_id: str
+    model: str
+    provider: str
+    latency_ms: float | None
+    prompt_tokens: int | None
+    completion_tokens: int | None
+    total_tokens: int | None
+    status: Literal["ok", "error"]
+    error_type: str | None
+    prompt_preview: str | None
+    response_preview: str | None
+
+def to_json_payload(record: LLMLogRecord) -> dict:
+    return asdict(record)
+```
+
+이 구조를 기준으로 `llm_request`에는 지연 시간과 토큰 수를 비워 두고, `llm_response`에서 채우는 방식으로 합의해 두면 분석 시 혼선이 줄어듭니다. 실패 이벤트(`llm_error`)도 같은 키 집합을 유지해야 쿼리가 단순해집니다.
+
+### OpenTelemetry trace를 로그와 연결하기
+
+메트릭과 로그만으로 원인을 좁히기 어려운 구간에서는 trace가 큰 도움이 됩니다. 특히 요청이 프롬프트 구성, 검색, 모델 호출, 후처리 단계를 거칠 때 각 span의 시간이 분리되어 보여야 병목을 빠르게 찾을 수 있습니다. 핵심은 trace id를 로그에 함께 남겨 교차 탐색이 가능하도록 만드는 것입니다.
+
+```python
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
+
+provider = TracerProvider()
+provider.add_span_processor(BatchSpanProcessor(ConsoleSpanExporter()))
+trace.set_tracer_provider(provider)
+tracer = trace.get_tracer("llm-app")
+
+def traced_llm_call(client, prompt: str) -> dict:
+    with tracer.start_as_current_span("chat.request") as span:
+        span.set_attribute("llm.model", MODEL)
+        span.set_attribute("llm.prompt_length", len(prompt))
+        result = ask_llm(client, prompt)
+        span.set_attribute("llm.total_tokens", result["total_tokens"])
+        span.set_attribute("llm.latency_ms", result["latency_ms"])
+
+        trace_id = format(span.get_span_context().trace_id, "032x")
+        LOGGER.info(
+            "llm_trace_link",
+            extra={"payload": {"request_id": result["request_id"], "trace_id": trace_id}},
+        )
+        return result
+```
+
+운영에서는 exporter를 OTLP로 바꾸어 Jaeger, Tempo, Datadog APM 같은 백엔드로 보내면 됩니다. 중요한 점은 도구 선택이 아니라 `request_id`와 `trace_id`를 동시에 남겨 한 요청의 로그와 trace를 이어 보는 습관입니다.
+
+### 대시보드 최소 설정 예시
+
+대시보드는 처음부터 복잡하게 만들 필요가 없습니다. 요청량, 오류율, P95 지연 시간, 토큰 사용량, 모델별 비용 추이를 먼저 고정하면 운영 회의에서 질문을 빠르게 정렬할 수 있습니다.
+
+```yaml
+dashboard: llm-ops-overview
+widgets:
+  - name: requests_per_min
+    query: count_over_time({event="llm_response"}[1m])
+  - name: error_rate
+    query: |
+      sum(rate({event="llm_error"}[5m]))
+      /
+      sum(rate({event=~"llm_response|llm_error"}[5m]))
+  - name: p95_latency_ms
+    query: quantile_over_time(0.95, {event="llm_response"} | unwrap latency_ms [5m])
+  - name: total_tokens_per_min
+    query: sum_over_time({event="llm_response"} | unwrap total_tokens [1m])
+  - name: top_error_types
+    query: topk(5, sum by (error_type) (rate({event="llm_error"}[10m])))
+alerts:
+  - name: p95_latency_regression
+    condition: p95_latency_ms > 2500 for 10m
+  - name: error_rate_spike
+    condition: error_rate > 0.03 for 5m
+```
+
+위와 같은 최소 템플릿을 먼저 적용하면 팀이 같은 숫자를 보고 대화할 수 있습니다. 이후에는 tenant별 분해, 모델별 분해, 프롬프트 버전별 분해를 단계적으로 추가하는 방식이 안전합니다.
+
 ## 처음 질문으로 돌아가기
 
 - **모든 LLM 요청 로그에는 어떤 필드가 반드시 들어가야 할까요?**

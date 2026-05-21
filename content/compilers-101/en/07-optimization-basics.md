@@ -44,8 +44,6 @@ This is post 7 in the Compilers 101 series.
 
 This picture places optimization basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of optimization basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - That "meaning preserving" is the absolute rule of optimization
@@ -59,8 +57,6 @@ This picture places optimization basics inside an operating flow. The point is n
 For the same algorithm, a compiler that reduces well makes code 10x faster or 1/10 the size. At the same time, a wrong optimization changes program meaning — the scariest kind of bug. Watching the optimizer is how you see where the compiler's trustworthiness comes from.
 
 > "Make it faster + keep the meaning." Holding both lines at once is what an optimizer does.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR

@@ -46,8 +46,6 @@ This is the 6th article in the SQLAlchemy 101 series.
 
 This picture places ORM Relationships: Connecting Both Sides Safely with relationship and back_populates inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of ORM Relationships: Connecting Both Sides Safely with relationship and back_populates is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 Misconfigured relationships create a familiar set of bugs:

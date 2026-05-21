@@ -53,8 +53,6 @@ Up through Episode 5, each command ran inside one machine. Starting now, the loc
 
 This picture places Creating a GitHub repository - remote, push, and pull in one go inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Creating a GitHub repository - remote, push, and pull in one go is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 A repository that lives only on your laptop is, for collaboration purposes, not very different from a personal notebook. To share code with teammates, or to survive a stolen laptop without losing history, the repository has to exist somewhere else as well. GitHub is the most common "somewhere else."

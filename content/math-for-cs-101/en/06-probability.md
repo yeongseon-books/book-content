@@ -52,9 +52,6 @@ A/B testing, recommendation ranking, classifier evaluation, and reliability work
 
 The main habit is to ask what world the denominator describes. Many practical mistakes in probability are not bad multiplication. They are failures to notice that the conditioning changed the space you are talking about.
 
-
-## Concept at a Glance
-
 Probability quantifies *likelihood* through events, conditional probabilities, distributions, and Bayes' theorem. It turns vague "probably" into precise numbers.
 
 ## Before/After

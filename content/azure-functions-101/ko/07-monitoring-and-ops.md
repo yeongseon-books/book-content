@@ -299,4 +299,6 @@ az monitor app-insights events show \
 - [Azure Functions Deep Dive — 스케일링 내부 동작](../../azure-functions-deep-dive/ko/05-scaling-internals.md)
 - [Azure Functions Deep Dive — 콜드 스타트와 Placeholder Mode](../../azure-functions-deep-dive/ko/06-cold-start-placeholder.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-functions-101/ko/07-monitoring-and-ops)
+
 Tags: Azure, Azure Functions, Serverless, Cloud

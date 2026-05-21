@@ -45,8 +45,6 @@ This is post 4 in the Discrete Math 101 series.
 
 This picture places Relations and Equivalence inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Relations and Equivalence is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The definition and representation of binary relations
@@ -59,8 +57,6 @@ This picture places Relations and Equivalence inside an operating flow. The poin
 The relational database model came directly from relation theory. Git's commit graph, npm dependency resolution, and build tool task scheduling are all topological sorts on partial orders. The `==` and `is` operators along with caching strategies are applications of equivalence relations.
 
 > A relation is the most basic tool for expressing structure between data.
-
-## Concept at a Glance
 
 > A relation is a set of pairs (a, b). Depending on which properties hold, it is classified as an equivalence relation, a partial order, etc.
 

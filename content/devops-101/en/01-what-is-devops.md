@@ -58,8 +58,6 @@ Software produces no value when *only built*. It must be *deployed* and *operate
 
 > *Fast deploys* and *stable operations* are *not in conflict*. They go together.
 
-## Concept at a Glance
-
 DevOps is not a tool purchase or a team rename. It is a practice where development and operations share one feedback loop: write code → ship → run → learn → write code again.
 
 ## Key Terms

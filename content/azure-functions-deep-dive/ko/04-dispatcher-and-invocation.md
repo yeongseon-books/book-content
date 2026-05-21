@@ -243,4 +243,6 @@ HTTP proxying도 같은 맥락에서 봐야 합니다. `HttpFunctionInvocationDi
 - [Azure Functions 101 — 스케일링과 콜드 스타트](../../azure-functions-101/ko/06-scaling-and-cold-start.md)
 - [Azure App Service Deep Dive — App Service 플랫폼 아키텍처](../../azure-app-service-deep-dive/ko/01-platform-architecture.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-functions-deep-dive/ko/04-dispatcher-and-invocation)
+
 Tags: Azure Functions, Serverless, Distributed Systems, gRPC

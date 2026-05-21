@@ -147,6 +147,111 @@ scrape_configs:
 
 좋은 알림은 문제를 더 많이 말해 주는 알림이 아니라, 새벽 3시에 울렸을 때 정말 행동해야 하는 알림입니다.
 
+## 모니터링 계층
+
+모니터링은 인프라, 애플리케이션, 비즈니스 세 계층으로 나눠 볼 수 있습니다. 각 계층은 서로 다른 지표와 도구를 필요로 합니다.
+
+| 계층 | 주요 지표 | 도구 |
+| --- | --- | --- |
+| 인프라 | CPU, 메모리, 디스크, 네트워크 | node_exporter, cAdvisor |
+| 애플리케이션 | 요청률, 에러율, 응답 시간 | prometheus_client, OpenTelemetry |
+| 비즈니스 | 주문 수, 결제 성공률, 활성 사용자 | 비즈니스 로직에서 직접 노출 |
+
+인프라 지표는 하드웨어 한계를, 애플리케이션 지표는 사용자 경험을, 비즈니스 지표는 실제 가치 생성을 반영합니다. 세 계층을 함께 보아야 문제의 근본 원인을 빠르게 좌힐 수 있습니다.
+
+## Python prometheus_client 예제
+
+애플리케이션에서 직접 메트릭을 노출하는 실제 코드 예제입니다. FastAPI 환경에서 바로 사용할 수 있습니다.
+
+```python
+from prometheus_client import Counter, Histogram, make_asgi_app
+from fastapi import FastAPI, Request
+import time
+
+app = FastAPI()
+
+# Define metrics
+requests_total = Counter(
+    "http_requests_total",
+    "Total HTTP requests",
+    ["method", "path", "status"]
+)
+
+request_duration = Histogram(
+    "http_request_duration_seconds",
+    "HTTP request latency",
+    ["method", "path"]
+)
+
+@app.middleware("http")
+async def track_metrics(request: Request, call_next):
+    start = time.time()
+    response = await call_next(request)
+    duration = time.time() - start
+    
+    # Record metrics
+    requests_total.labels(
+        method=request.method,
+        path=request.url.path,
+        status=response.status_code
+    ).inc()
+    
+    request_duration.labels(
+        method=request.method,
+        path=request.url.path
+    ).observe(duration)
+    
+    return response
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+# Mount /metrics endpoint
+app.mount("/metrics", make_asgi_app())
+```
+
+이 코드는 모든 HTTP 요청을 자동으로 추적하고, `/metrics` 엔드포인트에서 Prometheus 형식으로 노출합니다. Prometheus가 이 엔드포인트를 주기적으로 긁어 가면 메트릭 수집이 완료됩니다.
+
+## 알림 설계 원칙
+
+좋은 알림은 노이즈를 줄이고 행동 가능한 신호만 남깁니다. 이 원칙은 on-call 피로도와 대응 품질을 동시에 개선합니다.
+
+### 1. 5분 지속 조건 사용
+
+순간적인 스파이크는 무시해야 합니다. `for: 5m` 조건은 문제가 5분 이상 지속될 때만 알림을 보냅니다.
+
+```yaml
+- alert: HighErrorRate
+  expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.01
+  for: 5m
+  labels:
+    severity: warning
+  annotations:
+    summary: "5xx error rate above 1% for 5 minutes"
+    runbook_url: "https://wiki.example.com/runbooks/high-error-rate"
+```
+
+### 2. 비율로 판단
+
+절대값보다 비율이 더 안정적인 기준입니다. 요청률이 높아지면 에러 절대값도 함께 높아지지만, 비율은 일정하게 유지되기 때문입니다.
+
+```yaml
+- alert: HighFailureRatio
+  expr: |
+    rate(http_requests_total{status=~"5.."}[5m])
+    / rate(http_requests_total[5m]) > 0.05
+  for: 3m
+```
+
+### 3. runbook URL 포함
+
+모든 알림에는 runbook 링크를 붙여야 합니다. 새벽 3시에 알림을 받은 엔지니어가 검색부터 시작하지 않도록 해야 합니다.
+
+### 4. 심각도와 응답 시간 연결
+
+심각도에 따라 기대 응답 시간을 명확히 해야 합니다. critical은 즉시, warning은 30분 내, info는 다음 영업일처럼 명확한 기준이 필요합니다.
+
 ## 자주 하는 실수 5가지
 
 1. **알림을 너무 많이 만드는 실수**입니다. 알림 피로가 쌓이면 중요한 알림도 놓칩니다.
@@ -185,6 +290,74 @@ scrape_configs:
 ## 정리 및 다음 단계
 
 모니터링은 운영의 눈입니다. 다음 글에서는 눈으로 본 현상을 더 깊게 추적하게 해 주는 로그 수집과 분석을 다룹니다.
+
+## 모니터링 체계를 운영 결정 도구로 만드는 법
+
+모니터링의 목적은 데이터를 많이 모으는 것이 아니라 올바른 결정을 빠르게 내리는 것입니다. 그래서 지표 설계는 시각화보다 먼저 질문 설계에서 시작해야 합니다. "무엇이 나빠지면 누구에게 어떤 행동을 요구할 것인가"를 먼저 정의하면 알림 노이즈를 크게 줄일 수 있습니다.
+
+### 핵심 메트릭 분류 표
+
+| 분류 | 예시 | 사용 목적 |
+| --- | --- | --- |
+| 트래픽 | requests/sec | 부하 추세 확인 |
+| 오류 | 5xx ratio | 품질 저하 감지 |
+| 지연 | p95 latency | 사용자 체감 성능 확인 |
+| 자원 | CPU, memory, saturation | 용량/병목 판단 |
+| 비즈니스 | checkout success rate | 서비스 가치 관측 |
+
+### Prometheus 수집 설정 예시
+
+```yaml
+global:
+  scrape_interval: 15s
+scrape_configs:
+  - job_name: api
+    static_configs:
+      - targets: ["api:8000"]
+  - job_name: worker
+    static_configs:
+      - targets: ["worker:9000"]
+```
+
+### Alertmanager 규칙 예시
+
+```yaml
+groups:
+  - name: api-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.01
+        for: 5m
+        labels:
+          severity: page
+        annotations:
+          summary: "API 5xx ratio > 1% for 5m"
+          runbook: "https://internal/wiki/runbook-api-errors"
+```
+
+### Grafana 대시보드 설계 기준
+
+| 패널 순서 | 내용 | 이유 |
+| --- | --- | --- |
+| 1 | 요청률, 에러율, 지연시간 | 1분 내 서비스 상태 판단 |
+| 2 | 인프라 자원 사용률 | 병목 추정 근거 확보 |
+| 3 | 최근 배포 이벤트 | 변경과 이상 징후 상관 확인 |
+| 4 | 알림 히스토리 | 노이즈 패턴 점검 |
+
+### RED와 USE를 함께 쓰는 이유
+
+- RED는 사용자 요청 관점 품질을 빠르게 보여 줍니다.
+- USE는 시스템 자원 관점 병목을 설명합니다.
+- 두 프레임을 함께 봐야 "문제 발생"과 "원인 후보"를 한 흐름에서 다룰 수 있습니다.
+
+### 운영 실전 규칙
+
+1. 알림에는 반드시 runbook 링크를 포함합니다.
+2. `for` 조건을 두어 순간 스파이크를 걸러냅니다.
+3. 카디널리티를 제한해 저장 비용과 쿼리 속도를 관리합니다.
+4. 모니터링 시스템 자체의 상태(스크레이프 실패, 디스크 사용률)도 감시합니다.
+
+모니터링은 결국 팀의 의사결정 인터페이스입니다. 의미 있는 신호만 남기고 행동 가능한 알림만 울리게 설계해야 on-call 품질이 유지됩니다.
 
 ## 처음 질문으로 돌아가기
 

@@ -41,8 +41,6 @@ Here, we will build the mental model for retrieval-augmented generation and impl
 
 This picture places RAG introduction — answering with your own data inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of RAG introduction — answering with your own data is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why RAG exists
 
 Ask a general-purpose model about your internal refund policy or a product update from yesterday and it may hedge, guess, or simply not know. That is expected. The information may not have existed at training time, or the current version may no longer match what the model saw.

@@ -284,4 +284,6 @@ DB 커넥션 풀, 외부 API rate limit, Redis 연결 수는 Functions 인스턴
 - [Azure Functions Deep Dive — 스케일링 내부 동작](../../azure-functions-deep-dive/ko/05-scaling-internals.md)
 - [Azure Functions Deep Dive — 콜드 스타트와 Placeholder Mode](../../azure-functions-deep-dive/ko/06-cold-start-placeholder.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-functions-101/ko/06-scaling-and-cold-start)
+
 Tags: Azure, Azure Functions, Serverless, Cloud

@@ -47,8 +47,6 @@ This is the 8th article in the LLM from Scratch 101 series.
 
 This picture places Adapting the Base Model to Specific Tasks inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Adapting the Base Model to Specific Tasks is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Pre-training vs Fine-tuning vs RLHF — A Quick Summary
 
 Pre-training involves next-token prediction on a large corpus. SFT adapts the model to an instruction-response format. RLHF (Reinforcement Learning from Human Feedback) incorporates human preferences, which is beyond the scope of this series.

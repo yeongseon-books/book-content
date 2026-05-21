@@ -43,8 +43,6 @@ In this post, we will treat a type system not as simple data labeling but as a w
 
 This picture places Type Systems inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Type Systems is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - What role does a type actually play?
@@ -57,8 +55,6 @@ This picture places Type Systems inside an operating flow. The point is not to m
 Most modern languages have some kind of type system, and even Python, JavaScript, and Ruby grew gradual type systems (type hints, TypeScript). To use autocompletion, refactoring tools, and build-stage error messages well, you need to understand types. The later episodes — scope and closures — also operate on top of types.
 
 > A type narrows down, in advance, which inputs are even legal.
-
-## Concept at a Glance
 
 The type checker rules out impossible calls before runtime. Simultaneously, it gives the IDE the basis for autocompletion and safe refactoring.
 

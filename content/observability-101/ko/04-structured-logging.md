@@ -50,6 +50,107 @@ last_reviewed: '2026-05-15'
 
 구조화된 로그는 이 시간을 줄입니다. level, event, request_id, user_id, reason 같은 필드가 분리되어 있으면 특정 사용자, 특정 요청, 특정 에러 유형만 바로 골라 볼 수 있습니다. 로그가 데이터가 되는 순간, 장애 대응 속도가 달라집니다.
 
+## 비정형 vs 정형 로그
+
+로그 형식을 바꾸는 것만으로도 운영 효율이 크게 달라집니다.
+
+| 구분 | 비정형 로그 | 정형 로그 (JSON) |
+| --- | --- | --- |
+| 검색성 | 문자열 grep 의존 | 필드 기반 질의 가능 |
+| 파싱 비용 | 높음 (정규식 필요) | 낮음 (JSON parser 사용) |
+| 알림 연동 | 어려움 (문자열 매칭) | 쉽음 (필드 조건 필터) |
+| 집계 | 불가능에 가깨움 | 쉽게 가능 (GROUP BY) |
+| 예시 | `User 123 login failed` | `{"event":"login_failed","user_id":123}` |
+
+비정형 로그는 사람이 읽기에 편하지만, 기계가 질의하기에 약합니다. 정형 로그는 눈으로 읽기에는 불편할 수 있지만, 장애 대응과 집계에서 훨씬 빠릅니다.
+
+## structlog로 FastAPI 미들웨어 만들기
+
+structlog는 Python에서 구조화된 로그를 다루기 위한 대표적인 라이브러리입니다. 아래는 FastAPI에서 요청마다 구조화된 로그를 남기는 예제입니다.
+
+```python
+import structlog
+import uuid
+import time
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+
+# structlog 초기화
+structlog.configure(
+    processors=[
+        structlog.processors.add_log_level,
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.processors.JSONRenderer()
+    ]
+)
+
+logger = structlog.get_logger()
+app = FastAPI()
+
+@app.middleware("http")
+async def logging_middleware(request: Request, call_next):
+    request_id = request.headers.get("x-request-id") or str(uuid.uuid4())
+    start_time = time.time()
+    
+    # 컴텍스트 바인드
+    log = logger.bind(request_id=request_id, path=request.url.path, method=request.method)
+    
+    log.info("request_start")
+    
+    try:
+        response = await call_next(request)
+        duration_ms = (time.time() - start_time) * 1000
+        
+        log.info(
+            "request_end",
+            status_code=response.status_code,
+            duration_ms=round(duration_ms, 2)
+        )
+        
+        return response
+    except Exception as e:
+        duration_ms = (time.time() - start_time) * 1000
+        log.error(
+            "request_error",
+            error=str(e),
+            duration_ms=round(duration_ms, 2)
+        )
+        return JSONResponse(status_code=500, content={"error": "Internal server error"})
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+@app.get("/users/{user_id}")
+def get_user(user_id: int):
+    logger.info("user_lookup", user_id=user_id)
+    return {"user_id": user_id, "name": "test"}
+```
+
+이 코드는 모든 요청에 request_id를 붙이고, 시작과 끝을 구조화된 JSON 로그로 남깁니다. `bind()`로 공통 필드를 묶으면 매번 반복하지 않아도 됩니다.
+
+## 로그 레벨 전략
+
+로그 레벨은 단순한 분류가 아니라 저장량과 주목도를 동시에 통제하는 장치입니다.
+
+| 레벨 | 기준 | 예시 | 저장 기간 |
+| --- | --- | --- | --- |
+| DEBUG | 개발 중 상세 흐름 | 함수 호출, 변수 값 | 짧게 (1일 이하) |
+| INFO | 정상 이벤트 | 요청 시작/끝, 사용자 행동 | 보통 (7일) |
+| WARNING | 주의 필요 (조치 가능) | 재시도, deprecated API 사용 | 길게 (30일) |
+| ERROR | 요청 실패 | 예외 발생, 외부 API 타임아웃 | 매우 길게 (90일+) |
+| CRITICAL | 시스템 위험 | DB 연결 실패, 메모리 부족 | 영구 |
+
+### 레벨별 운영 지침
+
+- **DEBUG**: 프로덕션에서는 끄지 말기. 개발 환경에서만 켜서 흐름을 확인하는 용도입니다.
+- **INFO**: 기본 레벨. 대부분의 정상 이벤트는 INFO입니다.
+- **WARNING**: 경보로 연결할 필요는 없지만, 나중에 문제가 될 수 있는 조짐를 남깁니다.
+- **ERROR**: 즉시 경보로 연결. 사용자 요청이 실패했다면 ERROR입니다.
+- **CRITICAL**: 온콜 알림. 시스템 전체가 위험한 상황에만 사용합니다.
+
+레벨을 나누는 기준을 미리 합의해 두면 로그를 볼 때 중요도를 바로 판단할 수 있습니다. WARNING이 넘치면 기준이 널매한 것이고, ERROR가 매일 없으면 기준이 너무 높은 것입니다.
+
 ## 한눈에 보는 구조
 
 로그를 구조화하면 검색 속도가 빨라지고 집계가 가능해집니다. JSON 같은 정형 포맷으로 남기면 대규모에서 비용도 통제할 수 있습니다.
@@ -189,6 +290,71 @@ Expected output:
 ## 정리
 
 구조화된 로그는 운영 로그를 설명문에서 데이터로 바꿉니다. 로그 수준, 맥락 필드, 상관관계 ID가 자리 잡으면 장애 대응의 첫 5분이 짧아집니다. 다음 글에서는 요청이 여러 서비스를 가로지를 때 왜 분산 트레이싱이 필요한지 이어서 보겠습니다.
+
+## JSON 로그 필드 표준 제안
+
+구조화된 로깅을 도입해도 팀마다 필드 이름이 다르면 운영 효율이 낮아집니다. 아래처럼 최소 공통 스키마를 두면 질의 템플릿과 경보 규칙을 재사용하기 쉽습니다.
+
+| 필드 | 타입 | 설명 | 예시 |
+| --- | --- | --- | --- |
+| ts | number | Unix epoch 또는 ISO 타임스탬프 | 1716000123.22 |
+| level | string | 로그 수준 | INFO |
+| event | string | 이벤트 이름 | payment_failed |
+| service | string | 서비스 이름 | checkout-api |
+| env | string | 실행 환경 | prod |
+| trace_id | string | 분산 추적 식별자 | 9f3c... |
+| request_id | string | 요청 식별자 | req-12ab |
+| route | string | 정규화된 경로 | /orders/:id |
+| status_code | number | HTTP 상태 코드 | 502 |
+| error_code | string | 도메인 오류 코드 | GATEWAY_TIMEOUT |
+
+중요한 점은 "모든 정보를 다 넣기"가 아니라 "자주 묻는 질문에 답할 최소 필드"를 고정하는 것입니다. 사용자 이메일, 카드 번호, 주민번호처럼 민감한 값은 원문 저장을 피하고 마스킹 또는 해시로 대체해야 합니다.
+
+## structlog 초기화 템플릿
+
+```python
+import logging
+import structlog
+
+
+def configure_logger() -> None:
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    structlog.configure(
+        processors=[
+            structlog.contextvars.merge_contextvars,
+            structlog.processors.add_log_level,
+            structlog.processors.TimeStamper(fmt="iso"),
+            structlog.processors.StackInfoRenderer(),
+            structlog.processors.format_exc_info,
+            structlog.processors.JSONRenderer(),
+        ],
+        logger_factory=structlog.stdlib.LoggerFactory(),
+        wrapper_class=structlog.stdlib.BoundLogger,
+        cache_logger_on_first_use=True,
+    )
+
+
+def mask_email(email: str) -> str:
+    name, domain = email.split("@")
+    visible = name[:2] if len(name) >= 2 else name
+    return f"{visible}***@{domain}"
+```
+
+이 구성은 운영에서 자주 필요한 두 가지를 만족합니다. 첫째, 예외 정보를 JSON 안에 구조적으로 남깁니다. 둘째, request context를 `contextvars`로 전달해 비동기 코드에서도 공통 필드를 유지합니다.
+
+## 로그 레벨 운영 기준
+
+로그 레벨을 정의할 때는 "중요도"만이 아니라 "행동"을 기준으로 삼는 편이 좋습니다. 즉, 해당 로그를 본 사람이 무엇을 해야 하는가를 먼저 정합니다.
+
+| 레벨 | 질문 | 운영 행동 | 예시 이벤트 |
+| --- | --- | --- | --- |
+| DEBUG | 흐름이 맞는가 | 개발 환경 확인 | serializer_mismatch |
+| INFO | 정상 처리 중인가 | 대시보드 참고 | request_end |
+| WARNING | 악화 조짐인가 | 티켓/리뷰 | retry_exhausted_soon |
+| ERROR | 요청 실패인가 | 경보 또는 즉시 점검 | payment_failed |
+| CRITICAL | 광범위 장애인가 | 온콜 호출 | db_unavailable |
+
+레벨 기준이 없으면 팀마다 동일 이벤트를 서로 다른 레벨로 기록하게 됩니다. 그러면 경보 규칙의 신뢰도가 떨어지고, 같은 장애를 두 번 세 번 처리하게 됩니다. 레벨 사전은 코드 리뷰 체크리스트에 포함하는 편이 좋습니다.
 
 ## 처음 질문으로 돌아가기
 

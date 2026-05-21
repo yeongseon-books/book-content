@@ -42,7 +42,7 @@ This is post 2 in the Incident Response 101 series. This post shows how to defin
 
 This picture places Severity Classification inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Severity Classification is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Severity is your team's shorthand for action. When someone says SEV1, everyone knows the scope, who pages, and how often to communicate.
 
 ## Why this topic matters
 

@@ -45,8 +45,6 @@ This is post 6 in the Computer Architecture 101 series.
 
 This picture places Cache and Locality inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Cache and Locality is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - What a cache is and where it sits in the memory hierarchy
@@ -59,8 +57,6 @@ This picture places Cache and Locality inside an operating flow. The point is no
 On a modern CPU, the biggest single performance variable is not clock speed — it is cache miss rate. One main-memory access burns 100–300 cycles; an L1 hit takes around 4. The same algorithm can run 10x faster or slower depending on memory access patterns. Cache awareness is the highest-ROI optimization technique you can learn.
 
 > If the algorithm is fixed, the next question is "is this code cache-friendly?"
-
-## Concept at a Glance
 
 > A cache is a small, fast store that keeps recently and frequently used data close to the CPU. The CPU does not fetch a single byte from main memory — it fetches a 64-byte block called a cache line. Other data in the same line becomes nearly free to read on the next access.
 

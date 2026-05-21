@@ -41,8 +41,6 @@ This is post 6 in the Multimodal AI 101 series.
 
 This picture places Audio Processing and Whisper STT inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Audio Processing and Whisper STT is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why Whisper became the STT default
 
 Before OpenAI Whisper landed in September 2022, production STT meant Google Speech, AWS Transcribe, or Azure Speech. Non-English accuracy lagged English by a wide margin and pricing sat around USD 0.024 per minute.

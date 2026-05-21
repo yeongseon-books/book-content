@@ -42,7 +42,7 @@ This is post 7 in the Data Science 101 series. Here we build that safer path: ba
 
 This picture places Modeling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Modeling is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> At its core, Modeling is about deciding what enters a system, where validation happens, and which signals stay for the next cycle—not about feature names.
 
 ## Questions This Post Answers
 
@@ -67,7 +67,7 @@ A *good baseline* is the real starting line — much more than a fancy model. Wi
 
 > *Every model competes against a *baseline*.*
 
-## Concept at a Glance
+The key boundary in this episode is between the concept itself and how it operates in a real system. You need to know where the data comes in, where the decision happens, and what signal must be recorded.
 
 ## Key Terms
 

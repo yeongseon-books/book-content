@@ -45,8 +45,6 @@ This is post 4 in the Computer Networks 101 series.
 
 This picture places DNS inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of DNS is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The DNS hierarchy (root → TLD → authoritative)
@@ -59,8 +57,6 @@ This picture places DNS inside an operating flow. The point is not to memorize t
 Half of "the Internet does not work" turns out to be DNS, and a large share of that is misunderstanding TTL and caches. Without understanding DNS, "it still goes to the old IP after deploy" stays a mystery and service migrations or region failovers take much longer than they should. Every HTTP request also starts with a DNS lookup, so it always shows up in performance analysis.
 
 > "It's always DNS" — a joke among operators that is more than half true.
-
-## Concept at a Glance
 
 > A client asks the OS stub resolver, which usually asks the ISP or company recursive resolver. The recursive resolver walks root → TLD → authoritative, finds the answer, and caches it for the TTL.
 

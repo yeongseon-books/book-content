@@ -88,6 +88,85 @@ FROM orders;
 
 상품별로 주문 금액 순위를 계산합니다. 동률이 있을 때 순위가 어떻게 처리되는지 확인하는 것이 중요합니다.
 
+## 트랜잭션 격리 수준
+
+윈도 함수는 단일 쿼리 안에서 동작하지만, 실무에서는 여러 쿼리가 동시에 실행됩니다. 이때 트랜잭션 격리 수준이 결과에 영향을 줄 수 있습니다.
+
+| 격리 수준 | 발생 가능한 현상 | 성능 | 설명 |
+| --- | --- | --- | --- |
+| Read Uncommitted | Dirty Read, Non-repeatable Read, Phantom Read | 가장 빠름 | 커밋되지 않은 데이터도 읽음 |
+| Read Committed | Non-repeatable Read, Phantom Read | 빠름 | 커밋된 데이터만 읽음 (PostgreSQL 기본값) |
+| Repeatable Read | Phantom Read | 보통 | 같은 행은 트랜잭션 내내 같은 값 |
+| Serializable | 없음 | 가장 느림 | 완전한 직렬화, 동시성 최소 |
+
+PostgreSQL의 기본값은 Read Committed입니다. 대부분의 경우 이 수준으로 충분하지만, 분석 쿼리에서 일관된 스냅샷이 필요하다면 Repeatable Read를 고려할 수 있습니다.
+
+```sql
+BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+SELECT * FROM orders WHERE created_at >= '2026-01-01';
+-- 이 트랜잭션 안에서는 동일한 쿼리가 항상 같은 결과를 돌려줍니다
+COMMIT;
+```
+
+격리 수준을 높일수록 동시성 문제는 줄어들지만, 대신 잠금 경합과 성능 저하가 발생할 수 있습니다. 윈도 함수처럼 집계와 비교를 동시에 수행하는 쿼리는 격리 수준 선택이 결과 일관성에 영향을 줄 수 있으므로, 트랜잭션 범위를 명확히 설계하는 것이 중요합니다.
+
+## BEGIN/COMMIT/ROLLBACK 예제
+
+윈도 함수를 포함한 복잡한 분석 쿼리는 트랜잭션 안에서 실행하는 편이 안전합니다. 중간 단계를 임시 테이블로 만들거나, 여러 단계를 한 번에 검증할 때 특히 유용합니다.
+
+```sql
+BEGIN;
+
+-- 임시 테이블 생성
+CREATE TEMP TABLE user_rank AS
+SELECT user_id, total,
+    RANK() OVER (ORDER BY total DESC) AS rk
+FROM orders;
+
+-- 중간 결과 검증
+SELECT COUNT(*) FROM user_rank WHERE rk <= 10;
+
+-- 결과가 예상과 맞으면 커밋
+COMMIT;
+
+-- 또는 문제가 있으면 롤백
+-- ROLLBACK;
+```
+
+트랜잭션을 사용하면 중간 결과를 확인한 뒤 최종 커밋 여부를 결정할 수 있습니다. 특히 임시 테이블을 만들어 윈도 함수 결과를 재사용하거나, 여러 단계 분석을 안전하게 검증하는 패턴에서 자주 씁니다.
+
+## 데드락
+
+여러 트랜잭션이 동시에 실행될 때, 서로 상대방이 점유한 자원을 기다리며 무한 대기 상태에 빠지는 문제를 데드락이라고 합니다. 윈도 함수 자체는 읽기 전용 계산이므로 데드락을 일으키지 않지만, 집계 결과를 바탕으로 UPDATE나 INSERT를 수행하는 경우 주의가 필요합니다.
+
+### 데드락 시나리오
+
+```sql
+-- 트랜잭션 1
+BEGIN;
+UPDATE orders SET status = 'shipped' WHERE id = 100;
+-- 대기: id=200 잠금 요청
+UPDATE orders SET status = 'shipped' WHERE id = 200;
+COMMIT;
+
+-- 트랜잭션 2 (동시에 실행)
+BEGIN;
+UPDATE orders SET status = 'shipped' WHERE id = 200;
+-- 대기: id=100 잠금 요청
+UPDATE orders SET status = 'shipped' WHERE id = 100;
+COMMIT;
+```
+
+위 상황에서 트랜잭션 1은 id=100을 잠그고 id=200을 기다리고, 트랜잭션 2는 id=200을 잠그고 id=100을 기다립니다. PostgreSQL은 이런 상황을 감지하면 한쪽 트랜잭션을 자동으로 중단시킵니다.
+
+**데드락 회피 방법:**
+
+- 잠금 순서를 일정하게 유지합니다 (예: 항상 id 오름차순으로 UPDATE)
+- 트랜잭션 길이를 짧게 유지합니다
+- 가능하면 SELECT ... FOR UPDATE로 명시적 잠금을 먼저 획듍합니다
+- 윈도 함수 결과를 바탕으로 일괄 업데이트할 때는 순서를 명확히 합니다
+
+윈도 함수로 순위를 매긴 뒤 상위 N개만 업데이트하는 패턴에서는 순위 계산과 업데이트를 분리하고, 업데이트 순서를 일정하게 유지하는 것이 안전합니다.
 ### 3단계 — 이전 값 읽기
 
 ```sql
@@ -129,12 +208,99 @@ FROM daily_revenue;
 
 현재 행을 기준으로 직전 6일과 오늘까지 포함한 7일 평균을 구합니다. 프레임을 직접 적어 두는 습관이 특히 중요합니다.
 
+## 윈도 함수 실전 패턴
+
+윈도 함수를 실무에서 자주 사용하는 패턴을 모아봅니다.
+
+### 패턴 1: 그룹별 상위 N건 추출
+
+```sql
+WITH ranked AS (
+    SELECT product_id, user_id, total,
+        ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY total DESC) AS rk
+    FROM orders
+)
+SELECT * FROM ranked WHERE rk <= 3;
+```
+
+상품별로 금액 상위 3건만 가져옵니다.
+
+### 패턴 2: 전월 대비 증감률
+
+```sql
+SELECT month,
+    revenue,
+    LAG(revenue) OVER (ORDER BY month) AS prev_revenue,
+    revenue - LAG(revenue) OVER (ORDER BY month) AS diff,
+    ROUND(
+        (revenue - LAG(revenue) OVER (ORDER BY month)) * 100.0
+        / NULLIF(LAG(revenue) OVER (ORDER BY month), 0),
+        2
+    ) AS growth_pct
+FROM monthly_revenue;
+```
+
+전월 매출을 가져와서 증감률을 계산합니다. `NULLIF`로 0 나눗셈을 방지합니다.
+
+### 패턴 3: 누적 점유율
+
+```sql
+SELECT product_id, revenue,
+    SUM(revenue) OVER (ORDER BY revenue DESC) AS running_total,
+    ROUND(
+        SUM(revenue) OVER (ORDER BY revenue DESC) * 100.0
+        / SUM(revenue) OVER (),
+        2
+    ) AS cumulative_pct
+FROM product_revenue;
+```
+
+누적 매출이 전체의 몇 퍼센트인지 계산합니다. 파레토 분석에 유용합니다.
+
+### 패턴 4: 행 간 차이 계산
+
+```sql
+SELECT day, active_users,
+    active_users - LAG(active_users) OVER (ORDER BY day) AS daily_change
+FROM daily_active_users;
+```
+
+일별 활성 사용자 변화량을 계산합니다.
+
+### 패턴 5: 파티션별 분위수
+
+```sql
+SELECT country, user_id, revenue,
+    NTILE(4) OVER (PARTITION BY country ORDER BY revenue DESC) AS quartile
+FROM user_revenue;
+```
+
+국가별로 사용자를 매출 기준 4분위로 나납니다.
+
+윈도 함수는 이처럼 비교, 순위, 비율, 누적 같은 분석을 직관적으로 표현하게 해 줍니다. 패턴을 익히 두면 실무에서 비슷한 문제를 빠르게 풀 수 있습니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - `OVER ()`가 비어 있으면 전체 행이 하나의 파티션처럼 계산됩니다.
 - 순위와 이전 값 함수는 `ORDER BY`가 있어야 의미가 분명합니다.
 - 프레임을 명시하지 않으면 기본 동작을 오해하기 쉽습니다.
 
+### 윈도 함수 결과를 UPDATE에 바로 쓸 수 있을까
+
+윈도 함수는 SELECT에서만 쓸 수 있고, UPDATE나 DELETE의 SET 절에는 직접 쓸 수 없습니다. 대신 CTE나 서브쿼리로 먼저 계산한 뒤 조인하는 패턴을 사용합니다.
+
+```sql
+WITH ranked AS (
+    SELECT id, ROW_NUMBER() OVER (ORDER BY created_at DESC) AS rk
+    FROM orders
+)
+UPDATE orders o
+SET is_recent = true
+FROM ranked r
+WHERE o.id = r.id AND r.rk <= 100;
+```
+
+이 패턴은 윈도 함수 결과를 CTE로 만든 뒤, UPDATE 문에서 그 결과를 조인해 사용하는 방식입니다.
 ## 실무에서 자주 헷갈리는 지점
 
 ### `ROW_NUMBER`와 `RANK`는 무엇이 다를까

@@ -40,8 +40,6 @@ Local green tests are not enough when pull requests can still ship unverified co
 
 This picture places Test Automation with GitHub Actions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Test Automation with GitHub Actions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What This Article Covers
 
 - How to stop relying on developers to remember manual test runs before opening a PR

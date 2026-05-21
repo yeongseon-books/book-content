@@ -286,4 +286,6 @@ for row in report_rows:
 - [Python `time.perf_counter`](https://docs.python.org/3/library/time.html#time.perf_counter)
 - [BEIR: heterogeneous benchmark for IR](https://github.com/beir-cellar/beir)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/rag-benchmark-101/ko/02-retrieval-benchmarking)
+
 Tags: RAG, VectorDB, Benchmarking, LLM

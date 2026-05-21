@@ -45,10 +45,6 @@ seo_description: '[col1, col2, col3] row_factory │ ─────────
 
 *Python DB-API 101 6장 흐름 개요*
 
-이 그림에서는 Row factory와 type adapter (sqlite3, PEP 249)를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> Row factory와 type adapter (sqlite3, PEP 249)의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## Mental Model — 두 단계 변환
 
 > SQLite에서 Python으로 값이 넘어올 때는 먼저 **값 단위 타입 변환**이 일어나고, 그다음에 **행 단위 shape 변환**이 일어납니다. 이 순서를 분리해서 보면 adapter/converter와 row factory를 어디에 둘지 명확해집니다.
@@ -194,6 +190,50 @@ view나 join 결과는 선언된 타입 정보가 사라집니다. 별칭에 `[t
 row factory는 **shape**, adapter/converter는 **value**를 다룬다는 두 축만 분리하면 sqlite3의 데이터 변환은 단순해집니다. Repository 레이어를 Pydantic 모델 위에 올려 두면 schema 변경이 import error로 잡히고, 도메인 타입(`Decimal`, `Enum`, JSON)이 안전하게 흐릅니다.
 
 다음 글에서는 **error handling과 exception hierarchy**를 다룹니다. PEP 249가 정의한 8개 예외 클래스, sqlite3의 매핑(IntegrityError, OperationalError, ProgrammingError 등), `BUSY`와 `LOCKED`의 차이, 그리고 retry 전략을 코드로 정리합니다.
+
+## 실전 패턴 추가: connection/cursor/transaction 경계를 명시하는 운영 코드
+
+DB-API 코드는 SQL 문장보다 경계 관리가 더 중요합니다. 연결 수명, 커서 재사용 범위, 커밋/롤백 시점을 코드로 드러내야 장애 시 복구가 쉬워집니다.
+
+```python
+import sqlite3
+from contextlib import contextmanager
+from typing import Iterator
+
+@contextmanager
+def db_connection(path: str) -> Iterator[sqlite3.Connection]:
+    conn = sqlite3.connect(path, timeout=5.0)
+    try:
+        yield conn
+        conn.commit()
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
+
+def transfer(conn: sqlite3.Connection, sender: int, receiver: int, amount: int) -> None:
+    if amount <= 0:
+        raise ValueError("amount must be positive")
+
+    cur = conn.cursor()
+    cur.execute("UPDATE accounts SET balance = balance - ? WHERE id = ?", (amount, sender))
+    cur.execute("UPDATE accounts SET balance = balance + ? WHERE id = ?", (amount, receiver))
+
+def list_recent(conn: sqlite3.Connection, limit: int = 100) -> list[tuple[int, int, int]]:
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT sender_id, receiver_id, amount FROM transfers ORDER BY id DESC LIMIT ?",
+        (limit,),
+    )
+    return cur.fetchall()
+```
+
+이 패턴은 세 가지를 보장합니다. 첫째, 트랜잭션 성공/실패 경계를 컨텍스트 매니저 한 곳에서 통제합니다. 둘째, `execute` 파라미터 바인딩을 강제해 SQL 인젝션 리스크를 줄입니다. 셋째, 읽기/쓰기 함수를 분리해 장애 분석 시 어떤 쿼리가 상태를 바꿨는지 추적이 쉬워집니다. 소규모 서비스라도 이 구조를 일찍 도입하면 운영 중 데이터 정합성 이슈를 크게 줄일 수 있습니다.
+
+## 추가 실무 메모: 트랜잭션 로그를 남기는 기준
+
+쓰기 작업은 SQL 자체보다 실패 맥락을 남기는 편이 중요합니다. `order_id`, 영향 row 수, 예외 타입을 같은 로그 라인에 남기면 재시도 정책을 설계할 때 근거가 생깁니다. DB-API에서는 `except` 블록에서 롤백 후 재상승시키는 패턴을 기본값으로 두는 편이 안전합니다.
 
 ## 처음 질문으로 돌아가기
 

@@ -38,10 +38,6 @@ last_reviewed: '2026-05-12'
 
 *pytest 101 3장 흐름 개요*
 
-이 그림에서는 assert와 예외 테스트를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> assert와 예외 테스트의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 이 글이 중요한가
 
 테스트가 실패했는데 원인을 한눈에 읽을 수 없다면, 테스트가 디버깅을 돕는 것이 아니라 오히려 방해하게 됩니다. pytest는 이 지점에서 강합니다. `assert result == expected`처럼 단순한 표현만 써도, 실패 시 양쪽 값을 자세히 보여 주기 때문입니다.
@@ -266,6 +262,74 @@ def test_complex_assertion():
 ## 정리 및 다음 글 안내
 
 pytest의 `assert`는 읽기 쉽고, 실패했을 때도 유용합니다. `pytest.raises`와 `pytest.approx`까지 익히면 예외와 부동소수점처럼 자주 헷갈리는 영역도 안정적으로 검증할 수 있습니다. 다음 글에서는 테스트 데이터와 상태 준비를 반복 없이 관리하는 fixture를 살펴보겠습니다.
+
+## 실전 패턴 추가: fixture, parametrization, mock을 함께 설계하기
+
+테스트 파일이 커질수록 중요한 것은 개별 문법보다 테스트 경계를 일정하게 유지하는 일입니다. 특히 fixture로 상태를 준비하고, `@pytest.mark.parametrize`로 입력 집합을 확장하고, mock으로 외부 의존성을 분리하는 세 가지를 한 흐름으로 묶으면 테스트 유지보수 비용이 크게 줄어듭니다.
+
+```python
+# tests/test_order_service.py
+from __future__ import annotations
+
+from dataclasses import dataclass
+from unittest.mock import Mock
+
+import pytest
+
+
+@dataclass
+class Order:
+    item: str
+    qty: int
+
+
+class InventoryClient:
+    def reserve(self, item: str, qty: int) -> bool:  # pragma: no cover
+        raise NotImplementedError
+
+
+class OrderService:
+    def __init__(self, client: InventoryClient) -> None:
+        self.client = client
+
+    def place(self, order: Order) -> str:
+        if order.qty <= 0:
+            raise ValueError("qty must be positive")
+        ok = self.client.reserve(order.item, order.qty)
+        return "confirmed" if ok else "rejected"
+
+
+@pytest.fixture
+def inventory_client() -> Mock:
+    return Mock(spec=InventoryClient)
+
+
+@pytest.fixture
+def order_service(inventory_client: Mock) -> OrderService:
+    return OrderService(client=inventory_client)
+
+
+@pytest.mark.parametrize(
+    "order,expected",
+    [
+        (Order("book", 1), "confirmed"),
+        (Order("book", 3), "confirmed"),
+        (Order("book", 5), "rejected"),
+    ],
+)
+def test_place_orders(order_service: OrderService, inventory_client: Mock, order: Order, expected: str) -> None:
+    inventory_client.reserve.return_value = expected == "confirmed"
+    assert order_service.place(order) == expected
+
+
+def test_place_rejects_invalid_quantity(order_service: OrderService) -> None:
+    with pytest.raises(ValueError, match="qty must be positive"):
+        order_service.place(Order("book", 0))
+```
+
+위 구조의 핵심은 테스트 목적별 분리입니다. fixture는 준비, parametrization은 입력 공간, mock은 외부 의존성 제어를 담당합니다. 팀 단위에서는 이 분리를 지켜야 테스트를 고칠 때 영향 범위를 빠르게 읽을 수 있습니다.
+
+또한 fixture scope를 무조건 넓히지 않는 편이 안전합니다. DB 연결이나 임시 디렉터리처럼 생성 비용이 큰 자원만 `module` 또는 `session`으로 올리고, 나머지는 `function` scope로 두어 테스트 독립성을 유지하는 것이 좋습니다.
 
 ## 처음 질문으로 돌아가기
 

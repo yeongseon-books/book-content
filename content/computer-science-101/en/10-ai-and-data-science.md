@@ -43,8 +43,6 @@ In this article, we'll connect the previous nine posts to machine learning and d
 
 This picture places From CS to AI and Data Science inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of From CS to AI and Data Science is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions This Article Answers
 
 - Where do the CS fundamentals from this series show up directly in AI and data science?
@@ -67,8 +65,6 @@ AI is not magic. Models are trained on data, inference is matrix arithmetic, and
 > AI/DS = CS + statistics + domain.
 
 Tools change quickly; foundations stay valid for a long time.
-
-## Concept at a Glance
 
 > A rule-based system has humans write the rules. Machine learning infers the rules from data.
 

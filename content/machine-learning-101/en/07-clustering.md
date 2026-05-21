@@ -40,12 +40,9 @@ This is post 7 in the Machine Learning 101 series. Here we will compare KMeans a
 
 This picture places Clustering inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-
 ## Why It Matters
 
 Clustering is the backbone of segmentation, anomaly detection, and exploratory data analysis. It often runs before any supervised model.
-
-## Concept at a Glance
 
 ## Key Terms
 

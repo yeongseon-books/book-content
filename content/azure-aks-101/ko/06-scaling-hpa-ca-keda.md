@@ -326,4 +326,6 @@ autoscaling은 신뢰성과 비용을 동시에 다룹니다.
 - [Azure App Service 101](../../azure-app-service-101/ko/07-scaling-101.md) — 인스턴스 스케일과 Kubernetes 스케일의 차이를 비교할 때
 - [Azure Functions 101](../../azure-functions-101/ko/06-scaling-and-cold-start.md) — 서버리스 스케일 모델과 비교할 때
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-aks-101/ko/06-scaling-hpa-ca-keda)
+
 Tags: Azure, AKS, Kubernetes, Cloud

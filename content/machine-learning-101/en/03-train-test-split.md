@@ -40,12 +40,9 @@ This is post 3 in the Machine Learning 101 series. Here we will use train/test s
 
 This picture places Train/Test Split inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-
 ## Why It Matters
 
 Without measuring generalization, you cannot select or compare models. Training scores are scores you cannot ship.
-
-## Concept at a Glance
 
 ## Key Terms
 

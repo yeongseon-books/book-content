@@ -45,8 +45,6 @@ In this post, we pull the whole toolkit together in one small Python service: do
 
 This picture places Practicing Design with a Small Project inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Practicing Design with a Small Project is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - How to start design on a small project
@@ -60,8 +58,6 @@ This picture places Practicing Design with a Small Project inside an operating f
 The same principles work in small code. The mini-project here is small but it is the stage for applying every tool.
 
 > Good habits get built in small systems.
-
-## Concept at a Glance
 
 Domain → port → adapter → infrastructure.
 

@@ -45,7 +45,7 @@ This is post 4 in the Computer Science Major 101 series.
 
 This picture places Understanding Systems Subjects inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Understanding Systems Subjects is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Systems courses are not just theory—they bridge the gap between what you code and how the hardware actually runs it. That gap is where debugging happens.
 
 ## What You Will Learn
 
@@ -60,7 +60,7 @@ This picture places Understanding Systems Subjects inside an operating flow. The
 *Performance* and *incident analysis* are only possible on top of *systems knowledge*.
 
 ## Concept at a Glance
-
+Processes, memory hierarchies, caching, and instruction pipelines are not abstractions—they explain why your code runs at the speed it does.
 ## Key Terms
 
 - **OS**: *resource manager*.

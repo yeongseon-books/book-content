@@ -45,8 +45,6 @@ This is post 5 in the Type Hints in Python 101 series.
 
 This picture places TypedDict and dataclass inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of TypedDict and dataclass is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - TypedDict for dictionaries with known keys and typed values
@@ -61,8 +59,6 @@ Most Python bugs with dictionaries come from key typos and wrong value types. `u
 > TypedDict = typed dictionary. dataclass = typed class without boilerplate.
 
 Both turn unstructured data into structured, type-safe code.
-
-## Concept at a Glance
 
 > TypedDict annotates dictionary shapes. dataclass generates class boilerplate from type annotations.
 

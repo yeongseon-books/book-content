@@ -40,15 +40,11 @@ This is post 7 in the Backend Development 101 series. Here, we focus on three op
 
 This picture places Logging and Error Handling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Logging and Error Handling is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Code is written once and *operated for years*. Ninety percent of operations is *reading*, and the reading tool is the log. Building structured logs from day one cuts incident response time by *orders of magnitude*.
 
 > Good logs are read more often than the code itself.
-
-## Concept at a Glance
 
 Every path leads to the *log*.
 

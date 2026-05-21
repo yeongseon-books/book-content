@@ -43,8 +43,6 @@ This is post 9 in the Software Engineering 101 series. In this chapter, we class
 
 This picture places Maintenance and Tech Debt inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Maintenance and Tech Debt is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The four types of tech debt (Martin Fowler's quadrant)
@@ -58,8 +56,6 @@ This picture places Maintenance and Tech Debt inside an operating flow. The poin
 There is no codebase without debt. The question is whether you are aware of it, measuring it, and paying it down.
 
 > Debt is not the problem. Unconscious debt is.
-
-## Concept at a Glance
 
 Debt is a cycle, not an event.
 

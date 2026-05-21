@@ -58,8 +58,6 @@ In a microservice world, finding the cause of a *slow request* with logs and met
 
 > *Debugging a distributed system without tracing is *walking a maze blindfolded*.*
 
-## Concept at a Glance
-
 Observability is the ability to understand a system's internal state from external signals. In a distributed system, you cannot instrument every line of code. You rely on *metrics* (what happened), *logs* (why it happened), and *traces* (where it happened).
 
 ## Key Terms

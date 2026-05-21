@@ -41,15 +41,11 @@ This is post 3 in the Web Development 101 series. Here we turn the browser into 
 
 This picture places The Browser and the DOM inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of The Browser and the DOM is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Without a mental model of the DOM, you will never understand *why your page is slow*. Once the rendering pipeline is in your head, even React and Vue stop feeling like magic.
 
 > The browser is *a machine for drawing the DOM*.
-
-## Concept at a Glance
 
 The browser does not jump from HTML text straight to pixels. It builds internal structures first, and DOM updates can force part of that pipeline to run again, which is why UI work and performance are tightly connected.
 

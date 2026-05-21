@@ -43,15 +43,11 @@ Here we compare the heavyweight answer of 2PC with the more common production an
 
 This picture places Distributed Transactions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Distributed Transactions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 As microservices and multi-store architectures grow, "two systems in one transaction" appears more often. Single-DB ACID is far more expensive — sometimes impossible — across multiple nodes. Distributed transactions are essentially design under explicit tradeoffs.
 
 > A distributed transaction is the design of "recoverable inconsistency," not an imitation of ACID.
-
-## Concept at a Glance
 
 The coordinator sends prepare to both, and only commits when both answer yes. That is 2PC.
 

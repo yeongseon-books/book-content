@@ -42,8 +42,6 @@ This is post 3 in the Azure Container Apps 101 series. Here, we'll walk a Python
 
 This picture places Your first deploy — Python/FastAPI inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Your first deploy — Python/FastAPI is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 A single "hello world" deploy is the line between understanding ACA in your head and understanding it in your hands. After one real deploy, you have your own answers to questions like:

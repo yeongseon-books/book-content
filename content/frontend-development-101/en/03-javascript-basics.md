@@ -40,8 +40,6 @@ This is post 3 in the Frontend Development 101 series. Here we focus on the five
 
 This picture places JavaScript Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of JavaScript Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - `let`/`const` and *immutable thinking*
@@ -56,8 +54,6 @@ This picture places JavaScript Basics inside an operating flow. The point is not
 JavaScript stays the same *across frameworks*. Inside React components, inside Vue, inside Node.js — the *syntax is identical*. Time invested here makes *every framework faster to learn*.
 
 > Good JavaScript is a sum of *small, separated functions*.
-
-## Concept at a Glance
 
 ## Key Terms
 

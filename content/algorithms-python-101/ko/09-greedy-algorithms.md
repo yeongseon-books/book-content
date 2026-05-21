@@ -40,10 +40,6 @@ last_reviewed: '2026-05-12'
 
 *Algorithms with Python 101 9장 흐름 개요*
 
-이 그림에서는 그리디 알고리즘를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 그리디 알고리즘의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 중요한가
 
 그리디 알고리즘은 짧고 빠릅니다. 많은 문제가 정렬 한 번과 단일 순회 한 번으로 `O(n log n)`에 해결됩니다. 흔한 `O(n^2)` DP보다 훨씬 효율적일 수 있습니다.
@@ -333,5 +329,7 @@ print(f"DP:     {coin_change_dp(coins, amount)} coins")            # 2 (3+3)
 - [GeeksforGeeks — Greedy Algorithms](https://www.geeksforgeeks.org/greedy-algorithms/)
 - [Real Python — Greedy Algorithms in Python](https://realpython.com/python-greedy-algorithm/)
 - [LeetCode — Greedy Problems](https://leetcode.com/tag/greedy/)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/algorithms-python-101/ko/09-greedy-algorithms)
 
 Tags: Python, Algorithms, Greedy, Optimization, Activity Selection

@@ -40,8 +40,6 @@ This is post 7 in the Frontend Development 101 series. Here we treat a form as a
 
 This picture places Forms and Validation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Forms and Validation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - Controlled vs uncontrolled inputs
@@ -55,8 +53,6 @@ This picture places Forms and Validation inside an operating flow. The point is 
 Forms drive *conversion*. Sign-up, payment, search — all forms. *Slightly awkward* forms cause users to leave. Forms are the *UX exam* of the frontend.
 
 > Great forms *ask less*, *catch typos early*, and *submit fast*.
-
-## Concept at a Glance
 
 ## Key Terms
 

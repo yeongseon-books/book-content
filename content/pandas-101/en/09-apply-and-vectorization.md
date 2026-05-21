@@ -48,8 +48,6 @@ This picture places Apply and Vectorization inside an operating flow. The point 
 
 Analysis speed can differ by *tens to hundreds of times*. *Vectorization* is the *essence of Pandas*, and *apply abuse* is the *most common antipattern*.
 
-## Concept at a Glance
-
 ## Key Terms
 
 - **Vectorization**: array-level computation *without explicit loops*.

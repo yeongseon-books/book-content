@@ -45,8 +45,6 @@ This is post 5 in the Computer Networks 101 series.
 
 This picture places HTTP and HTTPS inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of HTTP and HTTPS is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The HTTP message structure (start line, headers, body)
@@ -60,8 +58,6 @@ This picture places HTTP and HTTPS inside an operating flow. The point is not to
 HTTP is the common language of essentially every service — backend, frontend, mobile, data, and ML serving. Misuse of methods and status codes silently breaks caching, retries, and error handling. HTTPS is the default now, but if you cannot answer "why?", certificate expiry, mixed content, and HSTS incidents stay mysteries.
 
 > HTTP is "the agreed shape of a text message", and REST is a style that organizes those agreements around resources.
-
-## Concept at a Glance
 
 Both requests and responses are "start line + headers + blank line + body".
 

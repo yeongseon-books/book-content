@@ -84,6 +84,87 @@ Before 상태에서는 장애 인지 시점이 늦고 맥락도 부족합니다.
 
 ---
 
+## 파이프라인 오케스트레이터 비교
+
+모니터링 외에도, 실험 관리부터 배포까지 전체 흐름을 자동화하려면 오케스트레이터가 필요합니다. 아래 표는 대표적인 네 가지 도구를 학습 곡선, 확장 규모, ML 특화 정도로 비교합니다.
+
+| 도구 | 학습 곡선 | 확장 규모 | ML 특화 | 주요 특징 |
+|---|---|---|---|---|
+| **Airflow** | 중간 | 대규모 | 범용 | Python DAG, 넓은 커뮤니티, 스케줄링 |
+| **Prefect** | 낮음 | 중간 | 범용 | 동적 DAG, 로컬 실행 쉬움 |
+| **Kubeflow** | 높음 | 대규모 | ML 특화 | Kubernetes 기반, TFX 통합 |
+| **Dagster** | 중간 | 중간 | 범용 | 데이터 자산 중심, Type-safe |
+
+선택 기준은 팀 규모, 인프라, ML 파이프라인 복잡도입니다. Airflow는 범용성이 높고 커뮤니티가 넓어 초기 도입이 안정적입니다. Kubeflow는 Kubernetes 환경에서 ML 전용 컴포넌트를 제공하지만, 초기 설정 비용이 큽니다.
+
+---
+
+## Airflow DAG로 모니터링 + 파이프라인 연결 예시
+
+Airflow는 단순 스케줄링뿐 아니라, 모델 학습 → 평가 → 배포까지 순서를 보장하는 DAG를 정의할 수 있습니다. 아래 예시는 학습, 평가, 배포 단계를 연결하는 최소 파이프라인입니다.
+
+```python
+from airflow import DAG
+from airflow.operators.python import PythonOperator
+from datetime import datetime
+
+def train():
+    print("Training model...")
+    # 실제 학습 로직
+
+def evaluate():
+    print("Evaluating model...")
+    # 평가 로직
+    return 0.92  # accuracy
+
+def deploy():
+    print("Deploying model...")
+    # 배포 로직
+
+with DAG(
+    dag_id="model_pipeline",
+    start_date=datetime(2026, 1, 1),
+    schedule="@daily",
+    catchup=False,
+) as dag:
+    t1 = PythonOperator(task_id="train", python_callable=train)
+    t2 = PythonOperator(task_id="evaluate", python_callable=evaluate)
+    t3 = PythonOperator(task_id="deploy", python_callable=deploy)
+    t1 >> t2 >> t3
+```
+
+이 DAG는 `train` → `evaluate` → `deploy` 순서를 강제합니다. 평가 단계에서 기준을 통과하지 못하면 배포를 건너뛰도록 `BranchPythonOperator`를 쓸 수 있습니다. 또한 매일 새벽 자동 실행되므로, 재학습 루프와 결합하면 드리프트 감지 후 자동 재학습까지 연결할 수 있습니다.
+
+---
+
+## 파이프라인 테스트
+
+운영 파이프라인도 테스트가 필요합니다. DAG 문법 오류, 의존성 누락, 타임아웃 설정 실수는 배포 후 첫 실행에서만 발견되기 쉽습니다. 아래는 Airflow DAG를 로컬에서 검증하는 최소 테스트 코드입니다.
+
+```python
+import pytest
+from airflow.models import DagBag
+
+def test_dag_loads():
+    dagbag = DagBag(dag_folder="dags/", include_examples=False)
+    assert len(dagbag.import_errors) == 0, f"DAG import errors: {dagbag.import_errors}"
+
+def test_task_count():
+    dagbag = DagBag(dag_folder="dags/", include_examples=False)
+    dag = dagbag.get_dag(dag_id="model_pipeline")
+    assert len(dag.tasks) == 3
+
+def test_task_dependencies():
+    dagbag = DagBag(dag_folder="dags/", include_examples=False)
+    dag = dagbag.get_dag(dag_id="model_pipeline")
+    train = dag.get_task("train")
+    evaluate = dag.get_task("evaluate")
+    assert evaluate in train.downstream_list
+```
+
+이 테스트는 DAG 파일이 문법적으로 올바른지, 예상한 개수의 태스크가 있는지, 의존 관계가 올바른지 확인합니다. CI에서 이 테스트를 돌리면 배포 전에 파이프라인 구조 오류를 잡을 수 있습니다.
+
+---
 ## FastAPI 모델에 메트릭을 붙여 보겠습니다
 
 ### 1단계 — 의존성을 설치합니다
@@ -239,6 +320,84 @@ annotations:
 모니터링은 배포 뒤에 붙는 옵션이 아니라, 모델을 운영 자산으로 다루기 위한 기본 관측 장치입니다. 정확도만 기다리면 너무 늦고, 운영 신호를 먼저 봐야 문제를 조기에 잡을 수 있습니다.
 
 이 글에서 기억할 핵심은 하나입니다. **모델이 살아 있는지보다, 지금 어떤 상태로 살아 있는지를 알아야 운영이 됩니다.** 다음 글에서는 그 신호를 바탕으로 데이터 드리프트와 모델 드리프트를 어떻게 구분할지 다루겠습니다.
+
+
+## 예측 드리프트 감지 코드 추가
+
+시스템 메트릭만으로는 모델 품질 이상을 놓칠 수 있으므로, 예측 분포 변화를 함께 계산하는 것이 좋습니다.
+
+```python
+import numpy as np
+
+
+def prediction_drift_score(ref_preds: np.ndarray, cur_preds: np.ndarray, bins: int = 20) -> float:
+    edges = np.linspace(0.0, 1.0, bins + 1)
+    r_hist, _ = np.histogram(ref_preds, bins=edges)
+    c_hist, _ = np.histogram(cur_preds, bins=edges)
+
+    r = r_hist / max(r_hist.sum(), 1)
+    c = c_hist / max(c_hist.sum(), 1)
+
+    eps = 1e-6
+    r = r + eps
+    c = c + eps
+
+    return float(np.sum((c - r) * np.log(c / r)))
+
+
+ref = np.random.beta(2, 5, size=5000)
+cur = np.random.beta(3, 4, size=5000)
+print(round(prediction_drift_score(ref, cur), 4))
+```
+
+이 값은 단독 판단 기준이 아니라 경보 신호로 쓰는 편이 안전합니다. 보통 임계값을 넘으면 대시보드 점검과 샘플 검토를 먼저 수행합니다.
+
+## 모니터링 대시보드 핵심 패널
+
+| 패널 | 목적 | 권장 시각화 |
+|---|---|---|
+| 요청량/성공률 | 트래픽과 실패 징후 파악 | 시계열 라인 |
+| p50/p95/p99 지연시간 | 성능 저하 조기 감지 | 히스토그램 + 라인 |
+| 예측 클래스 분포 | 모델 출력 이상 감지 | 스택 바/비율 라인 |
+| 입력 피처 결측률 | 데이터 품질 감지 | 피처별 히트맵 |
+| 배포 버전별 오류율 | 특정 버전 리스크 확인 | 버전 라벨 라인 |
+
+패널이 많아질수록 좋은 것이 아니라, 온콜이 1분 안에 상황을 파악할 수 있느냐가 더 중요합니다.
+
+## Prometheus 알림 룰 예시
+
+```yaml
+groups:
+  - name: model-serving
+    rules:
+      - alert: ModelErrorRateHigh
+        expr: rate(http_requests_total{path="/predict",status=~"5.."}[5m])
+          /
+          rate(http_requests_total{path="/predict"}[5m]) > 0.01
+        for: 10m
+        labels:
+          severity: page
+        annotations:
+          summary: "모델 API 5xx 비율이 1%를 초과했습니다"
+          runbook: "https://internal.example/runbooks/model-error"
+
+      - alert: PredictionDriftSuspected
+        expr: avg_over_time(prediction_drift_score[30m]) > 0.15
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "예측 분포 변화가 커졌습니다"
+```
+
+## 알림 피로를 줄이는 운영 원칙
+
+- 같은 원인에서 반복되는 경고는 그룹화합니다.
+- 일시 스파이크를 막기 위해 `for` 기간을 둡니다.
+- 페이지 수준 경고는 즉시 행동이 가능한 것만 남깁니다.
+- 모든 경고에는 런북 링크를 포함합니다.
+
+모니터링은 수집보다 대응 설계가 더 중요합니다. 경고가 행동으로 이어지지 않으면 시스템 신뢰는 빠르게 떨어집니다.
 
 ## 처음 질문으로 돌아가기
 

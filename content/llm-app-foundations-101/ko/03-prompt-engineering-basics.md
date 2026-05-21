@@ -424,4 +424,6 @@ print(completion.choices[0].message.content)
 - [대화 상태 관리 — 멀티턴 챗봇 만들기](./05-conversation-state.md)
 - [툴 호출 — 함수를 모델에 연결하기](../../llm-api-production-101/ko/02-tool-calling.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/llm-app-foundations-101/ko/03-prompt-engineering-basics)
+
 Tags: LLM, OpenAI, Prompt Engineering, Python

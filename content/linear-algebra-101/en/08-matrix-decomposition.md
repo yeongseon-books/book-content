@@ -40,7 +40,7 @@ This is post 8 in the Linear Algebra 101 series. Here we will place LU, QR, eige
 
 This picture places Matrix Decomposition inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Matrix Decomposition is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Matrix decomposition is the key to solving many numerical problems. LU, QR, SVD, and eigendecomposition each have different geometric and numerical meaning, and choosing the right one makes computation stable and efficient.
 
 ## Questions This Post Answers
 
@@ -56,8 +56,6 @@ This picture places Matrix Decomposition inside an operating flow. The point is 
 Solving linear systems, fitting least-squares models, compressing data, and building low-rank approximations all depend on decomposition. The choice affects both speed and numerical stability.
 
 This is one of the most useful mindset shifts in the series. Stable linear algebra is usually about selecting the right factorization for the question in front of you, not about reaching for the inverse because the formula looks short.
-
-## Concept at a Glance
 
 ## Key Terms
 

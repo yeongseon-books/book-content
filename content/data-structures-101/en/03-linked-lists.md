@@ -45,8 +45,6 @@ This is post 3 in the Data Structures 101 series.
 
 This picture places Linked Lists inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Linked Lists is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The structural difference between singly and doubly linked lists
@@ -59,8 +57,6 @@ This picture places Linked Lists inside an operating flow. The point is not to m
 Linked lists are at the heart of system software — operating-system kernels, LRU caches, free-memory lists. They also form the foundation of more complex structures like trees and graphs. Pointer manipulation is awkward at first, but once you understand it, a far wider library of structures opens up.
 
 > An array groups data by position. A linked list groups data by relationship.
-
-## Concept at a Glance
 
 > A singly linked list stores only a "next" pointer per node — small memory footprint, but reverse traversal is hard. A doubly linked list keeps both directions, so both ends are fast, at the cost of an extra pointer per node.
 

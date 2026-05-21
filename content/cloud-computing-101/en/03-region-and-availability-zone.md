@@ -24,7 +24,7 @@ last_reviewed: '2026-05-14'
 
 Two teams can run the same service on the same cloud and get very different outage stories. One loses a single data center and keeps serving traffic. The other loses the same kind of fault and goes dark. The difference usually starts with placement, not features.
 
-In cloud systems, choosing where something runs is not a cosmetic decision. It sets the floor for latency, shapes your failover blast radius, and determines how expensive replication will become later.
+Region and Availability Zone are geographic boundaries. A region is a city or continent. An AZ is a failure domain within a region — data centers separated so that failure in one does not cascade to another. Multi-AZ deployment is a foundation of reliability; Multi-Region is only for specific needs.
 
 This is post 3 in the Cloud Computing 101 series.
 
@@ -46,7 +46,7 @@ In this post, we'll separate Regions, Availability Zones, and edge locations, th
 
 This picture places Region and Availability Zone inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Region and Availability Zone is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Decisions about regions and zones shape your latency, cost, resilience, and compliance. They are not neutral.
 
 ## Questions This Chapter Answers
 
@@ -59,8 +59,6 @@ This picture places Region and Availability Zone inside an operating flow. The p
 ## Why It Matters
 
 If everything sits in one AZ, a single data center fire takes down your service. Distribution is the *prerequisite* for availability.
-
-## Concept at a Glance
 
 ## Key Terms
 

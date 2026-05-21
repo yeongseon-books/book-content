@@ -43,15 +43,11 @@ Here we name those realities precisely so later topics such as consensus, leases
 
 This picture places Failure Models inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Failure Models is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 If your algorithm does not state how nodes break, you cannot reason about its correctness or its cost. Raft, Paxos, and BFT algorithms differ because they assume different failure models. Without this vocabulary you cannot read papers or docs.
 
 > A failure model is the price tag of an algorithm.
-
-## Concept at a Glance
 
 The further right you go, the harsher the world you assume. Harsher worlds force more expensive algorithms and more nodes.
 

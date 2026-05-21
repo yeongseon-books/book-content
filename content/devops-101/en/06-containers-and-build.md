@@ -58,8 +58,6 @@ The same build artifact must *behave the same* in *every environment*. Container
 
 > Containers realize *Build once, run anywhere*.
 
-## Concept at a Glance
-
 Containers package code and its *exact runtime* into one deployable unit. Build automation runs the same steps every time, so *"works on my laptop"* becomes impossible.
 
 ## Key Terms

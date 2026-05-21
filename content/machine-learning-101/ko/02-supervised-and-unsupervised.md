@@ -40,6 +40,16 @@ last_reviewed: '2026-05-15'
 
 이 그림은 이 장의 핵심 개념들이 어떻게 연결되는지 보여줍니다.
 
+## ML 패러다임 비교
+
+| 유형 | 목표 | 출력 | 대표 알고리즘 |
+|---|---|---|---|
+| 분류(Classification) | 이산 레이블 예측 | 0, 1, 2 등 | Logistic Regression, Decision Tree |
+| 회귀(Regression) | 연속값 예측 | 123.4, -0.89 등 | Linear Regression, SVR |
+| 군집(Clustering) | 비슷한 점 묶기 | cluster ID | KMeans, DBSCAN |
+| 차원축소(Dimensionality Reduction) | 피처 압축 | 낮은 차원 X | PCA, t-SNE |
+
+분류와 회귀는 둘 다 지도학습이지만, 예측하려는 대상이 다릅니다. 군집과 차원축소는 비지도학습으로, 레이블 없이 데이터의 구조를 찾는 문제입니다.
 
 
 ## 왜 중요한가
@@ -104,6 +114,42 @@ print("inertia:", km.inertia_)
 
 **예상 출력:** 분류 예제는 정확도, 회귀 예제는 `R^2`, 군집화 예제는 inertia를 출력합니다. 숫자가 모두 성능처럼 보이지만 **서로 같은 의미가 아니며 직접 비교할 수도 없습니다.**
 
+## 준지도학습과 자기지도학습
+
+실무에서는 지도학습과 비지도학습 사이의 중간 지대가 더 흔합니다.
+
+### 준지도학습(Semi-supervised learning)
+
+- 레이블이 있는 데이터는 적고, 레이블이 없는 데이터는 많을 때 사용합니다.
+- 예시: 이미지 100장은 사람이 레이블링했고, 10,000장은 레이블이 없을 때 준지도 기법을 쓰면 레이블링 비용을 크게 줄일 수 있습니다.
+
+### 자기지도학습(Self-supervised learning)
+
+- 데이터 자체에서 레이블을 자동으로 만드는 방식입니다.
+- 예시: 문장에서 단어를 가리고 다음 단어를 예측하는 방식으로 언어 모델을 학습합니다.
+- 현대 NLP와 컴퓨터 비전에서 널리 쓰이는 전략입니다.
+
+입문 단계에서는 지도/비지도 경계만 명확히 잡으면 충분하지만, 실무에서는 중간 기법을 고려하는 것이 효율적일 때가 많습니다.
+
+## Python 예제: KMeans vs LogisticRegression
+
+```python
+from sklearn.datasets import load_iris
+from sklearn.cluster import KMeans
+from sklearn.linear_model import LogisticRegression
+
+X, y = load_iris(return_X_y=True)
+
+# 비지도: 군집
+km = KMeans(n_clusters=3, n_init=10, random_state=42).fit(X)
+print("Inertia:", km.inertia_)  # 응집도 (낙을수록 좋음)
+
+# 지도: 분류
+clf = LogisticRegression(max_iter=1000).fit(X, y)
+print("Accuracy:", clf.score(X, y))  # 정확도
+```
+
+군집 결과의 inertia와 분류 결과의 accuracy는 서로 비교할 수 없습니다. 비지도학습은 정답이 없기 때문에 해석이 더 어렵습니다.
 ## 이 코드에서 먼저 봐야 할 점
 
 - `clf.score`는 정확도, `reg.score`는 결정계수(R-squared), `km.inertia_`는 군집 응집도를 뜻합니다. **지표가 다르면 숫자의 의미도 달라집니다.**
@@ -156,6 +202,164 @@ print("inertia:", km.inertia_)
 이 글에서 기억할 핵심은 세 가지입니다. 첫째, 분류와 회귀는 둘 다 지도학습이지만 예측 대상이 다릅니다. 둘째, 군집화는 정답이 없는 구조 탐색 문제입니다. 셋째, 문제 프레이밍을 잘못 잡으면 모델 개선 자체가 무의미해집니다.
 
 다음 글에서는 Train/Test Split을 통해 일반화를 어떻게 측정하는지 살펴보겠습니다.
+
+## 실전 확장: 학습·평가 파이프라인을 한 번에 구성하기
+
+입문 단계에서 `fit()` 한 번으로 결과를 확인하면 모델이 잘 동작하는 것처럼 보이지만, 실무에서는 같은 데이터로 학습과 평가를 동시에 수행하면 성능이 과대평가되기 쉽습니다. 따라서 최소한 `train/validation/test` 구분을 갖춘 뒤, 피처 전처리와 모델 학습, 하이퍼파라미터 탐색, 최종 평가를 분리해야 합니다. 아래 예시는 분류 문제에서 재현 가능한 기준선을 만드는 기본 템플릿입니다.
+
+```python
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
+
+X, y = load_breast_cancer(return_X_y=True)
+
+X_train_full, X_test, y_train_full, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+X_train, X_val, y_train, y_val = train_test_split(
+    X_train_full, y_train_full, test_size=0.25, random_state=42, stratify=y_train_full
+)
+
+pipe = Pipeline([
+    ("scaler", StandardScaler()),
+    ("model", LogisticRegression(max_iter=2000))
+])
+
+param_grid = {
+    "model__C": [0.01, 0.1, 1.0, 10.0],
+    "model__penalty": ["l2"],
+    "model__solver": ["lbfgs"]
+}
+
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+search = GridSearchCV(
+    estimator=pipe,
+    param_grid=param_grid,
+    scoring="f1",
+    cv=cv,
+    n_jobs=-1
+)
+search.fit(X_train, y_train)
+
+val_pred = search.predict(X_val)
+val_proba = search.predict_proba(X_val)[:, 1]
+
+print("Best Params:", search.best_params_)
+print("Validation ROC-AUC:", roc_auc_score(y_val, val_proba))
+print(classification_report(y_val, val_pred, digits=4))
+print(confusion_matrix(y_val, val_pred))
+```
+
+핵심은 세 가지입니다. 첫째, 전처리(`StandardScaler`)를 파이프라인에 넣어 데이터 누수를 방지합니다. 둘째, `GridSearchCV`는 훈련 세트 내부에서만 교차검증을 수행하므로 검증 세트를 따로 남겨 둔 의미가 유지됩니다. 셋째, 검증 단계에서 `classification_report`와 `ROC-AUC`를 함께 확인해 임계값 민감도와 순위 품질을 동시에 점검합니다.
+
+## 분류 평가 지표를 함께 읽는 방법
+
+정확도 하나만 보면 클래스 불균형 상황에서 착시가 발생합니다. 예를 들어 양성 비율이 5%인 데이터에서 모두 음성으로 예측해도 정확도는 95%가 될 수 있습니다. 그래서 아래 지표를 함께 봐야 합니다.
+
+| 지표 | 질문 | 해석 포인트 |
+| --- | --- | --- |
+| Precision | 양성이라고 예측한 것 중 실제 양성 비율은? | 오탐(False Positive) 비용이 큰 문제에서 중요합니다. |
+| Recall | 실제 양성 중 모델이 잡아낸 비율은? | 미탐(False Negative) 비용이 큰 문제에서 중요합니다. |
+| F1-score | Precision과 Recall의 균형은 어떤가? | 한쪽만 높은 모델을 걸러내는 데 유용합니다. |
+| ROC-AUC | 다양한 임계값에서 양성과 음성을 얼마나 잘 분리하나? | 임계값 고정 전 모델 비교에 적합합니다. |
+
+실무에서는 보통 지표 우선순위를 도메인 비용으로 정합니다. 예를 들어 사기 탐지는 Recall을 높게 두고, 마케팅 리드 스코어링은 Precision을 우선 둘 수 있습니다. 즉, 좋은 모델이란 "절대적 최고 점수"가 아니라 "비즈니스 손실을 최소화하는 점수 조합"입니다.
+
+## 혼동 행렬을 운영 관점으로 해석하기
+
+혼동 행렬은 네 칸 숫자 자체보다, 어떤 유형의 오류가 반복되는지 보는 도구입니다.
+
+- True Positive: 맞게 탐지한 양성입니다.
+- True Negative: 맞게 걸러낸 음성입니다.
+- False Positive: 잘못 탐지한 양성입니다.
+- False Negative: 놓친 양성입니다.
+
+예를 들어 의료 스크리닝에서는 False Negative가 치명적일 수 있어 Recall 중심 임계값 조정이 필요합니다. 반대로 자동 승인 심사에서는 False Positive가 비용을 키우므로 Precision 중심 정책이 필요할 수 있습니다. 따라서 모델 개선 회의에서는 "정확도 몇 점"보다 "현재 오류의 대부분이 FP인지 FN인지"를 먼저 공유하는 편이 의사결정에 유리합니다.
+
+## 교차검증과 모델 비교를 표준화하기
+
+한 번의 분할 결과만으로 모델을 비교하면 우연에 휘둘립니다. 최소 5-fold 교차검증으로 분산을 같이 봐야 합니다.
+
+```python
+from sklearn.model_selection import cross_validate
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+
+candidates = {
+    "logreg": Pipeline([
+        ("scaler", StandardScaler()),
+        ("model", LogisticRegression(max_iter=2000))
+    ]),
+    "dt": DecisionTreeClassifier(max_depth=5, random_state=42),
+    "rf": RandomForestClassifier(n_estimators=300, random_state=42)
+}
+
+for name, est in candidates.items():
+    scores = cross_validate(
+        est,
+        X_train_full,
+        y_train_full,
+        cv=5,
+        scoring={"acc": "accuracy", "f1": "f1", "auc": "roc_auc"},
+        n_jobs=-1
+    )
+    print(name)
+    print("acc:", scores["test_acc"].mean(), "+/-", scores["test_acc"].std())
+    print("f1 :", scores["test_f1"].mean(), "+/-", scores["test_f1"].std())
+    print("auc:", scores["test_auc"].mean(), "+/-", scores["test_auc"].std())
+```
+
+평균 점수만 비슷하면 표준편차가 더 작은 모델을 운영 초기 선택지로 두는 것이 안전합니다. 이후 트래픽과 데이터가 쌓이면 복잡한 모델로 단계적으로 전환하면 됩니다.
+
+## 피처 엔지니어링에서 초기에 점검할 항목
+
+피처 엔지니어링은 고급 기법보다 기본 위생이 먼저입니다.
+
+1. 결측치 처리 규칙이 학습/추론에서 동일한지 확인합니다.
+2. 범주형 인코딩 방식(One-Hot, Target Encoding 등)의 누수 가능성을 점검합니다.
+3. 날짜 피처는 주기성(요일, 월, 시간대)을 분해해 반영합니다.
+4. 로그 스케일 변환이 긴 꼬리 분포를 안정화하는지 확인합니다.
+5. 파생 피처 추가 전후에 검증 지표가 실제로 개선되는지 기록합니다.
+
+아래처럼 `ColumnTransformer`와 파이프라인을 결합하면 전처리 일관성이 높아집니다.
+
+```python
+import pandas as pd
+from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import OneHotEncoder
+
+# df는 예시 데이터프레임이라고 가정합니다.
+num_cols = ["age", "income", "tenure_month"]
+cat_cols = ["region", "device_type"]
+
+a_preprocess = ColumnTransformer([
+    ("num", Pipeline([
+        ("imputer", SimpleImputer(strategy="median")),
+        ("scaler", StandardScaler())
+    ]), num_cols),
+    ("cat", Pipeline([
+        ("imputer", SimpleImputer(strategy="most_frequent")),
+        ("onehot", OneHotEncoder(handle_unknown="ignore"))
+    ]), cat_cols)
+])
+```
+
+이 구조를 사용하면 학습 시점의 전처리 규칙이 추론 시점에도 동일하게 재현됩니다. 문서화가 쉬워지고, 팀 내 인수인계 비용도 줄어듭니다.
+
+## 운영 직전 최종 점검 체크리스트
+
+- 데이터 분할 기준(`random_state`, `stratify`)이 코드에 고정되어 있습니다.
+- 평가 지표가 비즈니스 비용 구조와 연결되어 있습니다.
+- 혼동 행렬 기반으로 FP/FN 대응 정책이 합의되어 있습니다.
+- 교차검증 평균뿐 아니라 분산까지 비교했습니다.
+- 피처 전처리와 모델을 하나의 파이프라인으로 묶었습니다.
+
+이 다섯 가지를 만족하면, 단순히 "모델이 돌아간다" 수준을 넘어 "재현 가능하고 설명 가능한 학습 시스템"에 가까워집니다.
 
 ## 처음 질문으로 돌아가기
 

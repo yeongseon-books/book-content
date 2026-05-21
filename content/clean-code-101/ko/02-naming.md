@@ -41,9 +41,9 @@ last_reviewed: '2026-05-15'
 
 *Clean Code 101 2장 흐름 개요*
 
-이 그림에서는 이름 짓기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+이 그림은 이름을 세 가지 수준—변수, 함수, 클래스—에서 다루며, 각각 다른 기준으로 판단해야 함을 보여 줍니다. 좋은 이름은 검색 가능성과 발음 용이성을 동시에 만족해야 합니다.
 
-> 이름 짓기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+> 좋은 이름은 주석이 필요 없게 만듭니다.
 
 ## 왜 중요한가
 
@@ -191,6 +191,138 @@ python -m pytest -q tests/test_naming_examples.py
 ## 정리 및 다음 단계
 
 이름 짓기는 가독성에서 가장 레버리지가 큰 도구입니다. 다음 글에서는 그 이름이 가리키는 단위를 더 작게 만드는 방법, 즉 작은 함수에 대해 다룹니다.
+
+
+## 변수·함수·클래스 이름 규칙을 실제로 적용하기
+
+이름은 형식이 아니라 계약입니다. 호출자가 이름을 읽는 순간 무엇을 기대해야 하는지가 정해집니다. 아래 표는 실무에서 가장 자주 쓰는 이름 규칙을 정리한 것입니다.
+
+| 대상 | 좋은 규칙 | 피해야 할 패턴 | 예시 |
+| --- | --- | --- | --- |
+| 변수 | 값의 의미를 드러내기 | `data`, `tmp`, `obj` 남용 | `invoice_total_cents` |
+| 불리언 | 질문형/상태형으로 명확히 | 이중 부정 | `is_active`, `has_permission` |
+| 함수 | 동사 + 도메인 목적 | `do_stuff`, `handle_data` | `calculate_invoice_total` |
+| 클래스 | 역할 중심 명사 | 기술 구현 세부를 이름에 노출 | `InvoiceRepository` |
+| 컬렉션 | 복수형 + 요소 의미 | 단수형 혼용 | `active_users`, `line_items` |
+| 상수 | 단위 포함한 대문자 | 단위 없는 매직넘버 | `DEFAULT_TIMEOUT_SECONDS` |
+
+규칙의 핵심은 일관성입니다. 같은 도메인 개념을 파일마다 다르게 부르면 검색성과 협업 속도가 급격히 떨어집니다. 따라서 용어집을 먼저 합의하고, 이름 변경은 한 번에 넓게 수행하는 편이 안전합니다.
+
+## Before/After 비교: 이름이 의도를 바꾸는 순간
+
+```python
+# before
+
+def p(u, o, c):
+    if u and o:
+        t = 0
+        for i in o:
+            t += i["p"] * i["q"]
+        if c:
+            t -= 1000
+        return t
+    return None
+
+
+# after
+from typing import Iterable
+
+
+def calculate_order_total(user_id: str, line_items: Iterable[dict], has_coupon: bool) -> int | None:
+    if not user_id or not line_items:
+        return None
+
+    subtotal_cents = 0
+    for line_item in line_items:
+        subtotal_cents += line_item["unit_price_cents"] * line_item["quantity"]
+
+    if has_coupon:
+        subtotal_cents -= 1000
+
+    return subtotal_cents
+```
+
+두 버전은 로직이 거의 같지만, 후자는 호출자에게 훨씬 많은 정보를 제공합니다. 어떤 단위인지, 어떤 값이 기대되는지, 반환 조건이 무엇인지가 이름에서 먼저 읽힙니다. 이 차이는 디버깅 시간과 리뷰 속도에 그대로 반영됩니다.
+
+## 이름 변경 절차와 안전 장치
+
+리네임은 작아 보여도 영향 범위가 넓습니다. 아래 절차를 지키면 위험을 크게 줄일 수 있습니다.
+
+1. 후보 이름의 도메인 의미를 먼저 정의합니다.
+2. 참조 검색으로 영향 파일을 확인합니다.
+3. 공개 API인지 내부 구현인지 구분합니다.
+4. 테스트를 먼저 초록으로 고정합니다.
+5. 한 번에 한 개념씩 리네임하고 즉시 재검증합니다.
+
+```python
+def normalize_variable_name(raw_name: str) -> str:
+    cleaned = raw_name.strip().lower().replace(" ", "_")
+    while "__" in cleaned:
+        cleaned = cleaned.replace("__", "_")
+    return cleaned
+```
+
+위 유틸리티처럼 이름 정규화 규칙을 도구화하면 대규모 리네임 작업에서도 일관성을 유지하기 쉽습니다. 결국 이름 품질은 개인 취향보다 팀 합의와 자동화 수준에 크게 좌우됩니다.
+
+
+## 실무 적용 메모
+
+아래 메모는 팀 내 합의 문서에 그대로 옮겨 적어도 되는 수준의 운영 규칙입니다.
+
+1. 리뷰는 코드 스타일보다 변경 위험을 먼저 다룹니다.
+2. 규칙 위반은 사람 지적보다 자동화 전환을 우선합니다.
+3. 반복되는 설계 결함은 교육 과제가 아니라 구조 개선 과제로 등록합니다.
+4. 모든 개선은 테스트와 함께 진행하며, 동작 변경 여부를 PR 설명에 명시합니다.
+5. 다음 분기 목표에는 "새 기능 수"와 함께 "변경 비용 감소 지표"를 반드시 포함합니다.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class QualityGate:
+    has_tests: bool
+    has_clear_names: bool
+    has_boundary_error_handling: bool
+    has_small_functions: bool
+    has_review_notes: bool
+
+
+def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
+    missing = []
+    if not gate.has_tests:
+        missing.append("tests")
+    if not gate.has_clear_names:
+        missing.append("naming")
+    if not gate.has_boundary_error_handling:
+        missing.append("error-boundary")
+    if not gate.has_small_functions:
+        missing.append("function-size")
+    if not gate.has_review_notes:
+        missing.append("review-notes")
+    return len(missing) == 0, missing
+```
+
+이 체크 함수는 단순하지만, 품질 기준을 코드로 표현하는 출발점이 됩니다. 팀이 기준을 말로만 합의하면 시간이 지나며 흐려집니다. 반대로 코드와 템플릿과 자동화 규칙으로 남기면 신규 멤버가 들어와도 동일한 기준이 유지됩니다.
+
+또한 개선 활동은 단발성 이벤트가 아니라 루프여야 합니다. 한 번의 대청소보다 매 PR마다 작은 개선을 추가하는 편이 장기적으로 더 강합니다. 이름 하나, 함수 하나, 분기 하나를 매번 더 낫게 만드는 습관이 쌓이면 코드베이스의 평균 품질이 올라가고, 장애 대응 속도도 실제로 빨라집니다.
+
+
+## 추가 사례: 변경 비용 예측 스프린트 회고
+
+스프린트 회고에서 아래 세 질문을 반복하면 품질 개선 항목이 구체화됩니다.
+
+- 이번 스프린트에서 가장 오래 걸린 변경은 무엇이었는가
+- 오래 걸린 이유가 도메인 복잡도인지 코드 구조인지 구분되었는가
+- 같은 종류의 변경을 다음 달에는 얼마나 줄일 수 있는가
+
+```python
+def estimate_next_month_effort(current_hours: float, reduction_goal: float) -> float:
+    if not 0 <= reduction_goal <= 1:
+        raise ValueError("reduction_goal must be in [0, 1]")
+    return current_hours * (1 - reduction_goal)
+```
+
+이런 질문과 간단한 계산만으로도 "감" 중심 회고를 "계획" 중심 회고로 바꿀 수 있습니다.
 
 ## 처음 질문으로 돌아가기
 

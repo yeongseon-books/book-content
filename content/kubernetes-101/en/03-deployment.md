@@ -44,13 +44,9 @@ Here, we will treat Deployment as the default stateless workload controller that
 
 This picture places Deployment inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Deployment is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 *Zero-downtime deploy* and *self-healing* are the *biggest reasons* to adopt *Kubernetes*. The object that owns them is the *Deployment*.
-
-## Concept at a Glance
 
 ## Key Terms
 

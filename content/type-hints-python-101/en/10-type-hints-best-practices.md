@@ -41,8 +41,6 @@ This is the final post in the Type Hints in Python 101 series. In this article, 
 
 This picture places Type Hint Best Practices inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Type Hint Best Practices is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - Where type hint investment pays off first
@@ -57,8 +55,6 @@ This picture places Type Hint Best Practices inside an operating flow. The point
 Legacy Python modules usually combine two problems. First, public function signatures are vague enough that callers do not know the contract. Second, one `Any` return type leaks into half the file and quietly disables the checker downstream.
 
 This article is meant to close the loop from episodes 8 and 9. If type hints are going to become a real engineering habit, you need more than principles. You need a repeatable way to take a messy module, harden it in the right order, and verify that the new contract actually holds.
-
-## Concept at a Glance
 
 ```text
 Loose signatures / Any spread

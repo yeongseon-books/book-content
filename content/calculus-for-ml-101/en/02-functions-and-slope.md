@@ -44,8 +44,6 @@ In this post, we'll treat a function as both an input-output contract and a geom
 
 This picture places Functions and Slope inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Functions and Slope is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - Why should a function be understood as an input-output contract rather than just a formula?
@@ -57,8 +55,6 @@ This picture places Functions and Slope inside an operating flow. The point is n
 ## Why It Matters
 
 ML models are *function compositions*, and training pushes signals through *each function gradient*.
-
-## Concept at a Glance
 
 ## Key Terms
 

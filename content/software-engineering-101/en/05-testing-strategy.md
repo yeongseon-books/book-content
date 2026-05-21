@@ -43,8 +43,6 @@ This is post 5 in the Software Engineering 101 series. In this chapter, we use t
 
 This picture places Testing Strategy inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Testing Strategy is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The role of unit, integration, and E2E tests
@@ -58,8 +56,6 @@ This picture places Testing Strategy inside an operating flow. The point is not 
 Tests determine the cost of change. Good tests let you refactor without fear; bad tests make every PR a hesitation.
 
 > Code without tests is, in practice, frozen code.
-
-## Concept at a Glance
 
 The pyramid balances cost against speed.
 

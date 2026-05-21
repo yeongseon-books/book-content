@@ -41,7 +41,7 @@ This is the final post in the Developer Career 101 series.
 
 This picture places The Path to Senior inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of The Path to Senior is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> The path to senior is not deeper technical skill; it is the ability to define problems and explain your decisions to others.
 
 ## What You Will Learn
 
@@ -55,7 +55,7 @@ This picture places The Path to Senior inside an operating flow. The point is no
 
 Senior is a behavior, not a title.
 
-## Concept at a Glance
+Seniority is defined by scope: the size of problems you define, the depth of decisions you own, and the people you help grow.
 
 ## Key Terms
 

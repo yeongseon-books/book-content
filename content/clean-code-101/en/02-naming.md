@@ -43,7 +43,7 @@ Here we will look at the signals of a strong name, how variable, function, and c
 
 This picture places Naming inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Naming is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Good names eliminate the need for explanation and make search, review, and documentation easier at the same time.
 
 ## Questions this article answers
 
@@ -60,8 +60,6 @@ This picture places Naming inside an operating flow. The point is not to memoriz
 Names are the most-read element of code. Pick a wrong one and you keep saying it forever.
 
 > A searchable name is the start of maintainability.
-
-## Concept at a Glance
 
 The name lifts intent into view.
 

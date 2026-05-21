@@ -42,8 +42,6 @@ This is post 4 in the Serverless 101 series.
 
 This picture places Cold Start inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Cold Start is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - the definition of *Cold Start*
@@ -57,8 +55,6 @@ This picture places Cold Start inside an operating flow. The point is not to mem
 Cold start is not just “sometimes slower.” On login, payment, webhook, or synchronous API paths, a few cold invocations can dominate the latency story that users actually feel.
 
 The trap is that averages hide the problem. If warm invocations are common, the mean looks healthy while the tail still hurts real traffic. That makes cold start less of a micro-optimization topic and more of a design decision about where latency matters enough to spend money.
-
-## Concept at a Glance
 
 This diagram matters because it shows that *cold start* is not one delay. It is the sum of multiple delays: environment creation, runtime initialization, dependency loading, and your own startup code. The mitigation strategy changes depending on which of those dominates.
 

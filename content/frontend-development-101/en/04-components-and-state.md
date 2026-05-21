@@ -40,8 +40,6 @@ This is post 4 in the Frontend Development 101 series. Here we introduce compone
 
 This picture places Components and State inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Components and State is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The *component mindset*
@@ -56,8 +54,6 @@ This picture places Components and State inside an operating flow. The point is 
 The component mindset is not exclusive to React. The same pattern works in Vue, Svelte, Angular, and even *plain JS*. Once you internalize it, *every framework reads like a familiar language*.
 
 > Well-split components exist for *readability*, not for *reuse*.
-
-## Concept at a Glance
 
 State flows *down*, events flow *up*.
 

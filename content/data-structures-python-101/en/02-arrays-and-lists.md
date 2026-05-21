@@ -38,8 +38,6 @@ This is the second post in the Data Structures with Python 101 series.
 
 This picture places Arrays and Lists inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Arrays and Lists is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What This Article Answers
 
 - Is Python's `list` an array or a linked list?

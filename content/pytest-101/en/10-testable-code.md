@@ -40,8 +40,6 @@ When testing feels painful, the problem is often not pytest. It is that one func
 
 This picture places Writing Testable Code inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Writing Testable Code is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What This Article Covers
 
 - Why some tests need a wall of patches before they can even reach the assertion

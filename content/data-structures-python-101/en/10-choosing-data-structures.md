@@ -44,8 +44,6 @@ This is the final post in the Data Structures with Python 101 series.
 
 This picture places Choosing the Right Data Structure inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Choosing the Right Data Structure is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - Comparing operation time complexities across data structures

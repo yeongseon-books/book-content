@@ -52,8 +52,6 @@ Without this distinction, people either trust means too quickly or fail to expla
 
 > The Law of Large Numbers tells you the mean heads in the right direction. The Central Limit Theorem tells you how the remaining error is shaped.
 
-## Concept at a Glance
-
 ## Key Terms
 
 - **i.i.d.**: independent and identically distributed.

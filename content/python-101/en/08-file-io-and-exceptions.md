@@ -42,8 +42,6 @@ This post is the 8th article in the Python 101 series. This is the point in the 
 
 This picture places File I/O and exception handling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of File I/O and exception handling is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 File code touches outside resources. Unlike in-memory variables, a file handle is a limited operating system resource, and many failure modes come along with it. The disk may be full, permissions may be missing, or another process may hold the file open.

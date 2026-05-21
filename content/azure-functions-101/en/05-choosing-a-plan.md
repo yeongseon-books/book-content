@@ -43,8 +43,6 @@ This is the fifth post in the Azure Functions 101 series. Here, we compare the h
 
 This picture places Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## One-line definitions
 
 | Plan | One-line definition |

@@ -42,8 +42,7 @@ This is the first post in the Data Science Career 101 series.
 
 This picture places What Is a Data Career inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is a Data Career is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
+> In data career, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
 ## What You Will Learn
 
 - The data career *landscape*
@@ -58,8 +57,7 @@ The same dataset leads to very different expectations depending on the role arou
 
 An analyst may be asked to define a metric and explain a drop in conversion. A scientist may need to frame that same change as a hypothesis and test it. An engineer may care more about whether the underlying event table is complete, trustworthy, and fresh enough to support either of those conversations. The earlier you see those differences, the easier it becomes to make deliberate learning trade-offs.
 
-## Concept at a Glance
-
+Five roles emerge in most data organizations. Each role handles different questions about data, which shapes the tools, skills, and metrics that matter most.
 ## Key Terms
 
 - **data analyst**: Decision support specialist.
@@ -76,6 +74,7 @@ An analyst may be asked to define a metric and explain a drop in conversion. A s
 
 ## Hands-on: One-Liner per Role
 
+As a beginner, the simplest way to start thinking about roles is to ask: what problem does each role own?
 ### Step 1 — Analyst
 
 ```text

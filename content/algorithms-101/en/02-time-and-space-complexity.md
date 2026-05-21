@@ -43,8 +43,6 @@ This is post 2 in the Algorithms 101 series. Here we cover Big-O and related not
 
 This picture places Time and Space Complexity inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Time and Space Complexity is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The meaning of Big-O, Big-Omega, and Big-Theta
@@ -57,8 +55,6 @@ This picture places Time and Space Complexity inside an operating flow. The poin
 Asymptotic analysis is the shared vocabulary engineers use to discuss performance. Without it, "is this fast enough" becomes guesswork. With it, you can compare two algorithms before running either, and you can estimate whether code will hold at 100x its current load.
 
 > Big-O is the language in which performance arguments are made.
-
-## Concept at a Glance
 
 > Complexity describes growth, not absolute time. An O(n) algorithm may be slower than an O(n log n) one for small inputs but always wins for large ones. The constant factors disappear in asymptotic notation, which is what allows fair comparison across machines and languages.
 

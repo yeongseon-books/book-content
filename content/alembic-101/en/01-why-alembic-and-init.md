@@ -41,8 +41,6 @@ This is the first post in the Alembic 101 series. Here we will frame why Alembic
 
 This picture places Why Alembic, and getting to alembic init inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Why Alembic, and getting to alembic init is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 Schema changes are a recurring source of production incidents. Code lives in git, infrastructure lives in Terraform, but it is surprisingly common to manage "who ran which SQL on which environment" by hand. Staging quietly drifts away from production, and when something needs to roll back nobody can confidently say how far the schema should rewind.

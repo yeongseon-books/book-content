@@ -44,8 +44,6 @@ This is post 5 in the Functional Programming 101 series.
 
 This picture places map, filter, reduce inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of map, filter, reduce is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - How map, filter, and reduce work

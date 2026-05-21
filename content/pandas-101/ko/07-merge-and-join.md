@@ -40,9 +40,9 @@ last_reviewed: '2026-05-15'
 
 *Pandas 101 7장 흐름 개요*
 
-이 그림은 두 표를 관계로 연결하는 감랈를 보여 줍니다. 하나나 갇고는 치를 부주추기 날때나닝 윬나서 출력할 서 처음 부른 끌되는 다른 것도 진돘도 그 내도른 단라다.
+이 그림은 두 표를 관계로 연결하는 감각을 보여줍니다. 하나만 가지고는 답을 만들기 어려운 질문이 병합을 거치면서 비로소 의미를 갖게 됩니다.
 
-> **`merge`는 관계를 검증하는 도구**입니다. 백배 단라를 합찼다 로 동자뫌는 중복 백사른동아 고른다는 음답동일니다.
+> **`merge`는 관계를 검증하는 도구**입니다. 두 표를 합쳤을 때 행이 늘어나는지, 중복 키가 있는지, 자료형이 일치하는지를 항상 확인해야 합니다.
 
 ## 왜 중요한가
 
@@ -57,6 +57,21 @@ last_reviewed: '2026-05-15'
 - **오른쪽 조인**: 오른쪽 표를 기준으로 유지합니다.
 - **바깥쪽 조인**: 양쪽 키의 합집합을 남깁니다.
 - **교차 조인**: 가능한 모든 조합을 만듭니다.
+- **키**: 두 표를 연결하는 기준 열입니다.
+
+### 조인 방식 비교
+
+다음 표는 다섯 가지 조인 방식의 차이와 사용 조건을 정리한 것입니다.
+
+| 조인 방식 | how 파라미터 | 왼쪽 키 | 오른쪽 키 | 결과 행 | 주요 용도 |
+|---|---|---|---|---|---|
+| 안쪽 조인 | `inner` | 매칭된 행만 | 매칭된 행만 | 교집합 | 양쪽에 모두 존재하는 데이터만 분석 |
+| 왼쪽 조인 | `left` | 전체 유지 | 매칭된 행만 | 왼쪽 기준 | 기준 표를 보존하며 정보 추가 |
+| 오른쪽 조인 | `right` | 매칭된 행만 | 전체 유지 | 오른쪽 기준 | 왼쪽 조인의 역방향 |
+| 바깥쪽 조인 | `outer` | 전체 유지 | 전체 유지 | 합집합 | 양쪽 키 모두 보존 |
+| 교차 조인 | `cross` | 모든 행 | 모든 행 | 곱집합 | 모든 조합 생성 |
+
+안쪽 조인은 기본값이므로 `how`를 생략하면 자동으로 적용됩니다. 왼쪽 조인은 실무에서 가장 많이 쓰이는 패턴으로, 기준 표의 모든 행을 유지한 채 다른 표의 정보를 추가할 때 사용합니다.
 
 ## 전과 후
 
@@ -134,11 +149,173 @@ expected: MergeError
 
 `validate`는 조인 가정을 코드에 선언하는 매우 좋은 방법입니다. 기대한 관계와 실제 데이터 관계가 다르면 즉시 오류를 내서 조용한 데이터 오염을 막아 줍니다.
 
+### 결측치 처리 전략
+
+조인을 하면 왼쪽이나 오른쪽 표에만 있는 키 때문에 결측치가 생길 수 있습니다. 이 결측치를 어떻게 다룰지는 분석 목적에 따라 달라집니다.
+
+| 전략 | 조건 | 장점 | 단점 |
+|---|---|---|---|
+| 삭제 | 결측이 소수 | 간단하고 명확 | 정보 손실 |
+| 대체 | 합리적 기본값 존재 | 행 수 유지 | 왜곡 가능성 |
+| 보간 | 시간/순서 데이터 | 추세 반영 | 추가 가정 필요 |
+| 플래그 추가 | 결측 여부가 중요 | 정보 유지 | 열 증가 |
+
+```python
+users = pd.DataFrame({"uid": [1, 2, 3], "name": ["a", "b", "c"]})
+orders = pd.DataFrame({"uid": [1, 1, 2], "amount": [100, 200, 50]})
+
+merged = users.merge(orders, on="uid", how="left")
+
+# 전략 1: 결측 삭제
+print(merged.dropna())
+
+# 전략 2: 기본값 대체
+merged["amount"] = merged["amount"].fillna(0)
+print(merged)
+
+# 전략 4: 결측 플래그
+merged["has_order"] = merged["amount"].notna()
+print(merged)
+```
+
+**예상 출력 (플래그 추가):**
+
+```text
+   uid name  amount  has_order
+0    1    a   100.0       True
+1    1    a   200.0       True
+2    2    b    50.0       True
+3    3    c     0.0      False
+```
+
+결측치를 그냥 두면 이후 계산에서 예상치 못한 오류가 생길 수 있습니다. 조인 직후 결측 패턴을 확인하고 명시적으로 처리하는 습관이 중요합니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - `indicator=True`는 각 행의 출처를 보여 줍니다.
 - `suffixes`는 같은 이름의 열 충돌을 정리합니다.
 - `validate`는 조인 가정을 코드에 남기는 장치입니다.
+
+### fillna와 interpolate 예제
+
+조인 후 결측치를 보간하는 패턴은 시계열 데이터나 순서가 있는 데이터에서 자주 등장합니다.
+
+```python
+import pandas as pd
+import numpy as np
+
+# 시간순 데이터
+df = pd.DataFrame({
+    "date": pd.date_range("2026-01-01", periods=5),
+    "value": [10, np.nan, np.nan, 40, 50],
+})
+
+# 선형 보간
+df["interpolated"] = df["value"].interpolate(method="linear")
+
+# 앞 값으로 채우기
+df["ffill"] = df["value"].fillna(method="ffill")
+
+# 뒤 값으로 채우기
+df["bfill"] = df["value"].fillna(method="bfill")
+
+print(df)
+```
+
+**예상 출력:**
+
+```text
+        date  value  interpolated  ffill  bfill
+0 2026-01-01   10.0          10.0   10.0   10.0
+1 2026-01-02    NaN          20.0   10.0   40.0
+2 2026-01-03    NaN          30.0   10.0   40.0
+3 2026-01-04   40.0          40.0   40.0   40.0
+4 2026-01-05   50.0          50.0   50.0   50.0
+```
+
+보간은 결측 구간의 값을 추정해서 채우는 방식입니다. 시계열 분석에서는 선형 보간이 자주 쓰이지만, 보간이 항상 정답은 아니므로 데이터 특성에 맞게 선택해야 합니다.
+
+### 결측 패턴 시각화
+
+조인 후 결측치가 어디에 얼마나 있는지 시각적으로 확인하면 패턴을 빠르게 파악할 수 있습니다.
+
+```python
+import pandas as pd
+import numpy as np
+
+users = pd.DataFrame({"uid": [1, 2, 3, 4, 5], "name": ["a", "b", "c", "d", "e"]})
+orders = pd.DataFrame({"uid": [1, 1, 2], "amount": [100, 200, 50]})
+
+merged = users.merge(orders, on="uid", how="left")
+
+# 결측 여부를 0/1로 변환
+missing_map = merged.isnull().astype(int)
+print(missing_map)
+
+# 열별 결측 비율
+print(merged.isnull().mean())
+```
+
+**예상 출력:**
+
+```text
+   uid  name  amount
+0    0     0       0
+1    0     0       0
+2    0     0       0
+3    0     0       1
+4    0     0       1
+
+uid       0.0
+name      0.0
+amount    0.4
+dtype: float64
+```
+
+결측 비율을 먼저 보면 조인이 제대로 됐는지 감을 잡을 수 있습니다. 예상보다 결측이 많다면 키 관계나 조인 방식을 다시 점검해야 합니다.
+
+### 실무 예제: 고객-주문 병합
+
+실무에서 가장 자주 마주치는 패턴은 고객 테이블과 주문 테이블을 합치는 것입니다.
+
+```python
+import pandas as pd
+
+customers = pd.DataFrame({
+    "customer_id": [1, 2, 3],
+    "name": ["Alice", "Bob", "Charlie"],
+    "tier": ["Gold", "Silver", "Gold"],
+})
+
+orders = pd.DataFrame({
+    "order_id": [101, 102, 103, 104],
+    "customer_id": [1, 1, 2, 3],
+    "amount": [100, 150, 80, 200],
+})
+
+# 주문 총액 계산
+order_sum = orders.groupby("customer_id").agg(
+    total_amount=("amount", "sum"),
+    order_count=("order_id", "count"),
+)
+
+# 고객 정보와 병합
+result = customers.merge(order_sum, on="customer_id", how="left")
+result["total_amount"] = result["total_amount"].fillna(0)
+result["order_count"] = result["order_count"].fillna(0)
+print(result)
+```
+
+**예상 출력:**
+
+```text
+   customer_id     name    tier  total_amount  order_count
+0            1    Alice    Gold         250.0          2.0
+1            2      Bob  Silver          80.0          1.0
+2            3  Charlie    Gold         200.0          1.0
+```
+
+이 패턴은 고객별 KPI를 만들 때 기본이 됩니다. 주문 테이블을 먼저 그룹화해 집계한 다음, 고객 테이블과 병합하면 고객 수준의 통계를 얻을 수 있습니다.
 
 ## 자주 하는 실수 다섯 가지
 

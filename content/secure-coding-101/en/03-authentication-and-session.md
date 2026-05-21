@@ -44,8 +44,6 @@ Here, we will separate two concerns that are easy to blur together: proving who 
 
 This picture places Authentication and Session inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Authentication and Session is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions This Chapter Answers
 
 - The difference between *authentication* and *authorization*
@@ -59,8 +57,6 @@ This picture places Authentication and Session inside an operating flow. The poi
 When auth leaks, *every permission leaks*. The most common incidents are *weak hashing*, *session fixation*, and *secret leakage*.
 
 > *Auth is the *door*. The session is the *hallway badge*.*
-
-## Concept at a Glance
 
 ## Key Terms
 

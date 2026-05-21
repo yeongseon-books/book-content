@@ -42,13 +42,9 @@ This is post 9 in the Model Evaluation 101 series. In this post, we break the sc
 
 This picture places Error Analysis inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Error Analysis is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 92% accuracy overall can hide 60% accuracy on a specific user segment, which is a fairness issue.
-
-## Concept at a Glance
 
 ## Key Terms
 

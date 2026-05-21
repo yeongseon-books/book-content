@@ -42,13 +42,9 @@ This is the first post in the Model Evaluation 101 series. In this post, we buil
 
 This picture places Why Model Evaluation Is Hard inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Why Model Evaluation Is Hard is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Evaluation is the language of model selection. When the language is wrong, the entire team aims at the wrong target.
-
-## Concept at a Glance
 
 ## Key Terms
 

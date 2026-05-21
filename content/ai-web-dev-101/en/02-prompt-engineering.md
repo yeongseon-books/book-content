@@ -41,8 +41,6 @@ Here, we will treat prompts as executable contracts, not clever sentences.
 
 This picture places Prompt engineering basics — getting the answer you actually want inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Prompt engineering basics — getting the answer you actually want is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why prompt engineering deserves separate attention
 
 In the previous chapter, the main question was how to call the API at all. From here on, the important question becomes how to shape the request so the answer is useful. A vague request tends to produce a generic answer. A structured request tends to produce something closer to the actual job you want done.

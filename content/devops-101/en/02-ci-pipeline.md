@@ -58,8 +58,6 @@ Tests alone are not enough. *Lint, type checks, and security scans* must be bund
 
 > A PR without CI is *wishful thinking*.
 
-## Concept at a Glance
-
 A CI pipeline is an automated sequence of checks that run every time code is pushed. It should be *fast* (fail early), *clear* (report exactly what broke), and *consistent* (same rules apply to everyone).
 
 ## Key Terms

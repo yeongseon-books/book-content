@@ -42,8 +42,6 @@ This is post 7 in the SRE 101 series. Here we treat postmortems as a learning sy
 
 This picture places Postmortem inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-
-
 ## Why this topic matters
 
 Repeated outages are often the result of missing learning, not missing effort. If the team cannot preserve the timeline, causes, and follow-up changes, the next incident starts from the same weak foundation.

@@ -483,4 +483,6 @@ print(run_tool("cancel_order", '{"order_id": "ORD-1001"}'))
 - [구조화 출력 — JSON 모드와 응답 스키마](./01-structured-output.md)
 - [스트리밍 심화 — 청크 처리와 오류 복구](./03-streaming-in-depth.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/llm-api-production-101/ko/02-tool-calling)
+
 Tags: LLM, OpenAI, Streaming, Python

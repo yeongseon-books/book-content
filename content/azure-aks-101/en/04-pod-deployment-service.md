@@ -42,8 +42,6 @@ This is the fourth post in the Azure Kubernetes Service 101 series. Here, we sep
 
 This picture places Pod, Deployment, Service — the three ways you express a workload inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Pod, Deployment, Service — the three ways you express a workload is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## One picture first
 
 That diagram carries most of the model.

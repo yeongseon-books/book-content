@@ -48,8 +48,6 @@ This picture places Series and DataFrame inside an operating flow. The point is 
 
 *Every Pandas operation* eventually reduces to *Series-level work*. A *DataFrame column is a Series*. Understanding this model makes *everything else easy*.
 
-## Concept at a Glance
-
 ## Key Terms
 
 - **Series**: *values + index* — a *NumPy array* with *labels* on top.

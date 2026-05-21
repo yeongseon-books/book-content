@@ -41,8 +41,6 @@ This is the sixth post in the Azure Functions 101 series. Here, we turn scaling 
 
 This picture places Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Scaling Has Two Axes — Instance Count and In-Instance Concurrency
 
 “Scaling” hides two different controls.

@@ -281,4 +281,6 @@ def monthly_report(year: int, month: int) -> dict:
 - [PII 감지와 마스킹](./04-pii-detection-redaction.md)
 - [LLM 앱 운영 101 — LLM 앱 모니터링과 로깅](../../llm-apps-ops-101/ko/01-monitoring-and-logging.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-safety-guardrails-101/ko/09-audit-logging-compliance)
+
 Tags: AI Safety, Audit Logging, Compliance, GDPR

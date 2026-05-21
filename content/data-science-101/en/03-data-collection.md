@@ -42,7 +42,7 @@ This is post 3 in the Data Science 101 series. Here we treat collection as an en
 
 This picture places Data Collection inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Data Collection is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> At its core, Data Collection is about deciding what enters a system, where validation happens, and which signals stay for the next cycle—not about feature names.
 
 ## Questions This Post Answers
 
@@ -67,7 +67,7 @@ A missing record at the *collection step* haunts you all the way to the final re
 
 > *Only *traceable* data is *trustworthy* data.*
 
-## Concept at a Glance
+The key boundary in this episode is between the concept itself and how it operates in a real system. You need to know where the data comes in, where the decision happens, and what signal must be recorded.
 
 ## Key Terms
 

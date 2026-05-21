@@ -52,8 +52,6 @@ The risk gets worse when the base rate is small. A rare disease with a sensitive
 
 > Conditional probability is not the probability of an event in the original world. It is the probability of that event after the world has been narrowed by new information.
 
-## Concept at a Glance
-
 ## Key Terms
 
 - **P(A | B)**: probability of A given B = P(A∩B) / P(B).

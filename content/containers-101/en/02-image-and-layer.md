@@ -45,13 +45,13 @@ In this chapter, we unpack why images are split into layers, how OverlayFS makes
 
 This picture places Image and Layer inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Image and Layer is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> An image is not a single file; it is a stack of immutable layer snapshots. Each layer can be reused, cached, and transferred independently — that is why images are efficient.
 
 ## Why It Matters
 
 Without layers, you cannot really optimize a Dockerfile. The difference between a 1-minute and a 30-second build comes from understanding this.
 
-## Concept at a Glance
+Layers are read-only change sets. The bottom layers hold the base OS or runtime; upper layers add application dependencies. At runtime, an additional writable container layer is added on top so the base layers stay clean.
 
 ## Key Terms
 

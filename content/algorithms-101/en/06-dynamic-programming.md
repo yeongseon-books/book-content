@@ -43,8 +43,6 @@ This is post 6 in the Algorithms 101 series. Here we cover when DP applies, how 
 
 This picture places Dynamic Programming inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Dynamic Programming is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The two conditions DP needs: overlapping subproblems and optimal substructure
@@ -57,8 +55,6 @@ This picture places Dynamic Programming inside an operating flow. The point is n
 DP is the backbone of algorithm interviews and shows up in production for optimisation, scheduling, and string comparison. The same way of thinking extends to value functions in reinforcement learning, dynamic-programming-based control, and decoders in sequence-to-sequence models.
 
 > DP starts from one principle: never solve the same subproblem twice.
-
-## Concept at a Glance
 
 > DP defines a recurrence over a state space and solves it. Memoization is recursion plus a cache and feels intuitive. Tabulation fills small states first and tends to be faster and lighter on memory. The hard part — and the one worth practising — is choosing what the state means. That choice is 90% of the solution.
 

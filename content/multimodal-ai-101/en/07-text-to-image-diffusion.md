@@ -41,8 +41,6 @@ This is post 7 in the Multimodal AI 101 series.
 
 This picture places Text-to-Image with Diffusion inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Text-to-Image with Diffusion is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why diffusion replaced GANs
 
 From 2014 to around 2020, GANs were the default for image generation. StyleGAN produced eerily realistic faces, but it had two persistent weaknesses: mode collapse (the same patterns appearing over and over), and limited control via free-form text.

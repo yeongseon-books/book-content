@@ -379,4 +379,6 @@ def safe_divide(a: float, b: float) -> str:
 - [ReAct paper (Yao et al., 2022)](https://arxiv.org/abs/2210.03629)
 - [LangChain tool definition](https://python.langchain.com/docs/modules/tools/)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-app-patterns-101/ko/04-agent-tool-pattern)
+
 Tags: LLM, RAG, Agent, Python

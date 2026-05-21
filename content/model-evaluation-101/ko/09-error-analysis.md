@@ -40,10 +40,6 @@ last_reviewed: '2026-05-15'
 
 *Model Evaluation 101 9장 흐름 개요*
 
-이 그림에서는 오류 분석으로 약점 찾기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 오류 분석으로 약점 찾기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 이 글이 중요한가
 
 모델은 대개 전체 평균보다 특정 구간에서 더 위험하게 무너집니다. 특정 상품군, 특정 지역, 특정 입력 범위에서만 성능이 나빠질 수 있습니다. 이런 문제는 전체 점수만 보고 있으면 거의 보이지 않습니다.
@@ -149,6 +145,128 @@ print("ambiguous indices:", order.tolist())
 ## 정리
 
 오류 분석은 평균 점수의 뒤편을 보는 작업입니다. 어디서 틀리는지, 어떻게 틀리는지, 왜 틀리는지를 분리해야 개선의 방향이 생깁니다. 다음 글에서는 지금까지의 평가 결과를 한 장의 문서로 정리하는 평가 리포트 작성으로 시리즈를 마무리하겠습니다.
+
+
+## 평가 실무에서 바로 쓰는 계산 루틴
+
+### confusion matrix를 수식과 코드로 동시에 확인하기
+평가 지표는 라이브러리 호출만으로 끝내면 해석이 약해집니다. confusion matrix를 직접 계산해 보면 지표의 민감도를 빠르게 이해할 수 있습니다.
+
+```python
+from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score
+import numpy as np
+
+y_true = np.array([1,0,1,1,0,0,1,0,1,0])
+y_pred = np.array([1,0,1,0,0,1,1,0,1,0])
+
+tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
+precision = tp / (tp + fp)
+recall = tp / (tp + fn)
+f1 = 2 * precision * recall / (precision + recall)
+
+print(tn, fp, fn, tp)
+print(round(precision, 4), round(recall, 4), round(f1, 4))
+```
+
+직접 계산한 값과 `precision_score`, `recall_score`, `f1_score` 결과가 일치해야 합니다. 일치하지 않으면 positive label 설정, threshold, 또는 데이터 정렬이 틀린 경우가 많습니다. 이 교차검증 절차는 평가 파이프라인의 기본 안전장치입니다.
+
+### threshold 스윕으로 ROC와 운영 임계값 연결하기
+ROC-AUC는 모델 분리 능력을 보여주지만, 실제 운영은 단일 threshold를 선택해야 합니다. 따라서 `0.1` 간격 또는 더 촘촘한 구간으로 threshold를 스윕해 TPR/FPR 변화를 확인하는 단계가 필요합니다.
+
+```python
+from sklearn.metrics import roc_curve, roc_auc_score
+import numpy as np
+
+y_true = np.array([1,0,1,1,0,0,1,0,1,0])
+y_score = np.array([0.91,0.12,0.82,0.45,0.31,0.72,0.88,0.28,0.79,0.21])
+
+fpr, tpr, thresholds = roc_curve(y_true, y_score)
+auc = roc_auc_score(y_true, y_score)
+
+best = None
+for th in np.linspace(0.1, 0.9, 17):
+    pred = (y_score >= th).astype(int)
+    tn, fp, fn, tp = confusion_matrix(y_true, pred).ravel()
+    tpr_now = tp / (tp + fn)
+    fpr_now = fp / (fp + tn)
+    score = tpr_now - fpr_now
+    if best is None or score > best[0]:
+        best = (score, th, tpr_now, fpr_now)
+
+print("AUC:", round(auc, 4))
+print("best threshold:", best)
+```
+
+여기서 `TPR - FPR` 최대 지점을 임시 후보로 잡고, 비즈니스 비용(오탐 처리 비용, 미탐 손실 비용)을 반영해 최종 threshold를 확정합니다. 즉, ROC는 시각화 도구이면서 동시에 정책 결정 입력값입니다.
+
+### 교차검증 결과를 분포로 보고 불확실성 기록하기
+단일 점수는 모델 안정성을 숨깁니다. `StratifiedKFold`로 fold별 점수 분포를 남기면 "성능 평균"뿐 아니라 "성능 흔들림"도 관리할 수 있습니다.
+
+```python
+from sklearn.model_selection import StratifiedKFold, cross_val_score
+from sklearn.linear_model import LogisticRegression
+from sklearn.datasets import make_classification
+
+X, y = make_classification(n_samples=2000, n_features=20, weights=[0.8, 0.2], random_state=42)
+model = LogisticRegression(max_iter=1000)
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+
+scores = cross_val_score(model, X, y, cv=cv, scoring="f1")
+print("fold scores:", [round(s, 4) for s in scores])
+print("mean/std:", round(scores.mean(), 4), round(scores.std(), 4))
+```
+
+표준편차가 큰 모델은 데이터 구간에 따라 성능이 크게 달라질 수 있으므로, 배포 전에 데이터 분할 기준과 샘플링 전략을 재점검해야 합니다. 보고서에는 평균과 함께 분산 정보를 반드시 기록해 의사결정의 근거를 명확히 남겨야 합니다.
+
+## 운영 의사결정을 위한 평가 해석 확장
+
+### 클래스 불균형에서 PR 곡선 확인
+불균형 데이터에서는 ROC-AUC만으로 품질을 과대평가할 수 있습니다. 양성 비율이 낮을 때는 precision-recall 곡선을 함께 확인해야 실제 운영 난이도를 반영할 수 있습니다.
+
+```python
+from sklearn.metrics import precision_recall_curve, average_precision_score
+import matplotlib.pyplot as plt
+
+precision, recall, th = precision_recall_curve(y_true, y_score)
+ap = average_precision_score(y_true, y_score)
+
+print("AP:", round(ap, 4))
+for i in range(0, len(th), max(1, len(th)//5)):
+    print("th=", round(th[i], 3), "precision=", round(precision[i], 3), "recall=", round(recall[i], 3))
+```
+
+PR 곡선에서 운영팀이 감당 가능한 precision 구간을 먼저 정하고, 그때의 recall 손실을 확인하는 방식이 현실적입니다. 즉 지표 선택은 수학 문제가 아니라 운영 비용 문제와 연결됩니다.
+
+### 비용 민감 confusion matrix
+같은 오탐/미탐이라도 비용이 다르면 최적 모델이 달라집니다. 예를 들어 미탐 비용이 오탐보다 5배 크면 다음처럼 총비용을 계산해 비교할 수 있습니다.
+
+```python
+from sklearn.metrics import confusion_matrix
+
+cost_fp = 1
+cost_fn = 5
+
+pred = (y_score >= 0.42).astype(int)
+tn, fp, fn, tp = confusion_matrix(y_true, pred).ravel()
+
+total_cost = fp * cost_fp + fn * cost_fn
+print({"fp": int(fp), "fn": int(fn), "cost": int(total_cost)})
+```
+
+평가 보고서에 이 비용 지표를 함께 두면 모델 교체 기준이 명확해집니다. "AUC가 더 높다"는 주장보다 "월간 예상 손실을 18% 줄인다"는 근거가 훨씬 강합니다.
+
+### 캘리브레이션 확인 루틴
+점수 기반 의사결정에서는 확률 신뢰성이 중요합니다. 예측확률이 0.8인 샘플 집합에서 실제 양성 비율이 0.8에 근접하는지 확인해야 합니다.
+
+```python
+from sklearn.calibration import calibration_curve
+
+prob_true, prob_pred = calibration_curve(y_true, y_score, n_bins=10)
+for p_hat, p_real in zip(prob_pred, prob_true):
+    print(round(p_hat, 3), round(p_real, 3), round(p_real - p_hat, 3))
+```
+
+차이가 큰 구간은 후처리 보정 대상입니다. Platt scaling이나 isotonic regression 적용 전후를 같은 표로 기록하면, 확률 품질이 실제로 개선되었는지 검증 가능합니다.
 
 ## 처음 질문으로 돌아가기
 

@@ -259,4 +259,6 @@ KEDA scaler 종류는 [공식 문서](https://keda.sh/docs/scalers/)에 정리�
 - [Azure AKS 101](../../azure-aks-101/ko/01-what-is-aks.md)
 - [Azure Functions 101](../../azure-functions-101/ko/01-what-is-azure-functions.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-aca-101/ko/05-scaling-with-keda)
+
 Tags: Azure, Container Apps, Serverless, Containers

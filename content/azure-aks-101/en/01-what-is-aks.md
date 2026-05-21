@@ -40,8 +40,6 @@ AKS is Azure's answer to that cost. This first post is about understanding AKS m
 
 This picture places What is Azure Kubernetes Service? — what managed Kubernetes actually gives you inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What is Azure Kubernetes Service? — what managed Kubernetes actually gives you is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## One AKS cluster at a glance
 
 This is the map for the whole series.

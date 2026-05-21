@@ -42,8 +42,6 @@ This is post 9 in the Python Package 101 series. Here we connect README, guides,
 
 This picture places Documentation — README, MkDocs, API Reference inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Documentation — README, MkDocs, API Reference is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What you will learn
 
 - The structure and essential sections of a good README

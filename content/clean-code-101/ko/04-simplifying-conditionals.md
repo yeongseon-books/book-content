@@ -41,9 +41,9 @@ last_reviewed: '2026-05-15'
 
 *Clean Code 101 4장 흐름 개요*
 
-이 그림에서는 조건문 줄이기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+이 그림은 조건문 단순화의 세 가지 도구—가드 절, 다형성, 테이블 기반—가 어떻게 중첩을 평평하게 만드는지 보여 줍니다. 도구가 늘어날수록 분기 복잡도는 줄어듭니다.
 
-> 조건문 줄이기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+> 분기 깊이보다 분기 책임을 먼저 나누세요.
 
 ## 왜 중요한가
 
@@ -228,6 +228,139 @@ python -m pytest -q tests/test_pricing.py
 ## 정리 및 다음 단계
 
 조건문이 줄어들수록 코드의 핵심 흐름은 더 또렷해집니다. 다음 글에서는 또 하나의 큰 적인 중복을 어떻게 다뤄야 하는지 살펴보겠습니다.
+
+
+## 조건문 단순화 패턴을 체계적으로 고르는 법
+
+조건문을 단순화할 때는 한 가지 기법만 고집하지 않는 편이 좋습니다. 분기의 성격에 따라 패턴을 골라야 합니다.
+
+| 패턴 | 적용 상황 | 장점 | 주의점 |
+| --- | --- | --- | --- |
+| Guard Clause | 비정상 입력을 초기에 걸러야 할 때 | 들여쓰기 감소, 본 흐름 강조 | 반환 순서 변경 주의 |
+| Early Return | 조건 충족 시 즉시 종료 가능 | 가독성 향상 | 종료 경로 과다 주의 |
+| Lookup Table | 정책이 데이터로 표현 가능 | 확장 용이, if 감소 | 키 누락 검증 필요 |
+| Strategy | 알고리즘 선택이 잦을 때 | OCP 친화, 테스트 용이 | 클래스 과도 분할 주의 |
+| Polymorphism | 타입 분기가 반복될 때 | `isinstance` 제거 | 모델링 비용 고려 |
+
+핵심은 분기 수를 줄이는 것이 아니라 분기 책임을 올바른 위치로 옮기는 것입니다.
+
+## Guard Clause 전후 비교
+
+```python
+# before
+
+def approve_refund(user, order, amount):
+    if user is not None:
+        if user.is_active:
+            if order is not None:
+                if order.is_paid:
+                    if amount > 0:
+                        return amount <= order.total_amount
+    return False
+```
+
+```python
+# after
+
+def approve_refund(user, order, amount):
+    if user is None or not user.is_active:
+        return False
+    if order is None or not order.is_paid:
+        return False
+    if amount <= 0:
+        return False
+    return amount <= order.total_amount
+```
+
+후자는 정상 흐름을 마지막 한 줄로 모아 놓았기 때문에 리뷰어가 정책을 더 빠르게 검증할 수 있습니다.
+
+## 정책 테이블과 전략 객체 예시
+
+```python
+class MemberPolicy:
+    def discount(self, amount: int) -> int:
+        return int(amount * 0.9)
+
+
+class GuestPolicy:
+    def discount(self, amount: int) -> int:
+        return amount
+
+
+POLICIES = {
+    "member": MemberPolicy(),
+    "guest": GuestPolicy(),
+}
+
+
+def apply_discount(amount: int, user_type: str) -> int:
+    policy = POLICIES[user_type]
+    return policy.discount(amount)
+```
+
+위 구조는 if/elif 체인을 제거하고 정책 추가를 국소화합니다. 새 사용자 타입이 생겨도 기존 함수 본문을 수정하지 않고 정책 클래스만 추가하면 됩니다.
+
+## 분기 단순화 검증 포인트
+
+1. 예외 케이스가 초반에 배치되는가
+2. 들여쓰기 깊이가 감소했는가
+3. 정책 추가 시 기존 코드 변경량이 줄었는가
+4. 테스트 케이스가 조건 단위로 명확해졌는가
+
+```python
+def max_indentation_depth(lines: list[str]) -> int:
+    depth = 0
+    max_depth = 0
+    for line in lines:
+        leading_spaces = len(line) - len(line.lstrip(" "))
+        depth = leading_spaces // 4
+        max_depth = max(max_depth, depth)
+    return max_depth
+```
+
+수치를 함께 보면 조건문 개선이 실제로 효과를 냈는지 더 명확하게 판단할 수 있습니다.
+
+
+## 실무 적용 메모
+
+아래 메모는 팀 내 합의 문서에 그대로 옮겨 적어도 되는 수준의 운영 규칙입니다.
+
+1. 리뷰는 코드 스타일보다 변경 위험을 먼저 다룹니다.
+2. 규칙 위반은 사람 지적보다 자동화 전환을 우선합니다.
+3. 반복되는 설계 결함은 교육 과제가 아니라 구조 개선 과제로 등록합니다.
+4. 모든 개선은 테스트와 함께 진행하며, 동작 변경 여부를 PR 설명에 명시합니다.
+5. 다음 분기 목표에는 "새 기능 수"와 함께 "변경 비용 감소 지표"를 반드시 포함합니다.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class QualityGate:
+    has_tests: bool
+    has_clear_names: bool
+    has_boundary_error_handling: bool
+    has_small_functions: bool
+    has_review_notes: bool
+
+
+def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
+    missing = []
+    if not gate.has_tests:
+        missing.append("tests")
+    if not gate.has_clear_names:
+        missing.append("naming")
+    if not gate.has_boundary_error_handling:
+        missing.append("error-boundary")
+    if not gate.has_small_functions:
+        missing.append("function-size")
+    if not gate.has_review_notes:
+        missing.append("review-notes")
+    return len(missing) == 0, missing
+```
+
+이 체크 함수는 단순하지만, 품질 기준을 코드로 표현하는 출발점이 됩니다. 팀이 기준을 말로만 합의하면 시간이 지나며 흐려집니다. 반대로 코드와 템플릿과 자동화 규칙으로 남기면 신규 멤버가 들어와도 동일한 기준이 유지됩니다.
+
+또한 개선 활동은 단발성 이벤트가 아니라 루프여야 합니다. 한 번의 대청소보다 매 PR마다 작은 개선을 추가하는 편이 장기적으로 더 강합니다. 이름 하나, 함수 하나, 분기 하나를 매번 더 낫게 만드는 습관이 쌓이면 코드베이스의 평균 품질이 올라가고, 장애 대응 속도도 실제로 빨라집니다.
 
 ## 처음 질문으로 돌아가기
 

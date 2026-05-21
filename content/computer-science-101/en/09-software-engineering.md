@@ -43,8 +43,6 @@ In this article, we'll use testing, version control, code review, and refactorin
 
 This picture places Software Engineering inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Software Engineering is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions This Article Answers
 
 - What separates coding from software engineering in practice?
@@ -67,8 +65,6 @@ The ability to write code that works will plateau by year five. The same code ha
 > Code is written once and read a hundred times.
 
 Good code is not the code that's quickest to write today; it's the code that's easiest to change for years.
-
-## Concept at a Glance
 
 > Engineering is the activity of guaranteeing "still works tomorrow" on top of "works today."
 

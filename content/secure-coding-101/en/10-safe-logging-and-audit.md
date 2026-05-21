@@ -44,8 +44,6 @@ Here, we will treat logging as an evidence system rather than a convenience feat
 
 This picture places Safe Logging and Audit inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Safe Logging and Audit is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions This Chapter Answers
 
 - The difference between *application log* and *audit log*
@@ -59,8 +57,6 @@ This picture places Safe Logging and Audit inside an operating flow. The point i
 The first question in incident response is *when, who, what*. If you cannot answer, the *incident never ends*. Meanwhile, if passwords, tokens, or card numbers slip into logs, the *incident doubles*.
 
 > *Record everything precisely. Never record secrets.*
-
-## Concept at a Glance
 
 ## Key Terms
 

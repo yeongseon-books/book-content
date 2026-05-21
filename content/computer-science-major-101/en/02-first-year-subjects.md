@@ -45,7 +45,7 @@ This is post 2 in the Computer Science Major 101 series.
 
 This picture places Understanding First Year Subjects inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Understanding First Year Subjects is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> First-year subjects are not obstacles to 'real' CS—they are the ground floor. Each hour spent on calculus, linear algebra, discrete math, and intro programming saves you days of rework in upper courses.
 
 ## What You Will Learn
 
@@ -60,7 +60,7 @@ This picture places Understanding First Year Subjects inside an operating flow. 
 Year-one *foundations* underlie *algorithms*, *AI*, and *systems* — every later course.
 
 ## Concept at a Glance
-
+First-year courses establish the *pace*, *language*, and *thinking habits* you will carry forward. They are not prerequisites—they are ground-builders.
 ## Key Terms
 
 - **calculus**: math of *continuous* change.

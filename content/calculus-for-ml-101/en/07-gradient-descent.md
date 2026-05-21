@@ -44,8 +44,6 @@ In this post, we'll look at the update rule itself, the role of the learning rat
 
 This picture places Gradient Descent inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Gradient Descent is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - Why does moving in the direction opposite the gradient reduce the loss?
@@ -57,8 +55,6 @@ This picture places Gradient Descent inside an operating flow. The point is not 
 ## Why It Matters
 
 Most ML training is a *variant* of gradient descent.
-
-## Concept at a Glance
 
 ## Key Terms
 

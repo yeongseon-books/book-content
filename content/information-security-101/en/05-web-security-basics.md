@@ -45,7 +45,7 @@ This is post 5 in the Information Security 101 series.
 
 This picture places Web Security Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Web Security Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Web security is not about HTTPS alone. It is about ensuring that at every layer—HTTP headers, authentication checks, SQL composition, browser rendering—untrusted input cannot become a command.
 
 ## What You Will Learn
 
@@ -60,8 +60,6 @@ This picture places Web Security Basics inside an operating flow. The point is n
 About 80% of web security is the same handful of concepts repeated. Understanding origin and cookies blocks the bulk of CSRF and XSS exposure.
 
 > Origin is the security boundary.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR

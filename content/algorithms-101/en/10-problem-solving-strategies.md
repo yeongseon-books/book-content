@@ -43,8 +43,6 @@ This is the final post in the Algorithms 101 series. Here we wrap up the series 
 
 This picture places Algorithm Problem-Solving Strategies inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Algorithm Problem-Solving Strategies is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The standard thinking procedure to apply to any algorithm problem
@@ -57,8 +55,6 @@ This picture places Algorithm Problem-Solving Strategies inside an operating flo
 The point of studying algorithms is not memorising solutions but gaining the ability to decompose new problems. That matters in interviews and just as much in production system design. Two engineers with the same toolbox produce very different work depending on how they pick from it.
 
 > A good solution is the product of a consistent procedure, not a memorised answer.
-
-## Concept at a Glance
 
 > The standard procedure has five steps. (1) Restate the problem. (2) Write down inputs, outputs, and constraints. (3) Estimate the allowed complexity from input size. (4) Recognise the pattern and narrow the candidate tools. (5) Verify on a small example before writing code. The same procedure works in interviews.
 

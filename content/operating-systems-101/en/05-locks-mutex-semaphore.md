@@ -43,8 +43,6 @@ This is post 5 in the Operating Systems 101 series. It breaks down mutexes, sema
 
 This picture places Locks, Mutexes, and Semaphores inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Locks, Mutexes, and Semaphores is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - What are the actual differences between mutexes, reentrant locks, semaphores, and condition variables?
@@ -64,8 +62,6 @@ This picture places Locks, Mutexes, and Semaphores inside an operating flow. The
 A lock is the seat belt of concurrent code, but a wrongly fastened belt can pin you to the seat. Disagreeing on lock order in even one place can stop the whole system, and protecting too small a region leaves the race intact. Treating "just take a lock" as a safety guarantee is a leading cause of mysterious freezes in production.
 
 > A lock does not guarantee safety. It enforces the rules that, if followed, produce safety. Wrong rules produce wrong locks.
-
-## Concept at a Glance
 
 > A mutex lets one flow at a time enter the critical section. A semaphore lets up to N flows enter at once. An RLock (reentrant lock) lets the same flow take the same lock multiple times. A condition variable is a mechanism for waiting until some predicate becomes true and then waking the waiter.
 

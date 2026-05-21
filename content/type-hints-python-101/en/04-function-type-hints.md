@@ -45,8 +45,6 @@ This is post 4 in the Type Hints in Python 101 series.
 
 This picture places Function Type Hints inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Function Type Hints is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - `Callable[[ArgTypes], ReturnType]` for function-typed parameters
@@ -61,8 +59,6 @@ Higher-order functions — functions that take or return other functions — are
 > Callable = describing "what shape of function" a parameter expects.
 
 This is especially critical for decorators, which are used everywhere in frameworks like FastAPI and Flask.
-
-## Concept at a Glance
 
 > Callable describes function types. @overload describes multiple valid call signatures. ParamSpec preserves the original function's signature through decorators.
 

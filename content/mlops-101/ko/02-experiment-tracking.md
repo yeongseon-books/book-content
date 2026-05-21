@@ -52,6 +52,109 @@ last_reviewed: '2026-05-12'
 
 반대로 모든 run을 기록하면 모델 품질뿐 아니라 작업 과정도 자산이 됩니다. 실패한 실험이 남아 있으면 같은 실수를 반복하지 않고, 성공한 실험이 남아 있으면 승격 후보를 더 빨리 가를 수 있습니다.
 
+### 실험 추적 도구 비교
+
+많은 도구가 있지만 핵심 기능과 제약 사항은 비슷합니다. 다음 표는 대표 도구들의 특징과 무료 한도를 비교한 것입니다.
+
+| 도구 | 무료 한도 | 특징 | 세팅 복잡도 |
+|---|---|---|---|
+| MLflow | 무제한 (셀프 호스팅) | 오픈소스, 로컬/원격 모두 가능, 모델 레지스트리 통합 | 낮음 |
+| W&B (Weights & Biases) | 개인 프로젝트 무료, 팀은 유료 | UI 우수, 협업 기능 강력, Sweep 내장 | 낮음 |
+| Neptune | 200시간 트래킹 무료 | 모델 비교 UI 우수, 긴 실험 기록 보관 | 보통 |
+| Comet ML | 5000 run 무료 | 대시보드 커스터마이징, 실험 diff 기능 | 보통 |
+
+처음 시작하는 팀에게는 MLflow를 권합니다. 설치가 간단하고, 로컬에서도 바로 쓸 수 있으며, 나중에 원격 서버로 확장하기도 쉽습니다.
+
+### MLflow 코드 예제 — 완전한 흐름
+
+위 예제를 조금 더 확장해서 보겠습니다. 데이터 버전을 param으로 남기고, 메트릭을 여러 번 기록하고, 아티팩트로 모델과 그래프를 함께 남기는 예제입니다.
+
+```python
+import mlflow
+import hashlib
+import json
+from sklearn.datasets import make_classification
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+import pickle
+import matplotlib.pyplot as plt
+
+mlflow.set_tracking_uri("file:./mlruns")
+mlflow.set_experiment("demo-full")
+
+# 데이터 버전 계산
+X, y = make_classification(n_samples=1000, random_state=42)
+data_repr = json.dumps({"n": len(X), "seed": 42})
+data_version = hashlib.sha1(data_repr.encode()).hexdigest()[:8]
+
+X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=0)
+
+with mlflow.start_run():
+    # 1. 파라미터 기록
+    C = 1.0
+    max_iter = 1000
+    mlflow.log_param("C", C)
+    mlflow.log_param("max_iter", max_iter)
+    mlflow.log_param("data_version", data_version)
+
+    # 2. 학습
+    model = LogisticRegression(C=C, max_iter=max_iter, random_state=0).fit(X_train, y_train)
+
+    # 3. 메트릭 기록
+    train_acc = model.score(X_train, y_train)
+    val_acc = model.score(X_val, y_val)
+    mlflow.log_metric("train_acc", train_acc)
+    mlflow.log_metric("val_acc", val_acc)
+
+    # 4. 모델 아티팩트
+    with open("model.pkl", "wb") as f:
+        pickle.dump(model, f)
+    mlflow.log_artifact("model.pkl")
+
+    # 5. 시각화 아티팩트
+    fig, ax = plt.subplots()
+    ax.bar(["train", "val"], [train_acc, val_acc])
+    ax.set_ylim(0, 1)
+    ax.set_title("Accuracy")
+    fig.savefig("acc.png")
+    mlflow.log_artifact("acc.png")
+    plt.close()
+
+    print(f"Run completed. train={train_acc:.3f}, val={val_acc:.3f}")
+```
+
+이 코드에서 중요한 점은 데이터 버전, 파라미터, 모델, 메트릭, 시각화가 모두 하나의 run 안에 묶여 있다는 점입니다. 나중에 이 run을 열면 모든 결과를 함께 볼 수 있습니다.
+
+### 실험 명명 규칙
+
+실험이 쌓이면 이름만으로도 의도를 파악할 수 있어야 합니다. 다음은 팀 단위로 쓸 수 있는 표준 명명 규칙 예시입니다.
+
+#### Experiment 이름 규칙
+
+- `<project>-<task>` 형식 사용: `fraud-detection-baseline`, `recommendation-v2`
+- 별도 브랜치나 티켓 번호 추가 가능: `fraud-detection-TICKET-123`
+
+#### Run 명명 패턴
+
+MLflow는 run ID를 자동 생성하지만 `mlflow.set_tag("mlflow.runName", ...)`로 이름을 명시할 수도 있습니다.
+
+```python
+with mlflow.start_run():
+    mlflow.set_tag("mlflow.runName", "C=1.0-seed=42-v1")
+    # ...
+```
+
+#### Tag 활용
+
+실험 의도, 담당자, 버전을 tag로 남기면 후에 필터링이 쉽습니다.
+
+```python
+mlflow.set_tag("purpose", "hyperparameter-search")
+mlflow.set_tag("owner", "data-science-team")
+mlflow.set_tag("model_type", "logistic-regression")
+```
+
+표준 규칙이 있으면 팀원이 각자의 방식으로 run을 만들더라도 공통 축에서 비교할 수 있습니다.
 ---
 
 ## 전체 흐름을 먼저 보겠습니다
@@ -205,6 +308,91 @@ for r in runs[:3]:
 실험 관리는 팀의 단기 기억입니다. 모델을 계속 바꾸는 조직이라면, 무엇을 시도했고 무엇이 잘됐고 무엇이 실패했는지를 구조적으로 남겨야 합니다.
 
 이 글에서 기억할 핵심은 하나입니다. **실험 추적이 있어야 모델 개선이 개인 기억이 아니라 팀 자산이 됩니다.** 다음 글에서는 그 기억을 더 오래 보존하는 데이터 버전 관리를 다루겠습니다.
+
+
+## MLflow Tracking 실무 패턴
+
+실험 추적은 "기록한다"에서 끝나지 않고 "비교한다"까지 가야 합니다. 이를 위해서는 기록 키 이름과 실험 범위를 먼저 표준화해야 합니다.
+
+### 권장 기록 스키마
+
+| 구분 | 필수 키 예시 | 목적 |
+|---|---|---|
+| Param | `model_type`, `learning_rate`, `seed`, `data_version` | 입력 조건 고정 |
+| Metric | `val_auc`, `val_f1`, `train_time_sec` | 성능과 비용 비교 |
+| Tag | `owner`, `ticket`, `purpose` | 조직 문맥 연결 |
+| Artifact | `model.pkl`, `confusion_matrix.png`, `feature_importance.csv` | 결과 재사용 |
+
+키를 표준화하면 다음 분기부터 큰 차이가 납니다. 팀원이 바뀌어도 같은 실험 테이블을 읽을 수 있고, 모델 리뷰가 "감각"이 아니라 "증거" 중심으로 바뀝니다.
+
+### 실험 비교 코드 예시
+
+```python
+import mlflow
+from mlflow.tracking import MlflowClient
+
+client = MlflowClient(tracking_uri="file:./mlruns")
+exp = client.get_experiment_by_name("demo-full")
+runs = client.search_runs(
+    experiment_ids=[exp.experiment_id],
+    order_by=["metrics.val_auc DESC"],
+)
+
+print("top runs")
+for r in runs[:5]:
+    print({
+        "run_id": r.info.run_id,
+        "val_auc": r.data.metrics.get("val_auc"),
+        "lr": r.data.params.get("learning_rate"),
+        "data": r.data.params.get("data_version"),
+    })
+```
+
+이런 비교 코드가 있어야 회고 회의에서 "어떤 실험이 왜 이겼는가"를 빠르게 설명할 수 있습니다.
+
+## 실험 비교 테이블 템플릿
+
+아래 형식으로 주간 모델 리뷰를 운영하면 승격 판단이 훨씬 명확해집니다.
+
+| run_id | data_version | val_auc | val_f1 | train_time_sec | 승격 후보 |
+|---|---|---:|---:|---:|---|
+| a1b2c3 | 2026-05-10 | 0.861 | 0.742 | 388 | 후보 |
+| d4e5f6 | 2026-05-10 | 0.854 | 0.739 | 220 | 보류 |
+| g7h8i9 | 2026-05-03 | 0.847 | 0.733 | 190 | 탈락 |
+
+점수만 높은 모델이 아니라 학습 비용, 데이터 시점, 안정성까지 함께 보아야 실제 운영에서 후회가 줄어듭니다.
+
+## 재현 가능한 실험 실행 래퍼
+
+```python
+import os
+import subprocess
+import mlflow
+
+def run_experiment(cfg_path: str, data_version: str) -> None:
+    mlflow.set_experiment("fraud-lr")
+    with mlflow.start_run():
+        mlflow.log_param("config", cfg_path)
+        mlflow.log_param("data_version", data_version)
+        mlflow.log_param("git_sha", os.getenv("GIT_SHA", "unknown"))
+
+        subprocess.run(["python", "train.py", "--config", cfg_path], check=True)
+        subprocess.run(["python", "evaluate.py", "--output", "metrics.json"], check=True)
+
+        mlflow.log_artifact("metrics.json")
+        mlflow.log_artifact("model.pkl")
+```
+
+이 래퍼의 목적은 학습 스크립트를 복잡하게 만드는 것이 아닙니다. 실험 실행 경계에 메타데이터를 강제로 남기게 해서 재현 누락을 줄이는 데 있습니다.
+
+## 운영 규약 제안
+
+- 실패한 run도 삭제하지 않습니다.
+- `data_version`과 `git_sha`가 없는 run은 승격 후보에서 제외합니다.
+- 승격 심사에는 최근 3회 실행의 분산값을 포함합니다.
+- 실험 리뷰 주기를 정해 모델 선택 과정을 문서화합니다.
+
+이 규약이 있으면 실험 추적이 단순 로그 저장소에서 운영 의사결정 시스템으로 바뀝니다.
 
 ## 처음 질문으로 돌아가기
 

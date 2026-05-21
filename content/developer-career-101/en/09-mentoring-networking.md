@@ -41,7 +41,7 @@ This is post 9 in the Developer Career 101 series.
 
 This picture places Mentoring and Networking inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Mentoring and Networking is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Mentoring and networking are most effective when you define what you want to learn and what you have to share, rather than passively waiting for connection.
 
 ## What You Will Learn
 
@@ -55,7 +55,7 @@ This picture places Mentoring and Networking inside an operating flow. The point
 
 Solo learning has a ceiling. Connection is a shortcut.
 
-## Concept at a Glance
+Purpose-driven relationships compound faster than passive networking. Share what you know; ask for feedback on what you want to improve.
 
 ## Key Terms
 

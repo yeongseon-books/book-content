@@ -42,8 +42,6 @@ This is post 5 in the Serverless 101 series.
 
 This picture places Scaling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Scaling is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - the *concurrency* model
@@ -57,8 +55,6 @@ This picture places Scaling inside an operating flow. The point is not to memori
 Serverless is strong at horizontal expansion, but that strength becomes a liability if you measure only function throughput. A rapid increase in concurrency can exhaust database connections, hit third-party API limits, or starve peer functions that share the same account-level budget.
 
 That is why experienced operators treat concurrency like a budget. The point is not to remove every limit. The point is to place limits deliberately so that the whole system stays healthy.
-
-## Concept at a Glance
 
 The most important part of this diagram is what happens *after* the functions scale out. Good serverless scaling is not about making the left side infinitely elastic. It is about making sure the right side can absorb the parallelism safely.
 

@@ -44,8 +44,6 @@ Here, we will treat SQL injection as a structural error in how code combines syn
 
 This picture places SQL Injection and Safe ORM Usage inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of SQL Injection and Safe ORM Usage is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions This Chapter Answers
 
 - How *SQL injection* works
@@ -59,8 +57,6 @@ This picture places SQL Injection and Safe ORM Usage inside an operating flow. T
 A single SQLi exposes the *entire database*. Auth bypass, data exfiltration, and tampering — all at once.
 
 > *If SQL is built from string concatenation, it *will leak* one day.*
-
-## Concept at a Glance
 
 ## Key Terms
 

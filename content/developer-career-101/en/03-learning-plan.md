@@ -41,7 +41,7 @@ This is post 3 in the Developer Career 101 series.
 
 This picture places Building a Learning Plan inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Building a Learning Plan is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Learning plans matter most when paired with concrete projects that exercise the full cycle: requirements, design, implementation, test, and deployment feedback.
 
 ## What You Will Learn
 
@@ -55,7 +55,7 @@ This picture places Building a Learning Plan inside an operating flow. The point
 
 Learning without a plan disperses.
 
-## Concept at a Glance
+Effective learning connects theory to projects. You learn by doing: build, ship, gather feedback, iterate.
 
 ## Key Terms
 

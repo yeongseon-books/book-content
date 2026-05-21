@@ -40,15 +40,11 @@ This is post 6 in the Backend Development 101 series. Here, we separate authenti
 
 This picture places Authentication and Authorization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Authentication and Authorization is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Auth is the *one area* where a single mistake can sink a company. A line that stored passwords as plain text or skipped a token check returns *years later* as a security incident.
 
 > Auth code must be small, standard, and boring.
-
-## Concept at a Glance
 
 Authentication asks *who*; authorization asks *can you*.
 

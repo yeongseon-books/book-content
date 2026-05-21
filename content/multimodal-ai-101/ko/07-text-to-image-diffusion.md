@@ -306,4 +306,6 @@ Stable Diffusion 계열을 이해하면 text-to-image뿐 아니라 inpainting, i
 - [AI 앱 패턴 101 - 워크플로 자동화](../../ai-app-patterns-101/ko/05-workflow-automation.md)
 - [AI Agent 101 - 운영](../../ai-agent-101/ko/09-production-operations.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/multimodal-ai-101/ko/07-text-to-image-diffusion)
+
 Tags: Diffusion, Stable Diffusion, Text-to-Image, DALL-E, Image Generation, ControlNet

@@ -41,8 +41,6 @@ This is post 9 in the Type Hints in Python 101 series. In this article, we will 
 
 This picture places Pydantic and Type Hints inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Pydantic and Type Hints is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - How to turn type hints into runtime validation rules
@@ -57,8 +55,6 @@ This picture places Pydantic and Type Hints inside an operating flow. The point 
 Many production bugs start before business logic runs. The client sends an empty username, an invalid email, a value outside the allowed range, or two fields that contradict each other. If that boundary logic is handwritten with scattered `if` statements, it becomes repetitive, inconsistent, and easy to forget.
 
 Pydantic lets the boundary contract live in one place. The key is not memorizing `BaseModel`, `Field`, and validators as isolated features. The useful skill is seeing one request move through **model definition → field constraints → custom validators → FastAPI 422 failure → corrected success response**.
-
-## Concept at a Glance
 
 ```text
 HTTP request JSON

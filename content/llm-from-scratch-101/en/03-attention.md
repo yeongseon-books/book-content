@@ -42,8 +42,6 @@ This is post 3 in the LLM from Scratch 101 series. Here we connect QKV projectio
 
 This picture places Deciding Which Tokens to Focus On inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Deciding Which Tokens to Focus On is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 Attention is the component that makes a Transformer behave like a Transformer. Embeddings turn token IDs into vectors, but attention is what lets those vectors interact. This is the point where the model stops acting like isolated characters and starts behaving like a sequence model.

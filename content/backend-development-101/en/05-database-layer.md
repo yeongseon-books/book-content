@@ -40,15 +40,11 @@ This is post 5 in the Backend Development 101 series. Here, we use the repositor
 
 This picture places The Database Layer inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of The Database Layer is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Databases are *what changes most often* and *what should change least*. Splitting the layer early means swapping a database, adding a cache, or running tests on an in-memory engine all happen in *one file*.
 
 > A repository is the *translator between the database and the service*.
-
-## Concept at a Glance
 
 The service does not know SQL — only the repository does.
 

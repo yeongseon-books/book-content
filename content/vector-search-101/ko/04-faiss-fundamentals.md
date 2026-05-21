@@ -368,4 +368,6 @@ for score, idx in zip(scores_l2[0], indices_l2[0]):
 - [FAISS index selection guide](https://github.com/facebookresearch/faiss/wiki/Guidelines-to-choose-an-index)
 - [faiss-cpu on PyPI](https://pypi.org/project/faiss-cpu/)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/vector-search-101/ko/04-faiss-fundamentals)
+
 Tags: Vector Search, FAISS, Embeddings, Python

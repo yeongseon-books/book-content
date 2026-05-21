@@ -40,8 +40,6 @@ This is the third post in the LLM Fine-tuning 101 series.
 
 This picture places Configuring LoRA Adapters inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Configuring LoRA Adapters is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 From post 3 we touch real model objects. We assume no GPU and use a tiny model like `sshleifer/tiny-gpt2`, but the goal at this stage is not performance — it is **verifying that wiring is correct**. A single typo in `target_modules` makes `print_trainable_parameters()` print 0 with no traceback. Training runs, loss does not move — the most diagnostically painful failure mode in fine-tuning starts here.

@@ -43,8 +43,6 @@ This is post 4 in the Algorithms 101 series. Here we cover the trade-offs among 
 
 This picture places Sorting Algorithms inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Sorting Algorithms is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - Why comparison sorting cannot beat O(n log n)
@@ -57,8 +55,6 @@ This picture places Sorting Algorithms inside an operating flow. The point is no
 Sorting underpins index construction, batch processing, joins, window aggregations, and ML preprocessing. The cost of every downstream algorithm depends on which sort precedes it. Without a clear sense of trade-offs, you cannot estimate the cost of the rest of the pipeline.
 
 > Understanding sorting is the first vocabulary of algorithm design.
-
-## Concept at a Glance
 
 > The decision tree of comparison sorts has depth log(n!) ≈ n log n, so O(n log n) is the lower bound. Mergesort is stable, uses O(n) extra memory, and guarantees O(n log n). Quicksort is in-place, averages O(n log n), but degrades to O(n²) on bad pivots. Heapsort is in-place and guaranteed O(n log n) but unstable. Timsort layers run detection on top of mergesort.
 

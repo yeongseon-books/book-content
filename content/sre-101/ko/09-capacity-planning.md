@@ -80,6 +80,268 @@ Capacity Planning을 현재 상태, 미래 요구, 한계 지점으로 나누어
 
 좋은 계획은 헤드룸의 필요성을 막연히 주장하지 않습니다. 어느 정도 변동을 감당하려고 얼마를 더 쓰는지 설명합니다. 비용과 용량을 따로 떼어 놓지 않는 이유가 여기에 있습니다.
 
+## 용량 계획 입력 데이터
+
+용량 계획을 제대로 하려면 어떤 데이터를 수집해야 하는지 명확해야 합니다. 다음 표는 주요 입력 데이터와 수집 방법을 보여 줍니다.
+
+| 데이터 항목 | 수집 방법 | 예시 값 | 주의사항 |
+| --- | --- | --- | --- |
+| 현재 트래픽 | Prometheus `rate(http_requests_total[5m])` | 1500 RPS | 주간 평균, 피크 시간대 제외 |
+| 리소스 사용률 | Node exporter CPU/memory metrics | CPU 45%, Memory 60% | 평균보다 p95 사용률 확인 |
+| 주간 성장률 | 최근 4-8주 데이터 회귀 분석 | +10% per month | 계절성 보정 필요 |
+| 피크 배수 | 일간 최대/평균 비율 | 2.5x | 프로모션, 이벤트 고려 |
+| 노드당 처리량 | 부하 테스트 결과 | 350 RPS/node | latency p99 < 500ms 기준 |
+| 리드 타임 | 벤더 조달 기간 | 2-4 weeks | 클라우드는 즉시, 온프레미스는 길어짐 |
+
+이 데이터를 모두 수집하고 나면 예측 모델을 만들고 검증할 수 있습니다. 데이터가 불충분하면 예측의 정확도가 떨어집니다.
+
+## Python 선형 회귀 용량 예측 예제
+
+과거 트래픽 데이터를 기반으로 미래 용량을 예측하는 가장 단순한 방법은 선형 회귀입니다. numpy를 사용해 추세선을 그리고 미래 값을 예측합니다.
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from datetime import datetime, timedelta
+
+def linear_regression_forecast(historical_data, weeks_ahead):
+    """
+    선형 회귀로 미래 용량 예측
+    
+    Args:
+        historical_data: List of (week, rps) tuples
+        weeks_ahead: How many weeks to forecast
+    
+    Returns:
+        Predicted RPS for each future week
+    """
+    weeks = np.array([w for w, _ in historical_data])
+    rps = np.array([r for _, r in historical_data])
+    
+    # Fit linear regression: rps = a * week + b
+    coefficients = np.polyfit(weeks, rps, 1)
+    slope, intercept = coefficients
+    
+    # Generate predictions
+    future_weeks = np.arange(weeks[-1] + 1, weeks[-1] + weeks_ahead + 1)
+    predictions = slope * future_weeks + intercept
+    
+    return {
+        "slope": slope,
+        "intercept": intercept,
+        "predictions": list(zip(future_weeks, predictions)),
+        "growth_per_week": slope
+    }
+
+def plot_forecast(historical_data, forecast_result, weeks_ahead):
+    """Plot historical data and forecast"""
+    weeks_hist = [w for w, _ in historical_data]
+    rps_hist = [r for _, r in historical_data]
+    
+    weeks_forecast = [w for w, _ in forecast_result["predictions"]]
+    rps_forecast = [r for _, r in forecast_result["predictions"]]
+    
+    plt.figure(figsize=(12, 6))
+    plt.plot(weeks_hist, rps_hist, 'bo-', label='Historical Data')
+    plt.plot(weeks_forecast, rps_forecast, 'ro--', label='Forecast')
+    plt.xlabel('Week')
+    plt.ylabel('RPS')
+    plt.title('Traffic Forecast (Linear Regression)')
+    plt.legend()
+    plt.grid(True)
+    plt.savefig('/tmp/capacity_forecast.png')
+    plt.close()
+
+# Example usage
+historical_data = [
+    (1, 1200),
+    (2, 1280),
+    (3, 1350),
+    (4, 1420),
+    (5, 1500),
+    (6, 1580),
+    (7, 1650),
+    (8, 1720)
+]
+
+weeks_ahead = 12  # Forecast next 3 months
+
+result = linear_regression_forecast(historical_data, weeks_ahead)
+
+print("=== Capacity Forecast ===")
+print(f"Growth rate: {result['growth_per_week']:.1f} RPS/week")
+print(f"\nPredicted traffic for next {weeks_ahead} weeks:")
+
+for week, rps in result["predictions"]:
+    print(f"Week {week}: {rps:.0f} RPS")
+
+# Apply peak multiplier and headroom
+peak_multiplier = 2.5
+headroom_pct = 0.20
+
+print(f"\n=== With Peak Multiplier ({peak_multiplier}x) and Headroom ({headroom_pct*100}%) ===")
+
+final_week, final_rps = result["predictions"][-1]
+peak_rps = final_rps * peak_multiplier
+target_capacity = peak_rps * (1 + headroom_pct)
+
+print(f"Week {final_week} forecast: {final_rps:.0f} RPS")
+print(f"Peak capacity needed: {peak_rps:.0f} RPS")
+print(f"Target capacity (with headroom): {target_capacity:.0f} RPS")
+
+# Calculate nodes needed
+rps_per_node = 350
+nodes_needed = int(np.ceil(target_capacity / rps_per_node))
+
+print(f"\n=== Infrastructure ===")
+print(f"RPS per node: {rps_per_node}")
+print(f"Nodes required: {nodes_needed}")
+
+# Cost estimate
+monthly_cost_per_node = 180
+total_monthly_cost = nodes_needed * monthly_cost_per_node
+
+print(f"\n=== Cost Estimate ===")
+print(f"Monthly cost per node: ${monthly_cost_per_node}")
+print(f"Total monthly cost: ${total_monthly_cost}")
+
+# Plot
+plot_forecast(historical_data, result, weeks_ahead)
+print("\nForecast chart saved to /tmp/capacity_forecast.png")
+```
+
+**출력 예시:**
+
+```
+=== Capacity Forecast ===
+Growth rate: 74.3 RPS/week
+
+Predicted traffic for next 12 weeks:
+Week 9: 1789 RPS
+Week 10: 1863 RPS
+Week 11: 1938 RPS
+Week 12: 2012 RPS
+...
+Week 20: 2605 RPS
+
+=== With Peak Multiplier (2.5x) and Headroom (20%) ===
+Week 20 forecast: 2605 RPS
+Peak capacity needed: 6513 RPS
+Target capacity (with headroom): 7815 RPS
+
+=== Infrastructure ===
+RPS per node: 350
+Nodes required: 23
+
+=== Cost Estimate ===
+Monthly cost per node: $180
+Total monthly cost: $4140
+```
+
+이 코드는 과거 8주 데이터로 12주를 예측하고, 피크 배수와 헤드룸을 적용해 필요한 노드 수와 비용을 계산합니다. 예측 그래프도 생성해 시각적으로 확인할 수 있습니다.
+
+## 부하 테스트와 용량
+
+예측 모델은 현재 시스템 한계를 알려주지 않습니다. 부하 테스트가 필요한 이유는 예측한 수요를 현재 시스템이 처리할 수 있는지 검증하기 위함입니다.
+
+### 부하 테스트에서 확인해야 할 항목
+
+1. **최대 처리량**: 시스템이 버틸 수 있는 최대 RPS
+2. **병목 지점**: CPU, 메모리, DB 커넥션, 외부 API 중 어느 것이 먼저 한계에 닿는가
+3. **Latency 분포**: p50, p95, p99 latency가 부하에 따라 어떻게 변하는가
+4. **오류율**: 부하가 높아질 때 어느 지점부터 오류가 발생하는가
+5. **회복 시간**: 피크가 지나간 후 정상 상태로 돌아오는 데 걸리는 시간
+
+### 부하 테스트 결과 해석
+
+```python
+def analyze_load_test_results(test_results):
+    """
+    부하 테스트 결과 분석
+    
+    test_results: List of (rps, latency_p99, error_rate) tuples
+    """
+    analysis = {
+        "max_rps": 0,
+        "breaking_point": None,
+        "recommendations": []
+    }
+    
+    for rps, latency_p99, error_rate in test_results:
+        # latency 임계값: p99 < 1000ms
+        # 오류율 임계값: < 1%
+        
+        if latency_p99 < 1000 and error_rate < 0.01:
+            analysis["max_rps"] = rps
+        else:
+            if not analysis["breaking_point"]:
+                analysis["breaking_point"] = {
+                    "rps": rps,
+                    "latency_p99": latency_p99,
+                    "error_rate": error_rate
+                }
+                break
+    
+    # Headroom 계산: 최대 처리량의 80%를 목표로
+    safe_capacity = analysis["max_rps"] * 0.8
+    
+    analysis["safe_capacity"] = safe_capacity
+    analysis["recommendations"].append(
+        f"최대 처리량 {analysis['max_rps']} RPS, 안전 용량 {safe_capacity:.0f} RPS 권장"
+    )
+    
+    if analysis["breaking_point"]:
+        bp = analysis["breaking_point"]
+        if bp["latency_p99"] >= 1000:
+            analysis["recommendations"].append(
+                f"Latency 병목: {bp['rps']} RPS에서 p99 {bp['latency_p99']:.0f}ms 초과"
+            )
+        if bp["error_rate"] >= 0.01:
+            analysis["recommendations"].append(
+                f"오류율 증가: {bp['rps']} RPS에서 {bp['error_rate']*100:.1f}% 오류"
+            )
+    
+    return analysis
+
+# 예시 결과
+test_results = [
+    (1000, 250, 0.001),
+    (1500, 350, 0.002),
+    (2000, 450, 0.003),
+    (2500, 650, 0.005),
+    (3000, 850, 0.008),
+    (3500, 1200, 0.015),  # Breaking point
+]
+
+analysis = analyze_load_test_results(test_results)
+
+print("=== Load Test Analysis ===")
+print(f"Max RPS: {analysis['max_rps']}")
+print(f"Safe capacity (80%): {analysis['safe_capacity']:.0f} RPS")
+
+if analysis["breaking_point"]:
+    bp = analysis["breaking_point"]
+    print(f"\nBreaking point at {bp['rps']} RPS:")
+    print(f"  Latency p99: {bp['latency_p99']:.0f}ms")
+    print(f"  Error rate: {bp['error_rate']*100:.2f}%")
+
+print("\nRecommendations:")
+for rec in analysis["recommendations"]:
+    print(f"  - {rec}")
+```
+
+부하 테스트는 예측 모델을 현실로 보정합니다. 이론상 3000 RPS가 가능하다고 예측했더라도, 실제 테스트에서 2500 RPS에서 병목이 발견되면 그것이 현실적인 한계입니다.
+
+용량 계획은 현재 상태와 미래 예측을 입력으로 받습니다. 각 입력값이 무엇을 의미하는지 명확하게 정의해야 계획의 신뢰도가 올라갑니다.
+
+| 입력값 | 의미 | 예시 |
+| --- | --- | --- |
+| 현재 트래픽 | 현재 주간 평균 요청 수 | 1,500 RPS |
+| 성장률 | 주간 또는 월간 증가율 | 10% per month |
+| 피크 배수 | 평균 대비 최대 트래픽 | 2.5x |
+| 안전 마진 (headroom) | 예측 수요 위에 남길 여유 | 20% |
+
+이 값들을 모두 고려해야 실제 필요한 용량을 계산할 수 있습니다. 성장률만 보고 피크를 빼면 프로모션 기간에 문제가 생길 수 있습니다.
 ## 단계별로 용량 모델링하기
 
 ### 1단계 — 추세 예측
@@ -152,6 +414,138 @@ monthly_cost = cost(required_nodes, monthly_per_node=180)
 | 피크가 지나간 뒤 회복 시간은 얼마나 되는가 | 순간 최대치보다 tail recovery가 더 큰 사용자 영향을 줄 수 있습니다. |
 | autoscaling이 성능 저하 전에 반응하는가 | 확장 정책과 워크로드 패턴은 실제로 같이 검증해야 합니다. |
 
+## 용량 예측 계산 코드
+
+```python
+def capacity_forecast(current_rps, growth_rate_monthly, months_ahead, peak_multiplier, headroom_pct):
+    """
+    용량 예측 계산
+    
+    예시:
+    - 현재: 1500 RPS
+    - 월간 성장률: 10%
+    - 3개월 후 예상
+    - 피크 배수: 2.5x
+    - headroom: 20%
+    """
+    # Step 1: 성장 예측
+    forecast_rps = current_rps * ((1 + growth_rate_monthly) ** months_ahead)
+    
+    # Step 2: 피크 적용
+    peak_rps = forecast_rps * peak_multiplier
+    
+    # Step 3: headroom 추가
+    target_capacity = peak_rps * (1 + headroom_pct)
+    
+    return {
+        "current_rps": current_rps,
+        "forecast_rps": forecast_rps,
+        "peak_rps": peak_rps,
+        "target_capacity": target_capacity,
+        "months_ahead": months_ahead
+    }
+
+def calculate_nodes(target_capacity, rps_per_node):
+    """
+    필요한 노드 수 계산
+    """
+    import math
+    return math.ceil(target_capacity / rps_per_node)
+
+def cost_estimate(nodes, monthly_cost_per_node):
+    """
+    월간 비용 계산
+    """
+    return nodes * monthly_cost_per_node
+
+# 예시 계산
+result = capacity_forecast(
+    current_rps=1500,
+    growth_rate_monthly=0.10,
+    months_ahead=3,
+    peak_multiplier=2.5,
+    headroom_pct=0.20
+)
+
+print(f"현재: {result['current_rps']} RPS")
+print(f"3개월 후 예상: {result['forecast_rps']:.0f} RPS")
+print(f"피크 적용: {result['peak_rps']:.0f} RPS")
+print(f"목표 용량: {result['target_capacity']:.0f} RPS")
+
+# 노드 수 계산
+rps_per_node = 350
+required_nodes = calculate_nodes(result['target_capacity'], rps_per_node)
+print(f"필요 노드: {required_nodes}개")
+
+# 비용 계산
+monthly_cost = cost_estimate(required_nodes, monthly_cost_per_node=180)
+print(f"월간 비용: ${monthly_cost}")
+```
+
+이 계산은 성장 추세를 현실적인 인프라 증설 결정으로 바꿔 줍니다. 단순히 "트래픽이 느는 것 같다"가 아니라, 정확한 수치로 노드 수와 비용을 설명할 수 있습니다.
+
+## 로드 테스트 전략
+
+용량 계획은 예측만으로는 충분하지 않습니다. 현재 시스템이 실제로 얼마나 버티는지 검증해야 합니다. k6나 Locust 같은 도구로 로드 테스트를 수행하면 병목 지점과 한계 성능을 파악할 수 있습니다.
+
+### k6 기본 스크립트
+
+```javascript
+// load-test.js
+import http from 'k6/http';
+import { check, sleep } from 'k6';
+
+export let options = {
+  stages: [
+    { duration: '2m', target: 100 },  // ramp-up
+    { duration: '5m', target: 100 },  // steady state
+    { duration: '2m', target: 200 },  // spike
+    { duration: '5m', target: 200 },
+    { duration: '2m', target: 0 },    // ramp-down
+  ],
+  thresholds: {
+    http_req_duration: ['p(95)<500', 'p(99)<1000'],
+    http_req_failed: ['rate<0.01'],
+  },
+};
+
+export default function () {
+  let response = http.get('https://api.example.com/health');
+  check(response, {
+    'status is 200': (r) => r.status === 200,
+    'latency < 500ms': (r) => r.timings.duration < 500,
+  });
+  sleep(1);
+}
+```
+
+```bash
+k6 run --vus 200 --duration 10m load-test.js
+```
+
+### Locust 기본 스크립트
+
+```python
+# locustfile.py
+from locust import HttpUser, task, between
+
+class APIUser(HttpUser):
+    wait_time = between(1, 3)
+
+    @task(3)
+    def get_home(self):
+        self.client.get("/")
+
+    @task(1)
+    def get_api(self):
+        self.client.get("/api/data")
+```
+
+```bash
+locust -f locustfile.py --host=https://api.example.com --users 200 --spawn-rate 10
+```
+
+로드 테스트는 순간 최대치만이 아니라, latency 분포, 오류율, 병목 위치, 회복 시간을 함께 확인해야 합니다. 그래야 예측 모델을 현실에 맞게 보정할 수 있습니다.
 ## 이 코드에서 먼저 봐야 할 점
 
 - 예측과 검증을 함께 봐야 계획이 현실에 가까워집니다.

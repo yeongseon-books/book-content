@@ -45,8 +45,6 @@ This is post 3 in the Database Systems 101 series.
 
 This picture places SQL and Query Processing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of SQL and Query Processing is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The consequences of SQL being declarative
@@ -59,8 +57,6 @@ This picture places SQL and Query Processing inside an operating flow. The point
 Most performance problems do not come from rewriting SQL. They come from **not knowing what is actually being executed**. Once you can read a plan, "why is this slow?" stops being a guessing game.
 
 > Many SQL queries can produce the same answer, and many execution strategies can produce the same answer for one query. That is exactly why an optimizer exists.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR

@@ -45,7 +45,7 @@ This is post 6 in the Computer Science Major 101 series.
 
 This picture places AI and Data Science inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of AI and Data Science is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> AI and data science are not about algorithms—they are about matching the *right model* to the *right problem*, given the *right constraints*.
 
 ## What You Will Learn
 
@@ -60,7 +60,7 @@ This picture places AI and Data Science inside an operating flow. The point is n
 *Data sense* is the *core skill* of every *modern engineer*.
 
 ## Concept at a Glance
-
+Classification, regression, clustering, and neural networks are not black boxes—they are *assumptions about data* made visible through math.
 ## Key Terms
 
 - **feature**: *input* variable.

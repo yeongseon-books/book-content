@@ -40,9 +40,9 @@ last_reviewed: '2026-05-15'
 
 *Data Science 101 3장 흐름 개요*
 
-이 그림에서는 데이터 수집를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+데이터 수집를 운영 시스템 속에서 올바르게 배치하려면 어떤 경계에서 무엇을 입력받고, 어디에서 검증하며, 어떤 신호를 남겨야 하는지 먼저 봐야 합니다.
 
-> 데이터 수집의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+> 데이터 수집의 핵심은 기능 이름이 아니라, 입력을 받는 경계에서 결과를 내보내는 경계까지 어떤 기준으로 데이터를 검증하고 처리할 것인가를 명확히 정하는 데 있습니다.
 
 ## 이 글에서 배우는 내용
 
@@ -69,6 +69,86 @@ last_reviewed: '2026-05-15'
 - **Schema**: 데이터의 컬럼 구조와 타입입니다.
 - **Data dictionary**: 각 컬럼의 의미를 문서화한 표입니다.
 - **Provenance**: 데이터의 출처와 생성 이력입니다.
+
+## 피처 엔지니어링 기법 비교
+
+데이터 수집 후에는 원본 그대로 모델에 넣기보다, 모델이 학습하기 좋은 형태로 변환하는 피처 엔지니어링 단계를 거칩니다. 주요 기법을 표로 비교하면 다음과 같습니다.
+
+| 기법 | 적합 상황 | sklearn 함수 |
+|---|---|---|
+| 인코딩 (One-Hot) | 범주형 변수, cardinality 낮음 | `OneHotEncoder` |
+| 인코딩 (Ordinal) | 순서가 있는 범주 | `OrdinalEncoder` |
+| 스케일링 (Standard) | 정규분포 가정, 회귀/SVM | `StandardScaler` |
+| 스케일링 (MinMax) | 범위 유지 필요, 신경망 | `MinMaxScaler` |
+| 빈닝 (Binning) | 연속형을 구간으로 | `KBinsDiscretizer` |
+| 교차 피처 | 변수 간 상호작용 포착 | `PolynomialFeatures` |
+
+예를 들어 `country` 같은 범주형 변수는 One-Hot 인코딩으로 바꾸고, `age` 같은 숫자는 StandardScaler로 정규화하면 대부분의 모델에서 성능이 향상됩니다.
+
+## Python sklearn ColumnTransformer 파이프라인 예제
+
+피처 엔지니어링을 수동으로 하나씩 하면 코드가 길어지고 실수하기 쉽습니다. sklearn의 `ColumnTransformer`를 쓰면 여러 변환을 한 번에 파이프라인으로 묶을 수 있습니다.
+
+```python
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.pipeline import Pipeline
+from sklearn.linear_model import LogisticRegression
+import pandas as pd
+
+# 샘플 데이터
+df = pd.DataFrame({
+    "age": [25, 30, 35, 40],
+    "income": [50000, 60000, 70000, 80000],
+    "country": ["KR", "US", "KR", "JP"],
+    "churn": [0, 1, 0, 1]
+})
+
+X = df.drop("churn", axis=1)
+y = df["churn"]
+
+# 숫자형 컬럼과 범주형 컬럼 구분
+numeric_features = ["age", "income"]
+categorical_features = ["country"]
+
+# ColumnTransformer로 변환 파이프라인 구성
+preprocessor = ColumnTransformer(
+    transformers=[
+        ("num", StandardScaler(), numeric_features),
+        ("cat", OneHotEncoder(drop="first"), categorical_features)
+    ]
+)
+
+# 전처리 + 모델 파이프라인
+pipeline = Pipeline([
+    ("preprocessor", preprocessor),
+    ("classifier", LogisticRegression())
+])
+
+pipeline.fit(X, y)
+print("Pipeline 학습 완료")
+```
+
+이 파이프라인은 숫자형 변수는 표준화하고, 범주형 변수는 One-Hot 인코딩을 자동으로 적용한 뒤 모델까지 학습시킵니다. 데이터 수집 후 이런 전처리가 필수적이며, 파이프라인으로 관리하면 재현성이 크게 높아집니다.
+
+## 피처 선택 vs 피처 생성
+
+피처 엔지니어링은 크게 두 가지로 나뀜니다. 하나는 기존 피처 중에서 중요한 것만 골라내는 **피처 선택**(feature selection)이고, 다른 하나는 새로운 피처를 만드는 **피처 생성**(feature engineering)입니다.
+
+**피처 선택의 목적:**
+
+- 불필요한 변수를 제거해 모델 복잡도를 줄입니다.
+- 과적합(overfitting)을 방지합니다.
+- 학습 속도를 개선합니다.
+- 해석 가능성을 높입니다.
+
+**피처 생성의 목적:**
+
+- 도메인 지식을 수치화합니다.
+- 변수 간 상호작용을 포착합니다.
+- 비선형 패턴을 선형 모델에서도 학습 가능하게 만듭니다.
+
+예를 들어 `signup_date`를 그대로 쓰는 것보다, `days_since_signup` 같은 파생 변수로 바꾸면 모델이 패턴을 더 쉽게 학습할 수 있습니다. 반대로 상관이 거의 0인 변수는 제거하는 편이 모델 성능에 더 좋습니다.
 
 ## Before / After
 
@@ -186,6 +266,91 @@ print(meta)
 ## 정리 및 다음 글
 
 데이터 수집은 단순한 입력 단계가 아니라 분석의 재현성을 만드는 기록 단계입니다. 원본, 스냅샷, 출처를 구분하는 습관이 있어야 이후 정제와 분석이 흔들리지 않습니다. 다음 글에서는 이렇게 모은 데이터를 실제로 어떻게 정제하고 검증하는지 살펴보겠습니다.
+
+## 실무 확장: 데이터 수집 채널 비교와 안정적인 수집 패턴
+
+데이터 수집은 단순 입력이 아니라 신뢰 체인을 만드는 단계입니다. 같은 분석도 수집 방식에 따라 재현성, 최신성, 운영비용이 크게 달라집니다. 이 섹션에서는 파일, API, DB, 이벤트 로그를 실무 관점에서 비교하고, 파이썬 기반 최소 수집 패턴을 정리합니다.
+
+### 수집 채널 비교표
+
+| 채널 | 장점 | 단점 | 권장 사용 시점 | 주의점 |
+| --- | --- | --- | --- | --- |
+| CSV/Parquet 파일 | 시작이 빠름, 이동 쉬움 | 버전 혼선, 수작업 오염 위험 | PoC, 외부 전달 데이터 | 원본 불변, 파일명 버전 규칙 |
+| REST API | 최신 데이터 접근 용이 | 인증/쿼터/포맷 변경 리스크 | SaaS 통합, 외부 시스템 연동 | 재시도/백오프/스키마 검증 |
+| 데이터베이스 | 질의 유연성, 신뢰도 높음 | 운영 DB 부하 가능성 | 정형 집계, 기준 데이터 조회 | 복제본 사용, 쿼리 기록 |
+| 이벤트 로그 | 사용자 행동 맥락 풍부 | 스키마 드리프트 빈번 | 퍼널/세션/행동 분석 | 이벤트 버전 관리 필수 |
+
+### API 수집 기본 패턴: 재시도와 검증
+
+```python
+import requests
+import pandas as pd
+from time import sleep
+
+url = "https://api.example.com/v1/orders"
+rows = []
+for page in range(1, 6):
+    for attempt in range(3):
+        r = requests.get(url, params={"page": page}, timeout=10)
+        if r.status_code == 200:
+            data = r.json().get("items", [])
+            rows.extend(data)
+            break
+        sleep(1.5 * (attempt + 1))
+
+df = pd.DataFrame(rows)
+required = {"order_id", "user_id", "amount", "created_at"}
+missing = required - set(df.columns)
+if missing:
+    raise ValueError(f"schema mismatch: {missing}")
+
+print(df.shape)
+```
+
+핵심은 성공 케이스가 아니라 실패 케이스 처리입니다. 수집은 실패를 전제로 설계해야 안정성이 올라갑니다.
+
+### DB 수집 패턴: 쿼리와 메타데이터 동시 기록
+
+```python
+from sqlalchemy import create_engine
+import pandas as pd
+import datetime as dt
+
+query = """
+SELECT user_id, plan, amount, paid_at
+FROM payments
+WHERE paid_at >= '2026-05-01' AND paid_at < '2026-06-01'
+"""
+
+engine = create_engine("postgresql://reader:***@replica/warehouse")
+df = pd.read_sql(query, engine)
+
+meta = {
+    "query_name": "payments_monthly_window",
+    "fetched_at": dt.datetime.utcnow().isoformat(),
+    "row_count": int(len(df)),
+}
+print(meta)
+```
+
+수집 결과만 저장하면 나중에 같은 결과를 재현하기 어렵습니다. 어떤 쿼리와 어떤 시점으로 가져왔는지 메타데이터를 함께 남겨야 합니다.
+
+### 이벤트 로그 수집에서 자주 쓰는 방어 전략
+
+- 이벤트 스키마 버전 컬럼을 필수화합니다.
+- `event_name`과 `event_ts`가 없는 레코드는 격리 테이블로 보냅니다.
+- 수집 파이프라인에서 일일 null 비율 알림을 둡니다.
+- 키 컬럼(`user_id`, `session_id`) 누락률을 대시보드로 추적합니다.
+
+### 수집 단계 운영 체크리스트
+
+- 원본 저장소와 분석 저장소를 분리했는가
+- 추출 쿼리와 파라미터를 버전 관리하는가
+- API 오류율과 재시도 횟수를 기록하는가
+- 수집 실패 시 알림과 재처리 경로가 있는가
+- 민감 데이터 마스킹 규칙이 적용되는가
+
+데이터 수집의 완성도는 "얼마나 많이 모았는가"가 아니라 "얼마나 다시 가져올 수 있는가"로 판단하는 편이 정확합니다. 이 기준이 있어야 이후 정제, EDA, 모델링까지 같은 기준으로 연결됩니다.
 
 ## 처음 질문으로 돌아가기
 

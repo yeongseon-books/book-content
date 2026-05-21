@@ -144,6 +144,178 @@ GROUP BY country;
 
 그룹 키를 지나치게 많이 넣으면 사실상 원본 행을 거의 그대로 유지하는 결과가 됩니다. 숫자는 나오지만 해석 가능한 집계가 되지 않습니다. 그룹 키는 보고 싶은 관점을 드러내는 최소 단위여야 합니다.
 
+## 집계 함수 비교 표
+
+집계 함수는 여러 행을 하나의 값으로 압축하는 도구입니다. 각 함수는 NULL을 다루는 방식과 주의점이 다릅니다.
+
+| 함수 | 역할 | NULL 처리 | 주의점 |
+| --- | --- | --- | --- |
+| `COUNT(*)` | 전체 행 수 | NULL도 포함 | 가장 기본적인 집계 |
+| `COUNT(col)` | 특정 컴럼의 NULL 아닌 행 수 | NULL 제외 | `COUNT(*)`와 다름 |
+| `SUM(col)` | 합계 | NULL 제외 | 모든 값이 NULL이면 NULL 반환 |
+| `AVG(col)` | 평균 | NULL 제외 | NULL을 0으로 간주하지 않음 |
+| `MIN(col)` | 최소값 | NULL 제외 | 문자열, 날짜에도 사용 가능 |
+| `MAX(col)` | 최대값 | NULL 제외 | 문자열, 날짜에도 사용 가능 |
+
+### NULL 처리 예제
+
+```sql
+CREATE TABLE sales (
+    id INT,
+    amount INT
+);
+
+INSERT INTO sales VALUES (1, 100), (2, NULL), (3, 200);
+
+SELECT 
+    COUNT(*) AS total_rows,
+    COUNT(amount) AS non_null_count,
+    SUM(amount) AS total_amount,
+    AVG(amount) AS avg_amount
+FROM sales;
+```
+
+**Expected output:**
+
+| total_rows | non_null_count | total_amount | avg_amount |
+| --- | --- | --- | --- |
+| 3 | 2 | 300 | 150 |
+
+`COUNT(*)`는 3을 반환하지만, `COUNT(amount)`는 NULL을 제외하고 2를 반환합니다. `AVG(amount)`는 300 / 2 = 150이지, 300 / 3 = 100이 아닙니다.
+
+## GROUP BY + HAVING 복합 예제
+
+### 국가별 사용자 수 집계 + 필터링
+
+```sql
+SELECT 
+    country,
+    COUNT(*) AS user_count,
+    AVG(age) AS avg_age
+FROM users
+GROUP BY country
+HAVING COUNT(*) >= 10
+ORDER BY user_count DESC;
+```
+
+이 쿼리는 국가별로 사용자를 묶고, 10명 이상인 국가만 남기고, 사용자 수 내림차순으로 정렬합니다. `HAVING`은 집계 후 필터링이므로, `COUNT(*)`처럼 집계 함수를 쓸 수 있습니다.
+
+### 주문 상태별 금액 합계
+
+```sql
+SELECT 
+    status,
+    COUNT(*) AS order_count,
+    SUM(total) AS total_amount,
+    AVG(total) AS avg_amount,
+    MIN(total) AS min_amount,
+    MAX(total) AS max_amount
+FROM orders
+WHERE created_at >= '2026-01-01'
+GROUP BY status
+HAVING SUM(total) > 1000
+ORDER BY total_amount DESC;
+```
+
+이 쿼리는 2026년 이후 주문을 상태별로 묶고, 총액이 1000 이상인 그룹만 보여 줍니다. 여러 집계 함수를 함께 쓰면 한 번에 다양한 통계를 볼 수 있습니다.
+
+### 여러 기준으로 그룹화 + HAVING
+
+```sql
+SELECT 
+    country,
+    DATE_TRUNC('month', signup_at) AS month,
+    COUNT(*) AS new_users
+FROM users
+WHERE signup_at >= '2025-01-01'
+GROUP BY country, month
+HAVING COUNT(*) >= 5
+ORDER BY country, month;
+```
+
+국가와 월을 함께 그룹 키로 쓰면, 국가별이면서 동시에 월별인 세분화된 결과를 얻을 수 있습니다. 이 패턴은 시계열 분석에서 자주 나옵니다.
+
+### 조인 후 집계 + HAVING
+
+```sql
+SELECT 
+    u.country,
+    COUNT(DISTINCT o.id) AS order_count,
+    SUM(o.total) AS total_revenue
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.status = 'completed'
+GROUP BY u.country
+HAVING COUNT(DISTINCT o.id) >= 100
+ORDER BY total_revenue DESC;
+```
+
+조인을 한 뒤 집계할 때는 카디널리티를 특히 조심해야 합니다. 한 사용자가 여러 주문을 가지므로 `COUNT(DISTINCT o.id)`로 중복을 제거해야 정확한 주문 수를 얻을 수 있습니다.
+
+## WINDOW 함수와의 차이
+
+집계 함수는 여러 행을 하나로 압축하지만, WINDOW 함수(윈도우 함수)는 행을 유지하면서 집계 값을 계산합니다. 이 차이를 이해하면 언제 `GROUP BY`를 쓰고 언제 WINDOW 함수를 써야 할지 판단할 수 있습니다.
+
+### GROUP BY로 집계 (행을 압축)
+
+```sql
+SELECT 
+    country,
+    COUNT(*) AS user_count
+FROM users
+GROUP BY country;
+```
+
+**Expected output:**
+
+| country | user_count |
+| --- | --- |
+| US | 5 |
+| UK | 3 |
+
+결과는 국가당 한 행으로 압축됩니다. 개별 사용자 정보는 사라집니다.
+
+### WINDOW 함수로 집계 (행을 유지)
+
+```sql
+SELECT 
+    name,
+    country,
+    COUNT(*) OVER (PARTITION BY country) AS user_count
+FROM users;
+```
+
+**Expected output:**
+
+| name | country | user_count |
+| --- | --- | --- |
+| Ada | US | 5 |
+| Bob | US | 5 |
+| Grace | UK | 3 |
+
+각 행은 그대로 유지되고, `user_count` 컴럼에 그 사용자가 속한 국가의 전체 사용자 수가 표시됩니다.
+
+### 언제 무엇을 쓸까
+
+- **GROUP BY**: 결과를 그룹별 한 행으로 압축하고 싶을 때
+- **WINDOW 함수**: 개별 행을 유지하면서 그룹 통계를 각 행에 표시하고 싶을 때
+
+예를 들어 국가별 합계만 보고 싶다면 `GROUP BY`를 쓰고, 각 주문의 금액과 함께 그 국가의 전체 합계를 함께 표시하고 싶다면 WINDOW 함수를 씁니다.
+
+```sql
+-- 각 주문의 금액과, 그 국가의 전체 합계를 함께 표시
+SELECT 
+    o.id AS order_id,
+    u.country,
+    o.total AS order_total,
+    SUM(o.total) OVER (PARTITION BY u.country) AS country_total
+FROM orders o
+JOIN users u ON u.id = o.user_id;
+```
+
+이 쿼리는 각 주문 행을 유지하면서, 그 주문이 속한 국가의 전체 주문 합계를 함께 보여 줍니다. 이렇게 하면 개별 주문의 비율을 계산하거나, 순위를 매기는 분석을 할 때 유용합니다.
+
+WINDOW 함수는 다음 글에서 자세히 다루지만, 여기서는 집계 함수와의 관계만 알아 두면 충분합니다.
 ## 체크리스트
 
 - [ ] `WHERE`와 `HAVING`의 차이를 설명할 수 있다.
@@ -158,6 +330,28 @@ GROUP BY country;
 
 다음 글에서는 복잡한 질문을 여러 단계로 나누는 방법인 서브쿼리와 CTE를 다루겠습니다.
 
+## 집계 작성 모범 사례
+
+실무에서 집계 쿼리를 작성할 때 자주 마주치는 패턴을 좋은 예와 피할 예로 비교합니다.
+
+```sql
+-- 좋은 예: 그룹 키와 집계 함수 명확히
+SELECT 
+    country,
+    DATE_TRUNC('month', signup_at) AS signup_month,
+    COUNT(*) AS new_users,
+    AVG(age) AS avg_age
+FROM users
+WHERE signup_at >= '2025-01-01'
+GROUP BY country, signup_month
+HAVING COUNT(*) >= 10
+ORDER BY country, signup_month;
+
+-- 피할 예: 그룹 키가 불분명하고 별칭 없음
+-- SELECT country, DATE_TRUNC('month', signup_at), COUNT(*), AVG(age)
+-- FROM users WHERE signup_at >= '2025-01-01'
+-- GROUP BY country, DATE_TRUNC('month', signup_at);
+```
 ## 처음 질문으로 돌아가기
 
 - **`GROUP BY`는 언제 실행되고 무엇을 기준으로 묶을까요?**

@@ -363,4 +363,6 @@ print(f"session A history length: {len(sessions[session_a])}")
 - [Groq chat API](https://console.groq.com/docs/text-chat)
 - [LangChain chatbot use case](https://python.langchain.com/docs/use_cases/chatbots/)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-app-patterns-101/ko/01-chatbot-pattern)
+
 Tags: LLM, RAG, Agent, Python

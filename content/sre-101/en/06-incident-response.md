@@ -42,8 +42,6 @@ This is post 6 in the SRE 101 series. Here we treat incident response as a team 
 
 This picture places Incident Response inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-
-
 ## Why this topic matters
 
 Chaos magnifies impact. A technically recoverable issue can become a prolonged incident when decisions stall and communication lags behind the actual state of the system.

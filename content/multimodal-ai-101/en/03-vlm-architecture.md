@@ -43,8 +43,6 @@ Here we compare the three connection patterns that dominate modern VLMs: simple 
 
 This picture places Vision-Language Model Architecture inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Vision-Language Model Architecture is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## How VLMs give an LLM "eyes"
 
 Episode 2 covered CLIP, which aligns image and text in the same space. To do the kind of reasoning GPT-4V or LLaVA does ("describe this image and convert the table to markdown"), you need one more step: connecting image vectors so the LLM can consume them like tokens.

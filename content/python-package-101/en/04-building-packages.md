@@ -42,8 +42,6 @@ This is post 4 in the Python Package 101 series. Here we compare wheel and sdist
 
 This picture places Building Packages — wheel and sdist inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Building Packages — wheel and sdist is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What you will learn
 
 - The difference between sdist (source distribution) and wheel (built distribution)

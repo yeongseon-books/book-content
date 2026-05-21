@@ -44,13 +44,9 @@ Here, we will define a Pod as the smallest deployable execution bundle in Kubern
 
 This picture places Pod inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Pod is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 *Every workload* eventually runs *on a Pod*. You must understand the *Pod model* before higher-level objects make sense.
-
-## Concept at a Glance
 
 ## Key Terms
 

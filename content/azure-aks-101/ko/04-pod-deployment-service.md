@@ -300,4 +300,6 @@ AKS는 관리형 Kubernetes지만, Pod·Deployment·Service의 의미 자체를 
 - [Azure App Service 101](../../azure-app-service-101/ko/02-request-lifecycle.md) — 요청이 앱 인스턴스로 들어가는 흐름과 비교할 때
 - [Azure Functions 101](../../azure-functions-101/ko/02-triggers-and-bindings.md) — 함수 단위 실행 모델과 비교할 때
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-aks-101/ko/04-pod-deployment-service)
+
 Tags: Azure, AKS, Kubernetes, Cloud

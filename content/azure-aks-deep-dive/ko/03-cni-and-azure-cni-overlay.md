@@ -239,4 +239,6 @@ Azure CNI Pod Subnet은 Pod 전용 subnet을 쓰는 flat 모델이고, Azure CNI
 - [Azure AKS 101](../../azure-aks-101/ko/)
 - [Azure Functions Deep Dive 1화 — 전체 구조부터 잡기](../../azure-functions-deep-dive/ko/01-host-bootstrap.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-aks-deep-dive/ko/03-cni-and-azure-cni-overlay)
+
 Tags: AKS, Kubernetes, Distributed Systems, Containers

@@ -43,8 +43,6 @@ This is post 6 in the Operating Systems 101 series. It connects process memory l
 
 This picture places Memory Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Memory Management is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - What regions make up a process's memory layout?
@@ -64,8 +62,6 @@ This picture places Memory Management inside an operating flow. The point is not
 The most common cause of "the server gets slow after a while" is a memory leak, GC thrashing right before OOM, or a wrongly sized cache. Without understanding memory behavior, staring at CPU graphs gives no answers. Memory is invisible until it hits the limit, and then it is the loudest resource in the system.
 
 > Memory management is harder on the reclamation side than on the allocation side. The hard system-design question is "who is responsible for releasing this?"
-
-## Concept at a Glance
 
 > Process memory has four main regions: code (text), globals (data/bss), heap, and stack. Heap holds dynamic allocations; stack grows and shrinks automatically with function calls. The OS gives each process a virtual address space so each process appears to own its own RAM.
 

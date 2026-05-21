@@ -52,8 +52,6 @@ Weak probability intuition leads to predictable mistakes. People mix up likeliho
 
 > Probability is not a way to predict the future with certainty. It is a language for quantifying uncertainty given a set of possible outcomes and the information you have right now.
 
-## Concept at a Glance
-
 ## Key Terms
 
 - **Sample space Ω**: the set of all possible outcomes.

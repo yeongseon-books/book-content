@@ -46,8 +46,6 @@ This is the 2nd article in the Python DB-API 101 series.
 
 This picture places Connection and Cursor Lifecycle inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Connection and Cursor Lifecycle is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## 1. What a Connection Is
 
 A connection is a single communication channel between the application and the database. It wraps a TCP socket (PostgreSQL, MySQL) or a file handle (SQLite), and one connection holds one transaction context.

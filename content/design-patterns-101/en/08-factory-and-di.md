@@ -43,15 +43,11 @@ In this post, we'll look at Factory and Dependency Injection as two parts of the
 
 This picture places Factory and Dependency Injection inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Factory and Dependency Injection is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 When the domain creates its own dependencies, it learns *how to make* them. Factory and DI separate "*what* you use" from "*how* it is built".
 
 > Separating "use" from "assembly" makes testing and substitution easy.
-
-## Concept at a Glance
 
 ## Key Terms
 

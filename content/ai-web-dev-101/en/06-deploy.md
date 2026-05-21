@@ -41,8 +41,6 @@ Here, we will walk through the first deployment path for a frontend-heavy app on
 
 This picture places Deploying an AI web app — shipping to Vercel and Azure inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Deploying an AI web app — shipping to Vercel and Azure is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What to prepare before deployment
 
 Before you deploy, verify four things:

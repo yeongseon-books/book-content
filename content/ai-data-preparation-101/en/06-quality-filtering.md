@@ -41,8 +41,6 @@ This is post 6 in the AI Data Preparation 101 series. Here we cover how heuristi
 
 This picture places Quality Filtering - Heuristics and Classifiers inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Quality Filtering - Heuristics and Classifiers is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## "Collected does not mean trainable."
 
 A raw corpus is almost always more than half garbage. Ads, auto-generated spam, broken encodings, and meaningless boilerplate are mixed in. Training on it directly wrecks model perplexity and inflates hallucination rates.

@@ -41,7 +41,7 @@ This is post 7 in the Computer Science Major 101 series.
 
 This picture places Project Subjects inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Project Subjects is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Project courses are not about perfection—they are about *recording decisions*. Why did you choose this architecture? What would you do differently?
 
 ## Questions This Post Answers
 
@@ -63,7 +63,7 @@ This picture places Project Subjects inside an operating flow. The point is not 
 The *start* of your *portfolio* is often a *major project*.
 
 ## Concept at a Glance
-
+Team projects teach you that code review, version control, and deployment are not luxuries—they are how real software is built.
 > A project subject is not mainly about writing more code. It is about proving that a small team can turn a bounded problem into a demo, documentation, and a result another person can evaluate.
 
 ## Key Terms

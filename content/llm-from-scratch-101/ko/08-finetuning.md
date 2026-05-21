@@ -44,10 +44,6 @@ seo_description: 지난 글의 모델은 셰익스피어 리듬은 흉내 내도
 
 *LLM from Scratch 101 8장 흐름 개요*
 
-이 그림에서는 베이스 모델을 우리 작업에 맞추기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 베이스 모델을 우리 작업에 맞추기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 이 글이 중요한가
 
 파인튜닝은 base model을 애플리케이션 문맥으로 끌고 오는 첫 단계입니다. 사전학습 모델이 일반적인 문자 예측 능력을 가졌다면, SFT는 그 모델이 어떤 형식으로 대답해야 하는지, 어떤 응답 습관을 따라야 하는지를 더 강하게 학습시키는 과정입니다.
@@ -227,5 +223,7 @@ A: My lord, I serve thee with a faithful heart.
 - [AI Agent 101 — 컨텍스트 엔지니어링](../../ai-agent-101/ko/02-context-engineering.md)
 - [LLM 앱 기초 — 프롬프트 엔지니어링 기초](../../llm-app-foundations-101/ko/03-prompt-engineering-basics.md)
 - [LLM API 프로덕션 101 — 구조화 출력](../../llm-api-production-101/ko/01-structured-output.md)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/llm-from-scratch-101/ko/08-finetuning)
 
 Tags: LLM, PyTorch, Transformer, Tutorial

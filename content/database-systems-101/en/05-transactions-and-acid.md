@@ -45,8 +45,6 @@ This is post 5 in the Database Systems 101 series.
 
 This picture places Transactions and ACID inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Transactions and ACID is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - What a transaction is and why we need it
@@ -59,8 +57,6 @@ This picture places Transactions and ACID inside an operating flow. The point is
 Almost every business operation — money transfers, inventory adjustments, order creation — has to bundle two or more changes together. Stop in the middle and the data goes inconsistent. Without transactions, the application has to compensate by hand, which in practice does not work.
 
 > "All or nothing." That single phrase is the whole essence of a transaction.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR

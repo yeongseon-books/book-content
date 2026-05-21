@@ -45,8 +45,6 @@ This is post 7 in the Computer Architecture 101 series.
 
 This picture places Pipelining inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Pipelining is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The pipeline stages and the throughput concept
@@ -59,8 +57,6 @@ This picture places Pipelining inside an operating flow. The point is not to mem
 Modern CPUs have pipelines 14 stages deep or more, and superscalar designs can finish multiple instructions per cycle. But a single branch misprediction flushes the pipeline and refills it, costing 10–20 cycles. Reducing or making predictable the branches in a hot loop is a small optimization that compounds.
 
 > Pipelining makes the average fast, but a single misprediction breaks that average.
-
-## Concept at a Glance
 
 > In a 5-stage pipeline (Fetch, Decode, Execute, Memory, Writeback), five instructions are in flight every cycle. One instruction takes 5 cycles end-to-end, but throughput is one instruction per cycle. When a branch fires, the wrongly fetched instructions are discarded and fetching restarts.
 

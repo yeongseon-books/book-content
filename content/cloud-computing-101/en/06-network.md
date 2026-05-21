@@ -24,7 +24,7 @@ last_reviewed: '2026-05-14'
 
 Cloud networking looks simple until you have to change it. VPCs, subnets, security groups, NACLs, and load balancers all sound like pieces of the same thing, but they solve different boundary problems at different layers.
 
-The cost of getting the model wrong shows up later. Public exposure becomes too broad, routing rules become hard to reason about, and simple changes start requiring structural rewrites instead of safe configuration updates.
+A VPC is your network boundary. Inside, subnets partition the address space. Security groups and network ACLs filter traffic. Load balancers distribute it. VPN and Direct Connect bring on-prem into the picture. Networking often stays abstract until something breaks, then becomes very real.
 
 This is post 6 in the Cloud Computing 101 series.
 
@@ -46,7 +46,7 @@ In this post, we'll use a four-step mental model — isolate, place, allow, dist
 
 This picture places Network inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Network is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Good network design prevents failures from cascading and makes debugging possible when things break.
 
 ## Questions This Chapter Answers
 
@@ -59,8 +59,6 @@ This picture places Network inside an operating flow. The point is not to memori
 ## Why It Matters
 
 Network design is the hardest decision to undo later. The first hour shapes the next several years.
-
-## Concept at a Glance
 
 ## Key Terms
 

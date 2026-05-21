@@ -42,8 +42,6 @@ This post is the 7th article in the Python 101 series. This is the part of the s
 
 This picture places Modules and packages: import, __init__, __name__ inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Modules and packages: import, __init__, __name__ is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 Once you are comfortable writing functions, code starts piling up. A single file with hundreds of lines usually runs into familiar problems:

@@ -40,7 +40,7 @@ This is post 6 in the Linear Algebra 101 series. Here we will tie linear indepen
 
 This picture places Basis and Dimension inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Basis and Dimension is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Basis and dimension are the language that defines a vector space. Once a basis is fixed, every point in that space has a unique representation, and changing basis is just a change of coordinates.
 
 ## Questions This Post Answers
 
@@ -56,8 +56,6 @@ This picture places Basis and Dimension inside an operating flow. The point is n
 Multicollinearity, dimensionality reduction, principal components, and singular matrices all depend on these concepts. This is not an isolated definitions chapter. It feeds directly into model stability and data representation quality.
 
 In practice, some features add almost no new information because they are nearly explained by others. Good basis choices can make the same data easier to compress, inspect, and reason about. Basis and dimension are tools for reading the real complexity of a space.
-
-## Concept at a Glance
 
 ## Key Terms
 

@@ -42,7 +42,7 @@ In this post, we compare those workloads directly. The important question is not
 
 This picture places OLTP and OLAP inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of OLTP and OLAP is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> OLTP and OLAP have opposite optimization goals: OLTP for single-row speed, OLAP for bulk-read throughput. A single engine cannot do both well.
 
 ## Questions this article answers
 
@@ -66,7 +66,7 @@ OLTP processes *one record right now* fast. OLAP scans *all of history* in one s
 
 > *Pick the right tool. Trying to do both with one makes both unhappy.*
 
-## Concept at a Glance
+This picture places OLTP and OLAP inside an operating flow. The point is not to memorize the workload difference, but to see how row storage and column storage trade off for different access patterns.
 
 ## Key Terms
 

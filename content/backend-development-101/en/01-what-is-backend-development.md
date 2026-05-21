@@ -40,15 +40,11 @@ This is the first post in the Backend Development 101 series. Here, we define ba
 
 This picture places What Is Backend Development? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is Backend Development? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Building only the frontend lets you ship *what the user sees*. Building the backend lets you ship *systems that survive*. Data, authentication, consistency, and operations all live behind the screen, and someone has to design them.
 
 > The backend is invisible, but it decides everything.
-
-## Concept at a Glance
 
 Requests flow left to right; responses retrace the same path.
 

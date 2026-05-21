@@ -56,8 +56,6 @@ ACA's internal implementation is not published by Microsoft, so these versions a
 
 This picture places Revisions and traffic splitting — where Envoy weights come from inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Revisions and traffic splitting — where Envoy weights come from is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## A revision is an immutable runtime snapshot
 
 Microsoft's revisions documentation is explicit on the important part.

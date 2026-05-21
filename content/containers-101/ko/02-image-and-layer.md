@@ -200,6 +200,100 @@ docker inspect --format "{{index .RepoDigests 0}}" python:3.12-slim
 
 다음 글에서는 이렇게 준비된 이미지를 실제로 누가 어떻게 실행하는지, 즉 Runtime 계층을 살펴보겠습니다.
 
+
+## 심화: 멀티스테이지 빌드와 레이어 캐싱을 실전으로 연결하기
+
+이미지 최적화의 핵심은 "작게 만든다"가 아니라 "변경 비용을 통제한다"입니다. 대부분의 팀에서 배포가 느려지는 이유는 애플리케이션 코드 양보다 Dockerfile 레이어 설계가 비효율적이기 때문입니다. 특히 의존성 설치 단계와 소스 복사 단계의 순서를 잘못 두면, 사소한 코드 수정에도 전체 의존성을 재설치하게 되어 빌드 시간이 급격히 늘어납니다.
+
+다음은 Python 서비스 기준의 멀티스테이지 Dockerfile 예시입니다.
+
+```dockerfile
+FROM python:3.12-slim AS builder
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --upgrade pip && pip wheel --wheel-dir /wheels -r requirements.txt
+COPY . .
+RUN pip wheel --wheel-dir /wheels .
+
+FROM python:3.12-slim AS runtime
+WORKDIR /app
+COPY --from=builder /wheels /wheels
+RUN pip install --no-cache-dir /wheels/* && rm -rf /wheels
+COPY app ./app
+USER 1000
+CMD ["python", "-m", "app.main"]
+```
+
+이 구조의 장점은 명확합니다. 빌드에 필요한 컴파일 단계는 builder에 격리되고, runtime에는 실행에 필요한 결과물만 남습니다. 따라서 최종 이미지 크기가 줄고 취약점 표면도 함께 줄어듭니다.
+
+## 레이어 캐싱 전략: 자주 바뀌는 것과 덜 바뀌는 것을 분리
+
+캐시 적중률을 높이려면 레이어 순서를 데이터 변경 빈도 기준으로 설계해야 합니다.
+
+- 덜 바뀌는 레이어: 베이스 이미지, OS 패키지, requirements.txt
+- 자주 바뀌는 레이어: 애플리케이션 소스, 템플릿, 정적 자원
+
+아래 표는 흔한 패턴과 개선 패턴을 비교합니다.
+
+| 패턴 | 결과 | 개선 방향 |
+| --- | --- | --- |
+| `COPY . .`를 초반에 배치 | 소스 한 줄 변경에도 의존성 재설치 | 의존성 파일만 먼저 복사 |
+| RUN 명령 지나치게 분리 | 레이어 증가, 캐시 관리 복잡 | 의미 단위로 통합 |
+| 빌드 결과물을 최종 이미지에 그대로 포함 | 이미지 비대화, 공격 표면 증가 | 멀티스테이지로 결과만 복사 |
+| `.dockerignore` 부재 | 불필요 파일 전송 증가 | 컨텍스트 최소화 |
+
+`.dockerignore`도 반드시 함께 써야 합니다.
+
+```text
+.git
+__pycache__/
+*.pyc
+.venv/
+node_modules/
+.env
+coverage/
+```
+
+컨텍스트가 줄어들면 빌드 시작 자체가 빨라지고, CI 환경의 네트워크 전송 비용도 줄어듭니다.
+
+## OverlayFS 관점에서 레이어를 읽는 방법
+
+레이어는 단순 파일 묶음이 아니라 변경 델타입니다. OverlayFS는 lowerdir(읽기 전용 레이어들)과 upperdir(쓰기 가능 레이어)을 합쳐 하나의 파일시스템처럼 보여 줍니다. 이 구조를 이해하면 왜 삭제가 실제 삭제가 아니라 whiteout으로 표현되는지, 왜 레이어 순서가 결과 파일시스템에 직접 영향을 주는지 자연스럽게 이해됩니다.
+
+운영 디버깅에서 특히 중요한 포인트는 다음입니다.
+
+- 이미지가 갑자기 커졌다면 어느 레이어에서 대용량 파일이 추가되었는지 `docker history`로 먼저 확인합니다.
+- 캐시가 계속 깨진다면 Dockerfile 변경이 아니라 build context 변경(.git, generated file)인지 점검합니다.
+- 같은 태그인데 동작이 다르면 digest가 동일한지 확인합니다.
+
+다음 명령 조합은 원인 추적의 기본입니다.
+
+```bash
+docker history --no-trunc myapp:dev
+docker image inspect myapp:dev --format '{{json .RootFS.Layers}}'
+docker inspect --format '{{index .RepoDigests 0}}' myapp:dev
+```
+
+## CI에서 빌드 시간을 줄이는 실전 전략
+
+로컬보다 CI에서 빌드가 느린 이유는 캐시 재사용 구조가 약하기 때문입니다. BuildKit과 원격 캐시를 사용하면 개선할 수 있습니다.
+
+```bash
+DOCKER_BUILDKIT=1 docker build   --cache-from type=registry,ref=ghcr.io/example/myapp:buildcache   --cache-to type=registry,ref=ghcr.io/example/myapp:buildcache,mode=max   -t ghcr.io/example/myapp:sha-<gitsha> .
+```
+
+이 방식은 매 빌드마다 바뀐 레이어만 다시 계산하게 만들기 때문에, 팀 전체 빌드 시간이 안정적으로 줄어듭니다. 특히 의존성이 큰 Python/Node 프로젝트에서 효과가 큽니다.
+
+## 운영 체크리스트: 이미지/레이어 품질 기준
+
+- 멀티스테이지 사용 여부
+- final stage에 빌드 도구 잔존 여부
+- root 실행 여부
+- 이미지 digest 기록 여부
+- 취약점 스캔 결과(HIGH/CRITICAL) 기준 충족 여부
+
+이 기준을 PR 리뷰 항목으로 고정하면, 이미지 품질이 개인 숙련도에 의존하지 않고 팀 기본값으로 자리잡습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **레이어는 왜 사람들이 빈도문에 용드를 안 신기기까요?**

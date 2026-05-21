@@ -43,15 +43,11 @@ In this post, we'll treat structural patterns as named ways of assembling object
 
 This picture places Structural Patterns inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Structural Patterns is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Inheritance freezes the structure quickly. Composition lets you assemble responsibilities and stay flexible to change.
 
 > Favor composition over inheritance.
-
-## Concept at a Glance
 
 ## Key Terms
 

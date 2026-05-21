@@ -45,8 +45,6 @@ Here we set the mental model for the rest of the series: where text-only systems
 
 This picture places Why Multimodal AI Matters inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Why Multimodal AI Matters is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What multimodal AI actually solves
 
 | Task | Text-only limitation | Multimodal solution |

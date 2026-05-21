@@ -45,8 +45,6 @@ This is the first post in the Database Systems 101 series.
 
 This picture places What Is a Database System? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is a Database System? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The decisive difference between a file and a DBMS
@@ -59,8 +57,6 @@ This picture places What Is a Database System? inside an operating flow. The poi
 If you treat a database as "the place where data goes," you cannot explain why locks happen, why transactions exist, or why your data survives a power loss. Once you understand what a DBMS is for, the rest of this series — SQL, indexes, transactions, isolation — stops looking like trivia and starts looking like inevitable design.
 
 > "We use a database" really means "we don't write concurrency, crash recovery, and consistency by hand."
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR

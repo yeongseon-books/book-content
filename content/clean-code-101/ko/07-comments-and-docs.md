@@ -41,9 +41,9 @@ last_reviewed: '2026-05-15'
 
 *Clean Code 101 7장 흐름 개요*
 
-이 그림에서는 주석과 문서화를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+이 그림은 주석과 문서화를 담당하는 모등로 과멌 중복 제거, 비대추 될, 비대추 됰—에서 어떤 쩈차를 개선한 동스른—과 구리됐 동스른 동스른 동스른 동스른 동스른—을 보여 줍니다.
 
-> 주석과 문서화의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+> 동작과 부스라기는 명낙한 짱조 모든 뷼거늤뻹제 채웰 나넸니다.
 
 ## 왜 중요한가
 
@@ -216,6 +216,127 @@ python -m pytest -q tests/test_public_api_docs.py
 ## 정리 및 다음 단계
 
 좋은 주석은 적고 정확합니다. 다음 글에서는 코드베이스의 운명을 크게 좌우하는 테스트 가능성, 즉 테스트 가능한 코드를 다룹니다.
+
+
+## 주석 vs 자기문서화 코드 비교 기준
+
+좋은 주석은 적고 정확합니다. 더 좋은 코드는 주석이 거의 필요 없습니다. 아래 표는 언제 주석을 쓰고, 언제 코드 개선을 우선해야 하는지 구분하는 기준입니다.
+
+| 상황 | 코드 개선 우선 | 주석 우선 | 판단 이유 |
+| --- | --- | --- | --- |
+| 변수명/함수명이 모호함 | O | X | 이름 개선이 영구적 해결 |
+| 복잡한 외부 계약 우회 | X | O | "왜"를 코드만으로 표현 어려움 |
+| 성능 최적화 트릭 사용 | X | O | 의도와 제약을 남겨야 안전 |
+| TODO/FIXME 항목 | X | O | 추적 가능한 작업 메모 필요 |
+| 공개 API 입력/반환 계약 | X | O(docstring) | 호출자 계약 문서화 필요 |
+
+주석이 코드 동작을 그대로 설명한다면 제거 후보입니다. 반대로 외부 제약, 역사적 배경, 위험 경고를 전달한다면 남길 가치가 있습니다.
+
+## 좋은 주석과 나쁜 주석 예시
+
+```python
+# 나쁜 주석: 코드와 동일한 정보를 반복합니다.
+
+def add_one(value: int) -> int:
+    # value에 1을 더한다.
+    return value + 1
+```
+
+```python
+# 좋은 주석: 왜 이런 구현을 택했는지 설명합니다.
+
+def parse_gateway_status(response: dict) -> str:
+    # 결제 게이트웨이는 HTTP 200이어도 실패를 body.error_code로 내려주므로
+    # 상태 코드는 참고하지 않고 본문 값을 우선 판단합니다.
+    if response.get("error_code"):
+        return "FAILED"
+    return "PAID"
+```
+
+위 차이는 유지보수에서 크게 드러납니다. 나쁜 주석은 시간이 지나며 낡고, 좋은 주석은 의사결정 맥락을 보존합니다.
+
+## Python docstring 실무 규칙
+
+```python
+def calculate_refund_amount(total_cents: int, cancel_fee_rate: float) -> int:
+    """환불 금액을 센트 단위로 계산합니다.
+
+    Args:
+        total_cents: 원 결제 금액(센트 단위)
+        cancel_fee_rate: 취소 수수료 비율(0 이상 1 이하)
+
+    Returns:
+        수수료를 차감한 환불 금액(센트 단위)
+
+    Raises:
+        ValueError: 수수료 비율이 범위를 벗어난 경우
+    """
+    if not 0 <= cancel_fee_rate <= 1:
+        raise ValueError("cancel_fee_rate must be in [0, 1]")
+
+    refund_cents = int(total_cents * (1 - cancel_fee_rate))
+    return max(refund_cents, 0)
+```
+
+docstring은 구현 설명이 아니라 계약 설명이어야 합니다. 즉 "어떻게"보다 "무엇을 받고 무엇을 돌려주며 어떤 예외가 가능한가"를 기록해야 합니다.
+
+## 문서화 품질 체크 루틴
+
+1. 코드만 읽고 함수 목적을 10초 안에 말할 수 있는가
+2. 주석이 "왜"를 담고 있는가
+3. TODO가 담당자/기한/이슈 링크를 갖는가
+4. 공개 API의 docstring 계약이 테스트와 일치하는가
+
+```python
+def should_keep_comment(comment_text: str, explains_why: bool, duplicates_code: bool) -> bool:
+    if duplicates_code:
+        return False
+    return explains_why and len(comment_text.strip()) > 0
+```
+
+이 기준을 코드 리뷰 체크리스트에 넣으면, 소음 주석은 줄고 핵심 문서화 품질은 올라갑니다.
+
+
+## 실무 적용 메모
+
+아래 메모는 팀 내 합의 문서에 그대로 옮겨 적어도 되는 수준의 운영 규칙입니다.
+
+1. 리뷰는 코드 스타일보다 변경 위험을 먼저 다룹니다.
+2. 규칙 위반은 사람 지적보다 자동화 전환을 우선합니다.
+3. 반복되는 설계 결함은 교육 과제가 아니라 구조 개선 과제로 등록합니다.
+4. 모든 개선은 테스트와 함께 진행하며, 동작 변경 여부를 PR 설명에 명시합니다.
+5. 다음 분기 목표에는 "새 기능 수"와 함께 "변경 비용 감소 지표"를 반드시 포함합니다.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class QualityGate:
+    has_tests: bool
+    has_clear_names: bool
+    has_boundary_error_handling: bool
+    has_small_functions: bool
+    has_review_notes: bool
+
+
+def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
+    missing = []
+    if not gate.has_tests:
+        missing.append("tests")
+    if not gate.has_clear_names:
+        missing.append("naming")
+    if not gate.has_boundary_error_handling:
+        missing.append("error-boundary")
+    if not gate.has_small_functions:
+        missing.append("function-size")
+    if not gate.has_review_notes:
+        missing.append("review-notes")
+    return len(missing) == 0, missing
+```
+
+이 체크 함수는 단순하지만, 품질 기준을 코드로 표현하는 출발점이 됩니다. 팀이 기준을 말로만 합의하면 시간이 지나며 흐려집니다. 반대로 코드와 템플릿과 자동화 규칙으로 남기면 신규 멤버가 들어와도 동일한 기준이 유지됩니다.
+
+또한 개선 활동은 단발성 이벤트가 아니라 루프여야 합니다. 한 번의 대청소보다 매 PR마다 작은 개선을 추가하는 편이 장기적으로 더 강합니다. 이름 하나, 함수 하나, 분기 하나를 매번 더 낫게 만드는 습관이 쌓이면 코드베이스의 평균 품질이 올라가고, 장애 대응 속도도 실제로 빨라집니다.
 
 ## 처음 질문으로 돌아가기
 

@@ -42,8 +42,6 @@ This is the final post in the Git & GitHub 101 series. Here, we stitch the earli
 
 This picture places Building a real-world Git workflow: from issue to release in one cycle inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Building a real-world Git workflow: from issue to release in one cycle is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 Episodes 1 through 9 introduced commands one by one. Knowing a command and knowing a workflow are different. The same `git commit` carries a different meaning depending on which branch it lands on, which PR it belongs to, and which release it is heading toward. A workflow is a contract between teammates. Once everyone follows the same loop, a new hire can tell within a week where a change starts and where it ends.

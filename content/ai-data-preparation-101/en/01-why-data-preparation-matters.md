@@ -39,8 +39,6 @@ This is the first post in the AI Data Preparation 101 series. Here we cover why 
 
 This picture places Why Data Preparation Determines Model Quality inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Why Data Preparation Determines Model Quality is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## "Can't I Just Grab Some Data and Train?"
 
 This is the question every ML beginner asks. You download a Kaggle dataset, run `pandas.read_csv()`, and shove it into a model. Done, right? But trace any production model quality issue and 70-80% of the time the root cause sits in the data, not the model.

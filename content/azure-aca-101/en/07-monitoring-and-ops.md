@@ -47,8 +47,6 @@ This is the final post in the Azure Container Apps 101 series. Here, we'll map t
 
 This picture places Monitoring and ops — Log Analytics and Application Insights inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Monitoring and ops — Log Analytics and Application Insights is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 Imagine your production ACA app starts emitting 5xx errors.

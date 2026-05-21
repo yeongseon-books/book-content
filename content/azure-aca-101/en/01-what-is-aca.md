@@ -41,8 +41,6 @@ This is the first post in the Azure Container Apps 101 series. Here, we'll place
 
 This picture places What is Azure Container Apps? — running containers without Kubernetes inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What is Azure Container Apps? — running containers without Kubernetes is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 Anyone can build a container. It runs fine on a laptop. The hard part is everything that comes after.

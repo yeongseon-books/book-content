@@ -42,8 +42,6 @@ This is the final post in the Serverless 101 series.
 
 This picture places Designing a Serverless App inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Designing a Serverless App is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The core *design principles*
@@ -57,8 +55,6 @@ This picture places Designing a Serverless App inside an operating flow. The poi
 The difficulty of serverless app design is not the number of functions. It is the quality of the boundaries between them. Weak boundaries create long request paths, unclear retry ownership, mixed responsibilities, and debugging pain.
 
 Strong boundaries make the system easier to scale, easier to retry safely, and easier to operate when only one stage fails. That is why good serverless design is mostly about separation, not about function count.
-
-## Concept at a Glance
 
 This shape captures the default serverless instinct worth keeping: keep the request-path function thin, push long work behind a queue, store durable state explicitly, and separate notification from the business-critical path.
 

@@ -42,8 +42,6 @@ This is the ninth post in the Git & GitHub 101 series. Here, we look at message 
 
 This picture places Writing Good Commit Messages: Conventional Commits and Useful Bodies inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Writing Good Commit Messages: Conventional Commits and Useful Bodies is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 `git log` is a letter to your future self and to your teammates. Six months later, when `git blame` lands on a single line, a clear commit message restores the context in five seconds. The opposite — `fix bug`, `update`, `wip` — forces a reader to pull up the original PR and re-read the entire diff to figure out what happened.

@@ -54,8 +54,6 @@ This series walks through SQLAlchemy 2.x using SQLite, end to end. The first pos
 
 This picture places Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 Many SQLAlchemy tutorials begin with `Base = declarative_base()` from the ORM. As a result, when something breaks outside the ORM, say a connection drops or a transaction commits unexpectedly, beginners have no idea where to look. Engine and Connection are the foundation that supports the ORM Session, and when something goes wrong inside a Session, you ultimately have to debug at the Connection level.

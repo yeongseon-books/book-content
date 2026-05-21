@@ -40,10 +40,6 @@ last_reviewed: '2026-05-12'
 
 *Algorithms with Python 101 1장 흐름 개요*
 
-이 그림에서는 알고리즘이란 무엇인가?를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 알고리즘이란 무엇인가?의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 중요한가
 
 프로그래밍은 문제 해결입니다. 같은 문제라도 어떤 알고리즘을 선택하느냐에 따라 한쪽은 수천 배 더 빠를 수 있습니다. 알고리즘을 이해해야 더 빠르고, 더 정확하며, 더 예측 가능한 코드를 작성할 수 있습니다.
@@ -280,6 +276,57 @@ print(is_palindrome("A man a plan a canal Panama"))  # True
 
 알고리즘은 문제를 해결하는 명확한 절차이며, 어떤 알고리즘을 선택하느냐가 성능과 확장성을 크게 좌우합니다. 다음 글에서는 이 효율을 더 객관적으로 비교하는 도구인 시간 복잡도와 Big-O 표기법을 다룹니다.
 
+## 실전 패턴 추가: 정렬과 탐색 구현을 문제 유형별로 선택하기
+
+알고리즘 문제에서는 코드 길이보다 선택 기준이 더 중요합니다. 입력 크기, 데이터 분포, 정렬 여부에 따라 정렬/탐색 전략이 달라집니다. 아래 예시는 같은 정수 배열을 다루더라도 어떤 조건에서 어떤 구현을 고르는지 보여 줍니다.
+
+```python
+def binary_search(nums: list[int], target: int) -> int:
+    left, right = 0, len(nums) - 1
+    while left <= right:
+        mid = (left + right) // 2
+        if nums[mid] == target:
+            return mid
+        if nums[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+    return -1
+
+
+def merge_sort(nums: list[int]) -> list[int]:
+    if len(nums) <= 1:
+        return nums
+    mid = len(nums) // 2
+    left = merge_sort(nums[:mid])
+    right = merge_sort(nums[mid:])
+
+    merged: list[int] = []
+    i = j = 0
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:
+            merged.append(left[i])
+            i += 1
+        else:
+            merged.append(right[j])
+            j += 1
+    merged.extend(left[i:])
+    merged.extend(right[j:])
+    return merged
+
+
+def quick_sort(nums: list[int]) -> list[int]:
+    if len(nums) <= 1:
+        return nums
+    pivot = nums[len(nums) // 2]
+    less = [x for x in nums if x < pivot]
+    equal = [x for x in nums if x == pivot]
+    greater = [x for x in nums if x > pivot]
+    return quick_sort(less) + equal + quick_sort(greater)
+```
+
+실무 판단은 보통 이렇게 정리됩니다. 이미 정렬된 리스트에서 존재 여부를 반복 조회하면 이진 탐색이 기본 선택입니다. 입력이 계속 바뀌고 안정 정렬이 필요하면 병합 정렬 계열이 유리하고, 평균 성능과 구현 단순성을 우선하면 퀵 정렬 계열이 자주 선택됩니다. 코딩 테스트에서는 Python 내장 `sort()`가 Timsort 기반이라 거의 항상 가장 실용적인 기본값이지만, 원리를 직접 구현해 보면 경계 조건과 복잡도 해석 능력이 크게 좋아집니다.
+
 ## 처음 질문으로 돌아가기
 
 - **알고리즘은 정확히 무엇이며, 어떤 성질을 가져야 할까요?**
@@ -311,5 +358,7 @@ print(is_palindrome("A man a plan a canal Panama"))  # True
 - [Real Python — Sorting Algorithms in Python](https://realpython.com/sorting-algorithms-python/)
 - [GeeksforGeeks — Fundamentals of Algorithms](https://www.geeksforgeeks.org/fundamentals-of-algorithms/)
 - [Khan Academy — Algorithms](https://www.khanacademy.org/computing/computer-science/algorithms)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/algorithms-python-101/ko/01-what-are-algorithms)
 
 Tags: Python, Algorithms, Problem Solving, Programming Basics, Time Complexity

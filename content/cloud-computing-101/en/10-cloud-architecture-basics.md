@@ -24,7 +24,7 @@ last_reviewed: '2026-05-14'
 
 By the end of a cloud fundamentals series, the risk is thinking in product lists instead of systems. Compute, storage, networking, security, monitoring, and cost all make sense individually, but production architecture begins when those pieces reinforce each other inside one design.
 
-That is why architecture basics matter. Strong cloud systems are not impressive because they use many services. They are impressive because change is safe, failure stays localized, and the operating model can be repeated by the team.
+Availability, scalability, automation, and resilience are not yes-or-no questions. They are degrees. How much redundancy is enough? When should you automate? What failure rate is acceptable? Your business context answers these, not engineering ideals.
 
 This is the final post in the Cloud Computing 101 series.
 
@@ -46,7 +46,7 @@ In this post, we'll pull the series together through the Well-Architected pillar
 
 This picture places Cloud Architecture Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Cloud Architecture Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Architecture is not about perfect design. It is about deliberate tradeoffs and systems that are easy to debug and repair.
 
 ## Questions This Chapter Answers
 
@@ -59,8 +59,6 @@ This picture places Cloud Architecture Basics inside an operating flow. The poin
 ## Why It Matters
 
 The same feature can cost ten times more or ten times less depending on the architecture. This final post pulls the whole series into one picture.
-
-## Concept at a Glance
 
 ## Key Terms
 

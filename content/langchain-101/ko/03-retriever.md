@@ -374,4 +374,6 @@ Retriever 인터페이스는 뒤에 어떤 검색 시스템이 있든 공통 질
 - [FAISS VectorStore](https://python.langchain.com/docs/integrations/vectorstores/faiss/)
 - [Building a RAG chain](https://python.langchain.com/docs/use_cases/question_answering/)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/langchain-101/ko/03-retriever)
+
 Tags: LangChain, LCEL, Python, LLM

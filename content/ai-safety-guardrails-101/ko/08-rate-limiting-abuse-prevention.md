@@ -258,4 +258,6 @@ LLM rate limiting은 더 이상 초당 요청 수 제한이 아닙니다. 토큰
 - [LLM API 프로덕션 101 — 속도 제한 관리](../../llm-api-production-101/ko/06-rate-limit-management.md)
 - [운영 가드레일 시스템 구축](./10-production-guardrail-system.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-safety-guardrails-101/ko/08-rate-limiting-abuse-prevention)
+
 Tags: AI Safety, Rate Limiting, Abuse Prevention, Anomaly Detection

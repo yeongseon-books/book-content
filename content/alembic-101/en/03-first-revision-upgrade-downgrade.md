@@ -42,8 +42,6 @@ This is post 3 in the Alembic 101 series. Here we will walk through the structur
 
 This picture places Your first revision: writing upgrade and downgrade by hand inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Your first revision: writing upgrade and downgrade by hand is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 No matter how good autogenerate is, what it produces in the end is a combination of the same `op` calls. There is a real difference between someone who has written one of these by hand and someone who has not. The difference is whether you can read an auto-generated file and say "this part is not what I intended."

@@ -58,8 +58,6 @@ Console-built infrastructure exists *only in memory*. Replicating it elsewhere r
 
 > *Code is the single source of truth (SSOT)*.
 
-## Concept at a Glance
-
 IaC means infrastructure—networks, servers, databases—lives in *version control* and *deploys via code*, not manual clicks. Changes are *reviewable*, *repeatable*, and *traceable*.
 
 ## Key Terms

@@ -43,8 +43,6 @@ In this post, we will separate the two axes every language stands on: syntax and
 
 This picture places Syntax and Semantics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Syntax and Semantics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - Where exactly is the boundary between syntax and semantics?
@@ -57,8 +55,6 @@ This picture places Syntax and Semantics inside an operating flow. The point is 
 Reading errors quickly, picking up new language syntax fast, and understanding why the same code behaves differently across languages all require splitting the two axes. The later episodes — type systems, scope, closures — are all examples of "same syntax, different semantics."
 
 > "It builds" only means syntax passed. It does not mean the meaning matches your intent.
-
-## Concept at a Glance
 
 The lexer cuts characters into tokens; the parser checks token order against a grammar and builds a tree (AST). All of that is syntax. After it, interpreting meaning — type checking and evaluation — is semantics.
 

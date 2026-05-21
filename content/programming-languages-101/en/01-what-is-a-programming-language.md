@@ -43,8 +43,6 @@ In this post, we will treat a programming language not as a bag of syntax rules 
 
 This picture places What Is a Programming Language? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is a Programming Language? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - Why do we use high-level languages instead of machine code?
@@ -57,8 +55,6 @@ This picture places What Is a Programming Language? inside an operating flow. Th
 If you treat a language as just a tool, every new language feels like starting over. But once you see the structure every language shares — variables, expressions, control flow, functions, types — a new language becomes the question of **how it expresses ideas you already know**. Through this series we will pull that shared structure apart, piece by piece.
 
 > "Learning a language" really means learning the way of thinking that language emphasizes.
-
-## Concept at a Glance
 
 The higher up, the easier for humans to read; the lower down, the closer to what the CPU executes directly. A programming language picks a layer and decides what abstractions to offer there. One line of Python can correspond to dozens of lines of assembly.
 

@@ -410,4 +410,6 @@ print(manifest)
 - [Hybrid search introduction — Pinecone](https://www.pinecone.io/learn/hybrid-search-intro/)
 - [Sentence Transformers pretrained models](https://www.sbert.net/docs/sentence_transformer/pretrained_models.html)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/vector-search-101/ko/06-vector-search-pipeline)
+
 Tags: Vector Search, FAISS, Embeddings, Python

@@ -56,8 +56,6 @@ ACA's internal implementation is not published by Microsoft, so these versions a
 
 This picture places Dapr sidecar internals — the Go process that lives next to your container inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Dapr sidecar internals — the Go process that lives next to your container is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## The shortest accurate sentence
 
 ACA Dapr is upstream Dapr runtime integrated into the Container Apps product surface.

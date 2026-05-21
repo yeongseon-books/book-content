@@ -378,4 +378,6 @@ async def chat_stream(prompt: str) -> StreamingResponse:
 - [스트리밍 심화 — 청크 처리와 오류 복구](../../llm-api-production-101/ko/03-streaming-in-depth.md)
 - [챗봇 패턴 — 대화 이력 관리와 상태](../../ai-app-patterns-101/ko/01-chatbot-pattern.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/llm-app-foundations-101/ko/06-streaming-responses)
+
 Tags: LLM, OpenAI, Prompt Engineering, Python

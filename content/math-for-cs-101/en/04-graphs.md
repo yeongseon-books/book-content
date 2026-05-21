@@ -52,9 +52,6 @@ Friend recommendations, route planning, build dependencies, and service maps all
 
 That modeling choice often determines the solution strategy. Once a problem becomes a graph, shortest path, reachability, topological order, or traversal patterns come into play almost immediately.
 
-
-## Concept at a Glance
-
 Graphs consist of *nodes*, *edges*, and *properties* (directed, weighted, cyclic). Most real problems—networks, dependencies, recommendations, social connections—naturally become graphs.
 
 ## Before/After

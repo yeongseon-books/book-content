@@ -24,7 +24,7 @@ last_reviewed: '2026-05-14'
 
 EC2, Heroku, and Notion are all cloud services, but they feel nothing alike when you operate them. One makes you think about instances and patching. One wants your code and a start command. One gives you a finished application and asks almost nothing about infrastructure.
 
-The fastest way to sort out that difference is to stop memorizing acronyms and ask a simpler question: who operates what? Once you do that, IaaS, PaaS, and SaaS become responsibility boundaries instead of marketing labels.
+IaaS, PaaS, and SaaS differ in what part of the stack the provider manages. With IaaS, you manage the OS and runtime. With PaaS, the platform handles more. With SaaS, you use a finished product. Picking the right level requires knowing what tradeoff you're making.
 
 This is post 2 in the Cloud Computing 101 series.
 
@@ -46,7 +46,7 @@ In this post, we'll compare service models through control, speed, lock-in, and 
 
 This picture places IaaS, PaaS, SaaS inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of IaaS, PaaS, SaaS is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> The choice between IaaS, PaaS, and SaaS is a statement about who runs what, not about which is objectively better.
 
 ## Questions This Chapter Answers
 
@@ -59,8 +59,6 @@ This picture places IaaS, PaaS, SaaS inside an operating flow. The point is not 
 ## Why It Matters
 
 Pick the wrong model and you waste both *cost* and *speed*. Each stage of an organization fits a different abstraction level.
-
-## Concept at a Glance
 
 ## Key Terms
 

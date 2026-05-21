@@ -55,8 +55,6 @@ Two objects play the leading roles in the answer: `IFunctionInvocationDispatcher
 
 This picture places Dispatcher and Invocation — How a Function Call Reaches the Worker inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Dispatcher and Invocation — How a Function Call Reaches the Worker is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## From trigger to worker
 
 Let's start by drawing the entire path of a single invocation in one diagram.

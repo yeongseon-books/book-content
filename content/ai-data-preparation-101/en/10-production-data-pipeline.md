@@ -41,8 +41,6 @@ This is the final post in the AI Data Preparation 101 series. Here we cover how 
 
 This picture places Building a Production Data Pipeline inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Building a Production Data Pipeline is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## "How do I tie everything we learned into one pipeline?"
 
 Episodes 1-9 covered cleaning, dedup, PII redaction, tokenization, chunking, quality filtering, synthesis, augmentation, and splitting. In production these stages must run automatically every week or every day. The final episode is a pipeline design that integrates all of them.

@@ -43,15 +43,11 @@ In this post, we'll use the Adapter pattern as a thin translation layer at the b
 
 This picture places The Adapter Pattern inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of The Adapter Pattern is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 When external library calls scatter through the domain, every library tweak shakes the domain. An Adapter pins that movement to a single *boundary line*.
 
 > An Adapter is a *thin coat* at the boundary.
-
-## Concept at a Glance
 
 ## Key Terms
 

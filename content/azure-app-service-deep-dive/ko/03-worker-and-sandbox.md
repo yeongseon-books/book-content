@@ -219,4 +219,6 @@ az webapp config appsettings list -n my-app -g my-rg \
 - [Azure App Service 101 — Hosting Models](../../azure-app-service-101/ko/03-hosting-models.md)
 - [Azure Functions Deep Dive — Worker Process](../../azure-functions-deep-dive/ko/02-worker-process.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-app-service-deep-dive/ko/03-worker-and-sandbox)
+
 Tags: Azure, App Service, Distributed Systems, Platform Engineering

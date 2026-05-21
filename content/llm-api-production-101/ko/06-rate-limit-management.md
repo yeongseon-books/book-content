@@ -363,4 +363,6 @@ def limited_completion_with_429(prompt: str) -> str:
 - [재시도와 오류 처리 — 안정적인 API 호출 만들기](./05-retry-and-error-handling.md)
 - [LLM API Production 101 시리즈](../)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/llm-api-production-101/ko/06-rate-limit-management)
+
 Tags: LLM, OpenAI, Streaming, Python

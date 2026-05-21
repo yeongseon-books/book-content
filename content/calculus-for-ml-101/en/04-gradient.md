@@ -44,8 +44,6 @@ In this post, we'll treat the gradient as a direction vector on a loss landscape
 
 This picture places Gradient inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Gradient is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - What does it actually mean to bundle multiple partial derivatives into one gradient vector?
@@ -57,8 +55,6 @@ This picture places Gradient inside an operating flow. The point is not to memor
 ## Why It Matters
 
 *Gradient descent* takes *one step* in the *opposite* direction of the gradient.
-
-## Concept at a Glance
 
 ## Key Terms
 

@@ -45,8 +45,6 @@ In this post, we treat interfaces as contracts written in the caller's language.
 
 This picture places Interfaces and Abstraction inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Interfaces and Abstraction is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The role of an interface
@@ -60,8 +58,6 @@ This picture places Interfaces and Abstraction inside an operating flow. The poi
 An interface is a promise. When the promise is small and clear, both sides stay free.
 
 > Write interfaces in the user's language, not the implementer's.
-
-## Concept at a Glance
 
 The caller knows one shape; multiple implementations sit behind it.
 

@@ -44,8 +44,6 @@ This is post 2 in the Object-Oriented Programming 101 series.
 
 This picture places Classes and Instances inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Classes and Instances is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - Constructor (`__init__`) and instance initialization patterns

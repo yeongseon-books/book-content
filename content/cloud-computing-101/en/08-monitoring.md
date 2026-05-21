@@ -24,7 +24,7 @@ last_reviewed: '2026-05-14'
 
 If you cannot see a system clearly, your customers end up doing the detection for you. A well-chosen alarm can turn a weekend outage into a short investigation, while a noisy dashboard can waste the same weekend in alert fatigue.
 
-Good monitoring is not about collecting everything. It is about connecting three questions quickly: what changed, why it changed, and who should respond first.
+Metrics tell you what is happening (CPU, memory, requests). Logs tell you why (application events, errors). Traces show you how a request flowed through your system. Dashboards make patterns visible. Alerts wake you up. Together, they form the feedback loop that lets you operate a system.
 
 This is post 8 in the Cloud Computing 101 series.
 
@@ -46,7 +46,7 @@ In this post, we'll connect metrics, logs, traces, CloudWatch, and alert routing
 
 This picture places Monitoring inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Monitoring is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Good monitoring answers 'what is broken and where is the break' faster than the alternative: downtime without clues.
 
 ## Questions This Chapter Answers
 
@@ -59,8 +59,6 @@ This picture places Monitoring inside an operating flow. The point is not to mem
 ## Why It Matters
 
 Without monitoring, your *customers* tell you about outages first. A single well-tuned alarm protects entire weekends.
-
-## Concept at a Glance
 
 ## Key Terms
 

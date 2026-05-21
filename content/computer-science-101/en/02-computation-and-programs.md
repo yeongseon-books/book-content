@@ -43,8 +43,6 @@ In this article, we'll connect the formal definition of computation, the idea of
 
 This picture places Computation and Programs inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Computation and Programs is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions This Article Answers
 
 - What does it actually mean to call a problem computable?
@@ -65,8 +63,6 @@ This picture places Computation and Programs inside an operating flow. The point
 The answer to "Can every problem be solved by a program?" is no. Computation theory marks the line between problems we can solve and problems we cannot. Programming paradigms then decide *how* we express the solvable ones. Both are foundations of software design.
 
 > Computation theory = the constitution of CS. A paradigm = a philosophy of organizing code.
-
-## Concept at a Glance
 
 > Computation is the process of transforming input by rules. The Turing machine is the most basic model of that process, and a programming language is how we make it human-readable.
 

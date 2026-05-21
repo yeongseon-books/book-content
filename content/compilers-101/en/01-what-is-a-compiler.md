@@ -45,8 +45,6 @@ This is the first post in the Compilers 101 series.
 
 This picture places What Is a Compiler? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is a Compiler? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - A one-line definition of a compiler
@@ -60,8 +58,6 @@ This picture places What Is a Compiler? inside an operating flow. The point is n
 The meaning of error messages ("is this syntax or semantic?"), why builds are slow ("optimization is expensive"), how new languages get built — all of it is about which stage of the pipeline you are in. Knowing the stages makes the tools usable.
 
 > Knowing compilers means being able to answer "how far did this line get translated, and where did it stop?"
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR

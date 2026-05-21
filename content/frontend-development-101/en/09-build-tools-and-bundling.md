@@ -40,8 +40,6 @@ This is post 9 in the Frontend Development 101 series. Here we treat build tools
 
 This picture places Build Tools and Bundling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Build Tools and Bundling is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The *role* of a bundler (module graph, transform, split)
@@ -55,8 +53,6 @@ This picture places Build Tools and Bundling inside an operating flow. The point
 Bundle size is paid *directly* by your users. A 1MB bundle is *eight seconds of white screen* on a 3G connection. If you do not understand the build tool, you will not understand *why your product gets heavy*.
 
 > A good bundle is *small, cacheable, and split*.
-
-## Concept at a Glance
 
 ## Key Terms
 

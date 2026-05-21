@@ -42,7 +42,7 @@ This is post 7 in the Incident Response 101 series. This post explains how to ch
 
 This picture places Mitigation and Resolution inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Mitigation and Resolution is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Mitigation stops the bleeding now. Resolution fixes the cause later. Separate them and you double your speed.
 
 ## Why this topic matters
 

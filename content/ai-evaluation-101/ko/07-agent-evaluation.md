@@ -360,4 +360,6 @@ Production에서는 API 실패가 빈번합니다. Recovery 평가 없이 출시
 - [다음 글 — 회귀 테스트 — 어제 잘 되던 게 오늘 망가지지 않게](./08-regression-testing.md)
 - [시리즈 현재 위치 다시 보기](./07-agent-evaluation.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-evaluation-101/ko/07-agent-evaluation)
+
 Tags: AI Evaluation, Agent, Trajectory, Tool Use

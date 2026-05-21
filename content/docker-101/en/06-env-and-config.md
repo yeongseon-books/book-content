@@ -42,15 +42,11 @@ This is post 6 in the Docker 101 series. It covers the contract between image an
 
 This picture places Environment Variables and Configuration inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Environment Variables and Configuration is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 The *same image* must flow from *dev to staging to prod* unchanged for *reproducibility*. If per-environment config sneaks into code, that trust is gone.
 
 > *Images are build artifacts; environments are *runtime context*.*
-
-## Concept at a Glance
 
 ## Key Terms
 

@@ -44,13 +44,9 @@ Here, we will use ConfigMap and Secret to split environment-specific values from
 
 This picture places ConfigMap and Secret inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of ConfigMap and Secret is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Pulling *environment differences* out of the image is what makes things *reproducible*. *Secrets* must be tracked *separately*.
-
-## Concept at a Glance
 
 ## Key Terms
 

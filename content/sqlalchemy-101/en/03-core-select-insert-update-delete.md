@@ -54,8 +54,6 @@ This post walks through SQLAlchemy 2.x style `select()`, `insert()`, `update()`,
 
 This picture places SQLAlchemy Core - select, insert, update, delete in 2.x Style inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of SQLAlchemy Core - select, insert, update, delete in 2.x Style is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 Working with raw SQL strings adds three kinds of cost over time. First, every column rename forces a project-wide grep. Second, the same SQL gets copied with subtle differences in many places, leading to subtle behavioral drift. Third, you handle dialect differences yourself.

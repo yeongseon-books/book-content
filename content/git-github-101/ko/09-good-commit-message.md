@@ -39,10 +39,6 @@ seo_description: 좋은 commit message 구조와 Conventional Commits 실무 규
 
 *Git & GitHub 101 9장 흐름 개요*
 
-이 그림에서는 좋은 commit message 쓰기: Conventional Commits와 좋은 본문를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 좋은 commit message 쓰기: Conventional Commits와 좋은 본문의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 중요한가
 
 `git log`는 미래의 자신과 동료에게 보내는 편지입니다. `git blame`으로 특정 줄에 도달했을 때 message가 선명하면 5초 만에 맥락이 살아나고, `fix`, `update`, `wip` 같은 제목만 있으면 원래 diff와 PR을 다시 읽어야 합니다.
@@ -260,6 +256,66 @@ Subject does not match the Conventional Commits format.
 
 다음 글에서는 지금까지 배운 도구를 하나의 실전 워크플로로 묶어 issue부터 release tag까지 한 흐름으로 연결해 보겠습니다.
 
+
+## 실전 CLI 시나리오
+
+아래 예시는 feature branch에서 작업하고 main으로 합치는 가장 보편적인 흐름입니다. 핵심은 "작업 단위를 작게 자르고, 상태를 자주 확인하며, 충돌은 빠르게 해결한다"는 운영 원칙입니다.
+
+```bash
+git switch main
+git pull --ff-only origin main
+git switch -c feature/auth-session
+git status
+git add app/auth.py tests/test_auth.py
+git commit -m "feat(auth): add session refresh flow"
+git push -u origin feature/auth-session
+```
+
+`git pull --ff-only`를 앞단에 두면 로컬 main이 원격과 어긋난 상태에서 오래된 기반으로 branch를 파는 실수를 줄일 수 있습니다. 또한 `git status`를 commit 직전에 반복하면 불필요한 파일이 함께 올라가는 문제를 예방할 수 있습니다.
+
+## 브랜치 전략을 선택하는 기준
+
+실무에서는 전략 자체보다 "팀이 어떤 리듬으로 릴리스를 내는가"가 더 중요합니다. 아래 표는 초급 팀이 자주 비교하는 세 가지 전략입니다.
+
+| 전략 | 특징 | 적합한 상황 | 주의할 점 |
+| --- | --- | --- | --- |
+| Trunk-based | 짧은 branch 수명, 빠른 머지 | 배포 빈도가 높고 테스트 자동화가 있는 팀 | 작은 PR 규율이 없으면 main이 불안정해집니다 |
+| GitHub Flow | main + feature branch + PR | SaaS, 웹 서비스처럼 연속 배포 중심 | 환경별 배포 정책을 별도로 정의해야 합니다 |
+| Git Flow | develop/release/hotfix 등 다중 branch | 릴리스 윈도우가 고정된 제품형 조직 | 브랜치가 많아 운영 복잡도가 커집니다 |
+
+입문 단계에서는 GitHub Flow로 시작하는 편이 안전합니다. 규칙이 단순하고 Pull Request 중심의 협업 도구와 잘 맞기 때문입니다. 이후 릴리스 요구가 복잡해지면 release branch를 추가하는 방식으로 확장하면 됩니다.
+
+## 충돌 해결 절차를 표준화하기
+
+충돌은 실패가 아니라 동시 작업의 자연스러운 신호입니다. 중요한 것은 해결 순서와 검증 절차를 팀 공통 규칙으로 맞추는 일입니다.
+
+1. 충돌 파일을 확인하고, 어느 변경이 도메인 규칙에 맞는지 먼저 결정합니다.
+2. 마커(`<<<<<<<`, `=======`, `>>>>>>>`)를 제거하면서 의도한 최종 코드를 남깁니다.
+3. 단위 테스트와 정적 검사를 실행해 문법/동작 회귀를 확인합니다.
+4. 충돌 해결 commit을 별도로 남겨 리뷰어가 판단 근거를 읽을 수 있게 합니다.
+
+```bash
+git fetch origin
+git switch feature/auth-session
+git merge origin/main
+# 충돌 해결 후
+git add app/auth.py tests/test_auth.py
+git commit -m "merge: resolve auth-session conflicts with main"
+pytest -q
+git push
+```
+
+`merge` 대신 `rebase`를 쓰는 팀이라면 마지막 히스토리 모양이 달라질 뿐, 충돌을 해결하고 검증해야 한다는 원칙은 같습니다. 충돌 직후 테스트를 생략하면 "머지는 됐지만 동작은 깨진" 상태가 만들어지므로 반드시 자동 검증을 붙여야 합니다.
+
+## 리뷰 품질을 올리는 운영 팁
+
+- PR 설명에는 "무엇을 바꿨는가"보다 "왜 이 선택을 했는가"를 먼저 적는 편이 좋습니다.
+- 파일 수가 많다면 기능 단위로 commit을 분리해 reviewer가 논리 흐름을 추적하기 쉽게 만듭니다.
+- `git range-diff`를 사용하면 리뷰 피드백 반영 전후의 commit 변경을 선명하게 비교할 수 있습니다.
+- 긴급 수정(hotfix)은 main으로 직접 넣는 대신 작은 PR로 남겨 이력과 승인 기록을 보존합니다.
+
+이 네 가지를 지키면 Git 명령을 많이 아는 것보다 훨씬 빠르게 협업 안정성이 올라갑니다.
+
 ## 처음 질문으로 돌아가기
 
 - **좋은 commit message는 왜 코드만큼 중요한 자산일까요?**
@@ -293,4 +349,6 @@ Subject does not match the Conventional Commits format.
 - [git-rebase manual](https://git-scm.com/docs/git-rebase) — `rebase -i`와 `reword`로 이전 commit message를 다듬는 단계와 연결됩니다.
 - [githooks manual — commit-msg](https://git-scm.com/docs/githooks#_commit_msg) — `commit-msg` hook으로 메시지 형식을 강제하는 방법의 기준 문서입니다.
 - [GitHub Docs — About merge methods on GitHub](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/about-merge-methods-on-github) — squash merge 시 PR 제목이 기본 branch history에 어떤 형태로 남는지 이해하는 데 도움이 됩니다.
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/git-github-101/ko/09-good-commit-message)
+
 Tags: git-commit-message, conventional-commits, commit-style, imperative-mood, git-amend, code-blame

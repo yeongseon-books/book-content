@@ -40,8 +40,6 @@ This is post 2 in the Frontend Development 101 series. Here we treat HTML as the
 
 This picture places HTML and CSS Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of HTML and CSS Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - Building *meaningful structure* with semantic HTML
@@ -56,8 +54,6 @@ This picture places HTML and CSS Basics inside an operating flow. The point is n
 HTML and CSS are *long-lived skills*. Frameworks rotate every five years, but *semantic tags and the box model* stay. Time spent here is the *highest-yield investment* in your frontend career.
 
 > Semantic HTML is code that *search engines and screen readers can read together*.
-
-## Concept at a Glance
 
 ## Key Terms
 

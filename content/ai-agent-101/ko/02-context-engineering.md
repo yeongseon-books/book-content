@@ -202,6 +202,41 @@ Output: Sorry, I cannot execute DELETE statements.
 
 출력 형식 지정은 사람이 읽기 좋게 하려는 장식이 아닙니다. 후속 코드가 실패하지 않게 하려는 계약입니다. few-shot 역시 모델을 감동시키려는 예시가 아니라, 허용 행동과 금지 행동의 경계 샘플을 제공하는 수단입니다.
 
+### tool 선택 정확도를 높이려면 설명보다 선택 기준을 명시해야 합니다
+
+여러 도구가 비슷해 보이면 모델은 설명이 긴 도구를 고르거나 최근 대화에 나온 도구를 반복 선택하는 경향이 있습니다. 이를 줄이려면 각 도구에 "언제 사용"과 "언제 사용 금지"를 함께 적는 편이 안정적입니다.
+
+```python
+tools = [
+    {
+        "name": "search_docs",
+        "description": "Use for conceptual explanations from official docs.",
+        "when_to_use": [
+            "User asks what/why questions",
+            "No local file path is provided"
+        ],
+        "when_not_to_use": [
+            "User asks to modify repository files",
+            "Answer requires current runtime state"
+        ]
+    },
+    {
+        "name": "run_tests",
+        "description": "Run project tests and return summarized failures.",
+        "when_to_use": [
+            "User asks verification after code change",
+            "Need regression confidence"
+        ],
+        "when_not_to_use": [
+            "No code change occurred",
+            "Command requires unavailable credentials"
+        ]
+    }
+]
+```
+
+컨텍스트 엔지니어링 관점에서 핵심은 "도구 목록"이 아니라 "선택 규칙"입니다. 모델은 규칙이 있을 때 일관성이 올라가고, 운영자는 오선택 로그를 기준으로 어떤 규칙을 보완해야 할지 빠르게 찾을 수 있습니다.
+
 ## 흔히 헷갈리는 지점
 
 - 컨텍스트를 많이 넣을수록 좋아진다고 생각하기 쉽지만, 실제로는 불필요한 history가 판단을 흐릴 수 있습니다.
@@ -264,5 +299,7 @@ Output: Sorry, I cannot execute DELETE statements.
 
 - [Prompt Engineering 101](../../azure-app-service-101/ko/01-what-is-app-service.md)
 - [LangGraph 101 - 상태와 라우팅 설계](../../langgraph-101/ko/02-state-and-checkpoints.md)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-agent-101/ko/02-context-engineering)
 
 Tags: AI Agent, LLM, Tool Use, Python

@@ -45,8 +45,6 @@ In this post, we connect the open/closed principle with expand-contract and feat
 
 This picture places Reducing Change Impact inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Reducing Change Impact is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The blast radius of a change
@@ -60,8 +58,6 @@ This picture places Reducing Change Impact inside an operating flow. The point i
 Most systems are not built well from the start. They are built to change well. The smaller the impact of each change, the more often and more safely they can evolve.
 
 > Code is good when it is good at being changed.
-
-## Concept at a Glance
 
 Expand → switch → contract.
 

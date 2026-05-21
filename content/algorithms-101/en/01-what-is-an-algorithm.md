@@ -43,8 +43,6 @@ This is the first post in the Algorithms 101 series. Here we define what an algo
 
 This picture places What Is an Algorithm? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is an Algorithm? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The three properties an algorithm must satisfy
@@ -57,8 +55,6 @@ This picture places What Is an Algorithm? inside an operating flow. The point is
 Most production incidents that look like "the system is slow" are really "the algorithm does not scale." A linear scan over 10 million rows is fine in a test fixture but lethal in production. Knowing the vocabulary of algorithms is the first step toward predicting whether a system will hold under realistic load.
 
 > An algorithm is the contract between a problem and its solution.
-
-## Concept at a Glance
 
 > An algorithm has three obligations. It must produce the correct output for every valid input (correctness). It must terminate in finite time using finite memory (finiteness). It must do so within an efficiency envelope appropriate to the input size. Programs add concrete syntax, environment, and side effects, but the algorithm is the abstract recipe behind them.
 

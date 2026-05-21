@@ -242,6 +242,121 @@ A: 네, MIT 라이선스로 상업적 사용이 가능합니다.
 ```
 
 FAQ는 3-5개를 권장하며, 각 질문은 Q&A 형식으로 적습니다.
+
+## Contributing 가이드라인 작성법
+
+오픈소스 프로젝트는 README에 Contributing 섹션을 추가해 외부 기여자가 프로젝트에 참여하는 방법을 명확히 해야 합니다.
+
+### 기본 Contributing 템플릿
+
+```markdown
+## Contributing
+
+We welcome contributions! Here's how you can help:
+
+### 1. Fork the repository
+
+```bash
+git clone https://github.com/username/my-api-project.git
+cd my-api-project
+```
+
+### 2. Create a branch
+
+```bash
+git checkout -b feature/your-feature-name
+```
+
+### 3. Make your changes
+
+- Follow the code style in `.editorconfig`
+- Add tests for new features
+- Update documentation if needed
+
+### 4. Run tests
+
+```bash
+pytest tests/
+```
+
+### 5. Submit a pull request
+
+- Describe what you changed and why
+- Link related issues
+- Wait for review
+
+## Code of Conduct
+
+Please be respectful and constructive in all interactions. See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for details.
+```
+
+### Contributing을 별도 파일로 분리하는 기준
+
+다음 경우 `CONTRIBUTING.md`로 분리합니다:
+
+1. **기여 가이드가 README보다 긴 경우** (10줄 이상)
+2. **코드 스타일이나 테스트 규칙이 복잡한 경우**
+3. **팀 규모가 크고 프로세스가 정형화된 경우**
+
+README에는 다음처럼 링크만 남깁니다:
+
+```markdown
+## Contributing
+
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+```
+
+## Troubleshooting 섹션 구성
+
+README에 Troubleshooting 섹션을 추가하면 독자가 흔히 겪는 문제를 빠르게 해결할 수 있습니다.
+
+### 템플릿
+
+```markdown
+## Troubleshooting
+
+### 문제: `ModuleNotFoundError: No module named 'fastapi'`
+
+**원인**: 가상 환경이 활성화되지 않았거나 패키지가 설치되지 않았습니다.
+
+**해결**:
+
+```bash
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+### 문제: `Address already in use`
+
+**원인**: 포트 8000이 이미 사용 중입니다.
+
+**해결**:
+
+```bash
+fastapi dev main.py --port 8001
+```
+
+### 문제: 테스트가 실패합니다
+
+**원인**: 의존성이 최신 버전이 아닐 수 있습니다.
+
+**해결**:
+
+```bash
+pip install --upgrade -r requirements.txt
+pytest tests/
+```
+```
+
+### Troubleshooting을 별도 문서로 분리하는 기준
+
+문제가 5개 이상이거나 해결 방법이 복잡하면 `docs/troubleshooting.md`로 분리하고 README에는 링크만 남깁니다.
+
+```markdown
+## Troubleshooting
+
+See [docs/troubleshooting.md](docs/troubleshooting.md) for common issues and solutions.
+```
 ## 실습: README 다섯 부분 만들기
 
 ### 1단계 — What

@@ -45,7 +45,7 @@ This is post 3 in the Computer Science Major 101 series.
 
 This picture places Data Structures and Algorithms inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Data Structures and Algorithms is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Data structures and algorithms are not things to memorize—they are *patterns*. When you see a problem, the right structure should come to mind automatically.
 
 ## What You Will Learn
 
@@ -60,7 +60,7 @@ This picture places Data Structures and Algorithms inside an operating flow. The
 *Complexity* thinking is the first *standard* of *code quality*.
 
 ## Concept at a Glance
-
+Arrays, lists, trees, graphs, and hash tables are not data containers—they are *tools chosen for specific trade-offs* between speed, space, and simplicity.
 ## Key Terms
 
 - **array**: *contiguous* memory.

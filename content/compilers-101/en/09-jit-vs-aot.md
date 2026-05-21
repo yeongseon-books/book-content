@@ -45,8 +45,6 @@ This is post 9 in the Compilers 101 series.
 
 This picture places JIT vs AOT inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of JIT vs AOT is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The definitions and flow of AOT and JIT
@@ -60,8 +58,6 @@ This picture places JIT vs AOT inside an operating flow. The point is not to mem
 The same algorithm can run ten times faster or slower depending on the execution mode (JIT, AOT, interpreted). The startup vs peak balance can make the same language a great fit for servers and a poor fit for desktops. We are no longer choosing a compiler; we are choosing a compiler mode.
 
 > When you compile is what users feel as performance.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR
@@ -281,8 +277,6 @@ Tags: Computer Science, Compilers, JIT, AOT, Tradeoffs, Warmup
 The same algorithm can run ten times faster or slower depending on the execution mode (JIT, AOT, interpreted). The startup vs peak balance can make the same language a great fit for servers and a poor fit for desktops. We are no longer choosing a compiler; we are choosing a compiler mode.
 
 > When you compile is what users feel as performance.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR

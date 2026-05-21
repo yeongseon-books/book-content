@@ -40,15 +40,11 @@ This is post 4 in the Backend Development 101 series. Here, we define what belon
 
 This picture places The Service Layer inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of The Service Layer is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Putting business logic in controllers spreads the same rule across *three places* — REST, gRPC, batch jobs. Move it into services and *every entry point* enforces the same rule. This single principle determines how long your service survives.
 
 > Business rules do not change when the door changes.
-
-## Concept at a Glance
 
 A service is the *orchestrator* — it coordinates the repo, external APIs, and the event bus.
 

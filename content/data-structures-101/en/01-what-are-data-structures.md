@@ -45,8 +45,6 @@ This is the first post in the Data Structures 101 series.
 
 This picture places What Are Data Structures? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Are Data Structures? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The relationship between a data structure and an abstract data type (ADT)
@@ -61,8 +59,6 @@ Writing good code ultimately means making good decisions about how to represent 
 > Algorithms + Data Structures = Programs — Niklaus Wirth
 
 This series walks through nine core data structures: how they work, their time and space complexity, and when to reach for each one.
-
-## Concept at a Glance
 
 > A data structure has two layers: the logical structure of the data and its physical layout in memory. An ADT defines what you can do; a data structure decides how to do it.
 

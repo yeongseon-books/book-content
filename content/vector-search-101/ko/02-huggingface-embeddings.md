@@ -352,4 +352,6 @@ print(f"max difference: {np.max(np.abs(hf_vector - st_vector)):.6f}")
 - [sentence-transformers encode API](https://www.sbert.net/docs/package_reference/SentenceTransformer.html)
 - [all-MiniLM-L6-v2 model card](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/vector-search-101/ko/02-huggingface-embeddings)
+
 Tags: Vector Search, FAISS, Embeddings, Python

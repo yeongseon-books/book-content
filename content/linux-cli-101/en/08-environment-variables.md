@@ -42,8 +42,6 @@ This is post 8 in the Linux CLI 101 series.
 
 This picture places Environment Variables and PATH inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Environment Variables and PATH is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 When you type `python`, the Shell finds and runs the Python executable. How does it find it? Not by searching every directory — it checks only the directories listed in PATH, in order. If the path is not in PATH, you get "command not found".

@@ -371,4 +371,6 @@ def deterministic_gate(task_type: str, pred: str, expected: str) -> str:
 - [다음 글 — LLM-as-Judge — 모델로 모델을 평가하기](./04-llm-as-judge.md)
 - [시리즈 현재 위치 다시 보기](./03-deterministic-metrics.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-evaluation-101/ko/03-deterministic-metrics)
+
 Tags: AI Evaluation, LLM, Metrics, BLEU

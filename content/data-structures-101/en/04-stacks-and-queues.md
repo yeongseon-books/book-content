@@ -45,8 +45,6 @@ This is post 4 in the Data Structures 101 series.
 
 This picture places Stacks and Queues inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Stacks and Queues is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The ADT definitions of a stack and a queue and their core operations
@@ -59,8 +57,6 @@ This picture places Stacks and Queues inside an operating flow. The point is not
 Stacks and queues appear in language execution models, OS scheduling, and inter-service messaging in distributed systems. The ADTs are simple, but without a deep grasp you cannot reason about recursion, DFS, BFS, or event loops.
 
 > Without stacks, you cannot debug recursion. Without queues, you cannot design async systems.
-
-## Concept at a Glance
 
 > A stack is the "push on top, pop from top" model. A queue is the "join the back, leave from the front" model. Both ADTs only operate on the ends, so both can be O(1) with arrays or linked lists.
 

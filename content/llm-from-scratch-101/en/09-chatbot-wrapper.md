@@ -47,8 +47,6 @@ This is the final article in the LLM from Scratch 101 series.
 
 This picture places Turning Your LLM into a Chatbot — FastAPI + Streaming inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Turning Your LLM into a Chatbot — FastAPI + Streaming is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Chatbot = Model + History + Streaming + UI
 
 To build a functional chatbot, we need four components working together: the model itself, a way to track the conversation, a streaming protocol, and a browser-based frontend.

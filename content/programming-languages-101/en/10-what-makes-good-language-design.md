@@ -43,8 +43,6 @@ In this post, we will treat language design as an explicit tradeoff problem. The
 
 This picture places What Makes a Good Language Design? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Makes a Good Language Design? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - What axes should you use to evaluate a language design?
@@ -57,8 +55,6 @@ This picture places What Makes a Good Language Design? inside an operating flow.
 Design sense is not just for evaluating languages — **the same instinct applies every time you design an API, library, or internal DSL**. Even a single function signature meets the same tradeoffs.
 
 > Good design is not "good for everyone." It is "an answer that made its choices clear."
-
-## Concept at a Glance
 
 The five axes are coupled — push one down and another rises.
 

@@ -40,9 +40,9 @@ incident가 일어나면 누구나 빨리 원인을 찾고 싶어 합니다. 그
 
 *Incident Response 101 6장 흐름 개요*
 
-이 그림에서는 Root Cause Analysis를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+Root Cause Analysis는 '누가 실수했나'를 찾는 게 아니라, '어떤 시스템 경계에서 신호가 빠졌나'를 찾습니다.
 
-> Root Cause Analysis의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+> RCA는 과거를 비난하는 게 아니라, 미래를 설계하는 일입니다. 인과관계를 추적하고 시스템 개선점을 찾습니다.
 
 ## 왜 이 주제가 중요한가
 
@@ -130,6 +130,19 @@ def is_actionable(action):
 
 여기서 중요한 감각은 “누가 잘못했는가”보다 “왜 그런 실수가 incident로 이어질 수 있었는가”를 먼저 보는 것입니다. 개인의 실수는 자주 trigger일 수는 있어도, 반복 가능한 root cause는 대개 시스템과 프로세스 쪽에 남아 있습니다.
 
+## RCA 기법 비교
+
+RCA에는 여러 기법이 있으며, 사건의 성격에 따라 적합한 방법이 다릅니다. 각 기법의 특징과 적용 상황을 이해하면 분석 깊이를 더 효율적으로 확보할 수 있습니다.
+
+| 기법 | 적합 상황 | 장점 | 단점 |
+| --- | --- | --- | --- |
+| 5 Whys | 단순한 인과관계 | 빠르고 직관적 | 복잡한 사건에는 부족 |
+| Fishbone (Ishikawa) | 여러 축 요인 분석 | 기여 요인 시각화 | 원인 우선순위 불명확 |
+| Fault Tree | 하드웨어·안전 사고 | 논리적 체계 | 작성 시간 소요 |
+| Timeline | 시간순 복잡 사건 | 순서와 동시성 명확 | 인과보다 기록 중심 |
+
+실무에서는 5 Whys로 시작해 깊이를 확보하고, Fishbone으로 기여 요인을 넓게 펼친 뒤, Timeline으로 순서를 정렬하는 흐름을 자주 씁니다. 한 기법만 고집하면 사각이 생길 수 있으므로, 사건 특성에 맞춰 조합하는 편이 안전합니다.
+
 ## 자주 하는 실수 5가지
 
 1. 첫 답에서 바로 멈춥니다.
@@ -157,6 +170,19 @@ def is_actionable(action):
 
 이렇게 쓰면 사람이나 마지막 이벤트를 탓하는 대신, 다음 incident를 막을 수 있는 변경점이 더 또렷해집니다.
 
+## 근본 원인 vs 기여 요인
+
+RCA에서 자주 혼동되는 개념은 근본 원인(root cause)과 기여 요인(contributing factor)의 경계입니다. 근본 원인은 제거하면 같은 사건이 재발하지 않는 조건이고, 기여 요인은 사건을 키웠지만 그 자체로는 사건을 일으키지 못하는 조건입니다.
+
+예를 들어 앞서 결제 장애 사례를 다시 보면:
+
+- 근본 원인: timeout 변경이 검증 없이 프로덕션에 들어갈 수 있는 배포 보호 장치 부재
+- 기여 요인: staging 환경에 실제 결제 부하 테스트가 없음
+- 기여 요인: timeout 기본값이 문서화되지 않음
+- 기여 요인: 배포 당일 리뷰어가 한 명뿐이었음
+
+근본 원인만 고치면 같은 방식의 재발은 막을 수 있지만, 기여 요인을 함께 개선해야 전체 시스템 강건성이 높아집니다. 그래서 실무에서는 action item을 root cause 수정 한 개와 contributing factor 개선 여러 개로 나눠 우선순위를 매기는 경우가 많습니다.
+
 ## 체크리스트
 
 - [ ] RCA 템플릿 섹션이 미리 준비되어 있다.
@@ -170,21 +196,143 @@ def is_actionable(action):
 2. 5 Whys를 한 문장으로 정의해 보세요.
 3. contributing factor를 한 문장으로 정의해 보세요.
 
+## 장애 원인 그래프 예제
+
+복잡한 사건에서는 여러 조건이 함께 만나 장애가 발생합니다. 이때 인과관계를 그래프로 시각화하면 어떤 경로가 가장 큰 영향을 줬는지 분석하기 쉬워집니다.
+
+```python
+def build_cause_graph():
+    # 노드: 원인 요소
+    # 엣지: 인과관계 (A → B = A가 B를 유발)
+    graph = {
+        "배포": ["잘못된 timeout"],
+        "잘못된 timeout": ["결제 API 지연"],
+        "staging 부하 테스트 부재": ["잘못된 timeout"],
+        "배포 보호 장치 부재": ["잘못된 timeout"],
+        "결제 API 지연": ["고객 영향"],
+    }
+    return graph
+
+
+def find_root_paths(graph, target="고객 영향"):
+    # 타겟 노드까지 이어지는 모든 경로를 찾습니다
+    def backtrack(node, path):
+        if node not in graph or not graph[node]:
+            return [path]
+        paths = []
+        for parent in graph:
+            if node in graph[parent]:
+                paths.extend(backtrack(parent, [parent] + path))
+        return paths
+
+    return backtrack(target, [target])
+
+
+# 분석 실행
+g = build_cause_graph()
+paths = find_root_paths(g)
+for p in paths:
+    print(" → ".join(p))
+```
+
+출력 예시:
+
+```text
+배포 보호 장치 부재 → 잘못된 timeout → 결제 API 지연 → 고객 영향
+staging 부하 테스트 부재 → 잘못된 timeout → 결제 API 지연 → 고객 영향
+배포 → 잘못된 timeout → 결제 API 지연 → 고객 영향
+```
+
+이 그래프에서는 "잘못된 timeout"이 공통 중간 노드로 드러나고, 그 위로 세 가지 조건이 함께 연결됩니다. 이 구조를 보면 배포 보호 장치와 staging 부하 테스트 둘 다 개선해야 재발 가능성이 낮아진다는 점이 명확해집니다.
+
+실무에서는 이런 그래프를 Graphviz나 Mermaid로 그려 postmortem 문서에 첨부하기도 합니다. 시각화가 있으면 팀원들이 인과관계를 훨씬 빠르게 이해할 수 있습니다.
 ## 정리와 다음 글
 
 RCA의 목적은 마지막 계기를 찾는 데서 끝나지 않습니다. trigger와 root cause를 구분하고, 여러 기여 요인을 함께 보고, 검증 가능한 action item으로 이어져야 incident가 다시 반복되는 일을 줄일 수 있습니다.
 
 다음 글에서는 피해를 멈추는 mitigation과 원인을 제거하는 resolution을 어떻게 구분하고 운영할지 다루겠습니다.
 
+
+## RCA 심화: 5 Whys 사례와 피시본 다이어그램 해설
+
+RCA 품질은 질문의 깊이와 근거의 분리에서 결정됩니다. "무엇이 터졌는가"는 trigger에 가깝고, "왜 그 상태가 가능했는가"가 root cause에 가깝습니다. 실무에서는 이 둘을 분리하지 못해 같은 유형 incident가 반복됩니다.
+
+### 5 Whys 예시
+
+사례: 결제 API timeout 급증으로 SEV2 incident 발생
+
+1. 왜 결제가 실패했는가?  
+   - API timeout이 급증했기 때문입니다.
+2. 왜 timeout이 급증했는가?  
+   - 새 릴리스에서 외부 결제 게이트웨이 재시도 횟수가 증가했기 때문입니다.
+3. 왜 재시도 증가가 프로덕션에 반영됐는가?  
+   - 성능 회귀 테스트가 해당 경로를 포함하지 않았기 때문입니다.
+4. 왜 테스트가 경로를 포함하지 않았는가?  
+   - 테스트 시나리오 소유자가 명확하지 않았고, 릴리스 체크리스트가 불완전했기 때문입니다.
+5. 왜 소유자와 체크리스트가 불완전했는가?  
+   - 결제 경로 변경에 대한 배포 가드레일 정책이 문서화/자동화되지 않았기 때문입니다.
+
+이 체인에서 trigger는 "재시도 증가 릴리스"이고 root cause는 "가드레일 부재"입니다. 사람 실수는 보통 단일 원인이라기보다 시스템 결함을 드러내는 신호로 봐야 합니다.
+
+### 피시본(Fishbone) 축 정리
+
+피시본 다이어그램은 원인을 축별로 분리해 인과관계 누락을 줄입니다. incident RCA에서는 보통 다음 다섯 축이 유효합니다.
+
+- People: 역할/인수인계/교육
+- Process: 체크리스트/승인/릴리스 절차
+- Tooling: 모니터링/알림/배포 도구
+- System: 아키텍처/의존성/리소스 한계
+- Environment: 트래픽 패턴/외부 서비스/시간대 이벤트
+
+한 축만 보면 빠르게 결론이 나오는 대신 재발 가능성이 높아집니다. 최소 세 축 이상에서 근거를 모아야 균형 잡힌 RCA가 됩니다.
+
+## action item 작성 규칙
+
+좋은 action item은 동사로 시작하고, owner/due/검증 지표를 포함합니다.
+
+```text
+나쁜 예: 모니터링을 개선한다.
+좋은 예: checkout timeout p95가 800ms를 5분 연속 초과하면 SEV2 페이지가 열리도록 alert rule을 추가한다. Owner: sre-platform, Due: 2026-06-05, Verify: staging fault injection test pass
+```
+
+규칙을 지키면 postmortem 이후 "무엇이 바뀌었는가"를 추적할 수 있습니다.
+
+## 간단한 RCA 모델 코드
+
+```python
+def classify_cause(evidence_count: int, repeated: bool) -> str:
+    if evidence_count >= 3 and repeated:
+        return "root_cause"
+    if evidence_count >= 1:
+        return "trigger_or_factor"
+    return "unknown"
+
+
+def actionable(text: str) -> bool:
+    verbs = ("add ", "fix ", "remove ", "test ", "enforce ")
+    return text.startswith(verbs)
+```
+
+코드 자체보다 중요한 것은 기준의 명시화입니다. 기준이 명시되면 팀 간 리뷰에서 품질 논의를 구체적으로 할 수 있습니다.
+
+## RCA 리뷰 체크리스트
+
+- trigger, root cause, contributing factors가 분리되어 있는가?
+- 각 주장에 근거 로그/지표/타임라인 링크가 있는가?
+- action item이 검증 가능하게 작성되었는가?
+- 30일 뒤 재확인 일정이 잡혀 있는가?
+
+이 체크리스트를 통과한 RCA는 단순 회고를 넘어 재발 방지 설계 문서로 기능합니다.
+
 ## 처음 질문으로 돌아가기
 
 - **incident의 진짜 원인은 어떻게 찾아야 할까요?**
   - 본문의 기준은 Root Cause Analysis를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
-- **왜 5 Whys가 여전히 유용할까요?**
+  - RCA는 '누가 실수했나'를 찾는 게 아니라, '어떤 시스템 경계에서 신호가 빠졌나'를 찾습니다.
   - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
-- **trigger와 root cause는 어디서 갈릴까요?**
+  - 5Why, 타임라인, 콜그래프를 함께 보면서 인과관계를 추적합니다.
   - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
-
+  - 근본 원인 하나가 아니라 여러 원인이 함께 작용한 경우가 대부분입니다.
 <!-- toc:begin -->
 ## 시리즈 목차
 

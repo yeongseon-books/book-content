@@ -306,4 +306,6 @@ img = frame.to_image().resize((224, 224))  # shrink right away
 - [LangGraph 101 - 조건부 엣지와 분기 흐름](../../langgraph-101/ko/03-conditional-edges.md)
 - [AI Agent 101 - 운영](../../ai-agent-101/ko/09-production-operations.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/multimodal-ai-101/ko/09-video-understanding)
+
 Tags: Video Understanding, Video-LLaVA, Frame Sampling, Temporal Modeling, VideoMAE, Action Recognition

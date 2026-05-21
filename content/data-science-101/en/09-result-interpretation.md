@@ -42,7 +42,7 @@ This is post 9 in the Data Science 101 series. Here we turn raw analytical resul
 
 This picture places Result Interpretation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Result Interpretation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> At its core, Result Interpretation is about deciding what enters a system, where validation happens, and which signals stay for the next cycle—not about feature names.
 
 ## Questions This Post Answers
 
@@ -67,7 +67,7 @@ When interpretation is *exaggerated*, it leads to *bad decisions*; when it is *u
 
 > *A good interpretation does not overclaim, yet it still enables a decision.*
 
-## Concept at a Glance
+The key boundary in this episode is between the concept itself and how it operates in a real system. You need to know where the data comes in, where the decision happens, and what signal must be recorded.
 
 ## Key Terms
 

@@ -163,6 +163,128 @@ MTTR                  -> 탐지, 판단, 복구 중 어디가 가장 느린가
 
 좋은 DevOps 흐름은 자동화 수가 아니라, 팀이 같은 데이터를 같은 주기로 읽고 실제 변경으로 연결하는 힘에서 만들어집니다.
 
+## 운영 성숙도 레벨
+
+DevOps 성숙도는 도구의 수가 아니라, 자동화와 피드백 루프의 깊이로 판단합니다. 아래 표는 네 단계 성숙도를 정리한 것입니다.
+
+| 레벨 | 특징 | 자동화 수준 |
+| --- | --- | --- |
+| 0 | 수동 배포, SSH로 직접 접속, 로그는 서버에서 grep | 없음 |
+| 1 | CI 존재, 테스트 자동화, 배포는 수동 클릭 | 빌드 자동화 |
+| 2 | CD 파이프라인, 중앙 로그 수집, 기본 메트릭 | 배포 자동화 |
+| 3 | 자동 롤백, SLO 기반 알림, 포스트모템에서 학습 | 복구 자동화 |
+
+대부분의 팀은 레벨 1-2 사이에 있습니다. 레벨 3은 성숙한 플랫폼 팀의 목표지이고, 작은 팀은 레벨 2를 먼저 안정적으로 유지하는 편이 좋습니다. 중요한 것은 현재 레벨을 정확히 아는 것입니다.
+
+## DevOps 메트릭 (DORA 4 metrics)
+
+Google DORA 연구는 네 가지 핑심 지표를 제시했습니다. 이 지표들은 속도와 안정성의 균형을 함께 보여줍니다.
+
+### 1. Deployment Frequency (배포 빈도)
+
+얼마나 자주 배포하는지 측정합니다. 높을수록 변경을 작게 나눈다는 의미입니다.
+
+```text
+Elite: Multiple deploys per day
+High: Once per day to once per week
+Medium: Once per week to once per month
+Low: Fewer than once per month
+```
+
+### 2. Lead Time for Changes (변경 리드 타임)
+
+코드가 merge된 후 production에 도달하기까지 걸리는 시간입니다.
+
+```text
+Elite: Less than 1 hour
+High: Less than 1 day
+Medium: 1 day to 1 week
+Low: More than 1 week
+```
+
+### 3. Change Failure Rate (변경 실패율)
+
+배포가 장애를 일으킨 비율입니다. 낮을수록 테스트와 리뷰 품질이 높다는 의미입니다.
+
+```text
+Elite: 0-15%
+High: 16-30%
+Medium: 31-45%
+Low: More than 45%
+```
+
+### 4. Mean Time to Recovery (MTTR) (평균 복구 시간)
+
+장애가 발생한 후 복구까지 걸리는 평균 시간입니다.
+
+```text
+Elite: Less than 1 hour
+High: Less than 1 day
+Medium: 1 day to 1 week
+Low: More than 1 week
+```
+
+이 네 지표는 함께 봐야 합니다. 배포 빈도만 높이고 실패율이 높으면 불안정한 빠른 배포입니다. 반대로 실패율은 낮지만 리드 타임이 길면 안전하지만 느린 배포입니다.
+
+## Python 배포 빈도 측정 예제
+
+배포 때마다 GitHub Release를 만들고, 이를 집계하는 간단한 스크립트입니다.
+
+```python
+import httpx
+from datetime import datetime, timedelta
+import os
+
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+REPO = "myorg/myapp"
+
+async def get_deploy_frequency(days=7):
+    """Calculate deployment frequency over the last N days"""
+    url = f"https://api.github.com/repos/{REPO}/releases"
+    headers = {
+        "Authorization": f"token {GITHUB_TOKEN}",
+        "Accept": "application/vnd.github.v3+json"
+    }
+    
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url, headers=headers)
+        releases = response.json()
+    
+    cutoff_date = datetime.now() - timedelta(days=days)
+    recent_deploys = [
+        r for r in releases
+        if datetime.fromisoformat(r["published_at"].replace("Z", "+00:00")) > cutoff_date
+    ]
+    
+    frequency = len(recent_deploys) / days
+    
+    return {
+        "period_days": days,
+        "total_deploys": len(recent_deploys),
+        "deploys_per_day": round(frequency, 2),
+        "classification": classify_frequency(frequency)
+    }
+
+def classify_frequency(deploys_per_day):
+    """Map to DORA performance levels"""
+    if deploys_per_day >= 1:
+        return "Elite"
+    elif deploys_per_day >= 0.14:  # ~1 per week
+        return "High"
+    elif deploys_per_day >= 0.03:  # ~1 per month
+        return "Medium"
+    else:
+        return "Low"
+
+# Usage
+if __name__ == "__main__":
+    import asyncio
+    result = asyncio.run(get_deploy_frequency(30))
+    print(f"Deploy Frequency (last 30 days): {result}")
+```
+
+이 스크립트는 GitHub Release API를 통해 최근 배포 빈도를 계산하고 DORA 레벨로 분류합니다. CI에서 주기적으로 실행하면 팀의 배포 속도를 추적할 수 있습니다.
+
 ## 자주 하는 실수 5가지
 
 1. **도구부터 도입하는 실수**입니다. 흐름이 없으면 도구는 연결되지 않은 섬이 됩니다.
@@ -209,6 +331,82 @@ DevOps 101 시리즈는 여기서 마무리입니다. 핵심은 하나입니다.
 - **Kubernetes 101** — 컨테이너 오케스트레이션을 본격적으로 다루는 방법
 
 DevOps는 결국 팀이 배우는 방식입니다. 이 감각을 잡았다면 이제 다음 도구보다 다음 학습 루프를 설계할 차례입니다.
+
+## 시리즈 종합: 운영 가능한 DevOps 시스템 설계도
+
+마지막 단계에서 중요한 것은 개별 기술이 아니라 연결 구조입니다. CI, CD, IaC, 컨테이너, 관측성, on-call이 따로 존재하면 팀은 바쁘지만 느립니다. 반대로 각 단계가 다음 단계의 입력으로 이어지면 팀은 같은 인원으로 더 자주, 더 안전하게 배포할 수 있습니다.
+
+### 플랫폼 엔지니어링 관점 아키텍처
+
+```text
+Developer -> IDP Portal -> CI Templates -> Artifact Registry
+          -> GitOps Controller -> Runtime Platform
+          -> Metrics/Logs/Traces -> Alerting -> Incident Response
+          -> Postmortem Actions -> Backlog -> Developer
+```
+
+위 흐름은 학습 루프가 닫힌 구조를 보여 줍니다. 포스트모템 결과가 백로그와 템플릿 개선으로 다시 흘러가야 운영 가능한 DevOps가 됩니다.
+
+### IDP(Internal Developer Platform) 구성요소 표
+
+| 구성요소 | 역할 | 최소 기능 |
+| --- | --- | --- |
+| Service Catalog | 서비스 메타데이터 관리 | owner, repo, runbook 링크 |
+| Golden Templates | 표준 프로젝트 생성 | CI, Dockerfile, 기본 모니터링 |
+| Deployment Abstraction | 배포 단순화 | 환경별 승격/롤백 버튼 |
+| Policy Engine | 규정 자동 강제 | 필수 체크, 보안 게이트 |
+| Observability Hub | 통합 관측성 | RED 대시보드, 알림 라우팅 |
+
+### DORA 운영 해석 가이드
+
+| 지표 | 주간 질문 | 개선 레버 |
+| --- | --- | --- |
+| Deploy Frequency | 왜 배포가 묶음이 커졌는가 | PR 크기 축소, 파이프라인 속도 개선 |
+| Lead Time | 가장 긴 대기 단계는 어디인가 | 승인 정책 단순화, 병렬 테스트 |
+| Change Failure Rate | 어떤 변경 유형이 실패하는가 | 프리플라이트 테스트, 카나리 강화 |
+| MTTR | 탐지-판단-복구 중 병목은 어디인가 | 알림 품질, 런북 보강, 롤백 자동화 |
+
+### 90일 플랫폼 실행 계획
+
+```yaml
+phase_1_30d:
+  - create_service_catalog
+  - standardize_ci_template
+  - define_dora_collection
+phase_2_60d:
+  - rollout_gitops_for_stage
+  - add_security_gate_sast_dast
+  - publish_runbook_baseline
+phase_3_90d:
+  - self_service_deploy_for_teams
+  - monthly_postmortem_review
+  - automate_top_incident_prevention
+```
+
+### 운영 성숙도 점검표
+
+| 질문 | 예/아니오 |
+| --- | --- |
+| 신규 서비스가 하루 안에 표준 파이프라인을 갖추는가 |  |
+| 배포 실패 시 10분 내 롤백 경로가 준비되어 있는가 |  |
+| 알림에서 런북까지 한 번에 이동 가능한가 |  |
+| 월간 포스트모템 액션 완료율을 추적하는가 |  |
+
+### 종합 결론
+
+운영 가능한 DevOps는 기술 도입 결과가 아니라 시스템 설계 결과입니다. 표준화된 진입점, 측정 가능한 지표, 짧은 학습 루프, 책임이 분명한 운영 리듬이 함께 있을 때 비로소 지속 가능한 속도가 만들어집니다. 플랫폼 엔지니어링은 이 구조를 팀 전체에 확장하는 방법입니다.
+
+### 플랫폼 엔지니어링 도입 시 흔한 오해
+
+플랫폼 팀을 만든다고 DevOps가 자동 완성되지는 않습니다. 플랫폼의 목적은 팀을 대신해 배포하는 것이 아니라, 각 팀이 안전한 기본값을 빠르게 재사용하도록 돕는 것입니다.
+
+| 오해 | 실제 원칙 |
+| --- | --- |
+| 플랫폼 팀이 모든 운영을 담당한다 | 플랫폼은 셀프서비스 경로를 제공한다 |
+| 템플릿은 자유를 제한한다 | 반복 실수를 줄이는 안전 기본값이다 |
+| 지표는 보고용이다 | 우선순위 결정을 위한 운영 입력이다 |
+
+따라서 IDP 성공 기준은 기능 수가 아니라 신규 팀 온보딩 시간, 표준 파이프라인 채택률, 장애 재발률 감소 같은 운영 결과로 측정해야 합니다.
 
 ## 처음 질문으로 돌아가기
 

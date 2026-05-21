@@ -46,8 +46,6 @@ This is the 3rd article in the Python DB-API 101 series.
 
 This picture places execute, executemany, and Fetch Patterns inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of execute, executemany, and Fetch Patterns is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## 1. execute - one statement at a time
 
 `cursor.execute(operation, parameters=None)` runs a single SQL statement. SELECT, INSERT, UPDATE, DELETE, and DDL all use the same method.

@@ -52,8 +52,6 @@ Once the sample space is explicit, many probability problems turn into set probl
 
 > In many probability problems, the moment you write down the sample space carefully, half the solution is already visible.
 
-## Concept at a Glance
-
 ## Key Terms
 
 - **Sample space Ω**: the set of all outcomes.

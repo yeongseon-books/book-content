@@ -40,9 +40,9 @@ last_reviewed: '2026-05-15'
 
 *Data Science 101 4장 흐름 개요*
 
-이 그림에서는 데이터 정제를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+데이터 정제를 운영 시스템 속에서 올바르게 배치하려면 어떤 경계에서 무엇을 입력받고, 어디에서 검증하며, 어떤 신호를 남겨야 하는지 먼저 봐야 합니다.
 
-> 데이터 정제의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+> 데이터 정제의 핵심은 기능 이름이 아니라, 입력을 받는 경계에서 결과를 내보내는 경계까지 어떤 기준으로 데이터를 검증하고 처리할 것인가를 명확히 정하는 데 있습니다.
 
 ## 이 글에서 배우는 내용
 
@@ -69,6 +69,64 @@ last_reviewed: '2026-05-15'
 - **Outlier**: 다른 값들과 통계적으로 멀리 떨어진 값입니다.
 - **Type coercion**: 문자열을 숫자나 날짜로 변환하는 작업입니다.
 - **Imputation**: 결측치를 일정한 규칙으로 채우는 전략입니다.
+
+## 모델 선택 기준 비교
+
+데이터 정제 후에는 적합한 모델을 고르는 단계가 왔습니다. 모델 선택은 단순히 정확도만 보는 것이 아니라, 데이터 크기, 해석 필요성, 속도, 정확도 간 균형을 모두 고려해야 합니다.
+
+| 조건 | 데이터 크기 | 해석성 필요 | 속도 중요 | 최고 정확도 | 추천 모델 |
+|---|---|---|---|---|---|
+| 소규모, 해석 필수 | 작음 | 높음 | 보통 | 보통 | Logistic Regression, Decision Tree |
+| 중규모, 균형 | 보통 | 보통 | 보통 | 높음 | Random Forest, Gradient Boosting |
+| 대규모, 정확도 우선 | 크거나 매우 큼 | 낮음 | 느림 | 매우 높음 | XGBoost, LightGBM, Neural Network |
+| 실시간 예측 | 중간 | 낮음 | 매우 빠름 | 보통 | Logistic Regression, Naive Bayes |
+
+예를 들어 해석성이 중요하면 Decision Tree나 Logistic Regression이 적합하고, 정확도만 최대화하려면 XGBoost나 신경망을 고려하게 됩니다.
+
+## Python 여러 모델 비교 (cross_val_score)
+
+데이터 정제가 끝나면 본격적으로 모델을 테스트해야 합니다. 한 가지 모델만 시도하기보다, 여러 모델을 교차 검증으로 비교하면 더 확신을 가지고 선택할 수 있습니다.
+
+```python
+from sklearn.datasets import load_iris
+from sklearn.model_selection import cross_val_score
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+import numpy as np
+
+# 데이터 로드
+X, y = load_iris(return_X_y=True)
+
+# 모델 목록
+models = {
+    "Logistic Regression": LogisticRegression(max_iter=200),
+    "Decision Tree": DecisionTreeClassifier(),
+    "Random Forest": RandomForestClassifier()
+}
+
+# 각 모델의 교차 검증 점수
+for name, model in models.items():
+    scores = cross_val_score(model, X, y, cv=5, scoring="accuracy")
+    print(f"{name}: {np.mean(scores):.3f} (±{np.std(scores):.3f})")
+```
+
+이 예제는 세 가지 모델을 5-fold cross validation으로 비교합니다. 평균 정확도와 함께 표준편차도 출력하면 어느 모델이 안정적인지 판단할 수 있습니다. 데이터 정제 후에는 이런 비교를 기본적으로 수행하는 편이 안전합니다.
+
+## No Free Lunch 정리
+
+모델 선택에서 가장 중요한 기준은 "No Free Lunch" 정리입니다. 이 정리는 **모든 문제에 전범위하게 가장 좋은 단일 모델은 존재하지 않는다**는 의미입니다.
+
+특정 데이터에서 A 모델이 B보다 성능이 좋다더라도, 다른 데이터에서는 B가 더 좋을 수 있습니다. 그래서 실무에서는 한 가지 모델에 집착하기보다, 여러 모델을 실험하고 비교하는 일이 더 중요합니다.
+
+**실무에서의 적용:**
+
+- 한 가지 모델만 고집하지 말고, baseline 모델부터 시작해 점진적으로 복잡도를 높입니다.
+- 모델 선택의 정답은 데이터에 달려 있습니다.
+- 단순한 모델이 복잡한 모델보다 나을 때도 많습니다.
+- 해석성, 속도, 정확도 사이의 trade-off를 항상 고려해야 합니다.
+
+따라서 데이터 정제 후에는 모델 비교 단계를 반드시 거쳐야 하며, 단순한 모델부터 시작해 단계적으로 향상시키는 편이 안전합니다.
 
 ## Before / After
 
@@ -181,6 +239,78 @@ print(report)
 ## 정리 및 다음 글
 
 데이터 정제는 조용하지만 가장 많은 결론을 떠받치는 작업입니다. 입력이 정리되어야 이후 EDA와 모델링도 믿을 수 있습니다. 다음 글에서는 이렇게 정리한 데이터를 실제로 읽고 이해하는 탐색적 데이터 분석을 살펴보겠습니다.
+
+## 실무 확장: 정제 패턴 라이브러리와 재사용 가능한 전처리 함수
+
+정제는 프로젝트마다 새로 하는 일이 아니라, 반복 가능한 패턴을 축적하는 일입니다. 같은 도메인에서는 같은 오류가 반복됩니다. 날짜 형식 혼재, 금액 문자열, 중복 레코드, 결측치 규칙 부재는 거의 모든 데이터셋에서 다시 나타납니다. 그래서 실무 팀은 정제를 노트북 임시 코드로 끝내지 않고, 재사용 가능한 함수와 점검표로 관리합니다.
+
+### 대표 정제 패턴 비교표
+
+| 패턴 | 적용 조건 | 처리 방식 | 부작용 위험 | 기록 항목 |
+| --- | --- | --- | --- | --- |
+| 타입 강제 변환 | 문자열 숫자/날짜 혼재 | `to_numeric`, `to_datetime` | 변환 실패값 증가 | 실패 건수/비율 |
+| 중복 축약 | 동일 키 다중 레코드 | 최신 기준 `drop_duplicates` | 과도 삭제 | 삭제 건수, 기준 컬럼 |
+| 결측 대체 | 비핵심 컬럼 결측 | 규칙 기반 fill | 분포 왜곡 | 대체 규칙, 대체율 |
+| 이상치 플래그 | 분포 꼬리 길음 | IQR/Z-score flag | 정상값 오탐 | 임계값, 플래그 비율 |
+| 범주 정규화 | 표기 변형 다수 | 매핑 테이블 적용 | 매핑 누락 | 미매핑 목록 |
+
+### pandas 전처리 코드: 규칙을 함수로 분리
+
+```python
+import pandas as pd
+
+
+def clean_orders(df: pd.DataFrame) -> pd.DataFrame:
+    out = df.copy()
+    out["order_at"] = pd.to_datetime(out["order_at"], errors="coerce")
+    out["amount"] = pd.to_numeric(out["amount"], errors="coerce")
+
+    out = out.dropna(subset=["order_id", "user_id", "order_at"])
+    out = out.drop_duplicates(subset=["order_id"], keep="last")
+
+    q1, q3 = out["amount"].quantile([0.25, 0.75])
+    iqr = q3 - q1
+    lo, hi = q1 - 1.5 * iqr, q3 + 1.5 * iqr
+    out["amount_outlier"] = ~out["amount"].between(lo, hi)
+
+    out["country"] = out["country"].fillna("UNKNOWN").str.upper()
+    return out
+```
+
+함수화의 장점은 명확합니다. 같은 입력에 같은 출력이 보장되고, 코드 리뷰와 테스트가 가능해집니다.
+
+### 정제 리포트 자동 생성 패턴
+
+```python
+
+def build_cleaning_report(raw: pd.DataFrame, clean: pd.DataFrame) -> dict:
+    return {
+        "raw_rows": int(len(raw)),
+        "clean_rows": int(len(clean)),
+        "dropped_rows": int(len(raw) - len(clean)),
+        "null_rate_top5": clean.isna().mean().sort_values(ascending=False).head().to_dict(),
+        "outlier_rate": float(clean["amount_outlier"].mean()) if "amount_outlier" in clean else 0.0,
+    }
+```
+
+정제 자체만큼 중요한 것이 "무엇이 어떻게 바뀌었는지" 기록하는 일입니다. 팀 협업에서는 리포트가 정제 코드만큼 자주 읽힙니다.
+
+### 정제 설계 원칙
+
+- 원본 테이블은 절대 수정하지 않습니다.
+- 정제 규칙은 자연어가 아니라 코드로 남깁니다.
+- 삭제보다 플래그를 우선해 나중에 재검토 가능성을 남깁니다.
+- 도메인 규칙(예: 금액 음수 허용 여부)을 문서와 코드에 동시에 반영합니다.
+- 정제 변경은 모델 변경만큼 엄격하게 리뷰합니다.
+
+### 품질 게이트 예시
+
+- 핵심 키 결측률 0.1% 초과 시 파이프라인 실패
+- 날짜 변환 실패율 1% 초과 시 경고
+- 중복률 급증(전주 대비 +50%) 시 알림
+- 이상치 플래그 비율 급증 시 원인 조사 티켓 자동 생성
+
+정제는 데이터 과학의 "보이지 않는 기반"입니다. 기반이 단단해야 그 위에서 어떤 분석과 모델도 안정적으로 작동합니다.
 
 ## 처음 질문으로 돌아가기
 

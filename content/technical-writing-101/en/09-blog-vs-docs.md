@@ -50,8 +50,6 @@ When *kinds of writing* mix up, the *reader* gets *lost*.
 
 > Mental model: blogs preserve context and interpretation, while docs preserve the current truth.
 
-## Concept at a Glance
-
 Blogs and docs both serve engineering teams, but they have different owners, freshness rules, and lifespans. Separating them with clear ownership and deliberate links prevents the reader from following stale advice or citing context as official policy.
 ## Key Terms
 

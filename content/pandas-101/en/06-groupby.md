@@ -48,8 +48,6 @@ This picture places Groupby and Aggregation inside an operating flow. The point 
 
 *Aggregation is the core of analysis*. With *groupby*, *dozens of for-loop lines* collapse into *one*.
 
-## Concept at a Glance
-
 ## Key Terms
 
 - **groupby**: *split into groups* by key.

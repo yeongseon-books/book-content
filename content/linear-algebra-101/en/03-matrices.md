@@ -40,7 +40,7 @@ This is post 3 in the Linear Algebra 101 series. Here we will read matrices thro
 
 This picture places Matrices inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Matrices is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A matrix is not just a number grid. It is a transformation rule, and its structure (especially the number of rows and columns) defines not just the size but the very spaces of input and output.
 
 ## Questions This Post Answers
 
@@ -56,8 +56,6 @@ This picture places Matrices inside an operating flow. The point is not to memor
 Design matrices in regression, weight matrices in neural networks, user-item structures in recommenders, and transformation matrices in graphics all rely on the same object. A matrix is simultaneously storage and engine.
 
 Many production mistakes start as shape mistakes. If you cannot read how many dimensions go in, how many come out, and what kind of transformation is implied, code may run while the meaning is already wrong. Matrices reward the habit of reading structure before values.
-
-## Concept at a Glance
 
 ## Key Terms
 

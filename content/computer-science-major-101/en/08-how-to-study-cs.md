@@ -41,7 +41,7 @@ This is post 8 in the Computer Science Major 101 series.
 
 This picture places How to Study Computer Science inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of How to Study Computer Science is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Effective learning is not passive consumption—it is active *cycles* of understanding, attempting, failing, and discussing.
 
 ## Questions This Post Answers
 
@@ -63,7 +63,7 @@ This picture places How to Study Computer Science inside an operating flow. The 
 Study efficiency creates a large share of the gap between students in a CS major. Two students can attend the same lecture, but review spacing, practice frequency, and question habits create very different levels of understanding and retention.
 
 ## Concept at a Glance
-
+Study with *intention*: read to understand, code to fail, discuss to clarify, and build to integrate.
 > Studying computer science does not end when the lecture ends. It becomes real only when you revisit the idea, test it with your hands, and use questions to clear what still feels vague.
 
 Listening to a lecture is only the beginning. You need to compress the idea into notes, reopen it during review, test it through practice, and resolve weak spots through questions. When that loop keeps running, knowledge starts to stick instead of fading after the exam.

@@ -403,4 +403,6 @@ host code를 따라가고 나면 어떤 레버가 어느 단계를 줄이는지 
 - [Azure Functions Deep Dive — 호스트 부팅](./01-host-bootstrap.md)
 - [Azure Functions Deep Dive — 스케일링 내부 동작](./05-scaling-internals.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-functions-deep-dive/ko/06-cold-start-placeholder)
+
 Tags: Azure Functions, Serverless, Distributed Systems, gRPC

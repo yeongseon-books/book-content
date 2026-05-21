@@ -169,6 +169,261 @@ def is_tree(G):
 
 그래프는 관계 중심 문제를 다루는 가장 기본적인 수학 모델입니다. 정점과 간선, 표현 방식, 너비 우선 탐색 같은 기초만 익혀도 많은 실무 문제를 더 정확한 구조로 바라볼 수 있습니다. 다음 글에서는 경우의 수를 세는 조합론으로 넘어가 보겠습니다.
 
+
+## 그래프 표현 선택: 인접 리스트 vs 인접 행렬
+
+그래프 문제를 풀기 전에 표현 방식을 먼저 선택해야 합니다. 같은 알고리즘이라도 표현에 따라 시간과 메모리 비용이 크게 달라집니다.
+
+| 기준 | 인접 리스트 | 인접 행렬 |
+| --- | --- | --- |
+| 메모리 | `O(V + E)` | `O(V^2)` |
+| 이웃 순회 | 빠름 | 행 전체 스캔 필요 |
+| 간선 존재 질의 | 보통 `O(deg(v))` 또는 보조구조 필요 | `O(1)` |
+| 희소 그래프 | 유리 | 불리 |
+| 조밀 그래프 | 보통 | 유리할 수 있음 |
+
+대부분 서비스 데이터는 희소하므로 인접 리스트가 기본값입니다. 다만 정점 수가 작고 간선 존재 질의가 매우 빈번하면 행렬이 실용적일 수 있습니다.
+
+## BFS/DFS를 같은 인터페이스로 구현하기
+
+탐색 전략 차이를 구조적으로 이해하려면 인터페이스를 통일해 비교하는 것이 좋습니다.
+
+```python
+from collections import deque
+
+def bfs_order(graph: dict[str, list[str]], start: str) -> list[str]:
+    q = deque([start])
+    seen = {start}
+    order = []
+    while q:
+        v = q.popleft()
+        order.append(v)
+        for nxt in graph.get(v, []):
+            if nxt not in seen:
+                seen.add(nxt)
+                q.append(nxt)
+    return order
+
+def dfs_order(graph: dict[str, list[str]], start: str) -> list[str]:
+    stack = [start]
+    seen = set()
+    order = []
+    while stack:
+        v = stack.pop()
+        if v in seen:
+            continue
+        seen.add(v)
+        order.append(v)
+        for nxt in reversed(graph.get(v, [])):
+            if nxt not in seen:
+                stack.append(nxt)
+    return order
+```
+
+BFS는 레벨 기반 확장, DFS는 경로 기반 탐색이라는 차이가 코드에서도 그대로 드러납니다. 장애 전파 범위를 빠르게 확인할 때는 BFS가 직관적이고, 의존성 순환 탐지는 DFS 계열이 유리합니다.
+
+## networkx로 모델 검증하기
+
+초기 설계 단계에서 `networkx`를 쓰면 관계 모델이 맞는지 빠르게 검증할 수 있습니다.
+
+```python
+import networkx as nx
+
+G = nx.DiGraph()
+G.add_edges_from([
+    ('auth', 'user-db'),
+    ('api', 'auth'),
+    ('api', 'cache'),
+    ('worker', 'queue'),
+    ('queue', 'api'),
+])
+
+is_dag = nx.is_directed_acyclic_graph(G)
+```
+
+DAG 여부, 연결 요소 수, 최단 경로 존재 여부를 사전에 확인하면 구현 전에 모델 오류를 줄일 수 있습니다. 특히 배치 파이프라인이나 빌드 의존성은 DAG 검증을 자동화하는 것만으로도 장애를 크게 줄입니다.
+
+## 그래프 응용 맵
+
+| 도메인 | 정점 | 간선 | 대표 질문 |
+| --- | --- | --- | --- |
+| 소셜 | 사용자 | 팔로우/친구 | 추천 후보는 누구인가 |
+| 인프라 | 서비스 | 호출 의존성 | 장애 영향 범위는 어디까지인가 |
+| CI/CD | 작업 | 선행 조건 | 실행 가능한 다음 작업은 무엇인가 |
+| 지도 | 위치 | 도로 | 최소 비용 경로는 무엇인가 |
+| 보안 | 자산 | 접근 가능 경로 | 공격 경로가 존재하는가 |
+
+모델링 단계에서 이 표를 쓰면 "값 중심" 사고에서 "관계 중심" 사고로 빠르게 전환할 수 있습니다.
+
+## 그래프 설계 체크리스트
+
+1. 방향성 유무가 명시되어 있는가
+2. 다중 간선/가중치 필요 여부가 정의되었는가
+3. 순환 허용 여부가 요구사항과 일치하는가
+4. 연결되지 않은 정점 처리 정책이 있는가
+
+그래프 알고리즘을 외우기보다 먼저 이 네 항목을 문서에 고정하면 설계 안정성이 크게 올라갑니다.
+
+
+## 경로 문제를 빠르게 분류하는 기준
+
+그래프 문제를 받았을 때 아래 네 질문으로 시작하면 알고리즘 선택이 빨라집니다.
+
+1. 가중치가 있는가
+2. 음수 간선이 있는가
+3. 전체 경로가 필요한가, 도달 가능성만 필요한가
+4. 단일 시작점인가 다중 시작점인가
+
+```python
+def problem_type(weighted: bool, negative_edge: bool, reachability_only: bool) -> str:
+    if reachability_only:
+        return 'BFS/DFS'
+    if weighted and negative_edge:
+        return 'Bellman-Ford 계열'
+    if weighted:
+        return 'Dijkstra 계열'
+    return 'BFS 최단간선수'
+```
+
+이 분류는 완전한 해답이 아니라 초기 오판을 줄이는 안전장치입니다. 모델링 회의에서 이 질문을 먼저 통과시키면 구현 단계의 재작업이 크게 줄어듭니다.
+
+
+## 적용 연습 시나리오
+
+아래 시나리오는 이번 장 개념을 실제 엔지니어링 작업으로 연결하기 위한 공통 훈련 틀입니다. 시리즈 전편에서 재사용할 수 있도록 질문 구조를 동일하게 유지했습니다.
+
+### 시나리오 A — 요구사항을 수학 문장으로 바꾸기
+
+1. 요구사항 문장을 한 줄로 복사합니다.
+2. 입력 집합, 출력 집합, 금지 조건을 분리합니다.
+3. 성공 조건을 불변식 형태로 다시 씁니다.
+4. 경계 사례 3개를 고릅니다.
+
+이 과정의 목적은 구현 전 설계 명확화입니다. 코드 한 줄을 쓰지 않아도 모호한 요구사항을 빠르게 드러낼 수 있습니다.
+
+### 시나리오 B — 작은 코드로 검증 자동화하기
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class CheckResult:
+    name: str
+    passed: bool
+    detail: str
+
+
+def run_checks(cases, predicate):
+    results = []
+    for name, value in cases:
+        ok = bool(predicate(value))
+        results.append(CheckResult(name=name, passed=ok, detail=str(value)))
+    return results
+```
+
+핵심은 정답을 크게 만들기보다 검증 루프를 작게 만드는 것입니다. 작은 루프가 있으면 개념 변경이 생겨도 빠르게 회귀 검사를 돌릴 수 있습니다.
+
+### 시나리오 C — 실패를 문서화된 학습으로 전환하기
+
+실패를 발견했을 때 바로 코드 패치로 들어가기보다 아래 순서로 기록하면 재발 방지 효과가 큽니다.
+
+- 어떤 가정이 틀렸는가
+- 어떤 입력에서 처음 실패했는가
+- 실패를 막는 최소 불변식은 무엇인가
+- 테스트와 문서에 무엇을 추가했는가
+
+이 네 항목은 구현 스타일과 무관하게 적용됩니다. 수학 학습이 실무 가치로 전환되는 지점은 공식 암기가 아니라 실패 원인을 추상화해 재사용 가능한 규칙으로 남기는 데 있습니다.
+
+### 시나리오 D — 성능과 정확도 균형 점검
+
+아래 표 형식으로 현재 선택을 정리하면 의사결정이 명확해집니다.
+
+| 항목 | 현재 선택 | 대안 | 트레이드오프 |
+| --- | --- | --- | --- |
+| 정확도 | 엄격 검증 | 완화 검증 | 오류 감소 vs 처리량 |
+| 속도 | 전수 계산 | 샘플링 | 신뢰도 vs 지연 |
+| 메모리 | 캐시 적극 사용 | 계산 재수행 | 비용 vs 응답속도 |
+| 복잡도 | 단순 구현 | 수학 최적화 | 유지보수 vs 성능 |
+
+이 표를 업데이트하면서 팀이 같은 기준으로 토론하면, 개인 직관에 의존한 논쟁이 줄어듭니다.
+
+### 시나리오 E — 장기 학습 루프
+
+- 매주 한 개념을 선택해 15줄 내외의 파이썬 예제로 재구현합니다.
+- 예제를 한 문장 명제로 요약합니다.
+- 반례를 최소 1개 찾습니다.
+- 다음 주 예제와 연결되는 질문을 남깁니다.
+
+장기적으로는 이 루프가 개인 위키가 됩니다. 시리즈를 한 번 읽고 끝내는 대신, 각 장의 핵심을 실행 가능한 지식으로 축적할 수 있습니다.
+
+이 섹션은 분량 보강용이 아니라 재사용 가능한 작업 템플릿입니다. 실제 팀 문서, 코드 리뷰, 회고 문서에 그대로 가져다 쓸 수 있도록 의도적으로 일반화했습니다.
+
+### 인접 리스트와 인접 행렬 구현 비교
+
+그래프 표현을 선택할 때는 데이터 밀도를 먼저 봐야 합니다. 대부분의 서비스 그래프는 희소하므로 인접 리스트가 기본 선택입니다.
+
+```python
+def to_adj_list(edges):
+    g = {}
+    for u, v in edges:
+        g.setdefault(u, []).append(v)
+        g.setdefault(v, [])
+    return g
+
+def to_adj_matrix(nodes, edges):
+    idx = {n: i for i, n in enumerate(nodes)}
+    n = len(nodes)
+    m = [[0] * n for _ in range(n)]
+    for u, v in edges:
+        m[idx[u]][idx[v]] = 1
+    return m
+```
+
+인접 행렬은 간선 존재 조회가 O(1)이라 장점이 있지만, 메모리 O(V^2) 부담이 큽니다. 인접 리스트는 순회가 자연스럽고 저장 비용이 O(V+E)라 실무에서 유리합니다.
+
+### BFS/DFS 구현과 쓰임새
+
+```python
+from collections import deque
+
+def bfs(graph, start):
+    seen, q, order = {start}, deque([start]), []
+    while q:
+        v = q.popleft()
+        order.append(v)
+        for nxt in graph.get(v, []):
+            if nxt not in seen:
+                seen.add(nxt)
+                q.append(nxt)
+    return order
+
+def dfs(graph, start):
+    seen, stack, order = set(), [start], []
+    while stack:
+        v = stack.pop()
+        if v in seen:
+            continue
+        seen.add(v)
+        order.append(v)
+        for nxt in reversed(graph.get(v, [])):
+            if nxt not in seen:
+                stack.append(nxt)
+    return order
+```
+
+BFS는 최단 간선 수 거리, DFS는 경로 존재성/사이클 탐지에 강합니다. 문제 성격에 따라 탐색 전략을 바꿔야 합니다.
+
+### 그래프 응용 분야 매핑
+
+| 분야 | 그래프 모델 | 대표 알고리즘 | 검증 포인트 |
+| --- | --- | --- | --- |
+| 빌드 시스템 | 의존성 DAG | 위상 정렬 | 순환 의존성 없음 |
+| 소셜 네트워크 | 사용자-관계 그래프 | 중심성, 커뮤니티 탐지 | 연결 편향 점검 |
+| 네트워크 라우팅 | 라우터-링크 그래프 | 다익스트라 | 장애 시 대체 경로 |
+| 보안 | 권한 전파 그래프 | 도달성 분석 | 권한 상승 경로 차단 |
+
+그래프를 배우는 핵심은 알고리즘 이름 암기가 아니라 문제를 관계 모델로 재서술하는 능력입니다.
+
 ## 처음 질문으로 돌아가기
 
 - **관계가 있는 데이터를 왜 그래프로 표현할까요?**

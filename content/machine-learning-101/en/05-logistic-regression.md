@@ -40,12 +40,9 @@ This is post 5 in the Machine Learning 101 series. Here we will treat logistic r
 
 This picture places Logistic Regression inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-
 ## Why It Matters
 
 Logistic regression is the standard classification baseline. It is interpretable, fast, and stays competitive on imbalanced data when you tune the threshold.
-
-## Concept at a Glance
 
 ## Key Terms
 

@@ -40,12 +40,9 @@ This is post 8 in the Machine Learning 101 series. Here we will diagnose underfi
 
 This picture places Overfitting and Regularization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-
 ## Why It Matters
 
 Half of every model improvement is regularization. The more capacity a model has, the more regularization keeps it alive.
-
-## Concept at a Glance
 
 ## Key Terms
 

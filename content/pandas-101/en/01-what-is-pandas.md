@@ -50,8 +50,6 @@ CSV, Excel, databases, APIs — *80% of real-world data* is *tabular*. If you ca
 
 > *If your data fits in memory, Pandas is usually the right answer.*
 
-## Concept at a Glance
-
 ## Key Terms
 
 - **Series**: a *1D labeled array*.

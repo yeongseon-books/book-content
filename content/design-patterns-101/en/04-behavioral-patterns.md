@@ -43,15 +43,11 @@ In this post, we'll use behavioral patterns as a shared language for object coop
 
 This picture places Behavioral Patterns inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Behavioral Patterns is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Cooperation between objects quickly hardens into piles of if/elif. Behavioral patterns give that cooperation a *name* and a *shape*.
 
 > Turn flow into objects and the flow becomes testable.
-
-## Concept at a Glance
 
 ## Key Terms
 

@@ -43,8 +43,6 @@ This is post 9 in the Operating Systems 101 series. It explains the user/kernel 
 
 This picture places System Calls inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of System Calls is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - What is the real difference between user space and kernel space?
@@ -64,8 +62,6 @@ This picture places System Calls inside an operating flow. The point is not to m
 Two programs processing the same 100MB of data can be many times faster or slower depending only on syscall count. Container security (seccomp), debugging (strace), and performance analysis (perf) all operate at the syscall layer. Without understanding syscalls, half of what happens on top of the OS is invisible to you.
 
 > A system call is the only contract between user code and the kernel, and the count and cost of those calls largely set the system's performance.
-
-## Concept at a Glance
 
 > User space is where ordinary programs run; kernel space is where the OS core runs. There is a privilege boundary between them, and user code can only enter the kernel through the narrow entry of a system call. Each entry pays for context switching and security checks, which is why it costs.
 

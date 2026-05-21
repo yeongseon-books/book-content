@@ -39,8 +39,6 @@ This is the first post in the Korean AI Stack 101 series. Here, we build a repro
 
 This picture places Korean embedding models compared — KoSimCSE, BGE-M3, Solar inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Korean embedding models compared — KoSimCSE, BGE-M3, Solar is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Core flow
 
 ---

@@ -45,8 +45,6 @@ This is the final post in the Database Systems 101 series.
 
 This picture places OLTP and OLAP inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of OLTP and OLAP is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The fundamental difference between OLTP and OLAP workloads
@@ -59,8 +57,6 @@ This picture places OLTP and OLAP inside an operating flow. The point is not to 
 Operational databases get crushed by analytical queries all the time. One big aggregation grabs locks, blows away the cache, and hurts everyone else. Knowing the OLTP/OLAP split lets you immediately decide "where does this query belong?"
 
 > Putting operations and analytics in the same system is convenient short term, but the two workloads almost always sabotage each other.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR

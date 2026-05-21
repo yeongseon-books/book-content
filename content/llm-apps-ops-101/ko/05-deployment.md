@@ -274,6 +274,93 @@ curl --fail -H "Content-Type: application/json" -d '{"message":"Explain Python a
 
 다음 글에서는 모니터링, 비용, 품질, 보안을 한 요청 경로 위에 묶어 통합 운영 파이프라인으로 마무리하겠습니다.
 
+### 운영용 Dockerfile 보강 포인트
+
+앞선 Dockerfile은 학습용 최소 예제입니다. 실제 운영에서는 이미지 크기, 보안, 시작 속도를 함께 고려해야 합니다. 특히 루트 사용자로 실행하지 않고, 헬스체크를 이미지에 내장하면 오케스트레이터가 비정상 인스턴스를 더 빠르게 감지할 수 있습니다.
+
+```dockerfile
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /app
+RUN useradd -m appuser
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY main.py .
+USER appuser
+
+EXPOSE 8000
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
+  CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=2)"
+
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+이 구성은 Kubernetes, ECS, ACA 같은 환경에서 동일한 신호를 제공합니다. 앱 내부 `/health`와 컨테이너 `HEALTHCHECK`가 일치하면 장애 분석 시 관측 지점이 분리되지 않습니다.
+
+### readiness를 고려한 health endpoint 확장
+
+운영에서는 단순 liveness와 readiness를 분리하는 편이 안전합니다. 프로세스는 살아 있어도 모델 클라이언트 초기화가 실패한 상태일 수 있기 때문입니다.
+
+```python
+@app.get("/health/live")
+async def health_live() -> dict:
+    return {"status": "alive"}
+
+@app.get("/health/ready")
+async def health_ready() -> dict:
+    client_ready = hasattr(app.state, "client") and app.state.client is not None
+    return {
+        "status": "ready" if client_ready else "not_ready",
+        "model": MODEL,
+        "provider": "groq",
+    }
+```
+
+`/health/live`는 프로세스 생존만, `/health/ready`는 외부 의존성 준비 상태까지 포함하도록 나누면 롤링 업데이트 중 트래픽 유입 타이밍을 더 정확히 제어할 수 있습니다.
+
+### 블루-그린 배포 설정 예시
+
+LLM 앱은 모델 버전, 프롬프트 버전, SDK 버전이 동시에 바뀌기 쉽기 때문에 롤백 가능한 배포 전략이 특히 중요합니다. 블루-그린은 가장 해석이 쉬운 전략 중 하나입니다.
+
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: llm-chat
+spec:
+  replicas: 4
+  strategy:
+    blueGreen:
+      activeService: llm-chat-active
+      previewService: llm-chat-preview
+      autoPromotionEnabled: false
+      scaleDownDelaySeconds: 60
+  selector:
+    matchLabels:
+      app: llm-chat
+  template:
+    metadata:
+      labels:
+        app: llm-chat
+    spec:
+      containers:
+        - name: app
+          image: ghcr.io/example/llm-chat:2026-05-14
+          ports:
+            - containerPort: 8000
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 8000
+```
+
+이 방식에서는 preview 서비스에서 `/chat` self-test를 먼저 수행하고, 통과 시점에만 active로 승격합니다. 승격 후 오류율이나 P95 지연 시간이 임계치를 넘으면 즉시 블루로 되돌리는 절차를 자동화해 두는 편이 좋습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **배포 전 self-test는 왜 health check와 실제 chat 요청을 함께 검증해야 할까요?**

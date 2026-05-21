@@ -52,8 +52,6 @@ Choosing a distribution gives you more than one probability. It gives you a whol
 
 > Discrete distributions are reusable models for counted outcomes. Much of the work is deciding which process your data actually came from.
 
-## Concept at a Glance
-
 ## Key Terms
 
 - **Bernoulli(p)**: a single 0/1 trial. E=p, Var=p(1-p).

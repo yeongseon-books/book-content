@@ -40,10 +40,6 @@ last_reviewed: '2026-05-12'
 
 *Algorithms with Python 101 8장 흐름 개요*
 
-이 그림에서는 최단 경로 기초를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 최단 경로 기초의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 중요한가
 
 내비게이션, 네트워크 라우팅, 물류 최적화는 모두 가중치 그래프의 최단 경로 문제입니다. 다익스트라는 이 문제를 효율적으로 푸는 가장 기본적인 도구입니다.
@@ -361,5 +357,7 @@ for condition, algorithm in comparison:
 - [Python Documentation — heapq](https://docs.python.org/3/library/heapq.html)
 - [Visualgo — Single-Source Shortest Path](https://visualgo.net/en/sssp)
 - [Real Python — Priority Queue in Python](https://realpython.com/python-heapq-module/)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/algorithms-python-101/ko/08-shortest-path-basics)
 
 Tags: Python, Algorithms, Shortest Path, Dijkstra, heapq

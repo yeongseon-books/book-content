@@ -41,8 +41,6 @@ Here, we will focus on tool use, function calling, and the boundary between mode
 
 This picture places First steps with AI agents — making the model use tools inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of First steps with AI agents — making the model use tools is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Chatbot versus agent
 
 A normal chatbot generates text from the information already available in the prompt or the model weights. An agent goes one step further. It can decide that a tool is needed, request the tool call, read the result, and then continue.

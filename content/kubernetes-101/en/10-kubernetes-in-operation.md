@@ -44,13 +44,9 @@ Here, we will connect probes, RBAC, network boundaries, observability, GitOps, a
 
 This picture places Kubernetes in Operation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Kubernetes in Operation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 *Functionally working* and *staying up overnight without issues* are different. *Operability* is *service trust*.
-
-## Concept at a Glance
 
 ## Key Terms
 

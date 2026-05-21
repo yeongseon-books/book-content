@@ -51,8 +51,6 @@ Methods and status codes drive the *branching logic* on the client. Return the w
 
 > A status code is not a *number*. It is a *contract*.
 
-## Concept at a Glance
-
 Clients make retry, caching, and UX decisions from that pair first. If you design them separately, the syntax may still be valid HTTP, but the integration experience becomes fragile very quickly.
 
 ## Key Terms

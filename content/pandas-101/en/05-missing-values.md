@@ -48,8 +48,6 @@ This picture places Handling Missing Values inside an operating flow. The point 
 
 Real data is *full of missing values*. How you handle them decides *model performance* and *analysis credibility*.
 
-## Concept at a Glance
-
 ## Key Terms
 
 - **NaN**: *Not a Number* — *float* missing marker.

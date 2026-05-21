@@ -45,13 +45,13 @@ In this chapter, we treat the registry as the center of deployment identity, cov
 
 This picture places Registry inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Registry is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A registry is not a backup folder; it is the distribution contract that binds tags, digests, manifests, and policy into one reproducible handoff.
 
 ## Why It Matters
 
 A reproducible image is useless if there is *no place to fetch it from*. *Deployment starts at the registry.*
 
-## Concept at a Glance
+Tags are human-friendly labels; digests are content-based hashes. The same tag can point to different digests over time, but a digest always refers to the exact same bytes. Private registries add authentication and network isolation; public ones rely on image content and scanning.
 
 ## Key Terms
 

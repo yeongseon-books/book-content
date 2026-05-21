@@ -147,6 +147,114 @@ scrape_configs:
 
 로그는 많이 남기는 것보다 다시 읽을 수 있게 남기는 것이 중요합니다. 구조와 필드, 쿼리 가능성이 그 핵심입니다.
 
+## 로그 레벨 기준
+
+로그 레벨은 심각도와 용도를 결정합니다. 아래 표는 각 레벨을 언제 사용하고, 프로덕션 환경에서 활성화할지 정리한 것입니다.
+
+| 레벨 | 용도 | 프로덕션 활성화 |
+| --- | --- | --- |
+| DEBUG | 상세한 디버깅 정보, 변수 값 | 기본 OFF (일시적 ON 가능) |
+| INFO | 정상적인 흐름, 사용자 행동 | ON |
+| WARNING | 문제는 아니지만 주의 필요 | ON |
+| ERROR | 기능 실패, 예외 발생 | ON |
+| CRITICAL | 시스템 전체 중단 가능한 상황 | 항상 ON |
+
+DEBUG 레벨은 개발 환경에서는 유용하지만, 프로덕션에서 계속 켜 두면 비용과 노이즈가 폭증합니다. INFO 이상만 활성화하고, 필요할 때만 일시적으로 DEBUG를 켜는 구조가 바람직합니다.
+
+## Python structlog 예제
+
+구조화 로그를 바로 적용할 수 있는 Python structlog 설정 예제입니다.
+
+```python
+import structlog
+from structlog.processors import JSONRenderer
+from structlog.contextvars import merge_contextvars
+
+# Configure structured logging
+structlog.configure(
+    processors=[
+        structlog.contextvars.merge_contextvars,
+        structlog.processors.add_log_level,
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.processors.StackInfoRenderer(),
+        structlog.processors.format_exc_info,
+        JSONRenderer()
+    ],
+    wrapper_class=structlog.make_filtering_bound_logger(logging.INFO),
+    context_class=dict,
+    logger_factory=structlog.PrintLoggerFactory(),
+    cache_logger_on_first_use=True,
+)
+
+log = structlog.get_logger()
+
+# Usage example
+@app.post("/orders")
+async def create_order(order: Order, request: Request):
+    request_id = request.headers.get("X-Request-ID")
+    structlog.contextvars.bind_contextvars(
+        request_id=request_id,
+        user_id=order.user_id
+    )
+    
+    log.info("order.create.start", order_id=order.id, amount=order.amount)
+    
+    try:
+        result = await process_order(order)
+        log.info("order.create.success", order_id=order.id)
+        return result
+    except Exception as e:
+        log.error("order.create.failed", order_id=order.id, error=str(e))
+        raise
+```
+
+이 코드는 모든 로그를 JSON 형식으로 출력하고, request ID와 user ID를 각 로그 항목에 자동으로 포함시킵니다. 나중에 특정 요청이나 사용자의 행동을 추적할 때 매우 유용합니다.
+
+## 로그 파이프라인
+
+로그는 수집부터 검색까지 여러 단계를 거칩니다. 전체 흐름을 이해해야 병목 지점을 찾을 수 있습니다.
+
+### 수집 (Collection)
+
+애플리케이션은 stdout으로 로그를 내보냅니다. 컨테이너 런타임이 이를 수집하고, Promtail 같은 에이전트가 가져갑니다.
+
+```yaml
+# Promtail config
+scrape_configs:
+  - job_name: docker
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+    relabel_configs:
+      - source_labels: ['__meta_docker_container_name']
+        target_label: 'container'
+      - source_labels: ['__meta_docker_container_log_stream']
+        target_label: 'stream'
+```
+
+### 전송 (Shipping)
+
+수집된 로그는 중앙 저장소로 전송됩니다. 네트워크 지연이나 장애에 대비해 버퍼와 재시도 로직이 필요합니다.
+
+### 저장 (Storage)
+
+Loki나 Elasticsearch가 로그를 저장하고 인덱싱합니다. 보존 기간을 정해야 저장 비용을 관리할 수 있습니다.
+
+```yaml
+# Loki retention
+limits_config:
+  retention_period: 30d
+```
+
+### 검색 (Search)
+
+운영자는 Grafana나 Kibana를 통해 로그를 검색합니다. 구조화된 필드가 있어야 빠른 필터링이 가능합니다.
+
+```text
+{service="api", level="error", user_id="12345"} | json | line_format "{{.timestamp}} {{.msg}}"
+```
+
+이 네 단계가 모두 원활하게 작동해야 장애 시점에 빠른 분석이 가능합니다. 어느 한 단계라도 병목이 생기면 전체 파이프라인이 느려집니다.
+
 ## 자주 하는 실수 5가지
 
 1. **프로덕션에서 DEBUG 로그를 계속 켜 두는 실수**입니다. 비용과 노이즈가 함께 폭증합니다.
@@ -185,6 +293,83 @@ scrape_configs:
 ## 정리 및 다음 단계
 
 로그는 시스템을 시간을 거슬러 읽게 해 주는 기록입니다. 다음 글에서는 로그와 메트릭, 절차를 묶어 실제 장애에 대응하는 방법을 다룹니다.
+
+## 로그 분석을 장애 복구 속도로 연결하는 설계
+
+로그는 관측성의 마지막 근거입니다. 메트릭이 "어디가 나쁘다"를 보여 준다면 로그는 "왜 나쁜가"를 설명합니다. 따라서 로그 설계는 출력 형식보다 검색 전략, 필드 표준, 보존 정책이 먼저 합의되어야 합니다.
+
+### 로깅 스택 비교표
+
+| 항목 | ELK | Loki |
+| --- | --- | --- |
+| 저장 모델 | 전문 텍스트 인덱싱 | 라벨 기반 인덱싱 |
+| 장점 | 강력한 검색/집계 | 비용 효율, Grafana 통합 |
+| 주의점 | 운영 복잡도와 비용 증가 | 라벨 설계 실패 시 검색 한계 |
+| 적합 상황 | 복잡한 로그 분석 요구 | 메트릭+로그 통합 관측 |
+
+### 구조화 로그 필드 표준 예시
+
+| 필드 | 설명 |
+| --- | --- |
+| timestamp | RFC3339 시각 |
+| level | info/warn/error |
+| service | 서비스 이름 |
+| env | 실행 환경 |
+| request_id | 요청 추적 키 |
+| trace_id | 분산 추적 연계 키 |
+| message | 이벤트 설명 |
+
+### Python 구조화 로깅 예시
+
+```python
+import structlog
+
+structlog.configure(
+    processors=[
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.processors.JSONRenderer(),
+    ]
+)
+
+log = structlog.get_logger()
+log.info("payment.authorized", service="api", env="prod", request_id="req-123")
+```
+
+### Trivy 로그 기반 보안 이벤트 연계 예시
+
+```yaml
+security_pipeline:
+  sast:
+    tool: semgrep
+  dast:
+    tool: zap
+  image_scan:
+    tool: trivy
+    fail_on: [HIGH, CRITICAL]
+```
+
+로그 파이프라인과 보안 파이프라인을 연결하면 취약점 탐지 이벤트를 운영 로그와 같은 채널에서 추적할 수 있습니다.
+
+### Loki 수집 설정 예시
+
+```yaml
+scrape_configs:
+  - job_name: containers
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+    relabel_configs:
+      - source_labels: [__meta_docker_container_name]
+        target_label: container
+```
+
+### 운영 규칙
+
+1. PII는 애플리케이션 계층에서 마스킹합니다.
+2. 로그 레벨 정책을 서비스 공통 규칙으로 둡니다.
+3. 장애 빈도가 높은 이벤트에 대해 저장 기간을 길게 유지합니다.
+4. 주간으로 "자주 사용하는 쿼리"를 팀 위키에 축적합니다.
+
+결국 로그 품질은 장애 대응 품질과 같습니다. 같은 사건을 더 빠르게 재구성할 수 있을수록 MTTR이 줄어듭니다.
 
 ## 처음 질문으로 돌아가기
 

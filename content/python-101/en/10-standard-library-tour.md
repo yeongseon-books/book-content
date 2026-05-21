@@ -42,8 +42,6 @@ This post is the final article in the Python 101 series. This is the final stop 
 
 This picture places Standard library tour: datetime, pathlib, json, collections, itertools inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Standard library tour: datetime, pathlib, json, collections, itertools is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 Python is often described as "batteries included" — many of the tools you reach for daily are part of the standard library. Getting comfortable with it changes a few things.

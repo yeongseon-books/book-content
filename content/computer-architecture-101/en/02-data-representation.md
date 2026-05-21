@@ -45,8 +45,6 @@ This is post 2 in the Computer Architecture 101 series.
 
 This picture places Data Representation — Bit, Byte, Integer, Floating Point inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Data Representation — Bit, Byte, Integer, Floating Point is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The definitions of bit, byte, and word
@@ -59,8 +57,6 @@ This picture places Data Representation — Bit, Byte, Integer, Floating Point i
 If you do not understand representation, you meet the most common bugs head-on. Integer overflow vulnerabilities, accounting systems that fail because of float comparison, permission errors from a wrong bitmask — all of them come from ignoring the layer below the type. Every variable in every language is, in the end, a bit pattern in memory.
 
 > Integers are exact but finite. Floats are wide but imprecise. Both must be used with their limits in mind.
-
-## Concept at a Glance
 
 > A bit is 0 or 1; a byte is 8 bits. Integers are stored as unsigned or two's complement. Real numbers follow IEEE 754: sign, exponent, and mantissa. Single precision (float32) and double precision (float64) trade range for precision.
 

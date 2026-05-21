@@ -45,8 +45,6 @@ This is post 8 in the Computer Networks 101 series.
 
 This picture places Load Balancer inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Load Balancer is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The difference between an L4 LB and an L7 LB
@@ -59,8 +57,6 @@ This picture places Load Balancer inside an operating flow. The point is not to 
 A load balancer is more than a distributor — it is the device that decides reliability and deployment strategy. Blue-green deploys, canary releases, region failover, and autoscaling all happen on top of the LB. One wrong line in a health check sends traffic to a dead server or removes a healthy one entirely.
 
 > A load balancer is not a tool for picking the "best" server. It is a tool for picking a "good enough, live" server quickly.
-
-## Concept at a Glance
 
 An L4 LB sees only TCP flows. An L7 LB balances per HTTP request.
 

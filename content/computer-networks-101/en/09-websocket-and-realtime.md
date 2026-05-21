@@ -45,8 +45,6 @@ This is post 9 in the Computer Networks 101 series.
 
 This picture places WebSocket and Real-Time Communication inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of WebSocket and Real-Time Communication is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - How a WebSocket connection is upgraded from HTTP
@@ -59,8 +57,6 @@ This picture places WebSocket and Real-Time Communication inside an operating fl
 Dashboards, chat, games, market feeds, collaborative editing — all of them depend on the server speaking first. Faking this with plain HTTP forces you into polling and long-polling, both of which waste resources. Once you understand WebSocket, you also know when **not** to use it: many "real-time" UIs are perfectly happy with a 5-second refresh.
 
 > "Real time" usually means "shorter than a human's patience." If 200 ms is fine, WebSocket only adds cost.
-
-## Concept at a Glance
 
 The pivot is **101 Switching Protocols**. The connection starts as HTTP and, after the response, behaves as a stream of WebSocket frames instead.
 

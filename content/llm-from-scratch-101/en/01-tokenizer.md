@@ -49,8 +49,6 @@ This is the first article in the LLM from Scratch 101 series.
 
 This picture places Turning Text into Numbers inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Turning Text into Numbers is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why Can't We Just Input Text?
 
 Neural networks process tensors. You can't perform addition or matrix multiplication on a string. To process a line like "To be, or not to be," we first have to convert it into numbers. These numbers are called Token IDs.

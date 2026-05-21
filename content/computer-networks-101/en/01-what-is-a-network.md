@@ -45,8 +45,6 @@ This is the first post in the Computer Networks 101 series.
 
 This picture places What Is a Network? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is a Network? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The difference between a network and the Internet
@@ -59,8 +57,6 @@ This picture places What Is a Network? inside an operating flow. The point is no
 Open any networking book and a flood of acronyms appears at once: IP, TCP, UDP, DNS, HTTP, TLS, BGP, NAT. If you memorize them without a mental picture, you cannot see how they connect, and you forget all of them. The layered model is the bookshelf where these words go. Without a shelf, the books pile on the floor and never come out again.
 
 > Learning networking is not memorizing new words. It is deciding which shelf each word belongs on.
-
-## Concept at a Glance
 
 > Data is cut into small units called packets and pushed through the network. At each layer, a different kind of agreement takes responsibility — physical signals, frames between adjacent devices, packets routed worldwide, reliable connections, and finally meaningful messages such as HTTP requests. That division of labor is the layered model.
 

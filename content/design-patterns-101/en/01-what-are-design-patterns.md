@@ -43,15 +43,11 @@ In this post, we'll treat design patterns not as an answer catalog but as shared
 
 This picture places What Are Design Patterns? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Are Design Patterns? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Patterns are vocabulary, not answers. The biggest payoff is that "let's pull this into a Strategy" makes everyone in the room picture the same shape.
 
 > Patterns shine in conversation before they shine in code.
-
-## Concept at a Glance
 
 ## Key Terms
 

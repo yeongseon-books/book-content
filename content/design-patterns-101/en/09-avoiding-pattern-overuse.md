@@ -43,15 +43,11 @@ In this post, we'll focus on the difference between knowing patterns and using t
 
 This picture places Avoiding Pattern Overuse inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Avoiding Pattern Overuse is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Pre-applied patterns easily become misapplied patterns. A simple piece of code can grow until a pattern *emerges* — applying it then is not too late.
 
 > The best abstraction shows up *late*.
-
-## Concept at a Glance
 
 ## Key Terms
 

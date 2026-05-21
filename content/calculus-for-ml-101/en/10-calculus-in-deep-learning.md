@@ -44,8 +44,6 @@ In this post, we'll walk through the forward pass, loss computation, backward pa
 
 This picture places Calculus in Deep Learning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Calculus in Deep Learning is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - What stages make up the deep learning training loop, and where does calculus appear in each one?
@@ -57,8 +55,6 @@ This picture places Calculus in Deep Learning inside an operating flow. The poin
 ## Why It Matters
 
 This *capstone* synthesizes the series and lets you implement the *common skeleton* shared by every ML training run.
-
-## Concept at a Glance
 
 ## Key Terms
 

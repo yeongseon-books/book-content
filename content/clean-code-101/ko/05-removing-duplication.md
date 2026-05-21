@@ -41,9 +41,11 @@ last_reviewed: '2026-05-15'
 
 *Clean Code 101 5장 흐름 개요*
 
-이 그림에서는 중복 제거를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+이 그림은 중복 제거의 동스턴 동스턴 동스턴 동스턴 동스턴 동스턴
+중복 제거의 동스턴 동스턴 동스턴 동스턴 동스턴 동스턴 동스턴 동스턴 동스턴 동스턴 동스턴 동스턴 동스턴 동스턴 동스턴 동스턴
+중복 단순히 같은 이윤으로 바뀌는 나머지는 버망 처럼 처기 이위로 스도록 한다. 한 곳을 고친고 다른 곳을 놓친는 순간, 시스템에는 서로 다른 진실이 생깁니다.
 
-> 중복 제거의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+> 같은 이유로 바뀌는 중복만 추출해야 하나의 진실한 출처가 생깁니다.
 
 ## 왜 중요한가
 
@@ -206,6 +208,119 @@ API 정책, 폼 검증 규칙, 요금제 정보처럼 사실상 데이터인 영
 ## 정리 및 다음 단계
 
 DRY는 코드 줄 수가 아니라 변화의 출처를 하나로 유지하는 원칙입니다. 다음 글에서는 또 다른 부패 지점인 오류 처리를 정리합니다.
+
+
+## 중복 제거 기법을 단계별로 적용하기
+
+중복 제거는 "한 번에 크게 추상화"가 아니라, 변경 이유를 확인하면서 작은 단계로 진행해야 안전합니다. 아래 표는 대표 기법과 적용 타이밍입니다.
+
+| 기법 | 언제 적용할까 | 기대 효과 | 실패 신호 |
+| --- | --- | --- | --- |
+| Extract Function | 로직이 동일하고 맥락도 유사할 때 | 재사용, 테스트 단순화 | 인자 폭증 |
+| Parameterize | 차이가 소수 값으로 표현될 때 | 분기 감소 | 의미 없는 플래그 증가 |
+| Template Method | 알고리즘 골격은 같고 일부 단계만 다를 때 | 공통 흐름 고정 | 상속 계층 비대화 |
+| Strategy | 정책 교체가 자주 필요할 때 | 확장 용이 | 객체 수 과도 증가 |
+| Data Table화 | 규칙이 사실상 데이터일 때 | 변경 리스크 감소 | 키 정합성 관리 실패 |
+
+중복 제거의 핵심 질문은 항상 같습니다. "이 둘은 정말 같은 이유로 바뀌는가?"
+
+## DRY 원칙 Python 코드 예시
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class PricingRule:
+    name: str
+    multiplier: float
+
+
+PRICING_RULES = {
+    "kr": PricingRule(name="kr", multiplier=1.10),
+    "jp": PricingRule(name="jp", multiplier=1.08),
+    "us": PricingRule(name="us", multiplier=1.07),
+}
+
+
+def apply_tax(base_price: int, country_code: str) -> int:
+    rule = PRICING_RULES[country_code]
+    return int(base_price * rule.multiplier)
+```
+
+세 나라 규칙을 함수 세 개로 복제하던 구조를 테이블 하나로 모으면, 정책 수정 위치가 단일화됩니다. 이때 검증도 쉬워집니다. 나라별 테스트는 입력 데이터만 바꿔 같은 함수를 검증하면 되기 때문입니다.
+
+## 우연한 유사성과 본질 중복을 가르는 기준
+
+1. 변경 이슈가 항상 같이 열리는가
+2. 도메인 용어가 동일한가
+3. 실패 시 영향 범위가 같은가
+4. 배포 타이밍이 같이 움직이는가
+
+```python
+def is_essential_duplication(
+    same_change_issue: bool,
+    same_domain_term: bool,
+    same_failure_impact: bool,
+    same_release_timing: bool,
+) -> bool:
+    score = sum([same_change_issue, same_domain_term, same_failure_impact, same_release_timing])
+    return score >= 3
+```
+
+위처럼 단순한 평가 함수를 팀 합의로 정해 두면, 중복 제거 여부를 빠르게 결정할 수 있습니다.
+
+## 잘못된 추상화를 되돌리는 기준
+
+추상화는 한 번 만들면 계속 유지해야 한다고 오해하기 쉽지만, 실제로는 되돌림도 중요한 리팩토링입니다. 아래 상황이면 Inline을 검토할 가치가 큽니다.
+
+- 공통 함수 인자가 5개 이상으로 증가함
+- 호출자 대부분이 더미 값을 넘김
+- 공통 로직보다 분기 처리 코드가 더 많아짐
+- 새 요구사항이 들어올 때마다 예외 플래그가 늘어남
+
+잘못된 추상화를 되돌리면 코드가 잠시 중복돼 보일 수 있지만, 변경 이유가 분리되면서 장기 비용은 오히려 내려갑니다.
+
+
+## 실무 적용 메모
+
+아래 메모는 팀 내 합의 문서에 그대로 옮겨 적어도 되는 수준의 운영 규칙입니다.
+
+1. 리뷰는 코드 스타일보다 변경 위험을 먼저 다룹니다.
+2. 규칙 위반은 사람 지적보다 자동화 전환을 우선합니다.
+3. 반복되는 설계 결함은 교육 과제가 아니라 구조 개선 과제로 등록합니다.
+4. 모든 개선은 테스트와 함께 진행하며, 동작 변경 여부를 PR 설명에 명시합니다.
+5. 다음 분기 목표에는 "새 기능 수"와 함께 "변경 비용 감소 지표"를 반드시 포함합니다.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class QualityGate:
+    has_tests: bool
+    has_clear_names: bool
+    has_boundary_error_handling: bool
+    has_small_functions: bool
+    has_review_notes: bool
+
+
+def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
+    missing = []
+    if not gate.has_tests:
+        missing.append("tests")
+    if not gate.has_clear_names:
+        missing.append("naming")
+    if not gate.has_boundary_error_handling:
+        missing.append("error-boundary")
+    if not gate.has_small_functions:
+        missing.append("function-size")
+    if not gate.has_review_notes:
+        missing.append("review-notes")
+    return len(missing) == 0, missing
+```
+
+이 체크 함수는 단순하지만, 품질 기준을 코드로 표현하는 출발점이 됩니다. 팀이 기준을 말로만 합의하면 시간이 지나며 흐려집니다. 반대로 코드와 템플릿과 자동화 규칙으로 남기면 신규 멤버가 들어와도 동일한 기준이 유지됩니다.
+
+또한 개선 활동은 단발성 이벤트가 아니라 루프여야 합니다. 한 번의 대청소보다 매 PR마다 작은 개선을 추가하는 편이 장기적으로 더 강합니다. 이름 하나, 함수 하나, 분기 하나를 매번 더 낫게 만드는 습관이 쌓이면 코드베이스의 평균 품질이 올라가고, 장애 대응 속도도 실제로 빨라집니다.
 
 ## 처음 질문으로 돌아가기
 

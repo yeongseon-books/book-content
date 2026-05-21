@@ -305,4 +305,6 @@ def gate(deltas):
 - [FAISS documentation](https://faiss.ai/)
 - [GitHub Actions](https://docs.github.com/en/actions)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/rag-benchmark-101/ko/06-benchmark-complete)
+
 Tags: RAG, VectorDB, Benchmarking, LLM

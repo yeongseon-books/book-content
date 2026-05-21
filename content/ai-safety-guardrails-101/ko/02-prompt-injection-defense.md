@@ -327,4 +327,6 @@ Prompt injection은 결국 텍스트 분류 문제가 아니라 시스템 경계
 - [LLM 앱 운영 101 — LLM 앱 보안](../../llm-apps-ops-101/ko/04-security.md)
 - [LLM API 프로덕션 101 — 재시도와 오류 처리](../../llm-api-production-101/ko/05-retry-and-error-handling.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-safety-guardrails-101/ko/02-prompt-injection-defense)
+
 Tags: AI Safety, Prompt Injection, Guardrails, Red Team

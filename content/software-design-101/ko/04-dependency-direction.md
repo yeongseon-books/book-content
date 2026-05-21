@@ -41,10 +41,6 @@ last_reviewed: '2026-05-15'
 
 *Software Design 101 4장 흐름 개요*
 
-이 그림에서는 의존성 방향를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 의존성 방향의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 중요한가
 
 코드는 결국 그래프입니다. 한 모듈이 다른 모듈을 import하거나 호출하면 둘 사이에는 화살표가 생깁니다. 그 화살표가 불안정한 세부를 향하면 작은 변경도 핵심 규칙으로 쉽게 번집니다.
@@ -213,6 +209,110 @@ infra  -> domain          # 기대하는 방향
 의존성 방향이 맞으면 변경 비용은 줄어듭니다. 코어가 세부 구현을 모르게 만들수록 시스템은 더 오래 자유를 유지합니다. 포트와 어댑터는 그 자유를 코드로 구현하는 실용적인 도구입니다.
 
 다음 글에서는 이 방향을 더 안정적으로 붙잡아 두는 수단, 인터페이스와 추상화를 다룹니다.
+
+## 설계 경계를 코드로 내리는 추가 예시
+
+실무에서 설계 논의가 길어지는 이유는 "모듈 경계"가 문장으로만 남기 쉽기 때문입니다. 경계를 글로 합의한 뒤 코드로 고정하지 않으면 다음 기능을 붙이는 순간 경계가 다시 흐려집니다. 그래서 설계 문서와 함께, 경계를 강제하는 최소한의 구조를 코드에 먼저 두는 방식이 안전합니다.
+
+### 모듈 경계 예시: 주문 결제 도메인
+
+아래 구조는 결제 정책, 결제 수단 어댑터, 외부 API 호출을 분리합니다. 핵심은 도메인 모듈이 인프라 구현을 직접 모르고, 인터페이스를 통해서만 협력한다는 점입니다.
+
+```text
+order/
+  domain/
+    payment_policy.py
+    ports.py
+  application/
+    checkout_service.py
+  infrastructure/
+    stripe_gateway.py
+    kakao_gateway.py
+```
+
+```python
+# domain/ports.py
+from typing import Protocol
+
+class PaymentGateway(Protocol):
+    def authorize(self, order_id: str, amount: int) -> str: ...
+    def capture(self, payment_id: str) -> None: ...
+
+class RiskChecker(Protocol):
+    def is_suspicious(self, user_id: str, amount: int) -> bool: ...
+```
+
+이렇게 포트를 먼저 정의하면 애플리케이션 계층은 "무엇을 요청하는가"만 알면 됩니다. Stripe, KakaoPay, 사내 결제 모듈처럼 구현체가 달라져도 애플리케이션 서비스의 제어 흐름은 유지됩니다. 변경 비용을 구현체 내부로 가두는 효과가 생깁니다.
+
+### 의존성 주입(DI) 예시: 생성 시점에서 연결
+
+```python
+# application/checkout_service.py
+from dataclasses import dataclass
+from domain.ports import PaymentGateway, RiskChecker
+
+@dataclass
+class CheckoutService:
+    gateway: PaymentGateway
+    risk_checker: RiskChecker
+
+    def checkout(self, order_id: str, user_id: str, amount: int) -> str:
+        if self.risk_checker.is_suspicious(user_id, amount):
+            raise ValueError("risk blocked")
+        payment_id = self.gateway.authorize(order_id, amount)
+        self.gateway.capture(payment_id)
+        return payment_id
+```
+
+```python
+# composition_root.py
+from application.checkout_service import CheckoutService
+from infrastructure.stripe_gateway import StripeGateway
+from infrastructure.simple_risk_checker import SimpleRiskChecker
+
+service = CheckoutService(
+    gateway=StripeGateway(api_key="masked"),
+    risk_checker=SimpleRiskChecker(),
+)
+```
+
+DI의 핵심은 프레임워크 사용 여부가 아니라 "조립 위치"를 분리하는 것입니다. 비즈니스 로직 내부에서 구현체를 `new` 하지 않으면 테스트에서 대체 객체를 넣기 쉬워지고, 운영에서 구현체 교체 시 영향 범위가 줄어듭니다.
+
+### 인터페이스 패턴: 정책 객체 분리
+
+가격 계산이나 할인 규칙은 가장 자주 바뀌는 영역입니다. 이 규칙을 서비스 코드 안에 `if` 체인으로 붙이면 기능은 빠르게 나오지만 변경 지점이 폭발합니다. 아래처럼 정책 인터페이스를 두면 규칙 추가를 클래스 추가로 제한할 수 있습니다.
+
+```python
+from typing import Protocol
+
+class DiscountPolicy(Protocol):
+    def discount(self, amount: int) -> int: ...
+
+class RatePolicy:
+    def __init__(self, rate: float) -> None:
+        self.rate = rate
+
+    def discount(self, amount: int) -> int:
+        return int(amount * self.rate)
+
+class FixedPolicy:
+    def __init__(self, fixed: int) -> None:
+        self.fixed = fixed
+
+    def discount(self, amount: int) -> int:
+        return min(self.fixed, amount)
+```
+
+정책 인터페이스를 쓰면 런타임 선택도 단순해집니다. 신규 캠페인 규칙은 기존 서비스 코드를 수정하기보다 새 정책 클래스를 추가하고 조립부에서 연결하면 끝납니다. 이 방식은 OCP를 실무적으로 지키는 가장 단순한 패턴입니다.
+
+### 경계 품질을 확인하는 운영 체크
+
+- 모듈 경계를 넘는 import가 늘어나는지 주간으로 확인합니다.
+- 애플리케이션 계층에서 인프라 타입을 직접 참조하는지 검사합니다.
+- 변경 요청 하나당 수정 파일 수를 기록해 경계 누수를 추적합니다.
+- 구현체 교체(예: 결제 게이트웨이 변경) 리허설을 분기마다 1회 실행합니다.
+
+설계는 문서에서 시작하지만, 유지보수성은 경계 강제 구조와 조립 규칙에서 결정됩니다. 경계를 합의한 다음 즉시 포트, 조립부, 테스트 대역을 갖춘 최소 코드를 두면 다음 변경에서 체감되는 비용 차이가 명확하게 나타납니다.
 
 ## 처음 질문으로 돌아가기
 

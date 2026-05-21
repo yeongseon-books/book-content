@@ -45,8 +45,6 @@ This is the final post in the Computer Networks 101 series.
 
 This picture places Debugging Network Problems inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Debugging Network Problems is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - A layer-by-layer approach to narrowing a network problem
@@ -59,8 +57,6 @@ This picture places Debugging Network Problems inside an operating flow. The poi
 Under pressure, the first instinct is "what did we just change?" That is necessary but not enough. Without knowing where the path breaks, code changes are guesses. The habit of confirming "this layer is fine" one step at a time is what lets you stay calm at 3 a.m.
 
 > Debugging is less about finding what is broken and more about **confirming, one layer at a time, what is fine**.
-
-## Concept at a Glance
 
 Each step you confirm as healthy cuts the hypothesis space roughly in half.
 

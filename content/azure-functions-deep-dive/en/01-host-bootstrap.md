@@ -45,8 +45,6 @@ This post focuses on one question: **what happens the moment a Function App inst
 
 This picture places Host Bootstrap — Following `WebJobsScriptHostService` inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Host Bootstrap — Following `WebJobsScriptHostService` is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## One Azure Functions host instance
 
 This is the map for the rest of the series.

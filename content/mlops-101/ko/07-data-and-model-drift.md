@@ -84,6 +84,75 @@ Before 상태에서는 문제 인지가 늦고 원인도 모호합니다. After 
 
 ---
 
+## 모델 레지스트리 기능 비교
+
+드리프트를 감지한 다음에는 재학습하고, 새 모델을 등록하고, 버전 간 비교가 필요합니다. 아래 표는 대표적인 모델 레지스트리 도구를 버전 관리, 스테이지 전환, 메타데이터, 접근 제어 기능으로 비교합니다.
+
+| 기능 | MLflow | Vertex AI Model Registry | SageMaker Model Registry |
+|---|---|---|---|
+| 버전 관리 | 자동 버전 번호 | 수동 + 자동 | 자동 버전 번호 |
+| 스테이지 전환 | Staging → Production | Undeployed → Deployed | Pending → Approved |
+| 메타데이터 | 태그, 설명, 링크 | 라벨, 설명 | 메타데이터 key-value |
+| 접근 제어 | 파일 기반 | IAM | IAM |
+
+MLflow는 로컬 개발부터 클라우드까지 일관되게 쓸 수 있고, Vertex AI와 SageMaker는 각각 GCP, AWS 생태계와 깊게 통합됩니다. 선택 기준은 클라우드 벤더 종속성, 팀 규모, 거버넝스 요구사항입니다.
+
+---
+
+## MLflow로 모델 등록과 스테이지 전환 예시
+
+드리프트가 감지된 후 새 모델을 학습하고 등록하면, 그 모델을 Staging으로 올리고 검증한 뒤 Production으로 승격시킬 수 있습니다.
+
+```python
+import mlflow
+from mlflow.tracking import MlflowClient
+
+# 1. 모델 등록
+mlflow.set_tracking_uri("http://localhost:5000")
+with mlflow.start_run():
+    mlflow.log_param("alpha", 0.5)
+    mlflow.log_metric("accuracy", 0.92)
+    mlflow.sklearn.log_model(model, "model")
+
+# 2. 레지스트리에 등록
+client = MlflowClient()
+model_uri = "runs:/<run_id>/model"
+mv = mlflow.register_model(model_uri, "risk_model")
+
+# 3. Staging으로 전환
+client.transition_model_version_stage(
+    name="risk_model",
+    version=mv.version,
+    stage="Staging",
+)
+
+# 4. 검증 후 Production으로 승격
+client.transition_model_version_stage(
+    name="risk_model",
+    version=mv.version,
+    stage="Production",
+)
+```
+
+이 흐름에서 중요한 점은 Staging 단계를 건너뛰지 않는 것입니다. Production으로 바로 올리면 검증 없이 배포되어, 드리프트보다 더 큰 성능 저하가 생길 수 있습니다.
+
+---
+
+## 모델 거버넝스
+
+드리프트 감지와 재학습이 자동화되면, 모델 버전이 빠르게 쌓입니다. 이때 거버넝스 체계가 없으면 어떤 모델이 언제 누구에 의해 승인되어 배포되었는지 추적하기 어려워집니다.
+
+모델 거버넝스의 핵심 요소는 다음과 같습니다.
+
+1. **승인 프로세스**: Production 승격에 리뷰어를 둡니다.
+2. **감사 로그**: 누가 언제 모델을 승격했는지 기록합니다.
+3. **링크**: 모델 버전과 학습 런, 데이터 버전을 연결합니다.
+4. **보유 기간**: 오래된 모델 버전을 언제 삭제할지 정책을 둡니다.
+
+거버넝스 없이 자동화만 하면, 모델 버전이 무늘려나고 문제가 생겨도 원인을 찾기 어렵습니다. 거버넝스는 자동화를 안전하게 만드는 제동 장치입니다.
+
+---
+
 ## PSI로 드리프트를 감지해 보겠습니다
 
 ### 1단계 — 기준 데이터와 현재 데이터를 준비합니다
@@ -172,6 +241,63 @@ def status(p_value, psi_value):
 5. **알림만 만들고 재학습 흐름과 연결하지 않습니다.**
    경고가 있어도 운영 루프가 닫히지 않습니다.
 
+## 대규모 데이터에서 드리프트 감지 최적화
+
+데이터가 커지면 모든 피처에 대해 PSI를 계산하는 비용이 커집니다. 이 경우 우선순위를 정해야 합니다.
+
+1. **핵심 피처**: 모델 성능에 가장 큰 영향을 주는 5-10개 피처를 먼저 감시합니다.
+2. **샘플링**: 전체 데이터가 아니라 대표 샘플로 PSI를 계산합니다.
+3. **주기 조정**: 매시간 대신 매일 또는 매주 검사합니다.
+4. **증분 계산**: 전체 데이터를 다시 읽지 않고, 새 데이터에 대해서만 PSI를 계산하고 이전 결과와 합칩니다.
+
+크기가 커지면 효율이 중요해집니다. 하지만 효율보다 민감도가 더 중요한 피처는 샘플링하지 말고 전체를 다 검사해야 합니다.
+
+---
+
+## 드리프트 감지 후 재학습 트리거
+
+드리프트를 감지했다고 무조건 재학습하는 것은 아닙니다. 드리프트가 실제 성능 저하로 이어지는지 확인해야 합니다.
+
+```python
+def should_retrain(psi: float, recent_accuracy: float, baseline_accuracy: float):
+    if psi > 0.2 and recent_accuracy < baseline_accuracy - 0.05:
+        return True
+    if psi > 0.3:
+        return True
+    return False
+```
+
+이 함수는 두 가지 조건을 봅니다. 첨째, PSI가 0.2를 넘고 정확도가 5%p 이상 떨어졌으면 재학습합니다. 둘째, PSI가 0.3을 넘으면 정확도와 무관하게 재학습합니다. 이 규칙은 팀에 맞게 조정해야 하지만, 중요한 것은 드리프트와 성능을 함께 보는 것입니다.
+
+---
+
+## 드리프트 감지 테스트
+
+드리프트 감지 코드도 테스트가 필요합니다. PSI 계산식이 올바른지, 임계값이 잘 작동하는지 확인해야 합니다.
+
+```python
+import pytest
+import numpy as np
+
+def test_psi_same_distribution():
+    base = np.random.normal(0, 1, 1000)
+    live = np.random.normal(0, 1, 1000)
+    assert psi(base, live) < 0.1
+
+def test_psi_shifted_distribution():
+    base = np.random.normal(0, 1, 1000)
+    live = np.random.normal(1, 1, 1000)
+    assert psi(base, live) > 0.2
+
+def test_status_logic():
+    assert status(0.001, 0.05) == "ok"
+    assert status(0.001, 0.15) == "watch"
+    assert status(0.001, 0.25) == "drift"
+```
+
+이 테스트는 PSI 계산이 같은 분포에서는 낮게, 다른 분포에서는 높게 나오는지 확인합니다. 또한 상태 판단 로직이 임계값을 올바르게 판단하는지 검증합니다. 드리프트 감지는 운영 코드이므로 테스트 커버리지가 중요합니다.
+
+---
 ---
 
 ## 실무에서는 이렇게 봅니다
@@ -200,6 +326,120 @@ def status(p_value, psi_value):
 드리프트 감지는 모델이 조용히 낡아 가는 과정을 조기에 드러내는 장치입니다. 입력 분포 변화와 실제 성능 저하를 구분해서 봐야 대응도 더 정확해집니다.
 
 이 글에서 기억할 핵심은 하나입니다. **데이터 드리프트는 먼저 오는 신호이고, 모델 드리프트는 그 신호가 만든 결과입니다.** 다음 글에서는 이 신호를 받아 실제로 모델을 다시 학습시키는 재학습 자동화를 다루겠습니다.
+
+
+## 드리프트 유형 비교와 대응 우선순위
+
+드리프트는 하나의 현상처럼 보이지만, 실제 대응은 유형마다 다릅니다.
+
+| 유형 | 무엇이 변했는가 | 빠른 감지 지표 | 우선 대응 |
+|---|---|---|---|
+| 데이터 드리프트 | 입력 분포 X | PSI, KS, 결측률 | 수집/전처리 경로 점검 |
+| 개념 드리프트 | X와 Y 관계 | 지연 라벨 기반 성능 하락 | 재학습 후보 생성 |
+| 예측 드리프트 | 출력 분포 P(y^) | 클래스 비율 변화, 점수 분포 | 서빙 버전/입력 분포 동시 점검 |
+
+운영에서는 데이터 드리프트를 조기 경보로, 개념 드리프트를 영향 확인 신호로 함께 보는 편이 효과적입니다.
+
+## KS 검정 실전 코드
+
+```python
+import numpy as np
+from scipy.stats import ks_2samp
+
+
+def ks_drift(reference: np.ndarray, current: np.ndarray, alpha: float = 0.01) -> dict:
+    stat, p = ks_2samp(reference, current)
+    return {
+        "ks_stat": float(stat),
+        "p_value": float(p),
+        "drift": bool(p < alpha),
+    }
+
+
+ref = np.random.normal(loc=0.0, scale=1.0, size=3000)
+cur = np.random.normal(loc=0.25, scale=1.0, size=3000)
+print(ks_drift(ref, cur))
+```
+
+KS는 연속형 피처에서 유용하지만, 범주형 피처에는 카이제곱 검정이나 Jensen-Shannon divergence 같은 대안을 검토해야 합니다.
+
+## 피처별 드리프트 집계 예시
+
+```python
+import pandas as pd
+
+
+def drift_report(df_ref: pd.DataFrame, df_cur: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
+    rows = []
+    for c in cols:
+        out = ks_drift(df_ref[c].to_numpy(), df_cur[c].to_numpy())
+        rows.append({"feature": c, **out})
+    return pd.DataFrame(rows).sort_values("p_value")
+```
+
+피처 단위 보고서가 있으면 어떤 입력 경로가 먼저 흔들렸는지 빠르게 좁힐 수 있습니다.
+
+## 드리프트 대응 런북 초안
+
+1. 드리프트 경고 발생 시 기준선과 현재 구간을 먼저 확인합니다.
+2. 수집 누락, 스키마 변경, 결측 증가 같은 데이터 경로 이상을 점검합니다.
+3. 모델 예측 분포와 비즈니스 지표를 함께 확인합니다.
+4. 영향이 크면 챌린저 재학습 파이프라인을 실행합니다.
+5. 승격 전까지는 챔피언 모델과 비교 결과를 문서화합니다.
+
+드리프트 감지는 통계 계산 자체보다 운영 흐름과 연결될 때 가치가 생깁니다.
+
+## KS 검정 배치 잡 예시
+
+운영에서는 단일 함수보다 배치 잡 형태가 더 유용합니다. 아래 예시는 기준 구간과 현재 구간을 읽어 KS 결과와 판정을 한 번에 남기는 형태입니다.
+
+```python
+from __future__ import annotations
+
+import json
+import numpy as np
+from scipy.stats import ks_2samp
+
+
+def evaluate_ks(reference: np.ndarray, current: np.ndarray, alpha: float = 0.01) -> dict:
+    stat, p_value = ks_2samp(reference, current)
+    return {
+        "ks_stat": float(stat),
+        "p_value": float(p_value),
+        "alpha": alpha,
+        "drift": bool(p_value < alpha),
+    }
+
+
+def run_batch(reference: np.ndarray, current: np.ndarray, feature_name: str) -> None:
+    result = evaluate_ks(reference, current)
+    payload = {
+        "feature": feature_name,
+        "sample_ref": int(reference.size),
+        "sample_cur": int(current.size),
+        **result,
+    }
+    print(json.dumps(payload, ensure_ascii=False))
+
+
+if __name__ == "__main__":
+    ref = np.random.normal(0.0, 1.0, 5000)
+    cur = np.random.normal(0.35, 1.0, 5000)
+    run_batch(ref, cur, "risk_score")
+```
+
+이 코드는 결과를 JSON 한 줄로 출력하므로, 로그 수집기나 경고 시스템과 연결하기 쉽습니다. 특히 `sample_ref`, `sample_cur`를 함께 남기면 샘플 수 부족으로 인한 오탐지를 빠르게 구분할 수 있습니다.
+
+## 드리프트 유형별 대응 전략
+
+| 드리프트 신호 | 1차 점검 | 2차 조치 | 재학습 여부 |
+|---|---|---|---|
+| PSI 급등, KS 유의 | 수집 경로/스키마 변경 확인 | 전처리 롤백 또는 결측 보정 | 조건부 |
+| 예측 점수 분포 이동 | 입력 분포와 서빙 버전 동시 점검 | 서빙 설정/피처 적재 지연 복구 | 조건부 |
+| 지연 라벨 성능 하락 | 라벨 품질/지연 시간 확인 | 챌린저 학습 및 오프라인 재평가 | 높음 |
+| 특정 세그먼트만 악화 | 세그먼트별 샘플 수 점검 | 세그먼트 전용 임계값 재설계 | 선택적 |
+
+운영팀은 통계량 자체보다 "경고 이후 무엇을 먼저 할지"를 표준화해야 합니다. 위 표처럼 1차 점검과 2차 조치를 분리하면, 같은 경고가 반복될 때 대응 속도와 일관성이 크게 좋아집니다.
 
 ## 처음 질문으로 돌아가기
 

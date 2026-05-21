@@ -39,10 +39,6 @@ last_reviewed: '2026-05-12'
 
 *Computer Architecture 101 10장 흐름 개요*
 
-이 그림에서는 성능을 이해하는 법를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 성능을 이해하는 법의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 중요한가
 
 성능은 모든 시스템의 기능입니다. 더 빠른 페이지는 더 많은 사용자를 붙잡고, 더 효율적인 배치는 더 적은 서버 비용으로 돌아가며, 더 낮은 지연은 더 좋은 사용자 경험을 만듭니다.
@@ -276,6 +272,111 @@ benchmark("comprehension", comprehension_method)
 성능은 측정에서 시작합니다. 지연시간과 처리량을 구분하고, 꼬리 지연을 보고, USE로 병목을 찾고, 단일 변수 통제로 검증해야 합니다. 그래야 최적화가 신앙이 아니라 설명 가능한 엔지니어링이 됩니다.
 
 이것으로 Computer Architecture 101 시리즈를 마칩니다. 데이터 표현부터 멀티코어까지 살펴본 모든 주제는 결국 "왜 이 시스템은 이만큼 빠른가, 혹은 왜 이만큼 느린가"를 설명하는 도구였습니다.
+
+## 심화 실습: 비트 연산 · 캐시 계산 · 파이프라인 관찰
+
+컴퓨터 구조를 실제로 이해하려면 정의를 암기하는 대신 숫자를 직접 계산해 보는 과정이 필요합니다. 같은 명령이라도 비트 표현, 메모리 계층, 파이프라인 충돌 조건을 동시에 보면 성능 병목의 원인이 선명해집니다.
+
+### 2의 보수와 비트 마스크를 수치로 확인하기
+
+```python
+def to_u8(n: int) -> int:
+    return n & 0xFF
+
+def to_s8(n: int) -> int:
+    n &= 0xFF
+    return n - 0x100 if n & 0x80 else n
+
+x = to_u8(-5)          # 251 (0b11111011)
+y = to_u8(12)          # 12  (0b00001100)
+print(bin(x), bin(y))
+print(to_s8(x + y))    # 7
+print(to_s8(x - y))    # -17
+```
+
+핵심은 ALU가 "부호 있는 정수"와 "부호 없는 정수"를 따로 계산하지 않는다는 점입니다. 동일한 비트열을 어떻게 해석하느냐가 결과 의미를 바꿉니다. 그래서 ISA 문서에는 signed/unsigned 비교 명령이 따로 존재합니다.
+
+### 캐시 인덱스 계산을 손으로 풀기
+
+가정:
+- L1 D-cache = 32KiB
+- line size = 64B
+- 8-way set associative
+
+계산:
+- 총 line 수 = 32KiB / 64B = 512
+- set 수 = 512 / 8 = 64
+- set index 비트 수 = log2(64) = 6
+- block offset 비트 수 = log2(64) = 6
+- tag 비트 수(48-bit VA 가정) = 48 - 6 - 6 = 36
+
+즉 주소 비트 분해는 `[tag:36][index:6][offset:6]`이 됩니다. 두 주소가 같은 set에 매핑되는지 확인하려면 offset을 제거한 뒤 index 6비트를 비교하면 됩니다.
+
+### 캐시 미스 패턴을 추적하는 간단 코드
+
+```python
+# stride 접근이 캐시 locality에 미치는 영향 관찰
+N = 1024 * 1024
+arr = [0] * N
+
+def walk(step: int):
+    s = 0
+    for i in range(0, N, step):
+        s += arr[i]
+    return s
+
+for step in [1, 2, 4, 8, 16, 32, 64, 128]:
+    walk(step)
+```
+
+이 코드는 단순하지만 실험 관점에서는 매우 유용합니다. `step`이 커질수록 한 cache line에서 활용하는 유효 데이터가 줄고 miss 비율이 올라갑니다. 프로파일러에서는 CPI 증가와 함께 메모리 stall 시간이 늘어나는 형태로 관측됩니다.
+
+### 5단계 파이프라인에서 hazard를 그림으로 보기
+
+```mermaid
+flowchart LR
+    IF["IF"] --> ID["ID"] --> EX["EX"] --> MEM["MEM"] --> WB["WB"]
+    EX -->|"branch decision"| IF
+```
+
+간단한 명령 시퀀스:
+- `I1: LOAD R1, [R2]`
+- `I2: ADD R3, R1, R4`
+
+`I2`는 `R1`이 필요하지만 `I1`의 결과는 MEM/WB 이후에 준비됩니다. Forwarding이 없으면 stall이 필요하고, forwarding이 있으면 일부 cycle을 절약할 수 있습니다. 이 차이가 곧 IPC 차이로 이어집니다.
+
+### 파이프라인 타이밍 표를 직접 작성하기
+
+```text
+cycle:   1   2   3   4   5   6
+I1      IF  ID  EX MEM  WB
+I2          IF  ID STALL EX MEM WB
+I3              IF STALL ID  EX MEM WB
+```
+
+이 표를 직접 그려 보면 왜 분기 예측 실패가 큰 비용인지, 왜 load-use hazard가 민감한지 바로 이해할 수 있습니다. 이론보다 "cycle 단위로 어디가 비는지"를 보는 것이 훨씬 빠릅니다.
+
+### 성능 근사식으로 병목 분해하기
+
+성능은 보통 다음으로 근사합니다.
+
+`Execution Time = Instruction Count × CPI × Clock Cycle Time`
+
+여기서 구조 개선은 보통 세 축으로 나타납니다.
+- 명령 수 감소: 컴파일러 최적화/벡터화
+- CPI 감소: cache miss 감소, branch mispredict 감소, forwarding 개선
+- cycle time 단축: 더 높은 클록, 더 짧은 임계 경로
+
+실무에서는 한 축을 개선하면 다른 축이 악화될 수 있습니다. 예를 들어 파이프라인 단계를 늘려 클록을 높이면 분기 실패 패널티가 커질 수 있습니다. 따라서 "한 지표만" 보고 결론 내리면 위험합니다.
+
+### 점검 체크리스트
+
+- 주소 하나를 보고 `tag/index/offset`으로 즉시 분해할 수 있는가
+- load-use, branch hazard를 cycle 표로 그릴 수 있는가
+- signed/unsigned 연산 차이를 비트 패턴으로 설명할 수 있는가
+- CPI 상승의 원인을 cache/branch/structural hazard로 나눠 추적할 수 있는가
+
+이 체크리스트를 통과하면, 컴퓨터 구조 지식이 암기에서 운영 가능한 문제해결 도구로 바뀝니다.
 
 ## 처음 질문으로 돌아가기
 

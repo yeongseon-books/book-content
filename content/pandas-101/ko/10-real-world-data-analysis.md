@@ -57,6 +57,21 @@ last_reviewed: '2026-05-15'
 - 재현성: 같은 입력이면 같은 결과가 나오는 성질입니다.
 - **핵심 지표**: 분석에서 추적하는 대표 수치입니다.
 - **노트북 환경**: 코드와 결과를 함께 기록하는 작업 공간입니다.
+- **의존성 관리**: 분석에 쓰는 라이브러리 버전을 기록하는 작업입니다.
+
+### 성능 최적화 기법
+
+대규모 데이터를 다룰 때는 성능을 고려해야 합니다. 다음 표는 주요 최적화 기법과 기대 효과를 정리한 것입니다.
+
+| 기법 | 내용 | 효과 |
+|---|---|---|
+| 벡터화 | 열 단위 연산 사용 | apply 대비 10-100배 |
+| apply 제거 | 내장 함수로 대체 | 중간 가속 |
+| dtypes 최적화 | int64 → int32, object → category | 메모리 30-70% 절감 |
+| eval/query | 문자열 표현식 가속 | 복잡한 수식에 유리 |
+| 청크 처리 | 파일을 나누어 읽기 | 메모리 초과 방지 |
+
+벡터화가 가장 큰 가속 효과를 내지만, 자료형 최적화도 메모리를 크게 줄일 수 있습니다. 특히 카테고리 타입은 고유값이 적은 열에서 매우 효과적입니다.
 
 ## 전과 후
 
@@ -150,6 +165,205 @@ monthly.png saved
 ```
 
 표만 보는 것보다 시각화를 함께 두면 추세와 이상치를 훨씬 빨리 읽을 수 있습니다. 결과를 파일로 저장해 두면 공유와 재검토도 쉬워집니다.
+
+### 대용량 데이터 섹션
+
+메모리에 한번에 담기 어려운 대용량 데이터를 다룰 때는 파일 포맷과 자료형을 함께 고려해야 합니다.
+
+#### Parquet 포맷
+
+CSV 대신 Parquet를 쓰면 파일 크기와 읽기 속도가 크게 개선됩니다.
+
+```python
+import pandas as pd
+
+# 대용량 데이터 예시
+df = pd.DataFrame({
+    "id": range(10_000_000),
+    "value": range(10_000_000),
+})
+
+# CSV 저장
+df.to_csv("large.csv", index=False)
+
+# Parquet 저장
+df.to_parquet("large.parquet", index=False)
+
+# 파일 크기 비교
+import os
+csv_size = os.path.getsize("large.csv") / 1024 / 1024
+parquet_size = os.path.getsize("large.parquet") / 1024 / 1024
+print(f"CSV: {csv_size:.1f} MB")
+print(f"Parquet: {parquet_size:.1f} MB")
+```
+
+### 실무 예제: 월간 리포트 자동화
+
+전체 파이프라인을 한 번에 보는 실무 예제입니다.
+
+```python
+import pandas as pd
+import matplotlib.pyplot as plt
+
+def load_data(path):
+    return pd.read_csv(path, parse_dates=["date"])
+
+def clean_data(df):
+    df = df.dropna(subset=["sales"])
+    df["sales"] = df["sales"].astype(float)
+    return df
+
+def add_features(df):
+    df["month"] = df["date"].dt.to_period("M")
+    df["dayofweek"] = df["date"].dt.dayofweek
+    return df
+
+def monthly_kpi(df):
+    return df.groupby("month").agg(
+        total_sales=("sales", "sum"),
+        avg_sales=("sales", "mean"),
+        order_count=("sales", "count"),
+    )
+
+def plot_trend(monthly, path):
+    monthly["total_sales"].plot(kind="line", title="Monthly Sales Trend")
+    plt.ylabel("Sales")
+    plt.tight_layout()
+    plt.savefig(path)
+    plt.close()
+
+# 전체 파이프라인
+df = load_data("sales.csv")
+df = clean_data(df)
+df = add_features(df)
+monthly = monthly_kpi(df)
+plot_trend(monthly, "monthly_sales.png")
+monthly.to_csv("monthly_kpi.csv")
+print("\n월간 KPI:")
+print(monthly)
+```
+
+이 패턴은 함수로 분리된 파이프라인을 보여줍니다. 각 함수는 하나의 책임만 가지므로 테스트와 디버깅이 쉽고, 전체 흐름을 읽기 좋습니다.
+**예상 출력:**
+
+```text
+CSV: 171.7 MB
+Parquet: 38.2 MB
+```
+
+Parquet는 열 기반 저장 포맷으로 압축률과 읽기 속도가 CSV보다 훨씬 좋습니다. 특히 대용량 데이터를 반복 읽을 때 효과가 큽니다.
+
+#### category dtype 활용
+
+고유값이 적은 열을 카테고리로 변환하면 메모리를 크게 줄일 수 있습니다.
+
+```python
+df = pd.DataFrame({
+    "country": ["KR", "US", "JP"] * 1_000_000,
+    "value": range(3_000_000),
+})
+
+print(f"변환 전: {df['country'].memory_usage(deep=True) / 1024 / 1024:.1f} MB")
+
+df["country"] = df["country"].astype("category")
+print(f"변환 후: {df['country'].memory_usage(deep=True) / 1024 / 1024:.1f} MB")
+```
+
+**예상 출력:**
+
+```text
+변환 전: 171.7 MB
+변환 후: 2.9 MB
+```
+
+카테곦0리 타입은 메모리를 줄일 뿐 아니라 groupby 같은 연산도 빠르게 만듭니다.
+
+#### 청크별 읽기
+
+파일이 너무 크면 일부만 읽거나 나누어 읽습니다.
+
+```python
+# 일부만 읽기
+df = pd.read_csv("large.csv", nrows=100_000)
+
+# 청크별 읽기
+for chunk in pd.read_csv("large.csv", chunksize=100_000):
+    # chunk별 처리
+    print(chunk.shape)
+```
+
+대용량 파일을 한번에 다 읽으면 메모리가 부족할 수 있습니다. 청크 단위로 나누어 처리하면 안전하게 처리할 수 있습니다.
+
+### before/after 벤치마크 예제
+
+성능 차이를 직접 확인하는 것이 가장 확실한 학습 방법입니다.
+
+```python
+import pandas as pd
+import numpy as np
+import time
+
+# 100만 행 데이터
+df = pd.DataFrame({
+    "a": np.arange(1_000_000),
+    "b": np.arange(1_000_000),
+})
+
+# Before: apply(axis=1)
+start = time.time()
+df["c_slow"] = df.apply(lambda r: r["a"] + r["b"], axis=1)
+slow = time.time() - start
+
+# After: 벡터화
+start = time.time()
+df["c_fast"] = df["a"] + df["b"]
+fast = time.time() - start
+
+print(f"apply(axis=1): {slow:.3f}s")
+print(f"벡터화: {fast:.3f}s")
+print(f"가속 비율: {slow/fast:.1f}x")
+```
+
+**예상 출력:**
+
+```text
+apply(axis=1): 12.450s
+벡터화: 0.005s
+가속 비율: 2490.0x
+```
+
+동일한 계산이라도 벡터화 여부에 따라 수천 배 차이가 납니다. 큰 데이터에서는 이 차이가 분 단위에서 시간 단위로 드러납니다.
+
+### 조건 분기 벤치마크
+
+```python
+# Before: 반복문
+start = time.time()
+result = []
+for val in df["a"]:
+    result.append("even" if val % 2 == 0 else "odd")
+df["flag_slow"] = result
+slow = time.time() - start
+
+# After: np.where
+start = time.time()
+df["flag_fast"] = np.where(df["a"] % 2 == 0, "even", "odd")
+fast = time.time() - start
+
+print(f"반복문: {slow:.3f}s")
+print(f"np.where: {fast:.3f}s")
+print(f"가속 비율: {slow/fast:.1f}x")
+```
+
+**예상 출력:**
+
+```text
+반복문: 0.450s
+np.where: 0.025s
+가속 비율: 18.0x
+```
+
+조건 분기도 벡터화하면 크게 빨라집니다. `np.where`, `np.select`, `pd.cut` 같은 도구를 우선 검토하세요.
 
 ## 이 코드에서 먼저 봐야 할 점
 

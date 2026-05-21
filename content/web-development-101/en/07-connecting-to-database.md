@@ -41,15 +41,11 @@ This is post 7 in the Web Development 101 series. Here we move from in-memory th
 
 This picture places Connecting to a Database inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Connecting to a Database is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Almost all *state* in a web app lives in the database. Mishandle the connection and a server falls over with *dozens* of users. Learn it once and it pays back for years.
 
 > The database is *the keeper of truth*.
-
-## Concept at a Glance
 
 The app does not just “use SQL.” It opens or borrows a connection, issues work, and often needs to bundle multiple statements into one transaction. That lifecycle matters as much as the query text itself.
 

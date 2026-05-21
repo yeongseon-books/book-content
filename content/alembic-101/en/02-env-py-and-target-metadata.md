@@ -42,8 +42,6 @@ This is post 2 in the Alembic 101 series. Here we will pin down when `env.py` ru
 
 This picture places env.py and target_metadata: wiring models to migrations inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of env.py and target_metadata: wiring models to migrations is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 Episode 1 left you with a scaffolded project, but in that state Alembic does not know your models. Running `alembic revision --autogenerate` produces an empty file because `env.py` has no idea where to find the model metadata. Without that one line, Alembic has nothing to compare the live DB schema against.

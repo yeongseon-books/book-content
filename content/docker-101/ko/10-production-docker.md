@@ -40,10 +40,6 @@ last_reviewed: '2026-05-15'
 
 *Docker 101 10장 흐름 개요*
 
-이 그림에서는 배포용 Docker 구성를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 배포용 Docker 구성의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 이 글이 중요한가
 
 운영 환경에서는 이전에 배운 모든 결정이 한 번에 현실이 됩니다. 빌드 단계에서 남겨 둔 불필요한 도구는 공격 표면이 되고, `latest` 태그는 배포 추적을 어렵게 만들며, healthcheck와 재시작 정책이 없으면 죽은 컨테이너가 조용히 방치될 수 있습니다.
@@ -201,6 +197,129 @@ Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 여기까지 왔다면 Docker의 핵심 95%는 이미 다뤘다고 봐도 좋습니다. 이미지를 만들고, 컨테이너를 실행하고, 데이터와 네트워크를 분리하고, 설정을 외부화하고, 앱과 DB를 함께 운영하고, 이미지를 최적화하고, 마지막으로 프로덕션 기준까지 정리했습니다. 남는 과제는 이 감각을 더 큰 운영 환경으로 확장하는 것입니다.
 
 다음 단계로는 Kubernetes 101에서 컨테이너 오케스트레이션을, SRE 101에서 운영 신뢰성을 이어서 보는 것이 좋습니다. Docker는 출발점이지만, 이미 충분히 실무적인 출발점입니다.
+
+
+## 실전 설계 확장: Dockerfile, Compose, 멀티 스테이지
+
+Docker를 팀 표준으로 쓰려면 단순 실행 명령을 넘어서 이미지 빌드 규칙과 서비스 조합 규칙을 함께 정의해야 합니다. 특히 Dockerfile 계층 설계, docker-compose.yml 환경 분리, 멀티 스테이지 빌드 전략은 개발 속도와 보안 품질을 동시에 좌우합니다. 같은 애플리케이션 코드라도 이 세 가지를 어떻게 설계하느냐에 따라 이미지 크기, 빌드 시간, 취약점 노출 범위가 크게 달라집니다.
+
+### Dockerfile을 재현 가능한 빌드 문서로 다루기
+
+좋은 Dockerfile은 "동작한다"보다 "같은 입력에서 같은 산출물이 나온다"를 목표로 합니다. 베이스 이미지 태그를 고정하고, 의존성 설치 순서를 안정적으로 분리하고, 런타임 사용자 권한을 낮춰야 합니다.
+
+```dockerfile
+FROM python:3.12-slim AS base
+
+ENV PYTHONDONTWRITEBYTECODE=1     PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+RUN useradd -m appuser
+
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+USER appuser
+CMD ["python", "main.py"]
+```
+
+위 구조에서 중요한 점은 의존성 설치 계층과 소스 복사 계층을 분리해 캐시 효율을 확보하는 것입니다. `requirements.txt`가 바뀌지 않으면 패키지 설치 레이어를 재사용할 수 있어 빌드 시간이 크게 줄어듭니다.
+
+### docker-compose.yml은 서비스 경계를 코드로 남긴다
+
+Compose는 "여러 컨테이너를 한 번에 띄운다"가 전부가 아닙니다. 각 서비스의 책임 경계, 네트워크 연결, 볼륨 지속성, 헬스체크 기준을 파일로 고정하는 역할이 더 큽니다.
+
+```yaml
+version: "3.9"
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_ENV=local
+      - DATABASE_URL=postgresql://app:app@db:5432/appdb
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=app
+      - POSTGRES_PASSWORD=app
+      - POSTGRES_DB=appdb
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d appdb"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:
+```
+
+이 파일 하나로 새 팀원은 로컬 환경을 재현하고, CI는 같은 토폴로지를 사용해 통합 테스트를 수행할 수 있습니다. Compose를 문서 대신 코드로 다루는 이유가 여기에 있습니다.
+
+### 멀티 스테이지 빌드로 런타임 이미지를 가볍게 유지하기
+
+빌드 도구와 런타임이 섞이면 이미지가 불필요하게 커지고 공격 표면도 넓어집니다. 멀티 스테이지는 빌드에 필요한 것과 실행에 필요한 것을 분리해 이 문제를 해결합니다.
+
+```dockerfile
+FROM node:22-alpine AS build
+WORKDIR /src
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM nginx:1.27-alpine AS runtime
+COPY --from=build /src/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+```
+
+이 방식의 장점은 명확합니다.
+
+- 최종 이미지는 정적 파일과 최소 런타임만 포함합니다.
+- 빌드 도구 체인 취약점이 운영 이미지로 전파될 가능성을 줄입니다.
+- 배포 전 전송량이 줄어 레지스트리 푸시/풀 시간이 단축됩니다.
+
+### 운영 기준으로 보는 체크포인트
+
+- 이미지 태그는 `latest` 대신 버전+커밋 해시를 사용합니다.
+- 기본 사용자로 root를 피하고 최소 권한 사용자로 실행합니다.
+- 헬스체크를 통해 readiness 판단을 자동화합니다.
+- `.dockerignore`로 불필요한 파일 유입을 차단합니다.
+- Secret은 이미지에 bake-in 하지 않고 런타임 주입으로 관리합니다.
+
+### 빌드 파이프라인 예시
+
+```bash
+docker build -t ghcr.io/acme/app:1.4.2-3f2a9d1 .
+docker run --rm ghcr.io/acme/app:1.4.2-3f2a9d1 python -m pytest -q
+docker push ghcr.io/acme/app:1.4.2-3f2a9d1
+```
+
+위처럼 테스트 통과 이미지만 푸시하도록 규칙화하면 "코드는 통과했는데 이미지가 깨졌다" 같은 불일치를 줄일 수 있습니다. 컨테이너 운영의 핵심은 코드와 실행 단위를 같은 검증 루프로 묶는 데 있습니다.
+
+### 장애 대응 관점에서 Compose와 Dockerfile을 함께 본다
+
+운영 이슈가 발생하면 단일 파일만 봐서는 원인이 잘 드러나지 않습니다. 예를 들어 앱 컨테이너가 재시작 루프에 빠졌다면 Dockerfile의 엔트리포인트, Compose의 환경변수, 의존 서비스 헬스체크를 한 번에 확인해야 합니다. 따라서 리뷰 단계에서 "Dockerfile 단독 리뷰"가 아니라 "Dockerfile + Compose + 실행 로그"를 묶어 검토하는 습관이 필요합니다.
+
+이 관점을 유지하면 컨테이너는 단순 포장 기술이 아니라 신뢰 가능한 배포 단위로 자리잡습니다.
+
 
 ## 처음 질문으로 돌아가기
 

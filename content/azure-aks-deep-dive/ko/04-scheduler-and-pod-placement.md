@@ -235,4 +235,6 @@ HPA가 replica를 늘리고, Cluster Autoscaler가 node를 늘릴 때 왜 race w
 - [Azure AKS 101](../../azure-aks-101/ko/)
 - [Azure Functions Deep Dive 4화 — dispatcher와 invocation](../../azure-functions-deep-dive/ko/04-dispatcher-and-invocation.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-aks-deep-dive/ko/04-scheduler-and-pod-placement)
+
 Tags: AKS, Kubernetes, Distributed Systems, Containers

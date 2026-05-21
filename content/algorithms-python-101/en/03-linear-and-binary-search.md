@@ -42,8 +42,6 @@ This is post 3 in the Algorithms with Python 101 series. Here, we'll implement l
 
 This picture places Linear Search and Binary Search inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Linear Search and Binary Search is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - How linear search works and its limitations

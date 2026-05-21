@@ -52,9 +52,6 @@ A test checks specific cases. A proof targets the whole claim. Those two tools a
 
 That distinction matters far beyond textbook exercises. Type systems encode logical constraints on values. Consensus algorithms try to preserve safety under specific failure assumptions. Authentication and authorization flows become fragile when the logic between conditions is vague.
 
-
-## Concept at a Glance
-
 Logic distinguishes between a *true proposition*, an *implication* (`p → q`), proof methods (direct, contradiction, induction), and the power of *one counterexample* to invalidate a universal claim.
 
 ## Before/After

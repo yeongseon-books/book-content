@@ -57,8 +57,6 @@ Adopting tools *one by one* creates *islands*. Only when they connect as a *flow
 
 > What is *not measured* is *not improved*.
 
-## Concept at a Glance
-
 All the pieces—CI, CD, IaC, monitoring, on-call—work only when they *feed back* into each other. Fast deployment is safe when you monitor. Monitoring is useful when response is fast. The cycle closes when every team member owns the full path.
 
 ## Key Terms

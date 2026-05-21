@@ -411,4 +411,6 @@ def harvest_failures_to_regression_set(failed_traces: list[dict], regression_pat
 - [이전 글 — LLM A/B 테스팅 — 어느 prompt가 더 나은가](./09-ab-testing-llms.md)
 - [시리즈 현재 위치 다시 보기](./10-production-evaluation.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-evaluation-101/ko/10-production-evaluation)
+
 Tags: AI Evaluation, Production, Drift Detection, Monitoring

@@ -52,9 +52,6 @@ If you treat algorithms as code only, you often stop at whether they run. In rea
 
 That is why mathematical framing matters so much. It is not decoration around implementation. It is often the thing that tells you whether an implementation direction is sensible in the first place.
 
-
-## Concept at a Glance
-
 Algorithm analysis combines *complexity* (how cost scales), *proof* (why an algorithm works), and *trade-offs* (time vs. space, correctness vs. performance).
 
 ## Before/After

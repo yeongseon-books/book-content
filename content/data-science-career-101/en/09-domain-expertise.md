@@ -42,8 +42,7 @@ This is post 9 in the Data Science Career 101 series.
 
 This picture places Building Domain Expertise inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Building Domain Expertise is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
+> In domain knowledge, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
 ## What You Will Learn
 
 - The definition of *domain*
@@ -58,8 +57,7 @@ Technical patterns are often portable. Domain judgment is what makes the same pa
 
 You cannot reliably interpret retention, fraud, churn, utilization, or margin if you do not understand the business model and the operating constraints behind those words.
 
-## Concept at a Glance
-
+Domain expertise is what separates a person who knows how to run a query from a person who knows what question to ask. It grows faster if you read your company's business context, not just the code.
 ## Key Terms
 
 - **domain**: An industry or business area.
@@ -76,6 +74,7 @@ You cannot reliably interpret retention, fraud, churn, utilization, or margin if
 
 ## Hands-on: Five-Step Domain Study
 
+Pick one domain (marketing, finance, operations). Spend one month: read strategy docs, sit in one meeting, run one query, write one analysis, ask one industry expert.
 ### Step 1 — Build a Glossary
 
 ```text

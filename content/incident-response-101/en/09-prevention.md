@@ -42,7 +42,7 @@ This is post 9 in the Incident Response 101 series. This post explains how to pr
 
 This picture places Prevention inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Prevention is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Prevention items that are specific + measurable + assigned = items that actually get done.
 
 ## Why this topic matters
 

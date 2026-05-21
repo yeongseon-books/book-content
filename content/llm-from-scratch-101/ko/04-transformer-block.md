@@ -44,10 +44,6 @@ seo_description: 지난 글에서 CausalSelfAttention까지 만들고 나면 한
 
 *LLM from Scratch 101 4장 흐름 개요*
 
-이 그림에서는 블록 하나, 깊이의 단위를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 블록 하나, 깊이의 단위의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 이 글이 중요한가
 
 트랜스포머 블록은 GPT의 깊이를 구성하는 최소 단위입니다. 토큰끼리 보는 방법만 아는 상태에서는 아직 모델이 얕습니다. 블록이 있어야 토큰 간 관계를 반복적으로 섞고, 각 위치의 표현을 점진적으로 다듬으면서 더 강한 내부 표현을 만들 수 있습니다.
@@ -172,6 +168,24 @@ for block in self.blocks:
 
 다음 글에서는 지금까지 만든 임베딩과 블록들을 모두 조립해 `GPT(nn.Module)` 전체 클래스를 완성합니다. 즉, 입력부터 logits와 loss까지 한 번에 계산하는 모델 껍질을 만들게 됩니다.
 
+## 블록 단위 성능 점검 포인트
+
+트랜스포머 학습이 느리거나 불안정할 때는 전체 모델을 한 번에 보지 말고 블록 단위로 나눠 확인하는 편이 효과적입니다. 특히 아래 세 항목을 먼저 점검하면 원인 범위를 빠르게 줄일 수 있습니다.
+
+### 활성값 범위
+
+각 블록 출력의 평균과 분산이 층이 깊어질수록 급격히 커지거나 줄어들면, 학습률이나 초기화, LayerNorm 동작을 의심해야 합니다. pre-norm 구조라도 특정 설정에서는 드리프트가 발생할 수 있습니다.
+
+### attention 분포
+
+attention 확률이 일부 헤드에서 한 토큰에 과도하게 몰리거나, 반대로 거의 균일하게 퍼지면 문맥 활용이 비효율적일 수 있습니다. 이때는 head 수, block size, dropout 값을 함께 점검합니다.
+
+### FFN 기여도
+
+블록 출력 변화량에서 FFN 경로가 지나치게 작으면 비선형 변환이 약해지고, 지나치게 크면 residual 경로를 압도할 수 있습니다. 실전에서는 gradient norm을 attention/FFN으로 나눠 관찰하면 균형을 읽기 쉽습니다.
+
+이 점검은 대형 모델에서만 필요한 절차가 아닙니다. 작은 교육용 GPT에서도 같은 원리로 동작하기 때문에, 초기에 블록 단위 계측 습관을 들이면 이후 규모를 키울 때 디버깅 감각이 훨씬 좋아집니다.
+
 ## 처음 질문으로 돌아가기
 
 - **FeedForward는 왜 `Linear(C, 4C) -> GELU -> Linear(4C, C)` 형태를 많이 쓸까요?**
@@ -210,5 +224,7 @@ for block in self.blocks:
 - [LangGraph 101 — 상태와 라우팅 설계](../../langgraph-101/ko/02-state-and-checkpoints.md)
 - [AI Agent 101 — Agent Workflow 설계](../../ai-agent-101/ko/04-agent-workflow-design.md)
 - [LLM 앱 기초 — 대화 상태 관리](../../llm-app-foundations-101/ko/05-conversation-state.md)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/llm-from-scratch-101/ko/04-transformer-block)
 
 Tags: LLM, PyTorch, Transformer, Tutorial

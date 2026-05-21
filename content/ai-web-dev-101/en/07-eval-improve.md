@@ -41,8 +41,6 @@ Here, we will turn “it feels better” into a repeatable evaluation and improv
 
 This picture places Evaluating and improving an AI app — measuring quality over time inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Evaluating and improving an AI app — measuring quality over time is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why evaluation is necessary
 
 Traditional software usually aims for deterministic outputs from fixed inputs. AI systems often do not. The same prompt can vary slightly, and a change that improves one question can silently hurt another.

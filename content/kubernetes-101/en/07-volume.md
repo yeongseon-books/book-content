@@ -44,13 +44,9 @@ Here, we will connect Volumes, PersistentVolumeClaims, and StorageClasses into o
 
 This picture places Volume inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Volume is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 A container's filesystem *vanishes* with the *Pod*. Stateful workloads *require* a *Volume*.
-
-## Concept at a Glance
 
 ## Key Terms
 

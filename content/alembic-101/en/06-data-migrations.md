@@ -42,8 +42,6 @@ This is post 6 in the Alembic 101 series. Here we will focus on why schema chang
 
 This picture places Data migrations: separating schema changes from data changes inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Data migrations: separating schema changes from data changes is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 `ALTER TABLE` is not the only kind of migration. Column renames, enum value changes, JSON structure conversions — these all change the data alongside the schema. If you mix a data migration into the same revision as a schema change, large datasets cause lock issues and timeouts, and `downgrade` becomes effectively impossible.

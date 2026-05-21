@@ -45,7 +45,7 @@ This is post 2 in the Information Security 101 series.
 
 This picture places Authentication and Authorization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Authentication and Authorization is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Authentication and authorization are not just about verifying identity. They are about proving "user X performed action Y at time Z from location L" with audit trails that survive server restarts.
 
 ## What You Will Learn
 
@@ -60,8 +60,6 @@ This picture places Authentication and Authorization inside an operating flow. T
 Most breaches start with stolen credentials or abused permissions. Separating authentication from authorization, and choosing the right pattern for each, closes two of the biggest doors at once.
 
 > Verifying "who" and deciding "what" are different responsibilities.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR

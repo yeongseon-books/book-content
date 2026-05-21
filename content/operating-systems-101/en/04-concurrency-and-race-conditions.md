@@ -43,8 +43,6 @@ This is post 4 in the Operating Systems 101 series. It explains race conditions 
 
 This picture places Concurrency and Race Conditions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Concurrency and Race Conditions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - When can you say a race condition is actually happening?
@@ -64,8 +62,6 @@ This picture places Concurrency and Race Conditions inside an operating flow. Th
 Concurrency bugs are quiet during development and loud in production, especially under load. A bug that never appeared in tests corrupts data at 2am when traffic peaks. After living through this once, "be careful with concurrent code" stops being a slogan.
 
 > A race condition is worse than a wrong answer; it is a state where you cannot say which answer you will get.
-
-## Concept at a Glance
 
 > When two threads touch the same variable, the OS scheduler can interrupt either of them at any time. Steps from the two flows interleave, and the final state can differ from what either flow intended.
 

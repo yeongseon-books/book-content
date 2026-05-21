@@ -48,8 +48,6 @@ This episode covers a FastAPI-based multimodal API design, step-by-step inferenc
 
 This picture places Building a Production Multimodal Application inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Building a Production Multimodal Application is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## 1. End-to-End System Overview
 
 We will assume a multimodal Q&A service:

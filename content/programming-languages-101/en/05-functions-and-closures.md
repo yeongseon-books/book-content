@@ -43,8 +43,6 @@ In this post, we will treat closures as an ordinary consequence of lexical scope
 
 This picture places Functions and Closures inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Functions and Closures is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - What is the difference between first-class functions and higher-order functions?
@@ -57,8 +55,6 @@ This picture places Functions and Closures inside an operating flow. The point i
 Closures are the foundation of callbacks, decorators, partial application, and module-style encapsulation. Without a clear mental model you fall into classics like "all functions made inside a for-loop print the same value."
 
 > A closure is "a function plus the environment it grew up in."
-
-## Concept at a Glance
 
 The `add` returned by `make_adder` carries the binding `x = 10` along with it. The caller cannot see inside, but `add` computes on top of that environment.
 

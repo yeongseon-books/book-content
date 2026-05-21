@@ -45,10 +45,6 @@ sqlite3는 편의를 위해 트랜잭션을 암묵적으로 시작합니다. 이
 
 *Python DB-API 101 5장 흐름 개요*
 
-이 그림에서는 Transaction과 isolation level (sqlite3, PEP 249)를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> Transaction과 isolation level (sqlite3, PEP 249)의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## Mental Model — connection이 transaction 단위
 
 ```text

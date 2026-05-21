@@ -42,8 +42,6 @@ This is post 5 in the GitHub Actions 101 series. In this post, we will use Ruff,
 
 This picture places Lint and Type Check inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Lint and Type Check is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - Combined *style + lint* with *Ruff*
@@ -57,8 +55,6 @@ This picture places Lint and Type Check inside an operating flow. The point is n
 *Lint and types* are the *first things reviewers catch*. Automating them frees *review* to focus on *design*.
 
 > *Format gating* cuts *review time* in half.
-
-## Concept at a Glance
 
 ## Key Terms
 

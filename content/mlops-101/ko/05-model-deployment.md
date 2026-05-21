@@ -52,6 +52,154 @@ last_reviewed: '2026-05-12'
 
 그래서 배포는 학습의 마지막 단계가 아니라 운영의 첫 단계입니다. 어떤 버전이 살아 있는지, 어디까지 트래픽을 보낼지, 이상 징후가 보이면 어떻게 되돌릴지부터 함께 설계해야 합니다.
 
+### 모델 서빙 패턴 비교
+
+모델 배포를 설계할 때 가장 먼저 결정할 것은 서빙 패턴입니다. 응답 시간, 처리량, 비용이 모두 다르기 때문에 용도에 맞는 패턴을 골라야 합니다.
+
+| 패턴 | 지연시간 | 처리량 | 적합한 경우 |
+|---|---|---|---|
+| 배치 추론 | 분~시간 | 매우 높음 | 주간 리포트, 대량 예측 일괄 처리 |
+| 실시간 추론 | ms~초 | 보통 | 사용자 요청에 즉시 응답, 추천, 검색 |
+| 스트리밍 추론 | 초 이하 | 높음 | 실시간 사기 탐지, 이상 탐지, 로그 분석 |
+
+#### 배치 추론
+
+모든 입력을 모아 두고 정해진 시간에 한 번에 실행합니다. Airflow나 Cron으로 스케줄링하고, 결과는 DB나 파일로 저장합니다. 응답 속도보다 처리량이 중요한 경우에 적합합니다.
+
+#### 실시간 추론
+
+HTTP 요청을 받아 즉시 예측을 반환합니다. FastAPI, Flask, BentoML 같은 프레임워크가 쓰입니다. 응답 시간이 중요하고, 요청마다 결과가 달라야 하는 경우에 적합합니다.
+
+#### 스트리밍 추론
+
+Kafka, Kinesis 같은 메시지 큐에서 데이터를 받아 순차적으로 처리합니다. 이벤트가 계속 들어오고, 각 이벤트마다 즉시 판단이 필요한 경우에 적합합니다.
+
+### FastAPI 모델 서빙 코드 예제
+
+앞서 본 예제를 조금 더 확장해보겠습니다. 버전 정보, 입력 검증, 로깅, 메트릭 수집까지 포함한 예제입니다.
+
+```python
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
+import pickle
+import logging
+import time
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+app = FastAPI(title="Model API", version="1.0.0")
+
+# 시작 시 모델 로드
+MODEL_PATH = "model.pkl"
+try:
+    with open(MODEL_PATH, "rb") as f:
+        model = pickle.load(f)
+    logger.info(f"Model loaded from {MODEL_PATH}")
+except Exception as e:
+    logger.error(f"Failed to load model: {e}")
+    model = None
+
+class PredictRequest(BaseModel):
+    x: float = Field(..., ge=0, le=100, description="Input feature (0-100)")
+
+class PredictResponse(BaseModel):
+    prediction: int
+    model_version: str
+    latency_ms: float
+
+@app.get("/healthz")
+def health():
+    if model is None:
+        raise HTTPException(status_code=503, detail="Model not loaded")
+    return {"status": "ok", "version": "1.0.0"}
+
+@app.post("/predict", response_model=PredictResponse)
+def predict(req: PredictRequest):
+    if model is None:
+        raise HTTPException(status_code=503, detail="Model not loaded")
+
+    start = time.time()
+    try:
+        pred = int(model.predict([[req.x]])[0])
+        latency = (time.time() - start) * 1000
+        logger.info(f"Prediction: x={req.x}, pred={pred}, latency={latency:.2f}ms")
+        return PredictResponse(
+            prediction=pred,
+            model_version="1.0.0",
+            latency_ms=round(latency, 2),
+        )
+    except Exception as e:
+        logger.error(f"Prediction failed: {e}")
+        raise HTTPException(status_code=500, detail="Prediction error")
+```
+
+이 코드에서는 입력 범위 검증(`ge=0, le=100`), 모델 로드 실패 처리, 지연시간 측정, 로깅이 모두 들어가 있습니다. 운영에서는 이런 요소가 있어야 문제 상황을 빠르게 파악할 수 있습니다.
+
+### 모델 패키징
+
+모델을 배포하려면 코드, 모델 파일, 라이브러리, 환경 변수를 한 묶음으로 만들어야 합니다. 세 가지 패키징 방식을 소개합니다.
+
+#### 1. Docker 이미지
+
+가장 흐하게 쓰이는 방식입니다. 모델, 코드, 라이브러리, OS 환경을 통째로 묶습니다.
+
+```dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY model.pkl .
+COPY main.py .
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+장점: 환경 일관성, Kubernetes 같은 오케스트레이터와 호환성 높음.
+
+#### 2. ONNX 포맷
+
+ONNX는 프레임워크 중립적인 모델 포맷입니다. PyTorch, TensorFlow, scikit-learn 모델을 ONNX로 변환하면 다른 언어나 환경에서도 쓸 수 있습니다.
+
+```python
+from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import FloatTensorType
+
+initial_type = [("float_input", FloatTensorType([None, 1]))]
+onnx_model = convert_sklearn(model, initial_types=initial_type)
+
+with open("model.onnx", "wb") as f:
+    f.write(onnx_model.SerializeToString())
+```
+
+장점: 추론 속도 최적화, 프레임워크 독립성.
+
+#### 3. BentoML Bundle
+
+BentoML은 모델과 API 코드를 함께 패키징하는 도구입니다.
+
+```python
+import bentoml
+from sklearn.linear_model import LogisticRegression
+
+# 모델 저장
+model = LogisticRegression().fit([[0], [1]], [0, 1])
+bentoml.sklearn.save_model("lr_model", model)
+
+# 서빙 코드
+# service.py
+import bentoml
+from bentoml.io import JSON
+
+runner = bentoml.sklearn.get("lr_model:latest").to_runner()
+svc = bentoml.Service("lr_service", runners=[runner])
+
+@svc.api(input=JSON(), output=JSON())
+def predict(input_data):
+    result = runner.predict.run([input_data["x"]])
+    return {"prediction": int(result[0])}
+```
+
+장점: 모델 저장, API 서빙, Docker 빌드를 한 곳에서 처리.
 ---
 
 ## 전체 흐름을 먼저 보겠습니다
@@ -245,6 +393,84 @@ curl -s -X POST localhost:8000/predict -H "Content-Type: application/json" -d '{
 모델 배포는 학습 결과를 서비스 인터페이스와 실행 환경 안으로 옮기는 일입니다. 여기서 중요한 것은 단순 배포 성공이 아니라, 같은 환경을 다시 만들 수 있고 문제 시 되돌릴 수 있는가입니다.
 
 이 글에서 기억할 핵심은 하나입니다. **배포는 모델을 노출하는 단계가 아니라, 운영 위험을 제어하는 단계입니다.** 다음 글에서는 배포된 모델을 어떻게 관찰할지, 즉 모델 모니터링을 다루겠습니다.
+
+
+## FastAPI 서빙을 운영형으로 확장하기
+
+기본 예제에서 한 단계 더 나가려면 요청 식별자, 예측 로그, 모델 버전 라우팅을 함께 고려해야 합니다.
+
+```python
+from fastapi import FastAPI, Header
+from pydantic import BaseModel
+import time
+
+app = FastAPI()
+
+class Req(BaseModel):
+    x: float
+
+MODEL_VERSION = "2026.05.12"
+
+@app.post("/predict")
+def predict(req: Req, x_request_id: str | None = Header(default=None)):
+    start = time.time()
+    pred = int(req.x > 0.5)
+    latency_ms = (time.time() - start) * 1000
+    log = {
+        "request_id": x_request_id,
+        "model_version": MODEL_VERSION,
+        "x": req.x,
+        "pred": pred,
+        "latency_ms": round(latency_ms, 2),
+    }
+    print(log)
+    return {"prediction": pred, "model_version": MODEL_VERSION}
+```
+
+운영에서 가장 중요한 것은 결과 숫자뿐 아니라 "어떤 버전이 어떤 요청을 처리했는가"를 남기는 일입니다.
+
+## Docker 배포 구성 예시
+
+```yaml
+version: "3.9"
+services:
+  model-api:
+    build: .
+    image: model-api:2026.05.12
+    ports:
+      - "8000:8000"
+    environment:
+      - MODEL_VERSION=2026.05.12
+      - LOG_LEVEL=info
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+```
+
+이 구성은 단일 호스트에서도 버전 태그와 헬스 체크 기반 운영을 가능하게 해 줍니다.
+
+## A/B 또는 카나리 전환 규칙
+
+| 단계 | 트래픽 비율 | 관찰 지표 | 진행 조건 |
+|---|---:|---|---|
+| Stage 1 | 5% | 오류율, p95 지연시간 | 기존 대비 악화 없음 |
+| Stage 2 | 20% | 예측 분포, 비즈니스 KPI | 2시간 이상 안정 |
+| Stage 3 | 50% | KPI, 비용, 재시도율 | 온콜 승인 |
+| Stage 4 | 100% | 전체 SLO | 24시간 이상 안정 |
+
+이런 전환표가 있어야 "언제 확대하고 언제 중단할지"를 팀이 같은 기준으로 판단할 수 있습니다.
+
+## 롤백 런북 최소 템플릿
+
+1. 현재 서비스 이미지 태그와 배포 시각 확인
+2. 직전 안정 버전 태그 선택
+3. 트래픽을 직전 버전으로 전환
+4. 전환 후 10분간 오류율/지연시간 모니터링
+5. 사고 타임라인과 원인 후보 기록
+
+모델 배포에서 사고는 피하기보다 빠르게 복구하는 설계가 더 현실적입니다. 따라서 배포 설계의 핵심은 성공 경로뿐 아니라 실패 경로를 명시하는 데 있습니다.
 
 ## 처음 질문으로 돌아가기
 

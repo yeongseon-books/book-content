@@ -39,10 +39,6 @@ seo_description: 타입 힌트는 함수의 입력과 출력 타입을 명시하
 
 *Python Package 101 8장 흐름 개요*
 
-이 그림에서는 타입 힌트와 정적 검사를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 타입 힌트와 정적 검사의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 이 글에서 배우는 내용
 
 - 함수, 변수, 반환값에 타입 힌트를 추가하는 방법
@@ -274,6 +270,71 @@ mypy src/  # resolves import type errors for requests
 - `Any`를 남용하면 타입 힌트의 효과가 크게 줄어듭니다.
 
 다음 글에서는 문서화 — README, MkDocs, API Reference를 다룹니다.
+
+## 실전 패턴 추가: pyproject.toml, 빌드 명령, CI까지 한 번에 정리
+
+패키징은 파일 한두 개를 만드는 작업이 아니라, 메타데이터와 빌드 백엔드, 배포 검증을 같은 계약으로 묶는 작업입니다. `pyproject.toml`을 기준으로 로컬 빌드와 CI 검증 경로를 맞추면 릴리스 직전의 불일치를 크게 줄일 수 있습니다.
+
+```toml
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "acme-utils"
+version = "0.1.0"
+description = "Utility package for internal services"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "httpx>=0.27,<0.29",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "ruff>=0.5",
+  "mypy>=1.10",
+  "build>=1.2",
+  "twine>=5.1",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+```
+
+```bash
+python -m pip install -U pip
+python -m pip install -e ".[dev]"
+python -m build
+python -m twine check dist/*
+```
+
+```yaml
+name: package-ci
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install -U pip
+      - run: python -m pip install -e ".[dev]"
+      - run: pytest -q
+      - run: ruff check .
+      - run: mypy src
+      - run: python -m build
+      - run: python -m twine check dist/*
+```
+
+실무에서 중요한 포인트는 로컬과 CI가 같은 명령 세트를 사용하도록 고정하는 것입니다. 개발자가 로컬에서 `python -m build`를 통과시킨 산출물이 CI에서도 같은 방식으로 통과해야 릴리스 리스크가 줄어듭니다. 또한 `twine check`를 CI에 넣어 두면 README 렌더링 오류나 메타데이터 누락을 배포 전에 잡을 수 있습니다.
 
 ## 처음 질문으로 돌아가기
 

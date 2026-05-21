@@ -42,7 +42,7 @@ In this post, we compare ETL and ELT from an operational point of view: where tr
 
 This picture places ETL and ELT inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of ETL and ELT is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> ETL transforms before loading; ELT loads first and transforms in-warehouse. Each has different cost, flexibility, and operational tradeoffs.
 
 ## Questions this article answers
 
@@ -66,7 +66,7 @@ As warehouse *compute became cheap*, loading the *raw source* and *transforming 
 
 > *Pull transforms into SQL. Visibility and reproducibility come along for the ride.*
 
-## Concept at a Glance
+This picture shows where ETL and ELT sit in the data flow. The key is not to memorize the names, but to see who owns the transformation responsibility.
 
 ## Key Terms
 

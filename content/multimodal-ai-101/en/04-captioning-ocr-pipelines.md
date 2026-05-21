@@ -42,8 +42,6 @@ Here we treat captioning and OCR as complementary stages rather than competing t
 
 This picture places Image Captioning and OCR Pipelines inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Image Captioning and OCR Pipelines is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## "Doesn't pulling text out of an image cover it?"
 
 Two requests show up constantly in production multimodal systems:

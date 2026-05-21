@@ -40,7 +40,7 @@ This is post 7 in the Linear Algebra 101 series. Here we will read eigenvalues a
 
 This picture places Eigenvalues and Eigenvectors inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Eigenvalues and Eigenvectors is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Eigenvalues and eigenvectors are the essence of a linear transformation. An eigenvector keeps its direction; an eigenvalue is how much it stretches in that direction.
 
 ## Questions This Post Answers
 
@@ -56,8 +56,6 @@ This picture places Eigenvalues and Eigenvectors inside an operating flow. The p
 Eigendecomposition lets you read a complicated transformation in a simpler coordinate system. If you can find the right axes, a messy matrix may reduce to mostly independent scaling behavior along those axes.
 
 That is why the topic keeps returning in PCA, stability analysis, and ranking algorithms. Eigenvalues and eigenvectors are powerful not because they are formal, but because they tell you which modes dominate and which directions stay structurally meaningful.
-
-## Concept at a Glance
 
 ## Key Terms
 

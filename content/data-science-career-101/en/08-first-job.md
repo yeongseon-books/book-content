@@ -42,8 +42,7 @@ This is post 8 in the Data Science Career 101 series.
 
 This picture places Settling into the First Data Job inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Settling into the First Data Job is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
+> In onboarding, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
 ## What You Will Learn
 
 - Onboarding *30/60/90*
@@ -58,8 +57,7 @@ The first 90 days shape the reputation that later proposals will inherit.
 
 If you learn the context well, even small improvements land with more credibility. If you skip the context, bigger ideas often miss the real bottleneck and cost trust instead of building it.
 
-## Concept at a Glance
-
+Your first 90 days set expectations. Spend the first month learning the data map and stakeholders, the second month on a quick win, the third month on documentation and handoff.
 ## Key Terms
 
 - **data map**: Inventory of data sources.
@@ -76,6 +74,7 @@ If you learn the context well, even small improvements land with more credibilit
 
 ## Hands-on: 90-Day Plan
 
+Write a one-pager with your goals for each 30-day block. Share it with your manager. Then update it weekly. The plan keeps you focused and shows your manager you think systematically.
 ### Step 1 — Days 0-30: Listen
 
 ```text

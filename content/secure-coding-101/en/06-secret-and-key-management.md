@@ -44,8 +44,6 @@ In this chapter, we will treat secret handling as an operating model rather than
 
 This picture places Secret and Key Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Secret and Key Management is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions This Chapter Answers
 
 - What counts as a *secret*
@@ -59,8 +57,6 @@ This picture places Secret and Key Management inside an operating flow. The poin
 The most common incident is a *secret committed to git*. Once pushed, it is *forever traceable*. Even *history rewrite* is not a complete fix.
 
 > *Design every secret on the assumption that it *will leak someday*.*
-
-## Concept at a Glance
 
 ## Key Terms
 

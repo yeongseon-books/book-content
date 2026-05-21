@@ -42,7 +42,7 @@ In this post, we build the mental model for that split. The goal is to see why a
 
 This picture places What Is a Data Warehouse? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is a Data Warehouse? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A data warehouse separates operational reads (OLTP) from analytical reads (OLAP). This split lets each system optimize for what it does best.
 
 ## Questions this article answers
 
@@ -66,7 +66,7 @@ When a product grows, the database that handles *one order* and the one that ans
 
 > *Run analytics on its own road; keep operations on its own.*
 
-## Concept at a Glance
+This picture shows where a data warehouse fits into an operating flow. The key is not to memorize the concept in isolation, but to understand the boundaries where input becomes processed data, where data is validated against rules, and which signals the business depends on.
 
 ## Key Terms
 

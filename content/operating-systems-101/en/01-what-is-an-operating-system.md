@@ -43,8 +43,6 @@ This is the first post in the Operating Systems 101 series. It sets up the menta
 
 This picture places What Is an Operating System? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is an Operating System? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - What problem does an operating system actually exist to solve?
@@ -64,8 +62,6 @@ This picture places What Is an Operating System? inside an operating flow. The p
 The OS is invisible until something breaks. Out-of-memory kills, zombie processes, file-descriptor leaks, slow disks, blocked sockets — almost every production incident is, at its root, a conversation gone wrong with the OS. With a mental model of the OS, error messages stop being vague "system errors" and become traceable signals.
 
 > Your application sits on the OS, the OS sits on the hardware. If you do not know the cost of crossing those boundaries, you cannot reason about performance or stability.
-
-## Concept at a Glance
 
 > The OS is the software layer between user programs and hardware. Above, it exposes a small, simple interface to applications through system calls. Below, it talks directly to hardware via schedulers, memory managers, file systems, and device drivers.
 

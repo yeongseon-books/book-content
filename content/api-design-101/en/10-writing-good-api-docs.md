@@ -51,8 +51,6 @@ Documentation drives *adoption* more than the API itself. The same endpoint can 
 
 > Documentation is *part of the product*.
 
-## Concept at a Glance
-
 That means strong reference pages are necessary but not sufficient. Users also need a visible starting point, runnable examples, and a reliable way to see what changed after they integrate.
 
 ## Key Terms

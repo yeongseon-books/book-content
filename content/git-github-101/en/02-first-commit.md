@@ -42,8 +42,6 @@ This is the second post in the Git & GitHub 101 series. Here, we go through the 
 
 This picture places Your first commit - init, status, add, commit inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Your first commit - init, status, add, commit is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 Most Git commands make sense only when you can answer one question first: where does my change currently live? That is why the hard part of learning Git early on is not the command names but the mental picture of three areas.

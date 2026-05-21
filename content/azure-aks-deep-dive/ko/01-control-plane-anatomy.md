@@ -249,4 +249,6 @@ data plane은 실제 실행을 담당합니다.
 - [Azure AKS 101](../../azure-aks-101/ko/)
 - [Azure Functions Deep Dive 1화 — 호스트 부트스트랩과 전체 구조](../../azure-functions-deep-dive/ko/01-host-bootstrap.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-aks-deep-dive/ko/01-control-plane-anatomy)
+
 Tags: AKS, Kubernetes, Distributed Systems, Containers

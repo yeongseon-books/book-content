@@ -43,8 +43,6 @@ In this article, we'll walk through bits and bytes, character encoding, signed i
 
 This picture places Data Representation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Data Representation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions This Article Answers
 
 - How does a computer store numbers, text, and images using only 0 and 1?
@@ -67,8 +65,6 @@ Garbled characters, floating-point error, and integer overflow are all problems 
 > Data representation = the physics of the digital world.
 
 Bit-level understanding is the foundation of debugging and performance work.
-
-## Concept at a Glance
 
 > Every piece of data is a sequence of bits (0/1). Encoding rules give meaning to the bits.
 

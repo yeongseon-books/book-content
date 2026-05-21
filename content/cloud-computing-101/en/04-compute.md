@@ -24,7 +24,7 @@ last_reviewed: '2026-05-14'
 
 Compute is where cloud architecture becomes tangible. The same application can run on a VM, inside a container platform, or in a serverless runtime, but those choices produce very different bills, scaling behavior, and operational load.
 
-That is why strong teams do not start with a favorite platform. They start with workload fit: how long the code runs, how bursty traffic is, how much control the runtime needs, and how much human operations time the team can afford.
+VMs, containers, serverless, and bare metal sit on a spectrum. More control on one end, more abstraction on the other. The best choice for you depends on your workload, team, and constraints — not on what is trendy.
 
 This is post 4 in the Cloud Computing 101 series.
 
@@ -46,7 +46,7 @@ In this post, we'll compare VMs, containers, serverless, and bare metal, then co
 
 This picture places Compute inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Compute is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> The compute choice you make cascades through cost, operational complexity, and what kinds of problems you can solve.
 
 ## Questions This Chapter Answers
 
@@ -59,8 +59,6 @@ This picture places Compute inside an operating flow. The point is not to memori
 ## Why It Matters
 
 Compute choice drives roughly 60% of your bill and most of your operational pain.
-
-## Concept at a Glance
 
 ## Key Terms
 

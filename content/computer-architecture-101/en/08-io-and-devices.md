@@ -45,8 +45,6 @@ This is post 8 in the Computer Architecture 101 series.
 
 This picture places I/O and Devices inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of I/O and Devices is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The speed gap between CPU and devices, and what it implies
@@ -59,8 +57,6 @@ This picture places I/O and Devices inside an operating flow. The point is not t
 Every async program, every event loop, every system call is, ultimately, an abstraction for "handle slow devices efficiently." Without interrupts and DMA, every keystroke would freeze the CPU. Knowing these mechanisms is what makes tools like epoll, async/await, and kqueue stop looking arbitrary.
 
 > A fast CPU was designed to never wait for a slow device, and your code should follow the same principle.
-
-## Concept at a Glance
 
 > CPU and devices are connected by a bus. Polling — having the CPU keep asking — is simple but wastes cycles. An interrupt lets the device signal the CPU when it is ready. DMA lets a device write directly to RAM without involving the CPU. Memory-mapped I/O makes device registers look like ordinary memory addresses.
 

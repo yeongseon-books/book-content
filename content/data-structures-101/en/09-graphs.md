@@ -43,8 +43,6 @@ This is the ninth post in the Data Structures 101 series.
 
 This picture places Graphs inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Graphs is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - Core graph terminology (vertex, edge, degree, path)
@@ -57,8 +55,6 @@ This picture places Graphs inside an operating flow. The point is not to memoriz
 Graphs are the most general and powerful data structure in computer science. Social networks, maps, the internet, dependency managers, and recommendation algorithms all run on graphs. Without comfortable graph traversal skills, more than half of typical coding interview problems become hard.
 
 > A tree is the simplest possible relationship; the real world is best described as a graph.
-
-## Concept at a Glance
 
 > A graph G = (V, E) is a vertex set V and an edge set E. If edges have direction, you have a directed graph; if they carry weights, you have a weighted graph. Adjacency lists are memory efficient, while adjacency matrices answer "is there an edge between u and v?" in O(1).
 

@@ -44,13 +44,9 @@ Here, we will treat HPA as a control loop that adjusts Deployment replica count 
 
 This picture places HPA inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of HPA is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 *Manual scaling* causes *lag* and *over-provisioning*. *Autoscaling* protects both *cost* and *availability*.
-
-## Concept at a Glance
 
 ## Key Terms
 

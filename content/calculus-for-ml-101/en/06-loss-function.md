@@ -44,8 +44,6 @@ In this post, we'll use MSE, cross entropy, and gradient-based training signals 
 
 This picture places Loss Function inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Loss Function is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - How is a loss function different from a simple evaluation metric?
@@ -57,8 +55,6 @@ This picture places Loss Function inside an operating flow. The point is not to 
 ## Why It Matters
 
 The *wrong loss* yields the *wrong model*. *Choosing the loss* is *defining the problem*.
-
-## Concept at a Glance
 
 ## Key Terms
 

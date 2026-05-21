@@ -38,10 +38,6 @@ seo_description: 파인튜닝 데이터셋의 실패 원인인 형식 문제를 
 
 *LLM Fine-tuning 101 2장 흐름 개요*
 
-이 그림에서는 데이터셋 준비와 전처리를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 데이터셋 준비와 전처리의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 이 글이 중요한가
 
 데이터셋 단계에서 가장 중요한 것은 양이 아니라 **형식 일관성**입니다. 무엇이 입력인지, 어디부터가 모델이 학습해야 할 응답인지 애매하면 손실은 내려가도 실제 답변은 흐릿하게 남습니다. 작은 LoRA 실험일수록 이 경계가 더 중요합니다.
@@ -231,6 +227,57 @@ print(len(tokenized[0]["input_ids"]))   # 64
 
 다음 글인 3편에서는 LoRA 어댑터 구성을 다룹니다. `LoraConfig`의 `r`, `alpha`, `target_modules`, `dropout`이 실제 학습 동작에 어떻게 나타나는지 한 줄씩 뜯어 보겠습니다.
 
+## 실전 패턴 추가: 데이터 준비, LoRA 설정, 학습 입력 검증을 한 흐름으로 점검하기
+
+파인튜닝 품질은 모델 아키텍처보다 입력 계약에서 먼저 결정됩니다. 데이터셋 템플릿, LoRA 설정, 길이 통계를 따로 보지 말고 같은 파이프라인에서 검증해야 디버깅 비용이 줄어듭니다.
+
+```python
+from dataclasses import dataclass
+from typing import Iterable
+
+from peft import LoraConfig
+
+@dataclass
+class Sample:
+    instruction: str
+    input: str
+    output: str
+
+def render(sample: Sample) -> str:
+    return (
+        "### Instruction:
+" + sample.instruction + "
+
+"
+        "### Input:
+" + sample.input + "
+
+"
+        "### Response:
+" + sample.output
+    )
+
+def build_lora_config() -> LoraConfig:
+    return LoraConfig(
+        r=16,
+        lora_alpha=32,
+        lora_dropout=0.05,
+        target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
+        bias="none",
+        task_type="CAUSAL_LM",
+    )
+
+def length_stats(lengths: Iterable[int]) -> tuple[int, float, int]:
+    data = sorted(lengths)
+    if not data:
+        return 0, 0.0, 0
+    avg = sum(data) / len(data)
+    p95 = data[int(len(data) * 0.95) - 1]
+    return min(data), avg, p95
+```
+
+운영 관점에서는 `target_modules`와 데이터 템플릿이 함께 관리되어야 합니다. 템플릿이 바뀌면 토큰 길이 분포가 바뀌고, 이는 배치 크기와 학습 안정성에 바로 영향을 줍니다. 따라서 데이터 버전, LoRA 설정 버전, 평가 지표를 같은 실험 단위로 묶어 기록하는 것이 필수입니다. 이렇게 해야 특정 품질 변화가 데이터 문제인지, 어댑터 설정 문제인지 빠르게 분리할 수 있습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **`instruction / input / output` 세 필드를 어떤 형태로 잡아야 할까요?**
@@ -260,5 +307,7 @@ print(len(tokenized[0]["input_ids"]))   # 64
 - [Instruction tuning overview](https://arxiv.org/abs/2203.02155)
 - [Alpaca dataset format](https://github.com/tatsu-lab/stanford_alpaca#data-release)
 - [Llama 3 chat template](https://huggingface.co/docs/transformers/main/en/chat_templating)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/llm-finetuning-101/ko/02-dataset)
 
 Tags: Fine-tuning, LoRA, LLM, Python

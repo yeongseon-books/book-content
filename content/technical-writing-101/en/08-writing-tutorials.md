@@ -50,8 +50,6 @@ A *first success* creates the will to keep *learning*.
 
 > Mental model: every tutorial step needs a checkpoint the reader can verify before moving on.
 
-## Concept at a Glance
-
 Tutorials differ from reference docs because they prioritize momentum and small wins over completeness. Each step should reveal visible proof of progress and include a recovery path for the most likely failure.
 ## Key Terms
 

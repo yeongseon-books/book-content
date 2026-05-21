@@ -45,8 +45,6 @@ This is post 6 in the Computer Networks 101 series.
 
 This picture places TLS Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of TLS Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The three TLS guarantees (confidentiality, integrity, identity)
@@ -59,8 +57,6 @@ This picture places TLS Basics inside an operating flow. The point is not to mem
 Without TLS in your head, certificate-expiry incidents are paralyzing and dangerous code that "ignores self-signed" sneaks in. Modern infrastructure — mTLS, service mesh, zero-trust — all assumes TLS by default. If you cannot explain "why is it safe?" in your own words, security design drifts unconsciously.
 
 > TLS is not "this channel is safe". It is the combination "this key really belongs to this domain, and only that key can decrypt".
-
-## Concept at a Glance
 
 A symmetric session key is derived from the asymmetric agreement, and from that point all data is encrypted fast with that key.
 

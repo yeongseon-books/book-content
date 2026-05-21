@@ -42,8 +42,6 @@ This post is the 5th article in the Python 101 series. This is the point in the 
 
 This picture places Control flow: if, for, while, comprehension inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Control flow: if, for, while, comprehension is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 Branching and looping make up a large share of application code, so when this part is messy the rest is harder to read. Python's branching and loop syntax is leaner than most languages, but it adds a few unfamiliar tools — `for`-`else` and comprehensions — that pay off once you know them. With them in your toolbox you stop writing tall `if` ladders, and you can switch between regular loops and comprehensions on purpose.

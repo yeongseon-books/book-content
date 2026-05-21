@@ -282,4 +282,6 @@ az functionapp plan create \
 - [Azure Functions 101 — 스케일링과 콜드 스타트](./06-scaling-and-cold-start.md)
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/ko/) — 플랜 차이가 런타임 내부 동작에 어떻게 연결되는지 더 보고 싶다면
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-functions-101/ko/05-choosing-a-plan)
+
 Tags: Azure, Azure Functions, Serverless, Cloud

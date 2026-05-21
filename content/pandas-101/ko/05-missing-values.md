@@ -105,6 +105,20 @@ print(df.fillna(df.mean(numeric_only=True)))
 
 상수나 평균으로 채우는 방식은 빠르지만 의미가 약할 수 있습니다. 특히 평균 대체는 분포와 분산을 왜곡할 수 있다는 점을 염두에 둬야 합니다.
 
+## 결측치 처리 방법 비교
+
+결측치를 다루는 주요 방법을 표로 정리하면 상황별 선택 기준이 명확해집니다.
+
+| 방법 | 함수 | 장점 | 단점 |
+| --- | --- | --- | --- |
+| 제거 | `dropna()` | 간단, 빠름 | 표본 감소 |
+| 상수 대체 | `fillna(value)` | 간단, 예측 가능 | 분포 왜곡 |
+| 통계 대체 | `fillna(df.mean())` | 중심 경향 보존 | 분산 감소 |
+| 전후 채우기 | `ffill()`, `bfill()` | 시계열에 적합 | 끝단 결측 유지 |
+| 보간 | `interpolate()` | 흐름 보존 | 복잡도 증가 |
+
+각 방법은 장단점이 명확합니다. 데이터의 특성과 분석 목적에 따라 적절한 방법을 선택해야 합니다.
+
 ### 4단계 - 앞값이나 뒷값으로 채우기
 
 ```python
@@ -135,6 +149,42 @@ dtype: float64
 
 보간은 시계열처럼 흐름이 있는 데이터에 특히 잘 맞습니다. 모든 결측에 쓸 수 있는 만능 도구는 아니지만, 연속값의 빈 구간을 다룰 때는 매우 자연스럽습니다.
 
+## 복합 조건 필터링
+
+결측치를 기준으로 필터링할 때는 보통 여러 조건을 조합합니다.
+
+### 특정 열에 결측이 있는 행
+
+```python
+df = pd.DataFrame({
+    "x": [1, np.nan, 3],
+    "y": [np.nan, 2, 3],
+})
+has_missing_x = df[df["x"].isna()]
+print(has_missing_x)
+```
+
+특정 열에만 결측치가 있는 행을 골라내면 결측 패턴을 분석할 수 있습니다.
+
+### 모든 열이 비지 않은 행
+
+```python
+complete_rows = df.dropna()
+print(complete_rows)
+```
+
+모든 열이 채워져 있는 행만 남기면 완전한 데이터셋을 얻지만, 표본 크기는 크게 줄어듭니다.
+
+### query로 결측치 필터링
+
+Pandas 1.x부터는 `query`에서 `isna()`를 직접 쓸 수 없지만, 조건식을 미리 계산해 두면 가독성을 높일 수 있습니다.
+
+```python
+df["has_x"] = df["x"].notna()
+result = df.query("has_x == True")
+print(result)
+```
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - `isna().sum()`은 결측 진단의 첫 단계입니다.
@@ -161,12 +211,196 @@ dtype: float64
 - 시계열에서는 보간을 적극적으로 검토합니다.
 - 머신러닝에서는 결측 자체를 특징으로 활용할지 판단합니다.
 
+## 고급 결측치 처리 기법
+
+실무에서는 단순한 대체보다 더 정교한 방법이 필요할 때가 있습니다.
+
+### 그룹별 평균 대체
+
+```python
+df = pd.DataFrame({
+    "category": ["A", "A", "B", "B", "B"],
+    "value": [10, np.nan, 20, 25, np.nan],
+})
+df["value"] = df.groupby("category")["value"].transform(
+    lambda x: x.fillna(x.mean())
+)
+print(df)
+```
+
+같은 범주에 속한 데이터의 평균으로 대체하면 전체 평균보다 더 정확할 수 있습니다.
+
+### 결측 여부를 특징으로 활용
+
+```python
+df["value_missing"] = df["value"].isna().astype(int)
+print(df.head())
+```
+
+머신러닝에서는 결측 여부 자체가 중요한 정보일 수 있습니다. 별도 특징으로 추가하면 모델이 결측 패턴을 학습할 수 있습니다.
+
+### 조건부 대체
+
+```python
+df["value"] = df["value"].apply(
+    lambda x: 0 if pd.isna(x) and some_condition else x
+)
+```
+
+특정 조건에서만 결측치를 대체하고 싶을 때는 `apply`와 조건식을 결합할 수 있습니다.
+
+## 결측치 비율 분석
+
+결측치를 처리하기 전에 그 규모와 분포를 파악하는 것이 중요합니다.
+
+### 열별 결측 비율
+
+```python
+df = pd.DataFrame({
+    "a": [1, np.nan, 3, np.nan, 5],
+    "b": [np.nan, 2, 3, 4, 5],
+    "c": [1, 2, 3, 4, 5],
+})
+missing_ratio = df.isna().sum() / len(df) * 100
+print(missing_ratio)
+```
+
+**예상 출력:**
+
+```text
+a    40.0
+b    20.0
+c     0.0
+dtype: float64
+```
+
+결측 비율이 높은 열은 아예 제거하거나 별도로 처리하는 편이 나을 수 있습니다.
+
+### 행별 결측 개수
+
+```python
+missing_per_row = df.isna().sum(axis=1)
+print(missing_per_row)
+```
+
+행마다 결측 개수를 세면 어떤 행이 데이터 품질이 낮은지 파악할 수 있습니다.
+
+### 결측 패턴 시각화
+
+```python
+import matplotlib.pyplot as plt
+df.isna().sum().plot(kind="bar")
+plt.title("Missing Values per Column")
+plt.ylabel("Count")
+plt.show()
+```
+
+시각화를 통해 결측 분포를 한눈에 파악할 수 있습니다. 특정 열에 결측이 몰려 있다면 그 원인을 분석할 필요가 있습니다.
+
 ## 체크리스트
 
 - [ ] `isna().sum()`으로 결측 규모를 진단할 수 있습니다.
 - [ ] `dropna`가 데이터 양에 주는 영향을 측정합니다.
 - [ ] `fillna` 전략을 명시적으로 정합니다.
 - [ ] 결측 비율과 처리 기준을 기록합니다.
+
+
+
+## 결측 패턴 분석
+
+결측치를 처리하기 전에 패턴을 분석하면 더 나은 전략을 세울 수 있습니다.
+
+### 결측 상관관계
+
+```python
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+missing = df.isna()
+correlation = missing.corr()
+sns.heatmap(correlation, annot=True)
+plt.title("Missing Value Correlation")
+plt.show()
+```
+
+특정 열들의 결측치가 함께 나타나는 패턴이 있다면, 이는 데이터 수집 과정의 문제를 시사할 수 있습니다.
+
+### 시계열 결측 패턴
+
+```python
+df["date"] = pd.to_datetime(df["date"])
+df.set_index("date", inplace=True)
+missing_by_time = df.isna().resample("D").sum()
+missing_by_time.plot()
+plt.title("Missing Values Over Time")
+plt.show()
+```
+
+시간에 따른 결측치 분포를 보면 시스템 장애나 계절성 패턴을 발견할 수 있습니다.
+
+
+
+
+### 머신러닝에서의 결측치
+
+머신러닝 모델에서는 결측치 처리 전략이 모델 성능에 직접 영향을 줍니다.
+
+```python
+from sklearn.impute import SimpleImputer
+
+# Scikit-learn imputer 사용
+imputer = SimpleImputer(strategy="median")
+df_imputed = pd.DataFrame(
+    imputer.fit_transform(df),
+    columns=df.columns
+)
+print(df_imputed.isna().sum())
+```
+
+Pandas 기본 기능 외에도 scikit-learn의 Imputer를 활용할 수 있습니다.
+
+
+
+## 결측치 생성 패턴
+
+때로는 의도적으로 결측치를 생성해야 할 때도 있습니다.
+
+```python
+# 조건부로 NaN 설정
+df.loc[df["value"] < 0, "value"] = np.nan
+
+# 특정 값을 NaN으로 변환
+df.replace(-999, np.nan, inplace=True)
+
+# 범위 밖 값을 NaN으로
+df["temperature"] = df["temperature"].where(
+    (df["temperature"] >= -50) & (df["temperature"] <= 50)
+)
+```
+
+이상치를 결측치로 처리하는 것도 정제 전략 중 하나입니다.
+
+
+
+이상치를 결측치로 변환하는 전략은 통계 분석에서 자주 사용됩니다. 다만 원본 데이터는 별도로 보관하는 것이 안전합니다.
+
+
+## 결측 패턴 시각화
+
+결측 패턴을 시각화하면 데이터의 구조적 문제를 발견할 수 있습니다.
+
+```python
+import matplotlib.pyplot as plt
+
+missing_pattern = df.isna().astype(int)
+plt.imshow(missing_pattern, cmap="gray", aspect="auto")
+plt.xlabel("Column")
+plt.ylabel("Row")
+plt.title("Missing Value Pattern")
+plt.show()
+```
+
+결측이 무작위로 퍼져 있는지, 특정 구간에 몰려 있는지에 따라 처리 전략이 달라집니다.
 
 ## 연습 문제
 

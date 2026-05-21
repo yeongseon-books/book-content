@@ -288,4 +288,6 @@ python ... azure_functions_worker ...
 
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/ko/) — Host/Worker 분리를 코드 레벨에서 따라가는 심화 시리즈
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-functions-101/ko/03-host-and-worker)
+
 Tags: Azure, Azure Functions, Serverless, Cloud

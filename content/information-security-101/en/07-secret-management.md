@@ -45,7 +45,7 @@ This is post 7 in the Information Security 101 series.
 
 This picture places Secret Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Secret Management is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Secret management is not just storing encrypted keys. It is tracking who accessed what secret when, detecting abnormal access patterns, and proving that no key was exposed during its lifetime.
 
 ## What You Will Learn
 
@@ -60,8 +60,6 @@ This picture places Secret Management inside an operating flow. The point is not
 More than half of large incidents start with leaked secrets. A leaked secret without rotation is a permanent risk.
 
 > Secrets are liabilities, not assets — keep their lifetime short.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR

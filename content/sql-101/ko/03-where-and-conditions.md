@@ -123,6 +123,148 @@ SELECT * FROM users WHERE deleted_at IS NULL;
 
 이 세 가지는 문법 지식으로 끝나지 않습니다. 실제로 느린 쿼리와 잘못된 결과의 상당수가 여기서 나옵니다.
 
+## 비교 연산자와 논리 연산자 우선순위
+
+조건식을 정확하게 작성하려면 연산자의 우선순위를 알아야 합니다. 다음 표는 SQL에서 자주 쓰는 비교 연산자와 논리 연산자를 우선순위 순서대로 정리한 것입니다.
+
+| 우선순위 | 연산자 | 설명 |
+| --- | --- | --- |
+| 1 | `()` | 괄호 — 가장 먼저 평가 |
+| 2 | `NOT` | 논리 부정 |
+| 3 | 비교 연산자 | `=`, `<>`, `>`, `<`, `>=`, `<=`, `BETWEEN`, `IN`, `LIKE`, `IS NULL` |
+| 4 | `AND` | 논리적 AND |
+| 5 | `OR` | 논리적 OR |
+
+`AND`가 `OR`보다 먼저 결합하므로, 복잡한 조건식에서는 괄호로 의도를 명확히 하는 편이 안전합니다. 예를 들어 `A OR B AND C`는 `A OR (B AND C)`로 해석됩니다.
+
+```sql
+-- 괄호 없이 쓰면 예상과 다를 수 있습니다
+SELECT * FROM users
+WHERE country = 'US' OR country = 'UK' AND age >= 18;
+
+-- 의도를 명확히 하려면 괄호를 쓰세요
+SELECT * FROM users
+WHERE (country = 'US' OR country = 'UK') AND age >= 18;
+```
+
+쪰 번째 쿼리는 `country = 'UK' AND age >= 18`을 먼저 평가하고, 그 결과를 `country = 'US'`와 OR로 합칩니다. 두 번째 쿼리는 국가 조건을 먼저 모으고, 그 결과를 나이 조건과 AND로 결합합니다. 의도가 완전히 다릅니다.
+
+## BETWEEN, IN, LIKE, IS NULL 예제 모음
+
+### BETWEEN으로 범위 필터링
+
+```sql
+-- 나이가 18세 이상 30세 이하
+SELECT name, age FROM users WHERE age BETWEEN 18 AND 30;
+
+-- 날짜 범위
+SELECT * FROM orders WHERE order_date BETWEEN '2026-01-01' AND '2026-01-31';
+```
+
+`BETWEEN`은 양 끝을 포함하는 범위 조건입니다. `age >= 18 AND age <= 30`과 같은 의미이지만, 읽기 더 쉬습니다.
+
+### IN으로 목록 매칭
+
+```sql
+-- 국가가 US, UK, FR 중 하나
+SELECT * FROM users WHERE country IN ('US', 'UK', 'FR');
+
+-- 순자 목록
+SELECT * FROM users WHERE id IN (1, 3, 5, 7);
+```
+
+`IN`은 여러 개의 `OR` 조건을 간결하게 만들어 줍니다. `country = 'US' OR country = 'UK' OR country = 'FR'`을 한 줄로 표현할 수 있습니다.
+
+### LIKE로 패턴 검색
+
+```sql
+-- 이메일이 example.com으로 끝나는 사용자
+SELECT * FROM users WHERE email LIKE '%@example.com';
+
+-- 이름이 A로 시작
+SELECT * FROM users WHERE name LIKE 'A%';
+
+-- 이름에 'in'이 포함
+SELECT * FROM users WHERE name LIKE '%in%';
+```
+
+`LIKE`는 문자열 패턴을 찾을 때 쓰입니다. `%`는 0개 이상의 문자, `_`는 정확히 1개의 문자를 나타냅니다. 단, 와일드카드가 앞에 오면 (`%xxx`) 인덱스를 쓰기 어려워 비용이 커질 수 있습니다.
+
+### IS NULL로 NULL 검사
+
+```sql
+-- 삭제되지 않은 사용자
+SELECT * FROM users WHERE deleted_at IS NULL;
+
+-- 삭제된 사용자
+SELECT * FROM users WHERE deleted_at IS NOT NULL;
+
+-- 생년월일이 비어 있는 행
+SELECT * FROM users WHERE birth_date IS NULL;
+```
+
+`NULL`은 값이 없다거나 알 수 없다는 특별한 상태이므로, `= NULL`이 아니라 `IS NULL`로 비교해야 합니다. `= NULL`은 항상 모름으로 평가되어 결과를 반환하지 않습니다.
+
+### 여러 조건 조합 예제
+
+```sql
+-- 미국 또는 영국 사용자 중 성인
+SELECT * FROM users
+WHERE (country = 'US' OR country = 'UK') AND age >= 18;
+
+-- 이메일이 있고, 삭제되지 않은 활성 사용자
+SELECT * FROM users
+WHERE email IS NOT NULL AND deleted_at IS NULL;
+
+-- 주문 금액이 100 이상 500 이하, 상태가 'paid' 또는 'shipped'
+SELECT * FROM orders
+WHERE total BETWEEN 100 AND 500
+  AND status IN ('paid', 'shipped');
+```
+
+실무에서는 여러 조건을 조합하는 경우가 대부분입니다. 이때 괄호로 의도를 명확히 하고, 각 조건이 무엇을 걸러내는지 주석이나 부연 설명으로 남겨 두면 다른 사람이 읽기 쉬워집니다.
+
+## 인덱스와 WHERE 조건 순서
+
+인덱스는 특정 열의 값을 빠르게 찾기 위해 데이터베이스가 내부에 만들어 두는 보조 자료 구조입니다. `WHERE` 조건을 쓸 때 인덱스가 있는 열을 먼저 쓰면 데이터베이스가 훨씬 빠르게 행을 찾을 수 있습니다.
+
+### 인덱스를 타는 조건
+
+```sql
+-- user_id에 인덱스가 있다고 가정
+CREATE INDEX idx_user_id ON orders(user_id);
+
+-- 인덱스를 활용할 수 있는 조건
+SELECT * FROM orders WHERE user_id = 123;
+```
+
+이 쿼리는 `user_id` 인덱스를 통해 빠르게 실행됩니다. 데이터베이스는 전체 테이블을 읽지 않고, 인덱스를 통해 해당 행만 바로 찾습니다.
+
+### 인덱스를 못 타는 조건
+
+```sql
+-- 컴럼에 함수를 감싸면 인덱스 활용이 어려움
+SELECT * FROM orders WHERE YEAR(order_date) = 2026;
+
+-- 대신 이렇게 쓰는 편이 낫습니다
+SELECT * FROM orders
+WHERE order_date >= '2026-01-01' AND order_date < '2027-01-01';
+```
+
+컴럼에 함수를 감싸면 데이터베이스는 모든 행의 `order_date`를 읽어서 함수를 적용한 뒤 비교해야 합니다. 이렇게 하면 인덱스를 활용하기 어려워집니다. 가능하면 컴럼을 그대로 두고 비교 값을 조정하는 편이 낫습니다.
+
+### 조건 순서와 성능
+
+대부분의 현대 데이터베이스는 쿼리 최적화기가 조건 순서를 알아서 재배치합니다. 하지만 원칙적으로는 선택도가 높은 조건(적은 행을 걸러내는 조건)을 먼저 쓰면 데이터베이스가 불필요한 비교를 줄일 수 있습니다.
+
+```sql
+-- user_id가 100명, status='pending'이 10명이라면
+-- 선택도가 높은 조건을 먼저
+SELECT * FROM orders
+WHERE status = 'pending' AND user_id = 123;
+```
+
+이 경우 `status = 'pending'`이 먼저 10명을 걸러내고, 그 중에서 `user_id = 123`을 찾는 것이 효율적일 수 있습니다. 하지만 현대 데이터베이스는 통계 정보를 바탕으로 자동으로 순서를 조정하므로, 조건의 의미가 명확한 것이 순서보다 더 중요합니다.
 ## 실무에서 자주 헷갈리는 지점
 
 ### `= NULL`이 왜 항상 문제일까
@@ -151,6 +293,47 @@ SELECT * FROM users WHERE deleted_at IS NULL;
 
 다음 글에서는 여러 테이블을 연결하는 `JOIN`을 다루며, 결과가 왜 갑자기 불어나는지와 카디널리티를 어떻게 읽어야 하는지 정리하겠습니다.
 
+## WHERE 조건 작성 모범 사례
+
+실무에서 WHERE 조건을 작성할 때는 가독성과 성능을 함께 고려해야 합니다. 다음은 자주 쓰는 모범 사례입니다.
+
+### 날짜 범위 조건
+
+```sql
+-- 좋은 예: 인덱스를 타기 쉬운 형태
+SELECT * FROM orders
+WHERE order_date >= '2026-01-01' 
+  AND order_date < '2026-02-01';
+
+-- 피할 예: 함수 사용
+-- SELECT * FROM orders
+-- WHERE EXTRACT(MONTH FROM order_date) = 1;
+```
+
+### NULL 처리
+
+```sql
+-- 좋은 예: 명시적으로 IS NULL 사용
+SELECT * FROM users WHERE deleted_at IS NULL;
+
+-- 피할 예: = NULL은 동작하지 않음
+-- SELECT * FROM users WHERE deleted_at = NULL;
+```
+
+### 복잡한 AND/OR 조합
+
+```sql
+-- 좋은 예: 괄호로 의도 명확히
+SELECT * FROM products
+WHERE (category = 'electronics' OR category = 'computers')
+  AND price > 100
+  AND in_stock = true;
+
+-- 피할 예: 괄호 없이 혼동 가능
+-- SELECT * FROM products
+-- WHERE category = 'electronics' OR category = 'computers'
+--   AND price > 100 AND in_stock = true;
+```
 ## 처음 질문으로 돌아가기
 
 - **비교 연산자와 조건식은 어떻게 읽어야 할까요?**

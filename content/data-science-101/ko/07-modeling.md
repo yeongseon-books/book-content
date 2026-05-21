@@ -40,9 +40,9 @@ last_reviewed: '2026-05-15'
 
 *Data Science 101 7장 흐름 개요*
 
-이 그림에서는 모델링를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+모델링를 운영 시스템 속에서 올바르게 배치하려면 어떤 경계에서 무엇을 입력받고, 어디에서 검증하며, 어떤 신호를 남겨야 하는지 먼저 봐야 합니다.
 
-> 모델링의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+> 모델링의 핵심은 기능 이름이 아니라, 입력을 받는 경계에서 결과를 내보내는 경계까지 어떤 기준으로 데이터를 검증하고 처리할 것인가를 명확히 정하는 데 있습니다.
 
 ## 이 글에서 배우는 내용
 
@@ -190,6 +190,117 @@ print(scores.mean(), "+/-", scores.std())
 ## 정리 및 다음 글
 
 모델링은 복잡한 알고리즘 경연이 아니라, 기준선과 비교하며 조금씩 나아지는 과정입니다. 베이스라인, 분리, 누수 방지, 반복 평가를 챙겨야 모델 점수를 믿을 수 있습니다. 다음 글에서는 이렇게 만든 모델을 어떤 지표로 평가해야 하는지 살펴보겠습니다.
+
+## 실무 확장: 모델 선택 흐름과 sklearn 파이프라인 설계
+
+모델링에서 가장 흔한 실패는 알고리즘 선택보다 실험 설계 부재에서 시작됩니다. 어떤 문제인지, 데이터 형태가 무엇인지, 해석 가능성이 중요한지, 운영 제약이 있는지에 따라 모델 선택 기준은 달라집니다. 이 섹션에서는 초급 실무에서 바로 적용 가능한 선택 흐름과 `scikit-learn` 파이프라인 예시를 제시합니다.
+
+### 모델 선택 플로차트(텍스트 버전)
+
+1. 목표 변수가 연속형인가 범주형인가를 먼저 구분합니다.
+2. 데이터 건수가 작고 해석이 중요하면 선형/로지스틱 회귀를 우선 검토합니다.
+3. 비선형 패턴 가능성이 크면 트리 기반 모델을 후보에 추가합니다.
+4. 클래스 불균형이 크면 클래스 가중치와 임계값 전략을 함께 설계합니다.
+5. 배포 지연시간 제약이 있으면 추론 속도를 평가 항목에 포함합니다.
+
+### sklearn Pipeline 예시: 전처리 + 모델 + 검증
+
+```python
+import pandas as pd
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.pipeline import Pipeline
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import roc_auc_score
+
+
+df = pd.read_csv("churn.csv")
+X = df.drop(columns=["churn"])
+y = df["churn"]
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+num_cols = X.select_dtypes(include="number").columns.tolist()
+cat_cols = X.select_dtypes(exclude="number").columns.tolist()
+
+pre = ColumnTransformer(
+    transformers=[
+        ("num", StandardScaler(), num_cols),
+        ("cat", OneHotEncoder(handle_unknown="ignore"), cat_cols),
+    ]
+)
+
+clf = Pipeline(
+    steps=[
+        ("pre", pre),
+        ("model", LogisticRegression(max_iter=1000, class_weight="balanced")),
+    ]
+)
+
+clf.fit(X_train, y_train)
+proba = clf.predict_proba(X_test)[:, 1]
+print("test_auc:", round(roc_auc_score(y_test, proba), 4))
+print("cv_auc:", cross_val_score(clf, X_train, y_train, cv=5, scoring="roc_auc").mean())
+```
+
+### 후보 모델 비교표(입문 실무 기준)
+
+| 모델 | 장점 | 단점 | 추천 상황 |
+| --- | --- | --- | --- |
+| Logistic Regression | 빠름, 해석 쉬움 | 비선형 한계 | 베이스라인, 설명 필요 |
+| Random Forest | 강건함, 튜닝 난이도 중간 | 해석 상대적 어려움 | 일반 탭уляр 데이터 |
+| Gradient Boosting | 성능 우수 가능성 높음 | 튜닝/학습시간 증가 | 점수 극대화 필요 |
+
+### 실험 운영 규칙
+
+- 베이스라인 점수를 먼저 고정합니다.
+- 한 번에 한 가지 변화만 적용합니다.
+- 지표는 주 지표 + 가드레일 지표를 분리합니다.
+- 실험 로그에 데이터 버전, 피처 목록, 파라미터를 반드시 기록합니다.
+- 테스트셋은 마지막 검증에만 사용합니다.
+
+모델링은 "좋은 알고리즘 찾기"보다 "검증 가능한 실험 반복"에 가깝습니다. 이 관점을 잡으면 성능 개선이 느려 보여도 결과 신뢰도는 훨씬 높아집니다.
+
+### 보강 메모: 팀 운영 관점에서 꼭 남겨야 할 기록
+
+입문 프로젝트에서는 코드가 돌아가는 것만으로도 큰 성취를 느끼기 쉽습니다. 하지만 실무에서 더 중요한 것은 같은 결과를 팀이 다시 만들 수 있는가입니다. 그래서 본문 실습을 수행한 뒤에는 다음 항목을 반드시 문서로 남기는 습관이 필요합니다.
+
+- 실행 날짜와 데이터 버전
+- 사용한 핵심 컬럼 목록과 정의
+- 주요 가정(제외한 데이터, 임계값, 기간)
+- 결과 해석 시 주의할 제약 조건
+- 다음 반복에서 확인할 질문
+
+이 다섯 가지를 기록하면 다음 사이클에서 같은 논의를 처음부터 반복하지 않아도 됩니다. 특히 모델 점수나 차트 결과처럼 숫자가 좋아 보이는 상황일수록 제약 조건을 함께 적는 것이 중요합니다. 수치의 강점과 약점을 함께 남겨야 팀이 과신하지 않고, 반대로 필요한 행동은 빠르게 실행할 수 있습니다.
+
+### 보강 예시: 재현 가능한 결과 패키지 만들기
+
+```python
+from pathlib import Path
+import json
+import datetime as dt
+
+meta = {
+    "run_at": dt.datetime.utcnow().isoformat(),
+    "dataset": "example_v1",
+    "assumptions": [
+        "trial users excluded",
+        "analysis window = last 30 days",
+        "threshold fixed before final test",
+    ],
+    "next_question": "Which segment shows largest variance next week?",
+}
+
+out = Path("artifacts")
+out.mkdir(exist_ok=True)
+(out / "run_meta.json").write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
+print("saved", out / "run_meta.json")
+```
+
+이 코드는 분석 산출물을 실행 메타데이터와 함께 저장하는 가장 작은 예시입니다. 이렇게 작은 기록이 쌓이면 팀 차원의 학습 속도가 크게 올라갑니다. 프로젝트는 한 번의 정답을 찾는 작업이 아니라 반복을 통해 품질을 높이는 작업이기 때문입니다.
 
 ## 처음 질문으로 돌아가기
 

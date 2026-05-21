@@ -330,4 +330,6 @@ def prepare_for_vlm(path: str, max_side: int = 1024) -> Image.Image:
 - [LLM API 프로덕션 101 - 구조화 출력](../../llm-api-production-101/ko/01-structured-output.md)
 - [문서 수집과 인덱싱 101 - 다중 포맷 문서 파이프라인](../../document-ingestion-101/ko/05-multi-format-pipeline.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/multimodal-ai-101/ko/01-why-multimodal-matters)
+
 Tags: Multimodal AI, CLIP, GPT-4V, Flamingo, Vision Language, Modality Fusion

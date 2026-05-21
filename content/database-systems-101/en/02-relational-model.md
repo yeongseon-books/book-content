@@ -45,8 +45,6 @@ This is post 2 in the Database Systems 101 series.
 
 This picture places The Relational Model inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of The Relational Model is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - What "relation," "tuple," and "attribute" actually point to in a table
@@ -59,8 +57,6 @@ This picture places The Relational Model inside an operating flow. The point is 
 If you blur "table" and "relation," everything that comes later — normalization, indexes, transactions — feels slightly off. Get the model right once and SQL becomes "the language we use to operate on relations," not a list of incantations.
 
 > SQL is not a procedural language. It is a set of operations defined over relations. That is why you describe **what** you want, not **how**.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR

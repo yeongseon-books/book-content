@@ -351,4 +351,6 @@ print(report)
 - [시리즈 현재 위치 다시 보기](./01-why-evaluate-llm-apps.md)
 - [LLM Apps Ops 101](../../llm-apps-ops-101/ko/01-monitoring-and-logging.md) — 같은 "LLM 정확성" 문제를 운영 단계에서 다룹니다. 이 시리즈가 릴리스 전 게이트를 만든다면, ops 시리즈는 릴리스 후에 모니터링·로깅·알림으로 같은 신호를 추적합니다.
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-evaluation-101/ko/01-why-evaluate-llm-apps)
+
 Tags: AI Evaluation, LLM, Testing, Quality

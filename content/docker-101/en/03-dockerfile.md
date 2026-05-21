@@ -42,15 +42,11 @@ This is post 3 in the Docker 101 series. It explains the role of the core Docker
 
 This picture places Writing a Dockerfile inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Writing a Dockerfile is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 *One ordering choice* turns a build from *5 minutes into 30 seconds*. A good Dockerfile *visibly* changes team productivity.
 
 > *Slow builds are a *quiet cost*. At 50 builds a day, you lose *hundreds of hours per year*.*
-
-## Concept at a Glance
 
 ## Key Terms
 

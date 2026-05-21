@@ -237,4 +237,6 @@ control plane 지도, node 실행 경로, Pod 네트워킹, scheduler의 placeme
 - [Azure AKS 101](../../azure-aks-101/ko/)
 - [Azure Functions Deep Dive 5화 — 컨트롤 루프 읽기](../../azure-functions-deep-dive/ko/05-scaling-internals.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-aks-deep-dive/ko/06-keda-internals)
+
 Tags: AKS, Kubernetes, Distributed Systems, Containers

@@ -44,13 +44,9 @@ Here, we will look at Service as the networking contract that hides changing Pod
 
 This picture places Service inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Service is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 For *microservices* to call each other by *name*, a *Service* is mandatory.
-
-## Concept at a Glance
 
 ## Key Terms
 

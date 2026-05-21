@@ -62,6 +62,20 @@ last_reviewed: '2026-05-15'
 
 이 다섯 개를 함께 설계하면 커뮤니티의 진입 비용이 낮아집니다. 초보자는 어디에 무엇을 올려야 하는지 알고, 메인테이너는 같은 설명을 반복하는 시간을 줄일 수 있습니다.
 
+## 거버넌스 모델 비교
+
+커뮤니티 운영은 사람과 규칙의 문제일 뿐만 아니라, 의사결정 구조의 문제이기도 합니다. 프로젝트가 커지면 메인테이너 한 명의 판단으로는 감당하기 어려워집니다. 이때 거버넌스 모델이 필요합니다.
+
+| 모델 | 예시 | 장점 | 단점 |
+|---|---|---|---|
+| BDFL (Benevolent Dictator) | Python (Guido), Linux (Linus) | 빠른 결정, 일관된 방향 | 한 명 의존, 승계 문제 |
+| 메리토크라시 | Rust, Kubernetes | 기여도로 권한 획듍, 투명 | 초기 혼란, 의견 충돌 |
+| 위원회 | Node.js (TSC) | 분산 책임, 규모 대응 | 결정 느림, 절차 부담 |
+| 재단 | Apache, Eclipse | 법적 보호, 장기 안정성 | 행정 부담, 의사결정 느림 |
+
+소규모 프로젝트는 BDFL이나 메리토크라시로 시작하는 편이 부담 없이 좋습니다. 프로젝트가 사용자 1만 명을 넘기기 시작하면 위원회 구조를 고려할 때입니다. 재단은 상표권이나 법적 보호가 필요한 경우에 적합합니다.
+
+커뮤니티 운영에서 가장 힘든 부분은 대부분 일이 아니라, 반복되는 같은 질문을 처리하는 피로도입니다. FAQ 문서를 처음부터 잘 만들면 메인테이너 응답 부담을 크게 줄일 수 있습니다.
 ## 생각이 어떻게 바뀌어야 할까
 
 처음에는 공격적인 댓글이나 혼선이 어느 정도는 어쩔 수 없다고 생각하기 쉽습니다. 하지만 실제로는 규칙과 구조가 불분명해서 생기는 문제도 많습니다.
@@ -123,12 +137,91 @@ labels: bug
     pr-message: "Thanks for your first PR!"
 ```
 
+## 커뮤니티 활동 기록 가시화
+
+커뮤니티가 활성화되면 기여자 활동을 가시화하면 동기 부여와 투명성을 높일 수 있습니다. README에 기여자 목록을 자동 생성하면 소속감을 줄 수 있습니다.
+
+```yaml
+# .github/workflows/contributors.yml
+name: Update Contributors
+
+on:
+  schedule:
+    - cron: '0 0 * * 0' # 주간
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: minicli/action-contributors@v3
+      with:
+        repo: '${{ github.repository }}'
+        output: CONTRIBUTORS.md
+        template: 'table'
+    - run: |
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git add CONTRIBUTORS.md
+        git diff --quiet || git commit -m "Update contributors"
+        git push
+```
+
+이 자동화는 매주 기여자 목록을 업데이트합니다. 작은 기여도 공개적으로 인정받으면 다음 참여 가능성이 높아집니다. 이런 세심함이 커뮤니티 지속성을 만듭니다.
 ## 이 예시에서 먼저 읽어야 할 점
 
 행동 강령은 분위기 설명이 아니라 경계 설정입니다. 기여 안내 문서는 메인테이너 시간을 절약하는 문서입니다. 템플릿은 규율이 아니라 안내 장치입니다. 환영 메시지는 사소해 보여도 온보딩 경험을 바꿉니다.
 
 문서와 응답이 함께 있어야 커뮤니티가 작동합니다. 규칙만 있고 반응이 없으면 프로젝트는 닫혀 보이고, 반응만 있고 구조가 없으면 메인테이너가 금방 지칩니다.
 
+## 의사결정 프로세스 문서화
+
+행동 강령은 규칙을 제시하지만, 규칙을 기반으로 어떻게 결정하는지는 설명하지 않습니다. 그래서 의사결정 프로세스를 별도로 문서화하는 편이 좋습니다.
+
+**기본 구조 예시 (GOVERNANCE.md)**
+
+```markdown
+# Governance
+
+## Roles
+
+- Maintainer: Full access, final decision
+- Committer: Merge permission
+- Contributor: Anyone who opened PR
+
+## Decision Process
+
+- Bug fixes: Maintainer approves immediately
+- Small features: One committer review required
+- Breaking changes: Two maintainer reviews + 7-day notice
+
+## Voting
+
+- Committers vote on new committer nominations
+- Majority (>50%) wins
+- Voting period: 7 days
+```
+
+이 문서는 소규모 프로젝트에도 도움이 됩니다. 의사결정 근거가 명확하면 메인테이너의 판단을 투명하게 설명할 수 있고, 기여자는 이의를 제기할 근거를 얻습니다.
+
+## 커뮤니티 온보딩 체크리스트
+
+신규 기여자가 프로젝트에 처음 참여할 때 어디서부터 시작해야 할지 막막합니다. 온보딩 체크리스트를 제공하면 진입 장벽이 낮아집니다.
+
+```markdown
+## 기여자 온보딩 체크리스트
+
+- [ ] README를 읽고 프로젝트 목표를 이해했습니다
+- [ ] CONTRIBUTING.md에서 기여 방법을 확인했습니다
+- [ ] Code of Conduct를 읽었습니다
+- [ ] 로컬 개발 환경을 구성했습니다 (`pip install -e .[dev]`)
+- [ ] 테스트를 실행해 봤습니다 (`pytest`)
+- [ ] `good first issue` 라벨을 찾아봤습니다
+- [ ] Discord/Discussions에서 인사했습니다
+```
+
+이 체크리스트는 CONTRIBUTING.md 상단에 두거나, issue 템플릿에 링크로 넣습니다. 기여자가 스스로 준비 상태를 확인할 수 있습니다.
 ## 자주 하는 실수 다섯 가지
 
 1. 행동 강령을 두지 않습니다.
@@ -156,6 +249,33 @@ labels: bug
 2. `good first issue`와 `help wanted`의 차이를 한 문장으로 적어 보세요.
 3. 환영 메시지가 왜 중요한지 한 문장으로 적어 보세요.
 
+## 커뮤니티 지표 분석 도구
+
+커뮤니티 건강 지표를 자동으로 추적하면 메인테이너는 문제를 조기에 발견할 수 있습니다. GitHub Insights는 기본 기능이고, 더 상세한 분석은 외부 도구를 쓸 수 있습니다.
+
+```bash
+# GitHub CLI로 이슈 통계
+gh issue list --state all --json state,createdAt \
+  | jq '[group_by(.state) | .[] | {state: .[0].state, count: length}]'
+
+# 최근 30일 활동
+gh api repos/:owner/:repo/stats/commit_activity
+```
+
+**커뮤니티 대시보드 예시**
+
+```markdown
+## Community Health (2026-05)
+
+| Metric | Current | Target | Status |
+|---|---|---|---|
+| Avg response time | 36h | 48h | ✅ |
+| Active contributors | 5 | 3+ | ✅ |
+| Issue close rate | 65% | 70% | ⚠️ |
+| PR merge rate | 80% | 75% | ✅ |
+```
+
+이런 지표를 매달 README나 분기별 리포트로 공유하면 커뮤니티 건강 상태가 투명해집니다.
 ## 정리
 
 이번 글에서는 커뮤니티 운영을 친절의 문제가 아니라 프로젝트 지속성의 문제로 정리했습니다. 규칙, 가이드, 응답, 환영이 함께 있어야 신규 기여자가 실제 구성원으로 들어올 수 있습니다.
@@ -170,6 +290,39 @@ labels: bug
 
 - **프로젝트가 커지면서 커뮤니티 운영도 어떻게 바뀔까요?** 중핵 운영자 외에 **부운영자, 리뷰어, 문서 담당**으로 역할을 나누고, 규칙을 문서화해서 새로 들어온 사람도 일관성 있게 기여할 수 있게 해야 합니다.
 <!-- toc:begin -->
+
+## RFC/Proposal 템플릿
+
+커뮤니티가 생기면 새 기능이나 큰 변경을 제안하는 경로가 필요합니다. Rust나 Python PEP 같은 RFC(Request for Comments) 체계를 참고하면 좋습니다.
+
+```markdown
+# RFC Template
+
+## Meta
+- RFC ID: 001
+- Author: @username
+- Status: Draft | Review | Accepted | Rejected
+
+## Summary
+One paragraph: what problem does this solve?
+
+## Motivation
+Why now? Why not keep the status quo?
+
+## Detailed Design
+How does this work? Code examples, API surface, migration path.
+
+## Drawbacks
+What are the costs? Complexity, maintenance, breaking changes?
+
+## Alternatives
+What other approaches were considered?
+
+## Unresolved Questions
+What needs to be answered before accepting?
+```
+
+이 템플릿을 `rfcs/` 폴더에 넣고, Pull Request로 제안하게 하면 큰 결정에 커뮤니티 피드백을 받을 수 있습니다. Python의 PEP, Rust의 RFC, Kubernetes의 KEP가 모두 비슷한 구조입니다. 소규모 프로젝트는 이 절차를 간소화해도 되지만, 큰 방향 결정은 기록으로 남기는 편이 좋습니다.
 ## 시리즈 목차
 
 - [Open Source 101 (1/10): 오픈소스란 무엇인가](./01-what-is-open-source.md)

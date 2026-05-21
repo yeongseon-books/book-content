@@ -50,6 +50,18 @@ last_reviewed: '2026-05-15'
 
 특히 서비스 수준 목표는 엔지니어링과 비즈니스가 공통 언어를 갖게 해 줍니다. 사용자에게 무엇을 약속하는지, 어느 정도 실패는 감수할 수 있는지, 지금 속도로 가면 언제 위험해지는지를 숫자로 말할 수 있게 됩니다.
 
+### SLI 유형
+
+서비스 수준 지표는 여러 가지로 측정할 수 있습니다. 대표적인 네 가지 유형을 보겠습니다.
+
+| SLI 유형 | 측정 방법 | 좋은 임계값 예시 |
+|---|---|---|
+| 가용성 | (2xx+3xx) / total requests | 99.9% (43.2분/월) |
+| 지연 시간 | request duration p95 | 500ms 이하 |
+| 처리량 | requests per second (RPS) | 최소 1000 RPS |
+| 정확성 | non-error results / total | 99.99% |
+
+가용성은 가장 기본적인 SLI입니다. 5xx 응답이 아닌 요청을 성공으로 보고, 전체 요청으로 나눗니다. 지연 시간은 평균이 아닌 p95나 p99로 측정하는 편이 현실적이고, 처리량은 특정 임계 이상을 유지하는 것으로 정의할 수 있습니다. 정확성은 데이터 파이프라인이나 검색 결과처럼 정확한 결과가 중요한 경우에 정의합니다.
 ## 한눈에 보는 구조
 
 SLI는 서비스 수준을 측정하는 지표이고, SLO는 팀이 지켜야 할 목표입니다. 에러 버짓으로 변경과 안정성 사이의 균형을 맞춥니다.
@@ -121,6 +133,47 @@ That allows 30 * 24 * 60 * 0.001 = 43.2 minutes/month
 
 월간 보고는 지표를 조직 언어로 바꾸는 자리입니다. 숫자가 있어야 다음 달의 기능 우선순위와 안정화 계획도 설득력을 갖습니다.
 
+### SLO burn-rate 계산 예제
+
+오류 예산 소진 속도를 Python으로 계산하는 예시입니다.
+
+```python
+def calculate_burn_rate(actual_error_rate, slo_target, window_hours):
+    """
+    오류 예산 소진 속도 계산
+    actual_error_rate: 현재 오류율 (0.0 - 1.0)
+    slo_target: SLO 목표 (0.999 = 99.9%)
+    window_hours: 평가 창 시간
+    """
+    allowed_error_rate = 1.0 - slo_target
+    burn_rate = actual_error_rate / allowed_error_rate
+    
+    # 30일 기준 예산 소진 예측
+    hours_in_month = 30 * 24
+    budget_hours = hours_in_month * allowed_error_rate
+    burned_hours = window_hours * actual_error_rate
+    
+    return {
+        "burn_rate": burn_rate,
+        "budget_hours": budget_hours,
+        "burned_hours": burned_hours,
+        "remaining_hours": budget_hours - burned_hours
+    }
+
+# 예시: 99.9% SLO, 현재 1시간 동안 0.5% 오류율
+result = calculate_burn_rate(
+    actual_error_rate=0.005,
+    slo_target=0.999,
+    window_hours=1
+)
+print(f"Burn rate: {result['burn_rate']:.1f}x")
+print(f"Budget: {result['budget_hours']:.1f}h")
+print(f"Burned: {result['burned_hours']:.3f}h")
+print(f"Remaining: {result['remaining_hours']:.1f}h")
+```
+
+이 코드는 현재 오류율이 허용 오류율의 몇 배인지 계산합니다. burn rate가 1.0보다 크면 예산을 빠르게 소진하고 있다는 의미입니다.
+
 ## 오류 예산을 이렇게 운영합니다
 
 서비스 수준 목표는 문서에 써 두는 것만으로는 힘이 없습니다. 배포 속도와 안정화 우선순위를 실제로 바꾸는지 확인해야 합니다.
@@ -141,6 +194,87 @@ Expected output:
 - burn-rate 경보가 빠른 사고와 느린 악화를 모두 잡습니다.
 - 월간 리뷰에서 기능 출시 속도와 안정화 우선순위를 데이터로 조정합니다.
 ```
+
+### 에러 버짓 정책
+
+에러 버짓은 숫자일 뿐이고, 이를 실제로 운영하려면 정책이 필요합니다. 아래는 실제 팀에서 사용하는 에러 버짓 정책의 예시입니다.
+
+**정책 1: 예산 소진 70% 이하 (녹색 구간)**
+
+- 정상 배포 속도를 유지합니다.
+- 신규 기능 개발을 계속합니다.
+- 주간 회고에서 예산 소진 현황만 보고합니다.
+
+**정책 2: 예산 소진 70-90% (황색 구간)**
+
+- 고위험 배포는 보류합니다 (예: 데이터베이스 스키마 변경).
+- 기존 기능의 안정성 개선을 우선순위에 올립니다.
+- 주간 회고에서 주요 장애 원인을 분석합니다.
+
+**정책 3: 예산 소진 90% 초과 (빨간색 구간)**
+
+- 모든 신규 기능 배포를 중단합니다.
+- 안정화 태스크포스를 구성하고 집중합니다.
+- 경영진에게 상황을 에스커레이션합니다.
+- 예산이 70% 이하로 내려올 때까지 정책을 유지합니다.
+
+이 정책은 숫자를 행동으로 바꾸는 핵심입니다. 예산이 없으면 기능 개발을 멈춘다는 규칙이 명확하면 개발 팀과 비즈니스 팀 모두 같은 기준으로 말하게 됩니다.
+
+### SLA와의 차이점
+
+실무에서는 SLI, SLO, SLA를 혼용하는 경우가 많습니다. 세 개는 명확히 다른 역할을 합니다.
+
+**SLI (Service Level Indicator)**
+측정 가능한 지표입니다. 성공률, 지연 시간, 처리량처럼 숫자로 정확하게 표현할 수 있어야 합니다. 예: `가용성 = (성공 요청 / 전체 요청) * 100%`
+
+**SLO (Service Level Objective)**
+팀이 지키기로 합의한 목표값입니다. 예: `가용성 99.9% 이상 유지`. 목표를 맞추지 못하더라도 법적 체벌은 없지만, 팀 내부 운영 기준이 됩니다.
+
+**SLA (Service Level Agreement)**
+고객과 맺은 계약입니다. 예: `가용성 99.9% 미달 시 서비스 요금 10% 환불`. SLA는 위반 시 금전적 또는 법적 책임이 따르므로 SLO보다 보수적으로 설정하는 편입니다.
+
+일반적으로 SLO를 99.9%로 잡았다면 SLA는 99.5% 정도로 여유를 두는 것이 현명합니다. 내부 목표를 맞추지 못하더라도 고객과의 약속은 지킬 수 있는 보호 구간을 만들기 때문입니다.
+
+### 다중 SLO 우선순위
+
+하나의 서비스에 여러 SLO를 정하는 경우 우선순위를 명확히 해야 합니다. 모든 SLO를 동일한 비중으로 취급하면 어떤 것이 먼저 깨져도 괜찮은지 판단이 흔들립니다.
+
+```python
+slo_priority = {
+    "availability": {
+        "target": 0.999,
+        "weight": 1.0,  # 최고 우선순위
+        "action": "모든 배포 중단"
+    },
+    "latency_p95": {
+        "target": 500,  # ms
+        "weight": 0.8,
+        "action": "성능 튜닝 우선"
+    },
+    "latency_p99": {
+        "target": 1000,  # ms
+        "weight": 0.6,
+        "action": "긴 꼬리 최적화"
+    }
+}
+
+def check_slo_breach(metrics, slo_priority):
+    breached = []
+    for name, config in sorted(
+        slo_priority.items(),
+        key=lambda x: x[1]["weight"],
+        reverse=True
+    ):
+        if metrics[name] < config["target"]:
+            breached.append((name, config))
+    
+    if breached:
+        top = breached[0]
+        print(f"Critical SLO breach: {top[0]}")
+        print(f"Action required: {top[1]['action']}")
+```
+
+우선순위가 있으면 여러 SLO가 동시에 깨졌을 때 어느 것부터 복구할지 명확해집니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 
@@ -178,6 +312,75 @@ Expected output:
 ## 정리
 
 서비스 수준 지표와 목표는 신뢰성을 감정이 아니라 숫자로 다루게 해 줍니다. 측정된 값, 약속한 값, 허용한 실패량이 분리되면 운영 우선순위가 선명해집니다. 다음 글에서는 이 모든 관측성을 오래 운영하기 위해 반드시 알아야 할 비용과 카디널리티를 살펴보겠습니다.
+
+## SLI 계산 코드 예시
+
+지표 정의가 문서에만 있으면 운영 중 해석이 갈리기 쉽습니다. 아래처럼 계산 로직을 코드로 명시하면 팀 내 합의가 유지됩니다.
+
+```python
+from dataclasses import dataclass
+
+
+@dataclass
+class SLIResult:
+    good: int
+    total: int
+
+    @property
+    def value(self) -> float:
+        return 0.0 if self.total == 0 else self.good / self.total
+
+
+def availability_sli(status_codes: list[int]) -> SLIResult:
+    total = len(status_codes)
+    good = sum(1 for code in status_codes if 200 <= code < 500)
+    return SLIResult(good=good, total=total)
+
+
+samples = [200, 200, 201, 502, 503, 200, 429, 200]
+result = availability_sli(samples)
+print(f"SLI={result.value:.4f} ({result.good}/{result.total})")
+```
+
+여기서 성공 기준을 어떻게 둘지는 서비스 성격에 따라 달라집니다. 예를 들어 인증 시스템에서는 401을 정상 응답으로 볼 수 있고, 결제 API에서는 일부 4xx를 실패로 분류해야 할 수도 있습니다. 핵심은 기준을 명문화하고 변경 이력을 남기는 것입니다.
+
+## 오류 예산 소진 공식 정리
+
+운영에서 가장 많이 쓰는 공식은 아래 두 가지입니다.
+
+```text
+allowed_error_rate = 1 - slo_target
+burn_rate = actual_error_rate / allowed_error_rate
+```
+
+예를 들어 SLO 99.9%라면 허용 오류율은 0.1%(0.001)입니다. 실제 오류율이 0.5%(0.005)라면 burn rate는 5.0입니다. 즉, 예산을 허용 속도보다 다섯 배 빠르게 소모하고 있다는 의미입니다. 이 수치를 이용하면 장애 심각도를 절대값이 아닌 상대 속도로 해석할 수 있습니다.
+
+## 다중 윈도우 경보 템플릿
+
+짧은 창과 긴 창을 함께 쓰는 이유는 순간 급등과 느린 악화를 동시에 잡기 위해서입니다.
+
+```yaml
+groups:
+  - name: slo-burn
+    rules:
+      - alert: SLOFastBurn
+        expr: (error_rate_5m > 14.4 * 0.001) and (error_rate_1h > 14.4 * 0.001)
+        for: 2m
+        labels:
+          severity: page
+        annotations:
+          summary: "SLO fast burn detected"
+
+      - alert: SLOSlowBurn
+        expr: (error_rate_30m > 6 * 0.001) and (error_rate_6h > 6 * 0.001)
+        for: 15m
+        labels:
+          severity: ticket
+        annotations:
+          summary: "SLO slow burn detected"
+```
+
+Fast burn은 즉시 대응을, slow burn은 계획된 안정화를 유도합니다. 둘을 분리하지 않으면 팀은 항상 과잉 대응하거나 항상 늦게 대응하게 됩니다.
 
 ## 처음 질문으로 돌아가기
 

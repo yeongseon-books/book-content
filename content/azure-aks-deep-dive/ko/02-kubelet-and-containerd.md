@@ -243,4 +243,6 @@ Pod sandbox에 네트워크가 어떻게 연결되고, Azure CNI Pod Subnet, Nod
 - [Azure AKS 101](../../azure-aks-101/ko/)
 - [Azure Functions Deep Dive 3화 — 양방향 gRPC 스트림](../../azure-functions-deep-dive/ko/03-grpc-event-stream.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-aks-deep-dive/ko/02-kubelet-and-containerd)
+
 Tags: AKS, Kubernetes, Distributed Systems, Containers

@@ -41,10 +41,6 @@ last_reviewed: '2026-05-15'
 
 *Design Patterns 101 3장 흐름 개요*
 
-이 그림에서는 Structural 패턴를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> Structural 패턴의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 중요한가
 
 상속은 한번 뻗기 시작하면 구조를 빨리 굳혀 버립니다. 반면 합성은 같은 인터페이스를 유지한 채 구현을 감싸고, 바꾸고, 단순화하고, 트리로 엮을 수 있게 해 줍니다. 실무에서 구조 변경 비용을 낮추는 쪽은 대개 상속보다 합성입니다.
@@ -213,6 +209,136 @@ Structural 패턴을 넣기 전에 아래를 점검해 보세요.
 ## 정리 및 다음 글
 
 합성은 구조를 변경 가능하게 유지하는 가장 실용적인 기본값입니다. 다음 글에서는 구조에서 한 걸음 더 나아가, 객체들이 어떻게 협력하고 행동하는지를 다루는 Behavioral 패턴으로 넘어가겠습니다.
+
+## 실전 보강: 패턴 선택을 코드와 표로 검증하기
+
+디자인 패턴은 이름을 아는 것보다 **언제 적용하고 언제 버릴지**를 결정하는 능력이 더 중요합니다. 아래 보강 내용은 Python 코드, UML 유사 다이어그램, 선택 기준 표를 함께 사용해 판단 근거를 명확히 만드는 데 초점을 둡니다.
+
+### 1) 전략 교체를 런타임으로 밀어내는 패턴
+
+```python
+from dataclasses import dataclass
+from typing import Protocol
+
+class DiscountPolicy(Protocol):
+    def apply(self, price: int) -> int: ...
+
+@dataclass
+class NoDiscount:
+    def apply(self, price: int) -> int:
+        return price
+
+@dataclass
+class PercentDiscount:
+    rate: float
+    def apply(self, price: int) -> int:
+        return int(price * (1 - self.rate))
+
+@dataclass
+class PriceCalculator:
+    policy: DiscountPolicy
+
+    def final_price(self, price: int) -> int:
+        return self.policy.apply(price)
+```
+
+이 구조의 핵심은 `if/elif` 분기 증가를 객체 교체로 바꾸는 것입니다. 정책이 늘어도 기존 계산기 코드는 수정 없이 확장할 수 있습니다.
+
+### 2) UML 유사 텍스트 다이어그램
+
+```text
+[Client] --> [PriceCalculator]
+[PriceCalculator] --uses--> <<interface>> DiscountPolicy
+[NoDiscount] ----implements----> DiscountPolicy
+[PercentDiscount] -implements--> DiscountPolicy
+```
+
+다이어그램으로 보면 의존 방향이 분명해집니다. 구체 클래스가 아니라 추상 인터페이스로 향하면 테스트 더블 주입과 기능 확장이 쉬워집니다.
+
+### 3) 패턴 도입 판단표
+
+| 상황 | 도입 권장 패턴 | 기대 이점 | 과사용 신호 |
+| --- | --- | --- | --- |
+| 정책 분기가 자주 늘어남 | Strategy | 조건문 감소, 교체 용이 | 정책이 1개인데 인터페이스만 복잡 |
+| 객체 생성 규칙이 다양함 | Factory | 생성 책임 분리 | 생성 규칙이 단순한데 팩토리 계층 과다 |
+| 외부 라이브러리 인터페이스 상이 | Adapter | 호출부 안정화 | 어댑터가 비즈니스 규칙까지 흡수 |
+| 이벤트 구독자가 동적으로 변함 | Observer | 결합도 완화 | 이벤트 흐름 추적 불가, 디버깅 난해 |
+
+표를 사용하면 “패턴을 넣을지 말지”를 감각이 아니라 조건으로 설명할 수 있습니다.
+
+### 4) 안티패턴 회피 예시
+
+```python
+# 과한 추상화 예시(피해야 함)
+class AbstractFactoryProviderManager:
+    def get_factory(self):
+        ...
+
+# 개선: 실제 문제에 맞춘 단순 함수
+
+def build_storage(kind: str):
+    if kind == "memory":
+        return {}
+    if kind == "sqlite":
+        import sqlite3
+        return sqlite3.connect("app.db")
+    raise ValueError("unsupported storage")
+```
+
+패턴은 복잡성을 제거할 때만 가치가 있습니다. 불필요한 추상화 계층은 코드 탐색 비용만 늘립니다.
+
+### 5) 테스트 가능성 기준으로 최종 판단
+
+| 질문 | Pass 기준 |
+| --- | --- |
+| 교체 가능한 인터페이스가 필요한가 | 런타임 정책 변경 요구가 있음 |
+| 테스트 더블 주입이 실제로 유용한가 | 외부 의존성 분리가 테스트 속도를 높임 |
+| 새 요구가 들어올 때 수정 범위가 줄어드는가 | 기존 클래스 수정 없이 신규 클래스 추가 가능 |
+| 팀이 패턴을 공통 언어로 이해하는가 | 리뷰에서 동일 용어로 의사결정 가능 |
+
+패턴의 목적은 미학이 아니라 변경 비용 절감입니다. 코드, 다이어그램, 표 세 가지를 함께 점검하면 과설계와 미설계를 동시에 줄일 수 있습니다.
+
+### 추가 사례: 패턴 적용 전후 비교
+
+```python
+# Before: 조건문이 도메인 로직 곳곳에 흩어진 경우
+
+def notify(channel: str, message: str) -> None:
+    if channel == "email":
+        send_email(message)
+    elif channel == "slack":
+        send_slack(message)
+    elif channel == "sms":
+        send_sms(message)
+    else:
+        raise ValueError("unsupported channel")
+```
+
+```python
+# After: 전략 등록 방식
+from typing import Callable
+
+class Notifier:
+    def __init__(self) -> None:
+        self._handlers: dict[str, Callable[[str], None]] = {}
+
+    def register(self, channel: str, handler: Callable[[str], None]) -> None:
+        self._handlers[channel] = handler
+
+    def notify(self, channel: str, message: str) -> None:
+        if channel not in self._handlers:
+            raise ValueError("unsupported channel")
+        self._handlers[channel](message)
+```
+
+이 전환의 장점은 기능 추가 시 기존 분기 로직을 수정하지 않아도 된다는 점입니다. 변경 충돌이 줄고 테스트 범위가 국소화됩니다.
+
+| 평가 항목 | 분기 확장 방식 | 패턴 기반 방식 |
+| --- | --- | --- |
+| 신규 채널 추가 | 기존 함수 수정 필요 | 등록 코드 추가 |
+| 회귀 위험 | 높음 | 낮음 |
+| 테스트 범위 | 기존 케이스 재검증 범위 큼 | 신규 핸들러 중심 검증 |
+| 리뷰 난이도 | 조건 중첩으로 상승 | 역할 분리로 하락 |
 
 ## 처음 질문으로 돌아가기
 

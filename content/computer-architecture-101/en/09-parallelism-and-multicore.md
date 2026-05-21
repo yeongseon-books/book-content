@@ -45,8 +45,6 @@ This is post 9 in the Computer Architecture 101 series.
 
 This picture places Parallelism and Multicore inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Parallelism and Multicore is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The difference between concurrency and parallelism
@@ -59,8 +57,6 @@ This picture places Parallelism and Multicore inside an operating flow. The poin
 Every server, laptop, and phone is multicore today. Single-core clocks are no longer rising, so squeezing out performance means dividing work across cores. Done badly, this makes things slower. Lock contention, cache ping-pong, and false sharing wait at every corner.
 
 > Parallelism is not free. Always start by asking "is this work worth parallelizing?"
-
-## Concept at a Glance
 
 > Concurrency is the structural ability to deal with many tasks. Parallelism is physically running tasks at the same time. Multicore enables parallelism, but data movement between cores has a cost. Cache coherence keeps data consistent automatically, but contention on the same line crashes performance. Amdahl's law says "if 5% is sequential, no number of cores breaks past 20x speedup."
 

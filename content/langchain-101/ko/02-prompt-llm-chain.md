@@ -482,4 +482,6 @@ print(result)
 - [Output parsers](https://python.langchain.com/docs/modules/model_io/output_parsers/)
 - [RunnablePassthrough](https://python.langchain.com/docs/expression_language/primitives/passthrough/)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/langchain-101/ko/02-prompt-llm-chain)
+
 Tags: LangChain, LCEL, Python, LLM

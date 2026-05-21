@@ -39,10 +39,6 @@ seo_description: 리눅스 트리 구조를 파악하고 cd, ls부터 cp, mv, rm
 
 *Linux CLI 101 2장 흐름 개요*
 
-이 그림에서는 파일과 디렉터리 다루기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 파일과 디렉터리 다루기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 머릿속에 먼저 그릴 그림
 
 > Linux 파일 시스템은 하나의 뿌리(`/`)에서 시작하는 거대한 나무입니다. 모든 파일과 디렉터리는 이 나무의 가지입니다.
@@ -216,6 +212,130 @@ cp -r src/ backup/      # Correct: recursive copy
 - 절대 경로는 어디서든 동작하고, 상대 경로는 현재 위치에 의존합니다.
 
 다음 글에서는 **파일 권한과 소유자** — `chmod`, `chown`, `rwx`의 의미를 다룹니다.
+
+
+## 실전 CLI 운영 패턴
+
+### 명령을 순서가 아니라 데이터 흐름으로 설계하기
+CLI 작업이 길어질수록 핵심은 명령 개수보다 데이터 흐름입니다. 예를 들어 로그에서 오류 패턴을 찾고, 원인 프로세스를 좁히고, 마지막으로 자동 조치 후보를 만드는 과정은 하나의 파이프라인으로 보는 편이 안정적입니다. 다음 흐름은 실제 운영 환경에서 자주 쓰는 형태입니다.
+
+```bash
+journalctl -u my-api --since "10 min ago" \
+  | grep -E "ERROR|CRITICAL" \
+  | awk '{print $1" "$2" "$3" "$NF}' \
+  | sort \
+  | uniq -c \
+  | sort -nr
+```
+
+이 파이프라인의 목적은 "원시 로그"를 "빈도 기반 우선순위 목록"으로 바꾸는 것입니다. 앞쪽 명령은 후보를 넓게 모으고, 뒤쪽 명령은 노이즈를 줄여 의사결정 가능한 형태로 압축합니다. 운영자가 먼저 이 구조를 머릿속에 그려두면, 중간에 도구를 바꿔도 전체 전략은 유지됩니다.
+
+### 안전한 one-liner와 검증 루틴
+한 줄 명령은 빠르지만 위험합니다. 삭제, 이동, 권한 변경처럼 되돌리기 어려운 작업은 항상 dry-run 단계를 먼저 둡니다.
+
+```bash
+find ./tmp-exports -type f -mtime +7 -print
+find ./tmp-exports -type f -mtime +7 -print0 | xargs -0 rm -f
+```
+
+첫 줄은 영향 범위를 확인하는 단계이고, 둘째 줄은 실제 실행입니다. 이 두 단계를 분리하면 휴먼 에러를 크게 줄일 수 있습니다. 특히 공백이 있는 파일명을 다룰 때는 `-print0`와 `xargs -0` 조합을 기본값으로 두는 편이 안전합니다.
+
+### 작은 셸 스크립트를 운영 도구로 키우기
+반복 작업은 즉시 스크립트로 승격하는 것이 좋습니다. 아래 예시는 "서비스 상태 점검 + 이상 시 로그 추출"을 자동화한 최소 형태입니다.
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+service_name="my-api"
+window="5 min ago"
+
+if systemctl is-active --quiet "$service_name"; then
+  echo "[PASS] $service_name is active"
+else
+  echo "[FAIL] $service_name is not active"
+  journalctl -u "$service_name" --since "$window" | tail -n 80
+  exit 1
+fi
+```
+
+여기서 중요한 포인트는 세 가지입니다. 첫째, `set -euo pipefail`로 실패를 조기에 표면화합니다. 둘째, 하드코딩 값을 변수로 끌어올려 재사용성을 높입니다. 셋째, 실패 시 바로 조사 가능한 로그를 출력해 복구 시간을 줄입니다. 이런 작은 스크립트들이 쌓이면 팀의 운영 품질이 표준화됩니다.
+
+### 파이프 결과를 파일과 결합해 재현성 확보하기
+문제 분석은 재현 가능해야 합니다. 표준 출력으로만 보면 같은 분석을 다시 하기 어렵기 때문에 중간 결과를 파일로 남기는 습관이 유용합니다.
+
+```bash
+ps aux | grep "python" | grep -v grep | tee /tmp/python-proc.txt
+cut -d' ' -f1-12 /tmp/python-proc.txt > /tmp/python-proc-compact.txt
+```
+
+`tee`는 화면 확인과 파일 저장을 동시에 처리하므로 탐색 속도와 재현성을 함께 확보합니다. 이후 팀원이 같은 파일을 기반으로 추가 분석을 이어갈 수 있어 협업 비용이 줄어듭니다.
+
+## 자동화 품질을 높이는 셸 체크포인트
+
+### 입력 검증과 종료 코드 계약
+셸 스크립트가 팀 도구가 되려면 실패 방식이 예측 가능해야 합니다. 인자 검증과 종료 코드 계약을 명시하면 CI와 운영 스크립트가 안전하게 연동됩니다.
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  echo "usage: $0 <log_dir> <keyword>"
+}
+
+if [ "$#" -ne 2 ]; then
+  usage
+  exit 64
+fi
+
+log_dir="$1"
+keyword="$2"
+
+if [ ! -d "$log_dir" ]; then
+  echo "directory not found: $log_dir"
+  exit 66
+fi
+
+if grep -R --line-number "$keyword" "$log_dir" >/tmp/match.out; then
+  echo "match found"
+  exit 0
+else
+  echo "no match"
+  exit 1
+fi
+```
+
+여기서 `64`, `66` 같은 종료 코드는 호출자에게 실패 원인을 분류해 전달합니다. 사람이 읽는 메시지와 기계가 읽는 코드가 분리되어 있으면 자동화 파이프라인에서 분기 처리하기 쉽습니다.
+
+### 파이프라인 병목 찾기
+복잡한 파이프라인은 체감만으로 병목을 찾기 어렵습니다. 각 단계 앞뒤에 타임스탬프를 찍거나 임시 파일에 분리 저장해 어느 단계가 느린지 확인합니다.
+
+```bash
+time grep -R "ERROR" /var/log/myapp > /tmp/step1.txt
+time cut -d' ' -f1-8 /tmp/step1.txt > /tmp/step2.txt
+time sort /tmp/step2.txt | uniq -c | sort -nr > /tmp/step3.txt
+```
+
+이 방식은 단순하지만 효과가 큽니다. 어떤 단계가 CPU 중심인지 I/O 중심인지 빠르게 감을 잡을 수 있고, 이후 `awk` 대체, 병렬화, 입력 축소 같은 최적화 방향을 정하기 쉬워집니다.
+
+### 재사용 가능한 함수형 스니펫
+긴 스크립트에서도 기능 단위를 함수로 분리하면 테스트와 유지보수가 쉬워집니다.
+
+```bash
+collect_pids() {
+  pgrep -f "$1" || true
+}
+
+kill_gracefully() {
+  local pid="$1"
+  kill -TERM "$pid"
+  sleep 2
+  kill -0 "$pid" 2>/dev/null && kill -KILL "$pid" || true
+}
+```
+
+함수 단위로 쪼개면 시나리오별 검증이 가능해집니다. 예를 들어 종료 신호가 정상 처리되는지, 남은 프로세스가 있는지, 재시작 로직이 중복 실행되는지 등을 독립적으로 점검할 수 있습니다.
 
 ## 처음 질문으로 돌아가기
 

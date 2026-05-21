@@ -42,7 +42,7 @@ This is post 5 in the Incident Response 101 series. This post explains how to re
 
 This picture places Writing the Timeline inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Writing the Timeline is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> The timeline is for the postmortem investigator, not the responder. Record facts and timestamps, not feelings.
 
 ## Why this topic matters
 

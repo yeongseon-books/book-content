@@ -42,15 +42,11 @@ This is post 2 in the Docker 101 series. Here we use layers, copy-on-write, and 
 
 This picture places Images and Containers inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Images and Containers is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 If you do not understand how containers behave, *debugging becomes luck*. Knowing layers and lifecycle makes *80% of issues* *predictable*.
 
 > *Half of "non-reproducible" bugs come from *misunderstanding container state*.*
-
-## Concept at a Glance
 
 ## Key Terms
 

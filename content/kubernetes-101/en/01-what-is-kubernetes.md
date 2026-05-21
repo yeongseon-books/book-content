@@ -44,13 +44,9 @@ Here, we will frame Kubernetes as an orchestrator that continuously pushes the c
 
 This picture places What is Kubernetes? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What is Kubernetes? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 A handful of containers fits on *Compose*. From *dozens* upward, an *orchestrator* is a *survival requirement*.
-
-## Concept at a Glance
 
 ## Key Terms
 

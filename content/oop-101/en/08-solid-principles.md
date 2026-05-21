@@ -42,8 +42,6 @@ Rather than treating SOLID as five isolated slogans, we will use one checkout wo
 
 This picture places SOLID Principles Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of SOLID Principles Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions This Article Answers
 
 - Which SOLID principle matches the failure shape I am seeing right now?

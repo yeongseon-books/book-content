@@ -39,8 +39,6 @@ This is post 4 in the AI Data Preparation 101 series. Here we cover the stages r
 
 This picture places PII Detection and Anonymization for Training Data inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of PII Detection and Anonymization for Training Data is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## "We Can't Have PII in Training Data, Right?"
 
 LLMs leaking email addresses or phone numbers that came from training data is no longer hypothetical. Carlini et al. (2021), "Extracting Training Data from Large Language Models," demonstrated real names and contact info being extracted from GPT-2. Whatever PII you put in at training time can leak at inference time.

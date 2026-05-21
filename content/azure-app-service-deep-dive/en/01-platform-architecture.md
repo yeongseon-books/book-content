@@ -65,8 +65,6 @@ this series looks at the platform that hosts it.
 
 This picture places App Service platform architecture — Front-End, Worker, File Server inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of App Service platform architecture — Front-End, Worker, File Server is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## One request through App Service
 
 This is the map for the rest of the series.

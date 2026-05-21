@@ -45,8 +45,6 @@ This is the first post in the Discrete Math 101 series.
 
 This picture places What Is Discrete Mathematics? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is Discrete Mathematics? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - How discrete and continuous mathematics differ
@@ -61,8 +59,6 @@ Analyzing algorithms requires recurrences and combinatorics. Understanding datab
 > Discrete math = the language a computer scientist uses to organize their thinking.
 
 This series walks through the core concepts one episode at a time, drawing the link to computer science at every step.
-
-## Concept at a Glance
 
 > Discrete math rests on five pillars: logic, sets, functions, combinatorics, and graphs. They are unified by the property of "discreteness."
 

@@ -42,13 +42,9 @@ This is the final post in the Model Evaluation 101 series. In this post, we turn
 
 This picture places Building an Evaluation Report inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Building an Evaluation Report is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Reviews, audits, and post-incident analyses all read the same report. A consistent format speeds up the team.
-
-## Concept at a Glance
 
 ## Key Terms
 

@@ -40,10 +40,6 @@ last_reviewed: '2026-05-12'
 
 *Algorithms with Python 101 3장 흐름 개요*
 
-이 그림에서는 선형 탐색과 이진 탐색를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 선형 탐색과 이진 탐색의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 중요한가
 
 탐색은 프로그래밍에서 가장 흔한 연산입니다. 데이터가 100개일 때는 선형 탐색으로 충분합니다. 하지만 100만 개가 되면 이진 탐색은 많아야 20번 정도 비교하면 되고, 선형 탐색은 최악의 경우 100만 번 모두 확인해야 합니다.
@@ -285,6 +281,57 @@ for n in [10_000, 100_000, 1_000_000]:
 
 선형 탐색은 `O(n)`, 이진 탐색은 `O(log n)`입니다. 이진 탐색은 정렬이라는 전제가 필요하지만, 데이터가 커질수록 성능 차이는 매우 극적입니다. 다음 글에서는 데이터를 순서 있게 만드는 핵심 알고리즘, 정렬을 다룹니다.
 
+## 실전 패턴 추가: 정렬과 탐색 구현을 문제 유형별로 선택하기
+
+알고리즘 문제에서는 코드 길이보다 선택 기준이 더 중요합니다. 입력 크기, 데이터 분포, 정렬 여부에 따라 정렬/탐색 전략이 달라집니다. 아래 예시는 같은 정수 배열을 다루더라도 어떤 조건에서 어떤 구현을 고르는지 보여 줍니다.
+
+```python
+def binary_search(nums: list[int], target: int) -> int:
+    left, right = 0, len(nums) - 1
+    while left <= right:
+        mid = (left + right) // 2
+        if nums[mid] == target:
+            return mid
+        if nums[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+    return -1
+
+
+def merge_sort(nums: list[int]) -> list[int]:
+    if len(nums) <= 1:
+        return nums
+    mid = len(nums) // 2
+    left = merge_sort(nums[:mid])
+    right = merge_sort(nums[mid:])
+
+    merged: list[int] = []
+    i = j = 0
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:
+            merged.append(left[i])
+            i += 1
+        else:
+            merged.append(right[j])
+            j += 1
+    merged.extend(left[i:])
+    merged.extend(right[j:])
+    return merged
+
+
+def quick_sort(nums: list[int]) -> list[int]:
+    if len(nums) <= 1:
+        return nums
+    pivot = nums[len(nums) // 2]
+    less = [x for x in nums if x < pivot]
+    equal = [x for x in nums if x == pivot]
+    greater = [x for x in nums if x > pivot]
+    return quick_sort(less) + equal + quick_sort(greater)
+```
+
+실무 판단은 보통 이렇게 정리됩니다. 이미 정렬된 리스트에서 존재 여부를 반복 조회하면 이진 탐색이 기본 선택입니다. 입력이 계속 바뀌고 안정 정렬이 필요하면 병합 정렬 계열이 유리하고, 평균 성능과 구현 단순성을 우선하면 퀵 정렬 계열이 자주 선택됩니다. 코딩 테스트에서는 Python 내장 `sort()`가 Timsort 기반이라 거의 항상 가장 실용적인 기본값이지만, 원리를 직접 구현해 보면 경계 조건과 복잡도 해석 능력이 크게 좋아집니다.
+
 ## 처음 질문으로 돌아가기
 
 - **선형 탐색은 어떻게 동작하고, 한계는 무엇일까요?**
@@ -316,5 +363,7 @@ for n in [10_000, 100_000, 1_000_000]:
 - [Real Python — Binary Search in Python](https://realpython.com/binary-search-python/)
 - [GeeksforGeeks — Binary Search](https://www.geeksforgeeks.org/binary-search/)
 - [LeetCode — Binary Search Problems](https://leetcode.com/tag/binary-search/)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/algorithms-python-101/ko/03-linear-and-binary-search)
 
 Tags: Python, Algorithms, Linear Search, Binary Search, bisect

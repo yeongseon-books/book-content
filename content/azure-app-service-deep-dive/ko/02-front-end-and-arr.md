@@ -224,4 +224,6 @@ curl -s https://my-app.azurewebsites.net/diag/worker
 - [Azure App Service 101 — Request Lifecycle](../../azure-app-service-101/ko/02-request-lifecycle.md)
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/ko/04-dispatcher-and-invocation.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-app-service-deep-dive/ko/02-front-end-and-arr)
+
 Tags: Azure, App Service, Distributed Systems, Platform Engineering

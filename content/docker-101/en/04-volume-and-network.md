@@ -42,15 +42,11 @@ This is post 4 in the Docker 101 series. It focuses on when to use named volumes
 
 This picture places Volumes and Networks inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Volumes and Networks is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 *Data loss* and *broken communication* are the *most common incidents* in container ops. The right *volume/network model* prevents both.
 
 > *The moment *state leaks* into a stateless container, an incident begins.*
-
-## Concept at a Glance
 
 ## Key Terms
 

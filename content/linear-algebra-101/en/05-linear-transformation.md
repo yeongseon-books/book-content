@@ -40,7 +40,7 @@ This is post 5 in the Linear Algebra 101 series. Here we will read linear transf
 
 This picture places Linear Transformations inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Linear Transformations is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A linear transformation is a rule that maps vectors to vectors while preserving addition and scalar multiplication. When you read matrix multiplication as composition of transformations, it becomes clear why order matters.
 
 ## Questions This Post Answers
 
@@ -56,8 +56,6 @@ This picture places Linear Transformations inside an operating flow. The point i
 Every neural-network layer is a linear transformation plus a nonlinearity. Graphics pipelines, coordinate transforms, and many augmentation steps in vision use the same language.
 
 Once this intuition clicks, a matrix stops being a static object. Some matrices rotate space, some stretch it, some flip orientation, and some slant an entire grid. At that point, linear algebra becomes a language for movement and structure rather than a page of arithmetic rules.
-
-## Concept at a Glance
 
 ## Key Terms
 

@@ -40,7 +40,7 @@ This is post 4 in the Linear Algebra 101 series. Here we will connect the inner 
 
 This picture places Inner Product and Distance inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Inner Product and Distance is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Inner product and distance are the two foundations of vector comparison. Inner product measures directional relationship; distance measures the gap between points. Which you use depends on your problem's nature.
 
 ## Questions This Post Answers
 
@@ -56,8 +56,6 @@ This picture places Inner Product and Distance inside an operating flow. The poi
 Document embeddings often care about direction, which is why cosine similarity shows up everywhere. Coordinate differences, travel costs, and physical displacement often care about actual gap size, where Euclidean or Manhattan distance can be a better fit.
 
 Without that distinction, metric choice becomes habit instead of judgment. You start using cosine everywhere or L2 everywhere, even though search rankings, clusters, and neighbor sets can shift dramatically when the metric changes. This chapter is about choosing the comparison question, not memorizing one more formula.
-
-## Concept at a Glance
 
 ## Key Terms
 

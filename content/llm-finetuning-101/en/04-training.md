@@ -42,8 +42,6 @@ This article breaks one training step into its six moving parts so you can reaso
 
 This picture places Training Loop and Hyperparameters inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Training Loop and Hyperparameters is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 Episode 4 is the first article in this series where actual weight updates happen. But the goal is still not high accuracy — it is to **prove that the training loop is alive**. Once you verify a single end-to-end step, future failures become easy to triage: is it the environment, the data, or the hyperparameters?

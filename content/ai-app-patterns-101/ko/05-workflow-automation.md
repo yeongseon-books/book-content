@@ -378,4 +378,6 @@ print(f"\n=== final report ===\n{result['report']}")
 - [LangChain routing](https://python.langchain.com/docs/expression_language/how_to/routing/)
 - [RunnableParallel](https://python.langchain.com/docs/expression_language/primitives/parallel/)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-app-patterns-101/ko/05-workflow-automation)
+
 Tags: LLM, RAG, Agent, Python

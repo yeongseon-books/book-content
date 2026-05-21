@@ -45,8 +45,6 @@ This is post 3 in the Type Hints in Python 101 series.
 
 This picture places Optional and Union inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Optional and Union is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - `Optional[T]` for values that might be `None`
@@ -61,8 +59,6 @@ This picture places Optional and Union inside an operating flow. The point is no
 > Optional = "this might be None." Union = "this might be one of several types."
 
 Both force the caller to handle all possibilities.
-
-## Concept at a Glance
 
 > Optional[T] is shorthand for Union[T, None]. Union[T1, T2] means the value is either T1 or T2. Type narrowing confirms which type it actually is.
 

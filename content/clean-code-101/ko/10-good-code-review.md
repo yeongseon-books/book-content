@@ -41,9 +41,9 @@ last_reviewed: '2026-05-15'
 
 *Clean Code 101 10장 흐름 개요*
 
-이 그림에서는 좋은 코드 리뷰 기준를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+이 그림은 리뷰의 단순명 동스턴—메스지 뇌도, 륕 명넌, 비동—차 단늵 반복 동스른—서 명넌 동스른 동스른 동스른 동스른—를 보여 줍니다.
 
-> 좋은 코드 리뷰 기준의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+> 나마 동스턴돘게나 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른.
 
 ## 왜 중요한가
 
@@ -203,6 +203,143 @@ GIT_PAGER=cat git diff --stat HEAD~1..HEAD
 ## 정리 및 다음 단계
 
 좋은 리뷰는 Clean Code의 거울입니다. 이름, 함수, 분기, 중복, 오류, 주석, 테스트, 리팩토링, 리뷰까지 이 시리즈의 모든 주제는 결국 다음 사람이 더 쉽게 바꿀 수 있는 코드를 향합니다.
+
+
+## 레거시 코드 개선 전략과 점진적 리팩토링 계획
+
+좋은 리뷰는 지금 보이는 diff만 평가하지 않고, 다음 변경 비용까지 줄이는 방향을 제안합니다. 특히 레거시 코드에서는 "한 번에 완벽"보다 점진적 개선 계획이 중요합니다.
+
+| 단계 | 목표 | 리뷰 포인트 | 산출물 |
+| --- | --- | --- | --- |
+| 1단계 | 현재 동작 고정 | 특성화 테스트 존재 여부 | 안전망 테스트 |
+| 2단계 | 구조 단순화 | 함수 길이/분기 깊이 감소 | 리팩토링 PR |
+| 3단계 | 중복 제거 | 정책 출처 단일화 | 공통 모듈/테이블 |
+| 4단계 | 오류 경계 정리 | 예외 계층/매핑 명확성 | 에러 처리 가이드 |
+| 5단계 | 자동화 강화 | 반복 지적의 도구화 | lint/CI 규칙 |
+
+이 표를 리뷰 템플릿에 넣으면, 리뷰어가 단기 수정과 장기 계획을 동시에 제안하기 쉬워집니다.
+
+## 리뷰 코멘트를 계획으로 연결하는 예시
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class ReviewAction:
+    priority: str
+    message: str
+    follow_up_issue: str | None = None
+
+
+def build_review_actions() -> list[ReviewAction]:
+    return [
+        ReviewAction(
+            priority="MUST",
+            message="order_total의 분기 깊이가 4입니다. Guard Clause 적용이 필요합니다.",
+            follow_up_issue=None,
+        ),
+        ReviewAction(
+            priority="SUGG",
+            message="중복된 할인 계산을 Extract Method로 분리하면 테스트가 단순해집니다.",
+            follow_up_issue="#123",
+        ),
+        ReviewAction(
+            priority="NIT",
+            message="변수명 total을 subtotal_cents로 바꾸면 단위가 명확해집니다.",
+            follow_up_issue=None,
+        ),
+    ]
+```
+
+위처럼 우선순위와 후속 이슈를 함께 기록하면, 리뷰 코멘트가 단순 의견에서 실행 계획으로 바뀝니다.
+
+## 점진적 리팩토링 백로그 예시
+
+```python
+REFactoring_BACKLOG = [
+    {"id": "CC-101", "task": "order_total 분해", "owner": "backend", "week": 1},
+    {"id": "CC-102", "task": "예외 계층 표준화", "owner": "backend", "week": 2},
+    {"id": "CC-103", "task": "중복 할인 정책 테이블화", "owner": "backend", "week": 3},
+    {"id": "CC-104", "task": "리뷰 템플릿 강화", "owner": "platform", "week": 4},
+]
+
+
+def group_tasks_by_week(tasks: list[dict]) -> dict[int, list[str]]:
+    grouped: dict[int, list[str]] = {}
+    for task in tasks:
+        week = task["week"]
+        grouped.setdefault(week, []).append(task["task"])
+    return grouped
+```
+
+리뷰는 병합 버튼을 누르는 이벤트가 아니라, 품질 개선 루프를 운영하는 일입니다. 따라서 "이번 PR에서 반드시 할 일"과 "다음 스프린트에서 안전하게 할 일"을 명확히 분리해 제안하는 것이 중요합니다.
+
+## 리뷰 프로세스 성숙도 측정 지표
+
+1. 평균 PR 크기
+2. 첫 리뷰 응답 시간
+3. 재작업 라운드 수
+4. 병합 후 회귀 버그 비율
+5. 반복 코멘트 자동화 전환율
+
+```python
+def review_process_score(metrics: dict[str, float]) -> float:
+    weights = {
+        "small_pr_ratio": 0.25,
+        "fast_response_ratio": 0.2,
+        "low_rework_ratio": 0.2,
+        "low_regression_ratio": 0.25,
+        "automation_conversion_ratio": 0.1,
+    }
+    score = 0.0
+    for key, weight in weights.items():
+        score += metrics.get(key, 0.0) * weight
+    return round(score, 3)
+```
+
+이런 지표를 월 단위로 추적하면 코드 리뷰 문화가 실제로 개선되는지 확인할 수 있습니다.
+
+
+## 실무 적용 메모
+
+아래 메모는 팀 내 합의 문서에 그대로 옮겨 적어도 되는 수준의 운영 규칙입니다.
+
+1. 리뷰는 코드 스타일보다 변경 위험을 먼저 다룹니다.
+2. 규칙 위반은 사람 지적보다 자동화 전환을 우선합니다.
+3. 반복되는 설계 결함은 교육 과제가 아니라 구조 개선 과제로 등록합니다.
+4. 모든 개선은 테스트와 함께 진행하며, 동작 변경 여부를 PR 설명에 명시합니다.
+5. 다음 분기 목표에는 "새 기능 수"와 함께 "변경 비용 감소 지표"를 반드시 포함합니다.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class QualityGate:
+    has_tests: bool
+    has_clear_names: bool
+    has_boundary_error_handling: bool
+    has_small_functions: bool
+    has_review_notes: bool
+
+
+def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
+    missing = []
+    if not gate.has_tests:
+        missing.append("tests")
+    if not gate.has_clear_names:
+        missing.append("naming")
+    if not gate.has_boundary_error_handling:
+        missing.append("error-boundary")
+    if not gate.has_small_functions:
+        missing.append("function-size")
+    if not gate.has_review_notes:
+        missing.append("review-notes")
+    return len(missing) == 0, missing
+```
+
+이 체크 함수는 단순하지만, 품질 기준을 코드로 표현하는 출발점이 됩니다. 팀이 기준을 말로만 합의하면 시간이 지나며 흐려집니다. 반대로 코드와 템플릿과 자동화 규칙으로 남기면 신규 멤버가 들어와도 동일한 기준이 유지됩니다.
+
+또한 개선 활동은 단발성 이벤트가 아니라 루프여야 합니다. 한 번의 대청소보다 매 PR마다 작은 개선을 추가하는 편이 장기적으로 더 강합니다. 이름 하나, 함수 하나, 분기 하나를 매번 더 낫게 만드는 습관이 쌓이면 코드베이스의 평균 품질이 올라가고, 장애 대응 속도도 실제로 빨라집니다.
 
 ## 처음 질문으로 돌아가기
 

@@ -42,7 +42,7 @@ In this post, we assemble the whole picture with a single e-commerce example. Th
 
 This picture places Warehouse Design Example inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Warehouse Design Example is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A real warehouse design balances current constraints with future goals. Most decisions are reversible if you plan the transition path.
 
 ## Questions this article answers
 
@@ -66,7 +66,7 @@ Knowing the parts is not enough — *putting them together* is the real skill. A
 
 > *All clean designs begin with one line of grain.*
 
-## Concept at a Glance
+This picture shows a complete design example from requirement to deployment. The key is not to memorize this specific schema, but to see how all the concepts combine.
 
 ## Key Terms
 

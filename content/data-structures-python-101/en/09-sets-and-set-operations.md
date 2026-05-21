@@ -38,8 +38,6 @@ This is the ninth post in the Data Structures with Python 101 series.
 
 This picture places Sets and Set Operations inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Sets and Set Operations is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What This Article Answers
 
 - Why is `set` so strong at deduplication and membership testing?

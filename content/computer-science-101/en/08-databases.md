@@ -43,8 +43,6 @@ In this article, we'll connect SQL, indexes, execution plans, and ACID transacti
 
 This picture places Databases inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Databases is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions This Article Answers
 
 - How does a database store large amounts of data and still answer quickly?
@@ -67,8 +65,6 @@ Most service incidents start at the database. A single slow query can paralyze t
 > A DB is not just storage; it is the system in charge of concurrency and consistency.
 
 Queries are short, but deep algorithms sit behind them.
-
-## Concept at a Glance
 
 > An index is like the index in a book. Instead of skimming every page, you jump straight to the right one through the index.
 

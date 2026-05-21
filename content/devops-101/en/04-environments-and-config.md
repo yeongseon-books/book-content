@@ -58,8 +58,6 @@ This picture places Environments and Configuration inside an operating flow. The
 
 > *Build once, run anywhere*.
 
-## Concept at a Glance
-
 Environments (dev, staging, prod) exist to *test safety before production*. Configuration management ensures all three are *defined once* and *deployed identically*, not clicked by hand.
 
 ## Key Terms

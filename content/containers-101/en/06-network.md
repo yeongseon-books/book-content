@@ -45,13 +45,13 @@ In this chapter, we compare bridge, host, overlay, and none, then explain why us
 
 This picture places Network inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Network is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Container networking is not just about port mapping; it is about choosing which containers can see each other and how traffic flows between them.
 
 ## Why It Matters
 
 Both Compose and Kubernetes ride on top of these abstractions. Get the basics right and the rest is easy.
 
-## Concept at a Glance
+bridge mode isolates containers on a virtual network. host mode runs the container with the host network stack (no isolation, higher performance). overlay spreads containers across multiple hosts. DNS lets containers find each other by service name.
 
 ## Key Terms
 

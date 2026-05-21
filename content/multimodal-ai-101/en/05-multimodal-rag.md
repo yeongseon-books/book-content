@@ -43,8 +43,6 @@ Here we treat multimodal RAG as a retrieval redesign: what to index, what to kee
 
 This picture places Multimodal RAG: Searching Images and Text Together inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Multimodal RAG: Searching Images and Text Together is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions text RAG cannot answer
 
 A typical RAG system splits documents into chunks, embeds them into a vector DB, and retrieves the nearest chunks for a query embedding. But text chunks cannot answer "find the slide that contains a chart shaped like this" or "tell me where the red button is in this screenshot."

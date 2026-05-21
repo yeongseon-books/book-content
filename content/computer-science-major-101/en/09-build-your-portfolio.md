@@ -41,7 +41,7 @@ This is post 9 in the Computer Science Major 101 series.
 
 This picture places Build Your Portfolio inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Build Your Portfolio is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A strong portfolio is not a collection of projects—it is a set of *decisions* made visible. Each project should show *why* you chose what you chose.
 
 ## Questions This Post Answers
 
@@ -63,7 +63,7 @@ This picture places Build Your Portfolio inside an operating flow. The point is 
 Applications need visible evidence to start a real conversation. A repository, README, and demo link say far more than a single line on a resume because they reveal not only what you built, but how you explain and present your work.
 
 ## Concept at a Glance
-
+Show *reasoning*, not just code. Each project is a chance to document the boundaries, trade-offs, and lessons you learned.
 > An assignment ends at submission, but a portfolio starts only when the work is organized into a repository and explained through documentation.
 
 An assignment does not automatically become a portfolio piece. You need to organize it into a repository, add context through a README, and attach a demo when possible. That is when the work becomes readable to someone other than you.

@@ -386,4 +386,6 @@ else:
 - [프롬프트 엔지니어링 기초 — System·User·Assistant 역할](./03-prompt-engineering-basics.md)
 - [캐싱 전략 — 비용과 지연 시간 줄이기](../../llm-api-production-101/ko/04-caching-strategies.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/llm-app-foundations-101/ko/02-understanding-tokens)
+
 Tags: LLM, OpenAI, Prompt Engineering, Python

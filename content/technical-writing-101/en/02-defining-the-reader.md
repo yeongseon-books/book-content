@@ -50,8 +50,6 @@ A blurry *reader* leads to blurry *sentences*.
 
 > Mental model: once one reader becomes concrete, scope and vocabulary stop drifting.
 
-## Concept at a Glance
-
 A persona is not a demographic profile; it is a decision boundary. It answers how much background to include, which terms need explanation, how hard examples can be, and what the post should deliberately skip.
 ## Key Terms
 

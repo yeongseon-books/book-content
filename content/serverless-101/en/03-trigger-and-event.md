@@ -42,8 +42,6 @@ So this post avoids a taxonomy-only approach. Instead, we will follow one comple
 
 This picture places Trigger and Event inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Trigger and Event is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - how HTTP, queue, and schedule triggers differ as delivery contracts
@@ -58,8 +56,6 @@ This picture places Trigger and Event inside an operating flow. The point is not
 Beginners usually focus on the function body first. In production, the bigger source of failure is often the **invocation contract**. HTTP requests center around user latency and explicit responses. Queue messages center around retries, duplication, and eventual completion. Scheduled triggers center around overlap and re-entrancy.
 
 If you ignore those differences, code that looks perfectly reasonable in a single local run breaks down quickly in production. Real event systems introduce network delay, batch delivery, at-least-once redelivery, out-of-order arrival, and poison messages all at once.
-
-## Concept at a Glance
 
 Operationally, this is about role separation. The HTTP endpoint accepts work. The queue creates the async boundary. The consumer performs the actual side effect. The DLQ preserves repeated failures as inspectable payloads. Troubleshooting gets faster when you narrow the problem down in that order.
 

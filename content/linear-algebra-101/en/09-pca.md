@@ -40,7 +40,7 @@ This is post 9 in the Linear Algebra 101 series. Here we will treat PCA as the p
 
 This picture places PCA inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of PCA is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> PCA is the most intuitive place where you see eigenvalues and eigenvectors in action. Principal components are the axes along which data varies the most, and a few components often preserve most information while cutting dimensionality.
 
 ## Questions This Post Answers
 
@@ -56,8 +56,6 @@ This picture places PCA inside an operating flow. The point is not to memorize t
 Dimensionality reduction, visualization, denoising, and feature compression show up constantly in practice. PCA is often the first reliable linear-algebra tool for that job.
 
 It is also a useful synthesis chapter. Basis choice, eigenvalues, SVD, and reconstruction error all meet here. Once PCA feels concrete, the earlier chapters stop looking like isolated theory and start looking like parts of one workflow.
-
-## Concept at a Glance
 
 ## Key Terms
 

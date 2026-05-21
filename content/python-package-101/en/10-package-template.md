@@ -42,8 +42,6 @@ This is the final post in the Python Package 101 series. Here we combine structu
 
 This picture places Production Package Template inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Production Package Template is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What you will learn
 
 - How to create project templates with cookiecutter and copier

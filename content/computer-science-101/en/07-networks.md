@@ -43,8 +43,6 @@ In this article, we'll build a practical network model through the TCP/IP layers
 
 This picture places Networks inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Networks is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions This Article Answers
 
 - What path does data follow after you type an address into a browser?
@@ -67,8 +65,6 @@ When an API response is slow, when a certificate error pops up, when an odd time
 > Network = layered agreements.
 
 Each layer trusts the one below it and focuses on its own job.
-
-## Concept at a Glance
 
 > Data flows down through the layers (each adding a header) on the sending side, and up the layers (each stripping its header) on the receiving side.
 

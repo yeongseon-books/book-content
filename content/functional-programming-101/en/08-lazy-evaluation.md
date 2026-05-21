@@ -42,8 +42,6 @@ Lazy evaluation means deferring computation until a consumer actually asks for t
 
 This picture places Lazy Evaluation and Generators inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Lazy Evaluation and Generators is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The difference between eager evaluation and lazy evaluation

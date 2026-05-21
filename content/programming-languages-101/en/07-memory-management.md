@@ -43,8 +43,6 @@ In this post, we will treat memory management as the rule for deciding when an o
 
 This picture places Memory Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Memory Management is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - How are the stack and the heap different?
@@ -57,8 +55,6 @@ This picture places Memory Management inside an operating flow. The point is not
 Long-running services often slowly creep up in memory. Finding the cause means being able to answer "why is this object still alive?" Memory models are the tools that produce that answer.
 
 > Most leaks start with one forgotten reference.
-
-## Concept at a Glance
 
 The stack is reclaimed when the function returns. The heap needs someone to collect it.
 

@@ -45,8 +45,6 @@ This is post 3 in the Computer Networks 101 series.
 
 This picture places TCP and UDP inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of TCP and UDP is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The four responsibilities of TCP (connection, order, retransmission, congestion control)
@@ -59,8 +57,6 @@ This picture places TCP and UDP inside an operating flow. The point is not to me
 The transport-protocol choice directly affects system performance and user experience. Pick TCP for a game or a video call and one lost frame can stall the whole stream. Pick UDP for payment processing and transactions disappear. If you cannot answer "why this protocol?", system design becomes a cargo cult.
 
 > Protocol choice is a tradeoff — what to guarantee and what to give up.
-
-## Concept at a Glance
 
 > TCP creates a virtual circuit between two hosts and guarantees data flows in order, with no loss, and not too fast. UDP places packets on top of IP one at a time, with no circuit. If reliability is needed, the application has to build it.
 

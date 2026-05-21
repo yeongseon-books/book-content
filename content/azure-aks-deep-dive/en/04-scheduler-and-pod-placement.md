@@ -62,8 +62,6 @@ and records a Binding.
 
 This picture places Scheduler and Pod placement — who decides which node inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Scheduler and Pod placement — who decides which node is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters in real AKS operations
 
 Scheduler behavior is where abstract policy becomes an operational consequence. Zone-spread rules, taints, affinity, PVC topology, spot-node usage, and preemption all meet at the same decision point. If this layer is fuzzy, teams end up paying for it as Pending Pods, uneven failure domains, or high-priority workloads displacing the wrong tenants.

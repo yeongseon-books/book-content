@@ -42,8 +42,6 @@ This is post 2 in the GitHub Actions 101 series. In this post, we will map the r
 
 This picture places Workflows and Jobs inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Workflows and Jobs is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The exact relationship between *Workflow / Job / Step*
@@ -57,8 +55,6 @@ This picture places Workflows and Jobs inside an operating flow. The point is no
 A fully *serial* CI is slow; a fully *parallel* one *breaks ordering*. Drawing the *job graph* correctly is what makes a pipeline *fast and safe*.
 
 > *Parallel for speed, dependencies for safety*.
-
-## Concept at a Glance
 
 ## Key Terms
 

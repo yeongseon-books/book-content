@@ -50,8 +50,6 @@ One *figure* often replaces *five* paragraphs.
 
 > Mental model: use a figure for flow and a table for side-by-side decisions.
 
-## Concept at a Glance
-
 Figures work best for flow and relationships; tables work best for trade-offs and decisions. Choosing the right visual form based on the reader's actual question is what separates editorial clarity from decorative noise.
 ## Key Terms
 

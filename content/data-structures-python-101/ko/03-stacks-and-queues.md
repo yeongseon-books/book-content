@@ -36,10 +36,6 @@ last_reviewed: '2026-05-12'
 
 *Data Structures with Python 101 3장 흐름 개요*
 
-이 그림에서는 스택과 큐를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 스택과 큐의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 이 글이 중요한가
 
 스택과 큐는 가장 기본적인 추상 자료형입니다. 함수 호출 스택, 브라우저 뒤로 가기, 작업 큐, BFS 탐색처럼 운영 코드와 알고리즘 코드의 양쪽에서 모두 반복해서 등장합니다. 이 둘을 정확히 이해하면 더 복잡한 흐름 제어 구조를 훨씬 쉽게 읽을 수 있습니다.
@@ -289,6 +285,63 @@ print(f"deque is {list_time / deque_time:.0f}x faster")
 ## 정리 및 다음 글 안내
 
 스택은 LIFO, 큐는 FIFO라는 단순한 규칙 위에서 동작합니다. Python에서는 스택은 list, 큐는 deque라는 관례가 사실상 표준이며, 이 선택은 내부 연산 비용과 정확히 맞닿아 있습니다. 다음 글에서는 빠른 키 기반 조회를 가능하게 만드는 해시 테이블과 dict를 살펴보겠습니다.
+
+
+## Python 구현 보강: 타입 힌트와 검증 루틴
+
+Python에서 자료구조를 학습할 때는 동작 예시만 확인하는 단계에서 멈추지 않고, 타입 힌트와 최소 검증 루틴을 함께 작성해야 설계 의도가 명확해집니다. 특히 `TypeVar`, `Generic`, `Protocol`을 사용하면 자료구조 API의 입력/출력 계약을 코드 차원에서 드러낼 수 있습니다. 아래 예시는 여러 글에서 재사용할 수 있는 기본 인터페이스 패턴입니다.
+
+```python
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Generic, Iterable, Iterator, Optional, TypeVar
+
+T = TypeVar("T")
+
+@dataclass
+class Node(Generic[T]):
+    value: T
+    next: Optional["Node[T]"] = None
+
+class Container(Generic[T]):
+    def __init__(self, items: Optional[Iterable[T]] = None) -> None:
+        self._size = 0
+        self._head: Optional[Node[T]] = None
+        if items is not None:
+            for item in items:
+                self.push(item)
+
+    def push(self, value: T) -> None:
+        self._head = Node(value=value, next=self._head)
+        self._size += 1
+
+    def pop(self) -> T:
+        if self._head is None:
+            raise IndexError("empty container")
+        node = self._head
+        self._head = node.next
+        self._size -= 1
+        return node.value
+
+    def __len__(self) -> int:
+        return self._size
+
+    def __iter__(self) -> Iterator[T]:
+        cur = self._head
+        while cur is not None:
+            yield cur.value
+            cur = cur.next
+```
+
+이 패턴의 핵심은 세 가지입니다. 첫째, 공개 메서드의 타입을 먼저 확정하여 구현 교체 비용을 낮춥니다. 둘째, 예외 조건(`IndexError`)을 명시해 호출자 책임을 분리합니다. 셋째, `__iter__`, `__len__` 같은 파이썬 데이터 모델 메서드를 제공해 표준 라이브러리와 자연스럽게 결합합니다.
+
+성능 확인은 `timeit` 단일 숫자보다 시나리오 기반으로 진행하는 편이 정확합니다. 예를 들어 "1만 건 push 후 1만 건 pop", "임의 키 5천 건 조회", "중복 원소 30% 포함 집합 연산"처럼 입력 특성을 고정하고 결과를 비교합니다. 또한 `mypy`나 `pyright`로 정적 타입 검사를 돌리면 API 오용을 조기에 발견할 수 있습니다.
+
+마지막으로 학습 기록에는 "왜 이 구현을 선택했는가"를 반드시 남깁니다. 같은 기능을 `list`, `deque`, 사용자 정의 클래스 중 무엇으로 표현했는지와 그 이유를 적어두면, 이후 코드베이스에서 자료구조를 교체해야 할 때 판단 근거를 재사용할 수 있습니다.
+
+실무 코드에서는 `TypeVar` 기반 제네릭 API를 유지하고, `pytest`로 빈 입력/최대 입력/중복 입력 경계 조건을 검증해 구현 신뢰도를 높입니다.
+
 
 ## 처음 질문으로 돌아가기
 

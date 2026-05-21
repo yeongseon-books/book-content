@@ -42,8 +42,6 @@ To address the weakness called out in issue #779, this chapter is no longer a lo
 
 This picture places Synthetic Data Generation - From Self-Instruct to Distillation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Synthetic Data Generation - From Self-Instruct to Distillation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this chapter matters
 
 Synthetic data can sharply reduce labeling bottlenecks for instruction tuning and evaluation-set creation. But if you keep generating without verification, you accumulate repeated patterns, unsupported answers, teacher bias, and policy risk at the same time.

@@ -43,8 +43,6 @@ In this post, we will compare static and dynamic languages as a choice about whe
 
 This picture places Static vs Dynamic Languages inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Static vs Dynamic Languages is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - What is the shortest definition of static vs dynamic?
@@ -57,8 +55,6 @@ This picture places Static vs Dynamic Languages inside an operating flow. The po
 Every team debates "should we add more types?" Holding that conversation well requires a one-line answer for what static typing guarantees and what it does not.
 
 > A type is a promise about the shape of data. Where that promise is checked is what static vs dynamic comes down to.
-
-## Concept at a Glance
 
 The same kind of bug — caught by static at build time, by dynamic at run time.
 

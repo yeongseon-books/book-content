@@ -43,15 +43,11 @@ Here we use queues, offsets, and event logs to show how distributed systems turn
 
 This picture places Message Queues and Event Sourcing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Message Queues and Event Sourcing is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Direct service-to-service calls strongly couple availability and latency. Put a queue in between and one side staying up does not depend on the other. Event sourcing goes one step further by defining state as the sum of events, making history and replay possible.
 
 > Queues separate time. Events separate truth.
-
-## Concept at a Glance
 
 Producers write to the queue and consumers read at their own pace. A single message can be processed by several consumers.
 

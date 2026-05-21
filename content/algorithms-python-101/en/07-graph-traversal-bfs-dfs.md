@@ -42,8 +42,6 @@ This is post 7 in the Algorithms with Python 101 series. Here, we'll represent g
 
 This picture places Graph Traversal — BFS and DFS inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Graph Traversal — BFS and DFS is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - Graph basics and how to represent them in Python

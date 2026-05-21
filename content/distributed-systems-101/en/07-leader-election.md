@@ -43,15 +43,11 @@ Here we treat leader election as an operational safety problem: leases decide wh
 
 This picture places Leader Election inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Leader Election is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Many distributed-system bugs happen the moment "there are two leaders." When two leaders write to the same resource at the same time, data breaks. A correct election guarantees that only one leader holds authority at any point in time.
 
 > A good election is the promise that "there is no moment with two leaders."
-
-## Concept at a Glance
 
 Multiple candidates request a lease from a lock service. Only one becomes leader and renews the lease with heartbeats.
 

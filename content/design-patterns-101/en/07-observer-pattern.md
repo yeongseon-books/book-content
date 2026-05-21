@@ -43,15 +43,11 @@ In this post, we'll look at Observer as a way to turn direct calls into notifica
 
 This picture places The Observer Pattern inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of The Observer Pattern is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 If A *directly calls* B, C, and D when it changes, A knows all three. Observer turns those calls into *notifications*, so A no longer needs to know who is listening.
 
 > Observer dissolves coupling into *notification*.
-
-## Concept at a Glance
 
 ## Key Terms
 

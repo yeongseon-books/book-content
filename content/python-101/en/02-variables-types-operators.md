@@ -54,8 +54,6 @@ This chapter targets Python 3.12. Blocks shown as REPL sessions (with the `>>>` 
 
 This picture places Variables, types, and operators inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Variables, types, and operators is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 Variables and types are the skeleton of every program you'll ever write. It's tempting to dismiss `x = 1` as trivial, but here are the bugs you keep hitting if the model is fuzzy.

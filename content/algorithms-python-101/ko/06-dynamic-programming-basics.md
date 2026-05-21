@@ -40,10 +40,6 @@ last_reviewed: '2026-05-12'
 
 *Algorithms with Python 101 6장 흐름 개요*
 
-이 그림에서는 동적 계획법 기초를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 동적 계획법 기초의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 중요한가
 
 재귀만으로는 지수 시간이 걸릴 수 있습니다. DP는 부분 문제 결과를 저장해 그 비용을 다항 시간으로 줄입니다. 대표적으로 순진한 재귀 피보나치는 `O(2^n)`이지만, DP를 적용하면 `O(n)`이 됩니다.
@@ -292,6 +288,57 @@ print(knapsack(weights, values, capacity))  # 10
 
 동적 계획법은 중복 계산을 없애 지수 문제를 다항 문제로 바꾸는 강력한 도구입니다. 핵심은 항상 점화식을 정의하는 데 있습니다. 다음 글에서는 BFS와 DFS로 그래프를 탐색하는 방법을 살펴봅니다.
 
+## 실전 패턴 추가: 정렬과 탐색 구현을 문제 유형별로 선택하기
+
+알고리즘 문제에서는 코드 길이보다 선택 기준이 더 중요합니다. 입력 크기, 데이터 분포, 정렬 여부에 따라 정렬/탐색 전략이 달라집니다. 아래 예시는 같은 정수 배열을 다루더라도 어떤 조건에서 어떤 구현을 고르는지 보여 줍니다.
+
+```python
+def binary_search(nums: list[int], target: int) -> int:
+    left, right = 0, len(nums) - 1
+    while left <= right:
+        mid = (left + right) // 2
+        if nums[mid] == target:
+            return mid
+        if nums[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+    return -1
+
+
+def merge_sort(nums: list[int]) -> list[int]:
+    if len(nums) <= 1:
+        return nums
+    mid = len(nums) // 2
+    left = merge_sort(nums[:mid])
+    right = merge_sort(nums[mid:])
+
+    merged: list[int] = []
+    i = j = 0
+    while i < len(left) and j < len(right):
+        if left[i] <= right[j]:
+            merged.append(left[i])
+            i += 1
+        else:
+            merged.append(right[j])
+            j += 1
+    merged.extend(left[i:])
+    merged.extend(right[j:])
+    return merged
+
+
+def quick_sort(nums: list[int]) -> list[int]:
+    if len(nums) <= 1:
+        return nums
+    pivot = nums[len(nums) // 2]
+    less = [x for x in nums if x < pivot]
+    equal = [x for x in nums if x == pivot]
+    greater = [x for x in nums if x > pivot]
+    return quick_sort(less) + equal + quick_sort(greater)
+```
+
+실무 판단은 보통 이렇게 정리됩니다. 이미 정렬된 리스트에서 존재 여부를 반복 조회하면 이진 탐색이 기본 선택입니다. 입력이 계속 바뀌고 안정 정렬이 필요하면 병합 정렬 계열이 유리하고, 평균 성능과 구현 단순성을 우선하면 퀵 정렬 계열이 자주 선택됩니다. 코딩 테스트에서는 Python 내장 `sort()`가 Timsort 기반이라 거의 항상 가장 실용적인 기본값이지만, 원리를 직접 구현해 보면 경계 조건과 복잡도 해석 능력이 크게 좋아집니다.
+
 ## 처음 질문으로 돌아가기
 
 - **DP가 적용되는 두 조건은 무엇일까요?**
@@ -323,5 +370,7 @@ print(knapsack(weights, values, capacity))  # 10
 - [Real Python — Memoization with Python](https://realpython.com/lru-cache-python/)
 - [GeeksforGeeks — Dynamic Programming](https://www.geeksforgeeks.org/dynamic-programming/)
 - [LeetCode — Dynamic Programming Problems](https://leetcode.com/tag/dynamic-programming/)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/algorithms-python-101/ko/06-dynamic-programming-basics)
 
 Tags: Python, Algorithms, Dynamic Programming, DP, Memoization

@@ -46,8 +46,6 @@ This is the 5th article in the SQLAlchemy 101 series.
 
 This picture places Session in Depth: How Unit of Work and Identity Map Actually Work inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Session in Depth: How Unit of Work and Identity Map Actually Work is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 If you use the ORM without understanding the Session, you bump into mysterious behavior often:

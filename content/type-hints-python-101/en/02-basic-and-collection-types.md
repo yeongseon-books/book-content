@@ -45,8 +45,6 @@ This is post 2 in the Type Hints in Python 101 series.
 
 This picture places Basic Types and Collection Types inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Basic Types and Collection Types is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - Basic scalar types: `int`, `str`, `float`, `bool`, `bytes`, `None`
@@ -61,8 +59,6 @@ Most real-world Python code works with collections. API responses are dictionari
 > Parameterized types = telling the type checker what is *inside* the container.
 
 This is where type hints start paying real dividends in large codebases.
-
-## Concept at a Glance
 
 > Basic types annotate single values. Collection types wrap basic types to describe containers and their contents.
 

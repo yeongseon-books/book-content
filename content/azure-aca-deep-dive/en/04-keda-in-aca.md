@@ -56,8 +56,6 @@ ACA's internal implementation is not published by Microsoft, so these versions a
 
 This picture places KEDA inside ACA — what a scale rule actually creates inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of KEDA inside ACA — what a scale rule actually creates is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## The short version: a scale rule is not the scaler itself
 
 In ACA, the scale rule you author is product configuration.

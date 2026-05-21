@@ -424,4 +424,6 @@ kubectl describe service fastapi-hello
 - [Azure App Service 101](../../azure-app-service-101/ko/04-first-deploy.md) — 같은 FastAPI 앱을 더 높은 수준의 PaaS에 올리는 흐름과 비교할 때
 - [Azure Functions 101](../../azure-functions-101/ko/) — 코드 배포 단위가 컨테이너와 어떻게 다른지 비교할 때
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-aks-101/ko/03-first-cluster-and-deploy)
+
 Tags: Azure, AKS, Kubernetes, Cloud

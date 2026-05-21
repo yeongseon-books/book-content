@@ -45,7 +45,7 @@ This is the final post in the Information Security 101 series.
 
 This picture places Incident Response inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Incident Response is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Incident response is not just a playbook. It is the ability to detect fast, respond immediately, investigate thoroughly, recover completely, and never make the same mistake twice.
 
 ## What You Will Learn
 
@@ -60,8 +60,6 @@ This picture places Incident Response inside an operating flow. The point is not
 Incidents will happen. Good response shrinks loss; bad response amplifies it. A two-hour difference can save a company.
 
 > "Prevention" does not aim at zero. "Response" is half of real security.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR

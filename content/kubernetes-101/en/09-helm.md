@@ -44,13 +44,9 @@ Here, we will frame Helm as a repeatable deployment unit that separates shared s
 
 This picture places Helm inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Helm is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 *Per-environment copies* create *drift*. *Helm* lets you reuse the *same template* and only swap *values*.
-
-## Concept at a Glance
 
 ## Key Terms
 

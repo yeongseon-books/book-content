@@ -40,8 +40,6 @@ This is the fifth post in the Korean AI Stack 101 series. Here, we map out safe 
 
 This picture places Using HyperCLOVA X and Solar API inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Using HyperCLOVA X and Solar API is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 This post covers the patterns for safely calling Korean generation LLM APIs. Earlier posts cleaned the input data with embeddings (KoSimCSE, BGE-M3) and OCR (CLOVA). This post builds the answer on top. HyperCLOVA X (NAVER) and Solar (Upstage) are tuned for Korean fluency, but the real production problems live on the call-contract side: authentication, latency, error codes, token limits, prompt caching.

@@ -46,8 +46,6 @@ This is the 9th article in the SQLAlchemy 101 series.
 
 This picture places Async SQLAlchemy with aiosqlite and AsyncSession inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Async SQLAlchemy with aiosqlite and AsyncSession is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 Using sync SQLAlchemy from FastAPI, Starlette, or aiohttp blocks the event loop. SQLAlchemy 2.x ships an async API that has been stable since 1.4, and SQLite supports the same patterns through the `aiosqlite` driver.

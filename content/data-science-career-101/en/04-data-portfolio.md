@@ -42,8 +42,7 @@ This is post 4 in the Data Science Career 101 series.
 
 This picture places The Data Portfolio inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of The Data Portfolio is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
+> In portfolio strategy, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
 ## What You Will Learn
 
 - The shape of *three projects*
@@ -58,8 +57,7 @@ Hiring managers usually remember the shape of the story before they remember the
 
 If they can quickly understand the question, the data source, the method, the conclusion, and how to rerun the work, the project starts to look like evidence of judgment. Without that structure, even solid technical work can look unfinished or fragile.
 
-## Concept at a Glance
-
+A strong portfolio is not a collection of projects; it's a line of thinking. Someone reading your portfolio should see consistent judgment about problem definition, data quality, and result explanation.
 ## Key Terms
 
 - **portfolio**: A curated set of best work.
@@ -76,6 +74,7 @@ If they can quickly understand the question, the data source, the method, the co
 
 ## Hands-on: Portfolio Composition
 
+Start with three good projects rather than ten mediocre ones. For each, write a one-page summary: what was the problem, how did you approach it, what did you learn?
 ### Step 1 — Three Projects
 
 ```text

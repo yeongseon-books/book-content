@@ -38,10 +38,6 @@ seo_description: 쓸 만한 OCR 결과는 평문이 아니라, 의미 있는 줄
 
 *Korean AI Stack 101 4장 흐름 개요*
 
-이 그림에서는 CLOVA OCR API로 문서 텍스트 추출를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> CLOVA OCR API로 문서 텍스트 추출의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 이 단계가 중요한가
 
 이 글은 한국어 문서 이미지, 영수증, 세금계산서, 스캔 양식을 CLOVA OCR API로 처리하고, 그 결과를 앞 글의 BGE-M3 코퍼스에 바로 넣을 수 있는 모양으로 정리합니다. 앞 글이 텍스트 코퍼스 검색을 다뤘다면, 이번 글은 그 텍스트를 처음 만들어 내는 단계입니다.
@@ -293,5 +289,7 @@ CLOVA OCR 예제의 가치는 텍스트 정확도보다 먼저 응답 구조를 
 - [CLOVA OCR API guide](https://api.ncloud-docs.com/docs/ai-application-service-ocr-ocr)
 - [pdfplumber](https://github.com/jsvine/pdfplumber)
 - [OCR post-processing patterns](https://cloud.google.com/document-ai/docs/process-documents-client-libraries)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/korean-ai-stack-101/ko/04-clova-ocr)
 
 Tags: Korean NLP, LLM, Embeddings, OCR

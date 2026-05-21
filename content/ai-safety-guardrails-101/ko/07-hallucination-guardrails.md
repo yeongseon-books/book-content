@@ -279,4 +279,6 @@ Hallucination guardrail의 핵심은 모델을 더 똑똑하게 만드는 것이
 - [출력 필터링과 콘텐츠 모더레이션](./03-output-filtering.md)
 - [운영 가드레일 시스템 구축](./10-production-guardrail-system.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-safety-guardrails-101/ko/07-hallucination-guardrails)
+
 Tags: AI Safety, Hallucination, RAG, Grounding

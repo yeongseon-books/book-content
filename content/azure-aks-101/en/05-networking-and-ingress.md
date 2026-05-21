@@ -42,8 +42,6 @@ This is the fifth post in the Azure Kubernetes Service 101 series. Here, we conn
 
 This picture places Networking and Ingress — the path in and out of the cluster inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Networking and Ingress — the path in and out of the cluster is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Start with the request path
 
 From the outside, this is the shape that matters. The Service is the stable in-cluster endpoint. The Ingress layer is the HTTP router in front of it.

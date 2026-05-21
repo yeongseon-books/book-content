@@ -44,8 +44,6 @@ Here, we will look past the usual shorthand of "turn on disk encryption" and tre
 
 This picture places Safe Data Storage inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Safe Data Storage is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions This Chapter Answers
 
 - The difference between *at-rest* and *in-transit*
@@ -59,8 +57,6 @@ This picture places Safe Data Storage inside an operating flow. The point is not
 Both legally (GDPR, regional privacy laws) and in incident cost, *sensitive data leakage* is the most expensive class of breach. Plaintext storage is a *time bomb*.
 
 > *Collect less, separate more, lock harder.*
-
-## Concept at a Glance
 
 ## Key Terms
 

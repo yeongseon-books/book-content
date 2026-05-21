@@ -43,8 +43,6 @@ This is post 2 in the Software Engineering 101 series. In this chapter, we turn 
 
 This picture places Understanding Requirements inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Understanding Requirements is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - What makes a requirement good
@@ -58,8 +56,6 @@ This picture places Understanding Requirements inside an operating flow. The poi
 Over half of code defects originate at the requirements stage. The later you find them, the cost grows exponentially.
 
 > The most expensive code is code you rewrite.
-
-## Concept at a Glance
 
 Requirements only become real when they map to tests.
 

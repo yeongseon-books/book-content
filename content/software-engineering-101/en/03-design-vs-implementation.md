@@ -43,8 +43,6 @@ This is post 3 in the Software Engineering 101 series. In this chapter, we separ
 
 This picture places Design vs Implementation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Design vs Implementation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - Definitions of design and implementation
@@ -58,8 +56,6 @@ This picture places Design vs Implementation inside an operating flow. The point
 Design decisions outlive code. Bad design cannot be hidden under good code.
 
 > Code can be rewritten; the trace of decisions follows you forever.
-
-## Concept at a Glance
 
 Design sets the ceiling for implementation.
 

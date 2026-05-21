@@ -43,15 +43,11 @@ In this post, we'll look at Strategy as a way to turn algorithms into swappable 
 
 This picture places The Strategy Pattern inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of The Strategy Pattern is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Branching algorithms with if/elif means editing existing code every time a new option appears. Strategy turns those branches into *swappable objects* — open for extension, closed for modification (OCP).
 
 > Strategy is OCP made visible in code.
-
-## Concept at a Glance
 
 ## Key Terms
 

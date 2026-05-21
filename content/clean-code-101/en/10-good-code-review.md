@@ -43,7 +43,7 @@ Here we will convert the themes from the series into a practical review checklis
 
 This picture places Good Code Review Standards inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Good Code Review Standards is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Automation handles chores. People review intent and structure.
 
 ## Questions this article answers
 
@@ -60,8 +60,6 @@ This picture places Good Code Review Standards inside an operating flow. The poi
 Review is the last quality gate and the largest learning channel a team has.
 
 > Review is not where defects are caught. It is where the team finds a better answer together.
-
-## Concept at a Glance
 
 Automation handles chores. Humans look at intent.
 

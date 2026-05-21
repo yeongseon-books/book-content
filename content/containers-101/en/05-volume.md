@@ -45,13 +45,13 @@ In this chapter, we compare named volumes, bind mounts, and tmpfs by lifecycle a
 
 This picture places Volume inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Volume is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Volumes are the mechanism to keep data alive when containers die — they decouple storage lifecycle from container lifecycle.
 
 ## Why It Matters
 
 Containers are immutable, but the data they manage must survive. A bad volume design is a data-loss design.
 
-## Concept at a Glance
+Volumes are managed storage independent of container identity. Bind mounts let you connect a host path directly. tmpfs lives in memory and disappears when the container stops. Each has different persistence guarantees and performance trade-offs.
 
 ## Key Terms
 

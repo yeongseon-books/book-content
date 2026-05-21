@@ -43,8 +43,6 @@ This is the eighth post in the Data Structures 101 series.
 
 This picture places Heaps inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Heaps is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The heap invariant and its relationship to a complete binary tree
@@ -57,8 +55,6 @@ This picture places Heaps inside an operating flow. The point is not to memorize
 Heaps are the backbone of task scheduling, Dijkstra's algorithm, event simulation, and external sorting. They show up in every system that has to keep picking the next smallest (or largest) item to handle. If a BST is the general-purpose sorted tree, the heap is a specialised structure that handles only the two extremes.
 
 > Heap = the de facto implementation of a priority queue.
-
-## Concept at a Glance
 
 > A heap is a complete binary tree that maintains an ordering invariant between every parent-child pair. Because the tree is complete, you can store it inside an array with no gaps and find parents and children purely by index arithmetic. The result is excellent memory efficiency.
 

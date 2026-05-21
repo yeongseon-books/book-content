@@ -43,8 +43,6 @@ This is post 4 in the Software Engineering 101 series. In this chapter, we look 
 
 This picture places Code Review inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Code Review is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The real purpose of code review
@@ -58,8 +56,6 @@ This picture places Code Review inside an operating flow. The point is not to me
 Code review shapes both code quality and the distribution of knowledge in a team. The moment one person is the only one who understands a module, the organization is one resignation away from a freeze.
 
 > A review is a consensus, not a verdict.
-
-## Concept at a Glance
 
 Automation first, humans focus on judgment.
 

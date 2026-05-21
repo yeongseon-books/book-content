@@ -41,15 +41,11 @@ This is post 4 in the Web Development 101 series. Here we treat HTTP as the shar
 
 This picture places HTTP and APIs inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of HTTP and APIs is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Half of web work is *building and reading HTTP messages*. If you cannot picture the message, debugging becomes guesswork. Learn it once and it transfers to every framework.
 
 > HTTP is *a protocol made of plain text*.
-
-## Concept at a Glance
 
 Keep this frame in mind while reading every example in the chapter: the client sends method, URL, headers, and possibly a body; the server answers with status, headers, and a body. Everything else is detail layered on top.
 

@@ -46,8 +46,6 @@ This is the 6th article in the Python DB-API 101 series.
 
 This picture places Row factories and type adapters (sqlite3, PEP 249) inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Row factories and type adapters (sqlite3, PEP 249) is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What you will learn
 
 This post separates how sqlite3 moves data between SQL and Python into two axes.

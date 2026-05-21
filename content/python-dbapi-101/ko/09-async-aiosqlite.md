@@ -46,10 +46,6 @@ seo_description: aiosqlite는 SQLite를 비동기로 바꾸지 않는다. connec
 
 *Python DB-API 101 9장 흐름 개요*
 
-이 그림에서는 aiosqlite로 비동기 SQLite 다루기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> aiosqlite로 비동기 SQLite 다루기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## Mental Model: aiosqlite는 sqlite3 + thread + Future
 
 > aiosqlite는 SQLite를 비동기로 바꾸지 않는다. connection마다 백그라운드 스레드를 띄우고, `await`되는 메서드 호출을 그 스레드의 큐로 넣고, 결과를 Future로 받아 이벤트 루프에 돌려준다.

@@ -42,8 +42,6 @@ Python gives you functions, modules, `dataclass`, `NamedTuple`, `TypedDict`, and
 
 This picture places When to Avoid OOP inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of When to Avoid OOP is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions This Article Answers
 
 - Which classes are protecting real state, and which ones are only wrapping a simple transformation?

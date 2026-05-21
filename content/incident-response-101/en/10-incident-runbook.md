@@ -42,7 +42,7 @@ This is the final post in the Incident Response 101 series. This capstone post s
 
 This picture places Building an Incident Runbook inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Building an Incident Runbook is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A runbook is experience written down. The second time you face a problem, you are faster because the first time taught you.
 
 ## Why this topic matters
 

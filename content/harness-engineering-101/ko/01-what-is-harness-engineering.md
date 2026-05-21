@@ -380,4 +380,6 @@ Harness Engineering은 좋은 모델을 고르는 기술이 아니라, 모델이
 - [LangGraph 101 — 멀티 에이전트 시스템](../../langgraph-101/ko/05-multi-agent.md)
 - [AI Safety & Guardrails 101 — 운영 가드레일 시스템 구축](../../ai-safety-guardrails-101/ko/10-production-guardrail-system.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/harness-engineering-101/ko/01-what-is-harness-engineering)
+
 Tags: AI Agent, Harness, Production, Reliability

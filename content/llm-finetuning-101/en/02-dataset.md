@@ -40,8 +40,6 @@ This is the second post in the LLM Fine-tuning 101 series.
 
 This picture places Dataset Preparation and Preprocessing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Dataset Preparation and Preprocessing is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 At the dataset stage, what matters most is not volume but **format consistency**. If it is unclear what counts as input and which span the model should learn as a response, the loss may drop while the answers stay blurry. With the same 1,000 samples a consistent prompt format lets LoRA r=8 succeed; a mixed format may not converge even at r=64 with 5× more data.

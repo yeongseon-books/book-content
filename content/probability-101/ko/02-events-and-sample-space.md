@@ -203,6 +203,125 @@ print("indep?", round(P(set(A) & set(B)) - P(A) * P(B), 6))
 - 공정한 주사위를 가정하면 각 원소에 같은 확률을 둘 수 있습니다.
 - 순서를 구분하는지 여부가 답을 바꿉니다.
 
+## 조합론과 확률
+
+표본공간의 크기를 세는 문제는 조합론 문제로 자주 바뀝니다. 순서를 고려하는지, 복원을 하는지에 따라 결과의 가짃수가 달라집니다.
+
+**순열(permutation)**: 순서를 고려하는 선택
+
+- n개에서 r개를 선택해 순서 있게 배열: `P(n, r) = n! / (n-r)!`
+- 예: 5명 중 회장, 부회장 선출 = `P(5, 2) = 20`
+
+**조합(combination)**: 순서를 무시하는 선택
+
+- n개에서 r개를 선택: `C(n, r) = n! / (r!(n-r)!)`
+- 예: 5명 중 2명 선발 = `C(5, 2) = 10`
+
+**복원 추출 vs 비복원 추출**
+
+- 복원: 같은 것을 여러 번 뽑을 수 있음 (replacement)
+- 비복원: 한 번 뽑은 것은 다시 뽑을 수 없음 (without replacement)
+
+```python
+from math import factorial, comb, perm
+
+# 순열
+print(f"P(5, 2) = {perm(5, 2)}")
+
+# 조합
+print(f"C(5, 2) = {comb(5, 2)}")
+
+# 비율
+print(f"순열/조합 = {perm(5, 2) / comb(5, 2):.0f}")
+```
+
+실무 예시:
+
+- 비밀번호 4자리 (순서 O, 복원 O): `10^4 = 10,000`
+- 로또 6개 번호 (순서 X, 복원 X): `C(45, 6) = 8,145,060`
+- 팔로워 3명 선택 (순서 X, 복원 X): `C(100, 3)`
+
+조합론을 모르면 표본공간 크기를 잘못 세고, 확률 분모가 틀리게 됩니다.
+
+## 실제 문제에서 표본공간 정의하기
+
+표본공간을 어떻게 정의하느냐가 확률 계산의 첫 걸음입니다. 같은 문제라도 표본공간을 다르게 설정하면 답이 달라집니다.
+
+**예시 1: 동전 두 번 던지기**
+
+```python
+# 방법 1: 순서를 구분
+omega1 = [("H", "H"), ("H", "T"), ("T", "H"), ("T", "T")]
+# 4가지 결과, 각 확률 1/4
+
+# 방법 2: 순서를 무시, 앞면 개수만 고려
+omega2 = [0, 1, 2]  # 0개, 1개, 2개
+# 3가지 결과, 하지만 확률은 1/4, 1/2, 1/4 (균등하지 않음)
+
+print(f"방법 1: |Ω| = {len(omega1)}")
+print(f"방법 2: |Ω| = {len(omega2)} (하지만 확률 비균등)")
+```
+
+방법 1은 균등한 확률을 가징할 수 있어 계산이 간단하지만, 방법 2는 각 결과에 서로 다른 확률을 부여해야 합니다.
+
+**예시 2: 카드 분포**
+
+```python
+# 52장 카드 덱에서 1장 분포
+suits = ["spades", "hearts", "diamonds", "clubs"]
+ranks = list(range(1, 14))  # 1(A) ~ 13(K)
+omega = [(suit, rank) for suit in suits for rank in ranks]
+
+print(f"|Ω| = {len(omega)}")  # 52
+
+# 사건: 스페이드 A
+event = [("spades", 1)]
+print(f"P(spade A) = {len(event) / len(omega)}")
+```
+
+실무에서는 표본공간을 코드나 문서로 명시하는 팀이 강합니다. A/B 테스트의 버킷 정의, 이벤트 로그 스키마, 지표 계산식에 표본공간을 함께 적으면 오해를 크게 줄일 수 있습니다.
+
+## 드 모르간의 법칙
+
+드 모르간의 법칙은 집합 연산의 일반화된 형태입니다. 여집합의 교집합은 각 여집합의 합집합과 같습니다:
+
+```
+(A ∪ B)ᶜ = Aᶜ ∩ Bᶜ
+(A ∩ B)ᶜ = Aᶜ ∪ Bᶜ
+```
+
+확률로 읽으면:
+
+```
+P(not (A or B)) = P(not A and not B)
+P(not (A and B)) = P(not A or not B)
+```
+
+**Python 확인**
+
+```python
+omega = [(i, j) for i in range(1, 7) for j in range(1, 7)]
+A = {o for o in omega if o[0] + o[1] >= 10}
+B = {o for o in omega if o[0] == o[1]}
+
+# 드 모르간 첫 번째 법칙
+not_A_or_B = set(omega) - (set(A) | set(B))
+not_A_and_not_B = (set(omega) - set(A)) & (set(omega) - set(B))
+
+print(f"|(A∪B)ᶜ| = {len(not_A_or_B)}")
+print(f"|Aᶜ∩Bᶜ| = {len(not_A_and_not_B)}")
+print(f"드 모르간 1: {not_A_or_B == not_A_and_not_B}")
+
+# 드 모르간 두 번째 법칙
+not_A_and_B = set(omega) - (set(A) & set(B))
+not_A_or_not_B = (set(omega) - set(A)) | (set(omega) - set(B))
+
+print(f"|(A∩B)ᶜ| = {len(not_A_and_B)}")
+print(f"|Aᶜ∪Bᶜ| = {len(not_A_or_not_B)}")
+print(f"드 모르간 2: {not_A_and_B == not_A_or_not_B}")
+```
+
+드 모르간의 법칙은 논리회로 설계, 데이터베이스 쿼리 최적화, 부정 조건 필터링에서 자주 쓰입니다. 복잡한 조건을 간단한 형태로 변환할 때 유용합니다.
 ## 자주 헷갈리는 지점
 
 첫째, Ω를 적지 않고 계산에 들어가기 쉽습니다. 이 습관은 초반에는 빨라 보여도 뒤로 갈수록 더 많은 오해를 낳습니다.

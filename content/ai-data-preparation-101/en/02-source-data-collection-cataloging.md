@@ -39,8 +39,6 @@ This is post 2 in the AI Data Preparation 101 series. Here we cover how to colle
 
 This picture places Source Data Collection and Cataloging inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Source Data Collection and Cataloging is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## "I Don't Remember Where This Data Came From"
 
 A request lands: re-train the model from three months ago. You open the directory and find files like `dataset_v2_final_real.csv` with no record of where they originated. This common scene breaks reproducibility and seeds future license disputes.

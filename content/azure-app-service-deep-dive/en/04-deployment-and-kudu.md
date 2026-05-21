@@ -63,8 +63,6 @@ This post follows that path end to end.
 
 This picture places Deployment and Kudu — build, sync, release from the inside inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Deployment and Kudu — build, sync, release from the inside is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## The deployment pipeline in one picture
 
 Read deployment incidents through these four stages.

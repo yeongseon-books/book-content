@@ -44,8 +44,6 @@ In this chapter, we will treat browser security as a system of output escaping, 
 
 This picture places XSS and CSRF Defense inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of XSS and CSRF Defense is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions This Chapter Answers
 
 - The three flavors of *XSS*
@@ -59,8 +57,6 @@ This picture places XSS and CSRF Defense inside an operating flow. The point is 
 A single *XSS* can hijack the session. *CSRF* triggers transfers and deletes *without the user knowing*.
 
 > *Default rule — *escape on output, verify origin on request*.*
-
-## Concept at a Glance
 
 ## Key Terms
 

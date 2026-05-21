@@ -353,4 +353,6 @@ def fp_rate(logs: list[ModerationLog], window_days: int = 7) -> float:
 - [LLM 앱 운영 101 — LLM 앱 보안](../../llm-apps-ops-101/ko/04-security.md)
 - [LLM API 프로덕션 101 — 속도 제한 관리](../../llm-api-production-101/ko/06-rate-limit-management.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-safety-guardrails-101/ko/03-output-filtering)
+
 Tags: AI Safety, Content Moderation, Output Filtering, Llama Guard

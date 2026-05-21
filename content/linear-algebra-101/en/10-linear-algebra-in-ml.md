@@ -40,7 +40,7 @@ This is the final post in the Linear Algebra 101 series. Here we will pull linea
 
 This picture places Linear Algebra in Machine Learning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Linear Algebra in Machine Learning is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Linear algebra is the language beneath machine learning. Regression, classification, and dimensionality reduction are all expressed through vector and matrix operations, and the concepts of eigenvalues, decomposition, and orthogonality decide algorithmic efficiency and stability.
 
 ## Questions This Post Answers
 
@@ -56,8 +56,6 @@ This picture places Linear Algebra in Machine Learning inside an operating flow.
 Without linear-algebra intuition, the inside of a model stays opaque. Shape mismatches, strange embedding behavior, unstable gradients, and PCA outputs all feel like unrelated failures.
 
 With the right mental model, the internals get much less mysterious. A layer becomes matrix multiplication plus a nonlinearity. Embedding retrieval becomes a vector-comparison problem. Optimization becomes repeated updates to a parameter vector. That intuition survives even when the framework changes.
-
-## Concept at a Glance
 
 ## Key Terms
 

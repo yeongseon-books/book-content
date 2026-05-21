@@ -42,7 +42,7 @@ In this post, we focus on how partitioning and clustering help the engine skip w
 
 This picture places Partition and Clustering inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Partition and Clustering is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Partitioning reduces the data scanned by skipping irrelevant partitions; clustering arranges data physically to minimize I/O. Together they make large-table queries cheap.
 
 ## Questions this article answers
 
@@ -66,7 +66,7 @@ Warehouse facts often hold *billions of rows*. A daily partition alone lets the 
 
 > *You do not pay for data you do not read.*
 
-## Concept at a Glance
+This picture shows how partitioning and clustering shrink query scope and I/O. The key is not to memorize when to use each, but to measure where your queries spend time.
 
 ## Key Terms
 

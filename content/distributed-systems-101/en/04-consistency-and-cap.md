@@ -43,15 +43,11 @@ Here we map the consistency spectrum, then use CAP and PACELC to turn a vague tr
 
 This picture places Consistency and CAP inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Consistency and CAP is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 A one-line difference like "this DB is strongly consistent" or "eventual" reshapes the whole design. The screens you can build, your retry policy, and the failure behavior all flow from this. Without CAP vocabulary you cannot read database docs.
 
 > A consistency model is data's social contract.
-
-## Concept at a Glance
 
 Toward the left is intuitive but expensive. Toward the right is cheap and available but further from intuition.
 

@@ -45,8 +45,6 @@ In this post, we look at dependency direction as the mechanism that keeps a stab
 
 This picture places Dependency Direction inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Dependency Direction is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - How dependency relates to coupling
@@ -60,8 +58,6 @@ This picture places Dependency Direction inside an operating flow. The point is 
 Code is a graph. Where the arrows point determines whether a change in one place leaks into another.
 
 > Stable things must not depend on volatile things.
-
-## Concept at a Glance
 
 Details point toward the core.
 

@@ -43,7 +43,7 @@ Here we will separate working code from readable code and from code that stays c
 
 This picture places What Is Clean Code? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is Clean Code? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> The code we write once gets read a hundred times. Clean code is the discipline of saving the next person's time.
 
 ## Questions this article answers
 
@@ -60,8 +60,6 @@ This picture places What Is Clean Code? inside an operating flow. The point is n
 Code is written once and read a hundred times. Readability decides the cost of change.
 
 > Clean code is the act of saving the next person's time.
-
-## Concept at a Glance
 
 Working is the start, trust is the end.
 

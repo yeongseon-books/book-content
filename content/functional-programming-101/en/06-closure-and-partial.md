@@ -42,8 +42,6 @@ This is post 6 in the Functional Programming 101 series.
 
 This picture places Closures and Partial Application inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Closures and Partial Application is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The definition and mechanics of closures

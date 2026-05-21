@@ -45,7 +45,7 @@ This is post 3 in the Information Security 101 series.
 
 This picture places Cryptography and Hashing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Cryptography and Hashing is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Cryptography and hashing are not about hiding data. They are about proving "this data has not been tampered with" (hash) or "only the key holder can read this" (cipher) at every boundary.
 
 ## What You Will Learn
 
@@ -60,8 +60,6 @@ This picture places Cryptography and Hashing inside an operating flow. The point
 Most crypto incidents come from wrong combinations, not weak algorithms. Knowing what guarantees what blocks the major paths to disaster.
 
 > Algorithms are tools; safety lives in their composition and operation.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR

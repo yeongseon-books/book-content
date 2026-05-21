@@ -42,8 +42,6 @@ This is the first post in the Azure Functions 101 series. Here, we build the cor
 
 This picture places What Is Azure Functions? — A World Where Events Call Your Code inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is Azure Functions? — A World Where Events Call Your Code is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## A One-Sentence Definition — "An event arrives, my function runs, and then it's gone"
 
 Here's Azure Functions in a single line:

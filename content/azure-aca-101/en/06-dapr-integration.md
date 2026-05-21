@@ -47,8 +47,6 @@ This is post 6 in the Azure Container Apps 101 series. Here, we'll examine what 
 
 This picture places Dapr integration — what you get from a sidecar inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Dapr integration — what you get from a sidecar is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 Microservices keep posing the same problems.

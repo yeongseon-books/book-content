@@ -42,8 +42,6 @@ This is the seventh post in the Git & GitHub 101 series. Here, we follow one cha
 
 This picture places Collaborating with Pull Requests - From Branch to Review to Main inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Collaborating with Pull Requests - From Branch to Review to Main is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 When you work alone, `git merge feature/x` ends the story. The moment a second person joins, that command becomes painful. There is no place to record what changed, why it was needed, or who agreed it was a good idea.

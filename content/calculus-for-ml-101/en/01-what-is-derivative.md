@@ -44,8 +44,6 @@ In this post, we'll connect average rate of change, tangent lines, limits, and n
 
 This picture places What Is a Derivative inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is a Derivative is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - Why is learning in ML directly tied to derivatives?
@@ -57,8 +55,6 @@ This picture places What Is a Derivative inside an operating flow. The point is 
 ## Why It Matters
 
 *Gradient descent*, *backprop*, and *learning rate* are all defined on top of derivatives.
-
-## Concept at a Glance
 
 ## Key Terms
 

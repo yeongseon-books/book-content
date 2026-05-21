@@ -42,8 +42,6 @@ This is post 5 in the SRE 101 series. Here we treat monitoring as action-oriente
 
 This picture places Monitoring inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-
-
 ## Why this topic matters
 
 A flood of alerts drowns the real problem. When every threshold pages someone, the urgent signal and the background noise start to sound the same.

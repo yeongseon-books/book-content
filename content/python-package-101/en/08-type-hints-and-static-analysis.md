@@ -42,8 +42,6 @@ This is post 8 in the Python Package 101 series. Here we use type hints, `mypy`,
 
 This picture places Type Hints and Static Analysis inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Type Hints and Static Analysis is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What you will learn
 
 - How to add type hints to functions, variables, and return values

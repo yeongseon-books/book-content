@@ -62,6 +62,21 @@ maintainer는 저장소 방향과 품질 기준을 지키는 책임자입니다.
 
 이 다섯 가지가 모두 메인테이너의 하루 안에 들어 있습니다. 그래서 메인테이너 역할은 개발 업무의 확장판이 아니라 운영 역할이 더해진 별도 책임으로 보는 편이 맞습니다.
 
+메인테이너 역할 중 가장 어려운 부분은 모든 일을 혼자 처리하려는 유혹을 벌차는 것입니다. 초기에는 혹자 감당하는 것이 사명감으로 느껴지지만, 시간이 지나면서 번아웃으로 바뀝니다.
+
+## 오픈소스 문서 유형
+
+메인테이너의 역할은 코드만큼이나 문서의 전체 구조를 유지하는 데 달려 있습니다. 오픈소스 프로젝트는 문서 종류가 정해져 있으면 기여자도 참여하기 쉬습니다.
+
+| 문서 종류 | 목적 | 독자 | 대표 도구 |
+|---|---|---|---|
+| README | 프로젝트 소개, 빠른 시작 | 신규 사용자 | Markdown |
+| Tutorial | 단계별 학습 | 초급 사용자 | MkDocs, Docusaurus |
+| API Reference | 함수/클래스 명세 | 개발자 | Sphinx, JSDoc, rustdoc |
+| Changelog | 버전별 변경 이력 | 유지보수자 | Keep a Changelog |
+| Contributor Guide | 기여 절차 | 신규 기여자 | CONTRIBUTING.md |
+
+문서가 비어 있으면 메인테이너에게 같은 질문이 반복됩니다. README는 가장 먼저 보이는 문서이고, API reference는 가장 자주 검색되는 문서이며, Contributor Guide는 가장 오래 유효한 문서입니다. 세 가지가 모두 갖춰져야 커뮤니티는 확장됩니다.
 ## 생각이 어떻게 바뀌어야 할까
 
 처음에는 혼자 모든 이슈와 풀 리퀘스트를 처리해야 메인테이너답다고 느끼기 쉽습니다. 하지만 그런 구조는 대개 오래 가지 못합니다.
@@ -112,12 +127,78 @@ GitHub Org → Teams → write permission
 ```
 ````
 
+## 메인테이너 일정 투명화
+
+메인테이너가 언제 활동하는지 보이면 기여자도 응답을 기다릴 수 있습니다. README나 프로필에 일정을 공개하는 것도 좋은 방법입니다.
+
+```markdown
+## Maintainer Availability
+
+- @alice: Available Mon-Fri 9-17 UTC
+- @bob: Reviews PRs on weekends
+- Response time: ~48 hours
+```
+
+편견 없이 말하면 메인테이너도 사람입니다. 일정을 공개하면 기여자는 무응답을 거부로 오해하지 않고, 메인테이너는 항상 대기해야 한다는 압박에서 벗어납니다.
 ## 이 예시에서 먼저 읽어야 할 점
 
 루틴은 피로를 줄입니다. 위임은 규모 확장의 출발점입니다. 공지는 경계를 세우는 문장입니다. bus factor를 낮추는 일은 기술보다 사람 구조의 문제입니다.
 
 강한 메인테이너는 모든 답을 혼자 쥔 사람이 아닙니다. 프로젝트가 자신 없이도 굴러가게 만드는 사람입니다. 이 기준을 놓치면 열정이 빠르게 번아웃으로 바뀝니다.
 
+## 문서 자동화 예시
+
+메인테이너가 혼자 모든 문서를 수동으로 관리하면 금방 지칩니다. 문서 생성과 배포를 GitHub Actions로 자동화하면 부담을 크게 줄일 수 있습니다.
+
+**Sphinx + GitHub Pages 자동 배포**
+
+```yaml
+# .github/workflows/docs.yml
+name: Deploy Docs
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    - run: pip install sphinx sphinx-rtd-theme
+    - run: cd docs && make html
+    - uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs/_build/html
+```
+
+**MkDocs Material + GitHub Pages**
+
+```yaml
+# .github/workflows/docs.yml
+name: Deploy MkDocs
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    - run: pip install mkdocs-material
+    - run: mkdocs gh-deploy --force
+```
+
+문서를 커밋할 때마다 자동으로 배포되게 하면 README와 API reference가 항상 동기화됩니다. 메인테이너는 코드와 문서를 함께 PR에 넣는 습관을 유지하기만 하면 됩니다.
 ## 자주 하는 실수 다섯 가지
 
 1. 모든 풀 리퀘스트 리뷰를 혼자 맡습니다.
@@ -145,12 +226,78 @@ GitHub Org → Teams → write permission
 2. triage와 review의 차이를 한 문장으로 적어 보세요.
 3. 후계자를 키우는 방법 하나를 적어 보세요.
 
+## 이슈 템플릿 최적화
+
+이슈 템플릿이 너무 길면 사용자가 귀찮아하고, 너무 짧으면 정보가 부족합니다. 프로젝트 성격에 맞는 최소 필수 항목만 남기는 편이 좋습니다.
+
+```yaml
+# .github/ISSUE_TEMPLATE/bug_report.yml
+name: Bug Report
+description: 버그를 발견했다면 여기에 보고해 주세요
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 무슨 일이 일어났나요?
+      description: 버그 상황을 한두 문장으로 적어 주세요
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 재현 단계
+      placeholder: |
+        1. '...'를 실행합니다
+        2. '...'를 클릭합니다
+        3. 오류가 표시됩니다
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: 버전
+      placeholder: v1.2.3
+    validations:
+      required: true
+```
+
+템플릿을 YAML 형식으로 만들면 GitHub가 자동으로 form UI를 제공합니다. 사용자는 칸을 채우기만 하면 됩니다.
 ## 정리
 
 이번 글에서는 메인테이너를 뛰어난 개발자가 아니라 프로젝트의 흐름을 지키는 운영 책임자로 정리했습니다. 오픈소스가 오래 가려면 코드를 잘 쓰는 사람보다, 일을 나누고 경계를 세울 수 있는 사람이 필요할 때가 많습니다.
 
 다음 글에서는 이런 경험이 개인 경력에 어떻게 쌓이는지 보겠습니다. 오픈소스 활동을 포트폴리오로 정리하는 방법이 이어집니다.
 
+## 메인테이너 성장 경로
+
+메인테이너 역할도 성장 경로가 있습니다. 처음에는 모든 일을 혼자 하지만, 시간이 지나면서 역할을 나누고 시스템을 만듭니다.
+
+**단계 1: 창업 메인테이너 (Founder Maintainer)**
+
+- 혼자 모든 코드를 작성
+- 이슈와 PR을 직접 처리
+- 규칙을 문서화하기 시작
+
+**단계 2: 위임 메인테이너 (Delegating Maintainer)**
+
+- 몇명의 committer를 지정
+- 코드 리뷰를 분담
+- 이슈 triage 루틴을 공유
+
+**단계 3: 플랫폼 메인테이너 (Platform Maintainer)**
+
+- 프로젝트 방향만 결정
+- 일상 운영은 팀이 담당
+- 문서와 프로세스를 정비
+
+**단계 4: 명예 메인테이너 (Emeritus Maintainer)**
+
+- 일상 운영에서 완전히 물러남
+- 큰 결정에만 자문 역할
+- 후임 메인테이너가 주도권 완전 보유
+
+이 경로는 프로젝트가 개인에서 조직으로 성장하는 자연스러운 흐름입니다. 혹자 3단계까지 가지 못하면 번아웃으로 프로젝트가 멈춥니다.
 ## 처음 질문으로 돌아가기
 
 - **왜 메인테이너는 자주 번아웃할까요?** 메인테이너는 코드뿐만 아니라 이슈, PR 리뷰, 질문 답변, 커뮤니티 갈등을 **모두 혼자 감당**하는 경우가 많기 때문입니다.
@@ -159,6 +306,52 @@ GitHub Org → Teams → write permission
 
 - **메인테이너 역할을 나누려면 어떻게 해야 할까요?** **자주 기여하는 사람부터 리뷰어로 초대하고, 작은 의사결정부터 맡기고, 점진적으로 책임을 나누는 방식**으로 다음 세대의 메인테이너를 키워야 합니다.
 <!-- toc:begin -->
+
+## Sphinx 기본 설정 예시
+
+메인테이너가 API 문서를 직접 쓰지 않고 docstring에서 자동 생성하면 유지보수 부담이 줄어듭니다. Python 프로젝트는 Sphinx가 표준입니다.
+
+```python
+# docs/conf.py
+project = 'MyProject'
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.napoleon',  # Google/NumPy docstring
+    'sphinx.ext.viewcode',
+]
+
+html_theme = 'sphinx_rtd_theme'
+```
+
+```bash
+pip install sphinx sphinx-rtd-theme
+cd docs
+sphinx-quickstart
+sphinx-apidoc -o source/ ../myproject/
+make html
+```
+
+docstring 예시:
+
+```python
+def parse_version(version_string: str) -> tuple[int, int, int]:
+    """
+    Parse semantic version string.
+
+    Args:
+        version_string: Version in "MAJOR.MINOR.PATCH" format
+
+    Returns:
+        Tuple of (major, minor, patch)
+
+    Raises:
+        ValueError: If version_string is malformed
+    """
+    parts = version_string.split('.')
+    return (int(parts[0]), int(parts[1]), int(parts[2]))
+```
+
+이 방식은 코드와 문서를 한곳에서 관리하므로 불일치 가능성을 줄여 줍니다.
 ## 시리즈 목차
 
 - [Open Source 101 (1/10): 오픈소스란 무엇인가](./01-what-is-open-source.md)

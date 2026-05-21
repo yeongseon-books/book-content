@@ -41,8 +41,6 @@ This is the second post in the Azure Functions 101 series. Here, we make the bou
 
 This picture places Triggers and Bindings — Everything About Function I/O inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Triggers and Bindings — Everything About Function I/O is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## A trigger is the “cause” that wakes a function up
 
 Let’s nail the definition first. **A trigger is the external event that causes a function to run.** An incoming HTTP request, a message landing in a queue, a file being uploaded to Blob storage, the top of every hour — those are all triggers.

@@ -448,4 +448,6 @@ RAG Q&A는 LLM이 학습하지 않은 지식에 접근하게 만드는 가장 �
 - [RAG paper (Lewis et al., 2020)](https://arxiv.org/abs/2005.11401)
 - [FAISS VectorStore](https://python.langchain.com/docs/integrations/vectorstores/faiss/)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-app-patterns-101/ko/02-rag-qa-pattern)
+
 Tags: LLM, RAG, Agent, Python

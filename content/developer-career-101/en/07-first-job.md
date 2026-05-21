@@ -41,7 +41,7 @@ This is post 7 in the Developer Career 101 series.
 
 This picture places Settling into the First Job inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Settling into the First Job is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Your first job is about proving you can complete assigned work well and learning how your team works, not proving you are the smartest person in the room.
 
 ## What You Will Learn
 
@@ -55,7 +55,7 @@ This picture places Settling into the First Job inside an operating flow. The po
 
 The first impression frames the next eighteen months.
 
-## Concept at a Glance
+Your first ninety days set the tone. Prove reliability, learn fast, and expand scope gradually.
 
 ## Key Terms
 

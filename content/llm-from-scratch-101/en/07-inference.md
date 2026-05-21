@@ -47,8 +47,6 @@ This is the 7th article in the LLM from Scratch 101 series.
 
 This picture places Sampling — Generating Text from a Trained Model inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Sampling — Generating Text from a Trained Model is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Autoregressive Generation — One Token at a Time
 
 We input the current context `idx`, extract only the last step's logits, and then append the sampled token to the sequence.

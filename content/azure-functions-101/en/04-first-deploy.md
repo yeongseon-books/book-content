@@ -50,8 +50,6 @@ This is the fourth post in the Azure Functions 101 series. Here, we take a funct
 
 This picture places Deploy a Function App — From Localhost to Azure inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Deploy a Function App — From Localhost to Azure is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Tooling — three pieces
 
 You need three tools.

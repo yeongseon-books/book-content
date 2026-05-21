@@ -45,8 +45,6 @@ This is post 4 in the Database Systems 101 series.
 
 This picture places Indexes inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Indexes is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The intuition and limits of B-tree indexes
@@ -59,8 +57,6 @@ This picture places Indexes inside an operating flow. The point is not to memori
 Most performance problems come down to "missing index" or "wrong index." At the same time, too many indexes destroy write performance and waste disk. Once the intuition clicks, reading EXPLAIN starts to feel like reading a sentence: you can see why a query did or did not pick the index you expected.
 
 > An index is exactly like the index at the back of a book. It makes one lookup fast, but it makes "read every page once" slower.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart TB

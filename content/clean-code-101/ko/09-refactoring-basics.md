@@ -41,9 +41,9 @@ last_reviewed: '2026-05-15'
 
 *Clean Code 101 9장 흐름 개요*
 
-이 그림에서는 리팩토링 기초를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+이 그림은 리팩토링의 동스른 동스턴—먰능 추가로 곳이 만듣 동스른 동스른 동스른—를 명넌 동스른—서 명넌 동스른 동스른 동스른 동스른 동스른 동스른—를 보여 줍니다.
 
-> 리팩토링 기초의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+> 금달 컔단 동스른 동스른 동스른 동스른 동스른 동스른 동스른—.
 
 ## 왜 중요한가
 
@@ -207,6 +207,129 @@ python -m pytest -q tests/test_legacy_characterization.py
 ## 정리 및 다음 단계
 
 리팩토링은 다음 변경의 비용을 낮추는 투자입니다. 마지막 글에서는 이 시리즈 전체를 한 번에 점검하는 좋은 코드 리뷰 기준으로 마무리합니다.
+
+
+## 리팩토링 카탈로그를 실무에 매핑하기
+
+리팩토링은 이름을 아는 것보다 순서가 중요합니다. 아래 표는 자주 쓰는 기법과 적용 목적을 정리한 카탈로그입니다.
+
+| 기법 | 목적 | 시작 신호 | 기대 효과 |
+| --- | --- | --- | --- |
+| Extract Method | 긴 함수 분해 | 주석 블록이 많음 | 가독성/테스트 향상 |
+| Move Field | 잘못된 책임 이동 | 데이터를 다른 객체가 더 많이 사용 | 응집도 향상 |
+| Introduce Parameter Object | 인자 다발 정리 | 인자 4개 이상 반복 | 호출 소음 감소 |
+| Replace Temp with Query | 임시 변수 정리 | 중간 값 의미가 불명확 | 의도 명확화 |
+| Inline Function | 과도 추상화 축소 | 호출자가 1~2개뿐, 인자 과다 | 단순성 회복 |
+
+카탈로그를 팀 공통 언어로 쓰면 리뷰 대화가 빨라집니다. "여기 Move Field가 필요하다"처럼 짧고 정확하게 의도를 전달할 수 있습니다.
+
+## Extract Method / Move Field Python 예시
+
+```python
+# before
+class OrderService:
+    def __init__(self, order):
+        self.order = order
+        self.tax_rate = 0.1
+
+    def total(self):
+        subtotal = 0
+        for line_item in self.order.line_items:
+            subtotal += line_item.price * line_item.quantity
+        return int(subtotal * (1 + self.tax_rate))
+```
+
+```python
+# after
+class Order:
+    def __init__(self, line_items, tax_rate: float):
+        self.line_items = line_items
+        self.tax_rate = tax_rate
+
+    def subtotal(self) -> int:
+        return sum(line_item.price * line_item.quantity for line_item in self.line_items)
+
+    def total_with_tax(self) -> int:
+        return int(self.subtotal() * (1 + self.tax_rate))
+
+
+class OrderService:
+    def __init__(self, order: Order):
+        self.order = order
+
+    def total(self) -> int:
+        return self.order.total_with_tax()
+```
+
+위 변경에는 두 가지 핵심이 있습니다. `subtotal` 추출로 계산 의도가 드러났고, `tax_rate` 책임이 `Order`로 이동해 응집도가 높아졌습니다.
+
+## 점진적 리팩토링 절차
+
+1. 특성화 테스트로 현재 동작 고정
+2. 작은 리팩토링 1개 적용
+3. 테스트 실행
+4. 커밋
+5. 다음 리팩토링 진행
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class RefactorStep:
+    name: str
+    done: bool = False
+
+
+def next_refactor_step(steps: list[RefactorStep]) -> str | None:
+    for step in steps:
+        if not step.done:
+            return step.name
+    return None
+```
+
+이런 방식으로 리팩토링 계획을 명시하면, 큰 변경도 안전하게 작게 나눌 수 있습니다. 결국 리팩토링의 품질은 기법 지식보다 단계 관리에서 결정됩니다.
+
+
+## 실무 적용 메모
+
+아래 메모는 팀 내 합의 문서에 그대로 옮겨 적어도 되는 수준의 운영 규칙입니다.
+
+1. 리뷰는 코드 스타일보다 변경 위험을 먼저 다룹니다.
+2. 규칙 위반은 사람 지적보다 자동화 전환을 우선합니다.
+3. 반복되는 설계 결함은 교육 과제가 아니라 구조 개선 과제로 등록합니다.
+4. 모든 개선은 테스트와 함께 진행하며, 동작 변경 여부를 PR 설명에 명시합니다.
+5. 다음 분기 목표에는 "새 기능 수"와 함께 "변경 비용 감소 지표"를 반드시 포함합니다.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class QualityGate:
+    has_tests: bool
+    has_clear_names: bool
+    has_boundary_error_handling: bool
+    has_small_functions: bool
+    has_review_notes: bool
+
+
+def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
+    missing = []
+    if not gate.has_tests:
+        missing.append("tests")
+    if not gate.has_clear_names:
+        missing.append("naming")
+    if not gate.has_boundary_error_handling:
+        missing.append("error-boundary")
+    if not gate.has_small_functions:
+        missing.append("function-size")
+    if not gate.has_review_notes:
+        missing.append("review-notes")
+    return len(missing) == 0, missing
+```
+
+이 체크 함수는 단순하지만, 품질 기준을 코드로 표현하는 출발점이 됩니다. 팀이 기준을 말로만 합의하면 시간이 지나며 흐려집니다. 반대로 코드와 템플릿과 자동화 규칙으로 남기면 신규 멤버가 들어와도 동일한 기준이 유지됩니다.
+
+또한 개선 활동은 단발성 이벤트가 아니라 루프여야 합니다. 한 번의 대청소보다 매 PR마다 작은 개선을 추가하는 편이 장기적으로 더 강합니다. 이름 하나, 함수 하나, 분기 하나를 매번 더 낫게 만드는 습관이 쌓이면 코드베이스의 평균 품질이 올라가고, 장애 대응 속도도 실제로 빨라집니다.
 
 ## 처음 질문으로 돌아가기
 

@@ -45,8 +45,6 @@ This is the final post in the Azure Functions 101 series. Here, we focus on the 
 
 This picture places Monitoring and Operations Fundamentals inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Monitoring and Operations Fundamentals is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Application Insights Is the Starting Point
 
 Most of the operational data you need for Azure Functions ends up in Application Insights. Requests, exceptions, dependency calls, logs, and custom metrics converge there, which makes App Insights integration one of the most important choices you make when standing up a Function App.

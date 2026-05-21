@@ -40,8 +40,6 @@ This is the first post in the Frontend Development 101 series. In this chapter, 
 
 This picture places What Is Frontend Development? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is Frontend Development? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The *clear boundary* between frontend and backend
@@ -56,8 +54,6 @@ This picture places What Is Frontend Development? inside an operating flow. The 
 *Everything users feel* passes through the frontend. A perfect backend with a slow frontend is *judged as a slow product*. The frontend is the *first and last impression* of your product.
 
 > A great frontend is *invisible*: users just *use it* without thinking.
-
-## Concept at a Glance
 
 The browser *combines* the three languages to draw the screen.
 

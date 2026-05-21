@@ -43,15 +43,11 @@ Here we build the mental model for the rest of the series: a distributed system 
 
 This picture places What Is a Distributed System? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is a Distributed System? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Almost every service you build today is effectively a distributed system. A single database with a replica is distributed. Two microservices talking are distributed. Code written with single-machine intuition (instant response, always success, one clock) breaks the moment it sees production traffic.
 
 > Distributed systems live exactly where the assumptions of a single-machine program break.
-
-## Concept at a Glance
 
 Every arrow can carry latency, partial failure, and an unknown response. That is fundamentally different from a function call.
 

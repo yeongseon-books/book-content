@@ -42,8 +42,6 @@ This is post 8 in the Algorithms with Python 101 series. Here, we'll frame the s
 
 This picture places Shortest Path Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Shortest Path Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The shortest-path problem on weighted graphs

@@ -64,6 +64,92 @@ last_reviewed: '2026-05-12'
 
 ## Before/After
 
+## DevOps vs 전통 운영
+
+DevOps를 처음 이해하려 할 때 가장 혼란스러운 부분은 이것이 기술이 아니라 문화 전환이라는 점입니다. 아래 표는 전통 운영과 DevOps가 같은 문제를 어떻게 다르게 풀어내는지 정리한 것입니다.
+
+| 비교 기준 | 전통 운영 | DevOps |
+|---|---|---|
+| 배포 주기 | 분기별 또는 월별 대규모 배포 | 하루 수십 회 작은 배포 |
+| 책임 경계 | Dev는 기능 개발, Ops는 운영 | Dev와 Ops가 함께 전체 라이프사이클 책임 |
+| 피드백 루프 | 장애 → 원인 조사 → 개선 제안 → 다음 배포 (수주 ~ 수개월) | 장애 → 즉시 로그/메트릭 확인 → 롤백 또는 수정 (수분 ~ 수시간) |
+| 도구 | 수동 스크립트, 문서, 콘솔 클릭 | CI/CD 파이프라인, IaC, 모니터링 자동화 |
+
+전통 운영이 나쁘다는 말이 아닙니다. 다만 소프트웨어 출시 주기가 빨라지면서 분기 배포 구조는 점점 더 비용이 큽니다. DevOps는 그 비용을 줄이는 방법론입니다.
+
+## DevOps 문화의 핵심 원칙 (CALMS)
+
+DevOps는 도구보다 먼저 문화입니다. 이 문화를 다섯 가지 원칙으로 압축한 것이 CALMS 프레임워크입니다.
+
+### Culture (문화)
+
+개발과 운영을 별개 조직으로 나누면 자연스럽게 칸막이가 생깁니다. DevOps는 이 경계를 낮추고, 둘이 같은 목표와 같은 데이터를 보도록 만드는 문화 전환입니다.
+
+### Automation (자동화)
+
+수동 작업은 반복될 때마다 실수와 편차를 낳습니다. 자동화는 사람 손을 덜어 주는 것이 아니라, 팀 기준을 코드로 고정하는 방법입니다.
+
+### Lean (린)
+
+작고 빠르게 실패하는 쪽이, 크고 느리게 완벽을 추구하는 것보다 장기적으로 더 안전합니다. 린은 이 원칙을 배포 흐름에 적용하는 방법입니다.
+
+### Measurement (측정)
+
+배포 빈도, 장애 복구 시간(MTTR), 변경 실패율, 리드 타임 같은 지표는 팀이 나아지고 있는지 객관적으로 보여 줍니다.
+
+### Sharing (공유)
+
+장애 포스트모템, 런북, 메트릭 대시보드는 팀 지식이 특정 개인에게만 쌓이지 않게 만듭니다. 결국 운영 안정성은 공유된 지식에서 나옵니다.
+
+## Python CI 스크립트 예제
+
+CI는 거창한 플랫폼이 아니라 "PR마다 같은 검사를 자동으로 돌린다"는 원칙입니다. 아래는 GitHub Actions로 Python 프로젝트 CI를 구성하는 최소 예제입니다.
+
+```yaml
+# .github/workflows/ci.yml
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install ruff
+      - run: ruff check .
+
+  test:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - run: pytest
+
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install build
+      - run: python -m build
+```
+
+이 파이프라인은 린트 → 테스트 → 빌드 순서로 실행됩니다. 앞 단계가 실패하면 다음 단계는 건너뜁니다. 이 세 단계만으로도 코드 품질 합격선을 팀 시스템으로 고정할 수 있습니다.
+
 **Before (분리된 조직)**
 
 ```text
@@ -194,6 +280,62 @@ def health(): return {"status": "ok"}
 ## 정리 및 다음 단계
 
 DevOps는 문화의 전환이자 피드백 루프의 설계입니다. 다음 글에서는 이 흐름의 첫 번째 지렛대인 CI 파이프라인을 더 구체적으로 다룹니다.
+
+## DevOps 전환을 설계하는 실무 프레임
+
+DevOps를 도구 목록으로 이해하면 팀은 빠르게 피로해집니다. Jenkins, GitHub Actions, Kubernetes, Terraform을 도입했는데도 릴리스가 느리고 장애는 반복되는 이유가 여기에 있습니다. 실무에서 효과가 나는 접근은 항상 동일합니다. 먼저 흐름을 나누고, 병목을 수치로 확인하고, 가장 작은 자동화부터 붙인 뒤, 운영 신호를 다시 개발 단계로 환류시키는 구조를 만듭니다. 이 순서를 지키면 DevOps는 유행어가 아니라 팀 운영 모델이 됩니다.
+
+### DevOps와 전통 개발 운영 모델 비교
+
+| 관점 | 전통 분리 모델 | DevOps 모델 | 실무 영향 |
+| --- | --- | --- | --- |
+| 책임 구조 | 개발 완료 후 운영 이관 | 개발부터 운영까지 공동 책임 | 장애 책임 공방 감소 |
+| 배포 단위 | 큰 묶음, 저빈도 배포 | 작은 변경, 고빈도 배포 | 롤백 비용 축소 |
+| 검증 방식 | 릴리스 직전 집중 검증 | PR 단계부터 연속 검증 | 결함 조기 발견 |
+| 장애 대응 | 운영팀 단독 대응 | 서비스 팀 합동 대응 | MTTR 단축 |
+| 개선 루프 | 분기 단위 회고 | 주간/일일 피드백 루프 | 학습 속도 향상 |
+
+이 표에서 중요한 포인트는 도구가 아니라 책임 이동입니다. DevOps는 개발자가 운영자가 된다는 뜻이 아니라, 서비스 결과에 대한 책임 경계를 앞당긴다는 의미입니다. PR을 올리는 순간부터 배포와 관측성을 함께 고려하도록 팀 습관을 바꾸는 것이 핵심입니다.
+
+### CALMS 프레임워크로 DevOps 성숙도 읽기
+
+CALMS는 Culture, Automation, Lean, Measurement, Sharing 다섯 축으로 DevOps를 점검하는 프레임입니다. 팀이 어디서 막히는지 진단할 때 매우 유용합니다.
+
+| 축 | 확인 질문 | 초기 팀의 흔한 상태 | 개선 방향 |
+| --- | --- | --- | --- |
+| Culture | 장애를 함께 복기하는가 | 팀 간 책임 분리 | 합동 포스트모템 |
+| Automation | 수동 배포가 남아 있는가 | 특정 인력 의존 배포 | CI/CD 단계 자동화 |
+| Lean | 대기 시간이 긴 단계는 어디인가 | 승인/리뷰 병목 | WIP 제한, 작은 PR |
+| Measurement | 공통 지표가 있는가 | 감각 기반 판단 | DORA+SLO 측정 |
+| Sharing | 운영 지식이 문서화되는가 | 개인 노하우 편중 | 런북/체크리스트 축적 |
+
+CALMS는 성숙도 점수표가 아니라 대화 도구입니다. 예를 들어 자동화 수준이 높아도 Culture와 Sharing이 약하면 장애 시 대응 품질이 급격히 떨어집니다. 반대로 문화는 좋아도 Measurement가 없으면 개선 우선순위를 합의하기 어렵습니다. 다섯 축을 균형 있게 관리해야 실제 성능이 올라갑니다.
+
+### 최소 실행 단위: 2주 DevOps 부트스트랩
+
+첫 2주에 모든 체계를 갖출 필요는 없습니다. 아래처럼 작게 시작해도 효과가 큽니다.
+
+```yaml
+week_1:
+  - pr_required_checks: [lint, test]
+  - deployment: "main merge -> stage auto deploy"
+  - observability: "health endpoint + basic error metric"
+week_2:
+  - runbook: "top 3 failure scenarios"
+  - postmortem_template: "blameless + action owner"
+  - weekly_review: "deploy count, failure count, lead time"
+```
+
+핵심은 도입 항목 수가 아니라 루프 길이입니다. 검증, 배포, 관측, 회고가 같은 주 안에서 한 번이라도 순환하면 팀은 즉시 학습을 시작합니다. 이후 도구 확장은 그다음 문제입니다.
+
+### 도입 우선순위 결정 규칙
+
+1. 장애 비용이 큰 구간부터 자동화합니다.
+2. 배포 전 대기 시간을 만드는 단계를 먼저 줄입니다.
+3. 사람이 기억으로 수행하는 절차는 모두 문서화 후 자동화 후보로 등록합니다.
+4. 새 도구 도입 전, 기존 도구로 해결 가능한지 먼저 검토합니다.
+
+이 규칙을 따르면 DevOps 전환이 도구 쇼핑이 되지 않습니다. 결국 좋은 DevOps는 기술 스택의 화려함이 아니라, 팀이 반복 가능하게 일하는 방식에 의해 결정됩니다.
 
 ## 처음 질문으로 돌아가기
 

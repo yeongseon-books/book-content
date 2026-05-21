@@ -42,7 +42,7 @@ In this post, we treat optimization as a measurement discipline instead of a bag
 
 This picture places Performance Optimization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Performance Optimization is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Performance tuning follows a cycle: measure, find the bottleneck, improve, and measure again. Start with the query plan, not your intuition.
 
 ## Questions this article answers
 
@@ -66,7 +66,7 @@ Warehouses charge by *what you read*. The same answer with *fewer bytes* means *
 
 > *Optimization without measurement is *guessing*. Read the plan first.*
 
-## Concept at a Glance
+This picture shows the performance optimization cycle. The key is not to memorize tuning tricks, but to learn how to find where time is actually spent.
 
 ## Key Terms
 

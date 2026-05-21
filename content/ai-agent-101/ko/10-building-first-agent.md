@@ -305,4 +305,6 @@ class ResearchAgent:
 - [LangGraph 101](../../langgraph-101/ko/01-graph-basics.md)
 - [AI Evaluation 101](../../ai-evaluation-101/ko/01-why-evaluate-llm-apps.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-agent-101/ko/10-building-first-agent)
+
 Tags: AI Agent, LLM, Tool Use, Python

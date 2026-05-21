@@ -52,8 +52,6 @@ The key habit is to read center and spread together. A system with the same aver
 
 > Expectation tells you where a distribution is centered. Variance tells you how much it tends to move around that center.
 
-## Concept at a Glance
-
 ## Key Terms
 
 - **Expectation E[X]**: mean. Discrete: Σ x·p(x). Continuous: ∫x f(x) dx.

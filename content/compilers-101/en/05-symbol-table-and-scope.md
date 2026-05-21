@@ -44,8 +44,6 @@ This is post 5 in the Compilers 101 series.
 
 This picture places symbol table and scope inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of symbol table and scope is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - What a symbol table is and why it is the compiler's central data structure
@@ -59,8 +57,6 @@ This picture places symbol table and scope inside an operating flow. The point i
 The previous post's analyzer used a single dictionary as its environment. Real languages have many scopes — functions, blocks, classes, modules. How you design the symbol table IS the language's visibility rules.
 
 > You must answer "is this variable visible here?" in one step.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart TB

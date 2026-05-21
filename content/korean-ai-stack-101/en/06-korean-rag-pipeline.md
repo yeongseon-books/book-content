@@ -40,8 +40,6 @@ This is the final post in the Korean AI Stack 101 series. Here, we connect the e
 
 This picture places Assembling a Korean RAG pipeline inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Assembling a Korean RAG pipeline is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What you will learn
 
 This final post connects every piece introduced earlier in the series. You will split Korean documents into chunks, embed them with KoSimCSE or BGE-M3, retrieve top chunks with FAISS, and then call a Groq model (or Solar / HyperCLOVA X) using only the retrieved context — a minimum viable Korean RAG pipeline.

@@ -209,4 +209,6 @@ az monitor metrics list \
 - [Azure App Service 101 — Scaling 101](../../azure-app-service-101/ko/07-scaling-101.md)
 - [Azure Functions Deep Dive — Scaling internals](../../azure-functions-deep-dive/ko/05-scaling-internals.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-app-service-deep-dive/ko/05-scaling-internals)
+
 Tags: Azure, App Service, Distributed Systems, Platform Engineering

@@ -299,4 +299,6 @@ NGINX는 클러스터 안에서 동작하는 프록시라는 감각이 강합니
 - [Azure App Service 101](../../azure-app-service-101/ko/02-request-lifecycle.md) — 외부 요청이 애플리케이션 인스턴스로 들어가는 경로를 비교할 때
 - [Azure Functions 101](../../azure-functions-101/ko/01-what-is-azure-functions.md) — HTTP 엔드포인트 노출이 플랫폼에 더 많이 추상화된 모델과 비교할 때
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-aks-101/ko/05-networking-and-ingress)
+
 Tags: Azure, AKS, Kubernetes, Cloud

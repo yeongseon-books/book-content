@@ -52,9 +52,6 @@ Machine learning training, numerical optimization, physical simulation, and many
 
 That local information becomes operational in optimization. A derivative gives the slope at one point. A gradient gives the direction of fastest increase in many dimensions. Gradient descent then uses that information to keep moving in the opposite direction.
 
-
-## Concept at a Glance
-
 Calculus deals with *continuous change*: derivatives measure *rates of change*; integrals measure *accumulated quantity*; optimization finds *extrema*.
 
 ## Before/After

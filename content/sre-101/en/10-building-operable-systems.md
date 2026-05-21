@@ -42,8 +42,6 @@ This is the final post in the SRE 101 series. It gathers the earlier ideas into 
 
 This picture places Building Operable Systems inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-
-
 ## Why this topic matters
 
 A feature without operability returns as debt. It may ship successfully once, but every later change, incident, and debugging session becomes more expensive than it needed to be.

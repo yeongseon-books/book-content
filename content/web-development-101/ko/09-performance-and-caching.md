@@ -39,10 +39,6 @@ last_reviewed: '2026-05-15'
 
 *Web Development 101 9장 흐름 개요*
 
-이 그림에서는 성능과 캐싱를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 성능과 캐싱의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 성능은 측정부터 시작하는가
 
 빠른 사이트는 사용자 만족뿐 아니라 전환율, 검색 순위, 운영비에도 영향을 줍니다. 하지만 최적화는 감으로 하면 자주 빗나갑니다. 병목이 서버에 있는데 프론트엔드 코드만 만지거나, 이미지가 문제인데 데이터베이스만 의심하는 식입니다.
@@ -204,6 +200,123 @@ posts = db.fetch("SELECT p.*, u.name FROM posts p JOIN users u ON u.id = p.user_
 ## 정리와 다음 글
 
 성능은 감으로 고치는 분야가 아닙니다. 측정하고, 캐시하고, 줄이고, 늦추는 방식으로 같은 일을 더 적게 하게 만들어야 합니다. 다음 글에서는 이 시리즈에서 배운 개념을 하나로 묶어 작은 웹앱을 끝까지 만들어 보겠습니다.
+
+## 웹 서비스 품질을 높이는 추가 실전 예시
+
+웹 개발에서는 기능 구현 속도만큼 프로토콜 이해와 운영 경계 관리가 중요합니다. 특히 HTTP 메시지 설계, 인증 흐름, 배포 구성은 기능이 늘어날수록 장애 확률과 직접 연결됩니다. 아래 예시는 실제 프로젝트에서 반복해서 쓰이는 기본 패턴입니다.
+
+### HTTP 요청/응답 설계 예시
+
+```http
+POST /api/v1/orders HTTP/1.1
+Host: api.example.com
+Content-Type: application/json
+Authorization: Bearer <access_token>
+Idempotency-Key: 9a7d2f4a-31a2-4b11-9cd8-3e2f4dcf1b20
+
+{
+  "items": [{"sku": "A-100", "qty": 2}],
+  "payment_method": "card"
+}
+```
+
+```http
+HTTP/1.1 201 Created
+Content-Type: application/json
+Location: /api/v1/orders/ord_1024
+
+{
+  "order_id": "ord_1024",
+  "status": "created"
+}
+```
+
+여기서 `Idempotency-Key`는 네트워크 재시도로 인한 중복 결제를 막는 핵심 장치입니다. 웹 API는 "한 번 보냈다"가 아니라 "여러 번 도착할 수 있다"를 기본 가정으로 설계해야 합니다.
+
+### 인증 흐름: Access + Refresh 토큰 분리
+
+```text
+1) 사용자가 로그인하면 서버가 access(짧은 수명) + refresh(긴 수명)를 발급
+2) 클라이언트는 access로 API 호출
+3) access 만료 시 refresh로 재발급 요청
+4) refresh 탈취 위험을 줄이기 위해 회전(rotation)과 폐기(revoke) 정책 적용
+```
+
+```python
+# pseudo-auth-service.py
+from datetime import timedelta
+
+def issue_tokens(user_id: str) -> dict:
+    return {
+        "access_expires": timedelta(minutes=15),
+        "refresh_expires": timedelta(days=14),
+        "token_type": "Bearer",
+    }
+```
+
+브라우저 환경에서는 refresh 토큰을 `HttpOnly`, `Secure`, `SameSite` 정책이 적용된 쿠키로 다루는 방식이 일반적입니다. 인증 실패 응답은 `401`과 명확한 오류 코드를 함께 제공해야 클라이언트 재시도 전략을 안정적으로 구성할 수 있습니다.
+
+### 배포 구성: 앱/프록시/헬스체크 분리
+
+```yaml
+# docker-compose.prod.yml
+services:
+  web:
+    image: ghcr.io/example/web:1.4.0
+    env_file: .env
+    ports: ["8000"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+  nginx:
+    image: nginx:1.27
+    ports: ["80:80", "443:443"]
+    depends_on: [web]
+```
+
+헬스체크를 배포 단위에 포함하면 롤링 업데이트 중 비정상 인스턴스를 조기에 제외할 수 있습니다. 프록시 계층에서 TLS 종료와 정적 파일 캐싱을 처리하면 애플리케이션 서버는 비즈니스 로직에 더 집중할 수 있습니다.
+
+### 운영 체크 포인트
+
+- API마다 타임아웃, 재시도, 멱등 처리 기준을 문서화합니다.
+- 인증 토큰 만료/재발급 실패 비율을 대시보드로 모니터링합니다.
+- 배포 후 15분 동안 5xx 비율, p95, 로그인 성공률을 집중 관찰합니다.
+- CORS 정책을 `*`로 열어두지 않고 허용 출처를 명시합니다.
+
+웹 개발의 난이도는 화면 구현보다 경계 관리에서 더 크게 올라갑니다. HTTP 계약, 인증 수명주기, 배포 안전장치를 초기에 고정해 두면 기능 확장 시에도 장애 반경을 작게 유지할 수 있고, 팀 전체의 디버깅 속도도 안정적으로 유지됩니다.
+
+## HTTP-인증-배포를 함께 검증하는 점검 루틴
+
+웹 서비스는 단일 기능이 아니라 경로 전체의 안정성으로 평가됩니다. 따라서 API 스펙, 인증 예외, 배포 헬스체크를 같은 릴리스 체크리스트로 묶는 편이 안전합니다.
+
+```text
+배포 전 점검
+1) 핵심 API 3개에 대해 상태 코드/응답 스키마 계약 테스트 실행
+2) access 만료, refresh 만료, revoke 토큰 시나리오 재현
+3) /health, /ready 엔드포인트를 배포 환경에서 실제 호출
+4) CDN/브라우저 캐시 무효화 정책 확인
+```
+
+### 장애 예방을 위한 최소 헤더 정책
+
+```http
+Cache-Control: no-store
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+Referrer-Policy: strict-origin-when-cross-origin
+```
+
+헤더 정책은 프론트엔드 코드 변경 없이도 보안/캐시 동작을 크게 바꿉니다. 기능 개발과 별개로 표준 헤더를 고정해 두면 릴리스 변동성이 줄어듭니다.
+
+### 배포 후 15분 관찰 항목
+
+- 5xx 비율과 p95 지연 시간의 급격한 상승 여부
+- 로그인 성공률, 토큰 재발급 성공률
+- 정적 자산 404 발생률
+
+이 루틴을 반복하면 "배포는 되었지만 정상 운영은 아닌" 상태를 초기에 감지할 수 있습니다.
 
 ## 처음 질문으로 돌아가기
 

@@ -48,8 +48,6 @@ This is the 8th article in the Python DB-API 101 series.
 
 This picture places SQLite Connection Management: thread-safety, check_same_thread, and Pooling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of SQLite Connection Management: thread-safety, check_same_thread, and Pooling is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 A typical SQLite adoption falls into one of two traps. First, "one global connection" shared across all threads. It works at low traffic, then `ProgrammingError: SQLite objects created in a thread can only be used in that same thread` floods the logs the moment concurrency rises. Second, the team flips `check_same_thread=False` to silence the error and moves on. There may be no immediate corruption, but transaction boundaries become impossible to reason about.

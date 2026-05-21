@@ -58,8 +58,6 @@ The era of *ssh-ing* into a single server and running *grep* is over. In distrib
 
 > You read logs *three weeks later* far more often than you do *right now*.
 
-## Concept at a Glance
-
 Logs capture *what happened and when*. Centralized log collection and analysis let you *replay events*, *find patterns*, and *debug* incidents hours or days later.
 
 ## Key Terms

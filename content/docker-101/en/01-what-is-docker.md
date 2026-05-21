@@ -42,15 +42,11 @@ This is the first post in the Docker 101 series. It sets the mental model for th
 
 This picture places What Is Docker? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is Docker? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 *Environment differences* are the most demoralizing thing for newcomers. *One Docker line* gives the *whole team the same environment*, cutting half of the debugging time.
 
 > *Environment problems are not a *skill issue*; they are a *design issue*.*
-
-## Concept at a Glance
 
 ## Key Terms
 

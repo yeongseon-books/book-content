@@ -42,8 +42,7 @@ This is post 2 in the Data Science Career 101 series.
 
 This picture places Analyst vs Scientist vs Engineer inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Analyst vs Scientist vs Engineer is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
+> In role clarity, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
 ## What You Will Learn
 
 - The *purpose* of each role
@@ -58,8 +57,7 @@ Misunderstanding the role changes what you study, how you describe your work, an
 
 Someone aiming for analytics may need much stronger metric interpretation and dashboard storytelling. Someone aiming for engineering may need to show data modeling, orchestration, and reliability habits. The tools overlap, but the evidence of fit is different.
 
-## Concept at a Glance
-
+Think of the three roles as a chain: analyst asks the question and defines the metric, scientist tests it rigorously, engineer makes sure the data and pipeline are trustworthy enough to support both.
 ## Key Terms
 
 - **decision support**: Driving decisions with data.
@@ -76,6 +74,7 @@ Someone aiming for analytics may need much stronger metric interpretation and da
 
 ## Hands-on: Build a Comparison Table
 
+The fastest way to lock in these differences is to build a side-by-side table. Write down the typical input, output, tools, and success metrics for each role.
 ### Step 1 — Purpose
 
 ```text

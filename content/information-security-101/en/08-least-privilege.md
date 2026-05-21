@@ -45,7 +45,7 @@ This is post 8 in the Information Security 101 series.
 
 This picture places Least Privilege inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Least Privilege is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Least privilege is not about giving fewer permissions. It is about asking "does this user/service need this permission right now in this context?" at every access decision.
 
 ## What You Will Learn
 
@@ -60,8 +60,6 @@ This picture places Least Privilege inside an operating flow. The point is not t
 You cannot always prevent compromise, but you can always shrink the blast radius. Least privilege determines the cost of any incident.
 
 > Privileges are not granted; they are loaned.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR

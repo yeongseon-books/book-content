@@ -42,8 +42,6 @@ This is post 7 in the Alembic 101 series. Here we will connect online execution,
 
 This picture places Online and offline modes: previewing DDL with --sql and handling SQLite batch inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Online and offline modes: previewing DDL with --sql and handling SQLite batch is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 There are times before a production deploy when you want to see exactly what SQL a migration will run — when an external DBA needs to review it, or when the impact is so large that PR review alone is not reassuring. Alembic's offline mode is the tool for that.

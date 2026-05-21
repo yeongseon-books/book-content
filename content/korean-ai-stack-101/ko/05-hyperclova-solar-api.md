@@ -38,10 +38,6 @@ seo_description: 공급자를 바꾸는 일은 모델 이름 교체가 아니라
 
 *Korean AI Stack 101 5장 흐름 개요*
 
-이 그림에서는 HyperCLOVA X와 Solar API 사용하기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> HyperCLOVA X와 Solar API 사용하기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 이 단계가 중요한가
 
 이 글은 한국어 생성 API를 안전하게 호출하는 패턴을 다룹니다. 앞 글들은 임베딩(KoSimCSE, BGE-M3)과 OCR(CLOVA)로 입력 데이터를 정리했습니다. 이번 글은 그 위에서 답을 만드는 단계입니다. HyperCLOVA X(NAVER)와 Solar(Upstage)는 한국어 표현력이 좋지만, 실제 운영 문제는 인증 방식, 지연 시간, 에러 코드, 토큰 한도, 프롬프트 캐시처럼 호출 계약 쪽에서 더 자주 터집니다.
@@ -314,5 +310,7 @@ Solar는 `base_url`만 바꾸면 Groq 예제 대부분이 그대로 옮겨집니
 - [Groq API reference](https://console.groq.com/docs/api-reference)
 - [Upstage Solar documentation](https://developers.upstage.ai/docs/getting-started/overview)
 - [NAVER Cloud HyperCLOVA X overview](https://www.ncloud.com/product/aiService/clovaStudio)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/korean-ai-stack-101/ko/05-hyperclova-solar-api)
 
 Tags: Korean NLP, LLM, Embeddings, OCR

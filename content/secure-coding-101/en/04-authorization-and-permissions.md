@@ -44,8 +44,6 @@ In this chapter, we will treat authorization as a server-side decision over acto
 
 This picture places Authorization and Permissions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Authorization and Permissions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions This Chapter Answers
 
 - The difference between *RBAC* and *ABAC*
@@ -59,8 +57,6 @@ This picture places Authorization and Permissions inside an operating flow. The 
 OWASP Top 10 is often led by *Broken Access Control*. Hiding a button in the UI is *not a defense*. Every decision must happen *on the server*.
 
 > *Authorize at the *resource* level, not just the *route*.*
-
-## Concept at a Glance
 
 ## Key Terms
 

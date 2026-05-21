@@ -45,8 +45,6 @@ This is post 7 in the Database Systems 101 series.
 
 This picture places Normalization and Modeling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Normalization and Modeling is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The intuition behind functional dependencies
@@ -59,8 +57,6 @@ This picture places Normalization and Modeling inside an operating flow. The poi
 A sloppy model taxes every query. When the same fact is scattered across many places, updates miss rows, and joins return inconsistent answers. Normalization removes that risk at the model layer.
 
 > A good model never puts you in the position of "to change this column, you also have to change N rows in lockstep."
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR

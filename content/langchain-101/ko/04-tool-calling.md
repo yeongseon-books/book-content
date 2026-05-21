@@ -477,4 +477,6 @@ Tool Calling 루프는 세 부분으로 이루어집니다. `@tool`로 도구를
 
 - [LangGraph 101](../../langgraph-101/ko/01-graph-basics.md) — tool loop가 길어지고 분기와 상태가 필요해질 때는 단일 while 루프보다 그래프 기반 제어가 더 읽기 쉬워집니다.
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/langchain-101/ko/04-tool-calling)
+
 Tags: LangChain, LCEL, Python, LLM

@@ -40,8 +40,6 @@ This chapter uses one practical question as its spine: why is Python's built-in 
 
 This picture places Sorting Algorithms inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Sorting Algorithms is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - Why `sorted()` should usually be your production default

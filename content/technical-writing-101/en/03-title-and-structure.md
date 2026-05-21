@@ -50,8 +50,6 @@ The *title* earns the *click*, and the *structure* earns the *time*.
 
 > Mental model: the title makes the promise, and the section order delivers it.
 
-## Concept at a Glance
-
 A strong outline does more than organize sections. It exposes the reader's journey. If someone reads only the title and H2 headings and can still predict the next action, the structure is working.
 ## Key Terms
 

@@ -42,8 +42,6 @@ To fix the weaknesses called out in issue #779, this chapter is rebuilt around o
 
 This picture places Data Augmentation - From EDA to Back-Translation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Data Augmentation - From EDA to Back-Translation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this chapter matters
 
 Augmentation is especially useful when labeling budget is tight. It can improve minority-class recall and make a model more robust to typos, paraphrases, and other realistic variations. But if you also modify validation data, or if your transforms stop preserving meaning, the offline score may look cleaner while real generalization gets worse.

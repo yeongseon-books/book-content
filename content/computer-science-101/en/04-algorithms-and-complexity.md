@@ -43,8 +43,6 @@ In this article, we'll define algorithms, read time and space complexity, and sh
 
 This picture places Algorithms and Complexity inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Algorithms and Complexity is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions This Article Answers
 
 - How can you compare two solutions before you benchmark them?
@@ -67,8 +65,6 @@ Code that runs fine on 100 items may stall on 1,000,000. If you cannot predict h
 > Algorithm = the procedure to solve a problem. Complexity = the cost of that procedure.
 
 Reading complexity is one of the clearest dividing lines between senior and junior engineers.
-
-## Concept at a Glance
 
 > Two algorithms that produce the same result can diverge by thousands of times once the input grows.
 

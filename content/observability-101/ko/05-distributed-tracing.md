@@ -50,6 +50,126 @@ last_reviewed: '2026-05-15'
 
 분산 트레이싱이 필요한 이유는 요청을 전체 흐름으로 보기 위해서입니다. 하나의 요청이 어떤 서비스와 데이터베이스를 거쳤고, 어느 스팬이 길었고, 어떤 부모-자식 관계로 이어졌는지를 한눈에 보여 주면 원인 파악 시간이 크게 줄어듭니다.
 
+## 트레이싱 용어 정리
+
+분산 트레이싱에는 몇 가지 핵심 용어가 있습니다. 이 용어를 정확히 이해하면 트레이스 화면을 읽는 속도가 빨라집니다.
+
+| 용어 | 정의 | 역할 |
+| --- | --- | --- |
+| Span | 하나의 작업 구간 | 함수 호출, DB 쿼리, HTTP 요청 같은 개별 단위 |
+| Trace | 전체 요청 흐름 | 여러 Span을 하나의 trace_id로 묶은 트리 |
+| Context | 전파되는 메타데이터 | trace_id, span_id, 부모 span_id 같은 식별자 |
+| Baggage | 사용자 정의 데이터 | 서비스 간 전달할 비즈니스 데이터 (user_id, tenant_id 등) |
+
+Context는 표준 식별자를 전파하고, Baggage는 애플리케이션이 필요한 임의의 데이터를 전파합니다. Baggage는 편리하지만 모든 서비스 호출에 실려 다니므로 과도하게 쓰면 오버헤드가 커집니다.
+
+## OpenTelemetry로 HTTP 문맥 전파하기
+
+분산 트레이싱의 핵심은 서비스 사이에서 trace_id를 끊지 않고 전달하는 것입니다. 아래는 OpenTelemetry로 HTTP 헤더를 통해 문맥을 전파하는 예제입니다.
+
+```python
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import ConsoleSpanExporter, BatchSpanProcessor
+from opentelemetry.propagate import inject, extract
+import requests
+
+# Tracer 초기화
+trace.set_tracer_provider(TracerProvider())
+trace.get_tracer_provider().add_span_processor(
+    BatchSpanProcessor(ConsoleSpanExporter())
+)
+tracer = trace.get_tracer(__name__)
+
+# 서비스 A: 외부 API 호출
+def service_a_call_external():
+    with tracer.start_as_current_span("service_a_request") as span:
+        span.set_attribute("service.name", "service-a")
+        
+        # Context를 헤더에 주입
+        headers = {}
+        inject(headers)
+        
+        # 서비스 B 호출
+        response = requests.get("http://service-b/api", headers=headers)
+        span.set_attribute("http.status_code", response.status_code)
+        
+        return response.json()
+
+# 서비스 B: 수신한 요청 처리
+def service_b_handler(incoming_headers: dict):
+    # 헤더에서 Context 추출
+    ctx = extract(incoming_headers)
+    
+    # 추출한 Context를 현재 Span의 부모로 설정
+    with tracer.start_as_current_span("service_b_request", context=ctx) as span:
+        span.set_attribute("service.name", "service-b")
+        
+        # 비즈니스 로직
+        result = {"status": "ok"}
+        
+        return result
+
+# 사용 예시
+if __name__ == "__main__":
+    # 서비스 A가 서비스 B를 호출
+    # 실제로는 두 서비스가 별도 프로세스이지만,
+    # 여기서는 개념 설명을 위해 한 코드에 모았음
+    print("서비스 A가 서비스 B를 호출하고, trace_id가 전파됩니다.")
+```
+
+이 코드에서 `inject()`는 현재 Context를 HTTP 헤더에 넣고, `extract()`는 헤더에서 Context를 꺼냅니다. W3C Trace Context 표준에 따라 `traceparent` 헤더가 생성되고, 서비스 B는 이를 읽어 같은 트레이스로 이어갑니다.
+
+## 샘플링 전략
+
+모든 트레이스를 100% 저장하면 비용이 급격히 커집니다. 샘플링은 일부만 저장하는 전략입니다.
+
+### Head-based Sampling
+
+**정의**: 트레이스 시작 시점에 저장 여부를 결정합니다.
+
+**장점**:
+- 구현이 간단합니다.
+- 시스템 부하가 적습니다.
+- 예측 가능한 비용입니다.
+
+**단점**:
+- 느린 요청이나 오류를 놓칠 수 있습니다.
+- 희귀한 문제를 포착하기 어렵습니다.
+
+```python
+from opentelemetry.sdk.trace.sampling import TraceIdRatioBased
+
+# 10%만 저장
+sampler = TraceIdRatioBased(0.1)
+provider = TracerProvider(sampler=sampler)
+```
+
+### Tail-based Sampling
+
+**정의**: 트레이스 종료 후 결과를 보고 저장 여부를 결정합니다.
+
+**장점**:
+- 느린 요청이나 오류를 선택적으로 저장할 수 있습니다.
+- 중요한 트레이스를 놓치지 않습니다.
+
+**단점**:
+- 구현이 복잡합니다 (모든 span을 메모리에 모아야 함).
+- 시스템 부하가 큽니다.
+
+**사용 예시**:
+- 응답 시간이 1초 이상인 트레이스만 저장
+- HTTP 5xx 상태 코드가 포함된 트레이스만 저장
+- 특정 경로 (`/api/payment`)만 100% 저장
+
+### 실무 추천
+
+1. **개발 환경**: 100% 저장 (전체 흐름 확인)
+2. **스테이징**: 10% head-based sampling
+3. **프로덕션**: 1% head-based + tail-based (error/slow 요청)
+
+글로벌 트래픽이 매일 백만 건이 넘는다면 1% 샘플링에도 일만 건의 트레이스가 쌓입니다. 샘플링 비율은 트래픽과 비용을 보고 조정합니다.
+
 ## 한눈에 보는 구조
 
 분산 트레이싱은 하나의 요청이 여러 서비스를 거칠 때 그 경로 전체를 한 줄로 봅니다. trace_id로 요청을 추적하고, span으로 각 구간을 기록합니다.
@@ -184,6 +304,82 @@ Expected output:
 ## 정리
 
 분산 트레이싱은 요청 하나의 흐름을 지도처럼 보여 줍니다. 스팬, 문맥 전파, 샘플링이 자리 잡으면 여러 서비스를 가로지르는 장애도 훨씬 빨리 좁힐 수 있습니다. 다음 글에서는 이렇게 모인 신호를 어떤 화면으로 보여 줘야 운영에 도움이 되는지, 대시보드 설계를 다루겠습니다.
+
+## OpenTelemetry Python 계측 확장 예시
+
+자동 계측만으로는 도메인 경계를 충분히 표현하기 어려운 경우가 많습니다. 결제, 재고, 쿠폰 같은 비즈니스 구간은 수동 스팬을 추가해 의미를 분명히 하는 편이 좋습니다.
+
+```python
+import time
+from opentelemetry import trace
+from opentelemetry.trace import Status, StatusCode
+
+tracer = trace.get_tracer("checkout-service")
+
+
+def checkout(order_id: str, amount: int) -> None:
+    with tracer.start_as_current_span("checkout") as root:
+        root.set_attribute("order.id", order_id)
+        root.set_attribute("order.amount", amount)
+
+        with tracer.start_as_current_span("validate_order"):
+            time.sleep(0.02)
+
+        with tracer.start_as_current_span("charge_payment") as span:
+            try:
+                time.sleep(0.35)
+                raise TimeoutError("gateway timeout")
+            except TimeoutError as exc:
+                span.record_exception(exc)
+                span.set_status(Status(StatusCode.ERROR, str(exc)))
+                span.set_attribute("payment.retry", 2)
+                raise
+```
+
+스팬 이름은 이후 검색 키가 되므로 짧고 일관되게 유지합니다. 같은 동작을 `pay`, `payment_call`, `charge_gateway`처럼 섞어 쓰면 팀 전체 질의 품질이 떨어집니다.
+
+## 문맥 전파 실전 패턴
+
+서비스 간 호출에서 문맥 전파가 누락되는 지점은 주로 비HTTP 경계(큐, 배치, 비동기 작업)입니다. 아래 예시는 HTTP 헤더와 메시지 큐를 함께 다루는 단순 패턴입니다.
+
+```python
+from opentelemetry.propagate import inject, extract
+
+
+def build_http_headers() -> dict:
+    headers = {}
+    inject(headers)
+    return headers
+
+
+def publish_message(payload: dict) -> dict:
+    carrier = {}
+    inject(carrier)
+    return {
+        "payload": payload,
+        "trace_headers": carrier,
+    }
+
+
+def consume_message(message: dict):
+    ctx = extract(message["trace_headers"])
+    tracer = trace.get_tracer("worker")
+    with tracer.start_as_current_span("worker.handle", context=ctx):
+        # 실제 처리
+        pass
+```
+
+메시지 시스템에서는 헤더 필드 이름 표준을 팀 문서로 고정해야 합니다. 생산자와 소비자가 다른 언어를 쓰는 경우가 많아서, 한쪽에서만 규칙을 알고 있으면 트레이스가 중간에서 끊깁니다.
+
+## 샘플링 정책 설계 가이드
+
+| 정책 | 장점 | 단점 | 권장 상황 |
+| --- | --- | --- | --- |
+| 100% 저장 | 디버깅 정보 최대 | 비용 급증 | 개발/단기 실험 |
+| Head 10% | 단순, 예측 가능 | 희귀 오류 누락 가능 | 트래픽이 큰 정상 구간 |
+| Tail (오류/지연 우선) | 가치 높은 트레이스 보존 | 설정 복잡 | 운영 환경 기본 |
+
+추천 시작점은 "오류 100% + 지연 100% + 정상 5%"입니다. 이 조합이면 비용을 통제하면서도 장애 분석에 필요한 표본을 충분히 확보할 수 있습니다. 샘플링은 한 번 정하고 끝내는 설정이 아니라, 월별 트래픽과 장애 패턴에 맞춰 조정하는 운영 항목입니다.
 
 ## 처음 질문으로 돌아가기
 

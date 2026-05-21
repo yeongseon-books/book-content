@@ -45,8 +45,6 @@ This is the 5th article in the Python DB-API 101 series.
 
 This picture places Transactions and isolation levels (sqlite3, PEP 249) inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Transactions and isolation levels (sqlite3, PEP 249) is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What you will learn
 
 This post covers sqlite3 transaction semantics through a PEP 249 lens. Specifically:

@@ -52,8 +52,6 @@ Training itself is tied to probability as well. Cross-entropy in classification 
 
 > Machine learning is not only about guessing the right label. It is also about organizing uncertainty and tying that uncertainty to decision cost.
 
-## Concept at a Glance
-
 ## Key Terms
 
 - **Likelihood**: L(θ) = ∏ p(yᵢ | xᵢ; θ).

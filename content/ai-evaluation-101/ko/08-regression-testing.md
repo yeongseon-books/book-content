@@ -398,4 +398,6 @@ PR이 fail했을 때 다음 절차를 따릅니다.
 - [다음 글 — LLM A/B 테스팅 — 어느 prompt가 더 나은가](./09-ab-testing-llms.md)
 - [시리즈 현재 위치 다시 보기](./08-regression-testing.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-evaluation-101/ko/08-regression-testing)
+
 Tags: AI Evaluation, Regression Testing, CI, GitHub Actions

@@ -42,8 +42,6 @@ This is post 6 in the Python Package 101 series. Here we translate code changes 
 
 This picture places Versioning and Releases inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Versioning and Releases is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What you will learn
 
 - SemVer rules and when to bump each part

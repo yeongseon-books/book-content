@@ -42,8 +42,6 @@ This post is the 4th article in the Python 101 series. This is the stage in the 
 
 This picture places list, tuple, set, dict inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of list, tuple, set, dict is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 Choosing a collection determines both the performance and the meaning of the code. Reach for `dict` where a `list` would do, and the code grows heavy. Reach for a `list` where a `set` belongs, and a single membership check becomes O(n) — slowing down with every new element. Conversely, expressing an immutable bundle as a `list` invites someone to mutate what was supposed to be fixed; the type system gives no warning.

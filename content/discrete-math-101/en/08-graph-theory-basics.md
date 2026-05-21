@@ -45,8 +45,6 @@ This is post 8 in the Discrete Math 101 series.
 
 This picture places Graph Theory Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Graph Theory Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - Definition and types of graphs (undirected, directed, weighted)
@@ -59,8 +57,6 @@ This picture places Graph Theory Basics inside an operating flow. The point is n
 Shortest path in navigation, friend recommendations on Instagram, npm dependency resolution, dataflow analysis in compilers — all solved by graph algorithms. Without graph theory you cannot understand the inside of these tools.
 
 > A graph is a universal language for modeling anything with relationships.
-
-## Concept at a Glance
 
 > Graph G = (V, E). V is the vertex set, E is the edge set. Variants emerge from direction, weight, and multiplicity.
 

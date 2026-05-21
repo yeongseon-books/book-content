@@ -42,15 +42,11 @@ This is post 5 in the Docker 101 series. It shows how to express a multi-contain
 
 This picture places Docker Compose inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Docker Compose is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 New-hire setup finishes in *under five minutes*. The *README setup section* simply disappears.
 
 > *Compose is the shortest path to *environment-as-code*.*
-
-## Concept at a Glance
 
 ## Key Terms
 

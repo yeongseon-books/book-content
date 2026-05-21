@@ -44,8 +44,6 @@ This is post 4 in the Compilers 101 series.
 
 This picture places semantic analysis inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of semantic analysis is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The difference between syntactic correctness and semantic correctness
@@ -59,8 +57,6 @@ This picture places semantic analysis inside an operating flow. The point is not
 A parser can only say "are the parentheses balanced?" The case where `y` in `x = y + 1` was never declared, or where `y` is a string but you try to add `1`, is caught at the semantic stage. If this stage is weak, code that compiled cleanly dies at runtime.
 
 > Compilers earn trust through semantics, not through syntax.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR

@@ -45,8 +45,6 @@ This is post 6 in the Data Structures 101 series.
 
 This picture places Trees inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Trees is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - Core tree terminology (root, leaf, depth, height)
@@ -59,8 +57,6 @@ This picture places Trees inside an operating flow. The point is not to memorize
 Trees are the basic skeleton of nearly every hierarchical dataset: database indexes, the abstract syntax tree (AST) of a compiler, the file system in an operating system, the parsed result of JSON or XML. Without fluency in trees, you cannot handle graphs, BSTs, or heaps with confidence.
 
 > A tree is the structure where recursion feels most natural.
-
-## Concept at a Glance
 
 > A tree is a connected, acyclic graph of nodes and edges. A binary tree is a tree where each node has at most two children — the form algorithms use most often.
 

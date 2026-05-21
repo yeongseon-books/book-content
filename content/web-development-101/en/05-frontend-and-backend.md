@@ -41,15 +41,11 @@ This is post 5 in the Web Development 101 series. Here we draw the boundary betw
 
 This picture places Frontend and Backend inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Frontend and Backend is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Even when one person writes both sides, blurring the *boundary of responsibility* rots the code fast. The boundary is not a *physical line* — it is a *promise about who owns what*.
 
 > Good systems have *clear boundaries*.
-
-## Concept at a Glance
 
 This figure emphasizes direction: durable data usually starts in the database, the backend decides what may be returned, and the frontend turns that response into a user experience. Visible state and source of truth are not the same thing.
 

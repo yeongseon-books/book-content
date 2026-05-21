@@ -338,4 +338,6 @@ short-term memory는 현재 세션의 working set이고, long-term memory는 나
 - [LangGraph 101 - 체크포인트와 상태 관리](../../langgraph-101/ko/02-state-and-checkpoints.md)
 - [RAG 101 - 검색 컨텍스트 구성](../../multimodal-ai-101/ko/05-multimodal-rag.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-agent-101/ko/05-memory-and-state)
+
 Tags: AI Agent, LLM, Tool Use, Python

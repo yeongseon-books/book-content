@@ -45,8 +45,6 @@ This is the final post in the Computer Architecture 101 series.
 
 This picture places Understanding Performance inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Understanding Performance is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The difference between throughput and latency
@@ -59,8 +57,6 @@ This picture places Understanding Performance inside an operating flow. The poin
 Performance is a feature of every system. A faster page keeps more users, an efficient deployment runs on fewer servers, lower latency yields a better user experience. But the word "optimization" gets paired with assumption and aimed at the wrong place. Knuth's "premature optimization is the root of all evil" gets quoted often; what he meant was "do not optimize without measurement."
 
 > An unmeasured optimization is not optimization. It is faith.
-
-## Concept at a Glance
 
 > Performance has two axes — latency (how long one task takes) and throughput (how many tasks per unit of time). They often trade off. To find bottlenecks, the USE method examines utilization, saturation, and errors of each resource (CPU, memory, disk, network). Profiling comes in two flavors — statistical sampling and precise instrumentation — each with its own tradeoffs.
 

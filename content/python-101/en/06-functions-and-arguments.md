@@ -42,8 +42,6 @@ This post is the 6th article in the Python 101 series. This is the point in the 
 
 This picture places Functions and arguments: def, args, kwargs, default, lambda inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Functions and arguments: def, args, kwargs, default, lambda is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 Functions are the smallest unit you bundle code into. Once you carve branches and loops into functions, you stop repeating yourself, and the function becomes the unit of testing and change. Python's argument handling is rich, however, so beginners often struggle to choose between forms. Positional only ties calls to order; bad defaults leak state between calls; overusing `*args` and `**kwargs` makes signatures opaque.

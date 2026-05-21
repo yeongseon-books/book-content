@@ -43,8 +43,6 @@ This is the seventh post in the Data Structures 101 series.
 
 This picture places Binary Search Trees inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Binary Search Trees is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The definition of a BST and how search, insert, and delete work
@@ -57,8 +55,6 @@ This picture places Binary Search Trees inside an operating flow. The point is n
 BSTs are the foundation of database indexes, file system metadata, memory allocators, and any system that needs fast lookup over sorted data. Without an intuition for balanced trees, it is hard to understand database indexes deeply.
 
 > Sorted plus search plus insert plus delete, all at O(log n), is a property that almost only the BST family delivers.
-
-## Concept at a Glance
 
 > A BST is a "sorted tree". Every node maintains an invariant: the entire left subtree is smaller than the node, and the entire right subtree is larger. That invariant lets you discard half the data at every step, which is what makes average O(log n) search possible.
 

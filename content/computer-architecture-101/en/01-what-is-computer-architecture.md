@@ -45,8 +45,6 @@ This is the first post in the Computer Architecture 101 series.
 
 This picture places What Is Computer Architecture? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is Computer Architecture? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - A working definition of computer architecture
@@ -59,8 +57,6 @@ This picture places What Is Computer Architecture? inside an operating flow. The
 The same algorithm can run ten times faster or slower depending on memory access patterns, branch behavior, and instruction mix. Every abstraction eventually leaks, and when a system slows down the cause is almost always one layer below where you were looking. Without architecture knowledge, performance debugging is mostly guessing.
 
 > Computer architecture does not explain why your code is fast. It explains why it is only this fast.
-
-## Concept at a Glance
 
 > The von Neumann model places code and data in the same memory. The CPU fetches one instruction at a time, the ALU and control unit execute it, and results travel back through memory to output devices. Almost every general-purpose computer today is a variant of this model.
 

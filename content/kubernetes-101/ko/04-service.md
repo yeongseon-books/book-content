@@ -40,10 +40,6 @@ Pod를 여러 개 띄우기 시작하면 다음 문제가 바로 등장합니다
 
 *Kubernetes 101 4장 흐름 개요*
 
-이 그림에서는 Service를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> Service의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 중요한가
 
 마이크로서비스 구조에서는 애플리케이션이 다른 애플리케이션을 이름으로 호출해야 합니다. 그런데 Pod IP를 직접 쓰는 방식은 재시작 한 번으로 바로 깨집니다. Kubernetes에서 내부 통신이 안정적으로 보이려면 중간에서 변하는 파드 집합을 고정된 이름으로 가려 주는 계층이 필요합니다.
@@ -192,6 +188,113 @@ kubectl run dnscheck --rm -i --restart=Never --image=busybox -- nslookup web.def
 이 글에서는 Service를 변하는 파드 집합 앞에 안정적인 주소와 이름을 붙여 주는 객체로 정리했습니다. Kubernetes 네트워킹이 복잡해 보일 때도, 먼저 Service가 어떤 파드 집합을 어떤 이름으로 대표하는지부터 보면 흐름이 빠르게 정리됩니다.
 
 다음 글에서는 내부 통신을 넘어서, 외부에서 들어오는 HTTP 요청을 도메인과 경로 기준으로 어떻게 나누는지 Ingress를 보겠습니다.
+
+
+## 매니페스트 중심 운영 예시
+
+Kubernetes의 강점은 명령형 조작보다 선언형 매니페스트에 있습니다. 아래 예시는 Deployment, Service, Ingress를 분리해 책임 경계를 명확히 둔 기본 형태입니다.
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  labels:
+    app: api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/example/api:1.2.0
+          ports:
+            - containerPort: 8000
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+spec:
+  selector:
+    app: api
+  ports:
+    - port: 80
+      targetPort: 8000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: api.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api
+                port:
+                  number: 80
+```
+
+readiness probe와 resource request/limit를 함께 정의하면 "배포는 되었지만 트래픽을 받으면 무너지는" 상태를 줄일 수 있습니다. 선언형 파일에서 운영 안정성을 미리 포함시키는 방식이 중요합니다.
+
+## kubectl 운영 명령 세트
+
+매니페스트를 적용한 뒤에는 상태 관찰 명령을 빠르게 순환해야 합니다. 아래 조합은 장애 분석에서 가장 자주 사용하는 기본 세트입니다.
+
+```bash
+kubectl apply -f k8s/
+kubectl get deploy,rs,pod -n prod -o wide
+kubectl rollout status deploy/api -n prod
+kubectl describe pod -n prod -l app=api
+kubectl logs -n prod deploy/api --tail=200
+kubectl get events -n prod --sort-by=.metadata.creationTimestamp
+```
+
+`rollout status`와 `describe`를 먼저 보면 이미지 pull 실패, probe 실패, 스케줄링 실패를 빠르게 구분할 수 있습니다. 로그만 먼저 보면 인프라 원인을 애플리케이션 오류로 오판하기 쉽습니다.
+
+## 아키텍처 관점에서 봐야 할 경계
+
+- **API Server 경계**: 모든 선언 변경은 API 서버를 통과합니다. 직접 노드에 접속해 상태를 손으로 맞추는 방식은 drift를 만듭니다.
+- **Scheduler 경계**: Pod 배치는 자원 요청, taint/toleration, affinity 규칙의 결과입니다. 노드 선택 문제는 애플리케이션 버그와 분리해 봐야 합니다.
+- **Controller 경계**: Deployment Controller는 replica 수렴과 롤링 업데이트를 담당합니다. desired/current 값 차이를 관찰하는 습관이 핵심입니다.
+- **Network 경계**: Service와 Ingress는 L4/L7 책임이 다릅니다. 내부 통신 실패와 외부 진입 실패를 분리해 진단해야 대응이 빨라집니다.
+
+이 경계를 기준으로 장애를 분해하면 "클러스터 문제"라는 모호한 결론 대신, 어느 계층에서 어떤 신호가 깨졌는지 명확히 남길 수 있습니다.
+
+## 배포 안정성을 높이는 실무 체크
+
+1. 모든 워크로드에 readiness/liveness probe를 설정합니다.
+2. `latest` 태그 대신 고정 버전 태그를 사용해 롤백 기준을 확보합니다.
+3. 변경 전 `kubectl diff -f`로 영향을 검토해 무의식적 설정 누락을 줄입니다.
+4. 운영 네임스페이스에는 ResourceQuota와 LimitRange를 적용해 폭주 범위를 제한합니다.
+5. 배포 후 `kubectl rollout history`를 확인해 복구 경로를 문서화합니다.
+
+Kubernetes는 기능이 많아서 어려운 도구가 아니라, 경계를 나누어 관찰하지 않으면 쉽게 혼란스러워지는 도구입니다. 매니페스트, 관찰 명령, 아키텍처 경계를 함께 묶어 운영하면 학습 속도와 안정성이 동시에 올라갑니다.
 
 ## 처음 질문으로 돌아가기
 

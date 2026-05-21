@@ -41,15 +41,11 @@ This is post 2 in the Web Development 101 series. Here we separate structure, st
 
 This picture places HTML, CSS, and JavaScript inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of HTML, CSS, and JavaScript is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 When all three live in one file, fixing one line breaks another. *Separation* is the starting point of teamwork and maintenance — designers touch CSS, frontend engineers touch JS, content owners touch HTML.
 
 > Good web code keeps roles separate.
-
-## Concept at a Glance
 
 The point of this figure is not that three files are trendy. It is that one visible page is easier to change when structure, visual rules, and runtime behavior can move independently.
 

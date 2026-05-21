@@ -41,8 +41,6 @@ This is post 3 in the Computer Architecture 101 series. Here we use x86-64, ARM6
 
 This picture places CPU and Instructions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of CPU and Instructions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The fetch-decode-execute cycle
@@ -55,8 +53,6 @@ This picture places CPU and Instructions inside an operating flow. The point is 
 Performance work eventually reduces to "how many instructions does this code become, and how fast can the CPU run them?" Without the cycle in your head, profiler output is opaque, and without ever reading assembly, you cannot tell what the compiler did well and what it missed.
 
 > All high-level code is a sequence of instructions. Keeping that sequence short and simple is a joint effort with the compiler.
-
-## Concept at a Glance
 
 > Each cycle the CPU (1) fetches the instruction at the address in PC, (2) decodes its bit pattern, and (3) executes it. PC then moves to the next instruction unless a branch redirects it.
 

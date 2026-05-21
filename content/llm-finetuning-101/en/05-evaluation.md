@@ -41,8 +41,6 @@ This is the fifth post in the LLM Fine-tuning 101 series.
 
 This picture places Model Evaluation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Model Evaluation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 Right after training, the temptation is to look only at generated samples. In production you must look at quantitative signals first. The most basic one is perplexity, which shows how naturally the model predicts tokens in your evaluation data.

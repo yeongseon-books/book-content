@@ -50,6 +50,20 @@ last_reviewed: '2026-05-15'
 
 운영 가능한 스택이 중요한 이유는 교체 가능성과 일상성에 있습니다. 작은 팀이라면 오늘 바로 올릴 수 있어야 하고, 내일 문제가 생겼을 때 누구나 흐름을 따라가 볼 수 있어야 합니다.
 
+### 오픈소스 vs 상용 비교
+
+작은 팀이 관측성 스택을 고르는 과정에서 가장 자주 마주치는 질문은 "오픈소스를 직접 운영할까, 아니면 상용 서비스를 사용할까?"입니다.
+
+| 항목 | Prometheus + Grafana | Datadog | New Relic |
+|---|---|---|---|
+| 초기 비용 | 서버 비용만 (EC2/VM) | 월 $15/호스트 부터 | 월 $25/사용자 부터 |
+| 데이터 보존 | 직접 설정 (15일~1년) | 15개월 기본 | 8일 기본 |
+| 운영 부담 | 높음 (업데이트, 복제, 백업) | 낮음 (SaaS) | 낮음 (SaaS) |
+| 기능 폭 | Prometheus 생태계 | APM, RUM, 통합 모니터링 | Full-stack 관측성 |
+| 커스터마이징 | 높음 | 중간 | 중간 |
+| 보안/통제 | 내부 관리 | 벤더 신뢰 필요 | 벤더 신뢰 필요 |
+
+오픈소스는 초기 비용이 낮고 데이터를 내부에 둡 수 있지만, 운영 시간이 많이 필요합니다. 상용 서비스는 설치가 빠르고 기능이 풍부하지만, 데이터량이 늘면 비용이 빠르게 커집니다. 팀이 3명 이하라면 상용, 5명 이상이면 오픈소스를 고려하는 편이 현실적입니다.
 ## 한눈에 보는 구조
 
 완벽한 관측성 스택은 없습니다. 팀이 감당할 수 있는 범위에서 점진적으로 확장하며, 오픈소스와 SaaS의 장단점을 고려해 선택합니다.
@@ -133,6 +147,34 @@ Loki  -> Tempo: log "trace_id" -> trace view
 
 관측성 시스템도 운영 대상입니다. 스택 자체가 느리거나 자주 끊기면 정작 장애 순간에 가장 먼저 배신합니다. 그래서 운영자 목표를 별도로 두는 편이 좋습니다.
 
+### 스택 선택 의사결정 트리
+
+관측성 스택 선택은 단순히 도구 리스트를 고르는 것이 아니라 팀의 상황에 맞는 조합을 찾는 과정입니다. 아래 의사결정 트리를 따라가면 방향을 잡는 데 도움이 됩니다.
+
+```text
+Q1: 팀 크기가 3명 이하인가?
+  YES -> 상용 SaaS 고려 (Datadog, New Relic)
+  NO  -> Q2로
+
+Q2: 데이터를 내부에 보관해야 하는가?
+  YES -> 오픈소스 필수 (Prometheus + Grafana)
+  NO  -> Q3으로
+
+Q3: 매월 모니터링 비용 예산이 $500 이하인가?
+  YES -> 오픈소스 우선 (Prometheus + Loki + Tempo + Grafana)
+  NO  -> Q4로
+
+Q4: 운영 인력이 1명 이상 할당 가능한가?
+  YES -> 오픈소스 직접 운영
+  NO  -> 하이브리드 (Grafana Cloud 또는 부분 SaaS)
+
+Q5: APM, RUM, 로그 분석이 모두 필요한가?
+  YES -> Full-stack SaaS (Datadog, New Relic, Elastic)
+  NO  -> 가벼운 조합 (Prometheus + Loki + Tempo)
+```
+
+이 트리는 절대적인 정답이 아니라 출발점입니다. 실제로는 오픈소스로 시작했다가 특정 신호만 상용으로 옮기거나, 상용으로 시작했다가 비용 문제로 오픈소스로 전환하는 팀도 많습니다.
+
 ## 스택 연결은 이렇게 검증합니다
 
 작은 팀의 첫 스택은 기능 수보다 연결 상태가 더 중요합니다. 아래 세 가지가 모두 통과해야 "메트릭, 로그, 트레이스가 한 스택"이라고 말할 수 있습니다.
@@ -149,6 +191,57 @@ Expected output:
 - collector metrics 에서 exporter/send 관련 카운터가 증가합니다.
 - Grafana health 가 ok 를 반환하고, trace_id 기준으로 로그와 트레이스를 오갈 수 있습니다.
 ```
+
+### Day-2 운영
+
+관측성 스택을 올렸다고 끝이 아닉니다. 실제로 오래 운영하려면 Day-2 운영 계획이 필요합니다.
+
+**Retention (보존 정책)**
+
+데이터를 얼마나 오래 보관할지 정해야 합니다. Prometheus는 기본 15일, Loki는 7일, Tempo는 1일을 기본값으로 하지만, 실제로는 팀의 요구에 맞춰 조정해야 합니다. 최근 30일은 원본으로, 90일까지는 5분 해상도로, 1년은 1시간 해상도로 내리면 비용과 유용성을 균형 있게 가져갈 수 있습니다.
+
+```yaml
+# Prometheus retention
+prometheus:
+  retention.time: 15d
+  retention.size: 50GB
+
+# Thanos downsampling
+thanos:
+  retention.resolution-raw: 30d
+  retention.resolution-5m: 90d
+  retention.resolution-1h: 1y
+```
+
+**Compaction (압축)**
+
+오래된 데이터를 압축해 저장 공간을 줄입니다. Prometheus는 자체적으로 2시간 블록을 합치고, Thanos나 Cortex는 이를 더 긴 기간으로 압축합니다. Loki도 compactor를 돌리면 블록 파일을 합쳐 저장 효율을 높일 수 있습니다.
+
+```yaml
+compactor:
+  working_directory: /loki/compactor
+  shared_store: s3
+  compaction_interval: 10m
+```
+
+**Federation (연합)**
+
+여러 리전이나 클러스터가 있는 경우 중앙 Prometheus가 하위 Prometheus로부터 집계 데이터를 가져옵니다. 이를 통해 전체 시스템의 건강 상태를 한곳에서 볼 수 있습니다.
+
+```yaml
+scrape_configs:
+  - job_name: federate
+    honor_labels: true
+    metrics_path: /federate
+    params:
+      match[]:
+        - '{job="api"}'
+        - '{job="worker"}'
+    static_configs:
+      - targets: ['prometheus-region1:9090', 'prometheus-region2:9090']
+```
+
+이 세 가지는 첫 스택을 올린 뒤 바로 계획해야 하는 항목입니다. 특히 보존 정책을 명확하게 하지 않으면 디스크가 가득 차거나 비용이 폭발합니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 
@@ -186,6 +279,69 @@ Expected output:
 ## 정리
 
 작은 팀의 첫 관측성 스택은 완벽할 필요가 없지만 운영 가능해야 합니다. 수집은 표준으로 묶고, 메트릭·로그·트레이스를 연결하고, 스택 자체의 건강도 함께 관리하면 출발선으로 충분합니다. 이 시리즈는 여기서 마치지만, 다음 단계는 자연스럽게 사고 대응, 용량 계획, 비용 운영으로 이어집니다.
+
+## 운영 스택 아키텍처 텍스트 다이어그램
+
+아래 다이어그램은 작은 팀이 자주 채택하는 LGTM 기반 흐름을 텍스트로 표현한 것입니다.
+
+```text
+[App Services]
+  |- metrics/logs/traces via OTLP
+  v
+[OpenTelemetry Collector]
+  |- metrics -> [Prometheus] -> [Grafana]
+  |- logs    -> [Loki]       -> [Grafana]
+  |- traces  -> [Tempo]      -> [Grafana]
+  `- alerts  -> [Alertmanager] -> [PagerDuty/Slack]
+
+Correlation key: trace_id
+```
+
+Collector를 중심에 두면 애플리케이션은 OTLP만 알면 되고, 저장소 교체는 Collector 파이프라인에서 처리할 수 있습니다. 이 구조는 "앱 코드 최소 변경"이라는 운영 원칙에 잘 맞습니다.
+
+## 아키텍처 의사결정 표
+
+| 결정 항목 | 선택지 A | 선택지 B | 기준 | 권장 |
+| --- | --- | --- | --- | --- |
+| 수집 방식 | 앱 -> 저장소 직접 전송 | 앱 -> Collector | 변경 유연성 | Collector 중심 |
+| 메트릭 저장 | 단일 Prometheus | Prometheus + 장기 저장 | 보존 요구 | 초기 단일, 이후 확장 |
+| 로그 저장 | Loki | Elasticsearch 계열 | 운영 복잡도/검색 요구 | 팀 역량 기준 선택 |
+| 트레이스 저장 | Tempo | Jaeger | 운영 단순성 | Grafana 연동 우선 |
+| 시각화 | 도구별 개별 UI | Grafana 통합 | 대응 속도 | 통합 UI 권장 |
+
+모든 팀에 정답인 조합은 없습니다. 다만 작은 팀 출발점에서는 "통합 화면"과 "구성 단순성"의 가치를 높게 두는 편이 안정적입니다. 기능이 부족하면 확장하면 되지만, 복잡도는 초기 설계에서 과도하게 올리면 되돌리기 어렵습니다.
+
+## 운영 점검 체크 자동화 예시
+
+```python
+import requests
+
+
+def health_check() -> dict[str, bool]:
+    checks = {
+        "collector_metrics": "http://localhost:9464/metrics",
+        "prometheus_ready": "http://localhost:9090/-/ready",
+        "loki_ready": "http://localhost:3100/ready",
+        "tempo_ready": "http://localhost:3200/ready",
+        "grafana_health": "http://localhost:3000/api/health",
+    }
+    result: dict[str, bool] = {}
+    for name, url in checks.items():
+        try:
+            response = requests.get(url, timeout=3)
+            result[name] = response.status_code == 200
+        except Exception:
+            result[name] = False
+    return result
+
+
+if __name__ == "__main__":
+    status = health_check()
+    for k, v in status.items():
+        print(f"{k}: {'PASS' if v else 'FAIL'}")
+```
+
+관측성 플랫폼도 제품처럼 헬스체크가 필요합니다. 이 점검 스크립트를 크론이나 CI 파이프라인에 붙이면 "장애가 난 순간 관측 도구도 죽어 있는" 최악의 상황을 줄일 수 있습니다.
 
 ## 처음 질문으로 돌아가기
 

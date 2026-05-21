@@ -39,10 +39,6 @@ last_reviewed: '2026-05-12'
 
 *Type Hints in Python 101 3장 흐름 개요*
 
-이 그림에서는 Optional과 Union를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> Optional과 Union의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 이 주제가 중요한가
 
 Python 런타임 오류 중에는 `None` 관련 예외가 매우 많습니다. 함수가 찾지 못한 값을 `None`으로 반환했는데 호출자는 항상 객체가 온다고 가정하고 메서드를 호출해 버리는 식입니다. 이런 문제는 원인이 생긴 지점과 폭발하는 지점이 멀리 떨어져 있어서 디버깅 비용도 큽니다.
@@ -239,6 +235,66 @@ print(greet("Alice", "Dr."))      # Hello, Dr. Alice!
 `Optional[T]`는 값이 `None`일 수 있음을, `Union[T1, T2]`는 여러 타입 중 하나가 올 수 있음을 적는 방법입니다. 중요한 점은 타입을 적는 데서 끝나지 않고, 분기 안에서 그 가능성을 실제로 처리하는 것입니다. `isinstance`와 `is None`은 그 계약을 코드로 드러내는 가장 기본적인 패턴입니다.
 
 다음 글에서는 함수 자체를 값처럼 다룰 때 필요한 `Callable`, `*args`, `**kwargs`, `@overload`를 살펴보겠습니다.
+
+## 실전 패턴 추가: TypeVar, Generic, Protocol을 함께 쓰는 방법
+
+타입 힌트가 본격적으로 효율을 내는 구간은 공통 유틸리티와 도메인 인터페이스를 다룰 때입니다. 단순한 `list[int]`를 넘어서 `TypeVar`, `Generic`, `Protocol`을 함께 쓰면 구체 클래스에 묶이지 않는 API를 만들 수 있습니다.
+
+```python
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Generic, Protocol, TypeVar
+
+T = TypeVar("T")
+K = TypeVar("K")
+
+
+class SupportsKey(Protocol[K]):
+    def key(self) -> K:
+        ...
+
+
+class Repository(Protocol[T]):
+    def add(self, item: T) -> None:
+        ...
+
+    def all(self) -> list[T]:
+        ...
+
+
+@dataclass
+class User:
+    user_id: int
+    name: str
+
+    def key(self) -> int:
+        return self.user_id
+
+
+class InMemoryRepository(Generic[T]):
+    def __init__(self) -> None:
+        self._items: list[T] = []
+
+    def add(self, item: T) -> None:
+        self._items.append(item)
+
+    def all(self) -> list[T]:
+        return self._items
+
+
+def index_by_key(items: list[SupportsKey[K]]) -> dict[K, SupportsKey[K]]:
+    return {item.key(): item for item in items}
+```
+
+```python
+repo: Repository[User] = InMemoryRepository()
+repo.add(User(user_id=1, name="A"))
+repo.add(User(user_id=2, name="B"))
+indexed = index_by_key(repo.all())
+```
+
+이 패턴의 장점은 구현 교체 비용이 낮다는 점입니다. `Repository[User]` 계약만 지키면 메모리 저장소를 DB 저장소로 바꿔도 상위 서비스 타입 시그니처를 유지할 수 있습니다. 또한 Protocol 기반 설계는 상속 계층 없이도 구조적 타이핑으로 계약을 검사할 수 있어, 기존 코드에 점진적으로 타입 안전성을 도입할 때 특히 유리합니다.
 
 ## 처음 질문으로 돌아가기
 

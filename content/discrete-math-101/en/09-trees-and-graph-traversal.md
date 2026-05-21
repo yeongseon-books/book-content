@@ -45,8 +45,6 @@ This is post 9 in the Discrete Math 101 series.
 
 This picture places Trees and Graph Traversal inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Trees and Graph Traversal is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The definition and properties of trees (V-1 = E, unique paths)
@@ -59,8 +57,6 @@ This picture places Trees and Graph Traversal inside an operating flow. The poin
 File systems, the DOM, compiler ASTs, database indexes — almost every system hides a tree. BFS and DFS are the starting points of graph algorithms and underpin shortest-path search, cycle detection, topological sort, and MST.
 
 > A tree is the simplest non-trivial graph; traversal is the basic motion of every graph algorithm.
-
-## Concept at a Glance
 
 > Tree: a connected, acyclic, undirected graph. With n vertices it has exactly n-1 edges, and any two vertices are connected by exactly one path.
 

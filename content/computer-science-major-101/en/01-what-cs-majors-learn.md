@@ -45,7 +45,7 @@ This is the first post in the Computer Science Major 101 series.
 
 This picture places What Computer Science Majors Learn inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Computer Science Majors Learn is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> The CS major is not a collection of topic names—it is a foundation of *math* and *programming*, layered with *systems*, *data*, *AI*, and *capstone projects*, where each layer depends on what came before.
 
 ## What You Will Learn
 
@@ -60,7 +60,7 @@ This picture places What Computer Science Majors Learn inside an operating flow.
 A clear *map* keeps your *four years* from drifting.
 
 ## Concept at a Glance
-
+The six axes—*math*, *programming*, *systems*, *data*, *AI*, and *projects*—build on each other. Each is foundational to the next.
 ## Key Terms
 
 - **major**: your *primary* field.

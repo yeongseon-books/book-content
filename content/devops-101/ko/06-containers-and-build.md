@@ -150,6 +150,91 @@ HEALTHCHECK CMD curl -f http://localhost:8000/health || exit 1
 
 Dockerfile 한 줄 순서가 빌드 시간과 보안 수준을 동시에 바꿀 수 있습니다. 그래서 컨테이너 빌드는 단순 포장 작업이 아니라 운영 품질을 결정하는 설계 작업에 가깝습니다.
 
+## 컨테이너 빌드 최적화
+
+빌드 시간은 개발자 경험과 배포 속도를 동시에 결정합니다. 아래 표는 자주 사용하는 세 가지 최적화 기법과 효과를 정리한 것입니다.
+
+| 기법 | 효과 | 예시 |
+| --- | --- | --- |
+| 멀티스테이지 빌드 | 최종 이미지 크기 50-70% 감소 | builder stage 분리 |
+| layer cache 활용 | 변경 없는 빌드 시간 90% 단축 | requirements.txt 먼저 COPY |
+| 경량 베이스 이미지 | 공격 표면 축소, 빌드 시간 10-30% 개선 | python:3.12-slim, distroless |
+
+cache 최적화는 빈번한 재빌드에서 가장 큰 차이를 만듭니다. 의존성이 바뀌지 않았다면 재설치를 건너뛰는 것만으로 CI 대기 시간을 크게 줄일 수 있습니다.
+
+## Python FastAPI 멀티스테이지 Dockerfile 예제
+
+실무에서 바로 쓸 수 있는 FastAPI 앱의 멀티스테이지 Dockerfile 구성입니다. 빌드 단계와 실행 단계를 나눠 최종 이미지를 가볍게 유지합니다.
+
+```dockerfile
+# Stage 1: Build dependencies
+FROM python:3.12 AS builder
+WORKDIR /build
+
+# Install dependencies to user directory
+COPY requirements.txt .
+RUN pip install --user --no-cache-dir -r requirements.txt
+
+# Stage 2: Runtime
+FROM python:3.12-slim
+WORKDIR /app
+
+# Create non-root user
+RUN useradd --create-home --uid 1001 appuser
+
+# Copy dependencies from builder
+COPY --from=builder /root/.local /opt/runtime/.local
+ENV PATH=/opt/runtime/.local/bin:$PATH
+
+# Copy application code
+COPY --chown=appuser:appuser . /app
+
+# Switch to non-root user
+USER appuser
+
+# Health check
+HEALTHCHECK CMD curl -f http://localhost:8000/health || exit 1
+
+EXPOSE 8000
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+이 구조는 builder 단계에서 컴파일과 의존성 설치를 모두 끝낸 뒤, 실행 단계에서는 필요한 파일만 복사해 최종 이미지 크기를 최소화합니다. 추가로 non-root 사용자 전환과 health check까지 포함해 프로덕션 수준의 안정성을 갖춥니다.
+
+## 컨테이너 보안 스캔
+
+이미지를 빌드했다면 보안 취약점 스캔을 실행해야 합니다. CI 단계에서 자동 검증하는 것이 가장 효과적입니다.
+
+### Trivy를 사용한 취약점 스캔
+
+```bash
+# Install Trivy
+curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+
+# Scan image
+trivy image --severity HIGH,CRITICAL myapp:1.0
+
+# Fail CI if vulnerabilities found
+trivy image --exit-code 1 --severity CRITICAL myapp:1.0
+```
+
+스캔은 빌드 직후에 실행하고, CRITICAL 취약점이 있으면 파이프라인을 멈춰야 합니다. 이 단계는 선택이 아니라 배포 전 필수 검증입니다.
+
+### 스캔 결과 읽기
+
+Trivy는 CVE 번호, 심각도, 영향받는 패키지, 고정 버전을 함께 보여줍니다. HIGH 이상 취약점은 즉시 대응해야 하고, MEDIUM은 우선순위를 정해 점진적으로 고쳐야 합니다.
+
+```text
+Total: 3 (HIGH: 1, CRITICAL: 2)
+
+Package: openssl
+Vulnerability: CVE-2024-1234
+Severity: CRITICAL
+Fixed Version: 3.0.13
+```
+
+취약점 스캔은 이미지를 빌드한 순간의 상태만 알려 줍니다. 따라서 프로덕션에 배포된 이미지도 주기적으로 재스캔해 새로 발견된 CVE에 대응해야 합니다.
+
 ## 자주 하는 실수 5가지
 
 1. **`latest` 태그를 쓰는 실수**입니다. 재현성이 사라지므로 항상 버전을 고정해야 합니다.
@@ -188,6 +273,87 @@ Dockerfile 한 줄 순서가 빌드 시간과 보안 수준을 동시에 바꿀 
 ## 정리 및 다음 단계
 
 컨테이너는 실행 환경을 얼려서 전달하는 방식입니다. 다음 글에서는 이렇게 배포된 서비스를 운영 중에 어떻게 관찰할지 모니터링과 알림을 다룹니다.
+
+## 컨테이너 빌드를 운영 품질 관점으로 확장하기
+
+컨테이너는 포장 기술이지만, 빌드 방식은 보안과 성능을 동시에 결정합니다. 이미지 크기, 레이어 구성, 베이스 이미지, 서명과 스캔 정책이 모두 운영 리스크에 직접 연결됩니다.
+
+### 오케스트레이션 비교 관점
+
+| 항목 | Docker Compose | Kubernetes |
+| --- | --- | --- |
+| 목표 | 로컬/소규모 멀티컨테이너 실행 | 대규모 운영 오케스트레이션 |
+| 복구 | 수동 또는 단순 재시작 | 자동 스케줄링/자가 복구 |
+| 확장 | 제한적 | HPA/클러스터 오토스케일 |
+| 네트워크 | 단순 서비스 디스커버리 | Service/Ingress 정책 기반 |
+| 운영 난이도 | 낮음 | 높음 |
+
+### 멀티스테이지 Dockerfile 예시
+
+```dockerfile
+FROM python:3.12 AS builder
+WORKDIR /build
+COPY requirements.txt .
+RUN pip install --user --no-cache-dir -r requirements.txt
+
+FROM python:3.12-slim
+WORKDIR /app
+COPY --from=builder /root/.local /root/.local
+COPY . .
+ENV PATH="/root/.local/bin:${PATH}"
+RUN useradd --create-home appuser
+USER appuser
+EXPOSE 8000
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+### Docker Compose 배포 검증용 스택
+
+```yaml
+version: "3.9"
+services:
+  api:
+    image: ghcr.io/example/api:1.2.0
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 2s
+      retries: 3
+  redis:
+    image: redis:7
+```
+
+### 이미지 품질 체크 표
+
+| 항목 | 권장 기준 |
+| --- | --- |
+| 태그 | `latest` 금지, semver 또는 sha 태그 |
+| 크기 | 불필요한 빌드 도구 제거 |
+| 계정 | non-root 실행 |
+| 취약점 | HIGH/CRITICAL 차단 |
+| SBOM | 생성 및 저장 |
+
+### 보안 스캔 자동화 예시
+
+```yaml
+- name: Trivy image scan
+  uses: aquasecurity/trivy-action@0.24.0
+  with:
+    image-ref: ghcr.io/example/api:${{ github.sha }}
+    severity: HIGH,CRITICAL
+    exit-code: "1"
+```
+
+### 운영 연결 포인트
+
+1. 빌드 산출물 이미지는 불변(immutable)으로 다룹니다.
+2. 장애 대응 시 컨테이너 내부 수정보다 새 이미지 배포를 원칙으로 합니다.
+3. 이미지 서명과 검증 정책을 도입해 공급망 위협을 줄입니다.
+4. 빌드 시간, 이미지 크기, 취약점 수를 릴리스 지표로 관리합니다.
+
+컨테이너 빌드가 안정되면 배포 논의가 기술 세부 대신 운영 정책 중심으로 전환됩니다. 이것이 DevOps 성숙의 중요한 신호입니다.
 
 ## 처음 질문으로 돌아가기
 

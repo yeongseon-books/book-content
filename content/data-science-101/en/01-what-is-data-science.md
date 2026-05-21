@@ -42,7 +42,7 @@ This is the first post in the Data Science 101 series. Here we build the mental 
 
 This picture places What Is Data Science? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is Data Science? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Data science is about deciding what to verify at each boundary and which signal to keep—not about feature names or techniques.
 
 ## Questions This Post Answers
 
@@ -67,7 +67,7 @@ In a field full of *overlapping titles*, the boundaries blur fast. A clear *big 
 
 > *Learning without a *big picture* is just a pile of fragments.*
 
-## Concept at a Glance
+The fundamental distinction in this episode is between recognizing What Is Data Science as an abstract concept and understanding how it manifests at system boundaries—where data enters, where checks occur, and which signals persist.
 
 ## Key Terms
 

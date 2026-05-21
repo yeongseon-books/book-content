@@ -45,7 +45,7 @@ This is post 9 in the Information Security 101 series.
 
 This picture places Logging and Audit inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Logging and Audit is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Logging and audit are not post-incident analysis tools. They are real-time detection systems that catch anomalies as they happen and trigger immediate response.
 
 ## What You Will Learn
 
@@ -60,8 +60,6 @@ This picture places Logging and Audit inside an operating flow. The point is not
 Without detection there is no response. The mean time to detect a breach is over 200 days — good logging cuts that to hours.
 
 > A breach noticed in 200 days is not an incident; it is a disaster.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR

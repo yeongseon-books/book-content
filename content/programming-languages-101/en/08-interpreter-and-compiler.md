@@ -43,8 +43,6 @@ In this post, we will treat interpreters and compilers as two strategies for the
 
 This picture places Interpreters and Compilers inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Interpreters and Compilers is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - What is the shortest way to explain the difference between an interpreter and a compiler?
@@ -57,8 +55,6 @@ This picture places Interpreters and Compilers inside an operating flow. The poi
 When performance hurts, being able to answer "what does this line actually run as?" replaces guess-debugging with measurement. Knowing how the same code runs differently under interpreter, JIT, and AOT makes tool choice obvious.
 
 > The same algorithm can run 100x faster or slower depending on the execution model.
-
-## Concept at a Glance
 
 Python takes `A → ... → D → E`. JVM bumps hot code to `F`. C and Rust go straight to `G`.
 

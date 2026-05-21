@@ -48,8 +48,6 @@ This picture places Real-World Data Analysis inside an operating flow. The point
 
 Knowing each tool separately is not the same as *producing a result*. *Pro analysts* are defined by their *connecting ability*.
 
-## Concept at a Glance
-
 ## Key Terms
 
 - **EDA**: *Exploratory Data Analysis*.

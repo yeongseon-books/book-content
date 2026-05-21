@@ -44,13 +44,9 @@ Here, we will separate the declarative Ingress rule from the controller that enf
 
 This picture places Ingress inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Ingress is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 A *LoadBalancer Service per app* explodes *cost*. *Ingress* collapses everything into a *single entry*.
-
-## Concept at a Glance
 
 ## Key Terms
 

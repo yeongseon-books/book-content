@@ -52,6 +52,154 @@ last_reviewed: '2026-05-12'
 
 반대로 단계를 잘게 나누면 문제가 난 지점을 바로 좁힐 수 있고, 바뀐 입력이 있는 구간만 다시 실행할 수 있습니다. 파이프라인은 곧 학습의 관측성과 복구성을 높이는 장치입니다.
 
+### 모델 서빙 패턴
+
+모델을 운영에 내보내는 방식은 크게 세 가지로 나뒩니다. 각 패턴은 응답 시간, 처리량, 인프라 복잡도에서 다른 트레이드오프를 가집니다.
+
+| 패턴 | 지연시간 | 처리량 | 적합한 경우 |
+|---|---|---|---|
+| 배치 추론 | 분~시간 | 매우 높음 | 주간 리포트, 대량 예측 일괄 처리 |
+| 실시간 추론 | ms~초 | 보통 | 사용자 요청에 즉시 응답, 추천, 검색 |
+| 스트리밍 추론 | 초 이하 | 높음 | 실시간 사기 탐지, 이상 탐지, 로그 분석 |
+
+#### 배치 추론
+
+모든 입력을 모아 두고 정해진 시간에 한 번에 실행합니다. Airflow나 Cron으로 스케줄링하고, 결과는 DB나 파일로 저장합니다. 응답 속도보다 처리량이 중요한 경우에 적합합니다.
+
+#### 실시간 추론
+
+HTTP 요청을 받아 즉시 예측을 반환합니다. FastAPI, Flask, BentoML 같은 프레임워크가 쓰입니다. 응답 시간이 중요하고, 요청마다 결과가 달라야 하는 경우에 적합합니다.
+
+#### 스트리밍 추론
+
+Kafka, Kinesis 같은 메시지 큐에서 데이터를 받아 순차적으로 처리합니다. 이벤트가 계속 들어오고, 각 이벤트마다 즉시 판단이 필요한 경우에 적합합니다.
+
+### FastAPI 모델 서빙 코드 예제
+
+앞서 본 예제를 조금 더 확장해보겠습니다. 버전 정보, 입력 검증, 로깅, 메트릭 수집까지 포함한 예제입니다.
+
+```python
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
+import pickle
+import logging
+import time
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+app = FastAPI(title="Model API", version="1.0.0")
+
+# 시작 시 모델 로드
+MODEL_PATH = "model.pkl"
+try:
+    with open(MODEL_PATH, "rb") as f:
+        model = pickle.load(f)
+    logger.info(f"Model loaded from {MODEL_PATH}")
+except Exception as e:
+    logger.error(f"Failed to load model: {e}")
+    model = None
+
+class PredictRequest(BaseModel):
+    x: float = Field(..., ge=0, le=100, description="Input feature (0-100)")
+
+class PredictResponse(BaseModel):
+    prediction: int
+    model_version: str
+    latency_ms: float
+
+@app.get("/healthz")
+def health():
+    if model is None:
+        raise HTTPException(status_code=503, detail="Model not loaded")
+    return {"status": "ok", "version": "1.0.0"}
+
+@app.post("/predict", response_model=PredictResponse)
+def predict(req: PredictRequest):
+    if model is None:
+        raise HTTPException(status_code=503, detail="Model not loaded")
+
+    start = time.time()
+    try:
+        pred = int(model.predict([[req.x]])[0])
+        latency = (time.time() - start) * 1000
+        logger.info(f"Prediction: x={req.x}, pred={pred}, latency={latency:.2f}ms")
+        return PredictResponse(
+            prediction=pred,
+            model_version="1.0.0",
+            latency_ms=round(latency, 2),
+        )
+    except Exception as e:
+        logger.error(f"Prediction failed: {e}")
+        raise HTTPException(status_code=500, detail="Prediction error")
+```
+
+이 코드에서는 입력 범위 검증(`ge=0, le=100`), 모델 로드 실패 처리, 지연시간 측정, 로깅이 모두 들어가 있습니다. 운영에서는 이런 요소가 있어야 문제 상황을 빠르게 파악할 수 있습니다.
+
+### 모델 패키징
+
+모델을 배포하려면 코드, 모델 파일, 라이브러리, 환경 변수를 한 묶음으로 만들어야 합니다. 세 가지 패키징 방식을 소개합니다.
+
+#### 1. Docker 이미지
+
+가장 흐하게 쓰이는 방식입니다. 모델, 코드, 라이브러리, OS 환경을 통째로 묶습니다.
+
+```dockerfile
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY model.pkl .
+COPY main.py .
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+장점: 환경 일관성, Kubernetes 같은 오케스트레이터와 호환성 높음.
+
+#### 2. ONNX 포맷
+
+ONNX는 프레임워크 중립적인 모델 포맷입니다. PyTorch, TensorFlow, scikit-learn 모델을 ONNX로 변환하면 다른 언어나 환경에서도 쓸 수 있습니다.
+
+```python
+from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import FloatTensorType
+
+initial_type = [("float_input", FloatTensorType([None, 1]))]
+onnx_model = convert_sklearn(model, initial_types=initial_type)
+
+with open("model.onnx", "wb") as f:
+    f.write(onnx_model.SerializeToString())
+```
+
+장점: 추론 속도 최적화, 프레임워크 독립성.
+
+#### 3. BentoML Bundle
+
+BentoML은 모델과 API 코드를 함께 패키징하는 도구입니다.
+
+```python
+import bentoml
+from sklearn.linear_model import LogisticRegression
+
+# 모델 저장
+model = LogisticRegression().fit([[0], [1]], [0, 1])
+bentoml.sklearn.save_model("lr_model", model)
+
+# 서빙 코드
+# service.py
+import bentoml
+from bentoml.io import JSON
+
+runner = bentoml.sklearn.get("lr_model:latest").to_runner()
+svc = bentoml.Service("lr_service", runners=[runner])
+
+@svc.api(input=JSON(), output=JSON())
+def predict(input_data):
+    result = runner.predict.run([input_data["x"]])
+    return {"prediction": int(result[0])}
+```
+
+장점: 모델 저장, API 서빙, Docker 빌드를 한 곳에서 처리.
 ---
 
 ## 전체 흐름을 먼저 보겠습니다
@@ -209,6 +357,104 @@ run()
 학습 파이프라인은 단순 자동 실행이 아니라, 학습 과정을 단계로 쪼개 재현과 복구를 쉽게 만드는 구조입니다. MLOps에서 DAG가 중요한 이유도 바로 여기에 있습니다.
 
 이 글에서 기억할 핵심은 하나입니다. **좋은 파이프라인은 학습 속도보다 실패 복구 속도를 먼저 높입니다.** 다음 글에서는 이렇게 만들어진 모델을 안전하게 서비스로 내보내는 배포를 다루겠습니다.
+
+
+## Airflow와 Prefect로 보는 파이프라인 설계 차이
+
+오케스트레이터를 고를 때는 기능 목록보다 팀 운영 방식과 장애 대응 방식을 먼저 봐야 합니다.
+
+| 항목 | Airflow | Prefect |
+|---|---|---|
+| DAG 표현 | 정적 DAG 정의 중심 | 동적 플로우 표현 유연 |
+| 운영 경험 | 대규모 배치 운영 사례 풍부 | 초기 도입과 로컬 개발 편의 |
+| UI 관측 | 태스크/스케줄 관측 강함 | 실행 상태/재시도 가시성 우수 |
+| 적합 팀 | 데이터 플랫폼/배치 중심 | 제품 팀 주도 반복 실험 |
+
+둘 중 무엇이 절대적으로 낫다기보다, 팀이 어떤 종류의 파이프라인을 얼마나 자주 바꾸는지가 선택 기준입니다.
+
+## Airflow DAG 확장 예시
+
+```python
+from airflow import DAG
+from airflow.operators.python import PythonOperator
+from airflow.operators.empty import EmptyOperator
+from datetime import datetime
+
+
+def validate_schema():
+    print("validate schema")
+
+
+def train_model():
+    print("train model")
+
+
+def evaluate_model():
+    print("evaluate model")
+
+
+def register_model():
+    print("register model")
+
+with DAG(
+    dag_id="ml_training_pipeline",
+    start_date=datetime(2026, 1, 1),
+    schedule="0 2 * * *",
+    catchup=False,
+    max_active_runs=1,
+) as dag:
+    start = EmptyOperator(task_id="start")
+    schema = PythonOperator(task_id="validate_schema", python_callable=validate_schema)
+    train = PythonOperator(task_id="train", python_callable=train_model)
+    evaluate = PythonOperator(task_id="evaluate", python_callable=evaluate_model)
+    register = PythonOperator(task_id="register", python_callable=register_model)
+    end = EmptyOperator(task_id="end")
+
+    start >> schema >> train >> evaluate >> register >> end
+```
+
+이 구조에서 핵심은 각 단계가 실패 원인을 분리할 수 있도록 역할이 분명하다는 점입니다.
+
+## 파이프라인 설정 파일 예시
+
+```yaml
+pipeline:
+  name: churn-train
+  schedule: "0 2 * * *"
+  retries: 2
+  retry_delay_sec: 300
+
+data:
+  source: s3://ml-data/churn/raw/
+  schema_path: schemas/churn_v3.json
+  min_rows: 50000
+
+training:
+  algorithm: xgboost
+  objective: binary:logistic
+  max_depth: 6
+  eta: 0.1
+  n_estimators: 400
+
+evaluation:
+  min_auc: 0.84
+  max_inference_latency_ms: 80
+
+registry:
+  model_name: churn-risk-model
+  stage_on_success: Staging
+```
+
+파라미터를 코드에서 분리해 설정 파일로 두면, 운영 변경을 코드 수정 없이 관리할 수 있습니다.
+
+## 파이프라인 품질 게이트
+
+- 입력 스키마 검증 실패 시 학습 단계로 진행하지 않습니다.
+- 평가 지표 기준 미달 시 레지스트리 등록을 차단합니다.
+- 재시도 횟수 초과 시 알림과 런북 링크를 함께 보냅니다.
+- 동일 입력 재실행 시 출력 일관성을 검증합니다.
+
+이 게이트가 있어야 파이프라인 자동화가 단순 스케줄러를 넘어 품질 방어선 역할을 합니다.
 
 ## 처음 질문으로 돌아가기
 

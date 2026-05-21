@@ -44,8 +44,6 @@ This is post 4 in the pytest 101 series.
 
 This picture places Understanding Fixtures inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Understanding Fixtures is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - Defining fixtures and injecting them into tests

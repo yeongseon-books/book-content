@@ -351,4 +351,6 @@ LangGraph를 처음 보면 `add_node()`와 `add_edge()` 같은 API가 먼저 눈
 
 ---
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/langgraph-101/ko/01-graph-basics)
+
 Tags: LangGraph, Agent, Python, LLM

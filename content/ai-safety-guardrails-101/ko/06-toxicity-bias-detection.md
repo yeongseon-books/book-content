@@ -181,6 +181,54 @@ if max(rates.values()) - min(rates.values()) > 0.1:
 
 대출 승인, 이력서 분류, 의료 triage 같은 시스템은 단순 독성 차단보다 공정성 평가가 더 중요할 수 있습니다. 기준은 준법팀과 함께 정해야 합니다.
 
+편향 측정 지표는 하나만 쓰기보다 여러 지표를 함께 보는 편이 안전합니다. 현업에서는 demographic parity 차이뿐 아니라 equal opportunity 차이도 같이 추적합니다.
+
+```python
+def tpr_by_group(y_true: list[int], y_pred: list[int], groups: list[str]) -> dict[str, float]:
+    out = {}
+    uniq = sorted(set(groups))
+    for g in uniq:
+        idx = [i for i, gg in enumerate(groups) if gg == g]
+        positives = [i for i in idx if y_true[i] == 1]
+        if not positives:
+            out[g] = 0.0
+            continue
+        tp = sum(1 for i in positives if y_pred[i] == 1)
+        out[g] = tp / len(positives)
+    return out
+
+
+def equal_opportunity_gap(y_true, y_pred, groups) -> float:
+    tprs = tpr_by_group(y_true, y_pred, groups)
+    return max(tprs.values()) - min(tprs.values()) if tprs else 0.0
+```
+
+예를 들어 채용 추천 모델에서 한 그룹의 TPR이 지속적으로 낮다면, 같은 역량의 후보가 덜 추천되는 구조적 문제가 있을 수 있습니다. 이런 격차는 단일 샘플 검토로는 발견이 어렵고 주기적 리포트가 필요합니다.
+
+### 정책 임계값은 코드로 관리하고 변경 이력을 남겨야 합니다
+
+독성 차단 정책은 운영 중 자주 조정됩니다. 이때 수동 수정만 반복하면 언제 왜 변경했는지 추적이 어렵습니다. YAML이나 JSON으로 정책을 버전 관리하면 회귀 분석이 쉬워집니다.
+
+```yaml
+toxicity_policy:
+  version: "2026-05-14"
+  thresholds:
+    toxicity: 0.85
+    severe_toxicity: 0.50
+    insult: 0.85
+    threat: 0.50
+  fallback_message: "요청을 처리할 수 없습니다. 표현을 바꿔 다시 시도해 주세요."
+  block_logging:
+    store_raw_text: false
+    store_hash: true
+    sample_for_review_percent: 3
+  escalation:
+    severe_toxicity: "human_review"
+    threat: "security_alert"
+```
+
+정책 파일에 버전을 넣으면 배포 시점별 차단율 변화, false positive 변화, 사용자 이의 제기 비율을 연결해 해석할 수 있습니다. guardrail도 결국 운영 소프트웨어이므로, 코드와 동일하게 변경 이력을 남기는 습관이 중요합니다.
+
 ### false positive를 주간 샘플링으로 추적합니다
 
 - **Sampling rate**: 1 to 5 percent of blocks chosen at random
@@ -249,5 +297,7 @@ if max(rates.values()) - min(rates.values()) > 0.1:
 
 - [출력 필터링과 콘텐츠 모더레이션](./03-output-filtering.md)
 - [운영 가드레일 시스템 구축](./10-production-guardrail-system.md)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-safety-guardrails-101/ko/06-toxicity-bias-detection)
 
 Tags: AI Safety, Toxicity, Bias, Fairness

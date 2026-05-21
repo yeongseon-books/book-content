@@ -40,10 +40,6 @@ seo_description: 모델 클래스를 완성하고 나면 가장 무거워 보이
 
 *LLM from Scratch 101 6장 흐름 개요*
 
-이 그림에서는 기울기로 배우기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 기울기로 배우기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 이 글이 중요한가
 
 학습 루프는 모델이 정적인 구조에서 동적인 학습 시스템으로 바뀌는 순간입니다. 앞선 글들에서 만든 임베딩, 어텐션, 블록, GPT 클래스가 모두 여기서 실제 숫자 업데이트로 연결됩니다. 즉, 이 글은 "구조 이해"에서 "모델 훈련"으로 넘어가는 경계선입니다.
@@ -346,5 +342,7 @@ for step in range(200):
 - [LLM API 프로덕션 101 — 재시도와 오류 처리](../../llm-api-production-101/ko/05-retry-and-error-handling.md)
 - [AI Agent 101 — Agent 평가](../../ai-agent-101/ko/07-agent-evaluation.md)
 - [LangGraph 101 — 상태와 체크포인트](../../langgraph-101/ko/02-state-and-checkpoints.md)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/llm-from-scratch-101/ko/06-training-loop)
 
 Tags: LLM, PyTorch, Transformer, Tutorial

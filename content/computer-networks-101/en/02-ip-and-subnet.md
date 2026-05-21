@@ -45,8 +45,6 @@ This is post 2 in the Computer Networks 101 series.
 
 This picture places IP and Subnet inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of IP and Subnet is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The difference between IPv4 and IPv6
@@ -59,8 +57,6 @@ This picture places IP and Subnet inside an operating flow. The point is not to 
 If you memorize an IP address as "the number for one machine", routing, NAT, and firewalls look like magic. Every network device actually splits the IP into a network part and a host part and decides where to forward based only on the network part. If you cannot read a subnet, cloud VPCs, Kubernetes network policies, and corporate firewall rules all become guessing games.
 
 > What a router sees is not the IP address but the network part of the IP address.
-
-## Concept at a Glance
 
 > An IP address is a 32-bit number (IPv4) or a 128-bit number (IPv6). The subnet mask is a ruler that says where the network part ends and the host part begins. CIDR (`/24`, `/16`, etc.) writes the length of that ruler in bits.
 

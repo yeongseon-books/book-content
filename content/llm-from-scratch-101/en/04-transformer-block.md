@@ -49,8 +49,6 @@ This is the 4th article in the LLM from Scratch 101 series.
 
 This picture places The Transformer Block: A Unit of Depth inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of The Transformer Block: A Unit of Depth is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## FeedForward is Just a 2-layer MLP
 
 Stacking only attention layers allows tokens to reference each other extensively, but the representational power doesn't grow as expected. Each position lacks sufficient non-linear transformation. To fix this, we add an MLP with the structure `Linear(C, 4C) -> GELU -> Linear(4C, C)` to every block.

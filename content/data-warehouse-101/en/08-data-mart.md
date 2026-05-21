@@ -42,7 +42,7 @@ In this post, we look at data marts as the layer that translates common warehous
 
 This picture places Data Mart inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Data Mart is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A data mart is a specialized warehouse for one department or purpose. The central definitions stay consistent; each mart adds only what it needs.
 
 ## Questions this article answers
 
@@ -66,7 +66,7 @@ A warehouse holds *org-wide common data*. But *sales, finance, and ops* speak *d
 
 > *Common in the warehouse, domain in the mart.*
 
-## Concept at a Glance
+This picture shows how a data mart fits between the central warehouse and specific teams. The key is not to memorize mart types, but to see how specialization coexists with centralized definitions.
 
 ## Key Terms
 

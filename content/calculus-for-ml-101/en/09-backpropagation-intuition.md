@@ -44,8 +44,6 @@ In this post, we'll use computation graphs, forward and backward passes, local d
 
 This picture places Backpropagation Intuition inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Backpropagation Intuition is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - Why can backpropagation compute gradients for so many weights in a single pass?
@@ -57,8 +55,6 @@ This picture places Backpropagation Intuition inside an operating flow. The poin
 ## Why It Matters
 
 *Frameworks* compute gradients for you, so understanding the *principle* enables *debugging*.
-
-## Concept at a Glance
 
 ## Key Terms
 

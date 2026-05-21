@@ -42,8 +42,6 @@ This is post 3 in the Linux CLI 101 series.
 
 This picture places Permissions and Ownership inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Permissions and Ownership is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 You try to run a script on a server with `./deploy.sh` and get "Permission denied". The file clearly exists — so why won't it run? Because the execute permission (x) is missing.

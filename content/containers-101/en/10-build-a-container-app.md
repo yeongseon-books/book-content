@@ -45,13 +45,13 @@ In this chapter, we assemble a FastAPI app and Postgres into one stack with Dock
 
 This picture places Build a Container App inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Build a Container App is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Building a container app means weaving together development, testing, registry push, orchestration, and observability into one reproducible pipeline.
 
 ## Why It Matters
 
 Every concept above only sticks once you *integrate* it into *one running result*. That is the meaning of this *final post*.
 
-## Concept at a Glance
+A container app lives in three places: source code + Dockerfile in version control; built image in a registry (tagged for traceability); running instance in an orchestrator (with volumes, network policy, and logging attached). Each stage moves the same artifact forward.
 
 ## Key Terms
 

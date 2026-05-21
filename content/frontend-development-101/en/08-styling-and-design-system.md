@@ -40,8 +40,6 @@ This is post 8 in the Frontend Development 101 series. Here we look at styling a
 
 This picture places Styling and Design Systems inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Styling and Design Systems is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - A *comparison* of styling approaches (global CSS, CSS Modules, CSS-in-JS, Tailwind)
@@ -56,8 +54,6 @@ This picture places Styling and Design Systems inside an operating flow. The poi
 Even with consistent code, *inconsistent design* makes users *uneasy*. Buttons that differ per page make a product feel *unfinished*. A design system is *consistency at team scale*.
 
 > A great design system gets *designers and engineers speaking the same language*.
-
-## Concept at a Glance
 
 ## Key Terms
 

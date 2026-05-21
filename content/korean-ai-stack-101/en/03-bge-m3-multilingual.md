@@ -40,8 +40,6 @@ This is the third post in the Korean AI Stack 101 series. Here, we use BGE-M3 to
 
 This picture places BGE-M3 multilingual embedding in practice inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of BGE-M3 multilingual embedding in practice is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 This post moves into a Korean retrieval scenario that is the daily reality at Korean companies: queries arrive in Korean, but a large fraction of the document corpus is written in English. The previous post used KoSimCSE on Korean-only short sentences. Here we use BGE-M3 on a mixed Korean-English corpus.

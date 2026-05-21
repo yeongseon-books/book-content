@@ -40,12 +40,9 @@ This is post 9 in the Machine Learning 101 series. Here we will connect confusio
 
 This picture places Model Evaluation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-
 ## Why It Matters
 
 Wrong metric, wrong decision. When business cost and metric drift apart, the model only looks good on paper.
-
-## Concept at a Glance
 
 ## Key Terms
 

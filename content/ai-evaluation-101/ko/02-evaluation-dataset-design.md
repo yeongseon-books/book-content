@@ -303,4 +303,6 @@ def load_eval_set(path: Path) -> list[EvalExample]:
 - [다음 글 — 결정적 지표 — Exact Match, BLEU, ROUGE](./03-deterministic-metrics.md)
 - [시리즈 현재 위치 다시 보기](./02-evaluation-dataset-design.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-evaluation-101/ko/02-evaluation-dataset-design)
+
 Tags: AI Evaluation, LLM, Dataset, Quality

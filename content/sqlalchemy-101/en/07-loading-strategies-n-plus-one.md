@@ -46,8 +46,6 @@ This is the 7th article in the SQLAlchemy 101 series.
 
 This picture places Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 Lazy loading makes ORM code readable. You write `user.orders` and SELECTs happen behind the scenes. That convenience often turns into a 50-100x SELECT explosion in production:

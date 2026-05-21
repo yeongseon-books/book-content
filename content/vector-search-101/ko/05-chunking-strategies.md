@@ -463,4 +463,6 @@ run_experiment(260)
 - [Chunking strategies for LLM applications — Pinecone](https://www.pinecone.io/learn/chunking-strategies/)
 - [Sentence Transformers pretrained models](https://www.sbert.net/docs/sentence_transformer/pretrained_models.html)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/vector-search-101/ko/05-chunking-strategies)
+
 Tags: Vector Search, FAISS, Embeddings, Python

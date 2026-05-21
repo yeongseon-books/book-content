@@ -42,8 +42,6 @@ This is the fourth post in the Git & GitHub 101 series. Here, we focus on creati
 
 This picture places Branch basics - create, switch, and compare inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Branch basics - create, switch, and compare is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 The real value of Git shows up the moment you have more than one thing in flight. If you need to work on a "login feature" and a "bug fix" in the same folder at the same time, zip backups and copy-pasted folders fall apart fast.

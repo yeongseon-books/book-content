@@ -38,10 +38,6 @@ last_reviewed: '2026-05-12'
 
 *Frontend Development 101 6장 흐름 개요*
 
-이 그림에서는 API 호출과 비동기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> API 호출과 비동기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 중요한가
 
 프론트엔드 버그의 큰 비중은 비동기 처리에서 나옵니다. 빠른 사내 와이파이에서는 잘 보이지 않다가 실제 사용자의 느린 네트워크에서만 터지는 경우가 많습니다. 그래서 비동기 로직은 낙관보다 명시적 상태 관리가 더 중요합니다.
@@ -208,6 +204,173 @@ function Users() {
 비동기는 결국 상태입니다. 이 관점이 잡히면 이제 사용자 입력을 받는 폼도 같은 방식으로 더 명확하게 읽을 수 있습니다.
 
 다음 글에서는 폼과 유효성 검사를 통해 사용자 입력을 안전하고 친절하게 다루는 방법을 살펴보겠습니다.
+
+
+## 실전 구현 확장: HTML/CSS/JS, 컴포넌트, 빌드 설정
+
+프론트엔드 글을 읽고 바로 실무에 연결하려면 이론 설명 뒤에 실행 가능한 구조를 붙여 보는 연습이 필요합니다. 핵심은 화면을 "보이는 결과"로만 다루지 않고, HTML 구조, CSS 토큰, JavaScript 상태, 컴포넌트 경계, 빌드 산출물까지 한 흐름으로 연결하는 것입니다. 이 흐름이 잡히면 기능 추가와 디버깅이 훨씬 예측 가능해집니다.
+
+### HTML 구조를 의미 단위로 나누기
+
+처음부터 시맨틱 태그를 사용하면 접근성과 유지보수 비용이 함께 좋아집니다.
+
+```html
+<main class="layout">
+  <header class="hero">
+    <h1>주문 대시보드</h1>
+    <p>오늘 처리 상태를 빠르게 확인합니다.</p>
+  </header>
+
+  <section aria-labelledby="summary-title" class="card">
+    <h2 id="summary-title">요약</h2>
+    <ul id="summary-list"></ul>
+  </section>
+
+  <section aria-labelledby="queue-title" class="card">
+    <h2 id="queue-title">대기 주문</h2>
+    <div id="queue-root"></div>
+  </section>
+</main>
+```
+
+`div`만으로도 화면은 만들 수 있지만, `header`, `section`, `h1~h2` 계층을 쓰면 스크린 리더 탐색과 테스트 선택자가 안정됩니다. 구조가 명확하면 팀 내 협업에서도 컴포넌트 경계가 자연스럽게 정리됩니다.
+
+### CSS를 토큰 중심으로 설계하기
+
+디자인 시스템이 작더라도 색상, 간격, 타이포그래피 토큰을 먼저 선언하면 변경 비용을 크게 줄일 수 있습니다.
+
+```css
+:root {
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --accent: #0f766e;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --radius-md: 12px;
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(180deg, #eef4ff 0%, var(--bg) 35%);
+  color: var(--text);
+  font-family: "Noto Sans KR", sans-serif;
+}
+
+.card {
+  background: var(--surface);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+```
+
+토큰 방식의 장점은 테마 변경, 브랜드 컬러 교체, 다크 테마 실험 시 영향 범위를 빠르게 파악할 수 있다는 점입니다. 임의 값 하드코딩이 늘어나면 작은 수정도 전체 회귀 테스트가 필요해집니다.
+
+### JavaScript 상태 흐름을 단방향으로 유지하기
+
+입문 단계부터 상태 갱신 규칙을 일정하게 가져가면 복잡한 프레임워크로 넘어가도 사고 비용이 낮습니다.
+
+```javascript
+const state = {
+  orders: [],
+  loading: false,
+  error: null,
+};
+
+async function loadOrders() {
+  setState({ loading: true, error: null });
+  try {
+    const res = await fetch("/api/orders?status=pending");
+    const data = await res.json();
+    setState({ orders: data.items, loading: false });
+  } catch (err) {
+    setState({ error: "주문 목록을 불러오지 못했습니다.", loading: false });
+  }
+}
+
+function setState(patch) {
+  Object.assign(state, patch);
+  render();
+}
+```
+
+`setState -> render` 규칙을 명시하면 상태 변경 지점을 추적하기 쉬워지고, 비동기 오류 처리도 일관되게 유지됩니다.
+
+### 컴포넌트 패턴: Presentational vs Container
+
+작은 프로젝트에서도 데이터 책임과 표현 책임을 분리해 두면 재사용성이 올라갑니다.
+
+```javascript
+function OrderList({ items }) {
+  return `
+    <ul>
+      ${items.map((o) => `<li>${o.id} - ${o.customer}</li>`).join("")}
+    </ul>
+  `;
+}
+
+async function OrderListContainer(root) {
+  root.innerHTML = "<p>불러오는 중...</p>";
+  const res = await fetch("/api/orders");
+  const data = await res.json();
+  root.innerHTML = OrderList({ items: data.items });
+}
+```
+
+- Presentational 컴포넌트는 입력 props를 받아 화면만 렌더링합니다.
+- Container 컴포넌트는 데이터 조회, 예외 처리, 로딩 상태를 담당합니다.
+
+이 분리는 테스트 단위를 명확히 만들어 줍니다. 화면 렌더링 테스트와 API 실패 테스트를 별도로 설계할 수 있기 때문입니다.
+
+### 빌드 설정 예시: Vite 기반 최소 구성
+
+빌드 도구는 복잡해 보이지만 기본 설정은 단순합니다. 중요한 것은 개발 서버와 운영 번들의 차이를 이해하는 것입니다.
+
+```ts
+// vite.config.ts
+import { defineConfig } from "vite";
+
+export default defineConfig({
+  server: {
+    port: 5173,
+  },
+  build: {
+    sourcemap: true,
+    target: "es2020",
+    outDir: "dist",
+  },
+});
+```
+
+```json
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "npm run build && npm run test"
+  }
+}
+```
+
+운영 이슈를 빠르게 추적하려면 `sourcemap` 유지 전략, 캐시 무효화 파일명(hash), 환경변수 주입 규칙(`import.meta.env`)을 함께 문서화해야 합니다.
+
+### 프런트엔드 품질을 좌우하는 검증 항목
+
+- 접근성: 버튼/입력 요소의 label과 키보드 포커스 경로 확인
+- 성능: 첫 렌더링 크기, 이미지 최적화, 코드 스플리팅 여부 확인
+- 안정성: 네트워크 실패 시 로딩/오류/재시도 UI 동작 확인
+- 유지보수: 컴포넌트 props 계약과 상태 변경 규칙 일관성 확인
+
+이 항목을 PR 체크리스트로 고정하면 "기능은 동작하지만 운영 품질이 낮은 화면"을 사전에 걸러낼 수 있습니다.
+
+### 실무 연결 포인트
+
+프론트엔드는 더 이상 단순 화면 기술이 아닙니다. API 계약, 번들 최적화, 브라우저 성능, 접근성, 운영 관측이 모두 만나는 실행 계층입니다. 따라서 작은 예제라도 HTML/CSS/JS 코드, 컴포넌트 패턴, 빌드 설정을 한 번에 다뤄 보는 연습이 필요합니다. 이 연습을 반복하면 도구가 바뀌어도 구조를 잃지 않고, 신규 기능을 추가할 때도 안정적으로 확장할 수 있습니다.
+
 
 ## 처음 질문으로 돌아가기
 

@@ -58,8 +58,6 @@ Picking the *wrong signal* makes cost *explode* and answers *vanish*. Knowing th
 
 > *One right signal beats *ten wrong dashboards*.*
 
-## Concept at a Glance
-
 Observability is the ability to understand a system's internal state from external signals. In a distributed system, you cannot instrument every line of code. You rely on *metrics* (what happened), *logs* (why it happened), and *traces* (where it happened).
 
 ## Key Terms

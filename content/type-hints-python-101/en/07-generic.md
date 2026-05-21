@@ -41,8 +41,6 @@ This is post 7 in the Type Hints in Python 101 series. In this article, we will 
 
 This picture places Understanding Generics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Understanding Generics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - TypeVar definition and usage
@@ -57,8 +55,6 @@ Libraries and utility functions often need to work with multiple types. `Any` di
 > Generic = parameterize types so the type checker can track them.
 
 The same concept exists in Java, TypeScript, Rust, and Go.
-
-## Concept at a Glance
 
 > Generic declares a type variable and uses it in function or class signatures. The concrete type is determined at the call site.
 

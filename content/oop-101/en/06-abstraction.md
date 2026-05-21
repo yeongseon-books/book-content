@@ -40,8 +40,6 @@ In Python, abstraction is not mainly about sounding theoretical. It is about dec
 
 This picture places Abstraction inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Abstraction is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What This Article Tries to Solve
 
 > Abstraction is not the act of removing implementation details. It is the act of making the minimum shared contract explicit before a workflow starts spreading across multiple classes.

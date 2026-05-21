@@ -296,4 +296,6 @@ agent 평가는 단순한 정답 채점이 아닙니다. 어떤 도구를 어떤
 - [AI Evaluation 101](../../ai-evaluation-101/ko/01-why-evaluate-llm-apps.md)
 - [LangGraph 101 - trajectory와 상태 추적](../../langgraph-101/ko/02-state-and-checkpoints.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-agent-101/ko/07-agent-evaluation)
+
 Tags: AI Agent, LLM, Tool Use, Python

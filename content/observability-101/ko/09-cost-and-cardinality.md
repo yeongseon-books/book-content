@@ -50,6 +50,17 @@ last_reviewed: '2026-05-15'
 
 이 글의 핵심은 비용을 줄이자는 데만 있지 않습니다. 더 중요한 것은 비용을 예측 가능하게 만드는 일입니다. 어떤 라벨이 위험한지, 어떤 데이터는 오래 보관할 가치가 있는지, 어떤 트레이스만 남겨도 충분한지 기준이 있어야 운영이 흔들리지 않습니다.
 
+### 관측 비용 구성
+
+관측성 비용은 세 단계로 나눌 수 있습니다. 각 단계마다 비용 동인이 다르고 절감 전략도 다릅니다.
+
+| 비용 구성 | 비용 동인 | 절감 전략 |
+|---|---|---|
+| 수집 | 측정 포인트 수, 스크레이프 빈도, 네트워크 비용 | 수집 주기 늘리기, 불필요한 라벨 제거, 샘플링 |
+| 저장 | 데이터 크기, 보존 기간, 복제본 수 | 보존 계층 분리, 집계, 압축 |
+| 질의 | 시계열 수, 쿼리 복잡도, 시간 범위 | 카디널리티 통제, 그룹 함수 최소화, 인덱스 최적화 |
+
+수집 비용은 주로 네트워크 대역폭과 수집기 CPU에서 나오고, 저장 비용은 디스크 크기와 보조로 메모리나 CPU를 쓰며, 질의 비용은 카디널리티가 높을수록 급증합니다. 클라우드 환경에서는 저장과 질의 비용이 가장 크게 나타나므로 이 두 영역을 먼저 통제하는 편이 좋습니다.
 ## 한눈에 보는 구조
 
 관측성 비용은 수집, 저장, 질의 세 단계에서 발생합니다. 카디널리티가 높으면 저장 크기와 질의 시간이 급증하므로, 처음부터 통제해야 합니다.
@@ -130,6 +141,30 @@ trace:   <= Z traces per minute after sampling
 
 비용은 팀의 책임이어야 합니다. 신호별 상한선을 정해 두면 데이터 설계가 훨씬 신중해지고, 청구서가 나오기 전에 위험을 조정할 수 있습니다.
 
+### 라벨 설계 원칙
+
+메트릭 라벨은 카디널리티를 결정하는 가장 강력한 요인입니다. 아래 다섯 가지 원칙을 지키면 비용 폭발을 크게 줄일 수 있습니다.
+
+**1. 유한한 차원만 사용**
+
+라벨은 가능한 값의 수가 제한되어야 합니다. `method`, `status`, `path`, `environment`처럼 고정된 집합만 허용하고, `user_id`, `request_id`, `session_id`처럼 무한히 커지는 값은 피합니다.
+
+**2. 고카디널리티 차원은 로그로**
+
+사용자 식별자, 요청 ID, IP 주소처럼 개별 값을 추적해야 하는 경우는 메트릭이 아니라 로그에 남깁니다. 메트릭은 집계 데이터로 제한하고, 개별 요청은 로그나 트레이스에서 찾습니다.
+
+**3. 경로는 패턴으로 묶기**
+
+`path` 라벨은 동적 경로를 그대로 넣으면 안 됩니다. `/users/123`과 `/users/456`은 모두 `/users/:id`로 정규화해야 합니다. 경로 패턴을 정해 두면 엔드포인트 수가 제한됩니다.
+
+**4. 환경과 지역은 최상위로**
+
+`environment`, `region`, `cluster`처럼 전체 시스템을 가르는 라벨은 가장 바깥쪽에 놓는 편이 좋습니다. 이 차원은 보통 개수가 적고, 질의에서 필터로 자주 쓰이며, 상황에 따라 수집기 레벨에서 분리할 수도 있습니다.
+
+**5. 라벨 수는 5개 이하로**
+
+하나의 메트릭에 라벨이 많아질수록 카디널리티는 곱셈으로 커집니다. 3개 라벨을 기본으로 하고, 5개를 넘지 않도록 제한하면 폭발을 예방할 수 있습니다.
+
 ## 비용 점검은 이렇게 시작합니다
 
 카디널리티 문제는 청구서가 나온 뒤에 보는 것보다, 시계열 상위 항목을 주기적으로 확인하는 편이 훨씬 낫습니다.
@@ -145,6 +180,54 @@ Expected output:
 - path, status 같은 유한 라벨은 유지하고 user_id, request_id 같은 라벨은 제거해야 할지 판단할 수 있습니다.
 - 팀별 예산선을 넘는 경우 즉시 라벨 축소나 보존 정책 조정을 논의할 수 있습니다.
 ```
+
+### 카디널리티 측정 예제
+
+현재 시스템의 카디널리티를 측정하는 Python 예시입니다.
+
+```python
+from collections import Counter
+from typing import List, Dict
+
+def measure_cardinality(metrics: List[Dict[str, str]]) -> Dict[str, int]:
+    """
+    메트릭 라벨 조합의 고유값 개수 계산
+    metrics: [{"__name__": "http_requests", "method": "GET", "status": "200"}, ...]
+    """
+    unique_series = set()
+    label_values = Counter()
+    
+    for metric in metrics:
+        # 라벨 조합을 문자열로 변환해 고유 시계열 계산
+        series_key = ",".join(
+            f"{k}={v}" for k, v in sorted(metric.items())
+        )
+        unique_series.add(series_key)
+        
+        # 각 라벨의 고유값 수 카운트
+        for key, value in metric.items():
+            if key != "__name__":
+                label_values[key] += 1
+    
+    return {
+        "total_series": len(unique_series),
+        "label_value_count": dict(label_values),
+        "avg_labels_per_series": sum(label_values.values()) / len(unique_series)
+    }
+
+# 예시 사용
+metrics_sample = [
+    {"__name__": "http_requests", "method": "GET", "status": "200", "path": "/api"},
+    {"__name__": "http_requests", "method": "POST", "status": "200", "path": "/api"},
+    {"__name__": "http_requests", "method": "GET", "status": "500", "path": "/api"},
+]
+
+result = measure_cardinality(metrics_sample)
+print(f"Total series: {result['total_series']}")
+print(f"Label value count: {result['label_value_count']}")
+```
+
+이 코드는 라벨 조합의 고유값 개수를 측정합니다. 실제로는 Prometheus의 `count({__name__=~".+"})` 쿼리를 주기적으로 돌려서 카디널리티를 추적하는 편이 실용적입니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 
@@ -182,6 +265,54 @@ Expected output:
 ## 정리
 
 관측성 비용은 갑자기 커지는 것처럼 보여도, 실제로는 라벨 설계와 보존 정책, 샘플링 전략이 만든 결과인 경우가 많습니다. 비용을 예측 가능하게 만들면 관측성은 부담이 아니라 장기 자산이 됩니다. 마지막 글에서는 지금까지의 내용을 묶어 작은 팀이 실제로 운영 가능한 관측성 스택을 어떻게 꾸릴지 정리하겠습니다.
+
+## 카디널리티 폭발 사례
+
+카디널리티 문제는 개념으로는 간단하지만 실제 장애로 이어질 때 체감이 큽니다. 아래는 자주 발생하는 세 가지 사례입니다.
+
+| 사례 | 문제 라벨 | 결과 | 권장 대체 |
+| --- | --- | --- | --- |
+| 사용자 식별자 라벨링 | `user_id` | 사용자 수만큼 시계열 증가 | 로그 필드로 이동 |
+| 요청 ID 라벨링 | `request_id` | 요청량만큼 시계열 증가 | 트레이스 속성으로 이동 |
+| 원본 URL 라벨링 | `path=/orders/123` | 경로 조합 폭발 | `/orders/:id` 정규화 |
+
+라벨은 필터 기준이면서 저장 키입니다. "검색 편하겠다"는 이유로 식별자를 라벨에 넣으면 저장소는 사실상 사용자 테이블을 시계열로 복제하는 셈이 됩니다. 비용뿐 아니라 질의 지연, 컴팩션 시간, 백업 시간까지 함께 악화됩니다.
+
+## 비용 최적화 전략 표
+
+| 전략 | 적용 대상 | 기대 효과 | 주의점 |
+| --- | --- | --- | --- |
+| 라벨 축소 | 메트릭 | 시계열 수 즉시 감소 | 운영 분석 축을 과도하게 제거하지 않기 |
+| 보존 계층화 | 메트릭/로그 | 장기 저장 비용 감소 | 규정상 보관 의무 확인 |
+| 샘플링 | 트레이스/로그 | 저장량 감소 | 희귀 케이스 누락 방지 정책 필요 |
+| 로그 본문 절제 | 로그 | 수집/인덱스 비용 감소 | 디버깅 최소 필드 유지 |
+| 질의 캐시 | 대시보드 | 질의 CPU 절감 | 실시간성이 필요한 패널은 예외 처리 |
+
+비용 최적화는 한 번의 대청소보다 "기본 정책"으로 유지하는 편이 낫습니다. 신규 메트릭 PR에서 라벨 검토를 필수화하고, 월간 비용 리뷰에서 상위 지표를 자동 리포트하면 재발을 크게 줄일 수 있습니다.
+
+## 라벨 검토용 Python 도우미
+
+```python
+FORBIDDEN_LABEL_KEYS = {"user_id", "request_id", "session_id", "email"}
+
+
+def validate_metric_labels(metric_name: str, labels: dict[str, str]) -> list[str]:
+    errors: list[str] = []
+    for key, value in labels.items():
+        if key in FORBIDDEN_LABEL_KEYS:
+            errors.append(f"{metric_name}: forbidden label key '{key}'")
+        if len(value) > 64:
+            errors.append(f"{metric_name}: label '{key}' value too long")
+        if "/" in value and key == "path" and any(ch.isdigit() for ch in value):
+            errors.append(f"{metric_name}: path label appears unnormalized '{value}'")
+    return errors
+
+
+example = {"path": "/orders/12345", "status": "200"}
+print(validate_metric_labels("http_requests_total", example))
+```
+
+이런 도우미를 테스트나 CI에 붙이면 카디널리티 폭발을 사전에 차단할 수 있습니다. 비용 문제는 사후 대응보다 사전 차단이 훨씬 저렴합니다.
 
 ## 처음 질문으로 돌아가기
 

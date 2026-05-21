@@ -50,8 +50,6 @@ A *fix after publish* is far more expensive than a *check before publish*.
 
 > Mental model: the final pass is an operating routine for titles, links, code, visuals, and follow-up.
 
-## Concept at a Glance
-
 A pre-publish checklist is not perfectionism; it is cost control. One round of automated checks plus one round of human review can catch broken links, stale commands, missing captions, and edge cases before real readers encounter them.
 ## Key Terms
 

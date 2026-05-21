@@ -40,15 +40,11 @@ This is post 2 in the Backend Development 101 series. Here, we start from the fa
 
 This picture places Building an HTTP Server inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Building an HTTP Server is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Once you have *seen* what frameworks hide, every future debugging session gets faster. Without it, you guess at why a status code looks wrong or why a header is missing.
 
 > Frameworks are convenient, but seniors know what is *behind* the framework.
-
-## Concept at a Glance
 
 Both request and response are just *blocks of text*.
 

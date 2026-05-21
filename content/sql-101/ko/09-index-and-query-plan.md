@@ -70,6 +70,148 @@ last_reviewed: '2026-05-15'
 
 예를 들어 `(user_id, created_at)` 인덱스는 보통 `user_id`를 먼저 좁히는 쿼리에 잘 맞습니다. 컬럼 순서는 단순 장식이 아니라 사용 패턴과 직결됩니다.
 
+## 인덱스 유형 비교
+
+인덱스는 B-tree만 있는 것이 아닙니다. 데이터 특성과 조회 패턴에 따라 다른 유형이 더 적합할 수 있습니다.
+
+| 인덱스 유형 | 주 용도 | 장점 | 단점 |
+| --- | --- | --- | --- |
+| B-tree | 동등/범위 비교, 정렬 | 가장 범용적 | 매우 긴 텍스트는 비효율적 |
+| Hash | 동등 비교만 | 조회 매우 빠름 | 범위 검색, 정렬 불가 |
+| GIN | 전문 검색, JSON, 배열 | 복합 데이터 검색 | 빌드 비용 높음 |
+| GiST | 기하, 범위 검색 | 확장 가능한 프레임워크 | B-tree보다 느림 |
+
+PostgreSQL의 기본 인덱스는 B-tree입니다. 대부분의 조회는 B-tree로 충분하지만, 전문 검색이나 JSON 필드 검색이 필요하면 GIN을 고려해야 합니다.
+
+```sql
+-- B-tree (기본)
+CREATE INDEX idx_users_email ON users (email);
+
+-- GIN (JSONB 검색)
+CREATE INDEX idx_metadata ON logs USING GIN (metadata);
+
+-- Hash (동등 비교 전용)
+CREATE INDEX idx_hash ON users USING HASH (email);
+```
+
+인덱스 유형은 `USING` 키워드로 명시합니다. 생략하면 B-tree가 기본값입니다.
+
+## CREATE INDEX 예제 + EXPLAIN 출력
+
+인덱스를 만들기 전과 후의 실행 계획을 비교하면 인덱스의 효과를 명확히 확인할 수 있습니다.
+
+### 인덱스 없이
+
+```sql
+EXPLAIN SELECT * FROM orders WHERE user_id = 42;
+```
+
+**Expected output:**
+
+```text
+Seq Scan on orders  (cost=0.00..1850.00 rows=50 width=128)
+  Filter: (user_id = 42)
+```
+
+전체 테이블을 스캔하며 조건에 맞는 행을 걸러냅니다. 행이 많아지면 비용이 선형적으로 증가합니다.
+
+### 인덱스 추가 후
+
+```sql
+CREATE INDEX idx_orders_user_id ON orders (user_id);
+
+EXPLAIN SELECT * FROM orders WHERE user_id = 42;
+```
+
+**Expected output:**
+
+```text
+Index Scan using idx_orders_user_id on orders  (cost=0.29..12.50 rows=50 width=128)
+  Index Cond: (user_id = 42)
+```
+
+인덱스를 타면서 `user_id=42` 조건에 맞는 행만 바로 찾습니다. 비용이 1850에서 12.5로 크게 줄었습니다.
+
+## 인덱스를 걸지 말아야 할 때
+
+인덱스는 읽기 성능을 올려 주지만, 모든 열에 무조건 걸면 오히려 해가 될 수 있습니다. 다음 상황에서는 인덱스 추가를 신중히 검토해야 합니다.
+
+### 1. 선택도가 매우 낮을 때
+
+대부분의 행이 조건을 통과하면 인덱스 스캔이 순차 스캔보다 느릴 수 있습니다.
+
+```sql
+-- 전체 사용자의 95%가 활성 상태라면
+SELECT * FROM users WHERE is_active = true;
+-- 인덱스를 타도 거의 모든 행을 읽어야 하므로 효과가 작음
+```
+
+### 2. 테이블이 매우 작을 때
+
+행이 몇백 개 이하라면 순차 스캔도 충분히 빠를 수 있습니다. 인덱스 관리 비용이 오히려 부담이 될 수 있습니다.
+
+### 3. 쓰기 빈도가 매우 높을 때
+
+로그 테이블처럼 초당 수천 건씩 INSERT되는 테이블에는 인덱스 갱신 비용이 큰 부담이 됩니다. 조회가 드물다면 인덱스를 최소화하는 편이 낫습니다.
+
+### 4. 열 값의 종류가 매우 적을 때 (Cardinality가 낮을 때)
+
+```sql
+-- is_deleted가 true/false 두 가지밖에 없다면
+CREATE INDEX idx_is_deleted ON users (is_deleted); -- 효과가 작음
+```
+
+값의 종류가 적으면 인덱스로 분류하는 효과가 작습니다. 이런 경우 부분 인덱스를 고려하거나, 인덱스를 아예 만들지 않는 편이 나을 수 있습니다.
+
+**인덱스 계획 체크리스트:**
+
+- [ ] 조회 빈도 > 쓰기 빈도
+- [ ] 선택도가 충분히 높음 (조건이 행을 잘 걸러냄)
+- [ ] 테이블 크기가 충분히 큼
+- [ ] 열의 Cardinality가 충분히 높음
+
+## EXPLAIN ANALYZE 읽는 법
+
+`EXPLAIN`은 계획만 보여 주지만, `EXPLAIN ANALYZE`는 실제로 실행하고 실제 시간과 행 수를 함께 보여 줍니다.
+
+```sql
+EXPLAIN ANALYZE
+SELECT u.name, COUNT(o.id) AS order_count
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id
+GROUP BY u.id, u.name;
+```
+
+**Expected output:**
+
+```text
+HashAggregate  (cost=2850.00..2950.00 rows=10000 width=40) (actual time=45.123..46.234 rows=10000 loops=1)
+  Group Key: u.id, u.name
+  ->  Hash Left Join  (cost=1200.00..2700.00 rows=50000 width=36) (actual time=12.345..38.567 rows=50000 loops=1)
+        Hash Cond: (u.id = o.user_id)
+        ->  Seq Scan on users u  (cost=0.00..450.00 rows=10000 width=32) (actual time=0.012..5.678 rows=10000 loops=1)
+        ->  Hash  (cost=850.00..850.00 rows=50000 width=8) (actual time=12.123..12.123 rows=50000 loops=1)
+              Buckets: 65536  Batches: 1  Memory Usage: 2048kB
+              ->  Seq Scan on orders o  (cost=0.00..850.00 rows=50000 width=8) (actual time=0.034..6.789 rows=50000 loops=1)
+Planning Time: 0.456 ms
+Execution Time: 46.789 ms
+```
+
+### 읽는 순서
+
+1. **가장 들여쓴 노드부터** 읽습니다 (아래에서 위로)
+2. **actual time**: 실제 실행 시간 (ms)
+3. **rows**: 예상 vs 실제 행 수 비교
+4. **loops**: 해당 노드가 몇 번 반복됐는지
+
+### 주의할 지표
+
+- **예상 행 수 vs 실제 행 수**: 크게 차이 나면 통계 정보 갱신 필요
+- **loops 값이 큼**: 중첩 루프가 비효율적일 가능성
+- **Seq Scan이 긴 시간**: 인덱스 추가 검토
+- **Hash Join의 Batches > 1**: 메모리 부족, work_mem 조정 고려
+
+`EXPLAIN ANALYZE`는 실제로 쿼리를 실행하므로, UPDATE/DELETE같은 변경 작업에는 주의해서 사용해야 합니다. 테스트 환경이나 트랜잭션 안에서 실행하는 편이 안전합니다.
 ## 다섯 단계로 보는 튜닝 흐름
 
 ### 1단계 — 계획만 먼저 보기

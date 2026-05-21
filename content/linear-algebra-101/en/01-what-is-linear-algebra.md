@@ -40,7 +40,7 @@ This is the first post in the Linear Algebra 101 series. Here we will treat line
 
 This picture places What Is Linear Algebra? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is Linear Algebra? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Linear algebra is not a bag of calculations. It is a language for expressing space with coordinates and turning geometric rules into computation.
 
 ## Questions This Post Answers
 
@@ -56,8 +56,6 @@ This picture places What Is Linear Algebra? inside an operating flow. The point 
 In machine learning, input data arrives as vectors, parameters live in matrices, and an entire layer is usually a linear transformation followed by a nonlinearity. Recommender systems, graphics, and signal processing are not all the same field, but they keep returning to the same vector-and-matrix grammar.
 
 If your linear algebra intuition is weak, the inside of a model stays opaque. Once you can read what a vector stores, what a matrix compresses, and why multiplication depends on order, the notation stops feeling like decoration and starts revealing structure.
-
-## Concept at a Glance
 
 ## Key Terms
 

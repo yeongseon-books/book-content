@@ -413,4 +413,6 @@ Request Lifecycle을 단계별로 이해하면 장애 대응의 출발점이 분
 
 ---
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-app-service-101/ko/02-request-lifecycle)
+
 Tags: Azure, App Service, Cloud, Web Apps

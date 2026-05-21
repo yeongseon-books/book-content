@@ -42,8 +42,6 @@ This is post 8 in the Alembic 101 series. Here we will separate reversible from 
 
 This picture places Downgrade strategy: when to write it for real and when to forbid it inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Downgrade strategy: when to write it for real and when to forbid it is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 When you first learn alembic, downgrade looks like an obvious built-in feature. In real production, it is rarely used and frequently dangerous. But leaving it as an empty function is not the right answer either. "How do we handle downgrade" is an operational policy decision, and that policy should be expressed explicitly in code.

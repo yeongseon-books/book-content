@@ -36,10 +36,6 @@ seo_description: 임베딩 비교는 높은 점수 하나보다 유사 문장과
 
 *Korean AI Stack 101 1장 흐름 개요*
 
-이 그림에서는 한국어 임베딩 모델 비교 — KoSimCSE, BGE-M3, Solar를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 한국어 임베딩 모델 비교 — KoSimCSE, BGE-M3, Solar의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 핵심 흐름
 
 ---
@@ -469,5 +465,7 @@ mixed min= 0.411 p50= 0.503 max= 0.588
 - [jhgan/ko-sbert-nli](https://huggingface.co/jhgan/ko-sbert-nli)
 - [sentence-transformers/all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)
 - [Upstage Solar documentation](https://developers.upstage.ai/docs/getting-started/overview)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/korean-ai-stack-101/ko/01-korean-embedding-models)
 
 Tags: Korean NLP, LLM, Embeddings, OCR

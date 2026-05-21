@@ -45,8 +45,6 @@ This is post 6 in the Database Systems 101 series.
 
 This picture places Isolation Levels inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Isolation Levels is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The four classic concurrency anomalies
@@ -59,8 +57,6 @@ This picture places Isolation Levels inside an operating flow. The point is not 
 Without isolation knowledge, half of "we cannot reproduce this bug" tickets stay unexplained. A payment is charged twice, a balance goes negative, the same order is created twice — these are isolation problems. And almost none of them show up in unit tests.
 
 > Concurrency bugs hide in calm weather and hit you at the worst possible moment.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR

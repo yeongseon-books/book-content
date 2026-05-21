@@ -45,13 +45,13 @@ In this chapter, we define a container as an isolated process tree sharing the h
 
 This picture places What is a Container? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What is a Container? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> The real question is: which parts are shared with the host kernel, which parts are isolated, and what happens when that isolation breaks.
 
 ## Why It Matters
 
 Since 2013, the container has been the default unit of deployment. Without it, modern DevOps is closed off to you.
 
-## Concept at a Glance
+A container is a process tree isolated by namespaces (PID, network, filesystem, IPC) and constrained by cgroups. They share the host kernel but not the OS image or process visibility.
 
 ## Key Terms
 

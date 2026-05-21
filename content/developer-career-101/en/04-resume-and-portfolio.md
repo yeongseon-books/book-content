@@ -41,7 +41,7 @@ This is post 4 in the Developer Career 101 series.
 
 This picture places Resume and Portfolio inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Resume and Portfolio is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A resume and portfolio speak not to your technology list, but to the size of problems you solved and what you learned in solving them.
 
 ## What You Will Learn
 
@@ -55,7 +55,7 @@ This picture places Resume and Portfolio inside an operating flow. The point is 
 
 A resume is the ticket into the interview.
 
-## Concept at a Glance
+Your evidence is strongest when it shows the scope you handled and what you learned, not the technology you used.
 
 ## Key Terms
 

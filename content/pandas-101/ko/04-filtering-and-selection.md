@@ -105,6 +105,20 @@ print(df.iloc[0:2, 0])
 
 `iloc`는 순수하게 위치만 중요할 때 쓰면 됩니다. 슬라이싱 감각은 파이썬 리스트와 비슷하지만, 이름이 아닌 위치를 쓴다는 점을 잊지 않아야 합니다.
 
+## 인덱싱 방법 비교
+
+Pandas는 다양한 인덱싱 방법을 제공합니다. 각 방법의 용도와 특성을 이해하면 상황에 맞는 도구를 선택할 수 있습니다.
+
+| 방법 | 용도 | 속도 |
+| --- | --- | --- |
+| `[]` | 열 선택, 조건 필터링 | 빠름 |
+| `.loc` | 레이블 기반 선택, 할당 | 보통 |
+| `.iloc` | 위치 기반 선택 | 빠름 |
+| `.at` | 단일 셀 레이블 접근 | 매우 빠름 |
+| `.iat` | 단일 셀 위치 접근 | 매우 빠름 |
+
+대부분 상황에서 `loc`와 `iloc`만으로 충분하지만, 반복문 안에서 단일 값에 접근할 때는 `.at`과 `.iat`이 성능 측면에서 유리합니다.
+
 ### 4단계 - 조건으로 고르기
 
 ```python
@@ -136,6 +150,39 @@ c  3  30
 
 조건이 길어지면 `query`가 가독성을 높여 줄 수 있습니다. 특정 값 집합을 기준으로 고를 때는 `isin`이 긴 OR 체인보다 낫습니다.
 
+## Boolean Indexing 상세
+
+불리언 인덱싱은 Pandas에서 가장 자주 쓰는 패턴 중 하나입니다. 조건식을 명확하게 작성하는 법을 익히면 코드 가독성이 크게 높아집니다.
+
+### 단일 조건
+
+```python
+df = pd.DataFrame({"x": [1, 2, 3], "y": [10, 20, 30]})
+mask = df["x"] > 1
+print(mask)
+print(df[mask])
+```
+
+조건식 `df["x"] > 1`은 불리언 Series를 반환합니다. 이 Series를 DataFrame에 다시 적용하면 True인 행만 남습니다.
+
+### 복수 조건
+
+```python
+result = df[(df["x"] > 1) & (df["y"] < 30)]
+print(result)
+```
+
+여러 조건을 합칠 때는 반드시 괄호로 각 조건을 감싸야 합니다. `and`/`or` 대신 `&`/`|`를 써야 하는 점도 주의하세요.
+
+### 부정 조건
+
+```python
+not_match = df[~(df["x"] > 1)]
+print(not_match)
+```
+
+`~` 연산자로 조건을 반전시킬 수 있습니다. 이는 "특정 조건을 만족하지 않는 행"을 골라낼 때 유용합니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - `loc`는 끝점을 포함하고 `iloc`는 끝점을 제외합니다.
@@ -162,12 +209,196 @@ c  3  30
 - `isin`, `between` 같은 도구로 코드를 줄입니다.
 - 경고를 무시하지 않습니다.
 
+## MultiIndex
+
+MultiIndex는 행이나 열에 여러 레벨의 인덱스를 설정하는 기능입니다. 계층적 데이터를 다룰 때 특히 유용합니다.
+
+### MultiIndex 생성
+
+```python
+index = pd.MultiIndex.from_tuples([
+    ("A", 1),
+    ("A", 2),
+    ("B", 1),
+    ("B", 2),
+], names=["category", "id"])
+df = pd.DataFrame({"value": [10, 20, 30, 40]}, index=index)
+print(df)
+```
+
+**예상 출력:**
+
+```text
+               value
+category id       
+A        1       10
+         2       20
+B        1       30
+         2       40
+```
+
+계층적 구조를 가진 데이터를 나타내기에 적합합니다. 예를 들어 도시별, 날짜별 집계 결과를 표현할 때 유용합니다.
+
+### MultiIndex 접근
+
+```python
+print(df.loc["A"])
+print(df.loc[("A", 1)])
+```
+
+MultiIndex는 튜플을 키로 사용하거나, 첫 번째 레벨만으로 접근할 수 있습니다. 이 기능은 groupby 결과를 다룰 때도 자주 등장합니다.
+
+### 평탄화
+
+```python
+flat = df.reset_index()
+print(flat)
+```
+
+MultiIndex를 일반 컴럼으로 변환할 때는 `reset_index()`를 사용합니다. 이렇게 하면 인덱스가 컴럼으로 이동하고, 새 정수 인덱스가 생성됩니다.
+
 ## 체크리스트
 
 - [ ] `loc`와 `iloc`를 구분할 수 있습니다.
 - [ ] 여러 조건을 괄호와 `&/|`로 표현할 수 있습니다.
 - [ ] 체이닝 인덱싱을 피해야 하는 이유를 알고 있습니다.
 - [ ] `query`와 `isin`의 용도를 설명할 수 있습니다.
+
+## 실전 예제: 조건별 데이터 분할
+
+실무에서는 조건에 따라 데이터를 나누어 처리하는 경우가 많습니다.
+
+```python
+df = pd.DataFrame({
+    "user_id": [1, 2, 3, 4, 5],
+    "age": [25, 35, 45, 55, 65],
+    "purchase": [100, 200, 150, 300, 250],
+})
+
+# 연령대별 분할
+young = df[df["age"] < 40]
+middle = df[(df["age"] >= 40) & (df["age"] < 60)]
+senior = df[df["age"] >= 60]
+
+print(f"Young: {len(young)}, Middle: {len(middle)}, Senior: {len(senior)}")
+print(f"Young avg purchase: {young['purchase'].mean()}")
+```
+
+이런 분할은 A/B 테스트, 코호트 분석, 세그먼트별 지표 계산에서 자주 사용됩니다.
+
+## 성능 팁
+
+선택 연산의 성능을 최적화하는 방법을 알아두면 대용량 데이터에서 유리합니다.
+
+### Boolean indexing vs query
+
+```python
+# Boolean indexing - 빠름
+result1 = df[(df["x"] > 10) & (df["y"] < 50)]
+
+# query - 긴 조건에서 가독성 좋음
+result2 = df.query("x > 10 and y < 50")
+```
+
+단순 조건은 boolean indexing이 빠르지만, 복잡한 조건은 query가 읽기 좋습니다.
+
+
+## 성능 최적화 팁
+
+대용량 데이터를 다룰 때는 선택 연산의 성능이 중요합니다.
+
+### at/iat 활용
+
+```python
+# Slow
+for i in range(len(df)):
+    value = df.loc[i, "column"]
+    
+# Fast  
+for i in range(len(df)):
+    value = df.iat[i, 0]
+```
+
+단일 값 접근에서는 at/iat이 훨씬 빠릅니다.
+
+### 벡터화 우선
+
+```python
+# Slow - apply
+df["result"] = df["x"].apply(lambda x: x * 2 if x > 10 else x)
+
+# Fast - vectorized
+df["result"] = df["x"].where(df["x"] <= 10, df["x"] * 2)
+```
+
+가능하면 apply 대신 벡터화 연산을 사용하세요.
+
+
+
+
+### 체이닝 인덱싱 경고 해결
+
+```python
+# Bad - 경고 발생
+df[df["x"] > 0]["y"] = 100
+
+# Good - loc 사용
+df.loc[df["x"] > 0, "y"] = 100
+
+# Good - copy 명시
+subset = df[df["x"] > 0].copy()
+subset["y"] = 100
+```
+
+loc를 사용하거나 명시적 복사본을 만드는 것이 안전합니다.
+
+
+
+## 고급 인덱싱 패턴
+
+### 크로스 섹션
+
+```python
+# MultiIndex에서 특정 레벨 선택
+result = df.xs("A", level="category")
+print(result)
+```
+
+### IndexSlice
+
+```python
+idx = pd.IndexSlice
+result = df.loc[idx["A":"B", 1:2], :]
+print(result)
+```
+
+MultiIndex를 다룰 때 IndexSlice를 사용하면 슬라이싱이 더 직관적입니다.
+
+
+
+MultiIndex는 복잡해 보이지만, 계층적 데이터를 표현하는 강력한 도구입니다. groupby 결과도 종종 MultiIndex를 반환합니다.
+
+
+## 인덱싱 성능 비교
+
+인덱싱 방법에 따라 속도 차이가 발생합니다. 대량 데이터에서는 이 차이가 더 두드러집니다.
+
+```python
+import time
+
+df = pd.DataFrame({"x": range(100000)})
+start = time.time()
+for i in range(1000):
+    val = df.loc[i, "x"]
+print(f".loc 소요 시간: {time.time() - start:.4f}초")
+
+start = time.time()
+for i in range(1000):
+    val = df.at[i, "x"]
+print(f".at 소요 시간: {time.time() - start:.4f}초")
+```
+
+`.at`은 단일 값 접근에 최적화되어 있어 `.loc`보다 빠릅니다. 반복문 안에서 단일 값을 읽을 때는 `.at`을 우선하세요.
 
 ## 연습 문제
 

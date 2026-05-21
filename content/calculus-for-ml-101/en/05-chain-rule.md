@@ -44,8 +44,6 @@ In this post, we'll use outer and inner functions, stage-by-stage derivatives, a
 
 This picture places Chain Rule inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Chain Rule is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - When one function is nested inside another, why is the full derivative connected by multiplication rather than simple addition?
@@ -57,8 +55,6 @@ This picture places Chain Rule inside an operating flow. The point is not to mem
 ## Why It Matters
 
 A *neural network* is a *long composition* of functions, and only the chain rule computes the full gradient *efficiently*.
-
-## Concept at a Glance
 
 ## Key Terms
 

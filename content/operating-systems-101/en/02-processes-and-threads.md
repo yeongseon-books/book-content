@@ -43,8 +43,6 @@ This is post 2 in the Operating Systems 101 series. It explains what a process a
 
 This picture places Processes and Threads inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Processes and Threads is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - Which resources does a process actually own?
@@ -64,8 +62,6 @@ This picture places Processes and Threads inside an operating flow. The point is
 Processes and threads are the two basic building blocks of concurrency. Mixing them up leads to broken isolation, false thread-safety assumptions, and zombie children. "Why does the same data appear in one place but not the other?" almost always traces back to confusing these two models.
 
 > The process is the unit of isolation; the thread is the unit of concurrency. If you use the same tool for both, something usually leaks or blocks.
-
-## Concept at a Glance
 
 > Each process owns its own virtual address space, file descriptor table, signal handlers, and credentials. Inside it live one or more threads. Threads share memory and fds but have their own stack and registers.
 

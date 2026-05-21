@@ -39,10 +39,6 @@ Alembic을 처음 접하면 명령어보다 먼저 이런 의문이 생깁니다
 
 *Alembic 101 1장 흐름 개요*
 
-이 그림에서는 왜 Alembic인가, 그리고 init까지를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 왜 Alembic인가, 그리고 init까지의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 중요한가
 
 스키마 변경은 production 사고의 단골 원인입니다. 코드는 git으로, 인프라는 Terraform으로 관리하면서도 “누가 어떤 SQL을 어느 환경에 실행했는가”만 수작업으로 남기는 팀이 의외로 많습니다. 그러면 staging은 조용히 production과 어긋나고, 문제가 생겼을 때도 스키마를 어디까지 되돌려야 하는지 누구도 자신 있게 말하지 못합니다.
@@ -228,6 +224,19 @@ Alembic은 결국 “DB 스키마를 위한 git”이라는 한 줄로 요약됩
 
 다음 글에서는 `env.py`를 열어 봅니다. 모델 metadata를 어떻게 연결하는지, DB URL을 환경 변수에서 어떻게 안전하게 읽는지, online과 offline 모드는 실제로 무엇을 뜻하는지 정리합니다.
 
+## 팀 합류 시점에 바로 쓰는 점검 질문
+
+Alembic을 이미 쓰는 프로젝트에 합류했을 때는 명령어를 외우기 전에 "이 팀이 어떤 원칙으로 이력을 관리하는지"부터 확인하는 편이 좋습니다. 아래 질문은 온보딩 초기에 바로 써먹을 수 있는 최소 점검 목록입니다.
+
+1. **revision 생성 시점이 언제인지** 확인합니다. 기능 개발 중간인지, PR 머지 직전인지에 따라 충돌 빈도가 크게 달라집니다.
+2. **downgrade 정책이 있는지** 확인합니다. 모든 revision에 downgrade를 요구하는지, 특정 환경에서는 차단하는지 명시가 필요합니다.
+3. **배포 파이프라인에서 migration 실행 주체가 누구인지** 확인합니다. 앱 시작 시 자동 실행인지, 별도 release job인지에 따라 롤백 전략이 달라집니다.
+4. **장애 시 복구 절차 문서가 있는지** 확인합니다. `alembic current`, `history`, DB 백업 시점 확인 같은 기본 절차가 문서화돼 있어야 합니다.
+
+이 질문이 중요한 이유는, Alembic 자체보다 운영 방식이 사고를 더 많이 좌우하기 때문입니다. 같은 도구를 써도 팀 규칙이 모호하면 head 충돌, 누락 배포, 복구 지연이 반복됩니다. 반대로 원칙이 분명하면 revision 파일은 자연스럽게 코드 리뷰 대상이 되고, 데이터베이스 변경도 애플리케이션 코드와 같은 품질 기준으로 관리할 수 있습니다.
+
+추가로, 첫 주에는 의도적으로 작은 스키마 변경 하나를 만들어 `revision -> upgrade -> 확인 -> downgrade`까지 한 번 왕복해 보는 것이 좋습니다. 문서로 이해한 흐름과 실제 팀 파이프라인이 일치하는지 확인할 수 있고, 비상시에 어떤 명령을 어디서 실행해야 하는지도 몸에 익힐 수 있습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **마이그레이션 도구가 실제로 해결하는 문제는 무엇일까요?**
@@ -260,5 +269,7 @@ Alembic은 결국 “DB 스키마를 위한 git”이라는 한 줄로 요약됩
 - [Alembic: Configuration](https://alembic.sqlalchemy.org/en/latest/config.html)
 - [SQLAlchemy: MetaData](https://docs.sqlalchemy.org/en/20/core/metadata.html)
 - [SQLite Documentation](https://www.sqlite.org/docs.html)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/alembic-101/ko/01-why-alembic-and-init)
 
 Tags: Python, Alembic, SQLAlchemy, Migration

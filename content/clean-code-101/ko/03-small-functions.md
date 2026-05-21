@@ -41,9 +41,9 @@ last_reviewed: '2026-05-15'
 
 *Clean Code 101 3장 흐름 개요*
 
-이 그림에서는 함수 작게 만들기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+이 그림은 추출(Extract Function)이 이름을 가능하게 하고, 좋은 이름이 다시 재사용과 테스트를 쉽게 만드는 선순환을 보여 줍니다. 함수가 한 가지 일만 할 때 모든 것이 명확해집니다.
 
-> 함수 작게 만들기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+> 작은 함수는 설명의 필요성을 줄이고, 테스트 가능성을 높입니다.
 
 ## 왜 중요한가
 
@@ -206,6 +206,139 @@ python -m pytest -q tests/test_checkout.py
 ## 정리 및 다음 단계
 
 작은 함수는 좋은 이름과 테스트를 가능하게 만듭니다. 다음 글에서는 큰 함수를 키우는 가장 흔한 원인인 조건문을 어떻게 단순화할지 다룹니다.
+
+
+## 함수 분리 원칙: 어디까지 쪼개야 충분한가
+
+함수 분리는 "짧게 만들기" 자체가 목적이 아닙니다. 핵심은 변경 이유를 분리하는 것입니다. 아래 표는 함수를 분리할지 판단할 때 사용하는 기준입니다.
+
+| 기준 | 분리 신호 | 유지 가능 신호 | 권장 액션 |
+| --- | --- | --- | --- |
+| 변경 이유 | 서로 다른 정책이 함께 존재 | 한 정책만 수행 | 정책 단위 추출 |
+| 입력/출력 | 인자 의미가 섞여 있음 | 인자 의미가 단일 | Parameter Object 검토 |
+| 부수 효과 | 저장/로그/알림이 섞임 | 계산만 수행 | IO 경계 분리 |
+| 테스트 난이도 | 테스트 준비가 과도함 | 입력-출력 검증이 단순 | 순수 로직 먼저 추출 |
+| 네이밍 | 함수명에 and가 들어감 | 동사 하나로 설명 가능 | 두 함수로 분해 |
+
+분리 원칙은 코드 길이보다 책임 경계에 집중합니다. 30줄이어도 한 책임이면 유지할 수 있고, 10줄이어도 책임이 둘이면 분해하는 편이 낫습니다.
+
+## 리팩토링 전후 Python 예시
+
+```python
+# before
+
+def checkout(order, user, mailer, repository):
+    if not order.items:
+        raise ValueError("empty order")
+
+    subtotal = 0
+    for item in order.items:
+        subtotal += item.price * item.quantity
+
+    if user.is_member:
+        subtotal = int(subtotal * 0.9)
+
+    if order.coupon_code:
+        subtotal -= 1000
+
+    repository.save(order.id, subtotal)
+    mailer.send(user.email, f"paid={subtotal}")
+    return subtotal
+```
+
+```python
+# after
+
+def calculate_subtotal(items) -> int:
+    return sum(item.price * item.quantity for item in items)
+
+
+def apply_membership_discount(amount: int, is_member: bool) -> int:
+    return int(amount * 0.9) if is_member else amount
+
+
+def apply_coupon(amount: int, coupon_code: str | None) -> int:
+    return amount - 1000 if coupon_code else amount
+
+
+def checkout(order, user, mailer, repository) -> int:
+    if not order.items:
+        raise ValueError("empty order")
+
+    subtotal = calculate_subtotal(order.items)
+    subtotal = apply_membership_discount(subtotal, user.is_member)
+    subtotal = apply_coupon(subtotal, order.coupon_code)
+
+    repository.save(order.id, subtotal)
+    mailer.send(user.email, f"paid={subtotal}")
+    return subtotal
+```
+
+후자에서는 계산 규칙과 외부 부수 효과가 분리되어 테스트 전략이 즉시 달라집니다. `calculate_subtotal`, `apply_membership_discount`, `apply_coupon`은 빠른 단위 테스트 대상으로 떨어지고, `checkout`은 통합 경계를 검증하는 테스트로 좁힐 수 있습니다.
+
+## 함수 분해 체크 시나리오
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class FunctionSplitDecision:
+    has_multiple_policies: bool
+    has_side_effects: bool
+    argument_count: int
+
+
+def should_split_function(decision: FunctionSplitDecision) -> bool:
+    if decision.has_multiple_policies:
+        return True
+    if decision.has_side_effects:
+        return True
+    return decision.argument_count >= 4
+```
+
+이런 식의 단순한 규칙만 있어도 리뷰 기준이 선명해집니다. "왜 나누는가"를 설명할 때 감정이 아니라 기준으로 대화할 수 있기 때문입니다.
+
+
+## 실무 적용 메모
+
+아래 메모는 팀 내 합의 문서에 그대로 옮겨 적어도 되는 수준의 운영 규칙입니다.
+
+1. 리뷰는 코드 스타일보다 변경 위험을 먼저 다룹니다.
+2. 규칙 위반은 사람 지적보다 자동화 전환을 우선합니다.
+3. 반복되는 설계 결함은 교육 과제가 아니라 구조 개선 과제로 등록합니다.
+4. 모든 개선은 테스트와 함께 진행하며, 동작 변경 여부를 PR 설명에 명시합니다.
+5. 다음 분기 목표에는 "새 기능 수"와 함께 "변경 비용 감소 지표"를 반드시 포함합니다.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class QualityGate:
+    has_tests: bool
+    has_clear_names: bool
+    has_boundary_error_handling: bool
+    has_small_functions: bool
+    has_review_notes: bool
+
+
+def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
+    missing = []
+    if not gate.has_tests:
+        missing.append("tests")
+    if not gate.has_clear_names:
+        missing.append("naming")
+    if not gate.has_boundary_error_handling:
+        missing.append("error-boundary")
+    if not gate.has_small_functions:
+        missing.append("function-size")
+    if not gate.has_review_notes:
+        missing.append("review-notes")
+    return len(missing) == 0, missing
+```
+
+이 체크 함수는 단순하지만, 품질 기준을 코드로 표현하는 출발점이 됩니다. 팀이 기준을 말로만 합의하면 시간이 지나며 흐려집니다. 반대로 코드와 템플릿과 자동화 규칙으로 남기면 신규 멤버가 들어와도 동일한 기준이 유지됩니다.
+
+또한 개선 활동은 단발성 이벤트가 아니라 루프여야 합니다. 한 번의 대청소보다 매 PR마다 작은 개선을 추가하는 편이 장기적으로 더 강합니다. 이름 하나, 함수 하나, 분기 하나를 매번 더 낫게 만드는 습관이 쌓이면 코드베이스의 평균 품질이 올라가고, 장애 대응 속도도 실제로 빨라집니다.
 
 ## 처음 질문으로 돌아가기
 

@@ -85,6 +85,18 @@ print(s + s)
 
 시리즈 산술은 단순 반복문이 아니라 인덱스가 붙은 배열 연산입니다. 이 차이가 나중에 정렬 기반 계산의 핵심이 됩니다.
 
+## Series vs DataFrame
+
+이 두 구조의 관계는 표로 정리하면 명확해집니다.
+
+| 항목 | Series | DataFrame |
+| --- | --- | --- |
+| 차원 | 1차원 | 2차원 |
+| 인덱스 | 행 레이블 | 행 레이블 (공유) |
+| 생성 방법 | `pd.Series(list, index=...)` | `pd.DataFrame(dict)` |
+
+DataFrame은 같은 인덱스를 공유하는 Series의 묶음으로 볼 수 있습니다. 그래서 `df['column']`은 Series를 반환하고, `df[['column']]`은 1열 DataFrame을 반환합니다. 이 차이를 인지하는 것이 중요합니다.
+
 ### 3단계 - 데이터프레임 만들기
 
 ```python
@@ -139,6 +151,45 @@ dtype: float64
 
 Pandas는 단순히 같은 위치의 값을 더하지 않습니다. 먼저 인덱스를 맞춘 뒤 계산하고, 맞지 않는 위치는 `NaN`으로 남깁니다.
 
+## 다양한 DataFrame 생성법
+
+DataFrame을 만드는 방법은 여러 가지입니다. 각 방법은 데이터의 원본 형태에 따라 선택하면 됩니다.
+
+### 딕셔너리로 만들기
+
+```python
+df = pd.DataFrame({
+    "name": ["Alice", "Bob"],
+    "age": [25, 30],
+})
+print(df)
+```
+
+가장 직관적인 방법입니다. 딕셔너리의 키가 열 이름이 되고, 값 리스트가 각 열의 내용이 됩니다.
+
+### 리스트 of 딕셔너리로 만들기
+
+```python
+data = [
+    {"name": "Alice", "age": 25},
+    {"name": "Bob", "age": 30},
+]
+df = pd.DataFrame(data)
+print(df)
+```
+
+JSON API 응답이나 로그 파싱 결과처럼 행별로 데이터가 오는 경우에 자주 씁니다.
+
+### NumPy 배열로 만들기
+
+```python
+import numpy as np
+arr = np.array([[1, 2], [3, 4], [5, 6]])
+df = pd.DataFrame(arr, columns=["x", "y"])
+print(df)
+```
+
+내부적으로 Pandas는 NumPy 배열을 기반으로 동작하므로 이 방법도 매우 자연스럽습니다.
 ## 이 코드에서 먼저 봐야 할 점
 
 - `df["x"]`는 시리즈를 반환합니다.
@@ -165,12 +216,172 @@ A/B 테스트 비교, 시계열 정렬, 여러 소스의 데이터 결합에서 
 - `df.values` 의존도를 낮춥니다.
 - 시리즈 이름을 적극적으로 붙여 흐름을 읽기 쉽게 만듭니다.
 
+## 실전 예제: 시계열 데이터
+
+시리즈와 데이터프레임의 관계를 시계열 데이터로 확인해 보겠습니다.
+
+```python
+dates = pd.date_range("2024-01-01", periods=5, freq="D")
+temp = pd.Series([15, 16, 14, 17, 16], index=dates, name="temperature")
+humidity = pd.Series([60, 65, 55, 70, 68], index=dates, name="humidity")
+weather = pd.DataFrame({"temp": temp, "humidity": humidity})
+print(weather)
+print("\n평균 기온:", weather["temp"].mean())
+```
+
+시계열에서는 인덱스가 날짜가 되고, 각 열은 시간에 따른 관측값을 나타냅니다. 이 구조를 이해하면 시계열 분석이 훨씬 수월해집니다.
+
+## 성능 고려사항
+
+Series와 DataFrame의 내부 구조를 이해하면 성능 최적화에도 도움이 됩니다.
+
+### 벡터화를 우선하세요
+
+```python
+# Slow - 반복문
+result = []
+for val in df["x"]:
+    result.append(val * 2)
+
+# Fast - 벡터화
+result = df["x"] * 2
+```
+
+반복문 대신 열 단위 연산을 사용하면 NumPy의 최적화된 C 코드를 활용할 수 있습니다.
+
+### 메모리 효율적인 타입 선택
+
+```python
+# 기본 int64는 8바이트
+df["count"] = df["count"].astype("int32")  # 4바이트로 절반
+df["category"] = df["category"].astype("category")  # 범주형 데이터
+print(df.memory_usage(deep=True))
+```
+
+대용량 데이터를 다룰 때는 타입 선택이 메모리 사용량에 크게 영향을 줍니다.
+
+### copy vs view
+
+```python
+# view - 원본 데이터 공유
+subset = df[["x", "y"]]
+
+# copy - 독립적인 복사본
+subset = df[["x", "y"]].copy()
+```
+
+할당을 할 때는 복사본을 명시적으로 만들어 SettingWithCopyWarning을 피하세요.
+## dtypes 확인과 변환
+
+데이터프레임의 각 열은 자료형을 가집니다. 이 자료형을 명시적으로 확인하고 변환하는 것이 후속 연산의 정확성을 보장합니다.
+
+### 자료형 확인
+
+```python
+df = pd.DataFrame({
+    "id": [1, 2, 3],
+    "name": ["Alice", "Bob", "Charlie"],
+    "score": [85.5, 90.0, 78.5],
+})
+print(df.dtypes)
+```
+
+**예상 출력:**
+
+```text
+id         int64
+name      object
+score    float64
+dtype: object
+```
+
+Pandas는 자동으로 자료형을 추론하지만, 항상 정확한 것은 아닙니다. 그래서 명시적 변환이 필요할 때가 많습니다.
+
+### 자료형 변환
+
+```python
+df["id"] = df["id"].astype("string")
+df["score"] = df["score"].astype("int32")
+print(df.dtypes)
+```
+
+`astype()`을 사용하면 모5시적으로 타입을 바꿀 수 있습니다. 실수를 정수로, 숫자를 문자열로 바꾸는 작업이 자주 등장합니다.
+
+### 메모리 효율을 위한 타입 선택
+
+Pandas 1.0 이후로 `int8`, `int16`, `int32` 같은 작은 정수형과 `string` 타입을 적극 활용하면 메모리를 크게 줄일 수 있습니다. 특히 대용량 데이터를 다룰 때 타입 선택은 성능에 직접 영향을 줍니다.
+
 ## 체크리스트
 
 - [ ] 시리즈와 데이터프레임을 구분할 수 있습니다.
 - [ ] 인덱스와 열 레이블의 역할을 설명할 수 있습니다.
 - [ ] `df["col"]`이 시리즈임을 알고 있습니다.
 - [ ] 인덱스 정렬이 자동이라는 점을 이해하고 있습니다.
+
+
+
+## 인덱스 연산
+
+인덱스가 있는 시리즈끼리 연산할 때는 인덱스 정렬이 자동으로 일어납니다. 이 동작을 이해하면 데이터 병합과 조인의 원리를 더 쉽게 파악할 수 있습니다.
+
+```python
+s1 = pd.Series([1, 2, 3], index=["a", "b", "c"])
+s2 = pd.Series([10, 20], index=["b", "c"])
+print(s1 + s2)
+```
+
+인덱스가 맞지 않는 위치에는 NaN이 생깁니다. 이 동작이 Pandas의 강력한 기능이자 조심해야 할 부분입니다.
+
+
+
+
+### 주의사항
+
+인덱스 불일치로 생긴 NaN은 의도한 것인지 확인이 필요합니다. 필요하다면 `fill_value` 파라미터로 기본값을 지정할 수 있습니다.
+
+```python
+result = s1.add(s2, fill_value=0)
+print(result)
+```
+
+이렇게 하면 인덱스가 없는 위치에 0이 채워집니다.
+
+
+
+## DataFrame 메서드 체이닝
+
+Pandas는 메서드 체이닝을 지원하여 여러 연산을 연결할 수 있습니다.
+
+```python
+result = (df
+    .assign(total=lambda x: x["price"] * x["qty"])
+    .query("total > 100")
+    .sort_values("total", ascending=False)
+    .head(10)
+)
+print(result)
+```
+
+이 패턴은 코드를 읽기 쉽게 만들어 줍니다.
+
+
+
+메서드 체이닝은 Pandas의 강력한 기능이지만, 너무 길어지면 디버깅이 어려워질 수 있습니다. 적절한 길이로 나누는 것이 좋습니다.
+
+
+## Series 내부 구조
+
+Series는 내부적으로 NumPy 배열과 인덱스를 별도로 관리합니다. 이 구조를 이해하면 성능 최적화와 메모리 관리에 도움이 됩니다.
+
+```python
+s = pd.Series([1, 2, 3], index=["a", "b", "c"])
+print("Data type:", s.dtype)
+print("Array:", s.values)
+print("Index:", s.index)
+print("Memory:", s.memory_usage(deep=True), "bytes")
+```
+
+Series는 동일한 자료형만 담을 수 있습니다. 여러 자료형이 섞이면 `object` 타입으로 변환되어 성능이 떨어집니다. 따라서 생성 시 자료형을 명시적으로 설정하는 편이 좋습니다.
 
 ## 연습 문제
 

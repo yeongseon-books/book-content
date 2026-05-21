@@ -43,8 +43,6 @@ In this post, we will look at binding — attaching a value to a name — and sc
 
 This picture places Scope and Binding inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Scope and Binding is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - What is the precise difference between scope and binding?
@@ -57,8 +55,6 @@ This picture places Scope and Binding inside an operating flow. The point is not
 Without a grasp of scope, "why isn't this variable updating?" or "why am I suddenly getting NameError?" become mysteries. With it, you see that functions, modules, and closures are all variations of the same rule.
 
 > Binding ties a name to a value; scope is the region where that tie is visible.
-
-## Concept at a Glance
 
 Python's LEGB rule is the order — innermost to outermost — in which a name is looked up. The first binding found wins.
 

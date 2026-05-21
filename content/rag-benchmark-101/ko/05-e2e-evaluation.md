@@ -221,6 +221,69 @@ python3 main.py
 
 다음 글에서는 1편부터 5편까지의 도구를 하나로 묶습니다. 검색, 생성, 평가 결과를 한 번에 내는 통합 벤치마크 파이프라인이 시리즈의 마지막 주제입니다.
 
+### RAGAS 배치 평가 코드 확장
+
+실무에서는 평균 점수만 출력하면 디버깅이 어렵습니다. 샘플별 점수와 입력 데이터를 함께 저장해 두어야 회귀 분석이 가능합니다. 아래처럼 DataFrame으로 내보내는 코드를 붙이면 재검토가 쉬워집니다.
+
+```python
+import pandas as pd
+
+result = evaluate(
+    dataset=dataset,
+    metrics=[Faithfulness(), AnswerRelevancy(strictness=1)],
+    llm=ragas_llm,
+    embeddings=ragas_emb,
+    run_config=RunConfig(timeout=300, max_workers=1),
+)
+
+score_df = result.to_pandas()
+full_df = pd.concat([dataset.to_pandas(), score_df], axis=1)
+full_df.to_csv("ragas_report.csv", index=False)
+
+print(full_df[["question", "faithfulness", "answer_relevancy"]].head(10))
+```
+
+이 파일을 PR 아티팩트로 남기면, 점수 하락이 생겼을 때 어떤 질문에서 무너졌는지 즉시 추적할 수 있습니다.
+
+### 종단 간 테스트 스크립트 예시
+
+배포 파이프라인에서는 "검색 + 생성 + 평가"가 한 번에 실행되는 스크립트가 필요합니다. 아래 예시는 실패 임계치를 넘으면 종료 코드 1로 실패시키는 구조입니다.
+
+```python
+#!/usr/bin/env python3
+import json
+import sys
+
+from my_rag_eval import run_rag_eval  # returns dict with aggregate scores
+
+THRESHOLDS = {
+    "faithfulness": 0.85,
+    "answer_relevancy": 0.82,
+}
+
+def main() -> int:
+    report = run_rag_eval(sample_size=50)
+    print(json.dumps(report, ensure_ascii=False, indent=2))
+
+    for metric, minimum in THRESHOLDS.items():
+        score = report["aggregate"][metric]
+        if score < minimum:
+            print(f"FAIL: {metric}={score:.3f} < {minimum:.3f}")
+            return 1
+
+    print("PASS: e2e RAG evaluation thresholds satisfied")
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())
+```
+
+이 스크립트를 CI에서 nightly로 실행하면, 검색 인덱스 변경이나 프롬프트 변경이 실제 답변 품질에 미친 영향을 조기에 감지할 수 있습니다.
+
+### 평가 비용과 안정성 관리
+
+RAGAS는 유용하지만 비용이 들기 때문에 실행 정책을 분리하는 편이 좋습니다. PR마다 30~50개 샘플로 빠르게 회귀만 확인하고, 야간에는 300개 이상으로 안정 추세를 보는 식입니다. 또한 동일 데이터셋을 주기적으로 재평가해 평가 모델 드리프트를 모니터링하면, 점수 변화가 앱 문제인지 평가자 문제인지 분리하는 데 도움이 됩니다.
+
 ## 처음 질문으로 돌아가기
 
 - **검색 지표가 좋아도 최종 답변이 나쁘면 어느 단계를 다시 봐야 할까요?**
@@ -252,5 +315,7 @@ python3 main.py
 - [RAGAS GitHub repository](https://github.com/explodinggradients/ragas)
 - [Groq Python integration in LangChain](https://python.langchain.com/docs/integrations/chat/groq/)
 - [HuggingFace Datasets](https://huggingface.co/docs/datasets)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/rag-benchmark-101/ko/05-e2e-evaluation)
 
 Tags: RAG, VectorDB, Benchmarking, LLM

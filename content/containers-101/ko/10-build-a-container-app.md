@@ -234,6 +234,90 @@ docker compose logs --tail=100
 
 이제 다음 단계는 Kubernetes 101처럼 오케스트레이션 세계로 넘어가, 여러 컨테이너를 더 큰 시스템으로 다루는 방향입니다.
 
+
+## 심화: 프로덕션 컨테이너 운영 체크리스트와 Compose 실전 패턴
+
+시리즈 마지막에서 가장 중요한 것은 "동작하는 예제"를 "운영 가능한 시스템"으로 바꾸는 기준입니다. 실전에서는 빌드 성공보다 장애 복구 가능성, 배포 재현성, 보안 기본값, 성능 예측 가능성이 더 중요합니다. 따라서 Compose 예제도 운영 체크리스트 관점에서 점검해야 합니다.
+
+## 멀티서비스 Compose 예시(운영형)
+
+```yaml
+services:
+  app:
+    image: ghcr.io/example/app:1.0.0
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: app
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata: {}
+```
+
+이 구성은 서비스 의존성, 헬스체크, 볼륨 영속성, 최소권한 실행 방향을 모두 반영합니다.
+
+## 프로덕션 체크리스트
+
+| 영역 | 점검 항목 | Pass 기준 |
+| --- | --- | --- |
+| 이미지 | digest 고정 | 배포 매니페스트에 sha256 명시 |
+| 보안 | non-root 실행 | `USER` 또는 runtime user 명시 |
+| 네트워크 | 외부 노출 최소화 | 필요한 포트만 공개 |
+| 상태 | 데이터 영속성 | DB는 volume/관리형 스토리지 사용 |
+| 관측성 | 로그/헬스체크 | stdout 구조화 로그 + health endpoint |
+| 복구 | 재기동/롤백 | restart policy + 이전 digest 롤백 경로 |
+
+## 운영 모범사례
+
+1. 빌드와 배포 식별자를 분리합니다. 태그는 사람용, 배포는 digest용입니다.
+2. 헬스체크는 단순 200 응답이 아니라 의존성 상태까지 반영합니다.
+3. 시크릿은 Compose 파일 평문 대신 외부 주입 경로를 사용합니다.
+4. 로그는 파일보다 stdout 중심으로 수집해 중앙화합니다.
+5. 성능 기준(CPU, 메모리, p95 latency)을 사전에 정하고 알람 임계값을 문서화합니다.
+
+## 운영 전 검증 명령
+
+```bash
+docker compose config
+docker compose up -d
+docker compose ps
+docker compose logs --tail=200
+curl -f http://127.0.0.1:8080/health
+```
+
+이 다섯 단계는 배포 전후 점검의 최소 세트입니다. 특히 `docker compose config`를 먼저 실행하면 변수 치환과 문법 문제를 사전에 잡을 수 있어 장애를 줄일 수 있습니다.
+
+## 시리즈 종합 결론
+
+컨테이너 실전 역량은 명령어 암기가 아니라 경계 설계 능력입니다. 이미지, 런타임, 네트워크, 저장소, 보안, 오케스트레이션 신호를 하나의 운영 계약으로 엮을 수 있어야 합니다. 이 계약이 문서와 자동화로 남아 있을 때, 팀은 개인 숙련도에 의존하지 않고 안정적으로 서비스를 운영할 수 있습니다.
+
 ## 처음 질문으로 돌아가기
 - **개발 환경과 프로덕션 환경의 Dockerfile을 어떻게 다르게 구성할까요?**
   - 개발은 hot-reload와 디버깅 도구 포함, 프로덕션은 최소한의 런타임만 포함합니다. multi-stage build로 두 가지를 한 Dockerfile에 정의할 수 있습니다.

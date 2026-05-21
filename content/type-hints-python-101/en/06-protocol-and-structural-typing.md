@@ -41,8 +41,6 @@ This is post 6 in the Type Hints in Python 101 series. In this article, we will 
 
 This picture places Protocol and Structural Typing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Protocol and Structural Typing is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - Protocol definition and structural typing principles
@@ -57,8 +55,6 @@ ABCs force inheritance, which creates tight coupling. If a function requires `It
 > Protocol = static duck typing.
 
 Like Go interfaces and TypeScript structural types.
-
-## Concept at a Glance
 
 > Protocol defines a set of methods/attributes. Any class that has those methods is compatible — no inheritance required. This is structural typing.
 

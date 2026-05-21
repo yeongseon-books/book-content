@@ -41,8 +41,6 @@ This is post 8 in the Type Hints in Python 101 series. In this article, we will 
 
 This picture places Using mypy and pyright inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Using mypy and pyright is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - How to verify type hints without executing the program

@@ -45,7 +45,7 @@ This is the first post in the Information Security 101 series.
 
 This picture places What Is Information Security? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is Information Security? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Information security is not knowing technology names. It is building a state where your team can say "we protect X, we watch for Y, we accept Z."
 
 ## What You Will Learn
 
@@ -60,8 +60,6 @@ This picture places What Is Information Security? inside an operating flow. The 
 Security incidents almost never happen because the team lacked technology — they happen because the team did not make a decision. The other nine posts cover "how"; this one defines "what" and "why." Everything else stands on top of it.
 
 > Security is a discipline of decisions, not technology.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR

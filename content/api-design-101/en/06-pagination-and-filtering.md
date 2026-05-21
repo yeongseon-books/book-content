@@ -51,8 +51,6 @@ Bad pagination produces slow queries *and* duplicates *and* gaps — at the same
 
 > Large collections must travel in *chunks*.
 
-## Concept at a Glance
-
 The client should not have to understand the cursor internals. The server owns the ordering key and page boundary logic so that large collections can move forward without duplicates or gaps.
 
 ## Key Terms

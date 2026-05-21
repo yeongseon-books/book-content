@@ -45,8 +45,6 @@ This is post 8 in the Database Systems 101 series.
 
 This picture places Query Optimization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Query Optimization is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The big picture of how the optimizer chooses an execution plan
@@ -59,8 +57,6 @@ This picture places Query Optimization inside an operating flow. The point is no
 When the same SQL suddenly slows down, the cause is almost always "the optimizer picked a different plan." Statistics, data volume, added or dropped indexes, and parameter sniffing all trigger this. Without EXPLAIN, you are debugging by guessing.
 
 > Ninety percent of tuning is understanding "what does the optimizer know, and what doesn't it?"
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR

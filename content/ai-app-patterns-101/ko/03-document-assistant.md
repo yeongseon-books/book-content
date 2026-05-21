@@ -386,4 +386,6 @@ for text in texts:
 - [JsonOutputParser](https://python.langchain.com/docs/modules/model_io/output_parsers/json/)
 - [Map-Reduce pattern](https://python.langchain.com/docs/use_cases/summarization/#option-2-map-reduce)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-app-patterns-101/ko/03-document-assistant)
+
 Tags: LLM, RAG, Agent, Python

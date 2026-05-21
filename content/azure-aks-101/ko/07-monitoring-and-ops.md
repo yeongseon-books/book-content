@@ -324,4 +324,6 @@ Azure Monitor는 AKS에 대해 여러 알람 경로를 제공합니다.
 - [Azure Functions 101](../../azure-functions-101/ko/07-monitoring-and-ops.md) — Application Insights 중심 운영과 비교할 때
 - [Azure App Service 101](../../azure-app-service-101/ko/06-logging-monitoring.md) — 더 단순한 PaaS 운영 모델과 비교할 때
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-aks-101/ko/07-monitoring-and-ops)
+
 Tags: Azure, AKS, Kubernetes, Cloud

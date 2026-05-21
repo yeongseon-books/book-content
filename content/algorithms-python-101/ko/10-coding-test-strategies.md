@@ -38,10 +38,6 @@ last_reviewed: '2026-05-12'
 
 *Algorithms with Python 101 10장 흐름 개요*
 
-이 그림에서는 코딩 테스트 문제 접근법를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 코딩 테스트 문제 접근법의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 중요한가
 
 이 시리즈의 알고리즘을 모두 공부했더라도, 실제 문제 앞에서 무엇을 써야 할지 결정하지 못하면 소용이 없습니다. 핵심은 문제 유형을 빠르게 분류하고, 입력 제약에서 거꾸로 필요한 시간 복잡도를 추론하는 능력입니다.
@@ -364,5 +360,7 @@ grid = [[0] * cols for _ in range(rows)]  # correct
 
 - [Baekjoon Online Judge — 단계별로 풀어보기](https://www.acmicpc.net/step)
 - [Programmers — 코딩테스트 연습](https://programmers.co.kr/learn/challenges)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/algorithms-python-101/ko/10-coding-test-strategies)
 
 Tags: Python, Algorithms, Coding Test, Problem Solving, Interview

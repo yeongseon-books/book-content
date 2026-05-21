@@ -48,8 +48,6 @@ This episode covers frame sampling strategies, the core temporal models (VideoMA
 
 This picture places Video Understanding - From Frame Sampling to Video-LLaVA inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Video Understanding - From Frame Sampling to Video-LLaVA is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - Why is frame sampling the first key decision in video understanding?

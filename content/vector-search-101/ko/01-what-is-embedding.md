@@ -332,4 +332,6 @@ for item in sorted(results, key=lambda x: (-x["keyword_overlap"], -x["cosine"]))
 
 - [RAG Deep Dive](../../rag-deep-dive/ko/01-document-loading-and-chunking.md) — 이 시리즈가 다루는 임베딩과 ANN 인덱스를 RAG 파이프라인에서 어떻게 조립해 쓰는지 보여줍니다. 검색 엔진 자체보다 "문서 → 청크 → 검색 → 응답" 흐름이 궁금하다면 다음 단계로 권장합니다.
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/vector-search-101/ko/01-what-is-embedding)
+
 Tags: Vector Search, FAISS, Embeddings, Python

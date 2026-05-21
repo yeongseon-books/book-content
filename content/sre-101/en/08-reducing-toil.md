@@ -42,8 +42,6 @@ This is post 8 in the SRE 101 series. Here we define toil in operational terms, 
 
 This picture places Reducing Toil inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-
-
 ## Why this topic matters
 
 When toil becomes a large share of the week, improvement stops. The team is still working hard, but more of that effort goes into keeping the current system upright rather than making the next week better.

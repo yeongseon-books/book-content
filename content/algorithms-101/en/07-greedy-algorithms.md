@@ -43,8 +43,6 @@ This is post 7 in the Algorithms 101 series. Here we cover when greedy algorithm
 
 This picture places Greedy Algorithms inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Greedy Algorithms is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The two conditions a greedy algorithm needs to be correct
@@ -57,8 +55,6 @@ This picture places Greedy Algorithms inside an operating flow. The point is not
 Greedy algorithms are among the simplest and fastest. When they apply they are easy to write and operate, often O(n log n) or better. The downside is that without a justification step you can ship wrong answers and not notice. Mastering greedy means knowing exactly when it applies.
 
 > Greedy is the algorithm of simplicity, but it carries a heavier burden of correctness.
-
-## Concept at a Glance
 
 > The greedy-choice property says "there exists an optimal solution that contains the local greedy choice." Optimal substructure says "after that choice, the rest is solved by the same greedy rule." Both must hold. The usual proof technique is the exchange argument.
 

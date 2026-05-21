@@ -42,8 +42,6 @@ This is post 2 in the Azure Container Apps 101 series. Here, we'll separate thos
 
 This picture places Environment, Container App, Revision — ACA in three words inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Environment, Container App, Revision — ACA in three words is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 The first time you touch ACA, the same three words show up everywhere in the portal and CLI: Environment, Container App, Revision. They sound similar but they have very different **lifetimes, mutability, and ownership**.

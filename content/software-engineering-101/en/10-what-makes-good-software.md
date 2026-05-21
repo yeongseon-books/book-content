@@ -43,8 +43,6 @@ This is the final post in the Software Engineering 101 series. In this chapter, 
 
 This picture places What Makes Good Software inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Makes Good Software is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - Quality attributes (a short take on ISO/IEC 25010)
@@ -58,8 +56,6 @@ This picture places What Makes Good Software inside an operating flow. The point
 A working feature is the start, not the end. Good software endures over time and grows the people who work on it.
 
 > What is simple lasts.
-
-## Concept at a Glance
 
 Quality is not one axis but a balance across many.
 

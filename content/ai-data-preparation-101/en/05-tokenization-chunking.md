@@ -41,8 +41,6 @@ This is post 5 in the AI Data Preparation 101 series. Here we cover how tokeniza
 
 This picture places Tokenization and Chunking Strategies inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Tokenization and Chunking Strategies is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## "The tokenizer decides model quality?"
 
 In LLMs, tokenization is not just preprocessing. The moment the tokenizer is fixed, the units the model can see and the efficiency of its context window are decided. The reason GPT-4 uses far fewer tokens than GPT-3 for the same Korean text is that its tokenizer was retrained.

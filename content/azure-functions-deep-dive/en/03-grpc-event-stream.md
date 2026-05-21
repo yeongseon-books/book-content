@@ -53,8 +53,6 @@ That channel is a single **bidirectional gRPC stream**. In this post, we'll walk
 
 This picture places The gRPC Event Stream — What Do the Host and Worker Actually Exchange? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of The gRPC Event Stream — What Do the Host and Worker Actually Exchange? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## One host-worker event stream
 
 Let's start with the punchline. Host-worker communication in Azure Functions is **one gRPC service, one RPC**.

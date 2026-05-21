@@ -302,6 +302,60 @@ az appservice plan show \
 }
 ```
 
+### Plan 티어를 고를 때 최소 검증 명령을 함께 실행합니다
+
+표만 보고 티어를 고르면 실제 구독 제한이나 리전 제약 때문에 계획이 어긋날 수 있습니다. 후보 SKU를 정한 뒤에는 즉시 App Service 리소스 정보를 확인하는 루틴을 권장합니다.
+
+```bash
+# 현재 앱의 Plan SKU와 Linux 여부 확인
+az webapp show \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --query "{name:name, state:state, reserved:reserved, serverFarmId:serverFarmId}" \
+  --output json
+
+# 현재 Plan의 SKU/worker 수 확인
+az appservice plan show \
+  --resource-group $RG \
+  --name $PLAN_NAME \
+  --query "{sku:sku.name, tier:sku.tier, workers:numberOfWorkers, maxWorkers:maximumNumberOfWorkers}" \
+  --output json
+```
+
+이 과정을 배포 전 점검에 포함하면, "예상은 Standard였는데 실제는 Basic" 같은 설정 불일치를 조기에 잡을 수 있습니다. 특히 여러 팀이 같은 구독을 공유하는 환경에서는 IaC와 실제 리소스 상태가 어긋나는 경우가 자주 발생합니다.
+
+### Scale 설정은 용량뿐 아니라 응답 지연 기준으로 함께 설계합니다
+
+App Service에서 Scale Out은 인스턴스 수를 늘리는 기능이지만, 트리거를 CPU 하나에만 묶으면 I/O 병목을 놓칠 수 있습니다. 실무에서는 CPU와 HTTP queue, 응답 시간 경보를 함께 설계합니다.
+
+```bash
+# Autoscale 설정 예시 (기본 프로필)
+az monitor autoscale create \
+  --resource-group $RG \
+  --resource $PLAN_NAME \
+  --resource-type Microsoft.Web/serverfarms \
+  --name autoscale-$PLAN_NAME \
+  --min-count 2 \
+  --max-count 6 \
+  --count 2
+
+# CPU 70% 이상 10분 지속 시 +1
+az monitor autoscale rule create \
+  --resource-group $RG \
+  --autoscale-name autoscale-$PLAN_NAME \
+  --condition "Percentage CPU > 70 avg 10m" \
+  --scale out 1
+
+# CPU 35% 이하 15분 지속 시 -1
+az monitor autoscale rule create \
+  --resource-group $RG \
+  --autoscale-name autoscale-$PLAN_NAME \
+  --condition "Percentage CPU < 35 avg 15m" \
+  --scale in 1
+```
+
+운영에서 중요한 지점은 "최대 인스턴스"보다 "scale이 늦게 반응하지 않는가"입니다. 부하 테스트에서 P95 지연시간이 먼저 급증한다면 CPU 임계값만으로는 부족할 수 있으므로, 경보 조건을 재설계해야 합니다.
+
 ---
 
 ## Right-Sizing Checklist
@@ -365,5 +419,7 @@ Hosting Model 선택에서 기억할 핵심은 네 가지입니다.
 - [Azure Functions 101](../../azure-functions-101/ko/)
 
 ---
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-app-service-101/ko/03-hosting-models)
 
 Tags: Azure, App Service, Cloud, Web Apps

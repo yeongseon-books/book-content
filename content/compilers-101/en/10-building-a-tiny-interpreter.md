@@ -45,8 +45,6 @@ This is the final post in the Compilers 101 series.
 
 This picture places Building a Tiny Interpreter inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Building a Tiny Interpreter is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - How to combine a lexer, parser, and evaluator into one file
@@ -60,8 +58,6 @@ This picture places Building a Tiny Interpreter inside an operating flow. The po
 Stages you learned separately only click once you wire them together. The single-file program in this post is enough to check, at a glance, which compiler stages you can already operate. It is also a launchpad for adding variables, functions, and types.
 
 > Putting all stages in one file makes every interface obvious.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR

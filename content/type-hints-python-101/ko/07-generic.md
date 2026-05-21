@@ -39,10 +39,6 @@ last_reviewed: '2026-05-15'
 
 *Type Hints in Python 101 7장 흐름 개요*
 
-이 그림에서는 Generic 이해하기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> Generic 이해하기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 이 주제가 중요한가
 
 실무 유틸리티 함수와 라이브러리는 여러 타입을 다뤄야 합니다. 그런데 `Any`를 쓰는 순간 분석기는 더 이상 값의 관계를 추적하지 못합니다. 예를 들어 리스트의 첫 원소를 꺼내는 함수는 `list[int]`를 받으면 `int`를, `list[str]`를 받으면 `str`을 돌려줘야 자연스럽습니다.
@@ -284,6 +280,66 @@ def first_item(page: Page[T]) -> T:
 Generic은 하나의 함수나 클래스가 여러 타입을 다루더라도 타입 관계를 보존하게 해 줍니다. `TypeVar`는 그 관계를 선언하고, `Generic`은 클래스 수준으로 확장하며, bound와 constraint는 허용 범위를 정밀하게 조절합니다. 잘 쓴 Generic은 재사용성과 타입 안전성을 함께 가져옵니다.
 
 다음 글에서는 지금까지 붙인 타입 힌트를 실제로 검증하는 mypy와 pyright를 살펴보겠습니다.
+
+## 실전 패턴 추가: TypeVar, Generic, Protocol을 함께 쓰는 방법
+
+타입 힌트가 본격적으로 효율을 내는 구간은 공통 유틸리티와 도메인 인터페이스를 다룰 때입니다. 단순한 `list[int]`를 넘어서 `TypeVar`, `Generic`, `Protocol`을 함께 쓰면 구체 클래스에 묶이지 않는 API를 만들 수 있습니다.
+
+```python
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Generic, Protocol, TypeVar
+
+T = TypeVar("T")
+K = TypeVar("K")
+
+
+class SupportsKey(Protocol[K]):
+    def key(self) -> K:
+        ...
+
+
+class Repository(Protocol[T]):
+    def add(self, item: T) -> None:
+        ...
+
+    def all(self) -> list[T]:
+        ...
+
+
+@dataclass
+class User:
+    user_id: int
+    name: str
+
+    def key(self) -> int:
+        return self.user_id
+
+
+class InMemoryRepository(Generic[T]):
+    def __init__(self) -> None:
+        self._items: list[T] = []
+
+    def add(self, item: T) -> None:
+        self._items.append(item)
+
+    def all(self) -> list[T]:
+        return self._items
+
+
+def index_by_key(items: list[SupportsKey[K]]) -> dict[K, SupportsKey[K]]:
+    return {item.key(): item for item in items}
+```
+
+```python
+repo: Repository[User] = InMemoryRepository()
+repo.add(User(user_id=1, name="A"))
+repo.add(User(user_id=2, name="B"))
+indexed = index_by_key(repo.all())
+```
+
+이 패턴의 장점은 구현 교체 비용이 낮다는 점입니다. `Repository[User]` 계약만 지키면 메모리 저장소를 DB 저장소로 바꿔도 상위 서비스 타입 시그니처를 유지할 수 있습니다. 또한 Protocol 기반 설계는 상속 계층 없이도 구조적 타이핑으로 계약을 검사할 수 있어, 기존 코드에 점진적으로 타입 안전성을 도입할 때 특히 유리합니다.
 
 ## 처음 질문으로 돌아가기
 

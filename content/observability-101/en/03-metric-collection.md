@@ -58,8 +58,6 @@ A metric pipeline is the *starting line* of all observability. The moment the fi
 
 > *What you do not measure *does not exist*.*
 
-## Concept at a Glance
-
 Observability is the ability to understand a system's internal state from external signals. In a distributed system, you cannot instrument every line of code. You rely on *metrics* (what happened), *logs* (why it happened), and *traces* (where it happened).
 
 ## Key Terms

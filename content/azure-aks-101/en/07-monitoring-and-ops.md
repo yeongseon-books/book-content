@@ -42,8 +42,6 @@ This is the final post in the Azure Kubernetes Service 101 series. Here, we tie 
 
 This picture places Monitoring and ops — Container Insights, logs, alerts inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Monitoring and ops — Container Insights, logs, alerts is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## The operations view in one diagram
 
 The useful split is between two telemetry paths.

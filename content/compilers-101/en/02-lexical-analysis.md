@@ -45,8 +45,6 @@ This is post 2 in the Compilers 101 series.
 
 This picture places lexical analysis inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of lexical analysis is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The definition of a token and the problem a lexer solves
@@ -60,8 +58,6 @@ This picture places lexical analysis inside an operating flow. The point is not 
 The difference between someone who can answer "where does `SyntaxError: unexpected token` come from?" and someone who cannot is whether they have ever looked at lexical analysis. A good lexer is the starting point of good error messages.
 
 > If you cut tokens wrong, every step after that is built on the same wrong split.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR

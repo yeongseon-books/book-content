@@ -50,6 +50,91 @@ last_reviewed: '2026-05-15'
 
 문제는 메트릭을 잘못 수집하거나 잘못 그리면 오히려 오해가 커진다는 점입니다. 카운터를 그대로 선 그래프로 그리거나, 라벨을 과하게 붙이거나, 1초마다 무리하게 수집하면 숫자는 많아져도 판단은 더 느려집니다. 그래서 수집과 시각화는 함께 배워야 합니다.
 
+## 메트릭 유형 비교
+
+메트릭은 네 가지 주요 유형으로 나뉩니다. 각각의 정의, 예시, 사용 상황을 정리하면 언제 무엇을 쓸지 판단하기 쉬워집니다.
+
+| 유형 | 정의 | 예시 | 언제 쓰는가 |
+| --- | --- | --- | --- |
+| Counter | 계속 증가하는 값 | 총 요청 수, 에러 건수 | 누적량을 기록할 때 |
+| Gauge | 오르내리는 값 | CPU 사용률, 큐 길이, 메모리 | 현재 상태를 나타낼 때 |
+| Histogram | 분포를 버킷으로 저장 | 응답 시간 분포 (p50, p95, p99) | 꼬리 지연을 보려고 할 때 |
+| Summary | 분위를 클라이언트에서 계산 | p95, p99 (클라이언트 측 계산) | 서버 부담을 줄이고 싶을 때 |
+
+Prometheus에서는 Histogram을 더 권장합니다. Summary는 클라이언트에서 분위를 계산하기 때문에 여러 인스턴스를 합치기 어렵고, Histogram은 서버에서 나중에 임의의 분위를 계산할 수 있습니다.
+
+## prometheus_client로 메트릭 노출하기
+
+Python에서 prometheus_client 라이브러리를 쓰면 간단하게 메트릭을 노출할 수 있습니다.
+
+```python
+from prometheus_client import Counter, Gauge, Histogram, start_http_server
+import time
+import random
+
+# 메트릭 정의
+request_count = Counter(
+    "http_requests_total",
+    "Total HTTP requests",
+    ["method", "endpoint", "status"]
+)
+
+active_connections = Gauge(
+    "active_connections",
+    "Number of active connections"
+)
+
+request_duration = Histogram(
+    "http_request_duration_seconds",
+    "HTTP request duration in seconds",
+    ["method", "endpoint"],
+    buckets=(0.1, 0.5, 1.0, 2.0, 5.0)
+)
+
+# 사용 예시
+def handle_request(method: str, endpoint: str):
+    active_connections.inc()
+    
+    start = time.time()
+    status = 200 if random.random() > 0.1 else 500
+    
+    # 요청 처리 시뮬레이션
+    time.sleep(random.uniform(0.1, 1.0))
+    
+    duration = time.time() - start
+    
+    request_count.labels(method=method, endpoint=endpoint, status=status).inc()
+    request_duration.labels(method=method, endpoint=endpoint).observe(duration)
+    
+    active_connections.dec()
+    return status
+
+# 메트릭 서버 시작 (8000번 포트에 /metrics 노출)
+if __name__ == "__main__":
+    start_http_server(8000)
+    print("Metrics server running on :8000/metrics")
+    
+    while True:
+        handle_request("GET", "/api/users")
+        time.sleep(1)
+```
+
+이 코드를 실행하고 `curl localhost:8000/metrics`를 호출하면 Prometheus 형식의 메트릭을 볼 수 있습니다. Prometheus는 이 엔드포인트를 주기적으로 읽어 저장합니다.
+
+## 카디널리티 폭발 방지
+
+카디널리티는 라벨 조합이 얼마나 많이 생기는지를 뜻합니다. 예를 들어 user_id를 라벨로 붙이면 사용자 수만큼 메트릭 종류가 늘어나고, Prometheus는 각각을 별도 시계열로 저장하기 때문에 메모리와 디스크 비용이 폭발합니다.
+
+### 피해야 할 패턴
+
+1. **고유 식별자를 라벨에 넣지 말기**: user_id, order_id, session_id 같은 값은 로그나 트레이스 속성으로 남깁니다.
+2. **라벨 값을 제한하기**: HTTP 경로를 라벨로 쓸 때 `/api/users/123` 대신 `/api/users/:id`처럼 패턴으로 정규화합니다.
+3. **필요한 라벨만 남기기**: method, status, endpoint처럼 집계할 가치가 있는 차원만 라벨로 붙입니다.
+
+### 카디널리티 추정
+
+라벨 값이 각각 N개씩이면 카디널리티는 곱입니다. method 3가지 × endpoint 10가지 × status 5가지 = 150 시계열입니다. 라벨 하나를 더하기 전에 정말 필요한지, 대신 로그로 남길 수 있는지 먼저 물어봐야 합니다.
+
 ## 한눈에 보는 구조
 
 메트릭은 애플리케이션에서 시작해 저장소로 모여 대시보드로 표현됩니다. Pull과 push 방식이 있고, 각각 운영 환경에서 다른 장단점을 가집니다.
@@ -61,6 +146,20 @@ last_reviewed: '2026-05-15'
 - 시계열: 라벨 집합, 값, 시각으로 이루어진 데이터입니다.
 - PromQL: Prometheus 질의 언어입니다.
 - 패널: 대시보드 안의 개별 그래프입니다.
+
+## Pull vs Push 방식 비교
+
+메트릭 수집에는 크게 두 가지 방식이 있습니다.
+
+| 구분 | Pull (끝어오기) | Push (밀어넣기) |
+| --- | --- | --- |
+| 대표 도구 | Prometheus | Datadog, CloudWatch |
+| 동작 | 수집기가 주기적으로 엔드포인트 호출 | 애플리케이션이 수집기로 전송 |
+| 장점 | 수집 주기 통제 쉽고, 타깃 발견 쉽음 | 방화벽 안에서도 동작, 짧은 수명 작업 수집 가능 |
+| 단점 | 수집기가 엔드포인트에 도달 불가하면 실패 | 애플리케이션에 수집기 주소 설정 필요 |
+| 사용 상황 | 쿠버네티스, 마이크로서비스 | 서버리스, 단기 작업 |
+
+Prometheus는 pull 모델을 택했습니다. 수집기가 주도권을 가지기 때문에 어떤 타깃을 언제 읽을지 통제하기 쉽고, 타깃 발견도 서비스 디스커버리와 연결하면 자동화할 수 있습니다.
 
 ## 바꾸기 전과 후
 
@@ -182,6 +281,109 @@ Expected output:
 ## 정리
 
 메트릭 파이프라인이 붙으면 시스템은 그래프로 말을 하기 시작합니다. 애플리케이션은 메트릭을 노출하고, Prometheus는 수집하고, Grafana는 질문 단위의 화면으로 바꿉니다. 다음 글에서는 숫자만으로 부족한 이유, 곧 구조화된 로그가 왜 필요한지 이어서 보겠습니다.
+
+## Prometheus 스크레이프 구성 예시
+
+실무에서는 서비스 수가 늘면서 스크레이프 설정이 빠르게 복잡해집니다. 아래 예시는 정적 타깃과 Kubernetes 서비스 디스커버리를 함께 쓰는 기본 구성입니다.
+
+```yaml
+global:
+  scrape_interval: 15s
+  evaluation_interval: 30s
+
+scrape_configs:
+  - job_name: "app-static"
+    scrape_interval: 5s
+    static_configs:
+      - targets: ["app-1:8000", "app-2:8000"]
+        labels:
+          team: "checkout"
+          env: "prod"
+
+  - job_name: "node-exporter"
+    static_configs:
+      - targets: ["node-a:9100", "node-b:9100"]
+
+  - job_name: "kubernetes-pods"
+    kubernetes_sd_configs:
+      - role: pod
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        action: keep
+        regex: true
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_port]
+        action: replace
+        target_label: __address__
+        regex: (.+)
+        replacement: ${1}
+```
+
+구성 포인트는 두 가지입니다. 첫째, 모든 잡에 동일 간격을 쓰지 않습니다. 변화가 빠른 API는 5초, 상대적으로 완만한 노드 지표는 15초 이상으로 분리하면 수집 비용을 줄일 수 있습니다. 둘째, `team`, `env` 같은 운영 라벨을 명시적으로 붙여 질의와 라우팅을 단순화합니다.
+
+## Counter, Gauge, Histogram 실전 코드
+
+아래 예시는 동일 요청에서 세 메트릭 타입을 어떻게 함께 쓰는지 보여 줍니다.
+
+```python
+import random
+import time
+from prometheus_client import Counter, Gauge, Histogram
+
+REQUEST_TOTAL = Counter(
+    "checkout_requests_total",
+    "Total checkout requests",
+    ["route", "status"],
+)
+
+INFLIGHT = Gauge(
+    "checkout_inflight_requests",
+    "In-flight checkout requests",
+)
+
+LATENCY = Histogram(
+    "checkout_request_duration_seconds",
+    "Checkout request duration",
+    ["route"],
+    buckets=(0.05, 0.1, 0.25, 0.5, 1.0, 2.0, 5.0),
+)
+
+
+def handle_checkout(route: str = "/checkout") -> int:
+    INFLIGHT.inc()
+    started = time.time()
+    try:
+        time.sleep(random.uniform(0.03, 0.7))
+        status = 500 if random.random() < 0.08 else 200
+        REQUEST_TOTAL.labels(route=route, status=str(status)).inc()
+        return status
+    finally:
+        LATENCY.labels(route=route).observe(time.time() - started)
+        INFLIGHT.dec()
+```
+
+Counter는 누적 사실을 기록합니다. Gauge는 현재 순간 상태를 기록합니다. Histogram은 분포를 기록합니다. 세 타입을 분리하지 않고 하나로 뭉개면, 나중에 경보를 설계할 때 의미가 섞여 잘못된 결론으로 이어질 수 있습니다.
+
+## PromQL 해석 패턴
+
+대시보드 품질은 질의 품질과 같습니다. 아래 세 질의는 가장 자주 쓰는 기본 패턴입니다.
+
+```promql
+# 초당 처리량
+sum(rate(checkout_requests_total[1m]))
+
+# 5xx 비율
+sum(rate(checkout_requests_total{status=~"5.."}[5m]))
+/
+sum(rate(checkout_requests_total[5m]))
+
+# p95 지연
+histogram_quantile(
+  0.95,
+  sum by (le) (rate(checkout_request_duration_seconds_bucket[5m]))
+)
+```
+
+해석 순서는 항상 동일하게 가져가는 편이 좋습니다. 먼저 분모와 분자가 맞는지 확인하고, 다음으로 집계 축(`by`)이 과하거나 부족하지 않은지 봅니다. 마지막으로 윈도우 길이가 질문에 맞는지 점검합니다. 30초 단위 흔들림을 보려면 5분 윈도우는 너무 느리고, 월간 추세를 보려면 1분 윈도우는 너무 시끄럽습니다.
 
 ## 처음 질문으로 돌아가기
 

@@ -41,7 +41,7 @@ This is post 6 in the Developer Career 101 series.
 
 This picture places System Design Interviews inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of System Design Interviews is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> System design is not about the perfect answer; it is about understanding requirements, making assumptions explicit, and explaining your tradeoffs clearly.
 
 ## What You Will Learn
 
@@ -55,7 +55,7 @@ This picture places System Design Interviews inside an operating flow. The point
 
 Design is the senior-level filter.
 
-## Concept at a Glance
+System design is about making requirements explicit, exploring tradeoffs, and defending your choices.
 
 ## Key Terms
 

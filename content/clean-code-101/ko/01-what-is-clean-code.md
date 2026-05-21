@@ -41,9 +41,9 @@ last_reviewed: '2026-05-15'
 
 *Clean Code 101 1장 흐름 개요*
 
-이 그림에서는 Clean Code란 무엇인가?를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+이 그림은 코드 품질을 입력-처리-검증-신호의 네 가지 경계로 나누어 봅니다. 각 경계에서 어떤 책임을 진다는 것인지 분명하면, Clean Code의 나머지 원칙도 자동으로 따라갑니다.
 
-> Clean Code란 무엇인가?의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+> Clean Code는 한 번의 수정이 다른 곳을 깨뜨리지 않도록 경계를 명확하게 만드는 일입니다.
 
 ## 왜 중요한가
 
@@ -197,6 +197,134 @@ ruff check app/
 ## 정리 및 다음 단계
 
 Clean Code는 추상적인 취향이 아니라, 측정 가능한 작은 원칙의 합입니다. 다음 글에서는 그중에서도 가장 즉각적인 효과를 내는 주제인 이름 짓기를 다룹니다.
+
+
+## 코드 품질 지표를 숫자로 다루는 방법
+
+좋은 코드는 감각으로도 구분할 수 있지만, 팀 단위 개선에서는 숫자가 반드시 필요합니다. 숫자는 논쟁을 줄이고 우선순위를 정해 줍니다. 아래 표는 Clean Code 관점에서 자주 쓰는 지표와 해석 기준입니다.
+
+| 지표 | 권장 기준 | 측정 도구 예시 | 경고 신호 | 개선 우선순위 |
+| --- | --- | --- | --- | --- |
+| 함수 길이 | 20줄 이하 권장 | `radon`, 수동 리뷰 | 50줄 이상 함수 다수 | 높음 |
+| 순환 복잡도 | 10 이하 권장 | `radon cc` | 15 이상 분기 함수 | 높음 |
+| 인자 개수 | 3개 이하 권장 | 코드 리뷰, linter | 5개 이상 시그니처 | 중간 |
+| 중복률 | 낮을수록 좋음 | `jscpd` 유사 도구, 리뷰 | 같은 규칙이 여러 파일에 반복 | 높음 |
+| 테스트 커버리지 | 맥락 의존, 핵심 로직 우선 | `pytest --cov` | 핵심 계산 경로 미검증 | 높음 |
+| 변경 실패율 | 낮을수록 좋음 | 배포 지표 | 사소한 수정 후 장애 빈발 | 매우 높음 |
+
+지표는 절대 기준이 아니라 대화의 시작점입니다. 예를 들어 함수 길이가 30줄이어도 도메인 단위가 분명하고 테스트가 충분하면 유지할 수 있습니다. 반대로 12줄 함수라도 이름이 거짓말하고 부수 효과가 숨어 있으면 구조적으로 더 위험할 수 있습니다. 중요한 것은 지표를 맹신하지 않고, 지표를 근거로 설계 의도를 검증하는 습관입니다.
+
+## 기술 부채 비용을 계산하는 실무 예시
+
+기술 부채를 "나중에 고치면 된다"로 두면 거의 항상 더 비싸집니다. 아래는 단순한 산식으로 비용을 가시화하는 예시입니다.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class RefactorCost:
+    current_hours: float
+    monthly_growth_rate: float
+    delay_months: int
+    outage_risk_cost: float
+
+
+def estimate_total_cost(cost: RefactorCost) -> float:
+    # 지연할수록 수정 시간이 복리로 증가한다고 가정합니다.
+    future_hours = cost.current_hours * ((1 + cost.monthly_growth_rate) ** cost.delay_months)
+    engineering_cost = future_hours * 100_000  # 시간당 10만 원 가정
+    return engineering_cost + cost.outage_risk_cost
+
+
+def compare_now_vs_later() -> tuple[float, float]:
+    now = RefactorCost(
+        current_hours=18,
+        monthly_growth_rate=0.12,
+        delay_months=0,
+        outage_risk_cost=100_000,
+    )
+    later = RefactorCost(
+        current_hours=18,
+        monthly_growth_rate=0.12,
+        delay_months=6,
+        outage_risk_cost=1_000_000,
+    )
+    return estimate_total_cost(now), estimate_total_cost(later)
+```
+
+위 모델은 단순화된 예시이지만 팀 의사결정에는 충분히 유용합니다. 지금 고치면 200만 원 수준, 6개월 뒤에는 450만 원 이상으로 커질 수 있다는 숫자가 보이면, 리팩토링이 "취향"이 아니라 "재무적 선택"이라는 사실이 분명해집니다. 특히 장애 위험 비용을 같이 계산하면, 테스트와 구조 개선의 가치를 더 쉽게 설명할 수 있습니다.
+
+## 코드 품질 대시보드 설계 예시
+
+팀이 매주 보는 대시보드에는 최소한 다음 항목이 포함되는 편이 좋습니다.
+
+1. 복잡도 상위 20개 함수
+2. 최근 30일 변경 파일 중 테스트 미보강 항목
+3. 중복 규칙 감지 목록
+4. 리뷰에서 반복된 지적 키워드
+5. 핫스팟 파일의 리드타임
+
+핵심은 "어디부터 고칠지"가 바로 보이게 만드는 것입니다. 좋은 대시보드는 문제를 미학적으로 보여 주는 것이 아니라, 다음 행동을 즉시 고르게 도와줍니다. 따라서 지표를 많이 모으기보다, 행동으로 이어지는 지표를 작게 유지하는 쪽이 낫습니다.
+
+
+## 실무 적용 메모
+
+아래 메모는 팀 내 합의 문서에 그대로 옮겨 적어도 되는 수준의 운영 규칙입니다.
+
+1. 리뷰는 코드 스타일보다 변경 위험을 먼저 다룹니다.
+2. 규칙 위반은 사람 지적보다 자동화 전환을 우선합니다.
+3. 반복되는 설계 결함은 교육 과제가 아니라 구조 개선 과제로 등록합니다.
+4. 모든 개선은 테스트와 함께 진행하며, 동작 변경 여부를 PR 설명에 명시합니다.
+5. 다음 분기 목표에는 "새 기능 수"와 함께 "변경 비용 감소 지표"를 반드시 포함합니다.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class QualityGate:
+    has_tests: bool
+    has_clear_names: bool
+    has_boundary_error_handling: bool
+    has_small_functions: bool
+    has_review_notes: bool
+
+
+def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
+    missing = []
+    if not gate.has_tests:
+        missing.append("tests")
+    if not gate.has_clear_names:
+        missing.append("naming")
+    if not gate.has_boundary_error_handling:
+        missing.append("error-boundary")
+    if not gate.has_small_functions:
+        missing.append("function-size")
+    if not gate.has_review_notes:
+        missing.append("review-notes")
+    return len(missing) == 0, missing
+```
+
+이 체크 함수는 단순하지만, 품질 기준을 코드로 표현하는 출발점이 됩니다. 팀이 기준을 말로만 합의하면 시간이 지나며 흐려집니다. 반대로 코드와 템플릿과 자동화 규칙으로 남기면 신규 멤버가 들어와도 동일한 기준이 유지됩니다.
+
+또한 개선 활동은 단발성 이벤트가 아니라 루프여야 합니다. 한 번의 대청소보다 매 PR마다 작은 개선을 추가하는 편이 장기적으로 더 강합니다. 이름 하나, 함수 하나, 분기 하나를 매번 더 낫게 만드는 습관이 쌓이면 코드베이스의 평균 품질이 올라가고, 장애 대응 속도도 실제로 빨라집니다.
+
+
+## 추가 사례: 변경 비용 예측 스프린트 회고
+
+스프린트 회고에서 아래 세 질문을 반복하면 품질 개선 항목이 구체화됩니다.
+
+- 이번 스프린트에서 가장 오래 걸린 변경은 무엇이었는가
+- 오래 걸린 이유가 도메인 복잡도인지 코드 구조인지 구분되었는가
+- 같은 종류의 변경을 다음 달에는 얼마나 줄일 수 있는가
+
+```python
+def estimate_next_month_effort(current_hours: float, reduction_goal: float) -> float:
+    if not 0 <= reduction_goal <= 1:
+        raise ValueError("reduction_goal must be in [0, 1]")
+    return current_hours * (1 - reduction_goal)
+```
+
+이런 질문과 간단한 계산만으로도 "감" 중심 회고를 "계획" 중심 회고로 바꿀 수 있습니다.
 
 ## 처음 질문으로 돌아가기
 

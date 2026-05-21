@@ -40,8 +40,6 @@ This is post 6 in the Frontend Development 101 series. Here we frame async work 
 
 This picture places API Calls and Async inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of API Calls and Async is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The *minimum usage* of `fetch` and `async/await`
@@ -56,8 +54,6 @@ This picture places API Calls and Async inside an operating flow. The point is n
 Async bugs make up *half of frontend defects*. They hide on a fast network and explode on a user's *slow 3G*. Explicit state management is *the only cure*.
 
 > Good async code *assumes the worst network*.
-
-## Concept at a Glance
 
 ## Key Terms
 

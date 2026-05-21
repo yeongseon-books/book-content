@@ -61,8 +61,6 @@ This installment has three goals:
 
 This picture places Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Where scaling decisions are made
 
 Before we touch any code, here's the whole thing in one diagram.

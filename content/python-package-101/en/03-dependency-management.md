@@ -42,8 +42,6 @@ This is post 3 in the Python Package 101 series. Here we cover virtual environme
 
 This picture places Dependency Management — venv, pip, uv, requirements inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Dependency Management — venv, pip, uv, requirements is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What you will learn
 
 - How to create and activate a virtual environment with `python -m venv`

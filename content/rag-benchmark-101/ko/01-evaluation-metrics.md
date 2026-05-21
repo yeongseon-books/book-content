@@ -321,4 +321,6 @@ for row in report_rows:
 - [BEIR: A heterogeneous benchmark for zero-shot evaluation of IR models](https://arxiv.org/abs/2104.08663)
 - [MTEB Leaderboard](https://huggingface.co/spaces/mteb/leaderboard)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/rag-benchmark-101/ko/01-evaluation-metrics)
+
 Tags: RAG, VectorDB, Benchmarking, LLM

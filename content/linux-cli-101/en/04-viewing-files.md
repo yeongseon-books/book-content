@@ -42,8 +42,6 @@ This is post 4 in the Linux CLI 101 series.
 
 This picture places cat, less, head, tail — Viewing File Contents inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of cat, less, head, tail — Viewing File Contents is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 Viewing file contents comes up constantly during development. You check config values, hunt for errors in logs, and inspect CSV headers. Opening an editor is slow for large files, and edit mode risks accidental changes.

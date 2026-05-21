@@ -56,8 +56,6 @@ ACA's internal implementation is not published by Microsoft, so these versions a
 
 This picture places The Envoy ingress path — how the first request reaches your container inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of The Envoy ingress path — how the first request reaches your container is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Start with the full path, not with the app
 
 The first mistake in ingress debugging is to start at the user container.

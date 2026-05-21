@@ -294,4 +294,6 @@ ACA의 스케일링은 단순한 제품 편의 기능이 아닙니다. 사용자
 - [Azure AKS Deep Dive](../../azure-aks-deep-dive/ko/)
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/ko/)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-aca-deep-dive/ko/04-keda-in-aca)
+
 Tags: Container Apps, KEDA, Dapr, Envoy

@@ -45,13 +45,13 @@ In this chapter, we separate the user-facing layer, lifecycle daemon, low-level 
 
 This picture places Runtime inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Runtime is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> The runtime is really three layers: high-level (Docker, containerd) for image and storage; low-level (runc) for process spawning; and orchestration glue (CRI) for Kubernetes.
 
 ## Why It Matters
 
 Since Kubernetes 1.24 removed `dockershim`, you cannot debug effectively without knowing the runtime layers.
 
-## Concept at a Glance
+Docker and containerd are daemons that manage images and storage. runc is the actual process executor. When Kubernetes 1.24 removed dockershim, it meant most clusters switch directly to containerd or another CRI-compatible runtime.
 
 ## Key Terms
 

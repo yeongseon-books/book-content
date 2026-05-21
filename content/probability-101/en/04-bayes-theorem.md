@@ -52,8 +52,6 @@ Bayes' theorem is the compact rule that ties those pieces together. It is both a
 
 > Bayes' theorem does not throw away what you believed before. It combines prior belief and new evidence in a consistent way.
 
-## Concept at a Glance
-
 ## Key Terms
 
 - **Prior P(H)**: belief before seeing data.

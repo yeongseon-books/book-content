@@ -41,9 +41,9 @@ last_reviewed: '2026-05-15'
 
 *Clean Code 101 6장 흐름 개요*
 
-이 그림에서는 오류 처리를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
+오류 처리는 시스템 견고함을 결정하지만, 동시에 가독성을 망칠 수도 있습니다. 오류처리, 도메인 예외, 외부 호출 재시도, API 경계 매핑이 각각 다른 책임입니다.
 
-> 오류 처리의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+> 입력 검증을 먼저, 흐름을 잃은 순간에만 예외를 쓰세요.
 
 ## 왜 중요한가
 
@@ -226,6 +226,137 @@ API 서버에서는 핸들러가 보통 경계가 됩니다. 도메인 로직은
 ## 정리 및 다음 단계
 
 오류 처리는 일급 시민이어야 하지만, 주인공이 되어서는 안 됩니다. 다음 글에서는 자주 오해되고 남용되기 쉬운 주석과 문서화를 다룹니다.
+
+
+## 오류 처리 패턴 비교표
+
+오류 처리는 하나의 정답이 아니라 상황별 트레이드오프입니다. 아래 표는 자주 쓰는 패턴의 선택 기준을 정리한 것입니다.
+
+| 패턴 | 적합한 상황 | 장점 | 단점 | Python 구현 힌트 |
+| --- | --- | --- | --- | --- |
+| 예외 전파 | 호출자가 즉시 복구 불가 | 실패 원인 보존 | 제어 흐름 추적 난이도 증가 | `raise DomainError(...) from e` |
+| 값으로 반환(Result) | 호출자가 분기 처리 가능 | 테스트 단순, 흐름 명시 | 호출자 분기 코드 증가 | `Result(ok, value, error)` |
+| 경계 매핑 | API/CLI 경계에서 상태 코드 필요 | 내부-외부 책임 분리 | 매핑 테이블 유지 필요 | `except DomainError: return 400` |
+| 재시도+백오프 | 일시적 네트워크 장애 | 성공률 개선 | 멱등성 없으면 위험 | 지수 백오프 + 지터 |
+| 서킷 브레이커 | 다운스트림 장애가 길 때 | 연쇄 장애 방지 | 상태 관리 복잡 | 실패 카운터 + cooldown |
+
+핵심은 "복구 가능성"과 "경계 위치"입니다. 복구 가능한 실패는 값으로, 복구 불가능한 실패는 예외로 다루는 편이 구조가 선명해집니다.
+
+## 예외 계층 설계 예시
+
+```python
+class AppError(Exception):
+    """애플리케이션 최상위 예외"""
+
+
+class DomainError(AppError):
+    """비즈니스 규칙 위반"""
+
+
+class ValidationError(DomainError):
+    """입력 검증 실패"""
+
+
+class PricingError(DomainError):
+    """가격 계산 실패"""
+
+
+class InfraError(AppError):
+    """외부 시스템/인프라 오류"""
+
+
+class TimeoutInfraError(InfraError):
+    """타임아웃"""
+```
+
+예외 계층을 분리하면 핸들러에서 분기 기준이 명확해집니다. 예를 들어 `ValidationError`는 400, `InfraError`는 503처럼 일관된 HTTP 매핑을 만들 수 있습니다. 또한 로그 집계에서도 도메인 오류와 인프라 오류를 따로 관찰할 수 있어 운영 판단이 빨라집니다.
+
+## 경계 매핑과 재시도 구현 예시
+
+```python
+import random
+import time
+from dataclasses import dataclass
+
+
+@dataclass
+class HttpResponse:
+    status: int
+    body: dict
+
+
+def with_retry(operation, attempts: int = 3):
+    for attempt in range(attempts):
+        try:
+            return operation()
+        except TimeoutError as error:
+            if attempt == attempts - 1:
+                raise TimeoutInfraError("retry exhausted") from error
+            sleep_seconds = (2 ** attempt) + random.random()
+            time.sleep(sleep_seconds)
+
+
+def handle_http_request(payload: dict) -> HttpResponse:
+    try:
+        if "amount" not in payload:
+            raise ValidationError("amount is required")
+        if payload["amount"] <= 0:
+            raise ValidationError("amount must be positive")
+
+        result = with_retry(lambda: {"ok": True, "charged": payload["amount"]})
+        return HttpResponse(status=200, body=result)
+
+    except ValidationError as error:
+        return HttpResponse(status=400, body={"error": str(error)})
+    except InfraError:
+        return HttpResponse(status=503, body={"error": "temporary unavailable"})
+    except AppError:
+        return HttpResponse(status=500, body={"error": "application error"})
+```
+
+위 구조에서는 내부 함수가 자신의 실패 의미를 예외 타입으로 전달하고, API 경계가 외부 계약으로 변환합니다. 이 분리가 되어 있으면 장애 시 대응도 단순해집니다.
+
+
+## 실무 적용 메모
+
+아래 메모는 팀 내 합의 문서에 그대로 옮겨 적어도 되는 수준의 운영 규칙입니다.
+
+1. 리뷰는 코드 스타일보다 변경 위험을 먼저 다룹니다.
+2. 규칙 위반은 사람 지적보다 자동화 전환을 우선합니다.
+3. 반복되는 설계 결함은 교육 과제가 아니라 구조 개선 과제로 등록합니다.
+4. 모든 개선은 테스트와 함께 진행하며, 동작 변경 여부를 PR 설명에 명시합니다.
+5. 다음 분기 목표에는 "새 기능 수"와 함께 "변경 비용 감소 지표"를 반드시 포함합니다.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class QualityGate:
+    has_tests: bool
+    has_clear_names: bool
+    has_boundary_error_handling: bool
+    has_small_functions: bool
+    has_review_notes: bool
+
+
+def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
+    missing = []
+    if not gate.has_tests:
+        missing.append("tests")
+    if not gate.has_clear_names:
+        missing.append("naming")
+    if not gate.has_boundary_error_handling:
+        missing.append("error-boundary")
+    if not gate.has_small_functions:
+        missing.append("function-size")
+    if not gate.has_review_notes:
+        missing.append("review-notes")
+    return len(missing) == 0, missing
+```
+
+이 체크 함수는 단순하지만, 품질 기준을 코드로 표현하는 출발점이 됩니다. 팀이 기준을 말로만 합의하면 시간이 지나며 흐려집니다. 반대로 코드와 템플릿과 자동화 규칙으로 남기면 신규 멤버가 들어와도 동일한 기준이 유지됩니다.
+
+또한 개선 활동은 단발성 이벤트가 아니라 루프여야 합니다. 한 번의 대청소보다 매 PR마다 작은 개선을 추가하는 편이 장기적으로 더 강합니다. 이름 하나, 함수 하나, 분기 하나를 매번 더 낫게 만드는 습관이 쌓이면 코드베이스의 평균 품질이 올라가고, 장애 대응 속도도 실제로 빨라집니다.
 
 ## 처음 질문으로 돌아가기
 

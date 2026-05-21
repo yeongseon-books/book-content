@@ -329,4 +329,6 @@ curl "https://func-hello-xxxxx.azurewebsites.net/api/hello?name=Sisyphus"
 
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/ko/) — Host와 배포 이후 런타임 구조를 더 안쪽까지 보고 싶다면
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-functions-101/ko/04-first-deploy)
+
 Tags: Azure, Azure Functions, Serverless, Cloud

@@ -45,8 +45,6 @@ This is post 9 in the Database Systems 101 series.
 
 This picture places Replication and Backup inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Replication and Backup is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - How primary-replica replication works and what each role does
@@ -59,8 +57,6 @@ This picture places Replication and Backup inside an operating flow. The point i
 Failures happen. Disks die, someone runs the wrong DELETE, an entire region goes down. Replication and backup answer in advance: "when that happens, how much data do we lose, and how fast do we recover?"
 
 > A backup whose restore procedure has never been exercised is not a backup.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR

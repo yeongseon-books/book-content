@@ -44,8 +44,6 @@ In this chapter, we will frame validation as a contract that makes the system pr
 
 This picture places Input Validation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Input Validation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions This Chapter Answers
 
 - The difference between *allowlists* and *denylists*
@@ -59,8 +57,6 @@ This picture places Input Validation inside an operating flow. The point is not 
 Half of the OWASP Top 10 comes from *trusting input*. SQL injection, XSS, path traversal, unsafe deserialization — all are the result of a server *trusting the client too much*.
 
 > *The client is *hostile*. Validate again on the *server*.*
-
-## Concept at a Glance
 
 ## Key Terms
 

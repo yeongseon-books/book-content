@@ -214,6 +214,77 @@ def batch_review(items: Iterable[tuple[str, list[str]]]) -> None:
 
 그래서 문서 유형별 기본값을 다르게 잡고, 청크 수만이 아니라 길이 분포와 미리보기를 함께 점검해야 합니다. 다음 단계에서는 이렇게 만든 청크에 어떤 메타데이터를 붙여야 검색 후보군을 더 안정적으로 줄일 수 있는지 보겠습니다.
 
+### Recursive splitter 설정을 코드로 고정하는 방법
+
+실험을 반복하다 보면 separator 순서가 자주 바뀌는데, 이 변경이 기록되지 않으면 같은 문서를 다시 청킹해도 결과가 달라집니다. 그래서 프리셋을 코드 상수로 두고 문서 유형별 정책을 명시적으로 분리하는 편이 운영에 유리합니다.
+
+```python
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+@dataclass(frozen=True)
+class SplitterPreset:
+    chunk_size: int
+    chunk_overlap: int
+    separators: list[str]
+
+PRESETS: dict[str, SplitterPreset] = {
+    'faq': SplitterPreset(120, 24, ['\n\n', '\n', '? ', '. ', ' ']),
+    'manual': SplitterPreset(240, 48, ['\n## ', '\n\n', '\n', '. ', ' ']),
+    'policy': SplitterPreset(320, 72, ['\n\n', '\n', '; ', '. ', ' ']),
+}
+
+def build_splitter(doc_type: str) -> RecursiveCharacterTextSplitter:
+    preset = PRESETS[doc_type]
+    return RecursiveCharacterTextSplitter(
+        chunk_size=preset.chunk_size,
+        chunk_overlap=preset.chunk_overlap,
+        separators=preset.separators,
+    )
+```
+
+이 패턴의 장점은 `doc_type`만으로 분할 정책이 완전히 결정된다는 점입니다. 나중에 검색 회귀가 발생했을 때도, 어떤 문서군에 어떤 separator 순서를 적용했는지 곧바로 추적할 수 있습니다.
+
+### overlap 튜닝을 자동 비교하는 최소 루프
+
+겹침 값을 감으로 올리면 청크 수와 중복 토큰 비용이 빠르게 증가합니다. 반대로 너무 낮추면 질문의 앞부분과 답변의 뒷부분이 서로 다른 청크로 갈라집니다. 아래처럼 후보 overlap을 한 번에 비교하면, 비용과 문맥 보존 사이의 균형점을 찾기 쉽습니다.
+
+```python
+from __future__ import annotations
+
+from statistics import mean
+
+def tune_overlap(text: str, chunk_size: int, overlaps: list[int]) -> None:
+    for overlap in overlaps:
+        splitter = RecursiveCharacterTextSplitter(
+            chunk_size=chunk_size,
+            chunk_overlap=overlap,
+            separators=['\n\n', '\n', '. ', ' '],
+        )
+        chunks = splitter.split_text(text)
+        lengths = [len(chunk) for chunk in chunks]
+        duplicated = max(0, overlap) * max(0, len(chunks) - 1)
+        print(
+            f'overlap={overlap:>2} chunks={len(chunks):>2} '
+            f'avg={mean(lengths):>6.1f} duplicate_chars~={duplicated:>4}'
+        )
+
+sample_text = ' '.join(
+    [
+        '질문과 답변이 교차하는 FAQ 문단입니다.',
+        '겹침이 부족하면 질문과 답변이 분리됩니다.',
+        '겹침이 과하면 중복 비용이 커집니다.',
+    ]
+    * 20
+)
+tune_overlap(sample_text, chunk_size=180, overlaps=[0, 12, 24, 36, 48])
+```
+
+출력에서 `duplicate_chars`가 급증하는 지점을 먼저 찾고, 그 직전 값을 시작점으로 삼으면 과도한 중복 없이 문맥 연결을 확보할 수 있습니다. 이런 식으로 튜닝 과정을 숫자로 기록해 두면, 나중에 임베딩 모델을 바꿔도 청킹 정책을 독립적으로 유지할 수 있습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **모든 문서에 같은 chunk_size를 쓰면 왜 검색 품질이 흔들릴까요?**

@@ -45,8 +45,6 @@ This is post 2 in the Data Structures 101 series.
 
 This picture places Arrays and Dynamic Arrays inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Arrays and Dynamic Arrays is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - How a fixed-size array is laid out and why indexing is O(1)
@@ -61,8 +59,6 @@ Arrays are among the most basic and the fastest data structures. They mesh perfe
 > Without understanding arrays, you cannot deeply understand any other data structure.
 
 This article goes beyond "a collection of values" and looks at memory layout, reallocation, and cache friendliness.
-
-## Concept at a Glance
 
 > An array is a contiguous block of memory. `arr[i]` is computed as start address + `i × element size`, so it is O(1). When a dynamic array runs out of capacity, it usually allocates a block twice as large and copies the old elements over.
 

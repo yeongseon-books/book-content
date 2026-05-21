@@ -41,15 +41,11 @@ This is the final post in the Web Development 101 series. Here we turn the serie
 
 This picture places Building a Small Web App inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Building a Small Web App is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Knowledge sets only when you *make something small*. One small full-stack app teaches more than five books. The Todo app you build here becomes the skeleton of *every project that follows*.
 
 > Build *small* and go *all the way through*.
-
-## Concept at a Glance
 
 This final figure is the whole series compressed into one vertical slice. The browser submits input, Flask accepts and stores it, SQLite persists it, and the same data comes back through JSON for rendering.
 

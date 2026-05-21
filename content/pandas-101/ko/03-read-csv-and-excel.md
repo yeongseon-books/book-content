@@ -97,6 +97,19 @@ print(df.head())
 
 문자가 깨지거나 열이 한 칸으로 뭉쳐 들어오면 가장 먼저 확인할 항목이 인코딩과 구분자입니다. 파일 형식은 CSV처럼 보여도 실제 설정은 제각각인 경우가 많습니다.
 
+## 파일 형식별 read 함수
+
+파일 형식에 따라 다른 read 함수를 사용합니다. 각 형식의 특성과 성능을 이해하면 적절한 선택을 할 수 있습니다.
+
+| 형식 | 함수 | 주요 옵션 | 성능 |
+| --- | --- | --- | --- |
+| CSV | `read_csv` | `encoding`, `sep`, `dtype` | 빠름 |
+| Excel | `read_excel` | `sheet_name`, `header` | 느림 |
+| JSON | `read_json` | `orient`, `lines` | 보통 |
+| Parquet | `read_parquet` | `columns` | 매우 빠름 |
+
+CSV는 가장 흔하지만 인코딩 문제가 자주 생깁니다. Parquet는 타입 정보가 포함되어 있고 압축도 되어 있어 효율적이지만, 외부 시스템과의 호환성이 떨어지는 경우가 있습니다.
+
 ### 3단계 - 자료형을 명시하기
 
 ```python
@@ -129,6 +142,40 @@ print(total)
 ```
 
 청크 단위 적재는 큰 파일을 통째로 메모리에 올리지 않고도 행 수나 부분 집계를 확인할 수 있게 해 줍니다. 운영 환경에서는 이런 중간 확인이 메모리 사고를 예방합니다.
+
+## read_csv 옵션 상세 예제
+
+CSV 파일은 가장 보편적이지만 가장 까다로운 형식이기도 합니다. 다양한 옵션을 알아두면 현장의 대부분 문제를 해결할 수 있습니다.
+
+### 인코딩 명시
+
+```python
+df = pd.read_csv("data.csv", encoding="cp949")
+```
+
+한국어 데이터는 대부분 UTF-8 또는 CP949로 저장됩니다. 문자가 깨지면 먼저 인코딩을 확인하세요.
+
+### 날짜 열 파싱
+
+```python
+df = pd.read_csv(
+    "sales.csv",
+    parse_dates=["order_date", "ship_date"],
+    date_format="%Y-%m-%d",
+)
+print(df.dtypes)
+```
+
+날짜를 문자열로 두면 시계열 연산이 불가능합니다. 읽는 시점에 날짜형으로 변환해 두면 이후 처리가 훨씬 간결해집니다.
+
+### 특정 열만 읽기
+
+```python
+df = pd.read_csv("large.csv", usecols=["id", "name", "amount"])
+print(df.columns)
+```
+
+`usecols`로 필요한 열만 골라 읽으면 메모리와 시간을 크게 줄일 수 있습니다. 특히 수백 개의 열이 있는 파일에서 유용합니다.
 
 **예상 출력:**
 
@@ -164,12 +211,151 @@ ERP CSV, 회계 Excel, 외부 기관 데이터처럼 실무 파일은 형식이 
 - 큰 파일은 `chunksize`로 메모리를 방어합니다.
 - 원본 파일은 손대지 않고 읽기 로직만 조정합니다.
 
+## 실전 예제: 여러 파일 통합
+
+실무에서는 여러 파일을 읽어 하나로 통합하는 작업이 자주 등장합니다.
+
+```python
+import glob
+files = glob.glob("data/*.csv")
+dfs = []
+for file in files:
+    df = pd.read_csv(file)
+    dfs.append(df)
+combined = pd.concat(dfs, ignore_index=True)
+print(combined.shape)
+```
+
+여러 파일을 결합할 때는 열 구조가 동일한지 반드시 확인해야 합니다.
+
+## 오류 처리
+
+파일을 읽다가 오류가 발생하면 전체 파이프라인이 멈춘 수 있습니다. 오류 처리 옵션을 활용하면 더 강건한 코드를 작성할 수 있습니다.
+
+### 라인 오류 건너뛰기
+
+```python
+df = pd.read_csv("dirty.csv", on_bad_lines="skip")
+print(f"Loaded {len(df)} rows")
+```
+
+형식이 맞지 않는 행을 건너뛰고 나머지만 읽을 수 있습니다. 다만 몇 행이 누락되었는지 기록해 두는 편이 좋습니다.
+
+### 인코딩 오류 처리
+
+```python
+df = pd.read_csv("data.csv", encoding="utf-8", encoding_errors="ignore")
+```
+
+인코딩 오류를 무시하고 계속 읽을 수 있지만, 데이터가 손상될 수 있으므로 주의가 필요합니다. 가능하면 올바른 인코딩을 찾아 명시하는 편이 좋습니다.
+## 대용량 파일 처리
+
+메모리에 한 번에 올리기 어려운 파일을 다룰 때는 청크 단위 처리가 필수입니다.
+
+### chunksize로 나눠 읽기
+
+```python
+chunk_iter = pd.read_csv("big.csv", chunksize=50000)
+for i, chunk in enumerate(chunk_iter):
+    print(f"Chunk {i}: {len(chunk)} rows")
+    # 각 chunk를 처리
+```
+
+각 청크는 독립적인 데이터프레임입니다. 필터링, 집계, 변환 등을 처리한 뒤 결과만 모으면 메모리 부담을 크게 줄일 수 있습니다.
+
+### 부분 집계 예제
+
+```python
+total_amount = 0
+for chunk in pd.read_csv("sales.csv", chunksize=100000):
+    total_amount += chunk["amount"].sum()
+print(f"Total: {total_amount}")
+```
+
+전체 합계를 구할 때 전체 데이터를 메모리에 올리지 않고도 원하는 결과를 얻을 수 있습니다.
+
+### 메모리 모니터링
+
+```python
+df = pd.read_csv("data.csv")
+print(df.info(memory_usage="deep"))
+```
+
+`info()` 메서드의 `memory_usage` 옵션으로 실제 메모리 사용량을 확인할 수 있습니다. 특히 문자열 열이 많은 경우 메모리가 예상보다 훨씬 크게 잡힐 수 있습니다.
+
 ## 체크리스트
 
 - [ ] 인코딩을 항상 검토합니다.
 - [ ] 필요한 열의 자료형을 지정합니다.
 - [ ] 날짜 열을 읽는 시점에 처리할지 판단합니다.
 - [ ] Excel에서는 시트 이름과 헤더 위치를 확인합니다.
+
+
+
+## 스트리밍 읽기 패턴
+
+대용량 파일을 처리할 때는 전체를 메모리에 올리지 않고 스트리밍 방식으로 처리하는 것이 안전합니다.
+
+```python
+def process_large_csv(filename):
+    result = []
+    for chunk in pd.read_csv(filename, chunksize=100000):
+        # 필터링
+        filtered = chunk[chunk["amount"] > 100]
+        # 집계
+        summary = filtered.groupby("category")["amount"].sum()
+        result.append(summary)
+    return pd.concat(result).groupby(level=0).sum()
+
+total = process_large_csv("sales.csv")
+print(total)
+```
+
+이 패턴은 메모리 한계를 넘는 데이터를 다룰 때 표준적으로 사용됩니다.
+
+
+
+
+### 데이터 검증
+
+파일을 읽은 직후에는 항상 검증 단계를 거쳐야 합니다.
+
+```python
+def validate_dataframe(df, expected_columns, expected_dtypes):
+    assert set(df.columns) == set(expected_columns), "Column mismatch"
+    for col, dtype in expected_dtypes.items():
+        assert df[col].dtype == dtype, f"{col} dtype mismatch"
+    return True
+
+df = pd.read_csv("data.csv")
+validate_dataframe(df, ["id", "name", "amount"], {"id": "int64", "amount": "float64"})
+```
+
+
+
+## 압축 파일 읽기
+
+Pandas는 압축된 파일도 직접 읽을 수 있습니다.
+
+```python
+# gzip
+df = pd.read_csv("data.csv.gz", compression="gzip")
+
+# zip
+df = pd.read_csv("data.zip")
+
+# 자동 감지
+df = pd.read_csv("data.csv.bz2", compression="infer")
+```
+
+압축 파일은 디스크 공간을 절약하면서도 직접 읽을 수 있어 편리합니다.
+
+
+
+압축 파일을 사용하면 네트워크 전송 시간도 줄일 수 있어 클라우드 환경에서 특히 유용합니다.
+
+
+Pandas는 `.csv.gz`, `.csv.zip` 같은 압축 파일도 자동으로 인식해 읽을 수 있습니다. 스토리지를 아끼고 전송 시간을 줄이는 데 유용합니다.
 
 ## 연습 문제
 

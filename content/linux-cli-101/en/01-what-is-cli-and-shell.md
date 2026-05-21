@@ -42,8 +42,6 @@ This is the first post in the Linux CLI 101 series.
 
 This picture places What Is the CLI and Shell? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is the CLI and Shell? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 Most people start programming with a GUI editor and mouse clicks. Double-click a file to open it, click "Run" in the menu. That approach works at first, but the moment you step into a server environment, it falls apart.

@@ -24,7 +24,7 @@ last_reviewed: '2026-05-14'
 
 Buying servers used to be the default. Teams had to order hardware, rack it, wire the network, install the operating system, and only then start building the service itself. Cloud changed that sequence by turning infrastructure into something you can request in minutes.
 
-That convenience is only half of the story. Cloud is not just "someone else's server." It is an operating model where you provision compute, storage, and network on demand, pay for what you actually use, and split responsibility with the provider.
+Cloud provides five key characteristics: on-demand self-service provisioning, broad network access, resource pooling across tenants, elastic scaling, and measured service. Together, they form an operating model that shifts cost structure and responsibility.
 
 This is the first post in the Cloud Computing 101 series.
 
@@ -46,7 +46,7 @@ In this post, we'll build the mental model that makes later topics like service 
 
 This picture places What is Cloud Computing? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What is Cloud Computing? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> The key insight is that cloud cost and risk depend on what you decide to do inside it, not just signing up for it.
 
 ## Questions This Chapter Answers
 
@@ -59,8 +59,6 @@ This picture places What is Cloud Computing? inside an operating flow. The point
 ## Why It Matters
 
 You can launch a global service with *zero up-front capital*. The trade-off is that you must understand *cost* and *responsibility boundaries* from day one.
-
-## Concept at a Glance
 
 ## Key Terms
 

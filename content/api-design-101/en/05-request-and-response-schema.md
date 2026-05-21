@@ -51,8 +51,6 @@ If schemas wobble, *everything* on the client wobbles. Good schemas are *readabl
 
 > A schema is the *grammar* of your data.
 
-## Concept at a Glance
-
 That separation keeps handlers focused on business logic instead of ad hoc coercion. Once validation leaks inward, type fixing, defaulting, and edge-case cleanup start spreading across the service layer.
 
 ## Key Terms

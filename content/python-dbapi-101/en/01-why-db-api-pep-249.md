@@ -48,8 +48,6 @@ This is the first article in the Python DB-API 101 series.
 
 This picture places Why DB-API 2.0 - The Problem PEP 249 Solved inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Why DB-API 2.0 - The Problem PEP 249 Solved is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## 1. The Chaos Before DB-API
 
 Before the standard, every database library had its own API.

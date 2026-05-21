@@ -57,8 +57,6 @@ Cluster Autoscaler is operated by Microsoft as part of the AKS managed control p
 
 This picture places HPA and Cluster Autoscaler internals — two control loops inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of HPA and Cluster Autoscaler internals — two control loops is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Put both loops in one diagram
 
 ---

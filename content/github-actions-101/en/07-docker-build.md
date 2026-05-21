@@ -42,8 +42,6 @@ This is post 7 in the GitHub Actions 101 series. In this post, we will build a p
 
 This picture places Docker Build inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Docker Build is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - Enabling *Buildx* via *docker/setup-buildx-action*
@@ -57,8 +55,6 @@ This picture places Docker Build inside an operating flow. The point is not to m
 The *slowest CI step* is usually the *Docker build*. Done right (cache + multi-stage + Buildx), *minutes* become *seconds*.
 
 > *Container standards* drive *deployment standards*.
-
-## Concept at a Glance
 
 ## Key Terms
 

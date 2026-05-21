@@ -299,4 +299,6 @@ ai-evaluation-101 시리즈에서 이 평가 프레임워크를 자세히 다뤘
 - [RAG Deep Dive - Retriever 설계](../../rag-deep-dive/ko/03-retriever-design.md)
 - [RAG 평가와 벤치마크 101 - 종단 간 RAG 파이프라인 평가](../../rag-benchmark-101/ko/05-e2e-evaluation.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/multimodal-ai-101/ko/05-multimodal-rag)
+
 Tags: Multimodal RAG, CLIP Embeddings, Cross-modal Retrieval, FAISS, LangChain, Vector Search

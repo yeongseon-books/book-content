@@ -40,15 +40,11 @@ This is post 3 in the Backend Development 101 series. Here, we split routers fro
 
 This picture places Routing and Controllers inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Routing and Controllers is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 In a tiny project, a single file works. As endpoints grow, that single file *becomes hell*. Splitting layers from day one makes "where does this code go?" obvious for every new feature.
 
 > Good structure removes the question of *where to put code*.
-
-## Concept at a Glance
 
 Routers are the *map*, controllers are the *front desk*, services are the *experts*.
 

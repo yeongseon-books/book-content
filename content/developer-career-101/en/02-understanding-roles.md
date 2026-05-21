@@ -41,7 +41,7 @@ This is post 2 in the Developer Career 101 series.
 
 This picture places Understanding Roles inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Understanding Roles is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> The key to understanding roles is recognizing that the same title can mean different scope, responsibility, and tooling across companies and teams.
 
 ## What You Will Learn
 
@@ -55,7 +55,7 @@ This picture places Understanding Roles inside an operating flow. The point is n
 
 A bad role fit shortens the path to burnout.
 
-## Concept at a Glance
+Each technical role prioritizes different problems: frontend focuses on user experience, backend on stability and scale, data on accuracy and activation.
 
 ## Key Terms
 

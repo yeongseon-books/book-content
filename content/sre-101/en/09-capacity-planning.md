@@ -42,8 +42,6 @@ This is post 9 in the SRE 101 series. Here we connect demand forecasting, headro
 
 This picture places Capacity Planning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-
-
 ## Why this topic matters
 
 Without a forecast, the next traffic spike usually gets handled too late. By the time the team is discussing more instances or more budget, users may already be feeling the impact.

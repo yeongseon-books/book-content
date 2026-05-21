@@ -336,4 +336,6 @@ else:
 - [툴 호출 — 함수를 모델에 연결하기](./02-tool-calling.md)
 - [캐싱 전략 — 비용과 지연 시간 줄이기](./04-caching-strategies.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/llm-api-production-101/ko/03-streaming-in-depth)
+
 Tags: LLM, OpenAI, Streaming, Python

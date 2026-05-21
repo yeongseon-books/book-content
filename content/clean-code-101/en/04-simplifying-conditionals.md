@@ -43,7 +43,7 @@ Here we will flatten the easy cases with guard clauses, then move the harder cas
 
 This picture places Simplifying Conditionals inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Simplifying Conditionals is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> As your tools grow, branch count falls and flow flattens.
 
 ## Questions this article answers
 
@@ -60,8 +60,6 @@ This picture places Simplifying Conditionals inside an operating flow. The point
 Nested conditionals are the most common source of complexity. Reducing depth by one already doubles readability.
 
 > Depth is cognitive load.
-
-## Concept at a Glance
 
 More tools, fewer branches.
 

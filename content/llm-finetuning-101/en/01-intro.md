@@ -43,8 +43,6 @@ This article frames that decision around three variables so the rest of the seri
 
 This picture places LLM Fine-tuning Primer inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of LLM Fine-tuning Primer is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 LLM fine-tuning does not have to start with a GPU lab. If we throw a large model at the problem first, learning rate, dataset format, and adapter rank all wobble at once, and we lose the ability to tell which knob actually moved the result. The point of post 1 is to defer the model run and align our **arithmetic intuition** first.

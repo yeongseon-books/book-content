@@ -45,8 +45,6 @@ This is the first post in the Type Hints in Python 101 series.
 
 This picture places What Are Python Type Hints? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Are Python Type Hints? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - What type hints are and how they differ from static typing
@@ -61,8 +59,6 @@ As Python projects grow beyond a few hundred lines, the lack of explicit types b
 > Type hints = executable documentation that tools can verify.
 
 IDEs use type hints for better autocomplete. CI pipelines use them to catch bugs before code review. New team members read them to understand APIs faster.
-
-## Concept at a Glance
 
 > Type hints are optional annotations that describe expected types. Python ignores them at runtime, but static analysis tools use them to find errors.
 

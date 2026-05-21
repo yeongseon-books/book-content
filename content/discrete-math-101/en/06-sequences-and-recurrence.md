@@ -45,8 +45,6 @@ This is post 6 in the Discrete Math 101 series.
 
 This picture places Sequences and Recurrence inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Sequences and Recurrence is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - Definition of sequences and closed forms
@@ -59,8 +57,6 @@ This picture places Sequences and Recurrence inside an operating flow. The point
 `mergesort(n) = 2·mergesort(n/2) + O(n)` — that is a recurrence. Solving it gives O(n log n). Every divide-and-conquer algorithm, every dynamic programming problem, every recursive function is analyzed by solving a recurrence. Without recurrences you can write recursive code, but you cannot analyze it.
 
 > A recurrence is the mathematical mirror of a recursive algorithm.
-
-## Concept at a Glance
 
 > The recurrence T(n) = aT(n/b) + f(n) is the canonical divide-and-conquer form. The Master Theorem reads off the closed form instantly.
 

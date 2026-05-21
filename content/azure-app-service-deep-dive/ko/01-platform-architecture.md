@@ -211,4 +211,6 @@ az webapp show -n my-app -g my-rg \
 - [Azure App Service 101](../../azure-app-service-101/ko/01-what-is-app-service.md)
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/ko/01-host-bootstrap.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-app-service-deep-dive/ko/01-platform-architecture)
+
 Tags: Azure, App Service, Distributed Systems, Platform Engineering

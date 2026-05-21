@@ -412,4 +412,6 @@ print(cache.metrics)
 - [스트리밍 심화 — 청크 처리와 오류 복구](./03-streaming-in-depth.md)
 - [재시도와 오류 처리 — 안정적인 API 호출 만들기](./05-retry-and-error-handling.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/llm-api-production-101/ko/04-caching-strategies)
+
 Tags: LLM, OpenAI, Streaming, Python

@@ -40,15 +40,11 @@ This is post 9 in the Backend Development 101 series. Here, we treat deployment 
 
 This picture places Deploying the Backend inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Deploying the Backend is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 When deploys become *scary*, release frequency drops, and rare deploys carry *more change* and *more risk*. Making deploys boring is one of the most senior things you can do.
 
 > A great deploy has *no drama*.
-
-## Concept at a Glance
 
 Code becomes an *image*; the image runs the same way *everywhere*.
 

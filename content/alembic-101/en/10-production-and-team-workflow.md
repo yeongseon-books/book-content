@@ -42,8 +42,6 @@ This is the final post in the Alembic 101 series. Here we will pull the series t
 
 This picture places Production and team workflow: PR, CI, monitoring, and incident response inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Production and team workflow: PR, CI, monitoring, and incident response is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 Everything in the previous nine posts described how a single engineer can apply migrations safely in their own environment. Once a team starts changing the schema concurrently, a different class of problems appears. Two people creating a new revision at the same time produce a multi-head; if no one tests downgrade, rollback breaks; if production schema starts drifting, you have no idea where to start. Operational stability comes from workflow quality, not from code quality.

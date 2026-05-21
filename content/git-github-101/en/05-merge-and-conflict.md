@@ -50,8 +50,6 @@ This is the fifth post in the Git & GitHub 101 series. Here, we look at fast-for
 
 This picture places Merge and Conflict Resolution - Bringing Two Lines Back Together inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Merge and Conflict Resolution - Bringing Two Lines Back Together is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 In the previous chapters we created branches and moved between them to keep work separate. Eventually that work has to come back together. Merging happens when a PR lands, when you pull a teammate's changes into your branch, or when a long-running feature finally ships to `main`.

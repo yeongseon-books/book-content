@@ -450,4 +450,6 @@ Configuration 관리에서 기억할 기본 원칙은 아래와 같습니다.
 
 ---
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-app-service-101/ko/05-configuration)
+
 Tags: Azure, App Service, Cloud, Web Apps

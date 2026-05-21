@@ -42,8 +42,6 @@ This is the first post in the GitHub Actions 101 series. In this post, we will f
 
 This picture places What Is GitHub Actions? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is GitHub Actions? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The definition and place of *GitHub Actions*
@@ -57,8 +55,6 @@ This picture places What Is GitHub Actions? inside an operating flow. The point 
 CI/CD determines *team speed and quality*. *GitHub Actions* runs *next to your code* as a default automation engine, with no servers to operate.
 
 > Real CI starts at the moment a *PR is merged*, not when a human remembers.
-
-## Concept at a Glance
 
 ## Key Terms
 

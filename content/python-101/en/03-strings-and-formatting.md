@@ -42,8 +42,6 @@ This post is the 3rd article in the Python 101 series. This is the part of the s
 
 This picture places Strings and formatting inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Strings and formatting is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 Strings are the input and output of almost every program. User input, a line read from a file, an HTTP response, a log line, a JSON field — all of them are `str`. Mishandle strings and you walk into recurring accidents:

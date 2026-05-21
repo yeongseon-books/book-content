@@ -40,15 +40,11 @@ This is post 8 in the Backend Development 101 series. Here, we split tests into 
 
 This picture places Testing the Backend inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Testing the Backend is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Code without tests can be *read but not changed safely*. The mark of a good backend is *how easily it can be changed*, and automated tests are what create that safety.
 
 > Tests are the *insurance* of code — invisible day to day, decisive in incidents.
-
-## Concept at a Glance
 
 The test pyramid — *many* at the bottom, *few* at the top.
 

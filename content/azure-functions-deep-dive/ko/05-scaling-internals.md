@@ -309,4 +309,6 @@ Flex Consumption은 사실상 Consumption의 후속 플랫폼입니다. 호스�
 - [Azure Functions 101 — Host와 Worker](../../azure-functions-101/ko/03-host-and-worker.md)
 - [Azure App Service Deep Dive — App Service 플랫폼 아키텍처](../../azure-app-service-deep-dive/ko/01-platform-architecture.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-functions-deep-dive/ko/05-scaling-internals)
+
 Tags: Azure Functions, Serverless, Distributed Systems, gRPC

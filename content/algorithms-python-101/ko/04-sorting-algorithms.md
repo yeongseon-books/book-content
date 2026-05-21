@@ -38,10 +38,6 @@ last_reviewed: '2026-05-12'
 
 *Algorithms with Python 101 4장 흐름 개요*
 
-이 그림에서는 정렬 알고리즘를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 정렬 알고리즘의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 중요한가
 
 정렬은 컴퓨팅에서 가장 기본적인 작업 가운데 하나입니다. 이진 탐색, 중복 제거, 순위 계산은 모두 정렬된 데이터를 전제로 하거나 정렬의 도움을 크게 받습니다. 1만 개를 넘어가면 `O(n^2)`와 `O(n log n)`의 차이는 금방 체감 가능한 수준으로 벌어집니다.
@@ -396,5 +392,7 @@ for n in [1_000, 5_000]:
 - [Wikipedia — Sorting Algorithm](https://en.wikipedia.org/wiki/Sorting_algorithm)
 - [Visualgo — Sorting Visualization](https://visualgo.net/en/sorting)
 - [Real Python — How to Use sorted() and sort()](https://realpython.com/python-sort/)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/algorithms-python-101/ko/04-sorting-algorithms)
 
 Tags: Python, Algorithms, Sorting, Bubble Sort, Quick Sort

@@ -45,7 +45,7 @@ This is post 6 in the Information Security 101 series.
 
 This picture places SQL Injection and XSS inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of SQL Injection and XSS is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> SQL Injection and XSS both turn untrusted input into executable code in its target context. Defense is not input filtering; it is prepared statements for SQL and context-aware escaping for HTML.
 
 ## What You Will Learn
 
@@ -60,8 +60,6 @@ This picture places SQL Injection and XSS inside an operating flow. The point is
 Both bugs have stayed in the OWASP Top 10 for years. Once you understand the principle, you can defend the same way in any new framework or language.
 
 > Treat input as data; encode output for its context.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR

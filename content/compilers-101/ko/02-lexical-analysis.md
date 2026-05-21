@@ -37,10 +37,6 @@ last_reviewed: '2026-05-12'
 
 *Compilers 101 2장 흐름 개요*
 
-이 그림에서는 렉시컬 분석를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 렉시컬 분석의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 중요한가
 
 `SyntaxError: unexpected token`이 어디에서 오는지 정확히 답할 수 있는 사람과 그렇지 못한 사람의 차이는 대개 lexical analysis를 실제로 들여다봤는지에 달려 있습니다. 좋은 렉서는 단지 토큰을 자르는 도구가 아니라, 좋은 오류 메시지의 시작점이기도 합니다.
@@ -254,6 +250,173 @@ CPython의 렉서를 직접 볼 수 있습니다. `OP`, `NAME`, `NUMBER`, `NEWLI
 ## 정리 및 다음 글
 
 렉서는 텍스트를 의미 단위로 바꾸는 첫 번째 변환입니다. 다음 글에서는 이 토큰 스트림을 트리(AST)로 바꾸는 단계인 parsing을 다룹니다.
+
+## 심화 실습: Lexer · Parser · AST를 연결해 보는 기준
+
+이 지점에서는 "각 단계가 왜 분리되어야 하는가"를 코드 단위로 확인하는 것이 중요합니다. 핵심은 정답 코드를 외우는 것이 아니라, 같은 입력이 단계별로 어떻게 다른 데이터 구조로 변환되는지 관찰하는 것입니다.
+
+### EBNF로 문법을 먼저 고정하기
+
+문법을 먼저 적어 두면 파서 구현이 훨씬 명확해집니다. 아래 예시는 사칙연산과 괄호를 포함한 최소 문법입니다.
+
+```ebnf
+expr    = term , { ("+" | "-") , term } ;
+term    = factor , { ("*" | "/") , factor } ;
+factor  = number | "(" , expr , ")" ;
+number  = digit , { digit } ;
+digit   = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+```
+
+이 문법에서 `expr -> term -> factor`로 내려가는 구조가 바로 연산자 우선순위를 표현합니다. `+`와 `-`는 `expr` 레벨, `*`와 `/`는 `term` 레벨에 있으므로 `2 + 3 * 4`는 자연스럽게 `2 + (3 * 4)`로 해석됩니다.
+
+### 토큰화에서 위치 정보를 끝까지 보존하기
+
+실무 품질을 좌우하는 부분은 토큰의 `kind`보다 `line`, `column`, `offset`입니다. 오류 메시지 품질은 여기서 결정됩니다.
+
+```python
+from dataclasses import dataclass
+import re
+
+@dataclass
+class Token:
+    kind: str
+    text: str
+    line: int
+    col: int
+
+TOKEN_PATTERNS = [
+    ("NUMBER", r"\d+"),
+    ("PLUS", r"\+"),
+    ("MINUS", r"-"),
+    ("MUL", r"\*"),
+    ("DIV", r"/"),
+    ("LPAREN", r"\("),
+    ("RPAREN", r"\)"),
+    ("WS", r"\s+"),
+]
+
+def lex(src: str) -> list[Token]:
+    i = 0
+    line, col = 1, 1
+    out: list[Token] = []
+    while i < len(src):
+        for kind, pat in TOKEN_PATTERNS:
+            m = re.match(pat, src[i:])
+            if not m:
+                continue
+            text = m.group(0)
+            if kind != "WS":
+                out.append(Token(kind, text, line, col))
+            for ch in text:
+                if ch == "\n":
+                    line += 1
+                    col = 1
+                else:
+                    col += 1
+            i += len(text)
+            break
+        else:
+            raise SyntaxError(f"unexpected character '{src[i]}' at {line}:{col}")
+    return out
+```
+
+### AST를 명시적으로 설계하기
+
+파싱이 끝났을 때 결과가 문자열이 아니라 트리여야 이후 단계가 단순해집니다.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class Number:
+    value: int
+
+@dataclass
+class Binary:
+    op: str
+    left: object
+    right: object
+
+# 예시 AST: 2 + 3 * 4
+ast = Binary(
+    op="+",
+    left=Number(2),
+    right=Binary(op="*", left=Number(3), right=Number(4)),
+)
+```
+
+여기서 중요한 관찰은 동일한 AST를 여러 소비자가 사용할 수 있다는 점입니다.
+- 의미 분석기: 타입/스코프 검사
+- 인터프리터: 즉시 평가
+- 코드 생성기: 바이트코드/기계어 방출
+
+즉 파서는 "한 번만 정확히" 만들고, 나머지는 AST 위에서 독립적으로 발전시킬 수 있습니다.
+
+### 재귀 하강 파서의 최소 골격
+
+```python
+class Parser:
+    def __init__(self, tokens):
+        self.tokens = tokens
+        self.i = 0
+
+    def peek(self):
+        return self.tokens[self.i] if self.i < len(self.tokens) else None
+
+    def eat(self, kind):
+        tok = self.peek()
+        if tok is None or tok.kind != kind:
+            where = "EOF" if tok is None else f"{tok.line}:{tok.col}"
+            raise SyntaxError(f"expected {kind} at {where}")
+        self.i += 1
+        return tok
+
+    def parse_expr(self):
+        node = self.parse_term()
+        while self.peek() and self.peek().kind in ("PLUS", "MINUS"):
+            op = self.eat(self.peek().kind).text
+            rhs = self.parse_term()
+            node = Binary(op, node, rhs)
+        return node
+
+    def parse_term(self):
+        node = self.parse_factor()
+        while self.peek() and self.peek().kind in ("MUL", "DIV"):
+            op = self.eat(self.peek().kind).text
+            rhs = self.parse_factor()
+            node = Binary(op, node, rhs)
+        return node
+
+    def parse_factor(self):
+        tok = self.peek()
+        if tok.kind == "NUMBER":
+            self.eat("NUMBER")
+            return Number(int(tok.text))
+        if tok.kind == "LPAREN":
+            self.eat("LPAREN")
+            node = self.parse_expr()
+            self.eat("RPAREN")
+            return node
+        raise SyntaxError(f"unexpected token {tok.kind} at {tok.line}:{tok.col}")
+```
+
+### 디버깅 체크포인트
+
+파이프라인을 운영할 때는 다음 세 지점을 항상 로그로 남겨야 합니다.
+1. **Token stream**: 토큰 종류와 위치
+2. **AST dump**: 중첩 구조와 연산자 결합 방향
+3. **Type/Scope report**: 선언/참조 매칭 결과
+
+세 지점이 분리되어 있으면 오류를 "문법 단계 문제"인지 "의미 단계 문제"인지 즉시 구분할 수 있습니다. 예를 들어 괄호 누락은 파서에서, 미선언 변수 참조는 의미 분석기에서 실패해야 정상입니다.
+
+### 작은 입력으로 검증하는 습관
+
+다음 세 입력을 고정 테스트로 유지하면 회귀를 빠르게 잡을 수 있습니다.
+- `2 + 3 * 4` → 우선순위 검증
+- `(2 + 3) * 4` → 괄호 우선 검증
+- `2 + * 4` → 오류 위치와 메시지 품질 검증
+
+이처럼 Lexer/Parser/AST를 분리한 뒤, 문법과 테스트를 함께 고정하면 이후 최적화나 코드 생성 단계를 추가해도 프런트엔드 품질이 쉽게 무너지지 않습니다.
 
 ## 처음 질문으로 돌아가기
 

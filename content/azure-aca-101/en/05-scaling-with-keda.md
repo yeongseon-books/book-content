@@ -47,8 +47,6 @@ This is post 5 in the Azure Container Apps 101 series. Here, we'll unpack KEDA s
 
 This picture places Scaling — KEDA scalers and zero-to-N inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Scaling — KEDA scalers and zero-to-N is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 The core ACA value proposition is "running containers without the weight of Kubernetes."

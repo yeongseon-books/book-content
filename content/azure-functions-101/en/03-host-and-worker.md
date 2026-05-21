@@ -47,8 +47,6 @@ This is the third post in the Azure Functions 101 series. Here, we trace how the
 
 This picture places Host and Worker — Who Actually Runs Your Functions? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Host and Worker — Who Actually Runs Your Functions? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Host and worker as two processes
 
 A traditional web framework usually does everything inside a single process. Loading code, handling HTTP, calling the database, building the response — all in one chunk.

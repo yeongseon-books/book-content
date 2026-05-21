@@ -45,8 +45,6 @@ This is the final post in the Discrete Math 101 series.
 
 This picture places Discrete Mathematics and Algorithms inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Discrete Mathematics and Algorithms is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - Time complexity and Big-O — recurrences and the Master Theorem
@@ -59,8 +57,6 @@ This picture places Discrete Mathematics and Algorithms inside an operating flow
 Discrete math studied in isolation feels abstract; paired with algorithms it becomes an immediate practical tool. The vocabulary of interviews, system design, and performance work is built directly on the concepts collected in this article.
 
 > Without discrete math, algorithms look like magic; with it, they look like the result of reasoning.
-
-## Concept at a Glance
 
 > The three axes of algorithm analysis: (1) correctness = proof, (2) efficiency = complexity, (3) resource use = space/time trade-offs.
 

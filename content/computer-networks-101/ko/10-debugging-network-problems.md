@@ -37,10 +37,6 @@ last_reviewed: '2026-05-15'
 
 *Computer Networks 101 10장 흐름 개요*
 
-이 그림에서는 네트워크 문제 디버깅를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 네트워크 문제 디버깅의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 중요한가
 
 장애가 나면 사람은 먼저 "방금 뭘 바꿨지"를 떠올립니다. 그 질문은 필요하지만 충분하지 않습니다. 경로가 어디서 끊겼는지 모르면 코드 변경도 결국 추측이 됩니다. "여기까지는 정상"을 한 층씩 확정하는 습관이 있어야 새벽 장애에서도 침착하게 원인을 좁힐 수 있습니다.
@@ -223,6 +219,114 @@ sudo tcpdump -i eth0 -n -s 0 'host api.example.com and tcp port 443' -w cap.pcap
 네트워크 디버깅의 본질은 계층을 따라 내려가며 가설을 하나씩 지우는 일입니다. `ping`, `dig`, `nc`, `openssl s_client`, `curl -v` 다섯 줄이면 대부분 1분 안에 문제 층이 갈립니다. 그 뒤에야 `tcpdump`를 꺼내면 됩니다.
 
 이로써 Computer Networks 101 시리즈를 마칩니다. 네트워크의 개념에서 시작해 IP, TCP, DNS, HTTP, TLS, 라우팅, 로드밸런서, WebSocket, 그리고 디버깅까지 한 바퀴를 돌았습니다. 다음에 새벽 호출이 오더라도, 첫 다섯 줄은 머뭇거리지 않고 떠올릴 수 있기를 바랍니다.
+
+## 심화 실습: 패킷 캡처 · 헤더 해석 · 소켓 동작 검증
+
+네트워크 문제를 줄이려면 추상 계층 설명만으로는 부족합니다. 패킷 단위 관찰과 애플리케이션 소켓 로그를 연결해야 원인 구분이 가능합니다. 핵심은 "어느 계층에서 실패했는가"를 증거 기반으로 좁히는 것입니다.
+
+### tcpdump로 최소 증거를 확보하기
+
+```bash
+sudo tcpdump -i any -nn "tcp port 443" -c 20
+```
+
+이 명령으로 먼저 확인할 항목은 세 가지입니다.
+- SYN이 나가고 SYN-ACK가 돌아오는가
+- 재전송(retransmission)이 반복되는가
+- RST 패킷이 어느 쪽에서 발생하는가
+
+연결 실패를 애플리케이션 오류로 단정하기 전에, 3-way handshake가 실제로 성립했는지 먼저 확인해야 합니다.
+
+### IPv4/TCP 헤더를 바이트 단위로 해석하기
+
+```text
+IPv4 Header (20B 기본)
+- Version/IHL
+- Total Length
+- Identification
+- Flags/Fragment Offset
+- TTL
+- Protocol (6=TCP, 17=UDP)
+- Header Checksum
+- Source IP / Destination IP
+
+TCP Header (20B 기본)
+- Source Port / Destination Port
+- Sequence Number
+- Acknowledgment Number
+- Data Offset
+- Flags (SYN, ACK, FIN, RST, PSH)
+- Window Size
+- Checksum
+- Urgent Pointer
+```
+
+예를 들어 SYN 패킷에서 `flags=SYN`, `ack=0`이고, 응답에서 `flags=SYN,ACK`와 함께 `ack=client_seq+1`이 오면 handshake 2단계가 정상입니다. 이 규칙만 알아도 다수의 연결 이슈를 빠르게 분류할 수 있습니다.
+
+### Python 소켓으로 타임아웃과 재시도 경계 분리
+
+```python
+import socket
+
+def fetch_banner(host: str, port: int, timeout: float = 2.0) -> bytes:
+    with socket.create_connection((host, port), timeout=timeout) as sock:
+        sock.settimeout(timeout)
+        sock.sendall(b"HEAD / HTTP/1.1\r\nHost: example.com\r\n\r\n")
+        return sock.recv(512)
+
+try:
+    data = fetch_banner("93.184.216.34", 80)
+    print(data.decode(errors="replace"))
+except socket.timeout:
+    print("timeout: 네트워크 지연 또는 서버 응답 지연")
+except OSError as e:
+    print(f"os error: {e}")
+```
+
+포인트는 connect timeout과 read timeout을 구분하는 것입니다. connect 단계 실패는 라우팅/방화벽/리슨 상태 문제 가능성이 크고, read 단계 실패는 애플리케이션 지연이나 서버 과부하 가능성이 큽니다.
+
+### UDP 손실과 순서 역전 관찰 예시
+
+```python
+import socket
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock.settimeout(1.0)
+
+for i in range(1, 11):
+    payload = f"seq={i}".encode()
+    sock.sendto(payload, ("127.0.0.1", 9999))
+```
+
+UDP는 전달 보장과 순서 보장을 제공하지 않습니다. 따라서 실시간 시스템에서는 애플리케이션 레벨에서 `sequence`, `timestamp`, `dedup` 정책을 설계해야 합니다. 이 지점이 TCP와 UDP 선택의 핵심입니다.
+
+### TLS 핸드셰이크를 계층별로 읽기
+
+HTTPS 문제를 볼 때는 다음 흐름으로 분리하면 진단 속도가 올라갑니다.
+1. TCP 연결 성립 여부
+2. ClientHello/ServerHello 교환 여부
+3. 인증서 체인 검증 성공 여부
+4. 애플리케이션 데이터 송수신 여부
+
+즉 "HTTPS 실패"라는 한 문장을 TCP, TLS, HTTP 단계로 쪼개는 습관이 필요합니다. 같은 502/504라도 실제 원인은 완전히 다를 수 있습니다.
+
+### 패킷 캡처와 애플리케이션 로그를 합치는 방법
+
+운영에서는 다음 필드를 공통 키로 맞추면 추적성이 좋아집니다.
+- `src_ip`, `src_port`, `dst_ip`, `dst_port`
+- `timestamp`(밀리초 단위)
+- `request_id` 또는 `trace_id`
+
+이 키로 묶으면 "애플리케이션에서는 timeout, 패킷에서는 SYN 재전송" 같은 상관관계를 바로 찾을 수 있습니다. 결과적으로 네트워크 팀과 애플리케이션 팀이 같은 사실 기반으로 협업할 수 있습니다.
+
+### 점검 체크리스트
+
+- 연결 실패 시 handshake 3단계를 캡처로 확인했는가
+- TCP/UDP 선택 이유를 지연, 손실, 순서 보장 관점으로 설명할 수 있는가
+- 프로토콜 헤더의 핵심 필드를 보고 상태를 해석할 수 있는가
+- 소켓 timeout을 connect/read로 분리해 로깅했는가
+
+이 기준을 적용하면 네트워크 문제는 "감"이 아니라 재현 가능한 관찰 데이터로 다뤄집니다.
 
 ## 처음 질문으로 돌아가기
 

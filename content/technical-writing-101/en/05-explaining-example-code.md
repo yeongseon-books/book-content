@@ -50,8 +50,6 @@ A *runnable* example must reach the reader's *hands* to teach.
 
 > Mental model: show the smallest runnable snippet, point at the key line, then prove the output.
 
-## Concept at a Glance
-
 Code walkthroughs are stronger when they isolate the key lines, pair them with a short callout, and close the loop with visible output. That is what turns a copy-paste gamble into a reusable learning step.
 ## Key Terms
 

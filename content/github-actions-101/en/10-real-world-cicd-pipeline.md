@@ -42,8 +42,6 @@ This is the final post in the GitHub Actions 101 series. In this post, we will c
 
 This picture places A Real-World CI/CD Pipeline inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of A Real-World CI/CD Pipeline is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - *Responsibility split* across *PR, main, and tag*
@@ -57,8 +55,6 @@ This picture places A Real-World CI/CD Pipeline inside an operating flow. The po
 The parts you have learned only improve *DORA* (deploy frequency, lead time, change-failure rate, MTTR) when they sit *together* in one place.
 
 > *The pieces make you *fast*. The composition keeps you *fast*.*
-
-## Concept at a Glance
 
 ## Key Terms
 

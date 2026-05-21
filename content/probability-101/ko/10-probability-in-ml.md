@@ -50,6 +50,16 @@ last_reviewed: '2026-05-15'
 
 또 학습 자체도 확률과 깊게 연결됩니다. 분류에서 자주 쓰는 교차 엔트로피는 음의 로그가능도와 이어지고, 회귀도 어떤 오차 분포를 가정하느냐에 따라 손실함수 해석이 달라집니다. 손실함수는 단순한 계산 장치가 아니라 모델이 세계를 어떤 확률 구조로 본다고 가정하는지 드러내는 창입니다.
 
+### ML에서 확률이 쓰이는 곳
+
+| 영역 | 역할 | 예시 |
+|---|---|---|
+| 분류 확률 | `p(y=1|x)`를 출력해 판단 근거 제공 | 스팸 필터, 의료 진단 |
+| 손실함수 | 음의 로그가능도로 학습 목표 정의 | 교차 엔트로피, NLL |
+| 정규화 | Prior 가정을 파라미터 제약에 반영 | L2=가우시안 prior, L1=라플라스 |
+| 생성 모델 | 데이터 분포를 명시적으로 모델링 | VAE, GAN, 확률적 생성 |
+
+머신러닝의 거의 모든 단계에서 확률이 묵시적 또는 명시적으로 등장합니다. 손실함수는 어떤 확률 모델을 가정하는지 드러내고, 모델 출력은 조건부확률로 해석되며, 정규화는 파라미터에 대한 prior 신념을 반영하고, 생성 모델은 데이터 분포 자체를 학습합니다.
 ## 핵심 개념 한눈에 보기
 
 ## 핵심 용어
@@ -93,6 +103,33 @@ print("p(y=1|x=2):", clf.predict_proba([[2]])[0, 1])
 
 `predict_proba`가 내놓는 값은 조건부확률 `p(y|x)`의 추정치로 읽습니다. 모델이 어떤 조건부 세계를 학습했는지 그대로 드러내는 숫자입니다.
 
+### sklearn predict_proba 예제
+
+```python
+import numpy as np
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.datasets import make_classification
+
+# 이진 분류 데이터 생성
+X, y = make_classification(n_samples=200, n_features=4, n_classes=2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# 로지스틱 회귀 학습
+clf = LogisticRegression().fit(X_train, y_train)
+
+# 확률 예측
+probs = clf.predict_proba(X_test)
+print("첫 5개 예측 확률 (class 0, class 1):")
+print(probs[:5])
+
+# 예측 레이블과 확률 함께 보기
+preds = clf.predict(X_test)
+for i in range(5):
+    print(f"실제={y_test[i]}, 예측={preds[i]}, p(y=1|x)={probs[i, 1]:.3f}")
+```
+
+이 코드는 sklearn이 제공하는 `predict_proba` 메서드를 보여줍니다. 단순한 레이블 예측(`predict`)과 달리 `predict_proba`는 각 클래스에 대한 확률 추정치를 반환합니다. 이 확률을 활용하면 모델의 확신 정도를 파악할 수 있고, threshold를 조정하거나 불확실성을 정량화하는 등 더 정교한 의사결정이 가능합니다.
 ### 3단계 — 확률 보정 확인하기
 
 ```python
@@ -105,6 +142,43 @@ print("calibration gap:", np.abs(preds - actual).mean())
 
 정확도가 높다고 확률이 정직한 것은 아닙니다. 0.9라고 예측한 표본들이 실제로는 70%만 정답이라면, 그 모델은 과신하고 있는 것입니다. 확률 보정은 바로 이 차이를 봅니다.
 
+### 불확실성 정량화와 확률 보정
+
+모델이 내놓는 확률이 실제 빈도와 얼마나 일치하는지를 **calibration**이라 부릅니다. 예를 들어 모델이 0.8의 확률로 양성이라 예측한 100개 표본이 실제로 약 80개가 양성이면 well-calibrated, 60개만 양성이면 over-confident입니다.
+
+```python
+import numpy as np
+from sklearn.calibration import calibration_curve
+import matplotlib.pyplot as plt
+
+# 가상의 예측 확률과 실제 레이블
+y_true = np.array([0, 0, 1, 1, 0, 1, 1, 0, 1, 1]*10)
+y_prob = np.random.beta(2, 5, len(y_true))  # 임의 확률
+
+# Calibration curve 계산
+prob_true, prob_pred = calibration_curve(y_true, y_prob, n_bins=5)
+
+# 시각화
+plt.figure(figsize=(6, 4))
+plt.plot([0, 1], [0, 1], linestyle='--', label='Perfect calibration')
+plt.plot(prob_pred, prob_true, marker='o', label='Model')
+plt.xlabel('Predicted probability')
+plt.ylabel('Observed frequency')
+plt.title('Calibration Plot')
+plt.legend()
+plt.grid(True)
+plt.show()
+```
+
+Calibration plot은 예측 확률 구간별로 실제 빈도를 그린 그래프입니다. 대각선에 가까울수록 보정이 잘 되어 있고, 대각선 위에 있으면 과대 예측(over-confident), 아래에 있으면 과소 예측(under-confident)입니다. 의료 진단, 금융 리스크, 사기 탐지처럼 결정 비용이 큰 도메인에서는 정확도뿐 아니라 calibration도 필수 평가 지표입니다.
+
+**Calibration 개선 방법:**
+
+- **Platt Scaling**: 로지스틱 회귀를 한 번 더 학습해 확률을 보정합니다.
+- **Isotonic Regression**: 단조 함수를 이용해 비선형 보정을 수행합니다.
+- **Temperature Scaling**: 신경망 출력의 softmax temperature를 조정합니다.
+
+Calibration은 학습 당시만 보면 안 되고, 운영 중 데이터 분포가 바뀔 때도 drift가 생길 수 있으므로 지속적으로 모니터링해야 합니다.
 ### 4단계 — 베이지안 업데이트 연결하기
 
 ```python
@@ -128,6 +202,16 @@ print("Brier:", brier)
 ```
 
 브라이어 점수는 예측확률과 실제 결과 사이의 제곱오차를 봅니다. 로그 손실과 함께 확률 예측의 품질을 읽는 대표 지표입니다.
+
+### MLE와 MAP의 확률적 해석
+
+머신러닝에서 파라미터를 추정할 때 자주 쓰는 두 가지 방법이 MLE와 MAP입니다.
+
+**MLE (Maximum Likelihood Estimation)**: 데이터가 주어졌을 때 그 데이터를 가장 그럴듯하게 만드는 파라미터를 찾습니다. `argmax_θ P(D|θ)`
+
+**MAP (Maximum A Posteriori)**: prior와 likelihood를 모두 고려해 posterior를 최대화하는 파라미터를 찾습니다. `argmax_θ P(θ|D) ∝ P(D|θ)P(θ)`
+
+L2 정규화는 가우시안 prior를 놓는 MAP로 해석되고, L1은 라플라스 prior와 대응됩니다. 정규화를 단순히 과적합 방지 기법으로만 보지 말고, 어떤 prior 신념을 모델에 주입하는지로 읽으면 더 깊은 해석이 가능합니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 

@@ -38,10 +38,6 @@ last_reviewed: '2026-05-15'
 
 *Backend Development 101 1장 흐름 개요*
 
-이 그림에서는 백엔드 개발이란 무엇인가?를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 백엔드 개발이란 무엇인가?의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 중요한가
 
 프론트엔드만 만들면 사용자가 보는 화면은 빠르게 만들 수 있습니다. 하지만 데이터, 인증, 정합성, 운영 같은 문제는 모두 화면 뒤에서 처리됩니다. 결국 시스템이 오래 살아남으려면 백엔드가 어떤 책임을 지는지부터 분명히 이해해야 합니다.
@@ -212,6 +208,120 @@ curl -X POST -H "Content-Type: application/json" \
 ## 정리와 다음 글
 
 백엔드는 하나의 기능이 아니라 여러 책임이 모인 구조입니다. 다음 글에서는 그중 가장 아래쪽 입구를 열어, HTTP 서버가 실제로 어떻게 요청을 읽고 응답을 쓰는지 직접 살펴보겠습니다.
+
+
+## 추가 실전 섹션: 요청/응답 계약과 운영 패턴 심화
+
+백엔드 품질은 기능 수보다 계약의 명확성과 운영 신뢰성에서 결정됩니다. 아래 표는 라우터-서비스-DB-인증-로깅-배포까지 이어지는 경계에서 자주 쓰는 선택 기준입니다.
+
+| 계층 | 핵심 질문 | 권장 패턴 | 실패 신호 |
+| --- | --- | --- | --- |
+| Router/Controller | 입력이 어떤 계약을 가져야 하는가 | Pydantic 스키마 + 명시적 상태코드 | 200/500만 남발 |
+| Service | 비즈니스 규칙이 어디에 있는가 | use case 단위 메서드 | 라우트에 로직 과밀 |
+| Repository | 데이터 접근이 한곳에 모였는가 | 메서드 중심 데이터 추상화 | SQL 흩어짐 |
+| Auth | 신원/권한이 분리되어 있는가 | AuthN/AuthZ 분리 + 짧은 토큰 | 서버 권한검사 누락 |
+| Observability | 장애를 재현 없이 설명 가능한가 | request_id + 구조화 로그 | print 디버깅 의존 |
+| Deploy | 재현 가능하게 배포되는가 | 이미지 버전 고정 + healthcheck | 수동 SSH 배포 |
+
+### FastAPI 요청/응답 예시: 계약이 드러나는 엔드포인트
+
+```python
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
+
+app = FastAPI()
+
+class OrderIn(BaseModel):
+    item_id: int = Field(gt=0)
+    quantity: int = Field(gt=0, le=100)
+
+@app.post('/orders', status_code=201)
+def create_order(payload: OrderIn):
+    if payload.quantity > 20:
+        raise HTTPException(status_code=409, detail='stock conflict')
+    return {'order_id': 101, 'item_id': payload.item_id, 'quantity': payload.quantity}
+```
+
+입력 검증과 상태코드를 분리하면 클라이언트 재시도 정책, 알람 기준, 운영 대시보드 해석이 훨씬 명확해집니다.
+
+### Middleware 패턴: request_id + 지연 시간 측정
+
+```python
+import time
+import uuid
+from fastapi import Request
+
+@app.middleware('http')
+async def tracing_middleware(request: Request, call_next):
+    rid = str(uuid.uuid4())
+    request.state.request_id = rid
+    start = time.perf_counter()
+    response = await call_next(request)
+    latency_ms = (time.perf_counter() - start) * 1000
+    response.headers['X-Request-ID'] = rid
+    response.headers['X-Response-Time-MS'] = f'{latency_ms:.2f}'
+    return response
+```
+
+운영에서는 "느리다"보다 "어느 요청이 몇 ms 걸렸는가"가 더 중요합니다. 이 헤더와 로그 필드가 있으면 API 게이트웨이/애플리케이션 로그를 상호 추적하기 쉬워집니다.
+
+### API 응답 계약 표준화 예시
+
+| 상황 | HTTP | body 예시 | 클라이언트 액션 |
+| --- | --- | --- | --- |
+| 입력 오류 | 422/400 | `{ "code": "invalid_input", ... }` | 사용자 입력 수정 |
+| 인증 실패 | 401 | `{ "code": "unauthorized" }` | 토큰 갱신/재로그인 |
+| 권한 부족 | 403 | `{ "code": "forbidden" }` | 권한 요청 |
+| 충돌 | 409 | `{ "code": "conflict" }` | 재시도 또는 사용자 안내 |
+| 서버 오류 | 500 | `{ "code": "internal_error" }` | 재시도 + 관찰 |
+
+응답 계약이 고정되면 프론트엔드, 모바일, 배치 클라이언트가 동일한 오류 처리 전략을 재사용할 수 있습니다.
+
+### 배포 전 체크 시나리오
+
+1. `GET /healthz`와 핵심 비즈니스 경로를 동시에 확인합니다.
+2. 새 버전에서 에러율/지연시간이 baseline 대비 악화되지 않았는지 봅니다.
+3. 데이터베이스 migration의 롤백 경로를 문서로 확인합니다.
+4. 운영 secret이 이미지에 포함되지 않았는지 검증합니다.
+5. 롤백 명령을 실제로 1회 리허설합니다.
+
+이 체크리스트는 기능 완성보다 운영 안정성을 우선순위로 두는 습관을 만들어 줍니다.
+
+
+
+## 추가 보강: 검증 가능한 예제 세트
+
+### 입력 크기 대비 알고리즘/학습 선택 표
+
+| 상황 | 빠른 선택 | 검증 기준 |
+| --- | --- | --- |
+| 작은 입력, 빠른 프로토타입 | 단순 구현 우선 | 정답 검증 테스트 3종 |
+| 큰 입력, 지연시간 민감 | 차수 낮은 알고리즘 또는 안정적 optimizer | 시간/메모리 동시 측정 |
+| 운영 장애 재현 필요 | 로그/추적 필드 강화 | 동일 입력 재실행 가능성 |
+
+### 짧은 비교 코드
+
+```python
+import time
+
+def measure(fn, *args, repeat=3):
+    best = float('inf')
+    for _ in range(repeat):
+        t0 = time.perf_counter()
+        fn(*args)
+        best = min(best, time.perf_counter() - t0)
+    return best
+```
+
+측정 코드는 화려할 필요가 없습니다. 같은 입력, 같은 환경, 같은 반복 기준을 유지하는 것이 더 중요합니다. 이 습관이 있어야 최적화 전후의 차이를 신뢰할 수 있습니다.
+
+### 실전 점검 질문
+
+1. 지금 선택한 방법의 시간/공간 비용을 한 문장으로 설명할 수 있는가
+2. 경계 입력에서 동작이 바뀌는 지점을 테스트로 고정했는가
+3. 운영 로그만으로 실패 원인을 분리할 수 있는가
+
+이 질문에 즉답할 수 있으면 구현이 아니라 설계 수준에서 품질을 확보한 상태에 가깝습니다.
 
 ## 처음 질문으로 돌아가기
 

@@ -51,8 +51,6 @@ A single spec file produces *docs + validation + client code + mock server*. Han
 
 > Keep one *single source of truth*.
 
-## Concept at a Glance
-
 The real shift is organizational: the spec stops being a secondary artifact and becomes the contract that PRs review. That is what keeps one changed request field from silently diverging across docs, code, and generated clients.
 
 ## Key Terms

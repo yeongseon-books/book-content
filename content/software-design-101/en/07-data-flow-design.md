@@ -45,8 +45,6 @@ In this post, we design the path from input to output so each transformation ste
 
 This picture places Data Flow Design inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Data Flow Design is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The single-direction principle for data flow
@@ -60,8 +58,6 @@ This picture places Data Flow Design inside an operating flow. The point is not 
 Most bugs appear when data changes in unexpected places. A single direction makes the change easy to trace and limits the blast radius.
 
 > Good code keeps a short distance between input and output.
-
-## Concept at a Glance
 
 Each step is small and just hands off to the next.
 

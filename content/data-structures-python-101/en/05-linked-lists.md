@@ -44,8 +44,6 @@ This is post 5 in the Data Structures with Python 101 series.
 
 This picture places Linked Lists inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Linked Lists is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The structure and behavior of linked lists

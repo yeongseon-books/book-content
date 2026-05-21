@@ -41,15 +41,11 @@ This is post 8 in the Web Development 101 series. Here we treat deployment as a 
 
 This picture places Deployment inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Deployment is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Manual deploys cause weekly accidents. Automated deploys change *team velocity* itself. Once you internalize the flow, every platform feels familiar.
 
 > Deployment is *habit*, not *feature*.
-
-## Concept at a Glance
 
 The point of this picture is repeatability. If the artifact changes per environment, you are no longer promoting the same release through a pipeline—you are rebuilding the product under different conditions and hoping the results match.
 

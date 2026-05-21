@@ -474,4 +474,6 @@ App Service의 scaling은 버튼 하나를 누르는 기능이 아니라, 상태
 
 ---
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-app-service-101/ko/07-scaling-101)
+
 Tags: Azure, App Service, Cloud, Web Apps

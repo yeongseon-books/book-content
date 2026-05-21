@@ -58,8 +58,6 @@ Too many alerts *bury* the real signal. On-call *buys sleep* and *spends willpow
 
 > *Alerts have a *wake-up cost*. If you do not know it, you go *bankrupt*.*
 
-## Concept at a Glance
-
 Observability is the ability to understand a system's internal state from external signals. In a distributed system, you cannot instrument every line of code. You rely on *metrics* (what happened), *logs* (why it happened), and *traces* (where it happened).
 
 ## Key Terms

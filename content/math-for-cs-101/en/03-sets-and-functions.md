@@ -52,9 +52,6 @@ Python's `set`, `dict`, `map`, and `filter` already carry the mental model of se
 
 That clarity pays off when business rules get complicated. If you blur together the data boundary and the transformation rule, exceptions spread everywhere. When you separate them, you can explain what is allowed and how it is transformed as two different decisions.
 
-
-## Concept at a Glance
-
 Sets define *membership* and *boundaries*; functions map *inputs to outputs* systematically. Together they form the vocabulary of types and data transformations.
 
 ## Before/After

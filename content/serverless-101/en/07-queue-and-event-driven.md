@@ -42,8 +42,6 @@ This is post 7 in the Serverless 101 series.
 
 This picture places Queue and Event-driven Architecture inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Queue and Event-driven Architecture is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - the meaning of *decoupling*
@@ -57,8 +55,6 @@ This picture places Queue and Event-driven Architecture inside an operating flow
 When an order API directly calls payment, email, analytics, and inventory in sequence, one slow dependency stretches the whole response path. In a serverless environment, that also means more timeout risk, wider failure blast radius, and less flexibility about retries.
 
 Async messaging changes that shape. It lets producers publish facts and lets consumers move at their own speed, with their own retry policy and their own failure handling.
-
-## Concept at a Glance
 
 The key value here is not that everything becomes asynchronous. It is that producers and consumers no longer need to know each other's internals. That lower coupling is what makes fan-out, isolated retries, and independent evolution practical.
 

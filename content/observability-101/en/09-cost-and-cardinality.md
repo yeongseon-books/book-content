@@ -58,8 +58,6 @@ In young companies the *#1 line on the AWS bill* is often *observability*. When 
 
 > *If you do not know the cost of measurement, *measurement becomes the enemy*.*
 
-## Concept at a Glance
-
 Observability is the ability to understand a system's internal state from external signals. In a distributed system, you cannot instrument every line of code. You rely on *metrics* (what happened), *logs* (why it happened), and *traces* (where it happened).
 
 ## Key Terms

@@ -43,8 +43,6 @@ Here we focus on the layer that turns pixels into something searchable and compa
 
 This picture places Image Encoders: CLIP and ViT inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Image Encoders: CLIP and ViT is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why start with the image encoder
 
 The quality of any multimodal system ultimately rides on the quality of the representation produced by the image encoder. CLIP and ViT (Vision Transformer) are the two pillars on the image side of nearly every modern VLM, and BLIP-2, LLaVA, and GPT-4V all use ViT-family backbones. Episode 1 covered hybrid fusion; this episode looks directly at the vision encoder that feeds it.

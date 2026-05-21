@@ -401,6 +401,69 @@ ls /home/site/wwwroot
 cat /home/LogFiles/*docker*.log
 ```
 
+### 배포 방식별 검증 포인트를 분리해 두면 복구 속도가 빨라집니다
+
+첫 배포 이후에는 ZIP 기반 배포와 컨테이너 배포를 혼용하는 경우가 많습니다. 이때 "배포가 실패했다"는 같은 증상이라도 확인해야 할 로그 경로가 다릅니다.
+
+| 배포 방식 | 우선 확인 | 대표 실패 신호 | 1차 대응 |
+| --- | --- | --- | --- |
+| ZIP + Oryx | Deployment logs, Oryx build output | `pip install` 실패, 모듈 import 오류 | `requirements.txt`와 Python 버전 재확인 |
+| Container(ACR) | Container startup logs, image pull 상태 | image pull 인증 실패, startup command 실패 | Managed Identity/ACR 권한과 태그 확인 |
+
+아래 명령을 배포 직후 체크리스트에 넣어 두면 어떤 레이어에서 실패했는지 빠르게 좁힐 수 있습니다.
+
+```bash
+# 최근 배포 이력 확인
+az webapp log deployment list \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --output table
+
+# 앱 설정에서 startup command, build 플래그 확인
+az webapp config show \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --query "{linuxFxVersion:linuxFxVersion, appCommandLine:appCommandLine}" \
+  --output json
+
+az webapp config appsettings list \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --query "[?name=='SCM_DO_BUILD_DURING_DEPLOYMENT' || name=='WEBSITE_RUN_FROM_PACKAGE'].[name,value]" \
+  --output table
+```
+
+### 첫 배포부터 slot 기반 검증 루틴을 준비하면 이후 운영이 쉬워집니다
+
+초기에는 단일 슬롯으로 시작해도 되지만, staging 슬롯을 일찍 도입하면 배포 검증과 롤백이 단순해집니다. 특히 트래픽이 생기기 시작한 시점부터는 slot swap 전략이 장애 시간을 크게 줄여 줍니다.
+
+```bash
+# staging 슬롯 생성
+az webapp deployment slot create \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --slot staging
+
+# staging에만 환경변수 주입
+az webapp config appsettings set \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --slot staging \
+  --settings APP_ENV=staging
+
+# 슬롯 URL 확인 후 health 체크
+STAGING_URL="https://$(az webapp show \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --slot staging \
+  --query defaultHostName \
+  --output tsv)"
+
+curl "$STAGING_URL/health"
+```
+
+staging에서 헬스체크와 기본 API smoke test를 통과한 뒤 swap하면, 프로덕션 슬롯에서 바로 실패를 발견하는 위험을 줄일 수 있습니다. 첫 배포 단계에서 이 루틴을 습관화해 두면 이후 CI/CD로 확장할 때도 구조를 거의 그대로 재사용할 수 있습니다.
+
 ---
 
 ## Clean Up (Optional)
@@ -460,5 +523,7 @@ az group delete --name $RG --yes --no-wait
 - [Azure Functions 101](../../azure-functions-101/ko/)
 
 ---
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-app-service-101/ko/04-first-deploy)
 
 Tags: Azure, App Service, Cloud, Web Apps

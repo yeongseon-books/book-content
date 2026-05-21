@@ -296,4 +296,6 @@ ViT는 이미지를 patch token의 시퀀스로 바꾸고, CLIP은 그 시퀀스
 - [Vector Search 101 - 코사인 유사도와 벡터 검색](../../vector-search-101/ko/03-cosine-similarity.md)
 - [RAG 평가와 벤치마크 101 - 임베딩 모델 비교](../../rag-benchmark-101/ko/03-embedding-comparison.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/multimodal-ai-101/ko/02-image-encoders-clip-vit)
+
 Tags: CLIP, ViT, Image Encoder, Contrastive Learning, OpenAI, Vision Transformer

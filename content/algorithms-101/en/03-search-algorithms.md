@@ -43,8 +43,6 @@ This is post 3 in the Algorithms 101 series. Here we cover linear search, binary
 
 This picture places Search Algorithms inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Search Algorithms is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The cost difference between linear and binary search
@@ -57,8 +55,6 @@ This picture places Search Algorithms inside an operating flow. The point is not
 Search is the basic operation of almost every system. Database lookups, log queries, recommendation candidate retrieval, and game matchmaking all reduce to search. The wrong choice slows the entire system. Binary search also unlocks the broader pattern of parametric search, used widely in competitive programming.
 
 > Without binary search, you have read only half of the algorithms book.
-
-## Concept at a Glance
 
 > Linear search compares from the first element, O(n). Binary search uses sorted order to halve the search space, O(log n). For one million items, linear takes a million comparisons; binary takes about twenty. The leverage comes entirely from the precondition that the input is sorted.
 

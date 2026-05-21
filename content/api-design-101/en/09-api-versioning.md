@@ -51,8 +51,6 @@ External clients depend on your API. One break stops *dozens or hundreds* of cli
 
 > Compatibility is not free.
 
-## Concept at a Glance
-
 That transition has to be operational, not symbolic. Usage monitoring, successor links, and explicit sunset headers must keep moving after the code ships, or clients will still be surprised on shutdown day.
 
 ## Key Terms

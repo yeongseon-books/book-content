@@ -42,8 +42,6 @@ This is post 5 in the Python Package 101 series. Here we separate TestPyPI from 
 
 This picture places Publishing to PyPI — from TestPyPI to production inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Publishing to PyPI — from TestPyPI to production is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What you will learn
 
 - How to create PyPI and TestPyPI accounts and generate API tokens

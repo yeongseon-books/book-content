@@ -52,9 +52,6 @@ Classifier losses, communication codes, compression formats, and language-model 
 
 Once you see that connection, entropy stops feeling like a standalone definition. It becomes the lower-level quantity that explains why common messages should be short, rare messages should be long, and wrong probability models get penalized.
 
-
-## Concept at a Glance
-
 Information theory measures *entropy* (uncertainty), *mutual information* (shared knowledge), and compression ratios. It defines what is theoretically possible.
 
 ## Before/After

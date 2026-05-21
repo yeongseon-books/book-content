@@ -59,8 +59,6 @@ or the new process or container has not finished becoming traffic-eligible.
 
 This picture places Cold start and warmup — why the first request is expensive inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Cold start and warmup — why the first request is expensive is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## The cold path and the warm path
 
 That one diagram is the whole story.

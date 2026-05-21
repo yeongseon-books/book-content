@@ -40,8 +40,6 @@ This is the final post in the Frontend Development 101 series. Here we assemble 
 
 This picture places Building a Small Frontend App inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Building a Small Frontend App is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - How to pick a *folder structure* for a small project
@@ -54,8 +52,6 @@ This picture places Building a Small Frontend App inside an operating flow. The 
 Knowledge becomes *yours* only when it is *bound into a project*. The nine posts gave you *bricks*. The final post builds the *house*.
 
 > Polish does not have to be high. The experience of *shipping all the way to deployment* is *more powerful than any book*.
-
-## Concept at a Glance
 
 ## Key Terms
 

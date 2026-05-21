@@ -42,8 +42,6 @@ This is post 5 in the Linux CLI 101 series.
 
 This picture places grep, find, xargs — The Search Trio inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of grep, find, xargs — The Search Trio is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 As projects grow, file counts climb into the hundreds. "Where is this function called?", "Which files were modified yesterday?", "Show me only the log lines containing ERROR" — `grep` and `find` answer all of these questions.

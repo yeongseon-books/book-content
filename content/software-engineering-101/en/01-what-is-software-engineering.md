@@ -43,8 +43,6 @@ This is the first post in the Software Engineering 101 series. In this chapter, 
 
 This picture places What Is Software Engineering? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is Software Engineering? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The difference between coding and software engineering
@@ -58,8 +56,6 @@ This picture places What Is Software Engineering? inside an operating flow. The 
 Most learning stops at "how to write code". Real work is code + collaboration + operations. Understanding this gap shapes the next decade of your learning.
 
 > Code that runs once and a system that survives five years are different things.
-
-## Concept at a Glance
 
 Engineering is a loop that does not break.
 

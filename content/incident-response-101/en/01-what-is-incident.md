@@ -42,7 +42,7 @@ This is the first post in the Incident Response 101 series. This post explains h
 
 This picture places What is an Incident? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What is an Incident? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Without clear definitions, incident response becomes reactive and inconsistent. A shared threshold makes the first decision reliable.
 
 ## Why this topic matters
 

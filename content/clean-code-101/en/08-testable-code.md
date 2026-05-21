@@ -43,7 +43,7 @@ Here we will push time, IO, and randomness to the boundaries, then use seams, fa
 
 This picture places Testable Code inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Testable Code is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Pure logic at the center, thin adapters at the boundary.
 
 ## Questions this article answers
 
@@ -60,8 +60,6 @@ This picture places Testable Code inside an operating flow. The point is not to 
 Hard-to-test code is a sign of hard-to-change structure. Testability is a measure of design quality.
 
 > Testability is not an outcome. It is a result of design.
-
-## Concept at a Glance
 
 A pure core surrounded by thin adapters.
 

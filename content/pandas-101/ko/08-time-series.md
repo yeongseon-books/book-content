@@ -57,6 +57,22 @@ last_reviewed: '2026-05-15'
 - **이동 창 계산**: 일정 구간을 밀어 가며 통계를 구하는 방식입니다.
 - **시차 이동**: 값을 시간 축에서 앞으로 또는 뒤로 미는 연산입니다.
 - **시간대 부여와 변환**: 시간대 정보를 붙이고 다른 시간대로 바꾸는 작업입니다.
+- **분주**: 특정 미세 함수로 병리 데이터를 나누는 작업입니다.
+
+### 문자열 메서드 비교
+
+다음 표는 Pandas 문자열 accessor(`str`)의 주요 메서드와 정규식 지원 여부, 실제 예시를 정리한 것입니다.
+
+| 메서드 | 정규식 지원 | 반환 | 예시 |
+|---|---|---|---|
+| `str.contains()` | ● | bool 시리즈 | `s.str.contains("error")` |
+| `str.extract()` | ● | DataFrame | `s.str.extract(r"(\d+)")` |
+| `str.replace()` | ● | 시리즈 | `s.str.replace("old", "new")` |
+| `str.split()` | - | 리스트 시리즈 | `s.str.split(",")` |
+| `str.lower()` | - | 시리즈 | `s.str.lower()` |
+| `str.strip()` | - | 시리즈 | `s.str.strip()` |
+
+문자열 메서드는 텍스트 정제, 로그 파싱, 태그 추출 같은 실무 처리에서 매우 자주 쓰입니다. 특히 `contains`와 `extract`는 정규식을 지원하믰로 복잡한 패턴도 효율적으로 처리할 수 있습니다.
 
 ## 전과 후
 
@@ -135,11 +151,139 @@ Freq: D, dtype: int64
 
 시간대는 먼저 붙이고 그다음 변환해야 합니다. 시간대가 없는 시간과 있는 시간을 섞으면 비교와 병합에서 오류가 쉽게 생깁니다.
 
+### datetime accessor 예제
+
+날짜 열이 있을 때 `dt` accessor로 년/월/일/요일 같은 구성 요소를 바로 추출할 수 있습니다.
+
+```python
+import pandas as pd
+
+df = pd.DataFrame({
+    "date": pd.date_range("2026-01-01", periods=5, freq="D"),
+    "value": [10, 20, 30, 40, 50],
+})
+
+df["year"] = df["date"].dt.year
+df["month"] = df["date"].dt.month
+df["dayofweek"] = df["date"].dt.dayofweek  # 0=월요일
+df["quarter"] = df["date"].dt.quarter
+
+print(df.head())
+```
+
+**예상 출력:**
+
+```text
+        date  value  year  month  dayofweek  quarter
+0 2026-01-01     10  2026      1          3        1
+1 2026-01-02     20  2026      1          4        1
+2 2026-01-03     30  2026      1          5        1
+3 2026-01-04     40  2026      1          6        1
+4 2026-01-05     50  2026      1          0        1
+```
+
+날짜에서 구성 요소를 바로 추출하면 월별, 분기별, 요일별 집계가 매우 쉽습니다. 특히 `dayofweek`는 주말/평일 패턴 분석에 자주 쓰입니다.
+
+### resample 패턴
+
+시계열 데이터를 다른 주기로 변환하는 `resample`은 실무에서 매우 자주 등장합니다.
+
+```python
+# 일별 데이터를 주간 합계로
+df = df.set_index("date")
+weekly = df.resample("W")["value"].sum()
+print(weekly)
+```
+
+**예상 출력:**
+
+```text
+date
+2026-01-04     60
+2026-01-11    130
+Freq: W-SUN, Name: value, dtype: int64
+```
+
+`resample`은 시간 축을 새 단위로 묶어 집계하는 도구입니다. 월별 매출, 주간 트래픽, 시간별 센서 값 같은 실무 지표를 만들 때 필수입니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - 문자열 슬라이싱은 날짜 인덱스에서 특히 강력합니다.
 - `resample()`은 항상 집계 함수와 함께 써야 의미가 생깁니다.
 - 시간대는 먼저 부여하고 그다음 변환합니다.
+
+### 카테고리 타입 변환
+
+문자열로 저장된 범주형 데이터는 카테고리 타입으로 바꾸면 메모리와 속도가 크게 개선됩니다.
+
+#### 카테고리 타입의 이점
+
+1. **메모리 절감**: 문자열을 정수 코드로 저장합니다.
+2. **속도 향상**: 그룹화와 비교 연산이 빠릅니다.
+3. **순서 보존**: 범주형 변수의 순서를 명시할 수 있습니다.
+
+```python
+import pandas as pd
+
+df = pd.DataFrame({
+    "city": ["Seoul", "Busan", "Seoul", "Busan"] * 25000,
+    "value": range(100000),
+})
+
+# 변환 전
+print(f"문자열: {df['city'].memory_usage(deep=True) / 1024:.1f} KB")
+
+# 변환 후
+df["city"] = df["city"].astype("category")
+print(f"카테고리: {df['city'].memory_usage(deep=True) / 1024:.1f} KB")
+```
+
+**예상 출력:**
+
+```text
+문자열: 5859.5 KB
+카테곦0리: 97.8 KB
+```
+
+고유값이 적은 열은 카테곦0리로 바꾸는 것만으로도 메모리를 크게 줄일 수 있습니다. 특히 도시, 국가, 상태 코드 같은 반복되는 값에 효과적입니다.
+
+#### 순서 명시
+
+카테곦0리 타입은 범주의 순서를 명시할 수 있습니다.
+
+```python
+from pandas.api.types import CategoricalDtype
+
+sizes = ["S", "M", "L", "M", "S", "L"]
+cat_type = CategoricalDtype(categories=["S", "M", "L"], ordered=True)
+s = pd.Series(sizes, dtype=cat_type)
+
+print(s.sort_values())
+print(s > "S")  # 비교 가능
+```
+
+**예상 출력:**
+
+```text
+4    S
+0    S
+1    M
+3    M
+2    L
+5    L
+dtype: category
+Categories (3, object): ['S' < 'M' < 'L']
+
+0    False
+1     True
+2     True
+3     True
+4    False
+5     True
+dtype: bool
+```
+
+순서가 있는 카테곦0리는 정렬과 비교가 의미 있게 동작합니다. 설문 응답의 리커트 척도, 학년, 우선순위 같은 데이터에 유용합니다.
 
 ## 자주 하는 실수 다섯 가지
 
@@ -167,6 +311,33 @@ Freq: D, dtype: int64
 - [ ] `resample()`과 집계 함수를 함께 쓸 수 있습니다.
 - [ ] `rolling()`으로 이동 평균을 계산할 수 있습니다.
 - [ ] 시간대를 부여하고 변환할 수 있습니다.
+
+### 실무 예제: 주간 매출 분석
+
+실무에서 시계열 데이터를 분석할 때는 리샘플링과 이동 평균을 함께 사용하는 경우가 많습니다.
+
+```python
+import pandas as pd
+import numpy as np
+
+# 일별 매출 데이터
+dates = pd.date_range("2026-01-01", periods=30, freq="D")
+sales = np.random.randint(80, 150, size=30)
+df = pd.DataFrame({"sales": sales}, index=dates)
+
+# 주간 합계
+weekly = df.resample("W").sum()
+
+# 7일 이동 평균
+df["ma7"] = df["sales"].rolling(window=7).mean()
+
+print("\n주간 합계:")
+print(weekly.head())
+print("\n이동 평균 (마지막 5일):")
+print(df[["sales", "ma7"]].tail())
+```
+
+이 패턴은 일별 데이터의 추세를 파악하는 데 매우 유용합니다. 주간 합계는 주단위 패턴을 보고, 이동 평균은 단기 변동성을 완화해 전반적인 추세를 드러냅니다.
 
 ## 연습 문제
 

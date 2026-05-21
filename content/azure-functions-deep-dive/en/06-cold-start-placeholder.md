@@ -53,8 +53,6 @@ The answer to that question is **Placeholder Mode**. This part follows the code 
 
 This picture places Cold Start and Placeholder Mode — What Happens When a New Instance Is Born inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Cold Start and Placeholder Mode — What Happens When a New Instance Is Born is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why Cold Start Is Expensive — Decomposing the Bootstrap Cost
 
 Let's first lay out the steps a single new instance has to traverse before it's ready to run a function from scratch.

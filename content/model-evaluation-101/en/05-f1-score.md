@@ -42,8 +42,6 @@ This rewrite fixes that defect directly. F1 is still useful, but threshold selec
 
 This picture places F1 Score inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of F1 Score is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## This post answers
 
 - What review question do macro, micro, and weighted F1 each answer?

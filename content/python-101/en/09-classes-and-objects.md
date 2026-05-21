@@ -42,8 +42,6 @@ This post is the 9th article in the Python 101 series. This is the stage in the 
 
 This picture places Classes and objects: bundling data with behavior inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Classes and objects: bundling data with behavior is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 Functions and modules from earlier chapters kept behavior and data apart. A function takes input and returns output; a module groups related functions. When data and the behavior that operates on it are tightly paired, however, keeping them separate scatters the code.

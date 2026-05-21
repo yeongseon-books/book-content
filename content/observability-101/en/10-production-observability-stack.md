@@ -58,8 +58,6 @@ There is no *perfect* stack for a small team. The best stack is *operable* and *
 
 > *The perfect stack *will not arrive tomorrow*. Build the operable one *today*.*
 
-## Concept at a Glance
-
 Observability is the ability to understand a system's internal state from external signals. In a distributed system, you cannot instrument every line of code. You rely on *metrics* (what happened), *logs* (why it happened), and *traces* (where it happened).
 
 ## Key Terms

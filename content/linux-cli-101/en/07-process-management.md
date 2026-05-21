@@ -42,8 +42,6 @@ This is post 7 in the Linux CLI 101 series.
 
 This picture places Process Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Process Management is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 When a web server is consuming 100% CPU, a Python script is stuck in an infinite loop, or a port is already occupied by another process — you need to know how to check and manage processes to resolve any of these.

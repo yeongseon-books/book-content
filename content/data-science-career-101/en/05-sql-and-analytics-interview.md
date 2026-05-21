@@ -42,8 +42,7 @@ This is post 5 in the Data Science Career 101 series.
 
 This picture places SQL and Analytics Interviews inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of SQL and Analytics Interviews is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
+> In SQL interviews, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
 ## What You Will Learn
 
 - Core *SQL* patterns
@@ -58,8 +57,7 @@ SQL is the shared language across most data roles, which is why interviewers use
 
 They are also watching how you define the metric, whether you surface assumptions, and whether you can tell the difference between “I got a number” and “I understand what this number means.”
 
-## Concept at a Glance
-
+SQL questions are less about syntax and more about question decomposition. A good SQL answer shows you break the problem into smaller steps and explain your reasoning at each stage.
 ## Key Terms
 
 - **JOIN**: Combining tables.
@@ -76,6 +74,7 @@ They are also watching how you define the metric, whether you surface assumption
 
 ## Hands-on: Five Question Patterns
 
+Most SQL interview questions follow five recurring patterns. The faster you recognize the pattern, the faster you can plan your solution.
 ### Step 1 — Single-Table Aggregation
 
 ```sql

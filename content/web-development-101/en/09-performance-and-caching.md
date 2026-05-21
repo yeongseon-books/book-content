@@ -41,15 +41,11 @@ This is post 9 in the Web Development 101 series. Here we connect performance me
 
 This picture places Performance and Caching inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Performance and Caching is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 A fast site is *money* — conversion, search rank, and user satisfaction all scale with speed. And making it fast is a job of *measurement*, not guessing.
 
 > Performance starts with *measuring*.
-
-## Concept at a Glance
 
 Performance work gets easier once you see each cache as a separate distance-reduction tool. The browser, CDN, application cache, and database are not interchangeable; they remove different kinds of repeated work.
 

@@ -323,4 +323,6 @@ img = ImageOps.exif_transpose(Image.open(path))
 - [AI Agent 101 - 운영](../../ai-agent-101/ko/09-production-operations.md)
 - [Harness Engineering 101 - Observability](../../harness-engineering-101/ko/09-observability.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/multimodal-ai-101/ko/10-production-multimodal-app)
+
 Tags: Production, Multimodal API, FastAPI, Inference Pipeline, Cost Optimization, Caching

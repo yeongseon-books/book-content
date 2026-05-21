@@ -50,8 +50,6 @@ If the *concept* stays blurry, everything after it is a *sandcastle*.
 
 > Mental model: define the concept, mark the boundary, then prove it with an example.
 
-## Concept at a Glance
-
 The strongest concept explanations follow a pattern: definition, analogy, counterexample, and a worked example. This combination helps readers test the idea instead of just memorizing it.
 ## Key Terms
 

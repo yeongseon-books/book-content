@@ -169,6 +169,111 @@ IC = decision maker. Does NOT fix things directly.
 
 이렇게 남겨야 장애가 문서가 아니라 시스템 변경으로 이어집니다.
 
+## 인시던트 심각도
+
+장애 심각도를 명확히 정의해야 팀이 같은 기준으로 대응할 수 있습니다. 아래 표는 네 단계 심각도와 기대 응답 시간을 정리한 것입니다.
+
+| 심각도 | 기준 | 응답 시간 |
+| --- | --- | --- |
+| SEV1 | 전체 서비스 중단, 데이터 손실 가능 | 즉시 (5분 이내) |
+| SEV2 | 핵심 기능 저하, 일부 사용자 영향 | 30분 이내 |
+| SEV3 | 비핵심 기능 문제, 우회 가능 | 영업 시간 내 |
+| SEV4 | 경미한 버그, 사용자 영향 없음 | 백로그로 처리 |
+
+이 기준은 팀마다 달라야 합니다. 중요한 것은 숫자가 아니라, 팀이 같은 상황을 같은 이름으로 부를 수 있는가입니다. 심각도가 합의되면 알림 설정, on-call 로테이션, 에스케일레이션 규칙도 함께 명확해집니다.
+
+## 온콜 로테이션 설계
+
+on-call은 단순한 대기가 아니라, 팀의 피로도와 대응 품질을 함께 결정하는 운영 설계입니다. 좋은 로테이션은 피로를 분산시키고 항상 백업 경로를 남깁니다.
+
+### Primary 와 Secondary
+
+Primary가 먼저 알림을 받고, 응답하지 못하면 secondary가 자동으로 호출됩니다. 이 구조는 한 사람에게 만 의존하지 않고, 항상 백업 경로를 유지합니다.
+
+```yaml
+rotation:
+  schedule: weekly
+  primary:
+    - alice  # Week 1
+    - bob    # Week 2
+    - carol  # Week 3
+  secondary:
+    - dave
+    - erin
+  escalation_timeout: 15m
+```
+
+### Handoff 의식
+
+로테이션 교대 시점에 짧은 handoff 미팅을 하면, 진행 중인 인시던트와 주의 사항을 전달할 수 있습니다.
+
+```text
+Every Monday 10:00 AM:
+- Previous on-call summarizes the week
+- Hands off open incidents
+- Next on-call confirms receipt
+```
+
+### 피로 관리
+
+on-call 주기를 너무 길게 하면 피로가 쌓이고, 너무 짧게 하면 맥락 전환 비용이 커집니다. 1주일 단위가 가장 흔하지만, 팀 규모에 따라 조정해야 합니다.
+
+## Python PagerDuty webhook 예제
+
+실제 on-call 시스템과 연동하는 webhook 처리 예제입니다. PagerDuty나 Opsgenie 같은 서비스에서 인시던트를 생성할 때 사용합니다.
+
+```python
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+import httpx
+import os
+
+app = FastAPI()
+
+PAGERDUTY_URL = "https://events.pagerduty.com/v2/enqueue"
+PAGERDUTY_KEY = os.getenv("PAGERDUTY_INTEGRATION_KEY")
+
+class Alert(BaseModel):
+    severity: str  # SEV1, SEV2, SEV3, SEV4
+    title: str
+    description: str
+    service: str
+
+@app.post("/alert")
+async def create_alert(alert: Alert):
+    # Map severity to PagerDuty severity
+    pd_severity_map = {
+        "SEV1": "critical",
+        "SEV2": "error",
+        "SEV3": "warning",
+        "SEV4": "info"
+    }
+    
+    payload = {
+        "routing_key": PAGERDUTY_KEY,
+        "event_action": "trigger",
+        "payload": {
+            "summary": alert.title,
+            "severity": pd_severity_map.get(alert.severity, "error"),
+            "source": alert.service,
+            "custom_details": {
+                "description": alert.description,
+                "severity": alert.severity
+            }
+        }
+    }
+    
+    async with httpx.AsyncClient() as client:
+        response = await client.post(PAGERDUTY_URL, json=payload)
+        
+    if response.status_code != 202:
+        raise HTTPException(status_code=500, detail="Failed to create PagerDuty incident")
+    
+    return {"status": "triggered", "dedup_key": response.json().get("dedup_key")}
+```
+
+이 코드는 내부 알림 시스템에서 PagerDuty로 인시던트를 전송합니다. 심각도를 PagerDuty 형식으로 매핑하고, on-call 엔지니어에게 자동으로 통지됩니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - 사람이 아니라 시스템과 절차를 고치는 관점이 일관되게 들어 있습니다.
@@ -215,6 +320,91 @@ IC = decision maker. Does NOT fix things directly.
 ## 정리 및 다음 단계
 
 장애 대응은 기술과 조직이 만나는 운영 역량입니다. 다음 글에서는 지금까지 살펴본 모든 요소를 하나의 DevOps 흐름으로 연결해 정리합니다.
+
+## 장애 대응 조직 설계를 팀 운영 모델로 정착시키기
+
+on-call은 개인 헌신이 아니라 시스템 설계입니다. 누가 알림을 받는지뿐 아니라, 누가 의사결정하고 누가 기록하며 누가 외부 커뮤니케이션을 담당하는지까지 미리 정의해야 합니다.
+
+### 팀 구조 비교표
+
+| 구조 | 특징 | 장점 | 리스크 |
+| --- | --- | --- | --- |
+| 중앙 운영팀 단독 | 운영팀이 대부분 장애 처리 | 역할 집중 | 도메인 지식 단절 |
+| 서비스 팀 on-call | 개발팀이 서비스 직접 대응 | 복구 속도 향상 | 피로도 관리 필요 |
+| 하이브리드 | 서비스 팀 + 플랫폼 지원 | 균형 잡힌 대응 | 역할 경계 모호 가능 |
+
+### SEV 정의 예시
+
+| SEV | 영향 범위 | 목표 응답 시간 |
+| --- | --- | --- |
+| SEV1 | 전사 핵심 기능 중단 | 즉시 대응 |
+| SEV2 | 주요 기능 성능 저하 | 30분 이내 |
+| SEV3 | 부분 기능 저하 | 영업시간 내 |
+| SEV4 | 경미한 결함 | 백로그 처리 |
+
+### DORA 지표와 incident 연결
+
+| 지표 | incident 관점 해석 |
+| --- | --- |
+| Deploy Frequency | 작은 변경 단위 유지 여부 |
+| Lead Time | 복구성 있는 배포 흐름 여부 |
+| Change Failure Rate | 배포 품질 게이트 효과 |
+| MTTR | 감지/판단/복구 체계 성숙도 |
+
+### on-call 운영 YAML 예시
+
+```yaml
+oncall:
+  rotation: weekly
+  primary: [alice, bob, carol]
+  secondary: [dave, erin]
+  escalation:
+    - after: 10m
+      to: secondary
+    - after: 20m
+      to: incident-commander
+  handoff:
+    day: monday
+    time: "10:00"
+```
+
+### 사고 대응 템플릿
+
+```markdown
+# Incident Record
+- started_at:
+- detected_by:
+- sev:
+- impacted_scope:
+- mitigation:
+- status_page_update:
+- follow_up_owner:
+```
+
+### 운영 규칙
+
+1. 모든 페이지 알림에 runbook 링크를 포함합니다.
+2. IC는 복구 실무보다 조율과 의사결정에 집중합니다.
+3. 포스트모템 액션은 반드시 이슈 트래커로 추적합니다.
+4. 월 단위로 알림 노이즈와 on-call 부하를 점검합니다.
+
+장애 대응 체계의 목표는 완벽한 무장애가 아니라 빠른 복구와 반복 방지입니다. 이 구조가 있을 때 팀은 안정성과 개발 속도를 동시에 유지할 수 있습니다.
+
+### on-call 피로도 관리 지표
+
+장애 대응 체계는 복구 속도뿐 아니라 지속 가능성도 관리해야 합니다. on-call이 소수에게 과도하게 집중되면 대응 품질이 장기적으로 떨어집니다.
+
+| 지표 | 권장 관찰 |
+| --- | --- |
+| 주간 페이지 수 | 개인별 편차 확인 |
+| 야간 호출 비율 | 특정 서비스 노이즈 점검 |
+| 30분 내 완화율 | 런북 실효성 확인 |
+| 반복 알림 비율 | 알림 조건 튜닝 필요성 판단 |
+
+월간으로 이 지표를 점검하면 "장애는 줄었는데 팀 피로는 증가"하는 역전 현상을 조기에 발견할 수 있습니다.
+
+
+또한 인수인계 품질을 위해 주간 handoff 노트에 열린 incident, 미완료 액션, 취약 시간대를 반드시 기록해야 합니다. 이 문서가 누락되면 로테이션이 바뀔 때마다 같은 조사 과정이 반복되어 MTTR이 불필요하게 증가합니다.
 
 ## 처음 질문으로 돌아가기
 

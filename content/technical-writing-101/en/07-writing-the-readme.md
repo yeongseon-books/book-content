@@ -50,8 +50,6 @@ The *README* is the *first impression* of a project.
 
 > Mental model: the README should get a first-time visitor to a visible success with minimal scrolling.
 
-## Concept at a Glance
-
 A strong README compresses the install, run, and verification steps into one screen so the reader gets a first success before reading the full backstory. That early win makes the rest of the README feel safer to trust.
 ## Key Terms
 

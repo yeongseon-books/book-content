@@ -48,8 +48,6 @@ This picture places Time Series inside an operating flow. The point is not to me
 
 Sales, traffic, sensors, finance — *most operational data* is time series. Treating *time as an index* makes *KPI trends* visible immediately.
 
-## Concept at a Glance
-
 ## Key Terms
 
 - **DatetimeIndex**: an index of *time labels*.

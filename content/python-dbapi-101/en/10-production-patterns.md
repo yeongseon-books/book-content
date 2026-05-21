@@ -48,8 +48,6 @@ This is the final article in the Python DB-API 101 series.
 
 This picture places SQLite Production Patterns: retry, timeout, observability, backup inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of SQLite Production Patterns: retry, timeout, observability, backup is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 When a SQLite-backed service misbehaves in production, the most common reactions are: (1) "I don't know, restart it", or (2) "Just `cp` the DB file". Both work some of the time, but they bet your data integrity and your SLO on luck.

@@ -50,8 +50,6 @@ Writing tends to *outlive* the *code* it describes.
 
 > Mental model: the post only works when a reader can turn the explanation into an action.
 
-## Concept at a Glance
-
 Technical writing differs from everyday prose because it must close the loop: reader → task → measurable outcome. That closure is what separates a document that stalls on confusion from one that drives action.
 ## Key Terms
 

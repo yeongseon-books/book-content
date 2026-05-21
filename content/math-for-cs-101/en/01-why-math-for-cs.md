@@ -52,9 +52,6 @@ In software work, a successful run only verifies one moment, one environment, an
 
 Math helps you separate those concerns. Sets make boundaries explicit. Logic makes conditions and conclusions precise. Combinatorics shows when the search space is already exploding. Probability gives you a way to reason about uncertainty without hand-waving. Linear algebra, calculus, and information theory later become the language behind modern ML, optimization, and compression.
 
-
-## Concept at a Glance
-
 Math in CS consists of five overlapping tools: **abstraction** (extracting patterns), **proof** (guaranteeing truth), **modeling** (turning reality into equations), **analysis** (measuring behavior), and **invariant** (properties that persist).
 
 ## Before/After

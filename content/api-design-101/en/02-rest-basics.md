@@ -51,8 +51,6 @@ REST is the most common API style. Follow it well and your API becomes *predicta
 
 > Understand *why* the rule exists, not only the rule.
 
-## Concept at a Glance
-
 A client should be able to read `GET /users/42` and predict the intent immediately. Once that predictability disappears, the API may still use JSON over HTTP, but it stops behaving like a coherent REST interface.
 
 ## Key Terms

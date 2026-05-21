@@ -42,8 +42,6 @@ This is post 2 in the Linux CLI 101 series.
 
 This picture places Files and Directories inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Files and Directories is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 A developer's daily routine is an endless cycle of creating, moving, copying, and deleting files. You organize code files, copy configuration files, and remove build artifacts. In a GUI you drag and drop, but on a server everything is done through commands.

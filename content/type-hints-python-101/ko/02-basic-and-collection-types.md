@@ -39,10 +39,6 @@ last_reviewed: '2026-05-12'
 
 *Type Hints in Python 101 2장 흐름 개요*
 
-이 그림에서는 기본 타입과 collection 타입를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 기본 타입과 collection 타입의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 이 주제가 중요한가
 
 실무 Python 코드는 대부분 컬렉션과 함께 움직입니다. API 응답은 딕셔너리와 리스트로 오고, 설정은 중첩 딕셔너리로 들어오며, 쿼리 결과는 튜플 목록으로 다뤄집니다. 이때 `list`나 `dict`만 적어 두면 분석기는 안쪽 원소를 `object`에 가깝게 취급하고, 엉뚱한 메서드 호출이나 잘못된 값 삽입을 충분히 잡아내지 못합니다.
@@ -221,6 +217,83 @@ scores: UserScores = {
 기본 타입과 컬렉션 타입은 Python 타입 힌트의 가장 넓은 바닥을 이룹니다. `int`, `str`, `float`, `bool` 같은 스칼라 타입 위에 `list[T]`, `dict[K, V]`, `tuple[...]`, `set[T]` 같은 컨테이너가 쌓입니다. 여기서 중요한 습관은 컬렉션 안쪽 타입을 생략하지 않는 것입니다.
 
 다음 글에서는 값이 없을 수도 있거나 여러 타입 중 하나일 수 있는 상황을 표현하는 `Optional`과 `Union`을 다룹니다.
+
+## 실전 패턴 추가: TypeVar, Generic, Protocol을 함께 쓰는 방법
+
+타입 힌트가 본격적으로 효율을 내는 구간은 공통 유틸리티와 도메인 인터페이스를 다룰 때입니다. 단순한 `list[int]`를 넘어서 `TypeVar`, `Generic`, `Protocol`을 함께 쓰면 구체 클래스에 묶이지 않는 API를 만들 수 있습니다.
+
+```python
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Generic, Protocol, TypeVar
+
+T = TypeVar("T")
+K = TypeVar("K")
+
+
+class SupportsKey(Protocol[K]):
+    def key(self) -> K:
+        ...
+
+
+class Repository(Protocol[T]):
+    def add(self, item: T) -> None:
+        ...
+
+    def all(self) -> list[T]:
+        ...
+
+
+@dataclass
+class User:
+    user_id: int
+    name: str
+
+    def key(self) -> int:
+        return self.user_id
+
+
+class InMemoryRepository(Generic[T]):
+    def __init__(self) -> None:
+        self._items: list[T] = []
+
+    def add(self, item: T) -> None:
+        self._items.append(item)
+
+    def all(self) -> list[T]:
+        return self._items
+
+
+def index_by_key(items: list[SupportsKey[K]]) -> dict[K, SupportsKey[K]]:
+    return {item.key(): item for item in items}
+```
+
+```python
+repo: Repository[User] = InMemoryRepository()
+repo.add(User(user_id=1, name="A"))
+repo.add(User(user_id=2, name="B"))
+indexed = index_by_key(repo.all())
+```
+
+이 패턴의 장점은 구현 교체 비용이 낮다는 점입니다. `Repository[User]` 계약만 지키면 메모리 저장소를 DB 저장소로 바꿔도 상위 서비스 타입 시그니처를 유지할 수 있습니다. 또한 Protocol 기반 설계는 상속 계층 없이도 구조적 타이핑으로 계약을 검사할 수 있어, 기존 코드에 점진적으로 타입 안전성을 도입할 때 특히 유리합니다.
+
+## 추가 실무 메모: TypeVar 경계와 Any 확산 방지
+
+타입 힌트를 도입할 때 가장 먼저 막아야 하는 것은 `Any`의 확산입니다. 제네릭 함수에서 `TypeVar`를 사용하면 입력-출력 타입 연계를 유지할 수 있고, 실수로 타입 정보가 사라지는 경로를 줄일 수 있습니다.
+
+```python
+from typing import TypeVar
+
+T = TypeVar("T")
+
+def first(items: list[T]) -> T:
+    if not items:
+        raise ValueError("items must not be empty")
+    return items[0]
+```
+
+위 시그니처는 `list[int]`를 넣으면 `int`, `list[str]`를 넣으면 `str`을 반환한다는 계약을 유지합니다.
 
 ## 처음 질문으로 돌아가기
 

@@ -40,8 +40,6 @@ This is the fourth post in the Korean AI Stack 101 series. Here, we turn CLOVA O
 
 This picture places Document text extraction with CLOVA OCR API inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Document text extraction with CLOVA OCR API is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 This post processes Korean document images — receipts, tax invoices, scanned forms — with the CLOVA OCR API and shapes the result so it can drop into the BGE-M3 corpus from the previous post. The previous post handled multilingual retrieval over text. Here we make the source text in the first place.

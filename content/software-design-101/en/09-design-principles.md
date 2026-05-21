@@ -45,8 +45,6 @@ In this post, we recast SOLID, KISS, YAGNI, DRY, and the Law of Demeter as diagn
 
 This picture places Design Principles inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Design Principles is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The five SOLID principles in plain terms
@@ -60,8 +58,6 @@ This picture places Design Principles inside an operating flow. The point is not
 Principles are diagnostic tools, not commandments. When the code smells, they point at which principle was broken and hint at how to fix it.
 
 > Principles make you ask "why?"
-
-## Concept at a Glance
 
 Smell → principle → refactor.
 

@@ -42,8 +42,6 @@ This is the final post in the Linux CLI 101 series.
 
 This picture places SSH and Remote Access inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of SSH and Remote Access is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 Deploying code to a server, checking server logs, and connecting to a database all start with remote access. SSH is the foundation of every remote operation.

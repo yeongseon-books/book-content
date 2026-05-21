@@ -43,8 +43,6 @@ In this article, we'll turn processes, threads, virtual memory, system calls, an
 
 This picture places Operating Systems inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Operating Systems is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions This Article Answers
 
 - Why does one machine appear to run many programs at once?
@@ -67,8 +65,6 @@ Why a web server stalls, how a memory leak shows up to the OS, why multithreadin
 > An OS = resource manager + abstraction layer.
 
 Without understanding OS abstractions, debugging starts to feel like magic.
-
-## Concept at a Glance
 
 > A process is an isolated execution unit. A thread is a flow of execution that shares memory with other threads inside the same process.
 

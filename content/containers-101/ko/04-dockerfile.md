@@ -206,6 +206,132 @@ Dockerfile은 이미지 빌드 결과를 규정하는 핵심 설계 문서입니
 
 다음 글에서는 이미지가 아니라 상태를 어디에 둘 것인지, 즉 Volume 설계를 살펴보겠습니다.
 
+
+## 심화: 멀티스테이지 Dockerfile을 운영 표준으로 만드는 방법
+
+Dockerfile을 잘 작성하는 팀과 그렇지 않은 팀의 차이는 문법 지식이 아니라 기본 템플릿의 유무에서 갈립니다. 개인이 매번 처음부터 작성하면 품질 편차가 커지고, 결과적으로 빌드 시간과 보안 수준이 일정하지 않게 됩니다. 따라서 팀 단위로는 "권장 Dockerfile 템플릿"과 "리뷰 체크리스트"를 함께 운영해야 합니다.
+
+아래 예시는 Python 서비스용 운영 템플릿입니다.
+
+```dockerfile
+FROM python:3.12-slim AS builder
+WORKDIR /build
+COPY requirements.txt .
+RUN pip install --upgrade pip && pip wheel --wheel-dir /wheels -r requirements.txt
+COPY . .
+RUN pip wheel --wheel-dir /wheels .
+
+FROM python:3.12-slim
+WORKDIR /app
+COPY --from=builder /wheels /wheels
+RUN pip install --no-cache-dir /wheels/* && rm -rf /wheels
+COPY app ./app
+RUN useradd -m app && chown -R app:app /app
+USER app
+ENV PYTHONUNBUFFERED=1
+CMD ["python", "-m", "app.main"]
+```
+
+## 레이어 캐싱 전략을 Dockerfile 규칙으로 고정하기
+
+다음 규칙을 팀 규약으로 고정하면 캐시 효율이 크게 안정됩니다.
+
+1. 의존성 파일(`requirements.txt`, `poetry.lock`)을 소스보다 먼저 복사합니다.
+2. `COPY . .`는 최대한 뒤로 보냅니다.
+3. OS 패키지 설치는 하나의 RUN에서 정리까지 끝냅니다.
+4. 빌드 전용 도구는 final stage에 남기지 않습니다.
+
+예시:
+
+```dockerfile
+RUN apt-get update && apt-get install -y --no-install-recommends curl   && rm -rf /var/lib/apt/lists/*
+```
+
+이 패턴은 레이어 크기를 줄이고 취약점 스캔 노이즈도 낮춥니다.
+
+## BuildKit과 비밀값 처리
+
+실무에서 흔한 실수는 토큰이나 패스워드를 `ENV` 또는 `ARG`에 직접 넣는 것입니다. 빌드 히스토리나 이미지 레이어에 흔적이 남을 수 있으므로 권장되지 않습니다. BuildKit secret mount를 사용하면 흔적을 줄일 수 있습니다.
+
+```bash
+DOCKER_BUILDKIT=1 docker build   --secret id=pipconf,src=$HOME/.pip/pip.conf   -t myapp:secure .
+```
+
+Dockerfile:
+
+```dockerfile
+RUN --mount=type=secret,id=pipconf,target=/etc/pip.conf     pip install --no-cache-dir -r requirements.txt
+```
+
+## 팀 리뷰 체크리스트
+
+| 점검 항목 | Pass 기준 |
+| --- | --- |
+| 멀티스테이지 사용 | builder/runtime 분리 |
+| 비root 실행 | `USER` 명시 |
+| 캐시 친화 순서 | deps 먼저, code 나중 |
+| 비밀값 처리 | ENV 직접 주입 없음 |
+| 이미지 크기 | 이전 버전 대비 증가 원인 설명 |
+
+리뷰에서 이 체크리스트를 통과하지 못하면 병합하지 않는 규칙을 두면, Dockerfile 품질이 조직 차원에서 유지됩니다.
+
+## 배포 안정성을 높이는 태그 전략
+
+Dockerfile 품질과 함께 태그 전략도 중요합니다.
+
+- 개발: `myapp:dev-<gitsha>`
+- 스테이징: `myapp:stg-<gitsha>`
+- 운영: digest pin(`myapp@sha256:...`)
+
+운영에서는 태그보다 digest를 기준으로 배포해야 재현성을 보장할 수 있습니다.
+
+
+## 추가 실무 노트: 빌드 실패를 줄이는 Dockerfile 운영 규칙
+
+빌드 실패의 많은 부분은 Dockerfile 자체보다 입력 아티팩트의 불안정성에서 옵니다. 따라서 Dockerfile과 함께 다음 규칙을 묶어야 합니다.
+
+- lock file 필수(requirements.txt, poetry.lock)
+- base image 버전 고정(`python:3.12.3-slim`)
+- 빌드 컨텍스트 크기 제한(예: 50MB 이하)
+- CI에서 이미지 크기 회귀 검사
+
+```bash
+docker build -t myapp:test .
+docker image inspect myapp:test --format '{{.Size}}'
+```
+
+이미지 크기와 빌드 시간을 매 릴리스에서 기록하면 성능 퇴화를 조기에 발견할 수 있습니다.
+
+
+## 추가 정리: 운영 적용 전 최종 점검 질문
+
+아래 질문은 도구 지식이 아니라 운영 준비도를 확인하기 위한 질문입니다. 각 질문에 문서와 명령으로 답할 수 있어야 실제 팀 운영에서 반복 가능한 품질을 만들 수 있습니다.
+
+1. 이 구성은 새 팀원이 같은 절차로 재현할 수 있는가?
+2. 실패했을 때 어디서 원인을 확인해야 하는지 런북이 있는가?
+3. 보안 기본값(root 금지, 최소 권한, 시크릿 분리)이 강제되는가?
+4. 버전과 아티팩트 동일성(digest, lock file)이 보장되는가?
+5. 데이터/네트워크/권한 경계가 문서로 정의되어 있는가?
+
+다음은 공통 점검 명령 예시입니다.
+
+```bash
+# 아티팩트 동일성
+docker inspect --format '{{index .RepoDigests 0}}' <image>
+
+# 실행 상태
+docker ps --format 'table {{.Names}}	{{.Status}}	{{.Ports}}'
+
+# 로그 관측
+docker logs --tail 100 <container>
+
+# 네트워크/볼륨 구조
+docker network ls
+docker volume ls
+```
+
+이 명령 자체가 중요한 것이 아니라, 팀이 같은 순서로 문제를 좁혀 가는 절차를 공유한다는 점이 중요합니다. 컨테이너 운영의 성숙도는 개인의 숙련도보다 팀의 표준화 수준에서 결정됩니다. 따라서 시리즈 학습의 최종 목표는 기능 이해가 아니라 운영 계약의 명문화입니다.
+
 ## 처음 질문으로 돌아가기
 - **Dockerfile의 명령 순서는 왜 그렇게 중요할까요?**
   - 앞 명령이 캐시 히트하면 뒤의 명령까지 전부 생략될 수 있습니다. 반대로 앞 명령 하나가 바뀌면 뒤의 모든 레이어를 다시 만들어야 합니다.

@@ -42,8 +42,6 @@ This is the eighth post in the Git & GitHub 101 series. Here, we connect issues,
 
 This picture places Tracking Work with Issues and Projects - How GitHub Records What's Next inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Tracking Work with Issues and Projects - How GitHub Records What's Next is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 So far, this series has focused on what changed in the code. Commits recorded the change, and PRs created agreement around it. In real teams, the more frequent question is what comes before the code: "What should I work on now? Who owns this? How much is left this month?"

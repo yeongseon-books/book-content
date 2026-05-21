@@ -48,8 +48,6 @@ This picture places Reading CSV and Excel inside an operating flow. The point is
 
 *80%* of analysis is *loading and cleaning*. *Mistakes at load time* come back as *debugging cost* later.
 
-## Concept at a Glance
-
 ## Key Terms
 
 - **encoding**: file's *character encoding* (utf-8, cp949, latin-1).

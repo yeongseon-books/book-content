@@ -42,8 +42,6 @@ This is post 9 in the GitHub Actions 101 series. In this post, we will use scope
 
 This picture places Secret Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Secret Management is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The difference between *repository, environment, and organization* secrets
@@ -57,8 +55,6 @@ This picture places Secret Management inside an operating flow. The point is not
 *A leaked secret is unrecoverable*. Once it lands in a public log, it is on the internet *forever*.
 
 > *The biggest risk to a secret is not a hacker; it is *us*. One careless echo and it is over.*
-
-## Concept at a Glance
 
 ## Key Terms
 

@@ -45,7 +45,7 @@ This is post 5 in the Computer Science Major 101 series.
 
 This picture places Database and Network inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Database and Network is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Databases and networks are not separate concerns—they collaborate. Understanding their *boundary* tells you where consistency, latency, and failure happen.
 
 ## What You Will Learn
 
@@ -60,7 +60,7 @@ This picture places Database and Network inside an operating flow. The point is 
 *Most* of *backend time* is spent in *DB* and *network* code.
 
 ## Concept at a Glance
-
+SQL transactions, network retries, and replication protocols all answer the same question: how do we keep data *consistent* when things go wrong?
 ## Key Terms
 
 - **table**: *rows and columns*.

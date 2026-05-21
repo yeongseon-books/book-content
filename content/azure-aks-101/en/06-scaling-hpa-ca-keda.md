@@ -42,8 +42,6 @@ This is the sixth post in the Azure Kubernetes Service 101 series. Here, we sort
 
 This picture places Scaling — HPA, Cluster Autoscaler, KEDA inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Scaling — HPA, Cluster Autoscaler, KEDA is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## One diagram first
 
 That is the whole relationship.

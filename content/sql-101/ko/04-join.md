@@ -147,6 +147,152 @@ JOIN products p ON p.id = oi.product_id;
 
 조인 조건을 빠뜨리면 가능한 모든 조합이 만들어집니다. 작은 샘플에서는 티가 안 나도, 실무 데이터에서는 행 수가 순식간에 폭증합니다. 조인 조건이 있는지, 조인 키가 맞는지 검토하는 습관이 필요합니다.
 
+## JOIN 유형 비교
+
+JOIN은 두 테이블을 어떻게 연결할지 결정하는 연산입니다. 각 JOIN 유형은 결과 행 수와 내용을 다르게 만듭니다. 다음 표는 주요 JOIN 유형의 차이를 보여 줍니다.
+
+| JOIN 유형 | 결과 행 | 설명 | Venn 다이어그램 설명 |
+| --- | --- | --- | --- |
+| `INNER JOIN` | 양쪽 테이블에 모두 존재하는 행만 | 조인 조건을 만족하는 행만 반환 | 교집합 |
+| `LEFT JOIN` | 왼쪽 테이블의 모든 행 + 오른쪽 매칭 | 왼쪽 테이블 행은 모두 보존, 오른쪽은 매칭되면 표시 | 왼쪽 전체 |
+| `RIGHT JOIN` | 오른쪽 테이블의 모든 행 + 왼쪽 매칭 | 오른쪽 테이블 행은 모두 보존, 왼쪽은 매칭되면 표시 | 오른쪽 전체 |
+| `FULL OUTER JOIN` | 양쪽 테이블의 모든 행 | 매칭되지 않는 행도 모두 표시 (NULL 포함) | 합집합 |
+| `CROSS JOIN` | 가능한 모든 조합 (Cartesian product) | 조인 조건 없이 모든 행 조합 | 모든 조합 |
+
+### 각 JOIN의 행 수 예측
+
+- **INNER JOIN**: 최소 0개, 최대 `min(left_count, right_count)`
+- **LEFT JOIN**: 정확히 `left_count` (1:N 관계면 더 많을 수 있음)
+- **RIGHT JOIN**: 정확히 `right_count` (1:N 관계면 더 많을 수 있음)
+- **FULL OUTER JOIN**: 최소 `max(left_count, right_count)`, 최대 `left_count + right_count`
+- **CROSS JOIN**: 정확히 `left_count × right_count`
+
+실무에서 가장 자주 쓰는 것은 `INNER JOIN`과 `LEFT JOIN`입니다. `CROSS JOIN`은 의도치 않게 조인 조건을 빠뜨릴 때 발생하기 쉬우므로 특히 조심해야 합니다.
+
+## 다중 테이블 JOIN 예제
+
+실무에서는 두 테이블만 연결하는 경우보다 세 개 이상 테이블을 연결하는 경우가 훨씬 많습니다. 이때는 각 단계마다 어떤 테이블이 어떻게 연결되는지 명확하게 파악해야 합니다.
+
+### 사용자 → 주문 → 결제 연결
+
+```sql
+SELECT 
+    u.name AS user_name,
+    o.id AS order_id,
+    o.total AS order_total,
+    p.amount AS payment_amount,
+    p.status AS payment_status
+FROM users u
+JOIN orders o ON o.user_id = u.id
+JOIN payments p ON p.order_id = o.id
+WHERE u.country = 'US'
+ORDER BY u.id, o.id;
+```
+
+이 쿼리는 세 테이블을 순차적으로 연결합니다. 먼저 `users`와 `orders`를 연결하고, 그 결과에 `payments`를 다시 연결합니다. 이때 주의할 점은 한 주문에 여러 결제가 있으려나, 한 사용자가 여러 주문을 가지면 결과 행이 불어납니다.
+
+### 사용자 → 주문 → 주문 항목 → 상품 연결
+
+```sql
+SELECT 
+    u.name AS user_name,
+    o.id AS order_id,
+    prod.name AS product_name,
+    oi.quantity,
+    oi.price
+FROM users u
+JOIN orders o ON o.user_id = u.id
+JOIN order_items oi ON oi.order_id = o.id
+JOIN products prod ON prod.id = oi.product_id
+WHERE o.status = 'completed'
+ORDER BY u.id, o.id, oi.id;
+```
+
+이 쿼리는 네 테이블을 연결합니다. 한 주문에 여러 항목이 있으므로, 결과는 주문 항목 수만큼 반복됩니다. 이럴 때 주문 금액을 그냥 합산하면 항목 수만큼 불어나므로 조심해야 합니다.
+
+### 여러 단계 LEFT JOIN
+
+```sql
+SELECT 
+    u.name,
+    o.id AS order_id,
+    p.amount AS payment_amount
+FROM users u
+LEFT JOIN orders o ON o.user_id = u.id
+LEFT JOIN payments p ON p.order_id = o.id;
+```
+
+모든 사용자를 보존하면서 주문과 결제 정보를 붙이는 패턴입니다. 주문이 없는 사용자는 `order_id`와 `payment_amount`가 모두 `NULL`로 나옵니다.
+
+## 자기 조인 (Self Join)
+
+같은 테이블을 두 번 참조하여 조인하는 기법을 자기 조인이라고 부릅니다. 계층 구조나 그래프 관계를 표현할 때 유용합니다.
+
+### 직원과 관리자 관계
+
+```sql
+CREATE TABLE employees (
+    id INT PRIMARY KEY,
+    name TEXT NOT NULL,
+    manager_id INT
+);
+
+INSERT INTO employees (id, name, manager_id) VALUES
+    (1, 'Alice', NULL),
+    (2, 'Bob', 1),
+    (3, 'Charlie', 1),
+    (4, 'Diana', 2);
+
+-- 직원과 그 관리자 이름을 함께 표시
+SELECT 
+    e.name AS employee,
+    m.name AS manager
+FROM employees e
+LEFT JOIN employees m ON m.id = e.manager_id;
+```
+
+**Expected output:**
+
+| employee | manager |
+| --- | --- |
+| Alice | NULL |
+| Bob | Alice |
+| Charlie | Alice |
+| Diana | Bob |
+
+이 패턴은 같은 테이블을 `e`와 `m`이라는 별칭으로 두 번 참조합니다. `e`는 직원, `m`은 관리자로 해석할 수 있습니다.
+
+### 같은 국가 사용자 쌍 찾기
+
+```sql
+-- 같은 국가에 사는 다른 사용자 쌍
+SELECT 
+    u1.name AS user1,
+    u2.name AS user2,
+    u1.country
+FROM users u1
+JOIN users u2 ON u1.country = u2.country AND u1.id < u2.id;
+```
+
+이 쿼리는 같은 국가에 사는 사용자 쌍을 찾습니다. `u1.id < u2.id` 조건을 붙여서 중복 조합을 피합니다. 자기 자신과의 조합도 제외됩니다.
+
+### 연속된 이벤트 찾기
+
+```sql
+-- 같은 사용자의 연속된 두 이벤트
+SELECT 
+    e1.user_id,
+    e1.event_name AS first_event,
+    e2.event_name AS next_event,
+    e2.created_at - e1.created_at AS time_diff
+FROM events e1
+JOIN events e2 ON e2.user_id = e1.user_id AND e2.id = e1.id + 1
+ORDER BY e1.user_id, e1.id;
+```
+
+이 쿼리는 같은 사용자의 연속된 두 이벤트를 찾습니다. 실무에서는 이런 패턴으로 사용자 행동 흐름을 분석하거나, 퍼널 분석을 할 때 자주 나옵니다.
+
+자기 조인은 처음에는 낯설 수 있지만, 한 번 이해하면 계층 구조나 시계열 비교 같은 복잡한 문제를 훨씬 간결하게 해결할 수 있습니다.
 ## 체크리스트
 
 - [ ] `INNER JOIN`과 `LEFT JOIN`의 차이를 설명할 수 있다.

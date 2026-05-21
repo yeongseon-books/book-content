@@ -511,4 +511,6 @@ if __name__ == "__main__":
 
 - [LangGraph 101](../../langgraph-101/ko/01-graph-basics.md) — 단일 RAG chain을 넘어 분기, 사람 승인, 장기 상태가 필요해질 때 다음 단계로 이어집니다.
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/langchain-101/ko/06-putting-it-together)
+
 Tags: LangChain, LCEL, Python, LLM

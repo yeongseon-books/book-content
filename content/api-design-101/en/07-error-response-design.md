@@ -51,8 +51,6 @@ There is one success path and *hundreds of error paths*. If the shape is inconsi
 
 > A good error response cuts *debugging time*.
 
-## Concept at a Glance
-
 That stable shape lets clients keep one parser and branch cleanly on `status`, `code`, and `errors[]` instead of reverse-engineering a different payload for each endpoint.
 
 ## Key Terms

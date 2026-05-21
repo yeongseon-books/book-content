@@ -43,15 +43,11 @@ Here we gather the patterns that turn distributed-system theory into day-two ope
 
 This picture places Patterns for Operable Distributed Systems inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Patterns for Operable Distributed Systems is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 The tools we covered so far — replication, consensus, queues, transactions — are the building materials. Operational patterns are the operator's toolbox that keeps those materials standing in a "failures are common" reality.
 
 > Good operational patterns turn "expected failures" into ordinary events.
-
-## Concept at a Glance
 
 At every call boundary, combine timeout, breaker, bulkhead, and backpressure so a single failure does not spread.
 

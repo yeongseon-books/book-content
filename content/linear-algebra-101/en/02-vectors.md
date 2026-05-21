@@ -40,7 +40,7 @@ This is post 2 in the Linear Algebra 101 series. Here we will read vectors throu
 
 This picture places Vectors inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Vectors is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A vector is both a container of numbers and the smallest unit of direction in a space. You need both views to connect linear algebra to machine learning.
 
 ## Questions This Post Answers
 
@@ -56,8 +56,6 @@ This picture places Vectors inside an operating flow. The point is not to memori
 Feature rows, user embeddings, token embeddings, and gradients are all represented as vectors. Once you can read vectors cleanly, you can move from preprocessing to model internals without switching mental languages.
 
 This matters quickly in practice. Similarity search, normalization, and metric choice all become fragile when you cannot tell whether direction matters, magnitude matters, or both matter. Vectors are the first chapter of linear algebra, but they remain the basic unit all the way to production systems.
-
-## Concept at a Glance
 
 ## Key Terms
 

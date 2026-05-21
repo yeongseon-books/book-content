@@ -43,15 +43,11 @@ In this post, we'll look at how Python's own tools can express classic pattern i
 
 This picture places Pythonic Patterns inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Pythonic Patterns is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Python's basic tools — modules, functions, Protocols — already provide *runtime support* for many patterns. The same problem can be solved with *less code*.
 
 > Reach for the language's tools first; pull out a pattern only when those fall short.
-
-## Concept at a Glance
 
 ## Key Terms
 

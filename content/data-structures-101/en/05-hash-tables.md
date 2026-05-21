@@ -45,8 +45,6 @@ This is post 5 in the Data Structures 101 series.
 
 This picture places Hash Tables inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Hash Tables is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The role of a hash function and what makes one good
@@ -59,8 +57,6 @@ This picture places Hash Tables inside an operating flow. The point is not to me
 Hash tables sit in the standard library of nearly every language: Python's dict and set, Java's HashMap, JavaScript's Object and Map. Database indexes, caches, and compiler symbol tables all use hash tables. The single fact that average lookup is O(1) makes a great deal of computer science possible.
 
 > Without dict, half of the algorithm problems become hard.
-
-## Concept at a Glance
 
 > A hash table runs a two-step transform: "key → hash value → index" — landing on a specific slot in an array. When two keys map to the same slot, you resolve the collision with chaining (a linked list) or open addressing (probe for the next empty slot).
 

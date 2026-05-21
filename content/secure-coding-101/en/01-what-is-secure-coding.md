@@ -44,8 +44,6 @@ Here, we will treat secure coding not as a final review step but as a developmen
 
 This picture places What Is Secure Coding? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is Secure Coding? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions This Chapter Answers
 
 - What *secure coding* means and *why* it matters
@@ -59,8 +57,6 @@ This picture places What Is Secure Coding? inside an operating flow. The point i
 Most security incidents are *known patterns* repeated. *Skipped input validation*. *Secrets in code*. *No permission check*. Secure coding is not *exotic cryptography* — it is a small, daily set of rules.
 
 > *Security is not a *coating on top* of the feature. It is *part of the structure*.*
-
-## Concept at a Glance
 
 ## Key Terms
 

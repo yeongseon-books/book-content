@@ -40,8 +40,6 @@ This is the second post in the Korean AI Stack 101 series. Here, we build a mini
 
 This picture places Building sentence similarity search with KoSimCSE inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Building sentence similarity search with KoSimCSE is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 This post moves from model comparison into an actual Korean retrieval loop. The task is intentionally narrow: encode FAQ questions, index them with FAISS, and retrieve the closest match for a new Korean query.

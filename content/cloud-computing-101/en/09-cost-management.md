@@ -24,7 +24,7 @@ last_reviewed: '2026-05-14'
 
 Cloud lets you create infrastructure quickly, which also means you can create cost quickly. Surprise invoices are common not because the cloud is mysterious, but because visibility, ownership, and cleanup policies were weak from the start.
 
-Cost control works best when engineers treat it as a design signal instead of a finance report. If the bill is invisible, no one can improve it. If ownership is unclear, drift becomes normal.
+Cloud cost is not a single number; it is a sum of on-demand rates, reserved discounts, spot prices, storage tiers, data transfer charges, and managed service premiums. Without tagging and analysis, you cannot answer 'who spent what and why.' Without budgets, costs surprise you.
 
 This is post 9 in the Cloud Computing 101 series.
 
@@ -46,7 +46,7 @@ In this post, we'll use tags, budgets, Savings Plans, and rightsizing as a pract
 
 This picture places Cost Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Cost Management is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Cost control is not about spending less. It is about spending intentionally and knowing where your money goes.
 
 ## Questions This Chapter Answers
 
@@ -59,8 +59,6 @@ This picture places Cost Management inside an operating flow. The point is not t
 ## Why It Matters
 
 A surprise on the first invoice is a rite of passage. FinOps is part of engineering, not a finance team chore.
-
-## Concept at a Glance
 
 ## Key Terms
 

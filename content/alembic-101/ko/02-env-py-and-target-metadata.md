@@ -39,10 +39,6 @@ seo_description: Alembic의 부트 스크립트인 env.py 설정법과 target_me
 
 *Alembic 101 2장 흐름 개요*
 
-이 그림에서는 env.py와 target_metadata: 모델과 마이그레이션 연결를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> env.py와 target_metadata: 모델과 마이그레이션 연결의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 중요한가
 
 1편의 scaffold 상태에서 Alembic은 아직 모델 metadata의 위치를 모릅니다. 그래서 `alembic revision --autogenerate`를 실행해도 빈 파일이 나옵니다. `env.py`에 모델 metadata를 알려 주는 한 줄이 없으면, Alembic은 live DB schema와 무엇을 비교해야 하는지조차 알 수 없습니다.
@@ -304,5 +300,7 @@ PY
 - [Alembic: target_metadata](https://alembic.sqlalchemy.org/en/latest/autogenerate.html)
 - [Alembic: Batch Mode](https://alembic.sqlalchemy.org/en/latest/batch.html)
 - [Alembic: Offline Mode](https://alembic.sqlalchemy.org/en/latest/offline.html)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/alembic-101/ko/02-env-py-and-target-metadata)
 
 Tags: Python, Alembic, SQLAlchemy, Migration

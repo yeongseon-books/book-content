@@ -42,8 +42,6 @@ This is post 9 in the Alembic 101 series. Here we will pin down the safe order f
 
 This picture places Deploy ordering and blue/green: synchronizing schema and application code safely inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Deploy ordering and blue/green: synchronizing schema and application code safely is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 Most production schema incidents are caused by code and schema being deployed in the wrong order. If a new column exists before the code that uses it, you are safe. If the code starts using a new column before the schema catches up, you get an immediate 500. In a blue/green deploy two app versions hit the same database at the same time, so the schema must always be compatible with both.

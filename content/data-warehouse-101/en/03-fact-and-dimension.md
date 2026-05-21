@@ -42,7 +42,7 @@ In this post, we split measures from attributes on purpose. That separation is w
 
 This picture places Fact and Dimension inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Fact and Dimension is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A fact table records immutable events; dimension tables define how to view them. This separation makes schema changes cheaper and queries more readable.
 
 ## Questions this article answers
 
@@ -66,7 +66,7 @@ Analytical questions almost always read as *how much (measure)* by *which slice 
 
 > *Split measures from attributes. Together they slow each other down.*
 
-## Concept at a Glance
+This picture shows how Fact and Dimension tables work together inside a warehouse. The key is not to memorize the definitions, but to see which table records events and which records context.
 
 ## Key Terms
 

@@ -42,8 +42,7 @@ This is post 6 in the Data Science Career 101 series.
 
 This picture places The ML Interview inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of The ML Interview is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
+> In ML interviews, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
 ## What You Will Learn
 
 - *Fundamentals* questions
@@ -58,8 +57,7 @@ Memorizing models without a decision frame usually produces shallow answers.
 
 Interviewers want to hear how you reason under constraints: data size, interpretability, latency, class imbalance, labeling quality, and post-deployment drift. The model matters, but the reasoning matters more.
 
-## Concept at a Glance
-
+ML interview questions rarely have one right answer. Instead, they test whether you ask good clarifying questions, think about trade-offs, and know when to keep it simple.
 ## Key Terms
 
 - **bias-variance**: The balance between underfit and overfit.
@@ -76,6 +74,7 @@ Interviewers want to hear how you reason under constraints: data size, interpret
 
 ## Hands-on: Five Answer Patterns
 
+Practice building five core answers: classification problem, regression problem, unbalanced data, feature selection, and model evaluation. These five cover 70% of real interviews.
 ### Step 1 — Fundamentals
 
 ```text

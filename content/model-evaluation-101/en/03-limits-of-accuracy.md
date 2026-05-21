@@ -42,8 +42,6 @@ That is the structure of this rewrite. We will treat accuracy as the **last summ
 
 This picture places The Limits of Accuracy inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of The Limits of Accuracy is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## This post answers
 
 - When is a small accuracy lift over a dummy baseline still operationally weak?

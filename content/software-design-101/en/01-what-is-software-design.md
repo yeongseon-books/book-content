@@ -45,8 +45,6 @@ In this post, we treat software design not as code prettiness but as a bundle of
 
 This picture places What Is Software Design? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is Software Design? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - A working definition of software design
@@ -60,8 +58,6 @@ This picture places What Is Software Design? inside an operating flow. The point
 Design is invisible. But it shows itself every time the next change is more expensive than expected.
 
 > Design debt always charges interest.
-
-## Concept at a Glance
 
 Design determines change cost.
 

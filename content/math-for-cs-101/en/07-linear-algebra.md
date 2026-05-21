@@ -52,9 +52,6 @@ Embedding search, recommenders, PCA, 3D graphics, and neural nets all depend on 
 
 That shift matters in engineering work because many bugs are not arithmetic mistakes. They are interpretation mistakes: using the wrong axis, misunderstanding the shape, or forgetting what a column actually means.
 
-
-## Concept at a Glance
-
 Linear algebra studies *vectors* (direction and magnitude), *matrices* (transformations), and *eigenvalues* (intrinsic properties). It is the language of scale and symmetry.
 
 ## Before/After

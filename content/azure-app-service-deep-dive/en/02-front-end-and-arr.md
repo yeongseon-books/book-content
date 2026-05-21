@@ -61,8 +61,6 @@ and why App Service keeps pushing you toward stateless design.
 
 This picture places Front-End and ARR — how a request reaches a worker inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Front-End and ARR — how a request reaches a worker is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## The routing path in three stages
 
 At the public-documentation level, this is the safe mental model.

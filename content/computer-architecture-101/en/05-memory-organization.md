@@ -45,8 +45,6 @@ This is post 5 in the Computer Architecture 101 series.
 
 This picture places Memory Organization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Memory Organization is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The address model of RAM and word alignment
@@ -59,8 +57,6 @@ This picture places Memory Organization inside an operating flow. The point is n
 Without a memory model in your head, you keep meeting the same bugs: stack overflow, memory leaks, dangling pointers, alignment faults. They all come from missing one piece of memory organization. Virtual memory is also one of the single largest performance factors in any system — a page fault can make code 10,000 times slower in a single instruction.
 
 > "Where does this variable live?" is the starting question for both memory safety and performance.
-
-## Concept at a Glance
 
 > Each process gets its own virtual address space, and the MMU maps virtual addresses to physical RAM. Inside one process, the layout has fixed regions: text (code), initialized data, BSS (zero-initialized data), heap (grows up), and stack (grows down).
 

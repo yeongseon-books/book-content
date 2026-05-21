@@ -43,7 +43,7 @@ Here we will define what “small enough” really means, walk through a safe ex
 
 This picture places Small Functions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Small Functions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Extraction makes names possible, and good names make reuse and testing easy.
 
 ## Questions this article answers
 
@@ -60,8 +60,6 @@ This picture places Small Functions inside an operating flow. The point is not t
 A small function explains itself by name. A large function asks for comments, and comments turn into lies.
 
 > When functions shrink, names do the work.
-
-## Concept at a Glance
 
 Extraction enables names; names enable reuse.
 

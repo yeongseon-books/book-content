@@ -41,8 +41,6 @@ This is post 4 in the Computer Architecture 101 series. Here we look at register
 
 This picture places Registers and the ALU inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Registers and the ALU is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - What a register is and how it differs from memory
@@ -55,8 +53,6 @@ This picture places Registers and the ALU inside an operating flow. The point is
 The number of registers is the number of variables a CPU can hold at once. Too few and the code keeps bouncing through memory (slow). More allows the compiler more freedom. ALU throughput sets the upper bound on how many operations finish per cycle. Both shape the performance ceiling of code you write every day.
 
 > "Is this variable in a register or in memory?" is the starting question for nearly every hot-path optimization.
-
-## Concept at a Glance
 
 > A register is small storage inside a CPU core: typically a few dozen, each 64 bits wide, and accessible in less than a cycle. The ALU takes two register values as inputs and produces a result in one cycle. All arithmetic and logic happens here.
 

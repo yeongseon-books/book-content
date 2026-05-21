@@ -44,8 +44,6 @@ In this post, we'll treat momentum, RMSProp, Adam, schedules, and regularization
 
 This picture places Optimization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Optimization is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - Where does plain gradient descent start to break down in real deep learning training?
@@ -57,8 +55,6 @@ This picture places Optimization inside an operating flow. The point is not to m
 ## Why It Matters
 
 Modern optimizers like *Adam* work well — and you should *understand why*.
-
-## Concept at a Glance
 
 ## Key Terms
 

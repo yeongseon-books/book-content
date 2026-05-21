@@ -42,8 +42,6 @@ This is post 5 in the Algorithms with Python 101 series. Here, we'll make recurs
 
 This picture places Recursion and Divide and Conquer inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Recursion and Divide and Conquer is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - How recursive functions work and what the call stack looks like

@@ -289,4 +289,6 @@ az containerapp show \
 - [Azure AKS Deep Dive](../../azure-aks-deep-dive/ko/)
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/ko/)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-aca-deep-dive/ko/01-aca-architecture)
+
 Tags: Container Apps, KEDA, Dapr, Envoy

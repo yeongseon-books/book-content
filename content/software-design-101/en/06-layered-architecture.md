@@ -45,8 +45,6 @@ In this post, we use layered architecture to separate presentation, application 
 
 This picture places Layered Architecture inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Layered Architecture is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The classic four-layer structure
@@ -60,8 +58,6 @@ This picture places Layered Architecture inside an operating flow. The point is 
 Layers separate units of change. The UI, the domain, and the infrastructure all change at different rates.
 
 > Group together what changes for the same reason.
-
-## Concept at a Glance
 
 The domain is the stable core that nothing points away from.
 

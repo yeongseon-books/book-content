@@ -200,4 +200,6 @@ az webapp config appsettings list -n my-app -g my-rg --slot staging \
 - [Azure App Service 101 — First Deployment](../../azure-app-service-101/ko/04-first-deploy.md)
 - [Azure Functions Deep Dive](../../azure-functions-deep-dive/ko/03-grpc-event-stream.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-app-service-deep-dive/ko/04-deployment-and-kudu)
+
 Tags: Azure, App Service, Distributed Systems, Platform Engineering

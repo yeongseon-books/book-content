@@ -42,8 +42,7 @@ This is post 7 in the Data Science Career 101 series.
 
 This picture places The Case Interview inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of The Case Interview is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
+> In case interviews, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
 ## What You Will Learn
 
 - Case *types*
@@ -58,8 +57,7 @@ Technical skill alone does not solve ambiguous product problems.
 
 As data roles become more embedded in product and business teams, the ability to structure a fuzzy situation becomes as important as the ability to query or model the underlying data.
 
-## Concept at a Glance
-
+A case interview feels open-ended because it is. You need to structure the ambiguity yourself: ask clarifying questions, propose a frame, estimate numbers, and explain your reasoning at each step.
 ## Key Terms
 
 - **product sense**: Sense of product impact.
@@ -76,6 +74,7 @@ As data roles become more embedded in product and business teams, the ability to
 
 ## Hands-on: Five-Step Frame
 
+Most case answers follow the same skeleton. Build muscle memory by solving five cases using the same frame: clarify, scope, approach, estimate, reflect.
 ### Step 1 — Clarify
 
 ```text

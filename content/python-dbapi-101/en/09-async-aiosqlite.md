@@ -48,8 +48,6 @@ This is the 9th article in the Python DB-API 101 series.
 
 This picture places Asynchronous SQLite with aiosqlite inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Asynchronous SQLite with aiosqlite is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 In an async framework (FastAPI, aiohttp, Starlette), calling synchronous SQLite directly halts the worker for the duration of every query. If a single worker handles 100 concurrent requests and an average query takes 50 ms, p99 latency for the other 99 requests collapses.

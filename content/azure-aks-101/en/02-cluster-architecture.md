@@ -42,8 +42,6 @@ This is the second post in the Azure Kubernetes Service 101 series. Here, we tur
 
 This picture places Cluster architecture — control plane and node pools inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Cluster architecture — control plane and node pools is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Cut the cluster in half
 
 The left side is the Azure-managed layer. The right side is the layer you shape more directly. That single picture explains a lot: why the control plane is not billed separately, why node count is your decision, and why pod scaling and node scaling are different conversations.

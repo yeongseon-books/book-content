@@ -24,7 +24,7 @@ last_reviewed: '2026-05-14'
 
 S3, EBS, EFS, and Glacier exist separately for a reason. They may all hold data, but they are optimized for very different access patterns, durability expectations, and recovery trade-offs.
 
-Storage mistakes often stay hidden at first. The system seems fine until backup, restore, sharing, or long-term retention turns into the expensive part of the design. Picking the right storage tier early prevents a surprising amount of later rework.
+Block storage is for OS disks and databases. Object storage is for files, backups, and archives. File storage is for NFS-like shared access. Databases are for structured data with queries. Archive is for data you almost never touch. Each has a different cost curve, latency profile, and use case.
 
 This is post 5 in the Cloud Computing 101 series.
 
@@ -46,7 +46,7 @@ In this post, we'll compare object, block, file, and archive storage and connect
 
 This picture places Storage inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Storage is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Storage decisions lock in performance characteristics, cost patterns, and operational constraints that are hard to change later.
 
 ## Questions This Chapter Answers
 
@@ -59,8 +59,6 @@ This picture places Storage inside an operating flow. The point is not to memori
 ## Why It Matters
 
 The wrong storage choice is *expensive, slow, and fragile*. The right one quietly works for years.
-
-## Concept at a Glance
 
 ## Key Terms
 

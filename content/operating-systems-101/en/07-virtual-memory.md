@@ -43,8 +43,6 @@ This is post 7 in the Operating Systems 101 series. It explains virtual addresse
 
 This picture places Virtual Memory inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Virtual Memory is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - Why are virtual addresses and physical addresses separated at all?
@@ -64,8 +62,6 @@ This picture places Virtual Memory inside an operating flow. The point is not to
 Without virtual memory you cannot diagnose "RSS is small but the system is slow" or "swap fills up and response times collapse." Powerful features like mmap, fork, and copy-on-write all live on top of virtual memory. It is where the OS handles resources most elegantly, and also where the most expensive mistakes happen.
 
 > Virtual memory is not free. The illusion bills you precisely through page faults.
-
-## Concept at a Glance
 
 > Each process has its own virtual address space. Virtual addresses are split into pages (typically 4KB) and translated to physical addresses through a page table. The CPU caches recent translations in a TLB. When a translation is missing or the page is on disk, a page fault triggers and the OS handles it.
 

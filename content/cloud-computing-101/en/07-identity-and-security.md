@@ -24,7 +24,7 @@ last_reviewed: '2026-05-14'
 
 Most cloud security incidents do not begin with a cinematic attack chain. They begin with ordinary mistakes: permissions that are too broad, access keys that live too long, and credentials that were easier to create than to rotate.
 
-That is why IAM matters so much. In API-driven infrastructure, identity is not a side concern. It is the operating model that decides who may call what, from where, and for how long.
+IAM defines who can do what on which resources. Authentication proves who you are. Encryption protects data in transit and at rest. The shared responsibility model splits ownership: the provider secures the hardware and platform; you secure your applications, keys, and access rules.
 
 This is post 7 in the Cloud Computing 101 series.
 
@@ -46,7 +46,7 @@ In this post, we'll break down users, groups, roles, policies, MFA, and KMS thro
 
 This picture places Identity and Security inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Identity and Security is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Security is not a feature added at the end. It is a set of boundaries you decide to enforce from the start.
 
 ## Questions This Chapter Answers
 
@@ -59,8 +59,6 @@ This picture places Identity and Security inside an operating flow. The point is
 ## Why It Matters
 
 Most security incidents start with excessive permissions and forgotten keys. Solid IAM shrinks the blast radius of any single mistake.
-
-## Concept at a Glance
 
 ## Key Terms
 

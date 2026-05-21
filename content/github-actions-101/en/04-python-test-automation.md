@@ -42,8 +42,6 @@ This is post 4 in the GitHub Actions 101 series. In this post, we will build a p
 
 This picture places Python Test Automation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Python Test Automation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - Fast setup with *setup-python* + *pip cache*
@@ -57,8 +55,6 @@ This picture places Python Test Automation inside an operating flow. The point i
 Manual tests get *forgotten*. Only automation guarantees *the same trust* on every PR.
 
 > *Slow CI* becomes *skipped CI*.
-
-## Concept at a Glance
 
 ## Key Terms
 

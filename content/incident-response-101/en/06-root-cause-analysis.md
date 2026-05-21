@@ -42,7 +42,7 @@ This is post 6 in the Incident Response 101 series. This post shows how to separ
 
 This picture places Root Cause Analysis inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Root Cause Analysis is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> RCA is not blame. It is a map of how multiple small gaps aligned to create impact.
 
 ## Why this topic matters
 

@@ -42,8 +42,6 @@ This is post 9 in the Serverless 101 series.
 
 This picture places Cost inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Cost is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The *cost components* of serverless
@@ -57,8 +55,6 @@ This picture places Cost inside an operating flow. The point is not to memorize 
 Serverless is not automatically cheaper. It can be extremely efficient for short and bursty work, and surprisingly expensive for long-running, high-volume, or network-heavy workloads.
 
 That is why cost belongs in architecture review, not just in monthly reporting. The same feature can land in a very different cost envelope depending on memory size, downstream calls, egress, and whether you pay an idle tax for provisioned capacity.
-
-## Concept at a Glance
 
 The useful lesson in this diagram is that the bill is a composition of multiple behaviors. Optimizing only call volume or only code runtime is rarely enough.
 

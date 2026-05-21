@@ -42,7 +42,7 @@ In this post, we move from storage to consumption. The focus is on how metric de
 
 This picture places BI and Dashboard inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of BI and Dashboard is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> BI is the process of turning data into decisions; a dashboard is one medium for that communication. Good dashboards start with the right question, not the available data.
 
 ## Questions this article answers
 
@@ -66,7 +66,7 @@ BI is the *last centimeter* of a warehouse. You can model *billions of rows* per
 
 > *A dashboard's success is measured in *decisions made*, not in *opens*.*
 
-## Concept at a Glance
+This picture shows how BI connects warehouse data to business action. The key is not to memorize dashboard tool features, but to understand which metrics matter and why.
 
 ## Key Terms
 

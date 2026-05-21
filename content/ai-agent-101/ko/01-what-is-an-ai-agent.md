@@ -150,6 +150,62 @@ print(context)
 
 이 연습이 좋은 이유는 framework가 본질을 가리기 전에 구조를 먼저 보게 해주기 때문입니다. 결국 모든 agent는 현재 컨텍스트를 보고 다음 행동을 정하고, 그 행동의 결과를 다시 컨텍스트에 넣는 시스템입니다. 프레임워크는 이 반복을 편하게 만들 뿐, 구조 자체를 바꾸지는 않습니다.
 
+### 루프 제어를 코드로 명시하면 운영 안정성이 올라갑니다
+
+agent를 처음 구현할 때는 tool 호출 데모에 집중하기 쉽지만, 실제 운영에서는 루프 제어 조건이 더 중요합니다. `max_steps`, `allowed_tools`, `retry_budget`, `stop_reason`를 구조화해 두면 실패 원인을 재현하기 쉬워집니다.
+
+```python
+from dataclasses import dataclass, field
+
+@dataclass
+class AgentState:
+    goal: str
+    step: int = 0
+    max_steps: int = 6
+    history: list[dict] = field(default_factory=list)
+    stop_reason: str | None = None
+
+def run_agent(goal: str, planner, tools: dict[str, callable]) -> AgentState:
+    state = AgentState(goal=goal)
+
+    while state.step < state.max_steps:
+        state.step += 1
+        action = planner(goal=state.goal, history=state.history)
+
+        if action["type"] == "final":
+            state.history.append({"step": state.step, "final": action["answer"]})
+            state.stop_reason = "goal_achieved"
+            return state
+
+        tool_name = action["tool"]
+        if tool_name not in tools:
+            state.stop_reason = f"unknown_tool:{tool_name}"
+            return state
+
+        result = tools[tool_name](**action.get("args", {}))
+        state.history.append({"step": state.step, "action": action, "result": result})
+
+    state.stop_reason = "max_steps_exceeded"
+    return state
+```
+
+이 형태의 장점은 간단합니다. 종료 조건이 자연어가 아니라 코드로 고정되기 때문에, 관찰 가능한 실패 분류가 생깁니다. `goal_achieved`인지 `max_steps_exceeded`인지부터 구분되면 평가 지표를 설계할 때도 훨씬 유리합니다.
+
+### ReAct 패턴은 추론과 행동 로그를 분리해 기록하는 습관이 핵심입니다
+
+ReAct를 쓰면 모델이 생각과 행동을 번갈아 내놓습니다. 여기서 중요한 점은 "생각을 길게 쓰는 것"이 아니라, 행동 결정 근거를 최소한으로 남기고 실제 호출은 구조화된 형태로 분리하는 것입니다.
+
+```text
+Thought: 사용자의 질문은 오늘 도쿄 우산 필요 여부입니다. 최신 강수 정보를 확인해야 합니다.
+Action: get_weather
+Action Input: {"city": "Tokyo", "date": "today"}
+Observation: {"temp": 18, "condition": "rain", "precip_prob": 0.82}
+Thought: 강수 확률이 높으므로 우산 필요로 결론낼 수 있습니다.
+Final Answer: 오늘 도쿄는 비 예보라서 우산을 챙기는 편이 좋습니다.
+```
+
+실무에서는 위 형식을 그대로 사용자에게 노출하지 않고, 내부 telemetry로 수집합니다. 사용자 응답에는 최종 답만 제공하고, 시스템 로그에는 `Action`, `Action Input`, `Observation`을 남기는 방식이 일반적입니다. 그래야 도구 오용과 추론 오류를 분리해서 디버깅할 수 있습니다.
+
 ## 흔히 헷갈리는 지점
 
 - "답변을 잘하면 agent다"라고 생각하기 쉽지만, 실제 기준은 외부 행동과 반복 실행입니다.
@@ -212,5 +268,7 @@ AI Agent는 단순히 말을 잘하는 모델이 아닙니다. 목표를 받고,
 
 - [LangGraph 101 - 멀티 에이전트 시스템](../../langgraph-101/ko/05-multi-agent.md)
 - [AI Evaluation 101 - 평가 관점 확장](../../ai-evaluation-101/ko/01-why-evaluate-llm-apps.md)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-agent-101/ko/01-what-is-an-ai-agent)
 
 Tags: AI Agent, LLM, Tool Use, Python

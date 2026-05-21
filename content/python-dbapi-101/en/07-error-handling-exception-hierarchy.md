@@ -48,8 +48,6 @@ This is the 7th article in the Python DB-API 101 series.
 
 This picture places PEP 249 Exception Hierarchy and SQLite Error Handling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of PEP 249 Exception Hierarchy and SQLite Error Handling is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 A common reaction to seeing `OperationalError: database is locked` in production is one of two extremes: (1) wrap every SQL call in `try/except` and retry forever, or (2) propagate every error to the user. Both are wrong.

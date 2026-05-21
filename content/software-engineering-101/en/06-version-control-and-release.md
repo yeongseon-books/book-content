@@ -43,8 +43,6 @@ This is post 6 in the Software Engineering 101 series. In this chapter, we conne
 
 This picture places Version Control and Release inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Version Control and Release is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - Branching strategies (Trunk-Based vs Git Flow)
@@ -58,8 +56,6 @@ This picture places Version Control and Release inside an operating flow. The po
 A release is the only moment your code meets the user. If something fails here, every prior effort is forgotten.
 
 > Safe releases build trust faster than fast releases.
-
-## Concept at a Glance
 
 Each stage shrinks the cost of recovery.
 

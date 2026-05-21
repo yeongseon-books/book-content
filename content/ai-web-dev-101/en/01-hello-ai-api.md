@@ -41,8 +41,6 @@ Here, we will build the smallest successful OpenAI API call and turn it into a p
 
 This picture places AI API first steps — sending your first request with the OpenAI API inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of AI API first steps — sending your first request with the OpenAI API is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why the first call matters more than it seems
 
 At the beginning, the blurry part is rarely model quality. The blurry part is the service boundary. A chat UI hides it. Runtime code does not. Your application sends an HTTP request with authentication headers and a JSON body, and the model service sends a JSON response back.

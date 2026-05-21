@@ -42,8 +42,6 @@ This is the third post in the Azure Kubernetes Service 101 series. Here, we take
 
 This picture places Your first cluster, your first deploy — Python/FastAPI inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Your first cluster, your first deploy — Python/FastAPI is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Today's flow
 
 The split matters. `az` creates and configures Azure resources. `kubectl` talks to the Kubernetes API once the cluster exists.

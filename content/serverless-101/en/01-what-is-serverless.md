@@ -42,8 +42,6 @@ That is why the first question should not be “how do I write a function?” It
 
 This picture places What is Serverless? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What is Serverless? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - what *serverless* really delegates to the platform
@@ -81,8 +79,6 @@ Serverless is powerful for the same reason it is easy to misuse. The platform ab
 Paying by usage does not automatically make the system cheap. Cost is shaped by invocation count, duration, memory, network transfer, and the managed services around the function. Breaking a service into functions does not remove distributed-system complexity either. It simply changes where the complexity shows up.
 
 So the key framing for this first post is not “what became automatic?” but **“what do I still have to design explicitly?”** In serverless, that answer usually includes event boundaries, runtime budgets, external state, and observability.
-
-## Concept at a Glance
 
 The platform is the key actor in this diagram. It creates the execution environment, decides how invocations scale, and applies retry or timeout behavior. The developer no longer provisions servers directly, but becomes more responsible for **input contracts, response shape, state boundaries, and log fields**.
 

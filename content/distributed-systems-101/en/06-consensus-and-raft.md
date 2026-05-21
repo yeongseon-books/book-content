@@ -43,15 +43,11 @@ Here we use Raft to make the consensus problem concrete: terms, logs, quorums, a
 
 This picture places Consensus and Raft inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Consensus and Raft is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 A consensus algorithm sits at the heart of etcd, ZooKeeper, Consul, and CockroachDB. The Kubernetes control plane stands on top of etcd. Once you understand consensus, half of "why does this system behave this way?" answers itself.
 
 > Consensus is the value of agreement in a distributed system.
-
-## Concept at a Glance
 
 A single leader receives the log and replicates it to followers. Only entries received by a majority count as committed.
 

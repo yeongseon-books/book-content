@@ -42,8 +42,6 @@ So this post is deliberately narrow. Instead of isolated packaging tips, we will
 
 This picture places Function as a Service inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Function as a Service is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - how the FaaS execution contract is formed by the *handler*, *runtime*, and *deployment package*
@@ -58,8 +56,6 @@ This picture places Function as a Service inside an operating flow. The point is
 Introductory explanations often make FaaS sound like “just upload a function.” Production reality is the opposite. The runtime initializes before your handler runs. The package is loaded before the event reaches the handler. Initialization cost becomes latency before the business logic even starts.
 
 That is why performance and reliability problems rarely live in the handler body alone. Heavy dependencies, unnecessary files, runtime-version drift, and missing environment variables matter just as much. To understand FaaS is to understand the whole deployment contract, not only the function body.
-
-## Concept at a Glance
 
 In practical terms, the flow is simple. You write a handler, bundle its required files, and the platform loads that bundle inside a chosen runtime before invoking the handler. That means real-world FaaS behavior is always the combined result of **handler code + package contents + runtime startup cost**.
 

@@ -43,8 +43,6 @@ This is the final post in the Operating Systems 101 series. It ties namespaces, 
 
 This picture places Containers and the Operating System inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Containers and the Operating System is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - How do containers and virtual machines differ in the way they provide isolation?
@@ -64,8 +62,6 @@ This picture places Containers and the Operating System inside an operating flow
 In the container era, knowing the OS means knowing namespaces and cgroups. OOM-kills, CPU throttling, and network isolation problems inside containers all happen on top of OS primitives. If you only know "containers are lightweight VMs," you cannot diagnose the operational incidents that matter most.
 
 > A container is not a new OS. It is a tool that slices the same OS more precisely.
-
-## Concept at a Glance
 
 > A VM puts an entire guest OS on top of a hypervisor. A container reuses the host kernel directly, isolates "what is visible" with namespaces, and limits "how much can be used" with cgroups. So containers are light and start fast, but they share kernel vulnerabilities with the host.
 

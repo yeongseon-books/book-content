@@ -45,8 +45,6 @@ This is post 3 in the Compilers 101 series.
 
 This picture places parsing and AST inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of parsing and AST is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - What an AST (abstract syntax tree) is and why it must be a tree
@@ -60,8 +58,6 @@ This picture places parsing and AST inside an operating flow. The point is not t
 If the lexer made the "words," the parser builds the "sentence structure." When the AST is clean, every step above it — semantic analysis, optimization, code generation — is clean. When the AST is sloppy, every step has to compensate for the sloppiness.
 
 > Almost every compiler bug ends up being "the AST is wrong."
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR
@@ -310,8 +306,6 @@ Tags: Computer Science, Compilers, Parser, AST, RecursiveDescent, Precedence
 If the lexer made the "words," the parser builds the "sentence structure." When the AST is clean, every step above it — semantic analysis, optimization, code generation — is clean. When the AST is sloppy, every step has to compensate for the sloppiness.
 
 > Almost every compiler bug ends up being "the AST is wrong."
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR

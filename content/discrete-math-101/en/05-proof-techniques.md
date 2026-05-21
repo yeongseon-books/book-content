@@ -45,8 +45,6 @@ This is post 5 in the Discrete Math 101 series.
 
 This picture places Proof Techniques inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Proof Techniques is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - Direct and contrapositive proofs
@@ -59,8 +57,6 @@ This picture places Proof Techniques inside an operating flow. The point is not 
 Tests can show the presence of bugs but not their absence. Distributed consensus algorithms, cryptographic protocols, and compiler optimizations all rely on formal proofs. Recursive functions are proven correct by induction; algorithm termination is proven via well-founded measures.
 
 > A proof = a guarantee for every possible input.
-
-## Concept at a Glance
 
 > The proof technique you choose depends on the form of the statement: P → Q for direct/contrapositive, ¬P for contradiction, ∀n: P(n) for induction.
 

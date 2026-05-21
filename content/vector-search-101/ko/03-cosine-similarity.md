@@ -341,4 +341,6 @@ for rank, (score, text) in enumerate(results, start=1):
 - [sentence-transformers semantic similarity](https://www.sbert.net/docs/usage/semantic_textual_similarity.html)
 - [Vector similarity — Pinecone](https://www.pinecone.io/learn/vector-similarity/)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/vector-search-101/ko/03-cosine-similarity)
+
 Tags: Vector Search, FAISS, Embeddings, Python

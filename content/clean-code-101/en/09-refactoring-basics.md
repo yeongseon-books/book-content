@@ -43,7 +43,7 @@ Here we will use characterization tests, rename and extraction moves, and the â€
 
 This picture places Refactoring Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Refactoring Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Move from one green state to the next green state, one small step at a time.
 
 ## Questions this article answers
 
@@ -60,8 +60,6 @@ This picture places Refactoring Basics inside an operating flow. The point is no
 Refactoring is not rewriting. It improves internal structure while preserving external behavior.
 
 > Refactoring is an investment that lowers the cost of the next change.
-
-## Concept at a Glance
 
 Small steps between green and green.
 

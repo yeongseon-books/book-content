@@ -42,8 +42,6 @@ This post is the first article in the Python 101 series. This is the first step 
 
 This picture places Why Python, and how to install and use venv inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Why Python, and how to install and use venv is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 The single biggest source of pain when you start with Python is not syntax. It is **environment**.

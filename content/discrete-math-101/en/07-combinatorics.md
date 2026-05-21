@@ -45,8 +45,6 @@ This is post 7 in the Discrete Math 101 series.
 
 This picture places Combinatorics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Combinatorics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The product rule and the sum rule
@@ -59,8 +57,6 @@ This picture places Combinatorics inside an operating flow. The point is not to 
 Cipher key-space size, brute-force attack time, the birthday paradox — all combinatorics. To analyze how an algorithm behaves over every possible input, you need to know how big the input space is, and that calculation is combinatorics.
 
 > Combinatorics is the tool for measuring the exact size of possibility.
-
-## Concept at a Glance
 
 > Two basic counting laws (product, sum) extend into permutations, combinations, the binomial theorem, the pigeonhole principle, and inclusion-exclusion.
 

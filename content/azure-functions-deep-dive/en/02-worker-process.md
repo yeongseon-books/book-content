@@ -49,8 +49,6 @@ The reference commit is the same as in part 1: `5e59423`.
 
 This picture places Worker Processes — How One Host Hosts Many Languages inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Worker Processes — How One Host Hosts Many Languages is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Starting point — `worker.config.json`
 
 The answer is straightforward. The Host does not hard-code how to launch each language runtime. It reads **a `worker.config.json` file that ships with each language worker package** and follows that description. Adding a new language is therefore closer to adding a worker package than patching the Host.

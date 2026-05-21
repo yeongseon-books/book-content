@@ -43,8 +43,6 @@ This is post 9 in the Algorithms 101 series. Here we cover naive matching, KMP, 
 
 This picture places String Algorithm Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of String Algorithm Basics is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The cost and limits of naive matching
@@ -57,8 +55,6 @@ This picture places String Algorithm Basics inside an operating flow. The point 
 Strings appear everywhere — logs, documents, code, search, NLP. Naive matching is fine for many cases, but when patterns are long, texts are huge, or many patterns must be searched at once, the right algorithm decides whether your system is fast or grinds. Regex pitfalls also turn into security incidents (ReDoS).
 
 > String algorithms hide explosive cost behind a mask of simplicity.
-
-## Concept at a Glance
 
 > Naive matching tries the pattern at every starting position, so the worst case is O(nm). KMP precomputes a failure function — how the pattern overlaps with itself — so we never re-read the same character; it runs in O(n+m). A trie is a tree that shares prefixes, used for multi-pattern search and autocomplete. Regex engines come in NFA/DFA flavours and backtracking flavours; the latter can degrade exponentially on certain inputs.
 

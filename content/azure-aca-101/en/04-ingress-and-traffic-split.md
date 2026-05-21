@@ -42,8 +42,6 @@ This is post 4 in the Azure Container Apps 101 series. Here, we'll connect ingre
 
 This picture places Ingress and traffic splitting — revision-based deployment strategies inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Ingress and traffic splitting — revision-based deployment strategies is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 One of ACA's most powerful production features is revision-based traffic split. Using it correctly first requires getting ingress right.

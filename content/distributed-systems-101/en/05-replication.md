@@ -43,15 +43,11 @@ Here we look at replication as the layer that turns durability, availability, an
 
 This picture places Replication inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Replication is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Replication is the lowest layer in any distributed data system. The choices here shape what you saw in episode 4 (consistency) and what you will see in episode 6 (consensus). The answer to "why does my DB behave this way?" is usually in the replication settings.
 
 > Replication settings are the exchange rate between safety and speed.
-
-## Concept at a Glance
 
 These three topologies cover more than ninety percent of real systems.
 

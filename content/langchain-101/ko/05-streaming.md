@@ -379,4 +379,6 @@ LangChain 스트리밍은 한 가지 변화로 시작합니다. `invoke()`를 `s
 - [astream_events reference](https://python.langchain.com/docs/expression_language/interface/)
 - [FastAPI StreamingResponse](https://fastapi.tiangolo.com/advanced/custom-response/#streamingresponse)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/langchain-101/ko/05-streaming)
+
 Tags: LangChain, LCEL, Python, LLM

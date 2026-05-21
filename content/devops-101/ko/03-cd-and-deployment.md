@@ -62,6 +62,110 @@ last_reviewed: '2026-05-12'
 
 같은 자동 배포라도 어떤 전략을 고르느냐에 따라 장애 양상이 완전히 달라집니다. 그래서 배포 전략은 배포 도구 설정이 아니라 서비스 위험 모델의 일부로 봐야 합니다.
 
+## 배포 전략 비교
+
+배포 전략은 단순히 새 코드를 올리는 방식의 차이가 아닙니다. 실패했을 때 얼마나 빠르게 되돌릴 수 있고, 영향 범위를 얼마나 작게 제한할 수 있는지를 결정하는 구조적 차이입니다.
+
+| 전략 | 다운타임 | 롤백 속도 | 복잡도 | 적합 상황 |
+|---|---|---|---|---|
+| 롤링 (Rolling) | 거의 없음 | 빠름 (1-5분) | 낮음 | 상태 없는 서비스, 부분 장애 허용 |
+| 블루그린 (Blue-Green) | 없음 | 매우 빠름 (트래픽 전환만) | 중간 (이중 환경 유지) | 즐각 롤백 필요, 인프라 비용 감당 가능 |
+| 카나리 (Canary) | 없음 | 빠름 (5-10분 관찰 후) | 높음 (지표 모니터링 필수) | 대규모 트래픽, 점진적 검증 선호 |
+| 피처 플래그 (Feature Flag) | 없음 | 즉시 (플래그 off) | 고등 (코드베이스 분기 증가) | 기능 단위 통제, A/B 테스트 |
+
+중요한 것은 한 가지 전략이 다른 것보다 항상 나을 것은 없다는 점입니다. 조직의 위험 허용도, 트래픽 규모, 인프라 비용, 팀 역량에 따라 최적 선택이 달라집니다. 현실에서는 롤링 + 피처플래그 조합이 가장 흔합니다.
+
+## 배포 파이프라인 설계
+
+배포 파이프라인은 배포 자체보다 배포 전후 검증 단계를 어떻게 구조화하느냐가 더 중요합니다. 아래는 현실적으로 운영 가능한 5단계 CD 파이프라인입니다.
+
+### 1단계 - 스테이징 자동 배포
+
+main 브랜치에 코드가 머지되면 스테이징 환경에 자동으로 배포됩니다. 이 단계가 없으면 프로덕션 배포 전 최종 검증이 불가능합니다.
+
+### 2단계 - 스모크 테스트
+
+배포 직후 핵심 기능이 동작하는지 자동으로 확인합니다. 실패하면 프로덕션 승격을 차단합니다.
+
+### 3단계 - 프로덕션 Canary (10%)
+
+전체 트래픽의 10%만 새 버전으로 보냅니다. 이 단계에서 문제가 발견되면 영향 범위는 10%로 제한됩니다.
+
+### 4단계 - 5분 관찰
+
+Canary 지표를 모니터링합니다. 5xx 비율, p95 지연시간, 에러 로그를 확인합니다.
+
+### 5단계 - 승격 또는 롤백
+
+지표가 정상이면 50% → 100%로 확대합니다. 문제가 발견되면 즉시 롤백합니다.
+
+이 5단계를 파이프라인으로 코드화하면 배포는 이벤트가 아니라 반복 가능한 절차가 됩니다.
+
+## YAML CD 파이프라인 예제
+
+CD는 CI와 전혀 다른 에세를 가집니다. CI는 코드 품질을 검증하지만, CD는 실제 환경에 노출하는 순간을 다룹니다. 아래는 스테이징과 프로덕션 배포를 병렬로 관리하는 예시입니다.
+
+```yaml
+# .github/workflows/cd.yml
+name: CD Pipeline
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    environment: staging
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy to staging
+        run: ./scripts/deploy.sh staging
+      
+      - name: Run smoke tests
+        run: |
+          curl -f https://staging.example.com/health
+          pytest tests/smoke/ --base-url=https://staging.example.com
+      
+      - name: Notify deployment
+        if: success()
+        run: echo "Staging deployment successful"
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Deploy canary (10%)
+        run: ./scripts/deploy.sh prod --canary 10
+      
+      - name: Wait and monitor
+        run: sleep 300  # 5 minutes
+      
+      - name: Check canary metrics
+        id: canary-check
+        run: |
+          ERROR_RATE=$(curl -s https://metrics.example.com/api/error_rate)
+          if (( $(echo "$ERROR_RATE > 0.001" | bc -l) )); then
+            echo "Canary failed: error rate too high"
+            exit 1
+          fi
+      
+      - name: Promote to 100%
+        if: success()
+        run: ./scripts/deploy.sh prod --promote 100
+      
+      - name: Rollback on failure
+        if: failure()
+        run: ./scripts/rollback.sh prod
+```
+
+이 파이프라인은 스테이징 성공 후에만 프로덕션 배포를 진행합니다. Canary 지표가 임계값을 넘으면 자동으로 롤백합니다. 이것이 안전한 CD의 핵심입니다.
 ## Before/After
 
 **Before (big-bang deploy)**
@@ -211,6 +315,121 @@ T+10m 승격 또는 롤백 결정
 ## 정리 및 다음 단계
 
 CD는 되돌릴 수 있는 작은 변경의 흐름입니다. 다음 글에서는 여러 환경에 같은 코드를 안전하게 배포하기 위한 설정 관리 방식을 다룹니다.
+
+## CD 전략을 선택할 때 보는 실무 기준
+
+CD는 자동 배포 자체보다 "위험을 통제한 채로 변경을 전달하는 운영 규칙"에 가깝습니다. 같은 자동 배포라도 전환 방식, 모니터링 기준, 롤백 경로에 따라 결과는 완전히 달라집니다.
+
+### 배포 전략 비교표
+
+| 전략 | 전환 방식 | 장점 | 단점 | 적합한 상황 |
+| --- | --- | --- | --- | --- |
+| Blue-Green | 두 환경 준비 후 트래픽 스위치 | 즉시 롤백 용이 | 인프라 비용 증가 | 상태 비저장 서비스 |
+| Canary | 일부 트래픽부터 점진 확대 | 위험 국소화 | 관측 설계 필요 | 사용자 규모 큰 서비스 |
+| Rolling | 인스턴스 순차 교체 | 추가 비용 낮음 | 버전 혼재 시간 존재 | 전통적 VM/K8s 환경 |
+
+전략 선택은 정답 문제가 아닙니다. 서비스 특성, 트래픽 패턴, 데이터 마이그레이션 제약을 함께 고려해야 합니다.
+
+### GitHub Actions 기반 CD 예시
+
+```yaml
+name: cd
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy-stage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./scripts/deploy_stage.sh
+
+  smoke-test:
+    runs-on: ubuntu-latest
+    needs: deploy-stage
+    steps:
+      - run: ./scripts/smoke_test.sh https://stage.example.com
+
+  deploy-prod:
+    runs-on: ubuntu-latest
+    needs: smoke-test
+    steps:
+      - run: ./scripts/deploy_prod_canary.sh
+```
+
+### Argo CD 애플리케이션 선언 예시
+
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: api-prod
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/example/platform-manifests
+    targetRevision: main
+    path: apps/api/prod
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: api
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+```
+
+GitOps 기반 CD에서는 배포 명령보다 선언 상태의 수렴이 중요합니다. 누가 어떤 커밋으로 어떤 환경을 바꿨는지가 남아 운영 가시성이 높아집니다.
+
+### 승격 기준 예시
+
+| 단계 | 필수 조건 |
+| --- | --- |
+| stage -> canary | 스모크 테스트 통과, 주요 에러율 정상 범위 |
+| canary 10% -> 50% | 5분 관찰, p95 지연시간 기준 충족 |
+| canary 50% -> 100% | 고객 영향 없음, 로그 이상 패턴 없음 |
+| rollback | 에러율 임계 초과 또는 비정상 지표 지속 |
+
+### 기능 플래그와 배포 분리
+
+```python
+from fastapi import FastAPI
+
+app = FastAPI()
+FEATURE_NEW_CHECKOUT = False
+
+@app.get('/checkout')
+def checkout():
+    if FEATURE_NEW_CHECKOUT:
+        return {'path': 'new'}
+    return {'path': 'legacy'}
+```
+
+실무에서는 플래그 값을 원격 구성으로 빼고 점진 활성화합니다. 핵심은 코드 배포와 사용자 노출 시점을 분리해 사고 반경을 줄이는 것입니다.
+
+### CD 품질을 높이는 운영 규칙
+
+1. 롤백 명령을 문서가 아니라 자동화 스크립트로 검증합니다.
+2. 배포 직후 10분 체크리스트를 팀 공통으로 사용합니다.
+3. DB 마이그레이션은 expand/contract로 하위 호환을 유지합니다.
+4. 배포 성공 정의를 "완료"가 아니라 "관찰 통과"로 둡니다.
+
+이 규칙이 자리 잡으면 CD는 속도만 빠른 배포가 아니라, 학습 가능한 운영 프로세스로 진화합니다.
+
+### 배포 전략 선택 체크리스트
+
+실무에서는 전략 이름보다 전제 조건을 먼저 확인해야 합니다. Blue-Green은 전환은 빠르지만 두 환경을 동시에 유지할 인프라 여유가 필요합니다. Canary는 비용 효율이 좋지만 관측성과 자동 판단 기준이 없으면 운영자가 매번 수동으로 결정을 내려야 합니다. Rolling은 단순하지만 버전 혼재 구간에서 세션/캐시 호환성을 점검해야 합니다.
+
+| 질문 | Yes면 추천 |
+| --- | --- |
+| 트래픽 일부만 먼저 흘려 검증 가능한가 | Canary |
+| 즉시 전환/즉시 철회가 중요한가 | Blue-Green |
+| 비용 제약이 강하고 구조가 단순한가 | Rolling |
+
+배포 전략은 한 번 정하고 끝나는 설정이 아닙니다. 서비스 트래픽과 장애 패턴이 바뀌면 승격 기준도 함께 조정해야 합니다.
+
+
+추가로 배포 전환 자동화에서는 사람 승인 지점을 최소화하되, 고위험 변경만 선택적으로 승인하도록 정책을 나누는 것이 좋습니다. 예를 들어 스키마 변경 포함 배포는 승인 필요, 단순 애플리케이션 패치 배포는 자동 승격처럼 규칙을 분리하면 속도와 안정성을 함께 확보할 수 있습니다.
 
 ## 처음 질문으로 돌아가기
 

@@ -288,4 +288,6 @@ print(compare_reports(prev, curr))
 - [LLM 파인튜닝 101 — 데이터셋 준비와 전처리](../../llm-finetuning-101/ko/02-dataset.md)
 - [AI Evaluation 101 — 평가 데이터셋 설계하기](../../ai-evaluation-101/ko/02-evaluation-dataset-design.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-data-preparation-101/ko/01-why-data-preparation-matters)
+
 Tags: Data Preparation, ML Foundations, Data Quality, Pipelines

@@ -46,8 +46,6 @@ This is the 8th article in the SQLAlchemy 101 series.
 
 This picture places Events, hybrid_property, and custom types inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Events, hybrid_property, and custom types is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 When you first reach for an ORM, a model is just a table. Once the domain grows, you need email normalization, password hashing, audit columns, derived attributes, and encrypted fields. If every handler does this work itself, the same code is scattered everywhere and tests become painful.

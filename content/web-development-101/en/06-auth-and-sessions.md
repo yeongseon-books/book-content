@@ -41,15 +41,11 @@ This is post 6 in the Web Development 101 series. Here we connect cookies, sessi
 
 This picture places Authentication and Sessions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Authentication and Sessions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Almost every app has login. A weak design lets *account takeover* happen in one line. Knowing the names and roles of the tools blocks most disasters.
 
 > Auth is not a *feature* — it is *foundation*.
-
-## Concept at a Glance
 
 The key idea in this picture is that the password should not travel on every request. One successful login creates an identifier, and the browser replays that identifier so the server can recover user context safely.
 

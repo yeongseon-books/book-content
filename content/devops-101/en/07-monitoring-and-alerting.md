@@ -58,8 +58,6 @@ Incidents *always come*. The difference is *how fast you know* and *how fast you
 
 > Operating without monitoring is *driving with eyes closed*.
 
-## Concept at a Glance
-
 Monitoring collects metrics over time. Alerting triggers *when those metrics cross a boundary*. Together they answer: *Is it running? Is it healthy? What should I do right now?*
 
 ## Key Terms

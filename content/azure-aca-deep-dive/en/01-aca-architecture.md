@@ -56,8 +56,6 @@ ACA's internal implementation is not published by Microsoft, so these versions a
 
 This picture places ACA architecture — what Microsoft layered on a hidden Kubernetes inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of ACA architecture — what Microsoft layered on a hidden Kubernetes is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## One Container Apps environment
 
 This is the map for the whole series.

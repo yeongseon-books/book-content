@@ -374,4 +374,6 @@ print(log_payload)
 - [캐싱 전략 — 비용과 지연 시간 줄이기](./04-caching-strategies.md)
 - [속도 제한 관리 — Rate Limit 대응 패턴](./06-rate-limit-management.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/llm-api-production-101/ko/05-retry-and-error-handling)
+
 Tags: LLM, OpenAI, Streaming, Python

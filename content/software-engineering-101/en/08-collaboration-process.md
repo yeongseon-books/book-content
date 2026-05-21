@@ -43,8 +43,6 @@ This is post 8 in the Software Engineering 101 series. In this chapter, we treat
 
 This picture places Collaboration Process inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Collaboration Process is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - How to write an RFC (Request for Comments)
@@ -58,8 +56,6 @@ This picture places Collaboration Process inside an operating flow. The point is
 Code can be written alone, but products are not. Without a process, technical decisions get decided by relationships instead of facts.
 
 > A good process protects people.
-
-## Concept at a Glance
 
 Async-first; sync only at the moment of decision.
 

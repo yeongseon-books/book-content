@@ -41,15 +41,11 @@ This is the first post in the Web Development 101 series. Here we build the full
 
 This picture places How the Web Works inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of How the Web Works is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Web developers must see the *whole picture*. Knowing one layer well lets you build, but it does not let you debug. Once the five-step flow is in your head, every tool finds its place.
 
 > The web runs on *agreed protocols*, not magic.
-
-## Concept at a Glance
 
 Read this figure from left to right: a user action becomes a browser task, DNS resolves the host, the server responds over HTTP, and only then does the browser render what you can see. Later chapters simply zoom into one part of this same end-to-end path.
 

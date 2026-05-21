@@ -68,6 +68,20 @@ last_reviewed: '2026-05-15'
 
 대표 풀 리퀘스트 몇 개, 직접 만든 작은 프로젝트 하나, 그리고 일정 기간 이어진 활동 흐름이 정리돼 있으면 훨씬 신뢰할 수 있는 포트폴리오가 됩니다. 포트폴리오는 화려함보다 읽기 쉬움이 중요합니다.
 
+포트폴리오를 만드는 과정 자체가 학습입니다. 무엇을 보여 줄지 선택하고, 설명을 다듬고, 증거를 정리하며 자신의 성장을 객관화하는 훈련을 하게 됩니다.
+## 오픈소스 펜딩 모델
+
+포트폴리오로서의 오픈소스 활동은 무료 기여만을 의미하지 않습니다. 오픈소스 프로젝트도 지속 가능성을 위해 펜딩을 고민하게 되며, 포트폴리오에 펜딩 경험을 포함하면 비즈니스 감각도 보여 줄 수 있습니다.
+
+| 모델 | 예시 | 규모 | 지속성 | 특징 |
+|---|---|---|---|---|
+| 스폰서 | GitHub Sponsors, Patreon | 소규모 | 불안정 | 개인 기부 의존 |
+| 듀얼 라이선스 | MySQL, Qt | 대규모 | 안정 | OSS + 상업 버전 병행 |
+| SaaS | Sentry, GitLab | 대규모 | 안정 | 호스팅 서비스로 수익 |
+| 기부 | Apache, Linux | 대규모 | 안정 | 재단/기업 후원 |
+| 컨설팅 | Red Hat, Canonical | 대규모 | 안정 | 기술 지원 판매 |
+
+소규모 프로젝트는 GitHub Sponsors나 Ko-fi같은 스폰서부터 시작하는 편이 부담 없습니다. 사용자가 늘어나면 듀얼 라이선스나 SaaS 모델을 고려할 수 있습니다. 중요한 것은 펜딩 모델이 오픈소스 정신과 충돌하지 않도록 투명하게 공개하는 것입니다.
 ## 직접 따라해 보기: 포트폴리오 정리 절차
 
 ### 1단계 — 프로필 소개 문서 만들기
@@ -127,6 +141,48 @@ At least 2 commits per week, three months straight
 
 포트폴리오가 강해지는 이유는 숫자가 많아서가 아닙니다. 보는 사람이 "이 사람은 이런 문제를 골라 이런 방식으로 끝까지 밀어 왔구나"를 빠르게 이해할 수 있기 때문입니다.
 
+## GitHub Sponsors 설정 예시
+
+포트폴리오에 펜딩 경험을 추가하려면 GitHub Sponsors가 가장 쉽습니다. 포트폴리오 README에 스폰서 배지를 표시하면 비즈니스 감각을 보여 줄 수 있습니다.
+
+**1단계: `.github/FUNDING.yml` 파일 생성**
+
+```yaml
+github: [your-username]
+patreon: your-username
+ko_fi: your-username
+custom: ["https://paypal.me/username", "https://buymeacoffee.com/username"]
+```
+
+**2단계: 스폰서 티어 구성**
+
+```markdown
+## Sponsor Tiers
+
+### $5/month - Supporter
+- Name in README
+- Early access to releases
+
+### $25/month - Contributor
+- Priority issue triage
+- Monthly video call
+
+### $100/month - Sponsor
+- Logo on website
+- Dedicated support channel
+```
+
+**3단계: README에 배지 추가**
+
+```markdown
+## Sponsors
+
+Thank you to our sponsors!
+
+[![Sponsor](https://img.shields.io/github/sponsors/username?style=for-the-badge)](https://github.com/sponsors/username)
+```
+
+스폰서를 받는 경험은 포트폴리오에 두 가지를 보여 줍니다. 첨째, 프로젝트가 실제 사용자에게 가치를 주고 있다는 증거. 둘째, 비즈니스 모델을 설계하고 운영하는 능력.
 ## 자주 하는 실수 다섯 가지
 
 1. 포크만 쌓아 두고 정작 대표 작업은 보이지 않게 둡니다.
@@ -160,6 +216,35 @@ At least 2 commits per week, three months straight
 
 다음 글에서는 시리즈의 마지막으로, 작은 도구 하나를 실제 오픈소스 프로젝트로 공개하는 전 과정을 정리해 보겠습니다.
 
+## 포트폴리오 업데이트 주기
+
+오픈소스 포트폴리오는 한 번 쓰고 끝나는 문서가 아닙니다. 정기적으로 업데이트해야 최신 활동이 반영됩니다.
+
+| 주기 | 활동 | 목적 |
+|------|------|------|
+| **매달** | GitHub 프로필 README 업데이트 | 최근 3개월 활동 요약 유지 |
+| **분기마다** | 고정 항목 재검토 | 더 나은 프로젝트로 교체 |
+| **지원 전** | 대표 PR 목록 재작성 | 지원 직무에 맞게 강조점 조정 |
+
+포트폴리오는 "내가 무엇을 할 수 있는가"를 보여주는 살아있는 문서입니다. 6개월 전 활동만 있으면 "현재는 활동하지 않는다"는 인상을 줍니다.
+
+## 기술 블로그 연동
+
+오픈소스 프로젝트 경험을 기술 블로그 글로 정리하면 포트폴리오의 깊이가 더해집니다. 코드만으로는 보이지 않는 의사결정 과정과 학습 내용을 설명할 수 있습니다.
+
+```markdown
+## 블로그 글 연동 예시
+
+### 프로젝트
+- [my-cli-tool](https://github.com/username/my-cli-tool) — Python CLI 도구
+
+### 관련 글
+- [첫 오픈소스 프로젝트를 만들며 배운 것](https://blog.example.com/first-oss)
+- [GitHub Actions로 릴리스 자동화하기](https://blog.example.com/gh-actions)
+- [사용자 피드백을 받고 설계를 바꾼 이야기](https://blog.example.com/design-change)
+```
+
+블로그 글은 프로젝트 README의 "Related Posts" 섹션에 링크하거나, GitHub 프로필 README에 최신 글 목록을 자동으로 표시할 수 있습니다.
 ## 처음 질문으로 돌아가기
 
 - **왜 포트폴리오로 개인 프로젝트보다 오픈소스 기여를 보여주는 게 좋을까요?** 오픈소스는 **코드 리뷰, 피드백 수용, 협업**의 실제 과정이 모두 공개되어 있어서, 채용담당자가 기술 실력 외에 협업 능력도 판단할 수 있습니다.
@@ -168,6 +253,63 @@ At least 2 commits per week, three months straight
 
 - **"X개 프로젝트 기여"라고 쓰면 되는 건가요?** 아닙니다. **어떤 문제를 푸는 기여였고, 어떤 리뷰를 받았고, 그 경험에서 뭘 배웠는지**를 구체적으로 적을 때 포트폴리오의 신뢰도가 올라갑니다.
 <!-- toc:begin -->
+
+## 펜딩 없이 지속하는 법
+
+모든 오픈소스 프로젝트가 펜딩을 받을 필요는 없습니다. 펜딩이 없어도 오래 지속하는 프로젝트들이 많습니다. 다음은 펜딩 없이 지속하는 전략입니다.
+
+**1. 범위를 작게 유지**
+
+프로젝트 범위를 작게 유지하면 유지보수 부담이 줄어듭니다. 하나의 문제를 잘 푸는 도구는 모든 문제를 푸려는 플랫폼보다 오래 갑니다.
+
+```markdown
+## Non-goals
+
+- We will NOT add GUI
+- We will NOT support Python 2
+- We will NOT become a framework
+```
+
+**2. 자동화를 최대화**
+
+CI/CD, 테스트, 린트, 문서 배포를 모두 자동화하면 메인테이너의 수동 작업이 줄어듭니다.
+
+```yaml
+# .github/workflows/ci.yml
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - run: pytest
+    - run: ruff check
+```
+
+**3. 기여자를 메인테이너로 승격**
+
+한 명이 모든 것을 책임지려고 하면 금방 지칩니다. 정기적으로 기여하는 사람을 committer나 maintainer로 승격하면 bus factor가 올라갑니다.
+
+```markdown
+## Maintainers
+
+- @alice (founder)
+- @bob (committer since 2024)
+- @carol (docs maintainer)
+```
+
+**4. 휴면기를 인정**
+
+모든 프로젝트가 항상 활발해야 하는 것은 아닙니다. 프로젝트가 안정된 상태라면, README에 "Stable, not abandoned"라고 명시하는 것도 좋습니다.
+
+```markdown
+## Status
+
+This project is stable and maintained.
+We accept bug fixes but do not plan major new features.
+```
+
+펜딩 없이 지속하는 프로젝트는 펜딩을 받는 프로젝트보다 덜 중요하지 않습니다. 오히려 범위를 작게 유지하고 자동화를 잘 구축한 프로젝트가 더 오래 갑니다.
 ## 시리즈 목차
 
 - [Open Source 101 (1/10): 오픈소스란 무엇인가](./01-what-is-open-source.md)

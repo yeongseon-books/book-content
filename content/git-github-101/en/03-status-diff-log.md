@@ -42,8 +42,6 @@ This is the third post in the Git & GitHub 101 series. Here, we focus on reading
 
 This picture places Reading change history - status, diff, log inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Reading change history - status, diff, log is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why it matters
 
 The previous post walked through one full edit-to-commit cycle. From here on, real collaboration begins when you can answer not only "where does my change live?" but also "what exactly is in that change?"

@@ -45,8 +45,6 @@ In this post, we look at separation of concerns as a way to split code by reason
 
 This picture places Separation of Concerns inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Separation of Concerns is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - A definition of "concern"
@@ -60,8 +58,6 @@ This picture places Separation of Concerns inside an operating flow. The point i
 When concerns blend together you must understand everything to change one thing. Separation lowers the cost of the next change.
 
 > Separation is not a cost; it is a gift of options.
-
-## Concept at a Glance
 
 Three concerns separated, three independent timelines.
 

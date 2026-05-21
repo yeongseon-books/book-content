@@ -349,4 +349,6 @@ Test Harness는 에이전트가 끝났다고 말하는 순간을 믿지 않고, 
 - [LangGraph 101 — 멀티 에이전트 시스템](../../langgraph-101/ko/05-multi-agent.md)
 - [AI Safety & Guardrails 101 — 운영 가드레일 시스템 구축](../../ai-safety-guardrails-101/ko/10-production-guardrail-system.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/harness-engineering-101/ko/06-test-harness)
+
 Tags: AI Agent, Harness, Production, Reliability

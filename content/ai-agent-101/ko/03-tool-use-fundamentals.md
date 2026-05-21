@@ -295,4 +295,6 @@ tool use는 agent를 실세계 시스템과 연결하는 첫 번째 계층입니
 - [LangGraph 101 - Tool Calling](../../langgraph-101/ko/04-tool-calling-agent.md)
 - [Prompt Engineering 101 - 구조화 출력](../../multimodal-ai-101/ko/05-multimodal-rag.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-agent-101/ko/03-tool-use-fundamentals)
+
 Tags: AI Agent, LLM, Tool Use, Python

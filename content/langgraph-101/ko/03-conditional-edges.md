@@ -352,4 +352,6 @@ Answer: Route: fallback. The classifier returned an unknown label, so the graph 
 
 ---
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/langgraph-101/ko/03-conditional-edges)
+
 Tags: LangGraph, Agent, Python, LLM

@@ -206,4 +206,6 @@ done | sort -k2 -n | tail -10
 - [Azure App Service 101 — Request Lifecycle](../../azure-app-service-101/ko/02-request-lifecycle.md)
 - [Azure Functions Deep Dive — Cold start and Placeholder Mode](../../azure-functions-deep-dive/ko/06-cold-start-placeholder.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/azure-app-service-deep-dive/ko/06-cold-start-and-warmup)
+
 Tags: Azure, App Service, Distributed Systems, Platform Engineering

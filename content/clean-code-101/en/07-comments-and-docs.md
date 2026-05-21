@@ -43,7 +43,7 @@ Here we will separate the explanations that belong in naming and structure from 
 
 This picture places Comments and Documentation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Comments and Documentation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> If you need explanation, try fixing code first. Only then add comments.
 
 ## Questions this article answers
 
@@ -60,8 +60,6 @@ This picture places Comments and Documentation inside an operating flow. The poi
 Comments tend to lie. Code changes; comments rarely follow.
 
 > The best comment is the one you no longer need.
-
-## Concept at a Glance
 
 If something needs explaining, fix the code first.
 

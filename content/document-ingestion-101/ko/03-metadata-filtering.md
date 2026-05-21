@@ -200,6 +200,157 @@ Q4 infrastructure cost engineering - ...
 
 이 글에서 본 `category`, `quarter`, `source` 같은 키는 단순하지만 강력합니다. 다음 글에서는 이런 메타데이터 계약을 유지한 채, 변경된 문서만 다시 처리하는 증분 인덱싱 흐름으로 넘어가겠습니다.
 
+### 필수 메타데이터 스키마를 계약으로 고정하기
+
+필드가 느슨하면 검색 기능은 돌아가도 운영 중에 결과 해석이 어려워집니다. 특히 `source`나 `version`이 빠진 문서는 나중에 재색인 대상 판별과 감사 로그 연결이 힘들어집니다. 그래서 수집 단계에서 최소 계약을 코드로 강제하는 편이 안전합니다.
+
+```python
+from __future__ import annotations
+
+from dataclasses import dataclass
+from datetime import datetime
+
+@dataclass(frozen=True)
+class MetadataSchema:
+    source: str
+    doc_type: str
+    category: str
+    quarter: str
+    language: str
+    tenant: str
+    version: str
+    ingested_at: str
+
+def build_metadata(
+    *,
+    source: str,
+    doc_type: str,
+    category: str,
+    quarter: str,
+    language: str,
+    tenant: str,
+    version: str,
+) -> dict[str, str]:
+    schema = MetadataSchema(
+        source=source,
+        doc_type=doc_type,
+        category=category,
+        quarter=quarter,
+        language=language,
+        tenant=tenant,
+        version=version,
+        ingested_at=datetime.now().isoformat(timespec='seconds'),
+    )
+    return schema.__dict__.copy()
+```
+
+이처럼 필수 키를 명시해 두면, 검색 단계에서 조건식을 작성할 때 누락 필드 때문에 런타임에서 뒤늦게 실패하는 일을 줄일 수 있습니다. 또한 테넌트 분리나 버전 롤백 같은 운영 작업에서 같은 키 집합을 재사용할 수 있습니다.
+
+### 다중 조건 필터 쿼리를 조합하는 패턴
+
+실무 질의는 단일 조건보다 복합 조건이 많습니다. 예를 들어 마케팅 문서만 보되, 특정 분기와 특정 테넌트로 범위를 더 줄이는 식입니다. 조건을 코드로 조합해 두면 프론트엔드 필터 UI와 백엔드 검색 로직 사이 계약도 안정적으로 맞출 수 있습니다.
+
+```python
+from __future__ import annotations
+
+from typing import Any
+
+def build_filter(
+    *,
+    category: str | None = None,
+    quarter: str | None = None,
+    tenant: str | None = None,
+    language: str | None = None,
+) -> dict[str, Any]:
+    clauses: list[dict[str, str]] = []
+    if category:
+        clauses.append({'category': category})
+    if quarter:
+        clauses.append({'quarter': quarter})
+    if tenant:
+        clauses.append({'tenant': tenant})
+    if language:
+        clauses.append({'language': language})
+    if not clauses:
+        return {}
+    if len(clauses) == 1:
+        return clauses[0]
+    return {'$and': clauses}
+
+def run_filtered_search(vectorstore: Any, query: str) -> None:
+    filter_query = build_filter(
+        category='marketing',
+        quarter='2024Q4',
+        tenant='acme',
+        language='ko',
+    )
+    docs = vectorstore.similarity_search(query, k=5, filter=filter_query)
+    for rank, doc in enumerate(docs, start=1):
+        print(
+            f"rank={rank} source={doc.metadata['source']} "
+            f"category={doc.metadata['category']} quarter={doc.metadata['quarter']}"
+        )
+```
+
+벡터 유사도만으로는 근접하지만 범위가 틀린 문서가 끼어들 수 있습니다. 위 패턴처럼 조건을 먼저 조합하면 검색 후보군이 줄어들고, 랭킹이 해야 할 일이 더 명확해집니다. 결과적으로 응답 품질뿐 아니라 지연 시간과 비용도 함께 안정되는 경우가 많습니다.
+
+### 인덱싱 시점에 필터 성능을 고려한 설정
+
+필터가 많은 시스템에서는 인덱싱 단계에서 메타데이터 정규화를 함께 처리해야 합니다. 같은 의미를 가진 값이 `Q4`, `2024-Q4`, `2024Q4`로 섞여 있으면 필터 정확도가 떨어지고 캐시 적중률도 나빠집니다. 아래처럼 인덱싱 전에 정규화 함수를 강제하면 운영 품질이 좋아집니다.
+
+```python
+from __future__ import annotations
+
+from langchain_core.documents import Document
+
+def normalize_quarter(value: str) -> str:
+    compact = value.replace('-', '').replace(' ', '').upper()
+    if compact.startswith('Q') and len(compact) == 2:
+        raise ValueError('quarter must include year, for example 2024Q4')
+    return compact
+
+def normalize_metadata(metadata: dict[str, str]) -> dict[str, str]:
+    normalized = metadata.copy()
+    normalized['category'] = normalized['category'].strip().lower()
+    normalized['doc_type'] = normalized['doc_type'].strip().lower()
+    normalized['language'] = normalized['language'].strip().lower()
+    normalized['tenant'] = normalized['tenant'].strip().lower()
+    normalized['quarter'] = normalize_quarter(normalized['quarter'])
+    return normalized
+
+def prepare_document(text: str, metadata: dict[str, str]) -> Document:
+    normalized = normalize_metadata(metadata)
+    return Document(page_content=text, metadata=normalized)
+```
+
+정규화는 눈에 덜 띄지만, 메타데이터 기반 검색의 핵심 안정장치입니다. 인덱싱할 때 한 번 강제해 두면 이후 필터 조건이 단순해지고, 분석 대시보드에서 지표를 집계할 때도 값이 깨끗하게 모입니다.
+
+### 운영에서 자주 쓰는 메타데이터 인덱싱 구성 예시
+
+문서 저장소를 분리하지 않더라도, 최소한 어떤 필드를 필터 대상으로 삼을지 사전에 정해 두어야 합니다. 아래 예시는 애플리케이션 설정 파일에 필터 가능 필드를 선언하고, 수집 파이프라인이 이를 검증하는 흐름입니다.
+
+```yaml
+metadata_index:
+  required_fields:
+    - source
+    - doc_type
+    - category
+    - quarter
+    - tenant
+    - language
+    - version
+  filterable_fields:
+    - category
+    - quarter
+    - tenant
+    - language
+  strict_mode: true
+```
+
+`strict_mode`를 켜면 필수 필드 누락 문서를 인덱싱 단계에서 즉시 실패로 처리할 수 있습니다. 처음에는 엄격해 보이지만, 이 장치가 있어야 나중에 검색 장애를 인덱스 정비 작업으로 되돌리지 않고 수집 경계에서 바로 잡을 수 있습니다.
+
+요약하면 메타데이터 설계는 검색 직전의 옵션이 아니라 수집 파이프라인의 핵심 계약입니다. 스키마 정의, 값 정규화, 복합 필터 조합, 인덱싱 검증이 한 세트로 맞물려야 실제 서비스에서 예측 가능한 검색 동작을 얻을 수 있습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **메타데이터 스키마는 왜 임베딩 후가 아니라 수집 단계에서 먼저 설계해야 할까요?**

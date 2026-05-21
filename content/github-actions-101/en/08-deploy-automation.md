@@ -42,8 +42,6 @@ This is post 8 in the GitHub Actions 101 series. In this post, we will design a 
 
 This picture places Deployment Automation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Deployment Automation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - *GitHub Environments* and *required reviewers*
@@ -57,8 +55,6 @@ This picture places Deployment Automation inside an operating flow. The point is
 *Manual deploys* are the cause of *weekend pages*. Automation gives you *reproducibility*, not just speed.
 
 > If the *deployment runbook* lives only in someone's head, an *incident is coming*.
-
-## Concept at a Glance
 
 ## Key Terms
 

@@ -54,8 +54,6 @@ This post covers the heart of SQLAlchemy Core: `MetaData`, `Table`, `Column`, an
 
 This picture places SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 Managing schema with raw SQL has one big problem: when the column names in your INSERT/SELECT statements drift from the actual schema, you don't find out until runtime. A `no such column` error suddenly appears in production, and your IDE can't even autocomplete column names.

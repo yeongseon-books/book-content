@@ -45,8 +45,6 @@ This is the final post in the Data Structures 101 series.
 
 This picture places Choosing Data Structures inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Choosing Data Structures is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The five core questions that define a workload
@@ -59,8 +57,6 @@ This picture places Choosing Data Structures inside an operating flow. The point
 Algorithms run on top of data structures, so the data structure you pick sets the upper bound on system performance. A bad choice is hard to recover from with algorithmic optimisation alone. But picking a data structure without analysing the workload is just as risky. "What I know" or "the theoretically fastest one" is not always the right answer.
 
 > Choosing a data structure = workload analysis + understanding trade-offs + measurement.
-
-## Concept at a Glance
 
 > A good choice starts not from "the shape of the data" but from "the frequency and pattern of operations". You first define which operations are on the hot path, how big the input is, and what the memory constraints are.
 

@@ -268,4 +268,6 @@ agent reliability는 실패를 없애는 기술이 아니라 실패를 제어하
 - [AI Evaluation 101 - 실패 분석과 회귀 검사](../../ai-evaluation-101/ko/08-regression-testing.md)
 - [LangGraph 101 - 상태와 재시도](../../langgraph-101/ko/02-state-and-checkpoints.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-agent-101/ko/08-error-handling-reliability)
+
 Tags: AI Agent, LLM, Tool Use, Python

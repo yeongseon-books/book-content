@@ -43,8 +43,6 @@ This is post 8 in the Algorithms 101 series. Here we cover graph representations
 
 This picture places Graph Algorithms inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Graph Algorithms is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - Trade-offs between adjacency list and adjacency matrix
@@ -57,8 +55,6 @@ This picture places Graph Algorithms inside an operating flow. The point is not 
 Most production problems reduce to graph problems eventually: microservice call dependencies, build-tool task graphs, user-item bipartite graphs in recommendation systems, road networks in routing. Without graph algorithms, the cores of all those systems are out of reach.
 
 > Graphs are the shared language of systems thinking.
-
-## Concept at a Glance
 
 > A graph has V nodes and E edges. The adjacency list uses O(V+E) memory; the adjacency matrix uses O(V^2). BFS uses a queue and gives unweighted shortest paths in O(V+E). DFS uses a stack (or recursion) and powers connectivity and topological sort. Dijkstra is greedy + priority queue for non-negative weighted shortest paths, and the canonical MST algorithms are Kruskal (union-find) and Prim (priority queue).
 

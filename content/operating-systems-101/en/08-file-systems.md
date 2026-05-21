@@ -43,8 +43,6 @@ This is post 8 in the Operating Systems 101 series. It explains inode lookup, pa
 
 This picture places File Systems inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of File Systems is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - How do inodes and directory entries represent a file?
@@ -64,8 +62,6 @@ This picture places File Systems inside an operating flow. The point is not to m
 Half of all data-loss incidents trace back to "we did not call fsync" or "we assumed rename was atomic when it was not." Without a model of file-system behavior, the same code mysteriously works on one host and loses data on another. Reliable storage comes not from clever code but from precisely using the promises the system actually makes.
 
 > The file system is a spectrum from "slow but safe" to "fast but risky," and choosing where to sit is a developer's decision.
-
-## Concept at a Glance
 
 > A file is a combination of an inode (metadata) and data blocks. A directory is just a mapping from name to inode number. write() typically lands in the page cache, and the data hits disk later. fsync is the call that asks the OS to push it to disk now.
 

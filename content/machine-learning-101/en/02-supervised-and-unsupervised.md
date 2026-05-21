@@ -40,12 +40,9 @@ This is post 2 in the Machine Learning 101 series. Here we will separate supervi
 
 This picture places Supervised and Unsupervised Learning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-
 ## Why It Matters
 
 Picking the wrong paradigm makes any model improvement meaningless. Problem framing is the first lever.
-
-## Concept at a Glance
 
 ## Key Terms
 

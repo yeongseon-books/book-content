@@ -40,8 +40,6 @@ This is the final post in the LLM Fine-tuning 101 series.
 
 This picture places Model Serving inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Model Serving is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why this matters
 
 The final article in the series puts the trained adapter behind an API. In production, training and serving are kept separate as a rule. For a demo, however, doing one small fine-tuning step and immediately wrapping the result in an endpoint helps you see the whole flow at once.

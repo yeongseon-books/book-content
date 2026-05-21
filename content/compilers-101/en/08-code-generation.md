@@ -44,8 +44,6 @@ This is post 8 in the Compilers 101 series.
 
 This picture places code generation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of code generation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The two core problems code generation solves
@@ -59,8 +57,6 @@ This picture places code generation inside an operating flow. The point is not t
 Even with everything before this done well, getting the last step wrong means the program does not run. And for the same IR, a poor backend produces code 2-10x slower. Code generation decides the compiler's reputation.
 
 > Theory ends at the IR; skill shows in the backend.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR
@@ -301,8 +297,6 @@ Tags: Computer Science, Compilers, CodeGen, RegisterAllocation, Assembly
 Even with everything before this done well, getting the last step wrong means the program does not run. And for the same IR, a poor backend produces code 2-10x slower. Code generation decides the compiler's reputation.
 
 > Theory ends at the IR; skill shows in the backend.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR

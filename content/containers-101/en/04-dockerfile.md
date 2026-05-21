@@ -45,13 +45,13 @@ In this chapter, we focus on cache-friendly instruction order, multi-stage build
 
 This picture places Dockerfile inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Dockerfile is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> The quality of a Dockerfile lives or dies by cache efficiency. Change a layer deep in the file, and you rebuild everything below it.
 
 ## Why It Matters
 
 A Dockerfile directly drives team productivity and security. Get it right once and it pays back for years.
 
-## Concept at a Glance
+Each Dockerfile instruction creates one layer. Layers below are cached if their inputs match; changes above invalidate everything below. Multi-stage builds let you discard build artifacts before the final layer.
 
 ## Key Terms
 

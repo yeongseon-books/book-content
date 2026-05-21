@@ -48,8 +48,6 @@ This picture places Filtering and Selection inside an operating flow. The point 
 
 *Every step of analysis* involves *subset extraction*. *Slow or wrong selection* shakes the *whole pipeline*.
 
-## Concept at a Glance
-
 ## Key Terms
 
 - **loc**: *label-based* selection.

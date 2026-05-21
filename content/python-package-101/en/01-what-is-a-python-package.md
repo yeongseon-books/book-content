@@ -42,8 +42,6 @@ This is the first post in the Python Package 101 series. Here we define modules,
 
 This picture places What Is a Python Package? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is a Python Package? is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What you will learn
 
 - The definitions of module, package, library, and distribution

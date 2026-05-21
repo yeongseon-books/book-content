@@ -40,12 +40,9 @@ This is post 6 in the Machine Learning 101 series. Here we will look at what a s
 
 This picture places Decision Tree and Random Forest inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-
 ## Why It Matters
 
 Random forests and gradient-boosted trees still dominate tabular data. They belong in every baseline before you reach for deep learning.
-
-## Concept at a Glance
 
 ## Key Terms
 

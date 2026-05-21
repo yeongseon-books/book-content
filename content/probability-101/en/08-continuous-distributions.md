@@ -52,8 +52,6 @@ The practical payoff is that a good continuous model turns loose numbers into de
 
 > In continuous probability, the key habit is to think in intervals. Probability lives in area, not in a single point.
 
-## Concept at a Glance
-
 ## Key Terms
 
 - **Uniform(a,b)**: equal density on the interval. E=(a+b)/2.

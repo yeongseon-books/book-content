@@ -42,7 +42,7 @@ In this post, we look at why the star shape became the default warehouse pattern
 
 This picture places Star Schema inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Star Schema is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> A star schema balances normalization for write efficiency with denormalization for read speed. The result is predictable join cost and readable queries.
 
 ## Questions this article answers
 
@@ -66,7 +66,7 @@ Analytical queries get faster as joins decrease. A star schema keeps *one fact* 
 
 > *Analytics is a read game. The simpler the shape, the faster the answer.*
 
-## Concept at a Glance
+This picture shows the classic star schema: one fact table at the center, surrounded by dimension tables. The key is not to memorize the shape, but to see why all analyses start from the same fact table.
 
 ## Key Terms
 

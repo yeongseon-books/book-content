@@ -45,13 +45,13 @@ In this chapter, we build a practical baseline around non-root users, capability
 
 This picture places Container Security inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Container Security is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Container security is not one choice but layers: no root, minimal privileges, image scanning, runtime policies, and host isolation — break any layer and risk grows.
 
 ## Why It Matters
 
 A default container runs as *root* with *too many privileges* and easily becomes the *starting point* of a security incident.
 
-## Concept at a Glance
+Never run containers as root unless forced to. Use non-root users in Dockerfile. Scan images for known CVEs. Apply runtime policies (seccomp, SELinux, AppArmor) to restrict syscalls. Remember: containers share the host kernel, so kernel bugs can leak between containers.
 
 ## Key Terms
 

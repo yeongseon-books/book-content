@@ -319,4 +319,6 @@ overlap이 0이면 경계 정보가 자주 사라지고, 50%를 넘기면 중복
 - [벡터 검색 101 — 05-chunking-strategies](../../vector-search-101/ko/05-chunking-strategies.md)
 - [LLM 파인튜닝 101 — 데이터셋 준비와 전처리](../../llm-finetuning-101/ko/02-dataset.md)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-data-preparation-101/ko/05-tokenization-chunking)
+
 Tags: Tokenization, BPE, SentencePiece, Chunking, RAG, tiktoken

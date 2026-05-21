@@ -67,8 +67,6 @@ The goal is to map the **publicly observable scale-decision loop** into a usable
 
 This picture places Scaling internals — how Scale Out decisions become new workers inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Scaling internals — how Scale Out decisions become new workers is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## The control path in one diagram
 
 Two things matter here.

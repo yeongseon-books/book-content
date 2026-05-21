@@ -49,8 +49,6 @@ This is the 2nd article in the LLM from Scratch 101 series.
 
 This picture places From Integers to Vectors and Positions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of From Integers to Vectors and Positions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## nn.Embedding is Just a Lookup Table
 
 `nn.Embedding(vocab_size, n_embd)` is essentially a large table with dimensions `(vocab_size, n_embd)`. When a token ID comes in, it simply pulls the corresponding row. That's it. It might look complex through the lens of linear algebra, but the operation itself is just indexing.

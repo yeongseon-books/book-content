@@ -43,8 +43,6 @@ This is post 3 in the Operating Systems 101 series. It introduces the scheduler 
 
 This picture places Scheduling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Scheduling is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Questions this article answers
 
 - What goals is the scheduler trying to balance against each other?
@@ -64,8 +62,6 @@ This picture places Scheduling inside an operating flow. The point is not to mem
 The scheduler is invisible until things slow down or jitter. Why does the system feel sluggish when CPU is idle? Why do identical runs take different times? Why did a container suddenly get sluggish after we set a CPU limit? The answers usually come back to the scheduler's decisions.
 
 > Responsiveness, throughput, fairness, and power — the scheduler cannot maximize all four at once. Push one and another gives.
-
-## Concept at a Glance
 
 > The scheduler picks a runnable task from a queue and puts it on the CPU. It is invoked again whenever a task blocks on I/O, exhausts its time slice, or is preempted by a higher-priority task waking up.
 

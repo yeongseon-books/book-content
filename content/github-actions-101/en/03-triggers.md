@@ -42,8 +42,6 @@ This is post 3 in the GitHub Actions 101 series. In this post, we will use `push
 
 This picture places Understanding Triggers inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Understanding Triggers is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - The difference between *push* and *pull_request*
@@ -57,8 +55,6 @@ This picture places Understanding Triggers inside an operating flow. The point i
 Trigger design dictates your *cost and noise*. Running *every workflow on every commit* leads to *cost explosion and alert fatigue*.
 
 > A *good workflow* runs *only at the right moment*.
-
-## Concept at a Glance
 
 ## Key Terms
 

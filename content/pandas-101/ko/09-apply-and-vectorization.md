@@ -58,6 +58,20 @@ Pandas를 어느 정도 쓰기 시작하면 코드가 돌아가는 것과 빠르
 - **조건 선택**: 배열 단위 조건 분기입니다.
 - **표현식 가속**: 큰 수식 계산을 빠르게 처리하는 방법입니다.
 
+### reshape 함수 비교
+
+다음 표는 Pandas의 주요 reshape 함수들이 어떻게 데이터를 변환하는지 정리한 것입니다.
+
+| 함수 | 입력 형태 | 출력 형태 | 주요 용도 |
+|---|---|---|---|
+| `pivot()` | Long (id-var-value) | Wide (var as columns) | 간단한 wide 변환 |
+| `melt()` | Wide (many columns) | Long (id-var-value) | Wide를 long으로 |
+| `stack()` | Wide DataFrame | MultiIndex Series | 열을 인덱스로 |
+| `unstack()` | MultiIndex Series/DF | Wide DataFrame | 인덱스를 열로 |
+| `pivot_table()` | Long with duplicates | Wide (aggregated) | 집계를 포함한 wide |
+
+`pivot`과 `melt`는 서로 반대 방향입니다. `pivot`는 열을 늘리고, `melt`는 열을 행으로 쌓습니다. 이 두 함수를 잘 다루면 데이터 모양을 자유롭게 변형할 수 있습니다.
+
 ## 전과 후
 
 이전 관점: 행마다 더하는 반복문이나 `apply(axis=1)`로 계산합니다.
@@ -130,6 +144,202 @@ dtype: object
 ```
 
 값 치환이나 코드 변환은 `map`이 잘 맞습니다. 모든 경우를 `apply`로 처리하려고 하면 코드도 느려지고 의도도 흐려집니다.
+
+### crosstab 섹션
+
+`crosstab`은 빈도를 세는 특수한 형태의 피벗 테이블입니다. 두 범주형 변수 간의 교차 빈도를 확인할 때 자주 쓰입니다.
+
+#### 기본 예제
+
+```python
+import pandas as pd
+
+df = pd.DataFrame({
+    "gender": ["M", "F", "M", "F", "M", "F"],
+    "product": ["A", "A", "B", "B", "A", "C"],
+})
+
+ct = pd.crosstab(df["gender"], df["product"])
+print(ct)
+```
+
+**예상 출력:**
+
+```text
+product  A  B  C
+gender          
+F        1  1  1
+M        2  1  0
+```
+
+`crosstab`은 각 조합의 발생 횟수를 세어 표로 만듭니다. 설문 분석, A/B 테스트 결과, 고객 세그먼트 분포를 볼 때 매우 유용합니다.
+
+#### 비율 표시
+
+`normalize` 옵션을 쓰면 빈도 대신 비율을 볼 수 있습니다.
+
+```python
+ct_norm = pd.crosstab(df["gender"], df["product"], normalize="index")
+print(ct_norm)
+```
+
+**예상 출력:**
+
+```text
+product         A         B         C
+gender                              
+F        0.333333  0.333333  0.333333
+M        0.500000  0.250000  0.000000
+```
+
+`normalize="index"`로 하면 행 합이 1이 되도록 비율로 바꿑니다. 각 성별 내에서 제품 선호도가 어떻게 분포하는지 비교하기 좋습니다.
+
+#### margins 추가
+
+`margins=True`를 쓰면 행/열 합계를 함께 볼 수 있습니다.
+
+```python
+ct_margin = pd.crosstab(df["gender"], df["product"], margins=True)
+print(ct_margin)
+```
+
+**예상 출력:**
+
+```text
+product  A  B  C  All
+gender              
+F        1  1  1    3
+M        2  1  0    3
+All      3  2  1    6
+```
+
+`margins=True`는 각 행과 열의 합계를 함께 표시합니다. 전체 분포를 한눈에 보면서 비율도 쉽게 계산할 수 있습니다.
+
+### wide ↔ long 변환 예제
+
+reshape의 핵심은 wide와 long 형태를 자유롭게 오가는 것입니다.
+
+#### pivot: long → wide
+
+```python
+import pandas as pd
+
+# long 형태
+df_long = pd.DataFrame({
+    "id": [1, 1, 2, 2],
+    "var": ["A", "B", "A", "B"],
+    "val": [10, 20, 30, 40],
+})
+
+# wide 형태로 변환
+df_wide = df_long.pivot(index="id", columns="var", values="val")
+print(df_wide)
+```
+
+**예상 출력:**
+
+```text
+var   A   B
+id         
+1    10  20
+2    30  40
+```
+
+`pivot`은 행 식별자, 열 이름, 값을 각각 지정해 wide 형태로 펼칩니다.
+
+#### melt: wide → long
+
+```python
+# wide 형태
+df_wide2 = pd.DataFrame({
+    "id": [1, 2],
+    "A": [10, 30],
+    "B": [20, 40],
+})
+
+# long 형태로 변환
+df_long2 = df_wide2.melt(id_vars=["id"], value_vars=["A", "B"],
+                          var_name="var", value_name="val")
+print(df_long2)
+```
+
+**예상 출력:**
+
+```text
+   id var  val
+0   1   A   10
+1   2   A   30
+2   1   B   20
+3   2   B   40
+```
+
+`melt`는 wide 표를 long 형태로 녹여 내립니다. 다중 열을 하나의 변수 열과 값 열로 합칠 때 사용합니다.
+
+#### pivot_table: 집계를 포함한 wide
+
+중복 키가 있을 때는 `pivot` 대신 `pivot_table`을 쓰면 자동으로 집계합니다.
+
+```python
+df = pd.DataFrame({
+    "city": ["Seoul", "Seoul", "Busan", "Busan"],
+    "category": ["A", "A", "B", "B"],
+    "sales": [100, 120, 80, 95],
+})
+
+pt = df.pivot_table(index="city", columns="category", values="sales", aggfunc="sum")
+print(pt)
+```
+
+**예상 출력:**
+
+```text
+category     A      B
+city               
+Busan      NaN  175.0
+Seoul    220.0    NaN
+```
+
+`pivot_table`은 같은 키 조합이 여러 번 나와도 집계 함수로 합쳐 주므로 실무에서 매우 유용합니다.
+
+### 실무 예제: A/B 테스트 결과 분석
+
+벡터화와 reshape를 함께 사용하는 실무 패턴입니다.
+
+```python
+import pandas as pd
+
+# A/B 테스트 데이터
+df = pd.DataFrame({
+    "user_id": range(1, 7),
+    "variant": ["A", "B", "A", "B", "A", "B"],
+    "converted": [1, 0, 1, 1, 0, 1],
+    "revenue": [100, 0, 150, 80, 0, 120],
+})
+
+# 변형별 집계
+result = df.groupby("variant").agg(
+    users=("user_id", "count"),
+    conversions=("converted", "sum"),
+    total_revenue=("revenue", "sum"),
+)
+
+# 전환율 계산 (벡터화)
+result["cvr"] = result["conversions"] / result["users"]
+result["arpu"] = result["total_revenue"] / result["users"]
+
+print(result)
+```
+
+**예상 출력:**
+
+```text
+         users  conversions  total_revenue       cvr       arpu
+variant                                                         
+A            3            2            250  0.666667  83.333333
+B            3            2            200  0.666667  66.666667
+```
+
+이 예제는 그룹화, 벡터화, 파생 지표 계산을 한 흐름에 보여줍니다. 전환율과 사용자당 매출을 벡터화로 계산하면 코드가 간결하고 빠릅니다.
 
 ## 이 코드에서 먼저 봐야 할 점
 

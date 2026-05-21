@@ -42,8 +42,6 @@ This is post 3 in the SRE 101 series. Here we separate measurement, internal obj
 
 This picture places SLI, SLO, SLA inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-
-
 ## Why this topic matters
 
 If you mix the three terms, every decision gets wobbly. Operations may think the team is talking about an internal goal while sales repeats the same number as a public promise.

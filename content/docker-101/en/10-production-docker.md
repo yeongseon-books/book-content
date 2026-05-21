@@ -42,15 +42,11 @@ This is the final post in the Docker 101 series. It ties the earlier image, runt
 
 This picture places Production-Ready Docker inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Production-Ready Docker is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## Why It Matters
 
 Every prior decision is *validated together in production*. One weak link makes the *whole chain weak*.
 
 > *Production is a *system, not a checklist*. Everything must work *at the same time*.*
-
-## Concept at a Glance
 
 ## Key Terms
 

@@ -40,12 +40,9 @@ This is the first post in the Machine Learning 101 series. Here we will pin the 
 
 This picture places What Is Machine Learning? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-
 ## Why It Matters
 
 Recommendation, medicine, finance, autonomous driving — *every industry* is being *reshaped* by ML. Weak fundamentals make *every model collapse* later.
-
-## Concept at a Glance
 
 ## Key Terms
 

@@ -40,12 +40,9 @@ This is post 4 in the Machine Learning 101 series. Here we will treat linear reg
 
 This picture places Linear Regression inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-
 ## Why It Matters
 
 Linear regression is interpretable, fast, and surprisingly strong. Always run it first. Without a baseline, no complex model is justified.
-
-## Concept at a Glance
 
 ## Key Terms
 

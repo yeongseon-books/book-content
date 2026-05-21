@@ -70,6 +70,182 @@ last_reviewed: '2026-05-15'
 
 행이 실제로 존재하는지만 알고 싶다면 `EXISTS`가 의도를 잘 드러냅니다. 값 목록을 비교하는 `IN`과는 느낌이 다릅니다.
 
+## VIEW vs CTE vs 서브쿼리 비교
+
+각각 쿼리 안에서 중간 결과를 다루는 방법이지만, 수명, 최적화, 재사용성 측면에서 차이가 있습니다.
+
+| 항목 | VIEW | CTE | 서브쿼리 |
+| --- | --- | --- | --- |
+| 수명 | CREATE로 생성 후 영구 존재 | 쿼리 실행 동안만 존재 | 쿼리 실행 동안만 존재 |
+| 최적화 | 대개 인라인 확장 (DB마다 다름) | PostgreSQL은 대개 인라인 확장 | 옵티마이저가 최적화 |
+| 재사용성 | 여러 쿼리에서 공유 가능 | 같은 문장 안에서만 참조 | 해당 위치에서만 사용 |
+| 유지보수 | 스키마 변경 영향 받음 | 쿼리 자체에 정의 포함 | 쿼리 자체에 정의 포함 |
+| 가독성 | 이름으로 추상화 | 이름으로 단계 명시 | 중첩 시 읽기 어려움 |
+
+실무에서는 일회성 분석은 CTE로, 여러 곳에서 반복 참조되는 로직은 VIEW로 관리하는 경우가 많습니다. 서브쿼리는 간단한 조건에는 괜찮지만, 중첩이 깊어지면 CTE로 풀어 쓰는 편이 읽기 좋습니다.
+
+## WITH RECURSIVE 예제
+
+CTE는 재귀적으로 동작할 수도 있습니다. 예를 들어 조직도나 댓글 트리처럼 계층 구조를 탐색할 때 유용합니다.
+
+```sql
+WITH RECURSIVE employee_tree AS (
+    -- 초기 조건: 최상위 관리자
+    SELECT id, name, manager_id, 0 AS level
+    FROM employees WHERE manager_id IS NULL
+
+    UNION ALL
+
+    -- 재귀 단계: 상위 직원의 부하 직원
+    SELECT e.id, e.name, e.manager_id, et.level + 1
+    FROM employees e
+    JOIN employee_tree et ON e.manager_id = et.id
+)
+SELECT * FROM employee_tree ORDER BY level, name;
+```
+
+**Expected output:**
+
+| id | name | manager_id | level |
+| --- | --- | --- | --- |
+| 1 | CEO | NULL | 0 |
+| 2 | CTO | 1 | 1 |
+| 3 | CFO | 1 | 1 |
+| 4 | Dev Lead | 2 | 2 |
+| 5 | Accountant | 3 | 2 |
+
+재귀 CTE는 초기 쿼리와 재귀 단계로 나뉩니다. 초기 결과를 만든 뒤, 그 결과와 다시 조인하며 점점 범위를 넓혀 가는 구조입니다. 이런 패턴은 트리 전체를 한 번에 가져와야 할 때 특히 강력합니다.
+
+## Materialized View
+
+PostgreSQL에서는 CTE뿐 아니라 Materialized View도 제공합니다. VIEW가 매번 쿼리를 실행하는 반면, Materialized View는 결과를 디스크에 저장해 두고 필요할 때 갱신합니다.
+
+```sql
+CREATE MATERIALIZED VIEW user_order_summary AS
+SELECT user_id, COUNT(*) AS order_count, SUM(total) AS total_spend
+FROM orders
+GROUP BY user_id;
+
+-- 데이터 갱신
+REFRESH MATERIALIZED VIEW user_order_summary;
+```
+
+Materialized View는 복잡한 집계를 미리 계산해 두고, 빠른 조회가 필요할 때 사용합니다. 대신 데이터가 변경되면 수동 또는 스케줄러로 갱신해야 합니다. 실시간성을 포기하는 대신 조회 성능을 얻는 절충입니다.
+
+일반 VIEW와 비교하면 다음과 같습니다:
+
+- **VIEW**: 매번 쿼리 재실행, 항상 최신 데이터, 저장 공간 불필요
+- **Materialized View**: 결과 저장, 갱신 전까지 오래된 데이터, 디스크 공간 필요
+
+사용자별 주문 합계처럼 자주 조회하지만 실시간일 필요는 없는 지표는 Materialized View로 만들면 조회 부담을 크게 줄일 수 있습니다.
+
+## IN vs EXISTS 성능 비교
+
+둘 다 필터링에 사용되지만, 데이터 분포와 인덱스 여부에 따라 성능 차이가 날 수 있습니다.
+
+### IN 방식
+
+```sql
+SELECT * FROM users
+WHERE id IN (SELECT user_id FROM orders WHERE total > 1000);
+```
+
+`IN`은 서브쿼리 결과를 먼저 구체화한 뒤 외부 쿼리와 비교합니다. 서브쿼리 결과가 작으면 효율적이지만, 결과가 크면 메모리 부담이 생길 수 있습니다.
+
+### EXISTS 방식
+
+```sql
+SELECT * FROM users u
+WHERE EXISTS (
+    SELECT 1 FROM orders o WHERE o.user_id = u.id AND o.total > 1000
+);
+```
+
+`EXISTS`는 존재 여부만 확인하므로, 첫 번째 매칭 행을 찾으면 즉시 멈춥니다. 인덱스가 잘 걸려 있으면 `EXISTS`가 더 빠를 수 있습니다.
+
+### 선택 기준
+
+- 서브쿼리 결과가 작고 중복이 없으면: `IN`
+- 외부 테이블이 크고 서브쿼리가 빠르게 매칭되면: `EXISTS`
+- `NULL` 처리가 중요하면: `EXISTS` (더 안전)
+
+실무에서는 둘 다 작성해 보고 `EXPLAIN ANALYZE`로 비교하는 것이 가장 확실합니다.
+
+## CTE 성능 고려사항
+
+CTE는 가독성을 높여 주지만, PostgreSQL 11 이하에서는 항상 구체화(materialize)되어 최적화 기회를 제한할 수 있습니다. PostgreSQL 12 이상에서는 대부분의 CTE가 인라인 확장되지만, 필요하면 명시적으로 제어할 수 있습니다.
+
+```sql
+-- 구체화 강제
+WITH big_orders AS MATERIALIZED (
+    SELECT user_id, SUM(total) AS spend
+    FROM orders GROUP BY user_id
+    HAVING SUM(total) > 1000
+)
+SELECT * FROM big_orders;
+
+-- 인라인 확장 강제
+WITH big_orders AS NOT MATERIALIZED (
+    SELECT user_id, SUM(total) AS spend
+    FROM orders GROUP BY user_id
+    HAVING SUM(total) > 1000
+)
+SELECT * FROM big_orders;
+```
+
+대부분의 경우 PostgreSQL 기본 동작에 맡기는 편이 좋지만, CTE를 여러 번 참조하거나 성능이 예상과 다를 때는 `MATERIALIZED` 키워드를 명시적으로 사용할 수 있습니다.
+
+## 서브쿼리 안티패턴
+
+서브쿼리는 편리하지만, 잘못 사용하면 성능 문제를 일으키기 쉽습니다.
+
+### 안티패턴 1: SELECT 절의 상관 서브쿼리 반복
+
+```sql
+-- 나쁜 예
+SELECT id, name,
+    (SELECT COUNT(*) FROM orders WHERE user_id = u.id) AS order_count,
+    (SELECT SUM(total) FROM orders WHERE user_id = u.id) AS total_spend
+FROM users u;
+```
+
+같은 테이블을 두 번 스캔합니다. 더 나은 방식:
+
+```sql
+-- 좋은 예
+SELECT u.id, u.name,
+    COUNT(o.id) AS order_count,
+    SUM(o.total) AS total_spend
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id
+GROUP BY u.id, u.name;
+```
+
+### 안티패턴 2: 중첩 서브쿼리 남발
+
+```sql
+-- 읽기 어려움
+SELECT * FROM (
+    SELECT * FROM (
+        SELECT * FROM orders WHERE total > 100
+    ) AS t1 WHERE user_id > 10
+) AS t2 WHERE created_at > '2025-01-01';
+```
+
+CTE로 단계를 명확히 하는 편이 낫습니다:
+
+```sql
+-- 명확함
+WITH filtered_orders AS (
+    SELECT * FROM orders
+    WHERE total > 100
+      AND user_id > 10
+      AND created_at > '2025-01-01'
+)
+SELECT * FROM filtered_orders;
+```
+
+서브쿼리와 CTE는 강력하지만, 무분별하게 쓰면 오히려 복잡도만 올라갑니다. 의미 있는 단계에만 사용하는 것이 중요합니다.
 ## 다섯 가지 패턴으로 보기
 
 ### 1단계 — 스칼라 서브쿼리

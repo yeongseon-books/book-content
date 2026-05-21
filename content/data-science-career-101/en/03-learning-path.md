@@ -42,8 +42,7 @@ This is post 3 in the Data Science Career 101 series.
 
 This picture places Designing the Learning Path inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Designing the Learning Path is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
+> In learning structure, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
 ## What You Will Learn
 
 - A *12-week roadmap*
@@ -58,8 +57,7 @@ Random study usually produces random confidence. You touch many topics, but you 
 
 An ordered path gives you something more valuable than motivation: it gives you checkpoints. You know when to move from syntax to analysis, when to build a small project, and when to pause and correct the pace instead of just collecting more material.
 
-## Concept at a Glance
-
+The first 12 weeks matter more than the next 12 months. By pacing basics, analytics, and modeling in order—and leaving a small artifact each week—you build both skill and confidence.
 ## Key Terms
 
 - **fundamentals**: Core building blocks.
@@ -76,6 +74,7 @@ An ordered path gives you something more valuable than motivation: it gives you 
 
 ## Hands-on: 12-Week Learning Path
 
+Block out 12 weeks on a calendar. Each week has a specific output: a small script, a dashboard, a written analysis. The output is proof.
 ### Step 1 — Fundamentals (Weeks 1-4)
 
 ```text

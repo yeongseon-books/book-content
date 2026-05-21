@@ -45,8 +45,6 @@ This is post 7 in the Computer Networks 101 series.
 
 This picture places Routing and NAT inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Routing and NAT is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - How to read a routing table
@@ -59,8 +57,6 @@ This picture places Routing and NAT inside an operating flow. The point is not t
 Without routing, you cannot answer "why does it only fail on our corporate network?". Without NAT, "why can't I reach our server from outside?" or "why does it work at the office but not at home?" stay mysteries. VPNs, container networks, and cloud VPCs are also routing + NAT variations.
 
 > A router sees only one hop at a time. The Internet is the sum of those small decisions.
-
-## Concept at a Glance
 
 ## Key Terms
 

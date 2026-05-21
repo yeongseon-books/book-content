@@ -45,8 +45,6 @@ This is post 3 in the Discrete Math 101 series.
 
 This picture places Sets and Functions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Sets and Functions is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - Set notation and definitions
@@ -59,8 +57,6 @@ This picture places Sets and Functions inside an operating flow. The point is no
 A row in a database is an element of a Cartesian product, and JOIN evaluates a predicate over that product. A hash map is a partial function from keys to values. The functional `map` is function application across sets. Without sets and functions, you cannot understand the essence of these tools.
 
 > A data structure is the efficient implementation of a set or a function.
-
-## Concept at a Glance
 
 > Sets are collections of elements; functions are correspondences between sets. Together they describe every data structure.
 

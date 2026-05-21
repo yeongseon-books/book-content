@@ -41,7 +41,7 @@ This is the first post in the Developer Career 101 series.
 
 This picture places What Is a Developer Career inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of What Is a Developer Career is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Career growth has three axes: role (what level of work you own), skill (which of technical, collaborative, or domain understanding is weakest), and impact (who benefits from your work).
 
 ## What You Will Learn
 
@@ -55,7 +55,7 @@ This picture places What Is a Developer Career inside an operating flow. The poi
 
 Without direction, five years later you are still at square one.
 
-## Concept at a Glance
+Career stages are continuous—junior to mid to senior represent growing scope of responsibility, not separate boxes. Growth happens on multiple axes at once.
 
 ## Key Terms
 

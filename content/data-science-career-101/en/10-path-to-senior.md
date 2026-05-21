@@ -42,8 +42,7 @@ This is the final post in the Data Science Career 101 series.
 
 This picture places The Path to Senior in Data inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of The Path to Senior in Data is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
+> In seniority, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
 ## What You Will Learn
 
 - The definition of *senior*
@@ -58,8 +57,7 @@ Senior is best understood as a pattern of behavior, not a title badge.
 
 Two people with similar technical skill can have very different impact depending on whether they define the right problem, measure the outcome, record the reasoning, and make the team around them stronger.
 
-## Concept at a Glance
-
+Seniority is not about working longer or knowing more tools. It's about knowing when to say no, asking the right questions before you code, and building repeatability so others don't need to ask again.
 ## Key Terms
 
 - **scope**: Range of responsibility.
@@ -76,6 +74,7 @@ Two people with similar technical skill can have very different impact depending
 
 ## Hands-on: Five Senior Behaviors
 
+Start now. Don't wait until you're senior. Clarify problem scope before diving in. Document your reasoning. Build reusable solutions. Teach others. Reflect on what worked and what didn't.
 ### Step 1 — Define the Problem
 
 ```text

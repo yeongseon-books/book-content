@@ -43,7 +43,7 @@ Here we will set boundaries for validation, typed exceptions, return-value failu
 
 This picture places Error Handling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Error Handling is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Validate input first, then use exceptions only when flow is lost.
 
 ## Questions this article answers
 
@@ -60,8 +60,6 @@ This picture places Error Handling inside an operating flow. The point is not to
 When error handling code outweighs business logic, the code stops being readable.
 
 > Error handling is a first-class citizen, but never the lead role.
-
-## Concept at a Glance
 
 Validate up front; raise only when control is lost.
 

@@ -52,9 +52,6 @@ Complexity analysis, probability, collision analysis, and test generation all de
 
 The useful habit is to ask structural questions first: does order matter, is repetition allowed, and are the choices independent? Those questions matter more than memorizing a formula in isolation.
 
-
-## Concept at a Glance
-
 Combinatorics counts *possibilities* systematically: permutations (order matters), combinations (order does not), and recurrence relations (recursive structure).
 
 ## Before/After

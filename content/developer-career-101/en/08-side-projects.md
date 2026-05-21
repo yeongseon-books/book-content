@@ -41,7 +41,7 @@ This is post 8 in the Developer Career 101 series.
 
 This picture places Side Projects and Learning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Side Projects and Learning is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> Side projects are valuable not for the technology stack, but for owning the full responsibility: from gathering requirements to running production.
 
 ## What You Will Learn
 
@@ -55,7 +55,7 @@ This picture places Side Projects and Learning inside an operating flow. The poi
 
 A side project leaves both learning and evidence behind.
 
-## Concept at a Glance
+Value comes from ownership: building, shipping, supporting, and improving something you control.
 
 ## Key Terms
 

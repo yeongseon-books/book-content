@@ -62,6 +62,135 @@ last_reviewed: '2026-05-12'
 
 실무에서 이 용어들이 중요한 이유는 역할을 분리하기 쉽기 때문입니다. 예를 들어 빌드 실패와 테스트 실패를 구분해 보여 주면 원인 파악 속도가 크게 빨라집니다.
 
+## CI 도구 비교
+
+CI를 처음 시작할 때 가장 먼저 부딕히는 질문이 "GitHub Actions를 써야 하나, Jenkins를 써야 하나?"입니다. 아래 표는 세 가지 대표 도구를 비교하여 각 팀 환경에 적합한 선택지를 보여 줍니다.
+
+| 도구 | 특징 | 적합 규모 | 비용 |
+|---|---|---|---|
+| GitHub Actions | YAML 기반, GitHub 내장, 서버 관리 불필요 | 소규모 ~ 중규모 팀 | 공개 저장소 무료, 프라이빗 유료 (GitHub 요금제) |
+| Jenkins | 높은 확장성, 플러그인 생태계, 자체 호스팅 | 중규모 ~ 대규모 팀, 보안 요구사항 높은 조직 | 서버 비용, 운영 비용 발생 |
+| GitLab CI | GitLab 통합, YAML 기반, 러너 등록 필요 | 모든 규모 | GitLab 요금제에 포함, 자체 호스팅도 가능 |
+
+이 표를 보고 절대 정답을 고르려고 하면 안 됩니다. 중요한 것은 팔의 기술 스택과 보안 정책, 초기 설정 비용이 어떻게 맞는지입니다. 적합 규모와 비용 두 가지는 텀이 나중에 바꿀 수 있다는 점도 고려해야 합니다.
+
+## YAML 파이프라인 예제
+
+CI 파이프라인의 실제는 문법보다 순서와 병렬화 설계에 있습니다. 아래는 lint → test → build 세 단계를 효율적으로 구성한 예시입니다.
+
+```yaml
+# .github/workflows/ci.yml
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install linters
+        run: |
+          pip install ruff mypy
+      
+      - name: Run ruff
+        run: ruff check .
+      
+      - name: Run mypy
+        run: mypy src/
+
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pytest-cov
+      
+      - name: Run tests with coverage
+        run: pytest --cov=src --cov-report=xml
+      
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        if: matrix.python-version == '3.12'
+        with:
+          file: ./coverage.xml
+
+  build:
+    name: Build Package
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Build distribution
+        run: |
+          pip install build
+          python -m build
+      
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+```
+
+이 파이프라인은 lint가 통과해야 test가 돌고, test가 통과해야 build가 동작합니다. test는 두 가지 Python 버전에서 병렬로 동작해 피드백 속도를 높입니다. 이것이 좋은 CI의 기본 패턴입니다.
+
+## CI 안티패턴
+
+CI 파이프라인을 붙였다고 모든 문제가 해결되지는 않습니다. 실무에서 자주 보는 CI 안티패턴을 몇 가지 정리하면 다음과 같습니다.
+
+### 느린 빌드 (Slow Build)
+
+테스트나 빌드가 10분 이상 걸리면 팔원들은 PR 피드백을 기다리지 않고 다음 일을 시작합니다. 그러면 CI는 형식적인 절차로 전락합니다.
+
+**해결 방법:**
+
+- 테스트를 shard로 나누어 병렬화합니다.
+- 캠시 레이어를 적극 활용합니다.
+- 임팩트 분석으로 변경된 모듈만 검증합니다.
+
+### 플레이키 테스트 (Flaky Test)
+
+같은 코드를 두 번 돌렸는데 한 번은 통과하고 한 번은 실패하면, 팔은 그 테스트를 신뢰하지 않게 됩니다.
+
+**해결 방법:**
+
+- 비결정적 실행 순서를 고정합니다.
+- 네트워크 호출은 mock으로 바꿉니다.
+- 시간 의존적 테스트는 freezegun 같은 도구로 제어합니다.
+- 플레이키 테스트가 발견되면 즉시 수정하거나 quarantine 합니다.
+
+플레이키 테스트를 방치하면 팔 전체가 CI 결과를 무시하게 되고, 결국 CI의 가치가 사라집니다.
 ## Before/After
 
 **Before (수동 검증)**
@@ -189,6 +318,83 @@ CI 파이프라인의 목적은 많은 검사를 보여 주는 것이 아니라,
 ## 정리 및 다음 단계
 
 CI 파이프라인은 팀의 합격선을 코드로 고정하는 장치입니다. 다음 글에서는 통과한 코드를 어떻게 안전하게 배포할지 CD와 배포 전략을 다룹니다.
+
+## CI 설계를 실무 수준으로 끌어올리는 기준
+
+CI는 "테스트를 자동으로 돌린다"에서 끝나지 않습니다. 실제로는 변경 위험을 단계적으로 줄이는 품질 게이트 체계입니다. 따라서 좋은 CI는 단계 개수보다 실패를 빠르게 드러내는 순서, 캐시 전략, 병렬화, 실패 로그 가독성으로 평가해야 합니다.
+
+### Git 브랜치 전략 비교
+
+| 전략 | 특징 | 장점 | 주의점 | 추천 상황 |
+| --- | --- | --- | --- | --- |
+| Trunk-based | 짧은 브랜치, 빠른 병합 | 충돌 최소화, 빠른 릴리스 | 높은 테스트 신뢰성 필요 | 고빈도 배포 팀 |
+| GitFlow | develop/release/hotfix 분리 | 역할 구분 명확 | 브랜치 복잡도 증가 | 배포 주기 긴 조직 |
+| GitHub Flow | main + PR 중심 | 단순하고 학습 쉬움 | 환경 분리 규칙 별도 필요 | 스타트업/소규모 팀 |
+
+CI 관점에서는 Trunk-based 또는 GitHub Flow가 유리합니다. 브랜치 수가 많을수록 파이프라인 조합이 늘고, 테스트 표면적이 커져 운영 부담이 증가하기 때문입니다.
+
+### GitHub Actions 워크플로 예시
+
+```yaml
+name: ci
+on:
+  pull_request:
+    branches: [main]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements-dev.txt
+      - run: ruff check .
+
+  test:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements-dev.txt
+      - run: pytest -q
+```
+
+여기서 `needs: lint`는 단순 문법이 아니라 비용 제어 장치입니다. 가장 값싼 단계가 먼저 실패하도록 설계하면 빌드 자원 낭비를 줄일 수 있습니다.
+
+### CI 모범사례 체크 표
+
+| 항목 | 권장 기준 | 안티패턴 |
+| --- | --- | --- |
+| 피드백 시간 | PR 기준 5분 내 1차 결과 | 20분 이상 대기 |
+| 단계 분리 | lint/type/test/scan 분리 | 거대한 단일 스크립트 |
+| 재현성 | 로컬과 CI 명령 동일 | CI 전용 셸 스크립트 |
+| 실패 로그 | 원인 줄을 즉시 식별 가능 | 과도한 잡음 로그 |
+| 머지 정책 | Required checks 강제 | 수동 예외 남발 |
+
+### 캐시와 병렬화 전략
+
+파이프라인 시간이 길어지면 개발자는 CI를 우회하려고 합니다. 따라서 속도 최적화는 문화 이슈이기도 합니다.
+
+```yaml
+- uses: actions/cache@v4
+  with:
+    path: ~/.cache/pip
+    key: pip-${{ runner.os }}-${{ hashFiles('requirements-dev.txt') }}
+
+strategy:
+  matrix:
+    shard: [1, 2, 3, 4]
+```
+
+캐시는 의존성 설치 시간을 줄이고, 매트릭스 병렬화는 테스트 체감 대기 시간을 줄입니다. 단, flaky test가 많으면 병렬화는 오히려 디버깅 비용을 높일 수 있으므로 안정화가 선행돼야 합니다.
+
+### 운영 연결 포인트
+
+CI 품질은 배포 안정성과 직결됩니다. PR 통과 기준이 약하면 CD는 항상 위험해집니다. 반대로 CI에서 경고 수준을 명확히 분리하고 실패 기준을 일관되게 유지하면 배포 판단이 훨씬 단순해집니다. 결국 CI는 개발 편의 기능이 아니라 운영 위험 제어 계층입니다.
 
 ## 처음 질문으로 돌아가기
 

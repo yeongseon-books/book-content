@@ -44,8 +44,6 @@ This is post 6 in the Compilers 101 series.
 
 This picture places intermediate representation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of intermediate representation is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - What an IR is and why it exists
@@ -59,8 +57,6 @@ This picture places intermediate representation inside an operating flow. The po
 The AST is a form for humans. Machine code is a form for the CPU. Without an IR between them, optimization is tightly coupled to the AST, and supporting a new CPU means rewriting every analysis. The IR splits the compiler cleanly into two halves — frontend and backend.
 
 > The bridge that turns "M languages × N architectures" into "M + N" is the IR.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR

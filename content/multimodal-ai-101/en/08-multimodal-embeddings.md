@@ -48,8 +48,6 @@ We will cover how multimodal embeddings are produced, compare OpenCLIP, SigLIP, 
 
 This picture places Multimodal Embeddings and Cross-modal Search inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Multimodal Embeddings and Cross-modal Search is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## 1. What Is a Multimodal Embedding
 
 A single-modal embedding compresses meaning within one modality. A text encoder turns sentences into vectors; an image encoder turns images into vectors. Even with the same dimensionality, the two live in different spaces, so comparing them directly is meaningless.

@@ -44,10 +44,6 @@ seo_description: 토크나이저까지 만들고 나면 잠깐 멍해집니다. 
 
 *LLM from Scratch 101 2장 흐름 개요*
 
-이 그림에서는 정수에서 벡터로, 그리고 위치를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 정수에서 벡터로, 그리고 위치의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
-
 ## 왜 이 글이 중요한가
 
 임베딩은 LLM 내부 표현의 첫 번째 관문입니다. 토크나이저가 텍스트를 숫자로 잘랐다면, 임베딩은 그 숫자를 모델이 다룰 수 있는 연속 벡터 공간으로 올려 보냅니다. 이 단계가 없으면 뒤에 있는 선형층과 어텐션은 아무 의미 있는 구조도 학습할 수 없습니다.
@@ -208,6 +204,12 @@ print(y[0])
 
 다음 글에서는 이제 이 벡터들이 서로를 보게 만듭니다. 즉, 각 토큰이 다른 토큰을 얼마나 참고할지 결정하는 어텐션과 QKV 구조가 본격적으로 등장합니다.
 
+## 디버깅에서 반드시 확인할 출력
+
+임베딩 단계는 코드가 짧아서 지나치기 쉽지만, shape와 인덱스 범위를 한 번만 잘못 다루어도 이후 학습이 조용히 망가집니다. 그래서 초기에는 `x.min()`, `x.max()`, `x.dtype`, `tok_emb.shape`, `pos_emb.shape`를 로그로 남기는 편이 안전합니다.
+
+특히 `x.max() >= vocab_size` 같은 상태는 즉시 실패로 처리해야 합니다. 이런 가드를 초기에 넣어 두면 어텐션 단계에서 원인 모를 `nan`을 추적하는 시간을 크게 줄일 수 있습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **`nn.Embedding`은 실제로 어떤 연산을 수행할까요?**
@@ -245,5 +247,7 @@ print(y[0])
 - [Vector Search 101 — 임베딩이란 무엇인가](../../vector-search-101/ko/01-what-is-embedding.md)
 - [LLM 앱 기초 — 토큰 이해하기](../../llm-app-foundations-101/ko/02-understanding-tokens.md)
 - [LangChain 101 — Prompt와 LLM Chain](../../langchain-101/ko/02-prompt-llm-chain.md)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/llm-from-scratch-101/ko/02-embedding)
 
 Tags: LLM, PyTorch, Transformer, Tutorial

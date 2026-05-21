@@ -45,7 +45,7 @@ This is post 4 in the Information Security 101 series.
 
 This picture places TLS and Certificates inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of TLS and Certificates is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
+> TLS is not just encryption in transit. It is about proving "this server is really example.com" via a chain of trust, and preventing a middle node from breaking into the conversation.
 
 ## What You Will Learn
 
@@ -60,8 +60,6 @@ This picture places TLS and Certificates inside an operating flow. The point is 
 More than half of service-to-service traffic is protected by TLS. Operating without understanding it leads to expired certificates, weak ciphers, and skipped validation — all common incidents.
 
 > The padlock icon is not magic; it is a precise procedure.
-
-## Concept at a Glance
 
 ```mermaid
 flowchart LR

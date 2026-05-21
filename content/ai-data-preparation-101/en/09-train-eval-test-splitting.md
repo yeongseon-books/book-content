@@ -41,8 +41,6 @@ This is post 9 in the AI Data Preparation 101 series. Here we cover practical sp
 
 This picture places Train/Eval/Test Splitting and Contamination Control inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Train/Eval/Test Splitting and Contamination Control is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## "Doesn't random_split cover it?"
 
 The pattern of `train_test_split(data, test_size=0.2)` failing in production repeats every year. Two reasons:

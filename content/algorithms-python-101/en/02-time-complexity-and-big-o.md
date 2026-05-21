@@ -42,8 +42,6 @@ This is post 2 in the Algorithms with Python 101 series. Here, we'll build an in
 
 This picture places Time Complexity and Big-O inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
-> The core of Time Complexity and Big-O is not the feature name; it is deciding what to verify at each boundary and which signal to keep.
-
 ## What You Will Learn
 
 - What time complexity means and why wall-clock time is insufficient

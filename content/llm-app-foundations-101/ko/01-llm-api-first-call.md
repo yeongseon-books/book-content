@@ -338,4 +338,6 @@ if __name__ == "__main__":
 - [프롬프트 엔지니어링 기초 — System·User·Assistant 역할](./03-prompt-engineering-basics.md)
 - [LLM API Production 101](../../llm-api-production-101/ko/01-structured-output.md) — 이 시리즈가 끝나는 지점, 즉 첫 호출·토큰·기본 프롬프트 다음 단계를 다룹니다. 구조화 출력, 툴 호출, 스트리밍, 재시도처럼 production 환경에서 부딪히는 문제로 넘어갈 때 권장합니다.
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/llm-app-foundations-101/ko/01-llm-api-first-call)
+
 Tags: LLM, OpenAI, Prompt Engineering, Python
