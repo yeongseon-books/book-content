@@ -30,7 +30,6 @@ title: "Math for CS 101 (6/10): 확률"
 
 여기서는 확률을 숫자 놀음이 아니라, 불확실성을 설명하는 언어로 보고 표본공간, 조건부 확률, 베이즈 정리, 기댓값, 분산을 차근차근 연결해 보겠습니다.
 
-
 ![Math for CS 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/06/06-01-concept-at-a-glance.ko.png)
 *Math for CS 101 6장 흐름 개요*
 > 확률은 불확실성을 감으로 다루는 대신, 기댓값과 분포로 정량적 의사결정을 가능하게 합니다.
@@ -153,11 +152,6 @@ def variance(values, probs):
 2. 베이즈 정리를 한 문장으로 설명해 보세요.
 3. 기댓값과 분산의 차이를 정리해 보세요.
 
-## 정리
-
-확률은 불확실성을 포기하지 않고 다루는 방법입니다. 표본공간, 사건, 조건부 확률, 베이즈 정리, 기댓값과 분산을 익히면 감으로만 판단하던 영역을 훨씬 차분하게 다룰 수 있습니다. 다음 글에서는 데이터를 다루는 또 다른 핵심 언어인 선형대수를 보겠습니다.
-
-
 ## 베이즈 정리를 진단 시나리오로 풀기
 
 베이즈 정리는 증거가 들어온 뒤 믿음을 갱신하는 규칙입니다. 의료 검사, 스팸 필터, 이상 탐지에서 거의 같은 형태로 등장합니다.
@@ -195,7 +189,6 @@ posterior = bayes_posterior(p_pos_given_disease, p_disease, p_pos)
 def expected_value(values, probs):
     return sum(v * p for v, p in zip(values, probs))
 
-
 def variance(values, probs):
     mu = expected_value(values, probs)
     return sum(p * (v - mu) ** 2 for v, p in zip(values, probs))
@@ -230,7 +223,6 @@ def estimate_tail_prob(trials: int = 100000) -> float:
 
 확률의 목표는 불확실성을 제거하는 것이 아니라, 불확실성을 같은 단위로 비교 가능하게 만드는 것입니다.
 
-
 ## 확률 결과를 제품 지표로 번역하기
 
 확률 계산이 끝난 뒤 실제 의사결정으로 연결하려면 임계값 정책이 필요합니다.
@@ -241,7 +233,6 @@ def decide_action(p_risk: float, threshold: float = 0.2) -> str:
 ```
 
 동일한 확률이라도 서비스 성격에 따라 임계값은 달라집니다. 결제 사기 탐지는 보수적으로, 추천 노출은 공격적으로 설정할 수 있습니다. 중요한 점은 임계값을 감으로 두지 않고 비용 함수와 함께 문서화하는 것입니다.
-
 
 ## 적용 연습 시나리오
 
@@ -266,7 +257,6 @@ class CheckResult:
     name: str
     passed: bool
     detail: str
-
 
 def run_checks(cases, predicate):
     results = []
@@ -356,7 +346,6 @@ print(expected(vals, probs), variance(vals, probs))
 ### 확률 모델 검증 원칙
 
 독립 가정, 정상성 가정, 표본 대표성은 모두 명시적으로 검증해야 합니다. 모델링 가정을 문서화하지 않으면 계산은 정확해 보여도 결론이 틀릴 수 있습니다.
-
 
 ### 몰테카를로 시뮬레이션
 
@@ -480,6 +469,10 @@ simulate_poisson_histogram()
 ```
 
 이 코드는 Poisson 분포의 모양을 텍스트 히스토그램으로 보여줍니다. 람다(λ)가 평균이자 분산인 특성을 눈으로 확인할 수 있습니다. 서버 오류 수, 초당 요청 수 같은 희귀 사건 모델링에 Poisson이 자연스럽게 등장하는 이유입니다.
+
+## 정리
+
+확률은 불확실성을 포기하지 않고 다루는 방법입니다. 표본공간, 사건, 조건부 확률, 베이즈 정리, 기댓값과 분산을 익히면 감으로만 판단하던 영역을 훨씬 차분하게 다룰 수 있습니다. 다음 글에서는 데이터를 다루는 또 다른 핵심 언어인 선형대수를 보겠습니다.
 
 ## 처음 질문으로 돌아가기
 

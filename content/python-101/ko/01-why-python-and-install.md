@@ -28,7 +28,6 @@ Python은 한 대의 컴퓨터에 여러 개가 동시에 존재할 수 있고, 
 
 이 글은 Python 101 시리즈의 첫 번째 글입니다.
 
-
 ![Python 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-101/01/01-01-mental-model.ko.png)
 *Python 101 1장 흐름 개요*
 > 왜 Python인가, 그리고 설치와 venv의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
@@ -328,14 +327,6 @@ hello-python/
 - [ ] `pip install`로 설치한 뒤 `pip freeze > requirements.txt`로 저장했다
 - [ ] 새 폴더에서 `pip install -r requirements.txt`로 환경을 재현해 보았다
 
-## 정리
-
-- system Python은 OS의 영역입니다. 절대 `pip install`하지 않습니다.
-- 프로젝트마다 `python3.12 -m venv .venv`로 격리된 환경을 만듭니다.
-- 활성화 후에는 `which python`으로 격리를 검증합니다 — 이 한 단계가 미래의 버그 절반을 막아줍니다.
-- `pip freeze > requirements.txt`로 환경을 문서화하고, 동료는 `pip install -r requirements.txt`로 재현합니다.
-- venv 안에서는 `python`을 그대로 써도 좋지만, 활성화 전에는 항상 `python3`을 사용합니다.
-
 ## 다음 글
 
 다음 글에서는 변수, 타입, 연산자를 다룹니다. Python의 동적 타입이 무엇을 의미하는지, type hint가 왜 필요한지, 정수·실수·문자열·bool·None이 어떻게 다르게 동작하는지 짚어 봅니다.
@@ -458,6 +449,14 @@ venv: .venv
 4) 결론: 수정 전후 동작 차이가 무엇인가
 
 이 습관은 초급 단계에서는 다소 느리게 느껴질 수 있습니다. 하지만 프로젝트 규모가 커질수록 "정확한 기록"이 가장 빠른 길이 됩니다. Python 문법을 익히는 것과 별개로, 실험을 재현 가능한 형태로 남기는 역량은 개발자로서의 성장 속도를 결정합니다.
+
+## 정리
+
+- system Python은 OS의 영역입니다. 절대 `pip install`하지 않습니다.
+- 프로젝트마다 `python3.12 -m venv .venv`로 격리된 환경을 만듭니다.
+- 활성화 후에는 `which python`으로 격리를 검증합니다 — 이 한 단계가 미래의 버그 절반을 막아줍니다.
+- `pip freeze > requirements.txt`로 환경을 문서화하고, 동료는 `pip install -r requirements.txt`로 재현합니다.
+- venv 안에서는 `python`을 그대로 써도 좋지만, 활성화 전에는 항상 `python3`을 사용합니다.
 
 ## 처음 질문으로 돌아가기
 

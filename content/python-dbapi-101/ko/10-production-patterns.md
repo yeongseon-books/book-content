@@ -324,23 +324,6 @@ production에서 흔히 쓰는 SLO 항목과 측정 방법:
 - [ ] BUSY 발생률/slow query 비율이 메트릭으로 노출되는가?
 - [ ] WAL 파일을 포함한 디스크 사용량이 모니터링되는가?
 
-## 정리
-10개의 글에서 다음을 다뤘습니다.
-
-- DB-API 2.0(PEP 249)이 정의하는 인터페이스와 sqlite3 매핑
-- connection, cursor, paramstyle, executemany
-- 파라미터 바인딩과 SQL injection 방지
-- 트랜잭션과 isolation, WAL, autocommit
-- row factory와 type adapter/converter
-- PEP 249 예외 계층과 retry 정책
-- thread-safety, check_same_thread, connection 전략
-- aiosqlite와 async 패턴
-- production 패턴: retry, timeout, 관측성, 백업
-
-이제 손에 쥔 도구로 "작지만 운영 가능한" SQLite 기반 서비스를 만들 수 있습니다. 다음 시리즈는 이 토대 위에 SQLAlchemy를 얹어 ORM과 세션 관리 패턴으로 한 단계 올라갑니다. SQLAlchemy를 미리 알 필요는 없고, 이 시리즈에서 다룬 트랜잭션/connection 관리가 그대로 SQLAlchemy의 동작을 이해하는 발판이 됩니다.
-
-읽어 주셔서 감사합니다.
-
 ## 심화 앵커: 프로덕션 구성 템플릿과 복구 런북
 
 운영 환경에서는 retry, timeout, 관측성, 백업 검증을 한 묶음으로 관리해야 합니다. 아래 connection 템플릿은 시작점으로 바로 사용할 수 있습니다.
@@ -365,6 +348,23 @@ def open_prod_conn(path: str) -> sqlite3.Connection:
 | Sev-3 | slow query 증가 | 인덱스/배치 크기 점검 |
 
 복구 절차는 문서만으로 끝내지 말고 주기적으로 리허설해야 합니다. `PRAGMA integrity_check`와 핵심 테이블 row count 검증을 자동화하면 백업 품질을 측정할 수 있습니다.
+
+## 정리
+10개의 글에서 다음을 다뤘습니다.
+
+- DB-API 2.0(PEP 249)이 정의하는 인터페이스와 sqlite3 매핑
+- connection, cursor, paramstyle, executemany
+- 파라미터 바인딩과 SQL injection 방지
+- 트랜잭션과 isolation, WAL, autocommit
+- row factory와 type adapter/converter
+- PEP 249 예외 계층과 retry 정책
+- thread-safety, check_same_thread, connection 전략
+- aiosqlite와 async 패턴
+- production 패턴: retry, timeout, 관측성, 백업
+
+이제 손에 쥔 도구로 "작지만 운영 가능한" SQLite 기반 서비스를 만들 수 있습니다. 다음 시리즈는 이 토대 위에 SQLAlchemy를 얹어 ORM과 세션 관리 패턴으로 한 단계 올라갑니다. SQLAlchemy를 미리 알 필요는 없고, 이 시리즈에서 다룬 트랜잭션/connection 관리가 그대로 SQLAlchemy의 동작을 이해하는 발판이 됩니다.
+
+읽어 주셔서 감사합니다.
 
 ## 처음 질문으로 돌아가기
 

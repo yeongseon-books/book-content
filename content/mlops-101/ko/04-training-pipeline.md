@@ -30,7 +30,6 @@ last_reviewed: '2026-05-12'
 
 여기서는 학습 파이프라인을 스크립트 자동화와 구분해서 보고, 왜 단계 분리와 DAG가 중요한지 작은 예제로 정리하겠습니다.
 
-
 ![MLOps 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/04/04-01-see-the-flow-first.ko.png)
 *MLOps 101 4장 흐름 개요*
 > 파이프라인의 핵심은 처음부터 끝까지 같은 구조로 모두 배울 수 있다는 데 있습니다. 한 단계 실패 시 거기서만 재시작할 수 있고, 각 단계의 입출력이 명확해 장애 원인도 빨리 찾힙니다.
@@ -347,13 +346,6 @@ run()
 2. 전처리 단계만 캐싱하는 규칙을 설계해 보세요.
 3. 실패 시 슬랙 알림이 가도록 의사코드를 적어 보세요.
 
-## 정리
-
-학습 파이프라인은 단순 자동 실행이 아니라, 학습 과정을 단계로 쪼개 재현과 복구를 쉽게 만드는 구조입니다. MLOps에서 DAG가 중요한 이유도 바로 여기에 있습니다.
-
-이 글에서 기억할 핵심은 하나입니다. **좋은 파이프라인은 학습 속도보다 실패 복구 속도를 먼저 높입니다.** 다음 글에서는 이렇게 만들어진 모델을 안전하게 서비스로 내보내는 배포를 다루겠습니다.
-
-
 ## Airflow와 Prefect로 보는 파이프라인 설계 차이
 
 오케스트레이터를 고를 때는 기능 목록보다 팀 운영 방식과 장애 대응 방식을 먼저 봐야 합니다.
@@ -375,18 +367,14 @@ from airflow.operators.python import PythonOperator
 from airflow.operators.empty import EmptyOperator
 from datetime import datetime
 
-
 def validate_schema():
     print("validate schema")
-
 
 def train_model():
     print("train model")
 
-
 def evaluate_model():
     print("evaluate model")
-
 
 def register_model():
     print("register model")
@@ -450,7 +438,6 @@ registry:
 - 동일 입력 재실행 시 출력 일관성을 검증합니다.
 
 이 게이트가 있어야 파이프라인 자동화가 단순 스케줄러를 넘어 품질 방어선 역할을 합니다.
-
 
 ## DVC 파이프라인과 학습 통합
 
@@ -542,14 +529,12 @@ from typing import Callable
 
 logger = logging.getLogger(__name__)
 
-
 @dataclass
 class StageResult:
     name: str
     success: bool
     output_path: str | None = None
     error: str | None = None
-
 
 def run_stage(name: str, fn: Callable, retries: int = 2) -> StageResult:
     for attempt in range(retries + 1):
@@ -587,7 +572,6 @@ STAGE_FAILURES = Counter(
     ["stage_name"],
 )
 
-
 def timed_stage(name: str, fn: Callable):
     start = time.time()
     try:
@@ -602,6 +586,12 @@ def timed_stage(name: str, fn: Callable):
 파이프라인 각 단계의 실행 시간과 실패 횟수를 메트릭으로 남기면, 어떤 단계가 병목인지, 어떤 단계가 자주 실패하는지 대시보드에서 바로 볼 수 있습니다.
 
 운영 환경에서는 이 메트릭을 Grafana 대시보드와 연결해 알림 조건을 설정합니다. 예를 들어 `pipeline_stage_duration_seconds{stage_name="train"}` 값이 SLA 임계치(예: 3600초)를 초과하면 Slack 알림을 보내도록 구성할 수 있습니다. 이렇게 하면 야간 배치 파이프라인이 예상보다 오래 걸릴 때 담당자가 즉시 인지할 수 있습니다.
+
+## 정리
+
+학습 파이프라인은 단순 자동 실행이 아니라, 학습 과정을 단계로 쪼개 재현과 복구를 쉽게 만드는 구조입니다. MLOps에서 DAG가 중요한 이유도 바로 여기에 있습니다.
+
+이 글에서 기억할 핵심은 하나입니다. **좋은 파이프라인은 학습 속도보다 실패 복구 속도를 먼저 높입니다.** 다음 글에서는 이렇게 만들어진 모델을 안전하게 서비스로 내보내는 배포를 다루겠습니다.
 
 ## 처음 질문으로 돌아가기
 

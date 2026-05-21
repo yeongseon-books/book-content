@@ -30,7 +30,6 @@ last_reviewed: '2026-05-12'
 
 여기서는 재학습을 단순 재실행이 아니라, 명시적 트리거와 챔피언-챌린저 비교를 거쳐 승격 여부를 판단하는 운영 루프로 보겠습니다.
 
-
 ![MLOps 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/08/08-01-see-the-flow-first.ko.png)
 *MLOps 101 8장 흐름 개요*
 > 되돌림 발동은 늨른 정진로, 결부부 되돌림은 랜덴 노아웰단 모델 뽄석기단 다른 거라임을 브랈동기 를미긴 되어브단 람닝 둌삤낙 두른 를응다라는 시스템도 나냈음단 중실단반듰 개닱옉답니다.
@@ -292,13 +291,6 @@ def handle_failure(reason: str):
 2. 섀도우 결과가 나쁘게 나왔을 때 어떤 데이터부터 점검할지 적어 보세요.
 3. 두 모델이 비슷하게 나오면 왜 챔피언 유지가 기본값이어야 하는지 설명해 보세요.
 
-## 정리
-
-재학습은 모델을 자동으로 다시 돌리는 기능이 아니라, 명시적 신호를 받아 새 후보를 만들고 챔피언과 비교해 승격 여부를 판단하는 운영 루프입니다.
-
-이 글에서 기억할 핵심은 하나입니다. **재학습이 자동이어도 승격은 항상 근거 기반이어야 합니다.** 다음 글에서는 학습과 서빙에서 같은 피처를 쓰기 위한 피처 스토어를 다루겠습니다.
-
-
 ## 재학습 트리거 정책을 코드로 고정하기
 
 재학습 자동화는 트리거 규칙이 명시적일 때만 안전합니다. 아래는 다중 신호를 결합하는 예시입니다.
@@ -306,14 +298,12 @@ def handle_failure(reason: str):
 ```python
 from dataclasses import dataclass
 
-
 @dataclass
 class RetrainSignals:
     psi: float
     val_auc: float
     days_since_train: int
     new_rows: int
-
 
 def retrain_reason(s: RetrainSignals) -> str | None:
     if s.psi >= 0.2:
@@ -368,7 +358,6 @@ promotion:
 def should_promote(champion_auc: float, challenger_auc: float, margin: float = 0.01) -> bool:
     return challenger_auc >= champion_auc + margin
 
-
 def final_decision(reason: str | None, shadow_ok: bool, champion_auc: float, challenger_auc: float) -> str:
     if reason is None:
         return "skip"
@@ -398,14 +387,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 
-
 @dataclass
 class MetricsSnapshot:
     psi: float
     auc: float
     baseline_auc: float
     days_since_train: int
-
 
 def decide_trigger(m: MetricsSnapshot) -> str | None:
     if m.psi >= 0.25:
@@ -415,7 +402,6 @@ def decide_trigger(m: MetricsSnapshot) -> str | None:
     if m.days_since_train >= 30:
         return "schedule"
     return None
-
 
 def build_retrain_request(model_name: str, trigger: str, data_version: str) -> dict:
     return {
@@ -457,7 +443,6 @@ notifications:
 
 스케줄러 설정은 단순 실행 시간이 아니라, 승격 간 최소 간격과 품질 게이트까지 함께 정의해야 운영 안정성을 유지할 수 있습니다.
 
-
 ## A/B 테스트로 재학습 모델 검증하기
 
 재학습한 모델이 기존 모델보다 정말 나은지 확인하려면 A/B 테스트가 필요합니다. 오프라인 메트릭(AUC, RMSE)이 좋아도 온라인 비즈니스 지표(전환율, 매출)가 나빠질 수 있기 때문입니다.
@@ -466,7 +451,6 @@ notifications:
 import hashlib
 from dataclasses import dataclass
 
-
 @dataclass
 class ABConfig:
     experiment_name: str
@@ -474,14 +458,12 @@ class ABConfig:
     treatment_model: str    # 재학습 모델 버전
     traffic_split: float    # treatment 비율 (0.0 ~ 1.0)
 
-
 def assign_variant(user_id: str, config: ABConfig) -> str:
     """사용자를 deterministic하게 control/treatment에 배정합니다."""
     hash_input = f"{config.experiment_name}:{user_id}"
     hash_value = int(hashlib.sha256(hash_input.encode()).hexdigest(), 16)
     bucket = (hash_value % 1000) / 1000.0
     return "treatment" if bucket < config.traffic_split else "control"
-
 
 def route_prediction(user_id: str, features: dict, config: ABConfig):
     """배정된 variant에 따라 해당 모델로 추론을 라우팅합니다."""
@@ -503,7 +485,6 @@ A/B 테스트 결과를 판단할 때는 충분한 샘플이 모여야 합니다
 ```python
 from scipy import stats
 import numpy as np
-
 
 def evaluate_ab_test(
     control_conversions: int,
@@ -554,6 +535,12 @@ def evaluate_ab_test(
 | 의료 영상 | 느림 | 분기~연간 | 새 데이터셋 확보 시 |
 
 정기 스케줄과 이벤트 트리거를 함께 사용하는 것이 가장 안정적입니다. 정기 재학습으로 점진적 변화를 따라가고, 드리프트 알림으로 급격한 변화에 대응합니다.
+
+## 정리
+
+재학습은 모델을 자동으로 다시 돌리는 기능이 아니라, 명시적 신호를 받아 새 후보를 만들고 챔피언과 비교해 승격 여부를 판단하는 운영 루프입니다.
+
+이 글에서 기억할 핵심은 하나입니다. **재학습이 자동이어도 승격은 항상 근거 기반이어야 합니다.** 다음 글에서는 학습과 서빙에서 같은 피처를 쓰기 위한 피처 스토어를 다루겠습니다.
 
 ## 처음 질문으로 돌아가기
 

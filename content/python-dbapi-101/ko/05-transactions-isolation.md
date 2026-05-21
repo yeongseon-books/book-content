@@ -332,11 +332,6 @@ with dst:
 
 ---
 
-## 정리
-sqlite3의 transaction은 driver가 친절하게 자동 관리해 주지만, 그 자동 동작을 모르면 운영에서 lock과 데이터 유실로 직결됩니다. `isolation_level` 5가지 값과 `BEGIN` 변종, WAL mode를 한 번 정리해 두면 대부분의 transaction 이슈가 진단 가능해집니다.
-
-다음 글에서는 **row factory와 type adapter**를 다룹니다. 기본 tuple 결과를 dict, dataclass, Pydantic 모델로 받는 방법, `detect_types`와 사용자 정의 adapter/converter, 그리고 새 타입(예: `Decimal`, `enum`)을 안전하게 매핑하는 법을 코드로 정리합니다.
-
 ## 심화 앵커: isolation level 비교를 코드로 재현하기
 
 격리 수준은 용어 암기보다 충돌 시점을 재현해 보는 편이 빠릅니다. `IMMEDIATE`는 write 의도를 트랜잭션 시작 시점에 드러내므로 충돌을 늦게 맞지 않습니다.
@@ -364,6 +359,11 @@ finally:
 | EXCLUSIVE | BEGIN 시점(전체 차단) | 유지보수 작업 |
 
 운영 규칙은 단순합니다. `OperationalError(BUSY/LOCKED)`는 짧은 백오프 재시도, `IntegrityError`는 즉시 실패, `CORRUPT` 계열은 복구 절차로 전환합니다.
+
+## 정리
+sqlite3의 transaction은 driver가 친절하게 자동 관리해 주지만, 그 자동 동작을 모르면 운영에서 lock과 데이터 유실로 직결됩니다. `isolation_level` 5가지 값과 `BEGIN` 변종, WAL mode를 한 번 정리해 두면 대부분의 transaction 이슈가 진단 가능해집니다.
+
+다음 글에서는 **row factory와 type adapter**를 다룹니다. 기본 tuple 결과를 dict, dataclass, Pydantic 모델로 받는 방법, `detect_types`와 사용자 정의 adapter/converter, 그리고 새 타입(예: `Decimal`, `enum`)을 안전하게 매핑하는 법을 코드로 정리합니다.
 
 ## 처음 질문으로 돌아가기
 

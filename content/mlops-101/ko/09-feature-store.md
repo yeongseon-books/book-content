@@ -30,7 +30,6 @@ last_reviewed: '2026-05-12'
 
 여기서는 피처 스토어를 피처 저장소가 아니라, 학습과 서빙이 같은 정의를 공유하게 만드는 계약 계층으로 보고 Feast 예제로 감각을 잡아 보겠습니다.
 
-
 ![MLOps 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/09/09-01-see-the-flow-first.ko.png)
 *MLOps 101 9장 흐름 개요*
 > 피처 스토어의 핵심은 단순 저장이 아니라, 학습 캐시스럽 배느에 스칼라도 써하는 동동남니다. 모들 먼 메타데이터는 본제 메타데이터로 남니다.
@@ -309,13 +308,6 @@ features = compute_user_features(user_id, live_df)
 2. 시점 일치 조인이 없으면 어떤 데이터 누수가 생기는지 설명해 보세요.
 3. Feast 대신 쓸 수 있는 대안 두 가지와 그 차이를 정리해 보세요.
 
-## 정리
-
-피처 스토어는 피처를 저장하는 상자가 아니라, 학습과 서빙이 같은 정의를 보게 만드는 계약 계층입니다. 이 계층이 있어야 모델이 오프라인에서 본 세상과 운영에서 보는 세상이 덜 어긋납니다.
-
-이 글에서 기억할 핵심은 하나입니다. **피처 스토어의 목적은 편의성이 아니라 학습-서빙 일관성입니다.** 다음 글에서는 지금까지의 조각들을 묶어 하나의 운영 가능한 ML 시스템으로 정리하겠습니다.
-
-
 ## Feast 실무 사용 패턴 확장
 
 피처 스토어의 가치는 피처 재사용과 학습-서빙 일관성에 있습니다. 이를 위해 피처 정의, 적재 주기, 신선도 정책을 함께 설계해야 합니다.
@@ -411,9 +403,7 @@ from __future__ import annotations
 import pandas as pd
 from feast import FeatureStore
 
-
 store = FeatureStore(repo_path="feature_repo")
-
 
 def load_training_features() -> pd.DataFrame:
     entity_df = pd.DataFrame(
@@ -427,7 +417,6 @@ def load_training_features() -> pd.DataFrame:
         features=["user_behavior_v1:purchase_cnt_7d", "user_behavior_v1:avg_spend_30d"],
     ).to_df()
 
-
 def load_online_features(user_id: int) -> dict:
     return store.get_online_features(
         features=["user_behavior_v1:purchase_cnt_7d", "user_behavior_v1:avg_spend_30d"],
@@ -436,7 +425,6 @@ def load_online_features(user_id: int) -> dict:
 ```
 
 피처 이름 집합이 학습과 서빙에서 동일하게 유지되면, 성능 하락 시 문제 원인을 모델과 피처 중 어디에서 먼저 볼지 훨씬 빠르게 좁힐 수 있습니다.
-
 
 ## Feast 피처 정의 상세 예시
 
@@ -496,7 +484,6 @@ fraud_detection_service = FeatureService(
 from great_expectations.core import ExpectationSuite, ExpectationConfiguration
 import great_expectations as gx
 
-
 def create_feature_validation_suite(feature_view_name: str) -> ExpectationSuite:
     """피처 뷰에 대한 데이터 품질 검증 스위트를 생성합니다."""
     suite = ExpectationSuite(expectation_suite_name=f"{feature_view_name}_validation")
@@ -546,7 +533,6 @@ def create_feature_validation_suite(feature_view_name: str) -> ExpectationSuite:
 import numpy as np
 from feast import FeatureStore
 
-
 def validate_online_offline_consistency(
     store: FeatureStore,
     entity_ids: list[dict],
@@ -584,6 +570,12 @@ def validate_online_offline_consistency(
 ```
 
 이 검증을 주기적으로 실행하면 training-serving skew를 조기에 발견할 수 있습니다.
+
+## 정리
+
+피처 스토어는 피처를 저장하는 상자가 아니라, 학습과 서빙이 같은 정의를 보게 만드는 계약 계층입니다. 이 계층이 있어야 모델이 오프라인에서 본 세상과 운영에서 보는 세상이 덜 어긋납니다.
+
+이 글에서 기억할 핵심은 하나입니다. **피처 스토어의 목적은 편의성이 아니라 학습-서빙 일관성입니다.** 다음 글에서는 지금까지의 조각들을 묶어 하나의 운영 가능한 ML 시스템으로 정리하겠습니다.
 
 ## 처음 질문으로 돌아가기
 

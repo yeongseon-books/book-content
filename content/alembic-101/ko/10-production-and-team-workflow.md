@@ -324,14 +324,6 @@ alembic upgrade head
 2. `/health`에 `alembic_version`을 추가하고 drift가 나면 알람을 올리는 간단한 모니터링 스크립트를 작성해 보세요.
 3. 가상의 incident 시나리오 하나를 정하고, 그 상황을 해결하는 forward-fix revision을 설계해 보세요.
 
-## 정리
-
-열 편에 걸쳐 Alembic의 init부터 production workflow까지 이어 봤습니다. 핵심을 한 문장으로 요약하면 이렇습니다.
-
-> “Schema changes ship before code, with broader compatibility, one PR per revision, downgrade verified in CI, monitoring detects drift, incidents respond with forward-fix.”
-
-시리즈는 여기서 끝나지만, 실제 운영에서는 위 원칙을 사람 기억이 아니라 PR template, CI enforcement, deploy pipeline, monitoring으로 자동화해야 합니다. 그다음 학습 단계는 SQLAlchemy ORM의 더 깊은 주제들입니다.
-
 ## 팀 런북 템플릿: migration release day
 
 문서가 길어질수록 현장 대응 속도는 떨어집니다. 운영일에는 아래처럼 짧은 런북 템플릿이 더 효과적입니다.
@@ -395,6 +387,14 @@ SELECT COUNT(*) FROM users WHERE phone IS NULL;
 ```
 
 이 두 쿼리만 정기적으로 수집해도 schema drift와 tighten 타이밍 오류를 빠르게 감지할 수 있습니다.
+
+## 정리
+
+열 편에 걸쳐 Alembic의 init부터 production workflow까지 이어 봤습니다. 핵심을 한 문장으로 요약하면 이렇습니다.
+
+> “Schema changes ship before code, with broader compatibility, one PR per revision, downgrade verified in CI, monitoring detects drift, incidents respond with forward-fix.”
+
+시리즈는 여기서 끝나지만, 실제 운영에서는 위 원칙을 사람 기억이 아니라 PR template, CI enforcement, deploy pipeline, monitoring으로 자동화해야 합니다. 그다음 학습 단계는 SQLAlchemy ORM의 더 깊은 주제들입니다.
 
 ## 처음 질문으로 돌아가기
 

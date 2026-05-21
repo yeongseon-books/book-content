@@ -196,18 +196,6 @@ def export_notes(db_path, csv_path, chunk=500):
 4. **`arraysize`를 default 1로 두고 large fetch** - server-side cursor가 있는 driver에서 round-trip이 row 수만큼 발생합니다. ETL에서는 100~1000 사이로 조정합니다.
 5. **iteration 중에 같은 cursor로 다른 query 실행** - 진행 중인 결과셋이 invalidate됩니다. cursor를 두 개 만들거나 결과를 list로 받은 뒤 처리합니다.
 
-## 정리
-
-- `execute()`는 단일 statement를, `executemany()`는 같은 statement의 대량 쓰기를 담당합니다.
-- `fetchone`/`fetchall`/`fetchmany`/`for row in cur`는 습관이 아니라 결과 크기로 선택해야 합니다.
-- `for row in cur`는 큰 결과셋에서 OOM을 막는 streaming 기본 패턴입니다.
-- `arraysize`를 조정하면 driver의 prefetch 동작을 활용해 round-trip을 줄일 수 있습니다.
-- `rowcount`는 INSERT/UPDATE/DELETE에서만 신뢰하고 SELECT에서는 별도 count query를 사용합니다.
-
-다음 글에서는 parameter binding과 SQL injection 방어를 다룹니다.
-
-<!-- a-grade-example:begin -->
-
 ## 체크리스트
 
 - [ ] executemany로 다중 INSERT를 단일 호출로 처리했다.
@@ -361,6 +349,18 @@ def timed(fn, *args, **kwargs):
 ### Q5. 팀 단위로 품질을 유지하려면 어떤 합의가 필요하나요?
 
 코드 스타일 합의보다 더 중요한 것은 실패 처리 합의입니다. 어떤 예외를 retry할지, 어떤 예외를 즉시 실패로 처리할지, 어떤 로그 필드를 남길지를 문서와 테스트로 고정해야 합니다.
+
+## 정리
+
+- `execute()`는 단일 statement를, `executemany()`는 같은 statement의 대량 쓰기를 담당합니다.
+- `fetchone`/`fetchall`/`fetchmany`/`for row in cur`는 습관이 아니라 결과 크기로 선택해야 합니다.
+- `for row in cur`는 큰 결과셋에서 OOM을 막는 streaming 기본 패턴입니다.
+- `arraysize`를 조정하면 driver의 prefetch 동작을 활용해 round-trip을 줄일 수 있습니다.
+- `rowcount`는 INSERT/UPDATE/DELETE에서만 신뢰하고 SELECT에서는 별도 count query를 사용합니다.
+
+다음 글에서는 parameter binding과 SQL injection 방어를 다룹니다.
+
+<!-- a-grade-example:begin -->
 
 ## 처음 질문으로 돌아가기
 

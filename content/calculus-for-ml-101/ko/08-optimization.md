@@ -32,7 +32,6 @@ last_reviewed: '2026-05-12'
 
 끝까지 읽고 나면 optimizer 선택을 “유명하니까 Adam” 수준이 아니라, 현재 손실 지형과 학습 단계에 맞는 설계 판단으로 볼 수 있게 됩니다.
 
-
 ![Calculus for ML 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/08/08-01-concept-at-a-glance.ko.png)
 *Calculus for ML 101 8장 흐름 개요*
 
@@ -133,15 +132,6 @@ L2 regularization은 파라미터가 과도하게 커지는 것을 억제해 일
 - [ ] weight decay 또는 regularization 설정을 명시적으로 분리해 관리한다
 - [ ] 재시작 시 optimizer state 복원 정책을 실험 설정에 포함한다
 - [ ] 성능 문제를 볼 때 모델 구조와 함께 optimization recipe 전체를 점검한다
-
-## 정리
-
-최적화는 plain gradient descent를 더 빠르고 안정적으로 만들기 위한 보강 기법들의 조합입니다. momentum은 방향 일관성을, RMSProp은 좌표별 적응성을, Adam은 둘의 결합을 제공합니다. 여기에 schedule과 regularization이 더해져 실제 훈련 루프가 완성됩니다.
-
-실무에서는 optimizer 이름보다 recipe 전체가 더 중요할 때가 많습니다. learning rate, warmup, weight decay, gradient clipping이 함께 설계되어야 같은 모델도 제대로 학습됩니다. 그래서 optimization은 “어떤 알고리즘을 썼는가”보다 “gradient를 어떻게 다뤘는가”의 문제에 가깝습니다.
-
-다음 글에서는 이 optimization에 들어가는 gradient가 네트워크 전체에서 어떻게 계산되는지, 즉 backpropagation을 계산 그래프 관점에서 다시 보겠습니다.
-
 
 ## Adam을 식으로 다시 전개하기
 
@@ -364,7 +354,6 @@ batch size를 키우면 gradient 분산이 줄어 학습률을 키울 여지가 
 
 실험 로그는 반드시 `seed`, `batch size`, `augmentation`, `scheduler`를 함께 저장해야 합니다. optimizer만 바꿨다고 생각했지만 실제로는 다른 조건이 섞여 있으면 결론이 왜곡됩니다.
 
-
 ## AdamW 구현 세부: 파라미터 그룹과 예외 규칙
 
 실무 학습 코드에서는 모든 파라미터에 동일한 weight decay를 주지 않습니다. 일반적으로 bias와 normalization 계층 파라미터는 decay에서 제외합니다.
@@ -427,7 +416,6 @@ for step, batch in enumerate(loader):
 
 최적화는 결과만 기록하면 재사용하기 어렵습니다. "징후-가설-조치"까지 함께 저장해야 다음 프로젝트에서 의사결정 속도가 빨라집니다.
 
-
 ## Optimizer 선택 의사결정 트리
 
 아래 트리는 팀 내에서 optimizer 기본값을 빠르게 정할 때 쓸 수 있는 실무형 규칙입니다.
@@ -450,6 +438,14 @@ for step, batch in enumerate(loader):
 | 초반 NaN | scale 불안정 | warmup 추가, clipping 적용 |
 
 결정 트리는 완벽한 정답표가 아니라, 실패를 빠르게 좁히는 공통 언어입니다. 같은 징후를 같은 순서로 점검하면 실험 반복 비용을 크게 줄일 수 있습니다.
+
+## 정리
+
+최적화는 plain gradient descent를 더 빠르고 안정적으로 만들기 위한 보강 기법들의 조합입니다. momentum은 방향 일관성을, RMSProp은 좌표별 적응성을, Adam은 둘의 결합을 제공합니다. 여기에 schedule과 regularization이 더해져 실제 훈련 루프가 완성됩니다.
+
+실무에서는 optimizer 이름보다 recipe 전체가 더 중요할 때가 많습니다. learning rate, warmup, weight decay, gradient clipping이 함께 설계되어야 같은 모델도 제대로 학습됩니다. 그래서 optimization은 “어떤 알고리즘을 썼는가”보다 “gradient를 어떻게 다뤘는가”의 문제에 가깝습니다.
+
+다음 글에서는 이 optimization에 들어가는 gradient가 네트워크 전체에서 어떻게 계산되는지, 즉 backpropagation을 계산 그래프 관점에서 다시 보겠습니다.
 
 ## 처음 질문으로 돌아가기
 

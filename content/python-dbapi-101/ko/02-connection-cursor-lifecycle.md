@@ -217,18 +217,6 @@ cur.execute("SELECT 1")  # PostgreSQL: errors or discards the previous result
 
 server-side cursor를 쓰는 환경에서는 이전 결과를 다 읽거나 명시적으로 `cur.close()` 후 새 query를 던져야 합니다.
 
-## 정리
-
-- Connection은 통신 채널이자 transaction context이고, cursor는 단일 query 실행 단위입니다.
-- `with` 문은 lifecycle 관리의 기본 패턴이지만, SQLite의 `with conn`은 close가 아니라 commit/rollback만 담당합니다.
-- 실무에서는 try/commit/except/rollback/finally/close를 감싼 context manager로 일관성을 만드는 편이 안전합니다.
-- 동시 결과셋이 필요하면 cursor를 여러 개 만들고, connection은 재사용하거나 pool로 관리합니다.
-- connection leak, idle timeout, fork 이후 공유, cursor 미정리는 가장 흔한 lifecycle 버그입니다.
-
-다음 글에서는 `execute()`, `executemany()`, `fetchone()`/`fetchall()`/`fetchmany()`의 실전 패턴을 정리합니다.
-
-<!-- a-grade-example:begin -->
-
 ## 체크리스트
 
 - [ ] `with sqlite3.connect(...) as conn:` 패턴으로 자원 누수 없이 query를 실행했다.
@@ -367,6 +355,18 @@ def timed(fn, *args, **kwargs):
 ### 추가 점검 한 줄
 
 cursor를 외부로 반환하는 함수가 있다면 lifecycle 책임자가 모호해집니다. repository 함수 안에서 cursor를 열고 닫는 구조로 통일하면 누수와 장기 락을 줄일 수 있습니다.
+
+## 정리
+
+- Connection은 통신 채널이자 transaction context이고, cursor는 단일 query 실행 단위입니다.
+- `with` 문은 lifecycle 관리의 기본 패턴이지만, SQLite의 `with conn`은 close가 아니라 commit/rollback만 담당합니다.
+- 실무에서는 try/commit/except/rollback/finally/close를 감싼 context manager로 일관성을 만드는 편이 안전합니다.
+- 동시 결과셋이 필요하면 cursor를 여러 개 만들고, connection은 재사용하거나 pool로 관리합니다.
+- connection leak, idle timeout, fork 이후 공유, cursor 미정리는 가장 흔한 lifecycle 버그입니다.
+
+다음 글에서는 `execute()`, `executemany()`, `fetchone()`/`fetchall()`/`fetchmany()`의 실전 패턴을 정리합니다.
+
+<!-- a-grade-example:begin -->
 
 ## 처음 질문으로 돌아가기
 

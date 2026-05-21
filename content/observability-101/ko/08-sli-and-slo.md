@@ -28,7 +28,6 @@ last_reviewed: '2026-05-15'
 
 이 글은 Observability 101 시리즈의 8번째 글입니다.
 
-
 ![Observability 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/08/08-01-concept-at-a-glance.ko.png)
 *Observability 101 8장 흐름 개요*
 > 서비스 수준 지표와 목표 기초의 핵심은 도구 선택이 아니라, 언제 어디서 이 신호를 남기고 어떻게 해석할 것인가 하는 설계입니다.
@@ -304,17 +303,12 @@ def check_slo_breach(metrics, slo_priority):
 2. 99.9% 목표의 월간 오류 예산 시간을 직접 계산해 보세요.
 3. 빠른 소진과 느린 소진을 함께 잡는 경보 짝을 설계해 보세요.
 
-## 정리
-
-서비스 수준 지표와 목표는 신뢰성을 감정이 아니라 숫자로 다루게 해 줍니다. 측정된 값, 약속한 값, 허용한 실패량이 분리되면 운영 우선순위가 선명해집니다. 다음 글에서는 이 모든 관측성을 오래 운영하기 위해 반드시 알아야 할 비용과 카디널리티를 살펴보겠습니다.
-
 ## SLI 계산 코드 예시
 
 지표 정의가 문서에만 있으면 운영 중 해석이 갈리기 쉽습니다. 아래처럼 계산 로직을 코드로 명시하면 팀 내 합의가 유지됩니다.
 
 ```python
 from dataclasses import dataclass
-
 
 @dataclass
 class SLIResult:
@@ -325,12 +319,10 @@ class SLIResult:
     def value(self) -> float:
         return 0.0 if self.total == 0 else self.good / self.total
 
-
 def availability_sli(status_codes: list[int]) -> SLIResult:
     total = len(status_codes)
     good = sum(1 for code in status_codes if 200 <= code < 500)
     return SLIResult(good=good, total=total)
-
 
 samples = [200, 200, 201, 502, 503, 200, 429, 200]
 result = availability_sli(samples)
@@ -516,6 +508,10 @@ deliverables:
 ```
 
 각 단계에서 가장 중요한 것은 팀이 SLO를 의사결정 도구로 사용하는 습관을 만드는 것입니다. 숫자를 만드는 것보다 숫자를 보고 행동하는 문화가 먼저입니다.
+
+## 정리
+
+서비스 수준 지표와 목표는 신뢰성을 감정이 아니라 숫자로 다루게 해 줍니다. 측정된 값, 약속한 값, 허용한 실패량이 분리되면 운영 우선순위가 선명해집니다. 다음 글에서는 이 모든 관측성을 오래 운영하기 위해 반드시 알아야 할 비용과 카디널리티를 살펴보겠습니다.
 
 ## 처음 질문으로 돌아가기
 

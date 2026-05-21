@@ -326,14 +326,6 @@ threading.Thread(target=writer_worker, daemon=True).start()
 - [ ] 동시 쓰기 부하 테스트로 BUSY 발생률을 측정했는가?
 - [ ] connection 누수가 없는지 (`PRAGMA database_list`나 OS 핸들 모니터링) 확인했는가?
 
-## 정리
-- SQLite connection은 파일 핸들에 가깝고, 큰 connection pool보다 "역할별 작은 connection 전략"이 어울립니다.
-- `sqlite3.threadsafety`와 `check_same_thread`는 별개의 가드이며 둘 다 이해해야 합니다.
-- 대부분의 웹앱에는 "요청 단위 open/close + WAL 모드 + busy_timeout"이 가장 단순하고 안전한 기본값입니다.
-- 쓰기 병목이 있다면 read/write 분리, 단일 writer 큐를 검토합니다.
-
-다음 글에서는 동기 모델을 떠나 `aiosqlite`로 비동기 SQLite를 다룹니다. asyncio 컨텍스트에서 connection과 트랜잭션을 어떻게 쥐는지, 그리고 FastAPI의 async path와 어떻게 어우러지는지 살펴봅니다.
-
 ## 심화 앵커: 풀링 메트릭으로 병목을 식별하는 방법
 
 SQLite 풀링은 connection 생성 비용 절감보다 경계 제어가 목적입니다. 그래서 풀 크기보다 대기 시간과 BUSY 비율을 먼저 봐야 합니다.
@@ -365,6 +357,14 @@ class Pool:
 | `db.busy_rate` | 락 충돌 비율 |
 
 권장 구조는 read 경로와 write 경로 분리입니다. read pool은 다수, write 경로는 단일 직렬화로 두는 편이 SQLite 특성과 가장 잘 맞습니다.
+
+## 정리
+- SQLite connection은 파일 핸들에 가깝고, 큰 connection pool보다 "역할별 작은 connection 전략"이 어울립니다.
+- `sqlite3.threadsafety`와 `check_same_thread`는 별개의 가드이며 둘 다 이해해야 합니다.
+- 대부분의 웹앱에는 "요청 단위 open/close + WAL 모드 + busy_timeout"이 가장 단순하고 안전한 기본값입니다.
+- 쓰기 병목이 있다면 read/write 분리, 단일 writer 큐를 검토합니다.
+
+다음 글에서는 동기 모델을 떠나 `aiosqlite`로 비동기 SQLite를 다룹니다. asyncio 컨텍스트에서 connection과 트랜잭션을 어떻게 쥐는지, 그리고 FastAPI의 async path와 어떻게 어우러지는지 살펴봅니다.
 
 ## 처음 질문으로 돌아가기
 

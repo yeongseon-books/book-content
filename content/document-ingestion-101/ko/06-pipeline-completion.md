@@ -205,133 +205,6 @@ result=policy.pdf chunk_id=chunk-01 preview=Chunk metadata should preserve the o
 - [ ] FAISS 인덱스를 저장하고 다시 불러왔습니다.
 - [ ] 재로드한 인덱스로 검색까지 검증했습니다.
 
-## 정리
-
-완성된 파이프라인은 기능 목록이 많아서가 아니라, 각 단계의 출력이 다음 단계의 입력으로 자연스럽게 이어질 때 비로소 완성됩니다. 그래서 마지막 검증은 개별 기술보다 handoff가 끊기지 않는지를 보는 데 초점이 있어야 합니다.
-
-이 시리즈에서 다룬 PDF 추출, 청킹, 메타데이터, 증분 인덱싱, 다중 포맷 수집은 따로 존재하는 팁이 아닙니다. 하나의 흐름으로 묶였을 때 비로소 문서 수집 시스템의 최소 형태가 됩니다.
-
-### 단계 오케스트레이션을 명시적으로 분리하는 예시
-
-엔드투엔드 스크립트가 커질수록 각 단계가 암묵적으로 호출되기 쉽습니다. 이 상태에서는 어느 단계가 실패했는지 찾기 어렵고, 일부 단계만 재실행하기도 불편합니다. 그래서 오케스트레이터에서 단계 정의와 실행 순서를 별도 구조로 분리하면 운영성이 좋아집니다.
-
-```python
-from __future__ import annotations
-
-from dataclasses import dataclass
-from time import perf_counter
-from typing import Any, Callable
-
-StageFn = Callable[[dict[str, Any]], dict[str, Any]]
-
-@dataclass(frozen=True)
-class Stage:
-    name: str
-    fn: StageFn
-
-def run_pipeline(stages: list[Stage], initial_context: dict[str, Any]) -> dict[str, Any]:
-    context = initial_context.copy()
-    for stage in stages:
-        started = perf_counter()
-        context = stage.fn(context)
-        elapsed_ms = (perf_counter() - started) * 1000
-        print(f"stage={stage.name} status=ok elapsed_ms={elapsed_ms:.1f}")
-    return context
-```
-
-이 구조의 핵심은 단계 함수가 `context`를 입력과 출력으로 공유한다는 점입니다. 입력 파일 목록, 추출된 문서, 청크 목록, 인덱스 경로 같은 중간 산출물을 한 객체에 모으면 디버깅 경로가 짧아집니다.
-
-### 오류 처리 패턴: 치명적 실패와 부분 실패를 분리하기
-
-모든 실패를 즉시 중단으로 처리하면 파이프라인 안정성이 떨어질 수 있습니다. 반대로 모든 실패를 무시하면 품질이 조용히 붕괴합니다. 그래서 파일 단위 실패는 누적하고, 계약 위반은 즉시 중단하는 이중 정책이 실무에서 자주 쓰입니다.
-
-```python
-from __future__ import annotations
-
-from dataclasses import dataclass
-from typing import Any
-
-@dataclass
-class StageFailure:
-    stage: str
-    source: str
-    error: str
-
-class PipelineContractError(RuntimeError):
-    pass
-
-def load_stage(context: dict[str, Any]) -> dict[str, Any]:
-    loaded = []
-    failures: list[StageFailure] = context.setdefault('failures', [])
-    for source in context['sources']:
-        try:
-            loaded.extend(load_file(source))
-        except Exception as exc:  # noqa: BLE001
-            failures.append(StageFailure(stage='load', source=str(source), error=str(exc)))
-    context['loaded'] = loaded
-    return context
-
-def validate_stage(context: dict[str, Any]) -> dict[str, Any]:
-    chunks = context.get('chunks', [])
-    if not chunks:
-        raise PipelineContractError('chunk stage produced zero chunks')
-    if any('source' not in chunk.metadata for chunk in chunks):
-        raise PipelineContractError('chunk metadata missing source')
-    return context
-```
-
-위 패턴은 재시도 대상과 즉시 수정 대상을 구분해 줍니다. 로더에서 개별 파일 실패가 일부 발생해도 전체 배치를 끝까지 실행해 리포트를 만들 수 있고, 계약 위반은 빠르게 멈춰 잘못된 인덱스를 남기지 않습니다.
-
-### 모니터링 지표를 로그에 구조화해 남기는 방법
-
-운영에서는 "성공했다"라는 한 줄보다 단계별 수치가 중요합니다. 최소한 처리 파일 수, 청크 수, 실패 수, 단계별 지연 시간을 구조화된 로그로 남겨야 추세를 볼 수 있습니다.
-
-```python
-from __future__ import annotations
-
-import json
-from datetime import datetime
-
-def emit_metric(name: str, value: int | float, **labels: str) -> None:
-    payload = {
-        'ts': datetime.now().isoformat(timespec='seconds'),
-        'metric': name,
-        'value': value,
-        'labels': labels,
-    }
-    print(json.dumps(payload, ensure_ascii=False))
-
-def report_run_summary(context: dict[str, object]) -> None:
-    emit_metric('ingestion.files_total', int(context.get('files_total', 0)), env='prod')
-    emit_metric('ingestion.chunks_total', int(context.get('chunks_total', 0)), env='prod')
-    emit_metric('ingestion.failures_total', int(context.get('failures_total', 0)), env='prod')
-    emit_metric('ingestion.duration_ms', float(context.get('duration_ms', 0.0)), env='prod')
-```
-
-JSON 로그를 쓰면 이후 로그 수집기나 메트릭 변환기에서 파싱하기 쉽습니다. 또한 배치 ID, 테넌트, 문서 유형 같은 라벨을 추가하면 장애 범위를 특정하기 훨씬 수월해집니다.
-
-### 파이프라인 완료 기준을 코드로 정의하기
-
-완료 기준이 문서로만 남아 있으면 실제 실행에서 누락되기 쉽습니다. 아래처럼 품질 게이트를 함수로 두면, 완료 조건을 실행 가능한 규칙으로 관리할 수 있습니다.
-
-```python
-from __future__ import annotations
-
-def assert_completion(context: dict[str, object]) -> None:
-    if int(context.get('files_total', 0)) == 0:
-        raise RuntimeError('no input files discovered')
-    if int(context.get('chunks_total', 0)) == 0:
-        raise RuntimeError('no chunks generated')
-    if int(context.get('index_rows_total', 0)) < int(context.get('chunks_total', 0)):
-        raise RuntimeError('index row count is smaller than chunk count')
-    if int(context.get('sample_results_total', 0)) == 0:
-        raise RuntimeError('post-index validation query returned zero results')
-```
-
-이 기준은 작은 데모에서도 유효하고, 실제 운영 파이프라인으로 확장할 때도 그대로 재사용할 수 있습니다. 즉, 완성의 기준을 감각이 아니라 측정 가능한 조건으로 고정하는 역할을 합니다.
-
-결국 엔드투엔드 파이프라인의 완성은 화려한 모델보다 실행 경계의 명확성에서 나옵니다. 오케스트레이션 구조, 오류 정책, 모니터링 지표, 완료 게이트를 함께 설계해야 장기 운영에서 재현성과 복구 가능성을 확보할 수 있습니다.
-
 ## 실무 확장: 엔드투엔드 파이프라인 운영 규약
 
 마지막 단계에서 중요한 것은 "한 번 돌아간다"가 아니라 "매일 같은 방식으로 돌아간다"입니다. 이를 위해서는 단계 오케스트레이션, 메타데이터 계약 검증, 벡터 DB 품질 점검, 실행 리포트 생성이 하나의 배치 규약으로 묶여야 합니다.
@@ -459,6 +332,133 @@ def quick_health_report(stats: dict[str, int | float]) -> None:
 ## 시리즈를 마치며: 다음 단계를 위한 출발점
 
 이 시리즈에서 다룬 여섯 단계는 문서 수집 파이프라인의 최소 완성 형태입니다. 여기에 LLM 기반 답변 생성, 사용자 피드백 루프, A/B 검색 실험을 붙이면 RAG 시스템의 전체 윤곽이 됩니다. 하지만 그 확장이 안정적이려면 이 시리즈에서 만든 입력 품질 계약과 단계별 검증 게이트가 먼저 자리 잡아야 합니다.
+
+## 정리
+
+완성된 파이프라인은 기능 목록이 많아서가 아니라, 각 단계의 출력이 다음 단계의 입력으로 자연스럽게 이어질 때 비로소 완성됩니다. 그래서 마지막 검증은 개별 기술보다 handoff가 끊기지 않는지를 보는 데 초점이 있어야 합니다.
+
+이 시리즈에서 다룬 PDF 추출, 청킹, 메타데이터, 증분 인덱싱, 다중 포맷 수집은 따로 존재하는 팁이 아닙니다. 하나의 흐름으로 묶였을 때 비로소 문서 수집 시스템의 최소 형태가 됩니다.
+
+### 단계 오케스트레이션을 명시적으로 분리하는 예시
+
+엔드투엔드 스크립트가 커질수록 각 단계가 암묵적으로 호출되기 쉽습니다. 이 상태에서는 어느 단계가 실패했는지 찾기 어렵고, 일부 단계만 재실행하기도 불편합니다. 그래서 오케스트레이터에서 단계 정의와 실행 순서를 별도 구조로 분리하면 운영성이 좋아집니다.
+
+```python
+from __future__ import annotations
+
+from dataclasses import dataclass
+from time import perf_counter
+from typing import Any, Callable
+
+StageFn = Callable[[dict[str, Any]], dict[str, Any]]
+
+@dataclass(frozen=True)
+class Stage:
+    name: str
+    fn: StageFn
+
+def run_pipeline(stages: list[Stage], initial_context: dict[str, Any]) -> dict[str, Any]:
+    context = initial_context.copy()
+    for stage in stages:
+        started = perf_counter()
+        context = stage.fn(context)
+        elapsed_ms = (perf_counter() - started) * 1000
+        print(f"stage={stage.name} status=ok elapsed_ms={elapsed_ms:.1f}")
+    return context
+```
+
+이 구조의 핵심은 단계 함수가 `context`를 입력과 출력으로 공유한다는 점입니다. 입력 파일 목록, 추출된 문서, 청크 목록, 인덱스 경로 같은 중간 산출물을 한 객체에 모으면 디버깅 경로가 짧아집니다.
+
+### 오류 처리 패턴: 치명적 실패와 부분 실패를 분리하기
+
+모든 실패를 즉시 중단으로 처리하면 파이프라인 안정성이 떨어질 수 있습니다. 반대로 모든 실패를 무시하면 품질이 조용히 붕괴합니다. 그래서 파일 단위 실패는 누적하고, 계약 위반은 즉시 중단하는 이중 정책이 실무에서 자주 쓰입니다.
+
+```python
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Any
+
+@dataclass
+class StageFailure:
+    stage: str
+    source: str
+    error: str
+
+class PipelineContractError(RuntimeError):
+    pass
+
+def load_stage(context: dict[str, Any]) -> dict[str, Any]:
+    loaded = []
+    failures: list[StageFailure] = context.setdefault('failures', [])
+    for source in context['sources']:
+        try:
+            loaded.extend(load_file(source))
+        except Exception as exc:  # noqa: BLE001
+            failures.append(StageFailure(stage='load', source=str(source), error=str(exc)))
+    context['loaded'] = loaded
+    return context
+
+def validate_stage(context: dict[str, Any]) -> dict[str, Any]:
+    chunks = context.get('chunks', [])
+    if not chunks:
+        raise PipelineContractError('chunk stage produced zero chunks')
+    if any('source' not in chunk.metadata for chunk in chunks):
+        raise PipelineContractError('chunk metadata missing source')
+    return context
+```
+
+위 패턴은 재시도 대상과 즉시 수정 대상을 구분해 줍니다. 로더에서 개별 파일 실패가 일부 발생해도 전체 배치를 끝까지 실행해 리포트를 만들 수 있고, 계약 위반은 빠르게 멈춰 잘못된 인덱스를 남기지 않습니다.
+
+### 모니터링 지표를 로그에 구조화해 남기는 방법
+
+운영에서는 "성공했다"라는 한 줄보다 단계별 수치가 중요합니다. 최소한 처리 파일 수, 청크 수, 실패 수, 단계별 지연 시간을 구조화된 로그로 남겨야 추세를 볼 수 있습니다.
+
+```python
+from __future__ import annotations
+
+import json
+from datetime import datetime
+
+def emit_metric(name: str, value: int | float, **labels: str) -> None:
+    payload = {
+        'ts': datetime.now().isoformat(timespec='seconds'),
+        'metric': name,
+        'value': value,
+        'labels': labels,
+    }
+    print(json.dumps(payload, ensure_ascii=False))
+
+def report_run_summary(context: dict[str, object]) -> None:
+    emit_metric('ingestion.files_total', int(context.get('files_total', 0)), env='prod')
+    emit_metric('ingestion.chunks_total', int(context.get('chunks_total', 0)), env='prod')
+    emit_metric('ingestion.failures_total', int(context.get('failures_total', 0)), env='prod')
+    emit_metric('ingestion.duration_ms', float(context.get('duration_ms', 0.0)), env='prod')
+```
+
+JSON 로그를 쓰면 이후 로그 수집기나 메트릭 변환기에서 파싱하기 쉽습니다. 또한 배치 ID, 테넌트, 문서 유형 같은 라벨을 추가하면 장애 범위를 특정하기 훨씬 수월해집니다.
+
+### 파이프라인 완료 기준을 코드로 정의하기
+
+완료 기준이 문서로만 남아 있으면 실제 실행에서 누락되기 쉽습니다. 아래처럼 품질 게이트를 함수로 두면, 완료 조건을 실행 가능한 규칙으로 관리할 수 있습니다.
+
+```python
+from __future__ import annotations
+
+def assert_completion(context: dict[str, object]) -> None:
+    if int(context.get('files_total', 0)) == 0:
+        raise RuntimeError('no input files discovered')
+    if int(context.get('chunks_total', 0)) == 0:
+        raise RuntimeError('no chunks generated')
+    if int(context.get('index_rows_total', 0)) < int(context.get('chunks_total', 0)):
+        raise RuntimeError('index row count is smaller than chunk count')
+    if int(context.get('sample_results_total', 0)) == 0:
+        raise RuntimeError('post-index validation query returned zero results')
+```
+
+이 기준은 작은 데모에서도 유효하고, 실제 운영 파이프라인으로 확장할 때도 그대로 재사용할 수 있습니다. 즉, 완성의 기준을 감각이 아니라 측정 가능한 조건으로 고정하는 역할을 합니다.
+
+결국 엔드투엔드 파이프라인의 완성은 화려한 모델보다 실행 경계의 명확성에서 나옵니다. 오케스트레이션 구조, 오류 정책, 모니터링 지표, 완료 게이트를 함께 설계해야 장기 운영에서 재현성과 복구 가능성을 확보할 수 있습니다.
 
 ## 처음 질문으로 돌아가기
 

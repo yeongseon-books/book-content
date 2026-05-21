@@ -318,14 +318,6 @@ def post_user(payload: UserCreate, conn=Depends(get_conn)):
 - [ ] retry 횟수와 최종 결과가 로그/메트릭으로 남는가?
 - [ ] `ProgrammingError`는 알림 시스템으로 즉시 전달되는가?
 
-## 정리
-- PEP 249 예외 계층을 "코드 버그 / 비즈니스 규칙 / 일시적 환경 문제"로 다시 묶으면 의사결정이 단순해집니다.
-- `sqlite3`는 SQLite 에러 코드를 PEP 249 클래스로 매핑하지만, 같은 `OperationalError` 안에도 retry 대상과 비대상이 섞여 있어 `sqlite_errorname`까지 봐야 합니다.
-- retry는 BUSY/LOCKED 계열에만 적용하고, `IntegrityError`는 도메인 예외로 변환해 4xx로 돌려줍니다.
-- 트랜잭션은 retry 단위 안에 두고, `max_attempts`와 jitter를 반드시 설정합니다.
-
-다음 글에서는 connection 자체를 다룹니다. SQLite의 thread-safety 모드, `check_same_thread`, per-thread vs shared connection, 그리고 FastAPI에서의 connection 관리 패턴을 살펴보겠습니다.
-
 ## 심화 앵커: 예외를 운영 정책으로 매핑하는 고정 함수
 
 예외를 메시지 문자열로 분기하면 정책이 흔들립니다. 클래스와 SQLite 코드로 분기하는 고정 함수를 두면 팀 전체의 대응이 일관됩니다.
@@ -352,6 +344,14 @@ ProgrammingError -> 즉시 수정 대상
 ```
 
 구조화 로그 필드(`error.class`, `error.sqlite_name`, `retry.attempt`)를 고정하면 예외 비율의 추세를 대시보드에서 바로 추적할 수 있습니다.
+
+## 정리
+- PEP 249 예외 계층을 "코드 버그 / 비즈니스 규칙 / 일시적 환경 문제"로 다시 묶으면 의사결정이 단순해집니다.
+- `sqlite3`는 SQLite 에러 코드를 PEP 249 클래스로 매핑하지만, 같은 `OperationalError` 안에도 retry 대상과 비대상이 섞여 있어 `sqlite_errorname`까지 봐야 합니다.
+- retry는 BUSY/LOCKED 계열에만 적용하고, `IntegrityError`는 도메인 예외로 변환해 4xx로 돌려줍니다.
+- 트랜잭션은 retry 단위 안에 두고, `max_attempts`와 jitter를 반드시 설정합니다.
+
+다음 글에서는 connection 자체를 다룹니다. SQLite의 thread-safety 모드, `check_same_thread`, per-thread vs shared connection, 그리고 FastAPI에서의 connection 관리 패턴을 살펴보겠습니다.
 
 ## 처음 질문으로 돌아가기
 

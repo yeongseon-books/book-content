@@ -222,18 +222,6 @@ cur.execute(f"SELECT * FROM users WHERE name = '{name}'")
 
 `threadsafety=1`인 driver는 connection을 thread간 공유 불가입니다. sqlite3는 default가 `check_same_thread=True`라 다른 thread에서 쓰면 에러. multi-threaded app에서는 thread당 connection을 만들거나 connection pool을 씁니다.
 
-## 정리
-
-- DB-API 2.0(PEP 249)은 Python 데이터베이스 driver가 따르는 최소 공통 계약입니다.
-- `connect → cursor → execute → fetch → commit → close` 흐름은 sqlite3, psycopg, pymysql에서 거의 같습니다.
-- driver 간 가장 눈에 띄는 차이는 `paramstyle`이며, 나머지 애플리케이션 로직은 대부분 유지됩니다.
-- DB-API는 pooling, async, ORM, migration 같은 상위 문제를 일부러 비워 두었습니다.
-- autocommit, cursor 정리, `fetchall()` 메모리 사용, SQL injection, thread safety가 가장 먼저 부딪히는 함정입니다.
-
-다음 글에서는 connection과 cursor의 lifecycle을 더 깊이 들여다보고, context manager로 안전하게 다루는 패턴을 정리합니다.
-
-<!-- a-grade-example:begin -->
-
 ## 체크리스트
 
 - [ ] sqlite3로 connect → cursor → execute → fetch → close 사이클을 한 번 돌렸다.
@@ -358,6 +346,18 @@ def timed(fn, *args, **kwargs):
 ### 짧은 운영 참고
 
 실서비스에서는 SQL 실행 자체보다 경계 관리가 더 자주 문제를 만듭니다. connection 생성과 종료, commit/rollback 분기를 로그와 테스트로 고정하면 장애 대응 시간이 짧아집니다.
+
+## 정리
+
+- DB-API 2.0(PEP 249)은 Python 데이터베이스 driver가 따르는 최소 공통 계약입니다.
+- `connect → cursor → execute → fetch → commit → close` 흐름은 sqlite3, psycopg, pymysql에서 거의 같습니다.
+- driver 간 가장 눈에 띄는 차이는 `paramstyle`이며, 나머지 애플리케이션 로직은 대부분 유지됩니다.
+- DB-API는 pooling, async, ORM, migration 같은 상위 문제를 일부러 비워 두었습니다.
+- autocommit, cursor 정리, `fetchall()` 메모리 사용, SQL injection, thread safety가 가장 먼저 부딪히는 함정입니다.
+
+다음 글에서는 connection과 cursor의 lifecycle을 더 깊이 들여다보고, context manager로 안전하게 다루는 패턴을 정리합니다.
+
+<!-- a-grade-example:begin -->
 
 ## 처음 질문으로 돌아가기
 

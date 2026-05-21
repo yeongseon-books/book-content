@@ -28,7 +28,6 @@ last_reviewed: '2026-05-15'
 
 이 글은 Observability 101 시리즈의 9번째 글입니다.
 
-
 ![Observability 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/09/09-01-concept-at-a-glance.ko.png)
 *Observability 101 9장 흐름 개요*
 > 비용과 카디널리티의 핵심은 도구 선택이 아니라, 언제 어디서 이 신호를 남기고 어떻게 해석할 것인가 하는 설계입니다.
@@ -257,10 +256,6 @@ print(f"Label value count: {result['label_value_count']}")
 2. 세 단계 보존 정책을 설계해 보세요.
 3. 오류, 지연, 무작위 표본을 위한 꼬리 샘플링 정책을 써 보세요.
 
-## 정리
-
-관측성 비용은 갑자기 커지는 것처럼 보여도, 실제로는 라벨 설계와 보존 정책, 샘플링 전략이 만든 결과인 경우가 많습니다. 비용을 예측 가능하게 만들면 관측성은 부담이 아니라 장기 자산이 됩니다. 마지막 글에서는 지금까지의 내용을 묶어 작은 팀이 실제로 운영 가능한 관측성 스택을 어떻게 꾸릴지 정리하겠습니다.
-
 ## 카디널리티 폭발 사례
 
 카디널리티 문제는 개념으로는 간단하지만 실제 장애로 이어질 때 체감이 큽니다. 아래는 자주 발생하는 세 가지 사례입니다.
@@ -290,7 +285,6 @@ print(f"Label value count: {result['label_value_count']}")
 ```python
 FORBIDDEN_LABEL_KEYS = {"user_id", "request_id", "session_id", "email"}
 
-
 def validate_metric_labels(metric_name: str, labels: dict[str, str]) -> list[str]:
     errors: list[str] = []
     for key, value in labels.items():
@@ -301,7 +295,6 @@ def validate_metric_labels(metric_name: str, labels: dict[str, str]) -> list[str
         if "/" in value and key == "path" and any(ch.isdigit() for ch in value):
             errors.append(f"{metric_name}: path label appears unnormalized '{value}'")
     return errors
-
 
 example = {"path": "/orders/12345", "status": "200"}
 print(validate_metric_labels("http_requests_total", example))
@@ -340,7 +333,6 @@ def estimate_metric_cost(
         "total_gb": round(total_gb, 2),
         "monthly_cost_usd": round(cost_usd, 2),
     }
-
 
 # 시나리오 비교
 scenarios = [
@@ -426,14 +418,12 @@ PATTERNS = [
     (re.compile(r"/products/[\w-]+"), "/products/:slug"),
 ]
 
-
 def normalize_path(path: str) -> str:
     """고카디널리티 경로를 정규화합니다."""
     for pattern, replacement in PATTERNS:
         if pattern.search(path):
             return pattern.sub(replacement, path)
     return path
-
 
 # 미들웨어에서 사용
 async def metrics_middleware(request: Request, call_next):
@@ -445,6 +435,10 @@ async def metrics_middleware(request: Request, call_next):
 ```
 
 이 미들웨어 하나로 수만 개의 고유 경로가 수십 개의 패턴으로 줄어듭니다. 결과적으로 시계열 수가 수백 배 감소하고, 쿼리 속도와 스토리지 비용이 함께 개선됩니다.
+
+## 정리
+
+관측성 비용은 갑자기 커지는 것처럼 보여도, 실제로는 라벨 설계와 보존 정책, 샘플링 전략이 만든 결과인 경우가 많습니다. 비용을 예측 가능하게 만들면 관측성은 부담이 아니라 장기 자산이 됩니다. 마지막 글에서는 지금까지의 내용을 묶어 작은 팀이 실제로 운영 가능한 관측성 스택을 어떻게 꾸릴지 정리하겠습니다.
 
 ## 처음 질문으로 돌아가기
 

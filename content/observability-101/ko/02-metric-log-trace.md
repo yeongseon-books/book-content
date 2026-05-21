@@ -28,7 +28,6 @@ last_reviewed: '2026-05-15'
 
 이 글은 Observability 101 시리즈의 2번째 글입니다.
 
-
 ![Observability 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/02/02-01-concept-at-a-glance.ko.png)
 *Observability 101 2장 흐름 개요*
 > 메트릭, 로그, 트레이스는 각각을 빠르게 신호로 씁니다. 메트릭만 보면 증상을 보지만 왜를 찾을 수 없고, 로그만 머십으면 비용만 올라갑니다.
@@ -361,7 +360,6 @@ Expected output:
 - **요청 경로와 구간별 소요 시간** → 트레이스로 남깁니다.
 - **어느 신호에도 맞지 않는 대용량 데이터** → 데이터 웨어하우스로 보냅니다 (별도 파이프라인).
 
-
 ## 체크리스트
 
 - [ ] 카운터, 게이지, 히스토그램의 차이를 설명할 수 있습니다.
@@ -374,10 +372,6 @@ Expected output:
 1. 카운터와 게이지의 예를 각각 세 개씩 적어 보세요.
 2. 평균이 p99를 가리는 사례를 하나 설명해 보세요.
 3. 세 개의 서비스를 거치는 요청에서 trace_id가 어떻게 이어질지 스케치해 보세요.
-
-## 정리
-
-메트릭, 로그, 트레이스는 같은 신호의 세 버전이 아닙니다. 각자 답하는 질문이 다르고, 함께 써야 비로소 운영의 흐름이 보입니다. 다음 글에서는 이 가운데 메트릭을 실제로 어떻게 수집하고 그래프로 만드는지 살펴보겠습니다.
 
 ## 언제 어떤 신호를 먼저 볼까
 
@@ -406,7 +400,6 @@ COMMON_FIELDS = [
     "route", "status_code", "error_code"
 ]
 
-
 def write_log(event: str, fields: Dict[str, object]) -> None:
     payload = {
         "ts": time.time(),
@@ -414,7 +407,6 @@ def write_log(event: str, fields: Dict[str, object]) -> None:
         **fields,
     }
     print(json.dumps(payload, ensure_ascii=False))
-
 
 write_log(
     "payment_failed",
@@ -442,6 +434,10 @@ write_log(
 | 트레이스 | 요청 경로, 병목 위치 | 샘플링 없으면 고비용 | 100% 저장, 속성 과다 | 병목 분석 핵심 신호 |
 
 운영 성숙도가 높아질수록 신호별 담당 질문이 선명해집니다. 예를 들어 "p95가 상승했다"는 알림은 메트릭 담당, "어느 span이 길어졌는가"는 트레이스 담당, "왜 timeout이 났는가"는 로그 담당으로 역할을 나누면 회의 시간이 짧아집니다.
+
+## 정리
+
+메트릭, 로그, 트레이스는 같은 신호의 세 버전이 아닙니다. 각자 답하는 질문이 다르고, 함께 써야 비로소 운영의 흐름이 보입니다. 다음 글에서는 이 가운데 메트릭을 실제로 어떻게 수집하고 그래프로 만드는지 살펴보겠습니다.
 
 ## 처음 질문으로 돌아가기
 

@@ -30,7 +30,6 @@ last_reviewed: '2026-05-12'
 
 여기서는 앞선 아홉 개 조각을 하나의 운영 루프로 엮어 보고, 팀이 지금 어디쯤 와 있는지 평가하는 최소 체크리스트까지 정리하겠습니다.
 
-
 ![MLOps 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/10/10-01-see-the-loop-first.ko.png)
 *MLOps 101 10장 흐름 개요*
 > 됨 단계를 비파근총랐으로 단브 빠니다. 단단을 브는 단순냸답니다. 단뉸내거나 뮤랜발당니다.
@@ -263,13 +262,6 @@ print(status_line(checks))
 2. `99% < 200ms` 같은 SLO를 가장 먼저 깨뜨릴 수 있는 구성 요소를 골라 보세요.
 3. 자동 재학습이 새로 만드는 조직 리스크 두 가지를 정리해 보세요.
 
-## 정리
-
-운영 가능한 ML 시스템은 여러 도구를 나열한다고 생기지 않습니다. 데이터, 학습, 등록, 배포, 관측, 재학습이 닫힌 루프로 연결되고, 각 단계의 책임과 대응 절차가 분명해야 비로소 시스템이 됩니다.
-
-이 시리즈에서 가져가야 할 마지막 문장은 이것입니다. **MLOps의 완성은 더 많은 도구가 아니라, 더 분명한 경계와 더 짧은 운영 루프입니다.** 이제 실제 프로젝트에서 가장 약한 연결부 하나를 골라, 그 지점부터 시스템으로 바꿔 보시면 됩니다.
-
-
 ## 운영 ML 아키텍처 구성 요소 표준화
 
 개별 도구를 나열하는 대신, 운영 시스템을 구성 요소와 책임으로 분해하면 전체 구조가 훨씬 명확해집니다.
@@ -340,7 +332,6 @@ print({"score": score, "max": len(scorecard)})
 
 이 표는 도구 도입 여부보다 운영 가능성을 평가하는 기준입니다. 시스템 점검 회의에서 이 다섯 항목을 반복 확인하면, 기능 추가보다 안정성 보강의 우선순위를 유지하기 쉽습니다.
 
-
 ## 플랫폼 설정 코드로 일관성 유지하기
 
 운영 ML 시스템에서는 여러 컴포넌트의 설정이 일관되어야 합니다. 피처 스토어, 모델 레지스트리, 모니터링, 배포 환경이 서로 다른 설정을 참조하면 사고가 납니다. 설정을 코드로 관리하는 패턴을 보겠습니다.
@@ -349,7 +340,6 @@ print({"score": score, "max": len(scorecard)})
 from dataclasses import dataclass, field
 from pathlib import Path
 import yaml
-
 
 @dataclass
 class ModelConfig:
@@ -361,7 +351,6 @@ class ModelConfig:
     max_replicas: int = 4
     target_latency_ms: int = 100
 
-
 @dataclass
 class MonitoringConfig:
     prometheus_endpoint: str
@@ -370,14 +359,12 @@ class MonitoringConfig:
     slo_availability: float = 0.999
     slo_latency_p95_ms: int = 100
 
-
 @dataclass
 class FeatureStoreConfig:
     offline_store_path: str
     online_store_type: str = "redis"
     online_store_host: str = "redis.internal"
     ttl_days: int = 7
-
 
 @dataclass
 class PlatformConfig:
@@ -446,7 +433,6 @@ feature_store:
 import httpx
 import time
 
-
 def integration_test(config: PlatformConfig) -> dict:
     """전체 ML 시스템의 통합 테스트를 실행합니다."""
     results = {}
@@ -504,6 +490,12 @@ def integration_test(config: PlatformConfig) -> dict:
 ```
 
 이 테스트를 매일 새벽에 실행하면, 인프라 변경이나 네트워크 문제로 시스템이 조용히 깨지는 것을 조기에 발견할 수 있습니다.
+
+## 정리
+
+운영 가능한 ML 시스템은 여러 도구를 나열한다고 생기지 않습니다. 데이터, 학습, 등록, 배포, 관측, 재학습이 닫힌 루프로 연결되고, 각 단계의 책임과 대응 절차가 분명해야 비로소 시스템이 됩니다.
+
+이 시리즈에서 가져가야 할 마지막 문장은 이것입니다. **MLOps의 완성은 더 많은 도구가 아니라, 더 분명한 경계와 더 짧은 운영 루프입니다.** 이제 실제 프로젝트에서 가장 약한 연결부 하나를 골라, 그 지점부터 시스템으로 바꿔 보시면 됩니다.
 
 ## 처음 질문으로 돌아가기
 

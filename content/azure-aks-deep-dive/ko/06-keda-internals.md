@@ -358,8 +358,6 @@ kubectl annotate scaledobject orders-worker -n prod autoscaling.keda.sh/paused=t
 - [ ] external scaler 인증 방식을 managed identity와 secret 관점에서 정리했습니다.
 - [ ] KEDA metric과 실제 replica 변화의 일관성을 모니터링하도록 설정했습니다.
 
-## 정리
-
 ## 운영 팀이 자주 묻는 질문 두 가지
 
 첫째, “KEDA를 쓰면 HPA 튜닝이 필요 없나요?”라는 질문이 많습니다.
@@ -381,6 +379,8 @@ KEDA는 HPA 위에 올라타 있습니다.
 
 이로써 시리즈의 여섯 개 조각이 하나로 연결됩니다.
 control plane 지도, node 실행 경로, Pod 네트워킹, scheduler의 placement, HPA와 CA의 두 루프, 그리고 마지막으로 KEDA의 event bridge를 함께 보면 AKS를 관리형 Kubernetes라는 한 문장보다 훨씬 정밀한 구조로 읽을 수 있게 됩니다.
+
+## 정리
 
 ## 처음 질문으로 돌아가기
 

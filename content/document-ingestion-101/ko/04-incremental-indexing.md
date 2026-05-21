@@ -187,121 +187,6 @@ python main.py
 - [ ] 나중의 파일 수정이 `updated`로 분류됩니다.
 - [ ] 삭제 처리를 어디에 끼워 넣을지 정했습니다.
 
-## 정리
-
-증분 인덱싱의 본질은 벡터 저장소보다 먼저 상태 기억에 있습니다. 무엇이 새 파일인지, 무엇이 바뀌지 않았는지, 무엇이 다시 처리되어야 하는지를 안정적으로 구분해야 뒤의 임베딩 비용을 아낄 수 있습니다.
-
-해시와 작은 상태 저장소만으로도 그 출발점은 충분히 만들 수 있습니다. 다음 글에서는 이렇게 구분된 문서를 여러 파일 형식에서 공통 `Document` 계약으로 모으는 다중 포맷 파이프라인을 보겠습니다.
-
-### 해시 기반 변경 감지를 파일 단위에서 청크 단위로 확장하기
-
-파일 해시만 비교하면 문서가 바뀌었다는 사실은 알 수 있지만, 어느 청크가 바뀌었는지는 알기 어렵습니다. 대형 문서에서는 이 차이가 곧 비용 차이로 이어집니다. 그래서 파일 상태와 별개로 청크 해시 매니페스트를 함께 저장하면 부분 업데이트 경로를 열 수 있습니다.
-
-```python
-from __future__ import annotations
-
-import hashlib
-from dataclasses import dataclass
-
-def sha256_text(text: str) -> str:
-    return hashlib.sha256(text.encode('utf-8')).hexdigest()
-
-@dataclass(frozen=True)
-class ChunkDigest:
-    chunk_id: str
-    content_hash: str
-
-def build_chunk_manifest(chunks: list[str], source: str) -> list[ChunkDigest]:
-    manifest: list[ChunkDigest] = []
-    for index, chunk in enumerate(chunks):
-        chunk_id = f'{source}#chunk-{index:04d}'
-        manifest.append(ChunkDigest(chunk_id=chunk_id, content_hash=sha256_text(chunk)))
-    return manifest
-
-def diff_chunk_manifest(
-    previous: list[ChunkDigest],
-    current: list[ChunkDigest],
-) -> tuple[list[str], list[str], list[str]]:
-    prev_map = {item.chunk_id: item.content_hash for item in previous}
-    cur_map = {item.chunk_id: item.content_hash for item in current}
-
-    added = [chunk_id for chunk_id in cur_map if chunk_id not in prev_map]
-    removed = [chunk_id for chunk_id in prev_map if chunk_id not in cur_map]
-    updated = [
-        chunk_id
-        for chunk_id in cur_map
-        if chunk_id in prev_map and cur_map[chunk_id] != prev_map[chunk_id]
-    ]
-    return added, updated, removed
-```
-
-이 방식은 문서 전체를 다시 임베딩하지 않고도 변경된 청크만 교체할 근거를 제공합니다. 특히 정책 문서처럼 일부 문단만 자주 바뀌는 코퍼스에서 효과가 큽니다.
-
-### delta sync 실행 순서를 명시하는 패턴
-
-증분 인덱싱에서 자주 생기는 실수는 삭제와 추가 순서를 섞는 것입니다. 같은 `chunk_id`를 다시 쓰는 시스템이라면 순서가 바뀔 때 오래된 벡터가 남을 수 있습니다. 그래서 delta sync는 단계별로 고정된 실행 순서를 갖는 편이 안전합니다.
-
-```python
-from __future__ import annotations
-
-from collections.abc import Callable
-
-def apply_delta_sync(
-    *,
-    added: list[str],
-    updated: list[str],
-    removed: list[str],
-    delete_chunks: Callable[[list[str]], None],
-    upsert_chunks: Callable[[list[str]], None],
-) -> None:
-    # 1) 삭제를 먼저 반영합니다.
-    if removed:
-        delete_chunks(removed)
-
-    # 2) 업데이트 대상은 기존 벡터를 먼저 지우고 다시 올립니다.
-    if updated:
-        delete_chunks(updated)
-        upsert_chunks(updated)
-
-    # 3) 신규 청크를 마지막에 추가합니다.
-    if added:
-        upsert_chunks(added)
-```
-
-이 순서를 지키면 인덱스가 중간 상태에 머무는 시간을 줄일 수 있습니다. 또한 실행 로그를 `removed -> updated -> added` 순서로 읽을 수 있어 장애 분석도 빨라집니다.
-
-### 파일 삭제를 탐지하는 역방향 스캔
-
-추가와 수정은 현재 파일 목록에서 찾을 수 있지만, 삭제는 현재 목록에 나타나지 않습니다. 따라서 상태 저장소에 남아 있는 경로를 기준으로 역방향 스캔을 해야 합니다.
-
-```python
-from __future__ import annotations
-
-from pathlib import Path
-
-def detect_deleted_files(state_paths: set[str], live_paths: set[str]) -> list[str]:
-    return sorted(state_paths - live_paths)
-
-def collect_live_paths(root: Path) -> set[str]:
-    return {
-        str(path)
-        for path in root.rglob('*')
-        if path.is_file() and path.suffix.lower() in {'.txt', '.md', '.pdf'}
-    }
-```
-
-삭제 탐지를 별도 함수로 분리하면, 문서 삭제 정책이 바뀔 때도 파이프라인 전체를 뜯어고치지 않고 해당 경계만 수정할 수 있습니다.
-
-### 배치 단위 상태 갱신에서 지켜야 할 원칙
-
-증분 작업은 중간 실패가 전제인 작업입니다. 그래서 변경 반영이 끝나기 전에 상태 파일을 먼저 저장하면 재시작 시점에 불일치가 생길 수 있습니다. 안전한 기본 원칙은 다음과 같습니다.
-
-- 벡터 저장소 반영이 끝난 뒤에만 상태 저장소를 커밋합니다.
-- 배치 실행 ID를 상태에 기록해 어떤 실행이 어떤 해시 집합을 만들었는지 남깁니다.
-- 실패 시에는 상태 파일을 롤백하거나, 다음 실행이 이전 상태에서 다시 시작하게 합니다.
-
-이 원칙을 지키면 증분 인덱싱은 단순한 성능 최적화가 아니라 신뢰 가능한 동기화 메커니즘이 됩니다. 즉, 파일 시스템 상태와 벡터 인덱스 상태를 같은 기준으로 비교하고, 같은 순서로 반영하는 운영 시스템으로 확장됩니다.
-
 ## 실무 확장: 증분 인덱싱 오케스트레이션과 원자적 상태 갱신
 
 증분 인덱싱의 핵심 위험은 "인덱스는 바뀌었는데 상태 파일은 안 바뀐" 반쪽 성공입니다. 이 문제를 줄이려면 상태 갱신을 배치 단위 트랜잭션처럼 다루고, 실패 시 복구 경로를 명시해야 합니다.
@@ -472,6 +357,121 @@ step=search smoke_passed=false
 증분 인덱싱의 직접적인 운영 효과는 임베딩 API 호출 비용 절감입니다. 전체 재빌드 방식에서는 문서 1000건 기준으로 매일 동일한 임베딩 비용이 발생하지만, 증분 방식에서는 변경된 문서만 호출하므로 일반적으로 일일 비용이 5~15% 수준으로 줄어듭니다.
 
 다만 증분 처리가 비용을 아끼는 만큼, 상태 드리프트 위험이 생깁니다. 그래서 주 1회 전체 재검증 배치를 돌려 인덱스 일관성을 확인하는 비용까지 포함해서 전체 TCO를 계산해야 합니다. 증분과 전체 재빌드를 양자택일로 보지 않고, 증분을 기본 경로로 두되 주기적 전체 검증을 보조 경로로 병행하는 구조가 가장 실용적입니다.
+
+## 정리
+
+증분 인덱싱의 본질은 벡터 저장소보다 먼저 상태 기억에 있습니다. 무엇이 새 파일인지, 무엇이 바뀌지 않았는지, 무엇이 다시 처리되어야 하는지를 안정적으로 구분해야 뒤의 임베딩 비용을 아낄 수 있습니다.
+
+해시와 작은 상태 저장소만으로도 그 출발점은 충분히 만들 수 있습니다. 다음 글에서는 이렇게 구분된 문서를 여러 파일 형식에서 공통 `Document` 계약으로 모으는 다중 포맷 파이프라인을 보겠습니다.
+
+### 해시 기반 변경 감지를 파일 단위에서 청크 단위로 확장하기
+
+파일 해시만 비교하면 문서가 바뀌었다는 사실은 알 수 있지만, 어느 청크가 바뀌었는지는 알기 어렵습니다. 대형 문서에서는 이 차이가 곧 비용 차이로 이어집니다. 그래서 파일 상태와 별개로 청크 해시 매니페스트를 함께 저장하면 부분 업데이트 경로를 열 수 있습니다.
+
+```python
+from __future__ import annotations
+
+import hashlib
+from dataclasses import dataclass
+
+def sha256_text(text: str) -> str:
+    return hashlib.sha256(text.encode('utf-8')).hexdigest()
+
+@dataclass(frozen=True)
+class ChunkDigest:
+    chunk_id: str
+    content_hash: str
+
+def build_chunk_manifest(chunks: list[str], source: str) -> list[ChunkDigest]:
+    manifest: list[ChunkDigest] = []
+    for index, chunk in enumerate(chunks):
+        chunk_id = f'{source}#chunk-{index:04d}'
+        manifest.append(ChunkDigest(chunk_id=chunk_id, content_hash=sha256_text(chunk)))
+    return manifest
+
+def diff_chunk_manifest(
+    previous: list[ChunkDigest],
+    current: list[ChunkDigest],
+) -> tuple[list[str], list[str], list[str]]:
+    prev_map = {item.chunk_id: item.content_hash for item in previous}
+    cur_map = {item.chunk_id: item.content_hash for item in current}
+
+    added = [chunk_id for chunk_id in cur_map if chunk_id not in prev_map]
+    removed = [chunk_id for chunk_id in prev_map if chunk_id not in cur_map]
+    updated = [
+        chunk_id
+        for chunk_id in cur_map
+        if chunk_id in prev_map and cur_map[chunk_id] != prev_map[chunk_id]
+    ]
+    return added, updated, removed
+```
+
+이 방식은 문서 전체를 다시 임베딩하지 않고도 변경된 청크만 교체할 근거를 제공합니다. 특히 정책 문서처럼 일부 문단만 자주 바뀌는 코퍼스에서 효과가 큽니다.
+
+### delta sync 실행 순서를 명시하는 패턴
+
+증분 인덱싱에서 자주 생기는 실수는 삭제와 추가 순서를 섞는 것입니다. 같은 `chunk_id`를 다시 쓰는 시스템이라면 순서가 바뀔 때 오래된 벡터가 남을 수 있습니다. 그래서 delta sync는 단계별로 고정된 실행 순서를 갖는 편이 안전합니다.
+
+```python
+from __future__ import annotations
+
+from collections.abc import Callable
+
+def apply_delta_sync(
+    *,
+    added: list[str],
+    updated: list[str],
+    removed: list[str],
+    delete_chunks: Callable[[list[str]], None],
+    upsert_chunks: Callable[[list[str]], None],
+) -> None:
+    # 1) 삭제를 먼저 반영합니다.
+    if removed:
+        delete_chunks(removed)
+
+    # 2) 업데이트 대상은 기존 벡터를 먼저 지우고 다시 올립니다.
+    if updated:
+        delete_chunks(updated)
+        upsert_chunks(updated)
+
+    # 3) 신규 청크를 마지막에 추가합니다.
+    if added:
+        upsert_chunks(added)
+```
+
+이 순서를 지키면 인덱스가 중간 상태에 머무는 시간을 줄일 수 있습니다. 또한 실행 로그를 `removed -> updated -> added` 순서로 읽을 수 있어 장애 분석도 빨라집니다.
+
+### 파일 삭제를 탐지하는 역방향 스캔
+
+추가와 수정은 현재 파일 목록에서 찾을 수 있지만, 삭제는 현재 목록에 나타나지 않습니다. 따라서 상태 저장소에 남아 있는 경로를 기준으로 역방향 스캔을 해야 합니다.
+
+```python
+from __future__ import annotations
+
+from pathlib import Path
+
+def detect_deleted_files(state_paths: set[str], live_paths: set[str]) -> list[str]:
+    return sorted(state_paths - live_paths)
+
+def collect_live_paths(root: Path) -> set[str]:
+    return {
+        str(path)
+        for path in root.rglob('*')
+        if path.is_file() and path.suffix.lower() in {'.txt', '.md', '.pdf'}
+    }
+```
+
+삭제 탐지를 별도 함수로 분리하면, 문서 삭제 정책이 바뀔 때도 파이프라인 전체를 뜯어고치지 않고 해당 경계만 수정할 수 있습니다.
+
+### 배치 단위 상태 갱신에서 지켜야 할 원칙
+
+증분 작업은 중간 실패가 전제인 작업입니다. 그래서 변경 반영이 끝나기 전에 상태 파일을 먼저 저장하면 재시작 시점에 불일치가 생길 수 있습니다. 안전한 기본 원칙은 다음과 같습니다.
+
+- 벡터 저장소 반영이 끝난 뒤에만 상태 저장소를 커밋합니다.
+- 배치 실행 ID를 상태에 기록해 어떤 실행이 어떤 해시 집합을 만들었는지 남깁니다.
+- 실패 시에는 상태 파일을 롤백하거나, 다음 실행이 이전 상태에서 다시 시작하게 합니다.
+
+이 원칙을 지키면 증분 인덱싱은 단순한 성능 최적화가 아니라 신뢰 가능한 동기화 메커니즘이 됩니다. 즉, 파일 시스템 상태와 벡터 인덱스 상태를 같은 기준으로 비교하고, 같은 순서로 반영하는 운영 시스템으로 확장됩니다.
 
 ## 처음 질문으로 돌아가기
 

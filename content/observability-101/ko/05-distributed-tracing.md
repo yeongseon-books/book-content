@@ -28,7 +28,6 @@ last_reviewed: '2026-05-15'
 
 이 글은 Observability 101 시리즈의 5번째 글입니다.
 
-
 ![Observability 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/05/05-01-concept-at-a-glance.ko.png)
 *Observability 101 5장 흐름 개요*
 > 분산 트레이싱 기초의 핵심은 도구 선택이 아니라, 언제 어디서 이 신호를 남기고 어떻게 해석할 것인가 하는 설계입니다.
@@ -296,10 +295,6 @@ Expected output:
 2. 환경별로 다른 샘플링 비율을 설계해 보세요.
 3. 가장 느린 스팬을 찾는 질의를 하나 구상해 보세요.
 
-## 정리
-
-분산 트레이싱은 요청 하나의 흐름을 지도처럼 보여 줍니다. 스팬, 문맥 전파, 샘플링이 자리 잡으면 여러 서비스를 가로지르는 장애도 훨씬 빨리 좁힐 수 있습니다. 다음 글에서는 이렇게 모인 신호를 어떤 화면으로 보여 줘야 운영에 도움이 되는지, 대시보드 설계를 다루겠습니다.
-
 ## OpenTelemetry Python 계측 확장 예시
 
 자동 계측만으로는 도메인 경계를 충분히 표현하기 어려운 경우가 많습니다. 결제, 재고, 쿠폰 같은 비즈니스 구간은 수동 스팬을 추가해 의미를 분명히 하는 편이 좋습니다.
@@ -310,7 +305,6 @@ from opentelemetry import trace
 from opentelemetry.trace import Status, StatusCode
 
 tracer = trace.get_tracer("checkout-service")
-
 
 def checkout(order_id: str, amount: int) -> None:
     with tracer.start_as_current_span("checkout") as root:
@@ -340,12 +334,10 @@ def checkout(order_id: str, amount: int) -> None:
 ```python
 from opentelemetry.propagate import inject, extract
 
-
 def build_http_headers() -> dict:
     headers = {}
     inject(headers)
     return headers
-
 
 def publish_message(payload: dict) -> dict:
     carrier = {}
@@ -354,7 +346,6 @@ def publish_message(payload: dict) -> dict:
         "payload": payload,
         "trace_headers": carrier,
     }
-
 
 def consume_message(message: dict):
     ctx = extract(message["trace_headers"])
@@ -406,7 +397,6 @@ def parse_traceparent(header: str) -> dict:
         "sampled": parts[3] == "01",
     }
 
-
 # 예시
 tp = parse_traceparent("00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01")
 # {"version": "00", "trace_id": "4bf92f...", "parent_id": "00f067...", "sampled": True}
@@ -423,25 +413,21 @@ from opentelemetry import context, trace
 
 tracer = trace.get_tracer("async-service")
 
-
 async def handle_request():
     with tracer.start_as_current_span("async_handler"):
         # asyncio.create_task는 contextvars를 자동 복사합니다.
         task = asyncio.create_task(fetch_data())
         await task
 
-
 async def fetch_data():
     # 부모 span이 자동으로 연결됨
     with tracer.start_as_current_span("fetch_data"):
         await asyncio.sleep(0.1)
 
-
 def sync_work():
     # ThreadPoolExecutor로 넘긴 작업에서는 명시적 전파 필요
     with tracer.start_as_current_span("sync_work"):
         pass
-
 
 async def dispatch_to_thread():
     with tracer.start_as_current_span("dispatcher"):
@@ -477,7 +463,6 @@ from opentelemetry import trace
 
 logger = structlog.get_logger()
 
-
 def process_order(order_id: str):
     span = trace.get_current_span()
     ctx = span.get_span_context()
@@ -492,6 +477,10 @@ def process_order(order_id: str):
 ```
 
 Grafana에서 Loki(로그)와 Tempo(트레이스)를 데이터 소스로 등록하면, 로그의 `trace_id` 필드를 클릭해 해당 트레이스 화면으로 바로 이동할 수 있습니다. 이 연결이 없으면 로그와 트레이스를 수동으로 대조해야 하므로 장애 대응 시간이 늘어납니다.
+## 정리
+
+분산 트레이싱은 요청 하나의 흐름을 지도처럼 보여 줍니다. 스팬, 문맥 전파, 샘플링이 자리 잡으면 여러 서비스를 가로지르는 장애도 훨씬 빨리 좁힐 수 있습니다. 다음 글에서는 이렇게 모인 신호를 어떤 화면으로 보여 줘야 운영에 도움이 되는지, 대시보드 설계를 다루겠습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **스팬과 트레이스는 각각 무엇일까요?**

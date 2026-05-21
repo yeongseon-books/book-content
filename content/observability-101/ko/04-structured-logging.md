@@ -28,7 +28,6 @@ last_reviewed: '2026-05-15'
 
 이 글은 Observability 101 시리즈의 4번째 글입니다.
 
-
 ![Observability 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/04/04-01-concept-at-a-glance.ko.png)
 *Observability 101 4장 흐름 개요*
 > 구조화된 로깅의 핵심은 도구 선택이 아니라, 언제 어디서 이 신호를 남기고 어떻게 해석할 것인가 하는 설계입니다.
@@ -282,10 +281,6 @@ Expected output:
 2. 미들웨어에서 상관관계 ID를 주입해 보세요.
 3. 특정 사용자 ID의 ERROR 로그만 조회하는 질의를 설계해 보세요.
 
-## 정리
-
-구조화된 로그는 운영 로그를 설명문에서 데이터로 바꿉니다. 로그 수준, 맥락 필드, 상관관계 ID가 자리 잡으면 장애 대응의 첫 5분이 짧아집니다. 다음 글에서는 요청이 여러 서비스를 가로지를 때 왜 분산 트레이싱이 필요한지 이어서 보겠습니다.
-
 ## JSON 로그 필드 표준 제안
 
 구조화된 로깅을 도입해도 팀마다 필드 이름이 다르면 운영 효율이 낮아집니다. 아래처럼 최소 공통 스키마를 두면 질의 템플릿과 경보 규칙을 재사용하기 쉽습니다.
@@ -311,7 +306,6 @@ Expected output:
 import logging
 import structlog
 
-
 def configure_logger() -> None:
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     structlog.configure(
@@ -327,7 +321,6 @@ def configure_logger() -> None:
         wrapper_class=structlog.stdlib.BoundLogger,
         cache_logger_on_first_use=True,
     )
-
 
 def mask_email(email: str) -> str:
     name, domain = email.split("@")
@@ -430,10 +423,8 @@ import hashlib
 import re
 from typing import Any
 
-
 PII_FIELDS = {"email", "phone", "card_number", "ssn"}
 EMAIL_RE = re.compile(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}")
-
 
 def mask_value(key: str, value: Any) -> Any:
     """PII 필드를 해시 또는 마스킹으로 대체합니다."""
@@ -445,11 +436,9 @@ def mask_value(key: str, value: Any) -> Any:
         return EMAIL_RE.sub("[REDACTED_EMAIL]", value)
     return value
 
-
 def sanitize_log(payload: dict) -> dict:
     """로그 페이로드 전체를 순회하며 PII를 제거합니다."""
     return {k: mask_value(k, v) for k, v in payload.items()}
-
 
 # 사용 예시
 raw = {
@@ -486,7 +475,6 @@ from collections import defaultdict
 # 연속 발생 억제 예시
 _event_counts: dict = defaultdict(lambda: {"count": 0, "last_reset": time.time()})
 RATE_LIMIT = 10  # 초당 최대 횟수
-
 
 def should_log(event: str) -> bool:
     """1초 동안 동일 이벤트가 RATE_LIMIT회 초과하면 로그를 끊습니다."""
@@ -526,6 +514,10 @@ sum(rate(logs_dropped_total[5m])) / sum(rate(log_lines_total[5m])) * 100
 | CRITICAL | 광범위 장애인가 | 온콜 호출 | db_unavailable |
 
 레벨 기준이 없으면 팀마다 동일 이벤트를 서로 다른 레벨로 기록하게 됩니다. 그러면 경보 규칙의 신뢰도가 떨어지고, 같은 장애를 두 번 세 번 처리하게 됩니다. 레벨 사전은 코드 리뷰 체크리스트에 포함하는 편이 좋습니다.
+
+## 정리
+
+구조화된 로그는 운영 로그를 설명문에서 데이터로 바꿉니다. 로그 수준, 맥락 필드, 상관관계 ID가 자리 잡으면 장애 대응의 첫 5분이 짧아집니다. 다음 글에서는 요청이 여러 서비스를 가로지를 때 왜 분산 트레이싱이 필요한지 이어서 보겠습니다.
 
 ## 처음 질문으로 돌아가기
 

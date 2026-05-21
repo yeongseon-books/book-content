@@ -30,7 +30,6 @@ last_reviewed: '2026-05-12'
 
 여기서는 모델 모니터링을 시스템 메트릭, 모델 메트릭, 비즈니스 메트릭이 만나는 관측 계층으로 보고, Prometheus 중심의 최소 구성을 정리하겠습니다.
 
-
 ![MLOps 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/06/06-01-see-the-flow-first.ko.png)
 *MLOps 101 6장 흐름 개요*
 > 로그드 메트릭 링크가 배포 직후부터 끝답 초까지 리두머드 되기 때문에 단순한 로그 서칙 난제도 큰 문제가 된 수 있습니다.
@@ -310,20 +309,12 @@ annotations:
 2. 분당 평균 입력값을 기록하는 메트릭을 설계해 보세요.
 3. 첫 Grafana 화면에 어떤 위젯 네 개를 둘지 골라 보세요.
 
-## 정리
-
-모니터링은 배포 뒤에 붙는 옵션이 아니라, 모델을 운영 자산으로 다루기 위한 기본 관측 장치입니다. 정확도만 기다리면 너무 늦고, 운영 신호를 먼저 봐야 문제를 조기에 잡을 수 있습니다.
-
-이 글에서 기억할 핵심은 하나입니다. **모델이 살아 있는지보다, 지금 어떤 상태로 살아 있는지를 알아야 운영이 됩니다.** 다음 글에서는 그 신호를 바탕으로 데이터 드리프트와 모델 드리프트를 어떻게 구분할지 다루겠습니다.
-
-
 ## 예측 드리프트 감지 코드 추가
 
 시스템 메트릭만으로는 모델 품질 이상을 놓칠 수 있으므로, 예측 분포 변화를 함께 계산하는 것이 좋습니다.
 
 ```python
 import numpy as np
-
 
 def prediction_drift_score(ref_preds: np.ndarray, cur_preds: np.ndarray, bins: int = 20) -> float:
     edges = np.linspace(0.0, 1.0, bins + 1)
@@ -338,7 +329,6 @@ def prediction_drift_score(ref_preds: np.ndarray, cur_preds: np.ndarray, bins: i
     c = c + eps
 
     return float(np.sum((c - r) * np.log(c / r)))
-
 
 ref = np.random.beta(2, 5, size=5000)
 cur = np.random.beta(3, 4, size=5000)
@@ -393,7 +383,6 @@ groups:
 - 모든 경고에는 런북 링크를 포함합니다.
 
 모니터링은 수집보다 대응 설계가 더 중요합니다. 경고가 행동으로 이어지지 않으면 시스템 신뢰는 빠르게 떨어집니다.
-
 
 ## Grafana 대시보드 JSON 예시
 
@@ -461,7 +450,6 @@ import numpy as np
 
 logger = structlog.get_logger()
 
-
 def log_prediction(request_id: str, features: list, prediction: float):
     """추론 결과를 구조화된 로그로 남깁니다."""
     feature_array = np.array(features)
@@ -491,7 +479,6 @@ def log_prediction(request_id: str, features: list, prediction: float):
 | 드리프트 미감지 | PSI / KS 통계량 | PSI > 0.2 | Slack |
 
 이렇게 SLO 계층을 나누면, 가용성 SLO 위반은 즉시 대응하고, 정확도 SLO 위반은 다음 영업일에 분석하는 식으로 대응 우선순위를 체계화할 수 있습니다.
-
 
 ## 인시던트 대응 런북
 
@@ -524,6 +511,12 @@ def log_prediction(request_id: str, features: list, prediction: float):
 ```
 
 이 런북의 핵심은 2번 "영향 범위 파악"입니다. 드리프트가 감지됐더라도 비즈니스 지표에 영향이 없으면 즉시 대응할 필요가 없습니다. 반대로 비즈니스 지표가 떨어지고 있다면 원인 분석보다 롤백이 먼저입니다.
+
+## 정리
+
+모니터링은 배포 뒤에 붙는 옵션이 아니라, 모델을 운영 자산으로 다루기 위한 기본 관측 장치입니다. 정확도만 기다리면 너무 늦고, 운영 신호를 먼저 봐야 문제를 조기에 잡을 수 있습니다.
+
+이 글에서 기억할 핵심은 하나입니다. **모델이 살아 있는지보다, 지금 어떤 상태로 살아 있는지를 알아야 운영이 됩니다.** 다음 글에서는 그 신호를 바탕으로 데이터 드리프트와 모델 드리프트를 어떻게 구분할지 다루겠습니다.
 
 ## 처음 질문으로 돌아가기
 

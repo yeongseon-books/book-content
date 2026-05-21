@@ -27,7 +27,6 @@ last_reviewed: '2026-05-17'
 
 이 글은 Type Hints (Python) 101 시리즈의 마지막 글입니다. 여기서는 느슨한 주문 처리 모듈 하나를 출발점으로 삼아, `Any`가 퍼진 코드와 빈약한 시그니처를 어떻게 정리하는지, 왜 그 순서가 실무적으로 효과적인지, 그리고 마지막에 어떤 검증 단계까지 연결해야 하는지를 runnable한 before/after 흐름으로 정리합니다.
 
-
 ![Type Hints in Python 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/10/10-01-big-picture.ko.png)
 *Type Hints in Python 101 10장 흐름 개요*
 
@@ -370,13 +369,6 @@ Success: no issues found in 1 source file
 
 3. `order_service.py` 예제에 할인 쿠폰 필드를 추가하고, `coupon_code: str | None`을 안전하게 처리하는 helper를 직접 작성해 보세요.
 
-## 정리
-
-타입 힌트를 잘 쓴다는 것은 모든 줄에 주석을 다는 일이 아닙니다. 공개 시그니처와 반환 타입을 먼저 단단하게 만들고, `Any`가 퍼지는 지점을 끊고, Union을 의미 있는 helper로 좁히고, 마지막에 검사기 통과로 검증하는 일이 더 중요합니다. 그 순서가 잡혀 있어야 앞선 정적 검사와 런타임 검증도 실제 팀 규칙으로 이어집니다.
-
-이 시리즈에서는 기본 타입, `Optional`, `Union`, `Callable`, `TypedDict`, `dataclass`, `Protocol`, `Generic`, mypy, pyright, Pydantic까지 Python 타입 힌트의 전체 그림을 살펴봤습니다. 이제 남은 일은 완벽주의가 아니라, 중요한 경로부터 반복 가능한 hardening pass를 계속 쌓아 가는 것입니다.
-
-
 ## 실전 보강: 적용 전후 + 오류 해결
 
 ```python
@@ -411,7 +403,6 @@ after 상태에서는 호출부 타입 불일치를 정확히 보고합니다.
 | CI 게이트 | 실패 시 병합 차단 |
 | 예외 관리 | `type: ignore`에 사유와 코드 기재 |
 
-
 ## mypy 오류를 읽는 순서
 
 실무에서는 오류 개수보다 읽는 순서가 더 중요합니다. 다음 순서를 고정하면 수정 시간이 크게 줄어듭니다.
@@ -445,7 +436,6 @@ Found 2 errors in 1 file (checked 1 source file)
 
 이 체크포인트를 팀 규칙으로 두면 신규 코드와 레거시 코드의 품질 편차를 줄일 수 있습니다.
 
-
 ## 실전 보강: 타입 힌트 + mypy 오류 해결 루프
 
 아래 예시는 타입 힌트가 문서가 아니라 검증 가능한 계약이라는 점을 분명하게 보여 줍니다.
@@ -458,14 +448,12 @@ class Payment(TypedDict):
     amount: int
     currency: str
 
-
 def normalize_amount(raw: int | str) -> int:
     if isinstance(raw, int):
         return raw
     if raw.isdigit():
         return int(raw)
     raise ValueError("amount must be int or numeric string")
-
 
 def build_payment(order_id: int, amount: int | str, currency: str | None) -> Payment:
     if currency is None:
@@ -541,14 +529,12 @@ Success: no issues found in N source files
 
 위 결과가 나오더라도 끝이 아닙니다. 새로운 기능을 추가할 때 같은 원칙을 반복해 계약을 유지해야 타입 힌트가 장기적으로 품질을 지켜 줍니다.
 
-
 ## 추가 사례: 주문 처리 모듈 타입 하드닝
 
 아래 코드는 실제로 자주 보는 레거시 패턴입니다.
 
 ```python
 from typing import Any
-
 
 def build_invoice(payload: dict[str, Any]) -> dict[str, Any]:
     user = payload.get("user")
@@ -575,14 +561,12 @@ class InvoiceResult(TypedDict):
     email: str
     total: int
 
-
 def parse_total(raw: int | str) -> int:
     if isinstance(raw, int):
         return raw
     if raw.isdigit():
         return int(raw)
     raise ValueError("total must be int or numeric string")
-
 
 def build_invoice(payload: InvoicePayload) -> InvoiceResult:
     return {
@@ -617,7 +601,6 @@ service.py:36: error: Missing key "user" for TypedDict "InvoicePayload"  [typedd
 - 리뷰에서 `Any` 추가가 보이면 대체 타입 후보를 함께 요구합니다.
 - CI에서는 타입 검사 실패를 테스트 실패와 동등하게 취급합니다.
 
-
 ## 최종 운영 규칙 요약
 
 1. 공개 함수 시그니처와 반환 타입을 먼저 고정합니다.
@@ -633,6 +616,12 @@ Success: no issues found in N source files
 ```text
 Pass 기준: 타입 검사 실패가 테스트 실패와 동일하게 취급됩니다.
 ```
+
+## 정리
+
+타입 힌트를 잘 쓴다는 것은 모든 줄에 주석을 다는 일이 아닙니다. 공개 시그니처와 반환 타입을 먼저 단단하게 만들고, `Any`가 퍼지는 지점을 끊고, Union을 의미 있는 helper로 좁히고, 마지막에 검사기 통과로 검증하는 일이 더 중요합니다. 그 순서가 잡혀 있어야 앞선 정적 검사와 런타임 검증도 실제 팀 규칙으로 이어집니다.
+
+이 시리즈에서는 기본 타입, `Optional`, `Union`, `Callable`, `TypedDict`, `dataclass`, `Protocol`, `Generic`, mypy, pyright, Pydantic까지 Python 타입 힌트의 전체 그림을 살펴봤습니다. 이제 남은 일은 완벽주의가 아니라, 중요한 경로부터 반복 가능한 hardening pass를 계속 쌓아 가는 것입니다.
 
 ## 처음 질문으로 돌아가기
 

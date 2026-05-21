@@ -372,8 +372,6 @@ description: "사용자 요청 경로의 핵심 API"
 - [ ] Pending Pod 자동 진단 절차와 알림 기준을 마련했습니다.
 - [ ] stateful workload의 PVC zone과 node zone 정합성을 사전에 검증했습니다.
 
-## 정리
-
 ## troubleshooting 시나리오: 특정 zone만 계속 과밀해지는 경우
 
 운영에서 자주 보는 패턴은 전체 노드는 여유가 있는데 특정 zone 노드만 과밀해지는 현상입니다.
@@ -403,6 +401,8 @@ Filter와 Score는 서로 다른 질문에 답합니다.
 
 다음 글에서는 이 배치 결과를 입력으로 받아 움직이는 autoscaling 두 루프를 봅니다.
 HPA가 replica를 늘리고, Cluster Autoscaler가 node를 늘릴 때 왜 race window가 생기는지 이어서 살펴보겠습니다.
+
+## 정리
 
 ## 처음 질문으로 돌아가기
 

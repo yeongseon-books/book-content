@@ -30,7 +30,6 @@ last_reviewed: '2026-05-12'
 
 여기서는 학습된 모델을 API와 컨테이너로 감싸는 기본 흐름을 보고, 왜 카나리나 롤백 같은 운영 절차가 함께 필요해지는지 정리하겠습니다.
 
-
 ![MLOps 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/05/05-01-see-the-flow-first.ko.png)
 *MLOps 101 5장 흐름 개요*
 > 배포의 핵심은 여러 버전을 한 시스템 안에서 안전하게 전환하고, 문제가 생기면 빠르게 되돌릴 수 있는 구조를 만드는 데 있습니다.
@@ -383,13 +382,6 @@ curl -s -X POST localhost:8000/predict -H "Content-Type: application/json" -d '{
 2. Nginx 가중치 기반 카나리 전환 흐름을 그림으로 적어 보세요.
 3. 이 모델을 배치 추론 작업으로 바꾸면 무엇이 달라질지 정리해 보세요.
 
-## 정리
-
-모델 배포는 학습 결과를 서비스 인터페이스와 실행 환경 안으로 옮기는 일입니다. 여기서 중요한 것은 단순 배포 성공이 아니라, 같은 환경을 다시 만들 수 있고 문제 시 되돌릴 수 있는가입니다.
-
-이 글에서 기억할 핵심은 하나입니다. **배포는 모델을 노출하는 단계가 아니라, 운영 위험을 제어하는 단계입니다.** 다음 글에서는 배포된 모델을 어떻게 관찰할지, 즉 모델 모니터링을 다루겠습니다.
-
-
 ## FastAPI 서빙을 운영형으로 확장하기
 
 기본 예제에서 한 단계 더 나가려면 요청 식별자, 예측 로그, 모델 버전 라우팅을 함께 고려해야 합니다.
@@ -467,7 +459,6 @@ services:
 
 모델 배포에서 사고는 피하기보다 빠르게 복구하는 설계가 더 현실적입니다. 따라서 배포 설계의 핵심은 성공 경로뿐 아니라 실패 경로를 명시하는 데 있습니다.
 
-
 ## 모델 레지스트리 연동
 
 운영 환경에서는 모델 파일을 직접 복사하지 않고, 모델 레지스트리에서 버전을 지정해 가져옵니다. MLflow Model Registry를 기준으로 배포 시점에 모델을 로드하는 패턴을 보겠습니다.
@@ -483,7 +474,6 @@ MODEL_STAGE = "Production"
 mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
 client = MlflowClient()
 
-
 def load_production_model():
     """레지스트리에서 Production 스테이지 모델을 로드합니다."""
     model_uri = f"models:/{MODEL_NAME}/{MODEL_STAGE}"
@@ -491,7 +481,6 @@ def load_production_model():
     version_info = client.get_latest_versions(MODEL_NAME, stages=[MODEL_STAGE])
     current_version = version_info[0].version if version_info else "unknown"
     return model, current_version
-
 
 model, model_version = load_production_model()
 ```
@@ -508,18 +497,15 @@ from fastapi import FastAPI, Response, status
 app = FastAPI()
 model_loaded = False
 
-
 @app.on_event("startup")
 async def startup_load_model():
     global model_loaded
     load_production_model()
     model_loaded = True
 
-
 @app.get("/healthz")
 async def liveness():
     return {"status": "alive"}
-
 
 @app.get("/readyz")
 async def readiness(response: Response):
@@ -560,7 +546,6 @@ import sys
 BASE_URL = "http://localhost:8000"
 TIMEOUT = 10.0
 
-
 def smoke_test():
     """배포 직후 실행하는 최소 검증입니다."""
     # 1. 헬스 체크
@@ -580,7 +565,6 @@ def smoke_test():
 
     print("PASS: all smoke tests passed")
 
-
 if __name__ == "__main__":
     try:
         smoke_test()
@@ -590,6 +574,12 @@ if __name__ == "__main__":
 ```
 
 이 스크립트를 CI/CD 파이프라인의 배포 후 단계에 넣으면, 실패 시 자동으로 롤백을 트리거할 수 있습니다.
+
+## 정리
+
+모델 배포는 학습 결과를 서비스 인터페이스와 실행 환경 안으로 옮기는 일입니다. 여기서 중요한 것은 단순 배포 성공이 아니라, 같은 환경을 다시 만들 수 있고 문제 시 되돌릴 수 있는가입니다.
+
+이 글에서 기억할 핵심은 하나입니다. **배포는 모델을 노출하는 단계가 아니라, 운영 위험을 제어하는 단계입니다.** 다음 글에서는 배포된 모델을 어떻게 관찰할지, 즉 모델 모니터링을 다루겠습니다.
 
 ## 처음 질문으로 돌아가기
 
