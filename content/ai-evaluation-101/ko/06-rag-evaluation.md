@@ -308,6 +308,82 @@ print(result)
 
 직접 구현할 시간이 없으면 RAGAS로 시작하세요. 단, 도메인 특화 평가가 필요하면 직접 구현이 더 정확합니다.
 
+### DeepEval로 Faithfulness 회귀를 빠르게 막기
+
+RAGAS가 종합 진단에 강하다면, PR 단계의 빠른 회귀 방어에는 DeepEval 스타일의 테스트 케이스 기반 실행이 편할 때가 많습니다. 핵심은 "검색 문맥 밖 주장을 하는지"를 자동으로 막는 것입니다.
+
+```python
+# rag/deepeval_faithfulness_gate.py
+from deepeval.metrics import FaithfulnessMetric
+from deepeval.test_case import LLMTestCase
+
+def run_faithfulness_gate(question: str, answer: str, context_chunks: list[str]) -> float:
+    metric = FaithfulnessMetric(threshold=0.85, model="gpt-4o", include_reason=True)
+    test_case = LLMTestCase(
+        input=question,
+        actual_output=answer,
+        retrieval_context=context_chunks,
+    )
+    metric.measure(test_case)
+    print(metric.reason)
+    return metric.score
+```
+
+이 점수를 CI 임계값으로 연결하면, 검색은 정상인데 생성이 컨텍스트를 벗어나는 회귀를 빠르게 차단할 수 있습니다.
+
+### 검색 품질 개선 실험: top-K와 reranker를 함께 비교
+
+RAG 고도화에서 흔한 실수는 top-K만 키우는 것입니다. 실제로는 노이즈 증가로 precision이 먼저 무너지는 경우가 많아서, top-K와 reranker 조합을 표로 비교해야 합니다.
+
+| 실험 설정 | Context Recall | Context Precision | Faithfulness | 결론 |
+|---|---:|---:|---:|---|
+| K=3, reranker 없음 | 0.74 | 0.81 | 0.90 | 누락 있음, 노이즈 낮음 |
+| K=8, reranker 없음 | 0.88 | 0.52 | 0.79 | 노이즈 과다, 환각 증가 |
+| K=8, reranker 있음 | 0.86 | 0.77 | 0.91 | 균형 가장 좋음 |
+
+이런 비교표를 두면 검색층 개선이 실제 생성층 안정성으로 이어지는지 바로 확인할 수 있습니다.
+
+### 회귀 패턴: Faithfulness 하락이 먼저 오는 경우
+
+운영에서는 다음 순서로 문제가 터지는 경우가 많습니다.
+
+1. Prompt 변경으로 답변 길이가 늘어남
+2. Context 밖 일반론 문장이 증가
+3. Faithfulness 먼저 하락
+4. 며칠 뒤 thumbs-down 증가
+
+따라서 Faithfulness는 결과 지표라기보다 선행 경보 지표로 다루는 편이 안전합니다.
+
+### RAG 평가 로그 스키마 권장안
+
+RAG 문제를 재현하려면 질문, 검색 결과, 최종 답변을 함께 저장해야 합니다. 최종 답변만 저장하면 원인 분해가 거의 불가능합니다.
+
+```python
+RAG_EVAL_LOG_SCHEMA = {
+    "trace_id": "str",
+    "question": "str",
+    "retrieved_doc_ids": "list[str]",
+    "retrieved_contexts": "list[str]",
+    "answer": "str",
+    "metrics": {
+        "context_recall": "float",
+        "context_precision": "float",
+        "faithfulness": "float",
+        "answer_relevance": "float",
+    },
+}
+```
+
+이 스키마를 기준으로 로그를 쌓아 두면, 회귀 발생 시 "검색층 문제인지 생성층 문제인지"를 빠르게 재현할 수 있습니다.
+
+특히 `retrieved_doc_ids`를 남겨 두면 인덱스 재빌드 전후의 품질 변화를 문서 단위로 비교할 수 있어 원인 분석 속도가 크게 빨라집니다.
+
+운영 환경에서는 이 로그를 최소 2주 이상 보관해 두어야 분포 변화와 회귀를 시간축으로 비교하기 쉽습니다.
+
+문서 ID 기준 재현 로그가 있으면 "같은 질문인데 왜 오늘만 틀렸는가"를 훨씬 짧은 시간에 설명할 수 있습니다.
+
+RAG 운영팀에는 사실상 필수 습관입니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - 텍스트로 그린 두 단계 파이프라인부터 보시면 좋습니다. 이 그림이 이후 네 지표를 왜 둘씩 나눠 보는지 설명해 줍니다.

@@ -241,6 +241,119 @@ AKS는 관리형 Kubernetes지만, Pod·Deployment·Service의 의미 자체를 
 
 외부 요청이 실패한다고 해서 항상 Ingress부터 보는 것은 아닙니다. 실제로는 Service selector 오타, readiness probe 실패, 이미지 pull 문제 같은 더 아래층에서 막히는 경우가 많습니다.
 
+### 장애를 줄이는 선언 패턴: rollout 전략과 service endpoints 확인
+
+Pod·Deployment·Service를 아는 것과 운영 품질은 한 단계 차이가 있습니다. 운영 품질은 “변경 중에도 서비스가 유지되도록 선언했는가”에서 갈립니다. 최소한 Deployment의 rollout 전략과 Service endpoint 확인 습관은 초반부터 가져가는 편이 좋습니다.
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-hello
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: fastapi-hello
+  template:
+    metadata:
+      labels:
+        app: fastapi-hello
+    spec:
+      containers:
+        - name: app
+          image: <your-registry>/fastapi-hello:v2
+          ports:
+            - containerPort: 8000
+```
+
+`maxUnavailable: 0`은 업데이트 중에도 기존 가용 Pod를 유지하겠다는 강한 의도입니다. 트래픽이 작은 실습 환경에서는 차이가 덜 보이지만, 실제 트래픽이 있는 운영에서는 이 한 줄이 체감 품질을 크게 바꿉니다.
+
+또한 Service는 선언만 맞는다고 끝나지 않습니다. 아래처럼 endpoint를 반드시 확인해야 selector 불일치와 readiness 누락을 빨리 찾을 수 있습니다.
+
+```bash
+kubectl get svc fastapi-hello
+kubectl get endpoints fastapi-hello
+kubectl describe svc fastapi-hello
+```
+
+`endpoints`가 비어 있으면 Service 자체가 아니라 Pod 선택 조건 또는 Pod 준비 상태 문제일 가능성이 큽니다. 이 분리만 잘해도 “네트워크 문제”로 보이던 장애 상당수를 더 정확한 층으로 보낼 수 있습니다.
+
+### ConfigMap과 Secret을 붙이면 세 객체의 경계가 더 선명해집니다
+
+Pod·Deployment·Service를 배운 직후에는 “설정값은 어디에 둬야 하나”라는 질문이 바로 따라옵니다. 이때 ConfigMap과 Secret을 연결해 보면 객체 책임 분리가 더 명확해집니다. Deployment는 실행 단위와 버전을 관리하고, ConfigMap/Secret은 실행 시점 설정을 관리하며, Service는 접근 경로를 관리합니다.
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fastapi-hello-config
+data:
+  APP_NAME: "fastapi-hello"
+  LOG_LEVEL: "info"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: fastapi-hello-secret
+type: Opaque
+stringData:
+  DB_PASSWORD: "replace-me"
+```
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-hello
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fastapi-hello
+  template:
+    metadata:
+      labels:
+        app: fastapi-hello
+    spec:
+      containers:
+        - name: app
+          image: <your-registry>/fastapi-hello:v1
+          envFrom:
+            - configMapRef:
+                name: fastapi-hello-config
+            - secretRef:
+                name: fastapi-hello-secret
+```
+
+이 구조를 쓰면 “코드 배포”와 “환경값 변경”을 분리할 수 있어 롤백 판단이 쉬워집니다. 운영에서 자주 생기는 문제는 버그와 설정 오류가 동시에 섞일 때인데, 경계가 분리되어 있으면 조사 순서가 훨씬 단순해집니다.
+
+### 서비스 연결 문제를 재현 가능한 방식으로 점검합니다
+
+아래처럼 임시 디버그 Pod에서 Service DNS를 호출해 보면 Ingress 앞단 문제인지 Service/Pod 내부 문제인지 빠르게 분리할 수 있습니다.
+
+```bash
+kubectl run net-debug --rm -it --image=busybox:1.36 --restart=Never -- sh
+# 컨테이너 안에서
+wget -qO- http://fastapi-hello.default.svc.cluster.local/
+```
+
+클러스터 내부 호출이 성공하면 Service와 Pod 경로는 살아 있는 것입니다. 그 상태에서 외부 요청만 실패하면 Ingress, DNS, TLS 같은 상위 계층을 보는 편이 맞습니다. 이 한 번의 분리만으로 장애 대응 시간이 크게 줄어듭니다.
+
+또한 rollout 중에는 아래 두 명령을 같이 보는 편이 좋습니다.
+
+```bash
+kubectl rollout status deployment/fastapi-hello
+kubectl get pods -l app=fastapi-hello -w
+```
+
+첫 명령은 선언한 버전이 정상 수렴하는지, 두 번째 명령은 개별 Pod가 어떤 속도로 Ready로 전환되는지 보여 줍니다. Service는 결국 Ready Pod 집합을 대상으로 라우팅하므로, rollout 속도와 readiness 품질은 곧 사용자 체감 품질로 이어집니다.
+
 ## 흔히 헷갈리는 지점
 
 - Pod와 컨테이너를 같은 개념으로 생각하기 쉽지만, Kubernetes는 Pod를 스케줄링 단위로 봅니다.

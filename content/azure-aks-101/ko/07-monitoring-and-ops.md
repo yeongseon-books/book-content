@@ -263,6 +263,90 @@ Azure Monitor는 AKS에 대해 여러 알람 경로를 제공합니다.
 
 모니터링은 많이 모을수록 좋다가 아닙니다. **문제를 빨리 찾을 수 있을 만큼은 모으되 비용 통제를 잃지 않는 것**이 더 중요합니다.
 
+### 장애 대응 루틴을 명령 기준으로 고정해 두면 흔들림이 줄어듭니다
+
+운영 숙련도는 도구 종류보다 루틴 일관성에서 나옵니다. 예를 들어 아래처럼 “첫 10분 루틴”을 팀 공통으로 맞춰 두면, 담당자가 바뀌어도 조사 품질이 크게 떨어지지 않습니다.
+
+```bash
+# 1) 객체 상태
+kubectl get deploy,pods,svc -A
+
+# 2) 최근 이벤트
+kubectl get events -A --sort-by=.lastTimestamp
+
+# 3) 문제 Pod 상세
+kubectl describe pod <pod-name> -n <namespace>
+
+# 4) 직전 로그
+kubectl logs <pod-name> -n <namespace> --previous
+```
+
+그다음 Container Insights와 KQL에서 동일 시간대 신호를 맞춰 보면, 클러스터 내부 현상과 중앙 로그 데이터가 같은 이야기를 하는지 교차 검증할 수 있습니다. 즉 `kubectl`은 현장 스냅샷, Log Analytics는 시간축 복기 도구로 쓰는 방식입니다.
+
+### KQL 예시를 하나 더: 재시작 급증 감지
+
+아래 쿼리는 namespace 단위로 컨테이너 재시작 신호를 요약해 급격한 변화를 탐지할 때 유용합니다.
+
+```kusto
+KubePodInventory
+| where TimeGenerated > ago(30m)
+| summarize RestartCount=max(ContainerRestartCount) by Namespace, Name
+| where RestartCount > 3
+| order by RestartCount desc
+```
+
+이 쿼리의 목적은 완전한 RCA가 아닙니다. “지금 바로 볼 가치가 있는 워크로드”를 우선순위로 뽑는 것입니다. 운영에서는 완벽한 정보보다 빠른 triage가 더 중요할 때가 많습니다.
+
+### 알람은 실행 가능해야 합니다
+
+알람 정의에서 자주 빠지는 요소는 후속 액션입니다. 예를 들어 `available replicas 부족` 알람에는 runbook 링크, 담당 팀, 1차 확인 명령이 함께 있어야 실제 incident 대응으로 이어집니다. 알람은 신호가 아니라 의사결정 트리의 시작점이어야 합니다.
+
+운영팀이 자주 쓰는 최소 템플릿은 아래와 같습니다.
+
+- 알람 조건: 무엇이 임계값을 넘었는가
+- 영향 범위: 어떤 서비스/namespace가 영향받는가
+- 즉시 확인: `kubectl` 2-3개와 KQL 1개
+- 완화 조치: 롤백/스케일/트래픽 제한 중 무엇을 먼저 할 것인가
+
+이 템플릿을 갖추면 “경보는 많이 오는데 대응 품질이 낮다”는 상태를 빠르게 줄일 수 있습니다.
+
+### 운영 신호를 스케일링 계층과 연결해 읽는 법
+
+6화의 HPA, Cluster Autoscaler, KEDA를 실제 운영에서 다시 보면 관측 포인트가 더 분명해집니다. 예를 들어 응답 지연이 커졌을 때는 단순 CPU 그래프보다 아래 세 질문을 먼저 던지는 편이 좋습니다.
+
+1. HPA desired replicas가 current replicas보다 계속 높은가
+2. Pending Pod 이벤트가 같은 시간대에 증가했는가
+3. node pool 확장이 실제로 뒤따랐는가
+
+이 세 질문은 각각 Pod 계층, 스케줄링 계층, Node 계층을 의미합니다. 질문이 계층별로 분리되면 “무조건 스케일업” 같은 과잉 대응을 줄일 수 있습니다.
+
+### `kubectl` 출력과 KQL 결과를 같은 타임라인에 맞춥니다
+
+장애 직후에는 현장 상태(`kubectl`)와 중앙 기록(KQL)의 시간이 어긋나기 쉽습니다. 그래서 운영 문서에는 항상 UTC 기준 타임라인 정렬 절차를 두는 편이 좋습니다.
+
+```kusto
+KubeEvents
+| where TimeGenerated > ago(1h)
+| where Namespace == "default"
+| project TimeGenerated, Reason, Name, Message
+| order by TimeGenerated desc
+```
+
+```bash
+kubectl get events -n default --sort-by=.lastTimestamp
+kubectl get pods -n default -o wide
+```
+
+두 결과를 같은 15분 창으로 맞추면 “언제부터 Pending이 시작됐는가”, “재시작이 먼저였는가”, “배포 변경 직후였는가”가 훨씬 선명해집니다. 운영에서 중요한 것은 데이터 양보다 사건 순서를 복원하는 능력입니다.
+
+### 로그 수집 범위는 운영 단계별로 다르게 가져갑니다
+
+개발/스테이징/프로덕션을 동일 수집 정책으로 두면 비용이나 노이즈가 과도해지기 쉽습니다. 보통은 프로덕션에서 핵심 namespace와 핵심 워크로드의 보존 기간을 더 길게 두고, 개발 환경은 짧게 가져가는 편이 합리적입니다. 이 정책도 코드 리뷰 대상 문서로 남겨야 drift를 줄일 수 있습니다.
+
+운영 체계를 한 단계 올리려면 주간 점검 리듬도 권장됩니다. 예를 들어 “지난 7일 restart 상위 10개 Pod”, “HPA max 고착 상위 5개 워크로드”, “노드 압력 이벤트 빈도”를 주간 리포트로 고정하면, 장애가 터진 뒤에만 보는 수동 운영에서 벗어나 선제 운영으로 이동하기 쉽습니다.
+
+이 주간 리포트는 완벽한 대시보드보다 팀의 공통 판단 기준을 만드는 데 의미가 있습니다. 운영 품질은 데이터 양보다도 같은 데이터를 보고 같은 결론에 도달할 수 있는 팀 합의에서 안정됩니다.
+
 ## 흔히 헷갈리는 지점
 
 - 로그를 많이 모으면 운영이 잘된다고 생각하기 쉽지만, 메트릭과 객체 상태가 빠지면 추세를 놓치기 쉽습니다.

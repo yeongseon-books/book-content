@@ -293,6 +293,135 @@ PR이 fail했을 때 다음 절차를 따릅니다.
    - **회귀가 의도된 것**: 임계값을 새 baseline으로 업데이트하고 PR description에 명시.
    - 버그: 코드/prompt 수정 후 재시도.
 
+### Golden 데이터셋 생성 파이프라인 자동화
+
+골든셋은 사람이 직접 편집하면 금방 불균형해집니다. 주간 배치로 후보를 추출하고 승격 규칙을 적용해 반자동으로 관리하는 편이 운영 안정성이 높습니다.
+
+```python
+# regression/build_golden_candidates.py
+import json
+from collections import defaultdict
+
+def build_candidates(traces: list[dict]) -> list[dict]:
+    by_category = defaultdict(list)
+    for t in traces:
+        by_category[t["category"]].append(t)
+
+    candidates = []
+    for cat, rows in by_category.items():
+        rows = sorted(rows, key=lambda r: r.get("impact_score", 0), reverse=True)
+        candidates.extend(rows[:10])  # category별 상위 위험 사례
+    return candidates
+
+def save_jsonl(rows: list[dict], path: str):
+    with open(path, "w") as f:
+        for r in rows:
+            f.write(json.dumps(r, ensure_ascii=False) + "\n")
+```
+
+```text
+주간 운영 규칙
+1) production 실패 후보 추출
+2) category별 균형 점검
+3) 회귀셋 승격 리뷰
+4) 다음 주 PR 게이트 반영
+```
+
+### CI에서 메트릭 분해 리포트 남기기
+
+PR이 실패했을 때 평균 점수만 출력하면 원인 파악이 느립니다. 메트릭별로 어떤 케이스가 떨어졌는지 바로 아티팩트로 남기는 편이 좋습니다.
+
+```python
+# regression/report_breakdown.py
+import json
+
+def write_breakdown(report: dict, out_path: str):
+    rows = []
+    for case in report.get("cases", []):
+        rows.append({
+            "case_id": case["case_id"],
+            "exact_match": case.get("exact_match"),
+            "judge_score": case.get("judge_score"),
+            "faithfulness": case.get("faithfulness"),
+            "regressed": case.get("regressed", False),
+        })
+    with open(out_path, "w") as f:
+        json.dump({"rows": rows}, f, ensure_ascii=False, indent=2)
+```
+
+이 파일을 PR 아티팩트로 남기면 "무엇이 깨졌는지"를 리뷰어가 바로 확인할 수 있습니다.
+
+### 회귀 패턴 분류
+
+회귀는 원인군을 분리해 기록해야 재발 방지가 됩니다.
+
+| 패턴 | 신호 | 대응 |
+|---|---|---|
+| Prompt regression | judge_score 하락, deterministic 유지 | 지시문 충돌 검토 |
+| Retrieval regression | faithfulness 하락 + context precision 하락 | 인덱스/리랭커 점검 |
+| Model regression | 전 카테고리 동시 하락 | 모델 버전 롤백 검토 |
+| Cost regression | 품질 유지 + token 급증 | step 축소, max_tokens 재설정 |
+
+### Nightly 평가와 PR 평가 역할 분리
+
+PR 평가와 야간 평가를 같은 크기로 돌리면 속도와 비용이 모두 무너집니다. 실무에서는 역할을 분리하는 편이 안정적입니다.
+
+| 실행 시점 | 데이터셋 크기 | 목적 |
+|---|---:|---|
+| PR | 20~50 | 명백한 회귀 차단 |
+| Nightly | 300~1000 | 분포 변화, 미세 성능 추세 확인 |
+
+```yaml
+# .github/workflows/eval-nightly.yml
+name: Nightly Full Eval
+on:
+  schedule:
+    - cron: "0 18 * * *"
+jobs:
+  full-eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install -r requirements.txt
+      - run: python -m evals.full.run --dataset evals/full-v8.jsonl --output nightly-report.json
+```
+
+이 구조를 두면 PR 속도는 지키면서도 장기 품질 추세를 놓치지 않을 수 있습니다.
+
+### Baseline 업데이트 절차
+
+회귀 테스트가 성숙해지면 baseline 갱신 절차를 문서화해야 합니다. 임의로 갱신하면 기준선이 쉽게 무너집니다.
+
+```text
+Baseline 갱신 규칙 예시
+1) 최근 2주 연속 성능 개선 확인
+2) guardrail metric 악화 없음
+3) 운영 incident 증가 없음
+4) 리뷰어 2인 승인 후 baseline 파일 업데이트
+```
+
+```python
+def can_update_baseline(stats: dict) -> bool:
+    return (
+        stats["improved_for_weeks"] >= 2
+        and stats["guardrail_regression"] == 0
+        and stats["incident_increase"] is False
+        and stats["reviewer_approvals"] >= 2
+    )
+```
+
+이 절차가 있으면 baseline이 "실패를 가리기 위한 수치 조정"으로 오용되는 문제를 줄일 수 있습니다.
+
+baseline 업데이트 PR에는 반드시 하락 케이스와 개선 케이스를 함께 첨부해 임계값 변경의 근거를 투명하게 남겨야 합니다.
+
+이 관행이 자리 잡으면 threshold 변경이 편의적 예외가 아니라 운영 합의된 정책으로 유지됩니다.
+
+결국 회귀 테스트의 신뢰도는 이 변경 절차의 엄격함에서 나옵니다.
+
+절차 일관성이 곧 품질 일관성입니다.
+
+그래서 문서화가 중요합니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - Production eval과 Golden regression set을 비교한 표부터 보시면 두 데이터셋의 역할 차이가 분명해집니다.

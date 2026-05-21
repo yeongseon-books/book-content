@@ -166,6 +166,76 @@ curl -s https://my-app.azurewebsites.net/diag/worker
 
 **Expected output:** affinity가 켜져 있으면 cookie jar를 유지한 두 호출에서 같은 `instance_id`가 반복될 가능성이 높습니다. 반대로 쿠키 없이 호출하면 응답 `instance_id`가 더 쉽게 바뀝니다. 부분 장애가 의심될 때도 이 방법으로 "특정 사용자만 같은 worker에 고정되는가"를 먼저 확인할 수 있습니다.
 
+### ARR Affinity 디버깅 런북: 쿠키, 인스턴스, 지연 분포를 같이 본다
+
+부분 장애를 빠르게 확인하려면 "누가 느린가"보다 "누가 어떤 worker에 고정됐는가"를 먼저 봐야 합니다. 실전에서는 브라우저 쿠키를 보존한 경로와 쿠키를 제거한 경로를 나눠 비교하고, 동일 endpoint의 `WEBSITE_INSTANCE_ID` 분포를 동시에 수집합니다.
+
+```bash
+# 1) 쿠키 보존 요청
+for i in $(seq 1 8); do
+  curl -s -c arr.txt -b arr.txt https://my-app.azurewebsites.net/diag/worker
+  echo
+done
+
+# 2) 쿠키 없는 요청
+for i in $(seq 1 8); do
+  curl -s https://my-app.azurewebsites.net/diag/worker
+  echo
+done
+```
+
+여기에 지연 분포를 겹치면 더 강력합니다.
+
+```bash
+# 쿠키 보존 경로의 지연
+for i in $(seq 1 30); do
+  curl -o /dev/null -s -c arr.txt -b arr.txt -w "%{time_total}
+"     https://my-app.azurewebsites.net/api/ping
+done > sticky-latency.txt
+
+# 쿠키 미보존 경로의 지연
+for i in $(seq 1 30); do
+  curl -o /dev/null -s -w "%{time_total}
+"     https://my-app.azurewebsites.net/api/ping
+done > spread-latency.txt
+```
+
+**Expected output:** sticky 경로에서 특정 worker로 고정되면 지연 분포가 한쪽으로 기울 수 있습니다. spread 경로는 인스턴스가 분산되며 극단값이 줄어드는 경우가 많습니다. 이 차이가 명확하면 앱 버그보다 degraded worker 고정 가능성을 먼저 조사하는 편이 맞습니다.
+
+### 네트워크 트레이스 관점에서 본 Front-End 판단 경계
+
+Front-End 문제를 잡을 때는 앱 로그만으로 부족합니다. 최소한 다음 세 가지를 네트워크 관점에서 분리해 기록합니다. 첫째, hostname binding이 올바른지, 둘째, TLS/redirect가 의도한지, 셋째, upstream proxy와 App Service 내부 경계에서 쿠키가 어떻게 전달되는지입니다.
+
+```bash
+# 리다이렉트와 최종 응답 체인 확인
+curl -L -I -s https://my-custom-domain.example.com
+
+# 요청/응답 헤더 전체 확인 (쿠키 전달 포함)
+curl -v -s https://my-custom-domain.example.com/diag/worker -o /dev/null
+```
+
+이 기록을 남겨 두면 "custom domain에서는 느리고 default domain에서는 빠르다" 같은 이슈를 라우팅 경계 문제로 좁히기 쉬워집니다. 특히 Front Door 또는 Application Gateway를 앞에 둔 구성에서는 외부 계층의 cookie affinity와 App Service 내부 ARRAffinity를 분리해서 판단해야 합니다.
+
+### ARR 관련 장애 타임라인을 남기는 표준 포맷
+
+ARR 의심 장애는 재현보다 타임라인이 중요합니다. 아래 항목을 동일한 포맷으로 남기면 원인 분석이 빨라집니다: 요청 시각, client IP 대역, 쿠키 유무, 반환 instance_id, 응답 시간, 상태 코드. 같은 클라이언트가 장시간 같은 instance_id에 붙고 실패율이 높다면 stickiness가 장애 증폭에 기여했을 가능성이 큽니다.
+
+```bash
+for i in $(seq 1 40); do
+  ts=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+  body=$(curl -s -c arr.txt -b arr.txt https://my-app.azurewebsites.net/diag/worker)
+  t=$(curl -o /dev/null -s -w "%{time_total}" -c arr.txt -b arr.txt https://my-app.azurewebsites.net/api/ping)
+  printf "%s	%s	%s
+" "$ts" "$t" "$body"
+done
+```
+
+이 로그는 incident review에서 "일부 사용자만 실패"를 정량 데이터로 바꿔 줍니다. 감각 대신 분포를 남겨 두면 ARR 설정 변경의 효과도 바로 비교할 수 있습니다.
+
+### ARR 설정 변경 후 회귀 점검
+
+ARR Affinity 토글을 바꾼 뒤에는 로그인, 장바구니, 업로드 같은 상태 의존 경로를 반드시 재검증해야 합니다. sticky 해제 후 숨은 인메모리 의존성이 드러나는 경우가 실제로 자주 발생합니다.
+
 ## 흔히 헷갈리는 지점
 
 - **ARRAffinity는 애플리케이션 세션 쿠키가 아닙니다.** 플랫폼이 같은 client를 같은 worker로 보내기 위한 routing hint입니다.

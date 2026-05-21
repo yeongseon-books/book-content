@@ -162,6 +162,80 @@ az webapp config appsettings list -n my-app -g my-rg \
 
 **Expected output:** Linux custom container인데 `WEBSITES_ENABLE_APP_SERVICE_STORAGE`가 `false`로 보이면 `/home`을 영구 공유 저장소처럼 가정하면 안 됩니다. `PORT` 또는 `WEBSITES_PORT`가 기대와 다르면 startup contract 문제를 먼저 의심해야 합니다.
 
+### Sandbox 제약을 증명 가능한 체크로 바꾸는 방법
+
+Windows sandbox 이슈는 감으로 판단하면 길어집니다. 운영팀은 "이 라이브러리가 막힌다"가 아니라 "어떤 호출이 어떤 경계에서 실패했는가"를 남겨야 합니다. 최소한 프로세스 정보, 파일 경로, 런타임 환경 변수를 먼저 수집하고, 문제 라이브러리의 OS 의존 호출이 무엇인지 매핑합니다.
+
+```bash
+# 런타임 경계 수집
+az webapp ssh -n my-app -g my-rg
+
+# inside app container or site shell
+uname -a
+printenv | sort | grep -E "WEBSITE_|WEBSITES_|PORT"
+ls -la /home/site/wwwroot
+```
+
+Windows code app에서는 App Service Diagnostics와 이벤트 로그를 함께 봐야 하고, Linux에서는 컨테이너 stdout/stderr와 startup command 실행 로그를 같이 봐야 합니다. 핵심은 동일 증상이라도 운영 표면이 다르다는 사실을 문서로 고정하는 것입니다.
+
+### 성능 프로파일링 명령: worker 포화와 앱 병목을 분리한다
+
+worker 포화와 앱 코드 병목을 분리하려면 인프라 메트릭과 애플리케이션 프로파일을 동시에 찍어야 합니다. App Service에서 최소 단위로 유용한 명령은 CPU/메모리 지표 조회와 요청 시간 분포 수집입니다.
+
+```bash
+PLAN_ID=$(az appservice plan show -n my-plan -g my-rg --query id -o tsv)
+
+az monitor metrics list   --resource "$PLAN_ID"   --metric "CpuPercentage,MemoryPercentage,HttpQueueLength"   --interval PT1M -o table
+
+for i in $(seq 1 40); do
+  curl -o /dev/null -s -w "%{http_code} %{time_starttransfer} %{time_total}
+"     https://my-app.azurewebsites.net/api/healthz
+ done
+```
+
+**Expected output:** plan CPU와 queue length가 동반 상승하면 worker capacity 병목 가능성이 큽니다. 반대로 plan 지표가 안정적인데 특정 API만 느리면 앱 내부 lock, 외부 의존성, 쿼리 경로를 우선 의심하는 편이 맞습니다. 이 분리만 잘해도 "플랫폼 문제"라는 포괄 진단을 크게 줄일 수 있습니다.
+
+### Windows와 Linux를 분리한 장애 분류표
+
+같은 500 에러라도 실행 경계가 다르면 대응 순서가 달라집니다. 운영 문서에 아래 분류표를 붙여 두면 팀 내 판단 일관성이 올라갑니다.
+
+| 증상 | Windows code app 우선 확인 | Linux app 우선 확인 |
+|---|---|---|
+| 배포 직후 부팅 실패 | eventlog, web.config, sandbox 제약 | startup command, container log, warm-up path |
+| 특정 라이브러리만 실패 | GDI/User32/registry 의존성 | native dependency, image layer, file permission |
+| 인스턴스 교체 후 파일 유실 | local temp 사용 여부 | `/home` 마운트 및 storage 설정 |
+
+이 표의 목적은 정답 제공이 아니라 출발점 통일입니다. 진단 첫 10분의 질문이 맞아야 이후 로그 읽기도 맞아집니다.
+
+### 네트워크/프로세스 트레이스로 실행 경계를 확인하는 명령
+
+```bash
+# 앱 레벨 readiness와 worker 식별 동시 확인
+for i in $(seq 1 20); do
+  curl -s -w " status=%{http_code} total=%{time_total}
+" https://my-app.azurewebsites.net/diag/runtime
+ done
+
+# Linux 컨테이너 내부 프로세스 관찰
+az webapp ssh -n my-app -g my-rg --command "ps -eo pid,ppid,cmd,%mem,%cpu --sort=-%cpu | head -n 15"
+```
+
+이 기록으로 "플랫폼이 느리다"를 프로세스 포화, 준비 지연, 외부 의존성 지연으로 나눌 수 있습니다.
+
+### 실패를 재현할 때 남길 증거 세트
+
+worker 경계 이슈는 재현 로그 품질이 절반입니다. 요청 시각, 응답 코드, instance_id, OS/호스팅 모드, 관련 app setting 값을 한 번에 기록해 두면 동일 증상을 다른 팀원이 빠르게 재검증할 수 있습니다.
+
+```bash
+az webapp config appsettings list -n my-app -g my-rg   --query "[?name=='WEBSITES_ENABLE_APP_SERVICE_STORAGE' || name=='WEBSITES_PORT' || name=='PORT' || name=='WEBSITE_SLOT_NAME'].{name:name,value:value}" -o table
+```
+
+추가로 incident 템플릿에 재현 스크립트 경로와 실행 시점의 앱 버전(commit SHA)을 같이 남기면, sandbox 제약인지 코드 회귀인지를 훨씬 안정적으로 가를 수 있습니다.
+
+운영팀 관점에서는 "어디서 실패했는가"보다 "어떤 경계를 넘지 못했는가"를 기록하는 편이 더 재사용성이 높습니다. 같은 에러 문자열이라도 sandbox 경계 실패와 startup 계약 실패는 대응 팀과 재발 방지 조치가 다르기 때문입니다.
+
+이 기준을 코드 리뷰 체크리스트와 장애 템플릿에 동시에 반영하면 실행 경계 관련 회귀를 조기에 발견할 수 있습니다.
+
 ## 흔히 헷갈리는 지점
 
 - **worker는 단순히 인스턴스 수의 다른 말이 아닙니다.** 사용자 코드가 실제로 놓이는 실행 경계입니다.

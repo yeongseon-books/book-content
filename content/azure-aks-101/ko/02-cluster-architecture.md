@@ -261,6 +261,70 @@ kubectl top nodes
 
 즉 이 글의 구조는 그림 설명으로 끝나지 않습니다. **Control Plane인지, user pool인지, system pool인지 먼저 자르는 습관**이 생겨야 실제 운영에서 아키텍처 이해가 힘을 발휘합니다.
 
+## 노드 풀 설계를 YAML/명령으로 고정하는 방법
+
+아키텍처를 팀 공통 언어로 만들려면 다이어그램만으로는 부족하고, 실제 설정값이 남아야 합니다. 최소한 아래 네 값은 항상 문서와 코드에 같이 남기는 편이 좋습니다. `mode(system/user)`, VM 크기, autoscaler 범위, taint 정책입니다.
+
+```bash
+az aks nodepool add \
+  --resource-group "$RG" \
+  --cluster-name "$CLUSTER" \
+  --name userpoolapi \
+  --mode User \
+  --node-vm-size Standard_D4s_v5 \
+  --enable-cluster-autoscaler \
+  --min-count 1 \
+  --max-count 6
+
+kubectl taint nodes -l kubernetes.azure.com/mode=system \
+  CriticalAddonsOnly=true:NoSchedule
+```
+
+첫 명령은 user pool을 별도 수용력 계층으로 두겠다는 선언이고, 두 번째 명령은 system 노드에 일반 앱 Pod가 섞이지 않게 하는 안전장치입니다. 이 두 줄만 있어도 “왜 분리했는지”가 설계 문장이 아니라 실행 가능한 정책으로 남습니다.
+
+아래처럼 `kubectl get nodes -L kubernetes.azure.com/agentpool,kubernetes.azure.com/mode`를 주기적으로 확인하면 설계 의도와 실제 배치가 어긋났는지 빨리 찾을 수 있습니다. 운영에서 중요한 것은 완벽한 구조가 아니라, 구조가 깨졌을 때 즉시 보이는 관측 포인트를 갖추는 일입니다.
+
+## 아키텍처를 검증하는 진단 시나리오
+
+실제 현장에서는 “설계했다”보다 “설계가 지켜지고 있는지 검증했다”가 더 중요합니다. 아래는 system/user 분리, 스케줄링 제약, 용량 압력을 한 번에 점검하는 최소 진단 시나리오입니다.
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-on-user-pool
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: api-on-user-pool
+  template:
+    metadata:
+      labels:
+        app: api-on-user-pool
+    spec:
+      nodeSelector:
+        kubernetes.azure.com/mode: user
+      containers:
+        - name: app
+          image: mcr.microsoft.com/azuredocs/aks-helloworld:v1
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+```
+
+```bash
+kubectl apply -f api-on-user-pool.yaml
+kubectl get pods -o wide
+kubectl describe pod <pod-name>
+kubectl get nodes -L kubernetes.azure.com/mode,kubernetes.azure.com/agentpool
+```
+
+이때 Pod가 system 노드에 올라가면 분리 정책이 깨진 것입니다. 반대로 user 노드에만 배치되고, scale-out 시 user pool만 확장된다면 설계 의도가 제대로 반영된 것입니다. 이 검증을 릴리스 전 점검 루틴에 포함하면 구조 드리프트를 초기에 막기 쉽습니다.
+
+또한 장애 분석 템플릿에 “문제 Pod가 어느 pool에 있었는가”를 기본 항목으로 넣는 편이 좋습니다. 같은 오류 로그라도 system pool에서 발생한 문제와 user pool에서 발생한 문제는 운영 의미가 완전히 다르기 때문입니다.
+
 ## 흔히 헷갈리는 지점
 
 - Control Plane과 Node Pool을 모두 “클러스터”라고만 부르면서 문제 층을 구분하지 못하는 경우가 많습니다.

@@ -426,6 +426,100 @@ print(result)
 
 ---
 
+## 프롬프트 계약을 실패 전에 검증하기
+
+프롬프트 체인에서 장애가 가장 많이 나는 지점은 변수 누락입니다. 런타임에서 KeyError를 보는 대신, 실행 전에 필요한 입력 키를 명시적으로 검증하면 훨씬 안전합니다.
+
+```python
+from langchain_core.prompts import ChatPromptTemplate
+
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "You are reviewing {language} code."),
+    ("human", "Focus: {focus}\n\nCode:\n{code}"),
+])
+
+required = set(prompt.input_variables)
+incoming = {"language": "python", "focus": "error handling"}
+
+missing = required - set(incoming.keys())
+if missing:
+    raise ValueError(f"missing prompt variables: {sorted(missing)}")
+```
+
+이 방식은 API 경계에서도 그대로 적용할 수 있습니다. FastAPI 요청 바디를 받은 직후에 prompt 변수 기준으로 검증하면, 모델 호출 전에 명확한 4xx 에러를 반환할 수 있습니다.
+
+## 출력 파서 선택 기준 표
+
+| 상황 | 권장 파서 | 이유 | 실패 시 대응 |
+|---|---|---|---|
+| 블로그 문단 생성 | `StrOutputParser` | 후속 단계가 문자열 소비 | 길이 제한 후 재시도 |
+| API 응답 생성 | `JsonOutputParser` | 코드에서 dict 접근 필요 | 스키마 지시 강화 |
+| 엄격한 필드 검증 | 구조화 출력(`with_structured_output`) | 타입 안정성 | 필드별 fallback |
+
+파서 선택을 초기에 명시하면 체인이 길어졌을 때 타입 혼란을 줄일 수 있습니다. 특히 팀 협업에서는 "이 체인은 문자열 체인인지, 구조화 체인인지"를 코드 상단에서 분명히 두는 것이 좋습니다.
+
+## Prompt + Parser 조합의 운영 로그 예시
+
+LangSmith나 애플리케이션 로그에서 아래 항목만 남겨도 분석 품질이 크게 올라갑니다.
+
+```text
+request_id=req_20260521_1042
+prompt_template=review_v3
+input_keys=[language, review_focus, code]
+parser=JsonOutputParser
+llm_model=llama-3.1-8b-instant
+status=success latency_ms=1224
+```
+
+반대로 실패 로그는 parser 단계 기준으로 구분하는 것이 좋습니다.
+
+```text
+status=fail
+error_stage=parser
+error_type=OutputParserException
+raw_preview="Sure, here is your JSON: {...}"
+```
+
+이처럼 stage를 나눠 기록하면 "모델이 틀렸는지", "파서 기대치가 과한지"를 빠르게 분리할 수 있습니다.
+
+## Prompt 체인의 재사용 경계
+
+`ChatPromptTemplate`를 재사용 가능한 자산으로 다루면 체인 품질이 안정됩니다. 보통 다음 세 계층으로 나누면 좋습니다.
+
+| 계층 | 예시 | 변경 주기 |
+|---|---|---|
+| 정책(system) | 톤, 금지 규칙, 출력 언어 | 느림 |
+| 작업(human) | 요약, 리뷰, 분류 요청 | 중간 |
+| 출력 제약(parser 지시) | JSON 키, 길이 제한 | 빠름 |
+
+이 분리는 배포 전략과도 연결됩니다. 정책 프롬프트 변경은 실험군 비율을 낮게, 출력 제약 변경은 실험군 비율을 높게 잡아도 리스크가 상대적으로 낮습니다.
+
+## Prompt 디버깅 순서
+
+현업에서 프롬프트 체인 이슈가 생기면 아래 순서로 보는 편이 빠릅니다.
+
+1. **입력 dict 검증**: 필수 키 누락, 빈 문자열, 길이 초과 확인
+2. **렌더링 결과 확인**: 실제 system/human 메시지 내용 검토
+3. **모델 응답 원문 확인**: parser 적용 전 `AIMessage.content` 보관
+4. **파서 실패 분석**: 파싱 실패 원인이 문장 형식인지 스키마인지 구분
+
+이 순서를 습관화하면 "프롬프트를 고쳤더니 우연히 나아졌다" 같은 비재현성 문제를 줄일 수 있습니다.
+
+```python
+rendered = prompt.invoke({
+    "language": "python",
+    "review_focus": "readability",
+    "code": "print('hello')",
+})
+
+for msg in rendered.messages:
+    print(f"[{msg.type}] {msg.content}")
+```
+
+렌더링 메시지를 먼저 본 뒤 모델 호출을 진행하면, 템플릿 문구 문제와 모델 품질 문제를 분리해 판단할 수 있습니다.
+
+---
+
 ## 이 코드에서 주목할 점
 
 - 프롬프트 체인은 대체로 dict를 입력으로 받으며, 키 이름은 템플릿 변수와 정확히 맞아야 합니다.

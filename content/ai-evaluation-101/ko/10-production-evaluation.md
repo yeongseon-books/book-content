@@ -318,6 +318,76 @@ def harvest_failures_to_regression_set(failed_traces: list[dict], regression_pat
 
 이 사이클이 닫히면 운영 → 평가 데이터셋 → 다음 배포 → 운영의 순환이 자동화됩니다. 모든 실패가 시스템을 학습시키는 자산이 됩니다.
 
+### 운영 대시보드 구성 예시
+
+운영 평가가 실무에서 작동하려면 모델팀만 보는 보고서가 아니라, 온콜과 제품팀이 함께 보는 대시보드가 필요합니다. 다음 네 패널을 기본 화면으로 두면 운영 대화가 빨라집니다.
+
+1. 품질 패널: thumbs_down_rate, re_ask_rate, judge_score 추세
+2. 안정성 패널: safety_violation_rate, refusal_rate, escalation_rate
+3. 성능 패널: p50/p95 latency, timeout_rate
+4. 비용 패널: cost_per_request, judge_cost_ratio
+
+```python
+def build_ops_snapshot(metrics: dict) -> dict:
+    return {
+        "quality": {
+            "thumbs_down_rate": metrics["thumbs_down_rate"],
+            "re_ask_rate": metrics["re_ask_rate"],
+            "judge_score": metrics["judge_score"],
+        },
+        "reliability": {
+            "safety_violation_rate": metrics["safety_violation_rate"],
+            "refusal_rate": metrics["refusal_rate"],
+            "escalation_rate": metrics["escalation_rate"],
+        },
+        "performance": {
+            "p50_latency_ms": metrics["p50_latency_ms"],
+            "p95_latency_ms": metrics["p95_latency_ms"],
+            "timeout_rate": metrics["timeout_rate"],
+        },
+        "cost": {
+            "cost_per_request": metrics["cost_per_request"],
+            "judge_cost_ratio": metrics["judge_cost_ratio"],
+        },
+    }
+```
+
+### 운영 사고 후 환류 템플릿
+
+사고를 그냥 회고로 끝내지 말고, 평가 체계 업데이트까지 한 번에 연결해야 재발을 줄일 수 있습니다.
+
+```text
+Incident-to-Eval 템플릿
+- Incident ID:
+- 사용자 영향:
+- 실패 입력 패턴:
+- 재현 가능 여부:
+- 새 regression case 추가 여부: Yes/No
+- 새 guardrail metric 필요 여부: Yes/No
+- 임계값 조정 필요 여부: Yes/No
+```
+
+이 템플릿을 온콜 종료 체크리스트에 넣으면, 운영 실패가 자동으로 다음 배포 방어선 강화로 이어집니다.
+
+### 배포 승인 게이트 예시
+
+최종적으로는 운영 신호까지 포함한 승인 규칙이 필요합니다.
+
+```python
+def release_gate(snapshot: dict) -> tuple[bool, str]:
+    if snapshot["quality"]["thumbs_down_rate"] > 0.06:
+        return False, "thumbs_down_rate too high"
+    if snapshot["reliability"]["safety_violation_rate"] > 0.002:
+        return False, "safety violation exceeds threshold"
+    if snapshot["performance"]["p95_latency_ms"] > 4000:
+        return False, "p95 latency too high"
+    if snapshot["cost"]["judge_cost_ratio"] > 0.10:
+        return False, "judge cost ratio budget exceeded"
+    return True, "release approved"
+```
+
+배포 승인을 코드로 고정하면, "느낌상 괜찮다"는 판단을 줄이고 운영 기준을 일관되게 유지할 수 있습니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - 세 가지 샘플링 전략을 먼저 보시면 평가 예산을 어디에 써야 하는지 감이 잡힙니다. 전체를 다 볼 수 없기 때문에 무엇을 더 자주 볼지 결정해야 합니다.

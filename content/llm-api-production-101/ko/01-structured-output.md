@@ -343,6 +343,104 @@ except ValidationError as exc:
 
 이 출력이 중요한 이유는 장애 분류 기준을 바로 코드화할 수 있기 때문입니다. enum 위반인지, 범위 위반인지, 문자열 길이 문제인지가 명확하게 드러나므로 재시도 대신 계약 보강이나 프롬프트 축소로 방향을 바로 잡을 수 있습니다. 회귀 테스트에는 이런 실패 payload를 일부러 포함하는 편이 훨씬 안전합니다.
 
+### 함수 호출 인자도 같은 스키마 계층으로 검증하기
+
+구조화 출력 글에서 자주 놓치는 지점이 하나 있습니다. 모델이 바로 사용자 답변을 만드는 경로뿐 아니라, 다음 단계에서 함수 호출 인자를 만드는 경로도 결국 같은 계약 문제라는 점입니다. 즉 `response_format`으로 받은 JSON을 검증하는 것과 `tool_calls`의 `arguments`를 검증하는 것은 다른 기술이 아니라 같은 원칙의 반복입니다.
+
+아래 예제는 주문 조회 함수 인자를 Pydantic으로 검증하는 패턴을 보여 줍니다. 글의 주제는 구조화 출력이지만, 실제 운영에서는 이 경계가 곧바로 툴 호출 단계로 이어지므로 함께 이해하는 편이 안전합니다.
+
+```python
+import json
+from enum import Enum
+
+from pydantic import BaseModel, Field, ValidationError
+
+class Locale(str, Enum):
+    ko = "ko"
+    en = "en"
+
+class OrderLookupArgs(BaseModel):
+    order_id: str = Field(min_length=6, max_length=32)
+    include_history: bool = False
+    locale: Locale = Locale.ko
+
+raw_tool_arguments = '{"order_id":"ORD-1001","include_history":true,"locale":"ko"}'
+
+try:
+    args_dict = json.loads(raw_tool_arguments)
+    args = OrderLookupArgs.model_validate(args_dict)
+    print(args.model_dump())
+except json.JSONDecodeError as exc:
+    print("tool args json parse failed", exc)
+except ValidationError as exc:
+    print("tool args schema validation failed", exc)
+```
+
+이 패턴의 장점은 명확합니다. 함수 구현 본문은 이미 검증된 타입만 받는다는 가정으로 단순해지고, 실패는 호출 전 단계에서 일관되게 멈춥니다. 결과적으로 구조화 출력 계약은 “모델 답변 파싱”을 넘어서 “실행 경계 검증”까지 확장됩니다.
+
+### 응답 계약 버전 관리: 스키마를 바꾸면 키도 바꾼다
+
+운영에서 자주 발생하는 사건은 필드 추가입니다. 예를 들어 `summary`만 쓰다가 `root_cause`를 새로 추가하면, 새 코드와 옛 응답이 같은 경로에서 섞일 수 있습니다. 이때는 프롬프트만 바꾸는 대신 응답 계약 버전을 명시적으로 올려야 합니다.
+
+```python
+from pydantic import BaseModel, Field
+
+class TicketClassificationV2(BaseModel):
+    schema_version: str = "v2"
+    category: str
+    priority: int = Field(ge=1, le=5)
+    summary: str = Field(min_length=8, max_length=120)
+    root_cause: str = Field(min_length=3, max_length=200)
+
+def build_contract_context() -> dict:
+    return {
+        "schema_version": "v2",
+        "allowed_categories": ["billing", "account", "bug", "shipping"],
+    }
+```
+
+버전 필드는 사소해 보이지만 운영 사고를 줄이는 데 크게 기여합니다. 로그에서 어떤 계약으로 생성된 응답인지 즉시 식별할 수 있고, 캐시 키나 테스트 fixture도 버전 단위로 분리할 수 있습니다. 특히 구조화 출력이 여러 서비스로 전달되는 경우에는 이 버전 필드가 사실상 호환성의 기준점이 됩니다.
+
+### 구조화 출력 품질을 수치로 보는 회귀 테스트
+
+운영 품질을 안정적으로 유지하려면 “이번 배포에서 스키마 실패율이 올랐는가”를 숫자로 볼 수 있어야 합니다. 아래처럼 샘플 입력 묶음을 고정해 두고 통과율을 계산하면 프롬프트 변경이나 모델 교체의 영향을 빠르게 파악할 수 있습니다.
+
+```python
+import json
+from dataclasses import dataclass
+
+from pydantic import BaseModel, Field, ValidationError
+
+class TicketClassification(BaseModel):
+    category: str
+    priority: int = Field(ge=1, le=5)
+    summary: str = Field(min_length=8, max_length=120)
+
+@dataclass
+class EvalCase:
+    name: str
+    raw_json: str
+
+cases = [
+    EvalCase("valid", '{"category":"bug","priority":4,"summary":"Password reset mail is missing"}'),
+    EvalCase("bad-priority", '{"category":"bug","priority":9,"summary":"Password reset mail is missing"}'),
+    EvalCase("bad-json", '{"category":"bug","priority":4,"summary":"oops"'),
+]
+
+passed = 0
+for case in cases:
+    try:
+        payload = json.loads(case.raw_json)
+        TicketClassification.model_validate(payload)
+        passed += 1
+    except (json.JSONDecodeError, ValidationError):
+        pass
+
+print({"total": len(cases), "passed": passed, "pass_rate": round(passed / len(cases), 2)})
+```
+
+이 테스트는 모델 품질 평가를 대체하지는 않지만, 계약 안정성의 하한선을 지켜 줍니다. 특히 시리즈의 다음 단계인 툴 호출과 결합하면 “도구 실행 전 스키마 통과율”이라는 더 직접적인 운영 지표로 확장할 수 있습니다.
+
 ## 흔히 헷갈리는 지점
 
 - JSON 모드를 켰다고 해서 비즈니스 규칙까지 자동으로 보장되는 것은 아닙니다.

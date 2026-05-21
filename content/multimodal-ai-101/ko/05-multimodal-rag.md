@@ -235,6 +235,132 @@ def mrr(predictions: list[list[str]], gold: list[str]) -> float:
 
 ai-evaluation-101 시리즈에서 이 평가 프레임워크를 자세히 다뤘습니다.
 
+## 멀티모달 RAG 평가셋을 만드는 방법
+
+멀티모달 RAG는 텍스트 질문만으로 평가하면 실제 성능을 과대평가하게 됩니다. 평가셋을 만들 때는 질문 유형을 명시적으로 나눠야 합니다. 최소한 시각 패턴 질문, 수치/표 질문, OCR 오류 복원 질문, 이미지-텍스트 결합 질문 네 가지를 포함하는 편이 좋습니다.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class MMQuery:
+    query: str
+    answer: str
+    evidence_image_id: str
+    query_type: str  # visual | numeric | ocr_repair | mixed
+
+benchmark = [
+    MMQuery("빨간 경고 아이콘이 나온 화면을 찾아줘", "settings_error_12", "img_104", "visual"),
+    MMQuery("Q3 매출이 가장 낮은 그래프는?", "slide_27", "img_342", "numeric"),
+]
+```
+
+이렇게 유형을 분리하면 특정 인덱싱 전략의 약점이 바로 드러납니다. 예를 들어 image embedding 단독 전략은 visual 질문에서는 강하지만 numeric 질문에서 급락하는 패턴이 자주 보입니다.
+
+## 재순위화 계층: CLIP 후보 + GPT-4V/Claude 판정
+
+검색 계층을 두 단계로 두면 품질이 안정됩니다. 1단계에서는 CLIP과 텍스트 인덱스로 빠르게 top-30을 뽑고, 2단계에서는 GPT-4V 또는 Claude로 top-5를 재판정합니다.
+
+```python
+def fuse_scores(clip_score: float, text_score: float, beta: float = 0.55) -> float:
+    return beta * clip_score + (1 - beta) * text_score
+
+
+def should_rerank_with_vlm(query_type: str, top1_margin: float) -> bool:
+    if query_type in {"numeric", "mixed"}:
+        return True
+    return top1_margin < 0.08
+```
+
+재순위화 판단 기준을 명시적으로 두면 무분별한 Vision API 호출을 막을 수 있습니다. 특히 `top1_margin`을 쓰면 후보 간 점수 격차가 작은 불확실 상황만 선별할 수 있습니다.
+
+## 생성 단계에서 근거 추적 필드 남기기
+
+최종 답변은 자연어만 반환하지 말고, 어떤 이미지와 OCR 블록을 근거로 썼는지 함께 남겨야 합니다. 이 필드가 있어야 hallucination 감사와 사용자 이의 제기가 가능합니다.
+
+```python
+response = {
+    "answer": "Q3 매출은 0.9M으로 가장 낮습니다.",
+    "citations": [
+        {"image_id": "img_342", "bbox": [411, 298, 588, 346], "source": "ocr"},
+        {"image_id": "img_342", "source": "chart_bar_3"},
+    ],
+    "retrieval_scores": {"clip": 0.41, "text": 0.67, "fused": 0.54},
+}
+```
+
+이 구조를 먼저 고정하면 모델을 바꿔도 운영 품질 지표를 일관되게 비교할 수 있습니다.
+
+## 인덱스 운영: 갱신 주기와 재색인 정책
+
+멀티모달 인덱스는 한 번 만들고 끝나는 자산이 아닙니다. 이미지가 추가되거나 캡션 모델이 바뀌면 재색인이 필요하며, 이때 전체 재빌드를 할지 증분 반영을 할지 기준이 필요합니다. 실무에서는 "모델 버전 변경"과 "데이터 추가"를 구분해 관리합니다.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class IndexEvent:
+    kind: str  # add | delete | reembed
+    item_id: str
+    model_version: str
+```
+
+또한 운영 중에는 stale 인덱스 탐지가 중요합니다. 최근 업로드 자산이 검색 top-k에 거의 등장하지 않으면 증분 파이프라인이 지연되었을 가능성이 큽니다. 이런 지표를 대시보드에 두면 검색 품질 저하를 조기에 발견할 수 있습니다.
+
+## 검색 품질 저하를 빠르게 탐지하는 모니터링
+
+멀티모달 RAG에서는 생성 모델이 자연어를 잘 만들어도 retrieval이 무너지면 답변 신뢰도가 급락합니다. 따라서 운영 지표는 생성 품질보다 retrieval 신호를 먼저 감시해야 합니다. 대표적으로 top-1 점수 하락, top-k 다양성 감소, 최신 문서 회수율 저하를 경고 지표로 두는 것이 실용적입니다.
+
+```python
+def detect_retrieval_drift(avg_top1: float, latest_doc_hit_rate: float) -> bool:
+    if avg_top1 < 0.22:
+        return True
+    if latest_doc_hit_rate < 0.15:
+        return True
+    return False
+```
+
+또한 멀티모달 RAG는 이미지 자산의 라이프사이클 영향을 많이 받습니다. 이미지 URL 만료, 썸네일 손상, OCR 캐시 누락이 발생하면 retrieval 정확도가 급격히 흔들릴 수 있습니다. 그래서 데이터 계층 상태를 함께 모니터링하는 것이 중요합니다.
+
+운영 관점에서 좋은 시스템은 모델 정답률뿐 아니라 "근거 회수율"을 안정적으로 유지합니다. 이 값이 유지되어야 상위 생성 모델 교체도 안전하게 시도할 수 있습니다.
+
+## Query intent 분류와 가중치 자동 조정
+
+질의 의도를 분류해 검색 가중치를 조정하면 멀티모달 RAG 성능이 안정됩니다. 시각 묘사 중심 질문은 이미지 점수를 높이고, 숫자/사실 질문은 OCR·텍스트 점수를 높이는 방식이 효과적입니다.
+
+```python
+def choose_alpha(intent: str) -> float:
+    if intent == "visual":
+        return 0.75
+    if intent == "numeric":
+        return 0.25
+    return 0.5
+```
+
+작게 시작해도 충분합니다. 의도 분류를 복잡하게 만들기보다, 오답 로그를 모아 규칙을 점진적으로 늘리는 편이 운영 리스크가 낮습니다.
+
+## 운영 검증 루프: 주간 점검 항목을 고정하기
+
+멀티모달 시스템은 모델 정확도만으로 상태를 판단하면 늦게 대응하게 됩니다. 그래서 주간 운영 회의에서 항상 같은 항목을 점검하는 루프를 고정하는 편이 좋습니다. 예를 들어 요청량, 평균 지연 시간, P95 지연, 오류율, 재시도율, 캐시 히트율, 사용자 불만 비율을 동일 포맷으로 기록하면 작은 이상 징후를 초기에 잡을 수 있습니다.
+
+또한 지표는 기능별로 분해해야 합니다. 단일 "성공률" 수치만 보면 어떤 단계에서 손실이 났는지 알기 어렵습니다. 입력 검증 단계, 전처리 단계, 검색 단계, 생성 단계를 분리해 성공률을 기록하면 병목 구간이 명확해집니다. 이 분해 지표는 모델 교체나 파이프라인 변경 후 회귀를 탐지하는 데 특히 유용합니다.
+
+```python
+weekly_health = {
+    "request_count": 0,
+    "avg_latency_ms": 0,
+    "p95_latency_ms": 0,
+    "error_rate": 0.0,
+    "retry_rate": 0.0,
+    "cache_hit_rate": 0.0,
+    "user_downvote_rate": 0.0,
+}
+```
+
+운영 루프를 고정하면 기술 선택도 더 현실적으로 바뀝니다. 새 모델을 도입할 때 "정확도 상승"만 보지 않고, 지연 증가와 비용 증가를 같은 표에서 비교할 수 있기 때문입니다. 결국 프로덕션 품질은 한 번의 모델 업그레이드가 아니라, 반복 가능한 점검 루프를 통해 유지됩니다.
+
+짧게 정리하면, 멀티모달 RAG의 품질은 생성 모델 선택보다 retrieval 설계와 증거 관리 정책에서 먼저 결정됩니다. 따라서 인덱스 품질 지표와 근거 회수율을 주간 운영 지표로 고정해 두는 편이 좋습니다.
+
 ## 흔히 헷갈리는 지점
 
 - **CLIP과 텍스트 embedding을 같은 인덱스에 섞기** CLIP은 자체 latent space, BGE/OpenAI embedding은 다른 latent space입니다. 두 vector를 한 인덱스에 넣으면 거리가 의미를 잃습니다. 인덱스를 따로 두고 score를 가중평균합니다.

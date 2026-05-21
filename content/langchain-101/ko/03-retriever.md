@@ -318,6 +318,158 @@ print(f"\nresult: {results[0].page_content}")
 
 ---
 
+## 검색 품질을 숫자로 점검하기
+
+RAG에서 자주 놓치는 점은 "검색 결과가 그럴듯해 보인다"는 감각적 판단입니다. 최소한 아래처럼 질문별 상위 문서를 표로 남기면, 프롬프트 수정 전에 retrieval 품질을 정량적으로 비교할 수 있습니다.
+
+| query | 기대 문서 키워드 | top-1 포함 여부 | top-k 메모 |
+|---|---|---|---|
+| `Who developed FAISS?` | `Facebook AI Research` | Pass | top-1 정답 |
+| `What does RAG combine?` | `retrieved documents + LLM` | Pass | top-2까지 안정 |
+| `What is BM25?` | 없음(코퍼스 외) | Fail(의도) | 부재 응답 필요 |
+
+이 표는 모델 품질 평가표와 분리해 관리하는 것이 좋습니다. 검색이 Fail인데 모델 답변만 보고 프롬프트를 손대면 개선 속도가 크게 떨어집니다.
+
+## Retriever 구현 패턴 비교
+
+Retriever를 붙이는 방법은 하나가 아닙니다. 다만 입문 단계에서 많이 쓰는 패턴은 다음 셋입니다.
+
+| 패턴 | LCEL 형태 | 장점 | 단점 |
+|---|---|---|---|
+| 단순 연결 | `retriever | format_docs` | 이해가 빠름 | 길이 제어가 약함 |
+| 점수 필터 | `retriever_with_score | filter | format` | 잡음 문서 감소 | 구현 코드 증가 |
+| 재랭킹 추가 | `retriever | reranker | format` | 정확도 향상 가능 | 지연 증가 |
+
+실전에서는 단순 연결로 시작한 뒤, 품질 이슈가 확인되면 점수 필터와 재랭킹을 순서대로 추가하는 접근이 안전합니다.
+
+## 점수 기반 필터링 예제
+
+아래 코드는 `similarity_search_with_score`를 이용해 점수가 낮은 문서를 제거한 뒤 프롬프트 컨텍스트로 넘깁니다.
+
+```python
+from langchain_core.runnables import RunnableLambda
+
+def retrieve_with_threshold(query: str, threshold: float = 0.9):
+    pairs = vectorstore.similarity_search_with_score(query, k=4)
+    # L2 거리 기준: 값이 작을수록 유사
+    filtered = [doc for doc, score in pairs if score <= threshold]
+    return filtered
+
+def docs_to_context(docs: list) -> str:
+    if not docs:
+        return "NO_CONTEXT_FOUND"
+    return "\n\n".join(d.page_content for d in docs)
+
+retrieval_branch = RunnableLambda(retrieve_with_threshold) | RunnableLambda(docs_to_context)
+```
+
+이 패턴의 핵심은 Retriever 출력을 그대로 믿지 않고 한 번 더 애플리케이션 규칙으로 거른다는 점입니다. 특히 코퍼스 잡음이 높은 환경에서는 모델 프롬프트를 다듬는 것보다 이 필터 단계가 더 큰 효과를 냅니다.
+
+## 메타데이터 필터를 고려한 문서 설계
+
+Retriever 품질은 임베딩 모델만의 문제가 아닙니다. 문서 메타데이터를 처음부터 어떻게 넣었는지도 크게 좌우합니다.
+
+```python
+from langchain_core.documents import Document
+
+docs = [
+    Document(
+        page_content="FAISS supports exact and approximate nearest-neighbor search.",
+        metadata={"source": "faiss-intro", "topic": "vector-search", "lang": "en"},
+    ),
+    Document(
+        page_content="RAG combines retrieval context with generation.",
+        metadata={"source": "rag-guide", "topic": "rag", "lang": "en"},
+    ),
+]
+```
+
+나중에 `topic=rag`만 검색하고 싶어질 때, 메타데이터가 없으면 코퍼스 전체에서 텍스트 유사도만으로 해결해야 합니다. 문서 설계 단계에서 최소한 `source`, `topic`, `lang`, `updated_at` 정도를 넣어 두면 운영 유연성이 크게 올라갑니다.
+
+## LangSmith에서 Retriever 구간 추적하기
+
+Retriever가 포함된 체인을 LangSmith로 보면, LLM 단계 이전에 retrieval 단계가 별도 run으로 보입니다.
+
+```text
+[trace] run_type=chain name=rag_chain latency_ms=1198
+  [child] run_type=retriever name=VectorStoreRetriever latency_ms=71 k=3
+  [child] run_type=prompt name=ChatPromptTemplate latency_ms=2
+  [child] run_type=llm name=ChatGroq latency_ms=1089 tokens_in=522 tokens_out=118
+```
+
+이 정보만 있어도 지연 원인을 곧바로 분리할 수 있습니다. retrieval이 70ms인데 전체가 1.2초라면 검색 튜닝보다 모델/출력 길이 제어가 우선입니다. 반대로 retrieval이 600ms 이상이면 인덱스 구조와 필터 전략부터 점검해야 합니다.
+
+## Retriever 장애 체크리스트
+
+- `질문 로그`: 사용자 원문 질문과 정규화 질문을 분리 저장했는가
+- `hit 로그`: top-k 문서 ID, score, source를 남겼는가
+- `empty-hit 비율`: 컨텍스트 없음 응답 비율을 모니터링하는가
+- `index 버전`: 어떤 인덱스 스냅샷으로 검색했는지 추적 가능한가
+- `fallback 경로`: 컨텍스트 부재 시 답변 정책이 정해져 있는가
+
+이 다섯 항목만 갖춰도 "왜 어제는 답했는데 오늘은 모른다고 했는가" 같은 질문에 근거를 제시할 수 있습니다.
+
+## MMR과 similarity 선택 기준
+
+MMR(maximal marginal relevance)을 언제 쓸지 자주 묻습니다. 기준은 간단합니다. 질문이 좁고 명확하면 similarity가 유리하고, 질문이 넓거나 문서 중복이 심하면 MMR이 유리한 경우가 많습니다.
+
+| 조건 | 추천 검색 타입 | 이유 |
+|---|---|---|
+| 정의 질문(예: "FAISS가 뭐야?") | similarity | 정답 문서 한두 개에 집중 |
+| 비교 질문(예: "RAG와 키워드 검색 차이") | mmr | 서로 다른 관점 문서 확보 |
+| 잡음 코퍼스 | similarity + threshold | 낮은 점수 문서 제거 |
+
+```python
+retriever_similarity = vectorstore.as_retriever(
+    search_type="similarity",
+    search_kwargs={"k": 3},
+)
+
+retriever_mmr = vectorstore.as_retriever(
+    search_type="mmr",
+    search_kwargs={"k": 3, "fetch_k": 12, "lambda_mult": 0.4},
+)
+```
+
+운영에서는 질문 카테고리별로 기본 검색 타입을 다르게 두는 방법도 자주 씁니다. 예를 들어 FAQ형 질문은 similarity, 탐색형 질문은 MMR로 시작하면 평균 품질이 안정되는 경우가 많습니다.
+
+## Retriever + Prompt 길이 제어 패턴
+
+검색 품질이 좋아도 context 길이가 지나치면 모델 입력 비용과 지연이 커집니다. 그래서 retriever 다음에 길이 제어 함수를 두는 패턴이 실전에서 매우 중요합니다.
+
+```python
+def trim_context(docs: list, max_chars: int = 1200) -> str:
+    buf = []
+    total = 0
+    for doc in docs:
+        text = doc.page_content.strip()
+        if total + len(text) > max_chars:
+            break
+        buf.append(text)
+        total += len(text)
+    return "\n\n".join(buf)
+
+context_chain = retriever | trim_context
+```
+
+이 함수를 두면 `k`가 커져도 프롬프트 입력 길이를 일정 범위로 유지할 수 있습니다. 특히 스트리밍 응답에서 first token latency를 안정화하는 데 효과가 큽니다.
+
+## 검색 실패를 사용자 경험으로 연결하기
+
+검색 결과가 없을 때 단순히 "모릅니다"라고 끝내면 사용자 경험이 끊깁니다. 아래처럼 다음 행동을 제안하는 응답 정책이 필요합니다.
+
+| 상황 | 권장 응답 |
+|---|---|
+| 컨텍스트 없음 | "현재 인덱스에는 해당 주제가 없습니다. 키워드를 바꿔 다시 질문해 주세요." |
+| 점수 낮음 | "관련도가 낮아 신뢰하기 어렵습니다. 질문 범위를 좁혀 주세요." |
+| 문서 상충 | "문서 간 정보가 상충합니다. 출처를 지정해 주시면 좁혀서 답하겠습니다." |
+
+Retriever는 단순 기술 컴포넌트 같지만, 이 정책까지 포함해야 실제 서비스 품질이 완성됩니다.
+
+또한 운영 대시보드에는 질문당 top-k 문서 미리보기와 score 분포를 함께 두는 편이 좋습니다. 모델 응답만 보면 retrieval 실패를 늦게 발견하지만, score 분포를 같이 보면 인덱스 품질 저하를 조기에 감지할 수 있습니다.
+
+---
+
 ## 이 코드에서 주목할 점
 
 - VectorStore는 저장 레이어이고, Retriever는 그 위에 얹힌 질의 인터페이스입니다.

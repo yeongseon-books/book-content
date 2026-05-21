@@ -324,6 +324,78 @@ async def chat_stream(prompt: str) -> StreamingResponse:
 - 중간 렌더링만 신경 쓰고 최종 문자열 재구성을 빼먹기 쉽지만, 저장·캐시·후속 처리에는 전체 본문이 필요합니다.
 - 마지막 종료 신호를 명시하지 않으면 브라우저 UI는 정상 완료와 연결 문제를 구분하기 어렵습니다.
 
+## 스트리밍 운영 패턴: 중단, 재시도, 백프레셔
+
+스트리밍이 실제 서비스에 들어가면 가장 먼저 필요한 것은 예쁜 출력보다 종료 제어입니다. 사용자 취소, 네트워크 단절, 서버 재시작이 모두 중간에 일어날 수 있기 때문입니다. 그래서 스트림 소비 루프는 "완주"만이 아니라 "중단"을 정상 경로로 다뤄야 합니다.
+
+```python
+class StreamCancelled(Exception):
+    pass
+
+def consume_with_cancel(stream, is_cancelled) -> str:
+    parts: list[str] = []
+    for chunk in stream:
+        if is_cancelled():
+            raise StreamCancelled("User requested cancellation")
+
+        delta = chunk.choices[0].delta.content
+        if delta:
+            parts.append(delta)
+
+    return "".join(parts)
+```
+
+이 패턴을 두면 "취소했는데도 모델 호출이 끝까지 돈다" 같은 낭비를 줄일 수 있습니다.
+
+### 스트리밍 전용 오류 분기
+
+비스트리밍과 달리 스트리밍은 "시작 전 실패"와 "중간 실패"를 구분해야 합니다.
+
+| 실패 시점 | 예시 | 권장 대응 |
+|---|---|---|
+| 시작 전 | 인증 실패, 모델 ID 오류 | 즉시 실패 응답 |
+| 중간 | 네트워크 단절, 클라이언트 종료 | 부분 결과 저장 + 중단 상태 기록 |
+| 종료 직전 | done 이벤트 누락 | 타임아웃 후 강제 종료 처리 |
+
+중간 실패를 500으로만 뭉개면 사용자 입장에서는 "아무것도 안 나왔다"로 느껴집니다. 부분 텍스트를 남기고 재시도 가이드를 주는 쪽이 훨씬 낫습니다.
+
+### FastAPI SSE에서 백프레셔 완화
+
+브라우저 소비 속도가 느리면 서버 버퍼가 밀릴 수 있습니다. 이때는 청크를 너무 잘게 쪼개지 않고, 문장 단위 버퍼링을 넣는 편이 안정적입니다.
+
+```python
+async def sentence_buffered_sse(stream):
+    buffer = ""
+    async for chunk in stream:
+        delta = chunk.choices[0].delta.content
+        if not delta:
+            continue
+
+        buffer += delta
+        if buffer.endswith((".", "!", "?", "\n")):
+            yield f"data: {buffer}\n\n"
+            buffer = ""
+
+    if buffer:
+        yield f"data: {buffer}\n\n"
+    yield "data: [done]\n\n"
+```
+
+이 방식은 토큰 단위 실시간성은 조금 낮아지지만, 전송량과 렌더링 부하를 줄여 실제 UX가 더 안정적으로 보일 때가 많습니다.
+
+### 스트리밍 지표를 분리해서 보기
+
+스트리밍 도입 효과는 평균 응답 시간 하나로 잘 보이지 않습니다. 아래 지표를 분리해 보는 편이 정확합니다.
+
+| 지표 | 의미 | 목표 |
+|---|---|---|
+| TTFT(time to first token) | 첫 글자 도착 시간 | 가능한 낮게 |
+| Stream completion rate | `[done]`까지 정상 완료 비율 | 가능한 높게 |
+| Mid-stream abort rate | 중간 취소/단절 비율 | 원인별 추적 |
+| Avg tokens streamed | 평균 스트리밍 토큰 수 | use case별 기준화 |
+
+스트리밍은 "빠르다/느리다"보다 "얼마나 빨리 보이기 시작하는가"가 핵심입니다. 그래서 TTFT를 별도로 측정하지 않으면 개선 여부를 놓치기 쉽습니다.
+
 ## 운영 체크리스트
 
 - [ ] `stream=True` 호출이 기본 응답 객체와 다른 소비 패턴을 만든다는 점을 확인했습니다.

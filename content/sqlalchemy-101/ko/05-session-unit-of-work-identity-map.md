@@ -313,6 +313,134 @@ with Session(engine) as session:
 - [ ] 벌크 작업에서는 ORM 객체 대신 stmt 기반 INSERT를 검토했는가?
 - [ ] `sessionmaker`로 Session 생성 정책을 한곳에 모았는가?
 
+## 세션 라이프사이클 실전 로그
+
+Session을 이해했다는 말은 `flush`와 `commit` 사이에서 어떤 SQL이 나가는지 설명할 수 있다는 뜻입니다. 아래 로그는 가장 자주 보는 패턴입니다.
+
+```text
+INFO sqlalchemy.engine.Engine BEGIN (implicit)
+INFO sqlalchemy.engine.Engine INSERT INTO users (email) VALUES (?)
+INFO sqlalchemy.engine.Engine [generated in 0.00010s] ('alice@example.com',)
+INFO sqlalchemy.engine.Engine UPDATE users SET email=? WHERE users.id = ?
+INFO sqlalchemy.engine.Engine [generated in 0.00008s] ('alice+1@example.com', 1)
+INFO sqlalchemy.engine.Engine COMMIT
+```
+
+같은 트랜잭션 안에서 INSERT와 UPDATE가 함께 묶여 나간다는 점이 Unit of Work의 핵심입니다. 객체를 여러 번 변경해도 `commit` 시점에 최종 상태만 반영됩니다.
+
+## flush를 의도적으로 쓰는 시점
+
+다음 시나리오는 flush를 명시해야 하는 대표 사례입니다.
+
+```python
+with Session(engine) as session:
+    order = Order(status="pending")
+    session.add(order)
+    session.flush()
+
+    session.add(OrderAudit(order_id=order.id, action="created"))
+    session.commit()
+```
+
+`order.id`를 같은 트랜잭션 안에서 즉시 써야 하므로 `flush()`가 필요합니다. flush 없이 작성하면 PK가 아직 없어서 감사 로그를 만들 수 없습니다.
+
+## 세션 경계와 서비스 함수 설계
+
+실무에서는 세션을 서비스 계층에서 한 번 열고 여러 리포지토리 함수를 조합합니다.
+
+```python
+def place_order(session: Session, user_id: int, items: list[dict]) -> int:
+    order = Order(user_id=user_id, status="pending")
+    session.add(order)
+    session.flush()
+
+    for item in items:
+        session.add(OrderItem(order_id=order.id, sku=item["sku"], qty=item["qty"]))
+
+    order.status = "confirmed"
+    return order.id
+
+with SessionLocal() as session:
+    try:
+        with session.begin():
+            order_id = place_order(session, user_id=10, items=payload_items)
+    except Exception:
+        session.rollback()
+        raise
+```
+
+핵심은 함수가 `commit()`을 호출하지 않는다는 점입니다. 트랜잭션 경계는 상위 계층이 소유해야 재사용성과 테스트성이 올라갑니다.
+
+## identity map과 stale 데이터 점검
+
+Identity Map은 강력하지만 stale 데이터 오해를 만들기도 합니다. 같은 세션에서 오래 작업하면 이미 메모리에 올라온 객체를 계속 재사용하기 때문입니다. 장기 배치 작업에서는 아래 패턴으로 주기적으로 비웁니다.
+
+```python
+for i, payload in enumerate(stream):
+    apply_change(session, payload)
+    if i % 500 == 0:
+        session.flush()
+        session.expunge_all()
+```
+
+이 방식은 메모리 사용량 급증을 막고, 너무 커진 identity map 때문에 GC가 느려지는 문제를 줄여 줍니다.
+
+## 관측 지표: 세션 기준으로 무엇을 볼까
+
+운영에서 Session 계층은 다음 지표로 감시하면 효과가 큽니다.
+
+- 트랜잭션 평균 길이(ms)
+- 요청당 SQL 개수
+- `rollback` 비율
+- `IntegrityError`/`OperationalError` 발생 비율
+- 커넥션 체크아웃 대기 시간
+
+7편의 N+1 문제와 10편의 풀 튜닝은 결국 여기 지표로 연결됩니다. 세션은 ORM 추상화의 중심이자 운영 신호의 출발점입니다.
+
+## 보강 앵커: 세션 실패 복구 시나리오
+
+운영에서 세션 계층은 "실패했을 때 어떻게 원상복구하는가"가 중요합니다. 가장 흔한 실패 흐름은 무결성 오류 후 세션을 계속 사용하는 패턴입니다.
+
+```python
+with SessionLocal() as session:
+    try:
+        with session.begin():
+            create_user(session, email="dup@example.com")
+            create_user(session, email="dup@example.com")
+    except IntegrityError:
+        session.rollback()
+
+    # rollback 이후 새 트랜잭션으로 재시도
+    with session.begin():
+        create_user(session, email="unique@example.com")
+```
+
+rollback 없이 세션을 재사용하면 `PendingRollbackError`가 발생합니다. 세션은 실패 이후 반드시 명시적으로 정리해야 합니다.
+
+## 보강 앵커: Session 이벤트로 트랜잭션 감사 로그 남기기
+
+```python
+@event.listens_for(Session, "after_begin")
+def _tx_begin(session, transaction, connection):
+    logger.info("tx_begin sid=%s", id(session))
+
+@event.listens_for(Session, "after_commit")
+def _tx_commit(session):
+    logger.info("tx_commit sid=%s", id(session))
+
+@event.listens_for(Session, "after_rollback")
+def _tx_rollback(session):
+    logger.info("tx_rollback sid=%s", id(session))
+```
+
+이 세 줄만 있어도 장애 시점에 어떤 요청이 롤백 비율을 올렸는지 추적이 쉬워집니다.
+
+## 보강 메모
+
+Session 계층을 운영에서 다룰 때는 "어느 요청이 어떤 트랜잭션을 열고 닫았는가"를 항상 추적 가능한 형태로 남겨야 합니다. 요청 ID와 세션 ID를 함께 로깅하면 동일 증상 재현 속도가 크게 빨라집니다.
+
+운영 기준으로는 세션 경계가 곧 장애 경계입니다.
+
 ## 처음 질문으로 돌아가기
 
 - **`Session`은 단순한 connection 래퍼가 아니라 무엇을 관리할까요?**

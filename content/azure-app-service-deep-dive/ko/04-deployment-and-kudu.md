@@ -138,6 +138,95 @@ az webapp config appsettings list -n my-app -g my-rg --slot staging \
 
 이 명령은 slot 배포가 실제로 어떤 표면에서 제어되는지 보여 줍니다. production 이전에 어느 slot이 준비되는지, swap 관련 설정이 어떤 상태인지, 운영자가 어떤 조합을 의도했는지 빠르게 확인할 수 있습니다.
 
+### Kudu REST API로 배포 상태를 직접 추적하는 방법
+
+Kudu를 UI로만 보면 단계가 가려집니다. REST API를 사용하면 upload, deployment status, 로그를 분리해 읽을 수 있습니다. 아래 예시는 ZipDeploy 이후 배포 이력과 특정 배포 로그를 이어서 조회하는 기본 패턴입니다.
+
+```bash
+# Kudu 기본 인증 정보는 배포 자격증명을 사용
+KUDU_BASE="https://my-app.scm.azurewebsites.net"
+
+# 최근 배포 목록
+curl -s -u "$KUDU_USER:$KUDU_PASS"   "$KUDU_BASE/api/deployments"
+
+# 특정 배포 로그 조회
+DEPLOY_ID="<deployment-id>"
+curl -s -u "$KUDU_USER:$KUDU_PASS"   "$KUDU_BASE/api/deployments/$DEPLOY_ID/log"
+```
+
+배포 파일 배치 상태를 직접 확인할 때는 VFS endpoint가 유용합니다.
+
+```bash
+# wwwroot 디렉터리 목록 확인
+curl -s -u "$KUDU_USER:$KUDU_PASS"   "$KUDU_BASE/api/vfs/site/wwwroot/"
+```
+
+**Expected output:** `api/deployments`는 배포 단위의 성공/실패와 타임라인을 보여 주고, `api/deployments/<id>/log`는 실제 실패 단계(restore, build, script)를 보여 줍니다. `api/vfs`는 최종 파일 배치 여부를 확인하게 해 주므로, "업로드 실패"와 "런타임 시작 실패"를 분리하는 데 직접적입니다.
+
+### 배포 후 네트워크/성능 검증: startup readiness를 숫자로 확인
+
+Kudu success만으로 배포를 닫으면 위험합니다. 반드시 배포 직후 readiness와 첫 요청 성능을 함께 기록해야 합니다.
+
+```bash
+# 배포 직후 상태 코드와 TTFB 분포 확인
+for i in $(seq 1 20); do
+  curl -o /dev/null -s -w "%{http_code} ttfb=%{time_starttransfer} total=%{time_total}
+"     https://my-app.azurewebsites.net/healthz
+done
+
+# 슬롯 경유 검증 후 swap 전 마지막 점검
+curl -s https://my-app-staging.azurewebsites.net/diag/runtime
+```
+
+이 단계에서 status는 200인데 TTFB가 비정상적으로 길면 배포 실패가 아니라 startup 후속 작업 지연일 수 있습니다. 반대로 status가 반복적으로 실패하면 warm-up 경로 또는 startup command를 우선 확인해야 합니다.
+
+### Kudu API 기반 배포 검증 체크포인트
+
+배포 파이프라인을 자동화할 때는 성공 판정을 한 줄로 내리지 말고 체크포인트를 분리합니다. 권장 순서는 `zipdeploy 요청 수락 -> deployment status success -> VFS 경로 확인 -> 앱 readiness 성공`입니다.
+
+```bash
+# 1) zipdeploy 제출
+curl -s -X POST -u "$KUDU_USER:$KUDU_PASS"   -T app.zip "$KUDU_BASE/api/zipdeploy?isAsync=true"
+
+# 2) 배포 목록에서 최신 항목 확인
+curl -s -u "$KUDU_USER:$KUDU_PASS" "$KUDU_BASE/api/deployments"
+
+# 3) 런타임 readiness 확인
+curl -o /dev/null -s -w "%{http_code} %{time_total}
+" https://my-app.azurewebsites.net/healthz
+```
+
+체크포인트를 분리해 두면 실패 지점을 즉시 알 수 있어 롤백 기준도 명확해집니다. 특히 "Kudu 성공 + readiness 실패" 패턴을 독립된 유형으로 관리하면 운영 보고 품질이 크게 올라갑니다.
+
+### 배포 직후 성능 프로파일링으로 숨은 startup 비용 찾기
+
+```bash
+for i in $(seq 1 30); do
+  curl -o /dev/null -s -w "ttfb=%{time_starttransfer} total=%{time_total}
+"     https://my-app.azurewebsites.net/api/orders
+done
+```
+
+동일 코드 버전에서도 배포 직후 TTFB 꼬리가 길면 dependency 초기화 또는 cache prime이 readiness 뒤에 남아 있을 수 있습니다. 이 경우 warm-up endpoint를 보강해 사용자 경로 이전에 초기화를 끝내는 편이 안정적입니다.
+
+### 롤백 기준을 숫자로 정의하기
+
+배포 실패 판단을 느낌으로 두지 말고 기준을 고정합니다. 예를 들어 3분 내 `/healthz` 성공률 99% 미만 또는 p95 TTFB가 기준 대비 2배 초과이면 즉시 롤백 같은 규칙을 두면 의사결정 속도가 빨라집니다.
+
+```bash
+for i in $(seq 1 60); do
+  curl -o /dev/null -s -w "%{http_code} %{time_starttransfer}\n" https://my-app.azurewebsites.net/healthz
+done
+```
+
+이 기준은 배포 자동화 파이프라인에도 그대로 넣을 수 있습니다. readiness 실패가 임계치를 넘으면 승격을 중단하고 이전 슬롯으로 되돌리는 정책을 코드화해 두는 편이 안전합니다.
+
+또한 배포 로그를 장기 보존해 두면 계절성 장애 분석에 도움이 됩니다. 특정 월이나 특정 빌드 도구 버전에서만 startup 지연이 반복되는지를 확인할 수 있어, 플랫폼 이슈와 애플리케이션 이슈를 구분하는 근거가 됩니다.
+
+배포 파이프라인 변경 시에는 이 로그 포맷을 유지해 이전 릴리스와 비교 가능성을 보장해야 합니다.
+
+이 원칙은 필수입니다.
+
 ## 흔히 헷갈리는 지점
 
 - **Kudu success는 runtime success가 아닙니다.** artifact 수신과 file placement는 성공했지만 앱 startup은 실패할 수 있습니다.

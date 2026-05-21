@@ -363,6 +363,104 @@ kubectl describe service fastapi-hello
 
 이 흐름만 분명하면 이후 Ingress를 붙이거나 HPA를 켜거나 관측 도구를 추가하는 일도 모두 같은 언어로 이어집니다.
 
+### 12. ConfigMap과 Secret을 붙여 실제 운영 형태에 가깝게 만듭니다
+
+첫 배포가 끝났다면 다음으로 해야 할 일은 설정과 비밀값을 컨테이너 이미지에서 분리하는 것입니다. 실습 단계에서도 이 습관을 일찍 붙이면 배포 파이프라인과 운영 경계가 훨씬 명확해집니다.
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fastapi-hello-config
+data:
+  APP_ENV: "dev"
+  LOG_LEVEL: "info"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: fastapi-hello-secret
+type: Opaque
+stringData:
+  API_KEY: "replace-me"
+```
+
+그리고 Deployment의 컨테이너에 `envFrom` 또는 `env`를 연결합니다.
+
+```yaml
+envFrom:
+  - configMapRef:
+      name: fastapi-hello-config
+  - secretRef:
+      name: fastapi-hello-secret
+```
+
+이 구조의 장점은 명확합니다. 이미지 재빌드 없이도 환경값을 조정할 수 있고, 민감 정보의 변경 이력을 애플리케이션 코드 변경과 분리할 수 있습니다. AKS 운영에서 “배포 실패”와 “설정 오류”를 구분하는 데도 큰 도움이 됩니다.
+
+### 13. 실패 상황을 일부러 만들어 보고 확인 포인트를 익힙니다
+
+입문 실습에서도 한 번쯤은 의도적으로 실패를 만들어 보는 편이 좋습니다. 예를 들어 이미지 태그를 존재하지 않는 값으로 바꾼 뒤 `kubectl describe pod`를 보면 `ImagePullBackOff` 흐름을 실제로 확인할 수 있습니다. 이 경험은 이후 장애 대응 속도를 크게 올려 줍니다.
+
+```bash
+kubectl set image deployment/fastapi-hello app=<your-registry>/fastapi-hello:not-exist
+kubectl get pods -w
+kubectl describe pod <pod-name>
+kubectl rollout undo deployment/fastapi-hello
+```
+
+핵심은 실패를 피하는 것이 아니라, 실패를 빠르게 분류하고 되돌리는 루프를 팀 표준으로 만드는 일입니다. 첫 클러스터 실습의 완성도는 성공 화면보다 복구 동작에서 더 명확하게 드러납니다.
+
+### 14. Ingress 전환의 첫 단추까지 함께 경험해 봅니다
+
+실습을 한 단계 더 확장하면 5화 내용을 훨씬 쉽게 이해할 수 있습니다. `LoadBalancer` Service로 바로 노출했던 구조를 `ClusterIP + Ingress` 구조로 바꿔 보면, 외부 공개 모델이 어떻게 정리되는지 즉시 체감됩니다.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastapi-hello
+spec:
+  type: ClusterIP
+  selector:
+    app: fastapi-hello
+  ports:
+    - port: 80
+      targetPort: 8000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fastapi-hello
+spec:
+  ingressClassName: webapprouting.kubernetes.azure.com
+  rules:
+    - host: hello.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: fastapi-hello
+                port:
+                  number: 80
+```
+
+이 전환의 핵심은 공개 표면을 줄이는 것입니다. 서비스가 늘어날수록 `LoadBalancer`를 서비스마다 하나씩 두는 방식은 운영 부담이 빠르게 커집니다. 반면 Ingress를 사용하면 인증서와 도메인 라우팅을 한 계층에서 통제할 수 있습니다.
+
+### 15. 배포 후 확인 명령을 표준화합니다
+
+첫 클러스터 실습에서 가장 큰 실수는 “성공했다”를 `kubectl get pods` 한 줄로 판단하는 것입니다. 실제로는 rollout, endpoint, 요청 검증까지 같이 봐야 운영 관점에서 완료입니다.
+
+```bash
+kubectl rollout status deployment/fastapi-hello
+kubectl get endpoints fastapi-hello
+kubectl get ingress
+kubectl get events -A --sort-by=.lastTimestamp
+```
+
+`rollout status`는 선언한 버전이 실제로 배치됐는지를, `endpoints`는 Service가 실제 Pod를 잡았는지를, `events`는 보이지 않는 실패 힌트를 보여 줍니다. 이 네 줄을 습관화하면 “보기에 Running인데 서비스는 안 되는” 상황에서 진단 속도가 크게 올라갑니다.
+
 ## 흔히 헷갈리는 지점
 
 - `az aks create`만 끝나면 앱 배포까지 끝난 것처럼 느끼기 쉽지만, 그다음부터가 Kubernetes 객체 작업입니다.

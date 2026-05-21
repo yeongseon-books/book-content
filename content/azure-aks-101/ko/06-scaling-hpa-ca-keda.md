@@ -266,6 +266,86 @@ autoscaling은 신뢰성과 비용을 동시에 다룹니다.
 
 따라서 스케일링 설계는 “더 자동화된다”보다 “어떤 신호를 기준으로 어떤 비용을 지불할 것인가”로 읽는 편이 더 정확합니다. 잘못된 min/max 범위나 과민한 임계값은 곧 비용 문제로 돌아옵니다.
 
+### HPA와 Cluster Autoscaler를 함께 볼 때는 이벤트 순서를 확인합니다
+
+스케일링 장애 분석에서 가장 유용한 습관은 시간 순서를 보는 것입니다. “HPA가 먼저 replica를 올렸는가”, “그다음 Pending이 생겼는가”, “마지막에 노드가 추가됐는가”를 분리하면 원인을 빠르게 좁힐 수 있습니다.
+
+```bash
+kubectl get hpa -w
+kubectl get pods -A --field-selector=status.phase=Pending
+kubectl get events -A --sort-by=.lastTimestamp
+kubectl get nodes -o wide
+```
+
+실전에서 자주 보는 흐름은 이렇습니다. HPA가 목표치를 초과해 replica를 올리고, 잠시 뒤 `0/2 nodes are available`류의 스케줄링 이벤트가 발생하고, Cluster Autoscaler가 노드를 늘린 다음 새 Pod가 Ready가 됩니다. 이 시간차를 모르면 autoscaling이 실패한 것처럼 보이기 쉽습니다.
+
+### KEDA 워크로드는 안정화 구간과 cooldown을 같이 설계합니다
+
+KEDA는 외부 이벤트 신호를 매우 빠르게 반영할 수 있어 장점이 큽니다. 다만 입력 신호가 출렁이면 replica도 출렁일 수 있으므로 안정화 구간을 함께 잡는 편이 좋습니다. 특히 큐 기반 워크로드는 짧은 burst가 잦아 과민 반응을 피하는 설정이 중요합니다.
+
+```yaml
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: orders-scaler
+spec:
+  scaleTargetRef:
+    name: orders-deployment
+  minReplicaCount: 0
+  maxReplicaCount: 30
+  pollingInterval: 30
+  cooldownPeriod: 300
+  advanced:
+    horizontalPodAutoscalerConfig:
+      behavior:
+        scaleUp:
+          stabilizationWindowSeconds: 0
+        scaleDown:
+          stabilizationWindowSeconds: 300
+  triggers:
+    - type: azure-servicebus
+      metadata:
+        queueName: orders
+        messageCount: "10"
+      authenticationRef:
+        name: servicebus-trigger-auth
+```
+
+이 예시는 scale up은 빠르게, scale down은 천천히 하겠다는 의도를 명확히 드러냅니다. 트래픽 품질과 비용을 동시에 보려면 “얼마나 빨리 늘릴까”만큼 “얼마나 신중히 줄일까”도 중요합니다.
+
+### 스케일링 장애를 재현 가능한 방식으로 읽는 예시
+
+다음은 운영에서 자주 보는 시나리오입니다. 평균 CPU가 목표치를 넘어서 HPA가 replica를 올렸지만, user pool 용량이 부족해 일부 Pod가 Pending으로 남는 상황입니다. 이때는 HPA가 실패한 것이 아니라 계층 간 시간차가 발생한 것입니다.
+
+```bash
+kubectl get hpa fastapi-hello
+kubectl describe hpa fastapi-hello
+kubectl get pods -l app=fastapi-hello -o wide
+kubectl describe pod <pending-pod-name>
+```
+
+`describe hpa`에서 desired replica가 증가했다면 Pod 계층은 반응한 상태입니다. 이어서 `describe pod`에 `Insufficient cpu` 또는 `No nodes are available`가 보이면 Node 계층 병목입니다. 이런 식으로 읽어야 “어떤 autoscaler를 조정할지”가 명확해집니다.
+
+### Cluster Autoscaler 범위 설계는 워크로드 등급과 같이 봅니다
+
+많은 팀이 min/max 노드 값을 임의 숫자로 두는데, 더 안전한 방법은 워크로드 등급별로 기준 용량을 먼저 정하는 것입니다. 예를 들어 핵심 API는 최소 2노드 유지, 비핵심 워커 풀은 0까지 허용처럼 명시하면 비용과 가용성을 동시에 관리하기 쉬워집니다.
+
+```bash
+az aks nodepool update \
+  --resource-group "$RG" \
+  --cluster-name "$CLUSTER" \
+  --name userpoolapi \
+  --enable-cluster-autoscaler \
+  --min-count 2 \
+  --max-count 10
+```
+
+이 숫자는 성능 테스트와 장애 예행연습으로 검증해야 합니다. autoscaling은 설정 자체보다 검증 루프가 더 중요합니다. 값이 그럴듯해 보여도 실제 burst 트래픽에서 ready 지연이 길면 사용자 체감은 여전히 나쁠 수 있습니다.
+
+마지막으로 autoscaling을 도입한 워크로드는 배포 직후 꼭 baseline 부하 테스트를 남겨 두는 편이 좋습니다. 평상시 트래픽, 2배 burst, 5분 지속 부하 같은 단순 시나리오라도 기록해 두면 이후 임계값 조정의 기준점이 생깁니다. 기준점이 없으면 “느린 것 같다”는 체감만 남고, 정책 튜닝이 반복 시행착오로 흐르기 쉽습니다.
+
+그리고 이 결과를 릴리스 노트에 함께 남기면, 다음 버전에서 스케일링 특성이 바뀌었는지 비교하기 쉬워집니다. autoscaling은 코드 변경과 분리된 운영 영역처럼 보이지만, 실제로는 애플리케이션 동작 변화에 매우 민감하게 반응합니다.
+
 ## 흔히 헷갈리는 지점
 
 - `kubectl scale`과 HPA를 비슷한 것으로 생각하기 쉽지만, 하나는 수동 변경이고 다른 하나는 자동 제어 루프입니다.

@@ -230,6 +230,175 @@ def should_alert(metrics: AgentMetrics, baseline: AgentMetrics) -> str | None:
 1. **에러율 급증**: baseline의 2배 이상 + 절대값 5% 이상
 2. **P95 latency 급증**: baseline의 3배 이상
 3. **건당 비용 급증**: baseline의 5배 이상
+
+### OpenTelemetry 속성 표준화
+
+Observability가 팀마다 달라지는 가장 큰 이유는 속성 키가 제각각이기 때문입니다. 어떤 서비스는 `model`, 어떤 서비스는 `llm_name`, 또 다른 서비스는 `provider_model`처럼 쓰면 공통 대시보드와 쿼리가 깨집니다. 최소 키 집합을 표준화해야 합니다.
+
+```yaml
+# tracing_conventions.yaml
+span_names:
+  root: agent.run
+  planning: llm.plan
+  synthesis: llm.synthesize
+  retrieval: rag.retrieve
+  tool: tool.invoke
+
+required_attributes:
+  - agent.version
+  - agent.task_id
+  - llm.model
+  - llm.prompt_tokens
+  - llm.completion_tokens
+  - cost.usd
+  - latency.ms
+  - user.request_id
+  - safety.approval_required
+```
+
+```python
+REQUIRED_ATTRS = {
+    "agent.version",
+    "agent.task_id",
+    "llm.model",
+    "llm.prompt_tokens",
+    "llm.completion_tokens",
+    "cost.usd",
+    "latency.ms",
+    "user.request_id",
+    "safety.approval_required",
+}
+
+def validate_span_attributes(span: Span) -> None:
+    missing = sorted(REQUIRED_ATTRS - set(span.attributes.keys()))
+    if missing:
+        raise ValueError(f"span missing required attrs ({span.name}): {missing}")
+```
+
+이 검증을 CI와 런타임 샘플링에 함께 넣으면, observability 품질 자체를 테스트할 수 있습니다.
+
+### PII 최소화와 보존 정책
+
+trace가 자세할수록 보안 위험도 커집니다. 특히 prompt와 tool input을 그대로 저장하면 개인 정보가 쉽게 남습니다. Observability Harness는 기록량을 늘리는 설계와 동시에 보존 정책을 가져야 합니다.
+
+```python
+import re
+
+def redact_pii(text: str) -> str:
+    text = re.sub(r"[\w.+-]+@[\w-]+\.[\w.-]+", "[REDACTED_EMAIL]", text)
+    text = re.sub(r"\b\d{2,3}-\d{3,4}-\d{4}\b", "[REDACTED_PHONE]", text)
+    text = re.sub(r"\b\d{6}-\d{7}\b", "[REDACTED_KR_RRN]", text)
+    return text
+
+def sanitize_event_payload(event: dict) -> dict:
+    body = event.get("body")
+    if isinstance(body, str):
+        event["body"] = redact_pii(body)
+    return event
+```
+
+```yaml
+# retention_policy.yaml
+retention:
+  hot_trace_days: 14
+  warm_trace_days: 90
+  cold_archive_days: 365
+  delete_after_days: 365
+
+sampling:
+  default_rate: 0.2
+  error_rate: 1.0
+  high_risk_action_rate: 1.0
+```
+
+보존 정책을 명시하지 않으면 비용과 규정 준수 문제가 동시에 터집니다. 반대로 너무 빨리 지우면 재현이 불가능해집니다. 보통 정상 트래픽은 샘플링하고, 실패/고위험 이벤트는 100% 보존하는 이중 전략이 현실적입니다.
+
+### 실행 재현 리포트 자동 생성
+
+trace를 저장하는 것과 사람이 이해할 수 있는 보고서를 만드는 것은 별개입니다. 장애 대응 속도를 높이려면 trace 한 건에서 핵심 요약을 자동 생성해야 합니다.
+
+```python
+def build_incident_report(trace_id: str, store) -> dict:
+    spans = store.load_spans(trace_id)
+    root = next(s for s in spans if s.parent_id is None)
+    failed = [s for s in spans if s.status != "ok"]
+
+    return {
+        "trace_id": trace_id,
+        "agent_version": root.attributes.get("agent.version"),
+        "task_id": root.attributes.get("agent.task_id"),
+        "total_latency_ms": root.attributes.get("latency.ms"),
+        "total_cost_usd": root.attributes.get("cost.usd"),
+        "failed_spans": [
+            {
+                "name": s.name,
+                "status": s.status,
+                "error": s.attributes.get("error.message", ""),
+            }
+            for s in failed
+        ],
+    }
+```
+
+이 리포트는 on-call이 처음 5분 안에 보는 핵심 자료입니다. 디버깅을 잘하는 팀은 로그를 많이 보는 팀이 아니라, 첫 화면에서 다음 액션이 보이도록 자료를 정리하는 팀입니다.
+
+### 분산 실행에서 trace_id 전파
+
+agent 런타임이 단일 프로세스가 아니라 큐, 워커, 외부 도구 서비스로 분리되면 trace가 쉽게 끊깁니다. trace_id 전파 규칙을 프로토콜 수준에서 강제해야 end-to-end 재현이 가능합니다.
+
+```python
+def inject_trace_headers(headers: dict, trace_id: str, span_id: str) -> dict:
+    h = dict(headers)
+    h["x-trace-id"] = trace_id
+    h["x-parent-span-id"] = span_id
+    return h
+
+def extract_trace_headers(headers: dict) -> tuple[str | None, str | None]:
+    return headers.get("x-trace-id"), headers.get("x-parent-span-id")
+
+def enqueue_with_trace(queue, message: dict, trace_id: str, span_id: str) -> None:
+    message = dict(message)
+    message["_trace"] = {"trace_id": trace_id, "parent_span_id": span_id}
+    queue.publish(message)
+```
+
+이 규칙이 없으면 tool 호출 지연이 생겼을 때 root trace와 연결이 안 되어 원인 분석 시간이 크게 늘어납니다.
+
+### 운영 대시보드 예시 쿼리
+
+관측 데이터가 쌓여도 질문을 못 던지면 소용이 없습니다. 아래는 on-call에서 가장 자주 쓰는 질문입니다.
+
+```text
+Q1. 지난 30분 실패율이 높은 task_id는 무엇인가?
+Q2. approval_required=true 인 요청에서 bypass 시도가 있었는가?
+Q3. model=... 버전 전환 이후 cost.usd/run 증가는 얼마인가?
+Q4. policy_violation이 특정 tool에서 집중되는가?
+Q5. repeated_failure_signature 상위 10개는 무엇인가?
+```
+
+```python
+def top_failed_tasks(spans: list[Span], window_minutes: int = 30) -> list[tuple[str, int]]:
+    import collections
+    failures = collections.Counter()
+    for s in spans:
+        if s.name == "agent.run" and s.status != "ok":
+            task_id = s.attributes.get("agent.task_id", "unknown")
+            failures[task_id] += 1
+    return failures.most_common(10)
+
+def approval_bypass_attempts(spans: list[Span]) -> int:
+    return sum(1 for s in spans if s.attributes.get("safety.approval_bypass") is True)
+```
+
+핵심은 대시보드를 화려하게 만드는 것이 아니라, 장애 대응 질문에 즉시 답할 수 있는 쿼리를 준비하는 것입니다.
+
+운영 주기가 길어질수록 지표 정의도 버전 관리해야 합니다. 예를 들어 `cost.usd` 계산식이 모델 가격표 변경으로 달라지면 과거와 현재를 그대로 비교할 수 없습니다. metric definition version을 함께 기록하면 "지표가 나빠진 것인지 계산식이 바뀐 것인지"를 분리해 해석할 수 있습니다.
+
+또한 주간 리뷰에서 "가장 비싼 상위 20개 trace"를 정기적으로 확인하면 비용 최적화 기회가 빠르게 보입니다. 대부분은 모델 자체보다 불필요한 reflect 반복이나 과도한 retrieval 문서 수에서 발생합니다.
+
+관측 데이터 접근 권한도 계층화해야 합니다. on-call은 전체 trace 메타데이터를 보되, 원문 prompt/body 열람은 최소 권한 그룹으로 제한하면 보안과 운영 편의의 균형을 맞출 수 있습니다. Observability Harness는 기술 구성뿐 아니라 접근 통제까지 포함한 운영 정책으로 완성됩니다.
+
+마지막으로 replay 성공률 자체를 KPI로 두면 좋습니다. 샘플 trace 중 재현에 성공한 비율을 주간 지표로 관리하면 "기록은 남았지만 실제로는 재현이 안 되는" 숨은 품질 문제를 조기에 발견할 수 있습니다.
 ## 흔히 헷갈리는 지점
 - 출력만 저장해도 디버깅은 가능하다고 생각하기 쉽지만, prompt와 retrieved context가 없으면 replay가 불가능합니다.
 - PII는 나중에 마스킹하면 된다고 보기 쉽지만, raw span에 들어가는 순간 이미 새로운 위험이 됩니다.

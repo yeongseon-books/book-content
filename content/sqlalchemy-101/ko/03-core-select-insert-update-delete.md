@@ -497,6 +497,34 @@ with engine.connect().execution_options(stream_results=True) as conn:
 
 다음 글부터 ORM이 등장합니다. 4편에서는 `DeclarativeBase`와 `mapped_column`으로 Python class를 데이터베이스 row와 매핑하는 방법을 다룹니다. 이 글에서 본 `users.c.name`이 ORM에서는 `User.name`으로 바뀌고, `select(users)`가 `select(User)`로 바뀌는 것이 핵심 차이입니다. Core를 정확히 이해하고 ORM으로 올라가야 ORM의 마법을 디버깅할 수 있습니다.
 
+## 실전 앵커: Core 쿼리와 실행 계획 확인 루틴
+
+Core 표현식이 안전하다는 말은 성능까지 자동으로 보장된다는 뜻이 아닙니다. 실행 SQL과 인덱스 사용 여부는 여전히 확인해야 합니다. SQLite에서는 `EXPLAIN QUERY PLAN`을 붙여 즉시 확인할 수 있습니다.
+
+```python
+stmt = select(users.c.id, users.c.email).where(users.c.email == "alice@example.com")
+compiled = stmt.compile(compile_kwargs={"literal_binds": True})
+
+with engine.connect() as conn:
+    rows = conn.execute(text(f"EXPLAIN QUERY PLAN {compiled}"))
+    for row in rows:
+        print(row)
+```
+
+운영에서는 이 루틴을 쿼리 회귀 테스트에 넣어 두면 좋습니다. 인덱스를 타던 경로가 어느 순간 `SCAN users`로 바뀌면 응답 시간이 갑자기 튀기 시작합니다. Core를 쓰든 ORM을 쓰든, 마지막 실행 계획 검증은 동일합니다.
+
+## 실전 앵커: SQL echo 출력으로 버그 재현하기
+
+다음은 `update` 버그를 재현할 때 실제로 남겨 두는 로그 형태입니다.
+
+```text
+INFO sqlalchemy.engine.Engine UPDATE users SET name=? WHERE users.id = ?
+INFO sqlalchemy.engine.Engine [generated in 0.00009s] ('Alice Liddell', 1)
+INFO sqlalchemy.engine.Engine COMMIT
+```
+
+여기서 `WHERE users.id = ?`가 빠진 로그가 찍히면 전체 UPDATE 사고로 이어질 수 있습니다. 코드 리뷰에서는 Python 코드만 보지 말고, 테스트 로그에서 최종 SQL 형태를 같이 보는 습관이 필요합니다.
+
 ## 처음 질문으로 돌아가기
 
 - **`select()`는 어떤 순서로 조립되고, `Result`는 어떻게 읽어야 할까요?**

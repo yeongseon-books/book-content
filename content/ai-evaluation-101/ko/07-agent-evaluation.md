@@ -255,6 +255,130 @@ print(df.describe())
 - step_overhead 1.6 = 60% 더 많은 단계. 비용 문제.
 - recovered 0.72 = 28% 케이스에서 실패에 굴복. 개선 필요.
 
+### Trajectory 정답을 단일 경로로 고정하지 않는 방법
+
+에이전트 평가는 정답 경로가 여러 개일 수 있다는 점이 핵심입니다. 따라서 step-level 평가는 완전 일치보다 "허용 가능한 부분 순서"를 평가하는 방식이 더 현실적입니다.
+
+```python
+ALLOWED_PARTIAL_ORDER = [
+    {"read_calendar", "read_emails"},  # 순서 무관
+    {"summarize"},
+    {"send_email"},
+]
+
+def partial_order_match(actual_tools: list[str]) -> bool:
+    idx = 0
+    for stage in ALLOWED_PARTIAL_ORDER:
+        found = False
+        while idx < len(actual_tools):
+            if actual_tools[idx] in stage:
+                found = True
+                idx += 1
+                break
+            idx += 1
+        if not found:
+            return False
+    return True
+```
+
+이 방식은 "다른 경로로도 유효한 해결"을 불필요하게 실패 처리하는 문제를 줄여 줍니다.
+
+### 도구 인자 검증을 스키마 기반으로 고정하기
+
+도구 이름만 맞고 인자가 틀리면 실제 운영에서는 실패입니다. 인자 검증 규칙을 코드로 고정해 두면 프롬프트 변경 후의 미묘한 퇴행을 잡기 쉽습니다.
+
+```python
+TOOL_ARG_SCHEMAS = {
+    "send_email": {
+        "required": ["to", "subject", "body"],
+        "validators": {
+            "to": lambda v: isinstance(v, str) and "@" in v,
+            "subject": lambda v: isinstance(v, str) and len(v) >= 3,
+            "body": lambda v: isinstance(v, str) and len(v) >= 10,
+        },
+    }
+}
+
+def validate_tool_args(tool: str, args: dict) -> bool:
+    schema = TOOL_ARG_SCHEMAS.get(tool)
+    if not schema:
+        return True
+    for key in schema["required"]:
+        if key not in args:
+            return False
+    for key, fn in schema["validators"].items():
+        if not fn(args.get(key)):
+            return False
+    return True
+```
+
+인자 스키마는 평가 코드이면서 동시에 운영 계약입니다. 이 계약이 없으면 도구 호출 품질이 팀별 감각에 의존하게 됩니다.
+
+### 비용 경보 패턴
+
+에이전트는 품질 개선 과정에서 쉽게 장황해집니다. 다음 경보를 같이 두면 품질과 비용 균형을 유지하기 쉽습니다.
+
+```text
+- step_overhead > 1.8가 3일 연속 발생: 프롬프트/툴 설명 재검토
+- total_tokens p95가 주간 기준선 대비 +30%: 원인 분석 티켓 자동 생성
+- recovery 실패율 > 20%: fault injection 시나리오 보강
+```
+
+### agent 실험 로그 최소 필드
+
+실험을 반복하려면 최소 로그 필드를 고정하는 편이 좋습니다.
+
+```python
+AGENT_TRACE_FIELDS = [
+    "trace_id",
+    "task_type",
+    "steps",              # [{tool, args, latency_ms, tokens, error}]
+    "final_output",
+    "task_success",
+    "step_overhead",
+    "recovery_status",
+]
+```
+
+로그 필드가 고정되어 있으면 모델/프롬프트 변경 전후를 같은 축으로 비교할 수 있고, 대시보드 자동화도 단순해집니다.
+
+### 실패 원인 코드 분류
+
+agent 실패를 하나의 실패율로만 집계하면 개선 우선순위를 정하기 어렵습니다. 실패 원인 코드를 분류해 두면 어떤 계층을 먼저 고칠지 빠르게 결정할 수 있습니다.
+
+```python
+FAILURE_CODES = {
+    "TOOL_SELECTION": "잘못된 도구 선택",
+    "ARGUMENT_ERROR": "도구 인자 형식/값 오류",
+    "LOOPING": "불필요한 반복 단계",
+    "RECOVERY_FAIL": "도구 실패 후 복구 실패",
+    "FINAL_MISMATCH": "최종 응답이 사용자 의도와 불일치",
+}
+
+def classify_failure(run: dict) -> str:
+    if run.get("loop_count", 0) > 2:
+        return "LOOPING"
+    if not run.get("tool_selection_ok", True):
+        return "TOOL_SELECTION"
+    if not run.get("arguments_ok", True):
+        return "ARGUMENT_ERROR"
+    if run.get("recovery_status") == "GAVE_UP":
+        return "RECOVERY_FAIL"
+    return "FINAL_MISMATCH"
+```
+
+주간 리포트에서 이 코드 비율을 함께 보면, 프롬프트를 고칠지 툴 인터페이스를 고칠지 판단이 훨씬 빨라집니다.
+
+동일한 실패 코드가 2주 연속 상위에 남으면 일회성 튜닝보다 도구 계약 자체를 재설계하는 편이 효과적입니다.
+
+예를 들어 `ARGUMENT_ERROR`가 반복된다면 프롬프트 개선만으로는 한계가 있으므로, 툴 입력 스키마를 더 엄격하게 강제하는 편이 안전합니다.
+
+동시에 실패 코드별 소유 팀을 정해 두면 대응 속도가 더 빨라집니다.
+
+운영 관점에서는 이 책임 분리가 품질 개선 속도를 좌우합니다.
+
+장기적으로 누적 효과가 큽니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - 가장 먼저 end-to-end와 step-level을 나누는 부분부터 보시면 좋습니다. 최종 성공률은 헤드라인 수치이고, step-level은 실패 원인 분석 도구입니다.

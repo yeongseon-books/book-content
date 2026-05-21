@@ -280,6 +280,54 @@ def deterministic_gate(task_type: str, pred: str, expected: str) -> str:
 | reference가 매우 짧음 | BLEU가 지나치게 불안정하거나 0에 가까워짐 | 정규화한 Exact Match + Token F1 |
 | 구조화 출력인데 설명 문장이 섞임 | 형식 외 부가 문장 때문에 점수가 내려감 | JSON 파싱 후 필드 단위 채점 |
 
+### 결정적 지표와 의미 지표를 함께 쓰는 2단 게이트
+
+실무에서는 결정적 지표만으로 배포를 막지 않고, 애매한 구간을 LLM-as-judge로 보내는 2단 게이트를 자주 씁니다. 비용과 안정성의 균형이 좋기 때문입니다.
+
+```python
+def two_stage_gate(task_type: str, pred: str, expected: str) -> dict:
+    em = exact_match_normalized(pred, expected)
+    f1 = token_f1(pred, expected)
+
+    if task_type in {"extractive_qa", "classification"}:
+        if em == 1:
+            return {"decision": "PASS", "reason": "exact_match"}
+        if f1 >= 0.8:
+            return {"decision": "PASS", "reason": "high_token_f1"}
+        return {"decision": "REVIEW", "reason": "low_deterministic_score"}
+
+    rouge_l = scorer.score(expected, pred)["rougeL"].fmeasure
+    if rouge_l >= 0.85:
+        return {"decision": "LIKELY_PASS", "reason": "high_rouge_l"}
+    if rouge_l <= 0.4:
+        return {"decision": "SEND_TO_JUDGE", "reason": "low_rouge_l"}
+    return {"decision": "HUMAN_SPOT_CHECK", "reason": "gray_zone"}
+```
+
+여기서 중요한 것은 숫자 자체보다 운영 규칙입니다. 팀이 매번 해석하지 않도록 "어떤 점수 조합에서 어떤 후속 행동을 할지"를 먼저 고정해야 합니다.
+
+### 시각화 패턴: 평균 하나 대신 분포와 꼬리 보기
+
+결정적 지표를 대시보드에 올릴 때 평균만 보면 위험합니다. 하위 10% 꼬리 구간이 조용히 무너져도 평균은 멀쩡할 수 있습니다.
+
+```python
+import pandas as pd
+
+def metric_distribution_report(rows: list[dict]) -> pd.DataFrame:
+    df = pd.DataFrame(rows)
+    return pd.DataFrame({
+        "metric": ["exact_match", "token_f1", "rougeL"],
+        "mean": [df.exact_match.mean(), df.token_f1.mean(), df.rougeL.mean()],
+        "p10": [df.exact_match.quantile(0.1), df.token_f1.quantile(0.1), df.rougeL.quantile(0.1)],
+        "p50": [df.exact_match.quantile(0.5), df.token_f1.quantile(0.5), df.rougeL.quantile(0.5)],
+        "p90": [df.exact_match.quantile(0.9), df.token_f1.quantile(0.9), df.rougeL.quantile(0.9)],
+    })
+```
+
+분포를 함께 보면 "평균은 유지됐지만 최악 사례가 악화"된 회귀를 더 빨리 발견할 수 있습니다.
+
+이때 요약 리포트에 최소 한 줄은 케이스 예시를 같이 남기세요. 숫자만 보면 왜 하락했는지 파악이 늦어집니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - 가장 먼저 Exact Match 예제부터 보시면 좋습니다. 마침표 하나 때문에 0점이 되는 장면이 이 지표의 본질을 가장 선명하게 보여 줍니다.

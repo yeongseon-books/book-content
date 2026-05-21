@@ -152,6 +152,78 @@ az webapp show -n my-app -g my-rg \
 
 이 정도 출력만 있어도 "앱이 VM 하나를 독점한다"는 오해를 바로 걷어 낼 수 있습니다. 운영 문서에 이 JSON 예시를 붙여 두면 신규 팀원이 plan, worker, app 관계를 훨씬 빨리 이해합니다.
 
+### Front-End, Worker, Sandbox를 한 화면에서 읽는 운영 다이어그램
+
+아키텍처를 외우는 가장 빠른 방법은 요청 평면과 실행 평면, 격리 평면을 동시에 그려 보는 것입니다. Front-End는 host, TLS, affinity라는 라우팅 판단을 수행하고, Worker는 실제 사용자 코드를 실행하며, Sandbox는 그 코드가 접근할 수 있는 OS 기능 경계를 제한합니다. 이 세 레이어를 한 도표에 올려 두면 502, 503, startup 지연, 라이브러리 호환성 문제를 같은 범주로 섞지 않게 됩니다.
+
+```mermaid
+flowchart LR
+    C["Client"] --> FE["Front-End
+Host/TLS/ARR"]
+    FE --> W1["Worker A"]
+    FE --> W2["Worker B"]
+    subgraph W1S["Worker A 실행 경계"]
+      A1["App Process"]
+      A2["Sandbox Policy"]
+      A1 --> A2
+    end
+    subgraph W2S["Worker B 실행 경계"]
+      B1["App Process"]
+      B2["Sandbox Policy"]
+      B1 --> B2
+    end
+    W1 --> SH["Shared /home/site/wwwroot"]
+    W2 --> SH
+    K["Kudu SCM"] --> SH
+```
+
+이 그림의 실전 포인트는 단순합니다. Front-End 로그는 "어디로 보냈는가"를 설명하고, Worker 로그는 "무엇을 실행했는가"를 설명하며, Sandbox 관련 실패는 "무엇을 실행하지 못했는가"를 설명합니다. 장애 분석 중에 이 세 질문을 분리하면 원인 후보가 급격히 줄어듭니다.
+
+### 네트워크 트레이스로 경계를 검증하는 방법
+
+문서만 읽어서는 경계 감각이 약할 수 있으므로 간단한 네트워크 트레이스를 같이 남기는 편이 좋습니다. Front-End 경계에서는 hostname 해석과 TLS, 응답 헤더를 확인하고, 앱 경계에서는 인스턴스 식별자를 반환하는 진단 엔드포인트를 호출해 실제 worker 매핑을 확인합니다.
+
+```bash
+# Front-End 경계 확인: 호스트, TLS, 응답 헤더
+curl -I -s https://my-app.azurewebsites.net
+
+# 같은 요청에 대해 DNS와 TLS 핸드셰이크 시간 분해
+curl -o /dev/null -s -w "dns=%{time_namelookup} tls=%{time_appconnect} ttfb=%{time_starttransfer} total=%{time_total}
+"   https://my-app.azurewebsites.net/diag/worker
+
+# 다회 호출로 worker 분산 감지
+for i in $(seq 1 10); do
+  curl -s https://my-app.azurewebsites.net/diag/worker
+  echo
+done
+```
+
+**Expected output:** 첫 번째 명령은 App Service Front-End의 표준 응답 헤더를 보여 주고, 두 번째 명령은 네트워크 구간과 서버 처리 구간의 시간을 분리해 줍니다. 세 번째 반복 호출은 worker 식별자가 어떻게 바뀌는지 보여 주며, 분산과 stickiness를 판단하는 기준이 됩니다.
+
+### 성능 프로파일링으로 아키텍처 병목 위치를 찾기
+
+아키텍처 이해의 마지막 단계는 성능 병목을 레이어별로 분해하는 것입니다. Front-End, Worker, 외부 의존성 가운데 어디가 병목인지 구분하려면 요청 시간 분해와 플랫폼 메트릭을 같이 수집해야 합니다.
+
+```bash
+# 요청 시간 분해
+for i in $(seq 1 25); do
+  curl -o /dev/null -s -w "code=%{http_code} dns=%{time_namelookup} connect=%{time_connect} tls=%{time_appconnect} ttfb=%{time_starttransfer} total=%{time_total}
+"     https://my-app.azurewebsites.net/api/ping
+done
+
+# plan 리소스 지표
+PLAN_ID=$(az appservice plan show -n my-plan -g my-rg --query id -o tsv)
+az monitor metrics list --resource "$PLAN_ID" --metric "CpuPercentage,MemoryPercentage,HttpQueueLength" --interval PT1M -o table
+```
+
+DNS/TLS 구간이 길면 네트워크 경계 이슈를 먼저 보고, TTFB만 길면 worker 또는 앱 실행 구간을 우선 점검합니다. 이 식으로 계층별 해석을 고정하면 운영 대화가 훨씬 짧아집니다.
+
+### 운영 문서에 남겨야 할 최소 관찰값
+
+팀 런북에는 `instance_id`, `slot`, `status`, `ttfb`, `total` 다섯 값을 공통 포맷으로 남기는 규칙을 두는 것이 좋습니다. 이 값만 있어도 라우팅 문제와 실행 문제를 빠르게 분리할 수 있습니다.
+
+운영 회고에서는 위 다섯 값을 사건 타임라인에 붙여 두면, 다음 장애에서 동일한 분류 기준을 재사용할 수 있습니다.
+
 ## 흔히 헷갈리는 지점
 
 - **App Service Plan은 단순한 과금 바구니가 아닙니다.** worker capacity와 격리 수준을 함께 정의하는 실행 단위입니다.

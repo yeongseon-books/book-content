@@ -212,6 +212,173 @@ def load_eval_set(path: Path) -> list[EvalExample]:
 
 파일명에 버전을 박는 것도 좋은 습관입니다: `evals/customer-support/v3.jsonl`. 새 버전을 만들 때 옛 버전을 지우지 말고 이름을 늘리세요.
 
+### 골든 데이터셋 승격 규칙
+
+운영 로그에서 가져온 샘플이 모두 회귀 테스트용 골든 데이터셋으로 올라가면 유지가 어려워집니다. 실제로는 "어떤 케이스를 반드시 다시 막아야 하는가"를 기준으로 승격 규칙을 둬야 합니다.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class EvalCandidate:
+    case_id: str
+    user_impact: str          # "low", "medium", "high"
+    reproducible: bool
+    category: str             # "faq", "billing", "policy", "safety"
+    observed_failures: int
+
+def should_promote_to_golden(c: EvalCandidate) -> bool:
+    if c.user_impact == "high" and c.reproducible:
+        return True
+    if c.observed_failures >= 3 and c.reproducible:
+        return True
+    if c.category == "safety" and c.reproducible:
+        return True
+    return False
+```
+
+```text
+운영 규칙 예시
+- high impact + 재현 가능: 즉시 골든 승격
+- 같은 실패 3회 이상: 주간 회귀셋에 포함
+- safety/policy 위반: 영향도와 무관하게 포함
+```
+
+이렇게 규칙을 코드로 두면, 평가셋 확장은 감각이 아니라 정책으로 관리됩니다.
+
+### 라벨링 품질 점검표
+
+데이터셋이 커질수록 라벨링 불일치가 점수 변동의 주원인이 됩니다. 최소한 아래 항목은 주기적으로 점검하는 편이 좋습니다.
+
+| 점검 항목 | 질문 | 실패 신호 |
+|---|---|---|
+| Label consistency | 같은 입력을 두 평가자가 비슷하게 채점하는가 | 평가자별 점수 편차 과대 |
+| Metadata completeness | category, source, expected 형식이 모두 채워졌는가 | 집계 시 누락 행 다수 |
+| PII safety | 원문 데이터에 개인정보가 남아 있는가 | 이메일, 전화번호 정규식 탐지 |
+| Temporal relevance | 최신 사용자 패턴이 반영되어 있는가 | 신규 카테고리 커버리지 0% |
+
+라벨 품질을 관리하지 않으면 모델 품질 변화가 아니라 라벨 변동을 개선으로 착각하기 쉽습니다.
+
+### 도메인별 평가셋 구성 예시
+
+같은 LLM 앱이라도 도메인이 다르면 평가셋 비중이 달라집니다. 아래는 자주 쓰는 패턴입니다.
+
+| 도메인 | 추천 카테고리 비중 | 주의점 |
+|---|---|---|
+| 고객지원 챗봇 | FAQ 50, 계정 20, 결제 20, 정책 10 | 결제/환불은 실패 비용이 높아 별도 추적 |
+| 사내 문서 검색 | 지식 질의 60, 절차 질의 25, 권한/보안 15 | 오래된 문서 버전 혼입 주의 |
+| 코딩 어시스턴트 | 에러 해결 40, 코드 설명 30, 리팩터링 20, 보안 10 | 실행 가능성 검증 케이스 필요 |
+
+### 골든셋 승격 워크플로
+
+```python
+def promote_pipeline(candidates: list[dict]) -> list[dict]:
+    promoted = []
+    for c in candidates:
+        if c.get("severity") == "critical" and c.get("reproducible"):
+            promoted.append(c)
+            continue
+        if c.get("user_reports", 0) >= 3 and c.get("reproducible"):
+            promoted.append(c)
+    return promoted
+
+def cap_by_category(rows: list[dict], max_per_category: int = 15) -> list[dict]:
+    out = []
+    counts = {}
+    for r in rows:
+        cat = r["category"]
+        counts.setdefault(cat, 0)
+        if counts[cat] >= max_per_category:
+            continue
+        out.append(r)
+        counts[cat] += 1
+    return out
+```
+
+이 제한이 없으면 특정 카테고리가 과다 대표되어 전체 점수가 실제 운영 분포를 왜곡합니다.
+
+### 평가셋 변경 이력 템플릿
+
+```text
+Eval Set Changelog
+- version: v7 -> v8
+- added_cases: 14
+- removed_cases: 2
+- major_reason:
+  - production failure harvest (8)
+  - new product feature coverage (4)
+  - safety policy update (2)
+- expected impact:
+  - billing category difficulty up
+```
+
+이 기록이 있어야 "점수 하락이 모델 문제인지, 데이터셋 난이도 상승인지"를 해석할 수 있습니다.
+
+### 수집-라벨-검수 파이프라인 역할 분리
+
+평가셋 품질은 데이터 수집보다 검수 역할 분리에서 크게 올라갑니다. 한 사람이 수집, 라벨, 검수를 모두 하면 편향이 강해집니다.
+
+| 단계 | 담당 | 산출물 |
+|---|---|---|
+| 수집 | 운영/분석 | 후보 입력 목록 |
+| 1차 라벨 | 도메인 담당자 | expected, category, severity |
+| 2차 검수 | 다른 평가자 | 라벨 승인/수정 기록 |
+
+```python
+def dual_review_consensus(label_a: dict, label_b: dict) -> bool:
+    same_style = label_a.get("style") == label_b.get("style")
+    same_expected = label_a.get("expected") == label_b.get("expected")
+    return same_style and same_expected
+```
+
+합의율이 낮은 카테고리는 기준 문서가 부족하다는 뜻이므로 anchor 예시를 먼저 보강하는 편이 좋습니다.
+
+### 데이터셋 노화(aging) 점검
+
+평가셋이 오래되면 현재 사용자 질문과 멀어집니다. 최소 월 1회는 최신 트래픽과의 유사도를 점검해야 합니다.
+
+```python
+def aging_score(recent_ratio: float) -> str:
+    # recent_ratio: 최근 30일 입력 패턴과 유사한 케이스 비율
+    if recent_ratio >= 0.8:
+        return "fresh"
+    if recent_ratio >= 0.6:
+        return "watch"
+    return "stale"
+```
+
+stale 판정이 반복되면 새 카테고리 수집 비율을 늘려 평가셋을 갱신해야 합니다.
+
+운영에서 새 기능이 출시된 주에는 해당 기능 관련 입력을 별도 버킷으로 묶어 최소 커버리지를 강제하는 편이 안전합니다.
+
+### 평가셋 문서화 최소 항목
+
+평가셋 파일만 저장하고 설명 문서가 없으면 팀 교체 시 해석 품질이 급격히 떨어집니다. 최소한 아래 항목은 함께 관리하세요.
+
+```text
+Dataset README 최소 항목
+- 데이터 출처(운영 로그/합성/수동 작성)
+- 라벨링 규칙과 예외
+- 제외 기준(PII, 중복, 불명확 질문)
+- 버전별 변경 요약
+- 사용 목적(PR 회귀/야간 품질/모델 비교)
+```
+
+이 문서가 있으면 같은 데이터셋을 서로 다른 목적으로 오용하는 문제를 크게 줄일 수 있습니다.
+
+추가로, 평가셋 작성 날짜와 마지막 검토 날짜를 분리 기록하면 데이터 신선도 점검이 훨씬 쉬워집니다.
+
+```text
+metadata 예시
+- created_at: 2026-05-01
+- last_reviewed_at: 2026-05-20
+- owner: eval-platform
+```
+
+이 메타데이터는 평가셋 운영 책임을 명확히 하고, 변경 이력을 추적하는 기본 단위가 됩니다.
+
+작지만 필수적인 운영 장치입니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - `EvalExample`에 `category`를 명시한 부분이 핵심입니다. 평균 점수만 보면 엣지 케이스가 묻히기 때문에, 카테고리별 분리가 먼저 필요합니다.

@@ -415,6 +415,82 @@ def run_with_tools_safe(question: str) -> str:
 
 ---
 
+## Tool Calling 패턴 비교표
+
+| 패턴 | 설명 | 장점 | 운영 리스크 |
+|---|---|---|---|
+| 단일 도구 호출 | 질문당 tool call 1회 | 구현 단순 | 복합 작업에 약함 |
+| 다중 도구 연쇄 | add 후 multiply 같은 순차 호출 | 복합 질의 대응 | 루프 길이 증가 |
+| 조회+요약 혼합 | 조회 도구 결과를 모델이 요약 | 사용자 친화 응답 | 조회 실패 전파 필요 |
+
+이 표를 기준으로 API 정책을 구분하면 좋습니다. 예를 들어 프로덕션에서는 다중 도구 연쇄를 허용하되 반복 상한을 더 낮게 잡고, 단일 조회 도구는 상한을 느슨하게 둘 수 있습니다.
+
+## 인자 검증을 강제하는 예제
+
+도구 내부에서 검증하지 않으면 잘못된 호출이 늦게 터집니다. 아래처럼 범위를 먼저 검증하면 모델이 만든 잘못된 인자를 초기에 차단할 수 있습니다.
+
+```python
+from langchain_core.tools import tool
+
+@tool
+def safe_divide(a: float, b: float) -> float:
+    """Divide a by b. b must not be zero."""
+    if b == 0:
+        raise ValueError("b must not be zero")
+    return a / b
+
+@tool
+def top_k_items(items: list[str], k: int) -> list[str]:
+    """Return first k items. k must be 1..20."""
+    if not 1 <= k <= 20:
+        raise ValueError("k must be between 1 and 20")
+    return items[:k]
+```
+
+핵심은 모델이 틀릴 수 있다는 전제입니다. Tool Calling은 모델의 판단을 활용하는 구조이지, 모델 판단을 무조건 신뢰하는 구조가 아닙니다.
+
+## LangSmith 추적에서 보는 tool 루프
+
+Tool Calling 체인을 추적하면 LLM run과 tool run이 교차하는 형태로 나타납니다.
+
+```text
+[trace] run_type=chain name=tool_loop
+  [child] run_type=llm name=ChatGroq tool_calls=2
+  [child] run_type=tool name=add_numbers latency_ms=1
+  [child] run_type=tool name=multiply_numbers latency_ms=1
+  [child] run_type=llm name=ChatGroq final_answer=true
+```
+
+이 구조를 보면 반복 호출이 왜 생겼는지 해석하기 쉬워집니다. 같은 도구가 5회 이상 반복되면 프롬프트 지시가 모호한지, 도구 결과 형식이 모델이 이해하기 어려운지 먼저 확인해야 합니다.
+
+## ToolMessage 포맷 가이드
+
+운영에서는 `ToolMessage.content`를 사람이 읽기 쉬운 문장 대신 구조화된 문자열로 유지하는 편이 안전할 때가 많습니다.
+
+| 방식 | 예시 | 장점 | 단점 |
+|---|---|---|---|
+| 자유 텍스트 | `"result is 42"` | 빠른 구현 | 파싱 불안정 |
+| JSON 문자열 | `"{\"result\":42}"` | 후속 파싱 용이 | 프롬프트 길이 증가 |
+| 요약+원본 분리 | 요약 문장 + 내부 로그 | 사용자 친화 + 추적성 | 구현 복잡도 증가 |
+
+도구 결과를 다시 도구 입력으로 쓰는 체인에서는 JSON 문자열 방식이 특히 유리합니다. 추후 LangGraph로 확장할 때도 상태 전달이 안정됩니다.
+
+## 도구 호출 정책 표준화
+
+Tool Calling을 팀 단위로 운영할 때는 "호출 가능 도구 정책"을 코드 밖 문서로도 남겨 두는 편이 좋습니다.
+
+| 정책 항목 | 예시 |
+|---|---|
+| allowlist | `add_numbers`, `multiply_numbers`, `get_office_hours` |
+| 금지 도구 | 외부 결제, 삭제, 권한 변경 계열 |
+| 반복 상한 | 요청당 최대 8회 tool call |
+| 타임아웃 | 도구당 2초, 전체 루프 10초 |
+| 감사 로그 | `request_id`, `tool_name`, `args`, `result_preview` |
+
+이 기준이 있으면 모델 버전이 바뀌어 tool call 성향이 달라져도 운영 리스크를 제한할 수 있습니다.
+
+---
+
 ## 이 코드에서 주목할 점
 
 - `@tool`의 docstring과 타입 힌트는 모델이 보는 설명과 인자 스키마가 됩니다.

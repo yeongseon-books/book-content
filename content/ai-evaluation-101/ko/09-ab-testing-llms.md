@@ -292,6 +292,103 @@ print(f"A satisfaction: {a.mean():.3f}, B: {b.mean():.3f}, p={p:.4f}")
 
 **Online의 함정**: novelty effect (새 변형이 처음에는 신선해 보임), 외부 이벤트(주말/평일), 사용자 segmentation. 최소 1주, 가능하면 2주는 돌리세요.
 
+### Guardrail 지표를 포함한 실험 중단 규칙
+
+win rate가 높아도 안전성이나 비용이 악화되면 배포하면 안 됩니다. A/B 실험은 승패 지표와 중단 지표를 분리해서 운영해야 합니다.
+
+```python
+def should_stop_experiment(metrics: dict) -> tuple[bool, str]:
+    # metrics keys:
+    # satisfaction_delta, safety_violation_delta, p95_latency_delta_ms, cost_delta_usd
+    if metrics["safety_violation_delta"] > 0.005:
+        return True, "stop: safety regression"
+    if metrics["p95_latency_delta_ms"] > 400:
+        return True, "stop: latency regression"
+    if metrics["cost_delta_usd"] > 0.02 and metrics["satisfaction_delta"] < 0.01:
+        return True, "stop: cost increase without meaningful quality gain"
+    return False, "continue"
+```
+
+```text
+권장 중단 정책
+- 안전성 위반률 상승: 즉시 중단
+- p95 지연 급등: 트래픽 축소 후 원인 분석
+- 비용 상승 + 품질 이득 미미: 실험 종료
+```
+
+### 오프라인 A/B와 온라인 A/B 연결
+
+실무에서는 오프라인에서 후보를 걸러서 온라인 실험 대상을 줄이는 흐름이 가장 효율적입니다.
+
+| 단계 | 목표 | 통과 조건 |
+|---|---|---|
+| Offline pairwise | 명확히 열위 후보 제거 | win_rate >= 0.52, p<0.05 |
+| Shadow evaluation | 사용자 영향 없이 비교 | guardrail 위반 0건 |
+| Online 5% canary | 실사용 반응 검증 | 만족도 상승 + 경보 없음 |
+| Online 50% | 대규모 검증 | 1~2주 안정 유지 |
+
+이 계단을 밟으면 운영 리스크를 크게 줄일 수 있습니다.
+
+### 신뢰구간 시각화
+
+A/B 결과는 단일 승률보다 신뢰구간을 함께 보여야 해석이 안정됩니다.
+
+```python
+import math
+
+def wilson_interval(wins: int, total: int, z: float = 1.96) -> tuple[float, float]:
+    if total == 0:
+        return 0.0, 0.0
+    p = wins / total
+    denom = 1 + z**2 / total
+    center = (p + z**2 / (2 * total)) / denom
+    margin = z * math.sqrt((p * (1 - p) + z**2 / (4 * total)) / total) / denom
+    return center - margin, center + margin
+```
+
+신뢰구간이 크게 겹치면, p-value가 경계선일 때 성급한 교체 결정을 피할 수 있습니다.
+
+### 실험 종료 의사결정 템플릿
+
+실험이 끝났을 때 결론을 일관되게 내리려면 템플릿을 고정하는 편이 좋습니다.
+
+```text
+A/B 결론 템플릿
+- 후보: prompt-v3 (A) vs prompt-v2 (B)
+- 표본 수: n=820 (decisive=760, tie=60)
+- win rate: A 57.9%, B 42.1%
+- p-value: 0.003
+- effect size (Cohen's h): 0.32
+- guardrail: safety/latency/cost 이상 없음
+- 결론: A 채택, 10% canary 후 100% 전환
+```
+
+이 양식이 있으면 실험 리뷰가 감상문이 아니라 배포 의사결정 기록으로 남습니다.
+
+### 세그먼트별 승률 확인
+
+전체 승률이 높아도 특정 사용자군에서는 열위일 수 있습니다. 최소한 신규/기존 사용자, 짧은 질의/긴 질의, 카테고리별로 승률을 쪼개서 보는 편이 좋습니다.
+
+```python
+import pandas as pd
+
+def segment_win_rate(df: pd.DataFrame, segment_col: str) -> pd.DataFrame:
+    # df columns: segment_col, winner (A/B/Tie)
+    rows = []
+    for seg, group in df.groupby(segment_col):
+        decisive = group[group["winner"].isin(["A", "B"])]
+        if len(decisive) == 0:
+            continue
+        a_win = (decisive["winner"] == "A").mean()
+        b_win = (decisive["winner"] == "B").mean()
+        rows.append({"segment": seg, "a_win": a_win, "b_win": b_win, "n": len(decisive)})
+    return pd.DataFrame(rows)
+```
+
+이 분해를 보면 전체 평균에서 숨겨진 리스크를 조기에 발견할 수 있습니다.
+
+세그먼트별 결과가 크게 갈리면 전면 교체보다 점진적 롤아웃이나 조건부 라우팅이 더 안전한 선택일 수 있습니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - `ab_test` 함수는 pairwise 비교와 위치 편향 통제를 함께 묶어 놓은 가장 실용적인 골격입니다.

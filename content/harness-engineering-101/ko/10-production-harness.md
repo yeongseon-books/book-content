@@ -214,6 +214,162 @@ def build_refund_agent() -> HarnessStack:
 ```
 
 이 stack을 `HarnessRouter`에 등록하고, `CanaryDeployer`로 1% → 100% 순차 배포하면 production-ready 에이전트입니다.
+
+### 배포 아티팩트 버전 매니페스트
+
+Production Harness의 핵심은 "무엇이 배포되었는지"를 한 파일로 설명할 수 있어야 한다는 점입니다. 코드 SHA만으로는 부족합니다. 프롬프트, 도구 레지스트리, 정책, eval 세트를 함께 묶어야 rollback이 정확해집니다.
+
+```yaml
+# harness_release.yaml
+release_id: he101-2026-05-21-r3
+app_commit: 9f20d10
+prompt_bundle:
+  id: prompt-refund-v7
+  checksum: sha256:13f8...
+tool_registry:
+  id: tools-refund-v4
+  checksum: sha256:21ac...
+constraint_policy:
+  id: policy-refund-v3
+  checksum: sha256:9a70...
+approval_policy:
+  id: approval-refund-v2
+  checksum: sha256:6f1d...
+eval_suite:
+  id: eval-refund-v5
+  pass_threshold: 0.90
+  checksum: sha256:7ed2...
+```
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class ReleaseManifest:
+    release_id: str
+    app_commit: str
+    prompt_bundle_id: str
+    tool_registry_id: str
+    constraint_policy_id: str
+    approval_policy_id: str
+    eval_suite_id: str
+
+def assert_release_compatible(m: ReleaseManifest, loaded: dict) -> None:
+    if m.prompt_bundle_id != loaded["prompt_bundle_id"]:
+        raise RuntimeError("prompt bundle mismatch")
+    if m.tool_registry_id != loaded["tool_registry_id"]:
+        raise RuntimeError("tool registry mismatch")
+    if m.eval_suite_id != loaded["eval_suite_id"]:
+        raise RuntimeError("eval suite mismatch")
+```
+
+이 검사를 시작 시점에 걸어 두면 "코드는 새 버전인데 eval은 구버전" 같은 조합 오류를 배포 직후가 아니라 배포 전에 막을 수 있습니다.
+
+### 프로덕션 검증 게이트
+
+canary 이전에 최소한의 자동 검증을 통과하지 못하면 아예 배포하지 않는 것이 좋습니다. 아래 게이트는 가장 실용적인 기본 집합입니다.
+
+```python
+@dataclass
+class PreflightResult:
+    structure_ok: bool
+    eval_ok: bool
+    policy_ok: bool
+    tracing_ok: bool
+
+def run_preflight_checks() -> PreflightResult:
+    structure_ok = run_article_structure_like_checks()
+    eval_ok = run_eval_suite("evals/refund/v5.jsonl", threshold=0.90)
+    policy_ok = run_policy_contract_tests()
+    tracing_ok = run_trace_contract_tests()
+    return PreflightResult(structure_ok, eval_ok, policy_ok, tracing_ok)
+
+def assert_preflight_passed(r: PreflightResult) -> None:
+    if not (r.structure_ok and r.eval_ok and r.policy_ok and r.tracing_ok):
+        raise RuntimeError(f"preflight failed: {r}")
+```
+
+여기서 중요한 점은 테스트 종류가 서로 대체되지 않는다는 것입니다. eval이 좋아도 tracing contract가 깨져 있으면 운영 중 사고를 재현할 수 없습니다.
+
+### 운영 전환 패턴: Shadow, Canary, Full
+
+실무에서는 바로 canary로 가기보다 shadow 단계가 안정적입니다. shadow는 실제 요청을 후보 버전에 복제해 실행하되 결과는 사용자에게 반환하지 않는 방식입니다.
+
+```text
+Rollout stages
+1) Shadow  (0% user impact): baseline 응답만 사용자에게 반환, candidate는 내부 비교만 수행
+2) Canary  (1% -> 10% -> 50%): candidate 결과를 일부 사용자에게 반환
+3) Full    (100%): 모든 트래픽 전환
+```
+
+```python
+def shadow_compare(baseline_result: dict, candidate_result: dict) -> dict:
+    return {
+        "semantic_score": compare_semantics(baseline_result, candidate_result),
+        "policy_diff": diff_policy_violations(baseline_result, candidate_result),
+        "tool_call_diff": diff_tool_calls(baseline_result, candidate_result),
+    }
+```
+
+shadow 단계에서 semantic score가 지속적으로 낮거나 policy diff가 커지면 canary로 올리지 않습니다. 이 단계가 있으면 사용자 영향 없이 실패 패턴을 미리 수집할 수 있습니다.
+
+### 운영 환경 구성 예시
+
+Production Harness는 코드 구조만으로 완성되지 않습니다. 환경 변수, 기능 플래그, 긴급 차단 스위치까지 포함해야 운영자가 제어할 수 있습니다.
+
+```yaml
+# prod_config.yaml
+agent_runtime:
+  model: gpt-4.1
+  temperature: 0.0
+  timeout_seconds: 45
+  max_attempts: 3
+
+feature_flags:
+  enable_reflection: true
+  enable_shadow_compare: true
+  enable_approval_gate: true
+  disable_issue_refund_tool: false
+
+safety_switches:
+  emergency_read_only_mode: false
+  block_external_send: false
+  force_human_approval_all: false
+```
+
+```python
+def apply_emergency_switches(config: dict, stack: HarnessStack) -> HarnessStack:
+    safety = config.get("safety_switches", {})
+    if safety.get("emergency_read_only_mode"):
+        stack.tools.disable_side_effect_tools()
+    if safety.get("block_external_send"):
+        stack.tools.disable_tools({"send_customer_email", "send_slack"})
+    if safety.get("force_human_approval_all"):
+        stack.approval.force_all_actions()
+    return stack
+```
+
+긴급 스위치가 있으면 장애 시 코드 배포 없이도 피해 확산을 먼저 막을 수 있습니다. Production Harness는 평시 품질뿐 아니라 비상시 제어 가능성을 포함해야 합니다.
+
+### 운영 성숙도 체크포인트
+
+마지막으로 팀이 "운영 가능한 상태"인지 판단하는 기준을 정리합니다.
+
+1. 새 릴리스에서 preflight와 eval이 자동으로 실행되고 임계값 미달 시 배포가 중단됩니다.
+2. canary 단계별 승격 기준이 문서화되어 있고, 수동 판단 없이도 promote/rollback이 가능합니다.
+3. on-call이 trace_id 하나로 입력, 도구 호출, 승인 결정, 비용을 5분 안에 재구성할 수 있습니다.
+4. emergency switch 테스트를 분기마다 수행하고 결과를 runbook에 반영합니다.
+5. 사고 케이스가 regression suite로 들어가 다음 릴리스에서 재발을 자동 차단합니다.
+
+이 다섯 가지가 갖춰지면 Production Harness는 단순한 아키텍처 그림이 아니라 실제 운영 체계가 됩니다.
+
+추가로 비용 가드레일도 배포 규칙에 포함하는 편이 좋습니다. 기능 품질이 유지돼도 건당 비용이 baseline 대비 급증하면 장기적으로는 운영 불가능한 시스템이 됩니다. canary 승격 조건에 cost ceiling을 넣고, 초과 시 자동 롤백 또는 shadow 복귀를 수행하면 품질과 비용을 동시에 관리할 수 있습니다.
+
+결국 Production Harness의 본질은 변경 통제입니다. 무엇이 바뀌었는지 설명할 수 있고, 문제가 생기면 즉시 이전 상태로 돌아갈 수 있으며, 그 과정을 on-call이 재현 가능하게 따라갈 수 있을 때 비로소 운영 가능한 에이전트라고 부를 수 있습니다.
+
+운영 초기에는 완벽한 자동화보다 명확한 수동 전환 절차가 더 중요할 때가 많습니다. 자동 promote가 준비되지 않았다면 수동 승인 체크리스트를 먼저 고정하고, 각 단계의 판단 근거를 로그에 남기면서 점진적으로 자동화 범위를 넓혀 가는 방식이 실패 비용을 줄여 줍니다.
+
+이 접근은 팀 학습에도 유리합니다. 수동 단계에서 쌓인 판단 기록이 나중에 자동 승격 규칙의 데이터가 되기 때문에, 자동화 수준을 올릴수록 오히려 근거가 더 풍부해집니다.
 ## 흔히 헷갈리는 지점
 - 모든 harness를 한 번에 다 붙이는 것이 가장 성숙한 접근처럼 보이지만, 실제로는 운영 부담만 한꺼번에 커집니다.
 - canary 없이 100% 배포해도 작은 변경이면 괜찮다고 생각하기 쉽지만, 프롬프트와 도구 변경은 작아 보여도 전체 행동을 바꿀 수 있습니다.

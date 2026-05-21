@@ -294,6 +294,62 @@ def execute_python_safely(code: str, timeout: float = 5.0) -> dict:
 
 더 강한 격리는 컨테이너(gVisor, Firecracker), WebAssembly 런타임을 사용합니다. production agent에서 임의 코드 실행을 노출한다면 최소한 컨테이너 격리는 필수입니다.
 
+### Tool Registration Manifest와 계약 검증
+
+도구가 10개를 넘기 시작하면 코드만 보고 어떤 도구가 어느 환경에서 노출되는지 파악하기 어려워집니다. 이 시점부터는 등록 정보를 manifest로 분리하고, 부수효과 여부와 approval 요구 조건을 명시적으로 선언하는 편이 안전합니다.
+
+```yaml
+# tools.yaml
+tools:
+  - name: lookup_order
+    version: v1
+    side_effect: none
+    idempotent: true
+    requires_approval: false
+    input_schema: LookupOrderInput
+  - name: issue_refund
+    version: v2
+    side_effect: write
+    idempotent: true
+    requires_approval: true
+    approval_rule: amount_ge_100
+    input_schema: IssueRefundInput
+  - name: send_customer_email
+    version: v1
+    side_effect: external_send
+    idempotent: false
+    requires_approval: true
+    approval_rule: always
+    input_schema: SendEmailInput
+```
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class ToolManifest:
+    name: str
+    version: str
+    side_effect: str
+    idempotent: bool
+    requires_approval: bool
+    input_schema: str
+
+def validate_manifest(m: ToolManifest) -> None:
+    if m.side_effect in {"write", "external_send"} and not m.requires_approval:
+        raise ValueError(f"dangerous tool must require approval: {m.name}")
+    if m.name.startswith("send_") and m.side_effect != "external_send":
+        raise ValueError(f"send_* tool must declare external_send side effect: {m.name}")
+```
+
+manifest validation을 부팅 단계에 넣어 두면 새 발송 도구를 추가하면서 approval gate를 빼먹는 실수를 배포 전에 차단할 수 있습니다.
+
+추가로 도구 버저닝 전략도 중요합니다. 입력 스키마가 바뀌면 같은 이름으로 덮어쓰기보다 `issue_refund_v1`, `issue_refund_v2`처럼 병행 운영 기간을 두는 편이 안전합니다. Agent가 학습한 호출 패턴은 즉시 바뀌지 않기 때문에, 버전 전환 기간에 trajectory 테스트와 shadow 실행을 함께 돌려 호환성을 확인해야 합니다.
+
+실전에서는 deprecation 정책도 반드시 필요합니다. 예를 들어 v1 도구를 30일간 read-only 모드로 남기고 경고 이벤트를 발행하면, 남아 있는 호출 경로를 추적한 뒤 안전하게 제거할 수 있습니다. Tool Harness는 새 도구를 추가하는 속도보다, 오래된 도구를 안전하게 퇴역시키는 능력에서 성숙도가 갈립니다.
+
+도구 문서화도 운영 품질에 직접 영향을 줍니다. 각 도구별로 입력 예시 2개(정상/실패), 예상 에러 코드, 재시도 가능 여부를 같은 형식으로 남기면 신규 엔지니어가 빠르게 디버깅할 수 있습니다. Agent가 이해하는 스키마와 사람이 이해하는 운영 문서가 일치할수록 장애 대응 속도가 빨라집니다.
+
 ### Common Mistakes
 
 `process_order`가 결제까지 한다면 이름에 그것이 드러나야 합니다. `charge_and_fulfill_order` 같은 이름이 정직합니다.

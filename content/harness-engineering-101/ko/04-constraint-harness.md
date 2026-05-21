@@ -306,6 +306,65 @@ class ScopeViolation(Exception):
 
 데이터 레이어 제약은 Agent의 잘못된 동작이 어떻게 발생하든 영향 범위를 막아줍니다. application 레이어 제약보다 우회가 어렵고, audit log도 더 신뢰할 수 있습니다.
 
+### 정책 구성 파일과 위반 코드 체계
+
+Constraint Harness를 확장 가능한 시스템으로 운영하려면 정책을 코드에서 분리해야 합니다. 아래처럼 YAML에 정책을 선언하고, 실행 단계에서는 위반 코드를 구조화해 반환하면 approval, alert, postmortem에서 같은 분류를 재사용할 수 있습니다.
+
+```yaml
+# constraint_policy.yaml
+policy_id: policy-support-v3
+capability:
+  allowed_tools: [read_ticket, search_kb, summarize_case]
+  denied_tools: [send_email, write_db]
+resource:
+  max_prompt_tokens: 18000
+  max_completion_tokens: 2000
+  max_tool_calls: 8
+  max_runtime_seconds: 75
+behavioral:
+  deny_regex:
+    - '(?i)sk-[a-z0-9]{20,}'
+    - '(?i)password\s*[:=]'
+scope:
+  allowed_regions: [apac]
+  allowed_tables: [tickets, kb_articles]
+```
+
+```python
+from enum import Enum
+from dataclasses import dataclass
+
+class ViolationCode(Enum):
+    TOOL_NOT_ALLOWED = "tool_not_allowed"
+    TOKEN_BUDGET_EXCEEDED = "token_budget_exceeded"
+    TOOL_BUDGET_EXCEEDED = "tool_budget_exceeded"
+    OUTPUT_POLICY_VIOLATION = "output_policy_violation"
+    SCOPE_VIOLATION = "scope_violation"
+
+@dataclass
+class Violation:
+    code: ViolationCode
+    message: str
+    block: bool
+
+def enforce_tool_allowlist(tool_name: str, allowed: set[str]) -> Violation | None:
+    if tool_name not in allowed:
+        return Violation(
+            code=ViolationCode.TOOL_NOT_ALLOWED,
+            message=f"tool '{tool_name}' is not in allowlist",
+            block=True,
+        )
+    return None
+```
+
+운영 관점에서 중요한 점은 위반이 발생했을 때 단순 텍스트가 아니라 코드로 남기는 것입니다. scope_violation이 급증하면 데이터 접근 정책을 먼저 보고, token_budget_exceeded가 늘면 Context Harness의 budget 분배를 먼저 점검하는 식으로 대응 우선순위가 선명해집니다.
+
+제약 시스템은 배포 후에도 drift를 감시해야 합니다. 예를 들어 `tool_not_allowed` 위반이 갑자기 0으로 떨어진다면 안전해진 것이 아니라, 우회 경로로 직접 API 호출이 생겼을 가능성도 있습니다. 반대로 `output_policy_violation`이 증가하면 prompt 변경보다 입력 데이터의 분포 변화를 먼저 의심해야 합니다. Constraint Harness는 정책 정의와 집행 로그를 함께 운영해야 의미가 있습니다.
+
+또한 정책 예외 처리도 명시해야 합니다. 고위험 유지보수 윈도우에서 일시적으로 상한을 완화할 필요가 있다면, 예외 정책의 시작·종료 시각과 승인자를 함께 기록해야 합니다. 예외가 로그에 남지 않으면 사고 후 원인 분석에서 "정책 위반인지 승인된 예외인지"를 구분할 수 없습니다.
+
+마지막으로 제약 테스트는 실패 케이스 중심으로 유지해야 합니다. 정상 요청만 통과하는 테스트보다, 금지 도구 호출·범위 외 SQL·PII 포함 출력이 실제로 차단되는지를 확인하는 negative test가 운영 안전성을 더 직접적으로 보장합니다.
+
 ### Common Mistakes
 
 "DB를 수정하지 마세요"라고 프롬프트에 적는 것으로는 충분하지 않습니다. LLM은 지시를 무시할 수 있습니다. 도구를 노출하지 않거나, 데이터 레이어에서 막아야 합니다.

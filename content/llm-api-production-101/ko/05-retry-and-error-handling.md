@@ -314,6 +314,97 @@ print(log_payload)
 
 공급자 예외 원문을 그대로 보여 주면 노이즈가 많고 때로는 과도한 정보를 노출할 수 있습니다. 사용자 경험과 내부 디버깅 정보는 의도적으로 분리하는 것이 좋습니다.
 
+### 재시도 예산을 두어 장애 폭주를 막기
+
+재시도 정책이 있어도 트래픽 전체가 동시에 실패하면 문제가 다시 커집니다. 각 요청이 3회 재시도하면, 원래 100 RPS 경로가 순간적으로 300회 이상의 추가 호출을 만들 수 있습니다. 이때는 요청 단위 재시도 외에 시스템 단위 재시도 예산을 두는 편이 안전합니다.
+
+```python
+import time
+from collections import deque
+
+class RetryBudget:
+    def __init__(self, window_seconds: int, max_retries_in_window: int) -> None:
+        self.window_seconds = window_seconds
+        self.max_retries_in_window = max_retries_in_window
+        self.events: deque[float] = deque()
+
+    def allow_retry(self) -> bool:
+        now = time.monotonic()
+        while self.events and now - self.events[0] >= self.window_seconds:
+            self.events.popleft()
+
+        if len(self.events) >= self.max_retries_in_window:
+            return False
+
+        self.events.append(now)
+        return True
+
+budget = RetryBudget(window_seconds=60, max_retries_in_window=120)
+print(budget.allow_retry())
+```
+
+이 예산은 회로 차단기보다 단순하지만 효과적입니다. 장애가 확산되는 시점에 재시도 호출량을 제한해 공급자와 애플리케이션 양쪽의 압력을 줄여 줍니다. 특히 다중 워커 환경에서는 이 카운터를 Redis로 공유하는 것이 좋습니다.
+
+### 429와 5xx를 같은 백오프로 다루지 않기
+
+운영 로그를 보면 429와 5xx는 의미가 다릅니다. 429는 정책 충돌이고 5xx는 공급자 불안정일 가능성이 큽니다. 둘을 같은 대기 정책으로 묶으면 회복 속도가 늦거나, 반대로 너무 공격적인 재시도로 다시 실패를 키울 수 있습니다.
+
+```python
+import random
+
+def compute_backoff_seconds(error_type: str, attempt: int) -> float:
+    if error_type == "rate_limit":
+        # 429는 더 보수적으로 대기
+        return min(2 ** (attempt + 1), 16) + random.uniform(0, 0.5)
+
+    if error_type == "server_error":
+        # 5xx는 상대적으로 짧은 초기 백오프로 빠른 회복 시도
+        return min(2**attempt, 8) + random.uniform(0, 0.3)
+
+    return 0.0
+
+for i in range(3):
+    print("429 backoff", i, compute_backoff_seconds("rate_limit", i))
+    print("5xx backoff", i, compute_backoff_seconds("server_error", i))
+```
+
+백오프 수치 자체보다 중요한 것은 정책을 분리해 표현하는 것입니다. 분리가 되어 있으면 후속 튜닝에서 지표와 설정이 일대일로 연결됩니다. 예를 들어 429가 집중되는 시간대에는 rate-limit 경로만 조정하면 되고, 5xx가 증가하면 공급자 전환이나 timeout 재설계를 먼저 검토할 수 있습니다.
+
+### 재시도 시도 정보를 요청 컨텍스트에 남기기
+
+재시도 정책을 붙였는데도 디버깅이 어려운 경우는, 최종 실패 로그에 마지막 예외만 남고 중간 시도 정보가 사라졌기 때문인 경우가 많습니다. 각 시도의 오류 유형과 대기 시간을 남기면 장애 원인 분리가 훨씬 쉬워집니다.
+
+```python
+from dataclasses import dataclass, field
+
+@dataclass
+class RetryAttempt:
+    attempt: int
+    error_type: str
+    planned_sleep_seconds: float
+
+@dataclass
+class RetryTrace:
+    request_id: str
+    attempts: list[RetryAttempt] = field(default_factory=list)
+
+    def add(self, attempt: int, error_type: str, planned_sleep_seconds: float) -> None:
+        self.attempts.append(
+            RetryAttempt(
+                attempt=attempt,
+                error_type=error_type,
+                planned_sleep_seconds=planned_sleep_seconds,
+            )
+        )
+
+trace = RetryTrace(request_id="req-2026-05-15-001")
+trace.add(attempt=1, error_type="RateLimitError", planned_sleep_seconds=1.2)
+trace.add(attempt=2, error_type="RateLimitError", planned_sleep_seconds=2.1)
+print(trace)
+```
+
+이 필드는 APM이나 구조화 로그로 그대로 보내기 좋습니다. 운영자는 “몇 번째 시도에서 어떤 오류가 반복되는지”를 즉시 볼 수 있고, 재시도 예산 조정이나 백오프 튜닝을 감에 의존하지 않게 됩니다.
+
 ## 흔히 헷갈리는 지점
 
 - 재시도 횟수를 늘리면 안정성이 높아진다고 생각하기 쉽지만, 분류가 먼저입니다.

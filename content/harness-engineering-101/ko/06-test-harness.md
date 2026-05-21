@@ -284,6 +284,112 @@ def test_classification_snapshot(deterministic_agent):
 
 Snapshot test는 의도적인 변경에는 약합니다. 의도적으로 출력을 바꾸면 snapshot을 갱신해야 하는데, 그 갱신이 실수인지 의도인지 사람이 검토해야 합니다. PR 리뷰의 핵심 항목으로 만듭니다.
 
+### Trajectory 테스트와 도구 호출 계약
+
+Agent 테스트에서 자주 빠지는 영역이 중간 경로 검증입니다. 최종 출력만 맞으면 통과시키면, 우연히 맞은 경우와 안정적으로 맞은 경우를 구분할 수 없습니다. trajectory 테스트는 어떤 도구를 어떤 순서로, 어떤 제약 안에서 호출했는지까지 검사합니다.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class ExpectedStep:
+    tool: str
+    max_calls: int
+
+def assert_trajectory(actual_calls: list[dict], expected: list[ExpectedStep]) -> None:
+    counts: dict[str, int] = {}
+    for call in actual_calls:
+        counts[call["tool"]] = counts.get(call["tool"], 0) + 1
+
+    for step in expected:
+        used = counts.get(step.tool, 0)
+        if used == 0:
+            raise AssertionError(f"required tool not called: {step.tool}")
+        if used > step.max_calls:
+            raise AssertionError(f"tool overused: {step.tool} ({used}>{step.max_calls})")
+
+def test_refund_trajectory(refund_agent):
+    result = refund_agent.run({"intent": "refund", "order_id": "ord_1001", "amount": 250})
+    assert result.status == "completed"
+    assert_trajectory(
+        actual_calls=result.tool_calls,
+        expected=[
+            ExpectedStep("lookup_order", 1),
+            ExpectedStep("calc_refund", 1),
+            ExpectedStep("issue_refund", 1),
+        ],
+    )
+```
+
+이 테스트는 기능 테스트와 역할이 다릅니다. 출력 텍스트가 동일해도 불필요한 도구 호출이 늘어나는 회귀를 즉시 발견할 수 있습니다.
+
+### 평가 메트릭 설계: Pass/Fail를 넘어서기
+
+운영 배포에서는 평균 점수 하나로는 부족합니다. 최소한 성공률, 안전성 위반률, 비용, 지연, 승인 우회율을 함께 봐야 합니다.
+
+```python
+@dataclass
+class EvalMetrics:
+    pass_rate: float
+    policy_violation_rate: float
+    approval_bypass_rate: float
+    avg_tool_calls: float
+    p95_latency_ms: float
+    avg_cost_usd: float
+
+def compute_metrics(rows: list[dict]) -> EvalMetrics:
+    n = len(rows)
+    lat = sorted(r["latency_ms"] for r in rows)
+    p95 = lat[int(max(0, n - 1) * 0.95)] if n else 0.0
+    return EvalMetrics(
+        pass_rate=sum(1 for r in rows if r["passed"]) / n if n else 0.0,
+        policy_violation_rate=sum(1 for r in rows if r["policy_violation"]) / n if n else 0.0,
+        approval_bypass_rate=sum(1 for r in rows if r["approval_bypass"]) / n if n else 0.0,
+        avg_tool_calls=sum(r["tool_calls"] for r in rows) / n if n else 0.0,
+        p95_latency_ms=p95,
+        avg_cost_usd=sum(r["cost_usd"] for r in rows) / n if n else 0.0,
+    )
+```
+
+실무 기준 예시는 다음처럼 둡니다. pass_rate 0.90 이상, policy_violation_rate 0.01 이하, approval_bypass_rate 0, p95 latency 8초 이하, avg_cost_usd/run 0.05 이하입니다. 숫자는 서비스 특성에 맞게 조정하되, 여러 지표를 동시에 보는 원칙은 유지해야 합니다.
+
+### 실패 케이스의 운영 반영 루프
+
+Test Harness가 실제로 팀 품질을 올리는 지점은 실패 케이스를 eval에 반영하는 속도입니다. 운영에서 발견된 실패를 다음 주까지 미루면 같은 실패가 반복됩니다. 이상적인 흐름은 사고가 난 당일에 최소 재현 케이스를 만들고, 다음 PR부터 regression에 편입하는 것입니다.
+
+```python
+@dataclass
+class RegressionCase:
+    case_id: str
+    source_trace_id: str
+    input_payload: dict
+    expected_constraints: dict
+    severity: str
+
+def build_regression_case_from_trace(trace: dict) -> RegressionCase:
+    return RegressionCase(
+        case_id=f"reg-{trace['trace_id']}",
+        source_trace_id=trace["trace_id"],
+        input_payload=trace["input"],
+        expected_constraints={
+            "no_policy_violation": True,
+            "max_tool_calls": 6,
+            "approval_bypass": False,
+        },
+        severity=trace.get("severity", "medium"),
+    )
+
+def test_regression_case(agent, case: RegressionCase):
+    result = agent.run(case.input_payload)
+    assert not result.policy_violation
+    assert len(result.tool_calls) <= case.expected_constraints["max_tool_calls"]
+    assert not result.approval_bypass
+```
+
+이 구조의 장점은 postmortem 문서와 테스트 코드를 연결한다는 점입니다. trace_id를 케이스 메타데이터에 남겨 두면 "왜 이 테스트가 생겼는가"를 나중에 바로 추적할 수 있습니다.
+
+운영팀과 개발팀이 같은 케이스를 재사용할 수 있다는 점도 큽니다. 장애 회의에서 나온 실패 패턴을 곧바로 테스트 이름으로 고정하면, 개선 작업이 "좋아질 것 같다" 수준이 아니라 다음 릴리스에서 통과 여부로 확인됩니다.
+
 ### Common Mistakes
 
 "개발하면서 만들겠다"는 보통 안 만듭니다. 첫 task부터 최소 20개의 예시를 준비합니다.

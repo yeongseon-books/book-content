@@ -260,6 +260,97 @@ print(report)
 
 첫 하네스의 목표는 우아함이 아닙니다. 사용자 제보보다 먼저 회귀를 드러내는 속도입니다.
 
+### 팀이 바로 적용할 수 있는 최소 CI 평가 파이프라인
+
+평가가 문서로만 남으면 한 달 안에 무너집니다. 실제로는 PR마다 같은 조건으로 반복 실행되게 만들어야 합니다. 아래 예시는 가장 작은 형태의 GitHub Actions 기반 평가 파이프라인입니다.
+
+```yaml
+# .github/workflows/llm-eval-smoke.yml
+name: LLM Eval Smoke
+
+on:
+  pull_request:
+    paths:
+      - "src/**"
+      - "prompts/**"
+      - "evals/**"
+
+jobs:
+  smoke-eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - name: Run smoke evaluation
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python -m evals.smoke.run --input evals/smoke.jsonl --output evals/result.json
+      - name: Enforce gate
+        run: python -m evals.smoke.gate --report evals/result.json --min-pass-rate 0.8
+```
+
+```python
+# evals/smoke/gate.py
+import json
+import argparse
+import sys
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--report", required=True)
+    parser.add_argument("--min-pass-rate", type=float, required=True)
+    args = parser.parse_args()
+
+    with open(args.report) as f:
+        report = json.load(f)
+
+    pass_rate = report["pass_rate"]
+    if pass_rate < args.min_pass_rate:
+        print(f"FAIL: pass_rate={pass_rate:.2%} < {args.min_pass_rate:.2%}")
+        for case in report.get("failed_cases", []):
+            print(f"- {case['case_id']}: missing={case.get('missing', [])}")
+        sys.exit(1)
+
+    print(f"PASS: pass_rate={pass_rate:.2%}")
+
+if __name__ == "__main__":
+    main()
+```
+
+핵심은 화려한 대시보드가 아니라, PR 단계에서 품질 저하를 자동으로 막는 기준선을 만드는 일입니다.
+
+### 4주 도입 로드맵
+
+평가를 처음 도입하는 팀은 도구 선택보다 도입 순서가 더 중요합니다. 아래처럼 4주 단위로 범위를 제한하면 "하네스는 만들었지만 아무도 안 돌리는" 상태를 피하기 쉽습니다.
+
+| 주차 | 목표 | 산출물 |
+|---|---|---|
+| 1주차 | 10~20건 smoke eval 구축 | `evals/smoke.jsonl`, pass/fail 스크립트 |
+| 2주차 | 차원 분리 점수 도입 | correctness/relevance 분리 리포트 |
+| 3주차 | PR 자동 게이트 연결 | GitHub Actions fail gate |
+| 4주차 | 실패 환류 루프 시작 | 주간 실패 케이스 추가 규칙 |
+
+```python
+def weekly_eval_review(summary: dict) -> list[str]:
+    actions = []
+    if summary["pass_rate"] < 0.8:
+        actions.append("핵심 프롬프트 변경 롤백 검토")
+    if summary.get("safety_failures", 0) > 0:
+        actions.append("safety 케이스를 golden set으로 승격")
+    if summary.get("flaky_cases", 0) > 3:
+        actions.append("비결정성 높은 케이스를 분리 분석")
+    return actions
+```
+
+이 로드맵의 목적은 완성도가 아니라 반복성입니다. 작게 시작해도 매주 계속 돌면 품질 운영 능력은 빠르게 올라갑니다.
+
+평가를 도입하는 가장 좋은 순간은 완벽해졌을 때가 아니라, 변경이 잦아지기 시작했을 때입니다.
+
+작은 평가 루프라도 팀의 변경 속도를 늦추지 않으면서 품질 사고를 줄이는 효과가 분명히 나타납니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - `EvalResult`처럼 품질 차원을 구조체로 나누는 부분부터 보시면 좋습니다. 이 시점부터 팀의 대화가 '좋아졌다'가 아니라 '정확성은 올랐고 안전성은 유지됐다'로 바뀝니다.

@@ -243,6 +243,165 @@ def resolve_timeout(action_id: str, requested_at: datetime, now: datetime, timeo
 - reject reason이 비어 있어 같은 요청이 조금만 바뀐 채 반복해서 올라옵니다.
 
 그래서 gate 설계는 request, wait, decide, execute뿐 아니라 timeout, delegation, feedback 재사용까지 한 세트로 가져가야 합니다.
+
+### 승인 정책 DSL과 역할 기반 권한
+
+팀 규모가 커질수록 승인 규칙을 if 문으로만 유지하기 어렵습니다. 금액, 데이터 민감도, 환경(prod/staging), 실행 주체(role)에 따라 조합 규칙이 늘어나기 때문입니다. 이때 정책 DSL 형태로 분리하면 변경 이력과 리뷰가 쉬워집니다.
+
+```yaml
+# approval_policy.yaml
+version: 1
+rules:
+  - name: high_amount_refund
+    when:
+      action_type: refund
+      amount_gte: 1000
+    requires:
+      approver_role: finance_manager
+      min_approvals: 1
+      max_wait_seconds: 900
+
+  - name: production_deploy
+    when:
+      action_type: deploy
+      environment: production
+    requires:
+      approver_role: sre_oncall
+      min_approvals: 2
+      max_wait_seconds: 600
+
+  - name: customer_broadcast
+    when:
+      action_type: send_email
+      recipients_gte: 500
+    requires:
+      approver_role: crm_owner
+      min_approvals: 1
+      max_wait_seconds: 1200
+```
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class ApprovalRequirement:
+    approver_role: str
+    min_approvals: int
+    max_wait_seconds: int
+
+def evaluate_requirement(action: dict, rules: list[dict]) -> ApprovalRequirement | None:
+    for rule in rules:
+        cond = rule["when"]
+        if cond.get("action_type") and cond["action_type"] != action.get("action_type"):
+            continue
+        if "amount_gte" in cond and action.get("amount", 0) < cond["amount_gte"]:
+            continue
+        if "environment" in cond and action.get("environment") != cond["environment"]:
+            continue
+        if "recipients_gte" in cond and action.get("recipients", 0) < cond["recipients_gte"]:
+            continue
+        req = rule["requires"]
+        return ApprovalRequirement(req["approver_role"], req["min_approvals"], req["max_wait_seconds"])
+    return None
+```
+
+정책 DSL의 장점은 명확합니다. 운영 중 "왜 이 건은 승인자가 두 명이 필요한가"를 코드가 아니라 정책 파일에서 바로 설명할 수 있습니다.
+
+### 승인 이벤트 모델과 감사 추적
+
+Approval Gate는 결과만 저장하면 부족합니다. 요청 생성부터 최종 실행까지 상태 전이를 이벤트로 남겨야 감사 추적과 재현이 가능합니다.
+
+```python
+from dataclasses import dataclass
+from datetime import datetime, timezone
+
+@dataclass
+class ApprovalEvent:
+    action_id: str
+    event_type: str
+    actor: str
+    at: str
+    payload: dict
+
+def now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+def build_request_event(action_id: str, requester: str, preview: dict) -> ApprovalEvent:
+    return ApprovalEvent(
+        action_id=action_id,
+        event_type="approval_requested",
+        actor=requester,
+        at=now_iso(),
+        payload={"preview": preview},
+    )
+
+def build_decision_event(action_id: str, approver: str, decision: str, reason: str) -> ApprovalEvent:
+    return ApprovalEvent(
+        action_id=action_id,
+        event_type="approval_decided",
+        actor=approver,
+        at=now_iso(),
+        payload={"decision": decision, "reason": reason},
+    )
+
+def build_execution_event(action_id: str, executor: str, result: dict) -> ApprovalEvent:
+    return ApprovalEvent(
+        action_id=action_id,
+        event_type="action_executed",
+        actor=executor,
+        at=now_iso(),
+        payload={"result": result},
+    )
+```
+
+```json
+{
+  "action_id": "act-20260514-001",
+  "timeline": [
+    {"event_type": "approval_requested", "actor": "agent-refund", "at": "2026-05-14T10:01:04Z"},
+    {"event_type": "approval_decided", "actor": "finance_manager_a", "at": "2026-05-14T10:02:11Z", "decision": "approve"},
+    {"event_type": "action_executed", "actor": "refund-service", "at": "2026-05-14T10:02:12Z"}
+  ]
+}
+```
+
+이 타임라인이 있으면 사고 시점에 "승인은 있었는데 실행은 누가 언제 했는가"를 분 단위로 재구성할 수 있습니다. Approval Gate의 신뢰성은 승인 UI가 아니라 이 이벤트 체계에서 결정됩니다.
+
+### 다중 승인과 위임(delegation) 처리
+
+실제 조직에서는 승인자가 항상 온라인이 아닙니다. 단일 승인자 전제는 야간과 휴가 기간에 즉시 병목을 만듭니다. 따라서 다중 승인과 위임 규칙을 함께 설계해야 합니다.
+
+```python
+@dataclass
+class ApprovalAssignment:
+    primary: str
+    delegates: list[str]
+    required_count: int
+
+def resolve_approvers(primary: str, roster: dict[str, list[str]], required_count: int) -> ApprovalAssignment:
+    delegates = roster.get(primary, [])
+    return ApprovalAssignment(primary=primary, delegates=delegates, required_count=required_count)
+
+def is_quorum_reached(decisions: list[ApprovalDecision], required_count: int) -> bool:
+    approved = [d for d in decisions if d.decision == "approve"]
+    return len(approved) >= required_count
+```
+
+```yaml
+# approval_delegation.yaml
+delegation:
+  finance_manager_a: [finance_manager_b, finance_manager_c]
+  sre_oncall_a: [sre_oncall_b]
+quorum:
+  deploy_production: 2
+  refund_over_1000: 1
+```
+
+이 설계를 넣으면 timeout의 상당 부분을 정책 위반이 아니라 가용성 문제로 분리해서 볼 수 있습니다. Approval Gate를 운영하는 팀은 승인 정확도뿐 아니라 승인 처리시간 SLA도 함께 관리해야 합니다.
+
+승인 UX도 중요한 운영 요소입니다. 승인자가 모바일에서 바로 볼 수 있는 요약 카드와 위험 배지를 제공하면 응답 시간이 눈에 띄게 줄어듭니다. 반대로 링크를 여러 번 타고 들어가야 하는 구조는 승인 지연을 만들고, 결국 자동화 파이프라인 전체 지연으로 이어집니다.
+
+Approval Gate는 안전성과 처리량을 동시에 다루는 운영 설계라는 점을 항상 기억해야 합니다.
 ## 흔히 헷갈리는 지점
 - 모든 행동에 승인을 붙이면 더 안전하다고 생각하기 쉽지만, 실제로는 사람도 더 이상 꼼꼼히 보지 않게 됩니다.
 - 승인 요청에 맥락이 적을수록 빠를 것 같지만, 정보가 부족하면 기본값은 거의 항상 거절이 됩니다.

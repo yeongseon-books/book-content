@@ -148,6 +148,54 @@ az monitor metrics list \
 
 이 표면을 통해 운영자는 왜 확장이 일어났는지, 어떤 rule이 평가됐는지, 어떤 action이 실제로 시작되고 끝났는지를 문서 기반으로 추적할 수 있습니다. deep dive에서 중요한 것은 보이지 않는 배치 엔진을 상상하는 일이 아니라, 보이는 decision trail을 정확히 읽는 일입니다.
 
+### Scale Controller 로직을 규칙 JSON으로 읽는 방법
+
+autoscale이 왜 그렇게 반응했는지를 설명하려면 규칙 정의를 사람이 읽는 문장으로 변환해야 합니다. 아래 명령은 autoscale profile을 JSON으로 꺼내 threshold, window, cooldown을 바로 확인하게 해 줍니다.
+
+```bash
+az monitor autoscale show -g my-rg -n my-app-autoscale   --query "profiles[].{name:name,capacity:capacity,rules:rules[].{metric:metricTrigger.metricName,op:metricTrigger.operator,th:metricTrigger.threshold,window:metricTrigger.timeWindow,grain:metricTrigger.timeGrain,stat:metricTrigger.statistic,dir:scaleAction.direction,type:scaleAction.type,value:scaleAction.value,cooldown:scaleAction.cooldown}}"   -o json
+```
+
+이 출력은 scale controller의 의사결정 경계를 거의 그대로 보여 줍니다. 예를 들어 `CpuPercentage > 70 for PT10M` 같은 rule은 "10분 관찰 창이 채워져야 확장이 가능"하다는 뜻이고, `cooldown PT5M`은 확장 직후 재평가가 지연될 수 있음을 의미합니다. 즉 확장 체감 지연은 비정상이 아니라 설계 결과일 수 있습니다.
+
+### autoscale 행동 로그와 traffic 지표를 시간축으로 겹치기
+
+규칙 정의만으로는 충분하지 않으므로, 실제 행동 로그와 요청 지표를 같은 시간축으로 봐야 합니다.
+
+```bash
+PLAN_ID=$(az appservice plan show -n my-plan -g my-rg --query id -o tsv)
+
+az monitor metrics list   --resource "$PLAN_ID"   --metric "CpuPercentage,HttpQueueLength,Requests"   --interval PT1M -o table
+
+az monitor activity-log list   --resource-id "$PLAN_ID"   --offset 2h   --status Succeeded -o table
+```
+
+**Expected output:** metrics 급등 시점과 scale action initiated/completed 이벤트를 비교하면 제어 루프 지연을 정량화할 수 있습니다. 이 데이터를 런북에 남기면 "autoscale이 안 됐다"는 모호한 보고를 "규칙 평가 창과 cooldown으로 인해 6분 지연"처럼 설명 가능한 상태로 바꿀 수 있습니다.
+
+### Scale-out 실험 시나리오: 규칙 검증과 결과 측정
+
+규칙이 의도대로 동작하는지 확인하려면 부하 실험을 작은 범위로 반복하는 편이 좋습니다. 핵심은 실험 시작 시각, 메트릭 상승 시각, scale action 시각, 새 인스턴스 readiness 시각을 모두 기록하는 것입니다.
+
+```bash
+# 현재 인스턴스 수 확인
+az appservice plan show -n my-plan -g my-rg --query "{workers:numberOfWorkers,sku:sku.name}" -o json
+
+# 실험 중 1분 간격 상태 스냅샷
+for i in $(seq 1 20); do
+  date -u +"%Y-%m-%dT%H:%M:%SZ"
+  az appservice plan show -n my-plan -g my-rg --query numberOfWorkers -o tsv
+  sleep 60
+done
+```
+
+이 스냅샷을 요청량 그래프와 겹치면 제어 루프 지연을 팀 공통 언어로 설명할 수 있습니다. "느낌상 늦다"가 아니라 "규칙 창 10분 + cooldown 5분 + readiness 2분"처럼 근거 있는 운영 보고가 가능해집니다.
+
+### 스케일 정책 리뷰 주기
+
+autoscale 규칙은 한 번 만들고 끝나지 않습니다. 트래픽 계절성, 배치 작업 시간대, 신규 기능 출시 후 부하 곡선을 반영해 월 단위로 임계치와 cooldown을 재검토해야 과소확장과 과잉확장을 동시에 줄일 수 있습니다.
+
+특히 캠페인성 트래픽이 있는 서비스는 이벤트 전 사전 확장값을 별도 프로필로 두고, 이벤트 종료 후 자동 복귀 시점까지 함께 정의해야 운영 편차를 줄일 수 있습니다.
+
 ## 흔히 헷갈리는 지점
 
 - **autoscale은 앱이 아니라 plan을 확장합니다.** 앱 화면에서 시작했더라도 실제 타깃 리소스는 App Service Plan입니다.

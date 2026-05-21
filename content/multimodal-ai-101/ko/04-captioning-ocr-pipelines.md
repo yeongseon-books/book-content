@@ -285,6 +285,124 @@ def auto_rotate(path: str) -> Image.Image:
     img = Image.open(path)
     return ImageOps.exif_transpose(img)
 ```
+## 이미지 전처리 단계가 OCR 품질을 좌우하는 이유
+
+OCR 성능 문제의 상당수는 모델보다 입력 품질에서 발생합니다. 회전, 그림자, 저해상도, 압축 노이즈가 있는 입력은 고성능 엔진에서도 오류율이 크게 뛰기 때문에 전처리를 독립 단계로 두는 편이 안전합니다. 특히 문서 스캔과 모바일 촬영 이미지를 함께 받는 서비스라면 deskew와 대비 보정이 필수입니다.
+
+```python
+import cv2
+import numpy as np
+
+
+def preprocess_for_ocr(path: str) -> np.ndarray:
+    img = cv2.imread(path)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    denoised = cv2.fastNlMeansDenoising(gray, None, 12, 7, 21)
+    binarized = cv2.adaptiveThreshold(
+        denoised,
+        255,
+        cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+        cv2.THRESH_BINARY,
+        31,
+        11,
+    )
+    return binarized
+```
+
+전처리 결과를 바로 OCR에 넣기보다, 샘플링된 문서셋에서 문자 단위 CER(Character Error Rate)와 필드 단위 추출 정확도를 같이 측정해야 합니다. 운영에서 중요한 것은 문장을 그럴듯하게 읽는 능력보다 총액, 날짜, 계좌번호 같은 핵심 필드 오류를 줄이는 능력이기 때문입니다.
+
+## Captioning + OCR 결과를 Vision API로 교차 검증
+
+captioning과 OCR 결과가 충돌할 때 GPT-4V나 Claude를 심판기로 두면 오탐을 줄일 수 있습니다. 예를 들어 OCR은 "8"로 읽고 caption은 "3"이라고 서술하는 경우, 원본 이미지를 포함한 교차 질의를 통해 충돌을 정리할 수 있습니다.
+
+```python
+def build_validation_prompt(caption: str, ocr_text: str) -> str:
+    return (
+        "You are validating extracted information from a document image. "
+        "Compare the caption summary and OCR text. "
+        "Return a JSON object with fields: conflicts, corrected_values, confidence.
+
+"
+        f"caption:
+{caption}
+
+ocr:
+{ocr_text}"
+    )
+```
+
+이 교차 검증은 전량 실행이 아니라 "OCR confidence 평균 0.7 미만" 또는 "금액/날짜 필드 불일치" 같은 규칙에서만 호출하면 비용을 관리하기 쉽습니다.
+
+## 필드 추출 품질을 높이는 구조화 후처리
+
+OCR 결과를 그대로 LLM에 전달하면 동일한 문서에서도 출력 포맷이 흔들리기 쉽습니다. 먼저 정규식과 좌표 정보를 이용해 필드 후보를 구조화하고, 그 결과를 모델에 넘기는 편이 안정적입니다. 특히 금액, 날짜, 사업자번호처럼 포맷이 명확한 필드는 룰 기반이 LLM보다 더 신뢰할 수 있습니다.
+
+```python
+import re
+
+amount_pattern = re.compile(r"\d{1,3}(?:,\d{3})*(?:\.\d{2})?")
+
+def extract_amount_candidates(lines: list[str]) -> list[str]:
+    out = []
+    for line in lines:
+        out.extend(amount_pattern.findall(line))
+    return out
+```
+
+후처리 단계에서 "신뢰도 낮은 필드"만 Vision API 재검증 경로로 보내면 전체 비용을 크게 줄일 수 있습니다. 이 계층이 있으면 OCR 엔진을 바꿔도 상위 인터페이스를 거의 유지할 수 있습니다.
+
+## 문서 유형별 파이프라인 분기 전략
+
+OCR와 captioning을 항상 동일한 순서로 돌리면 불필요한 비용이 발생할 수 있습니다. 문서 유형을 먼저 분류하면 파이프라인을 더 효율적으로 운영할 수 있습니다. 예를 들어 영수증은 OCR 중심, 제품 사진은 caption 중심, 차트 이미지는 OCR+VLM 검증 중심으로 분기하는 방식입니다.
+
+이 분기는 복잡한 분류기 없이도 해상도, 텍스트 밀도, 선분 패턴 같은 휴리스틱으로 시작할 수 있습니다. 중요한 점은 분기 이유와 결과를 로그로 남기는 것입니다. 그래야 어떤 경로가 품질과 비용에서 유리한지 주기적으로 조정할 수 있습니다.
+
+```python
+def route_document_path(text_density: float, has_table_lines: bool) -> str:
+    if has_table_lines:
+        return "ocr_plus_vlm"
+    if text_density > 0.35:
+        return "ocr_first"
+    return "caption_first"
+```
+
+실무에서는 이 분기 정책 하나만으로 평균 지연 시간을 크게 줄일 수 있습니다. 동시에 고난도 문서를 별도 경로로 모아 품질 개선 루프를 돌리기 쉬워집니다.
+
+## OCR 신뢰도 기반 재처리 큐
+
+운영에서 가장 실용적인 패턴은 저신뢰 샘플만 재처리 큐로 보내는 것입니다. 전체 문서를 고성능 경로로 보내면 비용이 급격히 증가하므로, confidence와 필드 중요도를 함께 기준으로 두는 편이 좋습니다.
+
+```python
+def need_reprocess(avg_conf: float, has_amount: bool, has_date: bool) -> bool:
+    if avg_conf < 0.72:
+        return True
+    if (not has_amount) or (not has_date):
+        return True
+    return False
+```
+
+이 재처리 큐는 사람 검수와도 연결하기 쉽습니다. 중요한 필드가 누락된 문서를 우선순위로 올리면 운영 효율이 높아집니다.
+
+## 운영 검증 루프: 주간 점검 항목을 고정하기
+
+멀티모달 시스템은 모델 정확도만으로 상태를 판단하면 늦게 대응하게 됩니다. 그래서 주간 운영 회의에서 항상 같은 항목을 점검하는 루프를 고정하는 편이 좋습니다. 예를 들어 요청량, 평균 지연 시간, P95 지연, 오류율, 재시도율, 캐시 히트율, 사용자 불만 비율을 동일 포맷으로 기록하면 작은 이상 징후를 초기에 잡을 수 있습니다.
+
+또한 지표는 기능별로 분해해야 합니다. 단일 "성공률" 수치만 보면 어떤 단계에서 손실이 났는지 알기 어렵습니다. 입력 검증 단계, 전처리 단계, 검색 단계, 생성 단계를 분리해 성공률을 기록하면 병목 구간이 명확해집니다. 이 분해 지표는 모델 교체나 파이프라인 변경 후 회귀를 탐지하는 데 특히 유용합니다.
+
+```python
+weekly_health = {
+    "request_count": 0,
+    "avg_latency_ms": 0,
+    "p95_latency_ms": 0,
+    "error_rate": 0.0,
+    "retry_rate": 0.0,
+    "cache_hit_rate": 0.0,
+    "user_downvote_rate": 0.0,
+}
+```
+
+운영 루프를 고정하면 기술 선택도 더 현실적으로 바뀝니다. 새 모델을 도입할 때 "정확도 상승"만 보지 않고, 지연 증가와 비용 증가를 같은 표에서 비교할 수 있기 때문입니다. 결국 프로덕션 품질은 한 번의 모델 업그레이드가 아니라, 반복 가능한 점검 루프를 통해 유지됩니다.
+
 ## 흔히 헷갈리는 지점
 
 - **회전된 이미지 그대로 OCR** 스마트폰으로 찍은 영수증은 EXIF orientation 메타데이터를 가집니다. PIL은 자동 회전을 안 해주므로 명시적으로 처리해야 합니다.

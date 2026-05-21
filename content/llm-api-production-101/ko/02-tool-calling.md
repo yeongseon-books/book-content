@@ -423,6 +423,82 @@ print(run_tool("cancel_order", '{"order_id": "ORD-1001"}'))
 
 특히 `globals()`나 동적 import 같은 방식으로 함수 이름을 그대로 실행 경로에 연결하는 패턴은 피해야 합니다. 툴 호출의 장점은 명시적 allowlist에 있습니다. 그 장점을 버리면 구조화된 실행 경계를 만든 의미가 거의 사라집니다.
 
+### 툴 호출 라우터를 명시적 테이블로 고정하기
+
+함수가 두세 개일 때는 단순 딕셔너리도 충분합니다. 하지만 운영에서는 권한, 타임아웃, 감사 필드가 함수마다 달라지므로 메타데이터를 함께 갖는 라우팅 테이블이 더 안전합니다.
+
+```python
+import time
+from dataclasses import dataclass
+from typing import Callable
+
+@dataclass
+class ToolSpec:
+    func: Callable
+    timeout_seconds: float
+    side_effect: bool
+
+def get_order_status(order_id: str) -> dict:
+    return {"order_id": order_id, "status": "in_transit"}
+
+def cancel_order(order_id: str, reason: str) -> dict:
+    return {"order_id": order_id, "cancelled": True, "reason": reason}
+
+TOOL_REGISTRY: dict[str, ToolSpec] = {
+    "get_order_status": ToolSpec(func=get_order_status, timeout_seconds=2.0, side_effect=False),
+    "cancel_order": ToolSpec(func=cancel_order, timeout_seconds=5.0, side_effect=True),
+}
+
+def run_registered_tool(name: str, **kwargs) -> dict:
+    spec = TOOL_REGISTRY.get(name)
+    if spec is None:
+        raise ValueError(f"unknown tool: {name}")
+
+    started = time.monotonic()
+    result = spec.func(**kwargs)
+    elapsed = time.monotonic() - started
+
+    return {
+        "ok": True,
+        "tool": name,
+        "side_effect": spec.side_effect,
+        "elapsed_ms": int(elapsed * 1000),
+        "data": result,
+    }
+```
+
+이렇게 고정하면 장점이 분명합니다. 실행 가능한 도구 집합이 코드 한곳에 모이고, 위험한 도구를 별도로 분류하기 쉬우며, 로그 필드도 표준화됩니다. 이후 승인 워크플로, 사용자 권한, 최대 실행 시간 같은 규칙을 붙일 때도 같은 표를 확장하면 됩니다.
+
+### 상태 변경 도구에는 멱등성 키를 붙이기
+
+툴 호출에서 가장 위험한 구간은 재시도입니다. 네트워크 오류로 결과를 못 받은 요청이 실제로는 이미 성공했을 수 있기 때문입니다. 조회 도구는 재호출해도 문제가 적지만, 취소/생성/결제 같은 상태 변경 도구는 멱등성 키가 없으면 중복 부작용을 만들 수 있습니다.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class ToolExecutionContext:
+    request_id: str
+    idempotency_key: str
+
+executed: dict[str, dict] = {}
+
+def cancel_order_with_idempotency(order_id: str, reason: str, ctx: ToolExecutionContext) -> dict:
+    if ctx.idempotency_key in executed:
+        return executed[ctx.idempotency_key]
+
+    result = {
+        "order_id": order_id,
+        "cancelled": True,
+        "reason": reason,
+        "request_id": ctx.request_id,
+    }
+    executed[ctx.idempotency_key] = result
+    return result
+```
+
+운영에서는 이 키를 메모리가 아니라 Redis나 데이터베이스에 기록해야 합니다. 핵심은 “재시도는 같은 효과를 한 번만 내야 한다”는 원칙을 코드와 저장소 양쪽에서 보장하는 것입니다. 툴 호출 루프를 완성했다면, 다음 단계는 항상 멱등성입니다.
+
 ## 흔히 헷갈리는 지점
 
 - 모델이 `tool_calls`를 반환한다고 해서 스스로 코드를 실행하는 것은 아닙니다.

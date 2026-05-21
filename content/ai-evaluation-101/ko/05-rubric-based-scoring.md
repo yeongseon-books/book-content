@@ -278,6 +278,124 @@ for dim in dimensions:
 
 차원별 kappa가 다르면 **약한 차원의 anchor를 다시 작성**하세요. 모든 차원이 0.6 이상이 될 때까지 반복합니다.
 
+### Rubric 시각화: 레이더 차트보다 추세선이 먼저입니다
+
+Rubric 결과를 시각화할 때 레이더 차트만 붙이면 예쁘지만, 운영 판단에는 시간축 추세가 더 중요합니다. 차원별 주간 평균과 하위 10%를 함께 보아야 회귀를 조기에 잡을 수 있습니다.
+
+```python
+import pandas as pd
+
+def weekly_rubric_timeseries(scored_rows: list[dict]) -> pd.DataFrame:
+    # scored_rows fields: week, correctness, completeness, clarity, tone
+    df = pd.DataFrame(scored_rows)
+    summary = df.groupby("week").agg(
+        correctness_mean=("correctness", "mean"),
+        correctness_p10=("correctness", lambda s: s.quantile(0.1)),
+        completeness_mean=("completeness", "mean"),
+        clarity_mean=("clarity", "mean"),
+        tone_mean=("tone", "mean"),
+    )
+    return summary.reset_index()
+```
+
+이 리포트가 있으면 "총점은 유지되는데 clarity 하위 꼬리가 악화" 같은 신호를 평균 하나보다 먼저 볼 수 있습니다.
+
+### 정책 위반 차원은 가중치가 아니라 하드 게이트로 분리
+
+안전성이나 정책 준수는 가중 평균에 섞으면 위험합니다. 다른 차원이 높아서 정책 위반이 희석될 수 있기 때문입니다. 운영에서는 별도 하드 게이트로 분리하는 편이 안전합니다.
+
+```python
+def policy_hard_gate(scores: dict) -> str:
+    # scores keys: correctness, completeness, clarity, tone, policy_compliance
+    if scores["policy_compliance"] < 4:
+        return "FAIL_POLICY"
+
+    weighted, status = aggregate_weighted(scores)
+    if status == "FAIL":
+        return "FAIL_QUALITY"
+    if status == "REVIEW":
+        return "REVIEW"
+    return "PASS"
+```
+
+```text
+실무 규칙 예시
+- policy_compliance < 4: 즉시 fail
+- correctness < 3: 즉시 fail
+- 나머지 차원: 가중 평균 4.0 이상 통과
+```
+
+이 방식은 "중요하지만 드문 실패"를 평균에 묻히지 않게 해 줍니다.
+
+### Rubric 설계 리뷰 질문
+
+rubric을 만들고 나면 아래 질문으로 품질을 점검하는 편이 좋습니다.
+
+1. 차원 이름만 보고도 평가자가 같은 질문을 떠올리는가
+2. 1점과 5점 예시가 실제 운영 사례와 닮았는가
+3. 차원 간 상관이 과도하게 높지 않은가
+4. 배포 차단 기준이 명시되어 있는가
+
+```python
+def rubric_health_check(corr: dict, kappa: dict) -> list[str]:
+    issues = []
+    for pair, value in corr.items():
+        if value > 0.9:
+            issues.append(f"중복 차원 의심: {pair} corr={value:.2f}")
+    for dim, score in kappa.items():
+        if score < 0.6:
+            issues.append(f"일치도 낮음: {dim} kappa={score:.2f}")
+    return issues
+```
+
+### rubric 기반 회귀 감지 패턴
+
+단일 평균이 아니라 차원별 하락 폭으로 회귀를 잡는 규칙이 필요합니다.
+
+```python
+def detect_rubric_regression(current: dict, baseline: dict) -> list[str]:
+    alarms = []
+    for dim in ["correctness", "completeness", "clarity", "tone"]:
+        delta = current[dim] - baseline[dim]
+        if delta <= -0.3:
+            alarms.append(f"{dim} 하락: {delta:.2f}")
+    if current["correctness"] < 3.5:
+        alarms.append("correctness 절대 기준 미달")
+    return alarms
+```
+
+이 규칙이 있으면 "총점은 유사하지만 특정 차원이 무너진" 회귀를 조기에 차단할 수 있습니다.
+
+### Rubric 리뷰 회의 체크 질문
+
+1. 이번 주 하락 차원이 사용자 불만 카테고리와 일치하는가
+2. 하락한 차원의 anchor 문장이 실제 실패 사례를 설명하는가
+3. 임계값 조정이 필요한지, 아니면 프롬프트 수정을 먼저 할지 명확한가
+
+이 질문을 주간 회의에 고정하면 rubric 결과가 보고서에 머물지 않고 실제 개선 작업으로 연결됩니다.
+
+특히 correctness와 safety처럼 치명 차원은 "하락 이유 설명"을 필수 기록 항목으로 두면 개선 속도가 빨라집니다.
+
+### 운영 공지용 요약 문장 자동 생성
+
+Rubric 결과를 팀 전체에 공유할 때는 차원별 하락 포인트를 한 문장으로 요약해 주는 자동화가 유용합니다.
+
+```python
+def build_weekly_message(current: dict, baseline: dict) -> str:
+    drops = []
+    for dim in ["correctness", "completeness", "clarity", "tone"]:
+        delta = current[dim] - baseline[dim]
+        if delta < -0.2:
+            drops.append(f"{dim} {delta:.2f}")
+    if not drops:
+        return "이번 주 rubric 주요 하락 없음"
+    return "이번 주 하락 차원: " + ", ".join(drops)
+```
+
+이 메시지를 주간 공지에 고정하면 품질 논의가 빠르게 같은 사실 위에서 시작됩니다.
+
+작은 자동화지만 팀 정렬 효과가 큽니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - 가장 먼저 차원 표를 보시면 단일 점수가 왜 원인 분석에 약한지 금방 이해됩니다. 같은 4점이라도 실제 위험도는 전혀 다를 수 있습니다.

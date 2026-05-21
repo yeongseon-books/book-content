@@ -282,19 +282,155 @@ def enforce_budget(messages: list[dict[str, str]], max_input_tokens: int = 6000)
 - 요약은 압축이므로 반드시 정보 손실 위험이 있습니다. 요약 프롬프트가 무엇을 보존할지 분명해야 합니다.
 - 컨텍스트 초과를 실패 후에만 다루면 늦습니다. 길이 추정과 사전 압축이 먼저 있어야 합니다.
 
+## 세션 저장소와 상태 수명 정책
+
+입문 예제에서는 리스트 하나로 충분하지만, 실제 서비스는 다중 사용자 세션을 동시에 다룹니다. 이때 핵심은 메모리 전략보다 저장소 계약입니다. 어떤 키로 세션을 식별하고, 어느 시점에 만료시키며, 장애 시 복구할 수 있는지부터 정해야 합니다.
+
+| 저장소 | 장점 | 단점 | 권장 용도 |
+|---|---|---|---|
+| 프로세스 메모리 | 구현이 가장 단순 | 재시작 시 손실, 다중 인스턴스 불가 | 로컬 개발 |
+| Redis | 빠른 읽기/쓰기, TTL 쉬움 | 운영 복잡도 추가 | 실시간 챗봇 기본값 |
+| RDBMS | 감사/분석에 유리 | 지연이 상대적으로 큼 | 규제/감사 요구 환경 |
+
+아래는 Redis 기반 최소 저장 패턴입니다.
+
+```python
+import json
+from redis import Redis
+
+redis = Redis(host="localhost", port=6379, decode_responses=True)
+SESSION_TTL_SECONDS = 60 * 60 * 24
+
+def load_session_messages(session_id: str) -> list[dict[str, str]]:
+    raw = redis.get(f"chat:session:{session_id}")
+    if not raw:
+        return []
+    return json.loads(raw)
+
+def save_session_messages(session_id: str, messages: list[dict[str, str]]) -> None:
+    redis.set(
+        f"chat:session:{session_id}",
+        json.dumps(messages, ensure_ascii=False),
+        ex=SESSION_TTL_SECONDS,
+    )
+```
+
+TTL을 명시하지 않으면 오래된 세션이 계속 쌓여 비용과 보안 위험이 커집니다. 상태 관리는 기억을 늘리는 일이 아니라, 기억의 수명을 설계하는 일입니다.
+
+### 요약 메모리의 왜곡을 줄이는 이중 보관 패턴
+
+요약은 길이를 줄이지만 의미 손실을 만듭니다. 그래서 긴 세션에서는 "원본 일부 + 요약"을 함께 보관하는 이중 패턴이 유용합니다.
+
+```python
+def build_context_for_request(
+    system_message: dict[str, str],
+    summary_message: dict[str, str] | None,
+    recent_turns: list[dict[str, str]],
+    user_message: dict[str, str],
+) -> list[dict[str, str]]:
+    context = [system_message]
+    if summary_message:
+        context.append(summary_message)
+    context.extend(recent_turns[-6:])
+    context.append(user_message)
+    return context
+```
+
+이 패턴의 목적은 완벽한 기억이 아닙니다. 장기 맥락을 너무 싸구려로 요약해 망가뜨리지 않으면서도, 예산을 통제 가능한 범위로 묶는 것입니다.
+
+### 상태 관리용 오류 분류
+
+대화 품질 이슈를 빠르게 해결하려면 오류를 분류해야 합니다. 아래 표처럼 분류하면 디버깅 우선순위가 명확해집니다.
+
+| 증상 | 1차 원인 후보 | 점검 지점 |
+|---|---|---|
+| 사용자 선호를 잊음 | recent window 과도 축소 | 윈도우 크기, 요약 보존 규칙 |
+| 답변이 중간부터 맥락 이탈 | summary 왜곡 | 요약 프롬프트, 요약 주기 |
+| 429/지연 증가 | 이력 비대화 | 평균 `prompt_tokens`, 압축 트리거 |
+| 세션 간 정보 섞임 | session_id 충돌 | 세션 키 생성 방식, 멀티테넌트 경계 |
+
+### 멀티턴 비용을 세션 단위로 관찰하기
+
+단일 호출 사용량만 보면 상태 전략의 효과가 잘 안 보입니다. 세션 누적 토큰을 같이 기록해야 어떤 정책이 실제로 저렴한지 판단할 수 있습니다.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class SessionUsage:
+    prompt_tokens: int = 0
+    completion_tokens: int = 0
+
+    @property
+    def total_tokens(self) -> int:
+        return self.prompt_tokens + self.completion_tokens
+
+def accumulate_usage(usage_tracker: SessionUsage, usage) -> None:
+    usage_tracker.prompt_tokens += int(getattr(usage, "prompt_tokens", 0))
+    usage_tracker.completion_tokens += int(getattr(usage, "completion_tokens", 0))
+```
+
+운영 대시보드에서는 `session_total_tokens`, `avg_tokens_per_turn`, `summary_trigger_count` 세 값을 같이 보면 정책 효과가 분명해집니다.
+
+### OpenAI/Anthropic에서 상태 재구성할 때의 공통 원칙
+
+공급자를 바꿔도 대화 상태 관리 원칙은 동일합니다.
+
+- 이전 assistant 출력은 다음 요청에 명시적으로 재주입합니다.
+- 시스템 정책은 매 요청에 반복 포함합니다.
+- 요약 텍스트는 별도 슬롯으로 분리해 기록합니다.
+- 세션 종료 시 민감 대화는 즉시 삭제하거나 비식별화합니다.
+
+모델 품질 문제처럼 보이는 이슈 중 상당수는 이 네 가지 원칙 중 하나가 무너진 상태 문제입니다.
+
 ## 운영 체크리스트
 
+- [ ] 세션 저장소(TTL 포함)를 명시하고, 만료된 상태가 자동 삭제되는지 검증했습니다.
+- [ ] 요약 메모리와 최근 턴 메모리를 분리해 왜곡 시 복구 경로를 확보했습니다.
+- [ ] 세션 누적 토큰(`session_total_tokens`)을 기록해 메모리 정책 효과를 수치로 비교합니다.
+- [ ] 세션 키 충돌 방지를 위해 사용자·워크스페이스 경계를 포함한 `session_id` 규칙을 사용합니다.
 - [ ] 각 턴의 `assistant` 답변을 다음 호출용 이력에 다시 추가합니다.
 - [ ] 전체 이력 모드와 최근 N턴 모드를 각각 비교해 장단점을 확인했습니다.
 - [ ] 요약 프롬프트에 사용자 목표, 확정 사실, 선호, 미해결 질문 보존 규칙을 적었습니다.
 - [ ] 요청 전 누적 입력 길이를 추정하고 한계에 가까워지면 경고 또는 압축을 실행합니다.
 - [ ] 세션 초기화와 상태 확인용 명령(`/reset`, `/summary`, `/quit`)을 제공합니다.
 
+## 개인정보와 상태 삭제 정책
+
+대화 상태는 품질 자산이면서 동시에 보안 자산입니다. 특히 고객 지원·헬스케어·금융 도메인에서는 세션 안에 개인 식별 정보가 쉽게 들어옵니다. 그래서 멀티턴 설계에는 기억 정책과 같은 강도의 삭제 정책이 필요합니다.
+
+```python
+import re
+
+PII_PATTERNS = [
+    re.compile(r"\b\d{2,3}-\d{3,4}-\d{4}\b"),  # 전화번호
+    re.compile(r"\b[\w.-]+@[\w.-]+\.[A-Za-z]{2,}\b"),  # 이메일
+]
+
+def redact_pii(text: str) -> str:
+    redacted = text
+    for pattern in PII_PATTERNS:
+        redacted = pattern.sub("[REDACTED]", redacted)
+    return redacted
+
+def sanitize_messages(messages: list[dict[str, str]]) -> list[dict[str, str]]:
+    return [
+        {"role": m["role"], "content": redact_pii(m["content"])}
+        for m in messages
+    ]
+```
+
+이 단계는 품질과 충돌하지 않습니다. 오히려 장기 보관 로그가 필요할수록 비식별화는 더 중요합니다. 대화 상태는 "얼마나 오래 기억할 것인가"와 "얼마나 안전하게 잊을 것인가"를 같이 설계해야 완성됩니다.
+
 ## 정리
 
 멀티턴 챗봇의 핵심은 모델이 기억하는 척 보이게 만드는 데 있지 않습니다. 실제로는 애플리케이션이 무엇을 기억으로 간주할지 정의하고, 그것을 매 요청마다 다시 조립해 보내는 데 있습니다. 이 전제를 받아들이면 대화 상태 관리는 훨씬 더 명확한 엔지니어링 문제로 바뀝니다.
 
 실전에서는 세 가지 패턴을 함께 보게 됩니다. 짧은 세션은 전체 이력 유지로 충분하고, 예산 예측이 중요하면 슬라이딩 윈도우가 유리하며, 긴 세션은 요약 압축이 필요합니다. 대부분의 실제 시스템은 이 셋을 섞어 씁니다.
+
+여기에 운영 관점에서 반드시 덧붙여야 할 축이 보안과 수명 관리입니다. 상태를 오래 유지할수록 품질은 좋아질 수 있지만, 동시에 개인정보 노출 위험과 저장 비용이 커집니다. 따라서 대화 상태 설계는 "무엇을 기억할지"와 "언제 지울지"를 동일한 우선순위로 다뤄야 완성됩니다.
+
+이 기준이 명확하면 모델을 바꾸더라도 상태 계층은 안정적으로 유지되고, 품질 회귀도 훨씬 빨리 감지할 수 있습니다.
 
 다음 글에서는 마지막 기초 주제로 스트리밍 응답을 다룹니다. 이번 글이 “무엇을 기억할 것인가”의 문제였다면, 다음 글은 “생성 중인 답을 어떻게 즉시 보여 줄 것인가”의 문제입니다.
 

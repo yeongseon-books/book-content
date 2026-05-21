@@ -370,6 +370,77 @@ print(completion.choices[0].message.content)
 - few-shot 예시를 많이 넣을수록 좋다고 생각하기 쉽지만, 긴 예시는 토큰만 쓰고 패턴은 흐릴 수 있습니다.
 - “더 좋게”, “자세히”, “알아서” 같은 모호한 표현이 충분한 제어라고 믿기 쉽지만, 실제로는 문단 수·불릿 수·키 이름 같은 구체적 제약이 더 강합니다.
 
+## 재사용 가능한 프롬프트 템플릿 패턴
+
+프롬프트를 문장 덩어리로만 관리하면 변경 이력이 금방 꼬입니다. 실무에서는 템플릿과 슬롯을 분리해 정책·컨텍스트·출력 계약을 별도 변수로 다루는 편이 안전합니다.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class PromptTemplate:
+    system_policy: str
+    instruction: str
+    output_contract: str
+
+BASE_TEMPLATE = PromptTemplate(
+    system_policy=(
+        "You are a backend Python tutor. "
+        "Do not guess unknown facts. "
+        "If information is missing, say what is missing explicitly."
+    ),
+    instruction="",
+    output_contract=(
+        "Return exactly this structure:\n"
+        "summary: <2 sentences>\n"
+        "example: <code block>\n"
+        "pitfall: <1 sentence>"
+    ),
+)
+
+def build_user_prompt(task: str, context: str) -> str:
+    return (
+        f"Instruction: {task}\n"
+        f"Context: {context}\n"
+        f"Output format: {BASE_TEMPLATE.output_contract}"
+    )
+```
+
+이 구조의 장점은 정책 업데이트가 중앙 집중된다는 점입니다. 예를 들어 “근거 없는 추측 금지” 규칙을 강화할 때 `system_policy` 한 곳만 바꾸면 전체 경로가 동시에 정리됩니다.
+
+### 프롬프트 회귀 테스트 패턴
+
+프롬프트 변경은 코드 변경과 동일하게 회귀를 만듭니다. 최소한의 스냅샷 테스트를 두면 출력 형식이 깨지는 순간을 빠르게 찾을 수 있습니다.
+
+```python
+EXPECTED_KEYS = ["summary:", "example:", "pitfall:"]
+
+def assert_output_contract(text: str) -> None:
+    for key in EXPECTED_KEYS:
+        if key not in text:
+            raise AssertionError(f"Missing contract key: {key}")
+
+def assert_no_forbidden_phrase(text: str) -> None:
+    forbidden = ["I guess", "maybe", "not sure"]
+    lowered = text.lower()
+    for phrase in forbidden:
+        if phrase in lowered:
+            raise AssertionError(f"Forbidden uncertainty phrase found: {phrase}")
+```
+
+프롬프트 엔지니어링이 감각의 영역으로만 남지 않으려면, 이런 작고 단단한 계약 검증이 필요합니다.
+
+### OpenAI/Anthropic에서 역할 맵핑할 때의 주의점
+
+역할 이름은 비슷하지만 SDK 표면이 다릅니다. OpenAI는 `responses`/`chat.completions` 경로가 공존하고, Anthropic은 `messages` 경로가 중심입니다. 따라서 팀 공통 인터페이스를 두고 역할을 내부 표준으로 먼저 고정하는 편이 좋습니다.
+
+```python
+def normalize_messages(system_text: str, history: list[dict[str, str]], user_text: str):
+    return [{"role": "system", "content": system_text}, *history, {"role": "user", "content": user_text}]
+```
+
+공급자 교체 시 가장 자주 깨지는 부분은 모델 성능이 아니라 메시지 직렬화 계층입니다. 시작 단계에서 이 계층을 분리해 두면 이후 확장이 훨씬 단순해집니다.
+
 ## 운영 체크리스트
 
 - [ ] `system`에는 공통 정책, `user`에는 현재 요청, `assistant`에는 재주입할 이력을 둡니다.
@@ -383,6 +454,13 @@ print(completion.choices[0].message.content)
 프롬프트 엔지니어링의 출발점은 화려한 문장이 아닙니다. 역할이 분리된 메시지 배열입니다. `system`은 정책을 고정하고, `user`는 현재 요청을 담고, `assistant`는 다음 턴에 필요한 이력을 되살립니다. 이 기본 구조를 잡아야 같은 모델에서도 더 예측 가능한 동작을 만들 수 있습니다.
 
 이 글에서 기억할 핵심은 세 가지입니다. 공통 규칙은 `system`으로 올리고, 멀티턴 기억은 애플리케이션이 재구성하고, 파라미터 조정은 프롬프트 구조와 함께 읽어야 합니다. 이 세 가지가 분리되면 “왜 답이 흔들렸는가”를 훨씬 쉽게 설명할 수 있습니다.
+
+실무에서는 여기에 한 가지를 더 붙이면 안정성이 크게 좋아집니다. 프롬프트를 코드와 같은 변경 자산으로 취급하고, 템플릿 버전과 회귀 테스트를 운영 절차에 포함하는 것입니다. 같은 모델에서도 결과가 달라지는 이유를 추적할 수 있어야 시스템이 장기적으로 유지됩니다.
+
+프롬프트가 길어질수록 품질이 좋아진다는 보장은 없습니다. 길이보다 구조와 계약이 명확한 프롬프트가 결과를 더 안정적으로 만듭니다.
+
+운영에서는 이 원칙이 비용 절감과 장애 감소로 바로 연결됩니다.
+짧고 선명한 구조가 유리합니다.
 
 다음 글에서는 few-shot과 chain-of-thought를 다룹니다. 이번 글이 역할의 분리였다면, 다음 글은 그 위에 예시와 단계적 추론을 얹어 응답 패턴을 더 강하게 유도하는 단계입니다.
 

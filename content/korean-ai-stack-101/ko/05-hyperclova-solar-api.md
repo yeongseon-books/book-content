@@ -283,6 +283,195 @@ Solar는 `base_url`만 바꾸면 Groq 예제 대부분이 그대로 옮겨집니
 
 다음 글에서는 6편이자 마지막 글인 한국어 RAG 파이프라인을 조합합니다. BGE-M3 검색, CLOVA OCR 텍스트, 이 글의 LLM 호출을 하나의 흐름으로 묶어 사실 기반 한국어 응답을 만드는 최소 RAG를 코드로 완성합니다.
 
+## HyperCLOVA X REST 호출 예시
+
+OpenAI 호환 인터페이스는 Solar나 일부 공급자에서는 편리하지만, HyperCLOVA X는 NCP 전용 REST 계약을 이해해야 운영이 안정적입니다. 실제 운영에서는 SDK wrapper를 쓰더라도 원시 요청/응답 형식을 한 번은 확인해 두는 편이 좋습니다.
+
+```python
+import os
+import requests
+
+def call_hyperclova_x(prompt: str) -> str:
+    host = os.environ['NCP_APIGW_HOST']
+    endpoint = '/testapp/v1/chat-completions/HCX-005'
+    url = f'https://{host}{endpoint}'
+
+    headers = {
+        'Content-Type': 'application/json; charset=utf-8',
+        'X-NCP-CLOVASTUDIO-API-KEY': os.environ['NCP_CLOVA_API_KEY'],
+        'X-NCP-APIGW-API-KEY': os.environ['NCP_APIGW_API_KEY'],
+        'X-NCP-CLOVASTUDIO-REQUEST-ID': 'korean-ai-stack-101-ep05',
+    }
+
+    payload = {
+        'messages': [
+            {'role': 'system', 'content': '당신은 한국어 기술 문서를 설명하는 시니어 개발자입니다.'},
+            {'role': 'user', 'content': prompt},
+        ],
+        'topP': 0.8,
+        'topK': 0,
+        'temperature': 0.3,
+        'maxTokens': 320,
+        'repeatPenalty': 1.1,
+        'includeAiFilters': True,
+    }
+
+    resp = requests.post(url, headers=headers, json=payload, timeout=12)
+    resp.raise_for_status()
+    data = resp.json()
+    return data['result']['message']['content']
+```
+
+핵심은 모델 이름이 아니라 헤더 계약입니다. 운영 이슈의 상당수는 키 이름 오타, request id 누락, timeout 미설정에서 시작합니다.
+
+## 한국어 응답 품질을 측정하는 작은 벤치마크
+
+유창함과 정확도를 분리해 보려면 평가 세트를 아주 작게라도 만들어야 합니다. 다음은 한국어 기술 Q&A 기준선에서 자주 쓰는 최소 지표입니다.
+
+| 지표 | 정의 | 초기 기준값 예시 |
+| --- | --- | --- |
+| Format pass rate | JSON 응답 강제 시 파싱 성공 비율 | 0.98 이상 |
+| Refusal precision | 답할 수 없는 질문에서 거절 규칙 준수 비율 | 0.95 이상 |
+| Citation presence rate | 답변에 출처 라인 포함 비율 | 0.99 이상 |
+| Korean consistency | 영어 혼입 없는 한국어 문체 유지 비율 | 0.97 이상 |
+
+아래처럼 간단한 자동 점검 함수를 두면 배포 전 회귀를 빠르게 걸러낼 수 있습니다.
+
+```python
+import json
+import re
+
+def check_generation_contract(raw_text: str):
+    result = {
+        'len_ok': 20 <= len(raw_text) <= 2000,
+        'has_sources': '[sources:' in raw_text,
+        'no_ai_slop': not any(
+            bad in raw_text for bad in ['As an AI', 'I cannot', '저는 AI']
+        ),
+        'mostly_korean': bool(re.search(r'[가-힣]', raw_text)),
+    }
+    return result
+
+sample = '결제 동기화 지연을 먼저 확인하세요. [sources: 0,1]'
+print(json.dumps(check_generation_contract(sample), ensure_ascii=False))
+```
+
+## 생산 환경 구성 예시: 이중 공급자 라우팅
+
+한국어 서비스에서는 하나의 공급자만 고정하기보다 기본/대체 경로를 미리 준비해 두는 편이 안전합니다. 지연 급증이나 일시 장애에서 빠르게 우회할 수 있기 때문입니다.
+
+```yaml
+llm_router:
+  primary: solar-mini
+  fallback: hyperclova-x
+  timeout_ms: 10000
+  max_retries: 2
+
+providers:
+  solar:
+    base_url: https://api.upstage.ai/v1/solar
+    model: solar-mini
+    temperature: 0.3
+    max_tokens: 320
+
+  hyperclova:
+    host_env: NCP_APIGW_HOST
+    endpoint: /testapp/v1/chat-completions/HCX-005
+    temperature: 0.3
+    max_tokens: 320
+
+guardrails:
+  require_citation: true
+  reject_if_no_json_when_required: true
+  pii_mask_before_log: true
+```
+
+이 설정을 코드와 분리해 두면 공급자 전환을 PR 한 건으로 끝낼 수 있고, 온도/길이 조정 이력도 명확하게 남습니다.
+
+## 오류 코드 분류와 재시도 정책
+
+API 호출 실패는 무조건 재시도하면 오히려 상황을 악화시킬 수 있습니다. 상태 코드별 대응을 먼저 정의해 두는 편이 좋습니다.
+
+| 상태 코드 | 의미 | 권장 대응 |
+| --- | --- | --- |
+| 400 | 요청 형식 오류 | 재시도하지 않고 즉시 실패 처리 |
+| 401/403 | 인증/권한 문제 | 키 회전 알람, 재시도 금지 |
+| 429 | 속도 제한 | 지수 백오프 후 제한 횟수 재시도 |
+| 500/502/503 | 일시 서버 오류 | 짧은 백오프 재시도 후 fallback 전환 |
+| timeout | 네트워크/지연 | timeout 증가보다 요청 축소와 fallback 우선 |
+
+```python
+def should_retry(status_code: int) -> bool:
+    return status_code in (429, 500, 502, 503)
+```
+
+이 규칙을 라우터 레벨에 넣어 두면 모델별 SDK가 달라도 운영 정책은 일관되게 유지됩니다.
+
+## 한국어 시스템 프롬프트 템플릿 예시
+
+프롬프트 품질은 길이보다 계약이 중요합니다. 한국어 기술 문서 답변용으로 자주 쓰는 템플릿은 아래 정도면 충분합니다.
+
+```text
+당신은 한국어 기술 문서를 설명하는 시니어 개발자입니다.
+규칙:
+1) 반드시 한국어로 답합니다.
+2) 제공된 문맥에 없는 내용은 추측하지 말고 '문맥에서 확인하지 못했습니다.'라고 답합니다.
+3) 답변 마지막 줄에 [sources: ...] 형식으로 출처 번호를 적습니다.
+4) 불필요한 사과문, 자기소개, 모델 언급을 하지 않습니다.
+```
+
+이 템플릿을 고정하면 모델을 바꿔도 문체와 안전 규칙이 유지되어, 사용자 입장에서 제품이 덜 흔들립니다.
+
+## 호출 비용과 지연을 함께 관리하는 운영 표
+
+LLM API 운영에서는 품질만큼 비용과 지연이 중요합니다. 아래처럼 요청당 입력/출력 토큰과 p95 지연을 한 표에 묶어 추적하면 의사결정이 빨라집니다.
+
+| 프로필 | temperature | max_tokens | 평균 입력 토큰 | 평균 출력 토큰 | p95 지연(ms) | 요청당 비용(상대) |
+| --- | --- | --- | --- | --- | --- | --- |
+| concise-support | 0.2 | 180 | 420 | 120 | 820 | 1.0x |
+| default-explain | 0.3 | 320 | 530 | 210 | 1210 | 1.6x |
+| long-report | 0.4 | 700 | 760 | 520 | 2480 | 3.1x |
+
+운영팀은 이 표를 기준으로 제품 기능별 프로필을 나눠야 합니다. 모든 기능에 같은 토큰 상한을 주면 비용과 지연이 빠르게 불안정해집니다.
+
+## production 코드 예시: 공급자 추상화 인터페이스
+
+공급자 교체를 안전하게 하려면 호출 코드를 인터페이스로 감싸 두는 편이 좋습니다.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class LLMRequest:
+    system: str
+    user: str
+    temperature: float = 0.3
+    max_tokens: int = 320
+
+class LLMProvider:
+    def generate(self, req: LLMRequest) -> str:
+        raise NotImplementedError
+
+class SolarProvider(LLMProvider):
+    def __init__(self, client, model='solar-mini'):
+        self.client = client
+        self.model = model
+
+    def generate(self, req: LLMRequest) -> str:
+        resp = self.client.chat.completions.create(
+            model=self.model,
+            temperature=req.temperature,
+            max_tokens=req.max_tokens,
+            messages=[
+                {'role': 'system', 'content': req.system},
+                {'role': 'user', 'content': req.user},
+            ],
+        )
+        return resp.choices[0].message.content
+```
+
+이 구조를 쓰면 실험 단계에서는 Solar를, 규제나 계약 요건이 필요한 환경에서는 HyperCLOVA를 같은 인터페이스로 교체할 수 있습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **프롬프트 튜닝보다 먼저 고정해야 할 API 계약은 무엇일까요?**

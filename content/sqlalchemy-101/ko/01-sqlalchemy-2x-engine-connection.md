@@ -386,6 +386,53 @@ def engine():
 
 다음 글에서는 한 단계 위로 올라가 **MetaData, Table, Column, type system**을 다룹니다. raw SQL 문자열 대신 Python 객체로 schema를 선언하는 Core의 진짜 매력이 본격적으로 등장합니다. ORM 이전 단계인 Core SQL expression이 어떤 모양인지를 이해하면, 4편 이후의 ORM이 훨씬 쉽게 읽힙니다.
 
+## 실전 앵커: SQL echo 로그로 트랜잭션 경계 읽기
+
+Engine과 Connection을 이해했다는 말은 결국 로그 한 줄만 보고 현재 상태를 설명할 수 있다는 뜻입니다. 아래 예시는 `echo=True`에서 실제로 자주 보게 되는 출력이며, 각 줄이 무엇을 의미하는지 짚어 둡니다.
+
+```text
+2026-05-21 10:00:00,001 INFO sqlalchemy.engine.Engine BEGIN (implicit)
+2026-05-21 10:00:00,001 INFO sqlalchemy.engine.Engine INSERT INTO users (name) VALUES (?)
+2026-05-21 10:00:00,001 INFO sqlalchemy.engine.Engine [generated in 0.00011s] ('Alice',)
+2026-05-21 10:00:00,002 INFO sqlalchemy.engine.Engine COMMIT
+```
+
+첫 줄의 `BEGIN (implicit)`은 `with engine.connect()` 블록 안에서 첫 DML이 실행되며 자동으로 트랜잭션이 시작됐다는 신호입니다. 세 번째 줄은 바인딩 파라미터가 따로 전달되었음을 보여 줍니다. 마지막 줄의 `COMMIT`이 없으면 INSERT는 반영되지 않습니다. 이 네 줄은 2.x 스타일의 핵심을 압축합니다.
+
+반대로 다음 로그는 commit 누락을 바로 보여 줍니다.
+
+```text
+INFO sqlalchemy.engine.Engine BEGIN (implicit)
+INFO sqlalchemy.engine.Engine INSERT INTO users (name) VALUES (?)
+INFO sqlalchemy.engine.Engine [generated in 0.00008s] ('Bob',)
+INFO sqlalchemy.engine.Engine ROLLBACK
+```
+
+`ROLLBACK`으로 끝났다면 `with engine.connect()` 블록을 벗어나는 동안 명시적 `commit()`을 호출하지 않았다는 뜻입니다. 학습 단계에서 INSERT가 됐다고 착각하는 전형적인 상황이며, 실제 운영에서도 배치 스크립트에서 같은 실수가 반복됩니다.
+
+## 실전 앵커: 연결 풀 상태를 코드로 남기기
+
+운영에서는 "왜 갑자기 느려졌는가"를 코드로 설명할 수 있어야 합니다. SQLAlchemy는 풀 상태를 문자열로 확인할 수 있습니다.
+
+```python
+from sqlalchemy import create_engine, text
+
+engine = create_engine(
+    "sqlite:///app.db",
+    pool_pre_ping=True,
+    pool_recycle=1800,
+    echo=False,
+)
+
+with engine.begin() as conn:
+    conn.execute(text("SELECT 1"))
+
+print(engine.pool.status())
+# 예: Pool size: 5  Connections in pool: 1 Current Overflow: -4 Current Checked out connections: 0
+```
+
+이 출력은 부하 테스트 직후의 체크포인트로 매우 유용합니다. API 지연이 커졌는데 `Checked out connections`가 계속 높은 값이면, 트랜잭션 블록이 너무 길거나 커넥션 반환이 늦은 코드 경로가 있다는 뜻입니다.
+
 ## 처음 질문으로 돌아가기
 
 - **`Engine`은 정확히 무엇이고, `Connection`과 어떻게 역할을 나눌까요?**

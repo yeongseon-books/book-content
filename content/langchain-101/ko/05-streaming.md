@@ -323,6 +323,201 @@ asyncio.run(main())
 
 ---
 
+## Callback으로 스트리밍 로깅 붙이기
+
+스트리밍을 운영에 붙일 때는 "보였다"보다 "무엇이 언제 보였는지"가 중요합니다. 콜백 핸들러를 사용하면 토큰 단위 이벤트를 일관된 형식으로 로그에 남길 수 있습니다.
+
+```python
+import os
+from langchain_core.callbacks import BaseCallbackHandler
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+class StreamLogHandler(BaseCallbackHandler):
+    def on_llm_new_token(self, token: str, **kwargs) -> None:
+        if token:
+            print(f"[token] {token!r}")
+
+llm = ChatGroq(
+    model="llama-3.1-8b-instant",
+    api_key=os.environ["GROQ_API_KEY"],
+    streaming=True,
+    callbacks=[StreamLogHandler()],
+)
+
+chain = (
+    ChatPromptTemplate.from_template("Explain {topic} in two paragraphs.")
+    | llm
+    | StrOutputParser()
+)
+
+for chunk in chain.stream({"topic": "callback handlers"}):
+    print(chunk, end="", flush=True)
+```
+
+이 방식은 CLI 데모보다 서버 운영에서 더 유용합니다. token 이벤트를 request_id와 함께 저장하면 사용자 불만("응답이 멈췄다")을 재현할 때 큰 도움이 됩니다.
+
+## stream vs astream 운영 선택 기준
+
+| 항목 | `stream()` | `astream()` |
+|---|---|---|
+| 호출 문맥 | 동기 함수 | 비동기 함수 |
+| 반복 형태 | `for chunk in ...` | `async for chunk in ...` |
+| 적합한 환경 | CLI, 배치 스크립트 | FastAPI, WebSocket 서버 |
+| 취소 처리 | 상대적으로 단순 | 연결 취소/타임아웃 분기 필요 |
+
+팀 기준을 미리 정해 두면 코드 일관성이 좋아집니다. 예를 들어 "API 계층은 전부 `astream`만 사용"처럼 규칙을 두면 이벤트 루프 블로킹 문제를 줄일 수 있습니다.
+
+## 빈 chunk와 중간 오류 처리 패턴
+
+모델 공급자마다 스트리밍 이벤트 형식이 조금씩 다르므로, 빈 chunk를 오류로 오인하지 않는 코드가 필요합니다.
+
+```python
+def safe_stream(chain, payload: dict) -> str:
+    chunks: list[str] = []
+    try:
+        for chunk in chain.stream(payload):
+            if not chunk:
+                continue
+            print(chunk, end="", flush=True)
+            chunks.append(chunk)
+    except Exception as exc:
+        print(f"\n[stream-error] {type(exc).__name__}: {exc}")
+    finally:
+        print()
+    return "".join(chunks)
+```
+
+핵심은 실패하더라도 이미 전송한 부분 텍스트를 잃지 않는 것입니다. 사용자에게는 부분 결과를 보여 주고, 운영 로그에는 예외 유형과 마지막 chunk 시점을 함께 남겨야 합니다.
+
+## FastAPI에서 SSE 형식으로 내보내기
+
+단순 `text/plain`도 충분하지만, 프런트엔드가 이벤트 단위를 분리해야 한다면 SSE 형식이 더 안정적입니다.
+
+```python
+import json
+import os
+
+from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+app = FastAPI()
+
+chain = (
+    ChatPromptTemplate.from_template("Answer briefly: {question}")
+    | ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"])
+    | StrOutputParser()
+)
+
+@app.get("/sse")
+async def sse(question: str):
+    async def generate():
+        async for chunk in chain.astream({"question": question}):
+            if not chunk:
+                continue
+            payload = json.dumps({"type": "token", "text": chunk}, ensure_ascii=False)
+            yield f"data: {payload}\n\n"
+        yield "data: {\"type\":\"done\"}\n\n"
+
+    return StreamingResponse(generate(), media_type="text/event-stream")
+```
+
+이 구조를 쓰면 클라이언트가 `done` 이벤트를 기준으로 렌더링 완료를 명확히 판단할 수 있습니다. 운영에서 타임아웃 정책을 넣을 때도 이벤트 단위가 있으면 훨씬 다루기 쉽습니다.
+
+## LangSmith 추적으로 첫 토큰 지연 측정하기
+
+스트리밍 품질은 총 latency보다 first token latency에 더 크게 좌우됩니다. 추적 로그에서 두 값을 분리해 관리하는 것이 좋습니다.
+
+```text
+trace_id=trc_05_stream_001
+model=llama-3.1-8b-instant
+latency_total_ms=1820
+latency_first_token_ms=410
+tokens_out=278
+status=success
+```
+
+동일한 총 지연이라도 첫 토큰이 빠르면 체감은 크게 좋아집니다. 그래서 튜닝 순서도 보통 `first_token -> tokens/sec -> total_latency` 순으로 잡는 편이 효율적입니다.
+
+## 스트리밍 운영 체크리스트
+
+- `취소 처리`: 클라이언트 연결이 끊기면 생성 루프를 즉시 중단하는가
+- `부분 결과 정책`: 중간 오류 시 부분 텍스트를 사용자에게 유지하는가
+- `관측`: first token latency, total latency, output token 수를 저장하는가
+- `버퍼링 경로`: 프록시/게이트웨이에서 chunk buffering이 꺼져 있는가
+- `재시도`: 스트리밍 중 재시도는 새 요청으로 분리하는가
+
+이 체크리스트를 배포 전 점검 항목으로 넣어 두면, 기능 데모는 되는데 프로덕션에서 체감이 나빠지는 상황을 크게 줄일 수 있습니다.
+
+## Tool Calling과 스트리밍을 함께 쓰는 패턴
+
+실전 챗 인터페이스에서는 도구 호출과 최종 답변 스트리밍이 같이 등장합니다. 이때 사용자에게는 다음 두 단계를 구분해 보여 주는 편이 좋습니다.
+
+1. **도구 실행 단계**: "계산 중", "조회 중" 같은 상태 이벤트
+2. **최종 응답 생성 단계**: 토큰 스트리밍
+
+```python
+from langchain_core.messages import HumanMessage, ToolMessage
+
+async def run_tool_then_stream(question: str):
+    messages = [HumanMessage(content=question)]
+
+    # 1) 첫 라운드: tool 요청 확인
+    first = llm_with_tools.invoke(messages)
+    messages.append(first)
+
+    for tc in first.tool_calls:
+        result = tool_map[tc["name"]].invoke(tc["args"])
+        print(f"[tool] {tc['name']} -> {result}")
+        messages.append(ToolMessage(content=str(result), tool_call_id=tc["id"]))
+
+    # 2) 둘째 라운드: 최종 답변 스트리밍
+    async for chunk in llm_with_tools.astream(messages):
+        if hasattr(chunk, "content") and chunk.content:
+            print(chunk.content, end="", flush=True)
+    print()
+```
+
+이 패턴을 쓰면 사용자는 "지금 멈춘 것이 아니라 도구 실행 중"이라는 상태를 이해할 수 있고, 체감 품질이 좋아집니다.
+
+## backpressure를 고려한 전송 제어
+
+느린 클라이언트가 연결된 상태에서 무제한으로 토큰을 밀어내면 서버 메모리와 큐가 빠르게 커질 수 있습니다. 그래서 전송 계층에서 최소한의 흐름 제어가 필요합니다.
+
+```python
+import asyncio
+
+async def throttled_generate(chain, payload: dict, delay_sec: float = 0.0):
+    async for chunk in chain.astream(payload):
+        if not chunk:
+            continue
+        yield chunk
+        if delay_sec > 0:
+            await asyncio.sleep(delay_sec)
+```
+
+실제로는 인위적 지연보다 네트워크 버퍼 정책, SSE 프레임 크기, 게이트웨이 타임아웃을 함께 조정해야 합니다. 핵심은 애플리케이션 레벨에서도 backpressure를 전혀 무시하지 않는다는 점입니다.
+
+## 스트리밍 이벤트 설계 예시
+
+클라이언트와 합의한 이벤트 스키마를 두면 화면 로직이 단순해집니다.
+
+| event.type | payload 예시 | 프런트엔드 동작 |
+|---|---|---|
+| `status` | `{ "phase": "tool_calling" }` | 상태 배지 표시 |
+| `token` | `{ "text": "FAISS" }` | 본문 누적 렌더링 |
+| `usage` | `{ "tokens_out": 180 }` | 비용/통계 갱신 |
+| `done` | `{}` | 입력창 재활성화 |
+| `error` | `{ "message": "provider timeout" }` | 오류 토스트 표시 |
+
+이 합의가 없으면 프런트엔드가 공급자별 예외 형식을 직접 해석해야 하고, 유지보수 비용이 빠르게 올라갑니다.
+
+---
+
 ## 이 코드에서 주목할 점
 
 - 체인 정의는 `invoke()` 버전에서 거의 바뀌지 않습니다. 진짜 차이는 출력을 소비하는 방식입니다.

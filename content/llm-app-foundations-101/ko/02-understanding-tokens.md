@@ -331,6 +331,87 @@ else:
 - `max_tokens`를 크게 잡으면 충분하다고 생각하기 쉽지만, 입력이 이미 커지면 실제로 남은 출력 공간은 훨씬 작을 수 있습니다.
 - `finish_reason=length`를 가벼운 경고로 넘기기 쉽지만, 실제로는 문장 중간 잘림이나 코드 블록 손실로 이어질 수 있습니다.
 
+## 토큰 예산을 운영 정책으로 바꾸는 방법
+
+토큰을 이해했다면 다음 단계는 수치를 정책으로 고정하는 일입니다. 가장 실용적인 출발점은 요청 타입별 예산표를 만드는 것입니다. “대충 짧게”가 아니라 입력·출력 상한을 명시하면, 팀 내에서 같은 기준으로 프롬프트를 설계할 수 있습니다.
+
+| 요청 타입 | 입력 상한 | 출력 상한 | 안전 마진 | 비고 |
+|---|---:|---:|---:|---|
+| 일반 Q&A | 2,000 | 600 | 300 | 응답 속도 우선 |
+| 문서 요약 | 5,000 | 900 | 500 | 긴 본문 허용 |
+| 정책 판정 | 3,500 | 500 | 400 | 형식 안정성 우선 |
+| 코드 설명 | 4,500 | 1,000 | 500 | 코드 블록 여유 필요 |
+
+이 표를 코드로 옮기면 호출 전 검증이 쉬워집니다.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class TokenBudget:
+    max_prompt: int
+    max_output: int
+    safety_margin: int
+
+BUDGETS = {
+    "qa": TokenBudget(max_prompt=2000, max_output=600, safety_margin=300),
+    "summary": TokenBudget(max_prompt=5000, max_output=900, safety_margin=500),
+    "policy": TokenBudget(max_prompt=3500, max_output=500, safety_margin=400),
+    "code": TokenBudget(max_prompt=4500, max_output=1000, safety_margin=500),
+}
+
+def assert_budget_ok(estimated_prompt_tokens: int, use_case: str, context_window: int) -> None:
+    budget = BUDGETS[use_case]
+    allowed_prompt = context_window - budget.max_output - budget.safety_margin
+    if estimated_prompt_tokens > allowed_prompt:
+        raise ValueError(
+            f"Prompt too long: estimated={estimated_prompt_tokens}, allowed={allowed_prompt}, use_case={use_case}"
+        )
+```
+
+### 토큰 기반 rate limit 방어
+
+rate limit은 요청 횟수만의 문제가 아닙니다. 많은 공급자가 토큰 속도 제한도 함께 둡니다. 따라서 초당 요청 수(RPS)만 보고 설계하면, 긴 프롬프트 구간에서 `429`가 반복될 수 있습니다.
+
+```python
+import time
+
+class TokenRateLimiter:
+    def __init__(self, tokens_per_minute: int):
+        self.tokens_per_minute = tokens_per_minute
+        self.window_started = time.time()
+        self.used_tokens = 0
+
+    def consume(self, estimated_tokens: int) -> None:
+        now = time.time()
+        if now - self.window_started >= 60:
+            self.window_started = now
+            self.used_tokens = 0
+
+        if self.used_tokens + estimated_tokens > self.tokens_per_minute:
+            sleep_s = 60 - (now - self.window_started)
+            if sleep_s > 0:
+                time.sleep(sleep_s)
+            self.window_started = time.time()
+            self.used_tokens = 0
+
+        self.used_tokens += estimated_tokens
+```
+
+이 제한기는 거칠지만 효과가 분명합니다. 토큰이 큰 요청이 몰릴 때도 공급자 제한보다 먼저 속도를 줄이므로 `429` 폭주를 줄일 수 있습니다.
+
+### 월 비용을 빠르게 추정하는 테이블
+
+운영 의사결정에서는 호출 단가보다 월 총량이 중요합니다. 아래처럼 보수적으로 계산해 두면, 기능 추가 전에 예산 충격을 빠르게 확인할 수 있습니다.
+
+| 일 호출 수 | 평균 총 토큰 | 월 총 토큰(30일) | 단가 가정(USD / 1M) | 월 비용 추정 |
+|---:|---:|---:|---|---:|
+| 5,000 | 900 | 135,000,000 | 0.35 | 47.25 |
+| 20,000 | 1,200 | 720,000,000 | 0.35 | 252.00 |
+| 50,000 | 1,600 | 2,400,000,000 | 0.35 | 840.00 |
+
+토큰 비용은 모델 교체와 프롬프트 길이 변화에 민감합니다. 그래서 비용 회고를 할 때는 “요금표가 바뀌었다”보다 “평균 `prompt_tokens`가 얼마나 늘었는가”를 먼저 보는 편이 정확합니다.
+
 ## 운영 체크리스트
 
 - [ ] 실제 호출에서 `prompt_tokens`, `completion_tokens`, `total_tokens`를 모두 기록합니다.
@@ -344,6 +425,8 @@ else:
 토큰은 LLM 시스템에서 문장보다 더 중요한 단위입니다. 모델은 토큰으로 읽고, 토큰으로 생성하고, 공급자는 토큰으로 과금하며, 컨텍스트 창도 토큰으로 제한됩니다. 따라서 비용과 속도와 한계를 하나의 언어로 설명하려면 토큰 중심의 멘탈 모델이 필요합니다.
 
 이 글에서 가져가야 할 실전 감각은 분명합니다. 호출 후에는 `usage`를 읽고, 호출 전에는 `tiktoken`으로 대략적 길이를 추정하고, 출력 길이는 `max_tokens`, 잘림 여부는 `finish_reason`로 감시해야 합니다. 이 네 축이 모이면 길이 관련 문제는 훨씬 덜 신비로워집니다.
+
+추가로 기억할 점이 하나 더 있습니다. 토큰 최적화는 모델 품질을 낮추는 절약 기술이 아니라, 같은 예산에서 더 안정적인 결과를 얻기 위한 설계 기술입니다. 불필요한 반복 문장을 줄이고, 이력을 선택적으로 압축하고, 출력 형식을 명시하면 품질과 비용을 동시에 개선할 수 있습니다.
 
 다음 글에서는 같은 채팅 API 위에서 역할 기반 프롬프트 설계를 다룹니다. 토큰 예산을 읽을 수 있게 되었다면, 이제 같은 모델에서 더 안정적인 행동을 끌어내는 입력 구조를 설계할 차례입니다.
 

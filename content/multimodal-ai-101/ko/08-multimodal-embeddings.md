@@ -232,6 +232,118 @@ def hybrid_score(query: str, doc, alpha: float = 0.6) -> float:
 
 좋은 임베딩 시스템은 벡터를 만드는 단계에서 끝나지 않습니다. 만들어진 거리를 어떤 기준으로 해석하고, 어떤 경우에 사람 검수나 후속 모델로 넘길지를 함께 설계해야 비로소 서비스 품질이 안정됩니다.
 
+## 임베딩 품질 점검: 오프라인과 온라인 지표 분리
+
+멀티모달 임베딩은 오프라인 점수와 온라인 만족도가 자주 어긋납니다. 오프라인에서는 Recall@K, nDCG, MRR를 쓰고, 온라인에서는 클릭률, 저장률, 재질의율을 같이 봐야 품질을 제대로 해석할 수 있습니다. 특히 cross-modal 검색은 사용자가 결과를 어떻게 소비하는지에 따라 체감 품질이 크게 달라집니다.
+
+```python
+from collections import defaultdict
+
+stats = defaultdict(int)
+
+
+def log_search_event(query_type: str, clicked: bool, reformulated: bool) -> None:
+    stats[f"{query_type}_total"] += 1
+    if clicked:
+        stats[f"{query_type}_clicked"] += 1
+    if reformulated:
+        stats[f"{query_type}_reformulated"] += 1
+```
+
+이런 이벤트 로그를 modality별로 분리해 두면 "텍스트로 이미지 찾기"는 잘 되는데 "이미지로 문서 찾기"가 약한 구간을 빠르게 발견할 수 있습니다.
+
+## CLIP 임베딩과 메타데이터 결합 재랭킹
+
+CLIP 단독 검색은 빠르지만 도메인 제약을 반영하기 어렵습니다. 예를 들어 전자상거래에서는 카테고리, 가격대, 재고 상태 같은 메타데이터를 함께 써야 실사용 품질이 올라갑니다.
+
+```python
+def rerank_with_metadata(base_score: float, category_match: bool, in_stock: bool) -> float:
+    score = base_score
+    if category_match:
+        score += 0.08
+    if in_stock:
+        score += 0.03
+    return score
+```
+
+이 방식은 모델을 재학습하지 않고도 품질을 크게 개선합니다. 중요한 점은 가중치를 하드코딩으로 끝내지 않고 A/B 실험으로 주기적으로 재조정하는 것입니다.
+
+## 다국어 질의 보정 경로
+
+영어 중심 CLIP을 그대로 쓰는 경우 한국어 질의 성능이 떨어질 수 있습니다. 이때는 다국어 임베딩 모델로 교체하거나, 질의를 영어로 번역한 뒤 검색하는 이중 경로를 둡니다.
+
+```python
+def normalize_query_for_clip(q: str, lang: str) -> str:
+    if lang == "ko":
+        return f"Translate to concise English retrieval query: {q}"
+    return q
+```
+
+번역 경로를 도입할 때는 원문 질의도 함께 저장해 감사 가능성을 유지해야 합니다. 검색 품질 이슈는 번역 오차와 임베딩 오차가 섞여 나타나는 경우가 많기 때문입니다.
+
+## 임베딩 재생성 마이그레이션 절차
+
+모델을 교체하면 기존 벡터 인덱스를 전부 다시 만들어야 하는 경우가 많습니다. 이때 무중단 전환을 위해 dual index 전략을 사용합니다. 새 인덱스를 백그라운드로 구축하고, 일정 비율 트래픽을 새 인덱스로 보내 품질을 확인한 뒤 완전 전환하는 방식입니다.
+
+```python
+class IndexRouter:
+    def __init__(self):
+        self.primary = "clip_v1"
+        self.shadow = "clip_v2"
+        self.shadow_ratio = 0.1
+```
+
+전환 기준은 단순 정확도뿐 아니라 latency, cache hit 변화, 사용자 재질의율까지 포함해야 합니다. 그래야 모델 교체로 생기는 부작용을 놓치지 않습니다.
+
+## 하이브리드 검색에서 점수 정규화가 필요한 이유
+
+멀티모달 검색에서 흔한 실수는 서로 다른 점수 체계를 그대로 더하는 것입니다. CLIP cosine 점수와 BM25 점수, 또는 텍스트 임베딩 점수는 분포가 달라서 단순 합산하면 특정 채널이 과도하게 우세해집니다. 그래서 점수 정규화 단계를 분리해야 합니다.
+
+```python
+def minmax(x: float, lo: float, hi: float) -> float:
+    if hi <= lo:
+        return 0.0
+    return (x - lo) / (hi - lo)
+
+def fuse(clip_s: float, text_s: float, clip_rng: tuple[float, float], text_rng: tuple[float, float]) -> float:
+    a = minmax(clip_s, *clip_rng)
+    b = minmax(text_s, *text_rng)
+    return 0.6 * a + 0.4 * b
+```
+
+점수 정규화는 작은 구현처럼 보이지만, 검색 품질 변동 폭을 줄이는 데 매우 효과적입니다. 특히 모델 업그레이드 시 분포가 바뀌기 때문에 정규화 파라미터를 같이 갱신해야 안정적인 결과를 유지할 수 있습니다.
+
+## 검색 실패 로그를 학습 자산으로 전환하기
+
+검색 실패는 단순 오류가 아니라 임베딩 개선 데이터입니다. 사용자가 재질의한 케이스, 클릭하지 않은 top 결과, 사람이 수동으로 교정한 결과를 저장해 hard negative 세트로 만들면 다음 모델 평가 품질이 크게 올라갑니다.
+
+```python
+def build_hard_negative(query: str, shown_ids: list[str], clicked_ids: list[str]) -> list[str]:
+    return [x for x in shown_ids if x not in clicked_ids]
+```
+
+이 데이터셋은 모델 교체뿐 아니라 score calibration 튜닝에도 유용합니다. 운영 로그를 품질 자산으로 바꾸는 습관이 장기 성능을 만듭니다.
+
+## 운영 검증 루프: 주간 점검 항목을 고정하기
+
+멀티모달 시스템은 모델 정확도만으로 상태를 판단하면 늦게 대응하게 됩니다. 그래서 주간 운영 회의에서 항상 같은 항목을 점검하는 루프를 고정하는 편이 좋습니다. 예를 들어 요청량, 평균 지연 시간, P95 지연, 오류율, 재시도율, 캐시 히트율, 사용자 불만 비율을 동일 포맷으로 기록하면 작은 이상 징후를 초기에 잡을 수 있습니다.
+
+또한 지표는 기능별로 분해해야 합니다. 단일 "성공률" 수치만 보면 어떤 단계에서 손실이 났는지 알기 어렵습니다. 입력 검증 단계, 전처리 단계, 검색 단계, 생성 단계를 분리해 성공률을 기록하면 병목 구간이 명확해집니다. 이 분해 지표는 모델 교체나 파이프라인 변경 후 회귀를 탐지하는 데 특히 유용합니다.
+
+```python
+weekly_health = {
+    "request_count": 0,
+    "avg_latency_ms": 0,
+    "p95_latency_ms": 0,
+    "error_rate": 0.0,
+    "retry_rate": 0.0,
+    "cache_hit_rate": 0.0,
+    "user_downvote_rate": 0.0,
+}
+```
+
+운영 루프를 고정하면 기술 선택도 더 현실적으로 바뀝니다. 새 모델을 도입할 때 "정확도 상승"만 보지 않고, 지연 증가와 비용 증가를 같은 표에서 비교할 수 있기 때문입니다. 결국 프로덕션 품질은 한 번의 모델 업그레이드가 아니라, 반복 가능한 점검 루프를 통해 유지됩니다.
+
 ## 흔히 헷갈리는 지점
 
 - **Normalization 빠뜨리기** cosine similarity로 비교한다고 가정하고 코드를 짰는데, 정작 vector normalize를 안 하면 magnitude 큰 vector가 항상 이깁니다. embedding을 저장하기 전에 한 번 `v / v.norm()`을 거치는 습관이 안전합니다.

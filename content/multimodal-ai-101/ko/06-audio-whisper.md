@@ -250,6 +250,143 @@ segments, _ = model.transcribe(
     initial_prompt="patient, prescription, diagnosis, drug interaction, side effects.",
 )
 ```
+## Whisper 품질을 숫자로 관리하는 방법
+
+Whisper를 운영에 붙이면 "대체로 잘 된다"는 표현은 거의 의미가 없습니다. 최소한 WER(Word Error Rate), CER(Character Error Rate), segment latency, 무음 구간 hallucination 비율을 동시에 기록해야 품질 추이를 해석할 수 있습니다. 한국어 콜센터와 영어 회의록을 함께 처리하는 서비스라면 언어별 지표를 분리하는 것도 필수입니다.
+
+```python
+def wer(ref: list[str], hyp: list[str]) -> float:
+    n, m = len(ref), len(hyp)
+    dp = [[0] * (m + 1) for _ in range(n + 1)]
+    for i in range(n + 1):
+        dp[i][0] = i
+    for j in range(m + 1):
+        dp[0][j] = j
+    for i in range(1, n + 1):
+        for j in range(1, m + 1):
+            cost = 0 if ref[i - 1] == hyp[j - 1] else 1
+            dp[i][j] = min(
+                dp[i - 1][j] + 1,
+                dp[i][j - 1] + 1,
+                dp[i - 1][j - 1] + cost,
+            )
+    return dp[n][m] / max(1, n)
+```
+
+도메인 용어가 많은 환경에서는 `initial_prompt`만으로 한계가 있습니다. 이때는 사전 기반 치환(post-correction)을 추가하는 편이 현실적입니다. 예를 들어 의학 용어, 제품 SKU, 사람 이름을 사전으로 두고 후처리에서 교정하면 WER가 유의미하게 내려갑니다.
+
+## 오디오-비디오 결합 파이프라인
+
+회의나 강의 영상에서는 오디오 전사와 프레임 추출을 묶어 저장하면 나중에 질의응답 품질이 크게 좋아집니다. Whisper segment timestamp를 기준으로 해당 시간대 프레임을 추출해 함께 인덱싱하면 "이 말이 나온 화면"을 바로 복원할 수 있습니다.
+
+```python
+import subprocess
+
+def extract_frame_at(video_path: str, sec: float, out_path: str) -> None:
+    subprocess.run([
+        "ffmpeg", "-y",
+        "-ss", f"{sec:.3f}",
+        "-i", video_path,
+        "-frames:v", "1",
+        out_path,
+    ], check=True)
+```
+
+이 구조를 9편의 비디오 처리와 연결하면, 음성과 화면이 분리된 로그가 아니라 같은 이벤트 타임라인으로 관리됩니다. 멀티모달 RAG에서도 이 결합 인덱스가 재사용됩니다.
+
+## API 경로 선택 기준
+
+OpenAI API, self-hosted faster-whisper, 하이브리드 라우팅을 함께 운영하는 팀이 늘고 있습니다. 긴 파일은 self-host로, 짧은 실시간 요청은 API로 보내는 식의 비용 최적화가 가능합니다.
+
+```python
+def choose_stt_route(duration_sec: float, queue_depth: int) -> str:
+    if duration_sec > 600:
+        return "self_hosted"
+    if queue_depth > 120:
+        return "openai_api"
+    return "self_hosted"
+```
+
+이 라우팅 함수는 단순해 보이지만, 월 단위 비용과 P95 latency를 동시에 제어하는 핵심 장치가 됩니다.
+
+## 화자 분리와 결합할 때의 실무 포인트
+
+Whisper 자체는 화자를 구분하지 않기 때문에 회의록이나 상담 로그에서는 diarization을 별도로 붙여야 합니다. 이때 가장 많이 생기는 문제는 시간축 정렬 오차입니다. diarization 구간과 Whisper segment의 경계가 어긋나면 문장이 잘못된 화자에게 붙는 현상이 생깁니다.
+
+```python
+def assign_speaker(seg_start: float, seg_end: float, speaker_turns: list[dict]) -> str:
+    center = (seg_start + seg_end) / 2
+    for t in speaker_turns:
+        if t["start"] <= center <= t["end"]:
+            return t["speaker"]
+    return "UNKNOWN"
+```
+
+정렬 품질을 올리려면 segment를 너무 길게 묶지 말고, 3~8초 단위로 유지하는 편이 좋습니다. 또한 이름 매핑은 후처리 단계에서 별도로 관리해야 개인정보 정책과 충돌을 줄일 수 있습니다.
+
+## 긴 통화 로그 운영: 구간 병합과 검색 인덱싱
+
+콜센터나 회의록 같은 긴 오디오에서는 전사 결과를 그대로 한 덩어리 텍스트로 저장하면 검색 품질이 빠르게 떨어집니다. 보통 20~40초 단위 segment를 의미 단위로 병합하고, 병합 구간마다 시작/종료 시간을 메타데이터로 저장하는 방식이 효과적입니다.
+
+```python
+def merge_segments(segments: list[dict], max_window: float = 35.0) -> list[dict]:
+    merged = []
+    cur = None
+    for s in segments:
+        if cur is None:
+            cur = {"start": s["start"], "end": s["end"], "text": s["text"]}
+            continue
+        if s["end"] - cur["start"] <= max_window:
+            cur["end"] = s["end"]
+            cur["text"] += " " + s["text"]
+        else:
+            merged.append(cur)
+            cur = {"start": s["start"], "end": s["end"], "text": s["text"]}
+    if cur:
+        merged.append(cur)
+    return merged
+```
+
+이렇게 저장한 구간은 나중에 멀티모달 RAG에서 바로 재사용됩니다. 질문에 대한 답변을 줄 때 해당 시간대 오디오 원본과 비디오 프레임을 함께 제시할 수 있어 설명 가능성이 높아집니다.
+
+## 전사 품질 개선을 위한 사전 정규화
+
+오디오 전처리에서 볼륨 정규화와 무음 제거만 잘해도 Whisper 품질이 안정되는 경우가 많습니다. 특히 모바일 녹음처럼 입력 품질 편차가 큰 환경에서 효과가 큽니다.
+
+```python
+import librosa
+import numpy as np
+
+def normalize_audio(path: str):
+    y, sr = librosa.load(path, sr=16000, mono=True)
+    y = y / (np.max(np.abs(y)) + 1e-8)
+    return y, sr
+```
+
+전처리 로그를 남겨 두면 품질 이슈가 발생했을 때 원본 입력 특성과 전사 오류를 함께 분석할 수 있습니다.
+
+## 운영 검증 루프: 주간 점검 항목을 고정하기
+
+멀티모달 시스템은 모델 정확도만으로 상태를 판단하면 늦게 대응하게 됩니다. 그래서 주간 운영 회의에서 항상 같은 항목을 점검하는 루프를 고정하는 편이 좋습니다. 예를 들어 요청량, 평균 지연 시간, P95 지연, 오류율, 재시도율, 캐시 히트율, 사용자 불만 비율을 동일 포맷으로 기록하면 작은 이상 징후를 초기에 잡을 수 있습니다.
+
+또한 지표는 기능별로 분해해야 합니다. 단일 "성공률" 수치만 보면 어떤 단계에서 손실이 났는지 알기 어렵습니다. 입력 검증 단계, 전처리 단계, 검색 단계, 생성 단계를 분리해 성공률을 기록하면 병목 구간이 명확해집니다. 이 분해 지표는 모델 교체나 파이프라인 변경 후 회귀를 탐지하는 데 특히 유용합니다.
+
+```python
+weekly_health = {
+    "request_count": 0,
+    "avg_latency_ms": 0,
+    "p95_latency_ms": 0,
+    "error_rate": 0.0,
+    "retry_rate": 0.0,
+    "cache_hit_rate": 0.0,
+    "user_downvote_rate": 0.0,
+}
+```
+
+운영 루프를 고정하면 기술 선택도 더 현실적으로 바뀝니다. 새 모델을 도입할 때 "정확도 상승"만 보지 않고, 지연 증가와 비용 증가를 같은 표에서 비교할 수 있기 때문입니다. 결국 프로덕션 품질은 한 번의 모델 업그레이드가 아니라, 반복 가능한 점검 루프를 통해 유지됩니다.
+
+추가로, 음성 파이프라인에서는 전사 품질과 함께 처리 대기열 길이를 동시에 감시해야 합니다. 정확도만 좋아도 큐 적체가 심하면 사용자 경험은 빠르게 악화되므로, 품질 지표와 운영 지표를 한 대시보드에서 함께 보는 습관이 중요합니다.
+
 ## 흔히 헷갈리는 지점
 
 - **sample rate 변환 누락** Whisper는 16kHz mono입니다. 44.1kHz stereo wav를 그대로 넣으면 ffmpeg가 자동 변환을 해주지만, 직접 numpy waveform을 만들 때는 명시적으로 resample해야 합니다.

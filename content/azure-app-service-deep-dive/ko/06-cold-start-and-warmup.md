@@ -149,6 +149,88 @@ done | sort -k2 -n | tail -10
 
 이 측정은 평균값보다 tail latency를 보는 데 더 유용합니다. cold start는 드물어 보여도 사용자 경험에는 p99 형태로 남기 쉽기 때문입니다. 운영 문서에 cold-start SLO를 넣을 때 평균이 아니라 tail을 같이 보는 이유가 여기에 있습니다.
 
+### Warm-up 경로 설계: readiness를 너무 이르게 열지 않는다
+
+warm-up endpoint의 핵심은 단순한 200 반환이 아니라 "실제 트래픽을 받아도 되는 상태"를 선언하는 것입니다. DB 연결 풀 초기화, 필수 캐시 적재, 외부 의존성 최소 확인이 끝나기 전에는 성공을 반환하지 않도록 설계해야 합니다.
+
+```python
+@app.get("/warmup")
+def warmup():
+    db_ok = check_db_pool_ready()
+    cache_ok = check_required_cache_keys()
+    if not (db_ok and cache_ok):
+        return {"ready": False}, 503
+    return {"ready": True}, 200
+```
+
+Linux 앱이라면 이 endpoint를 `WEBSITE_WARMUP_PATH=/warmup`으로 맞추고, `WEBSITE_WARMUP_STATUSES=200`으로 제한해 false readiness를 줄이는 편이 안전합니다. 준비가 덜 된 302나 404를 성공처럼 받아들이게 두면 첫 사용자 요청이 실제 warm-up 역할을 대신하게 됩니다.
+
+### 콜드 스타트 계측과 성능 프로파일링 명령
+
+체감 개선을 확인하려면 warm-up 도입 전후의 분포를 같은 방식으로 측정해야 합니다.
+
+```bash
+# 앱 재시작 후 첫 30회 측정
+az webapp restart -n my-app -g my-rg
+for i in $(seq 1 30); do
+  curl -o /dev/null -s -w "%{http_code} connect=%{time_connect} ttfb=%{time_starttransfer} total=%{time_total}
+"     https://my-app.azurewebsites.net/warmup
+done
+
+# 운영 경로의 p95/p99 관측용 원시 로그 수집
+for i in $(seq 1 120); do
+  curl -o /dev/null -s -w "%{time_total}
+" https://my-app.azurewebsites.net/api/orders
+done > orders-latency.txt
+```
+
+또한 scale-out 직후 증상을 분리하려면 인스턴스 식별자를 함께 찍어야 합니다.
+
+```bash
+for i in $(seq 1 20); do
+  curl -s https://my-app.azurewebsites.net/diag/worker
+  echo
+done
+```
+
+**Expected output:** warm-up 개선 전후의 tail latency가 줄고, 새 인스턴스 투입 시점에서만 지연이 솟는 패턴이 보이면 startup readiness 경계가 원인임을 강하게 시사합니다. 이 데이터가 있어야 Always On, warm-up endpoint, slot 전략의 효과를 객관적으로 비교할 수 있습니다.
+
+### 네트워크 트레이스 기반 콜드 스타트 분석
+
+cold start를 애플리케이션 로그만으로 보면 네트워크 구간과 실행 구간이 섞입니다. 요청 시간 분해를 함께 기록하면 어디서 비용이 커지는지 더 명확해집니다.
+
+```bash
+for i in $(seq 1 40); do
+  curl -o /dev/null -s -w "code=%{http_code} dns=%{time_namelookup} connect=%{time_connect} tls=%{time_appconnect} ttfb=%{time_starttransfer} total=%{time_total}
+"     https://my-app.azurewebsites.net/warmup
+done
+```
+
+TTFB만 크게 튀고 네트워크 구간이 안정적이면 startup/readiness 구간 비용일 가능성이 높습니다. 반대로 connect/tls 구간까지 같이 늘면 네트워크 경로 또는 외부 프록시 설정을 추가로 점검해야 합니다.
+
+### 배포/스케일 직후 워밍 상태 확인 루틴
+
+```bash
+# 슬롯 스왑 직후
+for i in $(seq 1 15); do
+  curl -s https://my-app.azurewebsites.net/diag/runtime
+  echo
+done
+
+# 인스턴스 상태와 health check 동시 확인
+az webapp show -n my-app -g my-rg --query "{state:state,host:defaultHostName}" -o json
+```
+
+이 루틴을 release checklist에 넣어 두면 "성공 배포 후 첫 3분" 품질을 일정하게 유지할 수 있습니다.
+
+### warm-up 실패 시 즉시 확인할 항목
+
+warm-up이 반복 실패하면 endpoint 로직보다 먼저 status code 계약과 timeout 값을 확인합니다. Linux에서는 `WEBSITE_WARMUP_STATUSES`와 `WEBSITES_CONTAINER_START_TIME_LIMIT`, Windows에서는 초기화 경로와 dependency 연결 시간을 함께 봐야 합니다.
+
+이 값을 런북 첫 페이지에 고정해 두면, 새 팀원도 warm-up 문제를 네트워크 지연과 혼동하지 않고 바로 readiness 계약부터 점검할 수 있습니다.
+
+이 점검은 정기적으로 반복해야 합니다.
+
 ## 흔히 헷갈리는 지점
 
 - **Always On이 모든 startup cost를 없애 주는 것은 아닙니다.** idle coldness를 줄여 줄 뿐 redeploy·restart·new worker startup까지 대체하지는 못합니다.

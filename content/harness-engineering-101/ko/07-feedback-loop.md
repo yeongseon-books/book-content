@@ -282,6 +282,133 @@ class FailureMemory:
 
 Agent의 첫 시도 프롬프트에 failure_memory의 경고를 포함시키면, 과거 실수를 피하는 방향으로 시작합니다. 이는 학습 없이도 시간이 지날수록 품질이 올라가게 만듭니다.
 
+### 실패 분류 테이블과 루프 라우팅 규칙
+
+Feedback Loop를 안정적으로 운영하려면 실패를 분류하는 기준을 텍스트 설명이 아니라 테이블로 고정해야 합니다. 아래처럼 error code마다 다음 행동을 매핑해 두면 서비스별 편차가 줄어듭니다.
+
+```yaml
+# feedback_routing.yaml
+routing:
+  transient:
+    error_codes: [rate_limited, upstream_timeout, network_unreachable]
+    action: retry
+    max_retries: 2
+    backoff_seconds: [1, 3]
+  reasoning:
+    error_codes: [invalid_input, schema_mismatch, policy_violation]
+    action: reflect
+    max_reflects: 2
+  deterministic:
+    error_codes: [permission_denied, scope_violation, tool_not_allowed]
+    action: escalate
+```
+
+```python
+def next_action(error_code: str, table: dict) -> str:
+    for mode, cfg in table["routing"].items():
+        if error_code in cfg["error_codes"]:
+            return cfg["action"]
+    return "escalate"
+
+def assert_no_unrouted_codes(all_codes: set[str], table: dict) -> None:
+    routed = set()
+    for cfg in table["routing"].values():
+        routed.update(cfg["error_codes"])
+    missing = sorted(all_codes - routed)
+    if missing:
+        raise ValueError(f"unrouted error codes: {missing}")
+```
+
+이 검증이 없으면 새 에러 코드가 추가될 때 기본값으로 retry가 걸려 비용 루프로 빠지는 일이 반복됩니다.
+
+### Feedback 품질 점검 테스트
+
+reflect 메시지가 지나치게 길거나 모호하면 루프 품질이 바로 떨어집니다. feedback 자체를 테스트 대상으로 삼아야 합니다.
+
+```python
+def validate_feedback_message(msg: ReflectMessage) -> None:
+    if len(msg.failure_reason) < 12:
+        raise AssertionError("failure_reason is too short")
+    if len(msg.suggested_change) < 12:
+        raise AssertionError("suggested_change is too short")
+    if "다시" == msg.suggested_change.strip():
+        raise AssertionError("non-actionable suggestion")
+
+def test_feedback_is_actionable():
+    m = ReflectMessage(
+        attempt_number=2,
+        failed_action="called issue_refund without approval token",
+        failure_reason="approval token missing in step input",
+        suggested_change="call approval workflow first and inject approval_token",
+        constraint="issue_refund requires approval_token",
+    )
+    validate_feedback_message(m)
+```
+
+Feedback Loop는 결국 텍스트 품질과 제어 로직의 결합입니다. 둘 중 하나라도 자동 검증이 없으면 루프는 반복만 하고 개선하지 못합니다.
+
+### 루프 텔레메트리와 중단 기준
+
+Feedback Loop는 잘 만들수록 더 자주 실행되기 때문에, 루프 자체의 상태를 관찰하지 않으면 품질이 아니라 비용만 늘어날 수 있습니다. 최소한 다음 지표를 매 실행마다 남겨야 합니다.
+
+- attempts_used: 실제 시도 횟수
+- retry_count: transient 오류 재시도 횟수
+- reflect_count: reasoning 오류 반성 시도 횟수
+- repeated_failure_signature: 같은 실패 서명 반복 여부
+- loop_exit_reason: completed, escalated, timed_out, budget_exhausted
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class LoopTelemetry:
+    attempts_used: int = 0
+    retry_count: int = 0
+    reflect_count: int = 0
+    repeated_failure_signature: bool = False
+    loop_exit_reason: str = "unknown"
+
+def update_telemetry(t: LoopTelemetry, action: str, failure_sig: str, recent_sigs: list[str]) -> None:
+    t.attempts_used += 1
+    if action == "retry":
+        t.retry_count += 1
+    elif action == "reflect":
+        t.reflect_count += 1
+    t.repeated_failure_signature = failure_sig in recent_sigs[-2:]
+
+def should_force_stop(t: LoopTelemetry) -> bool:
+    if t.reflect_count >= 3:
+        t.loop_exit_reason = "reflect_limit"
+        return True
+    if t.repeated_failure_signature and t.attempts_used >= 3:
+        t.loop_exit_reason = "repeated_failure"
+        return True
+    return False
+```
+
+이 중단 기준이 없으면 루프는 "조금씩 다른 실패"를 반복하며 끝없이 돌 수 있습니다. 반복 실패 서명 검출은 특히 효과적입니다.
+
+### 실패 서명(Failure Signature) 설계
+
+failure memory를 잘 쓰려면 실패를 사람이 읽는 문장으로만 저장하면 안 됩니다. 같은 원인을 같은 키로 묶을 수 있어야 통계와 자동 대응이 가능합니다.
+
+```python
+import hashlib
+
+def build_failure_signature(error_code: str, tool_name: str, reason: str) -> str:
+    key = f"{error_code}|{tool_name}|{reason[:80]}"
+    return hashlib.sha1(key.encode()).hexdigest()[:12]
+
+def classify_for_memory(error) -> tuple[str, str]:
+    if isinstance(error, ToolError):
+        sig = build_failure_signature(error.code.value, getattr(error, "tool", "unknown"), error.why)
+        return sig, "tool_error"
+    sig = build_failure_signature("unknown", "unknown", str(error))
+    return sig, "unknown"
+```
+
+실무에서는 이 서명을 기준으로 "상위 5개 반복 실패"를 매일 보고합니다. 그렇게 하면 모델 개선보다 먼저 고쳐야 할 도구 설계 결함이 빠르게 드러납니다.
+
 ### Common Mistakes
 
 추론 오류는 retry로 안 풀립니다. 분류 후 reflect를 사용합니다.

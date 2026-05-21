@@ -276,6 +276,147 @@ else:
     print("show retry button to the user")
 ```
 
+### FastAPI SSE로 브라우저에 청크 전달하기
+
+터미널 루프가 안정화되면 다음 단계는 웹 전송입니다. 브라우저에서는 Server-Sent Events(SSE)를 쓰면 HTTP 연결 하나로 청크를 순서대로 전달할 수 있습니다. 이때 핵심은 모델 청크를 그대로 흘리는 것이 아니라, 애플리케이션 이벤트로 감싸서 상태를 함께 전송하는 것입니다.
+
+```python
+import json
+import os
+
+from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
+from groq import Groq
+
+app = FastAPI()
+client = Groq(api_key=os.environ["GROQ_API_KEY"])
+
+def sse_event(event: str, data: dict) -> str:
+    return f"event: {event}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
+
+@app.get("/api/stream")
+def stream_answer(q: str):
+    def event_generator():
+        parts: list[str] = []
+        stream = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[{"role": "user", "content": q}],
+            stream=True,
+            temperature=0,
+        )
+
+        yield sse_event("start", {"status": "started"})
+        try:
+            for chunk in stream:
+                choice = chunk.choices[0]
+                delta = choice.delta.content
+                if delta:
+                    parts.append(delta)
+                    yield sse_event("token", {"text": delta})
+
+                if choice.finish_reason is not None:
+                    yield sse_event("finish", {"finish_reason": choice.finish_reason})
+
+            yield sse_event("done", {"text": "".join(parts)})
+        except Exception as exc:
+            yield sse_event(
+                "error",
+                {
+                    "message": "stream interrupted",
+                    "partial_text": "".join(parts),
+                    "error_type": type(exc).__name__,
+                },
+            )
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
+```
+
+이 구성의 장점은 화면과 로그가 같은 상태 모델을 공유한다는 점입니다. 프런트엔드는 `token` 이벤트를 누적해 즉시 렌더링하고, `error` 이벤트에서 `partial_text`를 유지한 채 재시도 버튼만 보여 줄 수 있습니다. 운영자는 같은 이벤트 타입으로 장애 패턴을 집계할 수 있습니다.
+
+### 클라이언트 재연결을 위한 이벤트 ID 전략
+
+SSE를 실제 서비스에 붙이면 모바일 네트워크 환경에서 연결이 자주 끊길 수 있습니다. 이때 이벤트 ID를 붙여 두면 클라이언트가 어디까지 받았는지 복구하기 쉬워집니다.
+
+```python
+def sse_event_with_id(event_id: int, event: str, data: dict) -> str:
+    payload = json.dumps(data, ensure_ascii=False)
+    return f"id: {event_id}\nevent: {event}\ndata: {payload}\n\n"
+
+event_id = 0
+event_id += 1
+wire = sse_event_with_id(event_id, "token", {"text": "안녕하세요"})
+print(wire)
+```
+
+서버는 이벤트 ID와 세션 ID를 함께 로그에 남기고, 클라이언트는 마지막으로 수신한 ID를 저장해 재연결 시 `Last-Event-ID` 헤더를 보낼 수 있습니다. 처음에는 전체 재생성으로 시작해도 되지만, 이 구조를 미리 잡아 두면 대화형 제품에서 끊김 복구 품질이 크게 좋아집니다.
+
+### 스트리밍 세션 로그를 구조화해서 남기기
+
+스트리밍 장애는 나중에 재현하기 어렵기 때문에, 요청이 살아 있을 때 세션 요약을 남겨 두는 편이 좋습니다. 토큰 수, 청크 수, 마지막 이벤트 시각, 종료 이유를 한 레코드에 모으면 문제를 회고할 때 훨씬 빠릅니다.
+
+```python
+import time
+from dataclasses import dataclass
+
+@dataclass
+class StreamSessionLog:
+    request_id: str
+    chunk_count: int
+    text_chars: int
+    status: str
+    finish_reason: str | None
+    elapsed_ms: int
+
+def build_stream_log(
+    request_id: str,
+    chunk_count: int,
+    text: str,
+    status: str,
+    finish_reason: str | None,
+    started_at: float,
+) -> StreamSessionLog:
+    return StreamSessionLog(
+        request_id=request_id,
+        chunk_count=chunk_count,
+        text_chars=len(text),
+        status=status,
+        finish_reason=finish_reason,
+        elapsed_ms=int((time.monotonic() - started_at) * 1000),
+    )
+```
+
+이 로그 구조는 단순하지만 효과가 큽니다. 예를 들어 `status=failed`인데 `chunk_count`가 큰 요청이 많다면 네트워크 구간 문제를 먼저 의심할 수 있고, `finish_reason` 분포가 갑자기 바뀌면 모델 또는 파라미터 변경 영향을 빠르게 감지할 수 있습니다.
+
+### 스트리밍 + 구조화 출력 조합에서의 주의점
+
+텍스트 스트리밍을 잘 처리한 뒤, 같은 경로에서 JSON 구조화 출력까지 동시에 시도하는 경우가 많습니다. 이때 흔한 실수는 청크 단위로 들어오는 부분 문자열을 중간중간 `json.loads()` 하는 것입니다. JSON 객체는 완성되기 전까지 문법적으로 불완전할 수 있으므로, 파싱 시점은 종료 신호 이후로 미루는 편이 안전합니다.
+
+```python
+import json
+
+parts: list[str] = []
+finished = False
+
+def on_chunk(delta_text: str | None, finish_reason: str | None) -> None:
+    global finished
+    if delta_text:
+        parts.append(delta_text)
+    if finish_reason is not None:
+        finished = True
+
+def finalize_structured_output() -> dict:
+    raw = "".join(parts)
+    if not finished:
+        raise RuntimeError("stream ended without explicit finish signal")
+    return json.loads(raw)
+```
+
+운영 관점에서 이 패턴이 중요한 이유는 실패 위치가 명확해지기 때문입니다. “전송 중 실패”와 “완료 후 파싱 실패”를 나눌 수 있어, 재시도 정책도 다르게 적용할 수 있습니다. 전자는 transport 문제로, 후자는 프롬프트/스키마 문제로 분리됩니다.
+
+또 하나의 실무 팁은, JSON 파싱이 성공해도 즉시 신뢰하지 않는 것입니다. 구조화 출력 경로에서는 최종 단계에서 Pydantic 검증을 한 번 더 거쳐야 합니다. 스트리밍이 안정적일수록 오히려 의미 검증이 더 중요해집니다. 전송이 매끄럽다는 사실이 비즈니스 필드의 정확성을 보장하지는 않기 때문입니다.
+
+정리하면 스트리밍 경로의 품질은 세 층으로 관리됩니다. 전송 완전성, 구문 완전성, 의미 완전성입니다. 이 세 층을 분리해 로그와 예외를 남기면 “가끔 중간에서 멈춘다” 같은 모호한 제보도 구체적인 개선 작업으로 바꿀 수 있습니다.
+
 ## 흔히 헷갈리는 지점
 
 - 스트리밍은 일반 완료 응답을 빨리 출력하는 기능일 뿐이라고 생각하면 부분 실패 처리를 놓치기 쉽습니다.

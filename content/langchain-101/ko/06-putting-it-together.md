@@ -447,6 +447,78 @@ if __name__ == "__main__":
 
 ---
 
+## 통합 체인에 Tool Calling 분기 추가하기
+
+실전에서는 "검색으로 답할 질문"과 "계산 도구가 필요한 질문"이 섞여 들어옵니다. 이때는 단일 거대 체인보다 라우팅 분기를 두는 편이 유지보수에 유리합니다.
+
+```python
+from langchain_core.runnables import RunnableLambda
+
+def route_question(question: str) -> str:
+    keywords = ["더하기", "곱하기", "계산", "plus", "times"]
+    return "tool" if any(k in question.lower() for k in keywords) else "rag"
+
+router = RunnableLambda(route_question)
+
+def run_app(question: str) -> str:
+    branch = router.invoke(question)
+    if branch == "tool":
+        return run_with_tools(question)  # 4편 tool loop 재사용
+    return rag_chain.invoke(question)
+```
+
+이렇게 분기하면 검색 파이프라인과 도구 파이프라인의 실패 모드를 따로 다룰 수 있습니다. 통합 앱이 커질수록 이 분리가 중요해집니다.
+
+## 통합 경로 비교표
+
+| 질문 유형 | 경로 | 장점 | 주의점 |
+|---|---|---|---|
+| 지식 질의 | `retriever -> prompt -> llm` | 근거 기반 답변 | 인덱스 품질 의존 |
+| 계산/변환 | `llm(tool-call) -> tool -> llm` | 정확한 연산 | 루프 상한 필요 |
+| 혼합 질의 | 라우터 후 두 경로 결합 | 유연성 | 추적 복잡도 증가 |
+
+표를 보면 통합 전략의 핵심이 드러납니다. 모든 질문을 한 경로로 밀어 넣기보다, 질문 유형에 맞는 실행 경로를 먼저 정하는 것이 안정적입니다.
+
+## LangSmith로 전체 파이프라인 관측하기
+
+통합 앱은 단계가 많아서 로그가 쉽게 흩어집니다. trace 단위로 한 요청을 묶어 보면 원인 분석 속도가 크게 올라갑니다.
+
+```text
+trace_id=trc_06_full_013
+path=rag
+retriever.k=3
+retriever.latency_ms=64
+llm.latency_ms=921
+first_token_ms=355
+output_tokens=143
+status=success
+```
+
+tool 경로라면 아래처럼 run 구성이 달라집니다.
+
+```text
+trace_id=trc_06_full_014
+path=tool
+tool_calls=[add_numbers, multiply_numbers]
+tool_total_ms=3
+llm_rounds=2
+status=success
+```
+
+핵심은 경로별 지표 분리입니다. 검색 경로의 느림과 도구 경로의 느림은 원인이 다르므로, 대시보드도 분리해서 보는 편이 맞습니다.
+
+## 배포 전 최소 검증 시나리오
+
+- `지식 질의 성공`: 코퍼스 내부 질문 5개에서 근거 기반 응답 확인
+- `코퍼스 외 질문`: 근거 없음 응답 정책이 일관되게 동작하는지 확인
+- `도구 질의 성공`: 산술/변환 질문 5개에서 tool call 로그 확인
+- `스트리밍 동작`: 첫 토큰 지연과 완료 이벤트 확인
+- `재시작 안정성`: 인덱스 재로딩 후 동일 질문 품질 비교
+
+이 시나리오를 자동화해 두면, 모델 버전이나 인덱스 버전이 바뀌어도 품질 회귀를 조기에 발견할 수 있습니다.
+
+---
+
 ## 이 코드에서 주목할 점
 
 - 인덱싱 파이프라인과 질의 파이프라인을 분리하면 문서 준비 비용과 요청당 비용을 따로 이해하기 쉬워집니다.

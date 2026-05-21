@@ -327,6 +327,101 @@ def task_to_eval_dataset(task: TaskSpec, n: int = 10) -> list[dict]:
 ```
 
 이 변환이 있으면 TaskSpec 하나에서 시스템 프롬프트, 검증 함수, 평가 데이터셋이 모두 파생됩니다. Task가 단일 진실 공급원이 됩니다.
+
+### TaskSpec JSON Schema와 계약 테스트
+
+Task Harness를 팀 단위로 운영하면 "문서에는 있는데 런타임에서는 안 지켜지는 필드"가 빠르게 생깁니다. 이 문제를 막으려면 TaskSpec을 JSON Schema로 고정하고, API 입력 단계에서 바로 검증해야 합니다. 사람이 읽는 설명과 기계가 강제하는 계약을 분리하지 않는 것이 핵심입니다.
+
+```python
+from jsonschema import Draft202012Validator
+
+TASK_SPEC_SCHEMA = {
+    "type": "object",
+    "required": [
+        "task_id",
+        "goal",
+        "inputs",
+        "outputs",
+        "completion_criteria",
+        "constraints",
+    ],
+    "properties": {
+        "task_id": {"type": "string", "pattern": r"^task-[a-z0-9\-]{8,}$"},
+        "goal": {"type": "string", "minLength": 10, "maxLength": 300},
+        "inputs": {
+            "type": "object",
+            "required": ["source", "parameters"],
+            "properties": {
+                "source": {"type": "string"},
+                "parameters": {"type": "object"},
+            },
+            "additionalProperties": False,
+        },
+        "outputs": {
+            "type": "object",
+            "required": ["format", "destination", "schema"],
+            "properties": {
+                "format": {"enum": ["json", "markdown", "csv"]},
+                "destination": {"type": "string"},
+                "schema": {"type": "string"},
+            },
+            "additionalProperties": False,
+        },
+        "completion_criteria": {
+            "type": "array",
+            "minItems": 1,
+            "items": {"type": "string", "minLength": 8},
+        },
+        "constraints": {
+            "type": "object",
+            "required": ["max_tool_calls", "max_runtime_seconds", "approval_required"],
+            "properties": {
+                "max_tool_calls": {"type": "integer", "minimum": 1, "maximum": 20},
+                "max_runtime_seconds": {"type": "integer", "minimum": 5, "maximum": 300},
+                "approval_required": {"type": "boolean"},
+            },
+            "additionalProperties": False,
+        },
+    },
+    "additionalProperties": False,
+}
+
+validator = Draft202012Validator(TASK_SPEC_SCHEMA)
+
+def validate_task_spec(payload: dict) -> list[str]:
+    return [f"{e.json_path}: {e.message}" for e in validator.iter_errors(payload)]
+```
+
+```json
+{
+  "task_id": "task-refund-20260512",
+  "goal": "지난 7일 환불 요청 중 승인 대기 상태를 요약 보고서로 생성한다",
+  "inputs": {
+    "source": "postgres://ops/refunds",
+    "parameters": {
+      "from": "2026-05-05",
+      "to": "2026-05-12",
+      "status": "pending_approval"
+    }
+  },
+  "outputs": {
+    "format": "json",
+    "destination": "s3://ops-reports/refund-pending-2026-05-12.json",
+    "schema": "RefundPendingSummaryV1"
+  },
+  "completion_criteria": [
+    "요약 레코드 수가 원본 조건 쿼리 결과 수와 일치한다",
+    "각 항목에 request_id, amount, requested_at, approver_group 필드가 존재한다"
+  ],
+  "constraints": {
+    "max_tool_calls": 6,
+    "max_runtime_seconds": 90,
+    "approval_required": false
+  }
+}
+```
+
+이 패턴을 쓰면 Task Harness가 문서 표준이 아니라 런타임 계약이 됩니다. 이후 Test Harness에서는 이 스키마 자체를 fixture로 재사용하면 됩니다.
 ## 흔히 헷갈리는 지점
 - Goal을 그대로 Task로 넘기면 시스템이 스스로 잘게 쪼개 줄 것이라고 기대하기 쉽지만, 대부분의 비용 사고와 품질 흔들림이 여기서 시작됩니다.
 - completion criteria를 자연어 감상문처럼 적어 두고 나중에 사람이 보겠다고 미루기 쉽지만, 자동 검증이 안 되면 재시도 정책도 만들 수 없습니다.

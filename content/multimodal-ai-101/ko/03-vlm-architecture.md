@@ -234,6 +234,114 @@ print(processor.decode(output[0], skip_special_tokens=True))
 
 결국 좋은 선택은 가장 강한 모델이 아니라, 현재 팀의 데이터 규모와 serving 제약에 맞는 구조를 고르는 것입니다. 아키텍처를 이해하는 목적도 바로 이 현실적인 선택지를 분별하기 위해서입니다.
 
+## Adapter 선택을 위한 실험 프로토콜
+
+VLM 아키텍처를 비교할 때는 "정답률" 하나로 끝내면 안 됩니다. Adapter는 토큰 길이, 추론 지연, GPU 메모리에 직접 영향을 주므로 최소한 네 가지 지표를 함께 봐야 합니다. 첫째는 task별 정확도(TextVQA, ChartQA, DocVQA)입니다. 둘째는 평균 토큰 사용량입니다. 셋째는 P95 latency입니다. 넷째는 요청당 평균 비용입니다. 이 네 값을 같이 두면 LLaVA, BLIP-2, Flamingo 계열의 선택 기준이 명확해집니다.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class EvalRow:
+    model: str
+    docvqa: float
+    chartqa: float
+    avg_input_tokens: int
+    p95_latency_ms: int
+    usd_per_1k_requests: float
+
+rows = [
+    EvalRow("llava-1.6-7b", 0.71, 0.58, 3900, 1820, 7.4),
+    EvalRow("blip2-flan-t5-xl", 0.69, 0.55, 1700, 1490, 5.2),
+    EvalRow("flamingo-style", 0.74, 0.60, 1500, 2410, 9.8),
+]
+for r in rows:
+    print(r)
+```
+
+학습 실험에서도 단계를 분리해야 합니다. projection 또는 Q-Former만 학습하는 단계와 LLM 일부를 풀어 미세조정하는 단계를 섞으면 원인 분석이 어려워집니다. 운영 관점에서는 "어느 레이어를 변경했는가"를 변경 이력으로 강하게 관리하는 편이 안전합니다.
+
+## Vision API를 포함한 이중 검증 경로
+
+내부 VLM만으로 불확실한 답이 나오면 GPT-4V나 Claude로 재검증하는 경로를 두면 품질이 안정됩니다. 특히 문서 표 해석이나 작은 숫자 판독처럼 실패 비용이 큰 도메인에서 효과가 큽니다.
+
+```python
+def route_for_second_opinion(confidence: float, answer: str) -> str:
+    if confidence < 0.55:
+        return "gpt4v"
+    if "불확실" in answer or "잘 보이지" in answer:
+        return "claude"
+    return "accept"
+```
+
+재검증 경로는 모든 요청에 적용하지 않고 저신뢰 요청에만 걸어야 비용이 통제됩니다. 이때 confidence는 모델 logprob뿐 아니라 길이 이상치, OCR 불일치율 같은 보조 신호와 함께 계산하는 것이 안정적입니다.
+
+## 문서·차트·일반 이미지를 분리한 라우팅 전략
+
+하나의 VLM으로 모든 입력을 처리하면 운영은 단순해지지만 비용과 품질이 동시에 악화될 수 있습니다. 문서 OCR 중심 질문은 표와 숫자 읽기에 강한 모델로, 일반 장면 질문은 가벼운 모델로 보내는 라우팅이 전체 성능을 안정화합니다. 이때 입력 분류기는 복잡한 모델이 아니라 간단한 규칙 기반으로 시작해도 충분합니다.
+
+```python
+def route_model(question: str, has_table_like_text: bool, image_count: int) -> str:
+    if has_table_like_text:
+        return "gpt4v_doc"
+    if image_count > 3:
+        return "claude_long_context"
+    if "차트" in question or "그래프" in question:
+        return "vlm_chart"
+    return "llava_fast"
+```
+
+이 라우팅을 도입하면 평균 latency를 낮추면서도 어려운 케이스는 고성능 모델로 보낼 수 있습니다. 핵심은 규칙을 정한 뒤 주기적으로 오분류 케이스를 검토해 업데이트하는 것입니다.
+
+## 운영 설계 포인트: 토큰 예산과 실패 모드 문서화
+
+VLM 요청은 텍스트 요청보다 실패 모드가 다양합니다. 이미지 디코딩 실패, 시각 토큰 과다, OCR 불일치, 모델 환각이 한 요청 안에서 동시에 나타날 수 있습니다. 그래서 운영 전에는 토큰 예산표와 실패 모드 대응표를 문서화하는 편이 좋습니다.
+
+예를 들어 "입력 이미지 1장 = 평균 500 visual token"처럼 경험치를 표로 두고, 질문 길이와 합쳐 총 입력 토큰을 사전에 추정하면 timeout을 줄일 수 있습니다. 추정치가 임계값을 넘으면 자동으로 이미지 수를 줄이거나 고성능 모델 경로로 분기하는 정책을 둘 수 있습니다.
+
+```python
+def estimate_total_tokens(text_tokens: int, image_count: int, visual_tokens_per_image: int = 500) -> int:
+    return text_tokens + image_count * visual_tokens_per_image
+
+def enforce_token_budget(estimated: int, budget: int = 6000) -> bool:
+    return estimated <= budget
+```
+
+이 예산 정책을 로깅과 연결하면 어떤 유형의 요청이 시스템을 압박하는지 빠르게 보입니다. 결국 아키텍처 선택의 현실적 기준은 성능만이 아니라, 실패를 얼마나 예측 가능하게 다루는지에 달려 있습니다.
+
+## 평가 데이터셋 구성 예시
+
+VLM 아키텍처 비교를 위해서는 데이터셋도 입력 유형별로 분리해야 합니다. 문서 이미지, 차트, 일반 장면, UI 스크린샷을 섞어 두고 각 묶음의 점수를 따로 계산하면 모델의 편향이 더 선명하게 드러납니다. 이 기준이 있으면 특정 모델이 어디에서 유리한지 팀 내 합의를 만들기 쉽습니다.
+
+```python
+EVAL_SPLITS = {
+    "doc": 500,
+    "chart": 300,
+    "photo": 400,
+    "ui": 300,
+}
+```
+
+## 운영 검증 루프: 주간 점검 항목을 고정하기
+
+멀티모달 시스템은 모델 정확도만으로 상태를 판단하면 늦게 대응하게 됩니다. 그래서 주간 운영 회의에서 항상 같은 항목을 점검하는 루프를 고정하는 편이 좋습니다. 예를 들어 요청량, 평균 지연 시간, P95 지연, 오류율, 재시도율, 캐시 히트율, 사용자 불만 비율을 동일 포맷으로 기록하면 작은 이상 징후를 초기에 잡을 수 있습니다.
+
+또한 지표는 기능별로 분해해야 합니다. 단일 "성공률" 수치만 보면 어떤 단계에서 손실이 났는지 알기 어렵습니다. 입력 검증 단계, 전처리 단계, 검색 단계, 생성 단계를 분리해 성공률을 기록하면 병목 구간이 명확해집니다. 이 분해 지표는 모델 교체나 파이프라인 변경 후 회귀를 탐지하는 데 특히 유용합니다.
+
+```python
+weekly_health = {
+    "request_count": 0,
+    "avg_latency_ms": 0,
+    "p95_latency_ms": 0,
+    "error_rate": 0.0,
+    "retry_rate": 0.0,
+    "cache_hit_rate": 0.0,
+    "user_downvote_rate": 0.0,
+}
+```
+
+운영 루프를 고정하면 기술 선택도 더 현실적으로 바뀝니다. 새 모델을 도입할 때 "정확도 상승"만 보지 않고, 지연 증가와 비용 증가를 같은 표에서 비교할 수 있기 때문입니다. 결국 프로덕션 품질은 한 번의 모델 업그레이드가 아니라, 반복 가능한 점검 루프를 통해 유지됩니다.
+
 ## 흔히 헷갈리는 지점
 
 - **visual token이 LLM context를 잠식** LLaVA는 image 한 장에 576 token을 씁니다. context 4096짜리 모델이라면 system prompt와 question을 빼고 남는 용량이 빠르게 줄어듭니다. multi-turn conversation에서는 한 번에 1~2장만 유지하는 정책을 둡니다.

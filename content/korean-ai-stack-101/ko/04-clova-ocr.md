@@ -262,6 +262,219 @@ CLOVA OCR 예제의 가치는 텍스트 정확도보다 먼저 응답 구조를 
 
 다음 글에서는 5편 HyperCLOVA X와 Solar API를 다룹니다. OCR 텍스트나 BGE-M3 검색 결과를 한국어 LLM에 넘길 때 어떤 호출 계약과 프롬프트 패턴이 안전한지 구체적인 API 코드와 함께 봅니다.
 
+## OCR 후처리 파이프라인을 함수 경계로 분리하기
+
+실무에서는 OCR 품질 이슈가 한 번에 섞여 들어옵니다. 줄 복원 실패, 숫자 포맷 오류, 컬럼 병합 오류가 동시에 보이면 원인 파악이 늦어집니다. 아래처럼 함수 경계를 먼저 나누면 실패 지점을 로그로 분리할 수 있습니다.
+
+```python
+def extract_fields(payload):
+    for image in payload.get('images', []):
+        for field in image.get('fields', []):
+            yield {
+                'text': field.get('inferText', ''),
+                'confidence': float(field.get('inferConfidence', 0.0)),
+                'line_break': bool(field.get('lineBreak', False)),
+                'poly': field.get('boundingPoly', {}),
+            }
+
+def reconstruct_lines_from_fields(fields):
+    lines = []
+    cur_text, cur_conf = [], []
+    for f in fields:
+        cur_text.append(f['text'])
+        cur_conf.append(f['confidence'])
+        if f['line_break']:
+            lines.append({'text': ' '.join(cur_text), 'min_conf': min(cur_conf)})
+            cur_text, cur_conf = [], []
+    if cur_text:
+        lines.append({'text': ' '.join(cur_text), 'min_conf': min(cur_conf)})
+    return lines
+
+def validate_lines(lines):
+    errors = []
+    for i, line in enumerate(lines):
+        if len(line['text']) < 2:
+            errors.append((i, 'too_short'))
+        if '원' in line['text'] and not any(ch.isdigit() for ch in line['text']):
+            errors.append((i, 'amount_without_digits'))
+    return errors
+```
+
+이렇게 분리해 두면 API 공급자를 바꿔도 후처리 핵심은 유지됩니다. General OCR, Template OCR, 다른 OCR 엔진을 섞을 때 특히 효과가 큽니다.
+
+## 한국어 문서용 벤치마크 항목 정의
+
+OCR은 정답률 하나로 품질을 판단하면 운영에서 자주 실패합니다. 한국어 문서에서는 최소한 아래 지표를 별도로 기록하는 편이 좋습니다.
+
+| 지표 | 정의 | 권장 목표(초기) | 주의점 |
+| --- | --- | --- | --- |
+| Line reconstruction accuracy | 사람이 기대하는 줄 단위와 일치한 비율 | 0.93+ | 토큰 정확도와 별개 지표 |
+| Amount format pass rate | 금액 정규식 통과 비율 | 0.98+ | 통화 기호/콤마 규칙 문서화 필요 |
+| Date normalization pass rate | 날짜 표준화 성공 비율 | 0.95+ | `2026.05.01`, `2026-05-01` 동시 지원 |
+| Low-confidence review ratio | 재검토 큐로 간 비율 | 0.05~0.15 | 너무 낮으면 누락, 너무 높으면 비용 증가 |
+
+이 표를 대시보드로 연결하면 OCR 모델 버전 업그레이드의 효과를 훨씬 객관적으로 볼 수 있습니다.
+
+## production 설정 예시: OCR ingestion 워커
+
+OCR은 대개 비동기 배치로 운영됩니다. 요청당 처리 시간이 길고 외부 API 의존성이 있기 때문입니다.
+
+```yaml
+worker:
+  name: ocr-ingestion-worker
+  concurrency: 8
+  queue: docs-ocr
+
+clova:
+  mode: real
+  endpoint: https://example.apigw.ntruss.com/custom/v1/12345/abcd/general
+  timeout_seconds: 15
+  max_retries: 3
+  retry_backoff_seconds: [1, 2, 4]
+
+postprocess:
+  line_min_conf_threshold: 0.82
+  amount_regex: '^[0-9,]+원$'
+  keep_raw_payload: true
+  raw_payload_bucket: s3://ocr-raw-prod
+
+output:
+  cleaned_bucket: s3://ocr-clean-prod
+  corpus_topic: rag-corpus-update
+
+monitoring:
+  error_rate_alert_threshold: 0.03
+  p95_latency_ms_alert_threshold: 12000
+```
+
+`keep_raw_payload`는 비용이 들더라도 유지하는 편이 좋습니다. 품질 이슈가 생겼을 때 재호출 없이 재처리할 수 있기 때문입니다.
+
+## OCR 결과를 임베딩 친화 형태로 만드는 예시
+
+BGE-M3나 KoSimCSE로 넘길 때는 줄 텍스트만 던지기보다 최소 메타데이터를 함께 붙여 두는 편이 장기 운영에 유리합니다.
+
+```python
+def to_embedding_records(doc_id, lines, source='clova-ocr'):
+    records = []
+    for i, line in enumerate(lines):
+        records.append({
+            'chunk_id': f'{doc_id}#L{i:03d}',
+            'text': line['text'],
+            'meta': {
+                'doc_id': doc_id,
+                'source': source,
+                'line_no': i,
+                'min_confidence': round(line['min_conf'], 4),
+            },
+        })
+    return records
+```
+
+이 구조를 쓰면 검색 결과에서 곧바로 원본 줄 번호를 보여 줄 수 있고, 신뢰도 낮은 줄만 필터링하는 정책도 쉽게 만들 수 있습니다.
+
+## 좌표 기반 컬럼 복원 예시
+
+세금계산서, 명세서처럼 2열 이상 문서는 `lineBreak`만으로 복원이 불완전할 수 있습니다. 좌표를 함께 사용한 최소 예시는 아래와 같습니다.
+
+```python
+def left_x(field):
+    vertices = field.get('boundingPoly', {}).get('vertices', [])
+    if not vertices:
+        return 0
+    return min(v.get('x', 0) for v in vertices)
+
+def split_two_columns(fields, boundary_x=540):
+    left_col, right_col = [], []
+    for f in fields:
+        if left_x(f) < boundary_x:
+            left_col.append(f)
+        else:
+            right_col.append(f)
+    return left_col, right_col
+```
+
+문서 레이아웃이 고정된 서비스에서는 이 간단한 분리만으로도 줄 병합 오류를 크게 줄일 수 있습니다.
+
+## OCR 품질 회귀를 막는 테스트 세트 구성
+
+OCR 파이프라인은 모델 버전이나 전처리 변경에 민감합니다. 작은 테스트 세트를 고정해 두고 정량 검증을 붙이면 회귀를 빠르게 차단할 수 있습니다.
+
+```python
+EVAL_CASES = [
+    {
+        'name': 'receipt_simple',
+        'expected_lines': ['공급가액 45,000원', '부가세 4,500원', '합계 49,500원'],
+    },
+    {
+        'name': 'invoice_with_date',
+        'expected_lines': ['작성일자 2026-05-01', '청구 금액 120,000원'],
+    },
+]
+
+def line_exact_match_rate(pred_lines, expected_lines):
+    pred_set = set(pred_lines)
+    exp_set = set(expected_lines)
+    return len(pred_set & exp_set) / len(exp_set)
+```
+
+정확히 같은 줄이 몇 퍼센트 재현되는지 보는 지표는 단순하지만 강력합니다. 특히 영수증/계산서처럼 정형 문서에서 유용합니다.
+
+## 금액/날짜 정규화 유틸리티
+
+한국어 문서에서는 숫자 형식 정규화가 검색 품질과 바로 연결됩니다. 같은 금액이라도 `45,000원`, `45000원`, `45.000원`이 섞이면 검색 hit가 분산됩니다.
+
+```python
+import re
+
+AMOUNT_PATTERNS = [
+    re.compile(r'^(\d{1,3}(,\d{3})+)원$'),
+    re.compile(r'^(\d+)원$'),
+]
+
+DATE_PATTERNS = [
+    re.compile(r'^(\d{4})\.(\d{2})\.(\d{2})$'),
+    re.compile(r'^(\d{4})-(\d{2})-(\d{2})$'),
+]
+
+def normalize_amount(token: str) -> str:
+    clean = token.replace('.', '').replace(',', '')
+    if clean.endswith('원'):
+        num = clean[:-1]
+        if num.isdigit():
+            return f"{int(num):,}원"
+    return token
+
+def normalize_date(token: str) -> str:
+    for pat in DATE_PATTERNS:
+        m = pat.match(token)
+        if m:
+            y, mm, dd = m.groups()
+            return f'{y}-{mm}-{dd}'
+    return token
+```
+
+이 정규화는 화려하지 않지만, 임베딩 코퍼스에서 같은 의미 단위를 동일 문자열로 맞춰 주는 기반 역할을 합니다.
+
+## 운영 배치의 실패 복구 전략
+
+OCR 호출은 네트워크 오류, 용량 제한, 일시적 5xx 응답을 자주 만납니다. 큐 기반 배치에서는 실패 재처리 정책을 먼저 정의해야 전체 처리량이 안정됩니다.
+
+| 실패 유형 | 재시도 정책 | DLQ 전환 기준 |
+| --- | --- | --- |
+| timeout | 1s, 2s, 4s 백오프 재시도 | 3회 실패 시 DLQ |
+| 429 | 긴 백오프(5s+) + 지터 | 5회 실패 시 DLQ |
+| 5xx | 짧은 백오프 재시도 | 3회 실패 시 DLQ |
+| payload parse error | 재시도 금지 | 즉시 DLQ |
+
+```python
+def next_retry_delay(attempt, reason):
+    if reason == 'rate_limit':
+        return min(30, 5 * (2 ** attempt))
+    return min(10, 1 * (2 ** attempt))
+```
+
+이 정도 정책만 있어도 대량 문서 처리에서 워커 정체를 크게 줄일 수 있습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **OCR을 붙일 때는 텍스트 정확도부터 봐야 할까요, 아니면 응답 구조부터 봐야 할까요?**

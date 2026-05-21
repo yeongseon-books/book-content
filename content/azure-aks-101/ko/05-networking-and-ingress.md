@@ -238,6 +238,98 @@ NGINX는 클러스터 안에서 동작하는 프록시라는 감각이 강합니
 
 이 구조가 되면 공개 지점을 줄이고, TLS와 DNS 관리도 더 일관되게 가져갈 수 있습니다. 즉 Service 하나를 곧바로 공개하는 모델에서, **Ingress를 통해 외부 표면을 정리하는 모델**로 이동하는 셈입니다.
 
+### Azure CNI Overlay를 선택할 때 CIDR 계획을 먼저 고정합니다
+
+Overlay가 편리하다고 해서 CIDR 계획이 자동으로 사라지는 것은 아닙니다. 오히려 “VNet과 Pod CIDR이 분리된다”는 특성을 명시적으로 설계해야 나중에 클러스터를 여러 개 운영할 때 충돌을 줄일 수 있습니다.
+
+```bash
+az aks create \
+  --resource-group "$RG" \
+  --name "$CLUSTER" \
+  --location "$LOCATION" \
+  --network-plugin azure \
+  --network-plugin-mode overlay \
+  --pod-cidr 10.244.0.0/16 \
+  --service-cidr 10.0.0.0/16 \
+  --dns-service-ip 10.0.0.10 \
+  --node-count 2 \
+  --generate-ssh-keys
+```
+
+핵심은 세 주소 영역을 문서로 남기는 것입니다. VNet 서브넷, Pod CIDR, Service CIDR이 팀 공통 문서 없이 흩어져 있으면 peering이나 하이브리드 연결 때 충돌 위험이 크게 올라갑니다. 네트워크 설계는 기능보다 충돌 회피가 우선입니다.
+
+### Ingress 전환 시에는 Service 타입도 함께 바꿉니다
+
+Ingress를 도입했는데 기존 `LoadBalancer` Service를 그대로 두면 공개 지점이 중복됩니다. 운영 표면을 줄이려는 목적이었다면 Service를 `ClusterIP`로 바꾸고 Ingress 하나로 통합하는 편이 맞습니다.
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastapi-hello
+spec:
+  type: ClusterIP
+  selector:
+    app: fastapi-hello
+  ports:
+    - port: 80
+      targetPort: 8000
+```
+
+그리고 Ingress 규칙을 둘 이상 두어 host/path 분기를 명시하면 “새 서비스가 늘 때마다 공인 IP를 추가해야 하는가”라는 운영 질문을 줄일 수 있습니다. 네트워킹 품질은 라우팅 정확성뿐 아니라 공개 표면의 단순함으로도 측정됩니다.
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: apps-ingress
+spec:
+  ingressClassName: webapprouting.kubernetes.azure.com
+  rules:
+    - host: api.example.com
+      http:
+        paths:
+          - path: /orders
+            pathType: Prefix
+            backend:
+              service:
+                name: orders-service
+                port:
+                  number: 80
+          - path: /users
+            pathType: Prefix
+            backend:
+              service:
+                name: users-service
+                port:
+                  number: 80
+```
+
+### 문제를 층별로 자르는 진단 루틴
+
+AKS 네트워크 장애는 증상은 비슷해도 원인은 다른 경우가 많습니다. 그래서 “외부에서 안 된다”를 한 문장으로 다루기보다 아래 순서로 잘라 보는 편이 훨씬 빠릅니다.
+
+```bash
+# 1) Service와 endpoint 확인
+kubectl get svc -A
+kubectl get endpoints -A
+
+# 2) Ingress 규칙과 백엔드 확인
+kubectl get ingress -A
+kubectl describe ingress <name> -n <namespace>
+
+# 3) 클러스터 내부 DNS/HTTP 확인
+kubectl run net-debug --rm -it --image=busybox:1.36 --restart=Never -- sh
+
+# 4) Azure 측 리소스 상태 확인
+az network public-ip list -g <node-rg> -o table
+az network lb list -g <node-rg> -o table
+```
+
+1단계에서 endpoint가 비어 있으면 Service selector 또는 Pod readiness 문제일 가능성이 큽니다. 2단계에서 Ingress 규칙이 정상인데도 실패하면 ingress controller 상태나 TLS 인증서 연결을 봐야 합니다. 3단계에서 내부 호출이 성공하면 외부 edge 계층 문제일 가능성이 높습니다. 4단계는 Azure 리소스 프로비저닝 지연 또는 누락을 확인하는 구간입니다.
+
+이 루틴을 운영 문서에 고정해 두면 “네트워크가 이상하다”는 모호한 표현을 훨씬 빠르게 실행 가능한 진단 단계로 바꿀 수 있습니다.
+
 ## 흔히 헷갈리는 지점
 
 - Pod IP 할당 문제와 외부 HTTP 라우팅 문제를 같은 네트워크 문제로만 뭉뚱그려 보기 쉽습니다.

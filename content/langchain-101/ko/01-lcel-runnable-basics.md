@@ -360,6 +360,81 @@ results = chain.batch(topics, config={"max_concurrency": 2})
 
 ---
 
+## Runnable 계약을 코드로 확인하기
+
+LCEL을 쓰다 보면 문법 자체보다 계약이 더 중요해집니다. 아래처럼 각 단계를 변수로 분리한 뒤 `invoke`, `batch`, `stream`을 같은 객체에 대해 각각 호출해 보면, Runnable 인터페이스가 왜 중심 개념인지 바로 체감할 수 있습니다.
+
+```python
+import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+prompt = ChatPromptTemplate.from_template("Summarize {topic} in one sentence.")
+llm = ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"])
+parser = StrOutputParser()
+
+chain = prompt | llm | parser
+
+# 1) invoke
+single = chain.invoke({"topic": "Runnable interface"})
+print(f"invoke -> {single}")
+
+# 2) batch
+many = chain.batch([
+    {"topic": "LCEL"},
+    {"topic": "OutputParser"},
+], config={"max_concurrency": 2})
+print(f"batch count -> {len(many)}")
+
+# 3) stream
+print("stream -> ", end="")
+for chunk in chain.stream({"topic": "vector search"}):
+    print(chunk, end="", flush=True)
+print()
+```
+
+이 코드를 운영 코드에 그대로 넣지는 않지만, 팀 온보딩 문서에는 매우 유용합니다. 체인 객체 하나가 실행 모드만 바꿔 재사용된다는 점을 눈으로 확인하면, 이후에 retriever나 tool이 추가되어도 멘탈 모델이 흔들리지 않습니다.
+
+## LCEL 단계별 타입 표
+
+아래 표는 `prompt | llm | parser`를 디버깅할 때 가장 자주 확인하는 값들입니다.
+
+| 단계 | 입력 타입 | 출력 타입 | 확인 포인트 |
+|---|---|---|---|
+| `ChatPromptTemplate` | `dict` | `ChatPromptValue` | 템플릿 키 누락 여부 |
+| `ChatModel` (`ChatGroq`) | `PromptValue` 또는 메시지 리스트 | `AIMessage` | 응답 메타데이터, content |
+| `StrOutputParser` | `AIMessage` | `str` | 후속 단계 호환성 |
+
+이 표를 기억해 두면 에러 메시지 해석 속도가 빨라집니다. 예를 들어 parser 단계에서 타입 에러가 났다면 모델 응답이 비정상이었는지, prompt 단계에서 이미 다른 타입이 들어왔는지 역추적할 수 있습니다.
+
+## LangSmith 추적에서 보는 LCEL 실행
+
+초기 학습이 끝나면 체인을 실제 서비스 경로에서 관측해야 합니다. LangSmith를 붙이면 한 번의 `invoke`가 내부적으로 어떤 run들로 분해되었는지 확인할 수 있습니다.
+
+```text
+[trace] run_type=chain name=RunnableSequence latency_ms=842
+  [child] run_type=prompt name=ChatPromptTemplate latency_ms=2
+  [child] run_type=llm name=ChatGroq latency_ms=801 tokens_in=41 tokens_out=122
+  [child] run_type=parser name=StrOutputParser latency_ms=1
+```
+
+이 출력에서 중요한 것은 "어디가 느린가"와 "어디서 실패했는가"를 바로 분리할 수 있다는 점입니다. 프롬프트와 파서는 빠른데 LLM 단계만 느리다면 모델 공급자 또는 네트워크 이슈를 먼저 봐야 하고, parser에서만 실패가 반복되면 출력 형식 제약을 강화해야 합니다.
+
+## 실무에서 자주 쓰는 Runnable 조합
+
+| 패턴 | LCEL 형태 | 쓰는 이유 | 주의점 |
+|---|---|---|---|
+| 기본 질의 | `prompt | llm | StrOutputParser()` | 가장 단순한 텍스트 응답 | 구조화 출력에는 약함 |
+| 후처리 추가 | `... | RunnableLambda(fn)` | 포맷 정리, 길이 제한 | 비즈니스 로직 과적재 금지 |
+| 다중 입력 | `chain.batch(inputs)` | 대량 처리 | 동시성/요금 제어 필요 |
+| 실시간 응답 | `chain.stream(input)` | 체감 지연 감소 | 중간 실패 처리 필요 |
+
+표를 기준으로 팀 내 기본 패턴을 정해 두면, 코드 리뷰에서 "왜 여기만 다른 방식으로 조립했는가"를 빠르게 확인할 수 있습니다.
+
+---
+
 ## 이 코드에서 주목할 점
 
 - `prompt | llm | parser`는 문자열 파이핑이 아니라, 호환되는 *Runnable* 입출력 타입을 잇는 합성입니다.

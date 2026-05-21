@@ -292,6 +292,68 @@ def capture_snapshot(task_id: str, messages: list[dict], tools: list[dict], mode
 
 Snapshot이 있으면 "왜 이런 출력이 나왔는가?"를 사후에 분석할 수 있습니다. 없으면 "그때는 그랬다"로 끝납니다.
 
+### Context 조립 YAML과 슬롯 검증
+
+Context Harness를 운영 환경으로 옮기면 가장 먼저 필요한 것은 조립 규칙의 외부화입니다. 코드 안에서 하드코딩된 순서로 메시지를 붙이면 릴리스마다 diff를 추적하기 어렵습니다. 슬롯 기반 YAML을 두고, 각 슬롯의 최대 토큰과 우선순위를 검증하는 방식이 유지보수에 유리합니다.
+
+```yaml
+# context_assembly.yaml
+context_policy:
+  version: 1
+  slots:
+    - name: system_prompt
+      max_tokens: 2000
+      required: true
+    - name: task_spec
+      max_tokens: 1200
+      required: true
+    - name: conversation_summary
+      max_tokens: 1800
+      required: false
+    - name: retrieved_context
+      max_tokens: 7000
+      required: true
+      rerank_top_k: 8
+      compression: extractive
+    - name: tool_schemas
+      max_tokens: 3000
+      required: true
+    - name: guardrail_notes
+      max_tokens: 800
+      required: false
+  response_buffer_tokens: 4000
+  hard_window_tokens: 32000
+```
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class Slot:
+    name: str
+    max_tokens: int
+    required: bool
+
+def validate_slots(slots: list[Slot], response_buffer: int, hard_window: int) -> None:
+    total = sum(s.max_tokens for s in slots) + response_buffer
+    if total > hard_window:
+        raise ValueError(f"context budget overflow: {total} > {hard_window}")
+
+    names = [s.name for s in slots]
+    if len(names) != len(set(names)):
+        raise ValueError("duplicate slot name detected")
+
+    required_missing = [s.name for s in slots if s.required and s.max_tokens <= 0]
+    if required_missing:
+        raise ValueError(f"required slots misconfigured: {required_missing}")
+```
+
+이 검증을 부팅 단계에서 강제하면 retrieved_context를 과도하게 키워 응답 버퍼가 사라지는 사고를 사전에 막을 수 있습니다.
+
+또 하나의 실전 팁은 슬롯별 품질 메트릭을 따로 남기는 것입니다. retrieved_context 슬롯에는 hit-rate와 overlap-rate, history 슬롯에는 summary compression ratio를 기록하면 "어느 슬롯이 품질을 깎는지"를 수치로 볼 수 있습니다. Context Harness는 조립 규칙을 만드는 단계에서 끝나지 않고, 슬롯별 성능을 지속적으로 관찰해야 안정화됩니다.
+
+예를 들어 hit-rate는 높지만 overlap-rate가 같이 높다면 문서를 많이 가져오는 대신 중복 문서만 쌓고 있을 가능성이 큽니다. 이 경우 retrieval top_k를 늘리는 대신 reranker 임계값과 chunk granularity를 먼저 조정하는 편이 정확도와 비용 모두에 유리합니다.
+
 ### Common Mistakes
 
 "window가 200k니까 다 넣자"는 잘못된 직관입니다. 모델은 모든 입력을 동등하게 처리하지 않습니다. 토큰 예산을 정하고 그 안에서 압축합니다.

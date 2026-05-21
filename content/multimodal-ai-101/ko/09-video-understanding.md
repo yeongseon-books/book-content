@@ -242,6 +242,110 @@ ffmpeg -i input.webm -c:v libx264 -crf 23 -preset fast output.mp4
 ```python
 img = frame.to_image().resize((224, 224))  # shrink right away
 ```
+## 프레임 샘플링 정책을 자동으로 선택하기
+
+비디오 길이와 질문 유형이 다르면 최적 샘플링도 달라집니다. 고정 프레임 수를 모든 요청에 적용하면 짧은 영상에서는 과잉 계산이 발생하고, 긴 영상에서는 이벤트를 놓치기 쉽습니다. 그래서 길이와 목적에 따라 샘플링 전략을 분기하는 라우터가 필요합니다.
+
+```python
+def choose_sampling_policy(duration_sec: float, intent: str) -> dict:
+    if intent in {"event_detection", "safety_alert"}:
+        return {"mode": "dense", "fps": 2.0, "max_frames": 64}
+    if duration_sec > 900:
+        return {"mode": "keyframe", "max_frames": 48}
+    return {"mode": "uniform", "frames": 16}
+```
+
+이 정책을 먼저 고정하면 모델 변경 시에도 비교 기준이 유지됩니다. 반대로 샘플링과 모델을 동시에 바꾸면 어떤 변경이 품질을 바꿨는지 분리하기 어렵습니다.
+
+## 오디오 전사 결합: Whisper와 타임라인 통합
+
+비디오 이해 품질을 끌어올리는 가장 실용적인 방법 중 하나는 오디오 전사를 함께 쓰는 것입니다. Whisper segment를 시간축에 정렬해 프레임 메타데이터와 결합하면, 장면 설명과 발화 정보를 동시에 질의할 수 있습니다.
+
+```python
+def attach_transcript_to_frame(frame_ts: float, segments: list[dict], window: float = 1.5) -> str:
+    hits = [s["text"] for s in segments if abs((s["start"] + s["end"]) / 2 - frame_ts) <= window]
+    return " ".join(hits)
+```
+
+이 결합은 "누가 무엇을 말할 때 어떤 장면이었는가"를 복원하는 데 매우 효과적입니다. 교육, 회의, 스포츠 분석처럼 내러티브가 중요한 도메인에서 특히 유용합니다.
+
+## Video Q&A 평가 지표
+
+비디오 QA는 정답 일치율만으로 품질을 판단하기 어렵습니다. 시간 위치를 맞췄는지, 잘못된 객체를 언급했는지, 근거 프레임을 제시했는지까지 함께 봐야 합니다.
+
+```python
+metrics = {
+    "answer_exact_match": 0.0,
+    "temporal_iou": 0.0,
+    "evidence_frame_recall_at_3": 0.0,
+}
+```
+
+운영에서는 이 지표를 대시보드로 분리해 두는 편이 좋습니다. 모델이 답변 문장만 그럴듯하게 만들고 시간 근거를 놓치는 경우가 생각보다 자주 발생하기 때문입니다.
+
+## 긴 영상 처리: 청크 분할과 요약 병합
+
+30분 이상 영상은 한 번에 처리하기보다 시간 청크로 분할해 요약을 만든 뒤 계층적으로 병합하는 편이 안정적입니다. 예를 들어 3분 단위 청크 요약을 먼저 만들고, 상위 LLM이 이 요약들을 다시 통합해 최종 보고서를 만드는 구조를 사용합니다.
+
+```python
+def chunk_ranges(duration_sec: int, chunk_sec: int = 180):
+    ranges = []
+    s = 0
+    while s < duration_sec:
+        e = min(duration_sec, s + chunk_sec)
+        ranges.append((s, e))
+        s = e
+    return ranges
+```
+
+이 방식은 메모리와 컨텍스트 한계를 동시에 피하면서도 시간 순서를 유지하기 쉽습니다. 또한 특정 청크만 재처리할 수 있어 장애 복구도 단순해집니다.
+
+## 이벤트 탐지에서 임계값 튜닝 절차
+
+비디오 액션 인식은 임계값 설정에 따라 precision과 recall이 크게 바뀝니다. 그래서 운영 전에 도메인 목표를 먼저 정해야 합니다. 안전 사고 탐지는 recall 우선, 자동 태깅은 precision 우선처럼 목표가 다르면 임계값도 달라집니다.
+
+```python
+def classify_event(score: float, policy: str) -> str:
+    if policy == "recall":
+        return "event" if score >= 0.45 else "none"
+    return "event" if score >= 0.72 else "none"
+```
+
+또한 단일 프레임 점수로 즉시 판단하지 말고 시간 윈도에서 스무딩하는 편이 좋습니다. 잡음으로 인한 순간 오탐을 줄일 수 있기 때문입니다.
+
+이 절차를 문서화해 두면 모델 교체 후에도 같은 기준으로 비교가 가능해지고, 운영팀과 제품팀의 기대치를 맞추기 쉬워집니다.
+
+## 프레임 저장 정책과 스토리지 비용
+
+비디오 처리 시스템은 프레임 저장 정책이 없으면 저장소 비용이 빠르게 증가합니다. 전체 프레임 보관이 아니라 샘플 프레임과 근거 프레임만 남기는 정책을 명시해야 합니다.
+
+```python
+def keep_frame(is_evidence: bool, is_sampled: bool) -> bool:
+    return is_evidence or is_sampled
+```
+
+근거 프레임을 남기면 나중에 사용자 문의 대응과 품질 감사가 쉬워집니다. 반대로 무분별한 저장은 비용과 개인정보 리스크를 키웁니다.
+
+## 운영 검증 루프: 주간 점검 항목을 고정하기
+
+멀티모달 시스템은 모델 정확도만으로 상태를 판단하면 늦게 대응하게 됩니다. 그래서 주간 운영 회의에서 항상 같은 항목을 점검하는 루프를 고정하는 편이 좋습니다. 예를 들어 요청량, 평균 지연 시간, P95 지연, 오류율, 재시도율, 캐시 히트율, 사용자 불만 비율을 동일 포맷으로 기록하면 작은 이상 징후를 초기에 잡을 수 있습니다.
+
+또한 지표는 기능별로 분해해야 합니다. 단일 "성공률" 수치만 보면 어떤 단계에서 손실이 났는지 알기 어렵습니다. 입력 검증 단계, 전처리 단계, 검색 단계, 생성 단계를 분리해 성공률을 기록하면 병목 구간이 명확해집니다. 이 분해 지표는 모델 교체나 파이프라인 변경 후 회귀를 탐지하는 데 특히 유용합니다.
+
+```python
+weekly_health = {
+    "request_count": 0,
+    "avg_latency_ms": 0,
+    "p95_latency_ms": 0,
+    "error_rate": 0.0,
+    "retry_rate": 0.0,
+    "cache_hit_rate": 0.0,
+    "user_downvote_rate": 0.0,
+}
+```
+
+운영 루프를 고정하면 기술 선택도 더 현실적으로 바뀝니다. 새 모델을 도입할 때 "정확도 상승"만 보지 않고, 지연 증가와 비용 증가를 같은 표에서 비교할 수 있기 때문입니다. 결국 프로덕션 품질은 한 번의 모델 업그레이드가 아니라, 반복 가능한 점검 루프를 통해 유지됩니다.
+
 ## 흔히 헷갈리는 지점
 
 - **fps와 sampling rate 혼동** 원본이 30fps인지 60fps인지 확인 안 하면 "8 frame" 의미가 달라집니다. uniform sampling은 frame index 기준이지만 의미는 "몇 초 간격" 입니다. 영상 metadata를 먼저 읽어 `total_seconds`를 기준으로 sampling 하세요.

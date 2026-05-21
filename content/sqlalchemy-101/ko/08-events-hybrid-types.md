@@ -289,6 +289,175 @@ production에서는 보통 다음처럼 분배합니다.
 
 다음 글에서는 동기 패턴을 그대로 비동기로 옮기는 방법을 다룹니다. `aiosqlite` 드라이버와 `AsyncSession`, 그리고 비동기에서 lazy loading이 왜 더 위험한지 같이 살펴봅니다.
 
+## 실전 앵커: 이벤트 훅의 실행 순서와 로그
+
+이벤트를 안전하게 쓰려면 실행 순서를 아는 것이 먼저입니다. 아래 예시를 실행하면 한 트랜잭션에서 어떤 훅이 언제 불리는지 명확하게 볼 수 있습니다.
+
+```python
+@event.listens_for(Session, "before_flush")
+def _before_flush(session, flush_context, instances):
+    print("before_flush", len(session.new), len(session.dirty))
+
+@event.listens_for(User, "before_insert")
+def _before_insert(mapper, connection, target):
+    print("before_insert", target.email)
+
+@event.listens_for(Session, "after_commit")
+def _after_commit(session):
+    print("after_commit")
+```
+
+```text
+before_flush 1 0
+before_insert alice@example.com
+after_commit
+```
+
+이 순서를 머리에 넣어 두면 "왜 값이 이 시점에는 아직 안 바뀌어 있지" 같은 디버깅 시간이 크게 줄어듭니다.
+
+## hybrid_property를 인덱스 전략과 함께 보기
+
+`hybrid_property`는 읽기 좋은 API를 만들지만, SQL 표현이 인덱스를 타지 못하면 성능이 떨어질 수 있습니다.
+
+```python
+@hybrid_property
+def email_domain(self) -> str:
+    return self.email.split("@", 1)[-1]
+
+@email_domain.expression
+def email_domain(cls):
+    return func.substr(cls.email, func.instr(cls.email, "@") + 1)
+```
+
+이 표현식에 where를 자주 건다면 SQLite에서는 표현식 인덱스를 별도로 고려해야 합니다. 즉, 하이브리드는 편의 문법이 아니라 실행 계획까지 포함한 설계 대상으로 봐야 합니다.
+
+## TypeDecorator와 마이그레이션 경계
+
+커스텀 타입은 애플리케이션 계층에서 매우 강력하지만, DB 스키마 타입과 혼동하면 곤란합니다.
+
+- `TypeDecorator(JSONText)`는 DB에는 `TEXT`로 저장될 수 있습니다.
+- Alembic autogenerate는 내부 구현이 아니라 최종 DB 타입 기준으로 diff를 만듭니다.
+- 타입 로직 변경(예: 직렬화 포맷 변경)은 스키마 변경이 아니라 데이터 마이그레이션 작업일 수 있습니다.
+
+예를 들어 `settings`를 평문 JSON에서 암호화 JSON으로 바꾸면, DDL보다 데이터 재작성 배치가 핵심입니다. 이때는 10편 배포 순서처럼 이중 읽기/이중 쓰기 기간을 두는 편이 안전합니다.
+
+## 이벤트 남용을 피하는 규칙
+
+이벤트는 강력한 만큼 남용하기 쉽습니다. 팀 규칙으로 다음을 고정해 두면 장기 유지보수가 쉬워집니다.
+
+- 이벤트 함수는 30줄 이하, 외부 IO 금지
+- 예외 메시지는 도메인 문맥을 포함
+- 이벤트 내부에서 `commit()`/`flush()` 호출 금지
+- 이벤트 등록 위치를 `models/events.py`로 고정
+- 테스트에서 이벤트 동작을 명시적으로 검증
+
+## Session 이벤트와 outbox 상세 예시
+
+원자적 outbox를 조금 더 현실적인 형태로 적으면 다음과 같습니다.
+
+```python
+class OutboxEvent(Base):
+    __tablename__ = "outbox_events"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    topic: Mapped[str] = mapped_column(String(80), nullable=False)
+    payload: Mapped[dict] = mapped_column(JSONText, nullable=False)
+
+@event.listens_for(Session, "before_flush")
+def _outbox_order_created(session, flush_context, instances):
+    for obj in session.new:
+        if isinstance(obj, Order):
+            session.add(OutboxEvent(topic="order.created", payload={"order_id": obj.id}))
+```
+
+주의할 점은 `obj.id`가 아직 없을 수 있다는 것입니다. 이 경우 `after_flush_postexec`를 사용해 PK가 채워진 뒤 outbox를 만드는 방식도 검토해야 합니다.
+
+## 엔진 이벤트 기반 성능 프로파일링
+
+7편의 N+1 점검을 확장해 느린 SQL 샘플을 남기는 방식입니다.
+
+```python
+SLOW_MS = 150
+
+@event.listens_for(engine, "before_cursor_execute")
+def _start(conn, cursor, statement, parameters, context, executemany):
+    context._t0 = time.perf_counter()
+
+@event.listens_for(engine, "after_cursor_execute")
+def _end(conn, cursor, statement, parameters, context, executemany):
+    ms = (time.perf_counter() - context._t0) * 1000
+    if ms > SLOW_MS:
+        logger.warning("slow_query_ms=%.1f sql=%s", ms, statement[:160])
+```
+
+이 로그는 10편의 운영 관측과 바로 연결됩니다. 학습 단계에서 미리 심어 두면 프로덕션 전환 시 구조를 바꿀 필요가 없습니다.
+
+## 보강 앵커: 이벤트와 하이브리드 조합 예시
+
+실제 도메인에서는 하이브리드 속성과 이벤트를 함께 사용합니다. 예를 들어 주문 금액과 할인 금액으로 `net_amount`를 노출하고, 업데이트 시 감사 로그를 남길 수 있습니다.
+
+```python
+class Invoice(Base):
+    __tablename__ = "invoices"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    gross_amount: Mapped[int]
+    discount_amount: Mapped[int]
+
+    @hybrid_property
+    def net_amount(self) -> int:
+        return self.gross_amount - self.discount_amount
+
+    @net_amount.expression
+    def net_amount(cls):
+        return cls.gross_amount - cls.discount_amount
+
+@event.listens_for(Invoice, "before_update")
+def _audit_invoice(mapper, connection, target):
+    logger.info("invoice_update id=%s net=%s", target.id, target.net_amount)
+```
+
+이 조합은 "도메인 의미"와 "운영 추적"을 동시에 모델 근처에 고정합니다.
+
+## 보강 앵커: TypeDecorator 회귀 테스트
+
+커스텀 타입은 작은 변경이 큰 데이터 오염으로 이어질 수 있으므로 round-trip 테스트를 권장합니다.
+
+```python
+def test_jsontext_roundtrip(session: Session):
+    a = Account(handle="Alice", settings={"theme": "light"})
+    session.add(a)
+    session.commit()
+    loaded = session.get(Account, a.id)
+
+    assert loaded.handle == "alice"
+    assert loaded.settings == {"theme": "light"}
+```
+
+이 테스트는 직렬화 포맷 변경, 인코딩 문제, 소문자 정규화 누락을 동시에 잡아 줍니다.
+
+## 보강 앵커: 이벤트 디버깅 체크리스트
+
+- 이벤트가 등록된 모듈이 실제로 import되는가
+- 동일 이벤트가 중복 등록되지 않는가
+- 이벤트 함수가 예외를 삼키지 않는가
+- 이벤트 내부에서 세션 재진입을 유발하지 않는가
+- 이벤트 로그에 객체 식별자(PK)가 포함되는가
+
+이 다섯 항목만 점검해도 "이벤트가 안 돈다" 또는 "두 번 돈다" 문제의 대부분을 바로 좁힐 수 있습니다.
+
+## 보강 메모
+
+확장점을 도입할 때 가장 중요한 질문은 "이 규칙이 어디서 실행되는가"입니다. 타입 변환, 속성 계산, 이벤트 훅의 실행 위치가 분명해야 팀원이 로그만 보고도 데이터 흐름을 추적할 수 있고, 장애 시 복구 속도도 빨라집니다.
+
+추가로, 이벤트 훅은 관측 지표와 짝을 이루어야 합니다. 훅이 실제로 몇 번 호출되는지 카운터를 남기지 않으면 동작 여부를 감에 의존하게 됩니다.
+
+하이브리드 속성을 도입한 뒤에는 반드시 SQL expression 경로까지 테스트해야 합니다. Python 속성 테스트만 통과하면 쿼리 필터에서 실패하는 경우를 놓치기 쉽습니다.
+
+결국 확장점 설계의 목표는 규칙을 숨기지 않는 것입니다. 코드 검색 한 번으로 데이터 변환 지점을 찾을 수 있어야 운영 품질이 유지됩니다.
+
+운영 로그와 테스트가 함께 있어야 확장점은 신뢰할 수 있는 설계 도구가 됩니다.
+
+요약하면, 확장점의 힘은 명시성과 검증 가능성에서 나옵니다.
+
 ## 처음 질문으로 돌아가기
 
 - **이벤트, 속성, 타입 확장점은 각각 어떤 책임을 맡아야 할까요?**

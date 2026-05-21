@@ -352,6 +352,76 @@ print(cache.metrics)
 
 이 정도만 있어도 운영 판단이 쉬워집니다. 적중률은 낮은데 만료가 거의 없다면 키가 너무 엄격할 수 있고, 만료가 자주 나는데도 오래된 응답 이슈가 생긴다면 TTL이 여전히 길 수 있습니다. 캐시는 성능 기능이면서 동시에 정확성 기능이기 때문에, hit/miss/expired를 함께 보는 습관이 필요합니다.
 
+### Redis로 확장: 프로세스를 넘어 공유 캐시 만들기
+
+인메모리 캐시는 로직 학습용으로는 좋지만, 워커가 여러 개인 실제 배포에서는 적중률이 분산됩니다. 같은 요청이 워커마다 한 번씩 모델로 나가면 비용 절감 효과가 급격히 떨어집니다. 이때는 Redis 같은 공유 저장소를 앞단에 두는 편이 실용적입니다.
+
+```python
+import hashlib
+import json
+from typing import Any
+
+import redis
+
+r = redis.Redis(host="localhost", port=6379, decode_responses=True)
+
+def build_cache_key(payload: dict[str, Any]) -> str:
+    canonical = json.dumps(payload, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    digest = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+    return f"llm:completion:v1:{digest}"
+
+def get_cached_text(payload: dict[str, Any]) -> str | None:
+    key = build_cache_key(payload)
+    return r.get(key)
+
+def set_cached_text(payload: dict[str, Any], text: str, ttl_seconds: int) -> None:
+    key = build_cache_key(payload)
+    r.setex(key, ttl_seconds, text)
+```
+
+여기서 중요한 실무 포인트는 네임스페이스입니다. `llm:completion:v1:` 같은 prefix를 두면 운영 중 삭제 범위를 제어하기 쉬워집니다. 긴급 무효화가 필요하면 버전 prefix를 올리거나, 특정 prefix를 기준으로 정리 작업을 수행할 수 있습니다.
+
+### Semantic 캐시: 문장이 조금 달라도 같은 의미면 재사용하기
+
+정확 일치 키만 쓰면 안전하지만 적중률이 낮을 수 있습니다. 질문이 단어만 조금 다른 경우에는 매번 새 호출이 발생합니다. 이때는 임베딩 유사도를 이용한 semantic 캐시를 보조 계층으로 붙일 수 있습니다.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class SemanticEntry:
+    query: str
+    embedding: list[float]
+    answer: str
+
+def cosine_similarity(a: list[float], b: list[float]) -> float:
+    dot = sum(x * y for x, y in zip(a, b))
+    norm_a = sum(x * x for x in a) ** 0.5
+    norm_b = sum(y * y for y in b) ** 0.5
+    if norm_a == 0 or norm_b == 0:
+        return 0.0
+    return dot / (norm_a * norm_b)
+
+def find_semantic_hit(
+    query_embedding: list[float],
+    entries: list[SemanticEntry],
+    threshold: float = 0.92,
+) -> SemanticEntry | None:
+    best: SemanticEntry | None = None
+    best_score = 0.0
+    for entry in entries:
+        score = cosine_similarity(query_embedding, entry.embedding)
+        if score > best_score:
+            best_score = score
+            best = entry
+
+    if best is not None and best_score >= threshold:
+        return best
+    return None
+```
+
+이 접근은 비용 절감에 강하지만 오적중 위험이 있습니다. 따라서 기본값은 `exact-key cache -> semantic cache -> model call` 순서가 안전합니다. 또 semantic 캐시를 통과한 응답은 로그에 `cache_source=semantic`과 `similarity_score`를 남겨 품질 회귀를 감시해야 합니다.
+
 ## 흔히 헷갈리는 지점
 
 - 사용자 질문만 같으면 같은 캐시 키로 봐도 된다고 생각하기 쉽지만 대부분은 너무 느슨합니다.

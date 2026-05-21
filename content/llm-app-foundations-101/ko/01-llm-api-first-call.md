@@ -284,13 +284,187 @@ if __name__ == "__main__":
 - 비동기 호출은 더 고급 기능처럼 보이지만, 본질은 여러 I/O를 동시에 기다리는 구조 선택입니다. 품질 자체를 올려 주는 기능은 아닙니다.
 - 첫 호출 실패를 프롬프트 문제로 오해하기 쉽지만, 입문 단계에서는 인증 키 누락, 잘못된 모델 ID, 메시지 형식 오류가 더 흔합니다.
 
+## 공급자별 첫 호출 비교와 실패 패턴
+
+첫 호출 단계에서는 SDK 문법보다 요청 계약의 공통점과 차이를 같이 보는 편이 좋습니다. 같은 채팅 API라도 공급자마다 필드 이름과 응답 껍데기가 조금씩 다르기 때문입니다. 이 차이를 모르고 복사-붙여넣기하면 `400`이나 파싱 오류가 생깁니다.
+
+OpenAI Python SDK 기준 최소 호출은 아래처럼 생깁니다.
+
+```python
+from openai import OpenAI
+
+client = OpenAI()
+
+response = client.responses.create(
+    model="gpt-4.1-mini",
+    input="Python에서 list와 tuple 차이를 세 문장으로 설명하세요.",
+)
+
+print(response.output_text)
+```
+
+Anthropic Python SDK 기준 최소 호출은 아래처럼 생깁니다.
+
+```python
+import anthropic
+
+client = anthropic.Anthropic()
+
+message = client.messages.create(
+    model="claude-3-5-haiku-latest",
+    max_tokens=200,
+    messages=[
+        {"role": "user", "content": "Python list와 tuple 차이를 세 문장으로 설명하세요."}
+    ],
+)
+
+print(message.content[0].text)
+```
+
+핵심은 모델을 바꾸는 일이 아니라, 응답 본문을 꺼내는 위치를 고정하는 일입니다. OpenAI는 `output_text` 또는 블록 기반 응답을, Anthropic은 `content` 배열을 자주 사용합니다. 팀 코드에서 `extract_text(response)` 같은 공통 함수를 먼저 두면 공급자를 바꿔도 상위 로직은 거의 바꾸지 않아도 됩니다.
+
+```python
+def extract_text(provider: str, payload) -> str:
+    if provider == "groq":
+        return payload.choices[0].message.content or ""
+    if provider == "openai":
+        return getattr(payload, "output_text", "") or ""
+    if provider == "anthropic":
+        blocks = getattr(payload, "content", [])
+        return "".join(getattr(block, "text", "") for block in blocks)
+    raise ValueError(f"Unsupported provider: {provider}")
+```
+
+### 첫 호출 단계에서 바로 넣어야 하는 로그 필드
+
+입문 코드에서도 아래 필드는 즉시 남기는 편이 좋습니다. 이 값들이 있어야 토큰·비용·장애를 나중에 연결할 수 있습니다.
+
+| 필드 | 의미 | 누락 시 문제 |
+|---|---|---|
+| `provider` | 호출한 공급자 식별 | 장애 구간 분리가 어려움 |
+| `model` | 실제 응답 모델명 | 모델 교체 회귀 추적 불가 |
+| `request_id` | 공급자 요청 식별자 | 지원 문의·추적이 어려움 |
+| `latency_ms` | 응답 시간 | 느림 원인 추정만 하게 됨 |
+| `prompt_tokens`/`completion_tokens` | 사용량 | 비용 분석이 불가능 |
+| `finish_reason` | 종료 이유 | 길이 잘림 탐지가 늦어짐 |
+
+아래처럼 최소 로깅 함수를 두면 충분합니다.
+
+```python
+import time
+
+def call_and_log(client, model: str, messages: list[dict[str, str]]) -> str:
+    started = time.perf_counter()
+    completion = client.chat.completions.create(model=model, messages=messages)
+    latency_ms = (time.perf_counter() - started) * 1000
+
+    choice = completion.choices[0]
+    usage = completion.usage
+    print(
+        {
+            "provider": "groq",
+            "model": completion.model,
+            "latency_ms": round(latency_ms, 1),
+            "finish_reason": choice.finish_reason,
+            "prompt_tokens": usage.prompt_tokens,
+            "completion_tokens": usage.completion_tokens,
+            "total_tokens": usage.total_tokens,
+        }
+    )
+    return choice.message.content or ""
+```
+
+### 401, 429, 5xx를 다루는 기본 재시도 틀
+
+첫 호출 예제에서 가장 빠르게 운영 감각을 얻는 방법은 오류 분기를 명시하는 것입니다. `401`은 재시도로 해결되지 않고, `429`와 일부 `5xx`는 backoff 재시도가 유효합니다.
+
+```python
+import random
+import time
+
+def call_with_retry(create_fn, max_attempts: int = 4):
+    for attempt in range(1, max_attempts + 1):
+        try:
+            return create_fn()
+        except Exception as exc:  # SDK별 예외 타입으로 좁히면 더 좋습니다.
+            msg = str(exc)
+            if "401" in msg or "403" in msg:
+                raise
+            if ("429" in msg or "500" in msg or "503" in msg) and attempt < max_attempts:
+                sleep_s = (2 ** (attempt - 1)) + random.random() * 0.2
+                time.sleep(sleep_s)
+                continue
+            raise
+```
+
+이 단계에서 중요한 것은 완벽한 에러 프레임워크가 아닙니다. 어떤 오류는 즉시 실패해야 하고, 어떤 오류는 천천히 다시 시도해야 하는지 경계를 분명히 두는 것입니다.
+
+### 호출 단가를 처음부터 숫자로 보는 습관
+
+요청 하나의 비용을 대략 계산해 보는 습관을 초기에 들이면, 이후 프롬프트 설계가 훨씬 현실적으로 바뀝니다.
+
+| 시나리오 | prompt_tokens | completion_tokens | 단가 가정(USD / 1M) | 1회 호출 추정 비용 |
+|---|---:|---:|---|---:|
+| 짧은 Q&A | 180 | 120 | 입력 0.20 / 출력 0.60 | 0.000108 |
+| 중간 설명 | 850 | 400 | 입력 0.20 / 출력 0.60 | 0.000410 |
+| 긴 분석 | 2200 | 900 | 입력 0.20 / 출력 0.60 | 0.000980 |
+
+```python
+def estimate_cost_usd(
+    prompt_tokens: int,
+    completion_tokens: int,
+    in_price_per_m: float,
+    out_price_per_m: float,
+) -> float:
+    return (prompt_tokens / 1_000_000) * in_price_per_m + (
+        completion_tokens / 1_000_000
+    ) * out_price_per_m
+```
+
+요금은 공급자와 모델 버전에 따라 바뀌므로, 숫자 자체보다 계산 습관이 더 중요합니다. 한 번 이 함수를 연결해 두면 “좋은 답”과 “지속 가능한 답”을 같은 화면에서 볼 수 있습니다.
+
 ## 운영 체크리스트
 
+- [ ] 첫 호출 성공 직후 OpenAI/Anthropic 보조 호출을 한 번 더 실행해 응답 파싱 위치 차이를 확인했습니다.
+- [ ] `401`, `429`, `5xx`를 같은 오류로 취급하지 않고 분기별 대응(즉시 실패/재시도)을 코드에 명시했습니다.
+- [ ] 호출 로그에 `model`, `finish_reason`, `latency_ms`, `total_tokens`를 공통 필드로 남깁니다.
+- [ ] 요청 단가 계산 함수를 넣고, 최소 3개 시나리오(짧은/중간/긴 요청) 비용을 숫자로 검증했습니다.
 - [ ] `GROQ_API_KEY`를 환경변수로 주입했고 소스코드에 키 문자열을 넣지 않았습니다.
 - [ ] `pip install groq` 이후 `import groq`가 정상 동작합니다.
 - [ ] `client.chat.completions.create(model=..., messages=[...])` 호출이 정상 응답을 반환합니다.
 - [ ] 응답에서 `choices[0].message.content`, `usage.total_tokens`, `model`을 함께 기록합니다.
 - [ ] 같은 호출을 동기와 비동기 방식으로 각각 한 번씩 실행해 차이를 확인했습니다.
+
+## 첫 호출 이후 바로 붙일 실전 안전장치
+
+첫 호출이 성공하면 많은 팀이 곧바로 프롬프트 실험으로 넘어갑니다. 그런데 운영 관점에서는 이 시점에 안전장치를 먼저 넣는 편이 더 이득입니다. 특히 요청 ID 추적, 멱등 키, 타임아웃 상한은 초기에 넣을수록 나중 비용이 크게 줄어듭니다.
+
+```python
+import os
+import uuid
+from typing import Any
+
+from groq import Groq
+
+def create_completion_with_request_context(client: Groq, messages: list[dict[str, str]]) -> Any:
+    request_id = str(uuid.uuid4())
+    completion = client.chat.completions.create(
+        model="llama-3.1-8b-instant",
+        messages=messages,
+        timeout=20.0,
+    )
+    print({"request_id": request_id, "model": completion.model})
+    return completion
+
+client = Groq(api_key=os.environ["GROQ_API_KEY"])
+result = create_completion_with_request_context(
+    client,
+    [{"role": "user", "content": "Python 예외 처리의 핵심 원칙을 세 문장으로 정리하세요."}],
+)
+print(result.choices[0].message.content)
+```
+
+핵심은 복잡한 프레임워크가 아닙니다. "이 호출을 나중에 다시 찾아올 수 있는가"를 보장하는 최소 장치를 지금 넣는 것입니다. 이 한 단계만으로도 장애 대응 속도가 크게 달라집니다.
 
 ## 정리
 

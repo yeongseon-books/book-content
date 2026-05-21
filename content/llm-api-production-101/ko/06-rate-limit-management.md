@@ -302,6 +302,99 @@ def limited_completion_with_429(prompt: str) -> str:
 
 많은 시스템에서는 토큰 버킷으로 시작해도 충분합니다. 이후 공급자 정책이 창 기반 설명과 더 잘 맞으면 슬라이딩 윈도우로 옮기거나 둘을 함께 조합할 수 있습니다. 중요한 것은 어떤 모델을 고르느냐보다, 애플리케이션이 먼저 허용 여부를 결정한다는 원칙입니다.
 
+### 비용 추적 미들웨어를 같이 붙여야 하는 이유
+
+rate limit은 요청 수만 제한한다고 끝나지 않습니다. LLM 경로에서는 요청 수보다 토큰 비용이 더 빨리 병목이 되기도 합니다. 그래서 제한기와 같은 위치에 비용 추적 미들웨어를 두면, “왜 제한이 걸렸는지”를 요청 수와 비용 두 축으로 동시에 설명할 수 있습니다.
+
+```python
+import time
+from fastapi import FastAPI, Request
+
+app = FastAPI()
+
+@app.middleware("http")
+async def cost_tracking_middleware(request: Request, call_next):
+    started = time.monotonic()
+    response = await call_next(request)
+    elapsed_ms = int((time.monotonic() - started) * 1000)
+
+    prompt_tokens = int(response.headers.get("x-llm-prompt-tokens", "0"))
+    completion_tokens = int(response.headers.get("x-llm-completion-tokens", "0"))
+    total_tokens = prompt_tokens + completion_tokens
+
+    # 실제 환경에서는 구조화 로거/메트릭 시스템으로 전송
+    print(
+        {
+            "path": request.url.path,
+            "status_code": response.status_code,
+            "elapsed_ms": elapsed_ms,
+            "prompt_tokens": prompt_tokens,
+            "completion_tokens": completion_tokens,
+            "total_tokens": total_tokens,
+        }
+    )
+    return response
+```
+
+실전에서는 provider 응답에서 usage 필드를 추출해 헤더나 request state로 전달한 뒤 이 미들웨어에서 수집하는 방식이 자주 쓰입니다. 이렇게 수집한 `total_tokens` 분포를 보면, 같은 RPM이라도 어떤 엔드포인트가 TPM을 더 빠르게 소모하는지 즉시 드러납니다.
+
+### 다중 워커 환경에서는 Redis 기반 공유 제한기로 전환하기
+
+단일 프로세스 제한기는 학습과 소규모 배포에서는 충분하지만, 워커가 늘어나면 각 프로세스가 따로 카운트를 세게 됩니다. 이 상태에서는 애플리케이션 전체 한도를 보장할 수 없습니다. 최소한의 확장 경로는 Redis에 타임 윈도우 카운터를 두는 것입니다.
+
+```python
+import time
+
+import redis
+
+r = redis.Redis(host="localhost", port=6379, decode_responses=True)
+
+def allow_with_redis_window(key: str, max_requests: int, window_seconds: int) -> bool:
+    now = int(time.time())
+    bucket = now // window_seconds
+    redis_key = f"rl:{key}:{bucket}"
+
+    with r.pipeline() as pipe:
+        pipe.incr(redis_key)
+        pipe.expire(redis_key, window_seconds + 2)
+        current_count, _ = pipe.execute()
+
+    return int(current_count) <= max_requests
+
+print(allow_with_redis_window("llm-chat", max_requests=100, window_seconds=60))
+```
+
+이 방식은 정교한 분산 제한기의 최종형은 아니지만, 로컬 카운터보다 훨씬 현실적입니다. 전체 서비스 기준으로 요청 수를 한 번에 볼 수 있고, 운영자가 한도 조정을 할 때 효과가 즉시 반영됩니다. 이후에는 Lua 스크립트 기반 원자 연산, 사용자별 키 분리, 지역별 샤딩으로 단계적으로 확장하면 됩니다.
+
+### 요청 거절 응답도 계약으로 통일하기
+
+rate limit이 동작할 때 응답 형식이 들쭉날쭉하면 클라이언트가 처리하기 어려워집니다. 제한기로 거절한 경우에도 표준 오류 payload를 유지하면 프런트엔드와 백엔드가 같은 규칙으로 행동할 수 있습니다.
+
+```python
+from fastapi import FastAPI, HTTPException
+
+app = FastAPI()
+
+def build_rate_limit_error(retry_after_seconds: float) -> dict:
+    return {
+        "error": {
+            "code": "RATE_LIMITED",
+            "message": "요청이 많아 잠시 대기 후 다시 시도해 주세요.",
+            "retry_after_seconds": retry_after_seconds,
+        }
+    }
+
+@app.get("/api/chat")
+def chat_example():
+    allowed = False
+    if not allowed:
+        payload = build_rate_limit_error(retry_after_seconds=1.5)
+        raise HTTPException(status_code=429, detail=payload)
+    return {"ok": True}
+```
+
+이렇게 표준화하면 클라이언트는 `code`와 `retry_after_seconds`만 보고 재시도 UI를 통일할 수 있습니다. 운영 로그도 같은 코드값으로 집계할 수 있어, 공급자 429와 애플리케이션 선제 거절을 분리해 분석하기 쉬워집니다.
+
 ## 흔히 헷갈리는 지점
 
 - 재시도와 백오프만 있으면 rate limit 관리가 된다고 생각하기 쉽지만 그것은 사후 대응입니다.
