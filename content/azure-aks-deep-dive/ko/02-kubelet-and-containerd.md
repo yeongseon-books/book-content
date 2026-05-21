@@ -180,6 +180,133 @@ crictl images | grep my-app
 
 ## 흔히 헷갈리는 지점
 
+## 노드 실행 경로를 단계별 로그로 고정하기
+
+node-local 문제를 빠르게 줄이려면 kubelet 이벤트와 CRI 상태를 같은 타임라인으로 묶어 보는 습관이 필요합니다.
+아래 순서는 운영팀이 실제로 자주 쓰는 최소 점검 세트입니다.
+
+```bash
+kubectl get pod my-api-7f8dbf4b5f-2r9rk -n prod -o wide
+kubectl describe pod my-api-7f8dbf4b5f-2r9rk -n prod | tail -40
+
+kubectl debug node/aks-systempool-11930211-vmss000003 -it \
+  --image=mcr.microsoft.com/cbl-mariner/busybox:2.0 -- chroot /host
+
+crictl ps -a | grep my-api
+crictl inspectp <POD_SANDBOX_ID>
+crictl inspect <CONTAINER_ID>
+```
+
+예시 출력은 다음처럼 읽습니다.
+
+```text
+Warning  Failed     22s   kubelet  Failed to pull image "myacr.azurecr.io/my-api:2026.05.1": rpc error: code = Unknown desc = failed to resolve reference
+Normal   Pulling    21s   kubelet  Pulling image "myacr.azurecr.io/my-api:2026.05.1"
+Warning  BackOff    4s    kubelet  Back-off pulling image "myacr.azurecr.io/my-api:2026.05.1"
+```
+
+여기서는 `PullImage` 단계 실패가 명확하므로, 애플리케이션 entrypoint를 먼저 의심할 필요가 없습니다.
+즉 실행 사슬을 분리해 두면 “컨테이너가 안 뜬다”를 훨씬 빠르게 구체적 원인으로 바꿀 수 있습니다.
+
+## sandbox 네트워크 준비와 컨테이너 실행을 분리해서 보기
+
+2화에서 말한 것처럼 Pod는 sandbox가 먼저입니다.
+따라서 네트워크 미준비 문제와 프로세스 기동 실패를 같은 문제로 취급하면 진단이 꼬입니다.
+아래 다이어그램은 현장에서 자주 쓰는 분기점입니다.
+
+```mermaid
+flowchart LR
+  A["Pod Assigned"] --> B["RunPodSandbox"]
+  B --> C["CNI Setup"]
+  C --> D["PullImage"]
+  D --> E["CreateContainer"]
+  E --> F["StartContainer"]
+```
+
+`RunPodSandbox`에서 지연이 길면 CNI 또는 노드 네트워크 준비를 먼저 봐야 합니다.
+반대로 `StartContainer`에서만 실패하면 애플리케이션 프로세스, 파일 권한, 보안 컨텍스트, entrypoint 인자를 우선 의심하는 편이 맞습니다.
+
+## Helm values로 runtime 요구사항을 명시하기
+
+노드 실행 실패를 줄이려면 애플리케이션 요구사항을 chart 값으로 미리 명시해야 합니다.
+특히 request/limit, liveness/readiness, securityContext를 비워 두면 scheduler와 kubelet 양쪽에서 불필요한 불확실성이 생깁니다.
+
+```yaml
+resources:
+  requests:
+    cpu: "250m"
+    memory: "512Mi"
+  limits:
+    cpu: "500m"
+    memory: "1Gi"
+
+readinessProbe:
+  httpGet:
+    path: /health/ready
+    port: 8080
+  initialDelaySeconds: 8
+  periodSeconds: 5
+
+livenessProbe:
+  httpGet:
+    path: /health/live
+    port: 8080
+  initialDelaySeconds: 20
+  periodSeconds: 10
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  allowPrivilegeEscalation: false
+```
+
+이 값들은 문서화 이상의 의미가 있습니다.
+runtime이 실제로 시작 가능한 조건을 선언으로 고정하고, 재현 가능한 배포 기준을 만들기 때문입니다.
+
+## Registry 인증 실패를 미리 확인하는 루틴
+
+AKS에서 프라이빗 ACR을 쓰는 경우, 가장 흔한 초기 실패는 인증 경계입니다.
+managed identity 연동이 어긋나면 kubelet은 반복적으로 pull 실패를 내고 `ImagePullBackOff`로 빠집니다.
+아래처럼 사전 점검을 루틴으로 넣는 편이 좋습니다.
+
+```bash
+az aks check-acr -n my-cluster -g my-rg --acr myregistry.azurecr.io
+kubectl get secret -n prod | grep -E 'acr|registry'
+kubectl auth can-i get secrets -n prod --as system:serviceaccount:prod:default
+```
+
+출력 예시는 다음처럼 해석합니다.
+
+```text
+[✓] ACR myregistry.azurecr.io is reachable from cluster my-cluster
+[✓] Pull role assignment found for kubelet identity
+```
+
+이 단계가 통과되지 않으면 스케줄링 튜닝이나 probe 조정은 대부분 효과가 없습니다.
+실행 체인의 가장 앞단이 이미 막혀 있기 때문입니다.
+
+## graceful termination과 PDB를 함께 설계하기
+
+kubelet 경로를 이해했다면 시작만큼 종료 경로도 중요합니다.
+노드 업그레이드, scale-down, spot eviction에서 종료 시나리오를 설계하지 않으면 정상 배포도 가용성 저하로 이어집니다.
+아래는 API 워크로드에 자주 쓰는 기본 패턴입니다.
+
+```yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: my-api-pdb
+  namespace: prod
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: my-api
+```
+
+그리고 Deployment에는 `terminationGracePeriodSeconds`, `preStop` 훅을 함께 둡니다.
+이렇게 해야 kubelet이 종료 신호를 보낼 때 애플리케이션이 연결을 정리하고 안전하게 빠질 시간을 얻습니다.
+
 - **kubelet이 곧 container runtime은 아닙니다.** kubelet은 node agent이고, runtime 실행은 CRI 뒤의 containerd 계층이 맡습니다.
 - **Docker가 안 보인다고 runtime이 사라진 것이 아닙니다.** AKS Linux 기본 경로의 중심은 containerd입니다.
 - **컨테이너보다 sandbox가 먼저입니다.** Pod 수준 네트워크와 공유 namespace 문맥이 먼저 준비됩니다.
@@ -187,6 +314,67 @@ crictl images | grep my-app
 - **control plane이 healthy하다고 노드 실행도 healthy한 것은 아닙니다.** Binding 이후의 실패는 kubelet과 runtime 쪽에서 따로 볼 수 있습니다.
 
 ## 운영 체크리스트
+
+## troubleshooting 시나리오: CrashLoopBackOff를 실행 단계별로 분해하기
+
+CrashLoopBackOff는 결과 상태일 뿐 원인 이름이 아닙니다.
+실전에서는 아래처럼 실행 사슬에 맞춰 분해해야 대응이 빨라집니다.
+
+1) 이미지 pull 성공 여부
+2) 컨테이너 생성 성공 여부
+3) 프로세스 시작 직후 종료 코드
+4) probe 실패로 인한 재시작 여부
+
+명령:
+
+```bash
+kubectl describe pod my-api-7f8dbf4b5f-2r9rk -n prod
+kubectl logs my-api-7f8dbf4b5f-2r9rk -n prod --previous
+kubectl get pod my-api-7f8dbf4b5f-2r9rk -n prod -o jsonpath='{.status.containerStatuses[0].lastState.terminated.exitCode}'
+```
+
+예시 출력:
+
+```text
+Last State:     Terminated
+Reason:         Error
+Exit Code:      137
+Started:        Thu, 21 May 2026 09:10:11 +0900
+Finished:       Thu, 21 May 2026 09:10:29 +0900
+```
+
+Exit 137이면 OOM 가능성이 높으므로, 먼저 메모리 request/limit과 애플리케이션 초기화 구간 메모리 피크를 확인하는 편이 맞습니다.
+이 단계에서 문제가 확인되면 CNI나 scheduler 튜닝은 우선순위가 아닙니다.
+
+## 노드 업그레이드와 kubelet 경계에서 꼭 확인할 항목
+
+AKS 노드 이미지 업그레이드 시점에는 kubelet과 runtime 버전 조합, PDB, drain 시간이 동시에 영향을 줍니다.
+업그레이드 전후에 아래 항목을 체크하면 회귀를 줄일 수 있습니다.
+
+- 노드별 `Ready` 복귀 시간
+- 동일 워크로드의 cold start 시간 변화
+- 이미지 pull 캐시 효과 감소 여부
+- `FailedMount`, `FailedCreatePodSandBox` 이벤트 증가 여부
+
+검증 명령:
+
+```bash
+kubectl get nodes -o wide
+kubectl get events -A --sort-by=.lastTimestamp | tail -50
+```
+
+이 데이터는 단발성 점검이 아니라, 다음 업그레이드에서 비교 가능한 기준선으로 남겨야 합니다.
+
+## 관측 표준: kubelet 로그와 애플리케이션 로그를 분리 수집하기
+
+노드 실행 문제를 빨리 찾으려면 인프라 로그와 앱 로그를 한 스트림에 섞지 않는 편이 좋습니다.
+Prometheus/Grafana 또는 Log Analytics 구성에서 최소한 다음 태그를 분리합니다.
+
+- `source=kubelet`
+- `source=containerd`
+- `source=app`
+
+그리고 대시보드에서 `ImagePullBackOff`, `CreateContainerError`, `CrashLoopBackOff` 카운트를 시간축으로 함께 배치하면, 어느 계층에서 먼저 이상이 시작됐는지 즉시 보입니다.
 
 - [ ] 노드 수준 disk pressure와 memory pressure 알림을 설정했습니다.
 - [ ] node SKU에 맞춰 이미지 GC와 디스크 사용량 정책을 검토했습니다.

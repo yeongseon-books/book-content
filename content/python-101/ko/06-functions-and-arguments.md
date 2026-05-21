@@ -353,6 +353,149 @@ def with_logging(fn):
 
 다음 글에서는 모듈과 패키지를 다룹니다. `import`, `__init__.py`, `__name__`을 정리하고, 함수 묶음을 모듈 경계 너머에서 어떻게 노출하고 숨기는지 살핍니다.
 
+## 실전 앵커: 함수 경계 설계, 인자 계약, 디버깅 흐름
+
+함수는 재사용 단위이면서 동시에 버그 격리 단위입니다. 초급 단계에서 특히 중요한 것은 "무엇을 받고 무엇을 보장하는가"를 코드 형태로 명확히 두는 것입니다.
+
+```python
+def calculate_total(price: int, quantity: int, discount: float = 0.0) -> int:
+    if quantity < 0:
+        raise ValueError('quantity must be >= 0')
+    subtotal = price * quantity
+    return int(subtotal * (1 - discount))
+```
+
+위 함수는 타입 힌트, 기본값, 예외 조건이 함께 명시되어 있어서 호출자가 계약을 빠르게 이해할 수 있습니다.
+
+가변 인자와 키워드 인자는 로깅/래퍼 함수에서 자주 쓰입니다.
+
+```python
+def debug_call(name, *args, **kwargs):
+    print('call:', name)
+    print('args:', args)
+    print('kwargs:', kwargs)
+```
+
+`*args`, `**kwargs`를 남용하면 인터페이스가 흐려질 수 있으므로, 외부 공개 API에서는 명시적 인자 이름을 우선하고 래퍼 계층에서만 제한적으로 사용하는 편이 좋습니다.
+
+성능 관찰도 짧게 해보겠습니다.
+
+```python
+import timeit
+
+def f_pos(a, b, c):
+    return a + b + c
+
+def f_kw(*, a, b, c):
+    return a + b + c
+
+pos_t = timeit.timeit('f_pos(1,2,3)', globals=globals(), number=3_000_000)
+kw_t = timeit.timeit('f_kw(a=1,b=2,c=3)', globals=globals(), number=3_000_000)
+print(pos_t, kw_t)
+```
+
+키워드 전달이 약간 느릴 수 있지만, 호출 가독성과 실수 방지 효과가 크기 때문에 운영 코드에서는 충분히 가치가 있습니다.
+
+클로저와 스코프도 반드시 체감해 두어야 합니다.
+
+```python
+def make_multiplier(factor):
+    def mul(x):
+        return x * factor
+    return mul
+
+mul3 = make_multiplier(3)
+print(mul3(10))
+```
+
+`factor`는 외부 함수가 끝난 뒤에도 내부 함수가 참조합니다. 이 메커니즘이 데코레이터의 기반입니다.
+
+디버깅은 `pdb`로 인자 값을 확인하면 빠릅니다.
+
+```python
+import pdb
+
+def parse_age(text):
+    pdb.set_trace()
+    return int(text.strip())
+
+parse_age(' 42 ')
+```
+
+`p text`, `p repr(text)`, `n` 순서로 보면 변환 전후가 분명히 보입니다.
+
+마지막으로 패키징 관점의 함수 분리 예시를 보겠습니다. CLI 엔트리포인트는 입력/출력만 처리하고 핵심 로직은 별도 함수로 분리해야 테스트가 쉬워집니다.
+
+```python
+def run(argv):
+    # 파싱
+    # 검증
+    return main_logic(argv)
+```
+
+이 분리 원칙은 이후 모듈/패키지, 테스트 자동화 단계에서 그대로 재사용됩니다.
+
+### 추가 실습: 함수 시그니처를 통한 오용 방지
+
+초기 API 설계에서 positional-only(` / `), keyword-only(`*`)를 적절히 쓰면 호출 실수를 많이 줄일 수 있습니다.
+
+```python
+def divide(a, b, /, *, ndigits=2):
+    return round(a / b, ndigits)
+
+print(divide(10, 3, ndigits=3))
+```
+
+이 함수는 피연산자 순서를 위치 인자로 강제하고, 반올림 자릿수는 이름으로만 받습니다. 팀 코드에서 의도가 명확해집니다.
+
+문서화는 길게 쓰기보다 도크스트링에 입력/출력/예외를 짧게 명시하는 편이 효과적입니다.
+
+```python
+def parse_port(text: str) -> int:
+    """문자열 포트를 정수로 변환합니다.
+
+    Raises:
+        ValueError: 1~65535 범위를 벗어나면 발생
+    """
+    port = int(text)
+    if not (1 <= port <= 65535):
+        raise ValueError('invalid port')
+    return port
+```
+
+함수 단위에서 계약이 명확하면 모듈 경계를 넘어가도 디버깅이 단순해집니다.
+
+### 부록: 로컬 실습 로그 템플릿
+
+아래 템플릿은 학습 단계에서 직접 실험한 결과를 남길 때 유용합니다. 중요한 점은 "코드 + 실행 환경 + 출력"을 한 세트로 기록하는 것입니다. 이렇게 남긴 로그는 나중에 문제가 다시 발생했을 때 가장 신뢰할 수 있는 재현 자료가 됩니다.
+
+```text
+[환경]
+python: 3.12.x
+platform: macOS/Linux
+venv: .venv
+
+[실험]
+목표: 동작 확인 또는 성능 비교
+입력: 샘플 데이터 1,000건
+실행 명령: python script.py
+
+[출력]
+성공/실패 여부
+핵심 숫자(timeit, 처리 건수, 예외 메시지)
+```
+
+실무 코드 리뷰에서는 결과 숫자만 공유하는 경우가 많지만, 학습 단계에서는 중간 가정까지 함께 적는 편이 더 효과적입니다. 예를 들어 "셋 포함 검사가 빠를 것이다"라는 가정이 맞았는지, "f-string이 항상 더 읽기 쉽다"라는 판단이 팀 컨벤션과 맞는지까지 기록하면 다음 의사결정이 빨라집니다.
+
+디버깅 기록도 같은 형식을 쓰면 좋습니다.
+
+1) 증상: 어떤 입력에서 실패했는가
+2) 가설: 어떤 조건문/자료구조/경로가 원인인가
+3) 검증: `pdb`, `print`, `timeit`, 단위 테스트 중 무엇으로 확인했는가
+4) 결론: 수정 전후 동작 차이가 무엇인가
+
+이 습관은 초급 단계에서는 다소 느리게 느껴질 수 있습니다. 하지만 프로젝트 규모가 커질수록 "정확한 기록"이 가장 빠른 길이 됩니다. Python 문법을 익히는 것과 별개로, 실험을 재현 가능한 형태로 남기는 역량은 개발자로서의 성장 속도를 결정합니다.
+
 ## 처음 질문으로 돌아가기
 
 - **함수와 인자: def, args, kwargs, default, lambda를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?**

@@ -321,6 +321,241 @@ print(f"max difference: {np.max(np.abs(hf_vector - st_vector)):.6f}")
 - [ ] 결과 차원 수와 dtype를 인덱스 스키마와 맞췄다
 - [ ] 장기 보관하는 임베딩과 함께 모델 버전을 저장했다
 
+## 배치 크기 튜닝 실험 템플릿
+
+실무에서 가장 자주 받는 질문은 "배치 크기를 얼마로 두면 좋은가"입니다. 정답은 하드웨어마다 다르지만, 실험 틀은 공통입니다. 핵심은 처리량(tokens/sec 또는 docs/sec)과 p95 지연 시간을 같이 보는 것입니다.
+
+```python
+import statistics
+import time
+
+from langchain_huggingface import HuggingFaceEmbeddings
+
+texts = [f"sample document {i}" for i in range(2000)]
+
+def run_batch_test(batch_size: int) -> tuple[float, float]:
+    model = HuggingFaceEmbeddings(
+        model_name="sentence-transformers/all-MiniLM-L6-v2",
+        model_kwargs={"device": "cpu"},
+        encode_kwargs={"normalize_embeddings": True, "batch_size": batch_size},
+    )
+    timings = []
+    chunk = 200
+    for i in range(0, len(texts), chunk):
+        window = texts[i : i + chunk]
+        start = time.perf_counter()
+        model.embed_documents(window)
+        timings.append((time.perf_counter() - start) * 1000)
+    mean_ms = sum(timings) / len(timings)
+    p95_ms = statistics.quantiles(timings, n=20)[18]
+    return mean_ms, p95_ms
+```
+
+| batch_size | 평균 배치 시간(ms) | p95(ms) |
+|---:|---:|---:|
+| 16 | 72 | 89 |
+| 32 | 54 | 67 |
+| 64 | 43 | 58 |
+| 128 | 40 | 77 |
+
+위와 같이 128에서 평균은 개선되는데 p95가 튀면, 서비스 트래픽에서는 64가 더 안전할 수 있습니다.
+
+## 임베딩 생성과 인덱싱 분리 패턴
+
+임베딩 생성기를 검색 API 내부에 넣으면 운영이 어려워집니다. 보통은 생성과 인덱싱을 분리합니다.
+
+```python
+from dataclasses import dataclass
+
+import numpy as np
+
+@dataclass
+class EmbeddingArtifact:
+    vectors: np.ndarray
+    doc_ids: list[str]
+    model_name: str
+    normalized: bool
+
+def build_embedding_artifact(doc_ids: list[str], docs: list[str]) -> EmbeddingArtifact:
+    vectors = np.asarray(embedding_model.embed_documents(docs), dtype=np.float32)
+    return EmbeddingArtifact(
+        vectors=vectors,
+        doc_ids=doc_ids,
+        model_name="sentence-transformers/all-MiniLM-L6-v2",
+        normalized=True,
+    )
+```
+
+이 구조를 잡아 두면 다음 단계에서 FAISS, HNSW, IVF, 또는 외부 벡터 DB로 손쉽게 연결할 수 있습니다.
+
+## Chroma, Qdrant, Pinecone 적재 스니펫
+
+`HuggingFaceEmbeddings` 결과를 다른 저장소로 넣을 때도 핵심은 동일합니다.
+
+```python
+# Chroma
+from chromadb import PersistentClient
+
+artifact = build_embedding_artifact(["doc-1", "doc-2"], ["Chunk A", "Chunk B"])
+chroma = PersistentClient(path="./chroma")
+col = chroma.get_or_create_collection("vs101")
+col.add(ids=artifact.doc_ids, documents=["Chunk A", "Chunk B"], embeddings=artifact.vectors.tolist())
+```
+
+```python
+# Qdrant
+from qdrant_client import QdrantClient
+from qdrant_client.models import Distance, PointStruct, VectorParams
+
+qdrant = QdrantClient(path="./qdrant")
+qdrant.recreate_collection("vs101", vectors_config=VectorParams(size=384, distance=Distance.COSINE))
+qdrant.upsert(
+    "vs101",
+    points=[
+        PointStruct(id=1, vector=artifact.vectors[0].tolist(), payload={"doc_id": "doc-1"}),
+        PointStruct(id=2, vector=artifact.vectors[1].tolist(), payload={"doc_id": "doc-2"}),
+    ],
+)
+```
+
+```python
+# Pinecone
+from pinecone import Pinecone
+
+pc = Pinecone(api_key="${PINECONE_API_KEY}")
+index = pc.Index("vs101")
+index.upsert(vectors=[("doc-1", artifact.vectors[0].tolist()), ("doc-2", artifact.vectors[1].tolist())])
+```
+
+## 장애를 줄이는 운영 규칙
+
+임베딩 계층에서 운영 장애가 나는 패턴은 반복됩니다.
+
+- 모델 변경 후 재인덱싱 없이 서비스에 투입해 점수 분포가 뒤틀림
+- 다국어 입력인데 영어 전용 모델을 사용해 recall 하락
+- 정규화 옵션이 인덱싱 경로와 조회 경로에서 불일치
+- float64 저장 후 FAISS 적재 시 타입 변환 오류
+
+그래서 실무에서는 인덱싱 잡이 시작될 때 아래 항목을 자동 검증합니다.
+
+| 검증 항목 | 실패 시 조치 |
+|---|---|
+| 임베딩 차원 == 인덱스 차원 | 즉시 중단 |
+| normalize 설정 일치 | 즉시 중단 |
+| 모델 버전 태그 존재 | 즉시 중단 |
+| 샘플 질의 recall 기준 통과 | 배포 보류 |
+
+## 재현 가능한 임베딩 파이프라인 아티팩트
+
+임베딩 결과를 팀 간에 공유하려면 단순 `.npy` 파일 하나로는 부족합니다. 최소한 아래 항목을 함께 저장해야 재현성이 생깁니다.
+
+```python
+import hashlib
+import json
+from pathlib import Path
+
+import numpy as np
+
+def sha256_texts(texts: list[str]) -> str:
+    h = hashlib.sha256()
+    for item in texts:
+        h.update(item.encode("utf-8"))
+        h.update(b"\n")
+    return h.hexdigest()
+
+def persist_artifact(texts: list[str], vectors: np.ndarray, out_dir: str = "artifact") -> None:
+    path = Path(out_dir)
+    path.mkdir(parents=True, exist_ok=True)
+
+    np.save(path / "vectors.npy", vectors)
+    (path / "documents.json").write_text(json.dumps(texts, ensure_ascii=False, indent=2))
+
+    manifest = {
+        "model_name": "sentence-transformers/all-MiniLM-L6-v2",
+        "dimension": int(vectors.shape[1]),
+        "dtype": str(vectors.dtype),
+        "normalized": True,
+        "document_count": len(texts),
+        "input_hash": sha256_texts(texts),
+    }
+    (path / "manifest.json").write_text(json.dumps(manifest, indent=2))
+```
+
+이 패턴을 도입하면 나중에 인덱스 장애가 발생했을 때 "입력이 달랐는지"와 "모델이 달랐는지"를 빠르게 분리할 수 있습니다.
+
+## 한국어/영어 혼합 코퍼스 실험 포인트
+
+다국어 문서에서는 벡터 분포가 달라지는 경우가 많습니다. 예를 들어 영어 중심 모델로 한국어를 함께 처리하면 일부 질의에서 거리 분해능이 낮아집니다. 아래 체크리스트를 실행해 보면 초기에 위험 신호를 잡을 수 있습니다.
+
+- 한국어 질의 20개, 영어 질의 20개를 분리해 Recall@k를 각각 계산
+- 동일 의미의 한/영 문장 쌍에서 코사인 점수 분포 비교
+- 한국어 고유명사(서비스명, 오류코드) 질의에서 상위 결과 오류율 점검
+
+| 모델 | 한국어 Recall@5 | 영어 Recall@5 | 비고 |
+|---|---:|---:|---|
+| all-MiniLM-L6-v2 | 0.74 | 0.90 | 영어 강점, 한국어 약세 |
+| paraphrase-multilingual-MiniLM-L12-v2 | 0.86 | 0.87 | 균형형 |
+
+이 표처럼 차이가 크면 모델을 바꾸거나, 언어 감지 후 모델 라우팅을 고려해야 합니다.
+
+## 벡터 차원 마이그레이션 전략
+
+임베딩 모델을 바꾸면 차원이 달라질 수 있습니다. 예를 들어 384차원에서 768차원으로 이동할 때는 인덱스를 부분 갱신할 수 없고, 보통 전량 재인덱싱이 필요합니다.
+
+```python
+def requires_full_reindex(old_manifest: dict, new_manifest: dict) -> bool:
+    keys = ["model_name", "dimension", "normalized"]
+    return any(old_manifest.get(k) != new_manifest.get(k) for k in keys)
+```
+
+운영에서는 아래 3단계를 권장합니다.
+
+1. 신규 모델로 병렬 인덱스(`index_v2`)를 백그라운드에서 구축합니다.
+2. 평가셋으로 `index_v1`과 `index_v2`를 비교해 품질과 지연 시간을 점검합니다.
+3. 트래픽을 점진 전환하고 이상이 없으면 `index_v1`을 폐기합니다.
+
+이 절차를 건너뛰고 즉시 교체하면 품질 하락이 발생해도 롤백 근거가 약해집니다.
+
+## 임베딩 품질 회귀 테스트 자동화
+
+임베딩 계층은 코드 변경이 없어도 라이브러리 버전, 모델 캐시, 토크나이저 변경으로 결과가 흔들릴 수 있습니다. 그래서 CI에서 최소 회귀 테스트를 돌리는 편이 안전합니다.
+
+```python
+import numpy as np
+
+EVAL_PAIRS = [
+    ("python async programming", "handling concurrency in python", True),
+    ("python async programming", "dog food recipe", False),
+    ("faiss vector index", "approximate nearest neighbor", True),
+]
+
+def cosine(a: np.ndarray, b: np.ndarray) -> float:
+    return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
+
+def run_embedding_regression(model) -> None:
+    for a, b, should_be_similar in EVAL_PAIRS:
+        va = np.asarray(model.embed_query(a), dtype=np.float32)
+        vb = np.asarray(model.embed_query(b), dtype=np.float32)
+        score = cosine(va, vb)
+        if should_be_similar and score < 0.45:
+            raise AssertionError(f"expected similar: {a} vs {b}, got {score:.4f}")
+        if (not should_be_similar) and score > 0.35:
+            raise AssertionError(f"expected dissimilar: {a} vs {b}, got {score:.4f}")
+```
+
+임계값은 도메인마다 다르지만, 이 정도 장치만 있어도 모델 교체 실수를 초기에 잡을 수 있습니다.
+
+## 인코딩 큐와 백프레셔
+
+대량 문서 인입 시에는 임베딩 작업을 동기 호출로 처리하지 않고 큐 기반 비동기 파이프라인으로 분리하는 편이 좋습니다.
+
+- 수집 단계는 문서 ID와 원문만 큐에 넣습니다.
+- 워커는 배치 단위로 임베딩을 생성합니다.
+- 실패한 배치는 재시도 큐로 분리합니다.
+- 인덱싱 단계는 성공 배치만 받아 적재합니다.
+
+이 구조를 사용하면 급격한 트래픽 증가에도 API 응답 지연을 제한할 수 있습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **sentence-transformers로 만든 벡터가 정말 검색에 쓸 수 있는 형태인지 어디서 확인할까요?**

@@ -264,6 +264,78 @@ torch.Size([2, 4, 8, 8])
 
 또한 attention은 "모델이 문맥을 본다"는 설명으로 끝내기 쉬우나, 실제로는 매우 기계적인 텐서 조작의 합입니다. 그래서 큰 모델을 다룰 때도 추상적 설명보다 `shape`, `mask`, `projection`, `residual stream`이라는 언어로 접근하는 편이 훨씬 안정적입니다.
 
+## 메모리 프로파일로 보는 attention 비용
+
+attention을 이해할 때 가장 자주 놓치는 현실은 메모리입니다. 계산량뿐 아니라 `attention score`와 `attention prob` 텐서가 `B x H x T x T`로 만들어지는 순간 메모리 사용량이 급격히 늘어납니다. 그래서 block size를 키우기 전에 먼저 간단한 프로파일을 돌려 보는 습관이 필요합니다.
+
+```python
+import torch
+
+def estimate_attn_bytes(batch: int, n_head: int, t: int, dtype_bytes: int = 4) -> int:
+    # score + prob 두 텐서를 대략 합산
+    return 2 * batch * n_head * t * t * dtype_bytes
+
+for t in [64, 128, 256, 512]:
+    mb = estimate_attn_bytes(batch=8, n_head=8, t=t) / (1024**2)
+    print(f"T={t:>3} -> attn tensors ~= {mb:8.2f} MB")
+```
+
+예상 출력은 다음과 비슷합니다.
+
+```text
+T= 64 -> attn tensors ~=     2.00 MB
+T=128 -> attn tensors ~=     8.00 MB
+T=256 -> attn tensors ~=    32.00 MB
+T=512 -> attn tensors ~=   128.00 MB
+```
+
+`T`를 두 배로 늘리면 메모리가 네 배로 늘어나는 이유가 바로 여기서 보입니다. 이 수치 감각이 있으면 "왜 block_size를 512로 바꾸자마자 OOM이 났는가"를 직관적으로 설명할 수 있습니다.
+
+### PyTorch 프로파일러로 head별 병목을 확인하는 방법
+
+아래처럼 짧은 프로파일 구간을 넣으면 어느 연산이 시간을 먹는지 빠르게 볼 수 있습니다.
+
+```python
+with torch.profiler.profile(
+    activities=[torch.profiler.ProfilerActivity.CPU],
+    record_shapes=True,
+) as prof:
+    out = attn(x)
+
+print(
+    prof.key_averages()
+    .table(sort_by="self_cpu_time_total", row_limit=8)
+)
+```
+
+대체로 `matmul`, `softmax`, `transpose` 관련 항목이 상위에 뜹니다. 이 표를 한 번 확인해 두면 이후 최적화 우선순위를 정하기가 쉬워집니다. 예를 들어 소형 모델에서는 fancy한 최적화보다 `block_size` 조정과 batch tuning이 더 큰 효과를 내는 경우가 많습니다.
+
+### shape 추적 로그를 남기면 버그 원인을 즉시 좁힐 수 있습니다
+
+```python
+def forward(self, x: torch.Tensor):
+    b, t, c = x.shape
+    k = self.key(x).view(b, t, self.n_head, self.head_size).transpose(1, 2)
+    q = self.query(x).view(b, t, self.n_head, self.head_size).transpose(1, 2)
+    v = self.value(x).view(b, t, self.n_head, self.head_size).transpose(1, 2)
+    print("qkv", q.shape, k.shape, v.shape)  # (B,H,T,HS)
+
+    wei = q @ k.transpose(-2, -1)
+    print("wei", wei.shape)                  # (B,H,T,T)
+```
+
+생성 실패나 학습 불안정이 보일 때 이 로그 두 줄만 있어도 절반은 해결됩니다. 특히 `wei` shape가 `(B, T, H, T)`처럼 비정상으로 나오면 축 순서 실수로 바로 판단할 수 있습니다.
+
+### Attention 구현 비교표
+
+| 구현 방식 | 장점 | 단점 | 입문 단계 적합성 |
+| --- | --- | --- | --- |
+| 명시적 `q @ k^T`, `softmax` | 디버깅/학습에 매우 유리 | 최적화 자동 이점 적음 | 매우 높음 |
+| `scaled_dot_product_attention` API | 최신 커널 활용 가능 | 내부 동작 가시성 낮음 | 중간 |
+| Flash Attention 계열 | 긴 문맥 성능 우수 | 의존성/환경 제약 | 낮음(입문) |
+
+이번 시리즈는 첫 번째 방식을 택합니다. 이유는 단순합니다. 성능 절대값보다 attention이 어떻게 동작하는지 끝까지 추적하는 것이 목표이기 때문입니다.
+
 ## 흔히 헷갈리는 지점
 
 - Q, K, V가 완전히 다른 데이터에서 온다고 생각하기 쉽지만, 기본 self-attention에서는 같은 입력 텐서의 다른 선형 투영입니다.

@@ -185,6 +185,115 @@ A: My lord, I serve thee with a faithful heart.
 
 다음 글에서는 이렇게 미세 조정한 모델을 FastAPI 서버와 브라우저 UI로 감쌉니다. 즉, 지금까지 만든 LLM을 실제로 대화할 수 있는 작은 챗봇 시스템으로 마무리하게 됩니다.
 
+## SFT 데이터셋 품질 점검 스크립트
+
+파인튜닝에서 가장 먼저 망가지는 지점은 모델이 아니라 데이터입니다. 질문-응답 템플릿이 줄마다 다르거나, 응답이 지나치게 짧거나, 문자 집합이 tokenizer와 맞지 않으면 학습은 조용히 불안정해집니다. 따라서 학습 전에 데이터셋 리포트를 한 번 뽑는 편이 좋습니다.
+
+```python
+import json
+import statistics
+
+from data import encode
+
+rows = [json.loads(line) for line in open("instructions.jsonl", encoding="utf-8")]
+q_lens = [len(encode(r["instruction"])) for r in rows]
+a_lens = [len(encode(r["response"])) for r in rows]
+
+print("rows:", len(rows))
+print("q_len mean/p95:", round(statistics.mean(q_lens), 2), sorted(q_lens)[int(len(q_lens)*0.95)-1])
+print("a_len mean/p95:", round(statistics.mean(a_lens), 2), sorted(a_lens)[int(len(a_lens)*0.95)-1])
+print("empty responses:", sum(1 for r in rows if not r["response"].strip()))
+```
+
+이 리포트를 남기면 파인튜닝 실패 원인을 "모델 문제"와 "데이터 문제"로 빠르게 분리할 수 있습니다.
+
+### loss masking 경계를 눈으로 검증하는 출력
+
+mask가 의도대로 적용됐는지 보려면 한 샘플을 직접 출력하는 것이 가장 빠릅니다.
+
+```python
+x, y = build_example(rows[0], block_size=64)
+print("x_ids:", x.tolist()[:40])
+print("y_ids:", y.tolist()[:40])
+print("ignore_count:", int((y == -100).sum().item()))
+```
+
+`ignore_count`가 0이라면 prompt 구간이 학습 손실에 포함되고 있다는 뜻입니다. SFT 목적이 응답 형식 적응이라면 이 상태는 보통 바람직하지 않습니다.
+
+### 베이스 대비 학습률 축소 원칙
+
+SFT는 베이스 가중치를 크게 흔들지 않는 것이 중요합니다. 그래서 pretraining 대비 더 낮은 학습률을 쓰는 경우가 많습니다.
+
+| 단계 | 전형적 학습률 범위 | 의도 |
+| --- | --- | --- |
+| pre-training | `1e-4 ~ 5e-4` | 광범위 패턴 학습 |
+| SFT | `1e-5 ~ 5e-5` | 출력 형식/습관 미세 조정 |
+| 추가 정렬(RLHF 등) | 더 보수적 | 정책 안정화 |
+
+이번 예제에서 `3e-5`를 쓴 이유도 같은 맥락입니다. 큰 이동보다 안정적인 적응이 우선입니다.
+
+### before/after 평가 프롬프트 세트를 고정합니다
+
+```text
+Q: Who is Juliet?
+Q: Summarize Romeo in one sentence.
+Q: Give one short warning about jealousy.
+Q: Answer politely: What is loyalty?
+```
+
+항상 같은 평가 프롬프트를 써야 변화 해석이 가능합니다. 프롬프트가 매번 달라지면 모델 개선인지 입력 차이인지 분리하기 어렵습니다.
+
+### SFT 실패 모드와 대응
+
+| 증상 | 흔한 원인 | 첫 대응 |
+| --- | --- | --- |
+| 질문 복사 후 멈춤 | masking 경계 오류 | `-100` 적용 범위 점검 |
+| 문체 붕괴 | 학습률 과대/step 과다 | lr 하향, early stop |
+| 응답이 지나치게 짧음 | 데이터 응답 길이 편향 | 학습셋 길이 분포 보정 |
+| OOV 경고 다발 | 문자 집합 불일치 | 데이터 정규화/필터링 |
+
+이 표를 운영 체크리스트에 포함하면 SFT 반복 실험의 실패 비용이 크게 줄어듭니다.
+
+## 파인튜닝 실험 카드 템플릿
+
+SFT를 여러 번 돌리기 시작하면 어떤 설정이 어떤 출력을 만들었는지 빠르게 잊습니다. 그래서 실험마다 아래와 같은 실험 카드를 남기는 편이 좋습니다.
+
+```text
+exp_id=sft-2026-05-21-a
+base_ckpt=ckpt.pt
+train_rows=50
+lr=3e-5
+steps=500
+mask_prompt=true
+max_seq_len=64
+train_loss_last=1.42
+eval_prompt_set=v1
+notes=Q/A 형식 안정화, 사실성은 제한적
+```
+
+이 카드가 있으면 출력 품질 논의가 훨씬 생산적으로 바뀝니다. 어떤 설정에서 어떤 변화가 생겼는지 근거를 남길 수 있기 때문입니다.
+
+### 응답 구간 비율 점검
+
+```python
+def supervised_ratio(y: torch.Tensor) -> float:
+    total = y.numel()
+    active = int((y != -100).sum().item())
+    return active / max(total, 1)
+```
+
+masking을 쓸 때는 각 샘플에서 실제로 손실에 기여하는 토큰 비율이 너무 낮지 않은지 확인해야 합니다. 질문이 길고 답이 짧으면 학습 신호가 약해집니다.
+
+### 베이스 보존 vs 과적응 균형
+
+| 평가 축 | 기대 신호 | 위험 신호 |
+| --- | --- | --- |
+| Q/A 형식 | `A:` 뒤 답변 일관 | 질문 복사, 답변 누락 |
+| 일반 생성 | 기본 유창성 유지 | 급격한 붕괴/반복 |
+| 문체 | 목표 형식 강화 | 과도한 고정문구 |
+
+좋은 SFT는 새 습관을 추가하는 것이지 기존 능력을 지우는 것이 아닙니다. 그래서 형식 적응 지표와 기본 생성 품질을 함께 확인해야 합니다.
+
 ## 처음 질문으로 돌아가기
 
 - **pre-training, fine-tuning, RLHF는 각각 무엇을 바꾸는 단계일까요?**

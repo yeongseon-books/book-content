@@ -310,6 +310,188 @@ for rank, (score, text) in enumerate(results, start=1):
 - [ ] 점수 산정 뒤 리랭커에 넘길 후보 수를 결정했다
 - [ ] 거짓 양성 예시를 회귀 테스트 케이스로 남겼다
 
+## ANN 알고리즘과 거리 함수의 연결
+
+거리 함수는 수학 선택처럼 보이지만, 실제로는 인덱스 알고리즘 선택과 바로 연결됩니다. 예를 들어 HNSW와 IVF 모두 코사인/L2를 지원하지만, 내부 최적화 포인트가 다릅니다.
+
+| 알고리즘 | 일반 조합 | 핵심 튜닝 포인트 | 거리 함수와의 관계 |
+|---|---|---|---|
+| HNSW | cosine + normalized vectors | `M`, `efConstruction`, `efSearch` | `efSearch`를 높이면 recall 상승, latency 증가 |
+| IVF Flat | cosine 또는 L2 | `nlist`, `nprobe` | `nprobe`가 낮으면 후보 누락으로 recall 하락 |
+| Flat(정확) | cosine/IP/L2 | 없음 | 기준선(ground truth) 생성에 사용 |
+
+실무에서는 Flat 인덱스로 정답 집합을 만들고, HNSW/IVF가 그 정답을 얼마나 재현하는지로 recall을 계산합니다.
+
+## HNSW와 IVF 파라미터가 점수 해석에 미치는 영향
+
+아래 표는 같은 데이터셋에서 검색 파라미터만 바꿨을 때의 전형적인 경향입니다.
+
+| 설정 | Recall@10 | p95 latency (ms) |
+|---|---:|---:|
+| HNSW `efSearch=32` | 0.91 | 7 |
+| HNSW `efSearch=96` | 0.97 | 15 |
+| IVF `nprobe=4` | 0.84 | 4 |
+| IVF `nprobe=24` | 0.95 | 10 |
+
+포인트는 단순합니다. 점수 함수가 같아도 후보를 얼마나 보느냐가 달라지면 최종 순위가 달라집니다. 그래서 운영 대시보드는 점수 분포만 보지 말고 `efSearch`, `nprobe` 값도 같이 기록해야 합니다.
+
+## 최소 벤치마크 코드
+
+```python
+import time
+
+import faiss
+import numpy as np
+
+def recall_at_k(pred: np.ndarray, truth: np.ndarray, k: int) -> float:
+    hit = 0
+    total = pred.shape[0] * k
+    for i in range(pred.shape[0]):
+        hit += len(set(pred[i, :k]).intersection(set(truth[i, :k])))
+    return hit / total
+
+def benchmark(index: faiss.Index, queries: np.ndarray, truth: np.ndarray, k: int = 10) -> tuple[float, float]:
+    start = time.perf_counter()
+    _, pred = index.search(queries, k)
+    elapsed_ms = (time.perf_counter() - start) * 1000
+    return recall_at_k(pred, truth, k), elapsed_ms
+```
+
+이 코드 수준만 있어도 "튜닝 후 latency는 줄었는데 recall이 얼마나 빠졌는지"를 수치로 답할 수 있습니다.
+
+## 하이브리드 점수 결합에서의 스케일 정렬
+
+코사인 점수와 BM25 점수는 분포가 다릅니다. 둘을 그대로 더하면 BM25가 지나치게 우세하거나 반대로 코사인 점수가 모든 순위를 덮어 버릴 수 있습니다. 따라서 최소-최대 정규화 또는 z-score 정규화를 먼저 적용해야 합니다.
+
+```python
+import numpy as np
+
+def min_max(arr: np.ndarray) -> np.ndarray:
+    lo, hi = float(arr.min()), float(arr.max())
+    if hi == lo:
+        return np.zeros_like(arr, dtype=np.float32)
+    return (arr - lo) / (hi - lo)
+
+def hybrid_score(cos_scores: np.ndarray, bm25_scores: np.ndarray, alpha: float) -> np.ndarray:
+    cos_norm = min_max(cos_scores)
+    bm25_norm = min_max(bm25_scores)
+    return alpha * cos_norm + (1 - alpha) * bm25_norm
+```
+
+점수 결합을 도입했다면, 운영 로그에는 `alpha`, 정규화 방식, 상위 후보 수를 반드시 남겨야 다음 실험과 비교가 가능합니다.
+
+## 임계값(threshold) 기반 검색에서 자주 하는 실수
+
+top-k 방식은 상대 순위만 보지만, threshold 방식은 절대 점수 기준을 사용합니다. 예를 들어 코사인 점수가 0.62 이상이면 통과시키는 정책을 두면, 도메인이나 질의 길이에 따라 거짓 음성/거짓 양성이 크게 바뀔 수 있습니다.
+
+| 질의 유형 | 권장 접근 |
+|---|---|
+| 짧은 키워드형 질의 | threshold를 다소 높게 설정 |
+| 긴 설명형 질의 | threshold를 낮추고 top-k 확대 |
+| 오류 코드/식별자 질의 | 벡터 threshold보다 lexical 보강 우선 |
+
+threshold는 고정값 하나로 끝내기보다 질의 타입 분류와 함께 운영하는 편이 안정적입니다.
+
+## 거리 함수 선택과 리랭커 연동
+
+대부분 시스템은 1차 검색에서 빠르게 후보를 뽑고, 2차 리랭커로 정밀 정렬합니다. 이때 거리 함수 선택은 1차 후보의 다양성에 영향을 줍니다.
+
+- 코사인 중심 1차 검색은 의미적으로 넓은 후보를 확보하는 데 유리합니다.
+- L2 중심 1차 검색은 좌표 거리 보존이 중요할 때 유리하지만 텍스트 검색에서는 이점이 제한적입니다.
+- 리랭커(예: cross-encoder)를 쓴다면 1차 단계에서 recall 확보를 우선하고, precision은 2차에서 끌어올리는 편이 일반적입니다.
+
+아래는 후보 수와 리랭커 품질의 전형적인 관계 예시입니다.
+
+| 1차 후보 수 | 최종 Recall@5 | 최종 p95(ms) |
+|---:|---:|---:|
+| 10 | 0.84 | 120 |
+| 30 | 0.91 | 170 |
+| 50 | 0.93 | 230 |
+
+즉, 유사도 함수 선택은 리랭커를 포함한 전체 지연 시간 예산 안에서 판단해야 합니다.
+
+## FAISS 인덱스별 유사도 실험 코드 스케치
+
+```python
+import faiss
+import numpy as np
+
+def build_flat_ip(vectors: np.ndarray) -> faiss.Index:
+    index = faiss.IndexFlatIP(vectors.shape[1])
+    index.add(vectors.astype(np.float32))
+    return index
+
+def build_flat_l2(vectors: np.ndarray) -> faiss.Index:
+    index = faiss.IndexFlatL2(vectors.shape[1])
+    index.add(vectors.astype(np.float32))
+    return index
+```
+
+같은 질의셋으로 두 인덱스의 상위 결과를 비교하면, 정규화 여부가 결과 해석에 어떤 영향을 주는지 더 명확하게 보입니다.
+
+## 프로덕션 모니터링 지표
+
+거리 함수를 운영에 올렸다면 아래 지표를 기본으로 수집하는 편이 좋습니다.
+
+- 쿼리별 상위 1위 점수, 상위 5위 평균 점수
+- 무응답 질의 비율(임계값 미달)
+- 질의 길이 구간별 성공률
+- ANN 파라미터(`nprobe`, `efSearch`)별 latency/recall 추세
+
+이 지표를 보면 "점수 함수가 틀렸는지", "청킹이 틀렸는지", "ANN 튜닝이 부족한지"를 훨씬 빠르게 분리할 수 있습니다.
+
+## 코사인 점수 구간을 해석하는 방법
+
+실제 운영에서 점수 숫자만 보고 품질을 직관적으로 읽기 어렵다는 질문이 자주 나옵니다. 아래 구간은 절대 규칙은 아니지만 초기 해석 기준으로 유용합니다.
+
+| 코사인 점수 | 해석 가이드 |
+|---:|---|
+| 0.80 이상 | 의미가 매우 가깝거나 거의 동일한 문맥 |
+| 0.60~0.80 | 관련성이 높아 후보로 충분히 유의미 |
+| 0.40~0.60 | 부분 관련, 리랭커 또는 추가 필터 필요 |
+| 0.40 미만 | 노이즈일 가능성 큼 |
+
+도메인 문서가 기술 용어 중심인지, 일반 문장 중심인지에 따라 실제 구간은 달라지므로 반드시 내부 평가셋으로 재보정해야 합니다.
+
+## 질의 길이와 점수 분포
+
+짧은 질의와 긴 질의는 점수 분포가 다르게 나옵니다. 한두 단어 질의는 의미가 압축되어 상위 점수 편차가 작고, 긴 질의는 문맥 제약이 많아 상위 후보가 분명해지는 경향이 있습니다.
+
+```python
+def classify_query(query: str) -> str:
+    tokens = query.split()
+    if len(tokens) <= 2:
+        return "short"
+    if len(tokens) <= 8:
+        return "medium"
+    return "long"
+```
+
+운영에서는 질의 길이 구간별로 threshold를 다르게 두는 전략이 종종 유효합니다.
+
+## Precision/Recall 트레이드오프 예시
+
+| 정책 | Precision@5 | Recall@5 |
+|---|---:|---:|
+| threshold 0.70 | 0.91 | 0.62 |
+| threshold 0.55 | 0.84 | 0.79 |
+| threshold 0.45 | 0.73 | 0.88 |
+
+지원 챗봇처럼 놓치면 안 되는 환경이라면 recall 쪽으로, 탐색 품질이 중요한 문서 검색이라면 precision 쪽으로 맞추는 식으로 정책을 선택합니다.
+
+## 거리 함수 변경 시 롤아웃 체크리스트
+
+- 기존 함수와 신규 함수로 같은 평가셋을 병렬 실행
+- top-k 결과의 교집합 비율을 계산해 급격한 분포 변화를 점검
+- 품질 지표 외에 p95 latency와 비용 변화를 함께 확인
+- 실패 질의 샘플을 사람이 직접 검토하고 변경 이유를 문서화
+
+이 과정을 거치면 "수학적으로 더 좋아 보이는 함수"가 실제 사용자 질문에서도 좋은지 검증할 수 있습니다.
+
+추가로 기억할 점은 점수 함수가 단독으로 품질을 결정하지 않는다는 사실입니다. 실제 결과는 청킹, 임베딩 모델, ANN 후보 수, 리랭커 정책과 함께 만들어집니다. 그래서 거리 함수 비교 실험은 반드시 동일한 파이프라인 설정에서 진행해야 하며, 하나의 요소만 바꿔 A/B 테스트를 수행해야 원인을 정확히 분리할 수 있습니다.
+
+그리고 실험 결과를 공유할 때는 "어떤 함수가 더 좋다"는 결론만 남기지 말고, 질의 유형별 편차를 함께 기록해야 합니다. 보통 오류 코드, 짧은 명령형 질의, 긴 설명형 질의에서 점수 분포가 다르게 나타나며, 이 차이가 운영 정책을 결정하는 근거가 됩니다.
+
 ## 처음 질문으로 돌아가기
 
 - **벡터가 있으면 왜 바로 검색이 끝나는 게 아니라 거리 척도를 골라야 할까요?**

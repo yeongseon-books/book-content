@@ -172,6 +172,154 @@ kubectl get nodes -L topology.kubernetes.io/zone,agentpool
 
 ## 흔히 헷갈리는 지점
 
+## 배치 정책을 manifest로 명시하는 기본 템플릿
+
+스케줄링 안정성은 코드보다 manifest에서 먼저 결정됩니다.
+아래는 zone 분산, taint 허용, anti-affinity를 동시에 표현한 예시입니다.
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkout-api
+  namespace: prod
+spec:
+  replicas: 6
+  selector:
+    matchLabels:
+      app: checkout-api
+  template:
+    metadata:
+      labels:
+        app: checkout-api
+    spec:
+      tolerations:
+        - key: "workload"
+          operator: "Equal"
+          value: "critical"
+          effect: "NoSchedule"
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: checkout-api
+                topologyKey: kubernetes.io/hostname
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app: checkout-api
+      containers:
+        - name: app
+          image: myacr.azurecr.io/checkout-api:2026.05.1
+          resources:
+            requests:
+              cpu: "300m"
+              memory: "512Mi"
+```
+
+이 수준으로 정책을 명시하면 “왜 특정 노드에 못 갔는가”를 이벤트와 바로 대조할 수 있습니다.
+
+## FailedScheduling 이벤트를 해석하는 실전 예시
+
+Pending Pod를 볼 때는 이벤트 문장을 그대로 읽는 연습이 중요합니다.
+아래처럼 출력이 나오면 실패 원인을 즉시 분리할 수 있습니다.
+
+```text
+Warning  FailedScheduling  14s  default-scheduler
+0/12 nodes are available: 4 Insufficient memory, 5 node(s) didn't match Pod's node affinity, 3 node(s) had untolerated taint {workload: batch}.
+```
+
+이 메시지는 세 가지를 동시에 말합니다.
+메모리 부족 노드가 있고, affinity 규칙에서 탈락한 노드가 있고, toleration이 없어 배치 불가한 노드가 있습니다.
+즉 단일 병목이 아니라 정책과 용량이 겹친 상태입니다.
+
+점검 명령은 아래 순서를 권장합니다.
+
+```bash
+kubectl describe pod checkout-api-7dc4f7d6c8-zkqpx -n prod
+kubectl get nodes -L topology.kubernetes.io/zone,agentpool
+kubectl top nodes
+```
+
+## node pool별 책임 분리를 taint/label로 고정하기
+
+AKS에서는 system pool과 user pool을 분리한 뒤, user pool을 workload 성격별로 나누는 설계가 흔합니다.
+이때 taint/label 정책이 없으면 scheduler는 의도하지 않은 혼합 배치를 만들 수 있습니다.
+
+```bash
+kubectl taint nodes aks-userpool-gpu-000001 workload=gpu:NoSchedule
+kubectl label nodes aks-userpool-gpu-000001 node-type=gpu
+```
+
+그리고 워크로드에는 명시적으로 toleration과 node affinity를 둡니다.
+이렇게 해야 비용이 비싼 노드에 일반 서비스가 무심코 올라가는 상황을 줄일 수 있습니다.
+
+## PDB와 drain 시나리오를 배치 정책과 함께 설계하기
+
+스케줄링 정책은 정상 배치뿐 아니라 유지보수 시점에도 검증돼야 합니다.
+노드 업그레이드나 수동 drain에서 PDB가 너무 엄격하면 배치가 막히고 롤링 작업이 멈춥니다.
+
+```yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: checkout-api-pdb
+  namespace: prod
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: checkout-api
+```
+
+검증 명령:
+
+```bash
+kubectl drain aks-userpool-000004 --ignore-daemonsets --delete-emptydir-data
+kubectl get pdb -n prod
+```
+
+PDB와 스케줄링 제약을 따로 설계하면 운영 중 충돌이 자주 발생합니다.
+둘을 한 세트로 다루는 것이 안정적입니다.
+
+## scheduler 관측 대시보드의 최소 구성
+
+Prometheus/Grafana를 쓰는 클러스터라면 scheduler 계층에서 최소한 다음을 추적해야 합니다.
+
+- `scheduler_pending_pods`
+- `scheduler_e2e_scheduling_duration_seconds`
+- `scheduler_pod_scheduling_attempts_total`
+
+그래프는 zone, node pool, priority class 라벨로 분해해 보는 편이 좋습니다.
+그래야 “전체는 정상인데 특정 pool만 배치 실패가 집중되는” 패턴을 놓치지 않습니다.
+
+## Helm values에서 placement를 재사용 가능한 블록으로 관리하기
+
+여러 서비스가 같은 배치 규칙을 공유한다면 chart values에 placement 블록을 모아 재사용하는 편이 실용적입니다.
+아래 패턴은 팀 내 표준화를 도울 때 유용합니다.
+
+```yaml
+placement:
+  nodeSelector:
+    workload-tier: api
+  tolerations:
+    - key: "workload"
+      operator: "Equal"
+      value: "critical"
+      effect: "NoSchedule"
+  topologySpread:
+    enabled: true
+    maxSkew: 1
+```
+
+템플릿에서 이 값을 공통 partial로 렌더링하면 서비스마다 정책이 어긋나는 문제를 줄일 수 있습니다.
+
 - **scheduler가 Pod를 직접 실행하는 것은 아닙니다.** scheduler의 출력은 `Pod -> Node` Binding입니다.
 - **Pending은 곧바로 kubelet 문제를 뜻하지 않습니다.** feasible node가 없어서 placement 자체가 실패했을 수 있습니다.
 - **Filter와 Score는 같은 단계가 아닙니다.** 하나는 가능 여부를, 다른 하나는 우선순위를 다룹니다.
@@ -180,6 +328,50 @@ kubectl get nodes -L topology.kubernetes.io/zone,agentpool
 
 ## 운영 체크리스트
 
+## 스케줄링 정책 변경 전 검증 플로우
+
+affinity나 topology 정책은 작은 변경도 배치 결과를 크게 바꿉니다.
+그래서 운영 클러스터 반영 전에는 아래 순서를 권장합니다.
+
+1) 스테이징에서 동일 노드 라벨/taint 조건 재현
+2) 변경 전후 Pending 비율 비교
+3) zone 분산도와 노드 편중도 비교
+
+검증 명령:
+
+```bash
+kubectl get pods -n prod -l app=checkout-api -o wide
+kubectl get nodes -L topology.kubernetes.io/zone,agentpool
+kubectl get events -n prod --sort-by=.lastTimestamp | tail -30
+```
+
+정책 변경을 코드 리뷰할 때는 “배치 의도”를 PR 본문에 문장으로 남겨야 합니다.
+예를 들어 “zone 장애 시 가용성 우선으로 maxSkew=1 강제”처럼 목적을 명시해 두면, 이후 회귀 시 빠르게 판단할 수 있습니다.
+
+## 우선순위 정책과 운영 거버넌스
+
+PriorityClass는 기술 설정이면서 동시에 조직 정책입니다.
+무분별하게 높은 우선순위를 사용하면 preemption이 상시화되고, 결과적으로 전체 서비스 안정성이 떨어질 수 있습니다.
+아래처럼 우선순위 계층을 명확히 분리하는 편이 좋습니다.
+
+```yaml
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: critical-api
+value: 100000
+globalDefault: false
+description: "사용자 요청 경로의 핵심 API"
+```
+
+운영 규칙으로는 다음을 권장합니다.
+
+- PriorityClass 신규 생성 시 SLO 근거 필수
+- preemption 영향 대상 서비스 owner 사전 통지
+- 월 1회 우선순위 사용 현황 리뷰
+
+이 거버넌스가 없으면 기술적으로는 맞는 설정도 조직적으로는 큰 충돌을 만듭니다.
+
 - [ ] 핵심 워크로드의 affinity/anti-affinity와 zone spread 정책을 명시했습니다.
 - [ ] PriorityClass 사용 원칙과 preemption 허용 범위를 문서화했습니다.
 - [ ] 모든 node taint와 toleration에 owner를 지정했습니다.
@@ -187,6 +379,24 @@ kubectl get nodes -L topology.kubernetes.io/zone,agentpool
 - [ ] stateful workload의 PVC zone과 node zone 정합성을 사전에 검증했습니다.
 
 ## 정리
+
+## troubleshooting 시나리오: 특정 zone만 계속 과밀해지는 경우
+
+운영에서 자주 보는 패턴은 전체 노드는 여유가 있는데 특정 zone 노드만 과밀해지는 현상입니다.
+대개 `topologySpreadConstraints` 누락, zone 편향된 node affinity, 또는 StatefulSet의 volume zone 제약이 원인입니다.
+
+점검 순서:
+
+```bash
+kubectl get pods -n prod -l app=checkout-api -o wide
+kubectl get nodes -L topology.kubernetes.io/zone
+kubectl describe pod <pod-name> -n prod | grep -E 'Node-Selectors|Tolerations|Events' -A8
+```
+
+개선 원칙은 간단합니다.
+stateless 서비스는 spread를 우선 적용하고, stateful 서비스는 storage topology를 먼저 고정한 뒤 affinity를 조정합니다.
+이 순서를 지키면 zone 편중이 반복되는 문제를 크게 줄일 수 있습니다.
+추가로 배치 결과를 주 단위로 리포트해 node pool별 편중률을 수치로 남기면, 정책 회귀를 감으로 찾지 않아도 됩니다.
 
 kube-scheduler는 Pod를 실행하는 컴포넌트가 아닙니다.
 불가능한 노드를 Filter로 제거하고, 가능한 후보를 Score로 정렬하고, 마지막에 선택 결과를 Binding으로 기록하는 control-plane 루프입니다.

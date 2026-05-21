@@ -336,6 +336,204 @@ for score, idx in zip(scores_l2[0], indices_l2[0]):
 - [ ] 기본값이 아니라 측정값을 바탕으로 nprobe/ef를 조정했다
 - [ ] 벡터 수, 차원 수, 메모리 사용량 메트릭을 추가했다
 
+## HNSW와 IVF로 확장할 때의 실전 기준
+
+Flat 인덱스는 기준선을 만들기에는 좋지만, 트래픽이 커지면 한계가 명확합니다. 그다음 단계에서 가장 자주 검토하는 선택지는 HNSW와 IVF입니다.
+
+| 항목 | HNSW (`IndexHNSWFlat`) | IVF (`IndexIVFFlat`) |
+|---|---|---|
+| 검색 복잡도 경향 | 그래프 탐색 기반, 실무에서 매우 빠름 | coarse quantizer로 후보 축소 |
+| 구축 특성 | 구축 시간/메모리 증가 | 학습(train) 단계 필요 |
+| 온라인 추가 | 비교적 자연스러움 | 가능하지만 분포 변화 시 재학습 고려 |
+| 핵심 파라미터 | `M`, `efConstruction`, `efSearch` | `nlist`, `nprobe` |
+
+초기 운영에서는 HNSW가 튜닝 체감이 직관적이고, IVF는 데이터가 매우 클 때 비용 예측이 좋은 경우가 많습니다.
+
+## HNSW 생성 예시
+
+```python
+import faiss
+import numpy as np
+
+dimension = 384
+vectors = np.random.rand(50000, dimension).astype(np.float32)
+faiss.normalize_L2(vectors)
+
+index_hnsw = faiss.IndexHNSWFlat(dimension, 32)  # M=32
+index_hnsw.hnsw.efConstruction = 200
+index_hnsw.hnsw.efSearch = 64
+index_hnsw.add(vectors)
+
+print(index_hnsw.ntotal)
+```
+
+`efSearch`를 높이면 recall이 좋아지지만 지연 시간도 같이 증가합니다. 그래서 서비스 단계에서는 쿼리 유형별로 `efSearch`를 다르게 주는 정책도 자주 사용합니다.
+
+## IVF 생성 예시
+
+```python
+import faiss
+import numpy as np
+
+dimension = 384
+nlist = 1024
+vectors = np.random.rand(50000, dimension).astype(np.float32)
+faiss.normalize_L2(vectors)
+
+quantizer = faiss.IndexFlatIP(dimension)
+index_ivf = faiss.IndexIVFFlat(quantizer, dimension, nlist, faiss.METRIC_INNER_PRODUCT)
+index_ivf.train(vectors)
+index_ivf.add(vectors)
+index_ivf.nprobe = 24
+
+print(index_ivf.is_trained, index_ivf.ntotal)
+```
+
+IVF는 `train()`을 건너뛰면 검색이 불가능합니다. 학습 데이터는 실제 분포를 반영한 샘플을 써야 합니다. 임의 샘플로 학습하면 recall이 눈에 띄게 떨어집니다.
+
+## 튜닝 로그를 남기는 이유
+
+아래처럼 튜닝 결과를 표로 남기면 팀 의사결정이 빨라집니다.
+
+| 인덱스 | 파라미터 | Recall@10 | p95(ms) | 메모리(GB) |
+|---|---|---:|---:|---:|
+| FlatIP | - | 1.00 | 78 | 1.5 |
+| HNSW | M=32, efSearch=64 | 0.97 | 18 | 2.2 |
+| HNSW | M=32, efSearch=128 | 0.99 | 29 | 2.2 |
+| IVF | nlist=1024, nprobe=12 | 0.92 | 11 | 1.6 |
+| IVF | nlist=1024, nprobe=32 | 0.97 | 22 | 1.6 |
+
+이 기록이 있으면 "느려져도 정확도를 지켜야 하는가" 또는 "정확도를 조금 낮춰도 예산을 줄여야 하는가" 같은 선택을 수치로 논의할 수 있습니다.
+
+## 프로덕션 스케일링 패턴
+
+FAISS를 프로덕션에 올릴 때는 아래 패턴을 함께 설계하는 편이 안전합니다.
+
+- 읽기 트래픽은 인덱스 복제(replica)로 수평 확장
+- 인덱스 빌드와 서비스 인덱스를 분리하고, 원자적 스왑으로 배포
+- 인덱스 버전(`index_version`)과 임베딩 버전(`embedding_version`)을 로그에 동시 기록
+- 대규모 갱신은 증분 추가보다 배치 재구축이 더 안정적인지 주기적으로 검토
+
+이 패턴을 잡아 두면 단순 검색 성능뿐 아니라 장애 복구 시간도 크게 줄어듭니다.
+
+## IVF 파라미터 튜닝 워크플로
+
+IVF를 운영에 올릴 때는 `nlist`와 `nprobe`를 분리해서 튜닝해야 합니다. `nlist`는 인덱스 구조를 결정하고, `nprobe`는 질의 시 탐색 폭을 조절합니다.
+
+1. 데이터 규모를 기준으로 `nlist` 후보를 3개 정도 고릅니다.
+2. 각 `nlist`에 대해 `nprobe`를 증가시키며 recall/latency를 측정합니다.
+3. SLA를 만족하는 최소 `nprobe` 조합을 채택합니다.
+
+```python
+def sweep_nprobe(index_ivf, queries, truths, nprobe_values):
+    rows = []
+    for nprobe in nprobe_values:
+        index_ivf.nprobe = nprobe
+        recall, elapsed = benchmark(index_ivf, queries, truths, k=10)
+        rows.append((nprobe, recall, elapsed))
+    return rows
+```
+
+| nprobe | Recall@10 | p95(ms) |
+|---:|---:|---:|
+| 4 | 0.83 | 7 |
+| 8 | 0.89 | 10 |
+| 16 | 0.94 | 16 |
+| 32 | 0.97 | 28 |
+
+이 표를 보면 보통 16 부근이 균형점이 되는 경우가 많습니다.
+
+## HNSW 파라미터 해석
+
+HNSW에서는 `M`이 그래프 연결 수를, `efSearch`가 검색 시 후보 폭을 의미합니다. 일반적으로 `M`을 높이면 메모리 사용량과 구축 시간이 증가하고, `efSearch`를 높이면 질의 지연 시간이 증가합니다.
+
+| M | efSearch | Recall@10 | p95(ms) | 메모리 증가율 |
+|---:|---:|---:|---:|---:|
+| 16 | 32 | 0.90 | 8 | 1.0x |
+| 32 | 64 | 0.96 | 14 | 1.5x |
+| 48 | 96 | 0.98 | 23 | 2.0x |
+
+서비스가 메모리보다 지연 시간을 더 엄격히 보는지, 반대인지를 먼저 정한 뒤 파라미터를 선택해야 합니다.
+
+## 삭제/업데이트 전략
+
+FAISS Flat 인덱스는 문서 삭제가 잦은 워크로드에 바로 맞지 않습니다. 그래서 보통 아래 전략을 조합합니다.
+
+- tombstone 테이블로 삭제 대상 ID를 별도 관리
+- 조회 시 tombstone ID를 후처리에서 제외
+- 배치 재구축 시 tombstone을 반영해 인덱스를 정리
+
+```python
+def filter_deleted(results, deleted_ids: set[str]):
+    return [r for r in results if r["doc_id"] not in deleted_ids]
+```
+
+업데이트가 매우 잦고 삭제도 빈번하다면, Qdrant/Pinecone 같은 관리형/서버형 벡터 DB가 운영 복잡도를 낮추는 경우가 많습니다.
+
+## 장애 대응 플레이북 요약
+
+인덱스 계층에서 자주 발생하는 문제와 1차 대응을 짧게 정리하면 다음과 같습니다.
+
+| 증상 | 흔한 원인 | 1차 대응 |
+|---|---|---|
+| 점수가 전체적으로 낮아짐 | 정규화 불일치, 모델 교체 | 매니페스트 비교, 재인덱싱 여부 확인 |
+| latency 급증 | nprobe/efSearch 상승, 벡터 수 증가 | 파라미터 롤백, top-k 축소 |
+| 결과 품질 급락 | IVF 학습 샘플 분포 불일치 | train 데이터 재선정 후 재학습 |
+
+이 표를 런북에 포함해 두면 온콜 대응 속도가 크게 빨라집니다.
+
+## 검색 정확도 기준선 구축
+
+ANN 인덱스 튜닝에서 가장 중요한 원칙은 항상 기준선이 있어야 한다는 점입니다. 기준선은 보통 `IndexFlatIP` 또는 `IndexFlatL2`로 만든 정확 검색 결과입니다. 이후 HNSW/IVF 결과를 이 기준선과 비교해 Recall@k를 계산합니다.
+
+```python
+def build_ground_truth(flat_index, queries, k=10):
+    _, indices = flat_index.search(queries, k)
+    return indices
+```
+
+이렇게 기준선을 명시적으로 보관하면 데이터가 바뀌거나 파라미터를 바꿀 때 성능 변화를 정량적으로 추적할 수 있습니다.
+
+## 메모리 계산 감각 잡기
+
+운영 준비 단계에서는 대략적인 메모리 계산을 미리 해 두는 것이 좋습니다.
+
+```text
+메모리(바이트) ≈ 벡터 수(n) × 차원(d) × 4(float32)
+```
+
+예를 들어 `n=3,000,000`, `d=384`이면 벡터 원본만 약 4.3GB입니다. 여기에 HNSW 그래프 오버헤드가 추가되면 훨씬 커집니다. 따라서 인스턴스 선택 전에 여유 메모리를 포함한 용량 계획이 필수입니다.
+
+## 샤딩과 복제 전략
+
+데이터 규모가 커지면 단일 인덱스로는 운영이 어려워집니다. 이때 많이 쓰는 패턴은 샤딩과 복제입니다.
+
+- 샤딩: 문서 ID 해시 또는 도메인별로 인덱스를 분할
+- 복제: 같은 샤드를 여러 노드에 복제해 읽기 처리량 확보
+- 집계: 각 샤드 top-k를 모아 글로벌 top-k 재정렬
+
+이 구조는 복잡도가 늘지만, 대규모 트래픽에서도 지연 시간과 가용성을 유지하는 데 효과적입니다.
+
+## 운영 벤치마크 리포트 템플릿
+
+벤치마크를 할 때 아래 항목을 정해진 형식으로 남기면 비교가 쉬워집니다.
+
+| 항목 | 예시 |
+|---|---|
+| 데이터셋 버전 | `docs_2026_05_20` |
+| 임베딩 모델 | `all-MiniLM-L6-v2` |
+| 인덱스 유형 | `IndexHNSWFlat` |
+| 핵심 파라미터 | `M=32, efSearch=64` |
+| Recall@10 | `0.968` |
+| p95 latency | `18ms` |
+| 메모리 | `2.2GB` |
+
+이 템플릿을 습관화하면 실험이 늘어도 의사결정 품질이 떨어지지 않습니다.
+
+마지막으로 벤치마크 결과를 기록할 때는 단일 평균값보다 분포를 함께 남기는 편이 좋습니다. 특히 검색 시스템은 tail latency가 사용자 체감에 큰 영향을 주므로 p50, p95, p99를 함께 비교해야 합니다. 같은 평균이라도 p99가 급격히 나빠지면 실제 서비스에서는 불안정하게 느껴집니다.
+
+이 관점은 인덱스 선택뿐 아니라 용량 계획에서도 동일하게 적용됩니다.
+
 ## 처음 질문으로 돌아가기
 
 - **벡터가 많아질수록 단순 반복 검색은 어디서 한계가 날까요?**

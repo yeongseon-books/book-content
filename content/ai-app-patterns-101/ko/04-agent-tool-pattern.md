@@ -348,6 +348,210 @@ def safe_divide(a: float, b: float) -> str:
 
 다음 글에서는 워크플로 자동화를 다룹니다. 각 단계가 데이터를 변환해 다음 단계로 넘기는 다단계 체인 설계입니다.
 
+---
+
+## 도구 호출을 안전하게 감싸는 오케스트레이션 계층
+
+### 도구 입력 스키마 검증
+
+에이전트의 자유도는 도구 입력 검증이 있을 때만 안전합니다. 아래처럼 도구 호출 직전에 스키마를 확인하면 잘못된 호출을 Observation으로 되돌릴 수 있습니다.
+
+```python
+from pydantic import BaseModel, ValidationError
+
+class UnitConvertArgs(BaseModel):
+    value: float
+    from_unit: str
+    to_unit: str
+
+def call_unit_convert_with_validation(raw_args: dict) -> str:
+    try:
+        args = UnitConvertArgs.model_validate(raw_args)
+    except ValidationError as exc:
+        return f"error: invalid arguments - {exc.errors()}"
+
+    return unit_convert.invoke({
+        'value': args.value,
+        'from_unit': args.from_unit,
+        'to_unit': args.to_unit,
+    })
+```
+
+이 계층은 사소해 보여도 운영 안정성을 크게 올립니다. 모델이 `"100km"` 같은 문자열을 숫자 필드에 넣었을 때 즉시 실패 원인을 기록하고, 에이전트가 다른 전략을 선택할 기회를 줍니다.
+
+### 에이전트 런타임 상태 다이어그램
+
+```mermaid
+flowchart LR
+    U[사용자 입력] --> T[Thought]
+    T --> A[Action 선택]
+    A --> V{스키마 검증}
+    V -->|통과| X[도구 실행]
+    V -->|실패| O[Observation 오류]
+    X --> O
+    O --> T
+    T --> F[Final Answer]
+```
+
+*검증이 포함된 에이전트 런타임 루프*
+
+### FastAPI 에이전트 실행 엔드포인트
+
+```python
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class AgentRequest(BaseModel):
+    question: str
+
+@app.post('/agent/run')
+def run_agent(req: AgentRequest):
+    result = agent_executor.invoke({'input': req.question})
+    steps = [
+        {
+            'tool': action.tool,
+            'tool_input': str(action.tool_input),
+            'observation': observation,
+        }
+        for action, observation in result['intermediate_steps']
+    ]
+    return {
+        'question': req.question,
+        'answer': result['output'],
+        'steps': steps,
+    }
+```
+
+이 응답 형식은 에이전트 관측 가능성의 핵심입니다. 호출자는 "왜 이런 답을 냈는가"를 단계별로 확인할 수 있고, 운영자는 실패 사례를 재현 가능한 케이스로 축적할 수 있습니다.
+
+## 도구 호출 권한 경계와 시간 제한
+
+실전에서는 모든 도구를 모든 요청에 열어 두지 않습니다. 사용자 역할, 조직 정책, 요청 위험도에 따라 노출 가능한 도구 집합을 줄여야 합니다.
+
+```python
+ROLE_TOOL_POLICY = {
+    'viewer': {'word_count', 'get_current_time'},
+    'support': {'word_count', 'get_current_time', 'search_policy'},
+    'analyst': {'word_count', 'get_current_time', 'calculate', 'unit_convert'},
+}
+
+def allowed_tools_for_role(role: str, all_tools: list):
+    allowed_names = ROLE_TOOL_POLICY.get(role, set())
+    return [t for t in all_tools if t.name in allowed_names]
+```
+
+### 타임아웃과 서킷 브레이커
+
+도구가 외부 API를 호출할 때는 시간 제한이 없으면 에이전트 루프 전체가 묶입니다. 각 도구에 timeout과 재시도 정책을 분리해 두는 편이 안전합니다.
+
+```python
+import time
+
+def call_with_timeout(tool_fn, kwargs: dict, timeout_sec: float = 2.0):
+    start = time.time()
+    result = tool_fn(**kwargs)
+    elapsed = time.time() - start
+    if elapsed > timeout_sec:
+        return f"error: tool_timeout elapsed={elapsed:.2f}s"
+    return result
+```
+
+이 계층이 없으면 에이전트 실패가 모델 추론 문제인지 외부 도구 지연인지 분해하기 어렵습니다.
+
+### 에이전트 API 응답 계약 확장
+
+```json
+{
+  "question": "100 km를 mile로 변환해줘",
+  "answer": "100 km는 약 62.1371 mile입니다.",
+  "steps": [
+    {
+      "tool": "unit_convert",
+      "tool_input": "{"value":100,"from_unit":"km","to_unit":"mile"}",
+      "observation": "100 km = 62.1371 mile"
+    }
+  ],
+  "runtime": {
+    "iterations": 1,
+    "guardrails": ["schema_validation", "tool_timeout"]
+  }
+}
+```
+
+응답에 실행 메타데이터를 포함하면, 호출자 시스템이 재시도 여부와 실패 분류를 기계적으로 처리할 수 있습니다.
+
+## 에이전트 실패 분류와 대응 플레이북
+
+에이전트 운영에서는 실패를 유형별로 분류해 두어야 대응 속도가 올라갑니다. 대표적인 실패 유형은 다음과 같습니다.
+
+- `tool_not_found`: 모델이 허용되지 않은 도구명을 생성
+- `tool_argument_invalid`: 입력 스키마 불일치
+- `tool_runtime_error`: 도구 내부 예외
+- `max_iterations_exceeded`: 루프 중단 조건 도달
+
+```python
+def classify_agent_failure(result: dict) -> str:
+    if result.get('output'):
+        return 'success'
+
+    steps = result.get('intermediate_steps', [])
+    if not steps:
+        return 'no_action_generated'
+
+    last_obs = str(steps[-1][1]).lower()
+    if 'invalid arguments' in last_obs:
+        return 'tool_argument_invalid'
+    if 'timeout' in last_obs:
+        return 'tool_runtime_error'
+    return 'unknown_failure'
+```
+
+### 플레이북 예시
+
+```text
+if tool_argument_invalid -> 도구 스키마 힌트 강화 + few-shot 추가
+if tool_runtime_error -> timeout/retry 정책 점검
+if max_iterations_exceeded -> 프롬프트 종료 조건 명시 강화
+```
+
+이런 분류가 있으면 "에이전트가 가끔 이상함" 같은 모호한 운영 리포트를 실질적인 개선 작업으로 바꿀 수 있습니다.
+
+## 시스템 프롬프트 최소 템플릿
+
+에이전트 품질은 프롬프트 길이보다 제약의 명확성에 좌우됩니다. 아래처럼 도구 선택 규칙을 짧게 고정하면 루프 안정성이 좋아집니다.
+
+```text
+당신은 도구 기반 어시스턴트입니다.
+규칙 1) 도구가 필요한 질문만 Action을 생성합니다.
+규칙 2) 도구 인자는 JSON 스키마를 따릅니다.
+규칙 3) Observation이 error면 원인을 설명하고 재시도는 최대 1회만 합니다.
+규칙 4) 근거가 충분하면 Final Answer를 작성하고 종료합니다.
+```
+
+짧은 규칙이라도 반복 가능한 실패를 크게 줄일 수 있습니다. 에이전트는 "무엇을 할 수 있는가"보다 "무엇을 하면 안 되는가"를 명확히 줄 때 안정성이 올라갑니다.
+
+### 도구 선택 회귀 테스트
+
+에이전트 변경 시에는 최소 20개 내외의 질문 세트를 고정해 첫 번째 선택 도구가 기대값과 일치하는지 자동 점검하는 편이 좋습니다. 이 테스트가 있으면 프롬프트 수정이 도구 라우팅을 깨뜨리는 회귀를 빠르게 잡을 수 있습니다.
+
+### 도구 설명 품질 점검
+
+docstring은 에이전트의 라우팅 데이터입니다. "무엇을 하는가"뿐 아니라 "무엇을 하지 않는가"를 함께 써 두면 오선택을 크게 줄일 수 있습니다.
+
+### 운영 회고에서 반드시 남길 항목
+
+패턴 설계가 실제로 효과가 있었는지는 회고 기록 품질에서 드러납니다. 각 글에서 다룬 구조를 실서비스에 적용했다면, 최소한 다음 항목은 공통 템플릿으로 남기는 편이 좋습니다.
+
+- 변경 전/후의 실패 유형 분포
+- 변경 전/후의 평균 지연 시간과 p95
+- 사람이 개입한 건수와 자동 처리 건수 비율
+- 근거 부족, 파싱 실패, 도구 오류 같은 실패 코드의 추세
+- 다음 분기에서 조정할 임계값 또는 프롬프트 버전
+
+이 기록이 쌓이면 모델 자체 성능보다 애플리케이션 패턴 결정이 어떤 영향을 주었는지 분리해서 볼 수 있습니다. 결국 운영 품질은 한 번의 정답 설계가 아니라, 측정 가능한 개선 루프를 오래 유지하는 능력에서 만들어집니다.
+
 ## 처음 질문으로 돌아가기
 
 - **에이전트가 “도구를 고른다”는 말은 실제로 어디까지 자율적이라는 뜻일까요?**

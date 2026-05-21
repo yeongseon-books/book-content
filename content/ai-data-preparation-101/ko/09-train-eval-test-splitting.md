@@ -221,6 +221,208 @@ def production_split(df: pd.DataFrame, time_col: str, group_col: str | None = No
 
 이 함수가 좋은 이유는 거의 모든 실전 상황을 포괄하기 때문입니다. 먼저 미래 데이터를 test로 떼고, 과거 구간 안에서 사용자 누수나 클래스 불균형을 추가로 다룹니다.
 
+## contamination 검사를 배치 파이프라인으로 내장하기
+
+분할 전략이 아무리 좋아도 contamination 검사를 수동으로 돌리면 운영에서 빠지기 쉽습니다. 따라서 split 단계 바로 뒤에 decontamination 단계를 DAG로 강제하는 편이 안전합니다.
+
+```python
+SPLIT_DAG = {
+    "build_raw_snapshot": [],
+    "split_temporal_group": ["build_raw_snapshot"],
+    "cross_dedup_train_eval": ["split_temporal_group"],
+    "ngram_contamination_scan": ["cross_dedup_train_eval"],
+    "publish_split_manifest": ["ngram_contamination_scan"],
+}
+```
+
+## 분할 결과 매니페스트 예시
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class SplitManifest:
+    dataset_version: str
+    split_strategy: str
+    train_rows: int
+    val_rows: int
+    test_rows: int
+    time_cutoff: str
+    group_column: str | None
+    contamination_ratio_test: float
+    overlap_removed_train_rows: int
+
+manifest = SplitManifest(
+    dataset_version="v2.3.0",
+    split_strategy="temporal+group",
+    train_rows=420_000,
+    val_rows=72_000,
+    test_rows=88_000,
+    time_cutoff="2026-03-01",
+    group_column="user_id",
+    contamination_ratio_test=0.006,
+    overlap_removed_train_rows=5142,
+)
+```
+
+이 매니페스트가 있어야 실험 결과를 비교할 때 “모델 차이”와 “평가 조건 차이”를 분리할 수 있습니다.
+
+## contamination 샘플 리포트
+
+```python
+def collect_contamination_examples(eval_docs, pretrain_docs, overlap_fn, top_k=20):
+    rows = []
+    for e in eval_docs:
+        score, matched = overlap_fn(e, pretrain_docs)
+        if score > 0.5:
+            rows.append({"eval": e[:160], "score": score, "matched": matched[:160]})
+    rows.sort(key=lambda x: x["score"], reverse=True)
+    return rows[:top_k]
+```
+
+숫자만으로는 현상을 오해하기 쉽습니다. 상위 오염 샘플 몇 건을 사람이 직접 확인하면 threshold 조정이 훨씬 정확해집니다.
+
+## before/after 분할 샘플
+
+```text
+[잘못된 분할]
+train: 2026-04 데이터 포함
+test : 2026-03 데이터 포함
+
+[개선된 분할]
+train: <= 2026-02
+val  : 2026-02 일부
+test : >= 2026-03
+```
+
+이처럼 시간 축을 정직하게 맞추면 오프라인 점수는 낮아질 수 있지만, 배포 후 성능과의 괴리는 줄어듭니다.
+
+## DVC stage로 split 재현성 확보
+
+```yaml
+stages:
+  split_dataset:
+    cmd: python pipelines/split_dataset.py --strategy temporal_group --time-col timestamp --group-col user_id
+    deps:
+      - pipelines/split_dataset.py
+      - data/quality/train_filtered.parquet
+    outs:
+      - data/splits/train.parquet
+      - data/splits/val.parquet
+      - data/splits/test.parquet
+    metrics:
+      - reports/split_manifest.json
+      - reports/contamination_report.json
+```
+
+분할은 실험 전처리가 아니라 평가 계약입니다. 계약을 코드와 버전으로 남겨야 이후 모델 개선도 신뢰할 수 있습니다.
+
+## split 검증 자동화
+
+좋은 전략을 선택해도 검증을 자동화하지 않으면 쉽게 무너집니다. split 생성 직후 아래 검사를 모두 통과해야 다음 단계로 넘기는 것이 안전합니다.
+
+```python
+def validate_split(train_df, val_df, test_df, group_col=None):
+    checks = {}
+    checks["non_empty"] = len(train_df) > 0 and len(val_df) > 0 and len(test_df) > 0
+    checks["disjoint_index"] = (
+        set(train_df.index).isdisjoint(val_df.index) and
+        set(train_df.index).isdisjoint(test_df.index) and
+        set(val_df.index).isdisjoint(test_df.index)
+    )
+    if group_col:
+        checks["group_disjoint"] = (
+            set(train_df[group_col]).isdisjoint(val_df[group_col]) and
+            set(train_df[group_col]).isdisjoint(test_df[group_col]) and
+            set(val_df[group_col]).isdisjoint(test_df[group_col])
+        )
+    return checks
+```
+
+## 클래스 분포 안정성 점검
+
+```python
+def class_ratio(df, label_col):
+    vc = df[label_col].value_counts(normalize=True)
+    return {k: float(v) for k, v in vc.items()}
+
+def max_ratio_delta(a: dict, b: dict) -> float:
+    keys = set(a) | set(b)
+    return max(abs(a.get(k, 0.0) - b.get(k, 0.0)) for k in keys)
+```
+
+train/val/test 간 최대 분포 차이가 과도하면 분할 기준을 다시 잡아야 합니다. 특히 소수 클래스에서는 1~2% 차이도 실제 운영 지표에 크게 반영될 수 있습니다.
+
+## contamination 대응 단계
+
+1. `ngram overlap > threshold` 샘플을 추출합니다.
+2. 사람이 상위 샘플을 검토해 false positive를 제거합니다.
+3. 확정된 오염 샘플은 train에서 제거하고 report에 기록합니다.
+4. 제거 전/후 성능을 같이 보고 평가 신뢰도 변화를 확인합니다.
+
+이 루프를 자동화하면 “점수는 높은데 믿을 수 없는 평가” 상태를 훨씬 줄일 수 있습니다.
+
+## 운영에서 바로 쓰는 점검 질문
+
+아래 질문은 배포 직전 리뷰에서 실제로 자주 쓰는 체크 항목입니다. 단순 문서 확인이 아니라, 각 질문에 대해 파일 경로나 지표 값으로 즉시 답할 수 있어야 합니다.
+
+1. 이번 데이터셋은 어떤 버전에서 왔고, sha256은 무엇인가요?
+2. 지난 배치 대비 duplicate/null/length 분포가 얼마나 변했나요?
+3. 제거된 샘플은 어떤 규칙 때문에 빠졌고, 상위 제거 사유는 무엇인가요?
+4. train/eval/test 경계에서 누수 가능성은 수치로 얼마나 남아 있나요?
+5. 이번 배치에서 사람이 검토한 샘플과 발견된 오류 유형은 무엇인가요?
+
+```python
+def release_readiness(summary: dict) -> tuple[bool, list[str]]:
+    issues = []
+    if not summary.get("dataset_sha256"):
+        issues.append("missing_dataset_sha256")
+    if summary.get("duplicate_ratio", 1.0) > 0.10:
+        issues.append("duplicate_ratio_too_high")
+    if summary.get("null_ratio", 1.0) > 0.02:
+        issues.append("null_ratio_too_high")
+    if summary.get("contamination_ratio", 1.0) > 0.01:
+        issues.append("contamination_ratio_too_high")
+    if summary.get("human_reviewed_rows", 0) < 100:
+        issues.append("insufficient_human_review")
+    return len(issues) == 0, issues
+```
+
+운영 팀은 이 함수를 그대로 쓰지 않더라도 같은 개념을 파이프라인 게이트로 구현해야 합니다. 핵심은 “준비가 되었는지 느낌으로 판단하지 않는다”는 점입니다.
+
+## 실무 로그 예시
+
+```text
+[release-check] dataset=v2.4.1 sha=4fb1...
+[release-check] duplicate_ratio=0.061 null_ratio=0.008
+[release-check] contamination_ratio=0.004 human_reviewed_rows=240
+[release-check] status=PASS
+```
+
+이 로그 한 묶음이 있으면 모델 성능이 흔들릴 때도 데이터 준비 단계를 빠르게 제외하거나 집중 점검할 수 있습니다. 데이터 준비의 품질은 글 한 편의 설명보다, 이런 반복 가능한 검증 로그에서 드러납니다.
+
+### 테스트셋 접근 제어
+
+테스트셋은 배포 직전 검증에만 사용하고, 실험 반복 단계에서는 접근을 제한하는 편이 좋습니다. 저장소 권한과 CI job 분리로 접근 경로를 명시하면 무의식적인 test overfitting을 크게 줄일 수 있습니다.
+
+### 릴리스 노트에 남겨야 할 최소 항목
+
+해당 단계의 변경은 릴리스 노트에도 남겨야 합니다. 최소한 `변경 규칙`, `영향받은 행 수`, `핵심 지표 변화`, `롤백 경로` 네 항목이 있어야 다음 배치에서 같은 판단을 반복할 수 있습니다.
+
+분할 규칙 변경은 항상 독립 실험으로 기록해 모델 변경 효과와 분리해 해석해야 합니다.
+
+시간 기준 분할에서는 서비스 이벤트(프로모션, 장애 공지) 전후 구간을 별도 슬라이스로 점검하면 평가 신뢰도가 더 높아집니다.
+
+또한 split manifest를 실험 로그와 같이 보관해, 모델 점수 변화가 데이터 경계 변경 때문인지 모델 개선 때문인지 명확히 구분해야 합니다. 이 절차가 없으면 팀 내 성능 해석이 자주 충돌합니다.
+
+평가셋 접근 로그를 남기면 무의식적 누수를 사후에라도 추적할 수 있습니다.
+
+분할 결과는 리뷰 승인 후 고정해야 합니다.
+
+검증 로그의 보존 기간도 미리 정하는 것이 좋습니다.
+
+자동 점검을 권장합니다.
+
 ## 흔히 헷갈리는 지점
 
 - **random split이면 대부분 충분합니다**: 시간, 사용자, 클래스 구조를 무시하면 운영과 전혀 다른 쉬운 평가 문제가 됩니다.

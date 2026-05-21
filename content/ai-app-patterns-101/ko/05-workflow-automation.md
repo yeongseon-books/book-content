@@ -347,6 +347,262 @@ print(f"\n=== final report ===\n{result['report']}")
 
 마지막 글에서는 Human-in-the-loop 설계를 다룹니다. 자동화 파이프라인 안에 사람 검토와 승인 게이트를 삽입하는 방식입니다.
 
+---
+
+## 워크플로 오케스트레이션과 상태 전이
+
+### 단계 상태를 가진 오케스트레이터
+
+다단계 체인을 운영할 때는 각 단계의 성공/실패를 구조화해서 남겨야 합니다. 아래 예시는 상태 전이 기록을 포함한 최소 오케스트레이터입니다.
+
+```python
+from dataclasses import dataclass, field
+from datetime import datetime
+
+@dataclass
+class StageEvent:
+    stage: str
+    status: str
+    timestamp: str
+    detail: str = ""
+
+@dataclass
+class WorkflowRun:
+    run_id: str
+    input_text: str
+    events: list[StageEvent] = field(default_factory=list)
+    outputs: dict = field(default_factory=dict)
+
+    def mark(self, stage: str, status: str, detail: str = ""):
+        self.events.append(StageEvent(
+            stage=stage,
+            status=status,
+            timestamp=datetime.utcnow().isoformat(),
+            detail=detail,
+        ))
+
+def run_workflow(text: str) -> WorkflowRun:
+    run = WorkflowRun(run_id='wf-001', input_text=text)
+
+    run.mark('classify', 'started')
+    category = 'TECHNICAL'
+    run.outputs['category'] = category
+    run.mark('classify', 'completed', detail=f'category={category}')
+
+    run.mark('summarize', 'started')
+    summary = f'요약: {text[:100]}...'
+    run.outputs['summary'] = summary
+    run.mark('summarize', 'completed')
+
+    run.mark('response', 'started')
+    response = f'[{category}] {summary}'
+    run.outputs['response'] = response
+    run.mark('response', 'completed')
+
+    return run
+```
+
+이벤트 로그가 있으면 실패가 나도 "최종 결과 없음"으로 끝나지 않습니다. 어느 단계까지 성공했는지 보이기 때문에 재시작 지점을 명확히 잡을 수 있습니다.
+
+### 워크플로 다이어그램
+
+```mermaid
+flowchart LR
+    I[입력] --> C[분류]
+    C --> S[요약]
+    S --> R[응답 생성]
+    R --> P[발송]
+    C --> L[분기 로그]
+    S --> L
+    R --> L
+```
+
+*단계별 상태 이벤트를 남기는 워크플로*
+
+### 운영 체크: 재시도와 멱등성
+
+워크플로 자동화는 재시도 설계를 빼면 반쪽짜리입니다. 같은 입력이 두 번 들어와도 결과가 중복 발송되지 않도록 `idempotency_key`를 두고, 단계별 재시도 횟수를 제한해야 합니다.
+
+- `idempotency_key`: 외부 요청 ID 또는 `(customer_id, request_ts)` 해시
+- `retry_policy`: 단계별 `max_retries`, backoff, timeout
+- `dead_letter_queue`: 반복 실패 건의 격리 저장소
+
+이 기준이 없으면 장애 상황에서 자동화가 복구를 돕는 대신 중복 실행을 늘려 문제를 키우게 됩니다.
+
+## 워크플로를 API와 이벤트로 분리하기
+
+순차 체인이 한 프로세스에서만 돌아가면 장애 복구와 확장이 어렵습니다. 그래서 보통 트리거 API와 실행 워커를 분리합니다.
+
+```python
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class WorkflowRequest(BaseModel):
+    request_id: str
+    text: str
+
+work_queue: list[dict] = []
+
+@app.post('/workflow/submit')
+def submit(req: WorkflowRequest):
+    work_queue.append({'request_id': req.request_id, 'text': req.text, 'status': 'queued'})
+    return {'request_id': req.request_id, 'status': 'queued'}
+```
+
+```python
+def worker_once():
+    if not work_queue:
+        return None
+
+    item = work_queue.pop(0)
+    run = run_workflow(item['text'])
+    return {
+        'request_id': item['request_id'],
+        'status': 'completed',
+        'outputs': run.outputs,
+        'events': [e.__dict__ for e in run.events],
+    }
+```
+
+### 승인 게이트를 포함한 워크플로 확장
+
+자동화 파이프라인에 사람 승인을 넣어야 할 때는 별도 상태를 둡니다.
+
+```text
+queued -> running -> waiting_approval -> approved -> completed
+queued -> running -> waiting_approval -> rejected
+queued -> running -> failed
+```
+
+이 상태 전이가 있으면 대시보드에서 "왜 멈췄는가"를 한눈에 확인할 수 있습니다.
+
+### 운영 메트릭
+
+워크플로 자동화에서는 모델 품질 지표와 함께 프로세스 지표를 같이 봐야 합니다.
+
+- `p95_stage_latency`: 단계별 지연 시간
+- `reprocess_rate`: 재처리 비율
+- `approval_wait_time`: 사람 승인 대기 시간
+- `dead_letter_count`: 반복 실패 건수
+
+이 네 가지가 잡혀 있으면 자동화가 실제로 효율을 높이는지, 단지 복잡도만 늘렸는지 판단할 수 있습니다.
+
+## LangGraph 스타일 상태 머신으로 확장하기
+
+워크플로가 길어지면 순차 함수 호출보다 상태 머신이 관리하기 쉽습니다. 노드별 책임을 분리하고 상태 객체를 공유하면 분기와 재시도를 명확히 다룰 수 있습니다.
+
+```python
+from typing import TypedDict
+
+class FlowState(TypedDict):
+    request_id: str
+    inquiry: str
+    category: str
+    summary: str
+    answer: str
+    needs_approval: bool
+
+def node_classify(state: FlowState) -> FlowState:
+    state['category'] = 'BILLING'
+    state['needs_approval'] = state['category'] == 'BILLING'
+    return state
+
+def node_summarize(state: FlowState) -> FlowState:
+    state['summary'] = state['inquiry'][:120]
+    return state
+
+def node_answer(state: FlowState) -> FlowState:
+    state['answer'] = f"[{state['category']}] {state['summary']}"
+    return state
+```
+
+### 상태 기반 분기 다이어그램
+
+```mermaid
+flowchart LR
+    A[Start] --> B[Classify]
+    B --> C[Summarize]
+    C --> D[Generate Answer]
+    D --> E{needs_approval}
+    E -->|true| F[Approval Queue]
+    E -->|false| G[Deliver]
+```
+
+*상태 플래그 기반 승인 분기*
+
+### 왜 상태 머신이 유리한가
+
+- 단계 추가 시 기존 코드 영향 범위를 줄일 수 있습니다.
+- 실패 노드를 기준으로 재시작하기 쉽습니다.
+- 대시보드에서 현재 노드를 그대로 보여 줄 수 있습니다.
+
+이 특성 덕분에 워크플로 자동화는 기능 개발보다 운영 단계에서 더 큰 이점을 얻습니다.
+
+## 장애 복구 런북: 단계 재실행
+
+워크플로 장애 대응은 전체 재실행보다 단계 재실행이 기본이어야 합니다. 이를 위해 각 단계 출력 아티팩트를 저장해 둡니다.
+
+```text
+artifact://run_id/classify.json
+artifact://run_id/summary.txt
+artifact://run_id/response.txt
+```
+
+```python
+def resume_from_stage(run_id: str, stage: str):
+    if stage == 'summarize':
+        classify = load_artifact(run_id, 'classify.json')
+        return rerun_summarize_and_after(run_id, classify)
+    if stage == 'response':
+        summary = load_artifact(run_id, 'summary.txt')
+        return rerun_response_only(run_id, summary)
+    raise ValueError('unsupported stage')
+```
+
+재실행 단위를 단계로 제한하면 장애 대응 시간이 줄고, 중복 발송 같은 2차 사고를 줄일 수 있습니다.
+
+### Flask 상태 조회 엔드포인트
+
+```python
+from flask import Flask, jsonify
+app = Flask(__name__)
+
+RUNS = {}
+
+@app.get('/workflow/<run_id>')
+def get_workflow_run(run_id: str):
+    data = RUNS.get(run_id)
+    if not data:
+        return jsonify({'error': 'not found'}), 404
+    return jsonify(data)
+```
+
+운영자는 이 엔드포인트로 현재 단계와 실패 이유를 즉시 확인할 수 있습니다. 워크플로 자동화의 품질은 기능 수보다 관측 가능성에서 결정됩니다.
+
+### 단계별 타임아웃 정책
+
+긴 워크플로에서 전체 타임아웃 하나만 두면 병목 단계를 찾기 어렵습니다. 분류 3초, 요약 8초, 응답 생성 8초처럼 단계별 제한 시간을 분리하면 지연 원인을 빠르게 좁힐 수 있습니다.
+
+### 배포 전 드라이런
+
+워크플로 변경을 배포할 때는 실데이터 대신 샘플 100건으로 드라이런을 수행해 단계별 성공률과 지연 시간을 비교해야 합니다. 드라이런 리포트 없이 배포하면 변경 영향 범위를 과소평가하기 쉽습니다.
+
+### 운영 회고에서 반드시 남길 항목
+
+패턴 설계가 실제로 효과가 있었는지는 회고 기록 품질에서 드러납니다. 각 글에서 다룬 구조를 실서비스에 적용했다면, 최소한 다음 항목은 공통 템플릿으로 남기는 편이 좋습니다.
+
+- 변경 전/후의 실패 유형 분포
+- 변경 전/후의 평균 지연 시간과 p95
+- 사람이 개입한 건수와 자동 처리 건수 비율
+- 근거 부족, 파싱 실패, 도구 오류 같은 실패 코드의 추세
+- 다음 분기에서 조정할 임계값 또는 프롬프트 버전
+
+이 기록이 쌓이면 모델 자체 성능보다 애플리케이션 패턴 결정이 어떤 영향을 주었는지 분리해서 볼 수 있습니다. 결국 운영 품질은 한 번의 정답 설계가 아니라, 측정 가능한 개선 루프를 오래 유지하는 능력에서 만들어집니다.
+
+이 항목을 주간 리듬으로 점검하면, 자동화 품질이 우연이 아니라 재현 가능한 운영 습관으로 자리잡습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **다단계 체인은 언제 단순 순차 실행이고 언제 라우팅이 필요할까요?**

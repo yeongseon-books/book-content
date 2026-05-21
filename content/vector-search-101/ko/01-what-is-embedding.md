@@ -295,6 +295,132 @@ for item in sorted(results, key=lambda x: (-x["keyword_overlap"], -x["cosine"]))
 - [ ] 직접 고른 몇 개의 문장 쌍으로 유사도를 계산해 품질을 기본 점검했다
 - [ ] 임베딩 모델이 바뀔 때를 위한 재인덱싱 절차를 작성했다
 
+## 임베딩 생성 계약을 코드로 고정하기
+
+개념을 이해한 뒤 실제 서비스에 붙일 때 가장 먼저 해야 할 일은 임베딩 생성 계약을 코드로 고정하는 것입니다. 여기서 계약이란 `모델 이름`, `차원 수`, `정규화 여부`, `입력 전처리`, `출력 dtype`을 명시하고, 실행마다 같은 규칙을 강제하는 것을 뜻합니다. 이 계약이 느슨하면 같은 문장을 다른 조건으로 임베딩해 점수가 흔들리고, 인덱스 재현이 깨집니다.
+
+```python
+from dataclasses import dataclass
+
+import numpy as np
+from sentence_transformers import SentenceTransformer
+
+@dataclass(frozen=True)
+class EmbeddingSpec:
+    model_name: str
+    dimension: int
+    normalize: bool
+    dtype: str
+
+SPEC = EmbeddingSpec(
+    model_name="sentence-transformers/all-MiniLM-L6-v2",
+    dimension=384,
+    normalize=True,
+    dtype="float32",
+)
+
+_model = SentenceTransformer(SPEC.model_name)
+
+def embed_texts(texts: list[str]) -> np.ndarray:
+    vectors = _model.encode(texts, normalize_embeddings=SPEC.normalize)
+    vectors = np.asarray(vectors, dtype=np.float32)
+    if vectors.shape[1] != SPEC.dimension:
+        raise ValueError(f"dimension mismatch: got {vectors.shape[1]}, expected {SPEC.dimension}")
+    return vectors
+```
+
+이 패턴의 장점은 단순합니다. 이후 FAISS, Chroma, Qdrant, Pinecone으로 저장소를 바꿔도 임베딩 생성 규칙은 변하지 않습니다. 즉, 인덱스 계층을 바꿔도 점수 의미가 유지됩니다.
+
+## 벡터 저장소별 최소 연결 예시
+
+임베딩이 무엇인지 이해한 뒤에는 "어디에 넣을 것인가"가 자연스럽게 따라옵니다. 아래 예시는 개념 비교용으로 최소 코드만 남긴 형태입니다.
+
+```python
+# Chroma
+from chromadb import PersistentClient
+
+client = PersistentClient(path="./chroma-data")
+collection = client.get_or_create_collection(name="docs-mini")
+collection.add(
+    ids=["d1", "d2"],
+    documents=["Vector search introduction", "ANN indexing basics"],
+    embeddings=embed_texts(["Vector search introduction", "ANN indexing basics"]).tolist(),
+)
+```
+
+```python
+# Qdrant
+from qdrant_client import QdrantClient
+from qdrant_client.models import Distance, PointStruct, VectorParams
+
+qdrant = QdrantClient(path="./qdrant-local")
+qdrant.recreate_collection(
+    collection_name="docs-mini",
+    vectors_config=VectorParams(size=SPEC.dimension, distance=Distance.COSINE),
+)
+vectors = embed_texts(["Vector search introduction", "ANN indexing basics"])
+qdrant.upsert(
+    collection_name="docs-mini",
+    points=[
+        PointStruct(id=1, vector=vectors[0].tolist(), payload={"text": "Vector search introduction"}),
+        PointStruct(id=2, vector=vectors[1].tolist(), payload={"text": "ANN indexing basics"}),
+    ],
+)
+```
+
+```python
+# Pinecone (managed service)
+from pinecone import Pinecone, ServerlessSpec
+
+pc = Pinecone(api_key="${PINECONE_API_KEY}")
+index_name = "docs-mini"
+if index_name not in [idx["name"] for idx in pc.list_indexes()]:
+    pc.create_index(
+        name=index_name,
+        dimension=SPEC.dimension,
+        metric="cosine",
+        spec=ServerlessSpec(cloud="aws", region="us-east-1"),
+    )
+index = pc.Index(index_name)
+vectors = embed_texts(["Vector search introduction", "ANN indexing basics"])
+index.upsert(
+    vectors=[
+        ("d1", vectors[0].tolist(), {"text": "Vector search introduction"}),
+        ("d2", vectors[1].tolist(), {"text": "ANN indexing basics"}),
+    ]
+)
+```
+
+세 저장소 모두 API 모양은 다르지만 공통 원칙은 같습니다. `dimension`, `metric`, `metadata schema`가 임베딩 계약과 일치해야 합니다.
+
+## HNSW와 IVF를 처음 볼 때의 기준
+
+ANN 인덱스 알고리즘은 복잡해 보이지만 초반 기준은 간단하게 잡을 수 있습니다.
+
+| 항목 | HNSW | IVF |
+|---|---|---|
+| 핵심 아이디어 | 그래프를 따라 근접 후보 탐색 | 군집 중심을 먼저 찾고 일부 버킷만 탐색 |
+| 장점 | 높은 recall, 온라인 업데이트에 비교적 강함 | 메모리 효율, 대규모에서 예측 가능한 튜닝 |
+| 단점 | 메모리 사용량 증가 | nlist/nprobe 튜닝 없으면 recall 급락 가능 |
+| 주요 파라미터 | `M`, `efConstruction`, `efSearch` | `nlist`, `nprobe` |
+
+여기서 중요한 메시지는 "지금 1편에서 인덱스를 확정하지 말라"입니다. 임베딩과 점수 의미를 먼저 고정하고, 데이터가 커질 때 ANN으로 넘어가도 늦지 않습니다.
+
+## 초기 벤치마크 표를 남겨야 하는 이유
+
+처음부터 복잡한 평가 파이프라인을 만들 필요는 없습니다. 하지만 최소한 아래 두 축은 기록해야 합니다.
+
+| 설정 | top-5 recall(샘플 50개) | p95 latency (ms) |
+|---|---:|---:|
+| 브루트 포스(NumPy) | 1.00 | 82 |
+| FAISS IndexFlatIP | 1.00 | 27 |
+| HNSW(efSearch=64) | 0.98 | 11 |
+| IVF(nlist=256, nprobe=16) | 0.95 | 8 |
+
+수치 자체보다 중요한 것은 같은 질의셋으로 추이를 비교할 수 있는 기준선을 남기는 것입니다. 이 표가 없으면 "빨라졌는데 품질이 떨어졌는지"를 누구도 증명할 수 없습니다.
+
+또 하나의 실전 팁은 임베딩 스키마를 문서화해 두는 것입니다. 예를 들어 `embedding_model`, `dimension`, `normalized`, `distance_metric` 네 항목을 인덱스 메타데이터에 넣어 두면, 팀원이 바뀌거나 배포 환경이 바뀌어도 "이 인덱스가 어떤 가정 위에서 만들어졌는지"를 바로 확인할 수 있습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **키워드가 같은데도 검색 결과가 빗나가거나, 표현만 달라서 결과를 놓칠 때 무엇이 부족한 걸까요?**

@@ -246,6 +246,177 @@ def quality_filter_pipeline(docs: list[str], pf: PerplexityFilter, clf) -> list[
 
 좋은 품질 필터는 버리는 양이 아니라 **어떤 이유로 버렸는지 설명 가능한 통계**를 남깁니다.
 
+## 품질 필터 결과를 대시보드 지표로 고정하기
+
+필터링 파이프라인의 성공 기준은 “많이 걸렀다”가 아니라 “왜 걸렀는지 설명 가능하다”입니다. 그래서 stage별 drop 통계를 배치 리포트로 남겨야 threshold 회귀를 추적할 수 있습니다.
+
+```python
+import pandas as pd
+
+def build_drop_report(rows: list[dict]) -> pd.DataFrame:
+    # rows: {doc_id, stage, decision, reason}
+    df = pd.DataFrame(rows)
+    report = (
+        df.groupby(["stage", "reason", "decision"], dropna=False)
+          .size()
+          .reset_index(name="count")
+          .sort_values(["stage", "count"], ascending=[True, False])
+    )
+    return report
+
+def acceptance_by_source(rows: list[dict]) -> pd.DataFrame:
+    df = pd.DataFrame(rows)
+    agg = df.groupby(["source", "decision"]).size().unstack(fill_value=0)
+    agg["accept_ratio"] = agg.get("keep", 0) / agg.sum(axis=1)
+    return agg.reset_index()
+```
+
+## 품질 점수 모델 검증(간이)
+
+classifier를 붙였다면 최소한 calibration을 확인해야 합니다. 스코어 0.9가 실제로도 고품질 비율 90% 근처인지 확인하지 않으면 threshold를 안정적으로 운영할 수 없습니다.
+
+```python
+from sklearn.calibration import calibration_curve
+
+# y_true: 1=good, 0=bad
+# y_prob: classifier probability for good
+def calibration_summary(y_true, y_prob):
+    frac_pos, mean_pred = calibration_curve(y_true, y_prob, n_bins=10)
+    return [{"bin_pred": float(p), "bin_true": float(t)} for p, t in zip(mean_pred, frac_pos)]
+```
+
+## Label Studio로 경계 샘플 재라벨링
+
+`0.45~0.55` 구간 샘플은 모델이 가장 헷갈리는 데이터입니다. 이 구간만 사람에게 다시 라벨링받으면 다음 버전 정확도가 크게 오르는 경우가 많습니다.
+
+```xml
+<View>
+  <Text name="doc" value="$text"/>
+  <Choices name="quality" toName="doc" choice="single">
+    <Choice value="good"/>
+    <Choice value="bad"/>
+    <Choice value="borderline"/>
+  </Choices>
+  <TextArea name="reason" toName="doc" placeholder="판단 이유"/>
+</View>
+```
+
+## before/after 샘플
+
+```text
+[drop: repetitive]
+지금 클릭 지금 클릭 지금 클릭 지금 클릭 ...
+
+[keep]
+환불 지연 문의의 평균 처리 시간은 24시간이며, 주말에는 48시간까지 늘어날 수 있습니다.
+```
+
+이런 샘플과 통계를 같이 남기면 “필터가 과하게 공격적이다” 같은 논의를 데이터로 빠르게 정리할 수 있습니다.
+
+## DVC 파이프라인 단계
+
+```yaml
+stages:
+  quality_filter:
+    cmd: python pipelines/quality_filter.py --input data/clean/train.parquet --output data/quality/train_filtered.parquet
+    deps:
+      - pipelines/quality_filter.py
+      - data/clean/train.parquet
+    outs:
+      - data/quality/train_filtered.parquet
+    metrics:
+      - reports/quality_filter_metrics.json
+      - reports/quality_filter_drop_report.csv
+```
+
+품질 필터는 한 번 맞추고 끝나는 규칙이 아닙니다. 배치마다 분포가 바뀌므로 리포트 기반 재조정이 기본 운영 루프가 되어야 합니다.
+
+## quality score drift 감지
+
+품질 분류기를 운영하면 스코어 분포 자체가 변하는 시점이 옵니다. 모델이 망가진 것이 아니라 입력 분포가 바뀐 경우가 많습니다.
+
+```python
+import numpy as np
+
+def psi(expected: np.ndarray, actual: np.ndarray, bins: int = 10) -> float:
+    eps = 1e-6
+    cuts = np.quantile(expected, np.linspace(0, 1, bins + 1))
+    e_hist, _ = np.histogram(expected, bins=cuts)
+    a_hist, _ = np.histogram(actual, bins=cuts)
+    e = e_hist / max(e_hist.sum(), 1) + eps
+    a = a_hist / max(a_hist.sum(), 1) + eps
+    return float(np.sum((a - e) * np.log(a / e)))
+```
+
+PSI가 임계값을 넘으면 threshold를 재튜닝하거나, 소스별 필터를 분리해야 합니다. 이 과정을 자동화하지 않으면 필터 성능은 시간이 갈수록 조용히 악화됩니다.
+
+## 소스별 정책 분리
+
+같은 threshold를 모든 소스에 강제하면 특정 도메인이 과도하게 삭제될 수 있습니다. 뉴스, 포럼, 제품 문서는 본질적으로 길이·기호 분포가 다르기 때문입니다.
+
+```python
+SOURCE_THRESHOLDS = {
+    "news": {"max_symbol_ratio": 0.22, "max_perplexity": 420},
+    "forum": {"max_symbol_ratio": 0.28, "max_perplexity": 520},
+    "docs": {"max_symbol_ratio": 0.18, "max_perplexity": 380},
+}
+```
+
+이처럼 소스별 기준을 분리하면 불필요한 데이터 손실을 줄이면서도 전체 품질을 일정하게 유지할 수 있습니다.
+
+## 운영에서 바로 쓰는 점검 질문
+
+아래 질문은 배포 직전 리뷰에서 실제로 자주 쓰는 체크 항목입니다. 단순 문서 확인이 아니라, 각 질문에 대해 파일 경로나 지표 값으로 즉시 답할 수 있어야 합니다.
+
+1. 이번 데이터셋은 어떤 버전에서 왔고, sha256은 무엇인가요?
+2. 지난 배치 대비 duplicate/null/length 분포가 얼마나 변했나요?
+3. 제거된 샘플은 어떤 규칙 때문에 빠졌고, 상위 제거 사유는 무엇인가요?
+4. train/eval/test 경계에서 누수 가능성은 수치로 얼마나 남아 있나요?
+5. 이번 배치에서 사람이 검토한 샘플과 발견된 오류 유형은 무엇인가요?
+
+```python
+def release_readiness(summary: dict) -> tuple[bool, list[str]]:
+    issues = []
+    if not summary.get("dataset_sha256"):
+        issues.append("missing_dataset_sha256")
+    if summary.get("duplicate_ratio", 1.0) > 0.10:
+        issues.append("duplicate_ratio_too_high")
+    if summary.get("null_ratio", 1.0) > 0.02:
+        issues.append("null_ratio_too_high")
+    if summary.get("contamination_ratio", 1.0) > 0.01:
+        issues.append("contamination_ratio_too_high")
+    if summary.get("human_reviewed_rows", 0) < 100:
+        issues.append("insufficient_human_review")
+    return len(issues) == 0, issues
+```
+
+운영 팀은 이 함수를 그대로 쓰지 않더라도 같은 개념을 파이프라인 게이트로 구현해야 합니다. 핵심은 “준비가 되었는지 느낌으로 판단하지 않는다”는 점입니다.
+
+## 실무 로그 예시
+
+```text
+[release-check] dataset=v2.4.1 sha=4fb1...
+[release-check] duplicate_ratio=0.061 null_ratio=0.008
+[release-check] contamination_ratio=0.004 human_reviewed_rows=240
+[release-check] status=PASS
+```
+
+이 로그 한 묶음이 있으면 모델 성능이 흔들릴 때도 데이터 준비 단계를 빠르게 제외하거나 집중 점검할 수 있습니다. 데이터 준비의 품질은 글 한 편의 설명보다, 이런 반복 가능한 검증 로그에서 드러납니다.
+
+### 품질 필터 재학습 주기
+
+classifier 기반 필터는 분기마다 최소 한 번 재학습 후보를 검토하는 것이 안전합니다. 소스 도메인이 바뀌면 기존 negative 샘플이 낡아 경계 판단이 빠르게 흔들리기 때문입니다.
+
+### 릴리스 노트에 남겨야 할 최소 항목
+
+해당 단계의 변경은 릴리스 노트에도 남겨야 합니다. 최소한 `변경 규칙`, `영향받은 행 수`, `핵심 지표 변화`, `롤백 경로` 네 항목이 있어야 다음 배치에서 같은 판단을 반복할 수 있습니다.
+
+필터는 정확도 지표뿐 아니라 제거 사유 분포의 안정성까지 함께 모니터링해야 합니다.
+
+소스 유입이 바뀐 주에는 threshold 재점검을 기본 운영 절차로 두는 편이 좋습니다.
+
+필터 규칙 변경 시에는 최소 하루치 배치를 shadow run으로 먼저 돌린 뒤 본 반영하는 절차를 권장합니다.
+
 ## 흔히 헷갈리는 지점
 
 - **heuristic만 잘 짜면 classifier는 필요 없습니다**: 스팸과 보일러플레이트 중에는 규칙을 통과하는 샘플이 많아 classifier가 필요합니다.

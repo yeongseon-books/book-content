@@ -168,6 +168,148 @@ kubectl get nodes -L agentpool,kubernetes.azure.com/scalesetpriority
 
 ## 흔히 헷갈리는 지점
 
+## HPA 동작을 manifest와 출력으로 고정하기
+
+autoscaling 논의가 추상적으로 흐르지 않으려면 HPA 객체 자체를 명확히 보여 주는 편이 좋습니다.
+아래 예시는 CPU와 메모리를 함께 보는 기본 패턴입니다.
+
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: checkout-api
+  namespace: prod
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: checkout-api
+  minReplicas: 3
+  maxReplicas: 30
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 65
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 70
+```
+
+상태 확인:
+
+```bash
+kubectl get hpa checkout-api -n prod
+kubectl describe hpa checkout-api -n prod | tail -40
+```
+
+예시 출력:
+
+```text
+NAME           REFERENCE                 TARGETS          MINPODS   MAXPODS   REPLICAS   AGE
+checkout-api   Deployment/checkout-api   78%/65%,72%/70% 3         30        12         9d
+```
+
+이 출력은 HPA가 이미 scale-up 판단을 내렸음을 보여 줍니다.
+이후 Pending이 남아 있다면 문제는 scheduler 또는 node capacity 경계일 가능성이 높습니다.
+
+## Cluster Autoscaler 프로필을 의도적으로 설정하기
+
+AKS에서 CA는 관리형이지만 동작 성향은 프로필로 조정할 수 있습니다.
+기본값이 보수적이므로 burst 특성이 강한 서비스는 값 조정 근거를 명시해야 합니다.
+
+```bash
+az aks update \
+  --resource-group my-rg \
+  --name my-cluster \
+  --cluster-autoscaler-profile scan-interval=10s \
+    scale-down-unneeded-time=15m \
+    scale-down-delay-after-add=15m \
+    max-node-provision-time=20m
+```
+
+확인:
+
+```bash
+az aks show -g my-rg -n my-cluster --query "autoScalerProfile" -o yaml
+```
+
+핵심은 빠른 scale-up 요구와 안정적 scale-down 요구를 동시에 만족하는 균형점입니다.
+
+## HPA-CA race window를 시각화해서 팀 공통 언어 만들기
+
+같은 현상을 사람마다 다르게 부르면 대응이 느려집니다.
+아래 다이어그램처럼 타임라인을 공유하면 on-call 커뮤니케이션이 빨라집니다.
+
+```mermaid
+flowchart LR
+  A["Load Spike"] --> B["HPA Scale Up"]
+  B --> C["New Pods Pending"]
+  C --> D["CA Detects Unschedulable Pods"]
+  D --> E["Node Provisioning"]
+  E --> F["Pods Scheduled and Ready"]
+```
+
+이 흐름을 팀 런북에 그대로 넣어 두면 “현재 C 단계인지 D 단계인지”를 빠르게 맞출 수 있습니다.
+
+## 워크로드 보호를 위한 PDB와 선제 용량
+
+autoscaling만으로 모든 급증을 흡수하려 하면 대기 구간이 길어질 수 있습니다.
+핵심 API에는 baseline replica와 PDB를 함께 두어 “최소 서비스 용량”을 보장하는 편이 안전합니다.
+
+```yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: checkout-api-pdb
+  namespace: prod
+spec:
+  minAvailable: 4
+  selector:
+    matchLabels:
+      app: checkout-api
+```
+
+그리고 node pool에도 `min-count`를 충분히 둡니다.
+이 설계는 비용을 약간 늘리지만 급격한 트래픽 변동에서 사용자 체감 지연을 줄이는 데 효과적입니다.
+
+## Prometheus/Grafana로 두 루프를 한 화면에서 보기
+
+HPA와 CA를 각자 다른 대시보드에서만 보면 상관관계가 안 보입니다.
+아래 구성처럼 한 화면에서 나란히 보는 편이 좋습니다.
+
+- HPA current/desired replicas
+- Pending Pod 수
+- Node 개수와 NotReady 노드 수
+- 요청 지연 시간 p95/p99
+
+Grafana 패널을 `HPA desired`, `Pending`, `Node count`, `Latency p95`로 고정하면 race window가 애플리케이션 지연으로 번지는 순간을 즉시 파악할 수 있습니다.
+
+## 트러블슈팅 시나리오: HPA는 올랐는데 응답 지연이 계속 증가하는 경우
+
+아래 순서를 따라가면 대부분의 원인을 1차 분리할 수 있습니다.
+
+1) `kubectl describe hpa`에서 이미 scale-up 판단이 있었는지 확인
+2) Pending Pod가 증가하는지 확인
+3) CA 이벤트 또는 node 증가 여부 확인
+4) 새 노드 Ready 이후에도 지연이 지속되면 애플리케이션 콜드 스타트/DB 병목 확인
+
+명령 예시:
+
+```bash
+kubectl get hpa -n prod
+kubectl get pods -n prod --field-selector=status.phase=Pending
+kubectl get nodes -L agentpool
+kubectl get events -A --sort-by=.lastTimestamp | tail -30
+```
+
+이 순서는 “autoscaling이 느리다”라는 막연한 불만을 실행 가능한 진단 단계로 바꾸는 최소 절차입니다.
+
 - **HPA와 Cluster Autoscaler는 같은 일을 하지 않습니다.** 하나는 replica를, 다른 하나는 node를 조정합니다.
 - **HPA가 scale-up을 결정했다고 곧바로 Ready Pod가 늘어나는 것은 아닙니다.** 빈 node 자원이 없으면 Pending 단계가 먼저 보입니다.
 - **CA는 메트릭 비율을 직접 계산하지 않습니다.** unschedulable Pod와 template node 시뮬레이션이 핵심입니다.
@@ -176,6 +318,40 @@ kubectl get nodes -L agentpool,kubernetes.azure.com/scalesetpriority
 
 ## 운영 체크리스트
 
+## node pool 스케일 정책을 워크로드 클래스별로 분리하기
+
+CA가 하나의 pool만 보고 있다고 가정하면 실제 클러스터와 맞지 않습니다.
+대부분의 AKS 운영 환경은 system pool, 일반 API pool, batch/spot pool을 함께 사용합니다.
+따라서 autoscaling 정책도 pool별로 분리해 설계해야 합니다.
+
+예시 전략:
+
+- system pool: 고정 최소 노드, CA 비활성 또는 매우 보수적
+- api pool: 빠른 scale-up, 느린 scale-down
+- batch/spot pool: 공격적 scale-up, 실패 허용 범위 명시
+
+AKS 명령 예시:
+
+```bash
+az aks nodepool update -g my-rg --cluster-name my-cluster -n apipool --enable-cluster-autoscaler --min-count 3 --max-count 30
+az aks nodepool update -g my-rg --cluster-name my-cluster -n batchpool --enable-cluster-autoscaler --min-count 0 --max-count 50
+```
+
+이 분리는 비용 최적화뿐 아니라 장애 격리에도 중요합니다.
+batch 폭증이 API 응답 경로에 직접 영향 주는 상황을 줄일 수 있기 때문입니다.
+
+## 관측 경보 기준을 루프별로 나누기
+
+autoscaling 경보를 하나로 묶으면 원인 구분이 늦습니다.
+아래처럼 HPA/CA 각각에 경보를 두는 편이 좋습니다.
+
+- HPA desired replicas 급증 + current replicas 미추종
+- Pending Pod 지속 시간 임계치 초과
+- node provisioning 시간 임계치 초과
+- scale-down 이후 10분 내 재확장 반복(출렁임 신호)
+
+이 기준을 적용하면 “확장 자체가 실패한 것”과 “확장은 성공했지만 지연이 긴 것”을 운영 알림 단계에서 이미 분리할 수 있습니다.
+
 - [ ] 각 워크로드의 HPA 메트릭과 임계치 선택 근거를 ADR로 남겼습니다.
 - [ ] CA의 scale-down 관련 지연 값을 비용과 지연 요구사항에 맞게 검토했습니다.
 - [ ] HPA가 먼저 Pod를 늘리고 CA가 뒤따르는 race 시나리오를 부하 테스트로 확인했습니다.
@@ -183,6 +359,19 @@ kubectl get nodes -L agentpool,kubernetes.azure.com/scalesetpriority
 - [ ] VPA 허용 워크로드와 금지 워크로드를 명시적으로 분류했습니다.
 
 ## 정리
+
+## 부하 테스트에서 꼭 재현해야 하는 두 가지 패턴
+
+autoscaling 정책 검증은 평균 부하보다 급격한 변화 패턴에서 의미가 큽니다.
+최소한 아래 두 시나리오는 정기적으로 재현하는 편이 좋습니다.
+
+1) 2분 이내 급격한 scale-up이 필요한 burst 트래픽
+2) 30분 이상 완만한 감소 후 scale-down 안정성 확인
+
+각 테스트에서 기록할 항목은 동일합니다.
+HPA desired/current, Pending Pod 지속 시간, 새 노드 Ready 시간, 그리고 사용자 응답 지연 p95입니다.
+이 데이터를 쌓아 두면 임계치 조정이 감각이 아니라 근거 기반 결정으로 바뀝니다.
+특히 동일 부하 프로파일을 분기마다 반복 실행하면, 클러스터 버전 업그레이드 후 autoscaling 거동이 어떻게 달라졌는지도 안정적으로 비교할 수 있습니다.
 
 AKS autoscaling을 정확히 이해하려면 먼저 HPA와 Cluster Autoscaler를 분리해야 합니다.
 HPA는 메트릭을 읽고 replica 수를 조정하는 빠른 루프이고, Cluster Autoscaler는 unschedulable Pod를 보고 node 수를 조정하는 느리고 보수적인 루프입니다.

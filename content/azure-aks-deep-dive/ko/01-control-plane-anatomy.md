@@ -185,6 +185,120 @@ az monitor diagnostic-settings list \
 
 ## 흔히 헷갈리는 지점
 
+## control plane 운영 표면을 실제 객체로 고정하기
+
+control plane을 추상 개념으로만 이해하면 장애 시점마다 같은 질문을 다시 하게 됩니다.
+그래서 운영팀은 관찰 표면을 객체 단위로 고정해 두는 편이 좋습니다.
+아래처럼 API 응답을 기준으로 “지금 내가 볼 수 있는 control-plane 표면”을 표준화하면, 사람마다 다른 감으로 판단하는 시간을 줄일 수 있습니다.
+
+```bash
+# 1) API 서버 연결성과 버전 확인
+kubectl version --short
+
+# 2) API 서버 readiness 표면 확인
+kubectl get --raw='/readyz?verbose'
+
+# 3) API 우선순위/공정성으로 인한 지연 의심 시
+kubectl get --raw='/metrics' | grep apiserver_request_duration_seconds_bucket | head -5
+```
+
+예시 출력은 다음과 같이 읽습니다.
+
+```text
+Client Version: v1.30.2
+Kustomize Version: v5.0.4
+Server Version: v1.30.9
+
+[+]ping ok
+[+]log ok
+[+]etcd ok
+[+]poststarthook/start-apiextensions-controllers ok
+readyz check passed
+```
+
+`readyz` 결과에서 `etcd`와 admission 관련 훅이 함께 통과하는지 보면, 단순 네트워크 단절과 control-plane 내부 지연을 1차로 분리할 수 있습니다.
+물론 AKS에서 내부 호스트를 직접 다루지는 않지만, API 표면의 준비 상태 신호만으로도 “요청을 받을 준비가 되어 있는가”를 꽤 정확히 읽을 수 있습니다.
+
+## private API 서버를 쓸 때 경계가 어떻게 달라지는가
+
+AKS 운영에서 control plane 경계를 가장 크게 바꾸는 선택 중 하나가 private cluster입니다.
+public endpoint를 끄는 순간 진단 습관도 함께 바뀌어야 합니다.
+사내 점프 호스트, VPN, Bastion 경유 경로가 없으면 “클러스터가 죽은 것처럼” 보일 수 있기 때문입니다.
+
+아래 다이어그램은 운영팀이 자주 쓰는 private API 접근 구조입니다.
+
+```mermaid
+flowchart LR
+  A["Engineer Laptop"] --> B["Corp VPN"]
+  B --> C["Jump Host"]
+  C --> D["AKS Private API Server"]
+  D --> E["Managed Control Plane"]
+```
+
+경계가 바뀌면 런북도 같이 바뀌어야 합니다.
+예를 들어 “kubectl 연결 실패”는 더 이상 곧바로 API 서버 장애를 의미하지 않습니다.
+VPN 세션 만료, DNS split-horizon 누락, 점프 호스트 NSG 변경도 같은 증상을 만들 수 있으므로, 네트워크 경로 검증을 control-plane 진단의 0단계로 넣어야 합니다.
+
+## 컨트롤러 수렴 지연을 이벤트로 읽는 연습
+
+control plane은 결국 상태 수렴 루프입니다.
+그래서 단일 에러 로그보다 “상태 전이가 얼마나 늦어지는가”를 보는 편이 더 실용적일 때가 많습니다.
+아래는 Deployment 롤아웃이 느릴 때 자주 쓰는 확인 순서입니다.
+
+```bash
+kubectl rollout status deploy/my-api -n prod --timeout=120s
+kubectl get rs -n prod -l app=my-api
+kubectl get events -n prod --sort-by=.lastTimestamp | tail -25
+```
+
+출력이 아래와 비슷하면 controller-manager와 scheduler 경계에서 지연을 의심할 수 있습니다.
+
+```text
+deployment "my-api" exceeded its progress deadline
+Warning  FailedScheduling  26s   default-scheduler  0/9 nodes are available: 3 Insufficient cpu, 6 node(s) didn't match Pod's node affinity.
+Normal   ScalingReplicaSet 21s   deployment-controller Scaled up replica set my-api-7fb6d84f8d to 8
+```
+
+이 경우 deployment-controller는 원하는 replica를 올렸지만 scheduler 단계에서 실제 배치가 막혀 수렴이 지연됩니다.
+즉 control plane 문제를 “API 서버 문제” 하나로 뭉치지 않고, 어떤 루프가 이미 성공했고 어떤 루프가 아직 실패하는지 분해해서 볼 수 있습니다.
+
+## Admission/RBAC를 control-plane 안전장치로 쓰는 방법
+
+AKS는 관리형이라도 정책 계층은 사용자 책임입니다.
+특히 운영팀이 자주 배포하는 namespace에는 RBAC과 admission 정책을 같이 두는 편이 안전합니다.
+아래 예시는 운영자가 특정 namespace의 읽기 진단만 수행하도록 제한하는 최소 권한 패턴입니다.
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: prod-readonly-debug
+  namespace: prod
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "services", "events", "configmaps"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["apps"]
+    resources: ["deployments", "replicasets"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: prod-readonly-debug-binding
+  namespace: prod
+subjects:
+  - kind: Group
+    name: aks-oncall
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: prod-readonly-debug
+```
+
+여기에 Pod Security admission, image policy webhook, OPA Gatekeeper 같은 계층을 더하면 control plane은 단순 API 엔드포인트가 아니라 “변경을 허용할지 거절할지 결정하는 정책 경계”가 됩니다.
+운영 품질은 결국 이 경계의 엄격함과 관측 가능성에 비례합니다.
+
 - **관리형 control plane은 control plane이 없다는 뜻이 아닙니다.** 여전히 `kube-apiserver`, `etcd`, controller-manager, scheduler가 동작하며, 다만 사용자가 직접 운영하지 않을 뿐입니다.
 - **API server가 곧 control plane 전체는 아닙니다.** 사용자가 만나는 표면이 API server일 뿐, 뒤에서는 상태 저장과 수렴 루프가 계속 작동합니다.
 - **Pending Pod를 보면 곧바로 node 문제라고 단정하면 안 됩니다.** scheduler의 Filter/Score/Binding 단계에서 이미 막혔을 수 있습니다.

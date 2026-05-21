@@ -294,6 +294,134 @@ def anonymize_with_audit(rows: list[dict], audit_path: str,
 
 영어 데이터 파이프라인을 그대로 복사하면 한국어 이름과 국내 식별자가 빠지기 쉽습니다. 한국어 도메인은 별도의 테스트 샘플셋으로 탐지율을 검증하는 편이 안전합니다.
 
+## 검증 스키마와 품질 지표를 함께 두기
+
+PII 파이프라인은 탐지 성공 사례보다 누락 사례가 더 중요합니다. 그래서 익명화 결과를 단순 문자열 치환으로 끝내지 말고, 검증 스키마와 지표를 함께 남겨야 합니다.
+
+```python
+from pydantic import BaseModel, Field
+
+class PIIAuditRow(BaseModel):
+    row_id: str
+    pii_count: int = Field(ge=0)
+    pii_types: list[str]
+    char_reduction: int
+    detector_versions: dict
+
+class PIIBatchReport(BaseModel):
+    batch_id: str
+    rows_total: int
+    rows_with_pii: int
+    avg_pii_per_row: float
+    false_negative_sample_size: int
+    reviewer_ids: list[str]
+```
+
+```python
+def compute_pii_metrics(audit_rows: list[dict]) -> dict:
+    total = len(audit_rows)
+    with_pii = sum(r["pii_count"] > 0 for r in audit_rows)
+    total_pii = sum(r["pii_count"] for r in audit_rows)
+    return {
+        "rows_total": total,
+        "rows_with_pii_ratio": with_pii / max(total, 1),
+        "avg_pii_per_row": total_pii / max(total, 1),
+    }
+```
+
+실무에서 특히 유용한 지표는 `rows_with_pii_ratio`의 급변입니다. 특정 수집 소스가 바뀌거나 regex 패턴이 깨졌을 때 가장 먼저 튀는 값이기 때문입니다.
+
+## Label Studio로 민감정보 검수 큐 운영하기
+
+탐지기가 확신이 낮은 항목은 자동 치환보다 검수 큐로 보내는 편이 안전합니다. Label Studio에 span annotation으로 검수 큐를 만들면 운영자가 false negative를 빠르게 수정할 수 있습니다.
+
+```xml
+<View>
+  <Text name="text" value="$text"/>
+  <Labels name="pii" toName="text">
+    <Label value="PERSON" background="#ffb3ba"/>
+    <Label value="EMAIL" background="#ffdfba"/>
+    <Label value="PHONE" background="#ffffba"/>
+    <Label value="ADDRESS" background="#baffc9"/>
+  </Labels>
+  <TextArea name="note" toName="text" placeholder="누락/오탐 메모"/>
+</View>
+```
+
+이 방식의 장점은 모델 개선 루프가 자연스럽게 만들어진다는 점입니다. 검수에서 모은 정답 span은 다음 탐지기 학습 데이터로 바로 쓸 수 있습니다.
+
+## 익명화 전후 before/after 샘플
+
+```text
+before: 김영수 고객님 이메일은 ys.kim@acme.co.kr이고 연락처는 010-1234-5678입니다.
+after : [PERSON] 고객님 이메일은 [EMAIL_ADDRESS]이고 연락처는 [PHONE_NUMBER]입니다.
+```
+
+이런 샘플을 배치 리포트에 20건 정도 포함해두면 운영 리뷰가 훨씬 빨라집니다. 단, 리포트에 원문을 남길 때는 접근 통제와 만료 정책을 반드시 걸어야 합니다.
+
+## 익명화 방식 선택 매트릭스
+
+같은 PII 처리라도 사용 목적에 따라 최적 해법이 다릅니다. 아래 표를 의사결정 기본값으로 두면 팀 간 충돌을 줄일 수 있습니다.
+
+| 목적 | 권장 방식 | 주의점 |
+| --- | --- | --- |
+| 외부 공유 데이터셋 | redact | 컨텍스트 손실 큼 |
+| 고객 지원 로그 분석 | pseudonymize | pepper/secret 관리 필수 |
+| 결제 로그 점검 | mask | 일부 식별자 잔존 위험 |
+| 모델 학습 분포 유지 | synthesize | 합성 품질 검증 필요 |
+
+## 재식별 위험 점검
+
+```python
+# 준식별자 결합 위험(간이)
+def quasi_identifier_risk(rows, keys=("age_band", "region", "job_group")):
+    from collections import Counter
+    c = Counter(tuple(r.get(k) for k in keys) for r in rows)
+    unique_groups = sum(1 for v in c.values() if v == 1)
+    return {"group_count": len(c), "unique_group_ratio": unique_groups / max(len(c), 1)}
+```
+
+익명화가 끝났더라도 준식별자 결합으로 개인이 재식별될 수 있습니다. 따라서 본문에서 말한 탐지-치환-감사 외에, 배치 단위 재식별 위험 점검을 함께 두는 편이 안전합니다.
+
+## 운영에서 바로 쓰는 점검 질문
+
+아래 질문은 배포 직전 리뷰에서 실제로 자주 쓰는 체크 항목입니다. 단순 문서 확인이 아니라, 각 질문에 대해 파일 경로나 지표 값으로 즉시 답할 수 있어야 합니다.
+
+1. 이번 데이터셋은 어떤 버전에서 왔고, sha256은 무엇인가요?
+2. 지난 배치 대비 duplicate/null/length 분포가 얼마나 변했나요?
+3. 제거된 샘플은 어떤 규칙 때문에 빠졌고, 상위 제거 사유는 무엇인가요?
+4. train/eval/test 경계에서 누수 가능성은 수치로 얼마나 남아 있나요?
+5. 이번 배치에서 사람이 검토한 샘플과 발견된 오류 유형은 무엇인가요?
+
+```python
+def release_readiness(summary: dict) -> tuple[bool, list[str]]:
+    issues = []
+    if not summary.get("dataset_sha256"):
+        issues.append("missing_dataset_sha256")
+    if summary.get("duplicate_ratio", 1.0) > 0.10:
+        issues.append("duplicate_ratio_too_high")
+    if summary.get("null_ratio", 1.0) > 0.02:
+        issues.append("null_ratio_too_high")
+    if summary.get("contamination_ratio", 1.0) > 0.01:
+        issues.append("contamination_ratio_too_high")
+    if summary.get("human_reviewed_rows", 0) < 100:
+        issues.append("insufficient_human_review")
+    return len(issues) == 0, issues
+```
+
+운영 팀은 이 함수를 그대로 쓰지 않더라도 같은 개념을 파이프라인 게이트로 구현해야 합니다. 핵심은 “준비가 되었는지 느낌으로 판단하지 않는다”는 점입니다.
+
+## 실무 로그 예시
+
+```text
+[release-check] dataset=v2.4.1 sha=4fb1...
+[release-check] duplicate_ratio=0.061 null_ratio=0.008
+[release-check] contamination_ratio=0.004 human_reviewed_rows=240
+[release-check] status=PASS
+```
+
+이 로그 한 묶음이 있으면 모델 성능이 흔들릴 때도 데이터 준비 단계를 빠르게 제외하거나 집중 점검할 수 있습니다. 데이터 준비의 품질은 글 한 편의 설명보다, 이런 반복 가능한 검증 로그에서 드러납니다.
+
 ## 흔히 헷갈리는 지점
 
 - **regex만 잘 짜면 개인정보 처리는 끝납니다**: 정규식은 인명, 주소, 자연어 속 식별 표현을 거의 놓칩니다. NER와 함께 써야 합니다.

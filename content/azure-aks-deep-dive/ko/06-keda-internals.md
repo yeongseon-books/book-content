@@ -172,6 +172,145 @@ kubectl get hpa -n my-ns | grep keda
 
 ## 흔히 헷갈리는 지점
 
+## ScaledObject 선언을 운영 가능한 템플릿으로 만들기
+
+KEDA를 안정적으로 쓰려면 샘플 YAML을 그대로 복사하는 수준을 넘어서야 합니다.
+trigger 임계치, polling 간격, cooldown을 워크로드 특성에 맞게 명시해야 `0 ↔ 1` 체감이 예측 가능해집니다.
+
+```yaml
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: orders-worker
+  namespace: prod
+spec:
+  scaleTargetRef:
+    name: orders-worker
+  pollingInterval: 15
+  cooldownPeriod: 120
+  minReplicaCount: 0
+  maxReplicaCount: 25
+  triggers:
+    - type: azure-servicebus
+      metadata:
+        namespace: my-bus
+        queueName: orders
+        messageCount: "50"
+      authenticationRef:
+        name: sb-auth
+```
+
+이 선언이 적용되면 generated HPA가 자동 생성됩니다.
+따라서 ScaledObject 상태와 HPA 상태를 반드시 같이 확인해야 합니다.
+
+## generated HPA를 반드시 함께 검증하기
+
+KEDA 문제를 빠르게 분리하려면 아래 두 단계를 세트로 실행합니다.
+
+```bash
+kubectl get scaledobject orders-worker -n prod -o yaml
+kubectl get hpa -n prod | grep keda
+kubectl describe hpa keda-hpa-orders-worker -n prod | tail -40
+```
+
+예시 출력:
+
+```text
+NAME                     REFERENCE                  TARGETS    MINPODS   MAXPODS   REPLICAS
+keda-hpa-orders-worker   Deployment/orders-worker   120/50     1         25        8
+```
+
+ScaledObject는 정상인데 generated HPA가 없거나 갱신되지 않으면 operator reconcile 단계 문제를 먼저 의심해야 합니다.
+
+## external metrics 경로를 다이어그램으로 고정하기
+
+metrics adapter를 블랙박스로 두면 장애 시점에 어디서 막혔는지 설명이 어렵습니다.
+아래처럼 경로를 팀 공통 다이어그램으로 두는 편이 좋습니다.
+
+```mermaid
+flowchart LR
+  A["Event Source"] --> B["KEDA Scaler"]
+  B --> C["KEDA Metrics Adapter"]
+  C --> D["external.metrics.k8s.io"]
+  D --> E["Generated HPA"]
+  E --> F["Target Deployment"]
+```
+
+이 구조를 기준으로 보면 문제를 다섯 구간으로 분해할 수 있습니다.
+이벤트 수집, scaler 해석, adapter 응답, HPA 계산, Deployment 반영.
+
+## Helm values로 KEDA 파라미터 표준화하기
+
+여러 팀이 KEDA를 쓰는 클러스터에서는 chart 값으로 공통 정책을 묶어 두는 편이 안전합니다.
+
+```yaml
+keda:
+  enabled: true
+  pollingInterval: 15
+  cooldownPeriod: 120
+  minReplicaCount: 0
+  maxReplicaCount: 25
+  trigger:
+    type: azure-servicebus
+    messageCount: 50
+```
+
+템플릿에서 이 값을 ScaledObject로 렌더링하면 서비스마다 임계치가 제각각 되는 문제를 줄일 수 있습니다.
+특히 운영 기준을 변경할 때 일괄 적용이 쉽다는 장점이 있습니다.
+
+## 인증/권한 경계를 RBAC와 TriggerAuthentication으로 분리하기
+
+KEDA는 외부 시스템에 접근해야 하므로 권한 경계가 중요합니다.
+서비스 계정 RBAC과 external credential 관리를 분리해 두면 보안 감사가 쉬워집니다.
+
+```yaml
+apiVersion: keda.sh/v1alpha1
+kind: TriggerAuthentication
+metadata:
+  name: sb-auth
+  namespace: prod
+spec:
+  podIdentity:
+    provider: azure-workload
+```
+
+그리고 KEDA operator 권한은 최소 범위 RBAC으로 관리합니다.
+운영팀은 `get/list/watch` 중심의 진단 Role을 따로 두고, 변경 권한은 배포 파이프라인으로 제한하는 편이 좋습니다.
+
+## 관측 구성: 0→1 지연과 1→N 지연을 분리해서 측정하기
+
+KEDA 운영에서 가장 중요한 지표는 “확장이 일어났다”가 아니라 “어느 경계에서 얼마나 지연됐는가”입니다.
+그래서 최소한 다음 항목을 분리 측정해야 합니다.
+
+- 이벤트 발생 시각 → 첫 Pod Ready 시각(0→1)
+- 첫 Pod Ready 이후 목표 replica 도달 시각(1→N)
+- external metric 수집 실패율
+
+Grafana에서 이 세 지표를 한 패널 그룹으로 묶으면, KEDA 튜닝이 필요한지 HPA 튜닝이 필요한지 바로 구분할 수 있습니다.
+
+## 트러블슈팅 시나리오: 큐 메시지는 쌓이는데 scale-from-zero가 늦는 경우
+
+실전에서 자주 보는 패턴입니다.
+아래 순서로 확인하면 원인 분리가 빠릅니다.
+
+1) 이벤트 소스 큐 길이가 실제로 증가하는지 확인
+2) ScaledObject 상태에서 trigger active 여부 확인
+3) KEDA operator 로그에서 인증 오류/timeout 확인
+4) generated HPA 생성 여부 확인
+5) 첫 Pod가 Ready 된 뒤 애플리케이션 초기화 시간 확인
+
+명령 예시:
+
+```bash
+kubectl describe scaledobject orders-worker -n prod | tail -50
+kubectl -n kube-system logs -l app=keda-operator --tail=120
+kubectl -n kube-system logs -l app=keda-operator-metrics-apiserver --tail=120
+kubectl get hpa -n prod | grep orders-worker
+kubectl get pods -n prod -l app=orders-worker -w
+```
+
+이 순서는 KEDA를 막연한 “이벤트 스케일러”가 아니라, 검증 가능한 다중 경계 시스템으로 다루게 만듭니다.
+
 - **KEDA는 HPA를 없애지 않습니다.** generated HPA를 만들고 그 위에 external metric 경로를 얹습니다.
 - **ScaledObject가 곧 실제 autoscaling 객체는 아닙니다.** Kubernetes 안에서 concrete artifact는 HPA입니다.
 - **metrics adapter는 부가 기능이 아닙니다.** external metrics 경로를 열어 주는 핵심 컴포넌트입니다.
@@ -180,6 +319,45 @@ kubectl get hpa -n my-ns | grep keda
 
 ## 운영 체크리스트
 
+## 이벤트 소스별 trigger 설계 기준
+
+KEDA 도입 초기에 가장 흔한 실수는 서로 다른 이벤트 소스에 같은 임계치를 복붙하는 것입니다.
+큐 길이, lag, 메시지 처리 시간은 소스마다 분포가 다르므로 trigger 기준도 다르게 잡아야 합니다.
+
+예시 기준:
+
+- Service Bus queue: 처리 지연 SLO 기준으로 `messageCount` 설정
+- Kafka lag: 파티션 수와 컨슈머 동시성 고려
+- HTTP scaler: 요청 burst 길이와 cold start 시간 반영
+
+이 기준을 문서화하면 KEDA 튜닝이 개인 경험이 아니라 팀 지식으로 축적됩니다.
+
+## Scale-to-zero가 부적합한 워크로드를 미리 분리하기
+
+모든 서비스를 0까지 내리는 것은 비용상 매력적이지만, 인증 캐시 워밍이 길거나 초기 연결 비용이 큰 서비스에는 오히려 역효과가 날 수 있습니다.
+아래 체크포인트를 통과한 서비스만 `minReplicaCount: 0`으로 두는 편이 안전합니다.
+
+- 첫 요청 응답 지연 허용 범위가 넓은가
+- 초기화 시 외부 의존성 재연결 비용이 낮은가
+- 0→1 지연이 비즈니스 SLA를 깨지 않는가
+
+조건을 충족하지 못하면 `minReplicaCount: 1` 이상으로 유지해 사용자 체감 지연을 줄이는 편이 낫습니다.
+
+## KEDA 장애 대비 fallback 런북
+
+operator 또는 metrics adapter 장애 시에도 서비스가 완전히 멈추지 않도록 fallback 절차를 준비해야 합니다.
+대표적인 대응은 임시 HPA 전환 또는 고정 replica 전환입니다.
+
+```bash
+# 임시로 고정 replica 유지
+kubectl scale deploy/orders-worker -n prod --replicas=3
+
+# ScaledObject 일시 중단(운영 정책에 맞게 적용)
+kubectl annotate scaledobject orders-worker -n prod autoscaling.keda.sh/paused=true
+```
+
+이 절차를 런북에 넣어 두면 KEDA 계층 장애가 곧바로 사용자 장애로 번지는 위험을 줄일 수 있습니다.
+
 - [ ] trigger별 polling interval과 cooldown을 워크로드 스파이크 특성에 맞게 검토했습니다.
 - [ ] KEDA operator 장애 시 fallback 동작과 알림 기준을 정했습니다.
 - [ ] ScaledObject와 ScaledJob 중 무엇을 선택할지 팀 기준을 문서화했습니다.
@@ -187,6 +365,17 @@ kubectl get hpa -n my-ns | grep keda
 - [ ] KEDA metric과 실제 replica 변화의 일관성을 모니터링하도록 설정했습니다.
 
 ## 정리
+
+## 운영 팀이 자주 묻는 질문 두 가지
+
+첫째, “KEDA를 쓰면 HPA 튜닝이 필요 없나요?”라는 질문이 많습니다.
+답은 아니오입니다.
+KEDA는 입력 경로와 0↔1 경계를 개선하지만, 1↔N 구간의 안정성은 여전히 HPA 정책 품질에 크게 의존합니다.
+
+둘째, “모든 이벤트 워크로드를 ScaledJob으로 바꿔야 하나요?”라는 질문도 자주 나옵니다.
+이 역시 아닙니다.
+장시간 실행 서비스이면 ScaledObject가 더 자연스럽고, 배치성 단발 처리라면 ScaledJob이 더 맞습니다.
+핵심은 KEDA 도입 자체가 아니라 워크로드 성격에 맞는 리소스 타입 선택입니다.
 
 KEDA는 HPA를 대체하는 별도 autoscaler라기보다, event source를 HPA가 사용할 수 있는 external metric 경로로 번역하고 scale-to-zero 경계를 별도 책임으로 가져가는 계층입니다.
 ScaledObject는 선언이고, generated HPA는 실제 autoscaling 산출물이며, metrics adapter와 scaler는 그 사이를 연결하는 번역 경로입니다.

@@ -432,6 +432,78 @@ run_experiment(260)
 - [ ] 같은 문서에서 나온 거의 동일한 청크를 중복 제거했다
 - [ ] 출처 추적을 위해 문서 ID와 오프셋을 함께 저장했다
 
+## 청킹과 ANN 인덱스의 상호작용
+
+청킹은 임베딩 품질만 바꾸는 것이 아니라 인덱스 부하를 직접 바꿉니다. 같은 1,000개 문서라도 `chunk_size`를 500에서 200으로 줄이면 청크 수가 2배 이상 늘고, 결국 인덱스 벡터 수도 함께 증가합니다. 벡터 수가 늘어나면 HNSW의 그래프 메모리와 IVF의 학습 시간도 같이 올라갑니다.
+
+| chunk_size / overlap | 평균 청크 수(문서당) | 총 벡터 수 | 인덱싱 시간(상대) |
+|---|---:|---:|---:|
+| 500 / 50 | 8 | 8,000 | 1.0x |
+| 300 / 30 | 13 | 13,000 | 1.6x |
+| 200 / 20 | 19 | 19,000 | 2.3x |
+
+그래서 청킹 튜닝은 검색 품질 팀과 인프라 팀이 함께 보는 주제입니다. "더 잘게 쪼개자"는 결정은 품질에는 유리할 수 있지만 운영 비용을 키울 수 있습니다.
+
+## 문서 유형별 분할 규칙
+
+실무에서는 문서 유형마다 분할 규칙을 분기하는 경우가 많습니다.
+
+```python
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+def make_splitter(doc_type: str) -> RecursiveCharacterTextSplitter:
+    if doc_type == "api-reference":
+        return RecursiveCharacterTextSplitter(
+            chunk_size=220,
+            chunk_overlap=40,
+            separators=["\n## ", "\n### ", "\n", ". ", " ", ""],
+        )
+    if doc_type == "tutorial":
+        return RecursiveCharacterTextSplitter(
+            chunk_size=360,
+            chunk_overlap=50,
+            separators=["\n\n", "\n", ". ", " ", ""],
+        )
+    return RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=30)
+```
+
+API 레퍼런스는 짧고 정확한 조각이 필요하고, 튜토리얼은 맥락이 길게 이어지므로 더 큰 청크가 잘 맞는 경향이 있습니다.
+
+## 리콜/지연 시간 비교 실험
+
+청킹 변경은 반드시 측정으로 확인해야 합니다.
+
+| 실험 설정 | Recall@5 | p95 latency(ms) | 평균 컨텍스트 토큰 |
+|---|---:|---:|---:|
+| 220/40 | 0.89 | 42 | 680 |
+| 300/30 | 0.92 | 39 | 760 |
+| 420/50 | 0.91 | 35 | 980 |
+
+이런 표를 보면 300/30이 품질과 지연 시간의 균형이 좋다는 결론을 내릴 수 있습니다. 단, 질문 길이와 도메인이 바뀌면 최적값도 함께 바뀝니다.
+
+## 하이브리드 검색을 고려한 청크 구성
+
+키워드 검색(BM25)까지 함께 쓰는 경우에는 청크 내부 텍스트 정규화가 중요합니다. 코드 블록, 옵션 이름, 에러 코드는 지나치게 정규화하면 오히려 신호를 잃습니다. 따라서 아래처럼 필드를 분리해 저장하는 패턴이 안전합니다.
+
+```python
+chunk_payload = {
+    "text_for_vector": chunk_text,
+    "text_for_lexical": chunk_text,
+    "source": source_path,
+    "section": section_title,
+    "line_start": line_start,
+    "line_end": line_end,
+}
+```
+
+향후 하이브리드 결합 점수를 계산할 때 `text_for_vector`와 `text_for_lexical`을 분리하면 각 검색기의 장점을 더 쉽게 살릴 수 있습니다.
+
+또한 코드 블록이 많은 기술 문서에서는 코드 조각을 별도 청크 타입으로 분리하는 것이 유리합니다. 일반 문장과 같은 규칙으로 자르면 함수 시그니처나 명령어가 잘려 lexical 검색 성능이 급격히 떨어질 수 있습니다. 실무에서는 `chunk_type=paragraph|code|table`을 메타데이터에 넣고, 질의 유형에 따라 다른 가중치를 적용하는 패턴이 자주 사용됩니다.
+
+추가로 표 중심 문서에서는 행 단위 분할을 검토해 볼 만합니다. 표를 일반 문단처럼 분할하면 열 제목과 값의 연결이 끊겨 검색 정확도가 떨어지기 쉽습니다. 이 경우에는 헤더를 각 행에 반복 주입한 뒤 청크를 만드는 방식이 출처 해석과 검색 점수 모두에서 안정적인 결과를 보입니다.
+
+결국 청킹은 문서 구조를 검색 구조로 번역하는 작업입니다.
+
 ## 처음 질문으로 돌아가기
 
 - **긴 문서를 그대로 임베딩하지 않고 왜 청크로 나눠야 할까요?**

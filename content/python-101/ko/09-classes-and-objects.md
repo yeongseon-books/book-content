@@ -359,6 +359,164 @@ True
 
 다음 글에서는 표준 라이브러리 투어를 다룹니다. 지금까지 배운 함수, 모듈, 클래스 위에서 Python이 기본으로 제공하는 도구들을 빠르게 훑어봅니다.
 
+## 실전 앵커: 객체 설계 기준, 메모리 동작, 디버깅 흐름
+
+클래스 문법을 익힌 뒤 실제 코드에서 막히는 지점은 "이 책임을 객체가 가져야 하나"입니다. 기준은 단순합니다. 상태와 그 상태를 일관되게 다루는 동작이 함께 움직이면 클래스가 유리합니다.
+
+```python
+class Cart:
+    def __init__(self):
+        self.items = []
+
+    def add(self, name, price):
+        self.items.append({'name': name, 'price': price})
+
+    def total(self):
+        return sum(x['price'] for x in self.items)
+```
+
+`items`를 외부에서 직접 수정하도록 열어 두면 invariants가 깨집니다. 필요한 연산을 메서드로 제공해 경계를 명확히 두는 편이 안전합니다.
+
+`dataclasses`는 보일러플레이트를 줄이면서도 모델 의도를 분명하게 표현합니다.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class User:
+    id: int
+    name: str
+```
+
+`__repr__`, `__eq__` 생성 덕분에 디버깅과 테스트가 쉬워집니다.
+
+CPython 관점의 객체 수명도 한 번 짚어보겠습니다.
+
+```python
+import sys
+
+class A:
+    pass
+
+obj = A()
+print(sys.getrefcount(obj))
+alias = obj
+print(sys.getrefcount(obj))
+del alias
+print(sys.getrefcount(obj))
+```
+
+참조 수 변화가 객체 생존과 직접 연결됩니다. 순환 참조가 생기면 참조 카운트만으로 회수되지 않아 GC가 개입합니다.
+
+상속은 재사용 도구이지만, 과도한 계층은 오히려 이해 비용을 키웁니다. 초반에는 조합(composition)을 기본으로 두고, "is-a" 관계가 명확할 때만 상속을 쓰는 편이 좋습니다.
+
+```python
+class EmailSender:
+    def send(self, msg):
+        print('email:', msg)
+
+class Notifier:
+    def __init__(self, sender):
+        self.sender = sender
+
+    def notify(self, msg):
+        self.sender.send(msg)
+```
+
+디버깅은 메서드 바인딩을 직접 확인하면 도움이 됩니다.
+
+```pycon
+>>> u = User(1, 'kim')
+>>> u.__class__
+<class '__main__.User'>
+>>> User.__mro__
+(<class '__main__.User'>, <class 'object'>)
+```
+
+`__mro__`는 다중 상속에서 메서드 탐색 순서를 설명할 때 핵심입니다.
+
+성능 측정 예시로는 속성 접근 비용을 간단히 확인할 수 있습니다.
+
+```python
+import timeit
+
+class P:
+    def __init__(self):
+        self.x = 1
+
+p = P()
+attr_t = timeit.timeit('p.x', globals=globals(), number=20_000_000)
+local_t = timeit.timeit('x', setup='x=1', number=20_000_000)
+print(attr_t, local_t)
+```
+
+작은 차이지만, 핫루프에서는 구조 설계가 성능에 영향을 줄 수 있다는 감각을 얻을 수 있습니다.
+
+### 추가 실습: 캡슐화와 테스트 경계 잡기
+
+클래스가 커질수록 public 메서드와 internal 메서드를 구분해야 유지보수가 쉬워집니다. 외부 계약은 최소화하고, 내부 구현은 바꿀 수 있게 두는 것이 핵심입니다.
+
+```python
+class Balance:
+    def __init__(self, amount=0):
+        self._amount = amount
+
+    @property
+    def amount(self):
+        return self._amount
+
+    def deposit(self, value):
+        if value <= 0:
+            raise ValueError('value must be > 0')
+        self._amount += value
+```
+
+`_amount`는 관례상 internal 속성입니다. 외부는 `deposit` 같은 메서드 계약으로만 상태를 변경하게 해야 비즈니스 규칙을 보존할 수 있습니다.
+
+`__str__`와 `__repr__`를 분리하면 로그와 디버깅 품질이 올라갑니다.
+
+```python
+class Item:
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return f'Item(name={self.name!r})'
+```
+
+테스트에서 객체 비교가 많다면 `dataclass(frozen=True)`를 검토하면 안정성이 높아집니다.
+
+### 부록: 로컬 실습 로그 템플릿
+
+아래 템플릿은 학습 단계에서 직접 실험한 결과를 남길 때 유용합니다. 중요한 점은 "코드 + 실행 환경 + 출력"을 한 세트로 기록하는 것입니다. 이렇게 남긴 로그는 나중에 문제가 다시 발생했을 때 가장 신뢰할 수 있는 재현 자료가 됩니다.
+
+```text
+[환경]
+python: 3.12.x
+platform: macOS/Linux
+venv: .venv
+
+[실험]
+목표: 동작 확인 또는 성능 비교
+입력: 샘플 데이터 1,000건
+실행 명령: python script.py
+
+[출력]
+성공/실패 여부
+핵심 숫자(timeit, 처리 건수, 예외 메시지)
+```
+
+실무 코드 리뷰에서는 결과 숫자만 공유하는 경우가 많지만, 학습 단계에서는 중간 가정까지 함께 적는 편이 더 효과적입니다. 예를 들어 "셋 포함 검사가 빠를 것이다"라는 가정이 맞았는지, "f-string이 항상 더 읽기 쉽다"라는 판단이 팀 컨벤션과 맞는지까지 기록하면 다음 의사결정이 빨라집니다.
+
+디버깅 기록도 같은 형식을 쓰면 좋습니다.
+
+1) 증상: 어떤 입력에서 실패했는가
+2) 가설: 어떤 조건문/자료구조/경로가 원인인가
+3) 검증: `pdb`, `print`, `timeit`, 단위 테스트 중 무엇으로 확인했는가
+4) 결론: 수정 전후 동작 차이가 무엇인가
+
+이 습관은 초급 단계에서는 다소 느리게 느껴질 수 있습니다. 하지만 프로젝트 규모가 커질수록 "정확한 기록"이 가장 빠른 길이 됩니다. Python 문법을 익히는 것과 별개로, 실험을 재현 가능한 형태로 남기는 역량은 개발자로서의 성장 속도를 결정합니다.
+
 ## 처음 질문으로 돌아가기
 
 - **클래스와 객체: 데이터와 동작을 함께 묶기를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?**

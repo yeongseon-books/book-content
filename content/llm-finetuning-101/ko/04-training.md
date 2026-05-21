@@ -325,7 +325,168 @@ python main.py
 
 다음 글인 5편에서는 평가를 다룹니다. perplexity를 빠른 기준선으로 사용하고, 골든 세트 기반의 정성·정량 평가를 어떻게 함께 돌릴지 코드로 확인하겠습니다.
 
+## Trainer 설정 템플릿: 작은 검증에서 실전 확장까지
+
+학습 루프를 안정적으로 키우려면 `TrainingArguments`를 계층적으로 관리하는 편이 좋습니다.
+
+| 단계 | 목적 | 핵심 설정 |
+| --- | --- | --- |
+| smoke | 1-step 무결성 확인 | `max_steps=1`, `save_strategy=no`, `report_to=[]` |
+| debug | 손실 곡선 형태 확인 | `max_steps=50~200`, `logging_steps=5` |
+| baseline | 비교 가능한 기준선 확보 | 고정 시드, 고정 eval 세트, 체크포인트 저장 |
+| production-like | 실제 배포 후보 학습 | mixed precision, 주기적 eval, early stopping |
+
+이 표를 운영 문서에 그대로 두면 "지금 실험이 어느 단계인지"를 팀이 같은 언어로 말할 수 있습니다.
+
+## 하이퍼파라미터 스윕 표: 한 번에 하나만 바꾸는 규칙
+
+| 실험 축 | 고정값 | 변화값 | 기대 관찰 |
+| --- | --- | --- | --- |
+| 학습률 스윕 | 배치/데이터 고정 | `1e-4`, `2e-4`, `5e-4` | 손실 하강 속도와 안정성 |
+| 배치 스윕 | 학습률 고정 | 유효 배치 8/16/32 | 메모리와 수렴 변동 |
+| 랭크 스윕 | 데이터/학습률 고정 | `r=8`, `16`, `32` | 표현력 vs 과적합 |
+| 길이 스윕 | 모델 고정 | `max_length=256/384/512` | OOM 위험과 정보 손실 |
+
+규칙은 단순합니다. 비교에서 한 축만 움직이지 않으면 결론을 기록하지 않습니다.
+
+## 손실 곡선 해석 예시: 숫자보다 형태를 읽기
+
+```text
+step  1: loss=8.72
+step 10: loss=7.95
+step 20: loss=7.41
+step 30: loss=7.38
+step 40: loss=7.51
+step 50: loss=7.62
+```
+
+이 예시는 초반 하강 후 후반 반등 패턴입니다. 보통 학습률 과대, 데이터 부족, 혹은 마스킹 누락을 의심합니다. 반대로 완만한 하강 후 안정화는 정상 패턴으로 보는 편이 안전합니다.
+
+## VRAM 사용 비교: 배치와 길이가 만드는 차이
+
+아래는 동일 모델에서 자주 관찰되는 경향입니다.
+
+| 설정 | 최대 VRAM(예시) | 비고 |
+| --- | --- | --- |
+| batch=2, max_length=256 | 5.1GB | 안정 구간 |
+| batch=2, max_length=512 | 7.8GB | 길이 증가 영향 큼 |
+| batch=4, max_length=256 | 8.4GB | 배치 증가 영향 큼 |
+| batch=1, accum=4, max_length=256 | 5.4GB | 유효 배치 유지, 메모리 절감 |
+
+학습이 자주 끊기는 팀일수록 배치 크기보다 시퀀스 길이를 먼저 줄이는 편이 효과적입니다.
+
+## Hugging Face Trainer 로그에서 꼭 기록할 항목
+
+| 항목 | 이유 |
+| --- | --- |
+| `train_loss` | 학습 신호 기본선 |
+| `learning_rate` | 스케줄러 동작 검증 |
+| `epoch` 또는 `global_step` | 비교 기준 통일 |
+| `train_runtime` | 실험 비용 추정 |
+| `samples_per_second` | 병목 탐지 |
+
+이 다섯 항목만 CSV나 실험 로그에 남겨도 회귀 분석의 80%를 해결할 수 있습니다.
+
+## 학습 스크립트 확장 예시: 평가 스텝 포함
+
+```python
+args = TrainingArguments(
+    output_dir="artifacts",
+    per_device_train_batch_size=2,
+    per_device_eval_batch_size=2,
+    gradient_accumulation_steps=4,
+    learning_rate=2e-4,
+    warmup_ratio=0.03,
+    max_steps=200,
+    evaluation_strategy="steps",
+    eval_steps=25,
+    logging_steps=5,
+    save_steps=50,
+    save_total_limit=2,
+    bf16=True,
+    report_to=[],
+)
+```
+
+4편의 핵심은 이 설정 자체가 아니라, 왜 이 값을 넣었는지 이유를 로그에 함께 남기는 습관입니다.
+
+## before/after 생성 예시: 학습 스텝이 의미 있게 작동했는지 확인
+
+```text
+[Prompt]
+파이썬 예외 처리 패턴을 3줄로 보여 주세요.
+
+[Before 1-step]
+Python exception handling is important and used in many places.
+
+[After 200-step]
+try:
+    value = int(user_input)
+except ValueError:
+    return {"error": "invalid input"}
+```
+
+이 차이는 평가의 끝이 아니라 시작입니다. 5편에서는 이 변화가 우연인지 반복 가능한 개선인지 지표로 검증합니다.
+
 ## 처음 질문으로 돌아가기
+
+## 운영형 학습 설정 예시: QLoRA + Trainer 조합
+
+작은 데모를 통과한 뒤에는 보통 QLoRA 설정으로 이동합니다. 아래는 자주 쓰는 운영형 골격입니다.
+
+```python
+from peft import LoraConfig, TaskType, get_peft_model
+from transformers import AutoModelForCausalLM, BitsAndBytesConfig
+
+bnb = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_use_double_quant=True,
+    bnb_4bit_compute_dtype="bfloat16",
+)
+
+base = AutoModelForCausalLM.from_pretrained(
+    "meta-llama/Llama-3-8B-Instruct",
+    quantization_config=bnb,
+    device_map="auto",
+)
+
+lora = LoraConfig(
+    task_type=TaskType.CAUSAL_LM,
+    r=16,
+    lora_alpha=32,
+    lora_dropout=0.05,
+    target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
+    bias="none",
+)
+
+model = get_peft_model(base, lora)
+model.print_trainable_parameters()
+```
+
+4편에서 이 조합을 바로 실행할 필요는 없지만, 어떤 형태로 확장되는지 미리 보면 설정 파일 구조를 더 견고하게 설계할 수 있습니다.
+
+## 학습 로그 리딩 가이드: 무엇을 먼저 확인할지 고정하기
+
+| 순서 | 확인 항목 | 기대 상태 |
+| --- | --- | --- |
+| 1 | `trainable params` | 0%가 아님 |
+| 2 | 첫 10스텝 손실 | 유한값, 급격한 폭주 없음 |
+| 3 | 학습률 로그 | 스케줄대로 감소/증가 |
+| 4 | eval perplexity | 최소 정체 또는 하강 |
+| 5 | 체크포인트 용량 | 어댑터만 저장 시 작음 |
+
+이 순서를 고정하면 팀 내에서 디버깅 대화가 훨씬 짧아집니다.
+
+## 배치/누적 조합 실험 예시
+
+```text
+exp_a: per_device=2, grad_accum=4 -> effective batch=8
+exp_b: per_device=1, grad_accum=8 -> effective batch=8
+exp_c: per_device=4, grad_accum=2 -> effective batch=8
+```
+
+유효 배치가 같아도 손실 곡선이 완전히 같지는 않습니다. 패딩 비율, 커널 효율, 랜덤성 차이 때문입니다. 그래서 비교 실험에서는 최소 2~3회 반복해 평균을 보는 편이 안전합니다.
 
 - **`TrainingArguments`에서 한 번의 학습 스텝을 돌리려면 최소 무엇을 설정해야 할까요?**
   - 본문의 기준은 학습 루프와 하이퍼파라미터를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.

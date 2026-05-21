@@ -283,6 +283,153 @@ def register(conn, card: DatasetCard):
 
 작게 시작하는 것은 좋지만, 검색이 안 되는 상태를 오래 끌고 가는 것은 좋지 않습니다. 데이터 카탈로그도 조기 과최적화보다, 너무 늦은 구조화가 더 비쌉니다.
 
+## Label Studio 기반 수집-레이블 연결 설계
+
+카탈로그는 원본 파일만 관리하는 도구가 아닙니다. 라벨링으로 이어지는 순간부터 데이터 lineage를 연결해야 진짜 운영 자산이 됩니다. 특히 Label Studio를 쓰는 팀은 import 시점의 source metadata와 export 시점의 annotation metadata가 끊기지 않게 설계해야 합니다.
+
+```xml
+<View>
+  <Header value="고객 문의 분류"/>
+  <Text name="text" value="$text"/>
+  <Choices name="intent" toName="text" choice="single" showInLine="true">
+    <Choice value="refund_delay"/>
+    <Choice value="cancel_plan"/>
+    <Choice value="outage_question"/>
+    <Choice value="feature_request"/>
+  </Choices>
+  <TextArea name="rationale" toName="text"
+            placeholder="판단 근거를 한 줄로 작성"
+            rows="2"/>
+</View>
+```
+
+위 설정처럼 rationale 필드를 강제하면 이후 품질 감사에서 왜 해당 라벨을 붙였는지 추적할 수 있습니다. 카탈로그 관점에서는 최소 아래 필드를 annotation export와 같이 저장해야 합니다.
+
+```python
+ANNOTATION_REQUIRED = [
+    "task_id",
+    "dataset_version",
+    "source_sha256",
+    "annotator_id",
+    "label",
+    "rationale",
+    "labeled_at",
+]
+```
+
+실무에서는 수집 카드와 라벨 카드가 분리되면 곧바로 추적 비용이 폭증합니다. 그래서 아래처럼 한 레코드에 source provenance와 annotation provenance를 함께 적재하는 구조를 자주 씁니다.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class LabeledRecordCard:
+    dataset_name: str
+    dataset_version: str
+    source_url: str
+    source_sha256: str
+    row_id: str
+    text: str
+    label: str
+    annotator_id: str
+    label_confidence: float
+    rationale: str
+    label_studio_task_id: int
+    label_studio_project_id: int
+
+# 저장 단위: JSONL 한 줄 = 원본+레이블 lineage 1개
+```
+
+또 하나 중요한 포인트는 수집 시점의 라이선스와 라벨링 산출물의 재배포 권한을 분리해 기록하는 것입니다. 공개 데이터셋이라도 라벨링 결과물의 사용 범위가 계약에 따라 제한될 수 있기 때문입니다. 이 필드를 생략하면 모델은 학습됐는데 데이터셋은 외부 공유 불가인 상태가 자주 생깁니다.
+
+```python
+USAGE_POLICY = {
+    "raw_data_license": "CC-BY-NC-4.0",
+    "annotation_license": "internal-only",
+    "model_training_allowed": True,
+    "external_redistribution_allowed": False,
+}
+```
+
+카탈로그는 결국 질문에 답하는 시스템입니다. “이 라벨은 누가 어떤 원문에 어떤 기준으로 붙였는가?”를 1분 안에 답할 수 있다면 수집 설계가 제대로 된 것입니다.
+
+## 수집 파이프라인의 실패 복구 전략
+
+카탈로그를 운영하다 보면 수집 실패 자체보다 복구 정책 부재가 더 큰 문제를 만듭니다. 같은 소스를 재수집할 때도 `snapshot_date`, `etag`, `sha256`을 비교해 **정말 새 데이터인지** 판단해야 합니다.
+
+```python
+import requests
+
+def fetch_with_cache_meta(url: str, etag: str | None = None):
+    headers = {"If-None-Match": etag} if etag else {}
+    r = requests.get(url, headers=headers, timeout=20)
+    if r.status_code == 304:
+        return {"status": "not_modified", "content": None, "etag": etag}
+    r.raise_for_status()
+    return {"status": "ok", "content": r.content, "etag": r.headers.get("ETag")}
+```
+
+이 패턴을 쓰면 불필요한 재수집을 줄이고, 수집 시점이 달라진 데이터만 명확히 버전업할 수 있습니다.
+
+## provenance 조회 API 예시
+
+```python
+# GET /catalog/datasets/{name}/{version}
+# 응답에 raw source + annotation lineage + transform lineage를 모두 포함
+EXAMPLE_RESPONSE = {
+  "name": "support_tickets",
+  "version": "2.1.0",
+  "source": {"type": "first-party", "snapshot_date": "2026-05-01"},
+  "annotations": {"project": "label-studio-12", "count": 48210},
+  "transforms": ["clean@a2f91c", "dedup@f80ab2", "pii@91ed10"]
+}
+```
+
+카탈로그의 가치는 저장이 아니라 조회 속도입니다. 운영자가 1분 안에 lineage를 따라갈 수 없다면 구조를 다시 단순화하는 편이 좋습니다.
+
+## 운영에서 바로 쓰는 점검 질문
+
+아래 질문은 배포 직전 리뷰에서 실제로 자주 쓰는 체크 항목입니다. 단순 문서 확인이 아니라, 각 질문에 대해 파일 경로나 지표 값으로 즉시 답할 수 있어야 합니다.
+
+1. 이번 데이터셋은 어떤 버전에서 왔고, sha256은 무엇인가요?
+2. 지난 배치 대비 duplicate/null/length 분포가 얼마나 변했나요?
+3. 제거된 샘플은 어떤 규칙 때문에 빠졌고, 상위 제거 사유는 무엇인가요?
+4. train/eval/test 경계에서 누수 가능성은 수치로 얼마나 남아 있나요?
+5. 이번 배치에서 사람이 검토한 샘플과 발견된 오류 유형은 무엇인가요?
+
+```python
+def release_readiness(summary: dict) -> tuple[bool, list[str]]:
+    issues = []
+    if not summary.get("dataset_sha256"):
+        issues.append("missing_dataset_sha256")
+    if summary.get("duplicate_ratio", 1.0) > 0.10:
+        issues.append("duplicate_ratio_too_high")
+    if summary.get("null_ratio", 1.0) > 0.02:
+        issues.append("null_ratio_too_high")
+    if summary.get("contamination_ratio", 1.0) > 0.01:
+        issues.append("contamination_ratio_too_high")
+    if summary.get("human_reviewed_rows", 0) < 100:
+        issues.append("insufficient_human_review")
+    return len(issues) == 0, issues
+```
+
+운영 팀은 이 함수를 그대로 쓰지 않더라도 같은 개념을 파이프라인 게이트로 구현해야 합니다. 핵심은 “준비가 되었는지 느낌으로 판단하지 않는다”는 점입니다.
+
+## 실무 로그 예시
+
+```text
+[release-check] dataset=v2.4.1 sha=4fb1...
+[release-check] duplicate_ratio=0.061 null_ratio=0.008
+[release-check] contamination_ratio=0.004 human_reviewed_rows=240
+[release-check] status=PASS
+```
+
+이 로그 한 묶음이 있으면 모델 성능이 흔들릴 때도 데이터 준비 단계를 빠르게 제외하거나 집중 점검할 수 있습니다. 데이터 준비의 품질은 글 한 편의 설명보다, 이런 반복 가능한 검증 로그에서 드러납니다.
+
+### 카탈로그 최소 쿼리 세트
+
+운영자가 매일 쓰는 쿼리는 많지 않습니다. `최신 버전`, `소유자별 데이터셋`, `라이선스별 사용 가능 목록` 세 가지가 빠르게 나오면 대부분의 운영 질문을 즉시 처리할 수 있습니다.
+
 ## 흔히 헷갈리는 지점
 
 - **파일만 잘 보관하면 재현성은 충분합니다**: 파일의 존재만으로는 출처, 라이선스, 시점, 스키마를 설명할 수 없어서 재현성이 성립하지 않습니다.

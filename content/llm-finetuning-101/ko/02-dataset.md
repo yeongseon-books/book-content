@@ -227,6 +227,110 @@ print(len(tokenized[0]["input_ids"]))   # 64
 
 다음 글인 3편에서는 LoRA 어댑터 구성을 다룹니다. `LoraConfig`의 `r`, `alpha`, `target_modules`, `dropout`이 실제 학습 동작에 어떻게 나타나는지 한 줄씩 뜯어 보겠습니다.
 
+## 실전 데이터 포맷: instruction, chat, completion을 같은 기준으로 비교하기
+
+형식 선택은 취향 문제가 아니라 실패 비용 문제입니다. 한 번 잘못 고르면 이후 학습 로그가 모두 왜곡됩니다.
+
+| 형식 | 예시 구조 | 강점 | 취약점 | 추천 상황 |
+| --- | --- | --- | --- | --- |
+| instruction | `instruction/input/output` | 구현 단순, 검수 쉬움 | 멀티턴 표현 약함 | 단일 질의응답, 형식 교정 |
+| chat | `[{role, content}]` | 실제 대화 흐름과 유사 | 템플릿 의존도 큼 | 챗봇, 상담형 UX |
+| completion | `prefix + continuation` | 사전학습 형식과 유사 | 지시 구분이 모호 | 코드 자동완성, 문장 이어쓰기 |
+
+초기에는 instruction 형식으로 시작하고, 실제 제품이 멀티턴이면 chat 형식으로 옮기는 순서가 운영상 안정적입니다.
+
+## 데이터 품질 게이트: 학습 전에 실패를 막는 자동 점검
+
+아래 검사는 작은 JSONL에도 바로 적용할 수 있습니다.
+
+```python
+import json
+from pathlib import Path
+
+def validate_jsonl(path: Path) -> dict:
+    total = 0
+    missing = 0
+    empty_output = 0
+    long_samples = 0
+
+    with path.open("r", encoding="utf-8") as f:
+        for line in f:
+            total += 1
+            row = json.loads(line)
+            if "instruction" not in row or "output" not in row:
+                missing += 1
+                continue
+            if not row["output"].strip():
+                empty_output += 1
+            if len((row.get("instruction", "") + row.get("output", ""))) > 2000:
+                long_samples += 1
+
+    return {
+        "total": total,
+        "missing": missing,
+        "empty_output": empty_output,
+        "long_samples": long_samples,
+    }
+```
+
+이 검사를 CI에 두면 "학습은 끝났는데 결과가 이상하다"는 뒤늦은 사고를 많이 줄일 수 있습니다.
+
+## 라벨 마스킹 예시: 응답 구간에만 손실을 거는 방식
+
+전처리에서 가장 중요한 기술 포인트는 `labels` 마스킹입니다.
+
+```python
+def build_labels(input_ids, response_start_idx):
+    labels = input_ids.copy()
+    for i in range(response_start_idx):
+        labels[i] = -100
+    return labels
+```
+
+`-100`은 손실 계산에서 제외를 뜻합니다. 이 처리가 없으면 모델은 응답뿐 아니라 지시문 자체를 복제하는 데 손실을 소비하고, 실제 생성 품질이 흐릿해질 수 있습니다.
+
+## 길이 분포와 VRAM의 연결: max_length를 감으로 정하지 않기
+
+입력 길이는 곧 비용입니다. 아래처럼 분포를 숫자로 뽑아 두면 `max_length`를 합리적으로 고를 수 있습니다.
+
+| 지표 | 값(예시) | 해석 |
+| --- | --- | --- |
+| 평균 토큰 길이 | 148 | 작은 배치에서는 여유 |
+| p95 | 356 | `max_length=384` 후보 |
+| p99 | 612 | 긴 샘플 별도 처리 고려 |
+| 최대 길이 | 1304 | 통째 절단 시 정보 손실 큼 |
+
+실무에서는 p95를 기본 길이로 잡고, 극단적으로 긴 샘플은 분할하거나 별도 태스크로 분리하는 편이 안정적입니다.
+
+## 전처리 출력 샘플: 학습 전에 반드시 사람 눈으로 확인할 것
+
+```text
+### Instruction:
+사용자 이메일 검증 API를 FastAPI로 작성해 주세요.
+
+### Input:
+정규식 검증 실패 시 400을 반환해 주세요.
+
+### Response:
+@app.post("/validate-email")
+def validate_email(req: EmailRequest):
+    if not EMAIL_RE.match(req.email):
+        raise HTTPException(status_code=400, detail="invalid email")
+    return {"ok": True}<eos>
+```
+
+템플릿이 이렇게 일관되게 보이면 그다음 단계에서 발생하는 실패를 모델/학습 문제로 좁혀 볼 수 있습니다.
+
+## 하이퍼파라미터 테이블: 데이터셋 크기별 안전한 출발선
+
+| 샘플 수 | `max_length` | 배치 전략 | 학습률 | 메모 |
+| --- | --- | --- | --- | --- |
+| 100~500 | 256~384 | 작은 고정 배치 | `5e-4` | 파이프라인 검증 우선 |
+| 500~5k | 384~512 | 누적 배치 사용 | `2e-4`~`5e-4` | 과적합 관찰 필요 |
+| 5k+ | 512+ | 동적 패딩 권장 | `1e-4`~`3e-4` | 평가 세트 분리 필수 |
+
+데이터셋이 커질수록 먼저 바꿔야 할 것은 랭크가 아니라 길이/배치 정책입니다. 이 순서를 지켜야 원인 분석이 가능합니다.
+
 ## 실전 패턴 추가: 데이터 준비, LoRA 설정, 학습 입력 검증을 한 흐름으로 점검하기
 
 파인튜닝 품질은 모델 아키텍처보다 입력 계약에서 먼저 결정됩니다. 데이터셋 템플릿, LoRA 설정, 길이 통계를 따로 보지 말고 같은 파이프라인에서 검증해야 디버깅 비용이 줄어듭니다.
@@ -277,6 +381,105 @@ def length_stats(lengths: Iterable[int]) -> tuple[int, float, int]:
 ```
 
 운영 관점에서는 `target_modules`와 데이터 템플릿이 함께 관리되어야 합니다. 템플릿이 바뀌면 토큰 길이 분포가 바뀌고, 이는 배치 크기와 학습 안정성에 바로 영향을 줍니다. 따라서 데이터 버전, LoRA 설정 버전, 평가 지표를 같은 실험 단위로 묶어 기록하는 것이 필수입니다. 이렇게 해야 특정 품질 변화가 데이터 문제인지, 어댑터 설정 문제인지 빠르게 분리할 수 있습니다.
+
+## 데이터셋 버전 운영: 파일 하나가 아니라 실험 단위로 관리하기
+
+현업에서는 `train.jsonl` 파일 하나만 관리하면 곧바로 재현성이 깨집니다. 최소한 아래 세 파일을 함께 버전으로 묶는 편이 좋습니다.
+
+| 파일 | 역할 | 예시 |
+| --- | --- | --- |
+| `dataset.train.jsonl` | 학습 샘플 | instruction/input/output 원본 |
+| `dataset.eval.jsonl` | 평가 샘플 | hold-out 골든 후보 |
+| `dataset.meta.yaml` | 생성 규칙/정책 | 필드 규약, 마스킹 정책, 생성 날짜 |
+
+`dataset.meta.yaml`에 "응답 끝에 `<eos>`를 강제한다" 같은 규칙을 적어 두면, 팀원이 바뀌어도 전처리 결과가 같은 방향으로 유지됩니다.
+
+추가로 `book-examples` 저장소에는 데이터 생성 스크립트와 검증 스크립트를 함께 두는 편이 좋습니다. 원본 JSONL만 남기면 변경 의도가 사라지지만, 스크립트까지 남기면 왜 특정 샘플이 제거됐는지 추적할 수 있습니다.
+
+또한 샘플 단위 변경 이력은 PR 설명에 반드시 남겨 두는 편이 좋습니다. 데이터셋 품질 이슈는 코드와 달리 diff만으로 의미를 읽기 어렵기 때문입니다.
+
+실무에서는 데이터셋 변경 PR에 샘플 5개 전후 비교를 함께 첨부하면 리뷰 품질이 크게 올라갑니다.
+
+## 전처리 파이프라인 예시: 필터 -> 템플릿 -> 토큰화 -> 검증
+
+```python
+def preprocess_pipeline(dataset, tokenizer, max_length=384):
+    def filter_invalid(example):
+        return bool(example.get("instruction")) and bool(example.get("output"))
+
+    filtered = dataset.filter(filter_invalid)
+
+    def render(example):
+        input_text = example.get("input", "").strip()
+        return {
+            "text": (
+                "### Instruction:\n" + example["instruction"].strip() + "\n\n"
+                + "### Input:\n" + input_text + "\n\n"
+                + "### Response:\n" + example["output"].strip() + "<eos>"
+            )
+        }
+
+    rendered = filtered.map(render)
+
+    def tokenize(example):
+        return tokenizer(
+            example["text"],
+            truncation=True,
+            max_length=max_length,
+            padding=False,
+        )
+
+    tokenized = rendered.map(tokenize)
+    return tokenized
+```
+
+이 파이프라인은 단순하지만, 각 단계의 출력이 분리되어 있어 문제 지점을 빠르게 찾을 수 있습니다.
+
+## 손실 곡선으로 역추적하는 데이터 문제
+
+데이터셋 이슈는 학습 시작 후 손실 곡선에도 신호를 남깁니다.
+
+- 초반부터 손실이 거의 수평: 템플릿/마스킹 문제 또는 어댑터 연결 문제
+- 초반 급락 후 폭발적 진동: 중복 데이터 과다, 길이 분포 불균형
+- 학습 손실은 하강하지만 평가 지표 정체: 포맷 과적합, 의미 품질 부족
+
+이 패턴을 기록해 두면 데이터 정제 우선순위를 빠르게 결정할 수 있습니다.
+
+## 데이터 예시 확장: 나쁜 샘플과 좋은 샘플 비교
+
+```text
+[나쁜 샘플]
+instruction: "파이썬"
+output: "네"
+
+[좋은 샘플]
+instruction: "파이썬에서 리스트를 역순으로 순회하는 방법을 두 가지 설명해 주세요."
+input: "for 문 예시를 포함해 주세요."
+output: "1) reversed(lst)를 사용하면 원본을 유지한 채 역순 순회가 가능합니다..."
+```
+
+좋은 샘플은 길이가 긴 것이 아니라, 모델이 학습할 패턴이 명확한 샘플입니다.
+
+## 운영 체크용 통계 출력 예시
+
+```python
+def summarize_token_lengths(tokenized):
+    lengths = [len(x["input_ids"]) for x in tokenized]
+    lengths = sorted(lengths)
+    n = len(lengths)
+    p95 = lengths[int(n * 0.95) - 1]
+    p99 = lengths[int(n * 0.99) - 1]
+    return {
+        "count": n,
+        "min": lengths[0],
+        "mean": sum(lengths) / n,
+        "p95": p95,
+        "p99": p99,
+        "max": lengths[-1],
+    }
+```
+
+이 출력은 4편의 배치 전략 결정과 6편의 서빙 `max_new_tokens` 정책까지 연결됩니다.
 
 ## 처음 질문으로 돌아가기
 

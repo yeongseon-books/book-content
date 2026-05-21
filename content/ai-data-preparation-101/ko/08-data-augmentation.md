@@ -291,6 +291,163 @@ print(rename_vars(src))
 
 이 예시는 텍스트 분류용 augmentation과 별개로, **코드 코퍼스에서는 AST 수준 변환이 토큰 치환보다 안전하다**는 사실을 보여 주기 위한 branch입니다. 즉, 같은 augmentation이라도 데이터 종류가 바뀌면 선택지도 달라집니다.
 
+## 증강 파이프라인을 DAG로 고정하는 방법
+
+증강 실험이 늘어날수록 가장 먼저 필요한 것은 기법이 아니라 실행 순서 고정입니다. 실전에서는 아래처럼 `select -> augment -> guardrail -> dedup -> eval -> approve`를 DAG로 분리합니다.
+
+```python
+AUG_DAG = {
+    "select_train_slice": [],
+    "augment_candidates": ["select_train_slice"],
+    "apply_korean_guardrail": ["augment_candidates"],
+    "semantic_dedup": ["apply_korean_guardrail"],
+    "merge_train": ["semantic_dedup"],
+    "heldout_eval": ["merge_train"],
+    "approve_or_reject": ["heldout_eval"],
+}
+```
+
+이 구조를 두면 특정 단계 실패 시 전체 배치를 폐기할지, 일부 단계부터 재시도할지 기준이 명확해집니다.
+
+## 증강 샘플 검증 스키마
+
+```python
+from pydantic import BaseModel, Field
+
+class AugmentedRow(BaseModel):
+    source_id: str
+    text: str
+    label: str
+    aug_method: str
+    similarity: float = Field(ge=0.0, le=1.0)
+    passed_guardrail: bool
+
+class AugmentBatchReport(BaseModel):
+    batch_id: str
+    n_candidates: int
+    n_kept: int
+    keep_ratio: float
+    macro_f1_delta: float
+    slice_metric_delta: dict
+```
+
+## back-translation 예시(검증 포함)
+
+```python
+# pseudo-code
+def back_translate_ko(text: str, mt_ko_en, mt_en_ko):
+    mid = mt_ko_en(text)
+    out = mt_en_ko(mid)
+    return out
+
+def keep_bt_sample(src: str, cand: str, sim_fn) -> bool:
+    sim = sim_fn(src, cand)
+    if sim < 0.76 or sim > 0.98:
+        return False
+    if any(x in cand for x in ["개인정보", "계정 정지"]):
+        return False
+    return True
+```
+
+증강은 결국 평가지표 개선으로 닫혀야 합니다. `keep_ratio`가 높아도 held-out 개선이 없으면 그 배치는 버리는 것이 맞습니다.
+
+## before/after 샘플
+
+```text
+원문: 환불이 지연되고 있는데 진행 상태를 확인하고 싶습니다.
+증강: 환불 처리가 늦어지고 있어 현재 진행 상황을 알고 싶습니다.
+```
+
+이 정도의 변형은 라벨을 유지하면서 표현 다양성을 늘립니다. 반대로 정책 의미가 바뀌는 문장은 유사도가 높아도 버려야 합니다.
+
+## 증강 편입 비율(cap) 운영 규칙
+
+증강 샘플이 원본보다 많아지면 모델이 변형 문장 분포에 과적합할 수 있습니다. 그래서 클래스별 편입 상한을 두는 편이 안전합니다.
+
+```python
+AUG_CAP = {
+    "refund_delay": 0.8,   # augmented <= 80% of original class rows
+    "cancel_plan": 0.5,
+    "outage_question": 0.4,
+    "feature_request": 0.4,
+}
+
+def apply_cap(original_count: int, augmented_rows: list[dict], label: str) -> list[dict]:
+    cap = int(original_count * AUG_CAP[label])
+    return augmented_rows[:cap]
+```
+
+## 증강 배치 품질 리포트
+
+```python
+def augment_report(rows: list[dict]) -> dict:
+    sims = [r["similarity"] for r in rows]
+    return {
+        "n_rows": len(rows),
+        "avg_similarity": sum(sims) / max(len(sims), 1),
+        "min_similarity": min(sims) if sims else 0.0,
+        "max_similarity": max(sims) if sims else 0.0,
+        "method_dist": {m: sum(r["aug_method"] == m for r in rows) for m in sorted(set(r["aug_method"] for r in rows))},
+    }
+```
+
+`avg_similarity`만 보면 착시가 생깁니다. `min/max`와 method 분포를 같이 봐야 한 기법이 과도하게 지배하는 상황을 막을 수 있습니다.
+
+## 실무 기본값
+
+- first run은 paraphrase 단일 기법으로 시작합니다.
+- held-out 개선이 확인되면 back-translation을 소량 추가합니다.
+- EDA는 한국어에서 마지막 선택지로 둡니다.
+
+이 순서를 지키면 증강 실험의 실패 비용을 크게 줄일 수 있습니다.
+
+## 운영에서 바로 쓰는 점검 질문
+
+아래 질문은 배포 직전 리뷰에서 실제로 자주 쓰는 체크 항목입니다. 단순 문서 확인이 아니라, 각 질문에 대해 파일 경로나 지표 값으로 즉시 답할 수 있어야 합니다.
+
+1. 이번 데이터셋은 어떤 버전에서 왔고, sha256은 무엇인가요?
+2. 지난 배치 대비 duplicate/null/length 분포가 얼마나 변했나요?
+3. 제거된 샘플은 어떤 규칙 때문에 빠졌고, 상위 제거 사유는 무엇인가요?
+4. train/eval/test 경계에서 누수 가능성은 수치로 얼마나 남아 있나요?
+5. 이번 배치에서 사람이 검토한 샘플과 발견된 오류 유형은 무엇인가요?
+
+```python
+def release_readiness(summary: dict) -> tuple[bool, list[str]]:
+    issues = []
+    if not summary.get("dataset_sha256"):
+        issues.append("missing_dataset_sha256")
+    if summary.get("duplicate_ratio", 1.0) > 0.10:
+        issues.append("duplicate_ratio_too_high")
+    if summary.get("null_ratio", 1.0) > 0.02:
+        issues.append("null_ratio_too_high")
+    if summary.get("contamination_ratio", 1.0) > 0.01:
+        issues.append("contamination_ratio_too_high")
+    if summary.get("human_reviewed_rows", 0) < 100:
+        issues.append("insufficient_human_review")
+    return len(issues) == 0, issues
+```
+
+운영 팀은 이 함수를 그대로 쓰지 않더라도 같은 개념을 파이프라인 게이트로 구현해야 합니다. 핵심은 “준비가 되었는지 느낌으로 판단하지 않는다”는 점입니다.
+
+## 실무 로그 예시
+
+```text
+[release-check] dataset=v2.4.1 sha=4fb1...
+[release-check] duplicate_ratio=0.061 null_ratio=0.008
+[release-check] contamination_ratio=0.004 human_reviewed_rows=240
+[release-check] status=PASS
+```
+
+이 로그 한 묶음이 있으면 모델 성능이 흔들릴 때도 데이터 준비 단계를 빠르게 제외하거나 집중 점검할 수 있습니다. 데이터 준비의 품질은 글 한 편의 설명보다, 이런 반복 가능한 검증 로그에서 드러납니다.
+
+### 증강 중단 조건
+
+새 배치에서 `macro_f1`가 개선되지 않거나, 특정 클래스 precision이 2회 연속 하락하면 즉시 증강 실험을 중단하고 원인 분석으로 전환합니다.
+
+### 릴리스 노트에 남겨야 할 최소 항목
+
+해당 단계의 변경은 릴리스 노트에도 남겨야 합니다. 최소한 `변경 규칙`, `영향받은 행 수`, `핵심 지표 변화`, `롤백 경로` 네 항목이 있어야 다음 배치에서 같은 판단을 반복할 수 있습니다.
+
 ## 흔히 헷갈리는 지점
 
 - **validation도 같이 증강하면 더 공정합니다**: 아닙니다. 그건 공정성이 아니라 leakage입니다.

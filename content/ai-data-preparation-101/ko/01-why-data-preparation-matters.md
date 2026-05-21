@@ -228,6 +228,146 @@ print(compare_reports(prev, curr))
 
 이 보고서는 단순해 보여도 강력합니다. null 비율, 중복 비율, 길이 분포, 언어 분포를 이전 버전과 비교하면 학습을 시작하기 전에 이상 징후를 잡을 수 있습니다. 좋은 팀일수록 GPU를 켜기 전에 데이터 리포트를 먼저 봅니다.
 
+## 데이터셋 버전 고정과 품질 게이트를 같이 설계하기
+
+데이터 준비가 모델 품질을 결정한다는 말은 추상적으로 들릴 수 있습니다. 운영에서는 이를 `버전 고정 + 게이트 실패 시 중단`으로 구현해야 의미가 생깁니다. 아래 예시는 pandas와 polars를 함께 써서 스키마 검증, 중복 비율, 길이 분포를 계산하고 기준을 넘으면 학습을 중단하는 최소 파이프라인입니다.
+
+```python
+import pandas as pd
+import polars as pl
+
+RULES = {
+    "max_null_ratio": 0.02,
+    "max_duplicate_ratio": 0.10,
+    "max_p99_length": 2400,
+    "min_rows": 50_000,
+}
+
+def load_and_validate(path: str) -> dict:
+    pdf = pd.read_parquet(path)
+    required_cols = {"id", "text", "label", "source", "created_at"}
+    missing = sorted(required_cols - set(pdf.columns))
+    if missing:
+        raise ValueError({"error": "missing_columns", "columns": missing})
+
+    pldf = pl.from_pandas(pdf[["id", "text", "label", "source"]])
+    texts = pldf.select(pl.col("text").cast(pl.Utf8).fill_null(""))
+    lens = texts.select(pl.col("text").str.len_chars().alias("n")).to_series()
+
+    report = {
+        "rows": len(pdf),
+        "null_ratio": float(pdf["text"].isna().mean()),
+        "duplicate_ratio": float(1 - pdf["text"].astype(str).nunique() / max(len(pdf), 1)),
+        "p99_length": float(lens.quantile(0.99)),
+        "n_sources": int(pdf["source"].nunique()),
+    }
+
+    if report["rows"] < RULES["min_rows"]:
+        raise RuntimeError({"gate": "min_rows", "report": report})
+    if report["null_ratio"] > RULES["max_null_ratio"]:
+        raise RuntimeError({"gate": "null_ratio", "report": report})
+    if report["duplicate_ratio"] > RULES["max_duplicate_ratio"]:
+        raise RuntimeError({"gate": "duplicate_ratio", "report": report})
+    if report["p99_length"] > RULES["max_p99_length"]:
+        raise RuntimeError({"gate": "p99_length", "report": report})
+    return report
+```
+
+이렇게 준비한 리포트는 실험 로그와 항상 같은 run id를 가져야 합니다. 실험이 잘됐는지보다 먼저, 어떤 데이터셋 버전으로 실험했는지 답할 수 있어야 결과를 믿을 수 있기 때문입니다.
+
+```python
+from dataclasses import dataclass
+from datetime import datetime, timezone
+import json
+
+@dataclass
+class RunManifest:
+    run_id: str
+    dataset_version: str
+    dataset_sha256: str
+    quality_report: dict
+    git_commit: str
+    created_at: str
+
+def write_manifest(path: str, manifest: RunManifest) -> None:
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(manifest.__dict__, f, ensure_ascii=False, indent=2)
+
+manifest = RunManifest(
+    run_id="exp-2026-05-14-01",
+    dataset_version="v1.4.2",
+    dataset_sha256="c2d2...",
+    quality_report={"duplicate_ratio": 0.041, "p99_length": 980},
+    git_commit="9e1fabc",
+    created_at=datetime.now(timezone.utc).isoformat(),
+)
+```
+
+핵심은 간단합니다. 데이터 준비는 분석 노트가 아니라 배포 가능한 계약이어야 합니다. 실패 기준이 코드로 고정되어야 사람이 바뀌어도 같은 품질을 유지할 수 있습니다.
+
+## 운영 신호를 대시보드로 고정하는 방법
+
+데이터 준비를 팀 규칙으로 정착시키려면 문서보다 대시보드가 먼저 있어야 합니다. 실무에서는 배치마다 아래 네 신호를 반드시 비교합니다.
+
+- `duplicate_ratio`: 평가 오염 가능성 조기 감지
+- `null_ratio`: 수집 파이프라인 누락 감지
+- `p95/p99 token length`: 비용 급등과 context overflow 감지
+- `label/source drift`: 특정 소스 쏠림 감지
+
+```python
+from scipy.spatial.distance import jensenshannon
+import numpy as np
+
+def js_drift(prev_dist: dict, curr_dist: dict) -> float:
+    keys = sorted(set(prev_dist) | set(curr_dist))
+    p = np.array([prev_dist.get(k, 0.0) for k in keys], dtype=float)
+    q = np.array([curr_dist.get(k, 0.0) for k in keys], dtype=float)
+    p = p / max(p.sum(), 1e-9)
+    q = q / max(q.sum(), 1e-9)
+    return float(jensenshannon(p, q))
+```
+
+JS distance가 임계값을 넘으면 학습을 멈추고 원인 분석부터 들어가야 합니다. 모델 실험을 계속 돌리는 것보다 데이터 분포 이상을 먼저 해결하는 편이 전체 개발 속도가 더 빠릅니다.
+
+## 운영에서 바로 쓰는 점검 질문
+
+아래 질문은 배포 직전 리뷰에서 실제로 자주 쓰는 체크 항목입니다. 단순 문서 확인이 아니라, 각 질문에 대해 파일 경로나 지표 값으로 즉시 답할 수 있어야 합니다.
+
+1. 이번 데이터셋은 어떤 버전에서 왔고, sha256은 무엇인가요?
+2. 지난 배치 대비 duplicate/null/length 분포가 얼마나 변했나요?
+3. 제거된 샘플은 어떤 규칙 때문에 빠졌고, 상위 제거 사유는 무엇인가요?
+4. train/eval/test 경계에서 누수 가능성은 수치로 얼마나 남아 있나요?
+5. 이번 배치에서 사람이 검토한 샘플과 발견된 오류 유형은 무엇인가요?
+
+```python
+def release_readiness(summary: dict) -> tuple[bool, list[str]]:
+    issues = []
+    if not summary.get("dataset_sha256"):
+        issues.append("missing_dataset_sha256")
+    if summary.get("duplicate_ratio", 1.0) > 0.10:
+        issues.append("duplicate_ratio_too_high")
+    if summary.get("null_ratio", 1.0) > 0.02:
+        issues.append("null_ratio_too_high")
+    if summary.get("contamination_ratio", 1.0) > 0.01:
+        issues.append("contamination_ratio_too_high")
+    if summary.get("human_reviewed_rows", 0) < 100:
+        issues.append("insufficient_human_review")
+    return len(issues) == 0, issues
+```
+
+운영 팀은 이 함수를 그대로 쓰지 않더라도 같은 개념을 파이프라인 게이트로 구현해야 합니다. 핵심은 “준비가 되었는지 느낌으로 판단하지 않는다”는 점입니다.
+
+## 실무 로그 예시
+
+```text
+[release-check] dataset=v2.4.1 sha=4fb1...
+[release-check] duplicate_ratio=0.061 null_ratio=0.008
+[release-check] contamination_ratio=0.004 human_reviewed_rows=240
+[release-check] status=PASS
+```
+
+이 로그 한 묶음이 있으면 모델 성능이 흔들릴 때도 데이터 준비 단계를 빠르게 제외하거나 집중 점검할 수 있습니다. 데이터 준비의 품질은 글 한 편의 설명보다, 이런 반복 가능한 검증 로그에서 드러납니다.
+
 ## 흔히 헷갈리는 지점
 
 - **모델만 강하면 데이터 문제를 덮을 수 있습니다**: 더 큰 모델은 더러운 데이터에서도 그럴듯한 출력을 낼 수 있지만, 평가 누수와 편향까지 해결하지는 못합니다.

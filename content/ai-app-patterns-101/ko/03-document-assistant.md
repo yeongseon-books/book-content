@@ -355,6 +355,213 @@ for text in texts:
 
 다음 글에서는 에이전트와 도구 패턴을 다룹니다. 문맥만으로 답할 수 없는 질문에 대해 LLM이 자율적으로 도구를 선택하고 호출하는 구조입니다.
 
+---
+
+## 문서 처리 API: 요약·추출·분류를 같은 서비스에서 운영하기
+
+### 작업별 시스템 프롬프트 템플릿
+
+문서 어시스턴트는 "한 모델"보다 "작업 계약"이 먼저입니다. 아래처럼 작업마다 프롬프트 템플릿을 분리하면 품질 회귀를 좁게 관리할 수 있습니다.
+
+```python
+SUMMARY_SYSTEM_PROMPT = """
+당신은 기술 문서를 요약하는 편집자입니다.
+- 핵심 주장, 근거, 결론만 남깁니다.
+- 과장 표현을 제거합니다.
+- 출력은 4문장 이내로 제한합니다.
+""".strip()
+
+EXTRACTION_SYSTEM_PROMPT = """
+당신은 비정형 문서에서 구조화 필드를 추출합니다.
+- 지정된 JSON 스키마만 반환합니다.
+- 값이 없으면 null로 기록합니다.
+- 추측으로 필드를 채우지 않습니다.
+""".strip()
+
+CLASSIFICATION_SYSTEM_PROMPT = """
+당신은 운영 라우팅 분류기입니다.
+- 허용 라벨 집합 밖의 값을 만들지 않습니다.
+- 신뢰도(confidence)를 0~1로 함께 반환합니다.
+""".strip()
+```
+
+이렇게 나누면 요약 품질 저하와 추출 파싱 실패를 동일 원인으로 섞지 않게 됩니다. 운영 중에는 문제를 빠르게 분해하는 능력이 결과적으로 비용을 줄입니다.
+
+### Flask 엔드포인트 예시
+
+```python
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+@app.post('/documents/summarize')
+def summarize_document():
+    text = request.json['text']
+    style = request.json.get('style', 'technical')
+    # 실제 구현에서는 SUMMARY_SYSTEM_PROMPT를 사용한 모델 호출
+    return jsonify({'summary': f'[{style}] 요약 예시: {text[:120]}...'})
+
+@app.post('/documents/extract')
+def extract_fields():
+    text = request.json['text']
+    schema = request.json['schema']
+    # 실제 구현에서는 EXTRACTION_SYSTEM_PROMPT + JSON parser
+    return jsonify({'result': {'company': 'ABCTech', 'salary_range': None}, 'schema': schema})
+
+@app.post('/documents/classify')
+def classify_document():
+    text = request.json['text']
+    # 실제 구현에서는 CLASSIFICATION_SYSTEM_PROMPT
+    return jsonify({'category': 'Technology/IT', 'confidence': 0.91, 'preview': text[:60]})
+```
+
+### 배치 처리에서의 실패 복구 단위
+
+문서 처리에서는 한 건 실패 때문에 전체 배치를 중단하지 않는 설계가 중요합니다. 그래서 보통 문서 단위 재시도 키를 둡니다.
+
+```text
+job_id: batch-2026-05-21-001
+item_id: doc-00041
+status: failed
+failed_stage: extraction
+retry_count: 2
+last_error: invalid_json_output
+```
+
+이 메타데이터를 남기면 재처리 큐에서 `failed_stage`부터 재개할 수 있습니다. "어디서 깨졌는지"가 남지 않으면 긴 배치 작업은 재현 비용이 급격히 커집니다.
+
+## 문서 처리 안정성: 스키마 검증과 부분 실패 허용
+
+요약은 자연어라서 느슨하게 처리해도 되지만, 추출과 분류는 후속 시스템 입력이므로 엄격해야 합니다. 아래처럼 Pydantic 검증 계층을 두면 모델 출력이 흔들려도 오류를 조기에 잡을 수 있습니다.
+
+```python
+from pydantic import BaseModel, Field, ValidationError
+
+class JobExtract(BaseModel):
+    company: str
+    position: str
+    location: str | None = None
+    salary_range: str | None = None
+    experience_years: int | None = Field(default=None, ge=0, le=40)
+
+def validate_extract(payload: dict) -> tuple[bool, str]:
+    try:
+        JobExtract.model_validate(payload)
+        return True, 'ok'
+    except ValidationError as exc:
+        return False, str(exc)
+```
+
+### 부분 실패 허용 배치 루프
+
+```python
+def process_batch(items: list[dict]) -> dict:
+    results = []
+    failures = []
+
+    for item in items:
+        extracted = run_extraction(item['text'])
+        ok, reason = validate_extract(extracted)
+
+        if ok:
+            results.append({'id': item['id'], 'result': extracted})
+        else:
+            failures.append({'id': item['id'], 'reason': reason})
+
+    return {
+        'success_count': len(results),
+        'failure_count': len(failures),
+        'results': results,
+        'failures': failures,
+    }
+```
+
+배치 시스템에서 중요한 것은 100건 중 2건 실패를 100건 전체 실패로 키우지 않는 것입니다. 실패한 건만 분리해 재처리하면 처리량과 안정성을 동시에 챙길 수 있습니다.
+
+### 처리 파이프라인 다이어그램
+
+```mermaid
+flowchart LR
+    I[문서 입력] --> S[요약]
+    I --> E[추출]
+    I --> C[분류]
+    E --> V{스키마 검증}
+    V -->|통과| O[정상 저장]
+    V -->|실패| R[재처리 큐]
+    C --> O
+    S --> O
+```
+
+*요약·추출·분류 공존 파이프라인과 검증 분기*
+
+## 문서 길이와 작업 타입에 따른 실행 전략
+
+문서 어시스턴트의 운영 비용은 문서 길이 분포에 크게 좌우됩니다. 그래서 보통 입력 길이를 기준으로 실행 전략을 나눕니다.
+
+```python
+def choose_strategy(char_len: int, task_type: str) -> str:
+    if task_type == 'summary' and char_len > 8000:
+        return 'map_reduce_summary'
+    if task_type == 'extraction' and char_len > 12000:
+        return 'sectioned_extraction'
+    if task_type == 'classification' and char_len > 20000:
+        return 'hierarchical_classification'
+    return 'single_pass'
+```
+
+이 분기는 단순해 보이지만 효과가 큽니다. 모든 문서를 단일 전략으로 처리하면 과도한 비용이나 파싱 실패가 누적되기 쉽습니다.
+
+### 오케스트레이션 다이어그램
+
+```mermaid
+flowchart LR
+    I[문서 입력] --> L{길이/작업 평가}
+    L -->|short| S1[Single pass]
+    L -->|long summary| S2[Map-Reduce]
+    L -->|long extraction| S3[Sectioned extraction]
+    S1 --> O[결과 저장]
+    S2 --> O
+    S3 --> O
+```
+
+*문서 길이 기반 실행 전략 분기*
+
+### 운영 팁
+
+추출 실패를 줄이려면 모델 출력이 JSON이라고 가정하지 말고, "파싱 실패 시 원문 보존 + 재시도 큐"를 기본으로 두는 편이 안전합니다. 데이터 파이프라인에서 가장 비싼 실패는 조용한 실패입니다.
+
+## 품질 점검 샘플셋 운영
+
+문서 어시스턴트는 운영 전에 작업별 샘플셋을 두는 편이 안전합니다. 요약은 핵심 누락 여부, 추출은 스키마 일치율, 분류는 라벨 정확도로 분리해 측정해야 합니다.
+
+```text
+summary_set: 200건, metric=핵심키워드 재현율
+extraction_set: 300건, metric=필드 정합률
+classification_set: 500건, metric=macro_f1
+```
+
+하나의 점수로 묶으면 어떤 작업이 깨졌는지 보이지 않습니다. 작업별 품질 계기판을 분리하는 것이 유지보수에 유리합니다.
+
+### 출력 길이 가드
+
+요약 결과가 너무 길어지면 후속 시스템이 예상한 화면이나 DB 컬럼 길이를 넘길 수 있습니다. 작업별 최대 길이를 두고 초과 시 자동 재요약하는 후처리를 두면 안정성이 좋아집니다.
+
+### 파이프라인 버전 관리
+
+요약/추출/분류 체인은 각각 버전을 붙여 릴리스 노트와 함께 관리해야 합니다. 같은 문서라도 체인 버전에 따라 결과가 달라질 수 있기 때문입니다.
+
+### 운영 회고에서 반드시 남길 항목
+
+패턴 설계가 실제로 효과가 있었는지는 회고 기록 품질에서 드러납니다. 각 글에서 다룬 구조를 실서비스에 적용했다면, 최소한 다음 항목은 공통 템플릿으로 남기는 편이 좋습니다.
+
+- 변경 전/후의 실패 유형 분포
+- 변경 전/후의 평균 지연 시간과 p95
+- 사람이 개입한 건수와 자동 처리 건수 비율
+- 근거 부족, 파싱 실패, 도구 오류 같은 실패 코드의 추세
+- 다음 분기에서 조정할 임계값 또는 프롬프트 버전
+
+이 기록이 쌓이면 모델 자체 성능보다 애플리케이션 패턴 결정이 어떤 영향을 주었는지 분리해서 볼 수 있습니다. 결국 운영 품질은 한 번의 정답 설계가 아니라, 측정 가능한 개선 루프를 오래 유지하는 능력에서 만들어집니다.
+
 ## 처음 질문으로 돌아가기
 
 - **문서 어시스턴트에서 요약, 추출, 분류는 왜 서로 다른 출력 계약이 필요할까요?**

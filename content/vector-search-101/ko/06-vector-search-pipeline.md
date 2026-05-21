@@ -377,6 +377,107 @@ print(manifest)
 - [ ] 운영에서 평가 셋과 자동 품질 검증 스크립트를 유지했다
 - [ ] 지연 시간, recall, 비용을 같은 대시보드에서 보이게 했다
 
+## 벡터 DB로 교체 가능한 파이프라인 경계
+
+6편의 핵심은 특정 라이브러리에 종속되지 않는 경계를 세우는 것입니다. 아래처럼 인터페이스를 먼저 두면, 로컬 FAISS에서 Chroma/Qdrant/Pinecone으로 이동해도 상위 검색 로직은 유지됩니다.
+
+```python
+from typing import Protocol
+
+class VectorStore(Protocol):
+    def upsert(self, ids: list[str], vectors: list[list[float]], payloads: list[dict]) -> None:
+        ...
+
+    def search(self, query_vector: list[float], top_k: int) -> list[tuple[str, float, dict]]:
+        ...
+```
+
+파이프라인이 이 인터페이스를 기준으로 작성되어 있으면, 저장소 선택은 구현 세부로 내려갑니다.
+
+## 저장소별 구현 예시
+
+```python
+# Chroma adapter (요약)
+class ChromaStore:
+    def __init__(self, collection):
+        self.collection = collection
+
+    def upsert(self, ids, vectors, payloads):
+        self.collection.upsert(ids=ids, embeddings=vectors, metadatas=payloads)
+
+    def search(self, query_vector, top_k):
+        out = self.collection.query(query_embeddings=[query_vector], n_results=top_k)
+        return list(zip(out["ids"][0], out["distances"][0], out["metadatas"][0]))
+```
+
+```python
+# Qdrant adapter (요약)
+class QdrantStore:
+    def __init__(self, client, collection_name):
+        self.client = client
+        self.collection_name = collection_name
+
+    def upsert(self, ids, vectors, payloads):
+        points = [{"id": i, "vector": v, "payload": p} for i, v, p in zip(ids, vectors, payloads)]
+        self.client.upsert(collection_name=self.collection_name, points=points)
+
+    def search(self, query_vector, top_k):
+        hits = self.client.search(collection_name=self.collection_name, query_vector=query_vector, limit=top_k)
+        return [(str(h.id), float(h.score), h.payload) for h in hits]
+```
+
+```python
+# Pinecone adapter (요약)
+class PineconeStore:
+    def __init__(self, index):
+        self.index = index
+
+    def upsert(self, ids, vectors, payloads):
+        self.index.upsert(vectors=[(i, v, p) for i, v, p in zip(ids, vectors, payloads)])
+
+    def search(self, query_vector, top_k):
+        out = self.index.query(vector=query_vector, top_k=top_k, include_metadata=True)
+        return [(m.id, float(m.score), m.metadata) for m in out.matches]
+```
+
+## 하이브리드 검색 가중치 실험 루프
+
+하이브리드 검색은 한 번 구현하고 끝나는 기능이 아닙니다. `alpha` 값을 바꿔 평가셋에서 반복 측정해야 합니다.
+
+```python
+def evaluate_alpha(candidates, alpha_values):
+    rows = []
+    for alpha in alpha_values:
+        metrics = run_eval(candidates=candidates, alpha=alpha)  # precision/recall 계산 함수
+        rows.append((alpha, metrics["recall@5"], metrics["mrr@10"], metrics["p95_ms"]))
+    return rows
+```
+
+| alpha(vector weight) | Recall@5 | MRR@10 | p95(ms) |
+|---:|---:|---:|---:|
+| 0.2 | 0.81 | 0.63 | 38 |
+| 0.5 | 0.88 | 0.69 | 42 |
+| 0.7 | 0.90 | 0.71 | 44 |
+| 0.9 | 0.87 | 0.67 | 43 |
+
+이런 결과가 나오면 0.7 근처를 기본값으로 두고, 식별자 중심 질의에는 0.5 이하를 적용하는 정책 분기가 가능합니다.
+
+## 프로덕션 스케일링 패턴
+
+마지막으로 실제 운영에서 자주 사용하는 확장 패턴을 정리합니다.
+
+- 인덱싱 파이프라인은 배치 작업으로 분리하고, 서비스 검색 노드는 읽기 전용으로 유지
+- 인덱스 버전을 `blue/green`으로 운영해 무중단 교체
+- 쿼리 로그에서 실패 질의를 추출해 주기적으로 평가셋에 편입
+- latency budget을 초과하면 top-k 축소, ANN 파라미터 하향, 리랭커 비활성화 순으로 완화
+- 모델 교체 시 shadow traffic으로 점수 분포를 먼저 비교하고 본 배포 진행
+
+이 규칙을 자동화하면 "검색 품질"과 "서비스 안정성"이 충돌할 때도 대응 절차가 명확해집니다.
+
+추가로 운영 초기에 꼭 넣어야 할 항목은 "관측 가능성 계약"입니다. 최소한 `query_id`, `index_version`, `embedding_version`, `top_k`, `latency_ms`, `result_doc_ids`를 구조화 로그로 남기면 문제 재현 속도가 크게 올라갑니다. 벡터 검색 문제는 원인이 인덱스인지, 모델인지, 하이브리드 가중치인지 섞여 나타나는 경우가 많기 때문에, 이 필드가 없으면 원인 분리가 거의 불가능합니다.
+
+요약하면 파이프라인의 완성도는 단일 알고리즘보다 경계 설계와 운영 계측에서 결정됩니다.
+
 ## 처음 질문으로 돌아가기
 
 - **벡터 검색 파이프라인은 임베딩 한 번이 아니라 어떤 단계들의 연결일까요?**

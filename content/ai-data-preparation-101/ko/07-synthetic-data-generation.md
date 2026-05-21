@@ -358,6 +358,31 @@ require_policy_review(
 
 이 기준은 보편적인 절대값이 아니라, “샘플이 많아 보이지만 실제로는 실패한 배치”를 빠르게 거르기 위한 운영 기준입니다. 예를 들어 `unique_ratio`가 0.62라면 더 생성할 문제가 아니라 프롬프트와 seed set을 다시 설계할 문제일 가능성이 큽니다.
 
+## Dataset versioning과 DAG 관점으로 마무리하기
+
+합성 배치를 운영에 올릴 때는 생성 코드보다 버전 관리와 의존성 그래프가 더 중요해집니다. 최소한 아래 DAG처럼 `seed -> generate -> validate -> approve -> publish` 단계가 분리되어야 배치 실패 원인을 즉시 좁힐 수 있습니다.
+
+```python
+DAG = {
+    "seed_snapshot": [],
+    "generate_items": ["seed_snapshot"],
+    "validate_schema": ["generate_items"],
+    "validate_evidence": ["validate_schema"],
+    "human_review": ["validate_evidence"],
+    "publish_dataset": ["human_review"],
+}
+```
+
+또한 accepted 배치는 DVC나 동등한 데이터 버전 시스템으로 고정해 두어야 합니다.
+
+```bash
+dvc add datasets/ai-data-preparation-101/07-synthetic-data-generation/<run_id>/accepted.jsonl
+git add datasets/ai-data-preparation-101/07-synthetic-data-generation/<run_id>/accepted.jsonl.dvc
+git commit -m "Track synthetic batch <run_id>"
+```
+
+이 기록이 있어야 “어떤 프롬프트와 어떤 검증 기준으로 만들어진 데이터인지”를 나중에도 설명할 수 있습니다.
+
 ## 흔히 헷갈리는 지점
 
 - **합성 데이터는 많이 만들수록 좋습니다**: 아닙니다. reject 가능한 기준 없이 양만 늘리면 노이즈가 더 빨리 쌓입니다.

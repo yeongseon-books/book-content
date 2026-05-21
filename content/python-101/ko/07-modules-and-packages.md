@@ -366,6 +366,155 @@ def total(items):
 
 다음 글에서는 파일 I/O와 예외 처리를 다룹니다. 모듈 단위로 정리한 코드가 외부 자원을 안전하게 다루는 방법을 살펴봅니다.
 
+## 실전 앵커: import 경로, 패키지 구조, 배포 전 점검
+
+모듈/패키지 파트의 핵심은 "내 코드가 어디에서 로드되는가"를 확실히 아는 것입니다. 아래 세 줄만으로도 대부분의 import 문제를 빠르게 좁힐 수 있습니다.
+
+```python
+import sys
+import mypkg
+
+print(sys.path)
+print(mypkg.__file__)
+```
+
+`sys.path` 앞부분에 의도치 않은 경로가 있으면 같은 이름의 모듈이 그림자처럼 먼저 로드될 수 있습니다. 특히 파일명을 `random.py`, `json.py`로 짓는 실수가 자주 발생합니다.
+
+```text
+ImportError: cannot import name 'loads' from 'json' (/project/json.py)
+```
+
+이 에러는 표준 라이브러리 `json`이 아니라 프로젝트 파일 `json.py`를 먼저 읽은 경우입니다.
+
+패키지 구조는 최소 단위부터 단정하게 시작하는 편이 좋습니다.
+
+```text
+myapp/
+  pyproject.toml
+  src/
+    myapp/
+      __init__.py
+      cli.py
+      service.py
+```
+
+`src/` 레이아웃은 테스트 중 우연한 상대경로 import를 줄여 줍니다. 설치된 패키지 기준으로 동작을 확인하기 쉬워 배포 안정성이 올라갑니다.
+
+`pyproject.toml`의 가장 작은 예시는 다음처럼 유지할 수 있습니다.
+
+```toml
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "myapp"
+version = "0.1.0"
+description = "python-101 example"
+requires-python = ">=3.11"
+```
+
+설치 후에는 엔트리포인트를 통해 import 경로를 검증합니다.
+
+```bash
+python -m pip install -e .
+python -m myapp.cli
+```
+
+표준 라이브러리 `importlib`도 함께 익혀 두면 동적 로딩 코드의 디버깅이 쉬워집니다.
+
+```python
+import importlib
+
+math_mod = importlib.import_module('math')
+print(math_mod.sqrt(16))
+```
+
+성능 관점에서는 import 비용도 측정할 수 있습니다.
+
+```python
+import timeit
+
+cold = timeit.timeit("import json", number=1000)
+print(cold)
+```
+
+대부분은 미미하지만 대규모 CLI에서 초기 체감 속도를 바꾸는 경우가 있어, 느린 의존성은 함수 내부 지연 import로 분리하기도 합니다.
+
+디버깅 루틴으로는 `pdb`보다도 `python -X importtime -c "import myapp"`가 매우 유용합니다. 어떤 모듈 import가 느린지 계층별로 확인할 수 있습니다.
+
+모듈/패키지 단원의 목표는 코드 재사용을 넘어서, 실행 환경이 바뀌어도 동일하게 로드되는 구조를 만드는 것입니다.
+
+### 추가 실습: 배포 전 import 안정성 점검 절차
+
+패키지 작업에서 "로컬에서는 되는데 서버에서 안 되는" 문제는 대부분 경로/설치 방식에서 발생합니다. 배포 전에는 아래 절차를 고정해서 확인합니다.
+
+```bash
+python -m pip uninstall -y myapp
+python -m pip install .
+python -c "import myapp, sys; print(myapp.__file__); print(sys.version)"
+```
+
+editable install(`-e`)과 일반 install 모두 테스트하면 경로 의존 버그를 빨리 찾을 수 있습니다.
+
+네임스페이스 충돌 방지도 중요합니다. 표준 라이브러리와 같은 모듈명을 피하고, `__init__.py`에서 과도한 사이드이펙트 import를 줄여야 초기화 실패를 줄일 수 있습니다.
+
+```python
+# bad: __init__.py에서 네트워크 호출
+# good: 최소 공개 심볼만 노출
+from .service import run
+```
+
+마지막으로 `python -m package.module` 실행 습관을 들이면 상대 import 오류를 줄일 수 있습니다.
+
+### 부록: 로컬 실습 로그 템플릿
+
+아래 템플릿은 학습 단계에서 직접 실험한 결과를 남길 때 유용합니다. 중요한 점은 "코드 + 실행 환경 + 출력"을 한 세트로 기록하는 것입니다. 이렇게 남긴 로그는 나중에 문제가 다시 발생했을 때 가장 신뢰할 수 있는 재현 자료가 됩니다.
+
+```text
+[환경]
+python: 3.12.x
+platform: macOS/Linux
+venv: .venv
+
+[실험]
+목표: 동작 확인 또는 성능 비교
+입력: 샘플 데이터 1,000건
+실행 명령: python script.py
+
+[출력]
+성공/실패 여부
+핵심 숫자(timeit, 처리 건수, 예외 메시지)
+```
+
+실무 코드 리뷰에서는 결과 숫자만 공유하는 경우가 많지만, 학습 단계에서는 중간 가정까지 함께 적는 편이 더 효과적입니다. 예를 들어 "셋 포함 검사가 빠를 것이다"라는 가정이 맞았는지, "f-string이 항상 더 읽기 쉽다"라는 판단이 팀 컨벤션과 맞는지까지 기록하면 다음 의사결정이 빨라집니다.
+
+디버깅 기록도 같은 형식을 쓰면 좋습니다.
+
+1) 증상: 어떤 입력에서 실패했는가
+2) 가설: 어떤 조건문/자료구조/경로가 원인인가
+3) 검증: `pdb`, `print`, `timeit`, 단위 테스트 중 무엇으로 확인했는가
+4) 결론: 수정 전후 동작 차이가 무엇인가
+
+이 습관은 초급 단계에서는 다소 느리게 느껴질 수 있습니다. 하지만 프로젝트 규모가 커질수록 "정확한 기록"이 가장 빠른 길이 됩니다. Python 문법을 익히는 것과 별개로, 실험을 재현 가능한 형태로 남기는 역량은 개발자로서의 성장 속도를 결정합니다.
+
+### 보강 메모: 실수 줄이는 운영 습관
+
+학습 단계에서 만든 코드를 실제 프로젝트에 옮길 때는 세 가지를 같이 점검하는 편이 좋습니다. 첫째, 입력 검증 경계가 함수 시작 지점에 있는지 확인합니다. 둘째, 실패 시 사용자에게 보여 줄 메시지와 로그 메시지를 분리합니다. 셋째, 성능 판단은 추측이 아니라 `timeit` 또는 샘플 벤치마크로 남깁니다.
+
+간단한 템플릿은 다음과 같습니다.
+
+```python
+def safe_run(fn, *args, **kwargs):
+    try:
+        return fn(*args, **kwargs)
+    except Exception as e:
+        # 학습 단계에서는 원인 관찰을 우선
+        raise RuntimeError(f'실행 실패: {fn.__name__}') from e
+```
+
+또한 표준 라이브러리 문서를 읽을 때는 "모듈 개요 -> 대표 함수 3개 -> 예외 종류" 순서로 훑는 습관을 들이면 기억이 오래갑니다. 기능을 전부 외우는 것보다, 어떤 상황에서 어떤 모듈을 열어봐야 하는지 아는 것이 더 중요합니다.
+
 ## 처음 질문으로 돌아가기
 
 - **같은 이름의 함수와 변수가 충돌합니다?**

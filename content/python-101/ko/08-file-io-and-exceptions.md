@@ -315,6 +315,171 @@ done
 
 다음 글에서는 클래스와 객체를 다룹니다. 지금까지 다뤄 온 함수와 모듈의 묶음을 한 단계 더 추상화해, 데이터와 동작을 함께 묶는 방법을 살펴봅니다.
 
+## 실전 앵커: 파일 처리 신뢰성과 예외 설계
+
+파일 I/O는 정상 경로보다 실패 경로 설계가 중요합니다. 파일이 없거나, 인코딩이 다르거나, 권한이 없거나, 중간에 프로세스가 중단되는 상황을 먼저 가정해야 합니다.
+
+```python
+from pathlib import Path
+
+path = Path('data/input.txt')
+if not path.exists():
+    raise FileNotFoundError(path)
+
+text = path.read_text(encoding='utf-8')
+print(text[:40])
+```
+
+파일 쓰기는 원자성(atomicity) 관점에서 임시 파일 + 교체 패턴을 쓰면 안전합니다.
+
+```python
+from pathlib import Path
+
+final = Path('result.json')
+tmp = final.with_suffix('.tmp')
+tmp.write_text('{"ok": true}
+', encoding='utf-8')
+tmp.replace(final)
+```
+
+중간 실패가 발생해도 손상된 결과 파일을 남길 가능성이 줄어듭니다.
+
+예외 처리에서는 폭넓은 `except Exception:`을 먼저 쓰지 않는 것이 중요합니다. 예상 가능한 예외를 좁게 잡고, 복구 불가능한 예외는 다시 올려야 합니다.
+
+```python
+try:
+    value = int('42a')
+except ValueError as e:
+    print('숫자 파싱 실패:', e)
+```
+
+체이닝도 꼭 알아두어야 합니다.
+
+```python
+try:
+    raise ValueError('bad format')
+except ValueError as e:
+    raise RuntimeError('사용자 입력 검증 실패') from e
+```
+
+`from e`를 쓰면 원인 예외가 traceback에 보존되어 운영 디버깅이 쉬워집니다.
+
+`pdb`로 파일 처리 코드를 추적하는 예시는 다음이 기본입니다.
+
+```python
+import pdb
+from pathlib import Path
+
+def load_config(path):
+    pdb.set_trace()
+    return Path(path).read_text(encoding='utf-8')
+```
+
+`p path`, `n`, `p Path(path).exists()` 순서로 보면 실패 지점을 빠르게 찾을 수 있습니다.
+
+성능 측정도 간단히 해 봅니다.
+
+```python
+import timeit
+
+line_t = timeit.timeit("sum(1 for _ in open('big.txt', encoding='utf-8'))", number=10)
+all_t = timeit.timeit("len(open('big.txt', encoding='utf-8').read().splitlines())", number=10)
+print(line_t, all_t)
+```
+
+대용량 파일은 스트리밍 처리가 메모리 안정성 면에서 유리합니다.
+
+표준 라이브러리 예시를 더하면 다음 조합이 실무에서 자주 쓰입니다.
+
+- `pathlib`: 경로 조작의 가독성 향상
+- `csv`: 구분자/인용부호 처리 자동화
+- `json`: API/설정 파일 직렬화
+- `tempfile`: 임시 파일 안전 생성
+
+예외 처리는 "모든 오류를 숨기는 기술"이 아니라 "오류를 예측 가능하게 노출하는 설계"입니다. 이 관점을 잡아야 운영에서 원인 분석 시간이 줄어듭니다.
+
+### 추가 실습: 예외 로깅과 재시도 경계 설정
+
+예외를 처리할 때는 복구 가능한 오류와 즉시 실패해야 하는 오류를 구분해야 합니다. 파일 잠금, 일시적 네트워크 오류는 재시도 가능하지만 데이터 포맷 오류는 재시도로 해결되지 않습니다.
+
+```python
+import time
+
+def retry_read(read_fn, retries=3):
+    for attempt in range(1, retries + 1):
+        try:
+            return read_fn()
+        except OSError as e:
+            if attempt == retries:
+                raise
+            time.sleep(0.2 * attempt)
+```
+
+또한 로깅 시 traceback을 반드시 남겨야 사후 분석이 가능합니다.
+
+```python
+import logging
+
+logger = logging.getLogger(__name__)
+
+try:
+    1 / 0
+except ZeroDivisionError:
+    logger.exception('계산 실패')
+```
+
+`logger.exception`은 현재 예외 스택을 자동으로 붙여 주므로 운영 장애 대응에 유리합니다.
+
+텍스트 파일 처리에서는 newline 정책도 명확히 해야 합니다. CSV는 `newline=''`를 권장하고, 일반 텍스트는 기본 newline 정규화를 사용하되 플랫폼 간 결과를 테스트로 고정하는 편이 안전합니다.
+
+### 부록: 로컬 실습 로그 템플릿
+
+아래 템플릿은 학습 단계에서 직접 실험한 결과를 남길 때 유용합니다. 중요한 점은 "코드 + 실행 환경 + 출력"을 한 세트로 기록하는 것입니다. 이렇게 남긴 로그는 나중에 문제가 다시 발생했을 때 가장 신뢰할 수 있는 재현 자료가 됩니다.
+
+```text
+[환경]
+python: 3.12.x
+platform: macOS/Linux
+venv: .venv
+
+[실험]
+목표: 동작 확인 또는 성능 비교
+입력: 샘플 데이터 1,000건
+실행 명령: python script.py
+
+[출력]
+성공/실패 여부
+핵심 숫자(timeit, 처리 건수, 예외 메시지)
+```
+
+실무 코드 리뷰에서는 결과 숫자만 공유하는 경우가 많지만, 학습 단계에서는 중간 가정까지 함께 적는 편이 더 효과적입니다. 예를 들어 "셋 포함 검사가 빠를 것이다"라는 가정이 맞았는지, "f-string이 항상 더 읽기 쉽다"라는 판단이 팀 컨벤션과 맞는지까지 기록하면 다음 의사결정이 빨라집니다.
+
+디버깅 기록도 같은 형식을 쓰면 좋습니다.
+
+1) 증상: 어떤 입력에서 실패했는가
+2) 가설: 어떤 조건문/자료구조/경로가 원인인가
+3) 검증: `pdb`, `print`, `timeit`, 단위 테스트 중 무엇으로 확인했는가
+4) 결론: 수정 전후 동작 차이가 무엇인가
+
+이 습관은 초급 단계에서는 다소 느리게 느껴질 수 있습니다. 하지만 프로젝트 규모가 커질수록 "정확한 기록"이 가장 빠른 길이 됩니다. Python 문법을 익히는 것과 별개로, 실험을 재현 가능한 형태로 남기는 역량은 개발자로서의 성장 속도를 결정합니다.
+
+### 보강 메모: 실수 줄이는 운영 습관
+
+학습 단계에서 만든 코드를 실제 프로젝트에 옮길 때는 세 가지를 같이 점검하는 편이 좋습니다. 첫째, 입력 검증 경계가 함수 시작 지점에 있는지 확인합니다. 둘째, 실패 시 사용자에게 보여 줄 메시지와 로그 메시지를 분리합니다. 셋째, 성능 판단은 추측이 아니라 `timeit` 또는 샘플 벤치마크로 남깁니다.
+
+간단한 템플릿은 다음과 같습니다.
+
+```python
+def safe_run(fn, *args, **kwargs):
+    try:
+        return fn(*args, **kwargs)
+    except Exception as e:
+        # 학습 단계에서는 원인 관찰을 우선
+        raise RuntimeError(f'실행 실패: {fn.__name__}') from e
+```
+
+또한 표준 라이브러리 문서를 읽을 때는 "모듈 개요 -> 대표 함수 3개 -> 예외 종류" 순서로 훑는 습관을 들이면 기억이 오래갑니다. 기능을 전부 외우는 것보다, 어떤 상황에서 어떤 모듈을 열어봐야 하는지 아는 것이 더 중요합니다.
+
 ## 처음 질문으로 돌아가기
 
 - **파일 I/O와 예외 처리를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?**

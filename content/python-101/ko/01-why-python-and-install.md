@@ -345,6 +345,125 @@ hello-python/
 
 다음 글에서는 변수, 타입, 연산자를 다룹니다. Python의 동적 타입이 무엇을 의미하는지, type hint가 왜 필요한지, 정수·실수·문자열·bool·None이 어떻게 다르게 동작하는지 짚어 봅니다.
 
+## 실전 앵커: 설치 직후에 바로 보는 실행 환경과 인터프리터 내부
+
+입문자가 가장 많이 겪는 문제는 문법이 아니라 실행 환경 불일치입니다. VS Code에서 실행한 결과와 터미널에서 실행한 결과가 다르면, 코드 자체보다 먼저 인터프리터 경로를 확인해야 합니다. 아래 점검 루틴을 팀 온보딩 문서에 넣어 두면 초반 시행착오를 크게 줄일 수 있습니다.
+
+```bash
+python --version
+which python
+python -c "import sys; print(sys.executable)"
+python -c "import site; print(site.getsitepackages())"
+```
+
+실제 출력 예시는 다음처럼 해석합니다.
+
+```text
+$ python --version
+Python 3.12.4
+
+$ which python
+~/.pyenv/shims/python
+
+$ python -c "import sys; print(sys.executable)"
+~/.pyenv/versions/3.12.4/bin/python
+```
+
+여기서 중요한 포인트는 `which python`과 `sys.executable`이 논리적으로 같은 런타임을 가리키는지입니다. 다르면 쉘 alias, IDE 인터프리터 설정, 가상환경 활성화 순서를 먼저 의심합니다.
+
+CPython 관점에서도 설치 확인은 단순 버전 확인으로 끝나지 않습니다. 다음 한 줄은 현재 런타임의 구현체와 GIL 정보를 함께 확인하게 해 줍니다.
+
+```python
+import platform
+import sys
+
+print(platform.python_implementation())
+print(sys.version)
+print(sys.getswitchinterval())
+```
+
+`platform.python_implementation()`이 `CPython`이면, 우리가 이 시리즈에서 설명하는 참조 카운트(reference counting) 기반 메모리 관리 모델을 그대로 적용해서 이해할 수 있습니다. `sys.getswitchinterval()`은 스레드 전환 간격으로, GIL이 있는 CPython에서 CPU-bound 코드가 왜 선형 확장되지 않는지를 설명할 때 자주 쓰는 단서입니다.
+
+REPL에서도 메모리 모델을 짧게 체험할 수 있습니다.
+
+```pycon
+>>> import sys
+>>> a = []
+>>> sys.getrefcount(a)
+2
+>>> b = a
+>>> sys.getrefcount(a)
+3
+>>> del b
+>>> sys.getrefcount(a)
+2
+```
+
+`getrefcount` 값이 1씩 더 크게 보이는 이유는 함수 호출 인자 자체가 임시 참조를 만들기 때문입니다. 이런 작은 관찰이 나중에 함수 인자 전달, 얕은 복사/깊은 복사, 객체 수명 주기를 이해할 때 큰 차이를 만듭니다.
+
+패키지 설치까지 확장하면 표준 점검표는 아래처럼 정리할 수 있습니다.
+
+| 점검 항목 | 확인 명령 | 기대 결과 | 실패 시 대응 |
+|---|---|---|---|
+| 인터프리터 버전 | `python --version` | 3.11+ | pyenv/설치 버전 재선택 |
+| pip 연결 | `python -m pip --version` | 같은 python 경로 | `python -m pip` 방식 고정 |
+| venv 활성화 | `echo $VIRTUAL_ENV` | 경로 출력 | `source .venv/bin/activate` |
+| 인코딩 | `python -c "import sys; print(sys.getdefaultencoding())"` | utf-8 | 쉘 locale/터미널 설정 점검 |
+
+입문 단계에서 이 표를 귀찮아하면 이후 모든 디버깅 비용이 커집니다. 반대로 처음 한 번만 정확히 정렬해 두면, 시리즈 후반의 모듈/패키지, 테스트, 배포 주제를 훨씬 안정적으로 따라갈 수 있습니다.
+
+### 추가 실습: 환경 불일치를 5분 안에 찾는 체크리스트
+
+설치가 끝난 뒤 바로 프로젝트를 시작하기 전에, 아래 명령을 한 번 실행해 두면 이후 오류의 절반을 예방할 수 있습니다.
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install ipython
+python -c "import sys, platform; print(sys.executable); print(platform.platform())"
+```
+
+출력으로 확보해야 하는 사실은 세 가지입니다. 첫째, 실행 파일 경로가 프로젝트 내부 가상환경인지. 둘째, pip가 같은 경로의 python에 연결되는지. 셋째, 운영체제/아키텍처 정보가 팀 문서와 일치하는지입니다.
+
+```text
+$ python -m pip --version
+pip 25.0 from /project/.venv/lib/python3.12/site-packages/pip (python 3.12)
+```
+
+이런 확인을 루틴으로 만들면 "왜 제 컴퓨터에서만 안 돼요"라는 질문이 훨씬 줄어듭니다.
+
+### 부록: 로컬 실습 로그 템플릿
+
+아래 템플릿은 학습 단계에서 직접 실험한 결과를 남길 때 유용합니다. 중요한 점은 "코드 + 실행 환경 + 출력"을 한 세트로 기록하는 것입니다. 이렇게 남긴 로그는 나중에 문제가 다시 발생했을 때 가장 신뢰할 수 있는 재현 자료가 됩니다.
+
+```text
+[환경]
+python: 3.12.x
+platform: macOS/Linux
+venv: .venv
+
+[실험]
+목표: 동작 확인 또는 성능 비교
+입력: 샘플 데이터 1,000건
+실행 명령: python script.py
+
+[출력]
+성공/실패 여부
+핵심 숫자(timeit, 처리 건수, 예외 메시지)
+```
+
+실무 코드 리뷰에서는 결과 숫자만 공유하는 경우가 많지만, 학습 단계에서는 중간 가정까지 함께 적는 편이 더 효과적입니다. 예를 들어 "셋 포함 검사가 빠를 것이다"라는 가정이 맞았는지, "f-string이 항상 더 읽기 쉽다"라는 판단이 팀 컨벤션과 맞는지까지 기록하면 다음 의사결정이 빨라집니다.
+
+디버깅 기록도 같은 형식을 쓰면 좋습니다.
+
+1) 증상: 어떤 입력에서 실패했는가
+2) 가설: 어떤 조건문/자료구조/경로가 원인인가
+3) 검증: `pdb`, `print`, `timeit`, 단위 테스트 중 무엇으로 확인했는가
+4) 결론: 수정 전후 동작 차이가 무엇인가
+
+이 습관은 초급 단계에서는 다소 느리게 느껴질 수 있습니다. 하지만 프로젝트 규모가 커질수록 "정확한 기록"이 가장 빠른 길이 됩니다. Python 문법을 익히는 것과 별개로, 실험을 재현 가능한 형태로 남기는 역량은 개발자로서의 성장 속도를 결정합니다.
+
 ## 처음 질문으로 돌아가기
 
 - **왜 Python인가, 그리고 설치와 venv를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?**

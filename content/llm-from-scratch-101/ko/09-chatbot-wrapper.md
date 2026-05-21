@@ -227,6 +227,88 @@ source.onmessage=e=>out.textContent+=e.data;source.onerror=()=>source.close();};
 
 이 시리즈는 토크나이저에서 출발해 임베딩, 어텐션, 블록, GPT 클래스, 학습, 샘플링, 파인튜닝, 챗봇 래퍼까지 이어졌습니다. 작은 모델이지만 LLM 애플리케이션의 전체 흐름을 끝에서 끝까지 직접 만져 본 셈입니다.
 
+## API 계약을 명시하면 프론트엔드가 안정됩니다
+
+챗봇 래퍼에서 가장 실용적인 개선은 API 응답 계약을 고정하는 일입니다. 특히 경고, 오류, 생성 설정을 명시적으로 포함하면 UI와 서버가 느슨하게 연결되어도 동작이 안정됩니다.
+
+```json
+{
+  "response": "My lord, I serve thee with a faithful heart.",
+  "warning": "Dropped unsupported characters: 😊",
+  "meta": {
+    "model": "ckpt_sft.pt",
+    "temperature": 0.8,
+    "top_k": 20,
+    "top_p": 0.9,
+    "max_new_tokens": 120
+  }
+}
+```
+
+이 구조를 쓰면 클라이언트는 텍스트 렌더링과 경고 표시를 분리해서 처리할 수 있고, 운영 중 생성 설정이 바뀌어도 추적이 쉬워집니다.
+
+### SSE 이벤트 타입을 나누면 UI 처리 분기가 단순해집니다
+
+단일 `data:` 줄로도 동작하지만, 이벤트 타입을 분리하면 유지보수가 좋아집니다.
+
+```text
+event: token
+data: M
+
+event: token
+data: y
+
+event: warning
+data: Dropped unsupported characters: 😊
+
+event: done
+data: {"tokens":120}
+```
+
+브라우저에서는 `source.addEventListener("token", ...)`처럼 분기해 처리하면 문자열 누적, 경고 UI, 완료 처리 로직이 충돌하지 않습니다.
+
+### 서버 메모리/지연 시간 계측 예시
+
+```python
+import time
+
+start = time.perf_counter()
+with torch.no_grad():
+    out = state["model"].generate(idx, body.max_new_tokens, 0.8, 20, 0.9)
+latency_ms = (time.perf_counter() - start) * 1000
+
+resp = decode(out[0].tolist())[len(ids):]
+print(f"latency_ms={latency_ms:.1f} chars={len(resp)}")
+```
+
+예시 로그:
+
+```text
+latency_ms=184.2 chars=139
+latency_ms=201.7 chars=120
+```
+
+이 수치가 누적되면 p50/p95 지연을 바로 계산할 수 있고, streaming 적용 전후 체감 개선을 숫자로 설명할 수 있습니다.
+
+### 간단한 아키텍처 비교표
+
+| 구성 | 장점 | 단점 | 권장 시점 |
+| --- | --- | --- | --- |
+| 단일 `/chat` 동기 응답 | 구현 단순 | 대기 체감 큼 | 초기 검증 |
+| `/chat` + `/chat/stream` 병행 | UX 개선, 호환성 유지 | 코드 경로 2개 관리 | 데모/프로토타입 |
+| queue + worker 비동기 | 확장성 | 운영 복잡도 상승 | 고부하 서비스 |
+
+이번 시리즈는 두 번째 구성을 택합니다. 이유는 학습 비용 대비 사용자 체감 개선이 가장 크기 때문입니다.
+
+### 최소 보안/운영 체크
+
+- 입력 길이 상한을 둡니다 (`prompt` 최대 길이, `history` 최대 턴).
+- 요청당 `max_new_tokens` 상한을 강제합니다.
+- 서버 로그에 프롬프트 원문을 그대로 남기지 않도록 주의합니다.
+- CORS 정책을 명시하고, 공개 배포 시 rate limit을 붙입니다.
+
+소형 모델 데모라도 이 네 가지를 지키면 이후 실제 서비스 확장 시 재작업 비용이 크게 줄어듭니다.
+
 ## 처음 질문으로 돌아가기
 
 - **챗봇은 모델 외에 어떤 구성 요소를 더 필요로 할까요?**

@@ -190,6 +190,111 @@ Thee no more of men.
 
 다음 글에서는 이 베이스 모델 위에 instruction-response 형식을 덧입히는 파인튜닝을 수행합니다. 즉, 셰익스피어풍 문자 예측기에서 조금 더 질문-응답에 가까운 출력 습관으로 모델을 이동시키게 됩니다.
 
+## 샘플링 정책별 출력 차이를 같은 프롬프트로 비교하기
+
+생성 품질 평가는 단일 예시로 결론 내리기 어렵습니다. 따라서 같은 프롬프트와 같은 길이에서 정책만 바꿔 비교하는 절차를 고정해 두는 편이 좋습니다.
+
+```bash
+python generate.py --prompt "ROMEO:" --max 180 --temp 1.0 --top_k 1   --top_p 1.0
+python generate.py --prompt "ROMEO:" --max 180 --temp 0.8 --top_k 20  --top_p 1.0
+python generate.py --prompt "ROMEO:" --max 180 --temp 0.8 --top_k 100 --top_p 0.9
+python generate.py --prompt "ROMEO:" --max 180 --temp 1.2 --top_k 0   --top_p 0.95
+```
+
+이 비교는 "모델이 좋다/나쁘다"보다 "어떤 정책에서 어떤 실패 모드가 나타나는가"를 파악하는 데 유용합니다. 예를 들어 반복 루프, 의미 붕괴, 문체 과잉 변형 같은 증상이 정책별로 다르게 나타납니다.
+
+### repetition penalty를 추가하는 최소 구현
+
+반복이 심할 때는 최근 토큰에 패널티를 주는 단순 규칙이 효과적입니다.
+
+```python
+def apply_repetition_penalty(logits: torch.Tensor, recent_ids: torch.Tensor, penalty: float = 1.1):
+    # logits: (B, V), recent_ids: (B, K)
+    for b in range(logits.size(0)):
+        for tok in recent_ids[b].tolist():
+            logits[b, tok] /= penalty
+    return logits
+
+# generate 내부
+recent = idx[:, -32:]
+logits = apply_repetition_penalty(logits, recent, penalty=1.15)
+```
+
+이 방법은 완전한 해결책은 아니지만, 소형 모델의 단조 반복을 완화하는 데 자주 도움이 됩니다. 중요한 점은 패널티 강도를 너무 크게 주면 출력 유창성이 급격히 떨어질 수 있다는 점입니다.
+
+### 생성 지표를 간단히 기록하는 스크립트
+
+```python
+def distinct_n(text: str, n: int) -> float:
+    if len(text) < n:
+        return 0.0
+    grams = [text[i:i+n] for i in range(len(text)-n+1)]
+    return len(set(grams)) / max(len(grams), 1)
+
+sample = "...generated text..."
+print("distinct-2", distinct_n(sample, 2))
+print("distinct-3", distinct_n(sample, 3))
+```
+
+이 값은 절대 품질 지표는 아니지만, 정책 변경 전후 다양성 변화를 빠르게 비교하는 데 유용합니다. 특히 greedy와 top-k의 차이가 숫자로도 확인됩니다.
+
+### 디코딩 정책 선택 가이드
+
+| 목적 | 권장 설정 | 이유 |
+| --- | --- | --- |
+| 재현 가능한 디버깅 | `temp=1.0`, `top_k=1` | 결정적 출력으로 회귀 비교 용이 |
+| 기본 데모 | `temp=0.8`, `top_k=20`, `top_p=0.9` | 안정성과 다양성 균형 |
+| 창의성 탐색 | `temp=1.1~1.3`, `top_p=0.95` | 후보 다양성 확장 |
+| 안전한 문장 완성 | `temp=0.7`, `top_k=10` | 과도한 랜덤성 억제 |
+
+생성 단계에서 중요한 것은 "정답 파라미터"를 찾는 것이 아니라, 목적에 맞는 실패 비용을 관리하는 것입니다. 제품에서는 보수적 설정이, 실험에서는 더 다양한 설정이 유리한 경우가 많습니다.
+
+## 생성 품질을 읽는 운영 로그 템플릿
+
+샘플링 실험이 많아지면 "좋아 보인다"는 인상 평가로는 의사결정이 어렵습니다. 최소한 아래 항목을 로그로 남기면 같은 모델에서 정책만 바꿨을 때 차이를 재현 가능하게 비교할 수 있습니다.
+
+```text
+run_id=infer-2026-05-21-01
+checkpoint=ckpt.pt
+prompt=ROMEO:
+max_new_tokens=180
+temperature=0.8
+top_k=20
+top_p=0.9
+distinct_2=0.81
+distinct_3=0.93
+avg_token_logprob=-1.74
+repetition_warning=false
+```
+
+`avg_token_logprob`와 `distinct_n`을 같이 보면, 지나치게 안전한 출력과 지나치게 랜덤한 출력을 분리하기 쉽습니다. 하나의 지표만 보면 해석이 왜곡되기 쉽기 때문에 2~3개를 함께 보는 편이 안정적입니다.
+
+### 토큰 단위 확률을 함께 출력하는 디버그 모드
+
+```python
+def sample_one_step(logits: torch.Tensor, debug: bool = False):
+    probs = F.softmax(logits, dim=-1)
+    idx_next = torch.multinomial(probs, num_samples=1)
+    if debug:
+        topv, topi = torch.topk(probs, k=5, dim=-1)
+        print("top5 ids:", topi[0].tolist())
+        print("top5 probs:", [round(float(v), 4) for v in topv[0]])
+    return idx_next
+```
+
+이 모드는 왜 특정 토큰이 반복되는지 파악할 때 유용합니다. 예를 들어 상위 1개 확률이 계속 0.7 이상으로 고정된다면 temperature를 낮추기보다 오히려 높이는 쪽이 자연스러운 경우가 많습니다.
+
+### 슬라이딩 윈도우와 긴 문맥 착시
+
+char-level 모델은 문맥이 길어 보이더라도 실제로는 `block_size`를 넘어가면 앞부분을 잊습니다. 따라서 데모에서 긴 대화를 붙여도 모델이 "모든 이전 맥락"을 기억한다고 해석하면 안 됩니다. 아래처럼 현재 유효 문맥 길이를 출력해 두면 착시를 줄일 수 있습니다.
+
+```python
+idx_cond = idx[:, -self.config.block_size :]
+print("effective_context_len", idx_cond.size(1))
+```
+
+이 수치가 늘 `block_size`에 붙어 있다면, 모델은 이미 오래된 앞부분을 보지 못하고 있다는 뜻입니다. 챗봇 단계에서 히스토리 요약 전략이 필요한 이유도 여기서 시작합니다.
+
 ## 처음 질문으로 돌아가기
 
 - **생성 루프는 정확히 무엇을 반복할까요?**

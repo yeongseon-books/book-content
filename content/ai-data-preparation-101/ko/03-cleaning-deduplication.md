@@ -256,6 +256,181 @@ def cross_dedup(train: list[str], eval_set: list[str],
 
 이 순서를 어기면 공백 차이 복제본이 살아남거나, 어느 쪽을 제거해야 하는지 규칙이 모호해집니다. dedup은 알고리즘 선택만큼 순서 설계가 중요합니다.
 
+## before/after 샘플과 품질 지표를 같이 남기는 방식
+
+정제와 dedup에서 팀 간 합의가 가장 빨리 깨지는 지점은 “이번 규칙이 정말 좋아졌는가”입니다. 이를 막으려면 규칙 설명보다 before/after 샘플과 수치가 먼저 나와야 합니다.
+
+```python
+import pandas as pd
+
+def summarize_before_after(raw_df: pd.DataFrame, clean_df: pd.DataFrame) -> dict:
+    raw_text = raw_df["text"].astype(str)
+    clean_text = clean_df["text"].astype(str)
+    return {
+        "raw_rows": len(raw_df),
+        "clean_rows": len(clean_df),
+        "row_drop_ratio": 1 - len(clean_df) / max(len(raw_df), 1),
+        "raw_dup_ratio": 1 - raw_text.nunique() / max(len(raw_text), 1),
+        "clean_dup_ratio": 1 - clean_text.nunique() / max(len(clean_text), 1),
+        "raw_avg_len": float(raw_text.str.len().mean()),
+        "clean_avg_len": float(clean_text.str.len().mean()),
+    }
+
+SAMPLE_BEFORE = "<div>광고문의 010-1111-2222</div>\n\n지금 가입하면 50%"
+SAMPLE_AFTER = "지금 가입하면 50%"
+```
+
+**Before/After 예시**
+
+```text
+before: <div>광고문의 010-1111-2222</div>
+
+지금 가입하면 50%
+after : 지금 가입하면 50%
+```
+
+이처럼 샘플을 함께 남기면 “숫자는 좋아졌는데 의미가 망가졌다”는 반론을 빨리 검증할 수 있습니다.
+
+## MinHash threshold 튜닝 절차
+
+MinHash의 threshold를 감으로 정하면 false positive와 false negative가 함께 늘어납니다. 실무에서는 라벨링된 pair 샘플로 threshold를 먼저 고정합니다.
+
+```python
+CANDIDATE_THRESHOLDS = [0.75, 0.80, 0.85, 0.90]
+
+# hand_labeled_pairs: (doc_a, doc_b, is_duplicate)
+def evaluate_threshold(hand_labeled_pairs, near_dup_fn):
+    out = []
+    for th in CANDIDATE_THRESHOLDS:
+        tp = fp = fn = 0
+        for a, b, y in hand_labeled_pairs:
+            pred = near_dup_fn(a, b, threshold=th)
+            if pred and y:
+                tp += 1
+            elif pred and not y:
+                fp += 1
+            elif (not pred) and y:
+                fn += 1
+        precision = tp / max(tp + fp, 1)
+        recall = tp / max(tp + fn, 1)
+        out.append({"threshold": th, "precision": precision, "recall": recall})
+    return out
+```
+
+운영 기본값은 보통 `precision`을 조금 더 우선합니다. 중복이 아닌 문서를 잘못 제거하면 정보 손실이 즉시 생기기 때문입니다.
+
+## DVC로 dedup 결과 버전 관리
+
+정제와 dedup은 결과물이 크고 반복 실행이 많아서 Git만으로 추적하기 어렵습니다. 아래처럼 DVC를 같이 쓰면 데이터 버전과 코드 커밋을 함께 묶기 쉽습니다.
+
+```bash
+dvc add data/clean/train_dedup.parquet
+git add data/clean/train_dedup.parquet.dvc dvc.lock dvc.yaml
+git commit -m "Add deduplicated train set v1.3"
+```
+
+```yaml
+stages:
+  clean_dedup:
+    cmd: python pipelines/clean_dedup.py --input data/raw/train.parquet --output data/clean/train_dedup.parquet
+    deps:
+      - pipelines/clean_dedup.py
+      - data/raw/train.parquet
+    outs:
+      - data/clean/train_dedup.parquet
+    metrics:
+      - reports/clean_dedup_metrics.json
+```
+
+이 구성을 두면 “어제보다 왜 행 수가 12% 줄었나?” 같은 질문을 코드와 데이터 버전으로 바로 재현할 수 있습니다.
+
+## 데이터 정제 검증 스키마 예시
+
+정제 결과를 JSON 파일로만 남기면 누락 필드가 생겨도 늦게 발견됩니다. 검증 스키마를 두면 품질 회귀를 조기 차단할 수 있습니다.
+
+```python
+from pydantic import BaseModel, Field
+
+class CleaningMetrics(BaseModel):
+    raw_rows: int = Field(ge=1)
+    clean_rows: int = Field(ge=1)
+    raw_dup_ratio: float = Field(ge=0.0, le=1.0)
+    clean_dup_ratio: float = Field(ge=0.0, le=1.0)
+    row_drop_ratio: float = Field(ge=0.0, le=1.0)
+    minhash_threshold: float = Field(ge=0.5, le=0.99)
+
+class CleaningGate(BaseModel):
+    max_row_drop_ratio: float = 0.30
+    max_clean_dup_ratio: float = 0.08
+
+def pass_gate(metrics: CleaningMetrics, gate: CleaningGate) -> bool:
+    return metrics.row_drop_ratio <= gate.max_row_drop_ratio and metrics.clean_dup_ratio <= gate.max_clean_dup_ratio
+```
+
+## 분할 전후 중복률 비교 표
+
+| 단계 | 중복률 | 메모 |
+| --- | ---: | --- |
+| raw | 0.31 | 크롤링 footer 복제 다수 |
+| clean + exact dedup | 0.14 | 공백/대소문자 차이 제거 |
+| + MinHash near dedup | 0.06 | 유사 문서 클러스터 축소 |
+| split 후 train/eval cross-dedup | 0.00(교차) | 평가 오염 방지 |
+
+이 표처럼 교차 중복률을 별도 항목으로 보고해야 평가 신뢰도를 실제로 설명할 수 있습니다.
+
+## 운영에서 바로 쓰는 점검 질문
+
+아래 질문은 배포 직전 리뷰에서 실제로 자주 쓰는 체크 항목입니다. 단순 문서 확인이 아니라, 각 질문에 대해 파일 경로나 지표 값으로 즉시 답할 수 있어야 합니다.
+
+1. 이번 데이터셋은 어떤 버전에서 왔고, sha256은 무엇인가요?
+2. 지난 배치 대비 duplicate/null/length 분포가 얼마나 변했나요?
+3. 제거된 샘플은 어떤 규칙 때문에 빠졌고, 상위 제거 사유는 무엇인가요?
+4. train/eval/test 경계에서 누수 가능성은 수치로 얼마나 남아 있나요?
+5. 이번 배치에서 사람이 검토한 샘플과 발견된 오류 유형은 무엇인가요?
+
+```python
+def release_readiness(summary: dict) -> tuple[bool, list[str]]:
+    issues = []
+    if not summary.get("dataset_sha256"):
+        issues.append("missing_dataset_sha256")
+    if summary.get("duplicate_ratio", 1.0) > 0.10:
+        issues.append("duplicate_ratio_too_high")
+    if summary.get("null_ratio", 1.0) > 0.02:
+        issues.append("null_ratio_too_high")
+    if summary.get("contamination_ratio", 1.0) > 0.01:
+        issues.append("contamination_ratio_too_high")
+    if summary.get("human_reviewed_rows", 0) < 100:
+        issues.append("insufficient_human_review")
+    return len(issues) == 0, issues
+```
+
+운영 팀은 이 함수를 그대로 쓰지 않더라도 같은 개념을 파이프라인 게이트로 구현해야 합니다. 핵심은 “준비가 되었는지 느낌으로 판단하지 않는다”는 점입니다.
+
+## 실무 로그 예시
+
+```text
+[release-check] dataset=v2.4.1 sha=4fb1...
+[release-check] duplicate_ratio=0.061 null_ratio=0.008
+[release-check] contamination_ratio=0.004 human_reviewed_rows=240
+[release-check] status=PASS
+```
+
+이 로그 한 묶음이 있으면 모델 성능이 흔들릴 때도 데이터 준비 단계를 빠르게 제외하거나 집중 점검할 수 있습니다. 데이터 준비의 품질은 글 한 편의 설명보다, 이런 반복 가능한 검증 로그에서 드러납니다.
+
+### dedup 실패 복구 규칙
+
+near-dedup이 과하게 작동해 데이터가 과소 삭제되면 즉시 이전 DVC 아티팩트로 롤백하고 threshold를 한 단계 올려 재실행합니다. 이때 롤백 근거와 재실행 결과를 같은 리포트에 남겨야 의사결정 히스토리가 보존됩니다.
+
+### 릴리스 노트에 남겨야 할 최소 항목
+
+해당 단계의 변경은 릴리스 노트에도 남겨야 합니다. 최소한 `변경 규칙`, `영향받은 행 수`, `핵심 지표 변화`, `롤백 경로` 네 항목이 있어야 다음 배치에서 같은 판단을 반복할 수 있습니다.
+
+운영 기준으로는 threshold 변경 시 이전 배치와 비교표를 반드시 남겨야 합니다.
+
+또한 샘플 기반 수동 검토를 주 1회 유지하면 과삭제 회귀를 조기에 발견할 수 있습니다.
+
+정제 기준은 분기마다 한 번씩 재검토해 도메인 변화에 맞춰 업데이트해야 합니다.
+
 ## 흔히 헷갈리는 지점
 
 - **정제는 많이 할수록 좋습니다**: 설명할 수 없는 변환을 계속 추가하면 정보 손실이 커지고 원인 분석이 불가능해집니다.

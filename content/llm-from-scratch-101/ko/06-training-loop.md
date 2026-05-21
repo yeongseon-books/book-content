@@ -280,6 +280,87 @@ for step in range(200):
 
 작은 모델에서도 운영 감각은 이미 필요합니다. 예를 들어 CPU에서 5분이 걸리든 GPU에서 1분이 걸리든, 손실 로그와 체크포인트가 없으면 실험은 사실상 재현되지 않습니다. 반대로 지표와 체크포인트가 남아 있으면 작은 실험도 꽤 강한 학습 자산이 됩니다.
 
+## gradient accumulation을 붙여 유효 배치를 키우는 방법
+
+메모리가 작은 환경에서는 batch size를 크게 잡기 어렵습니다. 이때 자주 쓰는 방법이 gradient accumulation입니다. 핵심은 여러 micro-batch의 gradient를 누적한 뒤, 일정 횟수마다 한 번만 optimizer step을 수행하는 것입니다.
+
+```python
+accum_steps = 4
+
+for iter_num in range(max_iters + 1):
+    lr = get_lr(iter_num)
+    for pg in optimizer.param_groups:
+        pg["lr"] = lr
+
+    optimizer.zero_grad(set_to_none=True)
+    total_loss = 0.0
+
+    for micro in range(accum_steps):
+        xb, yb = get_batch("train")
+        _, loss = model(xb, yb)
+        (loss / accum_steps).backward()
+        total_loss += float(loss.item())
+
+    grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+    optimizer.step()
+
+    if iter_num % 100 == 0:
+        print(f"step {iter_num} loss {total_loss/accum_steps:.4f} grad_norm {float(grad_norm):.3f}")
+```
+
+이 방식은 실제 batch를 키운 것과 유사한 효과를 내면서 메모리 압박을 줄여 줍니다. 특히 소형 GPU에서 학습 안정성을 높일 때 실용적입니다.
+
+### loss 곡선을 파일로 남기면 회귀를 빨리 잡습니다
+
+```python
+import csv
+
+with open("train_log.csv", "w", newline="", encoding="utf-8") as f:
+    writer = csv.writer(f)
+    writer.writerow(["step", "train_loss", "val_loss", "lr", "grad_norm"])
+
+    for iter_num in range(max_iters + 1):
+        ...
+        if iter_num % eval_interval == 0:
+            losses = estimate_loss()
+            writer.writerow([iter_num, losses["train"], losses["val"], lr, float(grad_norm)])
+            f.flush()
+```
+
+이 로그를 남기면 코드 변경 후 곡선을 바로 비교할 수 있습니다. "체감상 좋아 보인다"가 아니라 숫자로 회귀 여부를 판단할 수 있기 때문에 실험 품질이 올라갑니다.
+
+### 메모리 프로파일 출력 예시
+
+GPU 사용 시에는 아래 두 값을 같이 보는 편이 좋습니다.
+
+```python
+if torch.cuda.is_available() and iter_num % 500 == 0:
+    alloc = torch.cuda.memory_allocated() / (1024**2)
+    peak = torch.cuda.max_memory_allocated() / (1024**2)
+    print(f"cuda_mem_mb alloc={alloc:.1f} peak={peak:.1f}")
+```
+
+예시 출력:
+
+```text
+cuda_mem_mb alloc=742.6 peak=911.3
+cuda_mem_mb alloc=755.1 peak=928.4
+```
+
+peak 값이 step마다 계속 오르면 텐서 참조 누수 가능성을 의심해야 합니다. 반대로 안정적으로 plateau를 이루면 루프가 건강하게 돌아가는 신호입니다.
+
+### 학습 안정성 체크 테이블
+
+| 점검 항목 | 정상 신호 | 경고 신호 |
+| --- | --- | --- |
+| 초기 loss | `ln(vocab)` 근처 | 즉시 `nan`, 비정상 대형값 |
+| grad norm | 완만한 변동 | 주기적 폭발/0 고착 |
+| train vs val | 함께 감소 후 완만 | train만 하락, val 정체/상승 |
+| lr 스케줄 | warmup 후 완만 하강 | 계단식 급변, 오적용 |
+| 메모리 peak | 초기 상승 후 안정 | step 진행과 함께 지속 상승 |
+
+이 표를 기준으로 학습 로그를 읽으면, 모델 문제와 루프 문제를 분리하기가 쉬워집니다.
+
 ## 흔히 헷갈리는 지점
 
 - 학습 루프가 길고 복잡해야 한다고 생각하기 쉽지만, 핵심은 다섯 줄입니다.

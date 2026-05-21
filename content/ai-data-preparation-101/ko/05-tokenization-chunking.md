@@ -259,6 +259,181 @@ chunk 경계에서 엔티티와 참조가 끊어지면 retrieval이 약해집니
 
 overlap이 0이면 경계 정보가 자주 사라지고, 50%를 넘기면 중복 정보가 늘어 retrieval 품질이 오히려 떨어질 수 있습니다. overlap은 많을수록 좋은 값이 아니라, 경계 손실을 완화하는 최소 공유 구간입니다.
 
+## 토큰 예산 기반 청킹 실험 설계
+
+토크나이저를 선택한 뒤에는 chunking 실험을 숫자로 닫아야 합니다. 특히 RAG에서는 “chunk 크기”보다 “질문당 소비 토큰”과 “정답 근거 회수율”이 더 중요한 지표입니다.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class ChunkExperimentResult:
+    strategy: str
+    chunk_size: int
+    overlap: int
+    avg_prompt_tokens: float
+    p95_prompt_tokens: float
+    retrieval_recall_at_5: float
+    answer_f1: float
+
+def choose_strategy(results: list[ChunkExperimentResult]) -> ChunkExperimentResult:
+    # hard constraints first
+    feasible = [r for r in results if r.p95_prompt_tokens <= 7000]
+    # optimize recall then cost
+    feasible.sort(key=lambda r: (r.retrieval_recall_at_5, -r.avg_prompt_tokens), reverse=True)
+    return feasible[0]
+```
+
+## Polars로 대규모 토큰 통계 계산
+
+대형 코퍼스에서는 pandas보다 polars가 빠른 경우가 많습니다. 아래 예시는 chunk 단위 토큰 수 분포를 계산해 과대 chunk를 사전에 제거하는 패턴입니다.
+
+```python
+import polars as pl
+import tiktoken
+
+enc = tiktoken.encoding_for_model("gpt-4o")
+
+def tok_len(s: str) -> int:
+    return len(enc.encode(s))
+
+pl_df = pl.read_parquet("data/chunks.parquet")
+pl_df = pl_df.with_columns(
+    pl.col("chunk_text").map_elements(tok_len, return_dtype=pl.Int32).alias("n_tokens")
+)
+
+stats = pl_df.select([
+    pl.len().alias("rows"),
+    pl.col("n_tokens").mean().alias("avg_tokens"),
+    pl.col("n_tokens").quantile(0.95).alias("p95_tokens"),
+    pl.col("n_tokens").quantile(0.99).alias("p99_tokens"),
+]).to_dicts()[0]
+print(stats)
+```
+
+`p99_tokens`가 과도하게 크면 retrieval 단계에서 일부 문서가 예산을 독점해 답변 품질이 흔들립니다. 이때는 separator 우선순위를 조정하거나, heading 단위 pre-split을 추가하는 편이 낫습니다.
+
+## before/after chunk 샘플 비교
+
+```text
+[fixed-size]
+...요금제 변경은 설정 페이지에서... (문장 중간 끊김)
+
+[recursive]
+### 요금제 변경
+요금제 변경은 설정 페이지에서 요청할 수 있으며, 변경 즉시 과금 주기가 재계산됩니다.
+```
+
+문장 중간 분할이 줄어들수록 retrieval grounding이 좋아집니다. 실제 운영에서는 이런 샘플을 평가 리포트에 함께 넣어 전략 변경 이유를 남기는 편이 안전합니다.
+
+## DVC stage로 재현성 확보
+
+```yaml
+stages:
+  chunk_corpus:
+    cmd: python pipelines/chunk_corpus.py --strategy recursive --max-tokens 700 --overlap 120
+    deps:
+      - pipelines/chunk_corpus.py
+      - data/clean/corpus.parquet
+    outs:
+      - data/chunks/chunks_recursive.parquet
+    metrics:
+      - reports/chunk_stats.json
+```
+
+chunking도 실험 코드가 아니라 데이터 파이프라인의 일부입니다. 버전과 지표가 같이 남아야 다음 회차에서도 같은 결과를 재현할 수 있습니다.
+
+## 검색 품질 관점의 chunk 평가 지표
+
+청킹 전략을 바꿀 때는 생성 모델 점수만 보지 말고 retrieval 단계 지표를 먼저 봐야 합니다. 최소한 아래 세 지표를 같이 비교해야 합니다.
+
+- `recall@k`: 정답 근거 chunk가 상위 k개 안에 들어오는 비율
+- `mrr`: 정답 근거가 앞 순위에 오는지
+- `context_utilization`: 프롬프트 토큰 중 실제 근거 토큰 비율
+
+```python
+def context_utilization(prompt_tokens: int, evidence_tokens: int) -> float:
+    return evidence_tokens / max(prompt_tokens, 1)
+
+def gating(metrics: dict) -> bool:
+    return (
+        metrics["recall_at_5"] >= 0.82 and
+        metrics["mrr"] >= 0.70 and
+        metrics["p95_prompt_tokens"] <= 7000
+    )
+```
+
+## 문서 구조 기반 pre-split
+
+대형 문서는 heading 단위 pre-split을 먼저 수행하면 recursive chunk 품질이 안정됩니다.
+
+```python
+import re
+
+def split_by_heading(md_text: str) -> list[str]:
+    parts = re.split(r"(?m)^#{1,3}\s+", md_text)
+    return [p.strip() for p in parts if p.strip()]
+```
+
+이 단계를 넣으면 서로 다른 주제가 한 chunk에 섞이는 비율이 줄어들고, retrieval precision이 개선됩니다.
+
+## 운영에서 바로 쓰는 점검 질문
+
+아래 질문은 배포 직전 리뷰에서 실제로 자주 쓰는 체크 항목입니다. 단순 문서 확인이 아니라, 각 질문에 대해 파일 경로나 지표 값으로 즉시 답할 수 있어야 합니다.
+
+1. 이번 데이터셋은 어떤 버전에서 왔고, sha256은 무엇인가요?
+2. 지난 배치 대비 duplicate/null/length 분포가 얼마나 변했나요?
+3. 제거된 샘플은 어떤 규칙 때문에 빠졌고, 상위 제거 사유는 무엇인가요?
+4. train/eval/test 경계에서 누수 가능성은 수치로 얼마나 남아 있나요?
+5. 이번 배치에서 사람이 검토한 샘플과 발견된 오류 유형은 무엇인가요?
+
+```python
+def release_readiness(summary: dict) -> tuple[bool, list[str]]:
+    issues = []
+    if not summary.get("dataset_sha256"):
+        issues.append("missing_dataset_sha256")
+    if summary.get("duplicate_ratio", 1.0) > 0.10:
+        issues.append("duplicate_ratio_too_high")
+    if summary.get("null_ratio", 1.0) > 0.02:
+        issues.append("null_ratio_too_high")
+    if summary.get("contamination_ratio", 1.0) > 0.01:
+        issues.append("contamination_ratio_too_high")
+    if summary.get("human_reviewed_rows", 0) < 100:
+        issues.append("insufficient_human_review")
+    return len(issues) == 0, issues
+```
+
+운영 팀은 이 함수를 그대로 쓰지 않더라도 같은 개념을 파이프라인 게이트로 구현해야 합니다. 핵심은 “준비가 되었는지 느낌으로 판단하지 않는다”는 점입니다.
+
+## 실무 로그 예시
+
+```text
+[release-check] dataset=v2.4.1 sha=4fb1...
+[release-check] duplicate_ratio=0.061 null_ratio=0.008
+[release-check] contamination_ratio=0.004 human_reviewed_rows=240
+[release-check] status=PASS
+```
+
+이 로그 한 묶음이 있으면 모델 성능이 흔들릴 때도 데이터 준비 단계를 빠르게 제외하거나 집중 점검할 수 있습니다. 데이터 준비의 품질은 글 한 편의 설명보다, 이런 반복 가능한 검증 로그에서 드러납니다.
+
+### 토큰 예산 SLA
+
+실무에서는 `질문 1회당 p95 7k tokens 이하`처럼 명시적 SLA를 두는 편이 좋습니다. chunk 전략이 바뀌어도 SLA를 넘기면 자동 실패시키면 비용 회귀를 빠르게 막을 수 있습니다.
+
+### 릴리스 노트에 남겨야 할 최소 항목
+
+해당 단계의 변경은 릴리스 노트에도 남겨야 합니다. 최소한 `변경 규칙`, `영향받은 행 수`, `핵심 지표 변화`, `롤백 경로` 네 항목이 있어야 다음 배치에서 같은 판단을 반복할 수 있습니다.
+
+토큰 예산은 모델 교체 시 즉시 재측정하고, 예전 추정치를 재사용하지 않는 것이 안전합니다.
+
+청킹 전략 변경 후에는 동일 질문 세트로 A/B 평가를 다시 수행해 회귀를 확인해야 합니다.
+
+모델 context window가 커졌더라도 무조건 큰 chunk가 정답은 아닙니다. 검색 단계에서는 작은 chunk가 더 정확한 근거를 찾는 경우가 많아, 비용과 품질을 같이 비교해 결정해야 합니다.
+
+토큰 비용 추정은 월별 실제 사용량과 연결해 검증해야 장기적으로 정확해집니다.
+
+예산 초과 경보도 필수입니다.
+
 ## 흔히 헷갈리는 지점
 
 - **문자 수만 보면 대략적인 토큰 수를 알 수 있습니다**: 언어와 코드 혼합 비율에 따라 차이가 커서 실제 토크나이저로 반드시 측정해야 합니다.

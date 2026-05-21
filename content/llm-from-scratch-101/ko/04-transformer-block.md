@@ -186,6 +186,70 @@ attention 확률이 일부 헤드에서 한 토큰에 과도하게 몰리거나,
 
 이 점검은 대형 모델에서만 필요한 절차가 아닙니다. 작은 교육용 GPT에서도 같은 원리로 동작하기 때문에, 초기에 블록 단위 계측 습관을 들이면 이후 규모를 키울 때 디버깅 감각이 훨씬 좋아집니다.
 
+## 아키텍처 비교: Transformer 블록 vs 단순 RNN 스택
+
+트랜스포머 블록의 필요성을 더 분명하게 보려면, 같은 문자 모델 기준으로 RNN 계열과 비교해 보는 것이 좋습니다. 목적은 어느 쪽이 절대적으로 우월한지 결론 내리는 것이 아니라, **이번 시리즈가 왜 블록 반복 구조를 택했는지**를 확인하는 데 있습니다.
+
+| 항목 | 단순 RNN/LSTM 스택 | Transformer 블록 |
+| --- | --- | --- |
+| 문맥 결합 방식 | 순차 업데이트 | 전 위치 병렬 상호참조(attention) |
+| 긴 의존성 처리 | 경로 길이 길어짐 | 경로 길이 상대적으로 짧음 |
+| 병렬화 | 낮음 | 높음 |
+| 구현 디버깅 포인트 | hidden state 전달 | shape/mask/projection |
+| 이번 시리즈 적합성 | 원리 설명은 가능 | 현대 LLM 구조와 직접 연결 |
+
+char-level toy 문제에서는 둘 다 동작할 수 있습니다. 다만 트랜스포머 블록을 쓰면 이후 GPT 계열 실전 코드와 구조적으로 바로 이어지기 때문에 학습 전이 효과가 큽니다.
+
+### 블록 내부 텐서 경로를 계측하는 미니 훅
+
+residual 경로와 sub-layer 출력을 함께 관찰하면 "어느 경로가 실제로 더 많이 기여하는가"를 읽기 쉬워집니다.
+
+```python
+def block_probe(block: Block, x: torch.Tensor) -> None:
+    with torch.no_grad():
+        h1 = block.ln1(x)
+        a = block.attn(h1)
+        x1 = x + a
+        h2 = block.ln2(x1)
+        f = block.ffn(h2)
+        x2 = x1 + f
+
+    print("attn_delta_norm:", float(a.norm().item()))
+    print("ffn_delta_norm :", float(f.norm().item()))
+    print("out_norm       :", float(x2.norm().item()))
+```
+
+이 값 자체가 정답은 아니지만, 학습 초반/중반/후반 변화를 보면 블록이 어떤 방식으로 표현을 갱신하는지 감각이 생깁니다. 특히 특정 단계에서 `ffn_delta_norm`이 0에 가깝게 고정된다면 FFN 경로가 죽었는지 점검해 볼 근거가 됩니다.
+
+### Pre-norm/Post-norm 실험 로그 예시
+
+같은 하이퍼파라미터에서 구조만 바꿔 보면 안정성 차이가 수치로 드러납니다.
+
+```text
+[pre-norm]
+step 0    loss 4.17
+step 500  loss 2.26
+step 1500 loss 1.84
+
+[post-norm]
+step 0    loss 4.16
+step 500  loss 2.49
+step 1500 loss 2.31 (간헐적 spike)
+```
+
+작은 모델에서도 이런 경향이 관찰되는 경우가 많습니다. 그래서 GPT 계열 실전 구현에서 pre-norm이 사실상 기본 선택이 되었습니다.
+
+### 블록 반복 수를 늘릴 때 먼저 고정할 원칙
+
+블록을 늘리는 실험은 유혹적이지만, 동시에 비교를 어렵게 만듭니다. 아래 항목을 먼저 고정하면 결과 해석이 쉬워집니다.
+
+- `tokenizer`, `vocab_size`, `block_size`를 고정합니다.
+- 학습 step 예산을 동일하게 맞춥니다.
+- train/val loss 외에 gradient norm 로그를 같이 남깁니다.
+- 생성 샘플 프롬프트를 동일하게 유지합니다.
+
+이렇게 해야 "깊이가 좋아진 것인지, 다른 변수 영향인지"를 분리할 수 있습니다. 시리즈 후반으로 갈수록 이런 실험 설계 습관이 훨씬 중요해집니다.
+
 ## 처음 질문으로 돌아가기
 
 - **FeedForward는 왜 `Linear(C, 4C) -> GELU -> Linear(4C, C)` 형태를 많이 쓸까요?**

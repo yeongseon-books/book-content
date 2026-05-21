@@ -210,6 +210,81 @@ print(y[0])
 
 특히 `x.max() >= vocab_size` 같은 상태는 즉시 실패로 처리해야 합니다. 이런 가드를 초기에 넣어 두면 어텐션 단계에서 원인 모를 `nan`을 추적하는 시간을 크게 줄일 수 있습니다.
 
+## 텐서 shape 주석을 코드에 남기는 실전 패턴
+
+임베딩 단계는 짧아서 "알아서 되겠지"라고 넘기기 쉽지만, 실제 버그는 여기서 조용히 시작됩니다. 가장 실용적인 방어는 **shape 주석을 코드 바로 옆에 남기고, forward마다 assert로 검증**하는 방식입니다.
+
+```python
+def forward(self, idx: torch.Tensor) -> torch.Tensor:
+    # idx: (B, T)
+    b, t = idx.shape
+    assert t <= self.config.block_size, "sequence too long"
+
+    pos = torch.arange(t, device=idx.device)           # (T,)
+    tok_emb = self.token_embedding_table(idx)          # (B, T, C)
+    pos_emb = self.position_embedding_table(pos)       # (T, C)
+    x = tok_emb + pos_emb                              # (B, T, C)
+
+    assert x.shape == (b, t, self.config.n_embd)
+    return x
+```
+
+이 습관의 장점은 협업에서 특히 큽니다. shape 합의가 문서가 아니라 코드에 남으므로, 후속 수정자가 `transpose` 축이나 `view` 차원을 잘못 건드려도 즉시 감지할 수 있습니다. 작은 모델일수록 이런 기본 가드가 디버깅 시간을 크게 줄입니다.
+
+### 임베딩 메모리 사용량을 먼저 계산해 두면 설정이 쉬워집니다
+
+임베딩은 계산보다 메모리를 먼저 먹는 경향이 있습니다. 따라서 `vocab_size`, `n_embd`, `dtype`만으로 대략 비용을 산정해 두면 실험 설계가 빨라집니다.
+
+```python
+def embedding_memory_bytes(vocab_size: int, n_embd: int, bytes_per_param: int = 4) -> int:
+    return vocab_size * n_embd * bytes_per_param
+
+for vocab, emb in [(65, 128), (8000, 256), (50000, 768)]:
+    mb = embedding_memory_bytes(vocab, emb) / (1024**2)
+    print(f"vocab={vocab:>6}, n_embd={emb:>4} -> {mb:7.2f} MB")
+```
+
+실행 예시는 다음과 비슷합니다.
+
+```text
+vocab=    65, n_embd= 128 ->    0.03 MB
+vocab=  8000, n_embd= 256 ->    7.81 MB
+vocab= 50000, n_embd= 768 ->  146.48 MB
+```
+
+여기서 바로 보이는 사실이 있습니다. char-level은 vocab이 작아서 임베딩 비용이 거의 무시됩니다. 반대로 서브워드 대형 vocab에서는 임베딩 테이블 자체가 꽤 큰 메모리 덩어리가 됩니다. 그래서 토크나이저 선택과 임베딩 차원 선택은 항상 같이 봐야 합니다.
+
+### 위치 임베딩 방식 비교를 테이블로 고정해 두면 의사결정이 빨라집니다
+
+| 방식 | 장점 | 한계 | 이번 시리즈 선택 |
+| --- | --- | --- | --- |
+| learned | 구현 단순, GPT 계열과 정합성 높음 | `block_size` 초과 길이 일반화 약함 | 사용 |
+| sinusoidal | 길이 일반화 직관적 | 구현/해석 분리감 | 미사용 |
+| rotary(RoPE) | 긴 문맥에서 강한 성능 사례 | 구현 복잡도 상승 | 미사용 |
+
+입문 단계에서는 learned positional embedding이 가장 설명 가능성이 높습니다. 다만 실전에서 문맥 길이를 키우기 시작하면 위치 표현을 다시 점검해야 한다는 사실도 함께 기억해야 합니다.
+
+### 임베딩 품질을 빠르게 확인하는 미니 프로브
+
+학습 초반에는 벡터 의미가 거의 랜덤이지만, 몇 천 step 이후에는 비슷한 문맥 토큰 사이 거리가 조금씩 줄어듭니다. 이를 간단히 확인하는 방법이 코사인 유사도 프로브입니다.
+
+```python
+import torch.nn.functional as F
+
+def cosine(a: torch.Tensor, b: torch.Tensor) -> float:
+    return float(F.cosine_similarity(a[None], b[None]).item())
+
+e = model.token_embedding_table.weight.detach()
+id_space = stoi.get(" ")
+id_e = stoi.get("e")
+id_t = stoi.get("t")
+
+print("cos(space, e)=", cosine(e[id_space], e[id_e]))
+print("cos(e, t)=", cosine(e[id_e], e[id_t]))
+```
+
+이 수치 자체가 정답은 아니지만, 학습 전/후 변화를 추적하면 임베딩이 실제로 학습되고 있는지 감각을 얻을 수 있습니다. loss 곡선만 보지 말고 표현 공간 변화도 함께 보면 모델 상태를 더 입체적으로 읽을 수 있습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **`nn.Embedding`은 실제로 어떤 연산을 수행할까요?**

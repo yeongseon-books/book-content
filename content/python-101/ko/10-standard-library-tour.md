@@ -235,6 +235,189 @@ Counter({'a': 3, 'n': 2, 'b': 1})
 
 이번 글로 Python 101 시리즈가 마무리됩니다. 여기서 다룬 함수, 모듈, 클래스, 표준 라이브러리는 이후 다른 시리즈(예: `python-dbapi-101`, `sqlalchemy-101`)에서 그대로 다시 쓰입니다. 다음 시리즈에서는 표준 라이브러리에서 시작해, 외부 패키지로 자연스럽게 영역을 넓혀 갑니다.
 
+## 실전 앵커: 표준 라이브러리 조합으로 작은 도구 만들기
+
+표준 라이브러리의 진짜 가치는 "각 모듈을 아는 것"보다 "여러 모듈을 묶어 문제를 끝내는 것"입니다. 여기서는 로그 파일 요약 도구를 예시로 모듈 조합을 보겠습니다.
+
+```python
+from pathlib import Path
+from collections import Counter
+import csv
+import json
+
+root = Path('logs')
+counter = Counter()
+
+for file in root.glob('*.csv'):
+    with file.open(encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            counter[row['level']] += 1
+
+summary = {'total': sum(counter.values()), 'by_level': dict(counter)}
+Path('summary.json').write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding='utf-8')
+```
+
+`pathlib + csv + collections + json`만으로도 운영에 바로 쓸 수 있는 수준의 유틸리티가 나옵니다.
+
+날짜/시간은 `datetime`과 `zoneinfo`를 같이 쓰는 습관을 들이는 편이 좋습니다.
+
+```python
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+now = datetime.now(ZoneInfo('Asia/Seoul'))
+print(now.isoformat())
+```
+
+타임존 없는 naive datetime을 남기면 로그 상관 분석이 매우 어려워집니다.
+
+정규식은 최소한의 안전장치를 붙여 사용합니다.
+
+```python
+import re
+
+pat = re.compile(r'^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$')
+print(bool(pat.match('dev@example.com')))
+```
+
+`subprocess`를 쓸 때는 쉘 문자열 결합보다 리스트 인자 전달을 기본으로 둡니다.
+
+```python
+import subprocess
+
+result = subprocess.run(['python', '--version'], capture_output=True, text=True, check=True)
+print(result.stdout.strip())
+```
+
+보안과 이식성 모두에서 더 안전합니다.
+
+벤치마크 예시도 하나 넣겠습니다.
+
+```python
+import timeit
+
+sort_t = timeit.timeit('sorted(data)', setup='import random; data=[random.randint(1,1000000) for _ in range(10000)]', number=300)
+heap_t = timeit.timeit('import heapq; h=data[:]; heapq.heapify(h); [heapq.heappop(h) for _ in range(10000)]', setup='import random; data=[random.randint(1,1000000) for _ in range(10000)]', number=300)
+print(sort_t, heap_t)
+```
+
+전체 정렬이 필요한지, 상위 K개만 필요한지에 따라 선택이 달라진다는 사실을 체감할 수 있습니다.
+
+패키징 관점의 마무리 예시로 `argparse` 기반 CLI 스켈레톤을 보면 표준 라이브러리만으로 배포 가능한 도구를 만들 수 있습니다.
+
+```python
+import argparse
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input', required=True)
+    args = parser.parse_args()
+    print('input:', args.input)
+
+if __name__ == '__main__':
+    main()
+```
+
+`pyproject.toml`에 console script 엔트리를 추가하면 팀 내부 유틸리티를 일관된 방식으로 실행할 수 있습니다.
+
+```toml
+[project.scripts]
+log-summary = "myapp.cli:main"
+```
+
+표준 라이브러리 학습은 "외부 라이브러리 없이 어디까지 가능한가"를 체험하는 과정입니다. 이 감각을 가져가면 의존성 선택도 훨씬 보수적이고 안정적으로 할 수 있습니다.
+
+### 추가 실습: 표준 라이브러리만으로 만드는 진단 CLI
+
+외부 의존성 없이도 진단 도구를 충분히 만들 수 있습니다. 예를 들어 디렉터리의 파일 수와 총 바이트를 계산하는 CLI는 `argparse`와 `pathlib`만으로 구현됩니다.
+
+```python
+from pathlib import Path
+import argparse
+
+def scan(root: Path):
+    files = [p for p in root.rglob('*') if p.is_file()]
+    total = sum(p.stat().st_size for p in files)
+    return len(files), total
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('root')
+    args = parser.parse_args()
+    count, total = scan(Path(args.root))
+    print(f'files={count} bytes={total}')
+
+if __name__ == '__main__':
+    main()
+```
+
+출력 예시:
+
+```text
+files=128 bytes=4092312
+```
+
+운영 자동화에서는 `shutil`, `zipfile`, `tempfile`도 자주 같이 사용됩니다.
+
+- `shutil.copytree`: 디렉터리 복사
+- `zipfile.ZipFile`: 압축/해제
+- `tempfile.TemporaryDirectory`: 임시 작업공간 관리
+
+이 조합은 배포 아티팩트 정리, 로그 번들링, 백업 스크립트 작성에서 바로 활용할 수 있습니다.
+
+### 부록: 로컬 실습 로그 템플릿
+
+아래 템플릿은 학습 단계에서 직접 실험한 결과를 남길 때 유용합니다. 중요한 점은 "코드 + 실행 환경 + 출력"을 한 세트로 기록하는 것입니다. 이렇게 남긴 로그는 나중에 문제가 다시 발생했을 때 가장 신뢰할 수 있는 재현 자료가 됩니다.
+
+```text
+[환경]
+python: 3.12.x
+platform: macOS/Linux
+venv: .venv
+
+[실험]
+목표: 동작 확인 또는 성능 비교
+입력: 샘플 데이터 1,000건
+실행 명령: python script.py
+
+[출력]
+성공/실패 여부
+핵심 숫자(timeit, 처리 건수, 예외 메시지)
+```
+
+실무 코드 리뷰에서는 결과 숫자만 공유하는 경우가 많지만, 학습 단계에서는 중간 가정까지 함께 적는 편이 더 효과적입니다. 예를 들어 "셋 포함 검사가 빠를 것이다"라는 가정이 맞았는지, "f-string이 항상 더 읽기 쉽다"라는 판단이 팀 컨벤션과 맞는지까지 기록하면 다음 의사결정이 빨라집니다.
+
+디버깅 기록도 같은 형식을 쓰면 좋습니다.
+
+1) 증상: 어떤 입력에서 실패했는가
+2) 가설: 어떤 조건문/자료구조/경로가 원인인가
+3) 검증: `pdb`, `print`, `timeit`, 단위 테스트 중 무엇으로 확인했는가
+4) 결론: 수정 전후 동작 차이가 무엇인가
+
+이 습관은 초급 단계에서는 다소 느리게 느껴질 수 있습니다. 하지만 프로젝트 규모가 커질수록 "정확한 기록"이 가장 빠른 길이 됩니다. Python 문법을 익히는 것과 별개로, 실험을 재현 가능한 형태로 남기는 역량은 개발자로서의 성장 속도를 결정합니다.
+
+### 보강 메모: 실수 줄이는 운영 습관
+
+학습 단계에서 만든 코드를 실제 프로젝트에 옮길 때는 세 가지를 같이 점검하는 편이 좋습니다. 첫째, 입력 검증 경계가 함수 시작 지점에 있는지 확인합니다. 둘째, 실패 시 사용자에게 보여 줄 메시지와 로그 메시지를 분리합니다. 셋째, 성능 판단은 추측이 아니라 `timeit` 또는 샘플 벤치마크로 남깁니다.
+
+간단한 템플릿은 다음과 같습니다.
+
+```python
+def safe_run(fn, *args, **kwargs):
+    try:
+        return fn(*args, **kwargs)
+    except Exception as e:
+        # 학습 단계에서는 원인 관찰을 우선
+        raise RuntimeError(f'실행 실패: {fn.__name__}') from e
+```
+
+또한 표준 라이브러리 문서를 읽을 때는 "모듈 개요 -> 대표 함수 3개 -> 예외 종류" 순서로 훑는 습관을 들이면 기억이 오래갑니다. 기능을 전부 외우는 것보다, 어떤 상황에서 어떤 모듈을 열어봐야 하는지 아는 것이 더 중요합니다.
+
+표준 라이브러리 학습의 마지막 기준은 간단합니다. 새로운 의존성을 추가하기 전에, 먼저 표준 라이브러리로 문제를 해결할 수 있는지 확인합니다. 이 습관이 프로젝트의 장기 유지보수 비용을 크게 낮춥니다.
+
+추가 팁: 팀 내 스크립트는 표준 라이브러리 우선 원칙을 두고, 외부 패키지는 명확한 필요가 생길 때만 도입하면 배포·보안·업그레이드 부담을 크게 낮출 수 있습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **외부 의존성을 줄일 수 있습니다.** 작은 스크립트에 패키지를 추가하기 전에 표준 라이브러리부터 살펴보면, requirements 파일을 더 가볍게 유지할 수 있습니다?**

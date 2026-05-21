@@ -516,6 +516,136 @@ Python에는 Haskell의 `.` 같은 내장 합성 연산자가 없지만, 그건 
 
 함수 합성은 작은 함수를 결합해 큰 변환을 만드는 방법입니다. 특히 `pipe`는 코드 순서와 실행 순서를 맞춰 주기 때문에 Python에서 읽기 좋은 파이프라인을 만들기 좋습니다. 다음 글에서는 시리즈를 마무리하며 **객체지향과 함수형의 균형**을 다룹니다.
 
+
+## 심화 앵커: 하이브리드 설계를 검증 가능한 형태로 고정하기
+
+여기서는 시리즈 전체에서 다룬 패턴을 하나의 실행 흐름으로 묶습니다. 핵심은 클래스 경계와 함수 경계를 분리하는 것입니다. 상태를 가진 객체는 조립과 라이프사이클을 담당하고, 계산은 순수 함수 파이프라인으로 고정합니다.
+
+```python
+from dataclasses import dataclass, replace
+from functools import reduce
+from itertools import islice
+
+@dataclass(frozen=True)
+class Event:
+    event_id: str
+    amount: int
+    kind: str
+
+@dataclass(frozen=True)
+class LedgerRow:
+    event_id: str
+    gross: int
+    fee: int
+    net: int
+
+
+def normalize(event: Event) -> Event:
+    return replace(event, kind=event.kind.strip().lower())
+
+
+def paid_only(event: Event) -> bool:
+    return event.kind == "paid"
+
+
+def to_ledger(event: Event) -> LedgerRow:
+    fee = int(event.amount * 0.02)
+    return LedgerRow(event_id=event.event_id, gross=event.amount, fee=fee, net=event.amount - fee)
+
+
+def summarize(rows: list[LedgerRow]) -> dict[str, int]:
+    return reduce(
+        lambda acc, row: {
+            "count": acc["count"] + 1,
+            "gross": acc["gross"] + row.gross,
+            "fee": acc["fee"] + row.fee,
+            "net": acc["net"] + row.net,
+        },
+        rows,
+        {"count": 0, "gross": 0, "fee": 0, "net": 0},
+    )
+
+
+def settle(events: list[Event]) -> dict[str, int]:
+    normalized = map(normalize, events)
+    filtered = filter(paid_only, normalized)
+    rows = list(map(to_ledger, filtered))
+    return summarize(rows)
+
+sample = [
+    Event("E-1", 10000, "paid"),
+    Event("E-2", 7000, "cancelled"),
+    Event("E-3", 12000, "paid"),
+]
+
+print(settle(sample))
+# {'count': 2, 'gross': 22000, 'fee': 440, 'net': 21560}
+```
+
+이 구조는 monad-like `Result` 패턴, 재귀적 변환, 지연 파이프라인으로 확장하기 쉽습니다. 특히 검증 단계에서 속성 기반 테스트를 추가하면 변경이 잦은 정산 규칙도 안정적으로 운영할 수 있습니다.
+
+```python
+from hypothesis import given, strategies as st
+
+@given(st.integers(min_value=0, max_value=10_000))
+def test_fee_never_negative(amount: int) -> None:
+    row = to_ledger(Event("X", amount, "paid"))
+    assert row.fee >= 0
+    assert row.net <= row.gross
+```
+
+테스트에서 중요한 것은 "예제가 맞다"가 아니라 "성질이 유지된다"입니다. 이 관점을 유지하면 OOP와 FP를 섞어도 설계 품질이 흔들리지 않습니다.
+
+
+
+## 검증 시나리오: 경계 조건을 먼저 잠그기
+
+실무에서 함수형 스타일이 유지되는 팀은 구현보다 먼저 검증 포인트를 고정합니다. 입력 경계, 빈 컬렉션, 정렬 안정성, 타입 변환 실패를 먼저 적어 두면 리팩터링 과정에서도 동작이 흔들리지 않습니다.
+
+```python
+from functools import reduce
+
+def pipeline(values: list[int]) -> dict[str, int]:
+    filtered = [v for v in values if v >= 0]
+    squared = [v * v for v in filtered]
+    total = reduce(lambda acc, x: acc + x, squared, 0)
+    return {
+        "count": len(squared),
+        "total": total,
+        "max": max(squared) if squared else 0,
+    }
+
+# 경계 조건 검증
+assert pipeline([]) == {"count": 0, "total": 0, "max": 0}
+assert pipeline([-3, -1]) == {"count": 0, "total": 0, "max": 0}
+assert pipeline([0, 2, 3]) == {"count": 3, "total": 13, "max": 9}
+
+print("Pass")
+```
+
+또한 지연 평가를 사용할 때는 소비 시점을 테스트에 명시해 두는 편이 좋습니다. generator는 한 번 소비하면 비어야 정상이며, 이 성질이 깨지면 중간 단계에서 의도치 않은 materialize가 발생했을 가능성이 큽니다.
+
+```python
+from itertools import islice
+
+def naturals():
+    n = 0
+    while True:
+        yield n
+        n += 1
+
+stream = naturals()
+first_five = list(islice(stream, 5))
+next_three = list(islice(stream, 3))
+
+assert first_five == [0, 1, 2, 3, 4]
+assert next_three == [5, 6, 7]
+print("Pass")
+```
+
+이런 검증 코드는 예제 코드가 아니라 운영 안전장치입니다. 새 규칙을 추가할 때도 기존 성질이 유지되는지 빠르게 확인할 수 있습니다.
+
+
 ## 처음 질문으로 돌아가기
 
 - **함수 합성은 수학적으로 어떤 의미를 가지며 Python에서는 어떻게 구현할까요?**
