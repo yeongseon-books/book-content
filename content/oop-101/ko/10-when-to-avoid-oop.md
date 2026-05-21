@@ -617,4 +617,5 @@ def review_signal(duplicate_rules: int, mutable_paths: int) -> str:
 - [Python 공식 문서 — functools](https://docs.python.org/3/library/functools.html)
 - [Stop Writing Classes — PyCon Talk by Jack Diederich](https://www.youtube.com/watch?v=o9pEzgHorH0)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/oop-101/ko)
 Tags: Python, OOP, 함수형 프로그래밍, dataclass, 설계 판단

@@ -629,4 +629,5 @@ def estimate(amount: int, is_weekend: bool) -> int:
 - [Real Python — SOLID Principles in Python](https://realpython.com/solid-principles-python/)
 - [Agile Software Development, Principles, Patterns, and Practices in C# — Robert C. Martin](https://www.oreilly.com/library/view/agile-software-development/0135974445/)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/oop-101/ko)
 Tags: Python, OOP, SOLID, 설계 원칙, 클린 코드

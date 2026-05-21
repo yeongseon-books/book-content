@@ -735,4 +735,5 @@ PASS
 - [Real Python — Python Code Coverage](https://realpython.com/python-testing/#testing-for-code-coverage)
 - [Martin Fowler — Test Coverage](https://martinfowler.com/bliki/TestCoverage.html)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/pytest-101/ko)
 Tags: Python, pytest, coverage, pytest-cov, 코드 커버리지

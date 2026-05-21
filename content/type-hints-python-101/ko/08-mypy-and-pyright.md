@@ -637,4 +637,5 @@ pyright: 로컬 편집 단계에서 즉시 피드백 제공
 - [pyright 설정 문서](https://microsoft.github.io/pyright/#/configuration)
 - [Real Python — Python Type Checking](https://realpython.com/python-type-checking/)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/type-hints-python-101/ko)
 Tags: Python, Type Hints, mypy, pyright, 정적 분석, CI

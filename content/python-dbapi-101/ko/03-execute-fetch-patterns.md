@@ -597,4 +597,5 @@ def timed(fn, *args, **kwargs):
 - [psycopg 3 - Server-side cursors](https://www.psycopg.org/psycopg3/docs/advanced/cursors.html)
 - [SQLite - Optimizing INSERT performance](https://www.sqlite.org/faq.html#q19)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-dbapi-101/ko)
 Tags: Python, DB-API, PEP 249, Database

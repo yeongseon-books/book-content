@@ -647,4 +647,5 @@ def timed(fn, *args, **kwargs):
 - [Bandit — B608 hardcoded_sql_expressions](https://bandit.readthedocs.io/en/latest/plugins/b608_hardcoded_sql_expressions.html)
 - [SQLite SQL parameters](https://www.sqlite.org/lang_expr.html#varparam)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-dbapi-101/ko)
 Tags: Python, DB-API, PEP 249, Database

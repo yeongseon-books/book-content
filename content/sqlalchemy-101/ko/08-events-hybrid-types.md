@@ -490,4 +490,5 @@ def test_jsontext_roundtrip(session: Session):
 - SQLAlchemy: Hybrid Attributes — https://docs.sqlalchemy.org/en/20/orm/extensions/hybrid.html
 - SQLAlchemy: TypeDecorator — https://docs.sqlalchemy.org/en/20/core/custom_types.html
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/sqlalchemy-101/ko)
 Tags: Python, SQLAlchemy, ORM, Database

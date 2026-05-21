@@ -658,4 +658,5 @@ print("Pass")
 - [Fluent Python — Chapter 7: Functions as First-Class Objects](https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/)
 - [Python 공식 문서 — functools](https://docs.python.org/3/library/functools.html)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/functional-programming-101/ko)
 Tags: Python, Functional Programming, 고차 함수, 콜백, 데코레이터

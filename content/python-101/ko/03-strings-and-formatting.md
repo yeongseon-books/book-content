@@ -567,4 +567,5 @@ venv: .venv
 - [Python 공식 문서 — `re`](https://docs.python.org/3/library/re.html) — raw string과 정규표현식 백슬래시 처리 규칙을 확인할 때 유용합니다.
 - [Python 공식 문서 — Input and Output](https://docs.python.org/3/tutorial/inputoutput.html) — 텍스트 포매팅, `repr()`/`str()`, 파일 입출력에서 문자열이 쓰이는 맥락을 보완합니다.
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-101/ko)
 Tags: strings, f-string, format-spec, unicode, string-methods, bytes-and-str

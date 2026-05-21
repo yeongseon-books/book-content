@@ -652,4 +652,5 @@ print("Pass")
 - [Python 공식 문서 — functools.lru_cache](https://docs.python.org/3/library/functools.html#functools.lru_cache)
 - [The Little Schemer — Daniel P. Friedman](https://mitpress.mit.edu/9780262560993/the-little-schemer/)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/functional-programming-101/ko)
 Tags: Python, Functional Programming, 재귀, 꼬리 호출, 스택

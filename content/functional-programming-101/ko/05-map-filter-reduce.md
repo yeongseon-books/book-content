@@ -641,4 +641,5 @@ print("Pass")
 - [Real Python — map, filter, reduce](https://realpython.com/python-map-function/)
 - [Fluent Python — Chapter 7: Functions as First-Class Objects](https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/functional-programming-101/ko)
 Tags: Python, Functional Programming, map, filter, reduce

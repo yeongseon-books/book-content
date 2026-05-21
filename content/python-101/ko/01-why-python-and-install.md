@@ -498,4 +498,5 @@ venv: .venv
 - [Python.org Downloads](https://www.python.org/downloads/) — 공식 설치 경로와 지원 버전 확인에 적합합니다.
 - [Python 공식 문서 — Using Python on Windows](https://docs.python.org/3/using/windows.html) — Windows에서 `python`/`py` 명령, 설치 관리자, venv 사용 규칙을 확인할 수 있습니다.
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-101/ko)
 Tags: Python, virtual-environments, environment-isolation, python-installation, package-management, developer-setup

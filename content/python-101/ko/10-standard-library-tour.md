@@ -452,4 +452,5 @@ def safe_run(fn, *args, **kwargs):
 - [Python 공식 문서 — `collections`](https://docs.python.org/3/library/collections.html) — `Counter`, `defaultdict`, `deque` 같은 보강 자료구조의 핵심 동작을 확인할 수 있습니다.
 - [Python 공식 문서 — `itertools`](https://docs.python.org/3/library/itertools.html) — lazy iterator 도구들의 의도와 조합 방식을 설명합니다.
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-101/ko)
 Tags: standard-library, datetime-module, pathlib-module, json-module, collections-module, itertools-module

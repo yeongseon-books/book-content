@@ -463,4 +463,5 @@ target_metadata = Base.metadata
 
 ORM의 출발점은 단순합니다. `DeclarativeBase`는 `MetaData`를 품은 그릇이고, `Mapped[T]`는 컬럼의 SQL 타입과 nullable 여부를 한 번에 표현하며, `mapped_column(...)`은 Core의 `Column(...)`을 타입 힌트와 결합한 헬퍼입니다. 이 세 도구로 정의한 모델은 그대로 `Base.metadata.create_all(engine)`으로 SQLite 스키마가 됩니다. 다음 글에서는 이 모델 위에서 `Session`이 어떻게 객체 변경을 추적하고, Unit of Work와 Identity Map이 어떤 식으로 SQL을 묶어 주는지 자세히 다룹니다.
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/sqlalchemy-101/ko)
 Tags: Python, SQLAlchemy, ORM, Database

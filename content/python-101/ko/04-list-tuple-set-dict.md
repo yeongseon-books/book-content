@@ -573,4 +573,5 @@ def safe_run(fn, *args, **kwargs):
 - [Python 공식 문서 — `collections`](https://docs.python.org/3/library/collections.html) — `namedtuple`, `deque` 같은 표준 보조 자료구조를 소개해 자료구조 선택 기준을 넓혀 줍니다.
 - [Python 공식 문서 — Data Model](https://docs.python.org/3/reference/datamodel.html) — 변경 가능 객체와 불변 객체의 차이를 언어 모델 차원에서 보강합니다.
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-101/ko)
 Tags: list-and-tuple, dict, set, mutability, comprehensions, hashable

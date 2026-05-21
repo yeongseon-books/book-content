@@ -739,4 +739,5 @@ tests/test_discount.py::test_discount_price_invalid[1000-1.1] PASSED
 - [freezegun — GitHub](https://github.com/spulec/freezegun)
 - [Real Python — Testing with tmp_path](https://realpython.com/pytest-python-testing/#tmp-path)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/pytest-101/ko)
 Tags: Python, pytest, tmp_path, freezegun, 시스템 리소스 테스트

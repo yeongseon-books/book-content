@@ -558,4 +558,5 @@ INFO sqlalchemy.engine.Engine COMMIT
 - [SQLAlchemy 2.x - Result Set API](https://docs.sqlalchemy.org/en/20/core/connections.html#sqlalchemy.engine.Result)
 - [SQLite RETURNING clause](https://www.sqlite.org/lang_returning.html)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/sqlalchemy-101/ko)
 Tags: Python, SQLAlchemy, ORM, Database

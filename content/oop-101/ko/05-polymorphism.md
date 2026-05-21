@@ -642,4 +642,5 @@ def review_signal(duplicate_rules: int, mutable_paths: int) -> str:
 - [PEP 544 — Protocols: Structural subtyping](https://peps.python.org/pep-0544/)
 - [Fluent Python — Chapter 13: Interfaces, Protocols, and ABCs](https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/oop-101/ko)
 Tags: Python, OOP, 다형성, 덕 타이핑, 프로토콜

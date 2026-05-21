@@ -687,4 +687,5 @@ POST /users 422 응답 핵심
 - [Pydantic v2 Migration Guide](https://docs.pydantic.dev/latest/migration/)
 - [Real Python — Pydantic](https://realpython.com/python-pydantic/)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/type-hints-python-101/ko)
 Tags: Python, Type Hints, Pydantic, BaseModel, 데이터 검증, FastAPI

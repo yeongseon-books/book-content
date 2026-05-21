@@ -639,4 +639,5 @@ def review_signal(duplicate_rules: int, mutable_paths: int) -> str:
 - [Effective Python — Item 41: Consider Composing Functionality with Mix-in Classes](https://effectivepython.com/)
 - [Clean Architecture — Robert C. Martin](https://www.oreilly.com/library/view/clean-architecture/9780134494272/)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/oop-101/ko)
 Tags: Python, OOP, 합성, 상속, 설계 패턴

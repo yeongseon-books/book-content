@@ -674,4 +674,5 @@ class User:
 - [mypy 문서 — Built-in types](https://mypy.readthedocs.io/en/stable/builtin_types.html)
 - [Real Python — Python Type Checking](https://realpython.com/python-type-checking/)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/type-hints-python-101/ko)
 Tags: Python, Type Hints, 컬렉션 타입, list, dict, tuple

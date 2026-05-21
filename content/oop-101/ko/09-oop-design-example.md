@@ -640,4 +640,5 @@ def review_signal(duplicate_rules: int, mutable_paths: int) -> str:
 - [Refactoring — Martin Fowler](https://refactoring.com/)
 - [Domain-Driven Design — Eric Evans](https://www.oreilly.com/library/view/domain-driven-design/0321125215/)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/oop-101/ko)
 Tags: Python, OOP, 설계 예제, 리팩터링, 클래스 설계

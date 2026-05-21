@@ -530,4 +530,5 @@ venv: .venv
 - [PEP 570 — Python Positional-Only Parameters](https://peps.python.org/pep-0570/) — `/` 구분자의 의미와 API 안정성 이유를 설명합니다.
 - [PEP 484 — Type Hints](https://peps.python.org/pep-0484/) — 시그니처에 타입 힌트를 붙이는 표준 근거입니다.
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-101/ko)
 Tags: function-definition, default-arguments, args-kwargs, keyword-only, lambda, type-hints

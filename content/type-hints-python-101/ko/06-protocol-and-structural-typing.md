@@ -657,4 +657,5 @@ Success: no issues found in 1 source file
 - [mypy 문서 — Protocols and structural subtyping](https://mypy.readthedocs.io/en/stable/protocols.html)
 - [Real Python — Structural Typing](https://realpython.com/python-protocol/)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/type-hints-python-101/ko)
 Tags: Python, Type Hints, Protocol, structural typing, 덕 타이핑, 인터페이스

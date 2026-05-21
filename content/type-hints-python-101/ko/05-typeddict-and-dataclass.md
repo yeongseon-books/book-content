@@ -691,4 +691,5 @@ class Payment:
 - [PEP 589 — TypedDict](https://peps.python.org/pep-0589/)
 - [Real Python — Data Classes](https://realpython.com/python-data-classes/)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/type-hints-python-101/ko)
 Tags: Python, Type Hints, TypedDict, dataclass, 구조화 데이터, 타입 안전

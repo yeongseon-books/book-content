@@ -600,4 +600,5 @@ def backup_and_check(src_path: str, dst_path: str):
 - [OpenTelemetry — Semantic Conventions for Database Calls](https://opentelemetry.io/docs/specs/semconv/database/database-spans/)
 - [SQLite — VACUUM INTO](https://www.sqlite.org/lang_vacuum.html#vacuuminto)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-dbapi-101/ko)
 Tags: Python, DB-API, PEP 249, Database

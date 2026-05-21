@@ -548,4 +548,5 @@ def safe_run(fn, *args, **kwargs):
 - [PEP 328 — Imports: Multi-Line and Absolute/Relative](https://peps.python.org/pep-0328/) — 절대/상대 import와 leading dot 문법의 배경입니다.
 - [PEP 420 — Implicit Namespace Packages](https://peps.python.org/pep-0420/) — `__init__.py` 없는 namespace package 개념을 확인할 수 있습니다.
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-101/ko)
 Tags: import-system, module-vs-package, init-py, name-main-guard, relative-imports, namespace-packages

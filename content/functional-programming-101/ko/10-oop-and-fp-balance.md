@@ -608,4 +608,5 @@ print("Pass")
 - [Fluent Python — Chapter 7: Functions as First-Class Objects](https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/)
 - [Python 공식 문서 — Programming FAQ](https://docs.python.org/3/faq/programming.html)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/functional-programming-101/ko)
 Tags: Python, Functional Programming, OOP, 다중 패러다임, 설계 판단

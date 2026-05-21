@@ -613,4 +613,5 @@ ValueError: user_id must be numeric
 - [mypy 공식 문서](https://mypy.readthedocs.io/en/stable/)
 - [Real Python — Python Type Checking](https://realpython.com/python-type-checking/)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/type-hints-python-101/ko)
 Tags: Python, Type Hints, 타입 힌트, 정적 분석, mypy, 코드 품질

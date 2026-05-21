@@ -686,4 +686,5 @@ Success: no issues found in 1 source file
 - [PEP 604 — Allow writing union types as X | Y](https://peps.python.org/pep-0604/)
 - [mypy 문서 — Optional types and None](https://mypy.readthedocs.io/en/stable/kinds_of_types.html#optional-types-and-the-none-type)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/type-hints-python-101/ko)
 Tags: Python, Type Hints, Optional, Union, None, 타입 안전

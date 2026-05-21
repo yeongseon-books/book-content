@@ -769,4 +769,5 @@ PASS
 - [pytest — Built-in Fixtures](https://docs.pytest.org/en/stable/reference/fixtures.html)
 - [Real Python — pytest Fixtures](https://realpython.com/pytest-python-testing/#fixtures-managing-state-and-dependencies)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/pytest-101/ko)
 Tags: Python, pytest, fixture, conftest, 테스트 데이터

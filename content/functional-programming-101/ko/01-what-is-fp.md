@@ -585,4 +585,5 @@ print("Pass")
 - [Composing Programs — Chapter 2: Building Abstractions with Data](https://www.composingprograms.com/pages/23-sequences.html)
 - [Why Functional Programming Matters — John Hughes](https://www.cs.kent.ac.uk/people/staff/dat/miranda/whyfp90.pdf)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/functional-programming-101/ko)
 Tags: Python, Functional Programming, 패러다임, 선언형, 프로그래밍 기초

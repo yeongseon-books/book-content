@@ -513,4 +513,5 @@ def safe_run(fn, *args, **kwargs):
 - [Python 공식 문서 — `pathlib`](https://docs.python.org/3/library/pathlib.html) — `Path`, `/` 연산자, `read_text()`/`write_text()` 같은 경로 기반 API를 다룹니다.
 - [PEP 343 — The "with" Statement](https://peps.python.org/pep-0343/) — 컨텍스트 매니저와 `with` 문이 자원 정리를 어떻게 표준화했는지 설명합니다.
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-101/ko)
 Tags: file-io, context-manager, text-vs-binary, exception-handling, try-except-finally, pathlib

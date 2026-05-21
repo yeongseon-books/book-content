@@ -623,4 +623,5 @@ def review_signal(duplicate_rules: int, mutable_paths: int) -> str:
 - [Clean Code — Robert C. Martin](https://www.oreilly.com/library/view/clean-code/9780136083238/)
 - [Python Crash Course — Eric Matthes](https://nostarch.com/python-crash-course-3rd-edition)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/oop-101/ko)
 Tags: Python, OOP, 객체지향, 프로그래밍 패러다임, 클래스

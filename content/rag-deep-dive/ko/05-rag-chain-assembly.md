@@ -602,4 +602,5 @@ if __name__ == "__main__":
 - [LangChain runnable base source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/runnables/base.py)
 - [LangChain `RunnablePassthrough` source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/core/langchain_core/runnables/passthrough.py)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/rag-deep-dive/ko)
 Tags: RAG, LangChain, Vector Search, LLM

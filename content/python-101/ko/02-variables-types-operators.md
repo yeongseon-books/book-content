@@ -537,4 +537,5 @@ def safe_run(fn, *args, **kwargs):
 - [PEP 484 — Type Hints](https://peps.python.org/pep-0484/) — 타입 힌트가 런타임 강제가 아니라 정적 분석용 계약이라는 점의 출처입니다.
 - [Python Data Model](https://docs.python.org/3/reference/datamodel.html) — 객체 정체성, 변경 가능성, 이름이 객체를 가리킨다는 모델을 더 깊게 보완합니다.
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-101/ko)
 Tags: variables, python-types, equality-vs-identity, floating-point, decimal, type-hints

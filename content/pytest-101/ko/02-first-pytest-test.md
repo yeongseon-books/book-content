@@ -779,4 +779,5 @@ tests/test_discount.py::test_discount_price_invalid[1000-1.1] PASSED
 - [src layout vs flat layout — Python Packaging Guide](https://packaging.python.org/en/latest/discussions/src-layout-vs-flat-layout/)
 - [Real Python — Effective Python Testing With Pytest](https://realpython.com/pytest-python-testing/)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/pytest-101/ko)
 Tags: Python, pytest, 테스트 작성, test discovery, 프로젝트 구조

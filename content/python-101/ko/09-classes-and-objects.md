@@ -550,4 +550,5 @@ venv: .venv
 - [Python 공식 문서 — `dataclasses`](https://docs.python.org/3/library/dataclasses.html) — 반복적인 `__init__`, `__repr__`, 비교 메서드를 자동 생성하는 표준 도구입니다.
 - [PEP 557 — Data Classes](https://peps.python.org/pep-0557/) — dataclass 설계 목적과 생성되는 dunder 메서드의 배경을 설명합니다.
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-101/ko)
 Tags: class-and-instance, init-method, self-parameter, dunder-methods, inheritance, dataclass

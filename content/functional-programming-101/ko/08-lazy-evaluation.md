@@ -637,4 +637,5 @@ print("Pass")
 - [Real Python — Introduction to Python Generators](https://realpython.com/introduction-to-python-generators/)
 - [David Beazley — Generator Tricks for Systems Programmers](http://www.dabeaz.com/generators/)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/functional-programming-101/ko)
 Tags: Python, Functional Programming, 제너레이터, 지연 평가, itertools

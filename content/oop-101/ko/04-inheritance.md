@@ -655,4 +655,5 @@ class PriceCalculator:
 - [Python MRO 공식 문서](https://docs.python.org/3/library/stdtypes.html#class.__mro__)
 - [Effective Python — Item 40: Initialize Parent Classes with super](https://effectivepython.com/)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/oop-101/ko)
 Tags: Python, OOP, 상속, 메서드 오버라이딩, super

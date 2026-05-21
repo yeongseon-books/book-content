@@ -610,4 +610,5 @@ print("Pass")
 - [Fluent Python — Chapter 8: Object References, Mutability, and Recycling](https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/)
 - [Python 공식 문서 — dataclasses (frozen)](https://docs.python.org/3/library/dataclasses.html)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/functional-programming-101/ko)
 Tags: Python, Functional Programming, 불변성, tuple, frozenset

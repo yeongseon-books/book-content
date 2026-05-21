@@ -675,4 +675,5 @@ $ pyright src/decorators.py
 - [PEP 612 — Parameter Specification Variables](https://peps.python.org/pep-0612/)
 - [mypy 문서 — Callable types](https://mypy.readthedocs.io/en/stable/kinds_of_types.html#callable-types-and-lambdas)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/type-hints-python-101/ko)
 Tags: Python, Type Hints, Callable, 함수 시그니처, 오버로드, 데코레이터

@@ -560,4 +560,5 @@ venv: .venv
 - [PEP 202 — List Comprehensions](https://peps.python.org/pep-0202/) — comprehension이 반복/필터링을 어떻게 표현식으로 압축하는지 보여 주는 원문입니다.
 - [Python 공식 문서 — Compound Statements](https://docs.python.org/3/reference/compound_stmts.html) — `if`, `while`, `for`의 정확한 문법과 `else` 의미를 언어 명세 수준에서 확인할 수 있습니다.
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-101/ko)
 Tags: control-flow, if-statement, for-loop, while-loop, comprehensions, enumerate-zip

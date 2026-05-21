@@ -774,4 +774,5 @@ PASS
 - [pytest — pytest.approx](https://docs.pytest.org/en/stable/reference/reference.html#pytest-approx)
 - [Real Python — Testing Exceptions](https://realpython.com/pytest-python-testing/#testing-for-exceptions)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/pytest-101/ko)
 Tags: Python, pytest, assert, 예외 테스트, pytest.raises

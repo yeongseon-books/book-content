@@ -703,4 +703,5 @@ def test_regression_cases(raw, exc):
 - [Test Pyramid — Martin Fowler](https://martinfowler.com/articles/practical-test-pyramid.html)
 - [Real Python — Getting Started With Testing in Python](https://realpython.com/python-testing/)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/pytest-101/ko)
 Tags: Python, pytest, Testing, 소프트웨어 품질, 자동화 테스트

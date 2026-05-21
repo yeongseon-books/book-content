@@ -731,4 +731,5 @@ tests/test_discount.py::test_discount_price_invalid[1000-1.1] PASSED
 - [Real Python — Parametrize Tests](https://realpython.com/pytest-python-testing/#parametrize)
 - [Effective Python Testing with pytest — Parametrize](https://testdriven.io/blog/testing-python/)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/pytest-101/ko)
 Tags: Python, pytest, parametrize, 테스트 케이스, 데이터 주도 테스트

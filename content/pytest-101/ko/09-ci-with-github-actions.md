@@ -586,4 +586,5 @@ tests/test_checkout.py::test_apply_coupon_handles_edge_values[INVALID] PASSED
 - [actions/setup-python](https://github.com/actions/setup-python)
 - [Store and share data with workflow artifacts](https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/pytest-101/ko)
 Tags: Python, pytest, GitHub Actions, CI/CD, 테스트 자동화

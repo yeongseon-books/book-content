@@ -702,4 +702,5 @@ $ pyright src/repository.py
 - [mypy 문서 — Variance of generic types](https://mypy.readthedocs.io/en/stable/generics.html#variance-of-generic-types)
 - [mypy 문서 — Generics](https://mypy.readthedocs.io/en/stable/generics.html)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/type-hints-python-101/ko)
 Tags: Python, Type Hints, Generic, TypeVar, 타입 매개변수, 제네릭 프로그래밍

@@ -761,4 +761,5 @@ OK
 - [Real Python — Understanding the Python Mock Object Library](https://realpython.com/python-mock-library/)
 - [pytest-mock — Plugin Documentation](https://pytest-mock.readthedocs.io/)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/pytest-101/ko)
 Tags: Python, pytest, mock, monkeypatch, 테스트 더블

@@ -638,4 +638,5 @@ def review_signal(duplicate_rules: int, mutable_paths: int) -> str:
 - [Fluent Python — Luciano Ramalho](https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/)
 - [Python dataclasses 공식 문서](https://docs.python.org/3/library/dataclasses.html)
 
+- [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/oop-101/ko)
 Tags: Python, OOP, 클래스, 인스턴스, 생성자
