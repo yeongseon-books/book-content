@@ -274,6 +274,42 @@ if __name__ == "__main__":
 
 현업에서 저는 여기서 평가 경계를 분리합니다. tool 호출 성공률, route 정확도, 최종 답변 품질은 서로 다른 지표입니다. calculator가 정상 동작해도 route가 잘못되면 쓸데없는 계산이 늘고, route가 좋아도 checkpoint가 약하면 다음 턴 품질이 흔들립니다. 완성형 그래프를 잘 운영하는 팀은 모델 하나의 품질보다 경로별 책임과 지표를 먼저 나눕니다.
 
+## 체크포인트 영속화와 배포 구성을 같이 설계하기
+
+`MemorySaver()`는 구조를 이해하기 좋은 출발점이지만, 프로세스 재시작 뒤에도 대화를 복구해야 하는 환경에서는 영속 체크포인트가 필요합니다. 핵심은 기술 선택보다 계약입니다. `thread_id`를 어떤 규칙으로 만들고, 세션 만료를 어떻게 정의하고, 복구 시 어떤 필드를 신뢰할지 먼저 정해야 합니다.
+
+예를 들어 웹 API 환경에서는 요청 헤더 또는 세션 토큰에서 `thread_id`를 안정적으로 추출하고, 모든 `app.invoke()`에 같은 값을 주입합니다. 그리고 체크포인트 저장소는 "메시지 타임라인 + route 필드 + 마지막 노드 결과"가 같은 단위로 저장되는지 확인해야 합니다. 그래야 장애 복구 후에도 왜 direct path를 탔는지, 왜 tool loop가 열렸는지를 설명할 수 있습니다.
+
+배포 관점에서도 이 경계는 중요합니다. 앱을 컨테이너로 올린 뒤 오토스케일이 열리면 같은 세션이 다른 인스턴스로 라우팅될 수 있습니다. 이때 in-memory 체크포인트만 쓰면 멀티턴 대화가 끊깁니다. 그래서 production에서는 보통 외부 저장소 기반 체크포인트를 두고, 인스턴스는 stateless하게 유지합니다. LangGraph 구조가 좋아도 저장 계층이 단절되면 사용자 체감은 "방금 대화를 잊어버린 봇"이 됩니다.
+
+아래는 운영 문서에 바로 붙일 수 있는 최소 배포 설정 예시입니다.
+
+```yaml
+service:
+  name: langgraph-complete
+  replicas: 3
+  env:
+    - name: LANGGRAPH_CHECKPOINT_BACKEND
+      value: postgres
+    - name: LANGGRAPH_THREAD_TTL_MINUTES
+      value: "1440"
+    - name: LANGGRAPH_MAX_RECURSION
+      value: "20"
+  probes:
+    readiness: /healthz/ready
+    liveness: /healthz/live
+```
+
+중요한 점은 특정 플랫폼 문법이 아니라 운영 의도입니다. 체크포인트 백엔드, 세션 TTL, 재귀 제한을 환경 변수로 분리해 두면 배포 환경마다 정책을 바꿔도 애플리케이션 코드를 건드릴 일이 줄어듭니다.
+
+## 장애 복구 시나리오를 그래프 단위로 준비하기
+
+완성형 그래프 운영에서는 "노드 예외 하나"보다 "경로 단위 실패"를 다루는 편이 효과적입니다. 예를 들어 tool path에서 외부 API timeout이 연속 발생하면, 재시도 후 `fallback_answer` 노드로 전환해 사용자에게 제한 사항을 명확히 알리고 세션을 종료하는 전략이 필요합니다. 반대로 direct path 실패는 짧은 재시도 후 human review 큐로 넘기는 식으로 분리할 수 있습니다.
+
+제가 권장하는 기본 패턴은 세 가지입니다. 첫째, 실패 코드를 상태에 구조화해서 남깁니다. 둘째, 실패 유형별 종료 경로를 고정합니다. 셋째, 복구 이후에도 원래 질문과 실패 원인을 같은 thread 타임라인에서 추적 가능하게 유지합니다. 이 세 가지가 갖춰지면 장애 리포트가 "모델이 이상했습니다"에서 "tool timeout 2회 후 fallback 전이"로 바뀝니다.
+
+운영 온콜 기준으로도 효과가 큽니다. 경로별 복구 전략이 문서화되어 있으면, 야간 장애에서 우선순위를 빠르게 정할 수 있습니다. direct path 오류인지, tool path 외부 의존성 오류인지, checkpoint 저장소 오류인지가 분리되기 때문입니다. 완성형 LangGraph의 진짜 완성은 기능 목록이 아니라, 실패했을 때도 경로와 책임이 보이는 상태입니다.
+
 ## 정리: LangGraph 완성은 기능 나열이 아니라, 상태·분기·도구·체크포인트를 하나의 운영 모델로 묶는 일이다
 ![턴 전반의 production 에이전트 흐름](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/06/06-04-summary.ko.png)
 *턴 전반의 production 에이전트 흐름*

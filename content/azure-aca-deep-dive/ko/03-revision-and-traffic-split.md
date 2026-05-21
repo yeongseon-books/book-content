@@ -215,6 +215,130 @@ canary가 실패했을 때 이전 버전을 다시 빌드할 필요가 없습니
 
 이것이 ACA Revision 모델의 가장 강한 실무적 장점 중 하나입니다. immutable snapshot과 separable traffic policy가 함께 있을 때만 가능한 운영 감각입니다.
 
+### Revision 생성 경계를 YAML로 고정해 두면 논쟁이 줄어듭니다
+
+운영에서 가장 자주 벌어지는 논쟁은 "이번 변경이 왜 새 Revision을 만들었느냐"입니다. 이 논쟁을 줄이는 가장 쉬운 방법은 템플릿 영역과 애플리케이션 영역을 YAML에서 분리해 눈에 보이게 두는 것입니다.
+
+```yaml
+name: orders-api
+type: Microsoft.App/containerApps
+properties:
+  template: # revision-scope
+    containers:
+      - name: api
+        image: ghcr.io/acme/orders:v1.2.3
+        resources:
+          cpu: 0.5
+          memory: 1Gi
+    scale:
+      minReplicas: 1
+      maxReplicas: 10
+  configuration: # application-scope
+    ingress:
+      external: true
+      targetPort: 8080
+      traffic:
+        - revisionName: orders-api--blue
+          weight: 100
+```
+
+위 예시에서 `template`의 이미지 태그를 바꾸면 새 Revision이 생깁니다. 반대로 `configuration.ingress.traffic` 비율만 바꾸면 기존 Revision 집합은 유지되고 라우팅 정책만 바뀝니다. 코드 리뷰에서 이 경계를 먼저 확인하면 "왜 revision이 늘었는지"를 감으로 추측하지 않게 됩니다.
+
+### 트래픽 분할은 CLI 실험으로 체감해야 진짜 이해됩니다
+
+문서만 읽으면 90/10, 50/50 같은 숫자가 추상적으로 느껴집니다. 아래처럼 같은 앱에서 비율을 단계적으로 바꾸고 응답 헤더나 로그의 revision 이름 분포를 직접 보는 편이 훨씬 빠릅니다.
+
+```bash
+# 현재 traffic 상태 확인
+az containerapp ingress traffic show \
+  -n orders-api -g rg-aca-prod -o table
+
+# 90/10 canary
+az containerapp ingress traffic set \
+  -n orders-api -g rg-aca-prod \
+  --revision-weight orders-api--blue=90 orders-api--green=10
+
+# canary 확대
+az containerapp ingress traffic set \
+  -n orders-api -g rg-aca-prod \
+  --revision-weight orders-api--blue=70 orders-api--green=30
+
+# 문제 발생 시 즉시 rollback
+az containerapp ingress traffic set \
+  -n orders-api -g rg-aca-prod \
+  --revision-weight orders-api--blue=100 orders-api--green=0
+```
+
+여기서 핵심은 "새 이미지를 다시 배포하지 않고도" 복구가 가능하다는 점입니다. green이 실패하면 policy만 되돌리면 됩니다. rollback 시간을 줄이는 주체는 CI 파이프라인이 아니라 ingress routing 변경입니다.
+
+### label URL과 main URL을 분리하면 검증 밀도가 올라갑니다
+
+실무에서는 main URL 비율과 별개로, 검증용 label URL을 고정해 두는 패턴이 매우 유용합니다. 예를 들어 `green` label URL은 QA와 운영자가 항상 같은 Revision을 확인하는 경로로 쓰고, main URL은 고객 트래픽 분할에만 사용합니다.
+
+```bash
+# green revision에 label 부여
+az containerapp revision label add \
+  -n orders-api -g rg-aca-prod \
+  --revision orders-api--green \
+  --label green
+
+# label 목록 확인
+az containerapp revision label list \
+  -n orders-api -g rg-aca-prod -o table
+```
+
+이렇게 두 경로를 분리하면 "고객 경로"와 "운영 검증 경로"를 섞지 않게 됩니다. 특히 multiple revision mode에서 장애 분석 시점에 어떤 요청이 어느 경로로 들어왔는지 설명이 쉬워집니다.
+
+### 요청 분포 확인은 access log 샘플링으로 시작하면 충분합니다
+
+가중치가 실제로 반영되는지 확인할 때 처음부터 복잡한 대시보드가 필요하지는 않습니다. 먼저 응답에 revision 식별자를 남기고 간단히 샘플링해도 됩니다.
+
+```text
+2026-05-19T10:31:07Z path=/checkout status=200 revision=orders-api--blue
+2026-05-19T10:31:07Z path=/checkout status=200 revision=orders-api--blue
+2026-05-19T10:31:08Z path=/checkout status=200 revision=orders-api--green
+2026-05-19T10:31:08Z path=/checkout status=200 revision=orders-api--blue
+```
+
+짧은 윈도우에서는 정확히 90/10이 나오지 않을 수 있습니다. weighted routing은 확률 분배이기 때문입니다. 그래서 운영에서는 분 단위가 아니라 충분한 샘플 수를 쌓아 추세로 보는 습관이 필요합니다.
+
+### 디버깅 시나리오: 비율은 10%인데 실패는 40%로 보일 때
+
+canary를 10%로 열었는데 오류 비율이 체감상 훨씬 높게 보이는 경우가 있습니다. 이때는 "라우팅 비율이 틀렸다"고 결론 내리기 전에 다음 순서로 확인하는 편이 안전합니다.
+
+1. 메인 URL 트래픽 비율(`traffic show`)과 label 직접 호출 결과를 분리해 본다.
+2. green Revision의 replica 수와 readiness 상태를 확인한다.
+3. 오류가 특정 endpoint나 특정 클라이언트군에서 집중되는지 본다.
+4. Envoy/ingress 계층 오류와 앱 5xx를 분리한다.
+
+실제 원인은 가중치 자체가 아니라 canary Revision의 readiness 변동, 느린 startup, 특정 경로의 회귀 버그인 경우가 더 많습니다. 즉 percentage 숫자보다 "선택된 Revision이 요청을 안정적으로 처리할 준비가 되었는가"가 먼저입니다.
+
+### 운영 정책으로 정리하면 rollout이 재현 가능해집니다
+
+팀마다 canary 단계는 다르지만, 문서화된 정책이 없으면 매번 즉흥적으로 비율을 바꾸게 됩니다. 아래처럼 고정 단계와 승급 조건을 정해 두면 누가 배포해도 비슷한 결과가 나옵니다.
+
+```yaml
+rolloutPolicy:
+  steps:
+    - weight: "95/5"
+      holdMinutes: 15
+      promoteWhen:
+        errorRateP95: "<1%"
+        latencyP95: "<400ms"
+    - weight: "80/20"
+      holdMinutes: 20
+      promoteWhen:
+        errorRateP95: "<1%"
+        latencyP95: "<450ms"
+    - weight: "50/50"
+      holdMinutes: 20
+      promoteWhen:
+        errorRateP95: "<1%"
+        latencyP95: "<500ms"
+```
+
+이 정책은 ACA가 강제하는 형식은 아니지만, Revision과 트래픽 분할 모델에 정확히 맞는 운영 문법입니다. 중요한 것은 숫자 자체보다 승급/중단 기준을 먼저 합의하는 것입니다.
+
 ## 흔히 헷갈리는 지점
 
 - **Revision은 deployment slot이 아닙니다.** mutable한 자리 대신 immutable snapshot입니다.

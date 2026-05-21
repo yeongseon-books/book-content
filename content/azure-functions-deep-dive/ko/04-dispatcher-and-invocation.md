@@ -177,6 +177,56 @@ gRPC stream
 
 HTTP proxying도 같은 맥락에서 봐야 합니다. `HttpFunctionInvocationDispatcher`는 별도 dispatcher 경로이지만, 일반 gRPC worker 경로에서 HTTP proxying capability가 켜지면 dispatcher는 여전히 `RpcFunctionInvocationDispatcher`입니다. 바뀌는 것은 HTTP body 운반 방식뿐입니다. control plane과 invocation 등록, response completion은 여전히 같은 worker-channel 경로에 남아 있습니다.
 
+### invocation 코드 경로를 파일 단위로 보면 디버깅 속도가 올라갑니다
+
+호출 실패를 분석할 때 클래스 이름만 기억하면 헷갈립니다. 아래처럼 파일 단위로 책임을 고정하면 로그 한 줄을 즉시 코드 경로에 대응시킬 수 있습니다.
+
+- `src/WebJobs.Script.Grpc/WorkerFunctionInvoker.cs`: `ScriptInvocationContext` 생성과 dispatcher 위임
+- `src/WebJobs.Script.Grpc/IFunctionInvocationDispatcher.cs`: invocation 전송 추상화 계약
+- `src/WebJobs.Script.Grpc/RpcFunctionInvocationDispatcher.cs`: 기본 gRPC worker 경로
+- `src/WebJobs.Script.Grpc/Channel/GrpcWorkerChannel.cs`: `InvocationRequest` 작성, outbound 송신, 응답 매칭
+- `src/WebJobs.Script.Grpc/Channel/WorkerChannel.cs`: 채널 공통 상태와 수명주기
+- `src/WebJobs.Script.Grpc/Channel/OrderedInvocationMessageDispatcher.cs`: invocation 내 메시지 순서 보장
+
+운영 문서에는 이 경로를 그대로 넣어 두는 것이 좋습니다. 그래야 온콜 엔지니어가 재현 시점에 "어느 레이어에서 멈췄는지"를 즉시 분기할 수 있습니다.
+
+### invocation 단계별 프로파일링 출력 예시
+
+한 번의 함수 호출 지연을 분해하려면 end-to-end 시간만 보면 부족합니다. 아래처럼 단계별 시간을 남기면 병목을 정확히 분리할 수 있습니다.
+
+```text
+[InvocationProfile]
+InvocationId=72e5f8f7-...
+CreateScriptInvocationContextMs=3
+SerializeInvocationRequestMs=7
+OutboundQueueWaitMs=21
+WorkerExecutionMs=388
+InboundDispatchMs=5
+CompleteTaskCompletionSourceMs=1
+TotalMs=425
+```
+
+이 예시에서 병목은 `WorkerExecutionMs`입니다. 반대로 `OutboundQueueWaitMs`가 길면 워커 포화 또는 throttle이 먼저 의심됩니다. 이런 숫자를 팀 공용 대시보드로 올려 두면 "플랫폼이 느린가, 함수 코드가 느린가" 논쟁을 데이터로 정리할 수 있습니다.
+
+### timeout과 cancellation은 invocation 경계에서 명시적으로 보입니다
+
+장시간 실행 호출에서 흔한 오해는 timeout이 "호스트 내부에서 조용히 처리된다"는 생각입니다. 실제로는 timeout/취소가 발생하면 `InvocationCancel` 메시지와 cancellation token 경로가 명시적으로 작동합니다. 즉 취소는 숨은 부작용이 아니라 프로토콜 이벤트입니다.
+
+이 특성 때문에 함수 코드는 cancellation을 무시하면 안 됩니다. 워커가 취소 신호를 받았는데 사용자 코드가 계속 외부 API를 호출하면, 호출자에게는 실패가 반환됐는데 실제 부작용은 뒤늦게 발생하는 일관성 문제가 생길 수 있습니다.
+
+### 동시성 제어 설정이 어디에 걸리는지 구체적으로 구분해야 합니다
+
+`maxConcurrentRequests`, `batchSize`, 워커 수, channel throttle은 모두 "동시성"처럼 보이지만 작동 지점이 다릅니다.
+
+| 설정/메커니즘 | 적용 지점 | 체감 효과 |
+|---|---|---|
+| `batchSize` | 트리거 listener가 이벤트를 읽어오는 앞단 | 한 번에 가져오는 작업량 조절 |
+| `maxConcurrentRequests` | HTTP 요청 처리 동시성 | 동시 HTTP invocation 상한 |
+| `FUNCTIONS_WORKER_PROCESS_COUNT` | 인스턴스 내부 워커 프로세스 수 | 병렬 실행 슬롯 증가 |
+| `WorkerChannelThrottleProvider` | 워커 채널 송신 직전 | 과포화 시 추가 invocation 지연 |
+
+이 구분이 없으면 잘못된 튜닝을 하게 됩니다. 예를 들어 큐 처리량 문제를 HTTP 동시성 설정으로 해결하려 하면 아무 변화가 없습니다. 설정은 "같은 단어"가 아니라 "같은 계층"에서 비교해야 합니다.
+
 ## 흔히 헷갈리는 지점
 
 - **모든 trigger가 다른 invocation 메커니즘을 갖는 것은 아닙니다.** trigger는 앞단이 다를 뿐, 워커로 넘어갈 때는 공통 `InvocationRequest` 경로로 정규화됩니다.

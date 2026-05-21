@@ -228,6 +228,26 @@ func azure functionapp publish $APP
 
 이 명령이 하는 일은 단순히 파일 업로드가 아닙니다. 로컬 프로젝트의 코드와 의존성, Functions 메타데이터를 Azure 쪽 Function App 실행 환경에 게시하고, 그 결과 Azure Host가 함수를 인덱싱하고 공개 엔드포인트를 준비하게 만듭니다.
 
+현업에서는 여기서 한 가지를 더 확인합니다. `func azure functionapp publish`는 편리하지만, 내부적으로는 패키징과 업로드, 원격 빌드 여부 판단, 함수 인덱싱 단계를 연달아 거칩니다. 그래서 "배포 성공" 메시지가 떠도 실제 호출이 가능한 시점까지 몇 초에서 수십 초 지연이 있을 수 있습니다. 이 간격을 모르면 배포 직후 404를 보고 배포 실패로 오해하기 쉽습니다.
+
+배포 옵션도 초반에 정리해 두면 좋습니다.
+
+```bash
+# 기본 publish
+func azure functionapp publish $APP
+
+# 원격 빌드 강제(플랫폼에서 의존성 빌드)
+func azure functionapp publish $APP --build remote
+
+# 로컬 빌드 산출물 사용
+func azure functionapp publish $APP --build local
+
+# 배포 후 브라우저 자동 열기
+func azure functionapp publish $APP --publish-local-settings -i
+```
+
+Linux/Python에서는 보통 원격 빌드가 더 안정적인 경우가 많습니다. 개발자 로컬 OS와 Azure 런타임의 바이너리 호환 차이를 줄일 수 있기 때문입니다. 반대로 CI 환경에서 재현 가능한 컨테이너 빌드 경로를 이미 갖고 있다면 로컬 빌드 아티팩트를 쓰는 편이 더 예측 가능할 수 있습니다. 핵심은 "팀의 빌드 기준을 하나로 고정"하는 것입니다.
+
 ![로컬 코드가 함수 앱에 배포되는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/04/04-03-5-deploy.ko.png)
 
 *로컬 코드가 함수 앱에 배포되는 흐름*
@@ -261,11 +281,48 @@ curl "https://func-hello-xxxxx.azurewebsites.net/api/hello?name=Sisyphus"
 4. **로그와 모니터링** — Application Insights를 초기에 붙여 두는 편이 훨씬 유리합니다.
 5. **플랜 선택** — 지금은 배포가 목적이었지만, 다음 장에서는 이 워크로드에 어떤 플랜이 맞는지를 다시 따져야 합니다.
 
+추가로 첫 배포 직후에는 아래 점검을 바로 해두면 이후 장애 대응이 쉬워집니다.
+
+```bash
+# 앱 설정 목록 확인(민감값은 마스킹됨)
+az functionapp config appsettings list \
+    --name $APP --resource-group $RG \
+    --output table
+
+# 배포된 함수 목록 확인
+az functionapp function list \
+    --name $APP --resource-group $RG \
+    --query "[].{name:name,invokeUrl:invokeUrlTemplate}" \
+    --output table
+
+# 기본 호스트 상태 확인(인증 필요)
+az functionapp keys list \
+    --name $APP --resource-group $RG \
+    --query "functionKeys"
+```
+
+이 세 명령은 각각 다른 문제를 빠르게 분리해 줍니다. 설정 누락 문제인지, 함수 인덱싱 문제인지, 키/인증 계층 문제인지 초반에 바로 가를 수 있습니다.
+
 ### 자주 막히는 지점도 미리 기억해 둘 만합니다
 
 - **Storage Account 이름 충돌** — 스토리지 이름은 전역 고유입니다.
 - **`func` 명령 버전 문제** — Core Tools v4인지 먼저 확인해야 합니다.
 - **배포는 성공했는데 URL이 404** — 함수 인덱싱 실패가 흔합니다. Log stream을 먼저 보는 편이 빠릅니다.
+- **`AzureWebJobsStorage` 설정 누락** — Host 기동 자체가 실패할 수 있습니다.
+- **지역/플랜 제약 미확인** — Flex Consumption 미지원 리전에서는 생성 단계에서 막힙니다.
+- **의존성 잠금 파일 불일치** — 로컬에서는 되는데 Azure에서 import 오류가 날 수 있습니다.
+- **시간대/로캘 차이** — 로컬 테스트는 통과했는데 Azure UTC 환경에서 타이머/날짜 파싱이 달라질 수 있습니다.
+
+특히 404와 500을 구분해서 보는 습관이 중요합니다. 404는 대개 함수 인덱싱/라우팅 문제 쪽, 500은 함수 내부 예외나 의존성 문제 쪽에 더 가깝습니다. 배포 직후 두 증상을 같은 원인으로 취급하면 디버깅 시간이 길어집니다.
+
+또한 배포 직후 1~2분은 플랫폼 초기화 구간으로 보고, 즉시 재배포 전에 로그부터 확인하는 편이 안전합니다.
+
+```bash
+# 실시간 로그 보기
+az webapp log tail --name $APP --resource-group $RG
+```
+
+로그를 볼 때는 "호스트 시작 로그"와 "함수 실행 로그"를 나눠 읽어야 합니다. 호스트 시작이 불안정하면 함수 코드가 아무리 정상이어도 호출은 계속 실패합니다.
 
 ## 흔히 헷갈리는 지점
 

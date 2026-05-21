@@ -227,6 +227,61 @@ def build_graph():
 
 제가 본 강한 팀들은 tool-calling agent를 설계할 때 먼저 세 가지를 문서화했습니다. 어떤 도구가 read-only인지, 어떤 도구가 side-effect를 일으키는지, loop를 어디서 끊을지입니다. 이 세 가지가 명시되지 않으면 도구 호출 agent는 똑똑한 assistant가 아니라 통제 어려운 실행기처럼 변하기 쉽습니다.
 
+## ToolMessage를 상태 계약으로 다루기
+
+tool loop를 운영에서 재현하려면 `ToolMessage`를 단순한 중간 산출물로 넘기면 안 됩니다. `ToolMessage`는 "어떤 tool call이 실제로 실행됐고, 그 결과가 무엇이었는지"를 state에 남기는 핵심 계약입니다. 모델이 다음 턴에서 읽는 것은 사람이 머릿속으로 기억한 맥락이 아니라, 결국 메시지 리스트에 직렬화된 실행 흔적이기 때문입니다.
+
+실무에서 중요한 포인트는 `tool_call_id` 연계입니다. 하나의 AI 응답이 여러 tool call을 만들 수 있고, 각 결과가 어떤 요청에 대한 응답인지 연결되지 않으면 모델이 잘못된 결과를 참조하기 쉽습니다. `ToolNode`를 쓰면 기본적인 연결은 처리되지만, 운영 로그에서는 아래처럼 호출 식별자와 결과 길이, 실패 여부를 같이 남겨 두는 편이 안전합니다.
+
+```python
+from langchain_core.messages import ToolMessage
+
+def normalize_tool_result(name: str, tool_call_id: str, payload: str, is_error: bool) -> ToolMessage:
+    content = payload if len(payload) < 2_000 else payload[:2_000] + "...<truncated>"
+    status = "error" if is_error else "ok"
+    return ToolMessage(
+        content=f"[{status}] {content}",
+        name=name,
+        tool_call_id=tool_call_id,
+    )
+```
+
+이렇게 남겨 두면 다음과 같은 운영 질문에 즉시 답할 수 있습니다. 왜 같은 도구가 두 번 호출됐는가, 첫 호출과 두 번째 호출의 입력은 같았는가, 첫 호출은 실패였는가, 실패였다면 모델이 어떤 실패 문자열을 읽고 다시 시도했는가입니다. 반대로 결과를 free-form 텍스트로만 이어 붙이면 호출 단위 재현이 거의 불가능해집니다.
+
+## agent loop를 시퀀스로 시각화하기
+
+LangGraph 코드만 보면 루프는 짧아 보이지만, 디버깅은 보통 "한 턴 안에서 몇 번 왕복했는지"를 보는 순간 쉬워집니다. 저는 팀 문서에 아래 같은 시퀀스를 항상 넣도록 권합니다.
+
+```text
+HumanMessage
+  -> agent(LLM): tool_calls=[calculator("sqrt(81)+5")]
+  -> tools(ToolNode): ToolMessage(tool_call_id=call_1, content="14.0")
+  -> agent(LLM): final answer 생성
+  -> END
+```
+
+이 표현은 단순하지만 효과가 큽니다. 첫째, 종료 판단이 언제 일어나는지 보입니다. 둘째, 도구 실패 시 재시도가 몇 번까지 허용되는지 policy를 붙이기 쉽습니다. 셋째, 관측 지표를 어디서 수집할지 명확해집니다. 예를 들어 `agent_turn_count`, `tool_call_count`, `tool_error_count`, `loop_terminated_reason`를 같은 턴 단위로 남기면 runaway loop를 조기에 잡을 수 있습니다.
+
+## 실패 복구 시나리오를 먼저 설계하기
+
+tool-calling agent를 production에 올릴 때 가장 큰 차이는 성공 경로가 아니라 실패 경로에서 드러납니다. 계산기처럼 read-only 도구라 해도 외부 API 기반 도구가 추가되면 timeout, 429, schema mismatch, 일시적 네트워크 오류가 자연스럽게 발생합니다. 이때 모델에게 "알아서 다시 해 봐"라고 맡기는 방식은 재현성과 비용 통제를 동시에 잃기 쉽습니다.
+
+아래처럼 도구 실행 계층에서 복구 정책을 고정해 두면, 모델 품질 변동과 무관하게 최소 안전선을 유지할 수 있습니다.
+
+```python
+MAX_TOOL_RETRY = 2
+
+def should_retry_tool(error_code: str, attempt: int) -> bool:
+    transient = {"timeout", "rate_limit", "upstream_5xx"}
+    return error_code in transient and attempt < MAX_TOOL_RETRY
+```
+
+이 정책에서 핵심은 재시도 판단을 프롬프트가 아니라 실행 계층에 둔다는 점입니다. 예를 들어 입력 검증 실패(`invalid_args`)는 즉시 중단하고, 일시적 오류만 제한적으로 재시도합니다. 그리고 최종 실패 시에는 무조건 같은 포맷의 에러 `ToolMessage`를 만들어 agent로 돌려보내 "왜 실패했고 다음에 무엇을 해야 하는지"를 모델이 읽을 수 있게 합니다.
+
+추가로 side-effect 도구를 붙인다면 idempotency key를 필수로 넣는 편이 좋습니다. 예를 들어 티켓 생성 도구는 `request_id`를 받아 중복 실행을 방지하고, 도구 계층은 같은 키가 다시 오면 "이미 처리된 요청"을 반환하도록 설계합니다. 이 장치가 없으면 loop 재시도 한 번이 곧 중복 티켓, 중복 결제, 중복 상태 변경으로 이어질 수 있습니다.
+
+결국 복구 전략의 목표는 단순합니다. 실패했을 때도 다음 액션이 예측 가능해야 합니다. 모델이 잘 판단하면 더 좋지만, 모델 판단이 흔들려도 시스템이 위험한 방향으로 미끄러지지 않게 만드는 것이 운영형 tool-calling agent의 핵심입니다.
+
 ---
 
 ## 첫 번째 운영 체크리스트

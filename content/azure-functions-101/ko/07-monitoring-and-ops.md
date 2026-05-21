@@ -143,6 +143,15 @@ requests
 
 평균보다 P95를 보는 이유는 tail latency가 사용자 체감과 운영 위험을 더 빨리 보여 주기 때문입니다. 느린 함수가 특정 몇 개로 집중되는지 확인하면 대응 우선순위를 정하기 쉬워집니다.
 
+추가로 "어느 시간대에 느려지는가"를 같이 보면 스케일 문제와 외부 의존성 문제를 더 빨리 분리할 수 있습니다.
+
+```kusto
+requests
+| where timestamp > ago(6h)
+| summarize p95=percentile(duration, 95), Count=count() by name, bin(timestamp, 5m)
+| order by timestamp desc
+```
+
 #### 4) cold start는 간접 신호로 봅니다
 
 Azure Functions에는 모든 플랜에서 신뢰할 수 있는 단일 “cold start count” 메트릭이 있는 것이 아닙니다. 따라서 운영에서는 아래 신호를 조합해 간접적으로 판단합니다.
@@ -171,6 +180,30 @@ dependencies
 
 함수 코드 자체보다 외부 시스템이 문제일 때 가장 빠르게 단서를 줍니다. 특히 DB, 외부 API, Storage가 병목인지 구분할 때 유용합니다.
 
+의존성 문제가 의심될 때는 느린 호출까지 함께 보면 더 좋습니다.
+
+```kusto
+dependencies
+| where timestamp > ago(1h)
+| summarize p95=percentile(duration, 95), Fail=countif(success == false), Total=count() by target, type
+| extend FailureRate = round(100.0 * Fail / Total, 2)
+| order by p95 desc
+```
+
+이 쿼리는 "실패는 적지만 지나치게 느린 외부 시스템"도 함께 잡아 줍니다. 장애는 항상 실패율 급등으로만 시작하지 않기 때문입니다.
+
+#### 6) 특정 operationId 기준으로 요청-의존성-예외를 한 번에 묶기
+
+```kusto
+let targetOp = "<operation_Id>";
+union requests, dependencies, exceptions, traces
+| where operation_Id == targetOp
+| project timestamp, itemType, name, resultCode, success, duration, message
+| order by timestamp asc
+```
+
+장애 중에는 "단일 실패 요청 한 건"을 끝까지 추적해야 할 때가 많습니다. 이 쿼리는 분산 추적 관점에서 가장 빠른 기본형입니다.
+
 ### 알람은 네 가지 우선순위면 충분합니다
 
 초기에 너무 많은 알람을 걸면 아무도 믿지 않게 됩니다. 다음 네 가지면 시작점으로 충분합니다.
@@ -183,6 +216,30 @@ dependencies
 | P2 | 비용 급증 | 일일 호출 수가 평시 대비 5배 | 버그, 재시도 폭주, 비정상 트래픽 가능성 |
 
 처음에는 P0 두 개만 안정적으로 운영해도 상당히 유용합니다. 운영팀이 신뢰하는 알람을 만드는 것이, 많은 알람을 만드는 것보다 훨씬 중요합니다.
+
+CLI로 시작하는 팀이라면 알람 규칙을 코드처럼 남기는 편이 좋습니다. 아래는 실패율 알람의 최소 예시입니다.
+
+```bash
+az monitor metrics alert create \
+  --name "af-failure-rate-p0" \
+  --resource-group $RG \
+  --scopes "/subscriptions/$SUB/resourceGroups/$RG/providers/Microsoft.Web/sites/$APP" \
+  --condition "avg Requests/Failed > 5" \
+  --window-size 5m \
+  --evaluation-frequency 1m \
+  --severity 0 \
+  --description "5분 평균 실패 요청이 임계값 초과"
+```
+
+그리고 알람은 반드시 Action Group과 연결해야 실제 대응이 시작됩니다.
+
+```bash
+az monitor action-group create \
+  --name "ag-functions-oncall" \
+  --resource-group $RG \
+  --short-name "funcops" \
+  --action email oncall ops@example.com
+```
 
 ### 인스턴스 수는 어디서 확인할까요
 
@@ -199,6 +256,17 @@ dependencies
 
 `/admin/host/scale/status` 같은 엔드포인트는 심화 진단에 가깝고, 일반 운영 표면으로 기대하는 편은 안전하지 않습니다.
 
+여기에 "대시보드 고정"을 같이 해두면 온콜 교대 품질이 안정됩니다. Azure Dashboard 또는 Workbook에 최소 6개 타일을 고정하는 것을 권장합니다.
+
+1. 함수 호출 수(1분 bin)
+2. 실패율(요청 대비 실패)
+3. P95 latency
+4. `InstanceCount`
+5. dependency 실패 Top 5
+6. 최근 예외 Top 5
+
+핵심은 화려함이 아니라 일관성입니다. 누가 온콜이든 같은 레이아웃을 보면 같은 질문으로 시작할 수 있어야 합니다.
+
 ### 비용 분석은 재시도 모델부터 나눠 봐야 합니다
 
 비용이 갑자기 늘었을 때 흔한 원인은 호출 폭증, 재시도 폭주, 로그 과다입니다. 특히 큐 트리거는 종류별 실패 처리 방식이 다르므로 먼저 나눠 봐야 합니다.
@@ -213,6 +281,14 @@ dependencies
 - **과도한 로그** — 큰 payload를 매 요청마다 남기면 App Insights 수집 비용이 커집니다.
 
 여기에 재시도 폭주가 겹치면 비용은 더 빨리 커집니다. 따라서 비용 알람은 단순 청구 알람이 아니라, 호출 수와 실패율과 재시도 패턴을 같이 해석하는 운영 알람으로 보는 편이 유용합니다.
+
+실무에서는 비용 급증을 아래처럼 3단계로 분리해 보는 편이 빠릅니다.
+
+- 호출 수 증가인가? (`requests` count)
+- 실패 재시도 증가인가? (`exceptions`, queue 재처리 신호)
+- 로그 수집량 증가인가? (`traces` volume)
+
+특히 로그 수집량은 놓치기 쉽습니다. payload 전체를 INFO 레벨로 지속 기록하면 성능뿐 아니라 모니터링 비용도 빠르게 증가합니다. 운영 단계에서는 로그 레벨 정책(기본 INFO, 상세 DEBUG는 단기 활성화)을 문서로 고정해 두는 편이 안전합니다.
 
 ```bash
 # 일일 호출 수 추세를 빠르게 확인하는 CLI 예시

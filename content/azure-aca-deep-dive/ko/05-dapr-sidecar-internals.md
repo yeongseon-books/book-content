@@ -222,6 +222,114 @@ az containerapp env dapr-component set \
 
 첫 번째 명령은 app-level enablement를, 두 번째 명령은 environment-level dependency를 만듭니다. Dapr가 왜 항상 두 범위를 가로지르는지 이 두 줄만 봐도 이해할 수 있습니다.
 
+### component manifest를 읽을 때는 metadata보다 운영 계약을 봐야 합니다
+
+아래는 state store component의 축약 예시입니다. 문법 자체보다 중요한 것은 sidecar가 어떤 이름으로 이 컴포넌트를 찾고, 어떤 secret key를 기대하며, 어떤 scope에서 로드해야 하는지입니다.
+
+```yaml
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: statestore
+spec:
+  type: state.redis
+  version: v1
+  metadata:
+    - name: redisHost
+      value: redis:6379
+    - name: redisPassword
+      secretRef: redis-password
+  scopes:
+    - orders
+    - checkout
+auth:
+  secretStore: kubernetes
+```
+
+이 파일에서 `scopes`가 `orders`를 포함하지 않으면, `orders` app ID를 가진 sidecar는 `statestore`를 로드하지 못합니다. 앱 코드가 같은 API를 호출해도 결과가 달라질 수 있는 이유가 여기에 있습니다.
+
+### pub/sub component도 같은 방식으로 경계를 드러냅니다
+
+```yaml
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: pubsub
+spec:
+  type: pubsub.azure.servicebus.queues
+  version: v1
+  metadata:
+    - name: connectionString
+      secretRef: servicebus-conn
+    - name: consumerID
+      value: orders-consumer
+  scopes:
+    - orders
+```
+
+운영에서 자주 나오는 오해는 "component는 만들어졌는데 왜 앱에서 안 보이지"입니다. 대부분은 scope 불일치, secret 누락, 혹은 sidecar 재시작 전후 시점 차이입니다. 그래서 component 배포 후에는 app ID 기준으로 실제 로드 상태를 반드시 확인해야 합니다.
+
+### sidecar health 확인 경로를 표준화하면 장애 대응 속도가 빨라집니다
+
+앱이 Dapr 호출에 실패할 때 바로 원인을 단정하지 말고, 먼저 sidecar 자체가 살아 있는지 확인해야 합니다. 가장 단순한 확인은 metadata/health endpoint입니다.
+
+```bash
+# 앱 컨테이너 안에서 sidecar 건강 상태 확인
+curl -sS http://127.0.0.1:3500/v1.0/healthz
+
+# sidecar 메타데이터 확인
+curl -sS http://127.0.0.1:3500/v1.0/metadata | jq .
+```
+
+`healthz`가 실패하면 앱 코드 이전 단계에서 이미 문제가 생긴 것입니다. 반대로 health가 정상인데 state 호출만 실패한다면 component 연결이나 backing 서비스 접근 권한 쪽을 먼저 의심하는 편이 맞습니다.
+
+### 요청 추적 출력은 app 로그와 sidecar 로그를 함께 남겨야 의미가 있습니다
+
+Dapr 경로는 홉이 늘어나는 구조라서 단일 로그만으로는 원인이 잘 안 보입니다. 아래처럼 같은 `trace_id`를 앱과 sidecar 양쪽에서 남기면 경로를 재구성하기 쉽습니다.
+
+```text
+# app log
+2026-05-20T02:14:11Z level=INFO trace_id=9f2a op=saveOrder stateStore=statestore
+
+# daprd log
+2026-05-20T02:14:11Z level=debug trace_id=9f2a component=statestore msg="state save request"
+2026-05-20T02:14:11Z level=error trace_id=9f2a component=statestore msg="dial tcp redis:6379: i/o timeout"
+```
+
+이런 출력이 있으면 "앱은 요청을 보냈고 sidecar가 어디에서 실패했는지"를 분리해서 설명할 수 있습니다. incident 타임라인에서 추측이 줄어드는 이유가 여기 있습니다.
+
+### 디버깅 시나리오: localhost는 되는데 invocation이 실패할 때
+
+현장에서 많이 보는 케이스가 "`/healthz`는 200인데 서비스 호출은 실패"입니다. 이때는 sidecar가 살아 있다는 사실과 호출 경로가 성공했다는 사실을 분리해야 합니다.
+
+1. `http://127.0.0.1:3500/v1.0/healthz`와 metadata에서 app ID/포트를 확인합니다.
+2. 대상 앱의 Dapr enablement와 app ID가 실제 호출 대상과 일치하는지 확인합니다.
+3. 대상 앱 revision이 active이고 ready replica를 갖는지 확인합니다.
+4. sidecar 로그에서 name resolution, mTLS, timeout 오류를 분리합니다.
+
+대부분은 DNS 자체 문제보다 app ID 오타, 잘못된 대상 포트, scope 누락에서 시작합니다. 그래서 Dapr 장애 대응은 네트워크 장비보다 "Dapr 계약 값"을 먼저 맞추는 작업에 가깝습니다.
+
+### 운영 기준을 문서화하면 Dapr 도입 범위를 통제하기 쉽습니다
+
+프로덕션에서 Dapr를 무분별하게 켜면 sidecar 수, 로그량, 운영 복잡도가 빠르게 증가합니다. 아래처럼 최소 기준을 정해 두는 편이 안전합니다.
+
+```yaml
+daprAdoptionPolicy:
+  enableWhen:
+    - cross-service invocation is required
+    - state store abstraction reduces direct SDK lock-in
+  mustHave:
+    - component owner
+    - sidecar health dashboard
+    - timeout and retry defaults
+    - incident runbook with app+sidecar logs
+  avoidWhen:
+    - single service without remote dependencies
+    - strict low-latency path with no sidecar budget
+```
+
+이 정책은 기술 제약이 아니라 운영 품질 제약입니다. Dapr는 강력하지만, sidecar를 하나 더 운영한다는 비용이 항상 따라온다는 사실을 팀 규칙으로 명시해야 합니다.
+
 ## 흔히 헷갈리는 지점
 
 - **Dapr enablement는 메타데이터 추가가 아닙니다.** 실제 sidecar 프로세스가 붙습니다.

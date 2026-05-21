@@ -118,6 +118,84 @@ ASP.NET Core 호스트가 올라오면 Functions 쪽 진짜 주인공은 `IHoste
 
 따라서 별도 “헬스 모니터 서비스”를 상상할 필요는 없습니다. 이 저장소 안에서 보이는 구현은 타이머 루프와 성능 판단 조합입니다. 부팅 예외, 지나치게 긴 부팅 시간, 메모리·CPU 임계치 초과 같은 현상이 결국 여기서 재시작 판단으로 이어집니다.
 
+### 소스 코드 경로를 파일 단위로 고정해 두면 재현 속도가 빨라집니다
+
+부팅 이슈를 재현할 때는 클래스 이름만 기억하면 검색 비용이 큽니다. 실제로는 "어느 파일에서 어떤 책임이 시작되는가"를 경로 단위로 고정해 두는 편이 훨씬 빠릅니다. `5e59423` 기준으로 부팅 추적에 자주 쓰는 파일은 아래 여섯 개입니다.
+
+- `src/WebJobs.Script.WebHost/WebJobsScriptHostService.cs`: 호스트 생명주기 진입점, 타이머 헬스 체크 루프, restart orchestration
+- `src/WebJobs.Script/Host/ScriptHost.cs`: `InitializeAsync`와 `StartAsyncCore` 순서, 함수 카탈로그 준비
+- `src/WebJobs.Script/Description/FunctionMetadataManager.cs`: 함수 메타데이터 인덱싱과 캐시 관리
+- `src/WebJobs.Script/Config/HostJsonFileConfigurationSource.cs`: `host.json`을 `IConfiguration`로 올리는 로더
+- `src/WebJobs.Script/Config/ScriptJobHostOptionsSetup.cs`: `functionTimeout` 등 host 옵션 매핑
+- `src/WebJobs.Script.WebHost/Health/HostPerformanceManager.cs`: 성능 임계치 판단과 과부하 신호
+
+이 맵을 먼저 잡아두면 로그 한 줄을 읽을 때도 "설정 단계인지 인덱싱 단계인지, 아니면 헬스 루프가 개입한 상황인지"를 빠르게 분기할 수 있습니다. 운영 문서에는 클래스명이 아니라 파일 경로까지 함께 남기는 편이 좋습니다.
+
+### 부팅 시퀀스를 시간축으로 보면 실패 지점이 선명해집니다
+
+문장으로만 보면 단계가 섞이기 쉽기 때문에, 실제 운영에서는 시간축으로 구분해 두는 것이 안전합니다. 아래 시퀀스는 인스턴스 cold start 기준의 단순화된 흐름입니다.
+
+```text
+T+0000ms  ASP.NET Core host process up
+T+0100ms  WebJobsScriptHostService.StartAsync 진입
+T+0300ms  CreateScriptHostAsync -> ScriptHost 생성
+T+0600ms  ScriptHost.InitializeAsync 시작
+T+1200ms  host.json 로딩 + 옵션 매핑
+T+2000ms  FunctionMetadata 인덱싱 완료
+T+2600ms  InitializeAsync 완료
+T+2900ms  base.StartAsyncCore() -> listener 시작 단계 진입
+T+3500ms  첫 trigger listener ready
+```
+
+이렇게 보면 `T+1200ms` 이전 실패는 대부분 설정/구성 경로, `T+2000ms` 전후 실패는 함수 카탈로그 생성 경로, `T+2900ms` 이후 실패는 리스너/트리거 경로로 좁혀집니다. "부팅 실패"라는 한 문장 대신 "카탈로그 생성 전 실패"처럼 표현이 바뀌면 팀 내 커뮤니케이션 비용이 크게 줄어듭니다.
+
+### `host.json`과 앱 설정 충돌은 우선순위 규칙으로 설명해야 합니다
+
+현장에서 실제로 자주 생기는 이슈는 `host.json` 값이 바뀌지 않는 것처럼 보이는 현상입니다. 대부분은 값이 안 바뀐 것이 아니라, 같은 키를 앱 설정으로 덮어쓴 상태입니다. Functions Host는 .NET `IConfiguration` 규칙을 따르기 때문에 provider 우선순위를 이해해야 합니다.
+
+예를 들어 팀이 `host.json`에 timeout을 5분으로 넣고, 운영 슬롯 앱 설정에서 별도 override를 주면 결과는 앱 설정 값이 됩니다. 그래서 변경 리뷰 시에는 파일 diff만 보면 안 되고 슬롯별 앱 설정 diff도 함께 봐야 합니다. 이 점을 놓치면 "분명 host.json을 수정했는데 반영이 안 된다"는 오판이 반복됩니다.
+
+```json
+{
+  "functionTimeout": "00:05:00",
+  "concurrency": {
+    "dynamicConcurrencyEnabled": true
+  }
+}
+```
+
+위처럼 파일에 설정이 있어도, 앱 설정에서 대응 키를 주면 최종 런타임은 다른 값으로 동작할 수 있습니다. 운영 런북에는 "host.json + 앱 설정을 합친 최종 구성"을 확인하는 절차를 반드시 넣어야 합니다.
+
+### 성능 프로파일링 출력으로 부팅 병목을 분해할 수 있습니다
+
+호스트 초기화가 느릴 때는 체감만으로 원인을 잡기 어렵습니다. 이때는 단계별 소요 시간을 텍스트로 남기는 것이 가장 실용적입니다. 아래 예시는 실제 형식을 단순화한 부팅 프로파일 출력 예시입니다.
+
+```text
+[BootstrapProfile]
+Step=CreateScriptHost DurationMs=278
+Step=LoadHostJson DurationMs=412
+Step=BuildConfiguration DurationMs=195
+Step=IndexFunctionMetadata DurationMs=1327
+Step=InitializeExtensions DurationMs=486
+Step=StartListeners DurationMs=691
+Total=3389ms
+```
+
+이런 로그가 있으면 병목은 대개 두 부류로 정리됩니다. `IndexFunctionMetadata`가 긴 경우는 함수 수 증가, reflection 비용, 파일 시스템 접근 지연이 원인 후보입니다. 반대로 `StartListeners`가 긴 경우는 외부 의존 트리거 초기 연결(스토리지, 서비스 버스 등) 지연일 가능성이 큽니다. 즉 "느리다"를 단계별 숫자로 쪼개면 바로 다음 실험 계획을 세울 수 있습니다.
+
+### 실패 모드별 1차 진단 순서를 표준화해 두는 것이 좋습니다
+
+같은 재시작이라도 조치 순서는 다릅니다. 아래처럼 실패 모드를 부팅 단계에 매핑해 두면 온콜 대응 시간이 줄어듭니다.
+
+| 관찰 증상 | 우선 확인 파일/로그 | 1차 가설 |
+|---|---|---|
+| 시작 직후 즉시 재시작 반복 | `WebJobsScriptHostService` 시작 예외 | 구성 오류, 필수 설정 누락 |
+| 함수 목록이 비어 있음 | `FunctionMetadataManager` 인덱싱 로그 | 함수 디렉터리/메타데이터 파싱 실패 |
+| 호스트는 살아 있으나 트리거 무응답 | `StartAsyncCore` 이후 listener 로그 | 트리거 연결 초기화 지연 또는 실패 |
+| 간헐적 과부하 재시작 | `HostPerformanceManager` 임계치 로그 | CPU/메모리 포화, 워커 수 과다 |
+
+중요한 점은 원인 추정 전에 "현재 어느 단계까지 갔는지"를 먼저 고정하는 것입니다. 단계가 고정되면 원인 후보군이 급격히 줄어듭니다.
+
 ### 운영 점검에 바로 쓸 수 있는 명령
 
 아래 명령은 현재 함수 앱의 핵심 앱 설정과 라이브 로그를 빠르게 확인할 때 유용합니다.

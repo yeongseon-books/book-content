@@ -233,6 +233,61 @@ message FunctionLoadRequest {
 
 이 그림이 잡히면 이후 dispatcher와 invocation 경로가 “generic event bus를 떠다니는 메시지”가 아니라, **워커 하나에 귀속된 실체적인 송수신 경로**로 보이기 시작합니다.
 
+### proto 필드 설계를 보면 확장 전략이 보입니다
+
+`FunctionRpc.proto`를 오래 보면 패턴이 드러납니다. 기존 메시지를 자주 깨지 않고 기능을 늘리기 위해, 새 capability를 먼저 협상하고 그 다음 새 메시지 타입을 `oneof`에 추가하는 방식입니다. 예를 들어 `FunctionLoadRequestCollection`, `WorkerWarmupRequest`, `CloseSharedMemoryResourcesRequest`는 모두 기존 스트림 계약을 유지한 채 기능을 확장한 사례입니다.
+
+이 방식의 장점은 호환성입니다. 구버전 워커가 신메시지를 모르면 capability 단계에서 비활성화하고 기존 경로로 폴백할 수 있습니다. 반대로 단점은 복잡성입니다. 운영자는 "메시지가 존재한다"와 "현재 조합에서 실제 사용된다"를 구분해야 합니다.
+
+### 큰 페이로드에서 shared memory 경로가 선택되는 조건
+
+큰 입력 데이터를 항상 gRPC frame으로 보내면 직렬화 비용과 메모리 복사가 커집니다. 그래서 호스트와 워커가 둘 다 shared memory capability를 광고하면, `ParameterBinding.rpc_data`가 `TypedData` 대신 `RpcSharedMemory`를 사용할 수 있습니다.
+
+```protobuf
+message RpcSharedMemory {
+  string name = 1;
+  int64 offset = 2;
+  int64 count = 3;
+  DataType type = 4;
+}
+```
+
+핵심은 이것이 "항상 더 빠른" 경로가 아니라는 점입니다. 페이로드 크기, 워커 구현체, 플랫폼 제약에 따라 효과가 달라집니다. 따라서 성능 튜닝 시에는 payload size 구간별로 inline(`TypedData`)과 shared memory를 나눠 측정해야 합니다.
+
+### 스트림 단절 시나리오를 단계별로 기록해야 재현이 쉽습니다
+
+실제 장애에서 자주 만나는 케이스는 "프로세스는 살아 있는데 스트림만 끊긴" 상태입니다. 이때 호스트 관점에서는 outbound write 실패, inbound reader 종료, heartbeat 응답 누락 같은 신호가 나타나고, 결과적으로 채널이 폐기된 뒤 새 워커 연결 절차가 시작됩니다.
+
+아래는 운영 로그를 단순화한 예시입니다.
+
+```text
+[GrpcChannel]
+WorkerId=python-3f2a
+State=Ready
+Event=OutboundWriteFailed
+Exception=RpcException(StatusCode=Unavailable)
+Action=CloseChannelAndRestartWorker
+RestartAttempt=1
+```
+
+이 출력이 의미하는 것은 네트워크 대역폭 문제가 아니라 "워커별 채널 계약이 깨졌다"는 사실입니다. 따라서 원인 분석도 인프라 전체보다 해당 워커 프로세스 상태, gRPC 서버 포트 충돌, 워커 구현체 예외를 먼저 보는 편이 정확합니다.
+
+### 메시지 레벨 프로파일링 예시
+
+프로토콜 병목을 보려면 함수 실행 시간만 보면 부족합니다. 메시지 단위 타이밍을 함께 남겨야 합니다.
+
+```text
+[GrpcMessageProfile]
+WorkerId=node-51ad
+StartStreamToInitResponseMs=37
+InitResponseToFunctionLoadCompleteMs=212
+InvocationRequestToFirstByteMs=18
+InvocationRequestToResponseP95Ms=406
+RpcLogMessagesPerInvocation=2.9
+```
+
+`StartStreamToInitResponseMs`가 높으면 워커 초기화 코드, `FunctionLoadCompleteMs`가 높으면 함수 로드/메타데이터 변환, `Invocation P95`가 높으면 사용자 코드 또는 외부 의존성 지연이 의심됩니다. 즉 메시지 시간축은 "느리다"를 프로토콜 단계로 쪼개는 도구입니다.
+
 ## 흔히 헷갈리는 지점
 
 - **호스트-워커 통신은 RPC 여러 개가 아니라 `EventStream` 하나입니다.** 수십 가지 메시지 타입이 `StreamingMessage.oneof`로 다중화됩니다.
