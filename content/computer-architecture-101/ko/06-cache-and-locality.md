@@ -81,7 +81,7 @@ CPU는 메인 메모리에서 한 바이트만 가져오지 않습니다. 보통
 **Before — 캐시 적대적 코드:**
 
 ```python
-# Column-major traversal of a 2D array
+# 2D 배열을 column-major로 순회
 def col_major(matrix, n):
     total = 0
     for j in range(n):
@@ -225,7 +225,7 @@ for i in range(N):
     for j in range(N):
         for k in range(N):
             c2[i, j] += a[i, k] * b[k, j]
-# only meaningful for smaller N because of speed
+# 속도 문제로 작은 N에서만 의미 있습니다.
 ```
 
 같은 행렬 곱셈도 캐시에 맞춘 블로킹을 하느냐에 따라 성능 차이가 극단적으로 벌어집니다.

@@ -67,8 +67,7 @@ sym. diff.   A ^ B  = {1, 2, 5, 6}
 | `frozenset` | 자기 자신도 해시 가능한 불변 set입니다 |
 | 집합 연산 | 합집합, 교집합, 차집합, 대칭차집합처럼 membership 기반으로 계산하는 연산입니다 |
 
-## Before / After
-
+## 적용 전후 비교
 list 기반 중복 제거와 set 기반 중복 제거를 비교해 보겠습니다.
 
 ```python
@@ -91,7 +90,7 @@ print(unique)  # {1, 2, 3, 4}
 
 ## 단계별 실습
 
-### Step 1: 기본 set 연산 확인하기
+### 단계 1: 기본 set 연산 확인하기
 
 ```python
 fruits = {"apple", "banana", "cherry"}
@@ -103,7 +102,7 @@ print("apple" in fruits)  # True
 print(len(fruits))         # 3
 ```
 
-### Step 2: 충돌을 강제로 만들고도 dedup이 유지되는지 보기
+### 단계 2: 충돌을 강제로 만들고도 dedup이 유지되는지 보기
 
 ```python
 class Tag:
@@ -140,7 +139,7 @@ True
 - 그런데도 set에는 논리적으로 두 원소만 남습니다. `Tag("python")` 두 개가 equality 기준으로 같은 키이기 때문입니다.
 - 즉, set의 속도는 해시 테이블에서 오지만, 정확성은 안정적인 해시와 올바른 equality 의미에 달려 있습니다.
 
-### Step 3: “list는 안 된다”를 넘어서 `frozenset`이 왜 되는지 증명하기
+### 단계 3: “list는 안 된다”를 넘어서 `frozenset`이 왜 되는지 증명하기
 
 ```python
 try:
@@ -167,7 +166,7 @@ editor
 
 plain `set`은 가변 객체라서 자기 자신을 다른 set의 원소나 dict 키로 넣을 수 없습니다. 반면 `frozenset`은 생성 후 내용이 바뀌지 않으므로 안정적인 해시를 만들 수 있고, 그래서 중첩 set이나 dict 키 역할을 안전하게 수행합니다.
 
-### Step 4: 집합 연산을 저장 모델과 연결해 보기
+### 단계 4: 집합 연산을 저장 모델과 연결해 보기
 
 ```python
 a = {1, 2, 3, 4, 5}
@@ -181,7 +180,7 @@ print(a ^ b)  # symmetric difference
 
 이 연산자들이 자연스러운 이유는 set이 애초부터 “고유한 키의 membership” 중심 구조이기 때문입니다.
 
-### Step 5: 태그 필터링은 proof가 아니라 응용으로 보기
+### 단계 5: 태그 필터링은 proof가 아니라 응용으로 보기
 
 ```python
 articles = [

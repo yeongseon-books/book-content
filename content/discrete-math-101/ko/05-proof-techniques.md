@@ -25,7 +25,6 @@ last_reviewed: '2026-05-12'
 
 이 글은 Discrete Math 101 시리즈의 5번째 글입니다.
 
-
 ![Discrete Math 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/05/05-01-big-picture.ko.png)
 *Discrete Math 101 5장 흐름 개요*
 
@@ -72,7 +71,7 @@ last_reviewed: '2026-05-12'
 **Before — no proof:**
 
 ```python
-# "100 tests passed, so it must work" — no guarantee on all inputs
+# "테스트 100개 통과했으니 맞다" — 모든 입력을 보장하진 않음
 def gcd(a, b):
     while b:
         a, b = b, a % b
@@ -98,8 +97,8 @@ def gcd(a: int, b: int) -> int:
 ### 1단계: 직접 증명
 
 ```python
-# Claim: the square of an even number is even
-# Proof: assume n = 2k. Then n² = 4k² = 2(2k²), which is even.
+# 주장: 짝수의 제곱은 짝수
+# 증명: n = 2k라 두면 n² = 4k² = 2(2k²)로 짝수
 
 def verify_direct(limit: int = 1000) -> bool:
     """Empirical check (the math proof is what really establishes it)"""
@@ -116,9 +115,9 @@ print(f"Verified: {verify_direct()}")
 ### 2단계: 대우 증명
 
 ```python
-# Claim: if n² is even, then n is even
-# Direct is awkward, but the contrapositive is easy:
-# Contrapositive: if n is odd, then n² is odd.
+# 주장: n²가 짝수면 n도 짝수
+# 직접증명은 까다롭지만 대우는 쉬움:
+# 대우: n이 홀수면 n²도 홀수
 # n = 2k + 1 → n² = 4k² + 4k + 1 = 2(2k² + 2k) + 1 → odd
 
 def contrapositive_check(limit: int = 1000) -> None:
@@ -135,11 +134,11 @@ print("Contrapositive cases verified")
 ### 3단계: 귀류법
 
 ```python
-# Claim: √2 is irrational
-# Assume √2 = p/q in lowest terms. Then 2q² = p².
-# → p² is even → p is even → p = 2k
-# → 2q² = 4k² → q² = 2k² → q² is even → q is even
-# → both p and q even ⊥ "lowest terms" assumption
+# 주장: √2는 무리수
+# √2 = p/q(기약분수)라 가정하면 2q² = p²
+# → p²가 짝수 → p가 짝수 → p = 2k
+# → 2q² = 4k² → q² = 2k² → q²가 짝수 → q가 짝수
+# → p와 q가 모두 짝수여서 "기약분수" 가정과 모순
 
 import math
 
@@ -161,7 +160,7 @@ print(f"Is √2 expressible as fraction with q ≤ 10000? {is_rational_approx(ma
 ```python
 # Claim: 1 + 2 + ... + n = n(n+1)/2
 # Base P(1): 1 = 1·2/2 = 1 ✓
-# Inductive step: assuming P(k), prove P(k+1)
+# 귀납 단계: P(k)를 가정하고 P(k+1) 증명
 #   1 + 2 + ... + k + (k+1) = k(k+1)/2 + (k+1) = (k+1)(k+2)/2 ✓
 
 def gauss_sum(n: int) -> int:
@@ -180,13 +179,13 @@ for n in [1, 10, 100, 1000]:
 ### 5단계: 알고리즘 정확성 증명
 
 ```python
-# Claim: this returns the correct index of target in a sorted array,
-# or -1 if absent.
+# 주장: 정렬된 배열에서 target의 올바른 인덱스를 반환하고,
+# 없으면 -1을 반환
 
 def binary_search(arr: list, target: int) -> int:
     low, high = 0, len(arr) - 1
     while low <= high:
-        # Invariant: if target is in arr, it lies in arr[low..high]
+        # 불변식: target이 arr에 있으면 arr[low..high] 구간에 존재
         mid = (low + high) // 2
         if arr[mid] == target:
             return mid
@@ -196,9 +195,9 @@ def binary_search(arr: list, target: int) -> int:
             high = mid - 1
     return -1
 
-# Termination: high - low strictly decreases each iteration
-# Correctness: loop invariant + termination condition
-# Both formal proofs use induction.
+# 종료성: 반복마다 high - low가 엄격히 감소
+# 정확성: loop 불변식 + 종료 조건
+# 두 형식적 증명 모두 귀납법 사용
 
 for arr, target in [([1, 3, 5, 7, 9], 5), ([1, 3, 5, 7, 9], 4)]:
     print(f"binary_search({arr}, {target}) = {binary_search(arr, target)}")
@@ -256,98 +255,6 @@ for arr, target in [([1, 3, 5, 7, 9], 5), ([1, 3, 5, 7, 9], 4)]:
 증명은 모든 가능한 입력에 대해 정확성을 보장하는 도구입니다. 직접, 대우, 귀류, 귀납이라는 네 가지 기법은 이산수학의 거의 모든 명제를 다루는 기본 세트이며, 알고리즘 정확성 검증에도 그대로 사용됩니다.
 
 다음 글에서는 귀납법과 가장 가까운 주제인 수열과 점화식으로 넘어가겠습니다.
-
-## 실전 보강: 증명, 집합 연산, 그래프 알고리즘을 연결해서 보기
-
-이산수학은 정의를 외우는 과목이 아니라, 명제를 세우고 검증하는 절차를 훈련하는 과목입니다. 아래 내용은 증명 예시, 집합 연산표, 그래프 알고리즘을 하나의 흐름으로 연결합니다.
-
-### 1) 짧은 직접 증명 예시
-
-명제: 임의의 정수 `n`에 대해 `n`이 짝수이면 `n^2`도 짝수입니다.
-
-증명: `n`이 짝수이므로 어떤 정수 `k`가 존재하여 `n = 2k`입니다. 그러면
-`n^2 = (2k)^2 = 4k^2 = 2(2k^2)` 이고, `2k^2`는 정수이므로 `n^2`는 짝수입니다.
-따라서 명제가 성립합니다.
-
-핵심은 결론을 먼저 믿는 것이 아니라, 정의(짝수의 정의)를 대입해 식을 변형하는 것입니다.
-
-### 2) 집합 연산표로 규칙 확인
-
-전체집합 `U = {1,2,3,4,5,6}`, `A = {1,2,3,4}`, `B = {3,4,5}`일 때:
-
-| 연산 | 결과 |
-| --- | --- |
-| `A ∪ B` | `{1,2,3,4,5}` |
-| `A ∩ B` | `{3,4}` |
-| `A \ B` | `{1,2}` |
-| `B \ A` | `{5}` |
-| `A^c` (in U) | `{5,6}` |
-
-이 표는 드모르간 법칙 검증에도 바로 사용됩니다.
-`(A ∪ B)^c = A^c ∩ B^c`를 실제 원소로 계산해 양변이 같음을 확인할 수 있습니다.
-
-### 3) 귀납법 예시
-
-명제: `1 + 2 + ... + n = n(n+1)/2`.
-
-- 기저 단계: `n=1`에서 좌변 `1`, 우변 `1(2)/2 = 1`로 성립.
-- 귀납 가정: `n=k`에서 성립한다고 가정.
-- 귀납 단계:
-  `1+...+k+(k+1) = k(k+1)/2 + (k+1)`
-  `= (k+1)(k+2)/2`.
-
-따라서 모든 자연수 `n`에 대해 성립합니다.
-
-귀납법의 핵심은 “k에서 참이면 k+1도 참”이라는 연결 고리를 명시하는 것입니다.
-
-### 4) 그래프 알고리즘: BFS 거리 계산
-
-```python
-from collections import deque
-
-def bfs_distance(graph: dict[int, list[int]], start: int) -> dict[int, int]:
-    dist = {start: 0}
-    q = deque([start])
-    while q:
-        v = q.popleft()
-        for nxt in graph.get(v, []):
-            if nxt not in dist:
-                dist[nxt] = dist[v] + 1
-                q.append(nxt)
-    return dist
-
-G = {
-    1: [2, 3],
-    2: [4],
-    3: [4, 5],
-    4: [6],
-    5: [],
-    6: [],
-}
-print(bfs_distance(G, 1))
-```
-
-BFS는 간선 가중치가 동일할 때 최단 거리 계층을 계산합니다. 증명 관점에서는 “큐에서 먼저 나온 정점의 거리는 이미 최단”이라는 불변식을 유지하는 것이 핵심입니다.
-
-### 5) DFS와 BFS 선택 기준
-
-| 기준 | BFS | DFS |
-| --- | --- | --- |
-| 주 용도 | 최단 거리(무가중치) | 경로 존재성, 사이클 탐지 |
-| 자료구조 | Queue | Stack(또는 재귀) |
-| 메모리 특성 | 폭이 넓으면 증가 | 깊이가 깊으면 증가 |
-| 직관 | 레벨 단위 탐색 | 한 경로 끝까지 탐색 |
-
-문제의 요구가 “최소 단계”인지 “탐색 가능성”인지 먼저 구분하면 알고리즘 선택이 쉬워집니다.
-
-### 6) 이산수학에서 알고리즘으로 넘어갈 때 체크 포인트
-
-- 명제를 자연어로 쓴 뒤 기호화할 수 있는가
-- 필요한 정의(짝수, 함수, 관계, 연결성)를 정확히 호출했는가
-- 반례 하나로 거짓을 보일 수 있는 문제인지 확인했는가
-- 증명 불변식을 코드 루프 불변식으로 옮길 수 있는가
-
-이산수학의 강점은 계산 자체보다 **판단 근거를 명시하는 습관**입니다. 이 습관이 자료구조, 알고리즘, 시스템 설계까지 그대로 이어집니다.
 
 ## 실전 확장: 증명 방법을 선택하는 기준과 워크드 예시
 
@@ -508,7 +415,6 @@ def verify_identity(left: set[int], right: set[int]) -> bool:
 
 각 장의 주제가 달라 보여도 훈련 루프는 같습니다. 정의를 선언하고, 계산을 수행하고, 반례로 검증하고, 증명 또는 불변식으로 고정하면 됩니다. 이 루프를 반복하면 새로운 문제에서도 같은 품질로 사고할 수 있습니다.
 
-
 ## 추가 심화: 오류 사례와 교정 로그
 
 실무에서 이산수학 개념이 흔들리는 지점은 대부분 "정의 생략"에서 시작합니다. 아래는 자주 나오는 오류와 교정 방식입니다.
@@ -546,7 +452,6 @@ def verify_identity(left: set[int], right: set[int]) -> bool:
 
 이 루프를 문서화하면 팀 단위 품질이 안정됩니다.
 
-
 ## 보강 메모: 손으로 계산해 보는 검증 절차
 
 아래 절차를 한 번 손으로 수행하면 개념이 빠르게 고정됩니다.
@@ -557,7 +462,6 @@ def verify_identity(left: set[int], right: set[int]) -> bool:
 - 점화식 문제: `n=1..6`까지 값을 적어 패턴을 추측한 뒤 귀납법으로 검증합니다.
 
 이 과정을 문서 마지막에 남기면 다음 글을 읽을 때도 같은 기준으로 사고를 이어갈 수 있습니다.
-
 
 ## 처음 질문으로 돌아가기
 

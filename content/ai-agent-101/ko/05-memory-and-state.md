@@ -102,7 +102,7 @@ memory.add_user_message("What's the weather today?")
 memory.add_assistant_message("Today's weather in Seoul is sunny.")
 
 memory.add_user_message("How about tomorrow?")
-# Agent remembers previous conversation ("weather today") and understands "tomorrow" refers to weather
+# Agent는 이전 대화("오늘 날씨")를 기억하고 "내일"이 날씨를 가리킨다는 것을 이해합니다.
 
 print(f"Message count: {len(memory.get_context())}")  # 4 (system + user + assistant + user)
 ```
@@ -156,7 +156,7 @@ class LongTermMemory:
         memories = self.memories[user_id]
 
         if key:
-            # Return only memories matching the key
+            # 키와 일치하는 메모리만 반환
             return [m for m in memories if m["key"] == key]
 
         return memories
@@ -180,7 +180,7 @@ class HybridMemory:
         memories = self.long_term.retrieve_memory(self.user_id)
 
         if memories:
-            # Add long-term memory content to system prompt
+            # 장기 메모리 내용을 system prompt에 추가
             context = "Previous user preferences:\n"
             for mem in memories:
                 context += f"- {mem['key']}: {mem['value']}\n"

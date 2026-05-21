@@ -405,7 +405,7 @@ db_query = rng.gamma(3, 4, n_simulations)
 # 전체 응답시간 = 합
 total = gateway + auth + db_query
 
-# SLA: 99th percentile이 50ms 이하여야 함
+# SLA: 99번째 백분위수가 50ms 이 초기 테스트
 p50 = np.percentile(total, 50)
 p95 = np.percentile(total, 95)
 p99 = np.percentile(total, 99)

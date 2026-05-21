@@ -78,8 +78,7 @@ def total_with_tax(amount: int, tax_rate: float) -> float:
 
 ## 실전 적용: 지저분함을 먼저 측정하기
 
-### 단계 1 — Function length
-
+### 단계 1 — 함수 길이
 ```python
 # 1_length.py
 def process(order):
@@ -89,8 +88,7 @@ def process(order):
 
 함수가 20줄을 넘기기 시작하면, 길어진 이유를 먼저 설명할 수 있어야 합니다. 설명이 길어진다면 대개 함수도 이미 너무 많은 일을 하고 있습니다.
 
-### 단계 2 — Argument count
-
+### 단계 2 — 인자 개수
 ```python
 # 2_args.py
 def create_user(name, email, age, address, role, plan, ref):
@@ -99,8 +97,7 @@ def create_user(name, email, age, address, role, plan, ref):
 
 인자가 세 개를 넘기기 시작하면, 하나의 객체로 묶을 수 있는지 점검하는 편이 좋습니다. 함수 시그니처는 그 자체로 설계의 부담을 드러냅니다.
 
-### 단계 3 — Indentation depth
-
+### 단계 3 — 들여쓰기 깊이
 ```python
 # 3_depth.py
 if a:
@@ -111,8 +108,7 @@ if a:
 
 들여쓰기 깊이가 3을 넘으면 추출이나 분기 재구성이 필요하다는 신호로 보는 것이 좋습니다. 깊이는 곧 인지 부담입니다.
 
-### 단계 4 — Honest names
-
+### 단계 4 — 정직한 이름
 ```python
 # 4_name.py
 def calc(x):  # of what?
@@ -123,8 +119,7 @@ def calculate_invoice_total(line_items):
 
 이름이 거짓말하면 코드를 읽는 사람도 잘못된 기대를 갖습니다. 반대로 정직한 이름은 주석 몇 줄을 대신합니다.
 
-### 단계 5 — Measure cognitive load
-
+### 단계 5 — 인지 부하 측정
 ```bash
 # 5_cc.sh
 radon cc app/ -a -s

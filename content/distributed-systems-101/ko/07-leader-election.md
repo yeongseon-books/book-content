@@ -57,8 +57,7 @@ last_reviewed: '2026-05-15'
 - **Fencing token**: 이전 리더의 요청을 거부하기 위해 단조 증가하는 ID입니다.
 - **Split-brain**: 두 노드가 동시에 자신이 리더라고 믿는 상태입니다.
 
-## Before / After
-
+## 적용 전후 비교
 **Before — heartbeat만으로 리더 판단**
 
 ```text
@@ -133,10 +132,10 @@ def write(token, data):
 
 ```python
 # 5_split.py (pseudocode)
-# old leader A: token=5, GC pause 30s
-# meanwhile new leader B: token=6 issued
-# A wakes up and tries to write with token=5 -> resource server rejects
-# B's write with token=6 succeeds
+# 기존 leader A: token=5, GC pause 30초
+# 그동안 새 leader B: token=6 발급
+# A가 깨어나 token=5로 write 시도 -> resource server가 거부
+# B의 token=6 write는 성공
 ```
 
 토큰이 없는 설계였다면 A의 쓰기가 실제로 반영되어 데이터가 망가졌을 것입니다.

@@ -26,7 +26,6 @@ last_reviewed: '2026-05-12'
 
 코드를 고칠 때마다 “이 변경이 다른 기능을 깨뜨리지는 않을까?”라는 불안이 생긴다면, 이미 테스트가 필요한 상태일 가능성이 큽니다. 테스트는 단지 품질 관리 문서가 아니라, 변경 후에도 기존 동작이 유지되는지 몇 초 안에 확인하게 해 주는 자동화 장치입니다.
 
-
 ![pytest 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/01/01-01-big-picture.ko.png)
 *pytest 101 1장 흐름 개요*
 
@@ -68,12 +67,11 @@ last_reviewed: '2026-05-12'
 | 테스트 피라미드 | 단위 테스트를 많이, 통합/E2E 테스트를 상대적으로 적게 두는 전략입니다 |
 | 회귀 테스트 | 변경 후에도 기존 기능이 계속 동작하는지 확인합니다 |
 
-## Before / After
-
+## 적용 전후 비교
 수동 확인과 pytest 자동 검증의 차이를 비교해 보겠습니다.
 
 ```python
-# before: manually call functions and visually inspect output
+# 기존: 함수를 수동 호출하고 출력 결과를 눈으로 확인
 def add(a, b):
     return a + b
 
@@ -82,7 +80,7 @@ print(add(-1, 1))   # check if 0 appears
 ```
 
 ```python
-# after: automated verification with pytest
+# 개선: pytest로 자동 검증
 def add(a, b):
     return a + b
 
@@ -97,15 +95,13 @@ def test_add_negative():
 
 ## 단계별 실습
 
-### Step 1: Check Python Environment
-
+### 단계 1: Python 환경 확인
 ```bash
 python3 --version
 # Python 3.10 or higher is fine
 ```
 
-### Step 2: Install pytest
-
+### 단계 2: pytest 설치
 ```bash
 pip install pytest
 pytest --version
@@ -214,74 +210,6 @@ test_calculator.py::test_divide_by_zero PASSED
 
 테스트는 코드 변경에 대한 안전망입니다. pytest는 `assert` 하나로도 충분히 읽기 좋은 테스트를 만들 수 있게 해 줍니다. 다음 글에서는 pytest가 테스트 파일과 함수를 어떻게 자동으로 찾는지부터, 첫 번째 테스트를 실제로 작성하는 과정까지 살펴보겠습니다.
 
-## 실전 패턴 추가: fixture, parametrization, mock을 함께 설계하기
-
-테스트 파일이 커질수록 중요한 것은 개별 문법보다 테스트 경계를 일정하게 유지하는 일입니다. 특히 fixture로 상태를 준비하고, `@pytest.mark.parametrize`로 입력 집합을 확장하고, mock으로 외부 의존성을 분리하는 세 가지를 한 흐름으로 묶으면 테스트 유지보수 비용이 크게 줄어듭니다.
-
-```python
-# tests/test_order_service.py
-from __future__ import annotations
-
-from dataclasses import dataclass
-from unittest.mock import Mock
-
-import pytest
-
-
-@dataclass
-class Order:
-    item: str
-    qty: int
-
-
-class InventoryClient:
-    def reserve(self, item: str, qty: int) -> bool:  # pragma: no cover
-        raise NotImplementedError
-
-
-class OrderService:
-    def __init__(self, client: InventoryClient) -> None:
-        self.client = client
-
-    def place(self, order: Order) -> str:
-        if order.qty <= 0:
-            raise ValueError("qty must be positive")
-        ok = self.client.reserve(order.item, order.qty)
-        return "confirmed" if ok else "rejected"
-
-
-@pytest.fixture
-def inventory_client() -> Mock:
-    return Mock(spec=InventoryClient)
-
-
-@pytest.fixture
-def order_service(inventory_client: Mock) -> OrderService:
-    return OrderService(client=inventory_client)
-
-
-@pytest.mark.parametrize(
-    "order,expected",
-    [
-        (Order("book", 1), "confirmed"),
-        (Order("book", 3), "confirmed"),
-        (Order("book", 5), "rejected"),
-    ],
-)
-def test_place_orders(order_service: OrderService, inventory_client: Mock, order: Order, expected: str) -> None:
-    inventory_client.reserve.return_value = expected == "confirmed"
-    assert order_service.place(order) == expected
-
-
-def test_place_rejects_invalid_quantity(order_service: OrderService) -> None:
-    with pytest.raises(ValueError, match="qty must be positive"):
-        order_service.place(Order("book", 0))
-```
-
-위 구조의 핵심은 테스트 목적별 분리입니다. fixture는 준비, parametrization은 입력 공간, mock은 외부 의존성 제어를 담당합니다. 팀 단위에서는 이 분리를 지켜야 테스트를 고칠 때 영향 범위를 빠르게 읽을 수 있습니다.
-
-또한 fixture scope를 무조건 넓히지 않는 편이 안전합니다. DB 연결이나 임시 디렉터리처럼 생성 비용이 큰 자원만 `module` 또는 `session`으로 올리고, 나머지는 `function` scope로 두어 테스트 독립성을 유지하는 것이 좋습니다.
-
 ## 추가 실무 메모: 실패 재현 테스트를 먼저 고정하기
 
 버그 수정에서는 구현보다 재현 테스트를 먼저 고정하는 순서가 중요합니다. 예를 들어 시간대나 경계값 입력처럼 운영에서만 드러나는 문제는 아래처럼 실패 케이스를 테스트로 먼저 기록한 뒤 수정해야 재발을 막을 수 있습니다.
@@ -316,7 +244,6 @@ class CartItem:
     price: int
     qty: int
 
-
 def calc_total(items: list[CartItem], coupon_rate: float = 0.0) -> int:
     if not 0.0 <= coupon_rate <= 1.0:
         raise ValueError("coupon_rate must be between 0 and 1")
@@ -330,16 +257,13 @@ def calc_total(items: list[CartItem], coupon_rate: float = 0.0) -> int:
 import pytest
 from pricing import CartItem, calc_total
 
-
 def test_calc_total_without_coupon():
     items = [CartItem("book", 10000, 2), CartItem("pen", 1000, 3)]
     assert calc_total(items) == 23000
 
-
 def test_calc_total_with_coupon():
     items = [CartItem("book", 10000, 2), CartItem("pen", 1000, 3)]
     assert calc_total(items, 0.1) == 20700
-
 
 @pytest.mark.parametrize("bad_rate", [-0.1, 1.1])
 def test_calc_total_rejects_bad_coupon_rate(bad_rate):
@@ -444,7 +368,6 @@ FEES = {
     "US": {"free_over": 100, "fee": 10},
 }
 
-
 def shipping_fee(country: str, total: int) -> int:
     policy = FEES.get(country)
     if policy is None:
@@ -453,7 +376,6 @@ def shipping_fee(country: str, total: int) -> int:
 ```
 
 같은 테스트를 실행해 모두 통과하면, 동작 계약을 지키면서 구조 개선이 끝난 것입니다.
-
 
 ## 팀 도입 로드맵: 테스트 문화를 실제로 시작하는 순서
 
@@ -516,13 +438,11 @@ def test_normalize_phone_rejects_invalid_input(bad):
 # regression_cases.py
 import pytest
 
-
 def parse_currency(value: str) -> int:
     cleaned = value.replace(",", "").strip()
     if not cleaned.isdigit():
         raise ValueError("invalid currency string")
     return int(cleaned)
-
 
 @pytest.mark.parametrize(
     "raw",
@@ -543,93 +463,6 @@ def test_parse_currency_regressions(raw):
 | 회귀 버그 수 | 같은 유형 재발 횟수 | 분기별 감소 |
 | PR 테스트 실행률 | 테스트 포함 PR 비율 | 90% 이상 |
 | 테스트 실행 시간 | 피드백 지연 정도 | 팀 합의선 유지 |
-
-
-## 심화 실습 세트: 실패를 빠르게 재현하고 고정하는 루틴
-
-아래 실습은 글 주제와 무관하게 pytest 프로젝트에서 반복적으로 쓰는 루틴입니다. 핵심은 실패를 의도적으로 만들고, 실패 메시지를 읽고, 테스트를 보강하고, 다시 통과시키는 사이클을 짧게 반복하는 것입니다.
-
-### 실습 A: 입력 검증 함수
-
-```python
-# app/input_guard.py
-
-def require_non_empty(value: str) -> str:
-    if value is None:
-        raise TypeError("value cannot be None")
-    if value.strip() == "":
-        raise ValueError("value cannot be blank")
-    return value.strip()
-```
-
-```python
-# tests/test_input_guard.py
-import pytest
-from app.input_guard import require_non_empty
-
-
-def test_require_non_empty_ok():
-    assert require_non_empty("  hello  ") == "hello"
-
-
-@pytest.mark.parametrize("bad", ["", "   ", "\n\t"])
-def test_require_non_empty_blank(bad):
-    with pytest.raises(ValueError, match="blank"):
-        require_non_empty(bad)
-
-
-def test_require_non_empty_none():
-    with pytest.raises(TypeError, match="None"):
-        require_non_empty(None)
-```
-
-```bash
-pytest tests/test_input_guard.py -v
-```
-
-```text
-tests/test_input_guard.py::test_require_non_empty_ok PASSED
-tests/test_input_guard.py::test_require_non_empty_blank[] PASSED
-tests/test_input_guard.py::test_require_non_empty_blank[   ] PASSED
-tests/test_input_guard.py::test_require_non_empty_blank[\n\t] PASSED
-tests/test_input_guard.py::test_require_non_empty_none PASSED
-========================= 5 passed =========================
-```
-
-### 실습 B: 실패 유도 후 원인 파악
-
-함수 구현을 일부러 아래처럼 바꿉니다.
-
-```python
-# 잘못된 구현 예시
-# if value.strip() == "":
-#     return value
-```
-
-다시 실행하면 실패가 즉시 재현됩니다.
-
-```text
-FAILED tests/test_input_guard.py::test_require_non_empty_blank[]
-E   Failed: DID NOT RAISE <class 'ValueError'>
-```
-
-이 출력 하나로 계약 위반 지점을 바로 확인할 수 있습니다.
-
-### 실습 C: 리팩터링 안정성 확인
-
-```python
-# app/input_guard.py (refactor)
-
-def require_non_empty(value: str) -> str:
-    if value is None:
-        raise TypeError("value cannot be None")
-    normalized = value.strip()
-    if normalized == "":
-        raise ValueError("value cannot be blank")
-    return normalized
-```
-
-같은 테스트를 실행해 모두 통과하면, 구조를 바꿔도 계약은 유지된 것입니다.
 
 ## 터미널 옵션 조합
 
@@ -667,7 +500,6 @@ def test_regression_cases(raw, exc):
 - 경계값 입력이 포함되어 있는가
 - 정상/오류 경로를 모두 검증하는가
 - 테스트 추가가 함수 복사 대신 데이터 추가로 끝나는가
-
 
 ## 처음 질문으로 돌아가기
 

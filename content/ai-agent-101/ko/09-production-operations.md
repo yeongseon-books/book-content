@@ -269,7 +269,7 @@ class RunRequest(BaseModel):
 
 @app.post('/agent/run')
 def run_agent_api(req: RunRequest):
-    # 실제 구현에서는 인증, rate limit, trace 주입 필요
+    # 실제 구현에서는 인증, rate limit, trace 주입이 필요합니다.
     result = {"status": "ok", "answer": "..."}
     return result
 ```

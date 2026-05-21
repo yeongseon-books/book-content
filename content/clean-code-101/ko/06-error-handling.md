@@ -86,8 +86,7 @@ def fetch(url):
 
 ## 실전 적용: 견고한 오류 처리 다섯 단계
 
-### 단계 1 — Fail fast
-
+### 단계 1 — 빠르게 실패하기
 ```python
 # 1_fail_fast.py
 def transfer(amount):
@@ -98,8 +97,7 @@ def transfer(amount):
 
 잘못된 입력은 최대한 입구에서 막는 편이 좋습니다. 오류를 뒤로 미루면 문제는 더 멀리 퍼지고, 원인도 흐려집니다.
 
-### 단계 2 — Errors as values
-
+### 단계 2 — 값으로서의 에러
 ```python
 # 2_result.py
 from dataclasses import dataclass
@@ -116,8 +114,7 @@ def parse_int(s):
 
 호출자가 분기해야 하는 실패라면 값으로 돌려주는 편이 낫습니다. 파싱, 검증, 사용자 입력 처리 같은 영역이 대표적입니다.
 
-### 단계 3 — Exception chaining
-
+### 단계 3 — 예외 체이닝
 ```python
 # 3_chain.py
 class ConfigError(Exception): ...
@@ -131,8 +128,7 @@ def load_config(path):
 
 `from e`는 원인을 보존합니다. 도메인 의미를 덧붙이면서도 디버깅에 필요한 원래 예외를 잃지 않는 방식입니다.
 
-### 단계 4 — Retry + backoff
-
+### 단계 4 — 재시도 + backoff
 ```python
 # 4_retry.py
 import time, random
@@ -146,8 +142,7 @@ def with_retry(fn, attempts=3):
 
 재시도는 아무 데나 붙이는 장식이 아닙니다. 일시적 실패이면서, 같은 작업을 다시 해도 안전한 경우에만 써야 합니다.
 
-### 단계 5 — Catch only at boundaries
-
+### 단계 5 — 경계에서만 잡기
 ```python
 # 5_boundary.py
 def handle_request(req):

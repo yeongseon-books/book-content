@@ -107,7 +107,7 @@ engine = create_engine("sqlite:///app.db", echo=True)
 # 이 시점에는 아직 app.db 파일이 열리지 않았다.
 
 with engine.connect() as conn:
-    # 여기서 비로소 sqlite3.connect("app.db")가 호출된다.
+    # 여기에서 sqlite3.connect("app.db")가 호출됩니다.
     ...
 ```
 
@@ -151,7 +151,7 @@ with engine.connect() as conn:
     conn.execute(text("INSERT INTO users(name) VALUES (:n)"), {"n": "Alice"})
     conn.commit()
 
-# 패턴 C: 자동 commit/rollback (가장 권장)
+# 패턴 C: 자동 커밋/롤백(가장 권장)
 with engine.begin() as conn:
     conn.execute(text("INSERT INTO users(name) VALUES (:n)"), {"n": "Bob"})
 # 블록을 정상 종료하면 commit, 예외 발생 시 rollback
@@ -277,7 +277,7 @@ with engine.connect() as conn:
     result = conn.execute(text("SELECT id, name, email FROM users ORDER BY id"))
 
     for row in result:
-        # row는 named tuple-like
+        # 행은 튜플과 유사한 이름으로 지정됩니다.
         print(row.id, row.name, row.email)
 
     # 다시 가져오려면 새 execute 필요 (Result는 한 번만 순회 가능)
@@ -422,7 +422,7 @@ with engine.begin() as conn:
     conn.execute(text("SELECT 1"))
 
 print(engine.pool.status())
-# 예: Pool size: 5  Connections in pool: 1 Current Overflow: -4 Current Checked out connections: 0
+# 예: 풀 크기: 5 풀의 연결: 1 현재 오버플로: -4 현재 체크아웃된 연결: 0
 ```
 
 이 출력은 부하 테스트 직후의 체크포인트로 매우 유용합니다. API 지연이 커졌는데 `Checked out connections`가 계속 높은 값이면, 트랜잭션 블록이 너무 길거나 커넥션 반환이 늦은 코드 경로가 있다는 뜻입니다.

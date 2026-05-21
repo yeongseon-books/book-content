@@ -173,8 +173,7 @@ services:
 
 Compose는 애플리케이션과 데이터베이스를 하나의 스택으로 묶습니다. 여기서 `depends_on + service_healthy` 조합이 중요한 이유는 단순 실행 순서가 아니라 준비 완료 신호까지 함께 보게 해 주기 때문입니다.
 
-### 단계 4 — Automate startup
-
+### 단계 4 — 시작 자동화
 ```python
 import subprocess
 
@@ -187,8 +186,7 @@ def logs():
 
 기동과 로그 확인도 명령으로 표준화합니다. 운영 가능성은 결국 “문제가 생겼을 때 어디를 보면 되는가”까지 포함해야 합니다.
 
-### 단계 5 — Tear down
-
+### 단계 5 — 정리(tear down)
 ```python
 def down():
     subprocess.run(["docker", "compose", "down", "-v"], check=True)

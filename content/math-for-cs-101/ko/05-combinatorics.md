@@ -455,7 +455,7 @@ def inclusion_exclusion_3(a: int, b: int, c: int,
     return a + b + c - ab - ac - bc + abc
 
 # 예시: 1000명 중 Python 사용자 400, Java 300, Go 200
-# Python&Java 100, Python&Go 50, Java&Go 30, 세 언어 모두 10
+# Python&Java 100, Python&Go 50, Java&Go 30, 세 모두 언어 10
 print(inclusion_exclusion_3(400, 300, 200, 100, 50, 30, 10))  # 730
 ```
 

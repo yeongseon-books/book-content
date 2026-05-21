@@ -30,7 +30,6 @@ last_reviewed: '2026-05-12'
 
 이 글은 Testing 101 시리즈의 일곱 번째 글입니다. 여기서는 라인, 브랜치, 함수 커버리지의 차이, `pytest-cov`로 측정하는 기본 흐름, 그리고 100퍼센트 숫자에 집착할 때 생기는 문제를 정리하겠습니다.
 
-
 ![Testing 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/07/07-01-diagram.ko.png)
 *Testing 101 7장 흐름 개요*
 > 커버리지는 지표일 뿐 목표가 아닙니다. 100% 커버리지도 모든 버그를 잡지는 못합니다.
@@ -205,7 +204,6 @@ def calculate_discount(price: float, user_tier: str) -> float:
         discount = price * 0.1
     return price - discount
 
-
 def test_calculate_discount():
     result = calculate_discount(100, "gold")
     # 실행만 하고 검증하지 않음
@@ -227,16 +225,16 @@ result = calculate_discount(5, "gold")   # 5 - 1 = 4 (OK)
 
 ```python
 def test_calculate_discount_with_assertions():
-    # gold tier: 20% discount
+    # 골드 등급: 20% 할인
     assert calculate_discount(100, "gold") == 80
     
-    # silver tier: 10% discount
+    # 실버 등급: 10% 할인
     assert calculate_discount(100, "silver") == 90
     
-    # unknown tier: no discount
+    # 알 수 없는 등급: 할인 없음
     assert calculate_discount(100, "bronze") == 100
     
-    # edge case: zero price
+    # 극단적인 경우: 가격 0
     assert calculate_discount(0, "gold") == 0
 ```
 
@@ -265,7 +263,7 @@ def test_calculate_discount_with_assertions():
 **예시: 핵심 로직 집중 테스트**
 
 ```python
-# src/order.py — 핵심 도메인
+# src/order.py — 핵심 핵심
 def calculate_order_total(items: list[Item], user: User) -> Money:
     """Calculate order total with discounts and tax."""
     subtotal = sum(item.price * item.quantity for item in items)
@@ -273,8 +271,7 @@ def calculate_order_total(items: list[Item], user: User) -> Money:
     tax = calculate_tax(subtotal - discount, user.region)
     return Money(subtotal - discount + tax)
 
-
-# tests/test_order.py — 90%+ 커버리지 목표
+# 테스트/test_order.py — 90%+ 커버리지 목표
 def test_calculate_order_total_all_paths():
     # normal case
     items = [Item(price=100, quantity=2)]
@@ -306,8 +303,7 @@ def format_currency(amount: float, currency: str = "USD") -> str:
         return f"₩{int(amount):,}"
     return f"{amount:.2f} {currency}"
 
-
-# tests/test_formatting.py — 50% 커버리지로 충분
+# 테스트/test_formatting.py — 50% 커버리지로 충분
 def test_format_currency_common_cases():
     assert format_currency(100.5, "USD") == "$100.50"
     assert format_currency(10000, "KRW") == "₩10,000"
@@ -315,84 +311,6 @@ def test_format_currency_common_cases():
 ```
 
 위험 기반 접근을 쓰면 제한된 시간을 가장 중요한 곳에 집중할 수 있습니다. 평균 80% 커버리지라도, 핵심 로직은 90%+, 유틸리티는 50%로 분산하는 것이 순수 전체 평균보다 훬씬 효과적입니다.
-
-## 현업 확장 노트: 계층별 검증을 연결하는 방법
-
-이 장의 핵심 개념을 팀 운영에 연결하려면, 테스트를 단독 문서가 아니라 저장소 규약으로 관리해야 합니다. 가장 많이 쓰는 방식은 테스트 디렉터리를 계층으로 분리하고, 각 계층의 실행 시점과 실패 기준을 명시하는 것입니다.
-
-```text
-tests/
-├─ unit/
-├─ integration/
-├─ e2e/
-└─ contracts/
-```
-
-이 구조를 도입하면 PR 단계에서는 unit과 일부 integration만 빠르게 실행하고, 병합 전이나 야간 빌드에서는 더 넓은 범위를 실행하는 운영이 가능합니다. "모든 테스트를 매번 전부"보다 "위험에 맞게 계층별로"가 훨씬 현실적입니다.
-
-```yaml
-name: test-pipeline
-on:
-  pull_request:
-  schedule:
-    - cron: '0 17 * * *'
-
-jobs:
-  fast-feedback:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - run: pip install -r requirements-dev.txt
-      - run: pytest tests/unit tests/integration -q --maxfail=1
-
-  nightly-full:
-    if: github.event_name == 'schedule'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - run: pip install -r requirements-dev.txt
-      - run: pytest -q
-```
-
-또한 `unittest.mock`과 fixture를 함께 쓰면 테스트 의도를 더 분명히 드러낼 수 있습니다. fixture는 "무엇을 준비했는가"를, mock 검증은 "어떤 상호작용이 일어났는가"를 표현합니다.
-
-```python
-import pytest
-from unittest.mock import Mock
-
-@pytest.fixture
-def notifier_mock():
-    return Mock()
-
-def test_notify_on_success(notifier_mock):
-    service = JobService(notifier=notifier_mock)
-    service.run(job_id='job-1')
-    notifier_mock.send.assert_called_once()
-```
-
-마지막으로 커버리지는 목표치 자체보다 누락 영역의 성격을 함께 봐야 합니다. 예를 들어 유틸리티 파일 60%보다 결제 도메인 82%가 더 위험할 수 있습니다. 따라서 커버리지 리포트를 읽을 때는 반드시 "이 파일이 실패하면 비즈니스 영향이 큰가"를 함께 판단해야 합니다.
-
-```bash
-pytest --cov=src --cov-report=term-missing
-```
-
-```text
-Name                        Stmts   Miss  Cover
------------------------------------------------
-src/domain/payment.py          96     14    85%
-src/domain/refund.py           64      4    94%
-src/utils/text.py              21      5    76%
------------------------------------------------
-TOTAL                          181    23    87%
-```
-
-이런 리포트에서는 `payment.py`의 누락 분기를 먼저 메우는 것이 합리적입니다. 테스트는 숫자를 맞추는 운동이 아니라, 고장 났을 때 손실이 큰 경로를 먼저 보호하는 엔지니어링 작업이기 때문입니다.
 
 ## 직접 검증해 볼 것
 

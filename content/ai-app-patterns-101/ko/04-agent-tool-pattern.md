@@ -168,7 +168,7 @@ llm = ChatGroq(
 
 tools = [calculate, get_current_time, word_count, unit_convert, search_policy]
 
-# ReAct prompt — instructs the LLM to follow the Thought/Action/Observation loop
+# ReAct 프롬프트 — LLM에게 생각/행동/관찰 루프를 따르도록 지시합니다.
 react_prompt = PromptTemplate.from_template("""
 You are an AI assistant that answers questions using the tools available to you.
 

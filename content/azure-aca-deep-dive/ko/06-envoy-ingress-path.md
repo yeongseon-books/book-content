@@ -259,7 +259,7 @@ static_resources:
 TLS가 ingress에서 종료되면 앱은 내부 hop의 HTTP 요청을 받습니다. 따라서 프레임워크가 `X-Forwarded-Proto`, `X-Forwarded-For`를 신뢰하도록 설정하지 않으면 리다이렉트 루프나 잘못된 절대 URL이 발생할 수 있습니다.
 
 ```python
-# Flask + Werkzeug proxy fix 예시
+# Flask + Werkzeug 프록시 수정 예시
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 app.wsgi_app = ProxyFix(

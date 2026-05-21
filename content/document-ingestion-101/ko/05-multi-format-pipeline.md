@@ -51,7 +51,7 @@ seo_description: 다중 포맷 파이프라인의 본질은 서로 다른 입력
 ## 실행 예제
 
 ```python
-# pyright: reportMissingImports=false, reportMissingModuleSource=false
+# pyright: 보고MissingImports=false, 보고MissingModuleSource=false
 from __future__ import annotations
 
 from pathlib import Path

@@ -239,7 +239,7 @@ doc_vectors = np.array(embedding_model.embed_documents(documents))
 
 def search(query: str, top_k: int = 3) -> list[tuple[float, str]]:
     query_vector = np.array(embedding_model.embed_query(query))
-    # normalized vectors: dot product == cosine similarity
+    # 정규화된 벡터: 내적 == 코사인 유사성
     scores = doc_vectors @ query_vector
     top_indices = np.argsort(scores)[::-1][:top_k]
     return [(float(scores[i]), documents[i]) for i in top_indices]

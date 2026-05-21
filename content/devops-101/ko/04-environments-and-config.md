@@ -24,7 +24,6 @@ last_reviewed: '2026-05-12'
 
 이 글은 DevOps 101 시리즈의 네 번째 글입니다.
 
-
 ![DevOps 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/04/04-01-diagram.ko.png)
 *DevOps 101 4장 흐름 개요*
 > 환경 분리의 핵심은 기술 설정이 아니라, 각 환경의 위험과 검증 수준을 얼마나 명확히 정의하느냐입니다.
@@ -79,7 +78,6 @@ last_reviewed: '2026-05-12'
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-
 class Settings(BaseSettings):
     """Application configuration loaded from environment variables."""
     
@@ -118,7 +116,6 @@ class Settings(BaseSettings):
             raise ValueError(f"log_level must be one of {allowed}")
         return v.upper()
 
-
 # Usage
 settings = Settings()
 print(f"Running in {settings.environment} with log level {settings.log_level}")
@@ -153,7 +150,6 @@ configs/
 # tests/test_config.py
 import pytest
 from config import Settings
-
 
 def test_prod_config_loads():
     """Ensure production config has all required fields."""
@@ -401,9 +397,7 @@ python scripts/check_required_env.py --env prod
 
 위와 같은 점검을 배포 파이프라인 전 단계에 넣으면 설정 누락 사고를 크게 줄일 수 있습니다. 핵심은 "값 비교"보다 "필수 키 존재 여부"를 자동 검증하는 것입니다.
 
-
 운영 시크릿 회전 절차도 미리 정의해야 합니다. 키를 회전할 때는 새 키 발급, 이중 키 허용 기간, 구 키 폐기 순서를 자동화해야 무중단 전환이 가능합니다. 이 절차를 문서로만 두지 말고 분기별 리허설로 검증하는 것이 안전합니다.
-
 
 ### 설정 변경 배포 절차 예시
 
@@ -420,7 +414,6 @@ config_change_flow:
 
 이 절차를 운영하면 "코드는 안 바뀌었는데 서비스가 깨졌다"는 유형의 사고를 크게 줄일 수 있습니다. 특히 외부 API endpoint, timeout, feature flag 기본값처럼 영향이 큰 설정은 반드시 stage 검증을 거쳐야 합니다.
 
-
 ### 설정 사고를 줄이는 리뷰 질문
 
 환경 설정 PR을 리뷰할 때는 문법보다 운영 영향 질문을 먼저 확인하는 것이 좋습니다.
@@ -432,144 +425,7 @@ config_change_flow:
 
 이 질문을 템플릿화하면 설정 리뷰 품질이 개인 경험에 덜 의존하게 됩니다.
 
-
 추가로 설정 키 명명 규칙을 통일하면 운영 효율이 좋아집니다. 예를 들어 모든 외부 API 키를 `EXTERNAL_<SERVICE>_API_KEY` 형식으로 고정하면 검색, 감사, 회전 자동화가 쉬워집니다. 작은 규칙이지만 장기 운영에서 큰 차이를 만듭니다.
-
-
-## 운영 앵커: 배포, 인프라, 관측성, 대응을 한 장으로 연결하기
-
-앞선 섹션에서 각 주제를 따로 설명했다면, 이 섹션은 실무에서 한 번에 연결해 쓰는 최소 구성 예시를 제공합니다. 핵심은 화려한 도구 조합이 아니라, 같은 기준으로 변경을 통과시키고 문제를 되돌릴 수 있는가입니다.
-
-### CI/CD 파이프라인 공통 YAML
-
-```yaml
-name: delivery-flow
-on:
-  pull_request:
-  push:
-    branches: [main]
-
-jobs:
-  ci:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - run: pip install -r requirements-dev.txt
-      - run: ruff check .
-      - run: pytest -q
-
-  deploy-stage:
-    needs: ci
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: ./scripts/deploy_stage.sh
-      - run: ./scripts/smoke_test.sh https://stage.example.com
-
-  deploy-prod-canary:
-    needs: deploy-stage
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: ./scripts/deploy_prod.sh --strategy canary --percent 10
-      - run: ./scripts/check_slo.sh --window 5m
-      - run: ./scripts/promote_or_rollback.sh
-```
-
-이 흐름의 실전 포인트는 세 가지입니다. 첫째, CI 통과 전에는 어떤 배포도 시작하지 않습니다. 둘째, stage 통과 후에만 production으로 승격합니다. 셋째, production 승격은 canary 관찰 통과를 조건으로 강제합니다.
-
-### Terraform과 Ansible 역할 분리 예시
-
-```hcl
-# infra/main.tf
-resource "aws_security_group" "api" {
-  name        = "api-sg"
-  description = "api security group"
-}
-
-resource "aws_instance" "api" {
-  ami           = var.ami
-  instance_type = "t3.small"
-  tags = {
-    service = "api"
-    env     = var.env
-  }
-}
-```
-
-```yaml
-# ops/playbooks/hardening.yml
-- hosts: api
-  become: true
-  tasks:
-    - name: Install security updates
-      apt:
-        update_cache: true
-        upgrade: dist
-
-    - name: Ensure auditd is installed
-      apt:
-        name: auditd
-        state: present
-
-    - name: Ensure ssh root login is disabled
-      lineinfile:
-        path: /etc/ssh/sshd_config
-        regexp: '^PermitRootLogin'
-        line: 'PermitRootLogin no'
-```
-
-Terraform은 "무엇을 만들 것인가"를 선언하고, Ansible은 "만들어진 시스템을 어떤 상태로 유지할 것인가"를 담당합니다. 두 도구를 구분하면 변경 리뷰 범위가 명확해지고, 장애 시 원인 추적도 빨라집니다.
-
-### 모니터링/알림 설정 예시
-
-```yaml
-# monitoring/alerts.yml
-groups:
-  - name: api-slo
-    rules:
-      - alert: ApiHighErrorRate
-        expr: rate(http_requests_total{service="api",status=~"5.."}[5m]) / rate(http_requests_total{service="api"}[5m]) > 0.01
-        for: 5m
-        labels:
-          severity: page
-        annotations:
-          summary: "API 5xx 비율 1% 초과"
-          runbook: "https://internal/wiki/runbooks/api-high-error-rate"
-
-      - alert: ApiHighLatencyP95
-        expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{service="api"}[5m])) by (le)) > 0.35
-        for: 10m
-        labels:
-          severity: warning
-```
-
-알림은 많이 울리는 것이 목표가 아닙니다. 운영자가 실제로 행동할 수 있는 신호만 남기고, 모든 page 알림에 runbook 링크를 붙여 대응 시작 시간을 줄여야 합니다.
-
-### 블루그린/카나리 승격 절차 예시
-
-```bash
-# blue-green switch
-./scripts/deploy_blue.sh
-./scripts/smoke_test.sh https://blue.example.com
-./scripts/switch_traffic.sh --from green --to blue
-
-# canary rollout
-./scripts/deploy_canary.sh --percent 10
-./scripts/check_metrics.sh --window 5m
-./scripts/promote_canary.sh --to 50
-./scripts/promote_canary.sh --to 100
-```
-
-블루그린은 즉시 전환과 즉시 롤백에 유리하고, 카나리는 위험을 작게 나눠 검증하는 데 유리합니다. 서비스 특성과 팀 역량에 따라 전략을 고르되, 승격/철수 명령을 반드시 런북과 자동화 스크립트로 함께 유지해야 합니다.
-
-### 인시던트 대응 런북 예시
-
-```markdown
-# Runbook: API 5xx 급증
 
 ## 0-5분
 1. SEV 판정 (SEV1/SEV2)

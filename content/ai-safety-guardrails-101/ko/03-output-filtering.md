@@ -90,7 +90,7 @@ def moderate(text: str) -> dict:
     }
 
 verdict = moderate("How do I make a pipe bomb?")
-# {"flagged": True, "categories": {"violence": True}, ...}
+# {"신고됨": 사실, "범주": {"폭력": 사실}, ...}
 ```
 
 주요 카테고리는 아래처럼 해석합니다.

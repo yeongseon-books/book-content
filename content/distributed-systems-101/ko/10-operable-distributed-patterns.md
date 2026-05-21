@@ -57,8 +57,7 @@ last_reviewed: '2026-05-15'
 - **Jitter**: thundering herd를 막기 위해 재시도 간격에 넣는 랜덤 오프셋입니다.
 - **Observability**: 메트릭, 로그, 트레이스로 시스템을 바깥에서 이해할 수 있게 하는 신호 체계입니다.
 
-## Before / After
-
+## 적용 전후 비교
 **Before — 무한 재시도와 공유 풀**
 
 ```text
@@ -130,7 +129,7 @@ class Breaker:
 # 4_bulkhead.py (pseudocode)
 pool_payment = ConnectionPool(size=10)
 pool_search  = ConnectionPool(size=10)
-# payment overload does not affect the search pool
+# payment 과부하가 search pool에 영향을 주지 않음
 ```
 
 같은 프로세스 안이라도 자원 풀을 나누는 순간 격리 경계가 생깁니다.

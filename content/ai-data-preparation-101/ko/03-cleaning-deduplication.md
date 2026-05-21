@@ -75,15 +75,15 @@ from html import unescape
 def clean_text(text: str) -> str:
     if not text:
         return ""
-    # 1. Encoding normalization (NFC: combine Hangul jamo)
+    # 1. 인코딩 정규화 (NFC: 한글 자모 결합)
     text = unicodedata.normalize("NFC", text)
-    # 2. HTML entity decode
+    # 2. HTML 엔티티 디코딩
     text = unescape(text)
-    # 3. HTML tag removal
+    # 3. HTML 태그 제거
     text = re.sub(r"<[^>]+>", " ", text)
-    # 4. Control characters (keep tab/newline)
+    # 4. 제어 문자 처리 (tab/newline 유지)
     text = "".join(ch for ch in text if ch == "\n" or ch == "\t" or ord(ch) >= 32)
-    # 5. Collapse runs of whitespace
+    # 5. 연속 공백 축약
     text = re.sub(r"[ \t]+", " ", text)
     text = re.sub(r"\n{3,}", "\n\n", text)
     # 6. Strip
@@ -141,7 +141,7 @@ def exact_dedup(docs: list[str]) -> list[str]:
     seen: set[str] = set()
     out: list[str] = []
     for doc in docs:
-        # Normalize before hashing (ignore whitespace differences)
+        # 해시 전에 정규화하여 공백 차이를 무시
         norm = re.sub(r"\s+", " ", doc.strip().lower())
         h = hashlib.sha256(norm.encode("utf-8")).hexdigest()
         if h not in seen:
@@ -159,7 +159,7 @@ from datasketch import MinHash, MinHashLSH
 
 def make_minhash(text: str, num_perm: int = 128) -> MinHash:
     m = MinHash(num_perm=num_perm)
-    # 5-gram word shingles
+    # 5-gram 단어 shingle 생성
     words = text.lower().split()
     for i in range(len(words) - 4):
         shingle = " ".join(words[i:i+5])
@@ -251,7 +251,7 @@ def cross_dedup(train: list[str], eval_set: list[str],
 
 이 순서를 어기면 공백 차이 복제본이 살아남거나, 어느 쪽을 제거해야 하는지 규칙이 모호해집니다. dedup은 알고리즘 선택만큼 순서 설계가 중요합니다.
 
-## before/after 샘플과 품질 지표를 같이 남기는 방식
+## 적용 전후 샘플과 품질 지표를 같이 남기는 방식
 
 정제와 dedup에서 팀 간 합의가 가장 빨리 깨지는 지점은 “이번 규칙이 정말 좋아졌는가”입니다. 이를 막으려면 규칙 설명보다 before/after 샘플과 수치가 먼저 나와야 합니다.
 

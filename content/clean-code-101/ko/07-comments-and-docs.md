@@ -63,7 +63,7 @@ last_reviewed: '2026-05-15'
 **Before**
 
 ```python
-# increment i by one
+# i를 1씩 증가
 i = i + 1
 
 # user list
@@ -80,23 +80,21 @@ def get_active_users(): ...
 
 ## 실전 적용: 유용한 문서화 다섯 단계
 
-### 단계 1 — Intent comment
-
+### 단계 1 — 의도 주석
 ```python
 # 1_intent.py
-# The payment gateway sometimes returns 200 with an error in the body,
-# so we read body.status instead of the HTTP status code.
+# 결제 게이트웨이에서 본문에 오류가 있어서 200을 반환하는 경우가 있는데,
+# 따라서 HTTP 상태 코드 대신 body.status를 썼습니다.
 def is_paid(resp):
     return resp.json().get("status") == "PAID"
 ```
 
 이런 주석은 코드가 표현하기 어려운 배경을 담습니다. 외부 시스템의 이상한 계약처럼 "왜 이렇게 했는지"가 핵심일 때 의미가 있습니다.
 
-### 단계 2 — Warning comment
-
+### 단계 2 — 경고 주석
 ```python
 # 2_warning.py
-# WARNING: this function performs IO. Do not call inside a transaction.
+# 주의: 이 기능은 IO를 수행합니다. 트랜잭션 내부에서 호출하지 마세요.
 def upload_invoice(path): ...
 ```
 
@@ -126,8 +124,7 @@ def discount(price: int, rate: float) -> int:
 
 공개 함수는 호출 계약을 분명히 남길 가치가 있습니다. 입력, 반환, 예외가 보이면 사용하는 사람의 추측 비용이 크게 줄어듭니다.
 
-### 단계 4 — README header
-
+### 단계 4 — README 헤더
 ```markdown
 <!-- 4_readme.md -->
 # checkout-service
@@ -141,11 +138,10 @@ Payment domain service that responds within 5 seconds.
 
 새 기여자가 30초 안에 프로젝트를 이해할 수 있어야 좋은 README입니다. 첫 문단과 실행 방법이 가장 먼저 보이는 것이 중요합니다.
 
-### 단계 5 — TODO with an owner
-
+### 단계 5 — 담당자가 있는 TODO
 ```python
 # 5_todo.py
-# TODO(yeongseon, 2026-06-01): replace simple retry with exponential backoff.
+# TODO(영선, 2026-06-01): 단순 재시도를 지수 백오프로 대체합니다.
 def retry_simple(): ...
 ```
 
@@ -241,7 +237,7 @@ def add_one(value: int) -> int:
 # 좋은 주석: 왜 이런 구현을 택했는지 설명합니다.
 
 def parse_gateway_status(response: dict) -> str:
-    # 결제 게이트웨이는 HTTP 200이어도 실패를 body.error_code로 내려주므로
+    # 결제 라이선싱은 HTTP 200이어도 실패합니다.
     # 상태 코드는 참고하지 않고 본문 값을 우선 판단합니다.
     if response.get("error_code"):
         return "FAILED"
@@ -350,7 +346,7 @@ def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
 ```python
 # before
 def p(a, b):
-    # check if user can buy
+    # 사용자가 구매할 수 있습니다.
     if a and b > 0:
         return True
     return False

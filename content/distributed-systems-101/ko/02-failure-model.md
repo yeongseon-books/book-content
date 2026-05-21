@@ -57,8 +57,7 @@ last_reviewed: '2026-05-15'
 - **Byzantine**: 노드가 거짓말하거나 임의의 행동을 할 수 있는 모델입니다.
 - **Network partition**: 노드 자체가 아니라 노드 사이 링크가 끊기는 상태입니다.
 
-## Before / After
-
+## 적용 전후 비교
 **Before — 그냥 죽었다고만 가정**
 
 ```text

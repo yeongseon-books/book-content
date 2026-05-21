@@ -82,20 +82,18 @@ def email(role, msg):
 
 ## 실전 적용: 안전하게 중복 없애기
 
-### 단계 1 — Wait for the third occurrence
-
+### 단계 1 — 세 번째 발생까지 대기
 ```python
 # 1_rule_of_three.py
-# Extract only after the same pattern shows up three times.
+# 동일한 패턴이 3번 나타난 후에만 추출합니다.
 def calc_a(x): return x * 1.1
 def calc_b(x): return x * 1.2
-# When the third arrives, decide whether to unify.
+# 세 번째가 오면 통합 여부를 결정하십시오.
 ```
 
 첫 번째, 두 번째 중복에서는 아직 섣불리 추상화하지 않는 편이 좋습니다. 세 번째가 나타날 때쯤이면 정말 같은 문제인지 더 분명하게 보입니다.
 
-### 단계 2 — Extract function
-
+### 단계 2 — 함수 추출
 ```python
 # 2_extract.py
 def with_tax(price, rate): return int(price * (1 + rate))
@@ -116,8 +114,7 @@ def greet(name, lang="en"):
 
 분기 대신 조회로 바꿀 수 있다면 구조는 더 단순해집니다. 매개변수화는 중복 제거와 조건문 제거를 동시에 돕기도 합니다.
 
-### 단계 4 — Remove data duplication
-
+### 단계 4 — 데이터 중복 제거
 ```python
 # 4_data.py
 PLANS = {
@@ -130,12 +127,11 @@ def quota(plan): return PLANS[plan]["limit"]
 
 데이터 중복은 코드 중복보다 더 위험할 때가 많습니다. 정책을 여러 함수에 흩뿌리지 말고 하나의 데이터 구조로 모으는 편이 안전합니다.
 
-### 단계 5 — Undo a wrong extraction
-
+### 단계 5 — 잘못된 추출 되돌리기
 ```python
 # 5_unfold.py
-# A function shared by only two callers but with six arguments
-# is usually better inlined back into two simple functions
+# 두 명의 호출자만 공유하지만 6개의 인수를 갖는 함수
+# 일반적으로 두 가지 간단한 함수로 다시 인라인되는 것이 더 좋습니다.
 # (Inline Function).
 ```
 

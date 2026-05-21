@@ -29,7 +29,6 @@ last_reviewed: '2026-05-15'
 
 이 글에서는 이름에 값을 붙이는 바인딩과, 그 바인딩이 보이는 범위인 스코프를 함께 보겠습니다. 특히 현대 언어 대부분이 택한 렉시컬 스코프가 왜 읽기 좋은 코드를 만들고, 어디서 흔히 헷갈리는지도 같이 정리하겠습니다.
 
-
 ![Programming Languages 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/04/04-01-concept-at-a-glance.ko.png)
 *Programming Languages 101 4장 흐름 개요*
 
@@ -100,7 +99,7 @@ def outer():
 
 outer()
 print(x)
-# local / enclosing / global
+# 로컬/포함/글로벌
 ```
 
 같은 이름이라도 가장 안쪽 바인딩부터 차례로 찾습니다. 이름 하나가 항상 값 하나만 뜻하는 것은 아닙니다.
@@ -288,157 +287,6 @@ def make_handlers() -> list:
 이 코드는 타입 오류를 실행 전에 막는가, 클로저 캡처가 의도한 값 기준으로 고정되는가, 공유 상태 접근이 동시성 규칙을 만족하는가를 한 번에 점검해야 합니다. 세 질문 중 하나라도 답하지 못하면 기능이 맞아도 운영 위험이 남습니다.
 
 스코프 규칙을 문서로만 아는 것과 리뷰에서 적용하는 것은 다릅니다. 이름 해석 시점, 캡처 대상, 수명 경계를 코드에서 명시하면 유지보수 난도가 눈에 띄게 낮아집니다.
-
-
-## 실무 앵커: 개념을 코드와 런타임으로 고정하기
-
-이 장에서 다룬 개념을 실무에서 재사용하려면, 문장 설명을 코드와 실행 흔적으로 고정해야 합니다. 아래 예시는 같은 문제를 여러 언어와 실행 맥락으로 비교해 개념 경계를 분명히 만드는 목적입니다.
-
-### 언어 비교 코드: Python, JavaScript, Go, Rust
-
-동일한 입력에서 짝수 값만 두 배로 만들고 합계를 계산하는 예시입니다. 핵심은 문법 차이가 아니라, 오류를 어디서 얼마나 일찍 막는지입니다.
-
-```python
-def sum_even_doubled(nums: list[int]) -> int:
-    return sum(n * 2 for n in nums if n % 2 == 0)
-
-print(sum_even_doubled([1, 2, 3, 4, 5, 6]))  # 24
-```
-
-```javascript
-function sumEvenDoubled(nums) {
-  return nums.filter((n) => n % 2 === 0).map((n) => n * 2).reduce((a, b) => a + b, 0);
-}
-
-console.log(sumEvenDoubled([1, 2, 3, 4, 5, 6])); // 24
-```
-
-```go
-package main
-
-import "fmt"
-
-func sumEvenDoubled(nums []int) int {
-    total := 0
-    for _, n := range nums {
-        if n%2 == 0 {
-            total += n * 2
-        }
-    }
-    return total
-}
-
-func main() {
-    fmt.Println(sumEvenDoubled([]int{1, 2, 3, 4, 5, 6})) // 24
-}
-```
-
-```rust
-fn sum_even_doubled(nums: &[i32]) -> i32 {
-    nums.iter()
-        .filter(|n| *n % 2 == 0)
-        .map(|n| n * 2)
-        .sum()
-}
-
-fn main() {
-    println!("{}", sum_even_doubled(&[1, 2, 3, 4, 5, 6])); // 24
-}
-```
-
-네 언어 모두 같은 답을 내지만, 타입 선언 강도, 표준 라이브러리 관용구, 에러 처리 문화가 다릅니다. 팀 기준을 세울 때는 성능 벤치마크보다 먼저, 리뷰 단계에서 실수를 드러내는 신호가 충분한지 확인하는 편이 안전합니다.
-
-### 타입 시스템 앵커: 실패를 어디서 잡는가
-
-아래 상황은 실무에서 자주 발생합니다. 문자열 숫자와 정수 숫자가 섞여 들어올 때, 파이프라인 초입에서 명시적으로 정규화하지 않으면 나중 단계에서 장애가 커집니다.
-
-```python
-from typing import Iterable
-
-def normalize(values: Iterable[str]) -> list[int]:
-    result: list[int] = []
-    for v in values:
-        result.append(int(v))
-    return result
-
-print(normalize(["1", "2", "3"]))
-```
-
-```typescript
-function normalize(values: string[]): number[] {
-  return values.map((v) => Number.parseInt(v, 10));
-}
-
-console.log(normalize(["1", "2", "3"]));
-```
-
-정적 타입 언어에서는 함수 경계에서 계약을 강하게 걸 수 있고, 동적 타입 언어에서는 런타임 검증 코드를 명시적으로 두는 습관이 중요합니다. 결론은 어느 쪽이 우월하냐가 아니라, 실패 지점을 팀이 의도적으로 앞당겼는가입니다.
-
-### 메모리 모델 다이어그램: 공유 상태의 책임 경계
-
-```text
-[Producer Goroutine/Thread]
-  write task -> queue
-       |
-       | happens-before 보장 지점
-       v
-[Queue Synchronization Boundary]
-       |
-       v
-[Consumer Goroutine/Thread]
-  read task -> process
-```
-
-동시성 결함 대부분은 계산 로직보다 경계 정의가 흐릴 때 생깁니다. 어떤 자료구조가 동기화 책임을 가지는지, 어느 호출 지점에서 메모리 가시성이 확보되는지를 코드 리뷰 항목으로 고정해야 재현 어려운 버그를 줄일 수 있습니다.
-
-### 간단 파서 구현 앵커: 구문과 의미를 분리하기
-
-토큰 배열을 받아 산술식 `NUM (+ NUM)*`를 계산하는 최소 파서 예시입니다.
-
-```python
-def parse_addition(tokens: list[str]) -> int:
-    if not tokens:
-        raise ValueError("empty")
-    total = int(tokens[0])
-    i = 1
-    while i < len(tokens):
-        op = tokens[i]
-        rhs = int(tokens[i + 1])
-        if op != "+":
-            raise ValueError(f"unexpected operator: {op}")
-        total += rhs
-        i += 2
-    return total
-
-print(parse_addition(["10", "+", "20", "+", "7"]))  # 37
-```
-
-이 구조의 핵심은 두 단계 분리입니다. 먼저 구문 오류를 검사하고, 그다음 의미 계산을 수행합니다. 이 원칙을 지키면 오류 메시지가 명확해지고, 연산자 우선순위나 괄호 지원 같은 확장을 추가하기 쉬워집니다.
-
-### REPL 세션 앵커: 실행 관찰 습관
-
-```text
-$ python3
->>> from demo import parse_addition
->>> parse_addition(["2", "+", "3"])
-5
->>> parse_addition(["2", "*", "3"])
-Traceback (most recent call last):
-  ...
-ValueError: unexpected operator: *
-```
-
-REPL은 작은 단위 가설을 빠르게 검증하는 도구입니다. 문서로 정리한 개념과 실제 런타임 동작이 어긋나지 않는지 확인할 때, 테스트 코드 작성 전 첫 관찰 지점으로 활용하면 품질이 안정적으로 올라갑니다.
-
-### 적용 체크리스트
-
-- 입력 경계에서 타입과 형식을 정규화했는가
-- 공유 상태보다 메시지 경계가 먼저 보이도록 설계했는가
-- 파서/검증/실행 단계를 분리해 오류 원인을 즉시 설명할 수 있는가
-- REPL 또는 단위 테스트로 실패 사례를 먼저 고정했는가
-
-이 체크리스트는 특정 언어 문법보다 오래 갑니다. 새 언어를 배우더라도 같은 질문으로 코드를 점검하면, 기능 개발 속도를 유지하면서도 운영 안정성을 함께 끌어올릴 수 있습니다.
-
 
 ## 실전 시나리오: 장애를 줄이는 언어 설계 점검
 

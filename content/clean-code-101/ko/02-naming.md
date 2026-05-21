@@ -76,8 +76,7 @@ SECONDS_PER_DAY = 86400
 
 ## 실전 적용: 이름을 개선하는 다섯 단계
 
-### 단계 1 — Reveal intent
-
+### 단계 1 — 의도 드러내기
 ```python
 # 1_intent.py
 def f(x): return x[0]            # of what?
@@ -96,8 +95,7 @@ DEFAULT_SALES_TAX_RATE = 0.08
 
 검색 가능한 이름은 나중의 분석 비용을 줄입니다. 너무 짧거나 흔한 이름은 찾는 순간부터 비용을 만듭니다.
 
-### 단계 3 — Domain terms
-
+### 단계 3 — 도메인 용어
 ```python
 # 3_domain.py
 def calc(items): ...             # domain lost
@@ -106,8 +104,7 @@ def calculate_invoice_subtotal(line_items): ...
 
 코드가 비즈니스와 다른 단어를 쓰기 시작하면 대화가 꼬입니다. 도메인 언어를 그대로 들여오면 사용자와 개발자의 문맥이 맞춰집니다.
 
-### 단계 4 — Avoid negatives
-
+### 단계 4 — 부정문 피하기
 ```python
 # 4_negative.py
 if not is_not_empty(x): ...      # double negative
@@ -116,8 +113,7 @@ if is_empty(x): ...
 
 이중 부정은 읽는 순간 사고를 한 번 더 요구합니다. 긍정형 표현이 대개 더 빠르고 덜 위험합니다.
 
-### 단계 5 — Balance brevity and accuracy
-
+### 단계 5 — 간결함과 정확성의 균형
 ```python
 # 5_balance.py
 i, j, k                          # short loops are fine

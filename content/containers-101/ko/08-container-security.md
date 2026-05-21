@@ -125,8 +125,7 @@ docker exec <container> cat /proc/1/status | grep Cap
 
 ## 실습: 컨테이너를 더 안전하게 실행하기
 
-### 단계 1 — Scan the image
-
+### 단계 1 — 이미지 스캔
 ```python
 import subprocess
 
@@ -140,8 +139,7 @@ def scan(image):
 
 실행 전 이미지 스캔을 먼저 합니다. 취약점은 런타임 정책만으로 해결되지 않기 때문에 공급망 입구부터 확인해야 합니다.
 
-### 단계 2 — Force non-root
-
+### 단계 2 — non-root 강제
 ```python
 def run_nonroot(image):
     subprocess.run([
@@ -152,8 +150,7 @@ def run_nonroot(image):
 
 비root 실행은 가장 기본적인 권한 축소입니다. root가 아니면 불가능한 공격 범위를 자연스럽게 줄일 수 있습니다.
 
-### 단계 3 — Drop capabilities
-
+### 단계 3 — 권한 제거
 ```python
 def run_min_caps(image):
     subprocess.run([
@@ -164,8 +161,7 @@ def run_min_caps(image):
 
 필요한 capability만 다시 추가합니다. “모두 허용 후 일부 차단”보다 “모두 제거 후 필요한 것만 허용”이 더 안전한 기본값입니다.
 
-### 단계 4 — Read-only filesystem
-
+### 단계 4 — 읽기 전용 파일시스템
 ```python
 def run_readonly(image):
     subprocess.run([
@@ -176,8 +172,7 @@ def run_readonly(image):
 
 읽기 전용 루트 파일시스템은 런타임에서 쓰기 가능 면적을 줄여 줍니다. 애플리케이션이 실제로 어디에 써야 하는지 더 명확하게 드러나는 장점도 있습니다.
 
-### 단계 5 — Mount a secret
-
+### 단계 5 — 시크릿 마운트
 ```python
 def run_with_secret(image, secret_path):
     subprocess.run([

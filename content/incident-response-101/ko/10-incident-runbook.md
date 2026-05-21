@@ -194,7 +194,7 @@ from jinja2 import Template
 
 
 RUNBOOK_TEMPLATE = """
-# Runbook: {{ service_name }}
+# 런북: {{ service_name }}
 
 **Last reviewed**: {{ last_reviewed }}
 **Owner**: {{ owner }}

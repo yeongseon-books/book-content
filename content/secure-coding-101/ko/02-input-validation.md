@@ -466,7 +466,7 @@ def create_user(req: UserCreateRequest):
         username=req.username,
         email=req.email,
         password_hash=hash_password(req.password),
-        # role과 is_active는 서버가 결정
+        # 역할과 is_active는 서버가 결정됩니다
     )
     return save_user(internal)
 ```

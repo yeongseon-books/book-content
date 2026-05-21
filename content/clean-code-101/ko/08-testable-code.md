@@ -86,8 +86,7 @@ def fetch_user(uid, http):
 
 ## 실전 적용: 테스트 가능성을 높이는 다섯 단계
 
-### 단계 1 — Extract pure logic
-
+### 단계 1 — 순수 로직 추출
 ```python
 # 1_pure.py
 def total(items):
@@ -96,8 +95,7 @@ def total(items):
 
 입출력 없이 계산만 하는 부분은 항상 순수 함수 후보입니다. 이런 핵심 계산을 먼저 분리하면 단위 테스트가 거의 공짜가 됩니다.
 
-### 단계 2 — Inject time
-
+### 단계 2 — 시간 주입
 ```python
 # 2_clock.py
 from datetime import datetime
@@ -108,8 +106,7 @@ def is_overdue(due, now=None):
 
 시간은 흐르기 때문에 테스트를 깨뜨립니다. 고정 가능한 값으로 받아들이는 순간 테스트는 안정성을 얻습니다.
 
-### 단계 3 — Fake objects
-
+### 단계 3 — Fake 객체
 ```python
 # 3_fake.py
 class FakeRepo:
@@ -123,8 +120,7 @@ def register(repo, user):
 
 도메인 로직을 검증하는 데 실제 데이터베이스가 꼭 필요하지는 않습니다. Fake는 느리고 불안정한 외부 의존성을 테스트 밖으로 밀어냅니다.
 
-### 단계 4 — Recording calls (Spy)
-
+### 단계 4 — 호출 기록 (Spy)
 ```python
 # 4_spy.py
 class EmailSpy:
@@ -137,8 +133,7 @@ def notify(email, user):
 
 Spy는 무엇을 보냈는지, 몇 번 호출했는지 검증하게 해 줍니다. 협력 객체와의 상호작용을 확인할 때 유용합니다.
 
-### 단계 5 — Isolate external calls
-
+### 단계 5 — 외부 호출 격리
 ```python
 # 5_adapter.py
 class HttpClient:

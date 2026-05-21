@@ -72,14 +72,14 @@ class LLMResponseError(Exception):
 
 def parse_llm_json(response_text: str) -> dict:
     """Safely parse JSON returned by an LLM."""
-    # 1. Strip markdown code fences
+    # 1. 마크다운 코드 펜스 제거
     cleaned = response_text.strip()
     if cleaned.startswith("```"):
-        # Remove ```json ... ``` or ``` ... ```
+        # ```json ... ``` 또는 ``` ... ``` 제거
         lines = cleaned.split("\n")
         cleaned = "\n".join(lines[1:-1] if lines[-1].strip() == "```" else lines[1:])
 
-    # 2. Try to parse
+    # 2. 파싱 시도
     try:
         return json.loads(cleaned)
     except json.JSONDecodeError as e:
@@ -111,7 +111,7 @@ def execute_tool_safely(tool_name: str, tool_fn, **kwargs) -> Any:
     except requests.ConnectionError:
         raise ToolExecutionError(tool_name, "network connection failed", recoverable=True)
     except ValueError as e:
-        # Bad arguments — same args won't succeed on retry
+        # 인자가 잘못된 경우에는 같은 args로 재시도해도 성공하지 않습니다.
         raise ToolExecutionError(tool_name, f"bad argument: {e}", recoverable=False)
     except Exception as e:
         raise ToolExecutionError(tool_name, f"unexpected error: {e}", recoverable=False)

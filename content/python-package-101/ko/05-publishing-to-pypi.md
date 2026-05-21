@@ -77,8 +77,7 @@ python -m build → dist/*.whl, dist/*.tar.gz
 | API token | 비밀번호 대신 사용하는 인증 토큰 | `pypi-` 접두어 |
 | Trusted Publisher | GitHub Actions에서 토큰 없이 배포하는 방식 | OIDC 기반 |
 
-## Before / After
-
+## 적용 전후 비교
 **Before (Git에서 직접 설치)**
 
 ```bash
@@ -99,7 +98,7 @@ pip install mylib==0.1.0
 
 ## 단계별 실습
 
-### Step 1. TestPyPI 계정과 토큰 만들기
+### 단계 1. TestPyPI 계정과 토큰 만들기
 
 ```text
 1. Register at https://test.pypi.org/account/register/
@@ -107,7 +106,7 @@ pip install mylib==0.1.0
 3. Save the token securely (a string starting with pypi-)
 ```
 
-### Step 2. `twine` 설치와 빌드 검증
+### 단계 2. `twine` 설치와 빌드 검증
 
 ```bash
 pip install twine
@@ -118,7 +117,7 @@ twine check dist/*
 # Checking dist/mylib-0.1.0.tar.gz: PASSED
 ```
 
-### Step 3. TestPyPI에 업로드
+### 단계 3. TestPyPI에 업로드
 
 ```bash
 twine upload --repository testpypi dist/*
@@ -129,7 +128,7 @@ twine upload --repository testpypi dist/*
 # View at: https://test.pypi.org/project/mylib/0.1.0/
 ```
 
-### Step 4. TestPyPI에서 설치 테스트
+### 단계 4. TestPyPI에서 설치 테스트
 
 ```bash
 python -m venv /tmp/test-pypi
@@ -144,7 +143,7 @@ python -c "from mylib.core import greet; print(greet('PyPI'))"
 deactivate
 ```
 
-### Step 5. 실제 PyPI에 배포
+### 단계 5. 실제 PyPI에 배포
 
 ```bash
 # PyPI account and token are separate (pypi.org)

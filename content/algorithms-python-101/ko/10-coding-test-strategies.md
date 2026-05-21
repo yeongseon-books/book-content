@@ -26,7 +26,6 @@ last_reviewed: '2026-05-12'
 
 이번 글에서는 앞선 내용을 "제약을 먼저 읽고, 틀린 복잡도를 먼저 버린 뒤, 구현과 검증까지 이어 가는 하나의 풀이 흐름"으로 묶어 보겠습니다. 반복 가능한 접근법이 중요한 이유는 시간을 아끼고, 불필요한 실수를 줄이고, 처음 보는 문제에서도 다시 복구할 수 있게 해 주기 때문입니다.
 
-
 ![Algorithms with Python 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/10/10-01-big-picture.ko.png)
 *Algorithms with Python 101 10장 흐름 개요*
 
@@ -68,32 +67,31 @@ N ≤ 10^8      → O(N)        — linear scan, two pointers
 | Backtracking | 조건이 맞지 않으면 되돌아가며 경우를 탐색합니다 |
 | Edge case | 빈 입력, 최소값, 최대값처럼 경계 조건입니다 |
 
-## Before / After
-
+## 적용 전후 비교
 문제 접근 방식의 차이를 비교해 보겠습니다.
 
 ```python
-# before: start coding immediately — risk of picking the wrong algorithm
+# before: 바로 코딩 시작 — 잘못된 알고리즘 선택 위험
 def solve(data):
-    # jump into nested loops without thinking → time limit exceeded
+    # 생각 없이 중첩 루프부터 작성하면 → 시간 초과
     for i in range(len(data)):
         for j in range(len(data)):
             pass  # O(N²) — exceeds time limit when N is 1,000,000
 ```
 
 ```python
-# after: analyze input size first, then choose the algorithm
+# after: 먼저 입력 크기를 분석한 뒤 알고리즘 선택
 def solve(data):
-    # N=1,000,000 → need O(N) or O(N log N)
-    # approach with sorting + two pointers
+    # N=1,000,000 → O(N) 또는 O(N log N) 필요
+    # sorting + two pointers 접근
     data.sort()  # O(N log N)
     left, right = 0, len(data) - 1
-    # ... O(N) scan
+    # ... O(N) scan 수행
 ```
 
 ## 단계별 실습
 
-### Step 1: 제약부터 읽고, 틀린 복잡도를 먼저 버립니다
+### 단계 1: 제약부터 읽고, 틀린 복잡도를 먼저 버립니다
 
 ```python
 problem = {
@@ -112,7 +110,7 @@ print(problem)
 
 `N = 200,000`이면 `O(N^2)` 이중 반복은 바로 탈락입니다. 1초 제한에서 4백억 번 비교에 가까운 접근은 구현이 아무리 깔끔해도 시간 초과가 납니다.
 
-### Step 2: 잘못된 접근을 먼저 기각합니다
+### 단계 2: 잘못된 접근을 먼저 기각합니다
 
 ```python
 def wrong_two_sum(nums: list[int], target: int) -> tuple[int, int] | None:
@@ -125,7 +123,7 @@ def wrong_two_sum(nums: list[int], target: int) -> tuple[int, int] | None:
 
 이 접근은 정답 자체는 구할 수 있지만, 제약과 맞지 않습니다. 따라서 여기서 중요한 것은 "이 코드는 느리다"가 아니라 "제약을 읽은 순간 이 코드를 쓰지 않기로 결정해야 한다"입니다.
 
-### Step 3: 문제 유형을 분류하고 목표 복잡도를 정합니다
+### 단계 3: 문제 유형을 분류하고 목표 복잡도를 정합니다
 
 | 질문 | 이번 문제의 답 | 의미 |
 |------|----------------|------|
@@ -136,7 +134,7 @@ def wrong_two_sum(nums: list[int], target: int) -> tuple[int, int] | None:
 
 이 문제는 DP나 그래프가 아닙니다. 상태를 누적해 최적 부분 구조를 쓰는 문제도 아니고, 정점과 간선을 탐색하는 문제도 아니기 때문입니다. 핵심 힌트는 "두 수의 합"과 "정렬 후 양끝에서 좁히기"입니다.
 
-### Step 4: 정렬 + 투 포인터로 구현합니다
+### 단계 4: 정렬 + 투 포인터로 구현합니다
 
 ```python
 def solve_two_sum(nums: list[int], target: int) -> tuple[int, int] | None:
@@ -171,7 +169,7 @@ assert sample_answer == (0, 3)
 
 만약 샘플조차 틀리면 먼저 정렬된 값만 보고 원본 인덱스를 잃어버리지 않았는지 확인하면 됩니다.
 
-### Step 5: 검증 루프로 엣지 케이스까지 닫습니다
+### 단계 5: 검증 루프로 엣지 케이스까지 닫습니다
 
 ```python
 verification_cases = [
@@ -227,7 +225,7 @@ for case in verification_cases:
 - 음수 케이스가 틀리면 포인터 이동 규칙을 값의 크기와 합 관점에서 다시 읽어야 합니다.
 - 최소 입력에서 터지면 구현보다 먼저 경계 조건 처리가 빠졌는지 봐야 합니다.
 
-### Step 6: 구현 속도를 올려 주는 Python 기본기
+### 단계 6: 구현 속도를 올려 주는 Python 기본기
 
 ```python
 import sys
@@ -238,24 +236,24 @@ import heapq
 # 1. Fast input
 input = sys.stdin.readline
 
-# 2. defaultdict — automatic key initialization
+# 2. defaultdict — key 자동 초기화
 graph: dict[int, list[int]] = defaultdict(list)
 graph[1].append(2)
 graph[1].append(3)
 print(dict(graph))  # {1: [2, 3]}
 
-# 3. Counter — frequency counting
+# 3. Counter — 빈도 계산
 text = "hello world"
 freq = Counter(text)
 print(freq.most_common(3))  # [('l', 3), ('o', 2), ('h', 1)]
 
-# 4. heapq — priority queue
+# 4. heapq — priority queue 구현
 heap: list[int] = []
 for x in [5, 1, 3, 7, 2]:
     heapq.heappush(heap, x)
 print(heapq.heappop(heap))  # 1
 
-# 5. Combinations and permutations
+# 5. Combinations와 permutations
 print(list(combinations([1, 2, 3], 2)))  # [(1,2), (1,3), (2,3)]
 print(list(permutations([1, 2, 3], 2)))  # [(1,2), (1,3), (2,1), ...]
 
@@ -263,10 +261,10 @@ print(list(permutations([1, 2, 3], 2)))  # [(1,2), (1,3), (2,1), ...]
 INF = float("inf")
 print(min(INF, 42))  # 42
 
-# 7. 2D array initialization
+# 7. 2D array 초기화
 rows, cols = 3, 4
 grid = [[0] * cols for _ in range(rows)]  # correct
-# wrong = [[0] * cols] * rows  # bug: all rows reference the same list
+# wrong = [[0] * cols] * rows  # bug: 모든 행이 같은 리스트를 참조
 ```
 
 코딩 테스트에서는 알고리즘 아이디어만큼 구현 속도도 중요합니다. 표준 라이브러리 활용과 흔한 함정 회피만으로도 큰 차이가 납니다.
@@ -335,7 +333,6 @@ def analyze_constraints(n_max: int, time_limit_sec: int = 1) -> str:
     if n_max <= 200_000:
         return "O(n log n) 이하 권장"
     return "O(n) 중심으로 설계"
-
 
 print(analyze_constraints(200_000))
 ```
@@ -409,7 +406,6 @@ def classify_failure(name: str, expected, actual) -> str:
 ```python
 import time
 
-
 def benchmark(func, *args, repeat: int = 5) -> float:
     best = float("inf")
     for _ in range(repeat):
@@ -452,54 +448,6 @@ E. 해답 없음 케이스: 종료 조건 검증
 - "필요하면 정답 유지 조건을 짧게 증명하겠습니다."
 
 이 스크립트를 반복하면 설명의 밀도가 올라가고, 구현 중 길을 잃는 빈도가 줄어듭니다.
-
-## 케이스 스터디 확장: 입력 규모가 커질 때의 판단
-
-### 시나리오 1: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
-
-### 시나리오 2: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
 
 ## 처음 질문으로 돌아가기
 

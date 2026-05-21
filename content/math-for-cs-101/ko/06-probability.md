@@ -426,11 +426,11 @@ def demonstrate_lln(p_true: float = 0.52, trials: list = None):
         print(f"n={n:>7d}: observed={heads/n:.4f}, true={p_true}")
 
 demonstrate_lln()
-# n=     10: observed=0.6000, true=0.52
-# n=    100: observed=0.5500, true=0.52
-# n=   1000: observed=0.5240, true=0.52
-# n=  10000: observed=0.5212, true=0.52
-# n= 100000: observed=0.5198, true=0.52
+# n= 10: 관찰됨=0.6000, 참=0.52
+# n= 100: 관찰됨=0.5500, 참=0.52
+# n= 1000: 관찰됨=0.5240, 참=0.52
+# n= 10000: 관찰됨=0.5212, 참=0.52
+# n= 100000: 관찰됨=0.5198, 참=0.52
 ```
 
 A/B 테스트에서 "표본이 충분한가?"를 판단할 때 이 원리가 작동합니다. 표본이 작으면 노이즈가 커서 차이를 신뢰할 수 없고, 표본이 충분하면 작은 차이도 통계적으로 유의해집니다.

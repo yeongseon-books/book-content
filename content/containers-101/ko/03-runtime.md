@@ -109,8 +109,7 @@ pstree -p $(docker inspect -f '{{.State.Pid}}' rt-demo)
 
 ## 실습: containerd 직접 보기
 
-### 단계 1 — Client (illustrative)
-
+### 단계 1 — 클라이언트 (예시)
 ```python
 import subprocess
 

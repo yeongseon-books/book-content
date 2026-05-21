@@ -215,7 +215,7 @@ with open("documents.json") as f:
 
 print(f"reloaded: {loaded_index.ntotal} vectors")
 
-# verify with a query
+# 쿼리로 검증합니다
 query_vector = np.array(
     [embedding_model.embed_query("vector search speed")], dtype=np.float32
 )

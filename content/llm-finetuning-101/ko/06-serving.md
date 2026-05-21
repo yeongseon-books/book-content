@@ -297,7 +297,7 @@ def load_adapter(base_model, adapter_name):
 
 학습 때와 달리 추론은 KV 캐시 영향이 크므로, 긴 응답 요청 패턴을 반드시 따로 관찰해야 합니다.
 
-## before/after 운영 예시: 실험 코드에서 서비스 계약으로
+## 적용 전후 운영 예시: 실험 코드에서 서비스 계약으로
 
 ```text
 [Before]

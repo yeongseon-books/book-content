@@ -141,14 +141,14 @@ import numpy as np
 
 DIM = 512  # ViT-B/32
 
-# 1. Image corpus -> embeddings -> index
+# 1. 이미지 코퍼스 -> 임베딩 -> 인덱스
 image_paths = ["img_001.jpg", "img_002.jpg", "img_003.jpg"]
 image_embeds = embed_image(image_paths).cpu().numpy().astype("float32")
 
 index = faiss.IndexFlatIP(DIM)  # inner product == cosine for normalized vectors
 index.add(image_embeds)
 
-# 2. Text query -> embedding -> search
+# 2. 텍스트 쿼리 -> 임베딩 -> 검색
 query = embed_text(["a sunset over the ocean"]).cpu().numpy().astype("float32")
 scores, ids = index.search(query, k=3)
 for rank, (i, s) in enumerate(zip(ids[0], scores[0]), 1):
@@ -204,7 +204,7 @@ print(f"text<->audio: {text_audio:.3f}, text<->image: {text_image:.3f}")
 
 실전에서 cross-modal embedding 단독으로는 정밀도가 부족할 때가 많습니다. 두 가지 hybrid가 자주 쓰입니다.
 
-### 6.1 Embedding + BM25 ensemble
+### 6.1 임베딩 + BM25 앙상블
 
 ```python
 def hybrid_score(query: str, doc, alpha: float = 0.6) -> float:
@@ -215,7 +215,7 @@ def hybrid_score(query: str, doc, alpha: float = 0.6) -> float:
 
 이미지 메타데이터(파일명, EXIF, caption)에 BM25를 걸고, 시각 유사도와 가중합하면 검색 품질이 눈에 띄게 올라갑니다.
 
-### 6.2 Two-stage: candidate → rerank
+### 6.2 2단계: 후보 선정 → 리랭킹
 
 1단계는 빠른 ANN(IVF/HNSW)으로 top-100을 뽑고, 2단계는 더 큰 model(예: BLIP-2, LLaVA, ColBERT)로 rerank합니다. user-facing latency는 1단계에서 결정되고, 정확도는 2단계가 결정합니다.
 

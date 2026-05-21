@@ -71,8 +71,7 @@ TCP가 제공하는 보장을 한 줄씩 분리해 보면:
 
 UDP는 이 네 가지를 모두 하지 않습니다. 그래서 헤더가 8바이트밖에 안 됩니다(TCP는 최소 20바이트).
 
-## Before / After
-
+## 적용 전후 비교
 **Before — "TCP는 좋고 UDP는 위험하다"**
 
 ```text
@@ -239,7 +238,7 @@ UDP는 단 두 줄입니다. handshake도 FIN도 없습니다.
 ### 4단계: 일부러 패킷을 버려 보기
 
 ```python
-# udp_lossy_server.py — 30% 패킷 드롭 시뮬레이션
+# udp_lossy_server.py — 30% 중단 임시
 import socket, random
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -264,7 +263,7 @@ UDP에서는 손실이 그냥 손실입니다. 클라이언트는 응답이 안 
 ### 5단계: 신뢰성을 직접 얹는 맛보기
 
 ```python
-# Simple ACK + retransmit on top of UDP
+# 단순 ACK + UDP 기반 재전송
 import socket, time, struct
 
 def send_reliable(sock, data: bytes, addr, retries=3, timeout=0.5):

@@ -155,7 +155,7 @@ def stage_ingest(sources: list[str]) -> pd.DataFrame:
     df["ingested_at"] = datetime.utcnow()
     return df
 
-# Stage 2: Clean + Dedup (Ep3)
+# Stage 2: 정제 + Dedup (Ep3)
 def stage_clean(df: pd.DataFrame) -> pd.DataFrame:
     df["text"] = df["text"].str.strip().str.replace(r"\s+", " ", regex=True)
     df = df[df["text"].str.len() >= 50]
@@ -176,7 +176,7 @@ def stage_pii(df: pd.DataFrame) -> pd.DataFrame:
     df["text"] = df["text"].map(redact)
     return df
 
-# Stage 4: Quality (Ep6)
+# Stage 4: 품질 (Ep6)
 def stage_quality(df: pd.DataFrame) -> pd.DataFrame:
     def passes(t: str) -> bool:
         words = t.split()
@@ -187,13 +187,13 @@ def stage_quality(df: pd.DataFrame) -> pd.DataFrame:
 def stage_chunk(df: pd.DataFrame, max_tokens: int = 500) -> pd.DataFrame:
     rows = []
     for _, r in df.iterrows():
-        # recursive_chunk from Ep5
+        # Ep5의 recursive_chunk 사용
         chunks = [r["text"][i:i+2000] for i in range(0, len(r["text"]), 1800)]
         for i, c in enumerate(chunks):
             rows.append({**r.to_dict(), "chunk_id": i, "text": c})
     return pd.DataFrame(rows)
 
-# Stage 6: Split + Version (Ep9)
+# Stage 6: 분할 + 버전 관리 (Ep9)
 def stage_split(df: pd.DataFrame, time_col: str = "ingested_at") -> dict:
     df = df.sort_values(time_col)
     n = len(df)
@@ -271,7 +271,7 @@ class TextSchema(pa.DataFrameModel):
     source: Series[str]
     ingested_at: Series["datetime64[ns]"]
 
-# Validate at every stage entry
+# 각 stage 진입 시점마다 검증
 TextSchema.validate(df)
 ```
 

@@ -25,13 +25,11 @@ last_reviewed: '2026-05-15'
 
 이 글은 Software Design 101 시리즈의 다섯 번째 글입니다.
 
-
 알림 기능 하나를 만들 때 `notify("email", ...)`, `notify("sms", ...)`, `notify("push", ...)` 같은 분기가 계속 늘어나기 시작하면 인터페이스가 구현 세부를 바깥으로 흘리고 있다는 신호일 수 있습니다. 호출자가 원하는 일보다 구현 방식이 더 많이 드러날수록 구조는 빨리 뻣뻣해집니다.
 
 이 글은 Software Design 101 시리즈의 5번째 글입니다.
 
 여기서는 좋은 인터페이스가 무엇인지, 추상화 수준을 어떻게 맞춰야 하는지, 다형성이 분기를 어떻게 줄이는지, LSP와 ISP가 왜 인터페이스 품질을 판단하는 기준이 되는지 설명합니다. 구현 교체가 쉬운 구조가 어떻게 만들어지는지도 함께 보겠습니다.
-
 
 ![Software Design 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/05/05-01-concept-at-a-glance.ko.png)
 *Software Design 101 5장 흐름 개요*
@@ -109,7 +107,7 @@ def notify(notifier: Notifier, user, msg):
 
 ```python
 # 3_params.py
-# Bad: charge(u, a, c, r, m, x, y)
+# 나쁜 예: charge(u, a, c, r, m, x, y)
 # Good: charge(user, amount, *, reason)
 ```
 
@@ -124,7 +122,7 @@ class Bird:
 
 class Penguin(Bird):
     def fly(self): raise NotImplementedError
-# Callers break — Bird itself needs a redesign.
+# 호출부가 깨집니다 — Bird 자체를 재설계해야 합니다.
 ```
 
 하위 타입이 상위 타입의 약속을 깨면, 문제는 펭귄 하나가 아니라 상위 인터페이스 설계일 가능성이 큽니다. 타입 계층을 다시 생각해야 합니다.
@@ -138,7 +136,7 @@ class Reader:
 
 class Writer:
     def write(self, x): ...
-# Better than one giant IO interface.
+# 거대한 IO 인터페이스 하나보다 낫습니다.
 ```
 
 읽기만 필요한 호출자에게 쓰기 메서드까지 강요하면 불필요한 결합이 생깁니다. 인터페이스도 책임별로 나뉘는 편이 좋습니다.
@@ -204,110 +202,6 @@ class Notifier:
 
 다음 글에서는 이런 인터페이스들이 모여 만드는 큰 구조, 계층 아키텍처를 다룹니다.
 
-## 설계 경계를 코드로 내리는 추가 예시
-
-실무에서 설계 논의가 길어지는 이유는 "모듈 경계"가 문장으로만 남기 쉽기 때문입니다. 경계를 글로 합의한 뒤 코드로 고정하지 않으면 다음 기능을 붙이는 순간 경계가 다시 흐려집니다. 그래서 설계 문서와 함께, 경계를 강제하는 최소한의 구조를 코드에 먼저 두는 방식이 안전합니다.
-
-### 모듈 경계 예시: 주문 결제 도메인
-
-아래 구조는 결제 정책, 결제 수단 어댑터, 외부 API 호출을 분리합니다. 핵심은 도메인 모듈이 인프라 구현을 직접 모르고, 인터페이스를 통해서만 협력한다는 점입니다.
-
-```text
-order/
-  domain/
-    payment_policy.py
-    ports.py
-  application/
-    checkout_service.py
-  infrastructure/
-    stripe_gateway.py
-    kakao_gateway.py
-```
-
-```python
-# domain/ports.py
-from typing import Protocol
-
-class PaymentGateway(Protocol):
-    def authorize(self, order_id: str, amount: int) -> str: ...
-    def capture(self, payment_id: str) -> None: ...
-
-class RiskChecker(Protocol):
-    def is_suspicious(self, user_id: str, amount: int) -> bool: ...
-```
-
-이렇게 포트를 먼저 정의하면 애플리케이션 계층은 "무엇을 요청하는가"만 알면 됩니다. Stripe, KakaoPay, 사내 결제 모듈처럼 구현체가 달라져도 애플리케이션 서비스의 제어 흐름은 유지됩니다. 변경 비용을 구현체 내부로 가두는 효과가 생깁니다.
-
-### 의존성 주입(DI) 예시: 생성 시점에서 연결
-
-```python
-# application/checkout_service.py
-from dataclasses import dataclass
-from domain.ports import PaymentGateway, RiskChecker
-
-@dataclass
-class CheckoutService:
-    gateway: PaymentGateway
-    risk_checker: RiskChecker
-
-    def checkout(self, order_id: str, user_id: str, amount: int) -> str:
-        if self.risk_checker.is_suspicious(user_id, amount):
-            raise ValueError("risk blocked")
-        payment_id = self.gateway.authorize(order_id, amount)
-        self.gateway.capture(payment_id)
-        return payment_id
-```
-
-```python
-# composition_root.py
-from application.checkout_service import CheckoutService
-from infrastructure.stripe_gateway import StripeGateway
-from infrastructure.simple_risk_checker import SimpleRiskChecker
-
-service = CheckoutService(
-    gateway=StripeGateway(api_key="masked"),
-    risk_checker=SimpleRiskChecker(),
-)
-```
-
-DI의 핵심은 프레임워크 사용 여부가 아니라 "조립 위치"를 분리하는 것입니다. 비즈니스 로직 내부에서 구현체를 `new` 하지 않으면 테스트에서 대체 객체를 넣기 쉬워지고, 운영에서 구현체 교체 시 영향 범위가 줄어듭니다.
-
-### 인터페이스 패턴: 정책 객체 분리
-
-가격 계산이나 할인 규칙은 가장 자주 바뀌는 영역입니다. 이 규칙을 서비스 코드 안에 `if` 체인으로 붙이면 기능은 빠르게 나오지만 변경 지점이 폭발합니다. 아래처럼 정책 인터페이스를 두면 규칙 추가를 클래스 추가로 제한할 수 있습니다.
-
-```python
-from typing import Protocol
-
-class DiscountPolicy(Protocol):
-    def discount(self, amount: int) -> int: ...
-
-class RatePolicy:
-    def __init__(self, rate: float) -> None:
-        self.rate = rate
-
-    def discount(self, amount: int) -> int:
-        return int(amount * self.rate)
-
-class FixedPolicy:
-    def __init__(self, fixed: int) -> None:
-        self.fixed = fixed
-
-    def discount(self, amount: int) -> int:
-        return min(self.fixed, amount)
-```
-
-정책 인터페이스를 쓰면 런타임 선택도 단순해집니다. 신규 캠페인 규칙은 기존 서비스 코드를 수정하기보다 새 정책 클래스를 추가하고 조립부에서 연결하면 끝납니다. 이 방식은 OCP를 실무적으로 지키는 가장 단순한 패턴입니다.
-
-### 경계 품질을 확인하는 운영 체크
-
-- 모듈 경계를 넘는 import가 늘어나는지 주간으로 확인합니다.
-- 애플리케이션 계층에서 인프라 타입을 직접 참조하는지 검사합니다.
-- 변경 요청 하나당 수정 파일 수를 기록해 경계 누수를 추적합니다.
-- 구현체 교체(예: 결제 게이트웨이 변경) 리허설을 분기마다 1회 실행합니다.
-
-설계는 문서에서 시작하지만, 유지보수성은 경계 강제 구조와 조립 규칙에서 결정됩니다. 경계를 합의한 다음 즉시 포트, 조립부, 테스트 대역을 갖춘 최소 코드를 두면 다음 변경에서 체감되는 비용 차이가 명확하게 나타납니다.
-
 ## 현업 적용 관점에서 다시 정리
 
 인터페이스는 "무엇을 할 수 있는가"를 드러내고 "어떻게 하는가"를 숨겨야 합니다. 추상화 레벨이 흔들리면 호출자가 구현 세부를 알게 되고 결합도가 급격히 커집니다.
@@ -330,11 +224,9 @@ class CouplingMetric:
         total = self.ca + self.ce
         return 0.0 if total == 0 else self.ce / total
 
-
 def report(metrics: list[CouplingMetric]) -> None:
     for m in metrics:
         print(f"{m.module:12} Ca={m.ca:2d} Ce={m.ce:2d} I={m.instability:.2f}")
-
 
 report(
     [
@@ -372,19 +264,16 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-
 @dataclass(frozen=True)
 class PaymentCommand:
     order_id: str
     user_id: str
     amount: int
 
-
 class PaymentGateway(ABC):
     @abstractmethod
     def charge(self, command: PaymentCommand) -> str:
         raise NotImplementedError
-
 
 class FakePaymentGateway(PaymentGateway):
     def charge(self, command: PaymentCommand) -> str:
@@ -420,7 +309,6 @@ def place_order_controller(request: dict, service: "PlaceOrderService") -> dict:
     result = service.execute(command)
     return result.to_http()
 
-
 class PlaceOrderService:
     def __init__(self, gateway: PaymentGateway, repo: OrderRepository) -> None:
         self.gateway = gateway
@@ -446,7 +334,6 @@ class PlaceOrderService:
 
 지표를 계층별로 분리해 보면 어디를 고쳐야 하는지가 명확해집니다. 모든 지표가 한 대시보드에서 섞여 있으면 "느리다"는 사실만 보이고 원인은 보이지 않습니다. 설계 경계를 운영 지표 경계와 맞추면 개선 사이클이 빠르게 돌아갑니다.
 
-
 ## 리뷰와 리팩터링을 위한 실전 질문 세트
 
 설계는 한 번 작성하고 끝나는 산출물이 아니라, 변경 요청이 들어올 때마다 점검하는 운영 습관입니다. 아래 질문은 코드 리뷰와 리팩터링 계획에서 바로 사용할 수 있는 최소 점검 세트입니다.
@@ -467,17 +354,14 @@ class PlaceOrderService:
 from dataclasses import dataclass
 from typing import Protocol
 
-
 @dataclass(frozen=True)
 class CreateCouponCommand:
     code: str
     discount_percent: int
 
-
 class CouponRepository(Protocol):
     def exists(self, code: str) -> bool: ...
     def save(self, code: str, discount_percent: int) -> None: ...
-
 
 class CreateCouponService:
     def __init__(self, repo: CouponRepository) -> None:

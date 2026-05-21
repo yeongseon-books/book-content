@@ -214,11 +214,11 @@ print(bfs(graph, "A"))   # ['A', 'B', 'C', 'D', 'E']
 from collections import deque
 
 dq = deque()
-# As a stack
+# 스택으로 사용
 dq.append(1); dq.append(2); dq.append(3)
 print(dq.pop())    # 3 (LIFO)
 
-# As a queue
+# 큐로 사용
 dq.append(1); dq.append(2); dq.append(3)
 print(dq.popleft()) # 1 (FIFO)
 ```

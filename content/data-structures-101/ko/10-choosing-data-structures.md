@@ -73,10 +73,10 @@ last_reviewed: '2026-05-12'
 **Before — "let's just use a dict":**
 
 ```python
-# Sequence matters, but a dict is used anyway
+# 순서가 중요한데도 dict를 사용
 events = {}
 events["e1"] = 1; events["e2"] = 2; events["e3"] = 3
-# Priority handling now means sorting on every access — slow
+# 우선순위 처리를 위해 매 접근마다 정렬 필요 — 느림
 ```
 
 **After — analyse the workload, then use a heap:**
@@ -86,7 +86,7 @@ import heapq
 events = []
 heapq.heappush(events, (1, "e1"))
 heapq.heappush(events, (2, "e2"))
-# Pop the highest-priority item in O(log n) every time
+# 매번 O(log n)으로 최고 우선순위 항목 pop
 ```
 
 문제는 데이터가 아니라 연산 패턴입니다. “어떤 값이 있나”보다 “무엇을 반복해서 하나”를 먼저 물으면 선택이 훨씬 정확해집니다.
@@ -96,7 +96,7 @@ heapq.heappush(events, (2, "e2"))
 ### 1단계: 다섯 가지 질문으로 워크로드 정의하기
 
 ```python
-# Five questions to answer before you pick a data structure
+# 데이터 구조를 고르기 전 답할 5가지 질문
 workload_questions = [
     "1. Which operation happens most frequently?",
     "2. How large is the input? (tens, tens of thousands, billions?)",
@@ -164,7 +164,7 @@ print(recommend_structure({"primary_op": "both_ends"}))       # deque
 import time
 from collections import deque
 
-# Wrong choice: a list as a queue
+# 잘못된 선택: queue로 list 사용
 def queue_with_list(n):
     q = []
     for i in range(n):
@@ -172,7 +172,7 @@ def queue_with_list(n):
     while q:
         q.pop(0)
 
-# Right choice: a deque as a queue
+# 올바른 선택: queue로 deque 사용
 def queue_with_deque(n):
     q = deque()
     for i in range(n):

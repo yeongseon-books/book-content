@@ -57,8 +57,7 @@ last_reviewed: '2026-05-15'
 - **Consumer group**: 메시지를 나눠 처리하는 소비자 집합의 단위입니다.
 - **Idempotency**: 같은 메시지를 여러 번 처리해도 결과가 같게 유지되는 성질입니다.
 
-## Before / After
-
+## 적용 전후 비교
 **Before — 직접 호출 사슬**
 
 ```text

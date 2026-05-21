@@ -70,7 +70,7 @@ Procedural                     Object-Oriented
 사용자 관리 로직을 비교합니다.
 
 ```python
-# before: procedural — data and functions are separate
+# before: procedural — 데이터와 함수가 분리됨
 users = []
 
 def create_user(name, email):
@@ -87,7 +87,7 @@ def get_user_display(user):
 ```
 
 ```python
-# after: OOP — data and behavior live in one class
+# after: OOP — 데이터와 동작이 한 클래스에 함께 있음
 class User:
     def __init__(self, name: str, email: str) -> None:
         self.name = name
@@ -135,9 +135,9 @@ dog3 = Dog("Max", "Labrador")
 dogs = [dog1, dog2, dog3]
 for dog in dogs:
     print(f"{dog.name} ({dog.breed}): {dog.bark()}")
-# Buddy (Golden Retriever): Buddy says woof!
-# Charlie (Poodle): Charlie says woof!
-# Max (Labrador): Max says woof!
+# Buddy (Golden Retriever): Buddy가 멍멍!
+# Charlie (Poodle): Charlie가 멍멍!
+# Max (Labrador): Max가 멍멍!
 
 print(dog1 is dog2)  # False — different instances
 ```

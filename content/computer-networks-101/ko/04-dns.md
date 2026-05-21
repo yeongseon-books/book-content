@@ -76,8 +76,7 @@ last_reviewed: '2026-05-15'
 | recursive resolver | 클라이언트 대신 root→TLD→auth를 따라가며 답을 찾아주는 서버 |
 | authoritative server | 특정 도메인의 레코드를 실제로 보유한 최종 서버 |
 
-## Before / After
-
+## 적용 전후 비교
 **Before — "DNS는 어디선가 찾아 주는 큰 사전"**
 
 ```text
@@ -168,7 +167,7 @@ import socket
 
 print(socket.gethostbyname('example.com'))   # 93.184.216.34
 print(socket.getaddrinfo('example.com', 443, type=socket.SOCK_STREAM))
-# Uses the OS stub resolver
+# OS 스텁 리졸버를 사용합니다.
 ```
 
 더 정밀하게 보려면 이렇게도 할 수 있습니다.

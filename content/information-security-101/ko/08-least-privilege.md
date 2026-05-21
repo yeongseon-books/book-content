@@ -138,7 +138,7 @@ metadata: { name: reports-reader, namespace: app }
 ```python
 # 4_temp_grant.py
 def assume_emergency_role():
-    # break-glass: 30-minute expiry, alerting, audit log
+    # break-glass: 30분 만료, 경고, 감사 로그
     issue_short_lived_credential(role="incident-responder", ttl_min=30)
 ```
 
@@ -174,13 +174,13 @@ def require_role(*allowed_roles):
     return decorator
 
 # 사용 예시
-# @app.route("/admin/users")
-# @require_role("admin")
+# @app.route("/관리자/사용자")
+# @require_role("관리자")
 # def list_all_users():
 #     return {"users": [...]}
 
 # @app.route("/reports")
-# @require_role("admin", "analyst")
+# @require_role("관리자", "분석가")
 # def view_reports():
 #     return {"reports": [...]}
 ```

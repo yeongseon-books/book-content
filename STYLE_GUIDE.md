@@ -194,6 +194,17 @@ ko 글의 H1/H2/H3는 **한국어 우선**이다.
 - `## Before vs. After`는 `## 적용 전후 비교`로 번역한다.
 - Guard: `scripts/check_ko_headings.py`가 CI에서 위반을 차단한다.
 
+### 소스 코드 블록 안 주석 언어 규칙
+
+ko 글의 source-code 블록(`python`, `javascript`, `typescript`, `go`, `rust`, `java`, `c`, `cpp` 등) 안 **설명 주석은 한국어로 작성**한다.
+
+- 3단어 이상의 영문 설명 주석(`# Check if the list is empty`)은 한국어로 번역한다.
+- 파일 경로 주석(`# server.py`, `# src/utils.py`)은 영문 유지.
+- 짧은 식별자/마커 주석(`# init`, `# todo`, `# type: ignore`)은 영문 유지.
+- 기술 용어는 한국어 문장 안에 영문으로 유지 (`# LLM이 도구를 호출하는지 확인`).
+- `bash`, `yaml`, `json`, `text`, `output` 블록은 이 규칙 대상이 아니다.
+- Guard: `scripts/check_code_comments.py`가 source-code 블록 안 영문 주석 비율을 측정한다.
+
 ---
 
 ## 3. 영어 글 스타일 (`en/`, `medium/`)

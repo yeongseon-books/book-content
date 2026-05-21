@@ -68,12 +68,11 @@ last_reviewed: '2026-05-12'
 | UTF-8 | 전 세계 문자를 1~4바이트로 표현하는 가변 길이 인코딩 |
 | Floating point | IEEE 754 규칙에 따라 실수를 근사 표현하는 방식 |
 
-## Before / After
-
+## 적용 전후 비교
 **Before — 데이터 표현을 모를 때:**
 
 ```python
-# Why isn't 0.1 + 0.2 equal to 0.3?
+# 왜 0.1 + 0.2는 0.3과 같지 않을까?
 result = 0.1 + 0.2
 print(result)          # 0.30000000000000004
 print(result == 0.3)   # False — and you do not know why
@@ -84,7 +83,7 @@ print(result == 0.3)   # False — and you do not know why
 ```python
 from decimal import Decimal
 
-# Floating point is a binary approximation; use Decimal for exact arithmetic.
+# 부동소수점은 2진 근사값이므로 정확한 계산에는 Decimal 사용
 result = Decimal("0.1") + Decimal("0.2")
 print(result)              # 0.3
 print(result == Decimal("0.3"))  # True
@@ -105,7 +104,7 @@ print(bin(255))     # 0b11111111
 print(int("101010", 2))   # 42
 print(int("11111111", 2)) # 255
 
-# Verify the conversion principle in code
+# 변환 원리를 코드로 검증
 def to_binary(n: int) -> str:
     """Convert a decimal integer to a binary string."""
     if n == 0:
@@ -122,19 +121,19 @@ print(to_binary(42))  # 101010
 ### 2단계: ASCII와 UTF-8
 
 ```python
-# ASCII: one byte per English character
+# ASCII: 영문자 1개당 1바이트
 print(ord("A"))        # 65
 print(chr(65))         # A
 print(ord("a"))        # 97
 
-# UTF-8: a Korean character takes three bytes
+# UTF-8: 한글 1글자는 3바이트
 korean = "가"
 print(ord(korean))                  # 44032
 print(korean.encode("utf-8"))       # b'\xea\xb0\x80' (3 bytes)
 print(len(korean))                  # 1 (character count)
 print(len(korean.encode("utf-8")))  # 3 (byte count)
 
-# Emoji: four bytes
+# 이모지: 4바이트
 emoji = "🐍"
 print(len(emoji))                   # 1 (character count)
 print(len(emoji.encode("utf-8")))   # 4 (byte count)
@@ -143,15 +142,15 @@ print(len(emoji.encode("utf-8")))   # 4 (byte count)
 ### 3단계: 정수의 크기와 2의 보수
 
 ```python
-# Python integers have no size limit (arbitrary precision)
+# Python 정수는 크기 제한이 없음(arbitrary precision)
 big_number = 2 ** 100
 print(big_number)  # 1267650600228229401496703205376
 
-# But C, Java, and others use fixed sizes
-# 8-bit signed: -128 to 127
-# 32-bit signed: -2,147,483,648 to 2,147,483,647
+# 하지만 C, Java 등은 고정 크기 사용
+# 8-bit signed: -128부터 127
+# 32-bit signed: -2,147,483,648부터 2,147,483,647
 
-# Two's complement represents negatives
+# 음수는 2의 보수로 표현
 def twos_complement(n: int, bits: int = 8) -> str:
     """Return the two's-complement representation of n."""
     if n >= 0:
@@ -168,18 +167,18 @@ print(twos_complement(-1))   # 11111111
 ```python
 import struct
 
-# Inspect the actual stored value of 0.1
+# 0.1의 실제 저장값 확인
 print(f"{0.1:.20f}")  # 0.10000000000000000555
 
-# IEEE 754 double-precision bit pattern
+# IEEE 754 배정밀도 비트 패턴
 bits = struct.pack("d", 0.1)
 print(" ".join(f"{b:08b}" for b in bits))
 
-# Compare with a tolerance
+# 허용 오차를 두고 비교
 import math
 print(math.isclose(0.1 + 0.2, 0.3))  # True
 
-# For money, use Decimal or integer cents
+# 금액 계산에는 Decimal 또는 정수 cents 사용
 price_cents = 1099  # $10.99 stored as cents
 tax_cents = int(price_cents * 0.1)
 total_cents = price_cents + tax_cents

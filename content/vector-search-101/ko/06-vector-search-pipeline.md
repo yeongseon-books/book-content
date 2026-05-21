@@ -243,7 +243,7 @@ def hybrid_search(
     """Combine vector search and BM25 keyword search.
     alpha: weight of vector score (0 = keyword only, 1 = vector only)
     """
-    # vector scores (already 0–1 with normalized vectors)
+    # 벡터 점수(정규화된 벡터로 이미 0–1 범위)
     q_vec = np.array([embedding_model.embed_query(query)], dtype=np.float32)
     vec_scores, vec_indices = index.search(q_vec, len(chunks))
     vec_score_map = {
@@ -252,7 +252,7 @@ def hybrid_search(
         if idx != -1
     }
 
-    # BM25 scores normalized to 0–1
+    # BM25 점수를 0–1로 정규화
     tokenized = [chunk.split() for chunk in chunks]
     bm25 = BM25Okapi(tokenized)
     bm25_scores = bm25.get_scores(query.split())

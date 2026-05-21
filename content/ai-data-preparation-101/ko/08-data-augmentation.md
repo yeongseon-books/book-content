@@ -346,7 +346,7 @@ def keep_bt_sample(src: str, cand: str, sim_fn) -> bool:
 
 증강은 결국 평가지표 개선으로 닫혀야 합니다. `keep_ratio`가 높아도 held-out 개선이 없으면 그 배치는 버리는 것이 맞습니다.
 
-## before/after 샘플
+## 적용 전후 샘플
 
 ```text
 원문: 환불이 지연되고 있는데 진행 상태를 확인하고 싶습니다.

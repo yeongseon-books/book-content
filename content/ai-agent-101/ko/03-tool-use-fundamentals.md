@@ -98,7 +98,7 @@ response = openai.chat.completions.create(
 첫 단계는 도구 정의를 모델에 보여 주는 것입니다. 이때 이름, 설명, 파라미터 스키마가 곧 모델이 보는 전체 인터페이스입니다. 설명이 약하면 라우팅이 흔들리고, 타입이 약하면 인자 품질이 흔들립니다.
 
 ```python
-# Example response from LLM
+# LLM의 응답 예시
 {
     "role": "assistant",
     "content": null,
@@ -125,7 +125,7 @@ def execute_tool(tool_name: str, arguments: str) -> str:
     params = json.loads(arguments)
 
     if tool_name == "get_weather":
-        # Call actual weather API
+        # 실제 weather API 호출
         weather_data = get_weather_api(params["location"])
         return json.dumps(weather_data)
 
@@ -139,7 +139,7 @@ result = execute_tool(tool_call.function.name, tool_call.function.arguments)
 세 번째 단계는 애플리케이션이 도구를 실행하는 구간입니다. 여기서는 파싱, validation, auth check, timeout, retry 같은 모든 현실 문제가 발생합니다. 그래서 production 코드에서는 이 함수가 생각보다 두꺼워지는 것이 정상입니다.
 
 ```python
-# Add tool result to conversation
+# 대화에 도구 실행 결과 추가
 messages = [
     {"role": "user", "content": "What's the weather in Seoul?"},
     response.choices[0].message,  # Assistant's tool call
@@ -150,14 +150,14 @@ messages = [
     }
 ]
 
-# Get final answer
+# 최종 답변 생성
 final_response = openai.chat.completions.create(
     model="gpt-4.1",
     messages=messages
 )
 
 print(final_response.choices[0].message.content)
-# Output: "The current weather in Seoul is sunny with a temperature of 15°C."
+# 출력: "서울의 현재 날씨는 맑고 기온은 15°C입니다."
 ```
 
 네 번째 단계는 결과를 모델에 되돌려 최종 답을 생성하는 구간입니다. 여기서 `tool_call_id` 연결이 깨지면 multi-tool turn이 흔들리고, 결과를 너무 장황하게 넣으면 context budget이 빠르게 소모됩니다.
@@ -189,15 +189,15 @@ def agent_with_tools(
 
         assistant_message = response.choices[0].message
 
-        # Check if LLM wants to use a tool
+        # LLM이 도구를 사용하려는지 확인
         if not assistant_message.tool_calls:
-            # No tool call = final answer ready
+            # 도구 호출이 없으면 최종 답변 준비 완료
             return assistant_message.content
 
-        # Add assistant's tool call to conversation
+        # assistant의 도구 호출을 대화에 추가
         messages.append(assistant_message)
 
-        # Execute each tool call
+        # 각 도구 호출 실행
         for tool_call in assistant_message.tool_calls:
             tool_name = tool_call.function.name
             tool_args = tool_call.function.arguments
@@ -205,7 +205,7 @@ def agent_with_tools(
             # Execute tool
             result = execute_tool(tool_name, tool_args)
 
-            # Add result to conversation
+            # 실행 결과를 대화에 추가
             messages.append({
                 "role": "tool",
                 "tool_call_id": tool_call.id,

@@ -26,7 +26,6 @@ last_reviewed: '2026-05-15'
 
 이 글은 머신러닝 101 시리즈의 2번째 글입니다. 여기서는 지도학습과 비지도학습의 경계를 정리하고, 분류·회귀·군집이 각각 어떤 질문에 답하는지 비교해 보겠습니다.
 
-
 ![Machine Learning 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/02/02-01-diagram.ko.png)
 *Machine Learning 101 2장 흐름 개요*
 
@@ -47,7 +46,6 @@ last_reviewed: '2026-05-15'
 
 분류와 회귀는 둘 다 지도학습이지만, 예측하려는 대상이 다릅니다. 군집과 차원축소는 비지도학습으로, 레이블 없이 데이터의 구조를 찾는 문제입니다.
 
-
 ## 왜 중요한가
 
 패러다임을 잘못 고르면 이후 모델 개선은 거의 의미가 없어집니다. 문제 프레이밍이 첫 번째 레버인 이유가 여기에 있습니다. 연속값을 예측해야 하는데 분류처럼 접근하거나, 정답 레이블이 없는데 지도학습 지표를 기대하면 모델보다 문제 정의가 먼저 어긋납니다.
@@ -62,22 +60,21 @@ last_reviewed: '2026-05-15'
 - **회귀(Regression)**: 연속적인 값을 예측합니다.
 - **군집화(Clustering)**: 거리나 밀도를 기준으로 비슷한 점들을 묶습니다.
 
-## Before/After
-
+## 적용 전과 후
 **Before**: "머신러닝은 회귀 한 줄이면 된다"고 생각해서 패러다임 구분을 건너뜁니다.
 
 **After**: 먼저 **레이블 유무**를 확인하고, 그다음 **분류인지 회귀인지**를 정한 뒤 알고리즘을 고릅니다.
 
 ## 실습: 5단계로 패러다임 비교하기
 
-### Step 1 — 데이터 로드
+### 단계 1 — 데이터 로드
 
 ```python
 from sklearn.datasets import load_iris
 X, y = load_iris(return_X_y=True)
 ```
 
-### Step 2 — 지도학습 분류
+### 단계 2 — 지도학습 분류
 
 ```python
 from sklearn.linear_model import LogisticRegression
@@ -85,14 +82,14 @@ clf = LogisticRegression(max_iter=1000).fit(X, y)
 print("clf acc:", clf.score(X, y))
 ```
 
-### Step 3 — 회귀 데이터셋
+### 단계 3 — 회귀 데이터셋
 
 ```python
 from sklearn.datasets import fetch_california_housing
 Xr, yr = fetch_california_housing(return_X_y=True)
 ```
 
-### Step 4 — 회귀 모델
+### 단계 4 — 회귀 모델
 
 ```python
 from sklearn.linear_model import LinearRegression
@@ -100,7 +97,7 @@ reg = LinearRegression().fit(Xr, yr)
 print("R^2:", reg.score(Xr, yr))
 ```
 
-### Step 5 — 비지도 군집화
+### 단계 5 — 비지도 군집화
 
 ```python
 from sklearn.cluster import KMeans
@@ -198,59 +195,6 @@ print("Accuracy:", clf.score(X, y))  # 정확도
 이 글에서 기억할 핵심은 세 가지입니다. 첫째, 분류와 회귀는 둘 다 지도학습이지만 예측 대상이 다릅니다. 둘째, 군집화는 정답이 없는 구조 탐색 문제입니다. 셋째, 문제 프레이밍을 잘못 잡으면 모델 개선 자체가 무의미해집니다.
 
 다음 글에서는 Train/Test Split을 통해 일반화를 어떻게 측정하는지 살펴보겠습니다.
-
-## 실전 확장: 학습·평가 파이프라인 통합
-
-입문 단계에서 `fit()` 한 번으로 결과를 확인하면 모델이 잘 동작하는 것처럼 보이지만, 실무에서는 같은 데이터로 학습과 평가를 동시에 수행하면 성능이 과대평가되기 쉽습니다. 따라서 최소한 `train/validation/test` 구분을 갖춘 뒤, 피처 전처리와 모델 학습, 하이퍼파라미터 탐색, 최종 평가를 분리해야 합니다. 아래 예시는 분류 문제에서 재현 가능한 기준선을 만드는 기본 템플릿입니다.
-
-```python
-from sklearn.datasets import load_breast_cancer
-from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
-
-X, y = load_breast_cancer(return_X_y=True)
-
-X_train_full, X_test, y_train_full, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42, stratify=y
-)
-X_train, X_val, y_train, y_val = train_test_split(
-    X_train_full, y_train_full, test_size=0.25, random_state=42, stratify=y_train_full
-)
-
-pipe = Pipeline([
-    ("scaler", StandardScaler()),
-    ("model", LogisticRegression(max_iter=2000))
-])
-
-param_grid = {
-    "model__C": [0.01, 0.1, 1.0, 10.0],
-    "model__penalty": ["l2"],
-    "model__solver": ["lbfgs"]
-}
-
-cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-search = GridSearchCV(
-    estimator=pipe,
-    param_grid=param_grid,
-    scoring="f1",
-    cv=cv,
-    n_jobs=-1
-)
-search.fit(X_train, y_train)
-
-val_pred = search.predict(X_val)
-val_proba = search.predict_proba(X_val)[:, 1]
-
-print("Best Params:", search.best_params_)
-print("Validation ROC-AUC:", roc_auc_score(y_val, val_proba))
-print(classification_report(y_val, val_pred, digits=4))
-print(confusion_matrix(y_val, val_pred))
-```
-
-핵심은 세 가지입니다. 첫째, 전처리(`StandardScaler`)를 파이프라인에 넣어 데이터 누수를 방지합니다. 둘째, `GridSearchCV`는 훈련 세트 내부에서만 교차검증을 수행하므로 검증 세트를 따로 남겨 둔 의미가 유지됩니다. 셋째, 검증 단계에서 `classification_report`와 `ROC-AUC`를 함께 확인해 임계값 민감도와 순위 품질을 동시에 점검합니다.
 
 ## 분류 지표를 함께 읽는 방법
 
@@ -356,7 +300,6 @@ a_preprocess = ColumnTransformer([
 - 피처 전처리와 모델을 하나의 파이프라인으로 묶었습니다.
 
 이 다섯 가지를 만족하면, 단순히 "모델이 돌아간다" 수준을 넘어 "재현 가능하고 설명 가능한 학습 시스템"에 가까워집니다.
-
 
 ## 실전 보강: 손실 함수, 검증 곡선, 비교표를 한 번에 정리
 
@@ -466,7 +409,6 @@ print("valid mean:", val_scores.mean(axis=1))
 - 검증 결과는 평균 점수와 표준편차를 함께 남깁니다.
 - 혼동 행렬 기반 FP/FN 대응 전략을 운영 정책에 연결합니다.
 - 다음 실험에서도 같은 템플릿을 재사용해 비교 가능성을 유지합니다.
-
 
 ### 추가 앵커: 학습/검증 곡선 해석 예시
 

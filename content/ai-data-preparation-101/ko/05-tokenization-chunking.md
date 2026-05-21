@@ -190,7 +190,7 @@ def recursive_chunk(text: str, max_tokens: int = 500,
         return [text]
     sep = separators[0]
     if not sep:
-        # base case: forced length-based split
+        # base case: 길이 기준 강제 분할
         mid = len(text) // 2
         return recursive_chunk(text[:mid], max_tokens, separators[1:]) + \
                recursive_chunk(text[mid:], max_tokens, separators[1:])
@@ -272,9 +272,9 @@ class ChunkExperimentResult:
     answer_f1: float
 
 def choose_strategy(results: list[ChunkExperimentResult]) -> ChunkExperimentResult:
-    # hard constraints first
+    # 하드 제약을 먼저 적용
     feasible = [r for r in results if r.p95_prompt_tokens <= 7000]
-    # optimize recall then cost
+    # recall을 먼저 최적화하고 그다음 cost를 최적화
     feasible.sort(key=lambda r: (r.retrieval_recall_at_5, -r.avg_prompt_tokens), reverse=True)
     return feasible[0]
 ```
@@ -308,7 +308,7 @@ print(stats)
 
 `p99_tokens`가 과도하게 크면 retrieval 단계에서 일부 문서가 예산을 독점해 답변 품질이 흔들립니다. 이때는 separator 우선순위를 조정하거나, heading 단위 pre-split을 추가하는 편이 낫습니다.
 
-## before/after chunk 샘플 비교
+## 적용 전후 chunk 샘플 비교
 
 ```text
 [fixed-size]

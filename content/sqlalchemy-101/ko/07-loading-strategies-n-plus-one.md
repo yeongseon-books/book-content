@@ -166,7 +166,7 @@ with Session(engine) as session:
         {"email": u.email, "orders": [o.amount for o in u.orders]}
         for u in users
     ]
-# echo 결과: SELECT users 1번 + SELECT orders WHERE user_id = ? 50번 = 51 SELECT
+# 에코 결과: SELECT 사용자 1번 + SELECT 주문 WHERE user_id = ? 50번 = 51 선택
 ```
 
 ### 개선 후: selectinload 한 줄 추가
@@ -179,7 +179,7 @@ with Session(engine) as session:
         {"email": u.email, "orders": [o.amount for o in u.orders]}
         for u in users
     ]
-# echo 결과: SELECT users 1번 + SELECT orders WHERE user_id IN (...) 1번 = 2 SELECT
+# 에코 결과: SELECT users 1번 + SELECT 주문 WHERE user_id IN (...) 1번 = 2 SELECT
 ```
 
 `options(selectinload(...))` 한 줄로 51 → 2 SELECT가 됩니다. 이 차이가 운영 환경에서 응답시간 5배~50배 개선으로 이어집니다.

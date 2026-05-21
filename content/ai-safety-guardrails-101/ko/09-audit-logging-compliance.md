@@ -114,10 +114,10 @@ def make_record(user_id: str, prompt: str, response: str, **kw) -> AuditRecord:
 
 ```python
 def store_audit(record: AuditRecord, prompt: str, response: str):
-    # 1. Audit log: append-only, hashes only
+    # 1. 감사 로그: 추가 전용, 해시 전용
     audit_db.insert(asdict(record))
 
-    # 2. PII store: KMS encrypted, short retention based on user consent
+    # 2. PII 저장소: KMS 암호화, 사용자 동의에 따른 단기 보존
     if user_consent_to_train(record.user_id_hash):
         encrypted_prompt = kms.encrypt(prompt)
         encrypted_response = kms.encrypt(response)

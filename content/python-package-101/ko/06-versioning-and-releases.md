@@ -72,8 +72,7 @@ MAJOR  (1.3.0 → 2.0.0): API changed or removed (breaking)
 | CHANGELOG | 버전별 변경 사항을 기록한 문서 | `CHANGELOG.md` |
 | single source of truth | 버전을 정확히 한 곳에서 관리하는 원칙 | `pyproject.toml` 또는 `__version__` |
 
-## Before / After
-
+## 적용 전후 비교
 **Before (버전 관리 없음)**
 
 ```text
@@ -96,7 +95,7 @@ v1.2.3 ← git tag
 
 ## 단계별 실습
 
-### Step 1. `pyproject.toml`에 버전 지정
+### 단계 1. `pyproject.toml`에 버전 지정
 
 ```toml
 [project]
@@ -104,7 +103,7 @@ name = "mylib"
 version = "0.1.0"
 ```
 
-### Step 2. `__version__` 동기화
+### 단계 2. `__version__` 동기화
 
 ```python
 # src/mylib/__init__.py
@@ -113,12 +112,12 @@ __version__ = "0.1.0"
 ```
 
 ```python
-# How users check the version
+# 사용자가 버전을 확인하는 방법
 import mylib
 print(mylib.__version__)  # 0.1.0
 ```
 
-### Step 3. Git 태그로 릴리스 표시
+### 단계 3. Git 태그로 릴리스 표시
 
 ```bash
 git add .
@@ -131,7 +130,7 @@ git tag
 # v0.1.0
 ```
 
-### Step 4. CHANGELOG 작성
+### 단계 4. CHANGELOG 작성
 
 ```markdown
 # CHANGELOG.md
@@ -145,7 +144,7 @@ git tag
 - pyproject.toml configuration
 ```
 
-### Step 5. 버전 올리고 릴리스하기
+### 단계 5. 버전 올리고 릴리스하기
 
 ```bash
 # pyproject.toml: version = "0.2.0"

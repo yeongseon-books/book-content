@@ -76,8 +76,7 @@ pyproject.toml          tests/
 | build-system | 빌드 도구를 지정하는 섹션 | `[build-system]` |
 | [project] | 이름, 버전, 의존성 등 메타데이터 | PEP 621 |
 
-## Before / After
-
+## 적용 전후 비교
 **Before (setup.py + 플랫 레이아웃)**
 
 ```python
@@ -107,7 +106,7 @@ dependencies = ["requests>=2.28"]
 
 ## 단계별 실습
 
-### Step 1. src layout 프로젝트 만들기
+### 단계 1. src layout 프로젝트 만들기
 
 ```bash
 mkdir -p ~/practice/mylib-project/src/mylib
@@ -126,7 +125,7 @@ def greet(name: str) -> str:
 EOF
 ```
 
-### Step 2. `pyproject.toml` 작성
+### 단계 2. `pyproject.toml` 작성
 
 ```bash
 cat > pyproject.toml << 'EOF'
@@ -150,7 +149,7 @@ Repository = "https://github.com/yourname/mylib"
 EOF
 ```
 
-### Step 3. 개발 모드 설치
+### 단계 3. 개발 모드 설치
 
 ```bash
 python -m venv .venv
@@ -161,7 +160,7 @@ python -c "from mylib.core import greet; print(greet('World'))"
 # Hello, World!
 ```
 
-### Step 4. 테스트 추가
+### 단계 4. 테스트 추가
 
 ```bash
 cat > tests/test_core.py << 'EOF'
@@ -179,7 +178,7 @@ pytest tests/
 # 2 passed
 ```
 
-### Step 5. setuptools 패키지 탐색 설정
+### 단계 5. setuptools 패키지 탐색 설정
 
 ```toml
 # Add to pyproject.toml

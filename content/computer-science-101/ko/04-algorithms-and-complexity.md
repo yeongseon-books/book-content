@@ -68,12 +68,11 @@ last_reviewed: '2026-05-12'
 | Big-O | 입력이 무한히 커질 때의 상한 증가율 표기 |
 | Data structure | 데이터를 저장하고 접근하는 방식 |
 
-## Before / After
-
+## 적용 전후 비교
 **Before — 복잡도를 모를 때:**
 
 ```python
-# Find common elements between two lists — O(n^2)
+# 두 리스트의 공통 원소 찾기 — O(n^2)
 def common_slow(a: list[int], b: list[int]) -> list[int]:
     result = []
     for x in a:
@@ -81,18 +80,18 @@ def common_slow(a: list[int], b: list[int]) -> list[int]:
             result.append(x)
     return result
 
-# At n=10,000 that is roughly 100 million comparisons — several seconds
+# n=10,000이면 대략 1억 번 비교 — 수 초 소요
 ```
 
 **After — 복잡도를 알 때:**
 
 ```python
-# Same problem — O(n)
+# 같은 문제 — O(n)
 def common_fast(a: list[int], b: list[int]) -> list[int]:
     b_set = set(b)        # one-time O(n)
     return [x for x in a if x in b_set]   # `in` on a set is O(1)
 
-# At n=10,000 that is roughly 20,000 comparisons — milliseconds
+# n=10,000이면 대략 2만 번 비교 — 밀리초 단위
 ```
 
 ## 단계별로 따라하기
@@ -147,10 +146,10 @@ print(f"binary : {time.perf_counter() - start:.6f}s")
 ### 3단계: 자료구조 선택이 복잡도를 바꾼다
 
 ```python
-# list: `in` is O(n)
+# list: `in`은 O(n)
 nums_list = list(range(1_000_000))
 
-# set: `in` is O(1) on average
+# set: `in`은 평균 O(1)
 nums_set = set(nums_list)
 
 start = time.perf_counter()
@@ -290,7 +289,7 @@ for count, size in sizes[:12]:
 | 최단 경로 | BFS/Dijkstra O(V+E) 시간, O(V) 공간 | DFS 반복 심화 O(V+E) 시간, O(깊이) 공간 |
 
 ```python
-# 시간 우선: Two Sum with hash map — O(n) time, O(n) space
+# 시간 우선: hash map 기반 Two Sum — O(n) time, O(n) space
 def two_sum_hash(nums: list[int], target: int) -> tuple[int, int]:
     seen = {}
     for i, num in enumerate(nums):
@@ -300,7 +299,7 @@ def two_sum_hash(nums: list[int], target: int) -> tuple[int, int]:
         seen[num] = i
     return (-1, -1)
 
-# 공간 우선: Two Sum with sort + two pointers — O(n log n) time, O(1) extra space
+# 공간 우선: sort + two pointers 기반 Two Sum — O(n log n) time, O(1) extra space
 def two_sum_sort(nums: list[int], target: int) -> tuple[int, int]:
     indexed = sorted(enumerate(nums), key=lambda x: x[1])
     lo, hi = 0, len(indexed) - 1

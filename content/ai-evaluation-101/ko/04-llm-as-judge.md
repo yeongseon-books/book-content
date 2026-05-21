@@ -203,7 +203,7 @@ def judge_pairwise_debiased(question: str, ans_a: str, ans_b: str) -> str:
     v1 = judge_pairwise(question, ans_a, ans_b)  # A=ans_a, B=ans_b
     v2 = judge_pairwise(question, ans_b, ans_a)  # A=ans_b, B=ans_a (swapped)
 
-    # In v2, "A" really means ans_b, so flip and compare
+    # v2에서는 "A"가 실제로 ans_b를 의미하므로 뒤집어서 비교
     flip = {"A": "B", "B": "A", "Tie": "Tie"}
     v2_normalized = flip[v2]
 
@@ -237,15 +237,15 @@ Judge가 실제로 믿을 만한지 어떻게 압니까? **사람이 채점한 5
 # eval/agreement.py
 from sklearn.metrics import cohen_kappa_score
 
-# Human grader scores 50 samples on a 1-5 scale
+# 인간 평가자가 50개 샘플을 1-5 척도로 평가
 human_scores  = [5, 4, 3, 5, 2, 4, 5, 3, 4, 5, ...]  # len=50
 judge_scores  = [5, 4, 4, 5, 2, 3, 5, 3, 4, 4, ...]  # len=50
 
-# Cohen's kappa: -1 to 1 (1=perfect, 0=chance, <0=worse than random)
+# Cohen's kappa: -1~1 (1=완벽 일치, 0=우연 수준, <0=무작위보다 나쁨)
 kappa = cohen_kappa_score(human_scores, judge_scores, weights="quadratic")
 print(f"Cohen's kappa: {kappa:.3f}")
 
-# Interpretation (Landis & Koch, 1977):
+# 해석 기준 (Landis & Koch, 1977):
 # 0.0-0.2: slight
 # 0.2-0.4: fair
 # 0.4-0.6: moderate

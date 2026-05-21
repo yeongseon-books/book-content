@@ -363,7 +363,7 @@ qdrant.upsert(
 ```
 
 ```python
-# Pinecone (managed service)
+# 솔방울(관리형 서비스)
 from pinecone import Pinecone, ServerlessSpec
 
 pc = Pinecone(api_key="${PINECONE_API_KEY}")

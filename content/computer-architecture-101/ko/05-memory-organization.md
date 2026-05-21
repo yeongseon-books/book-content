@@ -83,7 +83,7 @@ last_reviewed: '2026-05-12'
 ```python
 data = [0] * 1_000_000
 data[12345] = 42
-# "It just goes into slot 12345"
+# "그냥 12345번 슬롯에 들어간다"
 ```
 
 **After — "그 주소는 가상 주소이고 페이지를 거친다":**

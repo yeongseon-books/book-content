@@ -65,8 +65,7 @@ last_reviewed: '2026-05-12'
 | Pivot | 퀵 정렬에서 분할 기준으로 쓰는 원소입니다 |
 | Divide and conquer | 문제를 나누고, 각각을 풀고, 다시 합치는 전략입니다 |
 
-## Before / After
-
+## 적용 전후 비교
 같은 "직원 목록을 부서, 입사 순서 기준으로 정렬"하는 문제라도 접근은 크게 다를 수 있습니다.
 
 ```python
@@ -92,7 +91,7 @@ def sort_people(records):
 
 ## 단계별 실습
 
-### Step 1: 실무 기본값부터 확인하기 — `sorted(..., key=...)`
+### 단계 1: 실무 기본값부터 확인하기 — `sorted(..., key=...)`
 
 ```python
 records = [
@@ -131,7 +130,7 @@ print([
 - 점수 90 그룹의 순서가 `Mina → Sora`로 유지되어야 합니다.
 - 둘 중 하나라도 바뀌면 `key`를 잘못 주었는지보다 먼저 안정 정렬이 보장되는 도구를 쓰고 있는지 확인해야 합니다.
 
-### Step 2: 고전 정렬은 학습용 대비 재료로 보기
+### 단계 2: 고전 정렬은 학습용 대비 재료로 보기
 
 ```python
 def verify_sort(name: str, func, cases: dict[str, list[int]]) -> None:
@@ -196,7 +195,7 @@ verify_sort("insertion", insertion_sort, test_cases)
 
 선택 정렬은 가장 작은 값을 앞으로 보내고, 삽입 정렬은 현재 원소를 알맞은 자리에 끼워 넣습니다. 둘 다 `O(n^2)`이지만, 거의 정렬된 데이터에서는 삽입 정렬이 상대적으로 유리할 수 있습니다.
 
-### Step 3: Merge sort는 안정성의 원인을 보여 줍니다
+### 단계 3: Merge sort는 안정성의 원인을 보여 줍니다
 
 ```python
 def merge_sort(data: list[int]) -> list[int]:
@@ -254,7 +253,7 @@ assert [record["name"] for record in stable_records if record["score"] == 90] ==
 
 만약 숫자 정렬은 맞는데 같은 점수의 이름 순서가 바뀐다면, 먼저 `merge_records()`의 `<=`를 `<`로 잘못 바꾸지 않았는지 확인하면 됩니다.
 
-### Step 4: Quick sort는 빠르지만 똑같이 검증해야 합니다
+### 단계 4: Quick sort는 빠르지만 똑같이 검증해야 합니다
 
 ```python
 def quick_sort(data: list[int]) -> list[int]:
@@ -271,7 +270,7 @@ verify_sort("quick", quick_sort, test_cases)
 
 퀵 정렬은 피벗을 기준으로 작은 값과 큰 값을 분리합니다. 평균적으로는 빠르지만, 피벗 선택이 나쁘면 최악의 경우 `O(n^2)`가 될 수 있습니다. 뒤집힌 입력에서 실패하거나 지나치게 느리면 먼저 피벗 전략과 분할 조건을 의심해야 합니다.
 
-### Step 5: 벤치마크는 단일 숫자보다 성장 추세를 봅니다
+### 단계 5: 벤치마크는 단일 숫자보다 성장 추세를 봅니다
 
 ```python
 import random

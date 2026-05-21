@@ -26,7 +26,6 @@ last_reviewed: '2026-05-15'
 
 이 글은 머신러닝 101 시리즈의 7번째 글입니다. 여기서는 KMeans와 DBSCAN의 차이, `K`를 고르는 감각, 표준화가 군집 결과를 왜 바꿔 놓는지, 그리고 군집을 왜 정답이 아니라 가설로 봐야 하는지를 정리하겠습니다.
 
-
 ![Machine Learning 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/07/07-01-diagram.ko.png)
 *Machine Learning 101 7장 흐름 개요*
 
@@ -50,15 +49,14 @@ last_reviewed: '2026-05-15'
 - **Silhouette**: 응집도와 분리도를 함께 보는 지표입니다.
 - **Elbow**: `K`를 더 늘려도 개선 폭이 크지 않아지는 지점입니다.
 
-## Before/After
-
+## 적용 전과 후
 **Before**: "`K = 3`이면 됐다"고 근거 없이 끝냅니다.
 
 **After**: Elbow, Silhouette, 도메인 지식을 함께 써서 `K`를 고릅니다.
 
 ## 실습: 5단계로 보는 군집화
 
-### Step 1 — 데이터
+### 단계 1 — 데이터
 
 ```python
 from sklearn.datasets import load_iris
@@ -66,7 +64,7 @@ from sklearn.preprocessing import StandardScaler
 X = StandardScaler().fit_transform(load_iris().data)
 ```
 
-### Step 2 — KMeans
+### 단계 2 — KMeans
 
 ```python
 from sklearn.cluster import KMeans
@@ -74,14 +72,14 @@ km = KMeans(n_clusters=3, n_init=10, random_state=0).fit(X)
 print("inertia:", km.inertia_)
 ```
 
-### Step 3 — Silhouette
+### 단계 3 — Silhouette
 
 ```python
 from sklearn.metrics import silhouette_score
 print("sil:", silhouette_score(X, km.labels_))
 ```
 
-### Step 4 — Elbow
+### 단계 4 — Elbow
 
 ```python
 ks = list(range(2, 8))
@@ -89,7 +87,7 @@ scores = [KMeans(n_clusters=k, n_init=10, random_state=0).fit(X).inertia_ for k 
 print(list(zip(ks, scores)))
 ```
 
-### Step 5 — DBSCAN
+### 단계 5 — DBSCAN
 
 ```python
 from sklearn.cluster import DBSCAN
@@ -151,59 +149,6 @@ print("labels:", set(db.labels_))
 이 글에서 기억할 핵심은 네 가지입니다. 첫째, 군집화는 정답 맞히기보다 구조 탐색에 가깝습니다. 둘째, 표준화는 결과를 바꿀 정도로 중요합니다. 셋째, Elbow와 Silhouette은 보조 도구이지 최종 판단 자체는 아닙니다. 넷째, 군집 레이블은 항상 해석 단계를 거쳐야 합니다.
 
 다음 글에서는 Overfitting과 Regularization을 통해 모델이 잡음을 외우는 문제와 이를 제어하는 방법을 살펴보겠습니다.
-
-## 실전 확장: 학습·평가 파이프라인 통합
-
-입문 단계에서 `fit()` 한 번으로 결과를 확인하면 모델이 잘 동작하는 것처럼 보이지만, 실무에서는 같은 데이터로 학습과 평가를 동시에 수행하면 성능이 과대평가되기 쉽습니다. 따라서 최소한 `train/validation/test` 구분을 갖춘 뒤, 피처 전처리와 모델 학습, 하이퍼파라미터 탐색, 최종 평가를 분리해야 합니다. 아래 예시는 분류 문제에서 재현 가능한 기준선을 만드는 기본 템플릿입니다.
-
-```python
-from sklearn.datasets import load_breast_cancer
-from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
-
-X, y = load_breast_cancer(return_X_y=True)
-
-X_train_full, X_test, y_train_full, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42, stratify=y
-)
-X_train, X_val, y_train, y_val = train_test_split(
-    X_train_full, y_train_full, test_size=0.25, random_state=42, stratify=y_train_full
-)
-
-pipe = Pipeline([
-    ("scaler", StandardScaler()),
-    ("model", LogisticRegression(max_iter=2000))
-])
-
-param_grid = {
-    "model__C": [0.01, 0.1, 1.0, 10.0],
-    "model__penalty": ["l2"],
-    "model__solver": ["lbfgs"]
-}
-
-cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-search = GridSearchCV(
-    estimator=pipe,
-    param_grid=param_grid,
-    scoring="f1",
-    cv=cv,
-    n_jobs=-1
-)
-search.fit(X_train, y_train)
-
-val_pred = search.predict(X_val)
-val_proba = search.predict_proba(X_val)[:, 1]
-
-print("Best Params:", search.best_params_)
-print("Validation ROC-AUC:", roc_auc_score(y_val, val_proba))
-print(classification_report(y_val, val_pred, digits=4))
-print(confusion_matrix(y_val, val_pred))
-```
-
-핵심은 세 가지입니다. 첫째, 전처리(`StandardScaler`)를 파이프라인에 넣어 데이터 누수를 방지합니다. 둘째, `GridSearchCV`는 훈련 세트 내부에서만 교차검증을 수행하므로 검증 세트를 따로 남겨 둔 의미가 유지됩니다. 셋째, 검증 단계에서 `classification_report`와 `ROC-AUC`를 함께 확인해 임계값 민감도와 순위 품질을 동시에 점검합니다.
 
 ## 분류 지표를 함께 읽는 방법
 
@@ -309,7 +254,6 @@ a_preprocess = ColumnTransformer([
 - 피처 전처리와 모델을 하나의 파이프라인으로 묶었습니다.
 
 이 다섯 가지를 만족하면, 단순히 "모델이 돌아간다" 수준을 넘어 "재현 가능하고 설명 가능한 학습 시스템"에 가까워집니다.
-
 
 ## 실전 보강: 손실 함수, 검증 곡선, 비교표를 한 번에 정리
 
@@ -420,7 +364,6 @@ print("valid mean:", val_scores.mean(axis=1))
 - 혼동 행렬 기반 FP/FN 대응 전략을 운영 정책에 연결합니다.
 - 다음 실험에서도 같은 템플릿을 재사용해 비교 가능성을 유지합니다.
 
-
 ### 추가 앵커: 학습/검증 곡선 해석 예시
 
 아래는 하이퍼파라미터를 바꿨을 때 train/validation 곡선을 어떻게 읽는지 보여 주는 예시입니다.
@@ -457,7 +400,6 @@ for t in thresholds:
 - 데이터가 늘어날 가능성이 크면 재학습 파이프라인 단순성을 더 높은 우선순위로 둡니다.
 - 최종 선택 사유는 표와 로그로 남겨 다음 실험의 기준선으로 사용합니다.
 
-
 ### 추가 앵커: 재현성 로그 템플릿
 
 실험 로그에는 최소한 다음 항목을 고정합니다.
@@ -472,9 +414,7 @@ for t in thresholds:
 
 이 다섯 줄만 지켜도 같은 실험을 다시 돌리는 비용이 크게 줄어듭니다.
 
-
 운영 팁으로는 실험 노트에 "이번 변경이 데이터, 전처리, 모델, 임계값 중 어디를 건드렸는지"를 한 줄로 남기는 습관이 중요합니다. 같은 점수 변화라도 원인 축이 달라지면 다음 대응 전략이 완전히 달라지기 때문입니다.
-
 
 또한 모델 비교 회의에서는 "이번 실험으로 줄어든 오류 유형이 무엇인지"를 숫자로 남겨야 합니다. 예를 들어 FP가 20건 줄고 FN이 5건 늘었다면, 운영팀과 함께 비용을 환산해 변경 승인 여부를 결정하는 방식이 안전합니다. 이렇게 오류 유형 단위로 기록하면 다음 분기 모델 개선의 우선순위도 명확해집니다.
 

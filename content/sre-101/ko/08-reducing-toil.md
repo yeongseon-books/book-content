@@ -94,7 +94,7 @@ Toil을 정확하게 분류하려면 명확한 기준이 필요합니다. 다음
 SSL/TLS 인증서는 만료되면 서비스가 중단됩니다. 인증서 갱신을 사람이 수동으로 하는 것은 전형적인 Toil입니다. 다음은 Let's Encrypt를 사용한 자동 갱신 예제입니다.
 
 ```python
-#!/usr/bin/env python3
+# !/usr/bin/env python3
 """
 인증서 자동 갱신 스크립트
 
@@ -116,7 +116,7 @@ def check_cert_expiry(domain: str) -> int:
     ]
     
     try:
-        # Get certificate info
+        # 인증서 정보 얻기
         proc = subprocess.run(
             cmd,
             input=b"",
@@ -124,7 +124,7 @@ def check_cert_expiry(domain: str) -> int:
             timeout=10
         )
         
-        # Parse expiry date from openssl output
+        # openssl 출력에서 만료일을 파싱합니다
         output = proc.stdout.decode()
         for line in output.split("\n"):
             if "Not After" in line:
@@ -321,7 +321,7 @@ def break_even(saved_per_week, build_minutes):
 ## 자동 롤백 스크립트 예제
 
 ```python
-#!/usr/bin/env python3
+# !/usr/bin/env python3
 """
 자동 롤백 스크립트
 
@@ -362,7 +362,7 @@ def main():
     previous_version = "v2.0.5"
     api_url = "http://api.example.com"
     
-    # Wait 5 minutes after deployment
+    # 배포 후 5분 대기합니다
     time.sleep(300)
     
     if check_metrics(api_url):

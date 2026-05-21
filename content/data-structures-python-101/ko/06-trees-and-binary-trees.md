@@ -73,12 +73,11 @@ Binary Search Tree (BST):
 | 높이(height) | 특정 노드에서 가장 먼 리프까지의 거리입니다 |
 | 이진 탐색 트리(BST) | 왼쪽 자식 < 부모 < 오른쪽 자식 규칙을 만족하는 트리입니다 |
 
-## Before / After
-
+## 적용 전후 비교
 정렬된 데이터를 list로 순차 탐색하는 경우와 BST로 탐색하는 경우를 비교해 보겠습니다.
 
 ```python
-# before: linear search in a sorted list — O(n)
+# before: 정렬된 list에서 선형 탐색 — O(n)
 data = [1, 3, 6, 8, 10, 14]
 for item in data:
     if item == 10:
@@ -87,8 +86,8 @@ for item in data:
 ```
 
 ```python
-# after: BST search — O(log n)
-# BST: 8 → 10 → found (2 steps)
+# after: BST 탐색 — O(log n)
+# BST: 8 → 10 → 발견 (2단계)
 def search_bst(node, target):
     if node is None:
         return False
@@ -117,8 +116,7 @@ class TreeNode:
         return f"TreeNode({self.data})"
 ```
 
-### Step 2: Implement tree traversals
-
+### 단계 2: 트리 순회 구현
 ```python
 def inorder(node):
     """Inorder traversal: left → root → right"""
@@ -154,8 +152,7 @@ print(f"preorder:  {preorder(root)}")   # [1, 2, 4, 5, 3]
 print(f"postorder: {postorder(root)}")  # [4, 5, 2, 3, 1]
 ```
 
-### Step 3: Level-order traversal (BFS)
-
+### 단계 3: 레벨 순서 순회 (BFS)
 ```python
 from collections import deque
 

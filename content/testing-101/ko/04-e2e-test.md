@@ -30,7 +30,6 @@ E2E 테스트는 그 흐름을 사용자의 시선에서 다시 확인합니다.
 
 이 글은 Testing 101 시리즈의 네 번째 글입니다. 여기서는 E2E 테스트의 역할, Playwright로 첫 시나리오를 만드는 방법, 그리고 플래키(flaky)한 테스트를 줄이는 운영 원칙을 정리하겠습니다.
 
-
 ![Testing 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/04/04-01-diagram.ko.png)
 *Testing 101 4장 흐름 개요*
 > E2E 테스트는 현실적인 지만 느린 신호입니다. 따라서 시간 효율을 위해 주요 사용자 여정만 선택적으로 검증합니다.
@@ -261,84 +260,6 @@ E2E 테스트는 작성보다 유지가 더 어렵습니다. 그래서 처음부
 또 하나는 `time.sleep`으로 문제를 덮는 방식입니다. 잠깐은 통과할 수 있어도, 네트워크 상태나 렌더링 타이밍이 흔들리면 금방 다시 깨집니다. 기다림은 시간으로 처리하는 것이 아니라 조건으로 처리해야 합니다.
 
 실제 결제나 실제 운영 계정을 E2E에서 호출하는 문제도 자주 생깁니다. 비용과 위험이 너무 큽니다. E2E는 스테이징이나 샌드박스 환경에서 돌리는 것이 기본입니다.
-
-## 현업 확장 노트: 계층별 검증을 연결하는 방법
-
-이 장의 핵심 개념을 팀 운영에 연결하려면, 테스트를 단독 문서가 아니라 저장소 규약으로 관리해야 합니다. 가장 많이 쓰는 방식은 테스트 디렉터리를 계층으로 분리하고, 각 계층의 실행 시점과 실패 기준을 명시하는 것입니다.
-
-```text
-tests/
-├─ unit/
-├─ integration/
-├─ e2e/
-└─ contracts/
-```
-
-이 구조를 도입하면 PR 단계에서는 unit과 일부 integration만 빠르게 실행하고, 병합 전이나 야간 빌드에서는 더 넓은 범위를 실행하는 운영이 가능합니다. "모든 테스트를 매번 전부"보다 "위험에 맞게 계층별로"가 훨씬 현실적입니다.
-
-```yaml
-name: test-pipeline
-on:
-  pull_request:
-  schedule:
-    - cron: '0 17 * * *'
-
-jobs:
-  fast-feedback:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - run: pip install -r requirements-dev.txt
-      - run: pytest tests/unit tests/integration -q --maxfail=1
-
-  nightly-full:
-    if: github.event_name == 'schedule'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - run: pip install -r requirements-dev.txt
-      - run: pytest -q
-```
-
-또한 `unittest.mock`과 fixture를 함께 쓰면 테스트 의도를 더 분명히 드러낼 수 있습니다. fixture는 "무엇을 준비했는가"를, mock 검증은 "어떤 상호작용이 일어났는가"를 표현합니다.
-
-```python
-import pytest
-from unittest.mock import Mock
-
-@pytest.fixture
-def notifier_mock():
-    return Mock()
-
-def test_notify_on_success(notifier_mock):
-    service = JobService(notifier=notifier_mock)
-    service.run(job_id='job-1')
-    notifier_mock.send.assert_called_once()
-```
-
-마지막으로 커버리지는 목표치 자체보다 누락 영역의 성격을 함께 봐야 합니다. 예를 들어 유틸리티 파일 60%보다 결제 도메인 82%가 더 위험할 수 있습니다. 따라서 커버리지 리포트를 읽을 때는 반드시 "이 파일이 실패하면 비즈니스 영향이 큰가"를 함께 판단해야 합니다.
-
-```bash
-pytest --cov=src --cov-report=term-missing
-```
-
-```text
-Name                        Stmts   Miss  Cover
------------------------------------------------
-src/domain/payment.py          96     14    85%
-src/domain/refund.py           64      4    94%
-src/utils/text.py              21      5    76%
------------------------------------------------
-TOTAL                          181    23    87%
-```
-
-이런 리포트에서는 `payment.py`의 누락 분기를 먼저 메우는 것이 합리적입니다. 테스트는 숫자를 맞추는 운동이 아니라, 고장 났을 때 손실이 큰 경로를 먼저 보호하는 엔지니어링 작업이기 때문입니다.
 
 ## 직접 검증해 볼 것
 

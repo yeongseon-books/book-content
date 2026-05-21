@@ -101,14 +101,14 @@ Observe → Think → Act → Check 루프를 머리에 넣어 두면 ReAct, wor
 
 ```python
 response = llm.chat("What's the weather in Tokyo?")
-# → "I'm sorry, I don't have access to real-time information."
+# → "죄송하지만 실시간 정보에는 접근할 수 없습니다."
 ```
 
 ```python
 goal = "Tell me whether I need an umbrella in Tokyo today"
 agent = Agent(tools=[get_weather], llm=llm)
 result = agent.run(goal)
-# → "Yes, rain is forecast in Tokyo today (18°C, rain)"
+# → "네, 오늘 도쿄에는 비 예보가 있습니다 (18°C, 비)"
 ```
 
 차이를 만드는 핵심은 `tools=[get_weather]`입니다. 도구가 등록되는 순간 모델은 단순 답변 엔진이 아니라 외부 시스템을 경유할 수 있는 제어기 역할을 맡게 됩니다. 그래서 agent 설계에서는 model choice 못지않게 tool contract가 중요합니다. 어떤 도구가 있고, 어떤 입력을 받고, 어떤 실패를 반환하는지가 agent 품질을 좌우합니다.
@@ -117,7 +117,7 @@ result = agent.run(goal)
 
 ```python
 def get_weather(city: str) -> dict:
-    # In production this calls a real API. Mock here.
+    # 운영 환경에서는 실제 API를 호출합니다. 여기서는 목(mock)을 사용합니다.
     fake = {"Tokyo": {"temp": 18, "condition": "rain"},
             "Seoul": {"temp": 22, "condition": "clear"}}
     return fake.get(city, {"error": "unknown city"})
@@ -129,7 +129,7 @@ goal = "Tell me whether I need an umbrella in Tokyo today"
 # observe
 context = {"goal": goal, "history": []}
 
-# think (you decide)
+# think (직접 결정)
 next_action = ("get_weather", {"city": "Tokyo"})
 
 # act

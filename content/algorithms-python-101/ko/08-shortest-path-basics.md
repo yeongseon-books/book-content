@@ -28,7 +28,6 @@ last_reviewed: '2026-05-12'
 
 간선 가중치가 중요해지는 순간 BFS만으로는 부족합니다. 다음에 볼 후보 경로를 우선순위로 관리해야 하고, 그 지점에서 다익스트라 알고리즘이 힘을 발휘합니다.
 
-
 ![Algorithms with Python 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/08/08-01-concept-overview.ko.png)
 *Algorithms with Python 101 8장 흐름 개요*
 
@@ -72,12 +71,11 @@ A→E shortest path: A→B→E (cost 5)
 | Relaxation | 더 짧은 경로를 찾았을 때 거리 추정치를 갱신하는 과정입니다 |
 | Negative weight | 다익스트라가 올바르게 처리하지 못하는 음수 비용 간선입니다 |
 
-## Before / After
-
+## 적용 전후 비교
 가중치 그래프에서 최단 경로를 찾는 두 가지 접근입니다.
 
 ```python
-# before: BFS — ignores weights, gives wrong answer
+# before: BFS — 가중치를 무시해 잘못된 답을 냄
 def shortest(graph, start, end):
     from collections import deque
     queue = deque([(start, [start])])
@@ -94,7 +92,7 @@ def shortest(graph, start, end):
 ```
 
 ```python
-# after: Dijkstra — weight-aware shortest path
+# after: Dijkstra — 가중치를 고려한 최단 경로
 import heapq
 
 def shortest(graph, start, end):
@@ -134,8 +132,7 @@ for node, neighbors in graph.items():
 
 가중치 그래프는 이웃 노드뿐 아니라 간선 비용까지 함께 저장해야 합니다. 그래서 인접 리스트의 값이 `(neighbor, weight)` 튜플 목록이 됩니다.
 
-### Step 2: Dijkstra's Algorithm
-
+### 단계 2: Dijkstra 알고리즘
 ```python
 import heapq
 
@@ -171,8 +168,7 @@ for node, d in sorted(distances.items()):
 
 다익스트라는 현재까지 가장 짧다고 알려진 후보를 먼저 처리합니다. 그래서 우선순위 큐가 핵심이며, 이미 더 짧은 값이 기록된 노드는 건너뛰는 로직이 중요합니다.
 
-### Step 3: Path Reconstruction
-
+### 단계 3: 경로 복원
 ```python
 import heapq
 
@@ -213,8 +209,7 @@ for node in sorted(paths):
 
 거리만 구하는 것과 실제 경로를 복원하는 것은 다릅니다. `prev` 딕셔너리로 이전 노드를 기록해 두면 마지막에 경로를 되짚어 복원할 수 있습니다.
 
-### Step 4: Grid Shortest Path
-
+### 단계 4: 그리드 최단 경로
 ```python
 import heapq
 
@@ -251,8 +246,7 @@ print(grid_shortest_path(grid))  # 7 (1→1→1→1→2→1)
 
 격자 문제도 노드와 간선으로 해석하면 다익스트라의 전형적인 응용이 됩니다. 코딩 테스트에서 특히 자주 나오는 형태입니다.
 
-### Step 5: Algorithm Comparison
-
+### 단계 5: 알고리즘 비교
 ```python
 comparison = [
     ("Unweighted graph", "BFS — O(V+E)"),
@@ -331,7 +325,6 @@ for condition, algorithm in comparison:
 ```python
 import heapq
 
-
 def dijkstra_core(graph: dict[int, list[tuple[int, int]]], start: int):
     dist = {start: 0}
     prev = {start: None}
@@ -350,7 +343,6 @@ def dijkstra_core(graph: dict[int, list[tuple[int, int]]], start: int):
                 heapq.heappush(pq, (nd, nxt))
 
     return dist, prev
-
 
 def restore_path(prev: dict[int, int | None], end: int):
     if end not in prev:
@@ -412,7 +404,6 @@ pop  (5,E) ...
 ```python
 import time
 
-
 def benchmark(func, *args, repeat: int = 5) -> float:
     best = float("inf")
     for _ in range(repeat):
@@ -455,123 +446,6 @@ E. 해답 없음 케이스: 종료 조건 검증
 - "필요하면 정답 유지 조건을 짧게 증명하겠습니다."
 
 이 스크립트를 반복하면 설명의 밀도가 올라가고, 구현 중 길을 잃는 빈도가 줄어듭니다.
-
-## 케이스 스터디 확장: 입력 규모가 커질 때의 판단
-
-### 시나리오 1: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
-
-### 시나리오 2: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
-
-### 시나리오 3: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
-
-### 시나리오 4: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
-
-### 시나리오 5: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
 
 ## 처음 질문으로 돌아가기
 

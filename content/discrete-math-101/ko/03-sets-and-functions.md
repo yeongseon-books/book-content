@@ -25,7 +25,6 @@ last_reviewed: '2026-05-12'
 
 이 글은 Discrete Math 101 시리즈의 3번째 글입니다.
 
-
 ![Discrete Math 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/03/03-01-big-picture.ko.png)
 *Discrete Math 101 3장 흐름 개요*
 
@@ -82,7 +81,7 @@ for item in items:
 **After — using sets:**
 
 ```python
-# Leverage the set's intrinsic property
+# set의 고유 성질 활용
 result = list(set(items))
 ```
 
@@ -91,13 +90,13 @@ result = list(set(items))
 ### 1단계: 집합 표기
 
 ```python
-# Roster notation: list elements
+# 원소 나열법: 원소를 직접 나열
 A = {1, 2, 3, 4, 5}
 
-# Set-builder notation: state a condition
+# 조건 제시법: 조건으로 집합 정의
 B = {x for x in range(1, 11) if x % 2 == 0}
 
-# Power set: the set of all subsets
+# 멱집합: 모든 부분집합의 집합
 from itertools import chain, combinations
 
 def power_set(s: set) -> list[set]:
@@ -146,7 +145,7 @@ cartesian = set(product(A, B))
 print(f"A × B = {cartesian}")
 print(f"|A × B| = |A| × |B| = {len(cartesian)}")
 
-# A database row is an element of a Cartesian product
+# 데이터베이스 행은 Cartesian product의 한 원소
 users = {"alice", "bob"}
 roles = {"admin", "user"}
 permissions = set(product(users, roles))
@@ -258,98 +257,6 @@ print(f"Inverse: {inv}")
 집합은 데이터를 담는 그릇이고, 함수는 집합 사이의 명확한 대응입니다. 멱집합, 곱집합, 합성, 역함수까지 이해하면 자료구조와 데이터베이스를 훨씬 더 본질적으로 읽을 수 있습니다.
 
 다음 글에서는 집합 위에 정의되는 가장 중요한 구조인 관계와 동치관계를 살펴보겠습니다.
-
-## 실전 보강: 증명, 집합 연산, 그래프 알고리즘을 연결해서 보기
-
-이산수학은 정의를 외우는 과목이 아니라, 명제를 세우고 검증하는 절차를 훈련하는 과목입니다. 아래 내용은 증명 예시, 집합 연산표, 그래프 알고리즘을 하나의 흐름으로 연결합니다.
-
-### 1) 짧은 직접 증명 예시
-
-명제: 임의의 정수 `n`에 대해 `n`이 짝수이면 `n^2`도 짝수입니다.
-
-증명: `n`이 짝수이므로 어떤 정수 `k`가 존재하여 `n = 2k`입니다. 그러면
-`n^2 = (2k)^2 = 4k^2 = 2(2k^2)` 이고, `2k^2`는 정수이므로 `n^2`는 짝수입니다.
-따라서 명제가 성립합니다.
-
-핵심은 결론을 먼저 믿는 것이 아니라, 정의(짝수의 정의)를 대입해 식을 변형하는 것입니다.
-
-### 2) 집합 연산표로 규칙 확인
-
-전체집합 `U = {1,2,3,4,5,6}`, `A = {1,2,3,4}`, `B = {3,4,5}`일 때:
-
-| 연산 | 결과 |
-| --- | --- |
-| `A ∪ B` | `{1,2,3,4,5}` |
-| `A ∩ B` | `{3,4}` |
-| `A \ B` | `{1,2}` |
-| `B \ A` | `{5}` |
-| `A^c` (in U) | `{5,6}` |
-
-이 표는 드모르간 법칙 검증에도 바로 사용됩니다.
-`(A ∪ B)^c = A^c ∩ B^c`를 실제 원소로 계산해 양변이 같음을 확인할 수 있습니다.
-
-### 3) 귀납법 예시
-
-명제: `1 + 2 + ... + n = n(n+1)/2`.
-
-- 기저 단계: `n=1`에서 좌변 `1`, 우변 `1(2)/2 = 1`로 성립.
-- 귀납 가정: `n=k`에서 성립한다고 가정.
-- 귀납 단계:
-  `1+...+k+(k+1) = k(k+1)/2 + (k+1)`
-  `= (k+1)(k+2)/2`.
-
-따라서 모든 자연수 `n`에 대해 성립합니다.
-
-귀납법의 핵심은 “k에서 참이면 k+1도 참”이라는 연결 고리를 명시하는 것입니다.
-
-### 4) 그래프 알고리즘: BFS 거리 계산
-
-```python
-from collections import deque
-
-def bfs_distance(graph: dict[int, list[int]], start: int) -> dict[int, int]:
-    dist = {start: 0}
-    q = deque([start])
-    while q:
-        v = q.popleft()
-        for nxt in graph.get(v, []):
-            if nxt not in dist:
-                dist[nxt] = dist[v] + 1
-                q.append(nxt)
-    return dist
-
-G = {
-    1: [2, 3],
-    2: [4],
-    3: [4, 5],
-    4: [6],
-    5: [],
-    6: [],
-}
-print(bfs_distance(G, 1))
-```
-
-BFS는 간선 가중치가 동일할 때 최단 거리 계층을 계산합니다. 증명 관점에서는 “큐에서 먼저 나온 정점의 거리는 이미 최단”이라는 불변식을 유지하는 것이 핵심입니다.
-
-### 5) DFS와 BFS 선택 기준
-
-| 기준 | BFS | DFS |
-| --- | --- | --- |
-| 주 용도 | 최단 거리(무가중치) | 경로 존재성, 사이클 탐지 |
-| 자료구조 | Queue | Stack(또는 재귀) |
-| 메모리 특성 | 폭이 넓으면 증가 | 깊이가 깊으면 증가 |
-| 직관 | 레벨 단위 탐색 | 한 경로 끝까지 탐색 |
-
-문제의 요구가 “최소 단계”인지 “탐색 가능성”인지 먼저 구분하면 알고리즘 선택이 쉬워집니다.
-
-### 6) 이산수학에서 알고리즘으로 넘어갈 때 체크 포인트
-
-- 명제를 자연어로 쓴 뒤 기호화할 수 있는가
-- 필요한 정의(짝수, 함수, 관계, 연결성)를 정확히 호출했는가
-- 반례 하나로 거짓을 보일 수 있는 문제인지 확인했는가
-- 증명 불변식을 코드 루프 불변식으로 옮길 수 있는가
-
-이산수학의 강점은 계산 자체보다 **판단 근거를 명시하는 습관**입니다. 이 습관이 자료구조, 알고리즘, 시스템 설계까지 그대로 이어집니다.
 
 ## 실전 확장: 집합 연산과 함수 성질을 코드로 고정하기
 
@@ -508,7 +415,6 @@ def verify_identity(left: set[int], right: set[int]) -> bool:
 
 각 장의 주제가 달라 보여도 훈련 루프는 같습니다. 정의를 선언하고, 계산을 수행하고, 반례로 검증하고, 증명 또는 불변식으로 고정하면 됩니다. 이 루프를 반복하면 새로운 문제에서도 같은 품질로 사고할 수 있습니다.
 
-
 ## 추가 심화: 오류 사례와 교정 로그
 
 실무에서 이산수학 개념이 흔들리는 지점은 대부분 "정의 생략"에서 시작합니다. 아래는 자주 나오는 오류와 교정 방식입니다.
@@ -545,7 +451,6 @@ def verify_identity(left: set[int], right: set[int]) -> bool:
 4. 표/출력으로 재검증합니다.
 
 이 루프를 문서화하면 팀 단위 품질이 안정됩니다.
-
 
 ## 처음 질문으로 돌아가기
 

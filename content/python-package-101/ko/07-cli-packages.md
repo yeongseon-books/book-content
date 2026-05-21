@@ -74,8 +74,7 @@ greet = "mylib.cli:main"    →    Hello, Alice!
 | click | 데코레이터 기반 CLI 프레임워크 | `@click.command()` |
 | subcommand | 부모 명령 아래에 붙는 하위 명령 | `git commit`, `git push` |
 
-## Before / After
-
+## 적용 전후 비교
 **Before (스크립트 직접 실행)**
 
 ```bash
@@ -93,7 +92,7 @@ greet --name Alice
 
 ## 단계별 실습
 
-### Step 1. `argparse`로 기본 CLI 만들기
+### 단계 1. `argparse`로 기본 CLI 만들기
 
 ```python
 # src/mylib/cli.py
@@ -112,7 +111,7 @@ if __name__ == "__main__":
     main()
 ```
 
-### Step 2. `pyproject.toml`에 entry point 등록
+### 단계 2. `pyproject.toml`에 entry point 등록
 
 ```toml
 [project.scripts]
@@ -130,7 +129,7 @@ greet Alice --count 3
 # [3] Hello, Alice!
 ```
 
-### Step 3. `click`으로 리팩터링
+### 단계 3. `click`으로 리팩터링
 
 ```python
 # src/mylib/cli.py
@@ -165,7 +164,7 @@ greet --help
 #   --help           Show this message and exit.
 ```
 
-### Step 4. 서브커맨드 구조 만들기
+### 단계 4. 서브커맨드 구조 만들기
 
 ```python
 # src/mylib/cli.py
@@ -196,7 +195,7 @@ greet greet Alice        # Hello, Alice!
 greet check README.md    # Checking: README.md
 ```
 
-### Step 5. 에러 처리와 종료 코드
+### 단계 5. 에러 처리와 종료 코드
 
 ```python
 import sys
@@ -231,10 +230,10 @@ def main(path: str):
 ### 실수 2. `main()` 함수 시그니처에 인자를 직접 넣는다
 
 ```python
-# Wrong: entry point cannot pass arguments on its own
+# 잘못된 방법: 진입점이 스스로 인자를 전달할 수 없다
 def main(name: str): ...
 
-# Correct: let argparse/click handle arguments
+# 정답: argparse/click이 인수를 처리하도록 하세요.
 def main():
     parser = argparse.ArgumentParser()
     ...
@@ -310,7 +309,7 @@ which acme
 
 ```python
 # 생성되는 래퍼 스크립트 (자동 생성됨, 직접 수정 불필요)
-#!/path/to/.venv/bin/python
+# !/path/to/.venv/bin/python
 from acme_utils.cli import main
 import sys
 sys.exit(main())

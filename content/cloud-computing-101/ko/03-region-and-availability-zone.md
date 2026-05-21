@@ -59,8 +59,7 @@ last_reviewed: '2026-05-14'
 - **RTT**: 왕복 지연 시간으로, 물리 거리의 영향을 강하게 받습니다.
 - **Failover**: 워크로드를 다른 AZ나 리전으로 전환하는 과정입니다.
 
-## Before / After
-
+## 적용 전후 비교
 **Before**에서는 EC2와 RDS가 모두 같은 `az a`에 있습니다.
 
 **After**에서는 EC2를 `a/b/c`에 분산하고, RDS는 Multi-AZ 모드로 둡니다.
@@ -100,7 +99,7 @@ print(list_regions())
 
 ```python
 def estimate_rtt(km: float) -> float:
-    # fiber ~200,000 km/s, plus router overhead, round trip
+    # 광섬유 ~200,000km/s, 라우터 오버헤드, 왕복
     return (km / 200_000) * 2 * 1000 * 1.5  # ms
 ```
 

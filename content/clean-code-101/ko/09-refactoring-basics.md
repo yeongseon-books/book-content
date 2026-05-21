@@ -90,8 +90,7 @@ def order_total(o):
 
 ## 실전 적용: 안전한 리팩토링 다섯 단계
 
-### 단계 1 — Characterization tests as a safety net
-
+### 단계 1 — 특성 테스트를 안전망으로 활용
 ```python
 # 1_characterize.py
 def test_legacy_total():
@@ -101,8 +100,7 @@ def test_legacy_total():
 
 레거시 코드에서는 완전히 이해한 뒤 시작하려고 하면 너무 늦어집니다. 먼저 현재 동작을 고정하고, 그다음에 구조를 만지는 편이 훨씬 안전합니다.
 
-### 단계 2 — Extract Function
-
+### 단계 2 — 함수 추출
 ```python
 # 2_extract.py
 def subtotal(items): return sum(i.price * i.qty for i in items)
@@ -114,30 +112,28 @@ def subtotal(items): return sum(i.price * i.qty for i in items)
 
 ```python
 # 3_rename.py
-# Rename progressively so that names reveal intent.
+# 이름의 의도가 드러날 수 있도록 점진적으로 이름을 바꾸십시오.
 def items_subtotal(items): ...
 ```
 
 이름 변경은 리팩토링의 절반입니다. 구조를 바꿨는데 이름이 그대로면, 읽는 사람은 여전히 예전 정신 모델에 갇히게 됩니다.
 
-### 단계 4 — Inline and Move
-
+### 단계 4 — 인라인 후 이동
 ```python
 # 4_move.py
-# Move a misplaced function to the right module/class.
+# 위치가 잘못된 함수를 올바른 모듈/클래스로 이동합니다.
 class OrderPricing:
     def total(self, order): ...
 ```
 
 응집도는 올리고, 잘못 놓인 코드는 제자리로 옮겨야 합니다. 때로는 추출보다 이동이 더 큰 가독성 개선을 만듭니다.
 
-### 단계 5 — Keep two hats separate
-
+### 단계 5 — 두 역할 분리하기
 ```python
 # 5_two_hats.py
-# Never mix feature changes and refactoring in one PR.
-# PR-1: refactor (preserves behavior)
-# PR-2: add feature (new behavior)
+# 하나의 PR에 기능 변경과 리팩토링을 혼합하지 마십시오.
+# PR-1: 리팩터링(동작 유지)
+# PR-2: 기능 추가(새 동작)
 ```
 
 리팩토링 PR과 기능 PR을 분리해야 리뷰도 쉬워지고, 문제 발생 시 원인도 빨리 좁힐 수 있습니다.

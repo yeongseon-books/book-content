@@ -297,7 +297,7 @@ def momentum_step(w, g, v, lr=0.01, beta=0.9):
 ```python
 import numpy as np
 
-# saddle-like toy function
+# 안장점 형태의 toy function
 
 def saddle(w):
     x, y = w

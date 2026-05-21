@@ -152,7 +152,7 @@ registry.register(Tool("read_db", "Query DB", lambda q: ..., danger_level=0))
 registry.register(Tool("write_db", "Modify DB", lambda r: ..., danger_level=4))
 registry.register(Tool("send_email", "Send email", lambda m: ..., danger_level=3))
 
-# Task: produce an analytical report — read only
+# 작업: 분석 보고서 생성 — 읽기 전용
 exposed = registry.expose(allowed_names={"read_db"}, max_danger=2)
 assert all(t.name == "read_db" for t in exposed)
 ```
@@ -281,13 +281,13 @@ class ScopedDataAccess:
         return self._execute(scoped_sql)
 
     def _validate_tables(self, sql: str) -> None:
-        # Naive check — use a real SQL parser in production
+        # 단순 검사 — 운영 환경에서는 실제 SQL 파서를 사용하세요
         for table in ["users", "orders", "payments"]:
             if table in sql.lower() and table not in self.allowed_tables:
                 raise ScopeViolation(f"table not allowed: {table}")
 
     def _inject_filters(self, sql: str) -> str:
-        # Inject region filter into WHERE clause
+        # WHERE 절에 지역 필터를 주입합니다
         if "where" in sql.lower():
             return sql + f" AND region = '{self.region}'"
         return sql + f" WHERE region = '{self.region}'"
@@ -360,7 +360,7 @@ def enforce_tool_allowlist(tool_name: str, allowed: set[str]) -> Violation | Non
 
 마지막으로 제약 테스트는 실패 케이스 중심으로 유지해야 합니다. 정상 요청만 통과하는 테스트보다, 금지 도구 호출·범위 외 SQL·PII 포함 출력이 실제로 차단되는지를 확인하는 negative test가 운영 안전성을 더 직접적으로 보장합니다.
 
-### Common Mistakes
+### 흔한 실수
 
 "DB를 수정하지 마세요"라고 프롬프트에 적는 것으로는 충분하지 않습니다. LLM은 지시를 무시할 수 있습니다. 도구를 노출하지 않거나, 데이터 레이어에서 막아야 합니다.
 

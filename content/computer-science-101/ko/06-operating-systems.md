@@ -69,23 +69,22 @@ OS의 추상화를 모르면 디버깅은 마법이 됩니다.
 | System call | 사용자 프로그램이 커널 서비스에 요청을 보내는 인터페이스 |
 | Scheduler | 누가 CPU를 받을지 결정하는 OS 구성 요소 |
 
-## Before / After
-
+## 적용 전후 비교
 **Before — OS를 의식하지 않은 코드:**
 
 ```python
-# Fetch 100 URLs sequentially — most of the time is spent waiting
+# URL 100개를 순차 요청 — 대부분 대기 시간
 import urllib.request
 
 urls = [f"https://httpbin.org/delay/1?n={i}" for i in range(100)]
 results = [urllib.request.urlopen(u).read() for u in urls]
-# About 100 seconds — the CPU is idle, just waiting on I/O
+# 약 100초 — CPU는 유휴 상태로 I/O만 대기
 ```
 
 **After — OS의 비동기 I/O를 활용:**
 
 ```python
-# Same work, done concurrently — overlap the I/O wait
+# 같은 작업을 동시 처리 — I/O 대기를 겹쳐서 수행
 from concurrent.futures import ThreadPoolExecutor
 import urllib.request
 
@@ -94,7 +93,7 @@ def fetch(url: str) -> bytes:
 
 with ThreadPoolExecutor(max_workers=20) as pool:
     results = list(pool.map(fetch, urls))
-# About 5-10 seconds — other requests progress while one waits
+# 약 5-10초 — 하나가 대기하는 동안 다른 요청 진행
 ```
 
 ## 단계별로 따라하기
@@ -126,7 +125,7 @@ p.join()
 ### 2단계: GIL과 멀티스레딩의 한계
 
 ```python
-# CPU-bound work does not get faster with threads (CPython GIL)
+# CPU-bound 작업은 thread로 빨라지지 않음(CPython GIL)
 import time
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 
@@ -159,7 +158,7 @@ print(f"processes x4: {time.perf_counter() - start:.2f}s")  # about 4x faster
 ### 3단계: 시스템 콜 들여다보기
 
 ```python
-# Python's open() ultimately calls the OS open(2) system call
+# Python의 open()은 결국 OS의 open(2) system call 호출
 import os
 
 fd = os.open("/tmp/oscourse_demo.txt", os.O_CREAT | os.O_WRONLY, 0o644)
@@ -173,7 +172,7 @@ os.remove("/tmp/oscourse_demo.txt")
 ### 4단계: 가상 메모리 관찰하기
 
 ```python
-# Inspect process memory usage (Linux/macOS)
+# 프로세스 메모리 사용량 확인(Linux/macOS)
 import os
 import resource
 
@@ -186,8 +185,8 @@ print(f"page faults    : {usage.ru_minflt}")    # page-fault count
 ### 5단계: 동시성 vs 병렬성
 
 ```python
-# Concurrency = multiple tasks in progress (time-sliced)
-# Parallelism = multiple tasks running at the same instant (multi-core)
+# Concurrency = 여러 작업이 동시에 진행 중인 상태(time-sliced)
+# Parallelism = 여러 작업이 같은 순간에 실행되는 상태(multi-core)
 
 import asyncio
 import time

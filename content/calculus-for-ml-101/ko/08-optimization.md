@@ -191,7 +191,7 @@ v_t = eta_2 v_{t-1} + (1-eta_2) g_t^2
 
 optimizer가 방향을 정한다면 scheduler는 시간축 정책을 정합니다. 같은 Adam이라도 스케줄이 다르면 완전히 다른 학습 궤적이 나옵니다.
 
-### Step decay
+### 계단식 감소(Step decay)
 
 일정 epoch마다 학습률을 계단식으로 내리는 방식입니다.
 
@@ -210,7 +210,7 @@ def step_lr(step, base_lr=1e-3, drop_every=1000, gamma=0.5):
     return base_lr * (gamma ** (step // drop_every))
 ```
 
-### Cosine decay
+### 코사인 감소(Cosine decay)
 
 초기 학습률에서 0 또는 최소값으로 부드럽게 감쇠합니다.
 
@@ -229,7 +229,7 @@ def cosine_lr(step, total_steps, lr_max=1e-3, lr_min=1e-5):
 - 장점: 후반 미세 조정이 부드럽고 발산 위험이 낮습니다.
 - 단점: 총 step 수를 대략 정확히 알아야 합니다.
 
-### Warmup + main schedule
+### 워밍업 + 메인 스케줄
 
 대규모 배치나 Transformer 계열에서는 초반 gradient가 불안정해 곧바로 큰 학습률을 주면 손실이 튈 수 있습니다. warmup은 초반 `N` step 동안 학습률을 선형 상승시키고, 이후 본 스케줄(보통 cosine)로 넘어갑니다.
 

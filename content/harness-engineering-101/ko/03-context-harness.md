@@ -147,7 +147,7 @@ class HistoryManager:
             self.messages = self.messages[len(self.messages) // 2 :]
 
     def _summarize(self, messages: list[Message]) -> str:
-        # In practice, summarize with an LLM
+        # 실무에서는 LLM으로 요약합니다
         return f"[Summary: {len(messages)} turns]"
 
     def to_context(self) -> list[dict]:
@@ -349,7 +349,7 @@ def validate_slots(slots: list[Slot], response_buffer: int, hard_window: int) ->
 
 예를 들어 hit-rate는 높지만 overlap-rate가 같이 높다면 문서를 많이 가져오는 대신 중복 문서만 쌓고 있을 가능성이 큽니다. 이 경우 retrieval top_k를 늘리는 대신 reranker 임계값과 chunk granularity를 먼저 조정하는 편이 정확도와 비용 모두에 유리합니다.
 
-### Common Mistakes
+### 흔한 실수
 
 "window가 200k니까 다 넣자"는 잘못된 직관입니다. 모델은 모든 입력을 동등하게 처리하지 않습니다. 토큰 예산을 정하고 그 안에서 압축합니다.
 

@@ -28,7 +28,6 @@ last_reviewed: '2026-05-12'
 
 특히 Python은 꼬리 호출 최적화(TCO)를 지원하지 않습니다. 그래서 함수형 언어에서 자연스럽게 쓰는 재귀 패턴도 Python에서는 깊이에 따라 위험해질 수 있습니다. 이 차이를 이해해야 재귀를 예쁘기만 한 코드가 아니라 안전한 도구로 사용할 수 있습니다.
 
-
 ![Functional Programming 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/07/07-01-big-picture.ko.png)
 *Functional Programming 101 7장 흐름 개요*
 
@@ -69,12 +68,11 @@ factorial(4)
 | 스택 오버플로우(stack overflow) | 재귀 깊이가 한계를 넘어서 발생하는 오류입니다 |
 | 분할 정복(divide and conquer) | 문제를 더 작은 하위 문제로 나누어 푸는 전략입니다 |
 
-## Before / After
-
+## 적용 전후 비교
 반복문의 누적 합도 재귀로 표현할 수 있습니다. 다만 그 표현이 실제로 더 적절한지는 별도의 판단이 필요합니다.
 
 ```python
-# before: iterative sum
+# 이전: 반복문 기반 합계
 def sum_iterative(numbers: list[int]) -> int:
     total = 0
     for n in numbers:
@@ -85,7 +83,7 @@ print(sum_iterative([1, 2, 3, 4, 5]))  # 15
 ```
 
 ```python
-# after: recursive sum
+# 이후: 재귀 기반 합계
 def sum_recursive(numbers: list[int]) -> int:
     if not numbers:  # base case
         return 0
@@ -96,7 +94,7 @@ print(sum_recursive([1, 2, 3, 4, 5]))  # 15
 
 ## 단계별 실습
 
-### Step 1: 기본 재귀 — 팩토리얼
+### 단계 1: 기본 재귀 — 팩토리얼
 
 ```python
 def factorial(n: int) -> int:
@@ -108,7 +106,7 @@ def factorial(n: int) -> int:
 print(factorial(5))   # 120
 print(factorial(10))  # 3628800
 
-# visualize the call stack
+# call stack 시각화
 def factorial_verbose(n: int, depth: int = 0) -> int:
     indent = "  " * depth
     print(f"{indent}factorial({n})")
@@ -132,18 +130,18 @@ factorial_verbose(4)
 
 재귀를 이해하는 가장 좋은 방법은 호출 스택을 눈으로 따라가는 것입니다. base case가 왜 중요한지, 반환값이 어떻게 쌓여 올라오는지가 바로 보입니다.
 
-### Step 2: 피보나치와 메모이제이션
+### 단계 2: 피보나치와 메모이제이션
 
 ```python
 from functools import lru_cache
 
-# naive recursion: O(2^n) — very slow
+# 단순 재귀: O(2^n) — 매우 느림
 def fib_naive(n: int) -> int:
     if n <= 1:
         return n
     return fib_naive(n - 1) + fib_naive(n - 2)
 
-# memoization: O(n) — eliminates duplicate computation
+# memoization: O(n) — 중복 계산 제거
 @lru_cache(maxsize=None)
 def fib_memo(n: int) -> int:
     if n <= 1:
@@ -153,36 +151,36 @@ def fib_memo(n: int) -> int:
 print(fib_naive(10))  # 55 (slow)
 print(fib_memo(100))  # 354224848179261915075 (fast)
 
-# check cache statistics
+# cache 통계 확인
 print(fib_memo.cache_info())
 # CacheInfo(hits=98, misses=101, maxsize=None, currsize=101)
 ```
 
 재귀가 느린 것이 아니라, 같은 하위 문제를 중복 계산하는 재귀가 느린 것입니다. 이 차이를 이해하면 메모이제이션이 왜 강력한지 바로 연결됩니다.
 
-### Step 3: 꼬리 재귀와 Python의 한계
+### 단계 3: 꼬리 재귀와 Python의 한계
 
 ```python
 import sys
 
-# normal recursion — stack frames accumulate
+# 일반 재귀 — stack frame이 누적됨
 def factorial_normal(n: int) -> int:
     if n <= 1:
         return 1
     return n * factorial_normal(n - 1)  # multiplication is pending
 
-# tail recursion — result passed as argument
+# 꼬리 재귀 — 결과를 인자로 전달
 def factorial_tail(n: int, acc: int = 1) -> int:
     if n <= 1:
         return acc
     return factorial_tail(n - 1, n * acc)  # last operation is the recursive call
 
-# Python does NOT support tail call optimization (TCO)
+# Python은 tail call optimization(TCO)을 지원하지 않음
 print(sys.getrecursionlimit())  # default 1000
 print(factorial_tail(900))  # works but...
 # factorial_tail(1500)  # RecursionError!
 
-# solution: convert to iteration
+# 해결 방법: 반복문으로 변환
 def factorial_iterative(n: int) -> int:
     result = 1
     for i in range(2, n + 1):
@@ -194,12 +192,12 @@ print(factorial_iterative(10000))  # no problem
 
 많은 입문자가 여기서 한 번 헷갈립니다. 꼬리 재귀는 이론적으로 스택을 줄일 수 있는 형태이지만, Python 런타임이 그 최적화를 해 주지 않기 때문에 깊이가 깊어지면 결국 반복이 더 안전합니다.
 
-### Step 4: 트리 순회와 재귀의 궁합
+### 단계 4: 트리 순회와 재귀의 궁합
 
 ```python
 from typing import Any
 
-# traverse nested dicts (tree structure)
+# 중첩 dict(tree 구조) 순회
 def flatten_dict(
     d: dict,
     parent_key: str = "",
@@ -239,10 +237,10 @@ for k, v in flat.items():
 
 중첩 딕셔너리, 트리, AST처럼 구조 자체가 재귀적일 때는 재귀가 문제 도메인을 가장 직접적으로 반영합니다.
 
-### Step 5: 재귀를 반복으로 바꾸기
+### 단계 5: 재귀를 반복으로 바꾸기
 
 ```python
-# recursive version: total size of a simulated file tree
+# 재귀 버전: 모의 파일 트리의 전체 크기
 def total_size_recursive(tree: dict) -> int:
     """Total size of a file tree represented as nested dicts."""
     total = 0
@@ -253,7 +251,7 @@ def total_size_recursive(tree: dict) -> int:
             total += value
     return total
 
-# iterative version: explicit stack management
+# 반복 버전: 명시적 stack 관리
 def total_size_iterative(tree: dict) -> int:
     total = 0
     stack = [tree]
@@ -335,219 +333,6 @@ print(total_size_iterative(file_tree))  # 3300
 
 재귀는 문제를 더 작은 같은 문제로 분해해 푸는 방식입니다. 다만 Python은 꼬리 호출 최적화를 지원하지 않으므로 깊이 제한을 항상 염두에 두어야 합니다. 다음 글에서는 값이 정말 필요해질 때까지 계산을 미루는 **지연 평가와 제너레이터**를 다룹니다.
 
-
-## 심화 앵커: 실무에서 바로 쓰는 함수형 패턴 모음
-
-이 절은 앞선 개념을 한 번에 묶어 실무 코드로 옮기는 기준을 제시합니다. 공통 원칙은 단순합니다. 입력을 정규화하고, 순수 함수로 계산하고, 경계에서만 부수효과를 수행합니다. 이 구조가 잡히면 테스트 코드도 자연스럽게 단순해집니다.
-
-### `functools`와 `itertools`를 함께 쓰는 파이프라인
-
-```python
-from functools import reduce
-from itertools import islice, groupby
-from operator import itemgetter
-
-raw_orders = [
-    {"order_id": "O-1", "store": "seoul", "amount": 12000, "status": "paid"},
-    {"order_id": "O-2", "store": "seoul", "amount": 9000, "status": "cancelled"},
-    {"order_id": "O-3", "store": "busan", "amount": 15000, "status": "paid"},
-    {"order_id": "O-4", "store": "busan", "amount": 7000, "status": "paid"},
-]
-
-def normalize(order: dict) -> dict:
-    return {
-        **order,
-        "store": order["store"].strip().lower(),
-        "status": order["status"].strip().lower(),
-    }
-
-def is_paid(order: dict) -> bool:
-    return order["status"] == "paid"
-
-def with_fee(order: dict) -> dict:
-    fee = int(order["amount"] * 0.03)
-    return {**order, "fee": fee, "net": order["amount"] - fee}
-
-normalized = map(normalize, raw_orders)
-paid_only = filter(is_paid, normalized)
-settled = list(map(with_fee, paid_only))
-
-# groupby는 key 정렬이 선행되어야 동작이 안정적입니다.
-settled_sorted = sorted(settled, key=itemgetter("store"))
-report = {
-    store: reduce(
-        lambda acc, o: {
-            "orders": acc["orders"] + 1,
-            "gross": acc["gross"] + o["amount"],
-            "fee": acc["fee"] + o["fee"],
-            "net": acc["net"] + o["net"],
-        },
-        orders,
-        {"orders": 0, "gross": 0, "fee": 0, "net": 0},
-    )
-    for store, orders in groupby(settled_sorted, key=itemgetter("store"))
-}
-
-print(report)
-# {
-#   'busan': {'orders': 2, 'gross': 22000, 'fee': 660, 'net': 21340},
-#   'seoul': {'orders': 1, 'gross': 12000, 'fee': 360, 'net': 11640}
-# }
-```
-
-### 순수 함수 리팩터링 전후 비교
-
-```python
-# before: 계산과 로그 출력이 섞인 형태
-
-def score_user_before(user: dict) -> int:
-    base = user["purchases"] * 10
-    if user["vip"]:
-        base += 30
-    print(f"[DEBUG] scored {user['id']} => {base}")
-    return base
-
-# after: 계산은 순수 함수, 출력은 외부 경계
-
-def score_user(user: dict) -> int:
-    base = user["purchases"] * 10
-    bonus = 30 if user["vip"] else 0
-    return base + bonus
-
-def score_and_log(user: dict) -> int:
-    score = score_user(user)
-    print(f"[DEBUG] scored {user['id']} => {score}")
-    return score
-```
-
-핵심은 `before`가 틀렸다는 뜻이 아니라, 테스트 비용이 높아진다는 점입니다. `score_user()`는 입력과 출력만 검증하면 되기 때문에 fixture나 mock 없이 단위 테스트를 만들 수 있습니다.
-
-### 불변 데이터 구조 선택 기준
-
-| 상황 | 권장 타입 | 이유 |
-|---|---|---|
-| 위치 좌표, 버전 쌍 | `tuple[int, int]` | 해시 가능, 키로 사용 가능 |
-| 권한 집합 | `frozenset[str]` | 중복 제거 + 불변 |
-| 설정 객체 | `@dataclass(frozen=True)` | 타입 명시 + 불변 업데이트 용이 |
-| 레코드 스냅샷 | `NamedTuple` | 가볍고 필드 접근이 명확 |
-
-```python
-from dataclasses import dataclass, replace
-
-@dataclass(frozen=True)
-class AppConfig:
-    host: str
-    port: int
-    debug: bool
-
-base = AppConfig(host="localhost", port=8000, debug=False)
-debug_cfg = replace(base, debug=True)
-
-print(base)      # AppConfig(host='localhost', port=8000, debug=False)
-print(debug_cfg) # AppConfig(host='localhost', port=8000, debug=True)
-```
-
-### 재귀 호출 스택을 시각화하며 검증하기
-
-```python
-def sum_nested(values, depth: int = 0) -> int:
-    indent = "  " * depth
-    print(f"{indent}sum_nested({values})")
-
-    if isinstance(values, int):
-        print(f"{indent}-> int {values}")
-        return values
-
-    total = 0
-    for item in values:
-        total += sum_nested(item, depth + 1)
-
-    print(f"{indent}-> total {total}")
-    return total
-
-nested = [1, [2, [3, 4], 5], [6, 7]]
-print(sum_nested(nested))
-```
-
-재귀가 안전한지 확인할 때는 두 가지를 함께 봅니다. 종료 조건이 모든 경로에서 도달 가능한지, 그리고 입력 크기가 커졌을 때 반복으로 전환해야 하는지입니다.
-
-### Python에서 구현하는 monad-like 패턴
-
-엄밀한 수학적 모나드 구현이 아니라, 에러 전파를 일관되게 다루는 실전 패턴입니다.
-
-```python
-from dataclasses import dataclass
-from typing import Generic, TypeVar, Callable
-
-T = TypeVar("T")
-E = TypeVar("E")
-U = TypeVar("U")
-
-@dataclass(frozen=True)
-class Ok(Generic[T]):
-    value: T
-
-@dataclass(frozen=True)
-class Err(Generic[E]):
-    error: E
-
-Result = Ok[T] | Err[E]
-
-def bind(result: Result[T, E], fn: Callable[[T], Result[U, E]]) -> Result[U, E]:
-    if isinstance(result, Err):
-        return result
-    return fn(result.value)
-
-def parse_int(text: str) -> Result[int, str]:
-    return Ok(int(text)) if text.isdigit() else Err("not a digit")
-
-def positive(n: int) -> Result[int, str]:
-    return Ok(n) if n > 0 else Err("must be positive")
-
-def reciprocal(n: int) -> Result[float, str]:
-    return Err("division by zero") if n == 0 else Ok(1 / n)
-
-r1 = bind(bind(parse_int("8"), positive), reciprocal)
-r2 = bind(bind(parse_int("x"), positive), reciprocal)
-
-print(r1)  # Ok(value=0.125)
-print(r2)  # Err(error='not a digit')
-```
-
-이 패턴의 장점은 `try/except`를 중첩하지 않고도 실패 경로를 동일한 타입으로 유지할 수 있다는 점입니다.
-
-### 속성 기반 테스트 예시 (`hypothesis`)
-
-```python
-# pip install hypothesis
-from hypothesis import given, strategies as st
-
-def normalize_email(email: str) -> str:
-    return email.strip().lower()
-
-@given(st.text())
-def test_normalize_email_idempotent(raw: str) -> None:
-    once = normalize_email(raw)
-    twice = normalize_email(once)
-    assert once == twice
-
-@given(st.lists(st.integers(min_value=-10_000, max_value=10_000), max_size=100))
-def test_sum_matches_builtin(xs: list[int]) -> None:
-    assert sum(xs) == __builtins__["sum"](xs)
-```
-
-예제 기반 테스트는 특정 입력에 집중하고, 속성 기반 테스트는 함수의 보편적 성질을 검증합니다. 둘을 함께 쓰면 경계 조건 누락을 크게 줄일 수 있습니다.
-
-### 운영 경계에서의 구성 원칙
-
-- 계산 함수는 가능한 한 `print`, 파일 IO, 네트워크 호출을 포함하지 않습니다.
-- API 핸들러나 CLI 엔트리포인트에서만 부수효과를 수행합니다.
-- 파이프라인 단계마다 입력/출력 타입을 문서화해 연결 오류를 줄입니다.
-- 불변 객체를 기본값으로 두고, 변경이 필요할 때만 새 객체를 만듭니다.
-
-이 원칙을 지키면 코드 리뷰에서 "무엇이 바뀌었는가"가 아니라 "어디에서 부수효과가 발생하는가"를 빠르게 확인할 수 있습니다.
-
-
 ## 검증 시나리오: 경계 조건을 먼저 잠그기
 
 실무에서 함수형 스타일이 유지되는 팀은 구현보다 먼저 검증 포인트를 고정합니다. 입력 경계, 빈 컬렉션, 정렬 안정성, 타입 변환 실패를 먼저 적어 두면 리팩터링 과정에서도 동작이 흔들리지 않습니다.
@@ -595,7 +380,6 @@ print("Pass")
 
 이런 검증 코드는 예제 코드가 아니라 운영 안전장치입니다. 새 규칙을 추가할 때도 기존 성질이 유지되는지 빠르게 확인할 수 있습니다.
 
-
 ## 리뷰 포인트: 코드 리뷰에서 바로 확인할 항목
 
 함수형 스타일을 적용한 코드 리뷰에서는 다음 네 가지를 빠르게 확인합니다. 첫째, 계산 함수가 외부 상태를 직접 읽거나 쓰지 않는지 확인합니다. 둘째, mutable 인자를 제자리에서 수정하지 않는지 확인합니다. 셋째, 파이프라인 단계의 입력과 출력 타입이 자연스럽게 연결되는지 확인합니다. 넷째, 실패 경로가 값으로 표현되는지 확인합니다.
@@ -614,7 +398,6 @@ print("Pass")
 ```
 
 이 항목을 PR 템플릿에 고정해 두면 스타일 논쟁보다 설계 품질을 빠르게 맞출 수 있습니다.
-
 
 ## 처음 질문으로 돌아가기
 

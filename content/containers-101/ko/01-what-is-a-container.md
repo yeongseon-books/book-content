@@ -101,8 +101,7 @@ CI 서버:      docker run → 동일 이미지 실행
 
 ## 실습: 첫 번째 컨테이너 실행하기
 
-### 단계 1 — Version check
-
+### 단계 1 — 버전 확인
 ```python
 import subprocess
 
@@ -113,8 +112,7 @@ def docker_version():
 
 먼저 Docker CLI가 정상 설치되었는지 확인합니다. 입문 단계에서는 이 단계를 가볍게 넘기기 쉽지만, 실무에서는 도구 버전부터 확인하는 습관이 중요합니다.
 
-### 단계 2 — Pull image
-
+### 단계 2 — 이미지 pull
 ```python
 def pull(image):
     subprocess.run(["docker", "pull", image], check=True)
@@ -122,8 +120,7 @@ def pull(image):
 
 이미지는 실행 전에 먼저 받아 와야 합니다. 여기서 받아 오는 `nginx:latest` 같은 대상이 컨테이너 자체가 아니라 “실행 가능한 정적 템플릿”이라는 점을 분명히 기억해야 합니다.
 
-### 단계 3 — Run container
-
+### 단계 3 — 컨테이너 실행
 ```python
 def run_nginx():
     subprocess.run(
@@ -144,8 +141,7 @@ def ps():
 
 실행 중인 컨테이너를 확인합니다. 입문자에게 이 출력은 단순한 목록처럼 보이지만, 운영에서는 포트 매핑, 이름, 상태를 읽는 가장 기본적인 관찰 지점입니다.
 
-### 단계 5 — Clean up
-
+### 단계 5 — 정리하기
 ```python
 def cleanup(name):
     subprocess.run(["docker", "rm", "-f", name], check=True)

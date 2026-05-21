@@ -65,19 +65,18 @@ last_reviewed: '2026-05-12'
 | enqueue / dequeue | 큐에 데이터를 넣고 꺼내는 연산입니다 |
 | deque | 양쪽 끝 삽입·삭제를 O(1)에 제공하는 구조입니다 |
 
-## Before / After
-
+## 적용 전후 비교
 큐처럼 보이는 코드를 list로 구현할 때 생기는 문제를 먼저 보겠습니다.
 
 ```python
-# before: queue with list — pop(0) is O(n)
+# before: list로 queue 구현 — pop(0)은 O(n)
 queue = [1, 2, 3]
 queue.append(4)       # enqueue
 first = queue.pop(0)  # dequeue — O(n), shifts all elements
 ```
 
 ```python
-# after: queue with deque — popleft() is O(1)
+# after: deque로 queue 구현 — popleft()는 O(1)
 from collections import deque
 queue = deque([1, 2, 3])
 queue.append(4)           # enqueue — O(1)
@@ -159,8 +158,7 @@ print(queue.dequeue())  # "task1"
 print(queue.peek())     # "task2"
 ```
 
-### Step 3: Balanced parentheses check — stack in action
-
+### 단계 3: 괄호 짝 검사 — 스택 활용
 ```python
 def is_balanced(text: str) -> bool:
     pairs = {"(": ")", "[": "]", "{": "}"}
@@ -206,22 +204,21 @@ graph = {
 print(bfs(graph, "A"))  # ['A', 'B', 'C', 'D', 'E']
 ```
 
-### Step 5: Performance comparison — list.pop(0) vs deque.popleft()
-
+### 단계 5: 성능 비교 — list.pop(0) vs deque.popleft()
 ```python
 import time
 from collections import deque
 
 n = 100_000
 
-# list.pop(0) — O(n) per operation
+# list.pop(0) — 연산당 O(n)
 data_list = list(range(n))
 start = time.perf_counter()
 while data_list:
     data_list.pop(0)
 list_time = time.perf_counter() - start
 
-# deque.popleft() — O(1) per operation
+# deque.popleft() — 연산당 O(1)
 data_deque = deque(range(n))
 start = time.perf_counter()
 while data_deque:

@@ -107,7 +107,7 @@ def find_by_name(name: str) -> Optional[str]:
     return users.get(name)
 
 email = find_by_name("Alice")
-# email: Optional[str] — 사용 전에 확인 필요
+# email: Optional[str] — 사용하기 전에 확인 필요
 if email is not None:
     print(email.upper())  # 안전함
 ```
@@ -117,7 +117,7 @@ if email is not None:
 ### 2단계: Python 3.10+ 파이프 문법 쓰기
 
 ```python
-# Python 3.10+: Union/Optional 대신 | 문법을 사용합니다.
+# Python 3.10+: Union/Optional 대신 | 사용합니다.
 def find_by_name(name: str) -> str | None:
     users = {"Alice": "alice@example.com"}
     return users.get(name)
@@ -435,7 +435,7 @@ Found 3 errors in 1 file (checked 1 source file)
 
 위 메시지는 각각 키 타입 불일치, Union 좁히기 누락, Optional 처리 누락을 의미합니다. 즉, 정적 분석기가 실제 운영 버그 후보를 실행 전에 보여 준다는 뜻입니다.
 
-## before/after 요약
+## 적용 전후 요약
 
 | 구분 | before (느슨한 타입) | after (구체 타입) |
 | --- | --- | --- |

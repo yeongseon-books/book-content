@@ -88,8 +88,7 @@ last_reviewed: '2026-05-15'
 | Display filter | Wireshark에서 캡처된 패킷 중 보고 싶은 것만 필터링하는 표현식 |
 | Retransmission | 응답이 없어 같은 패킷을 다시 보내는 것 — 경로 손실의 증거 |
 
-## Before/After
-
+## 적용 전과 후
 **Before — 추측 기반 디버깅**
 
 ```text

@@ -138,9 +138,9 @@ print(secrets.token_urlsafe(32))
 
 ```python
 # 5_bad.py
-# import md5      # collisions found -> integrity not assured
-# AES-ECB         # identical plaintext blocks -> identical ciphertext
-# reused nonce    # GCM safety destroyed
+# import md5 # 충돌 발견 -> 무결성이 보장되지 않음
+# AES-ECB # 동일한 일반 텍스트 블록 -> 동일한 암호문
+# nonce 재사용 # GCM 안전 파괴
 ```
 
 무엇을 쓰면 안 되는지 아는 것도 절반의 방어입니다. 실제 장애와 취약점은 금지 패턴을 모른 채 반복해서 들어오는 경우가 많습니다.

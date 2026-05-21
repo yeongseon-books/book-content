@@ -106,8 +106,7 @@ docker run -d --name svc-c --cpus=0.5 --memory=256m myorg/svc-c:1.0
 
 ## 실습: 같은 앱을 두 방식으로 비교하기
 
-### 단계 1 — Run as a container
-
+### 단계 1 — 컨테이너로 실행
 ```python
 import subprocess, time
 
@@ -119,8 +118,7 @@ def run_container(image):
 
 컨테이너는 보통 밀리초에서 수초 안에 시작합니다. 빠른 부팅은 오토스케일과 배포 전략에 직접 영향을 줍니다.
 
-### 단계 2 — Run as a VM (concept)
-
+### 단계 2 — VM으로 실행 (개념)
 ```python
 def run_vm(image_path):
     t = time.time()
@@ -133,8 +131,7 @@ def run_vm(image_path):
 
 VM은 커널 부팅을 포함하므로 시작 비용이 더 큽니다. 대신 그만큼 강한 격리 경계를 제공합니다.
 
-### 단계 3 — Compare memory
-
+### 단계 3 — 메모리 비교
 ```python
 def mem_usage(pid):
     res = subprocess.run(
@@ -146,8 +143,7 @@ def mem_usage(pid):
 
 메모리 사용량을 비교하면 프로세스 격리와 OS 격리의 비용 차이를 더 현실적으로 볼 수 있습니다.
 
-### 단계 4 — Compare startup time
-
+### 단계 4 — 시작 시간 비교
 ```python
 def compare(image, vm_image):
     return {

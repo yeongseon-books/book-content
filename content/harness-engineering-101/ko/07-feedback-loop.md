@@ -234,7 +234,7 @@ def generate_with_critique(agent, prompt: str, criteria: list[str], max_rounds: 
 
 Self-critique는 두 가지 위험이 있습니다. (1) Agent가 자신의 실수를 못 봅니다 (false positive). (2) 매 턴마다 비용이 두 배 이상 듭니다. 외부 검증이 가능한 곳은 외부 검증을 우선합니다.
 
-### Failure Memory
+### 실패 기억
 
 ![Failure memory](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/07/07-04-failure-memory.ko.png)
 
@@ -404,7 +404,7 @@ def classify_for_memory(error) -> tuple[str, str]:
 
 실무에서는 이 서명을 기준으로 "상위 5개 반복 실패"를 매일 보고합니다. 그렇게 하면 모델 개선보다 먼저 고쳐야 할 도구 설계 결함이 빠르게 드러납니다.
 
-### Common Mistakes
+### 흔한 실수
 
 추론 오류는 retry로 안 풀립니다. 분류 후 reflect를 사용합니다.
 

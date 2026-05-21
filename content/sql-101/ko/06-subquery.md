@@ -111,7 +111,7 @@ SELECT * FROM employee_tree ORDER BY level, name;
 
 재귀 CTE는 초기 쿼리와 재귀 단계로 나뉩니다. 초기 결과를 만든 뒤, 그 결과와 다시 조인하며 점점 범위를 넓혀 가는 구조입니다. 이런 패턴은 트리 전체를 한 번에 가져와야 할 때 특히 강력합니다.
 
-## Materialized View
+## 구체화 뷰(Materialized View)
 
 PostgreSQL에서는 CTE뿐 아니라 Materialized View도 제공합니다. VIEW가 매번 쿼리를 실행하는 반면, Materialized View는 결과를 디스크에 저장해 두고 필요할 때 갱신합니다.
 

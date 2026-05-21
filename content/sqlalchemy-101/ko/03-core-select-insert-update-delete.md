@@ -439,7 +439,7 @@ stmt = select(users.c.name, cte.c.n).join(cte, cte.c.user_id == users.c.id)
 실무 코드에서 select은 보통 함수로 캡슐화해서 재사용합니다.
 
 ```python
-# repos/user_repo.py 파일 예시
+# repos/user_repo.py 예시
 from sqlalchemy import select, insert, update
 from schema import users
 

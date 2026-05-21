@@ -385,7 +385,7 @@ function buildPrompt(input: {
 챗봇이 "내 문서"를 답하도록 만들려면 검색 파이프라인을 채팅 경로에 조심스럽게 연결해야 합니다. 질문마다 검색을 무조건 수행하면 지연 시간이 급격히 늘 수 있으므로, 질문 분류를 한 번 두는 것이 좋습니다.
 
 ```python
-# pseudo code for backend
+# 백엔드용 의사 코드
 if is_document_question(user_question):
     query_embedding = embed(user_question)
     chunks = vector_store.search(query_embedding, top_k=4)

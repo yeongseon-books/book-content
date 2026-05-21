@@ -24,7 +24,6 @@ last_reviewed: '2026-05-12'
 
 이 글은 DevOps 101 시리즈의 첫 번째 글입니다.
 
-
 ![DevOps 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/01/01-01-diagram.ko.png)
 *DevOps 101 1장 흐름 개요*
 > DevOps의 핵심은 속도나 도구가 아니라, 빠른 배포와 안정적인 운영을 상충하지 않는 같은 목표로 함께 추구하는 것입니다.
@@ -214,7 +213,7 @@ deploy:
 배포를 자동화했다면 그다음은 상태를 읽는 눈이 필요합니다. 가장 작은 시작은 서비스가 살아 있는지 알려 주는 헬스 체크 하나입니다.
 
 ```python
-# a one-line health check
+# 한 줄짜리 헬스 체크
 @app.get("/health")
 def health(): return {"status": "ok"}
 ```
@@ -331,142 +330,6 @@ week_2:
 4. 새 도구 도입 전, 기존 도구로 해결 가능한지 먼저 검토합니다.
 
 이 규칙을 따르면 DevOps 전환이 도구 쇼핑이 되지 않습니다. 결국 좋은 DevOps는 기술 스택의 화려함이 아니라, 팀이 반복 가능하게 일하는 방식에 의해 결정됩니다.
-
-
-## 운영 앵커: 배포, 인프라, 관측성, 대응을 한 장으로 연결하기
-
-앞선 섹션에서 각 주제를 따로 설명했다면, 이 섹션은 실무에서 한 번에 연결해 쓰는 최소 구성 예시를 제공합니다. 핵심은 화려한 도구 조합이 아니라, 같은 기준으로 변경을 통과시키고 문제를 되돌릴 수 있는가입니다.
-
-### CI/CD 파이프라인 공통 YAML
-
-```yaml
-name: delivery-flow
-on:
-  pull_request:
-  push:
-    branches: [main]
-
-jobs:
-  ci:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - run: pip install -r requirements-dev.txt
-      - run: ruff check .
-      - run: pytest -q
-
-  deploy-stage:
-    needs: ci
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: ./scripts/deploy_stage.sh
-      - run: ./scripts/smoke_test.sh https://stage.example.com
-
-  deploy-prod-canary:
-    needs: deploy-stage
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: ./scripts/deploy_prod.sh --strategy canary --percent 10
-      - run: ./scripts/check_slo.sh --window 5m
-      - run: ./scripts/promote_or_rollback.sh
-```
-
-이 흐름의 실전 포인트는 세 가지입니다. 첫째, CI 통과 전에는 어떤 배포도 시작하지 않습니다. 둘째, stage 통과 후에만 production으로 승격합니다. 셋째, production 승격은 canary 관찰 통과를 조건으로 강제합니다.
-
-### Terraform과 Ansible 역할 분리 예시
-
-```hcl
-# infra/main.tf
-resource "aws_security_group" "api" {
-  name        = "api-sg"
-  description = "api security group"
-}
-
-resource "aws_instance" "api" {
-  ami           = var.ami
-  instance_type = "t3.small"
-  tags = {
-    service = "api"
-    env     = var.env
-  }
-}
-```
-
-```yaml
-# ops/playbooks/hardening.yml
-- hosts: api
-  become: true
-  tasks:
-    - name: Install security updates
-      apt:
-        update_cache: true
-        upgrade: dist
-
-    - name: Ensure auditd is installed
-      apt:
-        name: auditd
-        state: present
-
-    - name: Ensure ssh root login is disabled
-      lineinfile:
-        path: /etc/ssh/sshd_config
-        regexp: '^PermitRootLogin'
-        line: 'PermitRootLogin no'
-```
-
-Terraform은 "무엇을 만들 것인가"를 선언하고, Ansible은 "만들어진 시스템을 어떤 상태로 유지할 것인가"를 담당합니다. 두 도구를 구분하면 변경 리뷰 범위가 명확해지고, 장애 시 원인 추적도 빨라집니다.
-
-### 모니터링/알림 설정 예시
-
-```yaml
-# monitoring/alerts.yml
-groups:
-  - name: api-slo
-    rules:
-      - alert: ApiHighErrorRate
-        expr: rate(http_requests_total{service="api",status=~"5.."}[5m]) / rate(http_requests_total{service="api"}[5m]) > 0.01
-        for: 5m
-        labels:
-          severity: page
-        annotations:
-          summary: "API 5xx 비율 1% 초과"
-          runbook: "https://internal/wiki/runbooks/api-high-error-rate"
-
-      - alert: ApiHighLatencyP95
-        expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{service="api"}[5m])) by (le)) > 0.35
-        for: 10m
-        labels:
-          severity: warning
-```
-
-알림은 많이 울리는 것이 목표가 아닙니다. 운영자가 실제로 행동할 수 있는 신호만 남기고, 모든 page 알림에 runbook 링크를 붙여 대응 시작 시간을 줄여야 합니다.
-
-### 블루그린/카나리 승격 절차 예시
-
-```bash
-# blue-green switch
-./scripts/deploy_blue.sh
-./scripts/smoke_test.sh https://blue.example.com
-./scripts/switch_traffic.sh --from green --to blue
-
-# canary rollout
-./scripts/deploy_canary.sh --percent 10
-./scripts/check_metrics.sh --window 5m
-./scripts/promote_canary.sh --to 50
-./scripts/promote_canary.sh --to 100
-```
-
-블루그린은 즉시 전환과 즉시 롤백에 유리하고, 카나리는 위험을 작게 나눠 검증하는 데 유리합니다. 서비스 특성과 팀 역량에 따라 전략을 고르되, 승격/철수 명령을 반드시 런북과 자동화 스크립트로 함께 유지해야 합니다.
-
-### 인시던트 대응 런북 예시
-
-```markdown
-# Runbook: API 5xx 급증
 
 ## 0-5분
 1. SEV 판정 (SEV1/SEV2)

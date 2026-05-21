@@ -28,7 +28,6 @@ last_reviewed: '2026-05-12'
 
 이진 탐색은 교과서 예제에만 머물지 않습니다. 정확히 같은 값을 찾는 문제뿐 아니라, 어떤 조건을 처음 만족하는 지점을 찾는 문제에도 자주 확장됩니다.
 
-
 ![Algorithms with Python 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/03/03-01-big-picture.ko.png)
 *Algorithms with Python 101 3장 흐름 개요*
 
@@ -68,12 +67,11 @@ Binary search: [1, 3, 5, 7, 9, 11, 13] — find 9
 | Upper/lower bound | 특정 값 이상 또는 초과가 처음 나타나는 위치를 찾는 변형입니다 |
 | Parametric search | 정확한 값 대신 조건의 경계를 찾는 문제에 이진 탐색을 적용하는 방식입니다 |
 
-## Before / After
-
+## 적용 전후 비교
 정렬된 리스트에서 값을 찾는 두 가지 방법입니다.
 
 ```python
-# before: linear search — O(n)
+# before: 선형 탐색 — O(n)
 def search(data, target):
     for i, val in enumerate(data):
         if val == target:
@@ -82,7 +80,7 @@ def search(data, target):
 ```
 
 ```python
-# after: binary search — O(log n)
+# after: 이진 탐색 — O(log n)
 def search(data, target):
     left, right = 0, len(data) - 1
     while left <= right:
@@ -98,8 +96,7 @@ def search(data, target):
 
 ## 단계별 실습
 
-### Step 1: Implement Linear Search
-
+### 단계 1: 선형 탐색 구현
 ```python
 def linear_search(data: list, target) -> int:
     """Linear search — O(n)."""
@@ -112,13 +109,12 @@ data = [4, 2, 7, 1, 9, 3, 8]
 print(linear_search(data, 9))   # 4
 print(linear_search(data, 5))   # -1
 
-# No sorting required — works on any list
+# 정렬이 필요 없음 — 어떤 리스트에서도 동작
 ```
 
 선형 탐색의 장점은 단순함과 범용성입니다. 데이터가 정렬되어 있지 않아도 바로 사용할 수 있지만, 큰 데이터에서는 비용이 빠르게 커집니다.
 
-### Step 2: Implement Binary Search
-
+### 단계 2: 이진 탐색 구현
 ```python
 def binary_search(sorted_data: list[int], target: int) -> int:
     """Binary search — O(log n), requires sorted data."""
@@ -147,11 +143,11 @@ import bisect
 
 data = [1, 3, 5, 7, 9, 11, 13, 15]
 
-# Find insertion point (maintains sorted order)
+# 삽입 위치 찾기 (정렬 순서 유지)
 pos = bisect.bisect_left(data, 9)
 print(f"Position of 9: {pos}")  # 4
 
-# Check whether a value exists
+# 값 존재 여부 확인
 def bisect_search(sorted_data: list[int], target: int) -> int:
     pos = bisect.bisect_left(sorted_data, target)
     if pos < len(sorted_data) and sorted_data[pos] == target:
@@ -161,7 +157,7 @@ def bisect_search(sorted_data: list[int], target: int) -> int:
 print(bisect_search(data, 9))    # 4
 print(bisect_search(data, 10))   # -1
 
-# Insert into a sorted list
+# 정렬된 리스트에 삽입
 scores = [70, 80, 90]
 bisect.insort(scores, 85)
 print(scores)  # [70, 80, 85, 90]
@@ -176,13 +172,13 @@ import bisect
 
 data = [1, 3, 5, 5, 5, 7, 9]
 
-# bisect_left: position of the first occurrence
+# bisect_left: 첫 번째 출현 위치
 print(bisect.bisect_left(data, 5))   # 2
 
-# bisect_right: position after the last occurrence
+# bisect_right: 마지막 출현 다음 위치
 print(bisect.bisect_right(data, 5))  # 5
 
-# Count occurrences of 5
+# 5의 출현 횟수 세기
 count = bisect.bisect_right(data, 5) - bisect.bisect_left(data, 5)
 print(f"Count of 5: {count}")  # 3
 
@@ -197,8 +193,7 @@ print(f"First position > 5: {upper}")   # 5
 
 이 차이를 이해하면 중복 구간 길이 계산, 특정 기준 이상 값의 시작점 찾기 같은 문제를 훨씬 깔끔하게 풀 수 있습니다.
 
-### Step 5: Performance Comparison
-
+### 단계 5: 성능 비교
 ```python
 import time
 import bisect
@@ -279,57 +274,6 @@ for n in [10_000, 100_000, 1_000_000]:
 
 선형 탐색은 `O(n)`, 이진 탐색은 `O(log n)`입니다. 이진 탐색은 정렬이라는 전제가 필요하지만, 데이터가 커질수록 성능 차이는 매우 극적입니다. 다음 글에서는 데이터를 순서 있게 만드는 핵심 알고리즘, 정렬을 다룹니다.
 
-## 실전 패턴 추가: 정렬과 탐색 구현을 문제 유형별로 선택하기
-
-알고리즘 문제에서는 코드 길이보다 선택 기준이 더 중요합니다. 입력 크기, 데이터 분포, 정렬 여부에 따라 정렬/탐색 전략이 달라집니다. 아래 예시는 같은 정수 배열을 다루더라도 어떤 조건에서 어떤 구현을 고르는지 보여 줍니다.
-
-```python
-def binary_search(nums: list[int], target: int) -> int:
-    left, right = 0, len(nums) - 1
-    while left <= right:
-        mid = (left + right) // 2
-        if nums[mid] == target:
-            return mid
-        if nums[mid] < target:
-            left = mid + 1
-        else:
-            right = mid - 1
-    return -1
-
-
-def merge_sort(nums: list[int]) -> list[int]:
-    if len(nums) <= 1:
-        return nums
-    mid = len(nums) // 2
-    left = merge_sort(nums[:mid])
-    right = merge_sort(nums[mid:])
-
-    merged: list[int] = []
-    i = j = 0
-    while i < len(left) and j < len(right):
-        if left[i] <= right[j]:
-            merged.append(left[i])
-            i += 1
-        else:
-            merged.append(right[j])
-            j += 1
-    merged.extend(left[i:])
-    merged.extend(right[j:])
-    return merged
-
-
-def quick_sort(nums: list[int]) -> list[int]:
-    if len(nums) <= 1:
-        return nums
-    pivot = nums[len(nums) // 2]
-    less = [x for x in nums if x < pivot]
-    equal = [x for x in nums if x == pivot]
-    greater = [x for x in nums if x > pivot]
-    return quick_sort(less) + equal + quick_sort(greater)
-```
-
-실무 판단은 보통 이렇게 정리됩니다. 이미 정렬된 리스트에서 존재 여부를 반복 조회하면 이진 탐색이 기본 선택입니다. 입력이 계속 바뀌고 안정 정렬이 필요하면 병합 정렬 계열이 유리하고, 평균 성능과 구현 단순성을 우선하면 퀵 정렬 계열이 자주 선택됩니다. 코딩 테스트에서는 Python 내장 `sort()`가 Timsort 기반이라 거의 항상 가장 실용적인 기본값이지만, 원리를 직접 구현해 보면 경계 조건과 복잡도 해석 능력이 크게 좋아집니다.
-
 ## 심화 실전 노트: 탐색 문제를 경계 찾기로 확장하기
 
 ### 구현 앵커: lower bound / upper bound 직접 구현
@@ -345,7 +289,6 @@ def lower_bound(nums: list[int], target: int) -> int:
             right = mid
     return left
 
-
 def upper_bound(nums: list[int], target: int) -> int:
     left, right = 0, len(nums)
     while left < right:
@@ -355,7 +298,6 @@ def upper_bound(nums: list[int], target: int) -> int:
         else:
             right = mid
     return left
-
 
 arr = [1, 2, 2, 2, 5, 7]
 print(lower_bound(arr, 2), upper_bound(arr, 2))  # 1, 4
@@ -409,7 +351,6 @@ lower_bound(arr, 2)
 ```python
 import time
 
-
 def benchmark(func, *args, repeat: int = 5) -> float:
     best = float("inf")
     for _ in range(repeat):
@@ -452,123 +393,6 @@ E. 해답 없음 케이스: 종료 조건 검증
 - "필요하면 정답 유지 조건을 짧게 증명하겠습니다."
 
 이 스크립트를 반복하면 설명의 밀도가 올라가고, 구현 중 길을 잃는 빈도가 줄어듭니다.
-
-## 케이스 스터디 확장: 입력 규모가 커질 때의 판단
-
-### 시나리오 1: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
-
-### 시나리오 2: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
-
-### 시나리오 3: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
-
-### 시나리오 4: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
-
-### 시나리오 5: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
 
 ## 처음 질문으로 돌아가기
 

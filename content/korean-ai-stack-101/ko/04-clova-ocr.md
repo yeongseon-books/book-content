@@ -91,7 +91,7 @@ OCR 파이프라인은 네 단계로 분해됩니다.
 **After** — 먼저 `lineBreak`를 따라 줄을 복원하면 코퍼스는 이렇게 바뀝니다.
 
 ```python
-# Post-processed output (one line per document)
+# 사후 처리된 출력(문서당 한 줄)
 '공급가액 45,000원'      # confidence min: 0.994
 '부가세 4,500원'          # confidence min: 0.991
 '합계 49,500원'           # confidence min: 0.989
@@ -132,8 +132,7 @@ MOCK_RESPONSE = {
 
 실제 키가 생기면 dict를 만드는 부분만 `requests.post(...).json()`으로 바꾸면 됩니다.
 
-### Step 2 — Reconstruct lines
-
+### 단계 2 — 라인 재구성
 ![이 코드에서 주목할 점](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-02-what-to-notice-in-this-code.ko.png)
 
 *이 코드에서 주목할 점*

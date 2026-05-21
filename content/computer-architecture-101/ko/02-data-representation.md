@@ -129,8 +129,8 @@ print(bits(to_twos_complement(-5, 8)))   # 11111011
 ```python
 import numpy as np
 
-# Python int is arbitrary precision (no overflow),
-# but numpy uses fixed widths so the wrap-around is visible.
+# Python int는 arbitrary precision이라 overflow가 없고,
+# numpy는 fixed width를 써서 wrap-around가 보입니다.
 x = np.int8(127)
 print(x + 1)   # -128 (overflow)
 
@@ -166,7 +166,7 @@ print(0.1 + 0.2)                       # 0.30000000000000004
 print(0.1 + 0.2 == 0.3)                # False
 print(math.isclose(0.1 + 0.2, 0.3))    # True
 
-# Large + small absorption
+# 큰 수 + 작은 수 흡수 현상
 big = 1e16
 small = 1.0
 print(big + small - big)   # 0.0  (the small value is absorbed)

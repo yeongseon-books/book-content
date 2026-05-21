@@ -73,7 +73,7 @@ class Graph:
     def __init__(self): self._adj = {}
     def add_edge(self, u, v, w=1): ...
     def neighbors(self, u): ...
-# Every algorithm can rely on the same surface
+# 모든 알고리즘이 같은 인터페이스를 사용 가능
 ```
 
 표현이 제각각이면 BFS, DFS, 최단 경로 같은 알고리즘을 재사용하기 어렵습니다. 그래프는 인터페이스를 먼저 정리하는 것만으로도 코드 품질이 크게 좋아집니다.
@@ -184,7 +184,7 @@ print(f"path matches expectation: {path == expected}")
 
 # ['api-gateway', 'catalog-service', 'inventory-service', 'warehouse-db']
 # hop count: 3
-# path matches expectation: True
+# 경로가 기대값과 일치: True
 ```
 
 BFS는 가까운 정점을 먼저 방문하므로 비가중치 그래프에서 자연스럽게 최단 경로를 구합니다. 여기서 경로나 hop 수가 다르게 나오면 queue 순서를 깨뜨렸거나, `visited` 표시 시점이 늦었거나, 간선 방향을 잘못 넣었을 가능성이 큽니다.
@@ -244,7 +244,7 @@ print(cycle_found)
 print(f"topological traversal possible: {not cycle_found}")
 
 # True
-# topological traversal possible: False
+# 위상 순회 가능 여부: False
 ```
 
 이 검증은 DFS가 실무에서 어떻게 쓰이는지 직접 보여 줍니다. 역방향 간선이 생기면 의존성 그래프를 위상 정렬할 수 없습니다. 여기서 `cycle_found`가 `False`로 나오면 방향 그래프를 무방향처럼 다뤘거나, 재귀 스택 추적을 빼먹었을 가능성이 큽니다.

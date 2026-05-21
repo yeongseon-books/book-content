@@ -223,9 +223,9 @@ setup_toxiproxy("payment-api", "0.0.0.0:8001", "payment-api.internal:8000")
 inject_latency("payment-api", latency_ms=3000, jitter_ms=500)
 print("결제 API에 3초 레이턴시 주입 완료")
 
-# 3. timeout 후 circuit breaker 동작 확인
+# 3. 타임아웃 후 회로 차단기 동작 확인
 # 애플리케이션이 5초 timeout으로 설정되어 있다면
-# circuit breaker가 열리고 fallback이 동작해야 함
+# 서킷 브레이커가 충분히 fallback이 동작해야 함
 ```
 
 이 코드는 로컬 개발 환경이나 staging에서 돌릴 수 있습니다. 레이턴시를 주입한 뒤 애플리케이션 로그와 메트릭을 확인하면, timeout이 제대로 작동하는지, circuit breaker가 열리는지, alert가 발송되는지 모두 검증할 수 있습니다.

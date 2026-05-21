@@ -74,7 +74,7 @@ last_reviewed: '2026-05-14'
 
 ## 실습: 역할별 한 줄 정의
 
-### Step 1 — Analyst
+### 단계 1 — Analyst
 
 ```text
 Drives decisions with SQL and dashboards.
@@ -82,7 +82,7 @@ Drives decisions with SQL and dashboards.
 
 분석가는 데이터를 해석해 팀의 판단 속도를 높이는 역할입니다. SQL, 지표, 대시보드가 중심 도구가 되는 이유도 여기에 있습니다.
 
-### Step 2 — Scientist
+### 단계 2 — Scientist
 
 ```text
 Tests hypotheses with experiments and models.
@@ -90,7 +90,7 @@ Tests hypotheses with experiments and models.
 
 사이언티스트는 질문을 가설로 바꾸고, 실험과 모델로 그 가설을 검증합니다. 그래서 설명력과 검증력이 함께 요구됩니다.
 
-### Step 3 — Engineer
+### 단계 3 — Engineer
 
 ```text
 Builds pipelines and storage as data infrastructure.
@@ -98,16 +98,14 @@ Builds pipelines and storage as data infrastructure.
 
 엔지니어는 데이터가 안정적으로 흐르도록 기반을 만듭니다. 파이프라인과 스키마 품질이 무너지면 나머지 역할도 함께 흔들립니다.
 
-### Step 4 — ML Engineer
-
+### 단계 4 — ML 엔지니어
 ```text
 Trains, deploys, and monitors models.
 ```
 
 ML 엔지니어는 모델을 연구 대상이 아니라 운영 대상로 다룹니다. 학습, 배포, 모니터링을 하나의 시스템으로 보는 감각이 중요합니다.
 
-### Step 5 — Analytics Engineer
-
+### 단계 5 — 분석 엔지니어
 ```text
 Builds reliable analytics models with dbt and friends.
 ```

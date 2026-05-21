@@ -183,7 +183,7 @@ class EnvelopeEncryption:
 
     def encrypt(self, plaintext: bytes, kms_key_id: str) -> dict:
         """봉투 암호화: DEK 생성 → 데이터 암호화 → DEK를 KEK로 암호화"""
-        # 1) DEK 생성 (256-bit AES key)
+        # 1) DEK 생성(256비트 AES 키)
         dek = os.urandom(32)
         nonce = os.urandom(12)
 

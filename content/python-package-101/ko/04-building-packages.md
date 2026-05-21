@@ -69,8 +69,7 @@ source code → python -m build → dist/
 | build backend | 실제 빌드 로직을 수행하는 도구 | `setuptools`, `hatchling` |
 | dist/ | 빌드 결과물이 저장되는 디렉터리 | `dist/mylib-0.1.0.tar.gz` |
 
-## Before / After
-
+## 적용 전후 비교
 **Before (sdist만 제공)**
 
 ```bash
@@ -90,7 +89,7 @@ pip install mylib
 
 ## 단계별 실습
 
-### Step 1. build 도구 설치
+### 단계 1. build 도구 설치
 
 ```bash
 cd ~/practice/mylib-project
@@ -98,7 +97,7 @@ source .venv/bin/activate
 pip install build
 ```
 
-### Step 2. 빌드 실행
+### 단계 2. 빌드 실행
 
 ```bash
 python -m build
@@ -112,7 +111,7 @@ ls dist/
 # mylib-0.1.0.tar.gz
 ```
 
-### Step 3. wheel 파일 내부 확인
+### 단계 3. wheel 파일 내부 확인
 
 ```bash
 # .whl is a ZIP file
@@ -124,7 +123,7 @@ unzip -l dist/mylib-0.1.0-py3-none-any.whl
 # mylib-0.1.0.dist-info/RECORD
 ```
 
-### Step 4. sdist 파일 내부 확인
+### 단계 4. sdist 파일 내부 확인
 
 ```bash
 tar tzf dist/mylib-0.1.0.tar.gz
@@ -135,7 +134,7 @@ tar tzf dist/mylib-0.1.0.tar.gz
 # mylib-0.1.0/PKG-INFO
 ```
 
-### Step 5. 빌드 결과물 설치 테스트
+### 단계 5. 빌드 결과물 설치 테스트
 
 ```bash
 # Test wheel install in a fresh virtual environment
@@ -425,7 +424,7 @@ ERROR: `long_description_content_type` missing.    # content type 미지정
 WARNING: No `project_urls` found.                  # URL 없음
 ```
 
-## Reproducible Build
+## 재현 가능한 빌드
 
 같은 소스에서 항상 동일한 빌드 산출물을 생성하려면 추가 설정이 필요합니다.
 

@@ -269,7 +269,7 @@ with engine.begin() as conn:
 # 다른 곳에서 INSERT
 conn.execute(text("INSERT INTO users(name, emai, created_at) VALUES (:n, :e, :c)"),
              {"n": "Alice", "e": "alice@example.com", "c": "..."})
-# typo (emai)는 런타임에 OperationalError로 발견된다.
+# typo (emai)는 파티션에 OperationalError로 발견됩니다.
 ```
 
 ### 개선 후: MetaData + Table
@@ -294,7 +294,7 @@ metadata.create_all(engine)
 
 with engine.begin() as conn:
     conn.execute(insert(users).values(name="Alice", email="alice@example.com"))
-    # users.c.emai → AttributeError를 IDE/런타임 양쪽에서 즉시 알려준다
+    # users.c.emai → AttributeError IDE/런타임 자체에서 즉시 알려줍니다.
 ```
 
 이제 컬럼 이름 typo는 schema 정의 시점이나 IDE 자동완성에서 잡힙니다. `users.c.name`을 통해 컬럼을 참조할 수 있고, 같은 schema 객체를 select/insert/update에 모두 재사용합니다.

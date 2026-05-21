@@ -72,7 +72,7 @@ Animal (parent class)
 도형 클래스의 코드 중복을 제거합니다.
 
 ```python
-# before: no inheritance — duplicated code
+# before: inheritance 없음 — 코드 중복 발생
 class Circle:
     def __init__(self, name, color, radius):
         self.name = name
@@ -93,7 +93,7 @@ class Square:
 ```
 
 ```python
-# after: inheritance consolidates common logic
+# after: inheritance로 공통 로직 통합
 class Shape:
     def __init__(self, name: str, color: str) -> None:
         self.name = name
@@ -314,7 +314,7 @@ print(Duck.__mro__)
 [EmailNotification]   [SlackNotification]
 ```
 
-## before/after: 잘못된 상속에서 역할 분리로
+## 적용 전후: 잘못된 상속에서 역할 분리로
 
 ```python
 # before

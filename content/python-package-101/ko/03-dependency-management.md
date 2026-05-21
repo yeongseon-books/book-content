@@ -76,8 +76,7 @@ site-packages/             project-a/.venv/site-packages/
 | requirements.txt | 재현 가능한 설치를 위한 버전 고정 파일 | `requests==2.31.0` |
 | uv | Rust로 만든 고속 패키지 관리자 | `uv pip install requests` |
 
-## Before / After
-
+## 적용 전후 비교
 **Before (시스템 Python 공유)**
 
 ```bash
@@ -97,7 +96,7 @@ pip install requests==2.31   # project-b only
 
 ## 단계별 실습
 
-### Step 1. 가상환경 만들기
+### 단계 1. 가상환경 만들기
 
 ```bash
 cd ~/practice/mylib-project
@@ -109,7 +108,7 @@ which python
 # /home/user/practice/mylib-project/.venv/bin/python
 ```
 
-### Step 2. 패키지 설치와 freeze
+### 단계 2. 패키지 설치와 freeze
 
 ```bash
 pip install requests flask
@@ -127,7 +126,7 @@ cat requirements.txt
 # ...
 ```
 
-### Step 3. `requirements.txt`로 재현하기
+### 단계 3. `requirements.txt`로 재현하기
 
 ```bash
 # Install the same packages in another environment
@@ -138,7 +137,7 @@ pip install -r requirements.txt
 pip list  # same packages, same versions
 ```
 
-### Step 4. `pyproject.toml`의 `dependencies`
+### 단계 4. `pyproject.toml`의 `dependencies`
 
 ```toml
 # pyproject.toml
@@ -162,7 +161,7 @@ pip install -e .            # install dependencies
 pip install -e ".[dev]"     # install dev dependencies too
 ```
 
-### Step 5. `uv`로 더 빠르게 관리하기
+### 단계 5. `uv`로 더 빠르게 관리하기
 
 ```bash
 pip install uv

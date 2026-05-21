@@ -92,7 +92,7 @@ class TaskSpec(BaseModel):
             and self.completion_criteria
         )
 
-# Example: a clear task
+# 예시: 명확한 작업
 task = TaskSpec(
     goal="Generate a daily summary report from sales data for the past 7 days",
     inputs={
@@ -139,7 +139,7 @@ assert task.is_executable()
 ```python
 def decompose_goal(goal: str) -> list[TaskSpec]:
     """Decompose a Goal into executable Tasks."""
-    # Goal: "Improve customer support quality"
+    # 목표: "고객 지원 품질 향상"
     # → Tasks:
     return [
         TaskSpec(
@@ -212,7 +212,7 @@ task = VerifiableTask(
     verifier=verify_report,
 )
 
-# Verify the agent's output
+# 에이전트의 출력을 검증합니다
 result = {"summary": "...", "metrics": {}, "anomalies": [], "next_actions": []}
 assert task.verify(result)
 ```
@@ -264,7 +264,7 @@ class TaskCandidate(BaseModel):
 
 def request_to_tasks(request: str) -> list[TaskCandidate]:
     """Convert a vague request into task candidates."""
-    # In production this is built with LLM + templates.
+    # 운영 환경에서는 LLM + 템플릿으로 구성합니다.
     return [
         TaskCandidate(
             description="Send a weekly retrospective summary",
@@ -314,7 +314,7 @@ Verify each criterion before reporting completion.
 
 def task_to_eval_dataset(task: TaskSpec, n: int = 10) -> list[dict]:
     """Generate eval cases from a TaskSpec."""
-    # Vary inputs to create test cases
+    # 입력을 변형하여 테스트 케이스를 생성합니다
     return [
         {"task": task.model_dump(), "variation": i, "expected_pass": True}
         for i in range(n)

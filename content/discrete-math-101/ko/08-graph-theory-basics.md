@@ -62,7 +62,7 @@ last_reviewed: '2026-05-12'
 **Before — thinking only in flat data structures:**
 
 ```python
-# Manage friendships as a list — slow lookup
+# 친구 관계를 list로 관리 — 조회가 느림
 friends = [("alice", "bob"), ("bob", "carol"), ("alice", "carol")]
 
 def is_friend(a, b):
@@ -72,7 +72,7 @@ def is_friend(a, b):
 **After — modeled as a graph:**
 
 ```python
-# Adjacency list — average O(1) lookup, plus a rich algorithm toolkit
+# 인접 리스트 — 평균 O(1) 조회와 풍부한 알고리즘 활용
 from collections import defaultdict
 
 graph = defaultdict(set)
@@ -189,7 +189,7 @@ def degree(g: Graph, v) -> int:
 total_degree = sum(degree(g, v) for v in g.nodes())
 edge_count = len(g.edges())
 
-# Handshake lemma: Σ deg(v) = 2|E|
+# 핸드셰이크 정리: Σ deg(v) = 2|E|
 print(f"sum of degrees = {total_degree}, 2|E| = {2 * edge_count}")
 assert total_degree == 2 * edge_count
 ```

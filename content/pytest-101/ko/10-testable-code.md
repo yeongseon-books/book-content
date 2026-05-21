@@ -71,8 +71,7 @@ last_reviewed: '2026-05-17'
 | Fake | 실제 DB나 API 대신 테스트 안에서 동작하는 가벼운 구현체입니다 |
 | 경계(boundary) | 비즈니스 규칙과 외부 세계가 만나는 지점입니다 |
 
-## Before / After
-
+## 적용 전후 비교
 **Before — 결제, 시간, 저장, 알림이 한 함수 안에 섞여 있음:**
 
 ```python
@@ -143,7 +142,7 @@ After 버전의 핵심은 “무엇을 계산할지”와 “어디에 요청을
 
 ## 단계별 실습
 
-### Step 1: 먼저 순수 로직을 밖으로 끄집어낸다
+### 단계 1: 먼저 순수 로직을 밖으로 끄집어낸다
 
 ```python
 # pricing.py
@@ -202,7 +201,7 @@ def test_order_totals_for_silver_member():
 
 여기서는 네트워크도, DB도, 현재 시간도 없습니다. 그래서 테스트가 짧고 실패 이유도 바로 보입니다.
 
-### Step 2: 외부 협력 객체는 Protocol과 Fake로 분리한다
+### 단계 2: 외부 협력 객체는 Protocol과 Fake로 분리한다
 
 ```python
 # order_service.py
@@ -300,7 +299,7 @@ def test_create_order_with_fakes():
 
 Protocol은 “무슨 메서드가 필요하냐”를 드러내고, Fake는 “테스트에서 그 메서드를 어떻게 흉내 내느냐”를 담당합니다. 둘을 나누면 mock 프레임워크 없이도 협력 객체 테스트가 가능합니다.
 
-### Step 3: 요청 조립과 반환값 정리를 별도 함수로 둔다
+### 단계 3: 요청 조립과 반환값 정리를 별도 함수로 둔다
 
 ```python
 # checkout.py
@@ -365,7 +364,7 @@ def test_present_checkout_result():
 
 이렇게 payload를 조립하는 코드도 별도 함수가 되면 `json={...}` 같은 빈칸 예제가 아니라, 실제로 어떤 필드가 오가는지 테스트와 문서에서 모두 분명해집니다.
 
-### Step 4: 시간과 ID 생성도 경계 밖으로 뺀다
+### 단계 4: 시간과 ID 생성도 경계 밖으로 뺀다
 
 ```python
 from collections.abc import Callable
@@ -414,7 +413,7 @@ def test_create_checkout_payload_with_fixed_clock_and_id():
 
 `datetime.now()`와 `uuid4()`를 함수 안에서 바로 호출하면 테스트가 그 시점과 랜덤 값에 묶입니다. 시간을 문자열이나 `datetime` 인자로 넘기고, ID 생성 함수를 주입하면 테스트는 즉시 결정적(deterministic)으로 바뀝니다.
 
-### Step 5: patch 벽을 실제 before/after로 비교한다
+### 단계 5: patch 벽을 실제 before/after로 비교한다
 
 먼저 리팩터링 전 코드와 테스트를 보겠습니다.
 

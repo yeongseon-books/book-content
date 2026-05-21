@@ -168,7 +168,7 @@ inputs = processor(text=queries, images=images,
 with torch.no_grad():
     out = model(**inputs)
 
-# image-text similarity matrix (queries x images)
+# 이미지-텍스트 유사성 행렬(x 이미지 쿼리)
 logits = out.logits_per_text
 probs = logits.softmax(dim=-1)
 print(probs)

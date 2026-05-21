@@ -65,7 +65,7 @@ OrderService
 주문 처리 로직을 비교합니다.
 
 ```python
-# before: procedural — all logic in a single function
+# before: procedural — 모든 로직이 한 함수에 몰림
 def process_order(items, payment_type, discount_code):
     total = sum(item["price"] * item["qty"] for item in items)
     if discount_code == "SAVE10":
@@ -78,7 +78,7 @@ def process_order(items, payment_type, discount_code):
 ```
 
 ```python
-# after: OOP — responsibilities separated
+# after: OOP — 책임이 분리됨
 class Order:
     def __init__(self, items: list["OrderItem"]) -> None:
         self.items = items
@@ -283,7 +283,7 @@ class OrderService:
         }
         return self._repo.save(order_data)
 
-# Assembly and execution
+# 조립 및 실행
 cart = Cart()
 cart.add(Book("B001", "Python Basics", Money(25000)), 2)
 cart.add(Book("B002", "Django in Practice", Money(35000)))
@@ -296,7 +296,7 @@ service = OrderService(
 
 order_id = service.checkout(cart)
 # Card payment: $76500
-# Order saved: ORD-0001
+# 주문 저장 완료: ORD-0001
 print(f"Order complete: {order_id}")  # Order complete: ORD-0001
 ```
 
@@ -383,7 +383,7 @@ print(f"Order complete: {order_id}")  # Order complete: ORD-0001
   + close()
 ```
 
-## before/after: 서비스 메서드 단일 거대 함수 분해
+## 적용 전후: 서비스 메서드 단일 거대 함수 분해
 
 ```python
 # before

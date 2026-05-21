@@ -208,7 +208,7 @@ logger = structlog.get_logger()
 # 사용 예시
 logger.info("user_login", user_id="u-42", ip="192.168.1.100", method="password")
 # 출력: {"event": "user_login", "user_id": "u-42", "ip": "192.168.1.100",
-#         "method": "password", "level": "info", "timestamp": "2026-05-15T09:00:11Z"}
+# "방법": "비밀번호", "수준": "정보", "타임스탬프": "2026-05-15T09:00:11Z"}
 
 logger.warning("auth_failed", user_id="u-42", reason="invalid_password", attempt=3)
 ```
@@ -236,8 +236,8 @@ async def add_request_context(request: Request, call_next):
     response = await call_next(request)
     return response
 
-# 이후 어떤 함수에서든 logger.info("event") 하면
-# request_id, path, method, client_ip가 자동 포함
+# 이후 어떤 함수에서 logger.info("event") 는 다음과 같습니다.
+# request_id, path, method, client_ip가 자동으로 포함됩니다.
 ```
 
 ### PII(개인식별정보) 자동 필터링
@@ -565,7 +565,7 @@ class AlertEngine:
 
     def fire_alert(self, severity: str, rule: str, details: dict):
         logger.critical("security_alert", severity=severity, rule=rule, **details)
-        # Slack/PagerDuty/email 연동
+        # Slack/PagerDuty/이메일 캐스팅
 ```
 
 ### 로그 무결성 검증

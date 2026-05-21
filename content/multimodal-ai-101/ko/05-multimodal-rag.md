@@ -131,7 +131,7 @@ def index_text(items: list[dict]):
     index.add(vecs)
     return index, items
 
-# Assumes caption / ocr_text are precomputed per image
+# 이미지에 대해 caption / ocr_text가 사전에 상담해 드립니다
 items = [
     {"path": "slides/01.png",
      "caption": "bar chart of revenue",
@@ -164,7 +164,7 @@ class HybridIndex:
 
     def search(self, query: str, k: int = 5,
                alpha: float = 0.5) -> list[dict]:
-        # alpha=0: text only / alpha=1: image only
+        # alpha=0: 텍스트만 / alpha=1: 이미지만
         d_clip, i_clip = self.clip.search(self._clip_q(query), k=k * 3)
         d_text, i_text = self.text.search(self._text_q(query), k=k * 3)
         scores: dict[int, float] = {}

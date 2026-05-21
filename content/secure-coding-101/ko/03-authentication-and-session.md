@@ -400,7 +400,7 @@ def setup_totp(user_id: str) -> str:
     secret = pyotp.random_base32()
     # secret은 암호화해서 저장 — 평문 저장 금지
     save_encrypted_totp_secret(user_id, secret)
-    # QR 코드용 provisioning URI
+    # QR 코드용 프로비저닝 URI
     uri = pyotp.totp.TOTP(secret).provisioning_uri(
         name=user_id,
         issuer_name="MyApp",

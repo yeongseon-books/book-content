@@ -161,7 +161,7 @@ def embed(text: str) -> np.ndarray:
     v = np.array(resp.data[0].embedding)
     return v / np.linalg.norm(v)
 
-# Build once at startup; in production back this with FAISS or pgvector
+# 시작 시 한 번 빌드합니다. 프로덕션에서는 FAISS 또는 pgVector를 사용하여 이를 다시 지원합니다.
 JAILBREAK_INDEX = np.stack([embed(p) for p in load_jailbreak_dataset()])
 
 def embedding_score(text: str) -> float:

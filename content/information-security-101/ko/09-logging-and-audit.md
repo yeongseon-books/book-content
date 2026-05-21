@@ -110,9 +110,9 @@ log("auth_login", user="alice", ip="10.0.0.1", ok=True)
 
 ```python
 # 2_no_log.py
-# log("login", user=user, password=pw)        # forbidden
-# log("token", token=jwt)                     # forbidden
-# log("card", number="4111-...", cvv=cvv)     # forbidden
+# log("login", user=user, 비밀번호=pw) # 금지됨
+# log("token", token=jwt) # 금지됨
+# log("card", number="4111-...", cvv=cvv) ​​# 금지됨
 ```
 
 비밀번호, 토큰, 개인정보는 마스킹하거나 애초에 기록하지 않아야 합니다. 편의를 위해 남긴 로그가 더 큰 사고를 만들 수 있습니다.
@@ -237,7 +237,7 @@ def rotate_logs_to_tier(log_age_days: int) -> StorageTier:
     else:
         return StorageTier.ARCHIVE
 
-# S3 Lifecycle policy 예시
+# S3 수명주기 정책 예시
 # - 7일 후 STANDARD -> STANDARD_IA
 # - 30일 후 STANDARD_IA -> GLACIER
 # - 365일 후 GLACIER -> DEEP_ARCHIVE

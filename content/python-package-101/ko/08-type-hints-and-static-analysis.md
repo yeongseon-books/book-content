@@ -72,13 +72,12 @@ mypy checks:
 | Generic | 다른 타입을 매개변수로 받는 타입 | `list[str]`, `dict[str, int]` |
 | Union | 여러 타입 중 하나 | `str \| None` |
 
-## Before / After
-
+## 적용 전후 비교
 **Before (타입 힌트 없음)**
 
 ```python
 def process(data):
-    # What is data? dict? list? str?
+    # 데이터의 유형은? 딕셔너리? 목록? str?
     return data["name"]  # possible KeyError
 
 result = process({"username": "alice"})  # runtime error
@@ -101,7 +100,7 @@ result = process({"username": "alice"})  # mypy catches this before runtime
 
 ## 단계별 실습
 
-### Step 1. 기본 타입 힌트 추가
+### 단계 1. 기본 타입 힌트 추가
 
 ```python
 # src/mylib/core.py
@@ -116,7 +115,7 @@ def find_user(user_id: int) -> dict[str, str] | None:
     return users.get(user_id)
 ```
 
-### Step 2. `mypy` 설치와 실행
+### 단계 2. `mypy` 설치와 실행
 
 ```bash
 pip install mypy
@@ -125,7 +124,7 @@ mypy src/
 ```
 
 ```python
-# Add an intentional error
+# 의도적으로 오류를 추가합니다
 result: int = greet("Alice")  # assigning str to int
 ```
 
@@ -135,7 +134,7 @@ mypy src/
 #   (expression has type "str", variable has type "int")
 ```
 
-### Step 3. `pyproject.toml`에 `mypy` 설정 추가
+### 단계 3. `pyproject.toml`에 `mypy` 설정 추가
 
 ```toml
 [tool.mypy]
@@ -149,7 +148,7 @@ warn_unused_configs = true
 mypy src/
 ```
 
-### Step 4. `py.typed` 마커 추가
+### 단계 4. `py.typed` 마커 추가
 
 ```bash
 touch src/mylib/py.typed
@@ -161,7 +160,7 @@ touch src/mylib/py.typed
 mylib = ["py.typed"]
 ```
 
-### Step 5. 고급 타입 활용
+### 단계 5. 고급 타입 활용
 
 ```python
 # src/mylib/utils.py
@@ -308,7 +307,7 @@ from typing import Union
 def parse_value(value: str | int) -> str:
     return str(value)
 
-# Optional은 X | None의 축약
+# 선택사항은 X | 없음의 축약
 def find_user(user_id: int) -> dict[str, str] | None:
     users = {"1": {"name": "Alice"}}
     return users.get(str(user_id))
@@ -350,7 +349,7 @@ class Config:
 
 def save(obj: Serializable) -> None:
     data = obj.to_dict()
-    # User와 Config 모두 전달 가능 (to_dict 메서드가 있으므로)
+    # User와 Config 모두 제공 가능(to_dict Method가 보유)
 ```
 
 ### Generic 타입
@@ -417,9 +416,9 @@ add("1", "2")  # error: Argument 1 has incompatible type "str"; expected "int"
 def process(value: str | None) -> str:
     return value.upper()  # error: Item "None" has no attribute "upper"
     # 수정:
-    # if value is None:
+    # 값이 없음인 경우:
     #     return ""
-    # return value.upper()
+    # 반환값.upper()
 
 # 에러 4: 불완전한 딕셔너리 타입
 data: dict[str, int] = {}

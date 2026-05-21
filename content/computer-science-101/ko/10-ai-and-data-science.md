@@ -69,8 +69,7 @@ AI는 마법이 아닙니다. 모델은 데이터로 학습되고, 추론은 행
 | Model | 입력에서 출력을 계산하는 파라미터 묶음 |
 | Dataset | 학습·검증·평가에 사용하는 입력과 라벨의 집합 |
 
-## Before / After
-
+## 적용 전후 비교
 **Before — 규칙 기반 분류:**
 
 ```python
@@ -81,13 +80,13 @@ def classify_email(text: str) -> str:
     return "spam" if score >= 2 else "ham"
 
 print(classify_email("free coupon, you are the winner"))   # spam
-# Every new phrasing forces a human to update the rules
+# 새 표현이 나올 때마다 사람이 규칙을 갱신해야 함
 ```
 
 **After — 데이터로 학습한 분류:**
 
 ```python
-# Just the concept (no scikit-learn) — in practice, use sklearn, transformers, etc.
+# 개념만 예시(scikit-learn 미사용) — 실무에서는 sklearn, transformers 등 사용
 def train_naive_bayes(samples: list[tuple[str, str]]) -> dict:
     """Naive count-based learner: tally words per class."""
     counts = {"spam": {}, "ham": {}}
@@ -117,7 +116,7 @@ print(predict(model, "free lunch coupon"))   # decided from data
 ### 1단계: 데이터로부터 직선 학습 (선형 회귀)
 
 ```python
-# Estimate a, b in y ≈ a*x + b from data — no external libraries
+# 데이터에서 y ≈ a*x + b의 a, b 추정 — 외부 라이브러리 없음
 xs = [1, 2, 3, 4, 5]
 ys = [2.1, 3.9, 6.1, 8.0, 10.2]   # roughly y = 2x
 
@@ -160,7 +159,7 @@ start = time.perf_counter()
 for x in range(1_000_000):
     predict_y(x, a, b)
 print(f"1M inferences: {time.perf_counter() - start:.3f}s")
-# Simpler models infer faster — a key metric for real-time services
+# 단순한 모델일수록 추론이 빠름 — 실시간 서비스의 핵심 지표
 ```
 
 **Expected output:** 백만 번의 추론 시간이 숫자로 출력되고, 같은 정확도라면 더 단순한 모델이 운영 비용과 지연 시간에서 유리하다는 점을 확인할 수 있어야 합니다.
@@ -176,14 +175,14 @@ def basic_stats(values: list[float]) -> dict:
             "min": min(values), "max": max(values)}
 
 print(basic_stats(ys))
-# Looking at distribution, missing values, and outliers before training is half the job in ML
+# 학습 전 분포, 결측치, 이상치 확인이 ML 작업의 절반
 ```
 
 ### 5단계: ML 워크플로우 한 줄 요약
 
 ```python
-# 1) frame the problem -> 2) collect data -> 3) preprocess -> 4) train model
-# -> 5) evaluate -> 6) deploy -> 7) monitor -> back to 1)
+# 1) 문제 정의 -> 2) 데이터 수집 -> 3) 전처리 -> 4) 모델 학습
+# -> 5) 평가 -> 6) 배포 -> 7) 모니터링 -> 1)로 반복
 
 steps = [
     "frame problem", "collect data", "preprocess", "train model",

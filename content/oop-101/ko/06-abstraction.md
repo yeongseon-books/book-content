@@ -389,7 +389,7 @@ OrderRepository <- SqlOrderRepository, InMemoryOrderRepository
 PaymentGateway  <- MockGateway, RealGateway
 ```
 
-## before/after: 구체 구현 의존에서 포트-어댑터 구조로
+## 적용 전후: 구체 구현 의존에서 포트-어댑터 구조로
 
 ```python
 # before

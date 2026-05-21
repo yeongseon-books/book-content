@@ -76,7 +76,7 @@ last_reviewed: '2026-05-14'
 
 ## 실습: 비교표 만들기
 
-### Step 1 — Purpose
+### 단계 1 — Purpose
 
 ```text
 Analyst: answer questions
@@ -86,7 +86,7 @@ Engineer: guarantee data flow
 
 목적은 역할의 나침반입니다. 질문에 답하는 역할인지, 가설을 검증하는 역할인지, 데이터 흐름을 보장하는 역할인지에 따라 필요한 역량이 달라집니다.
 
-### Step 2 — Deliverables
+### 단계 2 — Deliverables
 
 ```text
 Analyst: dashboards, reports
@@ -96,8 +96,7 @@ Engineer: pipelines, schemas
 
 직무는 산출물로 가장 선명하게 드러납니다. 보고서와 대시보드가 중심인지, 실험 설계와 모델이 중심인지, 파이프라인과 스키마가 중심인지 보면 역할 구분이 쉬워집니다.
 
-### Step 3 — Primary Tools
-
+### 단계 3 — 주요 도구
 ```text
 Analyst: SQL, BI tool
 Scientist: Python, notebook, Spark
@@ -106,7 +105,7 @@ Engineer: Airflow, dbt, Kafka
 
 도구는 목적을 따라옵니다. 같은 Python을 써도 분석가는 가공과 해석에, 사이언티스트는 모델링에, 엔지니어는 파이프라인 자동화에 더 자주 씁니다.
 
-### Step 4 — Metrics
+### 단계 4 — Metrics
 
 ```text
 Analyst: decision adoption rate
@@ -116,7 +115,7 @@ Engineer: SLA, data quality
 
 어떤 지표로 평가받는지 알면 역할의 본질이 보입니다. 분석가는 의사결정 반영률, 사이언티스트는 검증의 신뢰도, 엔지니어는 안정성과 품질이 더 중요합니다.
 
-### Step 5 — Collaboration
+### 단계 5 — Collaboration
 
 ```text
 Analyst <-> PM/marketing

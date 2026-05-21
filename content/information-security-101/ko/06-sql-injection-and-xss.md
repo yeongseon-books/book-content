@@ -70,7 +70,7 @@ flowchart LR
 
 ```python
 cur.execute(f"SELECT * FROM users WHERE name='{name}'")
-# name = "' OR 1=1 --"  -> returns every row
+# name = "' OR 1=1 --" -> 모든 행을 반환합니다.
 ```
 
 ### 이후 — 매개변수 바인딩 사용
@@ -110,8 +110,8 @@ print(con.execute("SELECT * FROM u WHERE name=?", ("alice",)).fetchall())
 
 ```python
 # 2_orm_dynamic.py
-# SQLAlchemy raw escape hatches stay risky
-# session.execute(text(f"SELECT * FROM u WHERE name='{name}'"))  # do not do this
+# SQLAlchemy 원시 탈출 해치가 계속 위험함
+# session.execute(text(f"SELECT * FROM u WHERE name='{name}'")) # 이렇게 하지 마세요
 ```
 
 ORM은 많은 위험을 줄여 주지만, 원시 SQL이나 `text` 같은 탈출구를 쓰는 순간 같은 문제가 다시 들어옵니다.
@@ -132,7 +132,7 @@ def search(q):
 ```python
 # 4_xss_stored.py
 def render_comment(html):
-    # store the original; encode at output time
+    # 원본을 저장하고 출력 시점에 인코딩합니다
     return f"<div>{escape(html)}</div>"
 ```
 
@@ -142,7 +142,7 @@ def render_comment(html):
 
 ```javascript
 // 5_dom_xss.js
-// document.body.innerHTML = location.hash;   // dangerous
+// document.body.innerHTML = 위치.해시;   // 위험한
 const text = decodeURIComponent(location.hash.slice(1));
 const node = document.createTextNode(text);   // safe
 document.body.appendChild(node);
@@ -210,7 +210,7 @@ def get_users(sort_by: str):
 ### 거부 목록의 한계
 
 ```python
-# deny_list.py — 권장하지 않음
+# 거부_목록.py — 권장하지 마세요
 FORBIDDEN_PATTERNS = ["--", ";", "'", '"', "OR", "DROP"]
 
 def unsafe_filter(user_input: str):
@@ -221,7 +221,7 @@ def unsafe_filter(user_input: str):
 
 # 우회 가능:
 # 1. 대소문자: oR, Or
-# 2. 인코딩: %4F%52 (OR의 URL 인코딩)
+# 2. 기록: %4F%52 (OR의 URL)
 # 3. 주석: /**/ 사이에 공백 삽입
 # 4. Unicode: fullwidth 문자 사용
 ```
@@ -246,11 +246,11 @@ class UserQuery(BaseModel):
         return v
 
 # FastAPI 엔드포인트
-# @app.get("/users")
+# @app.get("/사용자")
 # def list_users(q: UserQuery):
-#     return db.execute(
-#         f"SELECT * FROM users WHERE id > ? ORDER BY {q.sort}",
-#         (q.user_id,)
+# db.execute를 반환합니다(
+# f"SELECT * FROM 사용자 WHERE id > ? ORDER BY {q.sort}",
+# (q.user_id,)
 #     )
 ```
 

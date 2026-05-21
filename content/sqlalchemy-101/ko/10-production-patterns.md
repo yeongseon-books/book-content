@@ -92,7 +92,7 @@ SQLite는 단일 writer DB입니다. file lock으로 직렬화되며, 큰 풀은
 ```python
 # Before: 기본값으로 만들어 버린 엔진
 engine = create_engine(DATABASE_URL)
-# 풀, pre-ping, recycle, 관측 모두 기본 → 새벽에 stale connection으로 5xx
+# 풀, pre-ping, recycle, 모두들 기본 → 새벽에 stale Connection으로 5xx
 ```
 
 ```python

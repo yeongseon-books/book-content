@@ -57,8 +57,7 @@ last_reviewed: '2026-05-15'
 - **Sync replication**: 리더가 팔로워의 확인 응답을 기다린 뒤 쓰기를 완료하는 방식입니다.
 - **Quorum (R, W, N)**: N개 복제본 중 R개를 읽고 W개에 쓰며, R+W>N이면 최신값을 읽을 수 있다는 원리입니다.
 
-## Before / After
-
+## 적용 전후 비교
 **Before — 단일 primary와 비동기 replica**
 
 ```text

@@ -66,12 +66,11 @@ last_reviewed: '2026-05-12'
 | Interpreter | 소스 코드를 실행하면서 해석하는 프로그램 |
 | Paradigm | 코드를 조직하는 방식과 사고 체계 |
 
-## Before / After
-
+## 적용 전후 비교
 **Before — 패러다임을 모를 때:**
 
 ```python
-# All logic crammed into one procedural function
+# 모든 로직을 하나의 절차적 함수에 몰아넣은 형태
 def process_orders(orders):
     total = 0
     for order in orders:
@@ -128,11 +127,11 @@ print(simple_state_machine(tape))  # ['0', '1', '0', '0', '1']
 ```python
 def halts(program, input_data):
     """This function cannot be implemented."""
-    # Decide whether `program` halts on `input_data`.
-    # Proof sketch: assuming this function exists leads to a contradiction.
+    # `input_data`에서 `program`이 종료하는지 판정
+    # 증명 개요: 이 함수가 존재한다고 가정하면 모순에 도달
     raise NotImplementedError("The halting problem is undecidable")
 
-# A practical workaround: use a timeout
+# 실용적인 우회 방법: timeout 사용
 import signal
 
 def run_with_timeout(func, timeout_sec: int = 5):
@@ -149,7 +148,7 @@ def run_with_timeout(func, timeout_sec: int = 5):
 ### 3단계: 명령형 프로그래밍
 
 ```python
-# Imperative: you tell the computer "how" step by step
+# Imperative: 컴퓨터에 "어떻게"를 단계별로 지시
 def sum_of_squares_imperative(n: int) -> int:
     total = 0
     for i in range(1, n + 1):
@@ -166,7 +165,7 @@ print(sum_of_squares_imperative(5))  # 55
 ```python
 from functools import reduce
 
-# Functional: you declare "what" to compute
+# Functional: 무엇을 계산할지만 선언
 def sum_of_squares_functional(n: int) -> int:
     return reduce(lambda acc, x: acc + x * x, range(1, n + 1), 0)
 
@@ -178,15 +177,15 @@ print(sum_of_squares_functional(5))  # 55
 ### 5단계: 컴파일과 인터프리트
 
 ```python
-# Python is an interpreted language
-# Source code -> bytecode -> executed on a virtual machine
+# Python은 인터프리터 언어
+# Source code -> bytecode -> virtual machine에서 실행
 
 import dis
 
 def add(a: int, b: int) -> int:
     return a + b
 
-# Inspect the Python bytecode
+# Python bytecode 확인
 dis.dis(add)
 # LOAD_FAST    0 (a)
 # LOAD_FAST    1 (b)
@@ -268,7 +267,7 @@ class TuringMachine:
 
 
 # 이진수에 1을 더하는 튜링 기계
-# 입력: "1011" (11 in decimal) -> 출력: "1100" (12 in decimal)
+# 입력: "1011" (10진수 11) -> 출력: "1100" (10진수 12)
 rules = {
     # 오른쪽 끝으로 이동
     ("start", "0"): ("start", "0", "R"),

@@ -74,12 +74,11 @@ Relationship network? -> graph
 | 프로파일링 | 실제 코드에서 병목이 어디인지 측정하는 작업입니다 |
 | 벤치마킹 | 여러 구현이나 구조의 성능을 비교하는 실험입니다 |
 
-## Before / After
-
+## 적용 전후 비교
 자료구조를 습관적으로 고르는 경우와 의도적으로 고르는 경우를 비교해 보겠습니다.
 
 ```python
-# before: using list everywhere — inefficient
+# before: 모든 곳에 list 사용 — 비효율적
 seen = []
 for item in data:
     if item not in seen:  # O(n) lookup
@@ -88,7 +87,7 @@ for item in data:
 ```
 
 ```python
-# after: choosing the right data structure — efficient
+# after: 올바른 data structure 선택 — 효율적
 seen = set()
 for item in data:
     if item not in seen:  # O(1) lookup
@@ -103,7 +102,7 @@ for item in data:
 ### 단계 1: 시간 복잡도 비교표 살펴보기
 
 ```python
-# Time complexity by data structure and operation
+# data structure와 연산별 시간 복잡도
 complexity = """
 | Operation      | list   | dict   | set    | deque  | heapq     |
 |---------------|--------|--------|--------|--------|-----------|
@@ -186,12 +185,11 @@ benchmark(
 )
 ```
 
-### Step 4: Use composite data structures
-
+### 단계 4: 복합 자료구조 사용
 ```python
 from collections import defaultdict, deque
 
-# Pattern 1: dict + list — grouping
+# 패턴 1: dict + list — 그룹화
 students_by_grade = defaultdict(list)
 students = [("Alice", "A"), ("Bob", "B"), ("Charlie", "A"), ("Diana", "B")]
 for name, grade in students:
@@ -199,7 +197,7 @@ for name, grade in students:
 print(dict(students_by_grade))
 # {'A': ['Alice', 'Charlie'], 'B': ['Bob', 'Diana']}
 
-# Pattern 2: dict + set — unique grouping
+# 패턴 2: dict + set — 중복 없는 그룹화
 unique_tags = defaultdict(set)
 articles = [("post1", "python"), ("post2", "python"), ("post1", "flask")]
 for title, tag in articles:
@@ -207,7 +205,7 @@ for title, tag in articles:
 print(dict(unique_tags))
 # {'post1': {'python', 'flask'}, 'post2': {'python'}}
 
-# Pattern 3: list + set — order preservation + fast search
+# 패턴 3: list + set — 순서 보존 + 빠른 탐색
 class OrderedSet:
     def __init__(self):
         self._items = []
@@ -230,8 +228,7 @@ for x in [3, 1, 4, 1, 5, 9, 2, 6, 5]:
 print(list(os))  # [3, 1, 4, 5, 9, 2, 6]
 ```
 
-### Step 5: Summarize optimal choices by scenario
-
+### 단계 5: 시나리오별 최적 선택 요약
 ```python
 scenarios = {
     "Cache (key-value store, O(1) lookup)": "dict",

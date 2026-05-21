@@ -153,7 +153,7 @@ x = np.arange(0, n+1)
 # 이항분포 PMF
 binom_pmf = stats.binom.pmf(x, n, p)
 
-# 정규분포 근사 (mean=np, var=np(1-p))
+# 정규분포 위치 (mean=np, var=np(1-p))
 mu = n * p
 sigma = np.sqrt(n * p * (1 - p))
 norm_pdf = stats.norm.pdf(x, mu, sigma)
@@ -212,7 +212,7 @@ from scipy import stats
 # 음이항분포 (Negative Binomial): 과분산 모델링
 mu = 5
 alpha = 2  # dispersion parameter
-# scipy에서는 (r, p) 형태로 표현
+# scipy에서는 (r, p) 형태로 표현합니다
 r = mu / alpha
 p = r / (r + mu)
 

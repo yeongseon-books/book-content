@@ -474,7 +474,7 @@ def reduce_sorting_to_convex_hull():
     정렬 문제를 Convex Hull로 환원하여
     Convex Hull의 하한이 O(n log n)임을 증명합니다.
     """
-    # 아이디어: 숫자 x_i를 점 (x_i, x_i^2)으로 변환
+    # 아이디어: 숫자 x_i 점을 (x_i, x_i^2)로 변환
     # 이 점들의 Convex Hull을 구하면 정렬된 순서가 나옴
     numbers = [5, 2, 8, 1, 9, 3]
 

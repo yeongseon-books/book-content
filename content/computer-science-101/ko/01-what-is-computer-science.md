@@ -68,12 +68,11 @@ last_reviewed: '2026-05-12'
 | Complexity | 알고리즘이 사용하는 시간과 공간의 증가율 |
 | Turing machine | 무엇이 계산 가능한지 정의하는 이론 모델 |
 
-## Before / After
-
+## 적용 전후 비교
 **Before — CS를 모를 때:**
 
 ```python
-# Compare every pair to find duplicates — O(n^2)
+# 모든 쌍을 비교해 중복 찾기 — O(n^2)
 def find_duplicates(items):
     duplicates = []
     for i in range(len(items)):
@@ -86,7 +85,7 @@ def find_duplicates(items):
 **After — CS를 알 때:**
 
 ```python
-# Use a set for an O(n) solution
+# set을 사용해 O(n)으로 해결
 def find_duplicates(items):
     seen = set()
     duplicates = set()
@@ -102,7 +101,7 @@ def find_duplicates(items):
 ### 1단계: 계산이란 무엇인가
 
 ```python
-# The simplest computation: input -> process -> output
+# 가장 단순한 계산: input -> process -> output
 def is_even(n: int) -> bool:
     """Return True if n is even."""
     return n % 2 == 0
@@ -116,7 +115,7 @@ print(is_even(7))   # False
 ### 2단계: 추상화의 힘
 
 ```python
-# Hide implementation details, expose only the interface
+# 구현 세부사항은 숨기고 interface만 노출
 class Stack:
     """An abstract stack — internals stay hidden."""
 
@@ -132,7 +131,7 @@ class Stack:
     def is_empty(self) -> bool:
         return len(self._items) == 0
 
-# Users do not need to know there is a list inside
+# 사용자는 내부에 list가 있는지 알 필요 없음
 stack = Stack()
 stack.push(1)
 stack.push(2)
@@ -184,7 +183,7 @@ print(f"Binary search: {time.time() - start:.6f}s")
 ### 4단계: 계층 구조로 이해하는 CS
 
 ```python
-# Express the layered relationship of CS subjects as a dictionary
+# CS 주제의 계층 관계를 dictionary로 표현
 cs_layers = {
     "Applications": ["AI", "Data science", "Web", "Mobile"],
     "Software": ["Software engineering", "Programming languages"],

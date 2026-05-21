@@ -61,8 +61,7 @@ last_reviewed: '2026-05-14'
 - **Cost Allocation Report**: 태그 기준으로 비용을 분류한 월별 리포트입니다.
 - **Unit Economics**: 요청 한 건, 사용자 한 명당 비용을 계산하는 방식입니다.
 
-## Before / After
-
+## 적용 전후 비교
 **Before**에서는 모든 인스턴스를 `m5.xlarge`로 맞춰 두고 밤에도 그대로 켜 둡니다.
 
 **After**에서는 비프로덕션은 야간에 자동으로 멈추고, 안정적인 프로덕션 부하는 Savings Plans로 할인받습니다.
@@ -89,7 +88,7 @@ last_reviewed: '2026-05-14'
 태그를 권장만 하면 누락률이 빠르게 올라갑니다. SCP(Service Control Policy)나 IAM 조건으로 강제해야 합니다.
 
 ```python
-# IAM 정책: team 태그 없이 EC2 인스턴스 생성 차단
+# IAM: 팀 태그 없이 EC2를 생성합니다.
 require_tags_policy = {
     "Version": "2012-10-17",
     "Statement": [{

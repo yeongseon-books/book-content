@@ -28,7 +28,6 @@ last_reviewed: '2026-05-12'
 
 알고리즘은 코딩 테스트에서만 중요한 주제가 아닙니다. 성능 최적화, 데이터 처리, 시스템에서의 트레이드오프 판단까지, 개발자가 실무에서 문제를 바라보는 방식 자체를 바꿉니다.
 
-
 ![Algorithms with Python 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/01/01-01-big-picture.ko.png)
 *Algorithms with Python 101 1장 흐름 개요*
 
@@ -72,19 +71,18 @@ Output: 9
 | Correctness | 모든 유효한 입력에 대해 올바른 출력을 만드는 성질입니다 |
 | Efficiency | 시간과 메모리를 얼마나 아껴 쓰는지를 나타냅니다 |
 
-## Before / After
-
+## 적용 전후 비교
 리스트에서 최댓값을 찾는 두 가지 접근을 비교해 보겠습니다.
 
 ```python
-# before: sort the list then take the last element — O(n log n)
+# before: 리스트를 정렬한 뒤 마지막 요소를 가져옴 — O(n log n)
 data = [3, 7, 2, 9, 4]
 sorted_data = sorted(data)
 maximum = sorted_data[-1]
 ```
 
 ```python
-# after: single pass through the list — O(n)
+# after: 리스트를 한 번만 순회 — O(n)
 data = [3, 7, 2, 9, 4]
 maximum = data[0]
 for x in data[1:]:
@@ -113,8 +111,7 @@ print(f"Maximum: {find_max(data)}")  # Maximum: 9
 
 가장 단순한 선형 순회 알고리즘입니다. 정렬 없이 한 번만 훑기 때문에, 같은 문제를 더 직접적으로 푼다는 점이 중요합니다.
 
-### Step 2: Compute Basic Statistics
-
+### 단계 2: 기본 통계 계산
 ```python
 def compute_stats(numbers: list[int]) -> dict:
     """Compute sum, average, min, and max of a list."""
@@ -156,14 +153,13 @@ def reverse_string(text: str) -> str:
 print(reverse_string("algorithm"))  # mhtirogla
 print(reverse_string("Python"))    # nohtyP
 
-# Compare with Python built-in
+# Python built-in과 비교
 print("algorithm"[::-1])  # mhtirogla
 ```
 
 내장 기능이 있어도 직접 구현해 보면 반복, 인덱스, 종료 조건 같은 알고리즘의 기본 단위를 더 분명하게 볼 수 있습니다.
 
-### Step 4: Compare Two Algorithms
-
+### 단계 4: 두 알고리즘 비교
 ```python
 import time
 
@@ -274,57 +270,6 @@ print(is_palindrome("A man a plan a canal Panama"))  # True
 
 알고리즘은 문제를 해결하는 명확한 절차이며, 어떤 알고리즘을 선택하느냐가 성능과 확장성을 크게 좌우합니다. 다음 글에서는 이 효율을 더 객관적으로 비교하는 도구인 시간 복잡도와 Big-O 표기법을 다룹니다.
 
-## 실전 패턴 추가: 정렬과 탐색 구현을 문제 유형별로 선택하기
-
-알고리즘 문제에서는 코드 길이보다 선택 기준이 더 중요합니다. 입력 크기, 데이터 분포, 정렬 여부에 따라 정렬/탐색 전략이 달라집니다. 아래 예시는 같은 정수 배열을 다루더라도 어떤 조건에서 어떤 구현을 고르는지 보여 줍니다.
-
-```python
-def binary_search(nums: list[int], target: int) -> int:
-    left, right = 0, len(nums) - 1
-    while left <= right:
-        mid = (left + right) // 2
-        if nums[mid] == target:
-            return mid
-        if nums[mid] < target:
-            left = mid + 1
-        else:
-            right = mid - 1
-    return -1
-
-
-def merge_sort(nums: list[int]) -> list[int]:
-    if len(nums) <= 1:
-        return nums
-    mid = len(nums) // 2
-    left = merge_sort(nums[:mid])
-    right = merge_sort(nums[mid:])
-
-    merged: list[int] = []
-    i = j = 0
-    while i < len(left) and j < len(right):
-        if left[i] <= right[j]:
-            merged.append(left[i])
-            i += 1
-        else:
-            merged.append(right[j])
-            j += 1
-    merged.extend(left[i:])
-    merged.extend(right[j:])
-    return merged
-
-
-def quick_sort(nums: list[int]) -> list[int]:
-    if len(nums) <= 1:
-        return nums
-    pivot = nums[len(nums) // 2]
-    less = [x for x in nums if x < pivot]
-    equal = [x for x in nums if x == pivot]
-    greater = [x for x in nums if x > pivot]
-    return quick_sort(less) + equal + quick_sort(greater)
-```
-
-실무 판단은 보통 이렇게 정리됩니다. 이미 정렬된 리스트에서 존재 여부를 반복 조회하면 이진 탐색이 기본 선택입니다. 입력이 계속 바뀌고 안정 정렬이 필요하면 병합 정렬 계열이 유리하고, 평균 성능과 구현 단순성을 우선하면 퀵 정렬 계열이 자주 선택됩니다. 코딩 테스트에서는 Python 내장 `sort()`가 Timsort 기반이라 거의 항상 가장 실용적인 기본값이지만, 원리를 직접 구현해 보면 경계 조건과 복잡도 해석 능력이 크게 좋아집니다.
-
 ## 심화 실전 노트: 알고리즘 사고를 코드로 고정하는 방법
 
 ### 구현 앵커: 사양-검증-복잡도 로그를 함께 남기는 템플릿
@@ -339,7 +284,6 @@ def run_algorithm_contract(name: str, func, cases: list[tuple[tuple, object]]) -
                 f"[{name}] case#{index} failed: args={args}, expected={expected}, actual={actual}"
             )
 
-
 def max_linear(nums: list[int]) -> int:
     if not nums:
         raise ValueError("empty input")
@@ -348,7 +292,6 @@ def max_linear(nums: list[int]) -> int:
         if value > current_max:
             current_max = value
     return current_max
-
 
 run_algorithm_contract(
     "max_linear",
@@ -420,7 +363,6 @@ run_algorithm_contract(
 ```python
 import time
 
-
 def benchmark(func, *args, repeat: int = 5) -> float:
     best = float("inf")
     for _ in range(repeat):
@@ -463,77 +405,6 @@ E. 해답 없음 케이스: 종료 조건 검증
 - "필요하면 정답 유지 조건을 짧게 증명하겠습니다."
 
 이 스크립트를 반복하면 설명의 밀도가 올라가고, 구현 중 길을 잃는 빈도가 줄어듭니다.
-
-## 케이스 스터디 확장: 입력 규모가 커질 때의 판단
-
-### 시나리오 1: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
-
-### 시나리오 2: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
-
-### 시나리오 3: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
 
 ## 처음 질문으로 돌아가기
 

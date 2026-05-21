@@ -132,7 +132,7 @@ print(response.content)
     squared_numbers = [x**2 for x in numbers]
     print(squared_numbers)  # [1, 4, 9, 16, 25]
 
-    # For loop equivalent
+    # for 루프와 동일한 코드
     numbers = [1, 2, 3, 4, 5]
     squared_numbers = []
     for x in numbers:
@@ -143,7 +143,7 @@ print(response.content)
     In this example, the list comprehension is a better choice because it is more concise and easier to read.
 
     ```python
-    # For loop with mutation
+    # 변이를 포함한 for 루프
     numbers = [1, 2, 3, 4, 5]
     numbers = [x**2 for x in numbers]
     print(numbers)  # [1, 4, 9, 16, 25]

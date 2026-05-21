@@ -76,8 +76,7 @@ last_reviewed: '2026-05-14'
 
 ## 실습: 12주 학습 경로
 
-### Step 1 — Fundamentals (Weeks 1-4)
-
+### 단계 1 — 기초 (1-4주차)
 ```text
 - Python syntax, pandas
 - SQL JOIN, GROUP BY
@@ -87,8 +86,7 @@ last_reviewed: '2026-05-14'
 
 처음 4주는 화려하지 않아도 괜찮습니다. 이 구간을 건너뛰면 뒤에서 더 큰 비용을 치르게 됩니다.
 
-### Step 2 — Analytics (Weeks 5-8)
-
+### 단계 2 — 분석 (5-8주차)
 ```text
 - Data cleaning
 - A/B test design
@@ -98,8 +96,7 @@ last_reviewed: '2026-05-14'
 
 분석 단계에서는 질문을 구조화하고 결과를 설명하는 연습이 필요합니다. 지표와 해석을 같이 다뤄야 실전 감각이 붙습니다.
 
-### Step 3 — Modeling (Weeks 9-12)
-
+### 단계 3 — 모델링 (9-12주차)
 ```text
 - One regression, one classification
 - scikit-learn pipeline
@@ -109,8 +106,7 @@ last_reviewed: '2026-05-14'
 
 모델링은 기초와 분석 위에 올라갑니다. 그래서 이 단계에서는 모델 자체보다 문제 정의와 평가 지표를 함께 보는 습관이 중요합니다.
 
-### Step 4 — Weekly Artifact
-
+### 단계 4 — 주간 산출물
 ```markdown
 - README
 - Data source
@@ -121,8 +117,7 @@ last_reviewed: '2026-05-14'
 
 주간 산출물은 “공부했다”가 아니라 “남겼다”는 증거입니다. 나중에 포트폴리오로 연결할 수 있다는 점에서도 중요합니다.
 
-### Step 5 — Retro Template
-
+### 단계 5 — 회고 템플릿
 ```text
 What went well / Improve / Next
 ```

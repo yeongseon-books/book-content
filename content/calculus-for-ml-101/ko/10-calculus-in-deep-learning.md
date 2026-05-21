@@ -183,7 +183,7 @@ with torch.no_grad():
 
 자동미분은 symbolic 미분이나 수치 미분과 다릅니다. 프로그램 연산 그래프를 그대로 따라가며 정확한 미분값을 계산합니다.
 
-### Forward mode
+### 순방향 모드(Forward mode)
 
 Forward mode는 입력 방향으로 미분 신호를 함께 전파합니다. 각 변수에 대해 값과 tangent를 동시에 유지합니다.
 
@@ -194,7 +194,7 @@ ightarrow (f(x), \dot{f})
 
 입력 차원이 작고 출력 차원이 큰 문제에서 유리합니다.
 
-### Reverse mode
+### 역방향 모드(Reverse mode)
 
 Reverse mode는 먼저 값을 전부 계산한 뒤, 출력에서 입력으로 adjoint를 전파합니다. 딥러닝은 보통 파라미터 수가 매우 많고 출력(loss)은 스칼라이므로 reverse mode가 압도적으로 효율적입니다.
 

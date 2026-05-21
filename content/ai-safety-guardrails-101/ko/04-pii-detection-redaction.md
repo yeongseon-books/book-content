@@ -100,7 +100,7 @@ def detect_pii(text: str) -> list[tuple[str, int, int, str]]:
 
 text = "Reach me at 555-123-4567 or alice@example.com."
 print(detect_pii(text))
-# [('us_phone', 12, 24, '555-123-4567'), ('email', 28, 45, 'alice@example.com')]
+# [('us_phone', 12, 24, '555-123-4567'), ('이메일', 28, 45, 'alice@example.com')]
 ```
 
 regex의 장점은 빠르고 explainable하다는 점입니다. 다만 이름, 주소, 의료 표현처럼 형식이 고정되지 않은 정보는 잘 잡지 못합니다. 카드 번호도 Luhn 검증 없이 정규식만 쓰면 false positive가 많습니다.
@@ -123,7 +123,7 @@ results = analyzer.analyze(text=text, language="en")
 
 masked = anonymizer.anonymize(text=text, analyzer_results=results)
 print(masked.text)
-# "<PERSON> called from <PHONE_NUMBER> about her order."
+# "<PERSON>이(가) 주문에 이상한 <PHONE_NUMBER>에서 전화했습니다."
 ```
 
 다국어 환경에서는 언어별 spaCy 모델이나 별도 NER 모델을 등록해 보완할 수 있습니다. 회사 내부 식별자도 커스텀 recognizer로 추가합니다.
@@ -155,7 +155,7 @@ class PIITokenizer:
     reverse: dict[str, str] = field(default_factory=dict)
 
     def tokenize(self, text: str, detected: list[tuple]) -> str:
-        # Iterate in reverse order so offsets stay valid
+        # 오프셋이 유효하게 유지되도록 역순으로 반복합니다.
         for cat, start, end, value in sorted(detected, key=lambda x: -x[1]):
             if value not in self.mapping:
                 token = f"<{cat.upper()}_{secrets.token_hex(4)}>"
@@ -173,8 +173,8 @@ tk = PIITokenizer()
 src = "Alice (alice@example.com) ordered. Send to alice@example.com."
 detected = detect_pii(src)
 masked = tk.tokenize(src, detected)
-# "Alice (<EMAIL_a3b2c1d0>) ordered. Send to <EMAIL_a3b2c1d0>."
-# Same email maps to the same token → model treats it as one entity.
+# "앨리스(<EMAIL_a3b2c1d0>)가 주문했습니다. <EMAIL_a3b2c1d0>으로 보내주세요."
+# 동일한 이메일은 동일한 토큰에 매핑됩니다. → 모델은 이를 하나의 엔터티로 취급합니다.
 
 response = llm.complete(masked)
 final = tk.detokenize(response)  # restore before sending to user
@@ -199,8 +199,8 @@ def safe_call(user_input: str, retrieved_docs: list[str]) -> str:
     if output_detected:
         log_pii_leak(output_detected, response)
         # Option 1: block
-        # return "Response blocked due to detected personal information."
-        # Option 2: mask and pass through
+        # "개인정보가 감지되어 답변이 차단되었습니다."를 반환합니다.
+        # 옵션 2: 마스크 및 통과
         response = mask_text(response, output_detected)
 
     return response

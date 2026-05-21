@@ -196,7 +196,7 @@ def callback(indata, frames, time_, status):
         segs, _ = model.transcribe(buffer, language="en")
         text = " ".join(s.text for s in segs)
         print("[partial]", text)
-        # sliding window: keep only last 1 second
+        # 슬라이딩 윈도우: 최근 1초만 유지
         buffer = buffer[-SR:]
 
 with sd.InputStream(callback=callback, channels=1, samplerate=SR):

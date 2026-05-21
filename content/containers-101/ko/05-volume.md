@@ -135,8 +135,7 @@ def create(name):
 
 먼저 명시적으로 volume을 만듭니다. 이름이 있는 volume은 특정 호스트 경로에 덜 의존하므로 운영과 이관에 유리합니다.
 
-### 단계 2 — Mount and run
-
+### 단계 2 — 마운트 후 실행
 ```python
 def run_db(volume):
     subprocess.run([
@@ -162,8 +161,7 @@ def inspect(name):
 
 volume 메타데이터를 확인합니다. 어떤 드라이버를 쓰는지, 실제 마운트 지점이 어디인지 점검할 수 있습니다.
 
-### 단계 4 — Back up
-
+### 단계 4 — 백업하기
 ```python
 def backup(volume, archive):
     subprocess.run([

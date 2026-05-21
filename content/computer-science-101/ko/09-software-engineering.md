@@ -69,8 +69,7 @@ last_reviewed: '2026-05-12'
 | CI/CD | 빌드·테스트·배포를 자동화하는 파이프라인 |
 | Technical debt | 단기 편의를 위해 미뤄 둔 구조 개선 비용 |
 
-## Before / After
-
+## 적용 전후 비교
 **Before — 테스트 없이 짠 함수:**
 
 ```python
@@ -81,7 +80,7 @@ def calc_discount(price, user_type):
         return price * 0.9
     else:
         return price
-# You don't know which input will break it until production calls it
+# 운영에서 호출되기 전까지 어떤 입력이 깨뜨릴지 알 수 없음
 ```
 
 **After — 테스트로 동작을 명세화한 함수:**
@@ -129,7 +128,7 @@ pytest -v
 ### 2단계: 회귀 테스트로 버그 막기
 
 ```python
-# When you find a bug, first write a test that reproduces it
+# 버그를 찾으면 먼저 재현 테스트부터 작성
 def test_zero_price_returns_zero():
     """A 0-priced item bought by a VIP must still be 0 (was broken in a previous version)."""
     assert calc_discount(0, "vip") == 0
@@ -153,7 +152,7 @@ git push origin feature/discount-vip
 ### 4단계: 리팩터링 — 동작은 그대로, 구조만 개선
 
 ```python
-# Before: the function grows every time a new tier is added
+# Before: 새 tier를 추가할 때마다 함수가 커짐
 def calc_discount(price, user_type):
     if user_type == "vip":
         return price * 0.7
@@ -163,7 +162,7 @@ def calc_discount(price, user_type):
         return price * 0.85
     return price
 
-# After: pulled out into a data table — adding a tier is one line
+# After: 데이터 테이블로 분리 — tier 추가는 한 줄
 DISCOUNT_RATES = {
     "vip":     0.70,
     "member":  0.90,
@@ -173,7 +172,7 @@ DISCOUNT_RATES = {
 def calc_discount(price: float, user_type: str) -> float:
     return price * DISCOUNT_RATES.get(user_type, 1.0)
 
-# If the same tests still pass, this is a safe refactor
+# 같은 테스트가 계속 통과하면 안전한 refactor
 ```
 
 ### 5단계: 간단한 CI 설정 (GitHub Actions)

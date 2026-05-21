@@ -69,12 +69,11 @@ last_reviewed: '2026-05-12'
 | ACID | 원자성·일관성·격리성·지속성 네 가지 속성 |
 | Query planner | SQL을 어떤 방식으로 실행할지 결정하는 DB 구성 요소 |
 
-## Before / After
-
+## 적용 전후 비교
 **Before — 인덱스 없이 N+1 쿼리:**
 
 ```python
-# Fetch orders for 100 users — 101 queries
+# 사용자 100명의 주문 조회 — 쿼리 101개
 users = cursor.execute("SELECT id FROM users").fetchall()
 orders = []
 for (user_id,) in users:
@@ -85,7 +84,7 @@ for (user_id,) in users:
 **After — JOIN과 인덱스 활용:**
 
 ```python
-# A single query, fast when user_id is indexed
+# 단일 쿼리, user_id에 index가 있으면 빠름
 cursor.execute("""
     SELECT u.id, o.id, o.amount
     FROM users u
@@ -136,7 +135,7 @@ conn.commit()
 for row in cur.execute("SELECT id, email FROM users"):
     print(row)
 
-# WHERE + ORDER BY + LIMIT
+# WHERE + ORDER BY + LIMIT 절 조합
 for row in cur.execute(
     "SELECT name, email FROM users WHERE name LIKE 'A%' ORDER BY id LIMIT 10"
 ):
@@ -188,7 +187,7 @@ print(f"after  index: {time.perf_counter() - start:.6f}s")
 ```python
 for row in cur.execute("EXPLAIN QUERY PLAN SELECT * FROM big WHERE k = 12345"):
     print(row)
-# A line like (… USING INDEX idx_big_k …) confirms the index is used
+# (… USING INDEX idx_big_k …) 같은 줄로 index 사용 확인
 ```
 
 ### 5단계: 트랜잭션과 ACID

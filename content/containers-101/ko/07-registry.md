@@ -140,8 +140,7 @@ def push(remote):
 
 이제 이미지를 레지스트리에 업로드합니다. 팀 운영에서는 보통 개발자 개인이 아니라 CI만 push 권한을 가지게 설계합니다.
 
-### 단계 4 — Read the digest
-
+### 단계 4 — 다이제스트 읽기
 ```python
 def digest(remote):
     res = subprocess.run(
@@ -153,8 +152,7 @@ def digest(remote):
 
 업로드 후에는 digest를 읽습니다. 운영 배포가 tag 기준인지 digest 기준인지에 따라 재현성 수준이 크게 달라집니다. CI 파이프라인에서 push 직후 digest를 환경변수나 파일로 기록해 두면 이후 승격 단계에서 동일성을 검증할 수 있습니다.
 
-### 단계 5 — Verify with pull
-
+### 단계 5 — pull로 검증
 ```python
 def verify_pull(remote_digest):
     subprocess.run(["docker", "pull", remote_digest], check=True)

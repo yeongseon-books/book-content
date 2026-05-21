@@ -168,7 +168,7 @@ LangChain에서 로더의 첫 책임은 파일을 읽는 일이고, 두 번째 �
 ```python
 from pathlib import Path
 
-# deprecated since langchain 0.2.8 — use langchain_unstructured.UnstructuredLoader instead
+# langchain 0.2.8부터 지원 중단 — langchain_unstructured.UnstructuredLoader를 대신 사용하세요
 from langchain_community.document_loaders import (
     PDFMinerLoader,
     TextLoader,
@@ -303,7 +303,7 @@ markdown_text = """# Service policy
 Users can reset passwords from the account settings page.
 The reset link expires after 15 minutes.
 
-## API rate limit
+# # API 속도 제한
 The public API allows 120 requests per minute per API key.
 Burst requests above the limit receive HTTP 429 responses.
 """

@@ -82,8 +82,7 @@ Write the "problem", not the "symptom".
 
 시니어는 증상과 문제를 구분합니다. 증상을 바로 고치기보다 왜 그런 현상이 생겼는지를 문제 정의 단계에서 분리해 내야 합니다.
 
-### Step 2 — Measure Impact
-
+### 단계 2 — 영향도 측정
 ```markdown
 - hypothesis
 - measurement plan
@@ -92,7 +91,7 @@ Write the "problem", not the "symptom".
 
 좋은 제안은 실행 전에 이미 측정 계획이 붙어 있습니다. 무엇이 좋아질 것이고, 어떻게 확인할지까지 말할 수 있어야 설득력이 생깁니다.
 
-### Step 3 — Mentor
+### 단계 3 — Mentor
 
 ```text
 - monthly 1:1
@@ -101,16 +100,14 @@ Write the "problem", not the "symptom".
 
 시니어는 자기 성과만 내는 사람이 아닙니다. 동료의 성장을 돕는 행동이 팀 전체의 생산성을 올립니다.
 
-### Step 4 — Decision Records
-
+### 단계 4 — 결정 기록
 ```text
 - decision / alternatives / rationale / impact
 ```
 
 의사결정 기록은 단순 메모가 아닙니다. 나중에 맥락을 복원하고 같은 논의를 반복하는 비용을 줄이는 장치입니다.
 
-### Step 5 — Systems Thinking
-
+### 단계 5 — 시스템 사고
 ```text
 - data -> model -> decision -> operation -> retro
 ```

@@ -26,7 +26,6 @@ last_reviewed: '2026-05-15'
 
 이 글은 머신러닝 101 시리즈의 4번째 글입니다. 여기서는 선형 회귀의 식과 직관, 평균제곱오차, R-squared, 잔차 해석을 함께 보면서 왜 이 모델이 여전히 가장 먼저 돌려 봐야 하는 기준선인지 정리하겠습니다.
 
-
 ![Machine Learning 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/04/04-01-diagram.ko.png)
 *Machine Learning 101 4장 흐름 개요*
 
@@ -89,7 +88,6 @@ print("w, b:", theta)
 
 선형 회귀는 이 가정들이 만족될 때 가장 잘 동작합니다. 가정이 깨지면 계수의 해석이 흘들리거나 예측 성능이 떨어집니다.
 
-
 ## 왜 중요한가
 
 선형 회귀는 해석이 쉽고 빠르며, 생각보다 강력합니다. 그래서 가장 먼저 돌려 보는 편이 좋습니다. 베이스라인이 없으면 더 복잡한 모델을 쓸 정당성도 약해집니다.
@@ -104,36 +102,35 @@ print("w, b:", theta)
 - **R-squared**: 모델이 설명한 분산의 비율입니다.
 - **잔차(Residual)**: `y - y_hat`입니다.
 
-## Before/After
-
+## 적용 전과 후
 **Before**: "그래프상 직선처럼 보인다"는 인상만 있고 수치 검증은 없습니다.
 
 **After**: 모델, 지표, 잔차를 함께 보며 세 단계로 검증합니다.
 
 ## 실습: 5단계로 보는 회귀
 
-### Step 1 — 데이터
+### 단계 1 — 데이터
 
 ```python
 from sklearn.datasets import fetch_california_housing
 X, y = fetch_california_housing(return_X_y=True)
 ```
 
-### Step 2 — 분할
+### 단계 2 — 분할
 
 ```python
 from sklearn.model_selection import train_test_split
 Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=42)
 ```
 
-### Step 3 — 학습
+### 단계 3 — 학습
 
 ```python
 from sklearn.linear_model import LinearRegression
 model = LinearRegression().fit(Xtr, ytr)
 ```
 
-### Step 4 — 평가
+### 단계 4 — 평가
 
 ```python
 from sklearn.metrics import mean_squared_error, r2_score
@@ -142,7 +139,7 @@ print("MSE:", mean_squared_error(yte, pred))
 print("R^2:", r2_score(yte, pred))
 ```
 
-### Step 5 — 계수 확인
+### 단계 5 — 계수 확인
 
 ```python
 for name, coef in zip(range(Xtr.shape[1]), model.coef_):
@@ -203,59 +200,6 @@ for name, coef in zip(range(Xtr.shape[1]), model.coef_):
 이 글에서 기억할 핵심은 네 가지입니다. 첫째, 선형 회귀는 `y_hat = Xw + b` 구조로 예측합니다. 둘째, MSE와 R-squared는 서로 다른 각도에서 성능을 읽게 해 줍니다. 셋째, 잔차 분석이 빠지면 모델 가정 검증도 빠집니다. 넷째, 복잡한 모델을 쓰기 전에는 항상 선형 회귀 베이스라인을 먼저 확인해야 합니다.
 
 다음 글에서는 분류의 기본 모델인 Logistic Regression으로 넘어가겠습니다.
-
-## 실전 확장: 학습·평가 파이프라인 통합
-
-입문 단계에서 `fit()` 한 번으로 결과를 확인하면 모델이 잘 동작하는 것처럼 보이지만, 실무에서는 같은 데이터로 학습과 평가를 동시에 수행하면 성능이 과대평가되기 쉽습니다. 따라서 최소한 `train/validation/test` 구분을 갖춘 뒤, 피처 전처리와 모델 학습, 하이퍼파라미터 탐색, 최종 평가를 분리해야 합니다. 아래 예시는 분류 문제에서 재현 가능한 기준선을 만드는 기본 템플릿입니다.
-
-```python
-from sklearn.datasets import load_breast_cancer
-from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
-
-X, y = load_breast_cancer(return_X_y=True)
-
-X_train_full, X_test, y_train_full, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42, stratify=y
-)
-X_train, X_val, y_train, y_val = train_test_split(
-    X_train_full, y_train_full, test_size=0.25, random_state=42, stratify=y_train_full
-)
-
-pipe = Pipeline([
-    ("scaler", StandardScaler()),
-    ("model", LogisticRegression(max_iter=2000))
-])
-
-param_grid = {
-    "model__C": [0.01, 0.1, 1.0, 10.0],
-    "model__penalty": ["l2"],
-    "model__solver": ["lbfgs"]
-}
-
-cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-search = GridSearchCV(
-    estimator=pipe,
-    param_grid=param_grid,
-    scoring="f1",
-    cv=cv,
-    n_jobs=-1
-)
-search.fit(X_train, y_train)
-
-val_pred = search.predict(X_val)
-val_proba = search.predict_proba(X_val)[:, 1]
-
-print("Best Params:", search.best_params_)
-print("Validation ROC-AUC:", roc_auc_score(y_val, val_proba))
-print(classification_report(y_val, val_pred, digits=4))
-print(confusion_matrix(y_val, val_pred))
-```
-
-핵심은 세 가지입니다. 첫째, 전처리(`StandardScaler`)를 파이프라인에 넣어 데이터 누수를 방지합니다. 둘째, `GridSearchCV`는 훈련 세트 내부에서만 교차검증을 수행하므로 검증 세트를 따로 남겨 둔 의미가 유지됩니다. 셋째, 검증 단계에서 `classification_report`와 `ROC-AUC`를 함께 확인해 임계값 민감도와 순위 품질을 동시에 점검합니다.
 
 ## 분류 지표를 함께 읽는 방법
 
@@ -361,7 +305,6 @@ a_preprocess = ColumnTransformer([
 - 피처 전처리와 모델을 하나의 파이프라인으로 묶었습니다.
 
 이 다섯 가지를 만족하면, 단순히 "모델이 돌아간다" 수준을 넘어 "재현 가능하고 설명 가능한 학습 시스템"에 가까워집니다.
-
 
 ## 실전 보강: 손실 함수, 검증 곡선, 비교표를 한 번에 정리
 
@@ -471,7 +414,6 @@ print("valid mean:", val_scores.mean(axis=1))
 - 검증 결과는 평균 점수와 표준편차를 함께 남깁니다.
 - 혼동 행렬 기반 FP/FN 대응 전략을 운영 정책에 연결합니다.
 - 다음 실험에서도 같은 템플릿을 재사용해 비교 가능성을 유지합니다.
-
 
 ### 추가 앵커: 학습/검증 곡선 해석 예시
 

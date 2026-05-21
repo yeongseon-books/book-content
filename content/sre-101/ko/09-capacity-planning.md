@@ -113,7 +113,7 @@ def linear_regression_forecast(historical_data, weeks_ahead):
     weeks = np.array([w for w, _ in historical_data])
     rps = np.array([r for _, r in historical_data])
     
-    # Fit linear regression: rps = a * week + b
+    # 사냥꾼 적합: rps = a * week + b
     coefficients = np.polyfit(weeks, rps, 1)
     slope, intercept = coefficients
     
@@ -170,7 +170,7 @@ print(f"\nPredicted traffic for next {weeks_ahead} weeks:")
 for week, rps in result["predictions"]:
     print(f"Week {week}: {rps:.0f} RPS")
 
-# Apply peak multiplier and headroom
+# 피크 배수와 여유분을 적용합니다
 peak_multiplier = 2.5
 headroom_pct = 0.20
 
@@ -184,7 +184,7 @@ print(f"Week {final_week} forecast: {final_rps:.0f} RPS")
 print(f"Peak capacity needed: {peak_rps:.0f} RPS")
 print(f"Target capacity (with headroom): {target_capacity:.0f} RPS")
 
-# Calculate nodes needed
+# nodes needed 계산
 rps_per_node = 350
 nodes_needed = int(np.ceil(target_capacity / rps_per_node))
 
@@ -263,7 +263,7 @@ def analyze_load_test_results(test_results):
     }
     
     for rps, latency_p99, error_rate in test_results:
-        # latency 임계값: p99 < 1000ms
+        # 대기 시간 레버 값: p99 < 1000ms
         # 오류율 임계값: < 1%
         
         if latency_p99 < 1000 and error_rate < 0.01:

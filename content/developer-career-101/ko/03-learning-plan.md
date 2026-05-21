@@ -211,7 +211,7 @@ def create_todo(title: str):
 # 기본 CRUD를 먼저 만든다
 @app.post("/users")
 def create_user(name: str):
-    # 나중에 relationship, join, transaction을 추가한다
+    # 나중에 관계, 가입, 거래를 추가한다
     user = User(name=name)
     session.add(user)
     session.commit()
@@ -258,11 +258,11 @@ update_tracker(1, "Python 기초 문법", "done")
 update_tracker(2, "List comprehension", "in-progress")
 update_tracker(3, "Generator", "planned")
 
-# 출력 파일: learning_tracker.md
+# 파일 출력: learning_tracker.md
 # | 주차 | 주제 | 상태 | 날짜 |
 # | --- | --- | --- | --- |
 # | 1 | Python 기초 문법 | done | 2026-05-21 |
-# | 2 | List comprehension | in-progress | 2026-05-21 |
+# | 2 | 목록 이해 | 진행 중 | 2026-05-21 |
 # | 3 | Generator | planned | 2026-05-21 |
 ```
 

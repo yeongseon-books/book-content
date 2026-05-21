@@ -64,7 +64,7 @@ last_reviewed: '2026-05-15'
 
 ```python
 def checkout(cart, user, addr, coupon):
-    # 60 lines: validate + price + tax + ship + log + email + save
+    # 60줄: 유효성 검사 + 가격 + 세금 + 배송 + 로그 + 이메일 + 저장
     ...
 ```
 
@@ -83,8 +83,7 @@ def checkout(cart, user, addr, coupon):
 
 ## 실전 적용: 안전하게 추출하기
 
-### 단계 1 — Partial extraction
-
+### 단계 1 — 부분 추출
 ```python
 # 1_extract.py
 def total(items):
@@ -96,8 +95,7 @@ def total(items):
 
 반복문은 추출 후보가 되기 좋습니다. 계산이 하나의 의미 단위로 보이기 시작하면 별도 함수 이름을 붙일 수 있습니다.
 
-### 단계 2 — Intent name
-
+### 단계 2 — 의도를 드러내는 이름
 ```python
 # 2_intent.py
 def line_total(item): return item.price * item.qty
@@ -106,8 +104,7 @@ def total(items): return sum(line_total(it) for it in items)
 
 이름을 붙이는 순간 코드 길이는 비슷해도 이해 비용은 줄어듭니다. 좋은 추출은 줄 수보다 의미를 더 잘 드러내는 데 있습니다.
 
-### 단계 3 — Command/Query split
-
+### 단계 3 — Command/Query 분리
 ```python
 # 3_cqs.py
 class Account:
@@ -119,8 +116,7 @@ class Account:
 
 질문하는 함수는 상태를 바꾸지 않는 편이 좋습니다. 읽는 쪽에서 예상 가능한 동작이 디버깅 시간을 줄입니다.
 
-### 단계 4 — Parameter object
-
+### 단계 4 — 매개변수 객체
 ```python
 # 4_param_obj.py
 from dataclasses import dataclass
@@ -131,8 +127,7 @@ def in_range(value, r: Range): return r.lo <= value <= r.hi
 
 인자가 많아질수록 호출 지점의 소음도 커집니다. 묶을 수 있는 인자는 객체로 올려서 문맥을 보존하는 편이 낫습니다.
 
-### 단계 5 — Make it pure
-
+### 단계 5 — 순수 함수로 만들기
 ```python
 # 5_pure.py
 def discount(price: int, rate: float) -> int:

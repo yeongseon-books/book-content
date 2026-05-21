@@ -126,7 +126,7 @@ Google이 SRE를 정립하면서 강조한 다섯 가지 원칙은 SRE 철학의
 ### 1단계 — 지표 선택
 
 ```python
-# Example: HTTP success ratio
+# 예: HTTP 성공률
 indicator = "http_2xx / http_total"
 ```
 

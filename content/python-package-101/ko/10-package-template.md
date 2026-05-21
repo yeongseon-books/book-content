@@ -79,8 +79,7 @@ cookiecutter/copier + template
 | Jinja2 | 템플릿 변수 치환 문법 | `{{ project_name }}` |
 | .github/workflows | GitHub Actions CI/CD 설정 | `ci.yml`, `publish.yml` |
 
-## Before / After
-
+## 적용 전후 비교
 **Before (수동 설정)**
 
 ```bash
@@ -104,7 +103,7 @@ copier copy gh:yourname/python-template myproject
 
 ## 단계별 실습
 
-### Step 1. 프로덕션 템플릿 구조 설계
+### 단계 1. 프로덕션 템플릿 구조 설계
 
 ```text
 python-template/
@@ -134,7 +133,7 @@ python-template/
 └── copier.yml
 ```
 
-### Step 2. `copier` 설정 파일 작성
+### 단계 2. `copier` 설정 파일 작성
 
 ```yaml
 # copier.yml
@@ -172,7 +171,7 @@ python_version:
   choices: ["3.9", "3.10", "3.11", "3.12"]
 ```
 
-### Step 3. 템플릿 `pyproject.toml`
+### 단계 3. 템플릿 `pyproject.toml`
 
 ```toml
 [build-system]
@@ -214,7 +213,7 @@ target-version = "py{{ python_version | replace('.', '') }}"
 select = ["E", "F", "I", "UP"]
 ```
 
-### Step 4. CI/CD 워크플로 템플릿
+### 단계 4. CI/CD 워크플로 템플릿
 
 ```yaml
 # .github/workflows/ci.yml
@@ -238,7 +237,7 @@ jobs:
       - run: pytest tests/
 ```
 
-### Step 5. 템플릿으로 프로젝트 생성
+### 단계 5. 템플릿으로 프로젝트 생성
 
 ```bash
 pip install copier
@@ -395,7 +394,7 @@ copier update
 # 4. 충돌 발생 시 사용자에게 해결 요청
 ```
 
-## GitHub Template Repository
+## GitHub 템플릿 저장소
 
 GitHub Template은 가장 단순한 프로젝트 템플릿 방식입니다.
 

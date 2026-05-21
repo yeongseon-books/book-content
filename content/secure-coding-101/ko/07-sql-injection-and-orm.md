@@ -185,20 +185,20 @@ SQL injection은 새로운 종류의 공격이라기보다, SQL과 데이터를 
 Blind SQLi는 쿼리 결과가 화면에 직접 노출되지 않아도 성공할 수 있는 공격입니다. 공격자는 조건의 참/거짓에 따른 응답 차이(Boolean-based)나 응답 시간 차이(Time-based)로 데이터를 한 글자씩 추출합니다.
 
 ```python
-# Boolean-based blind SQLi 시연
+# 불리언 기반 blind SQLi 시연
 # 공격자가 보내는 입력 (name 파라미터)
 payload_true  = "admin' AND SUBSTRING(password,1,1)='a' --"
 payload_false = "admin' AND SUBSTRING(password,1,1)='z' --"
 
 # 취약한 코드 — 문자열 연결
 query = f"SELECT * FROM users WHERE name='{name}'"
-# payload_true → 사용자 정보 반환 (200 OK, 데이터 있음)
+# payload_true → 사용자 정보 그대로 (200 OK, 데이터 있음)
 # payload_false → 빈 결과 (200 OK, 데이터 없음)
 # 응답 차이로 비밀번호를 한 글자씩 추출 가능
 ```
 
 ```python
-# Time-based blind SQLi
+# 시간 기반 블라인드 SQLi
 payload = "admin'; SELECT CASE WHEN (SUBSTRING(password,1,1)='a') THEN pg_sleep(3) ELSE pg_sleep(0) END --"
 # 응답이 3초 걸리면 첫 글자가 'a'
 ```
@@ -225,7 +225,7 @@ cursor.execute("INSERT INTO users (name) VALUES (%s)", (username,))
 row = cursor.fetchone()  # row[0] = "admin'--"
 # 취약한 코드 — 저장된 값을 신뢰하고 문자열 연결
 query = f"SELECT * FROM orders WHERE user_name='{row[0]}'"
-# → SELECT * FROM orders WHERE user_name='admin'--'
+# → SELECT * FROM 주문 WHERE user_name='admin'--'
 # → 조건 무효화, 모든 주문 조회 가능
 ```
 
@@ -236,7 +236,7 @@ query = f"SELECT * FROM orders WHERE user_name='{row[0]}'"
 cursor.execute("SELECT * FROM orders WHERE user_name=%s", (row[0],))
 ```
 
-### NoSQL Injection
+### NoSQL 인젝션
 
 MongoDB 같은 문서 데이터베이스도 인젝션에 취약합니다. SQL 문법은 아니지만, 쿼리 연산자를 입력으로 주입할 수 있습니다.
 
@@ -250,7 +250,7 @@ db = MongoClient().mydb
 @app.post("/login")
 def login():
     body = request.json
-    # body = {"username": "admin", "password": {"$ne": ""}}
+    # body = {"사용자 이름": "admin", "비밀번호": {"$ne": ""}}
     user = db.users.find_one({
         "username": body["username"],
         "password": body["password"]  # {"$ne": ""} → 비밀번호가 빈 문자열이 아닌 모든 문서 매칭
@@ -330,7 +330,7 @@ def search_users_safe(session: Session, keyword: str):
 
 # ❌ 실수 2: order_by에 입력값 직접 전달
 def get_sorted(session: Session, sort_field: str):
-    # 취약 — sort_field가 "name; DROP TABLE users--"이면?
+    # 정말 — sort_field가 "name; DROP TABLE users--" 그렇다면?
     return session.execute(text(f"SELECT * FROM users ORDER BY {sort_field}"))
 
 # ✅ 수정: 허용 목록 + getattr
@@ -416,7 +416,7 @@ class QueryAuditor:
     ]
 
     def audit_query(self, query: str, params: tuple, duration_ms: float):
-        # 1. 느린 쿼리 탐지 (time-based blind SQLi 징후)
+        # 1. 오류 조회(시간 기반 블라인드 SQLi 동작)
         if duration_ms > 3000:
             logger.warning("slow_query", extra={
                 "query_hash": hash(query),
@@ -453,7 +453,7 @@ class QueryAuditor:
 # 문제: 사용자가 '%'를 입력하면 모든 행이 매칭됨
 keyword = request.args.get("q")  # 사용자가 "%" 입력
 cursor.execute("SELECT * FROM products WHERE name LIKE %s", (f"%{keyword}%",))
-# → SELECT * FROM products WHERE name LIKE '%%%'  → 모든 행 반환
+# → SELECT * FROM products WHERE name LIKE '%%%' → 모든 것을 돌려드립니다
 
 # 수정: 와일드카드 이스케이프
 def escape_like(value: str) -> str:
@@ -498,7 +498,7 @@ from sqlalchemy.orm import Session
 def get_users_by_ids(session: Session, user_ids: list[int]):
     if not user_ids:
         return []
-    # SQLAlchemy의 expanding bind parameter
+    # SQLAlchemy의 확장 바인드 매개변수
     stmt = text("SELECT * FROM users WHERE id IN :ids")
     stmt = stmt.bindparams(bindparam("ids", expanding=True))
     return session.execute(stmt, {"ids": user_ids}).fetchall()

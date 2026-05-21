@@ -24,6 +24,9 @@ check-content:
 	python3 scripts/check_target_language_alignment.py
 	python3 scripts/lint_captions.py
 	python3 scripts/check_article_structure.py
+	python3 scripts/check_ko_headings.py
+	python3 scripts/check_code_comments.py
+	python3 scripts/check_no_boilerplate_duplication.py
 
 # Validate generated outputs (Medium HTML, exports)
 check-generated:

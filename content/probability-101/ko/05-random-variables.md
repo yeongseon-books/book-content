@@ -215,16 +215,16 @@ print(f"B 표준편차: {conversion_B.std():.2f}")
 import numpy as np
 from scipy import stats
 
-# X ~ Exponential(scale=2)
+# X ~ 지수(규모=2)
 X = stats.expon(scale=2)
 samples_X = X.rvs(size=10000, random_state=42)
 
-# 변환 1: Y = log(X) — 지수분포를 로그 변환
+# 변환 1: Y = log(X) — 지수분포를 변환
 samples_Y = np.log(samples_X)
 print(f"X: mean={samples_X.mean():.3f}, std={samples_X.std():.3f}")
 print(f"Y=log(X): mean={samples_Y.mean():.3f}, std={samples_Y.std():.3f}")
 
-# 변환 2: Z = (X - mean) / std — 표준화
+# 변환 2: Z = (X - 평균) / std — 변환
 samples_Z = (samples_X - samples_X.mean()) / samples_X.std()
 print(f"Z=(X-μ)/σ: mean={samples_Z.mean():.3f}, std={samples_Z.std():.3f}")
 

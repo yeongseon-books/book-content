@@ -111,7 +111,7 @@ with Session(engine) as session:
     session.add(b)
     # 아직 SQL 없음 — 두 객체는 pending 상태
     session.flush()
-    # 여기서 INSERT 두 건이 한 번에 발사됨, a.id / b.id 가 채워짐
+    # 여기 INSERT 두 건이 한 번에 반발됨, a.id / b.id 가 충전짐
     session.commit()
     # 트랜잭션 커밋
 ```
@@ -180,7 +180,7 @@ def update_email(session, user_id, new_email):
     if user is None:
         return
     user.email = new_email           # 속성 변경만 — Session이 dirty로 표시
-    # 함수 종료 후 commit() 시점에 Session이 자동으로 UPDATE 발사
+    # 윈도우 종료 후 커밋() 시점에 세션이 자동으로 업데이트 방어
 ```
 
 Session은 어떤 속성이 변경되었는지 추적해 두고, flush 시 변경된 컬럼만 골라 UPDATE를 만듭니다. 변경이 없으면 UPDATE 자체가 생략됩니다.

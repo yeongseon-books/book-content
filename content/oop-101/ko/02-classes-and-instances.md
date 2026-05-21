@@ -67,7 +67,7 @@ Class
 객체 비교와 출력을 개선합니다.
 
 ```python
-# before: no dunder methods — unhelpful output and comparison
+# before: dunder method 없음 — 출력/비교가 불편함
 class Point:
     def __init__(self, x, y):
         self.x = x
@@ -80,7 +80,7 @@ print(p1 == p2)  # False — same coordinates but considered different
 ```
 
 ```python
-# after: dunder methods — intuitive output and comparison
+# after: dunder methods — 출력/비교가 직관적임
 class Point:
     def __init__(self, x: float, y: float) -> None:
         self.x = x
@@ -225,7 +225,7 @@ import sys
 rp = RegularPoint(1, 2)
 op = OptimizedPoint(1, 2)
 print(sys.getsizeof(rp.__dict__))  # size of regular instance __dict__
-# OptimizedPoint has no __dict__ → saves memory
+# OptimizedPoint는 __dict__가 없어 메모리를 절약합니다.
 ```
 
 ## 이 코드에서 주목할 점
@@ -332,7 +332,7 @@ class PaymentService:
 InventoryService --> InventoryItem (uses)
 ```
 
-## before/after: 생성자 자유 입력에서 검증 중심 객체로
+## 적용 전후: 생성자 자유 입력에서 검증 중심 객체로
 
 ```python
 # before

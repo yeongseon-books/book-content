@@ -188,7 +188,7 @@ vecs = embed_images(paths)
 index = faiss.IndexFlatIP(vecs.shape[1])  # cosine = inner product on normalized
 index.add(vecs)
 
-# query by text
+# 텍스트로 검색
 query = proc(text=["a red sports car"], return_tensors="pt", padding=True)
 with torch.no_grad():
     qv = model.get_text_features(**query)

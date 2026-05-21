@@ -355,7 +355,7 @@ def add(a, b):
 ### 2단계 — 설명 줄
 
 ```python
-# Highlight: take two numbers and return their sum
+# 핵심: 두 수를 받아 합을 반환
 ```
 
 ### 3단계 — 실행

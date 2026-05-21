@@ -134,7 +134,7 @@ def keep_languages(text: str, allowed: set[str], min_conf: float = 0.7) -> bool:
     result = detect(text=sample, low_memory=True)
     return result["lang"] in allowed and result["score"] >= min_conf
 
-# Keep only Korean and English
+# 한국어와 영어만 유지
 ok = keep_languages(doc, allowed={"ko", "en"})
 ```
 
@@ -155,7 +155,7 @@ class PerplexityFilter:
         self.max_perplexity = max_perplexity
 
     def score(self, text: str) -> float:
-        # KenLM returns log10 probability
+        # KenLM은 log10 확률을 반환
         log_prob = self.model.score(text, bos=True, eos=True)
         n_tokens = len(text.split()) + 1
         return 10 ** (-log_prob / n_tokens)
@@ -163,7 +163,7 @@ class PerplexityFilter:
     def passes(self, text: str) -> bool:
         return self.score(text) <= self.max_perplexity
 
-# Use a KenLM model trained on Wikipedia as the reference
+# Wikipedia로 학습한 KenLM 모델을 기준으로 사용
 pf = PerplexityFilter("wiki-en.binary", max_perplexity=500.0)
 ```
 
@@ -177,9 +177,9 @@ heuristic은 obvious junk에 강하지만, 보기에는 문장처럼 생긴 저�
 # pip install fasttext
 import fasttext
 
-# 1) Prepare training data: wiki/books as positive, common-crawl junk as negative
+# 1) 학습 데이터 준비: wiki/books는 positive, common-crawl 정크는 negative
 # format: __label__pos text...
-# Assume train.txt is prepared
+# train.txt가 준비되어 있다고 가정
 model = fasttext.train_supervised(
     input="train.txt",
     epoch=10,
@@ -194,7 +194,7 @@ clf = fasttext.load_model("quality-clf.bin")
 
 def quality_score(text: str) -> float:
     labels, probs = clf.predict(text.replace("\n", " "), k=2)
-    # Probability of __label__pos
+    # __label__pos의 확률
     return float(probs[labels.index("__label__pos")]) if "__label__pos" in labels else 0.0
 
 threshold = 0.5
@@ -274,7 +274,7 @@ classifier를 붙였다면 최소한 calibration을 확인해야 합니다. 스�
 from sklearn.calibration import calibration_curve
 
 # y_true: 1=good, 0=bad
-# y_prob: classifier probability for good
+# y_prob: good에 대한 분류기 확률
 def calibration_summary(y_true, y_prob):
     frac_pos, mean_pred = calibration_curve(y_true, y_prob, n_bins=10)
     return [{"bin_pred": float(p), "bin_true": float(t)} for p, t in zip(mean_pred, frac_pos)]
@@ -296,7 +296,7 @@ def calibration_summary(y_true, y_prob):
 </View>
 ```
 
-## before/after 샘플
+## 적용 전후 샘플
 
 ```text
 [drop: repetitive]

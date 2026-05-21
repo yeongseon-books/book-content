@@ -455,7 +455,7 @@ actual_fields = {"id", "name", "email", "nickname"}
 
 result = validate_schema(required_fields, optional_fields, actual_fields)
 print(result)
-# {'valid': False, 'missing': set(), 'unexpected': {'nickname'}, 'recognized': {'id', 'name', 'email'}}
+# {'유효': 거짓, '누락': set(), '예기치 않은': {'닉네임'}, '인식됨': {'id', 'name', 'email'}}
 ```
 
 이 패턴은 API 요청 검증, CSV 컨럼 확인, 환경변수 체크 등 다양한 맥락에 그대로 재사용할 수 있습니다. 리스트 기반 검증보다 의도가 더 똑령하고 성능도 O(1) 룩업으로 아낌없이 맞습니다.

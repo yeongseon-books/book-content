@@ -381,7 +381,7 @@ config = {"minimum_score": 80, "chnanel": "email"}  # dict 키 오타가 숨어 
 
 첫 번째 형태는 함수 조합이 자연스럽고, 두 번째 형태는 상태 모델 객체가 자연스럽습니다.
 
-## before/after: 과도한 클래스화에서 함수 중심으로
+## 적용 전후: 과도한 클래스화에서 함수 중심으로
 
 ```python
 # before

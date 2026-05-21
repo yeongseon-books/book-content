@@ -93,7 +93,7 @@ def uniform_sample(traces: list[dict], rate: float = 0.01) -> list[dict]:
     """Pick `rate` fraction of traces uniformly."""
     return [t for t in traces if random.random() < rate]
 
-# 1% of 100k daily requests = 1,000 traces for evaluation
+# 일일 10만 요청의 1% = 평가용 trace 1,000개
 sampled = uniform_sample(today_traces, rate=0.01)
 ```
 
@@ -211,7 +211,7 @@ if drift > 0.1:
 
 KL divergence 0.1 이상이면 분포가 의미 있게 달라졌다고 판단합니다. 임계값은 baseline 변동성을 30일 정도 측정해서 잡아야 합니다.
 
-### Output drift
+### 출력 드리프트(Output drift)
 
 같은 입력 카테고리에 대해 응답 길이, 응답 거절율 (refusal rate), tone이 갑자기 달라지면 모델 공급사가 조용히 업데이트했을 가능성이 있습니다.
 
@@ -257,7 +257,7 @@ def relative_alert(current: float, baseline_mean: float, baseline_std: float, k:
     """Alert when current value is more than k std from baseline mean."""
     return abs(current - baseline_mean) > k * baseline_std
 
-# Learn baseline from past 30 days
+# 지난 30일 데이터로 baseline 학습
 baseline_mean = 0.03
 baseline_std = 0.008
 if relative_alert(today_rate, baseline_mean, baseline_std):

@@ -28,7 +28,6 @@ last_reviewed: '2026-05-12'
 
 이 주제는 코딩 테스트와 경쟁 프로그래밍에서 특히 자주 나오지만, 더 중요한 가치는 겹치는 부분 문제와 재사용 가능한 상태를 알아보는 눈을 기르는 데 있습니다.
 
-
 ![Algorithms with Python 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/06/06-01-concept-overview.ko.png)
 *Algorithms with Python 101 6장 흐름 개요*
 
@@ -70,12 +69,11 @@ fib(1)=1 → fib(2)=1 → fib(3)=2 → fib(4)=3 → fib(5)=5
 | Tabulation | 가장 작은 문제부터 표를 채우는 bottom-up 방식입니다 |
 | State transition | 이전 상태로부터 현재 상태를 계산하는 점화식입니다 |
 
-## Before / After
-
+## 적용 전후 비교
 피보나치 수열을 구하는 두 가지 방식입니다.
 
 ```python
-# before: naive recursion — O(2^n)
+# before: naive recursion 방식 — O(2^n)
 def fibonacci(n):
     if n <= 1:
         return n
@@ -83,7 +81,7 @@ def fibonacci(n):
 ```
 
 ```python
-# after: DP bottom-up — O(n)
+# after: DP bottom-up 방식 — O(n)
 def fibonacci(n):
     if n <= 1:
         return n
@@ -96,8 +94,7 @@ def fibonacci(n):
 
 ## 단계별 실습
 
-### Step 1: Top-Down — Memoization
-
+### 단계 1: Top-Down — 메모이제이션
 ```python
 from functools import lru_cache
 
@@ -126,8 +123,7 @@ print(fib_memo(50))  # 12586269025
 
 top-down 방식은 재귀 사고를 유지하면서도 중복 계산만 제거해 줍니다. 직관적으로 문제를 풀기 쉬운 대신, 입력이 아주 크면 재귀 깊이 제한을 고려해야 합니다.
 
-### Step 2: Bottom-Up — Tabulation
-
+### 단계 2: Bottom-Up — 테이블 채우기
 ```python
 def fib_bottom_up(n: int) -> int:
     """Bottom-up Fibonacci — O(n), O(n) space."""
@@ -155,8 +151,7 @@ print(fib_optimized(50))  # 12586269025
 
 bottom-up 방식은 작은 부분 문제부터 표를 차례대로 채웁니다. 필요한 이전 상태가 제한적이면 배열 대신 변수 몇 개로 공간까지 줄일 수 있습니다.
 
-### Step 3: Stair Climbing Problem
-
+### 단계 3: 계단 오르기 문제
 ```python
 def climb_stairs(n: int) -> int:
     """Number of ways to climb n stairs taking 1 or 2 steps at a time."""
@@ -169,7 +164,7 @@ def climb_stairs(n: int) -> int:
         dp[i] = dp[i - 1] + dp[i - 2]
     return dp[n]
 
-# Recurrence: dp[i] = dp[i-1] + dp[i-2]
+# 점화식: dp[i] = dp[i-1] + dp[i-2]
 for n in range(1, 8):
     print(f"Stairs {n}: {climb_stairs(n)} ways")
 # Stairs 1: 1 ways
@@ -183,8 +178,7 @@ for n in range(1, 8):
 
 계단 오르기는 DP의 전형적인 입문 문제입니다. 현재 상태가 직전 두 상태만으로 결정된다는 점을 통해 점화식의 감각을 잡을 수 있습니다.
 
-### Step 4: Minimum Coin Change
-
+### 단계 4: 최소 동전 교환
 ```python
 def coin_change(coins: list[int], amount: int) -> int:
     """Minimum coins to make amount — O(amount * len(coins))."""
@@ -205,8 +199,7 @@ print(coin_change([3, 7], 5))        # -1 (impossible)
 
 거스름돈 문제는 "현재 금액을 만들기 위한 최소 동전 수"라는 상태를 세우는 연습에 좋습니다. 불가능한 경우를 `inf`로 표현하는 방식도 자주 쓰입니다.
 
-### Step 5: 0-1 Knapsack
-
+### 단계 5: 0-1 배낭 문제
 ```python
 def knapsack(weights: list[int], values: list[int], capacity: int) -> int:
     """0-1 Knapsack — O(n * capacity)."""
@@ -286,57 +279,6 @@ print(knapsack(weights, values, capacity))  # 10
 
 동적 계획법은 중복 계산을 없애 지수 문제를 다항 문제로 바꾸는 강력한 도구입니다. 핵심은 항상 점화식을 정의하는 데 있습니다. 다음 글에서는 BFS와 DFS로 그래프를 탐색하는 방법을 살펴봅니다.
 
-## 실전 패턴 추가: 정렬과 탐색 구현을 문제 유형별로 선택하기
-
-알고리즘 문제에서는 코드 길이보다 선택 기준이 더 중요합니다. 입력 크기, 데이터 분포, 정렬 여부에 따라 정렬/탐색 전략이 달라집니다. 아래 예시는 같은 정수 배열을 다루더라도 어떤 조건에서 어떤 구현을 고르는지 보여 줍니다.
-
-```python
-def binary_search(nums: list[int], target: int) -> int:
-    left, right = 0, len(nums) - 1
-    while left <= right:
-        mid = (left + right) // 2
-        if nums[mid] == target:
-            return mid
-        if nums[mid] < target:
-            left = mid + 1
-        else:
-            right = mid - 1
-    return -1
-
-
-def merge_sort(nums: list[int]) -> list[int]:
-    if len(nums) <= 1:
-        return nums
-    mid = len(nums) // 2
-    left = merge_sort(nums[:mid])
-    right = merge_sort(nums[mid:])
-
-    merged: list[int] = []
-    i = j = 0
-    while i < len(left) and j < len(right):
-        if left[i] <= right[j]:
-            merged.append(left[i])
-            i += 1
-        else:
-            merged.append(right[j])
-            j += 1
-    merged.extend(left[i:])
-    merged.extend(right[j:])
-    return merged
-
-
-def quick_sort(nums: list[int]) -> list[int]:
-    if len(nums) <= 1:
-        return nums
-    pivot = nums[len(nums) // 2]
-    less = [x for x in nums if x < pivot]
-    equal = [x for x in nums if x == pivot]
-    greater = [x for x in nums if x > pivot]
-    return quick_sort(less) + equal + quick_sort(greater)
-```
-
-실무 판단은 보통 이렇게 정리됩니다. 이미 정렬된 리스트에서 존재 여부를 반복 조회하면 이진 탐색이 기본 선택입니다. 입력이 계속 바뀌고 안정 정렬이 필요하면 병합 정렬 계열이 유리하고, 평균 성능과 구현 단순성을 우선하면 퀵 정렬 계열이 자주 선택됩니다. 코딩 테스트에서는 Python 내장 `sort()`가 Timsort 기반이라 거의 항상 가장 실용적인 기본값이지만, 원리를 직접 구현해 보면 경계 조건과 복잡도 해석 능력이 크게 좋아집니다.
-
 ## 심화 실전 노트: DP를 점화식-표-검증 루프로 고정하기
 
 ### 구현 앵커: 상태 정의를 코드 주석으로 명시
@@ -407,7 +349,6 @@ dp[0]=10
 ```python
 import time
 
-
 def benchmark(func, *args, repeat: int = 5) -> float:
     best = float("inf")
     for _ in range(repeat):
@@ -450,123 +391,6 @@ E. 해답 없음 케이스: 종료 조건 검증
 - "필요하면 정답 유지 조건을 짧게 증명하겠습니다."
 
 이 스크립트를 반복하면 설명의 밀도가 올라가고, 구현 중 길을 잃는 빈도가 줄어듭니다.
-
-## 케이스 스터디 확장: 입력 규모가 커질 때의 판단
-
-### 시나리오 1: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
-
-### 시나리오 2: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
-
-### 시나리오 3: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
-
-### 시나리오 4: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
-
-### 시나리오 5: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
 
 ## 처음 질문으로 돌아가기
 

@@ -66,7 +66,7 @@ __name__                dunder — Python internal protocol
 계좌 잔액 관리를 비교합니다.
 
 ```python
-# before: direct access — invalid state possible
+# before: 직접 접근 — 잘못된 상태가 가능함
 class BankAccount:
     def __init__(self, balance):
         self.balance = balance
@@ -76,7 +76,7 @@ account.balance = -500  # negative balance allowed — bug
 ```
 
 ```python
-# after: property protection — validation guaranteed
+# after: property 보호 — validation 보장
 class BankAccount:
     def __init__(self, balance: int) -> None:
         self._balance = balance  # protected
@@ -319,7 +319,7 @@ Python에서 캡슐화는 "강제"가 아니라 "계약"입니다. 밑줄 관례
 [TransferService] --> [BankAccount]
 ```
 
-## before/after: 필드 직접 수정에서 규칙 기반 메서드로
+## 적용 전후: 필드 직접 수정에서 규칙 기반 메서드로
 
 ```python
 # before

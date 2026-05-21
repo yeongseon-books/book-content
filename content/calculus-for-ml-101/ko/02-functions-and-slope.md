@@ -240,7 +240,7 @@ print(f"z1={z1:.4f}, a1={a1:.4f}, y_hat={y_hat:.4f}")
 y = 3.0
 loss = (y_hat - y) ** 2  # MSE
 
-# backward: dL/dy_hat
+# backward: dL/dy_hat 계산
 dL_dy = 2 * (y_hat - y)  # -3.8068
 
 # dy_hat/da1 = w2

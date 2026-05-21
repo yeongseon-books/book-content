@@ -145,7 +145,7 @@ resource = Resource.create({
     "deployment.environment": "production",
 })
 
-# TracerProvider를 설정하고 OTLP exporter를 연결합니다.
+# TracerProvider를 설정하고 OTLP 내보내기를 연결합니다.
 provider = TracerProvider(resource=resource)
 exporter = OTLPSpanExporter(endpoint="http://otel-collector:4317")
 provider.add_span_processor(BatchSpanProcessor(exporter))

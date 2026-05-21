@@ -248,7 +248,7 @@ llm = ChatGroq(
     api_key=os.environ["GROQ_API_KEY"],
 )
 
-# session store — use Redis or a database in production
+# 세션 저장소 — 프로덕션에서 Redis 또는 데이터베이스를 사용합니다.
 sessions: dict[str, deque] = {}
 WINDOW_SIZE = 10
 SYSTEM_PROMPT = "You are a helpful AI assistant."
@@ -270,7 +270,7 @@ def chat(user_input: str, session_id: str | None = None) -> tuple[str, str]:
 
     return response.content, session_id
 
-# two users with independent sessions
+# 독립적인 세션을 가진 두 명의 사용자
 session_a = None
 session_b = None
 

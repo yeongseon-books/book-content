@@ -184,7 +184,7 @@ Harness 있는 실행
 
 각 harness는 독립적이지 않습니다. Tool Harness는 Constraint Harness 안에서 정의되고, Approval Gate는 Tool Harness의 특정 행동을 가로챕니다. Observability는 모든 harness의 상태를 기록합니다. 8가지를 함께 설계해야 일관된 시스템이 됩니다.
 
-### Harness vs Framework
+### 하네스와 프레임워크 비교
 
 LangChain, LangGraph, CrewAI 같은 프레임워크와 Harness Engineering의 관계를 자주 묻습니다. 둘은 다른 층위입니다.
 

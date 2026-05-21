@@ -108,8 +108,8 @@ print(totp.verify("123456"))        # bool
 
 ```python
 # 3_session_vs_jwt.py
-# session: server stores sid -> user (easy to revoke, stateful)
-# jwt:    token carries user/exp/sig (hard to revoke, stateless)
+# 세션: 서버는 sid를 저장합니다 -> 사용자(해지하기 쉽고 상태 저장)
+# jwt: 토큰은 사용자/exp/서명을 전달합니다(취소하기 어렵고 상태 비저장).
 import jwt
 t = jwt.encode({"sub": "u1", "exp": 9999999999}, "secret", algorithm="HS256")
 print(jwt.decode(t, "secret", algorithms=["HS256"]))

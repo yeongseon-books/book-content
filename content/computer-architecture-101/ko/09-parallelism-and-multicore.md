@@ -74,7 +74,7 @@ last_reviewed: '2026-05-12'
 **Before — 모든 코어를 아무 생각 없이 사용:**
 
 ```python
-# "8 cores so it must be 8x faster"
+# "코어가 8개니까 8배 빨라야 한다"
 from multiprocessing import Pool
 
 def task(x):
@@ -172,21 +172,21 @@ print(f"with lock: {time.time()-start:.2f}s, counter={counter}")
 ```python
 import threading, time
 
-# Adjacent indices updated by different threads share a cache line
+# 서로 다른 스레드가 갱신하는 인접 인덱스가 같은 cache line을 공유합니다.
 shared = [0] * 4
 
 def bump(idx, iters):
     for _ in range(iters):
         shared[idx] += 1
 
-# Adjacent (false sharing)
+# 인접 배치 (false sharing)
 threads = [threading.Thread(target=bump, args=(i, 5_000_000)) for i in range(4)]
 start = time.time()
 for t in threads: t.start()
 for t in threads: t.join()
 print(f"adjacent: {time.time()-start:.2f}s")
 
-# Spaced apart (false sharing reduced)
+# 간격 배치 (false sharing 감소)
 shared = [0] * 256
 threads = [threading.Thread(target=bump, args=(i*64, 5_000_000)) for i in range(4)]
 start = time.time()

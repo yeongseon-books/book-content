@@ -365,7 +365,7 @@ class Var:
                    self.deriv + other.deriv)
 
     def __mul__(self, other):
-        # 곱의 법칙: d(fg) = f'g + fg'
+        # 곱셈의 법칙: d(fg) = f'g + fg'
         return Var(self.value * other.value,
                    self.deriv * other.value + self.value * other.deriv)
 
@@ -409,7 +409,7 @@ def adam_update(params, grads, m, v, t, lr=0.001, beta1=0.9, beta2=0.999, eps=1e
         updated.append(params[i])
     return updated, m, v
 
-# 단순 예시: f(x) = x^2, 최소값 x=0
+# 예시: f(x) = x^2, 최소값 x=0
 x = [5.0]
 m = [0.0]
 v = [0.0]

@@ -57,8 +57,7 @@ last_reviewed: '2026-05-15'
 - **Commit**: 다수가 받은 엔트리가 더 이상 사라지지 않는 약속 상태입니다.
 - **Quorum**: 보통 2f+1 중 f+1, 즉 다수를 뜻합니다.
 
-## Before / After
-
+## 적용 전후 비교
 **Before — 리더 혼자 결정**
 
 ```text
@@ -140,9 +139,9 @@ def maybe_commit(self, peers):
 
 ```python
 # 5_partition.py (pseudocode)
-# 5 nodes, only 2 (leader included) on one side of a partition
-# - that side has no majority -> cannot elect a new leader -> cannot accept writes
-# - the other side has 3 nodes -> majority -> elects a new leader -> keeps working
+# 노드 5개 중 partition 한쪽에는 2개만 존재(leader 포함)
+# - 그쪽은 과반이 없어 새 leader 선출 불가 -> write 수락 불가
+# - 반대쪽은 노드 3개로 과반 확보 -> 새 leader 선출 -> 계속 동작
 ```
 
 다수를 잃은 쪽이 의도적으로 멈추는 설계가 split-brain을 막는 핵심입니다.

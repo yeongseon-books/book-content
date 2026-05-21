@@ -26,7 +26,6 @@ last_reviewed: '2026-05-12'
 
 테스트를 잘 써도 pytest가 파일과 함수를 발견하지 못하면 아무 의미가 없습니다. 그래서 테스트 작성의 출발점은 문법보다 구조입니다. 파일 위치, 이름 규칙, import 경로가 맞아야 팀 전체가 같은 방식으로 테스트를 실행할 수 있습니다.
 
-
 ![pytest 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/02/02-01-big-picture.ko.png)
 *pytest 101 2장 흐름 개요*
 
@@ -70,12 +69,11 @@ project/
 | 테스트 마커 | `@pytest.mark`로 테스트를 분류하고 선택 실행합니다 |
 | 종료 코드 | 0은 전체 성공, 1은 일부 실패, 2는 사용자 중단을 의미합니다 |
 
-## Before / After
-
+## 적용 전후 비교
 구조 없는 상태와 구조를 분리한 상태를 비교해 보겠습니다.
 
 ```python
-# before: production code and test logic mixed together
+# 기존: production code와 test logic이 한곳에 섞여 있음
 # main.py
 def greet(name):
     return f"Hello, {name}"
@@ -85,7 +83,7 @@ if __name__ == "__main__":
 ```
 
 ```python
-# after: separated structure
+# 개선: 구조 분리
 # src/myapp/greeting.py
 def greet(name: str) -> str:
     if not name:
@@ -106,15 +104,13 @@ def test_greet_empty_name():
 
 ## 단계별 실습
 
-### Step 1: Create Project Structure
-
+### 단계 1: 프로젝트 구조 생성
 ```bash
 mkdir -p src/myapp tests
 touch src/myapp/__init__.py
 ```
 
-### Step 2: Write Production Code
-
+### 단계 2: 프로덕션 코드 작성
 ```python
 # src/myapp/string_utils.py
 def reverse_string(s: str) -> str:
@@ -134,8 +130,7 @@ def truncate(s: str, max_length: int = 10) -> str:
     return s[:max_length] + "..."
 ```
 
-### Step 3: Write Tests
-
+### 단계 3: 테스트 작성
 ```python
 # tests/test_string_utils.py
 import pytest
@@ -176,8 +171,7 @@ class TestTruncate:
         assert truncate("hello", 5) == "hello"
 ```
 
-### Step 4: Configure pyproject.toml
-
+### 단계 4: pyproject.toml 설정
 ```toml
 # pyproject.toml
 [tool.pytest.ini_options]
@@ -185,8 +179,7 @@ testpaths = ["tests"]
 pythonpath = ["src"]
 ```
 
-### Step 5: Run Tests in Various Ways
-
+### 단계 5: 다양한 방식으로 테스트 실행
 ```bash
 # run all tests
 pytest
@@ -259,74 +252,6 @@ pytest -x
 
 이제 pytest가 테스트를 어떻게 발견하는지, 그리고 왜 구조가 문법보다 먼저인지 감이 잡혔을 것입니다. 다음 글에서는 `assert`가 왜 pytest에서 특히 강력한지, 그리고 예외 테스트를 어떻게 읽기 좋게 작성하는지 살펴보겠습니다.
 
-## 실전 패턴 추가: fixture, parametrization, mock을 함께 설계하기
-
-테스트 파일이 커질수록 중요한 것은 개별 문법보다 테스트 경계를 일정하게 유지하는 일입니다. 특히 fixture로 상태를 준비하고, `@pytest.mark.parametrize`로 입력 집합을 확장하고, mock으로 외부 의존성을 분리하는 세 가지를 한 흐름으로 묶으면 테스트 유지보수 비용이 크게 줄어듭니다.
-
-```python
-# tests/test_order_service.py
-from __future__ import annotations
-
-from dataclasses import dataclass
-from unittest.mock import Mock
-
-import pytest
-
-
-@dataclass
-class Order:
-    item: str
-    qty: int
-
-
-class InventoryClient:
-    def reserve(self, item: str, qty: int) -> bool:  # pragma: no cover
-        raise NotImplementedError
-
-
-class OrderService:
-    def __init__(self, client: InventoryClient) -> None:
-        self.client = client
-
-    def place(self, order: Order) -> str:
-        if order.qty <= 0:
-            raise ValueError("qty must be positive")
-        ok = self.client.reserve(order.item, order.qty)
-        return "confirmed" if ok else "rejected"
-
-
-@pytest.fixture
-def inventory_client() -> Mock:
-    return Mock(spec=InventoryClient)
-
-
-@pytest.fixture
-def order_service(inventory_client: Mock) -> OrderService:
-    return OrderService(client=inventory_client)
-
-
-@pytest.mark.parametrize(
-    "order,expected",
-    [
-        (Order("book", 1), "confirmed"),
-        (Order("book", 3), "confirmed"),
-        (Order("book", 5), "rejected"),
-    ],
-)
-def test_place_orders(order_service: OrderService, inventory_client: Mock, order: Order, expected: str) -> None:
-    inventory_client.reserve.return_value = expected == "confirmed"
-    assert order_service.place(order) == expected
-
-
-def test_place_rejects_invalid_quantity(order_service: OrderService) -> None:
-    with pytest.raises(ValueError, match="qty must be positive"):
-        order_service.place(Order("book", 0))
-```
-
-위 구조의 핵심은 테스트 목적별 분리입니다. fixture는 준비, parametrization은 입력 공간, mock은 외부 의존성 제어를 담당합니다. 팀 단위에서는 이 분리를 지켜야 테스트를 고칠 때 영향 범위를 빠르게 읽을 수 있습니다.
-
-또한 fixture scope를 무조건 넓히지 않는 편이 안전합니다. DB 연결이나 임시 디렉터리처럼 생성 비용이 큰 자원만 `module` 또는 `session`으로 올리고, 나머지는 `function` scope로 두어 테스트 독립성을 유지하는 것이 좋습니다.
-
 ## 실전 구조 설계: 작은 프로젝트를 테스트 가능한 형태로 시작하기
 
 다음 구조는 입문 단계에서 가장 실수가 적은 형태입니다.
@@ -361,7 +286,6 @@ def parse_limit(value: str) -> int:
 # src/myapp/service.py
 from myapp.parser import parse_limit
 
-
 def build_query(limit: str) -> str:
     n = parse_limit(limit)
     return f"SELECT * FROM users LIMIT {n}"
@@ -372,10 +296,8 @@ def build_query(limit: str) -> str:
 import pytest
 from myapp.service import build_query
 
-
 def test_build_query():
     assert build_query("10") == "SELECT * FROM users LIMIT 10"
-
 
 def test_build_query_rejects_non_positive():
     with pytest.raises(ValueError, match="positive"):
@@ -456,13 +378,11 @@ def sample_limits():
 # tests/test_parser.py
 from myapp.parser import parse_limit
 
-
 def test_parse_limit_values(sample_limits):
     assert [parse_limit(x) for x in sample_limits] == [1, 10, 100]
 ```
 
 이 구조를 초기에 잡으면 이후 fixture, parametrization, mock을 추가해도 디렉터리 규칙이 흔들리지 않습니다.
-
 
 ## 프로젝트 부팅 체크: 처음부터 흔들리지 않는 pytest 셋업
 
@@ -494,10 +414,8 @@ def multiply(a: int, b: int) -> int:
 # tests/test_math_ops.py
 from myapp.math_ops import multiply
 
-
 def test_multiply_positive():
     assert multiply(3, 4) == 12
-
 
 def test_multiply_zero():
     assert multiply(3, 0) == 0
@@ -530,7 +448,7 @@ tests/test_math_ops.py::test_multiply_positive
 tests/test_math_ops.py::test_multiply_zero
 ```
 
-## Before/After: 구조 개편 예시
+## 적용 전과 후: 구조 개편 예시
 
 ```text
 # before
@@ -558,93 +476,6 @@ project/
 - 테스트 함수명: `test_*`
 - 기능 수정 PR: 최소 1개 테스트 추가
 - 버그 수정 PR: 재현 테스트 필수
-
-
-## 심화 실습 세트: 실패를 빠르게 재현하고 고정하는 루틴
-
-아래 실습은 글 주제와 무관하게 pytest 프로젝트에서 반복적으로 쓰는 루틴입니다. 핵심은 실패를 의도적으로 만들고, 실패 메시지를 읽고, 테스트를 보강하고, 다시 통과시키는 사이클을 짧게 반복하는 것입니다.
-
-### 실습 A: 입력 검증 함수
-
-```python
-# app/input_guard.py
-
-def require_non_empty(value: str) -> str:
-    if value is None:
-        raise TypeError("value cannot be None")
-    if value.strip() == "":
-        raise ValueError("value cannot be blank")
-    return value.strip()
-```
-
-```python
-# tests/test_input_guard.py
-import pytest
-from app.input_guard import require_non_empty
-
-
-def test_require_non_empty_ok():
-    assert require_non_empty("  hello  ") == "hello"
-
-
-@pytest.mark.parametrize("bad", ["", "   ", "\n\t"])
-def test_require_non_empty_blank(bad):
-    with pytest.raises(ValueError, match="blank"):
-        require_non_empty(bad)
-
-
-def test_require_non_empty_none():
-    with pytest.raises(TypeError, match="None"):
-        require_non_empty(None)
-```
-
-```bash
-pytest tests/test_input_guard.py -v
-```
-
-```text
-tests/test_input_guard.py::test_require_non_empty_ok PASSED
-tests/test_input_guard.py::test_require_non_empty_blank[] PASSED
-tests/test_input_guard.py::test_require_non_empty_blank[   ] PASSED
-tests/test_input_guard.py::test_require_non_empty_blank[\n\t] PASSED
-tests/test_input_guard.py::test_require_non_empty_none PASSED
-========================= 5 passed =========================
-```
-
-### 실습 B: 실패 유도 후 원인 파악
-
-함수 구현을 일부러 아래처럼 바꿉니다.
-
-```python
-# 잘못된 구현 예시
-# if value.strip() == "":
-#     return value
-```
-
-다시 실행하면 실패가 즉시 재현됩니다.
-
-```text
-FAILED tests/test_input_guard.py::test_require_non_empty_blank[]
-E   Failed: DID NOT RAISE <class 'ValueError'>
-```
-
-이 출력 하나로 계약 위반 지점을 바로 확인할 수 있습니다.
-
-### 실습 C: 리팩터링 안정성 확인
-
-```python
-# app/input_guard.py (refactor)
-
-def require_non_empty(value: str) -> str:
-    if value is None:
-        raise TypeError("value cannot be None")
-    normalized = value.strip()
-    if normalized == "":
-        raise ValueError("value cannot be blank")
-    return normalized
-```
-
-같은 테스트를 실행해 모두 통과하면, 구조를 바꿔도 계약은 유지된 것입니다.
 
 ## 터미널 옵션 조합
 
@@ -682,7 +513,6 @@ def test_regression_cases(raw, exc):
 - 경계값 입력이 포함되어 있는가
 - 정상/오류 경로를 모두 검증하는가
 - 테스트 추가가 함수 복사 대신 데이터 추가로 끝나는가
-
 
 ## 추가 케이스 스터디: PR 리뷰에서 자주 보는 개선 포인트
 
@@ -743,7 +573,6 @@ tests/test_discount.py::test_discount_price_invalid[1000-1.1] PASSED
 - 예외 타입이 구체적인가
 - 실패 시 메시지로 원인을 알 수 있는가
 - 데이터 추가만으로 케이스 확장이 가능한 구조인가
-
 
 ## 처음 질문으로 돌아가기
 

@@ -190,7 +190,7 @@ df = pd.read_sql(
 ### 4단계 — 이벤트 로그에서 가져오기
 
 ```python
-# JSONL — one JSON event per line
+# JSONL — 한 줄에 하나의 JSON 이벤트
 import json
 with open("events.jsonl") as f:
     events = [json.loads(line) for line in f]

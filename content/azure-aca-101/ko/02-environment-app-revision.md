@@ -104,8 +104,7 @@ Revision은 이미지 + 설정의 불변 스냅샷입니다. 한번 만들어진
 - 트래픽을 이전 Revision으로 즉시 되돌릴 수 있는데, 이것이 rollback입니다
 - "rollback"은 새 Revision을 만드는 작업이 아니라 기존 Revision 사이의 가중치를 조정하는 작업입니다
 
-## Before / After
-
+## 적용 전후 비교
 **Before — (team × service × stage)마다 Environment 하나**
 
 ```bash
@@ -133,7 +132,7 @@ az containerapp create --name notifications --environment env-team-a-prod ...
 
 ## 실습 — Revision이 실제로 어떻게 움직이는지 보기
 
-### Step 1. Multiple revision mode로 Container App 만들기
+### 단계 1. Multiple revision mode로 Container App 만들기
 
 ```bash
 RG=rg-aca-demo
@@ -149,7 +148,7 @@ az containerapp create \
   --revisions-mode multiple
 ```
 
-### Step 2. 새 이미지로 두 번째 Revision 만들기
+### 단계 2. 새 이미지로 두 번째 Revision 만들기
 
 ```bash
 az containerapp update \
@@ -159,7 +158,7 @@ az containerapp update \
   --revision-suffix v2
 ```
 
-### Step 3. 두 Revision 사이에 트래픽 나누기(canary)
+### 단계 3. 두 Revision 사이에 트래픽 나누기(canary)
 
 ```bash
 az containerapp ingress traffic set \
@@ -168,7 +167,7 @@ az containerapp ingress traffic set \
   --revision-weight myapi--<v1-suffix>=90 myapi--<v2-suffix>=10
 ```
 
-### Step 4. 문제가 생기면 즉시 rollback 하기
+### 단계 4. 문제가 생기면 즉시 rollback 하기
 
 ```bash
 az containerapp ingress traffic set \

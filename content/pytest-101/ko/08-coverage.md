@@ -26,7 +26,6 @@ last_reviewed: '2026-05-12'
 
 커버리지는 버그가 없음을 증명하지는 않지만, 적어도 어떤 코드가 전혀 실행되지 않았는지는 객관적으로 보여 줍니다. 그래서 테스트 품질을 이야기할 때 커버리지는 출발점으로 매우 유용합니다.
 
-
 ![pytest 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/08/08-01-big-picture.ko.png)
 *pytest 101 8장 흐름 개요*
 
@@ -68,8 +67,7 @@ test: process(5) → line coverage 60% (3/5)
 | .coveragerc | 제외 규칙과 소스 경로를 설정하는 파일입니다 |
 | missing lines | 테스트가 한 번도 실행하지 않은 라인 번호입니다 |
 
-## Before / After
-
+## 적용 전후 비교
 커버리지 없이 실행하는 경우와 함께 측정하는 경우를 비교해 보겠습니다.
 
 ```bash
@@ -86,8 +84,7 @@ pytest --cov=src --cov-report=term-missing
 
 ## 단계별 실습
 
-### Step 1: Install pytest-cov
-
+### 단계 1: pytest-cov 설치
 ```bash
 pip install pytest-cov
 ```
@@ -118,8 +115,7 @@ def validate_age(age: int) -> bool:
     return True
 ```
 
-### Step 3: Write Partial Tests
-
+### 단계 3: 부분 테스트 작성
 ```python
 # tests/test_validator.py
 from myapp.validator import validate_email, validate_age
@@ -134,8 +130,7 @@ def test_valid_age():
     assert validate_age(25) is True
 ```
 
-### Step 4: Measure Coverage
-
+### 단계 4: 커버리지 측정
 ```bash
 pytest --cov=src/myapp --cov-report=term-missing
 
@@ -237,74 +232,6 @@ pytest --cov=src/myapp --cov-report=term-missing
 
 커버리지는 테스트 범위를 객관적으로 보여 주는 도구입니다. pytest-cov로 누락 구간을 찾고, 그 빈 곳을 메우는 테스트를 추가하며, CI에서 기준을 강제하면 테스트 품질을 훨씬 안정적으로 유지할 수 있습니다. 다음 글에서는 GitHub Actions로 이 검증을 자동화해 보겠습니다.
 
-## 실전 패턴 추가: fixture, parametrization, mock을 함께 설계하기
-
-테스트 파일이 커질수록 중요한 것은 개별 문법보다 테스트 경계를 일정하게 유지하는 일입니다. 특히 fixture로 상태를 준비하고, `@pytest.mark.parametrize`로 입력 집합을 확장하고, mock으로 외부 의존성을 분리하는 세 가지를 한 흐름으로 묶으면 테스트 유지보수 비용이 크게 줄어듭니다.
-
-```python
-# tests/test_order_service.py
-from __future__ import annotations
-
-from dataclasses import dataclass
-from unittest.mock import Mock
-
-import pytest
-
-
-@dataclass
-class Order:
-    item: str
-    qty: int
-
-
-class InventoryClient:
-    def reserve(self, item: str, qty: int) -> bool:  # pragma: no cover
-        raise NotImplementedError
-
-
-class OrderService:
-    def __init__(self, client: InventoryClient) -> None:
-        self.client = client
-
-    def place(self, order: Order) -> str:
-        if order.qty <= 0:
-            raise ValueError("qty must be positive")
-        ok = self.client.reserve(order.item, order.qty)
-        return "confirmed" if ok else "rejected"
-
-
-@pytest.fixture
-def inventory_client() -> Mock:
-    return Mock(spec=InventoryClient)
-
-
-@pytest.fixture
-def order_service(inventory_client: Mock) -> OrderService:
-    return OrderService(client=inventory_client)
-
-
-@pytest.mark.parametrize(
-    "order,expected",
-    [
-        (Order("book", 1), "confirmed"),
-        (Order("book", 3), "confirmed"),
-        (Order("book", 5), "rejected"),
-    ],
-)
-def test_place_orders(order_service: OrderService, inventory_client: Mock, order: Order, expected: str) -> None:
-    inventory_client.reserve.return_value = expected == "confirmed"
-    assert order_service.place(order) == expected
-
-
-def test_place_rejects_invalid_quantity(order_service: OrderService) -> None:
-    with pytest.raises(ValueError, match="qty must be positive"):
-        order_service.place(Order("book", 0))
-```
-
-위 구조의 핵심은 테스트 목적별 분리입니다. fixture는 준비, parametrization은 입력 공간, mock은 외부 의존성 제어를 담당합니다. 팀 단위에서는 이 분리를 지켜야 테스트를 고칠 때 영향 범위를 빠르게 읽을 수 있습니다.
-
-또한 fixture scope를 무조건 넓히지 않는 편이 안전합니다. DB 연결이나 임시 디렉터리처럼 생성 비용이 큰 자원만 `module` 또는 `session`으로 올리고, 나머지는 `function` scope로 두어 테스트 독립성을 유지하는 것이 좋습니다.
-
 ## coverage 리포트를 실제 개선으로 연결하는 흐름
 
 커버리지 숫자만 보는 단계에서 멈추지 않고, 누락 라인을 테스트 추가로 연결해야 품질이 올라갑니다.
@@ -329,7 +256,6 @@ def grade(score: int) -> str:
 ```python
 # tests/test_score.py (초기)
 from myapp.score import grade
-
 
 def test_grade_a():
     assert grade(95) == "A"
@@ -403,7 +329,7 @@ addopts = "--cov=src/myapp --cov-report=term-missing --cov-fail-under=85"
 - 커버리지 70%여도 핵심 경계를 잘 잡으면 실무 가치가 클 수 있습니다.
 - 숫자 자체보다 누락 라인의 성격이 더 중요합니다.
 
-## Before/After: 커버리지 주도 리팩터링
+## 적용 전과 후: 커버리지 주도 리팩터링
 
 ```python
 # before: 분기 많은 함수 한 덩어리
@@ -431,13 +357,11 @@ MAP = {
     ("US", False): "US-STD",
 }
 
-
 def shipping_label(country: str, express: bool) -> str:
     return MAP.get((country, express), "INTL")
 ```
 
 동작을 보존하면서 코드 가독성과 테스트 가시성을 동시에 높일 수 있습니다.
-
 
 ## 커버리지 리포트 읽는 순서
 
@@ -493,93 +417,6 @@ omit =
 
 커버리지는 통과/실패 숫자가 아니라 누락 구간 탐지 도구입니다. 누락된 라인을 테스트로 메우는 루프를 반복할 때 품질이 올라갑니다.
 
-
-## 심화 실습 세트: 실패를 빠르게 재현하고 고정하는 루틴
-
-아래 실습은 글 주제와 무관하게 pytest 프로젝트에서 반복적으로 쓰는 루틴입니다. 핵심은 실패를 의도적으로 만들고, 실패 메시지를 읽고, 테스트를 보강하고, 다시 통과시키는 사이클을 짧게 반복하는 것입니다.
-
-### 실습 A: 입력 검증 함수
-
-```python
-# app/input_guard.py
-
-def require_non_empty(value: str) -> str:
-    if value is None:
-        raise TypeError("value cannot be None")
-    if value.strip() == "":
-        raise ValueError("value cannot be blank")
-    return value.strip()
-```
-
-```python
-# tests/test_input_guard.py
-import pytest
-from app.input_guard import require_non_empty
-
-
-def test_require_non_empty_ok():
-    assert require_non_empty("  hello  ") == "hello"
-
-
-@pytest.mark.parametrize("bad", ["", "   ", "\n\t"])
-def test_require_non_empty_blank(bad):
-    with pytest.raises(ValueError, match="blank"):
-        require_non_empty(bad)
-
-
-def test_require_non_empty_none():
-    with pytest.raises(TypeError, match="None"):
-        require_non_empty(None)
-```
-
-```bash
-pytest tests/test_input_guard.py -v
-```
-
-```text
-tests/test_input_guard.py::test_require_non_empty_ok PASSED
-tests/test_input_guard.py::test_require_non_empty_blank[] PASSED
-tests/test_input_guard.py::test_require_non_empty_blank[   ] PASSED
-tests/test_input_guard.py::test_require_non_empty_blank[\n\t] PASSED
-tests/test_input_guard.py::test_require_non_empty_none PASSED
-========================= 5 passed =========================
-```
-
-### 실습 B: 실패 유도 후 원인 파악
-
-함수 구현을 일부러 아래처럼 바꿉니다.
-
-```python
-# 잘못된 구현 예시
-# if value.strip() == "":
-#     return value
-```
-
-다시 실행하면 실패가 즉시 재현됩니다.
-
-```text
-FAILED tests/test_input_guard.py::test_require_non_empty_blank[]
-E   Failed: DID NOT RAISE <class 'ValueError'>
-```
-
-이 출력 하나로 계약 위반 지점을 바로 확인할 수 있습니다.
-
-### 실습 C: 리팩터링 안정성 확인
-
-```python
-# app/input_guard.py (refactor)
-
-def require_non_empty(value: str) -> str:
-    if value is None:
-        raise TypeError("value cannot be None")
-    normalized = value.strip()
-    if normalized == "":
-        raise ValueError("value cannot be blank")
-    return normalized
-```
-
-같은 테스트를 실행해 모두 통과하면, 구조를 바꿔도 계약은 유지된 것입니다.
-
 ## 터미널 옵션 조합
 
 | 명령 | 목적 |
@@ -616,7 +453,6 @@ def test_regression_cases(raw, exc):
 - 경계값 입력이 포함되어 있는가
 - 정상/오류 경로를 모두 검증하는가
 - 테스트 추가가 함수 복사 대신 데이터 추가로 끝나는가
-
 
 ## 추가 케이스 스터디: PR 리뷰에서 자주 보는 개선 포인트
 
@@ -678,14 +514,12 @@ tests/test_discount.py::test_discount_price_invalid[1000-1.1] PASSED
 - 실패 시 메시지로 원인을 알 수 있는가
 - 데이터 추가만으로 케이스 확장이 가능한 구조인가
 
-
 ## 미니 점검표
 
 - 실패 케이스를 최소 3개 이상 유지합니다.
 - 경계값(최소/최대/빈값)을 포함합니다.
 - 실패 메시지가 의미 있는지 확인합니다.
 - CI에서 동일 명령으로 재현 가능한지 확인합니다.
-
 
 ## 짧은 확인
 
@@ -696,7 +530,6 @@ pytest -q
 ```text
 PASS
 ```
-
 
 추가 메모: 테스트는 실행 결과를 남기고, 실패 입력을 재현 가능한 형태로 보존해야 운영에서 같은 문제를 다시 만나지 않습니다. 이 문단은 바이트 기준 보강과 함께 실무 원칙을 다시 고정하기 위한 메모입니다.
 

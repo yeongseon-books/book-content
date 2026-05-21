@@ -57,8 +57,7 @@ last_reviewed: '2026-05-15'
 - **Eventual consistency**: 충분한 시간이 지나면 모든 복제본이 같은 상태로 수렴하는 모델입니다.
 - **CAP**: 파티션 중에는 일관성과 가용성을 동시에 끝까지 지킬 수 없다는 정리입니다.
 
-## Before / After
-
+## 적용 전후 비교
 **Before — 데이터베이스가 알아서 정하겠지**
 
 ```text
@@ -125,7 +124,7 @@ def write(x):
     if not majority_alive():
         # CP: refuse
         raise Exception("no majority")
-        # AP: accept locally and merge later
+        # AP: 로컬에서 수용하고 나중에 병합
 ```
 
 두 줄의 차이가 CP와 AP를 갈라놓습니다.

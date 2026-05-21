@@ -178,7 +178,7 @@ Decision: roll out to 100% paid desktop users; monitor for 2 more weeks.
 import pandas as pd
 from sklearn.inspection import permutation_importance
 
-# fitted model, X_valid, y_valid 가 이미 준비되었다고 가정
+# Fitted model, X_valid, y_valid 가 이미 준비하고 있습니다
 result = permutation_importance(model, X_valid, y_valid, n_repeats=5, random_state=42)
 imp = pd.DataFrame({
     "feature": X_valid.columns,

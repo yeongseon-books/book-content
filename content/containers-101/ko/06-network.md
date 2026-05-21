@@ -128,8 +128,7 @@ def create_net(name):
 
 먼저 명시적으로 네트워크를 만듭니다. 기본 bridge를 그대로 쓰는 것보다 명확하고, DNS 기반 이름 해석도 더 잘 활용할 수 있습니다.
 
-### 단계 2 — Run DB
-
+### 단계 2 — DB 실행
 ```python
 def run_db(net):
     subprocess.run([
@@ -140,8 +139,7 @@ def run_db(net):
 
 데이터베이스를 같은 네트워크에 연결합니다. 이 시점부터 컨테이너 이름 `db`가 네트워크 내부 DNS 이름이 됩니다.
 
-### 단계 3 — Run app
-
+### 단계 3 — 앱 실행
 ```python
 def run_app(net):
     subprocess.run([

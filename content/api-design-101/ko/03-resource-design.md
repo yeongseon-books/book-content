@@ -29,7 +29,6 @@ URL은 한 번 공개되면 데이터베이스 컬럼명보다 훨씬 오래 살
 
 여기서는 좋은 REST URL을 예쁜 문자열이 아니라 리소스 모델의 결과물로 봅니다. 컬렉션 경계, 하위 리소스, 식별자 노출 범위를 먼저 정해야 뒤의 메서드와 문서가 함께 안정됩니다.
 
-
 ![API Design 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/03/03-01-concept-at-a-glance.ko.png)
 *API Design 101 3장 흐름 개요*
 
@@ -88,11 +87,9 @@ BOOKS = {
     "ddd": {"title": "Domain-Driven Design", "author": "Eric Evans"},
 }
 
-
 @app.get("/books")              # Collection: 목록 반환
 def list_books():
     return jsonify(list(BOOKS.values()))
-
 
 @app.get("/books/<slug>")       # Item: 단일 리소스 반환
 def get_book(slug):
@@ -132,7 +129,7 @@ URL만 읽어도 리소스의 소유 관계와 조작 대상이 명확합니다.
 
 ## 실습: 리소스 모델을 만드는 다섯 단계
 
-### Step 1 — 도메인 명사 추출 (Start with Nouns)
+### 단계 1 — 도메인 명사 추출 (Start with Nouns)
 
 도메인에서 "관리 대상"을 명사로 뽑습니다. 이때 동사("주문하다")가 아니라 결과물("주문")을 찾습니다.
 
@@ -142,7 +139,7 @@ URL만 읽어도 리소스의 소유 관계와 조작 대상이 명확합니다.
 
 **함정:** `search`, `login`, `activate` 같은 동사를 명사처럼 쓰고 싶은 유혹이 있습니다. 이것은 리소스가 아니라 action이므로 별도 처리합니다 (Step 5 이후).
 
-### Step 2 — 식별자 결정 (Attach Identifiers)
+### 단계 2 — 식별자 결정 (Attach Identifiers)
 
 각 컬렉션의 아이템을 구분할 식별자를 정합니다.
 
@@ -162,7 +159,7 @@ URL만 읽어도 리소스의 소유 관계와 조작 대상이 명확합니다.
 
 **실무 권장:** 외부 공개 API는 UUID 또는 접두사+UUID를 씁니다. 내부 PK를 그대로 노출하면 enumerate attack에 취약합니다.
 
-### Step 3 — 소유 관계로 하위 리소스 결정 (Sub-resources)
+### 단계 3 — 소유 관계로 하위 리소스 결정 (Sub-resources)
 
 "X 없이 Y가 존재할 수 있는가?"를 묻습니다.
 
@@ -188,7 +185,7 @@ URL만 읽어도 리소스의 소유 관계와 조작 대상이 명확합니다.
 | 자식을 부모 없이 조회할 일이 있는가? | 최상위 고려 | 하위 리소스 |
 | 여러 부모에 속할 수 있는가? | 최상위 + 관계 링크 | 하위 리소스 |
 
-### Step 4 — 컬렉션 연산 구현 (Collection Operations)
+### 단계 4 — 컬렉션 연산 구현 (Collection Operations)
 
 ```python
 # resource_operations.py
@@ -206,12 +203,10 @@ ORDERS = {
     ]
 }
 
-
 @app.get("/users")
 def list_users():
     """Collection: 사용자 목록 반환"""
     return jsonify(list(USERS.values()))
-
 
 @app.get("/users/<int:uid>")
 def get_user(uid):
@@ -220,14 +215,12 @@ def get_user(uid):
         abort(404)
     return jsonify(USERS[uid])
 
-
 @app.get("/users/<int:uid>/orders")
 def list_user_orders(uid):
     """Sub-collection: 특정 사용자의 주문 목록"""
     if uid not in USERS:
         abort(404)
     return jsonify(ORDERS.get(uid, []))
-
 
 @app.get("/users/<int:uid>/orders/<int:oid>")
 def get_user_order(uid, oid):
@@ -241,7 +234,7 @@ def get_user_order(uid, oid):
 
 각 endpoint가 컬렉션-아이템-하위컬렉션-하위아이템 계층을 정확히 반영합니다.
 
-### Step 5 — 깊이 제한 (Restraint on Depth)
+### 단계 5 — 깊이 제한 (Restraint on Depth)
 
 ```text
 # 좋음: 2단계
@@ -282,7 +275,6 @@ from flask import Flask, jsonify
 app = Flask(__name__)
 USERS = {42: {"name": "Yeongseon", "bio": "Engineer", "avatar": "/img/ys.png"}}
 
-
 @app.get("/users/<int:uid>/profile")
 def get_profile(uid):
     """Singleton: 사용자당 프로필은 하나뿐"""
@@ -296,7 +288,6 @@ Singleton은 컬렉션(`/profiles`)이 아니라 특정 부모 아래 단일 리
 - `/users/42/settings` — 사용자별 설정 (하나)
 - `/repos/org/proj/readme` — 저장소별 README (하나)
 - `/system/health` — 시스템 전체 상태 (하나)
-
 
 ## Action은 어떻게 표현하는가
 
@@ -394,205 +385,6 @@ GET /v1/projects/{project}/locations/{location}/datasets/{dataset}
 ## 정리와 다음 글
 
 리소스는 API의 모양을 결정합니다. 다음 글에서는 이 리소스에 어떤 동작을 얹을지, 즉 HTTP method와 상태 코드를 다룹니다.
-
-
-## 실전 계약 확장: 스펙·예제·운영 신호를 한 번에 맞추기
-
-개념을 이해한 뒤 실제 팀에서 흔들리는 지점은 거의 같습니다. 문장 설명은 충분한데, 요청/응답 예제와 오류 형식, 페이지네이션 규칙, 버전 정책, 레이트 리밋 신호가 문서와 코드에서 따로 놀기 시작하는 순간입니다. 이 절은 그 간극을 줄이기 위해, 어떤 주제의 API 글이든 공통으로 넣어야 하는 실전 앵커를 정리합니다.
-
-### OpenAPI 조각: endpoint 계약을 텍스트가 아니라 스키마로 고정하기
-
-```yaml
-openapi: 3.1.0
-info:
-  title: API Design 101 Example
-  version: 1.2.0
-paths:
-  /v1/orders:
-    get:
-      summary: 주문 목록 조회
-      parameters:
-        - in: query
-          name: limit
-          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
-        - in: query
-          name: cursor
-          schema: { type: string }
-      responses:
-        '200':
-          description: 조회 성공
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrderListResponse'
-        '429':
-          description: 요청 제한 초과
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-components:
-  schemas:
-    OrderListResponse:
-      type: object
-      required: [data, page]
-      properties:
-        data:
-          type: array
-          items:
-            $ref: '#/components/schemas/Order'
-        page:
-          $ref: '#/components/schemas/PageInfo'
-    PageInfo:
-      type: object
-      required: [has_next]
-      properties:
-        next_cursor: { type: string, nullable: true }
-        has_next: { type: boolean }
-    ErrorResponse:
-      type: object
-      required: [error]
-      properties:
-        error:
-          type: object
-          required: [code, message, trace_id]
-          properties:
-            code: { type: string, example: RATE_LIMIT_EXCEEDED }
-            message: { type: string }
-            trace_id: { type: string }
-            retryable: { type: boolean, default: false }
-```
-
-스키마를 이렇게 고정하면 팀원마다 "대충 이런 형식"으로 기억하던 상태에서 벗어납니다. 특히 `429` 응답처럼 운영에서 자주 만나는 경계 케이스를 spec에 먼저 넣어 두면, 문서·테스트·SDK가 같은 신호를 보게 됩니다.
-
-### 요청/응답 JSON 샘플: 클라이언트가 바로 호출 가능한 수준으로 제시하기
-
-```json
-{
-  "request": {
-    "method": "POST",
-    "path": "/v1/orders",
-    "headers": {
-      "Authorization": "Bearer {ACCESS_TOKEN}",
-      "Idempotency-Key": "b7f9f7b8-6cd1-4c9e-9ad0-58ad8e9f45ac",
-      "Content-Type": "application/json"
-    },
-    "body": {
-      "customer_id": "cus_2026_001",
-      "items": [
-        {"product_id": "p-100", "quantity": 2},
-        {"product_id": "p-200", "quantity": 1}
-      ],
-      "currency": "KRW"
-    }
-  },
-  "response": {
-    "status": 201,
-    "headers": {
-      "Location": "/v1/orders/ord_01JXYZ",
-      "X-RateLimit-Remaining": "119"
-    },
-    "body": {
-      "id": "ord_01JXYZ",
-      "status": "created",
-      "total_amount": 54000,
-      "currency": "KRW",
-      "created_at": "2026-05-21T09:30:00Z"
-    }
-  }
-}
-```
-
-실제 소비자는 문장 정의보다 예제를 먼저 읽습니다. 그래서 예제는 "읽기 좋은 형태"가 아니라 "실행 가능한 형태"로 제공해야 합니다. 헤더 이름, 필드 타입, 상태 코드가 모두 들어간 샘플이 있어야 첫 호출 실패율이 내려갑니다.
-
-### 오류 응답 스키마: 디버깅 단서를 일관된 키로 고정하기
-
-```json
-{
-  "error": {
-    "code": "VALIDATION_FAILED",
-    "message": "items[1].quantity must be >= 1",
-    "trace_id": "4b6f39e6c4f14f8f9f4aa2f1a7b8c918",
-    "retryable": false,
-    "details": [
-      {
-        "field": "items[1].quantity",
-        "reason": "min_value",
-        "expected": ">= 1",
-        "actual": 0
-      }
-    ]
-  }
-}
-```
-
-`code`와 `trace_id`를 고정하면 운영 중 협업 속도가 크게 올라갑니다. 클라이언트는 `code`로 분기하고, 서버 운영자는 `trace_id`로 로그를 찾습니다. 이 둘이 매번 바뀌면 같은 장애를 두 번 분석하게 됩니다.
-
-### 페이지네이션·필터·정렬: 확장 가능한 쿼리 규칙으로 설계하기
-
-```http
-GET /v1/orders?limit=20&cursor=eyJpZCI6Im9yZF8wMUpYWiJ9&status=paid&sort=-created_at
-```
-
-```json
-{
-  "data": [
-    {"id": "ord_01JXYZ", "status": "paid", "created_at": "2026-05-20T23:59:20Z"},
-    {"id": "ord_01JXYY", "status": "paid", "created_at": "2026-05-20T23:58:02Z"}
-  ],
-  "page": {
-    "next_cursor": "eyJpZCI6Im9yZF8wMUpYWSJ9",
-    "has_next": true,
-    "limit": 20
-  }
-}
-```
-
-커서 기반 구조를 초기에 잡아 두면 데이터가 커졌을 때도 계약을 바꾸지 않고 버틸 수 있습니다. offset이 당장 단순해 보여도, 쓰기 부하가 높은 시스템에서는 중복/누락 페이지 이슈가 빠르게 드러납니다.
-
-### 레이트 리밋: 숫자와 복구 시점을 같이 전달하기
-
-```http
-HTTP/1.1 429 Too Many Requests
-Retry-After: 30
-X-RateLimit-Limit: 120
-X-RateLimit-Remaining: 0
-X-RateLimit-Reset: 1716286500
-Content-Type: application/json
-```
-
-```json
-{
-  "error": {
-    "code": "RATE_LIMIT_EXCEEDED",
-    "message": "Too many requests. Retry after 30 seconds.",
-    "trace_id": "f0e8d83a8d8f4d1da8f796f0dfcb66f6",
-    "retryable": true
-  }
-}
-```
-
-`429`를 반환하면서 복구 시점을 주지 않으면 클라이언트는 무의미한 재시도를 반복합니다. `Retry-After`와 남은 quota 헤더를 같이 제공해야 트래픽이 안정적으로 회복됩니다.
-
-### 버전 전략: 경로/헤더 정책과 폐기 절차를 함께 운영하기
-
-```http
-Deprecation: true
-Sunset: Wed, 31 Dec 2026 23:59:59 GMT
-Link: </docs/changelog#v1-sunset>; rel="deprecation"
-```
-
-버전 표기는 시작일 뿐입니다. 중요한 것은 종료 절차를 예측 가능하게 운영하는 일입니다. 어떤 필드가 언제 사라지는지, 대체 엔드포인트가 무엇인지, SDK 최소 버전이 무엇인지를 changelog와 reference에 동시에 반영해야 실제 마이그레이션이 진행됩니다.
-
-### 구현 체크: 계약 드리프트를 CI에서 차단하기
-
-- OpenAPI lint 실패를 merge 차단 규칙으로 둡니다.
-- 스키마 예제 JSON을 contract test 입력으로 재사용합니다.
-- `429`, `409`, `422` 같은 경계 응답을 스냅샷 테스트에 포함합니다.
-- changelog가 없는 breaking change PR은 리뷰 단계에서 반려합니다.
-
-요약하면, 좋은 API 글의 품질은 설명 문단 길이가 아니라 "코드·문서·운영이 같은 계약을 바라보는가"로 측정됩니다. 이 절의 앵커를 반복적으로 적용하면 시리즈의 어느 장을 읽더라도 독자가 같은 설계 원칙을 재사용할 수 있습니다.
-
 
 ## 처음 질문으로 돌아가기
 

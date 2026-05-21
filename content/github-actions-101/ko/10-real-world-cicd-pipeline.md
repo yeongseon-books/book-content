@@ -469,7 +469,7 @@ DORA 메트릭(배포 빈도, 변경 리드타임, 실패율, 복구 시간) 관
 
 여러 저장소에서 동일한 CI/CD 패턴을 사용한다면 조직 수준에서 표준화하는 방법을 고려합니다.
 
-### Template Repository
+### 템플릿 저장소
 
 ```text
 org/ci-template/
@@ -490,7 +490,7 @@ org/ci-template/
 
 새 저장소를 만들 때 이 template에서 시작하면 CI/CD가 즉시 동작합니다.
 
-### Centralized Reusable Workflows
+### 중앙 집중형 재사용 워크플로
 
 ```yaml
 # 다른 저장소에서 조직의 공용 워크플로우 호출

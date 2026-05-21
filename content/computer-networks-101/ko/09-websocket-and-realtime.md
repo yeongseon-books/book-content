@@ -81,12 +81,11 @@ last_reviewed: '2026-05-15'
 | Backpressure | 수신자가 느릴 때 송신 큐가 무한히 커지지 않도록 제어하는 메커니즘 |
 | Heartbeat | ping/pong으로 연결 생존을 확인하는 주기적 프레임 |
 
-## Before/After
-
+## 적용 전과 후
 **Before — 5초마다 polling**
 
 ```python
-# client.py — naive polling for new messages
+# client.py — 새 메시지에 대한 순진한 폴링
 import time, requests
 
 last_id = 0
@@ -103,7 +102,7 @@ while True:
 **After — WebSocket으로 즉시 수신**
 
 ```python
-# client.py — uses the websockets library
+# client.py — websockets 라이브러리를 사용합니다.
 import asyncio
 import websockets
 
@@ -133,7 +132,7 @@ asyncio.run(listen())
 SSE 서버 예시:
 
 ```python
-# sse_server.py — Flask
+# sse_server.py — 플라스크
 from flask import Flask, Response
 import time
 
@@ -214,7 +213,7 @@ asyncio.run(main())
 ### 4단계 — ping/pong으로 죽은 연결 감지
 
 ```python
-# server.py — add keepalive options
+# server.py — keepalive 옵션 추가
 async with websockets.serve(
     echo, "127.0.0.1", 8765,
     ping_interval=20,   # send a ping every 20 s
@@ -387,7 +386,7 @@ async def chat_with_backpressure(ws):
 Redis pub/sub을 사용한 구현 예시:
 
 ```python
-# gateway.py — Redis pub/sub 기반 브로드캐스트
+# Gateway.py — Redis pub/sub 안전하게 보호되는 은행
 import asyncio, websockets, redis.asyncio as redis
 
 CLIENTS = set()

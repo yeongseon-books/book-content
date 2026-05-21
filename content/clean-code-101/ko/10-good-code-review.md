@@ -78,8 +78,7 @@ Options: (a) split in this PR, (b) follow-up PR with an issue link."
 
 ## 실전 적용: 탄탄한 리뷰 프로세스 다섯 단계
 
-### 단계 1 — Push toil into automation
-
+### 단계 1 — 반복 작업을 자동화로 밀어내기
 ```yaml
 # 1_ci.yml
 - run: ruff check .
@@ -89,8 +88,7 @@ Options: (a) split in this PR, (b) follow-up PR with an issue link."
 
 스타일, 포맷, 기본 테스트는 사람 눈앞에 오기 전에 끝나야 합니다. 사람이 자동화가 할 일을 대신하면 리뷰의 질이 바로 떨어집니다.
 
-### 단계 2 — Keep PRs small
-
+### 단계 2 — PR을 작게 유지하기
 ```text
 # 2_small_pr.txt
 Recommended: under 400 lines diff, one responsibility
@@ -98,8 +96,7 @@ Recommended: under 400 lines diff, one responsibility
 
 작은 PR은 빠른 리뷰의 전제입니다. 한 책임만 담긴 PR이어야 리뷰어도 기준을 선명하게 적용할 수 있습니다.
 
-### 단계 3 — Read intent first
-
+### 단계 3 — 의도를 먼저 읽기
 ```markdown
 <!-- 3_pr_template.md -->
 ## 무엇을 바꾸는가
@@ -114,8 +111,7 @@ What could go wrong
 
 맥락 없는 PR은 제대로 리뷰할 수 없습니다. 리뷰어는 코드보다 먼저 의도와 위험을 읽어야 전체 구조를 올바르게 판단할 수 있습니다.
 
-### 단계 4 — Write actionable comments
-
+### 단계 4 — 실행 가능한 주석 작성
 ```text
 # 4_comment.txt
 NIT: minor (optional)
@@ -126,8 +122,7 @@ QUESTION: clarification
 
 우선순위 라벨이 붙은 코멘트는 불필요한 마찰을 줄입니다. 무엇이 선택 사항이고 무엇이 병합 전 필수인지 분명해야 합니다.
 
-### 단계 5 — Learn through retrospectives
-
+### 단계 5 — 회고를 통해 배우기
 ```text
 # 5_retro.txt
 - Move repeated comments into lints/docs.

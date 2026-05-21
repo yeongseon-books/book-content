@@ -105,7 +105,7 @@ class LLaVAProjector(nn.Module):
         )
 
     def forward(self, vision_features: torch.Tensor) -> torch.Tensor:
-        # vision_features: (B, num_patches, vision_dim)
+        # Vision_features: (B, num_patches,vision_dim)
         return self.proj(vision_features)  # (B, num_patches, llm_dim)
 ```
 
@@ -136,7 +136,7 @@ class QFormer(nn.Module):
         self.vision_proj = nn.Linear(vision_dim, hidden_dim)
 
     def forward(self, vision_features: torch.Tensor) -> torch.Tensor:
-        # vision_features: (B, num_patches, vision_dim)
+        # Vision_features: (B, num_patches,vision_dim)
         B = vision_features.size(0)
         q = self.queries.unsqueeze(0).expand(B, -1, -1)  # (B, 32, hidden)
         memory = self.vision_proj(vision_features)

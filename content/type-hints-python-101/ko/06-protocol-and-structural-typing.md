@@ -296,7 +296,7 @@ def publish_report(storage: StorageBackend, path: str, data: bytes) -> bytes:
 다음 글에서는 타입 관계를 입력과 출력 사이에 그대로 보존하는 Generic을 다루겠습니다.
 
 
-## 실전 보강: before/after + 오류 해결
+## 실전 보강: 적용 전후 + 오류 해결
 
 ```python
 # before
@@ -416,7 +416,7 @@ Found 3 errors in 1 file (checked 1 source file)
 
 위 메시지는 각각 키 타입 불일치, Union 좁히기 누락, Optional 처리 누락을 의미합니다. 즉, 정적 분석기가 실제 운영 버그 후보를 실행 전에 보여 준다는 뜻입니다.
 
-## before/after 요약
+## 적용 전후 요약
 
 | 구분 | before (느슨한 타입) | after (구체 타입) |
 | --- | --- | --- |

@@ -64,19 +64,18 @@ last_reviewed: '2026-05-12'
 | 추상 자료형(ADT) | 구현 세부사항을 숨기고 "어떤 연산이 가능한가"만 정의하는 개념입니다 |
 | 내장 자료구조 | Python이 기본으로 제공하는 list, dict, set, tuple 같은 구조입니다 |
 
-## Before / After
-
+## 적용 전후 비교
 자료구조를 모르고 코드를 쓰는 경우와, 연산 특성을 고려해 구조를 고른 경우를 비교해 보겠습니다.
 
 ```python
-# before: searching in a list — O(n)
+# before: list에서 탐색 — O(n)
 users = ["alice", "bob", "charlie", "diana"]
 if "charlie" in users:
     print("found")
 ```
 
 ```python
-# after: searching in a set — O(1)
+# after: set에서 탐색 — O(1)
 users = {"alice", "bob", "charlie", "diana"}
 if "charlie" in users:
     print("found")
@@ -86,7 +85,7 @@ list는 순서 보존에는 좋지만 검색은 선형으로 진행됩니다. �
 
 ## 단계별 실습
 
-### Step 1: list와 set의 검색 속도 비교
+### 단계 1: list와 set의 검색 속도 비교
 
 ```python
 import time
@@ -109,7 +108,7 @@ print(f"set  search: {set_time:.6f}s")
 print(f"set is {list_time / set_time:.0f}x faster")
 ```
 
-### Step 2: dict의 O(1) 키-값 조회 확인
+### 단계 2: dict의 O(1) 키-값 조회 확인
 
 ```python
 scores: dict[str, int] = {"alice": 95, "bob": 82, "charlie": 90}
@@ -117,15 +116,15 @@ print(scores["bob"])          # 82 — O(1) access
 print(scores.get("diana", 0)) # 0 — default when key is missing
 ```
 
-### Step 3: tuple로 불변 데이터 표현
+### 단계 3: tuple로 불변 데이터 표현
 
 ```python
 point: tuple[int, int] = (3, 4)
-# point[0] = 5  # TypeError — tuples are immutable
+# point[0] = 5  # TypeError — tuple은 immutable
 print(f"x={point[0]}, y={point[1]}")
 ```
 
-### Step 4: list를 스택으로 사용
+### 단계 4: list를 스택으로 사용
 
 ```python
 stack: list[str] = []
@@ -136,21 +135,21 @@ print(stack.pop())  # "c" — last in, first out
 print(stack.pop())  # "b"
 ```
 
-### Step 5: collections 모듈 탐색
+### 단계 5: collections 모듈 탐색
 
 ```python
 from collections import deque, Counter, defaultdict
 
-# deque: O(1) insert/delete at both ends
+# deque: 양 끝 삽입/삭제 O(1)
 dq: deque[int] = deque([1, 2, 3])
 dq.appendleft(0)
 print(list(dq))  # [0, 1, 2, 3]
 
-# Counter: frequency counting
+# Counter: 빈도 계산
 counter = Counter("abracadabra")
 print(counter.most_common(3))  # [('a', 5), ('b', 2), ('r', 2)]
 
-# defaultdict: dict with default values
+# defaultdict: 기본값이 있는 dict
 dd: defaultdict[str, list[str]] = defaultdict(list)
 dd["fruits"].append("apple")
 print(dd)  # defaultdict(<class 'list'>, {'fruits': ['apple']})

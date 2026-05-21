@@ -142,7 +142,7 @@ import numpy as np
 # 두 종속적 확률변수
 rng = np.random.default_rng(42)
 X = rng.normal(10, 2, 10000)
-# Y는 X에 의존: Y = X + noise
+# Y는 X에 의존: Y = X + 잡음
 Y = X + rng.normal(0, 1, 10000)
 
 # 선형 결합
@@ -285,7 +285,7 @@ from scipy import stats
 # 정규분포 N(0, 1)
 rv = stats.norm(0, 1)
 for k in [1, 2, 3]:
-    # 양쪽 꼬리 확률 P(|X| ≥ k)
+    # 서로 재미있는 재미있는 P(|X| ≥ k)
     tail_prob = 2 * (1 - rv.cdf(k))
     chebyshev_bound = 1 / k**2
     print(f"k={k}: 정규분포 실제={tail_prob:.4f}, 체비셰프 상한={chebyshev_bound:.4f}")
@@ -317,7 +317,7 @@ corr = np.corrcoef(X, Y)[0, 1]
 print(f"Cov(X, Y) = {cov_manual:.4f} (numpy: {cov_numpy:.4f})")
 print(f"ρ(X, Y) = {corr:.4f}")
 
-# 분산 덧셈: Var(X+Y) = Var(X) + Var(Y) + 2Cov(X,Y)
+# 2.2.2.4 Var(X+Y) = Var(X) + Var(Y) + 2Cov(X,Y)
 Z = X + Y
 var_sum_theory = X.var() + Y.var() + 2 * cov_manual
 var_sum_actual = Z.var()
@@ -351,7 +351,7 @@ mu_A, sigma_A = 0.10, 0.20
 mu_B, sigma_B = 0.06, 0.10
 rho = 0.3  # 상관계수
 
-# 포트폴리오: w_A 비중으로 A, (1-w_A)로 B
+# 포르투갈: w_A 자격으로 A, (1-w_A)로 B
 weights = np.linspace(0, 1, 11)
 
 print(f"{'w_A':>5} {'w_B':>5} {'기대수익':>8} {'표준편차':>8} {'샤프비율':>8}")

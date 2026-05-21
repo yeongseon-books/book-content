@@ -88,8 +88,7 @@ ACA는 모든 로그 행에 `RevisionName_s`를 채워 줍니다.
 - **App-level instrumentation** — `APPLICATIONINSIGHTS_CONNECTION_STRING`을 주입하고 OpenTelemetry SDK로 export합니다.
 - **Dapr telemetry** — `az containerapp env update --dapr-instrumentation-key`를 설정해 사이드카가 자체 telemetry를 내보내게 합니다. 앱 코드 트레이스와는 독립적입니다.
 
-## Before / After
-
+## 적용 전후 비교
 ### Before (관측성이 없는 경우)
 
 ```bash
@@ -124,7 +123,7 @@ az containerapp create \
 
 ## 단계별 실습
 
-### Step 1: Log Analytics workspace 만들기
+### 단계 1: Log Analytics workspace 만들기
 
 ```bash
 RG=rg-aca-demo
@@ -142,7 +141,7 @@ LOG_WORKSPACE_KEY=$(az monitor log-analytics workspace get-shared-keys \
   --query primarySharedKey -o tsv)
 ```
 
-### Step 2: ACA Environment에 연결하기
+### 단계 2: ACA Environment에 연결하기
 
 ```bash
 az containerapp env create \
@@ -151,7 +150,7 @@ az containerapp env create \
   --logs-workspace-key $LOG_WORKSPACE_KEY
 ```
 
-### Step 3: KQL로 조회하기
+### 단계 3: KQL로 조회하기
 
 Azure Portal → Log Analytics workspace → Logs에서 아래를 실행합니다.
 
@@ -177,7 +176,7 @@ ContainerAppSystemLogs_CL
 | top 50 by Time desc
 ```
 
-### Step 4: Application Insights 연결하기(FastAPI)
+### 단계 4: Application Insights 연결하기(FastAPI)
 
 ```bash
 AI_NAME=aca-appinsights

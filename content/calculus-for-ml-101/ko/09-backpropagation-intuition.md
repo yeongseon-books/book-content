@@ -131,7 +131,7 @@ y = mul(b, a)
 backward(y)
 
 # y = (a + a) * a = 2a^2
-# dy/da = 4a, so at a=2 the gradient is 8
+# dy/da = 4a, 따라서 a=2에서 gradient는 8
 print(a.grad)
 ```
 

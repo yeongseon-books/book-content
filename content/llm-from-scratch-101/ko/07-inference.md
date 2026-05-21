@@ -206,7 +206,7 @@ python generate.py --prompt "ROMEO:" --max 180 --temp 1.2 --top_k 0   --top_p 0.
 
 ```python
 def apply_repetition_penalty(logits: torch.Tensor, recent_ids: torch.Tensor, penalty: float = 1.1):
-    # logits: (B, V), recent_ids: (B, K)
+    # 로지트: (B, V), 최근_ID: (B, K)
     for b in range(logits.size(0)):
         for tok in recent_ids[b].tolist():
             logits[b, tok] /= penalty

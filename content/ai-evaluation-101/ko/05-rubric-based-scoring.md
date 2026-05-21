@@ -86,7 +86,7 @@ Rubric 기반 채점은 응답을 여러 차원으로 나눠서 각각 점수를
 Rubric 차원 정의 - 4단계 프로세스
 좋은 rubric은 즉흥적으로 만들 수 없습니다. 다음 4단계를 따릅니다.
 
-### Step 1: 사용자 가치에서 차원 도출
+### 단계 1: 사용자 가치에서 차원 도출
 
 "좋은 응답"이 무엇인지 사용자 관점으로 적습니다. 고객 지원 봇의 경우:
 
@@ -96,7 +96,7 @@ Rubric 차원 정의 - 4단계 프로세스
 
 도메인마다 다릅니다. 코드 리뷰 봇이면 Correctness, Specificity, Actionability를 씁니다.
 
-### Step 2: 차원당 anchor 작성
+### 단계 2: 차원당 anchor 작성
 
 각 차원에 대해 1점, 3점, 5점이 어떤 모습인지 **구체적인 예시**를 작성합니다.
 
@@ -117,7 +117,7 @@ anchors:
 
 Anchor가 없으면 judge LLM도 사람도 채점이 흔들립니다.
 
-### Step 3: 차원이 독립적인지 검증
+### 단계 3: 차원이 독립적인지 검증
 
 두 차원이 비슷한 것을 측정하면 중복입니다. 예: "Accuracy"와 "Correctness"는 같습니다. 50건 샘플로 차원 간 상관관계를 봅니다.
 
@@ -131,11 +131,11 @@ df = pd.DataFrame({
     "tone":        [5, 5, 3, 4, 4, ...],
 })
 print(df.corr())
-# Correlation > 0.9 means the two dimensions are effectively the same
-# → merge or drop one
+# 상관계수 > 0.9이면 두 차원은 사실상 동일합니다.
+# → 하나로 병합하거나 하나를 제거
 ```
 
-### Step 4: 3~5개로 제한
+### 단계 4: 3~5개로 제한
 
 차원이 10개를 넘으면 judge가 일관되게 채점하지 못합니다. **핵심 3~5개**로 줄이세요.
 
@@ -221,7 +221,7 @@ def aggregate_weighted(scores: dict) -> tuple[float, str]:
                "clarity": 0.15, "tone": 0.15}
     weighted = sum(scores[k] * weights[k] for k in weights)
 
-    # Correctness < 3 is an automatic FAIL
+    # Correctness < 3이면 자동 FAIL
     if scores["correctness"] < 3:
         return weighted, "FAIL"
     if weighted >= 4.0:
@@ -234,7 +234,7 @@ def aggregate_weighted(scores: dict) -> tuple[float, str]:
 ```python
 def aggregate_min(scores: dict) -> int:
     return min(scores.values())
-# The weakest dimension defines overall quality
+# 가장 약한 차원이 전체 품질을 결정
 ```
 
 **방식 3: 차원별로 따로 보고 (집계 없음)**
@@ -265,10 +265,10 @@ for dim in dimensions:
     j = [s[dim] for s in judge_scores]
     k = cohen_kappa_score(h, j, weights="quadratic")
     print(f"{dim}: kappa={k:.3f}")
-# correctness: kappa=0.78  ← trustworthy
-# completeness: kappa=0.65 ← trustworthy
-# clarity:     kappa=0.42  ← fair, prompt needs work
-# tone:        kappa=0.31  ← weak, rewrite anchors
+# correctness: kappa=0.78  ← 신뢰 가능
+# completeness: kappa=0.65 ← 신뢰 가능
+# clarity:     kappa=0.42  ← 보통 수준, prompt 개선 필요
+# tone:        kappa=0.31  ← 약함, 앵커 재작성 필요
 ```
 
 차원별 kappa가 다르면 **약한 차원의 anchor를 다시 작성**하세요. 모든 차원이 0.6 이상이 될 때까지 반복합니다.

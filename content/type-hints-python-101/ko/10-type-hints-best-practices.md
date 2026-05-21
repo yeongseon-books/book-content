@@ -91,7 +91,7 @@ def process_order(payload: OrderPayload) -> dict[str, str]:
 
 핵심은 지역 변수에 타입을 잔뜩 적는 것이 아니라, 시그니처와 경계 헬퍼를 먼저 단단하게 바꾸는 데 있습니다.
 
-## 한 모듈을 before/after로 단단하게 만들기
+## 한 모듈을 적용 전후로 단단하게 만들기
 
 이 글 전체에서는 `order_service.py` 하나를 개선합니다.
 
@@ -377,7 +377,7 @@ Success: no issues found in 1 source file
 이 시리즈에서는 기본 타입, `Optional`, `Union`, `Callable`, `TypedDict`, `dataclass`, `Protocol`, `Generic`, mypy, pyright, Pydantic까지 Python 타입 힌트의 전체 그림을 살펴봤습니다. 이제 남은 일은 완벽주의가 아니라, 중요한 경로부터 반복 가능한 hardening pass를 계속 쌓아 가는 것입니다.
 
 
-## 실전 보강: before/after + 오류 해결
+## 실전 보강: 적용 전후 + 오류 해결
 
 ```python
 # before
@@ -497,7 +497,7 @@ Found 3 errors in 1 file (checked 1 source file)
 
 위 메시지는 각각 키 타입 불일치, Union 좁히기 누락, Optional 처리 누락을 의미합니다. 즉, 정적 분석기가 실제 운영 버그 후보를 실행 전에 보여 준다는 뜻입니다.
 
-## before/after 요약
+## 적용 전후 요약
 
 | 구분 | before (느슨한 타입) | after (구체 타입) |
 | --- | --- | --- |

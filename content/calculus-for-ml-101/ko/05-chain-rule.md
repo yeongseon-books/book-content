@@ -238,7 +238,7 @@ def sigmoid(z):
     return 1.0 / (1.0 + np.exp(-z))
 
 def bce_grad(a, y):
-    # dL/da for BCE with probabilities
+    # 확률 기반 BCE에서 dL/da
     return -(y / (a + 1e-12)) + (1 - y) / (1 - a + 1e-12)
 
 def backward_one_sample(x, w, b, y):

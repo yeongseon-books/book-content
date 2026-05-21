@@ -65,8 +65,7 @@ slot 7 empty?    yes  -> 여기에 저장
 | sparse table | 빈 슬롯을 충분히 남겨 둬서 탐색 경로가 짧게 유지되는 테이블입니다 |
 | hashable | 안정적인 `__hash__`와 `__eq__` 의미를 가져 dict 키로 안전하게 쓸 수 있는 객체입니다 |
 
-## Before / After
-
+## 적용 전후 비교
 키-값 데이터를 선형 탐색하는 방식과 dict 조회를 비교해 보겠습니다.
 
 ```python
@@ -88,7 +87,7 @@ print(users["charlie"])  # 90
 
 ## 단계별 실습
 
-### Step 1: 기본 dict 연산 확인하기
+### 단계 1: 기본 dict 연산 확인하기
 
 ```python
 scores = {}
@@ -106,7 +105,7 @@ print(scores)                   # {'alice': 95, 'charlie': 90}
 print("alice" in scores)       # True
 ```
 
-### Step 2: 의도적으로 충돌을 만들어 보기
+### 단계 2: 의도적으로 충돌을 만들어 보기
 
 ```python
 class CollidingKey:
@@ -146,7 +145,7 @@ True
 - 그런데도 dict는 세 키를 모두 올바르게 저장하고 다시 찾아냅니다.
 - 교훈은 “충돌은 없다”가 아니라, “충돌이 있어도 dict는 내부 probe와 equality 비교로 정확성을 유지하고, 테이블이 과밀해지기 전에 resize해서 보통 빠름도 함께 지킨다”입니다.
 
-### Step 3: 삽입 순서, 삭제, 재삽입 관찰하기
+### 단계 3: 삽입 순서, 삭제, 재삽입 관찰하기
 
 ```python
 events = {"queued": 1, "running": 2, "done": 3}
@@ -171,7 +170,7 @@ print(events)
 
 Python dict는 현재 살아 있는 키들의 삽입 순서를 유지합니다. 하지만 키를 삭제했다가 다시 넣으면 그 키는 “새로 삽입된 키”가 되어 맨 뒤로 갑니다. 즉, 보존되는 것은 현재 상태의 삽입 순서이지, 키의 역사 전체가 아닙니다.
 
-### Step 4: hashable / unhashable 경계 확인하기
+### 단계 4: hashable / unhashable 경계 확인하기
 
 ```python
 print(hash("hello"))    # 세션마다 달라질 수 있음
@@ -185,7 +184,7 @@ except TypeError as error:
 
 list, dict, set 같은 가변 컨테이너는 내용이 바뀔 수 있으므로 안정적인 해시를 보장하지 못해 dict 키가 될 수 없습니다.
 
-### Step 5: 내부 모델이 잡힌 뒤 고수준 도구 쓰기
+### 단계 5: 내부 모델이 잡힌 뒤 고수준 도구 쓰기
 
 ```python
 from collections import Counter, defaultdict

@@ -175,7 +175,7 @@ print("posterior:", post)
 ### 5단계 — 두 관점 비교하기
 
 ```python
-# Same data, two interpretations
+# 같은 데이터, 두 가지 해석
 print("frequentist: long-run ratio")
 print("bayesian: updated belief")
 ```

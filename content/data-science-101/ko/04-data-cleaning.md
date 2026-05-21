@@ -158,7 +158,7 @@ print("after :", len(df))
 # Inspect missingness
 print(df.isna().mean().sort_values(ascending=False).head())
 
-# Strategy: drop critical, fill optional
+# 전략: 중요 삭제, 선택 사항 채우기
 df = df.dropna(subset=["user_id", "signup_at"])
 df["country"] = df["country"].fillna("UNKNOWN")
 ```

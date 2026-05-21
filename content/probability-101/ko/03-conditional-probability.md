@@ -346,7 +346,7 @@ print(f"P(음성|건강) = {TN/healthy:.3f}  # specificity")
 ### 1단계 — 데이터 만들기
 
 ```python
-# 100 people; 5 sick. Sensitivity 0.9, specificity 0.95
+# 100명; 5 아프다. 민감도 0.9, 특이도 0.95
 N, sick = 100, 5
 TP = round(sick * 0.9)
 FN = sick - TP

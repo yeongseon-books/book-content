@@ -93,8 +93,7 @@ def price(user, item):
 
 ## 실전 적용: 분기를 줄이는 다섯 단계
 
-### 단계 1 — Flatten with guard clauses
-
+### 단계 1 — 가드 절로 평탄화
 ```python
 # 1_guard.py
 def total(items):
@@ -105,11 +104,10 @@ def total(items):
 
 비정상 입력이나 예외 케이스는 초반에 바로 반환하는 편이 좋습니다. 정상 흐름을 가운데에 남겨 두어야 본문이 읽힙니다.
 
-### 단계 2 — Flip negative conditions
-
+### 단계 2 — 부정 조건 뒤집기
 ```python
 # 2_positive.py
-# Before: if not user.is_inactive: ...
+# 이전: user.is_inactive가 아닌 경우: ...
 # After:
 def can_login(user):
     if not user.is_active:
@@ -119,8 +117,7 @@ def can_login(user):
 
 부정형 조건은 생각을 한 번 더 꺾게 만듭니다. 특히 이중 부정은 거의 항상 더 나쁜 이름이나 더 나쁜 구조의 신호입니다.
 
-### 단계 3 — Remove branches with polymorphism
-
+### 단계 3 — 다형성으로 분기 제거
 ```python
 # 3_poly.py
 class Shape:
@@ -137,8 +134,7 @@ def total_area(shapes): return sum(s.area() for s in shapes)
 
 타입 분기가 반복되면, 각 타입이 자기 동작을 맡아야 할 때가 많습니다.
 
-### 단계 4 — Strategy pattern
-
+### 단계 4 — Strategy 패턴
 ```python
 # 4_strategy.py
 def percent_off(price, rate): return price * (1 - rate)

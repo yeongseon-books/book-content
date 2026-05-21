@@ -119,7 +119,7 @@ if __name__ == "__main__":
 
 모든 트레이스를 100% 저장하면 비용이 급격히 커집니다. 샘플링은 일부만 저장하는 전략입니다.
 
-### Head-based Sampling
+### 헤드 기반 샘플링(Head-based Sampling)
 
 **정의**: 트레이스 시작 시점에 저장 여부를 결정합니다.
 
@@ -140,7 +140,7 @@ sampler = TraceIdRatioBased(0.1)
 provider = TracerProvider(sampler=sampler)
 ```
 
-### Tail-based Sampling
+### 테일 기반 샘플링(Tail-based Sampling)
 
 **정의**: 트레이스 종료 후 결과를 보고 저장 여부를 결정합니다.
 
@@ -426,7 +426,7 @@ tracer = trace.get_tracer("async-service")
 
 async def handle_request():
     with tracer.start_as_current_span("async_handler"):
-        # asyncio.create_task는 contextvars를 자동 복사
+        # asyncio.create_task는 contextvars를 자동 복사합니다.
         task = asyncio.create_task(fetch_data())
         await task
 

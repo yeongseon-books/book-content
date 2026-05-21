@@ -120,7 +120,7 @@ print("R^2 :", r2_score(y_test, y_pred))
 ### 5단계 — 비즈니스 비용 직접 계산
 
 ```python
-# A false negative costs 5x a false positive
+# 위음성 비용이 위양성의 5배입니다
 cost = 5 * cm[1, 0] + 1 * cm[0, 1]
 print("expected cost:", cost)
 ```
@@ -195,7 +195,7 @@ cm = confusion_matrix(y_test, y_pred)
 print(cm)
 print(classification_report(y_test, y_pred, digits=4))
 
-# TN, FP, FN, TP
+# 테네시, FP, FN, TP
 TN, FP, FN, TP = cm.ravel()
 print({"false_positive": int(FP), "false_negative": int(FN)})
 ```

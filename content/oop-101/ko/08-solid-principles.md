@@ -495,7 +495,7 @@ SOLID는 다섯 문장을 외우는 과목이 아니라, 변경 비용을 줄이
   +-- [CampaignPolicy]    (LSP)
 ```
 
-## before/after: 다중 위반 코드 정리
+## 적용 전후: 다중 위반 코드 정리
 
 ```python
 # before

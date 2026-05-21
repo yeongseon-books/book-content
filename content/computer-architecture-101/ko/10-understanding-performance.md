@@ -80,8 +80,8 @@ last_reviewed: '2026-05-12'
 **Before — 추측으로 최적화:**
 
 ```python
-# "Python must be slow" so it gets ported to Cython
-# The real bottleneck was an N+1 SQL query
+# "Python은 느릴 수밖에 없다"고 보고 Cython으로 포팅
+# 실제 병목은 N+1 SQL query였습니다.
 def slow_endpoint(user_ids):
     users = []
     for uid in user_ids:
@@ -92,7 +92,7 @@ def slow_endpoint(user_ids):
 **After — 측정 후 실제 병목 수정:**
 
 ```python
-# Profiler shows SQL spending 95% of the time
+# Profiler 결과 시간의 95%를 SQL이 사용합니다.
 def fast_endpoint(user_ids):
     return db.query(
         "SELECT * FROM users WHERE id IN (?)",
@@ -112,12 +112,12 @@ import time
 def task():
     return sum(i * i for i in range(10_000))
 
-# Latency: time per call
+# Latency: 호출 1회당 시간
 start = time.time()
 task()
 print(f"latency: {(time.time()-start)*1000:.2f}ms")
 
-# Throughput: how many in 1 second
+# Throughput: 1초에 몇 개를 처리하는지
 end = time.time() + 1.0
 count = 0
 while time.time() < end:

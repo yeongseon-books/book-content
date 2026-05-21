@@ -465,7 +465,7 @@ print(release_decision(100, 14.4, "low"))
 
 에러 버짓을 운영 규칙으로 만들려면 정책 문서가 필요합니다. 다음은 팀이 처음 버짓 정책을 도입할 때 쓸 수 있는 템플릿 예시입니다.
 
-### Error Budget Policy Template
+### 오류 예산 정책 템플릿
 
 ```yaml
 team: payments-api

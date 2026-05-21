@@ -27,7 +27,6 @@ seo_description: CLI와 Shell, Terminal의 차이와 첫 명령 실행 흐름을
 
 처음 프로그래밍을 배울 때 대부분 GUI 에디터와 마우스 클릭으로 시작합니다. 파일을 더블클릭해서 열고, 메뉴에서 "실행"을 누릅니다. 이 방식은 처음에 직관적이지만, 서버 환경에 들어가는 순간 무력해집니다.
 
-
 ![Linux CLI 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/01/01-01-big-picture.ko.png)
 *Linux CLI 101 1장 흐름 개요*
 
@@ -202,64 +201,6 @@ cd My\ Documents    # Correct: backslash escapes the space
 
 다음 글에서는 **파일과 디렉터리를 다루는 명령어** — `ls`, `cd`, `mkdir`, `cp`, `mv`, `rm`을 다룹니다.
 
-
-## 실전 CLI 운영 패턴
-
-### 명령을 순서가 아니라 데이터 흐름으로 설계하기
-CLI 작업이 길어질수록 핵심은 명령 개수보다 데이터 흐름입니다. 예를 들어 로그에서 오류 패턴을 찾고, 원인 프로세스를 좁히고, 마지막으로 자동 조치 후보를 만드는 과정은 하나의 파이프라인으로 보는 편이 안정적입니다. 다음 흐름은 실제 운영 환경에서 자주 쓰는 형태입니다.
-
-```bash
-journalctl -u my-api --since "10 min ago" \
-  | grep -E "ERROR|CRITICAL" \
-  | awk '{print $1" "$2" "$3" "$NF}' \
-  | sort \
-  | uniq -c \
-  | sort -nr
-```
-
-이 파이프라인의 목적은 "원시 로그"를 "빈도 기반 우선순위 목록"으로 바꾸는 것입니다. 앞쪽 명령은 후보를 넓게 모으고, 뒤쪽 명령은 노이즈를 줄여 의사결정 가능한 형태로 압축합니다. 운영자가 먼저 이 구조를 머릿속에 그려두면, 중간에 도구를 바꿔도 전체 전략은 유지됩니다.
-
-### 안전한 one-liner와 검증 루틴
-한 줄 명령은 빠르지만 위험합니다. 삭제, 이동, 권한 변경처럼 되돌리기 어려운 작업은 항상 dry-run 단계를 먼저 둡니다.
-
-```bash
-find ./tmp-exports -type f -mtime +7 -print
-find ./tmp-exports -type f -mtime +7 -print0 | xargs -0 rm -f
-```
-
-첫 줄은 영향 범위를 확인하는 단계이고, 둘째 줄은 실제 실행입니다. 이 두 단계를 분리하면 휴먼 에러를 크게 줄일 수 있습니다. 특히 공백이 있는 파일명을 다룰 때는 `-print0`와 `xargs -0` 조합을 기본값으로 두는 편이 안전합니다.
-
-### 작은 셸 스크립트를 운영 도구로 키우기
-반복 작업은 즉시 스크립트로 승격하는 것이 좋습니다. 아래 예시는 "서비스 상태 점검 + 이상 시 로그 추출"을 자동화한 최소 형태입니다.
-
-```bash
-#!/usr/bin/env bash
-set -euo pipefail
-
-service_name="my-api"
-window="5 min ago"
-
-if systemctl is-active --quiet "$service_name"; then
-  echo "[PASS] $service_name is active"
-else
-  echo "[FAIL] $service_name is not active"
-  journalctl -u "$service_name" --since "$window" | tail -n 80
-  exit 1
-fi
-```
-
-여기서 중요한 포인트는 세 가지입니다. 첫째, `set -euo pipefail`로 실패를 조기에 표면화합니다. 둘째, 하드코딩 값을 변수로 끌어올려 재사용성을 높입니다. 셋째, 실패 시 바로 조사 가능한 로그를 출력해 복구 시간을 줄입니다. 이런 작은 스크립트들이 쌓이면 팀의 운영 품질이 표준화됩니다.
-
-### 파이프 결과를 파일과 결합해 재현성 확보하기
-문제 분석은 재현 가능해야 합니다. 표준 출력으로만 보면 같은 분석을 다시 하기 어렵기 때문에 중간 결과를 파일로 남기는 습관이 유용합니다.
-
-```bash
-ps aux | grep "python" | grep -v grep | tee /tmp/python-proc.txt
-cut -d' ' -f1-12 /tmp/python-proc.txt > /tmp/python-proc-compact.txt
-```
-
-`tee`는 화면 확인과 파일 저장을 동시에 처리하므로 탐색 속도와 재현성을 함께 확보합니다. 이후 팀원이 같은 파일을 기반으로 추가 분석을 이어갈 수 있어 협업 비용이 줄어듭니다.
-
 ## 자동화 품질을 높이는 셸 체크포인트
 
 ### 입력 검증과 종료 코드 계약
@@ -427,77 +368,6 @@ journalctl -u "$svc" --since '5 min ago'   | grep -E 'ERROR|CRITICAL|Timeout' ||
 
 이런 스크립트는 팀 내에서 같은 방식으로 상황을 재현하게 해 줍니다. 결국 CLI 역량의 목적은 "내가 빨라지는 것"을 넘어서 "팀의 진단 품질을 표준화하는 것"입니다.
 
-## 운영 점검 플레이북
-
-실무에서 CLI 지식은 "명령을 외우는 능력"보다 "실수 가능성을 줄이는 절차"로 드러납니다. 아래 플레이북은 작업 전에 위험을 줄이고, 작업 후 검증을 빠뜨리지 않기 위한 최소 절차입니다.
-
-### 1) 작업 전 컨텍스트 확인
-
-```bash
-whoami
-hostname
-pwd
-date
-
-# 예상 출력
-# deploy
-# prod-api-01
-# /opt/my-app
-# Thu May 21 15:24:18 KST 2026
-```
-
-같은 명령이라도 서버와 경로가 다르면 결과가 완전히 달라집니다. 컨텍스트 확인은 사소해 보이지만 잘못된 환경 조작을 막는 첫 방어선입니다.
-
-### 2) 영향 범위 먼저 출력
-
-```bash
-# 예시: 후보만 확인
-find ./target -type f -name '*.log' -mtime +7 -print
-```
-
-삭제·이동·권한 변경처럼 파괴적일 수 있는 작업은 항상 후보 목록 출력이 선행되어야 합니다. "실행 전에 눈으로 검토"가 자동화 품질의 핵심입니다.
-
-### 3) 파이프 체인으로 증거를 압축
-
-```bash
-journalctl -u my-api --since '20 min ago' --no-pager   | grep -E 'ERROR|CRITICAL|timeout|5[0-9]{2}'   | awk '{print $1, $2, $3, $NF}'   | sort   | uniq -c   | sort -nr
-```
-
-`grep -E` 정규식은 노이즈를 줄이는 첫 단계입니다. 빈도 집계(`uniq -c`)까지 연결하면 우선순위를 빠르게 정할 수 있습니다.
-
-### 4) systemd 상태와 애플리케이션 로그를 함께 확인
-
-```bash
-systemctl status my-api --no-pager | sed -n '1,15p'
-journalctl -u my-api -n 80 --no-pager
-```
-
-프로세스가 살아 있어도 서비스가 실패 상태일 수 있고, 반대로 서비스는 active인데 내부 오류가 계속 발생할 수 있습니다. 두 관점을 동시에 봐야 원인 추적이 정확해집니다.
-
-### 5) Bash 스크립트로 반복 점검 표준화
-
-```bash
-#!/usr/bin/env bash
-set -euo pipefail
-
-svc="my-api"
-window='10 min ago'
-
-printf '[INFO] host=%s user=%s time=%s
-' "$(hostname)" "$(whoami)" "$(date '+%F %T')"
-
-if systemctl is-active --quiet "$svc"; then
-  echo '[PASS] service active'
-else
-  echo '[FAIL] service inactive'
-fi
-
-journalctl -u "$svc" --since "$window" --no-pager   | grep -E 'ERROR|CRITICAL|timeout|Failed' || true
-```
-
-자동화의 목적은 사람이 바뀌어도 같은 품질의 점검 결과를 얻는 것입니다. 이 원칙이 지켜지면 장애 대응 시간과 커뮤니케이션 비용이 함께 줄어듭니다.
-
-
 ## 실전 점검 로그 예시
 
 아래 예시는 실제 운영에서 자주 보는 "점검 출력 형태"를 축약한 것입니다. 중요한 것은 특정 명령을 그대로 복사하는 것이 아니라, 출력을 근거로 다음 판단을 연결하는 습관입니다.
@@ -526,7 +396,6 @@ lsof -p "$(pgrep -f my-api | head -n 1)" | wc -l
 ```
 
 이런 출력들을 시계열로 저장해 두면 재발 시 비교가 쉬워지고, "지금이 평소와 어떻게 다른가"를 빠르게 설명할 수 있습니다. 결국 CLI 실무 역량은 명령 자체보다 **증거 기반 판단 루틴**을 안정적으로 반복하는 능력입니다.
-
 
 ## 처음 질문으로 돌아가기
 

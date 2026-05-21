@@ -76,7 +76,7 @@ last_reviewed: '2026-05-14'
 
 ## 실습: 다섯 가지 답변 패턴
 
-### Step 1 — Fundamentals
+### 단계 1 — Fundamentals
 
 ```text
 Explain bias-variance in one line.
@@ -84,8 +84,7 @@ Explain bias-variance in one line.
 
 기초 개념 질문은 짧지만 강합니다. 한 줄로 설명할 수 있을 정도로 개념을 압축해 두어야 응용 질문도 흔들리지 않습니다.
 
-### Step 2 — Model Choice
-
+### 단계 2 — 모델 선택
 ```text
 - assumptions: linear vs tree vs neural
 - data size, interpretability
@@ -93,7 +92,7 @@ Explain bias-variance in one line.
 
 모델 선택 문제에서는 이름보다 기준이 중요합니다. 데이터 크기, 가정, 해석 가능성, 지연 요구사항 같은 판단 기준을 먼저 말해야 합니다.
 
-### Step 3 — Evaluation
+### 단계 3 — Evaluation
 
 ```python
 from sklearn.metrics import precision_score, recall_score, roc_auc_score
@@ -101,8 +100,7 @@ from sklearn.metrics import precision_score, recall_score, roc_auc_score
 
 평가 지표는 문제 맥락과 분리해서 말할 수 없습니다. 비용 구조가 다른 문제에서는 precision과 recall의 우선순위도 달라집니다.
 
-### Step 4 — Production Traps
-
+### 단계 4 — 운영 환경 함정
 ```text
 - data leakage
 - class imbalance
@@ -111,8 +109,7 @@ from sklearn.metrics import precision_score, recall_score, roc_auc_score
 
 이 함정들을 먼저 언급하면 답변의 깊이가 달라집니다. 특히 leakage를 알고 있다는 사실 자체가 실무 감각 신호가 됩니다.
 
-### Step 5 — System Design
-
+### 단계 5 — 시스템 설계
 ```text
 - data -> train -> serve -> monitor
 - retraining cadence

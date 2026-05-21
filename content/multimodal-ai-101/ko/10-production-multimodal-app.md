@@ -128,7 +128,7 @@ async def multimodal_query(
     # 3. RAG retrieval
     docs = await search_docs(embed, question, k=4)
 
-    # 4. final VLM Q&A with streaming
+    # 4. 스트리밍을 통한 최종 VLM Q&A
     return StreamingResponse(
         stream_vlm_answer(image_bytes, question, caption, ocr_text, docs),
         media_type="text/event-stream",

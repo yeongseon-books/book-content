@@ -105,11 +105,11 @@ Regression dataset은 production용 평가 데이터셋(Ep2)과 다릅니다.
 import json
 
 GOLDEN = [
-    # Top usage cases
+    # 주요 사용 케이스
     {"id": "freq-001", "input": "today's weather", "expected_intent": "weather_query"},
     {"id": "freq-002", "input": "change my password", "expected_intent": "account_password"},
 
-    # Past regressions (with commit reference)
+    # 과거 회귀 이슈(커밋 참조 포함)
     {"id": "reg-001", "input": "where is my order?",
      "expected_contains": ["order", "status"],
      "note": "v1.2 returned 'item' instead of 'order' (PR #234)"},

@@ -119,7 +119,7 @@ def ab_test(questions: list[str], model_a: str, model_b: str) -> dict:
     for q in questions:
         ans_a = get_response(model_a, q)
         ans_b = get_response(model_b, q)
-        # Control position bias by swapping (Ep4)
+        # 순서를 바꿔 위치 편향 제어 (Ep4)
         v1 = judge_pairwise(q, ans_a, ans_b)
         v2 = judge_pairwise(q, ans_b, ans_a)
         flip = {"A": "B", "B": "A", "Tie": "Tie"}
@@ -163,13 +163,13 @@ def required_sample_size(p_a: float, p_b: float,
     )
     return int(n) + 1
 
-# To detect 60% vs 50%
+# 60% 대 50% 차이를 검출하려면
 print(required_sample_size(0.6, 0.5))  # ~388
 
-# 55% vs 50% (small difference)
+# 55% 대 50% (작은 차이)
 print(required_sample_size(0.55, 0.5))  # ~1565
 
-# 70% vs 50% (large difference)
+# 70% 대 50% (큰 차이)
 print(required_sample_size(0.7, 0.5))  # ~93
 ```
 
@@ -193,7 +193,7 @@ from statsmodels.stats.proportion import proportions_ztest
 
 def is_significantly_better(wins_a: int, wins_b: int,
                               total: int, alpha: float = 0.05) -> dict:
-    # Drop ties from the denominator; compare wins_a vs wins_b
+    # 분모에서 무승부를 제외하고 wins_a와 wins_b를 비교
     n_decisive = wins_a + wins_b
     if n_decisive == 0:
         return {"significant": False, "p_value": 1.0, "winner": None}
@@ -215,7 +215,7 @@ print(is_significantly_better(wins_a=240, wins_b=160, total=400))
 
 print(is_significantly_better(wins_a=22, wins_b=18, total=40))
 # {'p_value': 0.52, 'significant': False, 'winner': 'A', ...}
-# Same 60% vs 45% but the sample is too small
+# 같은 60% 대 45%라도 샘플이 너무 작음
 ```
 
 해석:

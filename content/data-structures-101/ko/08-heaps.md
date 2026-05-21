@@ -69,7 +69,7 @@ def add(event):
 
 def pop_next():
     return events.pop(0)
-# Insert O(n log n), pop O(n)
+# 삽입 O(n log n), pop O(n)
 ```
 
 **After — use a heap:**
@@ -82,7 +82,7 @@ def add(event):
 
 def pop_next():
     return heapq.heappop(events)
-# Insert and pop are both O(log n)
+# 삽입과 pop 모두 O(log n)
 ```
 
 모든 원소를 항상 정렬해 둘 필요는 없습니다. “다음에 꺼낼 하나”만 빠르게 보장하면 되는 문제라면 힙이 더 정확한 선택입니다.
@@ -158,7 +158,7 @@ print(heap)                      # internal array (the tree representation)
 print(heapq.heappop(heap))       # 1
 print(heapq.heappop(heap))       # 2
 
-# k smallest / largest
+# k개의 smallest / largest
 import heapq
 data = [5, 3, 8, 1, 9, 2, 7]
 print(heapq.nsmallest(3, data))   # [1, 2, 3]
@@ -208,7 +208,7 @@ print(f"order matches expectation: {order == expected}")
 #   (1, 'retry webhook'),
 #   (2, 'nightly batch'),
 # ]
-# order matches expectation: True
+# 순서가 기대값과 일치: True
 ```
 
 이제 예제가 실제 스케줄러에 더 가까워졌습니다. 출력 순서가 다르면 우선순위 방향을 거꾸로 잡았거나, tie-break 카운터를 빼먹었거나, 큐 안의 항목을 제자리에서 바꿔 힙 불변식을 깨뜨렸을 가능성이 큽니다.

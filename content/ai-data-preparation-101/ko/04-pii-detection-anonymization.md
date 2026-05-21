@@ -345,7 +345,7 @@ def compute_pii_metrics(audit_rows: list[dict]) -> dict:
 
 이 방식의 장점은 모델 개선 루프가 자연스럽게 만들어진다는 점입니다. 검수에서 모은 정답 span은 다음 탐지기 학습 데이터로 바로 쓸 수 있습니다.
 
-## 익명화 전후 before/after 샘플
+## 익명화 전후 적용 전후 샘플
 
 ```text
 before: 김영수 고객님 이메일은 ys.kim@acme.co.kr이고 연락처는 010-1234-5678입니다.

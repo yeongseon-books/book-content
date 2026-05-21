@@ -76,7 +76,7 @@ last_reviewed: '2026-05-14'
 
 ## 실습: 다섯 단계 프레임
 
-### Step 1 — Clarify
+### 단계 1 — Clarify
 
 ```text
 "DAU dropped" = which segment, what period?
@@ -84,7 +84,7 @@ last_reviewed: '2026-05-14'
 
 명확화 질문은 시간을 버는 장치가 아니라 잘못된 문제를 푸는 일을 막는 장치입니다. 세그먼트, 기간, 최근 변경 사항을 먼저 확인해야 합니다.
 
-### Step 2 — Metric
+### 단계 2 — Metric
 
 ```text
 - north star metric
@@ -93,7 +93,7 @@ last_reviewed: '2026-05-14'
 
 핵심 지표 하나와 보조 지표 둘 정도를 잡으면 답변의 중심이 생깁니다. 지표가 없으면 대화는 금방 추상적으로 흩어집니다.
 
-### Step 3 — Hypothesis
+### 단계 3 — Hypothesis
 
 ```text
 - product change
@@ -103,7 +103,7 @@ last_reviewed: '2026-05-14'
 
 가설은 하나만 두면 위험합니다. 제품 변경, 외부 이벤트, 데이터 파이프라인처럼 성격이 다른 가설을 함께 세워야 탐색이 균형을 잡습니다.
 
-### Step 4 — Data
+### 단계 4 — Data
 
 ```text
 - which query, which comparison
@@ -112,7 +112,7 @@ last_reviewed: '2026-05-14'
 
 “데이터를 보겠습니다”로는 약합니다. 어떤 비교를 할지, 어떤 로그를 볼지, 실험이 가능한지까지 말해야 실행 계획처럼 들립니다.
 
-### Step 5 — Decision
+### 단계 5 — Decision
 
 ```text
 - recommended action

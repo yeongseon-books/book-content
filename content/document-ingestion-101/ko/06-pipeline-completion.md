@@ -51,7 +51,7 @@ seo_description: 완성된 수집 파이프라인은 단계 수보다 단계 간
 ## 실행 예제
 
 ```python
-# pyright: reportMissingImports=false, reportMissingModuleSource=false
+# pyright: 보고MissingImports=false, 보고MissingModuleSource=false
 from __future__ import annotations
 
 import hashlib

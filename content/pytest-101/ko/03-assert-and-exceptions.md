@@ -26,7 +26,6 @@ last_reviewed: '2026-05-12'
 
 테스트는 실패했을 때 가치가 드러납니다. 왜 실패했는지 바로 읽히지 않는 테스트는 디버깅 시간을 늘리고, 예외 처리 검증이 빠진 테스트는 실제 운영에서 에러 핸들링이 깨져도 놓치기 쉽습니다.
 
-
 ![pytest 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/03/03-01-big-picture.ko.png)
 *pytest 101 3장 흐름 개요*
 
@@ -69,12 +68,11 @@ On failure:
 | match 파라미터 | 예외 메시지를 정규식으로 검증합니다 |
 | ExceptionInfo | `pytest.raises`가 반환하는 예외 정보 객체입니다 |
 
-## Before / After
-
+## 적용 전후 비교
 unittest 스타일과 pytest 스타일을 비교해 보겠습니다.
 
 ```python
-# before: unittest style — must memorize method names
+# 기존: unittest 스타일 — 메서드 이름을 외워야 함
 import unittest
 
 class TestMath(unittest.TestCase):
@@ -86,7 +84,7 @@ class TestMath(unittest.TestCase):
 ```
 
 ```python
-# after: pytest style — unified with assert
+# 개선: pytest 스타일 — assert로 통일
 import pytest
 
 def test_add():
@@ -99,8 +97,7 @@ def test_add():
 
 ## 단계별 실습
 
-### Step 1: Basic Assert Patterns
-
+### 단계 1: 기본 assert 패턴
 ```python
 # test_assert_patterns.py
 
@@ -124,8 +121,7 @@ def test_identity():
     assert a is None
 ```
 
-### Step 2: Collection Comparison
-
+### 단계 2: 컬렉션 비교
 ```python
 # test_collections.py
 
@@ -145,17 +141,16 @@ def test_set_comparison():
     assert result == expected  # shows set difference on failure
 ```
 
-### Step 3: Floating-Point Comparison
-
+### 단계 3: 부동소수점 비교
 ```python
 # test_float.py
 import pytest
 
 def test_float_naive():
-    # This test would fail:
+    # 이 테스트는 실패합니다:
     # assert 0.1 + 0.2 == 0.3
 
-    # Safe comparison with pytest.approx
+    # pytest.approx를 사용한 안전한 비교
     assert 0.1 + 0.2 == pytest.approx(0.3)
 
 def test_approx_with_tolerance():
@@ -167,8 +162,7 @@ def test_approx_list():
     assert result == pytest.approx([0.3, 0.5])
 ```
 
-### Step 4: Exception Testing
-
+### 단계 4: 예외 테스트
 ```python
 # test_exceptions.py
 import pytest
@@ -193,13 +187,12 @@ def test_raises_inspect_exception():
     assert exc_info.type is ValueError
 
 def test_raises_wrong_exception():
-    # This test fails because ValueError is raised, not TypeError
+    # TypeError가 아니라 ValueError가 발생하므로 이 테스트는 실패
     with pytest.raises(TypeError):
         divide(10, 0)
 ```
 
-### Step 5: Custom Error Messages
-
+### 단계 5: 커스텀 에러 메시지
 ```python
 # test_custom_message.py
 
@@ -261,74 +254,6 @@ def test_complex_assertion():
 
 pytest의 `assert`는 읽기 쉽고, 실패했을 때도 유용합니다. `pytest.raises`와 `pytest.approx`까지 익히면 예외와 부동소수점처럼 자주 헷갈리는 영역도 안정적으로 검증할 수 있습니다. 다음 글에서는 테스트 데이터와 상태 준비를 반복 없이 관리하는 fixture를 살펴보겠습니다.
 
-## 실전 패턴 추가: fixture, parametrization, mock을 함께 설계하기
-
-테스트 파일이 커질수록 중요한 것은 개별 문법보다 테스트 경계를 일정하게 유지하는 일입니다. 특히 fixture로 상태를 준비하고, `@pytest.mark.parametrize`로 입력 집합을 확장하고, mock으로 외부 의존성을 분리하는 세 가지를 한 흐름으로 묶으면 테스트 유지보수 비용이 크게 줄어듭니다.
-
-```python
-# tests/test_order_service.py
-from __future__ import annotations
-
-from dataclasses import dataclass
-from unittest.mock import Mock
-
-import pytest
-
-
-@dataclass
-class Order:
-    item: str
-    qty: int
-
-
-class InventoryClient:
-    def reserve(self, item: str, qty: int) -> bool:  # pragma: no cover
-        raise NotImplementedError
-
-
-class OrderService:
-    def __init__(self, client: InventoryClient) -> None:
-        self.client = client
-
-    def place(self, order: Order) -> str:
-        if order.qty <= 0:
-            raise ValueError("qty must be positive")
-        ok = self.client.reserve(order.item, order.qty)
-        return "confirmed" if ok else "rejected"
-
-
-@pytest.fixture
-def inventory_client() -> Mock:
-    return Mock(spec=InventoryClient)
-
-
-@pytest.fixture
-def order_service(inventory_client: Mock) -> OrderService:
-    return OrderService(client=inventory_client)
-
-
-@pytest.mark.parametrize(
-    "order,expected",
-    [
-        (Order("book", 1), "confirmed"),
-        (Order("book", 3), "confirmed"),
-        (Order("book", 5), "rejected"),
-    ],
-)
-def test_place_orders(order_service: OrderService, inventory_client: Mock, order: Order, expected: str) -> None:
-    inventory_client.reserve.return_value = expected == "confirmed"
-    assert order_service.place(order) == expected
-
-
-def test_place_rejects_invalid_quantity(order_service: OrderService) -> None:
-    with pytest.raises(ValueError, match="qty must be positive"):
-        order_service.place(Order("book", 0))
-```
-
-위 구조의 핵심은 테스트 목적별 분리입니다. fixture는 준비, parametrization은 입력 공간, mock은 외부 의존성 제어를 담당합니다. 팀 단위에서는 이 분리를 지켜야 테스트를 고칠 때 영향 범위를 빠르게 읽을 수 있습니다.
-
-또한 fixture scope를 무조건 넓히지 않는 편이 안전합니다. DB 연결이나 임시 디렉터리처럼 생성 비용이 큰 자원만 `module` 또는 `session`으로 올리고, 나머지는 `function` scope로 두어 테스트 독립성을 유지하는 것이 좋습니다.
-
 ## 실패 메시지를 자산으로 만드는 assert 작성법
 
 `assert`는 통과할 때가 아니라 실패할 때 팀 생산성을 결정합니다. 실패 메시지를 읽고 바로 조치할 수 있게 작성하는 패턴이 중요합니다.
@@ -360,11 +285,9 @@ from tax import calc_tax
 def test_calc_tax(amount, rate, expected):
     assert calc_tax(amount, rate) == expected
 
-
 def test_calc_tax_rejects_negative_amount():
     with pytest.raises(ValueError, match=r"amount must be >= 0"):
         calc_tax(-1, 0.1)
-
 
 def test_calc_tax_rejects_bad_rate():
     with pytest.raises(ValueError, match="between 0 and 1"):
@@ -421,18 +344,16 @@ with pytest.raises(ValueError, match="between 0 and 1"):
 ```python
 import pytest
 
-
 def test_discount_ratio():
     ratio = 1 - (90 / 100)
     assert ratio == pytest.approx(0.1)
-
 
 def test_vector_ratios():
     values = [1 / 3, 2 / 3]
     assert values == pytest.approx([0.333333, 0.666667], rel=1e-5)
 ```
 
-## Before/After: assert 메시지 강화
+## 적용 전과 후: assert 메시지 강화
 
 ```python
 # before
@@ -446,7 +367,6 @@ assert total > 0, f"total must be positive, got={total}, items={items}"
 
 후자의 실패 메시지는 재현 시간을 줄여 줍니다.
 
-
 ## assert 표현력을 높이는 패턴 모음
 
 ### 문자열 비교
@@ -455,7 +375,6 @@ assert total > 0, f"total must be positive, got={total}, items={items}"
 
 def render_title(name: str) -> str:
     return f"[USER] {name.strip()}"
-
 
 def test_render_title():
     assert render_title(" Alice ") == "[USER] Alice"
@@ -468,7 +387,6 @@ def test_render_title():
 def ids(users):
     return [u["id"] for u in users]
 
-
 def test_ids():
     data = [{"id": 1}, {"id": 2}]
     assert ids(data) == [1, 2]
@@ -479,13 +397,11 @@ def test_ids():
 ```python
 import pytest
 
-
 def parse_qty(value: str) -> int:
     qty = int(value)
     if qty <= 0:
         raise ValueError("qty must be positive")
     return qty
-
 
 def test_parse_qty_error_message():
     with pytest.raises(ValueError, match="positive"):
@@ -508,7 +424,7 @@ test_parse_qty.py::test_parse_qty_error_message PASSED
 E   AssertionError: Regex pattern did not match.
 ```
 
-## Before/After: try/except 제거
+## 적용 전과 후: try/except 제거
 
 ```python
 # before
@@ -531,93 +447,6 @@ with pytest.raises(ValueError, match="positive"):
 - 메시지까지 검증해 의도를 고정했는가
 - 부동소수점 비교에 `pytest.approx`를 썼는가
 - assert 실패 메시지로 재현에 필요한 입력이 남는가
-
-
-## 심화 실습 세트: 실패를 빠르게 재현하고 고정하는 루틴
-
-아래 실습은 글 주제와 무관하게 pytest 프로젝트에서 반복적으로 쓰는 루틴입니다. 핵심은 실패를 의도적으로 만들고, 실패 메시지를 읽고, 테스트를 보강하고, 다시 통과시키는 사이클을 짧게 반복하는 것입니다.
-
-### 실습 A: 입력 검증 함수
-
-```python
-# app/input_guard.py
-
-def require_non_empty(value: str) -> str:
-    if value is None:
-        raise TypeError("value cannot be None")
-    if value.strip() == "":
-        raise ValueError("value cannot be blank")
-    return value.strip()
-```
-
-```python
-# tests/test_input_guard.py
-import pytest
-from app.input_guard import require_non_empty
-
-
-def test_require_non_empty_ok():
-    assert require_non_empty("  hello  ") == "hello"
-
-
-@pytest.mark.parametrize("bad", ["", "   ", "\n\t"])
-def test_require_non_empty_blank(bad):
-    with pytest.raises(ValueError, match="blank"):
-        require_non_empty(bad)
-
-
-def test_require_non_empty_none():
-    with pytest.raises(TypeError, match="None"):
-        require_non_empty(None)
-```
-
-```bash
-pytest tests/test_input_guard.py -v
-```
-
-```text
-tests/test_input_guard.py::test_require_non_empty_ok PASSED
-tests/test_input_guard.py::test_require_non_empty_blank[] PASSED
-tests/test_input_guard.py::test_require_non_empty_blank[   ] PASSED
-tests/test_input_guard.py::test_require_non_empty_blank[\n\t] PASSED
-tests/test_input_guard.py::test_require_non_empty_none PASSED
-========================= 5 passed =========================
-```
-
-### 실습 B: 실패 유도 후 원인 파악
-
-함수 구현을 일부러 아래처럼 바꿉니다.
-
-```python
-# 잘못된 구현 예시
-# if value.strip() == "":
-#     return value
-```
-
-다시 실행하면 실패가 즉시 재현됩니다.
-
-```text
-FAILED tests/test_input_guard.py::test_require_non_empty_blank[]
-E   Failed: DID NOT RAISE <class 'ValueError'>
-```
-
-이 출력 하나로 계약 위반 지점을 바로 확인할 수 있습니다.
-
-### 실습 C: 리팩터링 안정성 확인
-
-```python
-# app/input_guard.py (refactor)
-
-def require_non_empty(value: str) -> str:
-    if value is None:
-        raise TypeError("value cannot be None")
-    normalized = value.strip()
-    if normalized == "":
-        raise ValueError("value cannot be blank")
-    return normalized
-```
-
-같은 테스트를 실행해 모두 통과하면, 구조를 바꿔도 계약은 유지된 것입니다.
 
 ## 터미널 옵션 조합
 
@@ -655,7 +484,6 @@ def test_regression_cases(raw, exc):
 - 경계값 입력이 포함되어 있는가
 - 정상/오류 경로를 모두 검증하는가
 - 테스트 추가가 함수 복사 대신 데이터 추가로 끝나는가
-
 
 ## 추가 케이스 스터디: PR 리뷰에서 자주 보는 개선 포인트
 
@@ -717,14 +545,12 @@ tests/test_discount.py::test_discount_price_invalid[1000-1.1] PASSED
 - 실패 시 메시지로 원인을 알 수 있는가
 - 데이터 추가만으로 케이스 확장이 가능한 구조인가
 
-
 ## 미니 점검표
 
 - 실패 케이스를 최소 3개 이상 유지합니다.
 - 경계값(최소/최대/빈값)을 포함합니다.
 - 실패 메시지가 의미 있는지 확인합니다.
 - CI에서 동일 명령으로 재현 가능한지 확인합니다.
-
 
 ## 짧은 확인
 
@@ -735,7 +561,6 @@ pytest -q
 ```text
 PASS
 ```
-
 
 추가 메모: 테스트는 실행 결과를 남기고, 실패 입력을 재현 가능한 형태로 보존해야 운영에서 같은 문제를 다시 만나지 않습니다. 이 문단은 바이트 기준 보강과 함께 실무 원칙을 다시 고정하기 위한 메모입니다.
 

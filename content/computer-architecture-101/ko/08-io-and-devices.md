@@ -77,7 +77,7 @@ CPU와 장치는 버스로 연결되고, 폴링은 CPU가 계속 묻는 방식, 
 **Before — 폴링으로 장치 대기:**
 
 ```python
-# Synthetic polling loop
+# Synthetic polling 루프
 def wait_for_data(device):
     while not device.is_ready():
         pass   # CPU pegged at 100%, no other work
@@ -87,14 +87,14 @@ def wait_for_data(device):
 **After — 인터럽트 + 콜백:**
 
 ```python
-# Synthetic interrupt model
+# Synthetic interrupt 모델
 def on_data_ready(device):
     data = device.read()
     process(data)
 
 device.register_interrupt(on_data_ready)
 do_other_work()   # CPU continues working
-# When the device is ready, on_data_ready is called automatically
+# 디바이스가 준비되면 on_data_ready가 자동 호출됩니다.
 ```
 
 같은 결과를 얻더라도 CPU 활용 방식은 완전히 달라집니다.
@@ -104,7 +104,7 @@ do_other_work()   # CPU continues working
 ### 1단계: 장치 속도 표 만들기
 
 ```python
-# Approximate costs (Latency Numbers Every Programmer Should Know, in ns)
+# 대략적인 비용 (Latency Numbers Every Programmer Should Know, 단위 ns)
 LATENCY = {
     "L1 cache":          1,
     "Branch misprediction": 5,
@@ -161,7 +161,7 @@ def device_thread():
 
 threading.Thread(target=device_thread, daemon=True).start()
 
-# CPU does other work and occasionally checks the queue
+# CPU는 다른 일을 하다가 가끔 큐를 확인합니다.
 work_done = 0
 while interrupts.empty():
     work_done += 1
@@ -187,7 +187,7 @@ def dma_transfer(source_size):
 
 threading.Thread(target=dma_transfer, args=(1_000_000,)).start()
 
-# CPU does its own work meanwhile
+# 그동안 CPU는 자신의 작업을 수행합니다.
 total = sum(i * i for i in range(100_000))
 print(f"CPU result: {total}")
 print(f"buffer after DMA: {len(shared_buffer)}")

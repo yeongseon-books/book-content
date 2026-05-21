@@ -156,8 +156,7 @@ for score, idx in zip(distances[0], indices[0]):
 
 상위 1개만 보지 말고 2~3개를 함께 보세요. 점수 분포를 보면 결과를 얼마나 믿어도 되는지 바로 감이 옵니다.
 
-### Step 5 — Measure Recall@k (optional)
-
+### 단계 5 — Recall@k 측정 (선택)
 ```python
 test_cases = [
     ('비밀번호 변경 어떻게 해요?', 0),  # gold: FAQ #0

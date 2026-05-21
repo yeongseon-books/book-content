@@ -69,7 +69,7 @@ last_reviewed: '2026-05-12'
 **Before — checking every node by hand:**
 
 ```python
-# Friends-of-friends, written manually — duplicate code per depth
+# 친구의 친구를 수동으로 작성 — 깊이마다 중복 코드 발생
 def friends_of_friends(person):
     result = set()
     for f in friends_of(person):

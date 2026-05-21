@@ -372,7 +372,7 @@ def sum_formula(n: int) -> int:
 def verify_sum(limit: int = 500):
     # base
     assert sum_formula(1) == 1
-    # induction-like exhaustive check for small n
+    # 작은 n에 대한 귀납적 전수 검사
     for n in range(1, limit):
         left = sum_formula(n + 1)
         right = sum_formula(n) + (n + 1)

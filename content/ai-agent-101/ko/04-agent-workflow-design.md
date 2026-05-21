@@ -80,7 +80,7 @@ def react_agent(user_query: str, tools: List[Dict], max_steps: int = 10) -> str:
     ]
 
     for step in range(max_steps):
-        # Request next action from LLM
+        # LLM에 다음 행동 요청
         response = openai.chat.completions.create(
             model="gpt-4.1",
             messages=messages,
@@ -90,15 +90,15 @@ def react_agent(user_query: str, tools: List[Dict], max_steps: int = 10) -> str:
 
         assistant_message = response.choices[0].message
 
-        # If final answer
+        # 최종 답변인 경우
         if assistant_message.content and "Final Answer:" in assistant_message.content:
             return assistant_message.content.replace("Final Answer:", "").strip()
 
-        # If tool call
+        # 도구 호출인 경우
         if assistant_message.tool_calls:
             messages.append(assistant_message)
 
-            # Execute each tool
+            # 각 도구 실행
             for tool_call in assistant_message.tool_calls:
                 result = execute_tool(tool_call.function.name, tool_call.function.arguments)
 
@@ -109,7 +109,7 @@ def react_agent(user_query: str, tools: List[Dict], max_steps: int = 10) -> str:
                     "content": f"Observation: {result}"
                 })
         else:
-            # Neither tool call nor final answer
+            # 도구 호출도 최종 답변도 아닌 경우
             messages.append(assistant_message)
 
     return "Max steps reached without solution."
@@ -123,7 +123,7 @@ ReAct의 장점은 중간 관찰에 따라 방향을 바꾸기 쉽다는 점입�
 def plan_and_execute_agent(user_query: str, tools: List[Dict]) -> str:
     """Plan-and-Execute pattern: Plan → Execute"""
 
-    # Step 1: Create plan
+    # 1단계: 계획 생성
     plan_prompt = f"""
     Task: {user_query}
 
@@ -144,7 +144,7 @@ def plan_and_execute_agent(user_query: str, tools: List[Dict]) -> str:
     plan = response.choices[0].message.content
     print(f"Plan:\n{plan}\n")
 
-    # Step 2: Execute plan
+    # 2단계: 계획 실행
     steps = parse_plan(plan)  # "1. step - Tool: name" → structured
 
     results = []
@@ -161,7 +161,7 @@ def plan_and_execute_agent(user_query: str, tools: List[Dict]) -> str:
 
         print(f"Result: {tool_result}\n")
 
-    # Step 3: Generate final answer
+    # 3단계: 최종 답변 생성
     summary_prompt = f"""
     Task: {user_query}
 
@@ -192,7 +192,7 @@ def reflexion_agent(user_query: str, tools: List[Dict], max_retries: int = 3) ->
     for attempt in range(max_retries):
         print(f"\n=== Attempt {attempt + 1} ===")
 
-        # Include previous reflections in context
+        # 이전 회고 내용을 컨텍스트에 포함
         context = "\n".join([f"Reflection {i+1}: {r}" for i, r in enumerate(reflections)])
 
         prompt = f"""
@@ -213,7 +213,7 @@ def reflexion_agent(user_query: str, tools: List[Dict], max_retries: int = 3) ->
         if evaluation["success"]:
             return result
 
-        # Reflect on failure
+        # 실패 원인 회고
         reflection_prompt = f"""
         Task: {user_query}
         Attempted method: {result}

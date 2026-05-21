@@ -69,12 +69,11 @@ Complex domain models         Mathematical / declarative logic
 | 값 객체(value object) | 동일성보다 값의 동등성으로 비교하는 불변 객체입니다 |
 | 서비스 함수(service function) | 상태 없이 비즈니스 로직을 수행하는 함수입니다 |
 
-## Before / After
-
+## 적용 전후 비교
 모든 것을 클래스 안에 넣는 설계는 익숙하지만, 계산 로직까지 상태 객체에 묶어 버릴 수 있습니다. 값 객체와 순수 함수를 분리하면 테스트성과 재사용성이 좋아집니다.
 
 ```python
-# before: everything in a class
+# 이전: 모든 것을 class에 배치
 class OrderProcessor:
     def __init__(self, tax_rate: float) -> None:
         self.tax_rate = tax_rate
@@ -92,7 +91,7 @@ print(processor.format_receipt([{"price": 25.00, "qty": 2}]))
 ```
 
 ```python
-# after: value objects (OOP) + pure functions (FP)
+# 이후: value object(OOP) + 순수 함수(FP)
 from dataclasses import dataclass
 
 @dataclass(frozen=True)
@@ -115,13 +114,13 @@ print(format_receipt(items, 0.1))
 
 ## 단계별 실습
 
-### Step 1: 값 객체와 순수 함수 조합하기
+### 단계 1: 값 객체와 순수 함수 조합하기
 
 ```python
 from dataclasses import dataclass, replace
 from typing import NamedTuple
 
-# value objects: immutable, equality-based
+# value object: 불변, 동등성 기반
 @dataclass(frozen=True)
 class Money:
     amount: int
@@ -130,7 +129,7 @@ class Money:
 class Percentage(NamedTuple):
     value: float
 
-# pure functions: transform value objects
+# 순수 함수: value object를 변환
 def apply_discount(price: Money, discount: Percentage) -> Money:
     discounted = int(price.amount * (1 - discount.value))
     return replace(price, amount=discounted)
@@ -153,12 +152,12 @@ print(f"After tax: {format_money(final)}")       # After tax: 49,500 USD
 
 값 객체는 OOP의 명시적인 데이터 모델링 장점을 가져오고, 순수 함수는 FP의 예측 가능성을 제공합니다. 둘을 함께 쓰면 서로의 약점을 상당 부분 보완할 수 있습니다.
 
-### Step 2: Functional Core, Imperative Shell 적용하기
+### 단계 2: Functional Core, Imperative Shell 적용하기
 
 ```python
 from dataclasses import dataclass
 
-# === Functional Core (pure functions) ===
+# === Functional Core(순수 함수) ===
 @dataclass(frozen=True)
 class User:
     name: str
@@ -183,7 +182,7 @@ def create_user_data(name: str, email: str) -> User | list[str]:
         return errors
     return User(name=name.strip(), email=email.lower())
 
-# === Imperative Shell (side effects) ===
+# === Imperative Shell(부수 효과) ===
 def handle_registration(name: str, email: str) -> None:
     """Registration handler — contains side effects."""
     result = create_user_data(name, email)
@@ -192,19 +191,19 @@ def handle_registration(name: str, email: str) -> None:
             print(f"  Error: {error}")
     else:
         print(f"  Registered: {result}")
-        # In production: save to DB, send email, etc.
+        # 운영 환경: DB 저장, 이메일 발송 등
 
 handle_registration("Alice", "alice@example.com")
-# Registered: User(name='Alice', email='alice@example.com', active=True)
+# 등록됨: User(name='Alice', email='alice@example.com', active=True)
 
 handle_registration("", "invalid-email")
-# Error: @ symbol is required
-# Error: Name is empty
+# 오류: @ 기호가 필요합니다
+# 오류: 이름이 비어 있습니다
 ```
 
 이 패턴은 Python에서 함수형 사고를 가장 실용적으로 도입하는 방법입니다. 핵심 규칙은 순수 함수로 두고, 실제 부수효과는 가장 바깥쪽 핸들러에서만 수행합니다.
 
-### Step 3: 클래스와 함수형 메서드 함께 쓰기
+### 단계 3: 클래스와 함수형 메서드 함께 쓰기
 
 ```python
 from dataclasses import dataclass
@@ -231,7 +230,7 @@ class DataPipeline:
             result = step(result)
         return result
 
-# pure function stages
+# 순수 함수 단계
 def normalize(records: list[dict]) -> list[dict]:
     return [{**r, "name": r["name"].strip().title()} for r in records]
 
@@ -241,7 +240,7 @@ def enrich(records: list[dict]) -> list[dict]:
 def filter_valid(records: list[dict]) -> list[dict]:
     return [r for r in records if r.get("score", 0) > 0]
 
-# assemble the pipeline (OOP interface + FP execution)
+# pipeline 조립(OOP 인터페이스 + FP 실행)
 pipeline = (
     DataPipeline()
     .add_step(normalize)
@@ -264,10 +263,10 @@ for r in result:
 
 공개 인터페이스는 클래스로 두고, 내부 실행은 순수 함수로 흘려보내는 방식도 아주 효과적입니다. 프레임워크 친화성과 테스트성을 동시에 챙길 수 있습니다.
 
-### Step 4: 패러다임 선택 기준 세우기
+### 단계 4: 패러다임 선택 기준 세우기
 
 ```python
-# Situation 1: state management -> OOP
+# 상황 1: 상태 관리 -> OOP
 class ShoppingCart:
     def __init__(self) -> None:
         self._items: list[dict] = []
@@ -279,19 +278,19 @@ class ShoppingCart:
     def total(self) -> int:
         return sum(i["price"] for i in self._items)
 
-# Situation 2: data transformation -> FP
+# 상황 2: 데이터 변환 -> FP
 def transform_prices(
     items: list[dict],
     rate: float,
 ) -> list[dict]:
     return [{**i, "price": int(i["price"] * rate)} for i in items]
 
-# Situation 3: framework integration -> OOP (framework requires it)
+# 상황 3: framework 통합 -> OOP(framework 요구)
 class UserSerializer:
     def to_dict(self, user) -> dict:
         return {"name": user.name, "email": user.email}
 
-# Situation 4: utility -> FP
+# 상황 4: 유틸리티 -> FP
 def slugify(text: str) -> str:
     return text.lower().strip().replace(" ", "-")
 
@@ -300,7 +299,7 @@ cart = ShoppingCart()
 cart.add("Coffee", 450)
 cart.add("Cake", 600)
 
-# transform OOP object data with FP
+# FP로 OOP 객체 데이터를 변환
 discounted = transform_prices(cart._items, 0.9)
 print(f"Before discount: {cart.total:,}")
 print(f"After discount: {sum(i['price'] for i in discounted):,}")
@@ -310,7 +309,7 @@ print(f"After discount: {sum(i['price'] for i in discounted):,}")
 
 이 예제는 패러다임 선택이 정체성이 아니라 상황 판단임을 잘 보여 줍니다. 상태를 오래 들고 있어야 하면 OOP, 데이터만 바꾸면 되면 FP가 더 자연스럽습니다.
 
-### Step 5: 실행 가능한 하이브리드 설계 워크플로
+### 단계 5: 실행 가능한 하이브리드 설계 워크플로
 
 ```python
 from dataclasses import dataclass
@@ -371,10 +370,10 @@ print("Normalized config:", normalize_config(good))
 print("Success run:", boot(good))
 print("Missing host:", boot(bad_host))
 print("Bad port:", boot(bad_port))
-# Normalized config: AppConfig(host='localhost', port=8080, debug=True)
-# Success run: starting server on localhost:8080 (debug)
-# Missing host: validation failed: ['host is required']
-# Bad port: validation failed: ['port must be 1-65535']
+# 정규화된 config: AppConfig(host='localhost', port=8080, debug=True)
+# 실행 성공: localhost:8080에서 서버 시작(debug)
+# host 누락: 검증 실패 ['host is required']
+# 잘못된 port: 검증 실패 ['port must be 1-65535']
 ```
 
 팀 차원의 기준을 만들 때도 결국 이런 질문이 필요합니다. 상태가 핵심인가, 변환이 핵심인가, 테스트 우선순위는 무엇인가. 이 기준이 없으면 패러다임 논쟁은 금방 취향 싸움이 됩니다.

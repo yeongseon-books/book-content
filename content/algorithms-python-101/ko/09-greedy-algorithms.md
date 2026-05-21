@@ -28,7 +28,6 @@ last_reviewed: '2026-05-12'
 
 다만 그리디 논리는 어디에나 안전하지 않습니다. 어떤 문제에서는 통하고 다른 문제에서는 실패하는 이유를 알아야, 단순함이 함정이 되지 않습니다.
 
-
 ![Algorithms with Python 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/09/09-01-concept-overview.ko.png)
 *Algorithms with Python 101 9장 흐름 개요*
 
@@ -70,12 +69,11 @@ Total: 6 coins — optimal via greedy
 | Fractional knapsack | 물건을 쪼갤 수 있는 배낭 문제로, 그리디가 통합니다 |
 | Counterexample | 그리디가 최적해를 내지 못하는 입력 사례입니다 |
 
-## Before / After
-
+## 적용 전후 비교
 겹치지 않는 활동을 최대한 많이 고르는 두 가지 접근입니다.
 
 ```python
-# before: brute-force all combinations — O(2^n)
+# before: 모든 조합 brute-force — O(2^n)
 from itertools import combinations
 
 def max_activities(activities):
@@ -88,7 +86,7 @@ def max_activities(activities):
 ```
 
 ```python
-# after: greedy — O(n log n)
+# after: greedy 방식 — O(n log n)
 def max_activities(activities):
     activities.sort(key=lambda x: x[1])  # sort by end time
     count, last_end = 0, 0
@@ -101,8 +99,7 @@ def max_activities(activities):
 
 ## 단계별 실습
 
-### Step 1: Coin Change (Greedy)
-
+### 단계 1: 거스름돈 문제 (Greedy)
 ```python
 def coin_change_greedy(amount: int, coins: list[int] | None = None) -> dict[int, int]:
     """Greedy coin change — use the largest coins first."""
@@ -126,8 +123,7 @@ print(f"Coins used: {total}")  # 6
 
 표준 화폐 체계처럼 큰 단위가 작은 단위를 잘 포함하는 경우에는 그리디가 깔끔하게 통합니다. 하지만 이 성공을 일반화하면 위험합니다.
 
-### Step 2: Activity Selection
-
+### 단계 2: 활동 선택 문제
 ```python
 def activity_selection(
     activities: list[tuple[int, int]],
@@ -154,8 +150,7 @@ print(f"Maximum activities: {len(result)}")  # 4
 
 활동 선택 문제에서는 빨리 끝나는 활동을 먼저 고르는 기준이 핵심입니다. 정렬 기준 하나가 그리디의 정당성을 결정합니다.
 
-### Step 3: Fractional Knapsack
-
+### 단계 3: 분할 가능 배낭 문제
 ```python
 def fractional_knapsack(
     items: list[tuple[int, int]], capacity: int
@@ -208,10 +203,9 @@ print(f"Minimum rooms: {min_meeting_rooms(meetings)}")  # 2
 
 구간 문제는 정렬 후 한 번 훑는 패턴으로 풀리는 경우가 많습니다. 그리디가 자주 등장하는 이유도 여기에 있습니다.
 
-### Step 5: Greedy vs DP
-
+### 단계 5: Greedy vs DP
 ```python
-# Greedy fails with non-standard coin denominations
+# 표준이 아닌 동전 단위에서는 Greedy가 실패
 # Coins: [1, 3, 4], amount: 6
 # Greedy: 4+1+1 = 3 coins
 # Optimal: 3+3 = 2 coins
@@ -303,7 +297,6 @@ print(f"DP:     {coin_change_dp(coins, amount)} coins")            # 2 (3+3)
 ```python
 from itertools import combinations
 
-
 def greedy_interval_count(intervals: list[tuple[int, int]]) -> int:
     intervals = sorted(intervals, key=lambda x: x[1])
     count, end = 0, -10**18
@@ -312,7 +305,6 @@ def greedy_interval_count(intervals: list[tuple[int, int]]) -> int:
             count += 1
             end = e
     return count
-
 
 def brute_interval_count(intervals: list[tuple[int, int]]) -> int:
     best = 0
@@ -377,7 +369,6 @@ def brute_interval_count(intervals: list[tuple[int, int]]) -> int:
 ```python
 import time
 
-
 def benchmark(func, *args, repeat: int = 5) -> float:
     best = float("inf")
     for _ in range(repeat):
@@ -420,123 +411,6 @@ E. 해답 없음 케이스: 종료 조건 검증
 - "필요하면 정답 유지 조건을 짧게 증명하겠습니다."
 
 이 스크립트를 반복하면 설명의 밀도가 올라가고, 구현 중 길을 잃는 빈도가 줄어듭니다.
-
-## 케이스 스터디 확장: 입력 규모가 커질 때의 판단
-
-### 시나리오 1: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
-
-### 시나리오 2: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
-
-### 시나리오 3: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
-
-### 시나리오 4: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
-
-### 시나리오 5: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
 
 ## 처음 질문으로 돌아가기
 

@@ -76,8 +76,7 @@ last_reviewed: '2026-05-14'
 
 ## 실습: 포트폴리오 구성
 
-### Step 1 — Three Projects
-
+### 단계 1 — 세 가지 프로젝트
 ```text
 - one analytics (dashboard)
 - one model (classification or regression)
@@ -86,8 +85,7 @@ last_reviewed: '2026-05-14'
 
 세 프로젝트는 서로 다른 역량을 보여 줍니다. 분석 프로젝트는 질문과 해석, 모델 프로젝트는 평가와 검증, 데이터 엔지니어링 프로젝트는 흐름과 재현성을 보여 주기에 좋습니다.
 
-### Step 2 — README Template
-
+### 단계 2 — README 템플릿
 ```markdown
 # Title
 ## 문제
@@ -99,8 +97,7 @@ last_reviewed: '2026-05-14'
 
 README는 저장소의 첫인상입니다. 무엇을 만들었는지보다 왜 만들었는지, 무엇을 배웠는지를 먼저 보여 주는 편이 더 강합니다.
 
-### Step 3 — Reproducible Environment
-
+### 단계 3 — 재현 가능한 환경
 ```bash
 uv pip install -r requirements.txt
 make data
@@ -109,7 +106,7 @@ make run
 
 실행 방법이 명확하면 프로젝트의 신뢰도가 크게 올라갑니다. 재현 가능성은 실무 감각을 드러내는 가장 값싼 신호 중 하나입니다.
 
-### Step 4 — Visualization
+### 단계 4 — Visualization
 
 ```text
 - one key chart
@@ -119,7 +116,7 @@ make run
 
 시각화는 많다고 좋은 것이 아닙니다. 핵심 차트 하나, 비교 표 하나, 한 줄 결론 하나가 오히려 더 오래 남습니다.
 
-### Step 5 — Documentation
+### 단계 5 — Documentation
 
 ```text
 - enough markdown cells in the notebook

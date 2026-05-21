@@ -82,7 +82,7 @@ items = [
     ("docs", "/home"),
     ("a.txt", "/home/docs"),
 ]
-# Finding parents, listing children, computing depth — all painful
+# 부모 찾기, 자식 나열, 깊이 계산 — 모두 번거로움
 ```
 
 **After — representing hierarchy with tree nodes:**
@@ -97,7 +97,7 @@ root = Node("/")
 home = Node("home"); root.children.append(home)
 docs = Node("docs"); home.children.append(docs)
 docs.children.append(Node("a.txt"))
-# Children and descendants traverse naturally with recursion
+# 자식과 하위 노드는 재귀로 자연스럽게 순회
 ```
 
 평면 리스트로도 관계를 표현할 수는 있지만, 부모 찾기·자식 나열·깊이 계산이 모두 불편합니다. 트리 구조를 쓰면 순회가 훨씬 자연스러워집니다.
@@ -135,7 +135,7 @@ class BinaryNode:
         self.left = left
         self.right = right
 
-# Build the tree
+# 트리 구성
 #         1
 #        / \
 #       2   3

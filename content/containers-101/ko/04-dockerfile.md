@@ -139,8 +139,7 @@ def base_stage():
 
 빌드 스테이지의 출발점을 정의합니다. 어떤 베이스 이미지를 고르느냐가 최종 이미지 크기와 취약점 표면에 직접 영향을 줍니다.
 
-### 단계 2 — Dependencies first
-
+### 단계 2 — 의존성 먼저
 ```python
 def deps_stage():
     return [
@@ -162,8 +161,7 @@ def code_stage():
 
 의존성 설치가 끝난 뒤에야 애플리케이션 코드를 복사합니다. 자주 바뀌는 레이어를 위로 올리는 전형적인 캐시 전략입니다.
 
-### 단계 4 — Runtime stage
-
+### 단계 4 — 런타임 스테이지
 ```python
 def runtime_stage():
     return [
@@ -177,8 +175,7 @@ def runtime_stage():
 
 최종 스테이지는 실행에 필요한 결과만 가져옵니다. 빌드 도구를 남기지 않는 것이 multi-stage의 핵심입니다.
 
-### 단계 5 — Non-root and run
-
+### 단계 5 — non-root로 실행
 ```python
 def finalize():
     return [

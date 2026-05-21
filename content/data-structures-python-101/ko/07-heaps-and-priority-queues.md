@@ -65,19 +65,18 @@ title: "Data Structures with Python 101 (7/10): 힙과 우선순위 큐"
 | 우선순위 큐 | 우선순위가 높은 항목을 먼저 꺼내는 추상 자료형입니다 |
 | 완전 이진 트리 | 마지막 레벨을 제외하면 모든 레벨이 꽉 찬 트리입니다 |
 
-## Before / After
-
+## 적용 전후 비교
 최솟값을 반복해서 꺼내는 문제를 정렬과 힙으로 각각 처리해 보겠습니다.
 
 ```python
-# before: sort to extract minimum — O(n log n) per extraction
+# before: 최소값 추출마다 정렬 — 추출당 O(n log n)
 tasks = [5, 3, 8, 1, 4]
 tasks.sort()
 smallest = tasks.pop(0)  # sort then pop — inefficient
 ```
 
 ```python
-# after: heapq for minimum extraction — O(log n) per extraction
+# after: 최소값 추출에 heapq 사용 — 추출당 O(log n)
 import heapq
 tasks = [5, 3, 8, 1, 4]
 heapq.heapify(tasks)           # O(n) to build the heap
@@ -88,25 +87,24 @@ smallest = heapq.heappop(tasks) # O(log n) to extract minimum
 
 ## 단계별 실습
 
-### Step 1: Basic heapq usage
-
+### 단계 1: 기본 heapq 사용법
 ```python
 import heapq
 
 data = [5, 3, 8, 1, 4, 2]
 
-# Convert list to heap — O(n)
+# list를 heap으로 변환 — O(n)
 heapq.heapify(data)
 print(data)  # [1, 3, 2, 5, 4, 8] — heap order
 
-# Peek at minimum — O(1)
+# 최소값 조회(Peek) — O(1)
 print(data[0])  # 1
 
-# Extract minimum — O(log n)
+# 최소값 추출 — O(log n)
 print(heapq.heappop(data))  # 1
 print(heapq.heappop(data))  # 2
 
-# Insert value — O(log n)
+# 값 삽입 — O(log n)
 heapq.heappush(data, 0)
 print(data[0])  # 0
 ```
@@ -116,8 +114,8 @@ print(data[0])  # 0
 ```python
 import heapq
 
-# Python heapq only supports min-heaps
-# Implement max-heap by negating values
+# Python heapq는 min-heap만 지원
+# 값에 음수를 붙여 max-heap 구현
 max_heap = []
 for val in [5, 3, 8, 1, 4]:
     heapq.heappush(max_heap, -val)
@@ -128,14 +126,13 @@ print(-heapq.heappop(max_heap))  # 5
 print(-heapq.heappop(max_heap))  # 4
 ```
 
-### Step 3: Solve Top-K problems
-
+### 단계 3: Top-K 문제 풀기
 ```python
 import heapq
 
 scores = [85, 92, 78, 95, 88, 76, 91, 83, 97, 80]
 
-# Top 3 — O(n log k)
+# 상위 3개 — O(n log k)
 top3 = heapq.nlargest(3, scores)
 print(f"top 3: {top3}")  # [97, 95, 92]
 
@@ -182,8 +179,7 @@ print(pq.pop())  # "normal task"
 print(pq.pop())  # "low priority task"
 ```
 
-### Step 5: Merge sorted lists
-
+### 단계 5: 정렬된 리스트 병합
 ```python
 import heapq
 
@@ -191,7 +187,7 @@ list1 = [1, 4, 7, 10]
 list2 = [2, 5, 8, 11]
 list3 = [3, 6, 9, 12]
 
-# Merge multiple sorted iterables into one — O(n log k)
+# 여러 정렬 iterable을 하나로 병합 — O(n log k)
 merged = list(heapq.merge(list1, list2, list3))
 print(merged)  # [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 ```

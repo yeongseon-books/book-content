@@ -340,7 +340,7 @@ mypy와 pyright는 타입 힌트를 실제 품질 게이트로 바꿔 주는 도
 다음 글에서는 이 정적 검증 바깥에서, 들어오는 데이터를 런타임에 검사하는 Pydantic을 살펴보겠습니다.
 
 
-## 실전 보강: before/after + 오류 해결
+## 실전 보강: 적용 전후 + 오류 해결
 
 ```python
 # before
@@ -460,7 +460,7 @@ Found 3 errors in 1 file (checked 1 source file)
 
 위 메시지는 각각 키 타입 불일치, Union 좁히기 누락, Optional 처리 누락을 의미합니다. 즉, 정적 분석기가 실제 운영 버그 후보를 실행 전에 보여 준다는 뜻입니다.
 
-## before/after 요약
+## 적용 전후 요약
 
 | 구분 | before (느슨한 타입) | after (구체 타입) |
 | --- | --- | --- |

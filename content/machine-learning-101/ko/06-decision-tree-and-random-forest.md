@@ -26,7 +26,6 @@ last_reviewed: '2026-05-15'
 
 이 글은 머신러닝 101 시리즈의 6번째 글입니다. 여기서는 결정 트리의 분할 기준, 단일 트리의 과적합 문제, 그리고 랜덤 포레스트가 여러 트리를 묶어 어떻게 더 안정적인 앙상블이 되는지 정리하겠습니다.
 
-
 ![Machine Learning 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/06/06-01-diagram.ko.png)
 *Machine Learning 101 6장 흐름 개요*
 
@@ -50,29 +49,28 @@ last_reviewed: '2026-05-15'
 - **Bagging**: 부트스트랩 샘플을 평균내는 방식입니다.
 - **Feature importance**: 각 피처가 분할에 기여한 정도입니다.
 
-## Before/After
-
+## 적용 전과 후
 **Before**: "트리는 해석 가능하다"에서 설명이 끝납니다. 단일 트리는 분산이 매우 큽니다.
 
 **After**: 포레스트로 분산을 줄이고, 설명은 SHAP 같은 도구까지 포함해 생각합니다.
 
 ## 실습: 5단계로 보는 트리와 포레스트
 
-### Step 1 — 데이터
+### 단계 1 — 데이터
 
 ```python
 from sklearn.datasets import load_breast_cancer
 X, y = load_breast_cancer(return_X_y=True)
 ```
 
-### Step 2 — 분할
+### 단계 2 — 분할
 
 ```python
 from sklearn.model_selection import train_test_split
 Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
 ```
 
-### Step 3 — 단일 트리
+### 단계 3 — 단일 트리
 
 ```python
 from sklearn.tree import DecisionTreeClassifier
@@ -80,15 +78,14 @@ tree = DecisionTreeClassifier(max_depth=4, random_state=0).fit(Xtr, ytr)
 print("tree:", tree.score(Xte, yte))
 ```
 
-### Step 4 — Random Forest
-
+### 단계 4 — Random Forest
 ```python
 from sklearn.ensemble import RandomForestClassifier
 rf = RandomForestClassifier(n_estimators=200, random_state=0).fit(Xtr, ytr)
 print("rf  :", rf.score(Xte, yte))
 ```
 
-### Step 5 — 피처 중요도
+### 단계 5 — 피처 중요도
 
 ```python
 import numpy as np
@@ -150,59 +147,6 @@ print("top:", order)
 이 글에서 기억할 핵심은 네 가지입니다. 첫째, 결정 트리는 분할 기준으로 피처 공간을 잘라 나갑니다. 둘째, 깊은 단일 트리는 과적합되기 쉽습니다. 셋째, 랜덤 포레스트는 bagging으로 분산을 줄입니다. 넷째, feature importance는 유용하지만 인과 설명은 아닙니다.
 
 다음 글에서는 비지도학습 대표 주제인 Clustering으로 넘어가겠습니다.
-
-## 실전 확장: 학습·평가 파이프라인 통합
-
-입문 단계에서 `fit()` 한 번으로 결과를 확인하면 모델이 잘 동작하는 것처럼 보이지만, 실무에서는 같은 데이터로 학습과 평가를 동시에 수행하면 성능이 과대평가되기 쉽습니다. 따라서 최소한 `train/validation/test` 구분을 갖춘 뒤, 피처 전처리와 모델 학습, 하이퍼파라미터 탐색, 최종 평가를 분리해야 합니다. 아래 예시는 분류 문제에서 재현 가능한 기준선을 만드는 기본 템플릿입니다.
-
-```python
-from sklearn.datasets import load_breast_cancer
-from sklearn.model_selection import train_test_split, GridSearchCV, StratifiedKFold
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
-
-X, y = load_breast_cancer(return_X_y=True)
-
-X_train_full, X_test, y_train_full, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42, stratify=y
-)
-X_train, X_val, y_train, y_val = train_test_split(
-    X_train_full, y_train_full, test_size=0.25, random_state=42, stratify=y_train_full
-)
-
-pipe = Pipeline([
-    ("scaler", StandardScaler()),
-    ("model", LogisticRegression(max_iter=2000))
-])
-
-param_grid = {
-    "model__C": [0.01, 0.1, 1.0, 10.0],
-    "model__penalty": ["l2"],
-    "model__solver": ["lbfgs"]
-}
-
-cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
-search = GridSearchCV(
-    estimator=pipe,
-    param_grid=param_grid,
-    scoring="f1",
-    cv=cv,
-    n_jobs=-1
-)
-search.fit(X_train, y_train)
-
-val_pred = search.predict(X_val)
-val_proba = search.predict_proba(X_val)[:, 1]
-
-print("Best Params:", search.best_params_)
-print("Validation ROC-AUC:", roc_auc_score(y_val, val_proba))
-print(classification_report(y_val, val_pred, digits=4))
-print(confusion_matrix(y_val, val_pred))
-```
-
-핵심은 세 가지입니다. 첫째, 전처리(`StandardScaler`)를 파이프라인에 넣어 데이터 누수를 방지합니다. 둘째, `GridSearchCV`는 훈련 세트 내부에서만 교차검증을 수행하므로 검증 세트를 따로 남겨 둔 의미가 유지됩니다. 셋째, 검증 단계에서 `classification_report`와 `ROC-AUC`를 함께 확인해 임계값 민감도와 순위 품질을 동시에 점검합니다.
 
 ## 분류 지표를 함께 읽는 방법
 
@@ -308,7 +252,6 @@ a_preprocess = ColumnTransformer([
 - 피처 전처리와 모델을 하나의 파이프라인으로 묶었습니다.
 
 이 다섯 가지를 만족하면, 단순히 "모델이 돌아간다" 수준을 넘어 "재현 가능하고 설명 가능한 학습 시스템"에 가까워집니다.
-
 
 ## 실전 보강: 손실 함수, 검증 곡선, 비교표를 한 번에 정리
 
@@ -419,7 +362,6 @@ print("valid mean:", val_scores.mean(axis=1))
 - 혼동 행렬 기반 FP/FN 대응 전략을 운영 정책에 연결합니다.
 - 다음 실험에서도 같은 템플릿을 재사용해 비교 가능성을 유지합니다.
 
-
 ### 추가 앵커: 학습/검증 곡선 해석 예시
 
 아래는 하이퍼파라미터를 바꿨을 때 train/validation 곡선을 어떻게 읽는지 보여 주는 예시입니다.
@@ -456,7 +398,6 @@ for t in thresholds:
 - 데이터가 늘어날 가능성이 크면 재학습 파이프라인 단순성을 더 높은 우선순위로 둡니다.
 - 최종 선택 사유는 표와 로그로 남겨 다음 실험의 기준선으로 사용합니다.
 
-
 ### 추가 앵커: 재현성 로그 템플릿
 
 실험 로그에는 최소한 다음 항목을 고정합니다.
@@ -471,9 +412,7 @@ for t in thresholds:
 
 이 다섯 줄만 지켜도 같은 실험을 다시 돌리는 비용이 크게 줄어듭니다.
 
-
 운영 팁으로는 실험 노트에 "이번 변경이 데이터, 전처리, 모델, 임계값 중 어디를 건드렸는지"를 한 줄로 남기는 습관이 중요합니다. 같은 점수 변화라도 원인 축이 달라지면 다음 대응 전략이 완전히 달라지기 때문입니다.
-
 
 또한 모델 비교 회의에서는 "이번 실험으로 줄어든 오류 유형이 무엇인지"를 숫자로 남겨야 합니다. 예를 들어 FP가 20건 줄고 FN이 5건 늘었다면, 운영팀과 함께 비용을 환산해 변경 승인 여부를 결정하는 방식이 안전합니다. 이렇게 오류 유형 단위로 기록하면 다음 분기 모델 개선의 우선순위도 명확해집니다.
 

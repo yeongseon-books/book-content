@@ -279,7 +279,7 @@ def monthly_cost(hourly_price: float, hours_per_day: int = 24, days: int = 30) -
     """인스턴스 하나의 월 비용 추정."""
     return hourly_price * hours_per_day * days
 
-# t3.micro (약 $0.0104/h) vs m5.large (약 $0.096/h)
+# t3.micro(약 $0.0104/h) 대 m5.large(약 $0.096/h)
 print(f"t3.micro 월비용: ${monthly_cost(0.0104):.2f}")
 print(f"m5.large 월비용: ${monthly_cost(0.096):.2f}")
 print(f"m5.large를 업무시간만 쓰면: ${monthly_cost(0.096, hours_per_day=10, days=22):.2f}")

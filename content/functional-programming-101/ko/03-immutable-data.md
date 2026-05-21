@@ -28,7 +28,6 @@ last_reviewed: '2026-05-12'
 
 Python은 기본적으로 mutable 객체를 많이 쓰는 언어이지만, 동시에 `tuple`, `frozenset`, `NamedTuple`, `frozen dataclass` 같은 좋은 불변 도구도 제공합니다. 중요한 것은 "무조건 복사하라"가 아니라, 바뀌지 않아야 하는 값을 명확하게 모델링하는 감각입니다.
 
-
 ![Functional Programming 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/03/03-01-big-picture.ko.png)
 *Functional Programming 101 3장 흐름 개요*
 
@@ -68,12 +67,11 @@ bytes                           user-defined classes (default)
 | frozen dataclass | `frozen=True`로 정의해 속성 할당을 막은 dataclass입니다 |
 | 방어적 복사(defensive copy) | 원본 변경을 막기 위해 함수 경계에서 데이터를 복사하는 패턴입니다 |
 
-## Before / After
-
+## 적용 전후 비교
 원본 리스트를 직접 수정하는 코드는 호출자에게 숨은 부작용을 만듭니다. 새 리스트를 반환하면 변경이 명시적이 됩니다.
 
 ```python
-# before: mutating the original list
+# 이전: 원본 리스트를 변경
 def add_tag(tags: list[str], tag: str) -> list[str]:
     tags.append(tag)
     return tags
@@ -84,7 +82,7 @@ print(original)  # ['python', 'fp', 'immutable'] — original changed!
 ```
 
 ```python
-# after: creating a new list
+# 이후: 새 리스트 생성
 def add_tag(tags: list[str], tag: str) -> list[str]:
     return [*tags, tag]
 
@@ -96,24 +94,24 @@ print(result)    # ['python', 'fp', 'immutable']
 
 ## 단계별 실습
 
-### Step 1: Python 내장 불변 타입
+### 단계 1: Python 내장 불변 타입
 
 ```python
-# tuple — immutable sequence
+# tuple — 불변 시퀀스
 point = (3, 4)
-# point[0] = 5  # TypeError: 'tuple' does not support item assignment
+# point[0] = 5  # TypeError: 'tuple'은 item assignment를 지원하지 않음
 
-# frozenset — immutable set
+# frozenset — 불변 집합
 allowed = frozenset({"read", "write", "execute"})
-# allowed.add("delete")  # AttributeError: 'frozenset' has no attribute 'add'
+# allowed.add("delete")  # AttributeError: 'frozenset'에는 'add' attribute가 없음
 
-# str — immutable string
+# str — 불변 문자열
 name = "hello"
 upper_name = name.upper()  # creates a new string
 print(name)        # hello — original preserved
 print(upper_name)  # HELLO
 
-# tuples are hashable and can serve as dict keys
+# tuple은 hashable하며 dict key로 사용할 수 있음
 grid: dict[tuple[int, int], str] = {
     (0, 0): "start",
     (1, 2): "goal",
@@ -123,7 +121,7 @@ print(grid[(0, 0)])  # start
 
 이 예제에서 중요한 점은 "바꿀 수 없다"는 제약이 오히려 설계를 명확하게 만든다는 것입니다. 좌표, 권한 집합, 문자열 같은 값은 애초에 변경 가능한 상태로 둘 이유가 많지 않습니다.
 
-### Step 2: NamedTuple로 의미 있는 불변 레코드 만들기
+### 단계 2: NamedTuple로 의미 있는 불변 레코드 만들기
 
 ```python
 from typing import NamedTuple
@@ -139,9 +137,9 @@ class Color(NamedTuple):
 
 p = Point(3.0, 4.0)
 print(p.x, p.y)  # 3.0 4.0
-# p.x = 5.0  # AttributeError — immutable
+# p.x = 5.0  # AttributeError — 불변 객체
 
-# create a modified copy with _replace
+# _replace로 수정된 복사본 생성
 p2 = p._replace(x=5.0)
 print(p)   # Point(x=3.0, y=4.0) — original preserved
 print(p2)  # Point(x=5.0, y=4.0)
@@ -152,7 +150,7 @@ print(red)  # Color(r=255, g=0, b=0)
 
 `NamedTuple`은 읽기 쉬운 필드 이름과 불변성을 동시에 제공합니다. 작은 값 객체를 표현할 때 매우 경제적인 선택입니다.
 
-### Step 3: frozen dataclass 사용하기
+### 단계 3: frozen dataclass 사용하기
 
 ```python
 from dataclasses import dataclass, replace
@@ -164,33 +162,33 @@ class User:
     role: str = "viewer"
 
 user = User(name="Alice", email="alice@example.com")
-# user.name = "Bob"  # FrozenInstanceError — cannot modify
+# user.name = "Bob"  # FrozenInstanceError — 수정 불가
 
-# create a new instance
+# 새 인스턴스 생성
 admin = replace(user, role="admin")
 print(user)   # User(name='Alice', email='alice@example.com', role='viewer')
 print(admin)  # User(name='Alice', email='alice@example.com', role='admin')
 
-# frozen dataclasses are hashable — usable as dict keys and set elements
+# frozen dataclass는 hashable — dict key와 set element로 사용 가능
 users = {user, admin}
 print(len(users))  # 2
 ```
 
 `frozen dataclass`는 실무에서 특히 유용합니다. 설정 객체, DTO, 도메인 값 객체처럼 "의미 있는 레코드"를 안정적으로 표현할 수 있기 때문입니다.
 
-### Step 4: 불변 딕셔너리 패턴
+### 단계 4: 불변 딕셔너리 패턴
 
 ```python
 from types import MappingProxyType
 
-# MappingProxyType — read-only dictionary view
+# MappingProxyType — 읽기 전용 dictionary view
 config = {"host": "localhost", "port": 8080, "debug": True}
 readonly_config = MappingProxyType(config)
 
 print(readonly_config["host"])  # localhost
-# readonly_config["host"] = "0.0.0.0"  # TypeError — cannot modify
+# readonly_config["host"] = "0.0.0.0"  # TypeError — 수정 불가
 
-# dictionary update — create a new dictionary
+# dictionary update — 새 dictionary 생성
 def update_config(config: dict, **updates) -> dict:
     return {**config, **updates}
 
@@ -203,7 +201,7 @@ print(updated)   # {'host': 'localhost', 'port': 9090, 'debug': False}
 
 딕셔너리는 편리하지만 무심코 수정하기 쉽습니다. 그래서 설정처럼 안정성이 필요한 데이터는 읽기 전용 뷰나 새 딕셔너리 반환 패턴을 습관적으로 쓰는 편이 안전합니다.
 
-### Step 5: 불변 데이터로 상태 이력 관리하기
+### 단계 5: 불변 데이터로 상태 이력 관리하기
 
 ```python
 from dataclasses import dataclass, replace
@@ -219,7 +217,7 @@ def increment(state: AppState) -> AppState:
 def set_message(state: AppState, msg: str) -> AppState:
     return replace(state, message=msg)
 
-# state history — every change is tracked
+# 상태 이력 — 모든 변경이 추적됨
 history: list[AppState] = []
 
 state = AppState(count=0, message="start")
@@ -236,10 +234,10 @@ history.append(state)
 
 for i, s in enumerate(history):
     print(f"Step {i}: count={s.count}, message='{s.message}'")
-# Step 0: count=0, message='start'
-# Step 1: count=1, message='start'
-# Step 2: count=2, message='start'
-# Step 3: count=2, message='done'
+# 단계 0: count=0, message='start'
+# 단계 1: count=1, message='start'
+# 단계 2: count=2, message='start'
+# 단계 3: count=2, message='done'
 ```
 
 불변 데이터가 강력한 이유가 여기서 드러납니다. 현재 상태만 있는 것이 아니라, 상태 변화의 이력이 그대로 남습니다. undo/redo나 이벤트 소싱과 잘 맞는 이유도 이 때문입니다.
@@ -293,219 +291,6 @@ for i, s in enumerate(history):
 
 불변 데이터는 예측 불가능한 상태 변경을 줄이고 코드 안정성을 높입니다. Python은 `tuple`, `frozenset`, `NamedTuple`, `frozen dataclass`를 통해 이를 충분히 실용적으로 지원합니다. 다음 글에서는 함수를 인자로 받고 반환하는 **고차 함수**를 다룹니다.
 
-
-## 심화 앵커: 실무에서 바로 쓰는 함수형 패턴 모음
-
-이 절은 앞선 개념을 한 번에 묶어 실무 코드로 옮기는 기준을 제시합니다. 공통 원칙은 단순합니다. 입력을 정규화하고, 순수 함수로 계산하고, 경계에서만 부수효과를 수행합니다. 이 구조가 잡히면 테스트 코드도 자연스럽게 단순해집니다.
-
-### `functools`와 `itertools`를 함께 쓰는 파이프라인
-
-```python
-from functools import reduce
-from itertools import islice, groupby
-from operator import itemgetter
-
-raw_orders = [
-    {"order_id": "O-1", "store": "seoul", "amount": 12000, "status": "paid"},
-    {"order_id": "O-2", "store": "seoul", "amount": 9000, "status": "cancelled"},
-    {"order_id": "O-3", "store": "busan", "amount": 15000, "status": "paid"},
-    {"order_id": "O-4", "store": "busan", "amount": 7000, "status": "paid"},
-]
-
-def normalize(order: dict) -> dict:
-    return {
-        **order,
-        "store": order["store"].strip().lower(),
-        "status": order["status"].strip().lower(),
-    }
-
-def is_paid(order: dict) -> bool:
-    return order["status"] == "paid"
-
-def with_fee(order: dict) -> dict:
-    fee = int(order["amount"] * 0.03)
-    return {**order, "fee": fee, "net": order["amount"] - fee}
-
-normalized = map(normalize, raw_orders)
-paid_only = filter(is_paid, normalized)
-settled = list(map(with_fee, paid_only))
-
-# groupby는 key 정렬이 선행되어야 동작이 안정적입니다.
-settled_sorted = sorted(settled, key=itemgetter("store"))
-report = {
-    store: reduce(
-        lambda acc, o: {
-            "orders": acc["orders"] + 1,
-            "gross": acc["gross"] + o["amount"],
-            "fee": acc["fee"] + o["fee"],
-            "net": acc["net"] + o["net"],
-        },
-        orders,
-        {"orders": 0, "gross": 0, "fee": 0, "net": 0},
-    )
-    for store, orders in groupby(settled_sorted, key=itemgetter("store"))
-}
-
-print(report)
-# {
-#   'busan': {'orders': 2, 'gross': 22000, 'fee': 660, 'net': 21340},
-#   'seoul': {'orders': 1, 'gross': 12000, 'fee': 360, 'net': 11640}
-# }
-```
-
-### 순수 함수 리팩터링 전후 비교
-
-```python
-# before: 계산과 로그 출력이 섞인 형태
-
-def score_user_before(user: dict) -> int:
-    base = user["purchases"] * 10
-    if user["vip"]:
-        base += 30
-    print(f"[DEBUG] scored {user['id']} => {base}")
-    return base
-
-# after: 계산은 순수 함수, 출력은 외부 경계
-
-def score_user(user: dict) -> int:
-    base = user["purchases"] * 10
-    bonus = 30 if user["vip"] else 0
-    return base + bonus
-
-def score_and_log(user: dict) -> int:
-    score = score_user(user)
-    print(f"[DEBUG] scored {user['id']} => {score}")
-    return score
-```
-
-핵심은 `before`가 틀렸다는 뜻이 아니라, 테스트 비용이 높아진다는 점입니다. `score_user()`는 입력과 출력만 검증하면 되기 때문에 fixture나 mock 없이 단위 테스트를 만들 수 있습니다.
-
-### 불변 데이터 구조 선택 기준
-
-| 상황 | 권장 타입 | 이유 |
-|---|---|---|
-| 위치 좌표, 버전 쌍 | `tuple[int, int]` | 해시 가능, 키로 사용 가능 |
-| 권한 집합 | `frozenset[str]` | 중복 제거 + 불변 |
-| 설정 객체 | `@dataclass(frozen=True)` | 타입 명시 + 불변 업데이트 용이 |
-| 레코드 스냅샷 | `NamedTuple` | 가볍고 필드 접근이 명확 |
-
-```python
-from dataclasses import dataclass, replace
-
-@dataclass(frozen=True)
-class AppConfig:
-    host: str
-    port: int
-    debug: bool
-
-base = AppConfig(host="localhost", port=8000, debug=False)
-debug_cfg = replace(base, debug=True)
-
-print(base)      # AppConfig(host='localhost', port=8000, debug=False)
-print(debug_cfg) # AppConfig(host='localhost', port=8000, debug=True)
-```
-
-### 재귀 호출 스택을 시각화하며 검증하기
-
-```python
-def sum_nested(values, depth: int = 0) -> int:
-    indent = "  " * depth
-    print(f"{indent}sum_nested({values})")
-
-    if isinstance(values, int):
-        print(f"{indent}-> int {values}")
-        return values
-
-    total = 0
-    for item in values:
-        total += sum_nested(item, depth + 1)
-
-    print(f"{indent}-> total {total}")
-    return total
-
-nested = [1, [2, [3, 4], 5], [6, 7]]
-print(sum_nested(nested))
-```
-
-재귀가 안전한지 확인할 때는 두 가지를 함께 봅니다. 종료 조건이 모든 경로에서 도달 가능한지, 그리고 입력 크기가 커졌을 때 반복으로 전환해야 하는지입니다.
-
-### Python에서 구현하는 monad-like 패턴
-
-엄밀한 수학적 모나드 구현이 아니라, 에러 전파를 일관되게 다루는 실전 패턴입니다.
-
-```python
-from dataclasses import dataclass
-from typing import Generic, TypeVar, Callable
-
-T = TypeVar("T")
-E = TypeVar("E")
-U = TypeVar("U")
-
-@dataclass(frozen=True)
-class Ok(Generic[T]):
-    value: T
-
-@dataclass(frozen=True)
-class Err(Generic[E]):
-    error: E
-
-Result = Ok[T] | Err[E]
-
-def bind(result: Result[T, E], fn: Callable[[T], Result[U, E]]) -> Result[U, E]:
-    if isinstance(result, Err):
-        return result
-    return fn(result.value)
-
-def parse_int(text: str) -> Result[int, str]:
-    return Ok(int(text)) if text.isdigit() else Err("not a digit")
-
-def positive(n: int) -> Result[int, str]:
-    return Ok(n) if n > 0 else Err("must be positive")
-
-def reciprocal(n: int) -> Result[float, str]:
-    return Err("division by zero") if n == 0 else Ok(1 / n)
-
-r1 = bind(bind(parse_int("8"), positive), reciprocal)
-r2 = bind(bind(parse_int("x"), positive), reciprocal)
-
-print(r1)  # Ok(value=0.125)
-print(r2)  # Err(error='not a digit')
-```
-
-이 패턴의 장점은 `try/except`를 중첩하지 않고도 실패 경로를 동일한 타입으로 유지할 수 있다는 점입니다.
-
-### 속성 기반 테스트 예시 (`hypothesis`)
-
-```python
-# pip install hypothesis
-from hypothesis import given, strategies as st
-
-def normalize_email(email: str) -> str:
-    return email.strip().lower()
-
-@given(st.text())
-def test_normalize_email_idempotent(raw: str) -> None:
-    once = normalize_email(raw)
-    twice = normalize_email(once)
-    assert once == twice
-
-@given(st.lists(st.integers(min_value=-10_000, max_value=10_000), max_size=100))
-def test_sum_matches_builtin(xs: list[int]) -> None:
-    assert sum(xs) == __builtins__["sum"](xs)
-```
-
-예제 기반 테스트는 특정 입력에 집중하고, 속성 기반 테스트는 함수의 보편적 성질을 검증합니다. 둘을 함께 쓰면 경계 조건 누락을 크게 줄일 수 있습니다.
-
-### 운영 경계에서의 구성 원칙
-
-- 계산 함수는 가능한 한 `print`, 파일 IO, 네트워크 호출을 포함하지 않습니다.
-- API 핸들러나 CLI 엔트리포인트에서만 부수효과를 수행합니다.
-- 파이프라인 단계마다 입력/출력 타입을 문서화해 연결 오류를 줄입니다.
-- 불변 객체를 기본값으로 두고, 변경이 필요할 때만 새 객체를 만듭니다.
-
-이 원칙을 지키면 코드 리뷰에서 "무엇이 바뀌었는가"가 아니라 "어디에서 부수효과가 발생하는가"를 빠르게 확인할 수 있습니다.
-
-
 ## 검증 시나리오: 경계 조건을 먼저 잠그기
 
 실무에서 함수형 스타일이 유지되는 팀은 구현보다 먼저 검증 포인트를 고정합니다. 입력 경계, 빈 컬렉션, 정렬 안정성, 타입 변환 실패를 먼저 적어 두면 리팩터링 과정에서도 동작이 흔들리지 않습니다.
@@ -553,7 +338,6 @@ print("Pass")
 
 이런 검증 코드는 예제 코드가 아니라 운영 안전장치입니다. 새 규칙을 추가할 때도 기존 성질이 유지되는지 빠르게 확인할 수 있습니다.
 
-
 ## 리뷰 포인트: 코드 리뷰에서 바로 확인할 항목
 
 함수형 스타일을 적용한 코드 리뷰에서는 다음 네 가지를 빠르게 확인합니다. 첫째, 계산 함수가 외부 상태를 직접 읽거나 쓰지 않는지 확인합니다. 둘째, mutable 인자를 제자리에서 수정하지 않는지 확인합니다. 셋째, 파이프라인 단계의 입력과 출력 타입이 자연스럽게 연결되는지 확인합니다. 넷째, 실패 경로가 값으로 표현되는지 확인합니다.
@@ -572,7 +356,6 @@ print("Pass")
 ```
 
 이 항목을 PR 템플릿에 고정해 두면 스타일 논쟁보다 설계 품질을 빠르게 맞출 수 있습니다.
-
 
 ## 처음 질문으로 돌아가기
 

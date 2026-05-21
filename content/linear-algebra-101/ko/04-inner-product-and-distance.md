@@ -379,7 +379,7 @@ def measure_distance_concentration(dim, n_samples=100):
     min_dist = np.min(distances)
     max_dist = np.max(distances)
     
-    # 분별력 지표: (max - min) / mean
+    # 분별력 지표: (max - min) / 평균
     discriminability = (max_dist - min_dist) / mean_dist
     
     return {

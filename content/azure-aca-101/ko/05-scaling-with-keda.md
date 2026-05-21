@@ -91,8 +91,7 @@ Scale-to-zero는 유휴 비용을 거의 0으로 밀어 내지만, 첫 요청은
 Python/FastAPI는 보통 1–3초 정도 걸리고, 무거운 모델 로딩은 10초 이상까지 늘 수 있습니다.
 사용자 대면 동기 API는 `min-replicas 1`이 낫고, 비동기 worker나 야간 배치는 `min-replicas 0`이 적절합니다.
 
-## Before / After
-
+## 적용 전후 비교
 ### Before (명시적인 스케일 규칙이 없는 경우)
 
 ```bash
@@ -122,7 +121,7 @@ az containerapp create \
 
 ## 단계별 실습
 
-### Step 1: HTTP API에 스케일 규칙 적용하기
+### 단계 1: HTTP API에 스케일 규칙 적용하기
 
 FastAPI 앱이 이미 ACR에 올라가 있다고 가정합니다.
 
@@ -140,7 +139,7 @@ az containerapp create \
   --scale-rule-http-concurrency 100
 ```
 
-### Step 2: Service Bus 큐 worker 만들기
+### 단계 2: Service Bus 큐 worker 만들기
 
 ```bash
 az containerapp create \
@@ -160,7 +159,7 @@ az containerapp create \
 `messageCount=5`는 "대기 메시지 5개마다 replica 하나"를 뜻합니다.
 큐가 비면 0으로 내려가고, 50개가 쌓이면 10 replica(최대값)까지 올라갑니다.
 
-### Step 3: 동작 검증하기
+### 단계 3: 동작 검증하기
 
 ```bash
 az containerapp replica list --name queue-worker --resource-group $RG -o table

@@ -29,7 +29,6 @@ last_reviewed: '2026-05-12'
 
 격리성은 켜고 끄는 스위치가 아니라, 안전성과 처리량 사이를 조정하는 다이얼에 가깝습니다. 너무 느슨하면 이상 현상이 남고, 너무 엄격하면 처리량이 급격히 떨어집니다. 이 글에서는 그 다이얼을 어떻게 읽어야 하는지, 그리고 MVCC와 행 잠금이 어떤 역할을 하는지 정리합니다.
 
-
 ![Database Systems 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/06/06-01-big-picture.ko.png)
 *Database Systems 101 6장 흐름 개요*
 
@@ -100,7 +99,7 @@ COMMIT;
 ### 1단계 — 두 세션 준비
 
 ```python
-# Open two psql shells, or two sqlite3 connections.
+# psql 쉘 두 개, 또는 sqlite3 연결 두 개를 연다.
 import sqlite3
 c1 = sqlite3.connect("iso.db", isolation_level="DEFERRED")
 c2 = sqlite3.connect("iso.db", isolation_level="DEFERRED")
@@ -137,10 +136,10 @@ print(c1.execute("SELECT n FROM counter").fetchone())  # 1, not 2
 # PostgreSQL
 # T1
 # BEGIN;
-# SELECT n FROM counter WHERE id=1 FOR UPDATE;  -- lock
-# UPDATE counter SET n = n+1 WHERE id=1;
+# SELECT n FROM 카운터 WHERE id=1 FOR UPDATE;  -- 잠그다
+# 업데이트 카운터 SET n = n+1 WHERE id=1;
 # COMMIT;
-# T2: blocks on SELECT ... FOR UPDATE until T1 ends
+# T2: T1이 끝날 때까지 SELECT ... FOR UPDATE를 차단합니다.
 ```
 
 명시적 행 잠금은 두 세션을 사실상 직렬화해 Lost Update를 막는 가장 흔한 도구입니다.
@@ -219,109 +218,6 @@ SERIALIZABLE은 가장 안전하지만, 충돌 감지와 재시도라는 운영 
 ## 정리 및 다음 단계
 
 격리 수준은 동시성 안전성과 처리량 사이의 다이얼입니다. 이상 현상과 각 수준의 약속을 이해하면 장애를 만난 뒤에 수습하는 대신, 애초에 실패 모드를 설계할 수 있습니다. 다음 글에서는 한 단계 위로 올라가 데이터 모델 자체의 품질, 즉 정규화와 함수 종속을 살펴봅니다.
-
-## 실전 보강: 실행 계획과 트랜잭션 설계를 한 번에 보는 연습
-
-아래 예시는 관계형 데이터베이스를 운영할 때 자주 만나는 세 가지 질문을 한 번에 다룹니다. 첫째, 이 쿼리가 왜 느린지, 둘째, 어떤 인덱스가 실제로 선택되는지, 셋째, 실패 시 데이터가 어디까지 보존되는지입니다.
-
-### 1) 조건과 정렬을 함께 고려한 인덱스 전략
-
-```sql
--- 주문 조회 API: 특정 사용자 최근 주문 20건
-SELECT id, user_id, status, created_at, total_amount
-FROM orders
-WHERE user_id = 42 AND status = 'paid'
-ORDER BY created_at DESC
-LIMIT 20;
-```
-
-이 쿼리는 보통 `user_id`, `status`, `created_at`의 순서를 가진 복합 인덱스 후보를 만듭니다.
-
-```sql
-CREATE INDEX idx_orders_user_status_created
-ON orders (user_id, status, created_at DESC);
-```
-
-핵심은 **필터링 컬럼을 앞쪽에**, 정렬 컬럼을 그다음에 배치하는 것입니다. 이렇게 하면 WHERE와 ORDER BY를 동시에 만족해 추가 정렬 비용을 줄일 수 있습니다.
-
-### 2) 실행 계획 비교하기
-
-```sql
-EXPLAIN ANALYZE
-SELECT id, user_id, status, created_at, total_amount
-FROM orders
-WHERE user_id = 42 AND status = 'paid'
-ORDER BY created_at DESC
-LIMIT 20;
-```
-
-계획을 읽을 때는 다음 순서를 고정해 확인합니다.
-
-| 확인 항목 | 의미 | 실무 해석 |
-| --- | --- | --- |
-| Scan 종류 | Seq Scan / Index Scan / Index Only Scan | 인덱스가 실제 사용되는지 |
-| Rows (estimate vs actual) | 예상 행 수와 실제 행 수 차이 | 통계 갱신 필요 여부 판단 |
-| Sort 노드 유무 | 별도 정렬 발생 여부 | 인덱스 컬럼 순서 재검토 |
-| Loop 횟수 | 반복 수행 정도 | Nested Loop 과비용 여부 |
-
-예상 행 수와 실제 행 수가 크게 어긋나면 `ANALYZE` 또는 통계 정책을 먼저 점검합니다. 인덱스를 추가하기 전에 통계부터 정상화하는 편이 안전합니다.
-
-### 3) 트랜잭션 경계와 실패 처리 패턴
-
-```python
-import sqlite3
-
-def create_order(db: sqlite3.Connection, user_id: int, amount: int) -> None:
-    try:
-        db.execute("BEGIN")
-        db.execute(
-            "INSERT INTO orders(user_id, status, total_amount) VALUES (?, 'paid', ?)",
-            (user_id, amount),
-        )
-        db.execute(
-            "UPDATE inventory SET stock = stock - 1 WHERE sku = ? AND stock > 0",
-            ("SKU-001",),
-        )
-        changed = db.execute("SELECT changes()").fetchone()[0]
-        if changed != 1:
-            raise RuntimeError("재고 부족")
-        db.execute("COMMIT")
-    except Exception:
-        db.execute("ROLLBACK")
-        raise
-```
-
-이 패턴의 의도는 명확합니다. 주문 생성과 재고 차감을 **하나의 원자 단위**로 묶고, 조건이 맞지 않으면 전체를 되돌립니다. 트랜잭션 안에서 외부 API 호출을 하지 않는 것도 중요합니다. 잠금 시간이 길어지면 동시성 충돌이 급격히 늘어납니다.
-
-### 4) 운영에서 자주 쓰는 진단 질의문
-
-```sql
--- 값 분포 확인(선택성 감각)
-SELECT status, COUNT(*) FROM orders GROUP BY status;
-
--- 최근 7일 데이터 비율 확인(파티션/인덱스 필요성 판단)
-SELECT COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '7 days') AS recent,
-       COUNT(*) AS total
-FROM orders;
-
--- 특정 조건의 실제 데이터량 확인
-SELECT COUNT(*)
-FROM orders
-WHERE user_id = 42 AND status = 'paid';
-```
-
-인덱스 설계는 문법 문제가 아니라 **분포 문제**입니다. 어떤 값이 얼마나 자주 등장하는지 모르면, 좋은 인덱스 순서를 고르기 어렵습니다.
-
-### 5) 읽기/쓰기 균형 체크
-
-| 판단 질문 | 읽기 중심 시스템 | 쓰기 중심 시스템 |
-| --- | --- | --- |
-| 인덱스 수 | 상대적으로 많아도 감당 가능 | 최소화가 우선 |
-| 커버링 인덱스 | 적극 검토 | 신중 검토 |
-| 배치 업데이트 | 야간 일괄 가능 | 짧은 배치로 분할 필요 |
-| 통계 갱신 | 주기적 자동 갱신 | 대량 쓰기 직후 즉시 갱신 |
-
-결론적으로 데이터베이스 튜닝은 “인덱스를 늘린다”가 아니라 “실행 계획을 읽고, 트랜잭션 경계를 짧게 유지하고, 분포를 근거로 선택한다”의 반복입니다.
 
 ## 격리 수준 데모: 같은 데이터, 다른 결과
 
@@ -452,7 +348,6 @@ SELECT COUNT(*) FROM users WHERE deleted_at IS NULL;
 
 이 체크리스트는 거창한 체계를 요구하지 않습니다. 작은 팀도 주 1회 반복하면 데이터 사고 빈도를 눈에 띄게 줄일 수 있습니다. 데이터베이스 운영의 본질은 "고급 기능을 많이 아는 것"이 아니라, "반복 가능한 검증 루프를 끊기지 않게 유지하는 것"입니다.
 
-
 ## 추가 실습 기록 템플릿
 
 아래 템플릿은 팀 위키에 그대로 붙여 넣어 실습 결과를 남길 때 사용합니다.
@@ -471,7 +366,6 @@ SELECT COUNT(*) FROM users WHERE deleted_at IS NULL;
 ```
 
 실습 기록을 남기면 지식이 개인 경험으로 소모되지 않고 팀 자산으로 누적됩니다. 특히 실행 계획 캡처와 복구 절차 검증 결과를 함께 보관하면, 다음 장애 대응에서 판단 속도를 크게 높일 수 있습니다.
-
 
 ## 처음 질문으로 돌아가기
 

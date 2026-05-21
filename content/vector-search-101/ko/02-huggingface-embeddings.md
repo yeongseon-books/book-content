@@ -244,7 +244,7 @@ embedding_model = HuggingFaceEmbeddings(
 **한 번만 초기화하기.** 모델 가중치를 로드하는 데는 몇 초가 걸릴 수 있습니다. `HuggingFaceEmbeddings` 객체를 모듈 수준에서 한 번 만들고 계속 재사용하는 편이 좋습니다.
 
 ```python
-# module level — initialize once
+# 모듈 수준 — 한 번만 초기화
 _embedding_model = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2",
     model_kwargs={"device": "cpu"},

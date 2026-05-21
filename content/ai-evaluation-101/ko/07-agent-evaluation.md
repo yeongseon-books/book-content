@@ -158,7 +158,7 @@ actual_tools   = ["draft_email","read_calendar", "send_email", ...]
 print(classification_report(expected_tools, actual_tools))
 #                precision  recall  f1-score
 # read_calendar      0.95    0.98    0.96
-# send_email         0.85    0.70    0.77   ← often confused with draft_email
+# send_email         0.85    0.70    0.77   ← draft_email과 자주 혼동됨
 # draft_email        0.60    0.90    0.72
 ```
 
@@ -185,7 +185,7 @@ def trajectory_metrics(agent_run: dict, expected_steps: int) -> dict:
 
 overheads = [trajectory_metrics(r, 4)["step_overhead"] for r in runs]
 print(f"avg step overhead: {sum(overheads)/len(overheads):.2f}")
-# avg step overhead: 1.8  ← agent uses ~2x more steps than needed
+# avg step overhead: 1.8  ← agent가 필요한 것보다 약 2배 많은 단계를 사용
 ```
 
 **경험적 기준**: step overhead가 2.0을 넘으면 prompt 또는 tool 설계 재검토.
@@ -210,12 +210,12 @@ def evaluate_recovery(agent_run: dict) -> str:
             return "GAVE_UP"
     return "NO_FAILURE"
 
-# 50 runs with injected failures
+# 실패를 주입한 50회 실행
 results = [evaluate_recovery(r) for r in fault_injected_runs]
 from collections import Counter
 print(Counter(results))
 # Counter({'RETRIED': 30, 'ALTERNATIVE': 12, 'GAVE_UP': 8})
-# → 16% of cases the agent gave up. Reinforce recovery in the prompt.
+# → 사례의 16%에서 agent가 포기했습니다. prompt의 복구 지침을 강화하세요.
 ```
 
 **Fault injection 패턴**: 평가 시 일부 tool에 가짜 에러를 주입하고 agent가 어떻게 반응하는지 측정합니다 (Ep8에서 회귀 테스트로 자동화).
@@ -239,7 +239,7 @@ for run in agent_runs:  # 100 runs
 
 df = pd.DataFrame(results)
 print(df.describe())
-#                  task_success  tool_f1  step_overhead  recovered
+# task_success  tool_f1  step_overhead  recovered
 # mean             0.78          0.85     1.6            0.72
 # std              0.41          0.18     0.7            0.45
 ```

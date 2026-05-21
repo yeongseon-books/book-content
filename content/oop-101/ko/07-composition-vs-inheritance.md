@@ -69,7 +69,7 @@ Tight coupling                 Loose coupling
 로깅 기능 추가를 비교합니다.
 
 ```python
-# before: logging via inheritance — multiple inheritance needed
+# before: inheritance 기반 로깅 — multiple inheritance 필요
 class Logger:
     def log(self, msg: str) -> None:
         print(f"[LOG] {msg}")
@@ -80,7 +80,7 @@ class UserService(Logger):  # UserService is-a Logger? No.
 ```
 
 ```python
-# after: logging via composition — natural has-a relationship
+# after: composition 기반 로깅 — 자연스러운 has-a 관계
 class Logger:
     def log(self, msg: str) -> None:
         print(f"[LOG] {msg}")
@@ -129,8 +129,8 @@ class Car:
 
 car = Car(Engine(200), GPS())
 car.drive("downtown")
-# 200hp engine started
-# Navigating to downtown
+# 200hp 엔진 시작됨
+# 도심으로 이동 중
 car.park()
 # Engine stopped
 ```
@@ -269,7 +269,7 @@ try:
     raise NotFoundError("User")
 except HttpError as e:
     print(f"[{e.status_code}] {e}")
-# [404] User not found
+# [404] 사용자를 찾을 수 없음
 ```
 
 ## 이 코드에서 주목할 점
@@ -341,7 +341,7 @@ except HttpError as e:
   - tax_policy: TaxPolicy
 ```
 
-## before/after: 상속 트리 폭증에서 정책 합성으로
+## 적용 전후: 상속 트리 폭증에서 정책 합성으로
 
 ```python
 # before

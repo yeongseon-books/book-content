@@ -76,7 +76,7 @@ def calculate_total(prices, tax_rate):
     subtotal = sum(prices)
     return int(subtotal * (1 + tax_rate))
 
-# prices가 list인지 tuple인지, tax_rate가 무엇인지 시그니처만으로는 알 수 없습니다.
+# 가격이 목록 인지 튜플 인지, 세금 세율이 무엇인지 시그니처 단독 수는 없습니다.
 ```
 
 ```python
@@ -84,7 +84,7 @@ def calculate_total(prices: list[int], tax_rate: float) -> int:
     subtotal = sum(prices)
     return int(subtotal * (1 + tax_rate))
 
-# prices는 list[int], tax_rate는 float, 반환값은 int라는 계약이 드러납니다.
+# 가격은 목록[int], 세금 세율은 float, 반환값은 int라는 서명이 불편한 것입니다.
 ```
 
 ## 단계별로 익히기
@@ -96,7 +96,7 @@ def greet(name: str) -> str:
     return f"Hello, {name}!"
 
 result = greet("Alice")  # OK
-# greet(42)  # mypy 오류: Argument 1 has incompatible type "int"
+# Greeting(42) # mypy 오류: 인수 1에 호환되지 않는 유형 "int"가 있습니다.
 ```
 
 기본 문법은 `매개변수: 타입`, `-> 반환타입`입니다. 중요한 점은 Python이 이 힌트를 실행 시점에 강제하지 않는다는 사실입니다.
@@ -433,7 +433,7 @@ Found 3 errors in 1 file (checked 1 source file)
 
 위 메시지는 각각 키 타입 불일치, Union 좁히기 누락, Optional 처리 누락을 의미합니다. 즉, 정적 분석기가 실제 운영 버그 후보를 실행 전에 보여 준다는 뜻입니다.
 
-## before/after 요약
+## 적용 전후 요약
 
 | 구분 | before (느슨한 타입) | after (구체 타입) |
 | --- | --- | --- |

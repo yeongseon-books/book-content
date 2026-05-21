@@ -29,7 +29,6 @@ last_reviewed: '2026-05-12'
 
 데이터베이스 관리 시스템(DBMS)은 단순한 저장 엔진이 아닙니다. 동시 접근, 장애 복구, 무결성, 질의 처리라는 네 가지 어려운 문제를 한 번에 맡는 소프트웨어입니다. 이 관점을 먼저 잡아 두면 이후에 나오는 SQL, 인덱스, 트랜잭션, 격리 수준이 왜 필요한지 자연스럽게 이어집니다.
 
-
 ![Database Systems 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/01/01-01-big-picture.ko.png)
 *Database Systems 101 1장 흐름 개요*
 
@@ -78,7 +77,7 @@ DBMS는 애플리케이션과 디스크 사이에 위치하면서, 여러 클라
 **Before — write to a file directly**
 
 ```python
-# accounts.py — touch the file ourselves
+# accounts.py — 파일을 직접 다룸
 import json
 
 def deposit(user_id: str, amount: int) -> None:
@@ -94,7 +93,7 @@ def deposit(user_id: str, amount: int) -> None:
 **After — use SQLite**
 
 ```python
-# accounts.py — DBMS owns concurrency and durability
+# account.py — DBMS가 유일한 성과 영속성을 담당합니다
 import sqlite3
 
 def deposit(db: sqlite3.Connection, user_id: str, amount: int) -> None:
@@ -171,7 +170,7 @@ except RuntimeError:
     pass
 
 print(db.execute("SELECT price FROM products WHERE name='apple'").fetchone())
-# unchanged — the update was rolled back
+# 변경 없음 — 업데이트가 롤백되었습니다
 ```
 
 바로 이 지점이 파일 기반 저장과 DBMS의 결정적인 차이입니다. 실패 중간 상태를 시스템 차원에서 되돌릴 수 있습니다.
@@ -179,7 +178,7 @@ print(db.execute("SELECT price FROM products WHERE name='apple'").fetchone())
 ### 5단계 — 두 프로세스 동시 실행
 
 ```python
-# writer.py — run in two terminals at the same time
+# writer.py — 두 터미널에서 동시에 실행합니다
 import sqlite3, time
 db = sqlite3.connect("shop.db", timeout=5.0)
 with db:
@@ -238,109 +237,6 @@ NoSQL이 빛나는 순간도 분명히 있습니다. 데이터 모양이 문서,
 ## 정리 및 다음 단계
 
 DBMS는 데이터를 넣어 두는 장소가 아니라, 동시성·영속성·일관성·질의를 한꺼번에 해결하는 소프트웨어입니다. 그 덕분에 애플리케이션은 의도에 집중할 수 있고, 어려운 상태 관리는 DBMS에 맡길 수 있습니다. 다음 글에서는 SQL이 기대고 있는 더 근본적인 모델, 관계형 모델을 살펴봅니다.
-
-## 실전 보강: 실행 계획과 트랜잭션 설계를 한 번에 보는 연습
-
-아래 예시는 관계형 데이터베이스를 운영할 때 자주 만나는 세 가지 질문을 한 번에 다룹니다. 첫째, 이 쿼리가 왜 느린지, 둘째, 어떤 인덱스가 실제로 선택되는지, 셋째, 실패 시 데이터가 어디까지 보존되는지입니다.
-
-### 1) 조건과 정렬을 함께 고려한 인덱스 전략
-
-```sql
--- 주문 조회 API: 특정 사용자 최근 주문 20건
-SELECT id, user_id, status, created_at, total_amount
-FROM orders
-WHERE user_id = 42 AND status = 'paid'
-ORDER BY created_at DESC
-LIMIT 20;
-```
-
-이 쿼리는 보통 `user_id`, `status`, `created_at`의 순서를 가진 복합 인덱스 후보를 만듭니다.
-
-```sql
-CREATE INDEX idx_orders_user_status_created
-ON orders (user_id, status, created_at DESC);
-```
-
-핵심은 **필터링 컬럼을 앞쪽에**, 정렬 컬럼을 그다음에 배치하는 것입니다. 이렇게 하면 WHERE와 ORDER BY를 동시에 만족해 추가 정렬 비용을 줄일 수 있습니다.
-
-### 2) 실행 계획 비교하기
-
-```sql
-EXPLAIN ANALYZE
-SELECT id, user_id, status, created_at, total_amount
-FROM orders
-WHERE user_id = 42 AND status = 'paid'
-ORDER BY created_at DESC
-LIMIT 20;
-```
-
-계획을 읽을 때는 다음 순서를 고정해 확인합니다.
-
-| 확인 항목 | 의미 | 실무 해석 |
-| --- | --- | --- |
-| Scan 종류 | Seq Scan / Index Scan / Index Only Scan | 인덱스가 실제 사용되는지 |
-| Rows (estimate vs actual) | 예상 행 수와 실제 행 수 차이 | 통계 갱신 필요 여부 판단 |
-| Sort 노드 유무 | 별도 정렬 발생 여부 | 인덱스 컬럼 순서 재검토 |
-| Loop 횟수 | 반복 수행 정도 | Nested Loop 과비용 여부 |
-
-예상 행 수와 실제 행 수가 크게 어긋나면 `ANALYZE` 또는 통계 정책을 먼저 점검합니다. 인덱스를 추가하기 전에 통계부터 정상화하는 편이 안전합니다.
-
-### 3) 트랜잭션 경계와 실패 처리 패턴
-
-```python
-import sqlite3
-
-def create_order(db: sqlite3.Connection, user_id: int, amount: int) -> None:
-    try:
-        db.execute("BEGIN")
-        db.execute(
-            "INSERT INTO orders(user_id, status, total_amount) VALUES (?, 'paid', ?)",
-            (user_id, amount),
-        )
-        db.execute(
-            "UPDATE inventory SET stock = stock - 1 WHERE sku = ? AND stock > 0",
-            ("SKU-001",),
-        )
-        changed = db.execute("SELECT changes()").fetchone()[0]
-        if changed != 1:
-            raise RuntimeError("재고 부족")
-        db.execute("COMMIT")
-    except Exception:
-        db.execute("ROLLBACK")
-        raise
-```
-
-이 패턴의 의도는 명확합니다. 주문 생성과 재고 차감을 **하나의 원자 단위**로 묶고, 조건이 맞지 않으면 전체를 되돌립니다. 트랜잭션 안에서 외부 API 호출을 하지 않는 것도 중요합니다. 잠금 시간이 길어지면 동시성 충돌이 급격히 늘어납니다.
-
-### 4) 운영에서 자주 쓰는 진단 질의문
-
-```sql
--- 값 분포 확인(선택성 감각)
-SELECT status, COUNT(*) FROM orders GROUP BY status;
-
--- 최근 7일 데이터 비율 확인(파티션/인덱스 필요성 판단)
-SELECT COUNT(*) FILTER (WHERE created_at >= NOW() - INTERVAL '7 days') AS recent,
-       COUNT(*) AS total
-FROM orders;
-
--- 특정 조건의 실제 데이터량 확인
-SELECT COUNT(*)
-FROM orders
-WHERE user_id = 42 AND status = 'paid';
-```
-
-인덱스 설계는 문법 문제가 아니라 **분포 문제**입니다. 어떤 값이 얼마나 자주 등장하는지 모르면, 좋은 인덱스 순서를 고르기 어렵습니다.
-
-### 5) 읽기/쓰기 균형 체크
-
-| 판단 질문 | 읽기 중심 시스템 | 쓰기 중심 시스템 |
-| --- | --- | --- |
-| 인덱스 수 | 상대적으로 많아도 감당 가능 | 최소화가 우선 |
-| 커버링 인덱스 | 적극 검토 | 신중 검토 |
-| 배치 업데이트 | 야간 일괄 가능 | 짧은 배치로 분할 필요 |
-| 통계 갱신 | 주기적 자동 갱신 | 대량 쓰기 직후 즉시 갱신 |
-
-결론적으로 데이터베이스 튜닝은 “인덱스를 늘린다”가 아니라 “실행 계획을 읽고, 트랜잭션 경계를 짧게 유지하고, 분포를 근거로 선택한다”의 반복입니다.
 
 ## 저장소에서 시스템으로 넘어가는 경계
 
@@ -470,7 +366,6 @@ SELECT COUNT(*) FROM users WHERE deleted_at IS NULL;
 - 백업 복구 리허설 최근 실행일을 확인합니다.
 
 이 체크리스트는 거창한 체계를 요구하지 않습니다. 작은 팀도 주 1회 반복하면 데이터 사고 빈도를 눈에 띄게 줄일 수 있습니다. 데이터베이스 운영의 본질은 "고급 기능을 많이 아는 것"이 아니라, "반복 가능한 검증 루프를 끊기지 않게 유지하는 것"입니다.
-
 
 ## 처음 질문으로 돌아가기
 

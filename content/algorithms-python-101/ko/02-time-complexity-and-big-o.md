@@ -28,7 +28,6 @@ last_reviewed: '2026-05-12'
 
 Big-O는 코드를 실서비스에 넣기 전이나 코딩 테스트 화이트보드 앞에 서기 전에도 성장 패턴을 비교할 수 있게 해 주는 실용적인 언어입니다.
 
-
 ![Algorithms with Python 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/02/02-01-big-picture.ko.png)
 *Algorithms with Python 101 2장 흐름 개요*
 
@@ -66,12 +65,11 @@ n=1,000  | O(1): 1       | O(log n): 10    | O(n): 1,000
 | O(n) — linear | 실행 시간이 입력 크기에 비례해 증가합니다 |
 | O(n^2) — quadratic | 실행 시간이 입력 크기의 제곱에 비례해 증가합니다 |
 
-## Before / After
-
+## 적용 전후 비교
 컬렉션 안에 값이 있는지 확인하는 두 가지 방법입니다.
 
 ```python
-# before: linear search in a list — O(n)
+# before: 리스트에서 선형 탐색 — O(n)
 def contains(data: list, target) -> bool:
     for item in data:
         if item == target:
@@ -80,15 +78,14 @@ def contains(data: list, target) -> bool:
 ```
 
 ```python
-# after: lookup in a set — O(1) average
+# after: set에서 조회 — 평균 O(1)
 def contains(data: set, target) -> bool:
     return target in data
 ```
 
 ## 단계별 실습
 
-### Step 1: O(1) — Constant Time
-
+### 단계 1: O(1) — 상수 시간
 ```python
 def get_first(data: list) -> int:
     """Access the first element — O(1)."""
@@ -107,8 +104,7 @@ print(get_by_key(lookup, "name"))  # Alice
 
 배열의 첫 원소 접근이나 해시 기반 딕셔너리 조회처럼, 입력이 커져도 비용이 거의 늘지 않는 연산이 `O(1)`입니다.
 
-### Step 2: O(n) — Linear Time
-
+### 단계 2: O(n) — 선형 시간
 ```python
 def linear_sum(data: list[int]) -> int:
     """Sum all elements — O(n)."""
@@ -131,8 +127,7 @@ print(find_value(data, 42))   # 42
 
 데이터를 처음부터 끝까지 한 번 훑어야 하면 보통 `O(n)`입니다. 입력이 두 배가 되면 대체로 실행 시간도 두 배 가까이 늘어납니다.
 
-### Step 3: O(n^2) — Quadratic Time
-
+### 단계 3: O(n^2) — 이차 시간
 ```python
 def bubble_sort(data: list[int]) -> list[int]:
     """Bubble sort — O(n^2)."""
@@ -177,7 +172,7 @@ def binary_search(sorted_data: list[int], target: int) -> int:
 data = list(range(1_000_000))
 print(binary_search(data, 999_999))  # 999999
 
-# Python's built-in sort is O(n log n) — Timsort
+# Python built-in sort는 O(n log n) — Timsort
 import random
 random_data = [random.randint(0, 1000) for _ in range(1000)]
 sorted_data = sorted(random_data)  # O(n log n)
@@ -186,8 +181,7 @@ print(sorted_data[:5])
 
 이진 탐색처럼 문제 공간을 절반씩 줄이는 알고리즘은 `O(log n)`입니다. 정렬처럼 분할과 병합이 결합된 많은 알고리즘은 `O(n log n)`에 속합니다.
 
-### Step 5: Empirical Measurement
-
+### 단계 5: 실험적 측정
 ```python
 import time
 
@@ -256,57 +250,6 @@ for n in sizes:
 
 시간 복잡도와 Big-O 표기법은 알고리즘 성능을 비교하는 공통 언어입니다. 특히 기억해야 할 계열은 `O(1)`, `O(log n)`, `O(n)`, `O(n log n)`, `O(n^2)`입니다. 다음 글에서는 가장 대표적인 두 탐색 알고리즘인 선형 탐색과 이진 탐색을 구현하고 비교합니다.
 
-## 실전 패턴 추가: 정렬과 탐색 구현을 문제 유형별로 선택하기
-
-알고리즘 문제에서는 코드 길이보다 선택 기준이 더 중요합니다. 입력 크기, 데이터 분포, 정렬 여부에 따라 정렬/탐색 전략이 달라집니다. 아래 예시는 같은 정수 배열을 다루더라도 어떤 조건에서 어떤 구현을 고르는지 보여 줍니다.
-
-```python
-def binary_search(nums: list[int], target: int) -> int:
-    left, right = 0, len(nums) - 1
-    while left <= right:
-        mid = (left + right) // 2
-        if nums[mid] == target:
-            return mid
-        if nums[mid] < target:
-            left = mid + 1
-        else:
-            right = mid - 1
-    return -1
-
-
-def merge_sort(nums: list[int]) -> list[int]:
-    if len(nums) <= 1:
-        return nums
-    mid = len(nums) // 2
-    left = merge_sort(nums[:mid])
-    right = merge_sort(nums[mid:])
-
-    merged: list[int] = []
-    i = j = 0
-    while i < len(left) and j < len(right):
-        if left[i] <= right[j]:
-            merged.append(left[i])
-            i += 1
-        else:
-            merged.append(right[j])
-            j += 1
-    merged.extend(left[i:])
-    merged.extend(right[j:])
-    return merged
-
-
-def quick_sort(nums: list[int]) -> list[int]:
-    if len(nums) <= 1:
-        return nums
-    pivot = nums[len(nums) // 2]
-    less = [x for x in nums if x < pivot]
-    equal = [x for x in nums if x == pivot]
-    greater = [x for x in nums if x > pivot]
-    return quick_sort(less) + equal + quick_sort(greater)
-```
-
-실무 판단은 보통 이렇게 정리됩니다. 이미 정렬된 리스트에서 존재 여부를 반복 조회하면 이진 탐색이 기본 선택입니다. 입력이 계속 바뀌고 안정 정렬이 필요하면 병합 정렬 계열이 유리하고, 평균 성능과 구현 단순성을 우선하면 퀵 정렬 계열이 자주 선택됩니다. 코딩 테스트에서는 Python 내장 `sort()`가 Timsort 기반이라 거의 항상 가장 실용적인 기본값이지만, 원리를 직접 구현해 보면 경계 조건과 복잡도 해석 능력이 크게 좋아집니다.
-
 ## 심화 실전 노트: Big-O를 문제 선택 도구로 쓰는 법
 
 ### 구현 앵커: 연산 카운터로 성장률 관찰하기
@@ -319,14 +262,12 @@ def count_linear_ops(n: int) -> int:
         ops += 1
     return ops
 
-
 def count_quadratic_ops(n: int) -> int:
     ops = 0
     for i in range(n):
         for j in range(i + 1, n):
             ops += 1
     return ops
-
 
 for n in [100, 500, 1_000]:
     linear = count_linear_ops(n)
@@ -384,7 +325,6 @@ n=1000  -> O(n)=1,000,   O(n^2)=499,500
 ```python
 import time
 
-
 def benchmark(func, *args, repeat: int = 5) -> float:
     best = float("inf")
     for _ in range(repeat):
@@ -427,123 +367,6 @@ E. 해답 없음 케이스: 종료 조건 검증
 - "필요하면 정답 유지 조건을 짧게 증명하겠습니다."
 
 이 스크립트를 반복하면 설명의 밀도가 올라가고, 구현 중 길을 잃는 빈도가 줄어듭니다.
-
-## 케이스 스터디 확장: 입력 규모가 커질 때의 판단
-
-### 시나리오 1: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
-
-### 시나리오 2: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
-
-### 시나리오 3: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
-
-### 시나리오 4: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
-
-### 시나리오 5: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
 
 ## 처음 질문으로 돌아가기
 

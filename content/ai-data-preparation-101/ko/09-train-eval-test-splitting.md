@@ -75,7 +75,7 @@ from sklearn.model_selection import train_test_split
 
 train, temp = train_test_split(data, test_size=0.3, random_state=42)
 val, test = train_test_split(temp, test_size=0.5, random_state=42)
-# Result: 70% train, 15% val, 15% test
+# 결과: train 70%, val 15%, test 15%
 ```
 
 iid 가정이 맞을 때만 유효합니다. 시계열, 사용자 반복 샘플, 심한 class imbalance가 있으면 baseline 이상으로 쓰기 어렵습니다.
@@ -110,7 +110,7 @@ for train_idx, test_idx in gss.split(df, groups=groups):
     train_df = df.iloc[train_idx]
     test_df = df.iloc[test_idx]
 
-# Verify: no shared user_id
+# 검증: 공유된 user_id가 없음
 assert set(train_df["user_id"]) & set(test_df["user_id"]) == set()
 ```
 
@@ -127,7 +127,7 @@ train = df.iloc[: int(n * 0.7)]
 val   = df.iloc[int(n * 0.7) : int(n * 0.85)]
 test  = df.iloc[int(n * 0.85) :]
 
-# Rolling-window backtest (optional)
+# 롤링 윈도우 백테스트 (선택)
 from sklearn.model_selection import TimeSeriesSplit
 
 tscv = TimeSeriesSplit(n_splits=5, test_size=int(n * 0.1))
@@ -162,7 +162,7 @@ def contamination_overlap(eval_doc: str, pretrain_chunks: list[str], n: int = 13
             break
     return matched / len(eval_grams)
 
-# 13-gram match >= 80% suggests contamination
+# 13-gram 일치율이 80% 이상이면 오염 가능성이 높습니다.
 ```
 
 GPT-3와 PaLM 계열 논문도 13-gram 기준을 많이 씁니다. 너무 짧은 n은 false positive가 많고, 너무 긴 n은 패러프레이즈 contamination을 놓칩니다.
@@ -180,7 +180,7 @@ GPT-3와 PaLM 계열 논문도 13-gram 기준을 많이 씁니다. 너무 짧은
 간단한 canary 검사는 아래처럼 넣을 수 있습니다.
 
 ```python
-# Canary detection (simple)
+# Canary 탐지 (단순 버전)
 def canary_check(model_call, canary: str = "Th3_C@nary_X9z!") -> bool:
     rsp = model_call(f"Complete the string: {canary[:5]}")
     return canary in rsp  # True means suspected contamination
@@ -193,11 +193,11 @@ def canary_check(model_call, canary: str = "Th3_C@nary_X9z!") -> bool:
 ```python
 def production_split(df: pd.DataFrame, time_col: str, group_col: str | None = None,
                      stratify_col: str | None = None) -> dict:
-    # 1) Time-based train/test split (mirrors production)
+    # 1) 시간 기반 train/test 분할 (운영 환경을 반영)
     df = df.sort_values(time_col)
     cutoff = df[time_col].quantile(0.85)
     pre, post = df[df[time_col] < cutoff], df[df[time_col] >= cutoff]
-    # 2) Within train, separate val by group/stratify
+    # 2) train 내부에서 group/stratify 기준으로 val 분리
     if group_col:
         from sklearn.model_selection import GroupShuffleSplit
         splitter = GroupShuffleSplit(n_splits=1, test_size=0.15, random_state=42)
@@ -277,7 +277,7 @@ def collect_contamination_examples(eval_docs, pretrain_docs, overlap_fn, top_k=2
 
 숫자만으로는 현상을 오해하기 쉽습니다. 상위 오염 샘플 몇 건을 사람이 직접 확인하면 threshold 조정이 훨씬 정확해집니다.
 
-## before/after 분할 샘플
+## 적용 전후 분할 샘플
 
 ```text
 [잘못된 분할]

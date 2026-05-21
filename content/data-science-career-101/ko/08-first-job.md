@@ -76,8 +76,7 @@ last_reviewed: '2026-05-14'
 
 ## 실습: 90일 계획
 
-### Step 1 — Days 0-30: Listen
-
+### 단계 1 — 0-30일차: 경청하기
 ```text
 - ten 1:1s
 - catalog the data
@@ -86,8 +85,7 @@ last_reviewed: '2026-05-14'
 
 처음 한 달은 가능한 한 많이 듣는 편이 좋습니다. 팀이 중요하게 보는 문제와 데이터 소스를 파악해야 이후 제안의 품질이 달라집니다.
 
-### Step 2 — Days 31-60: Quick Wins
-
+### 단계 2 — 31-60일차: 빠른 성과
 ```text
 - one analysis or model PoC
 - one SQL efficiency win
@@ -95,8 +93,7 @@ last_reviewed: '2026-05-14'
 
 작은 승리는 신뢰의 출발점입니다. 거창한 변화보다 팀이 바로 체감할 수 있는 개선이 훨씬 효과적입니다.
 
-### Step 3 — Days 61-90: Propose
-
+### 단계 3 — 61-90일차: 제안하기
 ```text
 - one quarterly agenda item
 - include measurement plan
@@ -104,16 +101,14 @@ last_reviewed: '2026-05-14'
 
 이 단계부터는 제안이 필요합니다. 다만 아이디어만 말하지 말고 무엇을 어떻게 측정할지까지 붙여야 설득력이 생깁니다.
 
-### Step 4 — Data Map
-
+### 단계 4 — 데이터 맵
 ```markdown
 | Source | Owner | Freshness | Use |
 ```
 
 데이터 지도는 개인 메모가 아니라 팀 자산입니다. 누가 소유자인지, 얼마나 자주 갱신되는지, 어디에 쓰이는지 정리해 두면 반복 질문이 크게 줄어듭니다.
 
-### Step 5 — Decision Log
-
+### 단계 5 — 결정 로그
 ```text
 - decision / alternatives / rationale / impact
 ```

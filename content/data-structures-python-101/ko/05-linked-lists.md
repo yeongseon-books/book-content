@@ -66,20 +66,19 @@ last_reviewed: '2026-05-15'
 | 단일 연결 리스트 | 각 노드가 다음 노드만 가리키는 구조입니다 |
 | 이중 연결 리스트 | 각 노드가 이전 노드와 다음 노드를 모두 가리키는 구조입니다 |
 
-## Before / After
-
+## 적용 전후 비교
 배열 기반 구조와 연결 리스트 기반 구조가 중간 삭제를 어떻게 다르게 처리하는지 보겠습니다.
 
 ```python
-# before: delete from middle of list — O(n), shifts all subsequent elements
+# before: list 중간 삭제 — O(n), 뒤 원소를 모두 당겨야 함
 data = [10, 20, 30, 40, 50]
 data.pop(2)  # removes 30 — 40 and 50 shift left
 ```
 
 ```python
-# after: delete from middle of linked list — O(1), change pointers only
+# after: linked list 중간 삭제 — O(1), 포인터만 변경
 # node_b.next = node_b.next.next
-# skip node 30 and connect 20 -> 40
+# 30 노드를 건너뛰고 20 -> 40으로 연결
 ```
 
 여기서 연결 리스트의 장단점이 동시에 드러납니다. 삭제 자체는 포인터 변경만으로 끝나지만, 삭제할 노드를 찾기까지는 보통 순차 탐색이 필요합니다. 그래서 “무엇을 빨리 하려는 구조인가”를 분리해서 봐야 합니다.
@@ -233,8 +232,7 @@ dll.prepend("Z")
 print(dll)  # Z <-> A <-> B <-> C
 ```
 
-### Step 5: Cycle detection (Floyd's algorithm)
-
+### 단계 5: 순환 감지 (Floyd 알고리즘)
 ```python
 def has_cycle(head: Node) -> bool:
     slow = fast = head

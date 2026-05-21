@@ -329,7 +329,7 @@ def predict(model, text):
     log_ham = math.log(model["P_ham"])
 
     for word in text.split():
-        # Laplace smoothing: (count + 1) / (total + V)
+        # 라플라스 평활화: (개수 + 1) / (전체 + V)
         p_w_spam = (model["spam_words"][word] + 1) / (model["total_spam"] + model["V"])
         p_w_ham = (model["ham_words"][word] + 1) / (model["total_ham"] + model["V"])
         log_spam += math.log(p_w_spam)

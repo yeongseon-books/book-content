@@ -28,7 +28,6 @@ last_reviewed: '2026-05-12'
 
 분할 정복은 그 패턴 가운데에서도 특히 중요합니다. 이진 탐색, 병합 정렬, 퀵 정렬처럼 이미 본 알고리즘들이 모두 이 아이디어 위에 서 있습니다.
 
-
 ![Algorithms with Python 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/05/05-01-big-picture.ko.png)
 *Algorithms with Python 101 5장 흐름 개요*
 
@@ -71,8 +70,7 @@ factorial(4) → 4 × factorial(3)
 | Divide and conquer | 문제를 나누고, 풀고, 합치는 전략입니다 |
 | Tail recursion | 마지막 연산이 재귀 호출인 형태입니다 |
 
-## Before / After
-
+## 적용 전후 비교
 리스트 합계를 구하는 두 가지 방법입니다.
 
 ```python
@@ -138,7 +136,7 @@ factorial_trace(4)
 #   factorial(3) called
 #     factorial(2) called
 #       factorial(1) called
-#       base case: return 1
+#       base case: 1 반환
 #     factorial(2) = 2
 #   factorial(3) = 6
 # factorial(4) = 24
@@ -161,8 +159,8 @@ def power(base: int, exp: int) -> int:
 print(power(2, 10))   # 1024
 print(power(3, 5))    # 243
 
-# Comparison: naive approach is O(n), D&C is O(log n)
-# Computing 2^1000 takes ~1000 vs ~10 multiplications
+# 비교: naive approach는 O(n), D&C는 O(log n)
+# 2^1000 계산은 곱셈이 약 1000회 vs 약 10회 필요
 ```
 
 문제를 반씩 줄이면 반복 횟수가 크게 줄어든다는 점을 잘 보여 주는 예시입니다. 분할 정복이 단순한 설명이 아니라 실제 성능 개선으로 이어진다는 사실이 중요합니다.
@@ -192,13 +190,13 @@ def hanoi(n: int, source: str, target: str, auxiliary: str):
     hanoi(n - 1, auxiliary, target, source)
 
 hanoi(3, "A", "C", "B")
-# Disk 1: A -> C
-# Disk 2: A -> B
-# Disk 1: C -> B
-# Disk 3: A -> C
-# Disk 1: B -> A
-# Disk 2: B -> C
-# Disk 1: A -> C
+# 원판 1: A -> C
+# 원판 2: A -> B
+# 원판 1: C -> B
+# 원판 3: A -> C
+# 원판 1: B -> A
+# 원판 2: B -> C
+# 원판 1: A -> C
 ```
 
 하노이 탑은 재귀 구조를 이해하기에 아주 좋은 문제입니다. 작은 문제를 먼저 해결해야 큰 문제를 풀 수 있다는 분할 정복 감각도 분명하게 드러납니다.
@@ -206,7 +204,7 @@ hanoi(3, "A", "C", "B")
 ### 단계 5: 재귀를 반복으로 변환하기
 
 ```python
-# Recursive factorial → iterative factorial
+# 재귀 factorial → 반복 factorial
 def factorial_iter(n: int) -> int:
     result = 1
     for i in range(2, n + 1):
@@ -215,7 +213,7 @@ def factorial_iter(n: int) -> int:
 
 print(factorial_iter(10))  # 3628800
 
-# Recursive fibonacci → memoized fibonacci
+# 재귀 fibonacci → memoized fibonacci
 from functools import lru_cache
 
 @lru_cache(maxsize=None)
@@ -227,7 +225,7 @@ def fibonacci_memo(n: int) -> int:
 
 print(fibonacci_memo(50))  # 12586269025
 
-# Python recursion depth limit
+# Python recursion depth 제한
 import sys
 print(f"Max recursion depth: {sys.getrecursionlimit()}")  # default 1000
 ```
@@ -282,57 +280,6 @@ print(f"Max recursion depth: {sys.getrecursionlimit()}")  # default 1000
 ## 정리와 다음 글
 
 재귀는 함수가 자기 자신을 호출하는 기법이고, 분할 정복은 그 재귀를 이용해 문제를 체계적으로 쪼개는 전략입니다. 다음 글에서는 중복 계산을 본격적으로 줄이는 도구인 동적 계획법을 다룹니다.
-
-## 실전 패턴 추가: 정렬과 탐색 구현을 문제 유형별로 선택하기
-
-알고리즘 문제에서는 코드 길이보다 선택 기준이 더 중요합니다. 입력 크기, 데이터 분포, 정렬 여부에 따라 정렬/탐색 전략이 달라집니다. 아래 예시는 같은 정수 배열을 다루더라도 어떤 조건에서 어떤 구현을 고르는지 보여 줍니다.
-
-```python
-def binary_search(nums: list[int], target: int) -> int:
-    left, right = 0, len(nums) - 1
-    while left <= right:
-        mid = (left + right) // 2
-        if nums[mid] == target:
-            return mid
-        if nums[mid] < target:
-            left = mid + 1
-        else:
-            right = mid - 1
-    return -1
-
-
-def merge_sort(nums: list[int]) -> list[int]:
-    if len(nums) <= 1:
-        return nums
-    mid = len(nums) // 2
-    left = merge_sort(nums[:mid])
-    right = merge_sort(nums[mid:])
-
-    merged: list[int] = []
-    i = j = 0
-    while i < len(left) and j < len(right):
-        if left[i] <= right[j]:
-            merged.append(left[i])
-            i += 1
-        else:
-            merged.append(right[j])
-            j += 1
-    merged.extend(left[i:])
-    merged.extend(right[j:])
-    return merged
-
-
-def quick_sort(nums: list[int]) -> list[int]:
-    if len(nums) <= 1:
-        return nums
-    pivot = nums[len(nums) // 2]
-    less = [x for x in nums if x < pivot]
-    equal = [x for x in nums if x == pivot]
-    greater = [x for x in nums if x > pivot]
-    return quick_sort(less) + equal + quick_sort(greater)
-```
-
-실무 판단은 보통 이렇게 정리됩니다. 이미 정렬된 리스트에서 존재 여부를 반복 조회하면 이진 탐색이 기본 선택입니다. 입력이 계속 바뀌고 안정 정렬이 필요하면 병합 정렬 계열이 유리하고, 평균 성능과 구현 단순성을 우선하면 퀵 정렬 계열이 자주 선택됩니다. 코딩 테스트에서는 Python 내장 `sort()`가 Timsort 기반이라 거의 항상 가장 실용적인 기본값이지만, 원리를 직접 구현해 보면 경계 조건과 복잡도 해석 능력이 크게 좋아집니다.
 
 ## 심화 실전 노트: 재귀를 설계할 때 먼저 고정할 세 가지
 
@@ -406,7 +353,6 @@ divide_template([5,1,9,3])
 ```python
 import time
 
-
 def benchmark(func, *args, repeat: int = 5) -> float:
     best = float("inf")
     for _ in range(repeat):
@@ -449,123 +395,6 @@ E. 해답 없음 케이스: 종료 조건 검증
 - "필요하면 정답 유지 조건을 짧게 증명하겠습니다."
 
 이 스크립트를 반복하면 설명의 밀도가 올라가고, 구현 중 길을 잃는 빈도가 줄어듭니다.
-
-## 케이스 스터디 확장: 입력 규모가 커질 때의 판단
-
-### 시나리오 1: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
-
-### 시나리오 2: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
-
-### 시나리오 3: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
-
-### 시나리오 4: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
-
-### 시나리오 5: 제약 기반 의사결정 로그
-
-문제를 처음 읽을 때 정답 코드보다 먼저 남겨야 하는 기록은 입력 크기, 허용 복잡도, 실패 가능성이 큰 경계 조건입니다. 이 기록이 있으면 구현 도중 방향이 흔들려도 빠르게 복구할 수 있습니다.
-
-| 항목 | 기록 예시 | 확인 이유 |
-|------|-----------|-----------|
-| 입력 상한 | `N=200000` | 중첩 루프 배제 판단 |
-| 목표 복잡도 | `O(n log n)` 이하 | 시간 초과 예방 |
-| 경계 조건 | 빈 입력/중복/음수 | 런타임 오류 예방 |
-
-```python
-def decision_log(n_max: int) -> str:
-    if n_max <= 5_000:
-        return "O(n^2)까지 검토"
-    if n_max <= 200_000:
-        return "O(n log n) 중심"
-    return "O(n) 우선"
-
-print(decision_log(200_000))
-```
-
-작은 보조 함수를 두면 문제별 판단 근거를 팀 문서와 코드 리뷰에 같은 형태로 남길 수 있습니다. 코딩 테스트 연습에서도 같은 틀을 반복하면 풀이 속도와 정확도가 함께 올라갑니다.
 
 ## 처음 질문으로 돌아가기
 

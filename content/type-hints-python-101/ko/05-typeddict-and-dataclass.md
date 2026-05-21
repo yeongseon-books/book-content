@@ -86,7 +86,7 @@ def create_user(name: str, age: int) -> User:
     return {"name": name, "age": age}
 
 user = create_user("Alice", 30)
-# user["nmae"]  # mypy 오류: TypedDict "User"에 없는 키
+# user["nmae"] # mypy 오류: TypedDict "User"에 없는 키
 ```
 
 ## 단계별로 익히기
@@ -105,7 +105,7 @@ class UserProfile(TypedDict):
 profile: UserProfile = {"name": "Alice", "age": 30, "email": "alice@example.com"}
 
 # 필수 키 누락 — mypy 오류
-# bad: UserProfile = {"name": "Alice", "age": 30}
+# 불량: UserProfile = {"name": "Alice", "age": 30}
 ```
 
 런타임에서는 여전히 일반 `dict`입니다. 타입 정보는 분석기에게만 의미가 있습니다.
@@ -163,7 +163,7 @@ class Point:
     y: float
 
 point = Point(1.0, 2.0)
-# point.x = 3.0  # FrozenInstanceError — 불변 객체
+# point.x = 3.0 # FrozenInstanceError — 불변
 ```
 
 불변 dataclass는 해시 가능하므로 딕셔너리 키나 집합 원소로 쓰기 좋습니다.
@@ -330,7 +330,7 @@ example.py:7: error: Incompatible types (expression has type "str", TypedDict it
 profile: Profile = {"username": "min", "age": 20}
 ```
 
-## dataclass before/after
+## dataclass 적용 전후 비교
 
 ```python
 # before
@@ -438,7 +438,7 @@ Found 3 errors in 1 file (checked 1 source file)
 
 위 메시지는 각각 키 타입 불일치, Union 좁히기 누락, Optional 처리 누락을 의미합니다. 즉, 정적 분석기가 실제 운영 버그 후보를 실행 전에 보여 준다는 뜻입니다.
 
-## before/after 요약
+## 적용 전후 요약
 
 | 구분 | before (느슨한 타입) | after (구체 타입) |
 | --- | --- | --- |

@@ -57,8 +57,7 @@ last_reviewed: '2026-05-15'
 - 조정: 여러 노드가 하나의 결정을 함께 맞추는 과정입니다.
 - **부분 장애**: 어떤 노드는 살아 있고 어떤 노드는 죽어 있는 상태입니다. 분산 환경의 대표적인 조건입니다.
 
-## Before / After
-
+## 적용 전후 비교
 **Before — 단일 머신 직관**
 
 ```text
@@ -140,8 +139,8 @@ requests.get("http://127.0.0.1:8001/slow", timeout=1)
 # 5_clock.py
 import time
 print("server time:", time.time())
-# run the same code on another machine and the two values
-# will not match exactly even with NTP (millisecond-level drift)
+# 같은 코드를 다른 머신에서 실행하면 두 값은
+# NTP를 사용해도 정확히 일치하지 않음(ms 단위 drift)
 ```
 
 실제 순서를 벽시계 시간으로 결정하면 안 됩니다. 6편의 합의와 8편의 메시지 순서 이야기가 이 문제를 직접 다룹니다.

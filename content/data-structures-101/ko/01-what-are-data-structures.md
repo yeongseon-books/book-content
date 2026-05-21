@@ -76,7 +76,7 @@ last_reviewed: '2026-05-12'
 **Before — without thinking about data structures:**
 
 ```python
-# Find a specific ID among 10 million users
+# 1천만 사용자 중 특정 ID 찾기
 users = [{"id": i, "name": f"user{i}"} for i in range(10_000_000)]
 
 def find_user(target_id: int):
@@ -85,19 +85,19 @@ def find_user(target_id: int):
             return user
     return None
 
-# 5 million comparisons on average, 10 million in the worst case
+# 평균 500만 번 비교, 최악 1천만 번 비교
 ```
 
 **After — with a data structure in mind:**
 
 ```python
-# Index the same data with a hash table
+# 같은 데이터를 hash table로 인덱싱
 users = {i: {"id": i, "name": f"user{i}"} for i in range(10_000_000)}
 
 def find_user(target_id: int):
     return users.get(target_id)
 
-# One comparison on average
+# 평균 한 번 비교
 ```
 
 겉보기에는 둘 다 같은 데이터를 다루지만, 하나는 선형 탐색이고 다른 하나는 키 기반 인덱싱입니다. 실무 성능 차이는 대부분 이렇게 단순한 선택에서 시작합니다.
@@ -185,23 +185,23 @@ for ds, ops in operations.items():
 ### 4단계: 잘못 고른 구조의 비용
 
 ```python
-# Scenario: process events arriving every second by priority
+# 시나리오: 매초 들어오는 이벤트를 우선순위로 처리
 import heapq
 
 events = []
-# Wrong choice: sort on every insert
+# 잘못된 선택: 삽입할 때마다 정렬
 def add_wrong(priority, event):
     events.append((priority, event))
     events.sort()
 
-# Right choice: a heap
+# 올바른 선택: heap
 heap = []
 def add_right(priority, event):
     heapq.heappush(heap, (priority, event))
 
-# add_wrong is O(n log n) per insert
-# add_right is O(log n) per insert
-# At 1 million events per day, that is a 1000x difference
+# add_wrong는 삽입마다 O(n log n)
+# add_right는 삽입마다 O(log n)
+# 하루 100만 이벤트면 1000배 차이
 ```
 
 자료구조를 잘못 고르면 같은 기능도 비용 구조가 완전히 달라집니다. 운영에서 병목은 대개 이런 반복 연산 경로에서 터집니다.

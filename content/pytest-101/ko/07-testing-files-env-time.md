@@ -26,7 +26,6 @@ last_reviewed: '2026-05-12'
 
 이 영역이 어려운 이유는 코드 자체보다 실행 환경이 결과를 바꿔 버리기 때문입니다. 같은 코드인데도 오늘은 통과하고 내일은 실패하는 테스트가 생긴다면, 대개 파일 경로 충돌, 전역 환경변수 오염, 현재 시각 의존성이 원인입니다.
 
-
 ![pytest 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/07/07-01-big-picture.ko.png)
 *pytest 101 7장 흐름 개요*
 
@@ -65,12 +64,11 @@ time → varies per execution       freezegun → fixed time
 | freezegun | `datetime.now()`를 고정된 시각으로 대체하는 라이브러리입니다 |
 | flaky test | 같은 코드에서도 간헐적으로 실패하는 테스트입니다 |
 
-## Before / After
-
+## 적용 전후 비교
 실제 경로를 쓰는 테스트와 `tmp_path` 기반 테스트를 비교해 보겠습니다.
 
 ```python
-# before: real paths — risk of collisions between tests
+# 기존: 실제 경로 사용 — 테스트 간 충돌 위험
 import os
 
 def test_write_file():
@@ -82,12 +80,12 @@ def test_write_file():
 ```
 
 ```python
-# after: tmp_path — automatic isolation and cleanup
+# 개선: tmp_path — 자동 격리와 정리
 def test_write_file(tmp_path):
     filepath = tmp_path / "test_output.txt"
     filepath.write_text("hello")
     assert filepath.read_text() == "hello"
-    # no cleanup needed — pytest handles it
+    # cleanup 불필요 — pytest가 처리
 ```
 
 ## 단계별 실습
@@ -136,8 +134,7 @@ def test_nested_directory(tmp_path):
     assert filepath.read_text() == "deep content"
 ```
 
-### Step 2: Multi-File Processing Test
-
+### 단계 2: 다중 파일 처리 테스트
 ```python
 # csv_processor.py
 from pathlib import Path
@@ -181,8 +178,7 @@ def test_merge_empty_dir(tmp_path):
     assert count == 0
 ```
 
-### Step 3: Environment Variable Testing
-
+### 단계 3: 환경 변수 테스트
 ```python
 # app_config.py
 import os
@@ -225,8 +221,7 @@ def test_debug_mode(monkeypatch):
     assert config["debug"] is True
 ```
 
-### Step 4: Freezing Time
-
+### 단계 4: 시간 고정
 ```python
 # billing.py
 from datetime import datetime
@@ -268,8 +263,7 @@ def test_days_until_expiry():
         assert days_until_expiry(expiry) == 10
 ```
 
-### Step 5: Using freezegun
-
+### 단계 5: freezegun 사용
 ```bash
 pip install freezegun
 ```
@@ -351,7 +345,6 @@ from datetime import datetime
 from pathlib import Path
 import os
 
-
 def write_report(path: Path, message: str) -> None:
     mode = os.getenv("APP_MODE", "dev")
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -363,7 +356,6 @@ def write_report(path: Path, message: str) -> None:
 from datetime import datetime
 from unittest.mock import patch
 from reporter import write_report
-
 
 def test_write_report(tmp_path, monkeypatch):
     monkeypatch.setenv("APP_MODE", "prod")
@@ -384,7 +376,6 @@ def test_write_report(tmp_path, monkeypatch):
 ```python
 from freezegun import freeze_time
 from reporter import write_report
-
 
 @freeze_time("2025-05-01 09:30:00")
 def test_write_report_with_freezegun(tmp_path, monkeypatch):
@@ -415,7 +406,7 @@ test_reporter.py::test_write_report_with_freezegun PASSED
 | `datetime.now()` 직접 비교 | 날짜 바뀌면 실패 | patch 또는 freezegun |
 | 로컬 타임존 가정 | CI에서 불일치 | UTC 또는 명시 정책 |
 
-## Before/After 리팩터링
+## 적용 전과 후: 리팩터링
 
 ```python
 # before
@@ -440,12 +431,10 @@ def is_expired(expiry_str: str, now_fn):
 ```python
 from datetime import datetime
 
-
 def test_is_expired():
     now = lambda: datetime(2025, 1, 10, 0, 0, 0)
     assert is_expired("2025-01-09T00:00:00", now) is True
 ```
-
 
 ## 시간대와 경계값 테스트
 
@@ -454,7 +443,6 @@ def test_is_expired():
 ```python
 # scheduler.py
 from datetime import datetime
-
 
 def is_month_end(now: datetime) -> bool:
     next_day = now.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -493,11 +481,9 @@ def use_new_checkout() -> bool:
 ```python
 from feature_flag import use_new_checkout
 
-
 def test_feature_off(monkeypatch):
     monkeypatch.setenv("FEATURE_NEW_CHECKOUT", "off")
     assert use_new_checkout() is False
-
 
 def test_feature_on(monkeypatch):
     monkeypatch.setenv("FEATURE_NEW_CHECKOUT", "on")
@@ -510,93 +496,6 @@ def test_feature_on(monkeypatch):
 - 줄바꿈 차이를 고려했는가
 - 테스트 간 파일명 충돌이 없는가
 - 임시 디렉터리 정리를 수동으로 하지 않는가
-
-
-## 심화 실습 세트: 실패를 빠르게 재현하고 고정하는 루틴
-
-아래 실습은 글 주제와 무관하게 pytest 프로젝트에서 반복적으로 쓰는 루틴입니다. 핵심은 실패를 의도적으로 만들고, 실패 메시지를 읽고, 테스트를 보강하고, 다시 통과시키는 사이클을 짧게 반복하는 것입니다.
-
-### 실습 A: 입력 검증 함수
-
-```python
-# app/input_guard.py
-
-def require_non_empty(value: str) -> str:
-    if value is None:
-        raise TypeError("value cannot be None")
-    if value.strip() == "":
-        raise ValueError("value cannot be blank")
-    return value.strip()
-```
-
-```python
-# tests/test_input_guard.py
-import pytest
-from app.input_guard import require_non_empty
-
-
-def test_require_non_empty_ok():
-    assert require_non_empty("  hello  ") == "hello"
-
-
-@pytest.mark.parametrize("bad", ["", "   ", "\n\t"])
-def test_require_non_empty_blank(bad):
-    with pytest.raises(ValueError, match="blank"):
-        require_non_empty(bad)
-
-
-def test_require_non_empty_none():
-    with pytest.raises(TypeError, match="None"):
-        require_non_empty(None)
-```
-
-```bash
-pytest tests/test_input_guard.py -v
-```
-
-```text
-tests/test_input_guard.py::test_require_non_empty_ok PASSED
-tests/test_input_guard.py::test_require_non_empty_blank[] PASSED
-tests/test_input_guard.py::test_require_non_empty_blank[   ] PASSED
-tests/test_input_guard.py::test_require_non_empty_blank[\n\t] PASSED
-tests/test_input_guard.py::test_require_non_empty_none PASSED
-========================= 5 passed =========================
-```
-
-### 실습 B: 실패 유도 후 원인 파악
-
-함수 구현을 일부러 아래처럼 바꿉니다.
-
-```python
-# 잘못된 구현 예시
-# if value.strip() == "":
-#     return value
-```
-
-다시 실행하면 실패가 즉시 재현됩니다.
-
-```text
-FAILED tests/test_input_guard.py::test_require_non_empty_blank[]
-E   Failed: DID NOT RAISE <class 'ValueError'>
-```
-
-이 출력 하나로 계약 위반 지점을 바로 확인할 수 있습니다.
-
-### 실습 C: 리팩터링 안정성 확인
-
-```python
-# app/input_guard.py (refactor)
-
-def require_non_empty(value: str) -> str:
-    if value is None:
-        raise TypeError("value cannot be None")
-    normalized = value.strip()
-    if normalized == "":
-        raise ValueError("value cannot be blank")
-    return normalized
-```
-
-같은 테스트를 실행해 모두 통과하면, 구조를 바꿔도 계약은 유지된 것입니다.
 
 ## 터미널 옵션 조합
 
@@ -634,7 +533,6 @@ def test_regression_cases(raw, exc):
 - 경계값 입력이 포함되어 있는가
 - 정상/오류 경로를 모두 검증하는가
 - 테스트 추가가 함수 복사 대신 데이터 추가로 끝나는가
-
 
 ## 추가 케이스 스터디: PR 리뷰에서 자주 보는 개선 포인트
 
@@ -696,14 +594,12 @@ tests/test_discount.py::test_discount_price_invalid[1000-1.1] PASSED
 - 실패 시 메시지로 원인을 알 수 있는가
 - 데이터 추가만으로 케이스 확장이 가능한 구조인가
 
-
 ## 미니 점검표
 
 - 실패 케이스를 최소 3개 이상 유지합니다.
 - 경계값(최소/최대/빈값)을 포함합니다.
 - 실패 메시지가 의미 있는지 확인합니다.
 - CI에서 동일 명령으로 재현 가능한지 확인합니다.
-
 
 ## 처음 질문으로 돌아가기
 

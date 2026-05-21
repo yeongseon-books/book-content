@@ -150,14 +150,14 @@ def map_reduce_summarize(long_document: str) -> str:
     chunks = splitter.split_text(long_document)
     print(f"  chunks: {len(chunks)}")
 
-    # Map: summarize each chunk independently
+    # 맵: 각 청크를 독립적으로 요약
     chunk_summaries = []
     for i, chunk in enumerate(chunks):
         summary = map_chain.invoke({"chunk": chunk})
         chunk_summaries.append(summary)
         print(f"  chunk {i + 1}/{len(chunks)} summarized")
 
-    # Reduce: merge all summaries
+    # 축소: 모든 요약을 병합합니다.
     combined = "\n\n".join(
         f"[Segment {i + 1}] {s}" for i, s in enumerate(chunk_summaries)
     )
@@ -392,20 +392,20 @@ app = Flask(__name__)
 def summarize_document():
     text = request.json['text']
     style = request.json.get('style', 'technical')
-    # 실제 구현에서는 SUMMARY_SYSTEM_PROMPT를 사용한 모델 호출
+    # 실제로 실제로 SUMMARY_SYSTEM_PROMPT를 실행하여 호출합니다.
     return jsonify({'summary': f'[{style}] 요약 예시: {text[:120]}...'})
 
 @app.post('/documents/extract')
 def extract_fields():
     text = request.json['text']
     schema = request.json['schema']
-    # 실제 구현에서는 EXTRACTION_SYSTEM_PROMPT + JSON parser
+    # 실제 구현에서는 EXTRACTION_SYSTEM_PROMPT + JSON 파서
     return jsonify({'result': {'company': 'ABCTech', 'salary_range': None}, 'schema': schema})
 
 @app.post('/documents/classify')
 def classify_document():
     text = request.json['text']
-    # 실제 구현에서는 CLASSIFICATION_SYSTEM_PROMPT
+    # CLASSIFICATION_SYSTEM_PROMPT의 실제 구현
     return jsonify({'category': 'Technology/IT', 'confidence': 0.91, 'preview': text[:60]})
 ```
 

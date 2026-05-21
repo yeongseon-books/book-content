@@ -69,8 +69,7 @@ docs/api.md        →  detailed reference: specs for every function/class
 | mkdocstrings | docstring에서 API 문서를 자동 생성하는 MkDocs 플러그인 | MkDocs plugin |
 | GitHub Pages | 무료 정적 사이트 호스팅 | `gh-pages` branch |
 
-## Before / After
-
+## 적용 전후 비교
 **Before (문서 없음)**
 
 ```text
@@ -99,7 +98,7 @@ https://yourname.github.io/mylib/
 
 ## 단계별 실습
 
-### Step 1. README 작성
+### 단계 1. README 작성
 
 ````markdown
 # mylib
@@ -140,7 +139,7 @@ pytest tests/
 MIT
 ````
 
-### Step 2. docstring 추가
+### 단계 2. docstring 추가
 
 ```python
 # src/mylib/core.py
@@ -160,7 +159,7 @@ def greet(name: str) -> str:
     return f"Hello, {name}!"
 ```
 
-### Step 3. MkDocs 설정
+### 단계 3. MkDocs 설정
 
 ```bash
 pip install mkdocs mkdocs-material mkdocstrings[python]
@@ -188,7 +187,7 @@ echo "# mylib" > docs/index.md
 echo "# Guide" > docs/guide.md
 ```
 
-### Step 4. API Reference 자동 생성
+### 단계 4. API Reference 자동 생성
 
 ```markdown
 <!-- docs/api.md -->
@@ -205,7 +204,7 @@ mkdocs serve
 # INFO - Serving on http://127.0.0.1:8000/
 ```
 
-### Step 5. GitHub Pages 배포
+### 단계 5. GitHub Pages 배포
 
 ```bash
 mkdocs gh-deploy

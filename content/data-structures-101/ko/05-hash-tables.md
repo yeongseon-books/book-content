@@ -78,7 +78,7 @@ def find(uid):
         if k == uid:
             return v
     return None
-# average O(n)
+# 평균 O(n)
 ```
 
 **After — searching keys with a dict:**
@@ -192,7 +192,7 @@ t.put("a", 1); t.put("b", 2)
 ### 4단계: 해시 함수 품질의 영향
 
 ```python
-# Bad hash function: always returns the same value
+# 나쁜 hash function: 항상 같은 값을 반환
 class BadHash:
     def __init__(self, val):
         self.val = val
@@ -221,17 +221,17 @@ print(f"good hash: {(time.perf_counter() - start) * 1000:.0f} ms")
 ### 5단계: 가변 객체는 키가 될 수 없다
 
 ```python
-# What happens if you use a mutable object as a dict key?
+# mutable object를 dict key로 사용하면 어떻게 될까?
 key = [1, 2, 3]
 try:
     {key: "value"}    # TypeError: unhashable type: 'list'
 except TypeError as e:
     print(f"error: {e}")
 
-# A tuple is immutable, so it works as a key
+# tuple은 immutable이라 key로 사용 가능
 print({(1, 2, 3): "value"})
 
-# A frozenset works too
+# frozenset도 사용 가능
 print({frozenset({1, 2}): "value"})
 ```
 

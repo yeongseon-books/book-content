@@ -107,7 +107,7 @@ except sqlite3.Error as exc:
 
 3.11 미만에서는 `exc.args[0]` 문자열을 파싱하는 외에는 방법이 없으므로, 운영 코드에서는 가능한 한 3.11+를 권장합니다.
 
-## Before / After: 예외 처리 안티패턴 vs 권장 패턴
+## 적용 전과 후: 예외 처리 안티패턴 vs 권장 패턴
 
 ### Before: 모든 예외를 같은 방식으로 처리
 
@@ -290,8 +290,8 @@ async def handle_duplicate_email(_, exc: DuplicateEmail):
 
 @app.exception_handler(TransientDBError)
 async def handle_transient(_, exc: TransientDBError):
-    # The retry decorator already exhausted max_attempts.
-    # Tell the client to back off; do not loop again here.
+    # 재시도 데코레이터가 이미 최대 시도 횟수를 소진했습니다.
+    # 클라이언트에 대기를 지시합니다; 여기서 다시 루프하지 마세요.
     raise HTTPException(
         status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
         detail="database temporarily unavailable",
@@ -352,204 +352,6 @@ ProgrammingError -> 즉시 수정 대상
 ```
 
 구조화 로그 필드(`error.class`, `error.sqlite_name`, `retry.attempt`)를 고정하면 예외 비율의 추세를 대시보드에서 바로 추적할 수 있습니다.
-
-## 심화 실전 부록: 운영에서 바로 쓰는 앵커 모음
-
-### 1) sqlite3와 psycopg2 비교 코드
-
-```python
-# sqlite3
-import sqlite3
-sconn = sqlite3.connect("app.db", timeout=5.0)
-scur = sconn.cursor()
-scur.execute("SELECT 1")
-print(scur.fetchone())
-scur.close()
-sconn.close()
-
-# psycopg2
-import psycopg2
-pconn = psycopg2.connect("dbname=app user=postgres password=secret host=127.0.0.1")
-pcur = pconn.cursor()
-pcur.execute("SELECT 1")
-print(pcur.fetchone())
-pcur.close()
-pconn.close()
-```
-
-두 driver 모두 `connect -> cursor -> execute -> fetch -> close` 경계가 동일합니다. 이 공통 경계를 기준으로 테스트를 작성하면 이식성과 운영 안정성이 동시에 올라갑니다.
-
-### 2) connection lifecycle 다이어그램
-
-```text
-Client Request
-  -> Connection Open
-  -> Cursor Open
-  -> SQL Execute
-  -> Fetch/Validate
-  -> Commit or Rollback
-  -> Cursor Close
-  -> Connection Close
-Response
-```
-
-트랜잭션이 길어지는 구간은 대개 `SQL Execute`와 `Commit` 사이입니다. 이 구간 시간을 측정해야 lock 경합 원인을 찾을 수 있습니다.
-
-### 3) SQL 인젝션 재현과 차단
-
-```python
-import sqlite3
-
-def demo_injection():
-    con = sqlite3.connect(":memory:")
-    con.executescript(
-        "CREATE TABLE users(id INTEGER PRIMARY KEY, name TEXT);"
-        "INSERT INTO users(name) VALUES ('alice');"
-        "INSERT INTO users(name) VALUES ('bob');"
-    )
-
-    payload = "alice' OR 1=1 --"
-
-    unsafe_sql = f"SELECT id, name FROM users WHERE name = '{payload}'"
-    unsafe_rows = con.execute(unsafe_sql).fetchall()
-
-    safe_rows = con.execute(
-        "SELECT id, name FROM users WHERE name = ?", (payload,)
-    ).fetchall()
-
-    return unsafe_rows, safe_rows
-```
-
-문자열 결합 SQL은 입력값이 문법으로 재해석되는 순간 무너집니다. 바인딩 SQL은 입력값을 값으로만 다룹니다.
-
-### 4) isolation level 비교표
-
-| 항목 | SQLite DEFERRED | SQLite IMMEDIATE | SQLite EXCLUSIVE | PostgreSQL READ COMMITTED |
-| --- | --- | --- | --- | --- |
-| 트랜잭션 시작 시 lock | 없음 | RESERVED | EXCLUSIVE | MVCC 스냅샷 |
-| write 충돌 감지 시점 | 늦음 | 빠름 | 매우 빠름 | 행/인덱스 잠금 시 |
-| 동시 read 허용 | 높음 | 높음 | 낮음 | 높음 |
-| 운영 기본값 추천 | 보통 | 높음 | 제한적 | 높음 |
-
-SQLite에서는 write가 포함되면 `IMMEDIATE`가 충돌을 앞당겨 장애 분석을 쉽게 만듭니다.
-
-### 5) connection pool 메트릭 템플릿
-
-```python
-from dataclasses import dataclass
-import time
-
-@dataclass
-class PoolMetric:
-    wait_ms: float
-    in_use: int
-    busy_rate: float
-
-def report_pool(wait_ms: float, in_use: int, busy_count: int, total_count: int) -> PoolMetric:
-    busy_rate = 0.0 if total_count == 0 else busy_count / total_count
-    metric = PoolMetric(wait_ms=wait_ms, in_use=in_use, busy_rate=busy_rate)
-    print(f"metric=pool.wait_ms value={metric.wait_ms:.1f}")
-    print(f"metric=pool.in_use value={metric.in_use}")
-    print(f"metric=db.busy_rate value={metric.busy_rate:.4f}")
-    return metric
-```
-
-풀 크기 증가보다 `wait_ms`와 `busy_rate` 추세를 먼저 봐야 병목 원인을 정확히 분리할 수 있습니다.
-
-### 6) async aiosqlite 트랜잭션 패턴
-
-```python
-import aiosqlite
-from contextlib import asynccontextmanager
-
-@asynccontextmanager
-async def tx(conn: aiosqlite.Connection):
-    await conn.execute("BEGIN IMMEDIATE")
-    try:
-        yield conn
-        await conn.commit()
-    except Exception:
-        await conn.rollback()
-        raise
-
-async def create_note(conn: aiosqlite.Connection, body: str) -> int:
-    async with tx(conn):
-        cur = await conn.execute("INSERT INTO notes(body) VALUES (?)", (body,))
-        return cur.lastrowid
-```
-
-`aiosqlite`는 이벤트 루프를 보호하지만, writer 1개 제약은 그대로입니다. 트랜잭션 길이를 짧게 유지해야 체감 성능이 좋아집니다.
-
-### 7) 예외 계층 운영 트리
-
-```text
-DB-API Error
-├─ IntegrityError      -> 재시도 금지, 입력/업무 규칙 응답
-├─ OperationalError    -> SQLITE_BUSY/LOCKED만 제한적 재시도
-├─ ProgrammingError    -> 코드 수정, 즉시 알림
-├─ InterfaceError      -> 드라이버 사용 오류, 즉시 수정
-└─ DatabaseError       -> 손상 가능성 점검, 복구 런북 실행
-```
-
-예외 클래스와 SQLite 코드(`sqlite_errorname`)를 함께 기록하면 재시도 정책을 정밀하게 적용할 수 있습니다.
-
-### 8) 프로덕션 구성 템플릿
-
-```python
-import sqlite3
-
-def open_prod(path: str) -> sqlite3.Connection:
-    conn = sqlite3.connect(path, timeout=5.0, isolation_level=None)
-    conn.execute("PRAGMA journal_mode=WAL")
-    conn.execute("PRAGMA synchronous=NORMAL")
-    conn.execute("PRAGMA foreign_keys=ON")
-    conn.execute("PRAGMA busy_timeout=5000")
-    conn.row_factory = sqlite3.Row
-    return conn
-```
-
-환경별 권장값:
-
-- 개발: `busy_timeout=1000`, 상세 SQL 로그 ON
-- 스테이징: `busy_timeout=3000`, slow query 임계치 150ms
-- 프로덕션: `busy_timeout=5000`, slow query 임계치 p95*2 기준
-
-### 9) 백업/복구 검증 템플릿
-
-```python
-import sqlite3
-
-def backup_and_check(src_path: str, dst_path: str):
-    src = sqlite3.connect(src_path)
-    dst = sqlite3.connect(dst_path)
-    try:
-        src.backup(dst)
-    finally:
-        src.close()
-        dst.close()
-
-    chk = sqlite3.connect(dst_path)
-    try:
-        result = chk.execute("PRAGMA integrity_check").fetchone()[0]
-        if result != "ok":
-            raise RuntimeError(result)
-    finally:
-        chk.close()
-```
-
-백업은 생성 성공보다 복구 성공이 중요합니다. 주기적으로 restore 리허설을 자동화해야 장애 시 복구 시간을 예측할 수 있습니다.
-
-### 10) 운영 체크리스트 확장
-
-- 트랜잭션 길이 p95를 측정하고 100ms 이상 구간을 분리합니다.
-- `SQLITE_BUSY` 비율과 retry 성공률을 같은 대시보드에서 봅니다.
-- slow query 로그에는 SQL 라벨, 경과 시간, row 수를 남깁니다.
-- PII가 포함될 수 있는 파라미터는 마스킹 후 기록합니다.
-- 릴리스 전 부하 테스트에서 lock 충돌 재현 스크립트를 실행합니다.
-- 배포 직후 `PRAGMA foreign_keys` 활성 상태를 점검합니다.
-- 백업 파일 무결성(`integrity_check`)과 복구 후 핵심 테이블 row count를 함께 검증합니다.
-
-부록의 목적은 새 개념 추가가 아니라 실전에서 반복되는 실패를 미리 차단하는 기본 템플릿을 제공하는 것입니다.
 
 ## 처음 질문으로 돌아가기
 

@@ -79,7 +79,7 @@ train = fetch_20newsgroups(subset="train", categories=categories)
 test = fetch_20newsgroups(subset="test", categories=categories)
 
 def clean(text: str) -> str:
-    # Strip headers, quotes, emails
+    # 헤더, 인용문, 이메일 제거
     text = re.sub(r"^(From|Subject|Lines|Organization):.*$", "", text, flags=re.M)
     text = re.sub(r"^>.*$", "", text, flags=re.M)
     text = re.sub(r"\S+@\S+", "", text)
@@ -130,10 +130,10 @@ print(f"Cleaned: {clean_acc:.4f}")
 
 ```python
 from sklearn.model_selection import train_test_split
-# Wrong: plain random split
+# 잘못된 방법: 단순 랜덤 분할
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
 
-# Right: stratify keeps class ratios stable
+# 올바른 방법: stratify로 클래스 비율을 안정적으로 유지
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, stratify=y, random_state=42
 )

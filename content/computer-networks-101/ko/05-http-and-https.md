@@ -72,8 +72,7 @@ HTTP는 백엔드, 프론트엔드, 모바일, 데이터 서비스, ML 서빙까
 | 멱등성 | 같은 요청을 여러 번 보내도 결과가 동일한 성질 (GET, PUT, DELETE) |
 | Content Negotiation | 클라이언트와 서버가 Accept/Content-Type으로 형식을 합의하는 과정 |
 
-## Before / After
-
+## 적용 전후 비교
 **Before — "HTTP는 브라우저가 알아서 하는 것"**
 
 ```text
@@ -152,7 +151,7 @@ print(r2.status_code)  # 304 Not Modified — 본문 전송 없음
 ### 4단계: 가장 작은 HTTP 서버
 
 ```python
-# server.py — Flask
+# server.py — 플라스크
 from flask import Flask, jsonify, request, abort
 
 app = Flask(__name__)

@@ -178,7 +178,7 @@ print(f"표본평균 std:  {means.std():.4f} (theory: 1/√30 = {1/30**0.5:.4f})
 ### 3단계 — 분포 시각화하기
 
 ```python
-# Histogram of sample means looks normal
+# 표본 평균의 히스토그램이 정규분포에 가까워 보입니다
 import matplotlib.pyplot as plt
 plt.hist(means, bins=40); plt.show()
 ```
@@ -223,7 +223,7 @@ for n in [10, 25, 50, 100, 400, 1000, 10000]:
 ```python
 import numpy as np
 rng = np.random.default_rng(0)
-# Even non-normal populations yield near-normal sample means
+# 비정규 모집단에서도 표본 평균은 거의 정규에 가깝다
 for dist in ["uniform", "exponential", "binomial"]:
     if dist == "uniform":
         s = rng.uniform(0, 1, (10_000, 30)).mean(axis=1)

@@ -68,12 +68,11 @@ Pipeline visualization:
 | pipe | 함수를 왼쪽에서 오른쪽으로 합성합니다 |
 | point-free style | 인자 이름을 드러내지 않고 함수 조합만으로 로직을 표현하는 스타일입니다 |
 
-## Before / After
-
+## 적용 전후 비교
 중첩 호출은 안쪽부터 해석해야 해서 읽기가 어렵습니다. 파이프라인은 실행 순서를 코드 순서와 맞춰 줍니다.
 
 ```python
-# before: nested calls — read from inside out
+# 이전: 중첩 호출 — 안쪽부터 읽어야 함
 result = format_output(
     sort_by_score(
         filter_passing(
@@ -86,7 +85,7 @@ result = format_output(
 ```
 
 ```python
-# after: pipeline — read top to bottom
+# 이후: pipeline — 위에서 아래로 읽음
 result = pipe(
     load_data,
     calculate_totals,
@@ -98,7 +97,7 @@ result = pipe(
 
 ## 단계별 실습
 
-### Step 1: compose와 pipe의 기본
+### 단계 1: compose와 pipe의 기본
 
 ```python
 from collections.abc import Callable
@@ -131,14 +130,14 @@ to_str = lambda x: f"Result: {x}"
 transform_c = compose(to_str, double, add_one)
 print(transform_c(5))  # Result: 12  — (5+1)*2 = 12
 
-# pipe: read order matches execution order
+# pipe: 읽는 순서가 실행 순서와 일치
 transform_p = pipe(add_one, double, to_str)
 print(transform_p(5))  # Result: 12
 ```
 
 실무에서는 `pipe`가 더 자주 읽기 좋습니다. 코드 순서와 실행 순서가 같아서 디버깅과 리뷰가 수월하기 때문입니다.
 
-### Step 2: 문자열 처리 파이프라인
+### 단계 2: 문자열 처리 파이프라인
 
 ```python
 import re
@@ -163,7 +162,7 @@ def truncate(max_len: int):
         return text[:max_len]
     return _truncate
 
-# slug generation pipeline
+# slug 생성 pipeline
 slugify = pipe(
     strip_whitespace,
     normalize_spaces,
@@ -182,7 +181,7 @@ print(slugify("  Functional Programming — A Composition Guide  "))
 
 문자열 정규화는 파이프라인의 장점을 가장 직관적으로 보여 줍니다. 단계마다 역할이 뚜렷해서 수정 포인트를 찾기도 쉽습니다.
 
-### Step 3: 데이터 처리 파이프라인
+### 단계 3: 데이터 처리 파이프라인
 
 ```python
 from collections.abc import Callable
@@ -196,7 +195,7 @@ def pipe_data(*funcs: Callable) -> Callable:
         return result
     return process
 
-# define each stage as an independent function
+# 각 stage를 독립 함수로 정의
 def parse_records(raw: list[str]) -> list[dict]:
     records = []
     for line in raw:
@@ -225,7 +224,7 @@ def format_table(records: list[dict]) -> str:
         lines.append(f"{r['name']:<10} {r['score']:>5} {r['grade']:>5}")
     return "\n".join(lines)
 
-# assemble the pipeline
+# pipeline 조립
 process_students = pipe_data(
     parse_records,
     add_grade,
@@ -244,7 +243,7 @@ raw_data = [
 ]
 
 print(process_students(raw_data))
-# Name        Score Grade
+# 이름        점수  등급
 # ----------------------
 # Diana          95     A
 # Bob            92     A
@@ -254,7 +253,7 @@ print(process_students(raw_data))
 
 좋은 파이프라인은 각 단계가 순수 함수이기 때문에 독립 테스트가 가능합니다. 어느 단계에서 데이터가 잘못됐는지도 빠르게 찾을 수 있습니다.
 
-### Step 4: 제너레이터 파이프라인
+### 단계 4: 제너레이터 파이프라인
 
 ```python
 from collections.abc import Callable
@@ -291,7 +290,7 @@ def to_upper(it: Iterator[str]) -> Iterator[str]:
     for line in it:
         yield line.upper()
 
-# assemble the lazy pipeline
+# 지연 pipeline 조립
 clean_text = gen_pipe(
     strip_lines,
     skip_empty,
@@ -318,7 +317,7 @@ for line in clean_text(lines(text)):
 
 파이프라인은 eager 데이터에만 쓰는 패턴이 아닙니다. generator와 결합하면 큰 입력도 메모리 효율적으로 처리할 수 있습니다.
 
-### Step 5: 조건부 파이프라인
+### 단계 5: 조건부 파이프라인
 
 ```python
 from collections.abc import Callable
@@ -340,7 +339,7 @@ def when(predicate: Callable[[Any], bool], func: Callable) -> Callable:
     """Applies a function only when the condition is true."""
     return conditional(predicate, func)
 
-# pipeline with conditional steps
+# 조건부 단계가 있는 pipeline
 process = pipe(
     lambda x: x.strip(),
     when(lambda x: x.startswith("http"), lambda x: x.replace("http://", "https://")),
@@ -439,11 +438,11 @@ print("Marketplace IDs:", [e.order_id for e in marketplace_only])
 print("Store report:", report)
 
 print("Pipeline report:", settle_orders(events))
-# Normalized IDs: ['A-1', 'A-2', 'A-3', 'A-4']
-# After cancellation filter: ['A-1', 'A-2', 'A-4']
-# Marketplace IDs: ['A-1', 'A-2']
-# Store report: {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
-# Pipeline report: {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
+# 정규화된 ID: ['A-1', 'A-2', 'A-3', 'A-4']
+# 취소 필터링 후 ID: ['A-1', 'A-2', 'A-4']
+# 마켓플레이스 ID: ['A-1', 'A-2']
+# 매장 리포트: {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
+# 파이프라인 리포트: {'seoul': {'revenue': 105960, 'margin': 19072, 'orders': 2}}
 ```
 
 이 예시는 장난감 문자열 변환보다 실무에 더 가깝습니다. 통화 정규화, 취소 주문 제외, 채널 필터링, 마진 보강, 매장별 집계가 순차적으로 드러나기 때문에, 장애가 나도 어느 단계에서 값이 달라졌는지 바로 추적할 수 있습니다.

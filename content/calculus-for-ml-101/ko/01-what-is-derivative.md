@@ -142,9 +142,9 @@ def power_rule_check(n, x):
 for n in [2, 3, 4]:
     a, num, err = power_rule_check(n, 2.0)
     print(f"x^{n} at x=2: analytic={a:.6f}, numeric={num:.6f}, error={err:.2e}")
-# x^2 at x=2: analytic=4.000000, numeric=4.000000, error=3.55e-10
-# x^3 at x=2: analytic=12.000000, numeric=12.000000, error=1.43e-09
-# x^4 at x=2: analytic=32.000000, numeric=32.000000, error=5.70e-09
+# x^2에서 x=2: analytic=4.000000, numeric=4.000000, error=3.55e-10
+# x^3에서 x=2: analytic=12.000000, numeric=12.000000, error=1.43e-09
+# x^4에서 x=2: analytic=32.000000, numeric=32.000000, error=5.70e-09
 ```
 
 오차가 $10^{-9}$ 수준이면 해석 미분과 수치 미분이 일치한다고 봐도 됩니다. 이 패턴은 이후 더 복잡한 함수의 gradient를 검증할 때도 동일하게 적용됩니다.
@@ -178,8 +178,8 @@ $f(g(x))$의 미분은 $f'(g(x)) \cdot g'(x)$입니다. 이 규칙은 5장에서
 ```python
 import math
 
-# f(x) = sin(x^2)
-# f'(x) = cos(x^2) * 2x  (chain rule)
+# 함수: f(x) = sin(x^2)
+# 도함수: f'(x) = cos(x^2) * 2x  (chain rule)
 def f_composed(x):
     return math.sin(x ** 2)
 
@@ -190,7 +190,7 @@ x = 1.0
 analytic = f_composed_grad(x)
 numeric = (f_composed(x + 1e-7) - f_composed(x - 1e-7)) / (2e-7)
 print(f"chain rule check: analytic={analytic:.6f}, numeric={numeric:.6f}")
-# chain rule check: analytic=1.080605, numeric=1.080605
+# chain rule 확인: analytic=1.080605, numeric=1.080605
 ```
 
 ## 수치 미분 심화: h 선택과 오차 분석

@@ -85,8 +85,7 @@ last_reviewed: '2026-05-14'
 
 도메인 학습의 시작은 어휘입니다. 회의에서 자주 나오는 단어 30개만 정리해도 이해도와 질문 수준이 눈에 띄게 달라집니다.
 
-### Step 2 — Five Key Metrics
-
+### 단계 2 — 5가지 핵심 지표
 ```text
 - definition
 - formula
@@ -95,8 +94,7 @@ last_reviewed: '2026-05-14'
 
 지표는 이름만 알면 부족합니다. 계산식, 사용하는 팀, 어떤 의사결정에 연결되는지까지 알아야 해석이 깊어집니다.
 
-### Step 3 — Field Shadowing
-
+### 단계 3 — 필드 섀도잉
 ```text
 - spend a day with sales or operations
 - notes and questions
@@ -104,8 +102,7 @@ last_reviewed: '2026-05-14'
 
 현장을 보면 숫자 뒤의 맥락이 빨리 보입니다. 운영팀이나 영업팀의 실제 흐름을 한 번만 봐도 왜 특정 KPI가 중요한지 훨씬 잘 이해됩니다.
 
-### Step 4 — External Study
-
+### 단계 4 — 외부 학습
 ```text
 - one industry conference per quarter
 - industry news RSS
@@ -113,8 +110,7 @@ last_reviewed: '2026-05-14'
 
 내부 데이터만 보면 조직 내부 시야에 갇히기 쉽습니다. 외부 학습은 업계 변화가 내부 지표에 어떻게 반영되는지 읽게 해 줍니다.
 
-### Step 5 — Quarterly Retro
-
+### 단계 5 — 분기 회고
 ```text
 - ten new words
 - three new metrics

@@ -91,7 +91,7 @@ seo_description: 공급자를 바꾸는 일은 모델 이름 교체가 아니라
 **After** — 한국어 system 메시지와 `temperature=0.3`을 주면 동작이 이렇게 안정됩니다.
 
 ```python
-# Three calls with the same question
+# 같은 질문으로 세 번 호출합니다
 '벡터 검색은 의미 유사도 기반, 키워드 검색은 문자 일치 기반입니다...'
 '벡터 검색은 임베딩으로 의미를 비교하고, 키워드 검색은 토큰 매칭에 의존합니다...'
 '벡터 검색은 의미를 벡터 공간에서 비교하고, 키워드 검색은 단어 단위 매칭입니다...'
@@ -132,8 +132,7 @@ print(response.choices[0].message.content)
 
 중요한 점은 **언어, 역할, 길이**를 모두 시스템 메시지에 넣는 것입니다. 그러면 사용자 메시지는 훨씬 깔끔해집니다.
 
-### Step 2 — Constrain output format (force JSON)
-
+### 단계 2 — 출력 형식 제한 (JSON 강제)
 ![이 코드에서 주목할 점](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/05/05-02-what-to-notice-in-this-code.ko.png)
 
 *이 코드에서 주목할 점*
@@ -213,7 +212,7 @@ clean = sanitize(validate(raw))
 *엔지니어가 헷갈리는 지점*
 
 ```python
-# Solar (Upstage) call — OpenAI SDK compatible
+# Solar(Upstage) 통화 — OpenAI SDK 호환
 from openai import OpenAI
 
 solar = OpenAI(

@@ -27,7 +27,6 @@ seo_description: Alembic의 부트 스크립트인 env.py 설정법과 target_me
 
 1편에서 `alembic init`까지 마쳤더라도 그 상태의 Alembic은 여러분 모델을 모릅니다. 이 연결을 `env.py`에서 제대로 하지 못하면 `alembic revision --autogenerate`는 즉시 신뢰를 잃습니다.
 
-
 ![Alembic 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/02/02-01-diagram-where-env-py-assembles-metadata.ko.png)
 *Alembic 101 2장 흐름 개요*
 
@@ -87,7 +86,7 @@ Alembic은 기본적으로 `alembic.ini`의 `sqlalchemy.url`을 읽지만, `env.
 ## 변경 전후
 
 ```python
-# Before: scaffolded defaults (autogenerate produces empty files)
+# 이전: 스캐폴드 기본값(자동 생성으로 빈 파일 생성)
 from alembic import context
 config = context.config
 target_metadata = None  # ← leaving this empty disables autogenerate
@@ -101,7 +100,7 @@ def run_migrations_online():
 ```
 
 ```python
-# After: model wired in, URL from environment
+# 이후: 모델 연결, 환경의 URL
 import os
 from alembic import context
 from sqlalchemy import engine_from_config, pool
@@ -109,7 +108,7 @@ from app.models import Base   # ← import the model
 
 config = context.config
 
-# Override alembic.ini if DATABASE_URL is set in the environment
+# DATABASE_URL이 환경에 맞는 경우 alembic.ini를 재정의합니다.
 db_url = os.environ.get("DATABASE_URL")
 if db_url:
     config.set_main_option("sqlalchemy.url", db_url)
@@ -366,115 +365,6 @@ alembic downgrade -1 || true
 
 여기서 중요한 건 마지막 줄이 아니라 첫 세 줄입니다. `current`가 읽히고, `autogenerate`가 실제 diff를 만들고, `--sql`이 정상 출력되면 env.py 책임 범위는 대체로 통과입니다.
 
-
-## 실전 부록: 운영 앵커 모음
-
-아래 블록은 migration 리뷰와 배포 검증에서 반복해서 쓰는 공통 앵커입니다.
-
-### 1) DDL 미리 보기
-
-```bash
-alembic upgrade <from>:<to> --sql > migration-preview.sql
-```
-
-리뷰 시점에서 실제 SQL을 확인하면 `DROP`, `ALTER`, 인덱스 재생성 비용을 사전에 파악할 수 있습니다.
-
-### 2) revision 그래프 확인
-
-```bash
-alembic history --verbose
-alembic heads
-alembic current
-```
-
-`heads`가 2개 이상이면 기능 결함이 아니라 그래프 정리 이슈입니다. merge revision으로 정리한 뒤 배포해야 안전합니다.
-
-### 3) schema 전후 비교
-
-```bash
-sqlite3 app.db ".schema" > before.sql
-alembic upgrade head
-sqlite3 app.db ".schema" > after.sql
-```
-
-변경 의도와 실제 결과를 텍스트로 남기면 코드 리뷰 품질이 올라갑니다.
-
-### 4) data migration 검증 쿼리
-
-```sql
-SELECT COUNT(*) FROM users WHERE tier IS NULL;
-SELECT tier, COUNT(*) FROM users GROUP BY tier ORDER BY tier;
-```
-
-`NULL` 잔여 수와 분포를 함께 보면 backfill 완료 여부를 빠르게 판단할 수 있습니다.
-
-### 5) env.py 핵심 설정
-
-```python
-context.configure(
-    connection=connection,
-    target_metadata=target_metadata,
-    compare_type=True,
-    compare_server_default=True,
-    render_as_batch=connection.dialect.name == "sqlite",
-)
-```
-
-type/default 비교 옵션과 SQLite batch 옵션은 drift 탐지와 호환성 유지에 직접적인 영향을 줍니다.
-
-### 6) blue/green 배포 게이트
-
-```text
-Gate A: expand 적용 후 v1 정상
-Gate B: v2 배포 후 overlap 정상
-Gate C: NULL row 0 확인 후 tighten
-Gate D: 구 컬럼 사용 중단 확인 후 contract
-```
-
-게이트를 코드화하면 배포 순서 실수를 줄일 수 있습니다.
-
-### 7) 비가역 변경 정책
-
-```python
-def downgrade() -> None:
-    raise NotImplementedError("irreversible revision by policy")
-```
-
-비가역 변경에서 침묵하는 `pass`보다 명시적 예외가 훨씬 안전합니다.
-
-### 8) CI 최소 게이트
-
-```bash
-alembic check
-alembic upgrade head
-alembic downgrade -1
-alembic upgrade head
-```
-
-drift, downgrade 결함, 체인 무결성을 PR 단계에서 차단할 수 있습니다.
-
-### 9) 에러 시그널 해석
-
-```text
-Multiple head revisions are present -> merge 필요
-Can't locate revision identified by ... -> revision chain 점검 필요
-table already exists -> baseline/stamp 전략 점검 필요
-```
-
-에러 유형별 대응 경로를 정해 두면 incident 대응 시간이 짧아집니다.
-
-### 10) 팀 운영 원칙
-
-```text
-- one PR = one revision
-- migration-first deploy
-- expand-contract 기본 적용
-- production 사고는 forward-fix 우선
-```
-
-원칙을 문서가 아니라 PR 템플릿과 CI로 강제하는 것이 핵심입니다.
-
-
 ## 확장 부록: 배포/복구 실습 시나리오
 
 ### 시나리오 A: add column + backfill + tighten
@@ -544,7 +434,6 @@ alembic upgrade head --sql > /tmp/migration-preview.sql
 
 이 게이트들은 Alembic 자체 기능이라기보다 팀 운영 안전장치입니다.
 
-
 ## 보강 메모: 검증 중심 운영 노트
 
 Alembic 운영에서 가장 큰 차이는 "명령 실행"이 아니라 "검증 기록"입니다. 같은 `upgrade head`를 실행해도 검증 쿼리, SQL preview, head 개수 확인을 함께 남기면 문제 재현성이 크게 높아집니다.
@@ -577,7 +466,6 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 ```
 
 이 네 단계는 엔진(SQLite/PostgreSQL)과 무관하게 공통으로 적용됩니다.
-
 
 ## 처음 질문으로 돌아가기
 

@@ -416,7 +416,7 @@ print(full_df[["question", "faithfulness", "answer_relevancy"]].head(10))
 배포 파이프라인에서는 "검색 + 생성 + 평가"가 한 번에 실행되는 스크립트가 필요합니다. 아래 예시는 실패 임계치를 넘으면 종료 코드 1로 실패시키는 구조입니다.
 
 ```python
-#!/usr/bin/env python3
+# !/usr/bin/env python3
 import json
 import sys
 

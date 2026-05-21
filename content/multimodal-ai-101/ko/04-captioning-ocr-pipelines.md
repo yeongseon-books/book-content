@@ -101,9 +101,9 @@ def caption(img_path: str, prompt: str | None = None) -> str:
     return processor.decode(out[0], skip_special_tokens=True)
 
 print(caption("samples/dog.jpg"))
-# > a brown dog sitting on a wooden floor
+# > 나무 바닥에 앉아 있는 갈색 개
 print(caption("samples/dog.jpg", prompt="a photography of"))
-# > a photography of a brown dog with a happy face
+# > 행복한 얼굴의 갈색 강아지 사진
 ```
 
 장점은 latency와 비용입니다. BLIP-base는 GPU에서 caption 1건당 50~100ms, OpenAI Vision API의 1/100 수준입니다. e-commerce 카탈로그 수백만 장 처리, log 분석 같은 대량 작업에 맞습니다.
