@@ -65,6 +65,8 @@ merge에 대한 그림이 없으면 두 가지 문제가 빨리 나타납니다.
 - **conflict marker**: `<<<<<<<`, `=======`, `>>>>>>>` 블록입니다.
 - **`git merge --abort`**: 진행 중인 merge를 취소하고 시작 전 상태로 되돌립니다.
 
+여기서 특히 많이 헷갈리는 지점은 `--no-ff`와 merge 전략(strategy)입니다. `--no-ff`는 **history 모양을 어떻게 남길지**에 대한 선택이고, 전략은 **Git이 실제 병합 계산을 어떤 알고리즘으로 수행할지**에 대한 선택입니다. 둘은 서로 다른 축입니다.
+
 ## 전후 비교
 
 수동 복사는 이렇게 남습니다.
@@ -170,6 +172,40 @@ Merge made by the 'ort' strategy.
  create mode 100644 header.md
 ```
 
+three-way merge에서 핵심은 "공통 조상(base), 현재 branch 끝(ours), 합치려는 branch 끝(theirs)"의 세 점을 동시에 비교한다는 점입니다. 그래서 branch가 갈라져 독립적으로 진화한 경우에도 Git은 단순 덮어쓰기가 아니라 변경 의도를 최대한 보존하려고 시도합니다.
+
+### 4-1. fast-forward와 `--no-ff` 비교
+
+fast-forward가 가능한 상황에서 `--no-ff`를 주면 결과 그래프가 달라집니다.
+
+```text
+$ git switch main
+$ git switch -c feature/toc-fix
+Switched to a new branch 'feature/toc-fix'
+$ printf "- 목차 링크 수정\n" >> notes.md
+$ git add notes.md
+$ git commit -m "Append TOC fix note"
+[feature/toc-fix 8a9b0c1] Append TOC fix note
+ 1 file changed, 1 insertion(+)
+$ git switch main
+Switched to branch 'main'
+$ git merge --no-ff feature/toc-fix
+Merge made by the 'ort' strategy.
+ notes.md | 1 +
+ 1 file changed, 1 insertion(+)
+```
+
+```text
+$ git log --oneline --graph --decorate --all
+*   4c5d6e7 (HEAD -> main) Merge branch 'feature/toc-fix'
+|\
+| * 8a9b0c1 (feature/toc-fix) Append TOC fix note
+|/
+* ...
+```
+
+같은 변경이라도 fast-forward를 허용하면 merge commit이 생기지 않고, `--no-ff`를 쓰면 "이 작업 단위는 하나의 feature branch였다"는 흔적이 남습니다. 릴리스 노트, revert 단위, 감사 추적이 중요한 팀은 `--no-ff`를 기본으로 두기도 합니다.
+
 ```text
 $ git log --oneline --graph --decorate --all
 *   b5d4c6e (HEAD -> main) Merge branch 'feature/header'
@@ -235,6 +271,35 @@ no changes added to commit (use "git add" and/or "git commit -a")
 ## My Project
 >>>>>>> feature/header-emoji
 ```
+
+실무에서는 한 파일에 충돌 구간이 여러 개 생기는 경우가 더 흔합니다. 아래는 함수 본문과 로그 문구가 동시에 충돌한 예시입니다.
+
+```text
+<<<<<<< HEAD
+def calculate_total(price, tax_rate):
+    total = price + (price * tax_rate)
+    print("total calculated")
+    return round(total, 2)
+=======
+def calculate_total(price, tax_rate, discount_rate=0.0):
+    subtotal = price - (price * discount_rate)
+    total = subtotal + (subtotal * tax_rate)
+    logger.info("calculated total with discount")
+    return round(total, 2)
+>>>>>>> feature/discount
+```
+
+이 상황에서는 "어느 쪽을 통째로 고를까"보다 "도메인 요구사항을 만족하는 최종 코드가 무엇인가"를 먼저 정해야 합니다. 예를 들어 할인 기능은 유지하고, 로깅은 표준 로거로 통일하고, 반올림 정책은 유지한다면 해결 결과는 아래처럼 정리할 수 있습니다.
+
+```text
+def calculate_total(price, tax_rate, discount_rate=0.0):
+    subtotal = price - (price * discount_rate)
+    total = subtotal + (subtotal * tax_rate)
+    logger.info("total calculated")
+    return round(total, 2)
+```
+
+충돌을 지우는 순서는 항상 같습니다. `git status`로 충돌 파일 확인 -> 파일 편집으로 marker 제거 -> `git add <file>`로 해결 표시 -> 테스트 실행 -> `git commit`으로 병합 완료입니다.
 
 - `<<<<<<< HEAD`와 `=======` 사이가 현재 branch(`main`) 내용입니다.
 - `=======`와 `>>>>>>> feature/header-emoji` 사이가 합치려던 branch 내용입니다.
@@ -358,6 +423,37 @@ git push -u origin feature/auth-session
 
 입문 단계에서는 GitHub Flow로 시작하는 편이 안전합니다. 규칙이 단순하고 Pull Request 중심의 협업 도구와 잘 맞기 때문입니다. 이후 릴리스 요구가 복잡해지면 release branch를 추가하는 방식으로 확장하면 됩니다.
 
+## merge 전략(strategy) 빠르게 구분하기
+
+Git 2.34 이후 일반적인 두 branch 병합 기본 전략은 `ort`입니다. 출력에서 `Merge made by the 'ort' strategy.` 문구가 보이면 이 경로로 병합된 것입니다.
+
+| 전략 | 언제 쓰는가 | 특징 | 주의할 점 |
+| --- | --- | --- | --- |
+| `ort` | 기본 두 branch merge | 빠르고 충돌 처리 품질이 안정적입니다. | 대부분 이 전략이면 충분합니다. |
+| `octopus` | 3개 이상 branch를 한 번에 merge | 릴리스 묶음 통합에 편합니다. | 충돌이 있으면 실패하며 수동 해결에 부적합합니다. |
+| `ours` | 현재 branch를 결과로 강제 | 이력상 merge는 남기되 내용은 현재 branch 유지 | 잘못 쓰면 상대 branch 변경이 전부 버려집니다. |
+| `subtree` | 저장소 하위 디렉터리 통합 | 외부 프로젝트 일부를 vendor 방식으로 들일 때 사용 | 경로 매핑을 잘못 잡으면 추적이 어려워집니다. |
+
+입문 단계에서는 전략을 바꾸기보다 기본 `ort`를 안정적으로 쓰는 습관이 먼저입니다. 전략 변경은 팀이 다중 저장소 통합, 대규모 벤더링 같은 분명한 요구가 있을 때만 도입하는 편이 안전합니다.
+
+## rebase와 merge를 어떻게 고를까
+
+둘 다 branch 통합 도구이지만 남는 이력이 다릅니다.
+
+| 항목 | merge | rebase |
+| --- | --- | --- |
+| 이력 형태 | 분기와 합류가 보존됩니다. | 직선 이력으로 재작성됩니다. |
+| commit 해시 | 기존 해시를 유지합니다. | 재적용되며 해시가 바뀝니다. |
+| 협업 안정성 | 공유 branch에서 안전합니다. | 이미 공유된 branch rebase는 위험합니다. |
+| conflict 시점 | merge 시점에 한 번(또는 파일별) 처리 | commit 재적용 단계마다 반복될 수 있음 |
+| 리뷰 관점 | "어떤 줄기가 합쳐졌는가"가 보임 | "최종 직선 흐름"을 읽기 쉬움 |
+
+실무 규칙으로는 다음 정도가 무난합니다.
+
+- 개인 로컬 정리: `rebase`로 commit을 깔끔하게 정리합니다.
+- 공유된 원격 branch: `merge`를 우선해 이력 재작성을 피합니다.
+- 팀 정책이 "main은 선형"이라면 PR merge 방식을 squash/rebase로 통일하되, 로컬에서 충돌 해결 후 테스트를 통과시키는 규칙은 동일하게 유지합니다.
+
 ## 충돌 해결 절차를 표준화하기
 
 충돌은 실패가 아니라 동시 작업의 자연스러운 신호입니다. 중요한 것은 해결 순서와 검증 절차를 팀 공통 규칙으로 맞추는 일입니다.
@@ -380,6 +476,31 @@ git push
 
 `merge` 대신 `rebase`를 쓰는 팀이라면 마지막 히스토리 모양이 달라질 뿐, 충돌을 해결하고 검증해야 한다는 원칙은 같습니다. 충돌 직후 테스트를 생략하면 "머지는 됐지만 동작은 깨진" 상태가 만들어지므로 반드시 자동 검증을 붙여야 합니다.
 
+### 충돌 직후 CLI 점검 루틴
+
+충돌을 고친 뒤 commit하기 전에 아래 네 줄을 습관처럼 확인하면 실수를 크게 줄일 수 있습니다.
+
+```text
+$ git status
+On branch main
+All conflicts fixed but you are still merging.
+  (use "git commit" to conclude merge)
+
+Changes to be committed:
+        modified:   header.md
+
+$ git diff --staged
+diff --git a/header.md b/header.md
+index 2cb2a7f..2ee5ac1 100644
+--- a/header.md
++++ b/header.md
+@@ -1 +1 @@
+-# Awesome Project
++## Awesome Project
+```
+
+`git status`는 "충돌이 끝났는지"를, `git diff --staged`는 "내가 의도한 최종 코드가 맞는지"를 확인하는 장치입니다. 충돌 해결에서 가장 비싼 실수는 marker를 지우는 데 성공했지만 잘못된 의미로 코드를 합쳐 버리는 경우입니다. 그래서 팀 리뷰에서는 충돌 commit일수록 staged diff를 기준으로 의도를 설명하는 습관이 중요합니다.
+
 ## 리뷰 품질을 올리는 운영 팁
 
 - PR 설명에는 "무엇을 바꿨는가"보다 "왜 이 선택을 했는가"를 먼저 적는 편이 좋습니다.
@@ -392,11 +513,11 @@ git push
 ## 처음 질문으로 돌아가기
 
 - **fast-forward merge는 언제 일어날까요?**
-  - 본문의 기준은 merge와 conflict 해결하기 - 두 줄기를 다시 합치기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 현재 branch가 대상 branch의 조상일 때 일어납니다. 이때 Git은 새 merge commit 없이 포인터만 앞으로 이동하고, CLI에 `Fast-forward` 문구를 출력합니다.
 - **three-way merge는 왜 부모가 두 개인 commit을 만들까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 이미 갈라진 두 줄기를 공통 조상 기준으로 다시 결합하기 때문입니다. 그래서 merge commit은 "현재 branch 끝"과 "합쳐진 branch 끝" 두 부모를 가집니다.
 - **conflict marker의 `HEAD` 쪽과 incoming branch 쪽은 어떻게 읽을까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - `<<<<<<< HEAD`와 `=======` 사이는 현재 branch 내용이고, `=======`와 `>>>>>>> <branch>` 사이는 incoming branch 내용입니다. marker를 제거한 뒤 `git add`로 해결 표시하고 테스트 후 commit해야 병합이 끝납니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -245,11 +245,241 @@ Deleted branch feature/sign-up (was f1e2d3c).
 - 아직 merge하지 않은 branch를 `-D`로 지워 버리면 복구가 어려워질 수 있습니다.
 - commit hash에 직접 붙는 detached HEAD 상태를 모르고 작업을 이어 가다 기록을 잃는 경우도 있습니다.
 
+실수 목록을 그냥 암기하면 금방 잊습니다. 그래서 아래처럼 "왜 이 실수가 생기고, 어떻게 예방하는지"를 함께 묶어두는 편이 좋습니다.
+
+### 실수 1) branch를 만들고 이동했다고 착각하기
+
+`git branch feature/x`는 포인터만 만들고 현재 위치를 바꾸지 않습니다. 이 한 줄 때문에 "분명 feature에서 작업했다고 생각했는데 main에 commit이 쌓였다"는 사고가 자주 납니다.
+
+```text
+$ git branch feature/payment
+$ git branch
+  feature/payment
+* main
+
+$ git status
+On branch main
+nothing to commit, working tree clean
+```
+
+예방은 단순합니다. 새 branch를 만들 때는 기본을 `git switch -c`로 고정합니다.
+
+```text
+$ git switch -c feature/payment
+Switched to a new branch 'feature/payment'
+```
+
+### 실수 2) 작업 중인 변경을 확인하지 않고 branch 전환하기
+
+전환 직전 `git status -s`를 생략하면, 현재 변경이 새 branch로 함께 넘어가면서 의도하지 않은 혼합 작업이 생깁니다.
+
+```text
+$ git status -s
+ M app.py
+?? notes-tmp.md
+```
+
+이 상태에서 `git switch bugfix/login`을 하면 변경이 그대로 따라갈 수 있습니다. 다른 작업 줄기까지 섞이지 않게 하려면 전환 전에 아래 셋 중 하나를 고릅니다.
+
+- 지금 branch에 commit한다
+- 임시 저장이 필요하면 `git stash push -m "wip"`를 사용한다
+- 정말 버릴 변경이면 삭제한다
+
+### 실수 3) detached HEAD를 모른 채 commit 쌓기
+
+commit hash로 직접 이동하면 branch가 아니라 특정 commit에 붙습니다.
+
+```text
+$ git switch --detach e7d2c1a
+HEAD is now at e7d2c1a Add author line to README
+```
+
+여기서 commit은 가능하지만 어떤 branch도 자동으로 따라오지 않습니다. 나중에 찾기 어려워지는 이유입니다.
+
+```text
+$ git commit -am "Try old baseline tweak"
+[detached HEAD c9d8e7f] Try old baseline tweak
+ 1 file changed, 1 insertion(+)
+```
+
+이 commit을 살리고 싶으면 즉시 branch를 만듭니다.
+
+```text
+$ git switch -c experiment/old-baseline
+Switched to a new branch 'experiment/old-baseline'
+```
+
+### 실수 4) 안전 삭제(`-d`)와 강제 삭제(`-D`)를 같은 것으로 보기
+
+`-d`는 merge 여부를 확인해 주는 안전장치입니다. 거절 메시지는 오류가 아니라 보호 기능입니다.
+
+```text
+$ git branch -d feature/report
+error: The branch 'feature/report' is not fully merged.
+If you are sure you want to delete it, run 'git branch -D feature/report'.
+```
+
+팀 작업에서는 먼저 `git log --oneline main..feature/report`로 남은 commit을 확인하고 삭제 여부를 결정합니다.
+
+## branch 포인터를 눈으로 읽는 법
+
+branch를 포인터라고 이해해도, 실제로는 히스토리 모양이 머릿속에서 잘 안 그려지는 경우가 많습니다. 그래서 텍스트 다이어그램으로 현재 위치를 반복해서 읽는 연습이 효과적입니다.
+
+### 상태 A: main 하나만 있을 때
+
+```text
+C1 --- C2 --- C3 (main, HEAD)
+```
+
+- `main`이 C3를 가리킵니다.
+- `HEAD`는 현재 branch인 `main`을 가리킵니다.
+
+### 상태 B: feature branch를 만든 직후
+
+```text
+C1 --- C2 --- C3 (main, feature/login, HEAD->main)
+```
+
+- branch를 만들기만 하면 포인터가 같은 commit(C3)을 함께 가리킵니다.
+- 저장소 크기가 거의 늘지 않는 이유가 여기 있습니다.
+
+### 상태 C: feature/login으로 이동 후 commit 2개 추가
+
+```text
+              F1 --- F2 (feature/login, HEAD)
+             /
+C1 --- C2 --- C3 (main)
+```
+
+- `main`은 그대로 C3에 남아 있습니다.
+- `feature/login`만 앞으로 이동합니다.
+
+이 모양은 `git log --oneline --graph --decorate --all`에서 아래처럼 보입니다.
+
+```text
+$ git log --oneline --graph --decorate --all
+* b91fa20 (HEAD -> feature/login) Add login API validation
+* 2a11f9c Add login form draft
+* e7d2c1a (main) Add author line to README
+* 9b8c3e2 Add intro paragraph to notes
+* 4f1a2c0 Initial commit
+```
+
+### 상태 D: main에서 다른 버그 수정 branch를 만들고 commit
+
+```text
+              F1 --- F2 (feature/login)
+             /
+C1 --- C2 --- C3 --- B1 (bugfix/header, HEAD)
+```
+
+같은 저장소 안에서 서로 다른 줄기가 동시에 자라는 모습입니다. branch 전략의 핵심은 이 줄기들을 짧게 유지하고, 리뷰 가능한 단위로 다시 합치는 것입니다.
+
+## 실전 시나리오 1: 기능 개발과 긴급 버그 수정을 동시에 처리하기
+
+현업에서 가장 자주 만나는 상황입니다. 로그인 기능을 만들던 중 운영 버그가 들어온 경우를 가정합니다.
+
+1) 기능 branch에서 작업 중
+
+```text
+$ git switch feature/login
+$ git status -s
+ M login.md
+```
+
+2) 긴급 수정이 필요하므로 현재 변경을 저장
+
+```text
+$ git add login.md
+$ git commit -m "WIP: draft login flow text"
+[feature/login 20ac3c1] WIP: draft login flow text
+ 1 file changed, 5 insertions(+)
+```
+
+3) `main`으로 이동해서 hotfix branch 생성
+
+```text
+$ git switch main
+Switched to branch 'main'
+
+$ git switch -c hotfix/header-null
+Switched to a new branch 'hotfix/header-null'
+```
+
+4) 수정 후 commit
+
+```text
+$ git add app.py
+$ git commit -m "fix: guard null header in auth middleware"
+[hotfix/header-null 5de82a4] fix: guard null header in auth middleware
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+```
+
+5) 작업 줄기 비교
+
+```text
+$ git branch
+  feature/login
+* hotfix/header-null
+  main
+
+$ git log --oneline --graph --decorate --all
+* 5de82a4 (HEAD -> hotfix/header-null) fix: guard null header in auth middleware
+| * 20ac3c1 (feature/login) WIP: draft login flow text
+|/
+* e7d2c1a (main) Add author line to README
+* 9b8c3e2 Add intro paragraph to notes
+* 4f1a2c0 Initial commit
+```
+
+핵심은 "한 번에 하나의 목적"입니다. 기능 branch와 hotfix branch가 분리되어 있으면 리뷰와 배포 판단이 훨씬 명확해집니다.
+
+## 실전 시나리오 2: 같은 기능을 두 접근으로 비교 실험하기
+
+로그인 화면 문구를 A안/B안으로 동시에 실험한다고 가정합니다.
+
+```text
+$ git switch main
+$ git switch -c experiment/login-copy-a
+Switched to a new branch 'experiment/login-copy-a'
+
+$ git switch main
+$ git switch -c experiment/login-copy-b
+Switched to a new branch 'experiment/login-copy-b'
+```
+
+각 branch에서 독립적으로 commit한 뒤 비교합니다.
+
+```text
+$ git log --oneline experiment/login-copy-a..experiment/login-copy-b
+8cb1d10 Update login CTA with urgency tone
+
+$ git diff experiment/login-copy-a experiment/login-copy-b
+diff --git a/login-copy.md b/login-copy.md
+index 4f13abc..8bc299a 100644
+--- a/login-copy.md
++++ b/login-copy.md
+@@ -1,3 +1,3 @@
+-지금 로그인하면 설정을 이어서 관리할 수 있습니다.
++지금 로그인하면 설정을 잃지 않고 바로 이어서 관리할 수 있습니다.
+```
+
+이 방식의 장점은 실험 흔적이 commit 단위로 남는다는 점입니다. 팀 토론에서 "어떤 문구가 왜 바뀌었는지"를 감이 아니라 이력으로 확인할 수 있습니다.
+
 ## 실무에서는 이렇게 본다
 
 branch는 작업 단위마다 짧게 만들고 빨리 닫는 편이 좋습니다. branch 수명이 길수록 `main`과 멀어지고, 나중 merge 비용도 커집니다. 그래서 팀에서는 보통 `feature/<summary>`, `bugfix/<summary>` 같은 규칙을 정하고 짧은 주기로 merge합니다.
 
 또한 branch를 옮기기 전 `git status -s`를 먼저 보는 습관이 중요합니다. 지금 working tree에 떠다니는 변경이 있는지 미리 보면 branch 전환 중 생길 혼란을 크게 줄일 수 있습니다.
+
+추가로, 팀이 커질수록 branch를 "기술 기능"이 아니라 "커뮤니케이션 단위"로 보는 관점이 중요해집니다. branch 이름은 작업 의도를 드러내고, commit 묶음은 리뷰 단위를 드러내며, PR 제목은 배포 노트의 원재료가 됩니다. 즉 branch 관리 품질이 곧 협업 비용과 직결됩니다.
+
+예를 들어 다음 규칙은 단순하지만 효과가 큽니다.
+
+- branch 이름은 `type/short-summary` 형식으로 통일합니다. 예: `feature/login-api`, `bugfix/token-refresh`.
+- 하루 이상 걸리는 작업은 중간 commit을 숨기지 말고 논리 단위로 남깁니다.
+- 장기 branch를 만들었다면 매일 `main`과의 거리(`git log --oneline main..HEAD`)를 확인합니다.
+- merge 직전에는 `git log --oneline --graph --decorate --all`로 줄기 모양을 다시 읽고, 의도와 다른 commit 유입이 없는지 확인합니다.
 
 ## 체크리스트
 
@@ -337,11 +567,11 @@ git push
 ## 처음 질문으로 돌아가기
 
 - **branch는 왜 파일 복사본이 아니라 포인터라고 할까요?**
-  - 본문의 기준은 branch 기초 - 만들고 옮기고 비교하기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - branch는 "특정 commit hash를 가리키는 이름"이기 때문입니다. `feature/login`을 만들 때 디스크 전체가 복사되지 않고, 기존 commit(C3)을 가리키는 포인터 하나만 추가됩니다. 이후 commit이 쌓일 때 그 branch 포인터만 앞으로 이동합니다.
 - **`git branch`와 `git switch`는 역할이 어떻게 다를까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - `git branch`는 branch를 만들거나 목록을 보는 명령이고, `git switch`는 현재 작업 branch를 바꾸는 명령입니다. 둘을 분리해 쓰면 "생성"과 "전환"이 혼동되지 않아 실수가 줄어듭니다. 만들고 바로 이동할 때는 `git switch -c`를 사용합니다.
 - **`HEAD`는 branch와 어떤 관계를 가질까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - `HEAD`는 "지금 내가 붙어 있는 위치"를 나타냅니다. 보통은 현재 branch를 가리키지만, commit hash에 직접 붙으면 detached HEAD가 됩니다. 그래서 `git status`, `git branch`, `git log --decorate`로 현재 위치를 자주 확인하는 습관이 필요합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

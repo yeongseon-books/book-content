@@ -65,6 +65,76 @@ seo_description: 좋은 commit message 구조와 Conventional Commits 실무 규
 | Imperative mood | `Add`, `Fix`, `Refactor`처럼 적용 명령처럼 읽히는 동사 |
 | Atomic commit | 하나의 논리적 변경만 담은 commit |
 
+Conventional Commits를 실제 팀에서 쓰려면 "형식"보다 "의미 매핑"을 먼저 고정해야 합니다. 예를 들어 어떤 팀은 UI 텍스트 수정을 `docs`로, 어떤 팀은 사용자 동작이 바뀌면 `feat`로 분류합니다. 규칙이 문서에 없다면 같은 변경도 사람마다 `fix`, `refactor`, `chore`로 갈라져 log 일관성이 깨집니다.
+
+아래는 실무에서 자주 쓰는 type 해석 기준입니다.
+
+| Type | 언제 쓰는가 | 포함/제외 판단 |
+| --- | --- | --- |
+| `feat` | 사용자 관점에서 기능이 늘어날 때 | API, UI, CLI 동작이 실제로 확장됨 |
+| `fix` | 기대 동작과 실제 동작의 차이를 바로잡을 때 | 버그 수정, 회귀 수정, 예외 케이스 보완 |
+| `docs` | 문서만 바뀔 때 | 코드 동작 변화 없음 |
+| `refactor` | 동작은 유지하고 내부 구조만 개선할 때 | 함수 분리, 이름 개선, 중복 제거 |
+| `test` | 테스트 코드 추가/수정 중심일 때 | 프로덕션 코드 변경이 최소 또는 없음 |
+| `chore` | 빌드/도구/메타 작업일 때 | 패키지 버전, 스크립트, 설정 정리 |
+| `perf` | 기능은 같고 성능 특성만 개선할 때 | 지연 시간/메모리/처리량 개선 |
+| `build` | 빌드 시스템/의존성 빌드 과정 변경 | webpack, Gradle, Poetry lock 등 |
+| `ci` | CI 파이프라인 동작 변경 | GitHub Actions, Jenkins, lint job |
+| `style` | 포맷/세미콜론/공백 등 비동작 변경 | lint autofix, formatting only |
+
+`scope`는 작을수록 좋습니다. `auth`, `checkout`, `docs`, `api`처럼 저장소에서 반복되는 도메인 경계를 쓰면, `git log --oneline`만 봐도 어느 영역이 자주 흔들리는지 보입니다. 반대로 `scope`를 매번 임의 문자열로 쓰면 오히려 검색성과 집계 품질이 떨어집니다.
+
+## Conventional Commits 사양을 실무 언어로 해석하기
+
+Conventional Commits 1.0.0은 복잡한 문법이 아니라 세 줄 규칙으로 요약할 수 있습니다.
+
+1. 첫 줄은 `type(scope)!: subject` 형식입니다. `scope`와 `!`는 선택입니다.
+2. 본문(body)은 선택이지만, 넣는다면 빈 줄 뒤에 "왜"를 설명합니다.
+3. 꼬리말(footer)은 메타데이터 영역이며 `BREAKING CHANGE:` 같은 키워드를 둡니다.
+
+아래 예시는 사양을 그대로 따르는 형태입니다.
+
+```text
+feat(auth): support passwordless login
+
+Add email link based login so users can sign in without memorizing
+passwords. This reduces login failure rates on mobile devices.
+
+Closes: #128
+```
+
+파괴적 변경은 두 가지 방식 중 하나로 표시합니다.
+
+```text
+feat(api)!: remove v1 session endpoint
+
+BREAKING CHANGE: /v1/session has been removed. Use /v2/session instead.
+```
+
+혹은 subject에는 `!`를 빼고 footer의 `BREAKING CHANGE:`만 사용해도 됩니다. 중요한 점은 팀이 둘 중 하나를 표준으로 정해 일관되게 쓰는 것입니다.
+
+## Subject, Body, Footer를 더 정확히 쓰는 기준
+
+subject는 "이 commit이 브랜치에 적용될 때 일어나는 변화"를 한 줄로 적는 영역입니다. 그래서 명령형이 잘 맞습니다.
+
+- 좋은 subject: `fix(auth): reject expired refresh tokens`
+- 모호한 subject: `fixed tokens`, `token issue`, `update`
+
+body는 diff를 번역하는 칸이 아니라 의사결정을 기록하는 칸입니다. 아래 기준을 권장합니다.
+
+1. **왜 바꿨는지**: 버그 원인, 사용자 영향, 운영 리스크
+2. **어떤 선택을 했는지**: 대안 중 무엇을 택했는지
+3. **어떤 범위를 의도했는지**: 이번 commit에 포함/제외한 범위
+
+footer는 참조를 정리하는 칸입니다. 대표 키는 다음과 같습니다.
+
+- `Refs: #42` - 참고 이슈 연결
+- `Closes: #42` - merge 시 이슈 자동 종료 의도
+- `Co-authored-by: Name <mail@example.com>` - 공동 작성자 기록
+- `BREAKING CHANGE: ...` - 하위 호환성 깨짐 알림
+
+subject에 이슈 번호, 팀 내부 티켓, 긴 URL을 밀어 넣으면 한 줄 가독성이 바로 무너집니다. 메타정보는 footer에 분리하는 습관이 중요합니다.
+
 ## 전후 비교
 
 메시지가 흐릿하면 log도 흐릿합니다.
@@ -88,6 +158,51 @@ $ git log --oneline -5
 6c5b4a3 test(auth): cover login redirect cases
 5b4a3f2 docs(auth): document OAuth setup steps
 ```
+
+실무에서는 여기에 branch 단위 요약까지 붙여 읽는 경우가 많습니다.
+
+```bash
+$ git log --oneline --decorate --graph -10
+```
+
+이 명령을 주간 회고나 릴리스 점검에서 열어 보면, message 품질이 낮은 팀은 "무엇이 배포됐는지"를 다시 PR 단위로 역추적해야 합니다. 반대로 subject가 정돈된 팀은 log 자체가 변경 목록 역할을 해 회의 시간이 줄어듭니다.
+
+## 좋은/나쁜 message 비교
+
+같은 변경도 문장에 따라 운영 난이도가 달라집니다.
+
+| 상황 | 나쁜 message | 좋은 message |
+| --- | --- | --- |
+| 로그인 실패 버그 수정 | `fix` | `fix(auth): handle null redirect_uri in OAuth callback` |
+| 문서 오탈자 수정 | `update readme` | `docs(readme): fix typo in local setup command` |
+| 성능 개선 | `refactor query` | `perf(search): add index hint for tag filter query` |
+| 테스트만 보강 | `more tests` | `test(auth): add regression test for expired token reuse` |
+| 파괴적 API 변경 | `change api` | `feat(api)!: rename /v1/orders to /v2/orders` |
+
+좋은 message의 공통점은 화려한 문장이 아니라 "판단에 필요한 최소 맥락"이 있다는 점입니다. 어떤 컴포넌트인지(scope), 무슨 종류 변경인지(type), 무엇이 바뀌는지(subject)가 1초 안에 읽혀야 합니다.
+
+## commit 단위를 자르는 기준
+
+좋은 message는 좋은 commit 단위와 같이 움직입니다. 변경 단위가 거칠면 message를 아무리 잘 써도 정확해질 수 없습니다.
+
+다음 기준으로 커밋 쪼개기를 권장합니다.
+
+1. **하나의 이유(one reason to change)**만 담습니다.
+2. **리뷰 가능한 크기**를 유지합니다. 보통 파일 수보다 논리적 일관성이 중요합니다.
+3. **되돌리기 가능성**을 고려합니다. 특정 commit만 되돌렸을 때도 저장소가 컴파일/테스트 가능한 상태가 좋아집니다.
+4. **기계적 변경과 의미 변경 분리**를 지킵니다. 포맷팅과 로직 수정을 같은 commit에 섞지 않습니다.
+
+예를 들어 인증 모듈 리팩터링을 한다면 아래처럼 쪼개는 편이 좋습니다.
+
+- `refactor(auth): extract token parser into dedicated module`
+- `test(auth): add parser edge-case coverage`
+- `fix(auth): reject malformed bearer token prefix`
+
+반대로 아래처럼 한 번에 묶으면, 제목 한 줄로 실제 diff 의도를 설명하기 어려워집니다.
+
+- `update auth`
+
+commit granularity는 협업 속도를 좌우합니다. 리뷰어가 "이 commit은 무슨 의도인지"를 매번 질문하기 시작하면, PR 왕복 횟수가 급격히 늘어납니다.
 
 ## 단계별 실습
 
@@ -161,6 +276,30 @@ pick c0d1e2f wip
 
 `pick`을 `reword`로 바꾸면 그 commit의 message를 다시 쓸 수 있습니다.
 
+실전에서는 `reword`만 쓰는 경우도 많지만, 메시지 품질을 높일 때 함께 자주 쓰는 명령이 있습니다.
+
+- `squash`: 바로 앞 commit과 합치고 두 메시지를 함께 편집합니다.
+- `fixup`: 바로 앞 commit과 합치되 현재 메시지는 버립니다.
+- `drop`: 불필요한 commit을 제거합니다.
+
+예를 들어 아래처럼 `wip` 두 개가 섞여 있으면:
+
+```text
+pick 11aa22b wip
+pick 33cc44d wip
+pick 55ee66f fix(auth): reject expired refresh token
+```
+
+다음처럼 정리할 수 있습니다.
+
+```text
+reword 11aa22b feat(auth): add token refresh path
+fixup 33cc44d wip
+pick   55ee66f fix(auth): reject expired refresh token
+```
+
+이 과정을 거치면 `git log --oneline`이 "작업 흔적"이 아니라 "의도 기록"으로 바뀝니다. 단, 이미 공유된 branch라면 rebase로 인한 hash 변경이 동료 작업과 충돌할 수 있으므로 팀 규칙을 먼저 확인해야 합니다.
+
 ### 5. `commit-msg` hook으로 형식 강제하기
 
 ```bash
@@ -233,6 +372,8 @@ Subject does not match the Conventional Commits format.
 특히 squash merge를 쓰는 팀에서는 PR 제목이 그대로 `main`의 commit message가 되므로, PR 제목도 같은 형식으로 맞추는 편이 유리합니다.
 
 또한 commit message 검증은 log를 위한 일일 뿐 아니라 release note 품질을 위한 일이기도 합니다. `feat`, `fix`, `docs`가 꾸준히 맞아 떨어지면 changelog 초안, 배포 공지, 회귀 분석이 모두 쉬워집니다. 결국 좋은 message는 "나중에 덜 고생하기 위한 선불 비용"에 가깝습니다.
+
+운영 조직에서는 type을 기반으로 배포 리스크를 빠르게 스캔합니다. 예를 들어 릴리스 직전 `git log --oneline`에서 `feat!`나 `BREAKING CHANGE`가 보이면, 문서/마이그레이션 공지를 같이 확인합니다. 반대로 대부분이 `docs`, `test`, `chore`라면 사용자 영향이 낮은 배포로 분류할 수 있습니다. message 규칙이 곧 배포 커뮤니케이션 비용을 줄이는 이유가 여기 있습니다.
 
 ## 체크리스트
 
@@ -319,11 +460,11 @@ git push
 ## 처음 질문으로 돌아가기
 
 - **좋은 commit message는 왜 코드만큼 중요한 자산일까요?**
-  - 본문의 기준은 좋은 commit message 쓰기: Conventional Commits와 좋은 본문를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 좋은 message는 `git log`, `git blame`, release note에서 동일한 맥락을 재사용하게 만들어 줍니다. 즉, diff를 다시 열어 보기 전에 의도를 먼저 읽을 수 있어 협업 비용을 줄입니다.
 - **subject, body, footer는 각각 무엇을 담아야 할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - subject는 한 줄 요약, body는 왜와 선택 근거, footer는 이슈/파괴적 변경 같은 메타데이터를 담습니다. 이 분리가 지켜질수록 log 가독성이 높아집니다.
 - **Conventional Commits의 `feat`, `fix`, `docs` 같은 type은 무엇을 해결할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - type은 변경의 종류를 사람이 일관되게 읽고, 도구가 자동으로 분류하게 만드는 공통 언어입니다. 결과적으로 changelog 생성, 릴리스 위험 판단, 회귀 추적이 쉬워집니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

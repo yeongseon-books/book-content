@@ -70,6 +70,13 @@ remote는 외부 저장소의 별칭입니다. URL을 매번 길게 입력하지
 | HTTPS URL | 토큰 인증 방식의 URL |
 | SSH URL | SSH key 인증 방식의 URL |
 
+여기서 `upstream`은 초급 단계에서 자주 혼동되는 단어입니다. 문맥에 따라 두 가지 뜻으로 쓰이기 때문입니다.
+
+1. **Git 설정 용어로서의 upstream**: 현재 로컬 branch가 기본으로 비교/동기화할 remote branch를 뜻합니다. 예를 들어 로컬 `main`의 upstream이 `origin/main`이면 `git push`, `git pull`을 짧게 쓸 수 있습니다.
+2. **협업 관례 용어로서의 upstream**: 포크 기반 협업에서 "원본 저장소"를 뜻합니다. 내 포크가 `origin`이고, 원본 프로젝트가 `upstream`인 구성입니다.
+
+이 글에서는 1번 의미를 기본으로 사용하지만, 실무에서 2번을 자주 만나므로 함께 기억해 두는 편이 좋습니다.
+
 ## 전후 비교
 
 remote가 없으면 push할 곳 자체가 없습니다.
@@ -123,6 +130,18 @@ origin  https://github.com/<your-id>/vacation-notes.git (push)
 ```
 
 `git remote add`는 출력이 없으니 `git remote -v`로 확인합니다.
+
+여기서 `-v`는 verbose를 뜻합니다. 단순히 이름만 보여주는 `git remote`와 달리 fetch URL, push URL을 함께 보여줍니다. 처음에는 둘이 같은 주소로 보이지만, 실무에서는 읽기 전용 mirror를 fetch에 두고 push는 내부 저장소로 보내는 식으로 분리하기도 합니다.
+
+```text
+$ git remote
+origin
+$ git remote -v
+origin  https://github.com/<your-id>/vacation-notes.git (fetch)
+origin  https://github.com/<your-id>/vacation-notes.git (push)
+```
+
+또한 remote 이름은 반드시 `origin`일 필요가 없습니다. 다만 협업 문서와 튜토리얼 대부분이 `origin`을 기본 전제로 설명하므로, 특별한 이유가 없다면 관례를 따르는 편이 커뮤니케이션 비용이 낮습니다.
 
 ### 3. 첫 push와 upstream 설정
 
@@ -234,6 +253,220 @@ $ git log --oneline -2
 2b3c4d5 Add quickstart section
 ```
 
+`fetch`와 `pull`의 차이를 단순 문장 하나로만 외우면 실제 상황에서 흔들리기 쉽습니다. 아래처럼 "어떤 ref가 움직이는가"로 보면 훨씬 안정적입니다.
+
+| 명령 | 내려받기 | `origin/main` 갱신 | 로컬 `main` 갱신 | 충돌 가능 시점 |
+| --- | --- | --- | --- | --- |
+| `git fetch` | 수행 | 수행 | 수행 안 함 | 없음 (작업 트리 불변) |
+| `git pull` | 수행 | 수행 | 수행 (merge/rebase) | 있음 |
+| `git push` | 로컬에서 remote로 업로드 | remote 쪽 ref 갱신 | 로컬 불변 | 서버 거절 가능 |
+
+이 표를 운영 관점으로 해석하면 다음과 같습니다.
+
+- 지금 당장 파일 충돌을 마주하고 싶지 않다면 먼저 `git fetch`로 정보만 가져옵니다.
+- 현재 브랜치를 바로 최신으로 맞춰야 하고 충돌 처리도 지금 하겠다면 `git pull`을 씁니다.
+- 내가 가진 commit을 공유 저장소 기준선으로 올릴 때 `git push`를 씁니다.
+
+특히 팀에서 아침 첫 명령을 `git pull`로 고정하면, 전날 남겨 둔 변경과 바로 충돌할 수 있습니다. `git fetch` → `git status` → 필요 시 `git pull --ff-only` 순서를 습관화하면 예측 가능성이 높아집니다.
+
+## origin과 upstream을 함께 쓰는 포크 협업
+
+이제 많이 쓰는 실무 패턴을 하나 더 보겠습니다. 회사나 오픈소스에서 자주 쓰는 구조는 아래와 같습니다.
+
+- `upstream`: 팀의 공식 저장소(원본)
+- `origin`: 내가 포크한 저장소(내 쓰기 권한이 있는 저장소)
+
+```text
+$ git remote -v
+origin    git@github.com:<your-id>/project-fork.git (fetch)
+origin    git@github.com:<your-id>/project-fork.git (push)
+upstream  git@github.com:org/project.git (fetch)
+upstream  git@github.com:org/project.git (push)
+```
+
+여기서 중요한 운영 규칙은 단순합니다. **최신 기준선은 `upstream/main`에서 받고, 내 작업 공유는 `origin/<feature-branch>`로 보낸다**는 규칙입니다.
+
+```bash
+# 1) 원본 최신 이력 가져오기
+git fetch upstream
+
+# 2) 내 로컬 main을 원본 기준선에 맞추기
+git switch main
+git merge --ff-only upstream/main
+
+# 3) 기능 브랜치 생성 후 작업
+git switch -c feature/readme-cleanup
+
+# 4) 내 포크(origin)로 push
+git push -u origin feature/readme-cleanup
+```
+
+왜 이런 분리를 쓰는지 이유를 이해하면 실수 확률이 크게 줄어듭니다.
+
+1. 원본 저장소에 직접 push 권한이 없는 상황에서도 정상적으로 작업할 수 있습니다.
+2. 내 포크에서 실험 브랜치를 자유롭게 관리할 수 있습니다.
+3. `upstream`과 `origin`의 역할이 분리되어 어떤 방향으로 동기화하는지 명확합니다.
+
+반대로 remote 이름을 뒤섞으면 `git push upstream main` 같은 위험한 명령을 실수로 실행할 수 있습니다. 그래서 팀 온보딩 문서에 remote 역할을 먼저 명시하는 것이 좋습니다.
+
+## SSH vs HTTPS 인증 선택 기준
+
+GitHub remote URL은 같은 저장소라도 두 형식이 있습니다.
+
+```text
+# HTTPS
+https://github.com/<your-id>/vacation-notes.git
+
+# SSH
+git@github.com:<your-id>/vacation-notes.git
+```
+
+둘 다 같은 Git 객체를 다루지만 인증 경로가 다릅니다.
+
+| 항목 | HTTPS | SSH |
+| --- | --- | --- |
+| 인증 재료 | PAT(Personal Access Token) | SSH key (public/private) |
+| 초기 설정 난이도 | 낮음 | 중간 |
+| 반복 사용 편의성 | 토큰 캐시 설정에 따라 다름 | 키 등록 후 편함 |
+| 네트워크 제약 | 443 포트 환경에 유리 | 22 포트 차단 시 제약 가능 |
+| 조직 보안 정책 대응 | SSO/PAT 정책과 연동 쉬움 | 키 로테이션/등록 정책 필요 |
+
+초급 단계에서는 HTTPS로 시작해도 충분합니다. 다만 장기간 한 저장소를 자주 다루면 SSH가 더 편해지는 경우가 많습니다. 반대로 회사 네트워크가 SSH를 제한하면 HTTPS가 현실적인 기본값이 됩니다.
+
+인증 실패 메시지도 자주 보게 됩니다.
+
+```text
+$ git push
+remote: Support for password authentication was removed on August 13, 2021.
+fatal: Authentication failed for 'https://github.com/<your-id>/vacation-notes.git/'
+```
+
+이 경우 비밀번호가 아니라 PAT 또는 SSH key를 써야 합니다. 즉, 문제의 본질은 Git 명령이 아니라 인증 방식입니다.
+
+이미 등록된 remote를 HTTPS에서 SSH로 바꾸는 절차는 간단합니다.
+
+```bash
+git remote set-url origin git@github.com:<your-id>/vacation-notes.git
+git remote -v
+```
+
+반대로 SSH에서 HTTPS로 바꿀 때도 같은 명령을 사용합니다. 변경 직후에는 반드시 `git remote -v`로 fetch/push URL이 기대와 맞는지 확인해야 합니다.
+
+## `.gitignore`를 먼저 잡아 두는 이유
+
+GitHub 저장소를 만들고 첫 push를 하기 전, `.gitignore` 기준을 먼저 정하면 history 품질이 크게 달라집니다. 초반에 실수로 올라간 빌드 산출물, 캐시, 비밀 파일은 나중에 지우더라도 commit history에 흔적이 남기 때문입니다.
+
+아래는 Python 기준으로 실무에서 자주 쓰는 패턴입니다.
+
+```gitignore
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+
+# Test / coverage artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# IDE/editor
+.vscode/
+.idea/
+
+# Secrets
+.env
+.env.*
+```
+
+패턴을 읽는 기본 규칙도 함께 익혀 두면 좋습니다.
+
+- `dir/`는 디렉터리 전체를 무시합니다.
+- `*.log`는 확장자 패턴을 무시합니다.
+- `!keep.log`처럼 `!`를 붙이면 무시 규칙에서 예외를 만듭니다.
+- 루트 기준으로만 지정하고 싶으면 `/`를 앞에 붙입니다. 예: `/dist/`
+
+이미 추적 중인 파일에는 `.gitignore`가 자동 적용되지 않는다는 점도 중요합니다. 예를 들어 `.env`를 이미 commit한 뒤 ignore를 추가하면 파일은 계속 추적됩니다. 이때는 index에서 추적을 제거해야 합니다.
+
+```bash
+git rm --cached .env
+git commit -m "Stop tracking .env"
+```
+
+핵심은 간단합니다. `.gitignore`는 "앞으로 추적하지 않을 것"을 정의하는 규칙이지, 이미 올라간 민감 파일을 자동으로 없애 주는 기능이 아닙니다.
+
+## README를 첫날부터 관리하는 규칙
+
+GitHub 저장소는 코드 보관소이면서 동시에 팀 문서의 첫 진입점입니다. 그래서 README를 "나중에 채우는 파일"로 미루기보다 첫 push 시점부터 최소 구조를 갖추는 편이 좋습니다.
+
+초급 팀에서도 바로 적용하기 좋은 README 최소 템플릿은 아래와 같습니다.
+
+```markdown
+# project-name
+
+한 줄 설명: 이 저장소가 해결하는 문제를 짧게 설명합니다.
+
+## Quickstart
+1. 의존성 설치
+2. 실행 방법
+3. 테스트 실행
+
+## Requirements
+- Python 3.12+
+- uv or pip
+
+## Project Structure
+- `app/`: 애플리케이션 코드
+- `tests/`: 테스트 코드
+
+## Git Workflow
+- `main`: 배포 가능한 기준선
+- `feature/*`: 작업 브랜치
+
+## License
+MIT
+```
+
+README를 이렇게 시작하면 얻는 장점이 분명합니다.
+
+1. 새 팀원이 저장소 목적과 실행 방법을 1분 안에 파악할 수 있습니다.
+2. Pull Request 리뷰 시 "실행 방법이 문서와 다른데요" 같은 피드백을 빠르게 받을 수 있습니다.
+3. 릴리스가 쌓일수록 운영 지식이 이슈 댓글이 아니라 저장소 루트에 남습니다.
+
+또한 README와 `.gitignore`를 GitHub에서 자동 생성할지, 로컬에서 만들지 기준을 정해 두면 초기 충돌을 줄일 수 있습니다.
+
+- 로컬에 이미 commit이 있는 상태라면: GitHub 저장소는 비워 두고 로컬에서 push하는 방식이 안전합니다.
+- 아직 로컬 작업이 없다면: GitHub에서 README/.gitignore를 생성해 시작해도 무방합니다.
+
+이번 글의 실습은 첫 번째 경우를 기준으로 했습니다. 그래서 저장소를 만들 때 README와 `.gitignore` 체크를 해제했습니다.
+
+## push 전 점검 루틴
+
+실무에서 품질을 올리는 가장 쉬운 습관은 "push 직전 30초 점검"입니다. 다음 순서를 고정해 두면 사고가 눈에 띄게 줄어듭니다.
+
+```bash
+git status
+git branch -vv
+git remote -v
+git log --oneline --decorate -5
+```
+
+각 명령이 확인하는 질문은 명확합니다.
+
+- `git status`: 지금 commit되지 않은 변경이 남아 있는가?
+- `git branch -vv`: 현재 브랜치 upstream이 어디인가? ahead/behind는 몇 개인가?
+- `git remote -v`: push 대상 URL이 맞는가?
+- `git log --oneline --decorate -5`: 방금 만든 commit이 의도한 순서와 메시지인가?
+
+이 점검은 복잡한 자동화보다 먼저 적용해야 할 기본 안전장치입니다.
+
 ## 자주 하는 실수
 
 - GitHub 저장소 생성 때 README나 `.gitignore`를 같이 넣어 첫 push를 복잡하게 만드는 경우가 많습니다.
@@ -334,11 +567,11 @@ git push
 ## 처음 질문으로 돌아가기
 
 - **remote는 정확히 무엇이고 왜 첫 이름이 보통 `origin`일까요?**
-  - 본문의 기준은 GitHub repository 만들기 - remote, push, pull 한 번에 익히기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - remote는 다른 위치의 Git 저장소 URL에 붙인 별칭입니다. 긴 URL 대신 `origin` 같은 짧은 이름으로 fetch/push 대상을 지정합니다. `origin`은 "처음 가져온 원천"이라는 관례에서 온 기본 이름이라 협업 문서와 예제가 거의 이 이름을 전제로 합니다.
 - **빈 GitHub 저장소를 로컬 저장소에 연결하는 순서는 어떻게 될까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - GitHub에서 빈 저장소를 만든 뒤, 로컬에서 `git remote add origin <URL>`로 연결하고 `git push -u origin main`으로 첫 업로드와 upstream 설정을 동시에 수행합니다. 이후에는 `git push`, `git pull` 같은 짧은 명령으로 같은 흐름을 반복할 수 있습니다.
 - **`git push -u origin main`은 한 번에 무엇을 두 가지나 설정할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 첫째, 로컬 `main`의 commit을 `origin/main`으로 업로드합니다. 둘째, 로컬 `main`의 upstream을 `origin/main`으로 등록해 이후 push/pull 기본 대상을 고정합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

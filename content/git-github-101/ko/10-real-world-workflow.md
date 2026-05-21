@@ -301,6 +301,172 @@ git push -u origin feature/auth-session
 
 입문 단계에서는 GitHub Flow로 시작하는 편이 안전합니다. 규칙이 단순하고 Pull Request 중심의 협업 도구와 잘 맞기 때문입니다. 이후 릴리스 요구가 복잡해지면 release branch를 추가하는 방식으로 확장하면 됩니다.
 
+## Git Flow vs GitHub Flow vs Trunk-Based 상세 비교
+
+아래 표는 팀이 전략을 선택할 때 바로 회의 문서에 붙일 수 있는 비교 기준입니다.
+
+| 항목 | GitHub Flow | Trunk-Based Development | Git Flow |
+| --- | --- | --- | --- |
+| 기본 branch 구조 | `main` + 짧은 feature branch | `main`(trunk) 중심, branch 수명 매우 짧음 | `main` + `develop` + `release/*` + `hotfix/*` |
+| 배포 리듬 | 수시 배포(continuous delivery)에 적합 | 하루 여러 번 배포하는 고빈도 환경에 적합 | 정해진 릴리스 주기(예: 2주/월간) 환경에 적합 |
+| PR 크기 기대치 | 작을수록 좋음(보통 1 기능/1 버그) | 매우 작아야 함(수 시간 단위) | release branch로 묶여 PR 단위가 커지기 쉬움 |
+| CI 요구 수준 | lint/test/build 필수 | 매우 강한 자동화 필수(빠른 피드백, flaky test 관리) | 중간~높음(릴리스 분기와 병합 검증 필요) |
+| rollback 방식 | revert commit + 재배포 | revert/feature flag off + 재배포 | hotfix branch로 수정 후 `main`/`develop` 동시 반영 |
+| hotfix 처리 | `main`에서 짧은 `hotfix/*` PR 권장 | trunk에서 즉시 수정 후 빠른 배포 | `hotfix/*`가 공식 루트, 릴리스 이력 관리 용이 |
+| 릴리스 태그 운영 | merge 후 `vX.Y.Z` 태그 | 배포 가능한 commit마다 태그 또는 자동 릴리스 태그 | `release/*` 검증 후 `main` 병합 시 태그 |
+| 팀 인지 부하 | 낮음 | 낮아 보이지만 규율 미흡 시 급상승 | 높음(branch 종류와 병합 규칙 다층) |
+| 잘 맞는 조직 | 스타트업, SaaS, 소규모 웹 팀 | 자동화 성숙도가 높은 제품 팀 | 다수 버전 동시 운영, 레거시 제품 라인 |
+
+중요한 것은 전략 이름보다 팀 규칙의 명확성입니다
+
+## release tagging을 설계하는 방법
+
+태그는 "이 commit이 고객에게 나간 기준점"을 남기는 작업입니다.
+
+아래는 release tagging에 자주 쓰는 최소 명령 세트입니다.
+
+```bash
+# 최신 main 기준으로 릴리스 기준점 확정
+git switch main
+git pull --ff-only origin main
+
+# annotated tag 생성 (권장)
+git tag -a v1.4.0 -m "Release v1.4.0: auth hardening, cache tuning"
+
+# 태그 push
+git push origin v1.4.0
+
+# 원격 태그 확인
+git ls-remote --tags origin
+```
+
+실무에서는 `annotated tag`를 기본값으로 두는 편이 좋습니다. 작성자, 날짜, 메시지를 함께 남길 수 있어 추적성이 높기 때문입니다.
+
+## Semantic Versioning과 태그를 연결하는 규칙
+
+`MAJOR.MINOR.PATCH`는 변경 영향도를 커뮤니케이션하는 계약입니다.
+
+| 버전 증가 | 의미 | 태그 예시 | PR/릴리스 판단 기준 |
+| --- | --- | --- | --- |
+| PATCH | 하위 호환 버그 수정 | `v1.4.3` | API 계약 변경 없음, 회귀 수정/안정화 중심 |
+| MINOR | 하위 호환 기능 추가 | `v1.5.0` | 기존 사용법 유지 + 기능 확장 |
+| MAJOR | 비호환 변경 포함 | `v2.0.0` | API/동작 계약이 깨짐, 마이그레이션 가이드 필요 |
+
+실수 방지를 위해 팀 문서에 "버전 판단 체크 질문"을 넣어 두는 것이 좋습니다.
+
+1. 기존 클라이언트 코드가 수정 없이 동작합니까?
+2. 공개 API의 요청/응답 스키마가 바뀌었습니까?
+3. 설정값, 환경변수, 권한 정책에 비호환 변경이 있습니까?
+
+이 세 질문 중 2번 또는 3번이 "예"라면 MAJOR 가능성을 먼저 검토하는 편이 안전합니다.
+
+## hotfix branch 운영: 긴급 수정에도 기록을 남기는 방법
+
+hotfix는 속도와 추적성을 동시에 잡아야 합니다.
+
+```bash
+# 1) 프로덕션 기준 main에서 hotfix 브랜치 생성
+git switch main
+git pull --ff-only origin main
+git switch -c hotfix/login-null-check
+
+# 2) 수정 + 테스트
+git add app/auth.py tests/test_auth.py
+git commit -m "fix(auth): guard null token path in login"
+
+# 3) 원격 push 후 PR 생성
+git push -u origin hotfix/login-null-check
+gh pr create --base main --title "fix(auth): hotfix null token login crash" --body "Closes #108"
+```
+
+핵심은 hotfix도 PR을 거쳐 승인 로그를 남기고, 배포 후 재발 방지 issue를 분리하는 것입니다.
+
+Git Flow를 쓰는 팀이라면 hotfix merge 방향을 한 번 더 명확히 적어 두어야 합니다. 즉, `hotfix/*`를 `main`에 먼저 병합하고 태그를 찍은 뒤, 같은 변경을 `develop`에도 반영해야 다음 릴리스에서 수정이 유실되지 않습니다.
+
+## CI/CD에 workflow를 연결하기
+
+좋은 workflow는 파이프라인으로 유지됩니다. 아래 네 가지는 최소 자동화 항목입니다.
+
+1. PR 열림/업데이트마다 `lint + test + build` 실행
+2. `main` 보호 규칙에 required status check 연결
+3. 태그 push(`v*`) 시 릴리스 노트 생성 및 배포 job 실행
+4. 실패 시 배포 중단과 알림 전송
+
+아래는 GitHub Actions 기준의 최소 예시입니다.
+
+```yaml
+name: ci-cd
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+    tags:
+      - "v*"
+
+jobs:
+  verify:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements-dev.txt
+      - run: ruff check .
+      - run: pytest -q
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./scripts/release.sh
+```
+
+핵심은 "통과하지 못하면 merge할 수 없게 만든다"는 제약입니다
+
+## 팀 conventions 문서 예시
+
+workflow를 말로만 공유하면 사람마다 해석이 달라집니다. 저장소에 운영 문서를 고정해 두는 편이 좋습니다.
+
+```md
+# Team Git Conventions
+
+## 1) Branch naming
+- feature: `feat/<scope>-<slug>`
+- bugfix: `fix/<scope>-<slug>`
+- hotfix: `hotfix/<slug>`
+
+## 2) Commit message
+- Conventional Commits 사용
+- 한 commit은 한 의도(atomic)
+
+## 3) Pull Request
+- 본문에 반드시 `Closes #N`
+- "무엇"보다 "왜"를 먼저 기술
+- 테스트 방법(재현 명령) 필수
+
+## 4) Merge policy
+- 기본 merge 방식: squash
+- required review 1명 이상
+- required checks: lint, test, build
+
+## 5) Release tagging
+- 버전 규칙: Semantic Versioning
+- 태그 형식: `vMAJOR.MINOR.PATCH`
+- annotated tag만 허용
+
+## 6) Emergency hotfix
+- `main` 기준 `hotfix/*` 생성
+- PR 승인 후 배포
+- 배포 후 재발 방지 issue 생성
+```
+
+이 문서의 목적은 완벽한 규칙집이 아니라 "팀의 기본값을 하나로 맞추는 기준점"입니다.
+
 ## 충돌 해결 절차를 표준화하기
 
 충돌은 실패가 아니라 동시 작업의 자연스러운 신호입니다. 중요한 것은 해결 순서와 검증 절차를 팀 공통 규칙으로 맞추는 일입니다.
@@ -335,11 +501,11 @@ git push
 ## 처음 질문으로 돌아가기
 
 - **GitHub Flow는 왜 작은 팀에서 특히 잘 맞을까요?**
-  - 본문의 기준은 실전 Git workflow 만들기: issue부터 release까지 한 흐름으로를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 규칙 수가 적고 PR 중심 도구와 바로 맞물려, issue부터 merge/tag까지 같은 리듬으로 반복하기 쉽기 때문입니다. branch protection과 required CI를 함께 두면 소규모 팀에서도 품질 하한을 안정적으로 유지할 수 있습니다.
 - **issue, branch, commit, PR, merge, tag는 어떤 순서로 연결될까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - issue로 작업 범위를 정의하고, feature 또는 hotfix branch에서 atomic commit을 만든 뒤, PR 리뷰와 CI 검증을 통과해 `main`에 병합합니다. 마지막으로 Semantic Versioning 기준으로 태그를 붙여 배포 기준점을 확정합니다.
 - **흐름 중간에 잘못된 branch에 commit하거나, 잘못 push했을 때 어떤 명령으로 회복할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - push 전에는 `cherry-pick`과 `reset`으로 복구하고, push 후에는 `revert`를 기본으로 사용합니다. 이력 재작성(force push)이 필요하면 반드시 `--force-with-lease`를 사용하고, 사고 대응 절차를 팀 conventions 문서에 고정해 재발을 막는 것이 핵심입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
