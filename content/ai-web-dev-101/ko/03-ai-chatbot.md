@@ -21,9 +21,11 @@ seo_description: Next.js와 Vercel AI SDK로 스트리밍 채팅 UI를 만들며
 
 # AI Web Development 101 (3/7): AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현
 
+이 글은 AI 웹 개발 입문 시리즈의 3번째 글입니다.
+
+
 터미널에서 AI를 호출하는 단계까지 왔다면, 이제 사용자가 직접 만질 수 있는 화면이 필요합니다. 여기서부터는 단순 API 호출을 넘어 입력 상태, 스트리밍 응답, 서버 경로, 사용자 경험이 함께 얽히기 시작합니다.
 
-이 글은 AI 웹 개발 입문 시리즈의 3번째 글입니다.
 
 여기서는 브라우저에서 AI와 실시간으로 대화하는 챗봇 UI를 구현해 보겠습니다. 이 편은 시리즈 안에서 잠시 프론트엔드로 이동하는 글이므로 Node.js, npm, React 기본기와 Next.js App Router 구조를 안다는 전제로 설명합니다.
 
@@ -322,6 +324,194 @@ export default function Chat() {
 
 다음 글에서는 대화 UI를 넘어, 우리 문서를 근거로 답하는 RAG 구조를 붙여 보겠습니다.
 
+## 서버 경계에서 지켜야 할 채팅 계약
+
+실시간 채팅 UI를 만들 때 가장 많이 생기는 실수는 브라우저 코드에서 모델 키를 직접 다루는 것입니다. 모델 공급자 API는 항상 서버 경계 뒤에서 호출하고, 브라우저는 오직 우리 서비스의 `/api/chat`만 호출해야 합니다. 이 경계를 명확히 잡아야 키 유출, 호출량 폭증, 감사 로그 누락을 막을 수 있습니다.
+
+```typescript
+// app/api/chat/route.ts
+import { streamText } from "ai"
+import { openai } from "@ai-sdk/openai"
+
+export const runtime = "edge"
+
+export async function POST(req: Request) {
+  const body = await req.json()
+  const messages = body.messages ?? []
+
+  const result = streamText({
+    model: openai("gpt-4o-mini"),
+    system: "당신은 한국어 개발 도우미입니다.",
+    messages,
+    temperature: 0.2,
+    maxTokens: 600,
+  })
+
+  return result.toDataStreamResponse()
+}
+```
+
+위 구조는 단순해 보이지만, 실제로는 모델 교체, 지표 수집, 레이트 리밋 도입을 모두 이 경계에서 수행할 수 있다는 장점이 있습니다.
+
+## 프롬프트 템플릿과 세션 메모리 분리
+
+챗봇 품질이 흔들리는 대표 원인은 이전 대화가 무제한으로 누적되는 것입니다. 세션 메시지를 모두 붙이면 비용이 빠르게 증가하고, 핵심 맥락이 묻히기도 쉽습니다. 따라서 "시스템 지침", "최근 대화", "검색 근거"를 별도 블록으로 분리해야 합니다.
+
+```typescript
+function buildPrompt(input: {
+  question: string
+  recentTurns: Array<{role: "user" | "assistant"; content: string}>
+  contextChunks: string[]
+}) {
+  return {
+    system: [
+      "당신은 한국어 기술 지원 도우미입니다.",
+      "근거가 없으면 모른다고 답합니다.",
+      "답변은 요약 1문장 + 핵심 3개로 작성합니다.",
+    ].join("\n"),
+    user: [
+      `질문: ${input.question}`,
+      "최근 대화:",
+      ...input.recentTurns.map((t) => `- ${t.role}: ${t.content}`),
+      "참고 문서:",
+      ...input.contextChunks,
+    ].join("\n"),
+  }
+}
+```
+
+이 패턴을 쓰면 이후 RAG를 붙여도 대화 품질 퇴화를 줄일 수 있습니다.
+
+## RAG 파이프라인을 챗봇에 연결하기
+
+챗봇이 "내 문서"를 답하도록 만들려면 검색 파이프라인을 채팅 경로에 조심스럽게 연결해야 합니다. 질문마다 검색을 무조건 수행하면 지연 시간이 급격히 늘 수 있으므로, 질문 분류를 한 번 두는 것이 좋습니다.
+
+```python
+# pseudo code for backend
+if is_document_question(user_question):
+    query_embedding = embed(user_question)
+    chunks = vector_store.search(query_embedding, top_k=4)
+    context = "\n\n".join([c.text for c in chunks])
+else:
+    context = ""
+
+messages = build_messages(question=user_question, context=context)
+answer = call_openai(messages)
+```
+
+질문 분류, 검색, 생성 단계를 분리하면 어느 구간이 병목인지 관측하기 쉬워집니다.
+
+## 배포 환경 설정 예시
+
+로컬에서는 `.env.local`이 편하지만, 운영에서는 플랫폼별 환경 변수 주입 방식이 필요합니다.
+
+```yaml
+# vercel.json
+{
+  "functions": {
+    "app/api/chat/route.ts": {
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "AI_MODEL": "gpt-4o-mini"
+  }
+}
+```
+
+```bash
+# Vercel CLI
+vercel env add OPENAI_API_KEY production
+vercel env add AI_MODEL production
+```
+
+설정 자체보다 중요한 것은 환경별 일관성입니다. 개발, 스테이징, 운영에서 모델 이름과 토큰 상한이 서로 다르면 디버깅 비용이 크게 늘어납니다.
+
+## 운영 지표: 체감 품질과 비용을 동시에 본다
+
+챗봇 운영에서는 다음 지표를 기본으로 수집하는 것이 좋습니다.
+
+- 첫 토큰 지연 시간(First Token Latency)
+- 전체 응답 완료 시간
+- 사용자 메시지당 총 토큰
+- 스트림 중단 비율
+- "도움이 되지 않았다" 피드백 비율
+
+이 다섯 가지 지표만 있어도 프론트 문제인지, 모델 문제인지, 검색 문제인지 빠르게 분류할 수 있습니다.
+
+
+
+## 장애 대응을 위한 사용자 메시지 정책
+
+실시간 채팅에서는 오류 문구도 사용자 경험입니다. 기술 상세를 그대로 노출하기보다, 재시도 가능 여부와 다음 행동을 알려주는 문구가 필요합니다.
+
+```text
+일시적으로 응답이 지연되고 있습니다.
+- 10초 뒤 다시 시도해 주세요.
+- 동일 문제가 반복되면 문의 채널에 request_id를 전달해 주세요.
+```
+
+이 정책을 정해 두면 프런트엔드와 백엔드가 서로 다른 오류 문구를 내보내는 혼선을 줄일 수 있습니다.
+
+
+## 스트리밍 응답 품질을 지키는 프런트엔드 패턴
+
+스트리밍 채팅은 빠르게 보이지만, 실제로는 중간 끊김과 상태 경합이 자주 발생합니다. 특히 사용자가 전송 버튼을 연속으로 누르는 경우 세션 상태가 꼬일 수 있습니다.
+
+```typescript
+const { messages, input, handleInputChange, handleSubmit, status, stop } = useChat({
+  api: "/api/chat",
+  onError(error) {
+    console.error("chat error", error)
+  },
+})
+
+const canSend = status !== "streaming" && input.trim().length > 0
+```
+
+`canSend` 같은 단순 가드만으로도 중복 요청이 크게 줄어듭니다. 또한 `stop()` 액션을 제공하면 사용자가 응답을 강제로 멈출 수 있어 체감 제어권이 올라갑니다.
+
+## 대화 저장 전략
+
+대화를 저장할 때는 전체 전문만 쌓지 말고 검색 가능한 메타데이터를 함께 저장해야 합니다.
+
+- `session_id`, `user_id`, `request_id`
+- 사용자 질문 요약
+- 모델 이름과 토큰 사용량
+- 응답 생성 시각과 지연 시간
+
+이 정보가 있어야 나중에 특정 세션의 품질 이슈를 빠르게 재현할 수 있습니다.
+
+
+## 챗봇 품질을 위한 요청 단위 추적 키
+
+운영에서 가장 유용한 키는 `request_id`입니다. 브라우저 이벤트, API 로그, 모델 호출 로그를 같은 ID로 묶으면 문제 재현 시간이 크게 줄어듭니다.
+
+```typescript
+const requestId = crypto.randomUUID()
+await fetch("/api/chat", {
+  method: "POST",
+  headers: { "x-request-id": requestId },
+  body: JSON.stringify({ messages }),
+})
+```
+
+사용자 문의를 받을 때도 request_id 하나만 있으면 같은 세션의 전체 흐름을 빠르게 추적할 수 있습니다.
+
+
+### 실무 메모
+
+이 절에서 다룬 원칙은 기능이 늘어날수록 더 중요해집니다. 특히 팀원이 늘어나면 개인 감각보다 문서화된 규칙이 더 큰 품질 차이를 만듭니다. 따라서 예제 코드를 복사해 쓰는 것에서 멈추지 말고, 현재 팀의 장애 패턴과 운영 제약에 맞춰 규칙을 재정의하는 작업이 필요합니다. 작은 체크리스트 하나가 장기적으로는 가장 큰 비용 절감으로 돌아옵니다.
+
+### 실무 메모
+
+이 절에서 다룬 원칙은 기능이 늘어날수록 더 중요해집니다. 특히 팀원이 늘어나면 개인 감각보다 문서화된 규칙이 더 큰 품질 차이를 만듭니다. 따라서 예제 코드를 복사해 쓰는 것에서 멈추지 말고, 현재 팀의 장애 패턴과 운영 제약에 맞춰 규칙을 재정의하는 작업이 필요합니다. 작은 체크리스트 하나가 장기적으로는 가장 큰 비용 절감으로 돌아옵니다.
+
+
+### 점검 질문
+
+배포 전 마지막으로 "응답이 늦을 때 사용자는 무엇을 보게 되는가", "중복 전송을 막는가", "요청 ID로 추적 가능한가"를 확인해야 합니다. 이 세 질문이 통과되면 초반 운영 안정성이 크게 높아집니다.
+
 ## 처음 질문으로 돌아가기
 
 - **터미널 예제를 브라우저 UI로 옮기려면 어떤 구성이 필요할까요?**
@@ -345,6 +535,7 @@ export default function Chat() {
 <!-- toc:end -->
 
 ## 참고 자료
+- [AI Web Development 101 예제 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/ai-web-dev-101/ko)
 
 - [Vercel AI SDK: Chatbot guide](https://sdk.vercel.ai/docs/ai-sdk-ui/chatbot) — `useChat` + 라우트 핸들러 조합의 정식 안내
 - [Vercel AI SDK: `useChat` reference](https://sdk.vercel.ai/docs/reference/ai-sdk-ui/use-chat) — 메시지 상태와 `status` 값의 정확한 의미

@@ -293,79 +293,482 @@ CLI에서 가장 중요한 것은 기능 수보다 **일관된 인터페이스**
 
 다음 글에서는 **타입 힌트와 정적 검사** — mypy, `py.typed`, 타입 안전한 패키지를 다룹니다.
 
-## 실전 패턴 추가: pyproject.toml, 빌드 명령, CI까지 한 번에 정리
+## Entry Point 동작 원리
 
-패키징은 파일 한두 개를 만드는 작업이 아니라, 메타데이터와 빌드 백엔드, 배포 검증을 같은 계약으로 묶는 작업입니다. `pyproject.toml`을 기준으로 로컬 빌드와 CI 검증 경로를 맞추면 릴리스 직전의 불일치를 크게 줄일 수 있습니다.
+`[project.scripts]`에 등록한 entry point는 `pip install` 시 실행 가능한 래퍼 스크립트를 생성합니다.
+
+### 설정과 생성되는 파일
+
+```toml
+# pyproject.toml
+[project.scripts]
+acme = "acme_utils.cli:main"
+```
+
+```bash
+pip install -e .
+which acme
+# /home/user/.local/bin/acme (또는 .venv/bin/acme)
+```
+
+```python
+# 생성되는 래퍼 스크립트 (자동 생성됨, 직접 수정 불필요)
+#!/path/to/.venv/bin/python
+from acme_utils.cli import main
+import sys
+sys.exit(main())
+```
+
+### entry point 종류
+
+| 종류 | 설정 키 | 용도 |
+|---|---|---|
+| console_scripts | `[project.scripts]` | 터미널 명령 |
+| gui_scripts | `[project.gui-scripts]` | GUI 앱 (Windows에서 콘솔 창 없음) |
+| plugins | `[project.entry-points]` | 플러그인 확장 포인트 |
+
+## Click으로 CLI 만들기
+
+Click은 Python CLI 프레임워크 중 가장 널리 사용됩니다. 데코레이터 기반으로 명령, 옵션, 인자를 선언합니다.
+
+### 기본 구조
+
+```python
+# src/acme_utils/cli.py
+import click
+
+@click.group()
+@click.version_option()
+def main():
+    """Acme utility CLI."""
+    pass
+
+@main.command()
+@click.argument("name")
+@click.option("--greeting", "-g", default="Hello", help="Greeting message")
+def hello(name: str, greeting: str):
+    """Greet someone."""
+    click.echo(f"{greeting}, {name}!")
+
+@main.command()
+@click.option("--format", "-f", type=click.Choice(["json", "yaml", "toml"]), default="json")
+@click.option("--output", "-o", type=click.Path(), help="Output file path")
+def config(format: str, output: str | None):
+    """Generate configuration template."""
+    import json
+    template = {"name": "acme-app", "version": "1.0.0", "debug": False}
+    
+    result = json.dumps(template, indent=2)
+    
+    if output:
+        with open(output, "w") as f:
+            f.write(result)
+        click.echo(f"Written to {output}")
+    else:
+        click.echo(result)
+```
+
+```bash
+# 사용 예시
+acme --version
+# acme-utils, version 0.1.0
+
+acme hello World
+# Hello, World!
+
+acme hello --greeting "Hi" Alice
+# Hi, Alice!
+
+acme config --format json --output config.json
+# Written to config.json
+```
+
+### Click의 자동 도움말
+
+```bash
+acme --help
+# Usage: acme [OPTIONS] COMMAND [ARGS]...
+# 
+#   Acme utility CLI.
+# 
+# Options:
+#   --version  Show the version and exit.
+#   --help     Show this message and exit.
+# 
+# Commands:
+#   config  Generate configuration template.
+#   hello   Greet someone.
+```
+
+## Typer: Click의 현대적 대안
+
+Typer는 Click 위에 구축되었지만 타입 힌트를 활용하여 더 간결한 코드를 제공합니다.
+
+```python
+# src/acme_utils/cli.py
+import typer
+from typing import Annotated
+
+app = typer.Typer(help="Acme utility CLI.")
+
+@app.command()
+def hello(
+    name: str,
+    greeting: Annotated[str, typer.Option("--greeting", "-g")] = "Hello",
+):
+    """Greet someone."""
+    typer.echo(f"{greeting}, {name}!")
+
+@app.command()
+def init(
+    project_name: str,
+    force: Annotated[bool, typer.Option("--force", "-f")] = False,
+):
+    """Initialize a new project."""
+    if force:
+        typer.echo(f"Force creating {project_name}...")
+    else:
+        typer.echo(f"Creating {project_name}...")
+
+def main():
+    app()
+```
+
+### Click vs Typer 비교
+
+| 항목 | Click | Typer |
+|---|---|---|
+| 타입 선언 | 데코레이터 매개변수 | Python 타입 힌트 |
+| 학습 곡선 | 중간 | 낮음 |
+| 생태계 | 매우 넓음 | Click 생태계 활용 |
+| 자동 완성 | 별도 설정 | 내장 지원 |
+| Python 최소 버전 | 3.7+ | 3.7+ |
+
+## argparse: 표준 라이브러리 선택지
+
+외부 의존성을 추가하고 싶지 않다면 `argparse`를 사용할 수 있습니다.
+
+```python
+# src/acme_utils/cli.py
+import argparse
+import sys
+
+def create_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog="acme",
+        description="Acme utility CLI",
+    )
+    parser.add_argument("--version", action="version", version="%(prog)s 0.1.0")
+    
+    subparsers = parser.add_subparsers(dest="command")
+    
+    # hello 서브커맨드
+    hello_parser = subparsers.add_parser("hello", help="Greet someone")
+    hello_parser.add_argument("name")
+    hello_parser.add_argument("--greeting", "-g", default="Hello")
+    
+    # init 서브커맨드
+    init_parser = subparsers.add_parser("init", help="Initialize project")
+    init_parser.add_argument("project_name")
+    init_parser.add_argument("--force", "-f", action="store_true")
+    
+    return parser
+
+def main() -> int:
+    parser = create_parser()
+    args = parser.parse_args()
+    
+    if args.command == "hello":
+        print(f"{args.greeting}, {args.name}!")
+    elif args.command == "init":
+        print(f"Creating {args.project_name}...")
+    else:
+        parser.print_help()
+        return 1
+    
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())
+```
+
+## CLI 테스트
+
+### Click 테스트
+
+```python
+# tests/test_cli.py
+from click.testing import CliRunner
+from acme_utils.cli import main
+
+def test_hello():
+    runner = CliRunner()
+    result = runner.invoke(main, ["hello", "World"])
+    assert result.exit_code == 0
+    assert "Hello, World!" in result.output
+
+def test_hello_with_greeting():
+    runner = CliRunner()
+    result = runner.invoke(main, ["hello", "--greeting", "Hi", "Alice"])
+    assert result.exit_code == 0
+    assert "Hi, Alice!" in result.output
+
+def test_version():
+    runner = CliRunner()
+    result = runner.invoke(main, ["--version"])
+    assert result.exit_code == 0
+    assert "version" in result.output
+```
+
+### Typer 테스트
+
+```python
+from typer.testing import CliRunner
+from acme_utils.cli import app
+
+runner = CliRunner()
+
+def test_hello():
+    result = runner.invoke(app, ["hello", "World"])
+    assert result.exit_code == 0
+    assert "Hello, World!" in result.output
+```
+
+## 종료 코드 관리
+
+CLI 도구는 적절한 종료 코드를 반환해야 스크립트와 CI에서 올바르게 동작합니다.
+
+```python
+import sys
+import click
+
+@click.command()
+@click.argument("path", type=click.Path(exists=True))
+def lint(path: str):
+    """Lint Python files."""
+    errors = run_linter(path)
+    
+    if errors:
+        for err in errors:
+            click.echo(f"ERROR: {err}", err=True)
+        sys.exit(1)  # 실패: 비정상 종료 코드
+    
+    click.echo("All checks passed!")
+    sys.exit(0)  # 성공
+```
+
+```text
+종료 코드 규칙:
+0   - 성공
+1   - 일반 에러
+2   - CLI 사용법 에러 (잘못된 인자)
+130 - Ctrl+C로 중단됨 (128 + SIGINT)
+```
+
+## Rich를 활용한 터미널 출력
+
+```python
+from rich.console import Console
+from rich.table import Table
+from rich.progress import track
+import time
+
+console = Console()
+
+def show_packages():
+    table = Table(title="Installed Packages")
+    table.add_column("Name", style="cyan")
+    table.add_column("Version", style="green")
+    table.add_column("Location")
+    
+    table.add_row("httpx", "0.27.2", "site-packages/httpx")
+    table.add_row("pydantic", "2.8.2", "site-packages/pydantic")
+    
+    console.print(table)
+
+def process_files(files: list[str]):
+    for file in track(files, description="Processing..."):
+        time.sleep(0.1)  # 실제 작업
+    console.print("[green]Done![/green]")
+```
+
+## 셸 자동 완성 설정
+
+### Click 자동 완성
+
+```bash
+# Bash
+_ACME_COMPLETE=bash_source acme > ~/.acme-complete.bash
+echo '. ~/.acme-complete.bash' >> ~/.bashrc
+
+# Zsh
+_ACME_COMPLETE=zsh_source acme > ~/.acme-complete.zsh
+echo '. ~/.acme-complete.zsh' >> ~/.zshrc
+
+# Fish
+_ACME_COMPLETE=fish_source acme > ~/.config/fish/completions/acme.fish
+```
+
+### Typer 자동 완성
+
+```bash
+# Typer는 내장 지원
+acme --install-completion
+# 자동으로 셸에 맞는 완성 스크립트 설치
+```
+
+
+## CLI 패키지 배포 구조
+
+CLI 패키지의 전체 프로젝트 구조와 pyproject.toml을 정리합니다.
+
+```text
+acme-cli/
+├── src/
+│   └── acme_cli/
+│       ├── __init__.py
+│       ├── __main__.py      # python -m acme_cli 지원
+│       ├── cli.py           # Click/Typer 앱 정의
+│       ├── commands/        # 서브커맨드 모듈
+│       │   ├── __init__.py
+│       │   ├── init.py
+│       │   ├── build.py
+│       │   └── deploy.py
+│       └── utils.py         # 공용 헬퍼
+├── tests/
+│   ├── test_cli.py
+│   └── test_commands/
+├── pyproject.toml
+└── README.md
+```
+
+### `__main__.py`: `python -m` 지원
+
+```python
+# src/acme_cli/__main__.py
+from .cli import main
+
+if __name__ == "__main__":
+    main()
+```
+
+```bash
+# 두 가지 실행 방법 모두 지원
+acme --help                # entry point
+python -m acme_cli --help  # __main__.py
+```
+
+### pyproject.toml 전체 설정
 
 ```toml
 [build-system]
-requires = ["setuptools>=68", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
-name = "acme-utils"
+name = "acme-cli"
 version = "0.1.0"
-description = "Utility package for internal services"
-readme = "README.md"
+description = "Command-line tools for Acme platform"
 requires-python = ">=3.10"
 dependencies = [
-  "httpx>=0.27,<0.29",
+    "click>=8.1",
+    "rich>=13.0",
+    "httpx>=0.27",
 ]
 
 [project.optional-dependencies]
 dev = [
-  "pytest>=8.0",
-  "ruff>=0.5",
-  "mypy>=1.10",
-  "build>=1.2",
-  "twine>=5.1",
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
 ]
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[project.scripts]
+acme = "acme_cli.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/acme_cli"]
+```
+
+## 설정 파일 관리
+
+CLI 도구는 사용자 설정을 파일로 저장하는 경우가 많습니다.
+
+```python
+# src/acme_cli/config.py
+from pathlib import Path
+import tomllib  # Python 3.11+
+
+def get_config_dir() -> Path:
+    """XDG Base Directory 규칙에 따른 설정 디렉터리."""
+    xdg = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
+    config_dir = xdg / "acme"
+    config_dir.mkdir(parents=True, exist_ok=True)
+    return config_dir
+
+def load_config() -> dict:
+    config_path = get_config_dir() / "config.toml"
+    if config_path.exists():
+        with open(config_path, "rb") as f:
+            return tomllib.load(f)
+    return {}
+```
+
+```toml
+# ~/.config/acme/config.toml
+[defaults]
+output_format = "json"
+verbose = false
+
+[auth]
+api_url = "https://api.acme.dev"
+```
+
+## 환경 변수와 CLI 옵션 우선순위
+
+CLI 도구의 설정 값은 여러 출처에서 올 수 있습니다. 일반적인 우선순위는 다음과 같습니다.
+
+```text
+우선순위 (높음 → 낮음):
+1. CLI 옵션 (--format json)
+2. 환경 변수 (ACME_FORMAT=json)
+3. 설정 파일 (~/.config/acme/config.toml)
+4. 기본값 (코드에 하드코딩)
+```
+
+```python
+@click.command()
+@click.option(
+    "--api-url",
+    envvar="ACME_API_URL",       # 환경 변수에서도 읽기
+    default="https://api.acme.dev",
+    help="API endpoint URL",
+)
+def deploy(api_url: str):
+    """Deploy to Acme platform."""
+    click.echo(f"Deploying to {api_url}...")
 ```
 
 ```bash
-python -m pip install -U pip
-python -m pip install -e ".[dev]"
-python -m build
-python -m twine check dist/*
+# 세 가지 방법 모두 동일하게 동작
+acme deploy --api-url https://staging.acme.dev
+ACME_API_URL=https://staging.acme.dev acme deploy
+# 또는 config.toml에 설정
 ```
 
-```yaml
-name: package-ci
-on:
-  pull_request:
-  push:
-    branches: [ main ]
 
-jobs:
-  verify:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: python -m pip install -U pip
-      - run: python -m pip install -e ".[dev]"
-      - run: pytest -q
-      - run: ruff check .
-      - run: mypy src
-      - run: python -m build
-      - run: python -m twine check dist/*
-```
+이 우선순위 체계를 잘 설계하면 사용자는 반복적인 옵션 입력 없이도 CLI를 편리하게 사용할 수 있고, 필요할 때만 명시적으로 값을 재정의할 수 있습니다. 대부분의 성숙한 CLI 도구(`aws`, `gh`, `docker`)가 이 패턴을 따릅니다.
 
-실무에서 중요한 포인트는 로컬과 CI가 같은 명령 세트를 사용하도록 고정하는 것입니다. 개발자가 로컬에서 `python -m build`를 통과시킨 산출물이 CI에서도 같은 방식으로 통과해야 릴리스 리스크가 줄어듭니다. 또한 `twine check`를 CI에 넣어 두면 README 렌더링 오류나 메타데이터 누락을 배포 전에 잡을 수 있습니다.
 
 ## 처음 질문으로 돌아가기
 
 - **`pip install` 후 바로 실행되는 명령어는 어떻게 만들까요?**
-  - 본문의 기준은 CLI 패키지 만들기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - `pyproject.toml`의 `[project.scripts]`에 `명령이름 = "패키지.모듈:함수"` 형식으로 entry point를 등록합니다. `pip install` 시 해당 함수를 호출하는 래퍼 스크립트가 `bin/` 디렉터리에 자동 생성되어 터미널에서 바로 실행할 수 있게 됩니다.
+
 - **`[project.scripts]` entry point는 어떻게 동작할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
-- **`argparse`와 `click`은 무엇이 다를까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - pip은 설치 시 `site-packages`의 `.dist-info/entry_points.txt`에 매핑을 기록하고, `bin/` 디렉터리에 Python 래퍼 스크립트를 생성합니다. 이 스크립트는 지정된 모듈을 import하고 지정된 함수를 호출하며, 함수의 반환값을 `sys.exit()`에 전달합니다.
+
+- **CLI 프레임워크는 어떤 것을 선택해야 할까요?**
+  - 외부 의존성을 원하지 않으면 `argparse`, 풍부한 생태계와 플러그인이 필요하면 `click`, 타입 힌트 기반 간결한 코드를 원하면 `typer`를 선택합니다. `typer`는 내부적으로 `click`을 사용하므로 click의 기능을 그대로 쓸 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -385,6 +788,7 @@ jobs:
 
 ## 참고 자료
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/python-package-101/ko)
 - [Python Packaging - Entry Points](https://packaging.python.org/en/latest/specifications/entry-points/)
 - [click documentation](https://click.palletsprojects.com/)
 - [argparse documentation](https://docs.python.org/3/library/argparse.html)

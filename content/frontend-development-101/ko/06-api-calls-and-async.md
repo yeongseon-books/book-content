@@ -22,9 +22,9 @@ last_reviewed: '2026-05-12'
 
 # Frontend Development 101 (6/10): API 호출과 비동기
 
-프론트엔드는 거의 항상 서버와 대화합니다. 사용자 목록을 불러오고 검색 결과를 받고 저장 버튼을 누르면 데이터를 전송합니다. 문제는 이 모든 일이 즉시 끝나지 않는다는 점입니다. 네트워크는 느릴 수 있고 실패할 수 있으며 요청 순서가 뒤집힐 수도 있습니다.
-
 이 글은 Frontend Development 101 시리즈의 여섯 번째 글입니다. 여기서는 프론트엔드의 비동기 흐름을 상태 중심으로 설명합니다. 비동기 코드는 결국 로딩, 성공, 실패라는 상태를 얼마나 명시적으로 다루느냐의 문제입니다.
+
+프론트엔드는 거의 항상 서버와 대화합니다. 사용자 목록을 불러오고 검색 결과를 받고 저장 버튼을 누르면 데이터를 전송합니다. 문제는 이 모든 일이 즉시 끝나지 않는다는 점입니다. 네트워크는 느릴 수 있고 실패할 수 있으며 요청 순서가 뒤집힐 수도 있습니다.
 
 ## 먼저 던지는 질문
 
@@ -56,7 +56,7 @@ last_reviewed: '2026-05-12'
 - **AbortController**: 진행 중인 요청을 취소하는 도구입니다.
 - **Stale-while-revalidate**: 캐시된 데이터를 먼저 보여 주고 뒤에서 새로 고치는 전략입니다.
 
-## Before/After
+## 전통 방식과 현대 방식 비교
 
 **Before (callback hell)**
 
@@ -206,7 +206,7 @@ function Users() {
 다음 글에서는 폼과 유효성 검사를 통해 사용자 입력을 안전하고 친절하게 다루는 방법을 살펴보겠습니다.
 
 
-## 실전 구현 확장: HTML/CSS/JS, 컴포넌트, 빌드 설정
+## 실전 구현 확장: 구조, 상태, 빌드, 운영 품질
 
 프론트엔드 글을 읽고 바로 실무에 연결하려면 이론 설명 뒤에 실행 가능한 구조를 붙여 보는 연습이 필요합니다. 핵심은 화면을 "보이는 결과"로만 다루지 않고, HTML 구조, CSS 토큰, JavaScript 상태, 컴포넌트 경계, 빌드 산출물까지 한 흐름으로 연결하는 것입니다. 이 흐름이 잡히면 기능 추가와 디버깅이 훨씬 예측 가능해집니다.
 
@@ -372,6 +372,276 @@ export default defineConfig({
 프론트엔드는 더 이상 단순 화면 기술이 아닙니다. API 계약, 번들 최적화, 브라우저 성능, 접근성, 운영 관측이 모두 만나는 실행 계층입니다. 따라서 작은 예제라도 HTML/CSS/JS 코드, 컴포넌트 패턴, 빌드 설정을 한 번에 다뤄 보는 연습이 필요합니다. 이 연습을 반복하면 도구가 바뀌어도 구조를 잃지 않고, 신규 기능을 추가할 때도 안정적으로 확장할 수 있습니다.
 
 
+
+## 실무 앵커 모음: 프레임워크, 레이아웃, 디버깅, 성능
+
+이 절은 앞에서 배운 개념을 실제 구현 단위로 연결하기 위한 공통 앵커입니다. 핵심은 기술 이름을 외우는 것이 아니라, 같은 문제를 React와 Vue에서 어떻게 구조화하는지, CSS 레이아웃과 접근성 규칙을 어떻게 함께 적용하는지, 그리고 DevTools와 빌드 설정으로 성능 가설을 어떻게 검증하는지를 한 번에 보는 것입니다.
+
+### React 컴포넌트 앵커: 상태와 접근성 속성 함께 설계하기
+
+```tsx
+import { useMemo, useState } from "react";
+
+type Todo = {
+  id: number;
+  title: string;
+  done: boolean;
+};
+
+const seed: Todo[] = [
+  { id: 1, title: "요구사항 정리", done: true },
+  { id: 2, title: "UI 구성", done: false },
+  { id: 3, title: "접근성 점검", done: false },
+];
+
+export default function TodoPanel() {
+  const [items, setItems] = useState<Todo[]>(seed);
+  const [keyword, setKeyword] = useState("");
+
+  const filtered = useMemo(
+    () => items.filter((item) => item.title.includes(keyword.trim())),
+    [items, keyword],
+  );
+
+  function toggle(id: number) {
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, done: !item.done } : item,
+      ),
+    );
+  }
+
+  return (
+    <section aria-labelledby="todo-title">
+      <h2 id="todo-title">작업 목록</h2>
+
+      <label htmlFor="todo-filter">제목 필터</label>
+      <input
+        id="todo-filter"
+        value={keyword}
+        onChange={(e) => setKeyword(e.target.value)}
+        placeholder="예: 접근성"
+      />
+
+      <ul>
+        {filtered.map((item) => (
+          <li key={item.id}>
+            <button
+              type="button"
+              aria-pressed={item.done}
+              onClick={() => toggle(item.id)}
+            >
+              {item.done ? "완료" : "진행"}: {item.title}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+```
+
+이 코드의 핵심은 세 가지입니다. 첫째, 상태 변경 지점을 `toggle` 하나로 모아 추적성을 높입니다. 둘째, `aria-pressed`로 토글 상태를 보조기술에 전달합니다. 셋째, 필터링 연산을 `useMemo`로 감싸 입력 반응성을 유지합니다. 입문 단계에서 이런 습관을 들이면 상태가 늘어나도 버그 위치를 빠르게 좁힐 수 있습니다.
+
+### Vue 컴포넌트 앵커: 반응형 계산과 입력 검증 흐름
+
+```vue
+<script setup lang="ts">
+import { computed, ref } from "vue";
+
+type Member = {
+  id: number;
+  name: string;
+  role: "dev" | "design" | "pm";
+};
+
+const members = ref<Member[]>([
+  { id: 1, name: "민서", role: "dev" },
+  { id: 2, name: "준호", role: "design" },
+  { id: 3, name: "유진", role: "pm" },
+]);
+
+const role = ref<"all" | Member["role"]>("all");
+const keyword = ref("");
+
+const visibleMembers = computed(() => {
+  return members.value.filter((member) => {
+    const roleMatched = role.value === "all" || role.value === member.role;
+    const keywordMatched = member.name.includes(keyword.value.trim());
+    return roleMatched && keywordMatched;
+  });
+});
+</script>
+
+<template>
+  <section aria-labelledby="member-title">
+    <h2 id="member-title">팀 멤버</h2>
+
+    <label for="role-select">역할</label>
+    <select id="role-select" v-model="role">
+      <option value="all">전체</option>
+      <option value="dev">개발</option>
+      <option value="design">디자인</option>
+      <option value="pm">기획</option>
+    </select>
+
+    <label for="member-keyword">이름 검색</label>
+    <input id="member-keyword" v-model="keyword" />
+
+    <ul>
+      <li v-for="member in visibleMembers" :key="member.id">
+        {{ member.name }} / {{ member.role }}
+      </li>
+    </ul>
+  </section>
+</template>
+```
+
+Vue에서는 `computed`를 중심으로 파생 상태를 선언하면 템플릿이 읽기 쉬워지고 테스트 지점도 명확해집니다. 특히 폼 입력과 필터링이 결합된 화면에서 `v-model`과 계산 속성을 분리해 두면, 검증 규칙 추가나 API 연동 시 수정 범위가 작아집니다.
+
+### CSS 레이아웃 앵커: Grid와 Flex를 역할별로 구분하기
+
+```css
+:root {
+  --surface: #ffffff;
+  --border: #e5e7eb;
+  --text: #111827;
+  --muted: #6b7280;
+  --gap-3: 12px;
+  --gap-4: 16px;
+  --radius: 14px;
+}
+
+.dashboard {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: var(--gap-4);
+  min-height: 100dvh;
+  padding: var(--gap-4);
+  background:
+    radial-gradient(circle at 10% 0%, #e0f2fe 0%, transparent 35%),
+    #f8fafc;
+  color: var(--text);
+}
+
+.sidebar,
+.content-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-3);
+  align-items: center;
+  justify-content: space-between;
+}
+
+@media (max-width: 960px) {
+  .dashboard {
+    grid-template-columns: 1fr;
+  }
+}
+```
+
+권장 기준은 단순합니다. 페이지 뼈대는 Grid, 같은 축의 정렬은 Flex로 나눕니다. 이렇게 역할을 분리하면 반응형 변경 시 어디를 수정해야 하는지 즉시 보입니다. 또한 `minmax(0, 1fr)`를 사용해 긴 텍스트가 그리드를 깨뜨리는 문제를 예방할 수 있습니다.
+
+### DevTools 워크플로: 가설부터 검증까지
+
+브라우저 DevTools는 "문제가 있다"는 느낌을 "어느 계층이 원인인지"로 바꾸는 도구입니다. 실무에서 반복 가능한 순서는 아래와 같습니다.
+
+1. **Network 탭**에서 느린 요청을 정렬하고 `TTFB`, `Content Download`를 분리해 확인합니다.
+2. **Performance 탭**에서 사용자 시나리오를 기록한 뒤 Long Task(50ms+) 구간을 찾습니다.
+3. **Coverage 탭**으로 사용되지 않는 CSS/JS 비율을 확인해 코드 스플리팅 후보를 뽑습니다.
+4. **Lighthouse**에서 접근성 경고(`label`, `color contrast`, `heading order`)를 우선 정리합니다.
+5. **Memory 탭**에서 화면 전환을 5회 반복 기록해 누수 패턴(Detached DOM tree)을 찾습니다.
+
+이 흐름의 장점은 도구를 많이 쓰는 데 있지 않습니다. 같은 문제를 팀원 누구나 같은 순서로 재현하고 같은 숫자로 대화할 수 있다는 점이 핵심입니다.
+
+### 빌드 설정 앵커: 개발/운영 차이를 명시적으로 관리하기
+
+```ts
+import { defineConfig } from "vite";
+
+export default defineConfig({
+  build: {
+    target: "es2020",
+    sourcemap: true,
+    cssCodeSplit: true,
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          framework: ["react", "react-dom"],
+          vendor: ["lodash-es", "dayjs"],
+        },
+      },
+    },
+  },
+  server: {
+    port: 5173,
+    strictPort: true,
+  },
+});
+```
+
+```json
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "analyze": "vite build --mode analyze",
+    "check": "npm run build && npm run test && npm run lint"
+  }
+}
+```
+
+중요한 포인트는 `manualChunks` 같은 최적화 옵션을 "속도 향상 마법"으로 보지 않는 것입니다. 먼저 측정 지표를 정하고, 변경 전후 번들 크기와 초기 렌더링 시간을 숫자로 비교해야 합니다. 그래야 회귀가 생겨도 원인을 빠르게 되짚을 수 있습니다.
+
+### 접근성 패턴 앵커: 키보드와 스크린 리더를 기본값으로
+
+```html
+<form aria-labelledby="signup-title" novalidate>
+  <h2 id="signup-title">뉴스레터 신청</h2>
+
+  <label for="email">이메일</label>
+  <input
+    id="email"
+    name="email"
+    type="email"
+    autocomplete="email"
+    aria-describedby="email-help email-error"
+    required
+  />
+  <p id="email-help">업무용 이메일을 권장합니다.</p>
+  <p id="email-error" role="alert" hidden>올바른 이메일 형식이 아닙니다.</p>
+
+  <button type="submit">신청</button>
+</form>
+```
+
+접근성은 별도 기능이 아니라 입력과 오류 흐름의 기본 계약입니다. `label` 연결, 오류 메시지의 `role="alert"`, 키보드 포커스 순서 같은 규칙은 초기에 넣어야 비용이 가장 낮습니다. 나중에 화면이 커진 뒤 보강하려면 컴포넌트 API부터 다시 설계해야 하는 경우가 많습니다.
+
+### 성능 예산 앵커: 감이 아니라 수치로 운영하기
+
+다음은 입문 팀에서도 바로 적용 가능한 예시 예산입니다.
+
+- 초기 JavaScript 번들(압축 후): **220KB 이하**
+- 최초 콘텐츠 표시(FCP): **1.8초 이하**
+- 상호작용 가능 시점(TTI): **3.0초 이하**
+- 이미지 총 전송량(첫 화면): **500KB 이하**
+- 장기 작업(Long Task): **페이지당 2회 이하**
+
+예산은 목표가 아니라 경계선입니다. 기능을 추가할 때 이 수치를 함께 검토하면 "동작은 하지만 체감은 나빠진" 상태를 초기에 차단할 수 있습니다. 특히 프론트엔드는 기능 품질과 성능 품질이 분리되지 않으므로, 정의 단계부터 성능 기준을 요구사항에 포함하는 편이 안전합니다.
+
+### 운영 관점 마무리
+
+프론트엔드는 빠르게 변하는 생태계처럼 보이지만, 실제로 오래가는 것은 구조화 원칙입니다. 컴포넌트 경계, 상태 흐름, 접근성 계약, 성능 예산, 검증 루프를 팀의 기본 언어로 고정하면 도구가 React에서 Vue로, Vite에서 다른 번들러로 바뀌어도 품질이 쉽게 무너지지 않습니다. 이 글의 나머지 내용을 읽을 때도 "무엇을 썼는가"보다 "왜 이 구조로 검증 가능한가"를 기준으로 보면 실무 전환 속도가 훨씬 빨라집니다.
+
+
 ## 처음 질문으로 돌아가기
 
 - **`fetch`와 `async/await`는 어떤 최소 패턴으로 시작하면 될까요?**
@@ -407,5 +677,7 @@ export default defineConfig({
 ### 확인용 자료
 - [SWR documentation](https://swr.vercel.app/)
 - [web.dev: Fetch API error handling](https://web.dev/articles/fetch-api-error-handling)
+
+- [이 시리즈 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/frontend-development-101/ko)
 
 Tags: Frontend, API, Async, Fetch, JavaScript

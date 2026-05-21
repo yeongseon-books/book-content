@@ -287,70 +287,422 @@ print(f"deque is {list_time / deque_time:.0f}x faster")
 스택은 LIFO, 큐는 FIFO라는 단순한 규칙 위에서 동작합니다. Python에서는 스택은 list, 큐는 deque라는 관례가 사실상 표준이며, 이 선택은 내부 연산 비용과 정확히 맞닿아 있습니다. 다음 글에서는 빠른 키 기반 조회를 가능하게 만드는 해시 테이블과 dict를 살펴보겠습니다.
 
 
-## Python 구현 보강: 타입 힌트와 검증 루틴
 
-Python에서 자료구조를 학습할 때는 동작 예시만 확인하는 단계에서 멈추지 않고, 타입 힌트와 최소 검증 루틴을 함께 작성해야 설계 의도가 명확해집니다. 특히 `TypeVar`, `Generic`, `Protocol`을 사용하면 자료구조 API의 입력/출력 계약을 코드 차원에서 드러낼 수 있습니다. 아래 예시는 여러 글에서 재사용할 수 있는 기본 인터페이스 패턴입니다.
+## 타입 힌트 기반 스택 구현
+
+스택은 LIFO(Last In, First Out) 규칙을 따르는 가장 단순한 ADT입니다. Python list의 `append()`와 `pop()`이 이미 LIFO를 제공하지만, 명시적 Stack 클래스를 만들면 "이 컬렉션은 LIFO로만 접근한다"는 의도를 코드에 고정할 수 있습니다.
 
 ```python
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Generic, Iterable, Iterator, Optional, TypeVar
+from typing import Generic, Iterator, TypeVar
 
 T = TypeVar("T")
 
-@dataclass
-class Node(Generic[T]):
-    value: T
-    next: Optional["Node[T]"] = None
 
-class Container(Generic[T]):
-    def __init__(self, items: Optional[Iterable[T]] = None) -> None:
-        self._size = 0
-        self._head: Optional[Node[T]] = None
-        if items is not None:
-            for item in items:
-                self.push(item)
+class Stack(Generic[T]):
+    """list 기반 LIFO 스택입니다."""
 
-    def push(self, value: T) -> None:
-        self._head = Node(value=value, next=self._head)
-        self._size += 1
+    def __init__(self) -> None:
+        self._data: list[T] = []
+
+    def push(self, item: T) -> None:
+        self._data.append(item)
 
     def pop(self) -> T:
-        if self._head is None:
-            raise IndexError("empty container")
-        node = self._head
-        self._head = node.next
-        self._size -= 1
-        return node.value
+        if not self._data:
+            raise IndexError("pop from empty stack")
+        return self._data.pop()
+
+    def peek(self) -> T:
+        if not self._data:
+            raise IndexError("peek from empty stack")
+        return self._data[-1]
 
     def __len__(self) -> int:
-        return self._size
+        return len(self._data)
+
+    def __bool__(self) -> bool:
+        return bool(self._data)
 
     def __iter__(self) -> Iterator[T]:
-        cur = self._head
-        while cur is not None:
-            yield cur.value
-            cur = cur.next
+        return reversed(self._data)
+
+    def __repr__(self) -> str:
+        return f"Stack(top={self._data[-1]!r}, size={len(self._data)})" if self._data else "Stack(empty)"
 ```
 
-이 패턴의 핵심은 세 가지입니다. 첫째, 공개 메서드의 타입을 먼저 확정하여 구현 교체 비용을 낮춥니다. 둘째, 예외 조건(`IndexError`)을 명시해 호출자 책임을 분리합니다. 셋째, `__iter__`, `__len__` 같은 파이썬 데이터 모델 메서드를 제공해 표준 라이브러리와 자연스럽게 결합합니다.
+### 설계 결정 세 가지
 
-성능 확인은 `timeit` 단일 숫자보다 시나리오 기반으로 진행하는 편이 정확합니다. 예를 들어 "1만 건 push 후 1만 건 pop", "임의 키 5천 건 조회", "중복 원소 30% 포함 집합 연산"처럼 입력 특성을 고정하고 결과를 비교합니다. 또한 `mypy`나 `pyright`로 정적 타입 검사를 돌리면 API 오용을 조기에 발견할 수 있습니다.
+1. **`__iter__`가 역순을 반환하는 이유**: 스택은 위에서부터 꺼내는 구조이므로, 순회도 top부터 bottom 순서가 자연스럽습니다.
+2. **`__bool__` 제공 이유**: `if stack:` 패턴으로 비어 있는지 간결하게 확인할 수 있습니다. `__len__`만 있으면 Python이 자동으로 truthiness를 판단하지만, 명시적 `__bool__`이 의도를 더 드러냅니다.
+3. **중간 접근 금지**: `__getitem__`을 의도적으로 구현하지 않았습니다. 스택에서 중간 원소에 접근하는 것은 ADT 계약 위반이므로, 아예 지원하지 않는 것이 올바릅니다.
 
-마지막으로 학습 기록에는 "왜 이 구현을 선택했는가"를 반드시 남깁니다. 같은 기능을 `list`, `deque`, 사용자 정의 클래스 중 무엇으로 표현했는지와 그 이유를 적어두면, 이후 코드베이스에서 자료구조를 교체해야 할 때 판단 근거를 재사용할 수 있습니다.
+## 타입 힌트 기반 큐 구현
 
-실무 코드에서는 `TypeVar` 기반 제네릭 API를 유지하고, `pytest`로 빈 입력/최대 입력/중복 입력 경계 조건을 검증해 구현 신뢰도를 높입니다.
+큐는 FIFO(First In, First Out) 규칙을 따릅니다. deque를 내부에 사용해 O(1) enqueue/dequeue를 보장합니다.
 
+```python
+from __future__ import annotations
+
+from collections import deque
+from typing import Generic, Iterator, TypeVar
+
+T = TypeVar("T")
+
+
+class Queue(Generic[T]):
+    """deque 기반 FIFO 큐입니다."""
+
+    def __init__(self, maxsize: int = 0) -> None:
+        self._data: deque[T] = deque(maxlen=maxsize if maxsize > 0 else None)
+        self._maxsize = maxsize
+
+    def enqueue(self, item: T) -> None:
+        if self._maxsize > 0 and len(self._data) >= self._maxsize:
+            raise OverflowError("queue is full")
+        self._data.append(item)
+
+    def dequeue(self) -> T:
+        if not self._data:
+            raise IndexError("dequeue from empty queue")
+        return self._data.popleft()
+
+    def front(self) -> T:
+        if not self._data:
+            raise IndexError("front from empty queue")
+        return self._data[0]
+
+    @property
+    def is_full(self) -> bool:
+        return self._maxsize > 0 and len(self._data) >= self._maxsize
+
+    def __len__(self) -> int:
+        return len(self._data)
+
+    def __bool__(self) -> bool:
+        return bool(self._data)
+
+    def __iter__(self) -> Iterator[T]:
+        return iter(self._data)
+
+    def __repr__(self) -> str:
+        if not self._data:
+            return "Queue(empty)"
+        return f"Queue(front={self._data[0]!r}, size={len(self._data)})"
+```
+
+### maxsize를 둔 이유
+
+실무에서 큐는 대부분 bounded입니다. 메모리를 무한정 사용하면 OOM(Out of Memory) 위험이 있기 때문입니다. `maxsize=0`은 무한 큐를 의미하고, 양수를 넣으면 가득 찼을 때 `OverflowError`를 발생시킵니다. 이 설계는 `queue.Queue`의 패턴을 따릅니다.
+
+## 메모리 프로파일링: list-stack vs deque-queue
+
+스택과 큐의 메모리 비용을 직접 측정해 보겠습니다.
+
+```python
+import sys
+from collections import deque
+
+
+def shallow_size(label: str, obj: object) -> None:
+    print(f"{label:>25}: {sys.getsizeof(obj):>8} bytes")
+
+
+n = 10_000
+
+# Stack: list 기반
+stack_data = list(range(n))
+shallow_size("list-stack (10k)", stack_data)
+
+# Queue: deque 기반
+queue_data = deque(range(n))
+shallow_size("deque-queue (10k)", queue_data)
+
+# 비교: deque with maxlen
+bounded_queue = deque(range(n), maxlen=n)
+shallow_size("bounded deque (10k)", bounded_queue)
+```
+
+예상 출력:
+
+```text
+        list-stack (10k):    85176 bytes
+       deque-queue (10k):    85096 bytes
+      bounded deque (10k):    85096 bytes
+```
+
+10,000개 수준에서 list와 deque의 얕은 크기는 거의 동일합니다. deque가 유리한 것은 크기가 아니라 앞쪽 삽입/삭제의 시간 복잡도입니다. deque는 내부적으로 고정 크기 블록의 이중 연결 리스트로 구현되어, 양 끝 연산이 O(1)입니다.
+
+### 깊은 메모리 비교: 원소까지 포함
+
+```python
+import sys
+from collections import deque
+from typing import Any
+
+
+def deep_getsizeof(obj: Any, seen: set[int] | None = None) -> int:
+    if seen is None:
+        seen = set()
+    obj_id = id(obj)
+    if obj_id in seen:
+        return 0
+    seen.add(obj_id)
+    size = sys.getsizeof(obj)
+    if isinstance(obj, (list, tuple, deque, set, frozenset)):
+        size += sum(deep_getsizeof(item, seen) for item in obj)
+    elif isinstance(obj, dict):
+        size += sum(deep_getsizeof(k, seen) + deep_getsizeof(v, seen) for k, v in obj.items())
+    return size
+
+
+n = 10_000
+stack_deep = deep_getsizeof(list(range(n)))
+queue_deep = deep_getsizeof(deque(range(n)))
+
+print(f"list-stack deep:  {stack_deep:>10} bytes")
+print(f"deque-queue deep: {queue_deep:>10} bytes")
+```
+
+두 구조 모두 Python int 객체를 동일하게 참조하므로 깊은 크기도 유사합니다. 메모리 관점에서 스택/큐 선택의 핵심은 크기가 아니라, 어떤 끝에서 연산하느냐에 따른 시간 비용입니다.
+
+## 성능 벤치마크: pop(0) vs popleft()
+
+"list를 큐로 쓰면 안 된다"의 근거를 숫자로 확인합니다.
+
+```python
+import timeit
+from collections import deque
+
+
+def bench_list_queue(n: int = 10_000) -> None:
+    """list를 큐처럼 사용: pop(0)으로 dequeue"""
+    q: list[int] = list(range(n))
+    for _ in range(n):
+        q.pop(0)
+
+
+def bench_deque_queue(n: int = 10_000) -> None:
+    """deque를 큐로 사용: popleft()로 dequeue"""
+    q: deque[int] = deque(range(n))
+    for _ in range(n):
+        q.popleft()
+
+
+trials = 10
+
+t_list = timeit.timeit(bench_list_queue, number=trials)
+t_deque = timeit.timeit(bench_deque_queue, number=trials)
+
+print(f"list.pop(0) x 10k (trials={trials}):   {t_list:.4f}s")
+print(f"deque.popleft() x 10k (trials={trials}): {t_deque:.4f}s")
+print(f"list is {t_list / t_deque:.1f}x slower")
+```
+
+예상 결과:
+
+```text
+list.pop(0) x 10k (trials=10):   0.4523s
+deque.popleft() x 10k (trials=10): 0.0041s
+list is 110.3x slower
+```
+
+10,000개 기준으로 이미 100배 이상 차이가 납니다. 원소가 10만 개로 늘면 차이는 1,000배 이상으로 벌어집니다. `pop(0)`은 남은 원소를 전부 앞으로 당기는 O(n) 연산이기 때문입니다.
+
+### push/pop 혼합 시나리오 벤치마크
+
+실무에서는 순수하게 전부 넣고 전부 빼는 경우보다, 넣기와 빼기가 교차되는 패턴이 더 흔합니다.
+
+```python
+import timeit
+from collections import deque
+
+
+def bench_mixed_list(n: int = 10_000) -> None:
+    q: list[int] = []
+    for i in range(n):
+        q.append(i)
+        if i % 3 == 0 and q:
+            q.pop(0)
+
+
+def bench_mixed_deque(n: int = 10_000) -> None:
+    q: deque[int] = deque()
+    for i in range(n):
+        q.append(i)
+        if i % 3 == 0 and q:
+            q.popleft()
+
+
+trials = 10
+t1 = timeit.timeit(bench_mixed_list, number=trials)
+t2 = timeit.timeit(bench_mixed_deque, number=trials)
+
+print(f"mixed list:  {t1:.4f}s")
+print(f"mixed deque: {t2:.4f}s")
+print(f"ratio: {t1/t2:.1f}x")
+```
+
+혼합 시나리오에서도 deque가 일관되게 빠릅니다. "큐가 필요하면 deque"는 벤치마크가 뒷받침하는 규칙입니다.
+
+## unittest로 Stack과 Queue 검증
+
+```python
+import unittest
+
+
+class TestStack(unittest.TestCase):
+    def setUp(self) -> None:
+        self.stack: Stack[int] = Stack()
+
+    def test_push_pop_lifo(self) -> None:
+        self.stack.push(1)
+        self.stack.push(2)
+        self.stack.push(3)
+        self.assertEqual(self.stack.pop(), 3)
+        self.assertEqual(self.stack.pop(), 2)
+        self.assertEqual(self.stack.pop(), 1)
+
+    def test_peek_does_not_remove(self) -> None:
+        self.stack.push(42)
+        self.assertEqual(self.stack.peek(), 42)
+        self.assertEqual(len(self.stack), 1)
+
+    def test_pop_empty_raises(self) -> None:
+        with self.assertRaises(IndexError):
+            self.stack.pop()
+
+    def test_bool(self) -> None:
+        self.assertFalse(self.stack)
+        self.stack.push(1)
+        self.assertTrue(self.stack)
+
+    def test_iter_top_first(self) -> None:
+        for i in range(5):
+            self.stack.push(i)
+        self.assertEqual(list(self.stack), [4, 3, 2, 1, 0])
+
+
+class TestQueue(unittest.TestCase):
+    def setUp(self) -> None:
+        self.queue: Queue[str] = Queue()
+
+    def test_enqueue_dequeue_fifo(self) -> None:
+        self.queue.enqueue("a")
+        self.queue.enqueue("b")
+        self.queue.enqueue("c")
+        self.assertEqual(self.queue.dequeue(), "a")
+        self.assertEqual(self.queue.dequeue(), "b")
+        self.assertEqual(self.queue.dequeue(), "c")
+
+    def test_front_does_not_remove(self) -> None:
+        self.queue.enqueue("x")
+        self.assertEqual(self.queue.front(), "x")
+        self.assertEqual(len(self.queue), 1)
+
+    def test_dequeue_empty_raises(self) -> None:
+        with self.assertRaises(IndexError):
+            self.queue.dequeue()
+
+    def test_bounded_queue_overflow(self) -> None:
+        bq: Queue[int] = Queue(maxsize=3)
+        bq.enqueue(1)
+        bq.enqueue(2)
+        bq.enqueue(3)
+        with self.assertRaises(OverflowError):
+            bq.enqueue(4)
+
+    def test_is_full(self) -> None:
+        bq: Queue[int] = Queue(maxsize=2)
+        self.assertFalse(bq.is_full)
+        bq.enqueue(1)
+        bq.enqueue(2)
+        self.assertTrue(bq.is_full)
+
+
+if __name__ == "__main__":
+    unittest.main()
+```
+
+이 테스트는 여섯 가지 경계를 검증합니다.
+
+1. **LIFO/FIFO 순서**: 넣은 순서와 꺼내는 순서가 각각의 규칙을 따르는지 확인합니다.
+2. **peek/front 비파괴**: 확인 연산이 원소를 제거하지 않는지 확인합니다.
+3. **빈 상태 예외**: 빈 구조에서 꺼내면 명확한 에러가 발생하는지 확인합니다.
+4. **bounded overflow**: 크기 제한을 초과하면 OverflowError가 나는지 확인합니다.
+5. **truthiness**: 빈 스택/큐가 falsy인지 확인합니다.
+6. **순회 순서**: 스택은 top-first, 큐는 front-first로 순회하는지 확인합니다.
+
+## 실무 패턴: 스택과 큐의 응용
+
+### 괄호 검증 (스택)
+
+```python
+def is_balanced(expression: str) -> bool:
+    """괄호 짝이 맞는지 스택으로 검증합니다."""
+    pairs = {"(": ")", "[": "]", "{": "}"}
+    stack: list[str] = []
+
+    for char in expression:
+        if char in pairs:
+            stack.append(char)
+        elif char in pairs.values():
+            if not stack:
+                return False
+            if pairs[stack.pop()] != char:
+                return False
+
+    return len(stack) == 0
+
+
+assert is_balanced("({[]})")
+assert not is_balanced("({[}])")
+assert is_balanced("")
+```
+
+### BFS 레벨 순회 (큐)
+
+```python
+from collections import deque
+from typing import Any
+
+
+def bfs_levels(graph: dict[str, list[str]], start: str) -> list[list[str]]:
+    """그래프를 BFS로 순회하며 레벨별로 노드를 반환합니다."""
+    visited: set[str] = {start}
+    queue: deque[tuple[str, int]] = deque([(start, 0)])
+    levels: list[list[str]] = []
+
+    while queue:
+        node, level = queue.popleft()
+        if level == len(levels):
+            levels.append([])
+        levels[level].append(node)
+
+        for neighbor in graph.get(node, []):
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append((neighbor, level + 1))
+
+    return levels
+
+
+graph = {"A": ["B", "C"], "B": ["D"], "C": ["D", "E"], "D": [], "E": []}
+print(bfs_levels(graph, "A"))
+# [['A'], ['B', 'C'], ['D', 'E']]
+```
+
+이 두 패턴은 스택과 큐의 가장 대표적인 실무 적용입니다. 괄호 검증은 "가장 최근에 연 것을 먼저 닫아야 한다"는 LIFO 규칙, BFS는 "먼저 발견한 것을 먼저 처리한다"는 FIFO 규칙을 그대로 반영합니다.
 
 ## 처음 질문으로 돌아가기
 
 - **스택과 큐는 각각 어떤 순서 규칙으로 동작할까요?**
-  - 본문의 기준은 스택과 큐를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 스택은 LIFO(Last In, First Out)로 가장 나중에 넣은 원소를 먼저 꺼냅니다. 큐는 FIFO(First In, First Out)로 가장 먼저 넣은 원소를 먼저 꺼냅니다. 괄호 검증이 스택, BFS가 큐를 사용하는 이유가 바로 이 순서 규칙 때문입니다.
 - **Python에서는 왜 스택에 list를, 큐에 deque를 주로 사용할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - list의 `append()`/`pop()`은 끝 연산이므로 O(1)입니다. 스택은 한쪽 끝에서만 동작하므로 list가 최적입니다. 큐는 양쪽 끝(뒤에 넣고 앞에서 빼기)을 쓰는데, list의 `pop(0)`은 O(n)입니다. deque의 `popleft()`는 O(1)이므로 큐에는 deque가 맞습니다.
 - **`list.pop(0)`이 큐 구현에 부적절한 이유는 무엇일까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - list는 연속 배열이므로 앞 원소를 제거하면 나머지 원소를 전부 한 칸 앞으로 당겨야 합니다. 벤치마크에서 확인했듯이 10,000개 기준으로 deque보다 100배 이상 느리고, 원소가 많을수록 차이는 더 벌어집니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -372,6 +724,7 @@ class Container(Generic[T]):
 
 - [Python 공식 문서 — collections.deque](https://docs.python.org/3/library/collections.html#collections.deque)
 - [Real Python — Stacks and Queues in Python](https://realpython.com/queue-in-python/)
+- [book-examples 저장소 — data-structures-python-101/ko](https://github.com/yeongseon-books/book-examples/tree/main/data-structures-python-101/ko)
 - [GeeksforGeeks — Stack Data Structure](https://www.geeksforgeeks.org/stack-data-structure/)
 - [Visualgo — Stack and Queue Visualization](https://visualgo.net/en/list)
 

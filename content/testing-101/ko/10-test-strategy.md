@@ -22,6 +22,8 @@ last_reviewed: '2026-05-12'
 
 # Testing 101 (10/10): 테스트 전략 세우기
 
+이 글은 Testing 101 시리즈의 마지막 글입니다.
+
 테스트를 많이 쓰는 팀이 항상 잘 운영되는 것은 아닙니다. 모든 함수에 단위 테스트를 붙이고, 모든 화면에 E2E 테스트를 추가하면 겉보기에는 촘촘해 보일 수 있습니다. 그런데 CI가 30분씩 걸리고, 플래키 테스트가 늘고, PR 속도가 급격히 떨어지면 그 체계는 버그보다 느린 개발 속도를 더 많이 만들 수 있습니다.
 
 그래서 마지막에는 수량보다 배치를 봐야 합니다. 어떤 계층에 얼마를 투자할지, 어디를 두껍게 보호할지, 무엇을 문서가 아니라 팀 습관으로 남길지를 결정하는 일이 전략입니다.
@@ -180,6 +182,84 @@ def test_payment_response_schema():
 
 이 예산은 팀마다 다를 수 있지만, 분포의 의도를 명시하는 것이 중요합니다.
 
+## 현업 확장 노트: 계층별 검증을 연결하는 방법
+
+이 장의 핵심 개념을 팀 운영에 연결하려면, 테스트를 단독 문서가 아니라 저장소 규약으로 관리해야 합니다. 가장 많이 쓰는 방식은 테스트 디렉터리를 계층으로 분리하고, 각 계층의 실행 시점과 실패 기준을 명시하는 것입니다.
+
+```text
+tests/
+├─ unit/
+├─ integration/
+├─ e2e/
+└─ contracts/
+```
+
+이 구조를 도입하면 PR 단계에서는 unit과 일부 integration만 빠르게 실행하고, 병합 전이나 야간 빌드에서는 더 넓은 범위를 실행하는 운영이 가능합니다. "모든 테스트를 매번 전부"보다 "위험에 맞게 계층별로"가 훨씬 현실적입니다.
+
+```yaml
+name: test-pipeline
+on:
+  pull_request:
+  schedule:
+    - cron: '0 17 * * *'
+
+jobs:
+  fast-feedback:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements-dev.txt
+      - run: pytest tests/unit tests/integration -q --maxfail=1
+
+  nightly-full:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements-dev.txt
+      - run: pytest -q
+```
+
+또한 `unittest.mock`과 fixture를 함께 쓰면 테스트 의도를 더 분명히 드러낼 수 있습니다. fixture는 "무엇을 준비했는가"를, mock 검증은 "어떤 상호작용이 일어났는가"를 표현합니다.
+
+```python
+import pytest
+from unittest.mock import Mock
+
+@pytest.fixture
+def notifier_mock():
+    return Mock()
+
+def test_notify_on_success(notifier_mock):
+    service = JobService(notifier=notifier_mock)
+    service.run(job_id='job-1')
+    notifier_mock.send.assert_called_once()
+```
+
+마지막으로 커버리지는 목표치 자체보다 누락 영역의 성격을 함께 봐야 합니다. 예를 들어 유틸리티 파일 60%보다 결제 도메인 82%가 더 위험할 수 있습니다. 따라서 커버리지 리포트를 읽을 때는 반드시 "이 파일이 실패하면 비즈니스 영향이 큰가"를 함께 판단해야 합니다.
+
+```bash
+pytest --cov=src --cov-report=term-missing
+```
+
+```text
+Name                        Stmts   Miss  Cover
+-----------------------------------------------
+src/domain/payment.py          96     14    85%
+src/domain/refund.py           64      4    94%
+src/utils/text.py              21      5    76%
+-----------------------------------------------
+TOTAL                          181    23    87%
+```
+
+이런 리포트에서는 `payment.py`의 누락 분기를 먼저 메우는 것이 합리적입니다. 테스트는 숫자를 맞추는 운동이 아니라, 고장 났을 때 손실이 큰 경로를 먼저 보호하는 엔지니어링 작업이기 때문입니다.
+
 ## 직접 검증해 볼 것
 
 1. 현재 저장소의 단위/통합/E2E 테스트 수와 각 잡의 실행 시간을 표로 적어 봅니다. 전략은 감이 아니라 현재 분포를 알아야 시작할 수 있습니다.
@@ -187,6 +267,56 @@ def test_payment_response_schema():
 3. 지난 분기 플래키 테스트 목록과 CI 평균 시간을 같이 놓고, 어떤 계층을 줄이거나 옮겨야 하는지 회고합니다.
 
 **예상 결과:** 모든 테스트를 늘리는 계획이 아니라, 위험이 큰 경로를 어떤 계층에서 어떻게 보호할지 우선순위가 드러나야 합니다.
+
+## 심화 실습: 운영 관점 테스트 점검
+
+실무에서 테스트를 확장할 때 가장 먼저 해야 할 일은 실패 원인을 사람이 추측하지 않도록 로그와 단언문을 정리하는 것입니다. 테스트 실패 메시지에는 입력값, 기대값, 실제값이 함께 남아야 하며, 그래야 CI 로그만으로도 원인을 좁힐 수 있습니다.
+
+또한 테스트는 코드와 함께 진화해야 합니다. 기능이 바뀌었는데 테스트가 그대로라면 테스트는 안전장치가 아니라 오경보 장치가 됩니다. 그래서 팀에서는 요구사항 변경 PR에 테스트 변경이 함께 포함되는지를 리뷰 기준으로 두는 편이 좋습니다.
+
+fixture는 단순 편의 기능이 아니라 설계 도구입니다. 어떤 객체를 기본 상태로 두는지, 어떤 상태 변형을 허용하는지 fixture 레이어에서 명확히 정의하면 테스트 의도가 깔끔해집니다. 특히 도메인 객체가 복잡할수록 fixture 설계 품질이 테스트 유지보수 비용을 좌우합니다.
+
+회귀 버그를 줄이려면 버그 티켓이 닫힐 때 반드시 재현 테스트를 남겨야 합니다. 수정 코드만 머지하면 같은 원인의 버그가 다른 경로에서 재발합니다. 반대로 재현 테스트를 함께 남기면 팀 지식이 실행 가능한 형태로 축적됩니다.
+
+커버리지 리포트는 주간 회고에서 매우 유용합니다. 숫자만 보는 대신 누락 라인이 핵심 도메인인지 확인하고, 다음 스프린트에서 보강할 테스트를 합의하면 테스트 투자가 산발적으로 흩어지지 않습니다.
+
+CI에서는 실패를 빠르게 보여 주는 순서가 중요합니다. 일반적으로 단위 테스트를 먼저 실행하고, 그 다음 통합 테스트, 마지막으로 느린 E2E를 배치하면 평균 피드백 시간이 줄어듭니다. 파이프라인 설계도 테스트 전략의 일부로 다루어야 합니다.
+
+실무에서 테스트를 확장할 때 가장 먼저 해야 할 일은 실패 원인을 사람이 추측하지 않도록 로그와 단언문을 정리하는 것입니다. 테스트 실패 메시지에는 입력값, 기대값, 실제값이 함께 남아야 하며, 그래야 CI 로그만으로도 원인을 좁힐 수 있습니다.
+
+또한 테스트는 코드와 함께 진화해야 합니다. 기능이 바뀌었는데 테스트가 그대로라면 테스트는 안전장치가 아니라 오경보 장치가 됩니다. 그래서 팀에서는 요구사항 변경 PR에 테스트 변경이 함께 포함되는지를 리뷰 기준으로 두는 편이 좋습니다.
+
+fixture는 단순 편의 기능이 아니라 설계 도구입니다. 어떤 객체를 기본 상태로 두는지, 어떤 상태 변형을 허용하는지 fixture 레이어에서 명확히 정의하면 테스트 의도가 깔끔해집니다. 특히 도메인 객체가 복잡할수록 fixture 설계 품질이 테스트 유지보수 비용을 좌우합니다.
+
+회귀 버그를 줄이려면 버그 티켓이 닫힐 때 반드시 재현 테스트를 남겨야 합니다. 수정 코드만 머지하면 같은 원인의 버그가 다른 경로에서 재발합니다. 반대로 재현 테스트를 함께 남기면 팀 지식이 실행 가능한 형태로 축적됩니다.
+
+커버리지 리포트는 주간 회고에서 매우 유용합니다. 숫자만 보는 대신 누락 라인이 핵심 도메인인지 확인하고, 다음 스프린트에서 보강할 테스트를 합의하면 테스트 투자가 산발적으로 흩어지지 않습니다.
+
+CI에서는 실패를 빠르게 보여 주는 순서가 중요합니다. 일반적으로 단위 테스트를 먼저 실행하고, 그 다음 통합 테스트, 마지막으로 느린 E2E를 배치하면 평균 피드백 시간이 줄어듭니다. 파이프라인 설계도 테스트 전략의 일부로 다루어야 합니다.
+
+실무에서 테스트를 확장할 때 가장 먼저 해야 할 일은 실패 원인을 사람이 추측하지 않도록 로그와 단언문을 정리하는 것입니다. 테스트 실패 메시지에는 입력값, 기대값, 실제값이 함께 남아야 하며, 그래야 CI 로그만으로도 원인을 좁힐 수 있습니다.
+
+또한 테스트는 코드와 함께 진화해야 합니다. 기능이 바뀌었는데 테스트가 그대로라면 테스트는 안전장치가 아니라 오경보 장치가 됩니다. 그래서 팀에서는 요구사항 변경 PR에 테스트 변경이 함께 포함되는지를 리뷰 기준으로 두는 편이 좋습니다.
+
+fixture는 단순 편의 기능이 아니라 설계 도구입니다. 어떤 객체를 기본 상태로 두는지, 어떤 상태 변형을 허용하는지 fixture 레이어에서 명확히 정의하면 테스트 의도가 깔끔해집니다. 특히 도메인 객체가 복잡할수록 fixture 설계 품질이 테스트 유지보수 비용을 좌우합니다.
+
+```python
+from unittest.mock import patch
+
+def test_payment_service_retries_once_on_timeout():
+    service = PaymentService()
+    with patch('src.payment.client.charge') as charge:
+        charge.side_effect = [TimeoutError(), {'status': 'ok'}]
+        result = service.pay(user_id='u-1', amount=10000)
+
+    assert result['status'] == 'ok'
+    assert charge.call_count == 2
+```
+
+```bash
+pytest -q --maxfail=1 --disable-warnings
+pytest --cov=src --cov-report=term-missing
+```
 
 ## 실패 신호와 첫 점검
 
@@ -269,22 +399,22 @@ def pytest_runtest_makereport(item, call):
 ```markdown
 # Testing Strategy
 
-## 1. Target Distribution
+## 1. 목표 분포
 - Unit: 70%
 - Integration: 20%
 - E2E: 10%
 
-## 2. Critical Paths (E2E Required)
+## 2. 핵심 경로(E2E 필수)
 - Login flow
 - Payment flow
 - Password reset
 
-## 3. Quality Metrics
+## 3. 품질 지표
 - CI time: < 5 min (PR)
 - Flaky rate: < 3%
 - Coverage: 80% (unit + integration)
 
-## 4. Team Habits
+## 4. 팀 습관
 - PR template: "회귀 테스트를 추가했는가? [ ]"
 - Weekly: 플래키 테스트 리뷰 30분
 - Quarterly: 전략 회고 1시간
@@ -328,6 +458,7 @@ def pytest_runtest_makereport(item, call):
 
 ## 참고 자료
 
+- 실습 예제 저장소(book-examples): https://github.com/yeongseon-books/book-examples/tree/main/testing-101/ko
 ### 공식 문서
 - [GitHub documentation for pull request templates](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-issue-and-pull-request-templates)
 - [Pact contract testing guides](https://docs.pact.io/)

@@ -22,6 +22,8 @@ last_reviewed: '2026-05-15'
 
 # Incident Response 101 (1/10): Incident란 무엇인가?
 
+이 글은 Incident Response 101 시리즈의 첫 번째 글입니다.
+
 온콜에 처음 들어가면 가장 먼저 흔들리는 질문이 있습니다. 알림이 울렸을 때 이것을 정말 incident로 봐야 하는지, 아니면 일반 버그나 경고로 남겨도 되는지 빠르게 판단하기 어렵기 때문입니다.
 
 기준이 없으면 어떤 팀은 과하게 반응하고, 어떤 팀은 너무 늦게 움직입니다. incident 대응의 출발점은 기술 스택보다 먼저, 고객 영향과 대응 임계값을 같은 언어로 합의하는 일입니다.
@@ -264,6 +266,97 @@ incident 기준은 한 번 정하고 끝나는 문서가 아닙니다. 월별로
 
 이 보강 메모를 남기는 목적은 분량을 늘리는 데 있지 않습니다. 기준을 사건 데이터와 연결해 "다음 대응의 입력"으로 쓰는 데 있습니다. 문서가 저장소 안에서 살아 있으려면 변경 이력, 검증 절차, 교육 루프가 함께 있어야 합니다. 결국 incident 대응 역량은 한 번의 완벽한 대응이 아니라, 같은 실수를 덜 반복하는 조직 습관에서 만들어집니다.
 
+## 현장에서 바로 쓰는 Incident 판정 템플릿
+
+incident를 선언할지 말지 망설이는 시간은 생각보다 비쌉니다. 그래서 팀은 선언 기준을 문장으로 외우기보다 표와 템플릿으로 고정하는 편이 좋습니다. 아래 템플릿은 초보 온콜이 첫 3분 안에 incident 후보를 정리할 때 그대로 붙여 넣어 사용할 수 있는 최소 양식입니다.
+
+```text
+[incident-triage-template]
+- detected_at_utc:
+- affected_journey: (로그인/결제/검색/주문/...)
+- estimated_impacted_users:
+- impact_duration_minutes:
+- current_error_rate:
+- current_latency_p95_ms:
+- current_severity_candidate: (SEV1/SEV2/SEV3/bug)
+- immediate_action: (declare incident / monitor as bug)
+- owner_oncall:
+```
+
+템플릿을 쓰면 개인 감각이 아니라 팀 기준으로 판단하게 됩니다. 더 중요한 점은 이 양식이 뒤의 severity 분류, 커뮤니케이션, timeline 작성으로 자연스럽게 이어진다는 사실입니다. incident 대응 품질은 정답을 빨리 찾는 능력보다, 같은 입력을 같은 구조로 받는 능력에서 먼저 올라갑니다.
+
+## 온콜 교대 기준과 최소 운영 규칙
+
+incident는 근무시간에만 발생하지 않습니다. 교대 품질이 낮으면 같은 사건을 두 번 대응하는 상황이 생깁니다. 아래는 작은 팀에서도 바로 적용 가능한 교대 규칙입니다.
+
+| 항목 | 최소 기준 | 실패 신호 |
+| --- | --- | --- |
+| 인계 메시지 | 4줄 요약(영향/완화/미해결/다음 행동) | "지금 어디까지 했죠?" 반복 질문 |
+| 인계 시점 | 교대 10분 전 초안, 교대 시 확정 | 교대 직후 15분 공백 |
+| 지표 확인 | 인수자가 핵심 지표 2회 재확인 | 구두만 듣고 즉시 판단 |
+| 문서 링크 | incident 채널, 대시보드, runbook 링크 포함 | 링크 누락으로 탐색 시간 증가 |
+
+운영 규칙의 목적은 문서를 늘리는 데 있지 않습니다. 누가 들어와도 같은 속도로 판단하도록 만드는 데 있습니다. incident 대응은 개인의 영웅 플레이가 아니라 교대 가능한 팀 스포츠여야 합니다.
+
+## 운영 부록: Incident 선언 기록 예시
+
+아래 예시는 실제 incident 선언 직후 남기는 기록 형식입니다. 핵심은 긴 설명이 아니라 판단 근거를 빠르게 남기는 것입니다.
+
+```text
+[declare-incident]
+incident_id: INC-2026-05-21-001
+detected_at_utc: 2026-05-21T01:03:11Z
+detected_by: alert.checkout.error_ratio
+candidate_severity: SEV2
+affected_journey: checkout
+estimated_impacted_users: 4300
+error_ratio: 0.087
+latency_p95_ms: 1840
+decision: declare_incident
+owner: primary-oncall
+next_update_utc: 2026-05-21T01:30:00Z
+```
+
+## 운영 부록: 팀 합의 규칙 카드
+
+1. incident 선언은 늦게 맞추는 정답보다 빠른 가설이 더 낫습니다.
+2. 선언 후 하향 조정은 가능하지만, 선언 자체를 늦추면 잃는 시간이 큽니다.
+3. 영향 수치가 불완전해도 "추정" 표기를 붙여 즉시 공유합니다.
+4. 원인 추정은 분리하고, 사실 데이터는 timeline에 우선 기록합니다.
+5. 사건 종료 후에는 반드시 선언 시점 판단이 적절했는지 리뷰합니다.
+
+## 운영 부록: 판정 회고 질문
+
+- 선언이 늦어진 원인은 무엇이었는가?
+- 선언 직후 역할 배정이 5분 안에 끝났는가?
+- 영향 수치가 첫 공지에 반영됐는가?
+- 선언 기준 문서와 실제 판단이 어긋난 지점은 어디였는가?
+- 다음 incident에서 바로 줄일 수 있는 마찰은 무엇인가?
+
+## 운영 추가 점검 항목
+
+아래 항목은 실무에서 바로 점검할 수 있는 추가 체크포인트입니다.
+
+- 체크포인트 1: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 2: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 3: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 4: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 5: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+
+```text
+[quick-audit]
+- declaration_latency_minutes:
+- first_update_latency_minutes:
+- mitigation_started_minutes:
+- recovery_verification_metrics:
+- postmortem_linked: true/false
+```
+
+
+## 운영 메모: 점검 루프
+
+운영 문서는 작성으로 끝나지 않습니다. 월간 점검 루프를 통해 선언 기준, 역할 분리, 공지 주기, 후속 조치 추적이 실제 incident에서 유지되는지 확인해야 합니다. 점검 결과는 다음 리허설 시나리오와 runbook 개정 항목으로 바로 연결하는 편이 좋습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **어떤 문제를 incident라고 불러야 할까요?**
@@ -298,6 +391,7 @@ incident 기준은 한 번 정하고 끝나는 문서가 아닙니다. 월별로
 - [NIST SP 800-61 Rev. 2 Computer Security Incident Handling Guide](https://csrc.nist.gov/pubs/sp/800/61/r2/final)
 
 ### 예제 소스
+- [incident-response-101 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/incident-response-101/ko)
 - [incident-response-101 canonical source in book-content](https://github.com/yeongseon-books/book-content/tree/main/content/incident-response-101)
 
 Tags: Incident, Response, SRE, Operations, OnCall

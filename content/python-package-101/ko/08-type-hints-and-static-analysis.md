@@ -271,79 +271,501 @@ mypy src/  # resolves import type errors for requests
 
 다음 글에서는 문서화 — README, MkDocs, API Reference를 다룹니다.
 
-## 실전 패턴 추가: pyproject.toml, 빌드 명령, CI까지 한 번에 정리
+## 타입 힌트 기초부터 고급까지
 
-패키징은 파일 한두 개를 만드는 작업이 아니라, 메타데이터와 빌드 백엔드, 배포 검증을 같은 계약으로 묶는 작업입니다. `pyproject.toml`을 기준으로 로컬 빌드와 CI 검증 경로를 맞추면 릴리스 직전의 불일치를 크게 줄일 수 있습니다.
+### 기본 타입 어노테이션
+
+```python
+# 기본 타입
+name: str = "acme"
+count: int = 42
+ratio: float = 3.14
+is_active: bool = True
+
+# 컬렉션 타입 (Python 3.9+)
+names: list[str] = ["alice", "bob"]
+scores: dict[str, int] = {"alice": 95, "bob": 87}
+unique_ids: set[int] = {1, 2, 3}
+coordinates: tuple[float, float] = (37.5, 127.0)
+```
+
+### 함수 시그니처
+
+```python
+def greet(name: str, times: int = 1) -> str:
+    return f"Hello, {name}! " * times
+
+def process_items(items: list[dict[str, int]]) -> dict[str, int]:
+    result: dict[str, int] = {}
+    for item in items:
+        result.update(item)
+    return result
+```
+
+### Union과 Optional
+
+```python
+from typing import Union
+
+# Python 3.10+ 문법
+def parse_value(value: str | int) -> str:
+    return str(value)
+
+# Optional은 X | None의 축약
+def find_user(user_id: int) -> dict[str, str] | None:
+    users = {"1": {"name": "Alice"}}
+    return users.get(str(user_id))
+```
+
+### TypedDict: 딕셔너리에 구조 부여
+
+```python
+from typing import TypedDict, NotRequired
+
+class UserConfig(TypedDict):
+    name: str
+    email: str
+    age: NotRequired[int]  # 선택 필드
+
+def create_user(config: UserConfig) -> None:
+    print(f"Creating user: {config['name']}")
+
+# mypy가 잘못된 키나 타입을 잡아줌
+create_user({"name": "Alice", "email": "a@b.com"})  # OK
+create_user({"name": 123, "email": "a@b.com"})      # mypy error!
+```
+
+### Protocol: 구조적 서브타이핑
+
+```python
+from typing import Protocol
+
+class Serializable(Protocol):
+    def to_dict(self) -> dict[str, str]: ...
+
+class User:
+    def to_dict(self) -> dict[str, str]:
+        return {"name": self.name}
+
+class Config:
+    def to_dict(self) -> dict[str, str]:
+        return {"key": self.key}
+
+def save(obj: Serializable) -> None:
+    data = obj.to_dict()
+    # User와 Config 모두 전달 가능 (to_dict 메서드가 있으므로)
+```
+
+### Generic 타입
+
+```python
+from typing import TypeVar, Generic
+
+T = TypeVar("T")
+
+class Result(Generic[T]):
+    def __init__(self, value: T | None = None, error: str | None = None):
+        self.value = value
+        self.error = error
+    
+    def is_ok(self) -> bool:
+        return self.error is None
+
+def fetch_data() -> Result[list[str]]:
+    try:
+        return Result(value=["data1", "data2"])
+    except Exception as e:
+        return Result(error=str(e))
+```
+
+## mypy 설정과 실전 사용
+
+### pyproject.toml에 mypy 설정
 
 ```toml
-[build-system]
-requires = ["setuptools>=68", "wheel"]
-build-backend = "setuptools.build_meta"
+[tool.mypy]
+python_version = "3.11"
+strict = true                    # 모든 엄격 옵션 활성화
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true     # 모든 함수에 타입 필수
+disallow_any_generics = true
+check_untyped_defs = true
+no_implicit_optional = true
 
-[project]
-name = "acme-utils"
-version = "0.1.0"
-description = "Utility package for internal services"
-readme = "README.md"
-requires-python = ">=3.10"
-dependencies = [
-  "httpx>=0.27,<0.29",
+# 서드파티 라이브러리별 설정
+[[tool.mypy.overrides]]
+module = "httpx.*"
+ignore_missing_imports = false
+
+[[tool.mypy.overrides]]
+module = "legacy_module.*"
+ignore_errors = true             # 레거시 코드 점진적 마이그레이션
+```
+
+### mypy가 잡아내는 대표적 에러
+
+```python
+# 에러 1: 반환 타입 불일치
+def get_name() -> str:
+    return None  # error: Incompatible return value type (got "None", expected "str")
+
+# 에러 2: 잘못된 인자 타입
+def add(a: int, b: int) -> int:
+    return a + b
+
+add("1", "2")  # error: Argument 1 has incompatible type "str"; expected "int"
+
+# 에러 3: None 체크 누락
+def process(value: str | None) -> str:
+    return value.upper()  # error: Item "None" has no attribute "upper"
+    # 수정:
+    # if value is None:
+    #     return ""
+    # return value.upper()
+
+# 에러 4: 불완전한 딕셔너리 타입
+data: dict[str, int] = {}
+data["count"] = "five"  # error: Incompatible types in assignment
+```
+
+### 점진적 타입 도입 전략
+
+기존 프로젝트에 타입을 한꺼번에 추가하는 것은 비현실적입니다. 점진적으로 도입합니다.
+
+```toml
+# 1단계: 느슨한 설정으로 시작
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+# strict = false (기본값)
+
+# 2단계: 새 파일에만 엄격 적용
+[[tool.mypy.overrides]]
+module = "acme_utils.new_module.*"
+disallow_untyped_defs = true
+
+# 3단계: 전체 strict 전환
+[tool.mypy]
+strict = true
+```
+
+## PEP 561: 패키지의 타입 정보 배포
+
+패키지를 설치한 사용자도 타입 검사를 활용하려면 PEP 561 마커가 필요합니다.
+
+### py.typed 마커 파일
+
+```bash
+# src/acme_utils/py.typed (빈 파일)
+touch src/acme_utils/py.typed
+```
+
+```toml
+# pyproject.toml에서 패키지 데이터로 포함
+[tool.setuptools.package-data]
+acme_utils = ["py.typed", "*.pyi"]
+```
+
+### 인라인 타입 vs 스텁 파일
+
+| 방식 | 파일 | 장점 | 단점 |
+|---|---|---|---|
+| 인라인 타입 | `.py` 파일에 직접 | 코드와 타입이 항상 동기화 | 런타임 import 비용 (미미) |
+| 스텁 파일 | `.pyi` 파일 | C 확장이나 레거시 코드에 적합 | 동기화 관리 필요 |
+
+### 스텁 파일 예시
+
+```python
+# src/acme_utils/core.pyi
+from typing import overload
+
+class Engine:
+    def __init__(self, config: dict[str, str]) -> None: ...
+    
+    @overload
+    def run(self, query: str) -> str: ...
+    @overload
+    def run(self, query: list[str]) -> list[str]: ...
+    def run(self, query: str | list[str]) -> str | list[str]: ...
+```
+
+### stubgen: 자동 스텁 생성
+
+```bash
+# mypy의 stubgen 도구
+pip install mypy
+stubgen src/acme_utils -o stubs/
+
+# 생성된 스텁 확인
+cat stubs/acme_utils/core.pyi
+```
+
+## Ruff: 초고속 린터와 포매터
+
+Ruff는 Rust로 작성된 Python 린터로, flake8 + isort + pycodestyle을 하나로 대체합니다.
+
+```toml
+# pyproject.toml
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "SIM",  # flake8-simplify
+    "TCH",  # flake8-type-checking
 ]
+ignore = ["E501"]  # line-too-long (formatter가 처리)
 
-[project.optional-dependencies]
-dev = [
-  "pytest>=8.0",
-  "ruff>=0.5",
-  "mypy>=1.10",
-  "build>=1.2",
-  "twine>=5.1",
-]
+[tool.ruff.lint.isort]
+known-first-party = ["acme_utils"]
 
-[tool.setuptools.packages.find]
-where = ["src"]
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
 ```
 
 ```bash
-python -m pip install -U pip
-python -m pip install -e ".[dev]"
-python -m build
-python -m twine check dist/*
+# 린트 실행
+ruff check .
+ruff check --fix .  # 자동 수정 가능한 것은 즉시 수정
+
+# 포맷 실행
+ruff format .
+ruff format --check .  # CI에서 검증만
 ```
 
+### Ruff vs 기존 도구 속도 비교
+
+```text
+프로젝트: 10,000줄 Python 코드 기준
+- flake8 + isort + black: ~5초
+- ruff check + ruff format: ~0.1초 (50배 빠름)
+```
+
+## CI에서 타입 검사와 린트 통합
+
 ```yaml
-name: package-ci
-on:
-  pull_request:
-  push:
-    branches: [ main ]
+name: Quality
+on: [push, pull_request]
 
 jobs:
-  verify:
+  quality:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: python -m pip install -U pip
-      - run: python -m pip install -e ".[dev]"
-      - run: pytest -q
+      - run: pip install -e ".[dev]"
+      
+      # 린트 (가장 빠름 - 먼저 실행)
       - run: ruff check .
+      - run: ruff format --check .
+      
+      # 타입 검사
       - run: mypy src
-      - run: python -m build
-      - run: python -m twine check dist/*
+      
+      # 테스트
+      - run: pytest --cov=acme_utils
 ```
 
-실무에서 중요한 포인트는 로컬과 CI가 같은 명령 세트를 사용하도록 고정하는 것입니다. 개발자가 로컬에서 `python -m build`를 통과시킨 산출물이 CI에서도 같은 방식으로 통과해야 릴리스 리스크가 줄어듭니다. 또한 `twine check`를 CI에 넣어 두면 README 렌더링 오류나 메타데이터 누락을 배포 전에 잡을 수 있습니다.
+## pyright: mypy의 대안
+
+```toml
+# pyproject.toml
+[tool.pyright]
+pythonVersion = "3.11"
+typeCheckingMode = "strict"
+reportMissingImports = true
+reportMissingTypeStubs = true
+```
+
+```bash
+pip install pyright
+pyright src/
+```
+
+| 항목 | mypy | pyright |
+|---|---|---|
+| 언어 | Python | TypeScript (Node.js) |
+| 속도 | 보통 | 빠름 |
+| IDE 통합 | 보통 | VSCode 최적화 (Pylance) |
+| 생태계 | 가장 넓음 | 빠르게 성장 |
+| 설정 난이도 | 중간 | 낮음 |
+
+
+## 타입 힌트 실전 패턴
+
+### Callable 타입
+
+```python
+from typing import Callable
+
+# 함수를 인자로 받는 함수
+def retry(
+    func: Callable[[], str],
+    max_attempts: int = 3,
+) -> str:
+    for attempt in range(max_attempts):
+        try:
+            return func()
+        except Exception:
+            if attempt == max_attempts - 1:
+                raise
+    return ""  # unreachable, but makes mypy happy
+
+# 데코레이터 타입
+from typing import TypeVar, ParamSpec
+from functools import wraps
+
+P = ParamSpec("P")
+R = TypeVar("R")
+
+def log_calls(func: Callable[P, R]) -> Callable[P, R]:
+    @wraps(func)
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        print(f"Calling {func.__name__}")
+        return func(*args, **kwargs)
+    return wrapper
+```
+
+### Literal 타입
+
+```python
+from typing import Literal
+
+def set_log_level(level: Literal["DEBUG", "INFO", "WARNING", "ERROR"]) -> None:
+    print(f"Setting level to {level}")
+
+set_log_level("INFO")     # OK
+set_log_level("VERBOSE")  # mypy error: not in Literal values
+```
+
+### Self 타입 (Python 3.11+)
+
+```python
+from typing import Self
+
+class Builder:
+    def __init__(self) -> None:
+        self._name: str = ""
+        self._version: str = ""
+    
+    def name(self, name: str) -> Self:
+        self._name = name
+        return self
+    
+    def version(self, version: str) -> Self:
+        self._version = version
+        return self
+
+# 메서드 체이닝이 타입 안전
+builder = Builder().name("acme").version("1.0")
+```
+
+### Overload: 입력에 따라 다른 반환 타입
+
+```python
+from typing import overload
+
+@overload
+def process(data: str) -> str: ...
+@overload
+def process(data: bytes) -> bytes: ...
+@overload
+def process(data: list[str]) -> list[str]: ...
+
+def process(data: str | bytes | list[str]) -> str | bytes | list[str]:
+    if isinstance(data, str):
+        return data.upper()
+    elif isinstance(data, bytes):
+        return data.upper()
+    else:
+        return [item.upper() for item in data]
+
+# mypy가 반환 타입을 정확히 추론
+result: str = process("hello")        # OK
+result2: bytes = process(b"hello")    # OK
+result3: list[str] = process(["a"])   # OK
+```
+
+## pre-commit에서 자동 검사
+
+커밋 전에 타입 검사와 린트를 자동으로 실행하면 PR에서 기본적인 문제가 발견되는 것을 방지합니다.
+
+```yaml
+# .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.5.5
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.11.0
+    hooks:
+      - id: mypy
+        additional_dependencies:
+          - types-requests
+          - pydantic>=2.5
+```
+
+```bash
+# pre-commit 설치
+pip install pre-commit
+pre-commit install
+
+# 수동 전체 실행
+pre-commit run --all-files
+```
+
+## 타입 검사 커버리지 측정
+
+```bash
+# mypy 리포트 생성
+mypy src --html-report reports/mypy
+
+# 또는 텍스트 요약
+mypy src --txt-report reports/mypy
+cat reports/mypy/index.txt
+```
+
+```text
+Module                Lines  Precise  Imprecise  Any
+acme_utils            450    420      20         10
+acme_utils.core       200    195      3          2
+acme_utils.config     120    118      2          0
+acme_utils.cli        130    107      15         8
+```
+
+타입 커버리지를 CI에서 추적하면 점진적으로 타입 안전성을 높일 수 있습니다.
+
+
+`Any` 비율이 높은 모듈은 타입 안전성의 빈틈입니다. 해당 모듈부터 우선적으로 타입을 보강하면 전체 프로젝트의 타입 신뢰도를 효율적으로 높일 수 있습니다. 목표는 `Precise` 비율 90% 이상을 유지하는 것입니다.
+
+
+실무에서는 mypy strict 모드를 새 모듈에만 먼저 적용하고, 레거시 모듈은 `ignore_errors = true`로 예외를 두되 점진적으로 줄여가는 전략이 현실적입니다.
+
 
 ## 처음 질문으로 돌아가기
 
 - **타입 힌트는 왜 필요하고 런타임에 영향을 줄까요?**
-  - 본문의 기준은 타입 힌트와 정적 검사를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 타입 힌트는 코드의 의도를 명시하여 mypy 같은 도구가 실행 전에 타입 불일치, None 체크 누락, 잘못된 인자 전달을 잡아줍니다. 런타임에는 타입 힌트가 무시되므로 성능에 영향을 주지 않습니다. 단, `typing` 모듈 import는 약간의 시작 시간을 추가합니다.
+
 - **`mypy`는 어떤 오류를 잡아 줄까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
-- **`py.typed` 마커 파일은 왜 필요할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 반환 타입 불일치, None일 수 있는 값에 대한 메서드 호출, 잘못된 타입의 인자 전달, 존재하지 않는 속성 접근, TypedDict의 필수 키 누락 등을 잡습니다. `strict` 모드를 사용하면 타입이 없는 함수 정의도 에러로 처리하여 프로젝트 전체의 타입 안전성을 보장합니다.
+
+- **패키지 사용자에게 타입 정보를 제공하려면 어떻게 해야 할까요?**
+  - `src/패키지/py.typed` 빈 파일을 추가하고 `pyproject.toml`의 package-data에 포함시킵니다. 이것이 PEP 561 마커로, mypy와 pyright가 이 패키지에서 타입 정보를 읽어야 한다는 신호입니다. 인라인 타입이 가장 간편하고, C 확장이나 레거시 코드에는 `.pyi` 스텁 파일을 사용합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -363,6 +785,7 @@ jobs:
 
 ## 참고 자료
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/python-package-101/ko)
 - [mypy documentation](https://mypy.readthedocs.io/)
 - [PEP 484 - Type Hints](https://peps.python.org/pep-0484/)
 - [PEP 561 - Distributing and Packaging Type Information](https://peps.python.org/pep-0561/)

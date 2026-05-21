@@ -238,6 +238,220 @@ for i, step in enumerate(steps, 1):
 | 데이터베이스(EP8) | 특징 저장소(feature store), 벡터 DB |
 | 소프트웨어 엔지니어링(EP9) | MLOps, 실험 재현성 |
 
+
+### 혼동 행렬(Confusion Matrix)과 평가 지표
+
+분류 모델의 성능을 단일 정확도(accuracy)로 판단하면 위험합니다. 클래스 불균형이 있을 때 혼동 행렬이 실체를 보여줍니다.
+
+```text
+                    예측
+              Positive    Negative
+실제 Positive │  TP (42)  │  FN (8)   │  → 재현율 = TP/(TP+FN) = 84%
+실제 Negative │  FP (12)  │  TN (938) │
+              └───────────┴───────────┘
+                    ↓
+              정밀도 = TP/(TP+FP) = 78%
+
+정확도 = (TP+TN)/전체 = 980/1000 = 98%  ← 높아 보이지만...
+```
+
+스팸 필터 예시: 1000통 중 스팸이 50통뿐이면 "전부 정상"이라고 예측해도 정확도 95%입니다. 하지만 재현율은 0%이므로 쓸모없습니다.
+
+```python
+from sklearn.metrics import confusion_matrix, classification_report
+import numpy as np
+
+# 실제값과 예측값
+y_true = [1]*50 + [0]*950   # 스팸 50개, 정상 950개
+y_pred = [1]*42 + [0]*8 + [1]*12 + [0]*938
+
+cm = confusion_matrix(y_true, y_pred, labels=[1, 0])
+print("혼동 행렬:")
+print(f"  TP={cm[0,0]}  FN={cm[0,1]}")
+print(f"  FP={cm[1,0]}  TN={cm[1,1]}")
+print()
+print(classification_report(y_true, y_pred, target_names=["스팸", "정상"]))
+```
+
+| 지표 | 공식 | 중요한 경우 |
+|------|------|-------------|
+| 정밀도(Precision) | TP / (TP + FP) | 오탐이 비싼 경우 (금융 사기) |
+| 재현율(Recall) | TP / (TP + FN) | 놓침이 치명적인 경우 (암 진단) |
+| F1 Score | 2 × P × R / (P + R) | 정밀도-재현율 균형 |
+| AUC-ROC | 분류 임계값 전체에서의 면적 | 모델 전반적 판별력 |
+
+### 경사 하강법(Gradient Descent) 직관
+
+머신러닝의 학습은 손실 함수를 최소화하는 파라미터를 찾는 최적화 문제입니다.
+
+```python
+import numpy as np
+
+def gradient_descent_demo():
+    """1차원 경사 하강법으로 y = (x-3)^2 의 최솟값을 찾습니다."""
+    # 손실 함수: f(x) = (x - 3)^2
+    # 기울기:    f'(x) = 2(x - 3)
+
+    x = 10.0              # 초기값 (임의)
+    learning_rate = 0.1   # 학습률
+    history = []
+
+    for step in range(20):
+        gradient = 2 * (x - 3)           # 기울기 계산
+        x = x - learning_rate * gradient  # 파라미터 업데이트
+        loss = (x - 3) ** 2              # 현재 손실
+        history.append((step, x, loss))
+
+    print(f"{'Step':>4} {'x':>8} {'Loss':>10}")
+    print("-" * 24)
+    for step, xi, loss in history[:10]:
+        print(f"{step:>4} {xi:>8.4f} {loss:>10.6f}")
+    print(f"최종: x = {x:.6f}, 최솟값 위치 = 3.0")
+
+gradient_descent_demo()
+```
+
+학습률이 너무 크면 발산하고, 너무 작으면 수렴이 느립니다.
+
+```text
+학습률에 따른 수렴 양상:
+
+Loss
+ ↑
+ │ ×            lr = 0.01 (느림)
+ │  ×
+ │   ×──×──×──×──×──×──  → 수렴하지만 느림
+ │
+ │ ×
+ │  ×
+ │   ×                    lr = 0.1 (적절)
+ │    ×─×─→ 수렴
+ │
+ │ × × × × × × × ×       lr = 1.0 (발산)
+ │× × × × × × × × ×     → 발산
+ └──────────────────────→ Step
+```
+
+실전에서는 학습률 스케줄러(cosine annealing, warmup)를 사용해 초기에는 크게, 후반에는 작게 조정합니다.
+
+### 데이터 파이프라인과 특징 엔지니어링
+
+모델 성능의 80%는 데이터 품질과 특징 설계에서 결정됩니다.
+
+```text
+원시 데이터 → [수집] → [정제] → [특징 추출] → [학습] → [평가] → [배포]
+                        │                                        │
+                        └─── 피드백 루프 ──────────────────────────┘
+```
+
+```python
+import pandas as pd
+import numpy as np
+
+def feature_engineering_example():
+    """전자상거래 데이터에서 특징을 생성하는 예시입니다."""
+    # 원시 주문 데이터
+    orders = pd.DataFrame({
+        "user_id": [1, 1, 1, 2, 2, 3],
+        "amount": [15000, 32000, 8000, 120000, 45000, 5000],
+        "created_at": pd.to_datetime([
+            "2026-01-01", "2026-01-15", "2026-02-01",
+            "2026-01-05", "2026-01-20", "2026-03-01",
+        ]),
+    })
+
+    # 사용자별 집계 특징 생성
+    features = orders.groupby("user_id").agg(
+        order_count=("amount", "count"),
+        total_spent=("amount", "sum"),
+        avg_order_value=("amount", "mean"),
+        max_order_value=("amount", "max"),
+        days_since_first=("created_at", lambda x: (x.max() - x.min()).days),
+    ).reset_index()
+
+    # 파생 특징
+    features["spending_velocity"] = (
+        features["total_spent"] / (features["days_since_first"] + 1)
+    )
+
+    print(features.to_string(index=False))
+
+feature_engineering_example()
+```
+
+특징 엔지니어링에서 흔한 실수:
+
+| 실수 | 결과 | 해결 |
+|------|------|------|
+| 미래 정보 누출(data leakage) | 학습 정확도↑, 운영 성능↓ | 시간 기준 분할 엄수 |
+| 결측값 무시 | NaN 전파로 모델 오류 | 명시적 대체 또는 제거 |
+| 스케일 미조정 | 큰 값 특징이 지배 | StandardScaler, MinMaxScaler |
+| 범주형 직접 입력 | 순서 관계 오해석 | One-hot encoding, Target encoding |
+| 학습/평가 데이터 오염 | 과적합을 탐지 못함 | 별도 검증 세트 + 교차 검증 |
+
+### MLOps: 모델을 운영 시스템으로 만드는 과정
+
+노트북에서 잘 되는 모델을 운영 서비스로 만들려면 소프트웨어 엔지니어링의 모든 원칙이 필요합니다.
+
+```text
+실험 단계                    운영 단계
+─────────────────────────────────────────────────
+Jupyter 노트북          →   패키지화된 Python 모듈
+로컬 CSV                →   데이터 파이프라인 (Airflow/Prefect)
+수동 학습               →   자동 재학습 파이프라인
+print() 디버깅          →   구조화된 로깅 + 모니터링
+단일 모델 파일          →   모델 레지스트리 (MLflow)
+수동 배포               →   CI/CD + 카나리 배포
+결과 수동 확인          →   A/B 테스트 + 자동 롤백
+```
+
+| MLOps 구성 요소 | 도구 예시 | 역할 |
+|-----------------|-----------|------|
+| 실험 추적 | MLflow, W&B | 하이퍼파라미터, 메트릭, 아티팩트 기록 |
+| 데이터 버전 관리 | DVC, lakeFS | 데이터셋 변경 이력 추적 |
+| 모델 서빙 | TorchServe, Triton, FastAPI | 저지연 추론 API |
+| 모니터링 | Evidently, Grafana | 데이터/모델 드리프트 감지 |
+| 오케스트레이션 | Kubeflow, Airflow | 파이프라인 스케줄링 |
+
+### 모델 드리프트와 재학습 전략
+
+운영 중인 모델은 시간이 지나면 성능이 떨어집니다. 입력 데이터의 분포가 변하기 때문입니다.
+
+| 드리프트 유형 | 원인 | 감지 방법 |
+|---------------|------|----------|
+| 데이터 드리프트 | 사용자 행동 변화, 계절성 | 입력 특징 분포 비교 (KS 검정, PSI) |
+| 개념 드리프트 | 입력-출력 관계 자체가 변함 | 예측 정확도 모니터링 |
+| 라벨 드리프트 | 라벨링 기준 변경 | 라벨 분포 추적 |
+
+재학습 전략:
+
+1. **정기 재학습**: 매주/매월 새 데이터로 재학습 (단순하지만 낭비 가능)
+2. **트리거 기반 재학습**: 성능 지표가 임계값 이하로 떨어지면 자동 실행
+3. **온라인 학습**: 새 데이터가 들어올 때마다 점진적 업데이트 (스트리밍)
+
+```python
+# 간단한 모델 드리프트 감지 예시
+from scipy import stats
+import numpy as np
+
+def detect_drift(reference: np.ndarray, current: np.ndarray, threshold: float = 0.05) -> bool:
+    """KS 검정으로 두 분포가 유의하게 다른지 판단합니다."""
+    statistic, p_value = stats.ks_2samp(reference, current)
+    drifted = p_value < threshold
+    print(f"KS statistic: {statistic:.4f}, p-value: {p_value:.4f}, drift: {drifted}")
+    return drifted
+
+# 학습 시 데이터 분포 (기준)
+train_distribution = np.random.normal(loc=50, scale=10, size=10000)
+
+# 운영 중 수집된 데이터 (정상)
+production_normal = np.random.normal(loc=50, scale=10, size=1000)
+detect_drift(train_distribution, production_normal)  # drift: False
+
+# 운영 중 수집된 데이터 (드리프트 발생)
+production_drifted = np.random.normal(loc=60, scale=15, size=1000)
+detect_drift(train_distribution, production_drifted)  # drift: True
+```
 ## 체크리스트
 
 - [ ] 머신러닝과 규칙 기반의 차이를 한 문장으로 설명할 수 있는가
@@ -289,12 +503,11 @@ AI·데이터 과학 단원에서는 모델 성능 수치뿐 아니라 데이터
 ## 처음 질문으로 돌아가기
 
 - **지금까지 배운 CS 기초가 AI와 데이터사이언스에서 어디에 직접 쓰일까요?**
-  - 본문의 기준은 AI와 데이터사이언스까지의 연결를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 알고리즘 복잡도는 학습 시간 예측에, 컴퓨터 구조는 GPU 병렬화 이해에, OS는 분산 학습 오케스트레이션에, 네트워크는 모델 서빙 지연 분석에, DB는 특징 저장소 설계에 직접 대응됩니다.
 - **규칙 기반 시스템과 머신러닝 시스템은 무엇이 본질적으로 다를까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 규칙 기반은 사람이 입력→출력 매핑을 명시적으로 코딩합니다. 머신러닝은 데이터에서 그 매핑을 자동으로 학습합니다. 규칙은 해석 가능하지만 복잡한 패턴에 한계가 있고, ML은 패턴 발견에 강하지만 블랙박스와 데이터 품질 의존이라는 대가를 치릅니다.
 - **학습, 추론, 데이터 품질 검증은 왜 결국 계산과 시스템 문제일까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
-
+  - 학습은 경사 하강법이라는 반복 최적화(행렬 연산 수십억 회)이고, 추론은 지연 시간 내에 결과를 반환하는 시스템 문제이며, 데이터 품질 검증은 파이프라인의 각 단계에서 분포 변화를 감시하는 모니터링 문제입니다.
 <!-- toc:begin -->
 ## 시리즈 목차
 
@@ -318,4 +531,5 @@ AI·데이터 과학 단원에서는 모델 성능 수치뿐 아니라 데이터
 - [Designing Machine Learning Systems — Chip Huyen](https://www.oreilly.com/library/view/designing-machine-learning/9781098107956/)
 - [The Bitter Lesson — Rich Sutton](http://www.incompleteideas.net/IncIdeas/BitterLesson.html)
 
+- [이 시리즈의 예제 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/computer-science-101/ko)
 Tags: Computer Science, AI, 데이터사이언스, 머신러닝, 통계, 진로

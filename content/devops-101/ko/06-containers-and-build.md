@@ -62,7 +62,7 @@ last_reviewed: '2026-05-12'
 
 이 용어를 구분하면 컨테이너 운영에서 자주 나오는 질문도 훨씬 쉽게 풀립니다. 예를 들어 문제를 고칠 때 컨테이너 안에서 직접 수정하는 것이 아니라 새 이미지를 다시 만드는 이유도 여기서 설명됩니다.
 
-## Before/After
+## 전환 전후
 
 **Before (host-dependent)**
 
@@ -88,7 +88,7 @@ CMD ["uvicorn", "main:app", "--host", "0.0.0.0"]
 
 Dockerfile이 있으면 실행 환경이 코드와 함께 버전 관리됩니다. 그 순간부터 환경 차이는 개인의 기억이 아니라 저장소 안의 변경 이력으로 다룰 수 있습니다.
 
-## 실전으로 보는 Dockerfile 5단계
+## 실전으로 보는 도커파일 다섯 단계
 
 ### 1단계 - 기본 빌드
 
@@ -162,7 +162,7 @@ Dockerfile 한 줄 순서가 빌드 시간과 보안 수준을 동시에 바꿀 
 
 cache 최적화는 빈번한 재빌드에서 가장 큰 차이를 만듭니다. 의존성이 바뀌지 않았다면 재설치를 건너뛰는 것만으로 CI 대기 시간을 크게 줄일 수 있습니다.
 
-## Python FastAPI 멀티스테이지 Dockerfile 예제
+## 파이썬 FastAPI 멀티스테이지 도커파일 예시
 
 실무에서 바로 쓸 수 있는 FastAPI 앱의 멀티스테이지 Dockerfile 구성입니다. 빌드 단계와 실행 단계를 나눠 최종 이미지를 가볍게 유지합니다.
 
@@ -355,6 +355,196 @@ services:
 
 컨테이너 빌드가 안정되면 배포 논의가 기술 세부 대신 운영 정책 중심으로 전환됩니다. 이것이 DevOps 성숙의 중요한 신호입니다.
 
+
+## 운영 앵커: 배포, 인프라, 관측성, 대응을 한 장으로 연결하기
+
+앞선 섹션에서 각 주제를 따로 설명했다면, 이 섹션은 실무에서 한 번에 연결해 쓰는 최소 구성 예시를 제공합니다. 핵심은 화려한 도구 조합이 아니라, 같은 기준으로 변경을 통과시키고 문제를 되돌릴 수 있는가입니다.
+
+### CI/CD 파이프라인 공통 YAML
+
+```yaml
+name: delivery-flow
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements-dev.txt
+      - run: ruff check .
+      - run: pytest -q
+
+  deploy-stage:
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./scripts/deploy_stage.sh
+      - run: ./scripts/smoke_test.sh https://stage.example.com
+
+  deploy-prod-canary:
+    needs: deploy-stage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./scripts/deploy_prod.sh --strategy canary --percent 10
+      - run: ./scripts/check_slo.sh --window 5m
+      - run: ./scripts/promote_or_rollback.sh
+```
+
+이 흐름의 실전 포인트는 세 가지입니다. 첫째, CI 통과 전에는 어떤 배포도 시작하지 않습니다. 둘째, stage 통과 후에만 production으로 승격합니다. 셋째, production 승격은 canary 관찰 통과를 조건으로 강제합니다.
+
+### Terraform과 Ansible 역할 분리 예시
+
+```hcl
+# infra/main.tf
+resource "aws_security_group" "api" {
+  name        = "api-sg"
+  description = "api security group"
+}
+
+resource "aws_instance" "api" {
+  ami           = var.ami
+  instance_type = "t3.small"
+  tags = {
+    service = "api"
+    env     = var.env
+  }
+}
+```
+
+```yaml
+# ops/playbooks/hardening.yml
+- hosts: api
+  become: true
+  tasks:
+    - name: Install security updates
+      apt:
+        update_cache: true
+        upgrade: dist
+
+    - name: Ensure auditd is installed
+      apt:
+        name: auditd
+        state: present
+
+    - name: Ensure ssh root login is disabled
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^PermitRootLogin'
+        line: 'PermitRootLogin no'
+```
+
+Terraform은 "무엇을 만들 것인가"를 선언하고, Ansible은 "만들어진 시스템을 어떤 상태로 유지할 것인가"를 담당합니다. 두 도구를 구분하면 변경 리뷰 범위가 명확해지고, 장애 시 원인 추적도 빨라집니다.
+
+### 모니터링/알림 설정 예시
+
+```yaml
+# monitoring/alerts.yml
+groups:
+  - name: api-slo
+    rules:
+      - alert: ApiHighErrorRate
+        expr: rate(http_requests_total{service="api",status=~"5.."}[5m]) / rate(http_requests_total{service="api"}[5m]) > 0.01
+        for: 5m
+        labels:
+          severity: page
+        annotations:
+          summary: "API 5xx 비율 1% 초과"
+          runbook: "https://internal/wiki/runbooks/api-high-error-rate"
+
+      - alert: ApiHighLatencyP95
+        expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{service="api"}[5m])) by (le)) > 0.35
+        for: 10m
+        labels:
+          severity: warning
+```
+
+알림은 많이 울리는 것이 목표가 아닙니다. 운영자가 실제로 행동할 수 있는 신호만 남기고, 모든 page 알림에 runbook 링크를 붙여 대응 시작 시간을 줄여야 합니다.
+
+### 블루그린/카나리 승격 절차 예시
+
+```bash
+# blue-green switch
+./scripts/deploy_blue.sh
+./scripts/smoke_test.sh https://blue.example.com
+./scripts/switch_traffic.sh --from green --to blue
+
+# canary rollout
+./scripts/deploy_canary.sh --percent 10
+./scripts/check_metrics.sh --window 5m
+./scripts/promote_canary.sh --to 50
+./scripts/promote_canary.sh --to 100
+```
+
+블루그린은 즉시 전환과 즉시 롤백에 유리하고, 카나리는 위험을 작게 나눠 검증하는 데 유리합니다. 서비스 특성과 팀 역량에 따라 전략을 고르되, 승격/철수 명령을 반드시 런북과 자동화 스크립트로 함께 유지해야 합니다.
+
+### 인시던트 대응 런북 예시
+
+```markdown
+# Runbook: API 5xx 급증
+
+## 0-5분
+1. SEV 판정 (SEV1/SEV2)
+2. incident 채널 개설
+3. 최근 배포 커밋 확인
+
+## 5-10분
+1. canary/최근 릴리스 롤백 시도
+2. 에러율, p95, DB 연결수 확인
+3. 고객 영향 범위 요약 공지
+
+## 10-20분
+1. 임시 완화 조치 적용
+2. 영구 수정 owner 지정
+3. postmortem 일정 예약
+```
+
+운영에서는 "잘 아는 사람"보다 "같은 순서를 따르는 팀"이 더 빠르게 복구합니다. 그래서 runbook은 설명 문서가 아니라 실행 문서여야 하며, 경보에서 한 번에 열 수 있어야 합니다.
+
+### 운영 메모
+
+운영 품질을 높이려면 변경 단위를 작게 유지하고, 실패 신호를 빠르게 드러내고, 되돌림 경로를 배포 설계에 포함해야 합니다. 또한 지표 해석과 대응 절차를 팀 공통 언어로 문서화해 개인 경험 의존도를 줄여야 합니다. 이 원칙이 지켜질 때 배포 속도와 안정성을 함께 올릴 수 있습니다.
+
+### 운영 메모
+
+운영 품질을 높이려면 변경 단위를 작게 유지하고, 실패 신호를 빠르게 드러내고, 되돌림 경로를 배포 설계에 포함해야 합니다. 또한 지표 해석과 대응 절차를 팀 공통 언어로 문서화해 개인 경험 의존도를 줄여야 합니다. 이 원칙이 지켜질 때 배포 속도와 안정성을 함께 올릴 수 있습니다.
+
+### 운영 메모
+
+운영 품질을 높이려면 변경 단위를 작게 유지하고, 실패 신호를 빠르게 드러내고, 되돌림 경로를 배포 설계에 포함해야 합니다. 또한 지표 해석과 대응 절차를 팀 공통 언어로 문서화해 개인 경험 의존도를 줄여야 합니다. 이 원칙이 지켜질 때 배포 속도와 안정성을 함께 올릴 수 있습니다.
+
+### 운영 메모
+
+운영 품질을 높이려면 변경 단위를 작게 유지하고, 실패 신호를 빠르게 드러내고, 되돌림 경로를 배포 설계에 포함해야 합니다. 또한 지표 해석과 대응 절차를 팀 공통 언어로 문서화해 개인 경험 의존도를 줄여야 합니다. 이 원칙이 지켜질 때 배포 속도와 안정성을 함께 올릴 수 있습니다.
+
+### 운영 메모
+
+운영 품질을 높이려면 변경 단위를 작게 유지하고, 실패 신호를 빠르게 드러내고, 되돌림 경로를 배포 설계에 포함해야 합니다. 또한 지표 해석과 대응 절차를 팀 공통 언어로 문서화해 개인 경험 의존도를 줄여야 합니다. 이 원칙이 지켜질 때 배포 속도와 안정성을 함께 올릴 수 있습니다.
+
+### 운영 메모
+
+운영 품질을 높이려면 변경 단위를 작게 유지하고, 실패 신호를 빠르게 드러내고, 되돌림 경로를 배포 설계에 포함해야 합니다. 또한 지표 해석과 대응 절차를 팀 공통 언어로 문서화해 개인 경험 의존도를 줄여야 합니다. 이 원칙이 지켜질 때 배포 속도와 안정성을 함께 올릴 수 있습니다.
+
+### 운영 메모
+
+운영 품질을 높이려면 변경 단위를 작게 유지하고, 실패 신호를 빠르게 드러내고, 되돌림 경로를 배포 설계에 포함해야 합니다. 또한 지표 해석과 대응 절차를 팀 공통 언어로 문서화해 개인 경험 의존도를 줄여야 합니다. 이 원칙이 지켜질 때 배포 속도와 안정성을 함께 올릴 수 있습니다.
+
+### 운영 메모
+
+운영 품질을 높이려면 변경 단위를 작게 유지하고, 실패 신호를 빠르게 드러내고, 되돌림 경로를 배포 설계에 포함해야 합니다. 또한 지표 해석과 대응 절차를 팀 공통 언어로 문서화해 개인 경험 의존도를 줄여야 합니다. 이 원칙이 지켜질 때 배포 속도와 안정성을 함께 올릴 수 있습니다.
+
+### 운영 메모
+
+운영 품질을 높이려면 변경 단위를 작게 유지하고, 실패 신호를 빠르게 드러내고, 되돌림 경로를 배포 설계에 포함해야 합니다. 또한 지표 해석과 대응 절차를 팀 공통 언어로 문서화해 개인 경험 의존도를 줄여야 합니다. 이 원칙이 지켜질 때 배포 속도와 안정성을 함께 올릴 수 있습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **컨테이너는 VM과 무엇이 다르고 왜 배포 재현성에 유리할까요?**
@@ -386,5 +576,7 @@ services:
 - [Distroless images](https://github.com/GoogleContainerTools/distroless)
 - [Trivy](https://trivy.dev/)
 - [Sigstore Cosign](https://docs.sigstore.dev/cosign/overview/)
+
+- [이 시리즈의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/devops-101/ko)
 
 Tags: DevOps, Docker, Container, Build, Image

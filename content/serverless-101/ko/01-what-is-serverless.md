@@ -24,6 +24,7 @@ last_reviewed: '2026-05-16'
 
 이 글은 Serverless 101 시리즈의 첫 번째 글입니다.
 
+
 서버리스를 처음 들으면 대개 “서버를 안 만지는 방식이구나”라고 이해합니다. 방향은 맞지만, 그 한 문장만으로는 이후 판단이 자꾸 틀어집니다. 서버가 사라지는 것이 아니라 **서버 운영 책임의 기본값이 플랫폼으로 이동**하기 때문입니다.
 
 그래서 서버리스 입문에서 가장 먼저 잡아야 할 질문은 “함수를 어떻게 쓰지?”가 아닙니다. **“이 워크로드를 정말 서버리스로 시작해도 되는가?”** 입니다. 이 판단을 먼저 해 두어야 첫 번째 함수 예제도 의미가 생기고, 뒤이어 나올 FaaS, 트리거, 콜드 스타트, 비용 이야기도 같은 멘탈 모델 안에서 읽힙니다.
@@ -73,7 +74,7 @@ last_reviewed: '2026-05-16'
 
 이 그림에서 핵심 주체는 함수보다 플랫폼입니다. 이벤트가 들어오면 플랫폼이 실행 환경을 준비하고, 핸들러를 호출하고, 필요하면 재시도하거나 새 인스턴스를 만듭니다. 개발자는 직접 서버를 띄우지 않지만, 대신 **입력 계약, 응답 형식, 상태 저장 위치, 관측성 기준**을 더 명확하게 정해야 합니다.
 
-## 첫 번째 서버리스 함수 워크플로: HTTP 요청 하나를 정상 처리해 보기
+## 첫 번째 서버리스 함수 워크플로: 하이퍼텍스트요청 요청 하나를 정상 처리해 보기
 
 이 글에서는 개념만 설명하지 않고, 이후 글에서도 계속 재사용할 아주 작은 주문 접수 예제를 기준으로 보겠습니다. 목표는 단순합니다. **HTTP 이벤트 하나를 받아 검증하고, 플랫폼이 기대하는 형식으로 응답을 돌려주는 최소 계약**을 확인하는 것입니다.
 
@@ -222,7 +223,7 @@ python3 app.py
 
 아닙니다. 함수가 짧아져도 시스템 경계가 늘어나면 오히려 추적과 재시도 설계가 더 어려워질 수 있습니다. 서버리스는 코드 줄 수보다 **이벤트 경계 설계**가 더 중요합니다.
 
-### 서버리스는 모든 API 백엔드의 좋은 출발점일까요?
+### 서버리스는 모든 인터페이스 백엔드의 좋은 출발점일까요?
 
 짧고 독립적인 요청, 트래픽 변동이 큰 API, 이벤트 기반 후처리에는 좋습니다. 반대로 장시간 연결, 실시간 게임 세션, 지속적 스트리밍, 세밀한 런타임 제어가 필요한 서비스는 상시 실행 환경이 더 단순할 수 있습니다.
 
@@ -239,11 +240,11 @@ python3 app.py
 
 이번 글의 가장 작은 예제는 주문 접수용 HTTP 핸들러 하나였지만, 그 안에도 이미 서버리스의 핵심 계약이 모두 들어 있었습니다. 다음 글에서는 이 예제를 이어 받아, 실제로 **패키지를 만들고 실행하고 측정하는 FaaS 워크플로**를 보겠습니다.
 
-## 심화 실전 노트: Lambda 구성, 콜드 스타트, 이벤트 소스 매핑 운영
+## 심화 실전 노트: 람다 구성, 콜드 스타트, 이벤트 소스 매핑 운영
 
 서버리스 운영에서는 함수 코드보다 구성값이 장애를 만드는 경우가 더 많습니다. 메모리, 타임아웃, 동시성, 재시도 정책, 이벤트 소스 매핑 배치 크기 같은 설정이 처리량과 비용을 동시에 바꾸기 때문입니다. 따라서 기능 구현과 설정 검토를 분리하지 않고, 배포 단위마다 같이 점검해야 합니다.
 
-### Lambda 구성에서 먼저 고정할 항목
+### 람다 구성에서 먼저 고정할 항목
 
 아래 예시는 AWS SAM 템플릿 기준으로 자주 사용하는 안전 기본값입니다.
 
@@ -275,7 +276,7 @@ Resources:
 
 단순 평균 지연만 보면 개선 효과가 숨겨질 수 있으므로, 배포 전후의 `Init Duration` 분포와 타임아웃 비율을 같이 비교하는 습관이 중요합니다.
 
-### 이벤트 소스 매핑(Event Source Mapping) 설계
+### 이벤트 소스 매핑(이벤트 소스 매핑) 설계
 
 SQS, Kinesis, DynamoDB Streams를 사용할 때는 배치 크기와 실패 재처리 정책이 핵심입니다.
 
@@ -307,6 +308,181 @@ Events:
 
 배포 직전에는 함수 코드 테스트와 함께 설정 검증을 반드시 포함해야 합니다. 메모리/타임아웃 조합, 최대 동시성 제한, DLQ 연결, 이벤트 매핑 배치 정책, 콜드 스타트 완화 전략까지 체크리스트로 남기면 장애 복구 시간이 크게 단축됩니다.
 
+## 실무 앵커: 첫 함수에서 운영 계약까지 한 번에 잇기
+
+개념을 이해한 뒤 바로 막히는 지점은 "그래서 무엇을 코드와 설정으로 고정해야 하는가"입니다. 아래는 가장 작은 주문 접수 흐름을 기준으로, 핸들러 코드와 배포 템플릿, API 라우팅, 데이터 저장까지 한 번에 연결한 최소 세트입니다.
+
+### 핸들러 코드: 입력 계약, 상관관계 식별자, 오류 응답
+
+```python
+import json
+import os
+import uuid
+from datetime import datetime, timezone
+
+import boto3
+from botocore.exceptions import ClientError
+
+TABLE_NAME = os.environ["ORDERS_TABLE"]
+ddb = boto3.resource("dynamodb")
+table = ddb.Table(TABLE_NAME)
+
+def handler(event, context):
+    headers = event.get("headers") or {}
+    correlation_id = headers.get("x-correlation-id", str(uuid.uuid4()))
+
+    try:
+        body = json.loads(event.get("body") or "{}")
+        customer_id = body["customerId"]
+        amount = int(body["amount"])
+
+        if amount <= 0:
+            raise ValueError("amount must be positive")
+
+        order_id = str(uuid.uuid4())
+        now = datetime.now(timezone.utc).isoformat()
+
+        table.put_item(
+            Item={
+                "pk": f"ORDER#{order_id}",
+                "sk": "META",
+                "customerId": customer_id,
+                "amount": amount,
+                "status": "ACCEPTED",
+                "createdAt": now,
+                "correlationId": correlation_id,
+            },
+            ConditionExpression="attribute_not_exists(pk)",
+        )
+
+        return {
+            "statusCode": 201,
+            "headers": {
+                "content-type": "application/json",
+                "x-correlation-id": correlation_id,
+            },
+            "body": json.dumps({"orderId": order_id, "status": "ACCEPTED"}),
+        }
+    except (KeyError, ValueError) as e:
+        return {
+            "statusCode": 400,
+            "headers": {"content-type": "application/json", "x-correlation-id": correlation_id},
+            "body": json.dumps({"error": str(e)}),
+        }
+    except ClientError:
+        return {
+            "statusCode": 500,
+            "headers": {"content-type": "application/json", "x-correlation-id": correlation_id},
+            "body": json.dumps({"error": "internal_error"}),
+        }
+```
+
+핵심은 세 가지입니다. 첫째, 입력 검증 실패와 시스템 실패를 분리합니다. 둘째, 상관관계 ID를 응답까지 유지합니다. 셋째, 조건부 쓰기로 중복 생성 사고를 막습니다. 서버리스에서 "작은 핸들러"는 짧은 코드가 아니라 **운영 계약을 숨기지 않는 코드**입니다.
+
+### 서버리스 애플리케이션 모델 템플릿: 인터페이스 게이트웨이, 람다, 다이너모디비 기본 결합
+
+```yaml
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  OrdersApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+
+  OrdersFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/
+      Handler: app.handler
+      Runtime: python3.12
+      MemorySize: 512
+      Timeout: 10
+      ReservedConcurrentExecutions: 20
+      Environment:
+        Variables:
+          ORDERS_TABLE: !Ref OrdersTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref OrdersTable
+      Events:
+        CreateOrder:
+          Type: Api
+          Properties:
+            RestApiId: !Ref OrdersApi
+            Path: /orders
+            Method: post
+
+  OrdersTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: pk
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+      KeySchema:
+        - AttributeName: pk
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+```
+
+이 템플릿에서 초반에 반드시 고정할 값은 `Timeout`, `MemorySize`, `ReservedConcurrentExecutions`입니다. 세 값이 바뀌면 실패 양상, 지연 시간, 비용이 동시에 움직이기 때문에 팀 공용 기준으로 먼저 잠가 두어야 합니다.
+
+### 서버리스 프레임워크 대안 구성
+
+```yaml
+service: orders-service
+frameworkVersion: '3'
+provider:
+  name: aws
+  runtime: python3.12
+  memorySize: 512
+  timeout: 10
+  environment:
+    ORDERS_TABLE: ${self:service}-orders
+functions:
+  createOrder:
+    handler: src/app.handler
+    reservedConcurrency: 20
+    events:
+      - httpApi:
+          path: /orders
+          method: post
+resources:
+  Resources:
+    OrdersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: pk
+            AttributeType: S
+          - AttributeName: sk
+            AttributeType: S
+        KeySchema:
+          - AttributeName: pk
+            KeyType: HASH
+          - AttributeName: sk
+            KeyType: RANGE
+```
+
+SAM을 쓰든 Serverless Framework를 쓰든 중요한 것은 도구 선택보다 **계약 일관성**입니다. 로컬 실행, CI 배포, 운영 관측 지표가 같은 전제 위에서 움직여야 문제를 재현할 수 있습니다.
+
+### 콜드 스타트 측정과 비용 판단을 같은 표로 보기
+
+초기 설계 단계에서 가장 실용적인 방법은 기능 정의서가 아니라 **측정 표**입니다.
+
+| 시나리오 | 메모리 | p50 지연 | p95 지연 | 콜드 스타트 비율 | 월 예상 비용 |
+| --- | --- | --- | --- | --- | --- |
+| 기본 설정 | 256MB | 120ms | 900ms | 8% | 약 18달러 |
+| 메모리 상향 | 512MB | 90ms | 520ms | 8% | 약 24달러 |
+| 프로비저닝 적용 | 512MB + 프로비저닝 5 | 85ms | 160ms | 0%대 | 약 52달러 |
+
+이 표는 정답표가 아니라 의사결정 표입니다. 사용자는 p95를 줄이고 싶은지, 비용 상한을 지키고 싶은지, 아니면 둘 사이 타협이 필요한지 먼저 선택해야 합니다. 서버리스는 자동 스케일링을 제공하지만, **자동 의사결정까지 대신해 주지는 않습니다.**
+
 ## 처음 질문으로 돌아가기
 
 - **서버리스는 정확히 무엇을 플랫폼에 넘기는 실행 모델일까요?**
@@ -333,6 +509,8 @@ Events:
 <!-- toc:end -->
 
 ## 참고 자료
+
+- 실습 예제 저장소: https://github.com/yeongseon-books/book-examples/tree/main/serverless-101/ko
 
 ### 공식 문서
 

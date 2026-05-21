@@ -195,131 +195,330 @@ PostgreSQL과 MySQL은 기본적으로 leader-follower 복제를 사용합니다
 복제는 분산 데이터의 토대입니다. 다음 글에서는 여러 노드가 다음 값이 무엇인지 함께 동의하는 문제, 즉 합의와 Raft를 다룹니다.
 
 
-## 실전 설계 확장: 합의, CAP, 메시지 큐 운영
+## 실전 설계 확장: 복제 토폴로지와 장애 복구
 
-분산 시스템을 실제로 운영할 때는 "요청을 받았다"보다 "요청이 어느 경계에서 확정되었는가"를 더 먼저 확인해야 합니다. 이유는 단순합니다. 네트워크 지연과 부분 장애가 존재하면 성공/실패 이분법으로 상태를 설명할 수 없고, 노드별 관측 시점이 달라 같은 사건을 다르게 기록할 수 있기 때문입니다. 따라서 설계 문서에는 기능 설명뿐 아니라 합의 규칙, 파티션 시 동작 규칙, 큐 처리 규칙이 함께 들어가야 운영에서 재현 가능한 판단이 가능합니다.
+복제를 운영 관점에서 깊게 보면 질문은 다섯 가지로 압축됩니다. "어떤 노드가 어떤 키를 책임지는가", "쓰기 성공을 어디에서 확정할 것인가", "복제 지연을 어떻게 수치화할 것인가", "리더 장애 때 승격 순서를 어떻게 강제할 것인가", "복구 후 정합성을 어떤 순서로 회복할 것인가"입니다. 이 섹션에서는 바로 이 다섯 질문을 설계 문서와 런북 수준으로 구체화합니다.
 
-### 합의 알고리즘을 어디에 쓰는가
+### 일관 해싱으로 샤드와 복제본을 배치하는 이유
 
-합의 알고리즘은 이론 주제가 아니라 운영 안전장치입니다. 예를 들어 주문 서비스의 리더 노드가 동시에 두 개 생기면, 같은 주문 번호에 서로 다른 상태가 기록될 수 있습니다. 이때 Raft 같은 리더 기반 합의는 "현재 임기의 과반이 인정한 리더만 쓰기 가능"이라는 제약으로 이중 기록을 막습니다.
+노드 수가 바뀔 때 전체 키 재배치를 줄이려면 해시 슬롯 테이블보다 일관 해싱이 유리합니다. 핵심 아이디어는 노드와 키를 같은 해시 링 위에 올린 뒤, 키가 시계 방향으로 처음 만나는 노드를 기본 소유자로 삼는 방식입니다.
 
 ```text
-노드 5개 구성에서 과반수는 3개입니다.
-리더가 쓰기를 확정하려면 최소 3개 노드에 로그가 복제되어야 합니다.
-2개 노드만 성공한 쓰기는 클라이언트 성공 응답으로 확정하면 안 됩니다.
+해시 링 (0 ~ 2^32-1)
+
+                [Node C]
+                   |
+       key:k9 ---> | ---> primary: Node C
+                   v
+        +-----------------------+
+        |                       |
+[Node B]|                       |[Node D]
+        |                       |
+        +-----------------------+
+                   ^
+                   |
+                [Node A]
+
+복제계수 RF=3이면:
+primary(Node C) + 다음 시계 방향 2개(Node D, Node A)
 ```
 
-실무 문서에 반드시 적어야 하는 항목은 다음과 같습니다.
+이 구조의 장점은 노드 추가/제거 시 이동 키 범위가 "인접 구간"으로 제한된다는 점입니다. 예를 들어 Node E를 C와 D 사이에 추가하면, 대부분 키는 그대로 두고 해당 구간 키만 E로 이동합니다. 대규모 캐시/스토리지에서 리밸런싱 비용을 줄이는 이유가 여기에 있습니다.
 
-- 리더 선출 타임아웃 범위(예: 150ms~300ms 랜덤)
-- 하트비트 간격(예: 50ms)
-- 로그 확정 기준(과반 복제 이후 commit)
-- 장애 복구 시 재조인 절차(스냅샷/로그 재동기화)
+운영에서 반드시 문서화할 값은 다음과 같습니다.
 
-이 네 가지를 수치로 고정하면, 장애 대응 중에 팀원마다 다른 가정을 들고 판단하는 상황을 줄일 수 있습니다.
+- 가상 노드 개수(vnode 수)
+- 복제계수(RF)
+- 리밸런싱 속도 제한(초당 이동 키 수 또는 MB/s)
+- 핫키 감지 기준(예: 특정 키 QPS 임계치)
 
-### CAP을 선언으로 끝내지 않고 시나리오로 적기
+이 값들이 빠지면 장애 상황에서 "노드만 늘리면 해결된다"는 잘못된 대응이 나옵니다. 실제로는 vnode 불균형과 핫 파티션 때문에 지연이 유지되는 경우가 많습니다.
 
-"우리 시스템은 AP" 같은 문장은 운영에서 거의 도움이 되지 않습니다. 어떤 API가 파티션 중에도 쓰기를 받는지, 읽기 결과가 얼마나 오래 뒤처질 수 있는지를 함께 정의해야 합니다.
+### 동기 복제와 비동기 복제: 확정 시점 설계
 
-예시로 재고 서비스의 파티션 정책을 문서화하면 아래처럼 표현할 수 있습니다.
+동기/비동기의 본질은 "성공 응답을 언제 보내는가"입니다. 아래 FastAPI 예시는 같은 API가 확정 지점을 다르게 두었을 때 어떤 동작 차이를 만드는지 보여줍니다.
+
+```python
+# sync_async_replication.py
+import asyncio
+from fastapi import FastAPI, HTTPException
+
+app = FastAPI()
+
+leader_store: dict[str, dict] = {}
+follower_a_store: dict[str, dict] = {}
+follower_b_store: dict[str, dict] = {}
+
+
+async def replicate_to_follower(target: dict[str, dict], key: str, value: dict, delay_ms: int) -> None:
+    await asyncio.sleep(delay_ms / 1000)
+    target[key] = value
+
+
+@app.post("/sync/items/{key}")
+async def write_sync(key: str, payload: dict):
+    leader_store[key] = payload
+    try:
+        await asyncio.gather(
+            replicate_to_follower(follower_a_store, key, payload, delay_ms=10),
+            replicate_to_follower(follower_b_store, key, payload, delay_ms=12),
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail=f"sync replication failed: {exc}")
+    return {"mode": "sync", "ack": "committed_on_3_nodes"}
+
+
+@app.post("/async/items/{key}")
+async def write_async(key: str, payload: dict):
+    leader_store[key] = payload
+    asyncio.create_task(replicate_to_follower(follower_a_store, key, payload, delay_ms=200))
+    asyncio.create_task(replicate_to_follower(follower_b_store, key, payload, delay_ms=250))
+    return {"mode": "async", "ack": "accepted_on_leader"}
+```
+
+이 코드를 운영 의미로 읽으면 다음과 같습니다.
+
+- 동기 엔드포인트는 응답 지연이 길어지지만, 리더 직후 장애에서도 손실 확률이 낮습니다.
+- 비동기 엔드포인트는 지연이 짧지만, 리더 장애 시 아직 전파되지 않은 최근 쓰기를 잃을 수 있습니다.
+- 따라서 "모든 쓰기를 동기" 또는 "모든 쓰기를 비동기"로 두기보다, 도메인별로 확정 수준을 분리하는 것이 일반적입니다.
+
+예를 들어 결제 원장은 동기, 클릭 로그는 비동기로 분리하면 사용자 체감 성능과 데이터 안전성을 동시에 맞출 수 있습니다.
+
+### 체인 복제 패턴: 순서 보장과 읽기 일관성
+
+체인 복제(chain replication)는 복제본을 선형 체인으로 두고, 쓰기는 헤드(head)에서 받아 테일(tail)까지 전달한 뒤 테일 확인을 기준으로 확정합니다. 읽기는 보통 테일에서 수행해 최신 커밋 값을 얻습니다.
+
+```text
+Client Write
+   |
+   v
+ [Head] -> [Middle] -> [Tail]
+    |         |          |
+    +---------+----------+
+          ack after Tail persist
+
+Client Read -> [Tail]
+```
+
+장점은 명확합니다.
+
+- 쓰기 순서가 체인 순서로 강제되어 충돌 해석이 단순합니다.
+- 최신 읽기 경로를 Tail로 고정하면 stale read 위험을 구조적으로 낮출 수 있습니다.
+- 노드 장애 시 체인 재구성이 명시적이라 런북 자동화가 쉽습니다.
+
+단점도 분명합니다.
+
+- Tail이 읽기 병목이 될 수 있습니다.
+- 체인이 길어질수록 쓰기 지연이 누적됩니다.
+- 중간 노드 장애 때 재연결 동안 처리율이 일시 저하됩니다.
+
+실무에서는 "핫키가 많은 쓰기 중심 워크로드"에 체인 복제를 적용하고, 읽기 부하는 캐시 또는 스냅샷 팔로워로 보완하는 조합을 자주 사용합니다.
+
+### 복제 지연을 Prometheus로 계량화하기
+
+복제 지연은 감으로 보지 않고 메트릭으로 다뤄야 합니다. 아래 예시는 리더 LSN과 팔로워 LSN 차이를 게이지로 노출하고, 최근 적용 시각 차이를 초 단위로 계산합니다.
+
+```python
+# replication_metrics.py
+import time
+from fastapi import FastAPI, Response
+from prometheus_client import CollectorRegistry, Gauge, generate_latest
+
+app = FastAPI()
+registry = CollectorRegistry()
+
+replication_lag_lsn = Gauge(
+    "replication_lag_lsn",
+    "Leader and follower LSN gap",
+    ["cluster", "follower"],
+    registry=registry,
+)
+
+replication_apply_delay_seconds = Gauge(
+    "replication_apply_delay_seconds",
+    "Delay between leader commit time and follower apply time",
+    ["cluster", "follower"],
+    registry=registry,
+)
+
+state = {
+    "leader_lsn": 120500,
+    "followers": {
+        "follower-a": {"lsn": 120460, "applied_at": time.time() - 1.2},
+        "follower-b": {"lsn": 120430, "applied_at": time.time() - 2.8},
+    },
+}
+
+
+def refresh_replication_metrics(cluster: str = "orders-prod") -> None:
+    leader_lsn = state["leader_lsn"]
+    now = time.time()
+    for name, follower in state["followers"].items():
+        lag = leader_lsn - follower["lsn"]
+        apply_delay = max(now - follower["applied_at"], 0)
+        replication_lag_lsn.labels(cluster=cluster, follower=name).set(lag)
+        replication_apply_delay_seconds.labels(cluster=cluster, follower=name).set(apply_delay)
+
+
+@app.get("/metrics")
+def metrics():
+    refresh_replication_metrics()
+    payload = generate_latest(registry)
+    return Response(content=payload, media_type="text/plain; version=0.0.4")
+```
+
+메트릭만 수집하면 끝이 아닙니다. 경보 기준까지 같이 고정해야 합니다.
 
 ```yaml
-service: inventory
-partition_policy:
-  write:
-    mode: reject_when_no_quorum
-    http_status: 503
-  read:
-    mode: allow_stale_read
-    max_staleness_seconds: 5
-recovery_policy:
-  reconcile: last_write_wins_with_version_check
-  audit_log_required: true
+groups:
+  - name: replication-alerts
+    rules:
+      - alert: ReplicationLagCritical
+        expr: replication_lag_lsn{cluster="orders-prod"} > 5000
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "복제 LSN 지연이 임계치를 초과했습니다"
+      - alert: ReplicationApplyDelayHigh
+        expr: replication_apply_delay_seconds{cluster="orders-prod"} > 5
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "팔로워 적용 지연이 5초를 초과했습니다"
 ```
 
-위 정책의 의미는 명확합니다. 네트워크가 갈라졌을 때 쓰기를 무조건 받지 않고, 읽기는 최대 5초까지 오래된 값을 허용합니다. 대신 복구 후에는 버전 검증과 감사 로그 기반으로 충돌을 정리합니다. CAP 선택은 이렇게 엔드포인트별 동작과 관측 지표로 내려와야 실제 운영 정책이 됩니다.
+이렇게 두 축(LSN gap, apply delay)을 같이 보면 "로그는 빨리 따라오는데 적용이 느린 상황"과 "전송 자체가 지연되는 상황"을 분리해 원인을 찾을 수 있습니다.
 
-### 메시지 큐 설정은 처리량보다 재처리 안전성을 먼저 본다
+### 장애 조치와 승격 패턴
 
-메시지 큐를 도입하면 비동기로 느슨한 결합을 얻지만, 동시에 중복 처리와 순서 역전이 기본 위험이 됩니다. 큐 설정에서 가장 먼저 다룰 항목은 처리량이 아니라 "실패한 메시지를 어떻게 안전하게 다시 처리할 것인가"입니다.
+리더 장애 시 가장 위험한 상황은 "오래된 팔로워를 새 리더로 승격"하는 경우입니다. 승격 대상 선정은 단순 생존 여부가 아니라 최신성, 동기 복제 참여 여부, 네트워크 건강 상태를 함께 봐야 합니다.
 
-아래는 RabbitMQ 스타일의 실무 기본 설정 예시입니다.
+아래는 운영 문서에 바로 넣을 수 있는 승격 정책 예시입니다.
 
 ```yaml
-queue:
-  name: order.events
-  durable: true
-  arguments:
-    x-dead-letter-exchange: order.dlx
-    x-message-ttl: 60000
-consumer:
-  prefetch_count: 20
-  ack_mode: manual
-  retry:
-    max_attempts: 5
-    backoff_ms: 200
-idempotency:
-  key_source: event_id
-  ttl_seconds: 86400
+failover_policy:
+  cluster: orders-prod
+  promotion:
+    min_candidate_count: 2
+    require_sync_replica: true
+    max_allowed_lag_lsn: 200
+    max_allowed_apply_delay_seconds: 1
+  split_brain_guard:
+    fencing: required
+    method: disable_old_leader_write_via_stonith
+  recovery:
+    rejoin_old_leader_as_follower: true
+    full_resync_if_lag_lsn_gt: 50000
 ```
 
-핵심은 세 가지입니다.
+핵심 운영 원칙은 네 가지입니다.
 
-- `durable: true`로 브로커 재시작 후에도 큐 정의를 유지합니다.
-- `manual ack`로 실제 처리 완료 후에만 확인 응답을 보냅니다.
-- `event_id` 기반 멱등성 저장소를 두어 중복 전달을 결과 중복으로 이어지지 않게 막습니다.
+1. **펜싱 우선**: 기존 리더의 쓰기 경로를 먼저 차단하고 새 리더를 열어 split-brain을 막습니다.
+2. **최신성 우선 승격**: lag 임계치 안의 팔로워만 후보로 두어 데이터 회귀를 줄입니다.
+3. **역할 전환 후 검증**: 승격 직후 read-after-write 검사와 핵심 테이블 카운트 검사를 자동 실행합니다.
+4. **구 리더 재합류 절차 고정**: 구 리더는 즉시 재리더화하지 않고 팔로워 재동기화부터 수행합니다.
 
-Kafka를 쓰는 경우도 원칙은 같습니다. 파티션 키를 어떻게 잡아 순서를 보존할지, 커밋 시점을 처리 성공 이후로 둘지, DLQ 토픽을 어떻게 운영할지를 문서로 고정해야 장애 시간에 판단 비용을 줄일 수 있습니다.
+아래와 같은 최소 점검 스크립트를 런북에 두면 사람 의존 오류를 줄일 수 있습니다.
 
-### 장애 주입 기반 검증 루프
-
-설계를 문서로만 두면 시간이 지나며 가정이 깨집니다. 그래서 운영 전 검증 루프를 습관화해야 합니다.
-
-1. 리더 노드 강제 종료: 선출 시간과 요청 오류율을 측정합니다.
-2. 네트워크 지연 주입: p95/p99 지연과 타임아웃 비율을 기록합니다.
-3. 큐 소비자 중단: 적체량 증가 속도와 복구 시간을 측정합니다.
-4. 중복 메시지 재주입: 멱등성 키로 결과 중복이 차단되는지 확인합니다.
-
-이 검증을 CI 야간 작업이나 스테이징 런북에 포함하면, 새 기능이 들어와도 합의/CAP/큐 운영 규칙이 계속 살아 있는지 지속적으로 확인할 수 있습니다.
-
-### 운영 대시보드에서 반드시 보는 지표
-
-- 합의 계층: 리더 변경 횟수, 선출 소요 시간, 로그 복제 지연
-- 요청 계층: 성공률, 타임아웃률, 재시도 횟수, 멱등성 충돌률
-- 큐 계층: consumer lag, DLQ 유입량, 재처리 성공률
-- 데이터 계층: 복제 지연, 버전 충돌 건수, 보정 작업 처리량
-
-지표를 계층별로 보면 "느리다"라는 증상을 "리더 불안정 때문에 재시도가 폭증했다"처럼 원인 단위로 분해할 수 있습니다. 분산 시스템 운영 성숙도는 결국 이 분해 능력에서 드러납니다.
-
-
-
-
-### 추가 운영 예시: 쿼럼 손실과 복구 절차
-
-쿼럼이 깨진 순간에는 "일단 쓰기를 받고 나중에 맞춘다"보다 "확정 가능한 쓰기만 받는다"를 기본값으로 두는 편이 안전합니다. 예를 들어 5노드 클러스터에서 2노드만 살아 있으면 새로운 쓰기는 거절하고, 읽기는 최신성 등급을 함께 내려 사용자와 상위 서비스가 의사결정을 할 수 있게 해야 합니다.
-
-```yaml
-degraded_mode:
-  quorum_required: 3
-  write_policy: reject
-  read_policy:
-    allow: true
-    staleness_label: required
-  response_headers:
-    X-Consistency-Level: stale-possible
+```shell
+# failover-check.sh
+python3 scripts/check_leader_health.py --cluster orders-prod
+python3 scripts/check_replication_lag.py --cluster orders-prod --max-lag-lsn 200
+python3 scripts/promote_replica.py --cluster orders-prod --candidate follower-a
+python3 scripts/verify_read_after_write.py --cluster orders-prod
 ```
 
-복구 시에는 아래 순서를 런북으로 고정해 두는 것이 좋습니다. 첫째, 리더 안정화 여부 확인. 둘째, 복제 지연이 임계치 아래로 내려왔는지 확인. 셋째, 큐 적체가 해소되었는지 확인. 넷째, 그 뒤에만 쓰기 트래픽 제한을 해제합니다. 이 순서가 바뀌면 겉보기 정상화 뒤에 데이터 불일치가 남을 가능성이 커집니다.
+중요한 점은 자동화 자체보다 "승격 전/중/후 검증 항목"이 고정되어 있어야 한다는 것입니다. 이 고정점이 있어야 야간 장애에서도 동일한 품질로 대응할 수 있습니다.
+
+### 읽기 일관성 전략: stale read를 의도적으로 다루기
+
+복제본에서 읽을 때 가장 큰 위험은 "모르는 사이에 stale read가 사용자에게 노출되는 것"입니다. 이를 방지하려면 읽기 경로를 의도적으로 설계해야 합니다.
+
+```python
+# read_consistency.py
+from enum import Enum
+from fastapi import FastAPI, Query
+
+app = FastAPI()
+
+
+class ReadConsistency(str, Enum):
+    STRONG = "strong"       # leader에서만 읽음
+    BOUNDED = "bounded"     # 최대 N초 이내 stale 허용
+    EVENTUAL = "eventual"   # 아무 복제본에서 읽음
+
+
+@app.get("/items/{key}")
+async def read_item(key: str, consistency: ReadConsistency = Query(default=ReadConsistency.BOUNDED)):
+    if consistency == ReadConsistency.STRONG:
+        return await read_from_leader(key)
+    elif consistency == ReadConsistency.BOUNDED:
+        follower = select_follower_within_lag(max_lag_seconds=2)
+        return await read_from_node(follower, key)
+    else:
+        follower = select_any_healthy_follower()
+        return await read_from_node(follower, key)
+```
+
+이 패턴의 핵심은 읽기 일관성을 API 인터페이스 수준에서 노출하는 것입니다. 호출자가 자신의 워크로드에 맞는 수준을 선택할 수 있으면, 시스템 전체를 strong consistency로 올릴 필요 없이 대부분의 읽기를 복제본으로 분산할 수 있습니다.
+
+운영에서 흔히 보는 조합은 다음과 같습니다.
+
+| 워크로드 | 일관성 수준 | 이유 |
+| --- | --- | --- |
+| 결제 잔액 조회 | strong | 실시간 정확성 필수 |
+| 대시보드 목록 | bounded (2초) | 약간의 지연은 허용, 부하 분산 필요 |
+| 추천 피드 | eventual | 수 초 stale도 사용자 불만 없음 |
+| 관리자 감사 로그 | strong | 최신 이벤트 누락 불가 |
+
+bounded staleness에서 `max_lag_seconds`를 어떻게 결정하느냐가 자주 나오는 질문입니다. 답은 "사용자가 인지하는 불일치 허용 시간"에서 출발합니다. 대시보드라면 새로고침 주기(보통 5~30초)보다 짧으면 충분하고, 실시간 채팅이라면 수백 밀리초 이내여야 합니다.
+
+### 복제본 건강 점검과 자동 제외
+
+복제 지연이 임계치를 넘은 팔로워는 읽기 풀에서 자동으로 빠져야 합니다. 그렇지 않으면 특정 사용자만 반복적으로 stale 응답을 받는 "운 나쁜 요청" 문제가 생깁니다.
+
+```python
+# follower_health.py
+import time
+
+FOLLOWER_STATUS = {
+    "follower-a": {"lag_seconds": 0.8, "last_check": time.time()},
+    "follower-b": {"lag_seconds": 4.2, "last_check": time.time()},
+    "follower-c": {"lag_seconds": 1.1, "last_check": time.time()},
+}
+
+MAX_ACCEPTABLE_LAG = 3.0  # seconds
+
+
+def healthy_followers() -> list[str]:
+    return [
+        name for name, status in FOLLOWER_STATUS.items()
+        if status["lag_seconds"] <= MAX_ACCEPTABLE_LAG
+    ]
+
+
+def select_follower_within_lag(max_lag_seconds: float) -> str:
+    candidates = [
+        name for name, status in FOLLOWER_STATUS.items()
+        if status["lag_seconds"] <= max_lag_seconds
+    ]
+    if not candidates:
+        return "leader"  # fallback to leader
+    return min(candidates, key=lambda n: FOLLOWER_STATUS[n]["lag_seconds"])
+```
+
+이 코드에서 중요한 결정은 `candidates`가 비었을 때 leader로 fallback하는 부분입니다. 모든 팔로워가 지연 임계치를 넘기면 읽기를 거부하는 대신 leader로 보내되, 이 fallback 비율 자체를 모니터링해야 합니다. leader fallback이 급증하면 복제 인프라 문제의 신호이기 때문입니다.
 
 ## 처음 질문으로 돌아가기
 
 - **왜 데이터를 복제하며, 어떤 복제 모델이 있을까요?**
-  - 본문의 기준은 복제를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 복제의 목적은 단순 백업이 아니라 장애 허용, 읽기 확장, 지역 분산을 동시에 달성하기 위해서입니다. 본문에서 본 것처럼 leader-follower는 운영 단순성과 예측 가능한 쓰기 경로가 강점이고, multi-leader는 다중 쓰기 지점이 필요한 환경에 유리하며, leaderless는 쿼럼으로 가용성과 분산 쓰기를 확보하는 데 적합합니다. 여기에 일관 해싱을 결합하면 노드 증감 시 재배치 비용까지 통제할 수 있습니다.
 - **leader-follower, multi-leader, leaderless는 어떻게 다를까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - leader-follower는 리더를 단일 진실 원천으로 두어 충돌 처리가 단순하지만 리더 장애 대응이 중요합니다. multi-leader는 쓰기 지점이 여러 개라 지역 독립성이 좋지만 충돌 해석 규칙을 애플리케이션이 가져가야 합니다. leaderless는 모든 노드가 대등하고 R/W/N 조합으로 읽기·쓰기 보장을 조절하며, 최신성 관리는 쿼럼과 read repair 정책이 핵심입니다.
 - **동기 복제와 비동기 복제는 어떤 데이터 손실 위험을 만들까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 동기 복제는 응답 전에 다수 복제본 반영을 기다려 리더 직후 장애에서도 손실 위험이 낮은 대신 지연이 늘어납니다. 비동기 복제는 빠른 응답을 주지만 전파 전 장애가 나면 최근 쓰기를 잃을 수 있습니다. 그래서 본문에서 다룬 것처럼 도메인별로 동기/비동기를 분리하고, Prometheus 기반 lag 지표와 승격 임계치를 함께 운영해야 실제 손실 위험을 관리할 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -343,5 +542,6 @@ degraded_mode:
 - [Quorum (distributed computing) — Wikipedia](https://en.wikipedia.org/wiki/Quorum_(distributed_computing))
 - [Amazon Dynamo paper](https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf)
 - [Designing Data-Intensive Applications — chapter 5](https://dataintensive.net/)
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/distributed-systems-101/ko)
 
 Tags: Computer Science, Distributed Systems, Replication, LeaderFollower, QuorumWrites, Durability

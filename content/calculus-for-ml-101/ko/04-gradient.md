@@ -142,148 +142,303 @@ Gradient는 여러 편미분을 한데 묶은 벡터이며, 현재 지점에서 
 다음 글에서는 함수가 함수 안에 들어가는 합성 구조에서 gradient가 어떻게 전달되는지 보겠습니다. 그러면 chain rule이 왜 backpropagation의 핵심인지 훨씬 분명해집니다.
 
 
-## 추가 실전 섹션: 미분 신호를 학습 루프로 연결하는 계산 연습
 
-미분 개념을 오래 유지하려면 손으로 계산한 값과 코드에서 나온 값이 같은지 반복 확인하는 연습이 중요합니다. 아래 표는 손실 함수와 gradient를 빠르게 점검할 때 자주 쓰는 비교 축입니다.
+## gradient 하강 경로를 수치로 시각화하기
 
-| 항목 | 회귀(MSE) | 분류(BCE) | 점검 포인트 |
-| --- | --- | --- | --- |
-| 손실 형태 | 평균 제곱 오차 | 음의 로그 우도 | 문제 유형 일치 여부 |
-| gradient 민감도 | 큰 오차에 더 민감 | 확신한 오답에 큰 페널티 | 폭주/포화 구간 확인 |
-| 수치 안정성 | 비교적 안정적 | `log(0)` 방어 필요 | `eps` 처리 |
-| 학습 신호 | 선형 오차 비례 | 확률 오차 반영 | calibration 해석 |
-
-### 체인 룰 검증: 수치 미분과 해석 미분 비교
+gradient를 실제 업데이트 경로로 읽으려면, 등고선 위 점이 어떻게 이동하는지를 숫자로 추적하는 연습이 가장 효과적입니다. 아래 코드는 2차원 손실 함수에서 초기점을 두고 경사하강법을 수행하면서 좌표, 손실, gradient norm을 동시에 기록합니다.
 
 ```python
-import math
+import numpy as np
 
-def f(x):
-    return math.sin(3 * x + 1)
+def loss(w):
+    x, y = w
+    return (x - 1.5) ** 2 + 3.0 * (y + 0.5) ** 2
 
-def analytic_grad(x):
-    # d/dx sin(3x+1) = cos(3x+1) * 3
-    return math.cos(3 * x + 1) * 3
+def grad(w):
+    x, y = w
+    return np.array([2.0 * (x - 1.5), 6.0 * (y + 0.5)])
 
-def numeric_grad(fn, x, h=1e-5):
-    return (fn(x + h) - fn(x - h)) / (2 * h)
+def run_gd(w0, lr=0.1, steps=20):
+    w = np.array(w0, dtype=float)
+    history = []
+    for t in range(steps):
+        g = grad(w)
+        history.append({
+            'step': t,
+            'x': float(w[0]),
+            'y': float(w[1]),
+            'loss': float(loss(w)),
+            'gnorm': float(np.linalg.norm(g)),
+        })
+        w = w - lr * g
+    return history
 
-x = 0.7
-print(analytic_grad(x), numeric_grad(f, x))
+hist = run_gd(w0=[-2.0, 2.0], lr=0.12, steps=12)
+for row in hist[:5]:
+    print(row)
 ```
 
-해석 미분과 수치 미분이 비슷하게 나오면 체인 룰 구현이 올바르게 연결되었다는 강한 증거가 됩니다.
+`x`보다 `y` 축의 곡률이 3배 크기 때문에, 동일한 learning rate에서도 `y` 방향 업데이트가 더 크게 흔들릴 수 있습니다. 이처럼 경로를 숫자로 보면, 왜 어떤 축에서 진동이 먼저 시작되는지 설명할 수 있습니다.
 
-### 2변수 손실에서 gradient 벡터 해석
-
-```python
-def loss(w1, w2):
-    return (w1 - 2) ** 2 + 4 * (w2 + 1) ** 2
-
-def grad(w1, w2):
-    return 2 * (w1 - 2), 8 * (w2 + 1)
-
-w1, w2 = 0.0, 0.0
-g1, g2 = grad(w1, w2)
-print('grad=', (g1, g2))
-```
-
-이 예시에서는 두 번째 축 gradient가 더 크게 나오므로 동일 learning rate에서도 `w2` 방향 업데이트가 더 공격적으로 일어납니다. 좌표별 스케일 차이를 optimizer가 어떻게 다루는지 이해하는 출발점입니다.
-
-### 손실 곡선 해석 표
-
-| 관찰 패턴 | 가능한 원인 | 우선 점검 |
+| 관찰 | 해석 | 대응 |
 | --- | --- | --- |
-| 초반 급상승 후 발산 | learning rate 과대, gradient 폭주 | lr 감소, clipping |
-| 매우 느린 하강 | learning rate 과소, 특징 스케일 불일치 | lr 증가, 정규화 |
-| 진동만 하고 정체 | 비등방 지형, batch noise 과다 | momentum, batch 조정 |
-| train 감소 / val 정체 | 과적합 | weight decay, early stopping |
+| loss는 내려가는데 x 이동이 느림 | x 축 곡률이 완만함 | lr 유지, step 수 증가 |
+| y 좌표가 과도하게 왕복 | y 축 곡률 대비 lr 과대 | lr 감소 또는 축 정규화 |
+| gnorm이 초반 급감 후 정체 | 평평한 구간 진입 | lr schedule 또는 momentum 검토 |
 
-### 미니 실습: 간단한 업데이트 루프
+## gradient norm 모니터링과 경보 기준
 
-```python
-def train_step(w, x, y, lr=0.05):
-    pred = w * x
-    loss = (pred - y) ** 2
-    grad = 2 * (pred - y) * x
-    w = w - lr * grad
-    return w, loss, grad
-
-w = 0.0
-for _ in range(5):
-    w, L, g = train_step(w, x=3.0, y=12.0)
-    print(f'w={w:.4f}, loss={L:.4f}, grad={g:.4f}')
-```
-
-짧은 루프지만 forward-loss-backward-update가 모두 포함되어 있습니다. 이 구조를 이해하면 어떤 딥러닝 프레임워크의 학습 코드도 핵심 의미를 잃지 않고 읽을 수 있습니다.
-
-### 실전 점검 루틴
-
-1. 해석 미분과 수치 미분을 작은 예제로 한 번 맞춰 봅니다.
-2. gradient norm을 함께 기록해 신호 크기 변화를 확인합니다.
-3. learning rate를 3개 이상 비교해 수렴 민감도를 봅니다.
-4. train/validation 손실을 동시에 관찰해 과적합 신호를 분리합니다.
-5. 이상 징후가 생기면 모델 구조보다 손실/미분/업데이트 순서를 먼저 점검합니다.
-
-이 루틴이 자리 잡으면 미분 개념이 수학 노트에 머무르지 않고 실제 모델 훈련 의사결정으로 연결됩니다.
-
-
-
-## 추가 보강: 검증 가능한 예제 세트
-
-### 입력 크기 대비 알고리즘/학습 선택 표
-
-| 상황 | 빠른 선택 | 검증 기준 |
-| --- | --- | --- |
-| 작은 입력, 빠른 프로토타입 | 단순 구현 우선 | 정답 검증 테스트 3종 |
-| 큰 입력, 지연시간 민감 | 차수 낮은 알고리즘 또는 안정적 optimizer | 시간/메모리 동시 측정 |
-| 운영 장애 재현 필요 | 로그/추적 필드 강화 | 동일 입력 재실행 가능성 |
-
-### 짧은 비교 코드
+실무에서는 gradient 값 자체보다 norm 시계열이 더 먼저 이상 신호를 알려 줍니다. norm 로그는 exploding/vanishing, 잘못된 스케일링, dtype 문제를 빠르게 식별하는 공통 지표입니다.
 
 ```python
-import time
+import numpy as np
 
-def measure(fn, *args, repeat=3):
-    best = float('inf')
-    for _ in range(repeat):
-        t0 = time.perf_counter()
-        fn(*args)
-        best = min(best, time.perf_counter() - t0)
-    return best
-```
-
-측정 코드는 화려할 필요가 없습니다. 같은 입력, 같은 환경, 같은 반복 기준을 유지하는 것이 더 중요합니다. 이 습관이 있어야 최적화 전후의 차이를 신뢰할 수 있습니다.
-
-### 실전 점검 질문
-
-1. 지금 선택한 방법의 시간/공간 비용을 한 문장으로 설명할 수 있는가
-2. 경계 입력에서 동작이 바뀌는 지점을 테스트로 고정했는가
-3. 운영 로그만으로 실패 원인을 분리할 수 있는가
-
-이 질문에 즉답할 수 있으면 구현이 아니라 설계 수준에서 품질을 확보한 상태에 가깝습니다.
-
-
-
-### 보강 메모: 경계 입력과 수치 검증
-
-경계 입력을 별도 표로 관리하면 알고리즘/학습 루프의 취약점을 빠르게 찾을 수 있습니다.
-
-| 케이스 | 기대 동작 |
-| --- | --- |
-| 빈 입력 또는 최소 크기 | 예외 없이 명시적 반환 |
-| 중복값 다수 | 안정성/경계 갱신 유지 |
-| 극단적으로 큰 값 | 오버플로우/수치 불안정 방어 |
-
-```python
-def sanity_cases(fn, cases):
-    out=[]
-    for c in cases:
-        out.append(fn(*c) if isinstance(c, tuple) else fn(c))
+def norms_from_grads(grad_list):
+    out = []
+    for t, g in enumerate(grad_list):
+        out.append((t, float(np.linalg.norm(g))))
     return out
+
+grads = [
+    np.array([0.8, -0.4]),
+    np.array([0.3, -0.1]),
+    np.array([0.06, -0.02]),
+    np.array([0.005, -0.001]),
+]
+print(norms_from_grads(grads))
 ```
 
-작은 검증 루틴을 글과 코드에 함께 남기면 이후 변경에서 같은 종류의 실수를 반복할 가능성이 크게 줄어듭니다.
+운영 로그에서는 절대값 하나로 판단하기보다, 구간별 변화율과 함께 해석해야 합니다.
+
+| 패턴 | 전형적 의미 | 우선 점검 |
+| --- | --- | --- |
+| norm이 반복적으로 10배 이상 급증 | 폭주 가능성 | lr, mixed precision 스케일러, clipping |
+| norm이 매우 작은 값으로 고정 | 소실 또는 포화 | activation, 초기화, 입력 스케일 |
+| norm 분산이 배치마다 과도함 | 미니배치 노이즈 과다 | batch size, 데이터 섞기 정책 |
+| norm은 정상인데 loss만 정체 | 방향성 문제 | 손실 정의, 라벨 품질, 모델 표현력 |
+
+현장에서 자주 쓰는 기준은 다음과 같습니다.
+
+1. epoch마다 평균 norm, 95퍼센타일 norm을 함께 기록합니다.
+2. 연속 N step 동안 norm이 임계치 이하이면 vanishing 경고를 냅니다.
+3. 임계치 이상이 M회 연속이면 clipping 여부를 강제 점검합니다.
+
+## gradient와 방향도함수의 관계
+
+gradient를 벡터라고 이해한 다음 단계는 방향도함수와의 연결입니다. 단위 벡터 `u` 방향으로 함수가 얼마나 변하는지는 `∇f(x) · u`로 계산합니다. 즉 gradient는 모든 방향도함수를 한꺼번에 담은 기준 벡터입니다.
+
+```python
+import numpy as np
+
+def f(w):
+    x, y = w
+    return x**2 + 2*x*y + 3*y**2
+
+def grad_f(w):
+    x, y = w
+    return np.array([2*x + 2*y, 2*x + 6*y])
+
+w = np.array([1.0, -0.5])
+u = np.array([1.0, 2.0])
+u = u / np.linalg.norm(u)
+
+directional = grad_f(w) @ u
+print('directional derivative =', directional)
+```
+
+같은 점에서 방향을 바꿔 계산하면 값이 달라집니다. 그중 최대값은 `||∇f||`이고, 그때의 방향이 gradient 방향과 일치합니다. 이 사실이 gradient를 "가장 가파른 증가 방향"으로 해석하는 수학적 근거입니다.
+
+| 방향 선택 | 방향도함수 부호 | 의미 |
+| --- | --- | --- |
+| `u = grad / ||grad||` | 양수 최대 | 가장 빠른 상승 |
+| `u = -grad / ||grad||` | 음수 최소 | 가장 빠른 하강 |
+| `u ⟂ grad` | 0 근처 | 등고선 접선 방향 이동 |
+
+## PyTorch에서 gradient 디버깅하기
+
+자동미분을 쓸 때도 gradient 검증 습관은 필요합니다. 특히 `requires_grad`, `detach`, in-place 연산 때문에 신호가 끊기는 경우가 흔합니다.
+
+```python
+import torch
+
+x = torch.tensor([[1.0, -1.0], [0.5, 2.0]], requires_grad=True)
+w = torch.tensor([[0.2], [0.3]], requires_grad=True)
+y_true = torch.tensor([[1.0], [0.0]])
+
+y_pred = x @ w
+loss = ((y_pred - y_true) ** 2).mean()
+loss.backward()
+
+print('loss:', float(loss))
+print('w.grad:', w.grad.view(-1))
+print('x.grad norm:', x.grad.norm())
+```
+
+다음 체크리스트를 적용하면 대부분의 gradient 문제를 빠르게 좁힐 수 있습니다.
+
+- `param.grad is None`이면 그래프 연결이 끊겼는지 확인합니다.
+- `grad` 값이 모두 0이면 activation 포화 또는 dead 경로를 의심합니다.
+- `grad`가 `inf`/`nan`이면 입력 스케일, 손실 안정성, 학습률을 점검합니다.
+- backward 직후 `torch.nn.utils.clip_grad_norm_` 적용 전후 norm을 함께 기록합니다.
+
+```python
+total_norm = torch.norm(torch.stack([p.grad.norm() for p in [w] if p.grad is not None]))
+print('total grad norm:', float(total_norm))
+```
+
+## 등고선 해석 실전 규칙
+
+등고선 그림을 볼 때는 단순히 "화살표가 아래로 간다" 수준을 넘어, 곡률과 축별 스케일을 같이 읽어야 합니다.
+
+| 등고선 모양 | 수학적 힌트 | 학습에서 보이는 현상 |
+| --- | --- | --- |
+| 원형에 가까움 | 축별 곡률 유사 | 안정적 수렴 |
+| 길게 늘어난 타원 | 축별 곡률 불균형 | 지그재그 경로, 느린 수렴 |
+| 능선/협곡 구조 | 조건수 악화 | lr 민감도 증가 |
+| 다중 분지 | 비볼록성 | 초기값 따라 경로 분기 |
+
+좌표계 변환(정규화, whitening)을 적용하면 타원을 원형에 가깝게 만들어 경로를 단순화할 수 있습니다. 이 관점은 optimizer를 바꾸기 전에 먼저 시도할 가치가 높습니다.
+
+## 고차원에서 gradient를 읽는 법
+
+고차원에서는 등고선 그림을 직접 그릴 수 없으므로, 요약 지표와 투영 분석이 필요합니다. 핵심은 전체 벡터를 작은 수의 관측값으로 안정적으로 축약하는 것입니다.
+
+```python
+import numpy as np
+
+def summarize_grad(g):
+    return {
+        'l2': float(np.linalg.norm(g)),
+        'linf': float(np.max(np.abs(g))),
+        'mean_abs': float(np.mean(np.abs(g))),
+        'sparsity(<1e-6)': float(np.mean(np.abs(g) < 1e-6)),
+    }
+
+g = np.random.randn(10000) * 0.01
+print(summarize_grad(g))
+```
+
+실전에서는 레이어별로 이 요약을 기록합니다.
+
+| 지표 | 용도 |
+| --- | --- |
+| L2 norm | 전체 신호 강도 추적 |
+| L∞ norm | 극단값 폭주 감시 |
+| 평균 절대값 | 전반적 업데이트 크기 추정 |
+| 희소도 | dead unit 증가 감시 |
+| cosine similarity(연속 step) | 방향 안정성 추적 |
+
+또한 연속 step 간 cosine similarity를 계산하면, gradient 방향이 일관적인지 확인할 수 있습니다.
+
+```python
+def cosine(a, b, eps=1e-12):
+    return float((a @ b) / ((np.linalg.norm(a) * np.linalg.norm(b)) + eps))
+```
+
+값이 지속적으로 음수로 떨어지면 업데이트가 같은 계곡에서 왕복하고 있을 가능성이 높습니다. 이때는 learning rate 조정, momentum 도입, 입력 정규화 순으로 점검하는 편이 안전합니다.
+
+
+## 좌표 스케일과 gradient 해석의 함정
+
+동일한 수학식이라도 입력 스케일이 바뀌면 gradient 분포가 크게 달라집니다. 예를 들어 `x`는 0~1 범위인데 `y`는 0~1000 범위라면, 같은 손실식에서도 `y` 축 편미분이 압도적으로 커질 수 있습니다. 이때 업데이트가 사실상 `y` 축만 따라가면 모델은 수렴이 느리거나 진동하게 됩니다.
+
+```python
+import numpy as np
+
+def grad_with_scale(x, y):
+    # toy loss: (x-1)^2 + (y-1)^2
+    return np.array([2*(x-1), 2*(y-1)])
+
+raw = grad_with_scale(0.2, 800.0)
+scaled = grad_with_scale(0.2, 0.8)
+print('raw grad   :', raw, 'norm=', np.linalg.norm(raw))
+print('scaled grad:', scaled, 'norm=', np.linalg.norm(scaled))
+```
+
+실무에서는 입력 정규화와 feature scaling이 단지 전처리 편의가 아니라 gradient 품질 관리라는 점을 반드시 연결해서 봐야 합니다.
+
+| 점검 항목 | 질문 | 기대 상태 |
+| --- | --- | --- |
+| 입력 스케일 | 특성별 분산이 과도하게 다른가 | 표준화 또는 적절한 스케일링 적용 |
+| 레이어별 grad norm | 특정 레이어만 과도하게 큰가 | 레이어 간 norm 편차가 과하지 않음 |
+| 업데이트 비율 | `||Δw|| / ||w||`가 안정적인가 | 극단적 스파이크 없음 |
+
+## 실험 기록 템플릿: gradient 중심 학습 일지
+
+gradient 문제는 재현 로그가 없으면 다시 반복됩니다. 아래처럼 최소 필드를 고정해 두면 실험 간 비교가 쉬워집니다.
+
+```python
+def record(epoch, step, loss, grad_norm, lr, clip_applied):
+    return {
+        'epoch': epoch,
+        'step': step,
+        'loss': float(loss),
+        'grad_norm': float(grad_norm),
+        'lr': float(lr),
+        'clip': bool(clip_applied),
+    }
+```
+
+추천 기록 순서는 다음과 같습니다.
+
+1. 학습 시작 5% 구간에서는 매 step 기록으로 초기 불안정을 잡습니다.
+2. 이후에는 구간 평균과 백분위수 통계로 저장량을 줄입니다.
+3. 이상 구간 발견 시 원시 step 로그를 다시 활성화합니다.
+
+이 루틴은 "왜 이번 실험이 실패했는가"를 감이 아니라 수치로 설명하게 해 줍니다.
+
+## 고차원 gradient 투영 해석
+
+고차원에서는 전체 벡터를 직접 볼 수 없으므로, 기준 방향으로 투영한 값이 유용합니다. 예를 들어 이전 step gradient `g_{t-1}`과 현재 gradient `g_t`의 내적 부호를 보면 방향 일관성을 확인할 수 있습니다.
+
+```python
+import numpy as np
+
+def projection(a, b):
+    # b 위로 a를 투영한 스칼라 성분
+    return float((a @ b) / (np.linalg.norm(b) + 1e-12))
+
+g_prev = np.random.randn(1024)
+g_curr = np.random.randn(1024)
+print('proj:', projection(g_curr, g_prev))
+```
+
+투영값이 계속 음수면 이전 방향과 반복 충돌 중이라는 뜻입니다. 이 경우 lr 축소나 모멘텀 완화가 효과적인 경우가 많습니다.
+
+
+## 현업 점검 시나리오: gradient 이상 징후 대응 순서
+
+실제 운영에서는 여러 신호가 동시에 깨지므로 우선순위가 필요합니다. 다음 순서를 표준화하면 대응 시간이 줄어듭니다.
+
+| 우선순위 | 점검 | 통과 기준 |
+| --- | --- | --- |
+| 1 | NaN/Inf 존재 여부 | 모든 grad가 유한값 |
+| 2 | 레이어별 norm 분포 | 특정 레이어 독주 없음 |
+| 3 | update/weight 비율 | 극단적 점프 없음 |
+| 4 | 손실-정확도 동조성 | 손실 하락 시 성능 동반 개선 |
+
+```python
+def update_ratio(update, weight, eps=1e-12):
+    import numpy as np
+    return float(np.linalg.norm(update) / (np.linalg.norm(weight) + eps))
+```
+
+이 비율이 반복적으로 과도하면 학습률이나 정규화 강도를 먼저 조정하는 것이 일반적으로 효과적입니다.
+
+
+### 현업 메모
+gradient 해석은 단일 스텝보다 구간 추세가 중요합니다. 최소 100 step 단위 이동 평균으로 norm과 loss를 함께 보아야 일시적 노이즈와 구조적 불안정을 구분할 수 있습니다.
+
+추가로, gradient 로그를 해석할 때는 단일 지표가 아니라 loss, norm, update ratio를 함께 읽어야 원인 분리가 정확해집니다.
+
+## 처음 질문으로 돌아가기
+
+- **여러 편미분을 하나의 gradient vector로 묶는다는 것은 정확히 무엇을 뜻할까요?**
+  - 본문에서 본 것처럼 gradient는 축별 편미분을 순서 있게 모은 벡터이며, `run_gd` 예제에서처럼 한 번의 업데이트 방향을 바로 계산하는 실행 단위입니다. 따라서 개별 편미분 목록이 아니라, 현재 파라미터 상태 전체를 이동시키는 좌표계 기준 화살표입니다.
+- **gradient의 방향과 크기는 각각 어떤 실무 의미를 가질까요?**
+  - 방향은 방향도함수 관점에서 "어느 쪽이 상승/하강인지"를 정하고, 크기는 norm 모니터링에서 "신호가 과한지 약한지"를 판단하는 지표가 됩니다. PyTorch 디버깅 섹션의 `total grad norm` 로그가 바로 이 크기 해석을 운영 지표로 옮긴 사례입니다.
+- **왜 gradient는 손실이 가장 빠르게 증가하는 방향을 가리킬까요?**
+  - 방향도함수 식 `∇f · u`를 쓰면 단위 방향 `u` 중 최대값이 `u = ∇f/||∇f||`일 때 나온다는 것을 확인할 수 있습니다. 그래서 gradient 방향이 최대 상승 방향이고, 경사하강법이 그 반대 방향으로 이동하면 가장 빠른 국소 하강 경로를 선택하게 됩니다.
 
 ## 처음 질문으로 돌아가기
 
@@ -317,6 +472,9 @@ def sanity_cases(fn, cases):
 - [Vector Calculus - 3Blue1Brown](https://www.3blue1brown.com/topics/calculus)
 - [Deep Learning Book - Numerical Computation](https://www.deeplearningbook.org/contents/numerical.html)
 - [PyTorch Autograd Mechanics](https://pytorch.org/docs/stable/notes/autograd.html)
+
+### 예제 코드
+- [book-examples/calculus-for-ml-101/ko](https://github.com/yeongseon-books/book-examples/tree/main/calculus-for-ml-101/ko)
 
 ### 관련 시리즈
 - [Linear Algebra 101](../../linear-algebra-101/ko/)

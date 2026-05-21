@@ -341,7 +341,7 @@ print("A@B", A @ B)
 print("A@v", A @ v)
 ```
 
-벡터화 연산은 반복문보다 빠를 뿐 아니라 수식 의미가 그대로 보인다는 장점이 있습니다. 코드 리뷰에서도 의도 전달이 쉬워집니다.
+벡터화 연산은 반복문보다 빠를 뿐 아니라 수식 의미가 그대로 보인다는 장점이 있습니다. 코드 리뷰에서도 의도 전달이 쉬워집니다. NumPy의 `@` 연산자는 Python 3.5부터 지원되며, `np.dot`보다 가독성이 높습니다.
 
 ### 고유값 계산과 해석
 
@@ -369,6 +369,134 @@ print(rot)
 ### 수치 안정성 체크
 
 조건수가 큰 행렬은 작은 입력 오차를 크게 증폭합니다. `np.linalg.cond`로 조건수를 점검하고, 필요하면 정규화나 분해 기반 풀이를 선택해야 합니다.
+
+
+### PCA로 차원 축소 구현하기
+
+고차원 데이터를 시각화하거나 모델 입력으로 쓸 때 차원 축소가 필요합니다. PCA(Principal Component Analysis)는 분산이 가장 큰 방향을 찾아 투영하는 방법입니다.
+
+```python
+import numpy as np
+
+def pca(X: np.ndarray, n_components: int = 2) -> np.ndarray:
+    """데이터 X를 n_components 차원으로 축소합니다."""
+    # 1. 평균 제거 (중심화)
+    X_centered = X - X.mean(axis=0)
+
+    # 2. 공분산 행렬 계산
+    cov = np.cov(X_centered, rowvar=False)
+
+    # 3. 고유값/고유벡터 분해
+    eigvals, eigvecs = np.linalg.eigh(cov)
+
+    # 4. 고유값 크기 순으로 정렬
+    idx = np.argsort(eigvals)[::-1]
+    eigvecs = eigvecs[:, idx]
+
+    # 5. 상위 n_components개 축으로 투영
+    W = eigvecs[:, :n_components]
+    return X_centered @ W
+
+# 예시: 5차원 데이터를 2차원으로
+np.random.seed(42)
+X = np.random.randn(100, 5)
+X_reduced = pca(X, 2)
+print(f"original: {X.shape} -> reduced: {X_reduced.shape}")
+print(f"explained direction shape: (5, 2)")
+```
+
+PCA의 핵심은 공분산 행렬의 고유벡터가 분산 최대 방향을 나타낸다는 점입니다. 고유값이 크면 그 축이 정보를 많이 담고 있다는 뜻입니다. 임베딩 시각화, 노이즈 제거, 특징 선택 등에 널리 쓰입니다. 실무에서는 `sklearn.decomposition.PCA`를 쓰지만, 내부 원리를 이해하면 `n_components` 선택과 설명력(설명된 분산 비율) 해석을 더 잘할 수 있습니다.
+
+### 코사인 유사도와 임베딩 검색
+
+백터 간 유사도 측정은 추천 시스템, 검색 엔진, RAG 파이프라인의 기본입니다.
+
+```python
+import numpy as np
+
+def cosine_similarity(a: np.ndarray, b: np.ndarray) -> float:
+    """두 벡터 사이의 코사인 유사도를 계산합니다."""
+    dot = np.dot(a, b)
+    norm_a = np.linalg.norm(a)
+    norm_b = np.linalg.norm(b)
+    if norm_a == 0 or norm_b == 0:
+        return 0.0
+    return dot / (norm_a * norm_b)
+
+def batch_cosine_similarity(query: np.ndarray, corpus: np.ndarray) -> np.ndarray:
+    """쿼리 벡터와 코퍼스 전체의 유사도를 일괄 계산합니다."""
+    norms = np.linalg.norm(corpus, axis=1)
+    norms[norms == 0] = 1.0  # zero-division 방지
+    normalized = corpus / norms[:, np.newaxis]
+    query_norm = query / (np.linalg.norm(query) or 1.0)
+    return normalized @ query_norm
+
+# 예시
+corpus = np.array([[1, 0, 1], [0, 1, 1], [1, 1, 0]], dtype=float)
+query = np.array([1, 0, 0], dtype=float)
+scores = batch_cosine_similarity(query, corpus)
+print(f"similarities: {scores}")  # 첫 번째와 세 번째가 높음
+```
+
+내적을 정규화한 것이 코사인 유사도입니다. 크기(norm)를 제거하고 방향만 비교하므로, 문서 길이에 독립적인 유사도를 얻을 수 있습니다. 임베딩 기반 검색(vector search)에서는 쿼리와 문서를 모두 정규화한 뒤 내적만 계산해 순위를 매깁니다. FAISS, Pinecone, Weaviate 같은 벡터 DB가 이 연산을 GPU/SIMD로 가속하는 이유입니다.
+
+### 희소 행렬(Sparse Matrix) 활용
+
+대부분의 실무 행렬은 0이 압도적으로 많습니다. 희소 행렬 포맷을 쓰면 메모리와 연산 비용을 크게 줄일 수 있습니다.
+
+```python
+from scipy import sparse
+import numpy as np
+
+# 10000x10000 행렬에서 0.1%만 비영인 경우
+n = 10000
+density = 0.001
+A_sparse = sparse.random(n, n, density=density, format='csr')
+
+# 메모리 비교
+dense_memory = n * n * 8  # float64
+sparse_memory = A_sparse.data.nbytes + A_sparse.indices.nbytes + A_sparse.indptr.nbytes
+print(f"dense: {dense_memory / 1e6:.1f} MB")
+print(f"sparse: {sparse_memory / 1e6:.1f} MB")
+print(f"ratio: {sparse_memory / dense_memory:.4f}")
+
+# 희소 행렬-벡터 곱
+x = np.random.randn(n)
+result = A_sparse @ x
+print(f"result shape: {result.shape}")
+```
+
+추천 시스템의 사용자-아이템 행렬, 그래프의 인접 행렬, NLP의 TF-IDF 행렬은 모두 희소 행렬입니다. dense로 다루면 메모리 부족으로 스케일링이 막힙니다. CSR/CSC 포맷의 특성을 이해하면 어떤 연산이 빠른지 예측할 수 있습니다.
+
+### 선형 시스템 풀기: Ax = b
+
+많은 실무 문제가 선형 시스템 Ax = b 형태로 귀결됩니다. 회귀 분석, 회로 방정식, 최적화 문제 등이 모두 이 구조입니다.
+
+```python
+import numpy as np
+
+# 3개의 방정식, 3개의 미지수
+A = np.array([
+    [2, 1, -1],
+    [-3, -1, 2],
+    [-2, 1, 2]
+], dtype=float)
+b = np.array([8, -11, -3], dtype=float)
+
+# 직접 풀기
+x = np.linalg.solve(A, b)
+print(f"solution: {x}")  # [2. 3. -1.]
+
+# 검증
+residual = np.linalg.norm(A @ x - b)
+print(f"residual: {residual:.2e}")  # ~0
+
+# 조건수 확인
+cond = np.linalg.cond(A)
+print(f"condition number: {cond:.2f}")
+```
+
+조건수가 크면(예: 10⁶ 이상) 입력의 작은 오차가 결과를 크게 흔들 수 있습니다. 이 경우 정규화, SVD 기반 의사역행렬, 또는 반복법(CG, GMRES)을 고려해야 합니다. 수치 선형대수에서 "정답이 나왔다"고 끝나는 것이 아니라 "이 답이 얼마나 믿을 만한가?"를 함께 평가하는 습관이 중요합니다.
 
 ## 처음 질문으로 돌아가기
 
@@ -402,5 +530,6 @@ print(rot)
 - [Introduction to Linear Algebra - Strang](https://math.mit.edu/~gs/linearalgebra/)
 - [NumPy Linear Algebra Documentation](https://numpy.org/doc/stable/reference/routines.linalg.html)
 - [NumPy GitHub repository](https://github.com/numpy/numpy)
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/math-for-cs-101/ko)
 
 Tags: Math, LinearAlgebra, Vectors, Matrices, Beginner

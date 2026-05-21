@@ -259,79 +259,418 @@ import my_package           # Import name: underscore
 
 다음 글에서는 **프로젝트 구조** — src layout과 `pyproject.toml`을 다룹니다.
 
-## 실전 패턴 추가: pyproject.toml, 빌드 명령, CI까지 한 번에 정리
+## import 시스템 내부 동작
 
-패키징은 파일 한두 개를 만드는 작업이 아니라, 메타데이터와 빌드 백엔드, 배포 검증을 같은 계약으로 묶는 작업입니다. `pyproject.toml`을 기준으로 로컬 빌드와 CI 검증 경로를 맞추면 릴리스 직전의 불일치를 크게 줄일 수 있습니다.
+`import requests`를 실행하면 Python 인터프리터는 다음 순서로 작업합니다.
+
+### 1단계: sys.modules 캐시 확인
+
+```python
+import sys
+
+# 이미 import한 모듈은 캐시에 저장됩니다.
+print("requests" in sys.modules)  # 첫 import 전: False
+
+import requests
+print("requests" in sys.modules)  # import 후: True
+
+# 두 번째 import는 캐시에서 즉시 반환합니다.
+import requests  # 파일을 다시 읽지 않음
+```
+
+Python은 `sys.modules` 딕셔너리에서 먼저 모듈을 찾습니다. 이미 있으면 파일 시스템을 탐색하지 않고 캐시된 모듈 객체를 그대로 반환합니다. 이 때문에 모듈 최상위에 있는 코드는 프로세스 생애에서 단 한 번만 실행됩니다.
+
+### 2단계: Finder와 Loader
+
+```python
+import sys
+
+for finder in sys.meta_path:
+    print(type(finder).__name__)
+# BuiltinImporter      - 내장 모듈 (sys, builtins)
+# FrozenImporter       - 프리즈된 모듈
+# PathFinder           - sys.path 기반 탐색
+```
+
+`sys.meta_path`에 등록된 finder가 순서대로 모듈을 찾습니다. `PathFinder`가 가장 마지막에 동작하며, `sys.path`의 각 경로를 순회하면서 `.py` 파일이나 패키지 디렉터리를 찾습니다.
+
+### 3단계: 모듈 실행과 바인딩
+
+```python
+# Python이 내부적으로 수행하는 과정을 단순화하면:
+# 1. 빈 모듈 객체 생성
+# 2. sys.modules에 등록 (순환 임포트 방지)
+# 3. 모듈 파일 실행 (.py의 최상위 코드)
+# 4. 호출자의 네임스페이스에 이름 바인딩
+
+# 이것이 의미하는 바:
+import mylib          # mylib 이름이 현재 네임스페이스에 바인딩
+from mylib import f   # f 이름만 바인딩, mylib은 바인딩되지 않음
+```
+
+### import 흐름 전체 다이어그램
+
+```text
+import mylib
+    │
+    ▼
+sys.modules에 있는가? ──Yes──> 캐시된 객체 반환
+    │ No
+    ▼
+sys.meta_path의 finder 순회
+    │
+    ▼
+PathFinder: sys.path 각 경로 탐색
+    │
+    ▼
+mylib/ 디렉터리 발견 (__init__.py 존재)
+    │
+    ▼
+모듈 객체 생성 → sys.modules 등록
+    │
+    ▼
+__init__.py 실행
+    │
+    ▼
+호출자 네임스페이스에 'mylib' 바인딩
+```
+
+## Namespace Package vs Regular Package
+
+Python 3.3부터 `__init__.py`가 없어도 디렉터리를 패키지로 인식하는 namespace package가 도입되었습니다. 하지만 두 방식은 동작이 다릅니다.
+
+| 구분 | Regular Package | Namespace Package |
+|---|---|---|
+| `__init__.py` | 필수 | 없음 |
+| `__path__` | 단일 디렉터리 | 여러 디렉터리 가능 |
+| 초기화 코드 | `__init__.py`에 작성 | 불가 |
+| 도구 호환성 | 모든 도구 지원 | 일부 도구 미지원 |
+| 용도 | 일반 패키지 | 플러그인, 분산 패키지 |
+
+```python
+# Regular Package: mylib/__init__.py 존재
+import mylib
+print(mylib.__file__)
+# /home/user/.local/lib/python3.11/site-packages/mylib/__init__.py
+
+# Namespace Package: __init__.py 없음
+import google.cloud  # google은 namespace package
+print(google.__path__)
+# _NamespacePath(['/path/to/site-packages/google'])
+# 여러 배포판이 google/ 아래 하위 패키지를 각각 설치
+```
+
+실무에서 namespace package를 사용하는 대표 사례는 `google-cloud-*` 패키지 군입니다. `google.cloud.storage`와 `google.cloud.bigquery`는 별도 배포판이지만 동일한 `google.cloud` namespace를 공유합니다.
+
+**권장**: 대부분의 프로젝트에서는 Regular Package(`__init__.py` 포함)를 사용하는 것이 명확합니다. Namespace Package는 여러 독립 배포판이 하나의 최상위 네임스페이스를 공유해야 할 때만 선택합니다.
+
+## `__init__.py` 활용 패턴
+
+`__init__.py`는 단순히 "이 디렉터리는 패키지입니다"를 선언하는 것 이상의 역할을 합니다.
+
+### 패턴 1: Public API 정의
+
+```python
+# mylib/__init__.py
+from .core import Engine
+from .config import Settings
+from .exceptions import MyLibError
+
+__all__ = ["Engine", "Settings", "MyLibError"]
+```
+
+사용자는 `from mylib import Engine`으로 바로 접근할 수 있고, 내부 구현 파일(`core.py`, `config.py`)은 숨겨집니다. `__all__`을 명시하면 `from mylib import *` 시 노출되는 이름을 제어합니다.
+
+### 패턴 2: 버전 정보 제공
+
+```python
+# mylib/__init__.py
+__version__ = "1.2.0"
+```
+
+```python
+import mylib
+print(mylib.__version__)  # "1.2.0"
+```
+
+### 패턴 3: 빈 파일로 두기
+
+```python
+# mylib/__init__.py
+# (비어 있음)
+```
+
+패키지가 깊은 구조를 가지고 있고, 사용자가 하위 모듈을 직접 import하는 경우에는 `__init__.py`를 비워 두는 것이 가장 단순합니다. Django의 `migrations/` 패키지가 이 패턴을 사용합니다.
+
+### 패턴 4: Lazy Import
+
+```python
+# mylib/__init__.py
+def __getattr__(name):
+    if name == "HeavyModule":
+        from .heavy import HeavyModule
+        return HeavyModule
+    raise AttributeError(f"module 'mylib' has no attribute {name}")
+```
+
+무거운 의존성을 가진 하위 모듈을 실제로 접근할 때까지 로드를 미루는 방식입니다. `import mylib`만으로는 `heavy.py`가 실행되지 않습니다.
+
+## Wheel 내부 구조
+
+`pip install`이 설치하는 대상은 대부분 wheel(`.whl`) 파일입니다. wheel은 단순한 ZIP 파일이며 내부 구조가 정해져 있습니다.
+
+```bash
+# wheel 파일의 실체 확인
+pip download requests --no-deps -d /tmp/wheels
+unzip -l /tmp/wheels/requests-2.32.3-py3-none-any.whl | head -20
+```
+
+```text
+requests-2.32.3-py3-none-any.whl 내부:
+├── requests/
+│   ├── __init__.py
+│   ├── api.py
+│   ├── sessions.py
+│   ├── models.py
+│   └── ...
+├── requests-2.32.3.dist-info/
+│   ├── METADATA        # 패키지 메타데이터 (이름, 버전, 의존성)
+│   ├── WHEEL           # wheel 형식 정보
+│   ├── RECORD          # 설치될 파일 목록 + 해시
+│   ├── top_level.txt   # 최상위 패키지 이름
+│   └── LICENSE
+```
+
+### Wheel 파일 이름 규칙
+
+```text
+{distribution}-{version}(-{build})?-{python}-{abi}-{platform}.whl
+
+예시:
+requests-2.32.3-py3-none-any.whl
+├── distribution: requests
+├── version: 2.32.3
+├── python: py3 (Python 3)
+├── abi: none (순수 Python)
+└── platform: any (모든 플랫폼)
+
+numpy-1.26.4-cp312-cp312-manylinux_2_17_x86_64.whl
+├── distribution: numpy
+├── version: 1.26.4
+├── python: cp312 (CPython 3.12)
+├── abi: cp312 (CPython 3.12 ABI)
+└── platform: manylinux_2_17_x86_64 (Linux x86_64)
+```
+
+순수 Python 패키지는 `py3-none-any`로 모든 환경에서 동일한 wheel을 사용합니다. C 확장을 포함하는 패키지는 플랫폼별로 별도 wheel이 필요합니다.
+
+## Editable Install 동작 원리
+
+개발 중에는 `pip install -e .`(editable install)을 사용합니다. 이 모드에서는 소스 코드를 `site-packages`에 복사하지 않고, 원본 디렉터리를 직접 참조합니다.
+
+```bash
+# 일반 설치: 파일이 site-packages로 복사됨
+pip install .
+# site-packages/mylib/__init__.py (복사본)
+
+# Editable 설치: 원본을 참조하는 링크가 생성됨
+pip install -e .
+# site-packages/mylib.egg-link 또는
+# site-packages/__editable__.mylib-0.1.0.pth
+```
+
+```python
+# editable install 후
+import mylib
+print(mylib.__file__)
+# /home/user/projects/mylib/src/mylib/__init__.py  (원본 경로!)
+```
+
+editable install의 장점은 소스를 수정하면 다시 설치하지 않아도 변경이 즉시 반영된다는 것입니다. 개발-테스트 사이클이 빨라집니다.
+
+### 모던 Editable Install (PEP 660)
 
 ```toml
+# pyproject.toml
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=64", "wheel"]
 build-backend = "setuptools.build_meta"
-
-[project]
-name = "acme-utils"
-version = "0.1.0"
-description = "Utility package for internal services"
-readme = "README.md"
-requires-python = ">=3.10"
-dependencies = [
-  "httpx>=0.27,<0.29",
-]
-
-[project.optional-dependencies]
-dev = [
-  "pytest>=8.0",
-  "ruff>=0.5",
-  "mypy>=1.10",
-  "build>=1.2",
-  "twine>=5.1",
-]
 
 [tool.setuptools.packages.find]
 where = ["src"]
 ```
 
 ```bash
-python -m pip install -U pip
-python -m pip install -e ".[dev]"
-python -m build
-python -m twine check dist/*
+pip install -e .
+# setuptools >= 64는 .pth 파일 방식으로 editable install 수행
+# import hook 없이도 src/ 레이아웃을 정상 인식
 ```
 
-```yaml
-name: package-ci
-on:
-  pull_request:
-  push:
-    branches: [ main ]
+## 패키지 이름 짓기: 충돌을 피하는 전략
 
-jobs:
-  verify:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: python -m pip install -U pip
-      - run: python -m pip install -e ".[dev]"
-      - run: pytest -q
-      - run: ruff check .
-      - run: mypy src
-      - run: python -m build
-      - run: python -m twine check dist/*
+PyPI에는 50만 개 이상의 패키지가 등록되어 있습니다. 이름 충돌을 피하면서도 찾기 쉬운 이름을 짓는 것이 중요합니다.
+
+### 이름 규칙
+
+| 규칙 | 예시 |
+|---|---|
+| 소문자 + 하이픈 (배포 이름) | `my-utils` |
+| 소문자 + 언더스코어 (import 이름) | `my_utils` |
+| PyPI에서 정규화 | `my-utils` == `my_utils` == `My.Utils` |
+| 3글자 이상 권장 | `io`보다 `fileio` |
+
+### 사내 패키지 네이밍 패턴
+
+```text
+{회사/조직}-{도메인}-{기능}
+예: acme-auth-client, acme-logging, acme-config
 ```
 
-실무에서 중요한 포인트는 로컬과 CI가 같은 명령 세트를 사용하도록 고정하는 것입니다. 개발자가 로컬에서 `python -m build`를 통과시킨 산출물이 CI에서도 같은 방식으로 통과해야 릴리스 리스크가 줄어듭니다. 또한 `twine check`를 CI에 넣어 두면 README 렌더링 오류나 메타데이터 누락을 배포 전에 잡을 수 있습니다.
+접두사를 통일하면 `pip list | grep acme-`로 사내 패키지를 한눈에 파악할 수 있습니다.
+
+### PyPI 이름 선점 확인
+
+```bash
+# 이름이 사용 가능한지 확인
+pip index versions my-desired-name
+# ERROR: No matching distribution found -> 사용 가능
+
+# 또는 API로 확인
+curl -s https://pypi.org/pypi/my-desired-name/json | python -m json.tool
+# 404 -> 사용 가능
+```
+
+## pip install 전체 흐름
+
+`pip install requests`를 실행하면 실제로 어떤 단계를 거치는지 살펴보겠습니다.
+
+```text
+pip install requests
+    │
+    ▼
+1. PyPI API 호출: GET https://pypi.org/simple/requests/
+    │
+    ▼
+2. 호환 wheel 선택 (Python 버전, 플랫폼 기준)
+    │
+    ▼
+3. wheel 다운로드 + 해시 검증
+    │
+    ▼
+4. 의존성 해결 (urllib3, certifi, charset-normalizer, idna)
+    │
+    ▼
+5. 의존성도 같은 과정으로 설치
+    │
+    ▼
+6. wheel 압축 해제 → site-packages/에 파일 배치
+    │
+    ▼
+7. .dist-info/ 디렉터리 생성 (METADATA, RECORD 등)
+```
+
+### 의존성 해결기 (Resolver)
+
+pip 20.3부터 새로운 의존성 해결기가 기본으로 동작합니다. 이 해결기는 모든 패키지의 버전 요구 사항이 동시에 만족되는 조합을 찾습니다.
+
+```bash
+# 의존성 트리 확인
+pip install pipdeptree
+pipdeptree -p requests
+```
+
+```text
+requests==2.32.3
+├── certifi [required: >=2017.4.17, installed: 2024.7.4]
+├── charset-normalizer [required: >=2,<4, installed: 3.3.2]
+├── idna [required: >=2.5,<4, installed: 3.7]
+└── urllib3 [required: >=1.21.1,<3, installed: 2.2.2]
+```
+
+### site-packages 설치 후 디렉터리 상태
+
+```bash
+ls site-packages/ | grep -E "requests|urllib3"
+```
+
+```text
+requests/
+requests-2.32.3.dist-info/
+urllib3/
+urllib3-2.2.2.dist-info/
+```
+
+각 패키지마다 두 개의 디렉터리가 생깁니다. 하나는 실제 코드가 담긴 패키지 디렉터리이고, 다른 하나는 메타데이터를 담는 `.dist-info/` 디렉터리입니다.
+
+### RECORD 파일: 설치된 파일 목록
+
+```bash
+head -5 site-packages/requests-2.32.3.dist-info/RECORD
+```
+
+```text
+requests/__init__.py,sha256=abc123...,4567
+requests/api.py,sha256=def456...,2345
+requests/sessions.py,sha256=ghi789...,12345
+requests/models.py,sha256=jkl012...,23456
+requests/adapters.py,sha256=mno345...,8901
+```
+
+`pip uninstall requests`를 실행하면 pip은 이 RECORD 파일을 읽어서 설치된 모든 파일을 정확히 제거합니다.
+
+## 모듈 검색 순서가 만드는 함정
+
+`sys.path`의 순서는 실질적인 우선순위입니다. 이 순서를 이해하지 못하면 의도치 않은 모듈이 import될 수 있습니다.
+
+```python
+import sys
+for i, path in enumerate(sys.path):
+    print(f"{i}: {path}")
+```
+
+```text
+0:                          # 빈 문자열 = 현재 디렉터리 (최우선)
+1: /usr/lib/python3.11
+2: /usr/lib/python3.11/lib-dynload
+3: /home/user/.local/lib/python3.11/site-packages
+4: /usr/lib/python3.11/site-packages
+```
+
+### Shadow Import 문제
+
+```bash
+# 현재 디렉터리에 random.py를 만들면:
+echo "print('This is NOT the stdlib random!')" > random.py
+python -c "import random; print(random.randint(1, 10))"
+# This is NOT the stdlib random!
+# AttributeError: module 'random' has no attribute 'randint'
+```
+
+현재 디렉터리(`sys.path[0]`)가 표준 라이브러리보다 먼저 탐색되기 때문입니다. 이 문제는 파일명만 바꾸면 해결됩니다.
+
+### 권장 확인 습관
+
+```python
+# 어떤 모듈이 실제로 로드되었는지 확인
+import json
+print(json.__file__)  # /usr/lib/python3.11/json/__init__.py 이면 정상
+
+# 의심스러우면 spec 확인
+import importlib.util
+spec = importlib.util.find_spec("json")
+print(spec.origin)
+```
 
 ## 처음 질문으로 돌아가기
 
 - **모듈과 패키지는 정확히 무엇이 다를까요?**
-  - 본문의 기준은 Python Package란 무엇인가?를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 모듈은 하나의 `.py` 파일이고, 패키지는 `__init__.py`가 있는 디렉터리입니다. 패키지는 여러 모듈을 하나의 네임스페이스로 묶어서 계층 구조를 만들 수 있게 합니다. `import json`은 모듈 하나를 가져오는 것이고, `import requests`는 패키지 전체(디렉터리)를 가져오는 것입니다.
+
 - **`import requests`를 실행하면 내부에서는 어떤 일이 일어날까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - Python은 먼저 `sys.modules` 캐시를 확인합니다. 없으면 `sys.meta_path`의 finder들이 순서대로 모듈을 탐색하고, `PathFinder`가 `sys.path`의 각 경로에서 `requests/` 디렉터리를 찾습니다. 디렉터리를 발견하면 모듈 객체를 생성하고, `__init__.py`를 실행한 뒤, 호출자의 네임스페이스에 `requests`라는 이름을 바인딩합니다.
+
 - **`pip install`은 실제로 무엇을 설치할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - `pip install`은 PyPI에서 wheel(`.whl`) 파일을 다운로드하고, 그 안에 들어 있는 패키지 파일을 `site-packages/` 디렉터리에 풀어 놓습니다. 동시에 `.dist-info/` 디렉터리를 생성하여 메타데이터, 설치된 파일 목록, 의존성 정보를 기록합니다. 이후 `import`할 때 `site-packages/`는 `sys.path`에 포함되어 있으므로 바로 찾을 수 있게 됩니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -351,6 +690,7 @@ jobs:
 
 ## 참고 자료
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/python-package-101/ko)
 - [Python Packaging User Guide](https://packaging.python.org/)
 - [Python Modules Tutorial](https://docs.python.org/3/tutorial/modules.html)
 - [Real Python - Python Packages](https://realpython.com/python-modules-packages/)

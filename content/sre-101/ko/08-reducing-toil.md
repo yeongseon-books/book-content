@@ -613,5 +613,6 @@ Toil은 반복되고 자동화 가능한 수작업이 사람 시간을 지속적
 - [Identifying and Tracking Toil - Google SRE Workbook](https://sre.google/workbook/eliminating-toil/)
 - [Automating Operations - Google SRE Book](https://sre.google/sre-book/automation-at-google/)
 - [Toil Reduction - Atlassian](https://www.atlassian.com/incident-management/devops/toil)
+- [SRE 101 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/sre-101/ko)
 
 Tags: SRE, Toil, Automation, Productivity, Operations

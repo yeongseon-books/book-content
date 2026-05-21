@@ -74,7 +74,7 @@ last_reviewed: '2026-05-12'
 | 메모리 계층 | 레지스터부터 캐시, RAM, 디스크까지의 저장 계층 |
 | 추상화 계층 | 언어에서 회로까지 내려가는 층위 |
 
-## Before / After
+## 적용 전과 후
 
 **Before — "코드는 그냥 실행된다":**
 
@@ -241,135 +241,253 @@ print(f"Strided (1/16th of work): {time.perf_counter() - start:.2f} s")
 
 다음 글에서는 이 지도의 가장 아래쪽 표현 단위부터 봅니다. 비트와 바이트, 정수와 부동소수점이 메모리 안에서 어떻게 저장되는지 짚어보겠습니다.
 
-## 심화 실습: 비트 연산 · 캐시 계산 · 파이프라인 관찰
+## 심화 학습: 폰 노이만 구조의 본질과 현대 변형
 
-컴퓨터 구조를 실제로 이해하려면 정의를 암기하는 대신 숫자를 직접 계산해 보는 과정이 필요합니다. 같은 명령이라도 비트 표현, 메모리 계층, 파이프라인 충돌 조건을 동시에 보면 성능 병목의 원인이 선명해집니다.
+컴퓨터 구조를 처음 배울 때는 폰 노이만 모델의 다섯 블록을 외우는 데서 그치기 쉽습니다. 하지만 실무에서 중요한 것은 "이 모델이 왜 지금도 유효하며, 어디서 병목이 생기는가"입니다.
 
-### 2의 보수와 비트 마스크를 수치로 확인하기
+### 폰 노이만 병목(Von Neumann Bottleneck)
 
-```python
-def to_u8(n: int) -> int:
-    return n & 0xFF
-
-def to_s8(n: int) -> int:
-    n &= 0xFF
-    return n - 0x100 if n & 0x80 else n
-
-x = to_u8(-5)          # 251 (0b11111011)
-y = to_u8(12)          # 12  (0b00001100)
-print(bin(x), bin(y))
-print(to_s8(x + y))    # 7
-print(to_s8(x - y))    # -17
-```
-
-핵심은 ALU가 "부호 있는 정수"와 "부호 없는 정수"를 따로 계산하지 않는다는 점입니다. 동일한 비트열을 어떻게 해석하느냐가 결과 의미를 바꿉니다. 그래서 ISA 문서에는 signed/unsigned 비교 명령이 따로 존재합니다.
-
-### 캐시 인덱스 계산을 손으로 풀기
-
-가정:
-- L1 D-cache = 32KiB
-- line size = 64B
-- 8-way set associative
-
-계산:
-- 총 line 수 = 32KiB / 64B = 512
-- set 수 = 512 / 8 = 64
-- set index 비트 수 = log2(64) = 6
-- block offset 비트 수 = log2(64) = 6
-- tag 비트 수(48-bit VA 가정) = 48 - 6 - 6 = 36
-
-즉 주소 비트 분해는 `[tag:36][index:6][offset:6]`이 됩니다. 두 주소가 같은 set에 매핑되는지 확인하려면 offset을 제거한 뒤 index 6비트를 비교하면 됩니다.
-
-### 캐시 미스 패턴을 추적하는 간단 코드
-
-```python
-# stride 접근이 캐시 locality에 미치는 영향 관찰
-N = 1024 * 1024
-arr = [0] * N
-
-def walk(step: int):
-    s = 0
-    for i in range(0, N, step):
-        s += arr[i]
-    return s
-
-for step in [1, 2, 4, 8, 16, 32, 64, 128]:
-    walk(step)
-```
-
-이 코드는 단순하지만 실험 관점에서는 매우 유용합니다. `step`이 커질수록 한 cache line에서 활용하는 유효 데이터가 줄고 miss 비율이 올라갑니다. 프로파일러에서는 CPI 증가와 함께 메모리 stall 시간이 늘어나는 형태로 관측됩니다.
-
-### 5단계 파이프라인에서 hazard를 그림으로 보기
-
-```mermaid
-flowchart LR
-    IF["IF"] --> ID["ID"] --> EX["EX"] --> MEM["MEM"] --> WB["WB"]
-    EX -->|"branch decision"| IF
-```
-
-간단한 명령 시퀀스:
-- `I1: LOAD R1, [R2]`
-- `I2: ADD R3, R1, R4`
-
-`I2`는 `R1`이 필요하지만 `I1`의 결과는 MEM/WB 이후에 준비됩니다. Forwarding이 없으면 stall이 필요하고, forwarding이 있으면 일부 cycle을 절약할 수 있습니다. 이 차이가 곧 IPC 차이로 이어집니다.
-
-### 파이프라인 타이밍 표를 직접 작성하기
+폰 노이만 구조에서 CPU와 메모리는 하나의 버스를 공유합니다. 명령어도 데이터도 같은 통로를 거쳐야 합니다.
 
 ```text
-cycle:   1   2   3   4   5   6
-I1      IF  ID  EX MEM  WB
-I2          IF  ID STALL EX MEM WB
-I3              IF STALL ID  EX MEM WB
+┌──────────┐      단일 버스       ┌──────────┐
+│   CPU    │◄──────────────────►│  Memory  │
+│(제어+ALU)│  명령어 + 데이터     │          │
+└──────────┘                     └──────────┘
 ```
 
-이 표를 직접 그려 보면 왜 분기 예측 실패가 큰 비용인지, 왜 load-use hazard가 민감한지 바로 이해할 수 있습니다. 이론보다 "cycle 단위로 어디가 비는지"를 보는 것이 훨씬 빠릅니다.
+이 구조의 한계를 숫자로 보겠습니다.
 
-### 성능 근사식으로 병목 분해하기
+| 항목 | 대략적 수치 |
+|------|-------------|
+| CPU 레지스터 접근 | ~0.3 ns |
+| L1 캐시 접근 | ~1 ns |
+| DRAM 접근 | ~100 ns |
+| CPU 연산 처리량 | 수십 GigaOps/s |
+| DRAM 대역폭 | ~50 GB/s |
 
-성능은 보통 다음으로 근사합니다.
+CPU가 1 ns마다 명령어를 완료할 수 있지만 메모리에서 데이터를 가져오는 데 100 ns가 걸린다면, 명령어 100개분의 시간을 기다리는 셈입니다. 이것이 폰 노이만 병목입니다. 현대 컴퓨터가 캐시 계층, 프리페치, 비순차 실행을 도입한 이유가 바로 이 병목을 완화하기 위함입니다.
 
-`Execution Time = Instruction Count × CPI × Clock Cycle Time`
+### 하버드 구조와의 비교
 
-여기서 구조 개선은 보통 세 축으로 나타납니다.
-- 명령 수 감소: 컴파일러 최적화/벡터화
-- CPI 감소: cache miss 감소, branch mispredict 감소, forwarding 개선
-- cycle time 단축: 더 높은 클록, 더 짧은 임계 경로
+폰 노이만 병목에 대한 초기 해법 중 하나가 하버드 구조입니다.
 
-실무에서는 한 축을 개선하면 다른 축이 악화될 수 있습니다. 예를 들어 파이프라인 단계를 늘려 클록을 높이면 분기 실패 패널티가 커질 수 있습니다. 따라서 "한 지표만" 보고 결론 내리면 위험합니다.
+```text
+┌──────────┐  명령어 버스  ┌──────────────┐
+│   CPU    │◄────────────►│ 명령어 메모리 │
+│          │              └──────────────┘
+│          │  데이터 버스  ┌──────────────┐
+│          │◄────────────►│ 데이터 메모리 │
+└──────────┘              └──────────────┘
+```
 
-### 점검 체크리스트
+| 특성 | 폰 노이만 | 하버드 |
+|------|-----------|--------|
+| 버스 | 단일 | 분리(명령어/데이터) |
+| 동시 접근 | 불가 | 가능 |
+| 유연성 | 코드=데이터 가능 | 코드↔데이터 이동 제한 |
+| 현대 적용 | 메인 메모리 관점 | L1 캐시 분리(I-cache/D-cache) |
 
-- 주소 하나를 보고 `tag/index/offset`으로 즉시 분해할 수 있는가
-- load-use, branch hazard를 cycle 표로 그릴 수 있는가
-- signed/unsigned 연산 차이를 비트 패턴으로 설명할 수 있는가
-- CPI 상승의 원인을 cache/branch/structural hazard로 나눠 추적할 수 있는가
+현대 프로세서는 두 구조를 결합합니다. 메인 메모리는 폰 노이만(통합)이지만 L1 캐시는 하버드(분리)로 동작합니다. 이 조합을 수정 하버드 구조(Modified Harvard Architecture)라 부릅니다.
 
-이 체크리스트를 통과하면, 컴퓨터 구조 지식이 암기에서 운영 가능한 문제해결 도구로 바뀝니다.
+### CISC vs RISC: 설계 철학의 분기점
+
+컴퓨터 구조의 역사에서 가장 큰 설계 논쟁 중 하나가 명령어 집합(ISA) 철학입니다.
+
+```text
+CISC (x86 계열)                    RISC (ARM, RISC-V 계열)
+┌────────────────────┐            ┌────────────────────┐
+│ 복잡한 명령어 다수   │            │ 단순한 명령어 소수   │
+│ 가변 길이 인코딩     │            │ 고정 길이 인코딩     │
+│ 메모리↔레지스터 연산 │            │ load/store 분리     │
+│ 마이크로코드 해석    │            │ 하드와이어드 제어    │
+└────────────────────┘            └────────────────────┘
+```
+
+| 비교 항목 | CISC (x86-64) | RISC (ARM64) |
+|-----------|---------------|--------------|
+| 명령어 길이 | 1~15 바이트 | 고정 4 바이트 |
+| 레지스터 수 | 16 범용 | 31 범용 |
+| 메모리 연산 | ADD 명령이 메모리 직접 참조 가능 | LOAD 후 ADD, 결과 STORE |
+| 디코딩 복잡도 | 높음(마이크로옵 변환) | 낮음(직접 실행) |
+| 전력 효율 | 상대적 높은 소모 | 상대적 낮은 소모 |
+| 대표 사용처 | 데스크톱, 서버 | 모바일, 임베디드, Apple Silicon |
+
+실무에서 이 차이가 드러나는 순간: ARM 서버에서 x86 전용 SIMD intrinsic을 사용한 코드를 재컴파일하면, 동일 알고리즘이라도 벡터 레지스터 너비와 명령어 매핑이 달라 성능 특성이 바뀝니다.
+
+### 추상화 계층과 비용: 소스 코드에서 트랜지스터까지
+
+```text
+Layer 7  │ Python source           │ x = a + b
+Layer 6  │ Bytecode (CPython)      │ BINARY_ADD
+Layer 5  │ C runtime               │ PyNumber_Add()
+Layer 4  │ Compiler output (x86)   │ add eax, ebx
+Layer 3  │ Microarchitecture       │ μop dispatch → ALU port
+Layer 2  │ RTL (Register Transfer) │ R[dst] ← R[src1] + R[src2]
+Layer 1  │ Gate level              │ full adder chain
+Layer 0  │ Transistor / Physics    │ CMOS switching
+```
+
+각 계층을 지날 때마다 추상화 비용이 발생합니다.
+
+**실측 예시: Python `a + b` vs C `a + b` vs 어셈블리 `add`**
+
+```python
+# Python: 단순 덧셈의 추상화 비용 측정
+import timeit
+
+# Python 정수 덧셈 (Layer 7)
+t_python = timeit.timeit("a + b", setup="a=42; b=58", number=10_000_000)
+print(f"Python 정수 덧셈 1천만 회: {t_python:.3f}초")
+
+# 비교: numpy를 통한 벡터 연산 (Layer 5~4 사이)
+import numpy as np
+arr = np.arange(10_000_000, dtype=np.int64)
+t_numpy = timeit.timeit(lambda: arr + 1, number=100)
+print(f"NumPy 1천만 원소 덧셈 100회: {t_numpy:.3f}초")
+```
+
+일반적인 결과:
+- Python 순수 루프: ~0.4초 (10M iterations)
+- NumPy 벡터화: ~0.02초 (10M elements × 100)
+
+NumPy가 빠른 이유는 Layer 7 반복을 Layer 4(SIMD 명령어)로 내림으로써 인터프리터 오버헤드를 제거하기 때문입니다. 이것이 "추상화 계층을 내려갈수록 성능이 올라간다"는 원리의 구체적 예시입니다.
+
+### ISA가 소프트웨어에 미치는 영향: 실제 어셈블리 비교
+
+같은 C 코드를 x86-64와 ARM64로 컴파일한 결과를 비교합니다.
+
+```c
+// 단순 함수
+int add_and_check(int a, int b) {
+    int sum = a + b;
+    if (sum > 100) return sum;
+    return 0;
+}
+```
+
+**x86-64 (gcc -O2):**
+```asm
+add_and_check:
+    lea     eax, [rdi+rsi]      ; a + b → eax (3바이트 명령)
+    cmp     eax, 100
+    mov     edx, 0
+    cmovle  eax, edx            ; 분기 없이 조건부 이동
+    ret
+```
+
+**ARM64 (gcc -O2):**
+```asm
+add_and_check:
+    add     w0, w0, w1          ; a + b → w0 (4바이트 고정)
+    cmp     w0, #100
+    csel    w0, w0, wzr, gt     ; 조건부 선택
+    ret
+```
+
+두 결과 모두 분기를 제거했지만 방식이 다릅니다. x86은 `cmovle`(조건부 이동), ARM64는 `csel`(조건부 선택)을 사용합니다. 명령어 수는 비슷하지만 x86은 가변 길이, ARM64는 고정 길이라서 프리페치 예측 효율이 달라집니다.
+
+### 설계 트레이드오프를 정량화하는 철의 법칙
+
+프로세서 성능의 "철의 법칙(Iron Law)"은 세 요소의 곱입니다.
+
+```text
+실행 시간 = 명령어 수 × CPI × 클록 주기
+
+         Instructions   Cycles    Seconds
+Time  =  ─────────── × ─────── × ───────
+          Program      Instruction  Cycle
+```
+
+| 개선 방향 | 영향을 받는 요소 | 부작용 |
+|-----------|-----------------|--------|
+| 더 강력한 명령어(CISC) | 명령어 수 ↓ | CPI ↑, 클록 주기 ↑ |
+| 더 단순한 명령어(RISC) | CPI ↓, 클록 주기 ↓ | 명령어 수 ↑ |
+| 파이프라인 깊게 | 클록 주기 ↓ | CPI ↑(hazard penalty) |
+| 캐시 확대 | CPI ↓(miss 감소) | 면적/전력 ↑ |
+
+이 법칙이 중요한 이유: "클록이 높으면 빠르다"는 단순한 판단이 왜 틀리는지를 설명해 줍니다. Pentium 4는 높은 클록을 추구했지만 파이프라인이 31단계로 깊어져 분기 실패 패널티가 커졌고, 결국 더 낮은 클록의 Core 아키텍처에 밀렸습니다.
+
+### 컴퓨터 구조 지식이 실무에 적용되는 세 가지 시나리오
+
+**시나리오 1: 메모리 레이아웃 선택**
+
+구조체 배열(AoS) vs 배열 구조체(SoA)는 캐시 라인 활용률에 직접 영향을 줍니다. 컴퓨터 구조를 모르면 "왜 같은 데이터인데 접근 순서만 바꿨는데 3배 빨라지는가"를 설명할 수 없습니다.
+
+**시나리오 2: 브랜치 프리 코드**
+
+위의 `cmov`/`csel` 예시처럼, 분기 예측 실패가 비싼 환경에서는 조건 분기를 제거하는 것이 유리합니다. 이 판단은 파이프라인 길이와 분기 예측기 정확도를 알아야 내릴 수 있습니다.
+
+**시나리오 3: NUMA 인지 할당**
+
+멀티소켓 서버에서는 어떤 CPU가 어떤 메모리 뱅크에 가까운지가 접근 시간을 결정합니다. `numactl --interleave=all`같은 옵션이 왜 필요한지 이해하려면 버스 토폴로지 지식이 선행되어야 합니다.
+
+
+### 실험으로 확인하는 메모리 계층 지연 시간
+
+아래 Python 코드는 다양한 크기의 배열에 접근하면서 접근 지연 시간의 변화를 관찰합니다. 배열이 L1에 들어가는 크기일 때와 DRAM까지 넘어가는 크기일 때 성능 차이를 직접 체감할 수 있습니다.
+
+```python
+import numpy as np
+import time
+
+def measure_access_time(size_kb: int, iterations: int = 1000) -> float:
+    """특정 크기의 배열에 대한 랜덤 접근 시간 측정."""
+    n_elements = (size_kb * 1024) // 8  # int64 기준
+    arr = np.random.randint(0, n_elements, size=n_elements, dtype=np.int64)
+    
+    # 포인터 체이싱 패턴: arr[i]가 다음 인덱스를 가리킴
+    indices = np.random.permutation(n_elements).astype(np.int64)
+    
+    start = time.perf_counter_ns()
+    idx = 0
+    for _ in range(iterations):
+        idx = indices[idx % n_elements]
+    elapsed = time.perf_counter_ns() - start
+    
+    return elapsed / iterations  # ns per access
+
+# 캐시 경계를 넘나드는 크기로 테스트
+sizes = [4, 8, 16, 32, 64, 128, 256, 512, 1024, 4096, 16384]
+print(f"{'크기(KB)':>10} {'접근 시간(ns)':>15}")
+print("-" * 28)
+for size in sizes:
+    t = measure_access_time(size)
+    print(f"{size:>10} {t:>15.1f}")
+```
+
+일반적인 결과 패턴:
+
+| 배열 크기 | 예상 지연 시간 | 위치 |
+|-----------|---------------|------|
+| 4~32 KB | 1~4 ns | L1 캐시 |
+| 64~256 KB | 4~12 ns | L2 캐시 |
+| 512 KB~4 MB | 12~40 ns | L3 캐시 |
+| 16 MB 이상 | 80~120 ns | DRAM |
+
+이 실험은 "메모리는 한 종류"라는 소프트웨어 관점의 환상을 깨뜨립니다. 같은 `arr[i]` 코드가 어디에 있는 데이터를 건드리느냐에 따라 30배 이상 느려질 수 있습니다.
+
+### 무어의 법칙과 구조 설계의 진화
+
+| 시대 | 대표 프로세서 | 트랜지스터 수 | 핵심 구조 혁신 |
+|------|-------------|-------------|--------------|
+| 1970s | Intel 8080 | ~6,000 | 단일 버스, 축적기 구조 |
+| 1980s | Intel 386 | ~275,000 | 보호 모드, 가상 메모리 |
+| 1990s | Pentium Pro | ~5,500,000 | 비순차 실행, 분기 예측 |
+| 2000s | Core 2 | ~291,000,000 | 멀티코어, 공유 L2 |
+| 2010s | Skylake | ~1,750,000,000 | 넓은 슈퍼스칼라, AVX-512 |
+| 2020s | Apple M2 | ~20,000,000,000 | 이종 코어(P+E), 통합 메모리 |
+
+트랜지스터가 늘어날 때마다 아키텍트가 선택한 "무엇에 트랜지스터를 쓸 것인가"가 달라집니다. 초기에는 기능 추가(부동소수점 유닛, MMU), 1990~2000년대에는 ILP(Instruction Level Parallelism) 극대화, 2010년대 이후에는 병렬 코어 수 증가와 특수 가속기(GPU, NPU)로 방향이 바뀌었습니다. 이 흐름을 이해하면 "다음 5년간 어떤 구조가 유리한가"를 예측하는 프레임이 생깁니다.
 
 ## 처음 질문으로 돌아가기
 
 - **컴퓨터 구조를 한 문장으로 정의하면 무엇일까요?**
-  - 본문의 기준은 컴퓨터 구조란 무엇인가?를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 컴퓨터 구조란 소프트웨어가 하드웨어에 작업을 지시하는 인터페이스(ISA)와, 그 인터페이스를 구현하는 마이크로아키텍처 설계를 아우르는 학문입니다. 본문에서 본 것처럼 ISA는 "무엇을 할 수 있는가"를 정의하고, 마이크로아키텍처는 "얼마나 빠르게 할 수 있는가"를 결정합니다.
 - **폰 노이만 모델의 다섯 구성 요소는 어떻게 연결될까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 입력 장치 → 메모리 → CPU(제어 유닛 + ALU) → 메모리 → 출력 장치 순으로 데이터가 흐르며, 제어 유닛이 메모리에서 명령어를 가져와(fetch) 해석(decode)하고 실행(execute)하는 사이클을 반복합니다. 본문의 폰 노이만 병목 분석에서 보았듯이, 명령어와 데이터가 같은 메모리를 공유하기 때문에 대역폭 경쟁이 발생합니다.
 - **Python 같은 고수준 코드가 실제 하드웨어까지 내려가는 경로는 어떻게 생겼을까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
-
-<!-- toc:begin -->
-## 시리즈 목차
-
-- **컴퓨터 구조란 무엇인가? (현재 글)**
-- 데이터 표현 — bit, byte, integer, floating point (예정)
-- CPU와 명령어 (예정)
-- 레지스터와 ALU (예정)
-- 메모리 구조 (예정)
-- 캐시와 지역성 (예정)
-- 파이프라인 (예정)
-- I/O와 장치 (예정)
-- 병렬성과 멀티코어 (예정)
-- 성능을 이해하는 법 (예정)
-
-<!-- toc:end -->
+  - Python 소스 → 바이트코드 → C 런타임 → 기계어 → 마이크로옵 → 게이트 → 트랜지스터까지 7~8개 추상화 계층을 거칩니다. 심화 학습에서 확인한 것처럼, NumPy가 빠른 이유는 이 계층 중 인터프리터 오버헤드를 건너뛰고 SIMD 명령어 레벨에서 직접 연산하기 때문입니다.
 
 ## 참고 자료
 
@@ -377,5 +495,6 @@ I3              IF STALL ID  EX MEM WB
 - [Hennessy & Patterson — Computer Architecture: A Quantitative Approach](https://www.elsevier.com/books/computer-architecture/hennessy/978-0-12-811905-1)
 - [Wikipedia — Von Neumann Architecture](https://en.wikipedia.org/wiki/Von_Neumann_architecture)
 - [CS:APP — Computer Systems: A Programmer's Perspective](https://csapp.cs.cmu.edu/)
+- [예제 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/computer-architecture-101/ko)
 
 Tags: Computer Science, 컴퓨터 구조, 하드웨어, 기초, 시스템, 폰 노이만

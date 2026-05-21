@@ -63,7 +63,7 @@ last_reviewed: '2026-05-12'
 
 이 용어를 미리 정리해 두면 장애 순간의 대화가 훨씬 짧아집니다. 무엇을 보고, 누가 받고, 누가 결정하는지 언어가 합의되어 있기 때문입니다.
 
-## Before/After
+## 전환 전후
 
 **Before**: 알림이 울리면 Slack에서 "이거 누가 보고 있나요?"가 먼저 나오고, 여러 사람이 동시에 손을 대다가 오히려 문제를 더 키우기 쉽습니다.
 
@@ -105,17 +105,17 @@ rotation:
 ```markdown
 # Runbook: API 500 spike
 
-## Symptoms
+## 증상
 - /api/* 5xx ratio above 5%
 
-## Diagnosis
+## 진단
 1. Open the Grafana "API Errors" dashboard
 2. Check recent logs: {service="api", level="error"}
 
-## Mitigation
+## 완화 조치
 - If a recent deploy is suspect: `kubectl rollout undo deploy/api`
 
-## Escalation
+## 에스컬레이션
 - If unresolved in 30 min, page IC in #incident channel
 ```
 
@@ -218,7 +218,7 @@ Every Monday 10:00 AM:
 
 on-call 주기를 너무 길게 하면 피로가 쌓이고, 너무 짧게 하면 맥락 전환 비용이 커집니다. 1주일 단위가 가장 흔하지만, 팀 규모에 따라 조정해야 합니다.
 
-## Python PagerDuty webhook 예제
+## 파이썬 페이저듀티 웹훅 예시
 
 실제 on-call 시스템과 연동하는 webhook 처리 예제입니다. PagerDuty나 Opsgenie 같은 서비스에서 인시던트를 생성할 때 사용합니다.
 
@@ -406,6 +406,160 @@ oncall:
 
 또한 인수인계 품질을 위해 주간 handoff 노트에 열린 incident, 미완료 액션, 취약 시간대를 반드시 기록해야 합니다. 이 문서가 누락되면 로테이션이 바뀔 때마다 같은 조사 과정이 반복되어 MTTR이 불필요하게 증가합니다.
 
+
+## 운영 앵커: 배포, 인프라, 관측성, 대응을 한 장으로 연결하기
+
+앞선 섹션에서 각 주제를 따로 설명했다면, 이 섹션은 실무에서 한 번에 연결해 쓰는 최소 구성 예시를 제공합니다. 핵심은 화려한 도구 조합이 아니라, 같은 기준으로 변경을 통과시키고 문제를 되돌릴 수 있는가입니다.
+
+### CI/CD 파이프라인 공통 YAML
+
+```yaml
+name: delivery-flow
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements-dev.txt
+      - run: ruff check .
+      - run: pytest -q
+
+  deploy-stage:
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./scripts/deploy_stage.sh
+      - run: ./scripts/smoke_test.sh https://stage.example.com
+
+  deploy-prod-canary:
+    needs: deploy-stage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./scripts/deploy_prod.sh --strategy canary --percent 10
+      - run: ./scripts/check_slo.sh --window 5m
+      - run: ./scripts/promote_or_rollback.sh
+```
+
+이 흐름의 실전 포인트는 세 가지입니다. 첫째, CI 통과 전에는 어떤 배포도 시작하지 않습니다. 둘째, stage 통과 후에만 production으로 승격합니다. 셋째, production 승격은 canary 관찰 통과를 조건으로 강제합니다.
+
+### Terraform과 Ansible 역할 분리 예시
+
+```hcl
+# infra/main.tf
+resource "aws_security_group" "api" {
+  name        = "api-sg"
+  description = "api security group"
+}
+
+resource "aws_instance" "api" {
+  ami           = var.ami
+  instance_type = "t3.small"
+  tags = {
+    service = "api"
+    env     = var.env
+  }
+}
+```
+
+```yaml
+# ops/playbooks/hardening.yml
+- hosts: api
+  become: true
+  tasks:
+    - name: Install security updates
+      apt:
+        update_cache: true
+        upgrade: dist
+
+    - name: Ensure auditd is installed
+      apt:
+        name: auditd
+        state: present
+
+    - name: Ensure ssh root login is disabled
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^PermitRootLogin'
+        line: 'PermitRootLogin no'
+```
+
+Terraform은 "무엇을 만들 것인가"를 선언하고, Ansible은 "만들어진 시스템을 어떤 상태로 유지할 것인가"를 담당합니다. 두 도구를 구분하면 변경 리뷰 범위가 명확해지고, 장애 시 원인 추적도 빨라집니다.
+
+### 모니터링/알림 설정 예시
+
+```yaml
+# monitoring/alerts.yml
+groups:
+  - name: api-slo
+    rules:
+      - alert: ApiHighErrorRate
+        expr: rate(http_requests_total{service="api",status=~"5.."}[5m]) / rate(http_requests_total{service="api"}[5m]) > 0.01
+        for: 5m
+        labels:
+          severity: page
+        annotations:
+          summary: "API 5xx 비율 1% 초과"
+          runbook: "https://internal/wiki/runbooks/api-high-error-rate"
+
+      - alert: ApiHighLatencyP95
+        expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{service="api"}[5m])) by (le)) > 0.35
+        for: 10m
+        labels:
+          severity: warning
+```
+
+알림은 많이 울리는 것이 목표가 아닙니다. 운영자가 실제로 행동할 수 있는 신호만 남기고, 모든 page 알림에 runbook 링크를 붙여 대응 시작 시간을 줄여야 합니다.
+
+### 블루그린/카나리 승격 절차 예시
+
+```bash
+# blue-green switch
+./scripts/deploy_blue.sh
+./scripts/smoke_test.sh https://blue.example.com
+./scripts/switch_traffic.sh --from green --to blue
+
+# canary rollout
+./scripts/deploy_canary.sh --percent 10
+./scripts/check_metrics.sh --window 5m
+./scripts/promote_canary.sh --to 50
+./scripts/promote_canary.sh --to 100
+```
+
+블루그린은 즉시 전환과 즉시 롤백에 유리하고, 카나리는 위험을 작게 나눠 검증하는 데 유리합니다. 서비스 특성과 팀 역량에 따라 전략을 고르되, 승격/철수 명령을 반드시 런북과 자동화 스크립트로 함께 유지해야 합니다.
+
+### 인시던트 대응 런북 예시
+
+```markdown
+# Runbook: API 5xx 급증
+
+## 0-5분
+1. SEV 판정 (SEV1/SEV2)
+2. incident 채널 개설
+3. 최근 배포 커밋 확인
+
+## 5-10분
+1. canary/최근 릴리스 롤백 시도
+2. 에러율, p95, DB 연결수 확인
+3. 고객 영향 범위 요약 공지
+
+## 10-20분
+1. 임시 완화 조치 적용
+2. 영구 수정 owner 지정
+3. postmortem 일정 예약
+```
+
+운영에서는 "잘 아는 사람"보다 "같은 순서를 따르는 팀"이 더 빠르게 복구합니다. 그래서 runbook은 설명 문서가 아니라 실행 문서여야 하며, 경보에서 한 번에 열 수 있어야 합니다.
+
 ## 처음 질문으로 돌아가기
 
 - **새벽 3시에 알림이 울리면 누가 무엇을 해야 할까요?**
@@ -437,5 +591,7 @@ oncall:
 - [PagerDuty Incident Response](https://response.pagerduty.com/)
 - [Atlassian Postmortem Template](https://www.atlassian.com/incident-management/postmortem/templates)
 - [Blameless Postmortems (Etsy)](https://www.etsy.com/codeascraft/blameless-postmortems/)
+
+- [이 시리즈의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/devops-101/ko)
 
 Tags: DevOps, Incident, OnCall, SRE, Postmortem

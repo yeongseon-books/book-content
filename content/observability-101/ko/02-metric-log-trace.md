@@ -115,6 +115,67 @@ process_payment(12345)
 ```
 
 이 코드를 실행하면 콘솔에 스팬 정보가 출력됩니다. 하나의 요청이 여러 구간으로 나뉘어지고, 각 구간의 시작과 끝이 기록됩니다. 나중에 느린 요청을 분석할 때 어느 스팬이 길었는지 한눈에 볼 수 있습니다.
+
+## PromQL로 메트릭 질의하기
+
+메트릭을 수집했다면 질의로 답을 뽑아야 합니다. Prometheus의 질의 언어인 PromQL은 시계열 데이터를 집계하고 필터링하는 핵심 도구입니다.
+
+```promql
+# 지난 5분간 초당 요청 수
+rate(http_requests_total{service="checkout-api"}[5m])
+
+# 에러율 (5xx 비율)
+sum(rate(http_requests_total{status=~"5.."}[5m]))
+  / sum(rate(http_requests_total[5m]))
+
+# p95 지연 시간 (히스토그램 기반)
+histogram_quantile(0.95,
+  sum(rate(http_request_duration_seconds_bucket{service="checkout-api"}[5m])) by (le)
+)
+
+# 서비스별 에러율 상위 5개
+topk(5,
+  sum(rate(http_requests_total{status=~"5.."}[5m])) by (service)
+  / sum(rate(http_requests_total[5m])) by (service)
+)
+```
+
+이 네 가지 질의가 운영에서 가장 자주 쓰이는 패턴입니다.
+
+- `rate()`: 카운터의 초당 변화율을 계산합니다. 원시 누적값보다 의미 있는 추세를 보여 줍니다.
+- `histogram_quantile()`: 히스토그램 버킷에서 백분위 수를 추정합니다. p95, p99 같은 꼬리 지연을 볼 때 필수입니다.
+- `topk()`: 가장 높은 값을 가진 시계열을 골라냅니다. 여러 서비스 중 문제가 큰 것부터 확인할 때 편리합니다.
+- `sum() by ()`: 라벨 기준으로 묶어 집계합니다. 서비스별, 경로별, 환경별 비교에 사용합니다.
+
+PromQL을 잘 쓰면 대시보드를 열지 않고도 CLI에서 바로 답을 얻을 수 있습니다. 다만 질의 대상이 되는 라벨이 지나치게 많으면 쿼리 성능이 급격히 떨어집니다. 라벨 설계는 9장(비용과 카디널리티)에서 더 자세히 다룹니다.
+
+## 카디널리티가 비용을 결정하는 이유
+
+메트릭 비용을 이해하려면 카디널리티를 먼저 알아야 합니다. 카디널리티는 라벨 조합이 만들어내는 고유 시계열 수입니다.
+
+```text
+http_requests_total{service="checkout", method="POST", status="200"}
+http_requests_total{service="checkout", method="POST", status="500"}
+http_requests_total{service="checkout", method="GET", status="200"}
+```
+
+위 예시에서 라벨 조합은 세 가지이므로 시계열도 세 개입니다. 문제는 라벨에 고유 식별자를 넣을 때 발생합니다.
+
+```text
+# 절대 하지 마세요
+http_requests_total{user_id="u-123456", ...}
+http_requests_total{user_id="u-123457", ...}
+# → 사용자 수만큼 시계열이 생깁니다
+```
+
+사용자 100만 명이면 시계열도 100만 개가 됩니다. Prometheus는 모든 활성 시계열을 메모리에 올려 두기 때문에, 카디널리티가 폭발하면 OOM(Out of Memory)으로 메트릭 시스템 자체가 죽습니다.
+
+안전한 라벨 설계 원칙은 간단합니다:
+
+1. 라벨 값은 유한 집합이어야 합니다 (HTTP method, status code, service name).
+2. 식별자(user_id, order_id, trace_id)는 라벨이 아닌 로그나 트레이스에 남깁니다.
+3. 새 라벨을 추가하기 전에 예상 시계열 수를 계산합니다: `기존 시계열 수 × 새 라벨 고유값 수`.
+
 ## 한눈에 보는 구조
 
 세 신호는 다른 질문에 답합니다. 전체 추세는 메트릭, 구체적 사건은 로그, 분산 경로는 트레이스로 봅니다. 한 신호만으로는 불완전합니다.
@@ -296,6 +357,16 @@ Expected output:
 
 시니어 엔지니어가 특히 먼저 보는 것은 경계입니다. 어떤 질문을 메트릭으로 풀고, 어떤 질문을 로그로 넘기고, 어떤 문제에만 트레이스를 깊게 쓰는지 합의가 있으면 시스템이 커져도 신호 설계가 덜 흔들립니다.
 
+특히 로그 볼륨이 폭증하는 팀일수록 신호 경계를 분명히 해야 합니다. 예를 들어 요청 건수는 메트릭으로 남기고, 요청 본문이나 응답 본문은 로그로 남기는 식으로 구분합니다. 이 구분이 없으면 로그 저장소에 모든 것이 쓰이고, 검색 시간이 길어지고, 월 비용이 예상치 못하게 늘어납니다.
+
+아래는 신호 경계를 정하는 실용적인 기준입니다.
+
+- **집계해도 의미 있는 숫자** → 메트릭으로 남깁니다.
+- **개별 사건의 맥락이 필요한 데이터** → 로그로 남깁니다.
+- **요청 경로와 구간별 소요 시간** → 트레이스로 남깁니다.
+- **어느 신호에도 맞지 않는 대용량 데이터** → 데이터 웨어하우스로 보냅니다 (별도 파이프라인).
+
+
 ## 체크리스트
 
 - [ ] 카운터, 게이지, 히스토그램의 차이를 설명할 수 있습니다.
@@ -408,5 +479,7 @@ write_log(
 - [Structured logging](https://www.datadoghq.com/blog/structured-logging/)
 - [OpenTelemetry traces](https://opentelemetry.io/docs/concepts/signals/traces/)
 - [Histograms vs averages](https://prometheus.io/docs/practices/histograms/)
+- [PromQL 공식 문서](https://prometheus.io/docs/prometheus/latest/querying/basics/)
+- [예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/observability-101/ko)
 
 Tags: Observability, Metrics, Logging, Tracing, SRE

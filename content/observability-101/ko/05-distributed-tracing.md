@@ -381,14 +381,130 @@ def consume_message(message: dict):
 
 추천 시작점은 "오류 100% + 지연 100% + 정상 5%"입니다. 이 조합이면 비용을 통제하면서도 장애 분석에 필요한 표본을 충분히 확보할 수 있습니다. 샘플링은 한 번 정하고 끝내는 설정이 아니라, 월별 트래픽과 장애 패턴에 맞춰 조정하는 운영 항목입니다.
 
+## W3C Trace Context 표준 상세
+
+분산 트레이싱의 상호 운용성은 W3C Trace Context 표준이 보장합니다. 이 표준은 두 개의 HTTP 헤더를 정의합니다.
+
+| 헤더 | 형식 | 예시 |
+| --- | --- | --- |
+| `traceparent` | `{version}-{trace-id}-{parent-id}-{trace-flags}` | `00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01` |
+| `tracestate` | 벤더별 키-값 쌍 | `congo=t61rcWkgMzE,rojo=00f067aa0ba902b7` |
+
+`traceparent`의 각 필드:
+
+- **version** (2자리): 현재 `00`으로 고정
+- **trace-id** (32자리 hex): 전체 요청을 식별하는 128비트 ID
+- **parent-id** (16자리 hex): 직전 스팬의 64비트 ID
+- **trace-flags** (2자리 hex): `01`이면 샘플링됨, `00`이면 샘플링되지 않음
+
+`tracestate`는 벤더별 추가 정보를 전달합니다. Datadog, Dynatrace 같은 상용 도구가 자체 상관 ID를 함께 실어 보낼 때 사용합니다. 표준을 지키는 한, 서비스가 서로 다른 트레이싱 백엔드를 써도 trace_id는 끊기지 않습니다.
+
+```python
+# traceparent 헤더 파싱 예시
+def parse_traceparent(header: str) -> dict:
+    parts = header.split("-")
+    return {
+        "version": parts[0],
+        "trace_id": parts[1],
+        "parent_id": parts[2],
+        "trace_flags": parts[3],
+        "sampled": parts[3] == "01",
+    }
+
+
+# 예시
+tp = parse_traceparent("00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01")
+# {"version": "00", "trace_id": "4bf92f...", "parent_id": "00f067...", "sampled": True}
+```
+
+## 비동기 문맥 전파
+
+Python의 `asyncio` 환경에서는 `contextvars`가 자동으로 코루틴 간 문맥을 전달합니다. 하지만 스레드 풀이나 프로세스 풀로 작업을 넘길 때는 명시적으로 문맥을 복사해야 합니다.
+
+```python
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
+from opentelemetry import context, trace
+
+tracer = trace.get_tracer("async-service")
+
+
+async def handle_request():
+    with tracer.start_as_current_span("async_handler"):
+        # asyncio.create_task는 contextvars를 자동 복사
+        task = asyncio.create_task(fetch_data())
+        await task
+
+
+async def fetch_data():
+    # 부모 span이 자동으로 연결됨
+    with tracer.start_as_current_span("fetch_data"):
+        await asyncio.sleep(0.1)
+
+
+def sync_work():
+    # ThreadPoolExecutor로 넘긴 작업에서는 명시적 전파 필요
+    with tracer.start_as_current_span("sync_work"):
+        pass
+
+
+async def dispatch_to_thread():
+    with tracer.start_as_current_span("dispatcher"):
+        ctx = context.get_current()
+        loop = asyncio.get_event_loop()
+        executor = ThreadPoolExecutor(max_workers=2)
+        # attach/detach로 스레드에 문맥 전달
+        await loop.run_in_executor(
+            executor,
+            lambda: context.attach(ctx) or sync_work()
+        )
+```
+
+주의할 점:
+
+1. **asyncio.create_task**: `contextvars`를 자동 복사하므로 추가 작업이 필요 없습니다.
+2. **ThreadPoolExecutor**: `context.get_current()`로 현재 문맥을 가져와 스레드 안에서 `context.attach()`해야 합니다.
+3. **ProcessPoolExecutor**: 프로세스 간에는 문맥이 전달되지 않습니다. 메시지에 `traceparent`를 직렬화해서 보내야 합니다.
+
+## 트레이스-로그-메트릭 연결
+
+트레이스만 단독으로 보면 "느렸다"는 사실은 알지만 "왜 느렸는지"는 놓칠 수 있습니다. 세 신호를 연결하면 원인을 빠르게 좁힐 수 있습니다.
+
+| 연결 방향 | 방법 | 효과 |
+| --- | --- | --- |
+| 트레이스 → 로그 | 로그에 `trace_id` 필드 포함 | 느린 스팬의 상세 맥락 확인 |
+| 트레이스 → 메트릭 | exemplar에 trace_id 첨부 | 히스토그램에서 느린 요청 클릭 시 트레이스로 이동 |
+| 메트릭 → 트레이스 | Grafana Tempo 연동 | 메트릭 대시보드에서 바로 트레이스 조회 |
+
+```python
+import structlog
+from opentelemetry import trace
+
+logger = structlog.get_logger()
+
+
+def process_order(order_id: str):
+    span = trace.get_current_span()
+    ctx = span.get_span_context()
+    # 로그에 trace_id를 자동 포함
+    log = logger.bind(
+        trace_id=format(ctx.trace_id, "032x"),
+        span_id=format(ctx.span_id, "016x"),
+    )
+    log.info("order_processing_start", order_id=order_id)
+    # ... 비즈니스 로직 ...
+    log.info("order_processing_end", order_id=order_id)
+```
+
+Grafana에서 Loki(로그)와 Tempo(트레이스)를 데이터 소스로 등록하면, 로그의 `trace_id` 필드를 클릭해 해당 트레이스 화면으로 바로 이동할 수 있습니다. 이 연결이 없으면 로그와 트레이스를 수동으로 대조해야 하므로 장애 대응 시간이 늘어납니다.
 ## 처음 질문으로 돌아가기
 
 - **스팬과 트레이스는 각각 무엇일까요?**
-  - 본문의 기준은 분산 트레이싱 기초를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 스팬은 하나의 작업 구간(함수 호출, DB 쿼리, HTTP 요청)을 기록하는 단위이고, 트레이스는 같은 trace_id를 공유하는 스팬들의 트리입니다. 루트 스팬이 요청의 시작이고, 자식 스팬들이 하위 호출입니다. Jaeger나 Tempo 화면에서 폭포수(waterfall) 형태로 보이는 것이 이 트리입니다.
 - **요청이 여러 서비스를 지날 때 문맥 전파는 왜 중요할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 문맥 전파가 없으면 각 서비스가 독립된 트레이스를 생성해 하나의 요청이 여러 조각으로 흩어집니다. W3C Trace Context 표준의 `traceparent` 헤더가 trace_id와 parent_span_id를 전달하므로, 수신 서비스가 같은 트리에 자신의 스팬을 붙일 수 있습니다.
 - **샘플링은 왜 비용 통제의 핵심일까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 트레이스 하나당 저장 비용은 수십 KB에서 수백 KB입니다. 하루 천만 요청이면 100% 저장 시 수 TB가 쌓입니다. 샘플링으로 정상 트래픽은 5%만 남기고, 오류와 지연은 100% 보존하면 비용을 90% 이상 줄이면서도 장애 분석 품질은 유지할 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -412,5 +528,6 @@ def consume_message(message: dict):
 - [W3C Trace Context](https://www.w3.org/TR/trace-context/)
 - [Jaeger architecture](https://www.jaegertracing.io/docs/latest/architecture/)
 - [Sampling strategies](https://opentelemetry.io/docs/concepts/sampling/)
+- [예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/observability-101/ko)
 
 Tags: Observability, Tracing, OpenTelemetry, SRE, Microservices

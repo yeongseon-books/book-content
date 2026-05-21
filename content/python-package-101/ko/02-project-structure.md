@@ -271,11 +271,251 @@ where = ["src"]
 
 다음 글에서는 **의존성 관리** — venv, pip, uv, requirements를 다룹니다.
 
-## 실전 패턴 추가: pyproject.toml, 빌드 명령, CI까지 한 번에 정리
+## pyproject.toml 심층 분석
 
-패키징은 파일 한두 개를 만드는 작업이 아니라, 메타데이터와 빌드 백엔드, 배포 검증을 같은 계약으로 묶는 작업입니다. `pyproject.toml`을 기준으로 로컬 빌드와 CI 검증 경로를 맞추면 릴리스 직전의 불일치를 크게 줄일 수 있습니다.
+`pyproject.toml`은 PEP 518(빌드 시스템 선언)과 PEP 621(프로젝트 메타데이터)의 결합입니다. 하나의 파일로 빌드 도구, 메타데이터, 도구 설정을 모두 관리합니다.
+
+### 전체 구조 맵
 
 ```toml
+# === 빌드 시스템 (PEP 518) ===
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+# === 프로젝트 메타데이터 (PEP 621) ===
+[project]
+name = "acme-utils"
+version = "0.1.0"
+description = "Internal utility library for Acme Corp"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "Platform Team", email = "platform@acme.dev"},
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Typing :: Typed",
+]
+dependencies = [
+    "httpx>=0.27,<0.29",
+    "pydantic>=2.5",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "ruff>=0.5",
+    "mypy>=1.10",
+    "build>=1.2",
+    "twine>=5.1",
+]
+docs = [
+    "mkdocs>=1.6",
+    "mkdocstrings[python]>=0.25",
+]
+
+[project.urls]
+Homepage = "https://github.com/acme/acme-utils"
+Documentation = "https://acme.github.io/acme-utils"
+Changelog = "https://github.com/acme/acme-utils/blob/main/CHANGELOG.md"
+
+[project.scripts]
+acme = "acme_utils.cli:main"
+
+# === 도구별 설정 ===
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.mypy]
+strict = true
+```
+
+### `[build-system]` 상세
+
+| 필드 | 역할 | 예시 |
+|---|---|---|
+| `requires` | 빌드에 필요한 패키지 목록 | `["setuptools>=68", "wheel"]` |
+| `build-backend` | 빌드 진입점 | `"setuptools.build_meta"` |
+| `backend-path` | 커스텀 백엔드 경로 (드문 경우) | `["."]` |
+
+`pip install .`을 실행하면 pip은 먼저 격리된 환경을 만들고, `requires`에 명시된 패키지를 설치한 뒤, `build-backend`가 가리키는 모듈의 `build_wheel()` 또는 `build_sdist()`를 호출합니다.
+
+### `[project]` 필수 필드 vs 선택 필드
+
+```text
+필수 (PyPI 업로드 시):
+├── name          # 배포 이름
+├── version       # 시맨틱 버전
+필수 (사실상):
+├── description   # 한 줄 설명
+├── requires-python
+권장:
+├── readme
+├── license
+├── authors
+├── classifiers
+├── dependencies
+선택:
+├── optional-dependencies
+├── urls
+├── scripts / gui-scripts
+├── entry-points
+```
+
+### 빌드 백엔드 비교
+
+| 백엔드 | 장점 | 단점 |
+|---|---|---|
+| setuptools | 생태계 최대, 레거시 호환 | 설정이 많을 수 있음 |
+| hatchling | 빠른 빌드, 간결한 설정 | 비교적 신생 |
+| flit-core | 매우 단순 | 기능이 적음 (C 확장 불가) |
+| maturin | Rust 확장 빌드 | Rust 전용 |
+| pdm-backend | pdm 생태계 통합 | 독자적 lock 방식 |
+
+```toml
+# hatchling 예시
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/acme_utils"]
+```
+
+```toml
+# flit-core 예시
+[build-system]
+requires = ["flit_core>=3.9,<4"]
+build-backend = "flit_core.buildapi"
+```
+
+## src layout이 import 착시를 막는 원리
+
+flat layout에서 테스트가 통과하지만 설치 후 실패하는 시나리오를 재현해 보겠습니다.
+
+```bash
+# flat layout 구조
+myproject/
+├── mylib/
+│   ├── __init__.py
+│   └── core.py
+├── tests/
+│   └── test_core.py
+└── pyproject.toml
+```
+
+```bash
+# 프로젝트 루트에서 pytest 실행
+cd myproject
+pytest tests/
+# PASSED - 현재 디렉터리의 mylib/을 직접 import
+
+# 다른 디렉터리에서 import 시도 (설치 안 한 상태)
+cd /tmp
+python -c "import mylib"
+# ModuleNotFoundError!
+```
+
+```bash
+# src layout 구조
+myproject/
+├── src/
+│   └── mylib/
+│       ├── __init__.py
+│       └── core.py
+├── tests/
+│   └── test_core.py
+└── pyproject.toml
+```
+
+```bash
+# 프로젝트 루트에서 pytest 실행 (설치 안 한 상태)
+cd myproject
+pytest tests/
+# ModuleNotFoundError - src/mylib/이 sys.path에 없음!
+# -> 반드시 pip install -e . 후 테스트해야 함
+```
+
+src layout은 "설치 없이 테스트 통과"라는 착시를 구조적으로 불가능하게 만듭니다. CI와 동일한 조건에서 항상 테스트를 실행하게 됩니다.
+
+## 실전 프로젝트 디렉터리 완전체
+
+```text
+acme-utils/
+├── src/
+│   └── acme_utils/
+│       ├── __init__.py          # __version__, public API
+│       ├── py.typed             # PEP 561 마커
+│       ├── core.py              # 핵심 비즈니스 로직
+│       ├── config.py            # 설정 로드
+│       ├── exceptions.py        # 커스텀 예외
+│       └── _internal.py         # 내부 전용 (_prefix)
+├── tests/
+│   ├── conftest.py              # 공용 fixture
+│   ├── test_core.py
+│   └── test_config.py
+├── docs/
+│   ├── index.md
+│   └── api.md
+├── pyproject.toml               # 단일 설정 파일
+├── README.md                    # PyPI 렌더링용
+├── CHANGELOG.md                 # 릴리스 기록
+├── LICENSE
+└── .github/
+    └── workflows/
+        └── ci.yml               # CI 파이프라인
+```
+
+### 각 파일의 역할
+
+| 파일 | 역할 |
+|---|---|
+| `py.typed` | 빈 파일. 이 패키지가 타입 힌트를 제공함을 선언 (PEP 561) |
+| `_internal.py` | `_` 접두사로 외부 사용 불가임을 명시 |
+| `conftest.py` | pytest가 자동 로드하는 fixture 모듈 |
+| `CHANGELOG.md` | 버전별 변경사항. Keep a Changelog 형식 권장 |
+
+## setup.py에서 pyproject.toml로의 마이그레이션
+
+레거시 프로젝트에서 모던 구조로 전환하는 단계별 절차입니다.
+
+### 마이그레이션 전 (레거시)
+
+```python
+# setup.py
+from setuptools import setup, find_packages
+
+setup(
+    name="acme-utils",
+    version="0.1.0",
+    packages=find_packages(),
+    install_requires=[
+        "httpx>=0.27",
+        "pydantic>=2.5",
+    ],
+    python_requires=">=3.10",
+)
+```
+
+### 마이그레이션 후 (모던)
+
+```toml
+# pyproject.toml - setup.py 내용을 그대로 옮김
 [build-system]
 requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
@@ -283,67 +523,224 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "acme-utils"
 version = "0.1.0"
-description = "Utility package for internal services"
-readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-  "httpx>=0.27,<0.29",
-]
-
-[project.optional-dependencies]
-dev = [
-  "pytest>=8.0",
-  "ruff>=0.5",
-  "mypy>=1.10",
-  "build>=1.2",
-  "twine>=5.1",
+    "httpx>=0.27",
+    "pydantic>=2.5",
 ]
 
 [tool.setuptools.packages.find]
 where = ["src"]
 ```
 
+### 마이그레이션 체크리스트
+
 ```bash
-python -m pip install -U pip
-python -m pip install -e ".[dev]"
+# 1. pyproject.toml 작성
+# 2. 소스를 src/ 아래로 이동
+mkdir -p src
+mv acme_utils src/
+
+# 3. setup.py 제거 (또는 shim으로 유지)
+# shim: 레거시 도구 호환용
+cat > setup.py << 'EOF'
+from setuptools import setup
+setup()
+EOF
+
+# 4. editable install 확인
+pip install -e .
+python -c "import acme_utils; print(acme_utils.__version__)"
+
+# 5. 테스트 통과 확인
+pytest
+
+# 6. 빌드 확인
 python -m build
 python -m twine check dist/*
 ```
 
+## GitHub Actions CI 연동
+
 ```yaml
-name: package-ci
+name: ci
 on:
   pull_request:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
-  verify:
+  test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-      - run: python -m pip install -U pip
+          python-version: ${{ matrix.python-version }}
       - run: python -m pip install -e ".[dev]"
-      - run: pytest -q
+      - run: pytest --cov=acme_utils --cov-report=term-missing
       - run: ruff check .
       - run: mypy src
       - run: python -m build
       - run: python -m twine check dist/*
 ```
 
-실무에서 중요한 포인트는 로컬과 CI가 같은 명령 세트를 사용하도록 고정하는 것입니다. 개발자가 로컬에서 `python -m build`를 통과시킨 산출물이 CI에서도 같은 방식으로 통과해야 릴리스 리스크가 줄어듭니다. 또한 `twine check`를 CI에 넣어 두면 README 렌더링 오류나 메타데이터 누락을 배포 전에 잡을 수 있습니다.
+이 워크플로우는 세 가지 Python 버전에서 lint, 타입 검사, 테스트, 빌드 검증을 모두 실행합니다. `pip install -e ".[dev]"`로 개발 의존성까지 한 번에 설치합니다.
+
+
+## pyproject.toml 동적 버전 관리
+
+버전을 `pyproject.toml`에 하드코딩하는 대신 동적으로 가져오는 패턴이 실무에서 자주 사용됩니다.
+
+### setuptools-scm: Git 태그에서 버전 추출
+
+```toml
+[build-system]
+requires = ["setuptools>=68", "setuptools-scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "acme-utils"
+dynamic = ["version"]
+
+[tool.setuptools_scm]
+write_to = "src/acme_utils/_version.py"
+```
+
+```bash
+git tag v0.1.0
+python -m build
+# 빌드 시 자동으로 0.1.0 버전이 설정됨
+```
+
+### hatchling의 동적 버전
+
+```toml
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "acme-utils"
+dynamic = ["version"]
+
+[tool.hatch.version]
+source = "vcs"
+```
+
+### __init__.py에서 버전 읽기 패턴
+
+```python
+# src/acme_utils/__init__.py
+try:
+    from ._version import __version__
+except ImportError:
+    __version__ = "0.0.0+unknown"
+```
+
+이 패턴을 사용하면 Git 태그가 버전의 단일 출처가 됩니다. `pyproject.toml`, `__init__.py`, Git 태그 세 곳의 버전이 항상 일치합니다.
+
+## 모노레포에서의 패키지 구조
+
+하나의 저장소에 여러 패키지를 두는 모노레포 구조도 실무에서 흔합니다.
+
+```text
+monorepo/
+├── packages/
+│   ├── acme-core/
+│   │   ├── src/acme_core/
+│   │   ├── tests/
+│   │   └── pyproject.toml
+│   ├── acme-auth/
+│   │   ├── src/acme_auth/
+│   │   ├── tests/
+│   │   └── pyproject.toml
+│   └── acme-cli/
+│       ├── src/acme_cli/
+│       ├── tests/
+│       └── pyproject.toml
+├── pyproject.toml              # 루트: 개발 도구 설정
+└── Makefile
+```
+
+```toml
+# packages/acme-auth/pyproject.toml
+[project]
+name = "acme-auth"
+dependencies = [
+    "acme-core",  # 같은 모노레포의 다른 패키지 참조
+]
+```
+
+```bash
+# 개발 시 모든 패키지를 editable로 설치
+pip install -e packages/acme-core
+pip install -e packages/acme-auth
+pip install -e packages/acme-cli
+```
+
+
+## EditorConfig와 개발 도구 설정 파일 배치
+
+프로젝트 루트에는 `pyproject.toml` 외에도 개발 경험을 일관되게 만드는 설정 파일이 필요합니다.
+
+```text
+acme-utils/
+├── .editorconfig           # 에디터 공통 설정
+├── .gitignore              # Git 무시 패턴
+├── .pre-commit-config.yaml # 커밋 전 자동 검사
+└── pyproject.toml          # 모든 Python 도구 설정 통합
+```
+
+```ini
+# .editorconfig
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+charset = utf-8
+indent_style = space
+indent_size = 4
+
+[*.{yml,yaml,toml}]
+indent_size = 2
+```
+
+```yaml
+# .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.5.5
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+```
+
+이 설정들은 팀원 간 코드 스타일 차이를 줄이고, 리뷰에서 형식 문제에 시간을 쓰지 않게 만듭니다.
+
 
 ## 처음 질문으로 돌아가기
 
 - **flat layout과 src layout은 무엇이 다를까요?**
-  - 본문의 기준은 프로젝트 구조 잡기 — src layout과 pyproject.toml를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - flat layout은 패키지 디렉터리가 프로젝트 루트에 바로 위치하여 설치 없이도 import됩니다. src layout은 패키지를 `src/` 아래에 두어 `pip install -e .` 없이는 import할 수 없게 만듭니다. 이 차이가 "로컬에서는 되는데 CI에서 실패" 문제를 구조적으로 방지합니다.
+
 - **`pyproject.toml`은 무엇이고 왜 `setup.py`를 대체할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - `pyproject.toml`은 PEP 518/621 표준으로, 선언적 TOML 파일 하나에 빌드 시스템과 메타데이터를 모두 담습니다. `setup.py`는 임의의 Python 코드를 실행할 수 있어 보안과 재현성 문제가 있었고, `pyproject.toml`은 정적 분석이 가능하고 도구 간 상호운용성을 보장합니다.
+
 - **`[build-system]`과 `[project]`에는 무엇이 들어갈까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - `[build-system]`은 빌드 도구(`requires`)와 진입점(`build-backend`)을 선언합니다. pip은 이 정보를 읽어 격리 환경에서 빌드합니다. `[project]`는 패키지 이름, 버전, 의존성, Python 요구 버전 등 메타데이터를 담으며, PyPI 페이지에 표시되는 정보의 원천입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -363,6 +760,7 @@ jobs:
 
 ## 참고 자료
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/python-package-101/ko)
 - [Python Packaging User Guide - Project Structure](https://packaging.python.org/en/latest/tutorials/packaging-projects/)
 - [PEP 621 - Storing project metadata in pyproject.toml](https://peps.python.org/pep-0621/)
 - [setuptools - src layout](https://setuptools.pypa.io/en/latest/userguide/package_discovery.html)

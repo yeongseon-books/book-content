@@ -22,6 +22,8 @@ last_reviewed: '2026-05-12'
 
 # Statistics 101 (6/10): 신뢰구간
 
+이 글은 Statistics 101 시리즈의 6번째 글입니다.
+
 통계 보고서에서 95% 신뢰구간이라는 표현은 자주 보이지만, 실제 의미는 자주 틀리게 읽힙니다. 많은 사람이 “이 구간 안에 참값이 있을 확률이 95%다”라고 이해하지만, 고전적 신뢰구간은 그런 문장을 직접 말하지 않습니다.
 
 신뢰구간은 개별 구간 하나의 확률보다, 그 구간을 만들어 내는 절차의 성질을 설명합니다. 이 차이를 분명히 이해해야 신뢰수준, 유의수준, 효과 해석을 섞지 않게 됩니다.
@@ -64,7 +66,7 @@ last_reviewed: '2026-05-12'
 - **t-분포**: 작은 표본에서 쓰는, 꼬리가 조금 더 두꺼운 분포입니다.
 - **Bootstrap**: 데이터를 재표집해 분포 가정 없이 구간을 만드는 방법입니다.
 
-## 신뢰수준별 z-값
+## 신뢰수준별 제트-값
 
 신뢰수준은 분석 목적과 위험 허용도에 따라 달라집니다. 아래 표는 정규분포를 가정할 때 자주 쓰이는 신뢰수준과 그에 대응하는 z-값입니다.
 
@@ -85,7 +87,7 @@ last_reviewed: '2026-05-12'
 
 표현이 덜 직관적으로 보일 수 있지만, 이쪽이 통계적으로 정확한 문장입니다.
 
-## 실습: 5단계 CI 구성
+## 실습: 5단계 신뢰구간 구성
 
 ### 1단계 — 표본을 준비한다
 
@@ -94,7 +96,7 @@ import numpy as np
 sample = np.random.normal(100, 20, size=64)
 ```
 
-### 2단계 — t 임계값을 구한다
+### 2단계 — 티 임계값을 구한다
 
 ```python
 from scipy import stats
@@ -123,7 +125,7 @@ print(f"95% CI: [{mean - moe:.2f}, {mean + moe:.2f}]")
 
 **예상 출력:** `95% CI: [95.xx, 104.xx]`처럼 추정값 주변의 범위가 출력됩니다.
 
-### 5단계 — bootstrap 구간과 비교한다
+### 5단계 — 부트스트랩 구간과 비교한다
 
 ```python
 from numpy.random import default_rng
@@ -136,7 +138,7 @@ print("Bootstrap CI:", np.percentile(boots, [2.5, 97.5]))
 
 정규 가정이 약한 상황에서는 bootstrap이 좋은 보완책이 됩니다.
 
-## Python scipy.stats로 신뢰구간 계산하기
+## 파이썬 사이파이 통계 모듈로 신뢰구간 계산하기
 
 scipy.stats의 `t.interval()`을 쓰면 자유도와 표본 통계량으로 신뢰구간을 직접 계산할 수 있습니다.
 
@@ -304,6 +306,210 @@ p-value: 0.01xx
 
 다음 글에서는 가설검정을 다룹니다. 차이가 있는지 없는지를 묻는 표준 절차가 어떻게 돌아가는지, 그리고 p-value와 효과 크기를 함께 읽어야 하는 이유를 이어서 보겠습니다.
 
+## 신뢰구간 실전 해석: 폭, 방향, 실행 기준
+
+신뢰구간은 단순히 유의/비유의로 나누기 위한 장치가 아닙니다. 구간의 폭과 방향이 실행 전략을 결정합니다.
+
+### 실무 해석 프레임
+
+1. 구간이 0을 넘는가: 방향 판단
+2. 구간 폭이 충분히 좁은가: 정밀도 판단
+3. 최소 실무 임계치(MDE)를 넘는가: 실행 가치 판단
+
+### 비율 차이 신뢰구간 예제
+
+```python
+import numpy as np
+from statsmodels.stats.proportion import confint_proportions_2indep
+
+nA, cA = 12000, 640
+nB, cB = 12000, 720
+
+ci_low, ci_high = confint_proportions_2indep(
+    count1=cB, nobs1=nB,
+    count2=cA, nobs2=nA,
+    method='wald'
+)
+
+lift = cB / nB - cA / nA
+print(f"차이: {lift:.4f}")
+print(f"95% 구간: [{ci_low:.4f}, {ci_high:.4f}]")
+```
+
+보고서에서는 “통계적으로 유의함”보다 “예상 개선 범위가 어느 정도인지”를 먼저 보여 주는 편이 의사결정에 더 직접적입니다.
+
+
+## 실무 확장 노트: 재현 가능한 분석 문서 만들기
+
+통계 글을 읽고 난 뒤 실제 업무에서 가장 먼저 부딪히는 문제는 "같은 분석을 다시 실행할 수 있는가"입니다. 재현 가능성이 없으면 숫자가 맞아도 신뢰를 얻기 어렵습니다. 그래서 통계 작업은 계산 코드뿐 아니라 입력 데이터 스냅샷, 버전, 시드, 가정 문장을 함께 남겨야 합니다.
+
+### 1) 입력 데이터 스냅샷 고정
+
+```python
+import pandas as pd
+from pathlib import Path
+
+raw = pd.read_csv('analysis_input.csv')
+Path('artifacts').mkdir(exist_ok=True)
+raw.to_parquet('artifacts/input_snapshot.parquet', index=False)
+print(raw.shape)
+```
+
+데이터 파이프라인이 바뀌면 같은 쿼리라도 다른 결과가 나올 수 있습니다. 그래서 분석 시점의 스냅샷을 남기는 습관이 중요합니다.
+
+### 2) 전처리 규칙 문서화
+
+```python
+import numpy as np
+
+def preprocess(df):
+    out = df.copy()
+    out = out.dropna(subset=['metric'])
+    out = out[(out['metric'] >= 0) & (out['metric'] <= out['metric'].quantile(0.999))]
+    out['segment'] = out['segment'].fillna('unknown')
+    return out
+```
+
+이상치 제거, 결측값 처리, 세그먼트 매핑은 결과를 크게 바꿉니다. 코드와 문서를 동시에 남겨야 이후 검토에서 혼선을 줄일 수 있습니다.
+
+### 3) 분포 진단 + 추정 + 검정을 한 화면에서 보고하기
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+x = np.random.default_rng(0).normal(100, 15, 600)
+y = np.random.default_rng(1).normal(103, 15, 600)
+
+fig, ax = plt.subplots(1, 2, figsize=(12, 4))
+ax[0].hist(x, bins=40, alpha=0.6, label='A')
+ax[0].hist(y, bins=40, alpha=0.6, label='B')
+ax[0].legend(); ax[0].set_title('분포 비교')
+
+ax[1].boxplot([x, y], labels=['A', 'B'])
+ax[1].set_title('사분위수 비교')
+plt.tight_layout(); plt.show()
+
+diff = y.mean() - x.mean()
+se = np.sqrt(x.var(ddof=1)/len(x) + y.var(ddof=1)/len(y))
+ci = (diff - 1.96*se, diff + 1.96*se)
+t, p = stats.ttest_ind(x, y, equal_var=False)
+print(f'diff={diff:.3f}, 95% CI={ci}, p={p:.4f}')
+```
+
+그래프와 수치를 분리하면 오해가 늘어납니다. 같은 섹션에서 함께 보여 주면 해석 품질이 올라갑니다.
+
+### 4) 효과 크기와 실행 기준 연결
+
+```python
+pooled = np.sqrt((x.var(ddof=1) + y.var(ddof=1)) / 2)
+cohens_d = (y.mean() - x.mean()) / pooled
+print(f"Cohen's d={cohens_d:.3f}")
+```
+
+p-value가 작아도 효과 크기가 매우 작다면 실행 우선순위가 낮을 수 있습니다. 반대로 p-value 경계선이더라도 효과 크기와 비용 구조가 유리하면 추가 실험으로 이어갈 가치가 있습니다.
+
+### 5) 결과 문장 표준화
+
+분석 결과는 다음 형식으로 정리하면 팀 의사결정이 빨라집니다.
+
+- 관찰 차이: 절대값과 상대값을 모두 표기합니다.
+- 불확실성: 95% 신뢰구간과 표본 수를 함께 표기합니다.
+- 유의성: 검정 방법과 p-value를 표기합니다.
+- 실행 판단: 배포/보류/추가실험 중 하나를 명시합니다.
+
+통계는 결국 팀의 공통 언어를 만드는 일입니다. 재현 가능한 분석 문서를 남기면 개인의 직관이 아니라 조직의 기준으로 의사결정을 반복할 수 있습니다.
+
+
+## 추가 메모: 검증 가능한 의사결정 문장
+
+분석 결과를 보고할 때는 "좋아 보입니다" 같은 모호한 문장을 피하고, 기준과 근거를 한 줄에 함께 적는 것이 좋습니다. 예를 들어 "전환율 +0.6%p, 95% 신뢰구간 +0.1~+1.1%p, p=0.014, 월간 기대효과 +320건, 2주 재검증 조건부 배포"처럼 쓰면 의사결정 책임이 명확해집니다. 이런 형식은 통계 도구가 바뀌어도 유지되는 팀 자산입니다.
+
+
+## 실무 확장 노트: 재현 가능한 분석 문서 만들기
+
+통계 글을 읽고 난 뒤 실제 업무에서 가장 먼저 부딪히는 문제는 "같은 분석을 다시 실행할 수 있는가"입니다. 재현 가능성이 없으면 숫자가 맞아도 신뢰를 얻기 어렵습니다. 그래서 통계 작업은 계산 코드뿐 아니라 입력 데이터 스냅샷, 버전, 시드, 가정 문장을 함께 남겨야 합니다.
+
+### 1) 입력 데이터 스냅샷 고정
+
+```python
+import pandas as pd
+from pathlib import Path
+
+raw = pd.read_csv('analysis_input.csv')
+Path('artifacts').mkdir(exist_ok=True)
+raw.to_parquet('artifacts/input_snapshot.parquet', index=False)
+print(raw.shape)
+```
+
+데이터 파이프라인이 바뀌면 같은 쿼리라도 다른 결과가 나올 수 있습니다. 그래서 분석 시점의 스냅샷을 남기는 습관이 중요합니다.
+
+### 2) 전처리 규칙 문서화
+
+```python
+import numpy as np
+
+def preprocess(df):
+    out = df.copy()
+    out = out.dropna(subset=['metric'])
+    out = out[(out['metric'] >= 0) & (out['metric'] <= out['metric'].quantile(0.999))]
+    out['segment'] = out['segment'].fillna('unknown')
+    return out
+```
+
+이상치 제거, 결측값 처리, 세그먼트 매핑은 결과를 크게 바꿉니다. 코드와 문서를 동시에 남겨야 이후 검토에서 혼선을 줄일 수 있습니다.
+
+### 3) 분포 진단 + 추정 + 검정을 한 화면에서 보고하기
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+x = np.random.default_rng(0).normal(100, 15, 600)
+y = np.random.default_rng(1).normal(103, 15, 600)
+
+fig, ax = plt.subplots(1, 2, figsize=(12, 4))
+ax[0].hist(x, bins=40, alpha=0.6, label='A')
+ax[0].hist(y, bins=40, alpha=0.6, label='B')
+ax[0].legend(); ax[0].set_title('분포 비교')
+
+ax[1].boxplot([x, y], labels=['A', 'B'])
+ax[1].set_title('사분위수 비교')
+plt.tight_layout(); plt.show()
+
+diff = y.mean() - x.mean()
+se = np.sqrt(x.var(ddof=1)/len(x) + y.var(ddof=1)/len(y))
+ci = (diff - 1.96*se, diff + 1.96*se)
+t, p = stats.ttest_ind(x, y, equal_var=False)
+print(f'diff={diff:.3f}, 95% CI={ci}, p={p:.4f}')
+```
+
+그래프와 수치를 분리하면 오해가 늘어납니다. 같은 섹션에서 함께 보여 주면 해석 품질이 올라갑니다.
+
+### 4) 효과 크기와 실행 기준 연결
+
+```python
+pooled = np.sqrt((x.var(ddof=1) + y.var(ddof=1)) / 2)
+cohens_d = (y.mean() - x.mean()) / pooled
+print(f"Cohen's d={cohens_d:.3f}")
+```
+
+p-value가 작아도 효과 크기가 매우 작다면 실행 우선순위가 낮을 수 있습니다. 반대로 p-value 경계선이더라도 효과 크기와 비용 구조가 유리하면 추가 실험으로 이어갈 가치가 있습니다.
+
+### 5) 결과 문장 표준화
+
+분석 결과는 다음 형식으로 정리하면 팀 의사결정이 빨라집니다.
+
+- 관찰 차이: 절대값과 상대값을 모두 표기합니다.
+- 불확실성: 95% 신뢰구간과 표본 수를 함께 표기합니다.
+- 유의성: 검정 방법과 p-value를 표기합니다.
+- 실행 판단: 배포/보류/추가실험 중 하나를 명시합니다.
+
+통계는 결국 팀의 공통 언어를 만드는 일입니다. 재현 가능한 분석 문서를 남기면 개인의 직관이 아니라 조직의 기준으로 의사결정을 반복할 수 있습니다.
+
+
 ## 처음 질문으로 돌아가기
 
 - **95% 신뢰구간은 정확히 무엇을 뜻할까요?**
@@ -335,5 +541,8 @@ p-value: 0.01xx
 - [BMJ — Common Misconceptions of Confidence Intervals](https://www.bmj.com/content/322/7280/226)
 - [Khan Academy — Confidence Intervals](https://www.khanacademy.org/math/statistics-probability/confidence-intervals-one-sample)
 - [Wikipedia — Bootstrap](https://en.wikipedia.org/wiki/Bootstrapping_%28statistics%29)
+
+
+- [이 시리즈의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/statistics-101/ko)
 
 Tags: Statistics, ConfidenceInterval, Inference, Uncertainty, Beginner

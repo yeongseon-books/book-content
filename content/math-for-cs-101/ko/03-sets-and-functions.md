@@ -397,6 +397,72 @@ print(is_injective(m), is_surjective(m, {1,2,3}))
 
 데이터베이스 조인 결과나 검색 인덱스 매핑은 종종 하나의 입력이 여러 출력을 가집니다. 이는 함수가 아니라 관계입니다. 관계를 함수처럼 가정하면 캐시, 테스트, 역변환에서 문제가 생깁니다. 집합과 함수를 배운다는 것은 결국 모델의 성질을 잘못 가정하지 않는 훈련입니다.
 
+
+### 집합 연산 기호 정리표
+
+수학 기호와 Python 연산자를 나란히 보면 개념이 더 또렷해집니다.
+
+| 수학 기호 | 이름 | Python | 의미 |
+| --- | --- | --- | --- |
+| A ∪ B | 합집합 | `a \| b` | 둘 중 하나에라도 속하는 원소 |
+| A ∩ B | 교집합 | `a & b` | 양쪽 모두에 속하는 원소 |
+| A ∖ B | 차집합 | `a - b` | A에만 속하고 B에는 없는 원소 |
+| A ⊕ B | 대칭차 | `a ^ b` | 양쪽 중 한쪽에만 속하는 원소 |
+| A ⊆ B | 부분집합 | `a <= b` | A의 모든 원소가 B에 포함됨 |
+| A ⊂ B | 진부분집합 | `a < b` | A ⊆ B이고 A ≠ B |
+| x ∈ A | 원소 | `x in a` | x가 A에 속함 |
+| |A| | 기수 | `len(a)` | A의 원소 수 |
+| ∅ | 공집합 | `set()` | 원소가 없는 집합 |
+| P(A) | 멱집합 | 아래 코드 참조 | A의 모든 부분집합의 집합 |
+
+### 멱집합과 기수
+
+멱집합(power set)은 집합 A의 모든 부분집합을 원소로 갖는 집합입니다. |A| = n이면 |P(A)| = 2ⁿ입니다. 이 개념은 조합론과 직결되며, 시스템 설정의 가능한 조합 수를 계산할 때 자주 등장합니다.
+
+```python
+from itertools import combinations
+
+def power_set(s: set) -> list:
+    items = list(s)
+    result = []
+    for r in range(len(items) + 1):
+        for combo in combinations(items, r):
+            result.append(set(combo))
+    return result
+
+features = {"cache", "retry", "logging"}
+all_configs = power_set(features)
+print(f"feature flags: {len(features)} -> configurations: {len(all_configs)}")  # 3 -> 8
+```
+
+설정 플래그가 3개면 조합은 8가지, 10개면 1,024가지입니다. 멱집합의 기수 성장을 이해하면 feature flag 폭발이 테스트 비용을 어떻게 높이는지 정량적으로 설명할 수 있습니다.
+
+### 집합 연산으로 데이터 검증 파이프라인 만들기
+
+실무에서 집합 연산이 가장 빛나는 장면은 데이터 검증입니다.
+
+```python
+def validate_schema(required: set, optional: set, actual: set) -> dict:
+    missing = required - actual
+    unexpected = actual - (required | optional)
+    recognized = actual & (required | optional)
+    return {
+        "valid": len(missing) == 0 and len(unexpected) == 0,
+        "missing": missing,
+        "unexpected": unexpected,
+        "recognized": recognized,
+    }
+
+required_fields = {"id", "name", "email"}
+optional_fields = {"phone", "address"}
+actual_fields = {"id", "name", "email", "nickname"}
+
+result = validate_schema(required_fields, optional_fields, actual_fields)
+print(result)
+# {'valid': False, 'missing': set(), 'unexpected': {'nickname'}, 'recognized': {'id', 'name', 'email'}}
+```
+
+이 패턴은 API 요청 검증, CSV 컨럼 확인, 환경변수 체크 등 다양한 맥락에 그대로 재사용할 수 있습니다. 리스트 기반 검증보다 의도가 더 똑령하고 성능도 O(1) 룩업으로 아낌없이 맞습니다.
 ## 처음 질문으로 돌아가기
 
 - **집합은 왜 자료구조와 데이터 모델의 기초라고 할까요?**
@@ -429,5 +495,6 @@ print(is_injective(m), is_surjective(m, {1,2,3}))
 - [Discrete Math - Rosen](https://en.wikipedia.org/wiki/Discrete_Mathematics_and_Its_Applications)
 - [Python Set Operations](https://docs.python.org/3/tutorial/datastructures.html#sets)
 - [SymPy GitHub repository](https://github.com/sympy/sympy)
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/math-for-cs-101/ko)
 
 Tags: Math, Sets, Functions, Foundations, Beginner

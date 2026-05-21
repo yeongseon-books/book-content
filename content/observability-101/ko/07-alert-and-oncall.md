@@ -384,14 +384,131 @@ receivers:
 
 오경보 비율이 높으면 규칙이 민감한 것이고, MTTA가 높으면 라우팅이나 승격 체계가 약한 것입니다. 지표를 경보 시스템 자체의 SLO로 관리하면 장기적으로 온콜 피로가 줄어듭니다.
 
+## Multi-Window Burn Rate 경보
+
+SLO 기반 경보의 핵심은 에러 버짯 소진 속도를 감지하는 것입니다. 단순히 "에러율 > 5%"보다 "에러 버짯이 예상보다 14배 빠르게 소진되고 있다"가 더 정확한 신호입니다.
+
+```yaml
+groups:
+  - name: slo-burn-rate
+    rules:
+      # 빠른 번 (1시간 창): burn rate 14x → 즉시 호출
+      - alert: SLOBurnRateFast
+        expr: |
+          (
+            sum(rate(http_requests_total{status=~"5..",service="checkout"}[1h]))
+            / sum(rate(http_requests_total{service="checkout"}[1h]))
+          ) > (14 * 0.001)
+        for: 2m
+        labels:
+          severity: page
+        annotations:
+          summary: "checkout SLO burn rate 14x (1h window)"
+          runbook: "https://wiki/runbook/slo-burn"
+
+      # 느린 번 (6시간 창): burn rate 6x → 티켓
+      - alert: SLOBurnRateSlow
+        expr: |
+          (
+            sum(rate(http_requests_total{status=~"5..",service="checkout"}[6h]))
+            / sum(rate(http_requests_total{service="checkout"}[6h]))
+          ) > (6 * 0.001)
+        for: 30m
+        labels:
+          severity: ticket
+        annotations:
+          summary: "checkout SLO burn rate 6x (6h window)"
+```
+
+Multi-window 접근의 핵심:
+
+| 창 크기 | Burn rate 임계 | 의미 | 대응 |
+| --- | --- | --- | --- |
+| 1시간 | 14x | 30일 버짯이 2일 만에 소진 | 즉시 호출 (page) |
+| 6시간 | 6x | 30일 버짯이 5일 만에 소진 | 업무 시간 대응 (ticket) |
+| 3일 | 1x | 소진 속도 정상 | 모니터링만 |
+
+이 방식이 단순 임계값보다 나은 이유는, SLO와 직접 연결되므로 "이 경보가 왜 중요한가"를 비즈니스 언어로 설명할 수 있기 때문입니다.
+
+## 사고 대응 타임라인 예시
+
+경보가 울린 뒤 실제 대응 흐름을 시간순으로 정리하면 아래와 같습니다.
+
+```text
+T+0m   PagerDuty 경보 수신 (SLOBurnRateFast)
+T+2m   1차 온콜 확인, Grafana 대시보드 접속
+T+5m   결제 API /checkout 엔드포인트 5xx 집중 확인
+T+7m   Loki 로그에서 "connection pool exhausted" 확인
+T+10m  DB connection limit 50 → 100 임시 증가
+T+12m  에러율 정상 복귀 확인
+T+15m  Slack #incidents 에 상황 요약 공유
+T+30m  근본 원인 조사 시작 (connection leak 의심)
+T+2h   핑스 배포, connection pool 원래값 복구
+T+24h  포스트모템 작성 완료
+```
+
+이 타임라인에서 중요한 점은 세 가지입니다:
+
+1. **T+2m 안에 인지**: MTTA가 2분 이내면 승격 정책이 잘 작동하는 것입니다.
+2. **T+10m에 완화 조치**: 근본 원인이 아니라도 사용자 영향을 먼저 멈추는 것이 우선입니다.
+3. **T+24h 포스트모템**: 같은 장애가 반복되지 않도록 근본 원인과 재발 방지를 기록합니다.
+
+## 경보 규칙 테스트 자동화
+
+경보 규칙도 코드와 마찬가지로 테스트할 수 있습니다. Prometheus는 `promtool`로 룰 테스트를 지원합니다.
+
+```yaml
+# tests/alert_rules_test.yaml
+rule_files:
+  - ../rules/api_alerts.yaml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'http_requests_total{status="500",service="checkout"}'
+        values: "0+10x20"  # 1분마다 10씩 증가, 20분 동안
+      - series: 'http_requests_total{status="200",service="checkout"}'
+        values: "0+100x20"
+    alert_rule_test:
+      - eval_time: 15m
+        alertname: HighErrorRate
+        exp_alerts:
+          - exp_labels:
+              severity: page
+            exp_annotations:
+              summary: "5xx > 5% for 10m"
+```
+
+```bash
+# CI에서 실행
+promtool test rules tests/alert_rules_test.yaml
+```
+
+이 테스트는 "에러율이 10%일 때 15분 시점에 HighErrorRate가 발화하는가"를 검증합니다. CI에 포함하면 규칙 변경 시 오경보를 미리 방지할 수 있습니다.
+
+## 경보 이력 관리
+
+경보 이력을 기록하면 패턴을 발견할 수 있습니다. 매주 경보 리뷰에서 확인할 항목:
+
+| 항목 | 목표 | 초과 시 조치 |
+| --- | --- | --- |
+| 주간 page 경보 건수 | ≤ 5건 | 규칙 튜닝 또는 자동화 검토 |
+| 오경보 비율 | ≤ 20% | for 조정, 임계값 재검토 |
+| Runbook 마리 비율 | 0% | 새 경보 승인 전 runbook 필수 |
+| MTTA | ≤ 5분 | 라우팅/승격 점검 |
+| MTTR | ≤ 1시간 (P1) | 런북 개선, 자동 복구 검토 |
+
+이 지표를 Grafana 대시보드로 시각화하면 경보 시스템 자체의 건강도를 보는 메타 대시보드가 됩니다. "경보 시스템을 관측하는 경보"가 있어야 운영 성숙도가 높아집니다.
 ## 처음 질문으로 돌아가기
 
 - **새벽에 사람을 깨울 만한 경보는 어떤 조건을 가져야 할까요?**
-  - 본문의 기준은 경보와 온콜를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 세 가지 조건을 모두 만족해야 합니다. (1) 사용자 영향이 진행 중일 것, (2) 즐시 조치하지 않으면 피해가 커질 것, (3) 자동 복구가 불가능할 것. 이 세 가지 중 하나라도 빠지면 ticket 등급으로 낮춰야 합니다.
 - **경보 피로는 왜 생기고 어떻게 줄일 수 있을까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 피로는 낮은 신뢰도에서 시작됩니다. 오경보가 쟦이면 사람은 경보 자체를 무시합니다. 해결책은 grouping, inhibition, silencing으로 중복을 줄이고, `for` 지속 시간으로 순간 튀을 걸러내며, 주간 오경보 비율을 리뷰하는 것입니다.
 - **증상 경보와 원인 경보는 어떻게 다를까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 증상 경보는 "사용자가 겪는 문제"를 감지합니다(5xx 급증, 지연 상승). 원인 경보는 "시스템 내부 상태"를 감지합니다(CPU 95%, 디스크 90%). 새벽 호출은 증상 경보 중심으로, 원인 경보는 드릴다운과 티켓용으로 분리합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -415,5 +532,6 @@ receivers:
 - [Prometheus alerting rules](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/)
 - [Alertmanager docs](https://prometheus.io/docs/alerting/latest/alertmanager/)
 - [On-call principles](https://increment.com/on-call/when-the-pager-goes-off/)
+- [예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/observability-101/ko)
 
 Tags: Observability, Alerting, SRE, OnCall, Monitoring

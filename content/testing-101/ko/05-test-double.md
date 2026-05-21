@@ -22,6 +22,8 @@ last_reviewed: '2026-05-12'
 
 # Testing 101 (5/10): 테스트 더블
 
+이 글은 Testing 101 시리즈의 다섯 번째 글입니다.
+
 단위 테스트를 쓰다 보면 곧 외부 의존과 마주칩니다. 메일 전송, 결제 API, 현재 시간, 데이터베이스처럼 실제로 호출하면 느리거나 비싸거나 불안정한 대상들입니다. 이런 의존을 매번 진짜로 호출하면 테스트가 느려지고, 실패 원인도 코드가 아니라 외부 환경으로 번집니다.
 
 그래서 테스트에서는 실제 의존 대신 대역을 씁니다. 다만 대역도 하나로 뭉뚱그리면 금방 헷갈립니다. 반환값만 흉내 내는 경우와 호출 자체를 기록하는 경우는 목적이 다르기 때문입니다.
@@ -151,7 +153,7 @@ class InMemoryUserRepo:
     def find(self, id): return self._db.get(id)
 ```
 
-## Python unittest.mock으로 보는 상세 예시
+## 파이썬 유닛테스트 목으로 보는 상세 예시
 
 ### Spy 상세 예시 — 호출 기록과 결과 검증
 
@@ -268,7 +270,7 @@ def test_user_registration_with_fake_repo():
 
 Spy를 쓸 때 호출 횟수만 보고 실제 결과를 확인하지 않는 문제도 자주 보입니다. 상호작용만 맞고 최종 결과가 틀릴 수 있으므로, 가능하면 결과 검증도 함께 고려해야 합니다.
 
-## 과한 Mock 사용이 보내는 신호
+## 과한 목 객체 사용이 보내는 신호
 
 Mock은 강력하지만 남용하면 테스트가 구현에 과하게 결합됩니다. 다음 징후가 보이면 Mock 사용을 재검토해야 합니다.
 
@@ -311,6 +313,84 @@ real_repo.find(1)  # User 객체 반환, dict 아님
 ```
 
 Mock과 실제 구현의 계약이 달라지면 통합 환경에서만 문제가 발견됩니다. Fake나 Contract Test로 보완해야 합니다.
+## 현업 확장 노트: 계층별 검증을 연결하는 방법
+
+이 장의 핵심 개념을 팀 운영에 연결하려면, 테스트를 단독 문서가 아니라 저장소 규약으로 관리해야 합니다. 가장 많이 쓰는 방식은 테스트 디렉터리를 계층으로 분리하고, 각 계층의 실행 시점과 실패 기준을 명시하는 것입니다.
+
+```text
+tests/
+├─ unit/
+├─ integration/
+├─ e2e/
+└─ contracts/
+```
+
+이 구조를 도입하면 PR 단계에서는 unit과 일부 integration만 빠르게 실행하고, 병합 전이나 야간 빌드에서는 더 넓은 범위를 실행하는 운영이 가능합니다. "모든 테스트를 매번 전부"보다 "위험에 맞게 계층별로"가 훨씬 현실적입니다.
+
+```yaml
+name: test-pipeline
+on:
+  pull_request:
+  schedule:
+    - cron: '0 17 * * *'
+
+jobs:
+  fast-feedback:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements-dev.txt
+      - run: pytest tests/unit tests/integration -q --maxfail=1
+
+  nightly-full:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements-dev.txt
+      - run: pytest -q
+```
+
+또한 `unittest.mock`과 fixture를 함께 쓰면 테스트 의도를 더 분명히 드러낼 수 있습니다. fixture는 "무엇을 준비했는가"를, mock 검증은 "어떤 상호작용이 일어났는가"를 표현합니다.
+
+```python
+import pytest
+from unittest.mock import Mock
+
+@pytest.fixture
+def notifier_mock():
+    return Mock()
+
+def test_notify_on_success(notifier_mock):
+    service = JobService(notifier=notifier_mock)
+    service.run(job_id='job-1')
+    notifier_mock.send.assert_called_once()
+```
+
+마지막으로 커버리지는 목표치 자체보다 누락 영역의 성격을 함께 봐야 합니다. 예를 들어 유틸리티 파일 60%보다 결제 도메인 82%가 더 위험할 수 있습니다. 따라서 커버리지 리포트를 읽을 때는 반드시 "이 파일이 실패하면 비즈니스 영향이 큰가"를 함께 판단해야 합니다.
+
+```bash
+pytest --cov=src --cov-report=term-missing
+```
+
+```text
+Name                        Stmts   Miss  Cover
+-----------------------------------------------
+src/domain/payment.py          96     14    85%
+src/domain/refund.py           64      4    94%
+src/utils/text.py              21      5    76%
+-----------------------------------------------
+TOTAL                          181    23    87%
+```
+
+이런 리포트에서는 `payment.py`의 누락 분기를 먼저 메우는 것이 합리적입니다. 테스트는 숫자를 맞추는 운동이 아니라, 고장 났을 때 손실이 큰 경로를 먼저 보호하는 엔지니어링 작업이기 때문입니다.
+
 ## 직접 검증해 볼 것
 
 1. `FakeMailer`가 실제 메일러와 같은 입력 계약을 지키는지 확인합니다. 메서드 이름이나 인자 모양이 다르면 테스트에서만 통과하는 가짜 안정감이 생깁니다.
@@ -318,6 +398,56 @@ Mock과 실제 구현의 계약이 달라지면 통합 환경에서만 문제가
 3. Spy나 Mock을 쓸 때는 호출 횟수만 보지 말고 최종 결과도 함께 점검합니다. 상호작용만 맞고 상태가 틀리는 경우가 실제로 자주 나옵니다.
 
 **예상 결과:** 대역을 써도 테스트 목적이 더 또렷해지고, 실제 의존을 붙였을 때보다 실행 시간이 눈에 띄게 짧아져야 합니다.
+
+## 심화 실습: 운영 관점 테스트 점검
+
+실무에서 테스트를 확장할 때 가장 먼저 해야 할 일은 실패 원인을 사람이 추측하지 않도록 로그와 단언문을 정리하는 것입니다. 테스트 실패 메시지에는 입력값, 기대값, 실제값이 함께 남아야 하며, 그래야 CI 로그만으로도 원인을 좁힐 수 있습니다.
+
+또한 테스트는 코드와 함께 진화해야 합니다. 기능이 바뀌었는데 테스트가 그대로라면 테스트는 안전장치가 아니라 오경보 장치가 됩니다. 그래서 팀에서는 요구사항 변경 PR에 테스트 변경이 함께 포함되는지를 리뷰 기준으로 두는 편이 좋습니다.
+
+fixture는 단순 편의 기능이 아니라 설계 도구입니다. 어떤 객체를 기본 상태로 두는지, 어떤 상태 변형을 허용하는지 fixture 레이어에서 명확히 정의하면 테스트 의도가 깔끔해집니다. 특히 도메인 객체가 복잡할수록 fixture 설계 품질이 테스트 유지보수 비용을 좌우합니다.
+
+회귀 버그를 줄이려면 버그 티켓이 닫힐 때 반드시 재현 테스트를 남겨야 합니다. 수정 코드만 머지하면 같은 원인의 버그가 다른 경로에서 재발합니다. 반대로 재현 테스트를 함께 남기면 팀 지식이 실행 가능한 형태로 축적됩니다.
+
+커버리지 리포트는 주간 회고에서 매우 유용합니다. 숫자만 보는 대신 누락 라인이 핵심 도메인인지 확인하고, 다음 스프린트에서 보강할 테스트를 합의하면 테스트 투자가 산발적으로 흩어지지 않습니다.
+
+CI에서는 실패를 빠르게 보여 주는 순서가 중요합니다. 일반적으로 단위 테스트를 먼저 실행하고, 그 다음 통합 테스트, 마지막으로 느린 E2E를 배치하면 평균 피드백 시간이 줄어듭니다. 파이프라인 설계도 테스트 전략의 일부로 다루어야 합니다.
+
+실무에서 테스트를 확장할 때 가장 먼저 해야 할 일은 실패 원인을 사람이 추측하지 않도록 로그와 단언문을 정리하는 것입니다. 테스트 실패 메시지에는 입력값, 기대값, 실제값이 함께 남아야 하며, 그래야 CI 로그만으로도 원인을 좁힐 수 있습니다.
+
+또한 테스트는 코드와 함께 진화해야 합니다. 기능이 바뀌었는데 테스트가 그대로라면 테스트는 안전장치가 아니라 오경보 장치가 됩니다. 그래서 팀에서는 요구사항 변경 PR에 테스트 변경이 함께 포함되는지를 리뷰 기준으로 두는 편이 좋습니다.
+
+fixture는 단순 편의 기능이 아니라 설계 도구입니다. 어떤 객체를 기본 상태로 두는지, 어떤 상태 변형을 허용하는지 fixture 레이어에서 명확히 정의하면 테스트 의도가 깔끔해집니다. 특히 도메인 객체가 복잡할수록 fixture 설계 품질이 테스트 유지보수 비용을 좌우합니다.
+
+회귀 버그를 줄이려면 버그 티켓이 닫힐 때 반드시 재현 테스트를 남겨야 합니다. 수정 코드만 머지하면 같은 원인의 버그가 다른 경로에서 재발합니다. 반대로 재현 테스트를 함께 남기면 팀 지식이 실행 가능한 형태로 축적됩니다.
+
+커버리지 리포트는 주간 회고에서 매우 유용합니다. 숫자만 보는 대신 누락 라인이 핵심 도메인인지 확인하고, 다음 스프린트에서 보강할 테스트를 합의하면 테스트 투자가 산발적으로 흩어지지 않습니다.
+
+CI에서는 실패를 빠르게 보여 주는 순서가 중요합니다. 일반적으로 단위 테스트를 먼저 실행하고, 그 다음 통합 테스트, 마지막으로 느린 E2E를 배치하면 평균 피드백 시간이 줄어듭니다. 파이프라인 설계도 테스트 전략의 일부로 다루어야 합니다.
+
+실무에서 테스트를 확장할 때 가장 먼저 해야 할 일은 실패 원인을 사람이 추측하지 않도록 로그와 단언문을 정리하는 것입니다. 테스트 실패 메시지에는 입력값, 기대값, 실제값이 함께 남아야 하며, 그래야 CI 로그만으로도 원인을 좁힐 수 있습니다.
+
+또한 테스트는 코드와 함께 진화해야 합니다. 기능이 바뀌었는데 테스트가 그대로라면 테스트는 안전장치가 아니라 오경보 장치가 됩니다. 그래서 팀에서는 요구사항 변경 PR에 테스트 변경이 함께 포함되는지를 리뷰 기준으로 두는 편이 좋습니다.
+
+fixture는 단순 편의 기능이 아니라 설계 도구입니다. 어떤 객체를 기본 상태로 두는지, 어떤 상태 변형을 허용하는지 fixture 레이어에서 명확히 정의하면 테스트 의도가 깔끔해집니다. 특히 도메인 객체가 복잡할수록 fixture 설계 품질이 테스트 유지보수 비용을 좌우합니다.
+
+```python
+from unittest.mock import patch
+
+def test_payment_service_retries_once_on_timeout():
+    service = PaymentService()
+    with patch('src.payment.client.charge') as charge:
+        charge.side_effect = [TimeoutError(), {'status': 'ok'}]
+        result = service.pay(user_id='u-1', amount=10000)
+
+    assert result['status'] == 'ok'
+    assert charge.call_count == 2
+```
+
+```bash
+pytest -q --maxfail=1 --disable-warnings
+pytest --cov=src --cov-report=term-missing
+```
 
 ## 실패 신호와 첫 점검
 
@@ -394,6 +524,7 @@ Mock이 과하게 필요하면 의존성 주입, 인터페이스 분리, 책임 
 
 ## 참고 자료
 
+- 실습 예제 저장소(book-examples): https://github.com/yeongseon-books/book-examples/tree/main/testing-101/ko
 - [Martin Fowler — Test Double](https://martinfowler.com/bliki/TestDouble.html)
 - [Meszaros — xUnit Test Patterns](http://xunitpatterns.com/Test%20Double.html)
 - [unittest.mock docs](https://docs.python.org/3/library/unittest.mock.html)

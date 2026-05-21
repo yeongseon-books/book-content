@@ -249,63 +249,270 @@ jobs:
 
 이 정리만 되어도 새 환경으로 옮길 때 배포 속도가 크게 올라가고, 장애 원인 추적도 쉬워집니다.
 
-### 품질 점검 기록 예시(반복 가능한 운영 습관)
+### GitHub Actions 배포 파이프라인 완전 예시
 
-포트폴리오 품질은 한 번의 대규모 수정으로 완성되지 않습니다. 짧은 주기로 같은 항목을 반복 점검할 때 품질이 안정됩니다. 아래 기록 방식은 프로젝트 크기와 무관하게 적용할 수 있습니다.
+포트폴리오 프로젝트에 CI/CD를 설정하면 '다시 배포할 수 있는 프로젝트'라는 신뢰를 줘야 합니다. 아래는 FastAPI 앱을 Render에 배포하는 실제 워크플로입니다.
 
-| 점검 항목 | 확인 질문 | 증거 형태 |
-| --- | --- | --- |
-| 문제 정의 | 문제 문장이 여전히 현재 구현과 일치하는가 | README/블로그 도입 문장 |
-| 데모 신뢰성 | 링크가 열리고 핵심 흐름이 실제로 작동하는가 | 라이브 URL, 백업 영상 |
-| 검증 체계 | 테스트와 CI 상태가 녹색인가 | CI 배지, 테스트 로그 |
-| 문서 정합성 | 실행 방법과 환경 변수 설명이 최신인가 | README, `.env.example` |
-| 설명 일관성 | 저장소/블로그/면접 답변이 같은 메시지를 말하는가 | 요약 문장 비교 |
+```yaml
+# .github/workflows/deploy.yml
+name: CI/CD Pipeline
 
-이 표를 기준으로 주기적 점검을 하면 개선 우선순위를 빠르게 정할 수 있습니다. 예를 들어 데모는 정상이지만 문서 정합성이 낮다면 기능 추가보다 문서 보완이 먼저입니다. 반대로 문서는 완벽하지만 CI가 불안정하면 공개 신뢰를 잃기 쉽습니다.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
-다음 템플릿은 실제 기록에 바로 사용할 수 있습니다.
+env:
+  PYTHON_VERSION: '3.11'
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
-```markdown
-## Weekly Portfolio Health Check
-- 날짜: 2026-05-21
-- 현재 상태: 데모 정상 / 문서 일부 불일치 / CI 정상
-- 발견 이슈:
-  1) README 실행 명령이 최신 compose 파일과 다름
-  2) 블로그 성과 수치가 최근 측정값과 불일치
-- 조치 계획:
-  1) README 실행 섹션 업데이트
-  2) 성과 표 재계산 및 캡처 갱신
-- 완료 기준:
-  - 신규 방문자가 5분 안에 문제/데모/실행/결과를 이해할 수 있음
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Type check
+        run: mypy src/
+
+      - name: Test
+        run: pytest --cov=src --cov-report=xml
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          file: coverage.xml
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} .
+          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy to Render
+        run: |
+          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
+
+      - name: Wait for deploy
+        run: sleep 30
+
+      - name: Health check
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" ${{ secrets.APP_URL }}/healthz)
+          if [ "$STATUS" != "200" ]; then
+            echo "Deploy failed! Health check returned $STATUS"
+            exit 1
+          fi
 ```
 
-핵심은 완벽함이 아니라 반복성입니다. 같은 기준으로 꾸준히 점검하면 프로젝트는 시간이 지나도 낡지 않습니다. 면접에서도 "어떻게 유지했는가"를 설명할 수 있어 결과물의 신뢰도가 더 높아집니다.
+이 파이프라인의 핵심은 3단계 분리입니다. test → build → deploy 순서로 진행하며, 앞 단계가 실패하면 뒤 단계는 실행되지 않습니다. PR에서는 test만, main push에서만 build/deploy가 동작합니다.
 
-### 실행 가능한 개선 TODO 예시
+### Dockerfile 작성 기본
 
-아래 TODO는 "읽고 끝나는 조언"이 아니라 실제로 바로 적용할 수 있는 작업 단위입니다. 각 항목은 30~90분 안에 끝낼 수 있는 크기로 쪼개는 것을 권장합니다.
+배포 가능한 프로젝트라면 Dockerfile이 있어야 합니다. 아래는 FastAPI 프로젝트의 기본 Dockerfile입니다.
 
-| 작업 | 예상 시간 | 완료 기준 |
-| --- | ---: | --- |
-| 핵심 메시지 1문장 재작성 | 30분 | README/발표/이력서 문장 일치 |
-| 데모 검증 리허설 1회 | 45분 | 로그인-핵심행동-결과 흐름 무중단 |
-| 테스트 명령 정리 | 30분 | 로컬/CI 명령이 문서와 일치 |
-| 결과 수치 업데이트 | 60분 | 최신 측정값과 표/그래프 동기화 |
+```dockerfile
+# Dockerfile
+FROM python:3.11-slim AS base
 
-작업을 작은 단위로 나누면 진행률이 눈에 보이고, 품질 개선이 미뤄지지 않습니다. 포트폴리오를 오래 유지하려면 큰 개편보다 이런 짧은 루틴이 더 효과적입니다.
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-### 마무리 검증 메모
+COPY src/ ./src/
+COPY scripts/seed_demo_data.py ./scripts/
 
-최종 공개 전에는 "내가 이해하는 프로젝트"가 아니라 "처음 보는 사람이 이해하는 프로젝트"인지 확인해야 합니다. 이를 위해 1) 문제를 한 문장으로 말해 보기, 2) 데모를 처음부터 끝까지 클릭해 보기, 3) 실행 명령을 새 환경에서 복사 실행해 보기, 4) 결과 수치를 다시 계산해 보기 네 단계를 반복하는 것이 좋습니다. 이 검증을 통과하면 문서와 데모와 코드의 정합성이 높아지고, 면접 답변도 훨씬 안정됩니다.
+# 데모용 시드 데이터 생성
+RUN python scripts/seed_demo_data.py
 
+EXPOSE 8000
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+Dockerfile에서 주의할 점:
+
+1. **slim 이미지 사용**: 이미지 크기를 줄이면 배포 속도가 빨라집니다.
+2. **requirements.txt 먼저 복사**: 레이어 캐싱으로 빌드 시간을 단축합니다.
+3. **시드 데이터 포함**: 데모 환경에서 빈 화면을 방지합니다.
+4. **포트 명시**: 문서화 목적으로 어떤 포트를 사용하는지 명시합니다.
+
+### 도메인 연결과 헬스체크
+
+프로젝트에 커스텀 도메인을 연결하면 전문성이 높아 보입니다. 하지만 필수는 아닙니다. 우선순위는 다음과 같습니다.
+
+| 우선순위 | 설정 | 이유 |
+| --- | --- | --- |
+| 1 | 헬스체크 엔드포인트 | 데모가 살아 있는지 자동 확인 |
+| 2 | HTTPS 설정 | 브라우저 보안 경고 방지 |
+| 3 | 커스텀 도메인 | 전문성 + 링크 안정성 |
+
+헬스체크 엔드포인트는 간단하지만 효과가 큽니다:
+
+```python
+# src/health.py
+from fastapi import APIRouter
+
+router = APIRouter()
+
+
+@router.get("/healthz")
+def health_check():
+    return {"status": "ok", "version": "1.0.0"}
+```
+
+이 엔드포인트가 있으면 CI/CD에서 배포 성공 여부를 자동으로 판단할 수 있고, 모니터링 도구와 연동해 다운타임을 발견할 수도 있습니다.
+
+### 배포 비용 비교표
+
+포트폴리오 프로젝트는 오래 유지해야 하므로 비용이 중요합니다. 대부분의 포트폴리오 프로젝트는 무료 티어로 충분합니다.
+
+| 플랫폼 | 무료 티어 | 제한사항 | 적합한 용도 |
+| --- | --- | --- | --- |
+| Vercel | 무제한 배포 | 서버리스/정적 사이트 | 프론트엔드, Next.js |
+| Render | 750시간/월 | 15분 불활동 시 sleep | API 서버 |
+| Railway | $5 크레딧/월 | 소진 시 정지 | 전체 스택 |
+| Fly.io | 3개 VM | 256MB RAM | 컬테이너 기반 |
+| GitHub Pages | 무제한 | 정적 사이트만 | 포트폴리오 웹사이트 |
+
+추천 전략: 프론트엔드는 Vercel, API는 Render 또는 Railway, 포트폴리오 웹사이트는 GitHub Pages로 구성하면 월 비용 $0으로 운영할 수 있습니다. 비용이 발생하는 시점에 도달하면 그때 마이그레이션하면 됩니다.
+
+### 배포 후 체크리스트
+
+배포가 완료되면 아래 항목을 순서대로 확인합니다.
+
+```text
+[ ] 공개 URL에서 첫 화면 로드 확인
+[ ] 헬스체크 엔드포인트 200 응답 확인
+[ ] 환경 변수 누락 없음 확인 (에러 로그 점검)
+[ ] HTTPS 적용 확인 (브라우저 자물쇠 아이콘)
+[ ] 시드 데이터가 정상적으로 보이는지 확인
+[ ] README의 데모 URL이 배포된 URL과 일치하는지 확인
+[ ] 모바일에서 접속해 레이아웃 확인
+```
+
+이 체크리스트를 통과하면 "배포된 프로젝트"로서 최소 요건을 충족합니다. README에 이 체크리스트 통과 사실을 기록해 두면 검토자에게 운영 관점을 보여 줄 수 있습니다.
+
+### Docker Compose로 로컬/프로덕션 환경 일치시키기
+
+로컬에서는 되는데 배포하면 안 되는 문제는 대부분 환경 차이에서 생깁니다. Docker Compose를 사용하면 로컬과 배포 환경의 차이를 최소화할 수 있습니다.
+
+```yaml
+# docker-compose.yml
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://user:pass@db:5432/portfolio
+      - APP_ENV=development
+      - SECRET_KEY=${SECRET_KEY:-dev-secret-key}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: portfolio
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user"]
+      interval: 5s
+      retries: 3
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
+```
+
+README에 다음 명령을 넣으면 누구나 동일한 환경을 재현할 수 있습니다:
+
+```bash
+# 로컬 실행 (3단계)
+git clone https://github.com/username/task-tracker.git
+cd task-tracker
+docker compose up --build
+# http://localhost:8000 에서 확인
+```
+
+이 방식의 장점은 의존성 버전, OS, 런타임 차이를 모두 컨테이너로 격리한다는 것입니다. "제 환경에서는 되는데요"라는 대화를 원천적으로 차단합니다.
+
+### 롤백 전략
+
+배포가 실패했을 때 빠르게 복구할 수 있는 계획이 있어야 합니다. 포트폴리오에서는 복잡한 롤백 시스템이 필요 없습니다. Git 기반의 단순한 접근으로 충분합니다.
+
+```bash
+# 직전 정상 버전으로 롤백
+git log --oneline -5        # 정상 커밋 해시 확인
+git revert HEAD --no-edit    # 새 커밋으로 되돌리기
+git push origin main         # 자동 배포 트리거
+```
+
+또는 대부분의 PaaS는 대시보드에서 직접 롤백을 지원합니다:
+
+- **Render**: Dashboard → Manual Deploy → 이전 커밋 선택
+- **Vercel**: Deployments 탭 → 이전 배포 → Redeploy
+- **Railway**: Deployments → Rollback 버튼
+
+README에 "배포 실패 시 `git revert HEAD`로 복구" 한 줄만 있어도, 이 프로젝트가 운영을 고려한 프로젝트라는 인상을 줍니다.
+
+### 배포 자동화의 단계별 접근
+
+처음부터 완벽한 CI/CD를 구축할 필요는 없습니다. 단계별로 자동화 수준을 높이는 접근이 현실적입니다.
+
+| 단계 | 자동화 수준 | 설정 예상 시간 | 효과 |
+| --- | --- | --- | --- |
+| 1 | 수동 배포 (CLI) | 0분 | 배포 경험 확보 |
+| 2 | Git push → 자동 배포 | 15분 | 반복 비용 제거 |
+| 3 | PR에 테스트 추가 | 30분 | 배포 전 검증 |
+| 4 | 헬스체크 + 알림 | 20분 | 장애 조기 발견 |
+| 5 | 스테이징 환경 추가 | 45분 | 안전한 검증 환경 |
+
+포트폴리오 프로젝트라면 3단계까지만 설정해도 충분합니다. 4-5단계까지 설정했다면 면접에서 "운영 경험"을 구체적으로 설명할 수 있는 근거가 됩니다. 특히 헬스체크와 알림까지 설정한 프로젝트는 신입 개발자 포트폴리오에서 매우 드물게 돋보입니다.
+
+실제로 이 단계를 방법대로 밟아가면, 아직 배포 경험이 없는 사람도 두 시간 이내에 3단계까지 도달할 수 있습니다. 가장 중요한 것은 첫 배포를 내보내는 것이고, 나머지는 조금씩 개선하면 됩니다.
+
+배포 자동화를 면접에서 설명할 때는 단순히 "배포를 자동화했습니다"라고 말하는 것보다, "처음에는 수동으로 배포하다가, PR 테스트를 추가하고, 헬스체크까지 설정했습니다"라고 과정을 설명하는 것이 훨씬 설득력 있습니다. 과정을 보여 주면 "문제를 인식하고 개선할 줄 아는 사람"이라는 신호를 줍니다.
 ## 처음 질문으로 돌아가기
 
 - **포트폴리오 프로젝트에서 공개 URL이 왜 필수에 가까울까요?**
-  - 시작은 무료 옵션으로 충분합니다. Vercel, Netlify, Railway, Render 같은 서비스는 무료 티어도 충분합니다. 중요한 것은 어디가 아니라 '배포되었다는 사실'입니다.
+  - 로컬에서만 동작하는 코드는 증거가 되지 않습니다. 공개 URL이 있어야 검토자가 직접 확인할 수 있고, 그때 비로소 완성된 프로젝트로 읽힙니다.
 - **호스팅 플랫폼은 화려함보다 어떤 기준으로 골라야 할까요?**
-  - 실행 중인 데모 링크, 로컬 실행 방법, 환경 변수 설정 방법을 모두 기록합니다. 검토자가 링크를 클릭해서 바로 확인할 수 있어야 합니다.
+  - 반복 가능성, 저비용, 운영 단순성이 기준입니다. 화려한 인프라보다 동일한 절차로 다시 배포할 수 있는지가 더 중요합니다.
 - **시크릿과 환경 변수는 왜 코드가 아니라 배포 환경에서 관리해야 할까요?**
-  - 최소 데모가 계속 젫아 있는지 확인하세요. 데이터베이스 초기화, 인증서 갱신, 의존성 업데이트 같은 기본 유지보수는 포트폴리오 관리의 일부입니다.
+  - 코드에 시크릿을 넣으면 저장소 공개 시 노출됩니다. 배포 환경의 환경 변수로 분리하면 보안과 운영 유연성을 동시에 확보할 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -329,5 +536,6 @@ jobs:
 - [Render Docs](https://render.com/docs)
 - [The Twelve-Factor App](https://12factor.net/)
 - [Deployment Strategies - Martin Fowler](https://martinfowler.com/bliki/BlueGreenDeployment.html)
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/portfolio-project-101/ko)
 
 Tags: Portfolio, Deploy, DevOps, Hosting, Beginner

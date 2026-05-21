@@ -22,6 +22,8 @@ last_reviewed: '2026-05-12'
 
 # Statistics 101 (5/10): 추정
 
+이 글은 Statistics 101 시리즈의 5번째 글입니다.
+
 표본 평균을 계산했다고 해서 분석이 끝난 것은 아닙니다. 숫자 하나를 얻었다는 사실보다 중요한 것은 그 숫자가 모집단의 참값에서 얼마나 벗어날 수 있는지입니다. 추정은 이 거리감을 숫자로 다루는 과정입니다.
 
 그래서 좋은 추정은 값만 내놓지 않습니다. 언제나 값과 오차를 함께 보고합니다. 오차가 빠진 추정값은 단정적인 문장처럼 보이지만 실제로는 불확실성을 숨긴 숫자에 가깝습니다.
@@ -56,7 +58,7 @@ last_reviewed: '2026-05-12'
 
 표준오차는 표본 자체의 흩어짐이 아니라, 표본평균이라는 추정량이 반복 표집에서 얼마나 흔들릴지를 나타냅니다. 이 차이를 구분하면 표준편차와 표준오차를 헷갈릴 일이 크게 줄어듭니다.
 
-### 점추정 vs 구간추정 비교
+### 점추정 대비 구간추정 비교
 
 | 구분 | 점추정 | 구간추정 |
 |---|---|---|
@@ -127,7 +129,7 @@ n=1000 → SE=0.632
 
 표본 수가 10배 늘면 표준오차는 약 √10배 줄어듭니다. 이 관계를 알면 "몇 개 샘플이면 충분한가?" 질문에 구체적으로 답할 수 있습니다.
 
-## Python 신뢰구간 계산 예제
+## 파이썬 신뢰구간 계산 예제
 
 ```python
 import numpy as np
@@ -276,6 +278,213 @@ A/B 테스트의 전환율, 월간 매출 평균, 대시보드의 p95 지연 시
 
 다음 글에서는 신뢰구간을 더 깊게 다룹니다. 95% 신뢰구간이라는 표현이 정확히 무엇을 뜻하는지, 그리고 많은 사람이 왜 이 개념을 잘못 읽는지 살펴보겠습니다.
 
+## 추정 정확도 높이기: 부트스트랩과 강건 추정
+
+점 추정과 신뢰구간을 계산한 뒤에는 추정량의 안정성을 추가로 검증하는 단계가 필요합니다. 특히 긴 꼬리 데이터에서는 평균 하나만으로는 결론이 쉽게 흔들립니다.
+
+### 평균과 중앙값을 함께 추정하는 이유
+
+- 평균은 전체 규모를 잘 반영하지만 이상치에 민감합니다.
+- 중앙값은 이상치에 강하지만 정규분포에서는 효율이 낮을 수 있습니다.
+- 둘을 함께 보고하면 분포 왜곡 신호를 빠르게 잡을 수 있습니다.
+
+### 부트스트랩으로 추정량 안정성 비교
+
+```python
+import numpy as np
+
+rng = np.random.default_rng(123)
+sample = rng.lognormal(mean=4.0, sigma=0.8, size=120)
+
+B = 8000
+mean_boot = []
+median_boot = []
+for _ in range(B):
+    r = rng.choice(sample, size=len(sample), replace=True)
+    mean_boot.append(r.mean())
+    median_boot.append(np.median(r))
+
+mean_ci = np.percentile(mean_boot, [2.5, 97.5])
+median_ci = np.percentile(median_boot, [2.5, 97.5])
+
+print(f"평균 추정 95% 구간: [{mean_ci[0]:.2f}, {mean_ci[1]:.2f}]")
+print(f"중앙값 추정 95% 구간: [{median_ci[0]:.2f}, {median_ci[1]:.2f}]")
+```
+
+긴 꼬리에서는 중앙값 구간이 더 안정적으로 나오는 경우가 많습니다. 보고서에는 “어떤 추정량을 채택했는지”와 “채택 이유”를 함께 적는 것이 좋습니다.
+
+
+## 실무 확장 노트: 재현 가능한 분석 문서 만들기
+
+통계 글을 읽고 난 뒤 실제 업무에서 가장 먼저 부딪히는 문제는 "같은 분석을 다시 실행할 수 있는가"입니다. 재현 가능성이 없으면 숫자가 맞아도 신뢰를 얻기 어렵습니다. 그래서 통계 작업은 계산 코드뿐 아니라 입력 데이터 스냅샷, 버전, 시드, 가정 문장을 함께 남겨야 합니다.
+
+### 1) 입력 데이터 스냅샷 고정
+
+```python
+import pandas as pd
+from pathlib import Path
+
+raw = pd.read_csv('analysis_input.csv')
+Path('artifacts').mkdir(exist_ok=True)
+raw.to_parquet('artifacts/input_snapshot.parquet', index=False)
+print(raw.shape)
+```
+
+데이터 파이프라인이 바뀌면 같은 쿼리라도 다른 결과가 나올 수 있습니다. 그래서 분석 시점의 스냅샷을 남기는 습관이 중요합니다.
+
+### 2) 전처리 규칙 문서화
+
+```python
+import numpy as np
+
+def preprocess(df):
+    out = df.copy()
+    out = out.dropna(subset=['metric'])
+    out = out[(out['metric'] >= 0) & (out['metric'] <= out['metric'].quantile(0.999))]
+    out['segment'] = out['segment'].fillna('unknown')
+    return out
+```
+
+이상치 제거, 결측값 처리, 세그먼트 매핑은 결과를 크게 바꿉니다. 코드와 문서를 동시에 남겨야 이후 검토에서 혼선을 줄일 수 있습니다.
+
+### 3) 분포 진단 + 추정 + 검정을 한 화면에서 보고하기
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+x = np.random.default_rng(0).normal(100, 15, 600)
+y = np.random.default_rng(1).normal(103, 15, 600)
+
+fig, ax = plt.subplots(1, 2, figsize=(12, 4))
+ax[0].hist(x, bins=40, alpha=0.6, label='A')
+ax[0].hist(y, bins=40, alpha=0.6, label='B')
+ax[0].legend(); ax[0].set_title('분포 비교')
+
+ax[1].boxplot([x, y], labels=['A', 'B'])
+ax[1].set_title('사분위수 비교')
+plt.tight_layout(); plt.show()
+
+diff = y.mean() - x.mean()
+se = np.sqrt(x.var(ddof=1)/len(x) + y.var(ddof=1)/len(y))
+ci = (diff - 1.96*se, diff + 1.96*se)
+t, p = stats.ttest_ind(x, y, equal_var=False)
+print(f'diff={diff:.3f}, 95% CI={ci}, p={p:.4f}')
+```
+
+그래프와 수치를 분리하면 오해가 늘어납니다. 같은 섹션에서 함께 보여 주면 해석 품질이 올라갑니다.
+
+### 4) 효과 크기와 실행 기준 연결
+
+```python
+pooled = np.sqrt((x.var(ddof=1) + y.var(ddof=1)) / 2)
+cohens_d = (y.mean() - x.mean()) / pooled
+print(f"Cohen's d={cohens_d:.3f}")
+```
+
+p-value가 작아도 효과 크기가 매우 작다면 실행 우선순위가 낮을 수 있습니다. 반대로 p-value 경계선이더라도 효과 크기와 비용 구조가 유리하면 추가 실험으로 이어갈 가치가 있습니다.
+
+### 5) 결과 문장 표준화
+
+분석 결과는 다음 형식으로 정리하면 팀 의사결정이 빨라집니다.
+
+- 관찰 차이: 절대값과 상대값을 모두 표기합니다.
+- 불확실성: 95% 신뢰구간과 표본 수를 함께 표기합니다.
+- 유의성: 검정 방법과 p-value를 표기합니다.
+- 실행 판단: 배포/보류/추가실험 중 하나를 명시합니다.
+
+통계는 결국 팀의 공통 언어를 만드는 일입니다. 재현 가능한 분석 문서를 남기면 개인의 직관이 아니라 조직의 기준으로 의사결정을 반복할 수 있습니다.
+
+
+## 추가 메모: 검증 가능한 의사결정 문장
+
+분석 결과를 보고할 때는 "좋아 보입니다" 같은 모호한 문장을 피하고, 기준과 근거를 한 줄에 함께 적는 것이 좋습니다. 예를 들어 "전환율 +0.6%p, 95% 신뢰구간 +0.1~+1.1%p, p=0.014, 월간 기대효과 +320건, 2주 재검증 조건부 배포"처럼 쓰면 의사결정 책임이 명확해집니다. 이런 형식은 통계 도구가 바뀌어도 유지되는 팀 자산입니다.
+
+
+## 실무 확장 노트: 재현 가능한 분석 문서 만들기
+
+통계 글을 읽고 난 뒤 실제 업무에서 가장 먼저 부딪히는 문제는 "같은 분석을 다시 실행할 수 있는가"입니다. 재현 가능성이 없으면 숫자가 맞아도 신뢰를 얻기 어렵습니다. 그래서 통계 작업은 계산 코드뿐 아니라 입력 데이터 스냅샷, 버전, 시드, 가정 문장을 함께 남겨야 합니다.
+
+### 1) 입력 데이터 스냅샷 고정
+
+```python
+import pandas as pd
+from pathlib import Path
+
+raw = pd.read_csv('analysis_input.csv')
+Path('artifacts').mkdir(exist_ok=True)
+raw.to_parquet('artifacts/input_snapshot.parquet', index=False)
+print(raw.shape)
+```
+
+데이터 파이프라인이 바뀌면 같은 쿼리라도 다른 결과가 나올 수 있습니다. 그래서 분석 시점의 스냅샷을 남기는 습관이 중요합니다.
+
+### 2) 전처리 규칙 문서화
+
+```python
+import numpy as np
+
+def preprocess(df):
+    out = df.copy()
+    out = out.dropna(subset=['metric'])
+    out = out[(out['metric'] >= 0) & (out['metric'] <= out['metric'].quantile(0.999))]
+    out['segment'] = out['segment'].fillna('unknown')
+    return out
+```
+
+이상치 제거, 결측값 처리, 세그먼트 매핑은 결과를 크게 바꿉니다. 코드와 문서를 동시에 남겨야 이후 검토에서 혼선을 줄일 수 있습니다.
+
+### 3) 분포 진단 + 추정 + 검정을 한 화면에서 보고하기
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+x = np.random.default_rng(0).normal(100, 15, 600)
+y = np.random.default_rng(1).normal(103, 15, 600)
+
+fig, ax = plt.subplots(1, 2, figsize=(12, 4))
+ax[0].hist(x, bins=40, alpha=0.6, label='A')
+ax[0].hist(y, bins=40, alpha=0.6, label='B')
+ax[0].legend(); ax[0].set_title('분포 비교')
+
+ax[1].boxplot([x, y], labels=['A', 'B'])
+ax[1].set_title('사분위수 비교')
+plt.tight_layout(); plt.show()
+
+diff = y.mean() - x.mean()
+se = np.sqrt(x.var(ddof=1)/len(x) + y.var(ddof=1)/len(y))
+ci = (diff - 1.96*se, diff + 1.96*se)
+t, p = stats.ttest_ind(x, y, equal_var=False)
+print(f'diff={diff:.3f}, 95% CI={ci}, p={p:.4f}')
+```
+
+그래프와 수치를 분리하면 오해가 늘어납니다. 같은 섹션에서 함께 보여 주면 해석 품질이 올라갑니다.
+
+### 4) 효과 크기와 실행 기준 연결
+
+```python
+pooled = np.sqrt((x.var(ddof=1) + y.var(ddof=1)) / 2)
+cohens_d = (y.mean() - x.mean()) / pooled
+print(f"Cohen's d={cohens_d:.3f}")
+```
+
+p-value가 작아도 효과 크기가 매우 작다면 실행 우선순위가 낮을 수 있습니다. 반대로 p-value 경계선이더라도 효과 크기와 비용 구조가 유리하면 추가 실험으로 이어갈 가치가 있습니다.
+
+### 5) 결과 문장 표준화
+
+분석 결과는 다음 형식으로 정리하면 팀 의사결정이 빨라집니다.
+
+- 관찰 차이: 절대값과 상대값을 모두 표기합니다.
+- 불확실성: 95% 신뢰구간과 표본 수를 함께 표기합니다.
+- 유의성: 검정 방법과 p-value를 표기합니다.
+- 실행 판단: 배포/보류/추가실험 중 하나를 명시합니다.
+
+통계는 결국 팀의 공통 언어를 만드는 일입니다. 재현 가능한 분석 문서를 남기면 개인의 직관이 아니라 조직의 기준으로 의사결정을 반복할 수 있습니다.
+
+
 ## 처음 질문으로 돌아가기
 
 - **표본평균은 모집단 평균을 얼마나 잘 대신할 수 있을까요?**
@@ -355,4 +564,7 @@ print(f"부트스트랩 95% CI: [{ci_lower:.2f}, {ci_upper:.2f}]")
 
 - 표본평균은 불편추정량(정확)이지만 극단값에 민감합니다(정밀도 낮음)
 - 중앙값은 극단값에 강하지만(정밀) 정규분포에서는 표본평균보다 효율이 떨어집니다
+
+- [이 시리즈의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/statistics-101/ko)
+
 Tags: Statistics, Estimation, Inference, PointEstimate, Beginner

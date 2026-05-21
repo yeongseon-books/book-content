@@ -313,70 +313,321 @@ Python에서는 연결 리스트를 직접 구현할 일이 많지 않습니다.
 연결 리스트는 노드를 참조로 연결해 삽입과 삭제를 유연하게 처리하는 구조입니다. 배열처럼 연속 메모리를 요구하지 않지만, 인덱스 기반 임의 접근은 느립니다. 즉, 연결 리스트는 “위치로 찾는 구조”보다 “연결을 바꾸는 구조”에 가깝습니다. 다음 글에서는 계층 구조를 표현하는 트리와 이진 트리를 살펴보겠습니다.
 
 
-## Python 구현 보강: 타입 힌트와 검증 루틴
 
-Python에서 자료구조를 학습할 때는 동작 예시만 확인하는 단계에서 멈추지 않고, 타입 힌트와 최소 검증 루틴을 함께 작성해야 설계 의도가 명확해집니다. 특히 `TypeVar`, `Generic`, `Protocol`을 사용하면 자료구조 API의 입력/출력 계약을 코드 차원에서 드러낼 수 있습니다. 아래 예시는 여러 글에서 재사용할 수 있는 기본 인터페이스 패턴입니다.
+## 타입 힌트 기반 이중 연결 리스트 구현
+
+단일 연결 리스트는 앞서 Step에서 다뤘으므로, 여기서는 실무에서 더 유용한 이중 연결 리스트(Doubly Linked List)를 타입 힌트와 함께 구현합니다.
 
 ```python
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Generic, Iterable, Iterator, Optional, TypeVar
+from typing import Generic, Iterator, Optional, TypeVar
 
 T = TypeVar("T")
 
+
 @dataclass
-class Node(Generic[T]):
+class DNode(Generic[T]):
+    """이중 연결 리스트의 노드입니다."""
     value: T
-    next: Optional["Node[T]"] = None
+    prev: Optional[DNode[T]] = None
+    next: Optional[DNode[T]] = None
 
-class Container(Generic[T]):
-    def __init__(self, items: Optional[Iterable[T]] = None) -> None:
-        self._size = 0
-        self._head: Optional[Node[T]] = None
-        if items is not None:
-            for item in items:
-                self.push(item)
 
-    def push(self, value: T) -> None:
-        self._head = Node(value=value, next=self._head)
-        self._size += 1
+class DoublyLinkedList(Generic[T]):
+    """sentinel 노드 기반 이중 연결 리스트입니다."""
 
-    def pop(self) -> T:
-        if self._head is None:
-            raise IndexError("empty container")
-        node = self._head
-        self._head = node.next
-        self._size -= 1
-        return node.value
+    def __init__(self) -> None:
+        # sentinel head/tail로 경계 조건을 단순화합니다
+        self._head: DNode[T] = DNode(value=None)  # type: ignore[arg-type]
+        self._tail: DNode[T] = DNode(value=None)  # type: ignore[arg-type]
+        self._head.next = self._tail
+        self._tail.prev = self._head
+        self._size: int = 0
 
     def __len__(self) -> int:
         return self._size
 
+    def __bool__(self) -> bool:
+        return self._size > 0
+
+    def _insert_between(self, value: T, predecessor: DNode[T], successor: DNode[T]) -> DNode[T]:
+        """predecessor와 successor 사이에 새 노드를 삽입합니다."""
+        new_node = DNode(value=value, prev=predecessor, next=successor)
+        predecessor.next = new_node
+        successor.prev = new_node
+        self._size += 1
+        return new_node
+
+    def _remove_node(self, node: DNode[T]) -> T:
+        """노드를 리스트에서 제거하고 값을 반환합니다."""
+        predecessor = node.prev
+        successor = node.next
+        assert predecessor is not None and successor is not None
+        predecessor.next = successor
+        successor.prev = predecessor
+        self._size -= 1
+        return node.value
+
+    def append(self, value: T) -> None:
+        """끝에 추가합니다. O(1)"""
+        self._insert_between(value, self._tail.prev, self._tail)  # type: ignore[arg-type]
+
+    def prepend(self, value: T) -> None:
+        """앞에 추가합니다. O(1)"""
+        self._insert_between(value, self._head, self._head.next)  # type: ignore[arg-type]
+
+    def pop_front(self) -> T:
+        """앞 원소를 제거하고 반환합니다. O(1)"""
+        if self._size == 0:
+            raise IndexError("pop from empty list")
+        return self._remove_node(self._head.next)  # type: ignore[arg-type]
+
+    def pop_back(self) -> T:
+        """끝 원소를 제거하고 반환합니다. O(1)"""
+        if self._size == 0:
+            raise IndexError("pop from empty list")
+        return self._remove_node(self._tail.prev)  # type: ignore[arg-type]
+
     def __iter__(self) -> Iterator[T]:
-        cur = self._head
-        while cur is not None:
-            yield cur.value
-            cur = cur.next
+        current = self._head.next
+        while current is not self._tail:
+            assert current is not None
+            yield current.value
+            current = current.next
+
+    def __reversed__(self) -> Iterator[T]:
+        current = self._tail.prev
+        while current is not self._head:
+            assert current is not None
+            yield current.value
+            current = current.prev
+
+    def __repr__(self) -> str:
+        items = " <-> ".join(repr(v) for v in self)
+        return f"DoublyLinkedList([{items}])"
 ```
 
-이 패턴의 핵심은 세 가지입니다. 첫째, 공개 메서드의 타입을 먼저 확정하여 구현 교체 비용을 낮춥니다. 둘째, 예외 조건(`IndexError`)을 명시해 호출자 책임을 분리합니다. 셋째, `__iter__`, `__len__` 같은 파이썬 데이터 모델 메서드를 제공해 표준 라이브러리와 자연스럽게 결합합니다.
+### 설계 결정 세 가지
 
-성능 확인은 `timeit` 단일 숫자보다 시나리오 기반으로 진행하는 편이 정확합니다. 예를 들어 "1만 건 push 후 1만 건 pop", "임의 키 5천 건 조회", "중복 원소 30% 포함 집합 연산"처럼 입력 특성을 고정하고 결과를 비교합니다. 또한 `mypy`나 `pyright`로 정적 타입 검사를 돌리면 API 오용을 조기에 발견할 수 있습니다.
+1. **sentinel 노드**: head와 tail에 더미 노드를 두면, 삽입/삭제 시 "리스트가 비어있는가?"를 별도로 확인할 필요가 없습니다. 모든 실제 노드는 항상 predecessor와 successor를 갖습니다.
+2. **`_insert_between`과 `_remove_node`**: 모든 삽입/삭제를 이 두 메서드로 위임하면, 포인터 조작 로직이 한 곳에 집중됩니다. append, prepend, pop_front, pop_back은 모두 이 메서드의 얇은 wrapper입니다.
+3. **`__reversed__` 구현**: 이중 연결 리스트의 장점은 역방향 순회가 O(n)에 가능하다는 점입니다. `reversed()` 내장 함수와 자연스럽게 연동됩니다.
 
-마지막으로 학습 기록에는 "왜 이 구현을 선택했는가"를 반드시 남깁니다. 같은 기능을 `list`, `deque`, 사용자 정의 클래스 중 무엇으로 표현했는지와 그 이유를 적어두면, 이후 코드베이스에서 자료구조를 교체해야 할 때 판단 근거를 재사용할 수 있습니다.
+## 메모리 프로파일링: list vs 연결 리스트
 
-실무 코드에서는 `TypeVar` 기반 제네릭 API를 유지하고, `pytest`로 빈 입력/최대 입력/중복 입력 경계 조건을 검증해 구현 신뢰도를 높입니다.
+연결 리스트는 삽입/삭제가 빠르지만, 메모리 측면에서는 비쌉니다. 각 노드가 별도 객체이고, prev/next 포인터 오버헤드가 있기 때문입니다.
 
+```python
+import sys
+from typing import Any
+
+
+def deep_getsizeof(obj: Any, seen: set[int] | None = None) -> int:
+    if seen is None:
+        seen = set()
+    obj_id = id(obj)
+    if obj_id in seen:
+        return 0
+    seen.add(obj_id)
+    size = sys.getsizeof(obj)
+    if hasattr(obj, "__dict__"):
+        size += deep_getsizeof(obj.__dict__, seen)
+        for v in obj.__dict__.values():
+            size += deep_getsizeof(v, seen)
+    if isinstance(obj, (list, tuple, set, frozenset)):
+        size += sum(deep_getsizeof(item, seen) for item in obj)
+    elif isinstance(obj, dict):
+        size += sum(deep_getsizeof(k, seen) + deep_getsizeof(v, seen) for k, v in obj.items())
+    return size
+
+
+n = 1_000
+
+# Python list
+py_list = list(range(n))
+list_size = deep_getsizeof(py_list)
+
+# DoublyLinkedList
+dll = DoublyLinkedList[int]()
+for i in range(n):
+    dll.append(i)
+dll_size = deep_getsizeof(dll)
+
+print(f"list ({n} ints):               {list_size:>10} bytes")
+print(f"DoublyLinkedList ({n} ints):   {dll_size:>10} bytes")
+print(f"linked list overhead: {dll_size / list_size:.1f}x")
+```
+
+연결 리스트는 보통 list보다 3-5배 더 많은 메모리를 사용합니다. 노드 객체 헤더(16바이트), `__dict__`(또는 `__slots__` 미사용 시), prev/next 포인터(각 8바이트)가 누적되기 때문입니다. 이것이 "대부분의 경우 list가 더 나은 기본값"인 이유의 하나입니다.
+
+### `__slots__`로 메모리 절약하기
+
+```python
+from __future__ import annotations
+from typing import Generic, Optional, TypeVar
+
+T = TypeVar("T")
+
+
+class SlotNode(Generic[T]):
+    __slots__ = ("value", "prev", "next")
+
+    def __init__(self, value: T, prev: Optional[SlotNode[T]] = None, next: Optional[SlotNode[T]] = None) -> None:
+        self.value = value
+        self.prev = prev
+        self.next = next
+```
+
+`__slots__`를 쓰면 노드당 `__dict__`가 생성되지 않아 약 40-60% 메모리를 절약할 수 있습니다. 노드가 수만 개 이상일 때 체감됩니다.
+
+## 성능 벤치마크: 중간 삽입 list vs 연결 리스트
+
+연결 리스트의 이론적 장점은 "노드 참조만 있으면 O(1) 삽입/삭제"입니다. 하지만 Python에서 이 장점이 실제로 발현되는지 측정해 봅니다.
+
+```python
+import timeit
+from collections import deque
+
+
+def bench_list_middle_insert(n: int = 10_000) -> None:
+    data = list(range(n))
+    mid = n // 2
+    for i in range(1_000):
+        data.insert(mid, i)
+
+
+def bench_deque_rotate_insert(n: int = 10_000) -> None:
+    """deque는 중간 삽입을 직접 지원하지 않으므로 rotate로 흉내냅니다."""
+    data = deque(range(n))
+    mid = n // 2
+    for i in range(1_000):
+        data.rotate(-mid)
+        data.appendleft(i)
+        data.rotate(mid)
+
+
+trials = 5
+t_list = timeit.timeit(bench_list_middle_insert, number=trials)
+t_deque = timeit.timeit(bench_deque_rotate_insert, number=trials)
+
+print(f"list middle insert (1k ops, n=10k): {t_list:.4f}s")
+print(f"deque rotate insert (1k ops, n=10k): {t_deque:.4f}s")
+```
+
+흥미롭게도 Python에서는 list의 중간 삽입이 deque rotate보다 빠른 경우가 많습니다. C 레벨의 `memmove`가 매우 최적화되어 있기 때문입니다. 연결 리스트가 진정으로 유리한 상황은 "노드 참조를 이미 갖고 있어서 탐색 없이 바로 삽입/삭제할 수 있는" 경우입니다. LRU 캐시가 대표적인 예입니다.
+
+## unittest로 DoublyLinkedList 검증
+
+```python
+import unittest
+
+
+class TestDoublyLinkedList(unittest.TestCase):
+    def setUp(self) -> None:
+        self.dll: DoublyLinkedList[int] = DoublyLinkedList()
+
+    def test_append_and_iter(self) -> None:
+        for i in range(5):
+            self.dll.append(i)
+        self.assertEqual(list(self.dll), [0, 1, 2, 3, 4])
+
+    def test_prepend(self) -> None:
+        for i in range(3):
+            self.dll.prepend(i)
+        self.assertEqual(list(self.dll), [2, 1, 0])
+
+    def test_pop_front(self) -> None:
+        self.dll.append(10)
+        self.dll.append(20)
+        self.assertEqual(self.dll.pop_front(), 10)
+        self.assertEqual(len(self.dll), 1)
+
+    def test_pop_back(self) -> None:
+        self.dll.append(10)
+        self.dll.append(20)
+        self.assertEqual(self.dll.pop_back(), 20)
+        self.assertEqual(len(self.dll), 1)
+
+    def test_reversed(self) -> None:
+        for i in range(5):
+            self.dll.append(i)
+        self.assertEqual(list(reversed(self.dll)), [4, 3, 2, 1, 0])
+
+    def test_empty_pop_raises(self) -> None:
+        with self.assertRaises(IndexError):
+            self.dll.pop_front()
+        with self.assertRaises(IndexError):
+            self.dll.pop_back()
+
+    def test_mixed_operations(self) -> None:
+        self.dll.append(1)
+        self.dll.prepend(0)
+        self.dll.append(2)
+        self.dll.pop_front()
+        self.assertEqual(list(self.dll), [1, 2])
+
+
+if __name__ == "__main__":
+    unittest.main()
+```
+
+## 실무 패턴: LRU 캐시와 연결 리스트
+
+연결 리스트가 실무에서 빛나는 대표적 사례는 LRU(Least Recently Used) 캐시입니다. 접근된 항목을 O(1)에 리스트 끝으로 이동시키고, 가장 오래된 항목을 O(1)에 제거할 수 있기 때문입니다.
+
+```python
+from collections import OrderedDict
+from typing import Generic, TypeVar
+
+K = TypeVar("K")
+V = TypeVar("V")
+
+
+class LRUCache(Generic[K, V]):
+    """OrderedDict 기반 LRU 캐시입니다."""
+
+    def __init__(self, capacity: int) -> None:
+        self._capacity = capacity
+        self._cache: OrderedDict[K, V] = OrderedDict()
+
+    def get(self, key: K) -> V | None:
+        if key not in self._cache:
+            return None
+        self._cache.move_to_end(key)
+        return self._cache[key]
+
+    def put(self, key: K, value: V) -> None:
+        if key in self._cache:
+            self._cache.move_to_end(key)
+        self._cache[key] = value
+        if len(self._cache) > self._capacity:
+            self._cache.popitem(last=False)
+
+    def __len__(self) -> int:
+        return len(self._cache)
+
+
+cache: LRUCache[str, int] = LRUCache(capacity=3)
+cache.put("a", 1)
+cache.put("b", 2)
+cache.put("c", 3)
+cache.get("a")      # "a"를 최근 사용으로 이동
+cache.put("d", 4)   # capacity 초과 → "b" 제거 (가장 오래 미사용)
+print(cache.get("b"))  # None — 이미 제거됨
+```
+
+`OrderedDict`는 내부적으로 이중 연결 리스트를 사용해 삽입 순서를 유지합니다. `move_to_end()`가 O(1)인 이유가 바로 연결 리스트의 포인터 재배치 때문입니다. Python 3.7+의 일반 dict도 삽입 순서를 유지하지만, `move_to_end()`를 지원하지 않으므로 LRU에는 OrderedDict가 필요합니다.
 
 ## 처음 질문으로 돌아가기
 
 - **Python에 이미 list가 있는데 왜 연결 리스트를 따로 배워야 할까요?**
-  - 본문의 기준은 연결 리스트를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - list(동적 배열)는 인덱스 접근에 강하고 메모리 효율이 좋지만, 중간 삽입/삭제는 원소 이동이 필요합니다. 연결 리스트는 노드 참조만 있으면 O(1)에 삽입/삭제가 가능합니다. LRU 캐시, undo 기록, 에디터 버퍼처럼 "특정 위치의 빈번한 삽입/삭제"가 핵심인 문제에서 연결 리스트의 구조적 장점이 발현됩니다.
 - **단일 연결 리스트와 이중 연결 리스트는 어떻게 다를까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 단일은 next 포인터만 있어 앞→뒤 순회만 가능하고, 삭제 시 이전 노드를 별도로 추적해야 합니다. 이중은 prev/next 모두 있어 양방향 순회와 O(1) 삭제가 가능합니다. 메모리는 포인터 하나만큼 더 쓰지만, 구현 단순성과 연산 효율 면에서 이중이 실무에서 더 자주 쓰입니다.
 - **연결 리스트는 왜 삽입·삭제에는 강하고, 인덱스 접근에는 약할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 삽입/삭제는 포인터 2-4개만 바꾸면 되므로 O(1)입니다. 하지만 n번째 원소에 접근하려면 head부터 n번 따라가야 하므로 O(n)입니다. 연속 메모리가 아니라 노드가 힙 곳곳에 흩어져 있어 주소 계산으로 바로 접근할 수 없기 때문입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -399,6 +650,7 @@ class Container(Generic[T]):
 - [Python 공식 문서 — collections.deque](https://docs.python.org/3/library/collections.html#collections.deque)
 - [CPython 소스 — collections 모듈 구현](https://github.com/python/cpython/blob/main/Modules/_collectionsmodule.c)
 - [Real Python — Linked Lists in Python](https://realpython.com/linked-lists-python/)
+- [book-examples 저장소 — data-structures-python-101/ko](https://github.com/yeongseon-books/book-examples/tree/main/data-structures-python-101/ko)
 - [Runestone Academy — Linked Lists](https://runestone.academy/ns/books/published/pythonds3/BasicDS/ImplementinganUnorderedListLinkedLists.html)
 
 Tags: Python, 자료구조, Linked List, 연결 리스트, 노드

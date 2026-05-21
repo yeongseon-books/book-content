@@ -394,6 +394,140 @@ def run_experiment(cfg_path: str, data_version: str) -> None:
 
 이 규약이 있으면 실험 추적이 단순 로그 저장소에서 운영 의사결정 시스템으로 바뀝니다.
 
+
+## MLflow 자동 로깅과 중첩 실행
+
+수동으로 `log_param`, `log_metric`을 호출하는 방식은 정확하지만, 매 실험마다 반복 코드가 늘어납니다. MLflow는 `autolog`를 제공해 이 부담을 줄입니다.
+
+### autolog 사용법
+
+```python
+import mlflow
+mlflow.autolog()
+
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+
+X, y = make_classification(n_samples=2000, n_features=20, random_state=42)
+X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2)
+
+with mlflow.start_run():
+    clf = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=0)
+    clf.fit(X_train, y_train)
+    # autolog가 파라미터, 메트릭, 모델을 자동 기록합니다
+```
+
+`autolog`를 켜면 `fit()` 호출 시점에 하이퍼파라미터, 학습 메트릭, 모델 아티팩트가 한꺼번에 기록됩니다. 그러나 데이터 버전이나 팀 태그는 자동으로 남지 않으므로, 이 부분은 여전히 수동으로 추가해야 합니다.
+
+### 중첩 실행으로 하이퍼파라미터 스윕 구조화
+
+하이퍼파라미터 탐색을 할 때, 모든 run을 동일 레벨에 두면 나중에 "이 run이 어떤 스윕에서 나왔는지" 구분하기 어렵습니다. 중첩 실행(nested run)을 사용하면 부모-자식 관계로 구조화할 수 있습니다.
+
+```python
+import mlflow
+from sklearn.linear_model import LogisticRegression
+from sklearn.datasets import make_classification
+
+X, y = make_classification(n_samples=1000, random_state=42)
+
+with mlflow.start_run(run_name="sweep-2026-05-12"):
+    mlflow.set_tag("sweep_type", "grid")
+    mlflow.set_tag("owner", "ml-team")
+
+    for C in [0.01, 0.1, 1.0, 10.0]:
+        for solver in ["lbfgs", "liblinear"]:
+            with mlflow.start_run(run_name=f"C={C}-{solver}", nested=True):
+                mlflow.log_param("C", C)
+                mlflow.log_param("solver", solver)
+                m = LogisticRegression(C=C, solver=solver, max_iter=1000).fit(X, y)
+                mlflow.log_metric("acc", m.score(X, y))
+```
+
+부모 run은 스윕 메타데이터(날짜, 목적, 담당자)를 담고, 자식 run은 개별 조합 결과를 담습니다. 이 구조가 있으면 스윕 단위 비교와 개별 run 비교를 모두 쉽게 할 수 있습니다.
+
+### 원격 추적 서버 구성
+
+로컬 `mlruns` 디렉터리는 빠르게 시작할 수 있지만, 팀 공유에는 적합하지 않습니다. 원격 서버를 두면 모든 팀원이 같은 실험 테이블을 봅니다.
+
+```bash
+# 추적 서버 시작 (PostgreSQL 백엔드)
+mlflow server \
+    --backend-store-uri postgresql://user:pass@db:5432/mlflow \
+    --default-artifact-root s3://mlflow-artifacts/ \
+    --host 0.0.0.0 \
+    --port 5000
+```
+
+```python
+# 클라이언트 코드에서 원격 서버 지정
+import mlflow
+mlflow.set_tracking_uri("http://mlflow-server:5000")
+```
+
+원격 서버를 기본값으로 두면 "개인 노트북에만 실험이 남는" 문제가 사라집니다. 백엔드를 PostgreSQL 같은 RDBMS로 두면 검색과 필터링 성능도 올라갑니다.
+
+### 실험 관리 운영 정책 확장
+
+| 항목 | 권장 정책 | 위반 시 영향 |
+|---|---|---|
+| 키 이름 표준 | 팀 위키에 정의, PR 리뷰 시 확인 | 비교 화면 무의미화 |
+| 데이터 버전 필수 | `data_version` param 없으면 CI 실패 | 재현 불가 |
+| 실패 run 보존 | 삭제 금지, `status=failed` 태그 부착 | 탐색 이력 소실 |
+| 승격 후보 기준 | 최근 3회 val_auc 평균 > threshold | 우연한 고점 배포 |
+| 정리 주기 | 90일 이상 미참조 run은 아카이브 | 저장 비용 증가 |
+
+이 정책이 팀 온보딩 문서에 포함되면, 새 팀원도 처음부터 일관된 방식으로 실험을 기록하게 됩니다.
+
+
+### MLflow UI 활용 팁
+
+MLflow UI는 `mlflow ui` 명령으로 시작합니다. 기본 포트는 5000입니다.
+
+```bash
+mlflow ui --port 5000
+# 브라우저에서 http://localhost:5000 접속
+```
+
+UI에서 가장 자주 쓰는 기능 세 가지는 다음과 같습니다.
+
+1. **비교 뷰**: 여러 run을 선택하고 Compare 버튼을 누르면 파라미터와 메트릭을 나란히 볼 수 있습니다.
+2. **차트 뷰**: 메트릭을 x축/y축에 놓아 산점도로 비교할 수 있습니다. 어떤 파라미터 조합이 성능에 영향을 주는지 시각적으로 파악합니다.
+3. **검색 필터**: `params.C > 0.5 and metrics.val_auc > 0.85` 같은 필터로 관심 있는 run만 골라낼 수 있습니다.
+
+### 실험 데이터 내보내기
+
+실험 결과를 팀 회의에서 공유하거나 문서화할 때, DataFrame으로 내보내는 패턴이 유용합니다.
+
+```python
+import mlflow
+import pandas as pd
+
+client = mlflow.tracking.MlflowClient()
+exp = client.get_experiment_by_name("demo-full")
+runs = client.search_runs(
+    experiment_ids=[exp.experiment_id],
+    order_by=["metrics.val_auc DESC"],
+    max_results=50,
+)
+
+rows = []
+for r in runs:
+    rows.append({
+        "run_id": r.info.run_id[:8],
+        "C": r.data.params.get("C"),
+        "solver": r.data.params.get("solver"),
+        "val_auc": r.data.metrics.get("val_auc"),
+        "data_version": r.data.params.get("data_version"),
+    })
+
+df = pd.DataFrame(rows)
+df.to_csv("experiment_report.csv", index=False)
+print(df.head(10))
+```
+
+이 CSV를 팀 위키나 슬랙에 공유하면, 실험 결과를 MLflow 접근 권한 없이도 리뷰할 수 있습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **실험 관리가 없으면 왜 같은 모델도 다시 만들기 어려울까요?**
@@ -420,6 +554,8 @@ def run_experiment(cfg_path: str, data_version: str) -> None:
 <!-- toc:end -->
 
 ## 참고 자료
+
+- [예제 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/mlops-101/ko)
 
 - [MLflow — Tracking](https://mlflow.org/docs/latest/tracking.html)
 - [Weights & Biases](https://docs.wandb.ai/)

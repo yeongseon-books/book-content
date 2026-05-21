@@ -22,6 +22,8 @@ last_reviewed: '2026-05-15'
 
 # Incident Response 101 (7/10): Mitigation과 Resolution
 
+이 글은 Incident Response 101 시리즈의 일곱 번째 글입니다.
+
 incident 대응에서 자주 생기는 혼동 하나는 피해를 멈춘 상태와 원인을 제거한 상태를 같은 것으로 보는 일입니다. 고객 영향이 줄어들면 마음이 급히 놓이고, 그 순간 incident가 끝났다고 느끼기 쉽습니다.
 
 하지만 많은 사고는 바로 그 지점에서 다시 터집니다. 잠깐 진정된 것과 실제로 해결된 것은 다르기 때문입니다.
@@ -345,6 +347,78 @@ mitigation 직후에는 "지표 반등"을 확인하는 짧은 관찰 구간이 
 
 리허설의 목적은 사람 평가가 아니라 문서 검증입니다. 실제 incident는 긴장 상태에서 진행되므로, 평시에는 분명해 보이던 절차도 현장에서는 모호해질 수 있습니다. 정기 리허설을 운영 루틴에 넣으면 문서와 실행 사이의 간극을 줄일 수 있습니다.
 
+## 완화-해결 전환 체크포인트
+
+완화와 해결을 구분하려면 단계 전환 기준을 숫자로 고정해야 합니다. 아래 표는 incident 현장에서 자주 쓰는 전환 기준 예시입니다.
+
+| 전환 | 필수 조건 | 확인 지표 |
+| --- | --- | --- |
+| Mitigate -> Stabilize | 오류율 하락 후 10분 유지 | error_ratio, p95 |
+| Stabilize -> Resolve | 원인 후보 수렴, 추가 확산 없음 | timeline, alert noise |
+| Resolve -> Verify | 영구 수정 반영, 회귀 테스트 통과 | test report |
+| Verify -> Close | 고객 공지 완료, postmortem 링크 생성 | comms log |
+
+단계 전환 기준이 있으면 "분위기상 종료"를 막을 수 있습니다. 특히 완화 직후에는 재확산 가능성이 높으므로 관찰 구간을 반드시 둬야 합니다.
+
+## on-call 실행 명령 템플릿
+
+```text
+[mitigation-command-sheet]
+- rollback_command:
+- feature_flag_off_command:
+- scale_out_command:
+- throttle_command:
+- verify_query:
+- rollback_of_mitigation_plan:
+```
+
+incident 중에는 명령 위치를 찾는 시간도 비용입니다. 서비스별로 이 명령 시트를 준비해 두면 초기 10분 대응 품질이 크게 좋아집니다.
+
+## 운영 부록: 완화 명령 실행 순서 카드
+
+```text
+[mitigation-order]
+1) rollback 가능 여부 확인
+2) feature flag off 실행
+3) scale out 또는 throttle 적용
+4) 5분 관찰 지표 확인
+5) 고객 공지 업데이트
+6) 재확산 시 이전 단계로 즉시 복귀
+```
+
+## 운영 부록: 완화 이후 관찰 표
+
+| 구간 | 확인 지표 | 기준 |
+| --- | --- | --- |
+| 0~5분 | error ratio | 하락 추세 확인 |
+| 5~10분 | p95 latency | 임계값 이하 유지 |
+| 10~15분 | 신규 critical alert | 0건 |
+| 15분 이후 | 고객 신고 | 증가 없음 |
+
+관찰 표가 있으면 완화 직후 조기 종료를 줄일 수 있습니다.
+
+## 완화-해결 운영 추가 점검 항목
+
+아래 항목은 실무에서 바로 점검할 수 있는 추가 체크포인트입니다.
+
+- 체크포인트 1: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 2: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 3: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+
+```text
+[quick-audit]
+- declaration_latency_minutes:
+- first_update_latency_minutes:
+- mitigation_started_minutes:
+- recovery_verification_metrics:
+- postmortem_linked: true/false
+```
+
+
+## 운영 메모: 점검 루프
+
+운영 문서는 작성으로 끝나지 않습니다. 월간 점검 루프를 통해 선언 기준, 역할 분리, 공지 주기, 후속 조치 추적이 실제 incident에서 유지되는지 확인해야 합니다. 점검 결과는 다음 리허설 시나리오와 runbook 개정 항목으로 바로 연결하는 편이 좋습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **불을 끄는 일과 원인을 없애는 일은 어떻게 다를까요?**
@@ -371,6 +445,8 @@ mitigation 직후에는 "지표 반등"을 확인하는 짧은 관찰 구간이 
 <!-- toc:end -->
 
 ## 참고 자료
+
+- [incident-response-101 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/incident-response-101/ko)
 
 ### 공식 문서
 - [Mitigation during incidents - PagerDuty](https://response.pagerduty.com/during/mitigation/)

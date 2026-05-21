@@ -472,6 +472,130 @@ services:
 
 모델 배포에서 사고는 피하기보다 빠르게 복구하는 설계가 더 현실적입니다. 따라서 배포 설계의 핵심은 성공 경로뿐 아니라 실패 경로를 명시하는 데 있습니다.
 
+
+## 모델 레지스트리 연동
+
+운영 환경에서는 모델 파일을 직접 복사하지 않고, 모델 레지스트리에서 버전을 지정해 가져옵니다. MLflow Model Registry를 기준으로 배포 시점에 모델을 로드하는 패턴을 보겠습니다.
+
+```python
+import mlflow
+from mlflow.tracking import MlflowClient
+
+MLFLOW_TRACKING_URI = "http://mlflow.internal:5000"
+MODEL_NAME = "fraud-detector"
+MODEL_STAGE = "Production"
+
+mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+client = MlflowClient()
+
+
+def load_production_model():
+    """레지스트리에서 Production 스테이지 모델을 로드합니다."""
+    model_uri = f"models:/{MODEL_NAME}/{MODEL_STAGE}"
+    model = mlflow.pyfunc.load_model(model_uri)
+    version_info = client.get_latest_versions(MODEL_NAME, stages=[MODEL_STAGE])
+    current_version = version_info[0].version if version_info else "unknown"
+    return model, current_version
+
+
+model, model_version = load_production_model()
+```
+
+이 패턴의 핵심은 배포 코드가 모델 파일 경로를 직접 알 필요가 없다는 것입니다. 레지스트리가 "Production 스테이지에 해당하는 최신 버전"을 관리하므로, 배포 코드는 스테이지 이름만 참조합니다.
+
+## 헬스 체크와 준비 상태 프로브
+
+Kubernetes나 로드 밸런서가 컨테이너의 상태를 판단하려면 두 가지 엔드포인트가 필요합니다.
+
+```python
+from fastapi import FastAPI, Response, status
+
+app = FastAPI()
+model_loaded = False
+
+
+@app.on_event("startup")
+async def startup_load_model():
+    global model_loaded
+    load_production_model()
+    model_loaded = True
+
+
+@app.get("/healthz")
+async def liveness():
+    return {"status": "alive"}
+
+
+@app.get("/readyz")
+async def readiness(response: Response):
+    if not model_loaded:
+        response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+        return {"status": "not_ready", "reason": "model loading"}
+    return {"status": "ready"}
+```
+
+Kubernetes 매니페스트에서는 다음처럼 설정합니다.
+
+```yaml
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: 8000
+  initialDelaySeconds: 5
+  periodSeconds: 10
+readinessProbe:
+  httpGet:
+    path: /readyz
+    port: 8000
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  failureThreshold: 3
+```
+
+`readinessProbe`의 `initialDelaySeconds`를 모델 로드 시간보다 크게 잡아야 합니다. 대형 모델은 로드에 30초 이상 걸릴 수 있으므로, 이 값을 너무 작게 설정하면 컨테이너가 준비되지 않은 상태에서 트래픽이 유입됩니다.
+
+## 배포 검증 스크립트
+
+배포 직후에는 자동화된 스모크 테스트로 기본 동작을 확인합니다.
+
+```python
+import httpx
+import sys
+
+BASE_URL = "http://localhost:8000"
+TIMEOUT = 10.0
+
+
+def smoke_test():
+    """배포 직후 실행하는 최소 검증입니다."""
+    # 1. 헬스 체크
+    resp = httpx.get(f"{BASE_URL}/healthz", timeout=TIMEOUT)
+    assert resp.status_code == 200, f"healthz failed: {resp.status_code}"
+
+    # 2. 준비 상태
+    resp = httpx.get(f"{BASE_URL}/readyz", timeout=TIMEOUT)
+    assert resp.status_code == 200, f"readyz failed: {resp.status_code}"
+
+    # 3. 추론 요청
+    payload = {"features": [0.1, 0.2, 0.3, 0.4]}
+    resp = httpx.post(f"{BASE_URL}/predict", json=payload, timeout=TIMEOUT)
+    assert resp.status_code == 200, f"predict failed: {resp.status_code}"
+    result = resp.json()
+    assert "prediction" in result, "response missing prediction field"
+
+    print("PASS: all smoke tests passed")
+
+
+if __name__ == "__main__":
+    try:
+        smoke_test()
+    except AssertionError as e:
+        print(f"FAIL: {e}", file=sys.stderr)
+        sys.exit(1)
+```
+
+이 스크립트를 CI/CD 파이프라인의 배포 후 단계에 넣으면, 실패 시 자동으로 롤백을 트리거할 수 있습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **학습된 모델 파일을 어떻게 사용자 요청에 연결할 수 있을까요?**
@@ -498,6 +622,8 @@ services:
 <!-- toc:end -->
 
 ## 참고 자료
+
+- [예제 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/mlops-101/ko)
 
 - [FastAPI documentation](https://fastapi.tiangolo.com/)
 - [Docker — Dockerfile best practices](https://docs.docker.com/develop/develop-images/dockerfile_best-practices/)

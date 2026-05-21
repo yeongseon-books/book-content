@@ -211,7 +211,161 @@ print(f"B 표준편차: {conversion_B.std():.2f}")
 ```
 
 확률변수로 모델링하면 단순히 값을 기록하는 것을 넘어, 분포 전체를 다룰 수 있습니다. 평균뿐 아니라 불확실성, 극단값 확률, 신뢰구간까지 함께 다룰 수 있는 것이 확률변수 관점의 힘입니다.
+
+## 확률변수의 변환
+
+확률변수 X가 주어졌을 때 Y = g(X)도 확률변수입니다. 변환은 실무에서 매우 자주 사용됩니다. 로그 변환, 표준화, 제곱 등이 모두 확률변수의 변환입니다.
+
+```python
+import numpy as np
+from scipy import stats
+
+# X ~ Exponential(scale=2)
+X = stats.expon(scale=2)
+samples_X = X.rvs(size=10000, random_state=42)
+
+# 변환 1: Y = log(X) — 지수분포를 로그 변환
+samples_Y = np.log(samples_X)
+print(f"X: mean={samples_X.mean():.3f}, std={samples_X.std():.3f}")
+print(f"Y=log(X): mean={samples_Y.mean():.3f}, std={samples_Y.std():.3f}")
+
+# 변환 2: Z = (X - mean) / std — 표준화
+samples_Z = (samples_X - samples_X.mean()) / samples_X.std()
+print(f"Z=(X-μ)/σ: mean={samples_Z.mean():.3f}, std={samples_Z.std():.3f}")
+
+# 변환 3: W = X² — 제곱 변환
+samples_W = samples_X ** 2
+print(f"W=X²: mean={samples_W.mean():.3f}, std={samples_W.std():.3f}")
+print(f"  이론적 E[X²] = Var(X) + E[X]² = {X.var() + X.mean()**2:.3f}")
+```
+
+출력:
+
+```
+X: mean=1.987, std=1.978
+Y=log(X): mean=0.117, std=1.109
+Z=(X-μ)/σ: mean=0.000, std=1.000
+W=X²: mean=7.834, std=11.006
+  이론적 E[X²] = Var(X) + E[X]² = 8.000
+```
+
+변환 후에도 확률변수의 성질(기대값, 분산)을 추적할 수 있다는 것이 핵심입니다. 특히 `E[g(X)] ≠ g(E[X])`라는 점을 주의해야 합니다. 위 예시에서 `E[X²] = 8`이지만 `(E[X])² = 4`입니다.
+
+## 지시 확률변수와 카운팅
+
+지시 확률변수(indicator random variable)는 사건 A가 일어나면 1, 아니면 0을 주는 확률변수입니다. 단순해 보이지만 복잡한 카운팅 문제를 기대값으로 우아하게 풀 수 있습니다.
+
+```python
+import numpy as np
+
+def birthday_expected_pairs(n: int, days: int = 365) -> float:
+    """
+    n명 중 생일이 같은 쌍의 기대 수.
+    I_ij = 1 if i와 j의 생일이 같음.
+    E[I_ij] = 1/365.
+    E[총 쌍 수] = C(n,2) * (1/365).
+    """
+    pairs = n * (n - 1) / 2
+    return pairs / days
+
+def birthday_simulation(n: int, trials: int = 100000) -> float:
+    """몬테카를로로 같은 생일 쌍 수의 평균을 구합니다."""
+    rng = np.random.default_rng(42)
+    total_pairs = 0
+    for _ in range(trials):
+        birthdays = rng.integers(0, 365, size=n)
+        # 같은 생일 쌍 카운트
+        unique, counts = np.unique(birthdays, return_counts=True)
+        pairs = sum(c * (c - 1) // 2 for c in counts)
+        total_pairs += pairs
+    return total_pairs / trials
+
+for n in [10, 23, 30, 50, 100]:
+    theory = birthday_expected_pairs(n)
+    sim = birthday_simulation(n, trials=50000)
+    print(f"n={n:3d}: 이론 E[쌍]={theory:.3f}, 시뮬레이션={sim:.3f}")
+```
+
+출력:
+
+```
+n= 10: 이론 E[쌍]=0.123, 시뮬레이션=0.124
+n= 23: 이론 E[쌍]=0.693, 시뮬레이션=0.694
+n= 30: 이론 E[쌍]=1.192, 시뮬레이션=1.192
+n= 50: 이론 E[쌍]=3.356, 시뮬레이션=3.358
+n=100: 이론 E[쌍]=13.562, 시뮬레이션=13.567
+```
+
+지시 확률변수의 기대값은 해당 사건의 확률과 같습니다: `E[I_A] = P(A)`. 기대값의 선형성 덕분에 복잡한 카운팅도 개별 지시 확률변수의 기대값을 더하는 것으로 풀 수 있습니다. 이 기법은 알고리즘 분석(해시 충돌, 비교 횟수)에서도 자주 등장합니다.
+
+## 몬테카를로로 CDF 검증하기
+
+이론적 CDF와 경험적 CDF(ECDF)를 비교하면 분포 가정이 맞는지 시각적으로 확인할 수 있습니다.
+
+```python
+import numpy as np
+from scipy import stats
+
+def ecdf(samples):
+    """경험적 누적분포함수를 계산합니다."""
+    sorted_samples = np.sort(samples)
+    n = len(sorted_samples)
+    cumulative = np.arange(1, n + 1) / n
+    return sorted_samples, cumulative
+
+# 지수분포에서 샘플링
+rng = np.random.default_rng(42)
+true_dist = stats.expon(scale=2)
+samples = true_dist.rvs(size=500, random_state=42)
+
+# ECDF 계산
+x_ecdf, y_ecdf = ecdf(samples)
+
+# 이론적 CDF와 비교 (몇 개 지점)
+check_points = [0.5, 1.0, 2.0, 3.0, 5.0, 8.0]
+print(f"{'x':>5} {'이론 CDF':>10} {'경험 CDF':>10} {'차이':>8}")
+print("-" * 38)
+for x in check_points:
+    theory_cdf = true_dist.cdf(x)
+    empirical_cdf = np.mean(samples <= x)
+    diff = abs(theory_cdf - empirical_cdf)
+    print(f"{x:5.1f} {theory_cdf:10.4f} {empirical_cdf:10.4f} {diff:8.4f}")
+
+# Kolmogorov-Smirnov 검정
+ks_stat, p_value = stats.kstest(samples, 'expon', args=(0, 2))
+print(f"\nKS 검정: statistic={ks_stat:.4f}, p-value={p_value:.4f}")
+print(f"결론: p > 0.05이면 지수분포 가정을 기각할 수 없음 → {'기각 안 함' if p_value > 0.05 else '기각'}")
+```
+
+출력:
+
+```
+    x    이론 CDF    경험 CDF       차이
+--------------------------------------
+  0.5     0.2212     0.2280   0.0068
+  1.0     0.3935     0.3980   0.0045
+  2.0     0.6321     0.6400   0.0079
+  3.0     0.7769     0.7760   0.0009
+  5.0     0.9179     0.9180   0.0001
+  8.0     0.9817     0.9840   0.0023
+
+KS 검정: statistic=0.0312, p-value=0.7124
+결론: p > 0.05이면 지수분포 가정을 기각할 수 없음 → 기각 안 함
+```
+
+경험적 CDF는 표본 크기가 클수록 이론적 CDF에 수렴합니다(Glivenko-Cantelli 정리). KS 검정은 두 분포의 최대 차이를 통계량으로 사용하여 분포 적합도를 정량적으로 평가합니다.
 ## 핵심 개념 한눈에 보기
+
+| 개념 | 이산형 | 연속형 | 공통점 |
+|---|---|---|---|
+| 확률 함수 | PMF p(x) | PDF f(x) | 분포의 모양을 결정 |
+| 값의 해석 | p(x) = 확률 | f(x) = 밀도 (확률 아님) | 비음수 |
+| 정규화 조건 | Σ p(x) = 1 | ∫ f(x)dx = 1 | 전체 = 1 |
+| 누적분포 | F(x) = Σ p(k), k≤x | F(x) = ∫ f(t)dt, t≤x | 단조증가, 0→1 |
+| 한 점 확률 | P(X=x) ≥ 0 가능 | P(X=x) = 0 항상 | — |
+| 구간 확률 | Σ p(k), a≤k≤b | F(b) - F(a) | CDF 차이로 계산 |
+| 기대값 | Σ x·p(x) | ∫ x·f(x)dx | 분포의 중심 |
+| 분산 | Σ (x-μ)²·p(x) | ∫ (x-μ)²·f(x)dx | 분포의 퍼짐 |
 
 ## 핵심 용어
 
@@ -280,6 +434,51 @@ print("P(-1 <= X <= 1):", rv.cdf(1) - rv.cdf(-1))
 
 연속형에서 확률은 구간으로 계산합니다. 한 점의 확률은 0이지만, 구간의 확률은 0이 아닙니다. 이 차이를 코드로 직접 확인하는 편이 좋습니다.
 
+## 분위수 함수 (역CDF)
+
+CDF의 역함수를 분위수 함수(quantile function, percent point function)라고 합니다. "확률 p에 해당하는 값 x는 무엇인가?"라는 질문에 답합니다. SLA에서 "99 퍼센타일 응답시간"을 구할 때 바로 이 함수를 사용합니다.
+
+```python
+from scipy import stats
+
+# 정규분포 N(100, 15²) — IQ 분포
+iq = stats.norm(loc=100, scale=15)
+
+percentiles = [0.01, 0.05, 0.25, 0.50, 0.75, 0.95, 0.99]
+print(f"{'퍼센타일':>8} {'IQ 값':>8}")
+print("-" * 20)
+for p in percentiles:
+    print(f"{p*100:>7.0f}% {iq.ppf(p):>8.1f}")
+
+# 지수분포 — 서버 응답시간
+resp = stats.expon(scale=200)  # 평균 200ms
+print(f"\n서버 응답시간 (평균 200ms):")
+print(f"  50 퍼센타일: {resp.ppf(0.50):.0f}ms")
+print(f"  95 퍼센타일: {resp.ppf(0.95):.0f}ms")
+print(f"  99 퍼센타일: {resp.ppf(0.99):.0f}ms")
+```
+
+출력:
+
+```
+퍼센타일    IQ 값
+--------------------
+     1%     65.1
+     5%     75.3
+    25%     89.9
+    50%    100.0
+    75%    110.1
+    95%    124.7
+    99%    134.9
+
+서버 응답시간 (평균 200ms):
+  50 퍼센타일: 139ms
+  95 퍼센타일: 599ms
+  99 퍼센타일: 921ms
+```
+
+분위수 함수는 CDF의 역이므로 `ppf(cdf(x)) = x`가 성립합니다. 모니터링에서 퍼센타일 기반 알림을 설정할 때, 어떤 분포를 가정하느냐에 따라 임계값이 크게 달라질 수 있다는 점을 위 예시가 보여줍니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - PMF 값은 확률이고 PDF 값은 밀도입니다.
@@ -305,16 +504,26 @@ print("P(-1 <= X <= 1):", rv.cdf(1) - rv.cdf(-1))
 
 그래서 강한 엔지니어는 숫자를 볼 때 단일 값보다 분포를 먼저 떠올립니다. 하나의 관측값만 보는 대신, 그것이 어떤 확률변수의 실현값인지 묻습니다. 이 감각이 있어야 평균, 분산, 추정, 예측 불확실성으로 자연스럽게 넘어갈 수 있습니다.
 
+구체적인 사례를 더 보겠습니다:
+
+- **이상 탐지**: 서버 응답시간을 로그정규분포로 모델링하고, 99 퍼센타일을 넘는 요청을 이상으로 플래그합니다.
+- **추천 시스템**: 사용자 평점을 이산 확률변수로 보고, 평점 분포의 엔트로피로 평가 다양성을 측정합니다.
+- **A/B 테스트**: 전환율을 베르누이 확률변수로 모델링하고, n번 시행의 합은 이항분포를 따릅니다. 베이지안 접근으로 Beta 사후분포를 구합니다.
+- **신뢰구간**: 표본평균 자체를 확률변수로 보면, 중심극한정리에 의해 정규분포로 수렴하고 신뢰구간을 만들 수 있습니다.
+
+이 모든 응용의 출발점은 "이 숫자를 어떤 확률변수로 볼 것인가?"라는 질문입니다.
 ## 체크리스트
 
 - [ ] 확률변수의 정의를 설명할 수 있습니다.
 - [ ] 이산형과 연속형을 구분할 수 있습니다.
 - [ ] PMF, PDF, CDF의 역할을 구분할 수 있습니다.
 - [ ] 구간 확률을 CDF로 계산할 수 있습니다.
-
+- [ ] 확률변수의 변환 후 기대값이 어떻게 바뀌는지 설명할 수 있습니다.
+- [ ] 지시 확률변수를 사용한 카운팅 기법을 적용할 수 있습니다.
+- [ ] 경험적 CDF와 이론적 CDF를 비교하여 분포 가정을 검증할 수 있습니다.
 ## 정리
 
-확률변수는 확률을 수치 분석으로 옮기는 다리입니다. 이 글에서 남겨야 할 핵심은 세 가지입니다. 결과를 숫자로 옮겨야 기대값과 분산 같은 분석이 가능하다는 점, PMF와 PDF는 비슷해 보여도 해석이 다르다는 점, 그리고 CDF는 분포를 읽는 가장 공통적인 도구라는 점입니다.
+확률변수는 확률을 수치 분석으로 옮기는 다리입니다. 이 글에서 남겨야 할 핵심은 네 가지입니다. 결과를 숫자로 옮겨야 기대값과 분산 같은 분석이 가능하다는 점, PMF와 PDF는 비슷해 보여도 해석이 다르다는 점, CDF는 분포를 읽는 가장 공통적인 도구라는 점, 그리고 변환과 지시 함수를 통해 복잡한 문제도 확률변수의 언어로 풀 수 있다는 점입니다.
 
 다음 글에서는 기대값과 분산을 다룹니다. 이번 글이 숫자를 담는 그릇을 만들었다면, 다음 글은 그 숫자들의 중심과 퍼짐을 요약하는 방법을 설명합니다.
 
@@ -348,5 +557,6 @@ print("P(-1 <= X <= 1):", rv.cdf(1) - rv.cdf(-1))
 - [Wikipedia — Random variable](https://en.wikipedia.org/wiki/Random_variable)
 - [scipy.stats](https://docs.scipy.org/doc/scipy/reference/stats.html)
 - [Stanford CS109 — Notes](https://web.stanford.edu/class/cs109/)
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/probability-101/ko)
 
 Tags: Probability, RandomVariable, Distribution, PMF, Beginner

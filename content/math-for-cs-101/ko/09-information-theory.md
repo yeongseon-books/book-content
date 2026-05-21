@@ -363,6 +363,173 @@ print(huffman_lengths({'A':45,'B':13,'C':12,'D':16,'E':9,'F':5}))
 
 정보이론을 압축 구현과 연결해 보면, 엔트로피가 단지 추상 지표가 아니라 실제 저장/전송 비용의 하한이라는 점이 더 분명해집니다.
 
+## 상호 정보량
+
+상호 정보량(Mutual Information, MI)은 두 확률변수가 서로에 대해 얼마나 많은 정보를 공유하는지 측정합니다.
+
+$$I(X;Y) = H(X) - H(X|Y) = H(Y) - H(Y|X) = H(X) + H(Y) - H(X,Y)$$
+
+X를 알면 Y의 불확실성이 얼마나 줄어드는지를 나타냅니다. MI가 0이면 두 변수는 독립입니다.
+
+```python
+import numpy as np
+from collections import Counter
+
+def mutual_information(x: list, y: list) -> float:
+    """이산 확률변수 x, y의 상호 정보량을 추정합니다."""
+    n = len(x)
+    assert n == len(y)
+
+    # 주변 분포
+    px = Counter(x)
+    py = Counter(y)
+    # 결합 분포
+    pxy = Counter(zip(x, y))
+
+    mi = 0.0
+    for (xi, yi), count_xy in pxy.items():
+        p_xy = count_xy / n
+        p_x = px[xi] / n
+        p_y = py[yi] / n
+        mi += p_xy * np.log2(p_xy / (p_x * p_y))
+    return mi
+
+# 예시: 완전 종속 vs 독립
+labels = [0, 0, 1, 1, 2, 2, 0, 1, 2, 0]
+same = labels[:]                     # X == Y (완전 종속)
+rand = [1, 2, 0, 2, 1, 0, 2, 0, 1, 2]  # 무관한 변수
+
+print(f"MI(X, X): {mutual_information(labels, same):.4f} bits")  # 최대
+print(f"MI(X, R): {mutual_information(labels, rand):.4f} bits")  # 약 0
+```
+
+상호 정보량은 다음과 같은 곳에서 활용됩니다.
+
+| 분야 | 활용 | 설명 |
+|------|------|------|
+| 특성 선택 | MI 기반 필터 | 타깃과 MI가 높은 특성을 우선 선택 |
+| 결정트리 | 정보 이득 | 분할 후 MI 증가량을 기준으로 노드 선택 |
+| 클러스터링 | NMI 지표 | Normalized MI로 클러스터 품질 평가 |
+| 생성 모델 | InfoGAN | 잠재 코드와 출력 간 MI 최대화 |
+
+## 채널 용량과 섀넌 한계
+
+통신 채널에 잡음이 있어도 오류율을 임의로 낮출 수 있는 최대 전송률이 존재합니다. 이것이 채널 용량(Channel Capacity)입니다.
+
+$$C = \max_{p(x)} I(X;Y)$$
+
+이진 대칭 채널(BSC)에서 비트가 확률 p로 뒤집힌다면:
+
+$$C_{BSC} = 1 - H(p) = 1 - [-p\log_2 p - (1-p)\log_2(1-p)]$$
+
+```python
+import numpy as np
+
+def binary_entropy(p: float) -> float:
+    """이진 엔트로피 함수 H(p)를 계산합니다."""
+    if p == 0 or p == 1:
+        return 0.0
+    return -(p * np.log2(p) + (1 - p) * np.log2(1 - p))
+
+def bsc_capacity(p: float) -> float:
+    """이진 대칭 채널의 용량을 계산합니다."""
+    return 1.0 - binary_entropy(p)
+
+# 오류 확률별 채널 용량
+error_probs = [0.0, 0.01, 0.05, 0.1, 0.2, 0.3, 0.5]
+print("오류확률(p)  채널용량(C)  의미")
+print("-" * 50)
+for p in error_probs:
+    c = bsc_capacity(p)
+    note = "완벽한 채널" if p == 0 else "무작위 채널" if p == 0.5 else ""
+    print(f"  {p:.2f}        {c:.4f}       {note}")
+```
+
+섀넌의 채널 부호화 정리는 다음을 보장합니다.
+
+- 전송률 R < C이면, 적절한 부호화로 오류율을 0에 가깝게 만들 수 있습니다.
+- 전송률 R > C이면, 어떤 부호화를 사용해도 오류를 피할 수 없습니다.
+
+이 결과는 5G, Wi-Fi, 위성 통신의 설계 한계를 결정합니다. LDPC 코드와 Turbo 코드는 섀넌 한계에 매우 가까운 성능을 달성하는 실용적 부호화 기법입니다.
+
+## 압축 효율 비교 실험
+
+이론적 엔트로피와 실제 압축 알고리즘의 결과를 비교하면, 엔트로피가 왜 '하한'인지 체감할 수 있습니다.
+
+```python
+import zlib
+import math
+from collections import Counter
+
+def entropy_bits(data: bytes) -> float:
+    """바이트 시퀀스의 엔트로피를 비트/바이트 단위로 계산합니다."""
+    freq = Counter(data)
+    n = len(data)
+    return -sum((c/n) * math.log2(c/n) for c in freq.values())
+
+def compression_experiment(data: bytes, label: str):
+    """데이터의 엔트로피와 실제 압축 결과를 비교합니다."""
+    h = entropy_bits(data)
+    compressed = zlib.compress(data, level=9)
+    ratio = len(compressed) / len(data)
+    theoretical_ratio = h / 8.0  # 엔트로피 / 최대 엔트로피(8 bits)
+
+    print(f"\n[{label}]")
+    print(f"  원본 크기: {len(data):,} bytes")
+    print(f"  엔트로피: {h:.3f} bits/byte (최대 8.0)")
+    print(f"  이론적 최소 비율: {theoretical_ratio:.3f}")
+    print(f"  zlib 압축 비율: {ratio:.3f}")
+    print(f"  엔트로피 대비 효율: {theoretical_ratio/ratio*100:.1f}%")
+
+# 실험 1: 편향된 데이터 (낮은 엔트로피)
+biased = bytes([0]*800 + [1]*150 + [2]*50)
+compression_experiment(biased, "편향 데이터 (엔트로피 낮음)")
+
+# 실험 2: 균등 분포 (높은 엔트로피)
+import os
+uniform = os.urandom(1000)
+compression_experiment(uniform, "무작위 데이터 (엔트로피 높음)")
+
+# 실험 3: 자연어 텍스트 (중간 엔트로피)
+text = ("정보이론은 통신과 데이터 압축의 기초입니다. " * 20).encode('utf-8')
+compression_experiment(text, "반복 텍스트 (중간 엔트로피)")
+```
+
+이 실험에서 확인할 수 있는 점은 다음과 같습니다.
+
+1. 엔트로피가 낮을수록 압축 비율이 좋습니다.
+2. 무작위 데이터는 엔트로피가 최대(~8 bits/byte)이므로 압축이 거의 불가능합니다.
+3. 실제 압축 알고리즘은 엔트로피 하한보다 항상 약간 큰 결과를 냅니다(오버헤드).
+4. zlib은 LZ77 + 허프만을 결합하므로, 반복 패턴이 있으면 엔트로피보다 훨씬 좋은 압축률을 보이기도 합니다(조건부 엔트로피가 낮기 때문).
+
+## KL 발산의 실용적 해석
+
+KL 발산 $D_{KL}(P \| Q)$는 '참 분포 P를 근사 분포 Q로 부호화할 때 추가로 드는 비트 수'입니다.
+
+```python
+import numpy as np
+
+def kl_divergence(p: np.ndarray, q: np.ndarray) -> float:
+    """KL(P || Q)를 계산합니다. P(x)=0인 항은 제외합니다."""
+    mask = p > 0
+    return float(np.sum(p[mask] * np.log2(p[mask] / q[mask])))
+
+# 모델 학습 시나리오: 타깃 분포 vs 모델 예측 분포
+target = np.array([0.7, 0.2, 0.1])          # 실제 레이블 분포
+model_good = np.array([0.65, 0.25, 0.10])   # 잘 학습된 모델
+model_bad = np.array([0.33, 0.34, 0.33])    # 균등 예측 (학습 안 됨)
+
+print(f"H(target): {-np.sum(target * np.log2(target)):.4f} bits")
+print(f"KL(target || good_model): {kl_divergence(target, model_good):.4f} bits")
+print(f"KL(target || bad_model):  {kl_divergence(target, model_bad):.4f} bits")
+print()
+print("KL이 작을수록 모델이 실제 분포를 잘 근사합니다.")
+print("교차 엔트로피 = H(P) + KL(P||Q) 이므로,")
+print("KL을 줄이는 것이 곧 교차 엔트로피 손실을 줄이는 것입니다.")
+```
+
+딥러닝에서 cross-entropy loss를 최소화하는 것은 사실상 모델 출력 분포와 참 레이블 분포 사이의 KL 발산을 최소화하는 것과 동일합니다. H(P)는 상수이므로, $\min CE(P, Q) = \min [H(P) + D_{KL}(P \| Q)] = \min D_{KL}(P \| Q)$입니다.
+
 ## 처음 질문으로 돌아가기
 
 - **정보의 양은 무엇으로 측정할까요?**
@@ -395,5 +562,6 @@ print(huffman_lengths({'A':45,'B':13,'C':12,'D':16,'E':9,'F':5}))
 - [Elements of Information Theory - Cover and Thomas](https://www.wiley.com/en-us/Elements+of+Information+Theory%2C+2nd+Edition-p-9780471241959)
 - [SciPy Stats Entropy Documentation](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.entropy.html)
 - [SciPy GitHub repository](https://github.com/scipy/scipy)
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/math-for-cs-101/ko)
 
 Tags: Math, InformationTheory, Entropy, Compression, Beginner

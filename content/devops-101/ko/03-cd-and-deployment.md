@@ -101,7 +101,7 @@ Canary 지표를 모니터링합니다. 5xx 비율, p95 지연시간, 에러 로
 
 이 5단계를 파이프라인으로 코드화하면 배포는 이벤트가 아니라 반복 가능한 절차가 됩니다.
 
-## YAML CD 파이프라인 예제
+## 야믈 지속적 배포 파이프라인 예시
 
 CD는 CI와 전혀 다른 에세를 가집니다. CI는 코드 품질을 검증하지만, CD는 실제 환경에 노출하는 순간을 다룹니다. 아래는 스테이징과 프로덕션 배포를 병렬로 관리하는 예시입니다.
 
@@ -166,7 +166,7 @@ jobs:
 ```
 
 이 파이프라인은 스테이징 성공 후에만 프로덕션 배포를 진행합니다. Canary 지표가 임계값을 넘으면 자동으로 롤백합니다. 이것이 안전한 CD의 핵심입니다.
-## Before/After
+## 전환 전후
 
 **Before (big-bang deploy)**
 
@@ -316,7 +316,7 @@ T+10m 승격 또는 롤백 결정
 
 CD는 되돌릴 수 있는 작은 변경의 흐름입니다. 다음 글에서는 여러 환경에 같은 코드를 안전하게 배포하기 위한 설정 관리 방식을 다룹니다.
 
-## CD 전략을 선택할 때 보는 실무 기준
+## 지속적 배포 전략을 선택할 때 보는 실무 기준
 
 CD는 자동 배포 자체보다 "위험을 통제한 채로 변경을 전달하는 운영 규칙"에 가깝습니다. 같은 자동 배포라도 전환 방식, 모니터링 기준, 롤백 경로에 따라 결과는 완전히 달라집니다.
 
@@ -431,6 +431,160 @@ def checkout():
 
 추가로 배포 전환 자동화에서는 사람 승인 지점을 최소화하되, 고위험 변경만 선택적으로 승인하도록 정책을 나누는 것이 좋습니다. 예를 들어 스키마 변경 포함 배포는 승인 필요, 단순 애플리케이션 패치 배포는 자동 승격처럼 규칙을 분리하면 속도와 안정성을 함께 확보할 수 있습니다.
 
+
+## 운영 앵커: 배포, 인프라, 관측성, 대응을 한 장으로 연결하기
+
+앞선 섹션에서 각 주제를 따로 설명했다면, 이 섹션은 실무에서 한 번에 연결해 쓰는 최소 구성 예시를 제공합니다. 핵심은 화려한 도구 조합이 아니라, 같은 기준으로 변경을 통과시키고 문제를 되돌릴 수 있는가입니다.
+
+### CI/CD 파이프라인 공통 YAML
+
+```yaml
+name: delivery-flow
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements-dev.txt
+      - run: ruff check .
+      - run: pytest -q
+
+  deploy-stage:
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./scripts/deploy_stage.sh
+      - run: ./scripts/smoke_test.sh https://stage.example.com
+
+  deploy-prod-canary:
+    needs: deploy-stage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./scripts/deploy_prod.sh --strategy canary --percent 10
+      - run: ./scripts/check_slo.sh --window 5m
+      - run: ./scripts/promote_or_rollback.sh
+```
+
+이 흐름의 실전 포인트는 세 가지입니다. 첫째, CI 통과 전에는 어떤 배포도 시작하지 않습니다. 둘째, stage 통과 후에만 production으로 승격합니다. 셋째, production 승격은 canary 관찰 통과를 조건으로 강제합니다.
+
+### Terraform과 Ansible 역할 분리 예시
+
+```hcl
+# infra/main.tf
+resource "aws_security_group" "api" {
+  name        = "api-sg"
+  description = "api security group"
+}
+
+resource "aws_instance" "api" {
+  ami           = var.ami
+  instance_type = "t3.small"
+  tags = {
+    service = "api"
+    env     = var.env
+  }
+}
+```
+
+```yaml
+# ops/playbooks/hardening.yml
+- hosts: api
+  become: true
+  tasks:
+    - name: Install security updates
+      apt:
+        update_cache: true
+        upgrade: dist
+
+    - name: Ensure auditd is installed
+      apt:
+        name: auditd
+        state: present
+
+    - name: Ensure ssh root login is disabled
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^PermitRootLogin'
+        line: 'PermitRootLogin no'
+```
+
+Terraform은 "무엇을 만들 것인가"를 선언하고, Ansible은 "만들어진 시스템을 어떤 상태로 유지할 것인가"를 담당합니다. 두 도구를 구분하면 변경 리뷰 범위가 명확해지고, 장애 시 원인 추적도 빨라집니다.
+
+### 모니터링/알림 설정 예시
+
+```yaml
+# monitoring/alerts.yml
+groups:
+  - name: api-slo
+    rules:
+      - alert: ApiHighErrorRate
+        expr: rate(http_requests_total{service="api",status=~"5.."}[5m]) / rate(http_requests_total{service="api"}[5m]) > 0.01
+        for: 5m
+        labels:
+          severity: page
+        annotations:
+          summary: "API 5xx 비율 1% 초과"
+          runbook: "https://internal/wiki/runbooks/api-high-error-rate"
+
+      - alert: ApiHighLatencyP95
+        expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{service="api"}[5m])) by (le)) > 0.35
+        for: 10m
+        labels:
+          severity: warning
+```
+
+알림은 많이 울리는 것이 목표가 아닙니다. 운영자가 실제로 행동할 수 있는 신호만 남기고, 모든 page 알림에 runbook 링크를 붙여 대응 시작 시간을 줄여야 합니다.
+
+### 블루그린/카나리 승격 절차 예시
+
+```bash
+# blue-green switch
+./scripts/deploy_blue.sh
+./scripts/smoke_test.sh https://blue.example.com
+./scripts/switch_traffic.sh --from green --to blue
+
+# canary rollout
+./scripts/deploy_canary.sh --percent 10
+./scripts/check_metrics.sh --window 5m
+./scripts/promote_canary.sh --to 50
+./scripts/promote_canary.sh --to 100
+```
+
+블루그린은 즉시 전환과 즉시 롤백에 유리하고, 카나리는 위험을 작게 나눠 검증하는 데 유리합니다. 서비스 특성과 팀 역량에 따라 전략을 고르되, 승격/철수 명령을 반드시 런북과 자동화 스크립트로 함께 유지해야 합니다.
+
+### 인시던트 대응 런북 예시
+
+```markdown
+# Runbook: API 5xx 급증
+
+## 0-5분
+1. SEV 판정 (SEV1/SEV2)
+2. incident 채널 개설
+3. 최근 배포 커밋 확인
+
+## 5-10분
+1. canary/최근 릴리스 롤백 시도
+2. 에러율, p95, DB 연결수 확인
+3. 고객 영향 범위 요약 공지
+
+## 10-20분
+1. 임시 완화 조치 적용
+2. 영구 수정 owner 지정
+3. postmortem 일정 예약
+```
+
+운영에서는 "잘 아는 사람"보다 "같은 순서를 따르는 팀"이 더 빠르게 복구합니다. 그래서 runbook은 설명 문서가 아니라 실행 문서여야 하며, 경보에서 한 번에 열 수 있어야 합니다.
+
 ## 처음 질문으로 돌아가기
 
 - **CD는 CI와 무엇이 같고 무엇이 다를까요?**
@@ -462,5 +616,7 @@ def checkout():
 - [Argo Rollouts](https://argoproj.github.io/rollouts/)
 - [LaunchDarkly — Feature Flags](https://launchdarkly.com/blog/what-are-feature-flags/)
 - [Spinnaker](https://spinnaker.io/)
+
+- [이 시리즈의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/devops-101/ko)
 
 Tags: DevOps, CD, Deployment, BlueGreen, Canary

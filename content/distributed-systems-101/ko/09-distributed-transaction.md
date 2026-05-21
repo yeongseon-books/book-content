@@ -211,112 +211,365 @@ XA와 2PC는 여전히 일부 RDBMS 클러스터와 브로커에서 쓰입니다
 분산 트랜잭션은 ACID를 그대로 복제하는 일이 아니라 결국 합의된 상태로 수렴하도록 설계하는 일입니다. 다음 마지막 글에서는 지금까지의 도구를 묶어 운영 가능한 분산 시스템 패턴으로 정리합니다.
 
 
-## 실전 설계 확장: 합의, CAP, 메시지 큐 운영
+## 실전 설계 확장: 2PC, Saga, Outbox, TCC
 
-분산 시스템을 실제로 운영할 때는 "요청을 받았다"보다 "요청이 어느 경계에서 확정되었는가"를 더 먼저 확인해야 합니다. 이유는 단순합니다. 네트워크 지연과 부분 장애가 존재하면 성공/실패 이분법으로 상태를 설명할 수 없고, 노드별 관측 시점이 달라 같은 사건을 다르게 기록할 수 있기 때문입니다. 따라서 설계 문서에는 기능 설명뿐 아니라 합의 규칙, 파티션 시 동작 규칙, 큐 처리 규칙이 함께 들어가야 운영에서 재현 가능한 판단이 가능합니다.
+이제부터는 "분산 트랜잭션이 실제로 어떻게 깨지고 어떻게 복구되는가"를 패턴별로 구체화합니다. 핵심은 단일 정답을 찾는 것이 아니라, 도메인 제약과 장애 모델에 맞는 실패 계약을 선택하는 것입니다.
 
-### 합의 알고리즘을 어디에 쓰는가
+### 2PC 상세 흐름: 준비와 확정의 분리
 
-합의 알고리즘은 이론 주제가 아니라 운영 안전장치입니다. 예를 들어 주문 서비스의 리더 노드가 동시에 두 개 생기면, 같은 주문 번호에 서로 다른 상태가 기록될 수 있습니다. 이때 Raft 같은 리더 기반 합의는 "현재 임기의 과반이 인정한 리더만 쓰기 가능"이라는 제약으로 이중 기록을 막습니다.
+2PC는 coordinator가 참여자(participant)에게 두 단계를 강제합니다.
 
-```text
-노드 5개 구성에서 과반수는 3개입니다.
-리더가 쓰기를 확정하려면 최소 3개 노드에 로그가 복제되어야 합니다.
-2개 노드만 성공한 쓰기는 클라이언트 성공 응답으로 확정하면 안 됩니다.
+1. **prepare 단계**: 각 참여자는 변경 가능 여부를 검사하고, 가능하면 로컬 잠금을 잡은 채 `YES`를 기록합니다.
+2. **commit 단계**: coordinator는 모든 `YES`를 받았을 때만 전원 commit을 지시합니다.
+
+아래 코드는 Flask 스타일 의사코드로, prepare 로그와 최종 결정 로그를 분리해 기록합니다.
+
+```python
+# 2pc_coordinator.py
+from enum import Enum
+from dataclasses import dataclass
+from typing import Dict, List
+
+
+class Vote(str, Enum):
+    YES = "YES"
+    NO = "NO"
+
+
+@dataclass
+class ParticipantClient:
+    name: str
+
+    def prepare(self, tx_id: str, payload: dict) -> Vote:
+        # 실제 구현에서는 HTTP/gRPC 호출
+        return Vote.YES
+
+    def commit(self, tx_id: str) -> None:
+        pass
+
+    def abort(self, tx_id: str) -> None:
+        pass
+
+
+class DecisionLog:
+    def __init__(self) -> None:
+        self.records: Dict[str, str] = {}
+
+    def write(self, tx_id: str, state: str) -> None:
+        self.records[tx_id] = state
+
+    def read(self, tx_id: str) -> str | None:
+        return self.records.get(tx_id)
+
+
+def run_2pc(tx_id: str, payload: dict, participants: List[ParticipantClient], log: DecisionLog) -> str:
+    log.write(tx_id, "PREPARING")
+    votes: Dict[str, Vote] = {}
+
+    for p in participants:
+        vote = p.prepare(tx_id=tx_id, payload=payload)
+        votes[p.name] = vote
+        if vote == Vote.NO:
+            log.write(tx_id, "ABORT")
+            for pp in participants:
+                pp.abort(tx_id)
+            return "ABORT"
+
+    log.write(tx_id, "COMMIT")
+    for p in participants:
+        p.commit(tx_id)
+    return "COMMIT"
 ```
 
-실무 문서에 반드시 적어야 하는 항목은 다음과 같습니다.
+실무에서 중요한 포인트는 `PREPARING`과 `COMMIT/ABORT`가 모두 durable 로그여야 한다는 점입니다. 메모리 상태만으로 운영하면 coordinator 재시작 후 결정을 잃어 in-doubt 상태를 과도하게 만들 수 있습니다.
 
-- 리더 선출 타임아웃 범위(예: 150ms~300ms 랜덤)
-- 하트비트 간격(예: 50ms)
-- 로그 확정 기준(과반 복제 이후 commit)
-- 장애 복구 시 재조인 절차(스냅샷/로그 재동기화)
+### 2PC coordinator 장애 처리: in-doubt를 줄이는 설계
 
-이 네 가지를 수치로 고정하면, 장애 대응 중에 팀원마다 다른 가정을 들고 판단하는 상황을 줄일 수 있습니다.
+2PC의 대표 약점은 coordinator 단일 장애점입니다. 특히 참여자는 `prepare YES` 후 잠금을 잡고 기다리기 때문에, coordinator가 죽으면 애플리케이션 지연이 연쇄적으로 커집니다.
 
-### CAP을 선언으로 끝내지 않고 시나리오로 적기
+실무 복구 전략은 보통 세 층으로 분리합니다.
 
-"우리 시스템은 AP" 같은 문장은 운영에서 거의 도움이 되지 않습니다. 어떤 API가 파티션 중에도 쓰기를 받는지, 읽기 결과가 얼마나 오래 뒤처질 수 있는지를 함께 정의해야 합니다.
+1. **결정 로그 복구**: coordinator 재기동 시 `PREPARING` 트랜잭션을 스캔합니다.
+2. **참여자 질의**: 각 참여자에게 `tx_id` 최종 상태를 질의합니다.
+3. **결정 재전파**: 다수 참여자가 `COMMITTED`면 commit 재전파, 아니면 abort 재전파를 수행합니다.
 
-예시로 재고 서비스의 파티션 정책을 문서화하면 아래처럼 표현할 수 있습니다.
+```python
+# 2pc_recovery.py
+def recover_pending_transactions(log, participants):
+    for tx_id, state in log.records.items():
+        if state != "PREPARING":
+            continue
+
+        participant_states = []
+        for p in participants:
+            participant_states.append(p.query_tx_state(tx_id))
+
+        if "COMMITTED" in participant_states:
+            log.write(tx_id, "COMMIT")
+            for p in participants:
+                p.commit(tx_id)
+        else:
+            log.write(tx_id, "ABORT")
+            for p in participants:
+                p.abort(tx_id)
+```
+
+여기서 핵심 운영 지표는 `in_doubt_count`, `prepare_lock_wait_ms`, `coordinator_recovery_seconds`입니다. 2PC를 선택했다면 기능 성공률보다 이 세 지표를 먼저 경보화해야 합니다.
+
+### Saga: 오케스트레이션과 코레오그래피
+
+Saga는 글로벌 잠금 대신 로컬 커밋 + 보상으로 정합성을 맞춥니다. 구현 방식은 두 가지가 널리 쓰입니다.
+
+#### 오케스트레이션 방식
+
+중앙 오케스트레이터가 단계 순서와 보상 순서를 명시적으로 관리합니다.
+
+```python
+# saga_orchestrator.py
+from fastapi import FastAPI, HTTPException
+import requests
+
+app = FastAPI()
+
+
+@app.post("/checkout")
+def checkout(order_id: str, user_id: str, amount: int):
+    reserve = requests.post("http://inventory/reserve", json={"order_id": order_id}).json()
+    if reserve["status"] != "ok":
+        raise HTTPException(status_code=409, detail="재고 부족")
+
+    charge = requests.post(
+        "http://payment/charge",
+        json={"order_id": order_id, "user_id": user_id, "amount": amount},
+    ).json()
+    if charge["status"] != "ok":
+        requests.post("http://inventory/release", json={"order_id": order_id})
+        raise HTTPException(status_code=409, detail="결제 실패")
+
+    ship = requests.post("http://shipping/create", json={"order_id": order_id}).json()
+    if ship["status"] != "ok":
+        requests.post("http://payment/refund", json={"order_id": order_id})
+        requests.post("http://inventory/release", json={"order_id": order_id})
+        raise HTTPException(status_code=409, detail="배송 생성 실패")
+
+    return {"status": "completed", "order_id": order_id}
+```
+
+장점은 흐름 가시성이 높고 실패 분기가 한곳에 모인다는 점입니다. 단점은 오케스트레이터가 비대해지면 배포 속도와 변경 충돌이 커진다는 점입니다.
+
+#### 코레오그래피 방식
+
+중앙 제어자 없이 이벤트를 통해 각 서비스가 다음 단계를 수행합니다.
+
+```python
+# saga_choreography_payment_consumer.py
+def on_inventory_reserved(event):
+    order_id = event["order_id"]
+    ok = try_charge_card(order_id=order_id, amount=event["amount"])
+    if ok:
+        publish("PaymentCharged", {"order_id": order_id})
+    else:
+        publish("PaymentFailed", {"order_id": order_id, "reason": "insufficient_funds"})
+
+
+def on_shipping_failed(event):
+    order_id = event["order_id"]
+    refund(order_id=order_id)
+    publish("PaymentRefunded", {"order_id": order_id})
+```
+
+장점은 서비스 자율성이 높고 중앙 병목이 줄어든다는 점입니다. 단점은 전체 흐름 추적이 어려워 분산 트레이싱과 상관관계 키(correlation id)가 사실상 필수라는 점입니다.
+
+### Saga 보상 로직: 취소가 아니라 역방향 도메인 명령
+
+보상 트랜잭션은 SQL rollback이 아닙니다. 이미 외부 세계에 반영된 결과를 비즈니스 의미로 상쇄하는 새 명령입니다. 따라서 "무조건 원복"이 아니라 "원복이 가능한 범위"를 먼저 정의해야 합니다.
+
+예를 들어 결제 보상은 다음과 같이 제약을 가집니다.
+
+- PG 승인 취소 가능 시간 창(예: 승인 후 10분 이내)
+- 부분 환불 허용 여부
+- 포인트, 쿠폰, 재고 예약의 역순 복구 규칙
+
+```python
+# compensation_policy.py
+from datetime import datetime, timedelta
+
+
+def compensate_payment(payment, now: datetime):
+    if payment.status != "captured":
+        return {"status": "noop", "reason": "이미 취소되었거나 미확정 상태입니다."}
+
+    if now - payment.captured_at <= timedelta(minutes=10):
+        cancel_authorization(payment.pg_tx_id)
+        return {"status": "compensated", "mode": "void"}
+
+    create_refund(payment.pg_tx_id, amount=payment.amount)
+    return {"status": "compensated", "mode": "refund"}
+```
+
+운영에서 자주 실패하는 지점은 보상 자체가 다시 실패하는 경우입니다. 그래서 Saga 상태 저장소에는 `compensate_retry_count`, `last_error_code`, `next_retry_at`를 남기고 재시도 정책을 명시해야 합니다.
+
+### 트랜잭셔널 아웃박스 구현: dual-write를 복구 가능한 backlog로 전환
+
+Outbox의 목적은 "DB 반영"과 "메시지 발행"을 하나의 로컬 트랜잭션으로 묶어, 중간 장애를 재처리 가능한 형태로 바꾸는 것입니다.
+
+```python
+# outbox_schema.sql (개념 예시)
+# CREATE TABLE outbox (
+#   id TEXT PRIMARY KEY,
+#   aggregate_type TEXT NOT NULL,
+#   aggregate_id TEXT NOT NULL,
+#   event_type TEXT NOT NULL,
+#   payload_json TEXT NOT NULL,
+#   status TEXT NOT NULL DEFAULT 'PENDING',
+#   created_at TIMESTAMP NOT NULL,
+#   published_at TIMESTAMP NULL
+# );
+```
+
+```python
+# outbox_writer.py
+import json
+import sqlite3
+import uuid
+from datetime import datetime
+
+
+def create_order_with_outbox(db: sqlite3.Connection, order_id: str, user_id: str, amount: int):
+    with db:
+        db.execute(
+            "INSERT INTO orders(id, user_id, amount, status) VALUES (?, ?, ?, 'CREATED')",
+            (order_id, user_id, amount),
+        )
+        db.execute(
+            "INSERT INTO outbox(id, aggregate_type, aggregate_id, event_type, payload_json, created_at) "
+            "VALUES (?, 'order', ?, 'OrderCreated', ?, ?)",
+            (
+                str(uuid.uuid4()),
+                order_id,
+                json.dumps({"order_id": order_id, "user_id": user_id, "amount": amount}),
+                datetime.utcnow().isoformat(),
+            ),
+        )
+```
+
+```python
+# outbox_relay.py
+def relay_batch(db, broker, batch_size: int = 100):
+    rows = db.execute(
+        "SELECT id, event_type, payload_json FROM outbox WHERE status='PENDING' ORDER BY created_at LIMIT ?",
+        (batch_size,),
+    ).fetchall()
+
+    for row in rows:
+        outbox_id, event_type, payload_json = row
+        broker.publish(topic=event_type, payload=payload_json)
+        with db:
+            db.execute(
+                "UPDATE outbox SET status='PUBLISHED', published_at=CURRENT_TIMESTAMP WHERE id=?",
+                (outbox_id,),
+            )
+```
+
+이 구조에서는 relay가 publish 직후 죽으면 중복 발행이 생길 수 있습니다. 따라서 소비자는 `event_id` 또는 `outbox_id` 기반 멱등성 저장소를 가져야 하며, 이것이 outbox와 항상 쌍으로 다뤄져야 하는 이유입니다.
+
+### TCC 패턴: 강한 비즈니스 제어가 필요한 경우
+
+TCC(Try-Confirm-Cancel)는 각 서비스가 명시적 예약 상태를 노출하는 패턴입니다.
+
+- **Try**: 실제 확정 전 자원을 임시 예약합니다.
+- **Confirm**: 모든 단계가 성공하면 예약을 확정합니다.
+- **Cancel**: 중간 실패 시 예약을 해제합니다.
+
+```python
+# tcc_inventory.py
+from fastapi import FastAPI, HTTPException
+
+app = FastAPI()
+reservations = {}
+
+
+@app.post("/tcc/try")
+def try_reserve(order_id: str, sku: str, qty: int):
+    if not has_available_stock(sku, qty):
+        raise HTTPException(status_code=409, detail="재고 부족")
+    token = hold_stock(order_id=order_id, sku=sku, qty=qty)
+    reservations[order_id] = token
+    return {"status": "tried", "token": token}
+
+
+@app.post("/tcc/confirm")
+def confirm(order_id: str):
+    token = reservations.get(order_id)
+    if not token:
+        return {"status": "already_confirmed_or_cancelled"}
+    confirm_stock(token)
+    reservations.pop(order_id, None)
+    return {"status": "confirmed"}
+
+
+@app.post("/tcc/cancel")
+def cancel(order_id: str):
+    token = reservations.get(order_id)
+    if not token:
+        return {"status": "already_confirmed_or_cancelled"}
+    release_stock(token)
+    reservations.pop(order_id, None)
+    return {"status": "cancelled"}
+```
+
+TCC는 Saga보다 제어력이 높지만 서비스 구현 부담이 큽니다. 모든 참여자가 예약 상태 모델과 만료 정책을 제공해야 하기 때문입니다.
+
+### 패턴 비교: 2PC vs Saga vs TCC
+
+| 항목 | 2PC | Saga | TCC |
+| --- | --- | --- | --- |
+| 정합성 모델 | 강한 원자성 지향 | 최종 일관성 | 예약 후 확정 일관성 |
+| 잠금/자원 점유 | 길어질 수 있음 | 짧음(로컬 커밋) | 예약 기간 동안 점유 |
+| 장애 시 복잡도 | coordinator 복구가 핵심 | 보상 설계가 핵심 | 토큰/만료/중복 처리 |
+| 성능/가용성 | 상대적으로 불리함 | 비교적 유리함 | 도메인 의존적 |
+| 적합한 도메인 | 내부 시스템 간 강한 일관성 | 주문/예약/결제 등 서비스 경계 | 좌석, 재고, 한도처럼 예약이 중요한 도메인 |
+
+의사결정 기준은 기술 선호가 아니라 비즈니스 실패 비용입니다. 실패했을 때 "잠시 지연"이 더 치명적인지, "보상 처리"가 더 치명적인지를 먼저 판단해야 합니다.
+
+### 분산 트랜잭션 모니터링: in-doubt와 보상 실패를 먼저 본다
+
+실패를 막을 수는 없지만, 오래 모르는 실패는 줄일 수 있습니다. 분산 트랜잭션 대시보드의 핵심 신호는 다음과 같습니다.
+
+- `tx_in_doubt_total`: 2PC 준비 후 최종 결정이 없는 건수
+- `tx_prepare_timeout_total`: prepare 단계 타임아웃 건수
+- `saga_compensation_failed_total`: 보상 단계 최종 실패 건수
+- `saga_compensation_retrying_total`: 재시도 중인 보상 건수
+- `outbox_backlog_count`: 발행 대기 outbox 적체량
+- `outbox_oldest_pending_seconds`: 가장 오래된 미발행 이벤트의 경과 시간
 
 ```yaml
-service: inventory
-partition_policy:
-  write:
-    mode: reject_when_no_quorum
-    http_status: 503
-  read:
-    mode: allow_stale_read
-    max_staleness_seconds: 5
-recovery_policy:
-  reconcile: last_write_wins_with_version_check
-  audit_log_required: true
+alerts:
+  - name: distributed_tx_in_doubt_spike
+    expr: tx_in_doubt_total > 0
+    for: 5m
+    severity: critical
+  - name: saga_compensation_failure
+    expr: increase(saga_compensation_failed_total[10m]) > 3
+    for: 2m
+    severity: critical
+  - name: outbox_backlog_growing
+    expr: outbox_oldest_pending_seconds > 120
+    for: 5m
+    severity: warning
 ```
 
-위 정책의 의미는 명확합니다. 네트워크가 갈라졌을 때 쓰기를 무조건 받지 않고, 읽기는 최대 5초까지 오래된 값을 허용합니다. 대신 복구 후에는 버전 검증과 감사 로그 기반으로 충돌을 정리합니다. CAP 선택은 이렇게 엔드포인트별 동작과 관측 지표로 내려와야 실제 운영 정책이 됩니다.
-
-### 메시지 큐 설정은 처리량보다 재처리 안전성을 먼저 본다
-
-메시지 큐를 도입하면 비동기로 느슨한 결합을 얻지만, 동시에 중복 처리와 순서 역전이 기본 위험이 됩니다. 큐 설정에서 가장 먼저 다룰 항목은 처리량이 아니라 "실패한 메시지를 어떻게 안전하게 다시 처리할 것인가"입니다.
-
-아래는 RabbitMQ 스타일의 실무 기본 설정 예시입니다.
-
-```yaml
-queue:
-  name: order.events
-  durable: true
-  arguments:
-    x-dead-letter-exchange: order.dlx
-    x-message-ttl: 60000
-consumer:
-  prefetch_count: 20
-  ack_mode: manual
-  retry:
-    max_attempts: 5
-    backoff_ms: 200
-idempotency:
-  key_source: event_id
-  ttl_seconds: 86400
-```
-
-핵심은 세 가지입니다.
-
-- `durable: true`로 브로커 재시작 후에도 큐 정의를 유지합니다.
-- `manual ack`로 실제 처리 완료 후에만 확인 응답을 보냅니다.
-- `event_id` 기반 멱등성 저장소를 두어 중복 전달을 결과 중복으로 이어지지 않게 막습니다.
-
-Kafka를 쓰는 경우도 원칙은 같습니다. 파티션 키를 어떻게 잡아 순서를 보존할지, 커밋 시점을 처리 성공 이후로 둘지, DLQ 토픽을 어떻게 운영할지를 문서로 고정해야 장애 시간에 판단 비용을 줄일 수 있습니다.
-
-### 장애 주입 기반 검증 루프
-
-설계를 문서로만 두면 시간이 지나며 가정이 깨집니다. 그래서 운영 전 검증 루프를 습관화해야 합니다.
-
-1. 리더 노드 강제 종료: 선출 시간과 요청 오류율을 측정합니다.
-2. 네트워크 지연 주입: p95/p99 지연과 타임아웃 비율을 기록합니다.
-3. 큐 소비자 중단: 적체량 증가 속도와 복구 시간을 측정합니다.
-4. 중복 메시지 재주입: 멱등성 키로 결과 중복이 차단되는지 확인합니다.
-
-이 검증을 CI 야간 작업이나 스테이징 런북에 포함하면, 새 기능이 들어와도 합의/CAP/큐 운영 규칙이 계속 살아 있는지 지속적으로 확인할 수 있습니다.
-
-### 운영 대시보드에서 반드시 보는 지표
-
-- 합의 계층: 리더 변경 횟수, 선출 소요 시간, 로그 복제 지연
-- 요청 계층: 성공률, 타임아웃률, 재시도 횟수, 멱등성 충돌률
-- 큐 계층: consumer lag, DLQ 유입량, 재처리 성공률
-- 데이터 계층: 복제 지연, 버전 충돌 건수, 보정 작업 처리량
-
-지표를 계층별로 보면 "느리다"라는 증상을 "리더 불안정 때문에 재시도가 폭증했다"처럼 원인 단위로 분해할 수 있습니다. 분산 시스템 운영 성숙도는 결국 이 분해 능력에서 드러납니다.
+운영 런북에는 "어떤 버튼을 누르는가"까지 있어야 합니다. 예를 들어 `tx_in_doubt_total > 0`이면 coordinator 결정 로그 점검, 참여자 상태 질의, commit/abort 재전파 순서로 자동화 스크립트를 실행하도록 명시합니다. Saga 보상 실패는 재시도 한도를 넘은 건을 수동 큐로 보내고, 도메인 담당자가 환불/재고/알림 상태를 교차 확인하는 절차를 포함해야 합니다.
 
 
 ## 처음 질문으로 돌아가기
 
 - **단일 노드 트랜잭션과 분산 트랜잭션은 무엇이 다를까요?**
-  - 본문의 기준은 분산 트랜잭션를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 단일 노드 트랜잭션은 하나의 DB 로그와 잠금 체계 안에서 commit/rollback이 끝나지만, 분산 트랜잭션은 서비스 경계를 넘어 로컬 커밋, 메시지 전달, 재시도, 보상까지 포함한 운영 계약으로 완성됩니다. 그래서 "즉시 원자성" 대신 "복구 가능한 최종 일관성"을 설계해야 하며, outbox와 멱등성 같은 장치가 필수입니다.
 - **2-phase commit은 어떻게 동작하고 어디서 약할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 2PC는 prepare에서 전원 동의를 받고 commit을 전파하는 두 단계로 동작합니다. 강점은 원자성 모델이 명확하다는 점이지만, coordinator 장애 시 참여자가 in-doubt로 잠길 수 있고 prepare 잠금이 길어지면 가용성과 지연이 급격히 나빠집니다. 그래서 결정 로그 내구성, 재기동 복구 로직, in-doubt 모니터링을 함께 설계해야 실전에서 버틸 수 있습니다.
 - **Saga의 핵심인 보상 트랜잭션은 무엇일까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 보상 트랜잭션은 데이터베이스 rollback이 아니라, 이미 발생한 비즈니스 결과를 역방향 명령으로 상쇄하는 동작입니다. 오케스트레이션과 코레오그래피 모두에서 보상 실패 재시도 정책, 만료 시간 창, 멱등 키를 명시해야 하며, 이 설계가 Saga의 성공 여부를 결정합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -341,5 +594,6 @@ Kafka를 쓰는 경우도 원칙은 같습니다. 파티션 키를 어떻게 잡
 - [Transactional Outbox — microservices.io](https://microservices.io/patterns/data/transactional-outbox.html)
 - [Designing Data-Intensive Applications — chapter 9](https://dataintensive.net/)
 - [Life of a Cloud Spanner read-write transaction](https://cloud.google.com/spanner/docs/transactions)
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/distributed-systems-101/ko)
 
 Tags: Computer Science, Distributed Systems, Transactions, TwoPhaseCommit, Saga, Idempotency

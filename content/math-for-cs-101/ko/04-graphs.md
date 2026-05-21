@@ -424,6 +424,113 @@ BFS는 최단 간선 수 거리, DFS는 경로 존재성/사이클 탐지에 강
 
 그래프를 배우는 핵심은 알고리즘 이름 암기가 아니라 문제를 관계 모델로 재서술하는 능력입니다.
 
+
+### 다익스트라 최단 경로 구현
+
+가중치 그래프에서 최단 경로를 찾는 다익스트라 알고리즘은 네트워크 라우팅, API 게이트웨이 비용 최적화, 지도 네비게이션 등 다양한 곳에서 사용됩니다.
+
+```python
+import heapq
+from typing import Dict, List, Tuple
+
+def dijkstra(graph: Dict[str, List[Tuple[str, int]]], start: str) -> Dict[str, int]:
+    """가중치 그래프에서 최단 거리를 계산합니다."""
+    dist = {start: 0}
+    pq = [(0, start)]
+
+    while pq:
+        d, u = heapq.heappop(pq)
+        if d > dist.get(u, float('inf')):
+            continue
+        for v, w in graph.get(u, []):
+            new_dist = d + w
+            if new_dist < dist.get(v, float('inf')):
+                dist[v] = new_dist
+                heapq.heappush(pq, (new_dist, v))
+
+    return dist
+
+# 예시: 네트워크 홈 간 지연 계산
+network = {
+    "gateway": [("auth", 2), ("cache", 1)],
+    "auth": [("db", 5), ("cache", 2)],
+    "cache": [("db", 3)],
+    "db": [],
+}
+print(dijkstra(network, "gateway"))
+# {'gateway': 0, 'cache': 1, 'auth': 2, 'db': 4}
+```
+
+이 코드에서 주의할 점은 음수 가중치가 없어야 한다는 전제입니다. 음수 간선이 있으면 벨만-포드 알고리즘을 써야 합니다. 실무에서는 지연, 비용, 거리 등 대부분의 가중치가 음수가 될 수 없으므로 다익스트라가 기본 선택이 됩니다.
+
+### 위상 정렬로 의존성 순서 결정
+
+빌드 시스템, 패키지 설치 순서, 데이터 파이프라인 스테이지 순서 등은 모두 위상 정렬(topological sort) 문제입니다.
+
+```python
+from collections import deque
+
+def topological_sort(graph: Dict[str, List[str]]) -> List[str]:
+    """카 알고리즘으로 위상 정렬을 수행합니다."""
+    in_degree = {u: 0 for u in graph}
+    for u in graph:
+        for v in graph[u]:
+            in_degree[v] = in_degree.get(v, 0) + 1
+
+    queue = deque([u for u in in_degree if in_degree[u] == 0])
+    order = []
+
+    while queue:
+        u = queue.popleft()
+        order.append(u)
+        for v in graph[u]:
+            in_degree[v] -= 1
+            if in_degree[v] == 0:
+                queue.append(v)
+
+    if len(order) != len(graph):
+        raise ValueError("순환 의존성이 있습니다")
+    return order
+
+# 빌드 의존성 예시
+build_deps = {
+    "app": ["lib", "config"],
+    "lib": ["utils"],
+    "config": [],
+    "utils": [],
+}
+print(topological_sort(build_deps))
+# ['config', 'utils', 'lib', 'app'] 또는 동치 순서
+```
+
+위상 정렬이 실패하면(순환 발견) 빌드를 진행할 수 없다는 신호입니다. 이 검사를 CI에 넣으면 순환 의존성이 들어오는 순간 바로 차단할 수 있습니다.
+
+### 사이클 탐지
+
+방향 그래프에서 사이클은 데드락, 무한 루프, 순환 참조의 원인입니다.
+
+```python
+def has_cycle(graph: Dict[str, List[str]]) -> bool:
+    WHITE, GRAY, BLACK = 0, 1, 2
+    color = {u: WHITE for u in graph}
+
+    def visit(u):
+        color[u] = GRAY
+        for v in graph.get(u, []):
+            if color.get(v, WHITE) == GRAY:
+                return True
+            if color.get(v, WHITE) == WHITE and visit(v):
+                return True
+        color[u] = BLACK
+        return False
+
+    return any(color[u] == WHITE and visit(u) for u in graph)
+
+print(has_cycle({"a": ["b"], "b": ["c"], "c": ["a"]}))  # True
+print(has_cycle({"a": ["b"], "b": ["c"], "c": []}))      # False
+```
+
+3-color DFS는 사이클 탐지의 기본 패턴입니다. GRAY 노드를 다시 만나면 백 엣지(back edge)가 있다는 뜻이고, 이는 사이클이 존재한다는 증거입니다.
 ## 처음 질문으로 돌아가기
 
 - **관계가 있는 데이터를 왜 그래프로 표현할까요?**
@@ -456,5 +563,6 @@ BFS는 최단 간선 수 거리, DFS는 경로 존재성/사이클 탐지에 강
 - [BFS and DFS - CLRS](https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/)
 - [NetworkX Documentation](https://networkx.org/)
 - [NetworkX GitHub repository](https://github.com/networkx/networkx)
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/math-for-cs-101/ko)
 
 Tags: Math, Graphs, DataStructure, Algorithms, Beginner

@@ -24,7 +24,9 @@ last_reviewed: '2026-05-15'
 
 벡터를 표현할 수 있게 되면 다음 질문이 바로 따라옵니다. 두 벡터는 얼마나 비슷한가, 얼마나 떨어져 있는가 하는 질문입니다. 추천 시스템, 벡터 검색, 임베딩 비교가 모두 결국 이 질문을 수치로 바꾸는 작업입니다.
 
-이 글은 Linear Algebra 101 시리즈의 4번째 글입니다. 여기서는 내적, 코사인 유사도, 유클리드 거리와 맨해튼 거리를 한 흐름으로 연결해 보겠습니다.
+이 글은 Linear Algebra 101 시리즈의 4번째 글입니다.
+
+여기서는 내적, 코사인 유사도, 유클리드 거리와 맨해튼 거리를 한 흐름으로 연결해 보겠습니다.
 
 ## 먼저 던지는 질문
 
@@ -151,7 +153,7 @@ print("Manhattan:", np.sum(np.abs(v - w)))
 
 또한 메트릭 선택이 모델 바깥의 전처리와 연결되어 있다는 점도 놓치지 않습니다. 정규화를 했는지, 스케일이 맞는지, 희소 벡터인지 밀집 벡터인지에 따라 비교 기준 자체가 달라져야 하기 때문입니다. 좋은 비교 기준은 좋은 검색 품질과 추천 품질의 출발점입니다.
 
-## Python scipy.spatial.distance 예제
+## 사이파이 거리 함수 예제
 
 SciPy는 다양한 거리 함수를 제공합니다. 실무에서는 직접 구현하는 대신 검증된 라이브러리를 사용하는 것이 안전합니다.
 
@@ -446,6 +448,32 @@ print('  cosine similarity:', np.dot(v_n, w_n))
 
 실무에서는 먼저 문제의 의미를 정의하고 메트릭을 고릅니다. 방향이 핵심이면 코사인, 절대 차이가 핵심이면 거리 함수를 우선합니다.
 
+## 실전 연결: 거리 척도 선택 기준 세우기
+
+벡터 비교에서 가장 흔한 실패는 척도를 목적과 분리해서 고르는 것입니다. 추천이나 검색처럼 의미 방향이 중요한 문제에서는 코사인 유사도가 자연스럽고, 실제 좌표 차이 자체가 비용을 의미하는 문제에서는 유클리드 거리나 맨해튼 거리가 더 적합합니다.
+
+```python
+import numpy as np
+
+q = np.array([0.4, 0.2, 0.9])
+docs = np.array([
+    [0.3, 0.2, 0.8],
+    [0.8, 0.1, 0.2],
+    [0.1, 0.0, 1.1],
+], dtype=float)
+
+docs_n = docs / np.linalg.norm(docs, axis=1, keepdims=True)
+q_n = q / np.linalg.norm(q)
+cos_score = docs_n @ q_n
+l2_dist = np.linalg.norm(docs - q, axis=1)
+print('cos:', cos_score)
+print('l2 :', l2_dist)
+```
+
+위 결과에서 코사인 기준 상위 문서와 L2 기준 상위 문서가 달라질 수 있습니다. 이것이 이상한 것이 아니라, 서로 다른 질문에 답하고 있기 때문입니다. 따라서 모델 평가 전에 먼저 “우리가 정의한 유사성”이 제품 요구와 일치하는지 확인해야 합니다.
+
+고차원 임베딩에서는 특히 정규화 여부가 중요합니다. 정규화를 생략하면 길이 큰 벡터가 과도하게 유리해져 검색 결과가 왜곡될 수 있습니다. 내적과 거리의 차이를 설계 레벨에서 합의해 두면 이후 실험의 재현성과 해석력이 크게 올라갑니다.
+
 ## 처음 질문으로 돌아가기
 
 - **내적은 왜 숫자 하나로 나올까요?**
@@ -473,6 +501,7 @@ print('  cosine similarity:', np.dot(v_n, w_n))
 
 ## 참고 자료
 
+- 시리즈 예제 코드: https://github.com/yeongseon-books/book-examples/tree/main/linear-algebra-101/ko
 - [Wikipedia — Dot product](https://en.wikipedia.org/wiki/Dot_product)
 - [Wikipedia — Cosine similarity](https://en.wikipedia.org/wiki/Cosine_similarity)
 - [3Blue1Brown — Dot products](https://www.3blue1brown.com/lessons/dot-products)

@@ -59,7 +59,7 @@ last_reviewed: '2026-05-12'
 | Path | 간선을 따라 이어지는 정점열 |
 | Cycle | 시작과 끝이 같은 경로 |
 
-## Before / After
+## 전후 비교
 
 **Before — thinking only in flat data structures:**
 
@@ -368,6 +368,240 @@ bipartite: True
 
 다음 글에서는 그래프 위에서 실제로 움직이는 기본 알고리즘인 트리, BFS, DFS를 살펴보겠습니다.
 
+## 실전 확장: 그래프 표현과 알고리즘 선택 기준
+
+그래프 문제는 표현이 절반입니다. 인접 행렬과 인접 리스트 중 무엇을 고르는지에 따라 공간 복잡도와 구현 난도가 크게 달라집니다.
+
+### 표현 비교
+
+| 표현 | 공간 | 간선 존재 확인 | 순회 |
+| --- | --- | --- | --- |
+| 인접 행렬 | `O(V^2)` | `O(1)` | `O(V)` |
+| 인접 리스트 | `O(V+E)` | 평균 `O(deg(v))` | `O(deg(v))` |
+
+희소 그래프에서는 인접 리스트가 실용적입니다.
+
+### BFS 구현 앵커
+
+```python
+from collections import deque
+
+def bfs_order(graph: dict[int, list[int]], start: int) -> list[int]:
+    seen = {start}
+    q = deque([start])
+    order = []
+    while q:
+        v = q.popleft()
+        order.append(v)
+        for nxt in graph.get(v, []):
+            if nxt not in seen:
+                seen.add(nxt)
+                q.append(nxt)
+    return order
+```
+
+### DFS 구현 앵커
+
+```python
+def dfs_order(graph: dict[int, list[int]], start: int) -> list[int]:
+    seen = set()
+    order = []
+
+    def visit(v: int) -> None:
+        seen.add(v)
+        order.append(v)
+        for nxt in graph.get(v, []):
+            if nxt not in seen:
+                visit(nxt)
+
+    visit(start)
+    return order
+```
+
+### 사이클 탐지(유향 그래프)
+
+```python
+def has_cycle_directed(graph: dict[int, list[int]]) -> bool:
+    WHITE, GRAY, BLACK = 0, 1, 2
+    color = {v: WHITE for v in graph}
+
+    def dfs(v: int) -> bool:
+        color[v] = GRAY
+        for nxt in graph.get(v, []):
+            if color.get(nxt, WHITE) == GRAY:
+                return True
+            if color.get(nxt, WHITE) == WHITE and dfs(nxt):
+                return True
+        color[v] = BLACK
+        return False
+
+    return any(color[v] == WHITE and dfs(v) for v in graph)
+```
+
+색칠 기법은 재귀 스택에 다시 들어오는 간선을 찾는 방식입니다.
+
+### 짧은 증명 앵커
+
+무방향 그래프에서 `Σdeg(v)=2|E|`인 이유는 간선 하나가 양 끝 정점의 차수를 각각 1씩 증가시키기 때문입니다. 모든 간선을 합치면 정확히 두 번 세어집니다.
+
+## 심화 워크숍: 그래프 알고리즘 적용 패턴
+
+### 연결 요소 계산
+
+무방향 그래프에서 연결 요소 개수는 네트워크 분리 상태를 측정하는 기본 지표입니다.
+
+```python
+def connected_components(graph: dict[int, list[int]]) -> list[set[int]]:
+    seen = set()
+    comps = []
+    for s in graph:
+        if s in seen:
+            continue
+        stack = [s]
+        comp = set()
+        seen.add(s)
+        while stack:
+            v = stack.pop()
+            comp.add(v)
+            for nxt in graph.get(v, []):
+                if nxt not in seen:
+                    seen.add(nxt)
+                    stack.append(nxt)
+        comps.append(comp)
+    return comps
+```
+
+### 최단 경로가 필요한지 판단하기
+
+요구사항이 "도달 가능 여부"면 DFS/BFS로 충분하지만 "최소 이동 횟수"면 BFS 또는 가중치가 있을 때 다익스트라가 필요합니다. 문제 문장에 있는 최적화 표현("최소", "가장 짧은")을 놓치지 않는 것이 중요합니다.
+
+### 그래프 모델 검증 질문
+
+- 고립 정점이 허용되는가
+- 자기 루프를 허용하는가
+- 다중 간선을 허용하는가
+- 방향성은 필요한가
+
+이 질문에 답하면 자료구조 선택이 자동으로 따라옵니다.
+
+## 부록: 검증 가능한 실습 패턴 모음
+
+아래 패턴은 각 장의 개념을 실습으로 고정하기 위한 공통 템플릿입니다. 핵심은 계산 결과를 맞히는 것보다, 어떤 정의를 적용했는지 문장으로 남기는 것입니다.
+
+### 패턴 1: 정의를 먼저 쓰고 계산하기
+
+1. 문제에서 사용하는 대상 집합을 명시합니다.
+2. 관계 또는 함수를 기호로 정의합니다.
+3. 계산을 수행하고, 결과가 정의를 만족하는지 다시 확인합니다.
+
+이 순서를 지키면 중간에 식이 길어져도 논리의 출발점을 잃지 않습니다.
+
+### 패턴 2: 반례를 의도적으로 만들기
+
+정리나 가설을 세웠다면, 반례 후보를 최소 3개 만듭니다.
+
+- 경계값 입력(0, 1, 최대값)
+- 중복/충돌 입력
+- 공집합 또는 단일 원소 입력
+
+반례가 발견되면 결론을 버리는 것이 아니라, 가정과 정의를 수정합니다. 이 절차가 수학적 엄밀성과 엔지니어링 실용성을 동시에 만족시킵니다.
+
+### 패턴 3: 표와 코드 출력을 함께 남기기
+
+진리표, 집합 연산표, 점화식 전개표 중 하나를 반드시 포함합니다. 그리고 같은 내용을 계산하는 짧은 코드를 붙여 결과를 재현합니다.
+
+```python
+def verify_identity(left: set[int], right: set[int]) -> bool:
+    return left == right
+```
+
+작은 검증 함수 하나라도 문서에 남기면 팀원 간 해석 차이를 줄일 수 있습니다.
+
+### 패턴 4: 증명 구조를 고정하기
+
+증명은 다음 네 문장 구조를 기본으로 씁니다.
+
+- 가정: 무엇을 참이라고 두는가
+- 전개: 어떤 정의/정리를 사용해 변형하는가
+- 핵심 전환: 결론으로 넘어가는 결정적 단계는 무엇인가
+- 결론: 원래 명제가 왜 성립하는가
+
+이 구조는 직접 증명, 대우 증명, 귀류법, 귀납법 모두에 적용됩니다.
+
+### 패턴 5: 알고리즘과 수학 근거 연결하기
+
+알고리즘 설명에는 다음 항목을 최소로 넣습니다.
+
+- 불변식 1개 이상
+- 종료 조건 1개
+- 복잡도 식 1개
+- 반례 테스트 1개
+
+이 네 항목이 있으면 코드가 바뀌어도 정확성 근거를 유지할 수 있습니다.
+
+### 미니 문제 세트
+
+1. 두 집합 `A`, `B`를 임의로 만들고 `A∩B`, `A∪B`, `A\B`를 계산한 뒤 포함관계를 설명하세요.
+2. 명제식 `(P→Q) ∧ (Q→R) → (P→R)`의 진리표를 작성하고 항진명제 여부를 확인하세요.
+3. 점화식 `T(n)=T(n-1)+n`의 닫힌형을 추측한 다음 귀납법으로 검증하세요.
+4. 인접 리스트 그래프 하나를 만든 뒤 BFS/DFS 방문 순서를 비교하세요.
+5. `nCk = nC(n-k)`를 식과 의미 해석(선택 vs 비선택) 두 방식으로 설명하세요.
+
+### 마무리
+
+각 장의 주제가 달라 보여도 훈련 루프는 같습니다. 정의를 선언하고, 계산을 수행하고, 반례로 검증하고, 증명 또는 불변식으로 고정하면 됩니다. 이 루프를 반복하면 새로운 문제에서도 같은 품질로 사고할 수 있습니다.
+
+
+## 추가 심화: 오류 사례와 교정 로그
+
+실무에서 이산수학 개념이 흔들리는 지점은 대부분 "정의 생략"에서 시작합니다. 아래는 자주 나오는 오류와 교정 방식입니다.
+
+### 오류 사례 1: 조건 누락
+
+- 증상: 코드가 특정 입력에서만 실패합니다.
+- 원인: 명제식에서 한 항을 자연어로만 설명하고 코드에 반영하지 않았습니다.
+- 교정: 조건을 변수화해 논리식으로 명시하고, 진리표의 위험 조합을 테스트로 고정합니다.
+
+### 오류 사례 2: 집합 경계 불일치
+
+- 증상: 제외되어야 할 원소가 결과에 섞입니다.
+- 원인: 전체집합 `U`를 정의하지 않아 여집합 계산이 흔들립니다.
+- 교정: `U`를 먼저 확정하고 `A^c = U \ A`를 코드와 문서에 동시에 기록합니다.
+
+### 오류 사례 3: 그래프 방향성 오해
+
+- 증상: 탐색 결과가 기대보다 과도하거나 부족합니다.
+- 원인: 유향/무향 그래프를 혼동해 간선을 양방향으로 추가했습니다.
+- 교정: 입력 스키마 단계에서 방향성을 필드로 분리하고, 예제 그래프를 최소 1개 유지합니다.
+
+### 오류 사례 4: 점화식 기저 조건 누락
+
+- 증상: 재귀가 종료되지 않거나 값이 어긋납니다.
+- 원인: `n=0`, `n=1`에서의 정의를 생략했습니다.
+- 교정: 기저 조건을 본문과 코드 첫 줄에 병기하고, 단위 테스트를 별도로 둡니다.
+
+### 교정 루프
+
+1. 정의를 다시 선언합니다.
+2. 최소 반례를 구성합니다.
+3. 식과 코드를 동시에 수정합니다.
+4. 표/출력으로 재검증합니다.
+
+이 루프를 문서화하면 팀 단위 품질이 안정됩니다.
+
+
+## 보강 메모: 손으로 계산해 보는 검증 절차
+
+아래 절차를 한 번 손으로 수행하면 개념이 빠르게 고정됩니다.
+
+- 진리표 문제: 입력 조합을 빠짐없이 나열하고, 각 행의 결론을 식에 따라 계산합니다.
+- 집합 문제: 원소를 실제로 써서 합집합/교집합/차집합을 구한 뒤 식과 일치하는지 확인합니다.
+- 그래프 문제: 정점 방문 순서를 한 줄 로그로 기록해 BFS/DFS 차이를 비교합니다.
+- 점화식 문제: `n=1..6`까지 값을 적어 패턴을 추측한 뒤 귀납법으로 검증합니다.
+
+이 과정을 문서 마지막에 남기면 다음 글을 읽을 때도 같은 기준으로 사고를 이어갈 수 있습니다.
+
+
 ## 처음 질문으로 돌아가기
 
 - **그래프의 정의와 종류는 무엇일까요?**
@@ -395,6 +629,7 @@ bipartite: True
 
 ## 참고 자료
 
+- [book-examples: discrete-math-101/ko](https://github.com/yeongseon-books/book-examples/tree/main/discrete-math-101/ko)
 - [Discrete Mathematics and Its Applications — Kenneth Rosen, Chapter 10](https://www.mheducation.com/highered/product/discrete-mathematics-its-applications-rosen/M9781259676512.html)
 - [Algorithms — Sedgewick & Wayne, Chapter 4](https://algs4.cs.princeton.edu/40graphs/)
 - [MIT Mathematics for Computer Science — Graphs and Trees](https://courses.csail.mit.edu/6.042/spring18/mcs.pdf)

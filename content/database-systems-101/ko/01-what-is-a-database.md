@@ -75,7 +75,7 @@ DBMS는 애플리케이션과 디스크 사이에 위치하면서, 여러 클라
 - **영속성(Durability)**: 커밋된 변경이 즉시 장애가 나더라도 살아남는 성질입니다.
 - **동시성 제어**: 여러 클라이언트가 동시에 같은 데이터를 다뤄도 결과를 일관되게 유지하는 메커니즘입니다.
 
-## Before/After
+## 변경 전/변경 후
 
 **Before — write to a file directly**
 
@@ -109,7 +109,7 @@ def deposit(db: sqlite3.Connection, user_id: str, amount: int) -> None:
 
 이제 동시성 처리는 DBMS가 잠금으로 맡고, 장애 복구는 WAL(Write-Ahead Log) 같은 메커니즘으로 맡습니다. 애플리케이션은 “잔액을 올려 달라”는 의도만 표현합니다.
 
-## 실습: SQLite로 작은 DBMS 체험하기
+## 실습: 경량 데이터베이스로 작은 시스템 체험하기
 
 ### 1단계 — 데이터베이스 만들기
 
@@ -265,7 +265,7 @@ ON orders (user_id, status, created_at DESC);
 
 핵심은 **필터링 컬럼을 앞쪽에**, 정렬 컬럼을 그다음에 배치하는 것입니다. 이렇게 하면 WHERE와 ORDER BY를 동시에 만족해 추가 정렬 비용을 줄일 수 있습니다.
 
-### 2) EXPLAIN으로 계획 비교하기
+### 2) 실행 계획 비교하기
 
 ```sql
 EXPLAIN ANALYZE
@@ -314,7 +314,7 @@ def create_order(db: sqlite3.Connection, user_id: int, amount: int) -> None:
 
 이 패턴의 의도는 명확합니다. 주문 생성과 재고 차감을 **하나의 원자 단위**로 묶고, 조건이 맞지 않으면 전체를 되돌립니다. 트랜잭션 안에서 외부 API 호출을 하지 않는 것도 중요합니다. 잠금 시간이 길어지면 동시성 충돌이 급격히 늘어납니다.
 
-### 4) 운영에서 자주 쓰는 진단 SQL
+### 4) 운영에서 자주 쓰는 진단 질의문
 
 ```sql
 -- 값 분포 확인(선택성 감각)
@@ -344,6 +344,136 @@ WHERE user_id = 42 AND status = 'paid';
 
 결론적으로 데이터베이스 튜닝은 “인덱스를 늘린다”가 아니라 “실행 계획을 읽고, 트랜잭션 경계를 짧게 유지하고, 분포를 근거로 선택한다”의 반복입니다.
 
+## 저장소에서 시스템으로 넘어가는 경계
+
+파일 저장은 출발점으로 충분하지만, 다중 사용자와 장애 복구 요구가 붙는 순간부터 시스템 설계가 달라집니다. 아래 예시는 같은 비즈니스 규칙을 파일 기반 접근과 DBMS 접근으로 비교한 것입니다.
+
+```text
+파일 기반 접근
+1) JSON 파일 읽기
+2) 메모리에서 잔액 차감
+3) JSON 파일 다시 쓰기
+4) 중간 실패 시 수동 복구
+
+DBMS 접근
+1) BEGIN
+2) UPDATE accounts SET balance = balance - 10000 WHERE id = 1;
+3) UPDATE accounts SET balance = balance + 10000 WHERE id = 2;
+4) COMMIT (실패 시 자동 ROLLBACK)
+```
+
+핵심 차이는 실패 처리 책임의 위치입니다. 파일 기반에서는 실패 복구 책임이 전부 애플리케이션 코드에 남습니다. DBMS에서는 트랜잭션, 로그, 잠금, 복구기가 실패 책임을 분담합니다. 그래서 데이터베이스를 단순 저장소가 아니라 운영 안정성을 위한 시스템 계층으로 봐야 합니다.
+
+## 질의 처리 내부 경로를 짧게 읽어 보기
+
+아래 출력은 작은 사용자 테이블에서 조건 조회를 했을 때의 실행 계획 예시입니다.
+
+```text
+EXPLAIN ANALYZE
+SELECT * FROM users WHERE email = 'alice@example.com';
+
+Index Scan using idx_users_email on users  (cost=0.28..8.30 rows=1 width=64)
+(actual time=0.021..0.023 rows=1 loops=1)
+Planning Time: 0.210 ms
+Execution Time: 0.049 ms
+```
+
+이 한 줄 출력만으로도 세 가지를 판단할 수 있습니다. 첫째, 인덱스를 타는지, 둘째, 예상 행 수와 실제 행 수가 크게 어긋나는지, 셋째, 계획 수립 시간 대비 실행 시간이 비정상적으로 큰지입니다. 데이터베이스 입문 단계에서 이 읽기 습관을 들이면, 이후 주제인 인덱스/트랜잭션/복제 학습이 훨씬 단단해집니다.
+
+## 실전 운영 점검표
+
+운영 환경에서 데이터베이스 품질을 안정적으로 유지하려면, 기능 개발과 별개로 점검 루틴을 명확하게 가져가야 합니다. 아래 항목은 서비스 규모와 상관없이 바로 적용할 수 있는 기준입니다.
+
+- 변경 전에는 항상 기준 지표를 남깁니다. 평균 지연 시간, P95, P99, 초당 트랜잭션 수, 잠금 대기 시간 같은 숫자를 캡처해 둬야 변경 이후를 비교할 수 있습니다.
+- 쿼리 튜닝은 SQL 문장 자체보다 실행 계획의 변화를 중심으로 추적합니다. 계획 노드가 바뀌었는지, 예상 행 수와 실제 행 수의 차이가 커졌는지, 정렬이나 해시가 디스크로 내려갔는지를 우선 확인합니다.
+- 스키마 변경은 단계적으로 진행합니다. 컬럼 추가, 백필, 코드 전환, 제약 강화 순서로 나누면 장애 반경을 줄일 수 있습니다.
+- 장애 대응 문서는 운영자가 밤중에도 바로 실행할 수 있는 형태여야 합니다. 복구 절차, 롤백 절차, 검증 SQL을 같은 문서에 둬야 실제 상황에서 흔들리지 않습니다.
+
+아래 예시는 팀이 릴리스 전후에 반복적으로 실행하는 최소 점검 SQL입니다.
+
+```sql
+-- 최근 10분 동안 느린 쿼리 확인(엔진별 뷰 이름은 다를 수 있음)
+SELECT query, calls, mean_exec_time, rows
+FROM pg_stat_statements
+ORDER BY mean_exec_time DESC
+LIMIT 20;
+
+-- 잠금 대기 체인 확인
+SELECT now(), pid, wait_event_type, wait_event, state, query
+FROM pg_stat_activity
+WHERE wait_event_type IS NOT NULL;
+
+-- 인덱스 사용률 점검
+SELECT relname AS table_name, seq_scan, idx_scan
+FROM pg_stat_user_tables
+ORDER BY seq_scan DESC
+LIMIT 20;
+```
+
+이 점검 루틴을 자동화 파이프라인에 연결하면, 성능 저하를 "느낌"이 아니라 "증거"로 관리할 수 있습니다. 결국 장기 운영에서 중요한 것은 뛰어난 한 번의 튜닝이 아니라, 작은 검증을 꾸준히 반복해 위험을 조기에 감지하는 습관입니다.
+## 운영 리허설 시나리오
+
+문서만 읽고 끝내면 운영에서 다시 같은 실수를 반복하기 쉽습니다. 아래 시나리오는 팀 온보딩과 장애 대응 훈련에 바로 사용할 수 있는 공통 리허설 절차입니다.
+
+### 시나리오 1: 느려진 조회 원인 찾기
+
+1. 문제 쿼리를 식별합니다. 애플리케이션 로그의 요청 식별자와 데이터베이스 쿼리 로그를 매칭합니다.
+2. 같은 파라미터로 `EXPLAIN ANALYZE`를 실행합니다.
+3. 계획 노드 중 시간이 큰 지점을 찾고, 해당 노드가 인덱스/통계/정렬 중 무엇과 관련 있는지 분류합니다.
+4. 개선안을 한 번에 하나만 적용합니다. 인덱스 추가, 통계 갱신, 질의문 재작성 가운데 하나만 바꿔 결과를 비교합니다.
+
+```text
+개선 전
+Seq Scan on events  (actual time=0.030..842.112 rows=12000)
+
+개선 후
+Index Scan using idx_events_tenant_created on events
+(actual time=0.041..21.553 rows=12000)
+```
+
+### 시나리오 2: 동시성 문제 재현과 완화
+
+1. 두 세션에서 같은 행을 거의 동시에 수정합니다.
+2. 격리 수준을 바꿔 가며 결과를 비교합니다.
+3. 필요하면 `FOR UPDATE` 잠금 조회 또는 낙관적 잠금 버전 컬럼을 적용합니다.
+4. 재시도 정책과 타임아웃 기준을 코드와 운영 문서에 같이 기록합니다.
+
+```sql
+-- 낙관적 잠금 예시
+UPDATE inventory
+SET qty = qty - 1, version = version + 1
+WHERE sku = 'A-100' AND version = 17;
+```
+
+영향 받은 행 수가 0이면 이미 다른 트랜잭션이 갱신한 것이므로, 재조회 후 재시도합니다. 이 패턴은 잠금 경합을 낮추면서도 정합성을 지키는 데 효과적입니다.
+
+### 시나리오 3: 복구 가능성 검증
+
+1. 최신 베이스 백업으로 테스트 인스턴스를 띄웁니다.
+2. 지정 시점까지 로그를 재적용합니다.
+3. 핵심 비즈니스 검증 SQL을 실행합니다.
+4. 복구 시간(RTO)과 데이터 유실 허용치(RPO)를 실제 숫자로 기록합니다.
+
+```sql
+-- 검증 SQL 예시
+SELECT COUNT(*) FROM orders WHERE created_at >= now() - interval '1 day';
+SELECT SUM(amount) FROM payments WHERE status = 'SUCCESS';
+SELECT COUNT(*) FROM users WHERE deleted_at IS NULL;
+```
+
+복구 리허설에서 가장 중요한 점은 성공 여부 자체보다, 누가 어떤 순서로 무엇을 확인했는지를 재현 가능하게 남기는 것입니다. 절차가 사람마다 다르면 실제 장애에서 속도와 품질이 동시에 무너집니다.
+
+## 체크리스트: 배포 전 최소 검증
+
+- 대표 조회 5개에 대해 실행 계획을 저장합니다.
+- 트랜잭션 경계가 긴 코드 경로를 식별합니다.
+- 잠금 대기 알람 임계치를 설정합니다.
+- 스키마 변경의 롤백 경로를 문서화합니다.
+- 백업 복구 리허설 최근 실행일을 확인합니다.
+
+이 체크리스트는 거창한 체계를 요구하지 않습니다. 작은 팀도 주 1회 반복하면 데이터 사고 빈도를 눈에 띄게 줄일 수 있습니다. 데이터베이스 운영의 본질은 "고급 기능을 많이 아는 것"이 아니라, "반복 가능한 검증 루프를 끊기지 않게 유지하는 것"입니다.
+
+
 ## 처음 질문으로 돌아가기
 
 - **파일과 DBMS의 결정적인 차이는 무엇일까요?**
@@ -371,6 +501,7 @@ WHERE user_id = 42 AND status = 'paid';
 
 ## 참고 자료
 
+- [database-systems-101 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/database-systems-101/ko)
 - [PostgreSQL Documentation — Concepts](https://www.postgresql.org/docs/current/intro-whatis.html)
 - [SQLite — When to Use SQLite](https://www.sqlite.org/whentouse.html)
 - [Database System Concepts (Silberschatz)](https://www.db-book.com/)

@@ -155,9 +155,205 @@ sudo iptables -F
 4. **파티션을 무시합니다.** 클라우드 환경에서는 일상적으로 일어나는 사건입니다.
 5. **완벽한 장애 감지기를 기대합니다.** 비동기 모델에서는 완벽한 감지기가 불가능합니다.
 
+## 장애 모델 스펙트럼: 약한 가정에서 강한 가정으로
+
+장애 모델은 스펙트럼으로 이해하는 것이 가장 정확합니다. 왼쪽이 가장 약한 가정(노드는 멈추기만 함)이고, 오른쪽이 가장 강한 가정(노드가 거짓말을 함)입니다.
+
+```text
+Crash (fail-stop)  ⊂  Crash-recovery  ⊂  Omission  ⊂  Timing  ⊂  Byzantine
+────────────────────────────────────────────────────────────────────
+약한 가정 (cheap)  ────────────────────────────────→  강한 가정 (expensive)
+```
+
+각 단계는 이전 단계를 포함합니다. Byzantine 모델을 견디는 알고리즘은 crash도 당연히 견딥니다. 하지만 비용이 너무 높기 때문에, 실무에서는 필요한 최소한의 가정을 선택하는 것이 원칙입니다.
+
+### 각 모델의 내결성 요구사항
+
+| 모델 | f개 장애 허용 시 최소 노드 수 | 대표 알고리즘 | 운영 비용 |
+|--------|--------------------------|---------------|---------|
+| Crash (fail-stop) | 2f + 1 | Raft, Paxos | 낮음 |
+| Crash-recovery | 2f + 1 | Raft (로그 복원) | 낮음~중간 |
+| Omission | 2f + 1 | 재전송 프로토콜 | 중간 |
+| Byzantine | 3f + 1 | PBFT, HotStuff | 높음 |
+
+5노드 Raft 클러스터는 f=2, 즉 동시에 2노드가 죽어도 정상 작동합니다. 같은 5노드로 Byzantine을 견디려면 f=1만 허용되므로, 동일 내결성을 위해 노드 수를 더 늘려야 합니다.
+
+---
+
+## Crash-recovery: 현실에서 가장 흔한 모델
+
+순수한 fail-stop(죽으면 영원히 죽음)은 이론적 모델입니다. 현실의 서버는 죽었다가 다시 살아납니다. OOM kill 후 systemd가 재시작하거나, VM이 다른 호스트에서 부활합니다. 이때 노드는 자신이 어디까지 처리했는지 기억해야 합니다.
+
+```python
+# crash-recovery 모델에서 안전한 상태 복원
+import json
+from pathlib import Path
+
+WAL_PATH = Path("/var/lib/myapp/wal.jsonl")
+
+def append_wal(entry: dict) -> None:
+    """디스크에 먼저 쓴 뒤 메모리에 반영한다."""
+    with open(WAL_PATH, "a") as f:
+        f.write(json.dumps(entry) + "\n")
+        f.flush()
+        import os; os.fsync(f.fileno())  # 디스크까지 보장
+
+def recover_from_wal() -> list[dict]:
+    """재시작 시 WAL을 읽어 마지막 상태를 복원한다."""
+    entries = []
+    if WAL_PATH.exists():
+        for line in WAL_PATH.read_text().splitlines():
+            entries.append(json.loads(line))
+    return entries
+```
+
+WAL(Write-Ahead Log)은 crash-recovery 모델의 기본 도구입니다. 디스크에 먼저 쓰고, 메모리에 반영하고, 재시작 시 WAL을 다시 읽어 복원합니다. PostgreSQL, etcd, Kafka 모두 이 패턴을 사용합니다.
+
+---
+
+## 장애 감지기의 한계와 트레이드오프
+
+비동기 시스템에서 완벽한 장애 감지기는 불가능합니다. 이것은 FLP impossibility(1985)로 증명된 결과입니다. 현실에서는 두 가지 종류의 오류를 트레이드오프합니다.
+
+| 오류 종류 | 의미 | 결과 |
+|-----------|------|------|
+| False positive | 살아 있는 노드를 죽었다고 판단 | 불필요한 페일오버, 재선출, 트래픽 재분배 |
+| False negative | 죽은 노드를 살아 있다고 판단 | 요청 유실, 타임아웃 누적, 사용자 오류 |
+
+타임아웃을 짧게 잡으면 false positive가 늘고, 길게 잡으면 false negative가 늘어납니다. 이 관계는 제거할 수 없고 관리할 수만 있습니다.
+
+### 적응형 타임아웃 구현
+
+```python
+# adaptive_timeout.py
+import time
+from collections import deque
+
+class AdaptiveTimeout:
+    """RTT 측정값 기반으로 타임아웃을 동적 조정한다."""
+    def __init__(self, initial_ms: float = 500, safety_factor: float = 4.0):
+        self._samples: deque[float] = deque(maxlen=100)
+        self._timeout_ms = initial_ms
+        self._safety_factor = safety_factor
+
+    def record_rtt(self, rtt_ms: float) -> None:
+        self._samples.append(rtt_ms)
+        if len(self._samples) >= 10:
+            avg = sum(self._samples) / len(self._samples)
+            std = (sum((x - avg) ** 2 for x in self._samples) / len(self._samples)) ** 0.5
+            self._timeout_ms = avg + self._safety_factor * std
+
+    @property
+    def timeout_ms(self) -> float:
+        return self._timeout_ms
+```
+
+이 구현은 TCP의 RTO 계산과 유사한 원리입니다. 평균 RTT + 4×표준편차를 타임아웃으로 사용하면, 정상적인 지연 변동은 흡수하면서도 진짜 장애는 빠르게 감지할 수 있습니다.
+
+---
+
+## 네트워크 파티션의 현실
+
+네트워크 파티션은 "노드는 모두 살아 있지만 서로를 볼 수 없는 상태"입니다. 노드 장애와 달리 파티션은 비대칭적일 수 있습니다.
+
+```text
+대칭 파티션:   A ↔ B 상호 통신 불가
+비대칭 파티션: A → B 가능, B → A 불가
+
+예) 3노드 {A, B, C}에서:
+    A ↔ B 정상
+    A ↔ C 정상
+    B ↔ C 단절  ← B와 C는 서로를 죽었다고 판단할 수 있음
+```
+
+이런 부분 파티션에서 각 노드가 독립적으로 "상대가 죽었다"고 판단하면 split-brain이 됩니다. B는 C 없이 리더를 자처하고, C도 B 없이 리더를 자처합니다. 결과는 두 개의 리더, 두 개의 진실입니다.
+
+### 파티션 시 설계 선택지
+
+| 선택 | 설명 | 대표 시스템 |
+|------|------|------------|
+| CP — 쓰기 거부 | 파티션 중 쓰기를 받지 않음, 일관성 유지 | etcd, ZooKeeper, Spanner |
+| AP — 쓰기 허용 | 파티션 중에도 쓰기를 받음, 충돌은 나중에 해결 | Cassandra, DynamoDB |
+| 하이브리드 | API별로 CP/AP를 다르게 적용 | 실무 대부분 |
+
+실무에서는 시스템 전체가 CP나 AP인 경우는 드뭅니다. 결제 API는 CP로, 상품 조회 API는 AP로 설정하는 하이브리드가 일반적입니다. 이 부분은 4편(CAP)에서 상세히 다룹니다.
+
+---
+
+## 장애 모델과 테스트: Chaos Engineering의 기초
+
+장애 모델을 명시하면, 그 모델에 맞는 테스트를 체계적으로 만들 수 있습니다.
+
+| 장애 모델 | 주입 방법 | 검증 항목 |
+|-----------|----------|----------|
+| Crash | `kill -9`, pod delete | 리더 재선출 시간, 요청 오류율 |
+| Omission | `tc netem loss 10%` | 재전송 성공률, 중복 처리 여부 |
+| Timing | `tc netem delay 500ms 200ms` | P99 응답, 타임아웃 비율 |
+| Byzantine | 응답 조작 proxy | 데이터 정합성, 감사 로그 |
+| Partition | `iptables DROP` | split-brain 발생 여부, 복구 시간 |
+
+```bash
+# tc를 사용한 장애 주입 예시 (Linux)
+# 10% 패킷 유실 + 200ms 지연 주입
+sudo tc qdisc add dev eth0 root netem delay 200ms loss 10%
+
+# 테스트 실행
+python3 -m pytest tests/integration/test_under_failure.py -v
+
+# 정리
+sudo tc qdisc del dev eth0 root
+```
+
+이 테스트를 CI에 포함하면 "장애 모델 X를 가정했을 때 시스템이 Y 시간 안에 복구되는가"를 반복적으로 검증할 수 있습니다. Netflix의 Chaos Monkey, AWS의 FIS, Gremlin 같은 도구들이 모두 이 원리 위에 만들어져 있습니다.
+
+---
+
+## 장애 감지 패턴 비교
+
+시스템이 장애를 감지하는 방식도 장애 모델에 따라 달라집니다.
+
+| 패턴 | 동작 | 장점 | 단점 |
+|--------|------|------|------|
+| Heartbeat | 주기적 신호 전송, 미도달 시 장애 판단 | 단순, 구현 쉬움 | false positive 위험 |
+| Lease | 리스 만료 시 자동 해제 | 시간 기반 안전 보장 | 시계 동기화 필요 |
+| Gossip | 노드들이 서로의 상태를 전파 | 중앙 장애점 없음 | 수렴 시간 느림 |
+| Accrual (φ) | 의심 도를 연속 값으로 출력 | 임계값 조절 가능 | 구현 복잡 |
+
+Cassandra는 Gossip + Accrual φ 조합을 사용합니다. etcd/Raft는 Heartbeat + Lease 조합을 사용합니다. 어떤 조합을 선택하든 false positive/negative 트레이드오프는 남습니다.
+
+---
+
+## 운영 시나리오: 장애 모델 오판으로 생기는 사고
+
+다음은 실제 운영에서 자주 발생하는 시나리오입니다.
+
+1. 네트워크 지연이 일시적으로 치솟습니다 (timing 장애).
+2. 타임아웃 기반 장애 감지기가 리더를 "죽었다"고 판단합니다 (false positive).
+3. 새 리더가 선출되고, 기존 리더도 복구됩니다.
+4. 순간적으로 두 리더가 동시에 쓰기를 받습니다 (split-brain).
+5. 클라이언트 요청 일부가 이전 리더로 가서 충돌하는 데이터가 생깁니다.
+
+이 사고의 근본 원인은 "느림"을 "죽음"으로 오판한 것입니다. 예방책은 다음과 같습니다.
+
+- fencing token: 이전 리더의 쓰기를 무효화하는 단조 증가 토큰을 사용합니다.
+- 적응형 타임아웃: 고정값 대신 측정 기반 동적 타임아웃을 사용합니다.
+- 리더 임기(term) 검증: 모든 쓰기 요청에 현재 임기 번호를 포함시키고, 이전 임기의 쓰기는 거부합니다.
+
+```python
+# fencing token 검증 예시
+def write_with_fence(key: str, value: str, fence_token: int) -> bool:
+    current_fence = db.get_fence_token(key)
+    if fence_token < current_fence:
+        return False  # 이전 리더의 쓰기 — 거부
+    db.put(key, value, fence_token=fence_token)
+    return True
+```
+
+---
+
 ## 실무에서는 이렇게 드러납니다
 
-대부분의 인터넷 서비스는 crash와 partition을 중심에 둔 CFT 모델을 전제로 합니다. 금융이나 블록체인 계열은 Byzantine까지 고려하는 BFT 계열을 선택합니다. Kubernetes, Spanner, Cassandra 같은 시스템의 설계 문서를 보면 어떤 장애 모델을 겨냥했는지가 분명히 적혀 있습니다.
+대부분의 인터넷 서비스는 crash와 partition을 중심에 둔 CFT 모델을 전제로 합니다. 금융이나 블록체인 계열은 Byzantine까지 고려하는 BFT 계열을 선택합니다. Kubernetes, Spanner, Cassandra 같은 시스템의 설계 문서를 보면 어떤 장애 모델을 겨냥했는지가 분명히 적혀 있습니다. 예를 들어 Kubernetes의 etcd는 Raft를 사용하므로 crash-recovery를 전제하고, Cassandra는 gossip 기반 장애 감지로 네트워크 파티션 상황에서도 가용성을 유지하도록 설계되어 있습니다. 장애 모델을 명시하지 않은 시스템은 암묵적으로 crash-stop을 가정하는 경우가 많은데, 이때 파티션이 발생하면 예측 불가능한 동작이 나타납니다.
 
 ## 시니어 엔지니어는 이렇게 생각합니다
 
@@ -181,140 +377,120 @@ sudo iptables -F
 2. 타임아웃 값을 정하기 위해 반드시 측정해야 할 지표 두 가지를 적어 보세요.
 3. 파티션이 발생했을 때 split-brain을 막는 메커니즘 하나를 조사해 보세요.
 
+## 실제 시스템의 장애 모델 선택 사례
+
+각 시스템이 어떤 장애 모델을 전제로 설계되었는지를 아는 것은 운영에서 매우 중요합니다.
+
+| 시스템 | 장애 모델 가정 | 내결성 | 설계 결과 |
+|--------|--------------|--------|----------|
+| etcd / Raft | Crash-recovery | 2f+1 (보통 3 or 5) | WAL + 스냅샷 복원, 리더 선출 |
+| Cassandra | Crash + Partition | QUORUM 설정 | Gossip 기반 감지, hinted handoff |
+| ZooKeeper | Crash-recovery | 2f+1 | 세션 + 임시 노드로 장애 전파 |
+| Bitcoin | Byzantine | 50% 해시파워 | PoW, 가장 긴 체인 선택 |
+| Spanner | Crash + Timing | 2f+1 | TrueTime으로 시계 불확실성 명시 |
+| Kafka | Crash-recovery | ISR 기반 | 최소 ISR 유지 시만 쓰기 허용 |
+
+이 표에서 주목할 점은 Bitcoin만 Byzantine을 가정한다는 사실입니다. 나머지는 모두 "노드가 거짓말하지 않는다"를 전제합니다. 데이터센터 내부에서는 노드를 운영자가 통제하기 때문입니다. 외부 참여자가 있는 시스템만 Byzantine 비용을 감수합니다.
+
+### Kafka ISR: crash-recovery 모델의 실무 적용
+
+Kafka는 ISR(In-Sync Replicas)이라는 개념으로 crash-recovery를 구현합니다.
+
+```text
+토픽: orders, 파티션 0
+리더: broker-1
+ISR: [broker-1, broker-2, broker-3]
+
+1. broker-3이 10초간 복제를 못 따라옴
+2. 리더가 broker-3을 ISR에서 제거
+   ISR: [broker-1, broker-2]
+3. min.insync.replicas=2 이므로 쓰기 계속 가능
+4. broker-3 복구 → 로그 따라잡기 → ISR 복귀
+   ISR: [broker-1, broker-2, broker-3]
+```
+
+만약 ISR이 `min.insync.replicas` 미만으로 떨어지면 프로듀서는 `NotEnoughReplicasException`을 받습니다. 이것이 Kafka가 crash-recovery 상황에서 데이터 유실을 방지하는 메커니즘입니다.
+
+---
+
+## 장애 모델 문서화 템플릿
+
+시스템의 장애 모델을 명시적으로 문서화하면 팀 전체가 같은 가정 위에서 판단할 수 있습니다.
+
+```yaml
+# failure-model.yaml
+service: payment-gateway
+failure_model:
+  node: crash-recovery
+  network: partition-possible
+  byzantine: not-assumed
+  rationale: >
+    내부 데이터센터 운영이므로 악의적 노드를 가정하지 않음.
+    노드는 OOM/배포로 죽었다 살아날 수 있으므로 crash-recovery 가정.
+
+detection:
+  method: heartbeat
+  interval_ms: 500
+  timeout_ms: 2000
+  false_positive_action: fencing_token_check
+
+partition_policy:
+  write: reject_without_quorum
+  read: allow_stale_with_header
+  recovery: log_replay_then_reconcile
+```
+
+이 문서가 존재하면 새로 합류하는 엔지니어도 "이 시스템은 왜 3노드인가", "타임아웃이 왜 2초인가", "파티션 시 왜 쓰기를 거부하는가"에 대한 답을 즉시 찾을 수 있습니다.
+
+---
+
+## 운영 대시보드에서 장애 모델을 모니터링하는 지표
+
+장애 모델이 정해졌으면, 그 모델이 현실과 맞는지 지속적으로 모니터링해야 합니다.
+
+| 범주 | 지표 | 의미 |
+|------|------|------|
+| Crash 감지 | 리더 재선출 횟수/시간 | 예상보다 잦으면 타임아웃 조정 필요 |
+| Omission | 재전송 비율, ACK 누락률 | 네트워크 품질 저하 신호 |
+| Timing | P99/P99.9 응답 시간 | 꼬리 지연이 타임아웃에 근접하면 위험 |
+| Partition | 노드 간 연결 상태 매트릭스 | 비대칭 파티션 조기 감지 |
+| Recovery | WAL 복원 시간, ISR 복귀 시간 | 복구 SLO 충족 여부 |
+
+```python
+# Prometheus 지표 예시
+from prometheus_client import Counter, Histogram
+
+leader_elections = Counter(
+    "leader_elections_total",
+    "Number of leader elections triggered",
+)
+
+detection_latency = Histogram(
+    "failure_detection_seconds",
+    "Time from actual failure to detection",
+    buckets=[0.1, 0.5, 1.0, 2.0, 5.0, 10.0],
+)
+
+false_positives = Counter(
+    "false_positive_detections_total",
+    "Nodes incorrectly marked as failed",
+)
+```
+
+false positive 카운터가 급증하면 타임아웃을 늘려야 합니다. leader election이 잦으면 네트워크 품질을 점검해야 합니다. 이렇게 장애 모델의 가정이 현실과 맞는지를 데이터로 검증하는 것이 운영 성숙도의 핵심입니다.
+
 ## 정리와 다음 글
 
 장애 모델은 가장 먼저 내려야 하는 설계 결정입니다. 이 결정이 알고리즘과 운영 비용을 함께 정합니다. 다음 글에서는 이런 장애 모델 위에서 노드들이 실제로 어떻게 통신하는지, 즉 RPC와 메시지 전달을 살펴보겠습니다.
 
-
-## 실전 설계 확장: 합의, CAP, 메시지 큐 운영
-
-분산 시스템을 실제로 운영할 때는 "요청을 받았다"보다 "요청이 어느 경계에서 확정되었는가"를 더 먼저 확인해야 합니다. 이유는 단순합니다. 네트워크 지연과 부분 장애가 존재하면 성공/실패 이분법으로 상태를 설명할 수 없고, 노드별 관측 시점이 달라 같은 사건을 다르게 기록할 수 있기 때문입니다. 따라서 설계 문서에는 기능 설명뿐 아니라 합의 규칙, 파티션 시 동작 규칙, 큐 처리 규칙이 함께 들어가야 운영에서 재현 가능한 판단이 가능합니다.
-
-### 합의 알고리즘을 어디에 쓰는가
-
-합의 알고리즘은 이론 주제가 아니라 운영 안전장치입니다. 예를 들어 주문 서비스의 리더 노드가 동시에 두 개 생기면, 같은 주문 번호에 서로 다른 상태가 기록될 수 있습니다. 이때 Raft 같은 리더 기반 합의는 "현재 임기의 과반이 인정한 리더만 쓰기 가능"이라는 제약으로 이중 기록을 막습니다.
-
-```text
-노드 5개 구성에서 과반수는 3개입니다.
-리더가 쓰기를 확정하려면 최소 3개 노드에 로그가 복제되어야 합니다.
-2개 노드만 성공한 쓰기는 클라이언트 성공 응답으로 확정하면 안 됩니다.
-```
-
-실무 문서에 반드시 적어야 하는 항목은 다음과 같습니다.
-
-- 리더 선출 타임아웃 범위(예: 150ms~300ms 랜덤)
-- 하트비트 간격(예: 50ms)
-- 로그 확정 기준(과반 복제 이후 commit)
-- 장애 복구 시 재조인 절차(스냅샷/로그 재동기화)
-
-이 네 가지를 수치로 고정하면, 장애 대응 중에 팀원마다 다른 가정을 들고 판단하는 상황을 줄일 수 있습니다.
-
-### CAP을 선언으로 끝내지 않고 시나리오로 적기
-
-"우리 시스템은 AP" 같은 문장은 운영에서 거의 도움이 되지 않습니다. 어떤 API가 파티션 중에도 쓰기를 받는지, 읽기 결과가 얼마나 오래 뒤처질 수 있는지를 함께 정의해야 합니다.
-
-예시로 재고 서비스의 파티션 정책을 문서화하면 아래처럼 표현할 수 있습니다.
-
-```yaml
-service: inventory
-partition_policy:
-  write:
-    mode: reject_when_no_quorum
-    http_status: 503
-  read:
-    mode: allow_stale_read
-    max_staleness_seconds: 5
-recovery_policy:
-  reconcile: last_write_wins_with_version_check
-  audit_log_required: true
-```
-
-위 정책의 의미는 명확합니다. 네트워크가 갈라졌을 때 쓰기를 무조건 받지 않고, 읽기는 최대 5초까지 오래된 값을 허용합니다. 대신 복구 후에는 버전 검증과 감사 로그 기반으로 충돌을 정리합니다. CAP 선택은 이렇게 엔드포인트별 동작과 관측 지표로 내려와야 실제 운영 정책이 됩니다.
-
-### 메시지 큐 설정은 처리량보다 재처리 안전성을 먼저 본다
-
-메시지 큐를 도입하면 비동기로 느슨한 결합을 얻지만, 동시에 중복 처리와 순서 역전이 기본 위험이 됩니다. 큐 설정에서 가장 먼저 다룰 항목은 처리량이 아니라 "실패한 메시지를 어떻게 안전하게 다시 처리할 것인가"입니다.
-
-아래는 RabbitMQ 스타일의 실무 기본 설정 예시입니다.
-
-```yaml
-queue:
-  name: order.events
-  durable: true
-  arguments:
-    x-dead-letter-exchange: order.dlx
-    x-message-ttl: 60000
-consumer:
-  prefetch_count: 20
-  ack_mode: manual
-  retry:
-    max_attempts: 5
-    backoff_ms: 200
-idempotency:
-  key_source: event_id
-  ttl_seconds: 86400
-```
-
-핵심은 세 가지입니다.
-
-- `durable: true`로 브로커 재시작 후에도 큐 정의를 유지합니다.
-- `manual ack`로 실제 처리 완료 후에만 확인 응답을 보냅니다.
-- `event_id` 기반 멱등성 저장소를 두어 중복 전달을 결과 중복으로 이어지지 않게 막습니다.
-
-Kafka를 쓰는 경우도 원칙은 같습니다. 파티션 키를 어떻게 잡아 순서를 보존할지, 커밋 시점을 처리 성공 이후로 둘지, DLQ 토픽을 어떻게 운영할지를 문서로 고정해야 장애 시간에 판단 비용을 줄일 수 있습니다.
-
-### 장애 주입 기반 검증 루프
-
-설계를 문서로만 두면 시간이 지나며 가정이 깨집니다. 그래서 운영 전 검증 루프를 습관화해야 합니다.
-
-1. 리더 노드 강제 종료: 선출 시간과 요청 오류율을 측정합니다.
-2. 네트워크 지연 주입: p95/p99 지연과 타임아웃 비율을 기록합니다.
-3. 큐 소비자 중단: 적체량 증가 속도와 복구 시간을 측정합니다.
-4. 중복 메시지 재주입: 멱등성 키로 결과 중복이 차단되는지 확인합니다.
-
-이 검증을 CI 야간 작업이나 스테이징 런북에 포함하면, 새 기능이 들어와도 합의/CAP/큐 운영 규칙이 계속 살아 있는지 지속적으로 확인할 수 있습니다.
-
-### 운영 대시보드에서 반드시 보는 지표
-
-- 합의 계층: 리더 변경 횟수, 선출 소요 시간, 로그 복제 지연
-- 요청 계층: 성공률, 타임아웃률, 재시도 횟수, 멱등성 충돌률
-- 큐 계층: consumer lag, DLQ 유입량, 재처리 성공률
-- 데이터 계층: 복제 지연, 버전 충돌 건수, 보정 작업 처리량
-
-지표를 계층별로 보면 "느리다"라는 증상을 "리더 불안정 때문에 재시도가 폭증했다"처럼 원인 단위로 분해할 수 있습니다. 분산 시스템 운영 성숙도는 결국 이 분해 능력에서 드러납니다.
-
-
-
-
-### 추가 운영 예시: 쿼럼 손실과 복구 절차
-
-쿼럼이 깨진 순간에는 "일단 쓰기를 받고 나중에 맞춘다"보다 "확정 가능한 쓰기만 받는다"를 기본값으로 두는 편이 안전합니다. 예를 들어 5노드 클러스터에서 2노드만 살아 있으면 새로운 쓰기는 거절하고, 읽기는 최신성 등급을 함께 내려 사용자와 상위 서비스가 의사결정을 할 수 있게 해야 합니다.
-
-```yaml
-degraded_mode:
-  quorum_required: 3
-  write_policy: reject
-  read_policy:
-    allow: true
-    staleness_label: required
-  response_headers:
-    X-Consistency-Level: stale-possible
-```
-
-복구 시에는 아래 순서를 런북으로 고정해 두는 것이 좋습니다. 첫째, 리더 안정화 여부 확인. 둘째, 복제 지연이 임계치 아래로 내려왔는지 확인. 셋째, 큐 적체가 해소되었는지 확인. 넷째, 그 뒤에만 쓰기 트래픽 제한을 해제합니다. 이 순서가 바뀌면 겉보기 정상화 뒤에 데이터 불일치가 남을 가능성이 커집니다.
-
-
-
-추가로, 장애 조치 연습은 분기별 1회가 아니라 배포 주기 안으로 넣어야 효과가 큽니다. 배포 전 체크에 리더 재선출, 큐 재처리, stale read 경고 노출 검증을 포함하면 운영 중 최초 발견 리스크를 크게 줄일 수 있습니다.
-
 ## 처음 질문으로 돌아가기
 
 - **장애 모델이란 무엇이며 왜 장애를 모델링해야 할까요?**
-  - 본문의 기준은 장애 모델를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 장애 모델은 "노드가 어떤 방식으로 망가질 수 있는가"를 명시하는 계약입니다. 이 계약 없이는 알고리즘의 정확성도 비용도 논할 수 없습니다. crash만 가정하면 2f+1 노드로 충분하지만, Byzantine을 가정하면 3f+1이 필요합니다.
 - **crash, omission, timing, Byzantine은 어떻게 다를까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 스펙트럼의 왼쪽에서 오른쪽으로: crash는 멈추기만 하고, omission은 메시지를 빠뜨리고, timing은 임의로 느려지며, Byzantine은 거짓말까지 합니다. 각 단계는 이전 단계를 포함하며 비용은 급격히 올라갑니다.
 - **네트워크 파티션은 왜 별도 범주로 봐야 할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 파티션은 노드가 아닌 링크의 장애입니다. 노드는 모두 정상인데 서로를 볼 수 없는 상태가 가능하고, 이때 독립적 판단은 split-brain으로 이어집니다. CAP 정리가 다루는 핵심 상황이 바로 이것입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -338,5 +514,6 @@ degraded_mode:
 - [Byzantine fault (Wikipedia)](https://en.wikipedia.org/wiki/Byzantine_fault)
 - [Network partition (Wikipedia)](https://en.wikipedia.org/wiki/Network_partition)
 - [Designing Data-Intensive Applications — chapter 8](https://dataintensive.net/)
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/distributed-systems-101/ko)
 
 Tags: Computer Science, Distributed Systems, Failure Models, Crash, Byzantine, Reliability

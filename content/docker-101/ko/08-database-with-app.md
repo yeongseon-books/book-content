@@ -22,11 +22,13 @@ last_reviewed: '2026-05-15'
 
 # Docker 101 (8/10): 데이터베이스와 함께 실행하기
 
+이 글은 Docker 101 시리즈의 8번째 글입니다.
+
+
 애플리케이션 컨테이너만 잘 만들었다고 해서 실제 서비스 구성이 끝난 것은 아닙니다. 대부분의 애플리케이션은 결국 데이터베이스와 함께 움직입니다. 문제는 여기서부터 훨씬 현실적이 됩니다. 앱이 먼저 떠 버리면 DB가 아직 준비되지 않아 실패하고, 스키마 변경이 자동화되지 않으면 배포마다 사람이 개입해야 하며, 시드 데이터가 중복으로 들어가면 환경이 점점 더 지저분해집니다.
 
 그래서 앱과 DB를 함께 실행하는 구조에서는 세 가지 리듬이 중요합니다. 데이터의 영속성, 준비 상태 확인, 그리고 마이그레이션 자동화입니다. 이 세 가지가 맞물려야 로컬 개발, CI, 운영 전환이 부드러워집니다.
 
-이 글은 Docker 101 시리즈의 8번째 글입니다. 여기서는 앱과 PostgreSQL을 함께 띄울 때 persistence·readiness·migration이라는 세 리듬을 어떻게 맞춰야 하는지, 그리고 migration과 seed를 어떤 순서로 검증해야 하는지 정리합니다.
 
 ## 먼저 던지는 질문
 
@@ -58,7 +60,7 @@ last_reviewed: '2026-05-15'
 
 이 다섯 가지는 하나의 흐름으로 이해하는 편이 좋습니다. 데이터는 volume에 남고, 준비 상태는 healthcheck가 알리며, schema 변화는 migration이 책임지고, 초기값은 seed가 담당합니다.
 
-## Before / After
+## 전과 후
 
 **Before**: 새 환경마다 수동 SQL을 적용하고, 마이그레이션 순서를 사람 기억에 의존합니다.
 
@@ -338,6 +340,179 @@ docker push ghcr.io/acme/app:1.4.2-3f2a9d1
 이 관점을 유지하면 컨테이너는 단순 포장 기술이 아니라 신뢰 가능한 배포 단위로 자리잡습니다.
 
 
+## 실전 앵커: 운영에서 바로 쓰는 명령 모음
+
+개념을 이해했다면 이제 실제 운영에서 자주 쓰는 명령과 구성으로 연결해 보는 것이 좋습니다. 아래 예시는 로컬 개발, CI 검증, 스테이징 점검에서 그대로 재사용할 수 있도록 구성했습니다. 핵심은 "한 번 실행해 보고 끝"이 아니라, 실패 원인을 빠르게 분리할 수 있는 관찰 포인트를 같이 남기는 것입니다.
+
+### Dockerfile 앵커: 빌드 캐시와 보안 기본값
+
+```dockerfile
+FROM python:3.12-slim AS builder
+WORKDIR /build
+COPY requirements.txt .
+RUN --mount=type=cache,target=/root/.cache/pip     pip wheel --wheel-dir /wheels -r requirements.txt
+
+FROM python:3.12-slim AS runtime
+WORKDIR /app
+COPY --from=builder /wheels /wheels
+RUN pip install --no-index --find-links=/wheels /wheels/*.whl     && rm -rf /wheels     && useradd -m -u 10001 appuser
+COPY . .
+USER appuser
+CMD ["python", "app.py"]
+```
+
+이 패턴은 의존성 빌드와 런타임 이미지를 분리해 크기와 취약점 표면을 함께 줄입니다. 또한 non-root 실행을 기본값으로 두어 운영 보안 정책과 충돌을 줄입니다.
+
+### Compose 앵커: 앱, DB, 캐시를 재현 가능한 단위로 묶기
+
+```yaml
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_ENV=local
+      - DATABASE_URL=postgresql://app:app@db:5432/appdb
+      - REDIS_URL=redis://cache:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_started
+    volumes:
+      - ./:/workspace:ro
+  db:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=app
+      - POSTGRES_PASSWORD=app
+      - POSTGRES_DB=appdb
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d appdb"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+  cache:
+    image: redis:7-alpine
+
+volumes:
+  pgdata:
+```
+
+여기서 중요한 점은 의존 관계를 명시하되, 앱 자체도 재시도 가능한 연결 로직을 가져야 한다는 것입니다. `depends_on`은 시작 순서를 도와주지만 분산 환경의 모든 지연을 해결하지는 못합니다.
+
+### 볼륨 마운트 앵커: 상태와 소스 코드를 분리하기
+
+```bash
+# 영속 데이터 볼륨
+docker volume create app-data
+
+# 읽기 전용 소스 마운트 + 쓰기 가능한 임시 디렉터리
+docker run --rm   -v "$PWD":/workspace:ro   -v app-data:/var/lib/app   --tmpfs /tmp   myapp:latest
+```
+
+운영에서 가장 흔한 실수는 애플리케이션 상태와 개발 편의용 마운트를 같은 경로에 섞는 것입니다. 상태 데이터 경로는 팀 규칙으로 고정하고, 개발 편의용 bind mount는 읽기 전용을 기본으로 두는 편이 안전합니다.
+
+### 네트워킹 앵커: 이름 기반 통신과 점검 명령
+
+```bash
+docker network create service-net
+
+docker run -d --name db --network service-net postgres:16-alpine
+docker run -d --name api --network service-net -e DB_HOST=db myapp:latest
+
+docker exec api getent hosts db
+docker exec api sh -lc 'nc -zv db 5432'
+docker network inspect service-net
+```
+
+컨테이너 통신 문제를 만났을 때는 먼저 DNS 해석(`getent hosts`)과 포트 도달성(`nc -zv`)을 분리해 확인합니다. 두 단계를 나누면 애플리케이션 버그와 네트워크 구성을 섞어 디버깅하는 일을 줄일 수 있습니다.
+
+### 이미지 최적화 앵커: 측정 기반으로 개선하기
+
+```bash
+DOCKER_BUILDKIT=1 docker build -t myapp:opt .
+docker history myapp:opt
+
+docker image inspect myapp:opt --format '{{.Size}}'
+docker run --rm wagoodman/dive:latest myapp:opt
+```
+
+이미지 최적화는 "작아 보인다"가 아니라 "측정값이 줄었다"로 판단해야 합니다. 히스토리와 레이어 분석 도구를 같이 쓰면 어떤 단계가 크기를 키우는지 빠르게 찾을 수 있습니다.
+
+### 운영 체크포인트
+
+- 같은 코드를 다시 빌드했을 때 캐시 적중으로 시간이 줄어드는지 확인합니다.
+- 컨테이너 재생성 후에도 필요한 데이터가 volume에 남는지 확인합니다.
+- healthcheck 실패 시 로그와 네트워크 점검 명령으로 원인을 1차 분리합니다.
+- 이미지 태그를 `latest`만 쓰지 않고 버전과 커밋 식별자를 함께 남깁니다.
+
+## 검증 시나리오: 실패를 재현하고 복구 경로까지 확인하기
+
+운영 준비가 되었는지 확인하려면 성공 경로만 보면 부족합니다. 의도적으로 실패를 만들고, 관찰 신호와 복구 절차가 준비되어 있는지 함께 점검해야 합니다. 아래 시나리오는 대부분의 Docker 기반 서비스에서 공통으로 재사용할 수 있습니다.
+
+### 시나리오 1: 애플리케이션 프로세스 비정상 종료
+
+```bash
+docker kill --signal=SIGKILL api
+docker ps -a
+docker logs api
+```
+
+- 재시작 정책이 있다면 컨테이너가 자동 복구되는지 확인합니다.
+- 자동 복구가 없다면 운영 기준에 맞는 실패 알림이 발생하는지 확인합니다.
+
+### 시나리오 2: 데이터베이스 일시 중단
+
+```bash
+docker stop db
+sleep 5
+docker start db
+docker compose logs -f app
+```
+
+- 애플리케이션이 즉시 영구 실패하지 않고 재시도하는지 확인합니다.
+- DB 복구 후 정상 요청 흐름으로 복귀하는지 확인합니다.
+
+### 시나리오 3: 네트워크 단절
+
+```bash
+docker network disconnect service-net api
+docker exec api sh -lc 'nc -zv db 5432 || true'
+docker network connect service-net api
+```
+
+- 단절 시 오류 메시지가 관찰 가능한 형태로 남는지 확인합니다.
+- 재연결 후 별도 수동 조치 없이 복구되는지 확인합니다.
+
+### 시나리오 4: 디스크 사용량 증가
+
+```bash
+docker system df
+docker volume ls
+docker image ls --format '{{.Repository}}:{{.Tag}} {{.Size}}'
+```
+
+- 정리 기준이 없는 중간 이미지와 미사용 볼륨이 빠르게 증가하는지 확인합니다.
+- 정리 정책(`image prune`, 보존 기간, 태그 규칙)이 문서화되어 있는지 확인합니다.
+
+### 시나리오 5: 배포 롤백 검증
+
+```bash
+docker pull ghcr.io/me/myapp:1.4.1
+docker run --rm ghcr.io/me/myapp:1.4.1 python -m pytest -q
+```
+
+- 이전 안정 버전으로 즉시 되돌릴 수 있는 태그 체계가 있는지 확인합니다.
+- 롤백 시 필요한 환경변수, 볼륨, 네트워크 계약이 변하지 않았는지 확인합니다.
+
+이 시나리오를 정기적으로 반복하면 "문제가 생겼을 때 무엇을 볼지"가 팀 공통 지식으로 고정됩니다. Docker 운영 품질은 고급 기능보다 실패를 얼마나 빨리 좁혀 가는지에서 차이가 납니다.
+
 ## 처음 질문으로 돌아가기
 
 - **Compose로 PostgreSQL과 앱을 어떻게 함께 띄울까요?**
@@ -375,5 +550,7 @@ docker push ghcr.io/acme/app:1.4.2-3f2a9d1
 ### 검증과 트러블슈팅
 
 - [docker compose run reference](https://docs.docker.com/reference/cli/docker/compose/run/)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/docker-101/ko)
 
 Tags: Docker, Postgres, Compose, Migration, Healthcheck

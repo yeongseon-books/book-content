@@ -22,9 +22,9 @@ last_reviewed: '2026-05-15'
 
 # SQL 101 (1/10): SQL이란 무엇인가?
 
-처음 SQL을 배우면 문법부터 외우려는 경우가 많습니다. 그런데 실무에서 더 중요한 출발점은 문법이 아니라 관점입니다. 왜 사람들은 수십 년 동안 SQL을 계속 쓰는지, 왜 스프레드시트와 애플리케이션 코드 사이에서 SQL이 공통 언어로 남았는지를 먼저 이해해야 이후 문법도 빠르게 정리됩니다.
-
 이 글은 SQL 101 시리즈의 첫 번째 글입니다. 여기서는 SQL을 단순한 조회 문법이 아니라, 관계형 데이터를 다루기 위한 선언형 언어라는 관점에서 설명합니다.
+
+처음 SQL을 배우면 문법부터 외우려는 경우가 많습니다. 그런데 실무에서 더 중요한 출발점은 문법이 아니라 관점입니다. 왜 사람들은 수십 년 동안 SQL을 계속 쓰는지, 왜 스프레드시트와 애플리케이션 코드 사이에서 SQL이 공통 언어로 남았는지를 먼저 이해해야 이후 문법도 빠르게 정리됩니다.
 
 ## 먼저 던지는 질문
 
@@ -275,6 +275,238 @@ SQL을 배울 때는 문법을 순서대로 외우기보다, 실제 질문을 SQ
 8. **인덱스와 성능**: 쿼리 최적화
 
 각 단계마다 실제 데이터로 연습하고, 같은 결과를 얻는 여러 방법을 비교해 보면 SQL의 유연성을 느낄 수 있습니다.
+
+## 실전 앵커: 선언형 사고를 체감하는 작은 실험
+
+문법을 외우는 속도보다 중요한 것은 **질문을 데이터 연산으로 바꾸는 습관**입니다. 아래 예시는 같은 질문을 서로 다른 방식으로 푸는 과정입니다. 처음에는 절차적으로 접근하지만, SQL에서는 선언형으로 바꿔야 최적화 여지가 생깁니다.
+
+```sql
+-- 질문: 2026년 1분기 결제 완료 주문의 국가별 매출 상위 5개
+SELECT
+    c.country,
+    SUM(o.total_amount) AS revenue
+FROM orders o
+JOIN customers c ON c.customer_id = o.customer_id
+WHERE o.status = 'paid'
+  AND o.ordered_at >= DATE '2026-01-01'
+  AND o.ordered_at <  DATE '2026-04-01'
+GROUP BY c.country
+ORDER BY revenue DESC
+LIMIT 5;
+```
+
+이 쿼리는 "어떻게 반복할지"를 쓰지 않았지만, 데이터베이스는 내부적으로 필터, 조인, 집계 순서를 계산해 실행 계획을 고릅니다. 즉 SQL의 핵심은 반복문을 숨기는 것이 아니라, **최적화 가능한 형태로 의도를 전달하는 것**입니다.
+
+## 실전 앵커: 같은 요구사항을 두 가지 모델로 비교하기
+
+관계형 모델을 이해할 때는 정규화 수준에 따라 쿼리가 어떻게 달라지는지 보는 편이 빠릅니다. 예를 들어 주문 데이터가 비정규화되어 있다면 처음에는 조회가 쉬워 보입니다.
+
+```sql
+-- 비정규화된 단일 테이블 예시
+SELECT order_id, customer_name, product_name, quantity, unit_price
+FROM order_flat
+WHERE ordered_at >= DATE '2026-05-01';
+```
+
+하지만 고객 이름 수정, 상품 가격 변경, 중복 데이터 정리 같은 변경 작업이 반복되면 관리 비용이 급격히 커집니다. 반대로 정규화된 구조에서는 JOIN이 필요하지만 변경 안정성이 높아집니다.
+
+```sql
+SELECT
+    o.order_id,
+    c.customer_name,
+    p.product_name,
+    oi.quantity,
+    oi.unit_price
+FROM orders o
+JOIN customers c ON c.customer_id = o.customer_id
+JOIN order_items oi ON oi.order_id = o.order_id
+JOIN products p ON p.product_id = oi.product_id
+WHERE o.ordered_at >= DATE '2026-05-01';
+```
+
+처음 학습 단계에서는 JOIN이 번거롭게 보이지만, 실무에서는 이 구조가 데이터 품질을 지키는 핵심 안전장치가 됩니다.
+
+## 실전 앵커: 실행 계획을 읽는 최소 루틴
+
+`EXPLAIN`을 무겁게 느끼는 초급자가 많지만, 아래 세 줄만 먼저 보면 충분합니다.
+
+```sql
+EXPLAIN
+SELECT *
+FROM orders
+WHERE customer_id = 42
+  AND ordered_at >= DATE '2026-01-01';
+```
+
+1) `Seq Scan`인지 `Index Scan`인지, 2) 예상 행 수(`rows`)가 현실과 비슷한지, 3) 비용이 급격히 커지는 연산이 있는지를 확인합니다. 이 루틴이 생기면 SQL을 문법이 아니라 **실행되는 프로그램**으로 볼 수 있습니다.
+
+## 실전 앵커: 학습용 체크 SQL
+
+아래 질문을 직접 SQL로 작성해 보면, 시리즈 전체를 훨씬 빠르게 흡수할 수 있습니다.
+
+- 특정 기간 결제 금액 상위 고객 10명
+- 카테고리별 평균 주문 금액과 중앙값 비교
+- 첫 구매 후 30일 내 재구매한 사용자 비율
+- 결제 실패 원인 코드별 분포
+
+질문을 SQL로 바꾸는 반복이 쌓이면, 이후 JOIN·윈도 함수·인덱스 학습이 각각 분리된 주제가 아니라 하나의 분석 흐름으로 연결됩니다.
+
+
+## 심화 실습 시나리오: 쿼리 품질을 수치로 검증하기
+
+문장 길이가 길어질수록 SQL 품질은 느낌이 아니라 **측정 가능한 기준**으로 관리해야 합니다. 아래 절차는 어떤 주제의 SQL이든 그대로 적용할 수 있는 공통 루틴입니다.
+
+1. 입력 데이터 범위(기간, 상태, 대상 테넌트)를 명시합니다.
+2. 같은 조건으로 `COUNT(*)`를 먼저 실행해 모수 행 수를 기록합니다.
+3. 본 쿼리를 실행하고 결과 행 수와 합계 지표를 기록합니다.
+4. `EXPLAIN (ANALYZE, BUFFERS)`를 실행해 병목 노드를 확인합니다.
+5. 인덱스/조건식을 조정한 뒤 2~4를 다시 반복합니다.
+
+```sql
+-- 1) 모수 확인
+SELECT COUNT(*) AS base_rows
+FROM orders
+WHERE ordered_at >= DATE '2026-01-01'
+  AND ordered_at <  DATE '2026-02-01';
+
+-- 2) 본 쿼리(예시)
+SELECT
+    customer_id,
+    COUNT(*) AS order_count,
+    SUM(total_amount) AS revenue
+FROM orders
+WHERE ordered_at >= DATE '2026-01-01'
+  AND ordered_at <  DATE '2026-02-01'
+GROUP BY customer_id
+ORDER BY revenue DESC
+LIMIT 20;
+
+-- 3) 계획 확인
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT
+    customer_id,
+    COUNT(*) AS order_count,
+    SUM(total_amount) AS revenue
+FROM orders
+WHERE ordered_at >= DATE '2026-01-01'
+  AND ordered_at <  DATE '2026-02-01'
+GROUP BY customer_id;
+```
+
+이 과정을 습관화하면 "왜 느린지"를 추측하지 않고 설명할 수 있습니다. 특히 팀 협업에서는 성능 이슈를 재현 가능한 단위로 공유할 수 있다는 점이 중요합니다.
+
+## 심화 실습 시나리오: 조인·서브쿼리·CTE 선택 비교
+
+아래 세 방식은 결과가 같아 보이지만, 데이터 크기와 통계 상태에 따라 실행 계획이 크게 달라질 수 있습니다.
+
+```sql
+-- A. 직접 조인
+SELECT c.customer_id, SUM(o.total_amount) AS revenue
+FROM customers c
+JOIN orders o ON o.customer_id = c.customer_id
+WHERE o.status = 'paid'
+GROUP BY c.customer_id;
+```
+
+```sql
+-- B. 서브쿼리
+SELECT c.customer_id, x.revenue
+FROM customers c
+JOIN (
+    SELECT customer_id, SUM(total_amount) AS revenue
+    FROM orders
+    WHERE status = 'paid'
+    GROUP BY customer_id
+) x ON x.customer_id = c.customer_id;
+```
+
+```sql
+-- C. CTE
+WITH paid_orders AS (
+    SELECT customer_id, total_amount
+    FROM orders
+    WHERE status = 'paid'
+),
+revenue_by_customer AS (
+    SELECT customer_id, SUM(total_amount) AS revenue
+    FROM paid_orders
+    GROUP BY customer_id
+)
+SELECT c.customer_id, r.revenue
+FROM customers c
+JOIN revenue_by_customer r ON r.customer_id = c.customer_id;
+```
+
+실무에서 권장하는 방법은 "문법 취향"이 아니라 "검증 가능성"으로 고르는 것입니다. 변경이 자주 일어나는 쿼리는 CTE가 리뷰와 테스트에 유리하고, 단발성 쿼리는 인라인 구조가 간결할 수 있습니다.
+
+## 심화 실습 시나리오: 인덱스 전략과 유지비용
+
+인덱스는 조회 성능을 높이지만 쓰기 비용을 늘립니다. 그래서 읽기/쓰기 비율을 기준으로 설계해야 합니다.
+
+```sql
+-- 조회 패턴에 맞춘 합성 인덱스
+CREATE INDEX idx_orders_customer_status_created
+    ON orders (customer_id, status, created_at DESC);
+
+-- 자주 쓰는 상태값만 가볍게 다루는 부분 인덱스
+CREATE INDEX idx_orders_paid_created
+    ON orders (created_at DESC)
+WHERE status = 'paid';
+```
+
+인덱스를 추가한 뒤에는 반드시 아래를 확인합니다.
+
+- `INSERT`/`UPDATE` TPS가 과도하게 떨어지지 않는가
+- VACUUM/ANALYZE 주기가 비정상적으로 늘어나지 않는가
+- 실제 주요 쿼리에서 `Index Scan` 또는 `Bitmap Index Scan`으로 전환되었는가
+
+인덱스는 "있으면 좋은 옵션"이 아니라 **운영 비용이 있는 구조물**입니다. 성능 개선 수치와 유지 비용을 같이 기록해야 장기적으로 안정됩니다.
+
+## 심화 실습 시나리오: 트랜잭션 격리 수준 재현 데모
+
+분석 SQL이든 운영 SQL이든 동시성 환경에서는 격리 수준 이해가 필요합니다. 다음은 재현 가능한 기본 데모입니다.
+
+```sql
+-- 세션 A
+BEGIN;
+SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+SELECT COUNT(*) FROM inventory WHERE product_id = 10;
+
+-- 세션 B
+BEGIN;
+UPDATE inventory SET quantity = quantity - 1 WHERE product_id = 10;
+COMMIT;
+
+-- 세션 A에서 다시 실행
+SELECT COUNT(*) FROM inventory WHERE product_id = 10;
+COMMIT;
+```
+
+`READ COMMITTED`에서는 같은 트랜잭션 안에서도 두 번째 조회가 다른 스냅샷을 볼 수 있습니다. 반면 `REPEATABLE READ`로 바꾸면 시작 시점 스냅샷이 유지됩니다.
+
+```sql
+BEGIN;
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+SELECT SUM(total_amount) FROM orders WHERE status = 'paid';
+-- 다른 세션의 커밋 이후에도 동일 스냅샷 유지
+SELECT SUM(total_amount) FROM orders WHERE status = 'paid';
+COMMIT;
+```
+
+배치 지표 계산에서는 이 차이가 그대로 숫자 불일치로 나타납니다. 따라서 격리 수준을 문서화하고, 배치 쿼리에서 명시적으로 설정하는 것이 안전합니다.
+
+## 심화 실습 시나리오: 리뷰 체크리스트를 쿼리 옆에 남기기
+
+SQL 리뷰를 사람 기억에 의존하면 시간이 지나면서 기준이 흔들립니다. 아래 항목을 PR 본문이나 문서에 고정하면 품질 편차를 줄일 수 있습니다.
+
+- 질문의 비즈니스 정의가 SQL 조건으로 정확히 번역되었는가
+- 키 유일성(기본키/대체키)이 조인 경로에서 유지되는가
+- 기간 조건이 반열린 구간으로 작성되어 경계 오류가 없는가
+- `NULL` 처리 규칙이 명시되어 있는가
+- 결과 검증용 샘플 출력(행 수, 합계, 상위 N)이 첨부되었는가
+
+이 기준은 학습용 글에서도 그대로 유효합니다. SQL은 결국 데이터와 의사결정을 연결하는 도구이기 때문에, 쿼리 자체보다 **검증 가능한 사고 과정**을 남기는 습관이 더 오래 갑니다.
+
 ## 처음 질문으로 돌아가기
 
 - **SQL은 정확히 어떤 종류의 언어일까요?**
@@ -301,6 +533,8 @@ SQL을 배울 때는 문법을 순서대로 외우기보다, 실제 질문을 SQ
 <!-- toc:end -->
 
 ## 참고 자료
+
+- [book-examples/sql-101 (ko)](https://github.com/yeongseon-books/book-examples/tree/main/sql-101/ko)
 
 - [PostgreSQL Tutorial — SQL](https://www.postgresql.org/docs/current/tutorial-sql.html)
 - [SQLBolt — Interactive SQL Lessons](https://sqlbolt.com/)

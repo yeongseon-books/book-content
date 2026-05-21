@@ -273,26 +273,280 @@ CORS는 공격을 막는 도구가 아니라 브라우저가 요청을 허용할
 
 
 
-## 운영 점검 루프와 문서화 기준
 
-보안 글에서 가장 자주 빠지는 부분은 "그래서 운영에서는 무엇을 주기적으로 확인할 것인가"입니다. 아래 루프를 기준으로 문서화하면 개념이 실무로 연결됩니다.
+## 서브리소스 무결성 검증(SRI)
 
-| 주기 | 점검 항목 | 산출물 |
+
+
+외부 CDN에서 스크립트나 스타일시트를 불러올 때, CDN이 침해되면 악성 코드가 삽입될 수 있습니다. SRI는 브라우저가 다운로드된 리소스의 해시를 검증해 변조된 파일을 차단합니다.
+
+
+
+```html
+
+<!-- SRI 적용 예시 -->
+
+<script src="https://cdn.example.com/lib.js"
+
+  integrity="sha384-oqVuAfXRKap7fdgcCY5uykM6+R9GqQ8K/uxAh...="
+
+  crossorigin="anonymous"></script>
+
+```
+
+
+
+SRI를 적용하면 CDN 공급망 공격으로부터 클라이언트를 보호할 수 있습니다. 다만 리소스 업데이트 시 해시값도 함께 갱신해야 하므로 배포 파이프라인에 포함시키는 것이 좋습니다.
+
+
+
+## CSP 위반 리포팅 설정
+
+
+
+CSP를 처음 도입할 때는 Enforce 대신 Report-Only로 시작해야 서비스 장애를 피할 수 있습니다. 리포팅 엔드포인트를 마련하고 수집된 위반 데이터를 분석한 뒤 정책을 좀혀 나갑니다.
+
+
+
+```python
+
+# csp_report_endpoint.py
+
+from flask import Flask, request, jsonify
+
+import json
+
+
+
+app = Flask(__name__)
+
+
+
+
+
+@app.post("/csp-report")
+
+def csp_report():
+
+    report = request.get_json(force=True)
+
+    # 위반 내역을 구조화된 로그로 저장
+
+    print(json.dumps(report, indent=2))
+
+    return jsonify(status="received"), 204
+
+```
+
+
+
+수집된 리포트에서 빈도가 높은 위반을 정리한 뒤, 허용 목록을 조정하거나 정말로 차단해야 하는 스크립트를 확인할 수 있습니다. 이 반복 루프가 CSP 도입의 핵심입니다.
+
+
+
+## OWASP Top 10 관점에서 보는 웹 기본 통제
+
+웹 보안 기본 항목을 OWASP Top 10에 매핑하면 우선순위를 설명하기 쉬워집니다.
+
+| 통제 | 대응하는 OWASP 위험 | 구현 포인트 |
 | --- | --- | --- |
-| 매일 | 고위험 경보, 인증 실패 급증, 권한 거부 급증 | 일일 보안 브리핑 |
-| 매주 | 신규 배포 변경점의 보안 영향 | 변경 검토 노트 |
-| 매월 | 키/토큰/인증서 만료 예정, 미사용 권한, 미사용 시크릿 | 월간 정리 리포트 |
-| 분기 | 위협 모델 재평가, 런북 훈련, 통제 효과 검토 | 분기 보안 회고 |
+| 입력 검증 + 출력 인코딩 | A03 Injection | 서버 측 검증, 문맥별 인코딩 |
+| CSP | A03 Injection(XSS) | `script-src` 최소화, nonce 전략 |
+| SameSite/HttpOnly/Secure 쿠키 | A07 Identification and Authentication Failures | 세션 탈취 표면 축소 |
+| 보안 헤더 세트(HSTS 등) | A05 Security Misconfiguration | 공통 미들웨어 강제 |
 
-실행 가능한 문서의 조건도 분명해야 합니다.
+프레임워크 기본값이 있다고 해도 팀 표준이 없으면 예외 코드에서 빈틈이 생깁니다. 따라서 "기본 미들웨어 + 회귀 테스트" 조합이 필수입니다.
 
-- 담당자(owner)와 대체 담당자가 명시되어야 합니다.
-- 실패 조건과 에스컬레이션 기준이 수치로 정의되어야 합니다.
-- 점검 결과가 티켓이나 액션 아이템으로 추적되어야 합니다.
-- 예외 승인에는 만료일이 반드시 있어야 합니다.
+## 프런트엔드 렌더링 안전 규칙
 
-보안은 단발성 프로젝트가 아니라 운영 루프입니다. 같은 점검을 반복해도 기준이 유지될 때 품질이 올라갑니다.
+- 사용자 입력을 HTML로 직접 주입하지 않습니다.
+- 허용 목록 기반 마크업 정제가 필요한 경우 전용 라이브러리를 단일 경로로 사용합니다.
+- 링크 렌더링 시 `javascript:` 스킴을 차단합니다.
+- 보안 헤더 누락을 CI에서 실패로 처리합니다.
 
+
+## 프런트엔드 보안 코드 리뷰 체크포인트
+
+웹 보안 이슈는 백엔드보다 프런트엔드 변경에서 조용히 유입되는 경우가 많습니다. 리뷰 체크포인트를 고정하면 누락을 줄일 수 있습니다.
+
+| 점검 항목 | 위험 신호 | 권장 수정 |
+| --- | --- | --- |
+| `innerHTML` 사용 | 사용자 입력 직접 삽입 | 텍스트 노드/안전 렌더링 사용 |
+| 외부 스크립트 로드 | 출처 검증 없음 | CSP 허용 목록 + SRI 적용 |
+| 쿠키 설정 | `Secure`/`HttpOnly` 누락 | 세 플래그 기본값 강제 |
+| CORS 설정 | `*`와 자격증명 동시 허용 시도 | 명시적 출처 제한 |
+
+## OWASP 시나리오 기반 테스트 예시
+
+1. 댓글 입력에 스크립트 삽입 시도 후 실행 여부 확인.
+2. 로그인 상태에서 외부 사이트 POST 요청으로 CSRF 방어 확인.
+3. 개발 도구로 헤더를 점검해 CSP/HSTS 적용 여부 확인.
+4. SameSite 정책 변경 시 결제/리다이렉트 흐름 회귀 테스트.
+
+보안 테스트는 별도 팀 전용 작업이 아니라 프런트엔드 QA 시나리오에 포함되어야 지속됩니다.
+
+
+## 브라우저 정책 회귀 테스트 설계
+
+| 테스트 | 목적 | 실패 시 의미 |
+| --- | --- | --- |
+| CSP 위반 리포트 검사 | 예상 외 스크립트 실행 차단 검증 | 신규 스크립트 경로 누락 |
+| CORS preflight 검사 | 교차 출처 허용 범위 검증 | 과도한 허용 또는 기능 장애 |
+| SameSite 쿠키 시나리오 | CSRF 방어와 사용자 흐름 균형 확인 | 결제/로그인 흐름 중단 가능 |
+| 보안 헤더 스냅샷 | 배포 중 헤더 누락 탐지 | 미들웨어 회귀 가능성 |
+
+테스트는 정적 점검만으로 부족합니다. 실제 브라우저 동작을 재현하는 E2E 시나리오를 함께 두어야 정책 변경의 영향이 보입니다.
+
+## CSRF 방어 전략 비교
+
+| 전략 | 장점 | 단점 | 권장 조건 |
+| --- | --- | --- | --- |
+| Synchronizer Token | 서버 검증 강력 | 서버 상태 관리 필요 | 세션 기반 서비스 |
+| Double Submit Cookie | 구현 단순 | 쿠키 설정 의존성 높음 | SPA + API 조합 |
+| SameSite 중심 | 설정 용이 | 일부 흐름 예외 필요 | 저위험 트랜잭션 |
+
+한 전략만 맹신하기보다, 서비스 특성에 맞춰 두 가지 이상을 결합하는 편이 안정적입니다.
+
+
+## 부록: 팀 보안 리뷰 워크시트
+
+다음 워크시트는 기능 배포 전 보안 리뷰에서 반복적으로 확인하는 항목을 표준화한 것입니다.
+
+### 1) 자산과 경계 정의
+
+| 항목 | 기록 예시 |
+| --- | --- |
+| 보호 대상 데이터 | 사용자 이메일, 결제 토큰, 내부 리포트 |
+| 진입 경로 | 웹 폼, 모바일 API, 관리자 콘솔 |
+| 신뢰 경계 | 인터넷-엣지, 엣지-앱, 앱-DB |
+| 외부 의존성 | 결제 API, 메시지 큐, 파일 저장소 |
+
+### 2) 통제 매핑
+
+| 위협 | 예방 통제 | 탐지 통제 | 대응 통제 |
+| --- | --- | --- | --- |
+| 계정 탈취 | MFA, 비밀번호 정책 | 로그인 이상 징후 경보 | 세션 강제 종료, 자격 재설정 |
+| 데이터 변조 | 입력 검증, 무결성 서명 | 감사 로그 무결성 검증 | 롤백, 포렌식 조사 |
+| 서비스 과부하 | 레이트 리밋, WAF | 오류율/지연 경보 | 트래픽 차단, 임시 확장 |
+
+### 3) 운영 점검 질문
+
+- 이번 변경으로 새로 열리는 네트워크 포트가 있는가
+- 권한 범위가 기존보다 넓어지는가
+- 로그 스키마 변경이 탐지 규칙에 영향을 주는가
+- 비밀 정보 또는 토큰 수명 정책이 달라지는가
+- 장애 시 롤백 절차가 검증되어 있는가
+
+### 4) 배포 전 검증 항목
+
+| 항목 | 통과 기준 |
+| --- | --- |
+| 보안 테스트 | 고위험 실패 없음 |
+| 설정 검증 | 디버그/임시 설정 제거 |
+| 감사 로그 | 주요 이벤트 필드 누락 없음 |
+| 문서 최신화 | 런북과 운영 가이드 업데이트 완료 |
+
+워크시트의 목적은 문서를 늘리는 것이 아니라 의사결정 속도를 높이는 것입니다. 보안 검토가 반복될수록 질문과 답변이 짧아지고, 같은 사고가 재발할 가능성이 줄어듭니다.
+
+
+## 부록: 브라우저 보안 회귀 방지 규칙
+
+1. 보안 헤더 변경은 기능 배포와 분리해 단계적으로 적용합니다.
+2. CSP 정책 변경 시 Report-Only 데이터를 최소 1주 수집한 뒤 강제 모드로 전환합니다.
+3. CORS 허용 목록 변경은 API 오너와 보안 리뷰를 동시에 통과해야 합니다.
+4. 쿠키 정책(`SameSite`, `Secure`, `HttpOnly`) 변경은 로그인/결제 E2E 테스트를 필수로 수행합니다.
+5. XSS 관련 코드 경로(`innerHTML`, 사용자 HTML 렌더링)는 전용 코드리뷰 라벨을 사용합니다.
+
+이 규칙을 팀 규약으로 두면 프론트엔드 변경 속도를 유지하면서도 보안 회귀를 줄일 수 있습니다.
+
+
+### 프론트엔드 보안 자동 점검 파이프라인
+
+CI/CD에서 프론트엔드 보안을 자동으로 점검하는 구성 예시입니다.
+
+```yaml
+# .github/workflows/frontend-security.yml
+name: Frontend Security Check
+on:
+  pull_request:
+    paths:
+      - 'src/**/*.{js,ts,tsx}'
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Dependency audit
+        run: npm audit --audit-level=moderate
+
+      - name: Static analysis for XSS patterns
+        run: |
+          # innerHTML, dangerouslySetInnerHTML, eval 사용 탐지
+          grep -rn 'innerHTML\|dangerouslySetInnerHTML\|eval(' src/ \
+            && echo 'WARN: potential XSS sink found' \
+            || echo 'PASS: no obvious XSS sink'
+
+      - name: CSP header validation
+        run: |
+          curl -sI https://staging.example.com \
+            | grep -i content-security-policy \
+            || (echo 'FAIL: CSP header missing'; exit 1)
+
+      - name: HTTPS redirect check
+        run: |
+          STATUS=$(curl -s -o /dev/null -w '%{http_code}' http://staging.example.com)
+          [ "$STATUS" = "301" ] || (echo "FAIL: HTTP not redirecting"; exit 1)
+```
+
+이 워크플로는 네 가지를 점검합니다. 첫째, 의존성 취약점이 moderate 이상인지 확인합니다. 둘째, XSS 싱크로 자주 사용되는 패턴을 정적 탐색합니다. 셋째, 스테이징 환경에 CSP 헤더가 존재하는지 검증합니다. 넷째, HTTP → HTTPS 리다이렉트가 올바르게 설정되었는지 확인합니다.
+
+### 쿠키 속성 점검표
+
+웹 보안에서 쿠키 설정은 세션 탈취 방어의 기초입니다. 다음 표는 주요 쿠키 속성과 권장 설정을 정리한 것입니다.
+
+| 속성 | 권장 값 | 효과 | 미설정 시 위험 |
+| --- | --- | --- | --- |
+| `Secure` | 항상 설정 | HTTPS에서만 전송 | 평문 네트워크에서 쿠키 노출 |
+| `HttpOnly` | 인증 쿠키 필수 | JavaScript 접근 차단 | XSS로 세션 토큰 탈취 |
+| `SameSite` | `Lax` 또는 `Strict` | 교차 사이트 요청 시 쿠키 제외 | CSRF 공격 가능 |
+| `Path` | 최소 경로 지정 | 해당 경로에서만 전송 | 불필요한 경로에 쿠키 노출 |
+| `Max-Age` | 세션 쿠키는 생략, 영속 쿠키는 최소 | 만료 시간 제한 | 장기 세션 유지로 탈취 창 확대 |
+
+Python Flask에서 이를 적용하는 예시입니다.
+
+```python
+from flask import Flask, make_response
+
+app = Flask(__name__)
+
+# 앱 전역 쿠키 보안 설정
+app.config.update(
+    SESSION_COOKIE_SECURE=True,
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+)
+
+
+@app.after_request
+def set_security_headers(response):
+    # CSP 헤더
+    response.headers["Content-Security-Policy"] = (
+        "default-src 'self'; "
+        "script-src 'self'; "
+        "style-src 'self' 'unsafe-inline'; "
+        "img-src 'self' data: https:; "
+        "frame-ancestors 'none'"
+    )
+    # 추가 보안 헤더
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    return response
+```
+
+이 설정은 세 가지 방어층을 동시에 구현합니다. 쿠키 속성으로 세션 보호, CSP 헤더로 스크립트 실행 범위 제한, 추가 헤더로 MIME 스니핑과 클릭재킹을 방지합니다.
 
 ## 처음 질문으로 돌아가기
 
@@ -325,5 +579,7 @@ CORS는 공격을 막는 도구가 아니라 브라우저가 요청을 허용할
 - [MDN — Same-origin policy](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy)
 - [MDN — Content Security Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP)
 - [web.dev — SameSite cookies explained](https://web.dev/articles/samesite-cookies-explained)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/information-security-101/ko)
 
 Tags: Computer Science, Security, WebSecurity, CORS, CSP, SameOrigin

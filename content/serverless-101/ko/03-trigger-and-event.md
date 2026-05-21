@@ -24,6 +24,7 @@ last_reviewed: '2026-05-16'
 
 이 글은 Serverless 101 시리즈의 세 번째 글입니다.
 
+
 서버리스 함수는 스스로 실행되지 않습니다. 누가 함수를 깨우는지, 같은 이벤트가 다시 들어오면 무엇이 달라지는지, 반복 실패 메시지는 어디로 가는지를 이해하지 못하면 함수 본문이 아무리 깔끔해도 운영은 빠르게 흔들립니다.
 
 그래서 이번 글은 이벤트 분류표만 나열하지 않습니다. 대신 하나의 운영 흐름을 끝까지 따라가 보겠습니다. **HTTP 요청이 큐 메시지로 바뀌고, 소비자가 이를 처리하고, 중복 메시지는 멱등성 저장소에서 건너뛰고, 반복 실패 메시지는 DLQ로 보내고, 운영자는 그 메시지를 다시 재처리하는 흐름**입니다. 이 한 흐름을 이해하면 트리거 이야기가 더 이상 추상적이지 않습니다.
@@ -62,7 +63,7 @@ last_reviewed: '2026-05-16'
 
 여기서 핵심은 “함수 하나가 모든 것을 처리한다”가 아닙니다. **동기 경계와 비동기 경계, 성공 경로와 실패 경로를 분리한다**는 점입니다.
 
-## HTTP → queue → consumer → idempotency → DLQ 워크플로
+## 하이퍼텍스트요청에서 큐 소비와 멱등 처리까지의 워크플로
 
 아래 예제는 학습용으로 파일 하나에 모았지만, 실제 운영에서는 HTTP 핸들러와 소비자 핸들러를 보통 별도 함수로 분리합니다.
 
@@ -255,7 +256,7 @@ http_event = {
 
 여기서 핵심은 “재시도가 일어나지 않는다”가 아닙니다. 핵심은 **재시도가 일어나도 중복 부작용이 없게 만든다**는 것입니다.
 
-### 3) 독성 메시지가 DLQ로 가는 경우
+### 3) 독성 메시지가 실패대기열로 가는 경우
 
 `sku`가 `poison-pill`인 메시지는 의도적으로 실패하게 만들었습니다. 세 번째 시도까지 실패하면 결과는 아래처럼 남습니다.
 
@@ -309,7 +310,7 @@ http_event = {
 
 대부분 그렇지 않습니다. 순서가 중요하다면 FIFO 큐, 파티션 키, 단일 소비자 전략 같은 별도 설계를 명시적으로 선택해야 합니다.
 
-### DLQ만 있으면 운영이 안전한가요?
+### 실패대기열만 있으면 운영이 안전한가요?
 
 아닙니다. DLQ는 실패를 보이게 해 주는 장치일 뿐입니다. 멱등성 키, 재시도 횟수, 원본 메시지 정보가 함께 남아야 재처리가 가능합니다.
 
@@ -326,11 +327,11 @@ http_event = {
 
 이번 글의 핵심은 하나입니다. HTTP 요청은 빠르게 받아들이고, 실제 작업은 큐 뒤로 넘기고, 중복은 멱등성 저장소에서 막고, 반복 실패는 DLQ에 남겨 운영 가능한 형태로 격리해야 합니다. 다음 글에서는 이 흐름 위에서 왜 콜드 스타트가 지연 시간에 큰 영향을 주는지 살펴보겠습니다.
 
-## 심화 실전 노트: Lambda 구성, 콜드 스타트, 이벤트 소스 매핑 운영
+## 심화 실전 노트: 람다 구성, 콜드 스타트, 이벤트 소스 매핑 운영
 
 서버리스 운영에서는 함수 코드보다 구성값이 장애를 만드는 경우가 더 많습니다. 메모리, 타임아웃, 동시성, 재시도 정책, 이벤트 소스 매핑 배치 크기 같은 설정이 처리량과 비용을 동시에 바꾸기 때문입니다. 따라서 기능 구현과 설정 검토를 분리하지 않고, 배포 단위마다 같이 점검해야 합니다.
 
-### Lambda 구성에서 먼저 고정할 항목
+### 람다 구성에서 먼저 고정할 항목
 
 아래 예시는 AWS SAM 템플릿 기준으로 자주 사용하는 안전 기본값입니다.
 
@@ -362,7 +363,7 @@ Resources:
 
 단순 평균 지연만 보면 개선 효과가 숨겨질 수 있으므로, 배포 전후의 `Init Duration` 분포와 타임아웃 비율을 같이 비교하는 습관이 중요합니다.
 
-### 이벤트 소스 매핑(Event Source Mapping) 설계
+### 이벤트 소스 매핑(이벤트 소스 매핑) 설계
 
 SQS, Kinesis, DynamoDB Streams를 사용할 때는 배치 크기와 실패 재처리 정책이 핵심입니다.
 
@@ -394,6 +395,125 @@ Events:
 
 배포 직전에는 함수 코드 테스트와 함께 설정 검증을 반드시 포함해야 합니다. 메모리/타임아웃 조합, 최대 동시성 제한, DLQ 연결, 이벤트 매핑 배치 정책, 콜드 스타트 완화 전략까지 체크리스트로 남기면 장애 복구 시간이 크게 단축됩니다.
 
+## 실무 앵커: 이벤트 계약을 코드와 인프라에서 동시에 검증하기
+
+트리거 설계의 핵심은 "어떤 이벤트가 온다"가 아니라 "어떤 이벤트만 통과시킬 것인가"입니다. 이벤트 스키마를 코드와 설정 양쪽에서 제한해야 독성 메시지와 중복 처리 위험을 낮출 수 있습니다.
+
+### 인터페이스 게이트웨이에서 메시지큐서비스로 넘기는 경로
+
+```yaml
+Resources:
+  IngressApi:
+    Type: AWS::Serverless::HttpApi
+
+  IntakeQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      VisibilityTimeout: 60
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt IntakeDlq.Arn
+        maxReceiveCount: 5
+
+  IntakeDlq:
+    Type: AWS::SQS::Queue
+
+  QueueConsumer:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: python3.12
+      Handler: consumer.handler
+      Timeout: 30
+      Events:
+        QueueTrigger:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt IntakeQueue.Arn
+            BatchSize: 10
+            MaximumBatchingWindowInSeconds: 5
+            FunctionResponseTypes:
+              - ReportBatchItemFailures
+```
+
+여기서 `ReportBatchItemFailures`를 켜 두면 배치 전체 재처리 대신 실패 메시지 단위로 재시도할 수 있어 중복 비용과 지연을 줄일 수 있습니다.
+
+### 소비자 코드: 멱등성 키와 부분 실패 응답
+
+```python
+import json
+import os
+
+import boto3
+from botocore.exceptions import ClientError
+
+ddb = boto3.resource("dynamodb")
+locks = ddb.Table(os.environ["IDEMPOTENCY_TABLE"])
+
+def handler(event, context):
+    failures = []
+
+    for record in event["Records"]:
+        message_id = record["messageId"]
+        payload = json.loads(record["body"])
+        idem_key = payload["eventId"]
+
+        try:
+            locks.put_item(
+                Item={"pk": idem_key},
+                ConditionExpression="attribute_not_exists(pk)",
+            )
+            process(payload)
+        except ClientError:
+            continue
+        except Exception:
+            failures.append({"itemIdentifier": message_id})
+
+    return {"batchItemFailures": failures}
+
+def process(payload):
+    # 도메인 처리 로직
+    return payload
+```
+
+이 패턴은 실패를 숨기지 않으면서도 재처리 범위를 최소화합니다. 이벤트 기반 시스템에서 "한 번 더 처리"는 정상 경로이기 때문에, 멱등성 저장소는 선택이 아니라 기본 구성입니다.
+
+### 비용과 지연을 함께 보는 트리거 표
+
+| 항목 | 즉시 동기 처리 | 큐 기반 비동기 처리 |
+| --- | --- | --- |
+| 사용자 응답 지연 | 길어질 수 있음 | 짧게 유지 가능 |
+| 실패 격리 | 낮음 | 높음 |
+| 재시도 비용 | 호출 전체 재실행 | 실패 메시지만 재시도 |
+| 운영 복잡도 | 낮음 | 중간 |
+
+트리거를 나누면 복잡도가 늘지만, 장애 격리와 비용 통제 능력이 커집니다. "단순한 경로"보다 "회복 가능한 경로"를 먼저 설계하는 것이 서버리스 운영에서 더 안전합니다.
+
+### 인터페이스 게이트웨이 입력 검증 예시
+
+입력 검증을 애플리케이션 코드에만 두면 무효 요청도 함수 실행 비용을 발생시킵니다. 간단한 스키마 검증은 게이트웨이 단계에서 차단하는 편이 비용과 지연 양쪽에 유리합니다.
+
+```yaml
+RequestModel:
+  type: object
+  required:
+    - eventId
+    - orderId
+    - amount
+  properties:
+    eventId:
+      type: string
+    orderId:
+      type: string
+    amount:
+      type: integer
+      minimum: 1
+```
+
+### 콜드 스타트가 트리거 설계에 미치는 영향
+
+동기 API 경로에서는 콜드 스타트가 사용자 체감 지연으로 직접 드러납니다. 반면 큐 소비 경로에서는 큐 지연으로 흡수될 수 있습니다. 따라서 사용자 응답을 엄격히 관리해야 하는 기능은 동기 경로를 짧게 유지하고, 무거운 처리는 이벤트로 분리하는 전략이 안정적입니다.
+
+이 판단을 문서화할 때는 "어떤 작업을 분리했는가"보다 "분리해서 무엇을 보호했는가"를 명시해야 합니다. 예를 들어 결제 승인 API에서 고객 응답 시간을 보호하기 위해 영수증 발행을 큐로 분리했다는 식으로 기록하면, 이후 변경 검토가 훨씬 명확해집니다.
+
 ## 처음 질문으로 돌아가기
 
 - **HTTP, 큐, 스케줄 트리거는 호출 의미가 어떻게 다를까요?**
@@ -420,6 +540,8 @@ Events:
 <!-- toc:end -->
 
 ## 참고 자료
+
+- 실습 예제 저장소: https://github.com/yeongseon-books/book-examples/tree/main/serverless-101/ko
 
 ### 공식 문서
 

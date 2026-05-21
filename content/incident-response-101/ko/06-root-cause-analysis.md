@@ -22,6 +22,8 @@ last_reviewed: '2026-05-15'
 
 # Incident Response 101 (6/10): Root Cause Analysis
 
+이 글은 Incident Response 101 시리즈의 여섯 번째 글입니다.
+
 incident가 일어나면 누구나 빨리 원인을 찾고 싶어 합니다. 그런데 현장에서는 가장 먼저 눈에 보인 사건을 곧바로 근본 원인으로 받아들이는 경우가 많습니다.
 
 배포 직후 장애가 났다면 배포가 원인처럼 보이고, 누군가 잘못된 명령을 실행했다면 그 사람이 원인처럼 보입니다. 하지만 그 한 단계 아래를 더 내려가 보면, 실제로는 보호 장치와 프로세스 빈틈이 함께 드러나는 경우가 대부분입니다.
@@ -324,6 +326,97 @@ def actionable(text: str) -> bool:
 
 이 체크리스트를 통과한 RCA는 단순 회고를 넘어 재발 방지 설계 문서로 기능합니다.
 
+## RCA 출력 포맷: 원인 지도와 실행 항목
+
+좋은 RCA는 결론 문장보다 구조가 먼저 보입니다. 아래 포맷은 trigger, root cause, 기여 요인, 검증 가능한 조치를 분리해 남기기 위한 예시입니다.
+
+```text
+[rca-output]
+- trigger:
+- root_cause:
+- contributing_factors:
+  - people:
+  - process:
+  - tooling:
+  - system:
+- corrective_actions:
+  - action:
+    owner:
+    due:
+    verify:
+```
+
+이 구조를 고정하면 "분석은 길었는데 조치가 없다"는 문제를 줄일 수 있습니다. RCA는 설명 문서가 아니라 다음 변경의 입력 문서여야 하기 때문입니다.
+
+## 원인 우선순위 매트릭스
+
+| 항목 | 재발 가능성 | 영향도 | 우선순위 |
+| --- | --- | --- | --- |
+| 배포 가드레일 부재 | 높음 | 높음 | 즉시 |
+| 관측 지표 부족 | 중간 | 높음 | 높음 |
+| 운영 절차 문서 누락 | 중간 | 중간 | 중간 |
+
+원인 우선순위를 정하면 action item이 현실적인 순서로 배치됩니다. 모든 원인을 동시에 고치려 하면 결국 아무것도 끝내지 못하는 경우가 많습니다.
+
+## 운영 부록: RCA 회의 템플릿
+
+```text
+[rca-meeting]
+- incident_id:
+- facilitator:
+- 참석자:
+- trigger 확인:
+- root cause 후보:
+- evidence 링크:
+- 기여 요인 분류(people/process/tooling/system):
+- action item 초안:
+- 검증 계획:
+```
+
+회의 템플릿을 고정하면 분석 깊이 편차를 줄일 수 있습니다.
+
+## 운영 부록: 근거 등급 규칙
+
+| 등급 | 기준 | 예시 |
+| --- | --- | --- |
+| A | 로그/메트릭/배포 이력 3개 이상 일치 | 원인 확정 가능 |
+| B | 근거 2개 일치, 일부 불확실성 | 보강 조사 필요 |
+| C | 가설 수준, 근거 부족 | root cause로 채택 금지 |
+
+근거 등급 규칙은 "느낌 RCA"를 줄이는 데 효과적입니다.
+
+## 운영 부록: 조치 검증 문장 예시
+
+- 배포 가드레일 추가 후 staging fault injection 테스트를 통과한다.
+- timeout 기본값 변경 후 p95 지연이 2주간 임계값 내 유지된다.
+- 경보 규칙 개정 후 동일 유형 장애에서 MTTA가 5분 이하로 유지된다.
+
+RCA 품질은 원인 문장보다 검증 문장에서 더 잘 드러납니다.
+
+## RCA 운영 추가 점검 항목
+
+아래 항목은 실무에서 바로 점검할 수 있는 추가 체크포인트입니다.
+
+- 체크포인트 1: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 2: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 3: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 4: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 5: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+
+```text
+[quick-audit]
+- declaration_latency_minutes:
+- first_update_latency_minutes:
+- mitigation_started_minutes:
+- recovery_verification_metrics:
+- postmortem_linked: true/false
+```
+
+
+## 운영 메모: 점검 루프
+
+운영 문서는 작성으로 끝나지 않습니다. 월간 점검 루프를 통해 선언 기준, 역할 분리, 공지 주기, 후속 조치 추적이 실제 incident에서 유지되는지 확인해야 합니다. 점검 결과는 다음 리허설 시나리오와 runbook 개정 항목으로 바로 연결하는 편이 좋습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **incident의 진짜 원인은 어떻게 찾아야 할까요?**
@@ -358,6 +451,7 @@ def actionable(text: str) -> bool:
 - [NIST SP 800-61 Rev. 2 Computer Security Incident Handling Guide](https://csrc.nist.gov/pubs/sp/800/61/r2/final)
 
 ### 예제 소스
+- [incident-response-101 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/incident-response-101/ko)
 - [incident-response-101 canonical source in book-content](https://github.com/yeongseon-books/book-content/tree/main/content/incident-response-101)
 
 Tags: Incident, RCA, Postmortem, Analysis, Operations

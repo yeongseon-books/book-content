@@ -22,7 +22,9 @@ seo_description: 청킹은 텍스트를 작게 자르는 일이 아니라 검색
 
 청킹은 많은 검색 시스템이 조용히 품질을 잃는 지점입니다. FAQ에 잘 맞는 분할기가 매뉴얼이나 정책 문서의 구조를 그대로 망가뜨리는 일은 흔합니다.
 
-이 글은 Document Ingestion 101 시리즈의 2번째 글입니다. 여기서는 문서 형태별 청킹 프리셋을 비교하고, 분할 결과를 신뢰해도 되는지 빠르게 판단할 수 있는 신호를 살펴봅니다.
+이 글은 Document Ingestion 101 시리즈의 두 번째 글입니다.
+
+여기서는 문서 형태별 청킹 프리셋을 비교하고, 분할 결과를 신뢰해도 되는지 빠르게 판단할 수 있는 신호를 살펴봅니다.
 
 ## 먼저 던지는 질문
 
@@ -285,6 +287,164 @@ tune_overlap(sample_text, chunk_size=180, overlaps=[0, 12, 24, 36, 48])
 
 출력에서 `duplicate_chars`가 급증하는 지점을 먼저 찾고, 그 직전 값을 시작점으로 삼으면 과도한 중복 없이 문맥 연결을 확보할 수 있습니다. 이런 식으로 튜닝 과정을 숫자로 기록해 두면, 나중에 임베딩 모델을 바꿔도 청킹 정책을 독립적으로 유지할 수 있습니다.
 
+## 실무 확장: 청킹 알고리즘 선택과 검색 회귀 방지
+
+청킹 전략은 한 번 정하고 끝내는 설정이 아닙니다. 문서 유형이 늘어나면 동일한 splitter라도 실패 패턴이 달라집니다. 그래서 운영에서는 문서군별 알고리즘을 분리하고, 검색 회귀를 숫자로 감지하는 루프를 반드시 둡니다.
+
+### 구조 기반 청킹과 길이 기반 청킹을 병행하는 패턴
+
+매뉴얼 문서는 제목 경계를 먼저 지키고, 정책 문서는 문단 길이를 우선 맞추는 식으로 알고리즘을 병행하면 안정성이 좋아집니다.
+
+```python
+from __future__ import annotations
+
+from langchain_text_splitters import MarkdownHeaderTextSplitter, RecursiveCharacterTextSplitter
+
+def chunk_manual(markdown_text: str) -> list[str]:
+    header_splitter = MarkdownHeaderTextSplitter(
+        headers_to_split_on=[('#', 'h1'), ('##', 'h2'), ('###', 'h3')]
+    )
+    docs = header_splitter.split_text(markdown_text)
+    body_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=280,
+        chunk_overlap=48,
+        separators=['
+
+', '
+', '. ', ' '],
+    )
+    chunks: list[str] = []
+    for doc in docs:
+        chunks.extend(body_splitter.split_text(doc.page_content))
+    return chunks
+
+def chunk_policy(long_text: str) -> list[str]:
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=360,
+        chunk_overlap=72,
+        separators=['
+
+', '; ', '. ', ' '],
+    )
+    return splitter.split_text(long_text)
+```
+
+핵심은 모든 문서를 하나의 분할기로 몰아넣지 않는 것입니다. 구조가 뚜렷한 문서는 구조 우선, 장문 정책 문서는 길이 우선으로 처리해야 검색 질문이 요구하는 문맥 단위를 유지할 수 있습니다.
+
+### 청킹 회귀를 탐지하는 오프라인 평가 루프
+
+프리셋 변경 후 검색 품질이 떨어졌는지 확인하려면 최소한 고정 질의 세트를 두고 정답 포함 여부를 추적해야 합니다.
+
+```python
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class RetrievalCase:
+    query: str
+    expected_source: str
+
+def evaluate_chunk_regression(retriever, cases: list[RetrievalCase], k: int = 5) -> None:
+    hit = 0
+    for case in cases:
+        docs = retriever.invoke(case.query)
+        topk = docs[:k]
+        if any(doc.metadata.get('source') == case.expected_source for doc in topk):
+            hit += 1
+    recall_at_k = hit / len(cases) if cases else 0.0
+    print(f'recall_at_{k}={recall_at_k:.3f} cases={len(cases)}')
+```
+
+이 점수는 완벽한 품질 지표는 아니지만, 청킹 변경이 검색을 악화시키는지 빠르게 확인하는 데 충분합니다. 운영에서는 `recall_at_k`가 기준 아래로 떨어지면 새 프리셋을 배포하지 않는 식으로 게이트를 걸 수 있습니다.
+
+### 청크 메타데이터를 벡터 DB 필터와 맞추는 이유
+
+청크를 만들 때 `doc_type`, `section`, `chunk_order`를 함께 저장해 두면 벡터 검색 결과를 설명하기 쉬워집니다.
+
+```python
+chunk.metadata.update(
+    {
+        'doc_type': 'manual',
+        'section': 'deployment-checklist',
+        'chunk_order': 17,
+        'chunk_size_policy': 'manual-v2',
+    }
+)
+```
+
+이 정보는 나중에 "왜 이 청크가 선택되었는가"를 해석하는 근거가 됩니다. 검색 실패를 모델 문제로 오해하지 않으려면, 청킹 단계의 의사결정 흔적을 메타데이터로 남겨야 합니다.
+
+## 운영 노트: 청크 정책을 버전으로 관리하기
+
+청킹 설정은 코드 한 줄이 아니라 검색 품질 계약입니다. 그래서 운영에서는 `chunk-policy-v1`, `chunk-policy-v2`처럼 정책 버전을 메타데이터에 함께 저장합니다.
+
+```python
+chunk.metadata.update(
+    {
+        'chunk_policy_version': 'chunk-policy-v2',
+        'chunk_size': 240,
+        'chunk_overlap': 48,
+        'separator_profile': 'manual-headers-first',
+    }
+)
+```
+
+이 정보가 있으면 검색 회귀가 발생했을 때 "어떤 정책으로 만들어진 청크에서 문제가 나는지"를 바로 좁힐 수 있습니다. 반대로 정책 버전을 남기지 않으면 인덱스에 서로 다른 규칙이 섞였는지 확인하기 어렵습니다.
+
+추가로, 정책 변경 직후에는 상위 질의 20~50개를 고정해 `recall@k`와 `source diversity`를 비교하는 습관을 권장합니다. 청크 수가 예쁘게 나와도 실제 질의 회수율이 떨어지면 변경을 되돌리는 편이 맞습니다.
+
+## 실전 점검 체크리스트 확장
+
+아래 체크리스트는 배포 직전 10분 점검용으로 자주 사용합니다. 문서 수집 파이프라인은 기능이 아니라 경계 검증으로 안정성이 결정되므로, 매 실행에서 같은 항목을 반복 확인하는 습관이 중요합니다.
+
+- 입력 파일 수가 평소 범위에서 크게 벗어나지 않는지 확인합니다.
+- 실패 문서 비율이 임계치(예: 3%)를 넘지 않는지 확인합니다.
+- 샘플 문서 3건 이상에 대해 source, page, chunk_id 추적이 가능한지 확인합니다.
+- 메타데이터 필드 누락(`source`, `format`, `doc_type`)이 0건인지 확인합니다.
+- 벡터 검색 샘플 질의에서 기대 출처가 상위 결과에 포함되는지 확인합니다.
+
+```python
+def quick_health_report(stats: dict[str, int | float]) -> None:
+    print(f"files_total={stats['files_total']}")
+    print(f"failed_total={stats['failed_total']}")
+    print(f"chunks_total={stats['chunks_total']}")
+    print(f"metadata_missing={stats['metadata_missing']}")
+    print(f"smoke_passed={stats['smoke_passed']}")
+```
+
+이 정도 점검만 자동화해도 "돌아갔다"와 "운영 가능한 상태로 끝났다"를 구분할 수 있습니다. 장기적으로는 이 리포트를 누적해 주간 추세를 보고, 특정 단계에서 실패율이 증가하는 패턴을 조기에 잡는 것이 좋습니다.
+
+## 마무리 운영 기준
+
+문서 수집 파이프라인은 새 기능보다 기준 유지가 더 중요합니다. 그래서 팀 단위 운영에서는 아래 네 가지를 주간 기준으로 고정해 두는 편이 좋습니다.
+
+- 파싱 품질 지표(평균 문자 수, OCR 비율, 재처리 비율)
+- 청킹 품질 지표(평균 길이, 극단 길이 비율, 정책 버전 분포)
+- 메타데이터 품질 지표(필수 필드 누락률, 정규화 실패 건수)
+- 검색 검증 지표(샘플 질의 recall@k, 출처 회수율)
+
+이 네 축을 함께 보면 어느 경계에서 품질이 떨어지는지 빠르게 확인할 수 있습니다. 결국 안정적인 ingestion은 화려한 모델 선택보다, 입력 품질과 단계 계약을 지속적으로 측정하는 운영 루틴에서 만들어집니다.
+
+## 임베딩 모델 토큰 제한과 청킹 크기의 관계
+
+청킹 크기를 정할 때 임베딩 모델의 최대 입력 토큰 수를 함께 고려해야 합니다. 예를 들어 `text-embedding-3-small`은 8191 토큰까지 받지만, 실제로 512 토큰 이하에서 가장 안정적인 유사도를 보이는 경우가 많습니다. 그래서 `chunk_size`를 문자 수로 설정하더라도, 최종 청크의 토큰 수가 모델 sweet spot을 넘지 않는지 확인하는 검증 단계를 추가하는 편이 좋습니다.
+
+```python
+from __future__ import annotations
+
+import tiktoken
+
+def estimate_tokens(text: str, model: str = 'cl100k_base') -> int:
+    enc = tiktoken.get_encoding(model)
+    return len(enc.encode(text))
+
+def flag_over_limit(chunks: list[str], max_tokens: int = 512) -> list[int]:
+    return [i for i, chunk in enumerate(chunks) if estimate_tokens(chunk) > max_tokens]
+```
+
+이 검증은 임베딩 호출 전에 넣어야 합니다. 토큰 초과 청크는 truncation되거나 의미가 잘릴 수 있기 때문입니다. 초과 비율이 높으면 `chunk_size`를 줄이거나 separator를 더 세밀하게 조정하라는 신호입니다.
+
 ## 처음 질문으로 돌아가기
 
 - **모든 문서에 같은 chunk_size를 쓰면 왜 검색 품질이 흔들릴까요?**
@@ -319,5 +479,7 @@ tune_overlap(sample_text, chunk_size=180, overlaps=[0, 12, 24, 36, 48])
 
 - [LangChain RecursiveCharacterTextSplitter API reference](https://python.langchain.com/api_reference/text_splitters/character/langchain_text_splitters.character.RecursiveCharacterTextSplitter.html)
 - [The Unicode Standard - Text segmentation overview](https://www.unicode.org/reports/tr29/)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/document-ingestion-101/ko)
 
 Tags: RAG, Document Processing, LangChain, Python

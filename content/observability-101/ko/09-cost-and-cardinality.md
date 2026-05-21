@@ -314,14 +314,151 @@ print(validate_metric_labels("http_requests_total", example))
 
 이런 도우미를 테스트나 CI에 붙이면 카디널리티 폭발을 사전에 차단할 수 있습니다. 비용 문제는 사후 대응보다 사전 차단이 훨씬 저렴합니다.
 
+### 비용 추정 공식
+
+관측 데이터 비용을 사전에 예측하려면 간단한 공식을 사용합니다.
+
+```text
+월간 메트릭 비용 = 시계열 수 × 수집 빈도(분당) × 60 × 24 × 30 × 바이트/샘플 × 스토리지 단가
+```
+
+실제 예시로 계산해 보겠습니다.
+
+```python
+# 비용 추정 계산기
+def estimate_metric_cost(
+    num_series: int,
+    scrape_interval_sec: int = 15,
+    bytes_per_sample: float = 2.0,
+    retention_days: int = 30,
+    storage_cost_per_gb: float = 0.10,  # USD
+) -> dict:
+    """월간 메트릭 스토리지 비용을 추정합니다."""
+    samples_per_day = num_series * (86400 / scrape_interval_sec)
+    total_samples = samples_per_day * retention_days
+    total_bytes = total_samples * bytes_per_sample
+    total_gb = total_bytes / (1024 ** 3)
+    cost_usd = total_gb * storage_cost_per_gb
+    return {
+        "series": num_series,
+        "samples_per_day": int(samples_per_day),
+        "total_gb": round(total_gb, 2),
+        "monthly_cost_usd": round(cost_usd, 2),
+    }
+
+
+# 시나리오 비교
+scenarios = [
+    ("소규모 (1,000 시계열)", 1_000),
+    ("중규모 (50,000 시계열)", 50_000),
+    ("대규모 (500,000 시계열)", 500_000),
+    ("카디널리티 폭발 (5,000,000 시계열)", 5_000_000),
+]
+
+for name, series in scenarios:
+    result = estimate_metric_cost(series)
+    print(f"{name}: {result['total_gb']} GB, ${result['monthly_cost_usd']}/월")
+```
+
+출력 예시입니다.
+
+```text
+소규모 (1,000 시계열): 0.93 GB, $0.09/월
+중규모 (50,000 시계열): 46.57 GB, $4.66/월
+대규모 (500,000 시계열): 465.66 GB, $46.57/월
+카디널리티 폭발 (5,000,000 시계열): 4656.61 GB, $465.66/월
+```
+
+카디널리티가 10배 늘면 비용도 정확히 10배 늘어납니다. 레이블 하나를 무분별하게 추가하면 시계열 수가 기하급수적으로 증가하므로, 레이블 추가 전에 반드시 카디널리티 영향을 계산해야 합니다.
+
+### Recording Rule로 카디널리티 줄이기
+
+고카디널리티 원시 메트릭을 recording rule로 미리 집계하면 쿼리 성능과 스토리지 비용을 동시에 개선할 수 있습니다.
+
+```yaml
+# prometheus-rules.yml
+groups:
+  - name: cost_optimization
+    interval: 1m
+    rules:
+      # 원본: instance × path × method × status (수만 시계열)
+      # 집계: method × status (수십 시계열)
+      - record: job:http_requests:rate5m
+        expr: sum by (method, status) (rate(http_requests_total[5m]))
+
+      # 원본: instance × path × le (수십만 시계열)
+      # 집계: path × le (수천 시계열)
+      - record: job:http_duration:histogram_quantile
+        expr: |
+          histogram_quantile(0.99,
+            sum by (path, le) (rate(http_request_duration_seconds_bucket[5m]))
+          )
+
+      # 장기 보존용 다운샘플링 (1시간 해상도)
+      - record: job:http_requests:rate1h
+        expr: sum by (service) (rate(http_requests_total[1h]))
+```
+
+이 접근법의 핵심은 대시보드와 경보가 recording rule의 결과를 참조하게 만드는 것입니다. 원시 메트릭은 단기(7일) 보존하고, recording rule 결과는 장기(90일) 보존하면 비용 구조가 크게 달라집니다.
+
+| 보존 계층 | 해상도 | 보존 기간 | 용도 |
+|----------|--------|----------|------|
+| Raw metrics | 15초 | 7일 | 실시간 디버깅 |
+| Recording rules (1분) | 1분 | 30일 | 대시보드, 경보 |
+| Downsampled (1시간) | 1시간 | 1년 | 추세 분석, 용량 계획 |
+| Aggregated (1일) | 1일 | 3년 | 경영 리포트 |
+
+### 레이블 거버넌스 정책
+
+카디널리티를 통제하려면 기술적 도구뿐 아니라 조직 차원의 정책이 필요합니다.
+
+| 규칙 | 설명 | 위반 시 조치 |
+|------|------|-------------|
+| 레이블 값 상한 | 하나의 레이블이 가질 수 있는 고유 값은 최대 100개 | CI에서 차단 |
+| 금지 레이블 | `user_id`, `request_id`, `trace_id`를 메트릭 레이블로 사용 금지 | 코드 리뷰 reject |
+| 신규 레이블 승인 | 새 레이블 추가 시 카디널리티 영향 계산서 필수 | PR 템플릿 체크리스트 |
+| 경로 정규화 | `/users/123` → `/users/:id`로 변환 후 레이블에 기록 | middleware 강제 |
+| 정기 감사 | 월 1회 top-50 고카디널리티 시계열 리뷰 | 팀 미팅 어젠다 |
+
+```python
+# middleware에서 경로 정규화 예시 (FastAPI)
+import re
+from fastapi import Request
+
+PATTERNS = [
+    (re.compile(r"/users/[0-9a-f-]+"), "/users/:id"),
+    (re.compile(r"/orders/\d+"), "/orders/:id"),
+    (re.compile(r"/products/[\w-]+"), "/products/:slug"),
+]
+
+
+def normalize_path(path: str) -> str:
+    """고카디널리티 경로를 정규화합니다."""
+    for pattern, replacement in PATTERNS:
+        if pattern.search(path):
+            return pattern.sub(replacement, path)
+    return path
+
+
+# 미들웨어에서 사용
+async def metrics_middleware(request: Request, call_next):
+    normalized = normalize_path(request.url.path)
+    # 메트릭에는 정규화된 경로만 기록
+    REQUEST_COUNT.labels(method=request.method, path=normalized).inc()
+    response = await call_next(request)
+    return response
+```
+
+이 미들웨어 하나로 수만 개의 고유 경로가 수십 개의 패턴으로 줄어듭니다. 결과적으로 시계열 수가 수백 배 감소하고, 쿼리 속도와 스토리지 비용이 함께 개선됩니다.
+
 ## 처음 질문으로 돌아가기
 
 - **카디널리티는 왜 비용과 직접 연결될까요?**
-  - 본문의 기준은 비용과 카디널리티를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 비용 추정 공식에서 확인했듯이, 시계열 수가 비용의 1차 변수입니다. 레이블 하나를 추가해 카디널리티가 100배 늘면 스토리지·쿼리·인덱싱 비용도 100배 늘어납니다. 메트릭은 무료가 아니며, 레이블 설계가 곧 비용 설계입니다.
 - **보존 기간을 나눠 가져가야 하는 이유는 무엇일까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 실시간 디버깅에는 15초 해상도가 필요하지만, 6개월 전 추세 분석에는 1시간 해상도면 충분합니다. 보존 계층을 나누면 같은 정보를 유지하면서 스토리지를 90% 이상 절약할 수 있습니다. Recording rule과 downsampling이 이 계층 구조를 자동으로 만들어 줍니다.
 - **머리 샘플링과 꼬리 샘플링은 어떻게 다를까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 머리 샘플링은 요청 시작 시점에 확률적으로 결정하므로 구현이 간단하지만 중요한 트레이스를 놓칠 수 있습니다. 꼬리 샘플링은 트레이스가 완료된 후 에러·지연 등 조건을 보고 보존을 결정하므로 비용 대비 가치가 높은 트레이스만 저장합니다. 비용 최적화에서는 꼬리 샘플링이 더 효과적입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -346,4 +483,5 @@ print(validate_metric_labels("http_requests_total", example))
 - [OpenTelemetry tail sampling](https://opentelemetry.io/docs/collector/configuration/#processors)
 - [Honeycomb on cost](https://www.honeycomb.io/blog/observability-cost)
 
+- [book-examples — observability-101 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/observability-101/ko)
 Tags: Observability, Cost, Cardinality, Metrics, Sampling

@@ -487,5 +487,6 @@ incident response는 정해진 순서와 역할을 갖춘 팀 활동입니다. �
 - [Incident Response - PagerDuty](https://response.pagerduty.com/)
 - [Incident Command System](https://en.wikipedia.org/wiki/Incident_Command_System)
 - [Atlassian Incident Handbook](https://www.atlassian.com/incident-management/handbook)
+- [SRE 101 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/sre-101/ko)
 
 Tags: SRE, Incident, Response, OnCall, Operations

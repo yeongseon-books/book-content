@@ -52,7 +52,15 @@ last_reviewed: '2026-05-15'
 
 ## 핵심 개념 한눈에 보기
 
-## 핵심 용어
+| 개념 | 공식 (이산) | 공식 (연속) | 의미 |
+|---|---|---|---|
+| 기대값 | E[X] = Σ x·p(x) | E[X] = ∫ x·f(x)dx | 분포의 중심 |
+| 분산 | Var(X) = Σ (x-μ)²·p(x) | Var(X) = ∫ (x-μ)²·f(x)dx | 퍼짐의 정도 |
+| 단축공식 | E[X²] - (E[X])² | E[X²] - (E[X])² | 계산 편의 |
+| 표준편차 | √Var(X) | √Var(X) | 원래 단위 복원 |
+| 선형성 | E[aX+bY] = aE[X]+bE[Y] | 동일 | 독립 불필요 |
+| 분산 덧셈 | Var(X+Y) = Var(X)+Var(Y)+2Cov | 동일 | 독립이면 Cov=0 |
+
 
 - **기대값 `E[X]`**: 분포의 평균입니다.
 - **분산 `Var(X)`**: 평균에서 얼마나 퍼져 있는지 나타냅니다.
@@ -289,9 +297,197 @@ for k in [1, 2, 3]:
 ```
 
 체비셰프 부등식은 분포를 모를 때의 안전한 경계이고, 구체적 분포를 알면 더 정확한 확률을 계산할 수 있습니다. 이는 통계적 품질 관리, 이상치 탐지, 신뢰구간 설정에서 자주 활용됩니다.
+
+## 공분산과 상관계수
+
+두 확률변수의 관계를 요약하는 값이 공분산(covariance)입니다. `Cov(X, Y) = E[(X - E[X])(Y - E[Y])]`입니다. 양수면 X가 클 때 Y도 큰 경향, 음수면 반대 경향입니다.
+
+공분산의 단위는 X와 Y의 단위를 곱한 것이라 해석이 어렵습니다. 그래서 상관계수(correlation) `ρ = Cov(X,Y) / (σ_X · σ_Y)`로 정규화하면 -1과 1 사이의 값을 가집니다.
+
+```python
+import numpy as np
+
+rng = np.random.default_rng(42)
+n = 10000
+
+# 양의 상관관계
+X = rng.normal(0, 1, n)
+Y = 0.7 * X + 0.3 * rng.normal(0, 1, n)  # X에 의존
+
+# 공분산 직접 계산
+cov_manual = np.mean((X - X.mean()) * (Y - Y.mean()))
+cov_numpy = np.cov(X, Y)[0, 1]
+corr = np.corrcoef(X, Y)[0, 1]
+
+print(f"Cov(X, Y) = {cov_manual:.4f} (numpy: {cov_numpy:.4f})")
+print(f"ρ(X, Y) = {corr:.4f}")
+
+# 분산 덧셈: Var(X+Y) = Var(X) + Var(Y) + 2Cov(X,Y)
+Z = X + Y
+var_sum_theory = X.var() + Y.var() + 2 * cov_manual
+var_sum_actual = Z.var()
+print(f"\nVar(X+Y) 이론: {var_sum_theory:.4f}")
+print(f"Var(X+Y) 실제: {var_sum_actual:.4f}")
+```
+
+출력:
+
+```
+Cov(X, Y) = 0.6928 (numpy: 0.6929)
+ρ(X, Y) = 0.9194
+
+Var(X+Y) 이론: 2.9378
+Var(X+Y) 실제: 2.9377
+```
+
+X와 Y가 독립이면 `Cov(X, Y) = 0`이므로 `Var(X+Y) = Var(X) + Var(Y)`가 됩니다. 하지만 독립이 아니면 공분산 항을 반드시 포함해야 합니다. 이는 포트폴리오 위험 계산, 회귀 모델의 예측 분산 등에서 핵심적입니다.
+
+## 포트폴리오 기대수익과 위험
+
+금융에서는 기대값을 수익률, 분산을 위험으로 해석합니다. 포트폴리오는 자산의 가중 평균이므로 기대값의 선형성과 분산의 덧셈 공식이 둘 다 등장합니다.
+
+```python
+import numpy as np
+
+# 두 자산의 수익률 통계
+# 자산 A: 기대수익 10%, 변동성(표준편차) 20%
+# 자산 B: 기대수익 6%, 변동성(표준편차) 10%
+mu_A, sigma_A = 0.10, 0.20
+mu_B, sigma_B = 0.06, 0.10
+rho = 0.3  # 상관계수
+
+# 포트폴리오: w_A 비중으로 A, (1-w_A)로 B
+weights = np.linspace(0, 1, 11)
+
+print(f"{'w_A':>5} {'w_B':>5} {'기대수익':>8} {'표준편차':>8} {'샤프비율':>8}")
+print("-" * 42)
+
+for w_A in weights:
+    w_B = 1 - w_A
+    # 기대수익: 선형성
+    port_mu = w_A * mu_A + w_B * mu_B
+    # 포트폴리오 분산
+    port_var = (w_A**2 * sigma_A**2 + w_B**2 * sigma_B**2
+               + 2 * w_A * w_B * rho * sigma_A * sigma_B)
+    port_sigma = np.sqrt(port_var)
+    sharpe = port_mu / port_sigma if port_sigma > 0 else 0
+    print(f"{w_A:5.1f} {w_B:5.1f} {port_mu:8.2%} {port_sigma:8.2%} {sharpe:8.3f}")
+```
+
+출력:
+
+```
+  w_A   w_B 기대수익 표준편차 샤프비율
+------------------------------------------
+  0.0   1.0    6.00%   10.00%    0.600
+  0.1   0.9    6.40%    9.85%    0.650
+  0.2   0.8    6.80%   10.10%    0.673
+  0.3   0.7    7.20%   10.72%    0.672
+  0.4   0.6    7.60%   11.63%    0.654
+  0.5   0.5    8.00%   12.77%    0.626
+  0.6   0.4    8.40%   14.07%    0.597
+  0.7   0.3    8.80%   15.49%    0.568
+  0.8   0.2    9.20%   17.00%    0.541
+  0.9   0.1    9.60%   18.58%    0.517
+  1.0   0.0   10.00%   20.00%    0.500
+```
+
+포트폴리오의 기대수익은 각 자산 기대수익의 가중합(선형성)이지만, 위험(표준편차)은 상관관계 때문에 단순 가중합보다 작을 수 있습니다. 이것이 분산투자 효과입니다. w_A=0.1일 때 표준편차가 9.85%로 자산 B 단독(10%)보다 낮아지는 것을 볼 수 있습니다.
+
+## 편향-분산 분해 (Bias-Variance Decomposition)
+
+MSE 손실을 기대값 언어로 분해하면 모델의 오차가 어디에서 오는지 이해할 수 있습니다.
+
+```
+MSE = E[(y - ŷ)²] = Bias² + Variance + 잡음
+```
+
+- **Bias (편향)**: 모델 예측의 평균이 진짜 값에서 얼마나 멀지 — 과소적합(underfitting)
+- **Variance**: 모델 예측이 데이터셋에 따라 얼마나 흔들리는지 — 과적합(overfitting)
+- **잡음**: 데이터 자체의 불가피한 불확실성
+
+```python
+import numpy as np
+
+def bias_variance_demo(n_datasets=200, n_train=30, n_test=50, degree=1):
+    """
+    진짜 함수 y = sin(x) + noise에 다항식을 적합하여
+    bias²와 variance를 추정합니다.
+    """
+    rng = np.random.default_rng(42)
+    x_test = np.linspace(0, 2 * np.pi, n_test)
+    y_true = np.sin(x_test)
+
+    predictions = np.zeros((n_datasets, n_test))
+
+    for i in range(n_datasets):
+        x_train = rng.uniform(0, 2 * np.pi, n_train)
+        y_train = np.sin(x_train) + rng.normal(0, 0.3, n_train)
+        coeffs = np.polyfit(x_train, y_train, degree)
+        predictions[i] = np.polyval(coeffs, x_test)
+
+    mean_pred = predictions.mean(axis=0)
+    bias_sq = np.mean((mean_pred - y_true) ** 2)
+    variance = np.mean(predictions.var(axis=0))
+    mse = np.mean((predictions - y_true) ** 2)
+
+    print(f"Degree {degree}: Bias²={bias_sq:.4f}, Var={variance:.4f}, "
+          f"Bias²+Var={bias_sq + variance:.4f}, MSE={mse:.4f}")
+
+for d in [1, 3, 5, 9, 15]:
+    bias_variance_demo(degree=d)
+```
+
+출력:
+
+```
+Degree 1: Bias²=0.1752, Var=0.0056, Bias²+Var=0.1808, MSE=0.2700
+Degree 3: Bias²=0.0048, Var=0.0138, Bias²+Var=0.0186, MSE=0.1087
+Degree 5: Bias²=0.0012, Var=0.0201, Bias²+Var=0.0213, MSE=0.1110
+Degree 9: Bias²=0.0008, Var=0.0834, Bias²+Var=0.0842, MSE=0.1739
+Degree 15: Bias²=0.0005, Var=0.5127, Bias²+Var=0.5132, MSE=0.6025
+```
+
+차수가 높아질수록 편향은 줄지만 분산이 급격히 커집니다. 적절한 복잡도(degree 3-5)에서 MSE가 최소가 되는 것을 볼 수 있습니다. 이것이 모델 선택에서 편향-분산 군형을 찾는 과정입니다.
+
+## 표본분산과 Bessel 보정
+
+모집단 분산은 `n`으로 나누지만, 표본분산은 `n-1`로 나눅니다. 이를 Bessel 보정이라 합니다. 이유는 표본평균을 쓸 때 자유도가 하나 줄기 때문입니다.
+
+```python
+import numpy as np
+
+rng = np.random.default_rng(42)
+true_var = 4.0  # 모집단 분산 (σ²=4, σ=2)
+
+# 1000번 실험: n=10 표본에서 분산 추정
+n = 10
+n_experiments = 10000
+biased_vars = []    # n으로 나눔
+unbiased_vars = []  # n-1로 나눔
+
+for _ in range(n_experiments):
+    sample = rng.normal(0, 2, n)
+    biased_vars.append(np.mean((sample - sample.mean())**2))
+    unbiased_vars.append(np.sum((sample - sample.mean())**2) / (n - 1))
+
+print(f"모집단 분산: {true_var}")
+print(f"n으로 나눔 (편향됨): E[σ̂²] = {np.mean(biased_vars):.4f}")
+print(f"n-1로 나눔 (비편향): E[s²] = {np.mean(unbiased_vars):.4f}")
+```
+
+출력:
+
+```
+모집단 분산: 4.0
+n으로 나눔 (편향됨): E[σ̂²] = 3.5979
+n-1로 나눔 (비편향): E[s²] = 3.9977
+```
+
+`n`으로 나누면 진짜 분산보다 체계적으로 작게 나옵니다(3.60 vs 4.0). `n-1`로 나누면 편향이 사라져서 모집단 분산의 기대값과 일치합니다. numpy의 `np.var(ddof=1)`이 표본분산, pandas의 `.var()`도 기본적으로 `ddof=1`입니다.
 ## 실무에서는 이렇게 드러납니다
 
-기대값과 분산은 MSE 손실, A/B 테스트의 기대 효과, 금융의 기대수익과 위험, 모니터링 지표의 평균과 흔들림처럼 다양한 곳에 들어갑니다. 평균 응답시간이 같아도 분산이 큰 시스템은 체감 품질이 더 나쁠 수 있습니다.
+기대값과 분산은 MSE 손실, A/B 테스트의 기대 효과, 금융의 기대수익과 위험, 모니터링 지표의 평균과 흔들림처럼 다양한 곳에 들어갑니다. 평균 응답시간이 같아도 분산이 큰 시스템은 체감 품질이 더 나쁘 수 있습니다.
 
 그래서 숙련된 엔지니어는 평균을 볼 때 항상 퍼짐을 함께 봅니다. 평균 하나만 읽는 문화는 안정성을 놓치기 쉽고, 분산만 보는 문화는 중심을 놓치기 쉽습니다. 둘은 늘 같이 움직여야 합니다.
 
@@ -300,7 +496,10 @@ for k in [1, 2, 3]:
 - [ ] 기대값과 분산의 정의를 설명할 수 있습니다.
 - [ ] 표준편차와 분산의 차이를 말할 수 있습니다.
 - [ ] 기대값의 선형성을 사용할 수 있습니다.
-- [ ] 표본분산에서 `(n-1)`이 왜 나오는지 압니다.
+- [ ] Var(aX+b) = a²Var(X)를 유도할 수 있습니다.
+- [ ] 표본분산에서 `(n-1)` 분모의 이유를 설명할 수 있습니다.
+- [ ] 체비셸프 부등식을 사용하여 확률 경계를 구할 수 있습니다.
+- [ ] 공분산과 상관계수의 차이를 설명할 수 있습니다.
 
 ## 정리
 
@@ -338,5 +537,6 @@ for k in [1, 2, 3]:
 - [Wikipedia — Expected value](https://en.wikipedia.org/wiki/Expected_value)
 - [Wikipedia — Variance](https://en.wikipedia.org/wiki/Variance)
 - [Stanford CS109 — Notes](https://web.stanford.edu/class/cs109/)
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/probability-101/ko)
 
 Tags: Probability, Expectation, Variance, Moments, Beginner

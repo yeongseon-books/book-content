@@ -22,11 +22,12 @@ last_reviewed: '2026-05-15'
 
 # Model Evaluation 101 (2/10): 훈련·검증·테스트 데이터 나누기
 
+이 글은 Model Evaluation 101 시리즈의 2번째 글입니다.
+
 모델 성능은 지표를 계산하는 순간보다 데이터를 나누는 순간에 이미 상당 부분 결정됩니다. 분할이 잘못되면 이후에 나오는 모든 점수는 그럴듯해 보여도 신뢰할 수 없습니다. 특히 전처리를 먼저 해 버리거나, 시계열 데이터를 무작위로 섞거나, 같은 사용자가 여러 세트에 동시에 들어가면 성능은 쉽게 부풀려집니다.
 
 그래서 train, validation, test의 역할 분리는 단순한 교과서 규칙이 아닙니다. 어떤 데이터로 학습하고, 어떤 데이터로 고르고, 어떤 데이터로 최종 확인할지 구분하는 훈련이 평가의 바닥을 만듭니다.
 
-이 글은 Model Evaluation 101 시리즈의 2번째 글입니다.
 
 ## 먼저 던지는 질문
 
@@ -267,6 +268,168 @@ for p_hat, p_real in zip(prob_pred, prob_true):
 
 차이가 큰 구간은 후처리 보정 대상입니다. Platt scaling이나 isotonic regression 적용 전후를 같은 표로 기록하면, 확률 품질이 실제로 개선되었는지 검증 가능합니다.
 
+
+## 실무 앵커: 지표를 운영 의사결정으로 연결하는 확장 절차
+
+앞선 본문이 개념의 뼈대를 잡아 주었다면, 이 절은 운영에서 바로 재사용할 수 있는 공통 앵커를 제공합니다. 모델 평가를 문서로만 끝내지 않고 재현 가능한 코드와 해석 규칙으로 남겨 두면, 다음 실험이나 다음 분기 리뷰에서도 같은 기준으로 비교할 수 있습니다. 특히 팀이 커질수록 "누가 돌려도 같은 결론이 나오는가"가 중요해지므로, 지표 계산 코드와 해석 문장을 함께 관리해야 합니다.
+
+### 혼동 행렬을 숫자표에서 행동 지침으로 읽는 방법
+
+혼동 행렬은 단순히 `TN, FP, FN, TP`를 보여 주는 표가 아닙니다. 어떤 오류를 줄여야 실제 비용이 내려가는지 가리키는 운영 지도입니다. 예를 들어 FP가 늘어나면 운영팀의 수동 검토 부담이 급증하고, FN이 늘어나면 놓침 손실이 직접 비용으로 돌아옵니다. 따라서 혼동 행렬을 읽을 때는 "점수"보다 "어떤 팀에 어떤 부담이 이동하는가"를 먼저 기록하는 편이 안전합니다.
+
+```python
+from sklearn.metrics import confusion_matrix
+import numpy as np
+
+y_true = np.array([1,0,1,1,0,0,1,0,1,0,1,0,0,1,0,1])
+y_pred = np.array([1,0,1,0,0,1,1,0,1,0,0,0,0,1,0,1])
+
+tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
+print({'tn': int(tn), 'fp': int(fp), 'fn': int(fn), 'tp': int(tp)})
+
+review_load = fp
+missed_cases = fn
+print('수동 검토 건수(오탐):', review_load)
+print('놓친 중요 건수(미탐):', missed_cases)
+```
+
+해석 문장을 고정해 두면 리뷰 품질이 안정됩니다. 예를 들어 "이번 배포 후보는 오탐 9건을 추가로 만들지만 미탐 14건을 줄인다"처럼 효과를 방향성으로 적으면, 단일 지표 숫자보다 의사결정이 훨씬 명확해집니다.
+
+### ROC 곡선과 임계값 탐색을 함께 기록하기
+
+ROC-AUC는 모델이 양성과 음성을 얼마나 잘 분리하는지 보여 주는 요약 숫자이지만, 실제 운영은 특정 임계값 하나를 선택해야 끝납니다. 그래서 AUC만 보고 배포 결정을 내리면 운영에서 필요한 FPR 상한이나 알림량 제한을 놓치기 쉽습니다. 안전한 방식은 ROC 곡선과 함께 임계값 후보 표를 같이 남기는 것입니다.
+
+```python
+from sklearn.metrics import roc_curve, roc_auc_score
+import numpy as np
+
+y_true = np.array([1,0,1,1,0,0,1,0,1,0,1,0,0,1,0,1])
+y_score = np.array([0.91,0.05,0.87,0.52,0.34,0.61,0.84,0.21,0.79,0.18,0.64,0.07,0.28,0.73,0.14,0.69])
+
+fpr, tpr, thresholds = roc_curve(y_true, y_score)
+auc = roc_auc_score(y_true, y_score)
+print('roc_auc:', round(auc, 4))
+
+for th in [0.2, 0.35, 0.5, 0.65, 0.8]:
+    pred = (y_score >= th).astype(int)
+    tn, fp, fn, tp = confusion_matrix(y_true, pred).ravel()
+    now_fpr = fp / (fp + tn)
+    now_tpr = tp / (tp + fn)
+    print({'threshold': th, 'fpr': round(now_fpr, 3), 'tpr': round(now_tpr, 3)})
+```
+
+운영 문서에는 "허용 가능한 오탐 비율(FPR)"을 먼저 적고 그 경계 안에서 재현율(TPR)이 가장 높은 임계값을 선택하는 규칙을 고정하는 편이 좋습니다. 이렇게 하면 담당자가 바뀌어도 같은 정책으로 같은 결론을 재현할 수 있습니다.
+
+### 교차검증을 평균 점수에서 분포 분석으로 확장하기
+
+교차검증은 평균 점수 한 줄로 끝내기 쉽지만, 실제로는 fold별 분포가 더 중요한 신호를 줍니다. 평균이 높아도 표준편차가 큰 모델은 특정 데이터 구간에서 갑자기 성능이 무너질 수 있기 때문입니다. 따라서 배포 전 리뷰에서는 "평균"과 "흔들림"을 함께 기록해야 합니다.
+
+```python
+from sklearn.datasets import make_classification
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import StratifiedKFold, cross_validate
+import numpy as np
+
+X, y = make_classification(
+    n_samples=3000,
+    n_features=24,
+    n_informative=8,
+    n_redundant=4,
+    weights=[0.85, 0.15],
+    random_state=42,
+)
+
+model = LogisticRegression(max_iter=2000)
+cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+result = cross_validate(
+    model,
+    X,
+    y,
+    cv=cv,
+    scoring={'f1': 'f1', 'roc_auc': 'roc_auc', 'recall': 'recall'},
+)
+
+for key in ['test_f1', 'test_roc_auc', 'test_recall']:
+    arr = result[key]
+    print(key, 'mean=', round(arr.mean(), 4), 'std=', round(arr.std(), 4), 'min=', round(arr.min(), 4))
+```
+
+여기서 `std`와 `min`이 크게 흔들리면 모델 구조보다 데이터 분할과 표본 추출 전략을 먼저 재검토해야 합니다. 특히 소수 클래스 성능이 fold마다 크게 갈리면 임계값을 아무리 조정해도 운영 안정성이 낮습니다.
+
+### 캘리브레이션 플롯으로 확률 신뢰성 점검하기
+
+분류 모델 점수가 후속 의사결정의 우선순위를 정한다면, 확률의 신뢰성은 정확도만큼 중요합니다. 예측확률 0.8 집합의 실제 양성 비율이 0.8과 멀다면, 점수 기반 우선순위가 계속 왜곡됩니다. 그래서 보정(calibration) 단계에서는 플롯과 수치 요약을 함께 남겨야 합니다.
+
+```python
+from sklearn.calibration import calibration_curve
+from sklearn.isotonic import IsotonicRegression
+import numpy as np
+
+# 예시 점수
+y_true = np.array([1,0,1,1,0,0,1,0,1,0,1,0,0,1,0,1])
+y_score = np.array([0.91,0.05,0.87,0.52,0.34,0.61,0.84,0.21,0.79,0.18,0.64,0.07,0.28,0.73,0.14,0.69])
+
+prob_true, prob_pred = calibration_curve(y_true, y_score, n_bins=6)
+print('before calibration')
+for p_hat, p_real in zip(prob_pred, prob_true):
+    print(round(p_hat, 3), round(p_real, 3), 'diff=', round(p_real - p_hat, 3))
+
+iso = IsotonicRegression(out_of_bounds='clip').fit(y_score, y_true)
+y_cal = iso.predict(y_score)
+prob_true2, prob_pred2 = calibration_curve(y_true, y_cal, n_bins=6)
+print('after calibration')
+for p_hat, p_real in zip(prob_pred2, prob_true2):
+    print(round(p_hat, 3), round(p_real, 3), 'diff=', round(p_real - p_hat, 3))
+```
+
+리뷰 문서에는 "보정 전/후 Brier score 변화"와 "고확률 구간 과대신뢰 완화 여부"를 함께 남기면 좋습니다. 이렇게 기록하면 모델 교체 시 확률 품질이 실제로 개선되었는지 빠르게 검증할 수 있습니다.
+
+### 오류 분석 워크플로를 표준 운영 절차로 만들기
+
+지표가 하락했을 때 바로 모델 구조부터 바꾸면 원인 분해가 어려워집니다. 먼저 오류 샘플을 패턴으로 묶고, 데이터 문제인지 피처 문제인지 의사결정 경계 문제인지 분리해야 합니다. 아래와 같은 절차를 템플릿으로 운영하면 재발 방지까지 연결하기 좋습니다.
+
+1. **오류 추출**: FP/FN 샘플을 최근 배치 기준으로 수집합니다.
+2. **하위군 분해**: 채널, 지역, 디바이스, 시간대 등 운영 축으로 오류율을 나눕니다.
+3. **설명 변수 확인**: 누락값, 스케일 불일치, 범주 희소성 같은 데이터 문제를 확인합니다.
+4. **임계값 시뮬레이션**: 후보 임계값별 FP/FN 비용을 계산해 정책을 재검토합니다.
+5. **수정 실험**: 데이터 정제/피처 보강/보정 모델 적용 후 동일 지표로 재검증합니다.
+6. **재발 방지**: 실패 패턴을 경보 규칙과 체크리스트에 반영합니다.
+
+```python
+import pandas as pd
+
+# 예시 오류 분석 테이블
+analysis = pd.DataFrame(
+    {
+        'segment': ['web', 'app', 'kiosk', 'web', 'app', 'kiosk'],
+        'is_error': [1, 1, 0, 1, 0, 1],
+        'error_type': ['FN', 'FP', 'none', 'FN', 'none', 'FP'],
+    }
+)
+
+summary = (
+    analysis.groupby(['segment', 'error_type'])
+    .size()
+    .rename('count')
+    .reset_index()
+)
+print(summary)
+```
+
+오류 분석 결과를 남길 때는 "무엇이 나빴다"보다 "어떤 축에서 반복적으로 나빴고 다음 주기에 무엇을 바꿀 것인가"를 중심으로 쓰는 편이 좋습니다. 그래야 평가가 회고 문서가 아니라 개선 루프의 입력으로 동작합니다.
+
+### 최종 리뷰 문장 템플릿
+
+실무 보고서에서는 숫자를 나열하는 대신 결정에 바로 연결되는 문장을 쓰는 편이 좋습니다. 다음 템플릿은 대부분의 분류 과제에서 그대로 재사용할 수 있습니다.
+
+- 베이스레이트와 더미 기준선을 먼저 제시합니다.
+- 핵심 운영 비용에 연결되는 지표(재현율, 정밀도, FPR)를 같은 문단에서 해석합니다.
+- ROC/PR, 캘리브레이션, 교차검증 분포를 함께 보고 안정성을 평가합니다.
+- 최종 임계값 선택 이유와 예상 운영 비용 변화를 수치로 남깁니다.
+- 다음 실험에서 바꿀 가설을 한 줄로 명시합니다.
+
+이 절의 목적은 평가를 더 복잡하게 만드는 것이 아닙니다. 오히려 동일한 질문을 반복 가능한 절차로 고정해, 모델이 바뀌어도 팀의 의사결정 품질을 유지하는 데 있습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **train, validation, test는 각각 무엇을 맡아야 할까요?**
@@ -298,5 +461,7 @@ for p_hat, p_real in zip(prob_pred, prob_true):
 - [scikit-learn — TimeSeriesSplit](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.TimeSeriesSplit.html)
 - [Forecasting: Principles and Practice — Hyndman](https://otexts.com/fpp3/)
 - [Google — Rules of ML](https://developers.google.com/machine-learning/guides/rules-of-ml)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/model-evaluation-101/ko)
 
 Tags: ModelEvaluation, TrainValTest, DataLeakage, CrossValidation, scikit-learn

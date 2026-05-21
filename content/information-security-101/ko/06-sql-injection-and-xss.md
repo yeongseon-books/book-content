@@ -370,6 +370,159 @@ def validate_limit(limit: int) -> int:
 
 탐지 신호가 없으면 "막았는지"를 알 수 없습니다. 방어와 탐지는 같이 설계해야 합니다.
 
+## 공격 재현과 방어 검증 시나리오
+
+취약점 방어는 "코드가 안전해 보인다"가 아니라 재현 테스트 통과로 확인해야 합니다.
+
+| 시나리오 | 입력 값 | 기대 결과 |
+| --- | --- | --- |
+| SQL 인젝션 우회 시도 | `' OR 1=1 --` | 400 또는 빈 결과 |
+| 저장형 XSS 시도 | `<script>alert(1)</script>` | 스크립트 미실행, 이스케이프 출력 |
+| DOM 기반 XSS 시도 | `#<img src=x onerror=alert(1)>` | 텍스트로 출력, 이벤트 미실행 |
+
+## WAF와 애플리케이션 방어의 역할 분리
+
+WAF는 공격 노이즈를 줄이는 보조선입니다. 근본 방어는 애플리케이션 코드에서 수행해야 합니다.
+
+```text
+요청 -> WAF 1차 필터 -> 앱 입력 검증 -> 바인딩 쿼리 -> 출력 인코딩 -> 응답
+```
+
+코드 수준 방어가 없는 상태에서 WAF만 의존하면 정상 요청 오탐과 우회 공격이 반복됩니다. 따라서 방어 책임을 계층별로 분리해 문서화해야 합니다.
+
+
+## 데이터베이스 계정 분리 전략
+
+SQL 인젝션 방어는 쿼리 작성법뿐 아니라 DB 권한 모델과 함께 봐야 합니다. 앱 계정이 과권한이면 우회 성공 시 피해가 커집니다.
+
+| 계정 | 허용 권한 | 금지 권한 |
+| --- | --- | --- |
+| 읽기 전용 API 계정 | SELECT | INSERT/UPDATE/DELETE/DDL |
+| 일반 쓰기 API 계정 | SELECT/INSERT/UPDATE | DROP/ALTER/GRANT |
+| 마이그레이션 계정 | DDL(제한 시간) | 상시 사용 금지 |
+
+## XSS 사고 대응 최소 절차
+
+- 취약 경로를 일시 차단하고 캐시된 악성 콘텐츠를 삭제합니다.
+- 세션 쿠키 회전과 강제 로그아웃 여부를 판단합니다.
+- CSP 위반 리포트를 수집해 재발 경로를 분석합니다.
+- 유입 경로(입력 폼, 관리자 화면, 외부 동기화)를 분류합니다.
+
+주입 취약점은 단일 패치로 끝나지 않습니다. 입력, 저장, 렌더링, 권한의 네 경계를 함께 보완해야 재발률이 내려갑니다.
+
+
+## 보안 테스트 자동화 예시
+
+```python
+# test_injection_regression.py
+import requests
+
+BASE = "https://staging.example.com"
+
+def test_sql_injection_payload_rejected():
+    payload = "' OR 1=1 --"
+    r = requests.get(f"{BASE}/api/users", params={"name": payload}, timeout=5)
+    assert r.status_code in (200, 400)
+    assert "alice" not in r.text
+
+def test_xss_payload_escaped():
+    payload = "<script>alert(1)</script>"
+    r = requests.post(f"{BASE}/comments", json={"body": payload}, timeout=5)
+    assert r.status_code == 201
+    page = requests.get(f"{BASE}/comments/latest", timeout=5)
+    assert "<script>" not in page.text
+```
+
+보안 테스트를 CI에 넣으면 취약점이 회귀로 재유입되는 것을 줄일 수 있습니다. 한 번 고친 취약점은 테스트로 잠가야 합니다.
+
+## OWASP 예시 시나리오
+
+- A03 Injection: 검색 필터 파라미터를 SQL 구문으로 해석.
+- A03 Injection(XSS): 댓글 렌더링 시 HTML 이스케이프 누락.
+- A05 Security Misconfiguration: 디버그 템플릿에서 `innerHTML` 사용.
+
+시나리오를 OWASP 항목에 매핑해두면 경영진/제품팀과 우선순위 대화를 할 때 공통 언어를 만들 수 있습니다.
+
+
+## 부록: 팀 보안 리뷰 워크시트
+
+다음 워크시트는 기능 배포 전 보안 리뷰에서 반복적으로 확인하는 항목을 표준화한 것입니다.
+
+### 1) 자산과 경계 정의
+
+| 항목 | 기록 예시 |
+| --- | --- |
+| 보호 대상 데이터 | 사용자 이메일, 결제 토큰, 내부 리포트 |
+| 진입 경로 | 웹 폼, 모바일 API, 관리자 콘솔 |
+| 신뢰 경계 | 인터넷-엣지, 엣지-앱, 앱-DB |
+| 외부 의존성 | 결제 API, 메시지 큐, 파일 저장소 |
+
+### 2) 통제 매핑
+
+| 위협 | 예방 통제 | 탐지 통제 | 대응 통제 |
+| --- | --- | --- | --- |
+| 계정 탈취 | MFA, 비밀번호 정책 | 로그인 이상 징후 경보 | 세션 강제 종료, 자격 재설정 |
+| 데이터 변조 | 입력 검증, 무결성 서명 | 감사 로그 무결성 검증 | 롤백, 포렌식 조사 |
+| 서비스 과부하 | 레이트 리밋, WAF | 오류율/지연 경보 | 트래픽 차단, 임시 확장 |
+
+### 3) 운영 점검 질문
+
+- 이번 변경으로 새로 열리는 네트워크 포트가 있는가
+- 권한 범위가 기존보다 넓어지는가
+- 로그 스키마 변경이 탐지 규칙에 영향을 주는가
+- 비밀 정보 또는 토큰 수명 정책이 달라지는가
+- 장애 시 롤백 절차가 검증되어 있는가
+
+### 4) 배포 전 검증 항목
+
+| 항목 | 통과 기준 |
+| --- | --- |
+| 보안 테스트 | 고위험 실패 없음 |
+| 설정 검증 | 디버그/임시 설정 제거 |
+| 감사 로그 | 주요 이벤트 필드 누락 없음 |
+| 문서 최신화 | 런북과 운영 가이드 업데이트 완료 |
+
+워크시트의 목적은 문서를 늘리는 것이 아니라 의사결정 속도를 높이는 것입니다. 보안 검토가 반복될수록 질문과 답변이 짧아지고, 같은 사고가 재발할 가능성이 줄어듭니다.
+
+
+## 부록: 주입 취약점 대응 우선순위
+
+| 우선순위 | 작업 | 완료 기준 |
+| --- | --- | --- |
+| 1 | 취약 경로 임시 차단 | 재현 페이로드 차단 확인 |
+| 2 | 코드 수정(바인딩/인코딩) | 보안 테스트 통과 |
+| 3 | 로그 기반 영향 분석 | 영향 사용자/데이터 범위 확정 |
+| 4 | 재발 방지 룰 추가 | 정적 분석/테스트 게이트 추가 |
+
+우선순위를 명시하면 사고 중 논쟁 시간을 줄이고 복구 속도를 올릴 수 있습니다.
+
+
+
+
+## OWASP Top 10에서 인젝션 취약점의 위치
+
+
+
+OWASP Top 10 2021 기준으로 A03(Injection)은 SQL 인젝션과 XSS를 모두 포함합니다. 이 카테고리가 여전히 상위에 있는 이유는 단순합니다. 새 프레임워크가 나와도 입력값을 데이터로 취급하지 않는 코드는 계속 생기기 때문입니다.
+
+
+
+| OWASP A03 세부 | 대응 원칙 | 검증 수단 |
+
+| --- | --- | --- |
+
+| SQL 인젝션 | 파라미터화 쿼리, ORM | SAST + 동적 테스트 |
+
+| XSS(Reflected/Stored) | 출력 인코딩, CSP | CSP report-uri 모니터링 |
+
+| Command Injection | 시스템 호출 회피, 허용 목록 | 코드 리뷰 체크리스트 |
+
+
+
+프레임워크의 기본 보호를 신뢰하되, 예외 경로에서 보호가 없는 코드가 생기지 않는지 CI에서 정적 분석을 돌려야 합니다.
+
+
+
 ## 처음 질문으로 돌아가기
 
 - **SQL 인젝션은 정확히 어떤 메커니즘으로 발생할까요?**
@@ -401,5 +554,7 @@ def validate_limit(limit: int) -> int:
 - [OWASP — XSS](https://owasp.org/www-community/attacks/xss/)
 - [OWASP Cheat Sheet — XSS Prevention](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html)
 - [PortSwigger Web Security Academy](https://portswigger.net/web-security)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/information-security-101/ko)
 
 Tags: Computer Science, Security, SQLInjection, XSS, InputValidation, OutputEncoding

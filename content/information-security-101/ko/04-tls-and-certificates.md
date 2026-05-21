@@ -277,27 +277,285 @@ mTLS를 도입할 때는 인증서 자동 발급/회전(예: service mesh, cert-
 보안은 단발성 프로젝트가 아니라 운영 루프입니다. 같은 점검을 반복해도 기준이 유지될 때 품질이 올라갑니다.
 
 
+## 인증서 투명성과 CT 로그
 
-## 운영 점검 루프와 문서화 기준
 
-보안 글에서 가장 자주 빠지는 부분은 "그래서 운영에서는 무엇을 주기적으로 확인할 것인가"입니다. 아래 루프를 기준으로 문서화하면 개념이 실무로 연결됩니다.
 
-| 주기 | 점검 항목 | 산출물 |
+인증서 투명성(Certificate Transparency, CT)은 CA가 인증서를 발급할 때마다 공개 로그에 기록하도록 강제하는 체계입니다. 잘못된 발급이나 악의적인 CA를 조기에 탐지하는 데 핵심 역할을 합니다.
+
+
+
+| 구성 요소 | 역할 | 운영 의미 |
+
 | --- | --- | --- |
-| 매일 | 고위험 경보, 인증 실패 급증, 권한 거부 급증 | 일일 보안 브리핑 |
-| 매주 | 신규 배포 변경점의 보안 영향 | 변경 검토 노트 |
-| 매월 | 키/토큰/인증서 만료 예정, 미사용 권한, 미사용 시크릿 | 월간 정리 리포트 |
-| 분기 | 위협 모델 재평가, 런북 훈련, 통제 효과 검토 | 분기 보안 회고 |
 
-실행 가능한 문서의 조건도 분명해야 합니다.
+| CT 로그 서버 | 발급된 인증서를 append-only 로그에 기록 | 위조 인증서 발견 시 증거 확보 |
 
-- 담당자(owner)와 대체 담당자가 명시되어야 합니다.
-- 실패 조건과 에스컬레이션 기준이 수치로 정의되어야 합니다.
-- 점검 결과가 티켓이나 액션 아이템으로 추적되어야 합니다.
-- 예외 승인에는 만료일이 반드시 있어야 합니다.
+| SCT(Signed Certificate Timestamp) | 인증서가 로그에 등록된 증거 | 브라우저가 SCT 없는 인증서를 거부할 수 있음 |
 
-보안은 단발성 프로젝트가 아니라 운영 루프입니다. 같은 점검을 반복해도 기준이 유지될 때 품질이 올라갑니다.
+| 모니터링 서비스 | 조직 도메인에 대한 신규 발급 감시 | 피싱/섀도 도메인 조기 경보 |
 
+
+
+CT 모니터링은 방어적 관점에서 매우 실용적입니다. 누군가 여러분 도메인에 대해 인증서를 발급하면 알림이 오기 때문에, 도메인 탈취 공격이나 서브도메인 하이재킹을 조기에 인식할 수 있습니다.
+
+
+
+```bash
+
+# CT 로그에서 특정 도메인의 인증서 발급 이력 조회
+
+# crt.sh를 이용한 간단한 확인
+
+curl -s "https://crt.sh/?q=%.example.com&output=json" | python3 -m json.tool | head -30
+
+```
+
+
+
+## TLS 암호군 감사 스크립트
+
+
+
+운영 중인 서비스의 TLS 설정이 기준선을 만족하는지 주기적으로 점검해야 합니다. 다음 스크립트는 서버가 허용하는 암호군 목록을 추출하고, 약한 암호군이 포함되었는지 확인합니다.
+
+
+
+```python
+
+# tls_cipher_audit.py
+
+import ssl
+
+import socket
+
+from typing import Final
+
+
+
+WEAK_CIPHERS: Final[set] = {"RC4", "3DES", "DES", "NULL", "EXPORT"}
+
+
+
+
+
+def audit_ciphers(host: str, port: int = 443) -> list[str]:
+
+    ctx = ssl.create_default_context()
+
+    warnings = []
+
+    with socket.create_connection((host, port), timeout=5) as raw:
+
+        with ctx.wrap_socket(raw, server_hostname=host) as tls:
+
+            cipher_name, protocol, bits = tls.cipher()
+
+            for weak in WEAK_CIPHERS:
+
+                if weak in cipher_name.upper():
+
+                    warnings.append(f"약한 암호군 감지: {cipher_name}")
+
+            if bits < 128:
+
+                warnings.append(f"키 길이 부족: {bits}bit")
+
+            if "TLSv1.0" in protocol or "TLSv1.1" in protocol:
+
+                warnings.append(f"구버전 프로토콜: {protocol}")
+
+    return warnings
+
+
+
+
+
+issues = audit_ciphers("example.com")
+
+if issues:
+
+    for w in issues:
+
+        print(f"[WARN] {w}")
+
+else:
+
+    print("[OK] TLS 설정 기준선 통과")
+
+```
+
+
+
+이 스크립트를 CI/CD 파이프라인에 넣으면 배포 시점에 TLS 설정 회귀를 자동 감지할 수 있습니다.
+
+
+
+## 방화벽 규칙과 TLS 종료 지점
+
+TLS를 어디서 종료할지 결정하면 네트워크 규칙도 같이 설계해야 합니다. 아래 표는 최소 권장 규칙 예시입니다.
+
+| 구간 | 허용 포트 | 출발지 | 목적지 | 정책 |
+| --- | --- | --- | --- | --- |
+| 인터넷 -> 엣지 로드밸런서 | 443 | Any | LB | 허용 |
+| 인터넷 -> 애플리케이션 노드 | 80,443 | Any | App | 거부 |
+| LB -> 앱 서비스 | 443 | LB 서브넷 | App | 허용 |
+| 앱 -> DB | 5432 | App 서브넷 | DB | 허용 |
+
+TLS가 켜져 있어도 포트 노출이 넓으면 공격 표면이 크게 남습니다. "암호화됨"과 "접근 제어됨"은 다른 문제이므로 방화벽 규칙을 반드시 함께 검토해야 합니다.
+
+## 인증서 장애 런북 요약
+
+1. 인증서 만료 경보 수신 후 영향 도메인 목록을 확정합니다.
+2. 신규 인증서 발급 전 체인(fullchain) 구성을 먼저 점검합니다.
+3. 스테이징에서 핸드셰이크 검증 후 점진 배포합니다.
+4. 배포 후 `openssl s_client`와 애플리케이션 헬스체크로 재확인합니다.
+5. 사후 회고에서 만료 알림 임계값과 자동화 누락을 보완합니다.
+
+
+## 인증서 운영 캘린더 예시
+
+인증서 장애는 대부분 만료 직전에 발견됩니다. 이를 막으려면 일정 기반 운영 캘린더가 필요합니다.
+
+| 시점 | 작업 | 담당 |
+| --- | --- | --- |
+| 만료 30일 전 | 자동 갱신 상태 확인, 경보 테스트 | 플랫폼 팀 |
+| 만료 14일 전 | 스테이징 체인 검증, 호환성 테스트 | 애플리케이션 팀 |
+| 만료 7일 전 | 운영 배포 승인, 롤백 계획 확정 | 보안/운영 공동 |
+| 만료 후 | 로그 점검, 회고, 임계값 조정 | SRE/보안 |
+
+## 내부 서비스 mTLS 확장 체크리스트
+
+- 서비스별 클라이언트 인증서 발급 주체를 명확히 합니다.
+- 인증서 재발급 자동화를 수동 절차로 대체하지 않습니다.
+- 폐기된 인증서 목록(deny list) 배포 지연을 모니터링합니다.
+- 서비스 메시 또는 게이트웨이에서 실패 이벤트를 중앙 수집합니다.
+
+mTLS는 보안 강도를 크게 높이지만, 수명 주기 자동화가 없으면 운영 리스크가 더 커질 수 있습니다. 도입 전후로 장애 실험을 반드시 수행해야 합니다.
+
+
+## TLS 설정 기준선 예시
+
+| 항목 | 권장 값 | 금지 값 |
+| --- | --- | --- |
+| 프로토콜 버전 | TLS 1.2, TLS 1.3 | TLS 1.0, TLS 1.1 |
+| 키 교환 | ECDHE | 정적 RSA 키 교환 |
+| 대칭 암호 | AES-GCM, ChaCha20-Poly1305 | RC4, 3DES |
+| 인증서 키 길이 | RSA 2048+ 또는 ECDSA P-256+ | RSA 1024 이하 |
+
+기준선을 문서화해두면 신규 서비스 온보딩 시 "기본 설정"으로 바로 적용할 수 있습니다. 매 서비스마다 수동 판단을 반복하면 설정 편차가 커집니다.
+
+## 인증서 회전 실패 패턴
+
+- 신규 인증서만 배포하고 중간 인증서 체인 누락
+- 스테이징 검증 없이 운영 선배포
+- 만료 알림 임계값을 1-2일로 너무 늦게 설정
+- 인증서 배포 자동화와 서비스 재로드 분리 실패
+
+이 패턴은 대부분 운영 절차의 빈틈에서 생깁니다. 기술 문제로 보이지만 실제로는 프로세스 문제인 경우가 많습니다.
+
+## 네트워크 팀과의 협업 체크리스트
+
+1. TLS 종료 지점을 단일 다이어그램으로 합의합니다.
+2. 종료 지점별 인증서 소유 팀을 명시합니다.
+3. 포트/방화벽 변경 시 보안 리뷰를 필수화합니다.
+4. 장애 훈련에서 인증서 만료 시나리오를 포함합니다.
+
+
+## 부록: 팀 보안 리뷰 워크시트
+
+다음 워크시트는 기능 배포 전 보안 리뷰에서 반복적으로 확인하는 항목을 표준화한 것입니다.
+
+### 1) 자산과 경계 정의
+
+| 항목 | 기록 예시 |
+| --- | --- |
+| 보호 대상 데이터 | 사용자 이메일, 결제 토큰, 내부 리포트 |
+| 진입 경로 | 웹 폼, 모바일 API, 관리자 콘솔 |
+| 신뢰 경계 | 인터넷-엣지, 엣지-앱, 앱-DB |
+| 외부 의존성 | 결제 API, 메시지 큐, 파일 저장소 |
+
+### 2) 통제 매핑
+
+| 위협 | 예방 통제 | 탐지 통제 | 대응 통제 |
+| --- | --- | --- | --- |
+| 계정 탈취 | MFA, 비밀번호 정책 | 로그인 이상 징후 경보 | 세션 강제 종료, 자격 재설정 |
+| 데이터 변조 | 입력 검증, 무결성 서명 | 감사 로그 무결성 검증 | 롤백, 포렌식 조사 |
+| 서비스 과부하 | 레이트 리밋, WAF | 오류율/지연 경보 | 트래픽 차단, 임시 확장 |
+
+### 3) 운영 점검 질문
+
+- 이번 변경으로 새로 열리는 네트워크 포트가 있는가
+- 권한 범위가 기존보다 넓어지는가
+- 로그 스키마 변경이 탐지 규칙에 영향을 주는가
+- 비밀 정보 또는 토큰 수명 정책이 달라지는가
+- 장애 시 롤백 절차가 검증되어 있는가
+
+### 4) 배포 전 검증 항목
+
+| 항목 | 통과 기준 |
+| --- | --- |
+| 보안 테스트 | 고위험 실패 없음 |
+| 설정 검증 | 디버그/임시 설정 제거 |
+| 감사 로그 | 주요 이벤트 필드 누락 없음 |
+| 문서 최신화 | 런북과 운영 가이드 업데이트 완료 |
+
+워크시트의 목적은 문서를 늘리는 것이 아니라 의사결정 속도를 높이는 것입니다. 보안 검토가 반복될수록 질문과 답변이 짧아지고, 같은 사고가 재발할 가능성이 줄어듭니다.
+
+
+## 부록: 인증서 운영 장애 사례
+
+운영에서 자주 만나는 사례는 비슷합니다. 첫째, 자동 갱신이 성공했지만 서비스 재로드가 실패해 구 인증서를 계속 쓰는 경우입니다. 둘째, 신규 서브도메인을 추가했지만 SAN 목록에 누락되어 특정 경로에서만 TLS 오류가 발생하는 경우입니다. 셋째, 중간 인증서 체인이 누락되어 일부 클라이언트에서만 접속 실패가 재현되는 경우입니다.
+
+이 세 가지는 모두 "검증 자동화"가 있으면 배포 전에 걸러집니다. 따라서 만료 모니터링만으로는 충분하지 않고, 실제 핸드셰이크 검증까지 파이프라인에 포함해야 합니다.
+
+
+### TLS 인증서 자동 검증 스크립트
+
+배포 파이프라인에 포함할 수 있는 인증서 검증 스크립트입니다.
+
+```python
+"""TLS 인증서 핸드셰이크 검증 스크립트."""
+import ssl
+import socket
+from datetime import datetime, timezone
+
+
+def verify_certificate(hostname: str, port: int = 443) -> dict:
+    """실제 핸드셰이크를 수행하여 인증서 상태를 확인한다."""
+    context = ssl.create_default_context()
+    with socket.create_connection((hostname, port), timeout=10) as sock:
+        with context.wrap_socket(sock, server_hostname=hostname) as tls:
+            cert = tls.getpeercert()
+            not_after = datetime.strptime(
+                cert["notAfter"], "%b %d %H:%M:%S %Y %Z"
+            ).replace(tzinfo=timezone.utc)
+            days_left = (not_after - datetime.now(timezone.utc)).days
+            san_list = [
+                entry[1]
+                for entry in cert.get("subjectAltName", [])
+                if entry[0] == "DNS"
+            ]
+            return {
+                "hostname": hostname,
+                "protocol": tls.version(),
+                "cipher": tls.cipher()[0],
+                "days_until_expiry": days_left,
+                "san_entries": san_list,
+                "issuer": dict(x[0] for x in cert["issuer"]),
+            }
+
+
+if __name__ == "__main__":
+    targets = ["api.example.com", "web.example.com"]
+    for host in targets:
+        result = verify_certificate(host)
+        status = "OK" if result["days_until_expiry"] > 30 else "WARN"
+        print(f"[{status}] {host}: {result['days_until_expiry']}일 남음, "
+              f"{result['protocol']}, {result['cipher']}")
+```
+
+이 스크립트는 단순 만료 확인을 넘어서 세 가지를 동시에 검증합니다. 첫째, 실제 TLS 핸드셰이크 성공 여부(중간 인증서 체인 포함)를 확인합니다. 둘째, SAN 목록에 대상 호스트가 포함되었는지 검증합니다. 셋째, 프로토콜 버전과 암호군이 기대 값인지 점검합니다.
 
 ## 처음 질문으로 돌아가기
 
@@ -330,5 +588,7 @@ mTLS를 도입할 때는 인증서 자동 발급/회전(예: service mesh, cert-
 - [Mozilla SSL Configuration Generator](https://ssl-config.mozilla.org/)
 - [Let's Encrypt — How It Works](https://letsencrypt.org/how-it-works/)
 - [BetterTLS — Test Suite](https://bettertls.com/)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/information-security-101/ko)
 
 Tags: Computer Science, Security, TLS, Certificate, PKI, mTLS

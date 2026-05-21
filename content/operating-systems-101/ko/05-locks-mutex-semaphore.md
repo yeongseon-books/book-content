@@ -319,6 +319,200 @@ strace -f -c -p <pid>
 
 운영 환경에서는 다음 원칙을 권장합니다. 첫째, 우선순위 조정은 임시 대응으로 제한합니다. 둘째, 조정 전후 지표를 캡처해 회귀를 확인합니다. 셋째, 근본 원인은 워크로드 분리, 큐 제어, 배치 시간 분산으로 해결합니다. 운영체제 기능은 문제를 숨기는 도구가 아니라 구조를 개선하기 위한 관측/제어 도구입니다.
 
+
+## 데드락 탐지 코드를 직접 작성해 보기
+
+데드락은 "걸렸을 때 복구"보다 "의존 그래프를 관찰해 조기 감지"가 효과적입니다. 아래 코드는 wait-for graph에서 사이클을 탐지하는 최소 예제입니다.
+
+```python
+from collections import defaultdict
+
+class DeadlockDetector:
+    def __init__(self):
+        self.graph = defaultdict(set)  # A -> B : A가 B가 가진 락을 기다림
+
+    def wait(self, waiter, owner):
+        self.graph[waiter].add(owner)
+
+    def release_wait(self, waiter, owner):
+        self.graph[waiter].discard(owner)
+
+    def has_cycle(self):
+        visited, stack = set(), set()
+
+        def dfs(node):
+            visited.add(node)
+            stack.add(node)
+            for nxt in self.graph[node]:
+                if nxt not in visited and dfs(nxt):
+                    return True
+                if nxt in stack:
+                    return True
+            stack.remove(node)
+            return False
+
+        return any(dfs(n) for n in list(self.graph) if n not in visited)
+
+
+d = DeadlockDetector()
+d.wait('T1', 'T2')
+d.wait('T2', 'T3')
+d.wait('T3', 'T1')
+print('deadlock?', d.has_cycle())  # True
+```
+
+운영 환경에서는 락 획득 시도/성공/해제 이벤트를 로그 스트림으로 수집해 그래프를 만들면, 실제 데드락 직전 패턴을 탐지할 수 있습니다.
+
+### 락 설계 표준 규약 예시
+
+1. 락 순서 전역 규약: `L_user -> L_order -> L_inventory`
+2. 락 타임아웃 기본값: 200ms
+3. 임계 구역 내 I/O 금지
+4. 예외 경로에서 반드시 해제(`with`, `try/finally`)
+
+이 네 규약만 지켜도 데드락과 락 호송(lock convoy) 빈도를 크게 낮출 수 있습니다.
+
+
+## 심화 실습: 운영체제 문제를 계층별로 좁히는 워크북
+
+실무에서 운영체제 문제는 보통 "느리다", "가끔 멈춘다", "재시작하면 잠깐 괜찮다"처럼 모호한 문장으로 시작합니다. 이때 중요한 것은 추측을 늘리는 것이 아니라, 관찰 단위를 줄여서 재현 가능한 사실로 바꾸는 일입니다. 아래 워크북은 CPU 스케줄링, 메모리 압박, 시스템 콜 패턴, 파일 시스템 내구성, 락 경합을 같은 순서로 점검하도록 구성했습니다.
+
+### 1) 증상 분류: 실행 대기인가, I/O 대기인가
+
+```bash
+vmstat 1
+pidstat -w -p <PID> 1
+iostat -xz 1
+```
+
+- `r`(run queue)가 길고 `wa`가 낮으면 CPU 경쟁이 중심입니다.
+- `wa`가 높고 디스크 지연이 길면 I/O 병목 가능성이 큽니다.
+- 컨텍스트 스위치(`cs`)가 급증하면 락 경합이나 과도한 타임슬라이스 분할을 의심합니다.
+
+이 단계의 목표는 "CPU가 부족하다" 같은 포괄 진단이 아니라, "CPU runnable 대기"와 "디스크 대기"를 명확히 분리하는 것입니다.
+
+### 2) 메모리 계층 점검: RSS, 페이지 폴트, 스왑
+
+```bash
+cat /proc/<PID>/status | grep -E "VmRSS|VmSize|Threads"
+cat /proc/<PID>/stat | awk '{print "minflt=" $10 ", majflt=" $12}'
+free -h
+cat /proc/swaps
+```
+
+- `majflt` 증가: 디스크에서 페이지를 자주 가져오는 상태입니다.
+- 스왑 사용 증가: 워킹셋이 물리 메모리를 넘어 응답성이 무너지기 쉬운 상태입니다.
+- 스레드 수 급증 + RSS 증가: 스택 증가와 큐 적체를 같이 확인해야 합니다.
+
+메모리 이슈는 OOM 시점보다 그 이전 신호를 보는 것이 중요합니다. RSS만 보면 늦고, 페이지 폴트와 스왑 추세를 같이 봐야 앞단에서 대응할 수 있습니다.
+
+### 3) 시스템 콜 트레이스: 호출 의미를 비용으로 읽기
+
+```bash
+strace -f -tt -T -c -p <PID>
+```
+
+요약표에서 자주 보는 패턴:
+- `read`/`write` 호출 수 과다: 버퍼링 단위가 너무 작을 가능성
+- `futex` 비중 과다: 락 경합, 임계 구역 과대
+- `epoll_wait` 비중 높음: 이벤트 대기 중심 workload
+- `openat`/`close` 반복 과다: 핸들 재사용 부족
+
+시스템 콜 추적은 "언어 런타임 이슈"를 "커널 경계 비용"으로 번역해 줍니다. 이 번역이 되면 코드 수정 지점이 훨씬 구체적으로 보입니다.
+
+### 4) 스케줄링 정책을 간단 모델로 검증
+
+아래처럼 작은 작업 집합을 만들어 정책 차이를 먼저 머리로 검증해 두면, 실제 서비스 지표 해석이 쉬워집니다.
+
+```text
+작업 집합: A(도착0,실행6), B(도착1,실행2), C(도착2,실행1)
+
+FCFS:
+0      6  8 9
+|---A---|-B|-C|
+평균 대기시간 = (0 + 5 + 6) / 3 = 3.67
+
+SRTF:
+0 1 3 4     9
+|A|B|C|--A--|
+평균 대기시간 = (3 + 0 + 1) / 3 = 1.33
+```
+
+서비스가 인터랙티브 중심이면 짧은 작업 응답성 개선이 체감 품질을 좌우합니다. 반대로 배치 중심이면 컨텍스트 스위치 감소와 처리량 안정성이 더 중요할 수 있습니다.
+
+### 5) 파일 시스템 안정성 검증 시나리오
+
+저장 코드는 정상 흐름이 아니라 비정상 종료를 기준으로 검증해야 합니다.
+
+검증 순서:
+1. 임시 파일에 기록
+2. `fsync(fd)`
+3. `rename`
+4. 부모 디렉터리 `fsync(dirfd)`
+
+이 절차를 지키면 전원 장애나 프로세스 크래시에서도 "부분 파일" 위험을 크게 줄일 수 있습니다. 운영체제는 내구성을 제공하지만, 애플리케이션이 내구성 경계를 정확히 호출해 주어야 보장이 성립합니다.
+
+### 6) 데드락과 락 경합을 구분해서 대응
+
+데드락은 진행이 완전히 멈추고, 락 경합은 진행은 되지만 매우 느린 상태입니다. 둘은 대응이 다릅니다.
+
+- 데드락 대응: 락 획득 순서 전역 규약, 타임아웃, 순환 대기 탐지
+- 경합 대응: 임계 구역 단축, 락 분할, 공유 상태 축소, 큐 기반 전달
+
+```text
+T1: lock(A) -> wait(B)
+T2: lock(B) -> wait(A)
+=> 순환 대기, 데드락
+```
+
+대부분의 서비스 장애는 완전 데드락보다 "느린 경합" 형태로 나타납니다. `futex` 비중, 대기 큐 길이, p95 지연시간을 함께 보면 판별이 쉽습니다.
+
+### 7) 컨테이너 환경에서 반드시 추가할 관찰 항목
+
+컨테이너에서는 호스트와 보이는 값이 다를 수 있으므로 cgroup 파일을 직접 읽어야 합니다.
+
+```bash
+cat /sys/fs/cgroup/memory.max
+cat /sys/fs/cgroup/memory.current
+cat /sys/fs/cgroup/cpu.max
+cat /proc/1/cgroup
+```
+
+- `memory.max` 대비 `memory.current` 추세로 OOM 위험을 예측합니다.
+- `cpu.max` 쿼터가 낮으면 runnable 상태여도 실제 처리량이 제한됩니다.
+- PID 1 처리(signal, zombie reap) 상태를 확인합니다.
+
+컨테이너 문제는 애플리케이션 버그와 리소스 격리 정책이 겹쳐 보이는 경우가 많기 때문에, OS 계층과 cgroup 계층을 동시에 보아야 합니다.
+
+### 8) 장애 보고서에 남겨야 할 최소 증거
+
+문제를 재현 가능하게 만들려면 지표 스냅샷을 표준 형식으로 남겨야 합니다.
+
+- 시간: 관찰 시작/종료 시각
+- CPU: `vmstat`, `pidstat -w`
+- 메모리: `/proc/<pid>/status`, major/minor fault
+- 시스템 콜: `strace -c` 상위 10개
+- 파일/저장: `fsync` 유무, 쓰기 단위, 저장 방식(덮어쓰기/원자적 교체)
+- 동기화: 락 순서, 임계 구역 길이, 타임아웃 정책
+
+이 여섯 항목만 확보해도 "느리다"는 제보를 재현 가능한 기술 보고서로 바꿀 수 있습니다.
+
+### 9) 운영체제 학습을 코드 리뷰 기준으로 연결하기
+
+운영체제 지식은 문답형 지식으로 끝나면 금방 사라집니다. 코드 리뷰 체크리스트로 연결해야 팀의 습관으로 남습니다.
+
+- 시스템 콜 경계: 작은 read/write 반복이 없는가
+- 메모리 상한: 캐시에 용량/회수 정책이 있는가
+- 동기화 경계: 락 순서 규약이 문서화되어 있는가
+- 내구성 경계: 원자적 저장 절차를 따르는가
+- 관찰 가능성: `/proc`, strace, 메트릭으로 검증 가능한가
+
+이 체크리스트를 PR 템플릿에 넣으면 운영체제 개념이 설계 단계에서 바로 작동합니다.
+
+### 10) 한 줄 정리
+
+운영체제는 배경지식이 아니라, 성능/안정성/보안 문제를 분해하는 좌표계입니다. 좌표계가 있으면 같은 장애도 더 짧은 시간에 더 정확하게 해결할 수 있습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **뮤텍스, 재진입 락, 세마포어, 조건 변수는 무엇이 다를까요?**
@@ -346,6 +540,7 @@ strace -f -c -p <pid>
 
 ## 참고 자료
 
+- [Operating Systems 101 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/operating-systems-101/ko)
 - [Tanenbaum & Bos — Modern Operating Systems](https://www.pearson.com/store/p/modern-operating-systems/P100000869539)
 - [The Art of Multiprocessor Programming — Herlihy & Shavit](https://www.elsevier.com/books/the-art-of-multiprocessor-programming/herlihy/978-0-12-415950-1)
 - [Java Concurrency in Practice — Brian Goetz](https://jcip.net/)

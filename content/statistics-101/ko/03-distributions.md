@@ -22,6 +22,8 @@ last_reviewed: '2026-05-12'
 
 # Statistics 101 (3/10): 분포
 
+이 글은 Statistics 101 시리즈의 3번째 글입니다.
+
 평균이 같은 두 데이터셋이 완전히 다른 행동을 보이는 경우는 흔합니다. 하나는 값이 고르게 모여 있고, 다른 하나는 일부 값이 아주 멀리 튀어 있을 수 있습니다. 숫자 하나만 같다고 데이터의 성격까지 같다고 볼 수 없는 이유가 여기에 있습니다.
 
 통계에서 분포는 데이터가 어떤 모양으로 퍼져 있는지를 말합니다. 이 모양을 제대로 읽어야 평균, 검정, 신뢰구간, SLA 같은 모든 후속 판단이 제자리를 찾습니다.
@@ -77,11 +79,11 @@ last_reviewed: '2026-05-12'
 
 많은 통계 기법은 정규성 가정을 전제로 합니다. t-검정, ANOVA, 선형회귀 모두 잔차가 정규분포를 따른다고 가정합니다. 만약 데이터가 긴 꼬리를 가지면 이런 기법들은 신뢰구간을 잘못 계산하거나 검정력이 떨어질 수 있습니다. 그럴 때는 비모수 검정(Mann-Whitney U, Kruskal-Wallis)이나 로그 변환을 고려해야 합니다.
 
-### 분포가 SLA와 알림 기준을 결정합니다
+### 분포가 서비스수준와 알림 기준을 결정합니다
 
 정규분포라면 평균 ± 2σ 구간에 95%가 들어가므로 평균 기준 관리가 가능합니다. 하지만 긴 꼬리 분포라면 평균은 대부분 사용자 경험을 대표하지 못하고, p95나 p99 같은 분위수 기준이 필요합니다. Datadog, Grafana, New Relic 같은 모니터링 도구가 평균보다 p95/p99를 강조하는 이유가 여기에 있습니다.
 
-## Python으로 분포 그리고 검증하기
+## 파이썬으로 분포 그리고 검증하기
 
 ```python
 import numpy as np
@@ -226,6 +228,216 @@ skew=+2.3, kurt=+8 → long-tail. SLA = p95 = 900ms.
 
 다음 글에서는 표본과 모집단을 다룹니다. 분포를 읽은 뒤에는 이제 일부 데이터를 보고 전체를 얼마나 말할 수 있는지가 다음 질문이 됩니다.
 
+## 분포 진단 심화: 시각화와 검정을 함께 사용하기
+
+분포는 그래프만으로 판단하거나 검정만으로 판단하면 오판 가능성이 커집니다. 시각화와 수치 검정을 함께 써야 안전합니다.
+
+### 추천 진단 순서
+
+1. 히스토그램으로 큰 모양 확인
+2. 박스플롯으로 이상치와 사분위수 확인
+3. 로그 스케일 히스토그램으로 꼬리 구조 확인
+4. Q-Q 플롯으로 정규성 근사 확인
+5. Shapiro 또는 D'Agostino 검정으로 수치 확인
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+rng = np.random.default_rng(0)
+x = np.r_[rng.lognormal(mean=4.2, sigma=0.6, size=1800), rng.lognormal(mean=6.0, sigma=0.4, size=200)]
+
+fig, ax = plt.subplots(1, 3, figsize=(15, 4))
+ax[0].hist(x, bins=60, edgecolor='black')
+ax[0].set_title('원본 히스토그램')
+
+ax[1].hist(np.log(x), bins=60, edgecolor='black')
+ax[1].set_title('로그 변환 히스토그램')
+
+stats.probplot(np.log(x), dist='norm', plot=ax[2])
+ax[2].set_title('로그 변환 Q-Q 플롯')
+plt.tight_layout()
+plt.show()
+
+k2, p = stats.normaltest(np.log(x))
+print(f"정규성 검정 p-value(로그 변환 후): {p:.4f}")
+```
+
+로그 변환 후 정규성 근사가 좋아지면 평균 기반 추정과 선형모형 적용이 더 안정적입니다. 변환 전후를 나란히 보여 주면 팀 합의가 빨라집니다.
+
+
+## 실무 확장 노트: 재현 가능한 분석 문서 만들기
+
+통계 글을 읽고 난 뒤 실제 업무에서 가장 먼저 부딪히는 문제는 "같은 분석을 다시 실행할 수 있는가"입니다. 재현 가능성이 없으면 숫자가 맞아도 신뢰를 얻기 어렵습니다. 그래서 통계 작업은 계산 코드뿐 아니라 입력 데이터 스냅샷, 버전, 시드, 가정 문장을 함께 남겨야 합니다.
+
+### 1) 입력 데이터 스냅샷 고정
+
+```python
+import pandas as pd
+from pathlib import Path
+
+raw = pd.read_csv('analysis_input.csv')
+Path('artifacts').mkdir(exist_ok=True)
+raw.to_parquet('artifacts/input_snapshot.parquet', index=False)
+print(raw.shape)
+```
+
+데이터 파이프라인이 바뀌면 같은 쿼리라도 다른 결과가 나올 수 있습니다. 그래서 분석 시점의 스냅샷을 남기는 습관이 중요합니다.
+
+### 2) 전처리 규칙 문서화
+
+```python
+import numpy as np
+
+def preprocess(df):
+    out = df.copy()
+    out = out.dropna(subset=['metric'])
+    out = out[(out['metric'] >= 0) & (out['metric'] <= out['metric'].quantile(0.999))]
+    out['segment'] = out['segment'].fillna('unknown')
+    return out
+```
+
+이상치 제거, 결측값 처리, 세그먼트 매핑은 결과를 크게 바꿉니다. 코드와 문서를 동시에 남겨야 이후 검토에서 혼선을 줄일 수 있습니다.
+
+### 3) 분포 진단 + 추정 + 검정을 한 화면에서 보고하기
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+x = np.random.default_rng(0).normal(100, 15, 600)
+y = np.random.default_rng(1).normal(103, 15, 600)
+
+fig, ax = plt.subplots(1, 2, figsize=(12, 4))
+ax[0].hist(x, bins=40, alpha=0.6, label='A')
+ax[0].hist(y, bins=40, alpha=0.6, label='B')
+ax[0].legend(); ax[0].set_title('분포 비교')
+
+ax[1].boxplot([x, y], labels=['A', 'B'])
+ax[1].set_title('사분위수 비교')
+plt.tight_layout(); plt.show()
+
+diff = y.mean() - x.mean()
+se = np.sqrt(x.var(ddof=1)/len(x) + y.var(ddof=1)/len(y))
+ci = (diff - 1.96*se, diff + 1.96*se)
+t, p = stats.ttest_ind(x, y, equal_var=False)
+print(f'diff={diff:.3f}, 95% CI={ci}, p={p:.4f}')
+```
+
+그래프와 수치를 분리하면 오해가 늘어납니다. 같은 섹션에서 함께 보여 주면 해석 품질이 올라갑니다.
+
+### 4) 효과 크기와 실행 기준 연결
+
+```python
+pooled = np.sqrt((x.var(ddof=1) + y.var(ddof=1)) / 2)
+cohens_d = (y.mean() - x.mean()) / pooled
+print(f"Cohen's d={cohens_d:.3f}")
+```
+
+p-value가 작아도 효과 크기가 매우 작다면 실행 우선순위가 낮을 수 있습니다. 반대로 p-value 경계선이더라도 효과 크기와 비용 구조가 유리하면 추가 실험으로 이어갈 가치가 있습니다.
+
+### 5) 결과 문장 표준화
+
+분석 결과는 다음 형식으로 정리하면 팀 의사결정이 빨라집니다.
+
+- 관찰 차이: 절대값과 상대값을 모두 표기합니다.
+- 불확실성: 95% 신뢰구간과 표본 수를 함께 표기합니다.
+- 유의성: 검정 방법과 p-value를 표기합니다.
+- 실행 판단: 배포/보류/추가실험 중 하나를 명시합니다.
+
+통계는 결국 팀의 공통 언어를 만드는 일입니다. 재현 가능한 분석 문서를 남기면 개인의 직관이 아니라 조직의 기준으로 의사결정을 반복할 수 있습니다.
+
+
+## 추가 메모: 검증 가능한 의사결정 문장
+
+분석 결과를 보고할 때는 "좋아 보입니다" 같은 모호한 문장을 피하고, 기준과 근거를 한 줄에 함께 적는 것이 좋습니다. 예를 들어 "전환율 +0.6%p, 95% 신뢰구간 +0.1~+1.1%p, p=0.014, 월간 기대효과 +320건, 2주 재검증 조건부 배포"처럼 쓰면 의사결정 책임이 명확해집니다. 이런 형식은 통계 도구가 바뀌어도 유지되는 팀 자산입니다.
+
+
+## 실무 확장 노트: 재현 가능한 분석 문서 만들기
+
+통계 글을 읽고 난 뒤 실제 업무에서 가장 먼저 부딪히는 문제는 "같은 분석을 다시 실행할 수 있는가"입니다. 재현 가능성이 없으면 숫자가 맞아도 신뢰를 얻기 어렵습니다. 그래서 통계 작업은 계산 코드뿐 아니라 입력 데이터 스냅샷, 버전, 시드, 가정 문장을 함께 남겨야 합니다.
+
+### 1) 입력 데이터 스냅샷 고정
+
+```python
+import pandas as pd
+from pathlib import Path
+
+raw = pd.read_csv('analysis_input.csv')
+Path('artifacts').mkdir(exist_ok=True)
+raw.to_parquet('artifacts/input_snapshot.parquet', index=False)
+print(raw.shape)
+```
+
+데이터 파이프라인이 바뀌면 같은 쿼리라도 다른 결과가 나올 수 있습니다. 그래서 분석 시점의 스냅샷을 남기는 습관이 중요합니다.
+
+### 2) 전처리 규칙 문서화
+
+```python
+import numpy as np
+
+def preprocess(df):
+    out = df.copy()
+    out = out.dropna(subset=['metric'])
+    out = out[(out['metric'] >= 0) & (out['metric'] <= out['metric'].quantile(0.999))]
+    out['segment'] = out['segment'].fillna('unknown')
+    return out
+```
+
+이상치 제거, 결측값 처리, 세그먼트 매핑은 결과를 크게 바꿉니다. 코드와 문서를 동시에 남겨야 이후 검토에서 혼선을 줄일 수 있습니다.
+
+### 3) 분포 진단 + 추정 + 검정을 한 화면에서 보고하기
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+x = np.random.default_rng(0).normal(100, 15, 600)
+y = np.random.default_rng(1).normal(103, 15, 600)
+
+fig, ax = plt.subplots(1, 2, figsize=(12, 4))
+ax[0].hist(x, bins=40, alpha=0.6, label='A')
+ax[0].hist(y, bins=40, alpha=0.6, label='B')
+ax[0].legend(); ax[0].set_title('분포 비교')
+
+ax[1].boxplot([x, y], labels=['A', 'B'])
+ax[1].set_title('사분위수 비교')
+plt.tight_layout(); plt.show()
+
+diff = y.mean() - x.mean()
+se = np.sqrt(x.var(ddof=1)/len(x) + y.var(ddof=1)/len(y))
+ci = (diff - 1.96*se, diff + 1.96*se)
+t, p = stats.ttest_ind(x, y, equal_var=False)
+print(f'diff={diff:.3f}, 95% CI={ci}, p={p:.4f}')
+```
+
+그래프와 수치를 분리하면 오해가 늘어납니다. 같은 섹션에서 함께 보여 주면 해석 품질이 올라갑니다.
+
+### 4) 효과 크기와 실행 기준 연결
+
+```python
+pooled = np.sqrt((x.var(ddof=1) + y.var(ddof=1)) / 2)
+cohens_d = (y.mean() - x.mean()) / pooled
+print(f"Cohen's d={cohens_d:.3f}")
+```
+
+p-value가 작아도 효과 크기가 매우 작다면 실행 우선순위가 낮을 수 있습니다. 반대로 p-value 경계선이더라도 효과 크기와 비용 구조가 유리하면 추가 실험으로 이어갈 가치가 있습니다.
+
+### 5) 결과 문장 표준화
+
+분석 결과는 다음 형식으로 정리하면 팀 의사결정이 빨라집니다.
+
+- 관찰 차이: 절대값과 상대값을 모두 표기합니다.
+- 불확실성: 95% 신뢰구간과 표본 수를 함께 표기합니다.
+- 유의성: 검정 방법과 p-value를 표기합니다.
+- 실행 판단: 배포/보류/추가실험 중 하나를 명시합니다.
+
+통계는 결국 팀의 공통 언어를 만드는 일입니다. 재현 가능한 분석 문서를 남기면 개인의 직관이 아니라 조직의 기준으로 의사결정을 반복할 수 있습니다.
+
+
 ## 처음 질문으로 돌아가기
 
 - **데이터의 분포 모양은 왜 중요한가요?**
@@ -258,7 +470,7 @@ skew=+2.3, kurt=+8 → long-tail. SLA = p95 = 900ms.
 - [Wikipedia — Power Law](https://en.wikipedia.org/wiki/Power_law)
 - [Brendan Gregg — Latency Distributions](https://www.brendangregg.com/blog/2014-06-23/latency-heat-maps.html)
 
-### Q-Q Plot으로 정규성 진단하기
+### 큐큐 플롯으로 정규성 진단하기
 
 Q-Q plot(Quantile-Quantile plot)은 데이터의 분위수와 이론적 정규분포의 분위수를 비교하는 그래프입니다. 데이터가 정규분포를 따르면 점들이 대각선 위에 일직선으로 놓입니다.
 
@@ -320,4 +532,7 @@ print(f"로그 변환 후 평균: {np.log(data).mean():.2f}, 중앙값: {np.medi
 ```
 
 로그 변환 후에는 평균과 중앙값이 가까워지고 히스토그램도 대칭에 가까워집니다. 이렇게 변환한 뒤 t-검정이나 회귀분석을 적용하면 정규성 가정을 만족하기 쉬워집니다.
+
+- [이 시리즈의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/statistics-101/ko)
+
 Tags: Statistics, Distribution, Normal, Skew, Beginner

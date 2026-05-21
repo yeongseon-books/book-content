@@ -238,6 +238,227 @@ asyncio.run(main())
 
 또한 운영체제 추상화가 완전하지 않다는 사실을 압니다. 가상 메모리는 무한해 보이지만 실제 RAM과 swap에는 한계가 있고, 파일 시스템은 단순한 폴더 트리처럼 보여도 inode와 mount 경계가 있습니다. 운영 버그는 늘 그 가장자리에서 커집니다.
 
+
+### 프로세스 상태 전이 다이어그램
+
+운영체제에서 프로세스는 다섯 가지 주요 상태를 오갑니다.
+
+```text
+                    ┌─────────────────────────────────────┐
+                    │                                     │
+                    ▼                                     │
+┌──────┐  fork  ┌──────┐  dispatch  ┌──────────┐        │
+│ New  │ ─────→ │Ready │ ─────────→ │ Running  │        │
+└──────┘        └──────┘            └──────────┘        │
+                  ▲   ▲                │  │  │          │
+                  │   │    preempt     │  │  │          │
+                  │   └────────────────┘  │  │          │
+                  │                       │  │  exit    │
+                  │   I/O complete        │  │    ┌─────────┐
+                  │                       │  └──→│Terminated│
+                  │     ┌──────────┐      │      └─────────┘
+                  └─────│ Blocked  │←─────┘
+                        │(Waiting) │  I/O request
+                        └──────────┘
+```
+
+| 상태 | 설명 | 전이 조건 |
+|------|------|-----------|
+| New | 프로세스 생성 중 | fork/exec 호출 |
+| Ready | CPU 할당 대기 | 스케줄러 큐에 진입 |
+| Running | CPU에서 실행 중 | dispatch(스케줄러 선택) |
+| Blocked | I/O 또는 이벤트 대기 | read/recv/sleep 등 |
+| Terminated | 실행 완료 또는 강제 종료 | exit/signal |
+
+### CPU 스케줄링 알고리즘 비교
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class Process:
+    name: str
+    arrival: int    # 도착 시각
+    burst: int      # CPU 버스트 시간
+    remaining: int = 0
+
+    def __post_init__(self):
+        self.remaining = self.burst
+
+def fcfs(processes: list[Process]) -> list[tuple[str, int, int]]:
+    """First-Come First-Served 스케줄링"""
+    timeline = []
+    current_time = 0
+    for p in sorted(processes, key=lambda x: x.arrival):
+        start = max(current_time, p.arrival)
+        end = start + p.burst
+        timeline.append((p.name, start, end))
+        current_time = end
+    return timeline
+
+def sjf(processes: list[Process]) -> list[tuple[str, int, int]]:
+    """Shortest Job First (비선점)"""
+    remaining = sorted(processes, key=lambda x: x.arrival)
+    timeline = []
+    current_time = 0
+    done = []
+
+    while remaining:
+        available = [p for p in remaining if p.arrival <= current_time]
+        if not available:
+            current_time = remaining[0].arrival
+            continue
+        shortest = min(available, key=lambda x: x.burst)
+        remaining.remove(shortest)
+        start = current_time
+        end = start + shortest.burst
+        timeline.append((shortest.name, start, end))
+        current_time = end
+    return timeline
+
+# 예시 프로세스
+procs = [
+    Process("P1", arrival=0, burst=6),
+    Process("P2", arrival=1, burst=3),
+    Process("P3", arrival=2, burst=1),
+    Process("P4", arrival=3, burst=4),
+]
+
+print("FCFS 스케줄링:")
+for name, start, end in fcfs(procs):
+    print(f"  {name}: {start}-{end} (대기: {start - next(p.arrival for p in procs if p.name == name)})")
+
+print("\nSJF 스케줄링:")
+for name, start, end in sjf(procs):
+    print(f"  {name}: {start}-{end}")
+```
+
+| 알고리즘 | 장점 | 단점 | 사용처 |
+|----------|------|------|--------|
+| FCFS | 구현 단순, 기아 없음 | 호위 효과(큰 작업이 뒤를 막음) | 배치 시스템 |
+| SJF | 평균 대기 시간 최소 | 긴 작업 기아, 버스트 예측 필요 | 이론적 최적 |
+| Round Robin | 응답 시간 균등 | 타임 퀀텀 선택이 성능 결정 | 범용 시분할 |
+| Priority | 중요 작업 우선 | 낮은 우선순위 기아 | 실시간 시스템 |
+| CFS (Linux) | 공정 CPU 분배 | 복잡한 구현 | Linux 커널 |
+
+Linux의 CFS(Completely Fair Scheduler)는 레드-블랙 트리로 가상 실행 시간이 가장 적은 프로세스를 O(log n)에 선택합니다.
+
+### 동기화 기본 요소와 교착 상태
+
+멀티스레드 프로그램에서 공유 자원을 보호하는 기본 도구들입니다.
+
+```python
+import threading
+import time
+
+# 경쟁 조건 시연
+counter = 0
+
+def increment_unsafe():
+    global counter
+    for _ in range(100_000):
+        counter += 1  # read-modify-write가 원자적이지 않음
+
+threads = [threading.Thread(target=increment_unsafe) for _ in range(4)]
+for t in threads: t.start()
+for t in threads: t.join()
+print(f"예상: 400,000 / 실제: {counter}")  # 대부분 400,000보다 작음
+
+# Lock으로 해결
+counter = 0
+lock = threading.Lock()
+
+def increment_safe():
+    global counter
+    for _ in range(100_000):
+        with lock:
+            counter += 1
+
+threads = [threading.Thread(target=increment_safe) for _ in range(4)]
+for t in threads: t.start()
+for t in threads: t.join()
+print(f"예상: 400,000 / 실제: {counter}")  # 정확히 400,000
+```
+
+교착 상태(deadlock)는 네 가지 조건이 모두 성립할 때 발생합니다.
+
+| 조건 | 설명 | 방지 전략 |
+|------|------|-----------|
+| 상호 배제 | 자원을 한 번에 하나만 사용 | 공유 가능한 자원으로 변경 |
+| 점유 대기 | 자원을 갖고 다른 자원을 요청 | 모든 자원을 한 번에 요청 |
+| 비선점 | 강제로 빼앗지 못함 | 타임아웃 후 반환 |
+| 순환 대기 | 환형으로 서로를 기다림 | 자원에 순서를 부여 |
+
+실무에서는 데이터베이스 트랜잭션 교착 상태가 흔합니다. PostgreSQL은 `deadlock_timeout`(기본 1초) 후 하나의 트랜잭션을 강제 롤백해 풀어줍니다.
+
+### 파일 시스템 내부 구조
+
+파일을 열고 쓸 때 OS 내부에서 벌어지는 일을 단계별로 추적합니다.
+
+```text
+사용자: open("data.txt", O_WRONLY)
+  │
+  ├─→ VFS (Virtual File System): 파일 시스템 종류 판별
+  │     └─→ ext4 드라이버: inode 조회
+  │           └─→ 디렉터리 엔트리에서 inode 번호 검색
+  │                 └─→ inode 로드 (소유자, 권한, 블록 포인터)
+  │
+  ├─→ 파일 디스크립터 할당 (프로세스별 fd 테이블에 등록)
+  │
+사용자: write(fd, buf, 4096)
+  │
+  ├─→ 페이지 캐시에 쓰기 (메모리에만 반영, dirty page)
+  │
+  └─→ (나중에) pdflush/writeback이 디스크에 반영
+```
+
+`fsync(fd)` 호출 전까지는 데이터가 메모리에만 있을 수 있습니다. 정전 시 데이터 유실을 방지하려면 중요한 쓰기 후 반드시 `fsync`를 호출해야 합니다. 데이터베이스가 WAL(Write-Ahead Log)을 먼저 기록하는 이유도 이 때문입니다.
+
+### 시스템 콜과 컨텍스트 스위치 비용
+
+사용자 프로그램이 OS 기능을 사용하려면 시스템 콜을 통해 커널 모드로 전환해야 합니다.
+
+```text
+사용자 모드                           커널 모드
+─────────────────────────────────────────────────────
+프로그램 실행 ──→ syscall 명령 ──→ 커널 진입
+                 (레지스터 저장)    (핸들러 실행)
+                                   (결과 생성)
+프로그램 재개 ←── sysret 명령 ←── 커널 복귀
+                 (레지스터 복원)
+```
+
+시스템 콜 하나의 오버헤드는 약 100-1000 ns입니다. 네트워크 서버가 `epoll`로 수천 개 소켓을 하나의 시스템 콜로 처리하는 이유는 이 비용을 줄이기 위해서입니다.
+
+컨텍스트 스위치(프로세스 전환)는 더 비쌉니다.
+
+| 전환 유형 | 비용 | 이유 |
+|-----------|------|------|
+| 스레드 전환 (같은 프로세스) | ~1-5 μs | 레지스터 + 스택 포인터만 교체 |
+| 프로세스 전환 | ~5-30 μs | + 페이지 테이블 교체 + TLB 플러시 |
+| VM 전환 (가상 머신) | ~50-200 μs | + VMCS 저장/복원 |
+
+이 비용을 줄이기 위해 Linux 커널은 프로세스 전환 시 TLB를 완전히 비우지 않고 PCID(Process Context ID)를 사용해 이전 매핑을 일부 유지합니다.
+
+### 컨테이너와 OS 가상화
+
+Docker 같은 컨테이너는 VM과 달리 호스트 커널을 공유합니다.
+
+| 구분 | 가상 머신 | 컨테이너 |
+|------|-----------|----------|
+| 격리 수준 | 하드웨어 수준 (하이퍼바이저) | OS 수준 (namespace + cgroup) |
+| 부팅 시간 | 수십 초 | 수백 ms |
+| 메모리 오버헤드 | 수백 MB (게스트 OS) | 수 MB |
+| 보안 격리 | 강함 | 커널 취약점 공유 위험 |
+
+Linux namespace가 격리하는 자원:
+- **PID**: 프로세스 ID 공간 분리
+- **NET**: 네트워크 인터페이스, IP, 포트 분리
+- **MNT**: 파일 시스템 마운트 포인트 분리
+- **USER**: UID/GID 매핑 분리
+- **IPC**: 공유 메모리, 세마포어 분리
+
+cgroup은 CPU, 메모리, I/O 등 자원 사용량의 상한을 설정합니다. Kubernetes가 Pod에 리소스 제한을 거는 것이 cgroup의 직접적 활용입니다.
 ## 체크리스트
 
 - [ ] 프로세스와 스레드의 차이를 메모리 관점에서 설명할 수 있는가
@@ -282,12 +503,11 @@ asyncio.run(main())
 ## 처음 질문으로 돌아가기
 
 - **하나의 머신에서 많은 프로그램이 동시에 실행되는 것처럼 보이는 이유는 무엇일까요?**
-  - 본문의 기준은 운영체제를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - CPU 스케줄러가 밀리초 단위로 프로세스를 전환(context switch)하기 때문입니다. Round Robin이나 CFS 같은 알고리즘이 각 프로세스에 타임 슬라이스를 배분하고, 사람이 인지하지 못할 정도로 빠르게 교대하므로 동시 실행처럼 보입니다.
 - **프로세스와 스레드는 메모리와 격리 측면에서 어떻게 다를까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 프로세스는 독립된 가상 주소 공간을 가져 서로의 메모리를 직접 접근할 수 없습니다. 스레드는 같은 프로세스 내에서 힙과 코드 영역을 공유하되 각자의 스택만 분리합니다. 공유 메모리 덕에 스레드 간 통신이 빠르지만, 동기화 없이 접근하면 경쟁 조건이 발생합니다.
 - **가상 메모리는 왜 필요한 추상화일까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
-
+  - 각 프로세스에 연속된 주소 공간을 제공해 프로그래밍을 단순화하고, 물리 메모리보다 큰 공간을 사용할 수 있게 합니다. 동시에 프로세스 간 메모리를 격리해 한 프로세스의 버그가 다른 프로세스를 망가뜨리지 않도록 보호합니다.
 <!-- toc:begin -->
 ## 시리즈 목차
 
@@ -311,4 +531,5 @@ asyncio.run(main())
 - [Linux man-pages — system calls](https://man7.org/linux/man-pages/dir_section_2.html)
 - [Andrew Tanenbaum — Modern Operating Systems](https://www.pearson.com/en-us/subject-catalog/p/modern-operating-systems/P200000003311)
 
+- [이 시리즈의 예제 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/computer-science-101/ko)
 Tags: Computer Science, 운영체제, 프로세스, 스레드, 가상 메모리, 동시성

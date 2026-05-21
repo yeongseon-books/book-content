@@ -75,7 +75,7 @@ flowchart LR
 - **Lost Update**: 두 트랜잭션이 같은 행을 동시에 갱신해 한쪽 변경이 사라지는 현상입니다.
 - **MVCC**: 한 행의 여러 버전을 유지해 읽기와 쓰기가 서로를 덜 막도록 하는 방식입니다.
 
-## Before/After
+## 변경 전/변경 후
 
 **Before — wrong isolation: balance debited twice**
 
@@ -117,7 +117,7 @@ c1.commit()
 
 두 세션이 같은 데이터를 동시에 만지는 상황을 의도적으로 만들기 위한 준비입니다.
 
-### 2단계 — Lost Update 재현
+### 2단계 — 갱신 손실 재현
 
 ```python
 c1.execute("BEGIN")
@@ -133,7 +133,7 @@ print(c1.execute("SELECT n FROM counter").fetchone())  # 1, not 2
 
 두 세션 모두 0을 읽고 각자 1을 썼기 때문에, 한 번의 증가가 사라졌습니다.
 
-### 3단계 — SELECT ... FOR UPDATE로 막기
+### 3단계 — 잠금 조회로 막기
 
 ```python
 # PostgreSQL
@@ -147,7 +147,7 @@ print(c1.execute("SELECT n FROM counter").fetchone())  # 1, not 2
 
 명시적 행 잠금은 두 세션을 사실상 직렬화해 Lost Update를 막는 가장 흔한 도구입니다.
 
-### 4단계 — REPEATABLE READ의 일관 읽기
+### 4단계 — 반복 가능 읽기의 일관성
 
 ```sql
 -- T1
@@ -163,7 +163,7 @@ COMMIT;
 
 REPEATABLE READ에서는 트랜잭션 시작 시점의 스냅샷을 계속 봅니다. PostgreSQL은 이를 MVCC로 구현해 읽기와 쓰기가 서로를 덜 막도록 만듭니다.
 
-### 5단계 — SERIALIZABLE의 비용
+### 5단계 — 직렬화 가능 수준의 비용
 
 ```sql
 -- T1, T2 both SERIALIZABLE.
@@ -246,7 +246,7 @@ ON orders (user_id, status, created_at DESC);
 
 핵심은 **필터링 컬럼을 앞쪽에**, 정렬 컬럼을 그다음에 배치하는 것입니다. 이렇게 하면 WHERE와 ORDER BY를 동시에 만족해 추가 정렬 비용을 줄일 수 있습니다.
 
-### 2) EXPLAIN으로 계획 비교하기
+### 2) 실행 계획 비교하기
 
 ```sql
 EXPLAIN ANALYZE
@@ -295,7 +295,7 @@ def create_order(db: sqlite3.Connection, user_id: int, amount: int) -> None:
 
 이 패턴의 의도는 명확합니다. 주문 생성과 재고 차감을 **하나의 원자 단위**로 묶고, 조건이 맞지 않으면 전체를 되돌립니다. 트랜잭션 안에서 외부 API 호출을 하지 않는 것도 중요합니다. 잠금 시간이 길어지면 동시성 충돌이 급격히 늘어납니다.
 
-### 4) 운영에서 자주 쓰는 진단 SQL
+### 4) 운영에서 자주 쓰는 진단 질의문
 
 ```sql
 -- 값 분포 확인(선택성 감각)
@@ -325,6 +325,156 @@ WHERE user_id = 42 AND status = 'paid';
 
 결론적으로 데이터베이스 튜닝은 “인덱스를 늘린다”가 아니라 “실행 계획을 읽고, 트랜잭션 경계를 짧게 유지하고, 분포를 근거로 선택한다”의 반복입니다.
 
+## 격리 수준 데모: 같은 데이터, 다른 결과
+
+아래는 `READ COMMITTED`에서 발생 가능한 갱신 충돌 예시입니다.
+
+```sql
+-- 트랜잭션 A
+BEGIN;
+SELECT balance FROM accounts WHERE id = 1; -- 100
+-- 애플리케이션 계산 후
+UPDATE accounts SET balance = 90 WHERE id = 1;
+COMMIT;
+
+-- 트랜잭션 B(거의 동시에)
+BEGIN;
+SELECT balance FROM accounts WHERE id = 1; -- 100
+UPDATE accounts SET balance = 80 WHERE id = 1;
+COMMIT;
+```
+
+두 트랜잭션이 서로의 계산 근거를 모른 채 커밋하면 마지막 쓰기만 남는 문제가 생길 수 있습니다. 이를 줄이기 위해 아래처럼 잠금 읽기를 사용합니다.
+
+```sql
+BEGIN;
+SELECT balance FROM accounts WHERE id = 1 FOR UPDATE;
+UPDATE accounts SET balance = balance - 10 WHERE id = 1;
+COMMIT;
+```
+
+## 다중 버전 동시성 제어 관찰 포인트
+
+MVCC 환경에서는 읽기와 쓰기가 버전 단위로 분리됩니다. 같은 시점 스냅샷을 기준으로 읽기 때문에, 읽기 트랜잭션이 쓰기 트랜잭션을 과도하게 막지 않습니다. 다만 오래 열린 트랜잭션은 정리 대상 버전을 붙잡아 저장소 팽창을 유발할 수 있으므로 운영 기준이 필요합니다.
+
+- 트랜잭션 최대 유지 시간을 정합니다.
+- 배치 작업은 구간을 나눠 짧게 커밋합니다.
+- 격리 수준 변경은 반드시 부하 테스트와 함께 검증합니다.
+
+## 실전 운영 점검표
+
+운영 환경에서 데이터베이스 품질을 안정적으로 유지하려면, 기능 개발과 별개로 점검 루틴을 명확하게 가져가야 합니다. 아래 항목은 서비스 규모와 상관없이 바로 적용할 수 있는 기준입니다.
+
+- 변경 전에는 항상 기준 지표를 남깁니다. 평균 지연 시간, P95, P99, 초당 트랜잭션 수, 잠금 대기 시간 같은 숫자를 캡처해 둬야 변경 이후를 비교할 수 있습니다.
+- 쿼리 튜닝은 SQL 문장 자체보다 실행 계획의 변화를 중심으로 추적합니다. 계획 노드가 바뀌었는지, 예상 행 수와 실제 행 수의 차이가 커졌는지, 정렬이나 해시가 디스크로 내려갔는지를 우선 확인합니다.
+- 스키마 변경은 단계적으로 진행합니다. 컬럼 추가, 백필, 코드 전환, 제약 강화 순서로 나누면 장애 반경을 줄일 수 있습니다.
+- 장애 대응 문서는 운영자가 밤중에도 바로 실행할 수 있는 형태여야 합니다. 복구 절차, 롤백 절차, 검증 SQL을 같은 문서에 둬야 실제 상황에서 흔들리지 않습니다.
+
+아래 예시는 팀이 릴리스 전후에 반복적으로 실행하는 최소 점검 SQL입니다.
+
+```sql
+-- 최근 10분 동안 느린 쿼리 확인(엔진별 뷰 이름은 다를 수 있음)
+SELECT query, calls, mean_exec_time, rows
+FROM pg_stat_statements
+ORDER BY mean_exec_time DESC
+LIMIT 20;
+
+-- 잠금 대기 체인 확인
+SELECT now(), pid, wait_event_type, wait_event, state, query
+FROM pg_stat_activity
+WHERE wait_event_type IS NOT NULL;
+
+-- 인덱스 사용률 점검
+SELECT relname AS table_name, seq_scan, idx_scan
+FROM pg_stat_user_tables
+ORDER BY seq_scan DESC
+LIMIT 20;
+```
+
+이 점검 루틴을 자동화 파이프라인에 연결하면, 성능 저하를 "느낌"이 아니라 "증거"로 관리할 수 있습니다. 결국 장기 운영에서 중요한 것은 뛰어난 한 번의 튜닝이 아니라, 작은 검증을 꾸준히 반복해 위험을 조기에 감지하는 습관입니다.
+## 운영 리허설 시나리오
+
+문서만 읽고 끝내면 운영에서 다시 같은 실수를 반복하기 쉽습니다. 아래 시나리오는 팀 온보딩과 장애 대응 훈련에 바로 사용할 수 있는 공통 리허설 절차입니다.
+
+### 시나리오 1: 느려진 조회 원인 찾기
+
+1. 문제 쿼리를 식별합니다. 애플리케이션 로그의 요청 식별자와 데이터베이스 쿼리 로그를 매칭합니다.
+2. 같은 파라미터로 `EXPLAIN ANALYZE`를 실행합니다.
+3. 계획 노드 중 시간이 큰 지점을 찾고, 해당 노드가 인덱스/통계/정렬 중 무엇과 관련 있는지 분류합니다.
+4. 개선안을 한 번에 하나만 적용합니다. 인덱스 추가, 통계 갱신, 질의문 재작성 가운데 하나만 바꿔 결과를 비교합니다.
+
+```text
+개선 전
+Seq Scan on events  (actual time=0.030..842.112 rows=12000)
+
+개선 후
+Index Scan using idx_events_tenant_created on events
+(actual time=0.041..21.553 rows=12000)
+```
+
+### 시나리오 2: 동시성 문제 재현과 완화
+
+1. 두 세션에서 같은 행을 거의 동시에 수정합니다.
+2. 격리 수준을 바꿔 가며 결과를 비교합니다.
+3. 필요하면 `FOR UPDATE` 잠금 조회 또는 낙관적 잠금 버전 컬럼을 적용합니다.
+4. 재시도 정책과 타임아웃 기준을 코드와 운영 문서에 같이 기록합니다.
+
+```sql
+-- 낙관적 잠금 예시
+UPDATE inventory
+SET qty = qty - 1, version = version + 1
+WHERE sku = 'A-100' AND version = 17;
+```
+
+영향 받은 행 수가 0이면 이미 다른 트랜잭션이 갱신한 것이므로, 재조회 후 재시도합니다. 이 패턴은 잠금 경합을 낮추면서도 정합성을 지키는 데 효과적입니다.
+
+### 시나리오 3: 복구 가능성 검증
+
+1. 최신 베이스 백업으로 테스트 인스턴스를 띄웁니다.
+2. 지정 시점까지 로그를 재적용합니다.
+3. 핵심 비즈니스 검증 SQL을 실행합니다.
+4. 복구 시간(RTO)과 데이터 유실 허용치(RPO)를 실제 숫자로 기록합니다.
+
+```sql
+-- 검증 SQL 예시
+SELECT COUNT(*) FROM orders WHERE created_at >= now() - interval '1 day';
+SELECT SUM(amount) FROM payments WHERE status = 'SUCCESS';
+SELECT COUNT(*) FROM users WHERE deleted_at IS NULL;
+```
+
+복구 리허설에서 가장 중요한 점은 성공 여부 자체보다, 누가 어떤 순서로 무엇을 확인했는지를 재현 가능하게 남기는 것입니다. 절차가 사람마다 다르면 실제 장애에서 속도와 품질이 동시에 무너집니다.
+
+## 체크리스트: 배포 전 최소 검증
+
+- 대표 조회 5개에 대해 실행 계획을 저장합니다.
+- 트랜잭션 경계가 긴 코드 경로를 식별합니다.
+- 잠금 대기 알람 임계치를 설정합니다.
+- 스키마 변경의 롤백 경로를 문서화합니다.
+- 백업 복구 리허설 최근 실행일을 확인합니다.
+
+이 체크리스트는 거창한 체계를 요구하지 않습니다. 작은 팀도 주 1회 반복하면 데이터 사고 빈도를 눈에 띄게 줄일 수 있습니다. 데이터베이스 운영의 본질은 "고급 기능을 많이 아는 것"이 아니라, "반복 가능한 검증 루프를 끊기지 않게 유지하는 것"입니다.
+
+
+## 추가 실습 기록 템플릿
+
+아래 템플릿은 팀 위키에 그대로 붙여 넣어 실습 결과를 남길 때 사용합니다.
+
+```text
+[실습 이름]
+- 실행 일시:
+- 실행 환경:
+- 입력 데이터 규모:
+- 대표 SQL:
+- EXPLAIN ANALYZE 핵심 노드:
+- 개선 전/후 실행 시간:
+- 적용 변경 사항:
+- 부작용 또는 주의점:
+- 다음 점검 항목:
+```
+
+실습 기록을 남기면 지식이 개인 경험으로 소모되지 않고 팀 자산으로 누적됩니다. 특히 실행 계획 캡처와 복구 절차 검증 결과를 함께 보관하면, 다음 장애 대응에서 판단 속도를 크게 높일 수 있습니다.
+
+
 ## 처음 질문으로 돌아가기
 
 - **고전적인 동시성 이상 현상 네 가지는 무엇일까요?**
@@ -352,6 +502,7 @@ WHERE user_id = 42 AND status = 'paid';
 
 ## 참고 자료
 
+- [database-systems-101 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/database-systems-101/ko)
 - [PostgreSQL — Transaction Isolation](https://www.postgresql.org/docs/current/transaction-iso.html)
 - [Jepsen — Consistency Models](https://jepsen.io/consistency)
 - [A Critique of ANSI SQL Isolation Levels (Berenson et al.)](https://www.microsoft.com/en-us/research/publication/a-critique-of-ansi-sql-isolation-levels/)

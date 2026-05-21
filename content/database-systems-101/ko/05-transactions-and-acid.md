@@ -76,7 +76,7 @@ flowchart LR
 - **영속성(Durability)**: 커밋된 변경이 전원 장애 이후에도 살아남는 성질입니다.
 - **WAL**: 데이터를 바꾸기 전에 변경 의도를 로그에 먼저 쓰는 방식으로, 복구의 토대입니다.
 
-## Before/After
+## 변경 전/변경 후
 
 **Before — transferring money without a transaction**
 
@@ -156,7 +156,7 @@ with sqlite3.connect("bank.db") as db:
 
 CHECK 제약이 깨지는 순간 트랜잭션 전체가 실패하고 롤백됩니다. 덕분에 잔액은 일관된 상태로 남습니다.
 
-### 4단계 — 명시적 ROLLBACK
+### 4단계 — 명시적 롤백
 
 ```python
 with sqlite3.connect("bank.db") as db:
@@ -169,7 +169,7 @@ with sqlite3.connect("bank.db") as db:
 
 ROLLBACK은 “BEGIN 이후의 변경을 모두 잊는다”는 뜻입니다. 데이터 파일에 반영되지 않은 것으로 되돌립니다.
 
-### 5단계 — Durability를 의식해 보기
+### 5단계 — 지속성 관점 점검
 
 ```python
 import sqlite3
@@ -254,7 +254,7 @@ ON orders (user_id, status, created_at DESC);
 
 핵심은 **필터링 컬럼을 앞쪽에**, 정렬 컬럼을 그다음에 배치하는 것입니다. 이렇게 하면 WHERE와 ORDER BY를 동시에 만족해 추가 정렬 비용을 줄일 수 있습니다.
 
-### 2) EXPLAIN으로 계획 비교하기
+### 2) 실행 계획 비교하기
 
 ```sql
 EXPLAIN ANALYZE
@@ -303,7 +303,7 @@ def create_order(db: sqlite3.Connection, user_id: int, amount: int) -> None:
 
 이 패턴의 의도는 명확합니다. 주문 생성과 재고 차감을 **하나의 원자 단위**로 묶고, 조건이 맞지 않으면 전체를 되돌립니다. 트랜잭션 안에서 외부 API 호출을 하지 않는 것도 중요합니다. 잠금 시간이 길어지면 동시성 충돌이 급격히 늘어납니다.
 
-### 4) 운영에서 자주 쓰는 진단 SQL
+### 4) 운영에서 자주 쓰는 진단 질의문
 
 ```sql
 -- 값 분포 확인(선택성 감각)
@@ -333,6 +333,150 @@ WHERE user_id = 42 AND status = 'paid';
 
 결론적으로 데이터베이스 튜닝은 “인덱스를 늘린다”가 아니라 “실행 계획을 읽고, 트랜잭션 경계를 짧게 유지하고, 분포를 근거로 선택한다”의 반복입니다.
 
+## 송금 시나리오로 보는 원자성과 지속성
+
+아래 예시는 송금 트랜잭션의 최소 형태입니다.
+
+```sql
+BEGIN;
+UPDATE accounts SET balance = balance - 10000 WHERE id = 1;
+UPDATE accounts SET balance = balance + 10000 WHERE id = 2;
+INSERT INTO transfer_history(from_id, to_id, amount) VALUES (1, 2, 10000);
+COMMIT;
+```
+
+중간에 장애가 나면 어떻게 될까요? DBMS는 WAL(쓰기 선행 로그)에 변경 의도를 먼저 기록하고, 커밋 시점에 내구성을 보장합니다. 그래서 일부 문장만 반영된 찢어진 상태를 방지할 수 있습니다.
+
+```text
+WAL 개념 흐름
+1) 변경 전후 정보 기록
+2) 커밋 레코드 기록
+3) 장애 발생 시 WAL 재적용(REDO)
+4) 미완료 트랜잭션은 취소(UNDO)
+```
+
+## 트랜잭션 경계 설계 원칙
+
+- 하나의 트랜잭션은 하나의 비즈니스 불변식을 완결해야 합니다.
+- 네트워크 호출, 사용자 입력 대기 같은 느린 작업은 트랜잭션 밖으로 빼야 합니다.
+- 재시도 가능한 오류와 재시도하면 안 되는 오류를 분리해야 합니다.
+
+트랜잭션을 "SQL 묶음"이 아니라 "불변식 보호 경계"로 보는 팀이 운영 장애를 덜 겪습니다.
+
+## 실전 운영 점검표
+
+운영 환경에서 데이터베이스 품질을 안정적으로 유지하려면, 기능 개발과 별개로 점검 루틴을 명확하게 가져가야 합니다. 아래 항목은 서비스 규모와 상관없이 바로 적용할 수 있는 기준입니다.
+
+- 변경 전에는 항상 기준 지표를 남깁니다. 평균 지연 시간, P95, P99, 초당 트랜잭션 수, 잠금 대기 시간 같은 숫자를 캡처해 둬야 변경 이후를 비교할 수 있습니다.
+- 쿼리 튜닝은 SQL 문장 자체보다 실행 계획의 변화를 중심으로 추적합니다. 계획 노드가 바뀌었는지, 예상 행 수와 실제 행 수의 차이가 커졌는지, 정렬이나 해시가 디스크로 내려갔는지를 우선 확인합니다.
+- 스키마 변경은 단계적으로 진행합니다. 컬럼 추가, 백필, 코드 전환, 제약 강화 순서로 나누면 장애 반경을 줄일 수 있습니다.
+- 장애 대응 문서는 운영자가 밤중에도 바로 실행할 수 있는 형태여야 합니다. 복구 절차, 롤백 절차, 검증 SQL을 같은 문서에 둬야 실제 상황에서 흔들리지 않습니다.
+
+아래 예시는 팀이 릴리스 전후에 반복적으로 실행하는 최소 점검 SQL입니다.
+
+```sql
+-- 최근 10분 동안 느린 쿼리 확인(엔진별 뷰 이름은 다를 수 있음)
+SELECT query, calls, mean_exec_time, rows
+FROM pg_stat_statements
+ORDER BY mean_exec_time DESC
+LIMIT 20;
+
+-- 잠금 대기 체인 확인
+SELECT now(), pid, wait_event_type, wait_event, state, query
+FROM pg_stat_activity
+WHERE wait_event_type IS NOT NULL;
+
+-- 인덱스 사용률 점검
+SELECT relname AS table_name, seq_scan, idx_scan
+FROM pg_stat_user_tables
+ORDER BY seq_scan DESC
+LIMIT 20;
+```
+
+이 점검 루틴을 자동화 파이프라인에 연결하면, 성능 저하를 "느낌"이 아니라 "증거"로 관리할 수 있습니다. 결국 장기 운영에서 중요한 것은 뛰어난 한 번의 튜닝이 아니라, 작은 검증을 꾸준히 반복해 위험을 조기에 감지하는 습관입니다.
+## 운영 리허설 시나리오
+
+문서만 읽고 끝내면 운영에서 다시 같은 실수를 반복하기 쉽습니다. 아래 시나리오는 팀 온보딩과 장애 대응 훈련에 바로 사용할 수 있는 공통 리허설 절차입니다.
+
+### 시나리오 1: 느려진 조회 원인 찾기
+
+1. 문제 쿼리를 식별합니다. 애플리케이션 로그의 요청 식별자와 데이터베이스 쿼리 로그를 매칭합니다.
+2. 같은 파라미터로 `EXPLAIN ANALYZE`를 실행합니다.
+3. 계획 노드 중 시간이 큰 지점을 찾고, 해당 노드가 인덱스/통계/정렬 중 무엇과 관련 있는지 분류합니다.
+4. 개선안을 한 번에 하나만 적용합니다. 인덱스 추가, 통계 갱신, 질의문 재작성 가운데 하나만 바꿔 결과를 비교합니다.
+
+```text
+개선 전
+Seq Scan on events  (actual time=0.030..842.112 rows=12000)
+
+개선 후
+Index Scan using idx_events_tenant_created on events
+(actual time=0.041..21.553 rows=12000)
+```
+
+### 시나리오 2: 동시성 문제 재현과 완화
+
+1. 두 세션에서 같은 행을 거의 동시에 수정합니다.
+2. 격리 수준을 바꿔 가며 결과를 비교합니다.
+3. 필요하면 `FOR UPDATE` 잠금 조회 또는 낙관적 잠금 버전 컬럼을 적용합니다.
+4. 재시도 정책과 타임아웃 기준을 코드와 운영 문서에 같이 기록합니다.
+
+```sql
+-- 낙관적 잠금 예시
+UPDATE inventory
+SET qty = qty - 1, version = version + 1
+WHERE sku = 'A-100' AND version = 17;
+```
+
+영향 받은 행 수가 0이면 이미 다른 트랜잭션이 갱신한 것이므로, 재조회 후 재시도합니다. 이 패턴은 잠금 경합을 낮추면서도 정합성을 지키는 데 효과적입니다.
+
+### 시나리오 3: 복구 가능성 검증
+
+1. 최신 베이스 백업으로 테스트 인스턴스를 띄웁니다.
+2. 지정 시점까지 로그를 재적용합니다.
+3. 핵심 비즈니스 검증 SQL을 실행합니다.
+4. 복구 시간(RTO)과 데이터 유실 허용치(RPO)를 실제 숫자로 기록합니다.
+
+```sql
+-- 검증 SQL 예시
+SELECT COUNT(*) FROM orders WHERE created_at >= now() - interval '1 day';
+SELECT SUM(amount) FROM payments WHERE status = 'SUCCESS';
+SELECT COUNT(*) FROM users WHERE deleted_at IS NULL;
+```
+
+복구 리허설에서 가장 중요한 점은 성공 여부 자체보다, 누가 어떤 순서로 무엇을 확인했는지를 재현 가능하게 남기는 것입니다. 절차가 사람마다 다르면 실제 장애에서 속도와 품질이 동시에 무너집니다.
+
+## 체크리스트: 배포 전 최소 검증
+
+- 대표 조회 5개에 대해 실행 계획을 저장합니다.
+- 트랜잭션 경계가 긴 코드 경로를 식별합니다.
+- 잠금 대기 알람 임계치를 설정합니다.
+- 스키마 변경의 롤백 경로를 문서화합니다.
+- 백업 복구 리허설 최근 실행일을 확인합니다.
+
+이 체크리스트는 거창한 체계를 요구하지 않습니다. 작은 팀도 주 1회 반복하면 데이터 사고 빈도를 눈에 띄게 줄일 수 있습니다. 데이터베이스 운영의 본질은 "고급 기능을 많이 아는 것"이 아니라, "반복 가능한 검증 루프를 끊기지 않게 유지하는 것"입니다.
+
+
+## 추가 실습 기록 템플릿
+
+아래 템플릿은 팀 위키에 그대로 붙여 넣어 실습 결과를 남길 때 사용합니다.
+
+```text
+[실습 이름]
+- 실행 일시:
+- 실행 환경:
+- 입력 데이터 규모:
+- 대표 SQL:
+- EXPLAIN ANALYZE 핵심 노드:
+- 개선 전/후 실행 시간:
+- 적용 변경 사항:
+- 부작용 또는 주의점:
+- 다음 점검 항목:
+```
+
+실습 기록을 남기면 지식이 개인 경험으로 소모되지 않고 팀 자산으로 누적됩니다. 특히 실행 계획 캡처와 복구 절차 검증 결과를 함께 보관하면, 다음 장애 대응에서 판단 속도를 크게 높일 수 있습니다.
+
+
 ## 처음 질문으로 돌아가기
 
 - **트랜잭션은 정확히 무엇이며 왜 필요할까요?**
@@ -360,6 +504,7 @@ WHERE user_id = 42 AND status = 'paid';
 
 ## 참고 자료
 
+- [database-systems-101 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/database-systems-101/ko)
 - [PostgreSQL — Transactions](https://www.postgresql.org/docs/current/tutorial-transactions.html)
 - [SQLite — Transactions](https://www.sqlite.org/lang_transaction.html)
 - [Designing Data-Intensive Applications — Chapter 7](https://dataintensive.net/)

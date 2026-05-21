@@ -195,16 +195,303 @@ jobs:
 다음 글에서는 이 그래프가 언제 실행돼야 하는지, 즉 트리거 설계를 다룹니다. 좋은 잡 구조도 적절한 시점에만 실행될 때 비로소 가치가 있습니다.
 
 
-## 워크플로 설계를 코드로 구체화하기
 
-워크플로우 품질은 "한 번 돌아간다"가 아니라 "변경이 누적돼도 의도를 유지한다"로 판단해야 합니다. 아래 예시는 테스트, 린트, 빌드를 분리해 실패 지점을 빠르게 찾는 구성입니다.
+---
+
+## 잡 분해 기준을 구체적으로 세워 보겠습니다
+
+"잡을 어떻게 나눌까?"는 직관만으로는 답이 나오지 않습니다. 실무에서는 다음 네 가지 기준이 유용합니다.
+
+**기준 1 — 실패 격리**: 린트 실패와 테스트 실패는 원인이 다릅니다. 한 잡에 넣으면 "어디서 깨졌는지"를 로그에서 찾아야 하고, 나누면 실패한 잡 이름만으로 원인을 좁힐 수 있습니다.
+
+**기준 2 — 실행 환경**: 린트는 Python만 있으면 되지만 빌드는 Docker가 필요할 수 있습니다. 실행 환경이 다르면 잡을 분리하는 편이 자연스럽습니다.
+
+**기준 3 — 병렬화 가능성**: 서로 결과를 공유하지 않는 작업은 병렬로 돌릴 수 있습니다. 잡을 나누면 GitHub Actions가 자동으로 병렬 실행하므로 전체 시간이 줄어듭니다.
+
+**기준 4 — 재실행 범위**: 잡 단위로 재실행이 가능합니다. 테스트는 통과했는데 배포만 실패했다면, 배포 잡만 다시 돌릴 수 있습니다. 하나의 잡에 모든 것이 들어 있으면 처음부터 다시 실행해야 합니다.
+
+이 기준을 표로 정리하면 아래와 같습니다.
+
+| 분리 기준 | 한 잡 유지 | 분리 추천 |
+| --- | --- | --- |
+| 실패 원인 | 같은 종류 | 다른 종류 |
+| 실행 환경 | 동일 | 다름 |
+| 병렬화 | 순서 의존 있음 | 독립적 |
+| 재실행 | 항상 함께 재실행 OK | 부분 재실행 필요 |
+
+---
+
+## `needs`로 만드는 잡 그래프의 실전 패턴
+
+단순한 직렬 체인(`A → B → C`)은 이해하기 쉽지만, 실무에서는 더 복잡한 패턴이 필요합니다. 자주 보이는 세 가지 패턴을 정리하겠습니다.
+
+### 팬아웃 / 팬인 패턴
 
 ```yaml
-name: ci
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: ruff check .
+
+  test-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: pytest tests/unit -q
+
+  test-integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: pytest tests/integration -q
+
+  build:
+    needs: [lint, test-unit, test-integration]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: python -m build
+```
+
+세 개의 검증 잡이 병렬로 실행되고(팬아웃), 모두 성공해야 빌드가 시작됩니다(팬인). 이 패턴은 검증 종류를 늘려도 전체 실행 시간이 가장 긴 잡에 맞춰지므로, 개별 잡 시간만 관리하면 됩니다.
+
+### 조건부 잡 패턴
+
+```yaml
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: pytest -q
+
+  deploy-staging:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: ./scripts/deploy.sh staging
+
+  deploy-production:
+    needs: deploy-staging
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v6
+      - run: ./scripts/deploy.sh production
+```
+
+`if:` 조건은 잡 그래프의 분기를 만듭니다. PR에서는 테스트만 돌고, main push에서는 스테이징까지, 태그 push에서만 프로덕션 배포가 실행됩니다. 같은 워크플로우 파일 하나로 여러 시나리오를 처리할 수 있습니다.
+
+### 매트릭스 + needs 조합 패턴
+
+```yaml
+jobs:
+  test:
+    strategy:
+      matrix:
+        python: ["3.11", "3.12"]
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+      - run: pytest -q
+
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: python -m build
+      - run: twine upload dist/*
+```
+
+`needs: test`는 매트릭스의 모든 조합이 성공해야 다음 잡이 시작된다는 뜻입니다. 4개 조합 중 하나라도 실패하면 publish는 실행되지 않습니다. 이 동작은 매트릭스를 안전장치로 쓸 수 있게 해 줍니다.
+
+---
+
+## `outputs`를 활용한 잡 간 데이터 전달 심화
+
+잡 사이에 값을 넘길 때 자주 만나는 패턴과 주의점을 정리하겠습니다.
+
+```yaml
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.get-tag.outputs.tag }}
+      should-deploy: ${{ steps.check.outputs.deploy }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - id: get-tag
+        run: |
+          TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+
+      - id: check
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  build:
+    needs: version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: |
+          echo "Building version: ${{ needs.version.outputs.tag }}"
+          docker build -t app:${{ needs.version.outputs.tag }} .
+
+  deploy:
+    needs: [version, build]
+    if: needs.version.outputs.should-deploy == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Deploying ${{ needs.version.outputs.tag }}"
+```
+
+이 패턴에서 주의할 점 세 가지입니다.
+
+1. **outputs는 항상 문자열입니다.** 불리언처럼 보이는 `'true'`도 실제로는 문자열이므로, `if:` 조건에서 `== 'true'`로 비교해야 합니다.
+2. **한 잡의 outputs는 `needs`로 연결된 잡에서만 접근 가능합니다.** `needs`에 명시하지 않은 잡에서는 다른 잡의 outputs를 읽을 수 없습니다.
+3. **큰 데이터는 아티팩트로 넘깁니다.** outputs는 짧은 문자열에 적합하고, 빌드 결과물이나 리포트는 `actions/upload-artifact`와 `actions/download-artifact`를 사용해야 합니다.
+
+---
+
+## 매트릭스 비용 통제 전략
+
+매트릭스는 강력하지만 조합이 커지면 비용이 빠르게 불어납니다. 실무에서 비용을 통제하는 방법을 정리하겠습니다.
+
+```yaml
+strategy:
+  fail-fast: true
+  matrix:
+    python: ["3.11", "3.12"]
+    os: [ubuntu-latest]
+    include:
+      - python: "3.12"
+        os: macos-latest
+    exclude:
+      - python: "3.10"
+        os: macos-latest
+```
+
+**`fail-fast: true`**: 하나가 실패하면 나머지를 즉시 취소합니다. 비용을 줄이는 가장 직접적인 방법입니다. 다만 호환성 매트릭스에서는 모든 결과를 보고 싶을 수 있으므로 `false`가 나을 때도 있습니다.
+
+**`include`와 `exclude`**: 전체 조합 대신 필요한 조합만 추가하거나 불필요한 조합을 제거합니다. macOS 테스트가 특정 버전에서만 필요하다면 `include`로 한 조합만 추가하는 편이 효율적입니다.
+
+**PR vs main 분리**: PR에서는 최소 매트릭스(최신 Python + Ubuntu만)로 빠른 피드백을 주고, main push에서 전체 매트릭스를 실행하는 이중 구조가 일반적입니다.
+
+```yaml
+strategy:
+  matrix:
+    python: ${{ github.event_name == 'pull_request' && fromJSON('["3.12"]') || fromJSON('["3.10", "3.11", "3.12"]') }}
+```
+
+이 표현식은 PR에서는 Python 3.12만, push에서는 세 버전 모두를 테스트합니다. 동적 매트릭스는 복잡해 보이지만, 비용과 피드백 속도를 동시에 잡는 실무 기법입니다.
+
+---
+
+## 잡 간 아티팩트 전달
+
+outputs가 문자열에 적합하다면, 빌드 결과물이나 테스트 리포트 같은 파일은 아티팩트로 전달해야 합니다.
+
+```yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: python -m build
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dist
+          path: dist/
+          retention-days: 3
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          name: dist
+          path: dist/
+      - run: twine upload dist/*
+```
+
+아티팩트 사용 시 알아 두면 좋은 점입니다.
+
+- `retention-days`를 짧게 잡으면 스토리지 비용을 줄일 수 있습니다. CI 용도로는 1-3일이면 충분합니다.
+- 같은 워크플로우 실행 안에서만 아티팩트를 공유할 수 있습니다. 다른 워크플로우에서 가져오려면 `workflow_run` 이벤트를 사용해야 합니다.
+- 아티팩트 이름은 매트릭스에서 고유해야 합니다. `name: dist-${{ matrix.python }}`처럼 변수를 포함시켜야 덮어쓰기를 방지합니다.
+
+---
+
+## `concurrency`로 중복 실행 방지
+
+같은 PR에 빠르게 여러 커밋을 push하면 워크플로우가 여러 번 실행됩니다. 결과를 기다리지 않을 앞선 실행이 리소스를 차지하는 낭비를 `concurrency`로 막을 수 있습니다.
+
+```yaml
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+```
+
+이 설정은 같은 브랜치(또는 PR)에서 새 실행이 시작되면 이전 실행을 자동 취소합니다. 배포 잡에서는 `cancel-in-progress: false`를 써서 진행 중인 배포가 취소되지 않게 보호하는 편이 안전합니다.
+
+```yaml
+jobs:
+  deploy:
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    steps:
+      - run: ./scripts/deploy.sh
+```
+
+잡 수준에서 `concurrency`를 걸면 워크플로우 전체가 아니라 특정 잡만 직렬화할 수 있습니다. 테스트는 병렬로 돌되, 배포만 한 번에 하나씩 실행하는 구조가 가능합니다.
+
+---
+
+## 워크플로우 파일 구조화 패턴
+
+워크플로우 파일이 길어지면 관리가 어려워집니다. 실무에서 쓰는 구조화 패턴을 정리하겠습니다.
+
+**패턴 1 — 역할별 파일 분리**
+
+```text
+.github/workflows/
+├── ci.yml          # 테스트, 린트, 타입체크
+├── build.yml       # 빌드, 패키징
+├── deploy.yml      # 배포
+└── maintenance.yml # 의존성 업데이트, 정리 작업
+```
+
+**패턴 2 — Reusable workflow로 공통 로직 추출**
+
+```yaml
+# .github/workflows/reusable-test.yml
 on:
-  pull_request:
-  push:
-    branches: [main]
+  workflow_call:
+    inputs:
+      python-version:
+        required: true
+        type: string
 
 jobs:
   test:
@@ -213,110 +500,64 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
         with:
-          python-version: "3.11"
-      - run: pip install -r requirements.txt
-      - run: pytest -q
-
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - run: pip install ruff
-      - run: ruff check .
-
-  build:
-    runs-on: ubuntu-latest
-    needs: [test, lint]
-    steps:
-      - uses: actions/checkout@v6
-      - run: docker build -t app:${{ github.sha }} .
-```
-
-`needs`를 통해 의존 관계를 명시하면 "테스트 실패인데 빌드는 왜 돌았는가" 같은 혼선을 줄일 수 있습니다. 또한 잡을 분리하면 병렬 실행이 가능해 전체 피드백 시간이 짧아집니다.
-
-## Job Matrix로 중복을 줄이기
-
-동일한 작업을 여러 런타임에서 반복해야 한다면 matrix가 가장 실용적입니다. 아래 구성은 Python 버전과 운영체제를 조합해 호환성을 검증합니다.
-
-```yaml
-jobs:
-  test-matrix:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-        python-version: ["3.10", "3.11", "3.12"]
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
-        with:
-          python-version: ${{ matrix.python-version }}
-      - run: pip install -r requirements.txt
+          python-version: ${{ inputs.python-version }}
       - run: pytest -q
 ```
 
-`fail-fast: false`를 켜면 한 조합이 실패해도 나머지 조합 결과를 끝까지 수집할 수 있습니다. 라이브러리 호환성 이슈를 찾는 단계에서는 이 설정이 원인 파악 속도를 높입니다.
-
-## Secret 처리 원칙
-
-비밀값은 YAML 본문에 직접 넣지 않고 GitHub Secrets나 OIDC 기반 임시 자격 증명을 사용해야 합니다. 고정 토큰을 코드에 넣으면 회전, 감사, 권한 축소가 모두 어려워집니다.
-
 ```yaml
+# .github/workflows/ci.yml
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-    steps:
-      - uses: actions/checkout@v6
-      - name: Login to cloud with OIDC
-        run: ./scripts/oidc-login.sh
-      - name: Deploy
-        env:
-          API_BASE_URL: ${{ secrets.API_BASE_URL }}
-        run: ./scripts/deploy.sh
+  test-311:
+    uses: ./.github/workflows/reusable-test.yml
+    with:
+      python-version: "3.11"
+
+  test-312:
+    uses: ./.github/workflows/reusable-test.yml
+    with:
+      python-version: "3.12"
 ```
 
-실무에서는 다음 기준을 함께 둡니다.
+Reusable workflow는 잡 그래프 설계와 직접 연결됩니다. 공통 검증 로직을 한 곳에서 관리하면서도, 호출하는 쪽에서 `needs`로 의존성을 걸 수 있습니다. 이 패턴은 시리즈 후반부(10장)에서 더 자세히 다룹니다.
 
-- secret 이름은 목적 중심으로 명명해 누가 봐도 용도를 파악할 수 있게 합니다.
-- PR from fork에서는 secret이 기본적으로 주입되지 않으므로, 배포 잡을 분리하거나 조건문으로 차단합니다.
-- 로그에 비밀값이 노출되지 않도록 `set -x` 사용 구간을 제한하고, 민감 출력은 마스킹합니다.
-- 회전 주기를 문서화하고, 사용하지 않는 secret은 즉시 폐기합니다.
+---
 
-## 운영 안정성을 높이는 추가 패턴
+## 잡 실행 시간 최적화
 
-- `concurrency`를 사용해 같은 브랜치의 중복 배포를 자동 취소하면 롤백 리스크를 줄일 수 있습니다.
-- 캐시 키는 잠금 파일(`poetry.lock`, `requirements.txt`) 해시와 연결해 오염된 캐시 재사용을 막습니다.
-- 배포 잡은 `environment` 보호 규칙과 reviewer 승인을 함께 걸어 사고 범위를 줄입니다.
-- 실패 알림은 채널 하나에 몰지 말고, 서비스 소유 팀 라우팅 기준으로 분리해야 대응 시간이 짧아집니다.
+잡 그래프가 올바르게 설계됐더라도 개별 잡 실행 시간이 길면 전체 피드백이 느려집니다. 자주 쓰는 최적화 기법을 정리하겠습니다.
 
-이 구조를 먼저 잡아 두면 워크플로 파일이 길어져도 책임 경계가 무너지지 않고, CI/CD 품질을 지속적으로 개선하기 쉬워집니다.
-
-
-## 운영 체크포인트 보강
-
-워크플로를 길게 쓰는 것보다 더 중요한 것은 실패 원인을 빠르게 고립하는 구조입니다. 테스트 잡에서는 의존성 설치 시간을 측정하고, 배포 잡에서는 릴리스 노트와 커밋 SHA를 함께 남겨 추적성을 확보해야 합니다. 또한 `if: github.event_name == "pull_request"` 같은 조건식을 사용해 PR 검증과 main 배포를 분리하면 권한 오남용과 불필요한 실행 시간을 동시에 줄일 수 있습니다.
+| 기법 | 효과 | 적용 시점 |
+| --- | --- | --- |
+| 의존성 캐시 | 설치 시간 50-80% 절감 | 항상 |
+| checkout fetch-depth: 1 | clone 시간 단축 | git 이력 불필요 시 |
+| 매트릭스 최소화 | 잡 수 감소 | PR 검증 |
+| 조건부 스킵 | 불필요 실행 방지 | paths 필터 |
+| 병렬 테스트 | 테스트 시간 단축 | 테스트 수 많을 때 |
 
 ```yaml
-- name: Record build metadata
-  run: |
-    echo "sha=${GITHUB_SHA}" >> build-info.txt
-    echo "ref=${GITHUB_REF}" >> build-info.txt
+- uses: actions/checkout@v6
+  with:
+    fetch-depth: 1  # shallow clone
+
+- uses: actions/setup-python@v6
+  with:
+    python-version: "3.12"
+    cache: "pip"
+
+- run: pytest -q -n auto  # pytest-xdist 병렬 실행
 ```
 
-메타데이터 파일을 아티팩트로 보존해 두면 장애 회고에서 "어떤 실행 결과가 어느 커밋과 연결되는가"를 빠르게 확인할 수 있습니다.
+`fetch-depth: 1`은 가장 쉬운 최적화입니다. 대부분의 CI 잡에서는 최신 커밋만 있으면 되므로, 전체 이력을 가져올 필요가 없습니다. 다만 `git describe`나 changelog 생성처럼 이력이 필요한 잡에서는 `fetch-depth: 0`을 써야 합니다.
+
 
 ## 처음 질문으로 돌아가기
 
 - **Workflow, Job, Step은 각각 무엇을 담당할까요?**
-  - 본문의 기준은 Workflow와 Job를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - Workflow는 자동화의 바깥 틀로 "어떤 이벤트에서 무엇이 시작되는가"를 정합니다. Job은 병렬 실행되는 작업 단위로 실패 격리와 병렬성의 경계입니다. Step은 Job 안에서 순서대로 실행되는 개별 명령입니다. 설계할 때는 "이 작업이 독립 실행 가능한가"를 기준으로 Job 경계를 잡고, "이 명령이 앞 결과에 의존하는가"를 기준으로 Step 순서를 정하면 됩니다.
 - **`needs`는 왜 단순한 옵션이 아니라 파이프라인 설계 도구일까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - `needs`는 잡 사이에 방향 있는 그래프를 만들어, "무엇이 성공해야 다음이 시작되는가"라는 비즈니스 규칙을 코드로 표현합니다. 팬아웃/팬인, 조건부 배포, 매트릭스 게이트 같은 실무 패턴이 모두 `needs` 위에서 동작합니다. 잘못 설계하면 불필요한 직렬화로 시간이 낭비되고, 생략하면 실패한 검증 위에 배포가 올라가는 사고가 납니다.
 - **`matrix`는 언제 유용하고 언제 비용 폭탄이 될까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 매트릭스는 호환성 검증(여러 Python 버전, 여러 OS)에서 유용합니다. 비용 폭탄이 되는 순간은 조합을 무분별하게 곱할 때입니다. Python 3개 × OS 3개 × DB 2개 = 18개 잡이 동시에 돌면 비용도 18배입니다. PR에서는 최소 조합, main에서 전체 조합을 돌리는 이중 구조와 `fail-fast`, `include`/`exclude`로 범위를 통제하는 것이 실무 기본입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -340,5 +581,7 @@ jobs:
 - [Using jobs in a workflow](https://docs.github.com/actions/using-jobs/using-jobs-in-a-workflow)
 - [Using a matrix for jobs](https://docs.github.com/actions/using-jobs/using-a-matrix-for-your-jobs)
 - [Defining outputs for jobs](https://docs.github.com/actions/using-jobs/defining-outputs-for-jobs)
+- [Reusing workflows](https://docs.github.com/actions/using-workflows/reusing-workflows)
+- [book-examples 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/github-actions-101/ko)
 
 Tags: GitHubActions, Workflow, Job, Matrix, CICD

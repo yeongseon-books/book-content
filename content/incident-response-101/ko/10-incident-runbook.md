@@ -22,6 +22,8 @@ last_reviewed: '2026-05-15'
 
 # Incident Response 101 (10/10): Incident Runbook 만들기
 
+이 글은 Incident Response 101 시리즈의 마지막 글입니다.
+
 사고 대응 문서가 여기저기 흩어져 있으면 실제 incident 순간에는 거의 도움이 되지 않습니다. severity 표는 위키 한쪽에 있고, 온콜 일정은 다른 도구에 있고, 고객 공지 템플릿은 누군가의 개인 문서에 있고, postmortem 양식은 예전 링크 속에 숨어 있습니다.
 
 낮에는 찾을 수 있어도 새벽 3시에는 시작점조차 헷갈립니다. 좋은 runbook은 흩어진 지식을 한 저장소 안에서 바로 실행 가능한 흐름으로 묶어 둔 운영 인터페이스여야 합니다.
@@ -418,6 +420,94 @@ def runbook_health(has_sev_map: bool, has_oncall: bool, has_comms: bool, has_dri
 
 incident 대응 역량은 큰 시스템 교체보다 작은 반복 개선에서 올라갑니다. runbook, 메트릭, 훈련 시나리오, postmortem 루프를 연결해 "경험"을 "체계"로 바꾸면, 야간 incident에서도 대응 품질을 안정적으로 유지할 수 있습니다.
 
+## 런북 통합 템플릿(캡스톤)
+
+시리즈 마지막 단계에서는 앞에서 다룬 내용을 하나의 실행 템플릿으로 묶는 것이 중요합니다. 아래 템플릿은 incident 선언부터 종료까지 필요한 링크와 결정을 한 화면에서 보게 만드는 최소 형태입니다.
+
+```markdown
+# Incident Runbook: <service-name>
+
+## 1) Severity Matrix Link
+- ./sev-matrix.md
+
+## 2) On-call Contacts
+- primary:
+- secondary:
+- escalation:
+
+## 3) First 10 Minutes Checklist
+- [ ] page ack
+- [ ] incident channel open
+- [ ] role assignment (IC/Ops/Comms/Scribe)
+- [ ] first mitigation started
+- [ ] first customer update sent
+
+## 4) Communication Templates
+- ./comms/internal.md
+- ./comms/external.md
+- ./comms/exec.md
+
+## 5) Resolution Gates
+- error_ratio < 1% for 15 minutes
+- p95 latency recovered
+- no new critical alerts
+
+## 6) Postmortem Link
+- ./postmortems/template.md
+```
+
+핵심은 정보량이 아니라 연결성입니다. incident 중 필요한 문서가 runbook에서 한 번에 열려야 탐색 시간이 줄어듭니다.
+
+## 게임데이 운영 시나리오 템플릿
+
+| 항목 | 내용 |
+| --- | --- |
+| 목표 | 선언/완화/공지/기록 루프 검증 |
+| 시나리오 | 결제 API 오류율 급증 + 외부 의존성 지연 |
+| 성공 기준 | 10분 내 역할 배정, 30분 내 첫 고객 공지, timeline 12줄 이상 |
+| 회고 질문 | 어떤 링크가 끊겼는가, 어떤 단계가 느렸는가 |
+
+정기 게임데이를 통해 runbook을 실제 운영 인터페이스로 유지할 수 있습니다. 문서는 작성보다 갱신이 더 중요합니다.
+
+## 운영 부록: 런북 정기 점검 체크리스트
+
+- severity 매트릭스가 최신 incident 기준과 일치하는가?
+- 온콜 연락망과 escalation 체인이 현재 조직 구조와 맞는가?
+- 커뮤니케이션 템플릿의 링크가 모두 유효한가?
+- rollback/scale/throttle 명령이 실제 환경에서 실행 가능한가?
+- postmortem 템플릿과 티켓 연결 규칙이 유지되는가?
+
+## 운영 부록: 점검 기록 템플릿
+
+```text
+[runbook-review-log]
+reviewed_at_utc:
+reviewer:
+scope:
+broken_links:
+outdated_steps:
+required_updates:
+next_review_date:
+```
+
+런북은 작성보다 유지가 어렵습니다. 점검 로그를 남기면 "알고 있지만 미뤄진" 변경을 줄일 수 있습니다.
+
+## 런북 운영 추가 점검 항목
+
+아래 항목은 실무에서 바로 점검할 수 있는 추가 체크포인트입니다.
+
+- 체크포인트 1: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+
+```text
+[quick-audit]
+- declaration_latency_minutes:
+- first_update_latency_minutes:
+- mitigation_started_minutes:
+- recovery_verification_metrics:
+- postmortem_linked: true/false
+```
+
+
 ## 처음 질문으로 돌아가기
 
 - **incident 대응 지식을 왜 한 runbook으로 묶어야 할까요?**
@@ -452,6 +542,7 @@ incident 대응 역량은 큰 시스템 교체보다 작은 반복 개선에서 
 - [Game days - Azure Architecture Center](https://learn.microsoft.com/azure/architecture/framework/resiliency/testing)
 
 ### 예제 소스
+- [incident-response-101 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/incident-response-101/ko)
 - [incident-response-101 canonical source in book-content](https://github.com/yeongseon-books/book-content/tree/main/content/incident-response-101)
 
 Tags: Incident, Runbook, OnCall, Capstone, Operations

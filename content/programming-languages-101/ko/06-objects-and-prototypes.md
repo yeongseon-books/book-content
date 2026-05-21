@@ -279,6 +279,205 @@ def make_handlers() -> list:
 
 그래서 언어 기능 선택을 할 때는 "지금 빨리 쓰기 쉬운가"보다 "오류를 조기에 막는가"를 기준으로 삼아야 합니다. 타입 힌트를 강제하고, 클로저 캡처 규칙을 리뷰 체크리스트에 넣고, 공유 상태 대신 메시지 전달을 우선하면 코드가 길어지더라도 운영 리스크가 크게 줄어듭니다. 결과적으로 좋은 설계는 문법의 화려함이 아니라, 팀이 반복 실수 없이 같은 문제를 안정적으로 푸는 능력으로 측정됩니다.
 
+
+## 실무 앵커: 개념을 코드와 런타임으로 고정하기
+
+이 장에서 다룬 개념을 실무에서 재사용하려면, 문장 설명을 코드와 실행 흔적으로 고정해야 합니다. 아래 예시는 같은 문제를 여러 언어와 실행 맥락으로 비교해 개념 경계를 분명히 만드는 목적입니다.
+
+### 언어 비교 코드: Python, JavaScript, Go, Rust
+
+동일한 입력에서 짝수 값만 두 배로 만들고 합계를 계산하는 예시입니다. 핵심은 문법 차이가 아니라, 오류를 어디서 얼마나 일찍 막는지입니다.
+
+```python
+def sum_even_doubled(nums: list[int]) -> int:
+    return sum(n * 2 for n in nums if n % 2 == 0)
+
+print(sum_even_doubled([1, 2, 3, 4, 5, 6]))  # 24
+```
+
+```javascript
+function sumEvenDoubled(nums) {
+  return nums.filter((n) => n % 2 === 0).map((n) => n * 2).reduce((a, b) => a + b, 0);
+}
+
+console.log(sumEvenDoubled([1, 2, 3, 4, 5, 6])); // 24
+```
+
+```go
+package main
+
+import "fmt"
+
+func sumEvenDoubled(nums []int) int {
+    total := 0
+    for _, n := range nums {
+        if n%2 == 0 {
+            total += n * 2
+        }
+    }
+    return total
+}
+
+func main() {
+    fmt.Println(sumEvenDoubled([]int{1, 2, 3, 4, 5, 6})) // 24
+}
+```
+
+```rust
+fn sum_even_doubled(nums: &[i32]) -> i32 {
+    nums.iter()
+        .filter(|n| *n % 2 == 0)
+        .map(|n| n * 2)
+        .sum()
+}
+
+fn main() {
+    println!("{}", sum_even_doubled(&[1, 2, 3, 4, 5, 6])); // 24
+}
+```
+
+네 언어 모두 같은 답을 내지만, 타입 선언 강도, 표준 라이브러리 관용구, 에러 처리 문화가 다릅니다. 팀 기준을 세울 때는 성능 벤치마크보다 먼저, 리뷰 단계에서 실수를 드러내는 신호가 충분한지 확인하는 편이 안전합니다.
+
+### 타입 시스템 앵커: 실패를 어디서 잡는가
+
+아래 상황은 실무에서 자주 발생합니다. 문자열 숫자와 정수 숫자가 섞여 들어올 때, 파이프라인 초입에서 명시적으로 정규화하지 않으면 나중 단계에서 장애가 커집니다.
+
+```python
+from typing import Iterable
+
+def normalize(values: Iterable[str]) -> list[int]:
+    result: list[int] = []
+    for v in values:
+        result.append(int(v))
+    return result
+
+print(normalize(["1", "2", "3"]))
+```
+
+```typescript
+function normalize(values: string[]): number[] {
+  return values.map((v) => Number.parseInt(v, 10));
+}
+
+console.log(normalize(["1", "2", "3"]));
+```
+
+정적 타입 언어에서는 함수 경계에서 계약을 강하게 걸 수 있고, 동적 타입 언어에서는 런타임 검증 코드를 명시적으로 두는 습관이 중요합니다. 결론은 어느 쪽이 우월하냐가 아니라, 실패 지점을 팀이 의도적으로 앞당겼는가입니다.
+
+### 메모리 모델 다이어그램: 공유 상태의 책임 경계
+
+```text
+[Producer Goroutine/Thread]
+  write task -> queue
+       |
+       | happens-before 보장 지점
+       v
+[Queue Synchronization Boundary]
+       |
+       v
+[Consumer Goroutine/Thread]
+  read task -> process
+```
+
+동시성 결함 대부분은 계산 로직보다 경계 정의가 흐릴 때 생깁니다. 어떤 자료구조가 동기화 책임을 가지는지, 어느 호출 지점에서 메모리 가시성이 확보되는지를 코드 리뷰 항목으로 고정해야 재현 어려운 버그를 줄일 수 있습니다.
+
+### 간단 파서 구현 앵커: 구문과 의미를 분리하기
+
+토큰 배열을 받아 산술식 `NUM (+ NUM)*`를 계산하는 최소 파서 예시입니다.
+
+```python
+def parse_addition(tokens: list[str]) -> int:
+    if not tokens:
+        raise ValueError("empty")
+    total = int(tokens[0])
+    i = 1
+    while i < len(tokens):
+        op = tokens[i]
+        rhs = int(tokens[i + 1])
+        if op != "+":
+            raise ValueError(f"unexpected operator: {op}")
+        total += rhs
+        i += 2
+    return total
+
+print(parse_addition(["10", "+", "20", "+", "7"]))  # 37
+```
+
+이 구조의 핵심은 두 단계 분리입니다. 먼저 구문 오류를 검사하고, 그다음 의미 계산을 수행합니다. 이 원칙을 지키면 오류 메시지가 명확해지고, 연산자 우선순위나 괄호 지원 같은 확장을 추가하기 쉬워집니다.
+
+### REPL 세션 앵커: 실행 관찰 습관
+
+```text
+$ python3
+>>> from demo import parse_addition
+>>> parse_addition(["2", "+", "3"])
+5
+>>> parse_addition(["2", "*", "3"])
+Traceback (most recent call last):
+  ...
+ValueError: unexpected operator: *
+```
+
+REPL은 작은 단위 가설을 빠르게 검증하는 도구입니다. 문서로 정리한 개념과 실제 런타임 동작이 어긋나지 않는지 확인할 때, 테스트 코드 작성 전 첫 관찰 지점으로 활용하면 품질이 안정적으로 올라갑니다.
+
+### 적용 체크리스트
+
+- 입력 경계에서 타입과 형식을 정규화했는가
+- 공유 상태보다 메시지 경계가 먼저 보이도록 설계했는가
+- 파서/검증/실행 단계를 분리해 오류 원인을 즉시 설명할 수 있는가
+- REPL 또는 단위 테스트로 실패 사례를 먼저 고정했는가
+
+이 체크리스트는 특정 언어 문법보다 오래 갑니다. 새 언어를 배우더라도 같은 질문으로 코드를 점검하면, 기능 개발 속도를 유지하면서도 운영 안정성을 함께 끌어올릴 수 있습니다.
+
+
+
+## 실전 시나리오: 장애를 줄이는 언어 설계 점검
+
+현업에서 언어 개념을 배울 때 가장 빠른 방법은 장애 시나리오를 기준으로 역추적하는 것입니다. 아래는 주문 이벤트 처리 파이프라인을 가정한 점검 예시입니다. 핵심은 기능 구현보다 경계 확인입니다.
+
+```text
+입력(JSON) -> 역직렬화 -> 타입 검증 -> 규칙 실행 -> 상태 반영 -> 로그/메트릭
+```
+
+각 단계에서 질문을 고정하면 품질이 크게 올라갑니다. 역직렬화 단계에서는 필수 필드 누락을 즉시 중단하는가, 타입 검증 단계에서는 문자열/숫자 혼합을 허용하지 않는가, 규칙 실행 단계에서는 부수효과를 최소화했는가, 상태 반영 단계에서는 재시도 시 멱등성이 보장되는가를 확인해야 합니다.
+
+### 미니 구현: 입력 검증과 멱등 키
+
+```python
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class OrderEvent:
+    event_id: str
+    amount: int
+
+def parse_event(raw: dict) -> OrderEvent:
+    if "event_id" not in raw or "amount" not in raw:
+        raise ValueError("missing required field")
+    event_id = str(raw["event_id"]).strip()
+    amount = int(raw["amount"])
+    if amount < 0:
+        raise ValueError("amount must be >= 0")
+    return OrderEvent(event_id=event_id, amount=amount)
+```
+
+이 예시는 단순하지만 기준이 분명합니다. 입력을 받는 즉시 도메인 객체로 변환해 이후 단계의 가정을 안정화하고, `event_id`를 멱등 키로 사용해 중복 처리를 통제할 수 있습니다. 언어 기능 자체보다도, 타입 경계를 어디에서 확정하는지가 운영 안정성을 좌우합니다.
+
+### REPL 확인
+
+```text
+$ python3
+>>> from order_demo import parse_event
+>>> parse_event({"event_id": "ev-1", "amount": "120"})
+OrderEvent(event_id='ev-1', amount=120)
+>>> parse_event({"event_id": "ev-2", "amount": -1})
+Traceback (most recent call last):
+  ...
+ValueError: amount must be >= 0
+```
+
+짧은 REPL 검증을 반복하면 설계 문서의 문장이 실제 런타임에서 유지되는지 빠르게 확인할 수 있습니다. 이 습관이 쌓이면 언어를 바꿔도 문제 분석 속도와 리뷰 품질이 함께 유지됩니다.
+
 ## 처음 질문으로 돌아가기
 
 - **객체를 가장 간단히 정의하면 무엇일까요?**
@@ -310,5 +509,7 @@ def make_handlers() -> list:
 - [MDN — Inheritance and the prototype chain](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Inheritance_and_the_prototype_chain)
 - [Self: The Power of Simplicity (Ungar & Smith)](https://bibliography.selflanguage.org/_static/self-power.pdf)
 - [Composition over inheritance (Wikipedia)](https://en.wikipedia.org/wiki/Composition_over_inheritance)
+
+- [Programming Languages 101 실습 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/programming-languages-101/ko)
 
 Tags: Computer Science, Programming Languages, Objects, Prototype, Class, Inheritance

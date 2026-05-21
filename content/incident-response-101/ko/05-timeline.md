@@ -22,6 +22,8 @@ last_reviewed: '2026-05-15'
 
 # Incident Response 101 (5/10): Timeline 작성
 
+이 글은 Incident Response 101 시리즈의 다섯 번째 글입니다.
+
 incident가 끝난 뒤 가장 자주 벌어지는 일 중 하나는 기억이 서로 다르게 남는 일입니다. 모두가 같은 채널에 있었고 같은 로그를 봤다고 생각하지만, 며칠만 지나도 순서와 판단 근거가 흐려집니다.
 
 그래서 timeline은 사건이 끝난 뒤 쓰는 장식이 아니라, 대응 중에 함께 만들어 두는 기록 장치여야 합니다. 짧고 정확한 한 줄이 나중의 RCA와 postmortem 품질을 결정합니다.
@@ -283,6 +285,113 @@ timeline은 작성 후 품질 감사를 거쳐야 합니다. 기준은 간단합
 
 이 보강 메모를 남기는 목적은 분량을 늘리는 데 있지 않습니다. 기준을 사건 데이터와 연결해 "다음 대응의 입력"으로 쓰는 데 있습니다. 문서가 저장소 안에서 살아 있으려면 변경 이력, 검증 절차, 교육 루프가 함께 있어야 합니다. 결국 incident 대응 역량은 한 번의 완벽한 대응이 아니라, 같은 실수를 덜 반복하는 조직 습관에서 만들어집니다.
 
+## 타임라인 작성 템플릿과 품질 규칙
+
+timeline은 대응 품질의 원본 데이터입니다. 글로 잘 쓰는 것보다 누락 없이 남기는 것이 더 중요합니다. 아래 템플릿은 현장에서 그대로 복사해 쓰기 위한 최소 형식입니다.
+
+```text
+[timeline-entry]
+- ts_utc:
+- kind: fact | note | decision
+- source: pagerduty | slack | deploy | dashboard
+- message:
+- actor:
+```
+
+이 형식의 장점은 단순함입니다. 형식이 짧아야 대응 중에도 계속 입력할 수 있습니다. 긴 양식은 평시에는 좋아 보여도 incident 중에는 잘 지켜지지 않습니다.
+
+## 기준 시점(anchor) 표준
+
+| anchor | 정의 | 예시 |
+| --- | --- | --- |
+| detected | 이상 탐지 시점 | alert fired |
+| acknowledged | 온콜 확인 시점 | page ack |
+| mitigated | 고객 영향 감소 확인 시점 | error ratio < 1% |
+| resolved | 원인 제거 확인 시점 | permanent fix deployed |
+| closed | 후속 기록 연결 시점 | postmortem ticket linked |
+
+anchor를 고정하면 MTTA, MTTM, MTTR 계산이 쉬워집니다. 무엇보다 사건 간 비교가 가능해져 예방 투자 우선순위를 정하기 좋아집니다.
+
+## 기록 누락 방지 운영법
+
+1. Scribe를 별도 지정하고 5분마다 누락 항목을 점검합니다.
+2. 명령 실행자는 결과를 구두로 보고하고 Scribe가 표준 형식으로 기록합니다.
+3. 공지 발행 시점과 내용 요약도 반드시 동일 타임라인에 남깁니다.
+4. incident 종료 24시간 내 정합성 점검을 한 번 더 수행합니다.
+
+이 네 가지를 지키면 timeline이 postmortem의 부록이 아니라, 분석의 중심 데이터로 작동합니다.
+
+## 운영 부록: 타임라인 CSV 예시
+
+```text
+ts_utc,kind,source,actor,message
+2026-05-21T01:00:03Z,fact,pagerduty,system,alert fired checkout 5xx 7.1%
+2026-05-21T01:01:10Z,fact,pagerduty,primary,acknowledged page
+2026-05-21T01:03:02Z,fact,slack,IC,incident channel created
+2026-05-21T01:05:40Z,note,slack,ops,?suspect timeout regression
+2026-05-21T01:08:11Z,fact,deploy,ops,rollback started
+2026-05-21T01:14:45Z,fact,dashboard,system,error ratio below 1%
+```
+
+CSV 형태로 남기면 검색, 통계, 시각화가 쉬워집니다.
+
+## 운영 부록: 타임라인 품질 검사 규칙
+
+1. 모든 레코드는 UTC 표기를 사용합니다.
+2. kind가 fact/note/decision 중 하나인지 확인합니다.
+3. note는 물음표 접두사 또는 별도 kind로 표기합니다.
+4. anchor 시점(detected/acknowledged/mitigated/resolved)을 누락 없이 포함합니다.
+5. 고객 공지 이벤트를 별도 source로 남깁니다.
+
+## 운영 부록: 간단 검증 코드
+
+```python
+def validate_timeline(rows: list[dict]) -> list[str]:
+    errors = []
+    required = {"ts_utc", "kind", "source", "actor", "message"}
+    for i, row in enumerate(rows, start=1):
+        if not required.issubset(row):
+            errors.append(f"row {i}: missing required columns")
+        if row.get("kind") not in {"fact", "note", "decision"}:
+            errors.append(f"row {i}: invalid kind")
+        if "Z" not in row.get("ts_utc", ""):
+            errors.append(f"row {i}: timestamp must be UTC")
+    return errors
+```
+
+타임라인 검증 코드는 단순해도 충분합니다. 핵심은 기록 품질을 사람이 아닌 규칙으로 반복 점검하는 데 있습니다.
+
+## 타임라인 운영 추가 점검 항목
+
+아래 항목은 실무에서 바로 점검할 수 있는 추가 체크포인트입니다.
+
+- 체크포인트 1: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 2: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 3: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 4: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 5: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 6: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 7: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 8: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+
+```text
+[quick-audit]
+- declaration_latency_minutes:
+- first_update_latency_minutes:
+- mitigation_started_minutes:
+- recovery_verification_metrics:
+- postmortem_linked: true/false
+```
+
+
+## 운영 메모: 점검 루프
+
+운영 문서는 작성으로 끝나지 않습니다. 월간 점검 루프를 통해 선언 기준, 역할 분리, 공지 주기, 후속 조치 추적이 실제 incident에서 유지되는지 확인해야 합니다. 점검 결과는 다음 리허설 시나리오와 runbook 개정 항목으로 바로 연결하는 편이 좋습니다.
+
+운영팀은 이 점검 결과를 다음 주 온콜 브리핑에서 공유하고, 기준 변경이 있으면 같은 날 runbook과 템플릿을 함께 갱신해 문서-실행 간 시차를 줄여야 합니다.
+
+또한 월 1회 교차 리뷰를 통해 템플릿 문장, 보고 주기, 연락 체계가 실제 조직 변경을 반영하는지 확인하고, 변경 사항은 즉시 버전 이력으로 남겨야 합니다.
+
 ## 처음 질문으로 돌아가기
 
 - **incident가 끝난 뒤 무엇이 언제 일어났는지 어떻게 복원할까요?**
@@ -317,6 +426,7 @@ timeline은 작성 후 품질 감사를 거쳐야 합니다. 기준은 간단합
 - [OpenTelemetry Semantic Conventions](https://github.com/open-telemetry/semantic-conventions)
 
 ### 예제 소스
+- [incident-response-101 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/incident-response-101/ko)
 - [incident-response-101 canonical source in book-content](https://github.com/yeongseon-books/book-content/tree/main/content/incident-response-101)
 
 Tags: Incident, Timeline, Postmortem, Logging, Operations

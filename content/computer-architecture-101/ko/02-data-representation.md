@@ -68,7 +68,7 @@ float64 = | sign 1 bit | exponent 11 bits | mantissa 52 bits |
 | IEEE 754 | 부동소수점 국제 표준 |
 | 오버플로 | 표현 가능한 범위를 넘는 결과 |
 
-## Before / After
+## 적용 전과 후
 
 **Before — 표현 한계를 모르는 코드:**
 
@@ -229,135 +229,365 @@ print(big + small - big)   # 0.0  (the small value is absorbed)
 
 다음 글에서는 이 비트 위에서 실제로 일하는 주체인 CPU와 명령어를 봅니다. ISA가 무엇이고 CPU가 한 사이클에 무엇을 하는지 짚어보겠습니다.
 
-## 심화 실습: 비트 연산 · 캐시 계산 · 파이프라인 관찰
+## 심화 학습: 데이터 표현의 경계 조건과 실무 함정
 
-컴퓨터 구조를 실제로 이해하려면 정의를 암기하는 대신 숫자를 직접 계산해 보는 과정이 필요합니다. 같은 명령이라도 비트 표현, 메모리 계층, 파이프라인 충돌 조건을 동시에 보면 성능 병목의 원인이 선명해집니다.
+데이터 표현을 "변환 규칙 암기"로 끝내면 실제 버그를 못 잡습니다. 이 절에서는 경계 조건, 정밀도 손실, 엔디언 문제를 코드와 숫자로 확인합니다.
 
-### 2의 보수와 비트 마스크를 수치로 확인하기
-
-```python
-def to_u8(n: int) -> int:
-    return n & 0xFF
-
-def to_s8(n: int) -> int:
-    n &= 0xFF
-    return n - 0x100 if n & 0x80 else n
-
-x = to_u8(-5)          # 251 (0b11111011)
-y = to_u8(12)          # 12  (0b00001100)
-print(bin(x), bin(y))
-print(to_s8(x + y))    # 7
-print(to_s8(x - y))    # -17
-```
-
-핵심은 ALU가 "부호 있는 정수"와 "부호 없는 정수"를 따로 계산하지 않는다는 점입니다. 동일한 비트열을 어떻게 해석하느냐가 결과 의미를 바꿉니다. 그래서 ISA 문서에는 signed/unsigned 비교 명령이 따로 존재합니다.
-
-### 캐시 인덱스 계산을 손으로 풀기
-
-가정:
-- L1 D-cache = 32KiB
-- line size = 64B
-- 8-way set associative
-
-계산:
-- 총 line 수 = 32KiB / 64B = 512
-- set 수 = 512 / 8 = 64
-- set index 비트 수 = log2(64) = 6
-- block offset 비트 수 = log2(64) = 6
-- tag 비트 수(48-bit VA 가정) = 48 - 6 - 6 = 36
-
-즉 주소 비트 분해는 `[tag:36][index:6][offset:6]`이 됩니다. 두 주소가 같은 set에 매핑되는지 확인하려면 offset을 제거한 뒤 index 6비트를 비교하면 됩니다.
-
-### 캐시 미스 패턴을 추적하는 간단 코드
-
-```python
-# stride 접근이 캐시 locality에 미치는 영향 관찰
-N = 1024 * 1024
-arr = [0] * N
-
-def walk(step: int):
-    s = 0
-    for i in range(0, N, step):
-        s += arr[i]
-    return s
-
-for step in [1, 2, 4, 8, 16, 32, 64, 128]:
-    walk(step)
-```
-
-이 코드는 단순하지만 실험 관점에서는 매우 유용합니다. `step`이 커질수록 한 cache line에서 활용하는 유효 데이터가 줄고 miss 비율이 올라갑니다. 프로파일러에서는 CPI 증가와 함께 메모리 stall 시간이 늘어나는 형태로 관측됩니다.
-
-### 5단계 파이프라인에서 hazard를 그림으로 보기
-
-```mermaid
-flowchart LR
-    IF["IF"] --> ID["ID"] --> EX["EX"] --> MEM["MEM"] --> WB["WB"]
-    EX -->|"branch decision"| IF
-```
-
-간단한 명령 시퀀스:
-- `I1: LOAD R1, [R2]`
-- `I2: ADD R3, R1, R4`
-
-`I2`는 `R1`이 필요하지만 `I1`의 결과는 MEM/WB 이후에 준비됩니다. Forwarding이 없으면 stall이 필요하고, forwarding이 있으면 일부 cycle을 절약할 수 있습니다. 이 차이가 곧 IPC 차이로 이어집니다.
-
-### 파이프라인 타이밍 표를 직접 작성하기
+### IEEE 754 단정밀도(float32) 비트 분해
 
 ```text
-cycle:   1   2   3   4   5   6
-I1      IF  ID  EX MEM  WB
-I2          IF  ID STALL EX MEM WB
-I3              IF STALL ID  EX MEM WB
+부호(1)  지수(8)       가수(23)
+  0     10000010    01000000000000000000000
+  
+  부호: 0 → 양수
+  지수: 10000010 → 130, bias 제거 → 130 - 127 = 3
+  가수: 1.01 (암묵적 1 포함) → 1 + 0.25 = 1.25
+  값: +1.25 × 2^3 = 10.0
 ```
 
-이 표를 직접 그려 보면 왜 분기 예측 실패가 큰 비용인지, 왜 load-use hazard가 민감한지 바로 이해할 수 있습니다. 이론보다 "cycle 단위로 어디가 비는지"를 보는 것이 훨씬 빠릅니다.
+이 분해를 Python으로 검증합니다.
 
-### 성능 근사식으로 병목 분해하기
+```python
+import struct
 
-성능은 보통 다음으로 근사합니다.
+def float_to_bits(f: float) -> str:
+    """float32의 비트 표현을 문자열로 반환."""
+    packed = struct.pack('>f', f)
+    bits = ''.join(f'{b:08b}' for b in packed)
+    return f"{bits[0]} {bits[1:9]} {bits[9:32]}"
 
-`Execution Time = Instruction Count × CPI × Clock Cycle Time`
+def bits_to_float(sign: int, exp: int, mantissa: int) -> float:
+    """비트 구성 요소에서 float32 복원."""
+    raw = (sign << 31) | (exp << 23) | mantissa
+    packed = struct.pack('>I', raw)
+    return struct.unpack('>f', packed)[0]
 
-여기서 구조 개선은 보통 세 축으로 나타납니다.
-- 명령 수 감소: 컴파일러 최적화/벡터화
-- CPI 감소: cache miss 감소, branch mispredict 감소, forwarding 개선
-- cycle time 단축: 더 높은 클록, 더 짧은 임계 경로
+# 10.0 검증
+print(float_to_bits(10.0))
+# 출력: 0 10000010 01000000000000000000000
 
-실무에서는 한 축을 개선하면 다른 축이 악화될 수 있습니다. 예를 들어 파이프라인 단계를 늘려 클록을 높이면 분기 실패 패널티가 커질 수 있습니다. 따라서 "한 지표만" 보고 결론 내리면 위험합니다.
+# 역방향 검증
+print(bits_to_float(0, 0b10000010, 0b01000000000000000000000))
+# 출력: 10.0
+```
 
-### 점검 체크리스트
+### 부동소수점 정밀도 함정: 0.1 + 0.2 ≠ 0.3
 
-- 주소 하나를 보고 `tag/index/offset`으로 즉시 분해할 수 있는가
-- load-use, branch hazard를 cycle 표로 그릴 수 있는가
-- signed/unsigned 연산 차이를 비트 패턴으로 설명할 수 있는가
-- CPI 상승의 원인을 cache/branch/structural hazard로 나눠 추적할 수 있는가
+```python
+a = 0.1
+b = 0.2
+c = a + b
 
-이 체크리스트를 통과하면, 컴퓨터 구조 지식이 암기에서 운영 가능한 문제해결 도구로 바뀝니다.
+print(f"{c:.20f}")  # 0.30000000000000004441
+print(c == 0.3)      # False
+
+# 왜 그런가: 0.1의 실제 비트 표현
+print(float_to_bits(0.1))
+# 0 01111011 10011001100110011001101
+# 0.1은 이진수로 무한소수(0.0001100110011...)이므로
+# 23비트에서 잘림 → 오차 발생
+```
+
+이 문제는 금융 계산, 좌표 비교, 물리 시뮬레이션에서 실제 버그를 만듭니다.
+
+**실무 해법:**
+
+| 상황 | 권장 방법 |
+|------|-----------|
+| 금융(원/달러) | 정수 단위 저장(센트, 원) 또는 `decimal.Decimal` |
+| 좌표 비교 | `abs(a - b) < epsilon` |
+| 누적 합산 | Kahan summation 알고리즘 |
+| 과학 계산 | float64 사용 + 오차 전파 분석 |
+
+### 2의 보수가 선택된 이유: 하드웨어 관점
+
+음수 표현 방식은 세 가지가 경쟁했습니다.
+
+| 방식 | -5 표현 (8비트) | 0의 표현 | 덧셈기 추가 회로 |
+|------|----------------|----------|----------------|
+| 부호-크기 | 10000101 | +0, -0 두 개 | 부호 비교 로직 필요 |
+| 1의 보수 | 11111010 | +0, -0 두 개 | end-around carry |
+| 2의 보수 | 11111011 | 0 하나 | 추가 없음 |
+
+2의 보수가 승리한 결정적 이유는 **덧셈기 하나로 덧셈과 뺄셈을 모두 처리**할 수 있기 때문입니다.
+
+```python
+# 2의 보수에서 뺄셈 = 비트 반전 + 1 + 덧셈
+def subtract_twos_complement(a: int, b: int, bits: int = 8) -> int:
+    """a - b를 2의 보수 덧셈으로 구현."""
+    mask = (1 << bits) - 1
+    neg_b = (~b + 1) & mask  # -b의 2의 보수
+    result = (a + neg_b) & mask
+    # 부호 확장
+    if result & (1 << (bits - 1)):
+        result -= (1 << bits)
+    return result
+
+print(subtract_twos_complement(3, 5))   # -2
+print(subtract_twos_complement(10, 3))  # 7
+```
+
+### 오버플로 감지: 하드웨어가 하는 일
+
+```python
+def add_with_overflow_check(a: int, b: int, bits: int = 8) -> tuple:
+    """부호 있는 덧셈 + 오버플로 감지."""
+    mask = (1 << bits) - 1
+    max_val = (1 << (bits - 1)) - 1   # 127 for 8-bit
+    min_val = -(1 << (bits - 1))       # -128 for 8-bit
+    
+    result = a + b
+    overflow = result > max_val or result < min_val
+    
+    # 하드웨어 방식: 최상위 비트의 carry-in ≠ carry-out이면 overflow
+    truncated = result & mask
+    if truncated & (1 << (bits - 1)):
+        truncated -= (1 << bits)
+    
+    return truncated, overflow
+
+print(add_with_overflow_check(100, 50))    # (-106, True) — 오버플로!
+print(add_with_overflow_check(50, 30))     # (80, False)
+```
+
+CPU의 상태 레지스터(FLAGS)에서 OF(Overflow Flag)는 바로 이 검사를 매 연산마다 수행한 결과입니다. C에서는 signed overflow가 undefined behavior이고, Rust에서는 debug 모드에서 panic을 발생시킵니다.
+
+### 엔디언(Byte Order): 네트워크와 파일에서 만나는 함정
+
+```python
+import struct
+
+value = 0x12345678
+
+# 빅엔디언 (네트워크 바이트 오더)
+big = struct.pack('>I', value)
+print(' '.join(f'{b:02x}' for b in big))
+# 출력: 12 34 56 78
+
+# 리틀엔디언 (x86, ARM 기본)
+little = struct.pack('<I', value)
+print(' '.join(f'{b:02x}' for b in little))
+# 출력: 78 56 34 12
+```
+
+| 상황 | 엔디언 | 예시 |
+|------|--------|------|
+| x86/ARM 메모리 | 리틀 | 일반 변수 저장 |
+| 네트워크 프로토콜 | 빅 | TCP/IP 헤더 |
+| Java `.class` 파일 | 빅 | 상수 풀 |
+| ELF 바이너리 | 아키텍처 따름 | 헤더에 명시 |
+| PNG 이미지 | 빅 | 청크 크기 |
+
+실무에서 자주 하는 실수: 바이너리 파일을 파싱할 때 엔디언을 확인하지 않고 `int.from_bytes()`를 호출하면, 값이 수십억 배 다르게 읽힙니다.
+
+### 문자 인코딩과 메모리 효율
+
+```python
+text = "안녕하세요"
+
+# 각 인코딩별 바이트 수 비교
+encodings = ['utf-8', 'utf-16', 'utf-32', 'euc-kr']
+for enc in encodings:
+    encoded = text.encode(enc)
+    print(f"{enc:>8}: {len(encoded):>3} bytes — {' '.join(f'{b:02x}' for b in encoded[:10])}...")
+```
+
+일반적 결과:
+
+| 인코딩 | "안녕하세요" 크기 | 특성 |
+|--------|-------------------|------|
+| UTF-8 | 15 bytes | 한글 3바이트, ASCII 1바이트 |
+| UTF-16 | 12 bytes (+BOM 2) | 대부분 2바이트 |
+| UTF-32 | 20 bytes (+BOM 4) | 모두 4바이트, 인덱싱 O(1) |
+| EUC-KR | 10 bytes | 한글 2바이트, 비표준 영역 제한 |
+
+UTF-8이 웹 표준이 된 이유: ASCII와 완전 호환되면서도 모든 유니코드를 표현할 수 있고, 영어 중심 텍스트에서 공간 효율이 최고입니다. 대신 한글 텍스트에서는 UTF-16보다 50% 더 큽니다.
+
+### 정수 표현 범위 정리
+
+| 타입 | 비트 수 | 최솟값 | 최댓값 |
+|------|---------|--------|--------|
+| int8 | 8 | -128 | 127 |
+| uint8 | 8 | 0 | 255 |
+| int16 | 16 | -32,768 | 32,767 |
+| uint16 | 16 | 0 | 65,535 |
+| int32 | 32 | -2,147,483,648 | 2,147,483,647 |
+| uint32 | 32 | 0 | 4,294,967,295 |
+| int64 | 64 | -9.2 × 10^18 | 9.2 × 10^18 |
+
+실무 사고: 2038년 문제는 Unix timestamp(int32)가 2,147,483,647초(2038-01-19)에 오버플로하는 문제입니다. int64로 전환하면 2920억 년까지 안전합니다.
+
+
+### 비트 마스크 연산의 실무 활용
+
+비트 마스크는 "플래그 집합"을 하나의 정수로 압축하여 저장하는 기법으로, 운영체제 권한, 네트워크 프로토콜 필드, 하드웨어 레지스터에서 광범위하게 사용됩니다.
+
+```python
+# Unix 파일 권한 예시
+READ    = 0b100  # 4
+WRITE   = 0b010  # 2
+EXECUTE = 0b001  # 1
+
+def check_permission(perm: int, flag: int) -> bool:
+    return bool(perm & flag)
+
+def add_permission(perm: int, flag: int) -> int:
+    return perm | flag
+
+def remove_permission(perm: int, flag: int) -> int:
+    return perm & ~flag
+
+user_perm = READ | WRITE  # 0b110 = 6
+print(f"읽기 가능: {check_permission(user_perm, READ)}")    # True
+print(f"실행 가능: {check_permission(user_perm, EXECUTE)}")  # False
+
+user_perm = add_permission(user_perm, EXECUTE)  # 0b111 = 7
+print(f"전체 권한: {bin(user_perm)}")  # 0b111
+```
+
+이 패턴은 CPU의 상태 레지스터(FLAGS)에서도 동일하게 사용됩니다. Zero Flag, Carry Flag, Overflow Flag 등이 각각 1비트 위치에 매핑되어 있고, 조건 분기 명령어가 이 비트들을 마스크로 검사합니다.
+
+### 고정소수점(Fixed-Point) 표현
+
+부동소수점의 정밀도 문제를 피하면서도 소수를 표현해야 할 때 고정소수점을 사용합니다. 임베디드 시스템, 오디오 DSP, 금융 계산에서 흔합니다.
+
+```python
+# Q8.8 고정소수점: 상위 8비트 = 정수부, 하위 8비트 = 소수부
+FRAC_BITS = 8
+SCALE = 1 << FRAC_BITS  # 256
+
+def to_fixed(f: float) -> int:
+    return int(f * SCALE)
+
+def from_fixed(q: int) -> float:
+    return q / SCALE
+
+def fixed_mul(a: int, b: int) -> int:
+    """고정소수점 곱셈: 결과를 SCALE로 나눠 정규화."""
+    return (a * b) >> FRAC_BITS
+
+# 3.14 × 2.5 = 7.85
+a = to_fixed(3.14)   # 804
+b = to_fixed(2.5)    # 640
+c = fixed_mul(a, b)
+print(f"3.14 × 2.5 = {from_fixed(c):.4f}")  # 7.8438 (Q8.8 정밀도 한계)
+
+# float32와 비교
+print(f"float: {3.14 * 2.5}")  # 7.85 (더 정확)
+```
+
+고정소수점의 장점은 **연산이 정수 ALU만으로 가능**하다는 것입니다. FPU가 없는 마이크로컨트롤러에서 오디오 필터, PID 제어를 구현할 때 필수적인 기법입니다.
+
+### 데이터 정렬(Alignment)과 성능
+
+현대 프로세서는 자연 정렬(natural alignment)된 데이터 접근이 가장 빠릅니다.
+
+```text
+주소:  0x00  0x04  0x08  0x0C
+       ┌─────┬─────┬─────┬─────┐
+       │ int │ int │ int │ int │  ← 정렬됨: 한 번에 읽기
+       └─────┴─────┴─────┴─────┘
+
+주소:  0x01  0x05  0x09
+       ┌──┬──┬──┬──┬──┐
+       │??│ int  │??│    ← 비정렬: 두 번 읽기 + 조합 필요
+       └──┴──┴──┴──┴──┘
+```
+
+```python
+import struct
+import sys
+
+# 구조체 패딩 확인
+class Unpadded:
+    # char(1) + int(4) + char(1) = 6 바이트 "논리적" 크기
+    pass
+
+# C 구조체를 struct로 시뮬레이션
+# 패딩 없이 팩
+packed = struct.pack('=bib', 1, 1000, 2)
+print(f"팩된 크기: {len(packed)} bytes")  # 6
+
+# 자연 정렬 시 (컴파일러 기본)
+aligned = struct.pack('=bi3xb3x', 1, 1000, 2)  # padding 포함
+print(f"정렬된 크기: {len(aligned)} bytes")  # 12
+```
+
+구조체 멤버 순서를 크기 내림차순으로 정렬하면 패딩을 최소화할 수 있습니다. 이것이 "구조체 멤버 순서가 메모리 사용량을 바꾼다"는 규칙의 원리입니다.
+
+### 특수 부동소수점 값과 NaN 전파
+
+IEEE 754는 일반 숫자 외에 특수 값을 정의합니다.
+
+| 패턴 | 지수 | 가수 | 의미 |
+|------|------|------|------|
+| 0 00000000 00...0 | 0 | 0 | +0 |
+| 1 00000000 00...0 | 0 | 0 | -0 |
+| 0 11111111 00...0 | 255 | 0 | +∞ |
+| 1 11111111 00...0 | 255 | 0 | -∞ |
+| X 11111111 ≠0 | 255 | ≠0 | NaN |
+| 0 00000000 ≠0 | 0 | ≠0 | 비정규수(denormal) |
+
+```python
+import math
+import numpy as np
+
+# 특수 값 생성과 비교
+print(float('inf') > 1e308)         # True
+print(float('nan') == float('nan'))  # False (NaN ≠ NaN)
+print(math.isnan(0.0 / 0.0 if False else float('nan')))  # True
+
+# NaN 전파: 어떤 연산이든 NaN이 섞이면 결과도 NaN
+arr = np.array([1.0, 2.0, float('nan'), 4.0])
+print(f"합계: {np.sum(arr)}")        # nan
+print(f"nansum: {np.nansum(arr)}")   # 7.0 (NaN 무시)
+```
+
+NaN 전파는 데이터 파이프라인에서 "조용한 오염"을 일으킵니다. 수천 개 피처 중 하나에 NaN이 섞이면 모델 전체의 예측이 NaN이 됩니다. 이것이 데이터 검증 파이프라인에서 `isnan` 체크를 초기 단계에 넣어야 하는 이유입니다.
+
+
+### 실수 비교의 올바른 구현
+
+부동소수점 비교에서 epsilon을 사용하는 것은 기본이지만, "어떤 epsilon"을 써야 하는지가 실무에서는 더 중요합니다.
+
+```python
+import math
+
+def naive_equal(a: float, b: float, eps: float = 1e-9) -> bool:
+    """절대 오차 비교 — 큰 수에서 실패."""
+    return abs(a - b) < eps
+
+def relative_equal(a: float, b: float, rel_eps: float = 1e-9) -> bool:
+    """상대 오차 비교 — 0 근처에서 실패."""
+    if a == b:
+        return True
+    return abs(a - b) / max(abs(a), abs(b)) < rel_eps
+
+def robust_equal(a: float, b: float, rel_eps: float = 1e-9, abs_eps: float = 1e-12) -> bool:
+    """혼합 비교: 0 근처는 절대, 큰 수는 상대 오차 사용."""
+    if a == b:
+        return True
+    diff = abs(a - b)
+    if diff < abs_eps:
+        return True
+    return diff / max(abs(a), abs(b)) < rel_eps
+
+# 테스트
+print(naive_equal(1e10, 1e10 + 1))     # False (실제로는 같다고 봐야 함)
+print(relative_equal(1e10, 1e10 + 1))  # True
+print(robust_equal(1e-15, 2e-15))      # True (0 근처)
+```
+
+이 패턴은 물리 시뮬레이션의 충돌 감지, 그래픽 엔진의 교차점 계산, 수치 최적화의 수렴 판정에서 직접 사용됩니다. "==" 연산자로 float를 비교하는 코드가 있다면 거의 항상 버그입니다.
 
 ## 처음 질문으로 돌아가기
 
 - **비트, 바이트, 워드는 각각 무엇일까요?**
-  - 본문의 기준은 데이터 표현 — bit, byte, integer, floating point를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 비트는 0 또는 1 하나, 바이트는 8비트 묶음으로 문자 하나를 표현하는 최소 단위, 워드는 CPU가 한 번에 처리하는 단위(현대 64비트 프로세서에서는 8바이트)입니다. 본문에서 보았듯이 이 단위들이 메모리 주소 지정, 정렬(alignment), 엔디언 해석의 기본 경계가 됩니다.
 - **음수는 왜 2의 보수로 저장할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 하드웨어 관점에서 덧셈기 하나로 덧셈과 뺄셈을 모두 처리할 수 있고, 0의 표현이 하나뿐이어서 비교 로직이 단순해지기 때문입니다. 심화 학습에서 확인한 것처럼, 부호-크기 방식이나 1의 보수는 추가 회로가 필요하고 +0/-0 문제를 일으킵니다.
 - **IEEE 754 부동소수점은 어떤 구조를 가질까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
-
-<!-- toc:begin -->
-## 시리즈 목차
-
-- [Computer Architecture 101 (1/10): 컴퓨터 구조란 무엇인가?](./01-what-is-computer-architecture.md)
-- **데이터 표현 — bit, byte, integer, floating point (현재 글)**
-- CPU와 명령어 (예정)
-- 레지스터와 ALU (예정)
-- 메모리 구조 (예정)
-- 캐시와 지역성 (예정)
-- 파이프라인 (예정)
-- I/O와 장치 (예정)
-- 병렬성과 멀티코어 (예정)
-- 성능을 이해하는 법 (예정)
-
-<!-- toc:end -->
+  - 부호(1비트) + 지수(8비트, bias 127) + 가수(23비트, 암묵적 1)의 구조입니다. 심화 학습에서 10.0을 비트 분해한 것처럼, 이 구조 때문에 0.1 같은 십진 소수는 정확히 표현할 수 없고, 이것이 `0.1 + 0.2 ≠ 0.3` 문제의 근본 원인입니다.
 
 ## 참고 자료
 
@@ -365,5 +595,6 @@ I3              IF STALL ID  EX MEM WB
 - [What Every Computer Scientist Should Know About Floating-Point Arithmetic](https://docs.oracle.com/cd/E19957-01/806-3568/ncg_goldberg.html)
 - [Two's complement — Wikipedia](https://en.wikipedia.org/wiki/Two%27s_complement)
 - [Python `decimal` module documentation](https://docs.python.org/3/library/decimal.html)
+- [예제 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/computer-architecture-101/ko)
 
 Tags: Computer Science, 컴퓨터 구조, 데이터 표현, 정수, 부동소수점, 비트 연산

@@ -22,6 +22,8 @@ last_reviewed: '2026-05-12'
 
 # Statistics 101 (4/10): 표본과 모집단
 
+이 글은 Statistics 101 시리즈의 4번째 글입니다.
+
 통계는 대개 전체를 다 보지 못한 채 시작합니다. 모든 고객에게 설문을 돌릴 수 없고, 모든 생산품을 파괴 검사할 수도 없고, 모든 방문자를 같은 조건으로 실험하기도 어렵습니다. 그래서 일부를 보고 전체를 말하게 됩니다.
 
 문제는 일부가 전체를 얼마나 닮았느냐입니다. 표본이 모집단을 잘 대표하지 못하면 그 뒤에 아무리 정교한 분석을 올려도 출발점이 흔들립니다.
@@ -89,7 +91,7 @@ n = (Z² × σ²) / E²
 - σ: 모집단 표준편차 (추정값 사용)
 - E: 허용 오차
 
-### Python으로 필요 표본 수 계산하기
+### 파이썬으로 필요 표본 수 계산하기
 
 ```python
 import numpy as np
@@ -114,7 +116,7 @@ print(f"필요한 표본 수: {n}")
 
 만약 오차를 ±1로 줄이려면 표본 수는 4배로 늘어납니다. 정밀도를 2배 높이려면 비용은 4배 늘어나는 구조입니다. 그래서 실무에서는 허용 오차와 예산을 함께 고려해 표본 수를 정합니다.
 
-## Python random.sample 예제
+## 파이썬 무작위 표본추출 예제
 
 ```python
 import pandas as pd
@@ -249,6 +251,224 @@ A/B 테스트, 만족도 조사, 품질 검사, 베타 테스트처럼 표본을
 
 다음 글에서는 추정을 다룹니다. 표본에서 계산한 통계량으로 모집단의 모수를 어떻게 가늠하는지, 그리고 그 추정값에 어떤 오차가 붙는지 살펴보겠습니다.
 
+## 표본 설계 실전: 편향을 줄이는 운영 절차
+
+표본 설계는 분석 품질의 70%를 결정합니다. 특히 온라인 서비스에서는 표본 추출보다 비응답과 누락 집단이 더 큰 문제를 만들기 쉽습니다.
+
+### 운영 절차
+
+1. 모집단 정의를 문장으로 고정합니다.
+2. 추출 프레임(누가 뽑힐 수 있는지)을 기록합니다.
+3. 층화 기준(플랜, 지역, 기기)을 미리 정의합니다.
+4. 응답률과 비응답자 특성을 동시에 기록합니다.
+5. 가중치 보정 여부를 명시합니다.
+
+### 층화 추출 + 가중치 보정 예제
+
+```python
+import numpy as np
+import pandas as pd
+
+rng = np.random.default_rng(7)
+pop = pd.DataFrame({
+    'plan': rng.choice(['free', 'pro', 'enterprise'], size=30000, p=[0.78, 0.18, 0.04]),
+    'satisfaction': rng.normal(3.9, 0.6, 30000).clip(1, 5),
+})
+
+# 층화 추출
+sample = pop.groupby('plan', group_keys=False).apply(lambda g: g.sample(n=500, random_state=42))
+
+# 응답 편향 가정: enterprise 응답률이 높음
+resp_prob = sample['plan'].map({'free': 0.35, 'pro': 0.45, 'enterprise': 0.70})
+resp = sample[np.random.rand(len(sample)) < resp_prob.to_numpy()]
+
+# 단순 평균
+naive = resp['satisfaction'].mean()
+
+# 가중치 보정
+pop_dist = pop['plan'].value_counts(normalize=True)
+resp_dist = resp['plan'].value_counts(normalize=True)
+weights = resp['plan'].map((pop_dist / resp_dist).to_dict())
+weighted = np.average(resp['satisfaction'], weights=weights)
+
+print(f"단순 평균: {naive:.3f}")
+print(f"가중 보정 평균: {weighted:.3f}")
+```
+
+가중 보정은 편향을 완전히 없애지는 못하지만, 표본-모집단 분포 차이를 줄이는 데 실용적입니다.
+
+
+## 실무 확장 노트: 재현 가능한 분석 문서 만들기
+
+통계 글을 읽고 난 뒤 실제 업무에서 가장 먼저 부딪히는 문제는 "같은 분석을 다시 실행할 수 있는가"입니다. 재현 가능성이 없으면 숫자가 맞아도 신뢰를 얻기 어렵습니다. 그래서 통계 작업은 계산 코드뿐 아니라 입력 데이터 스냅샷, 버전, 시드, 가정 문장을 함께 남겨야 합니다.
+
+### 1) 입력 데이터 스냅샷 고정
+
+```python
+import pandas as pd
+from pathlib import Path
+
+raw = pd.read_csv('analysis_input.csv')
+Path('artifacts').mkdir(exist_ok=True)
+raw.to_parquet('artifacts/input_snapshot.parquet', index=False)
+print(raw.shape)
+```
+
+데이터 파이프라인이 바뀌면 같은 쿼리라도 다른 결과가 나올 수 있습니다. 그래서 분석 시점의 스냅샷을 남기는 습관이 중요합니다.
+
+### 2) 전처리 규칙 문서화
+
+```python
+import numpy as np
+
+def preprocess(df):
+    out = df.copy()
+    out = out.dropna(subset=['metric'])
+    out = out[(out['metric'] >= 0) & (out['metric'] <= out['metric'].quantile(0.999))]
+    out['segment'] = out['segment'].fillna('unknown')
+    return out
+```
+
+이상치 제거, 결측값 처리, 세그먼트 매핑은 결과를 크게 바꿉니다. 코드와 문서를 동시에 남겨야 이후 검토에서 혼선을 줄일 수 있습니다.
+
+### 3) 분포 진단 + 추정 + 검정을 한 화면에서 보고하기
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+x = np.random.default_rng(0).normal(100, 15, 600)
+y = np.random.default_rng(1).normal(103, 15, 600)
+
+fig, ax = plt.subplots(1, 2, figsize=(12, 4))
+ax[0].hist(x, bins=40, alpha=0.6, label='A')
+ax[0].hist(y, bins=40, alpha=0.6, label='B')
+ax[0].legend(); ax[0].set_title('분포 비교')
+
+ax[1].boxplot([x, y], labels=['A', 'B'])
+ax[1].set_title('사분위수 비교')
+plt.tight_layout(); plt.show()
+
+diff = y.mean() - x.mean()
+se = np.sqrt(x.var(ddof=1)/len(x) + y.var(ddof=1)/len(y))
+ci = (diff - 1.96*se, diff + 1.96*se)
+t, p = stats.ttest_ind(x, y, equal_var=False)
+print(f'diff={diff:.3f}, 95% CI={ci}, p={p:.4f}')
+```
+
+그래프와 수치를 분리하면 오해가 늘어납니다. 같은 섹션에서 함께 보여 주면 해석 품질이 올라갑니다.
+
+### 4) 효과 크기와 실행 기준 연결
+
+```python
+pooled = np.sqrt((x.var(ddof=1) + y.var(ddof=1)) / 2)
+cohens_d = (y.mean() - x.mean()) / pooled
+print(f"Cohen's d={cohens_d:.3f}")
+```
+
+p-value가 작아도 효과 크기가 매우 작다면 실행 우선순위가 낮을 수 있습니다. 반대로 p-value 경계선이더라도 효과 크기와 비용 구조가 유리하면 추가 실험으로 이어갈 가치가 있습니다.
+
+### 5) 결과 문장 표준화
+
+분석 결과는 다음 형식으로 정리하면 팀 의사결정이 빨라집니다.
+
+- 관찰 차이: 절대값과 상대값을 모두 표기합니다.
+- 불확실성: 95% 신뢰구간과 표본 수를 함께 표기합니다.
+- 유의성: 검정 방법과 p-value를 표기합니다.
+- 실행 판단: 배포/보류/추가실험 중 하나를 명시합니다.
+
+통계는 결국 팀의 공통 언어를 만드는 일입니다. 재현 가능한 분석 문서를 남기면 개인의 직관이 아니라 조직의 기준으로 의사결정을 반복할 수 있습니다.
+
+
+## 추가 메모: 검증 가능한 의사결정 문장
+
+분석 결과를 보고할 때는 "좋아 보입니다" 같은 모호한 문장을 피하고, 기준과 근거를 한 줄에 함께 적는 것이 좋습니다. 예를 들어 "전환율 +0.6%p, 95% 신뢰구간 +0.1~+1.1%p, p=0.014, 월간 기대효과 +320건, 2주 재검증 조건부 배포"처럼 쓰면 의사결정 책임이 명확해집니다. 이런 형식은 통계 도구가 바뀌어도 유지되는 팀 자산입니다.
+
+
+## 실무 확장 노트: 재현 가능한 분석 문서 만들기
+
+통계 글을 읽고 난 뒤 실제 업무에서 가장 먼저 부딪히는 문제는 "같은 분석을 다시 실행할 수 있는가"입니다. 재현 가능성이 없으면 숫자가 맞아도 신뢰를 얻기 어렵습니다. 그래서 통계 작업은 계산 코드뿐 아니라 입력 데이터 스냅샷, 버전, 시드, 가정 문장을 함께 남겨야 합니다.
+
+### 1) 입력 데이터 스냅샷 고정
+
+```python
+import pandas as pd
+from pathlib import Path
+
+raw = pd.read_csv('analysis_input.csv')
+Path('artifacts').mkdir(exist_ok=True)
+raw.to_parquet('artifacts/input_snapshot.parquet', index=False)
+print(raw.shape)
+```
+
+데이터 파이프라인이 바뀌면 같은 쿼리라도 다른 결과가 나올 수 있습니다. 그래서 분석 시점의 스냅샷을 남기는 습관이 중요합니다.
+
+### 2) 전처리 규칙 문서화
+
+```python
+import numpy as np
+
+def preprocess(df):
+    out = df.copy()
+    out = out.dropna(subset=['metric'])
+    out = out[(out['metric'] >= 0) & (out['metric'] <= out['metric'].quantile(0.999))]
+    out['segment'] = out['segment'].fillna('unknown')
+    return out
+```
+
+이상치 제거, 결측값 처리, 세그먼트 매핑은 결과를 크게 바꿉니다. 코드와 문서를 동시에 남겨야 이후 검토에서 혼선을 줄일 수 있습니다.
+
+### 3) 분포 진단 + 추정 + 검정을 한 화면에서 보고하기
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+x = np.random.default_rng(0).normal(100, 15, 600)
+y = np.random.default_rng(1).normal(103, 15, 600)
+
+fig, ax = plt.subplots(1, 2, figsize=(12, 4))
+ax[0].hist(x, bins=40, alpha=0.6, label='A')
+ax[0].hist(y, bins=40, alpha=0.6, label='B')
+ax[0].legend(); ax[0].set_title('분포 비교')
+
+ax[1].boxplot([x, y], labels=['A', 'B'])
+ax[1].set_title('사분위수 비교')
+plt.tight_layout(); plt.show()
+
+diff = y.mean() - x.mean()
+se = np.sqrt(x.var(ddof=1)/len(x) + y.var(ddof=1)/len(y))
+ci = (diff - 1.96*se, diff + 1.96*se)
+t, p = stats.ttest_ind(x, y, equal_var=False)
+print(f'diff={diff:.3f}, 95% CI={ci}, p={p:.4f}')
+```
+
+그래프와 수치를 분리하면 오해가 늘어납니다. 같은 섹션에서 함께 보여 주면 해석 품질이 올라갑니다.
+
+### 4) 효과 크기와 실행 기준 연결
+
+```python
+pooled = np.sqrt((x.var(ddof=1) + y.var(ddof=1)) / 2)
+cohens_d = (y.mean() - x.mean()) / pooled
+print(f"Cohen's d={cohens_d:.3f}")
+```
+
+p-value가 작아도 효과 크기가 매우 작다면 실행 우선순위가 낮을 수 있습니다. 반대로 p-value 경계선이더라도 효과 크기와 비용 구조가 유리하면 추가 실험으로 이어갈 가치가 있습니다.
+
+### 5) 결과 문장 표준화
+
+분석 결과는 다음 형식으로 정리하면 팀 의사결정이 빨라집니다.
+
+- 관찰 차이: 절대값과 상대값을 모두 표기합니다.
+- 불확실성: 95% 신뢰구간과 표본 수를 함께 표기합니다.
+- 유의성: 검정 방법과 p-value를 표기합니다.
+- 실행 판단: 배포/보류/추가실험 중 하나를 명시합니다.
+
+통계는 결국 팀의 공통 언어를 만드는 일입니다. 재현 가능한 분석 문서를 남기면 개인의 직관이 아니라 조직의 기준으로 의사결정을 반복할 수 있습니다.
+
+
 ## 처음 질문으로 돌아가기
 
 - **모집단과 표본은 어떻게 구분할까요?**
@@ -330,4 +550,7 @@ print(f"\n응답률: {len(responses) / len(population):.1%}")
 1. **전체 코호트를 추적합니다**: 가입 시점부터 이탈까지 전체 여정을 봅니다
 2. **이탈자 인터뷰를 포함합니다**: 성공 사례만큼 실패 사례도 체계적으로 수집합니다
 3. **타임라인 분석을 합니다**: 어느 시점에 누가 빠져나갔는지 시각화합니다
+
+- [이 시리즈의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/statistics-101/ko)
+
 Tags: Statistics, Sampling, Population, Bias, Beginner

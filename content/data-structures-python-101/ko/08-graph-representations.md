@@ -313,70 +313,344 @@ print(distances)  # {'A': 0, 'C': 2, 'B': 4, 'D': 3, 'E': 8}
 그래프는 관계를 표현하는 범용 자료구조입니다. 인접 리스트와 인접 행렬로 표현할 수 있고, BFS와 DFS로 순회할 수 있으며, 가중치가 붙으면 최단 경로 문제로 확장됩니다. 다음 글에서는 중복 제거와 집합 연산에 강한 set을 살펴보겠습니다.
 
 
-## Python 구현 보강: 타입 힌트와 검증 루틴
 
-Python에서 자료구조를 학습할 때는 동작 예시만 확인하는 단계에서 멈추지 않고, 타입 힌트와 최소 검증 루틴을 함께 작성해야 설계 의도가 명확해집니다. 특히 `TypeVar`, `Generic`, `Protocol`을 사용하면 자료구조 API의 입력/출력 계약을 코드 차원에서 드러낼 수 있습니다. 아래 예시는 여러 글에서 재사용할 수 있는 기본 인터페이스 패턴입니다.
+## 타입 힌트 기반 그래프 구현
+
+실무에서 가장 많이 쓰이는 인접 리스트 기반 그래프를 타입 힌트와 함께 구현합니다.
 
 ```python
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Generic, Iterable, Iterator, Optional, TypeVar
+from collections import defaultdict, deque
+from typing import Generic, Iterator, TypeVar
 
-T = TypeVar("T")
+V = TypeVar("V")
 
-@dataclass
-class Node(Generic[T]):
-    value: T
-    next: Optional["Node[T]"] = None
 
-class Container(Generic[T]):
-    def __init__(self, items: Optional[Iterable[T]] = None) -> None:
-        self._size = 0
-        self._head: Optional[Node[T]] = None
-        if items is not None:
-            for item in items:
-                self.push(item)
+class Graph(Generic[V]):
+    """인접 리스트 기반 방향 그래프입니다."""
 
-    def push(self, value: T) -> None:
-        self._head = Node(value=value, next=self._head)
-        self._size += 1
+    def __init__(self, directed: bool = True) -> None:
+        self._adj: defaultdict[V, list[V]] = defaultdict(list)
+        self._directed = directed
+        self._vertex_count = 0
+        self._edge_count = 0
 
-    def pop(self) -> T:
-        if self._head is None:
-            raise IndexError("empty container")
-        node = self._head
-        self._head = node.next
-        self._size -= 1
-        return node.value
+    def add_vertex(self, vertex: V) -> None:
+        if vertex not in self._adj:
+            self._adj[vertex]  # defaultdict가 빈 리스트를 생성
+            self._vertex_count += 1
 
-    def __len__(self) -> int:
-        return self._size
+    def add_edge(self, source: V, target: V) -> None:
+        self.add_vertex(source)
+        self.add_vertex(target)
+        self._adj[source].append(target)
+        if not self._directed:
+            self._adj[target].append(source)
+        self._edge_count += 1
 
-    def __iter__(self) -> Iterator[T]:
-        cur = self._head
-        while cur is not None:
-            yield cur.value
-            cur = cur.next
+    def neighbors(self, vertex: V) -> list[V]:
+        return self._adj[vertex]
+
+    def has_vertex(self, vertex: V) -> bool:
+        return vertex in self._adj
+
+    def has_edge(self, source: V, target: V) -> bool:
+        return target in self._adj.get(source, [])
+
+    @property
+    def vertices(self) -> list[V]:
+        return list(self._adj.keys())
+
+    @property
+    def vertex_count(self) -> int:
+        return len(self._adj)
+
+    @property
+    def edge_count(self) -> int:
+        return self._edge_count
+
+    def bfs(self, start: V) -> Iterator[V]:
+        """BFS 순회 제너레이터입니다."""
+        visited: set[V] = {start}
+        queue: deque[V] = deque([start])
+        while queue:
+            vertex = queue.popleft()
+            yield vertex
+            for neighbor in self._adj[vertex]:
+                if neighbor not in visited:
+                    visited.add(neighbor)
+                    queue.append(neighbor)
+
+    def dfs(self, start: V) -> Iterator[V]:
+        """DFS 순회 제너레이터 (반복 구현)입니다."""
+        visited: set[V] = set()
+        stack: list[V] = [start]
+        while stack:
+            vertex = stack.pop()
+            if vertex in visited:
+                continue
+            visited.add(vertex)
+            yield vertex
+            for neighbor in reversed(self._adj[vertex]):
+                if neighbor not in visited:
+                    stack.append(neighbor)
+
+    def __repr__(self) -> str:
+        kind = "Directed" if self._directed else "Undirected"
+        return f"Graph({kind}, V={self.vertex_count}, E={self._edge_count})"
 ```
 
-이 패턴의 핵심은 세 가지입니다. 첫째, 공개 메서드의 타입을 먼저 확정하여 구현 교체 비용을 낮춥니다. 둘째, 예외 조건(`IndexError`)을 명시해 호출자 책임을 분리합니다. 셋째, `__iter__`, `__len__` 같은 파이썬 데이터 모델 메서드를 제공해 표준 라이브러리와 자연스럽게 결합합니다.
+### 설계 결정 네 가지
 
-성능 확인은 `timeit` 단일 숫자보다 시나리오 기반으로 진행하는 편이 정확합니다. 예를 들어 "1만 건 push 후 1만 건 pop", "임의 키 5천 건 조회", "중복 원소 30% 포함 집합 연산"처럼 입력 특성을 고정하고 결과를 비교합니다. 또한 `mypy`나 `pyright`로 정적 타입 검사를 돌리면 API 오용을 조기에 발견할 수 있습니다.
+1. **defaultdict 사용**: 존재하지 않는 키 접근 시 자동으로 빈 리스트가 생기므로, 정점 추가와 간선 추가 코드가 간결해집니다.
+2. **directed 플래그**: 무방향 그래프는 양쪽 모두에 간선을 추가합니다. 하나의 클래스로 두 가지를 모두 처리합니다.
+3. **BFS/DFS를 제너레이터로**: 전체 결과를 list로 반환하지 않고 yield하면, 탐색을 중간에 멈추거나 lazy하게 처리할 수 있습니다.
+4. **DFS 반복 구현**: 재귀 DFS는 깊은 그래프에서 RecursionError 위험이 있으므로, 명시적 스택을 사용합니다.
 
-마지막으로 학습 기록에는 "왜 이 구현을 선택했는가"를 반드시 남깁니다. 같은 기능을 `list`, `deque`, 사용자 정의 클래스 중 무엇으로 표현했는지와 그 이유를 적어두면, 이후 코드베이스에서 자료구조를 교체해야 할 때 판단 근거를 재사용할 수 있습니다.
+## 인접 행렬 구현
 
-실무 코드에서는 `TypeVar` 기반 제네릭 API를 유지하고, `pytest`로 빈 입력/최대 입력/중복 입력 경계 조건을 검증해 구현 신뢰도를 높입니다.
+정점 수가 적고 간선이 밀집된 그래프에서는 인접 행렬이 더 효율적입니다.
 
+```python
+class AdjacencyMatrix:
+    """인접 행렬 기반 그래프입니다. 정점은 0부터 n-1까지의 정수입니다."""
+
+    def __init__(self, n: int, directed: bool = True) -> None:
+        self._n = n
+        self._directed = directed
+        self._matrix: list[list[int]] = [[0] * n for _ in range(n)]
+
+    def add_edge(self, source: int, target: int, weight: int = 1) -> None:
+        self._matrix[source][target] = weight
+        if not self._directed:
+            self._matrix[target][source] = weight
+
+    def has_edge(self, source: int, target: int) -> bool:
+        return self._matrix[source][target] != 0
+
+    def neighbors(self, vertex: int) -> list[int]:
+        return [j for j in range(self._n) if self._matrix[vertex][j] != 0]
+
+    def __repr__(self) -> str:
+        return f"AdjacencyMatrix(n={self._n})"
+```
+
+### 인접 리스트 vs 인접 행렬 비교
+
+| 특성 | 인접 리스트 | 인접 행렬 |
+|------|------------|----------|
+| 공간 | O(V + E) | O(V²) |
+| 간선 존재 확인 | O(degree) | O(1) |
+| 이웃 순회 | O(degree) | O(V) |
+| 간선 추가 | O(1) | O(1) |
+| 희소 그래프 | 유리 | 메모리 낭비 |
+| 밀집 그래프 | 불리 | 유리 |
+
+대부분의 실제 그래프(소셜 네트워크, 웹 링크, 도로망)는 희소하므로 인접 리스트가 기본 선택입니다.
+
+## 메모리 프로파일링: 표현 방식별 비용
+
+```python
+import sys
+from collections import defaultdict
+
+
+def measure_adjacency_list(v: int, e: int) -> int:
+    """v개 정점, e개 간선의 인접 리스트 메모리"""
+    import random
+    adj: defaultdict[int, list[int]] = defaultdict(list)
+    for _ in range(e):
+        src = random.randint(0, v - 1)
+        tgt = random.randint(0, v - 1)
+        adj[src].append(tgt)
+    # 얕은 크기 + 내부 리스트들
+    total = sys.getsizeof(adj)
+    for lst in adj.values():
+        total += sys.getsizeof(lst)
+    return total
+
+
+def measure_adjacency_matrix(v: int) -> int:
+    """v x v 인접 행렬 메모리"""
+    matrix = [[0] * v for _ in range(v)]
+    total = sys.getsizeof(matrix)
+    for row in matrix:
+        total += sys.getsizeof(row)
+    return total
+
+
+v = 1_000
+e = 5_000  # 희소: 평균 degree 5
+
+list_mem = measure_adjacency_list(v, e)
+matrix_mem = measure_adjacency_matrix(v)
+
+print(f"인접 리스트 (V={v}, E={e}): {list_mem:>10} bytes")
+print(f"인접 행렬 (V={v}):          {matrix_mem:>10} bytes")
+print(f"행렬/리스트 = {matrix_mem / list_mem:.1f}x")
+```
+
+1,000개 정점에 5,000개 간선(희소)이면 인접 행렬이 인접 리스트보다 수십 배 메모리를 낭비합니다.
+
+## 성능 벤치마크: BFS vs DFS
+
+```python
+import random
+import timeit
+from collections import defaultdict, deque
+
+
+def make_random_graph(v: int, e: int) -> defaultdict[int, list[int]]:
+    adj: defaultdict[int, list[int]] = defaultdict(list)
+    for _ in range(e):
+        src = random.randint(0, v - 1)
+        tgt = random.randint(0, v - 1)
+        adj[src].append(tgt)
+    return adj
+
+
+def bench_bfs(adj: defaultdict[int, list[int]], start: int) -> None:
+    visited: set[int] = {start}
+    queue: deque[int] = deque([start])
+    while queue:
+        v = queue.popleft()
+        for n in adj[v]:
+            if n not in visited:
+                visited.add(n)
+                queue.append(n)
+
+
+def bench_dfs(adj: defaultdict[int, list[int]], start: int) -> None:
+    visited: set[int] = set()
+    stack: list[int] = [start]
+    while stack:
+        v = stack.pop()
+        if v in visited:
+            continue
+        visited.add(v)
+        for n in adj[v]:
+            if n not in visited:
+                stack.append(n)
+
+
+v, e = 10_000, 50_000
+adj = make_random_graph(v, e)
+trials = 20
+
+t_bfs = timeit.timeit(lambda: bench_bfs(adj, 0), number=trials)
+t_dfs = timeit.timeit(lambda: bench_dfs(adj, 0), number=trials)
+
+print(f"BFS (V=10k, E=50k): {t_bfs:.4f}s")
+print(f"DFS (V=10k, E=50k): {t_dfs:.4f}s")
+```
+
+BFS와 DFS의 시간 복잡도는 모두 O(V + E)로 동일합니다. 실측에서도 비슷한 시간이 나옵니다. 차이는 방문 순서와 메모리 패턴입니다. BFS는 레벨 순서로 가까운 노드부터 방문하고, DFS는 깊이 우선으로 한 경로를 끝까지 탐색합니다.
+
+## unittest로 Graph 검증
+
+```python
+import unittest
+
+
+class TestGraph(unittest.TestCase):
+    def setUp(self) -> None:
+        self.g: Graph[str] = Graph(directed=True)
+        self.g.add_edge("A", "B")
+        self.g.add_edge("A", "C")
+        self.g.add_edge("B", "D")
+        self.g.add_edge("C", "D")
+
+    def test_vertices(self) -> None:
+        self.assertEqual(self.g.vertex_count, 4)
+
+    def test_edges(self) -> None:
+        self.assertEqual(self.g.edge_count, 4)
+        self.assertTrue(self.g.has_edge("A", "B"))
+        self.assertFalse(self.g.has_edge("D", "A"))
+
+    def test_neighbors(self) -> None:
+        self.assertEqual(sorted(self.g.neighbors("A")), ["B", "C"])
+
+    def test_bfs_order(self) -> None:
+        order = list(self.g.bfs("A"))
+        self.assertEqual(order[0], "A")
+        # B와 C는 A의 이웃이므로 D보다 먼저
+        self.assertIn("B", order[1:3])
+        self.assertIn("C", order[1:3])
+        self.assertEqual(order[3], "D")
+
+    def test_dfs_visits_all(self) -> None:
+        order = list(self.g.dfs("A"))
+        self.assertEqual(set(order), {"A", "B", "C", "D"})
+
+    def test_undirected(self) -> None:
+        ug: Graph[int] = Graph(directed=False)
+        ug.add_edge(1, 2)
+        self.assertTrue(ug.has_edge(1, 2))
+        self.assertTrue(ug.has_edge(2, 1))
+
+    def test_isolated_vertex(self) -> None:
+        self.g.add_vertex("Z")
+        self.assertTrue(self.g.has_vertex("Z"))
+        self.assertEqual(self.g.neighbors("Z"), [])
+
+
+if __name__ == "__main__":
+    unittest.main()
+```
+
+## 실무 패턴: 위상 정렬(Topological Sort)
+
+의존성 그래프에서 실행 순서를 결정할 때 위상 정렬을 사용합니다. 빌드 시스템, 패키지 설치, 작업 스케줄링의 핵심 알고리즘입니다.
+
+```python
+from collections import defaultdict, deque
+
+
+def topological_sort(graph: dict[str, list[str]]) -> list[str]:
+    """Kahn 알고리즘으로 위상 정렬합니다. 순환이 있으면 ValueError."""
+    in_degree: defaultdict[str, int] = defaultdict(int)
+    for node in graph:
+        in_degree.setdefault(node, 0)
+        for neighbor in graph[node]:
+            in_degree[neighbor] += 1
+
+    queue: deque[str] = deque(node for node, deg in in_degree.items() if deg == 0)
+    result: list[str] = []
+
+    while queue:
+        node = queue.popleft()
+        result.append(node)
+        for neighbor in graph.get(node, []):
+            in_degree[neighbor] -= 1
+            if in_degree[neighbor] == 0:
+                queue.append(neighbor)
+
+    if len(result) != len(in_degree):
+        raise ValueError("cycle detected")
+    return result
+
+
+# 빌드 의존성 예시
+dependencies = {
+    "app": ["framework", "database"],
+    "framework": ["utils"],
+    "database": ["utils"],
+    "utils": [],
+}
+print(topological_sort(dependencies))
+# ['utils', 'framework', 'database', 'app'] 또는 유사한 유효 순서
+```
 
 ## 처음 질문으로 돌아가기
 
 - **소셜 네트워크, 지도, 의존성 관계는 코드에서 어떻게 표현할 수 있을까요?**
-  - 본문의 기준은 그래프 표현를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 인접 리스트(dict[node, list[neighbor]])로 표현합니다. 각 정점을 키로, 그 정점에서 갈 수 있는 이웃 목록을 값으로 저장합니다. Python의 defaultdict(list)가 이 패턴에 정확히 맞습니다.
 - **인접 리스트와 인접 행렬은 각각 언제 유리할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 인접 리스트는 희소 그래프(E << V²)에서 메모리와 이웃 순회가 유리합니다. 인접 행렬은 밀집 그래프이거나 "두 정점 사이에 간선이 있는가?"를 O(1)에 확인해야 할 때 유리합니다.
 - **BFS와 DFS는 무엇이 다르고 어디에 쓰일까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - BFS는 큐를 사용해 가까운 노드부터 방문합니다. 최단 경로, 레벨 탐색에 적합합니다. DFS는 스택을 사용해 한 경로를 끝까지 탐색합니다. 순환 탐지, 위상 정렬, 연결 요소 탐색에 적합합니다. 시간 복잡도는 둘 다 O(V + E)로 동일합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -400,5 +674,6 @@ class Container(Generic[T]):
 - [Python 공식 문서 — heapq](https://docs.python.org/3/library/heapq.html)
 - [Runestone Academy — Graphs](https://runestone.academy/ns/books/published/pythonds3/Graphs/toctree.html)
 - [Real Python — Graphs in Python](https://realpython.com/python-graph-algorithm/)
+- [book-examples 저장소 — data-structures-python-101/ko](https://github.com/yeongseon-books/book-examples/tree/main/data-structures-python-101/ko)
 
 Tags: Python, 자료구조, Graph, 그래프, BFS

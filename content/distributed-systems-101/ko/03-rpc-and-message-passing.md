@@ -177,15 +177,26 @@ def consume(msg):
 
 ## 실무에서는 이렇게 드러납니다
 
-즉시 응답이 필요한 사용자 경로는 RPC를 사용하고, 메일 발송이나 분석처럼 오래 걸리는 작업은 큐로 넘깁니다. 많은 마이크로서비스 아키텍처는 내부 모듈 간 호출은 RPC로, 도메인 경계는 메시지로 나눕니다. Event sourcing과 CQRS는 이 메시지 모델을 끝까지 밀어붙인 설계라고 볼 수 있습니다.
+즉시 응답이 필요한 사용자 경로는 RPC를 사용하고, 메일 발송이나 분석처럼 오래 걸리는 작업은 큐로 넘깁니다. 많은 마이크로서비스 아키텍처는 내부 모듈 간 호출은 RPC로, 도메인 경계는 메시지로 나눥니다. Event sourcing과 CQRS는 이 메시지 모델을 끝까지 밀어붙인 설계라고 볼 수 있습니다.
+
+대표적인 조합 예시:
+
+| 서비스 | 통신 방식 | 이유 |
+|---------|-----------|------|
+| 사용자 인증 | 동기 RPC | 로그인 결과를 즉시 보여줘야 함 |
+| 결제 처리 | 동기 RPC + 멱등성 | 결과 확인 필수, 재시도 안전성 필요 |
+| 이메일 발송 | 비동기 메시지 | 실패 시 재시도만 하면 됨, 지연 허용 |
+| 로그 수집 | 비동기 메시지 | 대량 처리, 순서 무관 |
+| 주문 상태 변경 | 이벤트 발행 | 여러 소비자가 각자 반응 |
 
 ## 시니어 엔지니어는 이렇게 생각합니다
 
 - 정말 동기 응답이 필요한지부터 먼저 묻습니다.
-- RPC 체인의 깊이를 제한합니다.
+- RPC 체인의 깊이를 제한합니다. 대부분 3단계 이상이면 중간에 비동기 경계를 넣습니다.
 - 첫 커밋부터 멱등성 키를 설계에 넣습니다.
 - 브로커는 기본적으로 at-least-once라고 가정합니다.
 - DLQ와 재시도 정책을 운영 책임의 일부로 봅니다.
+- gRPC를 쓸 때는 deadline propagation을 반드시 활성화합니다. 전파되지 않는 데드라인은 하위 서비스에 불필요한 부하를 줍니다.
 
 ## 체크리스트
 
@@ -205,132 +216,364 @@ def consume(msg):
 
 RPC와 메시지 전달은 동기와 비동기, 결합도와 회복력을 서로 다르게 교환하는 두 모델입니다. 다음 글에서는 데이터가 여러 노드에 놓이는 순간 바로 등장하는 가장 큰 트레이드오프, 일관성과 CAP를 다룹니다.
 
+## gRPC 서비스 메시 구성
 
-## 실전 설계 확장: 합의, CAP, 메시지 큐 운영
+마이크로서비스가 10개를 넘어가면 서비스 간 통신을 개별 코드로 관리하기 어렵습니다. 이때 서비스 메시가 RPC 계층의 공통 관심사를 인프라로 내립니다.
 
-분산 시스템을 실제로 운영할 때는 "요청을 받았다"보다 "요청이 어느 경계에서 확정되었는가"를 더 먼저 확인해야 합니다. 이유는 단순합니다. 네트워크 지연과 부분 장애가 존재하면 성공/실패 이분법으로 상태를 설명할 수 없고, 노드별 관측 시점이 달라 같은 사건을 다르게 기록할 수 있기 때문입니다. 따라서 설계 문서에는 기능 설명뿐 아니라 합의 규칙, 파티션 시 동작 규칙, 큐 처리 규칙이 함께 들어가야 운영에서 재현 가능한 판단이 가능합니다.
+### gRPC 서비스 정의
 
-### 합의 알고리즘을 어디에 쓰는가
+```protobuf
+// payment.proto
+syntax = "proto3";
 
-합의 알고리즘은 이론 주제가 아니라 운영 안전장치입니다. 예를 들어 주문 서비스의 리더 노드가 동시에 두 개 생기면, 같은 주문 번호에 서로 다른 상태가 기록될 수 있습니다. 이때 Raft 같은 리더 기반 합의는 "현재 임기의 과반이 인정한 리더만 쓰기 가능"이라는 제약으로 이중 기록을 막습니다.
+package payment.v1;
+
+service PaymentService {
+  rpc Charge(ChargeRequest) returns (ChargeResponse);
+  rpc Refund(RefundRequest) returns (RefundResponse);
+}
+
+message ChargeRequest {
+  string idempotency_key = 1;
+  int64 amount_cents = 2;
+  string currency = 3;
+  string customer_id = 4;
+}
+
+message ChargeResponse {
+  string transaction_id = 1;
+  Status status = 2;
+  enum Status {
+    SUCCESS = 0;
+    DECLINED = 1;
+    TIMEOUT = 2;
+  }
+}
+```
+
+gRPC는 HTTP/2 위에서 바이너리 직렬화(Protocol Buffers)를 사용하므로 JSON 기반 REST보다 페이로드가 작고 파싱이 빠릅니다. 하지만 진짜 이점은 `.proto` 파일 하나로 클라이언트와 서버의 계약이 코드 생성까지 자동화된다는 점입니다.
+
+### Envoy 사이드카 구성
+
+서비스 메시에서는 각 Pod에 Envoy 프록시를 사이드카로 붙입니다. 애플리케이션은 localhost로만 통신하고, 실제 라우팅·재시도·서킷 브레이커는 Envoy가 처리합니다.
+
+```yaml
+# envoy-sidecar.yaml (Istio 스타일)
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: payment-service
+spec:
+  host: payment.default.svc.cluster.local
+  trafficPolicy:
+    connectionPool:
+      http:
+        h2UpgradePolicy: UPGRADE  # gRPC는 HTTP/2 필수
+        maxRequestsPerConnection: 100
+    outlierDetection:
+      consecutive5xxErrors: 3
+      interval: 10s
+      baseEjectionTime: 30s
+    loadBalancer:
+      simple: ROUND_ROBIN
+  subsets:
+    - name: v1
+      labels:
+        version: v1
+```
+
+이 설정의 핵심은 `outlierDetection`입니다. 연속 3회 5xx 오류가 나면 해당 인스턴스를 30초간 풀에서 제거합니다. 애플리케이션 코드를 건드리지 않고도 장애 인스턴스를 격리할 수 있습니다.
+
+### 재시도 정책
+
+```yaml
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: payment-retry
+spec:
+  hosts:
+    - payment.default.svc.cluster.local
+  http:
+    - route:
+        - destination:
+            host: payment.default.svc.cluster.local
+      retries:
+        attempts: 3
+        perTryTimeout: 2s
+        retryOn: unavailable,deadline-exceeded,resource-exhausted
+```
+
+`retryOn`에 `unavailable`만 넣고 `internal`은 빼는 이유가 있습니다. 결제처럼 부작용이 있는 RPC는 서버 내부 오류 시 무조건 재시도하면 이중 청구 위험이 있습니다. 멱등성이 보장된 호출만 재시도 대상에 포함해야 합니다.
+
+---
+
+## RPC 패턴 심화: 타임아웃 전파와 데드라인
+
+gRPC는 deadline propagation을 기본 지원합니다. 클라이언트가 설정한 데드라인이 서버로 전파되어, 중간 서비스가 이미 시간이 초과된 요청을 계속 처리하는 낭비를 막습니다.
+
+```python
+# deadline propagation 예시
+import grpc
+from payment_pb2_grpc import PaymentServiceStub
+from payment_pb2 import ChargeRequest
+
+channel = grpc.insecure_channel("payment:50051")
+stub = PaymentServiceStub(channel)
+
+# 클라이언트 데드라인: 2초
+try:
+    response = stub.Charge(
+        ChargeRequest(
+            idempotency_key="order-12345",
+            amount_cents=5000,
+            currency="KRW",
+            customer_id="cust-001",
+        ),
+        timeout=2.0,  # 이 데드라인이 downstream으로 전파
+    )
+except grpc.RpcError as e:
+    if e.code() == grpc.StatusCode.DEADLINE_EXCEEDED:
+        # 타임아웃 — 결과를 모르는 상태
+        check_idempotency_key("order-12345")
+    elif e.code() == grpc.StatusCode.UNAVAILABLE:
+        # 서버 접근 불가 — 재시도 가능
+        retry_with_backoff()
+```
+
+데드라인이 전파되면 A → B → C 체인에서 A가 2초를 설정하고 B에서 1.5초를 소모하면, C는 남은 0.5초만 갖습니다. C가 0.5초 안에 끝내지 못하면 즉시 DEADLINE_EXCEEDED를 반환합니다. 이렇게 하면 이미 실패한 요청이 하위 서비스 자원을 계속 점유하는 문제를 방지합니다.
+
+---
+
+## 메시지 전달 심화: 순서 보장과 파티셔닝
+
+메시지 큐에서 가장 흔한 오해는 "큐니까 순서가 보장된다"입니다. 실제로 대부분의 분산 큐는 파티션 내 순서만 보장합니다.
 
 ```text
-노드 5개 구성에서 과반수는 3개입니다.
-리더가 쓰기를 확정하려면 최소 3개 노드에 로그가 복제되어야 합니다.
-2개 노드만 성공한 쓰기는 클라이언트 성공 응답으로 확정하면 안 됩니다.
+토픽: order.events (파티션 4개)
+
+파티션 키: customer_id
+→ 같은 고객의 이벤트는 같은 파티션으로 → 순서 보장
+→ 다른 고객의 이벤트 간에는 순서 보장 없음
+
+파티션 0: [cust-A 주문생성, cust-A 결제완료, cust-A 배송시작]
+파티션 1: [cust-B 주문생성, cust-B 결제완료]
+파티션 2: [cust-C 주문생성]
+파티션 3: (비어있음)
 ```
 
-실무 문서에 반드시 적어야 하는 항목은 다음과 같습니다.
+파티션 키 선택은 순서 보장 범위를 결정합니다. 고객 ID를 키로 쓰면 한 고객의 이벤트 순서는 보장되지만, 전체 이벤트의 글로벌 순서는 보장되지 않습니다. 글로벌 순서가 필요하면 파티션을 1개로 줄여야 하는데, 이는 처리량을 심각하게 제한합니다.
 
-- 리더 선출 타임아웃 범위(예: 150ms~300ms 랜덤)
-- 하트비트 간격(예: 50ms)
-- 로그 확정 기준(과반 복제 이후 commit)
-- 장애 복구 시 재조인 절차(스냅샷/로그 재동기화)
+### Dead Letter Queue 운영
 
-이 네 가지를 수치로 고정하면, 장애 대응 중에 팀원마다 다른 가정을 들고 판단하는 상황을 줄일 수 있습니다.
+소비자가 처리에 실패한 메시지는 무한 재시도 대신 DLQ로 분리합니다.
 
-### CAP을 선언으로 끝내지 않고 시나리오로 적기
+```python
+# DLQ 처리 패턴
+from dataclasses import dataclass
+from datetime import datetime
 
-"우리 시스템은 AP" 같은 문장은 운영에서 거의 도움이 되지 않습니다. 어떤 API가 파티션 중에도 쓰기를 받는지, 읽기 결과가 얼마나 오래 뒤처질 수 있는지를 함께 정의해야 합니다.
+@dataclass
+class DeadLetter:
+    original_topic: str
+    payload: dict
+    error: str
+    retry_count: int
+    first_failed_at: datetime
+    last_failed_at: datetime
 
-예시로 재고 서비스의 파티션 정책을 문서화하면 아래처럼 표현할 수 있습니다.
-
-```yaml
-service: inventory
-partition_policy:
-  write:
-    mode: reject_when_no_quorum
-    http_status: 503
-  read:
-    mode: allow_stale_read
-    max_staleness_seconds: 5
-recovery_policy:
-  reconcile: last_write_wins_with_version_check
-  audit_log_required: true
+def consume_with_dlq(msg, max_retries: int = 5):
+    try:
+        process(msg)
+        ack(msg)
+    except TransientError:
+        if msg.retry_count < max_retries:
+            nack_with_backoff(msg)
+        else:
+            send_to_dlq(msg, reason="max_retries_exceeded")
+    except PermanentError as e:
+        # 재시도해도 안 되는 오류는 즉시 DLQ
+        send_to_dlq(msg, reason=str(e))
 ```
 
-위 정책의 의미는 명확합니다. 네트워크가 갈라졌을 때 쓰기를 무조건 받지 않고, 읽기는 최대 5초까지 오래된 값을 허용합니다. 대신 복구 후에는 버전 검증과 감사 로그 기반으로 충돌을 정리합니다. CAP 선택은 이렇게 엔드포인트별 동작과 관측 지표로 내려와야 실제 운영 정책이 됩니다.
+DLQ에 쌓인 메시지는 수동 검토 후 원본 토픽으로 재주입하거나, 보정 로직을 적용합니다. 운영 대시보드에서 DLQ 유입률이 갑자기 치솟으면 소비자 코드에 버그가 들어갔거나 스키마가 변경된 신호입니다.
 
-### 메시지 큐 설정은 처리량보다 재처리 안전성을 먼저 본다
+---
 
-메시지 큐를 도입하면 비동기로 느슨한 결합을 얻지만, 동시에 중복 처리와 순서 역전이 기본 위험이 됩니다. 큐 설정에서 가장 먼저 다룰 항목은 처리량이 아니라 "실패한 메시지를 어떻게 안전하게 다시 처리할 것인가"입니다.
+## 하이브리드 패턴: 동기 확인 + 비동기 처리
 
-아래는 RabbitMQ 스타일의 실무 기본 설정 예시입니다.
+실무에서 가장 흔한 패턴은 순수 RPC도 순수 메시지도 아닌 하이브리드입니다.
 
-```yaml
-queue:
-  name: order.events
-  durable: true
-  arguments:
-    x-dead-letter-exchange: order.dlx
-    x-message-ttl: 60000
-consumer:
-  prefetch_count: 20
-  ack_mode: manual
-  retry:
-    max_attempts: 5
-    backoff_ms: 200
-idempotency:
-  key_source: event_id
-  ttl_seconds: 86400
+```python
+# 주문 API: 동기 확인 + 비동기 처리
+from fastapi import FastAPI, HTTPException
+from uuid import uuid4
+
+app = FastAPI()
+
+@app.post("/orders")
+async def create_order(order: OrderRequest):
+    # 1. 동기: 입력 검증 + 재고 확인 (RPC)
+    stock = await inventory_client.check(order.sku, order.qty)
+    if not stock.available:
+        raise HTTPException(409, "out of stock")
+
+    # 2. 동기: 주문 저장
+    order_id = str(uuid4())
+    await db.save_order(order_id, order, status="pending")
+
+    # 3. 비동기: 결제/배송은 메시지로 위임
+    await publisher.publish("order.created", {
+        "order_id": order_id,
+        "amount": order.total,
+        "customer_id": order.customer_id,
+    })
+
+    # 4. 즉시 응답: 사용자는 기다리지 않음
+    return {"order_id": order_id, "status": "accepted"}
 ```
 
-핵심은 세 가지입니다.
+이 패턴의 핵심은 사용자 응답 경로(동기)와 후속 처리 경로(비동기)를 분리하는 것입니다. 재고 확인은 즉시 답이 필요하므로 RPC로, 결제와 배송은 수초~수분 걸릴 수 있으므로 메시지로 위임합니다. 사용자는 "주문 접수됨" 응답을 즉시 받고, 이후 상태 변화는 폴링이나 웹소켓으로 확인합니다.
 
-- `durable: true`로 브로커 재시작 후에도 큐 정의를 유지합니다.
-- `manual ack`로 실제 처리 완료 후에만 확인 응답을 보냅니다.
-- `event_id` 기반 멱등성 저장소를 두어 중복 전달을 결과 중복으로 이어지지 않게 막습니다.
+---
 
-Kafka를 쓰는 경우도 원칙은 같습니다. 파티션 키를 어떻게 잡아 순서를 보존할지, 커밋 시점을 처리 성공 이후로 둘지, DLQ 토픽을 어떻게 운영할지를 문서로 고정해야 장애 시간에 판단 비용을 줄일 수 있습니다.
+## 통신 모델 선택 의사결정 트리
 
-### 장애 주입 기반 검증 루프
-
-설계를 문서로만 두면 시간이 지나며 가정이 깨집니다. 그래서 운영 전 검증 루프를 습관화해야 합니다.
-
-1. 리더 노드 강제 종료: 선출 시간과 요청 오류율을 측정합니다.
-2. 네트워크 지연 주입: p95/p99 지연과 타임아웃 비율을 기록합니다.
-3. 큐 소비자 중단: 적체량 증가 속도와 복구 시간을 측정합니다.
-4. 중복 메시지 재주입: 멱등성 키로 결과 중복이 차단되는지 확인합니다.
-
-이 검증을 CI 야간 작업이나 스테이징 런북에 포함하면, 새 기능이 들어와도 합의/CAP/큐 운영 규칙이 계속 살아 있는지 지속적으로 확인할 수 있습니다.
-
-### 운영 대시보드에서 반드시 보는 지표
-
-- 합의 계층: 리더 변경 횟수, 선출 소요 시간, 로그 복제 지연
-- 요청 계층: 성공률, 타임아웃률, 재시도 횟수, 멱등성 충돌률
-- 큐 계층: consumer lag, DLQ 유입량, 재처리 성공률
-- 데이터 계층: 복제 지연, 버전 충돌 건수, 보정 작업 처리량
-
-지표를 계층별로 보면 "느리다"라는 증상을 "리더 불안정 때문에 재시도가 폭증했다"처럼 원인 단위로 분해할 수 있습니다. 분산 시스템 운영 성숙도는 결국 이 분해 능력에서 드러납니다.
-
-
-
-
-### 추가 운영 예시: 쿼럼 손실과 복구 절차
-
-쿼럼이 깨진 순간에는 "일단 쓰기를 받고 나중에 맞춘다"보다 "확정 가능한 쓰기만 받는다"를 기본값으로 두는 편이 안전합니다. 예를 들어 5노드 클러스터에서 2노드만 살아 있으면 새로운 쓰기는 거절하고, 읽기는 최신성 등급을 함께 내려 사용자와 상위 서비스가 의사결정을 할 수 있게 해야 합니다.
-
-```yaml
-degraded_mode:
-  quorum_required: 3
-  write_policy: reject
-  read_policy:
-    allow: true
-    staleness_label: required
-  response_headers:
-    X-Consistency-Level: stale-possible
+```text
+사용자가 즉시 결과를 봐야 하는가?
+├── 예 → 동기 RPC
+│   ├── 체인 깊이 ≤ 2? → 직접 호출
+│   └── 체인 깊이 > 2? → API Gateway + 병렬 호출
+└── 아니오 → 비동기 메시지
+    ├── 순서가 중요한가?
+    │   ├── 예 → 파티션 키 기반 큐 (Kafka)
+    │   └── 아니오 → 작업 큐 (RabbitMQ, SQS)
+    └── 실패 시 재처리가 안전한가?
+        ├── 예 → at-least-once + 멱등성
+        └── 아니오 → 트랜잭션 아웃박스 패턴
 ```
 
-복구 시에는 아래 순서를 런북으로 고정해 두는 것이 좋습니다. 첫째, 리더 안정화 여부 확인. 둘째, 복제 지연이 임계치 아래로 내려왔는지 확인. 셋째, 큐 적체가 해소되었는지 확인. 넷째, 그 뒤에만 쓰기 트래픽 제한을 해제합니다. 이 순서가 바뀌면 겉보기 정상화 뒤에 데이터 불일치가 남을 가능성이 커집니다.
+이 트리를 설계 리뷰 체크리스트로 사용하면 "왜 이 호출을 RPC로 했는가"에 대한 근거를 팀 전체가 공유할 수 있습니다.
+
+---
+
+## 운영 지표: RPC vs 메시지
+
+| 계층 | 지표 | 의미 |
+|------|------|------|
+| RPC | P99 응답 시간 | 꼬리 지연이 데드라인에 근접하면 위험 |
+| RPC | 재시도 비율 | 10% 넘으면 서버 불안정 신호 |
+| RPC | 서킷 브레이커 open 횟수 | 하류 서비스 장애 빈도 |
+| 메시지 | consumer lag | 소비 속도 < 생산 속도면 적체 |
+| 메시지 | DLQ 유입률 | 처리 실패 메시지 비율 |
+| 메시지 | end-to-end 지연 | 발행~소비 완료까지 시간 |
+
+```python
+# 운영 지표 수집 예시
+from prometheus_client import Counter, Histogram
+
+rpc_duration = Histogram(
+    "rpc_duration_seconds",
+    "RPC call duration",
+    ["service", "method"],
+    buckets=[0.01, 0.05, 0.1, 0.5, 1.0, 2.0, 5.0],
+)
+
+rpc_retries = Counter(
+    "rpc_retries_total",
+    "RPC retry count",
+    ["service", "method", "reason"],
+)
+
+consumer_lag = Histogram(
+    "consumer_lag_seconds",
+    "Time from publish to consume",
+    ["topic", "consumer_group"],
+)
+
+dlq_messages = Counter(
+    "dlq_messages_total",
+    "Messages sent to DLQ",
+    ["topic", "reason"],
+)
+```
+
+RPC의 P99가 데드라인의 80%에 도달하면 경보를 울려야 합니다. consumer lag이 5분을 넘으면 소비자를 스케일아웃하거나 배치 크기를 조정해야 합니다. 이 지표들이 평상시 기준선(baseline)과 얼마나 벗어났는지를 자동으로 감지하는 것이 운영 성숙도의 핵심입니다.
+
+---
+
+## RPC 커넥션 풀링과 부하 제어
+
+gRPC 채널은 TCP 커넥션 위에 HTTP/2 스트림을 다중화합니다. 커넥션 하나로 여러 호출을 병렬할 수 있지만, 서버가 많아지면 커넥션 풀 관리가 필수입니다.
+
+```python
+# gRPC 커넥션 풀 설정 예시
+import grpc
+
+# 채널 옵션으로 커넥션 동작 제어
+options = [
+    ("grpc.keepalive_time_ms", 10000),       # 10초마다 keepalive ping
+    ("grpc.keepalive_timeout_ms", 5000),     # 5초 내 응답 없으면 재연결
+    ("grpc.max_connection_idle_ms", 300000), # 5분 유휴 시 연결 닫기
+    ("grpc.max_connection_age_ms", 600000),  # 10분 후 연결 갱신 (로드 밸런싱용)
+]
+
+channel = grpc.insecure_channel("payment:50051", options=options)
+```
+
+`max_connection_age_ms`는 로드 밸런서 뒤에서 중요합니다. gRPC는 연결이 오래 유지되면 특정 서버에 트래픽이 쾌이는 현상이 생깁니다. 주기적으로 연결을 갱신하면 로드 밸런서가 새 연결을 다른 백엔드로 분배할 기회를 얻습니다.
+
+### 마감 시간 계층화
+
+RPC 채인에서 마감 시간을 올바르게 설정하는 원칙은 "외부 호출자의 마감 > 내부 호출의 마감 합계"입니다.
+
+```text
+API Gateway (timeout: 10s)
+└── Order Service (timeout: 8s)
+    ├── Inventory RPC (timeout: 2s)
+    ├── Payment RPC (timeout: 3s)
+    └── Notification (async, no timeout)
+
+내부 동기 호출 합계: 2 + 3 = 5s < 8s (여유 3s)
+Order Service timeout 8s < API Gateway 10s (여유 2s)
+```
+
+이 여유를 두지 않으면 하위 서비스가 정상 응답했는데도 상위에서 타임아웃이 먼저 터지는 상황이 발생합니다. 이런 불필요한 타임아웃은 재시도를 유발하고, 재시도는 부하를 늘리고, 부하는 다시 타임아웃을 유발하는 악순환으로 이어집니다.
+
+### 백프레셔와 부하 제한
+
+메시지 큐의 소비자 측에서는 `prefetch_count`가 백프레셔 역할을 합니다. 한 번에 너무 많이 가져오면 메모리가 터지고, 너무 적게 가져오면 네트워크 왔복이 많아져 처리량이 떨어집니다.
+
+```python
+# 적응적 prefetch 예시
+import time
+
+class AdaptivePrefetch:
+    def __init__(self, min_pf=1, max_pf=100):
+        self.current = 10
+        self.min_pf = min_pf
+        self.max_pf = max_pf
+        self.last_process_time = 0.0
+
+    def adjust(self, process_time: float):
+        if process_time < 0.01:  # 처리가 빠르면 더 가져오기
+            self.current = min(self.current * 2, self.max_pf)
+        elif process_time > 1.0:  # 처리가 느리면 줄이기
+            self.current = max(self.current // 2, self.min_pf)
+        self.last_process_time = process_time
+        return self.current
+```
+
+이 패턴은 소비자의 처리 속도에 따라 큐에서 가져오는 양을 동적으로 조절합니다. 트래픽이 급증할 때 소비자가 과부하로 죽지 않게 보호하면서도, 여유가 있을 때는 치리량을 최대화합니다.
 
 ## 처음 질문으로 돌아가기
 
 - **RPC와 메시지 전달은 각각 무엇이며 어떻게 다를까요?**
-  - 본문의 기준은 RPC와 메시지 전달를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - RPC는 호출자가 응답을 기다리는 동기 계약이고, 메시지 전달은 브로커를 사이에 두고 생산자와 소비자가 독립적으로 동작하는 비동기 계약입니다. RPC는 강한 결합과 즉시 결과를, 메시지는 느슨한 결합과 지연 처리를 교환합니다.
 - **동기와 비동기, 요청-응답과 발행-구독은 어디서 갈릴까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 사용자가 즉시 결과를 봐야 하는 경로는 동기 RPC, 후속 처리나 이벤트 전파는 비동기 메시지입니다. 의사결정 트리에서 보았듯이 체인 깊이와 실패 시 재처리 안전성이 갈림점입니다.
 - **두 모델은 각각 어떤 장단점이 있고 어디에 어울릴까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - RPC는 간단하고 디버깅이 쉽지만 체인이 깊어지면 지연과 장애가 전파됩니다. 메시지는 회복력이 높고 부하를 분산하지만 순서 보장과 중복 처리라는 복잡도를 안습니다. 실무에서는 하이브리드 패턴으로 두 모델의 장점을 조합합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -355,4 +598,5 @@ degraded_mode:
 - [gRPC documentation](https://grpc.io/docs/)
 - [Apache Kafka documentation](https://kafka.apache.org/documentation/)
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/distributed-systems-101/ko)
 Tags: Computer Science, Distributed Systems, RPC, Messaging, Async, Idempotency

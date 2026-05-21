@@ -1,7 +1,7 @@
 ---
 series: design-patterns-101
 episode: 1
-title: "Design Patterns 101 (1/10): 디자인 패턴이란 무엇인가?"
+title: "디자인 패턴 101 (1/10): 디자인 패턴이란 무엇인가?"
 status: publish-ready
 targets:
   tistory: true
@@ -21,7 +21,7 @@ seo_description: 디자인 패턴을 정답집이 아니라 반복되는 설계 
 last_reviewed: '2026-05-15'
 ---
 
-# Design Patterns 101 (1/10): 디자인 패턴이란 무엇인가?
+# 디자인 패턴 101 (1/10): 디자인 패턴이란 무엇인가?
 
 디자인 패턴을 처음 배우면 대개 이름부터 외우기 시작합니다. Strategy, Adapter, Observer 같은 이름이 먼저 보이기 때문입니다. 하지만 실무에서 패턴이 힘을 발휘하는 순간은 암기 시험이 아니라, 같은 문제를 반복해서 만나는 시점입니다.
 
@@ -57,7 +57,7 @@ last_reviewed: '2026-05-15'
 - **안티패턴**: 흔히 쓰이지만 결과적으로 해로운 접근입니다.
 - **이디엄(idiom)**: 특정 언어의 문법과 관용구에 밀착된 작은 패턴입니다.
 
-## Before / After
+## 변경 전후 비교
 
 **Before**
 
@@ -214,7 +214,7 @@ class PriceCalculator:
 
 이 구조의 핵심은 `if/elif` 분기 증가를 객체 교체로 바꾸는 것입니다. 정책이 늘어도 기존 계산기 코드는 수정 없이 확장할 수 있습니다.
 
-### 2) UML 유사 텍스트 다이어그램
+### 2) 유엠엘 유사 텍스트 다이어그램
 
 ```text
 [Client] --> [PriceCalculator]
@@ -312,6 +312,241 @@ class Notifier:
 
 이처럼 패턴은 코드 양을 줄이는 도구라기보다, 변경 시 영향 범위를 예측 가능하게 만드는 구조적 장치입니다.
 
+## 실무 심화: 패턴을 설계 의사결정 문서로 연결하기
+
+패턴 학습의 목적은 이름을 아는 데서 끝나지 않습니다. 실무에서는 "왜 이 구조를 선택했는가"를 나중에 다시 설명해야 하고, 팀이 바뀌어도 같은 판단을 재현할 수 있어야 합니다. 그래서 패턴은 코드 안에만 두지 않고 ADR(Architecture Decision Record), 리뷰 체크리스트, 테스트 설계와 함께 다뤄야 합니다.
+
+### 유엠엘 유사 다이어그램으로 책임 경계 확인
+
+```text
+[요구사항] --> [의사결정]
+[의사결정] --> [패턴 후보: Strategy/Adapter/Observer]
+[패턴 후보] --> [코드 구조]
+[코드 구조] --> [테스트 전략]
+[테스트 전략] --> [운영 지표]
+```
+
+이 흐름을 문서로 남기면 패턴 도입이 취향 논쟁이 아니라 근거 기반 결정이 됩니다.
+
+### 변경 전후 리팩터링
+
+```python
+# 변경 전: 주문 할인 정책이 서비스 레이어에 박혀 있는 경우
+
+def checkout(user_tier: str, amount: int) -> int:
+    if user_tier == "vip":
+        return int(amount * 0.8)
+    if user_tier == "partner":
+        return int(amount * 0.9)
+    return amount
+```
+
+```python
+# 변경 후: 정책 객체로 분리
+from typing import Protocol
+
+class DiscountPolicy(Protocol):
+    def apply(self, amount: int) -> int: ...
+
+class VipPolicy:
+    def apply(self, amount: int) -> int:
+        return int(amount * 0.8)
+
+class PartnerPolicy:
+    def apply(self, amount: int) -> int:
+        return int(amount * 0.9)
+
+class CheckoutService:
+    def __init__(self, policy: DiscountPolicy) -> None:
+        self.policy = policy
+
+    def checkout(self, amount: int) -> int:
+        return self.policy.apply(amount)
+```
+
+리팩터링 포인트는 코드 길이가 아니라 변경 축의 분리입니다. 정책 변경이 서비스 로직을 흔들지 않게 만들면 배포 리스크가 줄어듭니다.
+
+### 장고/플라스크에서 드러나는 패턴
+
+- Django에서는 결제, 알림, 권한 정책을 서비스 객체로 분리할 때 Strategy 성격이 자연스럽게 등장합니다.
+- Flask에서는 블루프린트 경계에서 외부 SDK를 Adapter로 감싼 뒤 도메인 인터페이스만 노출하면 테스트가 쉬워집니다.
+- 공통적으로 "프레임워크 객체를 도메인으로 직접 흘려보내지 않는다"는 경계 규칙이 유지보수 비용을 결정합니다.
+
+### 솔리드 매핑으로 검증하기
+
+| 관점 | 패턴 적용 전 | 패턴 적용 후 |
+| --- | --- | --- |
+| SRP | 서비스가 정책+흐름을 함께 가짐 | 정책 책임과 흐름 책임 분리 |
+| OCP | 정책 추가 시 기존 함수 수정 | 정책 클래스 추가로 확장 |
+| DIP | 구체 조건문에 의존 | 추상 정책 인터페이스 의존 |
+
+이 표를 리뷰 때 사용하면 "패턴을 왜 넣었는지"를 기능 관점이 아닌 설계 관점으로 합의할 수 있습니다.
+
+### 운영 관점 체크
+
+1. 정책이 늘어날 때 테스트 케이스가 선형적으로 증가하는지 확인합니다.
+2. 새 정책 추가가 기존 코드 수정 없이 가능한지 PR 단위로 검증합니다.
+3. 로그에 정책 이름과 적용 결과를 남겨 장애 시 재현 가능성을 확보합니다.
+
+패턴은 예쁜 구조를 위한 장식이 아니라, 변경 비용과 장애 비용을 줄이기 위한 안전장치입니다.
+
+
+## 심화 워크숍: 패턴 적용을 운영 가능한 설계로 바꾸는 절차
+
+패턴을 도입한 뒤 품질이 안정되는 팀과 그렇지 않은 팀의 차이는 구현 문법이 아니라 검증 절차입니다. 아래 절차는 패턴 적용을 코드 예제 수준에서 끝내지 않고, 리뷰/테스트/운영까지 연결하는 실무형 워크플로를 정리한 것입니다.
+
+### 1단계: 요구사항을 변화 축으로 분해합니다
+
+요구사항을 기능 단위로만 보면 패턴이 과하거나 부족해집니다. 먼저 "무엇이 자주 바뀌는지"를 분리해야 합니다. 예를 들어 결제 수단, 알림 채널, 저장소 구현, 권한 규칙은 변화 주기가 서로 다릅니다. 변화 주기가 다르면 클래스 경계도 달라져야 합니다.
+
+```text
+[요구사항]
+  |- 자주 바뀜: 채널/정책/외부 API 계약
+  |- 가끔 바뀜: 도메인 규칙
+  |- 거의 안 바뀜: 엔터티 핵심 필드
+```
+
+이 분해를 먼저 하면 패턴 적용 대상이 명확해집니다.
+
+### 2단계: 변경 전후를 코드로 고정합니다
+
+```python
+# 변경 전: 분기와 생성이 한 함수에 결합
+
+def dispatch(kind: str, payload: dict) -> None:
+    if kind == "email":
+        client = SmtpClient(host="...")
+        client.send(payload["to"], payload["body"])
+    elif kind == "slack":
+        client = SlackClient(webhook="...")
+        client.push(payload["body"])
+    else:
+        raise ValueError("unsupported kind")
+```
+
+```python
+# 변경 후: 생성과 실행을 분리
+from typing import Protocol
+
+class Sender(Protocol):
+    def send(self, payload: dict) -> None: ...
+
+class SenderFactory:
+    def __init__(self, config: dict) -> None:
+        self.config = config
+
+    def create(self, kind: str) -> Sender:
+        if kind == "email":
+            return EmailSender(self.config["smtp_host"])
+        if kind == "slack":
+            return SlackSender(self.config["slack_webhook"])
+        raise ValueError("unsupported kind")
+
+class DispatchService:
+    def __init__(self, factory: SenderFactory) -> None:
+        self.factory = factory
+
+    def dispatch(self, kind: str, payload: dict) -> None:
+        self.factory.create(kind).send(payload)
+```
+
+변경 후 코드에서는 테스트 범위를 계층별로 나눌 수 있고, 새 채널 추가 시 수정 지점을 예측하기 쉬워집니다.
+
+### 3단계: 유엠엘 유사 다이어그램으로 의존 방향을 검증합니다
+
+```text
+[Controller] --> [DispatchService]
+[DispatchService] --> [SenderFactory]
+[SenderFactory] --creates--> <<interface>> [Sender]
+[EmailSender] --implements--> [Sender]
+[SlackSender] --implements--> [Sender]
+```
+
+의존 방향이 위에서 아래로 한 번만 흐르면 코드 탐색 비용이 줄어듭니다.
+
+### 4단계: 장고/플라스크 적용 지점을 분리합니다
+
+- Django: `apps.py` 또는 설정 초기화 지점에서 팩토리/전략 조립을 끝내고, 뷰는 서비스 인터페이스만 호출합니다.
+- Flask: `create_app()`에서 의존성 조립을 수행하고 블루프린트는 도메인 서비스에만 의존합니다.
+- 공통 규칙: 프레임워크 객체(`request`, ORM 세션, 외부 SDK 클라이언트)를 도메인 모델 안으로 직접 흘려보내지 않습니다.
+
+### 5단계: 솔리드 매핑으로 설계 품질을 점검합니다
+
+| 원칙 | 적용 전 리스크 | 적용 후 기대 효과 |
+| --- | --- | --- |
+| SRP | 한 클래스가 정책/생성/실행을 동시에 담당 | 책임 분리로 변경 파급 축소 |
+| OCP | 새 기능마다 기존 분기 수정 | 확장 지점 추가 중심으로 전환 |
+| LSP | 대체 구현이 계약을 깨뜨림 | 인터페이스 테스트로 대체 가능성 보장 |
+| ISP | 거대한 인터페이스 강요 | 용도별 작은 인터페이스 유지 |
+| DIP | 상위 계층이 구체 SDK에 결합 | 추상 계약 의존으로 테스트 용이 |
+
+### 6단계: 운영 로그와 알람 포인트를 함께 정의합니다
+
+패턴을 적용해도 관측이 없으면 운영에서 효과를 확인할 수 없습니다. 다음 항목을 로그에 남겨야 합니다.
+
+1. 선택된 전략/어댑터/팩토리 구현 이름
+2. 처리 시간과 실패 원인(예외 타입)
+3. 재시도 횟수와 최종 상태
+
+이 로그가 있어야 "패턴 도입 이후 장애 회복 시간이 줄었는가"를 측정할 수 있습니다.
+
+### 7단계: 테스트를 세 계층으로 분리합니다
+
+```python
+# 단위 테스트: 전략/어댑터 계약 테스트
+
+def test_email_sender_contract():
+    sender = FakeEmailSender()
+    sender.send({"to": "a@example.com", "body": "hello"})
+    assert sender.sent_count == 1
+```
+
+```python
+# 통합 테스트: 팩토리 조립 + 서비스 실행
+
+def test_dispatch_service_with_memory_config():
+    cfg = {"smtp_host": "localhost", "slack_webhook": "http://localhost"}
+    service = DispatchService(SenderFactory(cfg))
+    service.dispatch("email", {"to": "a@example.com", "body": "x"})
+```
+
+```python
+# 회귀 테스트: 새 구현 추가 시 기존 계약 보존
+
+def test_new_sender_does_not_break_existing_contract():
+    for sender in [FakeEmailSender(), FakeSlackSender()]:
+        sender.send({"body": "ok"})
+```
+
+계층 분리를 하면 실패 원인을 더 빨리 좁힐 수 있습니다.
+
+### 8단계: 패턴 남용 방지 규칙을 명시합니다
+
+- 클래스 수가 늘어도 변경 지점 수가 줄지 않으면 과설계입니다.
+- 인터페이스를 만들었는데 구현이 1개로 6개월 이상 유지되면 단순화 후보입니다.
+- 패턴 이름을 설명해도 비즈니스 이득을 말할 수 없다면 적용 근거가 약합니다.
+
+### 9단계: 문서화 템플릿
+
+다음 템플릿을 ADR에 기록하면 팀 합의가 빨라집니다.
+
+```text
+문제: 어떤 변화가 반복되는가?
+제약: 성능/보안/테스트/팀 숙련도 제약은 무엇인가?
+선택: 어떤 패턴을 적용했는가?
+대안: 왜 다른 패턴은 선택하지 않았는가?
+결과: 얻는 이점과 추가 비용은 무엇인가?
+```
+
+### 10단계: 릴리스 후 회고 질문
+
+1. 새 요구 추가 시 PR 수정 파일 수가 줄었는가?
+2. 장애 발생 시 원인 계층(생성/구조/행위)을 빠르게 특정했는가?
+3. 테스트 실행 시간이 합리적 수준으로 유지되는가?
+
+이 회고를 반복하면 패턴은 지식이 아니라 조직 역량으로 축적됩니다.
+
+
 ## 처음 질문으로 돌아가기
 
 - **디자인 패턴을 한 문장으로 정의하면 무엇일까요?**
@@ -349,5 +584,7 @@ class Notifier:
 
 - [Head First Design Patterns](https://www.oreilly.com/library/view/head-first-design/9781492077992/)
 - [Refactoring (Martin Fowler)](https://martinfowler.com/books/refactoring.html)
+
+- [이 시리즈의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/design-patterns-101/ko)
 
 Tags: Computer Science, DesignPatterns, SoftwareDesign, GoF, Architecture, Foundations

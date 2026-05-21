@@ -22,6 +22,8 @@ last_reviewed: '2026-05-12'
 
 # Statistics 101 (7/10): 가설검정
 
+이 글은 Statistics 101 시리즈의 7번째 글입니다.
+
 데이터를 보다 보면 “차이가 있는가”라는 질문을 자주 만나게 됩니다. 새 버튼이 전환율을 올렸는지, 새 약물이 기존 치료보다 나은지, 두 모델의 성능 차이가 우연인지 아닌지 같은 질문입니다. 가설검정은 이런 비교 질문을 정식 절차로 다루는 방법입니다.
 
 가설검정이 필요한 이유는 눈으로 보이는 차이가 항상 의미 있는 차이는 아니기 때문입니다. 표본에서는 우연한 흔들림이 계속 생기고, 그 흔들림을 통제하지 않으면 과장된 결론을 내리기 쉽습니다.
@@ -107,7 +109,7 @@ a = np.random.normal(3.2, 1, 1000)
 b = np.random.normal(3.6, 1, 1000)
 ```
 
-### 3단계 — 검정통계량과 p-value를 계산한다
+### 3단계 — 검정통계량과 유의확률를 계산한다
 
 ```python
 from scipy.stats import ttest_ind
@@ -141,7 +143,7 @@ print("Cohen's d:", diff / pooled)
 
 p-value와 효과 크기를 함께 읽어야 실제 의미가 보입니다.
 
-## Python scipy로 t-test 전체 예제
+## 파이썬 사이파이로 티검정 전체 예제
 
 아래 코드는 두 그룹 데이터를 준비하고, t-test를 수행하고, 효과 크기까지 계산하는 전체 흐름입니다.
 
@@ -235,7 +237,7 @@ for alpha in alpha_levels:
 4. **단측검정과 양측검정을 결과를 보고 고르는 경우**: 절차 오염이 생깁니다.
 5. **결과를 본 뒤 가설을 바꾸는 경우**: HARKing 문제로 이어집니다.
 
-## 검정력(Power)
+## 검정력(검정력)
 
 검정력은 1-β로, 실제 효과가 있을 때 그것을 올바르게 검출하는 확률입니다. 검정력이 낮으면 진짜 효과를 놓칠 위험이 큽니다.
 
@@ -250,7 +252,7 @@ for alpha in alpha_levels:
 
 일반적으로 검정력 0.8 이상을 목표로 합니다. 즉, 실제 효과가 있을 때 80% 이상의 확률로 그것을 검출할 수 있는 표본 수를 미리 계산합니다.
 
-### Python으로 필요 표본 수 계산하기
+### 파이썬으로 필요 표본 수 계산하기
 
 statsmodels의 `tt_solve_power`를 쓰면 원하는 검정력을 달성하기 위해 필요한 표본 수를 역산할 수 있습니다.
 
@@ -290,6 +292,212 @@ A/B 테스트 결과 페이지, 모델 비교 실험, 임상 연구처럼 비교
 
 다음 글에서는 상관과 회귀를 다룹니다. 두 변수의 관계를 숫자와 식으로 표현할 때 어떤 함정이 생기는지, 특히 상관과 인과를 섞지 않으려면 무엇을 봐야 하는지 이어서 살펴보겠습니다.
 
+## 가설검정 운영화: 설계-실행-회고 루프
+
+가설검정은 계산으로 끝나지 않습니다. 실무에서는 실험 설계 문서와 사후 회고 문서까지 포함해야 같은 실수를 줄일 수 있습니다.
+
+### 실험 설계 문서에 반드시 넣을 항목
+
+- 가설(H0/H1), 유의수준, 검정력 목표
+- 최소 의미 효과(MDE)
+- 중간 점검 규칙(언제 멈출지)
+- 다중비교 보정 방식
+- 로그 수집 품질 점검 항목
+
+### 에이비 테스트 표본 수 역산 예제
+
+```python
+from statsmodels.stats.power import zt_ind_solve_power
+
+baseline = 0.050
+target = 0.055
+effect = (target - baseline) / (baseline * (1 - baseline)) ** 0.5
+
+n = zt_ind_solve_power(effect_size=effect, alpha=0.05, power=0.80, alternative='two-sided')
+print(f"그룹당 필요 표본 수(근사): {int(n):,}")
+```
+
+검정력 분석 없이 실험을 시작하면 결과 해석에서 늘 “표본이 부족했을 수 있음”이라는 불확실성이 남습니다.
+
+### 회고 문장 템플릿
+
+- 관찰 효과: +0.42%p (95% 구간: +0.10%p ~ +0.74%p)
+- 유의성: p=0.009
+- 사업 영향: 월 추가 매출 추정 +1,800만원
+- 결정: 전체 배포, 4주 후 유지 효과 재검증
+
+
+## 실무 확장 노트: 재현 가능한 분석 문서 만들기
+
+통계 글을 읽고 난 뒤 실제 업무에서 가장 먼저 부딪히는 문제는 "같은 분석을 다시 실행할 수 있는가"입니다. 재현 가능성이 없으면 숫자가 맞아도 신뢰를 얻기 어렵습니다. 그래서 통계 작업은 계산 코드뿐 아니라 입력 데이터 스냅샷, 버전, 시드, 가정 문장을 함께 남겨야 합니다.
+
+### 1) 입력 데이터 스냅샷 고정
+
+```python
+import pandas as pd
+from pathlib import Path
+
+raw = pd.read_csv('analysis_input.csv')
+Path('artifacts').mkdir(exist_ok=True)
+raw.to_parquet('artifacts/input_snapshot.parquet', index=False)
+print(raw.shape)
+```
+
+데이터 파이프라인이 바뀌면 같은 쿼리라도 다른 결과가 나올 수 있습니다. 그래서 분석 시점의 스냅샷을 남기는 습관이 중요합니다.
+
+### 2) 전처리 규칙 문서화
+
+```python
+import numpy as np
+
+def preprocess(df):
+    out = df.copy()
+    out = out.dropna(subset=['metric'])
+    out = out[(out['metric'] >= 0) & (out['metric'] <= out['metric'].quantile(0.999))]
+    out['segment'] = out['segment'].fillna('unknown')
+    return out
+```
+
+이상치 제거, 결측값 처리, 세그먼트 매핑은 결과를 크게 바꿉니다. 코드와 문서를 동시에 남겨야 이후 검토에서 혼선을 줄일 수 있습니다.
+
+### 3) 분포 진단 + 추정 + 검정을 한 화면에서 보고하기
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+x = np.random.default_rng(0).normal(100, 15, 600)
+y = np.random.default_rng(1).normal(103, 15, 600)
+
+fig, ax = plt.subplots(1, 2, figsize=(12, 4))
+ax[0].hist(x, bins=40, alpha=0.6, label='A')
+ax[0].hist(y, bins=40, alpha=0.6, label='B')
+ax[0].legend(); ax[0].set_title('분포 비교')
+
+ax[1].boxplot([x, y], labels=['A', 'B'])
+ax[1].set_title('사분위수 비교')
+plt.tight_layout(); plt.show()
+
+diff = y.mean() - x.mean()
+se = np.sqrt(x.var(ddof=1)/len(x) + y.var(ddof=1)/len(y))
+ci = (diff - 1.96*se, diff + 1.96*se)
+t, p = stats.ttest_ind(x, y, equal_var=False)
+print(f'diff={diff:.3f}, 95% CI={ci}, p={p:.4f}')
+```
+
+그래프와 수치를 분리하면 오해가 늘어납니다. 같은 섹션에서 함께 보여 주면 해석 품질이 올라갑니다.
+
+### 4) 효과 크기와 실행 기준 연결
+
+```python
+pooled = np.sqrt((x.var(ddof=1) + y.var(ddof=1)) / 2)
+cohens_d = (y.mean() - x.mean()) / pooled
+print(f"Cohen's d={cohens_d:.3f}")
+```
+
+p-value가 작아도 효과 크기가 매우 작다면 실행 우선순위가 낮을 수 있습니다. 반대로 p-value 경계선이더라도 효과 크기와 비용 구조가 유리하면 추가 실험으로 이어갈 가치가 있습니다.
+
+### 5) 결과 문장 표준화
+
+분석 결과는 다음 형식으로 정리하면 팀 의사결정이 빨라집니다.
+
+- 관찰 차이: 절대값과 상대값을 모두 표기합니다.
+- 불확실성: 95% 신뢰구간과 표본 수를 함께 표기합니다.
+- 유의성: 검정 방법과 p-value를 표기합니다.
+- 실행 판단: 배포/보류/추가실험 중 하나를 명시합니다.
+
+통계는 결국 팀의 공통 언어를 만드는 일입니다. 재현 가능한 분석 문서를 남기면 개인의 직관이 아니라 조직의 기준으로 의사결정을 반복할 수 있습니다.
+
+
+## 추가 메모: 검증 가능한 의사결정 문장
+
+분석 결과를 보고할 때는 "좋아 보입니다" 같은 모호한 문장을 피하고, 기준과 근거를 한 줄에 함께 적는 것이 좋습니다. 예를 들어 "전환율 +0.6%p, 95% 신뢰구간 +0.1~+1.1%p, p=0.014, 월간 기대효과 +320건, 2주 재검증 조건부 배포"처럼 쓰면 의사결정 책임이 명확해집니다. 이런 형식은 통계 도구가 바뀌어도 유지되는 팀 자산입니다.
+
+
+## 실무 확장 노트: 재현 가능한 분석 문서 만들기
+
+통계 글을 읽고 난 뒤 실제 업무에서 가장 먼저 부딪히는 문제는 "같은 분석을 다시 실행할 수 있는가"입니다. 재현 가능성이 없으면 숫자가 맞아도 신뢰를 얻기 어렵습니다. 그래서 통계 작업은 계산 코드뿐 아니라 입력 데이터 스냅샷, 버전, 시드, 가정 문장을 함께 남겨야 합니다.
+
+### 1) 입력 데이터 스냅샷 고정
+
+```python
+import pandas as pd
+from pathlib import Path
+
+raw = pd.read_csv('analysis_input.csv')
+Path('artifacts').mkdir(exist_ok=True)
+raw.to_parquet('artifacts/input_snapshot.parquet', index=False)
+print(raw.shape)
+```
+
+데이터 파이프라인이 바뀌면 같은 쿼리라도 다른 결과가 나올 수 있습니다. 그래서 분석 시점의 스냅샷을 남기는 습관이 중요합니다.
+
+### 2) 전처리 규칙 문서화
+
+```python
+import numpy as np
+
+def preprocess(df):
+    out = df.copy()
+    out = out.dropna(subset=['metric'])
+    out = out[(out['metric'] >= 0) & (out['metric'] <= out['metric'].quantile(0.999))]
+    out['segment'] = out['segment'].fillna('unknown')
+    return out
+```
+
+이상치 제거, 결측값 처리, 세그먼트 매핑은 결과를 크게 바꿉니다. 코드와 문서를 동시에 남겨야 이후 검토에서 혼선을 줄일 수 있습니다.
+
+### 3) 분포 진단 + 추정 + 검정을 한 화면에서 보고하기
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+x = np.random.default_rng(0).normal(100, 15, 600)
+y = np.random.default_rng(1).normal(103, 15, 600)
+
+fig, ax = plt.subplots(1, 2, figsize=(12, 4))
+ax[0].hist(x, bins=40, alpha=0.6, label='A')
+ax[0].hist(y, bins=40, alpha=0.6, label='B')
+ax[0].legend(); ax[0].set_title('분포 비교')
+
+ax[1].boxplot([x, y], labels=['A', 'B'])
+ax[1].set_title('사분위수 비교')
+plt.tight_layout(); plt.show()
+
+diff = y.mean() - x.mean()
+se = np.sqrt(x.var(ddof=1)/len(x) + y.var(ddof=1)/len(y))
+ci = (diff - 1.96*se, diff + 1.96*se)
+t, p = stats.ttest_ind(x, y, equal_var=False)
+print(f'diff={diff:.3f}, 95% CI={ci}, p={p:.4f}')
+```
+
+그래프와 수치를 분리하면 오해가 늘어납니다. 같은 섹션에서 함께 보여 주면 해석 품질이 올라갑니다.
+
+### 4) 효과 크기와 실행 기준 연결
+
+```python
+pooled = np.sqrt((x.var(ddof=1) + y.var(ddof=1)) / 2)
+cohens_d = (y.mean() - x.mean()) / pooled
+print(f"Cohen's d={cohens_d:.3f}")
+```
+
+p-value가 작아도 효과 크기가 매우 작다면 실행 우선순위가 낮을 수 있습니다. 반대로 p-value 경계선이더라도 효과 크기와 비용 구조가 유리하면 추가 실험으로 이어갈 가치가 있습니다.
+
+### 5) 결과 문장 표준화
+
+분석 결과는 다음 형식으로 정리하면 팀 의사결정이 빨라집니다.
+
+- 관찰 차이: 절대값과 상대값을 모두 표기합니다.
+- 불확실성: 95% 신뢰구간과 표본 수를 함께 표기합니다.
+- 유의성: 검정 방법과 p-value를 표기합니다.
+- 실행 판단: 배포/보류/추가실험 중 하나를 명시합니다.
+
+통계는 결국 팀의 공통 언어를 만드는 일입니다. 재현 가능한 분석 문서를 남기면 개인의 직관이 아니라 조직의 기준으로 의사결정을 반복할 수 있습니다.
+
+
 ## 처음 질문으로 돌아가기
 
 - **데이터로 “차이가 있다”는 말을 어디까지 할 수 있을까요?**
@@ -321,5 +529,8 @@ A/B 테스트 결과 페이지, 모델 비교 실험, 임상 연구처럼 비교
 - [Khan Academy — Hypothesis Testing](https://www.khanacademy.org/math/statistics-probability/significance-tests-one-sample)
 - [Wikipedia — Multiple Comparisons Problem](https://en.wikipedia.org/wiki/Multiple_comparisons_problem)
 - [Statistics Done Wrong (Reinhart)](https://www.statisticsdonewrong.com/)
+
+
+- [이 시리즈의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/statistics-101/ko)
 
 Tags: Statistics, HypothesisTesting, Inference, ABTest, Beginner

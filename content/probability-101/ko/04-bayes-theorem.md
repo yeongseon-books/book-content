@@ -235,7 +235,179 @@ Round 3: 0.783 → 0.280 (evidence: neg)
 ```
 
 양성 두 번으로 확률이 크게 올라가다가, 음성 한 번으로 다시 내려갑니다. 이것이 베이즈 갱신의 본질입니다. 각 단계에서 이전 믿음과 새 증거를 합리적으로 통합합니다.
+
+## 베이즈 팩터와 가설 비교
+
+베이즈 정리를 두 가설 비교에 적용하면 베이즈 팩터(Bayes Factor)가 됩니다. 두 가설이 데이터를 얼마나 다르게 설명하는지 비교하는 도구입니다.
+
+```python
+def bayes_factor(data_given_H1: float, data_given_H0: float) -> float:
+    """
+    베이즈 팩터 = P(D|H1) / P(D|H0)
+    > 1: H1이 더 그럴듯함
+    < 1: H0이 더 그럴듯함
+    """
+    return data_given_H1 / data_given_H0
+
+# 예시: 동전이 편향됐는지 검정
+# H1: 앞면 확률 0.7 (편향)
+# H0: 앞면 확률 0.5 (공정)
+# 데이터: 10번 던져 7번 앞면
+
+from math import comb
+
+n, k = 10, 7
+# 이항분포: C(n,k) * p^k * (1-p)^(n-k)
+P_data_H1 = comb(n, k) * 0.7**k * 0.3**(n-k)
+P_data_H0 = comb(n, k) * 0.5**k * 0.5**(n-k)
+
+bf = bayes_factor(P_data_H1, P_data_H0)
+print(f"P(data|H1=0.7) = {P_data_H1:.4f}")
+print(f"P(data|H0=0.5) = {P_data_H0:.4f}")
+print(f"Bayes Factor = {bf:.2f}")
+print(f"해석: H1이 H0보다 {bf:.1f}배 더 그럴듯함")
+
+# 사전오즈 → 사후오즈
+prior_odds = 1.0  # H1과 H0를 동등하게 보는 사전
+posterior_odds = prior_odds * bf
+P_H1_given_data = posterior_odds / (1 + posterior_odds)
+print(f"\n사전오즈: {prior_odds:.1f}")
+print(f"사후오즈: {posterior_odds:.2f}")
+print(f"P(H1|data) = {P_H1_given_data:.3f}")
+```
+
+베이즈 팩터가 1보다 크면 데이터가 H1을 더 지지합니다. 일반적으로 3 이상이면 약한 증거, 10 이상이면 강한 증거, 100 이상이면 매우 강한 증거로 해석합니다.
+
+## Naive Bayes 분류기 예제
+
+베이즈 정리의 가장 유명한 실무 응용은 Naive Bayes 분류기입니다. "단어들이 주어졌을 때 스팸일 확률"을 계산합니다. "Naive"는 단어 간 독립을 가정한다는 뜻입니다.
+
+```python
+from collections import defaultdict
+import math
+
+# 학습 데이터
+spam_docs = [
+    "당첨 경품 무료 클릭",
+    "당첨 축하 큰돈 당첨",
+    "무료 상품 경품 이벤트",
+]
+ham_docs = [
+    "회의 일정 확인 부탁",
+    "보고서 검토 일정 조율",
+    "프로젝트 진행 상황 회의",
+    "일정 조율 보고서 제출",
+]
+
+# 단어 빈도 계산 (Laplace smoothing 적용)
+def train_naive_bayes(spam_docs, ham_docs):
+    spam_words = defaultdict(int)
+    ham_words = defaultdict(int)
+    vocab = set()
+
+    for doc in spam_docs:
+        for word in doc.split():
+            spam_words[word] += 1
+            vocab.add(word)
+
+    for doc in ham_docs:
+        for word in doc.split():
+            ham_words[word] += 1
+            vocab.add(word)
+
+    total_spam_words = sum(spam_words.values())
+    total_ham_words = sum(ham_words.values())
+    V = len(vocab)
+
+    return {
+        "spam_words": spam_words,
+        "ham_words": ham_words,
+        "total_spam": total_spam_words,
+        "total_ham": total_ham_words,
+        "V": V,
+        "P_spam": len(spam_docs) / (len(spam_docs) + len(ham_docs)),
+        "P_ham": len(ham_docs) / (len(spam_docs) + len(ham_docs)),
+    }
+
+def predict(model, text):
+    log_spam = math.log(model["P_spam"])
+    log_ham = math.log(model["P_ham"])
+
+    for word in text.split():
+        # Laplace smoothing: (count + 1) / (total + V)
+        p_w_spam = (model["spam_words"][word] + 1) / (model["total_spam"] + model["V"])
+        p_w_ham = (model["ham_words"][word] + 1) / (model["total_ham"] + model["V"])
+        log_spam += math.log(p_w_spam)
+        log_ham += math.log(p_w_ham)
+
+    # log-sum-exp로 확률 변환
+    max_log = max(log_spam, log_ham)
+    p_spam = math.exp(log_spam - max_log) / (
+        math.exp(log_spam - max_log) + math.exp(log_ham - max_log)
+    )
+    return {"P(스팸)": p_spam, "P(정상)": 1 - p_spam}
+
+model = train_naive_bayes(spam_docs, ham_docs)
+test_cases = ["당첨 경품 확인", "회의 일정 확인", "무료 큰돈"]
+for text in test_cases:
+    result = predict(model, text)
+    label = "스팸" if result["P(스팸)"] > 0.5 else "정상"
+    print(f"\"{text}\" → {label} (P(스팸)={result['P(스팸)']:.3f})")
+```
+
+Naive Bayes는 단순하지만 놀라울 정도로 잘 작동합니다. 독립 가정이 현실에서는 성립하지 않지만, 분류 성능에는 의외로 영향이 작습니다. 이는 베이즈 정리의 견고함을 보여주는 예시입니다.
+
+## 베이즈 정리와 기저율의 관계
+
+기저율이 사후확률에 얼마나 큰 영향을 미치는지 여러 유병률에서 비교해 보겠습니다.
+
+```python
+def ppv_table(sensitivity: float, specificity: float, prevalences: list):
+    """
+    다양한 유병률에서 PPV(양성예측도) 계산
+    """
+    print(f"민감도={sensitivity:.0%}, 특이도={specificity:.0%}")
+    print(f"{'--- 유병률 ---':<15} {'--- PPV ---':<12} {'--- 오경보율 ---'}")
+    for prev in prevalences:
+        P_pos = sensitivity * prev + (1 - specificity) * (1 - prev)
+        ppv = (sensitivity * prev) / P_pos
+        fdr = 1 - ppv
+        print(f"{prev:<15.4f} {ppv:<12.3f} {fdr:.1%}")
+
+ppv_table(
+    sensitivity=0.99,
+    specificity=0.95,
+    prevalences=[0.0001, 0.001, 0.01, 0.05, 0.1, 0.2, 0.5]
+)
+```
+
+출력:
+
+```
+민감도=99%, 특이도=95%
+--- 유병률 ---    --- PPV ---  --- 오경보율 ---
+0.0001          0.002        99.8%
+0.0010          0.019        98.1%
+0.0100          0.166        83.4%
+0.0500          0.510        49.0%
+0.1000          0.688        31.2%
+0.2000          0.832        16.8%
+0.5000          0.952        4.8%
+```
+
+유병률이 0.01%(1만 명 중 1명)일 때는 민감도 99%의 검사라도 PPV가 0.2%에 불과합니다. 양성 판정 500건 중 499건이 오경보입니다. 유병률이 5%를 넘어야 비로소 PPV가 50%를 넘습니다. 이것이 실무에서 기저율을 무시하면 안 되는 이유입니다.
 ## 핵심 개념 한눈에 보기
+
+| 구성 요소 | 기호 | 역할 | 진단 예시 |
+|---|---|---|---|
+| 사전확률 | P(H) | 증거 없이 가설을 믿는 정도 | 유병률 1% |
+| 우도 | P(D∣H) | 가설이 참일 때 데이터가 나올 가능성 | 민감도 99% |
+| 증거 | P(D) | 데이터가 관측될 전체 확률 | 양성률 5.94% |
+| 사후확률 | P(H∣D) | 데이터를 본 뒤 갱신된 믿음 | PPV 16.6% |
+| 베이즈 팩터 | P(D∣H₁)/P(D∣H₀) | 두 가설 비교 비율 | LR = sens/(1−spec) |
+
+이 표에서 주목할 점은 사전확률(1%)과 사후확률(16.6%)의 격차입니다. 민감도 99%라는 인상적인 숫자가 기저율 앞에서 얼마나 축소되는지를 한눈에 보여줍니다.
+
 
 ## 핵심 용어
 
@@ -330,13 +502,17 @@ print("posterior odds:", post_odds, "P:", post_odds / (1 + post_odds))
 
 강한 팀은 점수를 해석할 때도 베이즈적 질문을 합니다. 원래 얼마나 드문 사건인가, 지금 본 증거는 그 믿음을 얼마나 바꿔야 하는가, 같은 업데이트를 반복할 때 어떤 독립 가정을 두고 있는가를 함께 봅니다.
 
+베이지안 A/B 테스트를 예로 들겠습니다. 전환율에 대한 사전분포를 Beta(1, 1)로 시작하고, 유입되는 클릭/비클릭 데이터마다 Beta 분포를 갱신합니다. 빈도주의 방식과 달리 "현재 B가 A보다 나을 확률이 95%"처럼 의사결정에 직접 대응하는 문장을 만들 수 있습니다. 이때 사전분포 선택이 초기 판단에 큰 영향을 주므로, 이전 캠페인 데이터가 있다면 정보적 사전분포를 쓰는 편이 수렴 속도를 높입니다.
+
 ## 체크리스트
 
-- [ ] 베이즈 정리를 식으로 설명할 수 있습니다.
-- [ ] 사전확률, 우도, 사후확률을 구분할 수 있습니다.
-- [ ] 기저율이 사후확률에 미치는 영향을 설명할 수 있습니다.
-- [ ] 순차 갱신의 뜻을 이해합니다.
-
+- [ ] 베이즈 정리 공식을 유도 없이 쓸 수 있습니다.
+- [ ] 사전확률, 우도, 사후확률, 증거 네 요소를 구분할 수 있습니다.
+- [ ] 기저율이 낮을 때 PPV가 왜 낮아지는지 수치로 설명할 수 있습니다.
+- [ ] 순차 갱신에서 첫 번째 사후확률이 두 번째 사전확률이 됨을 코드로 시연할 수 있습니다.
+- [ ] 오즈 형태와 확률 형태의 변환을 수행할 수 있습니다.
+- [ ] Naive Bayes 분류기에서 독립 가정의 의미를 설명할 수 있습니다.
+- [ ] 베이즈 팩터가 10 이상이면 강한 증거라는 기준을 알고 있습니다.
 ## 정리
 
 베이즈 정리는 학습의 수학입니다. 이 글에서 남겨야 할 핵심은 세 가지입니다. 사후확률은 새 데이터와 기존 믿음을 함께 반영한다는 점, 기저율이 작으면 검사 결과의 해석도 달라진다는 점, 그리고 한 번 구한 사후확률이 다음 단계의 사전확률이 된다는 점입니다.
@@ -373,5 +549,6 @@ print("posterior odds:", post_odds, "P:", post_odds / (1 + post_odds))
 - [Wikipedia — Bayes' theorem](https://en.wikipedia.org/wiki/Bayes%27_theorem)
 - [Stanford CS109 — Notes](https://web.stanford.edu/class/cs109/)
 - [Kevin Murphy — Probabilistic ML](https://probml.github.io/pml-book/book1.html)
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/probability-101/ko)
 
 Tags: Probability, Bayes, Inference, Posterior, Beginner

@@ -22,9 +22,9 @@ last_reviewed: '2026-05-15'
 
 # SQL 101 (2/10): SELECT 기본
 
-SELECT는 가장 자주 쓰는 SQL 문장입니다. 그래서 익숙하다는 이유로 대충 쓰기 쉽습니다. 하지만 실무에서는 바로 이 문장에서 비용, 가독성, 유지보수성이 크게 갈립니다. 같은 데이터를 읽더라도 필요한 컬럼만 고르고, 의미 있는 별칭을 붙이고, 정렬과 제한을 명시하는 습관이 팀 전체의 쿼리 품질을 바꿉니다.
-
 이 글은 SQL 101 시리즈의 두 번째 글입니다. 여기서는 SELECT를 한 줄짜리 조회 문장이 아니라, 결과 집합의 모양을 설계하는 기본 도구로 정리합니다.
+
+SELECT는 가장 자주 쓰는 SQL 문장입니다. 그래서 익숙하다는 이유로 대충 쓰기 쉽습니다. 하지만 실무에서는 바로 이 문장에서 비용, 가독성, 유지보수성이 크게 갈립니다. 같은 데이터를 읽더라도 필요한 컬럼만 고르고, 의미 있는 별칭을 붙이고, 정렬과 제한을 명시하는 습관이 팀 전체의 쿼리 품질을 바꿉니다.
 
 ## 먼저 던지는 질문
 
@@ -346,6 +346,236 @@ LIMIT 100;
 ```
 
 여러 줄로 나누면 각 절의 역할이 명확해지고, 코드 리뷰와 디버그가 쉬워집니다.
+
+## 실전 앵커: 조회 컬럼 최소화와 커버링 인덱스
+
+`SELECT *`를 줄이는 이유는 네트워크 전송량 때문만이 아닙니다. 필요한 컬럼만 읽으면 인덱스만으로 결과를 반환하는 계획(커버링 인덱스)을 만들 수 있습니다.
+
+```sql
+-- 조회 패턴
+SELECT order_id, ordered_at, total_amount
+FROM orders
+WHERE customer_id = 1201
+ORDER BY ordered_at DESC
+LIMIT 20;
+
+-- 후보 인덱스
+CREATE INDEX idx_orders_customer_recent
+    ON orders (customer_id, ordered_at DESC)
+    INCLUDE (total_amount);
+```
+
+이 구조에서는 테이블 본문 접근을 최소화해 지연 시간이 안정적으로 줄어듭니다.
+
+## 실전 앵커: 페이지네이션의 함정과 대안
+
+`OFFSET`은 페이지 번호가 커질수록 앞부분 행을 계속 건너뛰므로 비용이 누적됩니다.
+
+```sql
+-- 비용이 누적되는 방식
+SELECT order_id, ordered_at, total_amount
+FROM orders
+ORDER BY ordered_at DESC, order_id DESC
+LIMIT 50 OFFSET 50000;
+```
+
+실무에서는 커서 기반 페이지네이션을 더 자주 씁니다.
+
+```sql
+-- 마지막으로 본 키를 기준으로 다음 페이지
+SELECT order_id, ordered_at, total_amount
+FROM orders
+WHERE (ordered_at, order_id) < (TIMESTAMP '2026-05-10 09:00:00', 881020)
+ORDER BY ordered_at DESC, order_id DESC
+LIMIT 50;
+```
+
+이 방식은 큰 데이터셋에서도 응답 시간 변동이 작습니다.
+
+## 실전 앵커: `DISTINCT`와 `GROUP BY`의 의도 구분
+
+중복 제거가 목적이라면 `DISTINCT`가 자연스럽고, 집계가 필요하면 `GROUP BY`를 택하는 편이 좋습니다.
+
+```sql
+-- 중복 제거
+SELECT DISTINCT customer_id
+FROM orders
+WHERE ordered_at >= CURRENT_DATE - INTERVAL '30 days';
+
+-- 집계
+SELECT customer_id, COUNT(*) AS order_count
+FROM orders
+WHERE ordered_at >= CURRENT_DATE - INTERVAL '30 days'
+GROUP BY customer_id;
+```
+
+둘은 결과 모양과 실행 계획이 다르므로, "일단 DISTINCT" 습관을 줄이는 것이 중요합니다.
+
+## 실전 앵커: 선택 컬럼 설계 기준
+
+조회 SQL을 작성할 때 아래 기준을 먼저 점검하면 팀 쿼리 품질이 빠르게 안정됩니다.
+
+- 화면/리포트에서 실제로 쓰는 컬럼만 고릅니다.
+- 의미가 모호한 컬럼은 별칭으로 도메인 용어를 맞춥니다.
+- 정렬 기준은 항상 명시합니다.
+- 집계와 원본 행 조회를 한 쿼리에 무리하게 섞지 않습니다.
+
+
+## 심화 실습 시나리오: 쿼리 품질을 수치로 검증하기
+
+문장 길이가 길어질수록 SQL 품질은 느낌이 아니라 **측정 가능한 기준**으로 관리해야 합니다. 아래 절차는 어떤 주제의 SQL이든 그대로 적용할 수 있는 공통 루틴입니다.
+
+1. 입력 데이터 범위(기간, 상태, 대상 테넌트)를 명시합니다.
+2. 같은 조건으로 `COUNT(*)`를 먼저 실행해 모수 행 수를 기록합니다.
+3. 본 쿼리를 실행하고 결과 행 수와 합계 지표를 기록합니다.
+4. `EXPLAIN (ANALYZE, BUFFERS)`를 실행해 병목 노드를 확인합니다.
+5. 인덱스/조건식을 조정한 뒤 2~4를 다시 반복합니다.
+
+```sql
+-- 1) 모수 확인
+SELECT COUNT(*) AS base_rows
+FROM orders
+WHERE ordered_at >= DATE '2026-01-01'
+  AND ordered_at <  DATE '2026-02-01';
+
+-- 2) 본 쿼리(예시)
+SELECT
+    customer_id,
+    COUNT(*) AS order_count,
+    SUM(total_amount) AS revenue
+FROM orders
+WHERE ordered_at >= DATE '2026-01-01'
+  AND ordered_at <  DATE '2026-02-01'
+GROUP BY customer_id
+ORDER BY revenue DESC
+LIMIT 20;
+
+-- 3) 계획 확인
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT
+    customer_id,
+    COUNT(*) AS order_count,
+    SUM(total_amount) AS revenue
+FROM orders
+WHERE ordered_at >= DATE '2026-01-01'
+  AND ordered_at <  DATE '2026-02-01'
+GROUP BY customer_id;
+```
+
+이 과정을 습관화하면 "왜 느린지"를 추측하지 않고 설명할 수 있습니다. 특히 팀 협업에서는 성능 이슈를 재현 가능한 단위로 공유할 수 있다는 점이 중요합니다.
+
+## 심화 실습 시나리오: 조인·서브쿼리·CTE 선택 비교
+
+아래 세 방식은 결과가 같아 보이지만, 데이터 크기와 통계 상태에 따라 실행 계획이 크게 달라질 수 있습니다.
+
+```sql
+-- A. 직접 조인
+SELECT c.customer_id, SUM(o.total_amount) AS revenue
+FROM customers c
+JOIN orders o ON o.customer_id = c.customer_id
+WHERE o.status = 'paid'
+GROUP BY c.customer_id;
+```
+
+```sql
+-- B. 서브쿼리
+SELECT c.customer_id, x.revenue
+FROM customers c
+JOIN (
+    SELECT customer_id, SUM(total_amount) AS revenue
+    FROM orders
+    WHERE status = 'paid'
+    GROUP BY customer_id
+) x ON x.customer_id = c.customer_id;
+```
+
+```sql
+-- C. CTE
+WITH paid_orders AS (
+    SELECT customer_id, total_amount
+    FROM orders
+    WHERE status = 'paid'
+),
+revenue_by_customer AS (
+    SELECT customer_id, SUM(total_amount) AS revenue
+    FROM paid_orders
+    GROUP BY customer_id
+)
+SELECT c.customer_id, r.revenue
+FROM customers c
+JOIN revenue_by_customer r ON r.customer_id = c.customer_id;
+```
+
+실무에서 권장하는 방법은 "문법 취향"이 아니라 "검증 가능성"으로 고르는 것입니다. 변경이 자주 일어나는 쿼리는 CTE가 리뷰와 테스트에 유리하고, 단발성 쿼리는 인라인 구조가 간결할 수 있습니다.
+
+## 심화 실습 시나리오: 인덱스 전략과 유지비용
+
+인덱스는 조회 성능을 높이지만 쓰기 비용을 늘립니다. 그래서 읽기/쓰기 비율을 기준으로 설계해야 합니다.
+
+```sql
+-- 조회 패턴에 맞춘 합성 인덱스
+CREATE INDEX idx_orders_customer_status_created
+    ON orders (customer_id, status, created_at DESC);
+
+-- 자주 쓰는 상태값만 가볍게 다루는 부분 인덱스
+CREATE INDEX idx_orders_paid_created
+    ON orders (created_at DESC)
+WHERE status = 'paid';
+```
+
+인덱스를 추가한 뒤에는 반드시 아래를 확인합니다.
+
+- `INSERT`/`UPDATE` TPS가 과도하게 떨어지지 않는가
+- VACUUM/ANALYZE 주기가 비정상적으로 늘어나지 않는가
+- 실제 주요 쿼리에서 `Index Scan` 또는 `Bitmap Index Scan`으로 전환되었는가
+
+인덱스는 "있으면 좋은 옵션"이 아니라 **운영 비용이 있는 구조물**입니다. 성능 개선 수치와 유지 비용을 같이 기록해야 장기적으로 안정됩니다.
+
+## 심화 실습 시나리오: 트랜잭션 격리 수준 재현 데모
+
+분석 SQL이든 운영 SQL이든 동시성 환경에서는 격리 수준 이해가 필요합니다. 다음은 재현 가능한 기본 데모입니다.
+
+```sql
+-- 세션 A
+BEGIN;
+SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+SELECT COUNT(*) FROM inventory WHERE product_id = 10;
+
+-- 세션 B
+BEGIN;
+UPDATE inventory SET quantity = quantity - 1 WHERE product_id = 10;
+COMMIT;
+
+-- 세션 A에서 다시 실행
+SELECT COUNT(*) FROM inventory WHERE product_id = 10;
+COMMIT;
+```
+
+`READ COMMITTED`에서는 같은 트랜잭션 안에서도 두 번째 조회가 다른 스냅샷을 볼 수 있습니다. 반면 `REPEATABLE READ`로 바꾸면 시작 시점 스냅샷이 유지됩니다.
+
+```sql
+BEGIN;
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+SELECT SUM(total_amount) FROM orders WHERE status = 'paid';
+-- 다른 세션의 커밋 이후에도 동일 스냅샷 유지
+SELECT SUM(total_amount) FROM orders WHERE status = 'paid';
+COMMIT;
+```
+
+배치 지표 계산에서는 이 차이가 그대로 숫자 불일치로 나타납니다. 따라서 격리 수준을 문서화하고, 배치 쿼리에서 명시적으로 설정하는 것이 안전합니다.
+
+## 심화 실습 시나리오: 리뷰 체크리스트를 쿼리 옆에 남기기
+
+SQL 리뷰를 사람 기억에 의존하면 시간이 지나면서 기준이 흔들립니다. 아래 항목을 PR 본문이나 문서에 고정하면 품질 편차를 줄일 수 있습니다.
+
+- 질문의 비즈니스 정의가 SQL 조건으로 정확히 번역되었는가
+- 키 유일성(기본키/대체키)이 조인 경로에서 유지되는가
+- 기간 조건이 반열린 구간으로 작성되어 경계 오류가 없는가
+- `NULL` 처리 규칙이 명시되어 있는가
+- 결과 검증용 샘플 출력(행 수, 합계, 상위 N)이 첨부되었는가
+
+이 기준은 학습용 글에서도 그대로 유효합니다. SQL은 결국 데이터와 의사결정을 연결하는 도구이기 때문에, 쿼리 자체보다 **검증 가능한 사고 과정**을 남기는 습관이 더 오래 갑니다.
+
 ## 처음 질문으로 돌아가기
 
 - **SELECT 문장은 어떤 순서로 읽어야 할까요?**
@@ -372,6 +602,8 @@ LIMIT 100;
 <!-- toc:end -->
 
 ## 참고 자료
+
+- [book-examples/sql-101 (ko)](https://github.com/yeongseon-books/book-examples/tree/main/sql-101/ko)
 
 - [PostgreSQL — SELECT](https://www.postgresql.org/docs/current/sql-select.html)
 - [SQLBolt — SELECT queries](https://sqlbolt.com/lesson/select_queries_introduction)

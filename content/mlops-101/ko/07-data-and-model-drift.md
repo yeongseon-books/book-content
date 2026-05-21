@@ -441,6 +441,96 @@ if __name__ == "__main__":
 
 운영팀은 통계량 자체보다 "경고 이후 무엇을 먼저 할지"를 표준화해야 합니다. 위 표처럼 1차 점검과 2차 조치를 분리하면, 같은 경고가 반복될 때 대응 속도와 일관성이 크게 좋아집니다.
 
+
+## 다변량 드리프트 감지
+
+단변량 검정(KS, PSI)은 특성 하나씩 비교하므로, 특성 간 상관관계가 바뀌는 경우를 놓칠 수 있습니다. 다변량 드리프트 감지는 특성 공간 전체의 분포 변화를 잡아냅니다.
+
+```python
+from alibi_detect.cd import MMDDrift
+import numpy as np
+
+# 레퍼런스 데이터: 학습 시점의 특성 분포
+reference_data = np.load("reference_features.npy")  # shape: (N, D)
+
+# MMD 기반 드리프트 감지기 초기화
+drift_detector = MMDDrift(
+    reference_data,
+    backend="pytorch",
+    p_val=0.05,
+    n_permutations=100,
+)
+
+
+def check_multivariate_drift(new_batch: np.ndarray) -> dict:
+    """새 배치 데이터에 대해 다변량 드리프트를 검정합니다."""
+    result = drift_detector.predict(new_batch)
+    return {
+        "is_drift": bool(result["data"]["is_drift"]),
+        "p_value": float(result["data"]["p_val"]),
+        "threshold": 0.05,
+        "distance": float(result["data"]["distance"]),
+    }
+```
+
+MMD(Maximum Mean Discrepancy)는 두 분포를 커널 공간에서 비교합니다. 단변량 검정과 달리 특성 간 상호작용 변화도 감지하므로, 개별 특성은 안정적인데 조합이 바뀐 경우(예: 나이-소득 상관관계 변화)를 잡아낼 수 있습니다.
+
+## 드리프트 감지 자동화 파이프라인
+
+드리프트 감지를 수동으로 실행하면 놓치기 쉽습니다. 정기적으로 실행되는 파이프라인에 통합하는 것이 좋습니다.
+
+```python
+from datetime import datetime, timedelta
+import json
+
+
+def daily_drift_report(
+    reference_path: str,
+    today_data_path: str,
+    output_path: str,
+):
+    """일일 드리프트 리포트를 생성합니다."""
+    reference = np.load(reference_path)
+    today = np.load(today_data_path)
+
+    # 다변량 검정
+    multi_result = check_multivariate_drift(today)
+
+    # 단변량 검정 (각 특성별)
+    from scipy.stats import ks_2samp
+
+    univariate_results = []
+    for col_idx in range(reference.shape[1]):
+        stat, p_val = ks_2samp(reference[:, col_idx], today[:, col_idx])
+        univariate_results.append({
+            "feature_index": col_idx,
+            "ks_statistic": float(stat),
+            "p_value": float(p_val),
+            "is_drift": p_val < 0.05,
+        })
+
+    report = {
+        "date": datetime.now().isoformat(),
+        "multivariate": multi_result,
+        "univariate": univariate_results,
+        "drifted_features": [
+            r["feature_index"]
+            for r in univariate_results
+            if r["is_drift"]
+        ],
+        "recommendation": (
+            "retrain" if multi_result["is_drift"] else "monitor"
+        ),
+    }
+
+    with open(output_path, "w") as f:
+        json.dump(report, f, indent=2)
+
+    return report
+```
+
+이 리포트에서 `recommendation` 필드가 `"retrain"`이면 재학습 파이프라인을 자동으로 트리거하는 구조를 만들 수 있습니다. 다음 장(재학습)에서 이 연결 고리를 구체적으로 다루겠습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **데이터 드리프트와 모델 드리프트는 무엇이 다를까요?**
@@ -467,6 +557,8 @@ if __name__ == "__main__":
 <!-- toc:end -->
 
 ## 참고 자료
+
+- [예제 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/mlops-101/ko)
 
 - [Evidently AI — drift detection](https://docs.evidentlyai.com/)
 - [SciPy — `ks_2samp`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ks_2samp.html)

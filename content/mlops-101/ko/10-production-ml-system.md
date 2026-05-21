@@ -345,6 +345,171 @@ print({"score": score, "max": len(scorecard)})
 
 이 표는 도구 도입 여부보다 운영 가능성을 평가하는 기준입니다. 시스템 점검 회의에서 이 다섯 항목을 반복 확인하면, 기능 추가보다 안정성 보강의 우선순위를 유지하기 쉽습니다.
 
+
+## 플랫폼 설정 코드로 일관성 유지하기
+
+운영 ML 시스템에서는 여러 컴포넌트의 설정이 일관되어야 합니다. 피처 스토어, 모델 레지스트리, 모니터링, 배포 환경이 서로 다른 설정을 참조하면 사고가 납니다. 설정을 코드로 관리하는 패턴을 보겠습니다.
+
+```python
+from dataclasses import dataclass, field
+from pathlib import Path
+import yaml
+
+
+@dataclass
+class ModelConfig:
+    name: str
+    version: str
+    registry_uri: str
+    serving_endpoint: str
+    min_replicas: int = 1
+    max_replicas: int = 4
+    target_latency_ms: int = 100
+
+
+@dataclass
+class MonitoringConfig:
+    prometheus_endpoint: str
+    alert_slack_channel: str
+    drift_check_interval_hours: int = 6
+    slo_availability: float = 0.999
+    slo_latency_p95_ms: int = 100
+
+
+@dataclass
+class FeatureStoreConfig:
+    offline_store_path: str
+    online_store_type: str = "redis"
+    online_store_host: str = "redis.internal"
+    ttl_days: int = 7
+
+
+@dataclass
+class PlatformConfig:
+    environment: str  # dev, staging, production
+    models: list[ModelConfig] = field(default_factory=list)
+    monitoring: MonitoringConfig = None
+    feature_store: FeatureStoreConfig = None
+
+    @classmethod
+    def from_yaml(cls, path: str) -> "PlatformConfig":
+        with open(path) as f:
+            data = yaml.safe_load(f)
+        models = [ModelConfig(**m) for m in data.get("models", [])]
+        monitoring = MonitoringConfig(**data["monitoring"]) if "monitoring" in data else None
+        feature_store = FeatureStoreConfig(**data["feature_store"]) if "feature_store" in data else None
+        return cls(
+            environment=data["environment"],
+            models=models,
+            monitoring=monitoring,
+            feature_store=feature_store,
+        )
+```
+
+대응하는 YAML 설정 파일은 다음과 같습니다.
+
+```yaml
+environment: production
+
+models:
+  - name: fraud-detector
+    version: "3.2.1"
+    registry_uri: http://mlflow.internal:5000
+    serving_endpoint: http://fraud-api.internal:8000
+    min_replicas: 2
+    max_replicas: 8
+    target_latency_ms: 50
+  - name: recommender
+    version: "2.1.0"
+    registry_uri: http://mlflow.internal:5000
+    serving_endpoint: http://rec-api.internal:8000
+    min_replicas: 3
+    max_replicas: 12
+    target_latency_ms: 80
+
+monitoring:
+  prometheus_endpoint: http://prometheus.internal:9090
+  alert_slack_channel: "#ml-alerts"
+  drift_check_interval_hours: 4
+  slo_availability: 0.999
+  slo_latency_p95_ms: 100
+
+feature_store:
+  offline_store_path: s3://ml-data/feature-store/
+  online_store_type: redis
+  online_store_host: redis-cluster.internal
+  ttl_days: 14
+```
+
+이 설정을 Git으로 관리하면 변경 이력이 남고, PR 리뷰로 실수를 잡을 수 있습니다. "누가 언제 왜 replica 수를 바꿨는지" 추적이 가능합니다.
+
+## 시스템 통합 테스트
+
+개별 컴포넌트가 잘 동작해도, 연결 지점에서 문제가 발생할 수 있습니다. 통합 테스트는 전체 파이프라인이 끝에서 끝까지 동작하는지 검증합니다.
+
+```python
+import httpx
+import time
+
+
+def integration_test(config: PlatformConfig) -> dict:
+    """전체 ML 시스템의 통합 테스트를 실행합니다."""
+    results = {}
+
+    # 1. 피처 스토어 접근 가능 여부
+    try:
+        from feast import FeatureStore
+        store = FeatureStore(repo_path="feature_repo/")
+        store.get_online_features(
+            features=["customer_features:total_purchases"],
+            entity_rows=[{"customer_id": "test-001"}],
+        )
+        results["feature_store"] = "PASS"
+    except Exception as e:
+        results["feature_store"] = f"FAIL: {e}"
+
+    # 2. 각 모델 서빙 엔드포인트 헬스 체크
+    for model in config.models:
+        try:
+            resp = httpx.get(f"{model.serving_endpoint}/healthz", timeout=5.0)
+            results[f"model_{model.name}_health"] = (
+                "PASS" if resp.status_code == 200 else f"FAIL: {resp.status_code}"
+            )
+        except Exception as e:
+            results[f"model_{model.name}_health"] = f"FAIL: {e}"
+
+    # 3. 모니터링 시스템 접근
+    try:
+        resp = httpx.get(
+            f"{config.monitoring.prometheus_endpoint}/api/v1/status/config",
+            timeout=5.0,
+        )
+        results["monitoring"] = "PASS" if resp.status_code == 200 else f"FAIL: {resp.status_code}"
+    except Exception as e:
+        results["monitoring"] = f"FAIL: {e}"
+
+    # 4. 종단 간 추론 테스트
+    for model in config.models:
+        try:
+            start = time.time()
+            resp = httpx.post(
+                f"{model.serving_endpoint}/predict",
+                json={"features": [0.1] * 10},
+                timeout=float(model.target_latency_ms) / 1000 * 3,
+            )
+            latency_ms = (time.time() - start) * 1000
+            if resp.status_code == 200 and latency_ms < model.target_latency_ms:
+                results[f"model_{model.name}_e2e"] = f"PASS ({latency_ms:.0f}ms)"
+            else:
+                results[f"model_{model.name}_e2e"] = f"FAIL: status={resp.status_code}, latency={latency_ms:.0f}ms"
+        except Exception as e:
+            results[f"model_{model.name}_e2e"] = f"FAIL: {e}"
+
+    return results
+```
+
+이 테스트를 매일 새벽에 실행하면, 인프라 변경이나 네트워크 문제로 시스템이 조용히 깨지는 것을 조기에 발견할 수 있습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **앞선 아홉 개 구성 요소는 실제 시스템에서 어떻게 연결될까요?**
@@ -371,6 +536,8 @@ print({"score": score, "max": len(scorecard)})
 <!-- toc:end -->
 
 ## 참고 자료
+
+- [예제 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/mlops-101/ko)
 
 - [Google — MLOps maturity](https://cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning)
 - [Microsoft — MLOps maturity model](https://learn.microsoft.com/azure/architecture/example-scenario/mlops/mlops-maturity-model)

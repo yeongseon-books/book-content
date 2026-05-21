@@ -462,6 +462,104 @@ notifications:
 
 스케줄러 설정은 단순 실행 시간이 아니라, 승격 간 최소 간격과 품질 게이트까지 함께 정의해야 운영 안정성을 유지할 수 있습니다.
 
+
+## A/B 테스트로 재학습 모델 검증하기
+
+재학습한 모델이 기존 모델보다 정말 나은지 확인하려면 A/B 테스트가 필요합니다. 오프라인 메트릭(AUC, RMSE)이 좋아도 온라인 비즈니스 지표(전환율, 매출)가 나빠질 수 있기 때문입니다.
+
+```python
+import hashlib
+from dataclasses import dataclass
+
+
+@dataclass
+class ABConfig:
+    experiment_name: str
+    control_model: str      # 기존 모델 버전
+    treatment_model: str    # 재학습 모델 버전
+    traffic_split: float    # treatment 비율 (0.0 ~ 1.0)
+
+
+def assign_variant(user_id: str, config: ABConfig) -> str:
+    """사용자를 deterministic하게 control/treatment에 배정합니다."""
+    hash_input = f"{config.experiment_name}:{user_id}"
+    hash_value = int(hashlib.sha256(hash_input.encode()).hexdigest(), 16)
+    bucket = (hash_value % 1000) / 1000.0
+    return "treatment" if bucket < config.traffic_split else "control"
+
+
+def route_prediction(user_id: str, features: dict, config: ABConfig):
+    """배정된 variant에 따라 해당 모델로 추론을 라우팅합니다."""
+    variant = assign_variant(user_id, config)
+    if variant == "treatment":
+        prediction = predict_with_model(config.treatment_model, features)
+    else:
+        prediction = predict_with_model(config.control_model, features)
+    log_ab_event(user_id, variant, prediction, config.experiment_name)
+    return prediction
+```
+
+핵심은 `assign_variant`가 deterministic이라는 점입니다. 같은 사용자는 실험 기간 동안 항상 같은 그룹에 속하므로, 결과가 일관됩니다.
+
+## 통계적 유의성 판단
+
+A/B 테스트 결과를 판단할 때는 충분한 샘플이 모여야 합니다. 너무 일찍 판단하면 잘못된 결론을 내립니다.
+
+```python
+from scipy import stats
+import numpy as np
+
+
+def evaluate_ab_test(
+    control_conversions: int,
+    control_total: int,
+    treatment_conversions: int,
+    treatment_total: int,
+    significance_level: float = 0.05,
+) -> dict:
+    """두 그룹의 전환율 차이를 검정합니다."""
+    control_rate = control_conversions / control_total
+    treatment_rate = treatment_conversions / treatment_total
+
+    # 이항 비율의 z-검정
+    pooled_rate = (control_conversions + treatment_conversions) / (
+        control_total + treatment_total
+    )
+    se = np.sqrt(
+        pooled_rate * (1 - pooled_rate) * (1 / control_total + 1 / treatment_total)
+    )
+    z_stat = (treatment_rate - control_rate) / se if se > 0 else 0.0
+    p_value = 2 * (1 - stats.norm.cdf(abs(z_stat)))
+
+    return {
+        "control_rate": control_rate,
+        "treatment_rate": treatment_rate,
+        "lift": (treatment_rate - control_rate) / control_rate if control_rate > 0 else 0,
+        "z_statistic": z_stat,
+        "p_value": p_value,
+        "is_significant": p_value < significance_level,
+        "recommendation": (
+            "deploy_treatment" if p_value < significance_level and treatment_rate > control_rate
+            else "keep_control"
+        ),
+    }
+```
+
+`recommendation`이 `"deploy_treatment"`이면 재학습 모델을 Production 스테이지로 승격합니다. 그렇지 않으면 기존 모델을 유지하고, 왜 재학습이 효과가 없었는지 원인을 분석합니다. 흔한 원인은 학습 데이터와 서빙 데이터의 분포 차이, 레이블 노이즈, 특성 엔지니어링 오류입니다.
+
+## 재학습 주기 결정 기준
+
+재학습 주기를 어떻게 잡을지는 도메인과 데이터 변화 속도에 따라 다릅니다.
+
+| 도메인 | 데이터 변화 속도 | 권장 주기 | 트리거 |
+| --- | --- | --- | --- |
+| 사기 탐지 | 빠름 (일 단위) | 매일~매주 | 드리프트 감지 |
+| 추천 시스템 | 중간 (주 단위) | 매주 | 정기 스케줄 |
+| 수요 예측 | 계절성 | 월간~분기 | 성능 하락 |
+| 의료 영상 | 느림 | 분기~연간 | 새 데이터셋 확보 시 |
+
+정기 스케줄과 이벤트 트리거를 함께 사용하는 것이 가장 안정적입니다. 정기 재학습으로 점진적 변화를 따라가고, 드리프트 알림으로 급격한 변화에 대응합니다.
+
 ## 처음 질문으로 돌아가기
 
 - **언제 재학습해야 하는지를 어떤 신호로 정할 수 있을까요?**
@@ -488,6 +586,8 @@ notifications:
 <!-- toc:end -->
 
 ## 참고 자료
+
+- [예제 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/mlops-101/ko)
 
 - [MLflow Model Registry](https://mlflow.org/docs/latest/model-registry.html)
 - [Google — continuous training](https://cloud.google.com/architecture/mlops-continuous-delivery-and-automation-pipelines-in-machine-learning)

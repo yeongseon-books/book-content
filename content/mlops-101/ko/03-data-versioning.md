@@ -417,6 +417,142 @@ stages:
 
 리니지 표를 문서와 레지스트리에 함께 남기면, 성능 저하가 생겼을 때 모델 코드와 데이터 경로를 동시에 역추적할 수 있습니다.
 
+
+## DVC 파이프라인 실전 구성
+
+데이터 버전 관리가 진짜 힘을 발휘하려면 파이프라인과 결합해야 합니다. DVC의 `dvc.yaml`은 각 단계의 입력, 명령, 출력을 선언적으로 정의합니다.
+
+### 전체 파이프라인 정의 예시
+
+```yaml
+stages:
+  ingest:
+    cmd: python src/ingest.py --output data/raw/events.parquet
+    deps:
+      - src/ingest.py
+    outs:
+      - data/raw/events.parquet
+
+  validate:
+    cmd: python src/validate.py --input data/raw/events.parquet --schema schemas/events_v3.json
+    deps:
+      - src/validate.py
+      - data/raw/events.parquet
+      - schemas/events_v3.json
+    metrics:
+      - reports/validation_metrics.json:
+          cache: false
+
+  preprocess:
+    cmd: python src/preprocess.py --input data/raw/events.parquet --output data/processed/features.parquet
+    deps:
+      - src/preprocess.py
+      - data/raw/events.parquet
+    outs:
+      - data/processed/features.parquet
+
+  split:
+    cmd: python src/split.py --input data/processed/features.parquet --train data/split/train.parquet --val data/split/val.parquet
+    deps:
+      - src/split.py
+      - data/processed/features.parquet
+    outs:
+      - data/split/train.parquet
+      - data/split/val.parquet
+
+  train:
+    cmd: python src/train.py --train data/split/train.parquet --model artifacts/model.pkl
+    deps:
+      - src/train.py
+      - data/split/train.parquet
+    outs:
+      - artifacts/model.pkl
+    params:
+      - train.yaml:
+          - model.n_estimators
+          - model.max_depth
+
+  evaluate:
+    cmd: python src/evaluate.py --model artifacts/model.pkl --data data/split/val.parquet
+    deps:
+      - src/evaluate.py
+      - artifacts/model.pkl
+      - data/split/val.parquet
+    metrics:
+      - reports/eval_metrics.json:
+          cache: false
+    plots:
+      - reports/confusion_matrix.csv:
+          cache: false
+```
+
+이 파이프라인의 장점은 명확합니다. `dvc repro`를 실행하면 입력이 바뀐 단계부터만 다시 실행됩니다. 데이터가 바뀌면 validate부터, 전처리 코드가 바뀌면 preprocess부터 다시 시작합니다.
+
+### DVC 메트릭과 플롯
+
+```bash
+# 메트릭 확인
+dvc metrics show
+
+# 브랜치 간 메트릭 비교
+dvc metrics diff main
+
+# 플롯 생성
+dvc plots show reports/confusion_matrix.csv
+```
+
+메트릭을 JSON으로 남기면 브랜치 간 성능 비교가 한 줄 명령으로 가능합니다. 이는 PR 리뷰에서 "이 변경이 성능에 어떤 영향을 줬는가"를 객관적으로 보여주는 데 유용합니다.
+
+### git-LFS와 DVC 선택 기준
+
+| 기준 | git-LFS | DVC |
+|---|---|---|
+| 파일 크기 | 수백 MB까지 적합 | GB~TB 규모 가능 |
+| 파이프라인 | 없음 | `dvc.yaml`로 DAG 정의 |
+| 원격 저장소 | Git 호스팅 LFS 서버 | S3, GCS, Azure, SSH 등 |
+| 캐싱 | 없음 | 단계별 캐싱 지원 |
+| 팀 협업 | Git 워크플로 그대로 | `dvc pull/push` 별도 필요 |
+| 적합 시나리오 | 소규모 바이너리, 이미지 | 대규모 학습 데이터, ML 파이프라인 |
+
+작은 팀이 수십 MB 파일 몇 개만 관리한다면 git-LFS로 충분할 수 있습니다. 하지만 학습 데이터가 GB 단위이고 파이프라인 재현이 필요하다면 DVC가 더 적합합니다.
+
+### 데이터 검증 코드 예시
+
+데이터 버전이 바뀔 때마다 스키마와 품질을 확인하는 검증 단계를 두면, 잘못된 데이터가 학습으로 넘어가는 사고를 줄일 수 있습니다.
+
+```python
+import json
+import pandas as pd
+
+
+def validate_schema(df: pd.DataFrame, schema_path: str) -> dict:
+    with open(schema_path) as f:
+        schema = json.load(f)
+
+    errors = []
+    for col_def in schema["columns"]:
+        name = col_def["name"]
+        dtype = col_def["dtype"]
+        nullable = col_def.get("nullable", True)
+
+        if name not in df.columns:
+            errors.append(f"Missing column: {name}")
+            continue
+
+        if not nullable and df[name].isnull().any():
+            null_rate = df[name].isnull().mean()
+            errors.append(f"Column {name} has {null_rate:.2%} nulls")
+
+    return {
+        "valid": len(errors) == 0,
+        "errors": errors,
+        "row_count": len(df),
+        "column_count": len(df.columns),
+    }
+```
+
+이 검증 함수를 파이프라인 validate 단계에 넣으면, 스키마 위반이 발생했을 때 학습으로 넘어가기 전에 차단할 수 있습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **왜 코드 버전만으로는 학습 결과를 재현할 수 없을까요?**
@@ -443,6 +579,8 @@ stages:
 <!-- toc:end -->
 
 ## 참고 자료
+
+- [예제 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/mlops-101/ko)
 
 - [DVC — Get Started](https://dvc.org/doc/start)
 - [git-LFS](https://git-lfs.com/)

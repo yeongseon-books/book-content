@@ -144,126 +144,314 @@ def signal(y, p):
 다음 글에서는 손실 gradient를 실제 업데이트로 바꾸는 경사하강법을 보겠습니다. 그러면 지금까지 쌓은 미분 직관이 처음으로 학습 루프의 움직임으로 연결됩니다.
 
 
-## 추가 실전 섹션: 미분 신호를 학습 루프로 연결하는 계산 연습
 
-미분 개념을 오래 유지하려면 손으로 계산한 값과 코드에서 나온 값이 같은지 반복 확인하는 연습이 중요합니다. 아래 표는 손실 함수와 gradient를 빠르게 점검할 때 자주 쓰는 비교 축입니다.
+## MSE 유도와 gradient 계산
 
-| 항목 | 회귀(MSE) | 분류(BCE) | 점검 포인트 |
+회귀에서 가장 자주 쓰는 MSE를 식부터 다시 정리해 보겠습니다.
+
+배치 크기 `N`에서
+
+`L = (1/N) * Σ (y_i - p_i)^2`
+
+예측 `p_i`에 대한 도함수는
+
+`dL/dp_i = (2/N) * (p_i - y_i)`
+
+입니다. 즉 오차가 양수면 예측을 줄이고, 음수면 예측을 키우라는 신호가 나옵니다.
+
+```python
+import numpy as np
+
+def mse(y, p):
+    y = np.asarray(y, dtype=float)
+    p = np.asarray(p, dtype=float)
+    return np.mean((y - p) ** 2)
+
+def mse_grad(y, p):
+    y = np.asarray(y, dtype=float)
+    p = np.asarray(p, dtype=float)
+    n = y.size
+    return (2.0 / n) * (p - y)
+
+y = np.array([3.0, -1.0, 2.0])
+p = np.array([2.2, -0.5, 3.0])
+print('mse:', mse(y, p))
+print('grad:', mse_grad(y, p))
+```
+
+오차를 제곱하기 때문에 큰 오차에 더 민감하다는 특성이 분명하게 드러납니다. 이상치가 많은 데이터라면 MSE만 고집하지 말고 Huber 같은 대안을 검토하는 것이 안전합니다.
+
+## cross entropy 유도와 gradient
+
+이진 분류에서 binary cross entropy(BCE)는 다음과 같습니다.
+
+`L = -(1/N) * Σ [ y_i log(p_i) + (1-y_i)log(1-p_i) ]`
+
+`p_i`에 대한 도함수는
+
+`dL/dp_i = -( y_i/p_i - (1-y_i)/(1-p_i) ) / N`
+
+입니다. 확신한 오답(`p`가 0 또는 1에 매우 가까운데 라벨이 반대)에서 gradient가 커지므로, 모델이 잘못된 확신을 빠르게 수정하도록 압력을 줍니다.
+
+```python
+import numpy as np
+
+def bce(y, p, eps=1e-12):
+    y = np.asarray(y, dtype=float)
+    p = np.asarray(p, dtype=float)
+    p = np.clip(p, eps, 1.0 - eps)
+    return -np.mean(y * np.log(p) + (1 - y) * np.log(1 - p))
+
+def bce_grad(y, p, eps=1e-12):
+    y = np.asarray(y, dtype=float)
+    p = np.asarray(p, dtype=float)
+    p = np.clip(p, eps, 1.0 - eps)
+    n = y.size
+    return (-(y / p) + (1 - y) / (1 - p)) / n
+
+y = np.array([1, 0, 1, 0], dtype=float)
+p = np.array([0.9, 0.3, 0.6, 0.1], dtype=float)
+print('bce :', bce(y, p))
+print('grad:', bce_grad(y, p))
+```
+
+## 손실 지형(loss landscape) 읽기
+
+손실 함수는 숫자 하나지만, 파라미터 공간에서는 지형을 이룹니다. 이 지형을 읽으면 왜 optimizer 설정이 민감한지 이해하기 쉬워집니다.
+
+```python
+import numpy as np
+
+def loss_surface(w1, w2):
+    return (w1 - 1.0)**2 + 0.5*(w2 + 2.0)**2 + 0.2*w1*w2
+
+w1s = np.linspace(-3, 3, 7)
+w2s = np.linspace(-4, 2, 7)
+grid = np.array([[loss_surface(a, b) for b in w2s] for a in w1s])
+print(grid)
+```
+
+등고선 관점에서는 다음을 먼저 확인합니다.
+
+| 지형 특징 | 학습 영향 | 권장 대응 |
+| --- | --- | --- |
+| 완만한 평지(plateau) | gradient 작아 학습 정체 | lr schedule, warmup, 초기화 개선 |
+| 좁은 협곡 | 축별 진동 증가 | 정규화, momentum, 적응형 optimizer |
+| 다중 골짜기 | 초기값 의존성 증가 | seed 다중 실험, 앙상블 고려 |
+| 날카로운 절벽 | 수치 불안정 위험 | gradient clipping, 손실 안정화 |
+
+## 커스텀 손실 구현 예시
+
+실무에서는 도메인 제약 때문에 기본 손실에 항을 추가하는 경우가 많습니다. 예를 들어 회귀 오차 + L2 정규화 + 임계치 초과 패널티를 함께 쓸 수 있습니다.
+
+```python
+import torch
+
+class HybridLoss(torch.nn.Module):
+    def __init__(self, l2_weight=1e-4, threshold=2.0, penalty_weight=0.5):
+        super().__init__()
+        self.l2_weight = l2_weight
+        self.threshold = threshold
+        self.penalty_weight = penalty_weight
+
+    def forward(self, pred, target, model_params):
+        mse = torch.mean((pred - target) ** 2)
+        l2 = torch.zeros((), device=pred.device)
+        for p in model_params:
+            l2 = l2 + torch.sum(p ** 2)
+
+        excess = torch.relu(torch.abs(pred - target) - self.threshold)
+        robust_penalty = torch.mean(excess)
+
+        return mse + self.l2_weight * l2 + self.penalty_weight * robust_penalty
+```
+
+커스텀 손실을 도입할 때는 반드시 세 항의 scale을 로그로 분리해 기록해야 합니다. 총손실만 보면 어느 항이 학습을 지배하는지 알 수 없습니다.
+
+## 손실 함수 선택 가이드
+
+손실 선택은 "문제 타입"과 "운영 제약"을 같이 봐야 합니다.
+
+| 문제 상황 | 기본 후보 | 보강 옵션 | 점검 질문 |
 | --- | --- | --- | --- |
-| 손실 형태 | 평균 제곱 오차 | 음의 로그 우도 | 문제 유형 일치 여부 |
-| gradient 민감도 | 큰 오차에 더 민감 | 확신한 오답에 큰 페널티 | 폭주/포화 구간 확인 |
-| 수치 안정성 | 비교적 안정적 | `log(0)` 방어 필요 | `eps` 처리 |
-| 학습 신호 | 선형 오차 비례 | 확률 오차 반영 | calibration 해석 |
+| 연속값 회귀 | MSE | Huber, LogCosh | 이상치 비중이 높은가 |
+| 이진 분류 | BCE | Focal Loss, class weight | 클래스 불균형이 큰가 |
+| 다중 분류 | Cross Entropy | Label Smoothing | 과신(confidence) 완화가 필요한가 |
+| 순위/추천 | Pairwise loss | sampled softmax | 상대 순서가 중요한가 |
+| 다중 과제 | 가중 합 손실 | uncertainty weighting | 과제별 gradient 균형이 맞는가 |
 
-### 체인 룰 검증: 수치 미분과 해석 미분 비교
+실무 기준으로는 다음 순서를 권장합니다.
 
-```python
-import math
+1. 문제 타입에 맞는 표준 손실로 시작합니다.
+2. 실패 패턴을 관찰한 뒤 최소 보강만 추가합니다.
+3. 보강 항을 넣을 때는 각 항의 scale과 gradient norm을 함께 모니터링합니다.
 
-def f(x):
-    return math.sin(3 * x + 1)
+## 수치 안정성: NaN을 막는 구현 규칙
 
-def analytic_grad(x):
-    # d/dx sin(3x+1) = cos(3x+1) * 3
-    return math.cos(3 * x + 1) * 3
-
-def numeric_grad(fn, x, h=1e-5):
-    return (fn(x + h) - fn(x - h)) / (2 * h)
-
-x = 0.7
-print(analytic_grad(x), numeric_grad(f, x))
-```
-
-해석 미분과 수치 미분이 비슷하게 나오면 체인 룰 구현이 올바르게 연결되었다는 강한 증거가 됩니다.
-
-### 2변수 손실에서 gradient 벡터 해석
+손실 함수는 미분 가능성뿐 아니라 수치 안정성까지 만족해야 합니다. 특히 log/exp 연산은 안정화 수식이 필수입니다.
 
 ```python
-def loss(w1, w2):
-    return (w1 - 2) ** 2 + 4 * (w2 + 1) ** 2
+import torch
 
-def grad(w1, w2):
-    return 2 * (w1 - 2), 8 * (w2 + 1)
-
-w1, w2 = 0.0, 0.0
-g1, g2 = grad(w1, w2)
-print('grad=', (g1, g2))
+# logits 기반 BCE는 내부적으로 안정화된 구현을 사용
+criterion = torch.nn.BCEWithLogitsLoss()
+logits = torch.tensor([3.0, -2.0, 0.4])
+target = torch.tensor([1.0, 0.0, 1.0])
+loss = criterion(logits, target)
+print(loss)
 ```
 
-이 예시에서는 두 번째 축 gradient가 더 크게 나오므로 동일 learning rate에서도 `w2` 방향 업데이트가 더 공격적으로 일어납니다. 좌표별 스케일 차이를 optimizer가 어떻게 다루는지 이해하는 출발점입니다.
+`sigmoid -> BCE`를 분리해서 직접 구현하면 underflow/overflow 위험이 커집니다. 가능하면 `BCEWithLogitsLoss`처럼 결합된 안정화 구현을 쓰는 편이 안전합니다.
 
-### 손실 곡선 해석 표
+추가로 자주 쓰는 안정화 규칙은 다음과 같습니다.
 
-| 관찰 패턴 | 가능한 원인 | 우선 점검 |
+- `log(p)` 전에는 `p = clip(p, eps, 1-eps)`를 적용합니다.
+- `exp(x)`는 큰 양수 입력에서 overflow가 나므로 `x` 범위를 제한합니다.
+- 합-로그 형태는 `log-sum-exp` 트릭으로 계산합니다.
+- mixed precision에서는 loss scaling과 gradient overflow 체크를 함께 사용합니다.
+
+| 위험 연산 | 불안정 조건 | 안정화 방법 |
 | --- | --- | --- |
-| 초반 급상승 후 발산 | learning rate 과대, gradient 폭주 | lr 감소, clipping |
-| 매우 느린 하강 | learning rate 과소, 특징 스케일 불일치 | lr 증가, 정규화 |
-| 진동만 하고 정체 | 비등방 지형, batch noise 과다 | momentum, batch 조정 |
-| train 감소 / val 정체 | 과적합 | weight decay, early stopping |
+| `log(p)` | `p -> 0` | clipping 또는 logits 기반 구현 |
+| `exp(x)` | `x >> 0` | 입력 클램프, `torch.logsumexp` |
+| `1/p` | `p -> 0` | 분모 epsilon 추가 |
+| softmax | 큰 logits 차이 | max-shift softmax |
 
-### 미니 실습: 간단한 업데이트 루프
+## 손실 디버깅 루틴
+
+모델이 학습되지 않을 때는 복잡한 변경보다 손실 경로를 먼저 점검하는 것이 빠릅니다.
+
+1. 배치 하나로 forward/backward를 돌려 loss와 grad의 유한성(`isfinite`)을 확인합니다.
+2. 손실 항이 여러 개면 항별 값과 항별 gradient norm을 분리 로그로 남깁니다.
+3. 라벨 분포, 예측 분포, threshold 기반 성능을 함께 비교합니다.
+4. 학습률을 바꾸기 전에 손실 구현의 reduction(mean/sum) 일관성을 확인합니다.
 
 ```python
-def train_step(w, x, y, lr=0.05):
-    pred = w * x
-    loss = (pred - y) ** 2
-    grad = 2 * (pred - y) * x
-    w = w - lr * grad
-    return w, loss, grad
-
-w = 0.0
-for _ in range(5):
-    w, L, g = train_step(w, x=3.0, y=12.0)
-    print(f'w={w:.4f}, loss={L:.4f}, grad={g:.4f}')
+def assert_finite(tensor, name):
+    if not torch.isfinite(tensor).all():
+        raise ValueError(f'{name} contains NaN or Inf')
 ```
 
-짧은 루프지만 forward-loss-backward-update가 모두 포함되어 있습니다. 이 구조를 이해하면 어떤 딥러닝 프레임워크의 학습 코드도 핵심 의미를 잃지 않고 읽을 수 있습니다.
-
-### 실전 점검 루틴
-
-1. 해석 미분과 수치 미분을 작은 예제로 한 번 맞춰 봅니다.
-2. gradient norm을 함께 기록해 신호 크기 변화를 확인합니다.
-3. learning rate를 3개 이상 비교해 수렴 민감도를 봅니다.
-4. train/validation 손실을 동시에 관찰해 과적합 신호를 분리합니다.
-5. 이상 징후가 생기면 모델 구조보다 손실/미분/업데이트 순서를 먼저 점검합니다.
-
-이 루틴이 자리 잡으면 미분 개념이 수학 노트에 머무르지 않고 실제 모델 훈련 의사결정으로 연결됩니다.
+이 루틴을 자동화하면 손실 문제를 모델 구조 문제와 분리해 더 빠르게 해결할 수 있습니다.
 
 
+## 다중 분류 cross entropy와 softmax gradient
 
-## 추가 보강: 검증 가능한 예제 세트
+다중 분류에서는 softmax와 cross entropy를 함께 사용합니다. 클래스 `k`의 확률을 `p_k`라고 하면
 
-### 입력 크기 대비 알고리즘/학습 선택 표
+`L = - Σ y_k log(p_k)`
 
-| 상황 | 빠른 선택 | 검증 기준 |
+이며 one-hot 라벨일 때 `dL/dz = p - y` 형태로 단순화됩니다(`z`는 logits). 이 단순화 덕분에 구현이 안정적이고 계산도 효율적입니다.
+
+```python
+import numpy as np
+
+def softmax(z):
+    z = z - np.max(z)
+    e = np.exp(z)
+    return e / np.sum(e)
+
+def ce_with_logits_grad(logits, y_onehot):
+    p = softmax(logits)
+    return p - y_onehot
+
+logits = np.array([2.0, 0.5, -1.0])
+y = np.array([1.0, 0.0, 0.0])
+print(ce_with_logits_grad(logits, y))
+```
+
+실무에서 프레임워크의 `CrossEntropyLoss`가 logits 입력을 요구하는 이유도 여기에 있습니다. softmax를 밖에서 한 번 더 적용하면 gradient가 왜곡될 수 있습니다.
+
+## 불균형 데이터에서 손실 설계
+
+클래스 불균형이 큰 문제에서는 평균 손실만으로는 소수 클래스 학습이 약해질 수 있습니다. 가중치 기반 손실이나 focal loss를 통해 희귀 클래스에 더 큰 신호를 줄 수 있습니다.
+
+| 방법 | 핵심 아이디어 | 장점 | 주의점 |
+| --- | --- | --- | --- |
+| class weight | 클래스별 손실 가중치 조정 | 구현 단순 | 과대 가중 시 불안정 |
+| focal loss | 쉬운 샘플 가중치 감소 | 어려운 샘플 집중 | gamma 튜닝 필요 |
+| resampling + 표준 손실 | 데이터 분포 보정 | 직관적 | 분산 증가 가능 |
+
+```python
+import torch
+
+criterion = torch.nn.CrossEntropyLoss(weight=torch.tensor([1.0, 3.0, 6.0]))
+logits = torch.randn(8, 3)
+target = torch.tensor([0, 1, 2, 2, 1, 0, 2, 1])
+loss = criterion(logits, target)
+print(loss)
+```
+
+## 손실 항 가중치 조정 실무 규칙
+
+다중 과제 모델이나 하이브리드 손실에서는 항별 가중치가 성능을 좌우합니다. 임의로 값을 정하기보다 다음 절차를 권장합니다.
+
+1. 초기 100~500 step에서 각 항의 평균값과 gradient norm을 기록합니다.
+2. 특정 항이 전체를 지배하면 가중치를 축소합니다.
+3. 검증 지표 개선 폭이 작은 항은 제거를 검토합니다.
+
+| 항목 | 기록 지표 | 해석 |
 | --- | --- | --- |
-| 작은 입력, 빠른 프로토타입 | 단순 구현 우선 | 정답 검증 테스트 3종 |
-| 큰 입력, 지연시간 민감 | 차수 낮은 알고리즘 또는 안정적 optimizer | 시간/메모리 동시 측정 |
-| 운영 장애 재현 필요 | 로그/추적 필드 강화 | 동일 입력 재실행 가능성 |
+| 기본 예측 손실 | 평균값, 분산 | 학습 목표 적합성 |
+| 정규화 항 | 값 대비 grad 기여 | 과규제 여부 |
+| 제약 패널티 | 활성화 비율 | 제약이 실제로 작동하는지 |
 
-### 짧은 비교 코드
+## 손실 구현 검증용 단위 테스트
+
+손실 함수는 모델 코드보다 작지만, 작은 버그가 학습 전체를 망가뜨립니다. 최소 단위 테스트를 두면 위험을 크게 줄일 수 있습니다.
 
 ```python
-import time
+import numpy as np
 
-def measure(fn, *args, repeat=3):
-    best = float('inf')
-    for _ in range(repeat):
-        t0 = time.perf_counter()
-        fn(*args)
-        best = min(best, time.perf_counter() - t0)
-    return best
+def test_mse_zero_when_equal():
+    y = np.array([1.0, 2.0, 3.0])
+    p = np.array([1.0, 2.0, 3.0])
+    assert np.isclose(np.mean((y-p)**2), 0.0)
+
+def test_bce_finite():
+    y = np.array([0.0, 1.0])
+    p = np.array([1e-15, 1-1e-15])
+    p = np.clip(p, 1e-12, 1-1e-12)
+    loss = -np.mean(y*np.log(p)+(1-y)*np.log(1-p))
+    assert np.isfinite(loss)
 ```
 
-측정 코드는 화려할 필요가 없습니다. 같은 입력, 같은 환경, 같은 반복 기준을 유지하는 것이 더 중요합니다. 이 습관이 있어야 최적화 전후의 차이를 신뢰할 수 있습니다.
+이 정도 테스트만 있어도 `log(0)` 계열 문제를 커밋 전에 잡을 수 있습니다.
 
-### 실전 점검 질문
 
-1. 지금 선택한 방법의 시간/공간 비용을 한 문장으로 설명할 수 있는가
-2. 경계 입력에서 동작이 바뀌는 지점을 테스트로 고정했는가
-3. 운영 로그만으로 실패 원인을 분리할 수 있는가
+## 손실과 평가 지표의 분리 운영
 
-이 질문에 즉답할 수 있으면 구현이 아니라 설계 수준에서 품질을 확보한 상태에 가깝습니다.
+학습 손실이 좋아도 운영 지표가 나빠질 수 있습니다. 따라서 손실과 지표를 분리해 모니터링해야 합니다.
+
+| 구분 | 목적 | 예시 |
+| --- | --- | --- |
+| 학습 손실 | gradient 생성 | MSE, BCE, CE |
+| 오프라인 평가 | 모델 비교 | RMSE, F1, AUC |
+| 온라인 지표 | 제품 성과 | CTR, 전환율, 지연시간 |
+
+손실은 최적화 편의 때문에 설계되고, 제품 지표는 비즈니스 목적 때문에 정의됩니다. 둘이 완전히 일치하지 않는 것이 일반적이므로, 실험 리포트에 두 축을 함께 기록해야 의사결정이 정확해집니다.
+
+## 수치 안정성 회귀 테스트
+
+손실 구현은 라이브러리 업데이트나 dtype 변경으로도 쉽게 흔들릴 수 있습니다. 정기 회귀 테스트를 추가해 안정성을 유지해야 합니다.
+
+```python
+def finite_check(loss_fn, inputs):
+    import numpy as np
+    vals = [loss_fn(*x) for x in inputs]
+    return all(np.isfinite(v) for v in vals)
+```
+
+극단 logits, 극단 확률, 빈 배치 경계 케이스를 고정 세트로 두면 배포 전 사고를 크게 줄일 수 있습니다.
+
+## 처음 질문으로 돌아가기
+
+- **손실 함수는 단순한 평가 지표와 무엇이 다를까요?**
+  - 평가 지표는 결과를 읽는 값이고, 손실 함수는 `dL/dp`를 만들어 파라미터 업데이트를 유도하는 학습 엔진입니다. MSE/BCE 유도식에서 보듯 손실은 오차의 크기뿐 아니라 수정 방향까지 제공합니다.
+- **회귀에서 MSE를, 분류에서 cross entropy를 자주 쓰는 이유는 무엇일까요?**
+  - MSE는 연속 오차를 제곱 벌점으로 다루어 회귀 목표와 잘 맞고, BCE는 확률 예측의 우도 관점과 연결되어 분류의 신뢰도 오류를 강하게 교정합니다. 따라서 문제 구조와 gradient 신호의 형태가 각각 자연스럽게 맞물립니다.
+- **손실 함수의 gradient는 왜 학습 신호라고 불릴까요?**
+  - gradient는 "얼마나 틀렸는가"를 "어느 방향으로 얼마나 움직일 것인가"로 변환합니다. 손실 지형, 커스텀 손실 항, 수치 안정화 규칙까지 포함해 이 신호 품질을 관리해야 실제 학습이 안정적으로 진행됩니다.
 
 ## 처음 질문으로 돌아가기
 
@@ -297,6 +485,9 @@ def measure(fn, *args, repeat=3):
 - [Cross Entropy - CS231n](https://cs231n.github.io/linear-classify/)
 - [Deep Learning Book - Loss](https://www.deeplearningbook.org/contents/mlp.html)
 - [Class Imbalance - scikit-learn](https://scikit-learn.org/stable/modules/svm.html#unbalanced-problems)
+
+### 예제 코드
+- [book-examples/calculus-for-ml-101/ko](https://github.com/yeongseon-books/book-examples/tree/main/calculus-for-ml-101/ko)
 
 ### 관련 시리즈
 - [Linear Algebra 101](../../linear-algebra-101/ko/)

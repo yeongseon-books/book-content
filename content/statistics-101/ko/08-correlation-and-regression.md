@@ -22,6 +22,8 @@ last_reviewed: '2026-05-12'
 
 # Statistics 101 (8/10): 상관과 회귀
 
+이 글은 Statistics 101 시리즈의 8번째 글입니다.
+
 두 변수가 함께 움직이면 사람은 곧바로 이유를 찾고 싶어 합니다. 광고비가 늘면 매출이 오르는지, 공부 시간이 길면 점수가 오르는지, 가격이 내려가면 수요가 늘어나는지 같은 질문은 분석의 출발점이 됩니다.
 
 하지만 함께 움직인다는 사실만으로 원인과 결과가 증명되지는 않습니다. 상관은 관계의 방향과 강도를 보여 주고, 회귀는 그 관계를 식으로 표현해 예측 가능한 형태로 만듭니다. 둘은 연결되어 있지만 같은 질문에 답하지는 않습니다.
@@ -64,7 +66,7 @@ last_reviewed: '2026-05-12'
 - **R²**: 모델이 데이터 분산을 얼마나 설명하는지 나타내는 비율입니다.
 - 잔차: 실제값에서 예측값을 뺀 값으로, 모델 진단의 핵심 재료입니다.
 
-## 상관 vs 인과
+## 상관 대비 인과
 
 상관과 인과는 가장 자주 섞이는 개념입니다. 아래 표는 둘의 차이와 판단 기준을 정리합니다.
 
@@ -152,7 +154,7 @@ plt.scatter(model.predict(X), resid); plt.axhline(0); plt.show()
 - R²는 설명력의 크기를 말하지만 모델 품질 전체를 대신하지는 않습니다.
 - 잔차 패턴은 비선형성이나 구조적 문제를 알려 줍니다.
 
-## Python statsmodels로 회귀 분석하기
+## 파이썬 스탯모델즈로 회귀 분석하기
 
 statsmodels는 scikit-learn보다 더 자세한 통계 요약을 제공합니다. 계수의 신뢰구간, p-value, R², 잔차 진단까지 한 번에 볼 수 있습니다.
 
@@ -257,7 +259,7 @@ VIF > 10이면 다중공선성이 심각합니다. 해결 방법:
 
 시니어 엔지니어는 상관이 높아도 바로 인과를 말하지 않고, 산점도를 먼저 보고, 잔차를 점검하고, 설명과 예측을 구분합니다. 숫자를 멋지게 뽑는 것보다 어떤 질문에 이 모델이 답할 수 있고 무엇은 답하지 못하는지 말하는 능력이 더 중요합니다.
 
-## 산점도(Scatter Plot) 해석 가이드
+## 산점도(산점도) 해석 가이드
 
 산점도는 회귀 분석에서 가장 먼저 그려야 하는 그림입니다. 숫자만으로는 놓치기 쉬운 패턴을 시각적으로 드러냅니다.
 
@@ -323,6 +325,210 @@ plt.show()
 
 다음 글에서는 p-value를 따로 떼어 더 깊게 다룹니다. 많은 보고서가 결론을 p < 0.05 한 줄로 적는 이유와, 그 문장이 왜 자주 잘못 읽히는지 정리해 보겠습니다.
 
+## 회귀 출력 해석 심화: 계수, 신뢰구간, 잔차
+
+회귀 모델의 핵심은 식 자체보다 해석 가능성입니다. 계수 하나를 읽을 때도 신뢰구간과 잔차 패턴을 함께 봐야 안전합니다.
+
+### 스탯모델즈 요약표에서 우선 볼 항목
+
+1. 계수(`coef`)의 부호와 크기
+2. 계수 구간(`[0.025, 0.975]`)이 0을 포함하는지
+3. `R-squared`와 `Adj. R-squared` 차이
+4. 잔차 진단(정규성, 등분산성)
+
+### 회귀 출력 해석 예제
+
+```python
+import numpy as np
+import pandas as pd
+import statsmodels.api as sm
+
+rng = np.random.default_rng(1)
+n = 300
+ads = rng.normal(100, 20, n)
+price = rng.normal(50, 5, n)
+sales = 800 + 3.2 * ads - 5.0 * price + rng.normal(0, 40, n)
+
+df = pd.DataFrame({'ads': ads, 'price': price, 'sales': sales})
+X = sm.add_constant(df[['ads', 'price']])
+model = sm.OLS(df['sales'], X).fit()
+print(model.summary())
+```
+
+이 출력에서 `ads` 계수의 구간이 0을 넘지 않고 양수라면 광고비 증가와 매출 증가의 관계가 통계적으로 안정적이라는 뜻입니다. 다만 인과 주장은 실험 설계가 뒷받침될 때만 가능합니다.
+
+
+## 실무 확장 노트: 재현 가능한 분석 문서 만들기
+
+통계 글을 읽고 난 뒤 실제 업무에서 가장 먼저 부딪히는 문제는 "같은 분석을 다시 실행할 수 있는가"입니다. 재현 가능성이 없으면 숫자가 맞아도 신뢰를 얻기 어렵습니다. 그래서 통계 작업은 계산 코드뿐 아니라 입력 데이터 스냅샷, 버전, 시드, 가정 문장을 함께 남겨야 합니다.
+
+### 1) 입력 데이터 스냅샷 고정
+
+```python
+import pandas as pd
+from pathlib import Path
+
+raw = pd.read_csv('analysis_input.csv')
+Path('artifacts').mkdir(exist_ok=True)
+raw.to_parquet('artifacts/input_snapshot.parquet', index=False)
+print(raw.shape)
+```
+
+데이터 파이프라인이 바뀌면 같은 쿼리라도 다른 결과가 나올 수 있습니다. 그래서 분석 시점의 스냅샷을 남기는 습관이 중요합니다.
+
+### 2) 전처리 규칙 문서화
+
+```python
+import numpy as np
+
+def preprocess(df):
+    out = df.copy()
+    out = out.dropna(subset=['metric'])
+    out = out[(out['metric'] >= 0) & (out['metric'] <= out['metric'].quantile(0.999))]
+    out['segment'] = out['segment'].fillna('unknown')
+    return out
+```
+
+이상치 제거, 결측값 처리, 세그먼트 매핑은 결과를 크게 바꿉니다. 코드와 문서를 동시에 남겨야 이후 검토에서 혼선을 줄일 수 있습니다.
+
+### 3) 분포 진단 + 추정 + 검정을 한 화면에서 보고하기
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+x = np.random.default_rng(0).normal(100, 15, 600)
+y = np.random.default_rng(1).normal(103, 15, 600)
+
+fig, ax = plt.subplots(1, 2, figsize=(12, 4))
+ax[0].hist(x, bins=40, alpha=0.6, label='A')
+ax[0].hist(y, bins=40, alpha=0.6, label='B')
+ax[0].legend(); ax[0].set_title('분포 비교')
+
+ax[1].boxplot([x, y], labels=['A', 'B'])
+ax[1].set_title('사분위수 비교')
+plt.tight_layout(); plt.show()
+
+diff = y.mean() - x.mean()
+se = np.sqrt(x.var(ddof=1)/len(x) + y.var(ddof=1)/len(y))
+ci = (diff - 1.96*se, diff + 1.96*se)
+t, p = stats.ttest_ind(x, y, equal_var=False)
+print(f'diff={diff:.3f}, 95% CI={ci}, p={p:.4f}')
+```
+
+그래프와 수치를 분리하면 오해가 늘어납니다. 같은 섹션에서 함께 보여 주면 해석 품질이 올라갑니다.
+
+### 4) 효과 크기와 실행 기준 연결
+
+```python
+pooled = np.sqrt((x.var(ddof=1) + y.var(ddof=1)) / 2)
+cohens_d = (y.mean() - x.mean()) / pooled
+print(f"Cohen's d={cohens_d:.3f}")
+```
+
+p-value가 작아도 효과 크기가 매우 작다면 실행 우선순위가 낮을 수 있습니다. 반대로 p-value 경계선이더라도 효과 크기와 비용 구조가 유리하면 추가 실험으로 이어갈 가치가 있습니다.
+
+### 5) 결과 문장 표준화
+
+분석 결과는 다음 형식으로 정리하면 팀 의사결정이 빨라집니다.
+
+- 관찰 차이: 절대값과 상대값을 모두 표기합니다.
+- 불확실성: 95% 신뢰구간과 표본 수를 함께 표기합니다.
+- 유의성: 검정 방법과 p-value를 표기합니다.
+- 실행 판단: 배포/보류/추가실험 중 하나를 명시합니다.
+
+통계는 결국 팀의 공통 언어를 만드는 일입니다. 재현 가능한 분석 문서를 남기면 개인의 직관이 아니라 조직의 기준으로 의사결정을 반복할 수 있습니다.
+
+
+## 추가 메모: 검증 가능한 의사결정 문장
+
+분석 결과를 보고할 때는 "좋아 보입니다" 같은 모호한 문장을 피하고, 기준과 근거를 한 줄에 함께 적는 것이 좋습니다. 예를 들어 "전환율 +0.6%p, 95% 신뢰구간 +0.1~+1.1%p, p=0.014, 월간 기대효과 +320건, 2주 재검증 조건부 배포"처럼 쓰면 의사결정 책임이 명확해집니다. 이런 형식은 통계 도구가 바뀌어도 유지되는 팀 자산입니다.
+
+
+## 실무 확장 노트: 재현 가능한 분석 문서 만들기
+
+통계 글을 읽고 난 뒤 실제 업무에서 가장 먼저 부딪히는 문제는 "같은 분석을 다시 실행할 수 있는가"입니다. 재현 가능성이 없으면 숫자가 맞아도 신뢰를 얻기 어렵습니다. 그래서 통계 작업은 계산 코드뿐 아니라 입력 데이터 스냅샷, 버전, 시드, 가정 문장을 함께 남겨야 합니다.
+
+### 1) 입력 데이터 스냅샷 고정
+
+```python
+import pandas as pd
+from pathlib import Path
+
+raw = pd.read_csv('analysis_input.csv')
+Path('artifacts').mkdir(exist_ok=True)
+raw.to_parquet('artifacts/input_snapshot.parquet', index=False)
+print(raw.shape)
+```
+
+데이터 파이프라인이 바뀌면 같은 쿼리라도 다른 결과가 나올 수 있습니다. 그래서 분석 시점의 스냅샷을 남기는 습관이 중요합니다.
+
+### 2) 전처리 규칙 문서화
+
+```python
+import numpy as np
+
+def preprocess(df):
+    out = df.copy()
+    out = out.dropna(subset=['metric'])
+    out = out[(out['metric'] >= 0) & (out['metric'] <= out['metric'].quantile(0.999))]
+    out['segment'] = out['segment'].fillna('unknown')
+    return out
+```
+
+이상치 제거, 결측값 처리, 세그먼트 매핑은 결과를 크게 바꿉니다. 코드와 문서를 동시에 남겨야 이후 검토에서 혼선을 줄일 수 있습니다.
+
+### 3) 분포 진단 + 추정 + 검정을 한 화면에서 보고하기
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+
+x = np.random.default_rng(0).normal(100, 15, 600)
+y = np.random.default_rng(1).normal(103, 15, 600)
+
+fig, ax = plt.subplots(1, 2, figsize=(12, 4))
+ax[0].hist(x, bins=40, alpha=0.6, label='A')
+ax[0].hist(y, bins=40, alpha=0.6, label='B')
+ax[0].legend(); ax[0].set_title('분포 비교')
+
+ax[1].boxplot([x, y], labels=['A', 'B'])
+ax[1].set_title('사분위수 비교')
+plt.tight_layout(); plt.show()
+
+diff = y.mean() - x.mean()
+se = np.sqrt(x.var(ddof=1)/len(x) + y.var(ddof=1)/len(y))
+ci = (diff - 1.96*se, diff + 1.96*se)
+t, p = stats.ttest_ind(x, y, equal_var=False)
+print(f'diff={diff:.3f}, 95% CI={ci}, p={p:.4f}')
+```
+
+그래프와 수치를 분리하면 오해가 늘어납니다. 같은 섹션에서 함께 보여 주면 해석 품질이 올라갑니다.
+
+### 4) 효과 크기와 실행 기준 연결
+
+```python
+pooled = np.sqrt((x.var(ddof=1) + y.var(ddof=1)) / 2)
+cohens_d = (y.mean() - x.mean()) / pooled
+print(f"Cohen's d={cohens_d:.3f}")
+```
+
+p-value가 작아도 효과 크기가 매우 작다면 실행 우선순위가 낮을 수 있습니다. 반대로 p-value 경계선이더라도 효과 크기와 비용 구조가 유리하면 추가 실험으로 이어갈 가치가 있습니다.
+
+### 5) 결과 문장 표준화
+
+분석 결과는 다음 형식으로 정리하면 팀 의사결정이 빨라집니다.
+
+- 관찰 차이: 절대값과 상대값을 모두 표기합니다.
+- 불확실성: 95% 신뢰구간과 표본 수를 함께 표기합니다.
+- 유의성: 검정 방법과 p-value를 표기합니다.
+- 실행 판단: 배포/보류/추가실험 중 하나를 명시합니다.
+
+통계는 결국 팀의 공통 언어를 만드는 일입니다. 재현 가능한 분석 문서를 남기면 개인의 직관이 아니라 조직의 기준으로 의사결정을 반복할 수 있습니다.
+
+
 ## 처음 질문으로 돌아가기
 
 - **상관계수는 무엇을 말하고 무엇은 말하지 못할까요?**
@@ -354,5 +560,8 @@ plt.show()
 - [Khan Academy — Correlation](https://www.khanacademy.org/math/statistics-probability/describing-relationships-quantitative-data)
 - [Spurious Correlations (Vigen)](https://www.tylervigen.com/spurious-correlations)
 - [Wikipedia — Anscombe's Quartet](https://en.wikipedia.org/wiki/Anscombe%27s_quartet)
+
+
+- [이 시리즈의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/statistics-101/ko)
 
 Tags: Statistics, Correlation, Regression, Modeling, Beginner

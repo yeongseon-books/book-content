@@ -238,6 +238,247 @@ for name, bits in data_sizes.items():
 
 문자 인코딩도 초기에 표준을 못 박습니다. 프로젝트 전역에서 UTF-8을 기본으로 삼고, 파일·HTTP 헤더·DB 연결마다 그 사실을 명시하는 습관이 수많은 깨짐 문제를 예방합니다.
 
+## 비트 연산과 마스킹: 데이터 표현의 실전 도구
+
+비트 연산은 데이터 표현을 직접 조작하는 가장 낮은 수준의 도구입니다. 네트워크 프로토콜 파싱, 권한 플래그 관리, 그래픽스 색상 조작 등 실무 곳곳에서 등장합니다.
+
+```python
+# 비트 연산 기본
+a = 0b1100  # 12
+b = 0b1010  # 10
+
+print(f"a & b (AND)  = {bin(a & b):>10}  ({a & b})")   # 1000 (8)
+print(f"a | b (OR)   = {bin(a | b):>10}  ({a | b})")   # 1110 (14)
+print(f"a ^ b (XOR)  = {bin(a ^ b):>10}  ({a ^ b})")   # 0110 (6)
+print(f"~a    (NOT)  = {bin(~a & 0xFF):>10}  ({~a & 0xFF})")  # 11110011 (243)
+print(f"a << 2 (LEFT)= {bin(a << 2):>10}  ({a << 2})") # 110000 (48)
+print(f"a >> 1 (RIGHT)= {bin(a >> 1):>10}  ({a >> 1})") # 110 (6)
+```
+
+### 권한 플래그 관리 예시
+
+Unix 파일 권한이나 사용자 역할 관리에서 비트 마스크를 사용하는 패턴입니다.
+
+```python
+# 권한을 비트 플래그로 관리
+READ = 0b100    # 4
+WRITE = 0b010   # 2
+EXECUTE = 0b001 # 1
+
+def describe_permissions(perm: int) -> str:
+    parts = []
+    if perm & READ:
+        parts.append("읽기")
+    if perm & WRITE:
+        parts.append("쓰기")
+    if perm & EXECUTE:
+        parts.append("실행")
+    return ", ".join(parts) if parts else "없음"
+
+# 권한 조합
+admin = READ | WRITE | EXECUTE  # 7 (rwx)
+viewer = READ                    # 4 (r--)
+editor = READ | WRITE            # 6 (rw-)
+
+print(f"admin:  {admin:03b} -> {describe_permissions(admin)}")
+print(f"viewer: {viewer:03b} -> {describe_permissions(viewer)}")
+print(f"editor: {editor:03b} -> {describe_permissions(editor)}")
+
+# 권한 추가와 제거
+user_perm = READ
+user_perm |= WRITE       # 쓰기 권한 추가
+print(f"추가 후: {user_perm:03b} -> {describe_permissions(user_perm)}")
+user_perm &= ~WRITE      # 쓰기 권한 제거
+print(f"제거 후: {user_perm:03b} -> {describe_permissions(user_perm)}")
+```
+
+## 엔디안과 네트워크 바이트 순서
+
+같은 정수라도 메모리에 저장하는 바이트 순서가 다를 수 있습니다. 이 차이가 네트워크 프로토콜과 파일 포맷에서 문제를 일으킵니다.
+
+```python
+import struct
+
+number = 0x01020304  # 16909060
+
+# 리틀 엔디안 (x86, ARM 기본): 낮은 바이트가 낮은 주소
+le_bytes = struct.pack("<I", number)
+print(f"리틀 엔디안: {' '.join(f'{b:02X}' for b in le_bytes)}")  # 04 03 02 01
+
+# 빅 엔디안 (네트워크 바이트 순서): 높은 바이트가 낮은 주소
+be_bytes = struct.pack(">I", number)
+print(f"빅 엔디안:   {' '.join(f'{b:02X}' for b in be_bytes)}")  # 01 02 03 04
+
+# 네트워크 프로토콜은 항상 빅 엔디안을 사용합니다
+import socket
+network_order = socket.htonl(number)  # host to network long
+print(f"네트워크 순서: {hex(network_order)}")
+```
+
+| 엔디안 | 사용처 | 특징 |
+| --- | --- | --- |
+| 리틀 엔디안 | x86, ARM(기본), Windows | 하위 바이트부터 저장 |
+| 빅 엔디안 | 네트워크 프로토콜, Java class 파일 | 상위 바이트부터 저장 |
+| 바이 엔디안 | ARM(설정 가능) | 모드 전환 가능 |
+
+## 부동소수점 깊이 보기: IEEE 754 내부 구조
+
+`0.1 + 0.2 != 0.3`이 왜 발생하는지를 IEEE 754 내부 구조 수준에서 살펴보겠습니다.
+
+```python
+import struct
+
+def float_to_parts(f: float) -> dict:
+    """64비트 부동소수점을 부호, 지수, 가수로 분해합니다."""
+    raw = struct.pack("d", f)
+    bits = int.from_bytes(raw, byteorder="little")
+
+    sign = (bits >> 63) & 1
+    exponent_raw = (bits >> 52) & 0x7FF
+    mantissa = bits & 0x000FFFFFFFFFFFFF
+
+    exponent = exponent_raw - 1023  # bias 제거
+    return {
+        "값": f,
+        "부호": sign,
+        "지수(raw)": exponent_raw,
+        "지수(실제)": exponent,
+        "가수(hex)": f"{mantissa:013X}",
+        "비트 패턴": f"{bits:064b}",
+    }
+
+for val in [0.1, 0.2, 0.3, 0.1 + 0.2]:
+    parts = float_to_parts(val)
+    print(f"{parts['값']:.20f}")
+    print(f"  부호={parts['부호']} 지수={parts['지수(실제)']} 가수=0x{parts['가수(hex)']}")
+    print()
+```
+
+이 코드를 실행하면 `0.1 + 0.2`의 가수 비트가 `0.3`과 미세하게 다르다는 것을 직접 확인할 수 있습니다. 이진법으로 `0.1`은 무한 소수(`0.0001100110011...`)이므로, 유한한 52비트 가수로 잘리면서 오차가 생깁니다.
+
+### 실무에서의 부동소수점 처리 전략
+
+| 상황 | 권장 방식 | 이유 |
+| --- | --- | --- |
+| 금융 계산 | `Decimal` 또는 정수(센트) | 정확한 십진 연산 필요 |
+| 과학 계산 | `float64` + 오차 허용 | 범위와 속도 우선 |
+| 비교 연산 | `math.isclose(rel_tol=1e-9)` | 직접 `==` 비교 금지 |
+| 누적 합산 | Kahan 합산 알고리즘 | 오차 누적 방지 |
+| 직렬화 | 문자열 또는 정수 변환 | 플랫폼 간 일관성 보장 |
+
+```python
+# Kahan 합산: 부동소수점 누적 오차를 줄이는 알고리즘
+def kahan_sum(values: list[float]) -> float:
+    total = 0.0
+    compensation = 0.0
+    for val in values:
+        y = val - compensation
+        t = total + y
+        compensation = (t - total) - y
+        total = t
+    return total
+
+# 0.1을 10000번 더한 결과 비교
+naive = sum([0.1] * 10000)
+kahan = kahan_sum([0.1] * 10000)
+print(f"단순 합산: {naive:.15f}")
+print(f"Kahan 합산: {kahan:.15f}")
+print(f"기대값:     {1000.0:.15f}")
+```
+
+## 문자 인코딩 실전: 깨진 텍스트 복구하기
+
+실무에서 가장 흔한 인코딩 문제는 "깨진 글자"입니다. 원인과 해결법을 코드로 확인합니다.
+
+```python
+# 흔한 인코딩 실수: UTF-8 바이트를 latin-1로 잘못 해석
+original = "안녕하세요"
+utf8_bytes = original.encode("utf-8")
+
+# 잘못된 디코딩 (mojibake 발생)
+broken = utf8_bytes.decode("latin-1")
+print(f"깨진 텍스트: {broken}")
+
+# 복구: 잘못된 인코딩을 역으로 되돌림
+recovered = broken.encode("latin-1").decode("utf-8")
+print(f"복구된 텍스트: {recovered}")
+
+# 인코딩별 바이트 크기 비교표
+test_strings = [
+    ("A", "영문 1자"),
+    ("가", "한글 1자"),
+    ("你", "중국어 1자"),
+    ("🐍", "이모지 1자"),
+]
+
+print(f"\n{'문자':<6} {'설명':<10} {'UTF-8':>6} {'UTF-16':>7} {'UTF-32':>7}")
+print("-" * 40)
+for char, desc in test_strings:
+    u8 = len(char.encode("utf-8"))
+    u16 = len(char.encode("utf-16-le"))
+    u32 = len(char.encode("utf-32-le"))
+    print(f"{char:<6} {desc:<10} {u8:>4}B  {u16:>5}B  {u32:>5}B")
+```
+
+### 데이터 정렬과 패딩
+
+CPU는 메모리에서 데이터를 읽을 때 자연 경계(natural boundary)에 맞춰 읽습니다. 예를 들어 4바이트 정수는 4의 배수 주소에서 시작해야 한 번의 메모리 접근으로 읽을 수 있습니다. 경계에 맞지 않으면 두 번 읽어야 하므로 성능이 떨어집니다.
+
+```text
+struct Example {
+    char  a;    // 1바이트, 오프셋 0
+    // 패딩 3바이트 (오프셋 1-3)
+    int   b;    // 4바이트, 오프셋 4
+    char  c;    // 1바이트, 오프셋 8
+    // 패딩 7바이트 (오프셋 9-15)
+    double d;   // 8바이트, 오프셋 16
+};
+// sizeof(Example) = 24바이트 (실제 데이터 14바이트 + 패딩 10바이트)
+```
+
+패딩을 줄이려면 필드를 크기 내림차순으로 배치합니다.
+
+```text
+struct Optimized {
+    double d;   // 8바이트, 오프셋 0
+    int    b;   // 4바이트, 오프셋 8
+    char   a;   // 1바이트, 오프셋 12
+    char   c;   // 1바이트, 오프셋 13
+    // 패딩 2바이트 (오프셋 14-15)
+};
+// sizeof(Optimized) = 16바이트 (실제 데이터 14바이트 + 패딩 2바이트)
+```
+
+네트워크 프로토콜에서는 `__attribute__((packed))`를 사용해 패딩을 제거하기도 합니다. 단, 비정렬 접근은 일부 아키텍처(ARM 구형, SPARC)에서 하드웨어 예외를 발생시키므로 주의가 필요합니다.
+
+### 체크섬과 오류 검출
+
+데이터가 저장되거나 전송될 때 비트 오류가 발생할 수 있습니다. 이를 감지하기 위해 여러 기법을 사용합니다.
+
+| 기법 | 원리 | 검출 능력 | 사용처 |
+|------|------|-----------|--------|
+| 패리티 비트 | 1의 개수를 짝수/홀수로 맞춤 | 1비트 오류 검출 | 메모리(ECC) |
+| CRC-32 | 다항식 나눗셈의 나머지 | 연속 32비트 이하 오류 | Ethernet, ZIP |
+| MD5/SHA | 해시 함수 | 의도적 변조 검출 | 파일 무결성 |
+| 해밍 코드 | 여분 비트로 위치 특정 | 1비트 수정, 2비트 검출 | ECC 메모리 |
+
+패리티 비트 계산 예시:
+
+```python
+def even_parity(byte: int) -> int:
+    """8비트 데이터에 짝수 패리티 비트를 추가합니다."""
+    ones = bin(byte).count("1")
+    parity = ones % 2  # 1의 개수가 홀수면 1, 짝수면 0
+    return (byte << 1) | parity
+
+# 예: 0b1010_0110 (1이 4개, 짝수) → 패리티 0 → 0b1_0100_1100
+# 예: 0b1010_0111 (1이 5개, 홀수) → 패리티 1 → 0b1_0100_1111
+print(f"{even_parity(0b10100110):09b}")  # 101001100
+print(f"{even_parity(0b10100111):09b}")  # 101001111
+```
+
+CRC는 더 강력합니다. 데이터를 이진 다항식으로 취급하고, 생성 다항식으로 나눈 나머지를 붙입니다. 수신 측에서 같은 나눗셈을 하면 나머지가 0이어야 정상입니다. 실무에서는 하드웨어 회로나 테이블 기반 알고리즘으로 고속 처리합니다.
+
 ## 체크리스트
 
 - [ ] 이진수와 십진수를 상호 변환할 수 있는가
@@ -285,11 +526,11 @@ for name, bits in data_sizes.items():
 ## 처음 질문으로 돌아가기
 
 - **컴퓨터는 0과 1만으로 숫자, 문자, 이미지를 어떻게 저장할까요?**
-  - 본문의 기준은 데이터 표현를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 모든 데이터는 비트(0/1)로 표현되며, 인코딩 규칙이 비트열에 의미를 부여합니다. 같은 바이트열 `0x41`도 ASCII로 해석하면 문자 'A', 정수로 해석하면 65, 색상 채널로 해석하면 밝기 값이 됩니다. 약속(규칙)이 데이터의 의미를 결정합니다.
 - **ASCII와 UTF-8은 무엇이 다르고 왜 바이트 수가 달라질까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - ASCII는 영문 128자를 1바이트로 표현하는 고정 길이 인코딩입니다. UTF-8은 전 세계 문자를 1~4바이트 가변 길이로 표현합니다. 영문은 1바이트, 한글은 3바이트, 이모지는 4바이트를 사용합니다. 가변 길이 덕분에 영문 중심 텍스트는 공간 효율이 높지만, `len(문자열) != len(바이트열)`이라는 함정이 생깁니다.
 - **음수는 왜 2의 보수 방식으로 표현할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 2의 보수는 덧셈 회로 하나로 양수와 음수 연산을 모두 처리할 수 있게 합니다. 별도의 뺄셈 하드웨어가 필요 없고, +0/-0 이중 표현 문제도 없습니다. 예제에서 확인한 것처럼 -5는 `11111011`로, 5(`00000101`)와 더하면 정확히 0(`00000000`, 오버플로우 비트 무시)이 됩니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -313,5 +554,6 @@ for name, bits in data_sizes.items():
 - [Python 문서 — Floating Point Arithmetic: Issues and Limitations](https://docs.python.org/3/tutorial/floatingpoint.html)
 - [What Every Programmer Should Know About Floating-Point](https://floating-point-gui.de/)
 - [Joel Spolsky — The Absolute Minimum About Unicode](https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/)
+- [이 시리즈의 예제 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/computer-science-101/ko)
 
 Tags: Computer Science, 이진수, 문자 인코딩, UTF-8, 부동소수점, 자료형

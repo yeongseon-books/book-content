@@ -352,6 +352,157 @@ print(chain_rule_example(2.0, 0.5, 1.0))
 
 손실 표면은 비볼록한 경우가 많아 국소 최소, 안장점, 평탄 구간이 공존합니다. 따라서 미분 값 하나만 보지 말고 업데이트 궤적, 손실 곡선, 검증 성능을 함께 점검해야 합니다.
 
+
+### 자동 미분(Automatic Differentiation) 기초
+
+수치 미분은 근사이고, 상징 미분은 느립니다. 자동 미분은 연산 그래프를 추적해 정확한 도함수를 계산합니다.
+
+```python
+class Var:
+    """최소 자동 미분 구현 (순방향 모드)"""
+    def __init__(self, value, deriv=0.0):
+        self.value = value
+        self.deriv = deriv  # 이 변수에 대한 도함수
+
+    def __add__(self, other):
+        return Var(self.value + other.value,
+                   self.deriv + other.deriv)
+
+    def __mul__(self, other):
+        # 곱의 법칙: d(fg) = f'g + fg'
+        return Var(self.value * other.value,
+                   self.deriv * other.value + self.value * other.deriv)
+
+    def __pow__(self, n):
+        # d(x^n) = n * x^(n-1) * dx
+        return Var(self.value ** n,
+                   n * self.value ** (n - 1) * self.deriv)
+
+# f(x) = x^2 + 3x 에서 x=2일 때 도함수
+x = Var(2.0, 1.0)  # deriv=1.0 → x에 대해 미분
+three = Var(3.0, 0.0)
+result = x ** 2 + three * x
+print(f"f(2) = {result.value}")   # 10.0
+print(f"f'(2) = {result.deriv}")  # 7.0 (2*2 + 3)
+```
+
+PyTorch, JAX, TensorFlow 모두 이 원리의 확장입니다. 순방향 모드(forward mode)는 입력 수가 적을 때, 역방향 모드(reverse mode)는 출력 수가 적을 때 효율적입니다. 신경망은 손실 하나(스칼라)에서 많은 파라미터로 미분하므로 역방향 모드가 기본입니다.
+
+### Adam 옵티마이저 스케치
+
+바닐라 경사하강법의 한계(학습률 선택 민감성, 느린 수렴)를 극복하기 위해 적응형 옵티마이저가 등장했습니다. Adam은 1차 모멘트(평균 기울기)와 2차 모멘트(기울기 분산)를 함께 추적합니다.
+
+```python
+import math
+
+def adam_update(params, grads, m, v, t, lr=0.001, beta1=0.9, beta2=0.999, eps=1e-8):
+    """
+    Adam 옵티마이저 1스텝 업데이트
+    params: 현재 파라미터 리스트
+    grads: 그래디언트 리스트
+    m, v: 1차/2차 모멘트
+    t: 현재 타임스텝
+    """
+    updated = []
+    for i in range(len(params)):
+        m[i] = beta1 * m[i] + (1 - beta1) * grads[i]
+        v[i] = beta2 * v[i] + (1 - beta2) * grads[i] ** 2
+        m_hat = m[i] / (1 - beta1 ** t)
+        v_hat = v[i] / (1 - beta2 ** t)
+        params[i] = params[i] - lr * m_hat / (math.sqrt(v_hat) + eps)
+        updated.append(params[i])
+    return updated, m, v
+
+# 단순 예시: f(x) = x^2, 최소값 x=0
+x = [5.0]
+m = [0.0]
+v = [0.0]
+for t in range(1, 201):
+    grad = [2 * x[0]]  # df/dx = 2x
+    x, m, v = adam_update(x, grad, m, v, t)
+
+print(f"x after 200 steps: {x[0]:.6f}")  # ~0.0
+```
+
+Adam이 실무에서 기본 선택인 이유는 학습률 튜닝에 덜 민감하고, 대부분의 문제에서 안정적으로 수렴하기 때문입니다.
+
+### 편미분과 그래디언트 벡터
+
+다변수 함수에서 각 변수에 대한 편미분을 모아 벡터로 만든 것이 그래디언트입니다.
+
+```python
+import numpy as np
+
+def numerical_gradient(f, x: np.ndarray, h: float = 1e-5) -> np.ndarray:
+    """다변수 함수의 수치 그래디언트를 계산합니다."""
+    grad = np.zeros_like(x)
+    for i in range(len(x)):
+        x_plus = x.copy()
+        x_minus = x.copy()
+        x_plus[i] += h
+        x_minus[i] -= h
+        grad[i] = (f(x_plus) - f(x_minus)) / (2 * h)
+    return grad
+
+# f(x, y) = x^2 + 2*y^2
+def loss(w):
+    return w[0]**2 + 2 * w[1]**2
+
+w = np.array([3.0, 2.0])
+g = numerical_gradient(loss, w)
+print(f"gradient at (3, 2): {g}")  # [6.0, 8.0]
+print(f"\u2207f = (2x, 4y) = ({2*3.0}, {4*2.0})")
+```
+
+그래디언트는 손실 함수가 가장 빠르게 증가하는 방향을 가리킵니다. 경사하강법은 그 반대 방향으로 이동해 손실을 줄입니다. 모델 파라미터가 수만~수억 개일 때도 이 원리는 동일하며, 역전파가 각 파라미터의 편미분을 효율적으로 계산해 줍니다.
+
+### 연쇄 법칙과 역전파
+
+딥러닝에서 손실 함수는 여러 층의 합성 함수입니다. 연쇄 법칙(chain rule)은 합성 함수의 미분을 각 단계의 미분 곱으로 분해합니다.
+
+$$\frac{\partial L}{\partial w_1} = \frac{\partial L}{\partial z_3} \cdot \frac{\partial z_3}{\partial z_2} \cdot \frac{\partial z_2}{\partial w_1}$$
+
+```python
+import numpy as np
+
+def forward_and_backward():
+    """2층 네트워크의 순전파와 역전파를 수동으로 구현합니다."""
+    # 입력과 가중치
+    x = np.array([1.0, 2.0])
+    w1 = np.array([[0.5, -0.3], [0.2, 0.8]])
+    w2 = np.array([[0.4], [0.7]])
+    y_true = np.array([1.0])
+
+    # --- 순전파 ---
+    z1 = x @ w1                    # (2,) @ (2,2) = (2,)
+    a1 = np.maximum(0, z1)         # ReLU
+    z2 = a1 @ w2                   # (2,) @ (2,1) = (1,)
+    loss = 0.5 * (z2 - y_true)**2  # MSE
+
+    # --- 역전파 (연쇄 법칙 적용) ---
+    dL_dz2 = z2 - y_true                          # ∂L/∂z2
+    dL_dw2 = a1.reshape(-1, 1) * dL_dz2           # ∂L/∂w2
+    dL_da1 = (dL_dz2 * w2.T).flatten()            # ∂L/∂a1
+    dL_dz1 = dL_da1 * (z1 > 0).astype(float)     # ReLU 미분
+    dL_dw1 = np.outer(x, dL_dz1)                  # ∂L/∂w1
+
+    print(f"loss: {loss[0]:.6f}")
+    print(f"dL/dw1:\n{dL_dw1}")
+    print(f"dL/dw2:\n{dL_dw2.flatten()}")
+    return dL_dw1, dL_dw2
+
+forward_and_backward()
+```
+
+각 층에서 국소 미분(local gradient)을 계산하고, 출력 쪽에서 입력 쪽으로 곱해 나가는 것이 역전파의 핵심입니다. 순전파 때 저장한 중간값(`z1`, `a1`)을 재활용하므로, 파라미터 수가 수억 개여도 한 번의 순전파 + 한 번의 역전파로 모든 그래디언트를 구할 수 있습니다.
+
+| 단계 | 순전파 계산 | 역전파에서 필요한 국소 미분 |
+|------|------------|--------------------------|
+| Linear (z = Wx) | 행렬 곱 | ∂z/∂W = x^T, ∂z/∂x = W^T |
+| ReLU (a = max(0, z)) | 원소별 비교 | z > 0 이면 1, 아니면 0 |
+| MSE Loss (L = ½(ŷ−y)²) | 차이 제곱 | ∂L/∂ŷ = ŷ − y |
+
+이 표를 기억하면, 새로운 활성화 함수나 손실 함수를 만났을 때도 국소 미분만 유도하면 역전파를 구현할 수 있습니다.
 ## 처음 질문으로 돌아가기
 
 - **변화량을 왜 한 점의 기울기로 요약할 수 있을까요?**
@@ -384,5 +535,6 @@ print(chain_rule_example(2.0, 0.5, 1.0))
 - [Gradient Descent - Deep Learning Book](https://www.deeplearningbook.org/contents/numerical.html)
 - [SymPy Calculus Documentation](https://docs.sympy.org/latest/modules/calculus/index.html)
 - [SymPy GitHub repository](https://github.com/sympy/sympy)
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/math-for-cs-101/ko)
 
 Tags: Math, Calculus, Derivative, GradientDescent, Beginner

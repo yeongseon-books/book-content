@@ -69,7 +69,7 @@ instr 5:                          F    D    E
 | Branch prediction | 분기 방향을 미리 추측하는 기법 |
 | Stall | 유효한 작업 없이 파이프라인이 쉬는 사이클 |
 
-## Before / After
+## 적용 전과 후
 
 **Before — 분기가 많은 코드:**
 
@@ -254,135 +254,359 @@ print(abs_with_branch(5), abs_branchless(5))
 
 다음 글에서는 CPU 바깥의 느린 세계, 즉 I/O와 장치를 봅니다. 디스크, 네트워크, 키보드 같은 장치가 어떻게 CPU와 연결되고, 왜 비동기 모델이 필요한지 짚어보겠습니다.
 
-## 심화 실습: 비트 연산 · 캐시 계산 · 파이프라인 관찰
+## 심화 학습: 파이프라인 해저드와 성능 최적화
 
-컴퓨터 구조를 실제로 이해하려면 정의를 암기하는 대신 숫자를 직접 계산해 보는 과정이 필요합니다. 같은 명령이라도 비트 표현, 메모리 계층, 파이프라인 충돌 조건을 동시에 보면 성능 병목의 원인이 선명해집니다.
-
-### 2의 보수와 비트 마스크를 수치로 확인하기
-
-```python
-def to_u8(n: int) -> int:
-    return n & 0xFF
-
-def to_s8(n: int) -> int:
-    n &= 0xFF
-    return n - 0x100 if n & 0x80 else n
-
-x = to_u8(-5)          # 251 (0b11111011)
-y = to_u8(12)          # 12  (0b00001100)
-print(bin(x), bin(y))
-print(to_s8(x + y))    # 7
-print(to_s8(x - y))    # -17
-```
-
-핵심은 ALU가 "부호 있는 정수"와 "부호 없는 정수"를 따로 계산하지 않는다는 점입니다. 동일한 비트열을 어떻게 해석하느냐가 결과 의미를 바꿉니다. 그래서 ISA 문서에는 signed/unsigned 비교 명령이 따로 존재합니다.
-
-### 캐시 인덱스 계산을 손으로 풀기
-
-가정:
-- L1 D-cache = 32KiB
-- line size = 64B
-- 8-way set associative
-
-계산:
-- 총 line 수 = 32KiB / 64B = 512
-- set 수 = 512 / 8 = 64
-- set index 비트 수 = log2(64) = 6
-- block offset 비트 수 = log2(64) = 6
-- tag 비트 수(48-bit VA 가정) = 48 - 6 - 6 = 36
-
-즉 주소 비트 분해는 `[tag:36][index:6][offset:6]`이 됩니다. 두 주소가 같은 set에 매핑되는지 확인하려면 offset을 제거한 뒤 index 6비트를 비교하면 됩니다.
-
-### 캐시 미스 패턴을 추적하는 간단 코드
-
-```python
-# stride 접근이 캐시 locality에 미치는 영향 관찰
-N = 1024 * 1024
-arr = [0] * N
-
-def walk(step: int):
-    s = 0
-    for i in range(0, N, step):
-        s += arr[i]
-    return s
-
-for step in [1, 2, 4, 8, 16, 32, 64, 128]:
-    walk(step)
-```
-
-이 코드는 단순하지만 실험 관점에서는 매우 유용합니다. `step`이 커질수록 한 cache line에서 활용하는 유효 데이터가 줄고 miss 비율이 올라갑니다. 프로파일러에서는 CPI 증가와 함께 메모리 stall 시간이 늘어나는 형태로 관측됩니다.
-
-### 5단계 파이프라인에서 hazard를 그림으로 보기
-
-```mermaid
-flowchart LR
-    IF["IF"] --> ID["ID"] --> EX["EX"] --> MEM["MEM"] --> WB["WB"]
-    EX -->|"branch decision"| IF
-```
-
-간단한 명령 시퀀스:
-- `I1: LOAD R1, [R2]`
-- `I2: ADD R3, R1, R4`
-
-`I2`는 `R1`이 필요하지만 `I1`의 결과는 MEM/WB 이후에 준비됩니다. Forwarding이 없으면 stall이 필요하고, forwarding이 있으면 일부 cycle을 절약할 수 있습니다. 이 차이가 곧 IPC 차이로 이어집니다.
-
-### 파이프라인 타이밍 표를 직접 작성하기
+### 5단계 파이프라인 타이밍 상세 분석
 
 ```text
-cycle:   1   2   3   4   5   6
-I1      IF  ID  EX MEM  WB
-I2          IF  ID STALL EX MEM WB
-I3              IF STALL ID  EX MEM WB
+단일 사이클 vs 파이프라인 비교:
+
+단일 사이클 (각 명령어 800ps):
+I1: |████████████████████████████████████████| 800ps
+I2:                                          |████████████████████████████████████████| 800ps
+I3:                                                                                   |████████...
+→ 3개 명령어 완료: 2400ps
+
+5단계 파이프라인 (각 단계 200ps):
+      IF    ID    EX   MEM   WB
+I1: |████|████|████|████|████|
+I2:      |████|████|████|████|████|
+I3:           |████|████|████|████|████|
+I4:                |████|████|████|████|████|
+I5:                     |████|████|████|████|████|
+→ 5개 명령어 완료: 1800ps (이상적)
+→ 처리량: 1 명령어/200ps vs 1 명령어/800ps = 4배 향상
 ```
 
-이 표를 직접 그려 보면 왜 분기 예측 실패가 큰 비용인지, 왜 load-use hazard가 민감한지 바로 이해할 수 있습니다. 이론보다 "cycle 단위로 어디가 비는지"를 보는 것이 훨씬 빠릅니다.
+이상적 속도 향상 = 파이프라인 단계 수. 하지만 해저드 때문에 실제로는 이보다 낮습니다.
 
-### 성능 근사식으로 병목 분해하기
+### 데이터 해저드: 포워딩으로 해결
 
-성능은 보통 다음으로 근사합니다.
+```text
+RAW (Read After Write) 해저드:
+I1: ADD R1, R2, R3    ; R1에 쓰기 (WB에서 완료)
+I2: SUB R4, R1, R5    ; R1 읽기 (ID에서 필요)
 
-`Execution Time = Instruction Count × CPI × Clock Cycle Time`
+포워딩 없이 (2 cycle stall):
+cycle:  1    2    3    4    5    6    7    8
+I1:    IF   ID   EX   MEM  WB
+I2:         IF   ID   --- | ---  EX   MEM  WB
+                      ↑ stall (R1 아직 없음)
 
-여기서 구조 개선은 보통 세 축으로 나타납니다.
-- 명령 수 감소: 컴파일러 최적화/벡터화
-- CPI 감소: cache miss 감소, branch mispredict 감소, forwarding 개선
-- cycle time 단축: 더 높은 클록, 더 짧은 임계 경로
+포워딩 적용 (EX→EX):
+cycle:  1    2    3    4    5    6
+I1:    IF   ID   EX   MEM  WB
+I2:         IF   ID   EX   MEM  WB
+                  ↑    ↑
+                  │    └─ EX 결과를 직접 받음 (bypass)
+                  ID에서 포워딩 가능 여부 확인
+```
 
-실무에서는 한 축을 개선하면 다른 축이 악화될 수 있습니다. 예를 들어 파이프라인 단계를 늘려 클록을 높이면 분기 실패 패널티가 커질 수 있습니다. 따라서 "한 지표만" 보고 결론 내리면 위험합니다.
+```python
+def pipeline_cycles_with_forwarding(instructions: list) -> dict:
+    """명령어 시퀀스의 파이프라인 실행 사이클 수 계산."""
+    stalls = 0
+    
+    for i in range(1, len(instructions)):
+        prev = instructions[i-1]
+        curr = instructions[i]
+        
+        # Load-Use hazard: 포워딩으로도 1 stall 필요
+        if prev.get('type') == 'LOAD' and prev.get('rd') in curr.get('src', []):
+            stalls += 1
+        # EX-EX forwarding: 0 stall (다른 RAW)
+        # MEM-EX forwarding: 0 stall
+    
+    total = len(instructions) + 4 + stalls  # pipeline fill + stalls
+    ipc = len(instructions) / (len(instructions) + stalls)
+    return {'cycles': total, 'stalls': stalls, 'IPC': ipc}
 
-### 점검 체크리스트
+# 예시 명령어 시퀀스
+instrs = [
+    {'type': 'LOAD', 'rd': 'R1', 'src': ['R2']},       # LW R1, 0(R2)
+    {'type': 'ALU',  'rd': 'R3', 'src': ['R1', 'R4']}, # ADD R3, R1, R4 ← load-use!
+    {'type': 'ALU',  'rd': 'R5', 'src': ['R3', 'R6']}, # SUB R5, R3, R6 (forwarding OK)
+    {'type': 'STORE','rd': None, 'src': ['R5', 'R7']},  # SW R5, 0(R7) (forwarding OK)
+]
 
-- 주소 하나를 보고 `tag/index/offset`으로 즉시 분해할 수 있는가
-- load-use, branch hazard를 cycle 표로 그릴 수 있는가
-- signed/unsigned 연산 차이를 비트 패턴으로 설명할 수 있는가
-- CPI 상승의 원인을 cache/branch/structural hazard로 나눠 추적할 수 있는가
+result = pipeline_cycles_with_forwarding(instrs)
+print(f"Stalls: {result['stalls']}, IPC: {result['IPC']:.2f}")
+```
 
-이 체크리스트를 통과하면, 컴퓨터 구조 지식이 암기에서 운영 가능한 문제해결 도구로 바뀝니다.
+### 제어 해저드: 분기 예측
+
+분기 명령어가 실행될 때까지 다음에 fetch할 주소를 모릅니다.
+
+```text
+분기 예측 실패 시 penalty:
+cycle:  1    2    3    4    5    6    7
+BEQ:   IF   ID   EX   MEM  WB
+I(X):       IF   ID   ← 취소 (flush)
+I(X+1):          IF   ← 취소 (flush)
+Target:               IF   ID   EX   MEM  WB
+→ 2 cycle 페널티 (5단계 파이프라인)
+```
+
+현대 프로세서는 더 깊은 파이프라인(14~20단계)을 가지므로 예측 실패 페널티가 훨씬 큽니다.
+
+| 프로세서 | 파이프라인 깊이 | 예측 실패 페널티 |
+|----------|---------------|----------------|
+| MIPS R4000 | 8단계 | 3 cycles |
+| Pentium 4 (Prescott) | 31단계 | ~20 cycles |
+| Apple M1 (Firestorm) | ~13단계 | ~14 cycles |
+| AMD Zen 4 | ~19단계 | ~13 cycles |
+
+```python
+def branch_prediction_impact(prediction_accuracy: float, 
+                              branch_ratio: float,
+                              penalty_cycles: int,
+                              base_cpi: float = 1.0) -> float:
+    """분기 예측이 CPI에 미치는 영향 계산."""
+    miss_rate = 1 - prediction_accuracy
+    branch_penalty = branch_ratio * miss_rate * penalty_cycles
+    return base_cpi + branch_penalty
+
+# 다양한 예측 정확도 시나리오
+for acc in [0.80, 0.90, 0.95, 0.97, 0.99]:
+    cpi = branch_prediction_impact(acc, branch_ratio=0.20, penalty_cycles=15)
+    print(f"  예측 정확도 {acc:.0%}: CPI = {cpi:.2f}")
+```
+
+출력:
+```text
+  예측 정확도 80%: CPI = 1.60
+  예측 정확도 90%: CPI = 1.30
+  예측 정확도 95%: CPI = 1.15
+  예측 정확도 97%: CPI = 1.09
+  예측 정확도 99%: CPI = 1.03
+```
+
+### 분기 예측 알고리즘
+
+```python
+class TwoBitPredictor:
+    """2-bit 포화 카운터 분기 예측기."""
+    # 상태: 00(Strong NT) → 01(Weak NT) → 10(Weak T) → 11(Strong T)
+    
+    def __init__(self, num_entries: int = 1024):
+        self.table = [0b10] * num_entries  # 초기: Weak Taken
+        self.correct = self.incorrect = 0
+    
+    def predict(self, pc: int) -> bool:
+        idx = pc % len(self.table)
+        return self.table[idx] >= 2  # 2 이상이면 Taken 예측
+    
+    def update(self, pc: int, actually_taken: bool):
+        idx = pc % len(self.table)
+        predicted = self.table[idx] >= 2
+        
+        if actually_taken:
+            self.table[idx] = min(3, self.table[idx] + 1)
+        else:
+            self.table[idx] = max(0, self.table[idx] - 1)
+        
+        if predicted == actually_taken:
+            self.correct += 1
+        else:
+            self.incorrect += 1
+    
+    @property
+    def accuracy(self) -> float:
+        total = self.correct + self.incorrect
+        return self.correct / total if total > 0 else 0
+
+# 시뮬레이션: for 루프 패턴 (99번 taken, 1번 not-taken)
+predictor = TwoBitPredictor(1024)
+pc = 0x1000
+
+for iteration in range(10):  # 10번 루프
+    for i in range(100):
+        taken = (i < 99)  # 마지막만 not-taken
+        predictor.predict(pc)
+        predictor.update(pc, taken)
+
+print(f"2-bit 예측 정확도: {predictor.accuracy:.1%}")
+# 기대값: ~98% (루프 시작과 끝에서만 실패)
+```
+
+### 슈퍼스칼라와 비순차 실행
+
+현대 프로세서는 한 사이클에 여러 명령어를 발행(issue)합니다.
+
+```text
+4-wide 슈퍼스칼라 파이프라인:
+         Fetch(4)   Decode(4)   Rename   Schedule   Execute   Commit
+cycle 1: I1,I2,I3,I4
+cycle 2: I5,I6,I7,I8  I1,I2,I3,I4
+cycle 3: ...           I5,I6,I7,I8   I1,I2,I3,I4
+...
+
+실행 유닛 구성 (예: Apple M1 Firestorm):
+- 정수 ALU × 4
+- 정수 MUL × 1
+- Branch × 2
+- Load × 2
+- Store × 1  
+- FP/SIMD × 4
+→ 이론상 피크 IPC: ~8
+→ 실제 평균 IPC: 3~5 (의존성, 미스 등)
+```
+
+### 파이프라인 최적화: 컴파일러의 역할
+
+컴파일러는 명령어 순서를 재배치(scheduling)하여 stall을 줄입니다.
+
+```text
+최적화 전 (load-use stall 발생):
+    LW   R1, 0(R10)     ; load
+    ADD  R2, R1, R3     ; R1 사용 → 1 stall
+    LW   R4, 4(R10)     ; load
+    ADD  R5, R4, R6     ; R4 사용 → 1 stall
+
+최적화 후 (명령어 스케줄링):
+    LW   R1, 0(R10)     ; load
+    LW   R4, 4(R10)     ; load (R1 안 씀 → stall 없음)
+    ADD  R2, R1, R3     ; R1 준비됨 (2 cycle 경과)
+    ADD  R5, R4, R6     ; R4 준비됨 (2 cycle 경과)
+→ stall 0개, 같은 결과
+```
+
+이것이 `-O2` 최적화가 성능을 크게 올리는 이유 중 하나입니다. 명령어의 의미는 같지만 순서가 달라져 파이프라인 활용률이 올라갑니다.
+
+
+### 구조적 해저드: 자원 충돌
+
+구조적 해저드는 두 명령어가 같은 하드웨어 자원을 동시에 필요로 할 때 발생합니다.
+
+```text
+예시: 단일 메모리 포트에서 IF와 MEM 단계 충돌
+
+cycle:  1    2    3    4    5    6
+I1:    IF   ID   EX   MEM  WB        ← MEM 단계에서 메모리 접근
+I2:         IF   ID   EX   MEM  WB
+I3:              IF   ID   EX   MEM  WB
+I4:                   IF   ← 메모리 포트 충돌! (I1의 MEM과 동시)
+
+해결: Harvard cache (I-cache / D-cache 분리)
+→ IF는 I-cache, MEM은 D-cache → 충돌 없음
+```
+
+현대 프로세서에서 구조적 해저드가 드문 이유:
+1. L1 캐시를 명령어/데이터로 분리 (Harvard)
+2. 실행 유닛을 여러 개 배치 (ALU×4, FPU×4 등)
+3. 레지스터 파일에 다중 읽기/쓰기 포트
+
+### 파이프라인 깊이의 트레이드오프
+
+```python
+def optimal_pipeline_depth(logic_delay_ns: float, latch_overhead_ns: float,
+                           branch_penalty_ratio: float = 0.05) -> dict:
+    """파이프라인 깊이에 따른 성능 모델링."""
+    results = []
+    
+    for stages in range(1, 51):
+        # 클록 주기 = (로직 지연 / 단계 수) + 래치 오버헤드
+        clock_period = (logic_delay_ns / stages) + latch_overhead_ns
+        clock_freq_ghz = 1.0 / clock_period
+        
+        # 이상적 처리량에서 해저드 손실 차감
+        # 분기 페널티 ∝ 파이프라인 깊이
+        branch_loss = branch_penalty_ratio * stages
+        effective_ipc = 1.0 - branch_loss
+        
+        throughput = effective_ipc * clock_freq_ghz  # GigaInstr/s
+        results.append((stages, clock_freq_ghz, effective_ipc, throughput))
+    
+    # 최적 깊이 찾기
+    best = max(results, key=lambda x: x[3])
+    return {
+        'optimal_stages': best[0],
+        'clock_ghz': best[1],
+        'ipc': best[2],
+        'throughput_gips': best[3],
+        'all_results': results
+    }
+
+# 현실적 파라미터
+result = optimal_pipeline_depth(
+    logic_delay_ns=5.0,    # 총 조합 로직 지연
+    latch_overhead_ns=0.05, # 래치 당 오버헤드
+    branch_penalty_ratio=0.01  # 분기 미스 비율 × 영향
+)
+print(f"최적 파이프라인 깊이: {result['optimal_stages']}단계")
+print(f"클록 주파수: {result['clock_ghz']:.2f} GHz")
+print(f"유효 IPC: {result['ipc']:.2f}")
+print(f"처리량: {result['throughput_gips']:.2f} GIPS")
+```
+
+역사적 교훈 — Pentium 4의 실패:
+- Willamette (2001): 20단계, 1.5GHz
+- Prescott (2004): 31단계, 3.8GHz
+- 클록은 높았지만 분기 페널티(~20 cycles)와 캐시 미스 페널티가 커서
+- 더 낮은 클록의 Core 아키텍처(14단계, 2.6GHz)에 성능이 밀림
+
+### 루프 언롤링과 파이프라인 효율
+
+```text
+원본 루프 (매 4 cycle마다 분기):
+.loop:
+    LW    R1, 0(R10)      ; load
+    ADD   R2, R1, R3      ; use (1 stall)
+    ADDI  R10, R10, 4     ; ptr++
+    BNE   R10, R11, .loop ; 분기 (예측 실패 시 2 stall)
+→ 4 명령어 / 루프, 분기 1회
+
+2배 언롤링:
+.loop:
+    LW    R1, 0(R10)
+    LW    R4, 4(R10)      ; 독립 load (stall 채움)
+    ADD   R2, R1, R3
+    ADD   R5, R4, R6      ; 독립 연산
+    ADDI  R10, R10, 8
+    BNE   R10, R11, .loop
+→ 6 명령어 / 루프, 분기 1회 (분기 비율 50% 감소)
+→ load-use stall도 자연스럽게 숨겨짐
+```
+
+| 언롤 배수 | 명령어/반복 | 분기 비율 | load-use stall | 코드 크기 |
+|-----------|------------|-----------|----------------|-----------|
+| 1배 (원본) | 4 | 25% | 1/반복 | 16B |
+| 2배 | 6 | 17% | 0/반복 | 24B |
+| 4배 | 10 | 10% | 0/반복 | 40B |
+| 8배 | 18 | 6% | 0/반복 | 72B |
+
+코드 크기가 커지면 I-cache 미스가 증가할 수 있으므로, 무조건 많이 언롤하는 것이 좋지는 않습니다. 컴파일러는 보통 루프 크기와 캐시 용량을 고려하여 최적 언롤 배수를 결정합니다.
+
+### VLIW: 명시적 병렬 파이프라인
+
+슈퍼스칼라(하드웨어가 병렬성 발견)의 대안으로 VLIW(컴파일러가 병렬성 명시)가 있습니다.
+
+```text
+VLIW 명령어 번들 (예: Itanium):
+┌─────────────┬─────────────┬─────────────┐
+│  Slot 0     │  Slot 1     │  Slot 2     │
+│  ALU op     │  Memory op  │  Branch op  │
+│  ADD R1,R2  │  LD R3,[R4] │  BNE R5,.L  │
+└─────────────┴─────────────┴─────────────┘
+128비트 번들: 3개 명령어를 동시 실행 보장 (NOP으로 채울 수도 있음)
+```
+
+| 특성 | 슈퍼스칼라 (x86, ARM) | VLIW (Itanium, DSP) |
+|------|---------------------|---------------------|
+| 병렬성 발견 | 하드웨어 (런타임) | 컴파일러 (컴파일 타임) |
+| 하드웨어 복잡도 | 높음 (스케줄러) | 낮음 |
+| 바이너리 호환성 | 세대 간 유지 | 세대 변경 시 재컴파일 |
+| 코드 밀도 | 높음 | 낮음 (NOP 패딩) |
+| 현재 상태 | 주류 | 니치 (DSP, GPU 일부) |
 
 ## 처음 질문으로 돌아가기
 
 - **파이프라인은 어떻게 처리량을 높일까요?**
-  - 본문의 기준은 파이프라인를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 명령어 실행을 여러 단계로 나누고 각 단계를 겹쳐 실행합니다. 5단계 파이프라인은 이상적으로 5배 처리량 향상을 주며, 한 사이클마다 1개 명령어가 완료됩니다. 슈퍼스칼라 구조는 여러 파이프라인을 병렬 배치하여 IPC > 1을 달성합니다.
 - **데이터 해저드와 제어 해저드는 무엇이 다를까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 데이터 해저드는 명령어 간 데이터 의존성(RAW: 이전 결과가 아직 안 나옴)으로 발생하며, 포워딩으로 대부분 해결됩니다. 제어 해저드는 분기 결과를 모르면 다음 fetch 주소를 결정할 수 없어 발생하며, 분기 예측으로 완화합니다.
 - **분기 예측은 어떤 가정을 바탕으로 동작할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
-
-<!-- toc:begin -->
-## 시리즈 목차
-
-- [Computer Architecture 101 (1/10): 컴퓨터 구조란 무엇인가?](./01-what-is-computer-architecture.md)
-- [Computer Architecture 101 (2/10): 데이터 표현 — bit, byte, integer, floating point](./02-data-representation.md)
-- [Computer Architecture 101 (3/10): CPU와 명령어](./03-cpu-and-instructions.md)
-- [Computer Architecture 101 (4/10): 레지스터와 ALU](./04-registers-and-alu.md)
-- [Computer Architecture 101 (5/10): 메모리 구조](./05-memory-organization.md)
-- [Computer Architecture 101 (6/10): 캐시와 지역성](./06-cache-and-locality.md)
-- **파이프라인 (현재 글)**
-- I/O와 장치 (예정)
-- 병렬성과 멀티코어 (예정)
-- 성능을 이해하는 법 (예정)
-
-<!-- toc:end -->
+  - "과거 패턴이 미래에도 반복된다"는 가정입니다. 2-bit 포화 카운터는 연속 같은 방향 분기를 학습하고, 루프의 경우 99%+ 정확도를 달성합니다. 심화 학습에서 본 것처럼, 예측 정확도가 97%에서 99%로 오르면 CPI가 1.09에서 1.03으로 개선됩니다.
 
 ## 참고 자료
 
@@ -390,5 +614,6 @@ I3              IF STALL ID  EX MEM WB
 - [Wikipedia — Branch predictor](https://en.wikipedia.org/wiki/Branch_predictor)
 - [Stack Overflow — Why is processing a sorted array faster?](https://stackoverflow.com/questions/11227809/why-is-processing-a-sorted-array-faster-than-processing-an-unsorted-array)
 - [Agner Fog — Software optimization resources](https://www.agner.org/optimize/)
+- [예제 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/computer-architecture-101/ko)
 
 Tags: Computer Science, 컴퓨터 구조, 파이프라인, 분기 예측, 성능, CPU

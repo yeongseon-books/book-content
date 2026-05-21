@@ -251,70 +251,400 @@ print([article["title"] for article in matches])
 Python `set`은 key-only hash table입니다. 그래서 빠른 membership test, 자동 dedup, 간결한 집합 연산이 모두 같은 저장 모델에서 나옵니다. 그리고 그 정확성은 안정적인 해시와 equality에 달려 있습니다. 다음 글에서는 시리즈를 마무리하며 상황별로 어떤 자료구조를 선택해야 하는지 기준을 정리하겠습니다.
 
 
-## Python 구현 보강: 타입 힌트와 검증 루틴
 
-Python에서 자료구조를 학습할 때는 동작 예시만 확인하는 단계에서 멈추지 않고, 타입 힌트와 최소 검증 루틴을 함께 작성해야 설계 의도가 명확해집니다. 특히 `TypeVar`, `Generic`, `Protocol`을 사용하면 자료구조 API의 입력/출력 계약을 코드 차원에서 드러낼 수 있습니다. 아래 예시는 여러 글에서 재사용할 수 있는 기본 인터페이스 패턴입니다.
+## 타입 힌트 기반 집합 구현
+
+Python set의 내부 원리를 이해하기 위해 해시 테이블 기반의 간소화된 집합을 구현합니다.
 
 ```python
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Generic, Iterable, Iterator, Optional, TypeVar
+from typing import Generic, Iterator, TypeVar
 
 T = TypeVar("T")
 
-@dataclass
-class Node(Generic[T]):
-    value: T
-    next: Optional["Node[T]"] = None
+_EMPTY = object()
+_DELETED = object()
 
-class Container(Generic[T]):
-    def __init__(self, items: Optional[Iterable[T]] = None) -> None:
+
+class HashSet(Generic[T]):
+    """Open addressing 기반 집합입니다."""
+
+    def __init__(self, capacity: int = 8) -> None:
+        self._capacity = capacity
         self._size = 0
-        self._head: Optional[Node[T]] = None
-        if items is not None:
-            for item in items:
-                self.push(item)
+        self._slots: list[object] = [_EMPTY] * capacity
 
-    def push(self, value: T) -> None:
-        self._head = Node(value=value, next=self._head)
-        self._size += 1
+    def _hash_index(self, item: T) -> int:
+        return hash(item) % self._capacity
 
-    def pop(self) -> T:
-        if self._head is None:
-            raise IndexError("empty container")
-        node = self._head
-        self._head = node.next
-        self._size -= 1
-        return node.value
+    def add(self, item: T) -> None:
+        if self._size / self._capacity >= 0.67:
+            self._resize()
+        idx = self._find_slot(item)
+        if self._slots[idx] is _EMPTY or self._slots[idx] is _DELETED:
+            self._slots[idx] = item
+            self._size += 1
+
+    def _find_slot(self, item: T) -> int:
+        idx = self._hash_index(item)
+        first_deleted: int | None = None
+        while self._slots[idx] is not _EMPTY:
+            if self._slots[idx] is _DELETED:
+                if first_deleted is None:
+                    first_deleted = idx
+            elif self._slots[idx] == item:
+                return idx
+            idx = (idx + 1) % self._capacity
+        return first_deleted if first_deleted is not None else idx
+
+    def __contains__(self, item: object) -> bool:
+        idx = self._hash_index(item)  # type: ignore[arg-type]
+        while self._slots[idx] is not _EMPTY:
+            if self._slots[idx] is not _DELETED and self._slots[idx] == item:
+                return True
+            idx = (idx + 1) % self._capacity
+        return False
+
+    def discard(self, item: T) -> None:
+        idx = self._hash_index(item)
+        while self._slots[idx] is not _EMPTY:
+            if self._slots[idx] is not _DELETED and self._slots[idx] == item:
+                self._slots[idx] = _DELETED
+                self._size -= 1
+                return
+            idx = (idx + 1) % self._capacity
 
     def __len__(self) -> int:
         return self._size
 
     def __iter__(self) -> Iterator[T]:
-        cur = self._head
-        while cur is not None:
-            yield cur.value
-            cur = cur.next
+        for slot in self._slots:
+            if slot is not _EMPTY and slot is not _DELETED:
+                yield slot  # type: ignore[misc]
+
+    def _resize(self) -> None:
+        old_slots = self._slots
+        self._capacity *= 2
+        self._slots = [_EMPTY] * self._capacity
+        self._size = 0
+        for slot in old_slots:
+            if slot is not _EMPTY and slot is not _DELETED:
+                self.add(slot)  # type: ignore[arg-type]
+
+    def union(self, other: HashSet[T]) -> HashSet[T]:
+        result: HashSet[T] = HashSet()
+        for item in self:
+            result.add(item)
+        for item in other:
+            result.add(item)
+        return result
+
+    def intersection(self, other: HashSet[T]) -> HashSet[T]:
+        result: HashSet[T] = HashSet()
+        for item in self:
+            if item in other:
+                result.add(item)
+        return result
+
+    def difference(self, other: HashSet[T]) -> HashSet[T]:
+        result: HashSet[T] = HashSet()
+        for item in self:
+            if item not in other:
+                result.add(item)
+        return result
+
+    def __repr__(self) -> str:
+        items = ", ".join(repr(item) for item in self)
+        return f"HashSet({{{items}}})"
 ```
 
-이 패턴의 핵심은 세 가지입니다. 첫째, 공개 메서드의 타입을 먼저 확정하여 구현 교체 비용을 낮춥니다. 둘째, 예외 조건(`IndexError`)을 명시해 호출자 책임을 분리합니다. 셋째, `__iter__`, `__len__` 같은 파이썬 데이터 모델 메서드를 제공해 표준 라이브러리와 자연스럽게 결합합니다.
+### 설계 결정 세 가지
 
-성능 확인은 `timeit` 단일 숫자보다 시나리오 기반으로 진행하는 편이 정확합니다. 예를 들어 "1만 건 push 후 1만 건 pop", "임의 키 5천 건 조회", "중복 원소 30% 포함 집합 연산"처럼 입력 특성을 고정하고 결과를 비교합니다. 또한 `mypy`나 `pyright`로 정적 타입 검사를 돌리면 API 오용을 조기에 발견할 수 있습니다.
+1. **중복 자동 무시**: `add()`에서 이미 존재하는 원소면 아무 일도 하지 않습니다. 이것이 set의 핵심 계약입니다.
+2. **집합 연산 반환 타입**: union, intersection, difference 모두 새로운 HashSet을 반환합니다. 원본은 변하지 않습니다 (Python set의 `|`, `&`, `-` 연산자와 동일).
+3. **discard vs remove**: discard는 원소가 없어도 에러를 내지 않습니다. Python set의 `discard()`와 동일한 계약입니다.
 
-마지막으로 학습 기록에는 "왜 이 구현을 선택했는가"를 반드시 남깁니다. 같은 기능을 `list`, `deque`, 사용자 정의 클래스 중 무엇으로 표현했는지와 그 이유를 적어두면, 이후 코드베이스에서 자료구조를 교체해야 할 때 판단 근거를 재사용할 수 있습니다.
+## 메모리 프로파일링: set vs list vs frozenset
 
-실무 코드에서는 `TypeVar` 기반 제네릭 API를 유지하고, `pytest`로 빈 입력/최대 입력/중복 입력 경계 조건을 검증해 구현 신뢰도를 높입니다.
+```python
+import sys
 
+
+def compare_memory(n: int) -> None:
+    data_list = list(range(n))
+    data_set = set(range(n))
+    data_frozenset = frozenset(range(n))
+
+    print(f"n={n:>7}")
+    print(f"  list:      {sys.getsizeof(data_list):>10} bytes")
+    print(f"  set:       {sys.getsizeof(data_set):>10} bytes")
+    print(f"  frozenset: {sys.getsizeof(data_frozenset):>10} bytes")
+
+
+for n in [100, 1_000, 10_000]:
+    compare_memory(n)
+    print()
+```
+
+set은 해시 테이블을 유지해야 하므로 같은 원소 수에서 list보다 메모리를 더 씁니다. frozenset은 set과 거의 동일한 크기입니다 (불변일 뿐 내부 구조는 같습니다). 메모리를 더 쓰는 대가로 O(1) membership test를 얻는 것이 핵심 교환입니다.
+
+### 깊은 메모리 측정
+
+```python
+import sys
+from typing import Any
+
+
+def deep_getsizeof(obj: Any, seen: set[int] | None = None) -> int:
+    if seen is None:
+        seen = set()
+    obj_id = id(obj)
+    if obj_id in seen:
+        return 0
+    seen.add(obj_id)
+    size = sys.getsizeof(obj)
+    if isinstance(obj, (list, tuple, set, frozenset)):
+        size += sum(deep_getsizeof(item, seen) for item in obj)
+    elif isinstance(obj, dict):
+        size += sum(deep_getsizeof(k, seen) + deep_getsizeof(v, seen) for k, v in obj.items())
+    return size
+
+
+n = 10_000
+list_deep = deep_getsizeof(list(range(n)))
+set_deep = deep_getsizeof(set(range(n)))
+
+print(f"list deep (10k): {list_deep:>10} bytes ({list_deep/n:.1f} per elem)")
+print(f"set deep (10k):  {set_deep:>10} bytes ({set_deep/n:.1f} per elem)")
+```
+
+## 성능 벤치마크: 집합 연산 속도
+
+```python
+import random
+import timeit
+
+
+def bench_membership_list(data: list[int], targets: list[int]) -> None:
+    for t in targets:
+        _ = t in data
+
+
+def bench_membership_set(data: set[int], targets: list[int]) -> None:
+    for t in targets:
+        _ = t in data
+
+
+n = 100_000
+k = 10_000
+universe = list(range(n))
+targets = random.sample(universe, k)
+
+data_list = universe[:]
+data_set = set(universe)
+
+trials = 5
+t_list = timeit.timeit(lambda: bench_membership_list(data_list, targets), number=trials)
+t_set = timeit.timeit(lambda: bench_membership_set(data_set, targets), number=trials)
+
+print(f"list membership (10k in 100k): {t_list:.4f}s")
+print(f"set membership (10k in 100k):  {t_set:.4f}s")
+print(f"list/set = {t_list/t_set:.0f}x")
+```
+
+### 집합 연산 벤치마크
+
+```python
+import random
+import timeit
+
+
+def bench_set_ops(n: int = 50_000) -> None:
+    a = set(random.sample(range(n * 2), n))
+    b = set(random.sample(range(n * 2), n))
+
+    _ = a | b   # union
+    _ = a & b   # intersection
+    _ = a - b   # difference
+    _ = a ^ b   # symmetric difference
+
+
+def bench_list_ops(n: int = 50_000) -> None:
+    a = random.sample(range(n * 2), n)
+    b = random.sample(range(n * 2), n)
+
+    # list로 동일한 연산 흉내
+    _ = list(set(a) | set(b))
+    _ = [x for x in a if x in set(b)]
+    _ = [x for x in a if x not in set(b)]
+
+
+trials = 5
+t_set = timeit.timeit(bench_set_ops, number=trials)
+t_list = timeit.timeit(bench_list_ops, number=trials)
+
+print(f"set operations (50k):  {t_set:.4f}s")
+print(f"list operations (50k): {t_list:.4f}s")
+```
+
+set의 집합 연산(`|`, `&`, `-`, `^`)은 C 레벨에서 구현되어 있어, Python 레벨의 list 컴프리헨션보다 훨씬 빠릅니다.
+
+## unittest로 HashSet 검증
+
+```python
+import unittest
+
+
+class TestHashSet(unittest.TestCase):
+    def setUp(self) -> None:
+        self.hs: HashSet[int] = HashSet()
+
+    def test_add_and_contains(self) -> None:
+        self.hs.add(1)
+        self.hs.add(2)
+        self.assertIn(1, self.hs)
+        self.assertIn(2, self.hs)
+        self.assertNotIn(3, self.hs)
+
+    def test_duplicate_ignored(self) -> None:
+        self.hs.add(5)
+        self.hs.add(5)
+        self.hs.add(5)
+        self.assertEqual(len(self.hs), 1)
+
+    def test_discard(self) -> None:
+        self.hs.add(10)
+        self.hs.discard(10)
+        self.assertNotIn(10, self.hs)
+        self.assertEqual(len(self.hs), 0)
+
+    def test_discard_missing(self) -> None:
+        # discard는 없는 원소에 대해 에러를 내지 않음
+        self.hs.discard(999)  # no error
+
+    def test_union(self) -> None:
+        a: HashSet[int] = HashSet()
+        b: HashSet[int] = HashSet()
+        for i in [1, 2, 3]:
+            a.add(i)
+        for i in [3, 4, 5]:
+            b.add(i)
+        result = a.union(b)
+        self.assertEqual(sorted(result), [1, 2, 3, 4, 5])
+
+    def test_intersection(self) -> None:
+        a: HashSet[int] = HashSet()
+        b: HashSet[int] = HashSet()
+        for i in [1, 2, 3, 4]:
+            a.add(i)
+        for i in [3, 4, 5, 6]:
+            b.add(i)
+        result = a.intersection(b)
+        self.assertEqual(sorted(result), [3, 4])
+
+    def test_difference(self) -> None:
+        a: HashSet[int] = HashSet()
+        b: HashSet[int] = HashSet()
+        for i in [1, 2, 3]:
+            a.add(i)
+        for i in [2, 3, 4]:
+            b.add(i)
+        result = a.difference(b)
+        self.assertEqual(sorted(result), [1])
+
+    def test_resize(self) -> None:
+        for i in range(50):
+            self.hs.add(i)
+        self.assertEqual(len(self.hs), 50)
+        for i in range(50):
+            self.assertIn(i, self.hs)
+
+
+if __name__ == "__main__":
+    unittest.main()
+```
+
+## set 컴프리헨션과 집합 대수
+
+set 컴프리헨션은 list 컴프리헨션과 동일한 문법에 중괄호를 씁니다.
+
+```python
+# 1부터 100까지의 수 중 3의 배수이면서 5의 배수인 것
+multiples = {x for x in range(1, 101) if x % 3 == 0 and x % 5 == 0}
+print(multiples)  # {15, 30, 45, 60, 75, 90}
+
+# 동일한 결과를 집합 연산으로
+threes = {x for x in range(1, 101) if x % 3 == 0}
+fives = {x for x in range(1, 101) if x % 5 == 0}
+print(threes & fives)  # {15, 30, 45, 60, 75, 90}
+```
+
+집합 대수의 기본 법칙은 코드로 검증할 수 있습니다.
+
+```python
+a = {1, 2, 3, 4}
+b = {3, 4, 5, 6}
+c = {4, 5, 6, 7}
+
+# 분배법칙: A & (B | C) == (A & B) | (A & C)
+assert a & (b | c) == (a & b) | (a & c)
+
+# 드모르간: ~(A | B) == ~A & ~B (전체집합 U 기준)
+u = set(range(10))
+assert u - (a | b) == (u - a) & (u - b)
+```
+
+이 법칙들은 복잡한 필터 조건을 집합 연산으로 분해할 때 유용합니다.
+
+## 실무 패턴: 중복 제거와 집합 연산
+
+```python
+# 패턴 1: 순서를 유지하면서 중복 제거
+def deduplicate_ordered(items: list[str]) -> list[str]:
+    """삽입 순서를 유지하면서 중복을 제거합니다."""
+    seen: set[str] = set()
+    result: list[str] = []
+    for item in items:
+        if item not in seen:
+            seen.add(item)
+            result.append(item)
+    return result
+
+
+# 패턴 2: 두 데이터 소스의 차이 분석
+def analyze_changes(old_ids: set[str], new_ids: set[str]) -> dict[str, set[str]]:
+    """이전/현재 상태를 비교해 추가/삭제/유지를 구분합니다."""
+    return {
+        "added": new_ids - old_ids,
+        "removed": old_ids - new_ids,
+        "unchanged": old_ids & new_ids,
+    }
+
+
+# 패턴 3: 태그 기반 필터링
+articles = {
+    "글1": {"python", "자료구조"},
+    "글2": {"python", "웹"},
+    "글3": {"자료구조", "알고리즘"},
+}
+
+# python AND 자료구조 태그를 모두 가진 글
+target_tags = {"python", "자료구조"}
+matched = [title for title, tags in articles.items() if target_tags <= tags]
+print(matched)  # ['글1']
+```
+
+`<=` 연산자는 부분집합 검사입니다. `target_tags <= tags`는 "target_tags의 모든 원소가 tags에 포함되는가"를 의미합니다.
 
 ## 처음 질문으로 돌아가기
 
 - **`set`은 왜 중복 제거와 membership test에 강할까요?**
-  - 본문의 기준은 set과 집합 연산를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - set은 내부적으로 해시 테이블을 사용합니다. 원소를 추가할 때 해시로 슬롯을 계산하고, 이미 같은 값이 있으면 무시합니다(자동 중복 제거). membership test도 해시로 슬롯을 바로 찾으므로 O(1)입니다. list의 O(n) 선형 탐색과 대비됩니다.
 - **충돌과 hashability는 set에서 어떤 의미를 가질까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 충돌은 서로 다른 원소가 같은 슬롯에 매핑되는 상황으로, probing으로 해결합니다. hashable이란 `__hash__()`를 구현하고 값이 불변인 객체를 뜻합니다. list처럼 내용이 바뀔 수 있는 객체는 해시가 변할 위험이 있어 set 원소가 될 수 없습니다.
 - **왜 `frozenset`은 set 원소나 dict 키가 될 수 있고 plain `set`은 안 될까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - frozenset은 불변이므로 해시 값이 객체 수명 동안 변하지 않습니다. plain set은 add/discard로 내용이 바뀔 수 있어, 해시 값이 변할 위험이 있습니다. 해시 기반 구조(set, dict)는 키/원소의 해시가 바뀌면 정합성이 깨지므로, 불변인 frozenset만 허용합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -339,5 +669,6 @@ class Container(Generic[T]):
 - [Python Data Model — `__hash__` and `__eq__`](https://docs.python.org/3/reference/datamodel.html#object.__hash__)
 - [Real Python — Sets in Python](https://realpython.com/python-sets/)
 - [Python TimeComplexity — Set](https://wiki.python.org/moin/TimeComplexity)
+- [book-examples 저장소 — data-structures-python-101/ko](https://github.com/yeongseon-books/book-examples/tree/main/data-structures-python-101/ko)
 
 Tags: Python, 자료구조, set, 집합 연산, frozenset

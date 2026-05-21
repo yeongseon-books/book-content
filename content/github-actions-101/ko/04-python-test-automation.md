@@ -172,141 +172,413 @@ Python 테스트 자동화의 핵심은 같은 환경에서 같은 명령을 반
 다음 글에서는 lint와 type check를 다룹니다. 테스트가 동작을 검증한다면, 그다음 단계는 스타일과 정적 타입 규칙을 자동으로 막는 품질 게이트를 세우는 일입니다.
 
 
-## 워크플로 설계를 코드로 구체화하기
 
-워크플로우 품질은 "한 번 돌아간다"가 아니라 "변경이 누적돼도 의도를 유지한다"로 판단해야 합니다. 아래 예시는 테스트, 린트, 빌드를 분리해 실패 지점을 빠르게 찾는 구성입니다.
+---
+
+## Python 테스트 환경 설정을 더 깊이 보겠습니다
+
+### setup-python의 캐시 전략
+
+`actions/setup-python`의 `cache` 옵션은 pip 다운로드 캐시를 워크플로우 실행 간에 보존합니다. 이 한 줄만으로 의존성 설치 시간을 50-80% 줄일 수 있습니다.
 
 ```yaml
-name: ci
-on:
-  pull_request:
-  push:
-    branches: [main]
+- uses: actions/setup-python@v6
+  with:
+    python-version: "3.12"
+    cache: "pip"
+    cache-dependency-path: |
+      requirements.txt
+      requirements-dev.txt
+```
 
+캐시 키는 `cache-dependency-path`에 지정한 파일들의 해시로 결정됩니다. 의존성 파일이 바뀌면 캐시가 무효화되고, 새 의존성을 다운로드합니다. 여러 의존성 파일이 있다면 모두 명시해야 캐시 적중률이 올라갑니다.
+
+캐시가 올바르게 동작하는지 확인하는 방법입니다.
+
+```text
+Run actions/setup-python@v6
+  Cache restored successfully  ← 캐시 적중
+  or
+  Cache not found for key: ...  ← 캐시 미스 (첫 실행 또는 의존성 변경)
+```
+
+### pip install 전략 비교
+
+```yaml
+# 방법 1: requirements.txt 기반 (단순)
+- run: pip install -r requirements.txt -r requirements-dev.txt
+
+# 방법 2: pyproject.toml 기반 (권장)
+- run: pip install -e ".[dev]"
+
+# 방법 3: pip-tools로 잠금 파일 기반 (재현성 최고)
+- run: pip install -r requirements.lock
+```
+
+방법 2가 현대 Python 프로젝트에서 가장 일반적입니다. `pyproject.toml`의 optional-dependencies에 개발 의존성을 선언하면, 로컬과 CI에서 동일한 명령으로 설치할 수 있습니다. 방법 3은 재현성이 가장 높지만 잠금 파일 관리 부담이 있습니다.
+
+---
+
+## pytest 실행 최적화
+
+테스트 수가 많아지면 실행 시간도 길어집니다. CI에서 pytest를 효율적으로 실행하는 기법을 정리하겠습니다.
+
+### 병렬 실행 (pytest-xdist)
+
+```yaml
+- run: pip install pytest-xdist
+- run: pytest -q -n auto --dist loadscope
+```
+
+`-n auto`는 CPU 코어 수에 맞춰 워커를 생성합니다. `--dist loadscope`는 같은 모듈의 테스트를 같은 워커에 배치해서 fixture 공유를 최적화합니다.
+
+GitHub-hosted 러너는 보통 2코어이므로 `-n 2`로 명시하는 것도 괜찮습니다. 코어 수보다 워커를 많이 만들면 오히려 컨텍스트 스위칭으로 느려질 수 있습니다.
+
+### 실패 우선 실행
+
+```yaml
+- run: pytest -q --lf --ff
+```
+
+`--lf`(last failed)는 이전 실행에서 실패한 테스트만 재실행하고, `--ff`(failed first)는 실패한 테스트를 먼저 실행합니다. CI에서는 캐시가 없으므로 `--ff`가 더 유용합니다. 빠른 피드백을 위해 실패 가능성이 높은 테스트를 먼저 돌리는 전략입니다.
+
+### 테스트 마킹과 선택 실행
+
+```yaml
+# PR에서는 느린 테스트 제외
+- run: pytest -q -m "not slow"
+
+# 야간 실행에서는 전체 포함
+- run: pytest -q
+```
+
+```python
+# tests/test_integration.py
+import pytest
+
+@pytest.mark.slow
+def test_full_pipeline():
+    """전체 파이프라인 통합 테스트 - 5분 이상 소요"""
+    ...
+```
+
+`@pytest.mark.slow`로 느린 테스트를 표시하고, PR 검증에서는 제외합니다. 야간 schedule 실행에서 전체 테스트를 돌리면 빠른 피드백과 완전한 검증을 모두 확보할 수 있습니다.
+
+---
+
+## 테스트 리포트를 PR에 표시하기
+
+테스트가 실패했을 때 "로그를 열어서 직접 찾아라"보다 PR 코멘트에 결과가 바로 보이면 개발자 경험이 크게 좋아집니다.
+
+```yaml
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
         with:
-          python-version: "3.11"
-      - run: pip install -r requirements.txt
-      - run: pytest -q
+          python-version: "3.12"
+          cache: "pip"
+      - run: pip install -e ".[dev]"
 
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - run: pip install ruff
-      - run: ruff check .
+      - name: 테스트 실행
+        run: pytest --junitxml=report.xml --cov=src --cov-report=xml
 
-  build:
-    runs-on: ubuntu-latest
-    needs: [test, lint]
-    steps:
-      - uses: actions/checkout@v6
-      - run: docker build -t app:${{ github.sha }} .
+      - name: 테스트 결과 PR 표시
+        uses: mikepenz/action-junit-report@v5
+        if: always()
+        with:
+          report_paths: report.xml
+          check_name: "pytest results"
+
+      - name: 커버리지 코멘트
+        uses: orgoro/coverage@v3.2
+        if: github.event_name == 'pull_request'
+        with:
+          coverageFile: coverage.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-`needs`를 통해 의존 관계를 명시하면 "테스트 실패인데 빌드는 왜 돌았는가" 같은 혼선을 줄일 수 있습니다. 또한 잡을 분리하면 병렬 실행이 가능해 전체 피드백 시간이 짧아집니다.
+`if: always()`가 중요합니다. 이 조건이 없으면 테스트 실패 시 리포트 업로드 스텝이 건너뛰어져서, 정작 실패 정보가 필요한 상황에서 리포트를 볼 수 없습니다.
 
-## Job Matrix로 중복을 줄이기
+---
 
-동일한 작업을 여러 런타임에서 반복해야 한다면 matrix가 가장 실용적입니다. 아래 구성은 Python 버전과 운영체제를 조합해 호환성을 검증합니다.
+## 커버리지 관리 전략
+
+커버리지 숫자 자체보다 중요한 것은 추세와 기준입니다. 80%가 좋은지 나쁜지는 프로젝트마다 다르지만, "이번 PR이 커버리지를 낮추지 않았는가"는 보편적으로 유용한 기준입니다.
+
+### 커버리지 게이트 설정
+
+```yaml
+# pyproject.toml
+[tool.coverage.run]
+source = ["src"]
+branch = true
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__.",
+]
+```
+
+`fail_under`를 설정하면 커버리지가 기준 아래로 떨어질 때 pytest가 실패합니다. 이 값은 현재 프로젝트 수준에 맞춰 시작하고 점진적으로 올리는 편이 현실적입니다.
+
+### Codecov / Coveralls 연동
+
+```yaml
+- name: 커버리지 업로드
+  uses: codecov/codecov-action@v5
+  with:
+    files: coverage.xml
+    flags: unittests
+    fail_ci_if_error: false
+```
+
+외부 서비스를 연동하면 커버리지 추세 그래프, PR별 diff 커버리지, 파일별 히트맵을 볼 수 있습니다. 특히 diff 커버리지(이번 PR에서 변경한 코드의 커버리지)는 전체 커버리지보다 실행 가능한 피드백을 줍니다.
+
+---
+
+## 테스트 매트릭스 실전 구성
+
+Python 프로젝트에서 자주 쓰는 테스트 매트릭스 패턴입니다.
 
 ```yaml
 jobs:
-  test-matrix:
+  test:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest]
         python-version: ["3.10", "3.11", "3.12"]
+        include:
+          - os: macos-latest
+            python-version: "3.12"
+          - os: windows-latest
+            python-version: "3.12"
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
-      - run: pip install -r requirements.txt
+          cache: "pip"
+      - run: pip install -e ".[dev]"
       - run: pytest -q
 ```
 
-`fail-fast: false`를 켜면 한 조합이 실패해도 나머지 조합 결과를 끝까지 수집할 수 있습니다. 라이브러리 호환성 이슈를 찾는 단계에서는 이 설정이 원인 파악 속도를 높입니다.
+이 매트릭스는 Ubuntu에서 세 Python 버전을, macOS와 Windows에서는 최신 버전만 테스트합니다. 총 5개 조합으로 호환성을 확인하면서도 비용을 합리적으로 유지합니다.
 
-## Secret 처리 원칙
-
-비밀값은 YAML 본문에 직접 넣지 않고 GitHub Secrets나 OIDC 기반 임시 자격 증명을 사용해야 합니다. 고정 토큰을 코드에 넣으면 회전, 감사, 권한 축소가 모두 어려워집니다.
+### 데이터베이스 서비스가 필요한 테스트
 
 ```yaml
 jobs:
-  deploy:
+  test-with-db:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://test:test@localhost:5432/testdb
     steps:
       - uses: actions/checkout@v6
-      - name: Login to cloud with OIDC
-        run: ./scripts/oidc-login.sh
-      - name: Deploy
-        env:
-          API_BASE_URL: ${{ secrets.API_BASE_URL }}
-        run: ./scripts/deploy.sh
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: "pip"
+      - run: pip install -e ".[dev]"
+      - run: pytest tests/integration -q
 ```
 
-실무에서는 다음 기준을 함께 둡니다.
+`services`는 잡에서 사용할 컨테이너를 함께 실행합니다. health check 옵션을 설정해야 서비스가 준비된 뒤에 테스트가 시작됩니다. 이 설정이 없으면 PostgreSQL이 아직 뜨지 않은 상태에서 테스트가 연결을 시도해 실패할 수 있습니다.
 
-- secret 이름은 목적 중심으로 명명해 누가 봐도 용도를 파악할 수 있게 합니다.
-- PR from fork에서는 secret이 기본적으로 주입되지 않으므로, 배포 잡을 분리하거나 조건문으로 차단합니다.
-- 로그에 비밀값이 노출되지 않도록 `set -x` 사용 구간을 제한하고, 민감 출력은 마스킹합니다.
-- 회전 주기를 문서화하고, 사용하지 않는 secret은 즉시 폐기합니다.
+---
 
-## 운영 안정성을 높이는 추가 패턴
+## 테스트 실패 시 디버깅 지원
 
-- `concurrency`를 사용해 같은 브랜치의 중복 배포를 자동 취소하면 롤백 리스크를 줄일 수 있습니다.
-- 캐시 키는 잠금 파일(`poetry.lock`, `requirements.txt`) 해시와 연결해 오염된 캐시 재사용을 막습니다.
-- 배포 잡은 `environment` 보호 규칙과 reviewer 승인을 함께 걸어 사고 범위를 줄입니다.
-- 실패 알림은 채널 하나에 몰지 말고, 서비스 소유 팀 라우팅 기준으로 분리해야 대응 시간이 짧아집니다.
-
-이 구조를 먼저 잡아 두면 워크플로 파일이 길어져도 책임 경계가 무너지지 않고, CI/CD 품질을 지속적으로 개선하기 쉬워집니다.
-
-
-## 운영 체크포인트 보강
-
-워크플로를 길게 쓰는 것보다 더 중요한 것은 실패 원인을 빠르게 고립하는 구조입니다. 테스트 잡에서는 의존성 설치 시간을 측정하고, 배포 잡에서는 릴리스 노트와 커밋 SHA를 함께 남겨 추적성을 확보해야 합니다. 또한 `if: github.event_name == "pull_request"` 같은 조건식을 사용해 PR 검증과 main 배포를 분리하면 권한 오남용과 불필요한 실행 시간을 동시에 줄일 수 있습니다.
+CI에서 테스트가 실패했을 때 원인을 빠르게 파악하려면 충분한 정보를 남겨야 합니다.
 
 ```yaml
-- name: Record build metadata
-  run: |
-    echo "sha=${GITHUB_SHA}" >> build-info.txt
-    echo "ref=${GITHUB_REF}" >> build-info.txt
+- name: 테스트 실행
+  run: pytest -q --tb=short --junitxml=report.xml -v
+  continue-on-error: true
+  id: test
+
+- name: 실패 시 상세 로그
+  if: steps.test.outcome == 'failure'
+  run: pytest --lf --tb=long -v
+
+- name: 아티팩트 저장
+  if: always()
+  uses: actions/upload-artifact@v7
+  with:
+    name: test-results
+    path: |
+      report.xml
+      .coverage
+      tests/output/
+    retention-days: 3
 ```
 
-메타데이터 파일을 아티팩트로 보존해 두면 장애 회고에서 "어떤 실행 결과가 어느 커밋과 연결되는가"를 빠르게 확인할 수 있습니다.
+이 패턴은 첫 실행에서 빠르게 결과를 확인하고, 실패한 경우에만 상세 로그를 출력합니다. 성공 시에는 불필요한 출력을 줄이고, 실패 시에는 디버깅에 충분한 정보를 제공합니다.
 
 
-## 실패 분석 루틴
+---
 
-테스트 자동화와 정적 검사는 "돌린다"보다 "실패를 재현한다"가 핵심입니다. 실패한 런에서는 로그 일부만 복사하지 말고, 실행한 Python 버전, 의존성 잠금 파일 해시, 실패 테스트 식별자(`-k`)를 함께 남겨야 다음 사람이 같은 조건으로 다시 실행할 수 있습니다. CI에서 실패한 테스트를 로컬에서 재현할 수 있어야 원인 분리가 빨라지고, flaky 테스트와 실제 회귀를 구분할 수 있습니다.
+## 테스트 안정성 관리
 
-```bash
-pytest -q -k "failing_test_name" --maxfail=1
-python -V
-pip freeze | sha256sum
+CI에서 간헐적으로 실패하는 테스트(flaky test)는 팀의 CI 신뢰를 빠르게 떨어뜨립니다. flaky 테스트를 다루는 전략을 정리하겠습니다.
+
+### flaky 테스트 감지
+
+```yaml
+- run: pytest -q --count=3 -x
+  # pytest-repeat으로 3회 반복 실행
 ```
 
-이 정보를 PR 코멘트 템플릿에 포함시키면 리뷰 과정에서 추측성 토론이 줄고, 수정 범위를 더 정확히 결정할 수 있습니다.
+같은 테스트를 여러 번 돌려서 간헐 실패를 재현합니다. CI에서만 실패하는 경우는 대부분 타이밍, 네트워크, 파일시스템 순서에 의존하는 테스트입니다.
+
+### flaky 테스트 격리
+
+```python
+# conftest.py
+import pytest
+
+def pytest_collection_modifyitems(items):
+    """flaky 마크가 있는 테스트를 별도 그룹으로 분리"""
+    for item in items:
+        if "flaky" in item.keywords:
+            item.add_marker(pytest.mark.xfail(
+                reason="known flaky", strict=False
+            ))
+```
+
+`xfail(strict=False)`로 표시하면 실패해도 전체 테스트 스위트를 깨뜨리지 않으면서, 성공하면 `XPASS`로 표시되어 안정화되었는지 추적할 수 있습니다.
+
+### 재시도 전략
+
+```yaml
+- name: 테스트 (재시도 포함)
+  uses: nick-fields/retry@v3
+  with:
+    max_attempts: 3
+    timeout_minutes: 10
+    command: pytest tests/integration -q
+```
+
+통합 테스트처럼 외부 의존성이 있는 테스트는 일시적 실패가 불가피합니다. 재시도를 두면 일시적 실패로 인한 불필요한 재실행을 줄일 수 있습니다. 다만 재시도는 근본 원인을 숨길 수 있으므로, 재시도 횟수와 실패 빈도를 모니터링해야 합니다.
+
+---
+
+## 전체 워크플로우 예제
+
+지금까지 다룬 내용을 종합한 실무 수준의 Python 테스트 워크플로우입니다.
+
+```yaml
+name: python-test
+
+on:
+  pull_request:
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "pyproject.toml"
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "tests/**"
+
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      pull-requests: write
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+    services:
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: --health-cmd "redis-cli ping" --health-interval 10s
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: 의존성 설치
+        run: pip install -e ".[dev]"
+
+      - name: 단위 테스트
+        run: pytest tests/unit -q -n auto --cov=src --cov-report=xml --junitxml=unit-report.xml
+
+      - name: 통합 테스트
+        run: pytest tests/integration -q --junitxml=integration-report.xml
+        env:
+          REDIS_URL: redis://localhost:6379
+
+      - name: 테스트 리포트
+        uses: mikepenz/action-junit-report@v5
+        if: always()
+        with:
+          report_paths: "*-report.xml"
+          check_name: "pytest-${{ matrix.python-version }}"
+
+      - name: 커버리지 업로드
+        if: matrix.python-version == '3.12'
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage.xml
+          flags: unittests
+```
+
+이 워크플로우의 설계 포인트를 정리하면 다음과 같습니다.
+
+- `paths` 필터로 관련 없는 변경에서는 실행하지 않습니다.
+- `concurrency`로 같은 PR의 중복 실행을 취소합니다.
+- 두 Python 버전으로 호환성을 확인하되, `fail-fast: false`로 모든 결과를 수집합니다.
+- 단위 테스트는 병렬(`-n auto`)로 빠르게 실행하고, 통합 테스트는 Redis 서비스와 함께 실행합니다.
+- 커버리지는 한 버전에서만 업로드해서 중복을 피합니다.
+- `if: always()`로 실패해도 리포트가 올라갑니다.
+
 
 ## 처음 질문으로 돌아가기
 
 - **`setup-python`과 pip 캐시는 왜 함께 다뤄야 할까요?**
-  - 본문의 기준은 Python 테스트 자동화를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - `setup-python`의 `cache: "pip"` 옵션은 pip 다운로드 캐시를 실행 간에 보존해서 의존성 설치 시간을 50-80% 줄입니다. `cache-dependency-path`로 캐시 키를 의존성 파일 해시에 연결하면, 의존성이 바뀔 때만 새로 다운로드하고 나머지 실행에서는 캐시를 재사용합니다. 이 한 줄 설정이 전체 워크플로우 시간에 미치는 영향이 크기 때문에 반드시 함께 설정해야 합니다.
 - **`pytest` 결과를 PR 체크와 리포트로 드러내려면 무엇이 필요할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - `--junitxml=report.xml`로 결과를 XML로 남기고, `mikepenz/action-junit-report` 같은 액션으로 PR 체크에 표시합니다. `if: always()`가 핵심인데, 이 조건이 없으면 실패 시 리포트 스텝이 건너뛰어져 정작 필요한 상황에서 정보를 볼 수 없습니다. `permissions: checks: write`도 잊지 말아야 합니다.
 - **커버리지는 왜 숫자 자체보다 추세와 기준이 중요할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 80%라는 숫자는 프로젝트마다 의미가 다릅니다. 중요한 것은 "이번 PR이 커버리지를 낮추지 않았는가"(diff coverage)와 "시간이 지나며 커버리지가 어떤 방향으로 움직이는가"(추세)입니다. `fail_under`로 하한선을 잡고, Codecov의 diff coverage로 PR별 피드백을 주면, 팀이 테스트를 쓰는 습관을 자연스럽게 유지할 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -330,5 +602,7 @@ pip freeze | sha256sum
 - [pytest documentation](https://docs.pytest.org/)
 - [coverage.py](https://coverage.readthedocs.io/)
 - [Codecov GitHub Action](https://github.com/codecov/codecov-action)
+- [pytest-xdist](https://pytest-xdist.readthedocs.io/)
+- [book-examples 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/github-actions-101/ko)
 
 Tags: GitHubActions, Python, Pytest, Testing, CICD

@@ -343,14 +343,137 @@ if __name__ == "__main__":
 
 관측성 플랫폼도 제품처럼 헬스체크가 필요합니다. 이 점검 스크립트를 크론이나 CI 파이프라인에 붙이면 "장애가 난 순간 관측 도구도 죽어 있는" 최악의 상황을 줄일 수 있습니다.
 
+### Docker Compose로 구성하는 전체 스택
+
+아래는 소규모 팀이 로컬 환경이나 개발 환경에서 전체 스택을 띄울 수 있는 Docker Compose 설정입니다.
+
+```yaml
+# docker-compose.observability.yml
+version: "3.9"
+services:
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.96.0
+    command: ["--config=/etc/otel/config.yaml"]
+    volumes:
+      - ./otel-config.yaml:/etc/otel/config.yaml:ro
+    ports:
+      - "4317:4317"   # OTLP gRPC
+      - "4318:4318"   # OTLP HTTP
+      - "8889:8889"   # Prometheus exporter
+    depends_on:
+      - tempo
+      - loki
+
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.retention.time=15d"
+      - "--storage.tsdb.retention.size=10GB"
+    ports:
+      - "9090:9090"
+
+  loki:
+    image: grafana/loki:2.9.4
+    volumes:
+      - loki_data:/loki
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+
+  tempo:
+    image: grafana/tempo:2.4.0
+    volumes:
+      - ./tempo.yaml:/etc/tempo.yaml:ro
+      - tempo_data:/tmp/tempo
+    command: ["-config.file=/etc/tempo.yaml"]
+    ports:
+      - "3200:3200"   # Tempo API
+      - "4320:4317"   # OTLP gRPC (Tempo direct)
+
+  grafana:
+    image: grafana/grafana:10.3.3
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+      - loki
+      - tempo
+
+volumes:
+  prometheus_data:
+  loki_data:
+  tempo_data:
+  grafana_data:
+```
+
+`docker compose -f docker-compose.observability.yml up -d`로 실행하면 메트릭(Prometheus), 로그(Loki), 트레이스(Tempo), 대시보드(Grafana), 수집기(OTel Collector)가 모두 떠오릅니다.
+
+### 프로덕션 하드닝 체크리스트
+
+로컬 환경에서 프로덕션으로 옮길 때 확인해야 할 항목입니다.
+
+| 영역 | 항목 | 로컬 | 프로덕션 |
+|------|------|------|---------|
+| 스토리지 | Prometheus 보존 | 15일 | retention.time + retention.size 설정 |
+| 스토리지 | Loki 청크 압축 | 기본값 | S3/GCS 백엔드 + compactor 활성화 |
+| 스토리지 | Tempo 블록 저장소 | 로컬 디스크 | S3/GCS 백엔드 + 압축 |
+| 가용성 | Prometheus HA | 단일 인스턴스 | Thanos/Mimir sidecar + 이중화 |
+| 가용성 | Collector HA | 단일 인스턴스 | 로드밸런서 뒤에 2+ 인스턴스 |
+| 가용성 | Grafana HA | 단일 인스턴스 | PostgreSQL 세션 + 로드밸런서 |
+| 보안 | 네트워크 격리 | 모두 같은 네트워크 | 내부 전용 네트워크 + mTLS |
+| 보안 | 인증 | anonymous | Grafana OIDC + Prometheus basic auth |
+| 보안 | 시크릿 관리 | 환경변수 | Vault / Sealed Secrets |
+| 운영 | 백업 | 없음 | Prometheus snapshot + Grafana provisioning git |
+| 운영 | 업그레이드 전략 | latest | 버전 고정 + 카나리 배포 |
+| 모니터링 | 자기 관측 | 없음 | 각 컴포넌트 /metrics + 헬스체크 스크립트 |
+
+### 용량 계획 기준
+
+프로덕션 환경의 리소스 산정 기준입니다.
+
+```text
+── Prometheus ──
+메모리: 시계열 수 × 120 bytes (대략적 기준)
+  50,000 시계열 → ~6 GB RAM
+  200,000 시계열 → ~24 GB RAM
+디스크: scrape_interval × 시계열 수 × 2 bytes × 보존일수
+  50,000 시계열, 15초, 15일 → ~43 GB
+
+── Loki ──
+압축 후 로그 크기: 원본의 ~10-15%
+  일 10 GB 로그 × 30일 × 12% → ~36 GB 스토리지
+
+── Tempo ──
+트레이스 크기: span 당 ~200-500 bytes (압축 후)
+  초당 1,000 span × 86,400초 × 7일 × 300 bytes → ~170 GB
+
+── OTel Collector ──
+CPU: 초당 span/로그 10,000건 기준 ~0.5 core
+메모리: batch + queue 설정에 따라 512 MB - 2 GB
+```
+
+용량 계획에서 가장 흔한 실수는 시계열 증가를 과소평가하는 것입니다. 서비스가 성장하면 인스턴스, 엔드포인트, 레이블 조합이 모두 늘어납니다. 분기별로 실제 시계열 수를 측정하고 예측치를 업데이트해야 합니다.
+
+초기 산정이 어려우면 보수적으로 2배 여유를 두고 시작하되, Prometheus의 `prometheus_tsdb_head_series` 메트릭과 Loki의 `loki_ingester_chunk_stored_bytes_total`을 주기적으로 관찰하면서 실제 사용량에 맞게 조정합니다. 관측성 플랫폼 자체의 리소스 사용량도 관측 대상이어야 합니다.
+
 ## 처음 질문으로 돌아가기
 
 - **작은 팀이 바로 시작할 수 있는 최소 관측성 스택은 어떤 모습일까요?**
-  - 본문의 기준은 운영 가능한 관측성 스택를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - Docker Compose 하나로 Prometheus + Loki + Tempo + Grafana + OTel Collector를 띄울 수 있습니다. 본문의 예시처럼 5개 컴포넌트면 메트릭·로그·트레이스 세 신호를 모두 수집하고 상관 분석할 수 있는 환경이 만들어집니다.
 - **OpenTelemetry 수집기를 왜 중심에 두는 편이 좋을까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 애플리케이션은 OTLP라는 하나의 프로토콜로만 내보내면 됩니다. 수집기가 백엔드(Prometheus, Loki, Tempo, Jaeger 등)로의 라우팅을 담당하므로, 백엔드를 교체할 때 애플리케이션 코드를 변경할 필요가 없습니다. 샘플링, 필터링, 변환도 수집기 설정에서 처리할 수 있어 운영 유연성이 높아집니다.
 - **메트릭, 로그, 트레이스를 한 화면에서 연결하려면 무엇이 필요할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - Grafana의 Explore 화면에서 trace ID로 검색하면 해당 트레이스와 연관된 로그, 그 시점의 메트릭을 한 화면에서 볼 수 있습니다. 이를 위해 로그에 trace_id 필드를 삽입하고, Grafana 데이터 소스에서 Loki→Tempo, Tempo→Prometheus 간 연결(derived fields, exemplars)을 설정해야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -375,4 +498,5 @@ if __name__ == "__main__":
 - [Tempo docs](https://grafana.com/docs/tempo/latest/)
 - [Loki docs](https://grafana.com/docs/loki/latest/)
 
+- [book-examples — observability-101 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/observability-101/ko)
 Tags: Observability, SRE, OpenTelemetry, Grafana, Prometheus

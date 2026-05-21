@@ -64,7 +64,7 @@ last_reviewed: '2026-05-15'
 
 교집합의 공식은 A와 B가 독립일 때만 곡셈으로 쓸 수 있습니다. 독립이 아니면 조건부확률을 써야 합니다: `P(A ∩ B) = P(A | B) × P(B)`. 여집합은 가장 간단하지만 가장 유용한 공식 중 하나입니다. 여집합을 이용하면 복잡한 사건을 더 간단한 사건으로 바꿀 수 있습니다.
 
-## Python set 연산 예제
+## 파이썬 집합 연산 예제
 
 표본공간과 사건을 Python set으로 표현하면 집합 연산을 코드로 바로 확인할 수 있습니다.
 
@@ -322,6 +322,110 @@ print(f"드 모르간 2: {not_A_and_B == not_A_or_not_B}")
 ```
 
 드 모르간의 법칙은 논리회로 설계, 데이터베이스 쿼리 최적화, 부정 조건 필터링에서 자주 쓰입니다. 복잡한 조건을 간단한 형태로 변환할 때 유용합니다.
+
+## 상호배반과 독립의 차이
+
+입문자가 가장 많이 혼동하는 개념이 상호배반(mutually exclusive)과 독립(independent)입니다. 두 개념은 이름도 다르고 의미도 완전히 다릅니다.
+
+| 속성 | 상호배반 | 독립 |
+| --- | --- | --- |
+| 정의 | A∩B = ∅ | P(A∩B) = P(A)·P(B) |
+| 의미 | 동시에 일어날 수 없음 | 한쪽이 다른 쪽에 영향 없음 |
+| P(A∩B) | 0 | P(A)·P(B) |
+| 관계 | A가 일어나면 B는 불가능 | A가 일어나도 B 확률 변화 없음 |
+
+```python
+# 상호배반과 독립의 차이 확인
+omega = set(range(1, 7))  # 주사위 한 개
+
+# 상호배반 예: A={1,2,3}, B={4,5,6}
+A_excl = {1, 2, 3}
+B_excl = {4, 5, 6}
+print(f"상호배반: A∩B = {A_excl & B_excl}")  # 공집합
+print(f"P(A)·P(B) = {len(A_excl)/6 * len(B_excl)/6:.3f}")
+print(f"P(A∩B) = {len(A_excl & B_excl)/6:.3f}")
+print(f"독립? {len(A_excl & B_excl)/6 == len(A_excl)/6 * len(B_excl)/6}")  # False
+
+print()
+# 독립 예: A={짝수}, B={3 이상}
+A_ind = {2, 4, 6}
+B_ind = {3, 4, 5, 6}
+P_A = len(A_ind) / 6
+P_B = len(B_ind) / 6
+P_AB = len(A_ind & B_ind) / 6
+print(f"독립: P(A)={P_A:.3f}, P(B)={P_B:.3f}")
+print(f"P(A)·P(B) = {P_A * P_B:.3f}")
+print(f"P(A∩B) = {P_AB:.3f}")
+print(f"독립? {abs(P_AB - P_A * P_B) < 1e-10}")  # True
+```
+
+출력:
+
+```
+상호배반: A∩B = set()
+P(A)·P(B) = 0.250
+P(A∩B) = 0.000
+독립? False
+
+독립: P(A)=0.500, P(B)=0.667
+P(A)·P(B) = 0.333
+P(A∩B) = 0.333
+독립? True
+```
+
+상호배반인 두 사건은 한쪽이 일어나면 다른 쪽이 불가능하므로 강하게 종속됩니다. 따라서 상호배반과 독립은 동시에 성립할 수 없습니다(둘 다 확률이 0보다 클 때). 이 구분을 일찍 잡아두면 조건부확률과 베이즈 정리에서 훨씬 편해집니다.
+
+## 몬테카를로로 확률 추정하기
+
+집합 크기를 세기 어려운 경우, 시뮬레이션으로 확률을 추정할 수 있습니다.
+
+```python
+import random
+
+def simulate_event(n_trials: int = 100_000) -> dict:
+    """주사위 2개: 합이 7일 확률 vs 합이 12일 확률"""
+    count_7 = 0
+    count_12 = 0
+    for _ in range(n_trials):
+        d1 = random.randint(1, 6)
+        d2 = random.randint(1, 6)
+        total = d1 + d2
+        if total == 7:
+            count_7 += 1
+        elif total == 12:
+            count_12 += 1
+    return {
+        "P(합=7)": count_7 / n_trials,
+        "P(합=12)": count_12 / n_trials,
+    }
+
+random.seed(42)
+results = simulate_event()
+print(f"시뮬레이션 P(합=7) = {results['P(합=7)']:.4f} (이론값: {6/36:.4f})")
+print(f"시뮬레이션 P(합=12) = {results['P(합=12)']:.4f} (이론값: {1/36:.4f})")
+```
+
+합이 7인 경우는 (1,6),(2,5),(3,4),(4,3),(5,2),(6,1)로 6가지이고, 합이 12인 경우는 (6,6) 한 가지뿐입니다. 시뮬레이션 결과가 이론값에 수렴하는 것을 확인하면, 해석적으로 풀기 어려운 문제에서도 같은 접근이 가능하다는 자신감을 얻을 수 있습니다.
+
+## 조건부 사고의 출발점
+
+사건과 표본공간을 제대로 정의해 두면, 다음 단계인 조건부확률로 자연스럽게 넘어갈 수 있습니다. 조건부확률은 새로운 정보가 들어왔을 때 표본공간을 축소하는 것과 같습니다.
+
+```python
+# 주사위 한 개: "3 이상"이라는 정보가 들어왔을 때
+omega = set(range(1, 7))
+B = {3, 4, 5, 6}  # 조건: 3 이상
+
+# 축소된 표본공간에서 짝수일 확률
+A = {2, 4, 6}  # 짝수
+A_given_B = A & B  # {4, 6}
+P_A_given_B = len(A_given_B) / len(B)
+print(f"P(짝수 | 3이상) = {P_A_given_B:.3f}")
+print(f"P(짝수) = {len(A)/len(omega):.3f}")
+print(f"조건이 확률을 바꿨는가? {P_A_given_B != len(A)/len(omega)}")
+```
+
+조건을 알게 되면 불가능한 결과가 사라지고, 남은 결과 안에서 비율을 다시 계산합니다. 이것이 조건부확률의 핵심이며, 다음 글에서 본격적으로 다룹니다.
 ## 자주 헷갈리는 지점
 
 첫째, Ω를 적지 않고 계산에 들어가기 쉽습니다. 이 습관은 초반에는 빨라 보여도 뒤로 갈수록 더 많은 오해를 낳습니다.
@@ -340,12 +444,65 @@ print(f"드 모르간 2: {not_A_and_B == not_A_or_not_B}")
 
 그래서 강한 팀일수록 계산식보다 먼저 이벤트 정의를 문서로 남깁니다. 무엇을 성공으로 볼지, 어떤 로그를 사건으로 볼지, 서로 배타적인 조건과 겹칠 수 있는 조건을 어떻게 나눌지부터 잡아야 지표도 안정됩니다.
 
+## 실무 사례: 이벤트 정의와 표본공간
+
+실무에서 표본공간을 명시적으로 정의하는 장면을 더 살펴보겠습니다.
+
+**A/B 테스트 버킷 설계**
+
+```python
+# 사용자 배정 시 표본공간 정의
+buckets = {"control", "variant_A", "variant_B"}
+# 상호배반: 한 사용자는 하나의 버킷에만 속함
+# 전체 확률 합: 1.0
+allocation = {"control": 0.50, "variant_A": 0.25, "variant_B": 0.25}
+assert abs(sum(allocation.values()) - 1.0) < 1e-10
+
+# 성공 사건 정의
+# "전환" = 결제 완료 이벤트가 발생한 세션
+# 표본공간: 모든 세션
+# 사건: 전환이 발생한 세션 (부분집합)
+print("표본공간: 모든 세션")
+print("사건: 전환 발생 세션")
+print("확률: 전환율 = |사건| / |표본공간|")
+```
+
+**사기 탐지 규칙**
+
+```python
+# 거래 이벤트의 표본공간 정의
+# Ω = 모든 거래
+# A = "비정상 거래" (사기 탐지 대상)
+# Aᶜ = "정상 거래"
+
+# 실무에서의 문제:
+# 1. A의 정의가 팀마다 다름 ("비정상"의 기준?)
+# 2. 기저율(base rate)이 매우 낮음: P(A) ≈ 0.001
+# 3. 기저율을 무시하면 양성 예측의 대부분이 오경보
+
+base_rate = 0.001
+# TPR(True Positive Rate) = 0.95, FPR(False Positive Rate) = 0.01
+# P(양성 판정 | 실제 사기) = 0.95
+# P(양성 판정 | 정상 거래) = 0.01
+tpr, fpr = 0.95, 0.01
+# 양성 판정 중 실제 사기 비율 (Precision)
+precision = (tpr * base_rate) / (tpr * base_rate + fpr * (1 - base_rate))
+print(f"Precision = {precision:.3f}")
+print(f"양성 판정의 {1-precision:.1%}는 오경보")
+```
+
+사기 탐지에서 기저율이 낮으면 정밀도가 낮아집니다. 이는 표본공간의 구조(정상 거래가 압도적으로 많음)를 무시한 채 사건만 보면 생기는 오해입니다. 베이즈 정리(4장)에서 이 문제를 본격적으로 다룹니다.
+
 ## 체크리스트
 
 - [ ] 표본공간을 먼저 정의할 수 있습니다.
 - [ ] 합사건, 곱사건, 여사건을 구분할 수 있습니다.
 - [ ] 상호배반과 독립의 차이를 설명할 수 있습니다.
 - [ ] 순서 유무와 복원 여부를 명시할 수 있습니다.
+- [ ] 포함-배제 원리를 두 사건 이상에서 적용할 수 있습니다.
+- [ ] 드 모르간의 법칙을 확률 문제에 활용할 수 있습니다.
+- [ ] 몬테카를로 시뮬레이션으로 확률을 추정할 수 있습니다.
+- [ ] A/B 테스트, 사기 탐지 등 실무 장면에서 표본공간과 사건 정의의 중요성을 설명할 수 있습니다.
 
 ## 정리
 
@@ -384,5 +541,6 @@ print(f"드 모르간 2: {not_A_and_B == not_A_or_not_B}")
 - [Wikipedia — Event (probability theory)](https://en.wikipedia.org/wiki/Event_(probability_theory))
 - [Wikipedia — Sample space](https://en.wikipedia.org/wiki/Sample_space)
 - [Stanford CS109 — Notes](https://web.stanford.edu/class/cs109/)
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/probability-101/ko)
 
 Tags: Probability, SampleSpace, Events, SetTheory, Beginner

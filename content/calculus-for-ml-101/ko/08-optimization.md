@@ -145,100 +145,323 @@ L2 regularization은 파라미터가 과도하게 커지는 것을 억제해 일
 다음 글에서는 이 optimization에 들어가는 gradient가 네트워크 전체에서 어떻게 계산되는지, 즉 backpropagation을 계산 그래프 관점에서 다시 보겠습니다.
 
 
-## 추가 실전 섹션: 미분 신호를 학습 루프로 연결하는 계산 연습
 
-미분 개념을 오래 유지하려면 손으로 계산한 값과 코드에서 나온 값이 같은지 반복 확인하는 연습이 중요합니다. 아래 표는 손실 함수와 gradient를 빠르게 점검할 때 자주 쓰는 비교 축입니다.
+## Adam을 식으로 다시 전개하기
 
-| 항목 | 회귀(MSE) | 분류(BCE) | 점검 포인트 |
-| --- | --- | --- | --- |
-| 손실 형태 | 평균 제곱 오차 | 음의 로그 우도 | 문제 유형 일치 여부 |
-| gradient 민감도 | 큰 오차에 더 민감 | 확신한 오답에 큰 페널티 | 폭주/포화 구간 확인 |
-| 수치 안정성 | 비교적 안정적 | `log(0)` 방어 필요 | `eps` 처리 |
-| 학습 신호 | 선형 오차 비례 | 확률 오차 반영 | calibration 해석 |
+Adam은 1차 모멘트(gradient 평균)와 2차 모멘트(gradient 제곱 평균)를 동시에 추적합니다. 핵심 식은 다음과 같습니다.
 
-### 체인 룰 검증: 수치 미분과 해석 미분 비교
+\[
+m_t = eta_1 m_{t-1} + (1-eta_1) g_t, \quad
+v_t = eta_2 v_{t-1} + (1-eta_2) g_t^2
+\]
+
+초기 단계에서는 `m_0=0`, `v_0=0`으로 시작하므로 편향이 큽니다. 이를 보정하기 위해 bias correction을 사용합니다.
+
+\[
+\hat{m}_t = rac{m_t}{1-eta_1^t}, \quad
+\hat{v}_t = rac{v_t}{1-eta_2^t}
+\]
+
+최종 업데이트는 아래와 같습니다.
+
+\[
+	heta_{t+1} = 	heta_t - lpha rac{\hat{m}_t}{\sqrt{\hat{v}_t}+\epsilon}
+\]
+
+이 식을 좌표별로 해석하면, `hat(v)`가 큰 좌표는 step이 자동으로 줄고, `hat(m)`는 최근 gradient 방향을 안정적으로 모읍니다. 즉 Adam은 진동 완화와 좌표별 스케일 보정을 동시에 수행합니다.
+
+### Adam 수치 예제
+
+초기값 `w=1.0`, `g1=0.3`, `g2=0.1`, `alpha=0.001`, `beta1=0.9`, `beta2=0.999`라고 하겠습니다.
+
+| 단계 | 값 |
+| --- | --- |
+| t=1, m1 | `0.03` |
+| t=1, v1 | `0.00009` |
+| t=1, m^1 | `0.3` |
+| t=1, v^1 | `0.09` |
+| 업데이트 | `0.001 * 0.3 / (sqrt(0.09)+eps) ≈ 0.001` |
+
+첫 step에서 bias correction이 없으면 `m`과 `v`가 과소평가되어 업데이트 크기가 왜곡됩니다. 그래서 Adam 구현에서는 correction이 사실상 필수입니다.
+
+### Adam 구현에서 자주 놓치는 세부점
+
+- `eps`는 분모 0 방지뿐 아니라, 매우 작은 분산 구간의 step 폭을 제한하는 안전장치입니다.
+- `beta2`를 너무 작게 잡으면 분산 추정이 흔들려 학습 곡선이 불안정해질 수 있습니다.
+- mixed precision에서는 gradient scale과 Adam 분모 안정성(`eps`)을 함께 점검해야 합니다.
+
+## 학습률 스케줄 설계
+
+optimizer가 방향을 정한다면 scheduler는 시간축 정책을 정합니다. 같은 Adam이라도 스케줄이 다르면 완전히 다른 학습 궤적이 나옵니다.
+
+### Step decay
+
+일정 epoch마다 학습률을 계단식으로 내리는 방식입니다.
+
+\[
+lpha_t = lpha_0 \cdot \gamma^{\lfloor t/s 
+floor}
+\]
+
+- 장점: 단순하고 해석이 쉽습니다.
+- 단점: 경계 시점에서 손실 곡선이 급하게 꺾일 수 있습니다.
 
 ```python
 import math
 
-def f(x):
-    return math.sin(3 * x + 1)
-
-def analytic_grad(x):
-    # d/dx sin(3x+1) = cos(3x+1) * 3
-    return math.cos(3 * x + 1) * 3
-
-def numeric_grad(fn, x, h=1e-5):
-    return (fn(x + h) - fn(x - h)) / (2 * h)
-
-x = 0.7
-print(analytic_grad(x), numeric_grad(f, x))
+def step_lr(step, base_lr=1e-3, drop_every=1000, gamma=0.5):
+    return base_lr * (gamma ** (step // drop_every))
 ```
 
-해석 미분과 수치 미분이 비슷하게 나오면 체인 룰 구현이 올바르게 연결되었다는 강한 증거가 됩니다.
+### Cosine decay
 
-### 2변수 손실에서 gradient 벡터 해석
+초기 학습률에서 0 또는 최소값으로 부드럽게 감쇠합니다.
+
+\[
+lpha_t = lpha_{min} + rac{1}{2}(lpha_{max}-lpha_{min})(1 + \cos(\pi t/T))
+\]
 
 ```python
-def loss(w1, w2):
-    return (w1 - 2) ** 2 + 4 * (w2 + 1) ** 2
+import math
 
-def grad(w1, w2):
-    return 2 * (w1 - 2), 8 * (w2 + 1)
-
-w1, w2 = 0.0, 0.0
-g1, g2 = grad(w1, w2)
-print('grad=', (g1, g2))
+def cosine_lr(step, total_steps, lr_max=1e-3, lr_min=1e-5):
+    ratio = step / total_steps
+    return lr_min + 0.5 * (lr_max - lr_min) * (1 + math.cos(math.pi * ratio))
 ```
 
-이 예시에서는 두 번째 축 gradient가 더 크게 나오므로 동일 learning rate에서도 `w2` 방향 업데이트가 더 공격적으로 일어납니다. 좌표별 스케일 차이를 optimizer가 어떻게 다루는지 이해하는 출발점입니다.
+- 장점: 후반 미세 조정이 부드럽고 발산 위험이 낮습니다.
+- 단점: 총 step 수를 대략 정확히 알아야 합니다.
 
-### 손실 곡선 해석 표
+### Warmup + main schedule
 
-| 관찰 패턴 | 가능한 원인 | 우선 점검 |
+대규모 배치나 Transformer 계열에서는 초반 gradient가 불안정해 곧바로 큰 학습률을 주면 손실이 튈 수 있습니다. warmup은 초반 `N` step 동안 학습률을 선형 상승시키고, 이후 본 스케줄(보통 cosine)로 넘어갑니다.
+
+```python
+def warmup_cosine(step, warmup_steps, total_steps, lr_max=3e-4, lr_min=3e-5):
+    if step < warmup_steps:
+        return lr_max * (step + 1) / warmup_steps
+    progress = (step - warmup_steps) / max(1, total_steps - warmup_steps)
+    import math
+    return lr_min + 0.5 * (lr_max - lr_min) * (1 + math.cos(math.pi * progress))
+```
+
+### 스케줄 선택 기준
+
+| 상황 | 추천 스케줄 | 이유 |
 | --- | --- | --- |
-| 초반 급상승 후 발산 | learning rate 과대, gradient 폭주 | lr 감소, clipping |
-| 매우 느린 하강 | learning rate 과소, 특징 스케일 불일치 | lr 증가, 정규화 |
-| 진동만 하고 정체 | 비등방 지형, batch noise 과다 | momentum, batch 조정 |
-| train 감소 / val 정체 | 과적합 | weight decay, early stopping |
+| 작은 모델, 빠른 실험 | Step decay | 튜닝 단순성 |
+| 긴 학습, 후반 정밀 조정 | Cosine | 부드러운 감쇠 |
+| 대규모 배치, 초반 발산 잦음 | Warmup + Cosine | 초기 안정성 + 후반 성능 |
 
-### 미니 실습: 간단한 업데이트 루프
+## Weight Decay와 L2 정규화의 차이
+
+표면적으로 둘 다 `w`를 줄이는 항이 들어가서 같아 보이지만, adaptive optimizer에서는 동치가 깨집니다.
+
+### L2 penalty 방식
+
+손실에 `\lambda/2 ||w||^2`를 더하면 gradient가 `g + \lambda w`로 바뀝니다. 즉 정규화 항이 gradient 경로에 결합됩니다.
+
+### Decoupled weight decay 방식
+
+AdamW는 gradient 경로와 별도로 파라미터를 직접 감쇠합니다.
+
+\[
+	heta_{t+1} = 	heta_t - lpha \cdot 	ext{AdamUpdate}(g_t) - lpha \lambda 	heta_t
+\]
+
+이 방식은 adaptive 분모와 정규화가 섞이지 않아 하이퍼파라미터 해석이 더 일관적입니다.
+
+### 비교 표
+
+| 항목 | L2 penalty (Adam) | Decoupled WD (AdamW) |
+| --- | --- | --- |
+| 적용 위치 | gradient 내부 | 파라미터 업데이트 외부 |
+| adaptive 분모 영향 | 받음 | 받지 않음 |
+| 튜닝 해석 | 복합적 | 비교적 명확 |
+| 실무 권장 | 제한적 | 일반적으로 권장 |
+
+## Optimizer 비교 표
+
+| Optimizer | 핵심 아이디어 | 장점 | 단점 | 기본 시작점 |
+| --- | --- | --- | --- | --- |
+| SGD | 현재 gradient만 사용 | 단순, 메모리 작음 | 지형이 거칠면 느림 | lr=0.1 전후 |
+| SGD+Momentum | 방향 누적 | 진동 완화, 일반화 양호 | lr 민감 | lr=0.1, m=0.9 |
+| RMSProp | 좌표별 분산 보정 | 비등방 지형 대응 | 장기 기억 약함 | lr=1e-3 |
+| Adam | 모멘트+분산 결합 | 초반 수렴 빠름 | 일반화가 항상 최선은 아님 | lr=1e-3 |
+| AdamW | Adam + decoupled WD | 대규모 모델에서 안정적 | wd 튜닝 필요 | lr=3e-4, wd=0.01 |
+
+## 하이퍼파라미터 튜닝 전략
+
+튜닝은 무작정 조합 탐색이 아니라, 실패 징후를 근거로 순서를 정하는 작업입니다.
+
+### 1) 학습률 범위 탐색
+
+아주 작은 값에서 시작해 step마다 증가시키며 손실이 악화되는 구간을 찾습니다. 그 직전 값을 초기 학습률 후보로 사용합니다.
 
 ```python
-def train_step(w, x, y, lr=0.05):
-    pred = w * x
-    loss = (pred - y) ** 2
-    grad = 2 * (pred - y) * x
-    w = w - lr * grad
-    return w, loss, grad
-
-w = 0.0
-for _ in range(5):
-    w, L, g = train_step(w, x=3.0, y=12.0)
-    print(f'w={w:.4f}, loss={L:.4f}, grad={g:.4f}')
+def lr_range_test(model, optimizer, data_loader, lr_start=1e-6, lr_end=1, steps=200):
+    mult = (lr_end / lr_start) ** (1 / steps)
+    lr = lr_start
+    for i, batch in enumerate(data_loader):
+        if i >= steps:
+            break
+        for pg in optimizer.param_groups:
+            pg['lr'] = lr
+        loss = model.training_step(batch)
+        loss.backward()
+        optimizer.step()
+        optimizer.zero_grad()
+        print(i, lr, float(loss))
+        lr *= mult
 ```
 
-짧은 루프지만 forward-loss-backward-update가 모두 포함되어 있습니다. 이 구조를 이해하면 어떤 딥러닝 프레임워크의 학습 코드도 핵심 의미를 잃지 않고 읽을 수 있습니다.
+### 2) wd를 lr과 분리해서 튜닝
 
-### 실전 점검 루틴
+`lr`을 먼저 고정한 뒤 `wd`를 `0, 1e-4, 1e-3, 1e-2`로 비교하면 과적합 억제 효과를 더 명확히 볼 수 있습니다.
 
-1. 해석 미분과 수치 미분을 작은 예제로 한 번 맞춰 봅니다.
-2. gradient norm을 함께 기록해 신호 크기 변화를 확인합니다.
-3. learning rate를 3개 이상 비교해 수렴 민감도를 봅니다.
-4. train/validation 손실을 동시에 관찰해 과적합 신호를 분리합니다.
-5. 이상 징후가 생기면 모델 구조보다 손실/미분/업데이트 순서를 먼저 점검합니다.
+### 3) batch size와 함께 재조정
 
-이 루틴이 자리 잡으면 미분 개념이 수학 노트에 머무르지 않고 실제 모델 훈련 의사결정으로 연결됩니다.
+batch size를 키우면 gradient 분산이 줄어 학습률을 키울 여지가 생깁니다. 반대로 작은 batch에서는 lr를 낮추거나 warmup을 길게 잡는 편이 안정적입니다.
 
+### 4) 로그 기반 진단
+
+아래 지표를 같은 x축(step)으로 기록하면 원인 분리가 빨라집니다.
+
+| 로그 지표 | 해석 |
+| --- | --- |
+| train loss | 최적화 진행 속도 |
+| val loss | 일반화 경향 |
+| grad norm | 폭주/소실 신호 |
+| lr | 스케줄 영향 |
+| parameter norm | wd/L2 효과 |
+
+## 실무용 선택 가이드
+
+### 작은 데이터, 빠른 반복 실험
+
+- 우선 `Adam(lr=1e-3)`로 시작합니다.
+- 초기 5~10 epoch에서 발산하면 `lr=3e-4`로 낮춥니다.
+- 과적합이 보이면 `AdamW(wd=1e-3~1e-2)`로 전환합니다.
+
+### 이미지/언어 대규모 사전학습 또는 파인튜닝
+
+- 기본값은 `AdamW + warmup + cosine` 조합이 안정적입니다.
+- warmup 비율은 전체 step의 1~5%에서 시작합니다.
+- gradient clipping을 함께 적용해 초반 급격한 업데이트를 제한합니다.
+
+### 일반화 성능이 특히 중요한 경우
+
+- `SGD+Momentum`을 강한 baseline으로 유지합니다.
+- 수렴 속도는 느려도 최종 val metric이 높게 나오는지 확인합니다.
+- 동일한 epoch가 아니라 동일한 wall-clock 혹은 동일 step 기준으로 비교해야 공정합니다.
+
+## 검증 가능한 미니 실험 설계
+
+아래와 같이 같은 모델에서 optimizer만 바꾸어 기록하면 선택 근거를 팀에 설명하기 쉬워집니다.
+
+| 실험 | 설정 | 관찰 포인트 |
+| --- | --- | --- |
+| A | Adam, lr=1e-3 | 초반 손실 하강 속도 |
+| B | AdamW, lr=3e-4, wd=0.01 | val 안정성 |
+| C | SGD+Momentum, lr=0.1 | 최종 일반화 |
+
+실험 로그는 반드시 `seed`, `batch size`, `augmentation`, `scheduler`를 함께 저장해야 합니다. optimizer만 바꿨다고 생각했지만 실제로는 다른 조건이 섞여 있으면 결론이 왜곡됩니다.
+
+
+## AdamW 구현 세부: 파라미터 그룹과 예외 규칙
+
+실무 학습 코드에서는 모든 파라미터에 동일한 weight decay를 주지 않습니다. 일반적으로 bias와 normalization 계층 파라미터는 decay에서 제외합니다.
+
+```python
+import torch
+
+def build_param_groups(model, wd=0.01):
+    decay, no_decay = [], []
+    for n, p in model.named_parameters():
+        if not p.requires_grad:
+            continue
+        if n.endswith('bias') or 'norm' in n.lower():
+            no_decay.append(p)
+        else:
+            decay.append(p)
+    return [
+        {'params': decay, 'weight_decay': wd},
+        {'params': no_decay, 'weight_decay': 0.0},
+    ]
+
+optimizer = torch.optim.AdamW(build_param_groups(model), lr=3e-4, betas=(0.9, 0.999), eps=1e-8)
+```
+
+이 패턴을 적용하면 정규화 계층의 scale/shift 파라미터가 과도하게 수축되는 문제를 줄일 수 있습니다.
+
+## 학습률 스케줄 실수 패턴
+
+| 실수 | 결과 | 수정 방법 |
+| --- | --- | --- |
+| warmup 없이 큰 lr 시작 | 초반 loss 급등, NaN | warmup 1~5% 추가 |
+| scheduler.step 위치 혼동 | lr 곡선 왜곡 | epoch/step 기준을 코드에 명시 |
+| total_steps 오계산 | cosine 감쇠 타이밍 오류 | dataloader 길이 기반 재계산 |
+| resume 시 scheduler state 미복원 | 재시작 직후 성능 흔들림 | checkpoint에 scheduler state 포함 |
+
+```python
+# step 단위 스케줄러 예시
+for step, batch in enumerate(loader):
+    loss = training_step(batch)
+    loss.backward()
+    optimizer.step()
+    scheduler.step()  # step 기반이면 optimizer 다음
+    optimizer.zero_grad()
+```
+
+## 최적화 실험 기록 템플릿
+
+아래 템플릿으로 실험을 남기면 "왜 이 optimizer를 선택했는가"를 재현 가능하게 설명할 수 있습니다.
+
+| 필드 | 예시 |
+| --- | --- |
+| 모델/데이터셋 | `resnet50 / cifar100` |
+| optimizer | `AdamW` |
+| lr policy | `warmup 5ep + cosine` |
+| wd/betas/eps | `0.01 / (0.9,0.999) / 1e-8` |
+| grad clipping | `1.0` |
+| best val metric | `top1=82.4` |
+| 실패 징후 | `epoch3에서 grad spike` |
+| 조치 | `lr 3e-4 -> 2e-4` |
+
+최적화는 결과만 기록하면 재사용하기 어렵습니다. "징후-가설-조치"까지 함께 저장해야 다음 프로젝트에서 의사결정 속도가 빨라집니다.
+
+
+## Optimizer 선택 의사결정 트리
+
+아래 트리는 팀 내에서 optimizer 기본값을 빠르게 정할 때 쓸 수 있는 실무형 규칙입니다.
+
+1. **초반 수렴이 너무 느린가?**
+   - 예: loss가 1~2 epoch 동안 거의 줄지 않음
+   - 조치: AdamW로 시작하고 lr range test를 먼저 실행합니다.
+2. **검증 성능이 후반에 흔들리는가?**
+   - 조치: cosine 후반 최소 lr를 낮추고, wd를 소폭 증가시킵니다.
+3. **학습이 안정적이지만 최종 일반화가 낮은가?**
+   - 조치: SGD+Momentum baseline을 병렬 비교합니다.
+4. **메모리 제약으로 batch가 작아 noisy한가?**
+   - 조치: gradient accumulation + warmup을 결합합니다.
+
+| 관찰된 징후 | 우선 가설 | 1차 조정 |
+| --- | --- | --- |
+| loss 진동 큼 | lr 과대, 모멘트 과대 | lr 0.5배, beta1 0.9 유지 |
+| val gap 확대 | 정규화 부족 | wd 증가, augmentation 점검 |
+| 후반 정체 | lr 하강 부족 | cosine min lr 하향 |
+| 초반 NaN | scale 불안정 | warmup 추가, clipping 적용 |
+
+결정 트리는 완벽한 정답표가 아니라, 실패를 빠르게 좁히는 공통 언어입니다. 같은 징후를 같은 순서로 점검하면 실험 반복 비용을 크게 줄일 수 있습니다.
 
 ## 처음 질문으로 돌아가기
 
 - **plain gradient descent는 실제 딥러닝 학습에서 어떤 약점을 드러낼까요?**
-  - 본문의 기준은 최적화를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 본문에서 확인했듯이 plain GD는 좌표별 gradient 스케일 차이를 직접 보정하지 못하고, 좁은 골짜기에서 진동이 커지며, 학습 단계별로 필요한 step 크기 변화를 반영하기 어렵습니다. 그래서 실무에서는 momentum, adaptive scaling, scheduler를 결합한 recipe가 필요합니다.
 - **momentum은 왜 관성이라는 비유로 설명하는 편이 가장 이해가 쉬울까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - momentum은 과거 gradient를 지수평균으로 누적해 현재 업데이트 방향에 반영합니다. 즉 한 번의 noisy gradient보다 "최근 진행 방향"을 더 신뢰해 지그재그를 줄이고 주된 하강 방향을 유지하므로, 물리적 관성 비유가 동작 원리를 가장 정확하게 전달합니다.
 - **RMSProp과 Adam은 좌표별 gradient scale 차이를 어떻게 완화할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - RMSProp은 좌표별 `g^2` 이동평균으로 분모를 만들어 큰 gradient 좌표의 step을 줄입니다. Adam은 여기에 1차 모멘트까지 결합하고 bias correction을 적용해 초반 단계 왜곡을 줄입니다. 결과적으로 스케일이 다른 파라미터를 동일 lr로도 안정적으로 학습시키는 효과를 얻습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -263,6 +486,9 @@ for _ in range(5):
 - [Optimizer Overview - Ruder](https://www.ruder.io/optimizing-gradient-descent/)
 - [Cosine LR Schedule - Loshchilov and Hutter](https://arxiv.org/abs/1608.03983)
 - [Decoupled Weight Decay - Loshchilov and Hutter](https://arxiv.org/abs/1711.05101)
+
+### 예제 코드
+- [book-examples/calculus-for-ml-101/ko](https://github.com/yeongseon-books/book-examples/tree/main/calculus-for-ml-101/ko)
 
 ### 관련 시리즈
 - [Linear Algebra 101](../../linear-algebra-101/ko/)

@@ -342,6 +342,182 @@ def mask_email(email: str) -> str:
 
 이 구성은 운영에서 자주 필요한 두 가지를 만족합니다. 첫째, 예외 정보를 JSON 안에 구조적으로 남깁니다. 둘째, request context를 `contextvars`로 전달해 비동기 코드에서도 공통 필드를 유지합니다.
 
+## 로그 집계 파이프라인 구성
+
+구조화된 로그를 남기는 것만으로는 충분하지 않습니다. 로그를 수집하고 저장하고 질의하는 파이프라인이 있어야 운영에서 실제로 쓸 수 있습니다.
+
+### Promtail + Loki 구성 예시
+
+```yaml
+# promtail-config.yaml
+server:
+  http_listen_port: 9080
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: app-logs
+    static_configs:
+      - targets: [localhost]
+        labels:
+          job: checkout-api
+          env: prod
+          __path__: /var/log/app/*.log
+    pipeline_stages:
+      - json:
+          expressions:
+            level: level
+            event: event
+            trace_id: trace_id
+            service: service
+      - labels:
+          level:
+          event:
+          service:
+      - timestamp:
+          source: ts
+          format: Unix
+```
+
+이 구성은 JSON 로그에서 필드를 추출해 Loki 라벨로 변환합니다. Loki에서 `{service="checkout-api", level="ERROR"}` 같은 질의가 바로 가능해집니다.
+
+### Fluentd 구성 예시 (ELK 방식)
+
+```xml
+<source>
+  @type tail
+  path /var/log/app/*.log
+  pos_file /var/log/fluentd/app.pos
+  tag app.checkout
+  <parse>
+    @type json
+    time_key ts
+    time_type float
+  </parse>
+</source>
+
+<filter app.**>
+  @type record_transformer
+  <record>
+    hostname "#{Socket.gethostname}"
+  </record>
+</filter>
+
+<match app.**>
+  @type elasticsearch
+  host elasticsearch
+  port 9200
+  index_name app-logs-%Y%m%d
+  <buffer>
+    flush_interval 5s
+    chunk_limit_size 8m
+  </buffer>
+</match>
+```
+
+Promtail+Loki와 Fluentd+Elasticsearch는 목적이 다릅니다:
+
+| 구성 | 장점 | 단점 | 적합한 상황 |
+| --- | --- | --- | --- |
+| Promtail + Loki | 저비용, Grafana 통합 | 전문 검색 약함 | 라벨 기반 필터링이 주 용도 |
+| Fluentd + ELK | 전문 검색 강력 | 운영 복잡도 높음 | 로그 본문 검색이 중요할 때 |
+
+## PII 마스킹 파이프라인
+
+운영 로그에 개인정보가 그대로 남으면 보안 사고로 이어집니다. 로깅 계층에서 마스킹을 처리하는 예제입니다.
+
+```python
+import hashlib
+import re
+from typing import Any
+
+
+PII_FIELDS = {"email", "phone", "card_number", "ssn"}
+EMAIL_RE = re.compile(r"[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}")
+
+
+def mask_value(key: str, value: Any) -> Any:
+    """PII 필드를 해시 또는 마스킹으로 대체합니다."""
+    if key in PII_FIELDS:
+        if isinstance(value, str):
+            return hashlib.sha256(value.encode()).hexdigest()[:16]
+        return "***"
+    if isinstance(value, str) and EMAIL_RE.search(value):
+        return EMAIL_RE.sub("[REDACTED_EMAIL]", value)
+    return value
+
+
+def sanitize_log(payload: dict) -> dict:
+    """로그 페이로드 전체를 순회하며 PII를 제거합니다."""
+    return {k: mask_value(k, v) for k, v in payload.items()}
+
+
+# 사용 예시
+raw = {
+    "event": "user_registered",
+    "email": "user@example.com",
+    "phone": "010-1234-5678",
+    "plan": "pro",
+}
+safe = sanitize_log(raw)
+# {"event": "user_registered", "email": "a1b2c3d4e5f6...", "phone": "***", "plan": "pro"}
+```
+
+마스킹 정책에서 주의할 점은 세 가지입니다:
+
+1. **해시 가능성**: 이메일을 SHA-256으로 해시하면 동일 사용자의 로그를 묶을 수는 있지만 원문을 복원할 수는 없습니다.
+2. **적용 시점**: 로그가 작성되는 시점에 마스킹해야 합니다. 저장소에 도달한 뒤에 지우는 것은 이미 늦습니다.
+3. **검증**: PII가 로그에 남지 않는지 주기적으로 스캔하는 CI 단계를 두는 편이 좋습니다.
+
+## 로그 볼륨 통제 전략
+
+로그는 제한 없이 남기면 저장 비용이 급증합니다. 특히 DEBUG 레벨 로그는 프로덕션에서 끄는 것이 일반적이지만, 그래도 볼륨이 폭증할 수 있는 상황이 있습니다.
+
+| 전략 | 설명 | 사용 시점 |
+| --- | --- | --- |
+| 레벨 필터링 | DEBUG 라인을 프로덕션에서 제외 | 기본 |
+| 샘플링 | 정상 요청의 10%만 로그 | 트래픽이 매우 클 때 |
+| 에러 우선 | 정상 요청은 샘플링, 에러는 100% 로그 | 비용과 가시성 균형 |
+| 연속 발생 억제 | 동일 이벤트 10회 초과 시 로그 중단 | 반복 장애로 로그가 폭주할 때 |
+
+```python
+import time
+from collections import defaultdict
+
+# 연속 발생 억제 예시
+_event_counts: dict = defaultdict(lambda: {"count": 0, "last_reset": time.time()})
+RATE_LIMIT = 10  # 초당 최대 횟수
+
+
+def should_log(event: str) -> bool:
+    """1초 동안 동일 이벤트가 RATE_LIMIT회 초과하면 로그를 끊습니다."""
+    now = time.time()
+    entry = _event_counts[event]
+    if now - entry["last_reset"] > 1.0:
+        entry["count"] = 0
+        entry["last_reset"] = now
+    entry["count"] += 1
+    return entry["count"] <= RATE_LIMIT
+```
+
+이 방식을 써도 억제된 건수는 메트릭으로 남겼니다. `logs_dropped_total{event="payment_timeout"}` 같은 카운터를 두면 로그가 억제되었는지 확인할 수 있습니다.
+
+억제 기준을 정할 때는 두 가지를 함께 고려합니다. 첫째, 정상 트래픽에서 초당 로그 라인 수를 측정해 baseline을 잡습니다. 둘째, baseline의 5배를 넘으면 자동 샘플링으로 전환하되, 에러와 경고는 항상 100% 기록합니다. 이렇게 하면 비용을 통제하면서도 장애 가시성은 유지할 수 있습니다.
+
+Prometheus에서 로그 볼륨을 감시하는 메트릭 예시:
+
+```promql
+# 로그 라인 유입 속도 (초당)
+rate(log_lines_total[5m])
+
+# 억제된 로그 비율
+sum(rate(logs_dropped_total[5m])) / sum(rate(log_lines_total[5m])) * 100
+```
+
 ## 로그 레벨 운영 기준
 
 로그 레벨을 정의할 때는 "중요도"만이 아니라 "행동"을 기준으로 삼는 편이 좋습니다. 즉, 해당 로그를 본 사람이 무엇을 해야 하는가를 먼저 정합니다.
@@ -359,11 +535,11 @@ def mask_email(email: str) -> str:
 ## 처음 질문으로 돌아가기
 
 - **왜 자유 형식 로그는 운영에서 금방 한계에 부딪힐까요?**
-  - 본문의 기준은 구조화된 로깅를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 자유 형식 로그는 파싱이 불가능합니다. `grep`으로는 특정 사용자, 특정 에러 코드, 특정 트레이스 ID를 정확히 걸러낼 수 없습니다. JSON 필드로 구조를 잡으면 Loki든 Elasticsearch든 인덱스 기반 질의가 가능해지고, 장애 대응 시 5분 안에 관련 로그를 모을 수 있습니다.
 - **구조화된 로그는 무엇이 다를까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 핵심 차이는 세 가지입니다. (1) 기계가 파싱할 수 있는 형식, (2) 맥락 필드(trace_id, request_id, service)가 자동 주입, (3) 로그 라벨로 필터링하면 전문 검색 없이도 대부분의 운영 질문에 답할 수 있습니다.
 - **로그 수준은 어떤 기준으로 나눠야 할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - "중요도"가 아니라 "운영 행동"으로 나눕니다. ERROR는 즉시 점검, WARNING은 리뷰 티켓, INFO는 대시보드 참고. 레벨 정의서를 코드 리뷰 체크리스트에 포함하면 팀 전체가 동일한 기준으로 로그를 작성합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -387,5 +563,7 @@ def mask_email(email: str) -> str:
 - [structlog](https://www.structlog.org/)
 - [OpenTelemetry logs](https://opentelemetry.io/docs/concepts/signals/logs/)
 - [Twelve-factor logs](https://12factor.net/logs)
+- [Grafana Loki](https://grafana.com/docs/loki/latest/)
+- [예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/observability-101/ko)
 
 Tags: Observability, Logging, Python, JSON, DevOps

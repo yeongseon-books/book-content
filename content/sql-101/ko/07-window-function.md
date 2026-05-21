@@ -22,9 +22,9 @@ last_reviewed: '2026-05-15'
 
 # SQL 101 (7/10): 윈도 함수
 
-`GROUP BY`를 배우고 나면 자연스럽게 다음 질문이 나옵니다. 그룹별 합계나 평균은 구할 수 있는데, 원본 행은 그대로 두면서 그 합계나 순위를 옆에 붙일 수는 없을까 하는 질문입니다. 이 지점에서 윈도 함수가 등장합니다.
-
 이 글은 SQL 101 시리즈의 일곱 번째 글입니다. 여기서는 윈도 함수를 사용해 원본 행을 유지하면서 그룹별 계산 결과를 덧붙이는 방법을 설명합니다.
+
+`GROUP BY`를 배우고 나면 자연스럽게 다음 질문이 나옵니다. 그룹별 합계나 평균은 구할 수 있는데, 원본 행은 그대로 두면서 그 합계나 순위를 옆에 붙일 수는 없을까 하는 질문입니다. 이 지점에서 윈도 함수가 등장합니다.
 
 ## 먼저 던지는 질문
 
@@ -329,6 +329,237 @@ WHERE o.id = r.id AND r.rk <= 100;
 
 다음 글에서는 데이터를 읽는 쿼리에서 한 걸음 나아가, 실제로 데이터를 넣고 수정하고 삭제하는 DML을 안전하게 다루는 방법을 보겠습니다.
 
+
+## 실전 앵커: 윈도 함수와 집계 함수의 경계
+
+윈도 함수는 행을 유지하면서 계산을 붙이고, 집계 함수는 행을 줄입니다. 이 경계를 명확히 이해하면 분석 SQL이 훨씬 안정됩니다.
+
+```sql
+SELECT
+    customer_id,
+    ordered_at,
+    total_amount,
+    SUM(total_amount) OVER (
+        PARTITION BY customer_id
+        ORDER BY ordered_at
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS running_revenue
+FROM orders;
+```
+
+## 실전 앵커: 프레임 지정 실수 줄이기
+
+`ORDER BY`만 쓰고 프레임을 생략하면 의도와 다른 결과가 나올 수 있습니다. 특히 중복 정렬 키가 있을 때 `RANGE`와 `ROWS` 차이가 크게 드러납니다.
+
+```sql
+-- 명시적으로 ROWS 프레임 지정
+AVG(total_amount) OVER (
+    PARTITION BY customer_id
+    ORDER BY ordered_at, order_id
+    ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+) AS avg_7_orders
+```
+
+## 실전 앵커: 트랜잭션 격리 수준 데모
+
+윈도 계산 결과를 리포트로 저장하는 배치에서는 격리 수준 이해가 필요합니다. 아래는 재현 실험용 시나리오입니다.
+
+```sql
+-- 세션 A
+BEGIN;
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+SELECT COUNT(*) FROM orders WHERE status = 'paid';
+-- 세션 B가 INSERT/COMMIT 후에도
+SELECT COUNT(*) FROM orders WHERE status = 'paid';
+COMMIT;
+```
+
+`READ COMMITTED`에서는 두 번째 조회 결과가 바뀔 수 있고, `REPEATABLE READ`에서는 트랜잭션 시작 시점 스냅샷을 유지합니다. 분석 배치의 일관성을 맞추려면 이 차이를 명시적으로 선택해야 합니다.
+
+## 실전 앵커: 순위 계산과 동률 처리
+
+```sql
+SELECT
+    DATE(ordered_at) AS d,
+    customer_id,
+    SUM(total_amount) AS revenue,
+    ROW_NUMBER() OVER (PARTITION BY DATE(ordered_at) ORDER BY SUM(total_amount) DESC) AS rn,
+    RANK()       OVER (PARTITION BY DATE(ordered_at) ORDER BY SUM(total_amount) DESC) AS rnk,
+    DENSE_RANK() OVER (PARTITION BY DATE(ordered_at) ORDER BY SUM(total_amount) DESC) AS drnk
+FROM orders
+GROUP BY DATE(ordered_at), customer_id;
+```
+
+동률 처리 정책(`ROW_NUMBER`, `RANK`, `DENSE_RANK`)을 문서로 남기면 지표 해석 충돌을 줄일 수 있습니다.
+
+
+## 심화 실습 시나리오: 쿼리 품질을 수치로 검증하기
+
+문장 길이가 길어질수록 SQL 품질은 느낌이 아니라 **측정 가능한 기준**으로 관리해야 합니다. 아래 절차는 어떤 주제의 SQL이든 그대로 적용할 수 있는 공통 루틴입니다.
+
+1. 입력 데이터 범위(기간, 상태, 대상 테넌트)를 명시합니다.
+2. 같은 조건으로 `COUNT(*)`를 먼저 실행해 모수 행 수를 기록합니다.
+3. 본 쿼리를 실행하고 결과 행 수와 합계 지표를 기록합니다.
+4. `EXPLAIN (ANALYZE, BUFFERS)`를 실행해 병목 노드를 확인합니다.
+5. 인덱스/조건식을 조정한 뒤 2~4를 다시 반복합니다.
+
+```sql
+-- 1) 모수 확인
+SELECT COUNT(*) AS base_rows
+FROM orders
+WHERE ordered_at >= DATE '2026-01-01'
+  AND ordered_at <  DATE '2026-02-01';
+
+-- 2) 본 쿼리(예시)
+SELECT
+    customer_id,
+    COUNT(*) AS order_count,
+    SUM(total_amount) AS revenue
+FROM orders
+WHERE ordered_at >= DATE '2026-01-01'
+  AND ordered_at <  DATE '2026-02-01'
+GROUP BY customer_id
+ORDER BY revenue DESC
+LIMIT 20;
+
+-- 3) 계획 확인
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT
+    customer_id,
+    COUNT(*) AS order_count,
+    SUM(total_amount) AS revenue
+FROM orders
+WHERE ordered_at >= DATE '2026-01-01'
+  AND ordered_at <  DATE '2026-02-01'
+GROUP BY customer_id;
+```
+
+이 과정을 습관화하면 "왜 느린지"를 추측하지 않고 설명할 수 있습니다. 특히 팀 협업에서는 성능 이슈를 재현 가능한 단위로 공유할 수 있다는 점이 중요합니다.
+
+## 심화 실습 시나리오: 조인·서브쿼리·CTE 선택 비교
+
+아래 세 방식은 결과가 같아 보이지만, 데이터 크기와 통계 상태에 따라 실행 계획이 크게 달라질 수 있습니다.
+
+```sql
+-- A. 직접 조인
+SELECT c.customer_id, SUM(o.total_amount) AS revenue
+FROM customers c
+JOIN orders o ON o.customer_id = c.customer_id
+WHERE o.status = 'paid'
+GROUP BY c.customer_id;
+```
+
+```sql
+-- B. 서브쿼리
+SELECT c.customer_id, x.revenue
+FROM customers c
+JOIN (
+    SELECT customer_id, SUM(total_amount) AS revenue
+    FROM orders
+    WHERE status = 'paid'
+    GROUP BY customer_id
+) x ON x.customer_id = c.customer_id;
+```
+
+```sql
+-- C. CTE
+WITH paid_orders AS (
+    SELECT customer_id, total_amount
+    FROM orders
+    WHERE status = 'paid'
+),
+revenue_by_customer AS (
+    SELECT customer_id, SUM(total_amount) AS revenue
+    FROM paid_orders
+    GROUP BY customer_id
+)
+SELECT c.customer_id, r.revenue
+FROM customers c
+JOIN revenue_by_customer r ON r.customer_id = c.customer_id;
+```
+
+실무에서 권장하는 방법은 "문법 취향"이 아니라 "검증 가능성"으로 고르는 것입니다. 변경이 자주 일어나는 쿼리는 CTE가 리뷰와 테스트에 유리하고, 단발성 쿼리는 인라인 구조가 간결할 수 있습니다.
+
+## 심화 실습 시나리오: 인덱스 전략과 유지비용
+
+인덱스는 조회 성능을 높이지만 쓰기 비용을 늘립니다. 그래서 읽기/쓰기 비율을 기준으로 설계해야 합니다.
+
+```sql
+-- 조회 패턴에 맞춘 합성 인덱스
+CREATE INDEX idx_orders_customer_status_created
+    ON orders (customer_id, status, created_at DESC);
+
+-- 자주 쓰는 상태값만 가볍게 다루는 부분 인덱스
+CREATE INDEX idx_orders_paid_created
+    ON orders (created_at DESC)
+WHERE status = 'paid';
+```
+
+인덱스를 추가한 뒤에는 반드시 아래를 확인합니다.
+
+- `INSERT`/`UPDATE` TPS가 과도하게 떨어지지 않는가
+- VACUUM/ANALYZE 주기가 비정상적으로 늘어나지 않는가
+- 실제 주요 쿼리에서 `Index Scan` 또는 `Bitmap Index Scan`으로 전환되었는가
+
+인덱스는 "있으면 좋은 옵션"이 아니라 **운영 비용이 있는 구조물**입니다. 성능 개선 수치와 유지 비용을 같이 기록해야 장기적으로 안정됩니다.
+
+## 심화 실습 시나리오: 트랜잭션 격리 수준 재현 데모
+
+분석 SQL이든 운영 SQL이든 동시성 환경에서는 격리 수준 이해가 필요합니다. 다음은 재현 가능한 기본 데모입니다.
+
+```sql
+-- 세션 A
+BEGIN;
+SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+SELECT COUNT(*) FROM inventory WHERE product_id = 10;
+
+-- 세션 B
+BEGIN;
+UPDATE inventory SET quantity = quantity - 1 WHERE product_id = 10;
+COMMIT;
+
+-- 세션 A에서 다시 실행
+SELECT COUNT(*) FROM inventory WHERE product_id = 10;
+COMMIT;
+```
+
+`READ COMMITTED`에서는 같은 트랜잭션 안에서도 두 번째 조회가 다른 스냅샷을 볼 수 있습니다. 반면 `REPEATABLE READ`로 바꾸면 시작 시점 스냅샷이 유지됩니다.
+
+```sql
+BEGIN;
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+SELECT SUM(total_amount) FROM orders WHERE status = 'paid';
+-- 다른 세션의 커밋 이후에도 동일 스냅샷 유지
+SELECT SUM(total_amount) FROM orders WHERE status = 'paid';
+COMMIT;
+```
+
+배치 지표 계산에서는 이 차이가 그대로 숫자 불일치로 나타납니다. 따라서 격리 수준을 문서화하고, 배치 쿼리에서 명시적으로 설정하는 것이 안전합니다.
+
+## 심화 실습 시나리오: 리뷰 체크리스트를 쿼리 옆에 남기기
+
+SQL 리뷰를 사람 기억에 의존하면 시간이 지나면서 기준이 흔들립니다. 아래 항목을 PR 본문이나 문서에 고정하면 품질 편차를 줄일 수 있습니다.
+
+- 질문의 비즈니스 정의가 SQL 조건으로 정확히 번역되었는가
+- 키 유일성(기본키/대체키)이 조인 경로에서 유지되는가
+- 기간 조건이 반열린 구간으로 작성되어 경계 오류가 없는가
+- `NULL` 처리 규칙이 명시되어 있는가
+- 결과 검증용 샘플 출력(행 수, 합계, 상위 N)이 첨부되었는가
+
+이 기준은 학습용 글에서도 그대로 유효합니다. SQL은 결국 데이터와 의사결정을 연결하는 도구이기 때문에, 쿼리 자체보다 **검증 가능한 사고 과정**을 남기는 습관이 더 오래 갑니다.
+
+
+## 추가 실습 메모: 운영에서 바로 쓰는 검증 질문
+
+아래 질문 네 가지를 기준으로 쿼리를 다시 읽어 보면, 단순히 동작하는 SQL과 운영에 견디는 SQL을 구분할 수 있습니다.
+
+- 이 쿼리는 같은 날 다시 실행해도 같은 결과를 재현할 수 있는가
+- 조건절이 인덱스를 활용할 수 있는 형태로 작성되었는가
+- 조인 이후 행 수가 의도대로 증가 또는 유지되는가
+- 실행 계획에서 가장 비싼 노드가 무엇인지 설명할 수 있는가
+
+짧은 쿼리라도 이 질문을 통과하면, 장애 대응과 지표 신뢰도에서 차이가 크게 납니다.
+
 ## 처음 질문으로 돌아가기
 
 - **`OVER (PARTITION BY ...)`는 무엇을 뜻할까요?**
@@ -355,6 +586,8 @@ WHERE o.id = r.id AND r.rk <= 100;
 <!-- toc:end -->
 
 ## 참고 자료
+
+- [book-examples/sql-101 (ko)](https://github.com/yeongseon-books/book-examples/tree/main/sql-101/ko)
 
 - [PostgreSQL — Window Functions](https://www.postgresql.org/docs/current/tutorial-window.html)
 - [PostgreSQL — Window Function Reference](https://www.postgresql.org/docs/current/functions-window.html)

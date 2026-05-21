@@ -399,6 +399,137 @@ groups:
 
 모니터링은 수집보다 대응 설계가 더 중요합니다. 경고가 행동으로 이어지지 않으면 시스템 신뢰는 빠르게 떨어집니다.
 
+
+## Grafana 대시보드 JSON 예시
+
+Prometheus 메트릭을 Grafana로 시각화할 때, 모델 모니터링용 대시보드의 핵심 패널 구성을 JSON으로 보겠습니다.
+
+```json
+{
+  "dashboard": {
+    "title": "ML Model Monitoring",
+    "panels": [
+      {
+        "title": "추론 요청 수 (분당)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(prediction_requests_total[5m])",
+            "legendFormat": "{{model_name}}"
+          }
+        ]
+      },
+      {
+        "title": "추론 지연 시간 (p95)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(prediction_latency_seconds_bucket[5m]))",
+            "legendFormat": "p95"
+          }
+        ]
+      },
+      {
+        "title": "예측값 분포",
+        "type": "heatmap",
+        "targets": [
+          {
+            "expr": "rate(prediction_value_bucket[10m])",
+            "legendFormat": "{{le}}"
+          }
+        ]
+      },
+      {
+        "title": "에러율",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "rate(prediction_errors_total[5m]) / rate(prediction_requests_total[5m])",
+            "legendFormat": "error_rate"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+이 대시보드에서 가장 먼저 봐야 할 패널은 "예측값 분포"입니다. 에러율이나 지연 시간은 인프라 문제로도 변할 수 있지만, 예측값 분포가 바뀌는 것은 모델 입력 데이터가 변했다는 뜻이기 때문입니다.
+
+## 로그 기반 모니터링 보완
+
+메트릭만으로 원인을 특정하기 어려울 때는 구조화된 로그가 필요합니다. 추론 요청마다 입력 특성 요약과 예측값을 로그로 남기면, 드리프트가 감지됐을 때 어떤 입력이 분포를 밀었는지 역추적할 수 있습니다.
+
+```python
+import structlog
+import numpy as np
+
+logger = structlog.get_logger()
+
+
+def log_prediction(request_id: str, features: list, prediction: float):
+    """추론 결과를 구조화된 로그로 남깁니다."""
+    feature_array = np.array(features)
+    logger.info(
+        "prediction_logged",
+        request_id=request_id,
+        feature_mean=float(feature_array.mean()),
+        feature_std=float(feature_array.std()),
+        feature_min=float(feature_array.min()),
+        feature_max=float(feature_array.max()),
+        prediction=prediction,
+        num_features=len(features),
+    )
+```
+
+이 로그를 Elasticsearch나 Loki에 저장하면, Grafana에서 메트릭 이상 시점의 로그를 바로 조회할 수 있습니다. 핵심은 `feature_mean`과 `feature_std`를 함께 남기는 것입니다. 이 값의 추이가 학습 데이터 통계와 벌어지면 데이터 드리프트를 의심할 수 있습니다.
+
+## SLO 기반 모니터링 설계
+
+모니터링 지표가 많아지면 "어떤 알림이 진짜 중요한지" 판단이 어려워집니다. SLO(Service Level Objective)를 먼저 정의하고, 그 SLO를 위협하는 지표만 알림으로 연결하는 방식이 효과적입니다.
+
+| SLO | 지표 | 임계치 | 알림 채널 |
+| --- | --- | --- | --- |
+| 추론 가용성 99.9% | 5xx 비율 | > 0.1% (5분) | PagerDuty |
+| p95 지연 < 100ms | 지연 히스토그램 | > 100ms (5분) | Slack |
+| 예측 정확도 > 85% | 일일 정확도 | < 85% (일간) | 이메일 |
+| 드리프트 미감지 | PSI / KS 통계량 | PSI > 0.2 | Slack |
+
+이렇게 SLO 계층을 나누면, 가용성 SLO 위반은 즉시 대응하고, 정확도 SLO 위반은 다음 영업일에 분석하는 식으로 대응 우선순위를 체계화할 수 있습니다.
+
+
+## 인시던트 대응 런북
+
+알림이 울렸을 때 담당자가 따라야 할 최소 절차를 문서화하면 평균 복구 시간(MTTR)을 줄일 수 있습니다.
+
+```text
+[모델 드리프트 알림 대응]
+
+1. 알림 확인
+   - 어떤 모델, 어떤 메트릭이 임계치를 넘었는지 확인
+   - 알림 발생 시각과 지속 시간 기록
+
+2. 영향 범위 파악
+   - 해당 모델을 사용하는 서비스 목록 확인
+   - 실제 비즈니스 지표(전환율, 클릭률 등)에 영향이 있는지 확인
+
+3. 긴급 조치 판단
+   - 비즈니스 영향 O → 이전 모델 버전으로 즉시 롤백
+   - 비즈니스 영향 X → 원인 분석 후 다음 배포 사이클에 반영
+
+4. 원인 분석
+   - 입력 데이터 분포 변화 확인 (feature_mean, feature_std 추이)
+   - 최근 업스트림 데이터 파이프라인 변경 이력 확인
+   - 계절성, 이벤트성 변화인지 판단
+
+5. 후속 조치
+   - 재학습 필요 여부 결정
+   - 알림 임계치 조정 필요 여부 검토
+   - 사후 분석(postmortem) 문서 작성
+```
+
+이 런북의 핵심은 2번 "영향 범위 파악"입니다. 드리프트가 감지됐더라도 비즈니스 지표에 영향이 없으면 즉시 대응할 필요가 없습니다. 반대로 비즈니스 지표가 떨어지고 있다면 원인 분석보다 롤백이 먼저입니다.
+
 ## 처음 질문으로 돌아가기
 
 - **정확도만 봐서는 왜 운영 문제를 너무 늦게 알게 될까요?**
@@ -425,6 +556,8 @@ groups:
 <!-- toc:end -->
 
 ## 참고 자료
+
+- [예제 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/mlops-101/ko)
 
 - [Prometheus documentation](https://prometheus.io/docs/)
 - [prometheus-client (Python)](https://github.com/prometheus/client_python)

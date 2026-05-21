@@ -265,12 +265,21 @@ Expected output:
 
 시니어 엔지니어는 대시보드보다 먼저 파이프라인을 봅니다. 수집 주기가 적절한지, 라벨이 통제되고 있는지, 쿼리가 누적값과 증가량을 헷갈리지 않는지부터 점검합니다. 숫자가 많다고 관측성이 좋아지는 것은 아니기 때문입니다.
 
+또 한 가지 중요한 관점은 메트릭 파이프라인의 신뢰성입니다. 수집기가 죽으면 모든 경보가 침묵합니다. 그래서 Prometheus를 단일 인스턴스로 돌리는 것은 작은 팀에서도 위험합니다. 최소한 두 가지를 확인해야 합니다:
+
+1. **수집기 사활 경보**: Prometheus 자체의 `up` 메트릭이 0이 되면 외부 채널(예: 헬스체크 기반 PagerDuty)로 알림이 가야 합니다.
+2. **수집 누락 감지**: `scrape_samples_scraped == 0`이 일정 시간 이상 지속되면 타깃이 죽었거나 네트워크 문제입니다.
+
+이러한 메타 경보를 먼저 마련해 두지 않으면, 장애 중에 대시보드가 비어 있는데도 아무도 모르는 상황이 발생합니다. 수집기가 안정적으로 돌아야 그 위에 쌓은 경보와 대시보드가 의미를 가집니다.
+
 ## 체크리스트
 
 - [ ] 애플리케이션이 `/metrics`를 노출합니다.
 - [ ] Prometheus에서 대상이 정상으로 보입니다.
 - [ ] PromQL 질의를 하나 이상 직접 쓸 수 있습니다.
 - [ ] Grafana에서 첫 패널을 만들 수 있습니다.
+- [ ] Recording rule의 용도와 명명 규칙을 설명할 수 있습니다.
+- [ ] 카디널리티 폭발이 발생하는 조건을 예를 들어 설명할 수 있습니다.
 
 ## 연습 문제
 
@@ -280,7 +289,7 @@ Expected output:
 
 ## 정리
 
-메트릭 파이프라인이 붙으면 시스템은 그래프로 말을 하기 시작합니다. 애플리케이션은 메트릭을 노출하고, Prometheus는 수집하고, Grafana는 질문 단위의 화면으로 바꿉니다. 다음 글에서는 숫자만으로 부족한 이유, 곧 구조화된 로그가 왜 필요한지 이어서 보겠습니다.
+메트릭 파이프라인이 붙으면 시스템은 그래프로 말을 하기 시작합니다. 애플리케이션은 메트릭을 노출하고, Prometheus는 수집하고, Grafana는 질문 단위의 화면으로 바꿱니다. Recording rule은 자주 쓰는 질의를 미리 계산해 두어 성능과 비용을 줄여 줍니다. 카디널리티를 통제하지 않으면 수집기 자체가 무너질 수 있으므로 라벨 설계는 항상 가장 먼저 점검해야 합니다. 다음 글에서는 숫자만으로 부족한 이유, 곧 구조화된 로그가 왜 필요한지 이어서 보겠습니다.
 
 ## Prometheus 스크레이프 구성 예시
 
@@ -385,6 +394,103 @@ histogram_quantile(
 
 해석 순서는 항상 동일하게 가져가는 편이 좋습니다. 먼저 분모와 분자가 맞는지 확인하고, 다음으로 집계 축(`by`)이 과하거나 부족하지 않은지 봅니다. 마지막으로 윈도우 길이가 질문에 맞는지 점검합니다. 30초 단위 흔들림을 보려면 5분 윈도우는 너무 느리고, 월간 추세를 보려면 1분 윈도우는 너무 시끄럽습니다.
 
+## Grafana 대시보드 JSON 예시
+
+Grafana 대시보드는 JSON으로 관리할 수 있습니다. 아래는 메트릭 수집 상태를 한눈에 보여 주는 최소 대시보드 구성입니다.
+
+```json
+{
+  "title": "Checkout API Overview",
+  "panels": [
+    {
+      "title": "Request Rate",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum(rate(checkout_requests_total[5m]))",
+          "legendFormat": "req/s"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+    },
+    {
+      "title": "Error Rate",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum(rate(checkout_requests_total{status=~\"5..\"}[5m])) / sum(rate(checkout_requests_total[5m]))",
+          "legendFormat": "error ratio"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+    },
+    {
+      "title": "p95 Latency",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(checkout_request_duration_seconds_bucket[5m])))",
+          "legendFormat": "p95"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+    },
+    {
+      "title": "In-Flight Requests",
+      "type": "gauge",
+      "targets": [
+        {
+          "expr": "sum(checkout_inflight_requests)",
+          "legendFormat": "inflight"
+        }
+      ],
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+    }
+  ]
+}
+```
+
+이 네 패널은 RED 방법론(Rate, Errors, Duration)에 현재 동시 처리량(In-Flight)을 더한 구성입니다. 대시보드는 질문 네 개에 정확히 대응합니다:
+
+1. 지금 요청이 얼마나 들어오는가? (Request Rate)
+2. 실패 비율이 올라가고 있는가? (Error Rate)
+3. 사용자가 느끼는 지연은 어느 수준인가? (p95 Latency)
+4. 동시에 처리 중인 요청이 몰리고 있는가? (In-Flight)
+
+패널을 추가할 때마다 "이 패널이 답하는 질문은 무엇인가"를 먼저 적는 습관이 좋습니다. 질문 없이 만든 패널은 결국 아무도 보지 않게 됩니다.
+
+## Recording Rule로 질의 비용 줄이기
+
+대시보드가 늘어나면 같은 PromQL을 여러 패널에서 반복 실행하게 됩니다. Recording rule은 자주 쓰는 질의를 미리 계산해 새 시계열로 저장하는 방법입니다.
+
+```yaml
+groups:
+  - name: checkout_rules
+    interval: 30s
+    rules:
+      - record: checkout:request_rate:5m
+        expr: sum(rate(checkout_requests_total[5m]))
+
+      - record: checkout:error_ratio:5m
+        expr: |
+          sum(rate(checkout_requests_total{status=~"5.."}[5m]))
+          / sum(rate(checkout_requests_total[5m]))
+
+      - record: checkout:latency_p95:5m
+        expr: |
+          histogram_quantile(0.95,
+            sum by (le) (rate(checkout_request_duration_seconds_bucket[5m]))
+          )
+```
+
+Recording rule의 장점은 세 가지입니다:
+
+1. **질의 속도 향상**: 대시보드가 복잡한 식을 매번 계산하는 대신 미리 계산된 시계열을 읽습니다.
+2. **경보 안정성**: 경보 규칙에 recording rule을 쓰면 시계열 누락으로 인한 false negative를 줄입니다.
+3. **장기 보존 용이**: 원본 고해상도 데이터는 2주만 유지하고, recording rule 결과는 더 오래 보관할 수 있습니다.
+
+이름 규칙은 `<namespace>:<metric>:<window>` 형태가 표준입니다. 팀 전체가 같은 명명 규칙을 따르면 질의 템플릿을 재사용하기 쉬워집니다.
+
 ## 처음 질문으로 돌아가기
 
 - **메트릭은 어떻게 수집되고 그래프로 바뀔까요?**
@@ -416,5 +522,7 @@ histogram_quantile(
 - [prometheus_client (Python)](https://github.com/prometheus/client_python)
 - [PromQL basics](https://prometheus.io/docs/prometheus/latest/querying/basics/)
 - [Grafana docs](https://grafana.com/docs/grafana/latest/)
+- [Recording rules](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/)
+- [예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/observability-101/ko)
 
 Tags: Observability, Metrics, Prometheus, Grafana, Monitoring

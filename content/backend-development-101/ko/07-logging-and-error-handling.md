@@ -22,6 +22,9 @@ last_reviewed: '2026-05-15'
 
 # Backend Development 101 (7/10): Logging과 Error Handling
 
+이 글은 Backend Development 101 시리즈의 7번째 글입니다.
+
+
 새벽에 장애 알림이 왔을 때 코드를 처음부터 다시 읽는 것만으로는 원인을 빨리 찾기 어렵습니다. 운영에서 중요한 것은 실패를 다시 실행하는 능력보다, 이미 일어난 요청을 로그와 오류 응답만으로 설명하는 능력입니다.
 
 이 글은 Backend Development 101 시리즈의 일곱 번째 글입니다. 여기서는 구조화 로그, request_id, 글로벌 예외 처리라는 세 가지 축을 중심으로 운영에서 읽히는 백엔드를 만드는 방법을 정리해 보겠습니다.
@@ -58,7 +61,7 @@ last_reviewed: '2026-05-15'
 - **request_id**: 하나의 요청을 모든 레이어에서 추적하기 위한 식별자입니다.
 - **Global exception handler**: 예외를 응답으로 바꾸는 단일 진입점입니다.
 
-## Before/After
+## 개선 전/개선 후
 
 **Before (print debugging)**
 
@@ -83,7 +86,7 @@ log.error(json.dumps({
 
 ## 실습: 다섯 단계로 보는 로그와 예외 처리
 
-### Step 1 — Standard logger setup
+### 단계 1 — 표준 로거 설정
 
 ```python
 # 1_setup.py
@@ -98,7 +101,7 @@ log.info("server started")
 
 표준 logger 설정만 잘해도 print보다 훨씬 나은 출발점이 됩니다. 최소한 시간, 레벨, 로거 이름 정도는 항상 남겨야 합니다.
 
-### Step 2 — JSON structured log
+### 단계 2 — 구조화 로그
 
 ```python
 # 2_json_log.py
@@ -114,7 +117,7 @@ logging.info("hello")
 
 구조화 로그는 한 줄짜리 JSON이어야 검색과 집계가 쉬워집니다. 사람이 보기에 예쁘지 않아도 운영에서는 이 형식이 훨씬 강합니다.
 
-### Step 3 — request_id middleware
+### 단계 3 — 요청 식별자 미들웨어
 
 ```python
 # 3_request_id.py
@@ -136,7 +139,7 @@ async def add_request_id(request: Request, call_next):
 
 request_id가 있으면 하나의 요청이 router, service, repository, 외부 API 호출을 어떻게 통과했는지 끝까지 따라갈 수 있습니다. 운영에서는 이 식별자 하나가 디버깅 시간을 크게 줄입니다.
 
-### Step 4 — Global exception handler
+### 단계 4 — 전역 예외 처리기
 
 ```python
 # 4_global_handler.py
@@ -159,7 +162,7 @@ async def handle_domain(_: Request, exc: DomainError):
 
 예외를 한곳에서 응답으로 바꾸면 클라이언트가 항상 같은 형태의 오류 응답을 받게 됩니다. 운영자 입장에서도 어떤 종류의 실패인지 더 빠르게 읽을 수 있습니다.
 
-### Step 5 — Picking log levels
+### 단계 5 — 로그 레벨 선택
 
 ```python
 # 5_levels.py
@@ -244,7 +247,7 @@ log.critical("database is down")
 | Observability | 장애를 재현 없이 설명 가능한가 | request_id + 구조화 로그 | print 디버깅 의존 |
 | Deploy | 재현 가능하게 배포되는가 | 이미지 버전 고정 + healthcheck | 수동 SSH 배포 |
 
-### FastAPI 요청/응답 예시: 계약이 드러나는 엔드포인트
+### 웹 프레임워크 요청/응답 예시: 계약이 드러나는 엔드포인트
 
 ```python
 from fastapi import FastAPI, HTTPException
@@ -265,7 +268,7 @@ def create_order(payload: OrderIn):
 
 입력 검증과 상태코드를 분리하면 클라이언트 재시도 정책, 알람 기준, 운영 대시보드 해석이 훨씬 명확해집니다.
 
-### Middleware 패턴: request_id + 지연 시간 측정
+### 미들웨어 패턴: 요청 식별자와 지연 시간 측정
 
 ```python
 import time
@@ -286,7 +289,7 @@ async def tracing_middleware(request: Request, call_next):
 
 운영에서는 "느리다"보다 "어느 요청이 몇 ms 걸렸는가"가 더 중요합니다. 이 헤더와 로그 필드가 있으면 API 게이트웨이/애플리케이션 로그를 상호 추적하기 쉬워집니다.
 
-### API 응답 계약 표준화 예시
+### 응용 프로그램 인터페이스 응답 계약 표준화 예시
 
 | 상황 | HTTP | body 예시 | 클라이언트 액션 |
 | --- | --- | --- | --- |
@@ -307,6 +310,186 @@ async def tracing_middleware(request: Request, call_next):
 5. 롤백 명령을 실제로 1회 리허설합니다.
 
 이 체크리스트는 기능 완성보다 운영 안정성을 우선순위로 두는 습관을 만들어 줍니다.
+
+
+## 실전 앵커: 운영 가능한 백엔드 기준선
+
+입문 단계에서 가장 흔한 오해는 "기능이 동작하면 백엔드가 완성되었다"는 판단입니다. 실제 운영에서는 기능 성공률보다 실패 시 복구 속도, 오류 원인 분리 가능성, 배포 재현 가능성이 더 먼저 평가됩니다. 아래 예시는 라우트-검증-인증-서비스-저장소-배포까지 이어지는 기준선을 하나의 흐름으로 고정하는 방법입니다.
+
+### 요청 검증과 라우트 계약을 먼저 고정하기
+
+```python
+from fastapi import APIRouter, HTTPException, status
+from pydantic import BaseModel, Field
+
+router = APIRouter(prefix='/v1/orders', tags=['orders'])
+
+class CreateOrderBody(BaseModel):
+    product_id: int = Field(gt=0)
+    quantity: int = Field(gt=0, le=50)
+    coupon_code: str | None = Field(default=None, min_length=4, max_length=32)
+
+@router.post('', status_code=status.HTTP_201_CREATED)
+def create_order(body: CreateOrderBody):
+    if body.quantity > 20:
+        raise HTTPException(status_code=409, detail='재고 충돌이 발생했습니다.')
+    return {
+        'order_id': 1001,
+        'product_id': body.product_id,
+        'quantity': body.quantity,
+        'coupon_code': body.coupon_code,
+    }
+```
+
+검증 규칙을 코드에 박아두면 API 문서와 런타임 동작이 어긋나는 구간이 줄어듭니다. 특히 `409`, `422`, `401`처럼 의미를 가진 상태 코드를 먼저 분리해 두면 클라이언트 재시도 정책도 단순해집니다.
+
+### ORM 모델과 저장소 경계를 분리하기
+
+```python
+from datetime import datetime
+from sqlalchemy import DateTime, ForeignKey, Integer, String, func
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+
+class Base(DeclarativeBase):
+    pass
+
+class User(Base):
+    __tablename__ = 'users'
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    role: Mapped[str] = mapped_column(String(30), default='user', nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+class Order(Base):
+    __tablename__ = 'orders'
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey('users.id'), nullable=False)
+    product_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    quantity: Mapped[int] = mapped_column(Integer, nullable=False)
+    status: Mapped[str] = mapped_column(String(20), default='created', nullable=False)
+    user: Mapped[User] = relationship()
+```
+
+모델은 스키마를 설명하고, 저장소는 데이터 접근 전략을 설명해야 합니다. 한 함수에서 SQL 작성, 비즈니스 정책, 응답 직렬화를 모두 처리하면 변경 범위를 예측하기 어렵습니다.
+
+### 인증 미들웨어와 권한 검사 분리하기
+
+```python
+from fastapi import Depends, HTTPException, Request, status
+from jose import JWTError, jwt
+
+SECRET_KEY = 'replace-in-env'
+ALGORITHM = 'HS256'
+
+def require_identity(request: Request):
+    auth = request.headers.get('Authorization', '')
+    if not auth.startswith('Bearer '):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='토큰이 필요합니다.')
+
+    token = auth.split(' ', 1)[1]
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+    except JWTError as exc:
+        raise HTTPException(status_code=401, detail='유효하지 않은 토큰입니다.') from exc
+
+    subject = payload.get('sub')
+    role = payload.get('role', 'user')
+    if not subject:
+        raise HTTPException(status_code=401, detail='토큰 주체가 비어 있습니다.')
+    return {'sub': subject, 'role': role}
+
+def require_admin(identity = Depends(require_identity)):
+    if identity['role'] != 'admin':
+        raise HTTPException(status_code=403, detail='관리자 권한이 필요합니다.')
+    return identity
+```
+
+인증(Authentication)과 인가(Authorization)를 분리하면 장애 원인도 분리됩니다. 토큰 형식 문제는 `401`, 권한 부족은 `403`으로 명확하게 갈라져야 운영 대시보드에서 경향을 읽을 수 있습니다.
+
+### 전역 예외 처리와 로그 정책
+
+```python
+import logging
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+
+app = FastAPI()
+logger = logging.getLogger('backend')
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    logger.exception(
+        'unhandled_exception',
+        extra={
+            'path': request.url.path,
+            'method': request.method,
+            'client': request.client.host if request.client else 'unknown',
+        },
+    )
+    return JSONResponse(
+        status_code=500,
+        content={'code': 'internal_error', 'message': '일시적인 오류가 발생했습니다.'},
+    )
+```
+
+"오류를 숨기는 것"과 "오류를 통제하는 것"은 다릅니다. 사용자에게는 안정된 계약을 주고, 내부 로그에는 분석 가능한 맥락을 남겨야 다음 배포에서 같은 장애를 줄일 수 있습니다.
+
+### 배포 설정을 코드와 함께 버전 고정하기
+
+```yaml
+services:
+  api:
+    image: ghcr.io/yeongseon-books/backend101-api:1.0.0
+    ports:
+      - '8000:8000'
+    env_file:
+      - .env
+    environment:
+      - APP_ENV=production
+      - LOG_LEVEL=INFO
+      - DATABASE_URL=postgresql+psycopg://app:app@db:5432/app
+    command: >
+      uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 2
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8000/healthz']
+      interval: 15s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+```
+
+배포 설정은 문서가 아니라 실행 파일이어야 합니다. 이미지 태그를 고정하고 헬스체크를 포함하면 "어제는 됐는데 오늘은 안 된다"는 비재현 문제를 크게 줄일 수 있습니다.
+
+### 운영 전 체크리스트: 실패를 가정하고 검증하기
+
+1. 입력 검증 실패(`422/400`)와 비즈니스 충돌(`409`)이 구분되는지 확인합니다.
+2. 토큰 누락, 토큰 만료, 권한 부족이 `401/403`으로 분리되는지 확인합니다.
+3. 데이터베이스 타임아웃 시 재시도 정책과 사용자 메시지가 분리되는지 확인합니다.
+4. 배포 직후 `healthz`와 핵심 API 성공률을 함께 확인합니다.
+5. 장애 로그만으로 요청 식별자, 사용자 식별자, 실패 경로를 역추적할 수 있는지 확인합니다.
+
+이 기준선을 매 글의 주제에 연결해 두면 학습이 단발성 지식으로 끝나지 않습니다. 라우팅을 배울 때도, 테스트를 배울 때도, 배포를 배울 때도 같은 운영 질문으로 품질을 판별하게 됩니다.
+
+
+
+### 장애 복구 훈련 시나리오
+
+다음 시나리오는 문서로만 읽지 말고 실제로 실행해야 효과가 있습니다. 첫째, 데이터베이스 연결 문자열을 일부러 잘못 넣은 뒤 애플리케이션이 어떤 상태 코드를 반환하는지 확인합니다. 둘째, 인증 헤더를 제거한 요청과 만료 토큰 요청을 각각 보내서 인증 실패와 권한 실패가 로그에서 구분되는지 점검합니다. 셋째, 동일한 요청을 짧은 간격으로 반복 호출해서 지연 시간 분포가 비정상적으로 튀는 구간이 있는지 확인합니다.
+
+여기서 핵심은 "문제가 생겼다"가 아니라 "어떤 계층에서 문제가 생겼는가"를 즉시 분류하는 습관입니다. 라우트 계약 문제인지, 서비스 규칙 문제인지, 저장소 연결 문제인지, 배포 설정 문제인지가 1차 대응 속도를 좌우합니다. 팀이 같은 체크리스트와 같은 로그 필드를 공유하면, 장애 대응이 개인 역량이 아니라 시스템 역량으로 바뀝니다.
+
+### 배포 변경 점검 표
+
+| 변경 항목 | 사전 확인 | 배포 직후 확인 | 실패 시 대응 |
+| --- | --- | --- | --- |
+| 환경 변수 변경 | 필수 키 존재, 기본값 검토 | 부팅 로그에서 로딩 확인 | 즉시 롤백, 누락 키 보완 |
+| 의존성 버전 변경 | 호환성 노트 확인 | 핵심 경로 지연 시간 비교 | 이전 이미지 재배포 |
+| 데이터베이스 스키마 변경 | 마이그레이션 롤백 스크립트 점검 | 읽기/쓰기 경로 샘플 호출 | 스키마 롤백 또는 읽기 전용 전환 |
+| 인증 정책 변경 | 테스트 토큰으로 권한 매트릭스 점검 | 401/403 비율 관찰 | 정책 플래그 즉시 원복 |
+
+이 표를 릴리스 템플릿에 넣어두면 매번 같은 실수를 반복하지 않게 됩니다. 백엔드 품질은 새 기능 추가 속도보다 변경 실패를 얼마나 빨리 안전하게 되돌릴 수 있는지에서 결정됩니다.
 
 
 ## 처음 질문으로 돌아가기
@@ -343,6 +526,8 @@ async def tracing_middleware(request: Request, call_next):
 - [Twelve-Factor logs](https://12factor.net/logs)
 
 ### 추가 읽을거리
+
+- [backend-development-101 예제 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/backend-development-101/ko)
 
 - [structlog docs](https://www.structlog.org/en/stable/)
 

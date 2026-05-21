@@ -74,7 +74,7 @@ last_reviewed: '2026-05-12'
 | Set | 서로 구별되는 원소들의 모임 |
 | Graph | 정점과 간선으로 이루어진 구조 |
 
-## Before / After
+## 전후 비교
 
 **Before — without discrete math:**
 
@@ -359,6 +359,198 @@ BFS는 간선 가중치가 동일할 때 최단 거리 계층을 계산합니다
 
 이산수학의 강점은 계산 자체보다 **판단 근거를 명시하는 습관**입니다. 이 습관이 자료구조, 알고리즘, 시스템 설계까지 그대로 이어집니다.
 
+## 실전 확장: 이산 모델링을 문제에 적용하는 절차
+
+이산수학을 실제 문제에 적용할 때는 "정의-모델-검증" 세 단계를 분리해서 진행하는 것이 안전합니다. 먼저 대상의 상태를 집합과 관계로 정의하고, 다음으로 연산 규칙을 명제로 표현하며, 마지막으로 반례와 경계값으로 검증합니다.
+
+### 모델링 예시: 회원 상태 전이
+
+회원 상태를 `신규`, `활성`, `휴면`, `탈퇴` 네 가지로 두고 전이 관계를 정의합니다.
+
+| 현재 상태 | 다음 상태 | 허용 여부 | 근거 |
+| --- | --- | --- | --- |
+| 신규 | 활성 | 허용 | 본인 인증 완료 |
+| 활성 | 휴면 | 허용 | 1년 미접속 |
+| 휴면 | 활성 | 허용 | 재인증 성공 |
+| 탈퇴 | 활성 | 금지 | 정책상 복구 불가 |
+
+관계로 쓰면 `R = {(신규,활성), (활성,휴면), (휴면,활성)}`입니다. 탈퇴 복구가 금지라는 사실은 관계에 쌍이 없다는 형태로 명시됩니다. 이 방식은 정책 문서와 코드의 불일치를 줄입니다.
+
+### 진리표 기반 정책 점검
+
+`P: 약관 동의`, `Q: 본인 인증`, `R: 계정 생성 허용`이라 두고 `R = P ∧ Q`를 사용한다고 가정합니다.
+
+| P | Q | P ∧ Q | R |
+| --- | --- | --- | --- |
+| T | T | T | T |
+| T | F | F | F |
+| F | T | F | F |
+| F | F | F | F |
+
+여기서 정책 변경으로 "소셜 로그인은 인증 생략"이 추가되면 식이 `R = P ∧ (Q ∨ S)`로 바뀝니다. 변경 전후 진리표를 나란히 두면 어떤 입력 조합이 새롭게 허용되는지 바로 확인할 수 있습니다.
+
+### 집합 연산 코드 앵커
+
+```python
+def policy_sets(total_users: set[int], agreed: set[int], verified: set[int]) -> dict[str, set[int]]:
+    eligible = agreed & verified
+    blocked = total_users - eligible
+    only_agreed = agreed - verified
+    only_verified = verified - agreed
+    return {
+        "eligible": eligible,
+        "blocked": blocked,
+        "only_agreed": only_agreed,
+        "only_verified": only_verified,
+    }
+
+U = set(range(1, 11))
+A = {1, 2, 3, 4, 7, 9}
+V = {2, 3, 5, 7, 8}
+print(policy_sets(U, A, V))
+```
+
+위 코드는 수식 `A ∩ V`, `U \ (A ∩ V)`를 그대로 구현합니다. 도메인 언어와 코드가 1:1로 대응되면 테스트 설계도 쉬워집니다.
+
+### 간단한 그래프 모델과 탐색
+
+실행 경로를 그래프로 보면 장애 분석이 빨라집니다.
+
+```python
+from collections import deque
+
+def reachable(graph: dict[str, list[str]], start: str) -> set[str]:
+    seen = {start}
+    q = deque([start])
+    while q:
+        cur = q.popleft()
+        for nxt in graph.get(cur, []):
+            if nxt not in seen:
+                seen.add(nxt)
+                q.append(nxt)
+    return seen
+
+flow = {
+    "login": ["token"],
+    "token": ["profile", "home"],
+    "profile": ["home"],
+    "home": [],
+}
+print(reachable(flow, "login"))
+```
+
+도달 가능 집합이 기대와 다르면 전이 규칙 자체가 잘못되었을 수 있습니다. 이처럼 그래프는 프로그램 구조의 논리적 완전성을 확인하는 데 유용합니다.
+
+## 심화 워크숍: 정의에서 검증까지 한 번에 연결하기
+
+### 시나리오: 추천 시스템의 후보 필터링
+
+추천 후보 집합 `C`에서 실제 노출 집합 `S`를 만들 때, 보통 다음 조건을 적용합니다.
+
+- 재고가 있어야 한다.
+- 사용자 차단 목록에 없어야 한다.
+- 연령 제한을 만족해야 한다.
+
+이를 집합으로 쓰면 `S = (C ∩ I ∩ A) \ B`입니다. 여기서 `I`는 재고 가능 집합, `A`는 연령 적합 집합, `B`는 차단 집합입니다. 기호로 적어 두면 정책 변경의 영향 범위를 좁힐 수 있습니다.
+
+```python
+def exposed(candidates: set[int], in_stock: set[int], age_ok: set[int], blocked: set[int]) -> set[int]:
+    return (candidates & in_stock & age_ok) - blocked
+```
+
+### 반례 기반 검증
+
+모델이 맞는지 빠르게 검증하려면 반례를 먼저 구성합니다.
+
+1. `blocked`가 공집합일 때 노출이 과도하게 늘어나는가
+2. `in_stock`이 공집합일 때 결과가 반드시 공집합인가
+3. `age_ok`가 누락되면 정책 위반 아이템이 포함되는가
+
+반례를 명시하면 "왜 틀렸는지"가 아니라 "어떤 정의가 빠졌는지"를 정확히 찾을 수 있습니다.
+
+### 논리식과 테스트 케이스 대응표
+
+| 논리식 | 테스트 이름 | 기대 결과 |
+| --- | --- | --- |
+| `x ∈ C ∧ x ∈ I ∧ x ∈ A ∧ x ∉ B` | `eligible_item_is_exposed` | 포함 |
+| `x ∈ B` | `blocked_item_not_exposed` | 제외 |
+| `x ∉ I` | `out_of_stock_not_exposed` | 제외 |
+| `x ∉ A` | `age_restricted_not_exposed` | 제외 |
+
+이 표가 있으면 요구사항-테스트-코드 간 연결이 끊기지 않습니다.
+
+### 요약
+
+이산수학의 기본 도구는 거창한 이론이 아니라, 변경 가능한 시스템을 안정적으로 다루는 작업 언어입니다. 정의를 기호로 고정하고, 반례를 통해 검증하고, 코드와 테스트를 1:1로 맞추는 습관이 핵심입니다.
+
+## 부록: 검증 가능한 실습 패턴 모음
+
+아래 패턴은 각 장의 개념을 실습으로 고정하기 위한 공통 템플릿입니다. 핵심은 계산 결과를 맞히는 것보다, 어떤 정의를 적용했는지 문장으로 남기는 것입니다.
+
+### 패턴 1: 정의를 먼저 쓰고 계산하기
+
+1. 문제에서 사용하는 대상 집합을 명시합니다.
+2. 관계 또는 함수를 기호로 정의합니다.
+3. 계산을 수행하고, 결과가 정의를 만족하는지 다시 확인합니다.
+
+이 순서를 지키면 중간에 식이 길어져도 논리의 출발점을 잃지 않습니다.
+
+### 패턴 2: 반례를 의도적으로 만들기
+
+정리나 가설을 세웠다면, 반례 후보를 최소 3개 만듭니다.
+
+- 경계값 입력(0, 1, 최대값)
+- 중복/충돌 입력
+- 공집합 또는 단일 원소 입력
+
+반례가 발견되면 결론을 버리는 것이 아니라, 가정과 정의를 수정합니다. 이 절차가 수학적 엄밀성과 엔지니어링 실용성을 동시에 만족시킵니다.
+
+### 패턴 3: 표와 코드 출력을 함께 남기기
+
+진리표, 집합 연산표, 점화식 전개표 중 하나를 반드시 포함합니다. 그리고 같은 내용을 계산하는 짧은 코드를 붙여 결과를 재현합니다.
+
+```python
+def verify_identity(left: set[int], right: set[int]) -> bool:
+    return left == right
+```
+
+작은 검증 함수 하나라도 문서에 남기면 팀원 간 해석 차이를 줄일 수 있습니다.
+
+### 패턴 4: 증명 구조를 고정하기
+
+증명은 다음 네 문장 구조를 기본으로 씁니다.
+
+- 가정: 무엇을 참이라고 두는가
+- 전개: 어떤 정의/정리를 사용해 변형하는가
+- 핵심 전환: 결론으로 넘어가는 결정적 단계는 무엇인가
+- 결론: 원래 명제가 왜 성립하는가
+
+이 구조는 직접 증명, 대우 증명, 귀류법, 귀납법 모두에 적용됩니다.
+
+### 패턴 5: 알고리즘과 수학 근거 연결하기
+
+알고리즘 설명에는 다음 항목을 최소로 넣습니다.
+
+- 불변식 1개 이상
+- 종료 조건 1개
+- 복잡도 식 1개
+- 반례 테스트 1개
+
+이 네 항목이 있으면 코드가 바뀌어도 정확성 근거를 유지할 수 있습니다.
+
+### 미니 문제 세트
+
+1. 두 집합 `A`, `B`를 임의로 만들고 `A∩B`, `A∪B`, `A\B`를 계산한 뒤 포함관계를 설명하세요.
+2. 명제식 `(P→Q) ∧ (Q→R) → (P→R)`의 진리표를 작성하고 항진명제 여부를 확인하세요.
+3. 점화식 `T(n)=T(n-1)+n`의 닫힌형을 추측한 다음 귀납법으로 검증하세요.
+4. 인접 리스트 그래프 하나를 만든 뒤 BFS/DFS 방문 순서를 비교하세요.
+5. `nCk = nC(n-k)`를 식과 의미 해석(선택 vs 비선택) 두 방식으로 설명하세요.
+
+### 마무리
+
+각 장의 주제가 달라 보여도 훈련 루프는 같습니다. 정의를 선언하고, 계산을 수행하고, 반례로 검증하고, 증명 또는 불변식으로 고정하면 됩니다. 이 루프를 반복하면 새로운 문제에서도 같은 품질로 사고할 수 있습니다.
+
+
 ## 처음 질문으로 돌아가기
 
 - **이산수학과 연속 수학은 무엇이 다를까요?**
@@ -386,6 +578,7 @@ BFS는 간선 가중치가 동일할 때 최단 거리 계층을 계산합니다
 
 ## 참고 자료
 
+- [book-examples: discrete-math-101/ko](https://github.com/yeongseon-books/book-examples/tree/main/discrete-math-101/ko)
 - [Discrete Mathematics and Its Applications — Kenneth Rosen](https://www.mheducation.com/highered/product/discrete-mathematics-its-applications-rosen/M9781259676512.html)
 - [MIT OCW — Mathematics for Computer Science](https://ocw.mit.edu/courses/6-042j-mathematics-for-computer-science-spring-2015/)
 - [Wikipedia — Discrete Mathematics](https://en.wikipedia.org/wiki/Discrete_mathematics)

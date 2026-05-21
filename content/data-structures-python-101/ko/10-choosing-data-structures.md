@@ -308,70 +308,319 @@ for scenario, choice in scenarios.items():
 이 시리즈에서는 list, dict, set, deque, 스택, 큐, 연결 리스트, 트리, 힙, 그래프를 차례로 살펴봤습니다. 결국 좋은 자료구조 선택의 기준은 하나로 모입니다. “내가 가장 자주 수행하는 연산은 무엇인가?” 이 질문에 답할 수 있으면, 코드 구조와 성능은 훨씬 예측 가능해집니다.
 
 
-## Python 구현 보강: 타입 힌트와 검증 루틴
 
-Python에서 자료구조를 학습할 때는 동작 예시만 확인하는 단계에서 멈추지 않고, 타입 힌트와 최소 검증 루틴을 함께 작성해야 설계 의도가 명확해집니다. 특히 `TypeVar`, `Generic`, `Protocol`을 사용하면 자료구조 API의 입력/출력 계약을 코드 차원에서 드러낼 수 있습니다. 아래 예시는 여러 글에서 재사용할 수 있는 기본 인터페이스 패턴입니다.
+## 구조 선택 의사결정 트리
+
+자료구조 선택을 체계적으로 하기 위한 의사결정 프레임워크입니다.
+
+```text
+[가장 빈번한 연산이 무엇인가?]
+  ├─ 순서가 중요 + 인덱스 접근 → list
+  ├─ 키-값 매핑 + O(1) 조회 → dict
+  ├─ 중복 제거 + membership → set
+  ├─ 양쪽 끝 삽입/삭제 → deque
+  ├─ 최솟값/최댓값 반복 추출 → heapq
+  ├─ 정렬 상태 유지 + 동적 삽입 → sortedcontainers.SortedList
+  └─ 계층 관계 + 탐색 → 트리/그래프
+```
+
+이 트리의 핵심은 "가장 빈번한 연산"을 먼저 파악하는 것입니다. 모든 연산을 동시에 최적화하는 구조는 존재하지 않으므로, 가장 자주 실행되는 연산의 비용을 최소화하는 구조를 기본값으로 선택합니다.
+
+### 복합 요구사항 처리 패턴
+
+단일 구조로는 부족할 때 여러 구조를 조합합니다.
+
+```python
+from collections import OrderedDict
+from typing import Generic, TypeVar
+
+K = TypeVar("K")
+V = TypeVar("V")
+
+
+class IndexedDict(Generic[K, V]):
+    """O(1) 키 조회 + 삽입 순서 유지 + 인덱스 접근을 동시 제공합니다."""
+
+    def __init__(self) -> None:
+        self._dict: OrderedDict[K, V] = OrderedDict()
+        self._keys: list[K] = []
+
+    def put(self, key: K, value: V) -> None:
+        if key not in self._dict:
+            self._keys.append(key)
+        self._dict[key] = value
+
+    def get(self, key: K) -> V | None:
+        return self._dict.get(key)
+
+    def get_by_index(self, index: int) -> tuple[K, V]:
+        key = self._keys[index]
+        return key, self._dict[key]
+
+    def __len__(self) -> int:
+        return len(self._dict)
+
+    def __contains__(self, key: object) -> bool:
+        return key in self._dict
+```
+
+이 패턴은 dict의 O(1) 조회와 list의 O(1) 인덱스 접근을 동시에 제공합니다. 대신 메모리를 두 배 쓰고, 삭제가 복잡해집니다. 모든 설계는 교환(trade-off)입니다.
+
+## 타입 힌트 기반 성능 프로파일러 구현
+
+어떤 구조를 선택했을 때 실제로 어떤 성능이 나오는지, 자동으로 비교하는 도구를 만들어 봅니다.
 
 ```python
 from __future__ import annotations
 
+import timeit
+from collections import deque
 from dataclasses import dataclass
-from typing import Generic, Iterable, Iterator, Optional, TypeVar
+from typing import Any, Callable
 
-T = TypeVar("T")
 
 @dataclass
-class Node(Generic[T]):
-    value: T
-    next: Optional["Node[T]"] = None
+class BenchResult:
+    structure: str
+    operation: str
+    n: int
+    time_sec: float
 
-class Container(Generic[T]):
-    def __init__(self, items: Optional[Iterable[T]] = None) -> None:
-        self._size = 0
-        self._head: Optional[Node[T]] = None
-        if items is not None:
-            for item in items:
-                self.push(item)
+    @property
+    def ops_per_sec(self) -> float:
+        return self.n / self.time_sec if self.time_sec > 0 else float("inf")
 
-    def push(self, value: T) -> None:
-        self._head = Node(value=value, next=self._head)
-        self._size += 1
+    def __repr__(self) -> str:
+        return f"{self.structure:>15} | {self.operation:<20} | n={self.n:<8} | {self.time_sec:.6f}s | {self.ops_per_sec:,.0f} ops/s"
 
-    def pop(self) -> T:
-        if self._head is None:
-            raise IndexError("empty container")
-        node = self._head
-        self._head = node.next
-        self._size -= 1
-        return node.value
 
-    def __len__(self) -> int:
-        return self._size
+def benchmark(structure: str, operation: str, func: Callable[[], None], n: int, trials: int = 5) -> BenchResult:
+    total = timeit.timeit(func, number=trials)
+    return BenchResult(structure=structure, operation=operation, n=n, time_sec=total / trials)
 
-    def __iter__(self) -> Iterator[T]:
-        cur = self._head
-        while cur is not None:
-            yield cur.value
-            cur = cur.next
+
+def compare_membership(n: int = 100_000) -> list[BenchResult]:
+    """list vs set vs dict의 membership test를 비교합니다."""
+    import random
+    data_list = list(range(n))
+    data_set = set(range(n))
+    data_dict = {i: None for i in range(n)}
+    targets = random.sample(range(n), min(1000, n))
+
+    results = []
+    results.append(benchmark("list", "membership", lambda: [t in data_list for t in targets], n))
+    results.append(benchmark("set", "membership", lambda: [t in data_set for t in targets], n))
+    results.append(benchmark("dict", "membership", lambda: [t in data_dict for t in targets], n))
+    return results
+
+
+def compare_append(n: int = 100_000) -> list[BenchResult]:
+    """list vs deque의 append/appendleft를 비교합니다."""
+    results = []
+    results.append(benchmark("list", "append", lambda: [None for _ in range(n)], n))
+    results.append(benchmark("list", "insert(0)", lambda: _bench_insert0(n // 10), n // 10))
+    results.append(benchmark("deque", "appendleft", lambda: _bench_appendleft(n), n))
+    return results
+
+
+def _bench_insert0(n: int) -> None:
+    data: list[int] = []
+    for i in range(n):
+        data.insert(0, i)
+
+
+def _bench_appendleft(n: int) -> None:
+    data: deque[int] = deque()
+    for i in range(n):
+        data.appendleft(i)
+
+
+# 실행
+print("=" * 80)
+print("Membership Test Comparison")
+print("=" * 80)
+for r in compare_membership():
+    print(r)
+
+print()
+print("=" * 80)
+print("Append/Insert Comparison")
+print("=" * 80)
+for r in compare_append():
+    print(r)
 ```
 
-이 패턴의 핵심은 세 가지입니다. 첫째, 공개 메서드의 타입을 먼저 확정하여 구현 교체 비용을 낮춥니다. 둘째, 예외 조건(`IndexError`)을 명시해 호출자 책임을 분리합니다. 셋째, `__iter__`, `__len__` 같은 파이썬 데이터 모델 메서드를 제공해 표준 라이브러리와 자연스럽게 결합합니다.
+이 프로파일러를 사용하면 "감으로 고르는" 대신 데이터로 판단할 수 있습니다.
 
-성능 확인은 `timeit` 단일 숫자보다 시나리오 기반으로 진행하는 편이 정확합니다. 예를 들어 "1만 건 push 후 1만 건 pop", "임의 키 5천 건 조회", "중복 원소 30% 포함 집합 연산"처럼 입력 특성을 고정하고 결과를 비교합니다. 또한 `mypy`나 `pyright`로 정적 타입 검사를 돌리면 API 오용을 조기에 발견할 수 있습니다.
+## 메모리 프로파일링: 구조별 비용 총정리
 
-마지막으로 학습 기록에는 "왜 이 구현을 선택했는가"를 반드시 남깁니다. 같은 기능을 `list`, `deque`, 사용자 정의 클래스 중 무엇으로 표현했는지와 그 이유를 적어두면, 이후 코드베이스에서 자료구조를 교체해야 할 때 판단 근거를 재사용할 수 있습니다.
+```python
+import sys
+from collections import deque, OrderedDict
 
-실무 코드에서는 `TypeVar` 기반 제네릭 API를 유지하고, `pytest`로 빈 입력/최대 입력/중복 입력 경계 조건을 검증해 구현 신뢰도를 높입니다.
 
+def measure_all(n: int) -> None:
+    structures = {
+        "list": list(range(n)),
+        "tuple": tuple(range(n)),
+        "set": set(range(n)),
+        "frozenset": frozenset(range(n)),
+        "dict": {i: i for i in range(n)},
+        "deque": deque(range(n)),
+        "OrderedDict": OrderedDict((i, i) for i in range(n)),
+    }
+
+    print(f"\n{'Structure':>15} | {'Shallow (bytes)':>15} | {'Per-element':>12}")
+    print("-" * 50)
+    for name, obj in structures.items():
+        size = sys.getsizeof(obj)
+        print(f"{name:>15} | {size:>15,} | {size/n:>10.1f}")
+
+
+measure_all(1_000)
+measure_all(10_000)
+measure_all(100_000)
+```
+
+이 표를 보면 몇 가지 패턴이 드러납니다.
+
+1. **tuple은 list보다 약간 작습니다**: overallocation이 없기 때문입니다.
+2. **dict는 set보다 큽니다**: 키뿐 아니라 값 포인터도 저장하기 때문입니다.
+3. **OrderedDict는 dict보다 큽니다**: 순서 유지를 위한 이중 연결 리스트를 내부에 갖기 때문입니다.
+4. **deque는 list와 비슷합니다**: 내부 블록 구조의 오버헤드가 있지만, 원소당 비용은 유사합니다.
+
+## 성능 벤치마크: 종합 시나리오 비교
+
+실무에서 자주 만나는 세 가지 시나리오를 구조별로 비교합니다.
+
+### 시나리오 1: 로그 수집 후 중복 제거
+
+```python
+import random
+import timeit
+
+
+def scenario_list_dedupe(n: int = 50_000) -> None:
+    logs = [f"event_{random.randint(0, n//2)}" for _ in range(n)]
+    seen: set[str] = set()
+    unique: list[str] = []
+    for log in logs:
+        if log not in seen:
+            seen.add(log)
+            unique.append(log)
+
+
+def scenario_dict_dedupe(n: int = 50_000) -> None:
+    logs = [f"event_{random.randint(0, n//2)}" for _ in range(n)]
+    unique = list(dict.fromkeys(logs))
+
+
+trials = 10
+t1 = timeit.timeit(scenario_list_dedupe, number=trials)
+t2 = timeit.timeit(scenario_dict_dedupe, number=trials)
+
+print(f"set + list dedupe: {t1:.4f}s")
+print(f"dict.fromkeys:     {t2:.4f}s")
+```
+
+`dict.fromkeys()`는 한 줄로 순서 유지 중복 제거를 수행하며, 내부적으로 C 레벨에서 동작해 더 빠릅니다.
+
+### 시나리오 2: 빈도 집계 후 상위 k개 추출
+
+```python
+import heapq
+import random
+import timeit
+from collections import Counter
+
+
+def scenario_counter_topk(n: int = 100_000, k: int = 10) -> None:
+    data = [random.randint(0, 1000) for _ in range(n)]
+    counter = Counter(data)
+    _ = counter.most_common(k)
+
+
+def scenario_manual_topk(n: int = 100_000, k: int = 10) -> None:
+    data = [random.randint(0, 1000) for _ in range(n)]
+    freq: dict[int, int] = {}
+    for x in data:
+        freq[x] = freq.get(x, 0) + 1
+    _ = heapq.nlargest(k, freq.items(), key=lambda x: x[1])
+
+
+trials = 10
+t1 = timeit.timeit(scenario_counter_topk, number=trials)
+t2 = timeit.timeit(scenario_manual_topk, number=trials)
+
+print(f"Counter.most_common: {t1:.4f}s")
+print(f"dict + heapq:        {t2:.4f}s")
+```
+
+Counter는 내부적으로 dict이며 `most_common(k)`은 heapq.nlargest를 사용합니다. 직접 구현과 성능이 유사하지만, 코드가 훨씬 간결합니다.
+
+## unittest로 IndexedDict 검증
+
+```python
+import unittest
+
+
+class TestIndexedDict(unittest.TestCase):
+    def setUp(self) -> None:
+        self.d: IndexedDict[str, int] = IndexedDict()
+
+    def test_put_and_get(self) -> None:
+        self.d.put("a", 1)
+        self.d.put("b", 2)
+        self.assertEqual(self.d.get("a"), 1)
+        self.assertEqual(self.d.get("b"), 2)
+
+    def test_get_missing(self) -> None:
+        self.assertIsNone(self.d.get("missing"))
+
+    def test_get_by_index(self) -> None:
+        self.d.put("x", 10)
+        self.d.put("y", 20)
+        self.d.put("z", 30)
+        self.assertEqual(self.d.get_by_index(0), ("x", 10))
+        self.assertEqual(self.d.get_by_index(2), ("z", 30))
+
+    def test_overwrite(self) -> None:
+        self.d.put("key", 1)
+        self.d.put("key", 2)
+        self.assertEqual(self.d.get("key"), 2)
+        self.assertEqual(len(self.d), 1)
+
+    def test_contains(self) -> None:
+        self.d.put("present", 1)
+        self.assertIn("present", self.d)
+        self.assertNotIn("absent", self.d)
+
+
+if __name__ == "__main__":
+    unittest.main()
+```
+
+## 선택 기준 요약표
+
+| 요구사항 | 1순위 구조 | 2순위 대안 | 이유 |
+|---------|-----------|-----------|------|
+| 순서 유지 + 인덱스 접근 | list | tuple (불변) | O(1) 인덱스 접근 |
+| 키-값 매핑 + 빠른 조회 | dict | defaultdict | O(1) 해시 기반 조회 |
+| 중복 제거 | set | dict.fromkeys() | O(1) membership |
+| 양쪽 끝 삽입/삭제 | deque | - | O(1) 양 끝 연산 |
+| 우선순위 처리 | heapq | queue.PriorityQueue | O(log n) 삽입/추출 |
+| 불변 키/원소 | tuple/frozenset | @dataclass(frozen) | hashable 보장 |
+| 빈도 집계 | Counter | defaultdict(int) | most_common() 내장 |
+| 정렬 유지 + 동적 삽입 | SortedList | bisect + list | O(log n) 삽입 |
 
 ## 처음 질문으로 돌아가기
 
 - **list, dict, set 중 무엇을 선택해야 할지 어떤 기준으로 판단할까요?**
-  - 본문의 기준은 자료구조 선택 기준를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - "가장 빈번한 연산이 무엇인가"를 기준으로 판단합니다. 순서와 인덱스가 중요하면 list, 키 기반 조회가 핵심이면 dict, 중복 제거와 membership test가 많으면 set입니다. 모든 연산을 동시에 최적화하는 구조는 없으므로, 핵심 연산 하나를 정하고 그에 맞는 구조를 선택합니다.
 - **자료구조 선택에서 가장 먼저 봐야 할 연산은 무엇일까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 읽기(조회/검색)입니다. 대부분의 시스템에서 읽기는 쓰기보다 훨씬 빈번합니다. 읽기 패턴이 "키로 찾기"인지, "인덱스로 접근"인지, "존재 여부 확인"인지에 따라 dict, list, set으로 자연스럽게 분기됩니다.
 - **여러 구조를 조합해 요구사항을 동시에 만족시키는 방법은 무엇일까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 두 구조를 동시에 유지합니다. IndexedDict 예시처럼 dict + list를 함께 쓰면 O(1) 키 조회와 O(1) 인덱스 접근을 동시에 제공할 수 있습니다. LRU 캐시의 OrderedDict, Counter의 dict + heap 조합도 같은 원리입니다. 대가는 메모리와 동기화 복잡성입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -395,5 +644,6 @@ class Container(Generic[T]):
 - [Python 공식 문서 — collections](https://docs.python.org/3/library/collections.html)
 - [Python 공식 문서 — heapq](https://docs.python.org/3/library/heapq.html)
 - [Python TimeComplexity — Python Wiki](https://wiki.python.org/moin/TimeComplexity)
+- [book-examples 저장소 — data-structures-python-101/ko](https://github.com/yeongseon-books/book-examples/tree/main/data-structures-python-101/ko)
 
 Tags: Python, 자료구조, 시간 복잡도, 성능 최적화, 자료구조 비교

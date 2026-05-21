@@ -23,9 +23,10 @@ seo_description: 리눅스 트리 구조를 파악하고 cd, ls부터 cp, mv, rm
 
 # Linux CLI 101 (2/10): 파일과 디렉터리 다루기
 
+이 글은 Linux CLI 101 시리즈의 2번째 글입니다.
+
 개발자의 일상은 파일을 만들고, 옮기고, 복사하고, 삭제하는 것의 연속입니다. 코드 파일을 정리하고, 설정 파일을 복사하고, 빌드 산출물을 삭제합니다. GUI에서는 드래그 앤 드롭으로 하지만, 서버에서는 모두 명령어입니다.
 
-이 글은 Linux CLI 101 시리즈의 2번째 글입니다.
 
 ## 먼저 던지는 질문
 
@@ -337,6 +338,239 @@ kill_gracefully() {
 
 함수 단위로 쪼개면 시나리오별 검증이 가능해집니다. 예를 들어 종료 신호가 정상 처리되는지, 남은 프로세스가 있는지, 재시작 로직이 중복 실행되는지 등을 독립적으로 점검할 수 있습니다.
 
+## 실무 시나리오: 파일 작업을 안전하게 자동화하기
+
+파일과 디렉터리 명령은 단순해 보이지만, 운영 사고의 상당수가 여기서 시작됩니다. 예를 들어 로그 정리 작업에서 경로 하나를 잘못 쓰면 필요한 파일을 삭제할 수 있습니다. 그래서 실무에서는 "작업 전 확인 -> 영향 범위 출력 -> 실제 실행"의 3단계를 습관화합니다.
+
+```bash
+# 1) 현재 위치와 대상 확인
+pwd
+ls -la ./releases
+
+# 예상 출력
+# /opt/my-app
+# drwxr-xr-x  8 deploy deploy 4096 May 21 13:00 .
+# drwxr-xr-x  5 deploy deploy 4096 May 21 09:11 ..
+# drwxr-xr-x  2 deploy deploy 4096 May 14 10:00 20260514
+```
+
+### 이름 규칙을 먼저 만들고 생성하기
+
+디렉터리 구조는 처음 설계가 중요합니다. 운영에서는 날짜와 환경 이름을 포함한 규칙을 두면 사고 추적이 쉬워집니다.
+
+```bash
+env_name="prod"
+release_date="$(date +%Y%m%d)"
+base_dir="/opt/my-app/releases/${env_name}-${release_date}"
+
+mkdir -p "$base_dir"/{bin,conf,logs,tmp}
+find "$base_dir" -maxdepth 2 -type d | sort
+
+# 예상 출력
+# /opt/my-app/releases/prod-20260521
+# /opt/my-app/releases/prod-20260521/bin
+# /opt/my-app/releases/prod-20260521/conf
+# /opt/my-app/releases/prod-20260521/logs
+# /opt/my-app/releases/prod-20260521/tmp
+```
+
+### 복사와 이동: 원자성 관점으로 보기
+
+`cp`는 원본을 남기고, `mv`는 위치를 바꿉니다. 배포에서는 임시 디렉터리에 준비한 뒤 심볼릭 링크를 바꾸는 방식이 안전합니다.
+
+```bash
+cp -a ./build/. "$base_dir/bin/"
+ln -sfn "$base_dir" /opt/my-app/current
+ls -la /opt/my-app/current
+
+# 예상 출력
+# lrwxrwxrwx 1 deploy deploy 34 May 21 13:12 /opt/my-app/current -> /opt/my-app/releases/prod-20260521
+```
+
+`ln -sfn`은 기존 링크를 덮어써서 전환을 짧게 만들 수 있습니다. 다만 링크 대상 검증 없이 실행하면 잘못된 릴리스로 전환될 수 있으므로, 전환 직전 파일 수와 체크섬을 확인하는 절차를 두는 편이 좋습니다.
+
+### 삭제는 항상 후보 출력부터 시작하기
+
+삭제 작업에서 안전장치가 없으면 복구 비용이 큽니다.
+
+```bash
+# 삭제 후보 확인
+find /opt/my-app/releases -maxdepth 1 -type d -name 'prod-*' -mtime +14 -print
+
+# 실제 삭제
+find /opt/my-app/releases -maxdepth 1 -type d -name 'prod-*' -mtime +14 -print0   | xargs -0 rm -rf
+```
+
+공백·특수문자 대응을 위해 `-print0`와 `xargs -0`를 조합합니다. 이 패턴은 파일 작업 자동화의 기본 안전장치입니다.
+
+### 권한과 소유자를 함께 검증하기
+
+파일이 있어도 권한이 맞지 않으면 서비스가 실패합니다.
+
+```bash
+chown -R deploy:deploy "$base_dir"
+find "$base_dir" -type d -exec chmod 755 {} \;
+find "$base_dir" -type f -name '*.sh' -exec chmod 750 {} \;
+
+# 점검
+find "$base_dir" -maxdepth 2 -printf '%M %u:%g %p
+' | head -n 8
+```
+
+여기서 핵심은 실행 파일(`*.sh`)과 일반 파일의 권한을 분리하는 것입니다. 모든 파일에 `chmod 777`을 주는 방식은 편해 보여도 보안과 감사 관점에서 바로 문제가 됩니다.
+
+### 파일 패턴 추출에 정규식 결합하기
+
+정리 작업에서는 파일명 패턴 필터링이 자주 필요합니다.
+
+```bash
+ls -1 /var/log/my-app   | grep -E '^app-[0-9]{4}-[0-9]{2}-[0-9]{2}\.log(\.[0-9]+)?$'   | sort
+
+# 예상 출력
+# app-2026-05-19.log
+# app-2026-05-20.log
+# app-2026-05-20.log.1
+```
+
+정규식을 명확히 써 두면 의도하지 않은 파일을 건드릴 확률이 줄어듭니다.
+
+### systemd 유닛과 디렉터리 구조 연결
+
+서비스가 참조하는 경로를 유닛 파일과 맞춰 두면 운영이 안정됩니다.
+
+```ini
+# /etc/systemd/system/my-app.service
+[Unit]
+Description=My App Service
+After=network.target
+
+[Service]
+Type=simple
+User=deploy
+WorkingDirectory=/opt/my-app/current
+ExecStart=/opt/my-app/current/bin/start.sh
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+```
+
+이 구조의 장점은 명확합니다. 새 릴리스를 준비한 뒤 `current` 링크만 바꾸면 유닛 파일은 건드리지 않아도 됩니다. 결과적으로 배포 변경점이 작아지고, 롤백도 빠르게 수행할 수 있습니다.
+
+## 운영 점검 플레이북
+
+실무에서 CLI 지식은 "명령을 외우는 능력"보다 "실수 가능성을 줄이는 절차"로 드러납니다. 아래 플레이북은 작업 전에 위험을 줄이고, 작업 후 검증을 빠뜨리지 않기 위한 최소 절차입니다.
+
+### 1) 작업 전 컨텍스트 확인
+
+```bash
+whoami
+hostname
+pwd
+date
+
+# 예상 출력
+# deploy
+# prod-api-01
+# /opt/my-app
+# Thu May 21 15:24:18 KST 2026
+```
+
+같은 명령이라도 서버와 경로가 다르면 결과가 완전히 달라집니다. 컨텍스트 확인은 사소해 보이지만 잘못된 환경 조작을 막는 첫 방어선입니다.
+
+### 2) 영향 범위 먼저 출력
+
+```bash
+# 예시: 후보만 확인
+find ./target -type f -name '*.log' -mtime +7 -print
+```
+
+삭제·이동·권한 변경처럼 파괴적일 수 있는 작업은 항상 후보 목록 출력이 선행되어야 합니다. "실행 전에 눈으로 검토"가 자동화 품질의 핵심입니다.
+
+### 3) 파이프 체인으로 증거를 압축
+
+```bash
+journalctl -u my-api --since '20 min ago' --no-pager   | grep -E 'ERROR|CRITICAL|timeout|5[0-9]{2}'   | awk '{print $1, $2, $3, $NF}'   | sort   | uniq -c   | sort -nr
+```
+
+`grep -E` 정규식은 노이즈를 줄이는 첫 단계입니다. 빈도 집계(`uniq -c`)까지 연결하면 우선순위를 빠르게 정할 수 있습니다.
+
+### 4) systemd 상태와 애플리케이션 로그를 함께 확인
+
+```bash
+systemctl status my-api --no-pager | sed -n '1,15p'
+journalctl -u my-api -n 80 --no-pager
+```
+
+프로세스가 살아 있어도 서비스가 실패 상태일 수 있고, 반대로 서비스는 active인데 내부 오류가 계속 발생할 수 있습니다. 두 관점을 동시에 봐야 원인 추적이 정확해집니다.
+
+### 5) Bash 스크립트로 반복 점검 표준화
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+svc="my-api"
+window='10 min ago'
+
+printf '[INFO] host=%s user=%s time=%s
+' "$(hostname)" "$(whoami)" "$(date '+%F %T')"
+
+if systemctl is-active --quiet "$svc"; then
+  echo '[PASS] service active'
+else
+  echo '[FAIL] service inactive'
+fi
+
+journalctl -u "$svc" --since "$window" --no-pager   | grep -E 'ERROR|CRITICAL|timeout|Failed' || true
+```
+
+자동화의 목적은 사람이 바뀌어도 같은 품질의 점검 결과를 얻는 것입니다. 이 원칙이 지켜지면 장애 대응 시간과 커뮤니케이션 비용이 함께 줄어듭니다.
+
+
+## 실전 점검 로그 예시
+
+아래 예시는 실제 운영에서 자주 보는 "점검 출력 형태"를 축약한 것입니다. 중요한 것은 특정 명령을 그대로 복사하는 것이 아니라, 출력을 근거로 다음 판단을 연결하는 습관입니다.
+
+```bash
+# 서비스 상태 + 최근 오류를 한 번에 수집
+systemctl is-active my-api
+journalctl -u my-api --since '5 min ago' --no-pager   | grep -E 'ERROR|CRITICAL|timeout|Failed'   | tail -n 20
+
+# 예상 출력
+# active
+# 2026-05-21 15:31:10 ERROR timeout while calling payment API
+# 2026-05-21 15:31:12 CRITICAL worker exited unexpectedly
+```
+
+```bash
+# 프로세스/포트/파일 핸들 점검
+ps -ef | grep -E 'my-api|gunicorn' | grep -v grep
+ss -lntp | grep -E ':8080|:80|:443'
+lsof -p "$(pgrep -f my-api | head -n 1)" | wc -l
+
+# 예상 출력 예시
+# deploy 18231 1  ... /opt/my-api/current/bin/start.sh
+# LISTEN 0 4096 0.0.0.0:8080 ... users:(("python3",pid=18231,fd=12))
+# 412
+```
+
+이런 출력들을 시계열로 저장해 두면 재발 시 비교가 쉬워지고, "지금이 평소와 어떻게 다른가"를 빠르게 설명할 수 있습니다. 결국 CLI 실무 역량은 명령 자체보다 **증거 기반 판단 루틴**을 안정적으로 반복하는 능력입니다.
+
+
+### 운영 메모: 실패 후 복구 순서
+
+실패가 발생했을 때는 "원인 추정 -> 즉시 재시작"보다 "상태 확인 -> 증거 수집 -> 최소 조치" 순서가 안전합니다.
+
+```bash
+systemctl status my-api --no-pager | sed -n '1,12p'
+journalctl -u my-api -n 50 --no-pager | grep -E 'ERROR|CRITICAL|timeout|Failed' || true
+```
+
+상태와 로그를 먼저 남겨 두면, 재시작 후 증거가 사라져도 회고와 재발 방지 작업을 진행할 수 있습니다.
+
+
 ## 처음 질문으로 돌아가기
 
 - **절대 경로와 상대 경로는 언제 다르게 느껴질까요?**
@@ -369,4 +603,5 @@ kill_gracefully() {
 - [The Missing Semester - Navigating the Shell](https://missing.csail.mit.edu/2020/course-shell/)
 - [Linux man page - cp, mv, rm](https://man7.org/linux/man-pages/)
 
+- book-examples (linux-cli-101): https://github.com/yeongseon-books/book-examples/tree/main/linux-cli-101/ko
 Tags: Linux, CLI, File System, Directory, ls, cp

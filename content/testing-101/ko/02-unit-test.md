@@ -22,6 +22,8 @@ last_reviewed: '2026-05-12'
 
 # Testing 101 (2/10): 단위 테스트
 
+이 글은 Testing 101 시리즈의 두 번째 글입니다.
+
 테스트를 처음 배우면 가장 먼저 드는 질문이 있습니다. 어디까지를 하나의 테스트 단위로 봐야 할까요? 함수 하나일 수도 있고, 메서드 하나일 수도 있고, 클래스의 특정 동작 하나일 수도 있습니다. 범위를 너무 넓게 잡으면 원인을 찾기 어려워지고, 너무 모호하게 잡으면 테스트가 금방 무거워집니다.
 
 그래서 단위 테스트는 크기를 줄이는 연습이기도 합니다. 외부 의존을 걷어 내고, 작은 동작 하나를 빠르게 확인하는 방식으로 신뢰를 쌓습니다.
@@ -99,7 +101,7 @@ def test_upgrade_sets_pro(): ...
 
 작게 나누면 실패 원인을 즉시 알 수 있습니다. 반대로 한 테스트에 여러 단계를 몰아넣으면 어디가 깨졌는지 추적하는 시간이 길어집니다. 단위 테스트의 장점은 작은 크기에서 나옵니다.
 
-## 다섯 단계로 `pytest` 시작하기
+## 다섯 단계로 파이테스트 시작하기
 
 ### 1단계 — 검증할 함수 준비
 
@@ -259,6 +261,118 @@ def test_apply_discount_rejects_invalid_percent(price, percent):
 ```
 
 경계값 테스트는 코드 리뷰에서 자주 등장하는 질문입니다. `0`일 때는? `None`일 때는? 빈 배열일 때는? 이 질문에 코드로 답하는 것이 경계값 테스트의 역할입니다.
+## 단위 테스트를 도메인 규칙에 맞추는 확장 패턴
+
+단위 테스트를 충분히 작성했는데도 운영 버그가 계속 나오는 팀은 대체로 같은 문제를 겪습니다. 함수 단위 분기는 많이 테스트했지만, 비즈니스 규칙의 조합을 충분히 다루지 못한 경우입니다. 예를 들어 할인 정책은 "회원 등급"과 "쿠폰"과 "최대 할인 상한"이 함께 작동합니다. 이때 조합 테스트를 설계하지 않으면 단일 케이스가 모두 통과해도 실제 시나리오에서 실패할 수 있습니다.
+
+```python
+import pytest
+
+@pytest.mark.parametrize(
+    'tier,coupon,amount,expected',
+    [
+        ('bronze', None, 10000, 10000),
+        ('silver', None, 10000, 9500),
+        ('gold', 'WELCOME10', 10000, 8500),
+        ('gold', 'VIP30', 10000, 7000),   # 상한 적용
+    ],
+)
+def test_calculate_price_by_tier_and_coupon(tier, coupon, amount, expected):
+    assert calculate_final_price(tier=tier, coupon=coupon, amount=amount) == expected
+```
+
+이 방식은 단순히 케이스 수를 늘리는 것이 아니라, 규칙 표를 테스트로 고정한다는 의미가 있습니다. 정책 문서가 바뀌면 표를 먼저 업데이트하고 테스트를 실패시켜 수정 범위를 드러내는 흐름이 효과적입니다.
+
+## 픽스처 계층화로 준비 비용 줄이기
+
+단위 테스트가 늘어날수록 fixture를 한 단계로만 운영하면 재사용성과 가독성이 동시에 떨어집니다. 실무에서는 "기본 객체"와 "상태 변형"을 분리해 계층화하면 유지보수가 쉬워집니다.
+
+```python
+import pytest
+
+@pytest.fixture
+def base_order():
+    return Order(id='o-1', total=20000, status='pending', paid=False)
+
+@pytest.fixture
+def paid_order(base_order):
+    base_order.paid = True
+    base_order.status = 'paid'
+    return base_order
+
+def test_refund_only_for_paid_order(paid_order):
+    assert can_refund(paid_order) is True
+
+def test_refund_rejected_for_pending_order(base_order):
+    assert can_refund(base_order) is False
+```
+
+fixture를 이렇게 쪼개면 테스트 본문은 의도만 남고, 준비 로직은 한곳에서 관리됩니다. 특히 도메인 객체 필드가 바뀔 때 수정 지점이 명확해집니다.
+
+## 유닛테스트 목 객체로 단위 경계 고정하기
+
+단위 테스트에서 외부 의존을 제거할 때 `unittest.mock`은 매우 실용적입니다. 핵심은 "외부 호출 결과를 흉내" 내는 것보다 "호출 계약이 지켜졌는지"를 확인하는 데 있습니다.
+
+```python
+from unittest.mock import Mock
+
+def test_send_invoice_calls_mailer_with_expected_payload():
+    mailer = Mock()
+    service = BillingService(mailer=mailer)
+
+    service.send_invoice(user_id='u-1', amount=39000)
+
+    mailer.send.assert_called_once_with(
+        to='u-1',
+        subject='청구서가 발행되었습니다',
+        body='결제 금액: 39000원',
+    )
+```
+
+이 테스트는 네트워크 없이도 서비스 계층의 행위를 검증합니다. 다만 호출 인자 검증이 구현 세부사항에 과하게 묶이지 않도록, 비즈니스적으로 의미 있는 필드만 확인하는 균형이 필요합니다.
+
+## 커버리지 리포트로 단위 테스트 공백 찾기
+
+`pytest-cov`를 단위 테스트 루프에 연결하면 누락 분기를 빠르게 발견할 수 있습니다.
+
+```bash
+pytest tests/unit -q --cov=src/domain --cov-report=term-missing
+```
+
+```text
+Name                     Stmts   Miss  Cover   Missing
+-------------------------------------------------------
+src/domain/coupon.py        48      7    85%   33-36, 58-60
+src/domain/tax.py           29      0   100%
+-------------------------------------------------------
+TOTAL                       77      7    90%
+```
+
+`coupon.py`의 누락 라인이 "만료 쿠폰" 처리라면, 곧바로 회귀 버그로 이어질 가능성이 큽니다. 이런 경우에는 커버리지 임계값을 높이는 것보다, 누락된 규칙 케이스를 먼저 추가하는 편이 맞습니다.
+
+## 단위 테스트를 지속적 통합 기본 계약으로 두기
+
+단위 테스트는 가장 빠르기 때문에 CI에서 반드시 실행해야 합니다. 다음 구성은 최소 기준으로 충분합니다.
+
+```yaml
+name: unit-test
+on:
+  pull_request:
+
+jobs:
+  run-unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements-dev.txt
+      - run: pytest tests/unit -q --maxfail=1
+```
+
+테스트 전략에서 가장 먼저 자동화해야 할 계층이 단위 테스트인 이유가 여기에 있습니다. 빠르고 싸고, 실패 원인이 선명하기 때문입니다.
+
 ## 직접 검증해 볼 것
 
 1. `apply_discount(1000, 100)`과 `apply_discount(1000, 0)`이 모두 기대값을 반환하는지 확인해 경계값 테스트가 실제로 작동하는지 봅니다.
@@ -266,6 +380,50 @@ def test_apply_discount_rejects_invalid_percent(price, percent):
 3. 같은 테스트 파일에서 DB 연결이나 HTTP 호출이 끼어들지 않는지 살펴봅니다. 단위 테스트에 외부 의존이 붙는 순간 피드백 속도가 급격히 떨어집니다.
 
 **예상 결과:** 정상 입력은 즉시 초록색으로 끝나고, 잘못된 퍼센트 입력은 `ValueError`를 분명하게 보여 줘야 합니다.
+
+## 심화 실습: 운영 관점 테스트 점검
+
+실무에서 테스트를 확장할 때 가장 먼저 해야 할 일은 실패 원인을 사람이 추측하지 않도록 로그와 단언문을 정리하는 것입니다. 테스트 실패 메시지에는 입력값, 기대값, 실제값이 함께 남아야 하며, 그래야 CI 로그만으로도 원인을 좁힐 수 있습니다.
+
+또한 테스트는 코드와 함께 진화해야 합니다. 기능이 바뀌었는데 테스트가 그대로라면 테스트는 안전장치가 아니라 오경보 장치가 됩니다. 그래서 팀에서는 요구사항 변경 PR에 테스트 변경이 함께 포함되는지를 리뷰 기준으로 두는 편이 좋습니다.
+
+fixture는 단순 편의 기능이 아니라 설계 도구입니다. 어떤 객체를 기본 상태로 두는지, 어떤 상태 변형을 허용하는지 fixture 레이어에서 명확히 정의하면 테스트 의도가 깔끔해집니다. 특히 도메인 객체가 복잡할수록 fixture 설계 품질이 테스트 유지보수 비용을 좌우합니다.
+
+회귀 버그를 줄이려면 버그 티켓이 닫힐 때 반드시 재현 테스트를 남겨야 합니다. 수정 코드만 머지하면 같은 원인의 버그가 다른 경로에서 재발합니다. 반대로 재현 테스트를 함께 남기면 팀 지식이 실행 가능한 형태로 축적됩니다.
+
+커버리지 리포트는 주간 회고에서 매우 유용합니다. 숫자만 보는 대신 누락 라인이 핵심 도메인인지 확인하고, 다음 스프린트에서 보강할 테스트를 합의하면 테스트 투자가 산발적으로 흩어지지 않습니다.
+
+CI에서는 실패를 빠르게 보여 주는 순서가 중요합니다. 일반적으로 단위 테스트를 먼저 실행하고, 그 다음 통합 테스트, 마지막으로 느린 E2E를 배치하면 평균 피드백 시간이 줄어듭니다. 파이프라인 설계도 테스트 전략의 일부로 다루어야 합니다.
+
+실무에서 테스트를 확장할 때 가장 먼저 해야 할 일은 실패 원인을 사람이 추측하지 않도록 로그와 단언문을 정리하는 것입니다. 테스트 실패 메시지에는 입력값, 기대값, 실제값이 함께 남아야 하며, 그래야 CI 로그만으로도 원인을 좁힐 수 있습니다.
+
+또한 테스트는 코드와 함께 진화해야 합니다. 기능이 바뀌었는데 테스트가 그대로라면 테스트는 안전장치가 아니라 오경보 장치가 됩니다. 그래서 팀에서는 요구사항 변경 PR에 테스트 변경이 함께 포함되는지를 리뷰 기준으로 두는 편이 좋습니다.
+
+fixture는 단순 편의 기능이 아니라 설계 도구입니다. 어떤 객체를 기본 상태로 두는지, 어떤 상태 변형을 허용하는지 fixture 레이어에서 명확히 정의하면 테스트 의도가 깔끔해집니다. 특히 도메인 객체가 복잡할수록 fixture 설계 품질이 테스트 유지보수 비용을 좌우합니다.
+
+회귀 버그를 줄이려면 버그 티켓이 닫힐 때 반드시 재현 테스트를 남겨야 합니다. 수정 코드만 머지하면 같은 원인의 버그가 다른 경로에서 재발합니다. 반대로 재현 테스트를 함께 남기면 팀 지식이 실행 가능한 형태로 축적됩니다.
+
+커버리지 리포트는 주간 회고에서 매우 유용합니다. 숫자만 보는 대신 누락 라인이 핵심 도메인인지 확인하고, 다음 스프린트에서 보강할 테스트를 합의하면 테스트 투자가 산발적으로 흩어지지 않습니다.
+
+CI에서는 실패를 빠르게 보여 주는 순서가 중요합니다. 일반적으로 단위 테스트를 먼저 실행하고, 그 다음 통합 테스트, 마지막으로 느린 E2E를 배치하면 평균 피드백 시간이 줄어듭니다. 파이프라인 설계도 테스트 전략의 일부로 다루어야 합니다.
+
+```python
+from unittest.mock import patch
+
+def test_payment_service_retries_once_on_timeout():
+    service = PaymentService()
+    with patch('src.payment.client.charge') as charge:
+        charge.side_effect = [TimeoutError(), {'status': 'ok'}]
+        result = service.pay(user_id='u-1', amount=10000)
+
+    assert result['status'] == 'ok'
+    assert charge.call_count == 2
+```
+
+```bash
+pytest -q --maxfail=1 --disable-warnings
+pytest --cov=src --cov-report=term-missing
+```
 
 ## 실패 신호와 첫 점검
 
@@ -323,6 +481,7 @@ def test_apply_discount_rejects_invalid_percent(price, percent):
 
 ## 참고 자료
 
+- 실습 예제 저장소(book-examples): https://github.com/yeongseon-books/book-examples/tree/main/testing-101/ko
 - [pytest — parametrize](https://docs.pytest.org/en/stable/how-to/parametrize.html)
 - [pytest — fixtures](https://docs.pytest.org/en/stable/explanation/fixtures.html)
 - [Martin Fowler — Unit Test](https://martinfowler.com/bliki/UnitTest.html)

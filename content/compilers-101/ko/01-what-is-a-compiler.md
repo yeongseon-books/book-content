@@ -23,7 +23,9 @@ last_reviewed: '2026-05-12'
 
 # Compilers 101 (1/10): 컴파일러란 무엇인가?
 
-이 글은 Compilers 101 시리즈의 첫 번째 글입니다. `2 + 3 * 4` 같은 짧은 식이 왜 바로 실행되지 않고 여러 단계를 거쳐 번역되는지 이해하면, 컴파일러를 더 이상 마법 상자가 아니라 단계별 변환 시스템으로 보게 됩니다.
+이 글은 Compilers 101 시리즈의 첫 번째 글입니다.
+
+`2 + 3 * 4` 같은 짧은 식이 왜 바로 실행되지 않고 여러 단계를 거쳐 번역되는지 이해하면, 컴파일러를 더 이상 마법 상자가 아니라 단계별 변환 시스템으로 보게 됩니다.
 
 ## 먼저 던지는 질문
 
@@ -66,7 +68,7 @@ flowchart LR
 - **파이프라인**: 입력을 단계적으로 변환하는 구조입니다.
 - **프런트엔드 / 백엔드**: 소스 언어에 가까운 단계 / 타깃에 가까운 단계입니다.
 
-## Before / After
+## 변경 전후
 
 **Before — “컴파일은 마법”이라는 막연한 그림**
 
@@ -234,31 +236,28 @@ def emit(node, out=None):
 2. 같은 코드에 CLI 플래그를 추가해서 인터프리터 모드와 코드 생성 모드를 전환해 보세요.
 3. 자주 쓰는 언어 하나를 골라 프런트엔드/백엔드 경계가 어디인지 한 단락으로 설명해 보세요.
 
-## 정리 및 다음 글
+## 정리와 다음 글
 
 컴파일러는 여러 단계를 분해해서 볼 때 비로소 구조가 보이는 시스템입니다. 다음 글에서는 그 첫 단계인 lexical analysis를 자세히 보며, 텍스트가 어떻게 토큰이 되는지 다룹니다.
 
-## 심화 실습: Lexer · Parser · AST를 연결해 보는 기준
+## 확장 실습: 프런트엔드부터 LLVM IR 직전까지 한 번에 검증하기
 
-이 지점에서는 "각 단계가 왜 분리되어야 하는가"를 코드 단위로 확인하는 것이 중요합니다. 핵심은 정답 코드를 외우는 것이 아니라, 같은 입력이 단계별로 어떻게 다른 데이터 구조로 변환되는지 관찰하는 것입니다.
+이 시점부터는 단계별 조각 실습을 넘어, 한 입력이 토큰, AST, 타입 정보, IR, 최적화 결과, 코드 생성 결과로 어떻게 이어지는지 한 번에 추적하는 연습이 필요합니다. 핵심은 코드 길이가 아니라 **변환 경계가 보이는 출력**을 남기는 것입니다. 아래 예시는 시리즈 전체를 관통하는 최소 골격입니다.
 
-### EBNF로 문법을 먼저 고정하기
+### 문법 고정: BNF 표기 먼저 확정하기
 
-문법을 먼저 적어 두면 파서 구현이 훨씬 명확해집니다. 아래 예시는 사칙연산과 괄호를 포함한 최소 문법입니다.
+문법이 흔들리면 파서와 의미 분석 경계도 함께 흔들립니다. 구현 전에 BNF를 먼저 잠그면 우선순위, 결합성, 허용 구문을 팀 단위로 공유할 수 있습니다.
 
-```ebnf
-expr    = term , { ("+" | "-") , term } ;
-term    = factor , { ("*" | "/") , factor } ;
-factor  = number | "(" , expr , ")" ;
-number  = digit , { digit } ;
-digit   = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+```bnf
+<program> ::= <stmt_list>
+<stmt_list> ::= <stmt> | <stmt> <stmt_list>
+<stmt> ::= "let" <ident> "=" <expr> ";" | "print" <expr> ";"
+<expr> ::= <term> | <expr> "+" <term> | <expr> "-" <term>
+<term> ::= <factor> | <term> "*" <factor> | <term> "/" <factor>
+<factor> ::= <number> | <ident> | "(" <expr> ")"
 ```
 
-이 문법에서 `expr -> term -> factor`로 내려가는 구조가 바로 연산자 우선순위를 표현합니다. `+`와 `-`는 `expr` 레벨, `*`와 `/`는 `term` 레벨에 있으므로 `2 + 3 * 4`는 자연스럽게 `2 + (3 * 4)`로 해석됩니다.
-
-### 토큰화에서 위치 정보를 끝까지 보존하기
-
-실무 품질을 좌우하는 부분은 토큰의 `kind`보다 `line`, `column`, `offset`입니다. 오류 메시지 품질은 여기서 결정됩니다.
+### 렉서 출력 고정: 토큰과 위치 정보를 함께 기록하기
 
 ```python
 from dataclasses import dataclass
@@ -271,23 +270,22 @@ class Token:
     line: int
     col: int
 
-TOKEN_PATTERNS = [
+SPEC = [
+    ("KW", r"\b(let|print)\b"),
+    ("IDENT", r"[A-Za-z_][A-Za-z0-9_]*"),
     ("NUMBER", r"\d+"),
-    ("PLUS", r"\+"),
-    ("MINUS", r"-"),
-    ("MUL", r"\*"),
-    ("DIV", r"/"),
+    ("OP", r"[+\-*/=]"),
     ("LPAREN", r"\("),
     ("RPAREN", r"\)"),
-    ("WS", r"\s+"),
+    ("SEMI", r";"),
+    ("WS", r"[ \t\n]+"),
 ]
 
 def lex(src: str) -> list[Token]:
-    i = 0
-    line, col = 1, 1
     out: list[Token] = []
+    i, line, col = 0, 1, 1
     while i < len(src):
-        for kind, pat in TOKEN_PATTERNS:
+        for kind, pat in SPEC:
             m = re.match(pat, src[i:])
             if not m:
                 continue
@@ -295,7 +293,8 @@ def lex(src: str) -> list[Token]:
             if kind != "WS":
                 out.append(Token(kind, text, line, col))
             for ch in text:
-                if ch == "\n":
+                if ch == "
+":
                     line += 1
                     col = 1
                 else:
@@ -303,13 +302,13 @@ def lex(src: str) -> list[Token]:
             i += len(text)
             break
         else:
-            raise SyntaxError(f"unexpected character '{src[i]}' at {line}:{col}")
+            raise SyntaxError(f"unexpected character {src[i]!r} at {line}:{col}")
     return out
 ```
 
-### AST를 명시적으로 설계하기
+이 출력은 이후 단계에서 오류 메시지 기준 좌표가 됩니다. line/col 정보가 없으면 파서와 의미 분석 품질을 끝까지 올리기 어렵습니다.
 
-파싱이 끝났을 때 결과가 문자열이 아니라 트리여야 이후 단계가 단순해집니다.
+### AST 노드 정의: 구조를 명시적으로 분리하기
 
 ```python
 from dataclasses import dataclass
@@ -319,91 +318,304 @@ class Number:
     value: int
 
 @dataclass
+class Identifier:
+    name: str
+
+@dataclass
 class Binary:
     op: str
     left: object
     right: object
 
-# 예시 AST: 2 + 3 * 4
-ast = Binary(
-    op="+",
-    left=Number(2),
-    right=Binary(op="*", left=Number(3), right=Number(4)),
-)
+@dataclass
+class LetStmt:
+    name: str
+    expr: object
+
+@dataclass
+class PrintStmt:
+    expr: object
 ```
 
-여기서 중요한 관찰은 동일한 AST를 여러 소비자가 사용할 수 있다는 점입니다.
-- 의미 분석기: 타입/스코프 검사
-- 인터프리터: 즉시 평가
-- 코드 생성기: 바이트코드/기계어 방출
+여기서 중요한 점은 문법 요소와 실행 요소를 섞지 않는 것입니다. AST는 실행기가 아니라 구조 표현이어야 하며, 해석/타입/코드 생성은 별도 단계로 분리하는 편이 장기적으로 안정적입니다.
 
-즉 파서는 "한 번만 정확히" 만들고, 나머지는 AST 위에서 독립적으로 발전시킬 수 있습니다.
-
-### 재귀 하강 파서의 최소 골격
+### 의미 분석 골격: 선언, 참조, 타입을 한 번에 점검하기
 
 ```python
-class Parser:
-    def __init__(self, tokens):
-        self.tokens = tokens
-        self.i = 0
+class Scope:
+    def __init__(self, parent=None):
+        self.parent = parent
+        self.table: dict[str, str] = {}
 
-    def peek(self):
-        return self.tokens[self.i] if self.i < len(self.tokens) else None
+    def define(self, name: str, ty: str):
+        if name in self.table:
+            raise TypeError(f"redeclared variable: {name}")
+        self.table[name] = ty
 
-    def eat(self, kind):
-        tok = self.peek()
-        if tok is None or tok.kind != kind:
-            where = "EOF" if tok is None else f"{tok.line}:{tok.col}"
-            raise SyntaxError(f"expected {kind} at {where}")
-        self.i += 1
-        return tok
+    def resolve(self, name: str) -> str:
+        if name in self.table:
+            return self.table[name]
+        if self.parent:
+            return self.parent.resolve(name)
+        raise NameError(f"undefined variable: {name}")
 
-    def parse_expr(self):
-        node = self.parse_term()
-        while self.peek() and self.peek().kind in ("PLUS", "MINUS"):
-            op = self.eat(self.peek().kind).text
-            rhs = self.parse_term()
-            node = Binary(op, node, rhs)
-        return node
-
-    def parse_term(self):
-        node = self.parse_factor()
-        while self.peek() and self.peek().kind in ("MUL", "DIV"):
-            op = self.eat(self.peek().kind).text
-            rhs = self.parse_factor()
-            node = Binary(op, node, rhs)
-        return node
-
-    def parse_factor(self):
-        tok = self.peek()
-        if tok.kind == "NUMBER":
-            self.eat("NUMBER")
-            return Number(int(tok.text))
-        if tok.kind == "LPAREN":
-            self.eat("LPAREN")
-            node = self.parse_expr()
-            self.eat("RPAREN")
-            return node
-        raise SyntaxError(f"unexpected token {tok.kind} at {tok.line}:{tok.col}")
+def type_of_expr(node, scope: Scope) -> str:
+    if isinstance(node, Number):
+        return "int"
+    if isinstance(node, Identifier):
+        return scope.resolve(node.name)
+    if isinstance(node, Binary):
+        lt = type_of_expr(node.left, scope)
+        rt = type_of_expr(node.right, scope)
+        if lt != "int" or rt != "int":
+            raise TypeError(f"binary op expects int/int, got {lt}/{rt}")
+        return "int"
+    raise TypeError(f"unknown node: {node}")
 ```
 
-### 디버깅 체크포인트
+시맨틱 단계에서 타입과 이름 해석을 확정하면, 뒤 단계(IR/최적화/코드 생성)는 오류 복구 부담을 크게 줄일 수 있습니다.
 
-파이프라인을 운영할 때는 다음 세 지점을 항상 로그로 남겨야 합니다.
-1. **Token stream**: 토큰 종류와 위치
-2. **AST dump**: 중첩 구조와 연산자 결합 방향
-3. **Type/Scope report**: 선언/참조 매칭 결과
+### IR 생성과 최적화 패스: 변환 파이프라인 분리하기
 
-세 지점이 분리되어 있으면 오류를 "문법 단계 문제"인지 "의미 단계 문제"인지 즉시 구분할 수 있습니다. 예를 들어 괄호 누락은 파서에서, 미선언 변수 참조는 의미 분석기에서 실패해야 정상입니다.
+```python
+def lower_expr(node, out, new_temp):
+    if isinstance(node, Number):
+        t = new_temp()
+        out.append(("const", t, node.value))
+        return t
+    if isinstance(node, Identifier):
+        t = new_temp()
+        out.append(("load", t, node.name))
+        return t
+    if isinstance(node, Binary):
+        l = lower_expr(node.left, out, new_temp)
+        r = lower_expr(node.right, out, new_temp)
+        t = new_temp()
+        out.append((node.op, t, l, r))
+        return t
+    raise RuntimeError("unsupported node")
 
-### 작은 입력으로 검증하는 습관
+def constant_folding(ir):
+    const = {}
+    out = []
+    for inst in ir:
+        if inst[0] == "const":
+            const[inst[1]] = inst[2]
+            out.append(inst)
+            continue
+        if inst[0] in {"+", "-", "*", "/"} and inst[2] in const and inst[3] in const:
+            a, b = const[inst[2]], const[inst[3]]
+            v = {"+": a+b, "-": a-b, "*": a*b, "/": a//b}[inst[0]]
+            const[inst[1]] = v
+            out.append(("const", inst[1], v))
+        else:
+            out.append(inst)
+    return out
+```
 
-다음 세 입력을 고정 테스트로 유지하면 회귀를 빠르게 잡을 수 있습니다.
-- `2 + 3 * 4` → 우선순위 검증
-- `(2 + 3) * 4` → 괄호 우선 검증
-- `2 + * 4` → 오류 위치와 메시지 품질 검증
+`IR -> 최적화 패스 -> IR` 형태를 유지하면 패스를 안전하게 합성할 수 있고, 결과 비교 테스트도 단순해집니다.
 
-이처럼 Lexer/Parser/AST를 분리한 뒤, 문법과 테스트를 함께 고정하면 이후 최적화나 코드 생성 단계를 추가해도 프런트엔드 품질이 쉽게 무너지지 않습니다.
+### 코드 생성 스니펫: 단순 스택 머신 또는 어셈블리로 내리기
+
+```python
+def emit_stack_vm(ir):
+    out = []
+    for inst in ir:
+        op = inst[0]
+        if op == "const":
+            out.append(f"PUSH {inst[2]}")
+        elif op == "load":
+            out.append(f"LOAD {inst[2]}")
+        elif op == "+":
+            out.append("ADD")
+        elif op == "-":
+            out.append("SUB")
+        elif op == "*":
+            out.append("MUL")
+        elif op == "/":
+            out.append("DIV")
+    out.append("HALT")
+    return out
+```
+
+이 수준의 생성기만 있어도 파서/의미 분석/최적화의 결과가 실제 실행 지시어로 어떻게 바뀌는지 빠르게 검증할 수 있습니다.
+
+### LLVM IR 샘플 읽기: SSA 감각 익히기
+
+```llvm
+; 입력 소스의 개념: let x = 2 * 3; print x + 1;
+define i32 @main() {
+entry:
+  %x = mul i32 2, 3
+  %y = add i32 %x, 1
+  ret i32 %y
+}
+```
+
+SSA에서 `%x`, `%y`처럼 버전이 분리되면 데이터 흐름 분석과 레지스터 할당 전 단계가 단순해집니다. 시리즈 후반 주제(최적화, 코드 생성, JIT/AOT)를 이해할 때 이 표현이 공통 언어가 됩니다.
+
+### 검증 기준: 단계별 스냅샷을 항상 남기기
+
+실전에서는 정답 코드보다 검증 루틴이 먼저입니다. 최소한 다음 다섯 가지를 파일로 남기면 회귀를 추적하기 쉽습니다.
+
+1. 토큰 덤프 (`tokens.json`)
+2. AST 덤프 (`ast.json`)
+3. 시맨틱 결과 (`symbols.json`, 타입 오류 목록)
+4. 최적화 전후 IR (`ir_before.txt`, `ir_after.txt`)
+5. 최종 코드 생성 결과 (`out.asm` 또는 `out.vm`)
+
+이렇게 하면 “어디서 깨졌는지”가 즉시 분리되고, 팀 협업에서도 디버깅 비용이 크게 줄어듭니다.
+
+
+
+
+### 단계별 실패 시나리오와 복구 전략
+
+실제 프로젝트에서는 정답 입력보다 실패 입력이 더 많이 들어옵니다. 따라서 각 단계가 실패했을 때 **다음 단계로 무엇을 전달할지**를 먼저 정해야 합니다. 다음 표는 최소 운영 기준입니다.
+
+| 단계 | 실패 예시 | 즉시 조치 | 다음 단계 전달 |
+| --- | --- | --- | --- |
+| 렉서 | 알 수 없는 문자 | 위치 포함 오류 생성 | 복구 가능한 토큰만 전달 |
+| 파서 | 괄호 누락, 세미콜론 누락 | 동기화 토큰 기준으로 재시작 | 부분 AST와 오류 목록 전달 |
+| 시맨틱 | 미선언 변수, 타입 불일치 | 심볼/타입 오류 축적 | 오류 수가 기준치 이하면 IR 생성 계속 |
+| IR 생성 | 미지원 구문 | 노드 단위 경고와 스킵 | 분석 가능한 블록만 전달 |
+| 최적화 | 패스 전제 위반 | 패스 비활성화 후 원본 IR 유지 | 코드 생성은 계속 |
+| 코드 생성 | 레지스터 부족 | spill 강제, 속도 저하 허용 | 실행 가능한 바이너리 우선 |
+
+이 기준은 "완벽한 컴파일"보다 "재현 가능한 컴파일"에 가깝습니다. 품질이 높은 컴파일러는 한 번에 많은 오류를 보여 주되, 어디까지 복구했는지 명확히 보고합니다.
+
+### 테스트 입력 세트: 경계 조건을 먼저 고정하기
+
+아래 입력 세트는 단계별 회귀를 빠르게 잡는 최소 묶음입니다.
+
+```text
+# 정상
+let x = 2 + 3 * 4;
+print x;
+
+# 문법 오류
+let x = (2 + 3;
+
+# 의미 오류
+print y;
+
+# 최적화 검증
+let z = 1 + 2 + 3 + 4;
+print z;
+```
+
+각 입력에 대해 토큰, AST, 시맨틱 결과, IR, 최종 코드를 별도 파일로 남기면 변경 전후 차이를 기계적으로 비교할 수 있습니다.
+
+### 간단한 골든 출력 비교 스크립트
+
+```python
+import json
+from pathlib import Path
+
+def save_snapshot(name: str, payload):
+    out_dir = Path("artifacts")
+    out_dir.mkdir(exist_ok=True)
+    p = out_dir / f"{name}.json"
+    p.write_text(json.dumps(payload, ensure_ascii=False, indent=2))
+
+# 예시 사용
+save_snapshot("tokens_case1", [{"kind": "NUMBER", "text": "2", "line": 1, "col": 1}])
+save_snapshot("ast_case1", {"kind": "Binary", "op": "+"})
+```
+
+스냅샷 파일을 Git에 남기면 리팩터링 이후에도 파이프라인의 의미가 바뀌었는지 즉시 검출할 수 있습니다.
+
+### 최적화 패스 예시: 상수 전파와 불필요 대입 제거
+
+```python
+def constant_propagation(ir):
+    env = {}
+    out = []
+    for inst in ir:
+        op = inst[0]
+        if op == "const":
+            env[inst[1]] = inst[2]
+            out.append(inst)
+        elif op in {"+", "-", "*", "/"}:
+            a = env.get(inst[2], inst[2])
+            b = env.get(inst[3], inst[3])
+            if isinstance(a, int) and isinstance(b, int):
+                v = {"+": a+b, "-": a-b, "*": a*b, "/": a//b}[op]
+                env[inst[1]] = v
+                out.append(("const", inst[1], v))
+            else:
+                out.append((op, inst[1], a, b))
+        else:
+            out.append(inst)
+    return out
+
+def remove_trivial_moves(ir):
+    return [inst for inst in ir if not (inst[0] == "mov" and inst[1] == inst[2])]
+```
+
+최적화는 큰 패스 하나보다 작은 패스 여러 개가 유지보수에 유리합니다. 실패하면 해당 패스만 끄고 원본 IR로 복구할 수 있기 때문입니다.
+
+### 코드 생성 검증: 간단한 레지스터 할당 로그 남기기
+
+```python
+REGS = ["r1", "r2", "r3"]
+
+def assign_registers(temporaries):
+    mapping = {}
+    spill = []
+    for t in temporaries:
+        if len(mapping) < len(REGS):
+            mapping[t] = REGS[len(mapping)]
+        else:
+            spill.append(t)
+    return mapping, spill
+
+m, s = assign_registers(["t1", "t2", "t3", "t4", "t5"])
+print("reg-map", m)
+print("spill ", s)
+```
+
+이 정도 로그만 있어도 특정 입력에서 왜 성능이 급락했는지 원인을 좁히기 쉽습니다. 특히 spill 급증은 코드 생성 병목의 대표 신호입니다.
+
+### LLVM IR 비교 기준: 변경 전후를 줄 단위로 확인하기
+
+```llvm
+; before optimization
+%t1 = mul i32 3, 4
+%t2 = add i32 2, %t1
+ret i32 %t2
+
+; after optimization
+ret i32 14
+```
+
+최적화가 의미를 보존하는지 검증할 때는 사람이 읽는 설명보다 IR diff가 더 신뢰할 수 있습니다. 동일 입력에서 `ret i32 14`로 바뀌면 folding이 실제로 적용되었음을 바로 확인할 수 있습니다.
+
+### 팀 운영 체크포인트
+
+1. 파서 변경 PR에는 반드시 BNF 변경 diff를 포함합니다.
+2. 시맨틱 규칙 변경 PR에는 실패 사례 3개 이상을 테스트에 추가합니다.
+3. 최적화 패스 추가 PR에는 비활성화 플래그를 함께 제공합니다.
+4. 코드 생성 변경 PR에는 최소 두 아키텍처 이상의 스냅샷을 첨부합니다.
+5. 릴리스 전에는 동일 입력에 대해 인터프리터 결과와 컴파일 결과를 교차 검증합니다.
+
+이 체크포인트를 유지하면 기능 추가 속도보다 품질 일관성을 더 안정적으로 가져갈 수 있습니다.
+
+
+
+### 마무리 점검: 단계 경계를 말로 설명해 보기
+
+마지막으로, 구현을 잠시 멈추고 다음 질문에 답해 보기를 권합니다. 이 질문은 코드량이 아니라 이해도를 검증합니다.
+
+- 렉서가 실패했을 때 파서가 받는 입력은 무엇입니까?
+- 파서가 복구한 부분 AST를 시맨틱 단계에서 어디까지 신뢰합니까?
+- 시맨틱 오류가 있어도 IR 생성을 계속할 조건은 무엇입니까?
+- 최적화 패스를 껐을 때도 결과의 의미가 유지되는지 어떻게 확인합니까?
+- 코드 생성 이후 실행 결과를 어떤 기준값과 비교합니까?
+
+이 다섯 질문에 팀이 같은 답을 할 수 있으면, 파이프라인 확장 시 품질이 급격히 흔들릴 가능성이 크게 줄어듭니다. 반대로 답이 제각각이면, 새로운 문법이나 최적화 패스를 추가할 때 같은 종류의 회귀가 반복됩니다.
+
+실무에서는 기능 추가보다 경계 합의가 먼저입니다. 경계를 합의한 다음 기능을 추가하면, 동일한 투자로 더 안정적인 컴파일러를 만들 수 있습니다.
 
 ## 처음 질문으로 돌아가기
 
@@ -436,5 +648,7 @@ class Parser:
 - [Crafting Interpreters (Robert Nystrom)](https://craftinginterpreters.com/)
 - [LLVM Project](https://llvm.org/)
 - [PEP 339 — Design of the CPython compiler](https://peps.python.org/pep-0339/)
+
+- [이 시리즈 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/compilers-101/ko)
 
 Tags: Computer Science, Compilers, Pipeline, AST, Bytecode, Frontend

@@ -231,6 +231,183 @@ dis.dis(add)
 
 계산 이론의 한계도 실무에서 중요합니다. 완벽한 정적 분석기나 모든 버그를 잡는 테스트는 원리적으로 불가능하다는 사실을 알면, 현실적인 타임아웃과 가드레일 설계에 더 집중하게 됩니다.
 
+## 튜링 기계를 Python으로 시뮬레이션하기
+
+앞서 상태 기계의 기본 개념을 봤습니다. 이제 좀 더 정교한 튜링 기계를 직접 구현해 보겠습니다. 이 시뮬레이터는 테이프, 헤드, 상태 전이 규칙을 갖춘 완전한 형태입니다.
+
+```python
+class TuringMachine:
+    """간단한 튜링 기계 시뮬레이터."""
+
+    def __init__(self, tape: list[str], rules: dict, start_state: str, halt_states: set[str]):
+        self.tape = list(tape)
+        self.head = 0
+        self.state = start_state
+        self.halt_states = halt_states
+        self.rules = rules  # (state, symbol) -> (new_state, write_symbol, direction)
+        self.steps = 0
+
+    def step(self) -> bool:
+        if self.state in self.halt_states:
+            return False
+        symbol = self.tape[self.head] if self.head < len(self.tape) else "B"
+        key = (self.state, symbol)
+        if key not in self.rules:
+            return False
+        new_state, write, direction = self.rules[key]
+        if self.head >= len(self.tape):
+            self.tape.append("B")
+        self.tape[self.head] = write
+        self.head += 1 if direction == "R" else -1 if direction == "L" else 0
+        self.state = new_state
+        self.steps += 1
+        return True
+
+    def run(self, max_steps: int = 1000) -> str:
+        while self.step() and self.steps < max_steps:
+            pass
+        return "".join(self.tape).rstrip("B")
+
+
+# 이진수에 1을 더하는 튜링 기계
+# 입력: "1011" (11 in decimal) -> 출력: "1100" (12 in decimal)
+rules = {
+    # 오른쪽 끝으로 이동
+    ("start", "0"): ("start", "0", "R"),
+    ("start", "1"): ("start", "1", "R"),
+    ("start", "B"): ("carry", "B", "L"),
+    # 캐리 전파
+    ("carry", "0"): ("done", "1", "L"),
+    ("carry", "1"): ("carry", "0", "L"),
+    ("carry", "B"): ("done", "1", "S"),
+}
+
+tm = TuringMachine(
+    tape=list("1011"),
+    rules=rules,
+    start_state="start",
+    halt_states={"done"},
+)
+result = tm.run()
+print(f"1011 + 1 = {result}")  # 1100
+print(f"수행한 단계 수: {tm.steps}")
+```
+
+이 예제의 핵심은 단순합니다. 튜링 기계는 테이프(메모리), 헤드(현재 위치), 상태(프로그램 카운터), 규칙(프로그램)으로 구성됩니다. 오늘날의 컴퓨터는 이 모델의 물리적 구현입니다. RAM이 테이프이고, CPU 레지스터가 헤드와 상태이며, 명령어 세트가 규칙입니다.
+
+### 계산 가능성의 경계: 실용적 의미
+
+정지 문제가 풀 수 없다는 사실은 이론적 호기심으로 끝나지 않습니다. 실무에서 만나는 여러 문제가 이 한계에서 직접 파생됩니다.
+
+| 불가능한 것 | 실무적 대안 |
+| --- | --- |
+| 모든 프로그램의 종료를 판정 | 타임아웃, 워치독 |
+| 완벽한 바이러스 탐지기 | 서명 기반 + 행동 기반 휴리스틱 |
+| 완벽한 정적 분석기 | 근사 분석 + 테스트 병행 |
+| 두 프로그램의 동치 판정 | 같은 테스트 슈트 통과 확인 |
+| 최적 컴파일러 | 휴리스틱 최적화 패스 |
+
+이 표가 말해주는 것은, "완벽한 자동화"가 원리적으로 불가능한 영역이 있다는 점입니다. 그래서 엔지니어는 완벽함 대신 "충분히 좋은" 근사와 안전장치를 조합합니다.
+
+## 프로그래밍 패러다임 비교: 같은 문제를 세 가지로 풀기
+
+명령형, 함수형, 객체지향 패러다임을 같은 문제에 적용해 보겠습니다. 문제는 "단어 목록에서 길이가 4 이상인 단어만 골라 대문자로 바꾸기"입니다.
+
+```python
+words = ["cat", "elephant", "dog", "butterfly", "ant", "whale"]
+
+# 명령형: 어떻게(how) 하는지 단계별로 지시
+result_imperative = []
+for word in words:
+    if len(word) >= 4:
+        result_imperative.append(word.upper())
+print(f"명령형: {result_imperative}")
+
+# 함수형: 무엇을(what) 원하는지 선언
+result_functional = list(map(str.upper, filter(lambda w: len(w) >= 4, words)))
+print(f"함수형: {result_functional}")
+
+# 리스트 내포 (Python 고유의 선언적 스타일)
+result_comprehension = [w.upper() for w in words if len(w) >= 4]
+print(f"내포식: {result_comprehension}")
+```
+
+세 접근 모두 같은 결과를 냅니다. 차이는 의도를 드러내는 방식입니다.
+
+| 패러다임 | 장점 | 단점 | 적합한 상황 |
+| --- | --- | --- | --- |
+| 명령형 | 실행 흐름이 명확, 디버깅 쉬움 | 길어지면 의도가 묻힘 | 상태 변화가 핵심인 로직 |
+| 함수형 | 부수효과 없음, 조합성 높음 | 깊은 중첩 시 가독성 저하 | 데이터 변환 파이프라인 |
+| 객체지향 | 상태와 행동을 캡슐화 | 과도한 클래스 계층 위험 | 도메인 모델링, 상태 관리 |
+
+### 컴파일과 인터프리트: 바이트코드 깊이 보기
+
+Python의 실행 과정을 한 단계 더 들여다보겠습니다.
+
+```python
+import dis
+import sys
+
+def fibonacci(n: int) -> int:
+    if n <= 1:
+        return n
+    return fibonacci(n - 1) + fibonacci(n - 2)
+
+# 바이트코드 출력
+print("=== fibonacci 바이트코드 ===")
+dis.dis(fibonacci)
+
+# 코드 객체의 상수와 변수 정보
+code = fibonacci.__code__
+print(f"\n상수(co_consts): {code.co_consts}")
+print(f"지역변수(co_varnames): {code.co_varnames}")
+print(f"바이트코드 크기: {len(code.co_code)} bytes")
+print(f"Python 버전: {sys.version}")
+```
+
+바이트코드를 읽을 줄 알면 두 가지 실무 이점이 있습니다. 첫째, 성능 병목을 코드 수준이 아니라 연산 수준에서 파악할 수 있습니다. 둘째, 동일한 로직을 다르게 쓴 코드가 실제로 같은 바이트코드를 생성하는지 확인해 불필요한 최적화를 피할 수 있습니다.
+
+## 계산 모델과 현대 시스템의 연결
+
+튜링 기계는 1936년에 제안되었지만, 오늘날의 시스템에서도 그 핵심 원리가 그대로 적용됩니다.
+
+| 튜링 기계 구성 요소 | 현대 시스템 대응 | 설명 |
+| --- | --- | --- |
+| 무한 테이프 | RAM + 디스크 + 클라우드 스토리지 | 가상 메모리로 거의 무한하게 확장 |
+| 헤드 이동 | 메모리 주소 접근 | 포인터, 인덱스가 헤드 역할 |
+| 상태 전이 | CPU의 명령어 실행 | Program Counter가 현재 상태 |
+| 전이 규칙 | 프로그램 (명령어 집합) | 코드가 곧 규칙 |
+| 정지 상태 | 프로그램 종료, return | exit code 반환 |
+
+분산 시스템도 이 프레임워크를 확장한 것입니다. 여러 튜링 기계가 네트워크로 연결되어 메시지를 교환하는 모델로 설명됩니다. 합의 알고리즘(Raft, Paxos)은 분산된 상태 기계들이 같은 상태 전이를 보장하는 방법입니다.
+
+
+### 컴파일 파이프라인 단계별 변환 예시
+
+소스 코드가 실행 파일이 되기까지 거치는 단계를 C 언어로 추적합니다.
+
+```text
+[소스 코드]  →  [전처리]  →  [컴파일]  →  [어셈블리]  →  [링킹]  →  [실행 파일]
+ hello.c        hello.i       hello.s       hello.o        a.out
+```
+
+```c
+// hello.c
+#include <stdio.h>
+#define MSG "Hello"
+int main(void) {
+    printf("%s\n", MSG);
+    return 0;
+}
+```
+
+**전처리 단계** (`gcc -E hello.c -o hello.i`): `#include`가 헤더 내용으로 치환되고, `MSG`가 `"Hello"`로 대체됩니다. 이 단계는 텍스트 치환이므로 계산 이론의 문자열 재작성 시스템과 대응됩니다.
+
+**컴파일 단계** (`gcc -S hello.i -o hello.s`): 토큰화 → 구문 분석 → 의미 분석 → 중간 표현(IR) → 최적화 → 어셈블리 생성 순서를 거칩니다. 최적화 단계에서 상수 전파, 죽은 코드 제거, 루프 언롤링 등이 적용됩니다.
+
+**어셈블리 단계** (`as hello.s -o hello.o`): 사람이 읽을 수 있는 어셈블리를 기계어 바이트로 변환합니다. 이 시점에서 심볼 테이블이 생성되고, 외부 함수(`printf`)는 아직 주소가 미정입니다.
+
+**링킹 단계** (`ld hello.o -lc -o a.out`): 미정이던 외부 심볼을 라이브러리에서 찾아 주소를 확정합니다. 정적 링킹은 라이브러리 코드를 복사하고, 동적 링킹은 런타임에 공유 라이브러리를 로드합니다.
 ## 체크리스트
 
 - [ ] 튜링 기계의 개념을 설명할 수 있는가
@@ -282,11 +459,11 @@ dis.dis(add)
 ## 처음 질문으로 돌아가기
 
 - **무엇을 두고 계산 가능하다고 말할 수 있을까요?**
-  - 본문의 기준은 계산과 프로그램를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 유한한 단계 안에 답을 내는 절차(알고리즘)가 존재하면 계산 가능합니다. 튜링 기계로 시뮬레이션할 수 있는 문제가 곧 계산 가능한 문제입니다. 이 정의가 중요한 이유는 "풀 수 없는 문제"의 존재를 알아야 실무에서 완벽한 자동화 대신 실용적 근사를 선택할 수 있기 때문입니다.
 - **튜링 기계는 왜 오늘날의 컴퓨터를 설명하는 기준 모델로 남아 있을까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 본문에서 구현한 것처럼 튜링 기계는 테이프(메모리), 헤드(접근 위치), 상태(프로그램 카운터), 규칙(프로그램)이라는 최소 구성으로 모든 계산을 표현합니다. 이보다 더 강력한 계산 모델은 알려져 있지 않으며(처치-튜링 논제), 따라서 어떤 프로그래밍 언어든 계산 능력은 동일합니다.
 - **정지 문제처럼 원리적으로 풀 수 없는 문제는 무엇을 의미할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 완벽한 정적 분석기, 완벽한 바이러스 탐지기, 두 프로그램이 같은 결과를 내는지 판정하는 도구는 원리적으로 만들 수 없습니다. 그래서 실무에서는 타임아웃, 테스트, 휴리스틱 같은 근사적 접근을 조합하여 "충분히 좋은" 수준의 검증을 달성합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -310,5 +487,6 @@ dis.dis(add)
 - [Stanford Encyclopedia of Philosophy — The Church-Turing Thesis](https://plato.stanford.edu/entries/church-turing/)
 - [SICP — Structure and Interpretation of Computer Programs](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book.html)
 - [Programming Paradigms for Dummies (Peter Van Roy)](https://www.info.ucl.ac.be/~pvr/VanRoyChapter.pdf)
+- [이 시리즈의 예제 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/computer-science-101/ko)
 
 Tags: Computer Science, 계산 모델, 튜링 기계, 프로그래밍 패러다임, 컴파일러, 인터프리터

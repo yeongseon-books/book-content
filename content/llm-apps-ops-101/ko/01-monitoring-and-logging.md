@@ -20,7 +20,9 @@ seo_description: LLM 호출 한 건을 나중에 복원할 수 있는 로그 구
 
 # LLM Apps Ops 101 (1/6): LLM 앱 모니터링과 로깅
 
-LLM 앱이 데모를 넘어 실제 트래픽을 받기 시작하면, 가장 먼저 드러나는 문제는 장애 자체보다도 “이 요청에서 정확히 무슨 일이 있었지?”를 다시 설명하지 못하는 상태입니다. 이 글은 LLM Apps Ops 101 시리즈의 첫 번째 글입니다. 여기서는 요청 한 건의 지연 시간, 토큰 사용량, 디버깅 맥락을 나중에 한 번에 복원할 수 있도록, 모니터링과 로깅의 최소 기준을 어디서부터 세워야 하는지 정리하겠습니다.
+이 글은 LLM Apps Ops 101 시리즈의 첫 번째 글입니다.
+
+LLM 앱이 데모를 넘어 실제 트래픽을 받기 시작하면, 가장 먼저 드러나는 문제는 장애 자체보다도 “이 요청에서 정확히 무슨 일이 있었지?”를 다시 설명하지 못하는 상태입니다. 여기서는 요청 한 건의 지연 시간, 토큰 사용량, 디버깅 맥락을 나중에 한 번에 복원할 수 있도록, 모니터링과 로깅의 최소 기준을 어디서부터 세워야 하는지 정리하겠습니다.
 
 보통 API 운영에서는 상태 코드와 응답 시간만으로도 출발할 수 있습니다. 하지만 LLM 앱은 같은 200 응답이어도 토큰 사용량이 크게 다를 수 있고, 응답 길이만 이상해도 바로 품질 문제로 이어질 수 있습니다. 그래서 관측 가능성의 출발점은 예쁜 대시보드가 아니라, 호출 한 건을 다시 설명할 수 있는 로그 레코드입니다.
 
@@ -164,6 +166,58 @@ if __name__ == "__main__":
 
 이 예제의 핵심은 로깅 라이브러리 사용법 자체가 아닙니다. 더 중요한 점은 요청 시작 시점과 응답 완료 시점에 어떤 정보를 남겨야 나중 질문에 답할 수 있는가입니다. `latency_ms`, `model`, `prompt_preview`, `response_preview`, `total_tokens`가 한 구조 안에 있으면 “왜 느렸지?”, “왜 비쌌지?”, “무슨 답이 나왔지?”를 같은 출처에서 다시 볼 수 있습니다.
 
+
+## 운영 대시보드를 설계할 때 먼저 고정할 축
+
+모니터링 대시보드는 예쁘게 만드는 순간보다, 어떤 질문에 답할지 먼저 고정하는 순간부터 가치가 생깁니다. LLM 운영에서 가장 자주 반복되는 질문은 대체로 세 가지입니다. 첫째, 지금 응답 지연이 어느 구간에서 늘었는가입니다. 둘째, 비용이 어떤 엔드포인트와 어떤 모델 조합에서 튀는가입니다. 셋째, 품질 저하가 특정 사용자군이나 프롬프트 버전과 연결되는가입니다.
+
+이 세 질문에 답하려면 패널도 세 축으로 나누는 편이 좋습니다. `지연 시간 축`, `토큰/비용 축`, `품질 축`입니다. 지연 시간 축에는 `p50`, `p95`, `p99`를 최소로 두고, 모델 호출 전처리 시간과 provider 응답 시간을 분리해 보여 줍니다. 토큰/비용 축에는 `input_tokens`, `output_tokens`, `estimated_cost_usd`를 요청수 대비 함께 표시합니다. 품질 축에는 길이 실패율, 스키마 실패율, 핵심 키워드 누락률처럼 빠르게 계산 가능한 지표를 둡니다.
+
+현업에서는 이 세 축을 각각 따로 보는 시간이 길어질수록 원인 파악이 늦어집니다. 예를 들어 p95 지연이 오르는 시점에 output token도 같이 늘었다면 모델 출력 길이 변화가 지연의 주원인일 수 있습니다. 반대로 지연은 안정적인데 비용만 오르면 입력 프롬프트가 장황해졌거나 캐시 히트율이 떨어졌을 가능성이 큽니다. 그래서 대시보드의 진짜 목적은 보기 좋은 시각화가 아니라, 서로 다른 운영 신호를 같은 시간축에 겹쳐 읽을 수 있게 만드는 데 있습니다.
+
+### 요청 단위 로그를 패널 단위 집계로 연결하는 예시
+
+```python
+from collections import defaultdict
+from statistics import median
+
+def build_dashboard_buckets(records: list[dict]) -> dict:
+    buckets = defaultdict(list)
+    for row in records:
+        key = (row["route"], row["model"], row["prompt_version"])
+        buckets[key].append(row)
+
+    panels = {}
+    for key, rows in buckets.items():
+        latencies = sorted(r["latency_ms"] for r in rows)
+        in_tokens = sum(r["input_tokens"] for r in rows)
+        out_tokens = sum(r["output_tokens"] for r in rows)
+        total_cost = round(sum(r["estimated_cost_usd"] for r in rows), 6)
+        schema_fail = sum(1 for r in rows if not r["schema_ok"])
+
+        p95_index = max(0, int(len(latencies) * 0.95) - 1)
+        panels[str(key)] = {
+            "request_count": len(rows),
+            "latency_p50_ms": median(latencies),
+            "latency_p95_ms": latencies[p95_index],
+            "input_tokens_total": in_tokens,
+            "output_tokens_total": out_tokens,
+            "cost_total_usd": total_cost,
+            "schema_fail_rate": round(schema_fail / len(rows), 4),
+        }
+    return panels
+```
+
+이 코드는 화려하지 않지만 운영에서 바로 쓸 수 있는 기준을 담고 있습니다. `route + model + prompt_version`을 묶음 키로 삼으면, 대시보드에서 어느 버전의 프롬프트가 지연과 비용을 동시에 흔드는지 빠르게 확인할 수 있습니다. 이후 Datadog, Grafana, BigQuery 어느 쪽으로 옮겨도 같은 집계 로직을 재사용하기 쉽습니다.
+
+## 프롬프트 버전 관리를 로그 계약으로 올리기
+
+LLM 서비스에서 "어제랑 오늘 응답이 다르다"라는 보고는 흔합니다. 문제는 이 차이가 모델 버전 때문인지, 시스템 프롬프트 수정 때문인지, few-shot 예시 교체 때문인지 분리하기 어렵다는 점입니다. 그래서 프롬프트 버전 문자열은 선택 필드가 아니라 운영 계약 필드로 취급해야 합니다.
+
+가장 실용적인 방식은 배포 단위마다 `prompt_version`을 올리고, 요청마다 `prompt_version`, `model`, `temperature`, `max_tokens`를 함께 기록하는 것입니다. 이렇게 하면 비용 급증, 지연 증가, 품질 저하를 프롬프트 변경과 연결해 회귀 분석할 수 있습니다. 특히 A/B 실험을 할 때는 `experiment_group`를 추가해 실험군별 실패율과 비용을 분리하는 편이 안전합니다.
+
+프롬프트 버전은 Git 태그와 1:1로 매핑하면 운영 가시성이 더 좋아집니다. 예를 들어 `prompt_version=v2026.05.20-briefing`처럼 날짜와 목적을 넣고, 릴리스 노트에 변경 의도를 남기면 장애 회고에서 설명 비용이 크게 줄어듭니다. 로그가 충분히 쌓이면 "어떤 프롬프트가 비싸지만 품질이 높았는지" 같은 trade-off도 숫자로 이야기할 수 있습니다.
+
 ## 어디서 자주 헷갈릴까요?
 
 ![메트릭과 로그가 함께 실패 범위를 좁히는 구조](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/01/01-03-where-engineers-get-confused.ko.png)
@@ -176,12 +230,37 @@ if __name__ == "__main__":
 
 실무에서 특히 자주 나오는 오해는 “로그만 잘 남기면 observability가 끝난다”는 생각입니다. 실제로는 메트릭이 먼저 이상 징후를 보여 주고, 로그가 그 원인을 설명합니다. 평균 지연 시간만 보면 멀쩡한데 P95가 급등하는 상황은 메트릭이 먼저 알려 주고, 그 뒤에 어떤 요청이 길어졌는지는 로그가 설명하는 식입니다.
 
+
+## 장애 대응용 질의 템플릿을 미리 준비하기
+
+로그와 대시보드가 있어도, 실제 장애 상황에서 무엇을 먼저 조회할지 정해져 있지 않으면 대응 속도가 느려집니다. 그래서 운영팀은 "질의 템플릿"을 사전에 문서화해 두는 편이 좋습니다. 예를 들어 "지난 30분 동안 p95 지연이 2배 이상 증가한 request_id 목록", "비용 상위 20개 요청과 공통 prompt_version", "schema_fail가 발생한 사용자 세그먼트" 같은 쿼리를 미리 준비해 두면, 문제 발생 시 즉시 같은 언어로 대화할 수 있습니다.
+
+이 템플릿은 SQL이든 로그 탐색 쿼리든 형식이 중요하지 않습니다. 중요한 점은 질문이 고정되어 있어야 한다는 것입니다. 질문이 고정되면 필요한 로그 필드도 역으로 고정되고, 결과적으로 계측 품질이 안정됩니다.
+
+### 운영 회고에서 자주 쓰는 질의 예시
+
+- 같은 `prompt_version`에서 `latency_p95_ms`가 급증한 시간대는 언제였는가
+- `estimated_cost_usd` 상위 요청은 어떤 route에서 발생했는가
+- `schema_ok=false`가 특정 모델에서 집중되는가
+- `output_tokens` 급증이 특정 고객 티어와 연결되는가
+
+이 네 가지 질문에 10분 안에 답할 수 있으면 모니터링 체계는 꽤 성숙한 편입니다. 반대로 이 질문에 답하려고 로그 구조를 먼저 뜯어고쳐야 한다면, 대시보드보다 로그 계약부터 다시 정리하는 편이 맞습니다.
+
 ## 체크리스트
 
 - [ ] 항상 `request_id`, `model`, `latency_ms`, `total_tokens`를 남긴다
 - [ ] 기본값은 전체 답변이 아니라 preview 로깅으로 둔다
 - [ ] 성공 이벤트와 실패 이벤트를 같은 스키마로 유지한다
 - [ ] 평균 지연 시간과 별도로 P95 지연 시간을 추적한다
+
+
+## 운영 리뷰 미팅에서 로그를 읽는 실전 순서
+
+주간 운영 리뷰에서는 데이터가 많을수록 오히려 결론이 흐려질 수 있습니다. 그래서 읽는 순서를 고정하는 편이 좋습니다. 첫 단계에서는 지연 시간과 오류 비율의 거시 지표를 확인합니다. 둘째 단계에서는 비용 신호를 겹쳐 보며, 트래픽 변화 대비 비용이 비정상적으로 커졌는지 확인합니다. 셋째 단계에서는 품질 지표와 프롬프트 버전을 연결해 회귀 가능성을 점검합니다. 마지막 단계에서만 샘플 로그를 열어 구체 사례를 읽습니다.
+
+이 순서가 중요한 이유는, 처음부터 개별 로그를 읽기 시작하면 국소적인 이상에 시선을 빼앗기기 쉽기 때문입니다. 반대로 거시 지표에서 좁혀 들어가면, 팀이 같은 맥락에서 원인을 논의할 수 있습니다.
+
+리뷰 결과는 "관찰", "가설", "실험" 세 칸으로 기록하는 것을 권장합니다. 예를 들어 "관찰: p95 상승 + output token 증가", "가설: 프롬프트 버전 v2026.05.20이 장문 응답을 유도", "실험: 출력 길이 제한과 지시문 간소화 적용"처럼 남깁니다. 이렇게 기록해 두면 다음 주에 동일 구조로 효과를 비교할 수 있습니다.
 
 ## 정리
 
@@ -290,6 +369,12 @@ alerts:
   - 필드 이름과 타입이 고정된 JSON 로그가 가장 오래 버팁니다. 저장소가 바뀌어도 스키마와 request_id가 유지되면 분석을 이어갈 수 있습니다.
 
 <!-- toc:begin -->
+
+## 운영 적용 메모
+
+모니터링 체계는 도입보다 유지가 어렵습니다. 그래서 팀에서 분기마다 로그 스키마와 대시보드 패널을 점검하는 시간을 확보해야 합니다. 새 기능이 들어오면 route, prompt_version, 평가 상태를 빠뜨리지 않고 기록하는지 확인하고, 더 이상 쓰지 않는 지표는 과감히 제거해 신호 대 잡음비를 유지합니다.
+
+
 ## 시리즈 목차
 
 - **LLM Apps Ops 101 (1/6): LLM 앱 모니터링과 로깅 (현재 글)**
@@ -305,6 +390,7 @@ alerts:
 
 ## 참고 자료
 
+- [LLM Apps Ops 101 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/llm-apps-ops-101/ko)
 - [Groq API Reference](https://console.groq.com/docs/api-reference)
 - [Python logging cookbook](https://docs.python.org/3/howto/logging-cookbook.html)
 - [OpenTelemetry Python](https://opentelemetry.io/docs/instrumentation/python/)

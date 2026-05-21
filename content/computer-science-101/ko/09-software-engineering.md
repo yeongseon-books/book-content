@@ -227,6 +227,260 @@ jobs:
 
 또한 완벽함보다 변경 가능성을 높게 둡니다. 모든 미래를 한 번에 설계하려 하기보다, 작게 배포하고 안전하게 고칠 수 있는 구조를 만듭니다. 테스트와 리뷰는 그 전략을 가능하게 하는 안전망입니다.
 
+
+### 테스팅 피라미드와 실전 비율
+
+테스트를 계층별로 나누어 비용과 신뢰도를 균형 잡습니다.
+
+```text
+          ╱╲
+         ╱  ╲         E2E 테스트 (5-10%)
+        ╱    ╲        - 느림, 불안정, 비싸지만 사용자 시나리오 검증
+       ╱──────╲
+      ╱        ╲      통합 테스트 (15-25%)
+     ╱          ╲     - DB, API 경계 검증, 중간 속도
+    ╱────────────╲
+   ╱              ╲   단위 테스트 (65-80%)
+  ╱                ╲  - 빠름, 안정적, 로직 검증
+ ╱──────────────────╲
+```
+
+| 계층 | 실행 시간 | 유지 비용 | 검증 범위 | 실패 원인 특정 |
+|------|-----------|-----------|-----------|---------------|
+| 단위 | ms | 낮음 | 함수/클래스 | 정확함 |
+| 통합 | 초 | 중간 | 모듈 경계 | 보통 |
+| E2E | 분 | 높음 | 전체 시스템 | 어려움 |
+
+```python
+# pytest를 사용한 테스트 계층 예시
+
+# 단위 테스트 — 외부 의존성 없음
+def calculate_discount(price: float, rate: float) -> float:
+    if rate < 0 or rate > 1:
+        raise ValueError("rate must be between 0 and 1")
+    return round(price * (1 - rate), 2)
+
+def test_calculate_discount():
+    assert calculate_discount(10000, 0.1) == 9000.0
+    assert calculate_discount(10000, 0) == 10000.0
+    assert calculate_discount(10000, 1) == 0.0
+
+def test_calculate_discount_invalid():
+    import pytest
+    with pytest.raises(ValueError):
+        calculate_discount(10000, 1.5)
+
+# 통합 테스트 — DB 연동 확인
+def test_create_order(db_session):
+    """주문 생성이 DB에 올바르게 반영되는지 확인합니다."""
+    order = create_order(db_session, user_id=1, items=[
+        {"product_id": 10, "quantity": 2, "price": 5000},
+    ])
+    assert order.id is not None
+    assert order.total == 10000
+
+    # DB에서 다시 읽어 확인
+    saved = db_session.query(Order).get(order.id)
+    assert saved.total == 10000
+    assert len(saved.items) == 1
+```
+
+### CI/CD 파이프라인 구성
+
+코드 변경이 운영에 도달하기까지의 자동화된 관문을 정리합니다.
+
+```text
+개발자 push → [Lint + Format] → [단위 테스트] → [통합 테스트]
+                                                      │
+                                                      ▼
+[코드 리뷰] ← PR 생성 ←──────────── 모든 체크 통과
+     │
+     ▼ (승인)
+[스테이징 배포] → [E2E 테스트] → [성능 테스트]
+                                      │
+                                      ▼ (통과)
+                              [프로덕션 배포]
+                                      │
+                                      ▼
+                              [모니터링 + 알림]
+                              (에러율 > 1% → 자동 롤백)
+```
+
+```yaml
+# GitHub Actions CI 파이프라인 예시
+name: CI
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: test
+          POSTGRES_PASSWORD: test
+        ports: ["5432:5432"]
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Lint
+        run: |
+          ruff check .
+          ruff format --check .
+
+      - name: Unit tests
+        run: pytest tests/unit/ -v --cov=src --cov-report=xml
+
+      - name: Integration tests
+        run: pytest tests/integration/ -v
+        env:
+          DATABASE_URL: postgresql://postgres:test@localhost:5432/test
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+```
+
+### Git 브랜치 전략
+
+| 전략 | 특징 | 적합한 팀 |
+|------|------|-----------|
+| GitHub Flow | main + feature 브랜치, 단순함 | 소규모, 빈번한 배포 |
+| Git Flow | develop + release + hotfix, 체계적 | 정기 릴리스 |
+| Trunk-based | 짧은 수명 브랜치, feature flag | 대규모, CI/CD 성숙 |
+
+```bash
+# GitHub Flow 기본 워크플로
+git checkout -b feature/add-discount-api
+# ... 코드 작성 ...
+git add -A
+git commit -m "feat: add discount calculation endpoint"
+git push -u origin feature/add-discount-api
+# → PR 생성 → 리뷰 → Squash merge → 브랜치 삭제
+```
+
+커밋 메시지 규칙 (Conventional Commits):
+
+```text
+<type>(<scope>): <description>
+
+feat:     새 기능 추가
+fix:      버그 수정
+refactor: 동작 변경 없는 코드 개선
+test:     테스트 추가/수정
+docs:     문서 변경
+chore:    빌드/도구 변경
+```
+
+### 기술 부채 관리
+
+기술 부채는 의도적 선택(시간 압박으로 단순 구현)과 비의도적 축적(설계 미숙)으로 나뉩니다.
+
+| 유형 | 예시 | 상환 전략 |
+|------|------|-----------|
+| 의도적-신중 | "지금은 하드코딩, 다음 스프린트에서 설정으로 분리" | 백로그에 기록, 기한 설정 |
+| 의도적-무모 | "테스트 없이 배포, 나중에 추가" | 즉시 상환 (사고 발생 전) |
+| 비의도적-신중 | "설계 후 더 나은 방법을 깨달음" | 리팩터링 스프린트 |
+| 비의도적-무모 | "레이어 구분 없이 작성" | 교육 + 점진적 재작성 |
+
+기술 부채를 정량화하는 지표: 코드 복잡도(Cyclomatic Complexity), 테스트 커버리지, 빌드 시간, 배포 빈도, 변경 실패율(DORA metrics).
+
+### 코드 리뷰 실전 가이드
+
+효과적인 코드 리뷰는 단순한 스타일 지적이 아니라 설계 결함과 운영 위험을 사전에 발견하는 과정입니다.
+
+리뷰어가 확인해야 할 체크포인트:
+
+| 관점 | 질문 | 예시 |
+|------|------|------|
+| 정확성 | 요구사항을 정확히 구현했는가? | 경계값 처리, null 케이스 |
+| 성능 | N+1 쿼리, 불필요한 루프는 없는가? | ORM lazy loading 주의 |
+| 보안 | SQL 인젝션, XSS, 인증 우회 가능성? | 파라미터 바인딩 확인 |
+| 유지보수 | 6개월 후 다른 사람이 이해할 수 있는가? | 함수명, 주석, 모듈 경계 |
+| 테스트 | 핵심 경로에 대한 테스트가 있는가? | happy path + error path |
+| 운영 | 롤백 가능한가? 모니터링 가능한가? | 로그, 메트릭, feature flag |
+
+```python
+# 리뷰에서 자주 지적되는 패턴 예시
+
+# Bad: 암묵적 동작, 디버깅 어려움
+def process(data):
+    result = []
+    for item in data:
+        if item.get("status") != "deleted":
+            result.append(transform(item))
+    return result
+
+# Good: 의도가 명확, 테스트 용이
+def filter_active_items(items: list[dict]) -> list[dict]:
+    """삭제되지 않은 항목만 필터링합니다."""
+    return [item for item in items if item.get("status") != "deleted"]
+
+def process_items(items: list[dict]) -> list[dict]:
+    """활성 항목을 변환합니다."""
+    active = filter_active_items(items)
+    return [transform(item) for item in active]
+```
+
+### 리팩터링 안전 패턴
+
+리팩터링은 외부 동작을 바꾸지 않으면서 내부 구조를 개선하는 작업입니다. 안전하게 수행하는 단계:
+
+1. **테스트 확보**: 변경할 코드의 현재 동작을 테스트로 고정합니다
+2. **작은 단위로 변경**: 한 번에 하나의 리팩터링만 적용합니다
+3. **매 단계 테스트 실행**: 초록불을 유지하면서 진행합니다
+4. **커밋 분리**: 기능 변경과 리팩터링을 같은 커밋에 섞지 않습니다
+
+자주 사용하는 리팩터링 기법:
+
+| 기법 | 적용 상황 | 효과 |
+|------|-----------|------|
+| Extract Function | 긴 함수의 일부를 분리 | 재사용성, 테스트 용이 |
+| Rename | 의미를 드러내지 않는 이름 | 가독성 향상 |
+| Replace Temp with Query | 임시 변수가 여러 줄에 걸침 | 의도 명확화 |
+| Introduce Parameter Object | 파라미터가 3개 이상 | 인터페이스 단순화 |
+| Replace Conditional with Polymorphism | 타입별 분기가 반복 | OCP 준수 |
+
+```python
+# Extract Function 예시
+
+# Before: 한 함수에 여러 책임이 섞여 있음
+def generate_report(orders: list[dict]) -> str:
+    # 필터링
+    valid = [o for o in orders if o["status"] == "completed"]
+    # 집계
+    total = sum(o["amount"] for o in valid)
+    count = len(valid)
+    avg = total / count if count else 0
+    # 포맷팅
+    return f"주문 {count}건, 총액 {total:,}원, 평균 {avg:,.0f}원"
+
+# After: 각 단계를 독립 함수로 분리
+def filter_completed(orders: list[dict]) -> list[dict]:
+    return [o for o in orders if o["status"] == "completed"]
+
+def summarize_orders(orders: list[dict]) -> dict:
+    total = sum(o["amount"] for o in orders)
+    count = len(orders)
+    return {"total": total, "count": count, "avg": total / count if count else 0}
+
+def format_summary(summary: dict) -> str:
+    return (f"주문 {summary['count']}건, "
+            f"총액 {summary['total']:,}원, "
+            f"평균 {summary['avg']:,.0f}원")
+
+def generate_report(orders: list[dict]) -> str:
+    completed = filter_completed(orders)
+    summary = summarize_orders(completed)
+    return format_summary(summary)
+```
 ## 체크리스트
 
 - [ ] 새 함수를 추가할 때 테스트도 함께 추가하는가
@@ -278,12 +532,11 @@ jobs:
 ## 처음 질문으로 돌아가기
 
 - **코딩과 소프트웨어 엔지니어링의 차이는 어디에서 생길까요?**
-  - 본문의 기준은 소프트웨어 엔지니어링를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 코딩은 한 사람이 한 시점에 코드를 작성하는 행위이고, 소프트웨어 엔지니어링은 여러 사람이 오랜 기간 코드를 유지·변경·운영하는 체계입니다. 테스트, 코드 리뷰, CI/CD, 기술 부채 관리가 그 체계를 구성합니다.
 - **테스트는 왜 변경을 안전하게 만드는 최소 장치일까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 테스트가 있으면 코드를 수정한 뒤 기존 동작이 깨지지 않았음을 초 단위로 확인할 수 있습니다. 테스트 없이는 수동 검증에 의존해 변경 주기가 길어지고, 회귀 버그가 누적됩니다.
 - **Git 기반 협업 흐름은 어떤 단위와 습관으로 유지될까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
-
+  - 하나의 논리적 변경을 하나의 커밋/PR로 만들고, 자동화된 CI 체크를 통과한 뒤 리뷰를 거쳐 머지합니다. Conventional Commits로 변경 유형을 명시하고, feature branch를 짧게 유지해 충돌을 줄입니다.
 <!-- toc:begin -->
 ## 시리즈 목차
 
@@ -307,4 +560,5 @@ jobs:
 - [pytest — Documentation](https://docs.pytest.org/)
 - [Pro Git — Scott Chacon (무료)](https://git-scm.com/book/en/v2)
 
+- [이 시리즈의 예제 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/computer-science-101/ko)
 Tags: Computer Science, 소프트웨어 엔지니어링, 테스트, 버전 관리, 코드 리뷰, 리팩터링

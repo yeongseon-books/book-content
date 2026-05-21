@@ -456,6 +456,158 @@ registry:
 
 이 게이트가 있어야 파이프라인 자동화가 단순 스케줄러를 넘어 품질 방어선 역할을 합니다.
 
+
+## DVC 파이프라인과 학습 통합
+
+Airflow 같은 오케스트레이터 없이도, DVC 파이프라인만으로 재현 가능한 학습 흐름을 만들 수 있습니다. 규모가 작은 팀에서는 이 방식이 더 가볍습니다.
+
+### `dvc.yaml` 학습 파이프라인
+
+```yaml
+stages:
+  prepare:
+    cmd: python src/prepare.py --config params.yaml
+    deps:
+      - src/prepare.py
+      - data/raw/
+    params:
+      - params.yaml:
+          - data.sample_rate
+          - data.random_seed
+    outs:
+      - data/prepared/
+
+  train:
+    cmd: python src/train.py --config params.yaml
+    deps:
+      - src/train.py
+      - data/prepared/
+    params:
+      - params.yaml:
+          - model.algorithm
+          - model.n_estimators
+          - model.max_depth
+    outs:
+      - artifacts/model.pkl
+    metrics:
+      - reports/train_metrics.json:
+          cache: false
+
+  evaluate:
+    cmd: python src/evaluate.py --model artifacts/model.pkl --data data/prepared/test.parquet
+    deps:
+      - src/evaluate.py
+      - artifacts/model.pkl
+      - data/prepared/test.parquet
+    metrics:
+      - reports/eval_metrics.json:
+          cache: false
+```
+
+### `params.yaml` 분리
+
+```yaml
+data:
+  sample_rate: 1.0
+  random_seed: 42
+
+model:
+  algorithm: random_forest
+  n_estimators: 200
+  max_depth: 8
+  min_samples_leaf: 5
+```
+
+파라미터를 코드에서 분리하면 실험을 바꿀 때 코드를 수정하지 않아도 됩니다. `dvc params diff`로 어떤 파라미터가 바뀌었는지 즉시 확인할 수 있습니다.
+
+### 파이프라인 재현과 캐싱
+
+```bash
+# 전체 재현
+dvc repro
+
+# 특정 단계만
+dvc repro train
+
+# 변경된 것 없으면 캐시 사용
+# "Stage 'train' didn't change, skipping"
+```
+
+DVC는 각 단계의 입력 해시를 비교해, 바뀐 부분만 다시 실행합니다. 대용량 데이터 전처리가 이미 끝났다면 학습만 다시 돌릴 수 있어 시간과 비용을 크게 줄입니다.
+
+## 파이프라인 오류 처리 패턴
+
+운영 파이프라인에서 가장 중요한 것은 실패했을 때 어떻게 대응하느냐입니다. 아래 패턴은 단계별 실패를 구조적으로 처리합니다.
+
+```python
+import logging
+import traceback
+from dataclasses import dataclass
+from typing import Callable
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass
+class StageResult:
+    name: str
+    success: bool
+    output_path: str | None = None
+    error: str | None = None
+
+
+def run_stage(name: str, fn: Callable, retries: int = 2) -> StageResult:
+    for attempt in range(retries + 1):
+        try:
+            output = fn()
+            logger.info(f"Stage '{name}' succeeded on attempt {attempt + 1}")
+            return StageResult(name=name, success=True, output_path=output)
+        except Exception as e:
+            logger.warning(f"Stage '{name}' attempt {attempt + 1} failed: {e}")
+            if attempt == retries:
+                return StageResult(
+                    name=name,
+                    success=False,
+                    error=traceback.format_exc(),
+                )
+    return StageResult(name=name, success=False, error="Unknown")
+```
+
+이 패턴의 핵심은 재시도 횟수를 정하고, 최종 실패 시 에러 정보를 구조화해 남기는 것입니다. 알림 시스템과 연결하면 야간 배치 실패를 아침에 바로 파악할 수 있습니다.
+
+## 파이프라인 관측성 메트릭
+
+```python
+import time
+from prometheus_client import Histogram, Counter
+
+STAGE_DURATION = Histogram(
+    "pipeline_stage_duration_seconds",
+    "Duration of each pipeline stage",
+    ["stage_name"],
+)
+STAGE_FAILURES = Counter(
+    "pipeline_stage_failures_total",
+    "Number of stage failures",
+    ["stage_name"],
+)
+
+
+def timed_stage(name: str, fn: Callable):
+    start = time.time()
+    try:
+        result = fn()
+        STAGE_DURATION.labels(stage_name=name).observe(time.time() - start)
+        return result
+    except Exception:
+        STAGE_FAILURES.labels(stage_name=name).inc()
+        raise
+```
+
+파이프라인 각 단계의 실행 시간과 실패 횟수를 메트릭으로 남기면, 어떤 단계가 병목인지, 어떤 단계가 자주 실패하는지 대시보드에서 바로 볼 수 있습니다.
+
+운영 환경에서는 이 메트릭을 Grafana 대시보드와 연결해 알림 조건을 설정합니다. 예를 들어 `pipeline_stage_duration_seconds{stage_name="train"}` 값이 SLA 임계치(예: 3600초)를 초과하면 Slack 알림을 보내도록 구성할 수 있습니다. 이렇게 하면 야간 배치 파이프라인이 예상보다 오래 걸릴 때 담당자가 즉시 인지할 수 있습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **학습 스크립트 하나를 여러 단계 파이프라인으로 나누는 이유는 무엇일까요?**
@@ -482,6 +634,8 @@ registry:
 <!-- toc:end -->
 
 ## 참고 자료
+
+- [예제 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/mlops-101/ko)
 
 - [Apache Airflow](https://airflow.apache.org/docs/)
 - [Prefect](https://docs.prefect.io/)

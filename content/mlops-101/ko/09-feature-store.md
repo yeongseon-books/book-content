@@ -442,6 +442,154 @@ def load_online_features(user_id: int) -> dict:
 
 피처 이름 집합이 학습과 서빙에서 동일하게 유지되면, 성능 하락 시 문제 원인을 모델과 피처 중 어디에서 먼저 볼지 훨씬 빠르게 좁힐 수 있습니다.
 
+
+## Feast 피처 정의 상세 예시
+
+Feast에서 피처를 정의할 때는 엔티티, 데이터 소스, 피처 뷰, 피처 서비스 네 가지 구성 요소를 이해해야 합니다.
+
+```python
+from feast import Entity, FeatureView, Field, FileSource, FeatureService
+from feast.types import Float32, Int64, String
+from datetime import timedelta
+
+# 1. 엔티티 정의 — 피처를 조회할 때 사용하는 키
+customer = Entity(
+    name="customer_id",
+    join_keys=["customer_id"],
+    description="고객 고유 식별자",
+)
+
+# 2. 데이터 소스 — 피처 값이 저장된 곳
+customer_source = FileSource(
+    path="data/customer_features.parquet",
+    timestamp_field="event_timestamp",
+    created_timestamp_column="created_timestamp",
+)
+
+# 3. 피처 뷰 — 피처 그룹과 메타데이터
+customer_features = FeatureView(
+    name="customer_features",
+    entities=[customer],
+    ttl=timedelta(days=7),
+    schema=[
+        Field(name="total_purchases", dtype=Int64),
+        Field(name="avg_order_value", dtype=Float32),
+        Field(name="days_since_last_order", dtype=Int64),
+        Field(name="preferred_category", dtype=String),
+        Field(name="lifetime_value", dtype=Float32),
+    ],
+    source=customer_source,
+    online=True,
+    tags={"team": "ml-platform", "version": "v2"},
+)
+
+# 4. 피처 서비스 — 모델별로 필요한 피처를 묶음
+fraud_detection_service = FeatureService(
+    name="fraud_detection_features",
+    features=[customer_features],
+    description="사기 탐지 모델에 필요한 피처 묶음",
+)
+```
+
+`ttl=timedelta(days=7)`은 7일 이상 지난 피처 값은 온라인 스토어에서 제거한다는 뜻입니다. TTL을 너무 짧게 잡으면 조회 시 null이 반환되고, 너무 길게 잡으면 오래된 값으로 추론하게 됩니다.
+
+## 피처 검증과 스키마 진화
+
+피처 스토어를 운영하다 보면 피처 스키마가 바뀌는 경우가 생깁니다. 새 피처를 추가하거나, 기존 피처의 타입을 변경하거나, 더 이상 사용하지 않는 피처를 제거해야 합니다.
+
+```python
+from great_expectations.core import ExpectationSuite, ExpectationConfiguration
+import great_expectations as gx
+
+
+def create_feature_validation_suite(feature_view_name: str) -> ExpectationSuite:
+    """피처 뷰에 대한 데이터 품질 검증 스위트를 생성합니다."""
+    suite = ExpectationSuite(expectation_suite_name=f"{feature_view_name}_validation")
+
+    # null 비율 검증
+    suite.add_expectation(
+        ExpectationConfiguration(
+            expectation_type="expect_column_values_to_not_be_null",
+            kwargs={"column": "customer_id"},
+        )
+    )
+
+    # 값 범위 검증
+    suite.add_expectation(
+        ExpectationConfiguration(
+            expectation_type="expect_column_values_to_be_between",
+            kwargs={
+                "column": "avg_order_value",
+                "min_value": 0,
+                "max_value": 100000,
+            },
+        )
+    )
+
+    # 고유값 비율 검증
+    suite.add_expectation(
+        ExpectationConfiguration(
+            expectation_type="expect_column_proportion_of_unique_values_to_be_between",
+            kwargs={
+                "column": "customer_id",
+                "min_value": 0.99,
+                "max_value": 1.0,
+            },
+        )
+    )
+
+    return suite
+```
+
+이 검증을 피처 적재 파이프라인에 넣으면, 잘못된 값이 온라인 스토어에 들어가는 것을 막을 수 있습니다. 특히 `avg_order_value`가 음수이거나 비현실적으로 큰 값이면 업스트림 ETL에 문제가 있다는 신호입니다.
+
+## 온라인/오프라인 일관성 검증
+
+피처 스토어의 핵심 약속은 "학습 시점과 서빙 시점에 같은 피처 값을 제공한다"는 것입니다. 이 약속이 깨지면 training-serving skew가 발생합니다.
+
+```python
+import numpy as np
+from feast import FeatureStore
+
+
+def validate_online_offline_consistency(
+    store: FeatureStore,
+    entity_ids: list[dict],
+    feature_service_name: str,
+    tolerance: float = 0.01,
+) -> dict:
+    """온라인과 오프라인 피처 값의 일관성을 검증합니다."""
+    # 온라인 조회
+    online_features = store.get_online_features(
+        features=store.get_feature_service(feature_service_name),
+        entity_rows=entity_ids,
+    ).to_dict()
+
+    # 오프라인 조회 (같은 시점)
+    offline_features = store.get_historical_features(
+        features=store.get_feature_service(feature_service_name),
+        entity_df=create_entity_df(entity_ids),
+    ).to_df()
+
+    mismatches = []
+    for col in online_features:
+        if col in ("customer_id", "event_timestamp"):
+            continue
+        online_vals = np.array(online_features[col])
+        offline_vals = offline_features[col].values
+        diff = np.abs(online_vals - offline_vals).max()
+        if diff > tolerance:
+            mismatches.append({"feature": col, "max_diff": float(diff)})
+
+    return {
+        "consistent": len(mismatches) == 0,
+        "mismatches": mismatches,
+        "checked_features": len(online_features) - 2,
+    }
+```
+
+이 검증을 주기적으로 실행하면 training-serving skew를 조기에 발견할 수 있습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **학습-서빙 불일치는 왜 자꾸 반복될까요?**
@@ -468,6 +616,8 @@ def load_online_features(user_id: int) -> dict:
 <!-- toc:end -->
 
 ## 참고 자료
+
+- [예제 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/mlops-101/ko)
 
 - [Feast documentation](https://docs.feast.dev/)
 - [Tecton — feature platforms](https://www.tecton.ai/blog/)

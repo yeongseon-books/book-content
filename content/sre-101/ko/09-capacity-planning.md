@@ -612,5 +612,6 @@ capacity planning은 미래 수요와 공급을 숫자로 맞추는 작업입니
 - [Capacity Planning - High Scalability](http://highscalability.com/blog/category/capacity-planning)
 - [The Art of Capacity Planning - O'Reilly](https://www.oreilly.com/library/view/the-art-of/9780596518578/)
 - [Load Testing - Grafana k6](https://grafana.com/docs/k6/latest/)
+- [SRE 101 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/sre-101/ko)
 
 Tags: SRE, CapacityPlanning, Forecasting, Performance, Operations

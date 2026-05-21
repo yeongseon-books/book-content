@@ -248,6 +248,157 @@ print("bayesian: updated belief")
 - 가능도: 0 이상, 합 제약 없음, 상대적 비교만 의미 있음
 
 머신러닝에서 최대가능도 추정(MLE)은 관찰된 데이터를 가장 잘 설명하는 파라미터를 찾는 방법입니다. 확률과 가능도를 혼동하면 모델 해석을 잘못하게 됩니다.
+
+## 몬테카를로 시뮬레이션으로 확률 추정하기
+
+빈도주의 관점을 극대화한 방법이 몬테카를로 시뮬레이션입니다. 해석적으로 풀기 어려운 확률도, 충분히 반복하면 비율로 추정할 수 있습니다.
+
+### 원의 넓이로 π 추정하기
+
+정사각형 안에 무작위로 점을 찍고, 내접 원 안에 들어간 비율로 π를 추정하는 예시입니다.
+
+```python
+import random
+
+def estimate_pi(n_samples: int) -> float:
+    """몬테카를로로 π 추정"""
+    inside = 0
+    for _ in range(n_samples):
+        x = random.uniform(-1, 1)
+        y = random.uniform(-1, 1)
+        if x**2 + y**2 <= 1:
+            inside += 1
+    return 4 * inside / n_samples
+
+random.seed(42)
+for n in [100, 1_000, 10_000, 100_000]:
+    pi_hat = estimate_pi(n)
+    error = abs(pi_hat - 3.141592653589793)
+    print(f"n={n:>7,}: π̂={pi_hat:.4f}, 오차={error:.4f}")
+```
+
+출력 예시:
+
+```
+n=    100: π̂=3.2400, 오차=0.0984
+n=  1,000: π̂=3.1480, 오차=0.0064
+n= 10,000: π̂=3.1412, 오차=0.0004
+n=100,000: π̂=3.1425, 오차=0.0009
+```
+
+샘플 수가 늘어날수록 오차가 줄어드는 모습이 빈도주의의 핵심 아이디어입니다. 해석적 해가 없는 복잡한 시스템에서도 시뮬레이션만으로 확률을 추정할 수 있다는 점이 몬테카를로의 강점입니다.
+
+### 생일 문제
+
+23명이 모이면 생일이 같은 쌍이 있을 확률이 50%를 넘는다는 직관에 반하는 결과를 시뮬레이션으로 확인합니다.
+
+```python
+import random
+
+def birthday_simulation(n_people: int, n_trials: int = 10_000) -> float:
+    """n명 중 생일이 같은 쌍이 있을 확률 추정"""
+    match_count = 0
+    for _ in range(n_trials):
+        birthdays = [random.randint(1, 365) for _ in range(n_people)]
+        if len(birthdays) != len(set(birthdays)):
+            match_count += 1
+    return match_count / n_trials
+
+random.seed(42)
+for n in [10, 23, 30, 50, 70]:
+    prob = birthday_simulation(n)
+    print(f"n={n:2d}명: P(생일 겹침)={prob:.3f}")
+```
+
+출력 예시:
+
+```
+n=10명: P(생일 겹침)=0.117
+n=23명: P(생일 겹침)=0.506
+n=30명: P(생일 겹침)=0.712
+n=50명: P(생일 겹침)=0.970
+n=70명: P(생일 겹침)=0.999
+```
+
+23명만 모여도 50%를 넘고, 50명이면 거의 확정입니다. 직관은 "365일 중 23명이면 희박하다"고 느끼지만, 실제로 비교해야 하는 쌍의 수는 23×22/2 = 253개입니다. 확률을 정확히 계산하려면 조합을 꼼꼼히 세어야 합니다.
+
+## 확률 공리와 기본 성질
+
+확률을 엄밀하게 다루려면 콜모고로프 공리를 알아야 합니다. 공리 자체보다 그로부터 나오는 기본 성질이 실무에서 더 자주 쓰입니다.
+
+### 콜모고로프 공리 (1933)
+
+1. **비음수성**: 모든 사건 A에 대해 P(A) ≥ 0
+2. **정규성**: P(Ω) = 1 (전체 표본공간의 확률은 1)
+3. **가산 가법성**: 서로 배반인 사건 A₁, A₂, ...에 대해 P(A₁ ∪ A₂ ∪ ...) = P(A₁) + P(A₂) + ...
+
+이 세 가지만 인정하면 나머지 확률 성질은 모두 유도됩니다.
+
+### 기본 성질 정리
+
+| 성질 | 수식 | 의미 |
+| --- | --- | --- |
+| 여사건 | P(Aᶜ) = 1 − P(A) | 일어나지 않을 확률 |
+| 공사건 | P(∅) = 0 | 불가능한 사건의 확률 |
+| 단조성 | A ⊆ B이면 P(A) ≤ P(B) | 포함되면 확률도 작거나 같음 |
+| 합사건 | P(A ∪ B) = P(A) + P(B) − P(A ∩ B) | 포함-배제 원리 |
+| 전확률 | P(B) = Σᵢ P(B|Aᵢ)P(Aᵢ) | 분할로 나눠 계산 |
+
+```python
+# 포함-배제 원리 검증
+# 주사위: A={짝수}, B={3 이상}
+omega = {1, 2, 3, 4, 5, 6}
+A = {2, 4, 6}
+B = {3, 4, 5, 6}
+
+P_A = len(A) / len(omega)
+P_B = len(B) / len(omega)
+P_A_and_B = len(A & B) / len(omega)
+P_A_or_B = len(A | B) / len(omega)
+
+# 포함-배제 원리 확인
+assert abs(P_A_or_B - (P_A + P_B - P_A_and_B)) < 1e-10
+print(f"P(A)={P_A:.3f}, P(B)={P_B:.3f}")
+print(f"P(A∩B)={P_A_and_B:.3f}, P(A∪B)={P_A_or_B:.3f}")
+print(f"검증: {P_A} + {P_B} - {P_A_and_B} = {P_A + P_B - P_A_and_B}")
+```
+
+출력:
+
+```
+P(A)=0.500, P(B)=0.667
+P(A∩B)=0.333, P(A∪B)=0.833
+검증: 0.5 + 0.6666666666666666 - 0.3333333333333333 = 0.8333333333333333
+```
+
+포함-배제 원리는 두 사건이 겹칠 때 중복 계산을 빼주는 기본 도구입니다. 이 성질은 조건부확률, 베이즈 정리, 전확률 공식의 출발점이 됩니다.
+
+## 표본공간 설계가 분석을 결정합니다
+
+같은 현상이라도 표본공간을 어떻게 잡느냐에 따라 사건의 정의와 확률이 달라집니다.
+
+```python
+# 동전 2개 던지기: 표본공간 설계 비교
+
+# 설계 1: 순서를 구분
+omega_ordered = {"HH", "HT", "TH", "TT"}
+event_one_head = {"HT", "TH"}
+P_one_head_ordered = len(event_one_head) / len(omega_ordered)
+print(f"순서 구분: P(앞면 정확히 1개) = {P_one_head_ordered:.3f}")
+
+# 설계 2: 순서 무시 (앞면 개수만 기록)
+# 가능한 결과: 0개, 1개, 2개
+# 하지만 각 결과의 확률이 다름!
+omega_count = {0: 1/4, 1: 2/4, 2: 1/4}
+print(f"순서 무시: P(앞면 정확히 1개) = {omega_count[1]:.3f}")
+
+# 핵심: 표본공간을 잘못 잡으면 등확률 가정이 깨짐
+# {0개, 1개, 2개}에 각 1/3을 부여하면 틀린 답
+P_wrong = 1/3
+print(f"잘못된 등확률 가정: P(앞면 1개) = {P_wrong:.3f} (오답)")
+```
+
+표본공간 설계에서 자주 하는 실수는 결과를 나열한 뒤 무조건 등확률을 부여하는 것입니다. 결과가 대칭적이지 않으면 각 결과에 서로 다른 확률을 부여해야 합니다. 이 감각은 이후 확률변수와 분포를 정의할 때도 계속 쓰입니다.
 ## 실무에서는 이렇게 드러납니다
 
 확률은 모델 내부에서만 쓰이지 않습니다. 분류 모델의 점수 해석, 이상치 탐지 임계값, A/B 테스트 판단, 수요 예측의 신뢰 해석까지 거의 모든 데이터 시스템이 확률 언어를 씁니다. 스팸 필터는 스팸일 가능성을, 추천 시스템은 클릭할 가능성을, 사기 탐지는 비정상 거래일 가능성을 다룹니다.
@@ -298,5 +449,6 @@ print("bayesian: updated belief")
 - [Wikipedia — Probability axioms](https://en.wikipedia.org/wiki/Probability_axioms)
 - [3Blue1Brown — Bayes' theorem](https://www.3blue1brown.com/lessons/bayes-theorem)
 - [Stanford CS109 — Probability for Computer Scientists](https://web.stanford.edu/class/cs109/)
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/probability-101/ko)
 
 Tags: Probability, Foundations, Intuition, DataScience, Beginner

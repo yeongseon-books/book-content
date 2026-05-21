@@ -23,9 +23,10 @@ seo_description: CLI와 Shell, Terminal의 차이와 첫 명령 실행 흐름을
 
 # Linux CLI 101 (1/10): CLI와 Shell이란 무엇인가?
 
+이 글은 Linux CLI 101 시리즈의 첫 번째 글입니다.
+
 처음 프로그래밍을 배울 때 대부분 GUI 에디터와 마우스 클릭으로 시작합니다. 파일을 더블클릭해서 열고, 메뉴에서 "실행"을 누릅니다. 이 방식은 처음에 직관적이지만, 서버 환경에 들어가는 순간 무력해집니다.
 
-이 글은 Linux CLI 101 시리즈의 첫 번째 글입니다.
 
 ## 먼저 던지는 질문
 
@@ -328,6 +329,208 @@ kill_gracefully() {
 
 함수 단위로 쪼개면 시나리오별 검증이 가능해집니다. 예를 들어 종료 신호가 정상 처리되는지, 남은 프로세스가 있는지, 재시작 로직이 중복 실행되는지 등을 독립적으로 점검할 수 있습니다.
 
+## 실무 시나리오: 장애 대응에서 CLI가 가지는 의미
+
+처음 CLI를 배우는 단계에서는 `ls`, `cd`, `echo`처럼 작은 명령이 보통의 학습 단위입니다. 하지만 실무에서는 명령 하나보다 **문제 진단 흐름을 어떻게 구성하는지**가 더 중요합니다. 예를 들어 API 서버가 느려졌다는 신고를 받으면, 운영자는 GUI 대시보드만 보지 않고 즉시 SSH로 들어가 프로세스·디스크·로그를 함께 확인합니다. 이때 CLI는 단순 입력 도구가 아니라, 짧은 시간 안에 가설을 세우고 검증하는 실행 환경입니다.
+
+```bash
+# 1) 현재 접속한 서버와 사용자 컨텍스트 확인
+whoami
+hostname
+pwd
+
+# 예상 출력
+# deploy
+# prod-api-01
+# /home/deploy
+```
+
+컨텍스트 확인을 먼저 하는 이유는 단순합니다. 잘못된 서버에 접속해 진단하거나 조치를 수행하는 사고를 막기 위해서입니다. 특히 운영/개발 서버가 비슷한 프롬프트를 쓰면, 첫 30초의 확인 습관이 전체 사고율을 줄입니다.
+
+```bash
+# 2) 시스템 상태를 한 번에 요약
+uptime
+free -h
+df -h /
+
+# 예상 출력
+# 14:31:02 up 17 days,  3:12,  2 users,  load average: 1.82, 1.20, 0.98
+#               total        used        free      shared  buff/cache   available
+# Mem:           7.6Gi       4.1Gi       1.2Gi       210Mi       2.3Gi       2.8Gi
+# Filesystem      Size  Used Avail Use% Mounted on
+# /dev/sda1        50G   29G   19G  61% /
+```
+
+위 세 명령은 각각 CPU 부하, 메모리 압박, 디스크 여유를 빠르게 보여줍니다. 이 값이 정상 범위를 벗어나면 애플리케이션 코드 문제인지 인프라 문제인지 분기할 수 있습니다. CLI 숙련도는 명령 암기가 아니라, 이런 분기를 빠르게 수행하는 능력에서 드러납니다.
+
+### 파이프 체인으로 노이즈 줄이기
+
+로그는 양이 많아서 원문 그대로 보면 판단이 늦어집니다. 운영에서는 파이프 체인을 통해 노이즈를 줄여 **판단 가능한 단위**로 압축합니다.
+
+```bash
+journalctl -u my-api --since '15 min ago'   | grep -E 'ERROR|CRITICAL|Timeout'   | sed -E 's/[0-9]{2}:[0-9]{2}:[0-9]{2}//'   | sort   | uniq -c   | sort -nr
+
+# 예상 출력
+#    37  Timeout while calling payment provider
+#    12  ERROR Database connection pool exhausted
+#     4  CRITICAL Worker process exited unexpectedly
+```
+
+핵심은 `grep -E`의 정규식입니다. `ERROR|CRITICAL|Timeout`처럼 OR 패턴을 쓰면 여러 실패 유형을 한 번에 잡을 수 있습니다. 이후 `uniq -c`로 빈도를 보면 가장 먼저 해결해야 할 항목이 자연스럽게 올라옵니다.
+
+### 셸이 해석하는 순서를 이해하면 사고가 줄어듭니다
+
+초보 구간에서 자주 발생하는 문제는 "명령은 맞는데 왜 다르게 실행되지?"입니다. 원인은 셸의 해석 순서를 놓치기 때문입니다. 변수 확장, 글로빙(`*`), 따옴표 처리, 파이프 분할이 먼저 일어나고 나서 실행됩니다.
+
+```bash
+name='api server'
+echo $name
+# api server
+
+echo "$name"
+# api server
+
+echo '$name'
+# $name
+```
+
+이 차이는 단순 문법이 아니라 보안·안정성과 직결됩니다. 자동화 스크립트에서 공백이 포함된 경로를 큰따옴표 없이 다루면 다른 파일이 대상이 될 수 있습니다. 그래서 실무에서는 변수를 넣을 때 기본값처럼 `"$var"`를 사용합니다.
+
+### 프로세스와 서비스 단위를 구분해 보기
+
+CLI 초급 글에서도 이 구분을 미리 알고 있으면 이후 학습이 쉬워집니다. `ps`는 프로세스 수준, `systemctl`은 서비스 단위 관리입니다.
+
+```bash
+ps -ef | grep my-api | grep -v grep
+systemctl status my-api --no-pager
+
+# 예상 출력 일부
+# deploy   18231     1  1 14:10 ?  00:00:08 /usr/bin/python3 /opt/my-api/app.py
+# Active: active (running) since Thu 2026-05-21 14:09:52 KST; 21min ago
+```
+
+프로세스는 떠 있는데 서비스 상태가 `failed`인 경우도 있고, 반대 상황도 나올 수 있습니다. 이 차이를 이해하면 7편(프로세스)과 systemd 운영 패턴을 더 빠르게 연결할 수 있습니다.
+
+### 미니 Bash 스크립트로 점검 루틴 고정하기
+
+반복 점검은 스크립트로 고정하는 편이 안전합니다.
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+svc="my-api"
+
+printf '[INFO] host=%s user=%s
+' "$(hostname)" "$(whoami)"
+systemctl is-active --quiet "$svc" && echo '[PASS] service active' || echo '[FAIL] service inactive'
+
+journalctl -u "$svc" --since '5 min ago'   | grep -E 'ERROR|CRITICAL|Timeout' || true
+```
+
+이런 스크립트는 팀 내에서 같은 방식으로 상황을 재현하게 해 줍니다. 결국 CLI 역량의 목적은 "내가 빨라지는 것"을 넘어서 "팀의 진단 품질을 표준화하는 것"입니다.
+
+## 운영 점검 플레이북
+
+실무에서 CLI 지식은 "명령을 외우는 능력"보다 "실수 가능성을 줄이는 절차"로 드러납니다. 아래 플레이북은 작업 전에 위험을 줄이고, 작업 후 검증을 빠뜨리지 않기 위한 최소 절차입니다.
+
+### 1) 작업 전 컨텍스트 확인
+
+```bash
+whoami
+hostname
+pwd
+date
+
+# 예상 출력
+# deploy
+# prod-api-01
+# /opt/my-app
+# Thu May 21 15:24:18 KST 2026
+```
+
+같은 명령이라도 서버와 경로가 다르면 결과가 완전히 달라집니다. 컨텍스트 확인은 사소해 보이지만 잘못된 환경 조작을 막는 첫 방어선입니다.
+
+### 2) 영향 범위 먼저 출력
+
+```bash
+# 예시: 후보만 확인
+find ./target -type f -name '*.log' -mtime +7 -print
+```
+
+삭제·이동·권한 변경처럼 파괴적일 수 있는 작업은 항상 후보 목록 출력이 선행되어야 합니다. "실행 전에 눈으로 검토"가 자동화 품질의 핵심입니다.
+
+### 3) 파이프 체인으로 증거를 압축
+
+```bash
+journalctl -u my-api --since '20 min ago' --no-pager   | grep -E 'ERROR|CRITICAL|timeout|5[0-9]{2}'   | awk '{print $1, $2, $3, $NF}'   | sort   | uniq -c   | sort -nr
+```
+
+`grep -E` 정규식은 노이즈를 줄이는 첫 단계입니다. 빈도 집계(`uniq -c`)까지 연결하면 우선순위를 빠르게 정할 수 있습니다.
+
+### 4) systemd 상태와 애플리케이션 로그를 함께 확인
+
+```bash
+systemctl status my-api --no-pager | sed -n '1,15p'
+journalctl -u my-api -n 80 --no-pager
+```
+
+프로세스가 살아 있어도 서비스가 실패 상태일 수 있고, 반대로 서비스는 active인데 내부 오류가 계속 발생할 수 있습니다. 두 관점을 동시에 봐야 원인 추적이 정확해집니다.
+
+### 5) Bash 스크립트로 반복 점검 표준화
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+svc="my-api"
+window='10 min ago'
+
+printf '[INFO] host=%s user=%s time=%s
+' "$(hostname)" "$(whoami)" "$(date '+%F %T')"
+
+if systemctl is-active --quiet "$svc"; then
+  echo '[PASS] service active'
+else
+  echo '[FAIL] service inactive'
+fi
+
+journalctl -u "$svc" --since "$window" --no-pager   | grep -E 'ERROR|CRITICAL|timeout|Failed' || true
+```
+
+자동화의 목적은 사람이 바뀌어도 같은 품질의 점검 결과를 얻는 것입니다. 이 원칙이 지켜지면 장애 대응 시간과 커뮤니케이션 비용이 함께 줄어듭니다.
+
+
+## 실전 점검 로그 예시
+
+아래 예시는 실제 운영에서 자주 보는 "점검 출력 형태"를 축약한 것입니다. 중요한 것은 특정 명령을 그대로 복사하는 것이 아니라, 출력을 근거로 다음 판단을 연결하는 습관입니다.
+
+```bash
+# 서비스 상태 + 최근 오류를 한 번에 수집
+systemctl is-active my-api
+journalctl -u my-api --since '5 min ago' --no-pager   | grep -E 'ERROR|CRITICAL|timeout|Failed'   | tail -n 20
+
+# 예상 출력
+# active
+# 2026-05-21 15:31:10 ERROR timeout while calling payment API
+# 2026-05-21 15:31:12 CRITICAL worker exited unexpectedly
+```
+
+```bash
+# 프로세스/포트/파일 핸들 점검
+ps -ef | grep -E 'my-api|gunicorn' | grep -v grep
+ss -lntp | grep -E ':8080|:80|:443'
+lsof -p "$(pgrep -f my-api | head -n 1)" | wc -l
+
+# 예상 출력 예시
+# deploy 18231 1  ... /opt/my-api/current/bin/start.sh
+# LISTEN 0 4096 0.0.0.0:8080 ... users:(("python3",pid=18231,fd=12))
+# 412
+```
+
+이런 출력들을 시계열로 저장해 두면 재발 시 비교가 쉬워지고, "지금이 평소와 어떻게 다른가"를 빠르게 설명할 수 있습니다. 결국 CLI 실무 역량은 명령 자체보다 **증거 기반 판단 루틴**을 안정적으로 반복하는 능력입니다.
+
+
 ## 처음 질문으로 돌아가기
 
 - **GUI 없이 컴퓨터를 다룬다는 말은 실제로 무엇을 뜻할까요?**
@@ -360,4 +563,5 @@ kill_gracefully() {
 - [The Missing Semester of Your CS Education - The Shell](https://missing.csail.mit.edu/2020/course-shell/)
 - [ExplainShell - match command-line arguments to their help text](https://explainshell.com/)
 
+- book-examples (linux-cli-101): https://github.com/yeongseon-books/book-examples/tree/main/linux-cli-101/ko
 Tags: Linux, CLI, Shell, Terminal, Bash, Command Line

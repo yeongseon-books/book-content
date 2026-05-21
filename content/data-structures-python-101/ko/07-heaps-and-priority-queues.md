@@ -250,70 +250,393 @@ print(merged)  # [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 힙은 최솟값과 최댓값을 효율적으로 관리하기 위한 구조이고, Python에서는 `heapq`가 그 기능을 간결하게 제공합니다. 핵심은 전체 정렬이 아니라, 우선순위가 가장 높은 하나를 계속 빠르게 꺼내는 데 있습니다. 다음 글에서는 노드와 간선으로 관계를 표현하는 그래프를 살펴보겠습니다.
 
 
-## Python 구현 보강: 타입 힌트와 검증 루틴
 
-Python에서 자료구조를 학습할 때는 동작 예시만 확인하는 단계에서 멈추지 않고, 타입 힌트와 최소 검증 루틴을 함께 작성해야 설계 의도가 명확해집니다. 특히 `TypeVar`, `Generic`, `Protocol`을 사용하면 자료구조 API의 입력/출력 계약을 코드 차원에서 드러낼 수 있습니다. 아래 예시는 여러 글에서 재사용할 수 있는 기본 인터페이스 패턴입니다.
+## 타입 힌트 기반 우선순위 큐 구현
+
+`heapq`는 모듈 수준 함수로 list를 힙처럼 다룹니다. 여기서는 이를 감싸서 ADT 인터페이스를 제공하는 우선순위 큐를 구현합니다.
 
 ```python
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Generic, Iterable, Iterator, Optional, TypeVar
+import heapq
+from dataclasses import dataclass, field
+from typing import Generic, Iterator, TypeVar
 
 T = TypeVar("T")
 
-@dataclass
-class Node(Generic[T]):
-    value: T
-    next: Optional["Node[T]"] = None
 
-class Container(Generic[T]):
-    def __init__(self, items: Optional[Iterable[T]] = None) -> None:
-        self._size = 0
-        self._head: Optional[Node[T]] = None
-        if items is not None:
-            for item in items:
-                self.push(item)
+@dataclass(order=True)
+class PriorityItem(Generic[T]):
+    """우선순위와 데이터를 함께 저장하는 래퍼입니다."""
+    priority: float
+    sequence: int = field(compare=True)  # 같은 우선순위일 때 삽입 순서 유지
+    data: T = field(compare=False)
 
-    def push(self, value: T) -> None:
-        self._head = Node(value=value, next=self._head)
-        self._size += 1
+
+class PriorityQueue(Generic[T]):
+    """heapq 기반 우선순위 큐입니다. 낮은 priority가 먼저 나옵니다."""
+
+    def __init__(self) -> None:
+        self._heap: list[PriorityItem[T]] = []
+        self._counter: int = 0
+
+    def push(self, item: T, priority: float = 0.0) -> None:
+        entry = PriorityItem(priority=priority, sequence=self._counter, data=item)
+        heapq.heappush(self._heap, entry)
+        self._counter += 1
 
     def pop(self) -> T:
-        if self._head is None:
-            raise IndexError("empty container")
-        node = self._head
-        self._head = node.next
-        self._size -= 1
-        return node.value
+        if not self._heap:
+            raise IndexError("pop from empty priority queue")
+        return heapq.heappop(self._heap).data
+
+    def peek(self) -> T:
+        if not self._heap:
+            raise IndexError("peek from empty priority queue")
+        return self._heap[0].data
 
     def __len__(self) -> int:
-        return self._size
+        return len(self._heap)
 
-    def __iter__(self) -> Iterator[T]:
-        cur = self._head
-        while cur is not None:
-            yield cur.value
-            cur = cur.next
+    def __bool__(self) -> bool:
+        return bool(self._heap)
+
+    def __repr__(self) -> str:
+        if not self._heap:
+            return "PriorityQueue(empty)"
+        return f"PriorityQueue(size={len(self._heap)}, next={self._heap[0].data!r})"
 ```
 
-이 패턴의 핵심은 세 가지입니다. 첫째, 공개 메서드의 타입을 먼저 확정하여 구현 교체 비용을 낮춥니다. 둘째, 예외 조건(`IndexError`)을 명시해 호출자 책임을 분리합니다. 셋째, `__iter__`, `__len__` 같은 파이썬 데이터 모델 메서드를 제공해 표준 라이브러리와 자연스럽게 결합합니다.
+### 설계 결정 세 가지
 
-성능 확인은 `timeit` 단일 숫자보다 시나리오 기반으로 진행하는 편이 정확합니다. 예를 들어 "1만 건 push 후 1만 건 pop", "임의 키 5천 건 조회", "중복 원소 30% 포함 집합 연산"처럼 입력 특성을 고정하고 결과를 비교합니다. 또한 `mypy`나 `pyright`로 정적 타입 검사를 돌리면 API 오용을 조기에 발견할 수 있습니다.
+1. **sequence 필드**: 같은 priority의 항목이 여러 개일 때, 삽입 순서로 tiebreak합니다. 이 필드가 없으면 data 간 비교가 발생해 `TypeError`가 날 수 있습니다.
+2. **`field(compare=False)`**: data는 비교에 참여하지 않습니다. 임의 타입의 객체를 넣을 수 있도록 하기 위함입니다.
+3. **최소 힙 기반**: `heapq`가 최소 힙만 제공하므로 priority가 낮을수록 먼저 나옵니다. 최대 힙이 필요하면 priority에 음수를 넣으면 됩니다.
 
-마지막으로 학습 기록에는 "왜 이 구현을 선택했는가"를 반드시 남깁니다. 같은 기능을 `list`, `deque`, 사용자 정의 클래스 중 무엇으로 표현했는지와 그 이유를 적어두면, 이후 코드베이스에서 자료구조를 교체해야 할 때 판단 근거를 재사용할 수 있습니다.
+### 최대 힙 패턴
 
-실무 코드에서는 `TypeVar` 기반 제네릭 API를 유지하고, `pytest`로 빈 입력/최대 입력/중복 입력 경계 조건을 검증해 구현 신뢰도를 높입니다.
+```python
+# heapq를 최대 힙으로 사용하는 관용 패턴
+import heapq
 
+scores = [85, 92, 78, 96, 88]
+max_heap = [-s for s in scores]
+heapq.heapify(max_heap)
+
+top_score = -heapq.heappop(max_heap)  # 96
+print(f"최고 점수: {top_score}")
+```
+
+## 메모리 프로파일링: 힙 vs 정렬 list
+
+```python
+import heapq
+import sys
+
+
+def measure(label: str, obj: object) -> None:
+    print(f"{label:>30}: {sys.getsizeof(obj):>8} bytes")
+
+
+n = 10_000
+data = list(range(n))
+
+# heapified list (구조는 동일한 list)
+heap_data = data[:]
+heapq.heapify(heap_data)
+
+# sorted list
+sorted_data = sorted(data)
+
+measure("heapified list (10k)", heap_data)
+measure("sorted list (10k)", sorted_data)
+```
+
+핵심 관찰: `heapq`는 별도의 자료구조를 만들지 않습니다. 기존 list를 힙 순서로 재배치할 뿐이므로, 메모리 사용량은 일반 list와 동일합니다. 이것이 `heapq`의 강점입니다 — 추가 메모리 없이 O(1) 최솟값 접근과 O(log n) 삽입/추출을 제공합니다.
+
+### heapify vs sort: 구축 비용 비교
+
+```python
+import heapq
+import timeit
+
+
+def bench_heapify(n: int = 100_000) -> None:
+    data = list(range(n, 0, -1))
+    heapq.heapify(data)
+
+
+def bench_sort(n: int = 100_000) -> None:
+    data = list(range(n, 0, -1))
+    data.sort()
+
+
+trials = 20
+t_heap = timeit.timeit(bench_heapify, number=trials)
+t_sort = timeit.timeit(bench_sort, number=trials)
+
+print(f"heapify (100k): {t_heap:.4f}s")
+print(f"sort (100k):    {t_sort:.4f}s")
+print(f"heapify is {t_sort/t_heap:.1f}x faster to build")
+```
+
+heapify는 O(n), sort는 O(n log n)입니다. "전체를 정렬할 필요 없이 최솟값/최댓값만 반복해서 꺼내면 되는" 상황에서 힙이 유리한 이유가 이 비용 차이입니다.
+
+## 성능 벤치마크: 상위 k개 추출
+
+실무에서 힙의 가장 흔한 용도는 "전체를 정렬하지 않고 상위/하위 k개만 빠르게 추출"하는 것입니다.
+
+```python
+import heapq
+import random
+import timeit
+
+
+def bench_nlargest_heap(data: list[int], k: int) -> None:
+    heapq.nlargest(k, data)
+
+
+def bench_nlargest_sort(data: list[int], k: int) -> None:
+    sorted(data, reverse=True)[:k]
+
+
+n = 100_000
+k = 10
+data = [random.randint(0, 1_000_000) for _ in range(n)]
+
+trials = 20
+t_heap = timeit.timeit(lambda: bench_nlargest_heap(data, k), number=trials)
+t_sort = timeit.timeit(lambda: bench_nlargest_sort(data, k), number=trials)
+
+print(f"heapq.nlargest(10, 100k): {t_heap:.4f}s")
+print(f"sorted()[:10] (100k):     {t_sort:.4f}s")
+```
+
+k가 작을 때 `heapq.nlargest`는 O(n log k)로 동작해 O(n log n) 정렬보다 빠릅니다. 하지만 k가 n에 가까워지면 정렬이 더 나을 수 있습니다. `heapq` 문서에서도 k가 전체의 10% 미만일 때 사용을 권장합니다.
+
+### 스트리밍 중앙값 (두 개의 힙)
+
+```python
+import heapq
+
+
+class MedianFinder:
+    """스트리밍 데이터에서 중앙값을 O(log n)에 유지합니다."""
+
+    def __init__(self) -> None:
+        self._lo: list[int] = []   # max-heap (음수 저장)
+        self._hi: list[int] = []   # min-heap
+
+    def add(self, num: int) -> None:
+        heapq.heappush(self._lo, -num)
+        heapq.heappush(self._hi, -heapq.heappop(self._lo))
+        if len(self._hi) > len(self._lo):
+            heapq.heappush(self._lo, -heapq.heappop(self._hi))
+
+    @property
+    def median(self) -> float:
+        if len(self._lo) > len(self._hi):
+            return -self._lo[0]
+        return (-self._lo[0] + self._hi[0]) / 2.0
+
+
+mf = MedianFinder()
+for x in [5, 2, 8, 1, 9]:
+    mf.add(x)
+    print(f"added {x}, median = {mf.median}")
+```
+
+이 패턴은 두 개의 힙(작은 쪽의 max-heap + 큰 쪽의 min-heap)을 유지해, 중앙값을 항상 O(1)에 조회하고 새 원소 삽입은 O(log n)에 처리합니다.
+
+## 힙 내부 구조: 배열로 트리 표현하기
+
+힙의 핵심 통찰은 완전 이진 트리를 배열(list)로 표현할 수 있다는 점입니다. 노드 포인터 없이도 부모-자식 관계를 인덱스 계산으로 파악합니다.
+
+```text
+인덱스:    0   1   2   3   4   5   6
+값:       [1,  3,  2,  7,  5,  4,  6]
+
+트리 표현:
+            1          (index 0)
+          /   \
+         3     2       (index 1, 2)
+        / \   / \
+       7   5 4   6    (index 3, 4, 5, 6)
+```
+
+인덱스 규칙은 다음과 같습니다.
+
+- 부모: `(i - 1) // 2`
+- 왼쪽 자식: `2 * i + 1`
+- 오른쪽 자식: `2 * i + 2`
+
+이 규칙 덕분에 포인터 없이 배열만으로 트리를 탐색할 수 있습니다. 메모리도 연속적이라 캐시 효율이 좋습니다.
+
+### heappush와 heappop의 동작 원리
+
+`heappush(heap, item)`은 다음 과정을 거칩니다.
+
+1. 배열 끝에 새 원소를 추가합니다 (O(1)).
+2. 부모와 비교하며 위로 올립니다 (sift-up). 최대 높이만큼 비교하므로 O(log n).
+
+`heappop(heap)`은 다음 과정을 거칩니다.
+
+1. 루트(인덱스 0)의 값을 저장합니다.
+2. 배열 마지막 원소를 루트로 이동합니다.
+3. 자식과 비교하며 아래로 내립니다 (sift-down). O(log n).
+
+```python
+import heapq
+
+heap: list[int] = []
+for val in [5, 3, 8, 1, 2]:
+    heapq.heappush(heap, val)
+    print(f"push {val}: {heap}")
+
+print()
+while heap:
+    val = heapq.heappop(heap)
+    print(f"pop {val}: {heap}")
+```
+
+출력을 관찰하면 배열이 항상 힙 속성(부모 ≤ 자식)을 유지하는 것을 확인할 수 있습니다.
+
+## 실무 패턴: 작업 스케줄러
+
+우선순위 큐의 대표적 실무 활용은 작업 스케줄링입니다. 긴급도가 높은 작업을 먼저 처리하고, 같은 긴급도면 먼저 등록된 작업을 처리합니다.
+
+```python
+from dataclasses import dataclass, field
+from enum import IntEnum
+import heapq
+from typing import Callable
+
+
+class Urgency(IntEnum):
+    CRITICAL = 0
+    HIGH = 1
+    MEDIUM = 2
+    LOW = 3
+
+
+@dataclass(order=True)
+class Task:
+    urgency: Urgency
+    sequence: int = field(compare=True)
+    name: str = field(compare=False)
+    action: Callable[[], None] = field(compare=False, repr=False)
+
+
+class TaskScheduler:
+    def __init__(self) -> None:
+        self._heap: list[Task] = []
+        self._counter: int = 0
+
+    def add_task(self, name: str, urgency: Urgency, action: Callable[[], None]) -> None:
+        task = Task(urgency=urgency, sequence=self._counter, name=name, action=action)
+        heapq.heappush(self._heap, task)
+        self._counter += 1
+
+    def run_next(self) -> str | None:
+        if not self._heap:
+            return None
+        task = heapq.heappop(self._heap)
+        task.action()
+        return task.name
+
+    def __len__(self) -> int:
+        return len(self._heap)
+
+
+# 사용 예시
+scheduler = TaskScheduler()
+scheduler.add_task("배포", Urgency.CRITICAL, lambda: print("배포 실행"))
+scheduler.add_task("로그 정리", Urgency.LOW, lambda: print("로그 정리"))
+scheduler.add_task("버그 수정", Urgency.HIGH, lambda: print("버그 수정"))
+
+while scheduler:
+    name = scheduler.run_next()
+    print(f"  완료: {name}")
+```
+
+IntEnum을 사용하면 urgency 값이 자연스럽게 비교 가능하고, CRITICAL(0)이 가장 먼저 나옵니다.
+
+## unittest로 PriorityQueue 검증
+
+```python
+import unittest
+
+
+class TestPriorityQueue(unittest.TestCase):
+    def setUp(self) -> None:
+        self.pq: PriorityQueue[str] = PriorityQueue()
+
+    def test_push_pop_order(self) -> None:
+        self.pq.push("low", priority=3)
+        self.pq.push("high", priority=1)
+        self.pq.push("mid", priority=2)
+        self.assertEqual(self.pq.pop(), "high")
+        self.assertEqual(self.pq.pop(), "mid")
+        self.assertEqual(self.pq.pop(), "low")
+
+    def test_same_priority_fifo(self) -> None:
+        self.pq.push("first", priority=1)
+        self.pq.push("second", priority=1)
+        self.pq.push("third", priority=1)
+        self.assertEqual(self.pq.pop(), "first")
+        self.assertEqual(self.pq.pop(), "second")
+
+    def test_peek(self) -> None:
+        self.pq.push("item", priority=5)
+        self.assertEqual(self.pq.peek(), "item")
+        self.assertEqual(len(self.pq), 1)
+
+    def test_empty_pop_raises(self) -> None:
+        with self.assertRaises(IndexError):
+            self.pq.pop()
+
+    def test_bool(self) -> None:
+        self.assertFalse(self.pq)
+        self.pq.push("x", priority=0)
+        self.assertTrue(self.pq)
+
+    def test_large_scale(self) -> None:
+        import random
+        items = [(random.random(), f"item_{i}") for i in range(1000)]
+        for priority, name in items:
+            self.pq.push(name, priority=priority)
+        prev_priority = -1.0
+        for priority, _ in sorted(items):
+            result = self.pq.pop()
+            # 정확한 순서 확인은 priority 기준
+
+
+if __name__ == "__main__":
+    unittest.main()
+```
+
+## heapq와 queue.PriorityQueue 비교
+
+Python 표준 라이브러리는 힙 기반 우선순위 큐를 두 곳에서 제공합니다.
+
+| 특성 | `heapq` | `queue.PriorityQueue` |
+|------|---------|----------------------|
+| 스레드 안전 | 아니오 | 예 (내부 Lock) |
+| 인터페이스 | 모듈 함수 (list 직접 조작) | 클래스 메서드 (put/get) |
+| 블로킹 | 불가 | get(timeout=...) 지원 |
+| 성능 | Lock 없으므로 단일 스레드에서 더 빠름 | Lock 오버헤드 있음 |
+| 적합 상황 | 단일 스레드, 알고리즘 구현 | 멀티스레드 생산자-소비자 패턴 |
+
+단일 스레드 코드에서는 `heapq`를 직접 사용하는 것이 더 빠르고 유연합니다. 멀티스레드 환경에서 생산자-소비자 패턴을 구현할 때만 `queue.PriorityQueue`를 사용합니다.
 
 ## 처음 질문으로 돌아가기
 
 - **가장 작은 값이나 가장 큰 값을 빠르게 꺼내려면 어떤 구조가 필요할까요?**
-  - 본문의 기준은 힙과 우선순위 큐를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 힙(heap)입니다. 힙은 루트에 항상 최솟값(또는 최댓값)을 유지하므로 O(1)에 확인하고 O(log n)에 꺼낼 수 있습니다. 정렬된 list도 최솟값을 O(1)에 확인할 수 있지만, 삽입이 O(n)입니다. 힙은 삽입도 O(log n)이므로 동적 데이터에 유리합니다.
 - **힙은 왜 정렬보다 우선순위 처리에 유리할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 전체 정렬은 O(n log n)이고 모든 원소의 순서를 확정합니다. 하지만 우선순위 큐에서는 "지금 가장 급한 것 하나"만 알면 됩니다. 힙은 전체 순서를 유지하지 않고 부분 순서(부모 ≤ 자식)만 유지하므로, 구축이 O(n)으로 빠르고 삽입/추출도 O(log n)에 끝납니다.
 - **Python의 `heapq`는 왜 최소 힙만 제공할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 설계 결정의 문제입니다. 최소 힙 하나만 있으면 최대 힙은 음수를 넣어 흉내 낼 수 있고, 코드가 단순해집니다. 또한 대부분의 알고리즘(Dijkstra, 작업 스케줄링, merge k sorted lists)이 최소 힙을 기본으로 사용하므로, 하나만 제공해도 실용적 커버리지가 충분합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -337,5 +660,6 @@ class Container(Generic[T]):
 - [Real Python — The Python heapq Module](https://realpython.com/python-heapq-module/)
 - [GeeksforGeeks — Heap Data Structure](https://www.geeksforgeeks.org/heap-data-structure/)
 - [Visualgo — Heap Visualization](https://visualgo.net/en/heap)
+- [book-examples 저장소 — data-structures-python-101/ko](https://github.com/yeongseon-books/book-examples/tree/main/data-structures-python-101/ko)
 
 Tags: Python, 자료구조, Heap, Priority Queue, heapq

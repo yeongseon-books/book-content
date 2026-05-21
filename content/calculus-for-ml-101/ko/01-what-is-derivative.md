@@ -30,7 +30,7 @@ last_reviewed: '2026-05-12'
 
 이 글에서는 평균 변화율, 접선, 극한, 수치 미분을 하나의 흐름으로 묶어 미분을 설명하겠습니다. 여기서 미분을 제대로 잡아 두면 이후 글에서 나오는 손실 함수의 gradient를 더 이상 추상적인 숫자로 보지 않게 됩니다.
 
-끝까지 읽고 나면 미분을 “공식 조작”이 아니라 “학습 방향을 읽는 첫 번째 센서”로 이해하게 될 것입니다.
+끝까지 읽고 나면 미분을 "공식 조작"이 아니라 "학습 방향을 읽는 첫 번째 센서"로 이해하게 될 것입니다.
 
 ## 먼저 던지는 질문
 
@@ -54,9 +54,9 @@ last_reviewed: '2026-05-12'
 
 ## 핵심 관점
 
-미분을 가장 실용적으로 이해하는 방법은 “한 점에서 함수값이 얼마인가”보다 “그 점 근처에서 조금 움직이면 함수가 어떻게 반응하는가”를 보는 것입니다. 평균 변화율은 넓은 구간을 보고, 미분은 그 구간을 무한히 좁혀 한 점의 국소적 움직임을 읽습니다. 이 차이를 잡는 순간, 미분은 암기 대상이 아니라 측정 도구가 됩니다.
+미분을 가장 실용적으로 이해하는 방법은 "한 점에서 함수값이 얼마인가"보다 "그 점 근처에서 조금 움직이면 함수가 어떻게 반응하는가"를 보는 것입니다. 평균 변화율은 넓은 구간을 보고, 미분은 그 구간을 무한히 좁혀 한 점의 국소적 움직임을 읽습니다. 이 차이를 잡는 순간, 미분은 암기 대상이 아니라 측정 도구가 됩니다.
 
-ML에서는 이 국소적 움직임이 특히 중요합니다. 파라미터를 아주 조금 바꿨을 때 loss가 증가하는지 감소하는지 알아야 다음 스텝을 결정할 수 있기 때문입니다. 미분은 “조금 바꿨을 때 어떤 일이 일어날까?”라는 질문을 수학적으로 안정된 형태로 바꾼 결과입니다.
+ML에서는 이 국소적 움직임이 특히 중요합니다. 파라미터를 아주 조금 바꿨을 때 loss가 증가하는지 감소하는지 알아야 다음 스텝을 결정할 수 있기 때문입니다. 미분은 "조금 바꿨을 때 어떤 일이 일어날까?"라는 질문을 수학적으로 안정된 형태로 바꾼 결과입니다.
 
 > 미분은 함수 전체를 한 번에 설명하는 도구가 아니라, 지금 서 있는 지점에서 어느 방향으로 얼마나 움직여야 하는지 알려 주는 국소 신호입니다.
 
@@ -86,7 +86,7 @@ def avg_rate(f, a, b):
     return (f(b) - f(a)) / (b - a)
 ```
 
-이 식은 두 점을 잇는 secant line의 기울기입니다. 아직 미분은 아니지만, 미분이 무엇을 극한으로 보완하는지 드러내는 핵심 출발점입니다. 실무 감각으로 바꾸면, 평균 변화율은 “이 구간 전체에서는 대체로 이렇게 움직였다”는 요약입니다.
+이 식은 두 점을 잇는 secant line의 기울기입니다. 아직 미분은 아니지만, 미분이 무엇을 극한으로 보완하는지 드러내는 핵심 출발점입니다. 실무 감각으로 바꾸면, 평균 변화율은 "이 구간 전체에서는 대체로 이렇게 움직였다"는 요약입니다.
 
 ### 수치 미분은 미분 직관을 계산으로 확인하는 방법입니다
 
@@ -105,7 +105,7 @@ def deriv(f, x, h=1e-5):
 slope = deriv(f, 2.0)  # about 4.0
 ```
 
-$x=2$ 근처에서 함수가 얼마나 빠르게 변하는지 수치적으로 읽은 값입니다. 접선의 기울기가 약 4라는 뜻은, 그 점 근처에서 입력을 아주 조금 늘리면 출력이 대략 네 배 속도로 증가한다는 뜻입니다. 이 “근처에서의 반응”이 바로 ML에서 gradient가 하는 역할과 연결됩니다.
+$x=2$ 근처에서 함수가 얼마나 빠르게 변하는지 수치적으로 읽은 값입니다. 접선의 기울기가 약 4라는 뜻은, 그 점 근처에서 입력을 아주 조금 늘리면 출력이 대략 네 배 속도로 증가한다는 뜻입니다. 이 "근처에서의 반응"이 바로 ML에서 gradient가 하는 역할과 연결됩니다.
 
 ### 손실 함수에 연결하면 미분의 역할이 선명해집니다
 
@@ -122,6 +122,285 @@ g = deriv(loss, 0.0)   # negative -> increase w to reduce loss
 
 미분은 함수값 자체보다 변화의 방향과 속도를 알려 줍니다. 평균 변화율은 넓은 구간을 보고, 도함수는 한 점의 국소적 반응을 봅니다. 그리고 손실 함수에 이 관점을 적용하면, 미분은 곧 학습 방향을 정하는 정보가 됩니다.
 
+## 미분 공식의 기초: 멱함수 규칙에서 합성함수까지
+
+여기까지 수치적 직관을 다뤘다면, 이제 해석적(analytic) 미분 공식을 정리합니다. 수치 미분은 검증에 좋지만 계산 비용이 높습니다. 해석 미분은 닫힌 형태의 공식을 미리 유도해 둠으로써, 수천만 개의 파라미터에 대한 gradient를 빠르게 계산할 수 있게 만듭니다.
+
+### 멱함수 규칙 (Power Rule)
+
+가장 기본적인 미분 공식입니다. $f(x) = x^n$일 때 $f'(x) = n \cdot x^{n-1}$입니다.
+
+```python
+import numpy as np
+
+def power_rule_check(n, x):
+    """해석 미분과 수치 미분을 비교합니다."""
+    analytic = n * x ** (n - 1)
+    h = 1e-7
+    numeric = ((x + h) ** n - (x - h) ** n) / (2 * h)
+    return analytic, numeric, abs(analytic - numeric)
+
+# n=2, 3, 4에 대해 x=2.0에서 검증
+for n in [2, 3, 4]:
+    a, num, err = power_rule_check(n, 2.0)
+    print(f"x^{n} at x=2: analytic={a:.6f}, numeric={num:.6f}, error={err:.2e}")
+# x^2 at x=2: analytic=4.000000, numeric=4.000000, error=3.55e-10
+# x^3 at x=2: analytic=12.000000, numeric=12.000000, error=1.43e-09
+# x^4 at x=2: analytic=32.000000, numeric=32.000000, error=5.70e-09
+```
+
+오차가 $10^{-9}$ 수준이면 해석 미분과 수치 미분이 일치한다고 봐도 됩니다. 이 패턴은 이후 더 복잡한 함수의 gradient를 검증할 때도 동일하게 적용됩니다.
+
+### 상수배 규칙과 합 규칙
+
+$f(x) = c \cdot g(x)$이면 $f'(x) = c \cdot g'(x)$이고, $f(x) = g(x) + h(x)$이면 $f'(x) = g'(x) + h'(x)$입니다. 단순하지만 ML에서 매우 자주 쓰입니다. 손실 함수가 여러 항의 합으로 이루어질 때, 각 항의 gradient를 독립적으로 구한 뒤 합칠 수 있다는 뜻이기 때문입니다.
+
+```python
+# 합 규칙 예시: L(w) = 0.5*(w-3)^2 + 2*w
+# dL/dw = 0.5*2*(w-3) + 2 = (w-3) + 2 = w-1
+def loss_sum(w):
+    return 0.5 * (w - 3) ** 2 + 2 * w
+
+def loss_sum_grad(w):
+    return (w - 3) + 2  # = w - 1
+
+w_test = 1.5
+print(f"analytic grad: {loss_sum_grad(w_test)}")  # 0.5
+print(f"numeric grad:  {(loss_sum(w_test+1e-7) - loss_sum(w_test-1e-7))/(2e-7):.6f}")
+```
+
+### 곱 규칙 (Product Rule)
+
+$f(x) = g(x) \cdot h(x)$일 때 $f'(x) = g'(x) \cdot h(x) + g(x) \cdot h'(x)$입니다. 정규화 항이 포함된 손실이나, attention score 계산처럼 두 함수의 곱이 등장하는 상황에서 필요합니다.
+
+### 연쇄 법칙 맛보기
+
+$f(g(x))$의 미분은 $f'(g(x)) \cdot g'(x)$입니다. 이 규칙은 5장에서 전체를 다루겠지만, 미분 공식 전체를 관통하는 핵심 아이디어이므로 여기서 한 번 맛보기로 봅니다.
+
+```python
+import math
+
+# f(x) = sin(x^2)
+# f'(x) = cos(x^2) * 2x  (chain rule)
+def f_composed(x):
+    return math.sin(x ** 2)
+
+def f_composed_grad(x):
+    return math.cos(x ** 2) * 2 * x
+
+x = 1.0
+analytic = f_composed_grad(x)
+numeric = (f_composed(x + 1e-7) - f_composed(x - 1e-7)) / (2e-7)
+print(f"chain rule check: analytic={analytic:.6f}, numeric={numeric:.6f}")
+# chain rule check: analytic=1.080605, numeric=1.080605
+```
+
+## 수치 미분 심화: h 선택과 오차 분석
+
+수치 미분에서 $h$를 어떻게 정하느냐에 따라 결과의 신뢰도가 달라집니다. 이 절에서는 $h$ 선택이 실제로 어떤 영향을 미치는지 실험으로 확인합니다.
+
+### 전진 차분 vs 중앙 차분
+
+```python
+import numpy as np
+
+def f(x):
+    return x ** 3
+
+# x=2에서의 해석 미분값: 3*x^2 = 12.0
+x = 2.0
+true_deriv = 12.0
+
+h_values = [1e-2, 1e-4, 1e-6, 1e-8, 1e-10, 1e-12, 1e-14]
+
+print(f"{'h':<12} {'forward err':<16} {'central err':<16}")
+print("-" * 44)
+for h in h_values:
+    forward = (f(x + h) - f(x)) / h
+    central = (f(x + h) - f(x - h)) / (2 * h)
+    fwd_err = abs(forward - true_deriv)
+    ctr_err = abs(central - true_deriv)
+    print(f"{h:<12.0e} {fwd_err:<16.2e} {ctr_err:<16.2e}")
+```
+
+실행하면 다음과 같은 패턴이 나타납니다.
+
+| h | 전진 차분 오차 | 중앙 차분 오차 |
+| --- | --- | --- |
+| 1e-2 | ~6e-2 | ~2e-4 |
+| 1e-4 | ~6e-4 | ~2e-8 |
+| 1e-6 | ~6e-6 | ~1e-10 |
+| 1e-8 | ~6e-8 | ~1e-8 (반등 시작) |
+| 1e-10 | 부동소수점 지배 | 부동소수점 지배 |
+| 1e-14 | 쓸모없음 | 쓸모없음 |
+
+중앙 차분은 $h$가 적당한 범위(대략 $10^{-5}$ ~ $10^{-7}$)일 때 가장 정확합니다. 너무 작으면 $f(x+h)$와 $f(x-h)$의 차이가 부동소수점 정밀도 이하로 떨어져 오히려 오차가 커집니다. 실무에서는 `h = 1e-5`를 기본값으로 쓰고, 함수값의 스케일이 매우 크거나 작을 때만 조정합니다.
+
+### gradient checking 실전 패턴
+
+PyTorch에서 autograd 결과를 수치 미분으로 검증하는 패턴입니다.
+
+```python
+import torch
+
+def gradient_check(fn, inputs, eps=1e-5, atol=1e-4):
+    """각 입력 원소에 대해 수치 미분과 autograd를 비교합니다."""
+    inputs = inputs.detach().requires_grad_(True)
+    loss = fn(inputs)
+    loss.backward()
+    autograd = inputs.grad.clone()
+
+    numeric = torch.zeros_like(inputs)
+    flat = inputs.data.view(-1)
+    for i in range(flat.numel()):
+        orig = flat[i].item()
+        flat[i] = orig + eps
+        loss_plus = fn(inputs).item()
+        flat[i] = orig - eps
+        loss_minus = fn(inputs).item()
+        flat[i] = orig
+        numeric.view(-1)[i] = (loss_plus - loss_minus) / (2 * eps)
+
+    max_diff = (autograd - numeric).abs().max().item()
+    passed = max_diff < atol
+    return passed, max_diff
+
+# 사용 예
+fn = lambda w: ((w - torch.tensor([1.0, 2.0, 3.0])) ** 2).sum()
+w = torch.tensor([0.5, 1.5, 2.5])
+ok, diff = gradient_check(fn, w)
+print(f"gradient check {'PASS' if ok else 'FAIL'}, max_diff={diff:.2e}")
+```
+
+이 패턴은 커스텀 레이어를 만들거나, 기존 코드의 backward가 의심스러울 때 가장 먼저 사용하는 디버깅 도구입니다. 통과 기준은 보통 상대 오차 $10^{-4}$ 이내입니다.
+
+## 미분이 존재하지 않는 경우
+
+모든 점에서 미분이 정의되는 것은 아닙니다. ML에서도 이 문제가 실제로 등장합니다.
+
+### 불연속점
+
+함수가 점프하는 지점에서는 좌극한과 우극한이 다르므로 미분이 정의되지 않습니다. 실무에서는 step function 대신 sigmoid를 쓰는 이유가 여기에 있습니다.
+
+### 뾰족한 점 (Kink)
+
+$f(x) = |x|$는 $x=0$에서 좌미분과 우미분이 다릅니다. ReLU 활성화 함수가 정확히 이 구조입니다.
+
+```python
+# ReLU의 미분: x > 0이면 1, x < 0이면 0, x = 0에서는 정의 모호
+def relu(x):
+    return max(0, x)
+
+def relu_grad(x):
+    if x > 0:
+        return 1
+    elif x < 0:
+        return 0
+    else:
+        return 0  # 관례상 0 또는 0.5를 사용
+
+# PyTorch는 x=0에서 grad=0을 반환합니다
+import torch
+x = torch.tensor(0.0, requires_grad=True)
+y = torch.relu(x)
+y.backward()
+print(f"ReLU grad at x=0: {x.grad.item()}")  # 0.0
+```
+
+프레임워크마다 kink point에서의 gradient 처리가 다를 수 있으므로, 활성화 함수를 직접 구현할 때는 이 경계 조건을 명시적으로 정해야 합니다.
+
+### 발산하는 미분
+
+$f(x) = x^{1/3}$는 $x=0$에서 미분값이 무한대입니다. 이런 상황은 드물지만, 특정 loss 함수에서 예측값이 정답과 정확히 일치할 때 비슷한 현상이 생길 수 있습니다. `log(0)` 방어와 같은 수치 안정성 처리가 필요한 이유입니다.
+
+## 미분과 학습 루프의 연결: 완전한 예제
+
+이 절에서는 미분이 실제 학습 루프에서 어떻게 사용되는지 처음부터 끝까지 추적합니다.
+
+### 문제 설정
+
+입력 $x$와 정답 $y$가 주어질 때, 파라미터 $w$를 찾아 $\hat{y} = w \cdot x$가 $y$에 가까워지도록 합니다. 손실은 $L(w) = (wx - y)^2$입니다.
+
+### 미분 유도
+
+$$\frac{dL}{dw} = 2(wx - y) \cdot x$$
+
+이 식은 멱함수 규칙과 연쇄 법칙만으로 유도됩니다. 미분값이 양수이면 $w$를 줄여야 loss가 감소하고, 음수이면 $w$를 늘려야 합니다.
+
+### 학습 루프 구현
+
+```python
+import numpy as np
+
+# 데이터: y = 4x에 노이즈 추가
+np.random.seed(42)
+X = np.array([1.0, 2.0, 3.0, 4.0, 5.0])
+Y = 4.0 * X + np.random.randn(5) * 0.3
+
+# 학습 파라미터
+w = 0.0
+lr = 0.01
+history = []
+
+for epoch in range(20):
+    # forward
+    pred = w * X
+    loss = np.mean((pred - Y) ** 2)
+
+    # backward (해석 미분)
+    grad = np.mean(2 * (pred - Y) * X)
+
+    # update
+    w = w - lr * grad
+    history.append({'epoch': epoch, 'w': w, 'loss': loss, 'grad': grad})
+
+    if epoch % 5 == 0:
+        print(f"epoch={epoch:2d}  w={w:.4f}  loss={loss:.4f}  grad={grad:.4f}")
+```
+
+출력에서 관찰할 수 있는 패턴은 세 가지입니다.
+
+1. **초반**: grad 절대값이 크고, w가 빠르게 움직이며, loss가 급격히 줄어듭니다.
+2. **중반**: grad가 점점 작아지면서 업데이트 폭도 줄어듭니다.
+3. **후반**: grad가 거의 0에 가까워지고, w가 정답(~4.0) 근처에서 안정됩니다.
+
+이 세 단계는 gradient descent의 보편적인 수렴 패턴이며, 그 모든 단계를 지배하는 것이 미분값입니다.
+
+### 학습률에 따른 수렴 비교
+
+```python
+for lr in [0.001, 0.01, 0.05, 0.1]:
+    w = 0.0
+    for _ in range(50):
+        grad = np.mean(2 * (w * X - Y) * X)
+        w = w - lr * grad
+    final_loss = np.mean((w * X - Y) ** 2)
+    print(f"lr={lr:.3f}  final_w={w:.4f}  final_loss={final_loss:.6f}")
+```
+
+| learning rate | 50 epoch 후 w | 최종 loss | 관찰 |
+| --- | --- | --- | --- |
+| 0.001 | ~2.8 | 높음 | 수렴 미완 |
+| 0.01 | ~3.97 | 낮음 | 안정 수렴 |
+| 0.05 | ~3.99 | 최저 | 빠른 수렴 |
+| 0.1 | 발산 | 증가 | lr 과대 |
+
+학습률이 너무 크면 gradient 방향으로 너무 멀리 이동해 오히려 loss가 증가합니다. 미분값의 크기와 학습률의 곱이 업데이트 크기를 결정하므로, 두 값의 상호작용을 이해해야 학습을 안정적으로 제어할 수 있습니다.
+
+### gradient norm으로 학습 상태 읽기
+
+gradient의 크기(norm)는 학습 상태를 진단하는 간접 지표입니다. norm이 큰 초반에는 파라미터가 정답과 멀리 있다는 뜻이고, norm이 0에 수렴하면 수렴했거나 안장점(saddle point)에 빠졌다는 뜻입니다.
+
+```python
+# gradient norm 기록
+grad_norms = [abs(h["grad"]) for h in history]
+print(f"초반 norm: {grad_norms[0]:.4f}")
+print(f"중반 norm: {grad_norms[9]:.4f}")
+print(f"후반 norm: {grad_norms[19]:.4f}")
+```
+
+이 값을 TensorBoard나 W\&B에 기록해 두면 학습 중 gradient가 폭주(exploding)하거나 소실(vanishing)되는 시점을 사후에 정확히 짚을 수 있습니다. 미분 개념이 실제 운영 모니터링으로 연결되는 지점이 바로 여기입니다.
+
 ## 흔히 헷갈리는 지점
 
 - 미분값과 함수값은 다릅니다. 함수값이 크다고 미분값도 큰 것은 아니고, 그 반대도 마찬가지입니다.
@@ -129,6 +408,7 @@ g = deriv(loss, 0.0)   # negative -> increase w to reduce loss
 - 수치 미분은 편리하지만 정답 그 자체가 아닙니다. $h$ 선택과 부동소수점 오차의 영향을 항상 받습니다.
 - 기울기의 크기만 보고 부호를 무시하면 업데이트 방향을 반대로 해석할 수 있습니다.
 - 극한이 성립하지 않는 지점에서는 미분이 존재하지 않을 수 있습니다. 불연속점이나 뾰족한 점에서 특히 주의해야 합니다.
+- "미분 = 기울기"라고만 외우면 다변수로 넘어갈 때 혼란이 생깁니다. 미분은 "국소적 선형 근사의 계수"라고 이해하는 편이 확장성이 좋습니다.
 
 ## 운영 체크리스트
 
@@ -137,145 +417,25 @@ g = deriv(loss, 0.0)   # negative -> increase w to reduce loss
 - [ ] 수치 미분은 검증용이고, 실제 학습은 해석 미분 또는 자동 미분이 맡는다는 점을 기억한다
 - [ ] gradient가 이상할 때 작은 예제로 centered difference 검증을 해 본다
 - [ ] 기울기의 크기와 방향을 각각 따로 읽는 습관을 갖는다
+- [ ] 커스텀 레이어를 작성한 뒤에는 gradient check를 반드시 실행한다
+- [ ] 학습률 변경 전에 현재 gradient norm 크기를 먼저 확인한다
 
 ## 정리
 
 미분은 함수가 한 점 근처에서 어떤 방향과 속도로 변하는지 알려 주는 도구입니다. 접선, 극한, 도함수는 각각 다른 주제가 아니라 이 국소적 변화를 읽기 위해 서로 맞물린 개념입니다. 이 관점을 잡아 두면 미분은 더 이상 기호 조작이 아니라, 현재 상태를 해석하는 센서가 됩니다.
 
-ML에서는 이 센서가 손실 함수 위에서 작동합니다. 손실의 미분은 파라미터를 어느 방향으로 움직여야 손실이 줄어드는지 알려 주고, 그 정보가 optimizer의 입력이 됩니다. 결국 “모델이 학습한다”는 문장은 “손실의 미분을 읽고 반복적으로 업데이트한다”는 문장으로 더 구체화됩니다.
+ML에서는 이 센서가 손실 함수 위에서 작동합니다. 손실의 미분은 파라미터를 어느 방향으로 움직여야 손실이 줄어드는지 알려 주고, 그 정보가 optimizer의 입력이 됩니다. 결국 "모델이 학습한다"는 문장은 "손실의 미분을 읽고 반복적으로 업데이트한다"는 문장으로 더 구체화됩니다.
 
 다음 글에서는 함수와 기울기 자체를 조금 더 그래프 중심으로 보겠습니다. 미분을 한 점의 변화율로 이해했다면, 이제는 함수의 모양과 기울기가 어떻게 연결되는지 살펴볼 차례입니다.
-
-
-## 추가 실전 섹션: 미분 신호를 학습 루프로 연결하는 계산 연습
-
-미분 개념을 오래 유지하려면 손으로 계산한 값과 코드에서 나온 값이 같은지 반복 확인하는 연습이 중요합니다. 아래 표는 손실 함수와 gradient를 빠르게 점검할 때 자주 쓰는 비교 축입니다.
-
-| 항목 | 회귀(MSE) | 분류(BCE) | 점검 포인트 |
-| --- | --- | --- | --- |
-| 손실 형태 | 평균 제곱 오차 | 음의 로그 우도 | 문제 유형 일치 여부 |
-| gradient 민감도 | 큰 오차에 더 민감 | 확신한 오답에 큰 페널티 | 폭주/포화 구간 확인 |
-| 수치 안정성 | 비교적 안정적 | `log(0)` 방어 필요 | `eps` 처리 |
-| 학습 신호 | 선형 오차 비례 | 확률 오차 반영 | calibration 해석 |
-
-### 체인 룰 검증: 수치 미분과 해석 미분 비교
-
-```python
-import math
-
-def f(x):
-    return math.sin(3 * x + 1)
-
-def analytic_grad(x):
-    # d/dx sin(3x+1) = cos(3x+1) * 3
-    return math.cos(3 * x + 1) * 3
-
-def numeric_grad(fn, x, h=1e-5):
-    return (fn(x + h) - fn(x - h)) / (2 * h)
-
-x = 0.7
-print(analytic_grad(x), numeric_grad(f, x))
-```
-
-해석 미분과 수치 미분이 비슷하게 나오면 체인 룰 구현이 올바르게 연결되었다는 강한 증거가 됩니다.
-
-### 2변수 손실에서 gradient 벡터 해석
-
-```python
-def loss(w1, w2):
-    return (w1 - 2) ** 2 + 4 * (w2 + 1) ** 2
-
-def grad(w1, w2):
-    return 2 * (w1 - 2), 8 * (w2 + 1)
-
-w1, w2 = 0.0, 0.0
-g1, g2 = grad(w1, w2)
-print('grad=', (g1, g2))
-```
-
-이 예시에서는 두 번째 축 gradient가 더 크게 나오므로 동일 learning rate에서도 `w2` 방향 업데이트가 더 공격적으로 일어납니다. 좌표별 스케일 차이를 optimizer가 어떻게 다루는지 이해하는 출발점입니다.
-
-### 손실 곡선 해석 표
-
-| 관찰 패턴 | 가능한 원인 | 우선 점검 |
-| --- | --- | --- |
-| 초반 급상승 후 발산 | learning rate 과대, gradient 폭주 | lr 감소, clipping |
-| 매우 느린 하강 | learning rate 과소, 특징 스케일 불일치 | lr 증가, 정규화 |
-| 진동만 하고 정체 | 비등방 지형, batch noise 과다 | momentum, batch 조정 |
-| train 감소 / val 정체 | 과적합 | weight decay, early stopping |
-
-### 미니 실습: 간단한 업데이트 루프
-
-```python
-def train_step(w, x, y, lr=0.05):
-    pred = w * x
-    loss = (pred - y) ** 2
-    grad = 2 * (pred - y) * x
-    w = w - lr * grad
-    return w, loss, grad
-
-w = 0.0
-for _ in range(5):
-    w, L, g = train_step(w, x=3.0, y=12.0)
-    print(f'w={w:.4f}, loss={L:.4f}, grad={g:.4f}')
-```
-
-짧은 루프지만 forward-loss-backward-update가 모두 포함되어 있습니다. 이 구조를 이해하면 어떤 딥러닝 프레임워크의 학습 코드도 핵심 의미를 잃지 않고 읽을 수 있습니다.
-
-### 실전 점검 루틴
-
-1. 해석 미분과 수치 미분을 작은 예제로 한 번 맞춰 봅니다.
-2. gradient norm을 함께 기록해 신호 크기 변화를 확인합니다.
-3. learning rate를 3개 이상 비교해 수렴 민감도를 봅니다.
-4. train/validation 손실을 동시에 관찰해 과적합 신호를 분리합니다.
-5. 이상 징후가 생기면 모델 구조보다 손실/미분/업데이트 순서를 먼저 점검합니다.
-
-이 루틴이 자리 잡으면 미분 개념이 수학 노트에 머무르지 않고 실제 모델 훈련 의사결정으로 연결됩니다.
-
-
-
-## 추가 보강: 검증 가능한 예제 세트
-
-### 입력 크기 대비 알고리즘/학습 선택 표
-
-| 상황 | 빠른 선택 | 검증 기준 |
-| --- | --- | --- |
-| 작은 입력, 빠른 프로토타입 | 단순 구현 우선 | 정답 검증 테스트 3종 |
-| 큰 입력, 지연시간 민감 | 차수 낮은 알고리즘 또는 안정적 optimizer | 시간/메모리 동시 측정 |
-| 운영 장애 재현 필요 | 로그/추적 필드 강화 | 동일 입력 재실행 가능성 |
-
-### 짧은 비교 코드
-
-```python
-import time
-
-def measure(fn, *args, repeat=3):
-    best = float('inf')
-    for _ in range(repeat):
-        t0 = time.perf_counter()
-        fn(*args)
-        best = min(best, time.perf_counter() - t0)
-    return best
-```
-
-측정 코드는 화려할 필요가 없습니다. 같은 입력, 같은 환경, 같은 반복 기준을 유지하는 것이 더 중요합니다. 이 습관이 있어야 최적화 전후의 차이를 신뢰할 수 있습니다.
-
-### 실전 점검 질문
-
-1. 지금 선택한 방법의 시간/공간 비용을 한 문장으로 설명할 수 있는가
-2. 경계 입력에서 동작이 바뀌는 지점을 테스트로 고정했는가
-3. 운영 로그만으로 실패 원인을 분리할 수 있는가
-
-이 질문에 즉답할 수 있으면 구현이 아니라 설계 수준에서 품질을 확보한 상태에 가깝습니다.
 
 ## 처음 질문으로 돌아가기
 
 - **머신러닝에서 말하는 학습은 왜 미분과 직접 연결될까요?**
-  - 본문의 기준은 미분이란 무엇인가를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 학습은 손실을 줄이는 방향으로 파라미터를 반복 업데이트하는 과정입니다. "줄이는 방향"을 알려면 현재 점에서 손실이 어느 쪽으로 감소하는지 알아야 하고, 그 정보가 바로 미분값(gradient)입니다. 미분 없이는 다음 스텝의 방향을 결정할 수 없으므로, 학습 자체가 성립하지 않습니다.
 - **평균 변화율과 순간 변화율은 무엇이 다르고, 왜 둘을 구분해야 할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 평균 변화율은 넓은 구간의 전체 기울기를 요약한 값이고, 순간 변화율은 구간 폭을 0에 수렴시켜 한 점의 국소적 기울기를 읽은 값입니다. 곡선 함수에서는 위치마다 기울기가 다르므로, 현재 점에서의 정확한 업데이트 방향을 알기 위해 순간 변화율이 필요합니다.
 - **접선의 기울기와 도함수는 어떤 관계로 이해하면 가장 실용적일까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 접선은 함수를 한 점 근처에서 직선으로 근사한 것이고, 그 직선의 기울기가 곧 그 점에서의 도함수 값입니다. 도함수는 모든 점에서의 접선 기울기를 하나의 함수로 정리한 것이므로, "함수의 기울기 지도"라고 이해하면 gradient 개념으로 자연스럽게 확장됩니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -300,6 +460,9 @@ def measure(fn, *args, repeat=3):
 - [Essence of Calculus - 3Blue1Brown](https://www.3blue1brown.com/topics/calculus)
 - [Deep Learning Book - Numerical Computation](https://www.deeplearningbook.org/contents/numerical.html)
 - [NumPy Numerical Differentiation](https://numpy.org/doc/stable/reference/generated/numpy.gradient.html)
+
+### 예제 코드
+- [book-examples/calculus-for-ml-101/ko](https://github.com/yeongseon-books/book-examples/tree/main/calculus-for-ml-101/ko)
 
 ### 관련 시리즈
 - [Linear Algebra 101](../../linear-algebra-101/ko/)

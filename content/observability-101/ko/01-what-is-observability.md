@@ -124,9 +124,90 @@ def health():
 ```
 
 이 코드는 요청마다 request_id를 붙이고, 시작과 끝을 JSON 로그로 남깁니다. 나중에 느린 요청을 찾으려면 `duration_ms > 1000` 같은 조건으로 필터링하면 됩니다. 문자열 grep 대신 필드 기반 질의가 가능해집니다.
+
+## OpenTelemetry로 자동 계측 시작하기
+
+위 예제는 수동으로 로그를 남기는 방식입니다. 실제 운영에서는 OpenTelemetry SDK를 사용하면 HTTP 요청, DB 쿼리, 외부 호출을 자동으로 계측할 수 있습니다.
+
+```python
+# requirements.txt
+# opentelemetry-api==1.25.0
+# opentelemetry-sdk==1.25.0
+# opentelemetry-instrumentation-fastapi==0.46b0
+# opentelemetry-exporter-otlp==1.25.0
+
+from opentelemetry import trace
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from opentelemetry.sdk.resources import Resource
+
+# 서비스 이름과 버전을 리소스로 등록합니다.
+resource = Resource.create({
+    "service.name": "checkout-api",
+    "service.version": "1.2.0",
+    "deployment.environment": "production",
+})
+
+# TracerProvider를 설정하고 OTLP exporter를 연결합니다.
+provider = TracerProvider(resource=resource)
+exporter = OTLPSpanExporter(endpoint="http://otel-collector:4317")
+provider.add_span_processor(BatchSpanProcessor(exporter))
+trace.set_tracer_provider(provider)
+
+# FastAPI 앱에 자동 계측을 적용합니다.
+app = FastAPI()
+FastAPIInstrumentor.instrument_app(app)
+
+# 이후 모든 HTTP 요청은 자동으로 span이 생성됩니다.
+# 수동 span이 필요한 경우:
+tracer = trace.get_tracer(__name__)
+
+@app.post("/checkout")
+async def checkout(order: dict):
+    with tracer.start_as_current_span("payment.process") as span:
+        span.set_attribute("order.id", order["id"])
+        span.set_attribute("order.amount", order["amount"])
+        result = await process_payment(order)
+        if result.failed:
+            span.set_status(trace.StatusCode.ERROR, result.error)
+        return result
+```
+
+이 코드에서 주목할 점은 세 가지입니다.
+
+첫째, `Resource`로 서비스 이름과 버전을 명시합니다. 나중에 트레이스를 검색할 때 어떤 서비스의 어떤 버전에서 발생한 문제인지 바로 구분할 수 있습니다.
+
+둘째, `FastAPIInstrumentor`가 모든 HTTP 엔드포인트에 자동으로 span을 생성합니다. 별도 코드 없이도 요청 경로, 상태 코드, 소요 시간이 기록됩니다.
+
+셋째, 비즈니스 로직에서 중요한 구간은 수동 span으로 감쌉니다. 결제 처리처럼 외부 의존성을 호출하는 부분은 자동 계측만으로 충분하지 않기 때문입니다. `span.set_attribute`로 주문 ID와 금액을 남기면, 장애 시 특정 주문을 바로 찾을 수 있습니다.
+
+### 자동 계측과 수동 계측의 구분
+
+| 구분 | 자동 계측 | 수동 계측 |
+| --- | --- | --- |
+| 적용 범위 | HTTP, DB, gRPC 등 라이브러리 수준 | 비즈니스 로직, 외부 API 호출 |
+| 설정 방식 | `Instrumentor.instrument_app()` 한 줄 | `tracer.start_as_current_span()` |
+| 얻는 정보 | 경로, 상태 코드, 소요 시간 | 주문 ID, 결제 금액, 실패 사유 |
+| 유지보수 | 라이브러리 업데이트 시 자동 반영 | 코드 변경 시 함께 수정 필요 |
+| 권장 시점 | 프로젝트 초기, 전체 가시성 확보 | 장애 빈도 높은 핵심 경로 |
+
+실무에서는 자동 계측으로 전체 가시성을 먼저 확보한 뒤, 장애가 반복되는 구간에 수동 span을 추가하는 순서가 가장 효율적입니다. 처음부터 모든 함수에 span을 넣으면 노이즈가 늘어나고 비용이 빠르게 증가합니다.
+
 ## 한눈에 보는 구조
 
 관측성은 시스템 바깥의 신호로 안쪽 상태를 추론하는 기술입니다. 메트릭은 시간 흐름을 보고, 로그는 사건의 맥락을 남기며, 트레이스는 요청 경로를 연결합니다.
+
+아래 표는 세 신호가 장애 대응 흐름에서 각각 어떤 역할을 맡는지 정리한 것입니다.
+
+| 신호 | 답하는 질문 | 저장 형태 | 대표 도구 |
+| --- | --- | --- | --- |
+| 메트릭 | 언제부터 이상한가? 얼마나 심한가? | 시계열 숫자 | Prometheus, Datadog |
+| 로그 | 그 순간 실제로 무슨 일이 있었는가? | 구조화된 이벤트 | Loki, Elasticsearch |
+| 트레이스 | 요청이 어디를 거쳤고 어디서 멈췄는가? | span 트리 | Jaeger, Tempo |
+
+세 신호는 서로 다른 해상도에서 같은 시스템을 비추는 렌즈입니다. 메트릭은 넓게, 트레이스는 깊게, 로그는 세밀하게 봅니다.
 
 ## 핵심 용어
 
@@ -251,6 +332,8 @@ Expected output:
 - [ ] 메트릭, 로그, 트레이스의 역할을 각각 말할 수 있습니다.
 - [ ] 구조화된 로그 한 줄을 직접 만들 수 있습니다.
 - [ ] trace_id가 왜 필요한지 설명할 수 있습니다.
+- [ ] OpenTelemetry SDK로 자동 계측을 설정할 수 있습니다.
+- [ ] 자동 계측과 수동 계측의 차이를 설명할 수 있습니다.
 
 ## 연습 문제
 
@@ -343,5 +426,7 @@ Expected output:
 - [Google SRE Book — Monitoring](https://sre.google/sre-book/monitoring-distributed-systems/)
 - [Three Pillars of Observability](https://www.cncf.io/blog/2022/05/24/observability-cloud-native/)
 - [Observability vs Monitoring](https://www.honeycomb.io/blog/observability-101)
+- [OpenTelemetry Python SDK](https://opentelemetry.io/docs/languages/python/)
+- [예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/observability-101/ko)
 
 Tags: Observability, Monitoring, SRE, DevOps, Metrics

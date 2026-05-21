@@ -234,6 +234,201 @@ complexity_table([10, 100, 1_000, 10_000, 100_000])
 
 동시에 이론적인 Big-O와 실제 벽시계 시간이 다를 수 있다는 사실도 압니다. 그래서 차수를 낮춘 뒤에는 반드시 측정합니다. 측정하지 않은 최적화는 추측에 가깝기 때문입니다.
 
+
+### 정렬 알고리즘 복잡도 비교표
+
+실무에서 만나는 주요 정렬 알고리즘의 시간·공간 복잡도를 정리합니다.
+
+| 알고리즘 | 최선 | 평균 | 최악 | 공간 | 안정성 | 특징 |
+|----------|------|------|------|------|--------|------|
+| Bubble Sort | O(n) | O(n²) | O(n²) | O(1) | 안정 | 교육용, 실무 부적합 |
+| Selection Sort | O(n²) | O(n²) | O(n²) | O(1) | 불안정 | 교환 횟수 최소 |
+| Insertion Sort | O(n) | O(n²) | O(n²) | O(1) | 안정 | 거의 정렬된 입력에 강함 |
+| Merge Sort | O(n log n) | O(n log n) | O(n log n) | O(n) | 안정 | 외부 정렬에 적합 |
+| Quick Sort | O(n log n) | O(n log n) | O(n²) | O(log n) | 불안정 | 평균 상수가 작음 |
+| Heap Sort | O(n log n) | O(n log n) | O(n log n) | O(1) | 불안정 | 캐시 지역성 낮음 |
+| Timsort | O(n) | O(n log n) | O(n log n) | O(n) | 안정 | Python/Java 기본 정렬 |
+| Counting Sort | O(n+k) | O(n+k) | O(n+k) | O(k) | 안정 | 범위 k가 작을 때 |
+| Radix Sort | O(d·n) | O(d·n) | O(d·n) | O(n+k) | 안정 | 자릿수 d가 작을 때 |
+
+Timsort가 Python 표준 라이브러리에 채택된 이유는 실세계 데이터가 부분 정렬된 경우가 많기 때문입니다. 이미 정렬된 구간(run)을 감지해 합치므로, 최선 O(n)을 실전에서도 자주 달성합니다.
+
+### 분할 상환 분석(Amortized Analysis)
+
+파이썬 `list.append()`는 대부분 O(1)이지만 가끔 배열을 재할당합니다. 이때 한 번의 비용은 O(n)입니다. 하지만 n번 연속으로 `append`를 하면 총 비용이 O(n)이므로 평균(분할 상환) 비용은 O(1)입니다.
+
+```python
+import sys
+
+sizes = []
+prev_size = 0
+arr = []
+for i in range(100):
+    arr.append(i)
+    curr_size = sys.getsizeof(arr)
+    if curr_size != prev_size:
+        sizes.append((i, curr_size))
+        prev_size = curr_size
+
+print("append 횟수 | 내부 배열 크기(bytes)")
+print("-" * 35)
+for count, size in sizes[:12]:
+    print(f"  {count:>5}      |  {size:>6}")
+```
+
+출력을 보면 배열 크기가 일정 비율(약 1.125배)로 증가합니다. 재할당은 드물게 발생하고, 이를 모든 연산에 나눠 부담하면 각 `append`는 상환 O(1)이 됩니다.
+
+이 개념은 해시 테이블의 리사이징, 스택의 동적 확장, 스플레이 트리의 회전 등에도 동일하게 적용됩니다.
+
+### 공간-시간 트레이드오프
+
+알고리즘 설계에서 시간을 줄이려면 공간을 더 쓰고, 공간을 아끼려면 시간이 늘어나는 상충 관계가 자주 나타납니다.
+
+| 문제 | 시간 우선 접근 | 공간 우선 접근 |
+|------|---------------|---------------|
+| 피보나치 수 | 메모이제이션 O(n) 시간, O(n) 공간 | 반복문 O(n) 시간, O(1) 공간 |
+| 두 수 합 | 해시맵 O(n) 시간, O(n) 공간 | 정렬 후 투 포인터 O(n log n) 시간, O(1) 공간 |
+| 중복 검사 | set 사용 O(n) 시간, O(n) 공간 | 정렬 후 인접 비교 O(n log n) 시간, O(1) 공간 |
+| 최단 경로 | BFS/Dijkstra O(V+E) 시간, O(V) 공간 | DFS 반복 심화 O(V+E) 시간, O(깊이) 공간 |
+
+```python
+# 시간 우선: Two Sum with hash map — O(n) time, O(n) space
+def two_sum_hash(nums: list[int], target: int) -> tuple[int, int]:
+    seen = {}
+    for i, num in enumerate(nums):
+        complement = target - num
+        if complement in seen:
+            return (seen[complement], i)
+        seen[num] = i
+    return (-1, -1)
+
+# 공간 우선: Two Sum with sort + two pointers — O(n log n) time, O(1) extra space
+def two_sum_sort(nums: list[int], target: int) -> tuple[int, int]:
+    indexed = sorted(enumerate(nums), key=lambda x: x[1])
+    lo, hi = 0, len(indexed) - 1
+    while lo < hi:
+        s = indexed[lo][1] + indexed[hi][1]
+        if s == target:
+            return (indexed[lo][0], indexed[hi][0])
+        elif s < target:
+            lo += 1
+        else:
+            hi -= 1
+    return (-1, -1)
+
+nums = [2, 7, 11, 15, 1, 8]
+print(two_sum_hash(nums, 9))   # (0, 1)
+print(two_sum_sort(nums, 9))   # (0, 1)
+```
+
+운영 환경에서는 메모리가 넉넉한 서버라면 시간 우선을, 임베디드 시스템이나 엣지 디바이스라면 공간 우선을 선택합니다.
+
+### 재귀와 반복의 복잡도 분석
+
+같은 알고리즘도 재귀와 반복으로 구현하면 실제 성능이 달라집니다.
+
+```python
+# 재귀 피보나치 — O(2^n) 시간, O(n) 콜 스택
+def fib_recursive(n: int) -> int:
+    if n <= 1:
+        return n
+    return fib_recursive(n - 1) + fib_recursive(n - 2)
+
+# 메모이제이션 피보나치 — O(n) 시간, O(n) 공간
+from functools import lru_cache
+
+@lru_cache(maxsize=None)
+def fib_memo(n: int) -> int:
+    if n <= 1:
+        return n
+    return fib_memo(n - 1) + fib_memo(n - 2)
+
+# 반복 피보나치 — O(n) 시간, O(1) 공간
+def fib_iterative(n: int) -> int:
+    if n <= 1:
+        return n
+    a, b = 0, 1
+    for _ in range(2, n + 1):
+        a, b = b, a + b
+    return b
+
+import time
+
+n = 35
+start = time.perf_counter()
+fib_recursive(n)
+print(f"recursive (n={n}): {time.perf_counter() - start:.4f}s")
+
+start = time.perf_counter()
+fib_memo(n)
+print(f"memoized  (n={n}): {time.perf_counter() - start:.6f}s")
+
+start = time.perf_counter()
+fib_iterative(n)
+print(f"iterative (n={n}): {time.perf_counter() - start:.6f}s")
+```
+
+재귀의 지수적 폭발을 메모이제이션으로 선형으로 줄이고, 반복으로 바꾸면 콜 스택까지 제거합니다. Python은 기본 재귀 깊이가 1000이므로, 깊은 재귀는 `sys.setrecursionlimit` 또는 반복 변환이 필요합니다.
+
+### 그래프 알고리즘의 복잡도
+
+그래프 문제는 실무에서 자주 등장합니다. 소셜 네트워크, 라우팅, 의존성 해결 등이 모두 그래프 문제입니다.
+
+| 알고리즘 | 시간 복잡도 | 공간 복잡도 | 용도 |
+|----------|-------------|-------------|------|
+| BFS | O(V + E) | O(V) | 최단 경로(비가중) |
+| DFS | O(V + E) | O(V) | 연결 요소, 위상 정렬 |
+| Dijkstra | O((V+E) log V) | O(V) | 최단 경로(가중, 양수) |
+| Bellman-Ford | O(V · E) | O(V) | 음수 간선 허용 |
+| Floyd-Warshall | O(V³) | O(V²) | 모든 쌍 최단 경로 |
+| Kruskal | O(E log E) | O(V) | 최소 신장 트리 |
+| Topological Sort | O(V + E) | O(V) | 빌드 순서, DAG |
+
+```python
+from collections import deque
+
+def bfs_shortest_path(graph: dict[str, list[str]], start: str, end: str) -> list[str]:
+    """BFS로 비가중 그래프의 최단 경로를 찾습니다."""
+    queue = deque([(start, [start])])
+    visited = {start}
+
+    while queue:
+        node, path = queue.popleft()
+        if node == end:
+            return path
+        for neighbor in graph[node]:
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append((neighbor, path + [neighbor]))
+    return []
+
+# 예시: 서울 지하철 노선 일부를 그래프로 표현
+metro = {
+    "서울역": ["시청", "남영"],
+    "시청": ["서울역", "종각", "을지로입구"],
+    "종각": ["시청", "종로3가"],
+    "종로3가": ["종각", "을지로3가"],
+    "을지로입구": ["시청", "을지로3가"],
+    "을지로3가": ["을지로입구", "종로3가"],
+    "남영": ["서울역"],
+}
+
+path = bfs_shortest_path(metro, "남영", "종로3가")
+print(f"최단 경로: {' → '.join(path)}")
+# 최단 경로: 남영 → 서울역 → 시청 → 종각 → 종로3가
+```
+
+V(정점 수)와 E(간선 수)로 복잡도를 표현하는 이유는, 그래프의 크기가 두 가지 독립 변수로 결정되기 때문입니다. 밀집 그래프(E ≈ V²)에서는 BFS도 O(V²)가 되므로, 인접 행렬과 인접 리스트 중 어떤 표현을 쓰느냐가 성능에 영향을 줍니다.
+
+### NP 문제와 현실적 한계
+
+모든 문제에 효율적인 알고리즘이 존재하는 것은 아닙니다. NP-완전 문제(외판원, 배낭, 그래프 색칠 등)는 알려진 최선 알고리즘이 지수 시간입니다. 실무에서는 이런 문제를 만나면 세 가지 전략을 씁니다.
+
+1. **근사 알고리즘**: 최적해의 일정 비율 이내 해를 다항 시간에 구합니다. 예를 들어 TSP의 2-근사는 최적의 2배 이내 경로를 O(n² log n)에 찾습니다.
+2. **휴리스틱**: 최적 보장은 없지만 실전에서 충분히 좋은 해를 빠르게 구합니다. 유전 알고리즘, 시뮬레이티드 어닐링이 대표적입니다.
+3. **문제 크기 제한**: 입력이 작으면(n < 20) 지수 알고리즘도 1초 안에 끝납니다. 비트마스크 DP가 이 범주에 해당합니다.
+
+복잡도 이론을 아는 것의 실무적 가치는 "이 문제는 다항 시간에 풀 수 없다"는 판단을 빠르게 내려서, 완벽한 해를 찾느라 시간을 낭비하지 않는 데 있습니다.
 ## 체크리스트
 
 - [ ] Big-O 표기법으로 알고리즘의 차수를 말할 수 있는가
@@ -281,11 +476,17 @@ complexity_table([10, 100, 1_000, 10_000, 100_000])
 ## 처음 질문으로 돌아가기
 
 - **같은 문제를 푸는 두 코드 중 무엇이 더 빠를지 어떻게 판단할까요?**
-  - 본문의 기준은 알고리즘과 복잡도를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 각 코드의 핵심 반복문이 입력 크기 n에 대해 몇 번 실행되는지 세고, Big-O로 표현합니다. O(n)과 O(n²)는 n=10에서 차이가 없어도 n=100만에서 수천 배 차이가 납니다. 차수를 비교한 뒤 실제 측정으로 상수항과 캐시 효과를 확인합니다.
 - **시간 복잡도와 공간 복잡도는 무엇을 각각 뜻할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 시간 복잡도는 입력이 커질 때 연산 횟수의 증가율, 공간 복잡도는 추가 메모리의 증가율입니다. 둘은 트레이드오프 관계에 있어서, 해시맵으로 시간을 줄이면 공간이 늘고, 정렬 후 투 포인터로 공간을 줄이면 시간이 늘어납니다.
 - **Big-O 표기법은 왜 코드를 실행하지 않고도 성능을 가늠하게 해 줄까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - Big-O는 입력이 무한히 커질 때의 상한 증가율만 남기므로, 하드웨어·언어·상수항에 관계없이 알고리즘의 본질적 비용을 비교할 수 있습니다. 실행 없이도 중첩 루프의 차수를 세면 운영 규모에서의 병목을 예측할 수 있습니다.
+
+
+
+
+
+
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -310,4 +511,5 @@ complexity_table([10, 100, 1_000, 10_000, 100_000])
 - [Introduction to Algorithms (CLRS)](https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/)
 - [Donald Knuth — The Art of Computer Programming](https://www-cs-faculty.stanford.edu/~knuth/taocp.html)
 
+- [이 시리즈의 예제 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/computer-science-101/ko)
 Tags: Computer Science, 알고리즘, 복잡도, Big-O, 자료구조, 성능

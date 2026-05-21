@@ -63,6 +63,9 @@ VPC는 클라우드 네트워크의 기본 경계입니다. 서브넷은 VPC 내
 - **Security Group**: 인스턴스 단위의 상태 저장 방화벽입니다.
 - **NACL**: 서브넷 단위의 무상태 방화벽입니다.
 - **Load Balancer**: 여러 대상에 트래픽을 분산합니다.
+- **Internet Gateway**: VPC와 인터넷을 연결하는 관문입니다.
+- **NAT Gateway**: Private 서브넷의 아웃바운드 인터넷 접속을 중개합니다.
+- **Route Table**: 서브넷의 트래픽이 어디로 향하는지 결정하는 규칙 집합입니다.
 
 ## Before / After
 
@@ -70,29 +73,108 @@ VPC는 클라우드 네트워크의 기본 경계입니다. 서브넷은 VPC 내
 
 **After**에서는 앱은 Private 서브넷에 두고 ALB만 외부에 노출합니다. 데이터베이스는 별도의 내부 서브넷에 배치합니다.
 
-## 실습: 보안 그룹 만들기
+## VPC CIDR 설계
 
-### 1단계 — 클라이언트
+VPC를 만들 때 가장 먼저 결정하는 것이 CIDR 블록입니다. 이 결정은 이후 서브넷 수, 인스턴스 수, VPC 간 피어링 가능 여부까지 영향을 미칩니다. 한 번 정하면 축소가 불가능하고 확장도 제한적이므로, 처음에 충분한 여유를 두는 편이 안전합니다.
+
+### CIDR 크기별 용량
+
+| CIDR | 총 IP 수 | AWS 예약 (5개/서브넷) 제외 후 | 용도 예시 |
+| --- | --- | --- | --- |
+| /16 | 65,536 | 서브넷 분할에 따라 다름 | 대규모 프로덕션 VPC |
+| /20 | 4,096 | 서브넷당 ~4,091 | 중규모 서비스 |
+| /24 | 256 | 251 | 소규모 서브넷, 관리용 |
+| /28 | 16 | 11 | 최소 서브넷 (ALB 최소 요구) |
+
+AWS는 각 서브넷에서 첫 4개 IP와 마지막 1개 IP를 예약합니다. 예를 들어 `10.0.0.0/24` 서브넷에서 실제 사용 가능한 IP는 `10.0.0.4`부터 `10.0.0.254`까지 251개입니다.
+
+### 실무 CIDR 설계 원칙
+
+1. VPC는 `/16`으로 시작합니다. 나중에 서브넷을 추가할 여유가 생깁니다.
+2. 서브넷은 `/24` 단위로 나눕니다. 한 AZ당 Public 1개, App 1개, DB 1개가 기본입니다.
+3. VPC 간 CIDR이 겹치면 피어링이 불가능합니다. `10.0.0.0/16`, `10.1.0.0/16`처럼 두 번째 옥텟으로 구분하는 방식이 흔합니다.
+4. 온프레미스 네트워크와 VPN으로 연결할 계획이 있다면, 기존 대역과 겹치지 않도록 미리 확인해야 합니다.
+
+## Security Group과 NACL 비교
+
+두 계층의 방화벽이 존재하는 이유는 책임 범위가 다르기 때문입니다.
+
+| 항목 | Security Group | Network ACL |
+| --- | --- | --- |
+| 적용 단위 | ENI(인스턴스) | 서브넷 |
+| 상태 | Stateful (응답 자동 허용) | Stateless (인/아웃 별도 규칙) |
+| 기본 정책 | 모든 인바운드 거부, 모든 아웃바운드 허용 | 모든 트래픽 허용 |
+| 규칙 방식 | 허용만 가능 (거부 규칙 없음) | 허용 + 거부 가능, 번호 순서로 평가 |
+| 규칙 수 제한 | 기본 60개 (인/아웃 합산) | 서브넷당 20개 (조정 가능) |
+| 주요 용도 | 역할별 접근 제어 | 서브넷 경계의 거부 목록 |
+
+실무에서는 Security Group이 주 방화벽이고, NACL은 보조 역할입니다. 예를 들어 특정 IP 대역을 서브넷 단위로 차단해야 할 때 NACL의 거부 규칙이 유용합니다. Security Group만으로는 거부를 명시할 수 없기 때문입니다.
+
+## 실습: VPC 전체 구성 (boto3)
+
+### 1단계 — VPC 생성
 
 ```python
 import boto3
+
 ec2 = boto3.client("ec2")
+
+
+def create_vpc(cidr: str, name: str) -> str:
+    resp = ec2.create_vpc(CidrBlock=cidr)
+    vpc_id = resp["Vpc"]["VpcId"]
+    ec2.create_tags(Resources=[vpc_id], Tags=[{"Key": "Name", "Value": name}])
+    ec2.modify_vpc_attribute(VpcId=vpc_id, EnableDnsSupport={"Value": True})
+    ec2.modify_vpc_attribute(VpcId=vpc_id, EnableDnsHostnames={"Value": True})
+    return vpc_id
 ```
 
-### 2단계 — SG 생성
+### 2단계 — 서브넷 생성
 
 ```python
-def create_sg(vpc_id, name):
-    res = ec2.create_security_group(
+def create_subnet(vpc_id: str, cidr: str, az: str, name: str) -> str:
+    resp = ec2.create_subnet(VpcId=vpc_id, CidrBlock=cidr, AvailabilityZone=az)
+    subnet_id = resp["Subnet"]["SubnetId"]
+    ec2.create_tags(Resources=[subnet_id], Tags=[{"Key": "Name", "Value": name}])
+    return subnet_id
+```
+
+### 3단계 — Internet Gateway 연결
+
+```python
+def attach_igw(vpc_id: str) -> str:
+    resp = ec2.create_internet_gateway()
+    igw_id = resp["InternetGateway"]["InternetGatewayId"]
+    ec2.attach_internet_gateway(InternetGatewayId=igw_id, VpcId=vpc_id)
+    return igw_id
+```
+
+### 4단계 — Route Table 구성
+
+```python
+def create_public_route_table(vpc_id: str, igw_id: str, subnet_id: str) -> str:
+    resp = ec2.create_route_table(VpcId=vpc_id)
+    rtb_id = resp["RouteTable"]["RouteTableId"]
+    ec2.create_route(
+        RouteTableId=rtb_id,
+        DestinationCidrBlock="0.0.0.0/0",
+        GatewayId=igw_id,
+    )
+    ec2.associate_route_table(RouteTableId=rtb_id, SubnetId=subnet_id)
+    return rtb_id
+```
+
+### 5단계 — Security Group 생성 및 규칙 추가
+
+```python
+def create_sg(vpc_id: str, name: str) -> str:
+    resp = ec2.create_security_group(
         GroupName=name, Description=name, VpcId=vpc_id,
     )
-    return res["GroupId"]
-```
+    return resp["GroupId"]
 
-### 3단계 — 인바운드 허용
 
-```python
-def allow_https(sg_id):
+def allow_https(sg_id: str) -> None:
     ec2.authorize_security_group_ingress(
         GroupId=sg_id,
         IpPermissions=[{
@@ -100,35 +182,77 @@ def allow_https(sg_id):
             "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
         }],
     )
-```
 
-### 4단계 — DB SG는 앱 SG만 허용
 
-```python
-def allow_db_from_app(db_sg, app_sg):
+def allow_from_sg(sg_id: str, source_sg: str, port: int) -> None:
     ec2.authorize_security_group_ingress(
-        GroupId=db_sg,
+        GroupId=sg_id,
         IpPermissions=[{
-            "IpProtocol": "tcp", "FromPort": 5432, "ToPort": 5432,
-            "UserIdGroupPairs": [{"GroupId": app_sg}],
+            "IpProtocol": "tcp", "FromPort": port, "ToPort": port,
+            "UserIdGroupPairs": [{"GroupId": source_sg}],
         }],
     )
 ```
 
-### 5단계 — 검증
+### 6단계 — 전체 조립
 
 ```python
-def describe(sg_id):
-    return ec2.describe_security_groups(GroupIds=[sg_id])
+def build_network():
+    vpc_id = create_vpc("10.0.0.0/16", "prod-vpc")
+    igw_id = attach_igw(vpc_id)
+
+    pub_a = create_subnet(vpc_id, "10.0.0.0/24", "ap-northeast-2a", "public-a")
+    app_a = create_subnet(vpc_id, "10.0.10.0/24", "ap-northeast-2a", "app-a")
+    db_a = create_subnet(vpc_id, "10.0.20.0/24", "ap-northeast-2a", "db-a")
+
+    create_public_route_table(vpc_id, igw_id, pub_a)
+
+    alb_sg = create_sg(vpc_id, "alb-sg")
+    app_sg = create_sg(vpc_id, "app-sg")
+    db_sg = create_sg(vpc_id, "db-sg")
+
+    allow_https(alb_sg)
+    allow_from_sg(app_sg, alb_sg, 8080)
+    allow_from_sg(db_sg, app_sg, 5432)
+
+    return {
+        "vpc": vpc_id,
+        "subnets": {"public": pub_a, "app": app_a, "db": db_a},
+        "security_groups": {"alb": alb_sg, "app": app_sg, "db": db_sg},
+    }
 ```
 
-이 예제는 네트워크 보안에서 가장 흔한 패턴 하나를 보여 줍니다. 데이터베이스는 CIDR 대역 전체가 아니라 애플리케이션 보안 그룹 자체를 신뢰합니다. 즉, IP 주소보다 역할에 맞춰 접근을 허용하는 방식입니다.
+## CLI로 같은 작업 확인하기
+
+boto3 코드와 동일한 결과를 AWS CLI로도 확인할 수 있습니다.
+
+```bash
+# VPC 생성
+aws ec2 create-vpc --cidr-block 10.0.0.0/16 --query 'Vpc.VpcId' --output text
+
+# 서브넷 생성
+aws ec2 create-subnet --vpc-id vpc-xxx --cidr-block 10.0.0.0/24 \
+    --availability-zone ap-northeast-2a --query 'Subnet.SubnetId' --output text
+
+# Internet Gateway 생성 및 연결
+aws ec2 create-internet-gateway --query 'InternetGateway.InternetGatewayId' --output text
+aws ec2 attach-internet-gateway --internet-gateway-id igw-xxx --vpc-id vpc-xxx
+
+# Route Table에 기본 라우트 추가
+aws ec2 create-route --route-table-id rtb-xxx \
+    --destination-cidr-block 0.0.0.0/0 --gateway-id igw-xxx
+
+# Security Group 확인
+aws ec2 describe-security-groups --group-ids sg-xxx sg-yyy \
+    --query 'SecurityGroups[].{Name:GroupName,Rules:IpPermissions}'
+```
 
 ## 이 코드에서 먼저 봐야 할 점
 
 - DB 보안 그룹은 CIDR보다 애플리케이션 보안 그룹을 참조하는 방식이 일반적입니다.
 - `0.0.0.0/0`은 전 세계에 열겠다는 명시적 선언입니다.
 - SG는 상태 저장, NACL은 무상태라는 차이가 있습니다.
+- Route Table이 없으면 서브넷 간 트래픽이 의도와 다르게 흐를 수 있습니다.
 
 ## 이 예제를 실제로 검증하는 순서
 
@@ -156,47 +280,146 @@ aws ec2 describe-security-groups --group-ids sg-xxxxxxxx sg-yyyyyyyy
 
 실무에서는 ALB를 Public 서브넷에 두고, 앱 서버는 Private 서브넷에, RDS는 DB 전용 Private 서브넷에 두는 구성이 기본입니다. 이렇게 하면 진입점이 명확해지고, 방화벽 규칙도 역할별로 단순하게 유지할 수 있습니다.
 
-## 자주 하는 실수 5가지
+## VPC 연결 옵션 비교
 
-1. SSH를 `0.0.0.0/0`으로 열어 둡니다.
-2. 데이터베이스를 Public 서브넷에 둡니다.
-3. NACL과 SG의 책임을 혼동합니다.
-4. Cross-AZ 트래픽 비용을 무시합니다.
-5. Egress 규칙을 검토하지 않습니다.
+서비스가 커지면 하나의 VPC로는 부족해집니다. 팀별 VPC를 분리하거나, 공유 서비스를 별도 VPC에 두는 패턴이 생깁니다. 이때 VPC 간 연결 방식을 선택해야 합니다.
 
-## 실무에서는 이렇게 생각합니다
+| 항목 | VPC Peering | Transit Gateway | PrivateLink |
+| --- | --- | --- | --- |
+| 연결 구조 | 1:1 | Hub-and-spoke | Provider-Consumer |
+| CIDR 겹침 허용 | 불가 | 불가 | 가능 |
+| 전이적 라우팅 | 불가 (A-B, B-C 연결해도 A-C 불가) | 가능 | 해당 없음 |
+| 비용 | 데이터 전송 요금만 | 시간당 요금 + 데이터 전송 | 시간당 요금 + 데이터 전송 |
+| 적합한 경우 | VPC 2-3개 직접 연결 | VPC 10개 이상 중앙 관리 | 특정 서비스만 노출 |
+| 관리 복잡도 | VPC 수 증가 시 O(n^2) | 중앙 집중 관리 | 서비스 단위로 독립 |
 
-- Private가 기본값이고, Public은 예외입니다.
-- 보안 그룹은 역할별로 쪼개는 편이 낫습니다.
-- 인바운드만큼 아웃바운드도 명시적으로 제한해야 합니다.
-- VPC Flow Logs는 기본적으로 켜 두는 편이 좋습니다.
-- CIDR 범위는 미래의 병합과 확장을 고려해 잡아야 합니다.
+**판단 기준**: VPC가 3개 이하이고 모두 같은 팀이 관리한다면 Peering으로 충분합니다. VPC가 늘어나기 시작하면 Transit Gateway로 전환하는 편이 낫습니다. 외부 팀이나 파트너에게 내부 서비스 하나만 노출해야 한다면 PrivateLink가 적합합니다.
 
-## 체크리스트
+## 로드 밸런서 유형 비교
 
-- [ ] Public 서브넷에 데이터베이스가 없는가.
-- [ ] 보안 그룹이 역할별로 분리되어 있는가.
-- [ ] Flow Logs가 활성화되어 있는가.
-- [ ] Egress 규칙이 명시적으로 정의되어 있는가.
+AWS에서 제공하는 로드 밸런서는 세 종류입니다. 선택 기준은 프로토콜과 성능 요구사항입니다.
 
-## 연습 문제
+| 항목 | ALB (Application) | NLB (Network) | CLB (Classic) |
+| --- | --- | --- | --- |
+| 계층 | L7 (HTTP/HTTPS) | L4 (TCP/UDP/TLS) | L4 + L7 혼합 |
+| 라우팅 | 경로, 호스트, 헤더 기반 | 포트 기반 | 단순 라운드로빈 |
+| 성능 | 수백만 RPS | 수억 PPS, 고정 IP 지원 | 레거시 |
+| WebSocket | 지원 | 지원 | 미지원 |
+| 고정 IP | 불가 (DNS 기반) | 가능 (EIP 연결) | 불가 |
+| 주요 용도 | 웹 API, 마이크로서비스 | gRPC, 게임, IoT | 신규 사용 비권장 |
 
-1. Security Group과 NACL의 차이 세 가지를 적어 보세요.
-2. Public/Private 서브넷 분리가 보안에 도움이 되는 이유를 한 문장으로 설명해 보세요.
-3. ALB와 NLB의 큰 차이 하나를 적어 보세요.
+대부분의 웹 서비스는 ALB로 시작합니다. gRPC처럼 L4 수준의 제어가 필요하거나, 고정 IP를 방화벽 화이트리스트에 등록해야 하는 경우 NLB를 선택합니다. CLB는 레거시이므로 신규 프로젝트에서는 사용하지 않습니다.
 
-## 정리 및 다음 단계
+### ALB 경로 기반 라우팅 예시
 
-연결 경로를 정했다면, 이제는 누가 어떤 권한으로 그 경로를 사용할지를 설계해야 합니다. 다음 글에서는 Identity와 Security를 다루겠습니다.
+ALB는 URL 경로에 따라 서로 다른 대상 그룹으로 트래픽을 분배할 수 있습니다. 마이크로서비스 아키텍처에서 하나의 도메인 뒤에 여러 서비스를 배치할 때 유용합니다.
 
-단일 가용성 영역(AZ)에만 배포하면 간단하지만, AZ 장애 시 서비스가 전체 중단됩니다. Multi-AZ 배포는 신뢰성을 높이지만 복잡도와 비용도 증가합니다.
+```text
+api.example.com/users/*   → Target Group A (사용자 서비스)
+api.example.com/orders/*  → Target Group B (주문 서비스)
+api.example.com/health    → Target Group C (헬스체크 전용)
+```
 
-보안 그룹은 상태 저장(stateful)이고, 네트워크 ACL은 상태 비저장(stateless)입니다. 정책을 작게 권한을 부여하는 최소 권한 원칙을 따르면 보안이 올라갑니다.
-  - 본문의 기준은 Network를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
-NAT 게이트웨이는 프라이빗 서브넷의 인스턴스가 인터넷에 연결되게 해줍니다. 하지만 인바운드 연결은 차단되므로, 외부 접근이 필요한 경우 로드 밸런서 또는 베스천 호스트를 사용합니다.
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
-- **Public 서브넷과 Private 서브넷은 어떤 패턴으로 나누는 것이 일반적일까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+이 구성을 사용하면 서비스별로 독립적인 배포와 스케일링이 가능합니다. 한 서비스의 장애가 다른 서비스에 영향을 주지 않도록 대상 그룹을 분리하는 것이 핵심입니다.
+
+## DNS 해석 흐름
+
+VPC 내부의 DNS 해석은 다음 순서로 진행됩니다.
+
+```text
+[애플리케이션] 
+    → VPC DNS Resolver (VPC CIDR + 2 주소, 예: 10.0.0.2)
+        → Route 53 Resolver
+            → Private Hosted Zone (내부 도메인)
+            → Public Hosted Zone (외부 도메인)
+            → 외부 DNS (재귀 해석)
+```
+
+`EnableDnsSupport`를 켜면 VPC 내부 인스턴스가 Amazon 제공 DNS를 사용할 수 있습니다. `EnableDnsHostnames`를 켜면 퍼블릭 IP가 있는 인스턴스에 자동으로 DNS 호스트명이 부여됩니다. 이 두 설정은 RDS 엔드포인트 해석, VPC 엔드포인트 사용, ACM 인증서 검증 등에 필수입니다.
+
+## NAT Gateway와 VPC Endpoint
+
+Private 서브넷의 인스턴스가 외부 인터넷에 접근해야 할 때 NAT Gateway를 사용합니다. 패키지 업데이트, 외부 API 호출, 라이선스 검증 등이 대표적인 사례입니다. NAT Gateway는 아웃바운드만 허용하고 인바운드는 차단하므로 보안과 편의를 동시에 제공합니다.
+
+그러나 NAT Gateway는 비용이 큽니다. 시간당 과금과 데이터 처리 요금이 모두 발생합니다. 특히 S3나 DynamoDB처럼 AWS 내부 서비스에 접근할 때 NAT Gateway를 경유하면 불필요한 비용이 쌓입니다. 이때 Gateway Endpoint를 사용하면 트래픽이 AWS 내부 네트워크를 통해 직접 전달되므로 NAT Gateway를 거치지 않습니다.
+
+```text
+[Private 서브넷 인스턴스]
+    ├─ 외부 인터넷 → NAT Gateway → Internet Gateway → 인터넷
+    ├─ S3 접근    → Gateway Endpoint → S3 (무료, AWS 내부망)
+    └─ SQS 접근   → Interface Endpoint → SQS (시간당 + GB당 과금)
+```
+
+Gateway Endpoint는 S3와 DynamoDB만 지원하며 무료입니다. Interface Endpoint는 그 외 대부분의 AWS 서비스를 지원하지만 시간당 요금과 데이터 처리 요금이 발생합니다. 그래도 NAT Gateway보다 저렴한 경우가 많으므로, 특정 서비스 호출이 빈번하다면 Interface Endpoint도 검토할 가치가 있습니다.
+
+### VPC Endpoint 설정 예시 (CLI)
+
+```bash
+# S3용 Gateway Endpoint 생성
+aws ec2 create-vpc-endpoint \
+    --vpc-id vpc-xxx \
+    --service-name com.amazonaws.ap-northeast-2.s3 \
+    --route-table-ids rtb-xxx
+
+# SQS용 Interface Endpoint 생성
+aws ec2 create-vpc-endpoint \
+    --vpc-id vpc-xxx \
+    --vpc-endpoint-type Interface \
+    --service-name com.amazonaws.ap-northeast-2.sqs \
+    --subnet-ids subnet-xxx \
+    --security-group-ids sg-xxx
+```
+
+## VPC Flow Logs 활용
+
+VPC Flow Logs는 네트워크 인터페이스를 오가는 IP 트래픽 정보를 기록합니다. 보안 감사, 트러블슈팅, 비용 분석에 필수적인 데이터입니다.
+
+```bash
+# VPC 수준 Flow Log 생성 (CloudWatch Logs로 전송)
+aws ec2 create-flow-logs \
+    --resource-type VPC \
+    --resource-ids vpc-xxx \
+    --traffic-type ALL \
+    --log-destination-type cloud-watch-logs \
+    --log-group-name /vpc/flow-logs/prod
+```
+
+Flow Logs에서 확인할 수 있는 정보는 다음과 같습니다.
+
+- 출발지/목적지 IP와 포트
+- 프로토콜 번호
+- 패킷 수와 바이트 수
+- 허용(ACCEPT) 또는 거부(REJECT) 여부
+- 타임스탬프
+
+거부된 트래픽만 필터링하면 보안 그룹이나 NACL에 의해 차단된 시도를 빠르게 파악할 수 있습니다. 허용된 트래픽 중에서도 예상치 못한 대량 전송이 보이면 비용 이상의 원인을 추적하는 데 활용할 수 있습니다.
+
+### Flow Logs 분석 팁
+
+1. REJECT 로그를 주기적으로 확인합니다. 정상적인 거부인지, 설정 오류로 인한 거부인지 구분해야 합니다.
+2. 특정 포트로의 반복적인 REJECT는 스캐닝 시도일 수 있습니다.
+3. Cross-AZ 트래픽 양을 측정하면 비용 예측에 도움이 됩니다.
+4. S3로 직접 전송하면 CloudWatch Logs보다 저렴하게 장기 보관할 수 있습니다.
+## 네트워크 비용 인식
+
+네트워크 비용은 아키텍처 결정에 직접 영향을 미칩니다. 같은 기능이라도 트래픽 경로에 따라 월 비용이 몇 배씩 달라질 수 있습니다.
+
+| 트래픽 경로 | 비용 (GB당, 서울 리전 기준) | 비고 |
+| --- | --- | --- |
+| 같은 AZ 내 (Private IP) | 무료 | 가장 저렴한 경로 |
+| Cross-AZ (같은 리전) | ~$0.01 (송신 + 수신 각각) | 고가용성의 비용 |
+| Cross-Region | ~$0.08 | DR, 멀티리전 배포 시 주의 |
+| 인터넷 아웃바운드 | $0.08 ~ $0.12 (구간별 체감) | 첫 10TB 이후 단가 하락 |
+| NAT Gateway 처리 | $0.045 (GB당) + 시간당 요금 | Private 서브넷 외부 접속 비용 |
+| VPC Endpoint (Gateway) | 무료 | S3, DynamoDB 전용 |
+| VPC Endpoint (Interface) | 시간당 요금 + $0.01/GB | 기타 AWS 서비스 |
+
+**비용 최적화 팁**:
+
+1. S3, DynamoDB 접근이 빈번하다면 Gateway Endpoint를 반드시 설정합니다. NAT Gateway를 경유하면 불필요한 비용이 발생합니다.
+2. Cross-AZ 비용은 고가용성을 위해 수용하되, 불필요한 AZ 간 호출은 줄입니다.
+3. NAT Gateway는 AZ당 하나씩 두는 것이 고가용성에 좋지만, 개발 환경에서는 하나로 충분합니다.
+4. 대용량 데이터 전송이 예상되면 AWS Direct Connect나 CloudFront를 검토합니다.
 
 ## VPC 설계 예시와 규칙 템플릿
 
@@ -225,72 +448,56 @@ security_groups:
         source_sg: app_sg
 ```
 
+## 자주 하는 실수 5가지
 
+1. SSH를 `0.0.0.0/0`으로 열어 둡니다.
+2. 데이터베이스를 Public 서브넷에 둡니다.
+3. NACL과 SG의 책임을 혼동합니다.
+4. Cross-AZ 트래픽 비용을 무시합니다.
+5. Egress 규칙을 검토하지 않습니다.
 
-### 운영 리뷰 질문 세트
+## 실무에서는 이렇게 생각합니다
 
-아래 질문은 설계 문서 리뷰와 장애 회고에서 반복적으로 사용할 수 있는 체크 질문입니다.
+- Private가 기본값이고, Public은 예외입니다.
+- 보안 그룹은 역할별로 쪼개는 편이 낫습니다.
+- 인바운드만큼 아웃바운드도 명시적으로 제한해야 합니다.
+- VPC Flow Logs는 기본적으로 켜 두는 편이 좋습니다.
+- CIDR 범위는 미래의 병합과 확장을 고려해 잡아야 합니다.
+- Gateway Endpoint는 비용 절감의 첫 번째 선택입니다.
+- NAT Gateway 비용은 월말에 놀랄 수 있으므로 태그와 알림을 설정합니다.
 
-| 질문 | 확인 포인트 | 흔한 실패 |
-| --- | --- | --- |
-| 책임 경계가 명확한가 | 공급자/사용자 책임 문서화 | "누가 고칠지" 미정 상태 |
-| 변경 영향이 예측 가능한가 | 롤백/격리 경로 존재 | 단일 경로 의존 |
-| 비용 신호가 보이는가 | 태그/예산/알림 연동 | 비용 급증 사후 인지 |
-| 보안 기준이 자동화되었는가 | 정책 코드화, 주기 점검 | 수동 예외 누적 |
-| 복구 가능성이 검증되었는가 | 정기 복원 리허설 | 백업만 있고 복원 실패 |
+## 체크리스트
 
-이 질문 세트는 기술 스택과 무관하게 적용할 수 있습니다. 중요한 것은 문장으로 "대답할 수 있는가"가 아니라, 로그/정책/테스트로 "증명할 수 있는가"입니다.
+- [ ] Public 서브넷에 데이터베이스가 없는가.
+- [ ] 보안 그룹이 역할별로 분리되어 있는가.
+- [ ] Flow Logs가 활성화되어 있는가.
+- [ ] Egress 규칙이 명시적으로 정의되어 있는가.
+- [ ] S3/DynamoDB용 Gateway Endpoint가 설정되어 있는가.
+- [ ] CIDR이 다른 VPC 및 온프레미스와 겹치지 않는가.
+- [ ] Route Table이 서브넷별로 올바르게 연결되어 있는가.
 
-### 팀 운영 계약 예시
+## 연습 문제
 
-```yaml
-team_operating_contract:
-  deploy:
-    requires_review: true
-    rollback_plan_required: true
-  security:
-    least_privilege_default: true
-    mfa_for_privileged_actions: true
-  reliability:
-    monthly_recovery_drill: true
-    incident_postmortem_required: true
-  cost:
-    budget_alert_thresholds: [50, 80, 100]
-    untagged_resource_policy: deny
-```
+1. Security Group과 NACL의 차이 세 가지를 적어 보세요.
+2. Public/Private 서브넷 분리가 보안에 도움이 되는 이유를 한 문장으로 설명해 보세요.
+3. ALB와 NLB의 큰 차이 하나를 적어 보세요.
+4. `/16` VPC를 `/24` 서브넷으로 나누면 최대 몇 개의 서브넷을 만들 수 있는지 계산해 보세요.
+5. NAT Gateway 대신 Gateway Endpoint를 사용하면 비용이 줄어드는 이유를 설명해 보세요.
 
-운영 계약을 명시하면 담당자가 바뀌어도 품질 기준이 유지됩니다. 클라우드의 핵심은 리소스를 빨리 만드는 능력이 아니라, 같은 품질을 반복해서 만드는 능력입니다. 따라서 이 문서와 같은 계약은 초기에 작게 시작해도 반드시 있어야 하며, 분기 단위로 업데이트하는 루틴을 두는 편이 안정적입니다.
+## 처음 질문으로 돌아가기
 
-### 장애/비용/보안을 함께 보는 회고 포맷
+- **VPC와 서브넷은 무엇이 다를까요?**
+  - VPC는 논리적으로 격리된 전체 네트워크 경계이고, 서브넷은 그 안에서 AZ 단위로 나눈 더 작은 IP 범위입니다. VPC가 건물이라면 서브넷은 층입니다.
 
-1. 무엇이 실패했는가를 한 문장으로 기록합니다.
-2. 탐지 시점과 첫 대응 시점을 분 단위로 기록합니다.
-3. 영향 범위(사용자 수, 금액, 데이터 범위)를 숫자로 기록합니다.
-4. 재발 방지 항목을 자동화/문서/훈련으로 분류합니다.
-5. 다음 점검 날짜를 지정하고 담당자를 명시합니다.
+- **Security Group과 NACL은 왜 따로 존재할까요?**
+  - Security Group은 인스턴스 단위의 stateful 허용 규칙이고, NACL은 서브넷 단위의 stateless 허용/거부 규칙입니다. SG로는 거부를 명시할 수 없으므로, 특정 IP를 서브넷 수준에서 차단할 때 NACL이 필요합니다.
 
-위 다섯 단계는 단순하지만 반복 효과가 큽니다. 특히 비용 이슈도 장애와 같은 수준으로 회고에 포함하면, 기술 선택과 운영 비용을 분리해서 보는 습관을 줄일 수 있습니다.
+- **Public 서브넷과 Private 서브넷은 어떤 패턴으로 나누는 것이 일반적일까요?**
+  - ALB만 Public에 두고, 앱 서버와 데이터베이스는 Private에 두는 3계층 패턴이 기본입니다. 외부 공개 지점을 최소화하면 방화벽 규칙이 단순해지고 공격 표면이 좁아집니다.
 
+## 정리 및 다음 단계
 
-
-### 실무 적용 시나리오
-
-다음 시나리오는 교육용 예시이지만, 실제 프로젝트에서 의사결정을 정리할 때 그대로 활용할 수 있습니다.
-
-| 상황 | 선택 | 이유 | 검증 방법 |
-| --- | --- | --- | --- |
-| 신규 서비스 초기 론칭 | 단순한 기본 아키텍처 + 필수 가드레일 | 속도와 안정성의 균형 | 체크리스트 기반 사전 점검 |
-| 트래픽 급증 이벤트 | 자동 확장 + 임계값 알림 강화 | 수동 대응 지연 방지 | 부하 테스트 + 알람 리허설 |
-| 보안 감사 대응 | 권한 축소 + 로그 보존 정책 정리 | 증빙 가능성 확보 | 감사 항목 매핑 문서 |
-| 비용 급증 발생 | 태그 누락/유휴 자원 우선 정리 | 즉시 효과가 큼 | 주간 비용 리포트 비교 |
-
-시나리오 기반으로 운영하면 기술 논의가 추상적 취향 싸움으로 흐르지 않습니다. 각 선택에 대해 "왜 이 결정을 했는가"와 "어떻게 검증할 것인가"를 짝지어 기록하면, 팀이 커져도 의사결정 품질을 유지할 수 있습니다. 또한 운영 회고에서 같은 포맷을 재사용하면 변경 누락과 책임 공백을 줄일 수 있습니다.
-
-
-
-### 빠른 점검 메모
-
-운영 단계에서는 정답 하나보다 반복 가능한 점검 리듬이 더 중요합니다. 배포 전 점검, 주간 운영 점검, 월간 개선 회고를 분리해 기록하면 누락이 줄어듭니다. 특히 신규 팀원이 합류할 때는 문서의 완성도보다 문서의 최신성이 더 큰 가치를 만듭니다. 따라서 작은 변경이라도 근거와 검증 결과를 함께 남기는 습관이 필요합니다.
+연결 경로를 정했다면, 이제는 누가 어떤 권한으로 그 경로를 사용할지를 설계해야 합니다. 다음 글에서는 Identity와 Security를 다루겠습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -314,5 +521,6 @@ team_operating_contract:
 - [AWS Security Groups](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html)
 - [AWS Network ACL](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-network-acls.html)
 - [AWS Elastic Load Balancing](https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html)
+- [book-examples](https://github.com/yeongseon-books/book-examples/tree/main/cloud-computing-101/ko)
 
 Tags: Cloud, Networking, VPC, Security, AWS

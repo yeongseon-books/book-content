@@ -251,6 +251,214 @@ print(cur.execute("SELECT * FROM accounts").fetchall())
 
 또한 데이터베이스는 시스템에서 가장 위험한 상태 저장 구성 요소라는 사실을 압니다. 코드 배포는 롤백할 수 있어도 잘못된 마이그레이션은 되돌리기 어렵습니다. 그래서 스키마 변경은 항상 호환 가능하게, 트랜잭션은 짧게, 운영 SQL은 실행 전 `EXPLAIN`으로 검증합니다.
 
+
+### B-Tree 인덱스의 내부 구조
+
+관계형 데이터베이스의 기본 인덱스는 B+Tree입니다. 디스크 I/O를 최소화하도록 설계된 균형 트리입니다.
+
+```text
+                    ┌──────────────┐
+                    │  [30 | 60]   │  ← 루트 노드
+                    └──────────────┘
+                   ╱       │        ╲
+        ┌─────────┐  ┌─────────┐  ┌─────────┐
+        │[10 | 20]│  │[40 | 50]│  │[70 | 80]│  ← 내부 노드
+        └─────────┘  └─────────┘  └─────────┘
+       ╱    │    ╲      │    ╲       │    ╲
+   ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌───┐
+   │1-9│→│11 │→│21 │→│31 │→│41 │→│61 │→│71 │  ← 리프 노드 (연결 리스트)
+   │   │ │-19│ │-29│ │-39│ │-59│ │-69│ │-89│
+   └───┘ └───┘ └───┘ └───┘ └───┘ └───┘ └───┘
+```
+
+핵심 특성:
+- 리프 노드만 실제 데이터(또는 데이터 포인터)를 저장합니다
+- 리프 노드끼리 연결 리스트로 이어져 범위 스캔이 효율적입니다
+- 트리 높이가 3-4이면 수억 행도 3-4회 디스크 접근으로 찾습니다
+- 각 노드는 디스크 페이지(보통 8-16 KB)에 맞춰 설계됩니다
+
+```sql
+-- 인덱스 유무에 따른 실행 계획 차이
+-- 테이블: users (1,000,000행)
+
+-- 인덱스 없이 조회
+EXPLAIN ANALYZE SELECT * FROM users WHERE email = 'hong@example.com';
+-- Seq Scan on users  (cost=0.00..22456.00 rows=1 width=128)
+--   Filter: (email = 'hong@example.com')
+-- Planning Time: 0.1 ms
+-- Execution Time: 95.3 ms  ← 전체 테이블 스캔
+
+-- 인덱스 생성 후
+CREATE INDEX idx_users_email ON users(email);
+
+EXPLAIN ANALYZE SELECT * FROM users WHERE email = 'hong@example.com';
+-- Index Scan using idx_users_email on users  (cost=0.42..8.44 rows=1 width=128)
+--   Index Cond: (email = 'hong@example.com')
+-- Planning Time: 0.2 ms
+-- Execution Time: 0.05 ms  ← 1900배 빠름
+```
+
+### 쿼리 실행 계획 읽는 법
+
+`EXPLAIN` 출력의 핵심 항목을 정리합니다.
+
+| 항목 | 의미 | 주의점 |
+|------|------|--------|
+| Seq Scan | 테이블 전체를 순서대로 읽음 | 행이 많으면 느림 |
+| Index Scan | 인덱스를 통해 필요한 행만 접근 | 선택도(selectivity)가 높을 때 유리 |
+| Index Only Scan | 인덱스만으로 결과 반환 (covering) | 가장 빠름 |
+| Nested Loop | 외부 행마다 내부를 반복 | 외부가 작을 때 적합 |
+| Hash Join | 한쪽을 해시 테이블로 빌드 | 메모리 충분할 때 |
+| Merge Join | 양쪽이 정렬되어 있을 때 병합 | 정렬 비용 고려 |
+| Sort | 정렬 수행 | work_mem 초과 시 디스크 사용 |
+| rows | 예상 행 수 | 실제와 차이가 크면 통계 갱신 필요 |
+| cost | 상대적 비용 (시작..총) | 단위는 시퀀셜 페이지 읽기 기준 |
+
+```sql
+-- 복합 쿼리 실행 계획 예시
+EXPLAIN ANALYZE
+SELECT u.name, COUNT(o.id) as order_count
+FROM users u
+JOIN orders o ON u.id = o.user_id
+WHERE u.created_at > '2025-01-01'
+GROUP BY u.name
+ORDER BY order_count DESC
+LIMIT 10;
+
+-- 예상 실행 계획:
+-- Limit (rows=10)
+--   → Sort (sort key: count(o.id) DESC)
+--       → HashAggregate (group key: u.name)
+--           → Hash Join (join condition: u.id = o.user_id)
+--               → Seq Scan on users (filter: created_at > '2025-01-01')
+--               → Hash
+--                   → Seq Scan on orders
+```
+
+### 트랜잭션 격리 수준과 이상 현상
+
+ACID 중 Isolation은 동시 트랜잭션 간 간섭을 얼마나 허용하느냐의 문제입니다.
+
+| 격리 수준 | Dirty Read | Non-repeatable Read | Phantom Read | 성능 |
+|-----------|-----------|---------------------|--------------|------|
+| Read Uncommitted | 가능 | 가능 | 가능 | 최고 |
+| Read Committed | 불가 | 가능 | 가능 | 높음 |
+| Repeatable Read | 불가 | 불가 | 가능 | 중간 |
+| Serializable | 불가 | 불가 | 불가 | 낮음 |
+
+PostgreSQL 기본값은 Read Committed, MySQL InnoDB 기본값은 Repeatable Read입니다.
+
+```python
+# Python에서 트랜잭션 격리를 제어하는 예시 (psycopg2)
+import psycopg2
+from psycopg2 import extensions
+
+conn = psycopg2.connect("dbname=myapp")
+conn.set_isolation_level(extensions.ISOLATION_LEVEL_SERIALIZABLE)
+
+try:
+    with conn.cursor() as cur:
+        cur.execute("SELECT balance FROM accounts WHERE id = 1")
+        balance = cur.fetchone()[0]
+
+        if balance >= 100:
+            cur.execute("UPDATE accounts SET balance = balance - 100 WHERE id = 1")
+            cur.execute("UPDATE accounts SET balance = balance + 100 WHERE id = 2")
+
+    conn.commit()
+except psycopg2.errors.SerializationFailure:
+    conn.rollback()
+    # 직렬화 실패 → 재시도 로직
+```
+
+### 정규화와 비정규화 트레이드오프
+
+| 정규화 수준 | 장점 | 단점 | 적합한 경우 |
+|-------------|------|------|-------------|
+| 1NF | 반복 그룹 제거 | — | 모든 경우 (기본) |
+| 2NF | 부분 종속 제거 | JOIN 증가 | 트랜잭션 중심 |
+| 3NF | 이행 종속 제거 | JOIN 더 증가 | 데이터 무결성 중요 |
+| 비정규화 | JOIN 감소, 읽기 빠름 | 갱신 이상, 용량 증가 | 읽기 중심 분석 |
+
+실무 패턴: OLTP(트랜잭션)는 3NF로 설계하고, OLAP(분석)용 데이터 웨어하우스는 Star/Snowflake 스키마로 비정규화합니다. ETL 파이프라인이 두 세계를 연결합니다.
+
+### 인덱스 전략과 안티패턴
+
+인덱스는 읽기를 빠르게 하지만 쓰기를 느리게 합니다. 모든 INSERT/UPDATE/DELETE 시 관련 인덱스도 갱신해야 하기 때문입니다.
+
+```sql
+-- 복합 인덱스의 컬럼 순서가 중요합니다
+-- (status, created_at) vs (created_at, status)
+
+-- 자주 사용하는 쿼리 패턴
+SELECT * FROM orders
+WHERE status = 'pending'
+  AND created_at > '2026-01-01'
+ORDER BY created_at DESC
+LIMIT 20;
+
+-- 좋은 인덱스: 등호 조건 먼저, 범위 조건 나중에
+CREATE INDEX idx_orders_status_created
+  ON orders(status, created_at DESC);
+
+-- 나쁜 인덱스: 범위 조건이 먼저 오면 status 필터링에 인덱스 사용 불가
+CREATE INDEX idx_orders_created_status
+  ON orders(created_at DESC, status);
+```
+
+인덱스 안티패턴 목록:
+
+| 안티패턴 | 문제 | 해결 |
+|----------|------|------|
+| 모든 컬럼에 개별 인덱스 | 쓰기 성능 저하, 저장 공간 낭비 | WHERE 조합 기준 복합 인덱스 |
+| 선택도 낮은 컬럼 인덱스 | `gender` 같은 2값 컬럼은 풀 스캔과 비슷 | 선택도 5% 이하일 때만 유효 |
+| 함수로 감싼 컬럼 | `WHERE YEAR(created_at) = 2026` → 인덱스 무용 | `WHERE created_at >= '2026-01-01'` |
+| LIKE '%keyword' | 앞에 와일드카드 → 인덱스 사용 불가 | Full-text search 또는 trigram |
+| 사용하지 않는 인덱스 방치 | 쓰기마다 불필요한 갱신 | `pg_stat_user_indexes`로 모니터링 |
+
+### 커넥션 풀링과 운영 패턴
+
+데이터베이스 연결은 TCP 핸드셰이크 + 인증 + 세션 초기화를 거치므로 비용이 큽니다.
+
+```python
+# 잘못된 패턴: 요청마다 연결 생성/해제
+def get_user_bad(user_id: int):
+    conn = psycopg2.connect("dbname=myapp")  # ~50ms
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+    result = cur.fetchone()
+    conn.close()
+    return result
+
+# 올바른 패턴: 커넥션 풀 사용
+from psycopg2 import pool
+
+connection_pool = pool.ThreadedConnectionPool(
+    minconn=5,
+    maxconn=20,
+    dsn="dbname=myapp"
+)
+
+def get_user_good(user_id: int):
+    conn = connection_pool.getconn()  # ~0.01ms (풀에서 꺼냄)
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM users WHERE id = %s", (user_id,))
+        return cur.fetchone()
+    finally:
+        connection_pool.putconn(conn)  # 풀에 반환
+```
+
+운영 환경에서의 커넥션 풀 설정 가이드:
+
+| 설정 | 권장값 | 이유 |
+|------|--------|------|
+| max_connections (DB) | CPU 코어 × 2 + 디스크 수 | PostgreSQL 권장 공식 |
+| pool_size (앱) | DB max의 80% / 앱 인스턴스 수 | 여유 확보 |
+| pool_timeout | 5-30초 | 무한 대기 방지 |
+| idle_timeout | 300초 | 유휴 연결 정리 |
+
+PgBouncer나 ProxySQL 같은 외부 풀링 프록시를 두면 앱 서버가 수백 대로 늘어나도 DB 커넥션 수를 제한할 수 있습니다.
 ## 체크리스트
 
 - [ ] 기본 키와 인덱스의 차이를 설명할 수 있는가
@@ -295,12 +503,11 @@ print(cur.execute("SELECT * FROM accounts").fetchall())
 ## 처음 질문으로 돌아가기
 
 - **데이터베이스는 많은 데이터를 어떻게 영구 저장하고 동시에 안전하게 읽고 쓸까요?**
-  - 본문의 기준은 데이터베이스를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - WAL(Write-Ahead Log)로 변경을 먼저 기록해 정전에도 복구할 수 있고, ACID 트랜잭션과 격리 수준으로 동시 접근 시 데이터 일관성을 보장합니다. 물리적으로는 페이지 단위로 디스크에 저장하고, 버퍼 풀로 자주 쓰는 페이지를 메모리에 캐싱합니다.
 - **인덱스는 왜 조회 속도를 급격하게 바꿀까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - B+Tree 인덱스는 수억 행에서도 3-4회의 디스크 접근으로 원하는 행을 찾습니다. 인덱스 없이는 전체 테이블을 순차 스캔해야 하므로 O(n) vs O(log n)의 차이가 발생합니다. 100만 행 기준 약 1900배 속도 차이를 만듭니다.
 - **SQL 한 줄과 실제 실행 계획 사이에는 어떤 차이가 있을까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
-
+  - SQL은 "무엇을 원하는지"를 선언하고, 옵티마이저가 "어떻게 실행할지"를 결정합니다. 같은 SQL도 인덱스 유무, 테이블 크기, 통계 정보에 따라 Seq Scan, Index Scan, Hash Join 등 전혀 다른 계획으로 실행될 수 있습니다.
 <!-- toc:begin -->
 ## 시리즈 목차
 
@@ -324,4 +531,5 @@ print(cur.execute("SELECT * FROM accounts").fetchall())
 - [SQLite EXPLAIN QUERY PLAN](https://www.sqlite.org/eqp.html)
 - [Designing Data-Intensive Applications — Martin Kleppmann](https://dataintensive.net/)
 
+- [이 시리즈의 예제 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/computer-science-101/ko)
 Tags: Computer Science, 데이터베이스, SQL, 인덱스, 트랜잭션, ACID

@@ -75,7 +75,7 @@ flowchart LR
 - **계획 노드**: Seq Scan, Index Scan, Hash Join, Nested Loop, Sort, Aggregate 같은 실행 단계입니다.
 - **EXPLAIN ANALYZE**: 계획과 함께 실제 실행 수치까지 보여 주는 명령입니다.
 
-## Before/After
+## 변경 전/변경 후
 
 **Before — stale stats lead to a full scan**
 
@@ -94,7 +94,7 @@ EXPLAIN ANALYZE SELECT * FROM orders WHERE user_id = 7;
 
 예상 행 수와 실제 행 수가 가까워지자, 옵티마이저는 인덱스 계획이 더 낫다고 판단합니다.
 
-## 실습: EXPLAIN으로 계획 읽기
+## 실습: 실행 계획으로 경로 읽기
 
 ### 1단계 — 데이터와 인덱스 준비
 
@@ -241,7 +241,7 @@ ON orders (user_id, status, created_at DESC);
 
 핵심은 **필터링 컬럼을 앞쪽에**, 정렬 컬럼을 그다음에 배치하는 것입니다. 이렇게 하면 WHERE와 ORDER BY를 동시에 만족해 추가 정렬 비용을 줄일 수 있습니다.
 
-### 2) EXPLAIN으로 계획 비교하기
+### 2) 실행 계획 비교하기
 
 ```sql
 EXPLAIN ANALYZE
@@ -290,7 +290,7 @@ def create_order(db: sqlite3.Connection, user_id: int, amount: int) -> None:
 
 이 패턴의 의도는 명확합니다. 주문 생성과 재고 차감을 **하나의 원자 단위**로 묶고, 조건이 맞지 않으면 전체를 되돌립니다. 트랜잭션 안에서 외부 API 호출을 하지 않는 것도 중요합니다. 잠금 시간이 길어지면 동시성 충돌이 급격히 늘어납니다.
 
-### 4) 운영에서 자주 쓰는 진단 SQL
+### 4) 운영에서 자주 쓰는 진단 질의문
 
 ```sql
 -- 값 분포 확인(선택성 감각)
@@ -320,6 +320,171 @@ WHERE user_id = 42 AND status = 'paid';
 
 결론적으로 데이터베이스 튜닝은 “인덱스를 늘린다”가 아니라 “실행 계획을 읽고, 트랜잭션 경계를 짧게 유지하고, 분포를 근거로 선택한다”의 반복입니다.
 
+## 통계 오차가 계획을 바꾸는 사례
+
+옵티마이저는 실제 데이터를 읽기 전에 통계로 비용을 추정합니다. 통계가 낡으면 작은 조건을 큰 조건으로 오판해 비싼 계획을 선택할 수 있습니다.
+
+```sql
+ANALYZE orders;
+
+EXPLAIN ANALYZE
+SELECT * FROM orders
+WHERE status = 'FAILED' AND created_at >= now() - interval '1 day';
+```
+
+```text
+Bitmap Heap Scan on orders
+  Recheck Cond: (status = 'FAILED')
+  -> Bitmap Index Scan on idx_orders_status
+(actual rows=182, estimated rows=12450)
+```
+
+예상과 실제가 크게 어긋나면, 컬럼 통계 타깃 조정이나 다중 컬럼 통계를 고려합니다.
+
+## 실행 분석 해석 체크리스트
+
+- `actual rows`와 `estimated rows`의 비율
+- 노드별 `actual time`과 병목 지점
+- 정렬/해시 노드의 메모리 사용과 디스크 스필 여부
+- 병렬 실행 시 워커 분배 균형
+
+튜닝은 SQL 문장 미세 수정보다, 통계와 계획 해석 루프를 짧게 돌리는 운영 습관에서 성과가 납니다.
+
+## 실전 운영 점검표
+
+운영 환경에서 데이터베이스 품질을 안정적으로 유지하려면, 기능 개발과 별개로 점검 루틴을 명확하게 가져가야 합니다. 아래 항목은 서비스 규모와 상관없이 바로 적용할 수 있는 기준입니다.
+
+- 변경 전에는 항상 기준 지표를 남깁니다. 평균 지연 시간, P95, P99, 초당 트랜잭션 수, 잠금 대기 시간 같은 숫자를 캡처해 둬야 변경 이후를 비교할 수 있습니다.
+- 쿼리 튜닝은 SQL 문장 자체보다 실행 계획의 변화를 중심으로 추적합니다. 계획 노드가 바뀌었는지, 예상 행 수와 실제 행 수의 차이가 커졌는지, 정렬이나 해시가 디스크로 내려갔는지를 우선 확인합니다.
+- 스키마 변경은 단계적으로 진행합니다. 컬럼 추가, 백필, 코드 전환, 제약 강화 순서로 나누면 장애 반경을 줄일 수 있습니다.
+- 장애 대응 문서는 운영자가 밤중에도 바로 실행할 수 있는 형태여야 합니다. 복구 절차, 롤백 절차, 검증 SQL을 같은 문서에 둬야 실제 상황에서 흔들리지 않습니다.
+
+아래 예시는 팀이 릴리스 전후에 반복적으로 실행하는 최소 점검 SQL입니다.
+
+```sql
+-- 최근 10분 동안 느린 쿼리 확인(엔진별 뷰 이름은 다를 수 있음)
+SELECT query, calls, mean_exec_time, rows
+FROM pg_stat_statements
+ORDER BY mean_exec_time DESC
+LIMIT 20;
+
+-- 잠금 대기 체인 확인
+SELECT now(), pid, wait_event_type, wait_event, state, query
+FROM pg_stat_activity
+WHERE wait_event_type IS NOT NULL;
+
+-- 인덱스 사용률 점검
+SELECT relname AS table_name, seq_scan, idx_scan
+FROM pg_stat_user_tables
+ORDER BY seq_scan DESC
+LIMIT 20;
+```
+
+이 점검 루틴을 자동화 파이프라인에 연결하면, 성능 저하를 "느낌"이 아니라 "증거"로 관리할 수 있습니다. 결국 장기 운영에서 중요한 것은 뛰어난 한 번의 튜닝이 아니라, 작은 검증을 꾸준히 반복해 위험을 조기에 감지하는 습관입니다.
+## 운영 리허설 시나리오
+
+문서만 읽고 끝내면 운영에서 다시 같은 실수를 반복하기 쉽습니다. 아래 시나리오는 팀 온보딩과 장애 대응 훈련에 바로 사용할 수 있는 공통 리허설 절차입니다.
+
+### 시나리오 1: 느려진 조회 원인 찾기
+
+1. 문제 쿼리를 식별합니다. 애플리케이션 로그의 요청 식별자와 데이터베이스 쿼리 로그를 매칭합니다.
+2. 같은 파라미터로 `EXPLAIN ANALYZE`를 실행합니다.
+3. 계획 노드 중 시간이 큰 지점을 찾고, 해당 노드가 인덱스/통계/정렬 중 무엇과 관련 있는지 분류합니다.
+4. 개선안을 한 번에 하나만 적용합니다. 인덱스 추가, 통계 갱신, 질의문 재작성 가운데 하나만 바꿔 결과를 비교합니다.
+
+```text
+개선 전
+Seq Scan on events  (actual time=0.030..842.112 rows=12000)
+
+개선 후
+Index Scan using idx_events_tenant_created on events
+(actual time=0.041..21.553 rows=12000)
+```
+
+### 시나리오 2: 동시성 문제 재현과 완화
+
+1. 두 세션에서 같은 행을 거의 동시에 수정합니다.
+2. 격리 수준을 바꿔 가며 결과를 비교합니다.
+3. 필요하면 `FOR UPDATE` 잠금 조회 또는 낙관적 잠금 버전 컬럼을 적용합니다.
+4. 재시도 정책과 타임아웃 기준을 코드와 운영 문서에 같이 기록합니다.
+
+```sql
+-- 낙관적 잠금 예시
+UPDATE inventory
+SET qty = qty - 1, version = version + 1
+WHERE sku = 'A-100' AND version = 17;
+```
+
+영향 받은 행 수가 0이면 이미 다른 트랜잭션이 갱신한 것이므로, 재조회 후 재시도합니다. 이 패턴은 잠금 경합을 낮추면서도 정합성을 지키는 데 효과적입니다.
+
+### 시나리오 3: 복구 가능성 검증
+
+1. 최신 베이스 백업으로 테스트 인스턴스를 띄웁니다.
+2. 지정 시점까지 로그를 재적용합니다.
+3. 핵심 비즈니스 검증 SQL을 실행합니다.
+4. 복구 시간(RTO)과 데이터 유실 허용치(RPO)를 실제 숫자로 기록합니다.
+
+```sql
+-- 검증 SQL 예시
+SELECT COUNT(*) FROM orders WHERE created_at >= now() - interval '1 day';
+SELECT SUM(amount) FROM payments WHERE status = 'SUCCESS';
+SELECT COUNT(*) FROM users WHERE deleted_at IS NULL;
+```
+
+복구 리허설에서 가장 중요한 점은 성공 여부 자체보다, 누가 어떤 순서로 무엇을 확인했는지를 재현 가능하게 남기는 것입니다. 절차가 사람마다 다르면 실제 장애에서 속도와 품질이 동시에 무너집니다.
+
+## 체크리스트: 배포 전 최소 검증
+
+- 대표 조회 5개에 대해 실행 계획을 저장합니다.
+- 트랜잭션 경계가 긴 코드 경로를 식별합니다.
+- 잠금 대기 알람 임계치를 설정합니다.
+- 스키마 변경의 롤백 경로를 문서화합니다.
+- 백업 복구 리허설 최근 실행일을 확인합니다.
+
+이 체크리스트는 거창한 체계를 요구하지 않습니다. 작은 팀도 주 1회 반복하면 데이터 사고 빈도를 눈에 띄게 줄일 수 있습니다. 데이터베이스 운영의 본질은 "고급 기능을 많이 아는 것"이 아니라, "반복 가능한 검증 루프를 끊기지 않게 유지하는 것"입니다.
+
+
+## 추가 실습 기록 템플릿
+
+아래 템플릿은 팀 위키에 그대로 붙여 넣어 실습 결과를 남길 때 사용합니다.
+
+```text
+[실습 이름]
+- 실행 일시:
+- 실행 환경:
+- 입력 데이터 규모:
+- 대표 SQL:
+- EXPLAIN ANALYZE 핵심 노드:
+- 개선 전/후 실행 시간:
+- 적용 변경 사항:
+- 부작용 또는 주의점:
+- 다음 점검 항목:
+```
+
+실습 기록을 남기면 지식이 개인 경험으로 소모되지 않고 팀 자산으로 누적됩니다. 특히 실행 계획 캡처와 복구 절차 검증 결과를 함께 보관하면, 다음 장애 대응에서 판단 속도를 크게 높일 수 있습니다.
+
+
+## 심화: 계획 회귀를 조기에 잡는 방법
+
+계획 회귀는 보통 코드 배포 직후보다 데이터 분포가 변한 시점에 터집니다. 그래서 배포 파이프라인 검증만으로는 부족하고, 운영 데이터 특성을 반영한 주기 점검이 필요합니다.
+
+- 상위 20개 핵심 조회문을 고정 목록으로 관리합니다.
+- 각 조회문에 대해 월 단위로 `EXPLAIN (ANALYZE, BUFFERS)`를 저장합니다.
+- 예상 행 수 오차 비율이 임계치(예: 10배) 넘으면 경고를 발생시킵니다.
+- 통계 갱신, 인덱스 재검토, 질의문 재작성 우선순위를 분리해 대응합니다.
+
+```text
+노드별 버퍼 확인 예시
+Index Scan using idx_orders_created on orders
+  Buffers: shared hit=1200 read=48
+
+Sort
+  Sort Method: quicksort  Memory: 1024kB
+```
+
+버퍼 정보까지 보면 "왜 느린지"가 더 또렷해집니다. CPU 병목인지, 디스크 읽기 병목인지, 잘못된 정렬 전략인지가 분리되기 때문입니다. 이 수준까지 해석할 수 있어야 튜닝이 일회성 처방에서 운영 체계로 올라갑니다.
+
+
 ## 처음 질문으로 돌아가기
 
 - **옵티마이저는 어떤 큰 그림으로 실행 계획을 고를까요?**
@@ -347,6 +512,7 @@ WHERE user_id = 42 AND status = 'paid';
 
 ## 참고 자료
 
+- [database-systems-101 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/database-systems-101/ko)
 - [PostgreSQL — Using EXPLAIN](https://www.postgresql.org/docs/current/using-explain.html)
 - [PostgreSQL — Statistics Used by the Planner](https://www.postgresql.org/docs/current/planner-stats.html)
 - [Use The Index, Luke!](https://use-the-index-luke.com/)

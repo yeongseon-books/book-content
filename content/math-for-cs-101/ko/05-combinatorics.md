@@ -370,6 +370,113 @@ for i in range(6):
 
 탐색 알고리즘 설계 전에는 반드시 분기 계수와 깊이를 곱셈 관점으로 추정해야 합니다. 이 추정이 없으면 성능 문제를 구현 이후에야 발견하게 됩니다. 조합론은 사후 최적화가 아니라 사전 리스크 관리 도구입니다.
 
+
+### 생일 문제(Birthday Problem)
+
+조합론의 직관적 예시로 가장 유명한 문제입니다. n명 중 생일이 같은 쌍이 있을 확률은 생각보다 빨리 커집니다.
+
+```python
+def birthday_collision_prob(n: int, days: int = 365) -> float:
+    """
+    n명 중 생일이 같은 쌍이 있을 확률을 계산합니다.
+    P(충돌) = 1 - P(모두 다름)
+    """
+    if n > days:
+        return 1.0
+    no_collision = 1.0
+    for i in range(n):
+        no_collision *= (days - i) / days
+    return 1 - no_collision
+
+# 23명이면 생일 충돌 확률이 50%를 넘습니다
+for n in [10, 23, 50, 70]:
+    print(f"n={n:3d}: {birthday_collision_prob(n):.4f}")
+# n= 10: 0.1169
+# n= 23: 0.5073
+# n= 50: 0.9704
+# n= 70: 0.9992
+```
+
+이 문제는 해시 충돌, UUID 중복, 랜덤 ID 부여 등에서 직접적으로 등장합니다. 128비트 UUID의 충돌 확률을 예측할 때도 같은 논리를 적용합니다. 도메인이 365일이 아니라 2¹²⁸이 될 뿐입니다.
+
+### 별과 막대(Stars and Bars) 정리
+
+n개의 동일한 물건을 k개의 구분된 상자에 나누는 방법의 수는 C(n+k-1, k-1)입니다. 이 공식은 리소스 분배, 로드 밸런싱, 파티션 문제에서 자주 쓰입니다.
+
+```python
+import math
+
+def distribute(items: int, bins: int) -> int:
+    """items개를 bins개 상자에 나누는 방법의 수 (빈 상자 허용)"""
+    return math.comb(items + bins - 1, bins - 1)
+
+# 10개의 요청을 3개의 서버에 분배하는 방법
+print(distribute(10, 3))  # 66
+
+# 5개의 크레딧을 4개의 프로젝트에 할당하는 방법
+print(distribute(5, 4))   # 56
+```
+
+실무에서 로드 밸런서가 요청을 백엔드 서버에 분배하는 경우의 수를 이해하면, 특정 분배 전략이 왜 편향되는지 정량적으로 설명할 수 있습니다.
+
+### 조합론 연습 문제 세트
+
+아래 문제들은 직접 풀어 보면 개념 정착에 도움이 됩니다.
+
+| 문제 | 힌트 | 답 |
+| --- | --- | --- |
+| 8명에서 3명 선발(순서 무관) | 조합 C(8,3) | 56 |
+| 4자리 비밀번호(0-9, 중복 허용) | 곱의 법칙 10⁴ | 10,000 |
+| 5개 동전 던지기에서 앞면 3개 | C(5,3) × (1/2)⁵ | 5/16 |
+| 10층 건물에서 3층 선택(순서 있음) | 순열 P(10,3) | 720 |
+| MISSISSIPPI 문자 배열 | 다항 순열 11!/(4!4!2!) | 34,650 |
+
+```python
+# 다항 순열 계산
+import math
+
+def multinomial_permutation(total: int, *groups: int) -> int:
+    denom = 1
+    for g in groups:
+        denom *= math.factorial(g)
+    return math.factorial(total) // denom
+
+# MISSISSIPPI: 11글자, M=1, I=4, S=4, P=2
+print(multinomial_permutation(11, 1, 4, 4, 2))  # 34650
+```
+
+조합론 문제를 풀 때 가장 중요한 첫 단계는 "순서가 중요한가?"입니다. 중요하면 순열, 아니면 조합입니다. 다음으로 "중복을 허용하는가?"를 묻습니다. 이 두 질문만으로 대부분의 문제를 올바른 공식으로 라우팅할 수 있습니다.
+
+### 포함-배제 원리 확장: 세 집합 이상
+
+두 집합일 때는 |A ∪ B| = |A| + |B| - |A ∩ B|로 간단하지만, 세 집합 이상이면 교차 항을 번갈아 더하고 빼야 합니다.
+
+```python
+def inclusion_exclusion_3(a: int, b: int, c: int,
+                          ab: int, ac: int, bc: int,
+                          abc: int) -> int:
+    """세 집합의 합집합 크기를 계산합니다."""
+    return a + b + c - ab - ac - bc + abc
+
+# 예시: 1000명 중 Python 사용자 400, Java 300, Go 200
+# Python&Java 100, Python&Go 50, Java&Go 30, 세 언어 모두 10
+print(inclusion_exclusion_3(400, 300, 200, 100, 50, 30, 10))  # 730
+```
+
+모니터링 시스템에서 "어떤 알람 규칙에도 해당하지 않는 이벤트 수"를 구할 때도 같은 원리를 적용합니다. 전체에서 각 규칙에 걸리는 수를 빼되, 중복 제거를 포함-배제 구조로 처리합니다.
+
+### 조합론으로 보는 암호 강도
+
+비밀번호나 토큰의 강도는 결국 경우의 수입니다. 공격자가 무차별 대입으로 맞출 확률을 계산할 때 조합론을 직접 사용합니다.
+
+| 토큰 구성 | 경우의 수 | 무차별 탐색 시간(1M/초) |
+| --- | --- | --- |
+| 숫자 4자리 | 10⁴ = 10,000 | 0.01초 |
+| 영소문자 8자리 | 26⁸ ≈ 2×10¹¹ | ~58시간 |
+| 영소+대+숫자+특수 12자리 | 94¹² ≈ 5×10²³ | 우주 나이 초과 |
+
+이 표를 보면 문자 종류를 늘리는 것보다 길이를 늘리는 편이 경우의 수를 더 빠르게 폭발시킵니다. 이것이 바로 곱의 법칙의 실무 적용입니다. 보안 감사에서 "토큰 엔트로피가 충분한가?"를 평가할 때 이 계산이 근거가 됩니다. 조합론을 모르면 "길면 안전하다"라는 막연한 직관에 의존하게 되고, 정량적 논거를 대지 못합니다.
+
 ## 처음 질문으로 돌아가기
 
 - **모든 경우를 직접 나열하지 않고도 왜 정확히 셀 수 있을까요?**
@@ -402,5 +509,6 @@ for i in range(6):
 - [Concrete Mathematics - Graham, Knuth, Patashnik](https://www-cs-faculty.stanford.edu/~knuth/gkp.html)
 - [Python math.comb Documentation](https://docs.python.org/3/library/math.html#math.comb)
 - [SymPy GitHub repository](https://github.com/sympy/sympy)
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/math-for-cs-101/ko)
 
 Tags: Math, Combinatorics, Counting, Probability, Beginner

@@ -22,6 +22,8 @@ last_reviewed: '2026-05-15'
 
 # Incident Response 101 (3/10): 초기 대응
 
+이 글은 Incident Response 101 시리즈의 세 번째 글입니다.
+
 incident가 발생했을 때 처음 몇 분은 유난히 짧고도 길게 느껴집니다. 알림은 이미 울렸고, 아직 정보는 부족하고, 누군가는 원인을 찾자고 하고 누군가는 고객 공지를 걱정합니다.
 
 이때 무엇부터 할지 정해 두지 않으면 팀은 빠르게 분산됩니다. 초기 대응의 품질은 완벽한 진단보다 먼저, 안정화와 역할 분리를 얼마나 빨리 실행했는지에서 갈립니다.
@@ -278,6 +280,101 @@ def initial_response(alert_id: str, team: list[str]) -> dict:
 
 짧은 인계 메시지를 표준화해 두면 교대 시점의 정보 손실을 줄일 수 있습니다.
 
+## 초기 대응 10분 실행표
+
+초기 대응은 정보가 적을수록 더 구조화해야 합니다. 아래 실행표는 incident 선언 직후 10분 동안 누구나 같은 순서로 움직이도록 만든 최소 표준입니다.
+
+| 분 단위 | 목표 | 담당 | 완료 기준 |
+| --- | --- | --- | --- |
+| 0~2분 | ack, 소유권 확정 | primary on-call | incident id + 채널 생성 |
+| 2~5분 | 영향 수치 1차 확보 | ops | 오류율/지연/영향 경로 기록 |
+| 5~7분 | 역할 배정 | IC | IC/Ops/Comms/Scribe 지정 |
+| 7~10분 | 첫 완화 실행 | ops | rollback/flag/throttle 중 1개 착수 |
+
+표가 있는 팀은 초반 혼선이 줄어듭니다. 특히 5~7분 구간에서 역할을 명시하면 이후 1시간이 안정됩니다. 반대로 역할 분리가 늦어지면 기술 대응자와 공지 담당자가 서로 같은 질문에 시간을 쓰게 됩니다.
+
+## 첫 공지 템플릿(내부/외부)
+
+초기 공지는 정확성과 속도의 균형이 중요합니다. 원인을 단정하지 않으면서도 현재 상태와 다음 업데이트 시간을 분명히 전달해야 합니다.
+
+```text
+[internal-first-update]
+- incident_id:
+- current_severity:
+- observed_impact:
+- mitigation_in_progress:
+- next_update_at:
+
+[external-first-update]
+- 현재 일부 사용자에게 서비스 오류가 발생하고 있습니다.
+- 대응팀이 원인 분석 및 완화 조치를 진행 중입니다.
+- 다음 공지는 <UTC 시각>에 업데이트하겠습니다.
+```
+
+초기 공지가 짧아도 괜찮습니다. 공지가 늦는 것보다 정시에 도착하는 짧은 사실 공지가 신뢰를 더 지킵니다.
+
+## 운영 부록: 초기 대응 실행 로그 템플릿
+
+```text
+[initial-response-log]
+00:00 page acknowledged
+00:01 incident channel opened
+00:03 IC/Ops/Comms/Scribe assigned
+00:05 first impact estimate posted
+00:07 mitigation candidate selected
+00:09 first customer update drafted
+00:10 mitigation command executed
+```
+
+초기 대응 로그는 길 필요가 없습니다. 다만 시각과 행위가 빠지지 않아야 합니다.
+
+## 운영 부록: 역할 카드 상세
+
+| 역할 | 핵심 책임 | 산출물 |
+| --- | --- | --- |
+| IC | 우선순위/단계 전환 결정 | 단계 전환 선언 메시지 |
+| Ops | 기술 조치 실행과 검증 | 명령 실행 로그, 지표 변화 |
+| Comms | 내부/외부 공지 발행 | 정시 업데이트 메시지 |
+| Scribe | 타임라인 기록 유지 | fact/note 분리 기록 |
+
+## 운영 부록: 초기 10분 실패 패턴
+
+1. 채널 미개설로 대화가 여러 DM으로 분산됨
+2. IC가 직접 명령 실행에 몰입해 의사결정 공백 발생
+3. 첫 공지 지연으로 고객 신뢰 하락
+4. 역할은 정했지만 책임 산출물 정의가 없어 혼선
+5. 완화 시도 후 검증 지표를 정하지 않아 재확산
+
+이 패턴을 팀 리허설에서 반복 점검하면 실제 incident에서 초기 10분 품질이 눈에 띄게 좋아집니다.
+
+## 초기 대응 운영 추가 점검 항목
+
+아래 항목은 실무에서 바로 점검할 수 있는 추가 체크포인트입니다.
+
+- 체크포인트 1: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 2: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 3: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 4: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 5: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 6: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+- 체크포인트 7: incident 운영에서 재현 가능한 품질을 만들려면 기준 문서, 실행 템플릿, 검증 루프가 하나로 연결되어야 합니다. 대응자는 판단 근거를 수치로 남기고, 커뮤니케이션은 정시로 발행하며, 종료 후에는 action item을 추적 가능한 티켓으로 전환해야 합니다. 이 원칙을 반복 적용하면 개인 경험에 의존하던 대응이 팀 시스템으로 바뀝니다.
+
+```text
+[quick-audit]
+- declaration_latency_minutes:
+- first_update_latency_minutes:
+- mitigation_started_minutes:
+- recovery_verification_metrics:
+- postmortem_linked: true/false
+```
+
+
+## 운영 메모: 점검 루프
+
+운영 문서는 작성으로 끝나지 않습니다. 월간 점검 루프를 통해 선언 기준, 역할 분리, 공지 주기, 후속 조치 추적이 실제 incident에서 유지되는지 확인해야 합니다. 점검 결과는 다음 리허설 시나리오와 runbook 개정 항목으로 바로 연결하는 편이 좋습니다.
+
+운영팀은 이 점검 결과를 다음 주 온콜 브리핑에서 공유하고, 기준 변경이 있으면 같은 날 runbook과 템플릿을 함께 갱신해 문서-실행 간 시차를 줄여야 합니다.
+
 ## 처음 질문으로 돌아가기
 
 - **알림이 온 뒤 첫 5분에 무엇부터 해야 할까요?**
@@ -312,6 +409,7 @@ def initial_response(alert_id: str, team: list[str]) -> dict:
 - [Statuspage incident communication guide](https://www.atlassian.com/software/statuspage/incident-communication)
 
 ### 예제 소스
+- [incident-response-101 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/incident-response-101/ko)
 - [incident-response-101 canonical source in book-content](https://github.com/yeongseon-books/book-content/tree/main/content/incident-response-101)
 
 Tags: Incident, Triage, Response, OnCall, Operations

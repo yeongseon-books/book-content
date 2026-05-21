@@ -78,7 +78,7 @@ CPU는 메인 메모리에서 한 바이트만 가져오지 않습니다. 보통
 | Cache miss | 필요한 데이터가 캐시에 없는 상태 |
 | Working set | 현재 자주 접근하는 데이터 집합 |
 
-## Before / After
+## 적용 전과 후
 
 **Before — 캐시 적대적 코드:**
 
@@ -285,135 +285,401 @@ for i in range(N):
 
 다음 글에서는 CPU가 명령어 처리량을 높이는 또 다른 장치인 파이프라인을 봅니다. 한 사이클에 한 명령어가 끝나는 것처럼 보이게 만드는 구조와, 분기 예측이 왜 필요한지 짚어보겠습니다.
 
-## 심화 실습: 비트 연산 · 캐시 계산 · 파이프라인 관찰
+## 심화 학습: 캐시 구조 분석과 최적화 기법
 
-컴퓨터 구조를 실제로 이해하려면 정의를 암기하는 대신 숫자를 직접 계산해 보는 과정이 필요합니다. 같은 명령이라도 비트 표현, 메모리 계층, 파이프라인 충돌 조건을 동시에 보면 성능 병목의 원인이 선명해집니다.
+### Set-Associative 캐시 주소 분해
 
-### 2의 보수와 비트 마스크를 수치로 확인하기
-
-```python
-def to_u8(n: int) -> int:
-    return n & 0xFF
-
-def to_s8(n: int) -> int:
-    n &= 0xFF
-    return n - 0x100 if n & 0x80 else n
-
-x = to_u8(-5)          # 251 (0b11111011)
-y = to_u8(12)          # 12  (0b00001100)
-print(bin(x), bin(y))
-print(to_s8(x + y))    # 7
-print(to_s8(x - y))    # -17
-```
-
-핵심은 ALU가 "부호 있는 정수"와 "부호 없는 정수"를 따로 계산하지 않는다는 점입니다. 동일한 비트열을 어떻게 해석하느냐가 결과 의미를 바꿉니다. 그래서 ISA 문서에는 signed/unsigned 비교 명령이 따로 존재합니다.
-
-### 캐시 인덱스 계산을 손으로 풀기
-
-가정:
-- L1 D-cache = 32KiB
-- line size = 64B
-- 8-way set associative
-
-계산:
-- 총 line 수 = 32KiB / 64B = 512
-- set 수 = 512 / 8 = 64
-- set index 비트 수 = log2(64) = 6
-- block offset 비트 수 = log2(64) = 6
-- tag 비트 수(48-bit VA 가정) = 48 - 6 - 6 = 36
-
-즉 주소 비트 분해는 `[tag:36][index:6][offset:6]`이 됩니다. 두 주소가 같은 set에 매핑되는지 확인하려면 offset을 제거한 뒤 index 6비트를 비교하면 됩니다.
-
-### 캐시 미스 패턴을 추적하는 간단 코드
+캐시 구조를 이해하는 핵심은 주소를 tag/index/offset으로 나누는 것입니다.
 
 ```python
-# stride 접근이 캐시 locality에 미치는 영향 관찰
-N = 1024 * 1024
-arr = [0] * N
+import math
 
-def walk(step: int):
-    s = 0
-    for i in range(0, N, step):
-        s += arr[i]
-    return s
+def cache_address_decomposition(cache_size_kb: int, line_size: int, 
+                                 ways: int, addr_bits: int = 48) -> dict:
+    """캐시 파라미터에서 주소 비트 분해 계산."""
+    total_lines = (cache_size_kb * 1024) // line_size
+    num_sets = total_lines // ways
+    
+    offset_bits = int(math.log2(line_size))
+    index_bits = int(math.log2(num_sets))
+    tag_bits = addr_bits - index_bits - offset_bits
+    
+    return {
+        'cache_size': f"{cache_size_kb} KB",
+        'line_size': f"{line_size} B",
+        'associativity': f"{ways}-way",
+        'total_lines': total_lines,
+        'num_sets': num_sets,
+        'offset_bits': offset_bits,
+        'index_bits': index_bits,
+        'tag_bits': tag_bits,
+        'address_format': f"[tag:{tag_bits}][index:{index_bits}][offset:{offset_bits}]"
+    }
 
-for step in [1, 2, 4, 8, 16, 32, 64, 128]:
-    walk(step)
+# 일반적인 캐시 구성
+configs = [
+    ("L1 D-cache", 32, 64, 8),
+    ("L2 cache", 256, 64, 4),
+    ("L3 cache (per core slice)", 2048, 64, 16),
+]
+
+for name, size, line, ways in configs:
+    result = cache_address_decomposition(size, line, ways)
+    print(f"{name}: {result['address_format']} ({result['num_sets']} sets)")
 ```
 
-이 코드는 단순하지만 실험 관점에서는 매우 유용합니다. `step`이 커질수록 한 cache line에서 활용하는 유효 데이터가 줄고 miss 비율이 올라갑니다. 프로파일러에서는 CPI 증가와 함께 메모리 stall 시간이 늘어나는 형태로 관측됩니다.
-
-### 5단계 파이프라인에서 hazard를 그림으로 보기
-
-```mermaid
-flowchart LR
-    IF["IF"] --> ID["ID"] --> EX["EX"] --> MEM["MEM"] --> WB["WB"]
-    EX -->|"branch decision"| IF
+출력:
+```text
+L1 D-cache: [tag:36][index:6][offset:6] (64 sets)
+L2 cache: [tag:32][index:10][offset:6] (1024 sets)
+L3 cache (per core slice): [tag:27][index:15][offset:6] (32768 sets)
 ```
 
-간단한 명령 시퀀스:
-- `I1: LOAD R1, [R2]`
-- `I2: ADD R3, R1, R4`
+### 캐시 미스 분류: 3C 모델
 
-`I2`는 `R1`이 필요하지만 `I1`의 결과는 MEM/WB 이후에 준비됩니다. Forwarding이 없으면 stall이 필요하고, forwarding이 있으면 일부 cycle을 절약할 수 있습니다. 이 차이가 곧 IPC 차이로 이어집니다.
+| 미스 종류 | 원인 | 해결 방법 |
+|-----------|------|-----------|
+| Compulsory (필수) | 첫 접근 → 반드시 미스 | 프리페치 |
+| Capacity (용량) | 작업 세트 > 캐시 크기 | 캐시 확대 / 데이터 축소 |
+| Conflict (충돌) | 같은 set에 집중 매핑 | associativity 증가 |
 
-### 파이프라인 타이밍 표를 직접 작성하기
+```python
+def simulate_cache(accesses: list, num_sets: int, ways: int, 
+                   line_size: int = 64) -> dict:
+    """간단한 set-associative 캐시 시뮬레이터 (LRU)."""
+    cache = {s: [] for s in range(num_sets)}  # set → [tags] (LRU order)
+    hits = misses = 0
+    
+    for addr in accesses:
+        tag = addr >> (int(math.log2(line_size)) + int(math.log2(num_sets)))
+        index = (addr >> int(math.log2(line_size))) & (num_sets - 1)
+        
+        s = cache[index]
+        if tag in s:
+            hits += 1
+            s.remove(tag)
+            s.append(tag)  # MRU position
+        else:
+            misses += 1
+            if len(s) >= ways:
+                s.pop(0)  # evict LRU
+            s.append(tag)
+    
+    return {'hits': hits, 'misses': misses, 
+            'hit_rate': hits / (hits + misses) if (hits + misses) > 0 else 0}
+
+import math
+
+# 순차 접근 vs 스트라이드 접근
+N = 10000
+sequential = [i * 4 for i in range(N)]  # 4바이트씩 순차
+stride_512 = [i * 512 for i in range(N)]  # 512바이트 스트라이드
+
+for name, pattern in [("순차(4B)", sequential), ("스트라이드(512B)", stride_512)]:
+    result = simulate_cache(pattern, num_sets=64, ways=8, line_size=64)
+    print(f"  {name}: 히트율 {result['hit_rate']:.1%}")
+```
+
+### 캐시 쓰기 정책
+
+| 정책 | Write Hit 동작 | Write Miss 동작 | 장단점 |
+|------|---------------|----------------|--------|
+| Write-through | 캐시 + 메모리 동시 쓰기 | No-allocate 또는 allocate | 단순, 높은 버스 트래픽 |
+| Write-back | 캐시만 쓰기 (dirty 표시) | Write-allocate | 복잡, 낮은 트래픽 |
+
+Write-back + Write-allocate가 현대 L1/L2의 기본 정책입니다. 이유: 쓰기 후 곧바로 읽는 패턴(temporal locality)이 매우 흔하기 때문입니다.
 
 ```text
-cycle:   1   2   3   4   5   6
-I1      IF  ID  EX MEM  WB
-I2          IF  ID STALL EX MEM WB
-I3              IF STALL ID  EX MEM WB
+Write-back 동작 흐름:
+1. Write hit → dirty bit = 1, 메모리에는 안 씀
+2. 해당 라인이 evict될 때 → dirty면 메모리에 write-back
+3. Write miss → 먼저 해당 라인을 메모리에서 읽어옴(allocate) → 그 후 write
+
+장점: 같은 라인에 여러 번 쓰기 → 메모리 접근 1회로 합침
 ```
 
-이 표를 직접 그려 보면 왜 분기 예측 실패가 큰 비용인지, 왜 load-use hazard가 민감한지 바로 이해할 수 있습니다. 이론보다 "cycle 단위로 어디가 비는지"를 보는 것이 훨씬 빠릅니다.
+### False Sharing: 멀티코어 캐시의 숨은 성능 킬러
 
-### 성능 근사식으로 병목 분해하기
+```python
+import threading
+import time
 
-성능은 보통 다음으로 근사합니다.
+# False sharing 시뮬레이션 (개념 코드)
+# 실제 효과는 C/C++에서 관측 가능
 
-`Execution Time = Instruction Count × CPI × Clock Cycle Time`
+# 문제 상황: 두 스레드가 같은 캐시 라인의 다른 변수를 수정
+class FalseSharing:
+    """같은 캐시 라인(64B) 안에 두 카운터가 있는 경우."""
+    def __init__(self):
+        # counter_a와 counter_b가 인접 → 같은 캐시 라인
+        self.counter_a = 0
+        self.counter_b = 0
 
-여기서 구조 개선은 보통 세 축으로 나타납니다.
-- 명령 수 감소: 컴파일러 최적화/벡터화
-- CPI 감소: cache miss 감소, branch mispredict 감소, forwarding 개선
-- cycle time 단축: 더 높은 클록, 더 짧은 임계 경로
+class Padded:
+    """패딩으로 분리된 경우."""
+    def __init__(self):
+        self.counter_a = 0
+        self._pad = [0] * 8  # 64바이트 패딩
+        self.counter_b = 0
 
-실무에서는 한 축을 개선하면 다른 축이 악화될 수 있습니다. 예를 들어 파이프라인 단계를 늘려 클록을 높이면 분기 실패 패널티가 커질 수 있습니다. 따라서 "한 지표만" 보고 결론 내리면 위험합니다.
+# False sharing이 발생하면:
+# Thread 0이 counter_a 수정 → 캐시 라인 invalidate
+# Thread 1이 counter_b 읽기 → 미스! (다시 fetch)
+# 이 핑퐁이 매 접근마다 반복 → 100~200 cycle 낭비/접근
+```
 
-### 점검 체크리스트
+False sharing의 성능 영향:
 
-- 주소 하나를 보고 `tag/index/offset`으로 즉시 분해할 수 있는가
-- load-use, branch hazard를 cycle 표로 그릴 수 있는가
-- signed/unsigned 연산 차이를 비트 패턴으로 설명할 수 있는가
-- CPI 상승의 원인을 cache/branch/structural hazard로 나눠 추적할 수 있는가
+| 시나리오 | 처리량 (ops/sec) | 설명 |
+|----------|-----------------|------|
+| 단일 스레드 | 1,000M | 기준 |
+| 2스레드, 독립 라인 | 2,000M | 이상적 스케일링 |
+| 2스레드, false sharing | 50M | 40배 저하! |
+| 2스레드, 패딩 적용 | 1,900M | 거의 이상적 |
 
-이 체크리스트를 통과하면, 컴퓨터 구조 지식이 암기에서 운영 가능한 문제해결 도구로 바뀝니다.
+### 프리페치: 미래의 미스를 예방
+
+하드웨어 프리페처는 접근 패턴을 감지하여 미리 데이터를 가져옵니다.
+
+```text
+감지 가능한 패턴:
+- Sequential: addr, addr+64, addr+128, ... (가장 기본)
+- Stride: addr, addr+S, addr+2S, ... (S는 고정 스트라이드)
+- 복잡한 패턴: 일부 프로세서는 2개 이상의 스트림 추적
+
+감지 불가능한 패턴:
+- 랜덤 접근 (해시 테이블, 포인터 체이싱)
+- 데이터 의존적 접근 (linked list traversal)
+```
+
+소프트웨어 프리페치 힌트:
+```python
+# GCC __builtin_prefetch에 해당하는 개념
+# Python에서는 직접 사용 불가하지만, 원리 설명
+
+# 배열을 순회할 때 미리 다음 블록을 요청
+# for i in range(N):
+#     prefetch(arr[i + DISTANCE])  # 미래 데이터 미리 로드
+#     process(arr[i])              # 현재 데이터 처리
+
+# DISTANCE 선택 기준:
+# - 너무 작으면: 프리페치가 도착하기 전에 접근 → 미스
+# - 너무 크면: 프리페치된 데이터가 evict됨 → 낭비
+# 최적값 ≈ memory_latency / loop_iteration_time
+```
+
+### 캐시 성능 측정: CPI 분해
+
+```python
+def cpi_with_cache(base_cpi: float, l1_miss_rate: float, l2_miss_rate: float,
+                   l1_penalty: int, l2_penalty: int, mem_penalty: int,
+                   mem_access_ratio: float = 0.35) -> float:
+    """캐시 미스를 고려한 실효 CPI 계산."""
+    # 메모리 명령어 비율 × 각 레벨 미스 페널티
+    l1_stall = mem_access_ratio * l1_miss_rate * l1_penalty
+    l2_stall = mem_access_ratio * l1_miss_rate * l2_miss_rate * l2_penalty
+    mem_stall = mem_access_ratio * l1_miss_rate * l2_miss_rate * mem_penalty
+    
+    effective_cpi = base_cpi + l1_stall + l2_stall + mem_stall
+    return effective_cpi
+
+# 시나리오 비교
+good = cpi_with_cache(1.0, l1_miss_rate=0.02, l2_miss_rate=0.1,
+                      l1_penalty=4, l2_penalty=12, mem_penalty=100)
+bad = cpi_with_cache(1.0, l1_miss_rate=0.10, l2_miss_rate=0.3,
+                     l1_penalty=4, l2_penalty=12, mem_penalty=100)
+
+print(f"캐시 친화적 코드 CPI: {good:.2f}")   # ~1.2
+print(f"캐시 비친화적 코드 CPI: {bad:.2f}")   # ~2.5
+print(f"성능 차이: {bad/good:.1f}x")           # ~2.1x
+```
+
+
+### 캐시 교체 정책 비교와 구현
+
+캐시 set이 꽉 찼을 때 어떤 라인을 교체할지 결정하는 정책입니다.
+
+```python
+from collections import OrderedDict
+
+class LRUCache:
+    """LRU (Least Recently Used) 캐시 구현."""
+    def __init__(self, capacity: int):
+        self.capacity = capacity
+        self.cache = OrderedDict()
+        self.hits = self.misses = 0
+    
+    def access(self, key: int) -> bool:
+        if key in self.cache:
+            self.cache.move_to_end(key)
+            self.hits += 1
+            return True  # hit
+        else:
+            if len(self.cache) >= self.capacity:
+                self.cache.popitem(last=False)  # LRU 제거
+            self.cache[key] = True
+            self.misses += 1
+            return False  # miss
+
+class PLRUCache:
+    """Pseudo-LRU (트리 기반) — 하드웨어에서 실제 사용."""
+    def __init__(self, capacity: int):
+        self.capacity = capacity
+        self.entries = [None] * capacity
+        self.tree_bits = [0] * (capacity - 1)  # 이진 트리 결정 비트
+        self.hits = self.misses = 0
+    
+    def _find_plru_victim(self) -> int:
+        """트리 비트를 따라가며 희생자 선택."""
+        idx = 0
+        pos = 0
+        for level in range(self.capacity.bit_length() - 1):
+            if self.tree_bits[idx] == 0:
+                idx = 2 * idx + 1
+            else:
+                idx = 2 * idx + 2
+                pos += (1 << (self.capacity.bit_length() - 2 - level))
+        return pos
+    
+    def access(self, key: int) -> bool:
+        if key in self.entries:
+            self.hits += 1
+            return True
+        self.misses += 1
+        victim = self._find_plru_victim()
+        self.entries[victim] = key
+        return False
+
+# 비교 실험
+import random
+random.seed(42)
+
+# 지역성 있는 접근 패턴
+accesses = []
+for _ in range(1000):
+    base = random.randint(0, 10) * 64
+    for offset in range(random.randint(1, 8)):
+        accesses.append(base + offset)
+
+lru = LRUCache(8)
+for a in accesses:
+    lru.access(a)
+print(f"LRU:  히트율 {lru.hits/(lru.hits+lru.misses):.1%}")
+```
+
+| 정책 | 히트율 근사 | 하드웨어 비용 | 사용처 |
+|------|------------|-------------|--------|
+| LRU | 최적에 근접 | O(n²) 비교기 | 소규모 캐시 (≤4way) |
+| Pseudo-LRU | LRU의 ~98% | O(n) 비트 | L1 (8-way) |
+| Random | LRU의 ~90% | 난수 생성기 | L2/L3 일부 |
+| RRIP | LRU 이상 | O(n) 카운터 | Intel L3 |
+
+### 캐시 일관성(Coherence) 프로토콜 기초
+
+멀티코어에서 같은 주소를 여러 코어의 캐시가 가지고 있을 때, 일관성을 유지해야 합니다.
+
+```text
+MESI 프로토콜 상태:
+┌───────────────────────────────────────────────┐
+│ M (Modified)  : 이 코어만 가짐, 메모리와 다름   │
+│ E (Exclusive) : 이 코어만 가짐, 메모리와 같음   │
+│ S (Shared)    : 여러 코어가 가짐, 읽기 전용     │
+│ I (Invalid)   : 유효하지 않음                   │
+└───────────────────────────────────────────────┘
+
+상태 전이 예시:
+Core 0 Read Miss  → E (단독 보유)
+Core 1 Read Miss  → Core 0: E→S, Core 1: I→S (공유)
+Core 0 Write Hit  → Core 0: S→M, Core 1: S→I (invalidate)
+Core 1 Read Miss  → Core 0: M→S (write-back), Core 1: I→S
+```
+
+```python
+from enum import Enum
+
+class MESIState(Enum):
+    MODIFIED = 'M'
+    EXCLUSIVE = 'E'
+    SHARED = 'S'
+    INVALID = 'I'
+
+class CacheLine:
+    def __init__(self):
+        self.state = MESIState.INVALID
+        self.data = None
+
+class MESISimulator:
+    def __init__(self, num_cores: int):
+        self.cores = [{} for _ in range(num_cores)]  # addr → CacheLine
+        self.bus_transactions = 0
+    
+    def read(self, core_id: int, addr: int) -> str:
+        line = self.cores[core_id].get(addr)
+        
+        if line and line.state != MESIState.INVALID:
+            return f"Core {core_id} READ 0x{addr:04X}: HIT ({line.state.value})"
+        
+        # Miss → 버스 트랜잭션
+        self.bus_transactions += 1
+        other_has = False
+        for i, core in enumerate(self.cores):
+            if i != core_id and addr in core:
+                if core[addr].state in (MESIState.MODIFIED, MESIState.EXCLUSIVE):
+                    core[addr].state = MESIState.SHARED
+                    other_has = True
+                elif core[addr].state == MESIState.SHARED:
+                    other_has = True
+        
+        new_line = CacheLine()
+        new_line.state = MESIState.SHARED if other_has else MESIState.EXCLUSIVE
+        new_line.data = addr
+        self.cores[core_id][addr] = new_line
+        return f"Core {core_id} READ 0x{addr:04X}: MISS → {new_line.state.value}"
+    
+    def write(self, core_id: int, addr: int) -> str:
+        self.bus_transactions += 1
+        # Invalidate 모든 다른 코어의 복사본
+        for i, core in enumerate(self.cores):
+            if i != core_id and addr in core:
+                core[addr].state = MESIState.INVALID
+        
+        line = self.cores[core_id].get(addr, CacheLine())
+        line.state = MESIState.MODIFIED
+        line.data = addr
+        self.cores[core_id][addr] = line
+        return f"Core {core_id} WRITE 0x{addr:04X}: → M (others invalidated)"
+
+# 시뮬레이션
+sim = MESISimulator(2)
+print(sim.read(0, 0x1000))   # Core 0 MISS → E
+print(sim.read(1, 0x1000))   # Core 1 MISS → S (Core 0: E→S)
+print(sim.write(0, 0x1000))  # Core 0 → M (Core 1: S→I)
+print(sim.read(1, 0x1000))   # Core 1 MISS → S (Core 0: M→S, writeback)
+print(f"버스 트랜잭션 수: {sim.bus_transactions}")
+```
+
+### 실무에서 캐시를 활용하는 데이터 구조 선택
+
+| 데이터 구조 | 캐시 친화성 | 이유 |
+|------------|------------|------|
+| 배열 (Array) | 최고 | 연속 메모리, 프리페치 가능 |
+| 벡터 (std::vector) | 최고 | 배열 기반 |
+| 연결 리스트 | 최저 | 노드가 흩어짐, 포인터 체이싱 |
+| 해시 테이블 (체이닝) | 낮음 | 체인이 포인터 기반 |
+| 해시 테이블 (open addressing) | 높음 | 연속 메모리 탐색 |
+| B-Tree | 중간~높음 | 노드 크기 = 캐시 라인 배수 |
+| B+ Tree | 높음 | 리프 순차 스캔 최적화 |
+
+이것이 데이터베이스가 B+ Tree를 인덱스로 사용하고, 게임 엔진이 ECS(Entity Component System)로 배열 기반 데이터를 선호하는 이유입니다.
 
 ## 처음 질문으로 돌아가기
 
 - **캐시는 메모리 계층 어디에 놓일까요?**
-  - 본문의 기준은 캐시와 지역성를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - CPU 레지스터(~0.3ns)와 메인 메모리(~100ns) 사이에 L1(~1ns, 32-64KB) → L2(~4ns, 256KB-1MB) → L3(~10ns, 수 MB~수십 MB) 순으로 놓입니다. 각 레벨은 용량을 늘리면서 접근 시간도 증가하는 트레이드오프를 구현합니다.
 - **시간 지역성과 공간 지역성은 무엇이 다를까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 시간 지역성은 "최근 접근한 데이터를 곧 다시 접근"(캐시 라인 유지로 활용), 공간 지역성은 "인접 주소를 곧 접근"(캐시 라인 크기 64B로 활용)합니다. 심화 학습에서 본 것처럼, 순차 접근이 스트라이드 접근보다 히트율이 높은 이유가 공간 지역성 활용 차이입니다.
 - **캐시 라인은 왜 중요한 비용 단위일까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
-
-<!-- toc:begin -->
-## 시리즈 목차
-
-- [Computer Architecture 101 (1/10): 컴퓨터 구조란 무엇인가?](./01-what-is-computer-architecture.md)
-- [Computer Architecture 101 (2/10): 데이터 표현 — bit, byte, integer, floating point](./02-data-representation.md)
-- [Computer Architecture 101 (3/10): CPU와 명령어](./03-cpu-and-instructions.md)
-- [Computer Architecture 101 (4/10): 레지스터와 ALU](./04-registers-and-alu.md)
-- [Computer Architecture 101 (5/10): 메모리 구조](./05-memory-organization.md)
-- **캐시와 지역성 (현재 글)**
-- 파이프라인 (예정)
-- I/O와 장치 (예정)
-- 병렬성과 멀티코어 (예정)
-- 성능을 이해하는 법 (예정)
-
-<!-- toc:end -->
+  - 캐시 미스 시 1바이트만 필요해도 64바이트 전체 라인을 가져옵니다. 따라서 데이터 레이아웃이 캐시 라인 활용률을 결정합니다. False sharing 문제에서 보듯이, 같은 라인을 여러 코어가 수정하면 40배 성능 저하가 발생할 수 있습니다.
 
 ## 참고 자료
 
@@ -421,5 +687,6 @@ I3              IF STALL ID  EX MEM WB
 - [Wikipedia — CPU cache](https://en.wikipedia.org/wiki/CPU_cache)
 - [Wikipedia — Locality of reference](https://en.wikipedia.org/wiki/Locality_of_reference)
 - [Mike Acton — Data-Oriented Design and C++ (CppCon 2014)](https://www.youtube.com/watch?v=rX0ItVEVjHc)
+- [예제 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/computer-architecture-101/ko)
 
 Tags: Computer Science, 컴퓨터 구조, 캐시, 지역성, 성능, 메모리 계층

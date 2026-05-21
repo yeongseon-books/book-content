@@ -194,6 +194,249 @@ print(f"상태: {result['status']}")
 
 이 코드는 버짓 상태를 하나의 함수로 요약합니다. 허용량, 현재값, 남은 여유, 상태를 한 번에 볼 수 있어 운영 의사결정이 빠라집니다.
 
+
+## Burn Rate 기반 알림 설계
+
+에러 버짓을 실시간으로 감시하려면 burn rate 기반 알림이 효과적입니다. 단순히 오류 비율 임계값을 거는 것보다, 버짓이 소진되는 속도를 보고 알림을 보내면 더 정확한 조기 경고를 받을 수 있습니다.
+
+### Burn Rate란?
+
+burn rate는 현재 속도로 오류가 계속 발생하면 윈도우가 끝나기 전에 버짓이 바닥나는지를 보여 줍니다.
+
+```
+burn_rate = (현재 오류 발생 속도) / (허용된 오류 발생 속도)
+```
+
+- burn rate = 1: 정확히 예산대로 소진 중 (월말에 딱 맞게 바닥남)
+- burn rate = 2: 2배 속도로 소진 중 (15일 만에 바닥남)
+- burn rate = 14.4: 매우 빠르게 소진 중 (약 2일 만에 바닥남)
+
+### PromQL로 Burn Rate 알림 설정
+
+Google SRE Workbook에서 권장하는 multi-window, multi-burn-rate 알림 방식입니다.
+
+```promql
+# Fast burn: 1시간 윈도우에서 14.4배 속도 초과
+(
+  sum(rate(http_requests_total{status=~"5..",service="payments"}[1h]))
+  /
+  sum(rate(http_requests_total{service="payments"}[1h]))
+) > (14.4 * 0.001)
+
+# Slow burn: 6시간 윈도우에서 6배 속도 초과
+(
+  sum(rate(http_requests_total{status=~"5..",service="payments"}[6h]))
+  /
+  sum(rate(http_requests_total{service="payments"}[6h]))
+) > (6 * 0.001)
+```
+
+### 알림 계층 설계
+
+```yaml
+# Prometheus alerting rules
+groups:
+  - name: error_budget_burn
+    rules:
+      - alert: ErrorBudgetFastBurn
+        expr: |
+          (
+            sum(rate(http_requests_total{status=~"5.."}[1h]))
+            / sum(rate(http_requests_total[1h]))
+          ) > (14.4 * 0.001)
+        for: 2m
+        labels:
+          severity: page
+        annotations:
+          summary: "에러 버짓이 14.4배 속도로 소진 중 (약 2일 내 고갈)"
+          runbook: "https://wiki.internal/runbooks/error-budget-fast-burn"
+
+      - alert: ErrorBudgetSlowBurn
+        expr: |
+          (
+            sum(rate(http_requests_total{status=~"5.."}[6h]))
+            / sum(rate(http_requests_total[6h]))
+          ) > (6 * 0.001)
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "에러 버짓이 6배 속도로 소진 중 (약 5일 내 고갈)"
+```
+
+Fast burn은 즉시 대응이 필요한 급격한 장애에 대응하고, slow burn은 점진적으로 품질이 나빠지는 상황을 잡아냅니다. 두 알림을 함께 써야 큰 장애도, 느린 악화도 모두 감지할 수 있습니다.
+
+## 에러 버짓 소진 시뮬레이션
+
+에러 버짓이 실제로 어떻게 소진되는지 시뮬레이션해 보면 burn rate의 의미가 더 명확해집니다.
+
+```python
+def simulate_budget_burn(
+    total_requests_per_day,
+    target_availability,
+    window_days,
+    daily_error_rates
+):
+    """
+    에러 버짓 소진 시뮬레이션
+    daily_error_rates: 각 날의 오류 비율 리스트
+    """
+    total_requests = total_requests_per_day * window_days
+    total_budget = total_requests * (1 - target_availability)
+    
+    cumulative_errors = 0
+    daily_report = []
+    
+    for day, error_rate in enumerate(daily_error_rates, 1):
+        daily_errors = total_requests_per_day * error_rate
+        cumulative_errors += daily_errors
+        spent_ratio = cumulative_errors / total_budget
+        
+        daily_report.append({
+            "day": day,
+            "daily_error_rate": f"{error_rate*100:.3f}%",
+            "cumulative_errors": int(cumulative_errors),
+            "budget_spent": f"{spent_ratio*100:.1f}%",
+            "status": get_status(spent_ratio)
+        })
+    
+    return daily_report
+
+def get_status(ratio):
+    if ratio >= 1.0: return "EXHAUSTED"
+    if ratio >= 0.8: return "CRITICAL"
+    if ratio >= 0.5: return "WARNING"
+    return "HEALTHY"
+
+# 시나리오: 일 100만 요청, 99.9% 목표, 30일 윈도우
+# 처음 5일은 정상, 6일째 장애 발생
+daily_rates = [0.0005] * 5 + [0.005] + [0.001] * 4 + [0.0005] * 20
+
+report = simulate_budget_burn(
+    total_requests_per_day=1_000_000,
+    target_availability=0.999,
+    window_days=30,
+    daily_error_rates=daily_rates
+)
+
+print(f"{'Day':<5} {'Error Rate':<12} {'Cumul Errors':<14} {'Budget':<10} {'Status'}")
+print("-" * 55)
+for r in report[:10]:  # 처음 10일만 출력
+    print(f"{r['day']:<5} {r['daily_error_rate']:<12} {r['cumulative_errors']:<14} {r['budget_spent']:<10} {r['status']}")
+```
+
+출력 예시:
+```
+Day   Error Rate   Cumul Errors   Budget     Status
+-------------------------------------------------------
+1     0.050%       500            1.7%       HEALTHY
+2     0.050%       1000           3.3%       HEALTHY
+3     0.050%       1500           5.0%       HEALTHY
+4     0.050%       2000           6.7%       HEALTHY
+5     0.050%       2500           8.3%       HEALTHY
+6     0.500%       7500           25.0%      HEALTHY
+7     0.100%       8500           28.3%      HEALTHY
+8     0.100%       9500           31.7%      HEALTHY
+9     0.100%       10500          35.0%      HEALTHY
+10    0.100%       11500          38.3%      HEALTHY
+```
+
+6일째 장애(0.5% 오류율)가 하루 만에 버짓의 16.7%를 소진합니다. 평소 0.05% 오류율에서는 하루에 1.7%밖에 소진하지 않으므로, 장애 하루가 평소 10일치 버짓을 소모한 셈입니다.
+
+## 에러 버짓과 릴리스 의사결정 흐름
+
+에러 버짓을 실제 릴리스 판단에 연결하는 흐름도입니다.
+
+```python
+def release_decision(budget_spent_pct, burn_rate, change_risk):
+    """
+    릴리스 의사결정 함수
+    change_risk: 'low', 'medium', 'high'
+    """
+    # 버짓 소진 100% 이상: 모든 배포 중단
+    if budget_spent_pct >= 100:
+        return {
+            "decision": "BLOCK",
+            "reason": "에러 버짓 소진, 안정화만 허용",
+            "allowed": ["hotfix", "rollback"],
+        }
+    
+    # 버짓 80% 이상: 고위험 변경 차단
+    if budget_spent_pct >= 80:
+        if change_risk == "high":
+            return {
+                "decision": "BLOCK",
+                "reason": "버짓 위험 구간, 고위험 변경 차단",
+                "allowed": ["hotfix", "low-risk config"],
+            }
+        return {
+            "decision": "REVIEW",
+            "reason": "버짓 위험 구간, 추가 리뷰 필요",
+            "required": ["SRE approval", "canary 1% 시작"],
+        }
+    
+    # 버짓 50% 이상: 리뷰 강화
+    if budget_spent_pct >= 50:
+        return {
+            "decision": "REVIEW",
+            "reason": "버짓 절반 소진, 리뷰 강화",
+            "required": ["peer review", "canary 5%"],
+        }
+    
+    # 버짓 여유: 정상 배포
+    return {
+        "decision": "APPROVE",
+        "reason": "버짓 여유, 정상 배포 가능",
+        "required": ["standard review"],
+    }
+
+# 예시
+print(release_decision(45, 1.2, "medium"))
+print(release_decision(82, 3.0, "high"))
+print(release_decision(100, 14.4, "low"))
+```
+
+이 함수는 단순하지만 중요한 원칙을 보여 줍니다. 에러 버짓이 의사결정 규칙과 연결되지 않으면 단순 관찰 지표에 불과합니다. 버짓 상태에 따라 배포 허용 범위가 자동으로 바뀌는 구조가 있어야 팀이 매번 논쟁 없이 움직일 수 있습니다.
+
+## 에러 버짓 대시보드 구성
+
+에러 버짓을 효과적으로 운영하려면 대시보드에 다음 정보가 한눈에 보여야 합니다.
+
+| 패널 | 내용 | 형식 |
+| --- | --- | --- |
+| 버짓 잔량 | 남은 에러 버짓 (%) | Gauge (초록→노랑→빨강) |
+| 소진 추이 | 30일간 누적 소진 그래프 | Time series + 목표선 |
+| Burn rate | 현재 소진 속도 (1h, 6h 윈도우) | Stat (1x, 2x, 14.4x) |
+| 정책 상태 | 현재 적용 중인 릴리스 정책 | Text (SHIP/REVIEW/FREEZE) |
+| 최근 배포 | 배포 시점과 이후 오류 변화 | Annotations + overlay |
+
+```promql
+# 에러 버짓 잔량 계산 (Grafana 변수 사용)
+1 - (
+  sum(increase(http_requests_total{status=~"5..",service="$service"}[30d]))
+  /
+  (sum(increase(http_requests_total{service="$service"}[30d])) * (1 - $target))
+)
+```
+
+대시보드는 "지금 배포해도 되는가?"라는 단일 질문에 답하는 도구로 설계해야 합니다. 그래프가 많다고 좋은 대시보드가 아닙니다. 판단에 필요한 정보만 보여 주는 대시보드가 좋은 대시보드입니다.
+
+## 에러 버짓 운영 시 팀 간 협업
+
+에러 버짓은 SRE팀만의 지표가 아닙니다. 제품팀, 개발팀, 경영진이 모두 같은 숫자를 보고 움직일 때 진짜 효과가 나타납니다.
+
+**제품팀과의 협업:**
+
+제품팀은 새로운 기능을 빨리 출시하고 싶어합니다. 에러 버짓이 충분히 남아 있으면 "지금 실험해도 괜찮습니다"라고 데이터로 말할 수 있습니다. 반대로 버짓이 부족하면 "이번 주는 안정화를 먼저 하고, 다음 주에 출시합시다"라고 제안할 근거가 됩니다.
+
+**개발팀과의 협업:**
+
+배포 후 버짓 소진 속도가 올라가면 해당 배포가 문제를 만들었다는 신호입니다. 개발팀은 이 신호를 보고 빠르게 롤백하거나 hotfix를 적용할 수 있습니다. 번아웃 없이 판단할 수 있습니다.
+
+**경영진과의 협업:**
+
+경영진은 "우리 서비스가 충분히 안정적인가?"라는 질문에 답을 원합니다. 에러 버짓 달성률을 월간 보고에 포함하면 신뢰성 투자의 효과를 정량적으로 보여 줄 수 있습니다.
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - 에러 버짓은 계산 가능한 숫자입니다.
@@ -315,5 +558,6 @@ review_schedule:
 - [Alerting on SLOs - Google SRE Workbook](https://sre.google/workbook/alerting-on-slos/)
 - [Error Budgets - Atlassian](https://www.atlassian.com/incident-management/kpis/error-budget)
 - [Error Budget Policy - Google](https://sre.google/workbook/error-budget-policy/)
+- [SRE 101 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/sre-101/ko)
 
 Tags: SRE, ErrorBudget, Reliability, Release, Risk

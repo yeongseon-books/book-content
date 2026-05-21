@@ -174,128 +174,386 @@ concurrency:
 다음 글에서는 Python 테스트 자동화를 다룹니다. 적절한 시점에 워크플로우를 깨우는 법을 이해했다면, 이제 그 안에서 어떤 테스트를 어떻게 돌릴지 구체화할 차례입니다.
 
 
-## 워크플로 설계를 코드로 구체화하기
 
-워크플로우 품질은 "한 번 돌아간다"가 아니라 "변경이 누적돼도 의도를 유지한다"로 판단해야 합니다. 아래 예시는 테스트, 린트, 빌드를 분리해 실패 지점을 빠르게 찾는 구성입니다.
+---
+
+## 트리거 조합 전략을 더 구체적으로 보겠습니다
+
+실무에서는 하나의 워크플로우에 여러 트리거를 조합하는 경우가 많습니다. 각 조합이 어떤 효과를 내는지 표로 정리하겠습니다.
+
+| 시나리오 | 트리거 조합 | 이유 |
+| --- | --- | --- |
+| PR 검증 | `pull_request` + `paths` | 변경된 코드만 검증, 비용 절감 |
+| main 배포 | `push: branches: [main]` | 머지된 코드만 배포 대상 |
+| 야간 전체 테스트 | `schedule` | 넓은 매트릭스를 비용 낮은 시간대에 실행 |
+| 수동 롤백/배포 | `workflow_dispatch` | 긴급 상황에서 사람이 직접 제어 |
+| 릴리스 발행 | `push: tags: ['v*']` | 태그 기반 버전 관리 |
+| 다른 워크플로우 완료 후 | `workflow_run` | 빌드 완료 후 배포 시작 |
+
+### push와 pull_request를 함께 쓸 때의 중복 실행 문제
 
 ```yaml
-name: ci
 on:
-  pull_request:
   push:
     branches: [main]
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
-        with:
-          python-version: "3.11"
-      - run: pip install -r requirements.txt
-      - run: pytest -q
-
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - run: pip install ruff
-      - run: ruff check .
-
-  build:
-    runs-on: ubuntu-latest
-    needs: [test, lint]
-    steps:
-      - uses: actions/checkout@v6
-      - run: docker build -t app:${{ github.sha }} .
+  pull_request:
+    branches: [main]
 ```
 
-`needs`를 통해 의존 관계를 명시하면 "테스트 실패인데 빌드는 왜 돌았는가" 같은 혼선을 줄일 수 있습니다. 또한 잡을 분리하면 병렬 실행이 가능해 전체 피드백 시간이 짧아집니다.
+이 설정에서 PR을 머지하면 `push` 이벤트도 함께 발생합니다. 즉, PR 머지 시점에 워크플로우가 두 번 실행될 수 있습니다. 이를 방지하는 일반적인 방법은 PR에서만 검증하고, push는 main 전용 작업(배포, 릴리스)에만 쓰는 것입니다.
 
-## Job Matrix로 중복을 줄이기
+```yaml
+# 검증용 (PR만)
+on:
+  pull_request:
 
-동일한 작업을 여러 런타임에서 반복해야 한다면 matrix가 가장 실용적입니다. 아래 구성은 Python 버전과 운영체제를 조합해 호환성을 검증합니다.
+# 배포용 (main push만)
+on:
+  push:
+    branches: [main]
+```
+
+파일을 분리하면 중복 실행 없이 각 시점에 적절한 작업만 돌릴 수 있습니다.
+
+---
+
+## paths 필터의 실전 활용
+
+paths 필터는 비용 절감의 핵심 도구입니다. 문서만 바꿨는데 전체 빌드가 돌면 시간과 비용 모두 낭비입니다.
+
+```yaml
+on:
+  pull_request:
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "pyproject.toml"
+      - "requirements*.txt"
+    paths-ignore:
+      - "docs/**"
+      - "*.md"
+      - ".github/ISSUE_TEMPLATE/**"
+```
+
+`paths`와 `paths-ignore`는 동시에 사용할 수 없습니다. 둘 중 하나만 선택해야 합니다. 일반적으로 포함할 경로가 명확하면 `paths`를, 제외할 경로가 적으면 `paths-ignore`를 사용합니다.
+
+paths 필터에서 자주 하는 실수는 의존성 파일을 빠뜨리는 것입니다. `requirements.txt`가 바뀌면 테스트 결과도 달라질 수 있으므로, 소스 코드뿐 아니라 의존성 선언 파일도 반드시 포함해야 합니다.
+
+### 변경 감지 기반 조건부 실행
+
+paths 필터로는 워크플로우 자체를 건너뛰지만, 잡 수준에서 더 세밀한 제어가 필요할 때는 `dorny/paths-filter` 같은 액션을 사용합니다.
 
 ```yaml
 jobs:
-  test-matrix:
-    runs-on: ${{ matrix.os }}
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'src/api/**'
+              - 'requirements*.txt'
+            frontend:
+              - 'src/web/**'
+              - 'package.json'
+
+  test-backend:
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: pytest tests/api -q
+
+  test-frontend:
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: npm test
+```
+
+이 패턴은 모노레포에서 특히 유용합니다. 백엔드 코드만 바뀌면 프론트엔드 테스트를 건너뛰고, 그 반대도 마찬가지입니다.
+
+---
+
+## schedule 트리거 심화
+
+cron 표현식은 UTC 기준입니다. 한국 시간(KST)은 UTC+9이므로, KST 새벽 2시에 실행하려면 UTC 17시(전날)로 설정해야 합니다.
+
+```yaml
+on:
+  schedule:
+    # KST 새벽 2시 = UTC 17:00 (전날)
+    - cron: "0 17 * * *"
+    # 월요일~금요일만 (주말 제외)
+    - cron: "0 17 * * 1-5"
+```
+
+schedule 트리거의 주의점을 정리하겠습니다.
+
+1. **정확한 시각을 보장하지 않습니다.** GitHub은 부하에 따라 최대 수십 분 지연될 수 있습니다. 정확한 시각이 중요하다면 외부 스케줄러에서 `workflow_dispatch`를 호출하는 편이 낫습니다.
+2. **기본 브랜치에서만 실행됩니다.** feature 브랜치의 schedule은 무시됩니다.
+3. **60일 이상 커밋이 없으면 비활성화됩니다.** 오래된 저장소에서 schedule이 멈추는 이유가 이것입니다.
+4. **여러 cron 표현식을 배열로 쓸 수 있습니다.** 야간 전체 테스트와 주간 의존성 검사를 같은 워크플로우에 둘 수 있습니다.
+
+### schedule 활용 패턴
+
+```yaml
+on:
+  schedule:
+    - cron: "0 17 * * 1-5"  # 평일 KST 02:00 - 전체 매트릭스 테스트
+    - cron: "0 9 * * 1"     # 월요일 KST 18:00 - 의존성 취약점 스캔
+
+jobs:
+  nightly-test:
+    if: github.event.schedule == '0 17 * * 1-5'
     strategy:
-      fail-fast: false
       matrix:
+        python: ["3.10", "3.11", "3.12"]
         os: [ubuntu-latest, macos-latest]
-        python-version: ["3.10", "3.11", "3.12"]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
         with:
-          python-version: ${{ matrix.python-version }}
-      - run: pip install -r requirements.txt
+          python-version: ${{ matrix.python }}
       - run: pytest -q
+
+  security-scan:
+    if: github.event.schedule == '0 9 * * 1'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - run: pip-audit
 ```
 
-`fail-fast: false`를 켜면 한 조합이 실패해도 나머지 조합 결과를 끝까지 수집할 수 있습니다. 라이브러리 호환성 이슈를 찾는 단계에서는 이 설정이 원인 파악 속도를 높입니다.
+`github.event.schedule`로 어떤 cron이 트리거했는지 구분해서 다른 잡을 실행할 수 있습니다.
 
-## Secret 처리 원칙
+---
 
-비밀값은 YAML 본문에 직접 넣지 않고 GitHub Secrets나 OIDC 기반 임시 자격 증명을 사용해야 합니다. 고정 토큰을 코드에 넣으면 회전, 감사, 권한 축소가 모두 어려워집니다.
+## workflow_dispatch 설계 가이드
+
+수동 트리거는 "자동화할 수 없는 상황"이 아니라 "사람의 판단이 필요한 시점"에 사용합니다. 롤백, 긴급 배포, 특정 환경 초기화 같은 작업이 대표적입니다.
 
 ```yaml
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "배포 대상 환경"
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+      version:
+        description: "배포할 버전 태그 (예: v1.2.3)"
+        required: true
+        type: string
+      dry-run:
+        description: "실제 배포 없이 검증만 실행"
+        required: false
+        type: boolean
+        default: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
+    environment: ${{ inputs.environment }}
     steps:
       - uses: actions/checkout@v6
-      - name: Login to cloud with OIDC
-        run: ./scripts/oidc-login.sh
-      - name: Deploy
-        env:
-          API_BASE_URL: ${{ secrets.API_BASE_URL }}
-        run: ./scripts/deploy.sh
+        with:
+          ref: ${{ inputs.version }}
+      - name: 검증
+        run: ./scripts/validate.sh ${{ inputs.environment }}
+      - name: 배포
+        if: inputs.dry-run == false
+        run: ./scripts/deploy.sh ${{ inputs.environment }} ${{ inputs.version }}
 ```
 
-실무에서는 다음 기준을 함께 둡니다.
+input 설계 시 지켜야 할 원칙입니다.
 
-- secret 이름은 목적 중심으로 명명해 누가 봐도 용도를 파악할 수 있게 합니다.
-- PR from fork에서는 secret이 기본적으로 주입되지 않으므로, 배포 잡을 분리하거나 조건문으로 차단합니다.
-- 로그에 비밀값이 노출되지 않도록 `set -x` 사용 구간을 제한하고, 민감 출력은 마스킹합니다.
-- 회전 주기를 문서화하고, 사용하지 않는 secret은 즉시 폐기합니다.
+- **`choice` 타입으로 선택지를 제한합니다.** 자유 입력은 실수를 유발하므로, 가능하면 정해진 값 중에서 고르게 합니다.
+- **`dry-run` 옵션을 기본값으로 둡니다.** 실수로 프로덕션 배포가 실행되는 사고를 막아 줍니다.
+- **description에 예시를 포함합니다.** UI에서 바로 보이므로 문서를 찾아보지 않아도 됩니다.
 
-## 운영 안정성을 높이는 추가 패턴
+---
 
-- `concurrency`를 사용해 같은 브랜치의 중복 배포를 자동 취소하면 롤백 리스크를 줄일 수 있습니다.
-- 캐시 키는 잠금 파일(`poetry.lock`, `requirements.txt`) 해시와 연결해 오염된 캐시 재사용을 막습니다.
-- 배포 잡은 `environment` 보호 규칙과 reviewer 승인을 함께 걸어 사고 범위를 줄입니다.
-- 실패 알림은 채널 하나에 몰지 말고, 서비스 소유 팀 라우팅 기준으로 분리해야 대응 시간이 짧아집니다.
+## 이벤트 컨텍스트 활용
 
-이 구조를 먼저 잡아 두면 워크플로 파일이 길어져도 책임 경계가 무너지지 않고, CI/CD 품질을 지속적으로 개선하기 쉬워집니다.
-
-
-## 운영 체크포인트 보강
-
-워크플로를 길게 쓰는 것보다 더 중요한 것은 실패 원인을 빠르게 고립하는 구조입니다. 테스트 잡에서는 의존성 설치 시간을 측정하고, 배포 잡에서는 릴리스 노트와 커밋 SHA를 함께 남겨 추적성을 확보해야 합니다. 또한 `if: github.event_name == "pull_request"` 같은 조건식을 사용해 PR 검증과 main 배포를 분리하면 권한 오남용과 불필요한 실행 시간을 동시에 줄일 수 있습니다.
+각 트리거는 `github.event` 객체에 고유한 정보를 담아 줍니다. 이를 활용하면 같은 워크플로우에서도 트리거 종류에 따라 다르게 동작할 수 있습니다.
 
 ```yaml
-- name: Record build metadata
-  run: |
-    echo "sha=${GITHUB_SHA}" >> build-info.txt
-    echo "ref=${GITHUB_REF}" >> build-info.txt
+jobs:
+  info:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 이벤트 정보 출력
+        run: |
+          echo "event: ${{ github.event_name }}"
+          echo "action: ${{ github.event.action }}"
+          echo "sender: ${{ github.event.sender.login }}"
+
+      - name: PR 전용 정보
+        if: github.event_name == 'pull_request'
+        run: |
+          echo "PR number: ${{ github.event.pull_request.number }}"
+          echo "PR title: ${{ github.event.pull_request.title }}"
+          echo "base branch: ${{ github.event.pull_request.base.ref }}"
+          echo "head branch: ${{ github.event.pull_request.head.ref }}"
 ```
 
-메타데이터 파일을 아티팩트로 보존해 두면 장애 회고에서 "어떤 실행 결과가 어느 커밋과 연결되는가"를 빠르게 확인할 수 있습니다.
+이 컨텍스트를 조건문에 활용하면 한 워크플로우에서 여러 시나리오를 처리할 수 있습니다. 다만 너무 많은 분기를 한 파일에 넣으면 읽기 어려워지므로, 복잡도가 올라가면 파일을 분리하는 편이 낫습니다.
+
+---
+
+## concurrency 설정의 실전 패턴
+
+앞에서 `concurrency`를 간단히 언급했지만, 트리거 설계와 함께 고려해야 하는 중요한 요소이므로 더 깊이 다루겠습니다.
+
+```yaml
+# 패턴 1: PR 단위 직렬화
+concurrency:
+  group: pr-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+# 패턴 2: 환경별 직렬화 (배포용)
+concurrency:
+  group: deploy-${{ inputs.environment || 'staging' }}
+  cancel-in-progress: false
+```
+
+`cancel-in-progress`의 선택 기준은 명확합니다.
+
+- **검증 워크플로우**: `true` — 새 push가 왔으면 이전 결과는 의미 없습니다.
+- **배포 워크플로우**: `false` — 진행 중인 배포를 취소하면 불완전한 상태가 될 수 있습니다.
+
+group 키 설계도 중요합니다. PR 번호를 포함하면 서로 다른 PR은 독립적으로 실행되면서, 같은 PR 내에서만 직렬화됩니다. `github.ref`만 쓰면 같은 브랜치의 모든 실행이 직렬화됩니다.
+
+---
+
+## 트리거 관련 보안 고려사항
+
+트리거 선택은 보안과 직결됩니다. 특히 fork에서 오는 PR을 처리할 때 주의할 점을 정리하겠습니다.
+
+| 이벤트 | secret 접근 | 위험도 | 사용 지침 |
+| --- | --- | --- | --- |
+| `pull_request` | 불가 (fork) | 낮음 | 기본 검증용으로 안전 |
+| `pull_request_target` | 가능 | 높음 | 신뢰할 수 없는 코드 실행 금지 |
+| `push` | 가능 | 중간 | 보호 브랜치만 사용 |
+| `workflow_dispatch` | 가능 | 낮음 | 권한 있는 사용자만 실행 |
+
+`pull_request_target`은 base 브랜치의 워크플로우를 실행하면서 secret에 접근할 수 있어, fork에서 악의적인 코드가 secret을 탈취할 수 있는 공격 벡터가 됩니다. 꼭 필요한 경우(라벨링, 코멘트 등)에만 사용하고, PR의 코드를 checkout하거나 실행하지 않아야 합니다.
+
+
+---
+
+## 트리거 디버깅 기법
+
+워크플로우가 예상대로 트리거되지 않을 때 확인해야 할 체크리스트입니다.
+
+1. **워크플로우 파일이 기본 브랜치에 있는가?** `schedule`과 `workflow_dispatch`는 기본 브랜치의 워크플로우만 인식합니다. feature 브랜치에서 새 워크플로우를 추가하면 해당 브랜치에서는 `pull_request` 트리거만 동작합니다.
+
+2. **YAML 문법이 올바른가?** `on:` 키 아래의 들여쓰기가 잘못되면 전체 워크플로우가 무시됩니다. GitHub UI의 "Workflow file" 탭에서 구문 오류를 확인할 수 있습니다.
+
+3. **paths 필터가 올바르게 동작하는가?** paths 필터가 있을 때 변경 파일이 필터에 매칭되지 않으면 워크플로우가 "skipped" 상태로 나타납니다. 이는 정상 동작이며, branch protection에서 "Require status checks"를 사용한다면 skipped 상태의 처리 방식을 확인해야 합니다.
+
+4. **이벤트 payload를 확인했는가?** `github.event`의 구조는 이벤트마다 다릅니다. 조건문이 예상대로 동작하지 않으면 payload를 출력해서 실제 값을 확인합니다.
+
+```yaml
+- name: 이벤트 payload 전체 출력
+  run: echo '${{ toJSON(github.event) }}' | jq .
+```
+
+5. **Activity type을 확인했는가?** `pull_request`는 기본적으로 `opened`, `synchronize`, `reopened`에서만 트리거됩니다. 라벨 추가나 리뷰 요청 시에도 실행하려면 `types:`를 명시해야 합니다.
+
+```yaml
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, review_requested]
+```
+
+---
+
+## 실무에서 자주 쓰는 트리거 조합 레시피
+
+### 레시피 1: PR 검증 + main 배포 분리
+
+```yaml
+# .github/workflows/ci.yml
+on:
+  pull_request:
+    paths: ["src/**", "tests/**", "pyproject.toml"]
+
+# .github/workflows/deploy.yml
+on:
+  push:
+    branches: [main]
+    paths: ["src/**"]
+```
+
+### 레시피 2: 태그 기반 릴리스
+
+```yaml
+on:
+  push:
+    tags: ["v[0-9]+.[0-9]+.[0-9]+"]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - run: python -m build
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true
+```
+
+### 레시피 3: 의존성 자동 업데이트 + 자동 머지
+
+```yaml
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  auto-merge-dependabot:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v6
+      - run: pytest -q
+      - uses: fastify/github-action-merge-dependabot@v3
+        with:
+          target: minor
+```
+
+이 레시피들은 그대로 복사해서 쓸 수 있는 출발점입니다. 팀 상황에 맞게 paths 필터와 조건문을 조정하면 됩니다.
+
 
 ## 처음 질문으로 돌아가기
 
 - **push와 pull_request는 어떤 차이로 써야 할까요?**
-  - 본문의 기준은 Trigger 이해하기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - `pull_request`는 코드 검증용입니다. PR이 열리거나 업데이트될 때 실행되며, fork에서는 secret이 차단되므로 안전합니다. `push`는 머지된 코드에 대한 후속 작업(배포, 릴리스)에 적합합니다. 두 이벤트를 같은 워크플로우에 넣으면 머지 시점에 중복 실행될 수 있으므로, 파일을 분리하거나 조건문으로 구분하는 편이 좋습니다.
 - **schedule은 왜 로컬 시간이 아니라 UTC로 이해해야 할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - GitHub Actions의 cron은 UTC 고정입니다. KST 새벽 2시에 돌리려면 UTC 17시로 설정해야 하고, 서머타임이 있는 지역에서는 연중 시각이 바뀌는 점도 고려해야 합니다. 또한 정확한 시각을 보장하지 않으므로, 분 단위 정확도가 필요하면 외부 스케줄러에서 `workflow_dispatch`를 호출하는 구조가 더 안정적입니다.
 - **workflow_dispatch는 언제 유용하고 무엇을 문서화해야 할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 긴급 배포, 롤백, 환경 초기화처럼 사람의 판단이 필요한 시점에 유용합니다. input의 `description`에 예시와 제약 조건을 적고, `choice` 타입과 `dry-run` 기본값으로 실수를 방지하며, 누가 언제 실행했는지 감사 로그에 남는다는 점을 팀에 공유해야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -319,5 +577,6 @@ jobs:
 - [Schedule events](https://docs.github.com/actions/using-workflows/events-that-trigger-workflows#schedule)
 - [workflow_dispatch](https://docs.github.com/actions/using-workflows/manually-running-a-workflow)
 - [Concurrency](https://docs.github.com/actions/using-jobs/using-concurrency)
+- [book-examples 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/github-actions-101/ko)
 
 Tags: GitHubActions, Trigger, Event, Schedule, CICD

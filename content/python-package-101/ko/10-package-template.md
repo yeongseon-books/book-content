@@ -329,14 +329,351 @@ GitHub Template Repository는 저장소를 복사할 뿐 파일 내용의 변수
 
 이것으로 Python Package 101 시리즈가 끝났습니다. 패키지의 개념부터 구조, 의존성, 빌드, 배포, 버전 관리, CLI, 타입 힌트, 문서화, 템플릿까지 Python 패키징의 전체 흐름을 한 바퀴 돌았습니다. 이제 여러분의 코드를 패키지로 만들고, 다른 사람이 설치해 쓸 수 있는 형태로 자신 있게 공유해 보시기 바랍니다.
 
+## cookiecutter vs copier 상세 비교
+
+### cookiecutter 동작 흐름
+
+```text
+cookiecutter gh:acme/template
+    │
+    ▼
+cookiecutter.json 읽기 (변수 정의)
+    │
+    ▼
+사용자에게 변수값 프롬프트
+    │
+    ▼
+Jinja2로 파일명 + 내용 렌더링
+    │
+    ▼
+hooks/post_gen_project.py 실행
+    │
+    ▼
+완성된 프로젝트 디렉터리 출력
+```
+
+### copier 동작 흐름
+
+```text
+copier copy gh:acme/template ./my-project
+    │
+    ▼
+copier.yml 읽기 (변수 + 타입 + 검증)
+    │
+    ▼
+사용자에게 변수값 프롬프트 (타입 검증 포함)
+    │
+    ▼
+Jinja2로 렌더링 + 조건부 파일 생성
+    │
+    ▼
+.copier-answers.yml 생성 (답변 기록)
+    │
+    ▼
+완성된 프로젝트 출력
+```
+
+```yaml
+# .copier-answers.yml (자동 생성, 커밋 대상)
+_commit: v1.2.0
+_src_path: gh:acme/python-package-template
+project_name: acme-auth
+package_name: acme_auth
+python_version: "3.11"
+use_cli: true
+build_backend: hatchling
+```
+
+### copier update: 템플릿 동기화
+
+```bash
+# 6개월 후 팀 템플릿에 새 린트 규칙 추가됨
+cd acme-auth
+copier update
+
+# copier가 수행하는 작업:
+# 1. 원본 템플릿의 최신 버전 다운로드
+# 2. .copier-answers.yml의 답변으로 새 버전 렌더링
+# 3. 현재 프로젝트와 3-way merge
+# 4. 충돌 발생 시 사용자에게 해결 요청
+```
+
+## GitHub Template Repository
+
+GitHub Template은 가장 단순한 프로젝트 템플릿 방식입니다.
+
+### 설정 방법
+
+```text
+1. GitHub 저장소 Settings
+2. "Template repository" 체크박스 활성화
+3. 사용자: "Use this template" → "Create a new repository"
+```
+
+### 한계
+
+| 항목 | cookiecutter/copier | GitHub Template |
+|---|---|---|
+| 변수 치환 | 자동 | 수동 |
+| 조건부 파일 | 지원 | 불가 |
+| 템플릿 업데이트 | copier update | 수동 diff |
+| 사용 편의성 | CLI 필요 | 웹 버튼 한 번 |
+| 적합한 상황 | 팀 표준화 | 간단한 시작점 |
+
+## 실전 템플릿에 포함할 파일 목록
+
+### 최소 구성 (모든 프로젝트)
+
+```text
+├── src/{{package_name}}/
+│   ├── __init__.py
+│   └── py.typed
+├── tests/
+│   ├── conftest.py
+│   └── test_placeholder.py
+├── pyproject.toml
+├── README.md
+├── LICENSE
+├── .gitignore
+└── Makefile
+```
+
+### 표준 구성 (팀 프로젝트)
+
+```text
+위 최소 구성 +
+├── .github/
+│   ├── workflows/ci.yml
+│   ├── workflows/publish.yml
+│   └── dependabot.yml
+├── .pre-commit-config.yaml
+├── .editorconfig
+├── CHANGELOG.md
+└── docs/
+    └── index.md
+```
+
+### 풀 구성 (오픈소스)
+
+```text
+위 표준 구성 +
+├── CONTRIBUTING.md
+├── CODE_OF_CONDUCT.md
+├── .github/
+│   ├── ISSUE_TEMPLATE/
+│   │   ├── bug_report.md
+│   │   └── feature_request.md
+│   └── pull_request_template.md
+├── docs/
+│   ├── getting-started/
+│   ├── guide/
+│   └── api/
+└── mkdocs.yml
+```
+
+## 템플릿 Makefile 상세
+
+Makefile은 프로젝트의 모든 일상 명령을 표준화합니다. 새 팀원이 합류해도 `make help`만 실행하면 가능한 작업을 한눈에 파악합니다.
+
+```makefile
+.DEFAULT_GOAL := help
+.PHONY: help install dev test lint format typecheck build check clean publish docs
+
+PACKAGE := acme_utils
+SRC := src/$(PACKAGE)
+
+help:  ## Show available commands
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | \
+		awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
+
+install:  ## Install in development mode
+	python -m pip install -e ".[dev]"
+	pre-commit install
+
+test:  ## Run tests
+	pytest --cov=$(PACKAGE) --cov-report=term-missing -q
+
+lint:  ## Run linter
+	ruff check $(SRC) tests
+
+format:  ## Format code
+	ruff format $(SRC) tests
+	ruff check --fix $(SRC) tests
+
+typecheck:  ## Run type checker
+	mypy $(SRC)
+
+build:  ## Build packages
+	rm -rf dist/
+	python -m build
+
+check: build  ## Verify built packages
+	twine check dist/*
+
+clean:  ## Clean build artifacts
+	rm -rf dist/ build/ src/*.egg-info/
+	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+	find . -type d -name .pytest_cache -exec rm -rf {} + 2>/dev/null || true
+	find . -type d -name .mypy_cache -exec rm -rf {} + 2>/dev/null || true
+
+docs:  ## Serve documentation locally
+	mkdocs serve
+
+docs-build:  ## Build documentation
+	mkdocs build --strict
+
+ci: lint format typecheck test build check  ## Run full CI locally
+```
+
+## 템플릿 테스트 자동화
+
+템플릿 자체도 CI로 테스트합니다. 템플릿에서 생성한 프로젝트가 정상 동작하는지 검증합니다.
+
+```yaml
+# 템플릿 저장소의 .github/workflows/test-template.yml
+name: Test Template
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+        build-backend: ["setuptools", "hatchling"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install copier
+      - name: Generate project
+        run: |
+          copier copy --defaults \
+            --data "project_name=test-project" \
+            --data "build_backend=${{ matrix.build-backend }}" \
+            . /tmp/test-project
+      - name: Verify project
+        working-directory: /tmp/test-project
+        run: |
+          pip install -e ".[dev]"
+          make ci
+```
+
+## 팀 온보딩 경험 설계
+
+좋은 템플릿은 새 팀원의 온보딩 시간을 줄여 줍니다.
+
+```text
+Day 1 (신규 팀원):
+1. copier copy gh:acme/python-package-template ./my-service
+2. cd my-service
+3. make install
+4. make test    (녹색 통과!)
+5. make ci      (전체 파이프라인 로컬 검증!)
+
+→ 30분 안에 첫 PR을 올릴 수 있는 환경이 준비됩니다.
+```
+
+이것이 템플릿의 가치입니다. 프로젝트 시작의 마찰을 줄이고, 팀 표준을 코드화하며, "이 프로젝트는 어떻게 빌드하지?"라는 질문을 없애는 것입니다.
+
+
+## 템플릿 버전 관리 전략
+
+템플릿도 SemVer로 버전을 관리하면 `copier update`시 어떤 변경이 반영되는지 추적할 수 있습니다.
+
+```text
+v1.0.0: 초기 템플릿 (setuptools)
+v1.1.0: hatchling 옵션 추가
+v1.2.0: Python 3.12 지원, ruff 설정 업데이트
+v2.0.0: src layout 강제 (breaking: flat layout 제거)
+```
+
+```bash
+# 특정 버전으로 생성
+copier copy --vcs-ref v1.2.0 gh:acme/template ./project
+
+# 업데이트 시 버전 범위 확인
+copier update  # .copier-answers.yml의 _commit과 최신 비교
+```
+
+### 템플릿 변경 로그 관리
+
+```markdown
+# Template CHANGELOG
+
+## [1.2.0] - 2024-07-01
+
+### Added
+- Python 3.12 support in CI matrix
+- Ruff 0.5+ configuration
+- `make docs` command
+
+### Changed
+- Default ruff rules expanded (added SIM, TCH)
+- pytest minimum version: 8.0
+
+### Migration
+After `copier update`:
+- Review new ruff rules in pyproject.toml
+- Update CI Python version matrix if needed
+```
+
+## 사내 패키지 생태계 관리
+
+대규모 조직에서는 여러 템플릿을 계층적으로 관리합니다.
+
+```text
+조직 레벨:
+├── base-template/          # 공통 (LICENSE, .editorconfig, CI 기본)
+├── library-template/       # 라이브러리용 (src layout, PyPI 배포)
+├── service-template/       # 마이크로서비스용 (Docker, K8s)
+├── cli-template/           # CLI 도구용 (Click, entry points)
+└── ml-template/            # ML 프로젝트용 (notebooks, DVC)
+```
+
+### 표준화 검증 도구
+
+```bash
+# 생성된 프로젝트가 팀 표준을 따르는지 검증하는 스크립트
+#!/bin/bash
+# scripts/check-standards.sh
+
+echo "Checking project standards..."
+
+# pyproject.toml 존재
+[ -f pyproject.toml ] || { echo "FAIL: pyproject.toml missing"; exit 1; }
+
+# src layout 사용
+[ -d src ] || { echo "FAIL: src/ directory missing"; exit 1; }
+
+# py.typed 존재
+find src -name "py.typed" | grep -q . || { echo "FAIL: py.typed missing"; exit 1; }
+
+# CI 워크플로우 존재
+[ -f .github/workflows/ci.yml ] || { echo "FAIL: CI workflow missing"; exit 1; }
+
+# pre-commit 설정
+[ -f .pre-commit-config.yaml ] || { echo "FAIL: pre-commit config missing"; exit 1; }
+
+echo "All standards met!"
+```
+
+이 스크립트를 CI의 첫 번째 단계로 넣어 두면, 누군가 표준을 벗어나는 변경을 하더라도 PR에서 즉시 발견됩니다.
+
+
+실무에서 템플릿은 한 번 만들고 잊는 것이 아닙니다. 분기별로 의존성 버전, 린트 규칙, CI 설정을 업데이트하고, `copier update`로 모든 프로젝트에 일괄 반영하는 루틴을 만들어야 합니다. 이 루틴이 정착되면 20개 이상의 마이크로서비스가 있어도 설정 드리프트 없이 일관된 품질을 유지할 수 있습니다.
+
+결국 좋은 템플릿은 "새 프로젝트를 시작하는 데 가장 좋은 방법은 무엇인가?"라는 팀의 합의를 코드로 표현한 것입니다.
+
 ## 처음 질문으로 돌아가기
 
 - **새 패키지마다 반복되는 설정을 어떻게 자동화할까요?**
-  - 본문의 기준은 실전 패키지 템플릿 만들기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - cookiecutter나 copier로 프로젝트 템플릿을 만들고, `pyproject.toml`, CI 워크플로우, Makefile, pre-commit 설정, 테스트 보일러플레이트를 변수화합니다. `copier copy` 한 번으로 팀 표준에 맞는 프로젝트가 즉시 생성되고, `make ci`로 바로 검증할 수 있는 상태가 됩니다.
 - **`cookiecutter`와 `copier`는 무엇이 다를까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - cookiecutter는 생성 후 템플릿과의 연결이 끊기지만, copier는 `copier update`로 템플릿 개선사항을 기존 프로젝트에 3-way merge할 수 있습니다. 팀 템플릿이 자주 개선된다면 copier가 유지보수 비용을 크게 줄여 줍니다.
 - **GitHub Template Repository는 언제 쓰면 좋을까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - GitHub Template은 "Use this template" 버튼으로 저장소를 복제합니다. 변수 치환이 없으므로 프로젝트명 등을 수동으로 바꿔야 합니다. 간단한 구조의 프로젝트나 외부 도구 설치가 어려운 환경에서 빠르게 시작할 때 적합합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -356,6 +693,7 @@ GitHub Template Repository는 저장소를 복사할 뿐 파일 내용의 변수
 
 ## 참고 자료
 
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/python-package-101/ko)
 - [copier documentation](https://copier.readthedocs.io/)
 - [cookiecutter documentation](https://cookiecutter.readthedocs.io/)
 - [Hypermodern Python - Claudio Jolowicz](https://cjolowicz.github.io/posts/hypermodern-python-01-setup/)

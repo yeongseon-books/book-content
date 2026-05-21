@@ -240,6 +240,229 @@ print(f"HTTPS  : {(t4 - t3) * 1000:6.1f} ms (total)")
 
 또한 네트워크는 항상 실패한다고 가정하고 코드를 짭니다. 타임아웃, 재시도, 회로 차단기, 멱등성은 선택 옵션이 아니라 기본값입니다. 정상 경로만 가정한 네트워크 코드는 운영에서 반드시 터집니다.
 
+
+### TCP 3-Way 핸드셰이크 상세
+
+TCP 연결 수립 과정을 패킷 단위로 추적합니다.
+
+```text
+클라이언트                                     서버
+    │                                           │
+    │── SYN (seq=100) ─────────────────────────→│  ① 연결 요청
+    │                                           │
+    │←── SYN+ACK (seq=300, ack=101) ───────────│  ② 요청 수락 + 서버 시퀀스
+    │                                           │
+    │── ACK (seq=101, ack=301) ────────────────→│  ③ 연결 확립
+    │                                           │
+    │══════════ 데이터 전송 가능 ══════════════════│
+    │                                           │
+    │── FIN (seq=500) ─────────────────────────→│  ④ 종료 요청
+    │←── ACK (seq=700, ack=501) ───────────────│  ⑤ FIN 수신 확인
+    │←── FIN (seq=700, ack=501) ───────────────│  ⑥ 서버도 종료
+    │── ACK (seq=501, ack=701) ────────────────→│  ⑦ 최종 확인
+    │                                           │
+    │     [TIME_WAIT 2MSL]                      │
+```
+
+각 단계에서 운영상 주의할 점:
+
+- **SYN 큐**: 서버가 SYN을 받고 SYN+ACK를 보낸 뒤 완전한 ACK를 기다리는 반접속(half-open) 상태가 쌓이는 큐입니다. SYN Flood 공격은 이 큐를 가득 채워 정상 연결을 막습니다.
+- **TIME_WAIT**: 마지막 ACK가 유실될 경우를 대비해 2×MSL(Maximum Segment Lifetime, 보통 60초) 동안 소켓을 유지합니다. 고빈도 서버에서 `TIME_WAIT` 소켓이 쌓이면 `SO_REUSEADDR`로 포트를 재사용합니다.
+
+### TCP 흐름 제어와 혼잡 제어
+
+TCP는 두 가지 메커니즘으로 네트워크를 보호합니다.
+
+| 구분 | 흐름 제어 (Flow Control) | 혼잡 제어 (Congestion Control) |
+|------|--------------------------|-------------------------------|
+| 보호 대상 | 수신자의 버퍼 | 네트워크 경로 |
+| 신호 | 수신 윈도우(rwnd) | 패킷 손실, RTT 증가 |
+| 조절 변수 | 송신 윈도우 ≤ rwnd | cwnd(혼잡 윈도우) |
+| 알고리즘 | 슬라이딩 윈도우 | Slow Start → AIMD |
+
+```text
+cwnd 변화 (Slow Start + Congestion Avoidance)
+
+cwnd
+ ↑
+ │            ×  패킷 손실 감지
+ │          ╱
+ │        ╱   ← Congestion Avoidance (선형 증가)
+ │      ╱
+ │    ╱
+ │  ╱  ← Slow Start (지수 증가)
+ │╱
+ └─────────────────────────→ 시간
+        ssthresh
+```
+
+Slow Start에서 cwnd는 매 RTT마다 2배로 증가합니다. ssthresh(임계값)에 도달하면 Congestion Avoidance로 전환되어 매 RTT마다 1 MSS씩만 증가합니다. 패킷 손실이 감지되면 cwnd를 절반으로 줄입니다(AIMD: Additive Increase, Multiplicative Decrease).
+
+### DNS 조회 과정 추적
+
+```python
+import socket
+import time
+
+def trace_dns(hostname: str) -> None:
+    """DNS 조회 시간을 측정합니다."""
+    start = time.perf_counter()
+    try:
+        results = socket.getaddrinfo(hostname, 443, socket.AF_INET, socket.SOCK_STREAM)
+        elapsed = (time.perf_counter() - start) * 1000
+        ip = results[0][4][0]
+        print(f"{hostname} → {ip} ({elapsed:.2f} ms)")
+    except socket.gaierror as e:
+        print(f"{hostname} → 실패: {e}")
+
+# 첫 번째 조회 (재귀 질의 필요)
+trace_dns("example.com")
+# 두 번째 조회 (OS DNS 캐시 적중)
+trace_dns("example.com")
+```
+
+DNS 조회 경로:
+
+```text
+브라우저 캐시 → OS 캐시 (/etc/hosts, systemd-resolved)
+  → 로컬 DNS 서버 (ISP/회사)
+    → 루트 네임서버 (.)
+      → TLD 네임서버 (.com)
+        → 권한 네임서버 (example.com)
+```
+
+각 단계의 캐싱 TTL이 응답 속도를 결정합니다. TTL이 짧으면(30초) 빠른 장애 전환이 가능하지만 DNS 부하가 증가합니다. TTL이 길면(24시간) 부하는 줄지만 IP 변경 시 전파가 느립니다.
+
+### HTTP 요청-응답 실제 형태
+
+HTTP/1.1 요청과 응답의 선 위 표현을 바이트 수준에서 봅니다.
+
+```text
+요청 (클라이언트 → 서버):
+────────────────────────────────────
+GET /api/users/123 HTTP/1.1\r\n
+Host: api.example.com\r\n
+Accept: application/json\r\n
+Authorization: Bearer eyJhbG...\r\n
+Connection: keep-alive\r\n
+\r\n
+────────────────────────────────────
+
+응답 (서버 → 클라이언트):
+────────────────────────────────────
+HTTP/1.1 200 OK\r\n
+Content-Type: application/json\r\n
+Content-Length: 82\r\n
+Cache-Control: max-age=60\r\n
+\r\n
+{"id":123,"name":"홍길동","email":"hong@example.com","created":"2026-01-15T09:30:00Z"}
+────────────────────────────────────
+```
+
+HTTP/2와 HTTP/3의 차이:
+
+| 버전 | 전송 프로토콜 | 멀티플렉싱 | 헤더 압축 | 특징 |
+|------|--------------|-----------|-----------|------|
+| HTTP/1.1 | TCP | 불가 (파이프라이닝 제한) | 없음 | 커넥션당 하나의 요청 |
+| HTTP/2 | TCP | 스트림 기반 | HPACK | Head-of-line blocking (TCP 수준) |
+| HTTP/3 | QUIC (UDP) | 스트림 기반 | QPACK | 스트림 독립 손실 복구 |
+
+### 소켓 프로그래밍 기본 구조
+
+```python
+import socket
+import threading
+
+def echo_server(host: str = "127.0.0.1", port: int = 9999) -> None:
+    """간단한 에코 서버 — 수신한 데이터를 그대로 반환합니다."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as srv:
+        srv.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        srv.bind((host, port))
+        srv.listen(5)
+        print(f"서버 시작: {host}:{port}")
+
+        while True:
+            conn, addr = srv.accept()
+            with conn:
+                print(f"연결: {addr}")
+                while True:
+                    data = conn.recv(1024)
+                    if not data:
+                        break
+                    conn.sendall(data)  # 에코
+
+def echo_client(host: str = "127.0.0.1", port: int = 9999) -> None:
+    """에코 서버에 메시지를 보내고 응답을 확인합니다."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.connect((host, port))
+        message = "Hello, Network!"
+        sock.sendall(message.encode())
+        response = sock.recv(1024)
+        print(f"송신: {message}")
+        print(f"수신: {response.decode()}")
+        assert response.decode() == message
+
+# 서버를 백그라운드 스레드로 실행
+server_thread = threading.Thread(target=echo_server, daemon=True)
+server_thread.start()
+
+import time; time.sleep(0.1)  # 서버 시작 대기
+echo_client()
+```
+
+이 단순 에코 서버는 연결당 하나의 스레드를 쓰므로 10,000개 동시 연결에는 적합하지 않습니다. 운영 환경에서는 `asyncio`, `epoll`, 또는 이벤트 루프 기반 프레임워크를 사용합니다.
+
+### 네트워크 지연 분해와 측정
+
+웹 요청의 총 시간을 구간별로 분해하면 병목을 정확히 짚을 수 있습니다.
+
+```text
+총 응답 시간 = DNS + TCP 연결 + TLS 핸드셰이크 + 요청 전송 + 서버 처리 + 응답 수신
+
+예시: https://api.example.com/users/123
+─────────────────────────────────────────────────
+DNS 조회:          15 ms  (캐시 미스 시 50-200 ms)
+TCP 연결:          25 ms  (1 RTT)
+TLS 1.3:          25 ms  (1 RTT, 재연결 시 0-RTT 가능)
+요청 전송:          1 ms  (수백 바이트)
+서버 처리:         45 ms  (DB 쿼리 + 직렬화)
+응답 수신:         10 ms  (1 KB JSON)
+─────────────────────────────────────────────────
+합계:             121 ms
+```
+
+```python
+import urllib.request
+import time
+
+def measure_http(url: str) -> dict[str, float]:
+    """HTTP 요청의 각 단계 시간을 측정합니다."""
+    start = time.perf_counter()
+    req = urllib.request.Request(url)
+    
+    dns_start = time.perf_counter()
+    with urllib.request.urlopen(req, timeout=5) as resp:
+        connect_done = time.perf_counter()
+        body = resp.read()
+        done = time.perf_counter()
+    
+    return {
+        "total_ms": (done - start) * 1000,
+        "body_bytes": len(body),
+        "status": resp.status,
+    }
+
+result = measure_http("http://example.com")
+print(f"상태: {result['status']}, 크기: {result['body_bytes']}B, 시간: {result['total_ms']:.1f}ms")
+```
+
+운영에서는 `curl -w` 포맷이나 브라우저 DevTools의 Timing 탭으로 각 구간을 분리합니다.
+
+```bash
+curl -o /dev/null -s -w "DNS: %{time_namelookup}s\nTCP: %{time_connect}s\nTLS: %{time_appconnect}s\nTotal: %{time_total}s\n" https://example.com
+```
+
+CDN은 DNS와 TCP 연결 구간을 줄이고, HTTP/2 멀티플렉싱은 여러 요청을 하나의 연결에서 처리해 TCP 핸드셰이크 반복을 제거합니다. Keep-Alive가 중요한 이유도 같은 맥락입니다.
 ## 체크리스트
 
 - [ ] TCP/IP 계층의 역할을 한 줄씩 설명할 수 있는가
@@ -284,12 +507,11 @@ print(f"HTTPS  : {(t4 - t3) * 1000:6.1f} ms (total)")
 ## 처음 질문으로 돌아가기
 
 - **브라우저에 주소를 입력했을 때 데이터가 내 화면까지 오는 경로는 어떻게 구성될까요?**
-  - 본문의 기준은 네트워크를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - DNS 조회로 도메인을 IP로 변환하고, TCP 3-Way 핸드셰이크로 연결을 수립한 뒤, HTTP 요청을 전송합니다. 서버 응답은 TCP 세그먼트로 쪼개져 IP 패킷에 실려 라우터들을 거쳐 돌아오고, 브라우저가 이를 재조합해 렌더링합니다.
 - **IP, TCP, HTTP, DNS는 각각 어느 층에서 어떤 역할을 맡을까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - DNS는 응용 계층에서 이름을 IP로 변환하고, HTTP도 응용 계층에서 요청/응답 형식을 정의합니다. TCP는 전송 계층에서 신뢰성(순서 보장, 재전송)을 담당하고, IP는 네트워크 계층에서 패킷을 목적지까지 라우팅합니다.
 - **HTTP 요청과 응답은 선 위에서 어떤 형태로 오갈까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
-
+  - 메서드, 경로, 헤더가 텍스트 줄로 구성되고 빈 줄 뒤에 본문이 옵니다. `GET /api/users HTTP/1.1\r\n` 같은 시작 줄, 키-값 헤더들, `\r\n\r\n` 구분자, 그리고 JSON/HTML 본문으로 이루어진 구조입니다.
 <!-- toc:begin -->
 ## 시리즈 목차
 
@@ -313,4 +535,5 @@ print(f"HTTPS  : {(t4 - t3) * 1000:6.1f} ms (total)")
 - [High Performance Browser Networking — Ilya Grigorik](https://hpbn.co/)
 - [Cloudflare Learning Center — DNS](https://www.cloudflare.com/learning/dns/what-is-dns/)
 
+- [이 시리즈의 예제 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/computer-science-101/ko)
 Tags: Computer Science, 네트워크, TCP/IP, HTTP, DNS, 소켓

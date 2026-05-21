@@ -259,7 +259,7 @@ spec:
 
 readiness probe와 resource request/limit를 함께 정의하면 "배포는 되었지만 트래픽을 받으면 무너지는" 상태를 줄일 수 있습니다. 선언형 파일에서 운영 안정성을 미리 포함시키는 방식이 중요합니다.
 
-## kubectl 운영 명령 세트
+## kubectl 운영 명령 모음
 
 매니페스트를 적용한 뒤에는 상태 관찰 명령을 빠르게 순환해야 합니다. 아래 조합은 장애 분석에서 가장 자주 사용하는 기본 세트입니다.
 
@@ -306,6 +306,132 @@ kubectl rollout status deploy/<name> -n <ns>
 
 운영 문서에는 위 명령의 기대 출력과 비정상 패턴을 함께 기록해 두는 편이 대응 품질을 높입니다.
 
+## Helm 차트를 재사용 가능한 단위로 나누기
+
+Helm의 핵심은 템플릿 문법이 아니라 재사용 경계입니다. `values.yaml`에 모든 환경 변수를 평면으로 두기보다, 이미지/리소스/네트워크/보안 블록으로 분리하면 리뷰와 운영이 쉬워집니다.
+
+```yaml
+image:
+  repository: ghcr.io/example/api
+  tag: 1.4.0
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 600m
+    memory: 512Mi
+ingress:
+  enabled: true
+  host: api.example.com
+```
+
+## 배포 전 검증 루틴
+
+```bash
+helm lint charts/api
+helm template api charts/api -f values-prod.yaml > rendered.yaml
+kubectl apply --dry-run=server -f rendered.yaml
+helm upgrade --install api charts/api -n prod -f values-prod.yaml
+helm history api -n prod
+```
+
+`helm template` 결과를 사람이 읽어 보는 단계가 중요합니다. 템플릿 조건문으로 인해 특정 환경에서만 필드가 누락되는 문제가 자주 발생합니다.
+
+## 롤백 전략과 값 관리
+
+Helm은 빠른 배포 도구이지만, 값 관리가 느슨하면 장애 전파도 빠릅니다. 운영에서는 `values-prod.yaml` 변경 이력, chart 버전, 앱 이미지 태그를 한 릴리스 단위로 묶어 추적해야 합니다. 문제 발생 시 `helm rollback`으로 즉시 복구하고, 차이 분석은 `helm get values`와 Git 이력으로 진행하세요.
+
+## 운영 시뮬레이션 확장
+
+Helm 관점의 문서를 읽고 끝내면 실제 운영에서 금방 잊힙니다. 그래서 학습 직후에 "장애를 일부러 만들어 보고 복구하는" 시뮬레이션을 반드시 권장합니다. 여기서 중요한 점은 성공 데모를 반복하는 것이 아니라, 실패 신호를 표준 절차로 읽는 훈련을 하는 것입니다. 팀이 성장할수록 기술 격차보다 절차 격차가 더 큰 장애를 만듭니다.
+
+먼저 시뮬레이션 전 공통 기준을 맞춥니다. 대상 네임스페이스를 분리하고, 적용한 매니페스트의 Git SHA를 기록하고, 관찰 명령 5개를 고정합니다. 이 기준이 있어야 "누가, 어떤 상태에서, 무엇을 바꿨는지"를 추적할 수 있습니다.
+
+```bash
+kubectl config current-context
+kubectl get ns
+kubectl get deploy,po,svc,ing -n prod -o wide
+kubectl get events -n prod --sort-by=.metadata.creationTimestamp
+kubectl top pod -n prod
+```
+
+다음으로 장애 주입 시나리오를 단계적으로 실행합니다. 첫째, 잘못된 이미지 태그를 넣어 `ImagePullBackOff`를 발생시킵니다. 둘째, readiness probe 경로를 의도적으로 틀려 `Ready` 전환 실패를 만듭니다. 셋째, 메모리 limit를 과도하게 낮춰 OOM 재시작을 유도합니다. 넷째, selector 불일치를 만들어 트래픽 블랙홀을 재현합니다. 이 네 가지는 초급 팀이 실제 운영에서 가장 자주 만나는 장애 패턴입니다.
+
+```bash
+kubectl set image deploy/api api=ghcr.io/example/api:not-found -n prod
+kubectl rollout status deploy/api -n prod
+kubectl describe pod -n prod -l app=api
+kubectl logs -n prod deploy/api --previous
+kubectl rollout undo deploy/api -n prod
+```
+
+복구 절차는 항상 동일한 순서를 사용합니다. 1) 영향 범위 확인, 2) 즉시 완화(rollback/scale), 3) 원인 확인, 4) 재발 방지 반영입니다. 순서를 바꾸면 현장에서 토론만 길어지고 복구는 늦어집니다. 특히 온콜 시간대에는 "정확한 분석"보다 "안전한 복구"를 먼저 해야 합니다.
+
+운영 품질을 높이려면 기술 항목을 문서 항목으로 바꿔야 합니다. 예를 들어 "probe를 잘 설정한다"가 아니라 "모든 워크로드는 readiness/liveness를 필수로 포함하고, 경로는 헬스 라우터 표준(`/readyz`, `/livez`)을 사용한다"처럼 검증 가능한 규칙으로 적어야 합니다. 또 "리소스를 적절히 준다" 대신 "CPU request는 최근 7일 P50의 1.3배, memory limit는 P99의 1.2배" 같은 팀 기준선을 고정하면 논쟁 비용이 줄어듭니다.
+
+### 런북에 남겨야 할 최소 항목
+
+- 장애 유형별 최초 확인 명령 3개
+- 즉시 완화 명령과 금지 명령
+- 롤백 기준 버전과 검증 체크리스트
+- 관련 대시보드 링크와 알림 임계치
+- 동일 유형 재발 시 담당 팀 에스컬레이션 경로
+
+문서를 이 수준으로 남기면 신규 팀원이 들어와도 대응 품질이 유지됩니다. Kubernetes 운영 성숙도는 기능 사용량이 아니라 "동일 장애를 같은 속도로 복구할 수 있는가"로 측정하는 편이 정확합니다.
+
+## 실무 검증 체크포인트
+
+운영에서 변경을 배포할 때는 코드 리뷰와 별도로 클러스터 검증 체크를 둬야 합니다. 체크 항목은 복잡할 필요가 없습니다. 적용 전 `kubectl diff`, 적용 후 `rollout status`, 엔드포인트 연결 확인, 로그 샘플 확인, 자원 사용률 확인 정도만 일관되게 수행해도 대다수 실수를 초기에 차단할 수 있습니다.
+
+```bash
+kubectl diff -f k8s/ -n prod
+kubectl apply -f k8s/ -n prod
+kubectl rollout status deploy/api -n prod
+kubectl get endpoints api -n prod
+kubectl top pod -n prod -l app=api
+```
+
+여기서 마지막으로 중요한 원칙은 "수동 핫픽스를 원복 가능한 상태로 남긴다"는 점입니다. 긴급 대응 중에 `kubectl edit`로 해결했다면, 근무 종료 전에 반드시 매니페스트에 같은 변경을 반영해 drift를 없애야 합니다. 선언형 시스템에서 drift는 시간이 지날수록 큰 장애로 돌아옵니다.
+
+## 관측성과 보안 기본선
+
+Kubernetes 학습이 진행될수록 기능 사용량은 늘어나지만, 실제 장애를 줄이는 요소는 관측성과 보안 기본선입니다. 최소한 애플리케이션 로그, 인프라 이벤트, 자원 메트릭이 같은 시간축에서 비교 가능해야 하고, 서비스 계정 권한과 시크릿 접근 범위가 분리되어 있어야 합니다. 이 두 축이 약하면 배포 속도가 빨라질수록 실패 속도도 같이 빨라집니다.
+
+관측성 기본선은 거창할 필요가 없습니다. 워크로드마다 공통 레이블(`app`, `component`, `version`)을 강제하고, 로그에 요청 식별자와 에러 코드를 남기고, 대시보드에서 레이블 필터로 바로 분해할 수 있으면 됩니다. 이벤트 스트림까지 함께 보면 "배포 변경"과 "오류 급증"의 시간적 상관관계를 빠르게 확인할 수 있습니다.
+
+```bash
+kubectl get events -n prod --sort-by=.metadata.creationTimestamp
+kubectl logs -n prod deploy/api --since=10m
+kubectl top pod -n prod -l app=api
+kubectl top node
+```
+
+보안 기본선에서는 RBAC 최소 권한 원칙을 먼저 적용하세요. 운영 계정이 모든 네임스페이스에 쓰기 권한을 가지면 단기적으로는 편하지만, 실수 한 번이 전체 서비스로 번질 수 있습니다. 네임스페이스 단위 Role/RoleBinding을 기본으로 두고, 클러스터 전역 권한은 예외 승인 절차를 거치도록 설계하는 편이 안전합니다.
+
+또한 NetworkPolicy를 도입하면 "통신이 되는 것이 기본"인 상태를 "허용한 통신만 된다"는 상태로 바꿀 수 있습니다. 초기에는 DNS, 내부 API, 데이터베이스 같은 필수 경로부터 열고, 나머지는 점진적으로 차단하는 방식이 현실적입니다. 정책은 기능이 아니라 운영 안전장치입니다.
+
+마지막으로, 변경 후 검증을 자동화하세요. `kubectl apply` 이후에 상태 확인 명령을 사람이 매번 동일하게 수행하기 어렵기 때문에, CI에서 `kubectl diff`, `kubeconform`류 스키마 체크, 서버 사이드 dry-run을 묶어 두면 기본 결함을 배포 전에 차단할 수 있습니다. Kubernetes 운영 성숙도는 고급 기능보다 "기본 검증을 빠짐없이 반복하는 능력"에서 먼저 올라갑니다.
+
+## 최종 점검 메모
+
+배포 전 마지막 점검은 단순하지만 효과가 큽니다. 첫째, 이번 변경이 어느 리소스에 영향을 주는지 `kubectl diff`로 확인합니다. 둘째, 적용 후 `rollout status`가 끝날 때까지 기다리고, 이벤트 로그에서 경고 신호가 없는지 확인합니다. 셋째, 사용자 경로 기준 헬스 체크를 직접 호출해 응답 코드와 지연 시간을 기록합니다. 넷째, 이전 안정 버전으로 되돌릴 명령을 미리 준비해 둡니다.
+
+```bash
+kubectl diff -f k8s/ -n prod
+kubectl rollout status deploy/api -n prod
+kubectl get events -n prod --sort-by=.metadata.creationTimestamp
+curl -fsS https://app.example.com/healthz
+```
+
+이 네 단계를 표준화하면 변경 속도가 빨라져도 운영 안정성을 유지하기 쉽습니다.
+
+## 운영 한 줄 원칙
+
+운영에서 가장 중요한 원칙은 "원인 추정 전에 상태 증거를 먼저 수집한다"입니다. `describe`, `events`, `rollout` 세 신호를 먼저 확보하면 잘못된 가정으로 시간을 쓰는 일을 줄일 수 있습니다.
+
+운영 중에는 변경 직후 10분 관찰 창을 두고 경고 이벤트를 반드시 확인합니다.
+
 ## 처음 질문으로 돌아가기
 
 - **환경마다 YAML을 복사하는 방식은 왜 드리프트를 만들까요?**
@@ -338,5 +464,7 @@ kubectl rollout status deploy/<name> -n <ns>
 - [Helm best practices](https://helm.sh/docs/chart_best_practices/)
 - [Artifact Hub](https://artifacthub.io/)
 - [helm lint](https://helm.sh/docs/helm/helm_lint/)
+
+- [Kubernetes 101 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/kubernetes-101/ko)
 
 Tags: Kubernetes, Helm, Chart, PackageManager, DevOps

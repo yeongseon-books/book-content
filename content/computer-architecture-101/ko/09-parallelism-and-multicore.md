@@ -71,7 +71,7 @@ last_reviewed: '2026-05-12'
 | Cache coherence | 코어별 캐시 내용을 일관되게 유지하는 메커니즘 |
 | Amdahl's law | 순차 비율이 속도 향상 상한을 정한다는 법칙 |
 
-## Before / After
+## 적용 전과 후
 
 **Before — 모든 코어를 아무 생각 없이 사용:**
 
@@ -271,135 +271,411 @@ I/O 바운드 작업은 한 코어에서도 동시성으로 크게 개선될 수
 
 다음 글은 이 시리즈의 마지막 글입니다. 지금까지 본 CPU, 메모리, 캐시, I/O, 병렬성을 모두 묶어 성능을 어떻게 측정하고 설명할지 정리하겠습니다.
 
-## 심화 실습: 비트 연산 · 캐시 계산 · 파이프라인 관찰
+## 심화 학습: 멀티코어 동기화와 메모리 순서 모델
 
-컴퓨터 구조를 실제로 이해하려면 정의를 암기하는 대신 숫자를 직접 계산해 보는 과정이 필요합니다. 같은 명령이라도 비트 표현, 메모리 계층, 파이프라인 충돌 조건을 동시에 보면 성능 병목의 원인이 선명해집니다.
-
-### 2의 보수와 비트 마스크를 수치로 확인하기
+### 암달의 법칙(Amdahl's Law) 정량 분석
 
 ```python
-def to_u8(n: int) -> int:
-    return n & 0xFF
+def amdahl_speedup(parallel_fraction: float, num_cores: int) -> float:
+    """암달의 법칙: 병렬화 가능 비율과 코어 수에 따른 속도 향상."""
+    serial_fraction = 1 - parallel_fraction
+    return 1.0 / (serial_fraction + parallel_fraction / num_cores)
 
-def to_s8(n: int) -> int:
-    n &= 0xFF
-    return n - 0x100 if n & 0x80 else n
+def gustafson_speedup(parallel_fraction: float, num_cores: int) -> float:
+    """구스타프슨의 법칙: 문제 크기를 키울 때의 속도 향상."""
+    serial_fraction = 1 - parallel_fraction
+    return serial_fraction + parallel_fraction * num_cores
 
-x = to_u8(-5)          # 251 (0b11111011)
-y = to_u8(12)          # 12  (0b00001100)
-print(bin(x), bin(y))
-print(to_s8(x + y))    # 7
-print(to_s8(x - y))    # -17
+# 비교: 90% 병렬화 가능 코드
+print(f"{'코어 수':>6} {'Amdahl':>8} {'Gustafson':>10}")
+print("-" * 26)
+for cores in [1, 2, 4, 8, 16, 32, 64, 128]:
+    a = amdahl_speedup(0.90, cores)
+    g = gustafson_speedup(0.90, cores)
+    print(f"{cores:>6} {a:>8.2f}x {g:>9.1f}x")
 ```
 
-핵심은 ALU가 "부호 있는 정수"와 "부호 없는 정수"를 따로 계산하지 않는다는 점입니다. 동일한 비트열을 어떻게 해석하느냐가 결과 의미를 바꿉니다. 그래서 ISA 문서에는 signed/unsigned 비교 명령이 따로 존재합니다.
+출력:
+```text
+  코어 수   Amdahl  Gustafson
+--------------------------
+     1    1.00x       1.0x
+     2    1.82x       1.9x
+     4    3.08x       3.7x
+     8    4.71x       7.3x
+    16    6.40x      14.5x
+    32    7.80x      28.9x
+    64    8.77x      57.7x
+   128    9.34x     115.3x
+```
 
-### 캐시 인덱스 계산을 손으로 풀기
+암달의 법칙에서 90% 병렬화 코드도 128코어에서 9.3배가 한계입니다. 10%의 직렬 부분이 병목이 됩니다. 구스타프슨의 법칙은 "문제 크기를 키우면 병렬 부분이 더 커진다"고 가정하여 더 낙관적 예측을 합니다.
 
-가정:
-- L1 D-cache = 32KiB
-- line size = 64B
-- 8-way set associative
-
-계산:
-- 총 line 수 = 32KiB / 64B = 512
-- set 수 = 512 / 8 = 64
-- set index 비트 수 = log2(64) = 6
-- block offset 비트 수 = log2(64) = 6
-- tag 비트 수(48-bit VA 가정) = 48 - 6 - 6 = 36
-
-즉 주소 비트 분해는 `[tag:36][index:6][offset:6]`이 됩니다. 두 주소가 같은 set에 매핑되는지 확인하려면 offset을 제거한 뒤 index 6비트를 비교하면 됩니다.
-
-### 캐시 미스 패턴을 추적하는 간단 코드
+### MESI 프로토콜과 캐시 일관성 비용
 
 ```python
-# stride 접근이 캐시 locality에 미치는 영향 관찰
-N = 1024 * 1024
-arr = [0] * N
+from enum import Enum
 
-def walk(step: int):
-    s = 0
-    for i in range(0, N, step):
-        s += arr[i]
-    return s
+class MESIState(Enum):
+    MODIFIED = 'M'
+    EXCLUSIVE = 'E' 
+    SHARED = 'S'
+    INVALID = 'I'
 
-for step in [1, 2, 4, 8, 16, 32, 64, 128]:
-    walk(step)
+def mesi_transition(current: MESIState, event: str, 
+                     other_cores_have: bool = False) -> tuple:
+    """MESI 상태 전이 + 버스 트래픽."""
+    bus_traffic = None
+    new_state = current
+    
+    if event == 'local_read':
+        if current == MESIState.INVALID:
+            if other_cores_have:
+                new_state = MESIState.SHARED
+                bus_traffic = 'BusRd (공유 응답)'
+            else:
+                new_state = MESIState.EXCLUSIVE
+                bus_traffic = 'BusRd (독점)'
+    elif event == 'local_write':
+        if current == MESIState.INVALID:
+            new_state = MESIState.MODIFIED
+            bus_traffic = 'BusRdX (invalidate all)'
+        elif current == MESIState.SHARED:
+            new_state = MESIState.MODIFIED
+            bus_traffic = 'BusUpgr (invalidate others)'
+        elif current == MESIState.EXCLUSIVE:
+            new_state = MESIState.MODIFIED
+            bus_traffic = None  # silent upgrade
+    elif event == 'remote_read':
+        if current == MESIState.MODIFIED:
+            new_state = MESIState.SHARED
+            bus_traffic = 'Flush (write-back + share)'
+        elif current == MESIState.EXCLUSIVE:
+            new_state = MESIState.SHARED
+            bus_traffic = None
+    elif event == 'remote_write':
+        if current in (MESIState.MODIFIED, MESIState.EXCLUSIVE, MESIState.SHARED):
+            new_state = MESIState.INVALID
+            bus_traffic = 'Invalidate 수신'
+    
+    return new_state, bus_traffic
+
+# 시뮬레이션: ping-pong 패턴 (false sharing)
+print("=== False Sharing Ping-Pong ===")
+core0_state = MESIState.INVALID
+core1_state = MESIState.INVALID
+
+events = [
+    ('Core 0 write', 'local_write', 0),
+    ('Core 1 write', 'local_write', 1),
+    ('Core 0 write', 'local_write', 0),
+    ('Core 1 write', 'local_write', 1),
+]
+
+for desc, event, core in events:
+    if core == 0:
+        core0_state, traffic = mesi_transition(core0_state, event, 
+                                                core1_state != MESIState.INVALID)
+        if core1_state != MESIState.INVALID:
+            core1_state, _ = mesi_transition(core1_state, 'remote_write')
+    else:
+        core1_state, traffic = mesi_transition(core1_state, event,
+                                                core0_state != MESIState.INVALID)
+        if core0_state != MESIState.INVALID:
+            core0_state, _ = mesi_transition(core0_state, 'remote_write')
+    
+    print(f"  {desc}: Core0={core0_state.value} Core1={core1_state.value} "
+          f"Bus: {traffic or 'none'}")
 ```
 
-이 코드는 단순하지만 실험 관점에서는 매우 유용합니다. `step`이 커질수록 한 cache line에서 활용하는 유효 데이터가 줄고 miss 비율이 올라갑니다. 프로파일러에서는 CPI 증가와 함께 메모리 stall 시간이 늘어나는 형태로 관측됩니다.
-
-### 5단계 파이프라인에서 hazard를 그림으로 보기
-
-```mermaid
-flowchart LR
-    IF["IF"] --> ID["ID"] --> EX["EX"] --> MEM["MEM"] --> WB["WB"]
-    EX -->|"branch decision"| IF
-```
-
-간단한 명령 시퀀스:
-- `I1: LOAD R1, [R2]`
-- `I2: ADD R3, R1, R4`
-
-`I2`는 `R1`이 필요하지만 `I1`의 결과는 MEM/WB 이후에 준비됩니다. Forwarding이 없으면 stall이 필요하고, forwarding이 있으면 일부 cycle을 절약할 수 있습니다. 이 차이가 곧 IPC 차이로 이어집니다.
-
-### 파이프라인 타이밍 표를 직접 작성하기
+### 메모리 순서 모델(Memory Ordering)
 
 ```text
-cycle:   1   2   3   4   5   6
-I1      IF  ID  EX MEM  WB
-I2          IF  ID STALL EX MEM WB
-I3              IF STALL ID  EX MEM WB
+x86 TSO (Total Store Order):
+- Store→Store: 순서 보장 ✓
+- Load→Load: 순서 보장 ✓
+- Load→Store: 순서 보장 ✓
+- Store→Load: 재배치 가능! (Store Buffer 때문)
+→ 대부분의 경우 "직관적"이지만 Store→Load에서 놀라움
+
+ARM/RISC-V (Relaxed):
+- 모든 조합에서 재배치 가능
+- 명시적 fence (dmb, fence) 명령어로 순서 강제
+→ 더 높은 성능 가능, 프로그래밍 더 어려움
 ```
 
-이 표를 직접 그려 보면 왜 분기 예측 실패가 큰 비용인지, 왜 load-use hazard가 민감한지 바로 이해할 수 있습니다. 이론보다 "cycle 단위로 어디가 비는지"를 보는 것이 훨씬 빠릅니다.
+```python
+# 메모리 순서 문제를 보여주는 예제 (개념)
+import threading
 
-### 성능 근사식으로 병목 분해하기
+# Dekker 알고리즘의 간소화: 상호 배제 시도
+# x86에서도 Store→Load 재배치 때문에 실패할 수 있음
 
-성능은 보통 다음으로 근사합니다.
+flag_a = False
+flag_b = False
+critical_count = 0
 
-`Execution Time = Instruction Count × CPI × Clock Cycle Time`
+def thread_a():
+    global flag_a, critical_count
+    flag_a = True        # STORE flag_a
+    # 여기에 메모리 배리어 필요!
+    if not flag_b:       # LOAD flag_b (Store→Load 재배치 위험)
+        critical_count += 1
 
-여기서 구조 개선은 보통 세 축으로 나타납니다.
-- 명령 수 감소: 컴파일러 최적화/벡터화
-- CPI 감소: cache miss 감소, branch mispredict 감소, forwarding 개선
-- cycle time 단축: 더 높은 클록, 더 짧은 임계 경로
+def thread_b():
+    global flag_b, critical_count
+    flag_b = True        # STORE flag_b
+    if not flag_a:       # LOAD flag_a
+        critical_count += 1
 
-실무에서는 한 축을 개선하면 다른 축이 악화될 수 있습니다. 예를 들어 파이프라인 단계를 늘려 클록을 높이면 분기 실패 패널티가 커질 수 있습니다. 따라서 "한 지표만" 보고 결론 내리면 위험합니다.
+# 올바른 구현은 atomic 연산 또는 fence가 필요
+```
 
-### 점검 체크리스트
+### 원자적 연산(Atomic Operations)과 하드웨어 지원
 
-- 주소 하나를 보고 `tag/index/offset`으로 즉시 분해할 수 있는가
-- load-use, branch hazard를 cycle 표로 그릴 수 있는가
-- signed/unsigned 연산 차이를 비트 패턴으로 설명할 수 있는가
-- CPI 상승의 원인을 cache/branch/structural hazard로 나눠 추적할 수 있는가
+| 연산 | x86 명령어 | ARM64 명령어 | 용도 |
+|------|-----------|-------------|------|
+| Compare-And-Swap | `LOCK CMPXCHG` | `LDXR/STXR` (LL/SC) | Lock-free 자료구조 |
+| Fetch-And-Add | `LOCK XADD` | `LDADD` | 카운터 |
+| Test-And-Set | `LOCK BTS` | `LDSET` | 스핀락 |
+| Load-Linked/Store-Conditional | — | `LDXR/STXR` | CAS 구현 |
 
-이 체크리스트를 통과하면, 컴퓨터 구조 지식이 암기에서 운영 가능한 문제해결 도구로 바뀝니다.
+```python
+import threading
+import time
+
+class SpinLock:
+    """CAS 기반 스핀락 (개념 구현)."""
+    def __init__(self):
+        self._lock = 0
+        self._real_lock = threading.Lock()  # Python GIL 우회용
+    
+    def acquire(self):
+        # 실제 하드웨어에서는 LOCK CMPXCHG로 구현
+        while True:
+            with self._real_lock:
+                if self._lock == 0:
+                    self._lock = 1
+                    return
+            # 스핀 대기 (CPU 시간 소모)
+    
+    def release(self):
+        with self._real_lock:
+            self._lock = 0
+
+class TicketLock:
+    """공정한 스핀락: FIFO 순서 보장."""
+    def __init__(self):
+        self.next_ticket = 0
+        self.now_serving = 0
+        self._lock = threading.Lock()
+    
+    def acquire(self) -> int:
+        with self._lock:
+            my_ticket = self.next_ticket
+            self.next_ticket += 1
+        # 내 차례가 올 때까지 대기
+        while self.now_serving != my_ticket:
+            pass  # spin
+        return my_ticket
+    
+    def release(self):
+        self.now_serving += 1
+```
+
+### 락 경합(Lock Contention) 성능 모델링
+
+```python
+def lock_contention_model(num_threads: int, critical_section_ratio: float,
+                           lock_overhead_cycles: int = 50) -> dict:
+    """락 경합에 따른 확장성 예측."""
+    # 이상적: 모든 스레드가 독립 실행
+    ideal_speedup = num_threads
+    
+    # 현실: 임계 구역은 직렬화됨
+    # 유효 병렬 비율 = 1 - critical_section_ratio
+    # + 락 오버헤드 (원자적 연산, 캐시 일관성 트래픽)
+    serial_with_overhead = critical_section_ratio * (1 + lock_overhead_cycles / 1000)
+    actual_speedup = 1.0 / (serial_with_overhead + (1 - critical_section_ratio) / num_threads)
+    
+    efficiency = actual_speedup / ideal_speedup
+    
+    return {
+        'threads': num_threads,
+        'ideal_speedup': ideal_speedup,
+        'actual_speedup': actual_speedup,
+        'efficiency': efficiency
+    }
+
+print(f"{'스레드':>6} {'이상적':>7} {'실제':>7} {'효율':>7}")
+print("-" * 30)
+for t in [1, 2, 4, 8, 16, 32]:
+    r = lock_contention_model(t, critical_section_ratio=0.05)
+    print(f"{r['threads']:>6} {r['ideal_speedup']:>7.1f}x {r['actual_speedup']:>6.1f}x "
+          f"{r['efficiency']:>6.0%}")
+```
+
+### False Sharing 진단과 해결
+
+```python
+import sys
+
+# False sharing 발생 조건 확인
+CACHE_LINE_SIZE = 64  # bytes
+
+class BadLayout:
+    """두 스레드의 카운터가 같은 캐시 라인에 위치."""
+    def __init__(self):
+        self.counter_a = 0  # Thread A가 수정
+        self.counter_b = 0  # Thread B가 수정
+        # 두 변수가 인접 → 같은 64B 캐시 라인 안에 있을 확률 높음
+
+class GoodLayout:
+    """패딩으로 캐시 라인 분리."""
+    def __init__(self):
+        self.counter_a = 0
+        self._pad_a = bytearray(CACHE_LINE_SIZE)  # 64B 패딩
+        self.counter_b = 0
+        self._pad_b = bytearray(CACHE_LINE_SIZE)
+
+# 실무에서의 해결법:
+# C/C++: alignas(64) 또는 __attribute__((aligned(64)))
+# Java: @Contended 어노테이션 (JDK 8+)
+# Rust: #[repr(align(64))]
+
+print(f"BadLayout 크기 추정: counter 간 거리 < {CACHE_LINE_SIZE}B → false sharing 위험")
+print(f"GoodLayout 크기 추정: counter 간 거리 >= {CACHE_LINE_SIZE}B → 안전")
+```
+
+
+### 이종 코어(Heterogeneous) 아키텍처
+
+Apple M1/M2, Intel Alder Lake는 성능 코어(P-core)와 효율 코어(E-core)를 함께 배치합니다.
+
+```text
+Apple M1 구성:
+┌─────────────────────────────────────────┐
+│  Performance Cores (Firestorm) × 4      │
+│  - 넓은 디코더 (8-wide)                 │
+│  - 깊은 비순차 실행 (~630 entries ROB)   │
+│  - 높은 클록 (~3.2 GHz)                 │
+│  - 높은 전력 (~10W/core)                │
+├─────────────────────────────────────────┤
+│  Efficiency Cores (Icestorm) × 4        │
+│  - 좁은 디코더 (4-wide)                 │
+│  - 얕은 비순차 실행                      │
+│  - 낮은 클록 (~2.0 GHz)                 │
+│  - 낮은 전력 (~1W/core)                 │
+├─────────────────────────────────────────┤
+│  GPU Cores × 8, Neural Engine × 16      │
+│  통합 메모리 (LPDDR5, 모든 유닛 공유)    │
+└─────────────────────────────────────────┘
+```
+
+```python
+def heterogeneous_scheduling(tasks: list, p_cores: int = 4, e_cores: int = 4,
+                              p_speed: float = 1.0, e_speed: float = 0.4) -> dict:
+    """이종 코어 스케줄링 시뮬레이션."""
+    # 작업을 중요도(interactive vs background)로 분류
+    interactive = [t for t in tasks if t.get('priority') == 'high']
+    background = [t for t in tasks if t.get('priority') == 'low']
+    
+    # P-core에 interactive, E-core에 background 할당
+    p_throughput = min(len(interactive), p_cores) * p_speed
+    e_throughput = min(len(background), e_cores) * e_speed
+    
+    # 전력 효율
+    p_power = min(len(interactive), p_cores) * 10  # W
+    e_power = min(len(background), e_cores) * 1    # W
+    total_power = p_power + e_power
+    total_throughput = p_throughput + e_throughput
+    
+    return {
+        'throughput': total_throughput,
+        'power_watts': total_power,
+        'perf_per_watt': total_throughput / total_power if total_power > 0 else 0
+    }
+
+tasks = ([{'priority': 'high'}] * 3 + [{'priority': 'low'}] * 6)
+result = heterogeneous_scheduling(tasks)
+print(f"처리량: {result['throughput']:.1f} units")
+print(f"전력: {result['power_watts']:.0f}W")
+print(f"성능/와트: {result['perf_per_watt']:.2f}")
+```
+
+### SIMD/벡터 병렬성
+
+단일 코어 내에서도 데이터 병렬성을 활용할 수 있습니다.
+
+```text
+스칼라 덧셈:           SIMD 덧셈 (256-bit AVX2):
+A[0] + B[0] = C[0]    A[0..7] + B[0..7] = C[0..7]
+A[1] + B[1] = C[1]    (한 명령어로 8개 float32 동시 처리)
+A[2] + B[2] = C[2]
+...                    
+A[7] + B[7] = C[7]    
+→ 8개 명령어           → 1개 명령어
+```
+
+```python
+import numpy as np
+import time
+
+# NumPy의 SIMD 활용 측정
+n = 10_000_000
+a = np.random.randn(n).astype(np.float32)
+b = np.random.randn(n).astype(np.float32)
+
+# 벡터 연산 (내부적으로 AVX/NEON 사용)
+start = time.perf_counter()
+for _ in range(100):
+    c = a + b
+simd_time = time.perf_counter() - start
+
+# 순수 Python 루프 (SIMD 없음)
+start = time.perf_counter()
+c_list = [a[i] + b[i] for i in range(min(n, 100000))]  # 일부만
+scalar_time = (time.perf_counter() - start) * (n / 100000)
+
+print(f"NumPy (SIMD): {simd_time:.3f}초 (1천만 × 100회)")
+print(f"Python 루프 (추정): {scalar_time:.1f}초 (1천만 × 1회)")
+print(f"속도 차이: ~{scalar_time * 100 / simd_time:.0f}배")
+```
+
+| SIMD 확장 | 벡터 너비 | float32 동시 처리 | 프로세서 |
+|-----------|-----------|-----------------|----------|
+| SSE4 | 128 bit | 4개 | x86 (2006~) |
+| AVX2 | 256 bit | 8개 | x86 (2013~) |
+| AVX-512 | 512 bit | 16개 | x86 서버 (2017~) |
+| NEON | 128 bit | 4개 | ARM (2009~) |
+| SVE/SVE2 | 128~2048 bit | 4~64개 | ARM 서버 (2020~) |
+
+### GPU 병렬성: 수천 코어의 활용
+
+```text
+CPU vs GPU 구조:
+CPU (8코어):                    GPU (수천 코어):
+┌──────────────────┐           ┌──────────────────────────┐
+│ 큰 코어 × 8      │           │ 작은 코어 × 5120         │
+│ 복잡한 제어 로직  │           │ 단순한 제어 (SIMT)       │
+│ 큰 캐시          │           │ 작은 캐시 (공유 메모리)   │
+│ 높은 단일 성능   │           │ 높은 집합 처리량         │
+│ 다양한 작업      │           │ 동일 작업 대량 병렬      │
+└──────────────────┘           └──────────────────────────┘
+
+적합한 작업:
+CPU: 분기 많음, 캐시 활용, 직렬 의존성 → 웹 서버, 컴파일러, DB
+GPU: 동일 연산 반복, 데이터 독립 → 행렬 곱셈, 렌더링, AI 추론
+```
 
 ## 처음 질문으로 돌아가기
 
 - **동시성과 병렬성은 무엇이 다를까요?**
-  - 본문의 기준은 병렬성과 멀티코어를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 동시성(concurrency)은 여러 작업이 논리적으로 겹쳐 진행되는 것(단일 코어에서도 가능, 컨텍스트 스위칭)이고, 병렬성(parallelism)은 물리적으로 동시에 실행되는 것(멀티코어 필수)입니다. 동시성은 구조의 문제이고, 병렬성은 실행의 문제입니다.
 - **멀티코어에서는 어떤 비용이 새로 생길까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 캐시 일관성 유지(MESI 프로토콜의 invalidate 메시지), 원자적 연산의 버스 트래픽, 메모리 순서 보장을 위한 fence 명령어, 그리고 락 경합 시 직렬화 비용이 새로 발생합니다. 심화 학습에서 본 것처럼, ping-pong 패턴은 매 접근마다 캐시 라인을 코어 간 이동시켜 수십 배 성능 저하를 일으킵니다.
 - **락 경합과 false sharing은 왜 위험할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
-
-<!-- toc:begin -->
-## 시리즈 목차
-
-- [Computer Architecture 101 (1/10): 컴퓨터 구조란 무엇인가?](./01-what-is-computer-architecture.md)
-- [Computer Architecture 101 (2/10): 데이터 표현 — bit, byte, integer, floating point](./02-data-representation.md)
-- [Computer Architecture 101 (3/10): CPU와 명령어](./03-cpu-and-instructions.md)
-- [Computer Architecture 101 (4/10): 레지스터와 ALU](./04-registers-and-alu.md)
-- [Computer Architecture 101 (5/10): 메모리 구조](./05-memory-organization.md)
-- [Computer Architecture 101 (6/10): 캐시와 지역성](./06-cache-and-locality.md)
-- [Computer Architecture 101 (7/10): 파이프라인](./07-pipelining.md)
-- [Computer Architecture 101 (8/10): I/O와 장치](./08-io-and-devices.md)
-- **병렬성과 멀티코어 (현재 글)**
-- 성능을 이해하는 법 (예정)
-
-<!-- toc:end -->
+  - 락 경합은 임계 구역을 직렬화하여 암달의 법칙에 의한 확장성 상한을 만듭니다. False sharing은 논리적으로 독립인 데이터가 같은 캐시 라인에 있어 불필요한 일관성 트래픽을 발생시킵니다. 둘 다 코어를 추가해도 성능이 오르지 않거나 오히려 떨어지는 원인입니다.
 
 ## 참고 자료
 
@@ -407,5 +683,6 @@ I3              IF STALL ID  EX MEM WB
 - [Wikipedia — Cache coherence](https://en.wikipedia.org/wiki/Cache_coherence)
 - [Wikipedia — False sharing](https://en.wikipedia.org/wiki/False_sharing)
 - [The Free Lunch Is Over (Herb Sutter, 2005)](http://www.gotw.ca/publications/concurrency-ddj.htm)
+- [예제 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/computer-architecture-101/ko)
 
 Tags: Computer Science, 컴퓨터 구조, 병렬성, 멀티코어, 동시성, 동기화

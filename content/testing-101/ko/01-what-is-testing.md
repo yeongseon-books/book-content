@@ -22,6 +22,8 @@ last_reviewed: '2026-05-12'
 
 # Testing 101 (1/10): 테스트란 무엇인가?
 
+이 글은 Testing 101 시리즈의 첫 번째 글입니다.
+
 처음 테스트를 배울 때는 코드보다 절차부터 떠올리기 쉽습니다. 서버를 띄우고, 브라우저를 열고, 회원가입 버튼을 눌러 보고, 로그인이 되는지 확인하는 식입니다. 이 방식은 처음 한두 번은 통합니다. 그런데 기능이 늘고 사람이 늘면 곧 같은 질문이 따라옵니다. 어제 확인한 기능을 오늘도 다시 손으로 눌러 봐야 할까요?
 
 변경이 잦은 코드베이스에서는 수작업 확인만으로 품질을 지키기 어렵습니다. 확인 범위가 넓어질수록 빠뜨리는 항목이 생기고, 그 공백은 배포 뒤에 사고로 돌아옵니다.
@@ -227,6 +229,119 @@ def test_good():
 
 세 번째 오해는 테스트를 나중에 몰아서 써도 된다고 생각하는 경우입니다. 실제로는 기능을 구현한 맥락이 머릿속에 남아 있을 때 같이 적는 편이 훨씬 저렴합니다. 미루면 테스트는 자주 빠지고, 빠진 테스트는 다시 채워지지 않는 경우가 많습니다.
 
+## 테스트 피라미드를 실제 저장소에 적용하는 예시
+
+개념을 이해한 뒤 가장 먼저 부딪히는 문제는 "우리 저장소에 어떤 비율로 테스트를 두어야 하는가"입니다. 이 질문은 추상적으로 답하면 도움이 되지 않습니다. 그래서 팀에서 실제로 쓰는 디렉터리 단위 계획으로 바꿔야 합니다.
+
+```text
+project/
+├─ src/
+│  ├─ domain/
+│  ├─ service/
+│  └─ api/
+├─ tests/
+│  ├─ unit/         # 빠른 피드백, 대다수 케이스
+│  ├─ integration/  # DB, 메시지 브로커, 외부 API 경계
+│  └─ e2e/          # 핵심 사용자 여정만
+└─ pyproject.toml
+```
+
+실무에서는 보통 테스트 수량 기준으로 단위 테스트가 70~85%, 통합 테스트가 10~20%, E2E 테스트가 5~10%를 차지하도록 시작합니다. 절대 비율은 프로젝트 성격에 따라 달라지지만, "빠른 테스트를 두껍게, 느린 테스트를 얇게"라는 원칙은 변하지 않습니다.
+
+```python
+# tests/unit/test_tax.py
+def test_calculate_vat_for_standard_rate():
+    assert calculate_vat(10000, 0.1) == 1000
+
+# tests/integration/test_order_repository.py
+def test_save_order_persists_to_db(db_session):
+    repo = OrderRepository(db_session)
+    order = Order(id='o-1', total=15000)
+    repo.save(order)
+    assert repo.get('o-1').total == 15000
+
+# tests/e2e/test_checkout_flow.py
+def test_checkout_flow(page):
+    page.goto('http://localhost:8000')
+    page.get_by_role('button', name='장바구니 담기').click()
+    page.get_by_role('button', name='결제하기').click()
+    expect(page.get_by_text('결제가 완료되었습니다')).to_be_visible()
+```
+
+위처럼 계층별 예시를 같은 저장소 안에서 보여 주면, 신입 개발자도 "어떤 종류의 위험을 어느 계층에서 잡는지"를 빠르게 이해합니다. 테스트 전략은 문장보다 파일 구조에서 더 잘 전달됩니다.
+
+## 픽스처 패턴을 처음부터 분리하는 이유
+
+초기 프로젝트에서는 테스트 데이터 준비를 함수마다 직접 작성해도 당장 큰 문제가 없습니다. 하지만 테스트가 200개를 넘으면 준비 코드 중복이 빠르게 증가하고, 데이터 형태가 바뀔 때 수정 범위가 폭발합니다. 그래서 `pytest` fixture는 입문 단계부터 패턴으로 정착시키는 편이 장기적으로 훨씬 저렴합니다.
+
+```python
+import pytest
+
+@pytest.fixture
+def user_factory():
+    def _build(**overrides):
+        data = {
+            'id': 'u-100',
+            'email': 'test@example.com',
+            'role': 'member',
+            'active': True,
+        }
+        data.update(overrides)
+        return User(**data)
+    return _build
+
+def test_admin_permission(user_factory):
+    admin = user_factory(role='admin')
+    assert can_publish(admin) is True
+```
+
+`factory fixture`는 같은 기본 데이터를 공유하면서도 테스트별 변형을 간단히 만들 수 있다는 장점이 있습니다. 이 패턴을 도입하면 테스트가 길어지지 않고, 비즈니스 규칙 변화에도 수정 지점을 줄일 수 있습니다.
+
+## 커버리지 보고서를 테스트 도입의 나침반으로 쓰는 방법
+
+커버리지는 품질 점수표가 아니라 투자 우선순위를 정하는 지표입니다. 아래처럼 리포트를 읽으면 "어떤 파일을 다음 주에 먼저 보호해야 하는지"를 합의할 수 있습니다.
+
+```bash
+pytest --cov=src --cov-report=term-missing
+```
+
+```text
+Name                       Stmts   Miss  Cover   Missing
+---------------------------------------------------------
+src/domain/pricing.py         82     19    77%   45-52, 71-79
+src/service/order.py         104      6    94%   88-90, 131-133
+src/utils/time.py             24      1    96%   18
+---------------------------------------------------------
+TOTAL                        210     26    88%
+```
+
+이 보고서에서 `pricing.py`가 핵심 도메인이라면 우선순위는 명확합니다. 단순 유틸리티보다 가격 계산의 누락 분기를 먼저 보강해야 합니다. 즉, 커버리지 숫자 자체보다 "어떤 위험을 먼저 닫았는가"가 중요합니다.
+
+## 지속적 통합에 테스트를 연결할 때 최소 기준
+
+테스트가 로컬에서만 실행되면 결국 사람의 의지에 의존하게 됩니다. 팀 품질 기준으로 굳히려면 PR마다 자동 실행되어야 합니다. 가장 단순한 출발점은 아래와 같습니다.
+
+```yaml
+name: test
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements-dev.txt
+      - run: pytest -q --maxfail=1
+```
+
+처음부터 복잡한 매트릭스를 넣기보다, "모든 PR에서 단위 테스트는 반드시 돈다"는 합의를 먼저 자동화하는 것이 좋습니다. 이후 프로젝트가 커지면 통합 테스트 병렬화, 캐시, 커버리지 업로드를 단계적으로 추가하면 됩니다.
+
 ## 직접 검증해 볼 것
 
 1. `add` 함수를 일부러 `return a - b`로 바꾼 뒤 `pytest -v`를 다시 실행해 봅니다. 실패가 바로 보이지 않으면 테스트가 실제 버그를 감시하지 못하고 있다는 뜻입니다.
@@ -234,6 +349,40 @@ def test_good():
 3. `pytest -q` 실행 시간을 적어 둡니다. 입문 단계의 테스트가 이미 오래 걸린다면, 이후 시리즈에서 더 많은 테스트를 추가할수록 습관으로 굳기 어렵습니다.
 
 **예상 결과:** 의도적으로 넣은 버그에서는 최소 1개 테스트가 즉시 실패하고, 원래 구현으로 되돌리면 다시 모두 통과해야 합니다.
+
+## 심화 실습: 운영 관점 테스트 점검
+
+실무에서 테스트를 확장할 때 가장 먼저 해야 할 일은 실패 원인을 사람이 추측하지 않도록 로그와 단언문을 정리하는 것입니다. 테스트 실패 메시지에는 입력값, 기대값, 실제값이 함께 남아야 하며, 그래야 CI 로그만으로도 원인을 좁힐 수 있습니다.
+
+또한 테스트는 코드와 함께 진화해야 합니다. 기능이 바뀌었는데 테스트가 그대로라면 테스트는 안전장치가 아니라 오경보 장치가 됩니다. 그래서 팀에서는 요구사항 변경 PR에 테스트 변경이 함께 포함되는지를 리뷰 기준으로 두는 편이 좋습니다.
+
+fixture는 단순 편의 기능이 아니라 설계 도구입니다. 어떤 객체를 기본 상태로 두는지, 어떤 상태 변형을 허용하는지 fixture 레이어에서 명확히 정의하면 테스트 의도가 깔끔해집니다. 특히 도메인 객체가 복잡할수록 fixture 설계 품질이 테스트 유지보수 비용을 좌우합니다.
+
+회귀 버그를 줄이려면 버그 티켓이 닫힐 때 반드시 재현 테스트를 남겨야 합니다. 수정 코드만 머지하면 같은 원인의 버그가 다른 경로에서 재발합니다. 반대로 재현 테스트를 함께 남기면 팀 지식이 실행 가능한 형태로 축적됩니다.
+
+커버리지 리포트는 주간 회고에서 매우 유용합니다. 숫자만 보는 대신 누락 라인이 핵심 도메인인지 확인하고, 다음 스프린트에서 보강할 테스트를 합의하면 테스트 투자가 산발적으로 흩어지지 않습니다.
+
+CI에서는 실패를 빠르게 보여 주는 순서가 중요합니다. 일반적으로 단위 테스트를 먼저 실행하고, 그 다음 통합 테스트, 마지막으로 느린 E2E를 배치하면 평균 피드백 시간이 줄어듭니다. 파이프라인 설계도 테스트 전략의 일부로 다루어야 합니다.
+
+실무에서 테스트를 확장할 때 가장 먼저 해야 할 일은 실패 원인을 사람이 추측하지 않도록 로그와 단언문을 정리하는 것입니다. 테스트 실패 메시지에는 입력값, 기대값, 실제값이 함께 남아야 하며, 그래야 CI 로그만으로도 원인을 좁힐 수 있습니다.
+
+```python
+from unittest.mock import patch
+
+def test_payment_service_retries_once_on_timeout():
+    service = PaymentService()
+    with patch('src.payment.client.charge') as charge:
+        charge.side_effect = [TimeoutError(), {'status': 'ok'}]
+        result = service.pay(user_id='u-1', amount=10000)
+
+    assert result['status'] == 'ok'
+    assert charge.call_count == 2
+```
+
+```bash
+pytest -q --maxfail=1 --disable-warnings
+pytest --cov=src --cov-report=term-missing
+```
 
 ## 실패 신호와 첫 점검
 
@@ -291,6 +440,7 @@ def test_good():
 
 ## 참고 자료
 
+- 실습 예제 저장소(book-examples): https://github.com/yeongseon-books/book-examples/tree/main/testing-101/ko
 ### 공식 문서
 - [pytest documentation](https://docs.pytest.org/)
 - [Python `unittest` documentation](https://docs.python.org/3/library/unittest.html)

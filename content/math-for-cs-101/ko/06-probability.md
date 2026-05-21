@@ -361,6 +361,130 @@ print(expected(vals, probs), variance(vals, probs))
 
 독립 가정, 정상성 가정, 표본 대표성은 모두 명시적으로 검증해야 합니다. 모델링 가정을 문서화하지 않으면 계산은 정확해 보여도 결론이 틀릴 수 있습니다.
 
+
+### 몰테카를로 시뮬레이션
+
+해석적 계산이 어려운 확률 문제는 시뮬레이션으로 근사할 수 있습니다.
+
+```python
+import random
+
+def monte_carlo_pi(n: int = 100_000) -> float:
+    """단위 원에 점을 랜덤하게 던져 π를 추정합니다."""
+    inside = 0
+    for _ in range(n):
+        x, y = random.random(), random.random()
+        if x * x + y * y <= 1.0:
+            inside += 1
+    return 4 * inside / n
+
+random.seed(42)
+print(f"pi estimate: {monte_carlo_pi():.4f}")  # ~3.1416
+```
+
+이 방법은 통합 테스트의 성공률 추정, A/B 테스트 신뢰구간 계산, 리스크 분석 등에서 넓게 쓰입니다. 핵심은 표본 수를 늘리면 추정값이 수렴한다는 대수의 법칙입니다.
+
+### 조건부 확률의 함정
+
+조건부 확률에서 가장 흔한 실수는 기저율(base rate)을 무시하는 것입니다.
+
+```python
+def false_positive_scenario():
+    """
+    시스템 이상 탐지 예시:
+    - 실제 장애 발생률: 0.1% (1000건 중 1건)
+    - 탐지기 민감도: 99% (장애시 알람)
+    - 오경보률: 2% (정상인데 알람)
+    """
+    p_fault = 0.001
+    p_alarm_given_fault = 0.99
+    p_alarm_given_ok = 0.02
+    p_ok = 1 - p_fault
+
+    p_alarm = p_alarm_given_fault * p_fault + p_alarm_given_ok * p_ok
+    p_fault_given_alarm = (p_alarm_given_fault * p_fault) / p_alarm
+
+    print(f"알람 발생 확률: {p_alarm:.4f}")
+    print(f"알람이 울렸을 때 실제 장애일 확률: {p_fault_given_alarm:.4f}")
+    # 알람이 울렸어도 실제 장애일 확률은 ~4.7%에 불과
+
+false_positive_scenario()
+```
+
+이 예시는 온콜 모니터링 알람 설계, 보안 이상 탐지, 의료 진단 등에서 반복되는 패턴입니다. 기저율이 낮으면 높은 민감도만으로는 정밀도(precision)를 보장할 수 없습니다.
+
+### 대수의 법칙과 실무 적용
+
+표본 크기가 커질수록 표본 평균이 모평균에 수렴합니다. 이 원리는 A/B 테스트 설계의 근거입니다.
+
+```python
+import random
+
+def demonstrate_lln(p_true: float = 0.52, trials: list = None):
+    """동전 던지기로 대수의 법칙을 확인합니다."""
+    if trials is None:
+        trials = [10, 100, 1000, 10000, 100000]
+    random.seed(123)
+    for n in trials:
+        heads = sum(1 for _ in range(n) if random.random() < p_true)
+        print(f"n={n:>7d}: observed={heads/n:.4f}, true={p_true}")
+
+demonstrate_lln()
+# n=     10: observed=0.6000, true=0.52
+# n=    100: observed=0.5500, true=0.52
+# n=   1000: observed=0.5240, true=0.52
+# n=  10000: observed=0.5212, true=0.52
+# n= 100000: observed=0.5198, true=0.52
+```
+
+A/B 테스트에서 "표본이 충분한가?"를 판단할 때 이 원리가 작동합니다. 표본이 작으면 노이즈가 커서 차이를 신뢰할 수 없고, 표본이 충분하면 작은 차이도 통계적으로 유의해집니다.
+
+### 독립 사건과 종속 사건 구분
+
+두 사건 A, B가 독립이라는 말은 P(A ∩ B) = P(A) × P(B)를 의미합니다. 실무에서 이 가정을 잘못 적용하는 경우가 많습니다.
+
+| 상황 | 독립 여부 | 이유 |
+| --- | --- | --- |
+| 서로 다른 리전의 서버 장애 | 대체로 독립 | 물리적 분리 |
+| 같은 서버의 CPU와 메모리 경고 | 종속 | 리소스 공유 |
+| 사용자 A의 클릭과 사용자 B의 클릭 | 독립 | 별개 행위자 |
+| 사용자의 첫 클릭과 두 번째 클릭 | 종속 | 세션 내 행동 연쇄 |
+
+독립 가정을 잘못 적용하면 장애 확률을 과소평가하거나 전환율을 잘못 계산합니다. 모델링 전에 "이 두 사건이 정말 독립인가?"를 먼저 묻는 습관이 필요합니다.
+
+### 확률 분포 시각화로 직관 얻기
+
+확률 분포를 코드로 시각화하면 모양이 직관적으로 들어옵니다.
+
+```python
+import random
+from collections import Counter
+
+def simulate_poisson_histogram(lam: float = 3.0, n: int = 10000):
+    """Poisson 분포를 시뮬레이션해 히스토그램으로 보여줍니다."""
+    # Poisson 시뮬레이션 (Knuth 알고리즘)
+    import math
+    samples = []
+    for _ in range(n):
+        L = math.exp(-lam)
+        k, p = 0, 1.0
+        while p > L:
+            k += 1
+            p *= random.random()
+        samples.append(k - 1)
+
+    counts = Counter(samples)
+    max_k = max(counts.keys())
+    for k in range(max_k + 1):
+        bar = '#' * (counts.get(k, 0) // 50)
+        print(f"k={k:2d}: {bar} ({counts.get(k, 0)})")
+
+random.seed(42)
+simulate_poisson_histogram()
+```
+
+이 코드는 Poisson 분포의 모양을 텍스트 히스토그램으로 보여줍니다. 람다(λ)가 평균이자 분산인 특성을 눈으로 확인할 수 있습니다. 서버 오류 수, 초당 요청 수 같은 희귀 사건 모델링에 Poisson이 자연스럽게 등장하는 이유입니다.
+
 ## 처음 질문으로 돌아가기
 
 - **불확실성을 감으로 넘기지 않고 어떻게 수치로 다룰까요?**
@@ -393,5 +517,6 @@ print(expected(vals, probs), variance(vals, probs))
 - [Introduction to Probability - Blitzstein](https://projects.iq.harvard.edu/stat110)
 - [Python statistics Module](https://docs.python.org/3/library/statistics.html)
 - [SciPy GitHub repository](https://github.com/scipy/scipy)
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/math-for-cs-101/ko)
 
 Tags: Math, Probability, Statistics, Bayes, Beginner

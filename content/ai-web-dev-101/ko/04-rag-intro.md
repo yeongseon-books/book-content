@@ -21,9 +21,11 @@ seo_description: RAG의 검색·임베딩·생성 흐름을 이해하고, 근거
 
 # AI Web Development 101 (4/7): RAG 입문 — 내 데이터로 답하는 AI 만들기
 
+이 글은 AI 웹 개발 입문 시리즈의 4번째 글입니다.
+
+
 모델이 아무리 좋아도, 학습 시점 이후에 생긴 정보나 우리 팀 내부 문서는 저절로 알지 못합니다. 그래서 실서비스에서는 “모델이 똑똑한가”보다 “필요한 근거를 제때 붙여 줄 수 있는가”가 더 중요해집니다.
 
-이 글은 AI 웹 개발 입문 시리즈의 4번째 글입니다.
 
 여기서는 모델이 모르는 최신 정보와 내부 문서를 답변에 연결하는 RAG의 기본 구조와 디버깅 포인트를 설명합니다.
 
@@ -288,6 +290,166 @@ RAG를 운영할 때는 답변 텍스트만 저장하면 원인 분석이 거의
 
 이 네 묶음을 남기면 "검색이 실패했는지", "검색은 맞았지만 생성이 흔들렸는지", "안전 규칙이 과도하게 차단했는지"를 같은 화면에서 판단할 수 있습니다. 작은 서비스라도 이 구조를 먼저 잡아 두면, 기능을 확장할수록 디버깅 시간이 크게 줄어듭니다.
 
+## 최소 구현으로 이해하는 RAG 파이프라인
+
+RAG를 이해하는 가장 좋은 방법은 작은 파이프라인을 끝까지 직접 만들어 보는 것입니다. 핵심은 세 단계입니다. 첫째 문서를 조각으로 쪼개고 임베딩합니다. 둘째 질문을 임베딩해 가장 가까운 문서 조각을 찾습니다. 셋째 검색된 근거를 프롬프트에 넣어 생성합니다.
+
+```python
+from openai import OpenAI
+import numpy as np
+
+client = OpenAI()
+
+def embed_text(text: str) -> list[float]:
+    res = client.embeddings.create(
+        model="text-embedding-3-small",
+        input=text,
+    )
+    return res.data[0].embedding
+
+def cosine(a: list[float], b: list[float]) -> float:
+    a_np, b_np = np.array(a), np.array(b)
+    return float(np.dot(a_np, b_np) / (np.linalg.norm(a_np) * np.linalg.norm(b_np)))
+```
+
+입문 단계에서는 로컬 파일 + 단순 코사인 유사도만으로도 개념 검증이 충분합니다. 중요한 것은 벡터DB를 먼저 고르는 일이 아니라, 검색 결과가 실제 답변 품질에 어떤 영향을 주는지 측정하는 일입니다.
+
+## 청크 전략: 길이, 경계, 중복
+
+RAG 품질은 모델보다 청크 전략에서 더 크게 갈리는 경우가 많습니다. 보통 다음 기준을 먼저 실험합니다.
+
+- 청크 길이: 300~800 토큰
+- 오버랩: 50~120 토큰
+- 경계 기준: 문단/제목 단위 우선
+- 메타데이터: 문서 ID, 섹션, 갱신 시각 포함
+
+청크가 너무 길면 검색 정밀도가 떨어지고, 너무 짧으면 문맥이 끊겨 답변 일관성이 무너집니다. 이 균형을 잡기 위해 최소 20개 정도의 대표 질문으로 오프라인 평가를 먼저 돌리는 편이 좋습니다.
+
+## 생성 프롬프트 템플릿
+
+RAG에서 프롬프트는 "근거 없는 창작"을 막는 안전장치입니다.
+
+```text
+역할: 당신은 사내 문서 질의응답 도우미입니다.
+규칙:
+1) 아래 문서 조각에 있는 내용만 근거로 답합니다.
+2) 근거가 부족하면 "근거 문서에서 확인되지 않습니다"라고 말합니다.
+3) 답변 마지막에 source_ids를 JSON 배열로 포함합니다.
+
+질문:
+{question}
+
+문서 조각:
+{context_chunks}
+```
+
+이 규칙이 없으면 모델은 검색 결과가 부족해도 그럴듯한 문장을 생성하려고 시도합니다.
+
+## LangChain 기반 RAG 예시
+
+LangChain을 사용하면 파이프라인 구성이 빨라집니다. 다만 프레임워크가 품질을 자동 보장해 주지는 않으므로, 검색 결과와 최종 답변을 반드시 로그로 남겨야 합니다.
+
+```python
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+from langchain_community.vectorstores import FAISS
+from langchain_core.prompts import ChatPromptTemplate
+
+emb = OpenAIEmbeddings(model="text-embedding-3-small")
+vs = FAISS.from_texts(texts=docs, embedding=emb)
+retriever = vs.as_retriever(search_kwargs={"k": 4})
+
+prompt = ChatPromptTemplate.from_template("""
+문서 근거만 사용해서 답변하세요.
+질문: {question}
+문서:
+{context}
+""")
+
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+
+def answer(question: str) -> str:
+    hits = retriever.invoke(question)
+    context = "\n\n".join([h.page_content for h in hits])
+    chain = prompt | llm
+    return chain.invoke({"question": question, "context": context}).content
+```
+
+## 운영 관점 지표와 실패 패턴
+
+RAG를 운영으로 가져갈 때는 최소한 아래 지표를 수집해야 합니다.
+
+- 검색 적중률: 정답 근거 문서가 top-k에 포함되는 비율
+- 근거 인용률: 답변이 source_ids를 제공하는 비율
+- 근거 불일치율: 인용한 문서와 실제 답변 내용이 어긋나는 비율
+- 검색 지연 시간과 생성 지연 시간 분리
+- 질문 유형별 실패 분포
+
+자주 나오는 실패 패턴도 미리 정리해 두면 좋습니다.
+
+| 실패 패턴 | 원인 | 대응 |
+| --- | --- | --- |
+| 엉뚱한 문서 인용 | 청크 경계 불량 | 문단 기준 분할로 재생성 |
+| 답변이 너무 일반적 | 검색 점수 임계치 없음 | 점수 하한 미달 시 "근거 없음" 처리 |
+| 오래된 정보 답변 | 문서 갱신 메타데이터 없음 | 최신 버전 우선 가중치 적용 |
+| 느린 응답 | 무조건 top-k 크게 설정 | 질문 유형별 동적 k 사용 |
+
+
+
+## 문서 갱신 파이프라인 기본 형태
+
+RAG 품질은 인덱스 갱신 주기에 크게 좌우됩니다. 문서가 자주 바뀌는 도메인이라면 최소 하루 1회 배치로 재색인하고, 변경량이 많지 않다면 주기보다 "변경 이벤트 기반"이 더 효율적입니다.
+
+```bash
+python3 scripts/build_chunks.py --series ai-web-dev-101
+python3 scripts/build_embeddings.py --model text-embedding-3-small
+python3 scripts/reindex_vector_store.py --target prod
+```
+
+갱신 실패 시 이전 인덱스로 즉시 롤백할 수 있도록 인덱스 버전을 남기는 습관이 중요합니다.
+
+
+## 검색 품질 디버깅 로그 예시
+
+RAG 장애 대응에서 가장 유용한 자료는 "질문-검색결과-최종답변" 3단 로그입니다. 이 세 가지가 한 화면에 보여야 검색 문제인지 생성 문제인지 즉시 분리할 수 있습니다.
+
+```json
+{
+  "question": "환불 정책 처리 기간",
+  "top_k": 4,
+  "hits": [
+    {"doc_id": "policy-2026-01", "score": 0.86},
+    {"doc_id": "faq-legacy", "score": 0.71}
+  ],
+  "answer": "환불은 영업일 기준 3~5일이 소요됩니다.",
+  "sources": ["policy-2026-01"]
+}
+```
+
+이 로그를 주기적으로 샘플링해 사람이 검토하면 자동 지표가 놓치는 결함을 초기에 발견할 수 있습니다.
+
+## 하이브리드 검색 고려사항
+
+벡터 검색만으로 해결되지 않는 도메인에서는 키워드 검색(BM25)과 결합한 하이브리드 검색이 유효할 수 있습니다. 제품 코드나 에러 번호처럼 정확 매칭이 중요한 질의에서 특히 효과가 큽니다.
+
+초기에는 복잡한 랭킹 모델보다 단순 가중치 결합으로 시작해도 충분합니다. 핵심은 "어떤 질문에서 어떤 검색기가 이기는지"를 데이터로 확인하는 것입니다.
+
+
+## 근거 제시 형식 표준화
+
+RAG 답변은 내용 자체만큼 "근거를 어떻게 보여 주는지"가 중요합니다. 인용 형식을 표준화하면 사용자 신뢰가 올라가고, 내부 검수도 빨라집니다.
+
+예를 들어 본문 끝에 `출처: 문서명(section)` 형태를 고정하거나, `source_ids` 배열을 UI 링크로 매핑하는 방식이 있습니다. 핵심은 사람이 클릭해 실제 문서로 이동해 검증할 수 있어야 한다는 점입니다.
+
+
+### 실무 메모
+
+이 절에서 다룬 원칙은 기능이 늘어날수록 더 중요해집니다. 특히 팀원이 늘어나면 개인 감각보다 문서화된 규칙이 더 큰 품질 차이를 만듭니다. 따라서 예제 코드를 복사해 쓰는 것에서 멈추지 말고, 현재 팀의 장애 패턴과 운영 제약에 맞춰 규칙을 재정의하는 작업이 필요합니다. 작은 체크리스트 하나가 장기적으로는 가장 큰 비용 절감으로 돌아옵니다.
+
+
+### 운영 메모
+
+검색 품질이 일정하지 않다면 모델 파라미터를 조정하기 전에 먼저 인덱스 품질과 청크 경계를 점검하는 것이 우선입니다. 대부분의 초기 실패는 생성 단계가 아니라 검색 단계에서 시작됩니다.
+
 ## 처음 질문으로 돌아가기
 
 - **모델은 왜 회사 문서나 최신 뉴스를 바로 답하지 못할까요?**
@@ -311,6 +473,7 @@ RAG를 운영할 때는 답변 텍스트만 저장하면 원인 분석이 거의
 <!-- toc:end -->
 
 ## 참고 자료
+- [AI Web Development 101 예제 코드 저장소](https://github.com/yeongseon-books/book-examples/tree/main/ai-web-dev-101/ko)
 
 - [OpenAI embeddings guide](https://platform.openai.com/docs/guides/embeddings)
 - [OpenAI Cookbook: Question answering using embeddings](https://cookbook.openai.com/examples/question_answering_using_embeddings)

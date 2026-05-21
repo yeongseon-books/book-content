@@ -22,6 +22,8 @@ title: "Incident Response 101 (9/10): 재발 방지"
 
 # Incident Response 101 (9/10): 재발 방지
 
+이 글은 Incident Response 101 시리즈의 아홉 번째 글입니다.
+
 사후 분석 문서까지 마쳤다고 해서 incident 대응이 끝난 것은 아닙니다. 그 문서가 다시 코드, 테스트, 운영 규칙으로 돌아가지 않으면 조직은 같은 실수를 반복합니다.
 
 그래서 재발 방지는 좋은 회고를 남기는 일이 아니라, 학습을 시스템에 박아 넣는 일에 가깝습니다. 기억보다 테스트와 guardrail이 먼저 막아 주는 상태를 만들어야 합니다.
@@ -374,6 +376,55 @@ def metrics(incident: dict) -> dict:
 
 리허설의 목적은 사람 평가가 아니라 문서 검증입니다. 실제 incident는 긴장 상태에서 진행되므로, 평시에는 분명해 보이던 절차도 현장에서는 모호해질 수 있습니다. 정기 리허설을 운영 루틴에 넣으면 문서와 실행 사이의 간극을 줄일 수 있습니다.
 
+## 예방 백로그 운영 템플릿
+
+재발 방지는 우선순위 관리가 핵심입니다. incident 뒤에는 개선 항목이 한꺼번에 늘어나므로, 예방 백로그를 별도로 운영해야 합니다.
+
+| 항목 | 유형 | 위험 감소 | 구현 비용 | 우선순위 | 상태 |
+| --- | --- | --- | --- | --- | --- |
+| checkout 회귀 테스트 | 테스트 | 높음 | 낮음 | 즉시 | 진행중 |
+| 배포 가드레일 추가 | 운영 규칙 | 높음 | 중간 | 높음 | 예정 |
+| 카오스 실험 자동화 | 검증 | 중간 | 중간 | 중간 | 예정 |
+
+이 표를 분기 리뷰에 포함하면 문서 기반 개선이 실제 실행으로 이어집니다. 예방은 한 번의 프로젝트가 아니라 운영 루틴입니다.
+
+## 온콜 교대 설정 예시
+
+```yaml
+oncall_rotation:
+  timezone: Asia/Seoul
+  handoff_minutes: 10
+  schedule:
+    - name: primary
+      weekday: mon-fri
+      from: "09:00"
+      to: "18:00"
+    - name: secondary
+      weekday: mon-fri
+      from: "18:00"
+      to: "09:00"
+  handoff_template:
+    - current_impact
+    - mitigation_status
+    - open_risks
+    - next_30m_plan
+```
+
+교대 설정은 incident가 없을 때 준비해야 incident가 있을 때 쓸 수 있습니다. 특히 인계 템플릿을 고정해 두면 팀 숙련도 차이로 인한 품질 편차를 줄일 수 있습니다.
+
+## 운영 부록: 예방 항목 상태 정의
+
+- `open`: 항목 생성, 아직 착수 전
+- `in_progress`: 구현 또는 검증 진행 중
+- `blocked`: 외부 의존성으로 지연
+- `done`: 검증 완료
+
+상태 정의를 단순하게 두면 분기 리뷰에서 누락 항목을 빠르게 찾을 수 있습니다.
+
+## 운영 메모: 점검 루프
+
+운영 문서는 작성으로 끝나지 않습니다. 월간 점검 루프를 통해 선언 기준, 역할 분리, 공지 주기, 후속 조치 추적이 실제 incident에서 유지되는지 확인해야 합니다. 점검 결과는 다음 리허설 시나리오와 runbook 개정 항목으로 바로 연결하는 편이 좋습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **사후 분석 뒤에 왜 같은 incident가 다시 반복될까요?**
@@ -408,6 +459,7 @@ def metrics(incident: dict) -> dict:
 - [Guardrails, not gates - Thoughtworks](https://www.thoughtworks.com/insights/blog/guardrails-not-gates)
 
 ### 예제 소스
+- [incident-response-101 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/incident-response-101/ko)
 - [incident-response-101 canonical source in book-content](https://github.com/yeongseon-books/book-content/tree/main/content/incident-response-101)
 
 Tags: Incident, Prevention, Reliability, Testing, Operations

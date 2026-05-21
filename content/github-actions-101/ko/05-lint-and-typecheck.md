@@ -171,141 +171,425 @@ repos:
 다음 글에서는 빌드 아티팩트를 다룹니다. 코드 품질을 검증했다면, 이제 그 결과물인 빌드 산출물을 어떻게 저장하고 다음 단계로 넘길지 살펴볼 차례입니다.
 
 
-## 워크플로 설계를 코드로 구체화하기
 
-워크플로우 품질은 "한 번 돌아간다"가 아니라 "변경이 누적돼도 의도를 유지한다"로 판단해야 합니다. 아래 예시는 테스트, 린트, 빌드를 분리해 실패 지점을 빠르게 찾는 구성입니다.
+---
+
+## Ruff 설정을 실무 수준으로 잡아 보겠습니다
+
+Ruff는 Python 린터와 포매터를 하나로 합친 도구입니다. Flake8, isort, pycodestyle, pyflakes 등 여러 도구의 규칙을 하나의 바이너리에서 실행하므로, CI 설정이 간단해지고 실행 속도도 빠릅니다.
+
+### pyproject.toml 설정
+
+```toml
+[tool.ruff]
+target-version = "py311"
+line-length = 88
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "N",    # pep8-naming
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "S",    # flake8-bandit (보안)
+    "A",    # flake8-builtins
+    "C4",   # flake8-comprehensions
+    "SIM",  # flake8-simplify
+    "TCH",  # flake8-type-checking
+    "RUF",  # ruff-specific rules
+]
+ignore = [
+    "E501",   # line-length (formatter가 처리)
+    "S101",   # assert 사용 (테스트에서 필요)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S106"]  # 테스트에서는 assert, 하드코딩 패스워드 허용
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+```
+
+이 설정의 설계 의도를 짚어 보겠습니다.
+
+- `select`에 규칙 그룹을 명시적으로 나열해서, 어떤 검사가 활성화돼 있는지 한눈에 보이게 합니다.
+- `per-file-ignores`로 테스트 코드에서는 불필요한 규칙을 비활성화합니다.
+- `line-length`는 formatter에 위임하고 린터에서는 무시합니다.
+
+### CI 워크플로우 설정
 
 ```yaml
-name: ci
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Ruff 린트
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: "check --output-format github"
+
+      - name: Ruff 포맷 확인
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: "format --check --diff"
+```
+
+`--output-format github`는 린트 오류를 PR의 파일 diff 위에 인라인 어노테이션으로 표시합니다. 개발자가 로그를 뒤지지 않아도 어디를 고쳐야 하는지 바로 보입니다.
+
+`format --check --diff`는 포매팅이 맞지 않는 부분을 diff로 보여주되, 파일을 수정하지는 않습니다. CI에서는 검증만 하고, 실제 수정은 개발자의 로컬 `ruff format`이나 pre-commit에서 처리하는 구조입니다.
+
+---
+
+## Mypy 타입 검사를 단계적으로 도입하기
+
+Mypy를 프로젝트에 처음 도입할 때 가장 큰 실수는 즉시 `--strict`를 켜는 것입니다. 기존 코드에 타입 어노테이션이 없으면 수백 개의 에러가 쏟아져 나오고, 팀이 의욕을 잃습니다.
+
+### 단계적 도입 전략
+
+```toml
+# pyproject.toml - 1단계: 기본 검사만
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+# 새 모듈은 strict
+[[tool.mypy.overrides]]
+module = "src.new_module.*"
+strict = true
+
+# 레거시 모듈은 느슨하게
+[[tool.mypy.overrides]]
+module = "src.legacy.*"
+ignore_errors = true
+```
+
+이 전략의 핵심은 새 코드에는 엄격한 기준을 적용하면서, 레거시 코드는 점진적으로 마이그레이션하는 것입니다.
+
+### CI에서 Mypy 실행
+
+```yaml
+jobs:
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: "pip"
+      - run: pip install -e ".[dev]"
+
+      - name: Mypy 타입 검사
+        run: mypy src --output-format=github-actions
+```
+
+`--output-format=github-actions`는 Ruff처럼 PR diff에 인라인 어노테이션을 표시합니다. Mypy 0.900 이상에서 사용 가능합니다.
+
+### Mypy 캐시 활용
+
+```yaml
+      - name: Mypy 캐시 복원
+        uses: actions/cache@v4
+        with:
+          path: .mypy_cache
+          key: mypy-${{ hashFiles('pyproject.toml') }}-${{ hashFiles('src/**/*.py') }}
+          restore-keys: |
+            mypy-${{ hashFiles('pyproject.toml') }}-
+            mypy-
+      
+      - run: mypy src
+```
+
+Mypy는 증분 검사를 지원하므로 캐시를 활용하면 실행 시간을 크게 줄일 수 있습니다. 소스 파일 해시를 캐시 키에 포함하면 코드가 바뀔 때만 캐시가 갱신됩니다.
+
+---
+
+## pre-commit과 CI의 관계
+
+pre-commit은 로컬 커밋 시점에 검사를 실행하는 도구입니다. "로컬에서 이미 검사했으니 CI에서는 필요 없지 않나?"라고 생각할 수 있지만, 두 가지 이유로 CI에서도 반드시 실행해야 합니다.
+
+1. **로컬 훅은 건너뛸 수 있습니다.** `git commit --no-verify`로 훅을 우회하거나, pre-commit을 설치하지 않은 개발자가 있을 수 있습니다.
+2. **CI가 최종 게이트입니다.** PR 체크에서 실패해야 머지를 막을 수 있습니다. 로컬 훅은 "빠른 피드백"이고, CI는 "강제 게이트"입니다.
+
+### .pre-commit-config.yaml
+
+```yaml
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.6
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.14.1
+    hooks:
+      - id: mypy
+        additional_dependencies:
+          - types-requests
+          - types-pyyaml
+```
+
+### CI에서 pre-commit 실행
+
+```yaml
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - uses: pre-commit/action@v3.0.1
+```
+
+`pre-commit/action`은 변경된 파일에 대해서만 훅을 실행하므로 전체 검사보다 빠릅니다. 캐시도 자동으로 처리합니다.
+
+---
+
+## 린트와 타입체크를 잡 구조에 배치하기
+
+린트와 타입체크를 다른 검증과 어떻게 조합하는지가 실무의 핵심입니다.
+
+```yaml
+name: quality-gate
+
 on:
   pull_request:
-  push:
-    branches: [main]
+    paths: ["src/**", "tests/**", "pyproject.toml"]
+
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/ruff-action@v3
+        with:
+          args: "check --output-format github"
+      - uses: astral-sh/ruff-action@v3
+        with:
+          args: "format --check"
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: "pip"
+      - run: pip install -e ".[dev]"
+      - run: mypy src
+
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-python@v6
         with:
-          python-version: "3.11"
-      - run: pip install -r requirements.txt
+          python-version: "3.12"
+          cache: "pip"
+      - run: pip install -e ".[dev]"
       - run: pytest -q
-
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - run: pip install ruff
-      - run: ruff check .
 
   build:
+    needs: [lint, typecheck, test]
     runs-on: ubuntu-latest
-    needs: [test, lint]
     steps:
       - uses: actions/checkout@v6
-      - run: docker build -t app:${{ github.sha }} .
+      - run: python -m build
 ```
 
-`needs`를 통해 의존 관계를 명시하면 "테스트 실패인데 빌드는 왜 돌았는가" 같은 혼선을 줄일 수 있습니다. 또한 잡을 분리하면 병렬 실행이 가능해 전체 피드백 시간이 짧아집니다.
+세 검증 잡이 병렬로 실행되고, 모두 통과해야 빌드가 시작됩니다. 린트는 가장 빠르게 끝나고(보통 10초 이내), 타입체크는 30초-1분, 테스트는 가장 오래 걸립니다. 이 구조에서 린트 실패는 즉시 피드백으로 돌아오고, 나머지 잡이 끝날 때까지 기다릴 필요가 없습니다.
 
-## Job Matrix로 중복을 줄이기
+---
 
-동일한 작업을 여러 런타임에서 반복해야 한다면 matrix가 가장 실용적입니다. 아래 구성은 Python 버전과 운영체제를 조합해 호환성을 검증합니다.
+## 점진적 엄격화 전략
 
-```yaml
-jobs:
-  test-matrix:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest]
-        python-version: ["3.10", "3.11", "3.12"]
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v6
-        with:
-          python-version: ${{ matrix.python-version }}
-      - run: pip install -r requirements.txt
-      - run: pytest -q
-```
+팀에 린트와 타입체크를 도입할 때 가장 현실적인 접근은 점진적 엄격화입니다.
 
-`fail-fast: false`를 켜면 한 조합이 실패해도 나머지 조합 결과를 끝까지 수집할 수 있습니다. 라이브러리 호환성 이슈를 찾는 단계에서는 이 설정이 원인 파악 속도를 높입니다.
+| 단계 | 린트 | 타입체크 | 기간 |
+| --- | --- | --- | --- |
+| 1단계 | 기본 규칙만 (E, F) | ignore_missing_imports | 2주 |
+| 2단계 | 확장 규칙 추가 (B, UP, SIM) | 새 모듈 strict | 1개월 |
+| 3단계 | 보안 규칙 포함 (S) | 전체 strict | 점진적 |
 
-## Secret 처리 원칙
+각 단계에서 CI 실패가 0이 되면 다음 단계로 넘어갑니다. 기존 코드의 문제는 별도 PR로 일괄 수정하고, 새 코드부터 엄격한 기준을 적용하는 방식이 팀 합의를 얻기 가장 쉽습니다.
 
-비밀값은 YAML 본문에 직접 넣지 않고 GitHub Secrets나 OIDC 기반 임시 자격 증명을 사용해야 합니다. 고정 토큰을 코드에 넣으면 회전, 감사, 권한 축소가 모두 어려워집니다.
-
-```yaml
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-    steps:
-      - uses: actions/checkout@v6
-      - name: Login to cloud with OIDC
-        run: ./scripts/oidc-login.sh
-      - name: Deploy
-        env:
-          API_BASE_URL: ${{ secrets.API_BASE_URL }}
-        run: ./scripts/deploy.sh
-```
-
-실무에서는 다음 기준을 함께 둡니다.
-
-- secret 이름은 목적 중심으로 명명해 누가 봐도 용도를 파악할 수 있게 합니다.
-- PR from fork에서는 secret이 기본적으로 주입되지 않으므로, 배포 잡을 분리하거나 조건문으로 차단합니다.
-- 로그에 비밀값이 노출되지 않도록 `set -x` 사용 구간을 제한하고, 민감 출력은 마스킹합니다.
-- 회전 주기를 문서화하고, 사용하지 않는 secret은 즉시 폐기합니다.
-
-## 운영 안정성을 높이는 추가 패턴
-
-- `concurrency`를 사용해 같은 브랜치의 중복 배포를 자동 취소하면 롤백 리스크를 줄일 수 있습니다.
-- 캐시 키는 잠금 파일(`poetry.lock`, `requirements.txt`) 해시와 연결해 오염된 캐시 재사용을 막습니다.
-- 배포 잡은 `environment` 보호 규칙과 reviewer 승인을 함께 걸어 사고 범위를 줄입니다.
-- 실패 알림은 채널 하나에 몰지 말고, 서비스 소유 팀 라우팅 기준으로 분리해야 대응 시간이 짧아집니다.
-
-이 구조를 먼저 잡아 두면 워크플로 파일이 길어져도 책임 경계가 무너지지 않고, CI/CD 품질을 지속적으로 개선하기 쉬워집니다.
-
-
-## 운영 체크포인트 보강
-
-워크플로를 길게 쓰는 것보다 더 중요한 것은 실패 원인을 빠르게 고립하는 구조입니다. 테스트 잡에서는 의존성 설치 시간을 측정하고, 배포 잡에서는 릴리스 노트와 커밋 SHA를 함께 남겨 추적성을 확보해야 합니다. 또한 `if: github.event_name == "pull_request"` 같은 조건식을 사용해 PR 검증과 main 배포를 분리하면 권한 오남용과 불필요한 실행 시간을 동시에 줄일 수 있습니다.
-
-```yaml
-- name: Record build metadata
-  run: |
-    echo "sha=${GITHUB_SHA}" >> build-info.txt
-    echo "ref=${GITHUB_REF}" >> build-info.txt
-```
-
-메타데이터 파일을 아티팩트로 보존해 두면 장애 회고에서 "어떤 실행 결과가 어느 커밋과 연결되는가"를 빠르게 확인할 수 있습니다.
-
-
-## 실패 분석 루틴
-
-테스트 자동화와 정적 검사는 "돌린다"보다 "실패를 재현한다"가 핵심입니다. 실패한 런에서는 로그 일부만 복사하지 말고, 실행한 Python 버전, 의존성 잠금 파일 해시, 실패 테스트 식별자(`-k`)를 함께 남겨야 다음 사람이 같은 조건으로 다시 실행할 수 있습니다. CI에서 실패한 테스트를 로컬에서 재현할 수 있어야 원인 분리가 빨라지고, flaky 테스트와 실제 회귀를 구분할 수 있습니다.
+`ruff check --statistics`로 현재 위반 현황을 파악하면 어떤 규칙을 먼저 활성화할지 판단하기 좋습니다.
 
 ```bash
-pytest -q -k "failing_test_name" --maxfail=1
-python -V
-pip freeze | sha256sum
+$ ruff check --statistics src/
+  128  F841  local variable is assigned but never used
+   45  E501  line too long
+   23  B006  mutable argument default
 ```
 
-이 정보를 PR 코멘트 템플릿에 포함시키면 리뷰 과정에서 추측성 토론이 줄고, 수정 범위를 더 정확히 결정할 수 있습니다.
+이 출력에서 가장 많은 위반부터 수정하면 효과가 큽니다.
+
+
+---
+
+## 자동 수정과 수동 검증의 균형
+
+린트 도구의 `--fix` 옵션은 편리하지만, CI에서 자동 수정을 적용해 커밋까지 만들면 의도하지 않은 변경이 PR에 섞일 수 있습니다. 실무에서는 다음 원칙을 따릅니다.
+
+- **로컬**: `ruff check --fix`와 `ruff format`으로 자동 수정 적용
+- **CI**: `ruff check`(fix 없이)와 `ruff format --check`로 검증만 수행
+
+만약 CI에서 자동 수정 후 커밋을 원한다면 다음 패턴을 사용할 수 있습니다.
+
+```yaml
+jobs:
+  auto-fix:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - run: pip install ruff
+      - run: ruff check --fix .
+      - run: ruff format .
+
+      - name: 변경사항 커밋
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git diff --quiet || (git add -A && git commit -m "style: auto-fix lint issues")
+          git push
+```
+
+이 패턴은 편리하지만 주의점이 있습니다. 자동 커밋이 들어오면 워크플로우가 다시 트리거될 수 있어 무한 루프가 생길 수 있습니다. `github-actions[bot]`의 토큰으로 만든 커밋은 기본적으로 워크플로우를 트리거하지 않으므로 보통 안전하지만, PAT를 사용하면 주의가 필요합니다.
+
+---
+
+## 커스텀 Ruff 규칙과 팀 표준
+
+팀 고유의 코딩 규칙이 있다면 Ruff의 설정으로 표현할 수 있습니다.
+
+```toml
+[tool.ruff.lint]
+# 팀 표준: 모든 public 함수에 docstring 필요
+select = ["D"]  # pydocstyle
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.isort]
+known-first-party = ["myapp"]
+force-single-line = true
+```
+
+또한 `ruff.toml`을 별도 파일로 관리하면 CI와 로컬에서 동일한 설정을 보장합니다. 설정 파일이 변경되면 CI에서 전체 검사를 다시 실행해야 하므로, paths 필터에 설정 파일도 포함하는 것을 잊지 마세요.
+
+```yaml
+on:
+  pull_request:
+    paths:
+      - "src/**"
+      - "pyproject.toml"
+      - "ruff.toml"  # 설정 변경도 검증 대상
+```
+
+---
+
+## 타입 검사 결과를 활용한 리팩토링
+
+Mypy는 단순한 검사 도구를 넘어, 리팩토링 안전망으로도 활용할 수 있습니다.
+
+```python
+# Before: Any 타입으로 숨겨진 버그
+def process_data(data):  # type: ignore
+    return data["key"]["nested"]  # KeyError 위험
+
+# After: 타입으로 계약을 명시
+from typing import TypedDict
+
+class NestedData(TypedDict):
+    nested: str
+
+class InputData(TypedDict):
+    key: NestedData
+
+def process_data(data: InputData) -> str:
+    return data["key"]["nested"]  # Mypy가 구조를 검증
+```
+
+타입 어노테이션을 추가하면 Mypy가 호출부에서의 타입 불일치를 잡아냅니다. 이는 테스트로는 발견하기 어려운 종류의 버그를 정적으로 차단합니다.
+
+### Mypy 엄격도 보고서
+
+현재 프로젝트의 타입 커버리지를 파악하려면 다음 명령을 사용합니다.
+
+```bash
+$ mypy src --txt-report mypy-report
+$ cat mypy-report/index.txt
+Module              Stmts   Miss  Cover
+--------------------------------------
+src.api.routes        45      3    93%
+src.core.models       80      0   100%
+src.legacy.utils     120     95    21%
+```
+
+이 보고서를 CI 아티팩트로 저장하면 시간에 따른 타입 커버리지 추세를 추적할 수 있습니다.
+
+---
+
+## 보안 린트 (Bandit/Ruff S 규칙)
+
+코드 보안 검사도 린트의 일부로 처리할 수 있습니다. Ruff의 `S` 규칙 그룹은 flake8-bandit의 규칙을 포함합니다.
+
+```toml
+[tool.ruff.lint]
+select = ["S"]  # 보안 규칙 활성화
+```
+
+자주 잡히는 보안 문제 예시입니다.
+
+| 규칙 | 내용 | 예시 |
+| --- | --- | --- |
+| S101 | assert 사용 | 프로덕션에서 -O 옵션으로 제거될 수 있음 |
+| S104 | 0.0.0.0 바인딩 | 의도하지 않은 외부 노출 |
+| S105 | 하드코딩된 비밀번호 | 변수명에 password 포함 |
+| S108 | /tmp 사용 | 심볼릭 링크 공격 가능 |
+| S301 | pickle 사용 | 역직렬화 공격 가능 |
+| S603 | subprocess 호출 | 커맨드 인젝션 위험 |
+
+보안 린트는 모든 문제를 잡아주지는 않지만, 가장 흔한 실수를 자동으로 방지합니다. 보안 팀의 코드 리뷰 부담을 줄이는 첫 단계입니다.
+
 
 ## 처음 질문으로 돌아가기
 
 - **Ruff는 왜 여러 도구를 하나로 줄이는 데 유용할까요?**
-  - 본문의 기준은 Lint와 Type Check를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - Ruff는 Flake8, isort, pycodestyle, pyflakes, flake8-bugbear 등 10개 이상의 도구 규칙을 하나의 Rust 바이너리에서 실행합니다. CI 설정이 `ruff check`와 `ruff format` 두 명령으로 단순해지고, 실행 속도는 기존 도구 대비 10-100배 빠릅니다. `--output-format github`로 PR diff에 인라인 어노테이션까지 표시할 수 있어, 별도 리포터 도구도 필요 없습니다.
 - **Mypy는 어느 시점부터 엄격 모드로 가져가는 편이 좋을까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 새 모듈은 처음부터 `strict`로 시작하고, 레거시 모듈은 `ignore_errors = true`에서 시작해 점진적으로 타입을 추가합니다. 전체 프로젝트에 즉시 strict를 거는 것은 수백 개의 에러와 팀의 의욕 저하를 동시에 만듭니다. `per-file-ignores`와 module overrides를 활용해 "새 코드는 엄격, 레거시는 점진적"이라는 현실적 전략을 써야 합니다.
 - **pre-commit은 왜 CI와 짝을 이뤄야 할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - pre-commit은 로컬에서 빠른 피드백을 주는 도구이고, CI는 강제 게이트입니다. 로컬 훅은 `--no-verify`로 건너뛸 수 있고, 설치하지 않은 개발자도 있을 수 있으므로, CI에서 동일한 검사를 한 번 더 실행해야 "통과하지 않으면 머지 불가"라는 규칙이 확실히 지켜집니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -329,5 +613,6 @@ pip freeze | sha256sum
 - [Mypy documentation](https://mypy.readthedocs.io/)
 - [pre-commit](https://pre-commit.com/)
 - [astral-sh/ruff-pre-commit](https://github.com/astral-sh/ruff-pre-commit)
+- [book-examples 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/github-actions-101/ko)
 
 Tags: GitHubActions, Lint, Ruff, Mypy, QualityGate

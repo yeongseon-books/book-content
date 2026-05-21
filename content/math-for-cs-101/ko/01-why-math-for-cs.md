@@ -404,5 +404,6 @@ for item in plan:
 - [Mathematical Foundations of CS - ACM](https://cacm.acm.org/magazines/2014/2/171688-mathematical-foundations-of-computer-science/)
 - [The Importance of Math in Programming - Dev.to](https://dev.to/codenameone/the-importance-of-math-in-programming-21k0)
 - [TheAlgorithms/Python GitHub repository](https://github.com/TheAlgorithms/Python)
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/math-for-cs-101/ko)
 
 Tags: Math, CS, Foundations, Learning, Beginner

@@ -22,9 +22,9 @@ last_reviewed: '2026-05-15'
 
 # SQL 101 (6/10): 서브쿼리와 CTE
 
-실전 SQL은 한 줄로 끝나지 않는 경우가 많습니다. 사용자별 주문 합계를 먼저 만들고, 그중 큰 금액만 골라 다시 사용자 정보와 붙이는 식으로 질문이 겹겹이 쌓입니다. 이때 한 문장 안에 모든 로직을 밀어 넣으면 읽는 사람도, 나중에 고치는 사람도 곧 길을 잃습니다.
-
 이 글은 SQL 101 시리즈의 여섯 번째 글입니다. 여기서는 서브쿼리와 CTE를 사용해 복잡한 질문을 단계로 나누고, 읽을 수 있는 SQL로 바꾸는 방법을 설명합니다.
+
+실전 SQL은 한 줄로 끝나지 않는 경우가 많습니다. 사용자별 주문 합계를 먼저 만들고, 그중 큰 금액만 골라 다시 사용자 정보와 붙이는 식으로 질문이 겹겹이 쌓입니다. 이때 한 문장 안에 모든 로직을 밀어 넣으면 읽는 사람도, 나중에 고치는 사람도 곧 길을 잃습니다.
 
 ## 먼저 던지는 질문
 
@@ -347,6 +347,242 @@ CTE는 쪼개기 도구이지만, 무조건 많이 쪼갠다고 좋아지지는 
 
 다음 글에서는 집계 결과를 각 행 옆에 다시 붙이는 윈도 함수를 다루겠습니다.
 
+
+## 실전 앵커: 서브쿼리와 CTE를 고르는 기준
+
+둘 다 같은 결과를 만들 수 있지만, 실무에서는 "재사용 범위"와 "리뷰 난이도"로 선택하는 편이 좋습니다.
+
+- 한 번만 쓰고 의미가 짧으면 인라인 서브쿼리
+- 여러 단계에서 재사용하면 CTE
+- 디버깅이 필요하면 단계별 CTE
+
+```sql
+WITH paid_orders AS (
+    SELECT *
+    FROM orders
+    WHERE status = 'paid'
+),
+customer_revenue AS (
+    SELECT customer_id, SUM(total_amount) AS revenue
+    FROM paid_orders
+    GROUP BY customer_id
+)
+SELECT *
+FROM customer_revenue
+WHERE revenue >= 100000;
+```
+
+## 실전 앵커: `IN` 대 `EXISTS`를 실행 계획으로 비교
+
+```sql
+-- IN
+SELECT c.customer_id
+FROM customers c
+WHERE c.customer_id IN (
+    SELECT o.customer_id
+    FROM orders o
+    WHERE o.status = 'paid'
+);
+
+-- EXISTS
+SELECT c.customer_id
+FROM customers c
+WHERE EXISTS (
+    SELECT 1
+    FROM orders o
+    WHERE o.customer_id = c.customer_id
+      AND o.status = 'paid'
+);
+```
+
+카디널리티가 큰 환경에서는 `EXISTS`가 조기 종료 특성 덕분에 더 유리한 경우가 많습니다. 결국 정답은 `EXPLAIN ANALYZE`로 확인해야 합니다.
+
+## 실전 앵커: 상관 서브쿼리 대체 전략
+
+상관 서브쿼리는 읽기 쉽지만 행마다 반복 실행될 수 있습니다.
+
+```sql
+-- 상관 서브쿼리
+SELECT o.order_id,
+       (SELECT SUM(oi.quantity * oi.unit_price)
+        FROM order_items oi
+        WHERE oi.order_id = o.order_id) AS amount
+FROM orders o;
+```
+
+데이터가 커지면 아래처럼 미리 집계해 JOIN하는 구조가 더 안정적입니다.
+
+```sql
+WITH item_sum AS (
+    SELECT order_id, SUM(quantity * unit_price) AS amount
+    FROM order_items
+    GROUP BY order_id
+)
+SELECT o.order_id, i.amount
+FROM orders o
+LEFT JOIN item_sum i ON i.order_id = o.order_id;
+```
+
+## 실전 앵커: CTE 디버깅 루틴
+
+복잡한 분석 SQL은 최종 결과만 보지 말고 CTE를 하나씩 단독 실행해 행 수를 확인합니다. 특히 각 단계에서 기본 키 유일성이 깨지는지 확인하면, 뒤쪽 JOIN 오류를 초기에 발견할 수 있습니다.
+
+
+## 심화 실습 시나리오: 쿼리 품질을 수치로 검증하기
+
+문장 길이가 길어질수록 SQL 품질은 느낌이 아니라 **측정 가능한 기준**으로 관리해야 합니다. 아래 절차는 어떤 주제의 SQL이든 그대로 적용할 수 있는 공통 루틴입니다.
+
+1. 입력 데이터 범위(기간, 상태, 대상 테넌트)를 명시합니다.
+2. 같은 조건으로 `COUNT(*)`를 먼저 실행해 모수 행 수를 기록합니다.
+3. 본 쿼리를 실행하고 결과 행 수와 합계 지표를 기록합니다.
+4. `EXPLAIN (ANALYZE, BUFFERS)`를 실행해 병목 노드를 확인합니다.
+5. 인덱스/조건식을 조정한 뒤 2~4를 다시 반복합니다.
+
+```sql
+-- 1) 모수 확인
+SELECT COUNT(*) AS base_rows
+FROM orders
+WHERE ordered_at >= DATE '2026-01-01'
+  AND ordered_at <  DATE '2026-02-01';
+
+-- 2) 본 쿼리(예시)
+SELECT
+    customer_id,
+    COUNT(*) AS order_count,
+    SUM(total_amount) AS revenue
+FROM orders
+WHERE ordered_at >= DATE '2026-01-01'
+  AND ordered_at <  DATE '2026-02-01'
+GROUP BY customer_id
+ORDER BY revenue DESC
+LIMIT 20;
+
+-- 3) 계획 확인
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT
+    customer_id,
+    COUNT(*) AS order_count,
+    SUM(total_amount) AS revenue
+FROM orders
+WHERE ordered_at >= DATE '2026-01-01'
+  AND ordered_at <  DATE '2026-02-01'
+GROUP BY customer_id;
+```
+
+이 과정을 습관화하면 "왜 느린지"를 추측하지 않고 설명할 수 있습니다. 특히 팀 협업에서는 성능 이슈를 재현 가능한 단위로 공유할 수 있다는 점이 중요합니다.
+
+## 심화 실습 시나리오: 조인·서브쿼리·CTE 선택 비교
+
+아래 세 방식은 결과가 같아 보이지만, 데이터 크기와 통계 상태에 따라 실행 계획이 크게 달라질 수 있습니다.
+
+```sql
+-- A. 직접 조인
+SELECT c.customer_id, SUM(o.total_amount) AS revenue
+FROM customers c
+JOIN orders o ON o.customer_id = c.customer_id
+WHERE o.status = 'paid'
+GROUP BY c.customer_id;
+```
+
+```sql
+-- B. 서브쿼리
+SELECT c.customer_id, x.revenue
+FROM customers c
+JOIN (
+    SELECT customer_id, SUM(total_amount) AS revenue
+    FROM orders
+    WHERE status = 'paid'
+    GROUP BY customer_id
+) x ON x.customer_id = c.customer_id;
+```
+
+```sql
+-- C. CTE
+WITH paid_orders AS (
+    SELECT customer_id, total_amount
+    FROM orders
+    WHERE status = 'paid'
+),
+revenue_by_customer AS (
+    SELECT customer_id, SUM(total_amount) AS revenue
+    FROM paid_orders
+    GROUP BY customer_id
+)
+SELECT c.customer_id, r.revenue
+FROM customers c
+JOIN revenue_by_customer r ON r.customer_id = c.customer_id;
+```
+
+실무에서 권장하는 방법은 "문법 취향"이 아니라 "검증 가능성"으로 고르는 것입니다. 변경이 자주 일어나는 쿼리는 CTE가 리뷰와 테스트에 유리하고, 단발성 쿼리는 인라인 구조가 간결할 수 있습니다.
+
+## 심화 실습 시나리오: 인덱스 전략과 유지비용
+
+인덱스는 조회 성능을 높이지만 쓰기 비용을 늘립니다. 그래서 읽기/쓰기 비율을 기준으로 설계해야 합니다.
+
+```sql
+-- 조회 패턴에 맞춘 합성 인덱스
+CREATE INDEX idx_orders_customer_status_created
+    ON orders (customer_id, status, created_at DESC);
+
+-- 자주 쓰는 상태값만 가볍게 다루는 부분 인덱스
+CREATE INDEX idx_orders_paid_created
+    ON orders (created_at DESC)
+WHERE status = 'paid';
+```
+
+인덱스를 추가한 뒤에는 반드시 아래를 확인합니다.
+
+- `INSERT`/`UPDATE` TPS가 과도하게 떨어지지 않는가
+- VACUUM/ANALYZE 주기가 비정상적으로 늘어나지 않는가
+- 실제 주요 쿼리에서 `Index Scan` 또는 `Bitmap Index Scan`으로 전환되었는가
+
+인덱스는 "있으면 좋은 옵션"이 아니라 **운영 비용이 있는 구조물**입니다. 성능 개선 수치와 유지 비용을 같이 기록해야 장기적으로 안정됩니다.
+
+## 심화 실습 시나리오: 트랜잭션 격리 수준 재현 데모
+
+분석 SQL이든 운영 SQL이든 동시성 환경에서는 격리 수준 이해가 필요합니다. 다음은 재현 가능한 기본 데모입니다.
+
+```sql
+-- 세션 A
+BEGIN;
+SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+SELECT COUNT(*) FROM inventory WHERE product_id = 10;
+
+-- 세션 B
+BEGIN;
+UPDATE inventory SET quantity = quantity - 1 WHERE product_id = 10;
+COMMIT;
+
+-- 세션 A에서 다시 실행
+SELECT COUNT(*) FROM inventory WHERE product_id = 10;
+COMMIT;
+```
+
+`READ COMMITTED`에서는 같은 트랜잭션 안에서도 두 번째 조회가 다른 스냅샷을 볼 수 있습니다. 반면 `REPEATABLE READ`로 바꾸면 시작 시점 스냅샷이 유지됩니다.
+
+```sql
+BEGIN;
+SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+SELECT SUM(total_amount) FROM orders WHERE status = 'paid';
+-- 다른 세션의 커밋 이후에도 동일 스냅샷 유지
+SELECT SUM(total_amount) FROM orders WHERE status = 'paid';
+COMMIT;
+```
+
+배치 지표 계산에서는 이 차이가 그대로 숫자 불일치로 나타납니다. 따라서 격리 수준을 문서화하고, 배치 쿼리에서 명시적으로 설정하는 것이 안전합니다.
+
+## 심화 실습 시나리오: 리뷰 체크리스트를 쿼리 옆에 남기기
+
+SQL 리뷰를 사람 기억에 의존하면 시간이 지나면서 기준이 흔들립니다. 아래 항목을 PR 본문이나 문서에 고정하면 품질 편차를 줄일 수 있습니다.
+
+- 질문의 비즈니스 정의가 SQL 조건으로 정확히 번역되었는가
+- 키 유일성(기본키/대체키)이 조인 경로에서 유지되는가
+- 기간 조건이 반열린 구간으로 작성되어 경계 오류가 없는가
+- `NULL` 처리 규칙이 명시되어 있는가
+- 결과 검증용 샘플 출력(행 수, 합계, 상위 N)이 첨부되었는가
+
+이 기준은 학습용 글에서도 그대로 유효합니다. SQL은 결국 데이터와 의사결정을 연결하는 도구이기 때문에, 쿼리 자체보다 **검증 가능한 사고 과정**을 남기는 습관이 더 오래 갑니다.
+
 ## 처음 질문으로 돌아가기
 
 - **서브쿼리는 언제 쓰고, CTE는 언제 더 나을까요?**
@@ -373,6 +609,8 @@ CTE는 쪼개기 도구이지만, 무조건 많이 쪼갠다고 좋아지지는 
 <!-- toc:end -->
 
 ## 참고 자료
+
+- [book-examples/sql-101 (ko)](https://github.com/yeongseon-books/book-examples/tree/main/sql-101/ko)
 
 - [PostgreSQL — Subqueries](https://www.postgresql.org/docs/current/functions-subquery.html)
 - [PostgreSQL — WITH Queries (CTE)](https://www.postgresql.org/docs/current/queries-with.html)

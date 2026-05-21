@@ -70,7 +70,7 @@ last_reviewed: '2026-05-15'
 - **Hypothesis**: 맞을 수도 틀릴 수도 있는 가설 문장입니다.
 - **Counterfactual**: 변화가 없었다면 어떻게 되었을지를 상상하는 비교 기준입니다.
 
-## EDA 기법 비교
+## 탐색적 데이터 분석 기법 비교
 
 EDA(Exploratory Data Analysis)는 모델링 전에 데이터의 모양을 이해하는 단계입니다. 어떤 기법을 언제 써야 하는지 정리하면 분석이 훨씬 구체적으로 바뀝니다.
 
@@ -83,7 +83,7 @@ EDA(Exploratory Data Analysis)는 모델링 전에 데이터의 모양을 이해
 
 예를 들어 분포를 볼 때는 평균보다 분위수를 먼저 확인하는 편이 안전합니다. 이상치가 많을 때 평균은 편향되기 쉽기 때문입니다.
 
-## Python matplotlib/seaborn 시각화 예제
+## 파이썬 matplotlib/seaborn 시각화 예제
 
 문제를 데이터 문제로 바꾸고 나면 다음 단계는 데이터를 실제로 확인하는 것입니다. Python의 matplotlib과 seaborn은 EDA에서 가장 많이 쓰는 시각화 라이브러리입니다.
 
@@ -115,7 +115,7 @@ plt.show()
 
 이 예제는 시간에 따른 변화, 분포의 모양, 변수 간 상관을 빠르게 확인합니다. 문제를 데이터 문제로 바꾸는 과정에서 이런 시각화는 가설을 빠르게 검증하게 해 줍니다.
 
-## EDA 체크리스트
+## 탐색적 데이터 분석 점검표
 
 문제를 데이터 문제로 바꾸기 전에 확인해야 할 항목을 체크리스트로 정리하면 실수를 줄일 수 있습니다.
 
@@ -137,7 +137,7 @@ plt.show()
 
 이 체크리스트는 문제를 데이터 문제로 바꾸는 과정에서 반복해서 확인해야 할 항목을 모은 것입니다. 실전에서는 이 목록을 부분적으로라도 문서화해 두는 편이 안전합니다.
 
-## Before / After
+## 전/후 비교
 
 **Before**: “왜 매출이 떨어졌지?”라는 질문을 받고 어디서부터 봐야 할지 막막합니다. 사람마다 떠올리는 지표와 비교 구간도 달라집니다.
 
@@ -253,7 +253,7 @@ population = paid subscribers (excluding trials)
 
 개선 후 문장에는 측정 조건과 행동 조건이 함께 있습니다. 이 구조가 있어야 분석 결과가 보고서로 끝나지 않고 운영 작업으로 이어집니다.
 
-### Python 예시: 프레이밍 문장을 검증 가능한 조건으로 변환
+### 파이썬 예시: 프레이밍 문장을 검증 가능한 조건으로 변환
 
 ```python
 import pandas as pd
@@ -284,6 +284,171 @@ print("trigger_action:", change <= -0.07)
 - 결과를 받을 의사결정자와 회의 주기를 명시했는가
 
 질문을 이렇게 구조화하면 "분석 잘하는 팀"이 아니라 "결정을 빠르게 만드는 팀"으로 전환됩니다. 데이터 과학의 성숙도는 코드 길이가 아니라, 문제 문장을 운영 가능한 규칙으로 바꾸는 능력에서 드러납니다.
+
+
+## 실무 심화: 분석 설계를 운영 가능한 루프로 만들기
+
+앞에서 다룬 개념을 실제 팀 운영으로 연결하려면, 분석 노트 수준을 넘어 반복 가능한 실험 루프를 만들어야 합니다. 핵심은 세 가지입니다. 첫째, 피처를 만드는 규칙이 코드와 문서에 동시에 남아야 합니다. 둘째, 시각화는 설명용 그림이 아니라 의사결정 트리거를 확인하는 점검 도구여야 합니다. 셋째, 모델 평가는 점수 한 줄이 아니라 행동 변화까지 포함해 해석해야 합니다.
+
+### 넘파이와 판다스로 만드는 피처 테이블 예시
+
+```python
+import numpy as np
+import pandas as pd
+
+orders = pd.read_csv('orders.csv', parse_dates=['ordered_at'])
+users = pd.read_csv('users.csv', parse_dates=['signup_at'])
+
+base = orders.merge(users[['user_id', 'signup_at', 'country']], on='user_id', how='left')
+base['days_since_signup'] = (base['ordered_at'] - base['signup_at']).dt.days.clip(lower=0)
+base['is_weekend'] = base['ordered_at'].dt.dayofweek.isin([5, 6]).astype(int)
+base['amount_log1p'] = np.log1p(base['amount'].clip(lower=0))
+
+agg = (
+    base.groupby('user_id', as_index=False)
+    .agg(
+        order_count=('order_id', 'count'),
+        avg_amount=('amount', 'mean'),
+        recent_amount=('amount', 'last'),
+        signup_age=('days_since_signup', 'max'),
+        weekend_ratio=('is_weekend', 'mean'),
+    )
+)
+
+print(agg.head())
+```
+
+이 예시는 원본 테이블을 그대로 쓰지 않고, 분석 목적에 맞는 사용자 단위 피처셋으로 변환합니다. `log1p` 같은 변환은 분포 왜곡을 완화하고, `weekend_ratio`처럼 행동 패턴 피처를 추가하면 단순 합계보다 설명력이 좋아지는 경우가 많습니다.
+
+### 맷플롯립으로 분포와 구간별 패턴 확인
+
+```python
+import matplotlib.pyplot as plt
+
+fig, ax = plt.subplots(1, 2, figsize=(12, 4))
+agg['avg_amount'].hist(bins=30, edgecolor='black', ax=ax[0])
+ax[0].set_title('평균 주문금액 분포')
+ax[0].set_xlabel('avg_amount')
+
+agg.sort_values('signup_age').reset_index(drop=True)['order_count'].rolling(100).mean().plot(ax=ax[1])
+ax[1].set_title('가입 경과일 기준 주문수 이동평균')
+ax[1].set_ylabel('rolling mean')
+
+plt.tight_layout()
+plt.show()
+```
+
+시각화의 목적은 "예쁜 차트"가 아니라 이상 신호를 빨리 찾는 것입니다. 분포가 한쪽으로 치우치면 로그 변환을 검토하고, 구간별 이동평균이 급변하면 세그먼트 분할 기준을 다시 정하는 식으로 다음 행동을 결정합니다.
+
+### sklearn 파이프라인으로 전처리와 모델을 한 번에 관리
+
+```python
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.impute import SimpleImputer
+from sklearn.linear_model import LogisticRegression
+
+num_cols = ['order_count', 'avg_amount', 'recent_amount', 'signup_age', 'weekend_ratio']
+cat_cols = ['country']
+
+numeric = Pipeline([
+    ('imputer', SimpleImputer(strategy='median')),
+    ('scaler', StandardScaler()),
+])
+
+categorical = Pipeline([
+    ('imputer', SimpleImputer(strategy='most_frequent')),
+    ('onehot', OneHotEncoder(handle_unknown='ignore')),
+])
+
+preprocess = ColumnTransformer([
+    ('num', numeric, num_cols),
+    ('cat', categorical, cat_cols),
+])
+
+model = Pipeline([
+    ('preprocess', preprocess),
+    ('clf', LogisticRegression(max_iter=1000, class_weight='balanced')),
+])
+```
+
+파이프라인을 쓰면 학습과 추론 경로가 동일해져서 재현성이 올라갑니다. "노트북에서는 되는데 배치에서는 안 된다" 같은 문제를 줄이는 가장 확실한 방법 중 하나입니다.
+
+### 간단한 A/B 테스트 설계 템플릿
+
+실험 설계는 모델링 못지않게 중요합니다. 아래 템플릿은 마케팅 메시지 개선 같은 실무 시나리오에서 바로 쓸 수 있습니다.
+
+| 항목 | 설계 예시 |
+| --- | --- |
+| 가설 | 신규 온보딩 메시지를 바꾸면 7일 재방문율이 증가합니다. |
+| 모집단 | 지난 14일 내 가입한 신규 사용자(사내 계정 제외) |
+| 무작위 배정 | user_id 해시 기준 50:50 |
+| 1차 지표 | 7일 재방문율 |
+| 가드레일 지표 | 고객센터 문의율, 결제 실패율 |
+| 실험 기간 | 최소 2주 또는 표본 수 도달 시점 |
+| 중지 조건 | 가드레일 지표 악화가 기준 임계치 초과 |
+
+A/B 테스트에서 가장 흔한 실수는 결과를 너무 빨리 확정하는 것입니다. 중간 결과를 여러 번 들여다보는 경우, 사전에 정한 중지 규칙과 분석 계획을 문서로 고정해 두지 않으면 우연한 변동을 효과로 오해할 수 있습니다.
+
+### 운영 체크포인트
+
+- 피처 생성 규칙을 코드와 문서에 동시에 남깁니다.
+- EDA 그래프마다 "이 그래프를 보고 어떤 결정을 내릴지"를 한 줄로 적습니다.
+- 모델 점수와 함께 비용, 지연, 운영 복잡도를 같이 평가합니다.
+- A/B 테스트는 가설, 표본, 중지 규칙을 실험 시작 전에 고정합니다.
+- 결과 발표 문서는 "무엇을 배웠고 다음 주에 무엇을 바꿀지"로 마무리합니다.
+
+
+
+### 추가 실전 예시: 파이프라인 결과를 실험 설계로 연결하기
+
+아래 예시는 피처셋을 만든 뒤 바로 끝내지 않고, 실제 실험 대상으로 넘기는 최소 흐름을 보여 줍니다. 분석 결과를 운영으로 연결하는 팀은 보통 이런 형태의 전환 코드를 갖고 있습니다.
+
+```python
+import pandas as pd
+
+scored = pd.read_csv('scored_users.csv')
+scored = scored.sort_values('risk_score', ascending=False)
+
+eligible = scored.query('is_marketing_opt_in == 1 and recent_complaint == 0').copy()
+eligible['bucket'] = (eligible.index % 2).map({0: 'A', 1: 'B'})
+
+plan = eligible[['user_id', 'risk_score', 'bucket']].head(5000)
+print(plan['bucket'].value_counts())
+print(plan.head())
+```
+
+이 단계에서 중요한 것은 점수보다 규칙입니다. 제외 조건, 배정 규칙, 실험 크기를 사전에 고정해야 실험 이후 해석 충돌이 줄어듭니다.
+
+### 추가 점검표
+
+- 데이터 추출 쿼리와 피처 생성 코드의 버전을 함께 기록합니다.
+- 모델 점수 분포를 분위수로 확인하고, 상위 구간 편향을 검토합니다.
+- 실험군 배정 후 집단 균형(국가, 디바이스, 유입채널)을 반드시 확인합니다.
+- 실험 종료 전에는 중간 지표를 의사결정 근거로 확정하지 않습니다.
+
+
+
+### 보강 메모: 결과 해석 전 확인할 최소 통제
+
+분석 결과를 공유하기 전에 최소 통제를 거치면 해석 품질이 크게 안정됩니다. 기간 경계가 바뀌지 않았는지, 결측치 처리 규칙이 버전 간 동일한지, 실험군 배정이 무작위로 유지됐는지 세 가지는 반드시 확인하는 편이 좋습니다.
+
+```python
+import pandas as pd
+
+report = pd.read_csv('experiment_daily_report.csv')
+checks = {
+    'date_min': str(report['date'].min()),
+    'date_max': str(report['date'].max()),
+    'null_rate': float(report.isna().mean().mean()),
+    'groups': report['bucket'].value_counts(normalize=True).to_dict(),
+}
+print(checks)
+```
+
+이 기록은 화려하지 않지만, 다음 회차에서 "같은 기준으로 다시 봤는가"를 보장하는 가장 실용적인 안전장치입니다.
+
 
 ## 처음 질문으로 돌아가기
 
@@ -316,5 +481,6 @@ print("trigger_action:", change <= -0.07)
 - [Cassie Kozyrkov — How to Ask Smart Questions](https://kozyrkov.medium.com/)
 - [Stitch Fix — A/B Testing Lessons](https://multithreaded.stitchfix.com/)
 - [Andrew Gelman — Statistical Modeling Blog](https://statmodeling.stat.columbia.edu/)
+- [book-examples — data-science-101/ko](https://github.com/yeongseon-books/book-examples/tree/main/data-science-101/ko)
 
 Tags: DataScience, ProblemFraming, Metrics, Workflow, Beginner

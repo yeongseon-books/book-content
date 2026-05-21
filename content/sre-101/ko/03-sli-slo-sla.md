@@ -223,12 +223,198 @@ def budget_summary(success, total, target):
 | 30일 rolling window인가, 달력 월 기준인가 | 같은 99.9%라도 해석해야 할 위험이 달라집니다. |
 | 유지보수 시간을 제외했는가 | 내부 목표와 외부 약속 문서는 예외 처리 방식이 다를 수 있습니다. |
 
+
+## 실무 SLI 정의 예시 (서비스별)
+
+SLI는 서비스마다 다릅니다. 같은 공식이라도 무엇을 성공으로 볼지, 어떤 요청을 포함할지에 따라 지표의 의미가 완전히 달라집니다. 다음은 서비스 유형별 SLI 정의 예시입니다.
+
+### API 서비스
+
+```python
+sli_api = {
+    "name": "api_availability",
+    "formula": "http_2xx / (http_total - http_4xx)",
+    "source": "ingress controller logs",
+    "note": "클라이언트 오류(4xx)는 서비스 책임이 아니므로 제외",
+}
+```
+
+4xx를 제외하는 이유가 중요합니다. 클라이언트가 잘못된 요청을 보낸 것은 서비스의 신뢰성 문제가 아닙니다. SLI 공식을 정할 때 이런 경계를 명확히 해야 팀 간 논쟁이 줄어듭니다.
+
+### 데이터 파이프라인
+
+```python
+sli_pipeline = {
+    "name": "pipeline_freshness",
+    "formula": "current_time - last_successful_run_time < threshold",
+    "source": "Airflow metadata DB",
+    "threshold": "15분",
+    "note": "데이터가 15분 이상 지연되면 신선하지 않은 것으로 판단",
+}
+```
+
+데이터 파이프라인은 HTTP 응답으로 측정할 수 없는 경우가 많습니다. 대신 데이터 신선도(freshness)를 SLI로 사용합니다. 마지막 성공 실행 시각과 현재 시각의 차이가 임계값을 넘으면 SLO 위반입니다.
+
+### 저장소 서비스
+
+```python
+sli_storage = {
+    "name": "storage_durability",
+    "formula": "verified_objects / total_objects",
+    "source": "integrity check batch job",
+    "frequency": "daily",
+    "note": "일 1회 무결성 검증 배치에서 확인",
+}
+```
+
+### PromQL 기반 SLI 계산
+
+실제 운영 환경에서 SLI를 PromQL로 정의하면 자동 계산과 알림 연결이 가능합니다.
+
+```promql
+# API 가용성 SLI (30일 rolling window)
+sum(increase(http_requests_total{status=~"2..",service="payments"}[30d]))
+/
+(
+  sum(increase(http_requests_total{service="payments"}[30d]))
+  -
+  sum(increase(http_requests_total{status=~"4..",service="payments"}[30d]))
+)
+```
+
+```promql
+# Latency SLI: 300ms 이내 응답 비율
+sum(increase(http_request_duration_seconds_bucket{le="0.3",service="search"}[30d]))
+/
+sum(increase(http_request_duration_seconds_count{service="search"}[30d]))
+```
+
+이 쿼리는 30일 동안 검색 서비스에서 300ms 이내에 응답한 요청의 비율을 계산합니다. 이 값이 SLO 목표(예: 99%) 아래로 떨어지면 에러 버짓이 소진됩니다.
+
+## SLO 문서 실전 템플릿
+
+SLO를 운영 가능하게 만들려면 목표 수치 외에 여러 정보를 함께 문서화해야 합니다. 다음은 실무에서 바로 쓸 수 있는 SLO 문서 템플릿입니다.
+
+```yaml
+# SLO Document: Payments API
+service: payments-api
+version: "2026-05-01"
+owner: payments-team
+approver: platform-lead
+
+slis:
+  - name: availability
+    formula: "http_2xx / (http_total - http_4xx)"
+    source: "ingress controller access logs"
+    
+  - name: latency
+    formula: "requests_under_300ms / total_requests"
+    source: "Prometheus histogram"
+
+slos:
+  - sli: availability
+    target: 99.9%
+    window: 30d (rolling)
+    consequence:
+      warning: "소진 50% → 배포 리뷰 강화"
+      critical: "소진 80% → 배포 freeze"
+      violated: "소진 100% → 전면 안정화, 포스트모템"
+    
+  - sli: latency
+    target: 99.0%
+    window: 30d (rolling)
+    threshold: "p99 < 300ms"
+    consequence:
+      warning: "p99 500ms 초과 → 성능 분석"
+      critical: "p99 1초 초과 → 긴급 대응"
+
+error_budget:
+  availability:
+    monthly_requests: 10_000_000
+    allowed_errors: 10_000
+    
+  latency:
+    monthly_requests: 10_000_000
+    allowed_slow: 100_000
+
+review:
+  frequency: weekly
+  participants: [sre-lead, payments-lead, product-manager]
+  dashboard: "https://grafana.internal/d/payments-slo"
+```
+
+이 템플릿의 핵심은 목표 수치만 적는 것이 아니라, 위반 시 행동(consequence)과 리뷰 일정(review)까지 함께 명시하는 것입니다. 이 구조가 있어야 SLO가 문서에서 멈추지 않고 운영 판단으로 이어집니다.
+
+## SLA 계약서에 들어가야 할 핵심 항목
+
+SLA는 법적 구속력이 있는 외부 약속입니다. 기술팀이 내부적으로 관리하는 SLO와 달리, SLA는 법무팀, 영업팀과 함께 만들어야 합니다. 다음은 SLA 계약서에 반드시 포함해야 할 항목입니다.
+
+| 항목 | 설명 | 예시 |
+| --- | --- | --- |
+| 서비스 범위 | SLA가 적용되는 서비스와 기능 | "결제 API의 POST /payments 엔드포인트" |
+| 측정 방법 | 가용성을 어떻게 계산하는지 | "5분 단위 성공 응답 비율, 모니터링 시스템 기준" |
+| 목표 수치 | 보장하는 서비스 수준 | "월간 99.5% 가용성" |
+| 제외 조건 | SLA에서 제외되는 상황 | "정기 유지보수, 고객 네트워크 문제, 불가항력" |
+| 보상 정책 | 위반 시 고객에게 제공하는 보상 | "99.5% 미달 시 월 요금 10% 크레딧" |
+| 보고 주기 | SLA 달성 여부를 보고하는 빈도 | "월 1회, 고객 포털에서 확인 가능" |
+| 분쟁 해결 | 측정 결과 불일치 시 절차 | "양측 합의된 제3자 모니터링 기준 적용" |
+
+```python
+# SLA 보상 계산 예시
+def calculate_credit(monthly_fee, availability, sla_tiers):
+    """
+    SLA 위반 시 크레딧 계산
+    sla_tiers: [(threshold, credit_pct), ...]
+    """
+    for threshold, credit_pct in sorted(sla_tiers, reverse=True):
+        if availability < threshold:
+            return monthly_fee * credit_pct
+    return 0
+
+sla_tiers = [
+    (0.995, 0.10),  # 99.5% 미달 → 10% 크레딧
+    (0.990, 0.25),  # 99.0% 미달 → 25% 크레딧
+    (0.950, 0.50),  # 95.0% 미달 → 50% 크레딧
+]
+
+# 이번 달 가용성 99.3%, 월 요금 100만원
+credit = calculate_credit(1_000_000, 0.993, sla_tiers)
+print(f"보상 크레딧: ₩{credit:,.0f}")  # ₩100,000
+```
+
+SLA의 목표 수치는 반드시 내부 SLO보다 낮게 설정해야 합니다. 내부적으로 99.9%를 목표로 운영하고, 외부에는 99.5%를 약속하면 버퍼가 생깁니다. 이 버퍼가 없으면 SLO를 약간만 놓쳐도 바로 SLA 위반으로 이어져 보상이 발생합니다.
+
+## SLI/SLO 도입 시 자주 하는 실수와 대응
+
+| 실수 | 왜 문제인가 | 대응 방법 |
+| --- | --- | --- |
+| 모든 API에 동일한 SLO 적용 | 중요도가 다른 서비스를 같은 기준으로 관리 | 핵심 경로와 부수 경로를 분리하여 차등 적용 |
+| SLO를 만들고 리뷰하지 않음 | 문서만 존재하고 운영에 반영 안 됨 | 주간 SLO 리뷰 미팅 필수화 |
+| SLA 수치를 SLO와 동일하게 설정 | 내부 목표 미달 시 바로 보상 발생 | SLA < SLO로 버퍼 확보 |
+| 측정 기간을 명시하지 않음 | 같은 수치도 해석이 달라짐 | 30일 rolling window 명시 |
+| SLI 정의에 데이터 소스 누락 | 숫자 재현 불가, 팀 간 논쟁 발생 | 쿼리문과 데이터 소스를 함께 기록 |
+
 ## 이 코드에서 먼저 봐야 할 점
 
 - SLI는 지표 정의와 데이터 출처를 함께 가져야 합니다.
 - SLO는 목표 수치만이 아니라 기간과 오너를 포함해야 합니다.
 - SLA는 외부 약속이므로 보상과 예외 조항이 빠지면 안 됩니다.
 - 위반 판정과 보고 형식까지 있어야 숫자가 실제 운영에 쓰입니다.
+
+
+## SLO 리뷰 미팅 운영법
+
+SLO 문서를 만들어 놓고 아무도 보지 않는다면 그 문서는 이미 죽은 것입니다. SLO를 살려 두려면 정기적인 리뷰 미팅이 필요합니다.
+
+**주간 SLO 리뷰 체크리스트:**
+
+- [ ] 지난 7일간 각 SLI의 실제 달성률을 확인했는가?
+- [ ] 에러 버짓 소진 속도(burn rate)를 확인했는가?
+- [ ] SLO 위반이 있었다면 원인을 파악했는가?
+- [ ] 다음 주 예정된 배포가 버짓에 미칠 영향을 예측했는가?
+- [ ] 액션 아이템이 있다면 오너와 기한을 정했는가?
+
+리뷰 미팅은 15-20분이면 충분합니다. 대시보드를 함께 보면서 "지금 괜찮은가?" → "괜찮지 않다면 왜인가?" → "무엇을 할 것인가?" 순서로 대화합니다. 이 습관이 SLO를 문서에서 운영 도구로 전환시킵니다.
 
 ## 여기서 자주 헷갈립니다
 
@@ -293,5 +479,6 @@ SLI, SLO, SLA는 비슷한 약어가 아니라 서로 다른 책임층입니다.
 - [Implementing SLOs - Google SRE Workbook](https://sre.google/workbook/implementing-slos/)
 - [SLI vs SLO vs SLA - Atlassian](https://www.atlassian.com/incident-management/kpis/sla-vs-slo-vs-sli)
 - [SLA, SLO, SLI - DigitalOcean](https://www.digitalocean.com/community/tutorials/what-is-sla-slo-sli)
+- [SRE 101 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/sre-101/ko)
 
 Tags: SRE, SLI, SLO, SLA, Reliability

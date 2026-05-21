@@ -458,6 +458,76 @@ def can_access(ctx: Context) -> bool:
 보안은 단발성 프로젝트가 아니라 운영 루프입니다. 같은 점검을 반복해도 기준이 유지될 때 품질이 올라갑니다.
 
 
+## 접근 제어 매트릭스와 승인 체계
+
+권한 최소화는 정책 파일보다 승인 프로세스에서 자주 무너집니다. 아래 매트릭스처럼 요청-승인-만료를 함께 설계해야 합니다.
+
+| 권한 유형 | 요청자 | 승인자 | 기본 만료 | 감사 이벤트 |
+| --- | --- | --- | --- | --- |
+| 운영 조회 권한 | 개발자 | 팀 리더 | 30일 | `permission_granted` |
+| 운영 변경 권한 | 운영 담당 | 보안 관리자 | 4시간 | `breakglass_granted` |
+| 데이터 내보내기 권한 | 데이터 분석가 | DPO/보안 | 1회성 | `sensitive_export` |
+
+권한 부여 행위 자체가 보안 이벤트입니다. 따라서 단순 승인 기록이 아니라 사유, 만료, 재검토 시점을 함께 남겨야 합니다.
+
+## 네트워크 방화벽 최소 권한 예시
+
+```text
+allow app-subnet -> db-subnet tcp/5432
+allow bastion -> app-subnet tcp/22 (JIT only)
+deny any -> db-subnet any
+```
+
+애플리케이션 인가가 잘 되어도 네트워크 경계가 열려 있으면 측면 이동이 쉬워집니다. 계층별 최소 권한을 같이 적용해야 폭발 반경이 줄어듭니다.
+
+
+## 권한 최소화 도입 로드맵
+
+권한 최소화는 한 번에 완성되지 않습니다. 단계적 도입이 현실적입니다.
+
+1. 현황 수집: 현재 역할, 정책, 사용 이력을 시각화합니다.
+2. 과권한 제거: 사용되지 않은 권한부터 제거합니다.
+3. 임시 권한화: 상시 관리자 권한을 만료형 권한으로 전환합니다.
+4. 자동 회수: 만료 이벤트 기반 회수와 경보를 자동화합니다.
+5. 분기 회고: 재발 패턴을 정책 템플릿으로 반영합니다.
+
+## 접근 제어 실패 패턴
+
+- 팀 확장 시 역할 템플릿 없이 개별 예외만 누적.
+- 프로젝트 종료 후 서비스 계정 폐기 누락.
+- 비상 권한 사용 후 회수 확인 생략.
+- 승인 사유 없는 자동 부여 스크립트 확장.
+
+이 패턴을 정기 점검 항목에 넣으면 권한 부채를 빠르게 줄일 수 있습니다.
+
+
+## 접근 제어 운영 지표
+
+- 미사용 권한 제거율(월간)
+- 임시 권한 만료 준수율
+- 권한 요청 승인 리드타임
+- 비상 권한 사용 건수와 사유 분포
+
+지표가 있어야 권한 최소화가 선언이 아니라 운영 활동이 됩니다.
+
+
+## 부록: 운영 리뷰 메모
+
+운영 회고에서 다음 네 가지를 매번 확인합니다.
+
+1. 이번 분기 가장 큰 위험이 무엇이었는가.
+2. 통제가 실제로 작동했는가.
+3. 탐지와 대응 시간이 목표를 충족했는가.
+4. 다음 분기 우선 개선 항목은 무엇인가.
+
+짧은 메모라도 반복해서 남기면 보안 품질의 추세를 읽을 수 있습니다.
+
+
+## 부록: 권한 리뷰 원칙
+
+권한 리뷰는 사용자 단위가 아니라 역할 단위로 시작하고, 예외 권한은 만료일을 기준으로 별도 트래킹합니다. 이 원칙만 지켜도 권한 부채 증가 속도를 크게 늦출 수 있습니다.
+
+
 ## 처음 질문으로 돌아가기
 
 - **권한 최소화 원칙은 정확히 무엇을 뜻할까요?**
@@ -489,5 +559,7 @@ def can_access(ctx: Context) -> bool:
 - [AWS — IAM Best Practices](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html)
 - [Kubernetes — RBAC Authorization](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)
 - [Google — BeyondCorp Zero Trust](https://cloud.google.com/beyondcorp)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/information-security-101/ko)
 
 Tags: Computer Science, Security, LeastPrivilege, IAM, AccessControl, ZeroTrust

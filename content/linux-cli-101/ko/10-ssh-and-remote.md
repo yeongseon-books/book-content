@@ -23,9 +23,10 @@ seo_description: SSH 접속, 키 인증, scp와 rsync를 통한 원격 작업의
 
 # Linux CLI 101 (10/10): SSH와 원격 서버 접속
 
+이 글은 Linux CLI 101 시리즈의 마지막 글입니다.
+
 개발한 코드를 서버에 배포하고, 서버 로그를 확인하고, 데이터베이스에 접속하는 일은 모두 원격 접속에서 시작됩니다. SSH는 이 모든 원격 작업의 기반입니다.
 
-이 글은 Linux CLI 101 시리즈의 마지막 글입니다.
 
 ## 먼저 던지는 질문
 
@@ -368,6 +369,229 @@ kill_gracefully() {
 
 함수 단위로 쪼개면 시나리오별 검증이 가능해집니다. 예를 들어 종료 신호가 정상 처리되는지, 남은 프로세스가 있는지, 재시작 로직이 중복 실행되는지 등을 독립적으로 점검할 수 있습니다.
 
+## 실무 시나리오: SSH 운영 표준과 자동화 접점
+
+SSH를 "원격 접속 명령"으로만 이해하면 운영 자동화와 보안 정책이 분리됩니다. 실무에서는 SSH를 인증, 접속 제어, 파일 전송, 원격 실행, 감사 가능한 기록 체계로 함께 봐야 합니다.
+
+### 접속 전 기본 점검
+
+```bash
+ssh -V
+ls -ld ~/.ssh
+ls -l ~/.ssh
+
+# 예상 출력 일부
+# OpenSSH_9.6p1, OpenSSL 3.0.13
+# drwx------ 2 user user 4096 May 21 12:01 /home/user/.ssh
+# -rw------- 1 user user  411 May 21 12:01 id_ed25519
+```
+
+권한이 느슨하면 SSH가 키 사용을 거부하므로, 연결 문제를 네트워크 탓으로 보기 전에 파일 권한부터 확인해야 합니다.
+
+### 접속 디버깅: verbose 로그 활용
+
+```bash
+ssh -v prod-server
+
+# 출력에서 확인할 포인트
+# debug1: Offering public key: /home/user/.ssh/id_ed25519
+# debug1: Server accepts key: /home/user/.ssh/id_ed25519
+# debug1: Authentication succeeded (publickey).
+```
+
+`Permission denied (publickey)` 상황에서 가장 빠른 진단 방법입니다.
+
+### ~/.ssh/config를 정책 문서처럼 쓰기
+
+```sshconfig
+Host prod-server
+    HostName 10.0.1.50
+    User deploy
+    Port 2222
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes
+    ServerAliveInterval 30
+    ServerAliveCountMax 3
+
+Host bastion
+    HostName 203.0.113.10
+    User jump
+
+Host internal-api
+    HostName 10.10.2.15
+    User deploy
+    ProxyJump bastion
+```
+
+설정 파일은 편의 기능을 넘어, 팀의 접속 방식을 표준화하는 문서 역할을 합니다.
+
+### 원격 명령과 파이프 체인
+
+```bash
+ssh prod-server "journalctl -u my-api --since '10 min ago' --no-pager"   | grep -E 'ERROR|CRITICAL|timeout|5[0-9]{2}'   | tee /tmp/prod-api-errors.txt
+```
+
+원격 출력도 로컬 파이프라인에 결합할 수 있어, 중앙 분석 스크립트를 만들기 좋습니다.
+
+### 파일 동기화 전략: scp vs rsync
+
+```bash
+# 단일 파일 전송
+scp dist/app.tar.gz prod-server:/opt/releases/
+
+# 변경분만 동기화
+rsync -avz --delete dist/ prod-server:/opt/my-api/current/
+```
+
+`--delete`는 원격의 불필요 파일을 정리해 상태를 맞추지만, 잘못된 경로에서 실행하면 큰 사고가 납니다. dry-run(`--dry-run`)으로 먼저 검증하세요.
+
+### SSH 터널로 내부 서비스 접근
+
+```bash
+# 원격 DB를 로컬 5432로 포워딩
+ssh -L 5432:127.0.0.1:5432 prod-server
+
+# 다른 터미널에서 접속
+psql -h 127.0.0.1 -p 5432 -U appuser appdb
+```
+
+운영망 DB를 직접 공개하지 않고도 안전하게 점검할 수 있습니다.
+
+### server-side sshd 설정 핵심
+
+```text
+# /etc/ssh/sshd_config 주요 예시
+PasswordAuthentication no
+PubkeyAuthentication yes
+PermitRootLogin no
+AllowUsers deploy ops
+```
+
+설정 변경 후에는 반드시 서비스 재시작과 로그 확인이 필요합니다.
+
+```bash
+sudo systemctl restart sshd
+sudo systemctl status sshd --no-pager
+sudo journalctl -u sshd -n 40 --no-pager
+```
+
+### 원격 운영 스크립트 예시
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+host="prod-server"
+svc="my-api"
+
+ssh "$host" "systemctl is-active --quiet $svc"
+ssh "$host" "systemctl status $svc --no-pager | sed -n '1,10p'"
+ssh "$host" "journalctl -u $svc -n 50 --no-pager | grep -E 'ERROR|CRITICAL|Failed' || true"
+```
+
+이 방식은 사람이 직접 SSH에 들어가 수동 점검하는 시간을 줄이고, 점검 결과 형식을 표준화합니다.
+
+## 운영 점검 플레이북
+
+실무에서 CLI 지식은 "명령을 외우는 능력"보다 "실수 가능성을 줄이는 절차"로 드러납니다. 아래 플레이북은 작업 전에 위험을 줄이고, 작업 후 검증을 빠뜨리지 않기 위한 최소 절차입니다.
+
+### 1) 작업 전 컨텍스트 확인
+
+```bash
+whoami
+hostname
+pwd
+date
+
+# 예상 출력
+# deploy
+# prod-api-01
+# /opt/my-app
+# Thu May 21 15:24:18 KST 2026
+```
+
+같은 명령이라도 서버와 경로가 다르면 결과가 완전히 달라집니다. 컨텍스트 확인은 사소해 보이지만 잘못된 환경 조작을 막는 첫 방어선입니다.
+
+### 2) 영향 범위 먼저 출력
+
+```bash
+# 예시: 후보만 확인
+find ./target -type f -name '*.log' -mtime +7 -print
+```
+
+삭제·이동·권한 변경처럼 파괴적일 수 있는 작업은 항상 후보 목록 출력이 선행되어야 합니다. "실행 전에 눈으로 검토"가 자동화 품질의 핵심입니다.
+
+### 3) 파이프 체인으로 증거를 압축
+
+```bash
+journalctl -u my-api --since '20 min ago' --no-pager   | grep -E 'ERROR|CRITICAL|timeout|5[0-9]{2}'   | awk '{print $1, $2, $3, $NF}'   | sort   | uniq -c   | sort -nr
+```
+
+`grep -E` 정규식은 노이즈를 줄이는 첫 단계입니다. 빈도 집계(`uniq -c`)까지 연결하면 우선순위를 빠르게 정할 수 있습니다.
+
+### 4) systemd 상태와 애플리케이션 로그를 함께 확인
+
+```bash
+systemctl status my-api --no-pager | sed -n '1,15p'
+journalctl -u my-api -n 80 --no-pager
+```
+
+프로세스가 살아 있어도 서비스가 실패 상태일 수 있고, 반대로 서비스는 active인데 내부 오류가 계속 발생할 수 있습니다. 두 관점을 동시에 봐야 원인 추적이 정확해집니다.
+
+### 5) Bash 스크립트로 반복 점검 표준화
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+svc="my-api"
+window='10 min ago'
+
+printf '[INFO] host=%s user=%s time=%s
+' "$(hostname)" "$(whoami)" "$(date '+%F %T')"
+
+if systemctl is-active --quiet "$svc"; then
+  echo '[PASS] service active'
+else
+  echo '[FAIL] service inactive'
+fi
+
+journalctl -u "$svc" --since "$window" --no-pager   | grep -E 'ERROR|CRITICAL|timeout|Failed' || true
+```
+
+자동화의 목적은 사람이 바뀌어도 같은 품질의 점검 결과를 얻는 것입니다. 이 원칙이 지켜지면 장애 대응 시간과 커뮤니케이션 비용이 함께 줄어듭니다.
+
+
+## 실전 점검 로그 예시
+
+아래 예시는 실제 운영에서 자주 보는 "점검 출력 형태"를 축약한 것입니다. 중요한 것은 특정 명령을 그대로 복사하는 것이 아니라, 출력을 근거로 다음 판단을 연결하는 습관입니다.
+
+```bash
+# 서비스 상태 + 최근 오류를 한 번에 수집
+systemctl is-active my-api
+journalctl -u my-api --since '5 min ago' --no-pager   | grep -E 'ERROR|CRITICAL|timeout|Failed'   | tail -n 20
+
+# 예상 출력
+# active
+# 2026-05-21 15:31:10 ERROR timeout while calling payment API
+# 2026-05-21 15:31:12 CRITICAL worker exited unexpectedly
+```
+
+```bash
+# 프로세스/포트/파일 핸들 점검
+ps -ef | grep -E 'my-api|gunicorn' | grep -v grep
+ss -lntp | grep -E ':8080|:80|:443'
+lsof -p "$(pgrep -f my-api | head -n 1)" | wc -l
+
+# 예상 출력 예시
+# deploy 18231 1  ... /opt/my-api/current/bin/start.sh
+# LISTEN 0 4096 0.0.0.0:8080 ... users:(("python3",pid=18231,fd=12))
+# 412
+```
+
+이런 출력들을 시계열로 저장해 두면 재발 시 비교가 쉬워지고, "지금이 평소와 어떻게 다른가"를 빠르게 설명할 수 있습니다. 결국 CLI 실무 역량은 명령 자체보다 **증거 기반 판단 루틴**을 안정적으로 반복하는 능력입니다.
+
+
 ## 처음 질문으로 돌아가기
 
 - **SSH는 Telnet 대신 왜 기본 원격 접속 수단이 되었을까요?**
@@ -400,4 +624,5 @@ kill_gracefully() {
 - [GitHub - Connecting with SSH](https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
 - [rsync man page](https://man7.org/linux/man-pages/man1/rsync.1.html)
 
+- book-examples (linux-cli-101): https://github.com/yeongseon-books/book-examples/tree/main/linux-cli-101/ko
 Tags: Linux, SSH, Remote, scp, Security, Server

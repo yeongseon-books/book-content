@@ -63,7 +63,7 @@ last_reviewed: '2026-05-15'
 
 실무에서는 독립을 가정하고 싶을 때가 많지만, 현실의 대부분 사건은 종속적입니다. 예를 들어 사용자의 클릭 행동은 이전 페이지 방문과 독립적이지 않습니다. 센서 값은 이전 측정값과 상관되어 있습니다. 독립을 부주의하게 가정하면 모델 성능이 크게 떨어지거나 편향이 발생할 수 있습니다.
 
-## Python 조건부확률 계산 예제: 스팸 필터
+## 파이썬 조건부확률 계산 예제: 스팸 필터
 
 스팸 필터는 조건부확률의 실용적인 예시입니다. 특정 단어가 나왔을 때 스팸일 확률을 계산합니다.
 
@@ -103,6 +103,187 @@ P(스팸|'당첨') = 0.857
 ```
 
 "당첨"이라는 단어가 나오기 전에는 스팸일 확률이 30%였지만, 이 단어를 본 후에는 85.7%로 올라갑니다. 조건부확률은 이렇게 새로운 정보가 확률을 어떻게 갱신하는지 보여줍니다.
+
+## 조건부확률 트리
+
+조건부확률 문제를 체계적으로 풀려면 확률 트리(probability tree)를 그리는 것이 효과적입니다. 각 분기에서 조건부확률을 곱하면 경로 확률을 구할 수 있습니다.
+
+```python
+# 조건부확률 트리 예시: 날씨와 교통체증
+# 1겵: 비 여부 (P(비)=0.3, P(맑음)=0.7)
+# 2겵: 교통체증 여부
+#   P(체증|비) = 0.8
+#   P(체증|맑음) = 0.2
+
+P_rain = 0.3
+P_clear = 0.7
+P_jam_given_rain = 0.8
+P_jam_given_clear = 0.2
+
+# 경로 확률 (곱셈정리)
+path_rain_jam = P_rain * P_jam_given_rain
+path_rain_no_jam = P_rain * (1 - P_jam_given_rain)
+path_clear_jam = P_clear * P_jam_given_clear
+path_clear_no_jam = P_clear * (1 - P_jam_given_clear)
+
+print("확률 트리:")
+print(f"  비 → 체증:    {path_rain_jam:.3f}")
+print(f"  비 → 원활:    {path_rain_no_jam:.3f}")
+print(f"  맑음 → 체증: {path_clear_jam:.3f}")
+print(f"  맑음 → 원활: {path_clear_no_jam:.3f}")
+print(f"  합계:         {path_rain_jam + path_rain_no_jam + path_clear_jam + path_clear_no_jam:.1f}")
+
+# 전체확률법칙: P(체증)
+P_jam = path_rain_jam + path_clear_jam
+print(f"\nP(체증) = {P_jam:.3f}")
+
+# 역추론: P(비|체증)
+P_rain_given_jam = path_rain_jam / P_jam
+print(f"P(비|체증) = {P_rain_given_jam:.3f}")
+print(f"체증일 때 비 때문일 확률이 {P_rain_given_jam:.0%}")
+```
+
+출력:
+
+```
+확률 트리:
+  비 → 체증:    0.240
+  비 → 원활:    0.060
+  맑음 → 체증: 0.140
+  맑음 → 원활: 0.560
+  합계:         1.0
+
+P(체증) = 0.380
+P(비|체증) = 0.632
+체증일 때 비 때문일 확률이 63%
+```
+
+트리의 각 경로는 곱셈정리를 적용한 결과입니다. 모든 말단 노드의 확률을 더하면 1이 됩니다. 역추론(체증인데 비 때문일 확률)은 해당 경로의 확률을 전체 체증 확률로 나누면 됩니다.
+
+## 몬테카를로로 조건부확률 추정하기
+
+해석적 계산이 복잡한 조건부확률도 시뮬레이션으로 추정할 수 있습니다.
+
+```python
+import random
+
+def simulate_conditional(n_trials: int = 100_000) -> dict:
+    """
+    주사위 2개: 합이 8 이상일 때, 두 눈이 같을 확률
+    P(두 눈 같음 | 합 >= 8)
+    """
+    count_condition = 0  # 합 >= 8인 경우
+    count_both = 0       # 합 >= 8이고 두 눈 같은 경우
+
+    for _ in range(n_trials):
+        d1 = random.randint(1, 6)
+        d2 = random.randint(1, 6)
+        if d1 + d2 >= 8:
+            count_condition += 1
+            if d1 == d2:
+                count_both += 1
+
+    return {
+        "P(합>=8)": count_condition / n_trials,
+        "P(두눈같음 ∩ 합>=8)": count_both / n_trials,
+        "P(두눈같음 | 합>=8)": count_both / count_condition if count_condition > 0 else 0,
+    }
+
+# 이론값 계산
+omega = [(i, j) for i in range(1, 7) for j in range(1, 7)]
+cond = [(i, j) for i, j in omega if i + j >= 8]
+both = [(i, j) for i, j in cond if i == j]
+theory = len(both) / len(cond)
+
+random.seed(42)
+results = simulate_conditional()
+print(f"시뮬레이션 P(두눈같음 | 합>=8) = {results['P(두눈같음 | 합>=8)']:.4f}")
+print(f"이론값 P(두눈같음 | 합>=8) = {theory:.4f}")
+print(f"조건 없이 P(두눈같음) = {6/36:.4f}")
+print(f"조건이 확률을 바꿨: {theory:.4f} vs {6/36:.4f}")
+```
+
+조건이 없을 때 두 눈이 같을 확률은 6/36 = 0.167이지만, "합이 8 이상"이라는 조건이 붙으면 확률이 달라집니다. 이것이 종속의 핵심입니다.
+
+## 기저율 오류 시뮬레이션
+
+기저율 오류(base rate fallacy)는 조건부확률에서 가장 흔한 실수입니다. 유병률이 낮은 질병에서 검사 양성의 의미를 시뮬레이션으로 확인합니다.
+
+```python
+import random
+
+def base_rate_simulation(
+    prevalence: float,
+    sensitivity: float,
+    specificity: float,
+    n_population: int = 100_000,
+) -> dict:
+    """
+    기저율 오류 시뮬레이션
+    prevalence: 유병률
+    sensitivity: P(양성|질병)
+    specificity: P(음성|건강)
+    """
+    tp = fp = fn = tn = 0
+
+    for _ in range(n_population):
+        sick = random.random() < prevalence
+        if sick:
+            positive = random.random() < sensitivity
+        else:
+            positive = random.random() > specificity
+
+        if sick and positive:
+            tp += 1
+        elif not sick and positive:
+            fp += 1
+        elif sick and not positive:
+            fn += 1
+        else:
+            tn += 1
+
+    total_positive = tp + fp
+    ppv = tp / total_positive if total_positive > 0 else 0
+    return {"TP": tp, "FP": fp, "FN": fn, "TN": tn, "PPV": ppv}
+
+random.seed(42)
+# 낮은 유병률 (0.1%) + 높은 민감도 (99%)
+result = base_rate_simulation(
+    prevalence=0.001, sensitivity=0.99, specificity=0.95
+)
+print(f"TP={result['TP']}, FP={result['FP']}")
+print(f"양성 판정 중 실제 환자 비율(PPV) = {result['PPV']:.3f}")
+print(f"즉, 양성이어도 {1-result['PPV']:.1%}는 오경보")
+
+print("\n--- 유병률을 5%로 높이면? ---")
+result2 = base_rate_simulation(
+    prevalence=0.05, sensitivity=0.99, specificity=0.95
+)
+print(f"TP={result2['TP']}, FP={result2['FP']}")
+print(f"PPV = {result2['PPV']:.3f}")
+```
+
+유병률이 0.1%일 때는 민감도가 99%이더라도 양성 판정의 대부분이 오경보입니다. 유병률이 5%로 올라가면 PPV가 크게 개선됩니다. 이것이 기저율의 힘입니다. 다음 글(베이즈 정리)에서 이 문제를 수식으로 정리합니다.
+
+## 다중 조건의 체이닝
+
+조건이 여러 개 붙을 수도 있습니다. 곱셈정리를 반복 적용하면 됩니다.
+
+```python
+# P(A ∩ B ∩ C) = P(A) × P(B|A) × P(C|A∩B)
+# 예: 비복원 추출에서 3장 모두 스페이드일 확률
+
+# 52장 중 스페이드 13장
+P_first = 13 / 52
+P_second_given_first = 12 / 51  # 스페이드 1장 빠짐
+P_third_given_first_two = 11 / 50  # 스페이드 2장 빠짐
+
+P_all_spades = P_first * P_second_given_first * P_third_given_first_two
+print(f"P(3장 모두 스페이드) = {P_all_spades:.4f}")
+print(f"약 {1/P_all_spades:.0f}번에 1번 발생")
+```
+
+체이닝의 핵심은 앞의 결과가 뒤의 조건을 바꾼다는 점입니다. 비복원 추출에서는 앞의 결과가 남은 표본공간을 축소시키므로 각 단계의 확률이 달라집니다.
 
 ## 조건부 확률의 직관
 
@@ -288,6 +469,18 @@ P(A|불량) = 0.250
 **추천 시스템의 click-through rate**는 `P(클릭 | 노출)`입니다. 아이템을 보여줬을 때 클릭할 확률을 계산해서 상위 N개를 추천합니다. 여기서도 조건을 정의하는 방식이 추천 품질을 결정합니다.
 
 조건부확률은 결국 "상황을 제한했을 때 무슨 일이 일어날 확률"을 계산하는 도구입니다. 조건을 어떻게 정의하느냐에 따라 같은 데이터에서도 전혀 다른 인사이트가 나옵니다.
+
+**실무 체크리스트**
+
+조건부확률을 해석할 때 스스로 확인해야 할 질문을 정리합니다:
+
+1. **분모가 무엇인가?** — 전체 집단인지, 특정 조건을 만족하는 하위 집단인지
+2. **조건의 방향은?** — P(A|B)와 P(B|A) 중 어느 쪽을 묻고 있는지
+3. **기저율은 얼마인가?** — 전체 집단에서 사건이 얼마나 흔한지
+4. **독립을 가정할 수 있는가?** — 조건이 확률을 실제로 바꾸는지
+5. **데이터가 충분한가?** — 조건부 빈도를 계산할 만큼 샘플이 충분한지
+
+이 다섯 가지 질문을 습관적으로 던지면 조건부확률 해석에서 생기는 대부분의 오류를 방지할 수 있습니다.
 ## 자주 헷갈리는 지점
 
 첫째, `P(A|B)`와 `P(B|A)`를 같은 값으로 읽기 쉽습니다. 이 실수가 가장 흔하고 가장 치명적입니다.
@@ -306,12 +499,17 @@ P(A|불량) = 0.250
 
 그래서 실무에서는 숫자 하나를 볼 때도 먼저 묻습니다. 무엇이 조건인가, 분모가 무엇인가, 기저율은 얼마인가. 이 세 질문을 빠뜨리면 모델 성능표도, 경보 시스템도, 진단 결과도 쉽게 과신하게 됩니다.
 
+머신러닝 모델의 출력값 자체가 조건부확률입니다. 분류 모델은 `P(class=1|features)`를 출력하고, 언어 모델은 `P(next_token|context)`를 출력합니다. 조건부확률을 제대로 이해하지 못하면 모델 출력을 올바르게 해석할 수 없습니다.
+
 ## 체크리스트
 
 - [ ] `P(A|B)`의 뜻을 분모 관점에서 설명할 수 있습니다.
 - [ ] 곱셈정리를 사용할 수 있습니다.
 - [ ] 독립과 종속을 구분할 수 있습니다.
 - [ ] 기저율 오류가 왜 생기는지 설명할 수 있습니다.
+- [ ] 전체확률법칙으로 P(B)를 계산할 수 있습니다.
+- [ ] 확률 트리를 그려 조건부확률 문제를 풀 수 있습니다.
+- [ ] 시뮬레이션으로 조건부확률을 추정할 수 있습니다.
 
 ## 정리
 
@@ -349,5 +547,6 @@ P(A|불량) = 0.250
 - [Wikipedia — Conditional probability](https://en.wikipedia.org/wiki/Conditional_probability)
 - [Wikipedia — Base rate fallacy](https://en.wikipedia.org/wiki/Base_rate_fallacy)
 - [Stanford CS109 — Notes](https://web.stanford.edu/class/cs109/)
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/probability-101/ko)
 
 Tags: Probability, Conditional, Independence, Inference, Beginner

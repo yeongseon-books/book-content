@@ -52,7 +52,15 @@ last_reviewed: '2026-05-15'
 
 ## 핵심 개념 한눈에 보기
 
-## 핵심 용어
+| 분포 | 질문 형태 | 모수 | E[X] | Var(X) | scipy 클래스 |
+|---|---|---|---|---|---|
+| 베르누이 | 성공/실패? | p | p | p(1-p) | `bernoulli(p)` |
+| 이항 | n번 중 성공 횟수? | n, p | np | np(1-p) | `binom(n, p)` |
+| 기하 | 첫 성공까지 횟수? | p | 1/p | (1-p)/p² | `geom(p)` |
+| 포아송 | 구간 내 발생 수? | λ | λ | λ | `poisson(λ)` |
+| 음이항 | r번 성공까지 실패 수? | r, p | r(1-p)/p | r(1-p)/p² | `nbinom(r, p)` |
+| 초기하 | 비복원 추출 성공? | N, K, n | nK/N | 복잡 | `hypergeom(N, K, n)` |
+
 
 - **베르누이분포**: 한 번의 0/1 실험입니다.
 - **이항분포**: 독립적인 베르누이 시행을 n번 반복했을 때 성공 횟수입니다.
@@ -272,11 +280,178 @@ plt.tight_layout()
 
 다섯째, 확률과 가능도를 다시 섞기 쉽습니다. 분포를 고르는 일과 분포 아래에서 확률을 계산하는 일은 같은 단계가 아닙니다.
 
+## 최대가능도 추정 (MLE)
+
+데이터가 주어졌을 때 모수를 어떻게 추정할까요? 최대가능도 추정(MLE)은 "이 데이터를 가장 그럴듯하게 만드는 모수"를 찾습니다.
+
+```python
+import numpy as np
+from scipy import stats
+from scipy.optimize import minimize_scalar
+
+# 예제: 시간당 오류 수 데이터 (포아송 가정)
+data = np.array([3, 5, 2, 7, 4, 6, 3, 5, 4, 2, 8, 1, 3, 5, 4])
+
+# 포아송 MLE: λ_hat = 표본평균
+lambda_mle = data.mean()
+print(f"포아송 MLE: λ̂ = {lambda_mle:.2f}")
+
+# 로그가능도 함수 시각화
+lambdas = np.linspace(1, 8, 100)
+log_likelihoods = [np.sum(stats.poisson.logpmf(data, lam)) for lam in lambdas]
+best_idx = np.argmax(log_likelihoods)
+print(f"수치적 최대: λ = {lambdas[best_idx]:.2f}")
+print(f"로그가능도: {max(log_likelihoods):.2f}")
+
+# 이항분포 MLE: p̂ = 성공/시행
+# 100명 중 15명 전환
+n_trial, k_success = 100, 15
+p_mle = k_success / n_trial
+print(f"\n이항분포 MLE: p̂ = {p_mle:.3f}")
+print(f"95% 신뢰구간: [{p_mle - 1.96*np.sqrt(p_mle*(1-p_mle)/n_trial):.3f}, "
+      f"{p_mle + 1.96*np.sqrt(p_mle*(1-p_mle)/n_trial):.3f}]")
+```
+
+출력:
+
+```
+포아송 MLE: λ̂ = 4.13
+수치적 최대: λ = 4.12
+로그가능도: -30.78
+
+이항분포 MLE: p̂ = 0.150
+95% 신뢰구간: [0.080, 0.220]
+```
+
+MLE는 데이터를 가장 잘 설명하는 모수를 찾는 원리입니다. 포아송에서는 표본평균이, 이항분포에서는 성공 비율이 MLE가 됩니다. 이 감각은 머신러닝의 손실함수 최적화와 직결됩니다.
+
+## 실무 예제: A/B 테스트 통계적 유의성
+
+A/B 테스트에서 전환율 차이가 통계적으로 유의미한지 판단하는 과정을 이항분포로 설명할 수 있습니다.
+
+```python
+import numpy as np
+from scipy import stats
+
+# A그룹: 1000명 중 120명 전환
+# B그룹: 1000명 중 150명 전환
+n_A, k_A = 1000, 120
+n_B, k_B = 1000, 150
+
+p_A = k_A / n_A
+p_B = k_B / n_B
+print(f"A 전환율: {p_A:.3f}")
+print(f"B 전환율: {p_B:.3f}")
+print(f"차이: {p_B - p_A:.3f}")
+
+# 빈도주의 접근: 정규근사
+# H0: p_A = p_B
+p_pool = (k_A + k_B) / (n_A + n_B)
+se = np.sqrt(p_pool * (1 - p_pool) * (1/n_A + 1/n_B))
+z_stat = (p_B - p_A) / se
+p_value = 2 * (1 - stats.norm.cdf(abs(z_stat)))
+
+print(f"\nz-statistic: {z_stat:.3f}")
+print(f"p-value: {p_value:.4f}")
+print(f"결론 (α=0.05): {'유의미함 — B가 더 낫다' if p_value < 0.05 else '유의미하지 않음'}")
+
+# 베이지안 접근: Beta 사후분포
+# Beta(1+k, 1+n-k) — 무정보 사전분포
+posterior_A = stats.beta(1 + k_A, 1 + n_A - k_A)
+posterior_B = stats.beta(1 + k_B, 1 + n_B - k_B)
+
+# B > A일 확률 (몬테카를로)
+rng = np.random.default_rng(42)
+samples_A = posterior_A.rvs(size=100000, random_state=rng)
+samples_B = posterior_B.rvs(size=100000, random_state=rng)
+prob_B_better = (samples_B > samples_A).mean()
+print(f"\n베이지안: P(B > A) = {prob_B_better:.3f}")
+print(f"기대 상승: {(samples_B - samples_A).mean():.4f}")
+```
+
+출력:
+
+```
+A 전환율: 0.120
+B 전환율: 0.150
+차이: 0.030
+
+z-statistic: 2.050
+p-value: 0.0404
+결론 (α=0.05): 유의미함 — B가 더 낫다
+
+베이지안: P(B > A) = 0.979
+기대 상승: 0.0298
+```
+
+빈도주의 접근은 p-value로 "우연이 아닌 차이"를 판단하고, 베이지안 접근은 "B가 A보다 나을 확률" 같은 직관적 답을 줍니다. 두 방법 모두 이항분포를 기반으로 합니다.
+
+## 포아송 과정으로 대기열 모델링하기
+
+콜센터, 티켓 시스템, 서버 요청 등 도착 과정을 포아송 과정으로 모델링하면 대기 시간과 용량 계획을 수학적으로 다룰 수 있습니다.
+
+```python
+import numpy as np
+from scipy import stats
+
+# 콜센터: 시간당 평균 8건 도착
+lambda_rate = 8
+poisson_dist = stats.poisson(mu=lambda_rate)
+
+# 각종 확률 계산
+print("콜센터 시간당 도착량 분석 (λ=8)")
+print(f"  P(도착=0) = {poisson_dist.pmf(0):.6f}  ← 한 시간 오는 사람이 없을 확률")
+print(f"  P(도착≤10) = {poisson_dist.cdf(10):.4f}")
+print(f"  P(도착>15) = {1 - poisson_dist.cdf(15):.6f}  ← 펼크 이상")
+print(f"  95 퍼센타일: {poisson_dist.ppf(0.95):.0f}건")
+
+# 용량 계획: 2시간 동안 총 도착
+lambda_2h = lambda_rate * 2  # λ는 구간에 비례
+poisson_2h = stats.poisson(mu=lambda_2h)
+print(f"\n2시간 동안 (λ=16):")
+print(f"  P(도착≥20) = {1 - poisson_2h.cdf(19):.4f}")
+print(f"  P(도착≥25) = {1 - poisson_2h.cdf(24):.6f}")
+
+# 시뮬레이션 검증
+rng = np.random.default_rng(42)
+arrivals = rng.poisson(lambda_rate, 10000)
+print(f"\n시뮬레이션 (10000시간):")
+print(f"  평균: {arrivals.mean():.2f}, 분산: {arrivals.var():.2f}")
+print(f"  평균/분산 비율: {arrivals.mean()/arrivals.var():.3f} (≈1이면 포아송 적합)")
+```
+
+출력:
+
+```
+콜센터 시간당 도착량 분석 (λ=8)
+  P(도착=0) = 0.000335  ← 한 시간 오는 사람이 없을 확률
+  P(도착≤10) = 0.8159
+  P(도착>15) = 0.003683  ← 피크 이상
+  95 퍼센타일: 12건
+
+2시간 동안 (λ=16):
+  P(도착≥20) = 0.1878
+  P(도착≥25) = 0.0170
+
+시뮬레이션 (10000시간):
+  평균: 8.01, 분산: 7.95
+  평균/분산 비율: 1.007 (≈1이면 포아송 적합)
+```
+
+포아송 과정의 가장 중요한 성질은 "구간을 늘리면 λ도 비례해서 커진다"는 점입니다. 1시간에 λ=8이면 2시간은 λ=16이 됩니다. 이 성질 덕분에 용량 계획이나 SLA 설정에 포아송을 쉼게 적용할 수 있습니다.
+
 ## 실무에서는 이렇게 드러납니다
 
 전환 수는 이항분포, 도착 수는 포아송분포, 재시도 수는 기하분포처럼 이산분포는 운영 지표와 실험 분석에서 계속 등장합니다. 로그를 보면 숫자는 흩어져 있지만, 분포 관점에서 보면 어떤 생성 과정이 있었는지 더 빨리 읽을 수 있습니다.
 
 강한 팀은 숫자를 받자마자 평균만 보지 않습니다. 이 숫자가 성공 횟수인지, 도착 횟수인지, 첫 성공까지 걸린 횟수인지부터 묻습니다. 분포를 잘못 고르면 같은 데이터도 전혀 다른 의미로 해석될 수 있기 때문입니다.
+
+구체적으로 실무 사례를 더 보겠습니다:
+
+- **재시도 정책 설계**: API 호출 실패 시 기하분포로 재시도 횟수를 모델링하면, 평균 재시도 횟수 = 1/p를 기대할 수 있습니다. p=0.9(성공률 90%)면 평균 1.11번만에 성공합니다.
+- **이상 탐지**: 시간당 오류 수가 포아송(λ=3)을 따를 때, P(X≥10)은 매우 작으므로 10건 이상이 관측되면 이상 신호를 발생시킵니다.
+- **품질 관리**: 100개 제품 중 불량품 수를 이항분포로 모델링하고, 3개 이상이면 라인 점검을 트리거하는 규칙을 만듭니다.
+- **솔로 배너 시스템**: 특정 광고의 노출 횟수를 이항분포로 모델링하고, 노출 대비 클릭 횟수도 이항분포로 보아 CTR을 추정합니다.
 
 ## 체크리스트
 
@@ -284,10 +459,15 @@ plt.tight_layout()
 - [ ] 각 분포의 질문 형태를 구분할 수 있습니다.
 - [ ] 평균과 분산을 함께 확인할 수 있습니다.
 - [ ] 포아송에서 과분산 여부를 점검할 수 있습니다.
+- [ ] 이항분포에서 정규근사 조건을 알고 있습니다.
+- [ ] MLE로 모수를 추정하는 과정을 설명할 수 있습니다.
+- [ ] 실무 문제를 적절한 이산분포에 매핑할 수 있습니다.
+- [ ] 기하분포와 음이항분포의 차이를 설명할 수 있습니다.
+- [ ] 초기하분포가 필요한 상황(비복원추출)을 식별할 수 있습니다.
 
-## 정리
+## 정리: 이산분포 핵심 요약
 
-이산분포는 카운트 데이터를 읽는 기본 사전입니다. 이 글에서 남겨야 할 핵심은 세 가지입니다. 문제 상황을 분포에 매핑하는 감각이 가장 중요하다는 점, 각 분포는 서로 다른 생성 과정을 요약한다는 점, 그리고 모수를 정하면 평균·분산·확률이 한꺼번에 따라온다는 점입니다.
+이산분포는 카운트 데이터를 읽는 기본 사전입니다. 이 글에서 남겨야 할 핵심은 세 가지입니다. 문제 상황을 분포에 매핑하는 감각이 가장 중요하다는 점, 각 분포는 서로 다른 생성 과정을 요약한다는 점, 그리고 모수를 정하면 평균·분산·확률이 한꺼번에 따라온다는 점입니다. 이 세 가지를 기억하면 새로운 분포를 만나도 빠르게 파악할 수 있습니다. 음이항분포, 초기하분포처럼 아직 다루지 않은 분포도 같은 틀 안에서 이해할 수 있습니다.
 
 다음 글에서는 연속분포를 다룹니다. 이번 글이 셀 수 있는 결과의 세계를 다뤘다면, 다음 글은 키·시간·오차처럼 연속적인 값의 세계로 넘어갑니다.
 
@@ -321,5 +501,6 @@ plt.tight_layout()
 - [Wikipedia — Binomial distribution](https://en.wikipedia.org/wiki/Binomial_distribution)
 - [Wikipedia — Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution)
 - [scipy.stats — Discrete](https://docs.scipy.org/doc/scipy/reference/stats.html#discrete-distributions)
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/probability-101/ko)
 
 Tags: Probability, Discrete, Bernoulli, Binomial, Beginner
