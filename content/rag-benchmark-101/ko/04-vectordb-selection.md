@@ -222,6 +222,177 @@ recall = np.mean([recall_at_k(a, e) for a, e in zip(ivf_results, flat_results)])
 
 다음 글에서는 검색기 뒤에 LLM을 연결해 종단 간 RAG 파이프라인을 평가합니다. 이제부터는 문서를 찾는 것뿐 아니라 답변 자체도 함께 점수화해야 합니다.
 
+## VectorDB 후보를 동일 기준으로 평가하는 실무 표준
+
+VectorDB 비교에서는 성능 숫자만큼 운영 조건의 동등성이 중요합니다. 아래 항목을 통일하지 않으면 벤치마크 결과는 거의 의미가 없어집니다.
+
+| 항목 | 반드시 고정할 값 |
+| --- | --- |
+| 벡터 차원 | 동일 임베딩 모델(예: 384d) |
+| 거리 함수 | cosine 또는 inner product 통일 |
+| top-k | 제품에서 실제 사용하는 값 |
+| 필터 조건 | 같은 metadata where clause |
+| 하드웨어 | vCPU, RAM, 디스크 유형 동일 |
+
+특히 거리 함수가 다르면 결과 해석 자체가 달라지므로, 보고서 첫 줄에 항상 명시하는 편이 좋습니다.
+
+### 성능 수집 스크립트 예시
+
+아래 코드는 후보별로 P50/P95 지연 시간과 recall@k를 수집하는 최소 골격입니다.
+
+```python
+import numpy as np
+import time
+
+def benchmark_search(index, queries, exact_results, k=5):
+    latencies = []
+    recalls = []
+
+    for q_vec, exact_ids in zip(queries, exact_results):
+        t0 = time.perf_counter()
+        _, approx_ids = index.search(q_vec.reshape(1, -1), k)
+        latencies.append((time.perf_counter() - t0) * 1000)
+        recalls.append(len(set(approx_ids[0]) & set(exact_ids)) / k)
+
+    return {
+        "p50_ms": float(np.percentile(latencies, 50)),
+        "p95_ms": float(np.percentile(latencies, 95)),
+        "recall@k": float(np.mean(recalls)),
+    }
+```
+
+이 함수는 라이브러리 의존도가 낮아서 FAISS, HNSW, 서버형 VectorDB 어댑터 모두 같은 출력 형식으로 맞추기 쉽습니다.
+
+### 필터링 성능을 따로 측정해야 하는 이유
+
+RAG 서비스에서는 날짜, 제품군, 고객사 같은 메타데이터 필터가 자주 사용됩니다. 필터 없는 성능만 측정하면 운영 체감과 괴리가 큽니다.
+
+| 시나리오 | 예시 필터 | 관측 지표 |
+| --- | --- | --- |
+| 기본 검색 | 없음 | recall@k, p95 |
+| 날짜 필터 | `year >= 2024` | recall@k, p95 |
+| 다중 조건 | `team == "ml" AND severity >= 2` | recall@k, p95, 실패율 |
+
+필터 적용 시 일부 엔진은 recall이 크게 떨어지거나 지연 시간이 급등할 수 있습니다. 그래서 필터 시나리오를 별도 표로 분리하는 편이 안전합니다.
+
+### 서버형 VectorDB 운영 설정 예시
+
+운영에서는 인덱스 알고리즘 파라미터뿐 아니라 네트워크/복제 설정도 함께 품질에 영향을 줍니다.
+
+```yaml
+vectordb:
+  engine: qdrant
+  collection: rag_docs_v2
+  vector_size: 384
+  distance: cosine
+  hnsw:
+    m: 32
+    ef_construct: 128
+    ef_search: 64
+  replication:
+    factor: 2
+  write_consistency: majority
+  read_timeout_ms: 500
+```
+
+이 구성값을 실험 리포트에 같이 보관하면 "같은 엔진인데 왜 지난달과 점수가 다르지"라는 질문에 즉시 답할 수 있습니다.
+
+### 장애 상황을 가정한 성능 수치도 필요합니다
+
+정상 상태만 측정하면 실제 운영 리스크를 과소평가하게 됩니다. 최소한 아래 두 가지는 별도 실행이 필요합니다.
+
+1. 인덱스 워밍 전 첫 질의 100개
+2. 리더 노드 장애 후 복구 중 질의 100개
+
+예시 리포트:
+
+```text
+scenario                     recall@5   p95_ms
+normal                       0.98       9.4
+cold-start                   0.98       42.1
+replica-recovery-in-progress 0.96       27.8
+```
+
+이 값이 있으면 SRE 팀과 SLA 논의를 할 때 훨씬 현실적인 기준을 세울 수 있습니다.
+
+### 선택 규칙을 점수 함수로 명시하기
+
+최종 선택을 회의 감으로 하지 않으려면 점수 함수를 선언하는 방법이 유효합니다.
+
+```text
+final_score = 0.5 * recall_norm + 0.3 * latency_norm + 0.2 * operability_norm
+```
+
+`operability_norm`에는 백업 난이도, 모니터링 통합성, 온콜 부담 같은 비기능 지표를 반영합니다. 이 규칙을 문서화해 두면 팀이 바뀌어도 같은 기준으로 다시 평가할 수 있습니다.
+
+## 실전 부록: VectorDB 벤치마크 리포트 표준 필드
+
+팀 간 공유를 위해 리포트 필드를 고정하면 회고와 재현이 쉬워집니다.
+
+### JSON 필드 예시
+
+```json
+{
+  "run_id": "20260521T021000-7d8e9f0",
+  "embedding_model": "all-MiniLM-L6-v2",
+  "vector_dim": 384,
+  "distance": "cosine",
+  "dataset_size": 100000,
+  "candidate": "faiss-ivf",
+  "params": {"nlist": 316, "nprobe": 8},
+  "metrics": {
+    "recall@5_vs_flat": 0.989,
+    "p50_ms": 7.4,
+    "p95_ms": 11.3,
+    "memory_mb": 386
+  }
+}
+```
+
+이 스키마를 고정하면 후보가 늘어나도 같은 대시보드에서 비교할 수 있습니다.
+
+### 필터 시나리오별 성능 표를 반드시 분리하기
+
+| candidate | scenario | recall@5 | p95_ms |
+| --- | --- | ---: | ---: |
+| flat | no-filter | 1.00 | 24.7 |
+| ivf(nprobe=8) | no-filter | 0.99 | 11.3 |
+| ivf(nprobe=8) | year>=2024 | 0.98 | 14.8 |
+| hnsw(ef=64) | team=ml | 0.97 | 12.1 |
+
+필터 시나리오를 분리하지 않으면 운영 체감과 벤치마크 결과가 어긋나는 상황이 자주 발생합니다.
+
+### 성능 측정 반복 횟수 권장값
+
+- 코퍼스 10만 미만: 쿼리당 20회 반복, 중앙값 사용
+- 코퍼스 10만~100만: 쿼리당 10회 반복, 중앙값 + p95 사용
+- 코퍼스 100만 이상: 샘플 쿼리 200개 이상, 샤드별로 독립 측정
+
+반복 횟수가 너무 적으면 일시적 캐시 효과를 실제 성능으로 오해할 수 있습니다.
+
+### 운영 전환 시 필수 검증 항목
+
+1. 백업/복구 테스트를 실제로 1회 이상 수행했는가?
+2. 인덱스 재빌드 시간을 운영 점검 창 안에서 소화할 수 있는가?
+3. 장애 시 fallback 검색 경로(flat 또는 이전 인덱스)가 준비되어 있는가?
+4. 모니터링에서 p95, 오류율, timeout을 분리 관찰하는가?
+
+VectorDB 선택은 단순한 성능 비교가 아니라 운영 체계 선택이라는 점을 끝까지 유지해야 합니다.
+
+### 쿼리 부하 단계별 성능 테스트 예시
+
+| QPS 구간 | candidate | recall@5 | p95(ms) | timeout rate |
+| --- | --- | ---: | ---: | ---: |
+| 10 | ivf(nprobe=8) | 0.99 | 10.9 | 0.0% |
+| 50 | ivf(nprobe=8) | 0.99 | 14.2 | 0.1% |
+| 100 | ivf(nprobe=8) | 0.98 | 28.6 | 0.9% |
+
+정적 벤치마크뿐 아니라 부하 구간별 측정을 같이 수행해야 실제 운영 한계를 읽을 수 있습니다.
+
+또한 결과 리포트에는 측정 시점의 데이터 적재율과 인덱스 파편화 수준을 함께 남기는 편이 좋습니다. 같은 후보라도 인덱스가 부분 갱신을 반복한 상태인지, 완전 재구축 직후인지에 따라 지연 시간과 recall 분포가 달라질 수 있기 때문입니다.
+
+실무에서는 인덱스 파라미터를 변경할 때마다 이전 파라미터를 즉시 폐기하지 않고 A/B 섀도우 실행을 24시간 이상 유지하는 방법이 안전합니다. 트래픽 패턴이 시간대별로 달라질 수 있어서, 짧은 벤치마크만으로는 실제 운영 변동성을 충분히 포착하기 어렵습니다.
+
 ### VectorDB 벤치마크 결과 예시
 
 아래 표는 동일한 100k 문서 벡터(384차원), 동일한 top-k=5 조건에서 측정한 예시입니다. 숫자는 환경에 따라 달라지지만, 해석 방법은 그대로 적용할 수 있습니다.

@@ -275,6 +275,175 @@ after: {'current_step': 'summarize', 'completed': ['collect']}
 
 실무에서는 "다음 step 결정에 꼭 필요한가", "다음 세션에도 다시 써야 하는가" 두 질문으로 memory 저장 여부를 나누는 편이 좋습니다. 첫 질문에만 해당하면 short-term이나 state로, 두 번째 질문까지 해당하면 long-term memory로 보내는 식입니다.
 
+## 실전 설계 보강
+
+### 메모리 레이어를 분리하면 망각과 누수를 동시에 줄입니다
+
+memory를 한 저장소로 몰아넣으면 초기에 단순하지만, 곧 품질 문제와 보안 문제가 함께 발생합니다. 운영에서는 단기 실행 상태, 세션 메모리, 장기 사용자 프로필을 분리하는 구조가 안전합니다.
+
+| 레이어 | 저장 대상 | TTL | 접근 규칙 |
+| --- | --- | --- | --- |
+| 실행 상태 | 현재 run의 step 기록 | run 종료 시 삭제 | planner/validator만 읽기 |
+| 세션 메모리 | 최근 대화/작업 요약 | 1~7일 | 사용자 범위 제한 |
+| 장기 메모리 | 선호도, 금지 사항 | 30일~영구 | 명시적 동의 후 저장 |
+
+### Redis 기반 세션 메모리 예시
+
+```python
+import json
+import redis
+
+r = redis.Redis(host="localhost", port=6379, decode_responses=True)
+
+def save_session_memory(session_id: str, item: dict):
+    key = f"agent:session:{session_id}"
+    r.rpush(key, json.dumps(item, ensure_ascii=False))
+    r.expire(key, 60 * 60 * 24 * 3)
+
+def load_recent_memory(session_id: str, limit: int = 20) -> list[dict]:
+    key = f"agent:session:{session_id}"
+    rows = r.lrange(key, -limit, -1)
+    return [json.loads(x) for x in rows]
+```
+
+TTL을 코드에서 강제하면 보존 기간 정책이 문서 의존에서 실행 의존으로 바뀝니다. 개인정보 규정 준수에서도 중요한 차이입니다.
+
+### 메모리 검색 전 재랭킹 패턴
+
+```python
+def rerank(memories: list[dict], goal: str) -> list[dict]:
+    # 단순 예시: goal 단어 중복 수로 점수 계산
+    tokens = set(goal.lower().split())
+    scored = []
+    for m in memories:
+        score = sum(1 for t in tokens if t in m.get("summary", "").lower())
+        scored.append((score, m))
+    scored.sort(key=lambda x: x[0], reverse=True)
+    return [m for _, m in scored[:8]]
+```
+
+메모리를 모두 프롬프트에 넣는 방식은 비용과 노이즈를 동시에 키웁니다. 검색 후 재랭킹을 거쳐 소수만 주입하는 구조가 더 안정적입니다.
+
+### state corruption 감지 규칙
+
+| 규칙 | 설명 |
+| --- | --- |
+| monotonic_step | step 번호가 감소하지 않아야 함 |
+| immutable_goal | 실행 중 goal 변경 금지 |
+| checksum_match | 직전 상태 해시와 연결 확인 |
+| tool_result_schema | 도구 결과가 스키마를 만족해야 함 |
+
+state corruption은 드물지만 발생하면 재현이 매우 어렵습니다. 기본 무결성 검사를 루프마다 넣어 두면 장기 운영에서 큰 차이를 만듭니다.
+
+## 심화 운영 노트
+
+### 운영 관점 실패 분류 템플릿
+
+실전에서는 실패를 "모델이 틀렸다" 한 문장으로 닫지 않습니다. 다음 템플릿처럼 실패 축을 분리하면 개선 우선순위가 명확해집니다.
+
+| 분류 축 | 질문 | 예시 |
+| --- | --- | --- |
+| 계획 실패 | 목표를 잘못 분해했는가 | 불필요한 step 6회 반복 |
+| 실행 실패 | 도구 호출이 실패했는가 | timeout, 429, schema mismatch |
+| 검증 실패 | 결과 확인이 부족했는가 | 잘못된 observation 채택 |
+| 정책 실패 | 안전 경계를 넘었는가 | 민감 데이터 외부 전송 시도 |
+
+이 표를 runbook에 고정해 두면 온콜 엔지니어가 같은 기준으로 사고를 분류할 수 있습니다.
+
+### 프롬프트/도구 버전 고정 전략
+
+변경 추적이 어려운 팀은 대부분 프롬프트와 도구 스키마를 코드 릴리스와 분리해 관리합니다. 안정적인 팀은 아래처럼 버전 필드를 요청 컨텍스트에 명시합니다.
+
+```json
+{
+  "run_id": "run_2026_05_21_001",
+  "model": "gpt-4.1-mini",
+  "prompt_version": "agent-101-ko-v3",
+  "tool_schema_version": "tools-v5",
+  "policy_version": "policy-2026-05"
+}
+```
+
+버전 필드만 있어도 회귀 분석 속도가 크게 빨라집니다. 특정 시점의 품질 저하가 모델 변경인지, 프롬프트 변경인지, 도구 변경인지 즉시 좁힐 수 있기 때문입니다.
+
+### 관측성 이벤트 예시
+
+```python
+import json
+from datetime import datetime
+
+def emit_event(event_type: str, payload: dict):
+    record = {
+        "ts": datetime.utcnow().isoformat() + "Z",
+        "event_type": event_type,
+        "payload": payload,
+    }
+    print(json.dumps(record, ensure_ascii=False))
+
+emit_event("agent.step", {"step": 2, "tool": "search_docs", "latency_ms": 412})
+```
+
+구조화 로그를 먼저 도입하면 추후 OpenTelemetry, ELK, Grafana 같은 스택으로 확장할 때 마이그레이션 비용이 낮아집니다.
+
+### 배포 체크 항목
+
+- 모델 API 키를 환경 변수와 Secret Manager로 분리했는지 확인합니다.
+- `max_steps`, `timeout_ms`, `retry_budget` 기본값이 운영 프로필에 맞는지 검증합니다.
+- 장애 시 fallback 응답 문구가 사용자에게 과장된 확신을 주지 않는지 점검합니다.
+- 알람 임계치(`error_rate`, `p95_latency`, `policy_violation_rate`)를 문서와 코드에서 동일하게 유지합니다.
+
+이 항목은 기능 개발보다 눈에 덜 띄지만, 실제 장애 빈도를 줄이는 데 직접적으로 기여합니다.
+
+### 비용 통제 포인트
+
+| 항목 | 설명 | 권장 기본값 |
+| --- | --- | --- |
+| max_steps | 1회 실행당 최대 루프 | 4~8 |
+| max_tool_calls | 도구 호출 상한 | 3~6 |
+| input_token_budget | 입력 토큰 예산 | 서비스별 정책 |
+| output_token_budget | 출력 토큰 예산 | 서비스별 정책 |
+
+비용 통제는 성능 최적화 이후에 붙이는 부가기능이 아닙니다. 처음부터 실행 예산을 고정해야 사용량 급증 시 서비스가 안정적으로 유지됩니다.
+
+### 품질 회귀를 막는 CI 게이트 예시
+
+```bash
+python3 scripts/eval_agent.py --dataset eval/agent_core_ko.jsonl --min-success 0.82
+python3 scripts/check_tool_schema.py --strict
+python3 scripts/check_prompt_version.py --require-changelog
+```
+
+배포 파이프라인에서 최소 품질 게이트를 자동화하면 "우연히 좋아 보이는 빌드"가 운영으로 유입되는 일을 줄일 수 있습니다.
+
+### 운영 관점 실패 분류 템플릿
+
+실전에서는 실패를 "모델이 틀렸다" 한 문장으로 닫지 않습니다. 다음 템플릿처럼 실패 축을 분리하면 개선 우선순위가 명확해집니다.
+
+| 분류 축 | 질문 | 예시 |
+| --- | --- | --- |
+| 계획 실패 | 목표를 잘못 분해했는가 | 불필요한 step 6회 반복 |
+| 실행 실패 | 도구 호출이 실패했는가 | timeout, 429, schema mismatch |
+| 검증 실패 | 결과 확인이 부족했는가 | 잘못된 observation 채택 |
+| 정책 실패 | 안전 경계를 넘었는가 | 민감 데이터 외부 전송 시도 |
+
+이 표를 runbook에 고정해 두면 온콜 엔지니어가 같은 기준으로 사고를 분류할 수 있습니다.
+
+### 프롬프트/도구 버전 고정 전략
+
+변경 추적이 어려운 팀은 대부분 프롬프트와 도구 스키마를 코드 릴리스와 분리해 관리합니다. 안정적인 팀은 아래처럼 버전 필드를 요청 컨텍스트에 명시합니다.
+
+```json
+{
+  "run_id": "run_2026_05_21_001",
+  "model": "gpt-4.1-mini",
+  "prompt_version": "agent-101-ko-v3",
+  "tool_schema_version": "tools-v5",
+  "policy_version": "policy-2026-05"
+}
+```
+
+버전 필드만 있어도 회귀 분석 속도가 크게 빨라집니다. 특정 시점의 품질 저하가 모델 변경인지, 프롬프트 변경인지, 도구 변경인지 즉시 좁힐 수 있기 때문입니다.
+
 ## 흔히 헷갈리는 지점
 
 - history를 길게 유지하면 더 똑똑해질 것 같지만, 실제로는 비용과 혼선을 함께 키울 수 있습니다.

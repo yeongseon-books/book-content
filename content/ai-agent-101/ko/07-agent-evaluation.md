@@ -233,6 +233,261 @@ trajectory를 남기면 같은 실패도 성격을 나눌 수 있습니다. 첫 
 - 비용이 큰 장문 요청과 짧은 요청을 모두 넣습니다.
 - 최종 정답뿐 아니라 허용 경로와 금지 경로도 문서화합니다.
 
+## 실전 설계 보강
+
+### 평가셋은 질문 모음이 아니라 실패 가설 모음입니다
+
+agent 평가를 제대로 하려면 샘플을 무작위로 모으는 대신 실패 가설 중심으로 분류해야 합니다. 예를 들어 도구 미호출, 잘못된 도구 선택, 과잉 반복, 위험 정책 위반 같은 가설을 먼저 정하고 케이스를 수집하는 방식입니다.
+
+| 평가 축 | 설명 | 예시 metric |
+| --- | --- | --- |
+| 과업 달성 | 목표를 실제로 완료했는가 | task_success_rate |
+| 경로 품질 | 불필요 step이 많은가 | avg_steps, detour_rate |
+| 도구 적합성 | 올바른 도구를 골랐는가 | tool_precision |
+| 안전성 | 금지 행동을 피했는가 | policy_violation_rate |
+
+### 실행 로그 기반 채점 예시
+
+```python
+def score_run(run: dict) -> dict:
+    success = run.get("stop_reason") == "goal_achieved"
+    steps = run.get("steps", 0)
+    violations = len(run.get("policy_violations", []))
+    return {
+        "task_success": 1 if success else 0,
+        "step_efficiency": max(0.0, 1.0 - max(0, steps - 4) * 0.1),
+        "safety": 1 if violations == 0 else 0,
+    }
+```
+
+이처럼 단순한 채점 함수라도 있으면 모델/프롬프트/도구 변경의 영향을 수치로 비교할 수 있습니다.
+
+### 오프라인 + 온라인 평가 분리
+
+```text
+오프라인: 고정 평가셋으로 회귀 테스트, 배포 전 품질 게이트
+온라인: 실제 트래픽 샘플링, 사용자 피드백/실패 리포트 반영
+```
+
+오프라인만 보면 실제 사용자 다양성이 반영되지 않고, 온라인만 보면 회귀를 놓치기 쉽습니다. 두 계층을 분리해 운영해야 품질이 장기적으로 유지됩니다.
+
+### 평가 대시보드 권장 항목
+
+| 지표 | 목표 예시 |
+| --- | --- |
+| task_success_rate | 0.85 이상 |
+| policy_violation_rate | 0.5% 이하 |
+| p95_latency | 8초 이하 |
+| avg_cost_per_run | 기준 예산 이하 |
+
+평가 체계가 있으면 "좋아진 것 같다"가 아니라 "어떤 축이 얼마나 바뀌었는가"로 의사결정할 수 있습니다.
+
+## 심화 운영 노트
+
+### 운영 관점 실패 분류 템플릿
+
+실전에서는 실패를 "모델이 틀렸다" 한 문장으로 닫지 않습니다. 다음 템플릿처럼 실패 축을 분리하면 개선 우선순위가 명확해집니다.
+
+| 분류 축 | 질문 | 예시 |
+| --- | --- | --- |
+| 계획 실패 | 목표를 잘못 분해했는가 | 불필요한 step 6회 반복 |
+| 실행 실패 | 도구 호출이 실패했는가 | timeout, 429, schema mismatch |
+| 검증 실패 | 결과 확인이 부족했는가 | 잘못된 observation 채택 |
+| 정책 실패 | 안전 경계를 넘었는가 | 민감 데이터 외부 전송 시도 |
+
+이 표를 runbook에 고정해 두면 온콜 엔지니어가 같은 기준으로 사고를 분류할 수 있습니다.
+
+### 프롬프트/도구 버전 고정 전략
+
+변경 추적이 어려운 팀은 대부분 프롬프트와 도구 스키마를 코드 릴리스와 분리해 관리합니다. 안정적인 팀은 아래처럼 버전 필드를 요청 컨텍스트에 명시합니다.
+
+```json
+{
+  "run_id": "run_2026_05_21_001",
+  "model": "gpt-4.1-mini",
+  "prompt_version": "agent-101-ko-v3",
+  "tool_schema_version": "tools-v5",
+  "policy_version": "policy-2026-05"
+}
+```
+
+버전 필드만 있어도 회귀 분석 속도가 크게 빨라집니다. 특정 시점의 품질 저하가 모델 변경인지, 프롬프트 변경인지, 도구 변경인지 즉시 좁힐 수 있기 때문입니다.
+
+### 관측성 이벤트 예시
+
+```python
+import json
+from datetime import datetime
+
+def emit_event(event_type: str, payload: dict):
+    record = {
+        "ts": datetime.utcnow().isoformat() + "Z",
+        "event_type": event_type,
+        "payload": payload,
+    }
+    print(json.dumps(record, ensure_ascii=False))
+
+emit_event("agent.step", {"step": 2, "tool": "search_docs", "latency_ms": 412})
+```
+
+구조화 로그를 먼저 도입하면 추후 OpenTelemetry, ELK, Grafana 같은 스택으로 확장할 때 마이그레이션 비용이 낮아집니다.
+
+### 배포 체크 항목
+
+- 모델 API 키를 환경 변수와 Secret Manager로 분리했는지 확인합니다.
+- `max_steps`, `timeout_ms`, `retry_budget` 기본값이 운영 프로필에 맞는지 검증합니다.
+- 장애 시 fallback 응답 문구가 사용자에게 과장된 확신을 주지 않는지 점검합니다.
+- 알람 임계치(`error_rate`, `p95_latency`, `policy_violation_rate`)를 문서와 코드에서 동일하게 유지합니다.
+
+이 항목은 기능 개발보다 눈에 덜 띄지만, 실제 장애 빈도를 줄이는 데 직접적으로 기여합니다.
+
+### 비용 통제 포인트
+
+| 항목 | 설명 | 권장 기본값 |
+| --- | --- | --- |
+| max_steps | 1회 실행당 최대 루프 | 4~8 |
+| max_tool_calls | 도구 호출 상한 | 3~6 |
+| input_token_budget | 입력 토큰 예산 | 서비스별 정책 |
+| output_token_budget | 출력 토큰 예산 | 서비스별 정책 |
+
+비용 통제는 성능 최적화 이후에 붙이는 부가기능이 아닙니다. 처음부터 실행 예산을 고정해야 사용량 급증 시 서비스가 안정적으로 유지됩니다.
+
+### 품질 회귀를 막는 CI 게이트 예시
+
+```bash
+python3 scripts/eval_agent.py --dataset eval/agent_core_ko.jsonl --min-success 0.82
+python3 scripts/check_tool_schema.py --strict
+python3 scripts/check_prompt_version.py --require-changelog
+```
+
+배포 파이프라인에서 최소 품질 게이트를 자동화하면 "우연히 좋아 보이는 빌드"가 운영으로 유입되는 일을 줄일 수 있습니다.
+
+### 운영 관점 실패 분류 템플릿
+
+실전에서는 실패를 "모델이 틀렸다" 한 문장으로 닫지 않습니다. 다음 템플릿처럼 실패 축을 분리하면 개선 우선순위가 명확해집니다.
+
+| 분류 축 | 질문 | 예시 |
+| --- | --- | --- |
+| 계획 실패 | 목표를 잘못 분해했는가 | 불필요한 step 6회 반복 |
+| 실행 실패 | 도구 호출이 실패했는가 | timeout, 429, schema mismatch |
+| 검증 실패 | 결과 확인이 부족했는가 | 잘못된 observation 채택 |
+| 정책 실패 | 안전 경계를 넘었는가 | 민감 데이터 외부 전송 시도 |
+
+이 표를 runbook에 고정해 두면 온콜 엔지니어가 같은 기준으로 사고를 분류할 수 있습니다.
+
+### 프롬프트/도구 버전 고정 전략
+
+변경 추적이 어려운 팀은 대부분 프롬프트와 도구 스키마를 코드 릴리스와 분리해 관리합니다. 안정적인 팀은 아래처럼 버전 필드를 요청 컨텍스트에 명시합니다.
+
+```json
+{
+  "run_id": "run_2026_05_21_001",
+  "model": "gpt-4.1-mini",
+  "prompt_version": "agent-101-ko-v3",
+  "tool_schema_version": "tools-v5",
+  "policy_version": "policy-2026-05"
+}
+```
+
+버전 필드만 있어도 회귀 분석 속도가 크게 빨라집니다. 특정 시점의 품질 저하가 모델 변경인지, 프롬프트 변경인지, 도구 변경인지 즉시 좁힐 수 있기 때문입니다.
+
+### 관측성 이벤트 예시
+
+```python
+import json
+from datetime import datetime
+
+def emit_event(event_type: str, payload: dict):
+    record = {
+        "ts": datetime.utcnow().isoformat() + "Z",
+        "event_type": event_type,
+        "payload": payload,
+    }
+    print(json.dumps(record, ensure_ascii=False))
+
+emit_event("agent.step", {"step": 2, "tool": "search_docs", "latency_ms": 412})
+```
+
+구조화 로그를 먼저 도입하면 추후 OpenTelemetry, ELK, Grafana 같은 스택으로 확장할 때 마이그레이션 비용이 낮아집니다.
+
+### 배포 체크 항목
+
+- 모델 API 키를 환경 변수와 Secret Manager로 분리했는지 확인합니다.
+- `max_steps`, `timeout_ms`, `retry_budget` 기본값이 운영 프로필에 맞는지 검증합니다.
+- 장애 시 fallback 응답 문구가 사용자에게 과장된 확신을 주지 않는지 점검합니다.
+- 알람 임계치(`error_rate`, `p95_latency`, `policy_violation_rate`)를 문서와 코드에서 동일하게 유지합니다.
+
+이 항목은 기능 개발보다 눈에 덜 띄지만, 실제 장애 빈도를 줄이는 데 직접적으로 기여합니다.
+
+### 비용 통제 포인트
+
+| 항목 | 설명 | 권장 기본값 |
+| --- | --- | --- |
+| max_steps | 1회 실행당 최대 루프 | 4~8 |
+| max_tool_calls | 도구 호출 상한 | 3~6 |
+| input_token_budget | 입력 토큰 예산 | 서비스별 정책 |
+| output_token_budget | 출력 토큰 예산 | 서비스별 정책 |
+
+비용 통제는 성능 최적화 이후에 붙이는 부가기능이 아닙니다. 처음부터 실행 예산을 고정해야 사용량 급증 시 서비스가 안정적으로 유지됩니다.
+
+### 품질 회귀를 막는 CI 게이트 예시
+
+```bash
+python3 scripts/eval_agent.py --dataset eval/agent_core_ko.jsonl --min-success 0.82
+python3 scripts/check_tool_schema.py --strict
+python3 scripts/check_prompt_version.py --require-changelog
+```
+
+배포 파이프라인에서 최소 품질 게이트를 자동화하면 "우연히 좋아 보이는 빌드"가 운영으로 유입되는 일을 줄일 수 있습니다.
+
+### 운영 관점 실패 분류 템플릿
+
+실전에서는 실패를 "모델이 틀렸다" 한 문장으로 닫지 않습니다. 다음 템플릿처럼 실패 축을 분리하면 개선 우선순위가 명확해집니다.
+
+| 분류 축 | 질문 | 예시 |
+| --- | --- | --- |
+| 계획 실패 | 목표를 잘못 분해했는가 | 불필요한 step 6회 반복 |
+| 실행 실패 | 도구 호출이 실패했는가 | timeout, 429, schema mismatch |
+| 검증 실패 | 결과 확인이 부족했는가 | 잘못된 observation 채택 |
+| 정책 실패 | 안전 경계를 넘었는가 | 민감 데이터 외부 전송 시도 |
+
+이 표를 runbook에 고정해 두면 온콜 엔지니어가 같은 기준으로 사고를 분류할 수 있습니다.
+
+### 프롬프트/도구 버전 고정 전략
+
+변경 추적이 어려운 팀은 대부분 프롬프트와 도구 스키마를 코드 릴리스와 분리해 관리합니다. 안정적인 팀은 아래처럼 버전 필드를 요청 컨텍스트에 명시합니다.
+
+```json
+{
+  "run_id": "run_2026_05_21_001",
+  "model": "gpt-4.1-mini",
+  "prompt_version": "agent-101-ko-v3",
+  "tool_schema_version": "tools-v5",
+  "policy_version": "policy-2026-05"
+}
+```
+
+버전 필드만 있어도 회귀 분석 속도가 크게 빨라집니다. 특정 시점의 품질 저하가 모델 변경인지, 프롬프트 변경인지, 도구 변경인지 즉시 좁힐 수 있기 때문입니다.
+
+### 관측성 이벤트 예시
+
+```python
+import json
+from datetime import datetime
+
+def emit_event(event_type: str, payload: dict):
+    record = {
+        "ts": datetime.utcnow().isoformat() + "Z",
+        "event_type": event_type,
+        "payload": payload,
+    }
+    print(json.dumps(record, ensure_ascii=False))
+
+emit_event("agent.step", {"step": 2, "tool": "search_docs", "latency_ms": 412})
+```
+
+구조화 로그를 먼저 도입하면 추후 OpenTelemetry, ELK, Grafana 같은 스택으로 확장할 때 마이그레이션 비용이 낮아집니다.
+
 ## 흔히 헷갈리는 지점
 
 - final answer만 맞으면 성공이라고 보기 쉽지만, 불필요한 step 폭증은 운영 실패 신호일 수 있습니다.

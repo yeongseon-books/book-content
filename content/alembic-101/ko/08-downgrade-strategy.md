@@ -248,6 +248,384 @@ downgrade는 기본 기능이 아니라 정책의 문제입니다. 변경을 rev
 
 다음 글에서는 migration과 application code를 어떤 순서로 배포해야 하는지, 그리고 blue/green 환경에서 schema 호환성을 어떻게 설계해야 하는지 다룹니다.
 
+## 변경 유형별 downgrade 정책 표준안
+
+팀 정책은 문장보다 표로 고정하는 편이 운영에 유리합니다.
+
+| 변경 유형 | 기본 downgrade 정책 | 비고 |
+| --- | --- | --- |
+| Add nullable column | 구현 | 역연산이 명확함 |
+| Add index | 구현 | 역연산이 명확함 |
+| Rename column | 단계 분해 후 일부 구현 | data 단계는 보통 비가역 |
+| Drop column | 차단 (`NotImplementedError`) | 데이터 손실 |
+| Bulk data transform | 차단 (`NotImplementedError`) | 이전 상태 복원이 어려움 |
+| Tighten NOT NULL | 조건부 구현 또는 차단 | NULL 복원 정책이 필요 |
+
+이 표를 PR 템플릿과 함께 쓰면 리뷰어가 "왜 downgrade가 비어 있는가"를 감으로 판단하지 않아도 됩니다.
+
+## forward-fix revision 예시
+
+비가역 revision에서 문제가 발생하면 일반적으로 새 revision으로 복구합니다.
+
+```python
+"""fix 8a12c3d4e5f6: restore users.tier default and backfill nulls"""
+
+revision = "9b23d4e5f6a7"
+down_revision = "8a12c3d4e5f6"
+
+def upgrade() -> None:
+    op.execute("UPDATE users SET tier = 'free' WHERE tier IS NULL")
+    with op.batch_alter_table("users") as batch:
+        batch.alter_column("tier", existing_type=sa.String(16), nullable=False)
+
+def downgrade() -> None:
+    raise NotImplementedError("forward-fix revision")
+```
+
+이 패턴은 이력을 앞으로 진행시키므로 incident 타임라인과 감사 로그를 일관되게 유지할 수 있습니다.
+
+## 배포 스크립트에서 downgrade 차단
+
+운영 실수를 줄이려면 사람의 선택에 맡기지 말고 배포 도구에서 막는 편이 좋습니다.
+
+```bash
+case "${ALEMBIC_ACTION:-upgrade}" in
+  upgrade)
+    alembic upgrade head
+    ;;
+  downgrade)
+    echo "Fail: production downgrade is blocked by policy"
+    exit 1
+    ;;
+  *)
+    echo "Fail: unknown action"
+    exit 1
+    ;;
+esac
+```
+
+정책이 코드화되어 있으면 야간 장애 상황에서도 위험한 명령이 우발적으로 실행될 가능성을 줄일 수 있습니다.
+
+
+## 실전 부록: 운영 앵커 모음
+
+아래 블록은 migration 리뷰와 배포 검증에서 반복해서 쓰는 공통 앵커입니다.
+
+### 1) DDL 미리 보기
+
+```bash
+alembic upgrade <from>:<to> --sql > migration-preview.sql
+```
+
+리뷰 시점에서 실제 SQL을 확인하면 `DROP`, `ALTER`, 인덱스 재생성 비용을 사전에 파악할 수 있습니다.
+
+### 2) revision 그래프 확인
+
+```bash
+alembic history --verbose
+alembic heads
+alembic current
+```
+
+`heads`가 2개 이상이면 기능 결함이 아니라 그래프 정리 이슈입니다. merge revision으로 정리한 뒤 배포해야 안전합니다.
+
+### 3) schema 전후 비교
+
+```bash
+sqlite3 app.db ".schema" > before.sql
+alembic upgrade head
+sqlite3 app.db ".schema" > after.sql
+```
+
+변경 의도와 실제 결과를 텍스트로 남기면 코드 리뷰 품질이 올라갑니다.
+
+### 4) data migration 검증 쿼리
+
+```sql
+SELECT COUNT(*) FROM users WHERE tier IS NULL;
+SELECT tier, COUNT(*) FROM users GROUP BY tier ORDER BY tier;
+```
+
+`NULL` 잔여 수와 분포를 함께 보면 backfill 완료 여부를 빠르게 판단할 수 있습니다.
+
+### 5) env.py 핵심 설정
+
+```python
+context.configure(
+    connection=connection,
+    target_metadata=target_metadata,
+    compare_type=True,
+    compare_server_default=True,
+    render_as_batch=connection.dialect.name == "sqlite",
+)
+```
+
+type/default 비교 옵션과 SQLite batch 옵션은 drift 탐지와 호환성 유지에 직접적인 영향을 줍니다.
+
+### 6) blue/green 배포 게이트
+
+```text
+Gate A: expand 적용 후 v1 정상
+Gate B: v2 배포 후 overlap 정상
+Gate C: NULL row 0 확인 후 tighten
+Gate D: 구 컬럼 사용 중단 확인 후 contract
+```
+
+게이트를 코드화하면 배포 순서 실수를 줄일 수 있습니다.
+
+### 7) 비가역 변경 정책
+
+```python
+def downgrade() -> None:
+    raise NotImplementedError("irreversible revision by policy")
+```
+
+비가역 변경에서 침묵하는 `pass`보다 명시적 예외가 훨씬 안전합니다.
+
+### 8) CI 최소 게이트
+
+```bash
+alembic check
+alembic upgrade head
+alembic downgrade -1
+alembic upgrade head
+```
+
+drift, downgrade 결함, 체인 무결성을 PR 단계에서 차단할 수 있습니다.
+
+### 9) 에러 시그널 해석
+
+```text
+Multiple head revisions are present -> merge 필요
+Can't locate revision identified by ... -> revision chain 점검 필요
+table already exists -> baseline/stamp 전략 점검 필요
+```
+
+에러 유형별 대응 경로를 정해 두면 incident 대응 시간이 짧아집니다.
+
+### 10) 팀 운영 원칙
+
+```text
+- one PR = one revision
+- migration-first deploy
+- expand-contract 기본 적용
+- production 사고는 forward-fix 우선
+```
+
+원칙을 문서가 아니라 PR 템플릿과 CI로 강제하는 것이 핵심입니다.
+
+
+
+## 확장 부록: 배포/복구 실습 시나리오
+
+### 시나리오 A: add column + backfill + tighten
+
+```bash
+alembic revision -m "add users.phone nullable"
+alembic revision -m "backfill users.phone"
+alembic revision -m "tighten users.phone not null"
+alembic upgrade head
+```
+
+```sql
+SELECT COUNT(*) FROM users WHERE phone IS NULL;
+```
+
+`COUNT(*) = 0`이 아니라면 tighten 단계는 멈춰야 합니다.
+
+### 시나리오 B: 동시에 생성된 head 정리
+
+```bash
+alembic heads
+alembic merge -m "merge concurrent heads" <head1> <head2>
+alembic heads
+```
+
+merge 후 head가 하나여야 합니다.
+
+### 시나리오 C: offline SQL 승인 흐름
+
+```bash
+alembic upgrade <prev>:head --sql > review.sql
+```
+
+검토 포인트는 `DROP`, `ALTER`, 인덱스 재생성, `alembic_version` 갱신 SQL 포함 여부입니다.
+
+### 시나리오 D: incident first checks
+
+```bash
+alembic current
+alembic heads
+```
+
+```sql
+SELECT version_num FROM alembic_version;
+```
+
+애플리케이션 `/health`의 기대 버전과 DB 버전이 다르면 drift 가능성을 먼저 의심합니다.
+
+### 운영 스크립트 예시
+
+```bash
+set -euo pipefail
+alembic check
+alembic upgrade head
+alembic upgrade head --sql > /tmp/migration-preview.sql
+```
+
+### 품질 게이트 정리
+
+```text
+- autogenerate 결과 수동 검토
+- downgrade 정책 명시
+- data migration idempotency 확보
+- migration-first 배포
+- post-deploy smoke test
+```
+
+이 게이트들은 Alembic 자체 기능이라기보다 팀 운영 안전장치입니다.
+
+
+
+## 보강 메모: 검증 중심 운영 노트
+
+Alembic 운영에서 가장 큰 차이는 "명령 실행"이 아니라 "검증 기록"입니다. 같은 `upgrade head`를 실행해도 검증 쿼리, SQL preview, head 개수 확인을 함께 남기면 문제 재현성이 크게 높아집니다.
+
+```bash
+alembic heads
+alembic current
+alembic upgrade head --sql > /tmp/ddl.sql
+```
+
+```sql
+SELECT version_num FROM alembic_version;
+```
+
+또한 data migration이 포함된 경우에는 진행률을 관찰 가능한 숫자로 남겨야 합니다.
+
+```sql
+SELECT COUNT(*) FROM users WHERE tier IS NULL;
+```
+
+운영자는 이 숫자를 기준으로 tighten 단계 진행 여부를 결정해야 합니다. 값이 0이 아니면 단계 진행을 멈추고 backfill을 계속해야 합니다.
+
+배포 실패 대응의 기본 원칙은 다음과 같습니다.
+
+```text
+1) 현재 revision 위치를 먼저 확정한다.
+2) graph 상태(single head인지)를 확인한다.
+3) backward-compatible 여부를 판단한다.
+4) 가능하면 forward-fix revision으로 복구한다.
+```
+
+이 네 단계는 엔진(SQLite/PostgreSQL)과 무관하게 공통으로 적용됩니다.
+
+
+
+## 보강 메모: 검증 중심 운영 노트
+
+Alembic 운영에서 가장 큰 차이는 "명령 실행"이 아니라 "검증 기록"입니다. 같은 `upgrade head`를 실행해도 검증 쿼리, SQL preview, head 개수 확인을 함께 남기면 문제 재현성이 크게 높아집니다.
+
+```bash
+alembic heads
+alembic current
+alembic upgrade head --sql > /tmp/ddl.sql
+```
+
+```sql
+SELECT version_num FROM alembic_version;
+```
+
+또한 data migration이 포함된 경우에는 진행률을 관찰 가능한 숫자로 남겨야 합니다.
+
+```sql
+SELECT COUNT(*) FROM users WHERE tier IS NULL;
+```
+
+운영자는 이 숫자를 기준으로 tighten 단계 진행 여부를 결정해야 합니다. 값이 0이 아니면 단계 진행을 멈추고 backfill을 계속해야 합니다.
+
+배포 실패 대응의 기본 원칙은 다음과 같습니다.
+
+```text
+1) 현재 revision 위치를 먼저 확정한다.
+2) graph 상태(single head인지)를 확인한다.
+3) backward-compatible 여부를 판단한다.
+4) 가능하면 forward-fix revision으로 복구한다.
+```
+
+이 네 단계는 엔진(SQLite/PostgreSQL)과 무관하게 공통으로 적용됩니다.
+
+
+
+## 보강 메모: 검증 중심 운영 노트
+
+Alembic 운영에서 가장 큰 차이는 "명령 실행"이 아니라 "검증 기록"입니다. 같은 `upgrade head`를 실행해도 검증 쿼리, SQL preview, head 개수 확인을 함께 남기면 문제 재현성이 크게 높아집니다.
+
+```bash
+alembic heads
+alembic current
+alembic upgrade head --sql > /tmp/ddl.sql
+```
+
+```sql
+SELECT version_num FROM alembic_version;
+```
+
+또한 data migration이 포함된 경우에는 진행률을 관찰 가능한 숫자로 남겨야 합니다.
+
+```sql
+SELECT COUNT(*) FROM users WHERE tier IS NULL;
+```
+
+운영자는 이 숫자를 기준으로 tighten 단계 진행 여부를 결정해야 합니다. 값이 0이 아니면 단계 진행을 멈추고 backfill을 계속해야 합니다.
+
+배포 실패 대응의 기본 원칙은 다음과 같습니다.
+
+```text
+1) 현재 revision 위치를 먼저 확정한다.
+2) graph 상태(single head인지)를 확인한다.
+3) backward-compatible 여부를 판단한다.
+4) 가능하면 forward-fix revision으로 복구한다.
+```
+
+이 네 단계는 엔진(SQLite/PostgreSQL)과 무관하게 공통으로 적용됩니다.
+
+
+
+## 보강 메모: 검증 중심 운영 노트
+
+Alembic 운영에서 가장 큰 차이는 "명령 실행"이 아니라 "검증 기록"입니다. 같은 `upgrade head`를 실행해도 검증 쿼리, SQL preview, head 개수 확인을 함께 남기면 문제 재현성이 크게 높아집니다.
+
+```bash
+alembic heads
+alembic current
+alembic upgrade head --sql > /tmp/ddl.sql
+```
+
+```sql
+SELECT version_num FROM alembic_version;
+```
+
+또한 data migration이 포함된 경우에는 진행률을 관찰 가능한 숫자로 남겨야 합니다.
+
+```sql
+SELECT COUNT(*) FROM users WHERE tier IS NULL;
+```
+
+운영자는 이 숫자를 기준으로 tighten 단계 진행 여부를 결정해야 합니다. 값이 0이 아니면 단계 진행을 멈추고 backfill을 계속해야 합니다.
+
+배포 실패 대응의 기본 원칙은 다음과 같습니다.
+
+```text
+1) 현재 revision 위치를 먼저 확정한다.
+2) graph 상태(single head인지)를 확인한다.
+3) backward-compatible 여부를 판단한다.
+4) 가능하면 forward-fix revision으로 복구한다.
+```
+
+이 네 단계는 엔진(SQLite/PostgreSQL)과 무관하게 공통으로 적용됩니다.
+
+
 ## 처음 질문으로 돌아가기
 
 - **production에서 downgrade는 언제 가능하고 언제 사실상 불가능할까요?**

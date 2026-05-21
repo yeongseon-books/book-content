@@ -335,6 +335,179 @@ alembic upgrade head
 
 시리즈는 여기서 끝나지만, 실제 운영에서는 위 원칙을 사람 기억이 아니라 PR template, CI enforcement, deploy pipeline, monitoring으로 자동화해야 합니다. 그다음 학습 단계는 SQLAlchemy ORM의 더 깊은 주제들입니다.
 
+## 팀 런북 템플릿: migration release day
+
+문서가 길어질수록 현장 대응 속도는 떨어집니다. 운영일에는 아래처럼 짧은 런북 템플릿이 더 효과적입니다.
+
+```text
+[Release Day Runbook]
+1. 대상 revision: <revision_id>
+2. 변경 유형: expand / migrate / contract
+3. 사전 게이트
+   - alembic check: Pass
+   - heads==1: Pass
+   - fresh DB smoke: Pass
+4. 실행 순서
+   - migrate stage
+   - deploy stage
+   - smoke test
+5. 실패 시 기본 대응
+   - backward-compatible: code rollback 우선
+   - non-compatible: forward-fix revision 작성
+6. 기록
+   - 실제 실행 시간
+   - 관측된 alembic_version
+   - 이상 징후
+```
+
+템플릿의 목적은 완벽한 문서화가 아니라, 장애 순간에 의사결정 순서를 강제하는 것입니다.
+
+## CI 로그에서 보는 조기 경고 신호
+
+아래 로그는 merge 전에 바로 잡아야 하는 대표 신호입니다.
+
+```text
+Fail: multi-head detected (2)
+```
+
+merge revision 누락입니다. 기능 코드 검토를 멈추고 그래프 정리부터 해야 합니다.
+
+```text
+FAILED: Can't proceed with --autogenerate option; ... does not provide a MetaData object
+```
+
+`env.py` wiring 결함입니다. migration 내용보다 설정부터 수정해야 합니다.
+
+```text
+AssertionError: backfill incomplete: 73 rows remain
+```
+
+데이터 단계 검증이 의도대로 동작한 상태입니다. 실패를 억지로 통과시키지 말고 backfill 기준을 다시 맞춰야 합니다.
+
+## 프로덕션 모니터링 지표 최소 세트
+
+Alembic 관점에서 최소 지표는 세 가지입니다.
+
+1. 인스턴스별 `alembic_version` 분포
+2. 배포 직후 5xx/latency 변화
+3. 변경 대상 테이블의 NULL/불일치 카운트
+
+```sql
+SELECT version_num FROM alembic_version;
+SELECT COUNT(*) FROM users WHERE phone IS NULL;
+```
+
+이 두 쿼리만 정기적으로 수집해도 schema drift와 tighten 타이밍 오류를 빠르게 감지할 수 있습니다.
+
+
+## 실전 부록: 운영 앵커 모음
+
+아래 블록은 migration 리뷰와 배포 검증에서 반복해서 쓰는 공통 앵커입니다.
+
+### 1) DDL 미리 보기
+
+```bash
+alembic upgrade <from>:<to> --sql > migration-preview.sql
+```
+
+리뷰 시점에서 실제 SQL을 확인하면 `DROP`, `ALTER`, 인덱스 재생성 비용을 사전에 파악할 수 있습니다.
+
+### 2) revision 그래프 확인
+
+```bash
+alembic history --verbose
+alembic heads
+alembic current
+```
+
+`heads`가 2개 이상이면 기능 결함이 아니라 그래프 정리 이슈입니다. merge revision으로 정리한 뒤 배포해야 안전합니다.
+
+### 3) schema 전후 비교
+
+```bash
+sqlite3 app.db ".schema" > before.sql
+alembic upgrade head
+sqlite3 app.db ".schema" > after.sql
+```
+
+변경 의도와 실제 결과를 텍스트로 남기면 코드 리뷰 품질이 올라갑니다.
+
+### 4) data migration 검증 쿼리
+
+```sql
+SELECT COUNT(*) FROM users WHERE tier IS NULL;
+SELECT tier, COUNT(*) FROM users GROUP BY tier ORDER BY tier;
+```
+
+`NULL` 잔여 수와 분포를 함께 보면 backfill 완료 여부를 빠르게 판단할 수 있습니다.
+
+### 5) env.py 핵심 설정
+
+```python
+context.configure(
+    connection=connection,
+    target_metadata=target_metadata,
+    compare_type=True,
+    compare_server_default=True,
+    render_as_batch=connection.dialect.name == "sqlite",
+)
+```
+
+type/default 비교 옵션과 SQLite batch 옵션은 drift 탐지와 호환성 유지에 직접적인 영향을 줍니다.
+
+### 6) blue/green 배포 게이트
+
+```text
+Gate A: expand 적용 후 v1 정상
+Gate B: v2 배포 후 overlap 정상
+Gate C: NULL row 0 확인 후 tighten
+Gate D: 구 컬럼 사용 중단 확인 후 contract
+```
+
+게이트를 코드화하면 배포 순서 실수를 줄일 수 있습니다.
+
+### 7) 비가역 변경 정책
+
+```python
+def downgrade() -> None:
+    raise NotImplementedError("irreversible revision by policy")
+```
+
+비가역 변경에서 침묵하는 `pass`보다 명시적 예외가 훨씬 안전합니다.
+
+### 8) CI 최소 게이트
+
+```bash
+alembic check
+alembic upgrade head
+alembic downgrade -1
+alembic upgrade head
+```
+
+drift, downgrade 결함, 체인 무결성을 PR 단계에서 차단할 수 있습니다.
+
+### 9) 에러 시그널 해석
+
+```text
+Multiple head revisions are present -> merge 필요
+Can't locate revision identified by ... -> revision chain 점검 필요
+table already exists -> baseline/stamp 전략 점검 필요
+```
+
+에러 유형별 대응 경로를 정해 두면 incident 대응 시간이 짧아집니다.
+
+### 10) 팀 운영 원칙
+
+```text
+- one PR = one revision
+- migration-first deploy
+- expand-contract 기본 적용
+- production 사고는 forward-fix 우선
+```
+
+원칙을 문서가 아니라 PR 템플릿과 CI로 강제하는 것이 핵심입니다.
+
+
 ## 처음 질문으로 돌아가기
 
 - **one-revision-per-PR 원칙은 왜 중요할까요?**

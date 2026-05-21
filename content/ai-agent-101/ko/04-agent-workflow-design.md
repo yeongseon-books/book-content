@@ -310,6 +310,175 @@ StepResult(name='draft_reply', ok=True, output='Minji 고객은 pro 요금제를
 - 시행착오를 통해 개선해야 하는 문제라면 Reflexion을 고려할 수 있습니다.
 - 실제 production에서는 Plan → ReAct execution → post-check 같은 혼합형이 자주 쓰입니다.
 
+## 실전 설계 보강
+
+### 상태 전이도를 먼저 고정하면 워크플로우가 안정됩니다
+
+워크플로우 설계에서 가장 자주 보이는 실수는 노드 목록부터 만드는 것입니다. 실제로는 상태 전이도(state transition)를 먼저 확정해야 합니다. 어떤 조건에서 다음 노드로 넘어가는지, 실패 시 어디로 되돌아가는지를 코드로 고정해야 재현 가능한 흐름이 됩니다.
+
+```python
+from typing import Literal, TypedDict
+
+class WFState(TypedDict):
+    goal: str
+    evidence: list[str]
+    decision: str | None
+    retries: int
+
+Next = Literal["plan", "act", "verify", "finish", "fallback"]
+```
+
+### LangGraph 분기 예시
+
+```python
+from langgraph.graph import StateGraph, END
+
+def route_after_verify(state: WFState) -> str:
+    if state["decision"] == "done":
+        return "finish"
+    if state["retries"] >= 2:
+        return "fallback"
+    return "act"
+
+graph = StateGraph(WFState)
+graph.add_node("plan", plan_node)
+graph.add_node("act", act_node)
+graph.add_node("verify", verify_node)
+graph.add_node("finish", finish_node)
+graph.add_node("fallback", fallback_node)
+graph.set_entry_point("plan")
+graph.add_edge("plan", "act")
+graph.add_edge("act", "verify")
+graph.add_conditional_edges("verify", route_after_verify, {
+    "finish": "finish",
+    "act": "act",
+    "fallback": "fallback",
+})
+graph.add_edge("finish", END)
+graph.add_edge("fallback", END)
+```
+
+이 구조의 장점은 stop reason이 자연어가 아니라 전이 규칙으로 남는다는 점입니다. 장애 분석 시 "왜 끝났는가"를 코드로 설명할 수 있습니다.
+
+### 승인 게이트를 포함한 배포 전 워크플로우
+
+```mermaid
+flowchart LR
+  A[goal 수신] --> B[plan 생성]
+  B --> C[tool 실행]
+  C --> D[검증]
+  D -->|위험 작업 아님| E[자동 완료]
+  D -->|위험 작업| F[사람 승인]
+  F -->|승인| E
+  F -->|거절| G[안전 종료]
+```
+
+고위험 액션은 사람 승인 노드를 명시적으로 둬야 합니다. 프롬프트 문장으로만 "주의"를 적어 두면 운영 중 우회 경로가 생깁니다.
+
+### 워크플로우 성능 지표
+
+| 지표 | 정의 | 개선 힌트 |
+| --- | --- | --- |
+| completion_rate | 목표 달성 비율 | 분기 과다/도구 실패 점검 |
+| avg_steps | 평균 step 수 | 불필요 루프 제거 |
+| fallback_rate | fallback 종료 비율 | 검증 기준 완화 또는 도구 품질 개선 |
+| human_gate_rate | 승인 게이트 진입률 | 위험 분류 정책 재조정 |
+
+워크플로우 설계는 프롬프트 기교보다 상태 전이, 승인 정책, 종료 조건의 명확성이 좌우합니다.
+
+## 심화 운영 노트
+
+### 운영 관점 실패 분류 템플릿
+
+실전에서는 실패를 "모델이 틀렸다" 한 문장으로 닫지 않습니다. 다음 템플릿처럼 실패 축을 분리하면 개선 우선순위가 명확해집니다.
+
+| 분류 축 | 질문 | 예시 |
+| --- | --- | --- |
+| 계획 실패 | 목표를 잘못 분해했는가 | 불필요한 step 6회 반복 |
+| 실행 실패 | 도구 호출이 실패했는가 | timeout, 429, schema mismatch |
+| 검증 실패 | 결과 확인이 부족했는가 | 잘못된 observation 채택 |
+| 정책 실패 | 안전 경계를 넘었는가 | 민감 데이터 외부 전송 시도 |
+
+이 표를 runbook에 고정해 두면 온콜 엔지니어가 같은 기준으로 사고를 분류할 수 있습니다.
+
+### 프롬프트/도구 버전 고정 전략
+
+변경 추적이 어려운 팀은 대부분 프롬프트와 도구 스키마를 코드 릴리스와 분리해 관리합니다. 안정적인 팀은 아래처럼 버전 필드를 요청 컨텍스트에 명시합니다.
+
+```json
+{
+  "run_id": "run_2026_05_21_001",
+  "model": "gpt-4.1-mini",
+  "prompt_version": "agent-101-ko-v3",
+  "tool_schema_version": "tools-v5",
+  "policy_version": "policy-2026-05"
+}
+```
+
+버전 필드만 있어도 회귀 분석 속도가 크게 빨라집니다. 특정 시점의 품질 저하가 모델 변경인지, 프롬프트 변경인지, 도구 변경인지 즉시 좁힐 수 있기 때문입니다.
+
+### 관측성 이벤트 예시
+
+```python
+import json
+from datetime import datetime
+
+def emit_event(event_type: str, payload: dict):
+    record = {
+        "ts": datetime.utcnow().isoformat() + "Z",
+        "event_type": event_type,
+        "payload": payload,
+    }
+    print(json.dumps(record, ensure_ascii=False))
+
+emit_event("agent.step", {"step": 2, "tool": "search_docs", "latency_ms": 412})
+```
+
+구조화 로그를 먼저 도입하면 추후 OpenTelemetry, ELK, Grafana 같은 스택으로 확장할 때 마이그레이션 비용이 낮아집니다.
+
+### 배포 체크 항목
+
+- 모델 API 키를 환경 변수와 Secret Manager로 분리했는지 확인합니다.
+- `max_steps`, `timeout_ms`, `retry_budget` 기본값이 운영 프로필에 맞는지 검증합니다.
+- 장애 시 fallback 응답 문구가 사용자에게 과장된 확신을 주지 않는지 점검합니다.
+- 알람 임계치(`error_rate`, `p95_latency`, `policy_violation_rate`)를 문서와 코드에서 동일하게 유지합니다.
+
+이 항목은 기능 개발보다 눈에 덜 띄지만, 실제 장애 빈도를 줄이는 데 직접적으로 기여합니다.
+
+### 비용 통제 포인트
+
+| 항목 | 설명 | 권장 기본값 |
+| --- | --- | --- |
+| max_steps | 1회 실행당 최대 루프 | 4~8 |
+| max_tool_calls | 도구 호출 상한 | 3~6 |
+| input_token_budget | 입력 토큰 예산 | 서비스별 정책 |
+| output_token_budget | 출력 토큰 예산 | 서비스별 정책 |
+
+비용 통제는 성능 최적화 이후에 붙이는 부가기능이 아닙니다. 처음부터 실행 예산을 고정해야 사용량 급증 시 서비스가 안정적으로 유지됩니다.
+
+### 품질 회귀를 막는 CI 게이트 예시
+
+```bash
+python3 scripts/eval_agent.py --dataset eval/agent_core_ko.jsonl --min-success 0.82
+python3 scripts/check_tool_schema.py --strict
+python3 scripts/check_prompt_version.py --require-changelog
+```
+
+배포 파이프라인에서 최소 품질 게이트를 자동화하면 "우연히 좋아 보이는 빌드"가 운영으로 유입되는 일을 줄일 수 있습니다.
+
+### 운영 관점 실패 분류 템플릿
+
+실전에서는 실패를 "모델이 틀렸다" 한 문장으로 닫지 않습니다. 다음 템플릿처럼 실패 축을 분리하면 개선 우선순위가 명확해집니다.
+
+| 분류 축 | 질문 | 예시 |
+| --- | --- | --- |
+| 계획 실패 | 목표를 잘못 분해했는가 | 불필요한 step 6회 반복 |
+| 실행 실패 | 도구 호출이 실패했는가 | timeout, 429, schema mismatch |
+| 검증 실패 | 결과 확인이 부족했는가 | 잘못된 observation 채택 |
+| 정책 실패 | 안전 경계를 넘었는가 | 민감 데이터 외부 전송 시도 |
+
+이 표를 runbook에 고정해 두면 온콜 엔지니어가 같은 기준으로 사고를 분류할 수 있습니다.
+
 ## 흔히 헷갈리는 지점
 
 - workflow 패턴을 모델 성능 비교로 이해하기 쉽지만, 실제로는 제어 흐름 선택 문제입니다.

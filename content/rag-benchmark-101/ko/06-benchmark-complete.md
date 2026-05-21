@@ -273,6 +273,230 @@ def gate(deltas):
 
 이후 확장 주제로는 더 긴 코퍼스, 하이브리드 검색기, reranker, 다회전 대화 평가가 자연스럽게 이어질 수 있습니다. 하지만 그 확장도 결국 같은 원칙 위에 서야 합니다. 먼저 변수와 측정 조건을 고정하고, 그다음에 비교해야 합니다.
 
+## 통합 벤치마크를 운영 파이프라인으로 고정하는 설계
+
+시리즈 마지막 단계에서는 "실험 코드"를 "운영 파이프라인"으로 바꾸는 작업이 필요합니다. 핵심은 실행 절차와 산출물 포맷을 표준화해 누구나 같은 방식으로 돌릴 수 있게 만드는 것입니다.
+
+### 권장 디렉터리 구조
+
+```text
+rag-benchmark/
+  configs/
+    ci.yaml
+    nightly.yaml
+  data/
+    corpus.jsonl
+    gold_queries.jsonl
+  reports/
+    baseline.json
+    latest.json
+    history/
+  src/
+    run_benchmark.py
+    compare_reports.py
+    render_markdown.py
+```
+
+구조가 고정되어 있으면 CI, 로컬 실행, 야간 배치가 같은 경로를 공유할 수 있어 운영 부담이 줄어듭니다.
+
+### 실행 설정에 포함해야 할 필수 항목
+
+```yaml
+run:
+  seed: 42
+  sample_size: 200
+  top_k: 5
+retrieval:
+  embedding_model: sentence-transformers/all-MiniLM-L6-v2
+  index_type: ivf
+  nprobe: 8
+generation:
+  llm_model: llama-3.1-8b-instant
+  temperature: 0
+evaluation:
+  metrics: [faithfulness, answer_relevancy]
+  max_workers: 1
+  timeout_sec: 300
+```
+
+`seed`와 `sample_size`를 남기면 샘플링 기반 평가에서도 비교 가능성을 유지할 수 있습니다.
+
+### 통합 리포트 JSON 스키마 예시
+
+```json
+{
+  "run_id": "20260521T020500-1a2b3c4",
+  "git_sha": "1a2b3c4d",
+  "config_hash": "f2fcbf...",
+  "retrieval": {
+    "hit_rate@5": 0.93,
+    "mrr": 0.79,
+    "avg_latency_ms": 58.4,
+    "p95_latency_ms": 91.2
+  },
+  "generation": {
+    "faithfulness": 0.88,
+    "answer_relevancy": 0.86
+  },
+  "cost": {
+    "prompt_tokens": 421991,
+    "completion_tokens": 109823,
+    "estimated_usd": 7.42
+  },
+  "per_question": []
+}
+```
+
+`config_hash`를 추가하면 같은 실행 조건인지 자동 판별할 수 있습니다.
+
+### 회귀 판정 규칙을 레이어별로 나누기
+
+통합 벤치마크는 회귀를 한 줄로 판정하면 위험합니다. 검색과 생성을 분리한 게이트가 필요합니다.
+
+| 레이어 | 지표 | 차단 기준 예시 |
+| --- | --- | --- |
+| Retrieval | hit_rate@5 | baseline 대비 -0.03 미만 |
+| Retrieval | p95_latency_ms | baseline 대비 +25ms 초과 |
+| Generation | faithfulness | baseline 대비 -0.04 미만 |
+| Generation | answer_relevancy | baseline 대비 -0.03 미만 |
+
+이 규칙은 품질 하락과 지연 증가를 동시에 감시합니다. 한쪽만 보면 다른 쪽 악화를 놓치기 쉽습니다.
+
+### CI 워크플로 예시
+
+```yaml
+name: rag-benchmark-gate
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - run: python src/run_benchmark.py --config configs/ci.yaml --out reports/latest.json
+      - run: python src/compare_reports.py --baseline reports/baseline.json --current reports/latest.json
+```
+
+이 워크플로는 최소 구조입니다. 실제 환경에서는 캐시, 아티팩트 업로드, 실패 시 샘플 로그 첨부를 추가하는 편이 좋습니다.
+
+### 사람이 읽는 요약 리포트 생성
+
+JSON만으로는 협업이 어렵기 때문에 Markdown 요약을 자동 생성하는 단계를 함께 두면 효과적입니다.
+
+```python
+def render_summary_md(report: dict) -> str:
+    return f"""
+## RAG Benchmark Report
+
+- run_id: {report['run_id']}
+- retrieval.hit_rate@5: {report['retrieval']['hit_rate@5']:.3f}
+- retrieval.mrr: {report['retrieval']['mrr']:.3f}
+- generation.faithfulness: {report['generation']['faithfulness']:.3f}
+- generation.answer_relevancy: {report['generation']['answer_relevancy']:.3f}
+""".strip()
+```
+
+이 요약을 PR 코멘트에 자동 첨부하면, 리뷰어가 원본 JSON을 열지 않아도 핵심 변화를 빠르게 파악할 수 있습니다.
+
+### 장애 대응 관점의 운영 런북 항목
+
+벤치마크 파이프라인도 운영 시스템이므로 장애 대응 절차가 필요합니다.
+
+1. 외부 LLM API 타임아웃 발생 시 재시도 횟수와 백오프 정책 확인
+2. VectorDB 연결 실패 시 fallback 인덱스 사용 여부 확인
+3. baseline 파일 손상 시 마지막 정상 실행에서 복구
+4. 평가 비용 급등 시 샘플 수 자동 축소 모드로 전환
+
+런북을 벤치마크 코드와 같은 저장소에 두면 온콜 상황에서 훨씬 빠르게 복구할 수 있습니다.
+
+### 보고 체계를 분기/월 단위로 축적하기
+
+단일 실행 결과만 보면 추세를 읽기 어렵습니다. 최소한 아래 두 축을 같이 저장하면 장기 품질 관리가 가능해집니다.
+
+| 축 | 저장 항목 |
+| --- | --- |
+| 브랜치/PR | baseline 대비 delta, 실패 질문 목록 |
+| 월간 추세 | 7일 이동평균, 분산, 회귀 발생 빈도 |
+
+추세 데이터를 축적하면 "최근 품질이 떨어졌다"를 감으로 말하지 않고, 실제 숫자로 설명할 수 있습니다.
+
+## 실전 부록: 통합 벤치마크 운영 체크포인트
+
+마지막으로, 통합 파이프라인을 실제 조직에서 유지하기 위한 운영 체크포인트를 정리합니다.
+
+### 실행 단계별 산출물 규약
+
+| 단계 | 산출물 | 저장 경로 예시 |
+| --- | --- | --- |
+| retrieval 실행 | 질문별 ranked_ids, latency | `reports/run_id/retrieval.jsonl` |
+| generation 실행 | 질문별 answer, prompt 토큰 | `reports/run_id/generation.jsonl` |
+| evaluation 실행 | faithfulness, answer relevancy | `reports/run_id/eval.jsonl` |
+| 통합 리포트 | aggregate + delta + 실패 목록 | `reports/run_id/summary.json` |
+
+산출물 규약이 있어야 장애 시 특정 단계만 재실행할 수 있습니다.
+
+### 실패 재현 명령을 리포트에 포함하기
+
+리포트에 아래 정보가 없으면 실패한 실행을 다시 재현하기 어렵습니다.
+
+```text
+reproduce_command:
+python src/run_benchmark.py --config configs/ci.yaml --run-id 20260521T020500-1a2b3c4
+```
+
+한 줄 명령을 같이 저장해 두면 온콜 상황에서도 빠르게 재현할 수 있습니다.
+
+### 비용 가드레일 추가
+
+품질 회귀만 막고 비용 급등을 놓치는 경우가 많습니다. 비용 가드레일을 같이 두는 편이 안전합니다.
+
+| 항목 | 경고 기준 | 차단 기준 |
+| --- | ---: | ---: |
+| 실행당 평가 비용(USD) | +20% | +35% |
+| 질문당 평균 토큰 | +15% | +25% |
+| 월간 예상 비용 | 예산 90% 도달 | 예산 초과 |
+
+이 기준을 넘으면 성능 개선이 있어도 릴리스를 재검토해야 합니다.
+
+### 배포 전 승인용 요약 템플릿
+
+```text
+Release Candidate Benchmark Review
+- Retrieval: hit@5 0.93 (+0.01), MRR 0.80 (+0.02), p95 92ms (+4ms)
+- Generation: faithfulness 0.89 (+0.01), answer_relevancy 0.87 (+0.00)
+- Cost: +8.4% within budget
+- Decision: PASS (no blocking regression)
+```
+
+승인 템플릿을 정해 두면 릴리스 회의가 수치 중심으로 정리됩니다.
+
+### 장기 유지보수에서 자주 발생하는 이슈
+
+1. baseline이 오래되어 현재 데이터 분포를 반영하지 못하는 문제
+2. 평가 모델 버전 변경 후 과거 점수와 직접 비교하는 문제
+3. 코퍼스 갱신 주기와 벤치마크 주기가 어긋나는 문제
+4. 질문 샘플링 편향으로 특정 도메인 회귀를 놓치는 문제
+
+이 이슈를 피하려면 baseline 갱신 정책, 평가자 버전 정책, 데이터 동기화 정책을 별도 문서로 유지해야 합니다.
+
+### 운영 점검용 주간 체크리스트
+
+- 지난 7일 기준 `faithfulness`, `MRR`, `p95 latency` 이동평균을 확인합니다.
+- 회귀 차단으로 실패한 PR의 공통 원인을 분류합니다.
+- 실패 질문 상위 20개가 동일 질문군에 편중되는지 확인합니다.
+- 평가 비용이 예산 대비 정상 범위인지 검토합니다.
+- baseline 갱신 필요 여부를 결정하고 기록합니다.
+
+이 체크리스트를 정기적으로 수행하면 벤치마크가 일회성 이벤트가 아니라 지속적인 품질 관리 루프로 유지됩니다.
+
+여기에 더해, 분기마다 벤치마크 데이터셋 대표성을 점검하는 절차를 넣는 편이 좋습니다. 제품 기능이 바뀌면 사용자 질문 분포도 바뀌기 때문에, 오래된 질문 세트만으로는 최신 회귀를 놓칠 수 있습니다. 대표성 점검은 벤치마크 유지비용을 줄이는 것이 아니라, 잘못된 안전감으로 인한 운영 리스크를 줄이는 투자입니다.
+
 ## 처음 질문으로 돌아가기
 
 - **벤치마크를 한 번 실행하는 스크립트에서 반복 가능한 의사결정 도구로 바꾸려면 무엇이 필요할까요?**

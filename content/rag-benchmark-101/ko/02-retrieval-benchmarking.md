@@ -254,6 +254,190 @@ for row in report_rows:
 
 다음 글에서는 같은 루프를 그대로 둔 채 임베딩 모델만 바꿔 봅니다. 코드 변경은 한 줄에 가깝지만, 결과 해석은 의외로 까다롭습니다.
 
+## 벤치마크 입력 파일을 고정하는 실전 형식
+
+검색 실험에서 가장 흔한 재현 실패 원인은 질문 세트가 실행마다 달라지는 것입니다. 아래처럼 질문과 정답 문서 ID를 JSONL로 고정해 두면 실행 조건을 명확히 보존할 수 있습니다.
+
+```json
+{"query_id":"q-001","question":"MRR는 무엇을 측정하나요?","relevant_ids":["doc-mrr-01"]}
+{"query_id":"q-002","question":"IVF의 nprobe는 왜 필요한가요?","relevant_ids":["doc-ivf-02","doc-ivf-03"]}
+{"query_id":"q-003","question":"RAG에서 chunk size를 크게 잡으면 어떤 영향이 있나요?","relevant_ids":["doc-chunk-04"]}
+```
+
+그리고 실행 시점에는 입력 파일 해시를 리포트에 반드시 남깁니다.
+
+```python
+import hashlib
+from pathlib import Path
+
+def file_sha256(path: str) -> str:
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+meta = {
+    "gold_set_path": "data/gold_queries.jsonl",
+    "gold_set_sha256": file_sha256("data/gold_queries.jsonl"),
+}
+```
+
+이 메타데이터가 없으면, 점수 차이가 코드 변경 때문인지 입력 변경 때문인지 분리하기 어렵습니다.
+
+### 질문군별 hit rate를 함께 기록하기
+
+평균 hit rate 하나만 보면 특정 도메인 회귀를 놓치기 쉽습니다. 질문에 `segment`를 붙여 그룹별 지표를 같이 계산하면 더 빨리 원인을 찾을 수 있습니다.
+
+| segment | 예시 질문 | hit@3 | MRR | 해석 |
+| --- | --- | ---: | ---: | --- |
+| 개념 정의 | "RAGAS faithfulness는?" | 0.95 | 0.86 | 안정적 |
+| 운영 설정 | "IVF nprobe 튜닝" | 0.78 | 0.62 | 튜닝 문서 검색 약함 |
+| 장애 대응 | "검색 지연 급등 대응" | 0.64 | 0.49 | 런북 문서 회수 실패 |
+
+이 표는 제품팀과 운영팀이 같은 리포트를 보고도 즉시 행동 항목을 정할 수 있게 해 줍니다.
+
+### 지연 시간 측정에서 분리해야 할 구간
+
+검색 지연 시간을 신뢰하려면 아래 경계를 명확히 나누어야 합니다.
+
+```text
+[포함]   retriever.invoke(question)
+[제외]   질문 로딩, 임베딩 모델 초기화, 결과 직렬화, 로그 업로드
+```
+
+특히 서버형 VectorDB를 쓴다면 네트워크 RTT가 크게 작용하므로, 같은 리포트에 네트워크 환경도 남겨 두는 편이 좋습니다.
+
+```yaml
+environment:
+  region: ap-northeast-2
+  client_host: bench-runner-01
+  vectordb_endpoint: qdrant.internal:6333
+  transport: http
+  tls: false
+```
+
+### 검색 품질 차트 설명 템플릿
+
+문서에는 종종 그래프 이미지가 붙습니다. 차트 해석 문장을 표준화하면 팀 내 오해를 줄일 수 있습니다.
+
+1. x축은 `top-k`, y축은 `hit rate` 또는 `MRR`로 고정합니다.
+2. 두 검색기 곡선이 교차하는 k 지점을 본문에 명시합니다.
+3. 운영 top-k(예: 5)에서의 값 차이를 문장으로 다시 적습니다.
+
+예시 설명 문장:
+
+"k=1에서는 BM25가 MRR 0.71로 앞서지만, k=5에서는 hybrid 검색기가 hit rate 0.93으로 역전합니다. 운영 top-k=4 기준으로는 hybrid가 정답 회수율에서 0.08 우세합니다."
+
+### CI 회귀 검사용 간단한 비교 스크립트
+
+아래 스크립트는 이전 실행 결과와 현재 실행 결과를 비교해 핵심 지표 회귀를 판정합니다.
+
+```python
+import json
+import sys
+
+THRESHOLDS = {
+    "hit_rate@3": -0.02,
+    "MRR": -0.03,
+    "p95_latency_ms": 8.0,
+}
+
+before = json.load(open("reports/baseline.json", "r", encoding="utf-8"))
+after = json.load(open("reports/current.json", "r", encoding="utf-8"))
+
+delta_hit = after["aggregate"]["hit_rate@3"] - before["aggregate"]["hit_rate@3"]
+delta_mrr = after["aggregate"]["MRR"] - before["aggregate"]["MRR"]
+delta_p95 = after["aggregate"]["p95_latency_ms"] - before["aggregate"]["p95_latency_ms"]
+
+if delta_hit < THRESHOLDS["hit_rate@3"] or delta_mrr < THRESHOLDS["MRR"] or delta_p95 > THRESHOLDS["p95_latency_ms"]:
+    print("FAIL: retrieval benchmark regression")
+    sys.exit(1)
+
+print("PASS: retrieval benchmark thresholds satisfied")
+```
+
+이 정도 자동화만 있어도 "좋아 보인다"가 아니라 "기준을 통과했다"로 대화를 전환할 수 있습니다.
+
+## 실전 부록: 검색 벤치마크 운영 설정과 로그 포맷
+
+검색 벤치마크를 팀 공용 파이프라인으로 운영하려면 실행 설정과 로그 포맷을 표준화해야 합니다.
+
+### 실행 설정 YAML 예시
+
+```yaml
+benchmark:
+  top_k: 5
+  warmup_queries: 5
+  repeats_per_query: 3
+  sample_size: 120
+retriever:
+  type: faiss
+  embedding_model: sentence-transformers/all-MiniLM-L6-v2
+  search_kwargs:
+    k: 5
+latency:
+  percentile: [50, 95]
+  include_network_rtt: true
+report:
+  save_json: true
+  save_csv: true
+  out_dir: reports/retrieval
+```
+
+이 정도만 고정해도 환경별 실행 차이를 크게 줄일 수 있습니다.
+
+### 질문별 로그 CSV 권장 컬럼
+
+| 컬럼 | 설명 |
+| --- | --- |
+| run_id | 실행 식별자 |
+| query_id | 질문 ID |
+| question | 원문 질문 |
+| ranked_ids | 상위 문서 ID 목록 |
+| relevant_ids | 정답 문서 ID 목록 |
+| hit@k | hit 여부 |
+| rr | reciprocal rank |
+| latency_ms | 검색 지연 시간 |
+
+CSV를 함께 저장해 두면 PM이나 운영팀도 파이썬 코드 없이 쉽게 확인할 수 있습니다.
+
+### 지연 시간 분포를 텍스트로 요약하는 방식
+
+그래프가 없어도 분포 요약을 텍스트로 남기면 추세 분석이 가능합니다.
+
+```text
+latency summary (ms)
+  min: 3.1
+  p50: 5.4
+  p95: 12.8
+  p99: 19.2
+  max: 27.7
+```
+
+이 요약은 인프라 변경 전후 비교에 특히 유용합니다.
+
+### 검색 품질 회귀 진단 순서
+
+1. `Recall@k = 0` 질문 목록부터 확인합니다.
+2. 해당 질문의 `ranked_ids`와 `relevant_ids`를 비교합니다.
+3. 공통 실패 토픽(예: 약어, 제품명, 버전명)을 묶습니다.
+4. 쿼리 확장 또는 문서 메타데이터 보강 실험을 우선 배치합니다.
+
+이 순서를 표준 절차로 두면, 회귀가 발생해도 대응 속도를 일정하게 유지할 수 있습니다.
+
+### 운영 파라미터 비교 테이블 예시
+
+| run_id | retriever | top_k | hit@5 | MRR | p95(ms) |
+| --- | --- | ---: | ---: | ---: | ---: |
+| r-20260521-a | bm25 | 5 | 0.81 | 0.63 | 21.4 |
+| r-20260521-b | faiss-flat | 5 | 0.90 | 0.77 | 34.8 |
+| r-20260521-c | hybrid | 5 | 0.93 | 0.80 | 39.2 |
+
+같은 질문 세트에서 위 표를 누적하면, 팀은 "품질 우선"인지 "지연 우선"인지 목적에 맞춰 검색기를 고를 수 있습니다.
+
+추가로, 실험 로그에는 "실패 질문 10개"를 별도 파일로 저장하는 편이 좋습니다. 평균 지표가 같아도 실패 질문 구성이 바뀌면 사용자 체감은 크게 달라질 수 있기 때문입니다. 실패 질문 목록이 누적되면 특정 도메인(예: 장애 대응 문서, 버전 호환성 문서)에서 반복적으로 취약한 패턴을 찾기 쉬워집니다.
+
+벤치마크 루프를 장기 운영할 때는 질문 세트 갱신 주기를 미리 정해 두는 것이 좋습니다. 예를 들어 월 1회 신규 질문 10%를 교체하고, 교체 전후 공통 질문 90%를 유지하면 추세 비교와 데이터 신선도를 함께 확보할 수 있습니다.
+
+또한 갱신된 질문은 최소 한 번 이상 도메인 리뷰를 거쳐 정답 문서 ID를 검증한 뒤 벤치마크에 반영해야, 지표 왜곡을 줄일 수 있습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **검색 성능을 감이 아니라 벤치마크 루프로 보려면 무엇을 고정해야 할까요?**

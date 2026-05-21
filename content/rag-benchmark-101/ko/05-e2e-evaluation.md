@@ -221,6 +221,178 @@ python3 main.py
 
 다음 글에서는 1편부터 5편까지의 도구를 하나로 묶습니다. 검색, 생성, 평가 결과를 한 번에 내는 통합 벤치마크 파이프라인이 시리즈의 마지막 주제입니다.
 
+## 종단 간 평가 리포트를 운영 가능한 형태로 확장하기
+
+종단 간 평가에서 가장 큰 실패는 점수 평균만 남기고 샘플 근거를 버리는 것입니다. 운영에서는 "왜 떨어졌는가"를 설명할 수 있어야 하므로, 아래 세 층을 함께 저장해야 합니다.
+
+1. 집계 점수: faithfulness, answer relevancy, 검색 지표
+2. 샘플별 점수: 질문 단위의 세부 점수
+3. 근거 데이터: contexts, answer, 참조 문서 ID
+
+### RAGAS 출력과 검색 출력 결합 예시
+
+```python
+def merge_eval_rows(retrieval_rows, ragas_df):
+    merged = []
+    for idx, r in enumerate(retrieval_rows):
+        merged.append({
+            "query_id": r["query_id"],
+            "question": r["question"],
+            "ranked_ids": r["ranked_ids"],
+            "hit@5": r["hit@5"],
+            "mrr": r["mrr"],
+            "answer": r["answer"],
+            "faithfulness": float(ragas_df.iloc[idx]["faithfulness"]),
+            "answer_relevancy": float(ragas_df.iloc[idx]["answer_relevancy"]),
+        })
+    return merged
+```
+
+이 구조를 쓰면 "검색은 맞았는데 답변 근거성이 떨어진 질문"을 즉시 필터링할 수 있습니다.
+
+### 판정 규칙을 명시적으로 두기
+
+점수만 나열하면 의사결정이 지연됩니다. 아래처럼 판정 규칙을 함께 두면 결과 해석이 빨라집니다.
+
+| 조건 | 판정 | 다음 액션 |
+| --- | --- | --- |
+| hit@5 낮음 + faithfulness 낮음 | 검색-생성 동시 실패 | 인덱스/임베딩/프롬프트 동시 점검 |
+| hit@5 높음 + faithfulness 낮음 | 생성 근거성 실패 | 인용 강제 프롬프트, 답변 포맷 제한 |
+| hit@5 낮음 + faithfulness 높음 | 검색 누락 | chunking, query expansion, reranker |
+| answer relevancy 낮음 | 질문 해석 실패 | 시스템 프롬프트와 질문 정규화 수정 |
+
+### 평가자 일관성을 위한 프롬프트 버전 고정
+
+LLM-as-judge는 평가 프롬프트가 바뀌면 점수 분포도 같이 바뀝니다. 그래서 평가 프롬프트를 버전 문자열로 고정해 리포트에 남겨야 합니다.
+
+```yaml
+evaluator:
+  provider: groq
+  model: llama-3.1-8b-instant
+  temperature: 0
+  prompt_version: ragas-faithfulness-v3
+  max_workers: 1
+```
+
+프롬프트 버전을 남기지 않으면, 다음 달 점수 변화가 모델 변화인지 평가 기준 변화인지 구분하기 어렵습니다.
+
+### LangSmith 트레이스 연동 예시
+
+질문별 실패를 빠르게 재현하려면 실행 ID와 트레이스를 연결하는 편이 좋습니다.
+
+```python
+trace_row = {
+    "query_id": query_id,
+    "run_id": run_id,
+    "langsmith_trace_url": trace_url,
+    "faithfulness": faithfulness,
+    "answer_relevancy": answer_relevancy,
+}
+```
+
+리포트에서 낮은 점수 행을 클릭해 바로 트레이스로 이동할 수 있으면 디버깅 시간이 크게 줄어듭니다.
+
+### RAGAS 실행 결과 텍스트 예시
+
+```text
+RAGAS aggregate:
+  faithfulness: 0.872
+  answer_relevancy: 0.846
+
+Worst cases by faithfulness:
+  q-014: 0.41 (질문: "IVF nprobe를 1로 두면?")
+  q-033: 0.45 (질문: "chunk overlap 권장값은?")
+```
+
+이 출력은 단순 평균보다 훨씬 실용적입니다. 팀은 즉시 최악 사례 두세 개를 열어 원인 분석을 시작할 수 있습니다.
+
+### 프로덕션용 평가 실행 정책
+
+평가 비용과 안정성을 위해 다음 정책을 자주 사용합니다.
+
+| 실행 종류 | 샘플 수 | 주기 | 목적 |
+| --- | ---: | --- | --- |
+| PR 경량 평가 | 30~50 | PR마다 | 회귀 빠른 감지 |
+| Nightly 표준 평가 | 200~400 | 매일 | 추세 모니터링 |
+| 릴리스 전 전체 평가 | 500+ | 릴리스 직전 | 승인 근거 확보 |
+
+이 정책을 문서화해 두면 "언제 어떤 점수를 신뢰할 것인가"에 대한 조직 합의를 만들 수 있습니다.
+
+## 실전 부록: 종단 간 평가 임계치와 실패 샘플 기록
+
+종단 간 평가는 점수만 맞추는 작업이 아니라 위험 질문을 관리하는 작업입니다. 그래서 임계치와 샘플 보관 정책을 같이 두는 편이 좋습니다.
+
+### 임계치 정책 예시
+
+| 지표 | 경고 | 차단 | 비고 |
+| --- | ---: | ---: | --- |
+| faithfulness | 0.86 미만 | 0.82 미만 | 환각 위험 증가 |
+| answer relevancy | 0.84 미만 | 0.80 미만 | 질문 비적합 답변 증가 |
+| retrieval hit@5 | 0.90 미만 | 0.86 미만 | 근거 문서 누락 증가 |
+
+차단 기준은 한 번에 엄격하게 올리기보다, 2주 이상의 baseline 분포를 본 뒤 단계적으로 조정하는 방식이 안전합니다.
+
+### 실패 샘플 저장 포맷
+
+```json
+{
+  "query_id": "q-108",
+  "question": "nprobe를 줄이면 어떤 트레이드오프가 생기나요?",
+  "contexts": ["..."],
+  "answer": "...",
+  "scores": {
+    "faithfulness": 0.41,
+    "answer_relevancy": 0.79,
+    "hit@5": 1.0
+  },
+  "diagnosis": "retrieval-ok-generation-hallucination"
+}
+```
+
+`diagnosis` 같은 분류 키를 추가해 두면 회귀 사례를 유형별로 빠르게 집계할 수 있습니다.
+
+### 평가 실행 안정성 설정
+
+```python
+from ragas.run_config import RunConfig
+
+run_config = RunConfig(
+    timeout=300,
+    max_workers=1,
+    max_retries=2,
+    retry_wait=2,
+)
+```
+
+평가 파이프라인은 외부 API 의존성이 크기 때문에 timeout/retry를 명시하지 않으면 flaky 실패가 많아집니다.
+
+### 리트리벌 품질과 생성 품질을 함께 보여 주는 요약 표
+
+| bucket | 질문 수 | avg hit@5 | avg faithfulness | avg answer relevancy |
+| --- | ---: | ---: | ---: | ---: |
+| 쉬운 질문 | 80 | 0.97 | 0.92 | 0.90 |
+| 중간 질문 | 90 | 0.91 | 0.86 | 0.85 |
+| 어려운 질문 | 40 | 0.82 | 0.76 | 0.79 |
+
+이 표는 난이도별 품질 격차를 드러내기 때문에, 개선 우선순위를 정할 때 실용적입니다.
+
+### 실패 케이스 라벨링 체계 예시
+
+질문별 회귀를 빠르게 분류하려면 라벨링 체계를 먼저 정해 두는 편이 좋습니다.
+
+| label | 의미 |
+| --- | --- |
+| retrieval-miss | 정답 문서 미회수 |
+| grounded-but-offtopic | 근거는 있으나 질문 비적합 |
+| hallucination-with-confidence | 자신감 있는 무근거 답변 |
+| citation-format-error | 근거 문서 인용 형식 오류 |
+
+라벨이 고정되면 월간 품질 회고에서 실패 비율 변화를 쉽게 추적할 수 있습니다.
+
+라벨링 체계를 유지할 때는 최소 주 1회 표본 검수를 권장합니다. 자동 라벨링 규칙이 누적 편향을 만들 수 있기 때문입니다. 사람이 주기적으로 확인한 라벨 샘플을 기준선으로 유지하면, 평가 파이프라인의 해석 품질도 함께 안정화됩니다.
+
+평가 리포트를 공유할 때는 낮은 점수 사례만이 아니라 개선된 사례도 같이 포함하는 편이 좋습니다. 실패 사례만 누적되면 팀이 원인만 찾고 성공 패턴을 재사용하지 못하는 경우가 많기 때문입니다. 성공 사례를 함께 기록하면 프롬프트와 검색 설정의 유효 패턴을 더 빠르게 확산할 수 있습니다.
+
 ### RAGAS 배치 평가 코드 확장
 
 실무에서는 평균 점수만 출력하면 디버깅이 어렵습니다. 샘플별 점수와 입력 데이터를 함께 저장해 두어야 회귀 분석이 가능합니다. 아래처럼 DataFrame으로 내보내는 코드를 붙이면 재검토가 쉬워집니다.

@@ -237,6 +237,309 @@ Alembic을 이미 쓰는 프로젝트에 합류했을 때는 명령어를 외우
 
 추가로, 첫 주에는 의도적으로 작은 스키마 변경 하나를 만들어 `revision -> upgrade -> 확인 -> downgrade`까지 한 번 왕복해 보는 것이 좋습니다. 문서로 이해한 흐름과 실제 팀 파이프라인이 일치하는지 확인할 수 있고, 비상시에 어떤 명령을 어디서 실행해야 하는지도 몸에 익힐 수 있습니다.
 
+## 현장에서 바로 쓰는 baseline 도입 시나리오
+
+기존 서비스에 Alembic을 나중에 도입할 때는 `init` 자체보다 baseline 전략이 더 중요합니다. 이미 운영 중인 스키마가 있는데도 무심코 `upgrade head`를 실행하면, Alembic은 "아무것도 적용되지 않은 DB"로 판단하고 처음 revision부터 모두 실행하려고 시도합니다. 이때 가장 흔한 실패가 "이미 존재하는 테이블 생성" 오류입니다.
+
+아래 순서가 실무에서 안전합니다.
+
+```bash
+# 1) 운영 DB를 직접 건드리지 않고 스냅샷으로 검증
+pg_dump -s "$DATABASE_URL" > schema-before-alembic.sql
+
+# 2) 현재 모델 기준 baseline revision 생성
+alembic revision --autogenerate -m "baseline current production schema"
+
+# 3) 생성 파일 검토: 절대 DROP/ALTER이 섞이면 안 됨
+git diff -- alembic/versions
+
+# 4) 운영 DB에는 DDL 실행 대신 stamp만 수행
+alembic stamp head
+
+# 5) 버전 포인터 확인
+alembic current
+```
+
+핵심은 4단계입니다. baseline 단계에서 필요한 것은 스키마 변경이 아니라 "이 DB는 이미 이 revision 상태다"라는 선언입니다. 그래서 `upgrade`가 아니라 `stamp`를 씁니다. 이 원칙이 없으면 도입 첫날부터 운영 DB를 불필요하게 흔들게 됩니다.
+
+## revision 파일 품질을 올리는 최소 리뷰 기준
+
+`alembic revision -m "..."`으로 파일이 생성되면 아래 다섯 항목만은 반드시 확인하는 편이 좋습니다.
+
+1. `revision`, `down_revision`이 의도한 그래프를 만드는가
+2. `upgrade`에서 생성한 객체를 `downgrade`에서 정확히 역순으로 제거하는가
+3. `server_default`와 ORM `default`를 혼동하지 않았는가
+4. SQLite라면 `batch_alter_table`이 필요한 연산인지 확인했는가
+5. data migration이 섞였다면 idempotent `WHERE` 조건이 있는가
+
+아래처럼 아주 작은 템플릿을 팀 위키에 두면 리뷰 밀도가 올라갑니다.
+
+```text
+[Migration Review]
+- graph: single head / intended branch
+- DDL safety: no accidental drop
+- downgrade: exact inverse or explicit irreversible
+- data step: idempotent + bounded batch
+- deploy note: expand / migrate / contract phase
+```
+
+이 체크리스트는 복잡한 규칙이 아니라 "사고가 자주 나는 지점"만 모아 둔 것입니다. 특히 `down_revision` 오타와 `downgrade` 누락은 작은 실수처럼 보여도 배포 파이프라인 전체를 멈추게 만듭니다.
+
+## 오류 시그널과 즉시 대응
+
+초기 도입 단계에서 자주 만나는 에러는 대체로 몇 가지로 수렴합니다.
+
+```text
+sqlalchemy.exc.OperationalError: table users already exists
+-> baseline이 필요한 DB에 upgrade를 실행했을 가능성
+
+FAILED: Can't locate revision identified by 'abc123...'
+-> 누락된 revision 파일 또는 잘못된 down_revision 체인
+
+FAILED: Multiple head revisions are present
+-> 병렬 revision이 merge 없이 main에 합쳐진 상태
+```
+
+첫 번째 에러는 `stamp`로 경로를 되돌리는 문제이고, 두 번째는 revision 파일 자체가 손실되었는지부터 확인해야 합니다. 세 번째는 기능 결함이 아니라 그래프 정리 문제이므로 `alembic merge`로 해결합니다. 에러를 유형별로 분리해서 대응하면 복구 시간이 크게 줄어듭니다.
+
+## schema 전후 비교 예시
+
+Alembic 도입 전후로 팀이 얻는 것은 "DDL 실행 기능"보다 "재현 가능한 이력"입니다. 아래 예시는 같은 변경을 두 방식으로 처리했을 때의 차이를 보여 줍니다.
+
+```sql
+-- Before (수동 SQL)
+ALTER TABLE users ADD COLUMN tier VARCHAR(16) NOT NULL DEFAULT 'free';
+CREATE INDEX ix_users_tier ON users(tier);
+```
+
+```python
+# After (revision 파일)
+def upgrade() -> None:
+    op.add_column("users", sa.Column("tier", sa.String(16), nullable=False, server_default="free"))
+    op.create_index("ix_users_tier", "users", ["tier"])
+
+def downgrade() -> None:
+    op.drop_index("ix_users_tier", table_name="users")
+    op.drop_column("users", "tier")
+```
+
+수동 SQL은 실행 당시에는 빠르지만 시간이 지나면 "누가, 왜, 어떤 순서로"를 잃습니다. revision 파일은 변경의 의도와 복구 경로를 코드로 남깁니다. Alembic을 도입하는 이유를 한 줄로 줄이면 결국 이 차이입니다.
+
+
+## 실전 부록: 운영 앵커 모음
+
+아래 블록은 migration 리뷰와 배포 검증에서 반복해서 쓰는 공통 앵커입니다.
+
+### 1) DDL 미리 보기
+
+```bash
+alembic upgrade <from>:<to> --sql > migration-preview.sql
+```
+
+리뷰 시점에서 실제 SQL을 확인하면 `DROP`, `ALTER`, 인덱스 재생성 비용을 사전에 파악할 수 있습니다.
+
+### 2) revision 그래프 확인
+
+```bash
+alembic history --verbose
+alembic heads
+alembic current
+```
+
+`heads`가 2개 이상이면 기능 결함이 아니라 그래프 정리 이슈입니다. merge revision으로 정리한 뒤 배포해야 안전합니다.
+
+### 3) schema 전후 비교
+
+```bash
+sqlite3 app.db ".schema" > before.sql
+alembic upgrade head
+sqlite3 app.db ".schema" > after.sql
+```
+
+변경 의도와 실제 결과를 텍스트로 남기면 코드 리뷰 품질이 올라갑니다.
+
+### 4) data migration 검증 쿼리
+
+```sql
+SELECT COUNT(*) FROM users WHERE tier IS NULL;
+SELECT tier, COUNT(*) FROM users GROUP BY tier ORDER BY tier;
+```
+
+`NULL` 잔여 수와 분포를 함께 보면 backfill 완료 여부를 빠르게 판단할 수 있습니다.
+
+### 5) env.py 핵심 설정
+
+```python
+context.configure(
+    connection=connection,
+    target_metadata=target_metadata,
+    compare_type=True,
+    compare_server_default=True,
+    render_as_batch=connection.dialect.name == "sqlite",
+)
+```
+
+type/default 비교 옵션과 SQLite batch 옵션은 drift 탐지와 호환성 유지에 직접적인 영향을 줍니다.
+
+### 6) blue/green 배포 게이트
+
+```text
+Gate A: expand 적용 후 v1 정상
+Gate B: v2 배포 후 overlap 정상
+Gate C: NULL row 0 확인 후 tighten
+Gate D: 구 컬럼 사용 중단 확인 후 contract
+```
+
+게이트를 코드화하면 배포 순서 실수를 줄일 수 있습니다.
+
+### 7) 비가역 변경 정책
+
+```python
+def downgrade() -> None:
+    raise NotImplementedError("irreversible revision by policy")
+```
+
+비가역 변경에서 침묵하는 `pass`보다 명시적 예외가 훨씬 안전합니다.
+
+### 8) CI 최소 게이트
+
+```bash
+alembic check
+alembic upgrade head
+alembic downgrade -1
+alembic upgrade head
+```
+
+drift, downgrade 결함, 체인 무결성을 PR 단계에서 차단할 수 있습니다.
+
+### 9) 에러 시그널 해석
+
+```text
+Multiple head revisions are present -> merge 필요
+Can't locate revision identified by ... -> revision chain 점검 필요
+table already exists -> baseline/stamp 전략 점검 필요
+```
+
+에러 유형별 대응 경로를 정해 두면 incident 대응 시간이 짧아집니다.
+
+### 10) 팀 운영 원칙
+
+```text
+- one PR = one revision
+- migration-first deploy
+- expand-contract 기본 적용
+- production 사고는 forward-fix 우선
+```
+
+원칙을 문서가 아니라 PR 템플릿과 CI로 강제하는 것이 핵심입니다.
+
+
+
+## 확장 부록: 배포/복구 실습 시나리오
+
+### 시나리오 A: add column + backfill + tighten
+
+```bash
+alembic revision -m "add users.phone nullable"
+alembic revision -m "backfill users.phone"
+alembic revision -m "tighten users.phone not null"
+alembic upgrade head
+```
+
+```sql
+SELECT COUNT(*) FROM users WHERE phone IS NULL;
+```
+
+`COUNT(*) = 0`이 아니라면 tighten 단계는 멈춰야 합니다.
+
+### 시나리오 B: 동시에 생성된 head 정리
+
+```bash
+alembic heads
+alembic merge -m "merge concurrent heads" <head1> <head2>
+alembic heads
+```
+
+merge 후 head가 하나여야 합니다.
+
+### 시나리오 C: offline SQL 승인 흐름
+
+```bash
+alembic upgrade <prev>:head --sql > review.sql
+```
+
+검토 포인트는 `DROP`, `ALTER`, 인덱스 재생성, `alembic_version` 갱신 SQL 포함 여부입니다.
+
+### 시나리오 D: incident first checks
+
+```bash
+alembic current
+alembic heads
+```
+
+```sql
+SELECT version_num FROM alembic_version;
+```
+
+애플리케이션 `/health`의 기대 버전과 DB 버전이 다르면 drift 가능성을 먼저 의심합니다.
+
+### 운영 스크립트 예시
+
+```bash
+set -euo pipefail
+alembic check
+alembic upgrade head
+alembic upgrade head --sql > /tmp/migration-preview.sql
+```
+
+### 품질 게이트 정리
+
+```text
+- autogenerate 결과 수동 검토
+- downgrade 정책 명시
+- data migration idempotency 확보
+- migration-first 배포
+- post-deploy smoke test
+```
+
+이 게이트들은 Alembic 자체 기능이라기보다 팀 운영 안전장치입니다.
+
+
+
+## 보강 메모: 검증 중심 운영 노트
+
+Alembic 운영에서 가장 큰 차이는 "명령 실행"이 아니라 "검증 기록"입니다. 같은 `upgrade head`를 실행해도 검증 쿼리, SQL preview, head 개수 확인을 함께 남기면 문제 재현성이 크게 높아집니다.
+
+```bash
+alembic heads
+alembic current
+alembic upgrade head --sql > /tmp/ddl.sql
+```
+
+```sql
+SELECT version_num FROM alembic_version;
+```
+
+또한 data migration이 포함된 경우에는 진행률을 관찰 가능한 숫자로 남겨야 합니다.
+
+```sql
+SELECT COUNT(*) FROM users WHERE tier IS NULL;
+```
+
+운영자는 이 숫자를 기준으로 tighten 단계 진행 여부를 결정해야 합니다. 값이 0이 아니면 단계 진행을 멈추고 backfill을 계속해야 합니다.
+
+배포 실패 대응의 기본 원칙은 다음과 같습니다.
+
+```text
+1) 현재 revision 위치를 먼저 확정한다.
+2) graph 상태(single head인지)를 확인한다.
+3) backward-compatible 여부를 판단한다.
+4) 가능하면 forward-fix revision으로 복구한다.
+```
+
+이 네 단계는 엔진(SQLite/PostgreSQL)과 무관하게 공통으로 적용됩니다.
+
+
 ## 처음 질문으로 돌아가기
 
 - **마이그레이션 도구가 실제로 해결하는 문제는 무엇일까요?**
