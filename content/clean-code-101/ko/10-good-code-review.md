@@ -63,7 +63,7 @@ last_reviewed: '2026-05-15'
 - **CI (Continuous Integration)**: 자동 빌드와 테스트입니다.
 - **Style guide**: 팀이 공유하는 규칙 모음입니다.
 
-## Before/After
+## 전/후 비교
 
 **Before**
 
@@ -83,7 +83,7 @@ Options: (a) split in this PR, (b) follow-up PR with an issue link."
 
 ## 실전 적용: 탄탄한 리뷰 프로세스 다섯 단계
 
-### Step 1 — Push toil into automation
+### 단계 1 — Push toil into automation
 
 ```yaml
 # 1_ci.yml
@@ -94,7 +94,7 @@ Options: (a) split in this PR, (b) follow-up PR with an issue link."
 
 스타일, 포맷, 기본 테스트는 사람 눈앞에 오기 전에 끝나야 합니다. 사람이 자동화가 할 일을 대신하면 리뷰의 질이 바로 떨어집니다.
 
-### Step 2 — Keep PRs small
+### 단계 2 — Keep PRs small
 
 ```text
 # 2_small_pr.txt
@@ -103,23 +103,23 @@ Recommended: under 400 lines diff, one responsibility
 
 작은 PR은 빠른 리뷰의 전제입니다. 한 책임만 담긴 PR이어야 리뷰어도 기준을 선명하게 적용할 수 있습니다.
 
-### Step 3 — Read intent first
+### 단계 3 — Read intent first
 
 ```markdown
 <!-- 3_pr_template.md -->
-## What
+## 무엇을 바꾸는가
 What is changing
-## Why
+## 왜 바꾸는가
 Why it changes (issue link)
-## How
+## 어떻게 바꾸는가
 How it was verified (tests/screenshots)
-## Risk
+## 위험은 무엇인가
 What could go wrong
 ```
 
 맥락 없는 PR은 제대로 리뷰할 수 없습니다. 리뷰어는 코드보다 먼저 의도와 위험을 읽어야 전체 구조를 올바르게 판단할 수 있습니다.
 
-### Step 4 — Write actionable comments
+### 단계 4 — Write actionable comments
 
 ```text
 # 4_comment.txt
@@ -131,7 +131,7 @@ QUESTION: clarification
 
 우선순위 라벨이 붙은 코멘트는 불필요한 마찰을 줄입니다. 무엇이 선택 사항이고 무엇이 병합 전 필수인지 분명해야 합니다.
 
-### Step 5 — Learn through retrospectives
+### 단계 5 — Learn through retrospectives
 
 ```text
 # 5_retro.txt
@@ -341,6 +341,278 @@ def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
 
 또한 개선 활동은 단발성 이벤트가 아니라 루프여야 합니다. 한 번의 대청소보다 매 PR마다 작은 개선을 추가하는 편이 장기적으로 더 강합니다. 이름 하나, 함수 하나, 분기 하나를 매번 더 낫게 만드는 습관이 쌓이면 코드베이스의 평균 품질이 올라가고, 장애 대응 속도도 실제로 빨라집니다.
 
+
+## 코드 리뷰 기준표: 의견이 아니라 근거로 대화하기
+
+좋은 리뷰는 취향 비교가 아니라 위험 관리입니다. 아래 기준표를 리뷰 템플릿에 고정하면 코멘트 품질이 빠르게 안정됩니다.
+
+| 관점 | 질문 | 확인 방법 |
+| --- | --- | --- |
+| 정확성 | 요구사항을 정확히 반영했는가 | 테스트/샘플 입력 검토 |
+| 가독성 | 이름과 함수 경계가 명확한가 | 전/후 코드 비교 |
+| 안정성 | 예외/경계 처리 누락이 없는가 | 실패 시나리오 확인 |
+| 확장성 | 새 정책 추가 시 수정 범위가 작은가 | OCP 관점 점검 |
+| 운영성 | 로그, 메트릭, 롤백 전략이 있는가 | PR 본문 체크리스트 |
+
+## 전/후 데모: 리뷰 가능한 PR 단위로 쪼개기
+
+```text
+# before
+PR-1: 결제 정책 변경 + 함수 분리 + 이름 변경 + 테스트 보강
+
+# after
+PR-1: 함수 분리(동작 동일)
+PR-2: 이름 변경(동작 동일)
+PR-3: 결제 정책 추가(동작 변경)
+```
+
+PR 단위를 분리하면 리뷰어는 "무엇이 바뀌었는가"와 "왜 바꿨는가"를 빠르게 판단할 수 있습니다. 결과적으로 리뷰 속도와 품질이 함께 올라갑니다.
+
+## 리뷰 코멘트 템플릿 예시
+
+```markdown
+- 관찰: `calculate_total`가 결제/할인/로깅을 함께 수행합니다.
+- 위험: 변경 이유가 여러 개라 회귀 가능성이 큽니다.
+- 제안: 계산 함수와 부수효과 함수를 분리하면 테스트 범위를 줄일 수 있습니다.
+- 확인: 분리 후 기존 테스트와 신규 경계 테스트를 함께 요청합니다.
+```
+
+## 자동화 게이트 예시
+
+```yaml
+name: review-gate
+on: [pull_request]
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install -r requirements-dev.txt
+      - run: ruff check .
+      - run: pytest -q
+```
+
+자동화는 리뷰어의 시간을 반복 검증에서 해방시킵니다. 사람이 봐야 하는 영역은 설계 의도와 위험 trade-off입니다.
+
+
+## 심화 실습: 리뷰 운영 지표 만들기
+
+리뷰 품질은 느낌이 아니라 지표로 관리해야 개선됩니다. 아래 지표를 월 단위로 보면 병목 지점을 찾기 쉽습니다.
+
+| 지표 | 설명 | 목표 예시 |
+| --- | --- | --- |
+| 첫 리뷰 응답 시간 | PR 생성 후 첫 코멘트까지 시간 | 4시간 이내 |
+| 리뷰 라운드 수 | 승인까지 필요한 왕복 횟수 | 2회 이하 |
+| 자동화 실패율 | 린터/테스트 실패 비율 | 10% 이하 |
+| 리뷰 후 회귀 결함률 | 병합 후 7일 내 결함 발생 | 2% 이하 |
+
+```python
+def review_health_score(first_response_hours: float, rounds: int, regression_rate: float) -> float:
+    score = 100.0
+    score -= max(0, first_response_hours - 4) * 2
+    score -= max(0, rounds - 2) * 5
+    score -= regression_rate * 100
+    return max(score, 0)
+```
+
+지표는 사람 평가가 아니라 프로세스 개선 도구입니다. 팀 문화를 해치지 않으려면 지표를 개인 비교가 아니라 시스템 개선 기준으로만 사용해야 합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
 ## 처음 질문으로 돌아가기
 
 - **리뷰 가능한 PR 크기는 어느 정도일까요?**
@@ -373,4 +645,5 @@ def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
 - [Best Kept Secrets of Peer Code Review (Smart Bear)](https://smartbear.com/resources/ebooks/best-kept-secrets-of-peer-code-review/)
 - [Microsoft Engineering Fundamentals — Code Review](https://microsoft.github.io/code-with-engineering-playbook/code-reviews/)
 - [Google engineering practices — code review](https://google.github.io/eng-practices/review/)
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/clean-code-101/ko)
 Tags: Computer Science, CleanCode, CodeReview, PullRequest, Quality, Collaboration

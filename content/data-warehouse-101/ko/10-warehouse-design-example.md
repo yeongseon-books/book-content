@@ -22,9 +22,11 @@ last_reviewed: '2026-05-15'
 
 # Data Warehouse 101 (10/10): Warehouse 설계 예제
 
+이 글은 데이터 웨어하우스 101 시리즈의 10번째 글입니다.
+
 개별 개념을 따로 이해하는 것과 실제로 하나의 Warehouse를 설계하는 일은 다릅니다. 하나의 도메인을 처음부터 끝까지 따라가 보면 grain, dimension, schema, 적재 흐름, mart가 왜 그 자리에 놓이는지 훨씬 분명해집니다. 이 마지막 글은 앞선 개념을 한 번에 조립해 보는 예제입니다.
 
-이 글은 Data Warehouse 101 시리즈의 마지막 글입니다.
+
 
 ## 먼저 던지는 질문
 
@@ -68,7 +70,7 @@ last_reviewed: '2026-05-15'
 - **Slowly Changing Dimension (SCD)**: 차원 속성 변화를 시간에 따라 기록하는 방식입니다.
 - **Mart**: 소비자에게 바로 제공하는 주제별 최종 모델입니다.
 
-## Before / After
+## 전후 비교
 
 **Before**: source DB를 직접 조회하며 분석할 때마다 SQL을 새로 작성해 느리고 비싸고 자주 깨집니다.
 
@@ -468,6 +470,109 @@ operating_baseline:
 
 또한 분기 단위 회고에서는 기술 성능 지표뿐 아니라 의사결정 지표도 함께 보는 것이 좋습니다. 예를 들어 "대시보드 숫자 논쟁으로 소모된 회의 시간", "지표 정의 변경 후 영향 범위 확인 시간", "재처리 요청 처리 리드타임" 같은 운영 지표를 추적하면 데이터 조직의 성숙도를 더 현실적으로 파악할 수 있습니다.
 
+
+## 실전 앵커: 모델, 파이프라인, 성능 검증
+
+아래 예시는 이 글의 개념을 실제 운영으로 옮길 때 바로 재사용할 수 있는 최소 앵커입니다. 스키마, 적재 설정, 성능 비교를 한 묶음으로 두면 설계 논의가 추상 수준에서 끝나지 않고 실행 가능한 결정으로 이어집니다.
+
+```sql
+-- 공통 분석 질의 템플릿: 기간 + 세그먼트 + 지표
+WITH scoped AS (
+    SELECT
+        f.date_key,
+        f.amount,
+        f.qty,
+        c.segment,
+        p.category
+    FROM fact_sales f
+    JOIN dim_customer c ON c.customer_key = f.customer_key
+    JOIN dim_product p ON p.product_key = f.product_key
+    WHERE f.date_key BETWEEN 20260101 AND 20260331
+)
+SELECT
+    segment,
+    category,
+    SUM(amount) AS revenue,
+    SUM(qty) AS units,
+    COUNT(*) AS order_lines,
+    ROUND(SUM(amount) / NULLIF(COUNT(*), 0), 2) AS avg_line_amount
+FROM scoped
+GROUP BY 1, 2
+ORDER BY revenue DESC;
+```
+
+```yaml
+pipeline_contract:
+  schedule: "0 * * * *"
+  source:
+    type: cdc
+    lag_slo_minutes: 15
+  transform:
+    engine: dbt
+    model_layers: [stg, int, mart]
+  quality_tests:
+    - not_null
+    - unique
+    - relationships
+    - accepted_values
+  publish:
+    target: mart_sales_daily
+    strategy: merge
+```
+
+```mermaid
+flowchart LR
+    A["OLTP 주문/결제"] --> B["Raw 적재"]
+    B --> C["Staging 정제"]
+    C --> D["Fact/Dimension 모델"]
+    D --> E["Mart 집계"]
+    E --> F["대시보드/리포트"]
+```
+
+성능 비교는 반드시 동일 조건에서 수행해야 합니다. 파티션 필터 유무, 조인 순서, 집계 단위를 고정하지 않으면 숫자가 설계를 설명하지 못합니다.
+
+| 비교 항목 | 조건 A(비최적화) | 조건 B(최적화) | 해석 |
+| --- | --- | --- | --- |
+| 스캔 바이트 | 480GB | 62GB | 파티션 프루닝이 대부분의 차이를 만듭니다. |
+| 실행 시간 | 94초 | 18초 | 집계 이전 필터링으로 셔플 비용이 줄어듭니다. |
+| 슬롯/크레딧 사용량 | 높음 | 중간 | 비용 안정성이 높아집니다. |
+| 재현성 | 낮음 | 높음 | 표준 템플릿 쿼리 사용 시 비교 가능성이 유지됩니다. |
+
+운영에서는 "정확한 한 번"보다 "안전한 재실행"이 더 중요한 경우가 많습니다. 그래서 적재 키를 두고 upsert 기준을 명확히 정의하는 방식이 필요합니다.
+
+```sql
+-- 재실행 가능한 머지 예시
+MERGE INTO mart_sales_daily t
+USING (
+    SELECT
+        d.full_date,
+        c.segment,
+        p.category,
+        SUM(f.amount) AS revenue,
+        SUM(f.qty) AS units
+    FROM fact_sales f
+    JOIN dim_date d ON d.date_key = f.date_key
+    JOIN dim_customer c ON c.customer_key = f.customer_key
+    JOIN dim_product p ON p.product_key = f.product_key
+    WHERE d.full_date >= CURRENT_DATE - INTERVAL '7 day'
+    GROUP BY 1, 2, 3
+) s
+ON t.full_date = s.full_date
+AND t.segment = s.segment
+AND t.category = s.category
+WHEN MATCHED THEN UPDATE SET
+    revenue = s.revenue,
+    units = s.units,
+    updated_at = CURRENT_TIMESTAMP
+WHEN NOT MATCHED THEN INSERT (
+    full_date, segment, category, revenue, units, updated_at
+) VALUES (
+    s.full_date, s.segment, s.category, s.revenue, s.units, CURRENT_TIMESTAMP
+);
+```
+
+이 패턴을 기준선으로 두면, 모델 변경이나 파이프라인 장애가 생겨도 영향을 계층별로 좁혀 복구할 수 있습니다. 데이터 웨어하우스 운영은 쿼리 한두 개의 튜닝보다, 반복 가능한 설계 계약을 지키는 과정에 더 가깝습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **처음 웨어하우스를 설계할 때 어디서 시작해야 할까요?**
@@ -499,5 +604,7 @@ operating_baseline:
 - [BigQuery — Schema Design Best Practices](https://cloud.google.com/bigquery/docs/best-practices-schema-design)
 - [dbt — How We Structure Our Projects](https://docs.getdbt.com/best-practices/how-we-structure/1-guide-overview)
 - [Snowflake — Data Modeling](https://docs.snowflake.com/en/user-guide/table-considerations)
+
+- [이 시리즈의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/data-warehouse-101/ko)
 
 Tags: DataWarehouse, Design, Example, EndToEnd, Analytics

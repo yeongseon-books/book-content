@@ -63,7 +63,7 @@ last_reviewed: '2026-05-15'
 - **Domain term**: 비즈니스에서 쓰는 단어를 코드에도 그대로 쓰는 방식입니다.
 - **Length budget**: 짧음보다 정확성을 우선하는 길이 감각입니다.
 
-## Before/After
+## 전/후 비교
 
 **Before**
 
@@ -81,7 +81,7 @@ SECONDS_PER_DAY = 86400
 
 ## 실전 적용: 이름을 개선하는 다섯 단계
 
-### Step 1 — Reveal intent
+### 단계 1 — Reveal intent
 
 ```python
 # 1_intent.py
@@ -91,7 +91,7 @@ def first_completed_order(orders): return orders[0]
 
 호출 지점에서 바로 이해되는 이름이 좋습니다. 함수 본문보다 이름이 먼저 읽힌다는 사실을 항상 기억해야 합니다.
 
-### Step 2 — Searchable
+### 단계 2 — Searchable
 
 ```python
 # 2_search.py
@@ -101,7 +101,7 @@ DEFAULT_SALES_TAX_RATE = 0.08
 
 검색 가능한 이름은 나중의 분석 비용을 줄입니다. 너무 짧거나 흔한 이름은 찾는 순간부터 비용을 만듭니다.
 
-### Step 3 — Domain terms
+### 단계 3 — Domain terms
 
 ```python
 # 3_domain.py
@@ -111,7 +111,7 @@ def calculate_invoice_subtotal(line_items): ...
 
 코드가 비즈니스와 다른 단어를 쓰기 시작하면 대화가 꼬입니다. 도메인 언어를 그대로 들여오면 사용자와 개발자의 문맥이 맞춰집니다.
 
-### Step 4 — Avoid negatives
+### 단계 4 — Avoid negatives
 
 ```python
 # 4_negative.py
@@ -121,7 +121,7 @@ if is_empty(x): ...
 
 이중 부정은 읽는 순간 사고를 한 번 더 요구합니다. 긍정형 표현이 대개 더 빠르고 덜 위험합니다.
 
-### Step 5 — Balance brevity and accuracy
+### 단계 5 — Balance brevity and accuracy
 
 ```python
 # 5_balance.py
@@ -208,7 +208,7 @@ python -m pytest -q tests/test_naming_examples.py
 
 규칙의 핵심은 일관성입니다. 같은 도메인 개념을 파일마다 다르게 부르면 검색성과 협업 속도가 급격히 떨어집니다. 따라서 용어집을 먼저 합의하고, 이름 변경은 한 번에 넓게 수행하는 편이 안전합니다.
 
-## Before/After 비교: 이름이 의도를 바꾸는 순간
+## 전/후 비교 비교: 이름이 의도를 바꾸는 순간
 
 ```python
 # before
@@ -324,6 +324,268 @@ def estimate_next_month_effort(current_hours: float, reduction_goal: float) -> f
 
 이런 질문과 간단한 계산만으로도 "감" 중심 회고를 "계획" 중심 회고로 바꿀 수 있습니다.
 
+
+## 명명 규칙 표준안: 팀 합의를 코드로 고정하기
+
+명명은 개인 취향이 아니라 팀의 공유 계약입니다. 아래 표준안을 저장소 루트 문서와 PR 템플릿에 함께 두면 리뷰 기준이 빠르게 안정됩니다.
+
+| 구분 | 권장 패턴 | 금지 패턴 | 예시 |
+| --- | --- | --- | --- |
+| 불리언 | `is_`, `has_`, `can_` 접두 | `flag`, `status` 단독 사용 | `has_payment_method` |
+| 단위 포함 수치 | 단위를 suffix에 명시 | 단위 없는 숫자 이름 | `retry_interval_seconds` |
+| 컬렉션 | 복수형 + 요소 의미 | `list`, `arr`, `data` | `overdue_invoices` |
+| 파생값 | 계산 의미를 드러내는 접미 | 원본과 동일한 이름 재사용 | `normalized_email` |
+| 임시 변수 | 블록 단위 목적 명시 | `tmp`, `x`, `v2` | `next_status` |
+
+## 함수 추출과 이름 재설계 동시 적용 데모
+
+```python
+# before
+def run(a, b, c):
+    if a and b and c > 0:
+        return b * c * 0.9
+    return 0
+
+
+# after
+def calculate_discounted_total(has_membership: bool, item_price_cents: int, quantity: int) -> int:
+    if not is_discount_eligible(has_membership, item_price_cents, quantity):
+        return 0
+    return int(item_price_cents * quantity * 0.9)
+
+
+def is_discount_eligible(has_membership: bool, item_price_cents: int, quantity: int) -> bool:
+    return has_membership and item_price_cents > 0 and quantity > 0
+```
+
+이 데모에서 핵심은 함수를 쪼갠 행위보다 이름이 만든 계약입니다. 호출자는 구현을 몰라도 입력 의미를 이해할 수 있고, 변경 시 영향 범위를 빠르게 추적할 수 있습니다.
+
+## 도메인 용어 테이블 예시
+
+| 사용자 표현 | 코드 용어 | 피해야 할 대체어 |
+| --- | --- | --- |
+| 주문 합계 | `order_total_cents` | `sum`, `total_value` |
+| 결제 완료 | `payment_confirmed` | `done`, `ok` |
+| 배송 준비 | `ready_for_shipment` | `prepared`, `state3` |
+| 할인 쿠폰 | `discount_coupon` | `dc`, `ticket` |
+
+도메인 용어집을 코드와 분리해 두는 것보다, 테스트 이름과 API 스키마에도 같은 용어를 넣는 것이 더 효과적입니다. 용어가 레이어마다 일치하면 장애 보고 문장도 짧아집니다.
+
+## 린터로 명명 규칙 강제하기
+
+```toml
+# pyproject.toml
+[tool.ruff.lint]
+select = ["E", "F", "N", "B"]
+
+[tool.ruff.lint.pep8-naming]
+ignore-names = ["setUp", "tearDown"]
+```
+
+명명 규칙을 린터에 넣으면 리뷰어가 반복적으로 "이름을 바꾸세요"라고 말할 필요가 없습니다. 리뷰 코멘트는 설계 의사결정과 위험 평가에 집중하게 됩니다.
+
+
+## 심화 실습: 명명 규칙 마이그레이션 계획
+
+대규모 저장소에서 이름 개선은 한 번에 끝낼 수 없습니다. 영역별로 우선순위를 나누어 점진적으로 진행해야 리스크가 작습니다. 보통은 공개 API, 핵심 도메인, 보조 유틸리티 순서로 진행합니다.
+
+| 우선순위 | 대상 | 기준 | 완료 조건 |
+| --- | --- | --- | --- |
+| 1 | 공개 API | 외부 호출자가 의존 | 변경 로그/호환성 확인 |
+| 2 | 핵심 도메인 | 기능 변경이 잦음 | 용어집과 코드 일치 |
+| 3 | 내부 유틸 | 영향 범위 제한 | 테스트 통과 |
+
+```python
+RENAME_MAP = {
+    "calc": "calculate_invoice_total",
+    "usr": "user",
+    "amt": "amount_cents",
+    "dt": "created_at",
+}
+
+
+def suggest_renamed_identifier(identifier: str) -> str:
+    return RENAME_MAP.get(identifier, identifier)
+```
+
+이런 매핑은 자동 치환 도구의 입력값으로도 사용할 수 있습니다. 단, 자동 치환 뒤에는 의미 검증 리뷰를 반드시 넣어야 합니다. 문자열 치환은 문맥을 이해하지 못하기 때문입니다.
+
+## 명명 리뷰 코멘트 예시
+
+- 관찰: `result`가 세 단계에서 서로 다른 의미로 재사용됩니다.
+- 위험: 디버깅 시 값 추적이 어려워 오해성 버그가 발생할 수 있습니다.
+- 제안: `validated_payload`, `persisted_order`, `response_body`처럼 단계별 의미를 분리합니다.
+
+이 방식은 공격적인 표현을 피하면서도 변경 이유를 분명하게 전달합니다. 리뷰 언어도 코드 품질의 일부입니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
 ## 처음 질문으로 돌아가기
 
 - **좋은 이름을 판단할 때 어떤 신호를 봐야 할까요?**
@@ -357,4 +619,5 @@ def estimate_next_month_effort(current_hours: float, reduction_goal: float) -> f
 - [PEP 8 — Naming Conventions](https://peps.python.org/pep-0008/#naming-conventions)
 - [Ruff pep8-naming rules](https://docs.astral.sh/ruff/rules/#pep8-naming-n)
 - [PEP 8 naming conventions](https://peps.python.org/pep-0008/#naming-conventions)
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/clean-code-101/ko)
 Tags: Computer Science, CleanCode, Naming, Readability, Refactoring, SoftwareEngineering

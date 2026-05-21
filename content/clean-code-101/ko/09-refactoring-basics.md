@@ -63,7 +63,7 @@ last_reviewed: '2026-05-15'
 - **Two hats**: 기능 추가와 구조 개선을 같은 변경에 섞지 않는 원칙입니다.
 - **Mikado method**: 큰 변경을 작은 의존 그래프로 쪼개는 접근입니다.
 
-## Before/After
+## 전/후 비교
 
 **Before**
 
@@ -95,7 +95,7 @@ def order_total(o):
 
 ## 실전 적용: 안전한 리팩토링 다섯 단계
 
-### Step 1 — Characterization tests as a safety net
+### 단계 1 — Characterization tests as a safety net
 
 ```python
 # 1_characterize.py
@@ -106,7 +106,7 @@ def test_legacy_total():
 
 레거시 코드에서는 완전히 이해한 뒤 시작하려고 하면 너무 늦어집니다. 먼저 현재 동작을 고정하고, 그다음에 구조를 만지는 편이 훨씬 안전합니다.
 
-### Step 2 — Extract Function
+### 단계 2 — Extract Function
 
 ```python
 # 2_extract.py
@@ -115,7 +115,7 @@ def subtotal(items): return sum(i.price * i.qty for i in items)
 
 가장 먼저 추출할 것은 계산이나 규칙처럼 의미 단위가 분명한 부분입니다. 작은 단위로 잘라야 다음 단계도 명확해집니다.
 
-### Step 3 — Rename
+### 단계 3 — Rename
 
 ```python
 # 3_rename.py
@@ -125,7 +125,7 @@ def items_subtotal(items): ...
 
 이름 변경은 리팩토링의 절반입니다. 구조를 바꿨는데 이름이 그대로면, 읽는 사람은 여전히 예전 정신 모델에 갇히게 됩니다.
 
-### Step 4 — Inline and Move
+### 단계 4 — Inline and Move
 
 ```python
 # 4_move.py
@@ -136,7 +136,7 @@ class OrderPricing:
 
 응집도는 올리고, 잘못 놓인 코드는 제자리로 옮겨야 합니다. 때로는 추출보다 이동이 더 큰 가독성 개선을 만듭니다.
 
-### Step 5 — Keep two hats separate
+### 단계 5 — Keep two hats separate
 
 ```python
 # 5_two_hats.py
@@ -223,7 +223,7 @@ python -m pytest -q tests/test_legacy_characterization.py
 
 카탈로그를 팀 공통 언어로 쓰면 리뷰 대화가 빨라집니다. "여기 Move Field가 필요하다"처럼 짧고 정확하게 의도를 전달할 수 있습니다.
 
-## Extract Method / Move Field Python 예시
+## 메서드 추출 / 필드 이동 Python 예시
 
 ```python
 # before
@@ -331,6 +331,290 @@ def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
 
 또한 개선 활동은 단발성 이벤트가 아니라 루프여야 합니다. 한 번의 대청소보다 매 PR마다 작은 개선을 추가하는 편이 장기적으로 더 강합니다. 이름 하나, 함수 하나, 분기 하나를 매번 더 낫게 만드는 습관이 쌓이면 코드베이스의 평균 품질이 올라가고, 장애 대응 속도도 실제로 빨라집니다.
 
+
+## 리팩토링 카탈로그: 작은 변경을 안전하게 누적하기
+
+리팩토링은 대규모 재작성보다 작은 단위의 안전한 누적이 효과적입니다. 아래 카탈로그는 우선순위를 잡는 기본 틀입니다.
+
+| 기법 | 적용 신호 | 선행 조건 |
+| --- | --- | --- |
+| 이름 변경 | 의미 불명확, 오해성 호출 | 참조 검색, 테스트 통과 |
+| 함수 추출 | 한 함수의 책임 다중화 | 동작 고정 테스트 |
+| 함수 이동 | 모듈 경계 위반 | 의존 방향 확인 |
+| 인라인 | 과도한 추상화 | 호출부 단순화 검토 |
+| 파라미터 객체 | 인자 목록 과다 | 데이터 응집도 확인 |
+
+## 전/후 데모: 단계적 리팩토링
+
+```python
+# before
+def make_report(users):
+    result = []
+    for u in users:
+        if u["active"] and u["last_login_days"] < 30:
+            result.append({"id": u["id"], "segment": "engaged"})
+    return result
+
+
+# after
+def make_report(users):
+    return [to_engaged_entry(user) for user in users if is_recent_active_user(user)]
+
+
+def is_recent_active_user(user: dict) -> bool:
+    return user["active"] and user["last_login_days"] < 30
+
+
+def to_engaged_entry(user: dict) -> dict:
+    return {"id": user["id"], "segment": "engaged"}
+```
+
+## SOLID 샘플: 개방-폐쇄와 의존 역전 적용
+
+```python
+from typing import Protocol
+
+class SegmentPolicy(Protocol):
+    def matches(self, user: dict) -> bool: ...
+
+
+def filter_users(users: list[dict], policy: SegmentPolicy) -> list[dict]:
+    return [user for user in users if policy.matches(user)]
+```
+
+정책 객체를 주입하면 규칙 추가 시 기존 함수 수정량이 줄어듭니다. 이 구조는 리팩토링과 기능 확장을 동시에 안전하게 지원합니다.
+
+## 린터/품질 게이트 예시
+
+```toml
+[tool.ruff.lint]
+select = ["E", "F", "B", "C90", "N", "I"]
+```
+
+```bash
+pytest -q
+ruff check app/ tests/
+```
+
+리팩토링 PR은 기능 PR과 분리하고, 검증 로그를 PR 본문에 남겨야 추적 가능성이 올라갑니다. 이 규칙이 장기 유지보수 비용을 결정합니다.
+
+
+## 심화 실습: 레거시 모듈 점진 개선 계획
+
+레거시 모듈은 "한 번에 교체"보다 "행동 고정 후 점진 개선"이 안전합니다. 먼저 Characterization Test로 현재 동작을 고정하고, 작은 리팩토링을 반복합니다.
+
+| 단계 | 목표 | 완료 기준 |
+| --- | --- | --- |
+| 1 | 현재 동작 고정 | 핵심 시나리오 테스트 통과 |
+| 2 | 이름 정리 | 주요 함수/변수 오해성 제거 |
+| 3 | 구조 분리 | 계산/검증/저장 경계 분리 |
+| 4 | 확장점 도입 | 정책 추가 시 수정 범위 축소 |
+
+```python
+def migrate_refactor_step(step_name: str, is_verified: bool) -> str:
+    if not is_verified:
+        return f"{step_name}:blocked"
+    return f"{step_name}:done"
+```
+
+리팩토링은 속도보다 신뢰가 먼저입니다. 각 단계마다 검증 로그를 남기면 다음 변경의 출발 비용이 줄어듭니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
 ## 처음 질문으로 돌아가기
 
 - **리팩토링은 정확히 무엇이고, 재작성과 무엇이 다를까요?**
@@ -364,4 +648,5 @@ def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
 - [The Mikado Method](https://mikadomethod.info/)
 - [Refactoring catalog](https://refactoring.com/catalog/)
 - [Working Effectively with Legacy Code](https://www.oreilly.com/library/view/working-effectively-with/0131177052/)
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/clean-code-101/ko)
 Tags: Computer Science, CleanCode, Refactoring, Patterns, LegacyCode, Quality

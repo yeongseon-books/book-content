@@ -22,9 +22,11 @@ last_reviewed: '2026-05-15'
 
 # Data Warehouse 101 (1/10): Data Warehouse란 무엇인가?
 
+이 글은 데이터 웨어하우스 101 시리즈의 1번째 글입니다.
+
 서비스가 커지면 주문 한 건을 처리하는 데이터베이스와 어제 매출 합계를 빠르게 계산하는 데이터베이스가 서로 다른 요구를 받기 시작합니다. 같은 테이블과 같은 엔진으로 두 일을 동시에 처리하려고 하면 운영 쿼리도 느려지고 분석 쿼리도 느려집니다. 그래서 운영용 저장소와 분석용 저장소를 분리하는 사고방식이 필요합니다.
 
-이 글은 Data Warehouse 101 시리즈의 첫 번째 글입니다.
+
 
 ## 먼저 던지는 질문
 
@@ -68,7 +70,7 @@ Data Warehouse는 운영 시스템(OLTP)의 부담 없이 분석(OLAP)을 수행
 - **ETL / ELT**: 원천 데이터를 추출하고 변환한 뒤 적재하는 파이프라인입니다.
 - **BI**: 데이터를 사람이 바로 판단에 쓸 수 있는 화면과 지표로 바꾸는 도구와 작업입니다.
 
-## Before / After
+## 전후 비교
 
 **Before**: 서비스 DB에서 6개월 매출을 직접 집계하느라 프로덕션 응답이 느려집니다.
 
@@ -297,6 +299,253 @@ operating_baseline:
 
 또한 분기 단위 회고에서는 기술 성능 지표뿐 아니라 의사결정 지표도 함께 보는 것이 좋습니다. 예를 들어 "대시보드 숫자 논쟁으로 소모된 회의 시간", "지표 정의 변경 후 영향 범위 확인 시간", "재처리 요청 처리 리드타임" 같은 운영 지표를 추적하면 데이터 조직의 성숙도를 더 현실적으로 파악할 수 있습니다.
 
+
+## 실전 앵커: 모델, 파이프라인, 성능 검증
+
+아래 예시는 이 글의 개념을 실제 운영으로 옮길 때 바로 재사용할 수 있는 최소 앵커입니다. 스키마, 적재 설정, 성능 비교를 한 묶음으로 두면 설계 논의가 추상 수준에서 끝나지 않고 실행 가능한 결정으로 이어집니다.
+
+```sql
+-- 공통 분석 질의 템플릿: 기간 + 세그먼트 + 지표
+WITH scoped AS (
+    SELECT
+        f.date_key,
+        f.amount,
+        f.qty,
+        c.segment,
+        p.category
+    FROM fact_sales f
+    JOIN dim_customer c ON c.customer_key = f.customer_key
+    JOIN dim_product p ON p.product_key = f.product_key
+    WHERE f.date_key BETWEEN 20260101 AND 20260331
+)
+SELECT
+    segment,
+    category,
+    SUM(amount) AS revenue,
+    SUM(qty) AS units,
+    COUNT(*) AS order_lines,
+    ROUND(SUM(amount) / NULLIF(COUNT(*), 0), 2) AS avg_line_amount
+FROM scoped
+GROUP BY 1, 2
+ORDER BY revenue DESC;
+```
+
+```yaml
+pipeline_contract:
+  schedule: "0 * * * *"
+  source:
+    type: cdc
+    lag_slo_minutes: 15
+  transform:
+    engine: dbt
+    model_layers: [stg, int, mart]
+  quality_tests:
+    - not_null
+    - unique
+    - relationships
+    - accepted_values
+  publish:
+    target: mart_sales_daily
+    strategy: merge
+```
+
+```mermaid
+flowchart LR
+    A["OLTP 주문/결제"] --> B["Raw 적재"]
+    B --> C["Staging 정제"]
+    C --> D["Fact/Dimension 모델"]
+    D --> E["Mart 집계"]
+    E --> F["대시보드/리포트"]
+```
+
+성능 비교는 반드시 동일 조건에서 수행해야 합니다. 파티션 필터 유무, 조인 순서, 집계 단위를 고정하지 않으면 숫자가 설계를 설명하지 못합니다.
+
+| 비교 항목 | 조건 A(비최적화) | 조건 B(최적화) | 해석 |
+| --- | --- | --- | --- |
+| 스캔 바이트 | 480GB | 62GB | 파티션 프루닝이 대부분의 차이를 만듭니다. |
+| 실행 시간 | 94초 | 18초 | 집계 이전 필터링으로 셔플 비용이 줄어듭니다. |
+| 슬롯/크레딧 사용량 | 높음 | 중간 | 비용 안정성이 높아집니다. |
+| 재현성 | 낮음 | 높음 | 표준 템플릿 쿼리 사용 시 비교 가능성이 유지됩니다. |
+
+운영에서는 "정확한 한 번"보다 "안전한 재실행"이 더 중요한 경우가 많습니다. 그래서 적재 키를 두고 upsert 기준을 명확히 정의하는 방식이 필요합니다.
+
+```sql
+-- 재실행 가능한 머지 예시
+MERGE INTO mart_sales_daily t
+USING (
+    SELECT
+        d.full_date,
+        c.segment,
+        p.category,
+        SUM(f.amount) AS revenue,
+        SUM(f.qty) AS units
+    FROM fact_sales f
+    JOIN dim_date d ON d.date_key = f.date_key
+    JOIN dim_customer c ON c.customer_key = f.customer_key
+    JOIN dim_product p ON p.product_key = f.product_key
+    WHERE d.full_date >= CURRENT_DATE - INTERVAL '7 day'
+    GROUP BY 1, 2, 3
+) s
+ON t.full_date = s.full_date
+AND t.segment = s.segment
+AND t.category = s.category
+WHEN MATCHED THEN UPDATE SET
+    revenue = s.revenue,
+    units = s.units,
+    updated_at = CURRENT_TIMESTAMP
+WHEN NOT MATCHED THEN INSERT (
+    full_date, segment, category, revenue, units, updated_at
+) VALUES (
+    s.full_date, s.segment, s.category, s.revenue, s.units, CURRENT_TIMESTAMP
+);
+```
+
+이 패턴을 기준선으로 두면, 모델 변경이나 파이프라인 장애가 생겨도 영향을 계층별로 좁혀 복구할 수 있습니다. 데이터 웨어하우스 운영은 쿼리 한두 개의 튜닝보다, 반복 가능한 설계 계약을 지키는 과정에 더 가깝습니다.
+
+
+### 운영 확장 메모
+
+데이터 웨어하우스를 오래 운영하면 기술 선택보다 운영 규율이 성능과 신뢰도를 좌우합니다. 다음 예시는 팀에서 반복적으로 사용하는 점검 묶음입니다.
+
+```sql
+-- 파티션 필터 누락 탐지용 예시
+EXPLAIN
+SELECT category, SUM(amount) AS revenue
+FROM fact_sales
+WHERE date_key BETWEEN 20260101 AND 20260131
+GROUP BY category;
+```
+
+```yaml
+review_policy:
+  query_rules:
+    - require_partition_filter: true
+    - block_select_star_on_fact: true
+    - require_owner_for_metric_change: true
+  incident_rules:
+    - classify: [schema_change, pipeline_lag, quality_failure]
+    - first_response_minutes: 15
+```
+
+```mermaid
+flowchart LR
+    A["모델 변경 요청"] --> B["영향 범위 분석"]
+    B --> C["샘플 검증 쿼리"]
+    C --> D["배치 재실행"]
+    D --> E["지표 대조"]
+    E --> F["배포 승인"]
+```
+
+아키텍처가 단순해 보여도, 계약과 검증 루프를 문서화해 두면 신규 인원이 합류해도 같은 품질을 유지할 수 있습니다.
+
+
+### 운영 확장 메모
+
+데이터 웨어하우스를 오래 운영하면 기술 선택보다 운영 규율이 성능과 신뢰도를 좌우합니다. 다음 예시는 팀에서 반복적으로 사용하는 점검 묶음입니다.
+
+```sql
+-- 파티션 필터 누락 탐지용 예시
+EXPLAIN
+SELECT category, SUM(amount) AS revenue
+FROM fact_sales
+WHERE date_key BETWEEN 20260101 AND 20260131
+GROUP BY category;
+```
+
+```yaml
+review_policy:
+  query_rules:
+    - require_partition_filter: true
+    - block_select_star_on_fact: true
+    - require_owner_for_metric_change: true
+  incident_rules:
+    - classify: [schema_change, pipeline_lag, quality_failure]
+    - first_response_minutes: 15
+```
+
+```mermaid
+flowchart LR
+    A["모델 변경 요청"] --> B["영향 범위 분석"]
+    B --> C["샘플 검증 쿼리"]
+    C --> D["배치 재실행"]
+    D --> E["지표 대조"]
+    E --> F["배포 승인"]
+```
+
+아키텍처가 단순해 보여도, 계약과 검증 루프를 문서화해 두면 신규 인원이 합류해도 같은 품질을 유지할 수 있습니다.
+
+
+### 운영 확장 메모
+
+데이터 웨어하우스를 오래 운영하면 기술 선택보다 운영 규율이 성능과 신뢰도를 좌우합니다. 다음 예시는 팀에서 반복적으로 사용하는 점검 묶음입니다.
+
+```sql
+-- 파티션 필터 누락 탐지용 예시
+EXPLAIN
+SELECT category, SUM(amount) AS revenue
+FROM fact_sales
+WHERE date_key BETWEEN 20260101 AND 20260131
+GROUP BY category;
+```
+
+```yaml
+review_policy:
+  query_rules:
+    - require_partition_filter: true
+    - block_select_star_on_fact: true
+    - require_owner_for_metric_change: true
+  incident_rules:
+    - classify: [schema_change, pipeline_lag, quality_failure]
+    - first_response_minutes: 15
+```
+
+```mermaid
+flowchart LR
+    A["모델 변경 요청"] --> B["영향 범위 분석"]
+    B --> C["샘플 검증 쿼리"]
+    C --> D["배치 재실행"]
+    D --> E["지표 대조"]
+    E --> F["배포 승인"]
+```
+
+아키텍처가 단순해 보여도, 계약과 검증 루프를 문서화해 두면 신규 인원이 합류해도 같은 품질을 유지할 수 있습니다.
+
+
+### 운영 확장 메모
+
+데이터 웨어하우스를 오래 운영하면 기술 선택보다 운영 규율이 성능과 신뢰도를 좌우합니다. 다음 예시는 팀에서 반복적으로 사용하는 점검 묶음입니다.
+
+```sql
+-- 파티션 필터 누락 탐지용 예시
+EXPLAIN
+SELECT category, SUM(amount) AS revenue
+FROM fact_sales
+WHERE date_key BETWEEN 20260101 AND 20260131
+GROUP BY category;
+```
+
+```yaml
+review_policy:
+  query_rules:
+    - require_partition_filter: true
+    - block_select_star_on_fact: true
+    - require_owner_for_metric_change: true
+  incident_rules:
+    - classify: [schema_change, pipeline_lag, quality_failure]
+    - first_response_minutes: 15
+```
+
+```mermaid
+flowchart LR
+    A["모델 변경 요청"] --> B["영향 범위 분석"]
+    B --> C["샘플 검증 쿼리"]
+    C --> D["배치 재실행"]
+    D --> E["지표 대조"]
+    E --> F["배포 승인"]
+```
+
+아키텍처가 단순해 보여도, 계약과 검증 루프를 문서화해 두면 신규 인원이 합류해도 같은 품질을 유지할 수 있습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **Data Warehouse는 정확히 무엇이고 왜 따로 두어야 할까요?**
@@ -328,5 +577,7 @@ operating_baseline:
 - [BigQuery — What Is a Data Warehouse?](https://cloud.google.com/learn/what-is-a-data-warehouse)
 - [Snowflake — Data Warehouse Guide](https://www.snowflake.com/guides/what-data-warehouse/)
 - [AWS — Data Warehouse Concepts](https://aws.amazon.com/data-warehouse/)
+
+- [이 시리즈의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/data-warehouse-101/ko)
 
 Tags: DataWarehouse, Analytics, OLAP, Database, BI

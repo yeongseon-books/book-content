@@ -63,7 +63,7 @@ last_reviewed: '2026-05-15'
 - **Pure function**: 같은 입력에 같은 출력을 내고, 부수 효과가 없는 함수입니다.
 - **Parameter Object**: 여러 인자를 하나의 객체로 묶는 방식입니다.
 
-## Before/After
+## 전/후 비교
 
 **Before**
 
@@ -88,7 +88,7 @@ def checkout(cart, user, addr, coupon):
 
 ## 실전 적용: 안전하게 추출하기
 
-### Step 1 — Partial extraction
+### 단계 1 — Partial extraction
 
 ```python
 # 1_extract.py
@@ -101,7 +101,7 @@ def total(items):
 
 반복문은 추출 후보가 되기 좋습니다. 계산이 하나의 의미 단위로 보이기 시작하면 별도 함수 이름을 붙일 수 있습니다.
 
-### Step 2 — Intent name
+### 단계 2 — Intent name
 
 ```python
 # 2_intent.py
@@ -111,7 +111,7 @@ def total(items): return sum(line_total(it) for it in items)
 
 이름을 붙이는 순간 코드 길이는 비슷해도 이해 비용은 줄어듭니다. 좋은 추출은 줄 수보다 의미를 더 잘 드러내는 데 있습니다.
 
-### Step 3 — Command/Query split
+### 단계 3 — Command/Query split
 
 ```python
 # 3_cqs.py
@@ -124,7 +124,7 @@ class Account:
 
 질문하는 함수는 상태를 바꾸지 않는 편이 좋습니다. 읽는 쪽에서 예상 가능한 동작이 디버깅 시간을 줄입니다.
 
-### Step 4 — Parameter object
+### 단계 4 — Parameter object
 
 ```python
 # 4_param_obj.py
@@ -136,7 +136,7 @@ def in_range(value, r: Range): return r.lo <= value <= r.hi
 
 인자가 많아질수록 호출 지점의 소음도 커집니다. 묶을 수 있는 인자는 객체로 올려서 문맥을 보존하는 편이 낫습니다.
 
-### Step 5 — Make it pure
+### 단계 5 — Make it pure
 
 ```python
 # 5_pure.py
@@ -340,6 +340,274 @@ def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
 
 또한 개선 활동은 단발성 이벤트가 아니라 루프여야 합니다. 한 번의 대청소보다 매 PR마다 작은 개선을 추가하는 편이 장기적으로 더 강합니다. 이름 하나, 함수 하나, 분기 하나를 매번 더 낫게 만드는 습관이 쌓이면 코드베이스의 평균 품질이 올라가고, 장애 대응 속도도 실제로 빨라집니다.
 
+
+## 함수 추출 기준: 분리 시점 판단표
+
+함수를 작게 만드는 일은 길이를 줄이는 작업이 아니라 책임 경계를 분명히 하는 작업입니다. 아래 기준표는 추출 시점을 빠르게 결정하는 데 도움을 줍니다.
+
+| 신호 | 현재 상태 | 분리 기준 | 분리 후 기대 효과 |
+| --- | --- | --- | --- |
+| 이름 붙이기 어려움 | 본문이 여러 역할 혼합 | 문장으로 요약 가능한 덩어리 단위 추출 | 호출 흐름 가독성 향상 |
+| 테스트 케이스 폭증 | 한 함수에서 조합 분기 과다 | 순수 계산과 I/O 분리 | 테스트 수 감소 |
+| 파라미터 과다 | 5개 이상 인자 반복 전달 | 파라미터 객체 도입 | 호출부 단순화 |
+| 재사용 애매함 | 유사 코드 복붙 증가 | 공통 의도 함수 추출 | 중복 감소 |
+
+## 함수 분해 데모: 단일 책임으로 나누기
+
+```python
+# before
+def checkout(order, payment_gateway, inventory, notifier):
+    if not order["items"]:
+        raise ValueError("empty_order")
+    total = 0
+    for item in order["items"]:
+        total += item["unit_price_cents"] * item["quantity"]
+    payment_gateway.charge(order["user_id"], total)
+    inventory.reserve(order["items"])
+    notifier.send(order["user_id"], "checkout-complete")
+    return {"total": total}
+
+
+# after
+def checkout(order, payment_gateway, inventory, notifier):
+    validate_order(order)
+    total_cents = calculate_order_total(order["items"])
+    charge_payment(order["user_id"], total_cents, payment_gateway)
+    reserve_items(order["items"], inventory)
+    send_checkout_notification(order["user_id"], notifier)
+    return {"total": total_cents}
+```
+
+이 분해는 각 단계를 별도 테스트로 검증 가능하게 만들고, 실패 지점을 로그와 메트릭에서 더 명확히 식별하게 해 줍니다.
+
+## SOLID 연결: 단일 책임과 의존 역전을 함수 수준에서 적용
+
+- SRP 관점에서 함수는 "변경 이유"가 하나여야 합니다. 결제 정책 변경과 알림 채널 변경이 같은 함수를 수정하게 만들면 SRP 위반입니다.
+- DIP 관점에서는 외부 의존을 인터페이스로 주입해야 테스트 더블 교체가 쉽습니다.
+
+```python
+from typing import Protocol
+
+class PaymentGateway(Protocol):
+    def charge(self, user_id: str, amount_cents: int) -> None: ...
+
+
+def charge_payment(user_id: str, amount_cents: int, gateway: PaymentGateway) -> None:
+    gateway.charge(user_id, amount_cents)
+```
+
+## 린터/정적분석 구성 예시
+
+```toml
+[tool.ruff.lint]
+select = ["E", "F", "B", "C90"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 8
+```
+
+복잡도 임계치를 낮추면 큰 함수가 자동으로 경고 대상이 됩니다. 작은 함수 문화는 교육보다 도구 설정에서 먼저 시작되는 경우가 많습니다.
+
+
+## 심화 실습: 함수 추출 워크숍
+
+함수 분해는 규칙 암기가 아니라 반복 훈련이 필요합니다. 아래 워크숍은 한 화면에서 끝나는 실습 흐름입니다.
+
+1. 기존 함수의 입력/출력/부수효과를 색으로 표시합니다.
+2. 색이 다른 덩어리를 함수 후보로 뽑습니다.
+3. 후보마다 이름을 붙여 문장으로 읽어 봅니다.
+4. 테스트를 먼저 고정하고 한 덩어리씩 추출합니다.
+
+```python
+def place_order(payload, repo, payment, notifier):
+    validated = validate_payload(payload)
+    amount_cents = calculate_amount(validated["line_items"])
+    payment_result = payment.charge(validated["user_id"], amount_cents)
+    order = persist_order(repo, validated, payment_result)
+    notifier.send_order_created(order["id"])
+    return order
+```
+
+위 구조처럼 한 줄이 한 책임을 나타내면 리뷰어는 흐름을 먼저 확인하고 세부 구현으로 내려갈 수 있습니다. 사고 비용이 크게 줄어듭니다.
+
+## 함수 크기 정책 예시
+
+| 항목 | 권장값 | 경고값 |
+| --- | --- | --- |
+| 함수 길이 | 5~20줄 | 30줄 이상 |
+| 인자 수 | 0~3개 | 5개 이상 |
+| 중첩 깊이 | 0~2단 | 3단 이상 |
+
+정책은 절대 규칙이 아니라 경고 기준입니다. 다만 경고가 누적되면 구조를 다시 설계해야 한다는 신호로 받아야 합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
 ## 처음 질문으로 돌아가기
 
 - **작은 함수가 주는 효과는 무엇일까요?**
@@ -372,4 +640,5 @@ def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
 - [Martin Fowler — Command Query Separation](https://martinfowler.com/bliki/CommandQuerySeparation.html)
 - [Refactoring — Introduce Parameter Object](https://refactoring.com/catalog/introduceParameterObject.html)
 - [Python dataclasses documentation](https://docs.python.org/3/library/dataclasses.html)
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/clean-code-101/ko)
 Tags: Computer Science, CleanCode, Functions, SRP, Refactoring, Readability

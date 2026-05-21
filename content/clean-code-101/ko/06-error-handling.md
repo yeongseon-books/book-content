@@ -63,7 +63,7 @@ last_reviewed: '2026-05-15'
 - **Retry**: 일시적 실패를 다시 시도하는 전략입니다.
 - **Backoff**: 재시도 간격을 점점 늘리는 방식입니다.
 
-## Before/After
+## 전/후 비교
 
 **Before**
 
@@ -91,7 +91,7 @@ def fetch(url):
 
 ## 실전 적용: 견고한 오류 처리 다섯 단계
 
-### Step 1 — Fail fast
+### 단계 1 — Fail fast
 
 ```python
 # 1_fail_fast.py
@@ -103,7 +103,7 @@ def transfer(amount):
 
 잘못된 입력은 최대한 입구에서 막는 편이 좋습니다. 오류를 뒤로 미루면 문제는 더 멀리 퍼지고, 원인도 흐려집니다.
 
-### Step 2 — Errors as values
+### 단계 2 — Errors as values
 
 ```python
 # 2_result.py
@@ -121,7 +121,7 @@ def parse_int(s):
 
 호출자가 분기해야 하는 실패라면 값으로 돌려주는 편이 낫습니다. 파싱, 검증, 사용자 입력 처리 같은 영역이 대표적입니다.
 
-### Step 3 — Exception chaining
+### 단계 3 — Exception chaining
 
 ```python
 # 3_chain.py
@@ -136,7 +136,7 @@ def load_config(path):
 
 `from e`는 원인을 보존합니다. 도메인 의미를 덧붙이면서도 디버깅에 필요한 원래 예외를 잃지 않는 방식입니다.
 
-### Step 4 — Retry + backoff
+### 단계 4 — Retry + backoff
 
 ```python
 # 4_retry.py
@@ -151,7 +151,7 @@ def with_retry(fn, attempts=3):
 
 재시도는 아무 데나 붙이는 장식이 아닙니다. 일시적 실패이면서, 같은 작업을 다시 해도 안전한 경우에만 써야 합니다.
 
-### Step 5 — Catch only at boundaries
+### 단계 5 — Catch only at boundaries
 
 ```python
 # 5_boundary.py
@@ -358,6 +358,267 @@ def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
 
 또한 개선 활동은 단발성 이벤트가 아니라 루프여야 합니다. 한 번의 대청소보다 매 PR마다 작은 개선을 추가하는 편이 장기적으로 더 강합니다. 이름 하나, 함수 하나, 분기 하나를 매번 더 낫게 만드는 습관이 쌓이면 코드베이스의 평균 품질이 올라가고, 장애 대응 속도도 실제로 빨라집니다.
 
+
+## 오류 처리 설계표: 어디서 던지고 어디서 잡을 것인가
+
+오류 처리는 예외 문법보다 경계 설계가 핵심입니다. 아래 표는 계층별 책임을 고정하는 기본 틀입니다.
+
+| 계층 | 해야 할 일 | 하지 말아야 할 일 |
+| --- | --- | --- |
+| 도메인 함수 | 의미 있는 예외 타입 발생 | HTTP 상태코드 직접 반환 |
+| 애플리케이션 서비스 | 예외를 업무 결과로 매핑 | 모든 예외를 동일 메시지로 압축 |
+| API 경계 | 상태코드/에러 페이로드 변환 | 내부 스택트레이스 노출 |
+| 인프라 어댑터 | 외부 오류를 도메인 예외로 래핑 | 원본 컨텍스트 삭제 |
+
+## 전/후 데모: 경계 매핑으로 오류 의미 보존
+
+```python
+# before
+def create_order(payload, repo):
+    try:
+        return repo.insert(payload)
+    except Exception:
+        return {"ok": False}
+
+
+# after
+class DuplicateOrderError(Exception):
+    pass
+
+
+def create_order(payload, repo):
+    try:
+        return repo.insert(payload)
+    except repo.DuplicateKey as exc:
+        raise DuplicateOrderError("order already exists") from exc
+```
+
+예외를 경계에서 의미 있게 변환하면 운영 로그에서 실패 이유를 집계하기 쉬워집니다. "실패"라는 한 단어보다 "중복 주문"이라는 원인이 훨씬 빠른 의사결정을 만듭니다.
+
+## 재시도 정책 샘플
+
+```python
+import time
+
+def with_backoff(call, retries: int = 3, base_delay: float = 0.2):
+    for attempt in range(retries):
+        try:
+            return call()
+        except TimeoutError:
+            if attempt == retries - 1:
+                raise
+            time.sleep(base_delay * (2 ** attempt))
+```
+
+재시도는 네트워크 일시 장애에만 적용해야 하며, 데이터 무결성 오류에는 적용하면 안 됩니다. 오류 분류가 재시도 정책보다 먼저입니다.
+
+## 린터/로깅 규칙 예시
+
+```toml
+[tool.ruff.lint]
+select = ["E", "F", "B", "TRY", "RUF"]
+```
+
+```python
+logger.error("order-create-failed", extra={"order_id": order_id, "error": str(exc)})
+```
+
+예외 타입과 로그 이벤트 이름을 함께 표준화하면 장애 대응 시간(MTTR)을 눈에 띄게 줄일 수 있습니다.
+
+
+## 심화 실습: 오류 예산과 예외 정책 연결
+
+오류 처리 품질은 코드 내부에서만 측정하지 않습니다. 서비스 오류 예산과 연결해야 우선순위가 명확해집니다.
+
+| 오류 유형 | 사용자 영향 | 처리 정책 |
+| --- | --- | --- |
+| 입력 검증 실패 | 요청 단건 실패 | 즉시 4xx 반환 |
+| 외부 API 타임아웃 | 지연/일시 실패 | 제한 재시도 + 서킷브레이커 |
+| 데이터 무결성 오류 | 데이터 손상 위험 | 재시도 금지, 즉시 격리 |
+
+```python
+class DomainError(Exception):
+    pass
+
+
+class ValidationError(DomainError):
+    pass
+
+
+class ExternalDependencyError(DomainError):
+    pass
+```
+
+예외 계층이 명확하면 경보 라우팅도 쉬워집니다. 예를 들어 `ValidationError`는 개발팀, `ExternalDependencyError`는 SRE와 함께 대응하도록 채널을 분리할 수 있습니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
 ## 처음 질문으로 돌아가기
 
 - **예외를 던질지 값을 반환할지 어떻게 판단할까요?**
@@ -391,4 +652,5 @@ def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
 - [AWS — Exponential Backoff and Jitter](https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/)
 - [Python exception hierarchy](https://docs.python.org/3/library/exceptions.html)
 - [AWS Builders Library — timeouts, retries, and backoff with jitter](https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/)
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/clean-code-101/ko)
 Tags: Computer Science, CleanCode, ErrorHandling, Exceptions, Robustness, Reliability

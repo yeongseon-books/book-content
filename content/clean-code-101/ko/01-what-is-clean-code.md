@@ -63,7 +63,7 @@ last_reviewed: '2026-05-15'
 - **Smell**: 중복, 거대 함수, 깊은 분기처럼 개선이 필요하다는 신호입니다.
 - **Refactoring**: 동작은 유지한 채 내부 구조를 개선하는 작업입니다.
 
-## Before/After
+## 전/후 비교
 
 **Before — works, that's all**
 
@@ -83,7 +83,7 @@ def total_with_tax(amount: int, tax_rate: float) -> float:
 
 ## 실전 적용: 지저분함을 먼저 측정하기
 
-### Step 1 — Function length
+### 단계 1 — Function length
 
 ```python
 # 1_length.py
@@ -94,7 +94,7 @@ def process(order):
 
 함수가 20줄을 넘기기 시작하면, 길어진 이유를 먼저 설명할 수 있어야 합니다. 설명이 길어진다면 대개 함수도 이미 너무 많은 일을 하고 있습니다.
 
-### Step 2 — Argument count
+### 단계 2 — Argument count
 
 ```python
 # 2_args.py
@@ -104,7 +104,7 @@ def create_user(name, email, age, address, role, plan, ref):
 
 인자가 세 개를 넘기기 시작하면, 하나의 객체로 묶을 수 있는지 점검하는 편이 좋습니다. 함수 시그니처는 그 자체로 설계의 부담을 드러냅니다.
 
-### Step 3 — Indentation depth
+### 단계 3 — Indentation depth
 
 ```python
 # 3_depth.py
@@ -116,7 +116,7 @@ if a:
 
 들여쓰기 깊이가 3을 넘으면 추출이나 분기 재구성이 필요하다는 신호로 보는 것이 좋습니다. 깊이는 곧 인지 부담입니다.
 
-### Step 4 — Honest names
+### 단계 4 — Honest names
 
 ```python
 # 4_name.py
@@ -128,7 +128,7 @@ def calculate_invoice_total(line_items):
 
 이름이 거짓말하면 코드를 읽는 사람도 잘못된 기대를 갖습니다. 반대로 정직한 이름은 주석 몇 줄을 대신합니다.
 
-### Step 5 — Measure cognitive load
+### 단계 5 — Measure cognitive load
 
 ```bash
 # 5_cc.sh
@@ -326,6 +326,220 @@ def estimate_next_month_effort(current_hours: float, reduction_goal: float) -> f
 
 이런 질문과 간단한 계산만으로도 "감" 중심 회고를 "계획" 중심 회고로 바꿀 수 있습니다.
 
+
+## 코드 스멜 카탈로그와 우선순위 결정
+
+클린 코드 개선은 "무엇이 불편한가"가 아니라 "어떤 변경 비용을 줄일 것인가"를 기준으로 우선순위를 잡아야 합니다. 아래 카탈로그는 초급 팀이 바로 적용할 수 있는 최소 기준입니다.
+
+| 코드 스멜 | 관찰 신호 | 위험 | 1차 수정 | 2차 수정 |
+| --- | --- | --- | --- | --- |
+| 긴 함수 | 40줄 이상, 중첩 3단 이상 | 리뷰 속도 저하 | 가드 절 분리 | 책임 단위 모듈화 |
+| 모호한 이름 | `data`, `info`, `tmp` 빈발 | 오해성 버그 | 목적이 드러나는 이름으로 변경 | 도메인 용어집 반영 |
+| 중복 분기 | 같은 if/elif 체인이 여러 파일에 존재 | 정책 불일치 | 정책 함수 추출 | 전략 객체로 승격 |
+| 경계 없는 예외 처리 | 모든 예외를 `except Exception`으로 흡수 | 장애 은폐 | 경계에서만 잡기 | 예외 계층 재설계 |
+| 테스트 어려움 | 외부 의존과 순수 로직 혼합 | 회귀 위험 | 의존성 주입 | 계약 테스트 도입 |
+
+카탈로그의 핵심은 "완벽한 설계"가 아니라 "다음 변경이 쉬운 구조"입니다. 스프린트 계획에 기능 항목과 함께 스멜 제거 항목을 넣으면 기술 부채가 백로그 밖으로 빠져나가지 않습니다.
+
+## 리팩토링 전/후 함수 추출 데모
+
+```python
+# before
+def process_signup(request, mailer, repo, logger):
+    email = request.get("email", "").strip().lower()
+    if not email or "@" not in email:
+        return {"ok": False, "reason": "invalid_email"}
+
+    if repo.exists_by_email(email):
+        return {"ok": False, "reason": "already_exists"}
+
+    user = {"email": email, "status": "pending"}
+    repo.save(user)
+    token = f"verify-{email}"
+    verify_link = f"https://example.com/verify?token={token}"
+    mailer.send(email, "verify", verify_link)
+    logger.info("signup-created", extra={"email": email})
+    return {"ok": True}
+
+
+# after
+def process_signup(request, mailer, repo, logger):
+    email = normalize_email(request)
+    validate_signup_preconditions(email, repo)
+
+    user = create_pending_user(email, repo)
+    send_verification_mail(user["email"], mailer)
+    logger.info("signup-created", extra={"email": user["email"]})
+    return {"ok": True}
+
+
+def normalize_email(request: dict) -> str:
+    return request.get("email", "").strip().lower()
+
+
+def validate_signup_preconditions(email: str, repo) -> None:
+    if not email or "@" not in email:
+        raise ValueError("invalid_email")
+    if repo.exists_by_email(email):
+        raise ValueError("already_exists")
+```
+
+리팩토링 후 코드는 동작보다 의도를 먼저 읽게 만듭니다. `process_signup`는 흐름만 보여 주고, 검증/생성/알림 책임은 별도 함수가 맡습니다. 이 구조가 바로 이후 테스트 가능한 코드의 기반이 됩니다.
+
+## 린터 구성 예시: 규칙을 사람 대신 도구가 강제하기
+
+```toml
+# pyproject.toml
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "B", "C90", "N", "I", "UP"]
+ignore = ["E501"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pep8-naming]
+classmethod-decorators = ["classmethod"]
+```
+
+린터 규칙은 합의의 자동화입니다. 팀 규칙이 문서에만 있으면 신규 멤버 온보딩 때마다 기준이 흔들립니다. 반대로 린터에 들어가면 코드 리뷰는 "스타일 지적"에서 "설계 판단"으로 이동합니다.
+
+
+## 심화 실습: 코드 품질 기준선을 팀에 도입하기
+
+클린 코드 원칙은 개인 습관으로 끝나면 유지되지 않습니다. 팀 단위 운영 규칙으로 정착해야 실제 효과가 납니다. 첫 주에는 "기준선 만들기"에만 집중하는 것이 좋습니다. 기존 코드를 한 번에 고치지 말고, 새로 바뀌는 파일부터 규칙을 적용합니다.
+
+| 주차 | 목표 | 산출물 | 검증 |
+| --- | --- | --- | --- |
+| 1주차 | 품질 기준선 정의 | 명명/함수/분기 규칙 문서 | 팀 합의 회의록 |
+| 2주차 | 자동화 연결 | 린터/테스트 게이트 | CI 통과율 |
+| 3주차 | 리뷰 규칙 정착 | PR 템플릿, 체크리스트 | 리뷰 리드타임 |
+| 4주차 | 회고 및 보정 | 실패 패턴 목록 | 다음 스프린트 액션 |
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class QualityBaseline:
+    max_function_lines: int = 30
+    max_cyclomatic_complexity: int = 10
+    max_arguments: int = 4
+    require_domain_terms: bool = True
+
+
+def evaluate_module_metrics(function_lines: int, complexity: int, arguments: int) -> list[str]:
+    issues: list[str] = []
+    baseline = QualityBaseline()
+
+    if function_lines > baseline.max_function_lines:
+        issues.append("function-too-long")
+    if complexity > baseline.max_cyclomatic_complexity:
+        issues.append("complexity-too-high")
+    if arguments > baseline.max_arguments:
+        issues.append("too-many-arguments")
+    return issues
+```
+
+실무에서는 완벽한 기준보다 측정 가능한 기준이 중요합니다. 함수 길이, 복잡도, 인자 수 같은 지표가 있어야 개선 우선순위를 정할 수 있습니다.
+
+## 변경 비용 추적 로그 예시
+
+```text
+2026-05-01 | user-profile.py | 함수 분해 전 | 리뷰 38분 | 버그 2건
+2026-05-08 | user-profile.py | 함수 분해 후 | 리뷰 17분 | 버그 0건
+2026-05-15 | checkout.py     | 분기 단순화 전 | 리뷰 41분 | 버그 3건
+2026-05-22 | checkout.py     | 분기 단순화 후 | 리뷰 19분 | 버그 1건
+```
+
+변경 비용 로그를 남기면 품질 개선이 감각이 아니라 데이터가 됩니다. 팀이 "왜 이 원칙을 지키는지"를 설명할 수 있어야 규칙이 오래 갑니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
 ## 처음 질문으로 돌아가기
 
 - **Clean Code를 판단할 때 어떤 신호를 먼저 봐야 할까요?**
@@ -359,4 +573,5 @@ def estimate_next_month_effort(current_hours: float, reduction_goal: float) -> f
 - [Google — Code Health Articles](https://testing.googleblog.com/search/label/Code%20Health)
 - [Ruff rule reference](https://docs.astral.sh/ruff/rules/)
 - [radon documentation](https://radon.readthedocs.io/en/latest/)
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/clean-code-101/ko)
 Tags: Computer Science, CleanCode, Readability, SoftwareEngineering, CodeQuality, Refactoring

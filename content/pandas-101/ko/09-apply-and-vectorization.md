@@ -22,11 +22,12 @@ last_reviewed: '2026-05-15'
 
 # Pandas 101 (9/10): 적용 함수와 벡터화
 
+이 글은 판다스 101 시리즈의 9번째 글입니다.
+
 Pandas를 어느 정도 쓰기 시작하면 코드가 돌아가는 것과 빠르게 도는 것이 전혀 다른 문제라는 사실을 곧 만나게 됩니다. 특히 `apply(axis=1)`는 편해 보여서 자주 손이 가지만, 데이터가 커지는 순간 병목이 되기 쉽습니다. 성능 문제를 피하려면 Pandas가 잘하는 계산 방식이 무엇인지 먼저 이해해야 합니다.
 
-이 글은 Pandas 101 시리즈의 9번째 글입니다.
 
-이번 글에서는 `apply`를 금지어처럼 다루기보다, 언제 느려지고 왜 벡터화가 Pandas의 본질인지 구조적으로 살펴보겠습니다.
+이번 글에서는 `apply`를 금지어처럼 다루기보다, 언제 느려지고 왜 벡터화가 Pandas의 본질인지 구조적으로 다루겠습니다.
 
 ## 먼저 던지는 질문
 
@@ -384,6 +385,271 @@ B            3            2            200  0.666667  66.666667
 
 벡터화는 Pandas의 성능과 문법을 함께 이해하는 핵심입니다. 행마다 함수를 부르기보다 열 단위 계산으로 넘기는 감각을 익히면 코드가 더 짧고 빠르고 읽기 쉬워집니다. 다음 글에서는 지금까지 배운 내용을 하나의 실전 분석 흐름으로 묶어 보겠습니다.
 
+## 실전 확장: 데이터 처리 파이프라인과 성능 점검
+
+앞선 절에서 개념과 기본 문법을 확인했다면, 이제는 실무에서 바로 재사용할 수 있는 형태로 흐름을 묶어 두는 것이 중요합니다. 이 절은 "읽기 → 정제 → 결합 → 집계 → 성능 점검 → 저장" 순서로 구성했습니다. 각 단계는 분리해서 테스트할 수 있고, 필요할 때 교체할 수 있습니다.
+
+### 1) CSV 적재와 스키마 고정
+
+```python
+import pandas as pd
+
+def load_orders(path: str) -> pd.DataFrame:
+    return pd.read_csv(
+        path,
+        dtype={
+            "order_id": "int64",
+            "customer_id": "int64",
+            "product_id": "int32",
+            "qty": "int16",
+            "unit_price": "float32",
+            "channel": "string",
+        },
+        parse_dates=["order_date"],
+    )
+
+def load_customers(path: str) -> pd.DataFrame:
+    return pd.read_csv(
+        path,
+        dtype={
+            "customer_id": "int64",
+            "segment": "string",
+            "region": "string",
+        },
+        parse_dates=["signup_date"],
+    )
+```
+
+자료형을 먼저 고정하면 이후 연산에서 경고가 줄고, 메모리 사용량도 예측하기 쉬워집니다. 문자열 식별자는 숫자로 변환하지 말고 원본 의미를 유지해야 합니다.
+
+### 2) 데이터프레임 조작과 결측 처리
+
+```python
+def clean_orders(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+    df = df.dropna(subset=["customer_id", "order_date", "qty", "unit_price"])
+    df["qty"] = df["qty"].clip(lower=1)
+    df["unit_price"] = df["unit_price"].clip(lower=0)
+    df["order_amount"] = (df["qty"] * df["unit_price"]).astype("float32")
+    df["order_month"] = df["order_date"].dt.to_period("M")
+    return df
+```
+
+핵심은 복사본을 명시한 뒤 변경하는 것입니다. 체이닝 인덱싱 경고를 피하고, 각 단계의 의도를 분명히 남길 수 있습니다.
+
+### 3) merge/join 비교와 안전한 결합
+
+```python
+def enrich_with_customer(orders: pd.DataFrame, customers: pd.DataFrame) -> pd.DataFrame:
+    merged = orders.merge(
+        customers,
+        on="customer_id",
+        how="left",
+        validate="many_to_one",
+        indicator=True,
+    )
+
+    # 조인 품질 확인
+    print(merged["_merge"].value_counts(dropna=False))
+
+    merged = merged.drop(columns=["_merge"])
+    merged["segment"] = merged["segment"].fillna("UNKNOWN")
+    merged["region"] = merged["region"].fillna("UNKNOWN")
+    return merged
+
+# 같은 작업을 인덱스 기반으로 할 때
+# customers_indexed = customers.set_index("customer_id")
+# orders.join(customers_indexed, on="customer_id", how="left")
+```
+
+`merge`는 열 기반 결합에, `join`은 인덱스 기반 결합에 더 자연스럽습니다. 중요한 점은 `validate`로 키 관계를 코드에 고정해 두는 것입니다.
+
+### 4) groupby 집계와 피벗 테이블
+
+```python
+def monthly_kpi(df: pd.DataFrame) -> pd.DataFrame:
+    by_month = df.groupby(["order_month", "segment"], observed=True).agg(
+        orders=("order_id", "count"),
+        customers=("customer_id", "nunique"),
+        revenue=("order_amount", "sum"),
+        aov=("order_amount", "mean"),
+    ).reset_index()
+
+    by_month["arpu_like"] = by_month["revenue"] / by_month["customers"].clip(lower=1)
+    return by_month
+
+def monthly_pivot(df: pd.DataFrame) -> pd.DataFrame:
+    return df.pivot_table(
+        index="order_month",
+        columns="segment",
+        values="order_amount",
+        aggfunc="sum",
+        fill_value=0,
+    )
+```
+
+집계 결과는 폭이 넓은 피벗 형태와 긴 형태를 모두 준비해 두면 리포트와 후속 모델 입력에 유리합니다.
+
+### 5) 벡터화와 iterrows 성능 벤치마크
+
+```python
+import time
+import numpy as np
+
+def benchmark_vectorized_vs_iterrows(df: pd.DataFrame) -> None:
+    bench = df[["qty", "unit_price"]].copy()
+
+    start = time.time()
+    out = []
+    for _, row in bench.iterrows():
+        out.append(row["qty"] * row["unit_price"])
+    iterrows_sec = time.time() - start
+
+    start = time.time()
+    vec = bench["qty"] * bench["unit_price"]
+    vectorized_sec = time.time() - start
+
+    print(f"iterrows: {iterrows_sec:.6f}s")
+    print(f"vectorized: {vectorized_sec:.6f}s")
+    print(f"speedup: {iterrows_sec / max(vectorized_sec, 1e-9):.1f}x")
+
+    # 계산 결과 일치 확인
+    assert np.allclose(np.array(out, dtype=float), vec.to_numpy(dtype=float))
+```
+
+행 반복은 학습용으로는 이해가 쉽지만, 운영 코드에서는 벡터화 연산을 우선으로 두는 편이 안전합니다. 성능뿐 아니라 코드 길이와 오류 가능성도 함께 줄어듭니다.
+
+### 6) 메모리 최적화 규칙
+
+```python
+def optimize_memory(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+
+    # 정수/실수 다운캐스팅
+    for col in df.select_dtypes(include=["int64"]).columns:
+        df[col] = pd.to_numeric(df[col], downcast="integer")
+    for col in df.select_dtypes(include=["float64"]).columns:
+        df[col] = pd.to_numeric(df[col], downcast="float")
+
+    # 고유값이 적은 문자열 열은 category로 전환
+    for col in ["segment", "region", "channel"]:
+        if col in df.columns:
+            ratio = df[col].nunique(dropna=False) / max(len(df), 1)
+            if ratio < 0.2:
+                df[col] = df[col].astype("category")
+
+    return df
+```
+
+메모리 최적화는 대용량 데이터에서 체감 차이가 큽니다. 특히 `category` 전환은 `groupby` 속도와 메모리 사용량을 동시에 개선하는 경우가 많습니다.
+
+### 7) 전체 파이프라인 실행 예시
+
+```python
+def run_pipeline(order_csv: str, customer_csv: str) -> tuple[pd.DataFrame, pd.DataFrame]:
+    orders = load_orders(order_csv)
+    customers = load_customers(customer_csv)
+
+    orders = clean_orders(orders)
+    merged = enrich_with_customer(orders, customers)
+    merged = optimize_memory(merged)
+
+    kpi = monthly_kpi(merged)
+    pivot = monthly_pivot(merged)
+
+    benchmark_vectorized_vs_iterrows(merged)
+
+    kpi.to_csv("kpi_monthly.csv", index=False)
+    pivot.to_csv("kpi_monthly_pivot.csv")
+    return kpi, pivot
+```
+
+결과를 CSV로 남기는 이유는 간단합니다. 노트북 화면에서 끝내지 않고, 다음 검토 단계와 배치 작업에서 그대로 재사용할 수 있기 때문입니다.
+
+### 8) 운영 점검 체크리스트
+
+- 조인 전후 행 수가 의도와 같은지 확인합니다.
+- 집계 기준 열의 자료형과 시간대가 고정되어 있는지 확인합니다.
+- 벡터화 가능한 계산에 `iterrows`나 `apply(axis=1)`가 남아 있지 않은지 확인합니다.
+- `memory_usage(deep=True)`로 최적화 전후 변화를 기록합니다.
+- 분석 결과 파일(CSV, PNG)의 생성 경로와 이름 규칙을 표준화합니다.
+
+이 절의 목표는 기능 추가가 아니라 품질 고정입니다. 같은 입력 파일을 다시 넣었을 때 같은 지표가 나오고, 병목 구간을 재현해서 개선할 수 있어야 실무 파이프라인으로 쓸 수 있습니다.
+
+## 실전 확장 2: 검증 가능한 분석 운영 습관
+
+파이프라인이 길어질수록 코드 자체보다 검증 절차가 더 중요해집니다. 특히 판다스 기반 분석은 입력 파일 버전, 열 타입, 조인 키 품질에 따라 결과가 크게 달라집니다. 이 절에서는 재현성을 높이기 위한 최소 검증 세트를 정리합니다.
+
+### 입력 검증 함수
+
+```python
+def validate_columns(df, required_cols):
+    missing = [c for c in required_cols if c not in df.columns]
+    if missing:
+        raise ValueError(f"필수 열 누락: {missing}")
+
+def validate_dtypes(df, expected):
+    for col, dtype in expected.items():
+        if col not in df.columns:
+            raise ValueError(f"열 없음: {col}")
+        if str(df[col].dtype) != dtype:
+            raise TypeError(f"{col} 자료형 불일치: {df[col].dtype} != {dtype}")
+```
+
+분석 스크립트 시작점에서 이 두 검증만 실행해도 하류 단계의 디버깅 시간을 크게 줄일 수 있습니다.
+
+### 조인 안정성 점검
+
+```python
+def assert_merge_rowcount(before_left: int, after_merged: int, tolerance: float = 1.2):
+    if after_merged > before_left * tolerance:
+        raise RuntimeError(
+            f"조인 후 행 수 급증: before={before_left}, after={after_merged}"
+        )
+```
+
+`validate` 옵션과 함께 행 수 급증 감시를 두면 many-to-many 조인 사고를 조기에 차단할 수 있습니다.
+
+### 그룹 집계 결과 점검
+
+```python
+def assert_non_negative(df, cols):
+    for col in cols:
+        if (df[col] < 0).any():
+            raise ValueError(f"음수 값 발견: {col}")
+
+def assert_no_nan(df, cols):
+    for col in cols:
+        if df[col].isna().any():
+            raise ValueError(f"결측치 발견: {col}")
+```
+
+매출, 수량, 건수처럼 음수가 나오면 안 되는 지표를 명시적으로 점검하면 품질 문제가 빠르게 드러납니다.
+
+### 성능 기록 템플릿
+
+```python
+import time
+
+def timed(name, fn, *args, **kwargs):
+    start = time.time()
+    out = fn(*args, **kwargs)
+    sec = time.time() - start
+    print(f"[timing] {name}: {sec:.4f}s")
+    return out
+```
+
+각 단계를 시간과 함께 기록하면 어느 구간이 병목인지 반복 실행에서 일관되게 추적할 수 있습니다.
+
+### 저장 전 최종 점검
+
+- 결과 데이터프레임의 행 수, 열 수, 핵심 열 결측 비율을 기록합니다.
+- 파일 출력 전 `head()`와 `tail()`을 함께 확인해 경계값 오류를 찾습니다.
+- 월별 집계 합계와 원본 합계가 일치하는지 대사(對査)합니다.
+- 분석 코드와 결과 파일에 실행 날짜를 남겨 재현 경로를 유지합니다.
+
+이 검증 절차는 화려한 기법이 아니라 기본 안전장치입니다. 작은 점검을 습관화하면 분석 품질이 급격히 흔들리는 상황을 안정적으로 막을 수 있습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **벡터화는 정확히 무엇을 뜻할까요?**
@@ -415,5 +681,7 @@ B            3            2            200  0.666667  66.666667
 - [pandas — apply](https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.apply.html)
 - [NumPy — Universal functions](https://numpy.org/doc/stable/reference/ufuncs.html)
 - [Real Python — Fast, Flexible, Easy and Intuitive Pandas](https://realpython.com/fast-flexible-pandas/)
+
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/pandas-101/ko)
 
 Tags: Pandas, Vectorization, Performance, Apply, Beginner

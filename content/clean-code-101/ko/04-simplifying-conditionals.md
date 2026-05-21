@@ -63,7 +63,7 @@ last_reviewed: '2026-05-15'
 - **Strategy Pattern**: 알고리즘 선택을 외부에서 주입하는 패턴입니다.
 - **Table-driven**: 분기 규칙을 데이터 구조로 표현하는 방식입니다.
 
-## Before/After
+## 전/후 비교
 
 **Before**
 
@@ -98,7 +98,7 @@ def price(user, item):
 
 ## 실전 적용: 분기를 줄이는 다섯 단계
 
-### Step 1 — Flatten with guard clauses
+### 단계 1 — Flatten with guard clauses
 
 ```python
 # 1_guard.py
@@ -110,7 +110,7 @@ def total(items):
 
 비정상 입력이나 예외 케이스는 초반에 바로 반환하는 편이 좋습니다. 정상 흐름을 가운데에 남겨 두어야 본문이 읽힙니다.
 
-### Step 2 — Flip negative conditions
+### 단계 2 — Flip negative conditions
 
 ```python
 # 2_positive.py
@@ -124,7 +124,7 @@ def can_login(user):
 
 부정형 조건은 생각을 한 번 더 꺾게 만듭니다. 특히 이중 부정은 거의 항상 더 나쁜 이름이나 더 나쁜 구조의 신호입니다.
 
-### Step 3 — Remove branches with polymorphism
+### 단계 3 — Remove branches with polymorphism
 
 ```python
 # 3_poly.py
@@ -142,7 +142,7 @@ def total_area(shapes): return sum(s.area() for s in shapes)
 
 타입 분기가 반복되면, 각 타입이 자기 동작을 맡아야 할 때가 많습니다.
 
-### Step 4 — Strategy pattern
+### 단계 4 — Strategy pattern
 
 ```python
 # 4_strategy.py
@@ -157,7 +157,7 @@ def apply(price, kind): return DISCOUNTS[kind](price)
 
 정책의 종류가 외부 입력에 따라 바뀐다면, 전략이나 딕셔너리 조회가 if/elif보다 더 단순하고 확장에도 유리합니다.
 
-### Step 5 — Table-driven
+### 단계 5 — Table-driven
 
 ```python
 # 5_table.py
@@ -244,7 +244,7 @@ python -m pytest -q tests/test_pricing.py
 
 핵심은 분기 수를 줄이는 것이 아니라 분기 책임을 올바른 위치로 옮기는 것입니다.
 
-## Guard Clause 전후 비교
+## 가드 절 전후 비교
 
 ```python
 # before
@@ -362,6 +362,306 @@ def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
 
 또한 개선 활동은 단발성 이벤트가 아니라 루프여야 합니다. 한 번의 대청소보다 매 PR마다 작은 개선을 추가하는 편이 장기적으로 더 강합니다. 이름 하나, 함수 하나, 분기 하나를 매번 더 낫게 만드는 습관이 쌓이면 코드베이스의 평균 품질이 올라가고, 장애 대응 속도도 실제로 빨라집니다.
 
+
+## 조건문 단순화 패턴 카탈로그
+
+분기 단순화는 코드 스타일 문제가 아니라 결함률을 낮추는 구조 개선입니다. 아래 카탈로그를 기준으로 현재 분기 형태를 분류하면 대응 전략을 빠르게 고를 수 있습니다.
+
+| 패턴 | 징후 | 추천 리팩토링 |
+| --- | --- | --- |
+| 깊은 중첩 if | 들여쓰기 3단 이상 | 가드 절 도입 |
+| 타입 분기 | `if type ==` 반복 | 다형성/전략 패턴 |
+| 조건 중복 | 파일마다 같은 조건식 | 판정 함수 추출 |
+| 부정형 과다 | `if not ... and not ...` | 긍정형 함수로 전환 |
+| 정책 하드코딩 | 지역 변수로 규칙 고정 | 정책 테이블 분리 |
+
+## 전/후 데모: 정책 테이블로 분기 축소
+
+```python
+# before
+def shipping_fee(country: str, amount_cents: int) -> int:
+    if country == "KR":
+        if amount_cents >= 50000:
+            return 0
+        return 3000
+    elif country == "JP":
+        if amount_cents >= 80000:
+            return 0
+        return 5000
+    elif country == "US":
+        if amount_cents >= 100000:
+            return 0
+        return 9000
+    return 15000
+
+
+# after
+FREE_SHIPPING_POLICY = {
+    "KR": (50000, 3000),
+    "JP": (80000, 5000),
+    "US": (100000, 9000),
+}
+
+
+def shipping_fee(country: str, amount_cents: int) -> int:
+    threshold, fee = FREE_SHIPPING_POLICY.get(country, (10**12, 15000))
+    return 0 if amount_cents >= threshold else fee
+```
+
+## SOLID 샘플: 개방-폐쇄 원칙 기반 전략 객체
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class DiscountRule:
+    min_total_cents: int
+    rate: float
+
+    def apply(self, total_cents: int) -> int:
+        if total_cents < self.min_total_cents:
+            return total_cents
+        return int(total_cents * (1 - self.rate))
+```
+
+정책이 늘어날수록 기존 분기문을 수정하는 대신 규칙 객체를 추가하는 구조가 유지보수 비용을 더 안정적으로 제어합니다.
+
+## 린터 예시: 복잡도 경고로 분기 폭발 예방
+
+```toml
+[tool.ruff.lint]
+select = ["C90", "PLR", "B", "E", "F"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 7
+```
+
+복잡도 한도를 낮추면 분기 폭발이 기능 출시 전에 드러납니다. 나중에 대청소하는 방식보다 예방 비용이 훨씬 작습니다.
+
+
+## 심화 실습: 분기 폭발을 예방하는 설계 루틴
+
+분기가 늘어나는 근본 원인은 정책이 코드 안쪽에 하드코딩되기 때문입니다. 정책을 데이터 또는 객체로 분리하면 if/elif 체인이 자연스럽게 줄어듭니다.
+
+```python
+RISK_POLICY = {
+    "new": 0.03,
+    "silver": 0.02,
+    "gold": 0.01,
+}
+
+
+def calculate_fee_by_tier(tier: str, amount_cents: int) -> int:
+    rate = RISK_POLICY.get(tier, 0.05)
+    return int(amount_cents * rate)
+```
+
+## 분기 리팩토링 체크표
+
+| 질문 | 예 | 조치 |
+| --- | --- | --- |
+| 같은 조건이 반복되는가 | 국가별 배송 조건 중복 | 정책 테이블 추출 |
+| 분기마다 같은 후처리가 있는가 | 로깅/메트릭 중복 | 공통 후처리 함수 |
+| 새로운 정책 추가가 어려운가 | `elif` 추가 시 기존 코드 수정 다수 | 전략 객체 도입 |
+
+분기 코드는 기능이 늘수록 기하급수적으로 복잡해집니다. 먼저 줄이는 습관이 비용을 크게 절감합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
 ## 처음 질문으로 돌아가기
 
 - **가드 절과 조기 반환은 어떤 상황에서 가장 효과적일까요?**
@@ -393,4 +693,5 @@ def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
 - [Refactoring — Replace Conditional with Polymorphism](https://refactoring.com/catalog/replaceConditionalWithPolymorphism.html)
 - [Strategy Pattern (Refactoring Guru)](https://refactoring.guru/design-patterns/strategy)
 - [Clean Code (Ch. 3 Functions, Ch. 6 Objects)](https://www.oreilly.com/library/view/clean-code-a/9780136083238/)
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/clean-code-101/ko)
 Tags: Computer Science, CleanCode, Conditionals, GuardClauses, Refactoring, Readability

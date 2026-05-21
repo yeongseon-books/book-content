@@ -63,7 +63,7 @@ last_reviewed: '2026-05-15'
 - **TODO/FIXME**: 미래 작업을 남기는 표식이며, 추적 가능해야 합니다.
 - **API doc**: 공개 인터페이스의 계약과 사용법입니다.
 
-## Before/After
+## 전/후 비교
 
 **Before**
 
@@ -85,7 +85,7 @@ def get_active_users(): ...
 
 ## 실전 적용: 유용한 문서화 다섯 단계
 
-### Step 1 — Intent comment
+### 단계 1 — Intent comment
 
 ```python
 # 1_intent.py
@@ -97,7 +97,7 @@ def is_paid(resp):
 
 이런 주석은 코드가 표현하기 어려운 배경을 담습니다. 외부 시스템의 이상한 계약처럼 "왜 이렇게 했는지"가 핵심일 때 의미가 있습니다.
 
-### Step 2 — Warning comment
+### 단계 2 — Warning comment
 
 ```python
 # 2_warning.py
@@ -107,7 +107,7 @@ def upload_invoice(path): ...
 
 호출자가 실제로 다칠 수 있는 위험은 코드 옆에서 바로 경고해야 합니다. 경고 주석은 친절함이 아니라 안전장치입니다.
 
-### Step 3 — Docstring
+### 단계 3 — Docstring
 
 ```python
 # 3_doc.py
@@ -131,7 +131,7 @@ def discount(price: int, rate: float) -> int:
 
 공개 함수는 호출 계약을 분명히 남길 가치가 있습니다. 입력, 반환, 예외가 보이면 사용하는 사람의 추측 비용이 크게 줄어듭니다.
 
-### Step 4 — README header
+### 단계 4 — README header
 
 ```markdown
 <!-- 4_readme.md -->
@@ -146,7 +146,7 @@ Payment domain service that responds within 5 seconds.
 
 새 기여자가 30초 안에 프로젝트를 이해할 수 있어야 좋은 README입니다. 첫 문단과 실행 방법이 가장 먼저 보이는 것이 중요합니다.
 
-### Step 5 — TODO with an owner
+### 단계 5 — TODO with an owner
 
 ```python
 # 5_todo.py
@@ -255,7 +255,7 @@ def parse_gateway_status(response: dict) -> str:
 
 위 차이는 유지보수에서 크게 드러납니다. 나쁜 주석은 시간이 지나며 낡고, 좋은 주석은 의사결정 맥락을 보존합니다.
 
-## Python docstring 실무 규칙
+## 파이썬 문서 문자열 실무 규칙
 
 ```python
 def calculate_refund_amount(total_cents: int, cancel_fee_rate: float) -> int:
@@ -338,6 +338,276 @@ def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
 
 또한 개선 활동은 단발성 이벤트가 아니라 루프여야 합니다. 한 번의 대청소보다 매 PR마다 작은 개선을 추가하는 편이 장기적으로 더 강합니다. 이름 하나, 함수 하나, 분기 하나를 매번 더 낫게 만드는 습관이 쌓이면 코드베이스의 평균 품질이 올라가고, 장애 대응 속도도 실제로 빨라집니다.
 
+
+## 주석 품질 판정표
+
+주석은 "코드를 설명"할 때보다 "코드로 표현할 수 없는 의사결정"을 기록할 때 가치가 큽니다. 아래 기준으로 주석을 평가하면 품질이 안정됩니다.
+
+| 주석 유형 | 좋은 예 | 나쁜 예 |
+| --- | --- | --- |
+| 의도 설명 | 특정 제약 때문에 현재 구현을 택한 이유 | 코드 문장을 그대로 반복 |
+| 경고 | 트랜잭션/성능/보안 위험을 명시 | 막연한 "주의" 문장 |
+| TODO | 담당자, 기한, 후속 조건 포함 | 소유자 없는 TODO 누적 |
+| 문서 링크 | ADR/이슈 번호와 연결 | 출처 없는 주장 |
+
+## 전/후 데모: 주석보다 이름과 구조로 설명하기
+
+```python
+# before
+def p(a, b):
+    # check if user can buy
+    if a and b > 0:
+        return True
+    return False
+
+
+# after
+def can_purchase(is_active_user: bool, stock_quantity: int) -> bool:
+    return is_active_user and stock_quantity > 0
+```
+
+전/후 비교에서 보듯이 주석이 없어도 이름만으로 의도가 드러나는 코드가 유지보수에 유리합니다. 주석은 마지막 수단이어야 합니다.
+
+## 문서화 루틴 예시
+
+1. PR 설명에 What/Why/How/Risk를 고정 템플릿으로 작성합니다.
+2. 공개 API 변경 시 README와 호출 예제를 같은 PR에서 갱신합니다.
+3. 운영 영향이 있는 변경은 ADR 링크를 포함합니다.
+
+```markdown
+## 변경 요약
+- What: 주문 취소 정책을 상태 기반으로 재구성
+- Why: 분기 중복 제거와 정책 오해 방지
+- How: 전략 객체 도입 + 기존 API 시그니처 유지
+- Risk: 레거시 호출자에서 상태 문자열 오타 가능
+```
+
+## 린터 예시: 문서 문자열 최소 기준
+
+```toml
+[tool.ruff.lint]
+select = ["D", "E", "F", "B"]
+ignore = ["D203", "D213"]
+```
+
+문서 문자열 규칙을 자동화하면 함수 수준 문서 누락이 초기에 발견됩니다. 이 과정은 문서 품질의 균질화를 돕습니다.
+
+
+## 심화 실습: 문서 부채 상환 루틴
+
+문서 품질을 유지하려면 기능 개발과 같은 리듬으로 문서 점검이 이루어져야 합니다. 월 1회 대청소보다 주간 루틴이 더 효과적입니다.
+
+| 루틴 | 주기 | 담당 | 출력물 |
+| --- | --- | --- | --- |
+| API 사용 예시 검증 | 매주 | 기능 담당자 | 실행 가능한 예시 코드 |
+| 오래된 TODO 정리 | 매주 | 리뷰어 | 제거/연장 기록 |
+| README 구조 점검 | 격주 | 모듈 오너 | 최신 아키텍처 다이어그램 |
+
+```markdown
+### TODO 관리 규칙
+- 담당자 없는 TODO 금지
+- 만료일 없는 TODO 금지
+- 만료 후 자동 이슈 전환
+```
+
+문서 부채를 기술 부채처럼 추적하면 신규 멤버 온보딩 속도가 빨라지고, 장애 대응 시 의사결정 시간이 줄어듭니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
 ## 처음 질문으로 돌아가기
 
 - **언제 주석을 쓰지 않는 편이 더 좋을까요?**
@@ -369,4 +639,5 @@ def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
 - [PEP 257 — Docstring Conventions](https://peps.python.org/pep-0257/)
 - [Google Python Style Guide — Comments](https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings)
 - [Write the Docs — Documentation Guide](https://www.writethedocs.org/guide/)
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/clean-code-101/ko)
 Tags: Computer Science, CleanCode, Comments, Documentation, Docstring, Readability

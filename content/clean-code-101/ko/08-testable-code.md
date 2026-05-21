@@ -63,7 +63,7 @@ last_reviewed: '2026-05-15'
 - **Fake**: 테스트용으로 단순화한 동작 구현체입니다.
 - **Spy**: 호출 기록을 남기는 테스트 더블입니다.
 
-## Before/After
+## 전/후 비교
 
 **Before**
 
@@ -91,7 +91,7 @@ def fetch_user(uid, http):
 
 ## 실전 적용: 테스트 가능성을 높이는 다섯 단계
 
-### Step 1 — Extract pure logic
+### 단계 1 — Extract pure logic
 
 ```python
 # 1_pure.py
@@ -101,7 +101,7 @@ def total(items):
 
 입출력 없이 계산만 하는 부분은 항상 순수 함수 후보입니다. 이런 핵심 계산을 먼저 분리하면 단위 테스트가 거의 공짜가 됩니다.
 
-### Step 2 — Inject time
+### 단계 2 — Inject time
 
 ```python
 # 2_clock.py
@@ -113,7 +113,7 @@ def is_overdue(due, now=None):
 
 시간은 흐르기 때문에 테스트를 깨뜨립니다. 고정 가능한 값으로 받아들이는 순간 테스트는 안정성을 얻습니다.
 
-### Step 3 — Fake objects
+### 단계 3 — Fake objects
 
 ```python
 # 3_fake.py
@@ -128,7 +128,7 @@ def register(repo, user):
 
 도메인 로직을 검증하는 데 실제 데이터베이스가 꼭 필요하지는 않습니다. Fake는 느리고 불안정한 외부 의존성을 테스트 밖으로 밀어냅니다.
 
-### Step 4 — Recording calls (Spy)
+### 단계 4 — Recording calls (Spy)
 
 ```python
 # 4_spy.py
@@ -142,7 +142,7 @@ def notify(email, user):
 
 Spy는 무엇을 보냈는지, 몇 번 호출했는지 검증하게 해 줍니다. 협력 객체와의 상호작용을 확인할 때 유용합니다.
 
-### Step 5 — Isolate external calls
+### 단계 5 — Isolate external calls
 
 ```python
 # 5_adapter.py
@@ -231,7 +231,7 @@ python -m pytest -q tests/test_http_adapter.py
 
 체크리스트를 문서화하면 "테스트를 더 써라" 같은 모호한 요청이 줄고, 무엇을 어디까지 검증해야 하는지가 명확해집니다.
 
-## PR 템플릿 예시
+## 풀 리퀘스트 템플릿 예시
 
 ```python
 PR_TEMPLATE = {
@@ -330,6 +330,289 @@ def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
 
 또한 개선 활동은 단발성 이벤트가 아니라 루프여야 합니다. 한 번의 대청소보다 매 PR마다 작은 개선을 추가하는 편이 장기적으로 더 강합니다. 이름 하나, 함수 하나, 분기 하나를 매번 더 낫게 만드는 습관이 쌓이면 코드베이스의 평균 품질이 올라가고, 장애 대응 속도도 실제로 빨라집니다.
 
+
+## 테스트 가능성 진단표
+
+테스트 가능한 코드 여부는 테스트 파일이 있는지보다 경계 분리가 되어 있는지로 판단합니다.
+
+| 진단 항목 | 나쁜 신호 | 개선 방향 |
+| --- | --- | --- |
+| 시간 의존 | `datetime.now()` 직접 호출 | 시계 객체 주입 |
+| 외부 호출 | 함수 본문에서 API/DB 직접 호출 | 어댑터 계층 분리 |
+| 난수 의존 | 랜덤 결과를 바로 사용 | 시드 또는 생성기 주입 |
+| 복합 책임 | 검증/계산/저장/알림 혼합 | 순수 함수 추출 |
+
+## 전/후 데모: 의존성 주입으로 단위 테스트 가능하게 만들기
+
+```python
+# before
+def issue_coupon(user_id):
+    from datetime import datetime
+    code = f"CP-{user_id}-{int(datetime.now().timestamp())}"
+    return code
+
+
+# after
+class Clock:
+    def now_ts(self) -> int:
+        raise NotImplementedError
+
+
+def issue_coupon(user_id: str, clock: Clock) -> str:
+    return f"CP-{user_id}-{clock.now_ts()}"
+```
+
+## 테스트 더블 선택 가이드
+
+| 상황 | 권장 더블 | 이유 |
+| --- | --- | --- |
+| 조회 결과 고정 | Stub | 입력-출력 검증 단순화 |
+| 호출 여부 검증 | Spy | 상호작용 계약 확인 |
+| 실패 시나리오 재현 | Fake | 운영과 유사한 흐름 검증 |
+
+```python
+class FakeClock(Clock):
+    def __init__(self, fixed_ts: int):
+        self.fixed_ts = fixed_ts
+
+    def now_ts(self) -> int:
+        return self.fixed_ts
+```
+
+## 테스트/린터 구성 예시
+
+```toml
+[tool.pytest.ini_options]
+addopts = "-q --maxfail=1"
+testpaths = ["tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "B", "PT"]
+```
+
+테스트 가능성은 설계의 부산물이 아니라 목표여야 합니다. 새 기능 PR에서 테스트 격리 수준을 함께 검토하면 회귀 결함을 체계적으로 줄일 수 있습니다.
+
+
+## 심화 실습: 테스트 설계 워크플로
+
+테스트 가능한 코드는 우연히 생기지 않습니다. 기능 설계 단계에서 테스트 경계를 먼저 그리는 습관이 필요합니다.
+
+1. 순수 계산 영역과 외부 I/O 영역을 분리합니다.
+2. 순수 영역은 단위 테스트, I/O 영역은 계약 테스트를 배치합니다.
+3. 실패 시나리오를 정상 시나리오와 같은 수로 준비합니다.
+
+```python
+def compute_invoice_total(line_items: list[dict], discount_rate: float) -> int:
+    subtotal = sum(item["unit_price_cents"] * item["quantity"] for item in line_items)
+    return int(subtotal * (1 - discount_rate))
+```
+
+## 테스트 케이스 설계표
+
+| 분류 | 예시 | 기대 결과 |
+| --- | --- | --- |
+| 정상 | 수량 2, 할인 10% | 계산값 정확 |
+| 경계 | 수량 0, 할인 0% | 0 반환 |
+| 오류 | 음수 수량 | 예외 발생 |
+
+설계표를 먼저 작성하면 테스트 구현 속도가 빨라지고 누락 케이스가 줄어듭니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
+
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
+
 ## 처음 질문으로 돌아가기
 
 - **순수 로직과 부수 효과는 어떻게 분리해야 할까요?**
@@ -363,4 +646,5 @@ def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
 - [Pytest — Fixtures](https://docs.pytest.org/en/stable/how-to/fixtures.html)
 - [Pytest fixtures](https://docs.pytest.org/en/stable/how-to/fixtures.html)
 - [Hexagonal architecture](https://alistair.cockburn.us/hexagonal-architecture/)
+- [이 글의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/clean-code-101/ko)
 Tags: Computer Science, CleanCode, Testability, Testing, DependencyInjection, Refactoring
