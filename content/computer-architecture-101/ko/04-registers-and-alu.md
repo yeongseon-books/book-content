@@ -530,6 +530,21 @@ Window N-1 (caller)     Window N (current)    Window N+1 (callee)
 - **ALU는 어떤 연산을 실제로 수행할까요?**
   - 산술(ADD, SUB, MUL), 논리(AND, OR, XOR, NOT), 시프트(SHL, SHR, SAR), 비교(SUB 후 FLAGS만 갱신)를 수행합니다. 심화 학습에서 구현한 것처럼, 모든 연산은 결과와 함께 FLAGS(CF, ZF, SF, OF)를 갱신하여 후속 조건 분기가 이를 참조할 수 있게 합니다.
 
+<!-- toc:begin -->
+## 이 시리즈
+- [Computer Architecture 101 (1/10): 컴퓨터 구조란 무엇인가?](./01-what-is-computer-architecture.md)
+- [Computer Architecture 101 (2/10): 데이터 표현 — bit, byte, integer, floating point](./02-data-representation.md)
+- [Computer Architecture 101 (3/10): CPU와 명령어](./03-cpu-and-instructions.md)
+- **Computer Architecture 101 (4/10): 레지스터와 ALU (현재 글)**
+- Computer Architecture 101 (5/10): 메모리 구조 (예정)
+- Computer Architecture 101 (6/10): 캐시와 지역성 (예정)
+- Computer Architecture 101 (7/10): 파이프라인 (예정)
+- Computer Architecture 101 (8/10): I/O와 장치 (예정)
+- Computer Architecture 101 (9/10): 병렬성과 멀티코어 (예정)
+- Computer Architecture 101 (10/10): 성능을 이해하는 법 (예정)
+
+<!-- toc:end -->
+
 ## 참고 자료
 
 - [Patterson & Hennessy — Computer Organization and Design](https://www.elsevier.com/books/computer-organization-and-design-mips-edition/patterson/978-0-12-820109-1)

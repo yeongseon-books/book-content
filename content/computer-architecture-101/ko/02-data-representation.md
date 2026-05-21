@@ -587,6 +587,21 @@ print(robust_equal(1e-15, 2e-15))      # True (0 근처)
 - **IEEE 754 부동소수점은 어떤 구조를 가질까요?**
   - 부호(1비트) + 지수(8비트, bias 127) + 가수(23비트, 암묵적 1)의 구조입니다. 심화 학습에서 10.0을 비트 분해한 것처럼, 이 구조 때문에 0.1 같은 십진 소수는 정확히 표현할 수 없고, 이것이 `0.1 + 0.2 ≠ 0.3` 문제의 근본 원인입니다.
 
+<!-- toc:begin -->
+## 이 시리즈
+- [Computer Architecture 101 (1/10): 컴퓨터 구조란 무엇인가?](./01-what-is-computer-architecture.md)
+- **Computer Architecture 101 (2/10): 데이터 표현 — bit, byte, integer, floating point (현재 글)**
+- Computer Architecture 101 (3/10): CPU와 명령어 (예정)
+- Computer Architecture 101 (4/10): 레지스터와 ALU (예정)
+- Computer Architecture 101 (5/10): 메모리 구조 (예정)
+- Computer Architecture 101 (6/10): 캐시와 지역성 (예정)
+- Computer Architecture 101 (7/10): 파이프라인 (예정)
+- Computer Architecture 101 (8/10): I/O와 장치 (예정)
+- Computer Architecture 101 (9/10): 병렬성과 멀티코어 (예정)
+- Computer Architecture 101 (10/10): 성능을 이해하는 법 (예정)
+
+<!-- toc:end -->
+
 ## 참고 자료
 
 - [IEEE 754 — Wikipedia](https://en.wikipedia.org/wiki/IEEE_754)

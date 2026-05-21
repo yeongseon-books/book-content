@@ -669,6 +669,21 @@ print(f"판정:     {result['verdict']}")
 - **샘플링 프로파일링과 계측은 무엇이 다를까요?**
   - 샘플링은 주기적으로 실행 위치를 기록하여 "어디에서 시간을 많이 쓰는가"를 통계적으로 파악합니다(오버헤드 ~1-5%). 계측은 모든 함수 호출을 기록하여 정확한 호출 횟수와 시간을 알지만 오버헤드가 10~100%입니다. 프로덕션에는 샘플링, 정밀 분석에는 계측이 적합합니다.
 
+<!-- toc:begin -->
+## 이 시리즈
+- [Computer Architecture 101 (1/10): 컴퓨터 구조란 무엇인가?](./01-what-is-computer-architecture.md)
+- [Computer Architecture 101 (2/10): 데이터 표현 — bit, byte, integer, floating point](./02-data-representation.md)
+- [Computer Architecture 101 (3/10): CPU와 명령어](./03-cpu-and-instructions.md)
+- [Computer Architecture 101 (4/10): 레지스터와 ALU](./04-registers-and-alu.md)
+- [Computer Architecture 101 (5/10): 메모리 구조](./05-memory-organization.md)
+- [Computer Architecture 101 (6/10): 캐시와 지역성](./06-cache-and-locality.md)
+- [Computer Architecture 101 (7/10): 파이프라인](./07-pipelining.md)
+- [Computer Architecture 101 (8/10): I/O와 장치](./08-io-and-devices.md)
+- [Computer Architecture 101 (9/10): 병렬성과 멀티코어](./09-parallelism-and-multicore.md)
+- **Computer Architecture 101 (10/10): 성능을 이해하는 법 (현재 글)**
+
+<!-- toc:end -->
+
 ## 참고 자료
 
 - [Wikipedia — Profiling (computer programming)](https://en.wikipedia.org/wiki/Profiling_(computer_programming))

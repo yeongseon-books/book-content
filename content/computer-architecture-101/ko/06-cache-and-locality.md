@@ -679,6 +679,21 @@ print(f"버스 트랜잭션 수: {sim.bus_transactions}")
 - **캐시 라인은 왜 중요한 비용 단위일까요?**
   - 캐시 미스 시 1바이트만 필요해도 64바이트 전체 라인을 가져옵니다. 따라서 데이터 레이아웃이 캐시 라인 활용률을 결정합니다. False sharing 문제에서 보듯이, 같은 라인을 여러 코어가 수정하면 40배 성능 저하가 발생할 수 있습니다.
 
+<!-- toc:begin -->
+## 이 시리즈
+- [Computer Architecture 101 (1/10): 컴퓨터 구조란 무엇인가?](./01-what-is-computer-architecture.md)
+- [Computer Architecture 101 (2/10): 데이터 표현 — bit, byte, integer, floating point](./02-data-representation.md)
+- [Computer Architecture 101 (3/10): CPU와 명령어](./03-cpu-and-instructions.md)
+- [Computer Architecture 101 (4/10): 레지스터와 ALU](./04-registers-and-alu.md)
+- [Computer Architecture 101 (5/10): 메모리 구조](./05-memory-organization.md)
+- **Computer Architecture 101 (6/10): 캐시와 지역성 (현재 글)**
+- Computer Architecture 101 (7/10): 파이프라인 (예정)
+- Computer Architecture 101 (8/10): I/O와 장치 (예정)
+- Computer Architecture 101 (9/10): 병렬성과 멀티코어 (예정)
+- Computer Architecture 101 (10/10): 성능을 이해하는 법 (예정)
+
+<!-- toc:end -->
+
 ## 참고 자료
 
 - [What Every Programmer Should Know About Memory (Ulrich Drepper)](https://www.akkadia.org/drepper/cpumemory.pdf)

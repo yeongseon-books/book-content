@@ -606,6 +606,21 @@ VLIW 명령어 번들 (예: Itanium):
 - **분기 예측은 어떤 가정을 바탕으로 동작할까요?**
   - "과거 패턴이 미래에도 반복된다"는 가정입니다. 2-bit 포화 카운터는 연속 같은 방향 분기를 학습하고, 루프의 경우 99%+ 정확도를 달성합니다. 심화 학습에서 본 것처럼, 예측 정확도가 97%에서 99%로 오르면 CPI가 1.09에서 1.03으로 개선됩니다.
 
+<!-- toc:begin -->
+## 이 시리즈
+- [Computer Architecture 101 (1/10): 컴퓨터 구조란 무엇인가?](./01-what-is-computer-architecture.md)
+- [Computer Architecture 101 (2/10): 데이터 표현 — bit, byte, integer, floating point](./02-data-representation.md)
+- [Computer Architecture 101 (3/10): CPU와 명령어](./03-cpu-and-instructions.md)
+- [Computer Architecture 101 (4/10): 레지스터와 ALU](./04-registers-and-alu.md)
+- [Computer Architecture 101 (5/10): 메모리 구조](./05-memory-organization.md)
+- [Computer Architecture 101 (6/10): 캐시와 지역성](./06-cache-and-locality.md)
+- **Computer Architecture 101 (7/10): 파이프라인 (현재 글)**
+- Computer Architecture 101 (8/10): I/O와 장치 (예정)
+- Computer Architecture 101 (9/10): 병렬성과 멀티코어 (예정)
+- Computer Architecture 101 (10/10): 성능을 이해하는 법 (예정)
+
+<!-- toc:end -->
+
 ## 참고 자료
 
 - [Wikipedia — Instruction pipelining](https://en.wikipedia.org/wiki/Instruction_pipelining)

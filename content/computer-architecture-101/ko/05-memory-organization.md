@@ -564,6 +564,21 @@ print(f"성능 차이: {unaware/aware:.1f}x")  # ~1.26x
 - **한 프로세스의 text, data, heap, stack은 어떻게 배치될까요?**
   - 낮은 주소부터 text(코드) → data(전역) → BSS → heap(↑) 순으로 배치되고, 높은 주소에서 stack(↓)이 아래로 자랍니다. 중간에 mmap 영역이 공유 라이브러리를 매핑합니다. Demand paging 덕분에 매핑된 크기와 실제 물리 메모리 사용량은 다릅니다.
 
+<!-- toc:begin -->
+## 이 시리즈
+- [Computer Architecture 101 (1/10): 컴퓨터 구조란 무엇인가?](./01-what-is-computer-architecture.md)
+- [Computer Architecture 101 (2/10): 데이터 표현 — bit, byte, integer, floating point](./02-data-representation.md)
+- [Computer Architecture 101 (3/10): CPU와 명령어](./03-cpu-and-instructions.md)
+- [Computer Architecture 101 (4/10): 레지스터와 ALU](./04-registers-and-alu.md)
+- **Computer Architecture 101 (5/10): 메모리 구조 (현재 글)**
+- Computer Architecture 101 (6/10): 캐시와 지역성 (예정)
+- Computer Architecture 101 (7/10): 파이프라인 (예정)
+- Computer Architecture 101 (8/10): I/O와 장치 (예정)
+- Computer Architecture 101 (9/10): 병렬성과 멀티코어 (예정)
+- Computer Architecture 101 (10/10): 성능을 이해하는 법 (예정)
+
+<!-- toc:end -->
+
 ## 참고 자료
 
 - [Wikipedia — Virtual memory](https://en.wikipedia.org/wiki/Virtual_memory)
