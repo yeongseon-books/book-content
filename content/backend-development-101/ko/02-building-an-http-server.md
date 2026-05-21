@@ -63,14 +63,14 @@ last_reviewed: '2026-05-15'
 
 ## 개선 전/개선 후
 
-**Before (the library hides everything)**
+**Before (라이브러리가 모든 것을 감춤)**
 
 ```python
 import requests
 print(requests.get("https://example.com").status_code)
 ```
 
-**After (you watch the bytes)**
+**After (바이트를 직접 관찰)**
 
 ```python
 import socket

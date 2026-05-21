@@ -63,13 +63,13 @@ last_reviewed: '2026-05-15'
 
 ## 개선 전/개선 후
 
-**Before (manual checks)**
+**Before (수동 확인)**
 
 ```python
-# Click around in the browser every time
+# 매번 브라우저에서 직접 클릭하며 확인
 ```
 
-**After (automatic verification)**
+**After (자동 검증)**
 
 ```python
 def test_create_user(client):

@@ -65,15 +65,15 @@ last_reviewed: '2026-05-15'
 
 ## 개선 전/개선 후
 
-**Before (the frontend does everything)**
+**Before (프론트엔드가 모든 것을 처리)**
 
 ```python
-# A password check inside the browser
+# 브라우저 안에서 비밀번호를 확인하는 코드
 if password == "admin123":
     show_dashboard()
 ```
 
-**After (the backend owns the rule)**
+**After (백엔드가 규칙을 소유)**
 
 ```python
 # server.py
@@ -84,7 +84,11 @@ def login(body):
     return 200, {"token": auth.token(body["email"])}
 ```
 
+위 코드에서 `auth`는 Service 계층에 해당합니다. 핵심 용어에서 본 5층 구조 중 "비즈니스 규칙이 머무는 계층"이 바로 이 역할을 합니다.
+
 비밀번호 검증은 클라이언트가 아니라 서버가 책임져야 합니다. 클라이언트는 결과를 소비하는 쪽이고, 규칙을 집행하는 쪽은 백엔드입니다. 이 구분이 흐려지면 보안과 운영 품질이 한 번에 무너집니다.
+
+실습에서는 가장 작은 서버부터 시작해 점진적으로 위 구조에 가까워지는 과정을 밟습니다. Before/After가 보여준 최종 목표를 단계별로 만들어 가는 흐름입니다.
 
 ## 실습: 다섯 단계로 보는 첫 번째 백엔드
 

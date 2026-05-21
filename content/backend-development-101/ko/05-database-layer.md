@@ -63,7 +63,7 @@ service는 SQL을 몰라도 되고, repository만 데이터 접근 세부 구현
 
 ## 개선 전/개선 후
 
-**Before (SQL inside the service)**
+**Before (서비스 안에 SQL 직접 작성)**
 
 ```python
 def create_user(name):
@@ -71,7 +71,7 @@ def create_user(name):
     return cur.lastrowid
 ```
 
-**After (wrapped by a repository)**
+**After (리포지터리로 감싸기)**
 
 ```python
 # repositories/user_repo.py

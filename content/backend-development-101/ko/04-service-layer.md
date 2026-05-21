@@ -63,7 +63,7 @@ service는 오케스트레이터입니다. repository, 외부 API, 이벤트 버
 
 ## 개선 전/개선 후
 
-**Before (controller does everything)**
+**Before (컨트롤러가 모든 것을 처리)**
 
 ```python
 @app.post("/orders")
@@ -75,7 +75,7 @@ def create_order(payload, db, mail):
     return order
 ```
 
-**After (service owns the rule)**
+**After (서비스가 규칙을 소유)**
 
 ```python
 # services/order_service.py

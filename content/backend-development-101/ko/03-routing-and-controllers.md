@@ -63,7 +63,7 @@ router는 지도를, controller는 접수창구를, service는 실제 규칙을 
 
 ## 개선 전/개선 후
 
-**Before (everything in one file)**
+**Before (모든 것이 한 파일에)**
 
 ```python
 # main.py
@@ -80,7 +80,7 @@ def list_orders(): ...
 def list_products(): ...
 ```
 
-**After (one router per module)**
+**After (모듈마다 라우터 분리)**
 
 ```python
 # routers/users.py

@@ -63,13 +63,13 @@ last_reviewed: '2026-05-15'
 
 ## 개선 전/개선 후
 
-**Before (print debugging)**
+**Before (print 디버깅)**
 
 ```python
 print("user=", user_id, "error", e)
 ```
 
-**After (structured log)**
+**After (구조화된 로그)**
 
 ```python
 import logging, json

@@ -63,13 +63,13 @@ last_reviewed: '2026-05-15'
 
 ## 개선 전/개선 후
 
-**Before (everything in one file)**
+**Before (모든 것이 한 파일에)**
 
 ```text
 app.py   # routing, business, DB, auth, logging — all together
 ```
 
-**After (layers visible as directories)**
+**After (계층이 디렉터리로 보임)**
 
 ```text
 src/

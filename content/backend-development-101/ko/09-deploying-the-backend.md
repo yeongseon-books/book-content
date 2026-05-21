@@ -63,7 +63,7 @@ last_reviewed: '2026-05-15'
 
 ## 개선 전/개선 후
 
-**Before (manual deploy)**
+**Before (수동 배포)**
 
 ```bash
 ssh server
@@ -72,12 +72,12 @@ pip install -r requirements.txt
 systemctl restart app
 ```
 
-**After (Dockerized — same image runs everywhere)**
+**After (Docker화 — 동일 이미지가 어디서든 실행)**
 
 ```bash
 docker build -t myapp:1.2.3 .
 docker push registry/myapp:1.2.3
-# Production pulls the same image and runs it
+# 프로덕션도 동일한 이미지를 pull해서 실행
 ```
 
 수동 배포는 사람이 기억에 의존합니다. 반면 이미지 기반 배포는 “무엇이 실행되고 있는가”를 버전으로 고정해 줍니다.
