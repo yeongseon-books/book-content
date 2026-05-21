@@ -648,4 +648,5 @@ def timed(fn, *args, **kwargs):
 - [SQLite SQL parameters](https://www.sqlite.org/lang_expr.html#varparam)
 
 - [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-dbapi-101/ko)
+
 Tags: Python, DB-API, PEP 249, Database

@@ -443,4 +443,5 @@ if __name__ == "__main__":
 - [FAISS `IndexFlat.h`](https://github.com/facebookresearch/faiss/blob/c72ef8a/faiss/IndexFlat.h)
 
 - [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/rag-deep-dive/ko)
+
 Tags: RAG, LangChain, Vector Search, LLM

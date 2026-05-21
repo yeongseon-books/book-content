@@ -492,4 +492,5 @@ Production에서는 `metadata.create_all`을 직접 부르지 않고 Alembic mig
 - [SQLite Datatypes In SQLite Version 3](https://www.sqlite.org/datatype3.html)
 
 - [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/sqlalchemy-101/ko)
+
 Tags: Python, SQLAlchemy, ORM, Database

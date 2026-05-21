@@ -559,4 +559,5 @@ INFO sqlalchemy.engine.Engine COMMIT
 - [SQLite RETURNING clause](https://www.sqlite.org/lang_returning.html)
 
 - [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/sqlalchemy-101/ko)
+
 Tags: Python, SQLAlchemy, ORM, Database

@@ -617,7 +617,6 @@ acme --install-completion
 # 자동으로 셸에 맞는 완성 스크립트 설치
 ```
 
-
 ## CLI 패키지 배포 구조
 
 CLI 패키지의 전체 프로젝트 구조와 pyproject.toml을 정리합니다.
@@ -755,9 +754,7 @@ ACME_API_URL=https://staging.acme.dev acme deploy
 # 또는 config.toml에 설정
 ```
 
-
 이 우선순위 체계를 잘 설계하면 사용자는 반복적인 옵션 입력 없이도 CLI를 편리하게 사용할 수 있고, 필요할 때만 명시적으로 값을 재정의할 수 있습니다. 대부분의 성숙한 CLI 도구(`aws`, `gh`, `docker`)가 이 패턴을 따릅니다.
-
 
 ## 처음 질문으로 돌아가기
 

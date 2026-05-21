@@ -476,4 +476,5 @@ def test_relationship_contract(session: Session):
 `relationship()`은 객체 레벨에서 관계 탐색을 담당하고, SQL 레벨의 `ForeignKey`와 짝을 이뤄 동작합니다. `back_populates`는 양방향 관계의 두 끝을 명시적으로 잇는 권장 패턴입니다. 일대다는 가장 흔한 형태이고, 다대다는 단순할 때 association table, 추가 컬럼이 필요할 때 association object로 표현합니다. cascade 정책은 부모-자식 관계의 안전망이고, SQLite에서는 외래키 PRAGMA가 함께 켜져야 합니다. 다음 글에서는 이 관계가 lazy 로딩으로 인해 N+1 문제를 만드는 시점을 살펴보고, joined/selectin 로딩으로 어떻게 미리 끌어오는지를 다룹니다.
 
 - [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/sqlalchemy-101/ko)
+
 Tags: Python, SQLAlchemy, ORM, Database

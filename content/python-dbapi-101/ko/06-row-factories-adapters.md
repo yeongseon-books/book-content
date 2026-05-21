@@ -585,4 +585,5 @@ def timed(fn, *args, **kwargs):
 - [Pydantic — Models](https://docs.pydantic.dev/latest/concepts/models/)
 
 - [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-dbapi-101/ko)
+
 Tags: Python, DB-API, PEP 249, Database

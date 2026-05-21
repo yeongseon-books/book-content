@@ -527,7 +527,6 @@ extra-index-url = https://pypi.mycompany.com/simple/
 trusted-host = pypi.mycompany.com
 ```
 
-
 ## 릴리스 자동화 전체 파이프라인
 
 실무에서 릴리스는 수동 명령이 아닌 자동화된 파이프라인으로 운영합니다.
@@ -702,7 +701,6 @@ Full docs: https://acme.github.io/acme-utils
 MIT
 ```
 
-
 ### PyPI 다운로드 통계 확인
 
 ```bash
@@ -713,7 +711,6 @@ pypistats system acme-utils         # OS별 다운로드
 ```
 
 패키지의 사용 현황을 파악하면 어떤 Python 버전과 플랫폼을 지원해야 하는지 데이터 기반으로 판단할 수 있습니다.
-
 
 ## 처음 질문으로 돌아가기
 

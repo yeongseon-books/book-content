@@ -590,7 +590,6 @@ jobs:
 
 이 워크플로우는 세 가지 Python 버전에서 lint, 타입 검사, 테스트, 빌드 검증을 모두 실행합니다. `pip install -e ".[dev]"`로 개발 의존성까지 한 번에 설치합니다.
 
-
 ## pyproject.toml 동적 버전 관리
 
 버전을 `pyproject.toml`에 하드코딩하는 대신 동적으로 가져오는 패턴이 실무에서 자주 사용됩니다.
@@ -682,7 +681,6 @@ pip install -e packages/acme-auth
 pip install -e packages/acme-cli
 ```
 
-
 ## EditorConfig와 개발 도구 설정 파일 배치
 
 프로젝트 루트에는 `pyproject.toml` 외에도 개발 경험을 일관되게 만드는 설정 파일이 필요합니다.
@@ -729,7 +727,6 @@ repos:
 ```
 
 이 설정들은 팀원 간 코드 스타일 차이를 줄이고, 리뷰에서 형식 문제에 시간을 쓰지 않게 만듭니다.
-
 
 ## 처음 질문으로 돌아가기
 

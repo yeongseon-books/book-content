@@ -602,4 +602,5 @@ def backup_and_check(src_path: str, dst_path: str):
 - [FastAPI — Dependencies](https://fastapi.tiangolo.com/tutorial/dependencies/)
 
 - [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/python-dbapi-101/ko)
+
 Tags: Python, DB-API, PEP 249, Database

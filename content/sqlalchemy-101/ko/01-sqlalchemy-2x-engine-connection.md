@@ -471,4 +471,5 @@ print(engine.pool.status())
 - [Python DB-API 101](../../python-dbapi-101/ko/01-why-db-api-pep-249.md) — SQLAlchemy가 그 위에 얹혀 있는 PEP 249 DB-API를 정리합니다. 커넥션 풀, 트랜잭션, 커서 같은 SQLAlchemy 동작이 "마법"처럼 느껴진다면 이 시리즈로 한 단계 내려가 어떤 드라이버 호출이 일어나는지 확인하기를 권장합니다.
 
 - [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/sqlalchemy-101/ko)
+
 Tags: Python, SQLAlchemy, ORM, Database

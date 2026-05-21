@@ -464,4 +464,5 @@ LangChain의 `EvaluatorType`과 `load_evaluator()`는 QA, criteria, exact match 
 - [LangChain evaluation loading source](https://github.com/langchain-ai/langchain/blob/langchain==0.2.17/libs/langchain/langchain/evaluation/loading.py)
 
 - [이 시리즈 예제 코드](https://github.com/yeongseon-books/book-examples/tree/main/rag-deep-dive/ko)
+
 Tags: RAG, LangChain, Vector Search, LLM

@@ -623,7 +623,6 @@ mike deploy 1.1 latest --push --update-aliases
 # https://acme.github.io/acme-utils/latest/
 ```
 
-
 ## CHANGELOG 문서화
 
 CHANGELOG는 릴리스 노트이자 사용자와의 계약서입니다.
@@ -772,7 +771,6 @@ https://acme.github.io/acme-utils/ 업데이트
 □ CHANGELOG가 업데이트되었는가
 ```
 
-
 ## Admonitions 활용법
 
 MkDocs Material에서 admonition(경고/정보 박스)을 활용하면 문서의 가독성이 크게 높아집니다.
@@ -796,9 +794,7 @@ MkDocs Material에서 admonition(경고/정보 박스)을 활용하면 문서의
 
 이 문법은 Markdown의 표준이 아니라 MkDocs Material 확장입니다. Sphinx에서는 `.. note::`, `.. warning::` 디렉티브가 같은 역할을 합니다.
 
-
 문서는 코드와 동일한 수준으로 리뷰하고 테스트해야 합니다. 오래된 문서는 문서가 없는 것보다 해로울 수 있습니다.
-
 
 ## 처음 질문으로 돌아가기
 
