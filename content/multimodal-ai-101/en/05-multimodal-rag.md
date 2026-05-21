@@ -29,19 +29,15 @@ This is post 5 in the Multimodal AI 101 series.
 
 Here we treat multimodal RAG as a retrieval redesign: what to index, what to keep out of the prompt, and how to keep image-aware search from becoming an expensive latency trap.
 
+
+![Multimodal AI 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/05/05-01-strategy-3-hybrid-both-image-and-text-ve.en.png)
+*Multimodal AI 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - Which questions fail first under text-only RAG once screenshots, charts, and scanned documents enter the corpus?
 - What are the trade-offs between image-only, text-only, and hybrid indexing strategies?
 - How should retrieval outputs be packaged before a VLM sees them?
-
-## Big Picture
-
-![Multimodal AI 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/05/05-01-strategy-3-hybrid-both-image-and-text-ve.en.png)
-
-*Multimodal AI 101 chapter 5 flow overview*
-
-This picture places Multimodal RAG: Searching Images and Text Together inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions text RAG cannot answer
 

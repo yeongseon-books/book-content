@@ -28,17 +28,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 HPA를 단순히 CPU가 높으면 파드를 늘리는 기능이 아니라, 메트릭을 기준으로 Deployment의 원하는 개수를 자동 조절하는 운영 자동화 계층이라는 관점에서 정리하겠습니다.
 
+
+![Kubernetes 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/08/08-01-concept-at-a-glance.ko.png)
+*Kubernetes 101 8장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 트래픽이 바뀔 때마다 사람이 직접 파드 수를 조절하면 왜 느리고 비싸질까요?
 - HPA는 어떤 지표를 보고 스케일 아웃과 스케일 인을 결정할까요?
 - resource requests가 없으면 왜 제대로 동작하지 않을까요?
-
-## 큰 그림
-
-![Kubernetes 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/08/08-01-concept-at-a-glance.ko.png)
-
-*Kubernetes 101 8장 흐름 개요*
 
 ## 왜 중요한가
 

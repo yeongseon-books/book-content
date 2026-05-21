@@ -31,19 +31,15 @@ This is the final post in the Database Systems 101 series.
 
 > Short, narrow transactions are OLTP; long, wide aggregations are OLAP. The two workloads differ in data model, storage format, and indexing strategy. Once that distinction lands, "why is analytics a separate system" becomes obvious.
 
+
+![database systems 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/10/10-01-big-picture.en.png)
+*database systems 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying OLTP and OLAP?
 - Which signal should the example or diagram make visible for OLTP and OLAP?
 - What failure should be prevented first when OLTP and OLAP reaches a real system?
-
-## Big Picture
-
-![database systems 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/10/10-01-big-picture.en.png)
-
-*database systems 101 chapter 10 flow overview*
-
-This picture places OLTP and OLAP inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

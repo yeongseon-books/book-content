@@ -30,21 +30,16 @@ last_reviewed: '2026-05-14'
 
 여기서는 클라우드 네트워크를 격리, 배치, 허용, 분산이라는 네 단계로 이해해 보겠습니다.
 
+
+![Cloud Computing 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/06/06-01-concept-at-a-glance.ko.png)
+*Cloud Computing 101 6장 흐름 개요*
+> 네트워크 설계는 보안, 성능, 비용을 동시에 고려하는 선택입니다. 단순한 연결이 아니라 운영 경계를 명확히 정하는 결정입니다.
+
 ## 먼저 던지는 질문
 
 - VPC와 서브넷은 무엇이 다를까요?
 - Security Group과 NACL은 왜 따로 존재할까요?
 - Public 서브넷과 Private 서브넷은 어떤 패턴으로 나누는 것이 일반적일까요?
-
-## 큰 그림
-
-![Cloud Computing 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/06/06-01-concept-at-a-glance.ko.png)
-
-*Cloud Computing 101 6장 흐름 개요*
-
-VPC는 클라우드 네트워크의 기본 경계입니다. 서브넷은 VPC 내부의 더 작은 네트워크 단위로, 리전 또는 가용성 영역(AZ) 단위로 나뉩니다. 보안 그룹과 네트워크 ACL은 트래픽을 필터링합니다. 로드 밸런서는 여러 인스턴스로 트래픽을 분산합니다.
-
-> 네트워크 설계는 보안, 성능, 비용을 동시에 고려하는 선택입니다. 단순한 연결이 아니라 운영 경계를 명확히 정하는 결정입니다.
 
 ## 왜 중요한가
 

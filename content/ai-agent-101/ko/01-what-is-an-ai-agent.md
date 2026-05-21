@@ -33,21 +33,15 @@ seo_description: chatbot과 agent를 가르는 기준과 기본 실행 루프를
 
 이 글에서는 AI Agent를 "말을 잘하는 모델"이 아니라 "목표를 받고 작업 루프를 실행하는 시스템"으로 이해해 보겠습니다.
 
+![agent 루프 한눈에 보기](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/01/01-01-agent-loop-at-a-glance.ko.png)
+*agent 루프 한눈에 보기*
+> Agent의 출발점은 더 똑똑한 말투가 아니라, 목표를 향해 반복 실행되는 제어 루프입니다.
+
 ## 먼저 던지는 질문
 
 - 챗봇과 agent를 가르는 기준을 기능 이름이 아니라 실행 책임으로 보면 무엇이 달라질까요?
 - Observe → Think → Act → Check 루프는 agent 실패를 어디서 나눠 보게 해 줄까요?
 - 처음 agent를 설계할 때 tool보다 먼저 정해야 할 경계는 무엇일까요?
-
-## 큰 그림
-
-![agent 루프 한눈에 보기](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/01/01-01-agent-loop-at-a-glance.ko.png)
-
-*agent 루프 한눈에 보기*
-
-이 그림에서는 목표를 받은 agent가 관찰하고, 판단하고, 행동하고, 결과를 확인하는 반복 흐름을 봅니다. 챗봇과 agent의 차이는 답변 품질보다 이 루프를 누가 책임지고 끝내는지에서 갈립니다.
-
-> Agent의 출발점은 더 똑똑한 말투가 아니라, 목표를 향해 반복 실행되는 제어 루프입니다.
 
 ## 왜 이 글이 중요한가
 

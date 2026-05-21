@@ -30,19 +30,15 @@ In this post, we'll look at the update rule itself, the role of the learning rat
 
 > Gradient descent is not magic. It is a repeated decision about how far to move against the local slope that the loss is showing you right now.
 
+
+![calculus for ml 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/07/07-01-concept-at-a-glance.en.png)
+*calculus for ml 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Gradient Descent?
 - Which signal should the example or diagram make visible for Gradient Descent?
 - What failure should be prevented first when Gradient Descent reaches a real system?
-
-## Big Picture
-
-![calculus for ml 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/07/07-01-concept-at-a-glance.en.png)
-
-*calculus for ml 101 chapter 7 flow overview*
-
-This picture places Gradient Descent inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions this article answers
 

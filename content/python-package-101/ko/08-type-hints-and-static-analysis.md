@@ -27,17 +27,14 @@ seo_description: 타입 힌트는 함수의 입력과 출력 타입을 명시하
 
 이 글은 Python Package 101 시리즈의 8번째 글입니다. 여기서는 타입 힌트의 기본 문법, `mypy` 검사 흐름, `py.typed` 마커 파일의 의미를 정리하겠습니다.
 
+![Python Package 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/08/08-01-mental-model.ko.png)
+*Python Package 101 8장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 타입 힌트는 왜 필요하고 런타임에 영향을 줄까요?
 - `mypy`는 어떤 오류를 잡아 줄까요?
 - `py.typed` 마커 파일은 왜 필요할까요?
-
-## 큰 그림
-
-![Python Package 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/08/08-01-mental-model.ko.png)
-
-*Python Package 101 8장 흐름 개요*
 
 ## 이 글에서 배우는 내용
 
@@ -77,7 +74,7 @@ mypy checks:
 
 ## Before / After
 
-**Before (no type hints)**
+**Before (타입 힌트 없음)**
 
 ```python
 def process(data):
@@ -87,7 +84,7 @@ def process(data):
 result = process({"username": "alice"})  # runtime error
 ```
 
-**After (type hints + mypy)**
+**After (타입 힌트 + mypy)**
 
 ```python
 from typing import TypedDict

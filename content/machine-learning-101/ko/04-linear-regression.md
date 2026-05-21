@@ -26,19 +26,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 머신러닝 101 시리즈의 4번째 글입니다. 여기서는 선형 회귀의 식과 직관, 평균제곱오차, R-squared, 잔차 해석을 함께 보면서 왜 이 모델이 여전히 가장 먼저 돌려 봐야 하는 기준선인지 정리하겠습니다.
 
+
+![Machine Learning 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/04/04-01-diagram.ko.png)
+*Machine Learning 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 선형 회귀 식은 어떤 방식으로 예측값을 만들까요?
 - 평균제곱오차와 최소제곱 해는 무엇을 최소화할까요?
 - R-squared는 정확히 무엇을 설명할까요?
-
-## 큰 그림
-
-![Machine Learning 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/04/04-01-diagram.ko.png)
-
-*Machine Learning 101 4장 흐름 개요*
-
-이 그림은 이 장의 핵심 개념들이 어떻게 연결되는지 보여줍니다.
 
 ## 비용함수와 경사하강법
 

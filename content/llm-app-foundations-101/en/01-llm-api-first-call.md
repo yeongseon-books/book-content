@@ -41,21 +41,15 @@ The main idea is simple: **an LLM app begins with request and response structure
 
 ---
 
+![LLM API first call: sending your first request](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/01/01-01-llm-api-first-call-sending-your-first-re.en.png)
+*LLM API first call: sending your first request*
+> The first call is not magic; it is a remote contract you can inspect field by field.
+
 ## Questions to Keep in Mind
 
 - What request-response shape sits underneath the SDK call?
 - When the first call fails, should you inspect authentication, the model id, or the message format first?
 - Where do you read the response body, token usage, and model name?
-
-## Big Picture
-
-![LLM API first call: sending your first request](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/01/01-01-llm-api-first-call-sending-your-first-re.en.png)
-
-*LLM API first call: sending your first request*
-
-This picture keeps the first call down to one round trip: your application sends a JSON-shaped request and receives a structured response. Authentication, model selection, messages, generated text, and usage all live on that boundary.
-
-> The first call is not magic; it is a remote contract you can inspect field by field.
 
 ## What an LLM API is
 

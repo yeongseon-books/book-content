@@ -29,19 +29,15 @@ Tech debt is not automatically a failure. Sometimes it is a conscious trade: spe
 
 This is post 9 in the Software Engineering 101 series. In this chapter, we classify debt, prioritize repayment, and use phased replacement and deprecation patterns to keep maintenance work recoverable.
 
+
+![software engineering 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/09/09-01-concept-at-a-glance.en.png)
+*software engineering 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Maintenance and Tech Debt?
 - Which signal should the example or diagram make visible for Maintenance and Tech Debt?
 - What failure should be prevented first when Maintenance and Tech Debt reaches a real system?
-
-## Big Picture
-
-![software engineering 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/09/09-01-concept-at-a-glance.en.png)
-
-*software engineering 101 chapter 9 flow overview*
-
-This picture places Maintenance and Tech Debt inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

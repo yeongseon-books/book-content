@@ -26,21 +26,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 머신러닝 101 시리즈의 6번째 글입니다. 여기서는 결정 트리의 분할 기준, 단일 트리의 과적합 문제, 그리고 랜덤 포레스트가 여러 트리를 묶어 어떻게 더 안정적인 앙상블이 되는지 정리하겠습니다.
 
+
+![Machine Learning 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/06/06-01-diagram.ko.png)
+*Machine Learning 101 6장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 결정 트리는 피처 공간을 어떤 기준으로 나눌까요?
 - Gini와 entropy는 무엇을 측정할까요?
 - 단일 트리는 왜 쉽게 과적합될까요?
-
-## 큰 그림
-
-![Machine Learning 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/06/06-01-diagram.ko.png)
-
-*Machine Learning 101 6장 흐름 개요*
-
-이 그림은 이 장의 핵심 개념들이 어떻게 연결되는지 보여줍니다.
-
-
 
 ## 왜 중요한가
 

@@ -26,21 +26,16 @@ Once vectors are in play, the next question comes immediately: how similar are t
 
 This is post 4 in the Linear Algebra 101 series. Here we will connect the inner product, cosine similarity, Euclidean distance, and Manhattan distance into one comparison toolkit.
 
+
+![linear algebra 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/04/04-01-concept-at-a-glance.en.png)
+*linear algebra 101 chapter 4 flow overview*
+> Inner product and distance are the two foundations of vector comparison. Inner product measures directional relationship; distance measures the gap between points. Which you use depends on your problem's nature.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Inner Product and Distance?
 - Which signal should the example or diagram make visible for Inner Product and Distance?
 - What failure should be prevented first when Inner Product and Distance reaches a real system?
-
-## Big Picture
-
-![linear algebra 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/04/04-01-concept-at-a-glance.en.png)
-
-*linear algebra 101 chapter 4 flow overview*
-
-This picture places Inner Product and Distance inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Inner product and distance are the two foundations of vector comparison. Inner product measures directional relationship; distance measures the gap between points. Which you use depends on your problem's nature.
 
 ## Questions This Post Answers
 

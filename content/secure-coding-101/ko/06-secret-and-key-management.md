@@ -28,17 +28,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 secret 관리를 단순히 환경 변수에 넣는 방법으로 끝내지 않고, 코드 분리, 비밀 저장소, 회전, 접근 감사, 마스킹까지 이어지는 운영 체계로 정리하겠습니다. 이 관점을 이해하면 왜 하드코딩이 위험한지뿐 아니라, 왜 회전 가능성이 secret 설계의 핵심인지도 분명해집니다.
 
+
+![Secure Coding 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/06/06-01-concept-at-a-glance.ko.png)
+*Secure Coding 101 6장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 어떤 값까지 secret으로 봐야 할까요?
 - 하드코딩된 secret은 왜 Git에 한 번만 올라가도 치명적일까요?
 - secret manager는 환경 변수와 무엇이 다를까요?
-
-## 큰 그림
-
-![Secure Coding 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/06/06-01-concept-at-a-glance.ko.png)
-
-*Secure Coding 101 6장 흐름 개요*
 
 ## 왜 중요한가
 

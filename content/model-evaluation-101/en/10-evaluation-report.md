@@ -28,19 +28,15 @@ A strong evaluation report prevents that amnesia. It is not paperwork for its ow
 
 This is the final post in the Model Evaluation 101 series. In this post, we turn metrics, slices, reproducibility, and known risks into one report that can survive beyond a single model run.
 
+
+![model evaluation 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/10/10-01-concept-at-a-glance.en.png)
+*model evaluation 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - The five sections of an evaluation report?
 - How it differs from a Model Card?
 - Reproducibility metadata?
-
-## Big Picture
-
-![model evaluation 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/10/10-01-concept-at-a-glance.en.png)
-
-*model evaluation 101 chapter 10 flow overview*
-
-This picture places Building an Evaluation Report inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

@@ -30,21 +30,16 @@ seo_description: 결정적 지표는 빠르고 재현 가능하지만, 의미가
 
 여기서는 결정적 지표가 무엇인지, 각각이 어떤 문제에 맞는지, 그리고 언제 LLM-as-judge나 사람 검토로 넘어가야 하는지 기준을 세워 보겠습니다.
 
+
+![결정적 지표 - Exact Match, BLEU, ROUGE](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/03/03-01-deterministic-metrics-exact-match-bleu-r.ko.png)
+*결정적 지표 - Exact Match, BLEU, ROUGE*
+> 결정적 지표는 빠르고 재현 가능하지만, 빠르다는 이유로 의미 품질의 최종 심판이 되지는 않습니다.
+
 ## 먼저 던지는 질문
 
 - Exact Match, BLEU, ROUGE 같은 결정적 지표는 언제 빠른 필터로 유용할까요?
 - 결정적 지표가 의미 판단까지 대신한다고 보면 어떤 오판이 생길까요?
 - 속도와 해석 가능성을 얻는 대신 어떤 보완 평가를 붙여야 할까요?
-
-## 큰 그림
-
-![결정적 지표 - Exact Match, BLEU, ROUGE](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/03/03-01-deterministic-metrics-exact-match-bleu-r.ko.png)
-
-*결정적 지표 - Exact Match, BLEU, ROUGE*
-
-이 그림에서는 Exact Match, BLEU, ROUGE 같은 결정적 지표가 빠르게 후보를 걸러내지만 의미 판단 전체를 대신하지는 못하는 구조를 봅니다. 결정적 지표는 평가의 시작점이지 최종 판결이 아닙니다.
-
-> 결정적 지표는 빠르고 재현 가능하지만, 빠르다는 이유로 의미 품질의 최종 심판이 되지는 않습니다.
 
 ## 왜 이 글이 중요한가
 

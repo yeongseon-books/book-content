@@ -27,21 +27,16 @@ Solo learning gets you started, but it rarely gives you fast feedback on judgmen
 
 This is post 9 in the Developer Career 101 series.
 
+
+![developer career 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/09/09-01-concept-at-a-glance.en.png)
+*developer career 101 chapter 9 flow overview*
+> Mentoring and networking are most effective when you define what you want to learn and what you have to share, rather than passively waiting for connection.
+
 ## Questions to Keep in Mind
 
 - How do you find a good mentor without turning the first contact into a burden?
 - What makes a question easy for another engineer to answer well?
 - How do communities, conferences, and public writing expand your network?
-
-## Big Picture
-
-![developer career 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/09/09-01-concept-at-a-glance.en.png)
-
-*developer career 101 chapter 9 flow overview*
-
-This picture places Mentoring and Networking inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Mentoring and networking are most effective when you define what you want to learn and what you have to share, rather than passively waiting for connection.
 
 ## What You Will Learn
 

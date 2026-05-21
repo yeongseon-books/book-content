@@ -28,21 +28,15 @@ This post implements two simple local limiters for that job: a token bucket and 
 
 This is the last post in the LLM API Production 101 series. Here we focus on token-bucket and sliding-window patterns that keep request flow inside rate limits.
 
+![Rate limit management: patterns for staying within limits](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/06/06-01-rate-limit-management-patterns-for-stayi.en.png)
+*Rate limit management: patterns for staying within limits*
+> Rate limiting is flow control before rejection, not apology after rejection.
+
 ## Questions to Keep in Mind
 
 - Is rate limit management something you do after a 429, or before traffic reaches the provider?
 - When does a token bucket fit better than a sliding window?
 - What should the app still do after receiving a provider 429?
-
-## Big Picture
-
-![Rate limit management: patterns for staying within limits](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/06/06-01-rate-limit-management-patterns-for-stayi.en.png)
-
-*Rate limit management: patterns for staying within limits*
-
-This picture treats rate limiting as application-side flow control before the provider rejects traffic. A local limiter lets the app shape user experience and stay within provider constraints.
-
-> Rate limiting is flow control before rejection, not apology after rejection.
 
 ## Runtime setup
 

@@ -31,19 +31,14 @@ In episode 3 of the intro series, I wrote that Functions runs the Host process (
 
 This post focuses on one question: **what happens the moment a Function App instance powers on**. Everything is pinned to commit `5e59423`, and every host code citation uses that commit.
 
+![azure functions deep dive chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/01/01-01-the-big-picture-one-azure-functions-host.en.png)
+*azure functions deep dive chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What process is the Functions Host exactly, and in what order does it bootstrap?
 - Is host.json just a config file, or a runtime configuration that changes host behaviour?
 - Where do host startup failures get logged, and where do you start looking?
-
-## Big Picture
-
-![azure functions deep dive chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/01/01-01-the-big-picture-one-azure-functions-host.en.png)
-
-*azure functions deep dive chapter 1 flow overview*
-
-This picture places Host Bootstrap — Following `WebJobsScriptHostService` inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## One Azure Functions host instance
 

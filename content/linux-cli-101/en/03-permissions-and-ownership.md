@@ -28,19 +28,15 @@ Permission problems often look misleading. A file is right there, but the script
 
 This is post 3 in the Linux CLI 101 series.
 
+
+![Linux CLI 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/03/03-01-big-picture.en.png)
+*Linux CLI 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - The 3x3 structure of Linux file permissions (owner/group/others x read/write/execute)?
 - How to read permission strings in `ls -l` output?
 - Two ways to change permissions with `chmod` (numeric and symbolic)?
-
-## Big Picture
-
-![Linux CLI 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/03/03-01-big-picture.en.png)
-
-*Linux CLI 101 chapter 3 flow overview*
-
-This picture places Permissions and Ownership inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

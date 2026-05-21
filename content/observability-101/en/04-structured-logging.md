@@ -28,21 +28,16 @@ Structured logging fixes that by turning log lines into data with fields you can
 
 This is post 4 in the Observability 101 series.
 
+
+![observability 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/04/04-01-concept-at-a-glance.en.png)
+*observability 101 chapter 4 flow overview*
+> Structured Logging is about the boundary decision, not the tool choice.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Structured Logging?
 - Which signal should the example or diagram make visible for Structured Logging?
 - What failure should be prevented first when Structured Logging reaches a real system?
-
-## Big Picture
-
-![observability 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/04/04-01-concept-at-a-glance.en.png)
-
-*observability 101 chapter 4 flow overview*
-
-This picture places Structured Logging inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Structured Logging is about the boundary decision, not the tool choice.
 
 ## Questions this article answers
 

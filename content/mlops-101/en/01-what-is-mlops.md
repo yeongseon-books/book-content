@@ -30,21 +30,16 @@ This is the first post in the MLOps 101 series.
 
 Here, we will treat MLOps not as a list of tool names, but as the operational loop that lets a model stay alive in production.
 
+
+![mlops 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/01/01-01-see-the-loop-first.en.png)
+*mlops 101 chapter 1 flow overview*
+> MLOps is not the tool collection that runs when a model file lands on a server. It is the operational system linking data → training → registration → deployment → monitoring → retraining in one loop.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What Is MLOps??
 - Which signal should the example or diagram make visible for What Is MLOps??
 - What failure should be prevented first when What Is MLOps? reaches a real system?
-
-## Big Picture
-
-![mlops 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/01/01-01-see-the-loop-first.en.png)
-
-*mlops 101 chapter 1 flow overview*
-
-This picture places What Is MLOps? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> MLOps is not the tool collection that runs when a model file lands on a server. It is the operational system linking data → training → registration → deployment → monitoring → retraining in one loop.
 
 ## Questions this article answers
 

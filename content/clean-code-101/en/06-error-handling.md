@@ -29,21 +29,16 @@ This is post 6 in the Clean Code 101 series.
 
 Here we will set boundaries for validation, typed exceptions, return-value failures, and retries so that robustness increases without letting the happy path disappear.
 
+
+![clean code 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/06/06-01-concept-at-a-glance.en.png)
+*clean code 101 chapter 6 flow overview*
+> Validate input first, then use exceptions only when flow is lost.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Error Handling?
 - Which signal should the example or diagram make visible for Error Handling?
 - What failure should be prevented first when Error Handling reaches a real system?
-
-## Big Picture
-
-![clean code 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/06/06-01-concept-at-a-glance.en.png)
-
-*clean code 101 chapter 6 flow overview*
-
-This picture places Error Handling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Validate input first, then use exceptions only when flow is lost.
 
 ## Questions this article answers
 

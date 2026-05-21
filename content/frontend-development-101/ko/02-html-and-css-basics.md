@@ -26,17 +26,15 @@ last_reviewed: '2026-05-12'
 
 프론트엔드를 조금만 공부해도 금방 느끼는 사실이 하나 있습니다. 화면을 빨리 만드는 일과 오래 유지되는 화면을 만드는 일은 전혀 다르다는 점입니다. 전자는 아무 태그나 놓고 색을 입혀도 되지만, 후자는 구조와 의미를 분리해야 합니다.
 
+
+![Frontend Development 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/02/02-01-diagram.ko.png)
+*Frontend Development 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 시맨틱 HTML이 단순한 취향 문제가 아니라 기본 설계인 이유는 무엇일까요?
 - 박스 모델은 CSS를 이해할 때 왜 가장 먼저 잡아야 할 개념일까요?
 - Flexbox와 Grid는 각각 어떤 상황에서 더 적합할까요?
-
-## 큰 그림
-
-![Frontend Development 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/02/02-01-diagram.ko.png)
-
-*Frontend Development 101 2장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -67,7 +65,7 @@ HTML과 CSS는 프론트엔드에서 가장 오래 살아남는 기술입니다.
 <div class="content">...</div>
 ```
 
-**After (semantic structure)**
+**After (시맨틱 구조)**
 
 ```html
 <header><nav>...</nav></header>
@@ -355,7 +353,6 @@ export default defineConfig({
 ### 실무 연결 포인트
 
 프론트엔드는 더 이상 단순 화면 기술이 아닙니다. API 계약, 번들 최적화, 브라우저 성능, 접근성, 운영 관측이 모두 만나는 실행 계층입니다. 따라서 작은 예제라도 HTML/CSS/JS 코드, 컴포넌트 패턴, 빌드 설정을 한 번에 다뤄 보는 연습이 필요합니다. 이 연습을 반복하면 도구가 바뀌어도 구조를 잃지 않고, 신규 기능을 추가할 때도 안정적으로 확장할 수 있습니다.
-
 
 
 ## 실무 앵커 모음: 프레임워크, 레이아웃, 디버깅, 성능

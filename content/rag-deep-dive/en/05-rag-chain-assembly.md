@@ -24,23 +24,16 @@ RetrievalQA is convenient, but it hides too much of the pipeline. This post comp
 
 This is post 5 in the RAG Deep Dive series.
 
+![RetrievalQA chain-type dispatch path](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-01-retrieval-qa-chain-type-dispatch.en.png)
+*RetrievalQA chain-type dispatch path*
+> A RAG chain is an execution graph from question to evidence to prompt to answer, and LCEL makes those seams explicit.
+
 ## Questions to Keep in Mind
 
 - Which boundaries do classic APIs like `RetrievalQA` hide, and which boundaries does LCEL expose?
 - What becomes easier to debug when retriever, prompt, llm, and parser are wired directly?
 - Where should the result shape be fixed so source documents are not lost after assembly?
 
-## Big Picture
-
-![RetrievalQA chain-type dispatch path](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-01-retrieval-qa-chain-type-dispatch.en.png)
-
-*RetrievalQA chain-type dispatch path*
-
-This picture compares `RetrievalQA` choosing an internal assembly path with LCEL exposing the runnable sequence explicitly. In RAG chain assembly, observability of boundaries can matter more than convenience.
-
-> A RAG chain is an execution graph from question to evidence to prompt to answer, and LCEL makes those seams explicit.
-
-<!-- a-grade-example:begin -->
 ## Minimal runnable example
 
 Example file: `en/05-rag-chain-assembly/main.py`

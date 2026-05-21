@@ -29,17 +29,15 @@ AI와 데이터사이언스는 갑자기 하늘에서 떨어진 별도 분야가
 
 여기서는 머신러닝의 기본 구조를 훑고, 앞선 아홉 편이 AI/DS 실무와 어떻게 이어지는지 연결한 뒤, 다음에 무엇을 공부하면 좋을지 로드맵을 정리하겠습니다.
 
+
+![Computer Science 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/10/10-01-concept-at-a-glance.ko.png)
+*Computer Science 101 10장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 지금까지 배운 CS 기초가 AI와 데이터사이언스에서 어디에 직접 쓰일까요?
 - 규칙 기반 시스템과 머신러닝 시스템은 무엇이 본질적으로 다를까요?
 - 학습, 추론, 데이터 품질 검증은 왜 결국 계산과 시스템 문제일까요?
-
-## 큰 그림
-
-![Computer Science 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/10/10-01-concept-at-a-glance.ko.png)
-
-*Computer Science 101 10장 흐름 개요*
 
 ## 이 글에서 배울 것
 

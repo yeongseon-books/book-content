@@ -28,17 +28,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 로깅을 디버깅 편의 기능으로만 보지 않고, 사고 대응과 감사에 필요한 증거 체계로 정리하겠습니다. 이 관점을 이해하면 왜 민감 필드 마스킹, 감사 로그 분리, 불변 저장소, 보존 정책이 모두 함께 필요하며, 시리즈 전체의 보안 원칙이 마지막에 로그로 모이는지도 분명해집니다.
 
+
+![Secure Coding 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/10/10-01-concept-at-a-glance.ko.png)
+*Secure Coding 101 10장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 애플리케이션 로그와 감사 로그는 무엇이 다를까요?
 - 민감 필드 마스킹 정책은 어디까지 포함해야 할까요?
 - 위변조 탐지와 append-only 저장은 왜 중요한가요?
-
-## 큰 그림
-
-![Secure Coding 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/10/10-01-concept-at-a-glance.ko.png)
-
-*Secure Coding 101 10장 흐름 개요*
 
 ## 왜 중요한가
 

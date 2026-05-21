@@ -28,21 +28,15 @@ last_reviewed: '2026-05-14'
 전공 후반부에 들어가면 많은 학생이 비슷한 질문을 합니다. 이제까지 배운 것을 어디에 써 보아야 하는지, 과목별 지식을 어떻게 하나의 결과물로 묶어야 하는지 감이 잘 오지 않기 때문입니다.
 
 
+![Computer Science Major 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/07/07-01-project-delivery-flow.ko.png)
+*컴퓨터학과 전공 가이드 7장 흐름 개요*
+> 프로젝트 과목들의 핵심은 완벽한 결과가 아니라, 제약 조건 속에서 의사결정을 기록하고 배움을 남기는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - 왜 프로젝트 과목은 전공 후반부의 핵심으로 여겨질까요?
 - 팀 프로젝트는 개인 과제와 무엇이 다르고 어떤 준비를 더 요구할까요?
 - 문제 정의, 범위 조절, 일정 관리, 시연 준비는 왜 모두 중요할까요?
-
-## 큰 그림
-
-![Computer Science Major 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/07/07-01-project-delivery-flow.ko.png)
-
-*컴퓨터학과 전공 가이드 7장 흐름 개요*
-
-이 그림에서 보이듯 프로젝트 과목들은 앞선 이론을 실제 결과물로 묶는 시간입니다. 각 프로젝트에서 배운 것이 어떤 현업 상황으로 직결되는지 이해하는 것이 핵심입니다.
-
-> 프로젝트 과목들의 핵심은 완벽한 결과가 아니라, 제약 조건 속에서 의사결정을 기록하고 배움을 남기는 데 있습니다.
 
 ## 이 글에서 배울 것
 

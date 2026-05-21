@@ -26,21 +26,16 @@ Once you work with matrices long enough, direct manipulation starts to hit limit
 
 This is post 8 in the Linear Algebra 101 series. Here we will place LU, QR, eigendecomposition, and SVD on the same map.
 
+
+![linear algebra 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/08/08-01-concept-at-a-glance.en.png)
+*linear algebra 101 chapter 8 flow overview*
+> Matrix decomposition is the key to solving many numerical problems. LU, QR, SVD, and eigendecomposition each have different geometric and numerical meaning, and choosing the right one makes computation stable and efficient.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Matrix Decomposition?
 - Which signal should the example or diagram make visible for Matrix Decomposition?
 - What failure should be prevented first when Matrix Decomposition reaches a real system?
-
-## Big Picture
-
-![linear algebra 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/08/08-01-concept-at-a-glance.en.png)
-
-*linear algebra 101 chapter 8 flow overview*
-
-This picture places Matrix Decomposition inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Matrix decomposition is the key to solving many numerical problems. LU, QR, SVD, and eigendecomposition each have different geometric and numerical meaning, and choosing the right one makes computation stable and efficient.
 
 ## Questions This Post Answers
 

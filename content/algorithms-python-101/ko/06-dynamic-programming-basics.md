@@ -28,17 +28,15 @@ last_reviewed: '2026-05-12'
 
 이 주제는 코딩 테스트와 경쟁 프로그래밍에서 특히 자주 나오지만, 더 중요한 가치는 겹치는 부분 문제와 재사용 가능한 상태를 알아보는 눈을 기르는 데 있습니다.
 
+
+![Algorithms with Python 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/06/06-01-concept-overview.ko.png)
+*Algorithms with Python 101 6장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - DP가 적용되는 두 조건은 무엇일까요?
 - 메모이제이션을 쓰는 top-down 구현은 어떻게 할까요?
 - 테이블을 채우는 bottom-up 구현은 어떻게 할까요?
-
-## 큰 그림
-
-![Algorithms with Python 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/06/06-01-concept-overview.ko.png)
-
-*Algorithms with Python 101 6장 흐름 개요*
 
 ## 왜 중요한가
 

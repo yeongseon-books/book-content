@@ -27,19 +27,15 @@ When a team first meets Alembic, the real question is not the command syntax but
 
 This is the first post in the Alembic 101 series. Here we will frame why Alembic exists and what `alembic init` actually sets up.
 
+
+![alembic 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/01/01-01-diagram-how-revision-history-reaches-the.en.png)
+*alembic 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What problem a "migration tool" actually solves?
 - Why `Base.metadata.create_all` is not enough for production?
 - Alembic's core concepts: revision, head, version table?
-
-## Big Picture
-
-![alembic 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/01/01-01-diagram-how-revision-history-reaches-the.en.png)
-
-*alembic 101 chapter 1 flow overview*
-
-This picture places Why Alembic, and getting to alembic init inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

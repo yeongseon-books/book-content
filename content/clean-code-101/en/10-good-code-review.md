@@ -29,21 +29,16 @@ This is the final post in the Clean Code 101 series.
 
 Here we will convert the themes from the series into a practical review checklist, then connect them to CI, PR sizing, comment labels, and measurable team feedback loops.
 
+
+![clean code 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/10/10-01-concept-at-a-glance.en.png)
+*clean code 101 chapter 10 flow overview*
+> Automation handles chores. People review intent and structure.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Good Code Review Standards?
 - Which signal should the example or diagram make visible for Good Code Review Standards?
 - What failure should be prevented first when Good Code Review Standards reaches a real system?
-
-## Big Picture
-
-![clean code 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/10/10-01-concept-at-a-glance.en.png)
-
-*clean code 101 chapter 10 flow overview*
-
-This picture places Good Code Review Standards inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Automation handles chores. People review intent and structure.
 
 ## Questions this article answers
 

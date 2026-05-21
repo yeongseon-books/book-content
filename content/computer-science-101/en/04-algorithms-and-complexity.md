@@ -29,19 +29,15 @@ This is post 4 in the Computer Science 101 series.
 
 In this article, we'll define algorithms, read time and space complexity, and show how data-structure choice changes performance long before micro-optimization matters.
 
+
+![Computer Science 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/04/04-01-concept-at-a-glance.en.png)
+*Computer Science 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Algorithms and Complexity?
 - Which signal should the example or diagram make visible for Algorithms and Complexity?
 - What failure should be prevented first when Algorithms and Complexity reaches a real system?
-
-## Big Picture
-
-![Computer Science 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/04/04-01-concept-at-a-glance.en.png)
-
-*Computer Science 101 chapter 4 flow overview*
-
-This picture places Algorithms and Complexity inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions This Article Answers
 

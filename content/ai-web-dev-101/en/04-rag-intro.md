@@ -27,19 +27,15 @@ This is post 4 in the AI Web Development 101 series.
 
 Here, we will build the mental model for retrieval-augmented generation and implement the smallest useful FAQ-style RAG flow.
 
+
+![AI Web Development 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/04/plain-llm-vs-rag.en.png)
+*AI Web Development 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why can a strong model still fail on company-specific or newly updated information?
 - Why is RAG often a better first step than fine-tuning?
 - What exactly do embeddings and vector search do?
-
-## Big Picture
-
-![AI Web Development 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/04/plain-llm-vs-rag.en.png)
-
-*AI Web Development 101 chapter 4 flow overview*
-
-This picture places RAG introduction — answering with your own data inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why RAG exists
 

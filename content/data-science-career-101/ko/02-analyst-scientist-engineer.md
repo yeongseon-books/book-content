@@ -31,21 +31,16 @@ last_reviewed: '2026-05-14'
 
 이 글은 Data Science Career 101 시리즈의 두 번째 글입니다.
 
+
+![Data Science Career 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/02/02-01-concept-at-a-glance.ko.png)
+*Data Science Career 101 2장 흐름 개요*
+> 둘 또는 세 역할을 구분하는 가장 달래 기중은 '차이가 뭐니 도구와 사람의 넓'을 보는 동맥싶'목적과 산출물'을 보는 동맥다는 것입니다.
+
 ## 먼저 던지는 질문
 
 - 분석가, 사이언티스트, 엔지니어가 각각 어떤 목적을 중심에 두는지 비교합니다?
 - 세 역할이 만드는 대표 산출물을 정리합니다?
 - 주요 도구와 성과 지표가 왜 달라지는지 설명합니다?
-
-## 큰 그림
-
-![Data Science Career 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/02/02-01-concept-at-a-glance.ko.png)
-
-*Data Science Career 101 2장 흐름 개요*
-
-이 그림은 짧은 링크로 간단히 세 가지 중심축을 보여줍니다. 각 역할은 질문에 답하고, 가설 검증하고, 데이터 흐름을 보장한다는 보른 링크로 연결되며, 서로 다른 도구와 기준을 가져옵니다.
-
-> 둘 또는 세 역할을 구분하는 가장 달래 기중은 '차이가 뭐니 도구와 사람의 넓'을 보는 동맥싶'목적과 산출물'을 보는 동맥다는 것입니다.
 
 ## 이 글에서 배우는 내용
 

@@ -28,21 +28,16 @@ Python에서 변수는 값을 담는 상자가 아니라 객체에 붙는 이름
 
 이 글은 Python 101 시리즈의 두 번째 글입니다.
 
+
+![Python 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-101/02/02-01-mental-model.ko.png)
+*Python 101 2장 흐름 개요*
+> 변수, 타입, 연산자의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - `total = total + items` 했더니 숫자에 문자열을 더했다는 `TypeError`가 납니다?
 - `if user.age == "18":` 처럼 비교했더니 영원히 `False`가 나옵니다?
 - `0.1 + 0.2 == 0.3`이 `False`라서 결제 금액 검증이 실패합니다?
-
-## 큰 그림
-
-![Python 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-101/02/02-01-mental-model.ko.png)
-
-*Python 101 2장 흐름 개요*
-
-이 그림에서는 변수, 타입, 연산자를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 변수, 타입, 연산자의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 멘탈 모델
 

@@ -28,19 +28,15 @@ Most Git mistakes get cheaper the moment you learn to read before you act. `stat
 
 This is the third post in the Git & GitHub 101 series. Here, we focus on reading change history accurately before branches and collaboration enter the picture.
 
+
+![Git & GitHub 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/03/03-01-mental-model.en.png)
+*Git & GitHub 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - How to read each line of `git status` output with confidence?
 - How to scan the same state quickly with `git status -s`?
 - Which area `git diff`, `git diff --cached`, and `git diff HEAD` each compare?
-
-## Big Picture
-
-![Git & GitHub 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/03/03-01-mental-model.en.png)
-
-*Git & GitHub 101 chapter 3 flow overview*
-
-This picture places Reading change history - status, diff, log inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

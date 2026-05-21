@@ -27,21 +27,16 @@ Some students remember concepts weeks later, while others lose them almost as so
 
 This is post 8 in the Computer Science Major 101 series.
 
+
+![computer science major 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/08/08-01-study-loop.en.png)
+*computer science major 101 chapter 8 flow overview*
+> Effective learning is not passive consumption—it is active *cycles* of understanding, attempting, failing, and discussing.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying How to Study Computer Science?
 - Which signal should the example or diagram make visible for How to Study Computer Science?
 - What failure should be prevented first when How to Study Computer Science reaches a real system?
-
-## Big Picture
-
-![computer science major 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/08/08-01-study-loop.en.png)
-
-*computer science major 101 chapter 8 flow overview*
-
-This picture places How to Study Computer Science inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Effective learning is not passive consumption—it is active *cycles* of understanding, attempting, failing, and discussing.
 
 ## Questions This Post Answers
 

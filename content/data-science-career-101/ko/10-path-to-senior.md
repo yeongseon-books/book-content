@@ -30,21 +30,15 @@ last_reviewed: '2026-05-14'
 더 큰 변화는 문제를 보는 관점에서 생깁니다. 무엇을 만들었는지보다 무엇을 바꿨는지, 내가 혼자 잘한 일보다 팀이 더 잘 움직이게 되었는지, 당장 급한 일보다 반복될 문제의 구조를 먼저 잡았는지가 시니어의 행동을 가릅니다.
 
 
+![Data Science Career 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/10/10-01-concept-at-a-glance.ko.png)
+*Data Science Career 101 10장 흐름 개요*
+> 시니어 데이터 직무로 가는 길에서 가장 중요한 것은 무엇을 할 수 있는가가 아니라 무엇을 물어봐야 하고 어떻게 답해야 하는가입니다.
+
 ## 먼저 던지는 질문
 
 - 시니어 데이터 직무가 무엇이 다른지 설명합니다?
 - 문제 정의 능력이 왜 시니어의 핵심 역량인지 정리합니다?
 - 영향 측정을 어떻게 계획해야 설득력이 생기는지 짚습니다?
-
-## 큰 그림
-
-![Data Science Career 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/10/10-01-concept-at-a-glance.ko.png)
-
-*Data Science Career 101 10장 흐름 개요*
-
-이 그림은 시니어 데이터 직무로 가는 길을 단계별로 보여줍니다. 각 단계에서 무엇을 중심으로 봐야 하는지가 중요합니다.
-
-> 시니어 데이터 직무로 가는 길에서 가장 중요한 것은 무엇을 할 수 있는가가 아니라 무엇을 물어봐야 하고 어떻게 답해야 하는가입니다.
 
 ## 이 글에서 배우는 내용
 

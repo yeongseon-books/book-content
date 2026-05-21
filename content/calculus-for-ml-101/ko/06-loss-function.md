@@ -32,17 +32,15 @@ last_reviewed: '2026-05-12'
 
 끝까지 읽고 나면 “왜 이 모델이 이런 방향으로 학습되었는가”를 손실 함수 정의에서부터 설명할 수 있게 됩니다.
 
+
+![Calculus for ML 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/06/06-01-concept-at-a-glance.ko.png)
+*Calculus for ML 101 6장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 손실 함수는 단순한 평가 지표와 무엇이 다를까요?
 - 회귀에서 MSE를, 분류에서 cross entropy를 자주 쓰는 이유는 무엇일까요?
 - 손실 함수의 gradient는 왜 학습 신호라고 불릴까요?
-
-## 큰 그림
-
-![Calculus for ML 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/06/06-01-concept-at-a-glance.ko.png)
-
-*Calculus for ML 101 6장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 
@@ -142,7 +140,6 @@ def signal(y, p):
 실무에서는 손실 함수가 곧 문제 정의입니다. 어떤 오차를 더 크게 벌줄지, 평균을 어떻게 낼지, 불균형을 어떻게 보정할지 모두 손실 설계에 담깁니다. 그래서 모델 성능이 어색할 때는 네트워크 구조만이 아니라 손실 정의부터 다시 봐야 합니다.
 
 다음 글에서는 손실 gradient를 실제 업데이트로 바꾸는 경사하강법을 보겠습니다. 그러면 지금까지 쌓은 미분 직관이 처음으로 학습 루프의 움직임으로 연결됩니다.
-
 
 
 ## MSE 유도와 gradient 계산

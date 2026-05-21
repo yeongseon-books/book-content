@@ -27,17 +27,14 @@ seo_description: Python 패키지는 재사용 가능한 코드를 묶어 다른
 
 이 글은 Python Package 101 시리즈의 첫 번째 글입니다. 여기서는 모듈, 패키지, 배포판이 각각 무엇이고 `pip install`이 실제로 무엇을 설치하는지, 그리고 왜 여러분의 코드를 패키지로 만들어야 하는지를 먼저 정리하겠습니다.
 
+![Python Package 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/01/01-01-mental-model.ko.png)
+*Python Package 101 1장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 모듈과 패키지는 정확히 무엇이 다를까요?
 - `import requests`를 실행하면 내부에서는 어떤 일이 일어날까요?
 - `pip install`은 실제로 무엇을 설치할까요?
-
-## 큰 그림
-
-![Python Package 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/01/01-01-mental-model.ko.png)
-
-*Python Package 101 1장 흐름 개요*
 
 ## 이 글에서 배우는 내용
 
@@ -79,7 +76,7 @@ utils.py    ->     mylib/               ->  mylib-1.0.0.tar.gz
 
 ## Before / After
 
-**Before (copy-paste code)**
+**Before (복사-붙여넣기 코드)**
 
 ```text
 project-a/utils.py   # copy 1
@@ -88,7 +85,7 @@ project-c/utils.py   # copy 3
 # -> Fix a bug? Edit all three.
 ```
 
-**After (packaged)**
+**After (패키지화)**
 
 ```text
 mylib/               # one package

@@ -31,19 +31,15 @@ This is post 2 in the Database Systems 101 series.
 
 > The relational model treats data as **sets**. A table is a set of rows; each row is a tuple of the same shape. Keys, foreign keys, normalization, and SQL itself all sit on top of that one promise. Once the model clicks, SQL stops looking like syntax and starts looking like algebra over relations.
 
+
+![database systems 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/02/02-01-big-picture.en.png)
+*database systems 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying The Relational Model?
 - Which signal should the example or diagram make visible for The Relational Model?
 - What failure should be prevented first when The Relational Model reaches a real system?
-
-## Big Picture
-
-![database systems 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/02/02-01-big-picture.en.png)
-
-*database systems 101 chapter 2 flow overview*
-
-This picture places The Relational Model inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

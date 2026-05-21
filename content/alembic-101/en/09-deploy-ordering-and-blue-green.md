@@ -28,19 +28,15 @@ Many schema incidents begin with deploy ordering, not with the migration code it
 
 This is post 9 in the Alembic 101 series. Here we will pin down the safe order for shipping migrations and application code together.
 
+
+![alembic 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/09/09-01-diagram-the-blue-green-compatibility-win.en.png)
+*alembic 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - The difference between migration-first and code-first deploy ordering?
 - Why a blue/green deploy requires schema changes that are compatible with two app versions at once?
 - How to split a NOT NULL tightening into two phases via expand-contract?
-
-## Big Picture
-
-![alembic 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/09/09-01-diagram-the-blue-green-compatibility-win.en.png)
-
-*alembic 101 chapter 9 flow overview*
-
-This picture places Deploy ordering and blue/green: synchronizing schema and application code safely inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

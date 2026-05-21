@@ -31,21 +31,16 @@ last_reviewed: '2026-05-04'
 
 This is post 7 in the Information Security 101 series.
 
+
+![information security 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/07/07-01-big-picture.en.png)
+*information security 101 chapter 7 flow overview*
+> Secret management is not just storing encrypted keys. It is tracking who accessed what secret when, detecting abnormal access patterns, and proving that no key was exposed during its lifetime.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Secret Management?
 - Which signal should the example or diagram make visible for Secret Management?
 - What failure should be prevented first when Secret Management reaches a real system?
-
-## Big Picture
-
-![information security 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/07/07-01-big-picture.en.png)
-
-*information security 101 chapter 7 flow overview*
-
-This picture places Secret Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Secret management is not just storing encrypted keys. It is tracking who accessed what secret when, detecting abnormal access patterns, and proving that no key was exposed during its lifetime.
 
 ## What You Will Learn
 

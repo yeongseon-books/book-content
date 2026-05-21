@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 레지스트리를 단순한 저장소가 아니라 배포 동일성을 보장하는 시스템으로 보고, push와 pull, digest pin, 서명 정책의 출발점을 함께 설명합니다.
 
+
+![Containers 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/07/07-01-concept-at-a-glance.ko.png)
+*Containers 101 7장 흐름 개요*
+> Registry의 핵심은 어디에 이미지가 보관되는가보다, tag와 digest로 어떻게 추적하고 어느 버전을 배포할지 결정하는 것입니다.
+
 ## 먼저 던지는 질문
 
 - 빌드한 이미지는 어디에 저장해 두어야 할까요?
 - push와 pull 흐름은 배포에서 어떤 역할을 할까요?
 - tag와 digest는 왜 구분해서 써야 할까요?
-
-## 큰 그림
-
-![Containers 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/07/07-01-concept-at-a-glance.ko.png)
-
-*Containers 101 7장 흐름 개요*
-
-registry는 단순한 이미지 저장소가 아니라 tag, digest, manifest, push/pull 정책이 모두 만나는 배포 계약 포인트입니다.
-
-> Registry의 핵심은 어디에 이미지가 보관되는가보다, tag와 digest로 어떻게 추적하고 어느 버전을 배포할지 결정하는 것입니다.
 
 ## 왜 중요한가
 

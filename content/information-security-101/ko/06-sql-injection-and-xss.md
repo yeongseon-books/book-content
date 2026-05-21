@@ -27,21 +27,16 @@ seo_description: SQL 인젝션과 XSS의 원인, 방어 원칙, 실전 코드를
 
 이 글은 Information Security 101 시리즈의 6번째 글입니다.
 
+
+![Information Security 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/06/06-01-big-picture.ko.png)
+*Information Security 101 6장 흐름 개요*
+> SQL 인젝션과 XSS 모두 신뢰할 수 없는 입력을 그 컨텍스트의 명령어로 해석하게 만드는 공격입니다. 방어는 입력 필터가 아니라 준비된 문과 컨텍스트 기반 이스케이핑입니다.
+
 ## 먼저 던지는 질문
 
 - SQL 인젝션은 정확히 어떤 메커니즘으로 발생할까요?
 - ORM을 쓰면 정말 안전해질까요?
 - Reflected, Stored, DOM 기반 XSS는 어디서 갈릴까요?
-
-## 큰 그림
-
-![Information Security 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/06/06-01-big-picture.ko.png)
-
-*Information Security 101 6장 흐름 개요*
-
-그림은 사용자 입력 → 파라미터 검증 → 쿼리 구성 또는 DOM 렌더링 → 저장 또는 브라우저 렌더링의 흐름에서, 신뢰할 수 없는 데이터가 어디서 탈출되고 기록되는지를 보여줍니다. SQL과 HTML 컨텍스트는 다른 탈출 규칙을 따릅니다.
-
-> SQL 인젝션과 XSS 모두 신뢰할 수 없는 입력을 그 컨텍스트의 명령어로 해석하게 만드는 공격입니다. 방어는 입력 필터가 아니라 준비된 문과 컨텍스트 기반 이스케이핑입니다.
 
 ## 왜 중요한가
 
@@ -497,14 +492,10 @@ def test_xss_payload_escaped():
 우선순위를 명시하면 사고 중 논쟁 시간을 줄이고 복구 속도를 올릴 수 있습니다.
 
 
-
-
 ## OWASP Top 10에서 인젝션 취약점의 위치
 
 
-
 OWASP Top 10 2021 기준으로 A03(Injection)은 SQL 인젝션과 XSS를 모두 포함합니다. 이 카테고리가 여전히 상위에 있는 이유는 단순합니다. 새 프레임워크가 나와도 입력값을 데이터로 취급하지 않는 코드는 계속 생기기 때문입니다.
-
 
 
 | OWASP A03 세부 | 대응 원칙 | 검증 수단 |
@@ -518,9 +509,7 @@ OWASP Top 10 2021 기준으로 A03(Injection)은 SQL 인젝션과 XSS를 모두 
 | Command Injection | 시스템 호출 회피, 허용 목록 | 코드 리뷰 체크리스트 |
 
 
-
 프레임워크의 기본 보호를 신뢰하되, 예외 경로에서 보호가 없는 코드가 생기지 않는지 CI에서 정적 분석을 돌려야 합니다.
-
 
 
 ## 처음 질문으로 돌아가기

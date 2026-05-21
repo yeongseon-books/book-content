@@ -32,17 +32,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 계층 아키텍처를 왜 쓰는지, presentation·application·domain·infrastructure를 어떤 기준으로 나누는지, 허용되는 의존성 방향은 무엇인지, 외부 모델이 도메인으로 그대로 새지 않게 막는 부패 방지 계층은 어디에 필요한지 살펴봅니다.
 
+
+![Software Design 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/06/06-01-concept-at-a-glance.ko.png)
+*Software Design 101 6장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 계층을 왜 나누고, 무엇을 기준으로 나눌까요?
 - 각 계층은 어떤 책임을 가져야 할까요?
 - 의존성은 어떤 방향으로만 흘러야 할까요?
-
-## 큰 그림
-
-![Software Design 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/06/06-01-concept-at-a-glance.ko.png)
-
-*Software Design 101 6장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -452,7 +450,6 @@ class PlaceOrderService:
 - 인프라 계층: 외부 API 오류율, DB 지연 시간
 
 지표를 계층별로 분리해 보면 어디를 고쳐야 하는지가 명확해집니다. 모든 지표가 한 대시보드에서 섞여 있으면 "느리다"는 사실만 보이고 원인은 보이지 않습니다. 설계 경계를 운영 지표 경계와 맞추면 개선 사이클이 빠르게 돌아갑니다.
-
 
 
 ## 리뷰와 리팩터링을 위한 실전 질문 세트

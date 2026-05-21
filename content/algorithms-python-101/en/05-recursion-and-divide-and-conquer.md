@@ -28,19 +28,15 @@ Divide and conquer is one of the most important of those patterns. It shows up i
 
 This is post 5 in the Algorithms with Python 101 series. Here, we'll make recursion concrete first, then use it to build an intuition for divide-and-conquer problem solving.
 
+
+![Algorithms with Python 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/05/05-01-big-picture.en.png)
+*Algorithms with Python 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Recursion and Divide and Conquer?
 - Which signal should the example or diagram make visible for Recursion and Divide and Conquer?
 - What failure should be prevented first when Recursion and Divide and Conquer reaches a real system?
-
-## Big Picture
-
-![Algorithms with Python 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/05/05-01-big-picture.en.png)
-
-*Algorithms with Python 101 chapter 5 flow overview*
-
-This picture places Recursion and Divide and Conquer inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

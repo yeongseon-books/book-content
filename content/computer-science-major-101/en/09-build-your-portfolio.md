@@ -27,21 +27,16 @@ Assignments and projects disappear faster than most students expect if they are 
 
 This is post 9 in the Computer Science Major 101 series.
 
+
+![computer science major 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/09/09-01-portfolio-publishing-flow.en.png)
+*computer science major 101 chapter 9 flow overview*
+> A strong portfolio is not a collection of projects—it is a set of *decisions* made visible. Each project should show *why* you chose what you chose.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Build Your Portfolio?
 - Which signal should the example or diagram make visible for Build Your Portfolio?
 - What failure should be prevented first when Build Your Portfolio reaches a real system?
-
-## Big Picture
-
-![computer science major 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/09/09-01-portfolio-publishing-flow.en.png)
-
-*computer science major 101 chapter 9 flow overview*
-
-This picture places Build Your Portfolio inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A strong portfolio is not a collection of projects—it is a set of *decisions* made visible. Each project should show *why* you chose what you chose.
 
 ## Questions This Post Answers
 

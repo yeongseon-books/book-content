@@ -30,21 +30,16 @@ This is post 8 in the Math for CS 101 series.
 
 Here we connect limits, derivatives, gradients, the chain rule, and gradient descent into one practical story about change and optimization.
 
+
+![math for cs 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/08/08-01-concept-at-a-glance.en.png)
+*math for cs 101 chapter 8 flow overview*
+> Calculus is the mathematics of continuous change; it underpins optimization, machine learning, and any system where rates of change matter.
+
 ## Questions to Keep in Mind
 
 - Why can local slope tell you so much about a global optimization process?
 - How are limits and derivatives connected?
 - What changes when one variable becomes many variables?
-
-## Big Picture
-
-![math for cs 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/08/08-01-concept-at-a-glance.en.png)
-
-*math for cs 101 chapter 8 flow overview*
-
-This picture places Calculus inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Calculus is the mathematics of continuous change; it underpins optimization, machine learning, and any system where rates of change matter.
 
 ## Why It Matters
 

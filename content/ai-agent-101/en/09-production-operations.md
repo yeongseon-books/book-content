@@ -28,21 +28,15 @@ The core of agent operations is observability. You must track all agent steps, m
 
 This is post 9 in the AI Agent 101 series. Here we cover agent observability, cost tracking, latency optimization, scaling patterns, and production checklists.
 
+![Observability](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/09/09-01-observability.en.png)
+*Observability*
+> An operable agent does not log only the final answer. It lets you follow the path, cost, and tool calls that produced it.
+
 ## Questions to Keep in Mind
 
 - What trace do you need first if production users ask why an agent answered that way?
 - At what unit should cost and latency be measured to reveal the real bottleneck?
 - Which observability signals should gate deployment and rollback for an agent?
-
-## Big Picture
-
-![Observability](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/09/09-01-observability.en.png)
-
-*Observability*
-
-This picture follows one request across planning, tool execution, observability, and safety controls until it feeds back into operations. Agent operations are not subjective quality review; they are system design for tracing cost, latency, and failure causes at each step.
-
-> An operable agent does not log only the final answer. It lets you follow the path, cost, and tool calls that produced it.
 
 ## Observability
 

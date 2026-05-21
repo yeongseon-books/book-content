@@ -28,21 +28,16 @@ This is post 5 in the Data Warehouse 101 series.
 
 In this post, we focus on how partitioning and clustering help the engine skip work. The useful mental model is simple: first narrow the chunks, then organize what remains inside each chunk.
 
+
+![data warehouse 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/05/05-01-concept-at-a-glance.en.png)
+*data warehouse 101 chapter 5 flow overview*
+> Partitioning reduces the data scanned by skipping irrelevant partitions; clustering arranges data physically to minimize I/O. Together they make large-table queries cheap.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Partition and Clustering?
 - Which signal should the example or diagram make visible for Partition and Clustering?
 - What failure should be prevented first when Partition and Clustering reaches a real system?
-
-## Big Picture
-
-![data warehouse 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/05/05-01-concept-at-a-glance.en.png)
-
-*data warehouse 101 chapter 5 flow overview*
-
-This picture places Partition and Clustering inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Partitioning reduces the data scanned by skipping irrelevant partitions; clustering arranges data physically to minimize I/O. Together they make large-table queries cheap.
 
 ## Questions this article answers
 

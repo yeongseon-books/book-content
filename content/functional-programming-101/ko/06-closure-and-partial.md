@@ -28,17 +28,15 @@ last_reviewed: '2026-05-12'
 
 `functools.partial`은 같은 문제를 다른 각도에서 풉니다. 기존 함수의 일부 인자를 미리 고정해 새 함수를 만들기 때문에, 클로저를 직접 쓰지 않고도 함수를 간단히 특화할 수 있습니다. 둘은 비슷해 보이지만 쓰임새가 조금 다릅니다.
 
+
+![Functional Programming 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/06/06-01-closure-vs-partial-decision-flow.ko.png)
+*Functional Programming 101 6장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 클로저는 바깥 스코프의 변수를 어떻게 기억할까요?
 - 자유 변수와 cell object는 디버깅에서 왜 중요한 단서일까요?
 - `functools.partial`은 어떤 상황에서 클로저보다 더 적합할까요?
-
-## 큰 그림
-
-![Functional Programming 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/06/06-01-closure-vs-partial-decision-flow.ko.png)
-
-*Functional Programming 101 6장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -560,7 +558,6 @@ def test_sum_matches_builtin(xs: list[int]) -> None:
 - 불변 객체를 기본값으로 두고, 변경이 필요할 때만 새 객체를 만듭니다.
 
 이 원칙을 지키면 코드 리뷰에서 "무엇이 바뀌었는가"가 아니라 "어디에서 부수효과가 발생하는가"를 빠르게 확인할 수 있습니다.
-
 
 
 ## 검증 시나리오: 경계 조건을 먼저 잠그기

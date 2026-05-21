@@ -27,21 +27,16 @@ Strong experience still gets ignored if it is hard to scan. Hiring teams usually
 
 This is post 4 in the Developer Career 101 series.
 
+
+![developer career 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/04/04-01-concept-at-a-glance.en.png)
+*developer career 101 chapter 4 flow overview*
+> A resume and portfolio speak not to your technology list, but to the size of problems you solved and what you learned in solving them.
+
 ## Questions to Keep in Mind
 
 - What structure lets a recruiter understand you quickly without guessing?
 - How do you rewrite responsibilities into outcome-oriented bullets with evidence?
 - Why are numbers and a compact STAR structure such strong hiring signals?
-
-## Big Picture
-
-![developer career 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/04/04-01-concept-at-a-glance.en.png)
-
-*developer career 101 chapter 4 flow overview*
-
-This picture places Resume and Portfolio inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A resume and portfolio speak not to your technology list, but to the size of problems you solved and what you learned in solving them.
 
 ## What You Will Learn
 

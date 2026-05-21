@@ -26,19 +26,15 @@ When the pager goes off at 3 a.m., re-reading the code is rarely the fastest pat
 
 This is post 7 in the Backend Development 101 series. Here, we focus on three operating basics — structured logs, request IDs, and global exception handling — so incidents become something you can read instead of reconstructing from memory.
 
+
+![backend development 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/07/07-01-concept-at-a-glance.en.png)
+*backend development 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why we use a logger instead of `print`?
 - The shape of a structured log?
 - How a global exception handler keeps responses consistent?
-
-## Big Picture
-
-![backend development 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/07/07-01-concept-at-a-glance.en.png)
-
-*backend development 101 chapter 7 flow overview*
-
-This picture places Logging and Error Handling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

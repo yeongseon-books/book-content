@@ -30,21 +30,16 @@ LLM에서는 특히 표현 자유도가 높아 단순 평균 점수보다 pairwi
 
 여기서는 pairwise win rate, 표본 크기 계산, 통계적 유의성, effect size, 그리고 운영 트래픽 기반 online A/B까지 실무 흐름으로 정리하겠습니다.
 
+
+![LLM A/B 테스팅 - prompt 비교](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/09/09-01-a-b-testing-llms-which-prompt-is-better.ko.png)
+*LLM A/B 테스팅 - prompt 비교*
+> LLM A/B 테스트의 목표는 더 좋아 보이는 후보를 고르는 것이 아니라, 더 낫다고 말할 근거를 만드는 것입니다.
+
 ## 먼저 던지는 질문
 
 - LLM A/B 테스트는 왜 “더 좋아 보인다”는 감상이 아니라 통계적 의사결정이어야 할까요?
 - win rate, sample size, statistical significance는 각각 어떤 판단을 도와줄까요?
 - 온라인 A/B에서 사용자 위험을 줄이려면 어떤 guardrail metric이 필요할까요?
-
-## 큰 그림
-
-![LLM A/B 테스팅 - prompt 비교](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/09/09-01-a-b-testing-llms-which-prompt-is-better.ko.png)
-
-*LLM A/B 테스팅 - prompt 비교*
-
-이 그림에서는 두 prompt나 모델 후보를 pairwise로 비교하고 win rate와 통계적 유의성을 통해 배포 판단을 내리는 흐름을 봅니다. A/B 테스트는 취향 대결이 아니라 불확실성을 줄이는 실험 설계입니다.
-
-> LLM A/B 테스트의 목표는 더 좋아 보이는 후보를 고르는 것이 아니라, 더 낫다고 말할 근거를 만드는 것입니다.
 
 ## 왜 이 글이 중요한가
 

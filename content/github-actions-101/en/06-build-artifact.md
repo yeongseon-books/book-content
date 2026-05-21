@@ -28,19 +28,15 @@ That is why artifacts matter more than they first appear to. They preserve the e
 
 This is post 6 in the GitHub Actions 101 series. In this post, we will use artifacts to keep build outputs, move them across jobs, and carry them into GitHub Releases when the workflow becomes an external delivery channel.
 
+
+![github actions 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/06/06-01-concept-at-a-glance.en.png)
+*github actions 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Build Artifacts?
 - Which signal should the example or diagram make visible for Build Artifacts?
 - What failure should be prevented first when Build Artifacts reaches a real system?
-
-## Big Picture
-
-![github actions 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/06/06-01-concept-at-a-glance.en.png)
-
-*github actions 101 chapter 6 flow overview*
-
-This picture places Build Artifacts inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

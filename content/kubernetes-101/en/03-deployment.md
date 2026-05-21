@@ -30,19 +30,15 @@ Here, we will treat Deployment as the default stateless workload controller that
 
 > Deployment matters because Kubernetes self-healing is really a controller story, not a bare-Pod story.
 
+
+![kubernetes 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/03/03-01-concept-at-a-glance.en.png)
+*kubernetes 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - Deployment* and *ReplicaSet* relationship?
 - The meaning of *replicas?
 - The *RollingUpdate* strategy?
-
-## Big Picture
-
-![kubernetes 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/03/03-01-concept-at-a-glance.en.png)
-
-*kubernetes 101 chapter 3 flow overview*
-
-This picture places Deployment inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

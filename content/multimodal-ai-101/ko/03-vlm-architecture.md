@@ -34,21 +34,16 @@ seo_description: 2편에서 본 CLIP은 image와 text를 같은 공간에 정렬
 
 세 학파의 공통 뼈대를 먼저 이해하면 모델 이름이 바뀌어도 판단 기준은 크게 흔들리지 않습니다.
 
+
+![Multimodal AI 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/03/03-01-big-picture.ko.png)
+*Multimodal AI 101 3장 흐름 개요*
+> Vision-Language Model 아키텍처의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - VLM은 어떤 경로로 image encoder의 출력을 LLM 입력으로 연결할까요?
 - Vision Encoder + Adapter + LLM이라는 공통 뼈대는 왜 대부분의 모델에서 반복될까요?
 - LLaVA, BLIP-2, Flamingo는 각각 어떤 trade-off를 선택한 설계일까요?
-
-## 큰 그림
-
-![Multimodal AI 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/03/03-01-big-picture.ko.png)
-
-*Multimodal AI 101 3장 흐름 개요*
-
-이 그림에서는 Vision-Language Model 아키텍처를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> Vision-Language Model 아키텍처의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

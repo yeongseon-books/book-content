@@ -28,19 +28,15 @@ That is why improvement work often begins not with a better metric, but with a b
 
 This is post 9 in the Model Evaluation 101 series. In this post, we break the score apart by slice, confidence, and error type so the next experiment has a concrete target.
 
+
+![model evaluation 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/09/09-01-concept-at-a-glance.en.png)
+*model evaluation 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - Decomposing performance by slice?
 - Classifying error types (FP, FN, class confusion)?
 - Analyzing accuracy by confidence?
-
-## Big Picture
-
-![model evaluation 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/09/09-01-concept-at-a-glance.en.png)
-
-*model evaluation 101 chapter 9 flow overview*
-
-This picture places Error Analysis inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

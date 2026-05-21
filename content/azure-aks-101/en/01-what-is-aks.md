@@ -26,19 +26,14 @@ Running a couple of containers isn't the hard part anymore. The hard part starts
 
 AKS is Azure's answer to that cost. This first post is about understanding AKS more precisely than “Kubernetes on Azure.” The useful question is not whether AKS uses Kubernetes. It does. The useful question is which responsibilities Azure takes over, and which ones stay with you.
 
+![azure kubernetes service 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/01/01-01-the-big-picture-one-aks-cluster-at-a-gla.en.png)
+*azure kubernetes service 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What does AKS take off your plate compared to self-managed Kubernetes, and what stays your job?
 - Is the AKS control plane really free, and what SLA does it carry?
 - What is a node pool, and how do you split system and user pools?
-
-## Big Picture
-
-![azure kubernetes service 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/01/01-01-the-big-picture-one-aks-cluster-at-a-gla.en.png)
-
-*azure kubernetes service 101 chapter 1 flow overview*
-
-This picture places What is Azure Kubernetes Service? — what managed Kubernetes actually gives you inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## One AKS cluster at a glance
 

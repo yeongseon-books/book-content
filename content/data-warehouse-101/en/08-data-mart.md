@@ -28,21 +28,16 @@ This is post 8 in the Data Warehouse 101 series.
 
 In this post, we look at data marts as the layer that translates common warehouse assets into domain-ready analytical surfaces. The key is to narrow the interface without breaking the shared definitions underneath.
 
+
+![data warehouse 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/08/08-01-concept-at-a-glance.en.png)
+*data warehouse 101 chapter 8 flow overview*
+> A data mart is a specialized warehouse for one department or purpose. The central definitions stay consistent; each mart adds only what it needs.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Data Mart?
 - Which signal should the example or diagram make visible for Data Mart?
 - What failure should be prevented first when Data Mart reaches a real system?
-
-## Big Picture
-
-![data warehouse 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/08/08-01-concept-at-a-glance.en.png)
-
-*data warehouse 101 chapter 8 flow overview*
-
-This picture places Data Mart inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A data mart is a specialized warehouse for one department or purpose. The central definitions stay consistent; each mart adds only what it needs.
 
 ## Questions this article answers
 

@@ -30,21 +30,16 @@ last_reviewed: '2026-05-12'
 
 이 글은 Statistics 101 시리즈의 4번째 글입니다. 여기서는 모집단, 표본, 모수, 통계량의 관계를 정리하고, 무작위 추출과 표본 편향이 왜 통계의 기초 체력인지 설명하겠습니다.
 
+
+![Statistics 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/04/04-01-concept-at-a-glance.ko.png)
+*Statistics 101 4장 흐름 개요*
+> 표본이 모집단을 제대로 대표할수록, 추론의 신뢰도가 높아집니다.
+
 ## 먼저 던지는 질문
 
 - 모집단과 표본은 어떻게 구분할까요?
 - 표본이 모집단을 닮게 만드는 핵심 조건은 무엇일까요?
 - 무작위 추출은 왜 그렇게 자주 등장할까요?
-
-## 큰 그림
-
-![Statistics 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/04/04-01-concept-at-a-glance.ko.png)
-
-*Statistics 101 4장 흐름 개요*
-
-표본으로부터의 추론은 통계의 핵심 목표입니다. 전체 모집단을 조사할 수 없으므로, 우리는 항상 일부에서 전체를 짐작합니다.
-
-> 표본이 모집단을 제대로 대표할수록, 추론의 신뢰도가 높아집니다.
 
 ## 왜 중요한가
 

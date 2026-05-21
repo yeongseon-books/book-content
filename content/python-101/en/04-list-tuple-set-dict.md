@@ -28,19 +28,15 @@ These four collections diverge along four axes: mutability, order, duplicates, a
 
 This post is the 4th article in the Python 101 series. This is the stage in the series where collection trade-offs become concrete.
 
+
+![Python 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/04/04-01-mental-model.en.png)
+*Python 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - How to tell list, tuple, set, and dict apart along the axes of mutability, order, duplicates, and hashability?
 - A first-cut decision rule for which collection to reach for?
 - Core methods like slicing, `append`/`extend`, `pop`, `update`?
-
-## Big Picture
-
-![Python 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/04/04-01-mental-model.en.png)
-
-*Python 101 chapter 4 flow overview*
-
-This picture places list, tuple, set, dict inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

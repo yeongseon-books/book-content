@@ -28,21 +28,16 @@ Containers reduce that gap by freezing the runtime environment into an image. On
 
 This is post 6 in the DevOps 101 series. Here we focus on how Dockerfiles, layer caching, multi-stage builds, and non-root execution turn containerization into a real operational advantage.
 
+
+![devops 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/06/06-01-concept-at-a-glance.en.png)
+*devops 101 chapter 6 flow overview*
+> Containers solve *"it works on my laptop"* by making the deployment unit *consistent* across every machine.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Containers and Build?
 - Which signal should the example or diagram make visible for Containers and Build?
 - What failure should be prevented first when Containers and Build reaches a real system?
-
-## Big Picture
-
-![devops 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/06/06-01-concept-at-a-glance.en.png)
-
-*devops 101 chapter 6 flow overview*
-
-This picture places Containers and Build inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Containers solve *"it works on my laptop"* by making the deployment unit *consistent* across every machine.
 
 ## Questions this article answers
 

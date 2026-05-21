@@ -32,17 +32,14 @@ seo_description: 토크나이저까지 만들고 나면 잠깐 멍해집니다. 
 
 이제 숫자 ID를 실제 표현 벡터로 바꾸는 입구를 이해하면, 다음 글의 어텐션도 훨씬 자연스럽게 이어집니다.
 
+![LLM from Scratch 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/02/02-01-sinusoidal-vs-learned-positional-embeddi.ko.png)
+*LLM from Scratch 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - `nn.Embedding`은 실제로 어떤 연산을 수행할까요?
 - 토큰 임베딩만으로는 왜 충분하지 않을까요?
 - 위치 정보는 왜 별도 임베딩으로 다루는 편이 실용적일까요?
-
-## 큰 그림
-
-![LLM from Scratch 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/02/02-01-sinusoidal-vs-learned-positional-embeddi.ko.png)
-
-*LLM from Scratch 101 2장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 

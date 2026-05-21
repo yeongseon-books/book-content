@@ -30,19 +30,15 @@ Here, we will look past the usual shorthand of "turn on disk encryption" and tre
 
 > Secure storage starts before encryption. First decide what not to collect, then separate what you keep, and finally protect the transport, storage, and backup path as one system.
 
+
+![secure coding 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/05/05-01-concept-at-a-glance.en.png)
+*secure coding 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Safe Data Storage?
 - Which signal should the example or diagram make visible for Safe Data Storage?
 - What failure should be prevented first when Safe Data Storage reaches a real system?
-
-## Big Picture
-
-![secure coding 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/05/05-01-concept-at-a-glance.en.png)
-
-*secure coding 101 chapter 5 flow overview*
-
-This picture places Safe Data Storage inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions This Chapter Answers
 

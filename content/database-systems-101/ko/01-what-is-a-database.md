@@ -29,17 +29,15 @@ last_reviewed: '2026-05-12'
 
 데이터베이스 관리 시스템(DBMS)은 단순한 저장 엔진이 아닙니다. 동시 접근, 장애 복구, 무결성, 질의 처리라는 네 가지 어려운 문제를 한 번에 맡는 소프트웨어입니다. 이 관점을 먼저 잡아 두면 이후에 나오는 SQL, 인덱스, 트랜잭션, 격리 수준이 왜 필요한지 자연스럽게 이어집니다.
 
+
+![Database Systems 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/01/01-01-big-picture.ko.png)
+*Database Systems 101 1장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 파일과 DBMS의 결정적인 차이는 무엇일까요?
 - DBMS가 가장 많은 비용을 들여 보장하는 네 가지 성질은 무엇일까요?
 - 관계형, 문서형, 키-값 저장소는 각각 어디에 강할까요?
-
-## 큰 그림
-
-![Database Systems 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/01/01-01-big-picture.ko.png)
-
-*Database Systems 101 1장 흐름 개요*
 
 ## 이 글에서 배울 내용
 

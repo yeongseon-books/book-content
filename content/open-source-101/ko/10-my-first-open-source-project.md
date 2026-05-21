@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 작은 도구 하나를 실제 오픈소스 프로젝트로 공개하기까지, 범위 설정부터 문서, 첫 릴리스, 피드백 수집까지 이어지는 최소 절차를 정리하겠습니다.
 
+
+![Open Source 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/10/10-01-the-smallest-path-to-publication.ko.png)
+*Open Source 101 10장 흐름 개요*
+> 첫 오픈소스 프로젝트는 완벽한 기능보다 **명확한 목적, 따라오기 쉬운 진입 경로, 응답 있는 커뮤니티**를 우선합니다.
+
 ## 먼저 던지는 질문
 
 - 첫 오픈소스 프로젝트는 어느 정도 크기여야 할까요?
 - 아이디어, 범위, MVP, 문서, 릴리스는 어떤 순서로 준비하면 좋을까요?
 - 코드보다 문서와 라이선스가 왜 공개 직전에 더 중요해질까요?
-
-## 큰 그림
-
-![Open Source 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/10/10-01-the-smallest-path-to-publication.ko.png)
-
-*Open Source 101 10장 흐름 개요*
-
-이 그림은 첫 오픈소스 프로젝트가 단순 "코드 공개"가 아니라 **라이선스, 문서, 기여 경로, 커뮤니티 규칙**을 함께 갖춰야 한다는 점을 보여줍니다.
-
-> 첫 오픈소스 프로젝트는 완벽한 기능보다 **명확한 목적, 따라오기 쉬운 진입 경로, 응답 있는 커뮤니티**를 우선합니다.
 
 ## 왜 중요한가
 

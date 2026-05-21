@@ -29,21 +29,16 @@ last_reviewed: '2026-05-15'
 
 이번 글에서는 `read_csv`와 `read_excel`을 단순한 파일 열기 함수로 보지 않고, 데이터를 의도한 형태로 적재하는 설정 지점으로 보겠습니다.
 
+
+![Pandas 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/03/03-01-concept-at-a-glance.ko.png)
+*Pandas 101 3장 흐름 개요*
+> 읽기는 사소한 함수 호출이 아니라 **데이터의 품질과 의도를 정하는 첫 관문**입니다. 여기서의 설정이 이후 모든 분석의 신뢰성을 결정합니다.
+
 ## 먼저 던지는 질문
 
 - `read_csv`와 `read_excel`에서 가장 먼저 봐야 할 옵션은 무엇일까요?
 - 문자 인코딩과 구분자는 왜 자주 문제를 일으킬까요?
 - 자료형을 명시하면 어떤 이점이 있을까요?
-
-## 큰 그림
-
-![Pandas 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/03/03-01-concept-at-a-glance.ko.png)
-
-*Pandas 101 3장 흐름 개요*
-
-이 그림은 파일을 읽는 순간 일어나는 세 가지 중요한 판단을 보여 줍니다. 인코딩은 제대로 해석되는가, 구분자는 맞는가, 자료형은 의도한 형태로 들어오는가.
-
-> 읽기는 사소한 함수 호출이 아니라 **데이터의 품질과 의도를 정하는 첫 관문**입니다. 여기서의 설정이 이후 모든 분석의 신뢰성을 결정합니다.
 
 ## 왜 중요한가
 
@@ -292,7 +287,6 @@ print(df.info(memory_usage="deep"))
 - [ ] Excel에서는 시트 이름과 헤더 위치를 확인합니다.
 
 
-
 ## 스트리밍 읽기 패턴
 
 대용량 파일을 처리할 때는 전체를 메모리에 올리지 않고 스트리밍 방식으로 처리하는 것이 안전합니다.
@@ -315,8 +309,6 @@ print(total)
 이 패턴은 메모리 한계를 넘는 데이터를 다룰 때 표준적으로 사용됩니다.
 
 
-
-
 ### 데이터 검증
 
 파일을 읽은 직후에는 항상 검증 단계를 거쳐야 합니다.
@@ -331,7 +323,6 @@ def validate_dataframe(df, expected_columns, expected_dtypes):
 df = pd.read_csv("data.csv")
 validate_dataframe(df, ["id", "name", "amount"], {"id": "int64", "amount": "float64"})
 ```
-
 
 
 ## 압축 파일 읽기
@@ -350,7 +341,6 @@ df = pd.read_csv("data.csv.bz2", compression="infer")
 ```
 
 압축 파일은 디스크 공간을 절약하면서도 직접 읽을 수 있어 편리합니다.
-
 
 
 압축 파일을 사용하면 네트워크 전송 시간도 줄일 수 있어 클라우드 환경에서 특히 유용합니다.

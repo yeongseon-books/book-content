@@ -45,19 +45,14 @@ Cold start is not a vague symptom.
 It means there is no warm execution unit ready yet,
 or the new process or container has not finished becoming traffic-eligible.
 
+![azure app service deep dive chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-01-the-cold-path-and-the-warm-path.en.png)
+*azure app service deep dive chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - What sequence of steps actually adds up to cold-start on App Service?
 - How much does Always On reduce cold-start, and when does it not help at all?
 - What must a warm-up ping hit to be meaningful, and what would give false confidence?
-
-## Big Picture
-
-![azure app service deep dive chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-01-the-cold-path-and-the-warm-path.en.png)
-
-*azure app service deep dive chapter 6 flow overview*
-
-This picture places Cold start and warmup — why the first request is expensive inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## The cold path and the warm path
 

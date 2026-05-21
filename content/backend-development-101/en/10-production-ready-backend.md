@@ -26,19 +26,15 @@ Once you try to fit HTTP handling, routing, services, databases, auth, logging, 
 
 This is the final post in the Backend Development 101 series. Here, we tie the earlier layers together into one production-ready backend shape and turn those ideas into directory boundaries, configuration rules, and observability defaults.
 
+
+![backend development 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/10/10-01-concept-at-a-glance.en.png)
+*backend development 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - A *project directory layout* that hosts all nine layers?
 - A strategy for splitting config across dev/staging/prod?
 - The three pillars of observability on one page?
-
-## Big Picture
-
-![backend development 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/10/10-01-concept-at-a-glance.en.png)
-
-*backend development 101 chapter 10 flow overview*
-
-This picture places A Production-Ready Backend Structure inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

@@ -28,21 +28,15 @@ The core of tool use is function calling. When the model determines "I need to c
 
 This is post 3 in the AI Agent 101 series. Here we cover the basic flow of function calling, tool schema design principles, error handling patterns, and tool selection strategies.
 
+![Tool-calling loop](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/03/03-01-tool-calling-loop.en.png)
+*Tool-calling loop*
+> Tool use separates model reasoning from code execution and connects them with schemas and validation.
+
 ## Questions to Keep in Mind
 
 - Where does the model decision end and application execution begin in function calling?
 - How does an ambiguous tool schema make an agent fail?
 - What should be validated before tool output is fed back to the model?
-
-## Big Picture
-
-![Tool-calling loop](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/03/03-01-tool-calling-loop.en.png)
-
-*Tool-calling loop*
-
-This picture shows the model producing a tool-call request, the application executing the real tool through a schema, and the result returning to the model. Tool use is less about letting the model run code and more about fixing the execution boundary as a contract.
-
-> Tool use separates model reasoning from code execution and connects them with schemas and validation.
 
 ## Function Calling Basic Flow
 

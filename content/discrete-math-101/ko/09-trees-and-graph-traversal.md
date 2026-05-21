@@ -25,17 +25,15 @@ last_reviewed: '2026-05-12'
 
 이 글은 Discrete Math 101 시리즈의 9번째 글입니다.
 
+
+![Discrete Math 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/09/09-01-big-picture.ko.png)
+*Discrete Math 101 9장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 트리의 정의와 성질은 무엇일까요?
 - BFS는 왜 최단 경로와 연결될까요?
 - DFS는 어떤 문제에서 강할까요?
-
-## 큰 그림
-
-![Discrete Math 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/09/09-01-big-picture.ko.png)
-
-*Discrete Math 101 9장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -577,7 +575,6 @@ print(has_euler_path(g))  # 오일러 회로 존재
 ```
 
 이 구분을 기억하면 "모든 간선을 방문"과 "모든 정점을 방문"이 계산 복잡도에서 얼마나 다른지 체감할 수 있습니다. 면접에서도 자주 등장하는 주제이므로 차수 조건을 즉시 떠올릴 수 있도록 연습해 두는 것이 좋습니다.
-
 
 
 ## 처음 질문으로 돌아가기

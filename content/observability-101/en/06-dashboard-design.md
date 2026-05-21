@@ -28,21 +28,16 @@ Good dashboard design fixes that. The first screen should compress the system in
 
 This is post 6 in the Observability 101 series.
 
+
+![observability 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/06/06-01-concept-at-a-glance.en.png)
+*observability 101 chapter 6 flow overview*
+> Dashboard Design is about the boundary decision, not the tool choice.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Dashboard Design?
 - Which signal should the example or diagram make visible for Dashboard Design?
 - What failure should be prevented first when Dashboard Design reaches a real system?
-
-## Big Picture
-
-![observability 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/06/06-01-concept-at-a-glance.en.png)
-
-*observability 101 chapter 6 flow overview*
-
-This picture places Dashboard Design inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Dashboard Design is about the boundary decision, not the tool choice.
 
 ## Questions this article answers
 

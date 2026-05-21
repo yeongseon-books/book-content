@@ -28,19 +28,15 @@ A file is a three-step resource: open it, read or write it, then close it. Excep
 
 This post is the 8th article in the Python 101 series. This is the point in the series where resource handling and failure paths become part of normal coding.
 
+
+![Python 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/08/08-01-mental-model.en.png)
+*Python 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - Open and close files safely using `open()` together with the `with` statement?
 - Tell text mode (`"r"`, `"w"`, `"a"`) apart from binary mode (`"rb"`, `"wb"`) and pick the right one?
 - Describe the difference between `read`, `readline`, `readlines`, and iterating the file object in one sentence each?
-
-## Big Picture
-
-![Python 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/08/08-01-mental-model.en.png)
-
-*Python 101 chapter 8 flow overview*
-
-This picture places File I/O and exception handling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

@@ -28,21 +28,16 @@ That is why data-changing SQL is less about syntax and more about safety procedu
 
 This is post 8 in the SQL 101 series. Here we focus on how to change rows safely instead of treating DML as just another clause to memorize.
 
+
+![sql 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/08/08-01-safe-data-change-flow.en.png)
+*sql 101 chapter 8 flow overview*
+> Data-changing operations demand more care than reads. A single WHERE typo in DELETE can erase months of data. Always test your filter conditions on a SELECT first.
+
 ## Questions to Keep in Mind
 
 - What are the basic shapes of INSERT, UPDATE, and DELETE?
 - Why is a transaction the default safety net for data changes?
 - Why is RETURNING so useful during verification?
-
-## Big Picture
-
-![sql 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/08/08-01-safe-data-change-flow.en.png)
-
-*sql 101 chapter 8 flow overview*
-
-INSERT adds rows, UPDATE modifies them, DELETE removes them. Each must respect constraints, and errors can silently corrupt data if you're not careful with your WHERE conditions.
-
-> Data-changing operations demand more care than reads. A single WHERE typo in DELETE can erase months of data. Always test your filter conditions on a SELECT first.
 
 ## Why It Matters
 

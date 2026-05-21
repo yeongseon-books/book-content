@@ -26,17 +26,14 @@ seo_description: 다국어 dense 검색은 화려한 신호 결합보다 먼저,
 
 이 글은 Korean AI Stack 101 시리즈의 3번째 글입니다. 여기서는 BGE-M3로 한국어·영어 혼합 코퍼스에서 dense 다국어 기준선을 측정한 뒤, 더 복잡한 검색 신호를 올리기 전에 무엇을 확인해야 하는지 살펴봅니다.
 
+![Korean AI Stack 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/03/03-01-core-flow.ko.png)
+*Korean AI Stack 101 3장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - BGE-M3는 한국어와 영어가 섞인 코퍼스에서 KoSimCSE보다 어디서 강합니까?
 - 하나의 모델이 dense, sparse, multi-vector 표현을 동시에 낸다는 말은 무엇을 뜻합니까?
 - 다국어 검색 첫 버전에서는 dense만으로도 왜 충분한 경우가 많습니까?
-
-## 큰 그림
-
-![Korean AI Stack 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/03/03-01-core-flow.ko.png)
-
-*Korean AI Stack 101 3장 흐름 개요*
 
 ## 왜 이 단계가 중요한가
 

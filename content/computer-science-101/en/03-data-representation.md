@@ -29,19 +29,15 @@ This is post 3 in the Computer Science 101 series.
 
 In this article, we'll walk through bits and bytes, character encoding, signed integers, and floating-point limits so you can reason from representation to behavior.
 
+
+![Computer Science 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/03/03-01-concept-at-a-glance.en.png)
+*Computer Science 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Data Representation?
 - Which signal should the example or diagram make visible for Data Representation?
 - What failure should be prevented first when Data Representation reaches a real system?
-
-## Big Picture
-
-![Computer Science 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/03/03-01-concept-at-a-glance.en.png)
-
-*Computer Science 101 chapter 3 flow overview*
-
-This picture places Data Representation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions This Article Answers
 

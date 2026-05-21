@@ -28,17 +28,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 브라우저 공격을 입력 정제만으로 보는 대신, 출력 이스케이프와 CSP, 쿠키 정책, CSRF 검증이 함께 돌아가는 방어 체계로 정리하겠습니다. 이 관점을 이해하면 브라우저가 언제 우리 편이고 언제 공격자 도구가 되는지도 더 명확해집니다.
 
+
+![Secure Coding 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/08/08-01-concept-at-a-glance.ko.png)
+*Secure Coding 101 8장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - XSS는 어떤 종류로 나뉘고 각각 어디서 생길까요?
 - 출력 이스케이프와 CSP는 어떤 역할 분담을 할까요?
 - CSRF는 왜 사용자의 권한을 그대로 악용할 수 있을까요?
-
-## 큰 그림
-
-![Secure Coding 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/08/08-01-concept-at-a-glance.ko.png)
-
-*Secure Coding 101 8장 흐름 개요*
 
 ## 왜 중요한가
 

@@ -31,21 +31,16 @@ last_reviewed: '2026-05-04'
 
 This is the first post in the Information Security 101 series.
 
+
+![information security 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/01/01-01-big-picture.en.png)
+*information security 101 chapter 1 flow overview*
+> Information security is not knowing technology names. It is building a state where your team can say "we protect X, we watch for Y, we accept Z."
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What Is Information Security??
 - Which signal should the example or diagram make visible for What Is Information Security??
 - What failure should be prevented first when What Is Information Security? reaches a real system?
-
-## Big Picture
-
-![information security 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/01/01-01-big-picture.en.png)
-
-*information security 101 chapter 1 flow overview*
-
-This picture places What Is Information Security? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Information security is not knowing technology names. It is building a state where your team can say "we protect X, we watch for Y, we accept Z."
 
 ## What You Will Learn
 

@@ -30,20 +30,16 @@ seo_description: 조합론으로 경우의 수를 세고 복잡도와 확률의 
 
 여기서는 조합론을 공식 암기 과목으로 보지 않고, 복잡도 분석과 확률 계산의 바닥에서 쓰는 셈의 언어로 정리해 보겠습니다.
 
+
+![Math for CS 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/05/05-01-concept-at-a-glance.ko.png)
+*Math for CS 101 5장 흐름 개요*
+> 조합 계산은 경우의 수 폭발을 대면하는 순간, 체계적으로 세고 검증하는 필수 기술이 됩니다.
+
 ## 먼저 던지는 질문
 
 - 모든 경우를 직접 나열하지 않고도 왜 정확히 셀 수 있을까요?
 - 곱의 법칙과 합의 법칙은 언제 각각 쓰일까요?
 - 순열과 조합은 무엇이 다를까요?
-
-## 큰 그림
-
-![Math for CS 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/05/05-01-concept-at-a-glance.ko.png)
-
-*Math for CS 101 5장 흐름 개요*
-이 그림은 조합 문제를 경우의 수 세기로 다루면서, 모든 가능성을 놓치지 않는 방법을 보여줍니다.
-
-> 조합 계산은 경우의 수 폭발을 대면하는 순간, 체계적으로 세고 검증하는 필수 기술이 됩니다.
 
 ## 왜 중요한가
 

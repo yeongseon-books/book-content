@@ -27,19 +27,14 @@ At first glance, Azure Container Apps looks like the missing middle ground betwe
 
 This is the first post in the Azure Container Apps 101 series. Here, we'll place ACA on the Azure container map and define the workloads it fits best.
 
+![azure container apps 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/01/01-01-the-big-picture-one-aca-environment-at-a.en.png)
+*azure container apps 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - How Azure Container Apps (ACA) differs from the other Azure container services (App Service, AKS, Functions)?
 - The role of ACA's three core building blocks: Environment, Container App, and Revision?
 - Which workloads belong on ACA, and which workloads belong somewhere else?
-
-## Big Picture
-
-![azure container apps 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/01/01-01-the-big-picture-one-aca-environment-at-a.en.png)
-
-*azure container apps 101 chapter 1 flow overview*
-
-This picture places What is Azure Container Apps? — running containers without Kubernetes inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

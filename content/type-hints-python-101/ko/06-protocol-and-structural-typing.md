@@ -27,17 +27,15 @@ Python은 오래전부터 덕 타이핑을 써 왔습니다. `close()`가 있으
 
 이 글은 Type Hints (Python) 101 시리즈의 6번째 글입니다. 여기서는 `Protocol`로 "이 메서드가 있으면 충분하다"는 계약을 어떻게 적는지, 그리고 그것이 structural typing과 어떻게 연결되는지 살펴봅니다.
 
+
+![Type Hints in Python 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/06/06-01-concept-at-a-glance.ko.png)
+*Type Hints in Python 101 6장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 상속 없이 인터페이스 계약을 적을 수 있을까요?
 - ABC와 Protocol은 무엇이 다를까요?
 - 속성만으로도 Protocol을 만족시킬 수 있을까요?
-
-## 큰 그림
-
-![Type Hints in Python 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/06/06-01-concept-at-a-glance.ko.png)
-
-*Type Hints in Python 101 6장 흐름 개요*
 
 ## 왜 이 주제가 중요한가
 
@@ -333,7 +331,6 @@ after 상태에서는 호출부 타입 불일치를 정확히 보고합니다.
 | 예외 관리 | `type: ignore`에 사유와 코드 기재 |
 
 
-
 ## mypy 오류를 읽는 순서
 
 실무에서는 오류 개수보다 읽는 순서가 더 중요합니다. 다음 순서를 고정하면 수정 시간이 크게 줄어듭니다.
@@ -464,7 +461,6 @@ Success: no issues found in N source files
 위 결과가 나오더라도 끝이 아닙니다. 새로운 기능을 추가할 때 같은 원칙을 반복해 계약을 유지해야 타입 힌트가 장기적으로 품질을 지켜 줍니다.
 
 
-
 ## 추가 사례: 주문 처리 모듈 타입 하드닝
 
 아래 코드는 실제로 자주 보는 레거시 패턴입니다.
@@ -541,7 +537,6 @@ service.py:36: error: Missing key "user" for TypedDict "InvoicePayload"  [typedd
 - CI에서는 타입 검사 실패를 테스트 실패와 동등하게 취급합니다.
 
 
-
 ## 보강 메모: 실전 리뷰에서 확인하는 타입 힌트 패턴
 
 ### 패턴 1: 경계 파싱 함수를 별도로 둡니다
@@ -596,7 +591,6 @@ def build_user(user_id: int, email: str) -> NormalizedUser:
 - `None` 가능성은 본문에서 실제로 처리되었는가?
 - `Any`가 도입되면 대체 가능한 구체 타입은 없는가?
 - mypy 오류를 숨기는 `type: ignore`가 정말 필요한가?
-
 
 
 ## Protocol 호환성 점검 로그

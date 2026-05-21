@@ -25,21 +25,15 @@ When a task has predictable stages, giving the model more freedom usually makes 
 
 This is post 5 in the AI App Patterns 101 series. Here we cover how to design multi-step LLM workflows with explicit stages and clean data contracts.
 
+![Sequential handoff across stages](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/05/05-01-sequential-handoff-across-stages.en.png)
+*Sequential handoff across stages*
+> Workflow automation removes model choice and replaces it with a pipeline that follows human-defined stages and data contracts.
+
 ## Questions to Keep in Mind
 
 - When is a multi-step chain just a sequence, and when does it need routing?
 - What breaks downstream when intermediate result types are not fixed?
 - Where should workflow automation log failures so they are not hidden by the final output?
-
-## Big Picture
-
-![Sequential handoff across stages](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/05/05-01-sequential-handoff-across-stages.en.png)
-
-*Sequential handoff across stages*
-
-This picture shows input moving through multiple processing steps or branching based on classification. Workflow automation stays debuggable when each step has its own contract and failure boundary.
-
-> Workflow automation removes model choice and replaces it with a pipeline that follows human-defined stages and data contracts.
 
 ## Sequential chains
 

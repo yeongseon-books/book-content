@@ -27,19 +27,15 @@ Most web bugs eventually reduce to one question: what exactly did the client sen
 
 This is post 4 in the Web Development 101 series. Here we treat HTTP as the shared contract between browser, script, and server so you can read methods, status codes, headers, and JSON payloads with much more confidence.
 
+
+![web development 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/04/04-01-concept-at-a-glance.en.png)
+*web development 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - The shape of HTTP requests and responses?
 - Methods (GET/POST/PUT/DELETE) and status codes?
 - The role of headers?
-
-## Big Picture
-
-![web development 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/04/04-01-concept-at-a-glance.en.png)
-
-*web development 101 chapter 4 flow overview*
-
-This picture places HTTP and APIs inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

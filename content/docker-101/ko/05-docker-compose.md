@@ -30,17 +30,14 @@ last_reviewed: '2026-05-15'
 Docker Compose는 이 문제를 YAML 하나로 정리합니다. 서비스, 네트워크, 볼륨, 의존 관계를 선언해 두면 팀 전체가 같은 멀티 컨테이너 환경을 같은 방식으로 띄울 수 있습니다. Compose는 많은 팀에서 사실상 첫 번째 인프라 코드입니다.
 
 
+![Docker 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/05/05-01-concept-at-a-glance.ko.png)
+*Docker 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 여러 컨테이너를 한 번에 재현 가능하게 실행하려면 무엇이 필요할까요?
 - service, network, volume은 Compose에서 어떻게 정의할까요?
 - `depends_on`과 healthcheck는 어떤 관계로 이해해야 할까요?
-
-## 큰 그림
-
-![Docker 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/05/05-01-concept-at-a-glance.ko.png)
-
-*Docker 101 5장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 

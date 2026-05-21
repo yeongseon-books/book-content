@@ -27,19 +27,15 @@ Static type checking protects the person writing the code. Real services also ne
 
 This is post 9 in the Type Hints in Python 101 series. In this article, we will build one continuous `CreateUserRequest` → FastAPI endpoint → `UserResponse` workflow so you can see how Pydantic turns type hints into runtime validation, how a bad request becomes a 422 response, and how the corrected request becomes a successful response.
 
+
+![Type Hints in Python 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/09/09-01-big-picture.en.png)
+*Type Hints in Python 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Pydantic and Type Hints?
 - Which signal should the example or diagram make visible for Pydantic and Type Hints?
 - What failure should be prevented first when Pydantic and Type Hints reaches a real system?
-
-## Big Picture
-
-![Type Hints in Python 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/09/09-01-big-picture.en.png)
-
-*Type Hints in Python 101 chapter 9 flow overview*
-
-This picture places Pydantic and Type Hints inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

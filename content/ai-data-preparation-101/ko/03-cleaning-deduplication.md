@@ -32,21 +32,16 @@ title: "AI Data Preparation 101 (3/10): 데이터 정제와 중복 제거"
 
 여기서는 원문 정제의 기본 변환과 exact·near·semantic dedup의 차이를 정리하고, 특히 train/eval cross-dedup이 왜 핵심인지 설명하겠습니다.
 
+
+![AI 데이터 준비 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/03/03-01-big-picture.ko.png)
+*AI 데이터 준비 3장 흐름 개요*
+> 데이터 정제와 중복 제거의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - 정제 함수는 왜 작은 변환들의 합으로 유지해야 할까요?
 - exact dedup만으로는 웹 코퍼스 품질 문제가 왜 충분히 해결되지 않을까요?
 - MinHash threshold를 너무 낮추거나 높이면 어떤 오류가 생길까요?
-
-## 큰 그림
-
-![AI 데이터 준비 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/03/03-01-big-picture.ko.png)
-
-*AI 데이터 준비 3장 흐름 개요*
-
-이 그림에서는 데이터 정제와 중복 제거를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 데이터 정제와 중복 제거의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

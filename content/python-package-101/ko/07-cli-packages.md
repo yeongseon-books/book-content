@@ -27,17 +27,14 @@ seo_description: entry point와 click으로 pip install 후 바로 실행 가능
 
 이 글은 Python Package 101 시리즈의 7번째 글입니다. 여기서는 `[project.scripts]` entry point가 어떻게 동작하는지, `argparse`와 `click`의 차이는 무엇인지, 그리고 실무에서 쓰기 좋은 CLI 구조를 어떻게 잡는지 정리하겠습니다.
 
+![Python Package 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/07/07-01-mental-model.ko.png)
+*Python Package 101 7장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - `pip install` 후 바로 실행되는 명령어는 어떻게 만들까요?
 - `[project.scripts]` entry point는 어떻게 동작할까요?
 - `argparse`와 `click`은 무엇이 다를까요?
-
-## 큰 그림
-
-![Python Package 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/07/07-01-mental-model.ko.png)
-
-*Python Package 101 7장 흐름 개요*
 
 ## 이 글에서 배우는 내용
 
@@ -79,14 +76,14 @@ greet = "mylib.cli:main"    →    Hello, Alice!
 
 ## Before / After
 
-**Before (run script directly)**
+**Before (스크립트 직접 실행)**
 
 ```bash
 python /path/to/mylib/cli.py --name Alice
 # must remember the path, must invoke python
 ```
 
-**After (entry point)**
+**After (엔트리 포인트)**
 
 ```bash
 pip install mylib

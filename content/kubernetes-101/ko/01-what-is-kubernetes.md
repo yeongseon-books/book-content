@@ -28,17 +28,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 Kubernetes를 단순히 "컨테이너를 많이 돌리는 도구"가 아니라, 원하는 상태를 선언하면 시스템이 그 상태로 계속 수렴하도록 만드는 오케스트레이터라는 관점에서 정리하겠습니다.
 
+
+![Kubernetes 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/01/01-01-concept-at-a-glance.ko.png)
+*Kubernetes 101 1장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 오케스트레이션이라는 말은 실제로 무엇을 대신해 줄까요?
 - 컨트롤 플레인과 워커 노드는 어떤 식으로 역할을 나눌까요?
 - 원하는 상태 모델이 왜 Kubernetes의 핵심 철학일까요?
-
-## 큰 그림
-
-![Kubernetes 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/01/01-01-concept-at-a-glance.ko.png)
-
-*Kubernetes 101 1장 흐름 개요*
 
 ## 왜 중요한가
 

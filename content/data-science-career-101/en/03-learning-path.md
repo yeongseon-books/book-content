@@ -28,21 +28,17 @@ In data work, sequence matters. If you jump into modeling before you are comfort
 
 This is post 3 in the Data Science Career 101 series.
 
+
+![data science career 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/03/03-01-concept-at-a-glance.en.png)
+*data science career 101 chapter 3 flow overview*
+> In learning structure, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
+
 ## Questions to Keep in Mind
 
 - What should a beginner learn first, and what can wait?
 - Why is a 12-week roadmap a more useful frame than a loose reading list?
 - What outcomes should each four-week phase produce?
 
-## Big Picture
-
-![data science career 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/03/03-01-concept-at-a-glance.en.png)
-
-*data science career 101 chapter 3 flow overview*
-
-This picture places Designing the Learning Path inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> In learning structure, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
 ## What You Will Learn
 
 - A *12-week roadmap*

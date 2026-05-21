@@ -31,19 +31,15 @@ In this post, we design the path from input to output so each transformation ste
 
 > Data gets easier to trust when you can point to where it came from, how it changed, and where it is going next.
 
+
+![software design 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/07/07-01-concept-at-a-glance.en.png)
+*software design 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Data Flow Design?
 - Which signal should the example or diagram make visible for Data Flow Design?
 - What failure should be prevented first when Data Flow Design reaches a real system?
-
-## Big Picture
-
-![software design 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/07/07-01-concept-at-a-glance.en.png)
-
-*software design 101 chapter 7 flow overview*
-
-This picture places Data Flow Design inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

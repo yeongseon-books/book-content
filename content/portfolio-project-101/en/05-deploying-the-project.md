@@ -30,21 +30,16 @@ This is post 5 in the Portfolio Project 101 series. Here we will treat deploymen
 
 > Deployment is not about getting the app up once. It is about making the app reachable, repeatable, and inspectable.
 
+
+![portfolio project 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/05/05-01-concept-at-a-glance.en.png)
+*portfolio project 101 chapter 5 flow overview*
+> Code that only runs locally is not evidence. When deployed so anyone can access it, then and only then does it read like an intentionally completed project.
+
 ## Questions to Keep in Mind
 
 - Why is a public URL close to mandatory for a portfolio project?
 - What should you optimize for when choosing a hosting platform?
 - Why should secrets and environment configuration live outside the codebase?
-
-## Big Picture
-
-![portfolio project 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/05/05-01-concept-at-a-glance.en.png)
-
-*portfolio project 101 chapter 5 flow overview*
-
-This picture places Deploying the Project inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Code that only runs locally is not evidence. When deployed so anyone can access it, then and only then does it read like an intentionally completed project.
 
 ## Why It Matters
 

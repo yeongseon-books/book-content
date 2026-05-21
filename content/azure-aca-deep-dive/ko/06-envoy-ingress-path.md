@@ -30,21 +30,15 @@ Azure Container Apps의 Ingress 설명은 짧고 명확합니다. Ingress를 켜
 
 이제 첫 요청 경로를 앱이 아니라 바깥 edge부터 따라가 보겠습니다.
 
+![Azure Container Apps Deep Dive 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/06/06-01-start-with-the-full-path-not-with-the-ap.ko.png)
+*Azure Container Apps Deep Dive 6장 흐름 개요*
+> Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - ACA의 public ingress 표면과 숨은 라우팅 계층은 어떻게 구분해 이해해야 할까요?
 - TLS는 어디서 종료되고, 앱은 원래 요청 정보를 어떤 header로 복구할까요?
 - Revision traffic split은 요청 경로의 어느 지점에서 실제가 될까요?
-
-## 큰 그림
-
-![Azure Container Apps Deep Dive 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/06/06-01-start-with-the-full-path-not-with-the-ap.ko.png)
-
-*Azure Container Apps Deep Dive 6장 흐름 개요*
-
-이 그림에서는 Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> Envoy Ingress 경로 — 첫 요청이 사용자 컨테이너에 닿기까지의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 복제를 저장소의 뒷단 구현이 아니라, 시스템이 사용자에게 약속하는 안전성과 지연 특성을 결정하는 설계 레이어로 봅니다.
 
+
+![Distributed Systems 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/05/05-01-concept-at-a-glance.ko.png)
+*Distributed Systems 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 왜 데이터를 복제하며, 어떤 복제 모델이 있을까요?
 - leader-follower, multi-leader, leaderless는 어떻게 다를까요?
 - 동기 복제와 비동기 복제는 어떤 데이터 손실 위험을 만들까요?
-
-## 큰 그림
-
-![Distributed Systems 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/05/05-01-concept-at-a-glance.ko.png)
-
-*Distributed Systems 101 5장 흐름 개요*
 
 ## 왜 중요한가
 

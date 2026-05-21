@@ -28,21 +28,16 @@ This is post 8 in the Pandas 101 series.
 
 In this chapter, we will keep time series work inside core Pandas patterns. The focus is on DatetimeIndex, time-aware grouping, rolling windows, and explicit time-zone handling.
 
+
+![pandas 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/08/08-01-concept-at-a-glance.en.png)
+*pandas 101 chapter 8 flow overview*
+> *Time series is about *order and frequency*. Skip the date index, miss a time period, or ignore seasonality and your trend analysis crumbles.
+
 ## Questions to Keep in Mind
 
 - The intuition of *DatetimeIndex?
 - resample* and *rolling?
 - Handling *time zones (tz)?
-
-## Big Picture
-
-![pandas 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/08/08-01-concept-at-a-glance.en.png)
-
-*pandas 101 chapter 8 flow overview*
-
-This picture places Time Series inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> *Time series is about *order and frequency*. Skip the date index, miss a time period, or ignore seasonality and your trend analysis crumbles.
 
 ## Why It Matters
 

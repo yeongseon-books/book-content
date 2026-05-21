@@ -29,17 +29,15 @@ last_reviewed: '2026-05-16'
 
 그래서 이번 글은 개념 나열 대신 하나의 짧은 루프에 집중합니다. **코드를 만들고, 패키지로 묶고, 로컬에서 같은 입력으로 실행하고, 결과와 아티팩트 크기를 확인하고, 그다음에야 메모리나 런타임을 조정하는 루프**입니다. FaaS를 제대로 다루는 팀은 거의 항상 이 순서로 움직입니다.
 
+
+![Serverless 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/02/02-01-concept-at-a-glance.ko.png)
+*Serverless 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - FaaS의 실행 계약은 핸들러, 런타임, 패키지 사이에서 어떻게 만들어질까요?
 - 실제 배포 전에는 어떤 파일 구조와 명령 순서로 검증하는 편이 좋을까요?
 - 패키지 크기와 의존성 수는 왜 실행 시간과 콜드 스타트에 직접 영향을 줄까요?
-
-## 큰 그림
-
-![Serverless 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/02/02-01-concept-at-a-glance.ko.png)
-
-*Serverless 101 2장 흐름 개요*
 
 ## 왜 이 주제가 중요한가
 

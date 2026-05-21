@@ -27,19 +27,15 @@ A web app can feel complete while everything still lives in process memory, righ
 
 This is post 7 in the Web Development 101 series. Here we move from in-memory thinking to database thinking by covering SQL basics, ORMs, connection pools, and transactions as the backbone of persistent application state.
 
+
+![web development 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/07/07-01-concept-at-a-glance.en.png)
+*web development 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why we need a database in the first place?
 - The four basic SQL operations (SELECT/INSERT/UPDATE/DELETE)?
 - What an ORM is and when to use it?
-
-## Big Picture
-
-![web development 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/07/07-01-concept-at-a-glance.en.png)
-
-*web development 101 chapter 7 flow overview*
-
-This picture places Connecting to a Database inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

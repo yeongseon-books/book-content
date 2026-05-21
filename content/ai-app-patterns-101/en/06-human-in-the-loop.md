@@ -25,21 +25,15 @@ Better automation does not remove the need for human review; it makes the review
 
 This is the final post in the AI App Patterns 101 series. Here we cover how to place human judgment inside an automated pipeline without turning the whole system back into manual work.
 
+![Human review by risk level](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/06/06-01-human-review-by-risk-level.en.png)
+*Human review by risk level*
+> Human-in-the-loop does not abandon automation; it inserts human judgment only at the points where automation is risky.
+
 ## Questions to Keep in Mind
 
 - Is human-in-the-loop a fallback for weak models, or part of product design?
 - When should you use an approval gate versus a confidence-based branch?
 - What should be logged so human decisions can be audited later?
-
-## Big Picture
-
-![Human review by risk level](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/06/06-01-human-review-by-risk-level.en.png)
-
-*Human review by risk level*
-
-This picture shows an automated path branching into human approval or review under specific conditions. HITL is not giving up on automation; it keeps risky decisions inside a safer boundary.
-
-> Human-in-the-loop does not abandon automation; it inserts human judgment only at the points where automation is risky.
 
 ## When HITL is the right choice
 

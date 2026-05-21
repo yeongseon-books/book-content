@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 이번 글에서는 Adapter 패턴을 외부 의존성을 경계 뒤에 가두는 얇은 번역층으로 설명하겠습니다. 핵심은 도메인이 외부 SDK의 언어를 배우지 않게 만드는 것입니다.
 
+
+![Design Patterns 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/06/06-01-concept-at-a-glance.ko.png)
+*Design Patterns 101 6장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - Adapter 패턴은 어떤 경계 문제를 해결할까요?
 - 도메인 인터페이스를 먼저 정의해야 하는 이유는 무엇일까요?
 - Object Adapter와 Class Adapter는 어떻게 다를까요?
-
-## 큰 그림
-
-![Design Patterns 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/06/06-01-concept-at-a-glance.ko.png)
-
-*Design Patterns 101 6장 흐름 개요*
 
 ## 왜 중요한가
 

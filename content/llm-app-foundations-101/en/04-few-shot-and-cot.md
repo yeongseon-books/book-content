@@ -38,21 +38,15 @@ The operating idea is simple: better prompts are often less about clever wording
 
 ---
 
+![Few-shot and chain-of-thought: steering better answers](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/04/04-01-few-shot-and-chain-of-thought-steering-b.en.png)
+*Few-shot and chain-of-thought: steering better answers*
+> Few-shot stabilizes the answer shape; chain-of-thought stabilizes the path.
+
 ## Questions to Keep in Mind
 
 - What does few-shot teach, and what does chain-of-thought teach?
 - When should you choose zero-shot, few-shot, or CoT?
 - Why can weak examples make the answer worse?
-
-## Big Picture
-
-![Few-shot and chain-of-thought: steering better answers](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/04/04-01-few-shot-and-chain-of-thought-steering-b.en.png)
-
-*Few-shot and chain-of-thought: steering better answers*
-
-This picture separates two steering goals: showing the answer shape and showing the reasoning path. Few-shot and CoT often sit together, but they stabilize different parts of the response.
-
-> Few-shot stabilizes the answer shape; chain-of-thought stabilizes the path.
 
 ## Few-shot prompting teaches by example inside the messages array
 

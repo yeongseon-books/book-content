@@ -26,19 +26,14 @@ RAG stops feeling mystical once you can see where each failure comes from. In Ko
 
 This is the final post in the Korean AI Stack 101 series. Here, we connect the earlier embedding, OCR, and generation pieces into one minimal Korean RAG pipeline.
 
+![Korean AI Stack 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/06/06-01-core-flow.en.png)
+*Korean AI Stack 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - What stages are non-negotiable in a minimal Korean RAG pipeline?
 - Which stage most often becomes the quality bottleneck — chunking, embedding, retrieval, or generation?
 - How should retrieved context be formatted before it reaches the LLM?
-
-## Big Picture
-
-![Korean AI Stack 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/06/06-01-core-flow.en.png)
-
-*Korean AI Stack 101 chapter 6 flow overview*
-
-This picture places Assembling a Korean RAG pipeline inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What you will learn
 

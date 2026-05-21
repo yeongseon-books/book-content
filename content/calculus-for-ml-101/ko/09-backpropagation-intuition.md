@@ -32,17 +32,15 @@ last_reviewed: '2026-05-12'
 
 끝까지 읽고 나면 `zero_grad`, gradient accumulation, graph retention 같은 실무 용어가 더 이상 API 암기가 아니라 자연스러운 운영 개념으로 보이게 됩니다.
 
+
+![Calculus for ML 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/09/09-01-concept-at-a-glance.ko.png)
+*Calculus for ML 101 9장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 역전파는 수많은 weight의 gradient를 왜 한 번에 계산할 수 있을까요?
 - 계산 그래프 관점에서 순전파와 역전파는 각각 무엇을 남길까요?
 - local derivative를 저장한다는 말은 실제로 어떤 의미일까요?
-
-## 큰 그림
-
-![Calculus for ML 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/09/09-01-concept-at-a-glance.ko.png)
-
-*Calculus for ML 101 9장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 
@@ -178,7 +176,6 @@ optimizer.step()
 실무적으로 중요한 포인트는 gradient accumulation과 그래프 수명입니다. `zero_grad`, detach, cached activations, 메모리 사용량은 모두 역전파 구조에서 직접 나온 운영 주제입니다. 프레임워크가 자동으로 해 주는 일이 많아도, 원리를 알면 버그를 훨씬 더 빠르게 좁힐 수 있습니다.
 
 다음 글에서는 이 시리즈 전체를 하나의 학습 루프로 묶겠습니다. forward, loss, backward, optimizer step이 어떻게 하나의 사이클을 이루는지, 그리고 왜 이것이 딥러닝 학습의 표준 골격인지 정리하겠습니다.
-
 
 
 ## 순전파와 역전파를 한 줄씩 추적하기

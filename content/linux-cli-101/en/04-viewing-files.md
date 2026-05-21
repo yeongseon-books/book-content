@@ -28,19 +28,15 @@ When you work on servers, reading files efficiently matters almost as much as ed
 
 This is post 4 in the Linux CLI 101 series.
 
+
+![Linux CLI 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/04/04-01-big-picture.en.png)
+*Linux CLI 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - Using `cat` to quickly view short files?
 - Using `less` to browse long files page by page?
 - Using `head` and `tail` to slice the beginning or end of a file?
-
-## Big Picture
-
-![Linux CLI 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/04/04-01-big-picture.en.png)
-
-*Linux CLI 101 chapter 4 flow overview*
-
-This picture places cat, less, head, tail — Viewing File Contents inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

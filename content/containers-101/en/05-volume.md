@@ -31,21 +31,16 @@ In this chapter, we compare named volumes, bind mounts, and tmpfs by lifecycle a
 
 > Replaceable containers need durable state boundaries. Volumes are where that boundary becomes explicit.
 
+
+![containers 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/05/05-01-concept-at-a-glance.en.png)
+*containers 101 chapter 5 flow overview*
+> Volumes are the mechanism to keep data alive when containers die — they decouple storage lifecycle from container lifecycle.
+
 ## Questions to Keep in Mind
 
 - Volumes vs bind mounts vs tmpfs?
 - Guaranteeing data persistence?
 - Backup and migration?
-
-## Big Picture
-
-![containers 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/05/05-01-concept-at-a-glance.en.png)
-
-*containers 101 chapter 5 flow overview*
-
-This picture places Volume inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Volumes are the mechanism to keep data alive when containers die — they decouple storage lifecycle from container lifecycle.
 
 ## Why It Matters
 

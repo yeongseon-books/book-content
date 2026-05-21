@@ -25,17 +25,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 Computer Networks 101 시리즈의 마지막 글입니다.
 
+
+![Computer Networks 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/10/10-01-concept-at-a-glance.ko.png)
+*Computer Networks 101 10장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 네트워크 문제를 계층별로 어떻게 좁혀 가야 할까요?
 - `ping`, `dig`, `curl`, `ss`, `tcpdump`는 각각 무엇을 말해 줄까요?
 - timeout, reset, DNS 실패는 어떤 모양으로 구분할 수 있을까요?
-
-## 큰 그림
-
-![Computer Networks 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/10/10-01-concept-at-a-glance.ko.png)
-
-*Computer Networks 101 10장 흐름 개요*
 
 ## 왜 중요한가
 

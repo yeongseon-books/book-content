@@ -29,17 +29,15 @@ last_reviewed: '2026-05-12'
 
 여기서는 알고리즘의 정의, 시간·공간 복잡도, Big-O 표기법, 그리고 자료구조 선택이 왜 성능을 바꾸는지 입문자 관점에서 정리하겠습니다.
 
+
+![Computer Science 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/04/04-01-concept-at-a-glance.ko.png)
+*Computer Science 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 같은 문제를 푸는 두 코드 중 무엇이 더 빠를지 어떻게 판단할까요?
 - 시간 복잡도와 공간 복잡도는 무엇을 각각 뜻할까요?
 - Big-O 표기법은 왜 코드를 실행하지 않고도 성능을 가늠하게 해 줄까요?
-
-## 큰 그림
-
-![Computer Science 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/04/04-01-concept-at-a-glance.ko.png)
-
-*Computer Science 101 4장 흐름 개요*
 
 ## 이 글에서 배울 것
 
@@ -481,11 +479,6 @@ V(정점 수)와 E(간선 수)로 복잡도를 표현하는 이유는, 그래프
   - 시간 복잡도는 입력이 커질 때 연산 횟수의 증가율, 공간 복잡도는 추가 메모리의 증가율입니다. 둘은 트레이드오프 관계에 있어서, 해시맵으로 시간을 줄이면 공간이 늘고, 정렬 후 투 포인터로 공간을 줄이면 시간이 늘어납니다.
 - **Big-O 표기법은 왜 코드를 실행하지 않고도 성능을 가늠하게 해 줄까요?**
   - Big-O는 입력이 무한히 커질 때의 상한 증가율만 남기므로, 하드웨어·언어·상수항에 관계없이 알고리즘의 본질적 비용을 비교할 수 있습니다. 실행 없이도 중첩 루프의 차수를 세면 운영 규모에서의 병목을 예측할 수 있습니다.
-
-
-
-
-
 
 
 <!-- toc:begin -->

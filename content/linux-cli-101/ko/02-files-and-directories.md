@@ -28,17 +28,14 @@ seo_description: 리눅스 트리 구조를 파악하고 cd, ls부터 cp, mv, rm
 개발자의 일상은 파일을 만들고, 옮기고, 복사하고, 삭제하는 것의 연속입니다. 코드 파일을 정리하고, 설정 파일을 복사하고, 빌드 산출물을 삭제합니다. GUI에서는 드래그 앤 드롭으로 하지만, 서버에서는 모두 명령어입니다.
 
 
+![Linux CLI 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/02/02-01-big-picture.ko.png)
+*Linux CLI 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 절대 경로와 상대 경로는 언제 다르게 느껴질까요?
 - `pwd`, `cd`, `ls`만으로 현재 위치를 어떻게 읽어야 할까요?
 - `cp`, `mv`, `rm`은 각각 어떤 상황에서 쓰면 안전할까요?
-
-## 큰 그림
-
-![Linux CLI 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/02/02-01-big-picture.ko.png)
-
-*Linux CLI 101 2장 흐름 개요*
 
 ## 머릿속에 먼저 그릴 그림
 

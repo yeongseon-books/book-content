@@ -26,19 +26,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 머신러닝 101 시리즈의 3번째 글입니다. 여기서는 train/test split이 왜 일반화 측정의 최소 장치인지, 그리고 `random_state`, `stratify`, K-fold 교차검증이 각각 어떤 역할을 하는지 정리해 보겠습니다.
 
+
+![Machine Learning 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/03/03-01-diagram.ko.png)
+*Machine Learning 101 3장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 훈련 세트, 검증 세트, 테스트 세트는 각각 무엇을 맡을까요?
 - `random_state`를 왜 항상 고정하라고 할까요?
 - `stratify`는 클래스 불균형에서 어떤 도움을 줄까요?
-
-## 큰 그림
-
-![Machine Learning 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/03/03-01-diagram.ko.png)
-
-*Machine Learning 101 3장 흐름 개요*
-
-이 그림은 이 장의 핵심 개념들이 어떻게 연결되는지 보여줍니다.
 
 ## 분할 전략 비교
 

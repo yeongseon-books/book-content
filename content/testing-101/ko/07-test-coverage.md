@@ -30,21 +30,16 @@ last_reviewed: '2026-05-12'
 
 이 글은 Testing 101 시리즈의 일곱 번째 글입니다. 여기서는 라인, 브랜치, 함수 커버리지의 차이, `pytest-cov`로 측정하는 기본 흐름, 그리고 100퍼센트 숫자에 집착할 때 생기는 문제를 정리하겠습니다.
 
+
+![Testing 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/07/07-01-diagram.ko.png)
+*Testing 101 7장 흐름 개요*
+> 커버리지는 지표일 뿐 목표가 아닙니다. 100% 커버리지도 모든 버그를 잡지는 못합니다.
+
 ## 먼저 던지는 질문
 
 - 라인, 브랜치, 함수 커버리지는 무엇이 다를까요?
 - `pytest-cov`로 커버리지를 어떻게 측정할까요?
 - 테스트가 닿지 않은 코드는 어떻게 찾을까요?
-
-## 큰 그림
-
-![Testing 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/07/07-01-diagram.ko.png)
-
-*Testing 101 7장 흐름 개요*
-
-이 그림에서는 라인 커버리지, 브랜치 커버리지, 경로 커버리지의 차이와 각각의 한계를 보여줍니다. 높은 커버리지 수치가 반드시 높은 품질을 보장하지는 않습니다.
-
-> 커버리지는 지표일 뿐 목표가 아닙니다. 100% 커버리지도 모든 버그를 잡지는 못합니다.
 
 ## 왜 중요한가
 

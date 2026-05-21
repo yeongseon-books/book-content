@@ -30,17 +30,14 @@ last_reviewed: '2026-05-15'
 기술부채는 존재 자체가 문제는 아닙니다. 실무에서는 의도적으로 빚을 지고 속도를 얻는 선택도 필요합니다. 다만 그 빚을 알고 있었는지, 누가 갚을지 정했는지, 측정 가능한 항목으로 관리하는지가 중요합니다. 의식 없는 부채가 위험한 이유는 일정, 안정성, 학습 비용을 동시에 잠식하기 때문입니다.
 
 
+![Software Engineering 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/09/09-01-concept-at-a-glance.ko.png)
+*Software Engineering 101 9장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 기술부채는 언제 도구이고, 언제 사고의 씨앗이 될까요?
 - Martin Fowler의 네 가지 기술부채 분류는 실무에 어떤 도움을 줄까요?
 - 부채 상환 우선순위는 어떻게 정해야 할까요?
-
-## 큰 그림
-
-![Software Engineering 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/09/09-01-concept-at-a-glance.ko.png)
-
-*Software Engineering 101 9장 흐름 개요*
 
 ## 왜 중요한가
 

@@ -28,21 +28,17 @@ That usually slows the ramp instead of accelerating it. In the first 90 days, th
 
 This is post 8 in the Data Science Career 101 series.
 
+
+![data science career 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/08/08-01-concept-at-a-glance.en.png)
+*data science career 101 chapter 8 flow overview*
+> In onboarding, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
+
 ## Questions to Keep in Mind
 
 - How should you think about the first 30, 60, and 90 days in a data role?
 - What should you listen for and document before trying to move fast?
 - Why is a data map one of the most useful early artifacts?
 
-## Big Picture
-
-![data science career 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/08/08-01-concept-at-a-glance.en.png)
-
-*data science career 101 chapter 8 flow overview*
-
-This picture places Settling into the First Data Job inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> In onboarding, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
 ## What You Will Learn
 
 - Onboarding *30/60/90*

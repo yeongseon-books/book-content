@@ -34,19 +34,14 @@ This is the 8th article in the Python DB-API 101 series.
 
 *SQLite connection Management: thread-safety, check_same_thread, and pooling*
 
+![python db-api 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/08/08-02-mental-model-a-connection-is-a-file-hand.en.png)
+*python db-api 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - What are SQLite's three thread-safety modes (single, multi, serialized) and how do you check which one you have?
 - What does `sqlite3.connect(check_same_thread=True)` actually protect against, and what becomes risky when you flip it to False?
 - When is per-thread vs shared connection appropriate?
-
-## Big Picture
-
-![python db-api 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/08/08-02-mental-model-a-connection-is-a-file-hand.en.png)
-
-*python db-api 101 chapter 8 flow overview*
-
-This picture places SQLite Connection Management: thread-safety, check_same_thread, and Pooling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

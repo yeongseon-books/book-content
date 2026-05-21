@@ -26,19 +26,14 @@ Many Korean teams search across a corpus where the query is Korean but half the 
 
 This is the third post in the Korean AI Stack 101 series. Here, we use BGE-M3 to measure a dense multilingual baseline over mixed Korean-English corpora before adding more complex retrieval signals.
 
+![Korean AI Stack 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/03/03-01-core-flow.en.png)
+*Korean AI Stack 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - Where does BGE-M3 outperform KoSimCSE on a corpus mixing Korean and English?
 - What does it mean for a single model to emit dense, sparse, and multi-vector representations at once?
 - Why is the dense-only baseline often enough for the first version of multilingual search?
-
-## Big Picture
-
-![Korean AI Stack 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/03/03-01-core-flow.en.png)
-
-*Korean AI Stack 101 chapter 3 flow overview*
-
-This picture places BGE-M3 multilingual embedding in practice inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

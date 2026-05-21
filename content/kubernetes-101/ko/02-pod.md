@@ -28,17 +28,15 @@ Kubernetes를 처음 배우면 가장 먼저 헷갈리는 지점이 있습니다
 
 여기서는 Pod를 단순히 "컨테이너 하나를 싸는 껍데기"로 보지 않고, 함께 뜨고 함께 내려가며 네트워크와 볼륨을 공유하는 실행 묶음이라는 관점에서 정리하겠습니다.
 
+
+![Kubernetes 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/02/02-01-concept-at-a-glance.ko.png)
+*Kubernetes 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - Pod와 컨테이너는 정확히 어떻게 다를까요?
 - 왜 Kubernetes는 컨테이너가 아니라 Pod를 기본 단위로 삼을까요?
 - 사이드카 패턴은 어떤 상황에서 필요할까요?
-
-## 큰 그림
-
-![Kubernetes 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/02/02-01-concept-at-a-glance.ko.png)
-
-*Kubernetes 101 2장 흐름 개요*
 
 ## 왜 중요한가
 

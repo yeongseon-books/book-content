@@ -29,19 +29,15 @@ Treat design and implementation as the same activity, and the important decision
 
 This is post 3 in the Software Engineering 101 series. In this chapter, we separate the questions design answers from the questions implementation answers, then use ADRs and small examples to show how to keep that boundary visible.
 
+
+![software engineering 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/03/03-01-concept-at-a-glance.en.png)
+*software engineering 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Design vs Implementation?
 - Which signal should the example or diagram make visible for Design vs Implementation?
 - What failure should be prevented first when Design vs Implementation reaches a real system?
-
-## Big Picture
-
-![software engineering 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/03/03-01-concept-at-a-glance.en.png)
-
-*software engineering 101 chapter 3 flow overview*
-
-This picture places Design vs Implementation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

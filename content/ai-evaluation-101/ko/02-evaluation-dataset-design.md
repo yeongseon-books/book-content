@@ -30,21 +30,16 @@ seo_description: 좋은 평가 데이터셋은 production 트래픽의 분포를
 
 여기서는 50~200건 규모의 출발용 평가 데이터셋을 어떻게 설계하고, 어디서 수집하고, 어떤 방식으로 라벨을 붙여야 하는지 정리하겠습니다.
 
+
+![평가 데이터셋 설계하기](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/02/02-01-designing-evaluation-datasets.ko.png)
+*평가 데이터셋 설계하기*
+> 평가 데이터셋은 모델을 시험하는 종이가 아니라, 제품이 실제로 만나는 요청의 압축 표본입니다.
+
 ## 먼저 던지는 질문
 
 - 좋은 평가 데이터셋은 왜 모델 시험지가 아니라 운영 표본이어야 할까요?
 - 대표 사례와 실패 사례를 어떤 비율로 섞어야 실제 품질 변화를 볼 수 있을까요?
 - eval set을 버전 관리하지 않으면 어떤 판단이 흐려질까요?
-
-## 큰 그림
-
-![평가 데이터셋 설계하기](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/02/02-01-designing-evaluation-datasets.ko.png)
-
-*평가 데이터셋 설계하기*
-
-이 그림에서는 운영에서 나온 요청, edge case, 실패 사례가 평가 데이터셋으로 정리되는 흐름을 봅니다. 좋은 평가셋은 평균 점수를 재는 도구이면서 실제 사고를 잊지 않게 하는 저장소입니다.
-
-> 평가 데이터셋은 모델을 시험하는 종이가 아니라, 제품이 실제로 만나는 요청의 압축 표본입니다.
 
 ## 왜 이 글이 중요한가
 

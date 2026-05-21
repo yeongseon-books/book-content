@@ -25,17 +25,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 Computer Networks 101 시리즈의 4번째 글입니다.
 
+
+![Computer Networks 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/04/04-01-concept-at-a-glance.ko.png)
+*Computer Networks 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - DNS 계층 구조는 어떻게 되어 있을까요?
 - recursive resolver와 캐시는 어떤 역할을 할까요?
 - A, AAAA, CNAME, MX, TXT 레코드는 각각 어디에 쓰일까요?
-
-## 큰 그림
-
-![Computer Networks 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/04/04-01-concept-at-a-glance.ko.png)
-
-*Computer Networks 101 4장 흐름 개요*
 
 ## 왜 중요한가
 

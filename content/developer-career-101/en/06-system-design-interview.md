@@ -27,21 +27,16 @@ System design interviews can look like a whiteboard drawing exercise from the ou
 
 This is post 6 in the Developer Career 101 series.
 
+
+![developer career 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/06/06-01-concept-at-a-glance.en.png)
+*developer career 101 chapter 6 flow overview*
+> System design is not about the perfect answer; it is about understanding requirements, making assumptions explicit, and explaining your tradeoffs clearly.
+
 ## Questions to Keep in Mind
 
 - What are interviewers truly evaluating in a system design round?
 - In what order should you move through requirements, estimates, high-level design, and deep dives?
 - Why do trade-offs and bottlenecks separate shallow answers from senior ones?
-
-## Big Picture
-
-![developer career 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/06/06-01-concept-at-a-glance.en.png)
-
-*developer career 101 chapter 6 flow overview*
-
-This picture places System Design Interviews inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> System design is not about the perfect answer; it is about understanding requirements, making assumptions explicit, and explaining your tradeoffs clearly.
 
 ## What You Will Learn
 

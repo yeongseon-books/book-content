@@ -31,21 +31,16 @@ In this chapter, we compare shared-kernel isolation with hypervisor-based isolat
 
 > Containers and VMs solve different boundary problems. Choosing well means matching the boundary to the workload.
 
+
+![containers 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/09/09-01-concept-at-a-glance.en.png)
+*containers 101 chapter 9 flow overview*
+> Containers share the host kernel for speed; VMs run their own kernel for isolation. Neither is universally "better" — the choice depends on your isolation and resource trade-offs.
+
 ## Questions to Keep in Mind
 
 - Kernel sharing* vs *hypervisor?
 - Differences in *isolation level?
 - Startup time* and *resource* comparison?
-
-## Big Picture
-
-![containers 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/09/09-01-concept-at-a-glance.en.png)
-
-*containers 101 chapter 9 flow overview*
-
-This picture places Containers vs VMs inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Containers share the host kernel for speed; VMs run their own kernel for isolation. Neither is universally "better" — the choice depends on your isolation and resource trade-offs.
 
 ## Why It Matters
 

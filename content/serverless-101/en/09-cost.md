@@ -28,19 +28,15 @@ Duration, memory, data transfer, provisioned capacity, and downstream managed se
 
 This is post 9 in the Serverless 101 series.
 
+
+![serverless 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/09/09-01-concept-at-a-glance.en.png)
+*serverless 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Cost?
 - Which signal should the example or diagram make visible for Cost?
 - What failure should be prevented first when Cost reaches a real system?
-
-## Big Picture
-
-![serverless 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/09/09-01-concept-at-a-glance.en.png)
-
-*serverless 101 chapter 9 flow overview*
-
-This picture places Cost inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

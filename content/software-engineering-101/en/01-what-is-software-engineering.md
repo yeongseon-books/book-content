@@ -29,19 +29,15 @@ In real teams, the important question is no longer "Can we write code?" but "Can
 
 This is the first post in the Software Engineering 101 series. In this chapter, we use that boundary as the starting mental model: software engineering is not just producing code, but building a system that stays understandable and changeable over time.
 
+
+![software engineering 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/01/01-01-concept-at-a-glance.en.png)
+*software engineering 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What Is Software Engineering??
 - Which signal should the example or diagram make visible for What Is Software Engineering??
 - What failure should be prevented first when What Is Software Engineering? reaches a real system?
-
-## Big Picture
-
-![software engineering 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/01/01-01-concept-at-a-glance.en.png)
-
-*software engineering 101 chapter 1 flow overview*
-
-This picture places What Is Software Engineering? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

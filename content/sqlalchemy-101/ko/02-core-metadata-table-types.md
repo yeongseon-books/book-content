@@ -33,21 +33,15 @@ seo_description: MetaData, Table, Column으로 스키마를 Python 객체로 모
 
 *SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기*
 
+![SQLAlchemy 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/02/02-02-why-this-matters.ko.png)
+*SQLAlchemy 101 2장 흐름 개요*
+> SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - `MetaData`는 어떤 역할을 하고 왜 스키마 카탈로그라고 부를까요?
 - `Table`과 `Column`을 Python 객체로 두면 어떤 실수가 줄어들까요?
 - SQLAlchemy 타입 시스템은 SQLite 같은 데이터베이스 차이를 어떻게 흡수할까요?
-
-## 큰 그림
-
-![SQLAlchemy 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/02/02-02-why-this-matters.ko.png)
-
-*SQLAlchemy 101 2장 흐름 개요*
-
-이 그림에서는 SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> SQLAlchemy Core - MetaData, Table, Column으로 schema를 Python 객체로 만들기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 

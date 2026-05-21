@@ -29,19 +29,15 @@ This is the first post in the Computer Science 101 series.
 
 In this article, we'll define what computer science actually studies, why abstraction is the field's shared tool, and how the rest of the series connects into one map.
 
+
+![Computer Science 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/01/01-01-concept-at-a-glance.en.png)
+*Computer Science 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What Is Computer Science??
 - Which signal should the example or diagram make visible for What Is Computer Science??
 - What failure should be prevented first when What Is Computer Science? reaches a real system?
-
-## Big Picture
-
-![Computer Science 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/01/01-01-concept-at-a-glance.en.png)
-
-*Computer Science 101 chapter 1 flow overview*
-
-This picture places What Is Computer Science? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions This Article Answers
 

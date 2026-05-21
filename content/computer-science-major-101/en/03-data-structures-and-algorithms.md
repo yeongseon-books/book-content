@@ -31,21 +31,16 @@ last_reviewed: '2026-05-14'
 
 This is post 3 in the Computer Science Major 101 series.
 
+
+![computer science major 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/03/03-01-dsa-problem-solving-map.en.png)
+*computer science major 101 chapter 3 flow overview*
+> Data structures and algorithms are not things to memorize—they are *patterns*. When you see a problem, the right structure should come to mind automatically.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Data Structures and Algorithms?
 - Which signal should the example or diagram make visible for Data Structures and Algorithms?
 - What failure should be prevented first when Data Structures and Algorithms reaches a real system?
-
-## Big Picture
-
-![computer science major 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/03/03-01-dsa-problem-solving-map.en.png)
-
-*computer science major 101 chapter 3 flow overview*
-
-This picture places Data Structures and Algorithms inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Data structures and algorithms are not things to memorize—they are *patterns*. When you see a problem, the right structure should come to mind automatically.
 
 ## What You Will Learn
 

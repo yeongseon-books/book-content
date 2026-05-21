@@ -28,19 +28,15 @@ This is post 9 in the Functional Programming 101 series.
 
 Pipelines help because they make execution order visible. Instead of nesting calls from the inside out, you let data move across named stages. That shift is especially valuable in production data flows, where debugging means asking which step changed the value and why.
 
+
+![Functional Programming 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/09/09-01-how-a-readable-pipeline-flows.en.png)
+*Functional Programming 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Function Composition and Pipelines?
 - Which signal should the example or diagram make visible for Function Composition and Pipelines?
 - What failure should be prevented first when Function Composition and Pipelines reaches a real system?
-
-## Big Picture
-
-![Functional Programming 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/09/09-01-how-a-readable-pipeline-flows.en.png)
-
-*Functional Programming 101 chapter 9 flow overview*
-
-This picture places Function Composition and Pipelines inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

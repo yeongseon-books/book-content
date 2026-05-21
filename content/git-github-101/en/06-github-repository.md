@@ -39,19 +39,15 @@ This is the sixth post in the Git & GitHub 101 series. Here, we connect a local 
 
 Up through Episode 5, each command ran inside one machine. Starting now, the local repository becomes something other people can see and other machines can keep working on.
 
+
+![Git & GitHub 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/06/06-01-mental-model.en.png)
+*Git & GitHub 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - What exactly is a `remote`, and why is the first one conventionally called `origin`?
 - Which commands, in what order, connect an empty GitHub repository to your local one?
 - What two things does `git push -u origin main` do in a single shot?
-
-## Big Picture
-
-![Git & GitHub 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/06/06-01-mental-model.en.png)
-
-*Git & GitHub 101 chapter 6 flow overview*
-
-This picture places Creating a GitHub repository - remote, push, and pull in one go inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

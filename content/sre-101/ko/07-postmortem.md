@@ -28,21 +28,16 @@ title: "SRE 101 (7/10): Postmortem"
 
 이 글은 SRE 101 시리즈의 7번째 글입니다. 여기서는 postmortem을 학습 시스템으로 보고, blameless 원칙, 문서 템플릿, 액션 아이템 추적, 조직 차원의 공유 방식까지 정리합니다.
 
+
+![SRE 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/07/07-01-concept-at-a-glance.ko.png)
+*SRE 101 7장 흐름 개요*
+> 포스트모템은 장애 설명이 아니라, 같은 장애를 덜 겪게 만드는 학습 시스템입니다.
+
 ## 먼저 던지는 질문
 
 - 포스트모템은 왜 보고서보다 학습 장치에 가깝다고 할까요?
 - blameless 원칙이 없으면 왜 중요한 정보가 빠질까요?
 - 좋은 포스트모템 문서에는 어떤 항목이 반드시 들어가야 할까요?
-
-## 큰 그림
-
-![SRE 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/07/07-01-concept-at-a-glance.ko.png)
-
-*SRE 101 7장 흐름 개요*
-
-Postmortem을 학습 시스템으로 봅니다. 장애가 문서로 끝나지 않고, 그 문서가 액션으로 연결되며, 액션이 추적과 리뷰로 이어질 때 재발 방지 효과가 생깁니다.
-
-> 포스트모템은 장애 설명이 아니라, 같은 장애를 덜 겪게 만드는 학습 시스템입니다.
 
 ## 왜 이 주제가 중요한가
 

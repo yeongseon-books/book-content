@@ -26,21 +26,16 @@ As soon as you go one step deeper into linear algebra, a natural question appear
 
 This is post 6 in the Linear Algebra 101 series. Here we will tie linear independence, basis, dimension, and rank into one picture.
 
+
+![linear algebra 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/06/06-01-concept-at-a-glance.en.png)
+*linear algebra 101 chapter 6 flow overview*
+> Basis and dimension are the language that defines a vector space. Once a basis is fixed, every point in that space has a unique representation, and changing basis is just a change of coordinates.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Basis and Dimension?
 - Which signal should the example or diagram make visible for Basis and Dimension?
 - What failure should be prevented first when Basis and Dimension reaches a real system?
-
-## Big Picture
-
-![linear algebra 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/06/06-01-concept-at-a-glance.en.png)
-
-*linear algebra 101 chapter 6 flow overview*
-
-This picture places Basis and Dimension inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Basis and dimension are the language that defines a vector space. Once a basis is fixed, every point in that space has a unique representation, and changing basis is just a change of coordinates.
 
 ## Questions This Post Answers
 

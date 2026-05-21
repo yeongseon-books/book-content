@@ -24,17 +24,14 @@ seo_description: 임베딩 비교는 높은 점수 하나보다 유사 문장과
 
 이 글은 Korean AI Stack 101 시리즈의 첫 번째 글입니다. 여기서는 이후 검색 설계의 기준선이 될 수 있도록, 한국어 임베딩 모델을 재현 가능하게 비교하는 프레임을 먼저 만듭니다.
 
+![Korean AI Stack 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/01/01-01-core-flow.ko.png)
+*Korean AI Stack 101 1장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 영어 중심 임베딩 모델은 한국어 비중이 높은 데이터에서 어디서 자주 무너질까요?
 - 코사인 점수 하나보다 유사 쌍과 무관 쌍 사이의 간격이 왜 더 쓸모 있을까요?
 - 한국어 텍스트에 영어 기술 용어가 자주 섞일 때는 무엇부터 시험해야 할까요?
-
-## 큰 그림
-
-![Korean AI Stack 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/01/01-01-core-flow.ko.png)
-
-*Korean AI Stack 101 1장 흐름 개요*
 
 ## 핵심 흐름
 

@@ -27,21 +27,15 @@ An agent does not see one abstract “window.” It sees a contested budget shar
 
 This is post 3 in the Harness Engineering 101 series. Here we treat context as an allocation problem instead of a dumping ground.
 
+![Context harness - designing what the agent should know and not know](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/03/03-01-context-harness-designing-what-the-agent.en.png)
+*Context harness - designing what the agent should know and not know*
+> The goal of a Context Harness is not more information; it is showing the agent only the information needed for the current decision.
+
 ## Questions to Keep in Mind
 
 - Why is a Context Harness a budget-allocation problem rather than infinite memory?
 - By what rule should you decide what the agent sees and what stays hidden?
 - As retrieved context grows, how do you preserve precision?
-
-## Big Picture
-
-![Context harness - designing what the agent should know and not know](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/03/03-01-context-harness-designing-what-the-agent.en.png)
-
-*Context harness - designing what the agent should know and not know*
-
-This picture shows the Context Harness selecting what the agent should see and what should stay hidden. Context gets better not by growing larger, but by placing the evidence needed for the current task accurately.
-
-> The goal of a Context Harness is not more information; it is showing the agent only the information needed for the current decision.
 
 ## Context Is a Resource
 

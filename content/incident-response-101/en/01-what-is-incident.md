@@ -28,21 +28,16 @@ Without a shared threshold, teams drift in opposite directions. Some page everyo
 
 This is the first post in the Incident Response 101 series. This post explains how to define an incident around customer impact, duration, and response thresholds so the rest of the incident process has a stable starting point.
 
+
+![incident response 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/01/01-01-diagram-at-a-glance.en.png)
+*incident response 101 chapter 1 flow overview*
+> Without clear definitions, incident response becomes reactive and inconsistent. A shared threshold makes the first decision reliable.
+
 ## Questions to Keep in Mind
 
 - Which problems should count as an incident instead of a regular bug?
 - How is an alert different from an incident?
 - What metrics make customer impact concrete enough to page people?
-
-## Big Picture
-
-![incident response 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/01/01-01-diagram-at-a-glance.en.png)
-
-*incident response 101 chapter 1 flow overview*
-
-This picture places What is an Incident? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Without clear definitions, incident response becomes reactive and inconsistent. A shared threshold makes the first decision reliable.
 
 ## Why this topic matters
 

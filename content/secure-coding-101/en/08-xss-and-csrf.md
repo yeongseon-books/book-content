@@ -30,19 +30,15 @@ In this chapter, we will treat browser security as a system of output escaping, 
 
 > XSS runs attacker-controlled code in our page. CSRF abuses the user's existing authority to send a request they did not mean to send.
 
+
+![secure coding 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/08/08-01-concept-at-a-glance.en.png)
+*secure coding 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying XSS and CSRF Defense?
 - Which signal should the example or diagram make visible for XSS and CSRF Defense?
 - What failure should be prevented first when XSS and CSRF Defense reaches a real system?
-
-## Big Picture
-
-![secure coding 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/08/08-01-concept-at-a-glance.en.png)
-
-*secure coding 101 chapter 8 flow overview*
-
-This picture places XSS and CSRF Defense inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions This Chapter Answers
 

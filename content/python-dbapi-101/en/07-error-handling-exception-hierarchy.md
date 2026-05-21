@@ -34,19 +34,14 @@ This is the 7th article in the Python DB-API 101 series.
 
 *PEP 249 exception hierarchy and SQLite error handling*
 
+![python db-api 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/07/07-02-mental-model-an-exception-is-a-signal-ab.en.png)
+*python db-api 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - What do the eight PEP 249 exceptions mean and how are they related?
 - How does `sqlite3` map SQLite error codes (SQLITE_BUSY, SQLITE_CONSTRAINT, ...) to PEP 249 classes?
 - Which of `OperationalError`, `IntegrityError`, `ProgrammingError` is safe to retry and which one is a bug?
-
-## Big Picture
-
-![python db-api 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/07/07-02-mental-model-an-exception-is-a-signal-ab.en.png)
-
-*python db-api 101 chapter 7 flow overview*
-
-This picture places PEP 249 Exception Hierarchy and SQLite Error Handling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

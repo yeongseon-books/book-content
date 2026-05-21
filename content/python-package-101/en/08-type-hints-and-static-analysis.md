@@ -28,19 +28,14 @@ The moment other developers import your package, they need more than working cod
 
 This is post 8 in the Python Package 101 series. Here we use type hints, `mypy`, and `py.typed` to turn Python packaging into something safer to consume and easier to refactor.
 
+![Python Package 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/08/08-01-mental-model.en.png)
+*Python Package 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why are type hints needed and do they affect runtime?
 - What kinds of errors does `mypy` catch?
 - Why is the `py.typed` marker file needed?
-
-## Big Picture
-
-![Python Package 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/08/08-01-mental-model.en.png)
-
-*Python Package 101 chapter 8 flow overview*
-
-This picture places Type Hints and Static Analysis inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What you will learn
 

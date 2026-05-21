@@ -28,21 +28,16 @@ A good capstone topic is not the flashiest topic. It is the one your team can ex
 
 This is post 2 in the Capstone Project 101 series. It explains how to compare candidate topics and how to shrink an attractive idea into a semester-sized project.
 
+
+![capstone project 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/02/02-01-the-flow-at-a-glance.en.png)
+*capstone project 101 chapter 2 flow overview*
+> Choosing well means balancing fresh ideas against the time constraint. The best topic is one where a demoable result appears within weeks, not months.
+
 ## Questions to Keep in Mind
 
 - What qualities make a topic strong enough for a capstone?
 - How do you separate a trendy idea from a deliverable one?
 - Which shared criteria should the team use when comparing options?
-
-## Big Picture
-
-![capstone project 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/02/02-01-the-flow-at-a-glance.en.png)
-
-*capstone project 101 chapter 2 flow overview*
-
-This picture places Choosing a Topic inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Choosing well means balancing fresh ideas against the time constraint. The best topic is one where a demoable result appears within weeks, not months.
 
 ## What You Will Learn
 

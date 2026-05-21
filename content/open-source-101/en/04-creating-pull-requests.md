@@ -28,21 +28,16 @@ This is post 4 in the Open Source 101 series.
 
 Here, we will walk through the full contribution path from fork and branch to commit history, description, review response, and post-merge cleanup.
 
+
+![open source 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/04/04-01-put-the-flow-in-your-head-first.en.png)
+*open source 101 chapter 4 flow overview*
+> A pull request is not a finished product you submit. It is an invitation to collaborate and improve the code together.
+
 ## Questions to Keep in Mind
 
 - What does a pull request that maintainers welcome actually look like?
 - Why should fork, branch, commit, and PR each stay separate?
 - What roles do commit messages and the PR description play?
-
-## Big Picture
-
-![open source 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/04/04-01-put-the-flow-in-your-head-first.en.png)
-
-*open source 101 chapter 4 flow overview*
-
-This picture places Creating Pull Requests inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A pull request is not a finished product you submit. It is an invitation to collaborate and improve the code together.
 
 ## Why It Matters
 

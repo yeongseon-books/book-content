@@ -28,21 +28,16 @@ To understand probability well, you need to look past the number itself and ask 
 
 This is the first post in the Probability 101 series. It sets up the core idea of probability, contrasts the frequentist and Bayesian views, and gives you a small code experiment you can use as a mental anchor for the rest of the series.
 
+
+![probability 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/01/01-01-concept-at-a-glance.en.png)
+*probability 101 chapter 1 flow overview*
+> What Is Probability? requires both definition and intuition, learned through concrete examples.
+
 ## Questions to Keep in Mind
 
 - What probability is actually measuring?
 - Why sample space and events come before any calculation?
 - How the frequentist and Bayesian views answer different questions?
-
-## Big Picture
-
-![probability 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/01/01-01-concept-at-a-glance.en.png)
-
-*probability 101 chapter 1 flow overview*
-
-This picture places What Is Probability? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> What Is Probability? requires both definition and intuition, learned through concrete examples.
 
 ## Why It Matters
 

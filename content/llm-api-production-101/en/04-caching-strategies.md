@@ -28,21 +28,15 @@ This post builds the smallest useful cache for an LLM API path: an in-memory cac
 
 This is the fourth post in the LLM API Production 101 series. Here we focus on request-hash caching strategies that reduce both cost and latency.
 
+![Caching strategies: reducing cost and latency](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/04/04-01-caching-strategies-reducing-cost-and-lat.en.png)
+*Caching strategies: reducing cost and latency*
+> An LLM cache is safe only when the cache key preserves the meaning of the request.
+
 ## Questions to Keep in Mind
 
 - Why is an LLM cache a request-identity contract rather than just a response store?
 - What belongs in a cache key besides the prompt text?
 - Which paths should avoid caching even when calls are expensive?
-
-## Big Picture
-
-![Caching strategies: reducing cost and latency](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/04/04-01-caching-strategies-reducing-cost-and-lat.en.png)
-
-*Caching strategies: reducing cost and latency*
-
-This picture treats caching as a contract for deciding when two requests are truly the same work. The cache key must include the values that can change the meaning of the answer.
-
-> An LLM cache is safe only when the cache key preserves the meaning of the request.
 
 ## Runtime setup
 

@@ -28,21 +28,16 @@ This is post 8 in the Open Source 101 series.
 
 Here, we will define the maintainer not as a heroic programmer who does everything alone, but as the operator who keeps project flow and responsibility sustainable over time.
 
+
+![open source 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/08/08-01-the-maintainer-loop-in-one-line.en.png)
+*open source 101 chapter 8 flow overview*
+> Maintaining a project is not just writing code. It is keeping people, decisions, and sustainability in balance.
+
 ## Questions to Keep in Mind
 
 - What responsibilities does a maintainer really carry?
 - Why should triage, review, and release be seen as one operating loop?
 - Why are delegation and successor growth sustainability issues rather than optional extras?
-
-## Big Picture
-
-![open source 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/08/08-01-the-maintainer-loop-in-one-line.en.png)
-
-*open source 101 chapter 8 flow overview*
-
-This picture places The Maintainer Role inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Maintaining a project is not just writing code. It is keeping people, decisions, and sustainability in balance.
 
 ## Why It Matters
 

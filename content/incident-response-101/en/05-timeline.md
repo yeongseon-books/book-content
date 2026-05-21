@@ -28,21 +28,16 @@ A useful timeline is not a polished story reconstructed after the fact. It is a 
 
 This is post 5 in the Incident Response 101 series. This post explains how to record incident events in real time, merge multiple channels into one chronology, and anchor the moments that matter for later RCA and postmortem work.
 
+
+![incident response 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/05/05-01-diagram-at-a-glance.en.png)
+*incident response 101 chapter 5 flow overview*
+> The timeline is for the postmortem investigator, not the responder. Record facts and timestamps, not feelings.
+
 ## Questions to Keep in Mind
 
 - Why should timeline work begin during the incident instead of after it?
 - Which channels need to be collected besides the main response chat?
 - How do you separate recorded facts from later theories?
-
-## Big Picture
-
-![incident response 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/05/05-01-diagram-at-a-glance.en.png)
-
-*incident response 101 chapter 5 flow overview*
-
-This picture places Writing the Timeline inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> The timeline is for the postmortem investigator, not the responder. Record facts and timestamps, not feelings.
 
 ## Why this topic matters
 

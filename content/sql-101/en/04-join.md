@@ -28,21 +28,16 @@ That is why JOIN is less about memorizing keywords and more about thinking in re
 
 This is post 4 in the SQL 101 series. Here we treat JOIN as a relationship operation between row sets, not as a formatting trick for columns.
 
+
+![sql 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/04/04-01-join-result-flow.en.png)
+*sql 101 chapter 4 flow overview*
+> JOIN is not about memorizing the types; it's about predicting what the result will look like when you connect two tables on a condition, and knowing when to use each type.
+
 ## Questions to Keep in Mind
 
 - How do INNER, LEFT, RIGHT, FULL, and CROSS JOIN differ?
 - Why should you inspect join keys and cardinality before anything else?
 - Why do row counts sometimes grow unexpectedly after a join?
-
-## Big Picture
-
-![sql 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/04/04-01-join-result-flow.en.png)
-
-*sql 101 chapter 4 flow overview*
-
-JOINs combine rows from multiple tables based on matching conditions. The type of join (INNER, LEFT, FULL, CROSS) and the join condition together determine both the size and the contents of the result.
-
-> JOIN is not about memorizing the types; it's about predicting what the result will look like when you connect two tables on a condition, and knowing when to use each type.
 
 ## Why It Matters
 

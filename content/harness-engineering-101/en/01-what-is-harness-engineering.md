@@ -27,21 +27,15 @@ The difference is usually not the model. It is the work environment around the m
 
 This is the first post in the Harness Engineering 101 series. It establishes the operating model for the rest of the series, so Task, Context, Constraint, Tool, Test, Feedback, Approval, and Observability read as one system rather than eight isolated tips.
 
+![What is Harness Engineering](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/01/01-01-what-is-harness-engineering.en.png)
+*What is Harness Engineering*
+> A good agent is decided more by the work environment around the model than by the model alone.
+
 ## Questions to Keep in Mind
 
 - If an agent stays unstable with a strong model, what should you inspect first?
 - How do design questions change when you treat a harness as the work environment outside the model?
 - Why is framework choice not the same decision layer as Harness Engineering?
-
-## Big Picture
-
-![What is Harness Engineering](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/01/01-01-what-is-harness-engineering.en.png)
-
-*What is Harness Engineering*
-
-This picture shows the surrounding task, context, constraints, tools, and tests supporting agent execution rather than the model alone. Harness Engineering is not pushing the model harder; it is designing the environment the model works inside.
-
-> A good agent is decided more by the work environment around the model than by the model alone.
 
 ## Why this chapter matters
 

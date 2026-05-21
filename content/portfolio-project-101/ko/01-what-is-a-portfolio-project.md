@@ -26,21 +26,16 @@ last_reviewed: '2026-05-15'
 
 이 글은 Portfolio Project 101 시리즈의 첫 번째 글입니다. 여기서는 포트폴리오 프로젝트를 숙제나 토이 저장소와 구분하는 기준을 먼저 잡고, 무엇이 있어야 검토 가능한 결과물로 읽히는지 살펴보겠습니다.
 
+
+![Portfolio Project 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/01/01-01-diagram.ko.png)
+*Portfolio Project 101 1장 흐름 개요*
+> 포트폴리오 프로젝트는 코드 한 덩어리가 아니라, 문제 정의에서 배포와 설명까지 모든 단계를 보여 주는 사례 연구입니다.
+
 ## 먼저 던지는 질문
 
 - 포트폴리오 프로젝트와 단순한 연습 저장소는 무엇이 다를까요?
 - 채용 담당자나 리뷰어는 코드보다 먼저 무엇을 확인할까요?
 - 작은 프로젝트라도 포트폴리오로 읽히게 만드는 최소 구성은 무엇일까요?
-
-## 큰 그림
-
-![Portfolio Project 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/01/01-01-diagram.ko.png)
-
-*Portfolio Project 101 1장 흐름 개요*
-
-이 그림에서는 포트폴리오 프로젝트의 정의를 입력부터 검증까지 단계로 나누어 봅니다. 관점을 전환하면, 같은 프로젝트도 단순한 연습 저장소인지 검토 가능한 포트폴리오인지가 결정됩니다.
-
-> 포트폴리오 프로젝트는 코드 한 덩어리가 아니라, 문제 정의에서 배포와 설명까지 모든 단계를 보여 주는 사례 연구입니다.
 
 ## 왜 중요한가
 

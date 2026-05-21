@@ -28,21 +28,15 @@ Recommended frameworks are LangGraph and Crew AI. Both simplify agent constructi
 
 This is the final post in the AI Agent 101 series. Here we cover end-to-end implementation examples, LangGraph vs Crew AI comparison, deployment methods, and next step learning paths.
 
+![End-to-end build map](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/10/10-01-end-to-end-build-map.en.png)
+*End-to-end build map*
+> A first agent should be more than a demo; it should be a small operating skeleton that validates boundaries, tools, memory, and eval together.
+
 ## Questions to Keep in Mind
 
 - Where should you draw the ownership boundary for the first research-assistant agent?
 - In what order should tools, memory, the agent loop, and eval be assembled so failures stay small?
 - How should you choose among raw code, LangGraph, and CrewAI for a first agent?
-
-## Big Picture
-
-![End-to-end build map](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/10/10-01-end-to-end-build-map.en.png)
-
-*End-to-end build map*
-
-This picture shows a research-assistant agent analyzing a question, searching, calculating, synthesizing, and storing conversation history as one end-to-end flow. The goal of a first agent is not feature count; it is turning the earlier design principles into a small, verifiable loop.
-
-> A first agent should be more than a demo; it should be a small operating skeleton that validates boundaries, tools, memory, and eval together.
 
 ## What We Are Building: A Research Assistant
 

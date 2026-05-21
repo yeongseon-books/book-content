@@ -29,21 +29,16 @@ This is post 3 in the Clean Code 101 series.
 
 Here we will define what “small enough” really means, walk through a safe extraction sequence, and show how side effects and argument growth tell you when to stop.
 
+
+![clean code 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/03/03-01-concept-at-a-glance.en.png)
+*clean code 101 chapter 3 flow overview*
+> Extraction makes names possible, and good names make reuse and testing easy.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Small Functions?
 - Which signal should the example or diagram make visible for Small Functions?
 - What failure should be prevented first when Small Functions reaches a real system?
-
-## Big Picture
-
-![clean code 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/03/03-01-concept-at-a-glance.en.png)
-
-*clean code 101 chapter 3 flow overview*
-
-This picture places Small Functions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Extraction makes names possible, and good names make reuse and testing easy.
 
 ## Questions this article answers
 

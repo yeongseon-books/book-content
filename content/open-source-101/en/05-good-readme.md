@@ -28,21 +28,16 @@ This is post 5 in the Open Source 101 series.
 
 Here, we will define a good README as the document that helps a first-time visitor understand and run the project within the first five minutes.
 
+
+![open source 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/05/05-01-follow-the-reader-s-order.en.png)
+*open source 101 chapter 5 flow overview*
+> A good README is not a technical manual. It is a 5-minute message that answers: What does this do? When would I use it? How do I start?
+
 ## Questions to Keep in Mind
 
 - What information does a first-time visitor look for first?
 - Why are the title, one-line summary, installation, usage example, and license the core sections?
 - When do badges and screenshots help, and when do they get in the way?
-
-## Big Picture
-
-![open source 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/05/05-01-follow-the-reader-s-order.en.png)
-
-*open source 101 chapter 5 flow overview*
-
-This picture places A Good README inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A good README is not a technical manual. It is a 5-minute message that answers: What does this do? When would I use it? How do I start?
 
 ## Why It Matters
 

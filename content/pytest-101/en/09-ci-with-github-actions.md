@@ -26,19 +26,15 @@ This is post 9 in the pytest 101 series.
 
 Local green tests are not enough when pull requests can still ship unverified combinations of Python versions, dependencies, and coverage regressions. In this article, we'll turn pytest into an operational gate by wiring one coherent GitHub Actions workflow to every push and pull request.
 
+
+![pytest 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/09/09-01-github-actions-workflow-overview.en.png)
+*pytest 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Test Automation with GitHub Actions?
 - Which signal should the example or diagram make visible for Test Automation with GitHub Actions?
 - What failure should be prevented first when Test Automation with GitHub Actions reaches a real system?
-
-## Big Picture
-
-![pytest 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/09/09-01-github-actions-workflow-overview.en.png)
-
-*pytest 101 chapter 9 flow overview*
-
-This picture places Test Automation with GitHub Actions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What This Article Covers
 

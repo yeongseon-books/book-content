@@ -28,21 +28,16 @@ This is post 7 in the Data Warehouse 101 series.
 
 In this post, we move from storage to consumption. The focus is on how metric definitions, dashboard layout, and drill-down order determine whether a chart becomes an operating tool or just another report no one trusts.
 
+
+![data warehouse 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/07/07-01-concept-at-a-glance.en.png)
+*data warehouse 101 chapter 7 flow overview*
+> BI is the process of turning data into decisions; a dashboard is one medium for that communication. Good dashboards start with the right question, not the available data.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying BI and Dashboard?
 - Which signal should the example or diagram make visible for BI and Dashboard?
 - What failure should be prevented first when BI and Dashboard reaches a real system?
-
-## Big Picture
-
-![data warehouse 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/07/07-01-concept-at-a-glance.en.png)
-
-*data warehouse 101 chapter 7 flow overview*
-
-This picture places BI and Dashboard inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> BI is the process of turning data into decisions; a dashboard is one medium for that communication. Good dashboards start with the right question, not the available data.
 
 ## Questions this article answers
 

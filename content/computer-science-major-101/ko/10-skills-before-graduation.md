@@ -28,21 +28,15 @@ last_reviewed: '2026-05-14'
 졸업이 가까워질수록 많은 학생이 비슷한 불안을 느낍니다. 과목은 거의 다 들었는데, 정말 현업에 들어갈 준비가 되었는지는 잘 모르겠다는 감각입니다.
 
 
+![Computer Science Major 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/10/10-01-graduation-skill-map.ko.png)
+*컴퓨터학과 전공 가이드 10장 흐름 개요*
+> 졸업 전 갖춰야 할 역량의 핵심은 기술적 깊이만이 아니라, 기술을 언제 어디에 써야 하고 왜 선택했는지 설명할 수 있는 능력에 있습니다.
+
 ## 먼저 던지는 질문
 
 - 졸업장만으로는 설명되지 않는 역량은 무엇일까요?
 - 기초, 시스템, 데이터, 협업, 문서화라는 다섯 축은 왜 함께 봐야 할까요?
 - 학점과 자격증만으로 실력을 설명하기 어려운 이유는 무엇일까요?
-
-## 큰 그림
-
-![Computer Science Major 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/10/10-01-graduation-skill-map.ko.png)
-
-*컴퓨터학과 전공 가이드 10장 흐름 개요*
-
-이 그림에서 보이듯 실전 엔지니어가 갖춰야 할 역량은 기술만이 아니라 문제 정의, 팀 협력, 영향력 있는 기여 능력입니다. 각 기술이 어떤 현업 문맥에서 가치를 만드는지 이해하는 것이 중요합니다.
-
-> 졸업 전 갖춰야 할 역량의 핵심은 기술적 깊이만이 아니라, 기술을 언제 어디에 써야 하고 왜 선택했는지 설명할 수 있는 능력에 있습니다.
 
 ## 이 글에서 배울 것
 

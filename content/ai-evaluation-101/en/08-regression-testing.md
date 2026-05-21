@@ -25,21 +25,16 @@ Changing one line of a prompt can break other cases.
 
 This is post 8 in the AI Evaluation 101 series. Here we cover a CI-integrated LLM regression test suite, golden datasets, and threshold-based failure policies.
 
+
+![Regression testing - Don't let Yesterday's wins break today](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/08/08-01-regression-testing-don-t-let-yesterday-s.en.png)
+*Regression testing - Don't let Yesterday's wins break today*
+> Regression testing is not a one-time evaluation ritual; it is the guardrail that protects quality whenever change enters.
+
 ## Questions to Keep in Mind
 
 - Why should regression testing move LLM evaluation from a pre-release event into the PR gate?
 - What changes should the golden dataset and thresholds block?
 - What tolerance and fail policy are needed when non-determinism makes evals noisy?
-
-## Big Picture
-
-![Regression testing - Don't let Yesterday's wins break today](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/08/08-01-regression-testing-don-t-let-yesterday-s.en.png)
-
-*Regression testing - Don't let Yesterday's wins break today*
-
-This picture shows a golden dataset and evaluation thresholds running on every PR so yesterday’s quality does not break today. Regression testing turns LLM quality from a feeling into a deployment guardrail.
-
-> Regression testing is not a one-time evaluation ritual; it is the guardrail that protects quality whenever change enters.
 
 ## Evaluate Every Time, Not Just Once
 

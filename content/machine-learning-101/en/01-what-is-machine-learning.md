@@ -26,19 +26,15 @@ Recommendation systems, fraud filters, and medical triage tools all get called �
 
 This is the first post in the Machine Learning 101 series. Here we will pin the topic down to one practical definition: machine learning means fitting a function from data, then trusting that function on inputs the model has never seen before.
 
+
+![machine learning 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/01/01-01-concept-at-a-glance.en.png)
+*machine learning 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What exactly is the model learning when we say “machine learning”?
 - Why is generalization different from scoring well on the training set?
 - Where does machine learning diverge from statistics and rule-based code?
-
-## Big Picture
-
-![machine learning 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/01/01-01-concept-at-a-glance.en.png)
-
-*machine learning 101 chapter 1 flow overview*
-
-This picture places What Is Machine Learning? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

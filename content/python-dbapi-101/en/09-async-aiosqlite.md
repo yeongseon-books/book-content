@@ -34,19 +34,14 @@ This is the 9th article in the Python DB-API 101 series.
 
 *Asynchronous SQLite with aiosqlite*
 
+![python db-api 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/09/09-02-mental-model-aiosqlite-is-sqlite3-thread.en.png)
+*python db-api 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - How does `aiosqlite` work under the hood? Is it real async I/O?
 - How should you hold connections and transactions in an async path?
 - What does the `async with` syntax guarantee, and what does it not?
-
-## Big Picture
-
-![python db-api 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/09/09-02-mental-model-aiosqlite-is-sqlite3-thread.en.png)
-
-*python db-api 101 chapter 9 flow overview*
-
-This picture places Asynchronous SQLite with aiosqlite inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

@@ -28,19 +28,14 @@ This post breaks those three apart. If they stay fuzzy, Ingress and autoscaling 
 
 This is the fourth post in the Azure Kubernetes Service 101 series. Here, we separate Pod, Deployment, and Service so the workload model behind the earlier FastAPI example becomes explicit.
 
+![azure kubernetes service 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/04/04-01-one-picture-first.en.png)
+*azure kubernetes service 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - How do Pod, ReplicaSet, and Deployment split responsibilities?
 - How does a Service hide Pod IP churn and route traffic underneath?
 - How do rolling and blue/green deploys express themselves in a Deployment?
-
-## Big Picture
-
-![azure kubernetes service 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/04/04-01-one-picture-first.en.png)
-
-*azure kubernetes service 101 chapter 4 flow overview*
-
-This picture places Pod, Deployment, Service — the three ways you express a workload inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## One picture first
 

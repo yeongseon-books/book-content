@@ -29,17 +29,15 @@ last_reviewed: '2026-05-12'
 
 이 관점을 잡고 나면 SQL도 덜 임의적으로 보입니다. SELECT, JOIN, 제약, 정규화가 모두 한 모델 위에 올라가 있다는 사실이 보이기 때문입니다. 이 글에서는 관계, 튜플, 속성, 기본키, 외래키라는 단어를 “시험용 용어”가 아니라 실제 설계 판단의 기준으로 연결해 보겠습니다.
 
+
+![Database Systems 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/02/02-01-big-picture.ko.png)
+*Database Systems 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 테이블에서 말하는 관계, 튜플, 속성은 각각 무엇을 가리킬까요?
 - 기본키와 외래키는 정확히 무엇을 보장할까요?
 - NULL과 무결성 제약은 어떤 의미를 가질까요?
-
-## 큰 그림
-
-![Database Systems 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/02/02-01-big-picture.ko.png)
-
-*Database Systems 101 2장 흐름 개요*
 
 ## 이 글에서 배울 내용
 

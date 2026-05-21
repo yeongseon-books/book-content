@@ -29,17 +29,15 @@ last_reviewed: '2026-05-12'
 
 정규화는 이 문제를 푸는 고전적 도구입니다. “각 사실은 정확히 한 곳에 둔다”는 원칙을 1NF, 2NF, 3NF라는 단계별 규칙으로 풀어낸 것이기 때문입니다. 이 글에서는 함수 종속을 중심 축으로 잡고, 왜 테이블을 쪼개야 하는지와 어디까지 쪼개야 하는지를 설명하겠습니다.
 
+
+![Database Systems 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/07/07-01-big-picture.ko.png)
+*Database Systems 101 7장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 함수 종속은 어떤 직관으로 이해하면 좋을까요?
 - 1NF, 2NF, 3NF는 각각 무엇을 금지할까요?
 - 비정규화는 언제 정당화될까요?
-
-## 큰 그림
-
-![Database Systems 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/07/07-01-big-picture.ko.png)
-
-*Database Systems 101 7장 흐름 개요*
 
 ## 이 글에서 배울 내용
 

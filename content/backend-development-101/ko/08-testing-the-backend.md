@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 Backend Development 101 시리즈의 여덟 번째 글입니다. 여기서는 unit·integration·E2E 테스트를 어떻게 나눠 생각해야 하는지, 그리고 pytest와 FastAPI TestClient로 변경에 안전한 백엔드를 만드는 방법을 살펴보겠습니다.
 
+
+![Backend Development 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/08/08-01-concept-at-a-glance.ko.png)
+*Backend Development 101 8장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - unit, integration, E2E 테스트는 각각 무엇을 검증할까요?
 - pytest로 service를 어떻게 테스트할 수 있을까요?
 - FastAPI `TestClient`는 endpoint를 어떻게 검증하게 해 줄까요?
-
-## 큰 그림
-
-![Backend Development 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/08/08-01-concept-at-a-glance.ko.png)
-
-*Backend Development 101 8장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -456,7 +454,6 @@ services:
 5. 장애 로그만으로 요청 식별자, 사용자 식별자, 실패 경로를 역추적할 수 있는지 확인합니다.
 
 이 기준선을 매 글의 주제에 연결해 두면 학습이 단발성 지식으로 끝나지 않습니다. 라우팅을 배울 때도, 테스트를 배울 때도, 배포를 배울 때도 같은 운영 질문으로 품질을 판별하게 됩니다.
-
 
 
 ### 장애 복구 훈련 시나리오

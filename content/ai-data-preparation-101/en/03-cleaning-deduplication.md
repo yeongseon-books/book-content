@@ -25,19 +25,15 @@ Teams that have processed large corpora tend to agree on one point: deduplicatio
 
 This is post 3 in the AI Data Preparation 101 series. Here we cover the basic cleaning transforms for raw text and the deduplication methods that keep training quality honest.
 
+
+![AI data preparation chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/03/03-01-big-picture.en.png)
+*AI data preparation chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - Which text-cleaning transforms are worth keeping because they solve measurable problems?
 - Why is exact dedup not enough for web-scale corpora?
 - How should you tune MinHash thresholds without creating too many false positives?
-
-## Big Picture
-
-![AI data preparation chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/03/03-01-big-picture.en.png)
-
-*AI data preparation chapter 3 flow overview*
-
-This picture places Cleaning and Deduplication inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## "Is Deduplication Really That Important?"
 

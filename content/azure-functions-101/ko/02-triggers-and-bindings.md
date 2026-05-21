@@ -31,21 +31,15 @@ seo_description: 앞 장에서 “함수 하나에는 트리거 하나가 묶인
 
 이제 함수가 깨어나는 원인과, 함수가 바깥세상과 데이터를 주고받는 선이 어떻게 나뉘는지 차례로 보겠습니다.
 
+![Azure Functions 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/02/02-01-a-trigger-is-the-cause-that-wakes-a-func.ko.png)
+*Azure Functions 101 2장 흐름 개요*
+> 트리거와 바인딩 — 함수 입출력의 모든 것의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - 트리거와 바인딩은 근본적으로 무엇이 다르고 왜 분리되어 있을까요?
 - 입력 바인딩과 출력 바인딩은 코드를 얼마나 줄여 주고, 대신 어떤 제약을 가져올까요?
 - 함수 하나에 여러 트리거를 붙일 수 없다면 그 이유는 무엇일까요?
-
-## 큰 그림
-
-![Azure Functions 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/02/02-01-a-trigger-is-the-cause-that-wakes-a-func.ko.png)
-
-*Azure Functions 101 2장 흐름 개요*
-
-이 그림에서는 트리거와 바인딩 — 함수 입출력의 모든 것를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 트리거와 바인딩 — 함수 입출력의 모든 것의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

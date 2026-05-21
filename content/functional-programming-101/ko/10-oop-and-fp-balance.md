@@ -28,17 +28,15 @@ last_reviewed: '2026-05-12'
 
 Python은 애초에 다중 패러다임 언어입니다. 데이터 모델은 객체지향적으로 두고, 핵심 계산은 순수 함수로 분리하고, 프레임워크 경계에서는 다시 클래스나 핸들러를 쓰는 식의 혼합 설계가 가장 현실적입니다. 중요한 것은 신념이 아니라 선택 기준입니다.
 
+
+![Functional Programming 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/10/10-01-where-to-draw-the-oop-fp-boundary.ko.png)
+*Functional Programming 101 10장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 객체지향과 함수형은 각각 어떤 문제에 더 잘 맞을까요?
 - 두 패러다임을 섞을 때 가장 실용적인 기본 패턴은 무엇일까요?
 - Functional Core, Imperative Shell은 Python에서 어떻게 적용할 수 있을까요?
-
-## 큰 그림
-
-![Functional Programming 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/10/10-01-where-to-draw-the-oop-fp-boundary.ko.png)
-
-*Functional Programming 101 10장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -525,7 +523,6 @@ def test_fee_never_negative(amount: int) -> None:
 ```
 
 테스트에서 중요한 것은 "예제가 맞다"가 아니라 "성질이 유지된다"입니다. 이 관점을 유지하면 OOP와 FP를 섞어도 설계 품질이 흔들리지 않습니다.
-
 
 
 ## 검증 시나리오: 경계 조건을 먼저 잠그기

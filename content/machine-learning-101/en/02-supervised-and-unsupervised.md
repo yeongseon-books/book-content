@@ -26,19 +26,15 @@ Most beginner ML mistakes are not model mistakes. They are framing mistakes. Tea
 
 This is post 2 in the Machine Learning 101 series. Here we will separate supervised learning from unsupervised learning and use that split to clarify where classification, regression, and clustering actually belong.
 
+
+![machine learning 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/02/02-01-concept-at-a-glance.en.png)
+*machine learning 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - When labels are present versus absent, do we reach for the same algorithms?
 - How do classification and regression differ if both are supervised learning?
 - Why is clustering not just “classification without labels”?
-
-## Big Picture
-
-![machine learning 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/02/02-01-concept-at-a-glance.en.png)
-
-*machine learning 101 chapter 2 flow overview*
-
-This picture places Supervised and Unsupervised Learning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

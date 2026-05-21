@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 사용자 도구, 런타임 데몬, 저수준 실행기, Kubernetes 인터페이스를 각각 어떤 책임으로 나눠 이해해야 하는지 살펴봅니다.
 
+
+![Containers 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/03/03-01-concept-at-a-glance.ko.png)
+*Containers 101 3장 흐름 개요*
+> Runtime의 핵심은 '더 빠르고 작다'는 게 아니라, 어디서 디버깅하고 어디서 스케일링을 제어할지 아는 것입니다.
+
 ## 먼저 던지는 질문
 
 - Docker, containerd, runc는 왜 따로 존재할까요?
 - 고수준 런타임과 저수준 런타임은 무엇이 다를까요?
 - Docker → containerd → runc 흐름은 어떻게 이어질까요?
-
-## 큰 그림
-
-![Containers 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/03/03-01-concept-at-a-glance.ko.png)
-
-*Containers 101 3장 흐름 개요*
-
-이 그림에서는 Runtime이 Docker, containerd, runc 세 계층으로 어떻게 나뉘며, 각 계층이 어떤 책임을 가지는지 봅니다. 중요한 것은 자신이 어느 계층을 다루고 있는지 파악하는 것입니다.
-
-> Runtime의 핵심은 '더 빠르고 작다'는 게 아니라, 어디서 디버깅하고 어디서 스케일링을 제어할지 아는 것입니다.
 
 ## 왜 중요한가
 

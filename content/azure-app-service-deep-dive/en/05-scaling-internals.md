@@ -53,19 +53,14 @@ the safe facts are clear.
 This episode goes one level deeper without inventing private internals.
 The goal is to map the **publicly observable scale-decision loop** into a usable worker-pool mental model.
 
+![azure app service deep dive chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/05/05-01-the-control-path-in-one-diagram.en.png)
+*azure app service deep dive chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - On what metric sources and what cadence does auto-scale evaluate rules?
 - Scale-out and scale-up are not the same decision tree — who decides what, and how?
 - When should you turn per-site scaling on, and when is it dangerous?
-
-## Big Picture
-
-![azure app service deep dive chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/05/05-01-the-control-path-in-one-diagram.en.png)
-
-*azure app service deep dive chapter 5 flow overview*
-
-This picture places Scaling internals — how Scale Out decisions become new workers inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## The control path in one diagram
 

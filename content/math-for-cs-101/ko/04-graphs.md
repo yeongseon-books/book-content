@@ -30,20 +30,16 @@ title: "Math for CS 101 (4/10): 그래프"
 
 여기서는 그래프를 알고리즘 이름 모음이 아니라 관계 중심 데이터를 설명하는 공통 문법으로 보고, 표현과 탐색의 기초를 정리해 보겠습니다.
 
+
+![Math for CS 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/04/04-01-concept-at-a-glance.ko.png)
+*Math for CS 101 4장 흐름 개요*
+> 그래프는 관계를 구조화하고, 복잡한 문제를 연결성과 경로로 단순화하는 도구입니다.
+
 ## 먼저 던지는 질문
 
 - 관계가 있는 데이터를 왜 그래프로 표현할까요?
 - 정점과 간선은 실무 모델에서 각각 무엇에 해당할까요?
 - 방향 그래프와 무방향 그래프는 어떻게 다를까요?
-
-## 큰 그림
-
-![Math for CS 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/04/04-01-concept-at-a-glance.ko.png)
-
-*Math for CS 101 4장 흐름 개요*
-이 그림은 그래프를 구조적 관계로 보고, 탐색과 경로 문제가 어떻게 연결되는지 보여줍니다.
-
-> 그래프는 관계를 구조화하고, 복잡한 문제를 연결성과 경로로 단순화하는 도구입니다.
 
 ## 왜 중요한가
 

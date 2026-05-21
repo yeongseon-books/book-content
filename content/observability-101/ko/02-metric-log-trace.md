@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 이 글은 Observability 101 시리즈의 2번째 글입니다.
 
+
+![Observability 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/02/02-01-concept-at-a-glance.ko.png)
+*Observability 101 2장 흐름 개요*
+> 메트릭, 로그, 트레이스는 각각을 빠르게 신호로 씁니다. 메트릭만 보면 증상을 보지만 왜를 찾을 수 없고, 로그만 머십으면 비용만 올라갑니다.
+
 ## 먼저 던지는 질문
 
 - 메트릭, 로그, 트레이스는 각각 어떤 질문에 답할까요?
 - 세 신호의 데이터 형태는 어떻게 다를까요?
 - 카디널리티와 비용은 어디에서 커질까요?
-
-## 큰 그림
-
-![Observability 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/02/02-01-concept-at-a-glance.ko.png)
-
-*Observability 101 2장 흐름 개요*
-
-메트릭, 로그, 트레이스 각각이 다른 질문에 답합니다. 어떤 값이 들어오고, 어느 구간이 느린지, 왜 실패했는지는 다른 신호로 봐야 합니다. 한 신호만으로는 불완전합니다.
-
-> 메트릭, 로그, 트레이스는 각각을 빠르게 신호로 씁니다. 메트릭만 보면 증상을 보지만 왜를 찾을 수 없고, 로그만 머십으면 비용만 올라갑니다.
 
 ## 왜 중요한가
 

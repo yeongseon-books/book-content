@@ -31,21 +31,16 @@ last_reviewed: '2026-05-04'
 
 This is post 2 in the Information Security 101 series.
 
+
+![information security 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/02/02-01-big-picture.en.png)
+*information security 101 chapter 2 flow overview*
+> Authentication and authorization are not just about verifying identity. They are about proving "user X performed action Y at time Z from location L" with audit trails that survive server restarts.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Authentication and Authorization?
 - Which signal should the example or diagram make visible for Authentication and Authorization?
 - What failure should be prevented first when Authentication and Authorization reaches a real system?
-
-## Big Picture
-
-![information security 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/02/02-01-big-picture.en.png)
-
-*information security 101 chapter 2 flow overview*
-
-This picture places Authentication and Authorization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Authentication and authorization are not just about verifying identity. They are about proving "user X performed action Y at time Z from location L" with audit trails that survive server restarts.
 
 ## What You Will Learn
 

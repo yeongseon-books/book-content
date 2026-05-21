@@ -30,21 +30,15 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 이제 워커가 연결된 뒤 호스트와 워커 사이에 놓이는 실제 wire protocol 경계를 선명하게 보겠습니다.
 
+![Azure Functions Deep Dive 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/03/03-01-all-on-one-screen.ko.png)
+*Azure Functions Deep Dive 3장 흐름 개요*
+> gRPC 이벤트 스트림 — 호스트와 워커는 무엇을 주고받는가의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - 호스트-워커 gRPC 스트림에는 어떤 메시지가 어떤 방식으로 실릴까요?
 - 스트림이 끊기면 호스트와 워커는 각각 무엇을 가정할까요?
 - 큰 페이로드는 이 스트림 위를 어떻게 지나가며, 어디에서 한계가 드러날까요?
-
-## 큰 그림
-
-![Azure Functions Deep Dive 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/03/03-01-all-on-one-screen.ko.png)
-
-*Azure Functions Deep Dive 3장 흐름 개요*
-
-이 그림에서는 gRPC 이벤트 스트림 — 호스트와 워커는 무엇을 주고받는가를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> gRPC 이벤트 스트림 — 호스트와 워커는 무엇을 주고받는가의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

@@ -29,17 +29,15 @@ last_reviewed: '2026-05-16'
 
 그래서 서버리스 입문에서 가장 먼저 잡아야 할 질문은 “함수를 어떻게 쓰지?”가 아닙니다. **“이 워크로드를 정말 서버리스로 시작해도 되는가?”** 입니다. 이 판단을 먼저 해 두어야 첫 번째 함수 예제도 의미가 생기고, 뒤이어 나올 FaaS, 트리거, 콜드 스타트, 비용 이야기도 같은 멘탈 모델 안에서 읽힙니다.
 
+
+![Serverless 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/01/01-01-concept-at-a-glance.ko.png)
+*Serverless 101 1장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 서버리스는 정확히 무엇을 플랫폼에 넘기는 실행 모델일까요?
 - 첫 번째 서버리스 함수는 어떤 입력 계약과 응답 계약으로 시작해야 할까요?
 - 로컬 호출과 실제 배포 사이에서 최소한 무엇을 맞춰 두어야 할까요?
-
-## 큰 그림
-
-![Serverless 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/01/01-01-concept-at-a-glance.ko.png)
-
-*Serverless 101 1장 흐름 개요*
 
 ## 서버리스가 틀린 기본값인 순간부터 먼저 구분하기
 

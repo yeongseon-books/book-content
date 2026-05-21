@@ -31,19 +31,15 @@ This is post 6 in the Database Systems 101 series.
 
 > Isolation (the I in ACID) is not on/off, it is a dial. Too loose and you get anomalies like dirty reads or phantom reads; too strict and throughput collapses. Isolation levels are the dial that decides where you stop and where you give in.
 
+
+![database systems 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/06/06-01-big-picture.en.png)
+*database systems 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Isolation Levels?
 - Which signal should the example or diagram make visible for Isolation Levels?
 - What failure should be prevented first when Isolation Levels reaches a real system?
-
-## Big Picture
-
-![database systems 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/06/06-01-big-picture.en.png)
-
-*database systems 101 chapter 6 flow overview*
-
-This picture places Isolation Levels inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

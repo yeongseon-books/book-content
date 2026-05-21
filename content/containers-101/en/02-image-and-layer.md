@@ -31,21 +31,16 @@ In this chapter, we unpack why images are split into layers, how OverlayFS makes
 
 > Layers are the reason images can be reused, cached, and transferred efficiently at the same time.
 
+
+![containers 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/02/02-01-concept-at-a-glance.en.png)
+*containers 101 chapter 2 flow overview*
+> An image is not a single file; it is a stack of immutable layer snapshots. Each layer can be reused, cached, and transferred independently — that is why images are efficient.
+
 ## Questions to Keep in Mind
 
 - The physical structure of an image?
 - The job of a layer?
 - How OverlayFS stacks them?
-
-## Big Picture
-
-![containers 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/02/02-01-concept-at-a-glance.en.png)
-
-*containers 101 chapter 2 flow overview*
-
-This picture places Image and Layer inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> An image is not a single file; it is a stack of immutable layer snapshots. Each layer can be reused, cached, and transferred independently — that is why images are efficient.
 
 ## Why It Matters
 

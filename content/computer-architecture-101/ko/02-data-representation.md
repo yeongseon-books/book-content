@@ -27,17 +27,15 @@ last_reviewed: '2026-05-12'
 
 표현 방식은 언어 문법보다 한 단계 아래에 있지만, 실제 장애는 그 아래층에서 자주 시작됩니다. 정수 오버플로, 금액 계산 오차, 비트마스크 실수는 모두 데이터가 메모리에서 어떻게 생겼는지를 놓쳐서 생깁니다.
 
+
+![Computer Architecture 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/02/02-01-big-picture.ko.png)
+*Computer Architecture 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 비트, 바이트, 워드는 각각 무엇일까요?
 - 음수는 왜 2의 보수로 저장할까요?
 - IEEE 754 부동소수점은 어떤 구조를 가질까요?
-
-## 큰 그림
-
-![Computer Architecture 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/02/02-01-big-picture.ko.png)
-
-*Computer Architecture 101 2장 흐름 개요*
 
 ## 왜 중요한가
 

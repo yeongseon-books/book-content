@@ -29,19 +29,15 @@ This is post 6 in the Design Patterns 101 series.
 
 In this post, we'll use the Adapter pattern as a thin translation layer at the boundary. The aim is to let the domain speak in its own contract while the adapter absorbs SDK-specific calls, types, and exceptions.
 
+
+![design patterns 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/06/06-01-concept-at-a-glance.en.png)
+*design patterns 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - The problem Adapter solves?
 - Define a domain interface, then wrap external calls?
 - Object Adapter vs Class Adapter?
-
-## Big Picture
-
-![design patterns 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/06/06-01-concept-at-a-glance.en.png)
-
-*design patterns 101 chapter 6 flow overview*
-
-This picture places The Adapter Pattern inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

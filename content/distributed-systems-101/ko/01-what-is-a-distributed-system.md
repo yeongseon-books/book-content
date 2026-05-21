@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 그 차이를 지연, 장애, 조정이라는 세 축으로 정리해 두고, 이후 글 전체를 읽을 때 기준점이 되는 멘탈 모델을 세웁니다.
 
+
+![Distributed Systems 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/01/01-01-concept-at-a-glance.ko.png)
+*Distributed Systems 101 1장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 분산 시스템은 정확히 무엇이며 단일 머신 프로그램과 무엇이 다를까요?
 - 지연, 장애, 조정이라는 세 축은 왜 분산 시스템의 기본 언어일까요?
 - 분산 컴퓨팅의 8가지 허상은 왜 지금도 반복될까요?
-
-## 큰 그림
-
-![Distributed Systems 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/01/01-01-concept-at-a-glance.ko.png)
-
-*Distributed Systems 101 1장 흐름 개요*
 
 ## 왜 중요한가
 

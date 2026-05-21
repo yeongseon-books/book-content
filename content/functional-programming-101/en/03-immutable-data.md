@@ -30,19 +30,15 @@ This is post 3 in the Functional Programming 101 series.
 
 > Immutable data cannot be modified after creation. When you need a new value, you create new data based on the original. This article covers Python's immutable types and patterns for writing safe, predictable code.
 
+
+![Functional Programming 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/03/03-01-big-picture.en.png)
+*Functional Programming 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Immutable Data?
 - Which signal should the example or diagram make visible for Immutable Data?
 - What failure should be prevented first when Immutable Data reaches a real system?
-
-## Big Picture
-
-![Functional Programming 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/03/03-01-big-picture.en.png)
-
-*Functional Programming 101 chapter 3 flow overview*
-
-This picture places Immutable Data inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

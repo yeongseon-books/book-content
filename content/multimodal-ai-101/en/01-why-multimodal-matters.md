@@ -31,19 +31,15 @@ This is the first post in the Multimodal AI 101 series.
 
 Here we set the mental model for the rest of the series: where text-only systems break, what multimodal systems really add, and which operating constraints you should lock down before you scale usage.
 
+
+![Multimodal AI 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/01/01-01-mental-model-multimodal-expands-the-reas.en.png)
+*Multimodal AI 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - Where do text-only LLM pipelines break first once real document and image input arrives?
 - Which product problems genuinely improve with multimodal models, rather than just looking better in demos?
 - How should you think about early fusion, late fusion, and cross-attention without getting lost in paper terminology?
-
-## Big Picture
-
-![Multimodal AI 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/01/01-01-mental-model-multimodal-expands-the-reas.en.png)
-
-*Multimodal AI 101 chapter 1 flow overview*
-
-This picture places Why Multimodal AI Matters inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What multimodal AI actually solves
 

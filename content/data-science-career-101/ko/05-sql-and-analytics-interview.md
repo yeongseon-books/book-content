@@ -31,21 +31,16 @@ SQL 인터뷰를 준비할 때 많은 지원자가 처음에는 문법 문제집
 
 이 글은 Data Science Career 101 시리즈의 다섯 번째 글입니다.
 
+
+![Data Science Career 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/05/05-01-concept-at-a-glance.ko.png)
+*Data Science Career 101 5장 흐름 개요*
+> SQL과 분석 인터뷰에서 가장 중요한 것은 무엇을 할 수 있는가가 아니라 무엇을 물어봐야 하고 어떻게 답해야 하는가입니다.
+
 ## 먼저 던지는 질문
 
 - SQL과 분석 인터뷰가 실제로 무엇을 평가하는지 설명합니다?
 - 질문을 어떻게 분해하고 쿼리로 옮겨야 하는지 정리합니다?
 - JOIN, 집계, 윈도우 함수, 퍼널 분석의 대표 패턴을 살펴봅니다?
-
-## 큰 그림
-
-![Data Science Career 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/05/05-01-concept-at-a-glance.ko.png)
-
-*Data Science Career 101 5장 흐름 개요*
-
-이 그림은 SQL과 분석 인터뷰을 단계별로 보여줍니다. 각 단계에서 무엇을 중심으로 봐야 하는지가 중요합니다.
-
-> SQL과 분석 인터뷰에서 가장 중요한 것은 무엇을 할 수 있는가가 아니라 무엇을 물어봐야 하고 어떻게 답해야 하는가입니다.
 
 ## 이 글에서 배우는 내용
 

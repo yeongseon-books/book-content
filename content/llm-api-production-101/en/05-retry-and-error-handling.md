@@ -28,21 +28,15 @@ That is why retries work only when they begin with error classification. A retry
 
 This is the fifth post in the LLM API Production 101 series. Here we focus on error classification and bounded retry policies for reliable API calls.
 
+![Retry and error handling: making API calls reliable](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/05/05-01-retry-and-error-handling-making-api-call.en.png)
+*Retry and error handling: making API calls reliable*
+> Retry is useful only after the system knows which failures can recover by trying again.
+
 ## Questions to Keep in Mind
 
 - Why should API failures not share one retry policy?
 - Which failures are retryable, and which should fail fast?
 - After final failure, how should user messages and internal logs differ?
-
-## Big Picture
-
-![Retry and error handling: making API calls reliable](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/05/05-01-retry-and-error-handling-making-api-call.en.png)
-
-*Retry and error handling: making API calls reliable*
-
-This picture treats retry as a limited recovery strategy built on error classification. Retrying only helps when the failure has a realistic chance of changing on the next attempt.
-
-> Retry is useful only after the system knows which failures can recover by trying again.
 
 ## Runtime setup
 

@@ -28,19 +28,14 @@ TinyShakespeare is especially helpful here because the numbers move quickly enou
 
 This is post 6 in the LLM from Scratch 101 series. Here we will build a compact but usable `train.py` with AdamW, warmup, cosine decay, gradient clipping, periodic evaluation, and checkpoint saving.
 
+![LLM from Scratch 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/06/06-01-the-5-line-core-of-the-training-loop.en.png)
+*LLM from Scratch 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - What are the five lines at the heart of the training loop?
 - Why is AdamW usually easier to work with than SGD for Transformers?
 - What do warmup and cosine decay do for stability?
-
-## Big Picture
-
-![LLM from Scratch 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/06/06-01-the-5-line-core-of-the-training-loop.en.png)
-
-*LLM from Scratch 101 chapter 6 flow overview*
-
-This picture places Learning via Gradients inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

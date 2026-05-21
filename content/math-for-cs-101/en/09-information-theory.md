@@ -30,21 +30,16 @@ This is post 9 in the Math for CS 101 series.
 
 Here we connect information content, entropy, cross entropy, KL divergence, and compression limits into one mental model.
 
+
+![math for cs 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/09/09-01-concept-at-a-glance.en.png)
+*math for cs 101 chapter 9 flow overview*
+> Entropy and information measure the theoretical limits of communication, compression, and storage; they set the boundaries of what is possible.
+
 ## Questions to Keep in Mind
 
 - What does it mean to measure information in bits?
 - Why is entropy called average information content?
 - Why is cross entropy so common as an ML loss function?
-
-## Big Picture
-
-![math for cs 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/09/09-01-concept-at-a-glance.en.png)
-
-*math for cs 101 chapter 9 flow overview*
-
-This picture places Information Theory inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Entropy and information measure the theoretical limits of communication, compression, and storage; they set the boundaries of what is possible.
 
 ## Why It Matters
 

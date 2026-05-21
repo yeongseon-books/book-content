@@ -30,21 +30,16 @@ last_reviewed: '2026-05-12'
 
 이 글은 Testing 101 시리즈의 다섯 번째 글입니다. 여기서는 테스트 더블의 다섯 종류를 구분하고, 언제 무엇을 써야 하는지, 그리고 왜 과한 목 사용이 문제를 만드는지 정리하겠습니다.
 
+
+![Testing 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/05/05-01-diagram.ko.png)
+*Testing 101 5장 흐름 개요*
+> 테스트 더블은 외부 의존을 제어함으로써 빠르고 반복 가능한 테스트를 만듭니다.
+
 ## 먼저 던지는 질문
 
 - 테스트 더블은 무엇을 대체하는 장치일까요?
 - Dummy, Stub, Spy, Mock, Fake는 어떻게 다를까요?
 - 어떤 상황에서 어떤 종류를 골라야 할까요?
-
-## 큰 그림
-
-![Testing 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/05/05-01-diagram.ko.png)
-
-*Testing 101 5장 흐름 개요*
-
-이 그림에서는 테스트에서 외부 의존을 대체하는 방식들을 보여줍니다. 실제 네트워크 호출을 피하고, 느린 데이터베이스를 메모리 버전으로 바꾸거나, 예측 불가능한 외부 서비스 응답을 고정값으로 제어할 수 있습니다.
-
-> 테스트 더블은 외부 의존을 제어함으로써 빠르고 반복 가능한 테스트를 만듭니다.
 
 ## 왜 중요한가
 

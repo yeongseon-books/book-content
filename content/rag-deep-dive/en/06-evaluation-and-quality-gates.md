@@ -24,23 +24,16 @@ RAGAS faithfulness and answer_relevancy metrics let you evaluate RAG answer qual
 
 This is the final post in the RAG Deep Dive series.
 
+![Sample fields controlling metric eligibility](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/06/06-01-ragas-dataset-schema-and-sample-fields.en.png)
+*Sample fields controlling metric eligibility*
+> Evaluation re-expands one RAG answer into the relationship between question, evidence, answer, and target truth, then turns that relationship into scores.
+
 ## Questions to Keep in Mind
 
 - Why do RAGAS dataset columns define what can actually be evaluated?
 - What does Faithfulness compare against evidence instead of judging whether the answer sounds plausible?
 - Which failures should a quality gate block in CI or production?
 
-## Big Picture
-
-![Sample fields controlling metric eligibility](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/06/06-01-ragas-dataset-schema-and-sample-fields.en.png)
-
-*Sample fields controlling metric eligibility*
-
-This picture shows question, answer, context, and ground-truth columns feeding RAGAS metrics that produce different quality signals. A RAG quality gate starts with reproducible columns and failure thresholds, not subjective impressions.
-
-> Evaluation re-expands one RAG answer into the relationship between question, evidence, answer, and target truth, then turns that relationship into scores.
-
-<!-- a-grade-example:begin -->
 ## Minimal runnable example
 
 Example file: `en/06-evaluation-and-quality-gates/main.py`

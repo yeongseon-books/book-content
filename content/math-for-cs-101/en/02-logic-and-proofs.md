@@ -30,21 +30,16 @@ This is post 2 in the Math for CS 101 series.
 
 Here we treat logic and proof as a practical grammar for explaining correctness in code, not as an isolated math ritual.
 
+
+![math for cs 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/02/02-01-concept-at-a-glance.en.png)
+*math for cs 101 chapter 2 flow overview*
+> Logic is about making the relationship between assumptions and conclusions explicit; proof is about guaranteeing that relationship holds in every case.
+
 ## Questions to Keep in Mind
 
 - How is a proof different from running a handful of examples?
 - How do propositions, implication, and equivalence map to real code?
 - When is a direct proof clearer than proof by contradiction?
-
-## Big Picture
-
-![math for cs 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/02/02-01-concept-at-a-glance.en.png)
-
-*math for cs 101 chapter 2 flow overview*
-
-This picture places Logic and Proofs inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Logic is about making the relationship between assumptions and conclusions explicit; proof is about guaranteeing that relationship holds in every case.
 
 ## Why It Matters
 

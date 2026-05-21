@@ -32,17 +32,15 @@ last_reviewed: '2026-05-12'
 
 끝까지 읽고 나면 optimizer 로그에서 loss curve를 볼 때 왜 learning rate가 가장 먼저 의심되는지 자연스럽게 설명할 수 있게 됩니다.
 
+
+![Calculus for ML 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/07/07-01-concept-at-a-glance.ko.png)
+*Calculus for ML 101 7장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - gradient의 반대 방향으로 이동하면 왜 손실이 줄어들까요?
 - learning rate는 단순한 배율 이상으로 어떤 역할을 할까요?
 - 경사하강법이 수렴하거나 발산하는 패턴은 어떻게 구분할 수 있을까요?
-
-## 큰 그림
-
-![Calculus for ML 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/07/07-01-concept-at-a-glance.ko.png)
-
-*Calculus for ML 101 7장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 
@@ -149,7 +147,6 @@ for lr in [0.001, 0.1, 1.5]:
 실무적으로 가장 중요한 감각은 learning rate 해석입니다. 발산, 느린 수렴, noisy curve 같은 현상은 대부분 경사하강법의 기본 요소로 설명할 수 있습니다. 따라서 optimizer를 바꾸기 전에 먼저 기본 GD 관점에서 현상을 읽어 보는 습관이 중요합니다.
 
 다음 글에서는 plain GD의 약점을 보완하는 momentum, RMSProp, Adam 같은 최적화 기법을 보겠습니다. 그러면 왜 현대 학습 루프가 그 변형들을 쓰는지 연결해서 이해할 수 있습니다.
-
 
 
 ## 순수 경사하강법 구현과 로그 해석

@@ -29,19 +29,15 @@ This is post 9 in the Programming Languages 101 series.
 
 In this post, we will compare static and dynamic languages as a choice about when type promises are checked, not as a contest between good and bad. Side by side, the same function will show which errors move earlier, which ones stay at runtime, and why gradual typing became the compromise many teams adopted.
 
+
+![programming languages 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/09/09-01-concept-at-a-glance.en.png)
+*programming languages 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Static vs Dynamic Languages?
 - Which signal should the example or diagram make visible for Static vs Dynamic Languages?
 - What failure should be prevented first when Static vs Dynamic Languages reaches a real system?
-
-## Big Picture
-
-![programming languages 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/09/09-01-concept-at-a-glance.en.png)
-
-*programming languages 101 chapter 9 flow overview*
-
-This picture places Static vs Dynamic Languages inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions this article answers
 

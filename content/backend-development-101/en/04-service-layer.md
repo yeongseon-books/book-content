@@ -26,19 +26,15 @@ Once controllers start doing too much, the same business rule gets copied into R
 
 This is post 4 in the Backend Development 101 series. Here, we define what belongs in the service layer, why transactions usually start there, and how that boundary improves reuse, testing, and long-term operability.
 
+
+![backend development 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/04/04-01-concept-at-a-glance.en.png)
+*backend development 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - The role of the service layer?
 - How to split responsibility across controller, service, and repository?
 - Where to start a transaction?
-
-## Big Picture
-
-![backend development 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/04/04-01-concept-at-a-glance.en.png)
-
-*backend development 101 chapter 4 flow overview*
-
-This picture places The Service Layer inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

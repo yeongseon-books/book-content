@@ -25,17 +25,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 Computer Networks 101 시리즈의 첫 번째 글입니다.
 
+
+![Computer Networks 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/01/01-01-concept-at-a-glance.ko.png)
+*Computer Networks 101 1장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 네트워크와 인터넷은 어떻게 다른가요?
 - 패킷은 왜 네트워크의 기본 단위로 취급될까요?
 - 계층 모델이 없으면 IP, TCP, DNS, HTTP를 왜 함께 이해하기 어려울까요?
-
-## 큰 그림
-
-![Computer Networks 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/01/01-01-concept-at-a-glance.ko.png)
-
-*Computer Networks 101 1장 흐름 개요*
 
 ## 왜 중요한가
 

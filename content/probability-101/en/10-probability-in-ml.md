@@ -28,21 +28,16 @@ Much of modern machine learning is probability wearing different names. Cross-en
 
 This is the final post in the Probability 101 series. Here we connect probability to loss functions, conditional model outputs, calibration metrics, and Bayesian thinking so the earlier ideas show up in a recognizable ML workflow.
 
+
+![probability 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/10/10-01-concept-at-a-glance.en.png)
+*probability 101 chapter 10 flow overview*
+> Probability in Machine Learning requires both definition and intuition, learned through concrete examples.
+
 ## Questions to Keep in Mind
 
 - Where probability is hiding inside common machine learning workflows?
 - Why cross-entropy and negative log-likelihood point to the same idea?
 - What a classifier score like 0.8 should mean before you trust it?
-
-## Big Picture
-
-![probability 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/10/10-01-concept-at-a-glance.en.png)
-
-*probability 101 chapter 10 flow overview*
-
-This picture places Probability in Machine Learning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Probability in Machine Learning requires both definition and intuition, learned through concrete examples.
 
 ## Why It Matters
 

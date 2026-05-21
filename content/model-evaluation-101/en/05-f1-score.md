@@ -28,19 +28,15 @@ Once precision and recall are framed as a threshold memo, teams immediately ask 
 
 This rewrite fixes that defect directly. F1 is still useful, but threshold selection now follows the correct **train → validation → test** flow. At the same time, macro, micro, and weighted F1 are connected back to the review question they actually answer.
 
+
+![model evaluation 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/05/05-01-concept-at-a-glance.en.png)
+*model evaluation 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying F1 Score?
 - Which signal should the example or diagram make visible for F1 Score?
 - What failure should be prevented first when F1 Score reaches a real system?
-
-## Big Picture
-
-![model evaluation 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/05/05-01-concept-at-a-glance.en.png)
-
-*model evaluation 101 chapter 5 flow overview*
-
-This picture places F1 Score inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## This post answers
 

@@ -26,17 +26,15 @@ last_reviewed: '2026-05-12'
 
 이 영역이 어려운 이유는 코드 자체보다 실행 환경이 결과를 바꿔 버리기 때문입니다. 같은 코드인데도 오늘은 통과하고 내일은 실패하는 테스트가 생긴다면, 대개 파일 경로 충돌, 전역 환경변수 오염, 현재 시각 의존성이 원인입니다.
 
+
+![pytest 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/07/07-01-big-picture.ko.png)
+*pytest 101 7장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 파일 테스트에서 왜 실제 경로 대신 `tmp_path`를 써야 할까요?
 - 환경변수는 왜 테스트마다 격리해야 할까요?
 - 현재 시간을 기준으로 동작하는 로직은 어떻게 안정적으로 검증할 수 있을까요?
-
-## 큰 그림
-
-![pytest 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/07/07-01-big-picture.ko.png)
-
-*pytest 101 7장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 

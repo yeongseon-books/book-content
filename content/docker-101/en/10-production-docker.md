@@ -28,19 +28,15 @@ That is why production readiness is not one Docker flag. It is the alignment of 
 
 This is the final post in the Docker 101 series. It ties the earlier image, runtime, configuration, and optimization topics into a production checklist you can actually use for tagging, signing, hardening, and observing a deployed container.
 
+
+![docker 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/10/10-01-concept-at-a-glance.en.png)
+*docker 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - An *image tag policy* (semver + sha)?
 - Registries* and *signed images?
 - Runtime security* (read-only, capabilities)?
-
-## Big Picture
-
-![docker 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/10/10-01-concept-at-a-glance.en.png)
-
-*docker 101 chapter 10 flow overview*
-
-This picture places Production-Ready Docker inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

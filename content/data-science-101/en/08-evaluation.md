@@ -28,21 +28,16 @@ Good evaluation therefore starts with the cost of being wrong. If missing a posi
 
 This is post 8 in the Data Science 101 series. In this chapter, we connect classification and regression metrics back to business cost so that model scores line up with real decisions.
 
+
+![data science 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/08/08-01-concept-at-a-glance.en.png)
+*data science 101 chapter 8 flow overview*
+> At its core, Evaluation is about deciding what enters a system, where validation happens, and which signals stay for the next cycle—not about feature names.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Evaluation?
 - Which signal should the example or diagram make visible for Evaluation?
 - What failure should be prevented first when Evaluation reaches a real system?
-
-## Big Picture
-
-![data science 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/08/08-01-concept-at-a-glance.en.png)
-
-*data science 101 chapter 8 flow overview*
-
-This picture places Evaluation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> At its core, Evaluation is about deciding what enters a system, where validation happens, and which signals stay for the next cycle—not about feature names.
 
 ## Questions This Post Answers
 

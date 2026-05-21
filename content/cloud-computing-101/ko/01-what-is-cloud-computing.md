@@ -30,21 +30,16 @@ last_reviewed: '2026-05-14'
 
 여기서는 클라우드를 단순한 유행어가 아니라, 비용 구조와 운영 책임까지 함께 바꾸는 실행 모델로 이해해 보겠습니다.
 
+
+![Cloud Computing 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/01/01-01-concept-at-a-glance.ko.png)
+*Cloud Computing 101 1장 흐름 개요*
+> 클라우드의 핵심은 기술 이름이 아니라, 초기 투자 없이 필요에 따라 자원을 프로비저닝하고, 사용한 만큼 비용을 내며, 공급자와 사용자가 운영 책임을 명확히 나누는 실행 모델에 있습니다.
+
 ## 먼저 던지는 질문
 
 - 왜 많은 팀이 서버를 직접 사는 방식에서 인터넷으로 자원을 빌려 쓰는 방식으로 이동했을까요?
 - 클라우드의 핵심 특성은 무엇이고, 온프레미스와 비교하면 무엇이 달라질까요?
 - AWS, Azure, Google Cloud 같은 사업자는 정확히 어떤 역할을 맡을까요?
-
-## 큰 그림
-
-![Cloud Computing 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/01/01-01-concept-at-a-glance.ko.png)
-
-*Cloud Computing 101 1장 흐름 개요*
-
-클라우드 컴퓨팅을 이해하려면 단순히 "남의 서버"라는 표현을 벗어나 비용 구조와 책임 경계의 변화를 함께 봐야 합니다.
-
-> 클라우드의 핵심은 기술 이름이 아니라, 초기 투자 없이 필요에 따라 자원을 프로비저닝하고, 사용한 만큼 비용을 내며, 공급자와 사용자가 운영 책임을 명확히 나누는 실행 모델에 있습니다.
 
 ## 왜 중요한가
 

@@ -28,19 +28,14 @@ They are related, but they are not the same. This post separates them by input s
 
 This is the sixth post in the Azure Kubernetes Service 101 series. Here, we sort out how HPA, Cluster Autoscaler, and KEDA each react to demand and which layer of capacity each one changes.
 
+![azure kubernetes service 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/06/06-01-one-diagram-first.en.png)
+*azure kubernetes service 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - What does each of HPA, Cluster Autoscaler, and KEDA observe and scale?
 - When does CPU/memory-based HPA fall short, and how does KEDA fill that gap?
 - Under what conditions can Cluster Autoscaler safely reschedule Pods when scaling nodes down?
-
-## Big Picture
-
-![azure kubernetes service 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/06/06-01-one-diagram-first.en.png)
-
-*azure kubernetes service 101 chapter 6 flow overview*
-
-This picture places Scaling — HPA, Cluster Autoscaler, KEDA inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## One diagram first
 

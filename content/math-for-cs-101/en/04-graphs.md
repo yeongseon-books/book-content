@@ -30,21 +30,16 @@ This is post 4 in the Math for CS 101 series.
 
 Here we treat graphs as the baseline language for relationship-heavy systems, with a focus on representation and traversal.
 
+
+![math for cs 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/04/04-01-concept-at-a-glance.en.png)
+*math for cs 101 chapter 4 flow overview*
+> A graph structures relationships and transforms complex problems into connectivity and pathfinding challenges that become solvable.
+
 ## Questions to Keep in Mind
 
 - Why do relationship-heavy problems become clearer when modeled as graphs?
 - What do vertices and edges correspond to in real systems?
 - How do directed and undirected graphs change the meaning of a model?
-
-## Big Picture
-
-![math for cs 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/04/04-01-concept-at-a-glance.en.png)
-
-*math for cs 101 chapter 4 flow overview*
-
-This picture places Graphs inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A graph structures relationships and transforms complex problems into connectivity and pathfinding challenges that become solvable.
 
 ## Why It Matters
 

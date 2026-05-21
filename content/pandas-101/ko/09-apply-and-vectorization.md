@@ -29,21 +29,16 @@ Pandas를 어느 정도 쓰기 시작하면 코드가 돌아가는 것과 빠르
 
 이번 글에서는 `apply`를 금지어처럼 다루기보다, 언제 느려지고 왜 벡터화가 Pandas의 본질인지 구조적으로 다루겠습니다.
 
+
+![Pandas 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/09/09-01-concept-at-a-glance.ko.png)
+*Pandas 101 9장 흐름 개요*
+> **벡터화는 Pandas의 핵심 이점**입니다. `apply`에 손을 대기 전에 먼저 내장 함수, 리스트 컴프리헨션, NumPy 연산으로 충분한지 확인하세요.
+
 ## 먼저 던지는 질문
 
 - 벡터화는 정확히 무엇을 뜻할까요?
 - `apply`, `map`, NumPy 연산은 어떤 차이가 있을까요?
 - 왜 `apply(axis=1)`가 특히 느릴까요?
-
-## 큰 그림
-
-![Pandas 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/09/09-01-concept-at-a-glance.ko.png)
-
-*Pandas 101 9장 흐름 개요*
-
-이 그림은 명시적 반복문(`apply`)과 암묵적 반복(`vectorization`)의 선택을 보여줍니다. 같은 계산도 어떤 방식으로 표현하느냐에 따라 성능이 10배, 100배 달라집니다.
-
-> **벡터화는 Pandas의 핵심 이점**입니다. `apply`에 손을 대기 전에 먼저 내장 함수, 리스트 컴프리헨션, NumPy 연산으로 충분한지 확인하세요.
 
 ## 왜 중요한가
 

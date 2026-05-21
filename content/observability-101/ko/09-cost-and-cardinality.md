@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 이 글은 Observability 101 시리즈의 9번째 글입니다.
 
+
+![Observability 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/09/09-01-concept-at-a-glance.ko.png)
+*Observability 101 9장 흐름 개요*
+> 비용과 카디널리티의 핵심은 도구 선택이 아니라, 언제 어디서 이 신호를 남기고 어떻게 해석할 것인가 하는 설계입니다.
+
 ## 먼저 던지는 질문
 
 - 카디널리티는 왜 비용과 직접 연결될까요?
 - 보존 기간을 나눠 가져가야 하는 이유는 무엇일까요?
 - 머리 샘플링과 꼬리 샘플링은 어떻게 다를까요?
-
-## 큰 그림
-
-![Observability 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/09/09-01-concept-at-a-glance.ko.png)
-
-*Observability 101 9장 흐름 개요*
-
-비용과 카디널리티를 다루는 이번 장에서는 주요 개념과 실무 패턴을 봅니다. 시스템이 복잡해질수록 이 개념들이 어디에서 시작되고 어떤 결과를 만드는지 이해하는 것이 중요합니다.
-
-> 비용과 카디널리티의 핵심은 도구 선택이 아니라, 언제 어디서 이 신호를 남기고 어떻게 해석할 것인가 하는 설계입니다.
 
 ## 왜 중요한가
 

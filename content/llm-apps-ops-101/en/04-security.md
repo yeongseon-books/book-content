@@ -26,21 +26,15 @@ This is the fourth post in the LLM Apps Ops 101 series. Here, we will set up a b
 
 The practical goal is not perfect prevention. It is to fail earlier, before bad input reaches the model and before bad output reaches the user.
 
+![LLM app security layer structure](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/04/04-01-big-picture.en.png)
+*LLM app security layer structure*
+> Input can become instruction and output can become data leakage, so both boundaries need controls.
+
 ## Questions to Keep in Mind
 
 - Why should LLM app security separate input guards from output filters?
 - What responsibilities should prompt-injection detection and PII masking have in code?
 - Which logs should you inspect first when rejection rate rises or falls?
-
-## Big Picture
-
-![LLM app security layer structure](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/04/04-01-big-picture.en.png)
-
-*LLM app security layer structure*
-
-This picture shows input guards blocking prompt injection while output filters re-check PII and policy violations on the way out. LLM app security is not telling the model to be safe; it is validating each data boundary.
-
-> Input can become instruction and output can become data leakage, so both boundaries need controls.
 
 ## Why this layer matters
 ![Input guard and output filter flow](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/04/04-01-why-this-layer-matters.en.png)

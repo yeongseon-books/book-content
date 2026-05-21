@@ -30,21 +30,15 @@ LLM은 현재 prompt 안에 들어온 정보만 보고 판단합니다. system p
 
 이 글에서는 컨텍스트를 역할, 규칙, 도구 설명, 상태 정보의 계약으로 나눠서 보는 관점을 정리하겠습니다.
 
+![컨텍스트 구성 지도](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/02/02-01-context-map.ko.png)
+*컨텍스트 구성 지도*
+> Context는 모델 입력 문자열이 아니라, agent가 어떤 역할로 무엇을 해도 되고 무엇을 하면 안 되는지 정하는 실행 계약입니다.
+
 ## 먼저 던지는 질문
 
 - agent가 엉뚱하게 행동할 때 prompt 문장보다 먼저 어떤 context 경계를 확인해야 할까요?
 - system prompt, 대화 기록, tool 설명, 현재 state는 각각 어떤 책임을 나눌까요?
 - context가 길어질수록 무엇을 버리고 무엇을 유지할지 어떻게 판단해야 할까요?
-
-## 큰 그림
-
-![컨텍스트 구성 지도](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/02/02-01-context-map.ko.png)
-
-*컨텍스트 구성 지도*
-
-이 그림에서는 agent의 행동을 결정하는 context가 system prompt, history, tool description, state로 나뉘는 구조를 봅니다. context engineering은 문장을 꾸미는 일이 아니라 agent가 읽는 행동 계약을 설계하는 일입니다.
-
-> Context는 모델 입력 문자열이 아니라, agent가 어떤 역할로 무엇을 해도 되고 무엇을 하면 안 되는지 정하는 실행 계약입니다.
 
 ## 왜 이 글이 중요한가
 

@@ -33,17 +33,14 @@ seo_description: '[col1, col2, col3] row_factory │ ─────────
 
 *Row factory와 type adapter (sqlite3, PEP 249)*
 
+![Python DB-API 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.ko.png)
+*Python DB-API 101 6장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - Row factory와 type adapter (sqlite3, PEP 249)를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?
 - Row factory와 type adapter (sqlite3, PEP 249)에서 예제나 다이어그램으로 검증해야 할 핵심 신호는 무엇일까요?
 - Row factory와 type adapter (sqlite3, PEP 249)를 실제 시스템에 적용할 때 어떤 실패를 먼저 막아야 할까요?
-
-## 큰 그림
-
-![Python DB-API 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.ko.png)
-
-*Python DB-API 101 6장 흐름 개요*
 
 ## Mental Model — 두 단계 변환
 

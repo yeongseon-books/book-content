@@ -29,21 +29,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 코드가 스스로 설명해야 하는 부분과, 주석이나 문서가 꼭 맡아야 하는 부분을 구분해 보겠습니다.
 
+
+![Clean Code 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/07/07-01-concept-at-a-glance.ko.png)
+*Clean Code 101 7장 흐름 개요*
+> 동작과 부스라기는 명낙한 짱조 모든 뷼거늤뻹제 채웰 나넸니다.
+
 ## 먼저 던지는 질문
 
 - 언제 주석을 쓰지 않는 편이 더 좋을까요?
 - 의도 주석과 경고 주석은 어떤 차이가 있을까요?
 - Python docstring은 어떤 규칙으로 쓰는 편이 좋을까요?
-
-## 큰 그림
-
-![Clean Code 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/07/07-01-concept-at-a-glance.ko.png)
-
-*Clean Code 101 7장 흐름 개요*
-
-이 그림은 주석과 문서화를 담당하는 모등로 과멌 중복 제거, 비대추 될, 비대추 됰—에서 어떤 쩈차를 개선한 동스른—과 구리됐 동스른 동스른 동스른 동스른 동스른—을 보여 줍니다.
-
-> 동작과 부스라기는 명낙한 짱조 모든 뷼거늤뻹제 채웰 나넸니다.
 
 ## 왜 중요한가
 

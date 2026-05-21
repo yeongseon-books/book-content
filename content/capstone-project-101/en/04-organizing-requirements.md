@@ -28,21 +28,16 @@ A useful requirements document behaves more like a compact delivery contract. It
 
 This is post 4 in the Capstone Project 101 series. It turns the problem statement into implementable requirements and explicit verification criteria.
 
+
+![capstone project 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/04/04-01-the-flow-at-a-glance.en.png)
+*capstone project 101 chapter 4 flow overview*
+> Strong requirements emerge from the gap between what users need and what's buildable. Documentation captures that tension so priorities stay visible.
+
 ## Questions to Keep in Mind
 
 - Why is a feature list alone not enough?
 - How should user stories pair with acceptance criteria?
 - Why should non-functional constraints live in a separate table?
-
-## Big Picture
-
-![capstone project 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/04/04-01-the-flow-at-a-glance.en.png)
-
-*capstone project 101 chapter 4 flow overview*
-
-This picture places Organizing Requirements inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Strong requirements emerge from the gap between what users need and what's buildable. Documentation captures that tension so priorities stay visible.
 
 ## What You Will Learn
 

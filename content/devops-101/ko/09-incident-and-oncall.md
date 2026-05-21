@@ -24,21 +24,16 @@ last_reviewed: '2026-05-12'
 
 이 글은 DevOps 101 시리즈의 아홉 번째 글입니다.
 
+
+![DevOps 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/09/09-01-diagram.ko.png)
+*DevOps 101 9장 흐름 개요*
+> 장애 대응과 on-call의 핵심은 누가 빠르게 행동하는지가 아니라, 팀이 함께 배우고 같은 실수를 반복하지 않는 것입니다.
+
 ## 먼저 던지는 질문
 
 - 새벽 3시에 알림이 울리면 누가 무엇을 해야 할까요?
 - 장애 심각도(SEV)는 어떤 기준으로 나눠야 팀이 같은 언어로 움직일까요?
 - on-call 로테이션은 왜 일정표가 아니라 운영 설계일까요?
-
-## 큰 그림
-
-![DevOps 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/09/09-01-diagram.ko.png)
-
-*DevOps 101 9장 흐름 개요*
-
-이 그림은 장애 감지부터 초기 대응, 원인 분석, 후속 조치까지의 전체 사건 대응 흐름을 보여줍니다. on-call은 단순한 대기가 아니라 팀의 신뢰를 구축하는 과정입니다.
-
-> 장애 대응과 on-call의 핵심은 누가 빠르게 행동하는지가 아니라, 팀이 함께 배우고 같은 실수를 반복하지 않는 것입니다.
 
 ## 왜 중요한가
 

@@ -24,23 +24,16 @@ HuggingFaceEmbeddings and FAISS IndexFlatL2 turn raw text into search coordinate
 
 This is post 2 in the RAG Deep Dive series.
 
+![Document and query embedding flow](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/02/02-01-embedding-call-flow.en.png)
+*Document and query embedding flow*
+> Embeddings turn chunks into coordinates, and the vector index turns coordinate distance into retrieval rank.
+
 ## Questions to Keep in Mind
 
 - Why should document embedding and query embedding be inspected as separate paths even with the same model?
 - What calculation does FAISS `IndexFlatL2` actually repeat during search?
 - What breaks when the index is fast but the metadata mapping is wrong?
 
-## Big Picture
-
-![Document and query embedding flow](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/02/02-01-embedding-call-flow.en.png)
-
-*Document and query embedding flow*
-
-This picture shows documents and queries becoming vectors, then FAISS computing distances between those vectors. Vector search depends not only on storage and math but also on stable ids and metadata mapping.
-
-> Embeddings turn chunks into coordinates, and the vector index turns coordinate distance into retrieval rank.
-
-<!-- a-grade-example:begin -->
 ## Minimal runnable example
 
 Example file: `en/02-embeddings-and-vector-index/main.py`

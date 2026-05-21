@@ -27,21 +27,16 @@ The first developer job often creates pressure to prove yourself immediately. Mo
 
 This is post 7 in the Developer Career 101 series.
 
+
+![developer career 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/07/07-01-concept-at-a-glance.en.png)
+*developer career 101 chapter 7 flow overview*
+> Your first job is about proving you can complete assigned work well and learning how your team works, not proving you are the smartest person in the room.
+
 ## Questions to Keep in Mind
 
 - What should a new developer focus on during the first ninety days?
 - Why do questions, notes, and feedback loops matter more than pretending to know everything?
 - How can your first PR and your 1:1s build trust quickly?
-
-## Big Picture
-
-![developer career 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/07/07-01-concept-at-a-glance.en.png)
-
-*developer career 101 chapter 7 flow overview*
-
-This picture places Settling into the First Job inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Your first job is about proving you can complete assigned work well and learning how your team works, not proving you are the smartest person in the room.
 
 ## What You Will Learn
 

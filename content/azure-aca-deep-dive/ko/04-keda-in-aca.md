@@ -30,21 +30,15 @@ Microsoft 문서가 ACA scaling을 KEDA-powered라고 명시하는 이유도 여
 
 이제 ACA의 friendly Scale blade 뒤에 있는 KEDA형 구조를 보겠습니다.
 
+![Azure Container Apps Deep Dive 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/04/04-01-the-short-version-a-scale-rule-is-not-th.ko.png)
+*Azure Container Apps Deep Dive 4장 흐름 개요*
+> ACA 안의 KEDA — Scale Rule이 만드는 것의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - ACA의 scale rule은 KEDA에서 어떤 형태의 제어 루프로 읽는 편이 가장 정확할까요?
 - 왜 scale rule은 app-scope가 아니라 revision-scope에 속할까요?
 - `minReplicas: 0`이 가능하다는 사실은 스케일 모델을 어떻게 바꿀까요?
-
-## 큰 그림
-
-![Azure Container Apps Deep Dive 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/04/04-01-the-short-version-a-scale-rule-is-not-th.ko.png)
-
-*Azure Container Apps Deep Dive 4장 흐름 개요*
-
-이 그림에서는 ACA 안의 KEDA — Scale Rule이 만드는 것를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> ACA 안의 KEDA — Scale Rule이 만드는 것의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

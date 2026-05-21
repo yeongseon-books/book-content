@@ -30,21 +30,16 @@ This is post 6 in the Math for CS 101 series.
 
 Here we use probability as the language for uncertainty in engineering decisions, connecting sample spaces, conditional probability, Bayes updates, expectation, and variance.
 
+
+![math for cs 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/06/06-01-concept-at-a-glance.en.png)
+*math for cs 101 chapter 6 flow overview*
+> Probability lets you stop hand-waving about uncertainty and instead reason quantitatively about expectations and distributions.
+
 ## Questions to Keep in Mind
 
 - How do you turn uncertainty into a model instead of a vague guess?
 - What is the difference between a sample space and an event?
 - Why is conditional probability really about changing the denominator world?
-
-## Big Picture
-
-![math for cs 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/06/06-01-concept-at-a-glance.en.png)
-
-*math for cs 101 chapter 6 flow overview*
-
-This picture places Probability inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Probability lets you stop hand-waving about uncertainty and instead reason quantitatively about expectations and distributions.
 
 ## Why It Matters
 

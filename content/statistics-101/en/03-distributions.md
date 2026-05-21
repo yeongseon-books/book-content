@@ -28,21 +28,16 @@ In statistics, the distribution is the shape of the data. If you misread that sh
 
 This is post 3 in the Statistics 101 series. Here we will build intuition for reading data shape and explain why assuming normality too quickly causes real problems.
 
+
+![statistics 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/03/03-01-concept-at-a-glance.en.png)
+*statistics 101 chapter 3 flow overview*
+> Understanding the *shape* of your data unlocks why the *same mean* can hide *different realities*.
+
 ## Questions to Keep in Mind
 
 - Why does the shape of a distribution matter?
 - How do normal, uniform, exponential, and power-law distributions differ?
 - What do skewness and kurtosis tell us numerically?
-
-## Big Picture
-
-![statistics 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/03/03-01-concept-at-a-glance.en.png)
-
-*statistics 101 chapter 3 flow overview*
-
-This picture places Distributions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Understanding the *shape* of your data unlocks why the *same mean* can hide *different realities*.
 
 ## Why It Matters
 

@@ -32,21 +32,16 @@ In this post, we'll build the mental model that makes later topics like service 
 
 > Cloud computing is an operating model: rent compute, storage, and network on demand, then manage cost and responsibility as deliberately as performance.
 
+
+![cloud computing 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/01/01-01-concept-at-a-glance.en.png)
+*cloud computing 101 chapter 1 flow overview*
+> The key insight is that cloud cost and risk depend on what you decide to do inside it, not just signing up for it.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What is Cloud Computing??
 - Which signal should the example or diagram make visible for What is Cloud Computing??
 - What failure should be prevented first when What is Cloud Computing? reaches a real system?
-
-## Big Picture
-
-![cloud computing 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/01/01-01-concept-at-a-glance.en.png)
-
-*cloud computing 101 chapter 1 flow overview*
-
-This picture places What is Cloud Computing? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> The key insight is that cloud cost and risk depend on what you decide to do inside it, not just signing up for it.
 
 ## Questions This Chapter Answers
 

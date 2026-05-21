@@ -27,22 +27,15 @@ last_reviewed: '2026-05-15'
 Warehouse는 읽은 데이터 양에 따라 비용이 커지는 경우가 많습니다. 같은 답을 더 적은 바이트로 구하면 비용과 시간 둘 다 줄일 수 있습니다. 그래서 성능 최적화는 감으로 시작하지 않고, 어떤 계획으로 얼마나 읽었는지 먼저 확인하는 데서 출발합니다.
 
 
+![Data Warehouse 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/09/09-01-concept-at-a-glance.ko.png)
+*Data Warehouse 101 9장 흐름 개요*
+> Slow query log와 쿼리 실행 계획은 성능 최적화의 출발점입니다.
 
 ## 먼저 던지는 질문
 
 - Warehouse 성능은 어떤 패턴에서 가장 크게 갈릴까요?
 - 같은 결과를 더 적은 비용으로 읽는 방법은 무엇일까요?
 - bytes scanned와 shuffle, spill은 왜 먼저 확인할까요?
-
-## 큰 그림
-
-![Data Warehouse 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/09/09-01-concept-at-a-glance.ko.png)
-
-*Data Warehouse 101 9장 흐름 개요*
-
-성능 최적화는 '측정 → 병목 특정 → 개선 → 검증'의 반복입니다. 추측으로 시작하지 말고 쿼리 실행 계획, 스캔 범위, I/O 패턴을 먼저 확인해 진짜 문제를 찾습니다.
-
-> Slow query log와 쿼리 실행 계획은 성능 최적화의 출발점입니다.
 
 ## 이 글에서 배울 것
 
@@ -267,7 +260,6 @@ ORDER BY size_gb DESC;
 성능 최적화는 작은 요령 몇 개를 외우는 일이 아니라, 어떤 쿼리가 무엇을 얼마나 읽는지 이해하는 일입니다. 컬럼 수를 줄이고, pruning을 살리고, 자주 쓰는 결과를 미리 계산하는 세 가지 원칙만 지켜도 큰 차이가 납니다. 다음 글에서는 지금까지 배운 내용을 묶어 처음부터 끝까지 Warehouse를 설계하는 예제를 살펴보겠습니다.
 
 
-
 ## 인덱스 전략보다 먼저 보는 최적화 우선순위
 
 Warehouse 성능 개선 요청이 오면 많은 팀이 먼저 인덱스를 떠올립니다. 하지만 열 지향 DW에서는 스캔 범위와 데이터 이동이 더 큰 병목입니다. 아래 표는 우선순위를 정리한 기준입니다.
@@ -331,7 +323,6 @@ query_guardrails:
 OLTP에서의 인덱스 사고를 Warehouse에 그대로 옮기면 오해가 생깁니다. Warehouse에서는 인덱스보다 파티션, 클러스터링, 물질화 계층의 영향이 크다는 점을 기준으로 설계해야 합니다.
 
 
-
 ## 비용 중심 쿼리 리뷰 루틴
 
 성능 개선을 이벤트성 작업으로 두지 않으려면 정기 리뷰 루틴이 필요합니다.
@@ -376,7 +367,6 @@ LIMIT 20;
 ```
 
 운영 데이터에 기반한 리뷰가 있어야 최적화 우선순위를 합리적으로 정할 수 있습니다.
-
 
 
 ## 실무 적용 메모

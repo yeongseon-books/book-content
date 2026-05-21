@@ -27,19 +27,15 @@ Concepts feel separate until you force them to cooperate inside one real project
 
 This is the final post in the Web Development 101 series. Here we turn the series into a working Todo app so the core layers of web development can be practiced end to end in one small but complete system.
 
+
+![web development 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/10/10-01-concept-at-a-glance.en.png)
+*web development 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - See every concept from the series live *in one app?
 - A folder layout for a small full-stack project?
 - The full build-and-deploy flow end to end?
-
-## Big Picture
-
-![web development 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/10/10-01-concept-at-a-glance.en.png)
-
-*web development 101 chapter 10 flow overview*
-
-This picture places Building a Small Web App inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

@@ -32,19 +32,14 @@ This is the 4th article in the SQLAlchemy 101 series.
 
 *ORM Basics: defining models with DeclarativeBase and mapped_column*
 
+![sqlalchemy 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/04/04-02-why-it-matters.en.png)
+*sqlalchemy 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - What is `DeclarativeBase`, and how does it relate to Core's `MetaData`?
 - What is the difference between `Mapped[int]` and `Mapped[str | None]`?
 - How does `mapped_column(...)` differ from Core's `Column(...)`?
-
-## Big Picture
-
-![sqlalchemy 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/04/04-02-why-it-matters.en.png)
-
-*sqlalchemy 101 chapter 4 flow overview*
-
-This picture places ORM Basics: Defining Models with DeclarativeBase and mapped_column inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

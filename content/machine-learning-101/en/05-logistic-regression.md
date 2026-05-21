@@ -26,19 +26,15 @@ Beginner confusion around logistic regression is healthy because the name really
 
 This is post 5 in the Machine Learning 101 series. Here we will treat logistic regression as a probability engine, then connect thresholds, precision, recall, and class imbalance back to the decisions a production system has to make.
 
+
+![machine learning 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/05/05-01-concept-at-a-glance.en.png)
+*machine learning 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - If the output is 0 or 1, why is the model called regression?
 - How does the sigmoid turn a linear score into a probability?
 - Why is `0.5` only a default threshold, not a law?
-
-## Big Picture
-
-![machine learning 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/05/05-01-concept-at-a-glance.en.png)
-
-*machine learning 101 chapter 5 flow overview*
-
-This picture places Logistic Regression inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

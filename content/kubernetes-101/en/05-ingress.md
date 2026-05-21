@@ -30,19 +30,15 @@ Here, we will separate the declarative Ingress rule from the controller that enf
 
 > Ingress is the routing rule. The Ingress controller is the runtime that makes the rule real.
 
+
+![kubernetes 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/05/05-01-concept-at-a-glance.en.png)
+*kubernetes 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - Splitting *Ingress* and *IngressController?
 - Host / path* routing?
 - TLS termination?
-
-## Big Picture
-
-![kubernetes 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/05/05-01-concept-at-a-glance.en.png)
-
-*kubernetes 101 chapter 5 flow overview*
-
-This picture places Ingress inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

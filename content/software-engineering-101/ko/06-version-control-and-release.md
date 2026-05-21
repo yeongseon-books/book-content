@@ -30,17 +30,14 @@ last_reviewed: '2026-05-15'
 많은 팀이 릴리스를 한 번의 이벤트로만 봅니다. 버전 번호를 올리고, 체인지로그를 쓰고, 프로덕션에 올리면 끝이라고 생각합니다. 하지만 안정적인 팀은 릴리스를 회복 가능한 과정으로 봅니다. 작은 변경을 자주 보내고, 카나리로 먼저 노출하고, 신호가 나쁘면 즉시 되돌릴 수 있어야 합니다.
 
 
+![Software Engineering 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/06/06-01-concept-at-a-glance.ko.png)
+*Software Engineering 101 6장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 브랜치 전략은 언제 trunk-based가 맞고, 언제 Git Flow가 맞을까요?
 - 버전 1.4.2 같은 숫자는 사용자에게 무엇을 약속할까요?
 - 체인지로그는 어떻게 자동화할 수 있을까요?
-
-## 큰 그림
-
-![Software Engineering 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/06/06-01-concept-at-a-glance.ko.png)
-
-*Software Engineering 101 6장 흐름 개요*
 
 ## 왜 중요한가
 

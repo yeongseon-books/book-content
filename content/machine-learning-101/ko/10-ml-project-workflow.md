@@ -26,21 +26,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 머신러닝 101 시리즈의 10번째 글입니다. 여기서는 문제 정의부터 데이터, 피처, 모델, 평가, 배포, 모니터링까지 이어지는 7단계 워크플로를 정리하고, `Pipeline`이 왜 유지보수성과 재현성의 중심인지 살펴보겠습니다.
 
+
+![Machine Learning 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/10/10-01-diagram.ko.png)
+*Machine Learning 101 10장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 정확도가 높아도 왜 많은 ML 프로젝트는 배포에 실패할까요?
 - 문제 정의, 데이터, 모델, 배포, 모니터링을 왜 하나의 루프로 봐야 할까요?
 - `Pipeline`은 왜 전처리 누수를 막는 핵심 도구일까요?
-
-## 큰 그림
-
-![Machine Learning 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/10/10-01-diagram.ko.png)
-
-*Machine Learning 101 10장 흐름 개요*
-
-이 그림은 이 장의 핵심 개념들이 어떻게 연결되는지 보여줍니다.
-
-
 
 ## 왜 중요한가
 

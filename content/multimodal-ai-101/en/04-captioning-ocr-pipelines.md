@@ -28,19 +28,15 @@ This is post 4 in the Multimodal AI 101 series.
 
 Here we treat captioning and OCR as complementary stages rather than competing tools, then build the hybrid pipeline that most real systems end up shipping.
 
+
+![Multimodal AI 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/04/04-01-ocr-vlm-hybrid-pipeline.en.png)
+*Multimodal AI 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why does "extract the text and move on" fail on receipts, screenshots, and structured documents?
 - When should you use a lightweight captioner, and when does a full VLM call earn its cost?
 - How do Tesseract, PaddleOCR, and cloud document APIs differ in real operating terms?
-
-## Big Picture
-
-![Multimodal AI 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/04/04-01-ocr-vlm-hybrid-pipeline.en.png)
-
-*Multimodal AI 101 chapter 4 flow overview*
-
-This picture places Image Captioning and OCR Pipelines inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## "Doesn't pulling text out of an image cover it?"
 

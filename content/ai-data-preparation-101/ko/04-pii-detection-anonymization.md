@@ -41,21 +41,16 @@ seo_description: LLM이 학습 데이터에 있던 이메일 주소나 전화번
 
 개인정보 처리는 “최대한 많이 가리자”가 아니라 사용 목적과 리스크에 맞게 적절한 기법을 고르는 문제이기도 합니다. redact, mask, pseudonymize, synthesize는 목적이 서로 다릅니다.
 
+
+![AI 데이터 준비 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/04/04-01-big-picture.ko.png)
+*AI 데이터 준비 4장 흐름 개요*
+> 학습 데이터 PII 탐지와 익명화의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - PII 처리 파이프라인을 detection, classification, anonymization, audit로 나누는 이유는 무엇일까요?
 - regex만으로 잡히는 정보와 NER가 추가로 잡아내는 정보는 어떻게 다를까요?
 - redact, mask, pseudonymize, synthesize는 각각 어떤 운영 목적에 맞을까요?
-
-## 큰 그림
-
-![AI 데이터 준비 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/04/04-01-big-picture.ko.png)
-
-*AI 데이터 준비 4장 흐름 개요*
-
-이 그림에서는 학습 데이터 PII 탐지와 익명화를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 학습 데이터 PII 탐지와 익명화의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

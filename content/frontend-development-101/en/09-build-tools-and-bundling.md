@@ -26,19 +26,15 @@ During development, frontend code lives as dozens or hundreds of separate files.
 
 This is post 9 in the Frontend Development 101 series. Here we treat build tools as a performance layer, not just as developer convenience. The shape of the bundle is one of the clearest predictors of how quickly a user sees and uses the first screen.
 
+
+![frontend development 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/09/09-01-concept-at-a-glance.en.png)
+*frontend development 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Build Tools and Bundling?
 - Which signal should the example or diagram make visible for Build Tools and Bundling?
 - What failure should be prevented first when Build Tools and Bundling reaches a real system?
-
-## Big Picture
-
-![frontend development 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/09/09-01-concept-at-a-glance.en.png)
-
-*frontend development 101 chapter 9 flow overview*
-
-This picture places Build Tools and Bundling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

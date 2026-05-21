@@ -32,19 +32,14 @@ This is the 8th article in the SQLAlchemy 101 series.
 
 *Events, hybrid_property, and custom types*
 
+![sqlalchemy 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/08/08-02-why-this-matters.en.png)
+*sqlalchemy 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - How to attach lifecycle hooks at the model, session, and engine levels using the SQLAlchemy event system?
 - How to validate inputs with `@validates`?
 - How to define `hybrid_property` so the same attribute works in Python and in SQL?
-
-## Big Picture
-
-![sqlalchemy 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/08/08-02-why-this-matters.en.png)
-
-*sqlalchemy 101 chapter 8 flow overview*
-
-This picture places Events, hybrid_property, and custom types inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

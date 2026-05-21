@@ -31,21 +31,16 @@ last_reviewed: '2026-05-14'
 
 이 글은 Data Science Career 101 시리즈의 네 번째 글입니다.
 
+
+![Data Science Career 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/04/04-01-concept-at-a-glance.ko.png)
+*Data Science Career 101 4장 흐름 개요*
+> 포트폴리오에서 가장 중요한 것은 무엇을 할 수 있는가가 아니라 무엇을 물어봐야 하고 어떻게 답해야 하는가입니다.
+
 ## 먼저 던지는 질문
 
 - 데이터 포트폴리오를 어떤 프로젝트 조합으로 구성하면 좋은지 설명합니다?
 - 코드만 있는 저장소가 왜 약하게 보이는지 짚습니다?
 - README가 어떤 구조를 가져야 하는지 정리합니다?
-
-## 큰 그림
-
-![Data Science Career 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/04/04-01-concept-at-a-glance.ko.png)
-
-*Data Science Career 101 4장 흐름 개요*
-
-이 그림은 포트폴리오을 단계별로 보여줍니다. 각 단계에서 무엇을 중심으로 봐야 하는지가 중요합니다.
-
-> 포트폴리오에서 가장 중요한 것은 무엇을 할 수 있는가가 아니라 무엇을 물어봐야 하고 어떻게 답해야 하는가입니다.
 
 ## 이 글에서 배우는 내용
 

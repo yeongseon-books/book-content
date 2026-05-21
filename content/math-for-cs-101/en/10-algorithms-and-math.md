@@ -30,21 +30,16 @@ This is the final post in the Math for CS 101 series.
 
 Here we use algorithm design as the place where all of those mathematical tools finally meet.
 
+
+![math for cs 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/10/10-01-concept-at-a-glance.en.png)
+*math for cs 101 chapter 10 flow overview*
+> Algorithm performance and correctness are guaranteed only through complexity analysis and proof; math is the tool that makes verification rigorous.
+
 ## Questions to Keep in Mind
 
 - How do the math topics from this series combine in algorithm design?
 - Why does combinatorics matter so much for complexity analysis?
 - How does graph modeling change the solution strategy itself?
-
-## Big Picture
-
-![math for cs 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/10/10-01-concept-at-a-glance.en.png)
-
-*math for cs 101 chapter 10 flow overview*
-
-This picture places Algorithms and Math inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Algorithm performance and correctness are guaranteed only through complexity analysis and proof; math is the tool that makes verification rigorous.
 
 ## Why It Matters
 

@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 깃허브 이슈를 단순한 할 일 목록이 아니라, 문제 정의와 재현 절차와 합의 기록이 쌓인 문서로 읽는 방법을 정리하겠습니다.
 
+
+![Open Source 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/03/03-01-fix-the-reading-order-first.ko.png)
+*Open Source 101 3장 흐름 개요*
+> 이슈를 제대로 읽을 수 있으려면 **버그, 기능, 설계, 커뮤니티의 관심**이 서로 어떻게 얽히는지 먼저 이해해야 합니다.
+
 ## 먼저 던지는 질문
 
 - 제목만 보고 판단하면 왜 기여 방향이 자주 빗나갈까요?
 - 라벨, 재현 절차, 담당자, 댓글은 각각 어떤 역할을 할까요?
 - `good first issue`가 붙어 있어도 바로 들어가기 어려운 경우는 언제일까요?
-
-## 큰 그림
-
-![Open Source 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/03/03-01-fix-the-reading-order-first.ko.png)
-
-*Open Source 101 3장 흐름 개요*
-
-이 그림은 이슈가 어떻게 프로젝트 소통의 중심이 되는지 보여줍니다. 버그 보고, 기능 제안, 설계 논의, 커뮤니티 질문이 모두 이슈 탭을 거칩니다.
-
-> 이슈를 제대로 읽을 수 있으려면 **버그, 기능, 설계, 커뮤니티의 관심**이 서로 어떻게 얽히는지 먼저 이해해야 합니다.
 
 ## 왜 중요한가
 

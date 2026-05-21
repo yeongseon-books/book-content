@@ -35,19 +35,14 @@ At the end of part 1 I left a question hanging: *what exactly happens inside the
 
 The reference commit is the same as in part 1: `5e59423`.
 
+![azure functions deep dive chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/02/02-01-one-level-up-workerconfigfactory.en.png)
+*azure functions deep dive chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - How does the worker process differ across languages, and what does that mean operationally?
 - Is the worker stateless? How far is in-process state safe?
 - When a worker OOMs or hangs, by what signal does the host detect it?
-
-## Big Picture
-
-![azure functions deep dive chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/02/02-01-one-level-up-workerconfigfactory.en.png)
-
-*azure functions deep dive chapter 2 flow overview*
-
-This picture places Worker Processes — How One Host Hosts Many Languages inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Starting point — `worker.config.json`
 

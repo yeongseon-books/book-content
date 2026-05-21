@@ -30,17 +30,14 @@ last_reviewed: '2026-05-15'
 그래서 앱과 DB를 함께 실행하는 구조에서는 세 가지 리듬이 중요합니다. 데이터의 영속성, 준비 상태 확인, 그리고 마이그레이션 자동화입니다. 이 세 가지가 맞물려야 로컬 개발, CI, 운영 전환이 부드러워집니다.
 
 
+![Docker 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/08/08-01-concept-at-a-glance.ko.png)
+*Docker 101 8장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - Compose로 PostgreSQL과 앱을 어떻게 함께 띄울까요?
 - healthcheck와 시작 순서는 어떻게 연결해야 할까요?
 - Alembic migration은 어떤 방식으로 자동화하는 편이 좋을까요?
-
-## 큰 그림
-
-![Docker 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/08/08-01-concept-at-a-glance.ko.png)
-
-*Docker 101 8장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 

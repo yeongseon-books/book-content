@@ -26,21 +26,15 @@ Dapr는 마이크로서비스에서 반복되는 배관 작업을 많이 줄여 
 
 이 글은 Azure Container Apps 101 시리즈의 6번째 글입니다. 여기서는 ACA에서 사이드카가 무엇을 제공하고, 무엇은 여전히 여러분이 책임져야 하는지 살펴보겠습니다.
 
+![Azure Container Apps 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/06/06-01-where-dapr-sits.ko.png)
+*Azure Container Apps 101 6장 흐름 개요*
+> Dapr 통합 — 사이드카로 얻는 것의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - Dapr가 무엇이며, 그 사이드카는 ACA 안에서 정확히 어디에 붙을까요?
 - App 수준 설정과 Environment 수준 component는 왜 분리해서 봐야 할까요?
 - Service invocation, Pub/Sub, State store, Secret store 네 가지 핵심 구성요소는 각각 어떤 문제를 해결할까요?
-
-## 큰 그림
-
-![Azure Container Apps 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/06/06-01-where-dapr-sits.ko.png)
-
-*Azure Container Apps 101 6장 흐름 개요*
-
-이 그림에서는 Dapr 통합 — 사이드카로 얻는 것를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> Dapr 통합 — 사이드카로 얻는 것의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 이 글이 답할 질문
 

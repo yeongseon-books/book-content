@@ -26,17 +26,15 @@ last_reviewed: '2026-05-12'
 
 코드를 고칠 때마다 “이 변경이 다른 기능을 깨뜨리지는 않을까?”라는 불안이 생긴다면, 이미 테스트가 필요한 상태일 가능성이 큽니다. 테스트는 단지 품질 관리 문서가 아니라, 변경 후에도 기존 동작이 유지되는지 몇 초 안에 확인하게 해 주는 자동화 장치입니다.
 
+
+![pytest 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/01/01-01-big-picture.ko.png)
+*pytest 101 1장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 테스트는 개발 속도를 늦추는 작업일까요, 아니면 오히려 속도를 높이는 투자일까요?
 - 단위 테스트, 통합 테스트, E2E 테스트는 무엇이 다를까요?
 - 수동 테스트와 자동화 테스트는 어떤 차이를 만들까요?
-
-## 큰 그림
-
-![pytest 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/01/01-01-big-picture.ko.png)
-
-*pytest 101 1장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 

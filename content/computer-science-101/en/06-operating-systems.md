@@ -29,19 +29,15 @@ This is post 6 in the Computer Science 101 series.
 
 In this article, we'll turn processes, threads, virtual memory, system calls, and concurrency into a practical model you can use while debugging and designing software.
 
+
+![Computer Science 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/06/06-01-concept-at-a-glance.en.png)
+*Computer Science 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Operating Systems?
 - Which signal should the example or diagram make visible for Operating Systems?
 - What failure should be prevented first when Operating Systems reaches a real system?
-
-## Big Picture
-
-![Computer Science 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/06/06-01-concept-at-a-glance.en.png)
-
-*Computer Science 101 chapter 6 flow overview*
-
-This picture places Operating Systems inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions This Article Answers
 

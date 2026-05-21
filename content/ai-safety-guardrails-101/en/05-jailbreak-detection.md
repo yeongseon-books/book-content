@@ -26,21 +26,16 @@ A jailbreak does more than override a system instruction. It tries to peel back 
 
 This is post 5 in the AI Safety & Guardrails 101 series. It covers the signals that make jailbreak attempts detectable and how to combine detectors without depending on a single classifier.
 
+
+![Jailbreak detection layers](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/05/05-01-big-picture.en.png)
+*Jailbreak detection layers*
+> A jailbreak is not one phrase; it is an intent signal that tries to bypass alignment and policy.
+
 ## Questions to Keep in Mind
 
 - Why is keyword blocking not enough for jailbreak detection?
 - How should normalization, pattern checks, embeddings, and an LLM judge be layered?
 - How should multilingual and encoded bypass cases be preserved in the regression dataset?
-
-## Big Picture
-
-![Jailbreak detection layers](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/05/05-01-big-picture.en.png)
-
-*Jailbreak detection layers*
-
-This picture layers input normalization, pattern checks, similarity detection, LLM intent judgment, and block or isolation decisions. Jailbreak defense is not one detector; it is a pipeline that reads bypass intent across layers.
-
-> A jailbreak is not one phrase; it is an intent signal that tries to bypass alignment and policy.
 
 ## What a Jailbreak Is
 

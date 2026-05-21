@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 회전, 확대, 반사, 전단을 예로 들어 선형변환을 기하학적으로 읽어 보겠습니다.
 
+
+![Linear Algebra 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/05/05-01-concept-at-a-glance.ko.png)
+*Linear Algebra 101 5장 흐름 개요*
+> 선형변환은 벡터를 다른 벡터로 보내되 덧셈과 스칼라곱 구조를 지키는 규칙입니다. 행렬 곱을 변환의 합성으로 읽으면 왜 순서가 중요한지가 자동으로 의미를 얻습니다.
+
 ## 먼저 던지는 질문
 
 - 행렬을 곱한다는 말은 공간에 어떤 변화를 주는 걸까요?
 - 회전, 확대, 반사, 전단은 행렬 모양으로 어떻게 드러날까요?
 - 변환의 합성은 왜 행렬 곱으로 표현될까요?
-
-## 큰 그림
-
-![Linear Algebra 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/05/05-01-concept-at-a-glance.ko.png)
-
-*Linear Algebra 101 5장 흐름 개요*
-
-선형변환은 벡터 공간을 다른 벡터 공간으로 옮기는 규칙입니다. 회전, 확대, 반사, 전단 변환 등은 모두 선형변환의 예입니다. 각 변환은 행렬로 표현되며, 행렬이 어떤 기하학적 작용을 나타내는지 이해하면 계산의 의미가 분명해집니다.
-
-> 선형변환은 벡터를 다른 벡터로 보내되 덧셈과 스칼라곱 구조를 지키는 규칙입니다. 행렬 곱을 변환의 합성으로 읽으면 왜 순서가 중요한지가 자동으로 의미를 얻습니다.
 
 ## 왜 중요한가
 

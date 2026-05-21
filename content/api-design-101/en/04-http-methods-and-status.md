@@ -29,21 +29,16 @@ This is post 4 in the API Design 101 series.
 
 Here, we treat HTTP methods and status codes as the client-side branching model of the API. The method communicates intent, and the status code tells the caller what happened in a way that retries, caching, and error handling can trust.
 
+
+![api design 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/04/04-01-concept-at-a-glance.en.png)
+*api design 101 chapter 4 flow overview*
+> The power of HTTP methods and status codes is that clients do not need to parse response bodies to know what happened — the code tells the story.
+
 ## Questions to Keep in Mind
 
 - The meaning of GET / POST / PUT / PATCH / DELETE?
 - Safe vs idempotent operations?
 - The 2xx / 3xx / 4xx / 5xx families?
-
-## Big Picture
-
-![api design 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/04/04-01-concept-at-a-glance.en.png)
-
-*api design 101 chapter 4 flow overview*
-
-The diagram pairs request verbs with response codes: GET returns 200 if found or 404 if not; POST returns 201 if created or 400 if input is invalid; each combination signals a different outcome that clients can act on.
-
-> The power of HTTP methods and status codes is that clients do not need to parse response bodies to know what happened — the code tells the story.
 
 ## Why It Matters
 

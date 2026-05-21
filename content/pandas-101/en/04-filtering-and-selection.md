@@ -28,21 +28,16 @@ This is post 4 in the Pandas 101 series.
 
 My goal here is to organize selection tools as a small decision framework: labels, positions, and conditions. Once you think that way, the syntax choices become much easier to justify.
 
+
+![pandas 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/04/04-01-concept-at-a-glance.en.png)
+*pandas 101 chapter 4 flow overview*
+> *Filtering is repeating at every stage of analysis. Slow or ambiguous selection code breaks everything downstream — treat this as a core skill, not syntax.
+
 ## Questions to Keep in Mind
 
 - The difference between *loc* and *iloc?
 - The intuition behind *boolean indexing?
 - The readability of *query?
-
-## Big Picture
-
-![pandas 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/04/04-01-concept-at-a-glance.en.png)
-
-*pandas 101 chapter 4 flow overview*
-
-This picture places Filtering and Selection inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> *Filtering is repeating at every stage of analysis. Slow or ambiguous selection code breaks everything downstream — treat this as a core skill, not syntax.
 
 ## Why It Matters
 

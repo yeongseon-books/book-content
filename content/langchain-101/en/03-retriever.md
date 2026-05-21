@@ -25,21 +25,15 @@ RAG quality is often decided before the model writes a single token. If retrieva
 
 This is the third post in the LangChain 101 series. It covers Retrievers, VectorStores, and the basic pattern for injecting retrieved context into an LLM prompt.
 
+![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/03/03-02-the-flow-at-a-glance.en.png)
+*The flow at a glance*
+> A Retriever does not store knowledge by itself; it turns a question into the subset of documents worth showing the model.
+
 ## Questions to Keep in Mind
 
 - How does a Retriever turn VectorStore results into LLM context?
 - When retrieval is empty or wrong, what should you inspect before blaming the model?
 - What metadata must be saved and reloaded with a VectorStore?
-
-## Big Picture
-
-![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/03/03-02-the-flow-at-a-glance.en.png)
-
-*The flow at a glance*
-
-This picture shows a user question passing through a retriever into relevant document chunks, which then become prompt context. In a RAG chain, model quality cannot be judged until the retrieval boundary is visible.
-
-> A Retriever does not store knowledge by itself; it turns a question into the subset of documents worth showing the model.
 
 ## Minimal runnable example
 

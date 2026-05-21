@@ -27,17 +27,15 @@ last_reviewed: '2026-05-12'
 
 이 글은 Type Hints (Python) 101 시리즈의 5번째 글입니다. 여기서는 딕셔너리 형태를 유지하면서 키 구조를 고정하는 `TypedDict`와, 보일러플레이트를 줄인 구조화 클래스를 만드는 `dataclass`를 비교합니다.
 
+
+![Type Hints in Python 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/05/05-01-big-picture.ko.png)
+*Type Hints in Python 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 이름 있는 키와 값 타입을 가진 딕셔너리는 어떻게 표현할까요?
 - 자동 생성된 `__init__`, `__repr__`, `__eq__`가 필요한 가벼운 데이터 객체는 어떻게 만들까요?
 - 선택 키, 상속, 불변 객체 같은 패턴은 어디서 쓸까요?
-
-## 큰 그림
-
-![Type Hints in Python 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/05/05-01-big-picture.ko.png)
-
-*Type Hints in Python 101 5장 흐름 개요*
 
 ## 왜 이 주제가 중요한가
 
@@ -485,7 +483,6 @@ Success: no issues found in N source files
 위 결과가 나오더라도 끝이 아닙니다. 새로운 기능을 추가할 때 같은 원칙을 반복해 계약을 유지해야 타입 힌트가 장기적으로 품질을 지켜 줍니다.
 
 
-
 ## 추가 사례: 주문 처리 모듈 타입 하드닝
 
 아래 코드는 실제로 자주 보는 레거시 패턴입니다.
@@ -562,7 +559,6 @@ service.py:36: error: Missing key "user" for TypedDict "InvoicePayload"  [typedd
 - CI에서는 타입 검사 실패를 테스트 실패와 동등하게 취급합니다.
 
 
-
 ## 보강 메모: 실전 리뷰에서 확인하는 타입 힌트 패턴
 
 ### 패턴 1: 경계 파싱 함수를 별도로 둡니다
@@ -619,8 +615,6 @@ def build_user(user_id: int, email: str) -> NormalizedUser:
 - mypy 오류를 숨기는 `type: ignore`가 정말 필요한가?
 
 
-
-
 ## 짧은 실전 확인
 
 아래 명령으로 수정 직후 타입 검사를 바로 확인합니다.
@@ -630,7 +624,6 @@ mypy path/to/example.py
 ```
 
 검사 결과가 통과해도 `Optional` 분기와 예외 메시지 품질까지 함께 점검해야 실제 운영에서 디버깅 비용을 줄일 수 있습니다.
-
 
 
 TypedDict와 dataclass를 함께 쓰는 팀에서는 보통 외부 입출력 경계는 TypedDict로, 내부 계산 모델은 dataclass로 분리합니다. 이렇게 두 계층을 나누면 직렬화 형식 변화와 도메인 로직 변경을 독립적으로 다룰 수 있어 유지보수성이 높아집니다.

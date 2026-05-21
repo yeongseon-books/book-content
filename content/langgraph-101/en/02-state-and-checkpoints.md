@@ -31,21 +31,15 @@ This is the second article in the LangGraph 101 series. Here I want to frame che
 
 Once that model is clear, the next chapter becomes easier too. Conditional edges stop looking like isolated branching logic and start looking like routing decisions made from saved state. Tool loops become repeated state transitions on top of the same timeline. If checkpointing remains a fuzzy “memory-like thing,” `thread_id`, merge rules, replay, and time travel all stay fuzzier than they should.
 
+![Resume flow through thread_id](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/02/02-01-minimal-runnable-example.en.png)
+*Resume flow through thread_id*
+> State is the contract for the current run; a checkpoint is the storage boundary that lets the next call resume that contract.
+
 ## Questions to Keep in Mind
 
 - What bugs become easier to avoid when state is the single source of truth in LangGraph?
 - How is a checkpoint different from in-memory state, and when does it become a recovery boundary?
 - What limit appears if the MemorySaver example is mistaken for production storage?
-
-## Big Picture
-
-![Resume flow through thread_id](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/02/02-01-minimal-runnable-example.en.png)
-
-*Resume flow through thread_id*
-
-This picture shows state being updated during graph execution while checkpoints persist it between calls. Separating state from checkpoints makes multi-turn execution and recovery boundaries clear.
-
-> State is the contract for the current run; a checkpoint is the storage boundary that lets the next call resume that contract.
 
 ## Why this structure matters
 

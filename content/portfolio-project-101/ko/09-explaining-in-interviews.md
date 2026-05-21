@@ -26,21 +26,16 @@ last_reviewed: '2026-05-15'
 
 이 글은 Portfolio Project 101 시리즈의 9번째 글입니다. 여기서는 포트폴리오 프로젝트를 면접에서 설명할 때 짧은 시간 안에 핵심을 전달하는 구조를 살펴보겠습니다. 목표는 많이 말하는 것이 아니라, 판단력이 들리는 답변을 만드는 데 있습니다.
 
+
+![Portfolio Project 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/09/09-01-diagram.ko.png)
+*Portfolio Project 101 9장 흐름 개요*
+> 같은 프로젝트도 기술 면접에서는 아키텍처 결정을 강조하고, 행동 기반 면접에서는 어려움과 해결 과정을 강조합니다. 청중에 맞춤 설명이 신뢰를 만듭니다.
+
 ## 먼저 던지는 질문
 
 - 면접관은 코드 양보다 무엇을 더 듣고 싶어 할까요?
 - STAR 구조는 왜 짧은 답변에서 특히 강할까요?
 - 숫자와 트레이드오프는 답변 설득력을 어떻게 바꿀까요?
-
-## 큰 그림
-
-![Portfolio Project 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/09/09-01-diagram.ko.png)
-
-*Portfolio Project 101 9장 흐름 개요*
-
-이 그림에서는 포트폴리오 프로젝트를 면접관 앞에서 어떻게 설명할지 전략을 봅니다. 청중이 바뀌면 이야기 구조도 달라집니다.
-
-> 같은 프로젝트도 기술 면접에서는 아키텍처 결정을 강조하고, 행동 기반 면접에서는 어려움과 해결 과정을 강조합니다. 청중에 맞춤 설명이 신뢰를 만듭니다.
 
 ## 왜 중요한가
 

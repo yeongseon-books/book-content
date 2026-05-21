@@ -27,19 +27,15 @@ Collected data is rarely clean enough to become training data as-is. The real qu
 
 This is post 6 in the AI Data Preparation 101 series. Here we cover how heuristic rules and classifier-based filters work together to keep low-value samples out of the corpus.
 
+
+![AI data preparation chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/06/06-01-big-picture.en.png)
+*AI data preparation chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - Which low-cost heuristics catch obvious junk before you spend model calls on it?
 - What does language detection remove that simple length or symbol checks cannot?
 - How should perplexity and classifier scores sit behind the heuristic layer?
-
-## Big Picture
-
-![AI data preparation chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/06/06-01-big-picture.en.png)
-
-*AI data preparation chapter 6 flow overview*
-
-This picture places Quality Filtering - Heuristics and Classifiers inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## "Collected does not mean trainable."
 

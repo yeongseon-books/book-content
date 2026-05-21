@@ -25,17 +25,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 Computer Networks 101 시리즈의 3번째 글입니다.
 
+
+![Computer Networks 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/03/03-01-concept-at-a-glance.ko.png)
+*Computer Networks 101 3장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - TCP가 맡는 책임은 정확히 무엇일까요?
 - UDP는 왜 일부 책임을 의도적으로 하지 않을까요?
 - 3-way handshake와 연결 종료는 어떤 흐름으로 일어날까요?
-
-## 큰 그림
-
-![Computer Networks 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/03/03-01-concept-at-a-glance.ko.png)
-
-*Computer Networks 101 3장 흐름 개요*
 
 ## 왜 중요한가
 

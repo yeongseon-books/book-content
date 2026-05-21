@@ -31,21 +31,16 @@ last_reviewed: '2026-05-04'
 
 This is post 6 in the Information Security 101 series.
 
+
+![information security 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/06/06-01-big-picture.en.png)
+*information security 101 chapter 6 flow overview*
+> SQL Injection and XSS both turn untrusted input into executable code in its target context. Defense is not input filtering; it is prepared statements for SQL and context-aware escaping for HTML.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying SQL Injection and XSS?
 - Which signal should the example or diagram make visible for SQL Injection and XSS?
 - What failure should be prevented first when SQL Injection and XSS reaches a real system?
-
-## Big Picture
-
-![information security 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/06/06-01-big-picture.en.png)
-
-*information security 101 chapter 6 flow overview*
-
-This picture places SQL Injection and XSS inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> SQL Injection and XSS both turn untrusted input into executable code in its target context. Defense is not input filtering; it is prepared statements for SQL and context-aware escaping for HTML.
 
 ## What You Will Learn
 

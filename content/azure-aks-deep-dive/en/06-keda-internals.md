@@ -42,19 +42,14 @@ feeds the external metrics path,
 and directly handles the scale-to-zero boundary by writing replica counts itself.
 KEDA installs two main components: the **operator**, which watches `ScaledObject` and `ScaledJob` CRDs, creates the HPA, and reconciles activation and deactivation; and the **metrics adapter**, which implements the Kubernetes external-metrics API so HPA can pull scaler values. A **scaler** is the Go interface each event source implements for activity detection and metric production.
 
+![azure kubernetes service deep dive chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/06/06-01-the-keda-structure.en.png)
+*azure kubernetes service deep dive chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - How does KEDA synthesize HPA external metrics, and where does the adapter's responsibility end?
 - What is the decisive difference between triggers that scale to zero and those that cannot?
 - How do ScaledObject and ScaledJob differ in intent, and who picks which?
-
-## Big Picture
-
-![azure kubernetes service deep dive chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/06/06-01-the-keda-structure.en.png)
-
-*azure kubernetes service deep dive chapter 6 flow overview*
-
-This picture places KEDA internals — how a ScaledObject builds an HPA inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## The KEDA structure
 

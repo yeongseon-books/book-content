@@ -29,21 +29,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 동작하는 코드와 읽기 쉬운 코드, 그리고 바꾸기 쉬운 코드가 어떻게 다른지 한 번에 정리하겠습니다.
 
+
+![Clean Code 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/01/01-01-concept-at-a-glance.ko.png)
+*Clean Code 101 1장 흐름 개요*
+> Clean Code는 한 번의 수정이 다른 곳을 깨뜨리지 않도록 경계를 명확하게 만드는 일입니다.
+
 ## 먼저 던지는 질문
 
 - Clean Code를 판단할 때 어떤 신호를 먼저 봐야 할까요?
 - 동작하는 코드와 읽기 쉬운 코드의 차이는 무엇일까요?
 - 작은 원칙이 실제 유지보수 비용에 왜 큰 차이를 만들까요?
-
-## 큰 그림
-
-![Clean Code 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/01/01-01-concept-at-a-glance.ko.png)
-
-*Clean Code 101 1장 흐름 개요*
-
-이 그림은 코드 품질을 입력-처리-검증-신호의 네 가지 경계로 나누어 봅니다. 각 경계에서 어떤 책임을 진다는 것인지 분명하면, Clean Code의 나머지 원칙도 자동으로 따라갑니다.
-
-> Clean Code는 한 번의 수정이 다른 곳을 깨뜨리지 않도록 경계를 명확하게 만드는 일입니다.
 
 ## 왜 중요한가
 

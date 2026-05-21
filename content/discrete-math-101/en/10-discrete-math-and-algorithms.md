@@ -31,19 +31,15 @@ This is the final post in the Discrete Math 101 series.
 
 > Discrete math is the language of algorithms. Recurrences feed time-complexity analysis, combinatorics counts cases, graph theory powers routing and dependency resolution, and proof techniques validate correctness. This final article reorganizes the whole series from an algorithmic point of view and briefly steps up to higher concepts like P and NP.
 
+
+![discrete math 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/10/10-01-big-picture.en.png)
+*discrete math 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Discrete Mathematics and Algorithms?
 - Which signal should the example or diagram make visible for Discrete Mathematics and Algorithms?
 - What failure should be prevented first when Discrete Mathematics and Algorithms reaches a real system?
-
-## Big Picture
-
-![discrete math 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/10/10-01-big-picture.en.png)
-
-*discrete math 101 chapter 10 flow overview*
-
-This picture places Discrete Mathematics and Algorithms inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

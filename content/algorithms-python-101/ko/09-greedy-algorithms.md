@@ -28,17 +28,15 @@ last_reviewed: '2026-05-12'
 
 다만 그리디 논리는 어디에나 안전하지 않습니다. 어떤 문제에서는 통하고 다른 문제에서는 실패하는 이유를 알아야, 단순함이 함정이 되지 않습니다.
 
+
+![Algorithms with Python 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/09/09-01-concept-overview.ko.png)
+*Algorithms with Python 101 9장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 그리디 알고리즘이 최적해를 만드는 조건은 무엇일까요?
 - 동전 거스름돈, 활동 선택, 분할 가능한 배낭 문제는 어떻게 풀까요?
 - 그리디는 동적 계획법과 어떤 차이가 있을까요?
-
-## 큰 그림
-
-![Algorithms with Python 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/09/09-01-concept-overview.ko.png)
-
-*Algorithms with Python 101 9장 흐름 개요*
 
 ## 왜 중요한가
 

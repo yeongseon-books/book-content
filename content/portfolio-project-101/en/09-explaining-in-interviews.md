@@ -30,21 +30,16 @@ This is post 9 in the Portfolio Project 101 series. Here we will shape a portfol
 
 > A strong interview answer is not a product pitch. It is a compressed record of problem, task, action, result, and learning.
 
+
+![portfolio project 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/09/09-01-concept-at-a-glance.en.png)
+*portfolio project 101 chapter 9 flow overview*
+> The same project can emphasize architecture decisions in a technical interview and problem-solving process in a behavioral interview. Matching your explanation to the audience builds trust.
+
 ## Questions to Keep in Mind
 
 - What do interviewers usually want to hear before they care about implementation detail?
 - Why is the STAR structure especially useful for short project answers?
 - How do numbers and trade-offs change the credibility of the answer?
-
-## Big Picture
-
-![portfolio project 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/09/09-01-concept-at-a-glance.en.png)
-
-*portfolio project 101 chapter 9 flow overview*
-
-This picture places Explaining in Interviews inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> The same project can emphasize architecture decisions in a technical interview and problem-solving process in a behavioral interview. Matching your explanation to the audience builds trust.
 
 ## Why It Matters
 

@@ -30,19 +30,15 @@ This is post 2 in the pytest 101 series.
 
 > pytest uses the `test_` prefix convention to auto-discover files and functions. This article covers project layout, writing tests, and using various execution options.
 
+
+![pytest 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/02/02-01-big-picture.en.png)
+*pytest 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Writing Your First pytest Test?
 - Which signal should the example or diagram make visible for Writing Your First pytest Test?
 - What failure should be prevented first when Writing Your First pytest Test reaches a real system?
-
-## Big Picture
-
-![pytest 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/02/02-01-big-picture.en.png)
-
-*pytest 101 chapter 2 flow overview*
-
-This picture places Writing Your First pytest Test inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

@@ -25,17 +25,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 Computer Networks 101 시리즈의 2번째 글입니다.
 
+
+![Computer Networks 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/02/02-01-concept-at-a-glance.ko.png)
+*Computer Networks 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - IPv4와 IPv6는 어떤 차이를 가질까요?
 - subnet mask와 CIDR 표기는 무엇을 나눠서 보여 줄까요?
 - 네트워크 주소, 브로드캐스트 주소, 사용 가능한 호스트 수는 어떻게 계산할까요?
-
-## 큰 그림
-
-![Computer Networks 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/02/02-01-concept-at-a-glance.ko.png)
-
-*Computer Networks 101 2장 흐름 개요*
 
 ## 왜 중요한가
 

@@ -29,17 +29,15 @@ last_reviewed: '2026-05-17'
 
 이번 글에서는 정확도를 맨 앞 숫자가 아니라 **마지막 확인 숫자**로 다루겠습니다. 특히 `ko/03-limits-of-accuracy.md:64-69,115-131`에서 약했던 부분을 보강해, 높은 정확도가 실제 개선인지 아니면 다수 클래스가 만든 착시인지 운영자 관점에서 판정하는 절차로 재구성하겠습니다.
 
+
+![Model Evaluation 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/03/03-01-concept-at-a-glance.ko.png)
+*Model Evaluation 101 3장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 정확도의 한계를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?
 - 정확도의 한계에서 예제나 다이어그램으로 검증해야 할 핵심 신호는 무엇일까요?
 - 정확도의 한계를 실제 시스템에 적용할 때 어떤 실패를 먼저 막아야 할까요?
-
-## 큰 그림
-
-![Model Evaluation 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/03/03-01-concept-at-a-glance.ko.png)
-
-*Model Evaluation 101 3장 흐름 개요*
 
 ## 이 글이 답하는 질문
 

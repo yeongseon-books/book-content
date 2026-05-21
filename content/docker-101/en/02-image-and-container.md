@@ -28,19 +28,15 @@ Once that distinction is clear, a lot of troubleshooting gets easier. You can se
 
 This is post 2 in the Docker 101 series. Here we use layers, copy-on-write, and lifecycle commands to build a durable mental model for image state, container state, and what actually survives a restart.
 
+
+![docker 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/02/02-01-concept-at-a-glance.en.png)
+*docker 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - The *lifecycle* of *images* and *containers?
 - Layers* and *copy-on-write?
 - The *ten commands* you actually use?
-
-## Big Picture
-
-![docker 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/02/02-01-concept-at-a-glance.en.png)
-
-*docker 101 chapter 2 flow overview*
-
-This picture places Images and Containers inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

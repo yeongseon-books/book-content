@@ -28,19 +28,14 @@ After the first public release, users stop asking only “does it work?” and s
 
 This is post 6 in the Python Package 101 series. Here we translate code changes into SemVer decisions, keep package metadata in sync, and turn release history into something users can trust.
 
+![Python Package 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/06/06-01-mental-model.en.png)
+*Python Package 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - When do you bump each part of MAJOR.MINOR.PATCH in SemVer?
 - Where in the code should the version be recorded?
 - What is the relationship between Git tags and releases?
-
-## Big Picture
-
-![Python Package 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/06/06-01-mental-model.en.png)
-
-*Python Package 101 chapter 6 flow overview*
-
-This picture places Versioning and Releases inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What you will learn
 

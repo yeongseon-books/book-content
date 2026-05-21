@@ -32,19 +32,14 @@ This is the 6th article in the SQLAlchemy 101 series.
 
 *ORM Relationships: connecting both sides safely with relationship and back_populates*
 
+![sqlalchemy 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/06/06-02-why-it-matters.en.png)
+*sqlalchemy 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - What does `relationship()` actually do, and how does it relate to `ForeignKey`?
 - What is the difference between `back_populates` and `backref`, and why is `back_populates` preferred?
 - What happens when you append a new object to `User.orders`?
-
-## Big Picture
-
-![sqlalchemy 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/06/06-02-why-it-matters.en.png)
-
-*sqlalchemy 101 chapter 6 flow overview*
-
-This picture places ORM Relationships: Connecting Both Sides Safely with relationship and back_populates inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

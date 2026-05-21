@@ -28,21 +28,16 @@ That is why severity is more than a label. It is the shorthand that turns impact
 
 This is post 2 in the Incident Response 101 series. This post shows how to define SEV levels, how to map them to concrete actions, and how to keep boundary cases from turning into live arguments during an outage.
 
+
+![incident response 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/02/02-01-diagram-at-a-glance.en.png)
+*incident response 101 chapter 2 flow overview*
+> Severity is your team's shorthand for action. When someone says SEV1, everyone knows the scope, who pages, and how often to communicate.
+
 ## Questions to Keep in Mind
 
 - What separates SEV1, SEV2, and SEV3 in practice?
 - Which axes matter most: users, scope, revenue, legal exposure, or duration?
 - How should severity affect paging and update cadence?
-
-## Big Picture
-
-![incident response 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/02/02-01-diagram-at-a-glance.en.png)
-
-*incident response 101 chapter 2 flow overview*
-
-This picture places Severity Classification inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Severity is your team's shorthand for action. When someone says SEV1, everyone knows the scope, who pages, and how often to communicate.
 
 ## Why this topic matters
 

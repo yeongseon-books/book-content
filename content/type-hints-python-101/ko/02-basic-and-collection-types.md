@@ -27,17 +27,15 @@ last_reviewed: '2026-05-12'
 
 이 글은 Type Hints (Python) 101 시리즈의 2번째 글입니다. 여기서는 기본 스칼라 타입과 컬렉션 타입을 어떻게 표현하는지, 그리고 컨테이너 안쪽 타입까지 적어야 하는 이유를 정리합니다.
 
+
+![Type Hints in Python 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/02/02-01-big-picture.ko.png)
+*Type Hints in Python 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - `int`, `str`, `float`, `bool`, `bytes`, `None`은 어떻게 적을까요?
 - `list`, `dict`, `tuple`, `set`은 왜 원소 타입까지 붙여야 할까요?
 - 고정 길이 튜플과 가변 길이 튜플은 어떻게 다를까요?
-
-## 큰 그림
-
-![Type Hints in Python 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/02/02-01-big-picture.ko.png)
-
-*Type Hints in Python 101 2장 흐름 개요*
 
 ## 왜 이 주제가 중요한가
 
@@ -483,7 +481,6 @@ Success: no issues found in N source files
 위 결과가 나오더라도 끝이 아닙니다. 새로운 기능을 추가할 때 같은 원칙을 반복해 계약을 유지해야 타입 힌트가 장기적으로 품질을 지켜 줍니다.
 
 
-
 ## 추가 사례: 주문 처리 모듈 타입 하드닝
 
 아래 코드는 실제로 자주 보는 레거시 패턴입니다.
@@ -560,7 +557,6 @@ service.py:36: error: Missing key "user" for TypedDict "InvoicePayload"  [typedd
 - CI에서는 타입 검사 실패를 테스트 실패와 동등하게 취급합니다.
 
 
-
 ## 보강 메모: 실전 리뷰에서 확인하는 타입 힌트 패턴
 
 ### 패턴 1: 경계 파싱 함수를 별도로 둡니다
@@ -615,7 +611,6 @@ def build_user(user_id: int, email: str) -> NormalizedUser:
 - `None` 가능성은 본문에서 실제로 처리되었는가?
 - `Any`가 도입되면 대체 가능한 구체 타입은 없는가?
 - mypy 오류를 숨기는 `type: ignore`가 정말 필요한가?
-
 
 
 ## 실전 표: TypedDict와 dataclass 경계 분리

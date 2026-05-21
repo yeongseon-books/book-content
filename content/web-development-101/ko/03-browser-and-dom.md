@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 브라우저가 HTML을 DOM으로 바꾸고, 렌더링 파이프라인과 이벤트 루프를 통해 살아 있는 화면을 만드는 과정을 정리하겠습니다.
 
+
+![Web Development 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/03/03-01-concept-at-a-glance.ko.png)
+*Web Development 101 3장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - DOM은 정확히 무엇이며 어떻게 만들어질까요?
 - 브라우저 렌더링 파이프라인은 어떤 단계로 이어질까요?
 - JavaScript는 DOM을 어떻게 읽고 바꿀까요?
-
-## 큰 그림
-
-![Web Development 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/03/03-01-concept-at-a-glance.ko.png)
-
-*Web Development 101 3장 흐름 개요*
 
 ## 왜 이 모델이 중요한가
 
@@ -71,7 +69,7 @@ DOM에 대한 감각이 없으면 페이지가 왜 느린지 설명하기 어렵
 
 ## 전후 비교로 보는 DOM 조작 방식
 
-**Before (string-style HTML)**
+**Before (문자열 방식 HTML)**
 
 ```js
 document.body.innerHTML += "<p>new item</p>";

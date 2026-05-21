@@ -24,21 +24,16 @@ last_reviewed: '2026-05-12'
 
 이 글은 DevOps 101 시리즈의 마지막 글입니다.
 
+
+![DevOps 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/10/10-01-diagram.ko.png)
+*DevOps 101 10장 흐름 개요*
+> 운영 가능한 DevOps의 핵심은 배포와 모니터링, 장애 대응까지가 하나의 피드백 루프를 이루는 것입니다.
+
 ## 먼저 던지는 질문
 
 - CI, CD, 모니터링, 장애 대응이 각각 있는데도 팀 전체 속도가 느린 이유는 무엇일까요?
 - DevOps를 도구 목록이 아니라 하나의 운영 흐름으로 보려면 어떤 그림이 필요할까요?
 - DORA 4지표는 무엇을 측정하며 왜 함께 봐야 할까요?
-
-## 큰 그림
-
-![DevOps 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/10/10-01-diagram.ko.png)
-
-*DevOps 101 10장 흐름 개요*
-
-이 그림은 지금까지 배운 모든 DevOps 요소가 어떻게 하나의 운영 흐름으로 통합되는지 보여줍니다. 각 단계의 자동화와 피드백이 순환할 때 진정한 DevOps가 시작됩니다.
-
-> 운영 가능한 DevOps의 핵심은 배포와 모니터링, 장애 대응까지가 하나의 피드백 루프를 이루는 것입니다.
 
 ## 왜 중요한가
 

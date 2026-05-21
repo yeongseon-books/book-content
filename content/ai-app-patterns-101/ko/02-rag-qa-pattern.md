@@ -26,21 +26,15 @@ LLM이 모르는 최신 정보, 사내 문서, 비공개 지식이 필요한 순
 
 이 글은 AI App Patterns 101 시리즈의 두 번째 글입니다. 여기서는 가장 작은 실용적인 RAG Q&A 파이프라인을 만들고, 검색과 생성이 어떻게 맞물리는지 차례로 정리합니다.
 
+![오프라인 인덱싱 파이프라인](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/02/02-01-offline-indexing-pipeline.ko.png)
+*오프라인 인덱싱 파이프라인*
+> RAG는 답을 외우는 모델이 아니라, 검색된 문서를 생성 전에 프롬프트에 주입하는 파이프라인입니다.
+
 ## 먼저 던지는 질문
 
 - RAG 답변 품질을 보기 전에 왜 검색 결과부터 확인해야 할까요?
 - 근거가 약한데도 모델이 답하게 두면 어떤 실패가 생길까요?
 - 출처를 함께 반환하려면 청크와 메타데이터를 어디서 보존해야 할까요?
-
-## 큰 그림
-
-![오프라인 인덱싱 파이프라인](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/02/02-01-offline-indexing-pipeline.ko.png)
-
-*오프라인 인덱싱 파이프라인*
-
-이 그림에서는 질문이 검색 단계에서 관련 문서 조각으로 바뀌고, 그 조각이 생성 단계의 근거로 들어가는 흐름을 봅니다. RAG Q&A는 모델 호출보다 검색 경계와 근거 품질을 먼저 봐야 안전합니다.
-
-> RAG는 답을 외우는 모델이 아니라, 검색된 문서를 생성 전에 프롬프트에 주입하는 파이프라인입니다.
 
 ## RAG의 두 단계
 

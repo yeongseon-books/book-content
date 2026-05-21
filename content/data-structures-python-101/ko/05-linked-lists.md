@@ -24,17 +24,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 Data Structures with Python 101 시리즈의 다섯 번째 글입니다.
 
+
+![Data Structures with Python 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/05/05-01-linked-structure-at-a-glance.ko.png)
+*Data Structures with Python 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - Python에 이미 list가 있는데 왜 연결 리스트를 따로 배워야 할까요?
 - 단일 연결 리스트와 이중 연결 리스트는 어떻게 다를까요?
 - 연결 리스트는 왜 삽입·삭제에는 강하고, 인덱스 접근에는 약할까요?
-
-## 큰 그림
-
-![Data Structures with Python 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/05/05-01-linked-structure-at-a-glance.ko.png)
-
-*Data Structures with Python 101 5장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 
@@ -311,7 +309,6 @@ Python에서는 연결 리스트를 직접 구현할 일이 많지 않습니다.
 ## 정리 및 다음 글 안내
 
 연결 리스트는 노드를 참조로 연결해 삽입과 삭제를 유연하게 처리하는 구조입니다. 배열처럼 연속 메모리를 요구하지 않지만, 인덱스 기반 임의 접근은 느립니다. 즉, 연결 리스트는 “위치로 찾는 구조”보다 “연결을 바꾸는 구조”에 가깝습니다. 다음 글에서는 계층 구조를 표현하는 트리와 이진 트리를 살펴보겠습니다.
-
 
 
 ## 타입 힌트 기반 이중 연결 리스트 구현

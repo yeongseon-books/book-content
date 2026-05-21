@@ -26,21 +26,16 @@ last_reviewed: '2026-05-15'
 
 시리즈 앞부분에서 배운 `SELECT`, `WHERE`, `JOIN`, `GROUP BY`, 서브쿼리, 윈도 함수는 각각 따로 존재하는 기능이 아닙니다. 실제 분석 업무에서는 이 도구들이 한 쿼리 안에서 층층이 결합됩니다. 그래서 시리즈 마지막에서는 문법별 설명보다, 자주 반복되는 분석 패턴을 한 번에 보는 편이 더 도움이 됩니다.
 
+
+![SQL 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/10/10-01-analytics-query-layering-flow.ko.png)
+*SQL 101 10장 흐름 개요*
+> 실전 분석 SQL의 핵심은 개별 기능을 외우는 것이 아니라, 여러 기능을 조합하여 복잡한 질문을 명확하고 유지보수 가능한 작은 단계들로 분해하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - DAU, WAU, MAU 같은 활성 사용자 지표는 어떤 모양으로 작성할까요?
 - 코호트와 유지율은 어떤 단계로 계산할까요?
 - 퍼널 분석은 어떻게 한 쿼리 안에 정리할 수 있을까요?
-
-## 큰 그림
-
-![SQL 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/10/10-01-analytics-query-layering-flow.ko.png)
-
-*SQL 101 10장 흐름 개요*
-
-이 그림에서는 SELECT, WHERE, JOIN, GROUP BY, 윈도 함수가 함께 어떻게 복잡한 분석 쿼리를 만드는지 봅니다. 실전 쿼리는 앞의 개념들을 조합하여 비즈니스 질문에 답하는 도구입니다.
-
-> 실전 분석 SQL의 핵심은 개별 기능을 외우는 것이 아니라, 여러 기능을 조합하여 복잡한 질문을 명확하고 유지보수 가능한 작은 단계들로 분해하는 데 있습니다.
 
 ## 왜 중요한가
 

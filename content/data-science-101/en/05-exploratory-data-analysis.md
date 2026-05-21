@@ -28,21 +28,16 @@ EDA is how you replace those assumptions with observations. If you skip it, you 
 
 This is post 5 in the Data Science 101 series. Here we walk through a compact but production-friendly EDA loop that helps you read the dataset before you try to optimize it.
 
+
+![data science 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/05/05-01-concept-at-a-glance.en.png)
+*data science 101 chapter 5 flow overview*
+> At its core, Exploratory Data Analysis is about deciding what enters a system, where validation happens, and which signals stay for the next cycle—not about feature names.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Exploratory Data Analysis?
 - Which signal should the example or diagram make visible for Exploratory Data Analysis?
 - What failure should be prevented first when Exploratory Data Analysis reaches a real system?
-
-## Big Picture
-
-![data science 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/05/05-01-concept-at-a-glance.en.png)
-
-*data science 101 chapter 5 flow overview*
-
-This picture places Exploratory Data Analysis inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> At its core, Exploratory Data Analysis is about deciding what enters a system, where validation happens, and which signals stay for the next cycle—not about feature names.
 
 ## Questions This Post Answers
 

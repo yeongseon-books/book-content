@@ -28,21 +28,16 @@ That is exactly when the most valuable learning can be lost. A good postmortem c
 
 This is post 8 in the Incident Response 101 series. This post covers blameless postmortem structure, quantified impact, actionable follow-up items, and the review loop that keeps the document from becoming shelfware.
 
+
+![incident response 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/08/08-01-diagram-at-a-glance.en.png)
+*incident response 101 chapter 8 flow overview*
+> Postmortems are not optional. They are how the team learns and the codebase improves from each incident.
+
 ## Questions to Keep in Mind
 
 - Why is a postmortem still necessary after the incident is already over?
 - What does blameless analysis mean in practical terms?
 - Why should the template stay stable across incidents?
-
-## Big Picture
-
-![incident response 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/08/08-01-diagram-at-a-glance.en.png)
-
-*incident response 101 chapter 8 flow overview*
-
-This picture places Postmortem inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Postmortems are not optional. They are how the team learns and the codebase improves from each incident.
 
 ## Why this topic matters
 

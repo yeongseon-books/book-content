@@ -29,21 +29,15 @@ AKS를 쓰다 막히는 지점은 대개 네트워크입니다. Pod끼리는 통
 
 여기서는 **Pod IP 설계와 외부 HTTP 라우팅을 분리해서** AKS 네트워킹을 정리하겠습니다. Azure CNI Overlay가 왜 새 클러스터의 자연스러운 기본 선택지인지, 그리고 Service와 Ingress가 왜 L4와 L7이라는 서로 다른 층에 놓이는지 차례로 보겠습니다.
 
+![Azure Kubernetes Service 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/05/05-01-start-with-the-request-path.ko.png)
+*Azure Kubernetes Service 101 5장 흐름 개요*
+> 네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - Pod IP 할당 방식과 외부 HTTP 라우팅을 왜 별개의 문제로 봐야 할까요?
 - kubenet, Azure CNI, Azure CNI Overlay는 각각 어떤 운영 trade-off를 가질까요?
 - 새 AKS 클러스터에서 Azure CNI Overlay를 먼저 검토하는 이유는 무엇일까요?
-
-## 큰 그림
-
-![Azure Kubernetes Service 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/05/05-01-start-with-the-request-path.ko.png)
-
-*Azure Kubernetes Service 101 5장 흐름 개요*
-
-이 그림에서는 네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 네트워킹과 Ingress — 클러스터 안과 밖을 잇는 길의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

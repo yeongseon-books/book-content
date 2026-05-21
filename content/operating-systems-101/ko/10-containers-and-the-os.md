@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 Operating Systems 101 시리즈의 마지막 글입니다.
 
+
+![Operating Systems 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/10/10-01-the-layers-that-create-container-isolati.ko.png)
+*Operating Systems 101 10장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 컨테이너와 가상 머신은 격리 방식이 어떻게 다를까요?
 - namespace는 "무엇이 보이는가"를, cgroup은 "얼마나 쓸 수 있는가"를 어떻게 나눌까요?
 - overlayfs는 왜 컨테이너 이미지를 가볍게 느끼게 만들까요?
-
-## 큰 그림
-
-![Operating Systems 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/10/10-01-the-layers-that-create-container-isolati.ko.png)
-
-*Operating Systems 101 10장 흐름 개요*
 
 ## 기본 모델
 > VM은 하이퍼바이저 위에 게스트 OS를 통째로 올립니다. 컨테이너는 호스트 커널을 그대로 쓰고, namespace로 "보이는 것"을 격리하고, cgroup으로 "쓸 수 있는 자원"을 제한합니다. 따라서 컨테이너는 가볍고 빠르게 시작하지만, 커널 취약점은 호스트와 공유합니다.

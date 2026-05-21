@@ -27,21 +27,16 @@ Senior is one of the most overloaded words in engineering careers. It sounds lik
 
 This is the final post in the Developer Career 101 series.
 
+
+![developer career 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/10/10-01-concept-at-a-glance.en.png)
+*developer career 101 chapter 10 flow overview*
+> The path to senior is not deeper technical skill; it is the ability to define problems and explain your decisions to others.
+
 ## Questions to Keep in Mind
 
 - What actually separates a senior engineer from a mid-level engineer?
 - How do problem framing, judgment, influence, and mentoring show up in day-to-day work?
 - Which behaviors matter beyond technical depth as your scope expands?
-
-## Big Picture
-
-![developer career 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/10/10-01-concept-at-a-glance.en.png)
-
-*developer career 101 chapter 10 flow overview*
-
-This picture places The Path to Senior inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> The path to senior is not deeper technical skill; it is the ability to define problems and explain your decisions to others.
 
 ## What You Will Learn
 

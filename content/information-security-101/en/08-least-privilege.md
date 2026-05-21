@@ -31,21 +31,16 @@ last_reviewed: '2026-05-04'
 
 This is post 8 in the Information Security 101 series.
 
+
+![information security 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/08/08-01-big-picture.en.png)
+*information security 101 chapter 8 flow overview*
+> Least privilege is not about giving fewer permissions. It is about asking "does this user/service need this permission right now in this context?" at every access decision.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Least Privilege?
 - Which signal should the example or diagram make visible for Least Privilege?
 - What failure should be prevented first when Least Privilege reaches a real system?
-
-## Big Picture
-
-![information security 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/08/08-01-big-picture.en.png)
-
-*information security 101 chapter 8 flow overview*
-
-This picture places Least Privilege inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Least privilege is not about giving fewer permissions. It is about asking "does this user/service need this permission right now in this context?" at every access decision.
 
 ## What You Will Learn
 

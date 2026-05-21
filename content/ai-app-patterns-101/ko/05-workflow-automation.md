@@ -26,21 +26,15 @@ seo_description: 워크플로 자동화는 모델 선택권 대신 사람이 정
 
 이 글은 AI App Patterns 101 시리즈의 다섯 번째 글입니다. 여기서는 명시적인 단계와 깔끔한 데이터 계약을 가진 다단계 LLM 워크플로를 어떻게 설계할지 다룹니다.
 
+![단계 사이의 순차 handoff](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/05/05-01-sequential-handoff-across-stages.ko.png)
+*단계 사이의 순차 handoff*
+> 워크플로 자동화는 모델의 선택권을 줄이고, 사람이 정의한 단계와 데이터 계약을 따르는 파이프라인으로 바꾸는 설계입니다.
+
 ## 먼저 던지는 질문
 
 - 다단계 체인은 언제 단순 순차 실행이고 언제 라우팅이 필요할까요?
 - 중간 결과의 타입을 고정하지 않으면 다음 단계에서 어떤 문제가 생길까요?
 - 워크플로 자동화에서 실패를 한 번에 숨기지 않으려면 어디에 로그를 남겨야 할까요?
-
-## 큰 그림
-
-![단계 사이의 순차 handoff](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/05/05-01-sequential-handoff-across-stages.ko.png)
-
-*단계 사이의 순차 handoff*
-
-이 그림에서는 입력이 여러 처리 단계를 지나거나 분류 결과에 따라 다른 경로로 라우팅되는 흐름을 봅니다. 워크플로 자동화의 핵심은 단계별 계약과 실패 지점을 분리해서 긴 체인을 추적 가능하게 만드는 것입니다.
-
-> 워크플로 자동화는 모델의 선택권을 줄이고, 사람이 정의한 단계와 데이터 계약을 따르는 파이프라인으로 바꾸는 설계입니다.
 
 ## 순차 체인
 

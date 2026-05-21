@@ -30,21 +30,16 @@ last_reviewed: '2026-05-12'
 
 이 글은 Statistics 101 시리즈의 3번째 글입니다. 여기서는 데이터의 모양을 읽는 기본 감각을 잡고, 정규분포를 당연한 기본값처럼 가정할 때 어떤 문제가 생기는지 정리하겠습니다.
 
+
+![Statistics 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/03/03-01-concept-at-a-glance.ko.png)
+*Statistics 101 3장 흐름 개요*
+> 분포를 이해하면 단순 요약값 너머의 데이터 성격을 정확히 읽을 수 있습니다.
+
 ## 먼저 던지는 질문
 
 - 데이터의 분포 모양은 왜 중요한가요?
 - 정규, 균등, 지수, 멱법칙 분포는 어떤 차이를 보일까요?
 - 왜도와 첨도는 무엇을 수치로 말해 줄까요?
-
-## 큰 그림
-
-![Statistics 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/03/03-01-concept-at-a-glance.ko.png)
-
-*Statistics 101 3장 흐름 개요*
-
-분포는 데이터의 전체 모양을 한눈에 보여주는 도구입니다. 평균이 같아도 분포가 다르면 완전히 다른 이야기를 하게 됩니다.
-
-> 분포를 이해하면 단순 요약값 너머의 데이터 성격을 정확히 읽을 수 있습니다.
 
 ## 왜 중요한가
 

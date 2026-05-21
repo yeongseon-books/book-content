@@ -27,17 +27,15 @@ last_reviewed: '2026-05-12'
 
 이 글은 Type Hints (Python) 101 시리즈의 첫 번째 글입니다. 여기서는 타입 힌트가 무엇이고, Python의 동적 타이핑과 어떻게 공존하며, 왜 실무에서 빠르게 가치가 드러나는지부터 정리합니다.
 
+
+![Type Hints in Python 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/01/01-01-big-picture.ko.png)
+*Type Hints in Python 101 1장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 타입 힌트는 정적 타입 언어의 타입 선언과 무엇이 다를까요?
 - PEP 484가 해결하려던 문제는 무엇이었을까요?
 - 변수, 매개변수, 반환값에 어떤 문법으로 타입을 붙일까요?
-
-## 큰 그림
-
-![Type Hints in Python 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/01/01-01-big-picture.ko.png)
-
-*Type Hints in Python 101 1장 흐름 개요*
 
 ## 왜 이 주제가 중요한가
 
@@ -480,7 +478,6 @@ Success: no issues found in N source files
 위 결과가 나오더라도 끝이 아닙니다. 새로운 기능을 추가할 때 같은 원칙을 반복해 계약을 유지해야 타입 힌트가 장기적으로 품질을 지켜 줍니다.
 
 
-
 ## 추가 사례: 주문 처리 모듈 타입 하드닝
 
 아래 코드는 실제로 자주 보는 레거시 패턴입니다.
@@ -555,7 +552,6 @@ service.py:36: error: Missing key "user" for TypedDict "InvoicePayload"  [typedd
 - 외부 입력 파싱 함수에는 `Optional`/`Union` 처리 분기를 강제합니다.
 - 리뷰에서 `Any` 추가가 보이면 대체 타입 후보를 함께 요구합니다.
 - CI에서는 타입 검사 실패를 테스트 실패와 동등하게 취급합니다.
-
 
 
 ## 실전 점검 로그: 타입 힌트를 계약으로 다루는 최소 루프

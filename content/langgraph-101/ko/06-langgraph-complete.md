@@ -30,21 +30,15 @@ seo_description: routing, tool loop, checkpoint를 하나의 LangGraph로 묶어
 
 여기서는 **직접 답변 경로와 도구 경로를 분리하고, 그 전체 대화를 같은 상태 타임라인 위에 저장하는 구조**를 읽어 보겠습니다. 완성형 LangGraph를 볼 때 먼저 확인할 것은 세 가지입니다. 어떤 요청이 굳이 도구로 가는지, tool loop가 어디서 끝나는지, 그리고 다음 턴이 시작될 때 이전 판단과 결과가 어떤 상태로 되살아나는지입니다. 이 세 가지가 선명하면 그래프는 커져도 읽힙니다.
 
+![supervisor와 tool loop가 결합된 통합 그래프](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/06/06-01-minimal-runnable-example.ko.png)
+*supervisor와 tool loop가 결합된 통합 그래프*
+> 완성형 에이전트의 기준은 기능을 모두 붙였는지가 아니라, 경로 선택과 도구 실행과 상태 복구를 각각 설명할 수 있는지입니다.
+
 ## 먼저 던지는 질문
 
 - 완성형 LangGraph 앱은 왜 하나의 거대한 프롬프트가 아니라 협력하는 상태 기계로 봐야 할까요?
 - 체크포인트, 분기, tool call, 멀티턴 이력을 붙여도 어떤 state 계약은 끝까지 유지해야 할까요?
 - 운영에서 그래프 실행을 설명하려면 어떤 로그와 검증 지점을 남겨야 할까요?
-
-## 큰 그림
-
-![supervisor와 tool loop가 결합된 통합 그래프](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/06/06-01-minimal-runnable-example.ko.png)
-
-*supervisor와 tool loop가 결합된 통합 그래프*
-
-이 그림에서는 state, checkpoint, conditional edge, tool node, 최종 응답이 하나의 실행 그래프로 연결되는 흐름을 봅니다. 완성형 LangGraph의 기준은 기능 수가 아니라 각 경계가 관찰 가능하고 복구 가능한지입니다.
-
-> 완성형 에이전트의 기준은 기능을 모두 붙였는지가 아니라, 경로 선택과 도구 실행과 상태 복구를 각각 설명할 수 있는지입니다.
 
 ## 왜 이 구조가 중요한가
 완성형 예제가 중요한 이유를 “기능이 다 들어 있으니까” 정도로 설명하면 충분하지 않습니다. 더 현실적인 이유는 운영 경계가 여기서 한꺼번에 만난다는 점입니다. routing이 잘못되면 필요 없는 tool loop가 열리고, tool loop가 과하면 비용과 지연이 늘고, checkpoint 설계가 약하면 다음 턴에서 왜 그런 판단이 나왔는지 재구성하기 어려워집니다. 각 요소를 따로 배울 때는 보이지 않던 문제가, 합치는 순간 드러납니다.

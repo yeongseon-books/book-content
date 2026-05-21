@@ -27,17 +27,15 @@ branch를 이해하는 순간 Git은 백업 도구에서 병렬 작업 도구로
 
 이 글은 Git/GitHub 101 시리즈의 네 번째 글입니다. 여기서는 branch를 만들고, 옮기고, 비교하는 흐름을 먼저 익히고 merge는 다음 글로 넘깁니다.
 
+
+![Git & GitHub 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/04/04-01-mental-model.ko.png)
+*Git & GitHub 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - branch는 왜 파일 복사본이 아니라 포인터라고 할까요?
 - `git branch`와 `git switch`는 역할이 어떻게 다를까요?
 - `HEAD`는 branch와 어떤 관계를 가질까요?
-
-## 큰 그림
-
-![Git & GitHub 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/04/04-01-mental-model.ko.png)
-
-*Git & GitHub 101 4장 흐름 개요*
 
 ## 왜 중요한가
 

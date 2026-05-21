@@ -29,19 +29,15 @@ This is post 8 in the Distributed Systems 101 series.
 
 Here we use queues, offsets, and event logs to show how distributed systems turn time and replay into design tools rather than accidental side effects.
 
+
+![distributed systems 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/08/08-01-concept-at-a-glance.en.png)
+*distributed systems 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - The decoupling and guarantees that a message queue provides?
 - The meaning of at-most-once, at-least-once, and exactly-once?
 - The definition of event sourcing and its relationship to CQRS?
-
-## Big Picture
-
-![distributed systems 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/08/08-01-concept-at-a-glance.en.png)
-
-*distributed systems 101 chapter 8 flow overview*
-
-This picture places Message Queues and Event Sourcing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

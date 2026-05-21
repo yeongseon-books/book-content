@@ -25,17 +25,15 @@ last_reviewed: '2026-05-12'
 
 이 글은 Discrete Math 101 시리즈의 마지막 글입니다.
 
+
+![Discrete Math 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/10/10-01-big-picture.ko.png)
+*Discrete Math 101 10장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 점화식과 마스터 정리는 시간 복잡도와 어떻게 연결될까요?
 - 귀납법과 루프 불변식은 알고리즘 정확성을 어떻게 보장할까요?
 - P, NP, NP-완전은 어떤 직관으로 이해해야 할까요?
-
-## 큰 그림
-
-![Discrete Math 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/10/10-01-big-picture.ko.png)
-
-*Discrete Math 101 10장 흐름 개요*
 
 ## 왜 중요한가
 

@@ -24,17 +24,15 @@ last_reviewed: '2026-05-12'
 
 이 글은 Data Structures with Python 101 시리즈의 첫 번째 글입니다.
 
+
+![Data Structures with Python 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/01/01-01-big-picture.ko.png)
+*Data Structures with Python 101 1장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 자료구조는 정확히 무엇이고 왜 따로 배워야 할까요?
 - 같은 데이터를 저장해도 자료구조에 따라 성능이 왜 크게 달라질까요?
 - Python이 기본으로 제공하는 list, dict, set, tuple은 각각 어떤 역할에 맞을까요?
-
-## 큰 그림
-
-![Data Structures with Python 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/01/01-01-big-picture.ko.png)
-
-*Data Structures with Python 101 1장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 

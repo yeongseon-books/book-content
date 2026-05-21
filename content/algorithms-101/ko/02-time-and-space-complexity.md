@@ -27,17 +27,15 @@ last_reviewed: '2026-05-12'
 
 코드를 쓰기 전에도 이 알고리즘이 충분히 빠를지 예측할 수 있을까요? 여기서는 Big-O와 관련 표기법, 그리고 벤치마크 전에 알고리즘을 비교하기 위한 비용 모델을 정리합니다.
 
+
+![Algorithms 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/02/02-01-big-picture.ko.png)
+*Algorithms 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - Big-O, Big-Omega, Big-Theta는 각각 무엇을 뜻할까요?
 - 코드 조각만 보고 복잡도를 어떻게 추정할 수 있을까요?
 - 반드시 즉시 떠올릴 수 있어야 하는 비용 계층은 무엇일까요?
-
-## 큰 그림
-
-![Algorithms 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/02/02-01-big-picture.ko.png)
-
-*Algorithms 101 2장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -274,7 +272,6 @@ for t in trace:
 이 루틴을 습관화하면 "코드가 돌아간다"와 "운영에서도 안전하다" 사이의 간격이 크게 줄어듭니다.
 
 
-
 ## 추가 보강: 검증 가능한 예제 세트
 
 ### 입력 크기 대비 알고리즘/학습 선택 표
@@ -308,7 +305,6 @@ def measure(fn, *args, repeat=3):
 3. 운영 로그만으로 실패 원인을 분리할 수 있는가
 
 이 질문에 즉답할 수 있으면 구현이 아니라 설계 수준에서 품질을 확보한 상태에 가깝습니다.
-
 
 
 ### 보강 메모: 경계 입력과 수치 검증

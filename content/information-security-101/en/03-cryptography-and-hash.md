@@ -31,21 +31,16 @@ last_reviewed: '2026-05-04'
 
 This is post 3 in the Information Security 101 series.
 
+
+![information security 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/03/03-01-big-picture.en.png)
+*information security 101 chapter 3 flow overview*
+> Cryptography and hashing are not about hiding data. They are about proving "this data has not been tampered with" (hash) or "only the key holder can read this" (cipher) at every boundary.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Cryptography and Hashing?
 - Which signal should the example or diagram make visible for Cryptography and Hashing?
 - What failure should be prevented first when Cryptography and Hashing reaches a real system?
-
-## Big Picture
-
-![information security 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/03/03-01-big-picture.en.png)
-
-*information security 101 chapter 3 flow overview*
-
-This picture places Cryptography and Hashing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Cryptography and hashing are not about hiding data. They are about proving "this data has not been tampered with" (hash) or "only the key holder can read this" (cipher) at every boundary.
 
 ## What You Will Learn
 

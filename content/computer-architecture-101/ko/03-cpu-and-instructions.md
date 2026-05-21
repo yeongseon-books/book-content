@@ -29,17 +29,15 @@ last_reviewed: '2026-05-12'
 
 성능 최적화는 결국 "이 코드는 몇 개의 명령어가 되었고, CPU는 그것을 얼마나 빨리 처리하는가"로 수렴합니다. 이 사이클을 머릿속에 넣어 두면 프로파일러 출력과 어셈블리 리스트가 비로소 읽히기 시작합니다.
 
+
+![Computer Architecture 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/03/03-01-cpu-fetch-decode-execute.ko.png)
+*Computer Architecture 101 3장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - CPU는 한 사이클에 정확히 무엇을 할까요?
 - ISA는 무엇을 약속하는 계약일까요?
 - 명령어는 opcode와 operand로 어떻게 구성될까요?
-
-## 큰 그림
-
-![Computer Architecture 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/03/03-01-cpu-fetch-decode-execute.ko.png)
-
-*Computer Architecture 101 3장 흐름 개요*
 
 ## 왜 중요한가
 

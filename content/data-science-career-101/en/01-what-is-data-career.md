@@ -28,21 +28,17 @@ That ambiguity matters early. If you cannot tell whether a team mainly values bu
 
 This is the first post in the Data Science Career 101 series.
 
+
+![data science career 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/01/01-01-concept-at-a-glance.en.png)
+*data science career 101 chapter 1 flow overview*
+> In data career, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
+
 ## Questions to Keep in Mind
 
 - What roles are usually grouped together when people say “data career”?
 - Why is it safer to distinguish data jobs by responsibility and deliverable than by title alone?
 - What do analyst, scientist, engineer, ML engineer, and analytics engineer each optimize for?
 
-## Big Picture
-
-![data science career 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/01/01-01-concept-at-a-glance.en.png)
-
-*data science career 101 chapter 1 flow overview*
-
-This picture places What Is a Data Career inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> In data career, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
 ## What You Will Learn
 
 - The data career *landscape*

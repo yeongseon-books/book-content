@@ -28,21 +28,16 @@ This is post 9 in the Open Source 101 series.
 
 Here, we will look at how to turn GitHub activity into a portfolio that shows problem selection, execution style, and sustained evidence rather than just activity noise.
 
+
+![open source 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/09/09-01-the-smallest-portfolio-structure.en.png)
+*open source 101 chapter 9 flow overview*
+> Your open source history is not a list of projects. It is a public record of how you solve problems and work with others.
+
 ## Questions to Keep in Mind
 
 - How does open source contribution become a portfolio?
 - What should a profile README and pinned repositories each communicate?
 - Which pull requests are worth highlighting as representative work?
-
-## Big Picture
-
-![open source 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/09/09-01-the-smallest-portfolio-structure.en.png)
-
-*open source 101 chapter 9 flow overview*
-
-This picture places An Open Source Portfolio inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Your open source history is not a list of projects. It is a public record of how you solve problems and work with others.
 
 ## Why It Matters
 

@@ -28,21 +28,16 @@ title: "SRE 101 (4/10): Error Budget"
 
 이 글은 SRE 101 시리즈의 4번째 글입니다. 여기서는 에러 버짓이 무엇인지, SLO에서 어떻게 계산하는지, burn rate를 왜 같이 봐야 하는지, 그리고 버짓이 실제 릴리스 정책을 어떻게 바꾸는지 설명합니다.
 
+
+![SRE 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/04/04-01-concept-at-a-glance.ko.png)
+*SRE 101 4장 흐름 개요*
+> Error Budget은 허용 단계에서 계산되고, 누적 차감에서 상태를 보여 주며, 속도 범위에서 위험 신호를 납니다.
+
 ## 먼저 던지는 질문
 
 - 에러 버짓은 왜 속도와 안정성 사이의 공통 언어가 될까요?
 - SLO를 세운 뒤 허용 가능한 실패 범위는 어떻게 계산할까요?
 - 누적 소진량과 burn rate는 왜 다른 질문에 답할까요?
-
-## 큰 그림
-
-![SRE 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/04/04-01-concept-at-a-glance.ko.png)
-
-*SRE 101 4장 흐름 개요*
-
-Error Budget를 세 층으로 분해하면 각 부분이 서로 다른 질문에 답하며 계산, 당일 차감, 속도라는 세 기준으로 나뇉니다.
-
-> Error Budget은 허용 단계에서 계산되고, 누적 차감에서 상태를 보여 주며, 속도 범위에서 위험 신호를 납니다.
 
 ## 왜 이 주제가 중요한가
 

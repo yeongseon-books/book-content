@@ -25,17 +25,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 Computer Networks 101 시리즈의 8번째 글입니다.
 
+
+![Computer Networks 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/08/08-01-concept-at-a-glance.ko.png)
+*Computer Networks 101 8장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - L4 로드밸런서와 L7 로드밸런서는 어떻게 다를까요?
 - round-robin, least connections, hash 같은 분산 알고리즘은 언제 쓰일까요?
 - 헬스체크와 graceful drain은 왜 신뢰성의 핵심일까요?
-
-## 큰 그림
-
-![Computer Networks 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/08/08-01-concept-at-a-glance.ko.png)
-
-*Computer Networks 101 8장 흐름 개요*
 
 ## 왜 중요한가
 

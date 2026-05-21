@@ -30,19 +30,15 @@ This is post 7 in the Object-Oriented Programming 101 series.
 
 > "Favor composition over inheritance" is a core principle from the GoF Design Patterns. Inheritance suits is-a relationships; composition suits has-a relationships. This article examines the structural differences and practical selection criteria.
 
+
+![Object-Oriented Programming 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/07/07-01-concept-overview.en.png)
+*Object-Oriented Programming 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Composition vs Inheritance?
 - Which signal should the example or diagram make visible for Composition vs Inheritance?
 - What failure should be prevented first when Composition vs Inheritance reaches a real system?
-
-## Big Picture
-
-![Object-Oriented Programming 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/07/07-01-concept-overview.en.png)
-
-*Object-Oriented Programming 101 chapter 7 flow overview*
-
-This picture places Composition vs Inheritance inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

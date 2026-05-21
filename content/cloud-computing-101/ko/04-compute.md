@@ -30,21 +30,16 @@ last_reviewed: '2026-05-14'
 
 여기서는 VM, 컨테이너, 서버리스, 베어메탈을 어떤 기준으로 구분해야 하는지 살펴보겠습니다.
 
+
+![Cloud Computing 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/04/04-01-concept-at-a-glance.ko.png)
+*Cloud Computing 101 4장 흐름 개요*
+> 워크로드의 특성에 맞는 추상화 수준을 선택하는 게 중요합니다. 추상화가 높을수록 운영 부담은 줄지만, 제어권과 비용 효율성은 함께 변합니다.
+
 ## 먼저 던지는 질문
 
 - VM, 컨테이너, 서버리스, 베어메탈은 각각 어떤 상황에서 선택할까요?
 - Auto Scaling은 실제로 무엇을 자동화하고 무엇은 자동화하지 않을까요?
 - On-Demand, Reserved, Spot은 어떤 식으로 조합해야 할까요?
-
-## 큰 그림
-
-![Cloud Computing 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/04/04-01-concept-at-a-glance.ko.png)
-
-*Cloud Computing 101 4장 흐름 개요*
-
-VM은 초기 투자 없이 가장 세밀한 제어권을 줍니다. 컨테이너는 배포 속도는 빠르지만 런타임 관리는 여전히 팀의 책임입니다. 서버리스는 상태 관리 걱정 없이 비즈니스 로직에만 집중할 수 있습니다. 베어메탈은 극도의 성능 요구 사항이 있을 때만 고려합니다.
-
-> 워크로드의 특성에 맞는 추상화 수준을 선택하는 게 중요합니다. 추상화가 높을수록 운영 부담은 줄지만, 제어권과 비용 효율성은 함께 변합니다.
 
 ## 왜 중요한가
 

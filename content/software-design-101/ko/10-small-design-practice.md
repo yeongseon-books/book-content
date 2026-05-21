@@ -32,17 +32,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 아주 작은 URL 단축기 예제를 통해 관심사 분리, 의존성 방향, 계층, 데이터 흐름, 포트와 어댑터를 한곳에 모아 봅니다. 목표는 거대한 프레임워크를 만드는 것이 아니라, 작은 코드에서도 설계 습관이 어떻게 자리 잡는지 감각을 얻는 것입니다.
 
+
+![Software Design 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/10/10-01-concept-at-a-glance.ko.png)
+*Software Design 101 10장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 작은 프로젝트는 어디서부터 설계를 시작해야 할까요?
 - 왜 도메인부터 쓰는 편이 좋을까요?
 - 저장소와 키 생성 같은 인프라 세부를 어떻게 막아 둘 수 있을까요?
-
-## 큰 그림
-
-![Software Design 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/10/10-01-concept-at-a-glance.ko.png)
-
-*Software Design 101 10장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -477,7 +475,6 @@ class PlaceOrderService:
 - 인프라 계층: 외부 API 오류율, DB 지연 시간
 
 지표를 계층별로 분리해 보면 어디를 고쳐야 하는지가 명확해집니다. 모든 지표가 한 대시보드에서 섞여 있으면 "느리다"는 사실만 보이고 원인은 보이지 않습니다. 설계 경계를 운영 지표 경계와 맞추면 개선 사이클이 빠르게 돌아갑니다.
-
 
 
 ## 리뷰와 리팩터링을 위한 실전 질문 세트

@@ -30,21 +30,15 @@ seo_description: Always On, warm-up path, health check로 App Service 첫 요청
 
 이제 새 worker가 실제 사용자 요청을 안전하게 받을 수 있기까지의 마지막 준비 시간을 보겠습니다.
 
+![Azure App Service Deep Dive 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-01-the-cold-path-and-the-warm-path.ko.png)
+*Azure App Service Deep Dive 6장 흐름 개요*
+> 콜드 스타트와 Warmup — 첫 요청이 비싼 이유의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - App Service에서 cold start 비용은 실제로 어떤 준비 단계들의 합일까요?
 - Always On은 어떤 종류의 coldness를 줄이고, 어떤 종류의 startup cost에는 거의 도움을 주지 못할까요?
 - Windows와 Linux는 warm-up readiness를 어떤 다른 도구와 설정으로 표현할까요?
-
-## 큰 그림
-
-![Azure App Service Deep Dive 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/06/06-01-the-cold-path-and-the-warm-path.ko.png)
-
-*Azure App Service Deep Dive 6장 흐름 개요*
-
-이 그림에서는 콜드 스타트와 Warmup — 첫 요청이 비싼 이유를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 콜드 스타트와 Warmup — 첫 요청이 비싼 이유의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

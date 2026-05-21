@@ -28,19 +28,15 @@ A revision file ultimately comes down to how well you write `upgrade()` and `dow
 
 This is post 3 in the Alembic 101 series. Here we will walk through the structure of a first revision and the rules for writing safe upgrade and downgrade paths.
 
+
+![alembic 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/03/03-01-diagram-the-two-way-contract-inside-a-re.en.png)
+*alembic 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - The shape of the file that `alembic revision` generates?
 - The core operations: `op.create_table`, `op.add_column`, `op.drop_column`, `op.execute`?
 - Rules for keeping `upgrade()` and `downgrade()` symmetric?
-
-## Big Picture
-
-![alembic 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/03/03-01-diagram-the-two-way-contract-inside-a-re.en.png)
-
-*alembic 101 chapter 3 flow overview*
-
-This picture places Your first revision: writing upgrade and downgrade by hand inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

@@ -30,21 +30,15 @@ Classifying customer tickets, creating follow-up tasks, and drafting replies all
 
 This is the first post in the AI Agent 101 series. Here we build the basic mental model for Agents by separating them from chatbots and walking through the observe → think → act → check loop.
 
+![Agent loop at a glance](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/01/01-01-agent-loop-at-a-glance.en.png)
+*Agent loop at a glance*
+> An agent starts not with a smarter style of prose, but with a control loop that keeps executing toward a goal.
+
 ## Questions to Keep in Mind
 
 - What changes when you separate chatbots and agents by execution responsibility instead of product labels?
 - How does the Observe → Think → Act → Check loop help you locate agent failures?
 - Which boundary should be defined before choosing tools for a first agent?
-
-## Big Picture
-
-![Agent loop at a glance](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/01/01-01-agent-loop-at-a-glance.en.png)
-
-*Agent loop at a glance*
-
-This picture shows an agent receiving a goal, observing context, deciding what to do, acting, and checking the result. The chatbot-agent boundary is less about answer quality than about who owns that loop until the work is done.
-
-> An agent starts not with a smarter style of prose, but with a control loop that keeps executing toward a goal.
 
 ## What you will learn
 

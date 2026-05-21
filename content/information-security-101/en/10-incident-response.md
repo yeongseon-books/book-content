@@ -31,21 +31,16 @@ last_reviewed: '2026-05-04'
 
 This is the final post in the Information Security 101 series.
 
+
+![information security 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/10/10-01-big-picture.en.png)
+*information security 101 chapter 10 flow overview*
+> Incident response is not just a playbook. It is the ability to detect fast, respond immediately, investigate thoroughly, recover completely, and never make the same mistake twice.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Incident Response?
 - Which signal should the example or diagram make visible for Incident Response?
 - What failure should be prevented first when Incident Response reaches a real system?
-
-## Big Picture
-
-![information security 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/10/10-01-big-picture.en.png)
-
-*information security 101 chapter 10 flow overview*
-
-This picture places Incident Response inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Incident response is not just a playbook. It is the ability to detect fast, respond immediately, investigate thoroughly, recover completely, and never make the same mistake twice.
 
 ## What You Will Learn
 

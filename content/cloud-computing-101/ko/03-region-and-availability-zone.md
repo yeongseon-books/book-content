@@ -30,21 +30,16 @@ last_reviewed: '2026-05-14'
 
 여기서는 Region, Availability Zone, Edge의 차이를 정리하고, 가용성을 위해 무엇을 기본값으로 생각해야 하는지 살펴보겠습니다.
 
+
+![Cloud Computing 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/03/03-01-concept-at-a-glance.ko.png)
+*Cloud Computing 101 3장 흐름 개요*
+> 리전은 도시 또는 대륙 규모의 위치이고, AZ는 리전 내부에서 물리적으로 분리된 장애 경계입니다. Multi-AZ 구성이 가장 기본이고, Multi-Region은 비용과 운영 복잡도를 크게 올리기 때문에 판단이 필요합니다.
+
 ## 먼저 던지는 질문
 
 - Region, Availability Zone, Edge는 각각 무엇을 뜻할까요?
 - Multi-AZ는 정확히 무엇을 의미하고, 왜 기본값으로 봐야 할까요?
 - Multi-Region은 언제 고려해야 하고, 언제 과한 선택이 될까요?
-
-## 큰 그림
-
-![Cloud Computing 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/03/03-01-concept-at-a-glance.ko.png)
-
-*Cloud Computing 101 3장 흐름 개요*
-
-모든 자원이 하나의 AZ에만 있으면 단일 장애가 곧 전체 장애가 됩니다. 데이터센터 전원 문제나 네트워크 장애 같은 사건 하나가 서비스 전체를 멈추게 만들 수 있습니다. 반대로 최소한의 Multi-AZ 구성을 갖추면 같은 리전 안에서도 훨씬 현실적인 수준의 고가용성을 확보할 수 있습니다.
-
-> 리전은 도시 또는 대륙 규모의 위치이고, AZ는 리전 내부에서 물리적으로 분리된 장애 경계입니다. Multi-AZ 구성이 가장 기본이고, Multi-Region은 비용과 운영 복잡도를 크게 올리기 때문에 판단이 필요합니다.
 
 ## 왜 중요한가
 
@@ -449,7 +444,6 @@ placement_policy:
 ```
 
 이 템플릿은 "어디에 배치할지"를 운영 목표와 연결합니다. 중요한 것은 기술적 가능성이 아니라 목표 복구 시간과 데이터 손실 허용 범위를 문서화하는 것입니다. 그 기준이 있어야 Multi-Region이 필요한지, 아니면 과한지 판단할 수 있습니다.
-
 
 
 ## 처음 질문으로 돌아가기

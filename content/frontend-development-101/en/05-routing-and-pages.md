@@ -26,19 +26,15 @@ A one-screen app is easy to reason about. Real products are not. As soon as you 
 
 This is post 5 in the Frontend Development 101 series. Here we explain SPA navigation through the lens of URLs. The important idea is that a URL is not only an address. It is the portable description of the current screen state, and the router is the layer that maps that state to the component tree.
 
+
+![frontend development 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/05/05-01-concept-at-a-glance.en.png)
+*frontend development 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Routing and Pages?
 - Which signal should the example or diagram make visible for Routing and Pages?
 - What failure should be prevented first when Routing and Pages reaches a real system?
-
-## Big Picture
-
-![frontend development 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/05/05-01-concept-at-a-glance.en.png)
-
-*frontend development 101 chapter 5 flow overview*
-
-This picture places Routing and Pages inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

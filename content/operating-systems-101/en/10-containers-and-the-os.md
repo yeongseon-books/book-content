@@ -29,19 +29,15 @@ That is also why this chapter works as the series finale: every concept we cover
 
 This is the final post in the Operating Systems 101 series. It ties namespaces, cgroups, overlayfs, and privilege boundaries back to the OS fundamentals underneath container platforms.
 
+
+![operating systems 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/10/10-01-the-layers-that-create-container-isolati.en.png)
+*operating systems 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Containers and the Operating System?
 - Which signal should the example or diagram make visible for Containers and the Operating System?
 - What failure should be prevented first when Containers and the Operating System reaches a real system?
-
-## Big Picture
-
-![operating systems 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/10/10-01-the-layers-that-create-container-isolati.en.png)
-
-*operating systems 101 chapter 10 flow overview*
-
-This picture places Containers and the Operating System inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions this article answers
 

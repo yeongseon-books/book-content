@@ -29,17 +29,14 @@ last_reviewed: '2026-05-15'
 평가가 흔들리면 모델 선택도 흔들립니다. 더 큰 문제는 팀이 잘못된 숫자를 기준으로 같은 방향으로 달려간다는 점입니다. 그래서 평가를 지표 계산이 아니라 의사결정 설계의 일부로 이해해야 합니다.
 
 
+![Model Evaluation 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/01/01-01-concept-at-a-glance.ko.png)
+*Model Evaluation 101 1장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 왜 정확도 하나만으로 모델을 판단하면 위험할까요?
 - 데이터 분포와 베이스레이트는 평가를 어떻게 왜곡할까요?
 - 임계값이 바뀌면 같은 모델의 점수는 왜 달라질까요?
-
-## 큰 그림
-
-![Model Evaluation 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/01/01-01-concept-at-a-glance.ko.png)
-
-*Model Evaluation 101 1장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 

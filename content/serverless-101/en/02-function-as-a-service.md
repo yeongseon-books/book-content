@@ -28,19 +28,15 @@ Once serverless makes sense as a responsibility shift, the next question becomes
 
 So this post is deliberately narrow. Instead of isolated packaging tips, we will follow one operator loop from start to finish: **write the handler, package it, run the same event locally, inspect the artifact, and only then touch resource tuning**. That loop is what makes FaaS operationally real.
 
+
+![serverless 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/02/02-01-concept-at-a-glance.en.png)
+*serverless 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Function as a Service?
 - Which signal should the example or diagram make visible for Function as a Service?
 - What failure should be prevented first when Function as a Service reaches a real system?
-
-## Big Picture
-
-![serverless 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/02/02-01-concept-at-a-glance.en.png)
-
-*serverless 101 chapter 2 flow overview*
-
-This picture places Function as a Service inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

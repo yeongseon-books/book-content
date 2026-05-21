@@ -28,21 +28,16 @@ That is why visualization is really about judgment, not software. The core skill
 
 This is post 6 in the Data Science 101 series. In this chapter, we connect common analytical messages to chart choices, and we treat axes, color, labels, and annotations as decision-support tools rather than styling details.
 
+
+![data science 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/06/06-01-concept-at-a-glance.en.png)
+*data science 101 chapter 6 flow overview*
+> At its core, Visualization is about deciding what enters a system, where validation happens, and which signals stay for the next cycle—not about feature names.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Visualization?
 - Which signal should the example or diagram make visible for Visualization?
 - What failure should be prevented first when Visualization reaches a real system?
-
-## Big Picture
-
-![data science 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/06/06-01-concept-at-a-glance.en.png)
-
-*data science 101 chapter 6 flow overview*
-
-This picture places Visualization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> At its core, Visualization is about deciding what enters a system, where validation happens, and which signals stay for the next cycle—not about feature names.
 
 ## Questions This Post Answers
 

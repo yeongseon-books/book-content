@@ -27,17 +27,15 @@ last_reviewed: '2026-05-12'
 
 현대 하드웨어가 충분히 빠른데도 왜 여전히 좋은 알고리즘이 중요할까요? 여기서는 알고리즘이 무엇인지, 프로그램과 어떻게 다른지, 그리고 이후 시리즈 전체를 떠받치는 핵심 용어를 정리합니다.
 
+
+![Algorithms 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/01/01-01-big-picture.ko.png)
+*Algorithms 101 1장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 알고리즘이 반드시 만족해야 하는 세 가지 조건은 무엇일까요?
 - 알고리즘과 프로그램은 어떻게 다를까요?
 - 왜 알고리즘 설계에서는 의사코드가 중요한 작업 언어가 될까요?
-
-## 큰 그림
-
-![Algorithms 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/01/01-01-big-picture.ko.png)
-
-*Algorithms 101 1장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -267,7 +265,6 @@ for t in trace:
 이 루틴을 습관화하면 "코드가 돌아간다"와 "운영에서도 안전하다" 사이의 간격이 크게 줄어듭니다.
 
 
-
 ## 추가 보강: 검증 가능한 예제 세트
 
 ### 입력 크기 대비 알고리즘/학습 선택 표
@@ -301,7 +298,6 @@ def measure(fn, *args, repeat=3):
 3. 운영 로그만으로 실패 원인을 분리할 수 있는가
 
 이 질문에 즉답할 수 있으면 구현이 아니라 설계 수준에서 품질을 확보한 상태에 가깝습니다.
-
 
 
 ### 보강 메모: 경계 입력과 수치 검증

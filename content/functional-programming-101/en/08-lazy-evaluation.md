@@ -28,19 +28,15 @@ This is post 8 in the Functional Programming 101 series.
 
 Lazy evaluation means deferring computation until a consumer actually asks for the next value. In Python, generators and the iterator protocol turn that idea into a practical way to keep memory stable while data keeps moving.
 
+
+![Functional Programming 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/08/08-01-lazy-pipeline-pull-model.en.png)
+*Functional Programming 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Lazy Evaluation and Generators?
 - Which signal should the example or diagram make visible for Lazy Evaluation and Generators?
 - What failure should be prevented first when Lazy Evaluation and Generators reaches a real system?
-
-## Big Picture
-
-![Functional Programming 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/08/08-01-lazy-pipeline-pull-model.en.png)
-
-*Functional Programming 101 chapter 8 flow overview*
-
-This picture places Lazy Evaluation and Generators inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

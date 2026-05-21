@@ -29,19 +29,15 @@ This is post 6 in the Programming Languages 101 series.
 
 In this post, we will define an object first as a bundle of state and behavior, then compare the two common ways languages build that bundle: classes and prototypes. The key difference is not marketing or syntax. It is where a method lookup goes next when the current object does not have the answer.
 
+
+![programming languages 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/06/06-01-concept-at-a-glance.en.png)
+*programming languages 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Objects and Prototypes?
 - Which signal should the example or diagram make visible for Objects and Prototypes?
 - What failure should be prevented first when Objects and Prototypes reaches a real system?
-
-## Big Picture
-
-![programming languages 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/06/06-01-concept-at-a-glance.en.png)
-
-*programming languages 101 chapter 6 flow overview*
-
-This picture places Objects and Prototypes inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions this article answers
 

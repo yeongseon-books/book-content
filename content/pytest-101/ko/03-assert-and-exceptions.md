@@ -26,17 +26,15 @@ last_reviewed: '2026-05-12'
 
 테스트는 실패했을 때 가치가 드러납니다. 왜 실패했는지 바로 읽히지 않는 테스트는 디버깅 시간을 늘리고, 예외 처리 검증이 빠진 테스트는 실제 운영에서 에러 핸들링이 깨져도 놓치기 쉽습니다.
 
+
+![pytest 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/03/03-01-big-picture.ko.png)
+*pytest 101 3장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - pytest의 `assert`는 왜 더 읽기 좋은 실패 메시지를 제공할까요?
 - 컬렉션, 문자열, 부동소수점은 어떤 방식으로 검증해야 할까요?
 - `pytest.raises`로 예외 타입과 메시지를 어떻게 확인할 수 있을까요?
-
-## 큰 그림
-
-![pytest 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/03/03-01-big-picture.ko.png)
-
-*pytest 101 3장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 
@@ -737,7 +735,6 @@ pytest -q
 ```text
 PASS
 ```
-
 
 
 추가 메모: 테스트는 실행 결과를 남기고, 실패 입력을 재현 가능한 형태로 보존해야 운영에서 같은 문제를 다시 만나지 않습니다. 이 문단은 바이트 기준 보강과 함께 실무 원칙을 다시 고정하기 위한 메모입니다.

@@ -30,17 +30,14 @@ last_reviewed: '2026-05-15'
 좋은 코드 리뷰는 단순히 버그를 찾는 자리가 아닙니다. 이 변경이 왜 필요한지, 시스템 경계에 어떤 영향을 주는지, 팀이 이 코드를 앞으로도 이해할 수 있는지 확인하는 과정입니다. 그래서 리뷰는 판결문이 아니라 합의 과정에 더 가깝습니다.
 
 
+![Software Engineering 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/04/04-01-concept-at-a-glance.ko.png)
+*Software Engineering 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 코드 리뷰는 결함 탐지와 지식 공유 중 무엇이 더 중요할까요?
 - 리뷰하기 쉬운 PR은 어떻게 만들 수 있을까요?
 - 리뷰어는 실제로 어떤 항목을 먼저 볼까요?
-
-## 큰 그림
-
-![Software Engineering 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/04/04-01-concept-at-a-glance.ko.png)
-
-*Software Engineering 101 4장 흐름 개요*
 
 ## 왜 중요한가
 

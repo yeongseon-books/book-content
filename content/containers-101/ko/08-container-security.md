@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 non-root, capability 축소, seccomp, 읽기 전용 파일시스템, 이미지 스캔과 서명이 어떻게 하나의 보안 기본선으로 이어지는지 정리합니다.
 
+
+![Containers 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/08/08-01-concept-at-a-glance.ko.png)
+*Containers 101 8장 흐름 개요*
+> Container Security의 핵심은 root로 실행하지 않는 것, 최소 권한 원칙, 그리고 격리는 완전하지 않다는 가정 아래 심층 방어(defense-in-depth)입니다.
+
 ## 먼저 던지는 질문
 
 - 격리된 컨테이너가 왜 자동으로 안전한 것은 아닐까요?
 - non-root 실행은 어떤 보안 의미를 가질까요?
 - capabilities와 seccomp는 무엇을 줄여 줄까요?
-
-## 큰 그림
-
-![Containers 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/08/08-01-concept-at-a-glance.ko.png)
-
-*Containers 101 8장 흐름 개요*
-
-Container Security는 이미지 빌드 시점, 런타임 정책, 호스트 커널 관리까지 여러 계층을 아우릅니다. 한 계층만 신경 쓴다고 안전하지 않습니다.
-
-> Container Security의 핵심은 root로 실행하지 않는 것, 최소 권한 원칙, 그리고 격리는 완전하지 않다는 가정 아래 심층 방어(defense-in-depth)입니다.
 
 ## 왜 중요한가
 

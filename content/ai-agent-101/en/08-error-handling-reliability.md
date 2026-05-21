@@ -28,21 +28,15 @@ To build reliable agents, you must anticipate and respond to these failures. Ret
 
 This is post 8 in the AI Agent 101 series. Here we cover common agent failure modes, retry strategies, fallback patterns, timeout handling methods, and graceful degradation.
 
+![Reliability control loop](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/08/08-01-reliability-control-loop.en.png)
+*Reliability control loop*
+> A reliable agent is not an agent that never fails; it is one that detects, limits, and stops failures in explainable ways.
+
 ## Questions to Keep in Mind
 
 - When designing agent reliability, what should be controlled instead of pretending failures disappear?
 - Which failures fit Retry, Fallback, or Circuit Breaker patterns?
 - What guards are needed before and after safe tool execution?
-
-## Big Picture
-
-![Reliability control loop](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/08/08-01-reliability-control-loop.en.png)
-
-*Reliability control loop*
-
-This picture shows a reliability loop that detects failures, retries, degrades through fallback, or stops execution with a circuit breaker. Reliability comes from containing failure before it spreads, not from assuming failure will not happen.
-
-> A reliable agent is not an agent that never fails; it is one that detects, limits, and stops failures in explainable ways.
 
 ## Error Types in Agents
 

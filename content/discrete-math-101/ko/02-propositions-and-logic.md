@@ -25,17 +25,15 @@ last_reviewed: '2026-05-12'
 
 이 글은 Discrete Math 101 시리즈의 2번째 글입니다.
 
+
+![Discrete Math 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/02/02-01-big-picture.ko.png)
+*Discrete Math 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 명제와 비명제는 어떻게 구분할까요?
 - 다섯 가지 기본 논리 연산자는 어떻게 동작할까요?
 - 진리표로 논리적 동치를 어떻게 확인할까요?
-
-## 큰 그림
-
-![Discrete Math 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/02/02-01-big-picture.ko.png)
-
-*Discrete Math 101 2장 흐름 개요*
 
 ## 왜 중요한가
 

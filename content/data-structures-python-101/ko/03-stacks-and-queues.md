@@ -24,17 +24,15 @@ last_reviewed: '2026-05-12'
 
 이 글은 Data Structures with Python 101 시리즈의 세 번째 글입니다.
 
+
+![Data Structures with Python 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/03/03-01-big-picture.ko.png)
+*Data Structures with Python 101 3장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 스택과 큐는 각각 어떤 순서 규칙으로 동작할까요?
 - Python에서는 왜 스택에 list를, 큐에 deque를 주로 사용할까요?
 - `list.pop(0)`이 큐 구현에 부적절한 이유는 무엇일까요?
-
-## 큰 그림
-
-![Data Structures with Python 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/03/03-01-big-picture.ko.png)
-
-*Data Structures with Python 101 3장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 
@@ -285,7 +283,6 @@ print(f"deque is {list_time / deque_time:.0f}x faster")
 ## 정리 및 다음 글 안내
 
 스택은 LIFO, 큐는 FIFO라는 단순한 규칙 위에서 동작합니다. Python에서는 스택은 list, 큐는 deque라는 관례가 사실상 표준이며, 이 선택은 내부 연산 비용과 정확히 맞닿아 있습니다. 다음 글에서는 빠른 키 기반 조회를 가능하게 만드는 해시 테이블과 dict를 살펴보겠습니다.
-
 
 
 ## 타입 힌트 기반 스택 구현

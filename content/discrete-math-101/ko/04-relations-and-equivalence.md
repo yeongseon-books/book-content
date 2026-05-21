@@ -25,17 +25,15 @@ last_reviewed: '2026-05-12'
 
 이 글은 Discrete Math 101 시리즈의 4번째 글입니다.
 
+
+![Discrete Math 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/04/04-01-big-picture.ko.png)
+*Discrete Math 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 이항관계는 어떻게 정의하고 표현할까요?
 - 반사, 대칭, 추이, 반대칭 성질은 어떻게 구분할까요?
 - 동치관계와 동치류, 분할은 왜 서로 연결될까요?
-
-## 큰 그림
-
-![Discrete Math 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/04/04-01-big-picture.ko.png)
-
-*Discrete Math 101 4장 흐름 개요*
 
 ## 왜 중요한가
 

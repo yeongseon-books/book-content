@@ -28,21 +28,16 @@ Collection is where reliability starts. Before cleaning or modeling ever matter,
 
 This is post 3 in the Data Science 101 series. Here we treat collection as an engineering discipline: source selection, provenance, and repeatability come first, and the code that fetches the rows comes second.
 
+
+![data science 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/03/03-01-concept-at-a-glance.en.png)
+*data science 101 chapter 3 flow overview*
+> At its core, Data Collection is about deciding what enters a system, where validation happens, and which signals stay for the next cycle—not about feature names.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Data Collection?
 - Which signal should the example or diagram make visible for Data Collection?
 - What failure should be prevented first when Data Collection reaches a real system?
-
-## Big Picture
-
-![data science 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/03/03-01-concept-at-a-glance.en.png)
-
-*data science 101 chapter 3 flow overview*
-
-This picture places Data Collection inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> At its core, Data Collection is about deciding what enters a system, where validation happens, and which signals stay for the next cycle—not about feature names.
 
 ## Questions This Post Answers
 

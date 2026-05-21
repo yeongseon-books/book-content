@@ -29,21 +29,16 @@ This is post 6 in the API Design 101 series.
 
 Here, we treat pagination, sorting, and filtering as part of the API's correctness and performance contract. The central design choice is whether offset or cursor behavior gives you a safer operating model for the collection you are exposing.
 
+
+![api design 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/06/06-01-concept-at-a-glance.en.png)
+*api design 101 chapter 6 flow overview*
+> Pagination and filtering are not about performance — they are about letting the client ask questions instead of forcing it to process the entire dataset.
+
 ## Questions to Keep in Mind
 
 - The limits of offset / limit pagination?
 - Cursor-based pagination?
 - Sorting, filtering, and searching?
-
-## Big Picture
-
-![api design 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/06/06-01-concept-at-a-glance.en.png)
-
-*api design 101 chapter 6 flow overview*
-
-The diagram shows how to handle large result sets: limit and offset split results into pages, and filters (by status, date, keyword) let clients ask for exactly what they need instead of receiving everything.
-
-> Pagination and filtering are not about performance — they are about letting the client ask questions instead of forcing it to process the entire dataset.
 
 ## Why It Matters
 

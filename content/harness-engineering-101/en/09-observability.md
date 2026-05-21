@@ -27,21 +27,15 @@ Operationally, the real requirement is stronger: after a bad run, you must be ab
 
 This is post 9 in the Harness Engineering 101 series. Here we treat observability as a replayable execution model, not as a collection of ad hoc logs.
 
+![Observability - tracing and replaying agent work](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/09/09-01-observability-tracing-and-replaying-agen.en.png)
+*Observability - tracing and replaying agent work*
+> An observable agent can explain not only what it answered, but which input, context, tools, costs, and decisions produced that answer.
+
 ## Questions to Keep in Mind
 
 - How should an Observability Harness let you reconstruct an agent run later?
 - What operational questions do traces, replay, and cost-latency dashboards each answer?
 - Which signals deserve alerts that wake a human?
-
-## Big Picture
-
-![Observability - tracing and replaying agent work](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/09/09-01-observability-tracing-and-replaying-agen.en.png)
-
-*Observability - tracing and replaying agent work*
-
-This picture shows agent work being recorded as traces, replay data, and cost-latency metrics so the run can be reconstructed later. An Observability Harness stores evidence of why a run unfolded that way, not just the final answer.
-
-> An observable agent can explain not only what it answered, but which input, context, tools, costs, and decisions produced that answer.
 
 ## What Is Observability?
 

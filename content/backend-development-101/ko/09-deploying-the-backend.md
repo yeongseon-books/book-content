@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 Docker, 환경 변수, healthcheck, rolling update를 중심으로 배포를 재현성의 문제로 이해해 보겠습니다.
 
+
+![Backend Development 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/09/09-01-concept-at-a-glance.ko.png)
+*Backend Development 101 9장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 배포 환경은 어떤 요소들로 이루어질까요?
 - Dockerfile은 왜 재현 가능한 실행 환경을 만드는 핵심일까요?
 - 환경 변수와 secret은 어떻게 분리해야 할까요?
-
-## 큰 그림
-
-![Backend Development 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/09/09-01-concept-at-a-glance.ko.png)
-
-*Backend Development 101 9장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -457,7 +455,6 @@ services:
 5. 장애 로그만으로 요청 식별자, 사용자 식별자, 실패 경로를 역추적할 수 있는지 확인합니다.
 
 이 기준선을 매 글의 주제에 연결해 두면 학습이 단발성 지식으로 끝나지 않습니다. 라우팅을 배울 때도, 테스트를 배울 때도, 배포를 배울 때도 같은 운영 질문으로 품질을 판별하게 됩니다.
-
 
 
 ### 장애 복구 훈련 시나리오

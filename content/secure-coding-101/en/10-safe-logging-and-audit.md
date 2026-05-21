@@ -30,19 +30,15 @@ Here, we will treat logging as an evidence system rather than a convenience feat
 
 > Logs are evidence and risk at the same time. Safe logging requires precise records, deliberate non-recording of secrets, and storage that resists tampering.
 
+
+![secure coding 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/10/10-01-concept-at-a-glance.en.png)
+*secure coding 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Safe Logging and Audit?
 - Which signal should the example or diagram make visible for Safe Logging and Audit?
 - What failure should be prevented first when Safe Logging and Audit reaches a real system?
-
-## Big Picture
-
-![secure coding 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/10/10-01-concept-at-a-glance.en.png)
-
-*secure coding 101 chapter 10 flow overview*
-
-This picture places Safe Logging and Audit inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions This Chapter Answers
 

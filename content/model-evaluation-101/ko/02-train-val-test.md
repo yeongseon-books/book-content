@@ -29,17 +29,14 @@ last_reviewed: '2026-05-15'
 그래서 train, validation, test의 역할 분리는 단순한 교과서 규칙이 아닙니다. 어떤 데이터로 학습하고, 어떤 데이터로 고르고, 어떤 데이터로 최종 확인할지 구분하는 훈련이 평가의 바닥을 만듭니다.
 
 
+![Model Evaluation 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/02/02-01-concept-at-a-glance.ko.png)
+*Model Evaluation 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - train, validation, test는 각각 무엇을 맡아야 할까요?
 - 왜 validation과 test를 같은 용도로 쓰면 안 될까요?
 - 데이터 누수는 어떤 경로로 가장 자주 들어올까요?
-
-## 큰 그림
-
-![Model Evaluation 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/02/02-01-concept-at-a-glance.ko.png)
-
-*Model Evaluation 101 2장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 

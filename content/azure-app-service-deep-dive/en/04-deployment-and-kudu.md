@@ -49,19 +49,14 @@ the build stage is tightly connected to **Oryx**.
 
 This post follows that path end to end.
 
+![azure app service deep dive chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/04/04-01-the-deployment-pipeline-in-one-picture.en.png)
+*azure app service deep dive chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - Where does Kudu run, and through what stages does an App Service 'deployment' actually flow?
 - How are ZIP deploy, OneDeploy, GitHub Actions, and Run From Package fundamentally different?
 - When you swap a Deployment Slot, what gets swapped and what does not?
-
-## Big Picture
-
-![azure app service deep dive chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/04/04-01-the-deployment-pipeline-in-one-picture.en.png)
-
-*azure app service deep dive chapter 4 flow overview*
-
-This picture places Deployment and Kudu — build, sync, release from the inside inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## The deployment pipeline in one picture
 

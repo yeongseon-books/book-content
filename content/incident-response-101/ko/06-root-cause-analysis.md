@@ -30,21 +30,16 @@ incident가 일어나면 누구나 빨리 원인을 찾고 싶어 합니다. 그
 
 이 글은 Incident Response 101 시리즈의 6번째 글입니다. 여기서는 trigger와 root cause를 구분하는 기준, 5 Whys를 운영 문서에 남기는 방법, 그리고 검증 가능한 action item으로 이어지는 RCA 흐름을 다룹니다.
 
+
+![Incident Response 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/06/06-01-diagram-at-a-glance.ko.png)
+*Incident Response 101 6장 흐름 개요*
+> RCA는 과거를 비난하는 게 아니라, 미래를 설계하는 일입니다. 인과관계를 추적하고 시스템 개선점을 찾습니다.
+
 ## 먼저 던지는 질문
 
 - incident의 진짜 원인은 어떻게 찾아야 할까요?
 - 왜 5 Whys가 여전히 유용할까요?
 - trigger와 root cause는 어디서 갈릴까요?
-
-## 큰 그림
-
-![Incident Response 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/06/06-01-diagram-at-a-glance.ko.png)
-
-*Incident Response 101 6장 흐름 개요*
-
-Root Cause Analysis는 '누가 실수했나'를 찾는 게 아니라, '어떤 시스템 경계에서 신호가 빠졌나'를 찾습니다.
-
-> RCA는 과거를 비난하는 게 아니라, 미래를 설계하는 일입니다. 인과관계를 추적하고 시스템 개선점을 찾습니다.
 
 ## 왜 이 주제가 중요한가
 

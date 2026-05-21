@@ -28,21 +28,16 @@ Useful concept writing needs more than a polished sentence. It needs a boundary.
 
 This is post 4 in the Technical Writing 101 series. Here we build that four-part concept explanation pattern.
 
+
+![technical writing 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/04/04-01-concept-at-a-glance.en.png)
+*technical writing 101 chapter 4 flow overview*
+> A concept without a boundary is just a fact to memorize; with a boundary, it becomes a tool to apply.
+
 ## Questions to Keep in Mind
 
 - A *one line* definition?
 - Using an *analogy?
 - Using a *counterexample?
-
-## Big Picture
-
-![technical writing 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/04/04-01-concept-at-a-glance.en.png)
-
-*technical writing 101 chapter 4 flow overview*
-
-This picture places Explaining Concepts inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A concept without a boundary is just a fact to memorize; with a boundary, it becomes a tool to apply.
 
 ## Why It Matters
 

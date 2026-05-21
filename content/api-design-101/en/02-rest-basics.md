@@ -29,21 +29,16 @@ This is post 2 in the API Design 101 series.
 
 Here, we treat REST as a set of architectural constraints rather than a fashionable URL style. That is the lens you need before resource design, method selection, caching, and documentation start to reinforce each other.
 
+
+![api design 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/02/02-01-concept-at-a-glance.en.png)
+*api design 101 chapter 2 flow overview*
+> REST is not a list of rules — it is the discipline of thinking in HTTP verbs and resources instead of arbitrary function names.
+
 ## Questions to Keep in Mind
 
 - The definition and history of REST?
 - The six architectural constraints?
 - Resource-centric thinking?
-
-## Big Picture
-
-![api design 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/02/02-01-concept-at-a-glance.en.png)
-
-*api design 101 chapter 2 flow overview*
-
-The diagram maps HTTP verbs (GET, POST, PUT, DELETE) to operations: each verb tells the server what kind of action the client wants, and the path identifies which resource to act upon.
-
-> REST is not a list of rules — it is the discipline of thinking in HTTP verbs and resources instead of arbitrary function names.
 
 ## Why It Matters
 

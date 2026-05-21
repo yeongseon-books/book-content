@@ -32,17 +32,15 @@ last_reviewed: '2026-05-12'
 
 끝까지 읽고 나면 함수의 그래프를 보는 것만으로도 학습이 쉬운 구간과 어려운 구간을 어느 정도 짐작할 수 있게 됩니다.
 
+
+![Calculus for ML 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/02/02-01-concept-at-a-glance.ko.png)
+*Calculus for ML 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 함수는 왜 단순한 수식이 아니라 입력과 출력의 계약으로 이해해야 할까요?
 - 선형 함수의 기울기와 비선형 함수의 국소 기울기는 어떻게 다를까요?
 - ReLU와 sigmoid의 기울기 차이는 학습 과정에 어떤 영향을 줄까요?
-
-## 큰 그림
-
-![Calculus for ML 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/02/02-01-concept-at-a-glance.ko.png)
-
-*Calculus for ML 101 2장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 

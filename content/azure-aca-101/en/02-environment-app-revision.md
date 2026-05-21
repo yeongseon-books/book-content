@@ -28,19 +28,14 @@ Environment, Container App, and Revision show up everywhere in ACA. The names so
 
 This is post 2 in the Azure Container Apps 101 series. Here, we'll separate those three terms from an operator's point of view.
 
+![azure container apps 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/02/02-01-start-with-the-hierarchy.en.png)
+*azure container apps 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - The exact responsibilities of ACA's three operational units — Environment, Container App, and Revision?
 - Which changes create a new Revision and which do not?
 - The difference between Single Revision mode and Multiple Revision mode, and when each fits?
-
-## Big Picture
-
-![azure container apps 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/02/02-01-start-with-the-hierarchy.en.png)
-
-*azure container apps 101 chapter 2 flow overview*
-
-This picture places Environment, Container App, Revision — ACA in three words inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

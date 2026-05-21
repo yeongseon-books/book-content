@@ -28,21 +28,17 @@ Senior data work usually means better problem definition, better measurement, mo
 
 This is the final post in the Data Science Career 101 series.
 
+
+![data science career 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/10/10-01-concept-at-a-glance.en.png)
+*data science career 101 chapter 10 flow overview*
+> In seniority, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
+
 ## Questions to Keep in Mind
 
 - What actually makes a senior data role feel different from a junior one?
 - Why is problem definition such a strong signal of seniority?
 - How do measurement plans make proposals more credible?
 
-## Big Picture
-
-![data science career 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/10/10-01-concept-at-a-glance.en.png)
-
-*data science career 101 chapter 10 flow overview*
-
-This picture places The Path to Senior in Data inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> In seniority, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
 ## What You Will Learn
 
 - The definition of *senior*

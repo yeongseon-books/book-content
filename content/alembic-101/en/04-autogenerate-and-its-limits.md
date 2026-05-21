@@ -28,19 +28,15 @@ Autogenerate can diff the live database against `target_metadata`, but it cannot
 
 This is post 4 in the Alembic 101 series. Here we will separate what autogenerate handles well from the cases that still need a human pass.
 
+
+![alembic 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/04/04-01-diagram-the-autogenerate-diff-pipeline.en.png)
+*alembic 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - What `alembic revision --autogenerate` actually compares under the hood?
 - Which kinds of changes autogenerate handles well, and which it misses?
 - The `compare_type`, `compare_server_default`, `include_object`, and `include_name` options?
-
-## Big Picture
-
-![alembic 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/04/04-01-diagram-the-autogenerate-diff-pipeline.en.png)
-
-*alembic 101 chapter 4 flow overview*
-
-This picture places autogenerate: the line between what it catches and what it misses inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

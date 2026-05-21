@@ -26,21 +26,16 @@ last_reviewed: '2026-05-15'
 
 이 글은 Portfolio Project 101 시리즈의 3번째 글입니다. 여기서는 포트폴리오 README를 단순한 안내문이 아니라 첫 번째 데모로 보고, 리뷰어가 60초 안에 프로젝트를 이해할 수 있게 만드는 구성과 문장 방식을 살펴보겠습니다.
 
+
+![Portfolio Project 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/03/03-01-diagram.ko.png)
+*Portfolio Project 101 3장 흐름 개요*
+> README는 저장소의 얼굴입니다. 1분 안에 문제와 해결을 이해할 수 있으면, 방문자는 코드를 읽을 동기가 생깁니다.
+
 ## 먼저 던지는 질문
 
 - 포트폴리오 README에서 가장 먼저 보여 줘야 할 정보는 무엇일까요?
 - 한 줄 소개, 데모, 스택, 실행 방법, 다음 작업은 왜 이 순서가 읽기 쉬울까요?
 - 스크린샷이 많아도 README가 약하게 느껴지는 이유는 무엇일까요?
-
-## 큰 그림
-
-![Portfolio Project 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/03/03-01-diagram.ko.png)
-
-*Portfolio Project 101 3장 흐름 개요*
-
-이 그림에서는 README가 저장소의 진입점부터 선택까지 어떻게 영향을 미치는지 봅니다. 첫 번째 문단이 방문자의 체류 결정을 좌우할 만큼 중요한 위치에 있습니다.
-
-> README는 저장소의 얼굴입니다. 1분 안에 문제와 해결을 이해할 수 있으면, 방문자는 코드를 읽을 동기가 생깁니다.
 
 ## 왜 중요한가
 

@@ -27,21 +27,16 @@ Solving lots of problems does not automatically translate into strong interview 
 
 This is post 5 in the Developer Career 101 series.
 
+
+![developer career 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/05/05-01-concept-at-a-glance.en.png)
+*developer career 101 chapter 5 flow overview*
+> The substance of coding interviews is not the answer alone, but how you ask clarifying questions, communicate tradeoffs, and adapt when blocked.
+
 ## Questions to Keep in Mind
 
 - Why is raw problem count alone a weak preparation strategy?
 - How do recurring patterns reduce wasted time in unfamiliar questions?
 - Why do communication, complexity analysis, and time management change the score so much?
-
-## Big Picture
-
-![developer career 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/05/05-01-concept-at-a-glance.en.png)
-
-*developer career 101 chapter 5 flow overview*
-
-This picture places Preparing for Coding Interviews inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> The substance of coding interviews is not the answer alone, but how you ask clarifying questions, communicate tradeoffs, and adapt when blocked.
 
 ## What You Will Learn
 

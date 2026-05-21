@@ -25,17 +25,15 @@ last_reviewed: '2026-05-12'
 
 이 글은 Discrete Math 101 시리즈의 5번째 글입니다.
 
+
+![Discrete Math 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/05/05-01-big-picture.ko.png)
+*Discrete Math 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 직접 증명과 대우 증명은 언제 쓰일까요?
 - 귀류법은 어떤 명제에서 특히 강력할까요?
 - 수학적 귀납법과 강한 귀납법은 어떻게 작동할까요?
-
-## 큰 그림
-
-![Discrete Math 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/05/05-01-big-picture.ko.png)
-
-*Discrete Math 101 5장 흐름 개요*
 
 ## 왜 중요한가
 

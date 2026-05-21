@@ -31,19 +31,14 @@ This is the final post in the Azure Functions 101 series. Here, we focus on the 
 
 > 90% of operations is the ability to see 'what is different from baseline' inside 30 seconds.
 
+![azure functions 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/07/07-01-the-first-screen-to-open-during-an-incid.en.png)
+*azure functions 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - How do Application Insights and Log Analytics divide responsibilities for Functions ops?
 - Which queries actually surface per-function latency, failure rate, and dependency calls?
 - When does Live Metrics beat stream logs, and vice versa?
-
-## Big Picture
-
-![azure functions 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/07/07-01-the-first-screen-to-open-during-an-incid.en.png)
-
-*azure functions 101 chapter 7 flow overview*
-
-This picture places Monitoring and Operations Fundamentals inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Application Insights Is the Starting Point
 

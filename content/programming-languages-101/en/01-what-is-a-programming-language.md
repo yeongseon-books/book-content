@@ -29,19 +29,15 @@ This is the first post in the Programming Languages 101 series.
 
 In this post, we will treat a programming language not as a bag of syntax rules but as the frame a developer uses to express a problem. By solving one computation in multiple paradigms, we can see what a language hides, what it exposes, and why new languages keep appearing even when older ones still work.
 
+
+![programming languages 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/01/01-01-concept-at-a-glance.en.png)
+*programming languages 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What Is a Programming Language??
 - Which signal should the example or diagram make visible for What Is a Programming Language??
 - What failure should be prevented first when What Is a Programming Language? reaches a real system?
-
-## Big Picture
-
-![programming languages 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/01/01-01-concept-at-a-glance.en.png)
-
-*programming languages 101 chapter 1 flow overview*
-
-This picture places What Is a Programming Language? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions this article answers
 

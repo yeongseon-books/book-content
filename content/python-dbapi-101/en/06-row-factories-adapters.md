@@ -32,19 +32,14 @@ This is the 6th article in the Python DB-API 101 series.
 
 *Row factories and type adapters (sqlite3, PEP 249)*
 
+![python db-api 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.en.png)
+*python db-api 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - How do you receive default tuple results as dict, dataclass, or Pydantic models?
 - What is `sqlite3.Row` and when is it enough?
 - What does `detect_types` actually detect?
-
-## Big Picture
-
-![python db-api 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.en.png)
-
-*python db-api 101 chapter 6 flow overview*
-
-This picture places Row factories and type adapters (sqlite3, PEP 249) inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What you will learn
 

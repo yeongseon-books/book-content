@@ -40,19 +40,14 @@ This post covers the heart of SQLAlchemy Core: `MetaData`, `Table`, `Column`, an
 
 *SQLAlchemy core - modeling schema as python objects with MetaData, Table, and column*
 
+![sqlalchemy 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/02/02-02-why-this-matters.en.png)
+*sqlalchemy 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What a `MetaData` object is and why it becomes the single source of truth for your schema?
 - How to declare a `Table` in Python, and the key `Column` options (primary_key, nullable, unique, index, default, server_default)?
 - How SQLAlchemy's generic types (`Integer`, `String`, `Text`, `Boolean`, `DateTime`, `Numeric`, `JSON`) map to SQLite affinities?
-
-## Big Picture
-
-![sqlalchemy 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/02/02-02-why-this-matters.en.png)
-
-*sqlalchemy 101 chapter 2 flow overview*
-
-This picture places SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

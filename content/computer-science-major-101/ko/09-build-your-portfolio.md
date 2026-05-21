@@ -28,21 +28,15 @@ last_reviewed: '2026-05-14'
 학생 때 만든 과제와 프로젝트는 정리하지 않으면 생각보다 빨리 사라집니다. 로컬 폴더에만 남아 있고 설명도 없다면, 나중에는 만든 사람조차 다시 꺼내 보기 어려워집니다.
 
 
+![Computer Science Major 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/09/09-01-portfolio-publishing-flow.ko.png)
+*컴퓨터학과 전공 가이드 9장 흐름 개요*
+> 포트폴리오의 핵심은 프로젝트 개수가 아니라, 각 프로젝트에서 당신의 의사결정과 배움이 선명하게 드러나는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - 전공 과제와 프로젝트는 어떻게 포트폴리오가 될 수 있을까요?
 - GitHub 저장소, README, 실행 방법, 데모 링크는 왜 모두 중요할까요?
 - 코드만 올려 두는 것과 설명 가능한 결과물을 공개하는 것은 무엇이 다를까요?
-
-## 큰 그림
-
-![Computer Science Major 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/09/09-01-portfolio-publishing-flow.ko.png)
-
-*컴퓨터학과 전공 가이드 9장 흐름 개요*
-
-이 그림에서 보이듯 좋은 포트폴리오는 기술 선택, 구현 결정, 결과 설명이 일관되게 연결된 프로젝트들입니다. 각 프로젝트에서 어떤 문제를 어떻게 풀었는지, 무엇을 배웠는지 전달하는 것이 핵심입니다.
-
-> 포트폴리오의 핵심은 프로젝트 개수가 아니라, 각 프로젝트에서 당신의 의사결정과 배움이 선명하게 드러나는 데 있습니다.
 
 ## 이 글에서 배울 것
 

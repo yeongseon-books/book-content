@@ -26,17 +26,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 GitHub Actions 101 시리즈의 4번째 글입니다. 여기서는 GitHub Actions에서 Python 테스트를 자동화하는 기본 흐름을 정리하고, 캐시, 리포트, 커버리지, 매트릭스까지 어떤 기준으로 붙여야 하는지 설명하겠습니다.
 
+
+![GitHub Actions 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/04/04-01-diagram.ko.png)
+*GitHub Actions 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - `setup-python`과 pip 캐시는 왜 함께 다뤄야 할까요?
 - `pytest` 결과를 PR 체크와 리포트로 드러내려면 무엇이 필요할까요?
 - 커버리지는 왜 숫자 자체보다 추세와 기준이 중요할까요?
-
-## 큰 그림
-
-![GitHub Actions 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/04/04-01-diagram.ko.png)
-
-*GitHub Actions 101 4장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -170,7 +168,6 @@ steps:
 Python 테스트 자동화의 핵심은 같은 환경에서 같은 명령을 반복 실행하게 만드는 것입니다. 캐시로 피드백 시간을 줄이고, 리포트와 커버리지로 결과를 남기고, 필요할 때만 매트릭스로 검증 범위를 넓히면 됩니다.
 
 다음 글에서는 lint와 type check를 다룹니다. 테스트가 동작을 검증한다면, 그다음 단계는 스타일과 정적 타입 규칙을 자동으로 막는 품질 게이트를 세우는 일입니다.
-
 
 
 ---

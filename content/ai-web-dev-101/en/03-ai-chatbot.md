@@ -27,19 +27,15 @@ This is post 3 in the AI Web Development 101 series.
 
 Here, we will build a browser chatbot and focus on the boundary between client UI state and the server route that talks to the model.
 
+
+![AI Web Development 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/03/chatbot-architecture-overview.en.png)
+*AI Web Development 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - What changes when you move a terminal example into a browser UI?
 - Why is the Next.js plus Vercel AI SDK combination a strong beginner path?
 - What should `/api/chat` actually do?
-
-## Big Picture
-
-![AI Web Development 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/03/chatbot-architecture-overview.en.png)
-
-*AI Web Development 101 chapter 3 flow overview*
-
-This picture places Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why Next.js and the Vercel AI SDK work well here
 

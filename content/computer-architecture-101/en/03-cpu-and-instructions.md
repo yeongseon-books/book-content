@@ -27,19 +27,15 @@ When a hot loop shows up in a profiler, the next useful question is not "what sy
 
 This is post 3 in the Computer Architecture 101 series. Here we use x86-64, ARM64, and RISC-V as concrete examples of the ISA contract, then follow one small function down to the instruction stream the CPU actually runs.
 
+
+![computer architecture 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/03/03-01-cpu-fetch-decode-execute.en.png)
+*computer architecture 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying CPU and Instructions?
 - Which signal should the example or diagram make visible for CPU and Instructions?
 - What failure should be prevented first when CPU and Instructions reaches a real system?
-
-## Big Picture
-
-![computer architecture 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/03/03-01-cpu-fetch-decode-execute.en.png)
-
-*computer architecture 101 chapter 3 flow overview*
-
-This picture places CPU and Instructions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

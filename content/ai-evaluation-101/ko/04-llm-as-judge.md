@@ -30,21 +30,16 @@ seo_description: 사람이 모든 응답을 평가할 수 없을 때, 강력한 
 
 여기서는 judge 프롬프트를 어떻게 쓰고, 어떤 편향을 통제하고, 사람 채점과 어느 정도 일치해야 실무에서 믿고 쓸 수 있는지 정리하겠습니다.
 
+
+![LLM-as-Judge - 모델로 모델을 평가하기](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-01-llm-as-judge-evaluating-models-with-mode.ko.png)
+*LLM-as-Judge - 모델로 모델을 평가하기*
+> LLM judge는 강력하지만, 기준선과 편향 통제 없이 쓰면 평가 자동화가 아니라 자동화된 착각이 됩니다.
+
 ## 먼저 던지는 질문
 
 - LLM-as-Judge는 언제 사람이 매번 평가하기 어려운 품질 판단을 도와줄까요?
 - judge prompt와 rubric이 없으면 자동 채점기는 어떤 편향에 흔들릴까요?
 - 사람 기준선과 agreement를 어떻게 붙여야 judge 결과를 믿을 수 있을까요?
-
-## 큰 그림
-
-![LLM-as-Judge - 모델로 모델을 평가하기](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-01-llm-as-judge-evaluating-models-with-mode.ko.png)
-
-*LLM-as-Judge - 모델로 모델을 평가하기*
-
-이 그림에서는 후보 답변을 judge 모델이 rubric 기준으로 평가하고, 사람 기준선과 bias check로 결과를 보정하는 흐름을 봅니다. LLM-as-Judge는 자동 채점기가 아니라 관리해야 하는 동료 평가자입니다.
-
-> LLM judge는 강력하지만, 기준선과 편향 통제 없이 쓰면 평가 자동화가 아니라 자동화된 착각이 됩니다.
 
 ## 왜 이 글이 중요한가
 

@@ -29,17 +29,15 @@ issue #772는 이 장이 다른 장들과 비슷한 리듬으로 반복된다고
 
 그래서 이번 글은 정의 설명보다 **운영 임계값 결정 메모**에 가깝게 다시 씁니다. 정밀도와 재현율은 개념 암기용 용어가 아니라, 알림을 얼마나 더 보내고 얼마나 더 놓칠지를 결정하는 숫자라는 관점으로 읽겠습니다.
 
+
+![Model Evaluation 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/04/04-01-concept-at-a-glance.ko.png)
+*Model Evaluation 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 정밀도와 재현율를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?
 - 정밀도와 재현율에서 예제나 다이어그램으로 검증해야 할 핵심 신호는 무엇일까요?
 - 정밀도와 재현율를 실제 시스템에 적용할 때 어떤 실패를 먼저 막아야 할까요?
-
-## 큰 그림
-
-![Model Evaluation 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/04/04-01-concept-at-a-glance.ko.png)
-
-*Model Evaluation 101 4장 흐름 개요*
 
 ## 이 글이 답하는 질문
 

@@ -31,19 +31,15 @@ last_reviewed: '2026-05-04'
 
 This is post 4 in the Data Structures 101 series.
 
+
+![data structures 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/04/04-01-big-picture.en.png)
+*data structures 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Stacks and Queues?
 - Which signal should the example or diagram make visible for Stacks and Queues?
 - What failure should be prevented first when Stacks and Queues reaches a real system?
-
-## Big Picture
-
-![data structures 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/04/04-01-big-picture.en.png)
-
-*data structures 101 chapter 4 flow overview*
-
-This picture places Stacks and Queues inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

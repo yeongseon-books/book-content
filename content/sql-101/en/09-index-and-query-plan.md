@@ -28,21 +28,16 @@ If you cannot read that path, tuning stays stuck at guesswork. Indexes become ca
 
 This is post 9 in the SQL 101 series. Here we focus on how indexes, selectivity, and EXPLAIN fit together into a practical tuning workflow.
 
+
+![sql 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/09/09-01-plan-selection-flow.en.png)
+*sql 101 chapter 9 flow overview*
+> Indexing is not about adding indexes everywhere; it's about using EXPLAIN to identify slow queries, understanding why they're slow, and adding indexes only where they help.
+
 ## Questions to Keep in Mind
 
 - What is the simplest mental model for a B-tree index?
 - How do EXPLAIN and EXPLAIN ANALYZE differ?
 - Why can a database skip an index even when one exists?
-
-## Big Picture
-
-![sql 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/09/09-01-plan-selection-flow.en.png)
-
-*sql 101 chapter 9 flow overview*
-
-An index lets the database find rows quickly by a specific column value, but maintaining indexes slows down writes. EXPLAIN shows the execution plan, revealing whether your index is actually being used.
-
-> Indexing is not about adding indexes everywhere; it's about using EXPLAIN to identify slow queries, understanding why they're slow, and adding indexes only where they help.
 
 ## Why It Matters
 

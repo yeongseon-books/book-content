@@ -29,19 +29,15 @@ This is post 3 in the Multimodal AI 101 series.
 
 Here we compare the three connection patterns that dominate modern VLMs: simple projection, token compression, and cross-attention insertion.
 
+
+![Multimodal AI 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/03/03-01-common-skeleton-vision-encoder-adapter-l.en.png)
+*Multimodal AI 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - Where does a VLM actually spend its complexity: in the vision encoder, the adapter, or the LLM?
 - Why do projection, Q-Former compression, and gated cross-attention lead to different serving trade-offs?
 - When is the simplest adapter good enough, and when does token compression become mandatory?
-
-## Big Picture
-
-![Multimodal AI 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/03/03-01-common-skeleton-vision-encoder-adapter-l.en.png)
-
-*Multimodal AI 101 chapter 3 flow overview*
-
-This picture places Vision-Language Model Architecture inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## How VLMs give an LLM "eyes"
 

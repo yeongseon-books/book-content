@@ -28,17 +28,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 저장 보안을 디스크 암호화만으로 보지 않고, 어떤 데이터를 모을지부터 전송 구간, 저장 구간, 키 분리, 백업 보호까지 이어지는 흐름으로 정리하겠습니다. 이 관점을 잡아 두면 민감 데이터가 왜 가장 비싼 사고 자산인지, 그리고 왜 백업까지 같은 수준으로 봐야 하는지도 자연스럽게 이해할 수 있습니다.
 
+
+![Secure Coding 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/05/05-01-concept-at-a-glance.ko.png)
+*Secure Coding 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 저장 중 암호화와 전송 중 암호화는 무엇이 다를까요?
 - PII와 민감 데이터를 분류하는 작업이 왜 먼저일까요?
 - 대칭키, 비대칭키, KMS는 어떤 역할로 나뉠까요?
-
-## 큰 그림
-
-![Secure Coding 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/05/05-01-concept-at-a-glance.ko.png)
-
-*Secure Coding 101 5장 흐름 개요*
 
 ## 왜 중요한가
 

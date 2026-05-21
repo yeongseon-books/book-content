@@ -31,19 +31,15 @@ last_reviewed: '2026-05-04'
 
 This is the first post in the Data Structures 101 series.
 
+
+![data structures 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/01/01-01-big-picture.en.png)
+*data structures 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What Are Data Structures??
 - Which signal should the example or diagram make visible for What Are Data Structures??
 - What failure should be prevented first when What Are Data Structures? reaches a real system?
-
-## Big Picture
-
-![data structures 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/01/01-01-big-picture.en.png)
-
-*data structures 101 chapter 1 flow overview*
-
-This picture places What Are Data Structures? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

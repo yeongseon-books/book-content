@@ -27,17 +27,15 @@ last_reviewed: '2026-05-12'
 
 Python의 `sorted`는 왜 그렇게 안정적으로 빠를까요? 그리고 교과서의 quicksort가 놓치는 것은 무엇일까요? 여기서는 대표 정렬 알고리즘의 트레이드오프와 Timsort가 실무에서 자주 이기는 이유를 다룹니다.
 
+
+![Algorithms 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/04/04-01-big-picture.ko.png)
+*Algorithms 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 비교 기반 정렬은 왜 O(n log n)보다 더 좋아질 수 없을까요?
 - mergesort, quicksort, heapsort는 각각 무엇을 주고 무엇을 얻을까요?
 - 안정 정렬과 비안정 정렬의 차이는 왜 중요할까요?
-
-## 큰 그림
-
-![Algorithms 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/04/04-01-big-picture.ko.png)
-
-*Algorithms 101 4장 흐름 개요*
 
 ## 왜 중요한가
 

@@ -31,19 +31,15 @@ This is the first post in the Compilers 101 series.
 
 > A compiler is a program that translates a program written in one language into another (usually less abstract). The translation does not happen in one step — it runs as a **pipeline**: lexer, parser, semantic analyzer, IR, optimizer, code generator. Once you can draw this pipeline in your head, every compiler, interpreter, and transpiler looks like a variation of the same picture.
 
+
+![compilers 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/01/01-01-big-picture.en.png)
+*compilers 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What Is a Compiler??
 - Which signal should the example or diagram make visible for What Is a Compiler??
 - What failure should be prevented first when What Is a Compiler? reaches a real system?
-
-## Big Picture
-
-![compilers 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/01/01-01-big-picture.en.png)
-
-*compilers 101 chapter 1 flow overview*
-
-This picture places What Is a Compiler? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

@@ -26,21 +26,16 @@ After learning matrices, the natural follow-up is simple: what do those matrices
 
 This is post 5 in the Linear Algebra 101 series. Here we will read linear transformations geometrically through rotation, scaling, reflection, and shear.
 
+
+![linear algebra 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/05/05-01-concept-at-a-glance.en.png)
+*linear algebra 101 chapter 5 flow overview*
+> A linear transformation is a rule that maps vectors to vectors while preserving addition and scalar multiplication. When you read matrix multiplication as composition of transformations, it becomes clear why order matters.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Linear Transformations?
 - Which signal should the example or diagram make visible for Linear Transformations?
 - What failure should be prevented first when Linear Transformations reaches a real system?
-
-## Big Picture
-
-![linear algebra 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/05/05-01-concept-at-a-glance.en.png)
-
-*linear algebra 101 chapter 5 flow overview*
-
-This picture places Linear Transformations inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A linear transformation is a rule that maps vectors to vectors while preserving addition and scalar multiplication. When you read matrix multiplication as composition of transformations, it becomes clear why order matters.
 
 ## Questions This Post Answers
 

@@ -29,21 +29,16 @@ This is post 8 in the API Design 101 series.
 
 Here, we treat OpenAPI and Swagger as contract automation, not just documentation tooling. A single spec needs to drive validation, examples, SDK generation, and mock behavior if it is going to be the source of truth in practice.
 
+
+![api design 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/08/08-01-concept-at-a-glance.en.png)
+*api design 101 chapter 8 flow overview*
+> OpenAPI is not a documentation tool — it is a single source of truth that prevents documentation and code from drifting apart.
+
 ## Questions to Keep in Mind
 
 - The structure of the OpenAPI 3 spec?
 - Swagger UI and Redoc?
 - Code-first vs schema-first?
-
-## Big Picture
-
-![api design 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/08/08-01-concept-at-a-glance.en.png)
-
-*api design 101 chapter 8 flow overview*
-
-The diagram shows OpenAPI as the API's machine-readable blueprint: it lists every endpoint, method, parameter, request schema, response schema, and status code in YAML or JSON, so tools can auto-generate clients, tests, and documentation.
-
-> OpenAPI is not a documentation tool — it is a single source of truth that prevents documentation and code from drifting apart.
 
 ## Why It Matters
 

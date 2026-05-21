@@ -43,19 +43,14 @@ ACA's internal implementation is not published by Microsoft, so these versions a
 - **Inferred from upstream behavior**: how those documented boundaries most likely map onto runtime isolation and sidecar scoping.
 - **Out of bounds**: the exact private cluster layout and non-public control-plane implementation inside an ACA environment.
 
+![azure container apps deep dive chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/02/02-01-the-environment-is-the-platform-s-isolat.en.png)
+*azure container apps deep dive chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - How does a managed environment map internally to node pools and namespaces?
 - Can you explain how many IPs the infrastructure subnet needs, and exactly why?
 - If you swap the Log Analytics workspace, who breaks and what falls silent?
-
-## Big Picture
-
-![azure container apps deep dive chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/02/02-01-the-environment-is-the-platform-s-isolat.en.png)
-
-*azure container apps deep dive chapter 2 flow overview*
-
-This picture places Environment internals — the network, observability, and Dapr scope boundary inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## The environment is the platform's isolation unit
 

@@ -28,19 +28,15 @@ The important point is that optimization is rarely one trick. Base image choice,
 
 This is post 9 in the Docker 101 series. It walks through multi-stage builds, cache mounts, and base-image trade-offs so you can reason about build speed, runtime simplicity, and debugging cost at the same time.
 
+
+![docker 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/09/09-01-concept-at-a-glance.en.png)
+*docker 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - Multi-stage builds* to split *build vs runtime?
 - BuildKit cache mounts* to *speed rebuilds?
 - Comparing *slim / alpine / distroless?
-
-## Big Picture
-
-![docker 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/09/09-01-concept-at-a-glance.en.png)
-
-*docker 101 chapter 9 flow overview*
-
-This picture places Image Optimization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

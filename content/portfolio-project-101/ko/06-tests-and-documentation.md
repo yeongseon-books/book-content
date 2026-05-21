@@ -26,21 +26,16 @@ last_reviewed: '2026-05-15'
 
 이 글은 Portfolio Project 101 시리즈의 6번째 글입니다. 여기서는 포트폴리오 프로젝트에서 어떤 수준의 테스트와 문서화가 있으면 충분히 믿을 만한 프로젝트로 읽히는지, 그리고 그 흔적이 왜 채용과 협업 관점에서 중요한지 살펴보겠습니다.
 
+
+![Portfolio Project 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/06/06-01-diagram.ko.png)
+*Portfolio Project 101 6장 흐름 개요*
+> 테스트는 당신이 해 본 모든 검증을 자동으로 반복 실행하는 기록입니다. 문서는 다음 개발자(또는 당신)이 다시 이해할 수 있길 남기는 지도입니다.
+
 ## 먼저 던지는 질문
 
 - 단위 테스트, 통합 테스트, 전체 흐름 테스트는 각각 무엇을 증명할까요?
 - 자동 검증은 왜 작은 포트폴리오에서도 중요한 기준이 될까요?
 - API 문서나 변경 기록은 어떤 신뢰를 더해 줄까요?
-
-## 큰 그림
-
-![Portfolio Project 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/06/06-01-diagram.ko.png)
-
-*Portfolio Project 101 6장 흐름 개요*
-
-이 그림에서는 테스트와 문서가 코드 신뢰도를 어떻게 높이는지 봅니다. 테스트 없는 코드는 기능이고, 테스트 있는 코드는 검증된 사례입니다.
-
-> 테스트는 당신이 해 본 모든 검증을 자동으로 반복 실행하는 기록입니다. 문서는 다음 개발자(또는 당신)이 다시 이해할 수 있길 남기는 지도입니다.
 
 ## 왜 중요한가
 

@@ -29,21 +29,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 좋은 이름이 왜 주석을 줄이고 검색 비용을 낮추는지, 그리고 변수·함수·클래스 이름을 어떻게 다르게 다뤄야 하는지 정리하겠습니다.
 
+
+![Clean Code 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/02/02-01-concept-at-a-glance.ko.png)
+*Clean Code 101 2장 흐름 개요*
+> 좋은 이름은 주석이 필요 없게 만듭니다.
+
 ## 먼저 던지는 질문
 
 - 좋은 이름을 판단할 때 어떤 신호를 봐야 할까요?
 - 변수 이름과 함수 이름, 클래스 이름은 무엇이 다를까요?
 - 도메인 용어를 코드 안으로 어떻게 자연스럽게 가져올 수 있을까요?
-
-## 큰 그림
-
-![Clean Code 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/02/02-01-concept-at-a-glance.ko.png)
-
-*Clean Code 101 2장 흐름 개요*
-
-이 그림은 이름을 세 가지 수준—변수, 함수, 클래스—에서 다루며, 각각 다른 기준으로 판단해야 함을 보여 줍니다. 좋은 이름은 검색 가능성과 발음 용이성을 동시에 만족해야 합니다.
-
-> 좋은 이름은 주석이 필요 없게 만듭니다.
 
 ## 왜 중요한가
 

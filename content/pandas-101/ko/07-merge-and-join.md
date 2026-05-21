@@ -29,21 +29,16 @@ last_reviewed: '2026-05-15'
 
 이번 글에서는 `merge`와 `join`을 단순히 SQL 용어의 번역으로 보지 않고, 키가 어디에 놓여 있는지에 따라 표를 안전하게 결합하는 도구로 정리해 보겠습니다.
 
+
+![Pandas 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/07/07-01-concept-at-a-glance.ko.png)
+*Pandas 101 7장 흐름 개요*
+> **`merge`는 관계를 검증하는 도구**입니다. 두 표를 합쳤을 때 행이 늘어나는지, 중복 키가 있는지, 자료형이 일치하는지를 항상 확인해야 합니다.
+
 ## 먼저 던지는 질문
 
 - 왜 Pandas에는 `merge`와 `join`이 둘 다 있을까요?
 - 안쪽, 왼쪽, 오른쪽, 바깥쪽, 교차 조인은 어떻게 다를까요?
 - 중복 키가 있을 때 왜 행 수가 갑자기 늘어날까요?
-
-## 큰 그림
-
-![Pandas 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/07/07-01-concept-at-a-glance.ko.png)
-
-*Pandas 101 7장 흐름 개요*
-
-이 그림은 두 표를 관계로 연결하는 감각을 보여줍니다. 하나만 가지고는 답을 만들기 어려운 질문이 병합을 거치면서 비로소 의미를 갖게 됩니다.
-
-> **`merge`는 관계를 검증하는 도구**입니다. 두 표를 합쳤을 때 행이 늘어나는지, 중복 키가 있는지, 자료형이 일치하는지를 항상 확인해야 합니다.
 
 ## 왜 중요한가
 

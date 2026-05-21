@@ -29,21 +29,16 @@ This is post 5 in the API Design 101 series.
 
 Here, we treat schemas as boundary contracts that must be enforced, not as optional documentation. Input validation, response serialization, and standard handling for time and money all need to line up if you want later versioning to stay manageable.
 
+
+![api design 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/05/05-01-concept-at-a-glance.en.png)
+*api design 101 chapter 5 flow overview*
+> A schema is not documentation — it is a testable promise that every request and response will match the shape the client and server agreed upon.
+
 ## Questions to Keep in Mind
 
 - JSON and content types?
 - Field naming conventions?
 - Where and how to validate?
-
-## Big Picture
-
-![api design 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/05/05-01-concept-at-a-glance.en.png)
-
-*api design 101 chapter 5 flow overview*
-
-The diagram shows the shape of the contract: what fields are required in the request, what optional fields the API accepts, and what the response always contains; schemas make that contract machine-verifiable.
-
-> A schema is not documentation — it is a testable promise that every request and response will match the shape the client and server agreed upon.
 
 ## Why It Matters
 

@@ -28,21 +28,16 @@ title: "SRE 101 (2/10): Reliability"
 
 이 글은 SRE 101 시리즈의 2번째 글입니다. 여기서는 reliability를 가용성, 지연 시간, 정확성, 내구성이라는 네 차원으로 나눠 보고, 왜 평균값 하나로는 신뢰성을 설명하기 어려운지 정리합니다.
 
+
+![SRE 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/02/02-01-concept-at-a-glance.ko.png)
+*SRE 101 2장 흐름 개요*
+> Reliability는 하나의 숫자가 아니라 여러 차원의 조합입니다. 각 차원은 서로 다른 실패 양상을 드러내며, 서비스 특성에 따라 어떤 차원을 우선할지가 달라집니다.
+
 ## 먼저 던지는 질문
 
 - reliability를 막연한 안정감이 아니라 측정 가능한 값으로 보려면 무엇이 필요할까요?
 - 가용성과 지연 시간은 왜 비슷해 보이지만 다른 문제일까요?
 - 정확성과 내구성은 어떤 시스템에서 특히 더 중요해질까요?
-
-## 큰 그림
-
-![SRE 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/02/02-01-concept-at-a-glance.ko.png)
-
-*SRE 101 2장 흐름 개요*
-
-Reliability를 네 차원(availability, latency, correctness, durability)으로 나누고 각 차원이 서로 다른 실패 양상을 포착하는 과정을 보여줍니다.
-
-> Reliability는 하나의 숫자가 아니라 여러 차원의 조합입니다. 각 차원은 서로 다른 실패 양상을 드러내며, 서비스 특성에 따라 어떤 차원을 우선할지가 달라집니다.
 
 ## 왜 이 주제가 중요한가
 

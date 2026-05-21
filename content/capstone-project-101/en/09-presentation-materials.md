@@ -28,21 +28,16 @@ A strong deck is not a catalog of screens. It is a concise story about the probl
 
 This is post 9 in the Capstone Project 101 series. It uses a problem-solution-result arc for the deck and folds in demo fallback planning plus Q&A preparation.
 
+
+![capstone project 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/09/09-01-the-flow-at-a-glance.en.png)
+*capstone project 101 chapter 9 flow overview*
+> A strong presentation does not show all features. It shows the problem, the path taken, and the learning captured.
+
 ## Questions to Keep in Mind
 
 - Why do feature-list presentations lose attention quickly?
 - What should survive on each slide?
 - Why does the demo need a written script?
-
-## Big Picture
-
-![capstone project 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/09/09-01-the-flow-at-a-glance.en.png)
-
-*capstone project 101 chapter 9 flow overview*
-
-This picture places Building Presentation Materials inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A strong presentation does not show all features. It shows the problem, the path taken, and the learning captured.
 
 ## What You Will Learn
 

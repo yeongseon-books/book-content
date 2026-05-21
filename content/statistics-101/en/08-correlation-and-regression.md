@@ -28,21 +28,16 @@ Correlation describes direction and strength. Regression writes the relationship
 
 This is post 8 in the Statistics 101 series. Here we will compare correlation coefficients with simple linear regression, explain why R² and residuals matter, and draw a clear boundary between relationship and causation.
 
+
+![statistics 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/08/08-01-concept-at-a-glance.en.png)
+*statistics 101 chapter 8 flow overview*
+> Correlation shows *co-movement*; regression shows *prediction*. *Neither* proves *causation*.
+
 ## Questions to Keep in Mind
 
 - What does a correlation coefficient tell us, and what does it not tell us?
 - What extra information does a regression equation provide?
 - How should we interpret R²?
-
-## Big Picture
-
-![statistics 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/08/08-01-concept-at-a-glance.en.png)
-
-*statistics 101 chapter 8 flow overview*
-
-This picture places Correlation and Regression inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Correlation shows *co-movement*; regression shows *prediction*. *Neither* proves *causation*.
 
 ## Why It Matters
 

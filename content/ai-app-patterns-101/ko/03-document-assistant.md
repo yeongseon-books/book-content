@@ -26,21 +26,15 @@ seo_description: 문서 어시스턴트는 대화형 시스템이 아니라 긴 
 
 이 글은 AI App Patterns 101 시리즈의 세 번째 글입니다. 여기서는 문서 어시스턴트 패턴을 요약, 구조화 추출, 분류 흐름으로 나누어 정리합니다.
 
+![짧은 문서 요약 흐름](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/03/03-01-short-document-summarization-flow.ko.png)
+*짧은 문서 요약 흐름*
+> 문서 어시스턴트는 대화형 시스템이 아니라, 긴 입력을 읽고 작업 목적에 맞는 짧은 출력으로 바꾸는 변환기입니다.
+
 ## 먼저 던지는 질문
 
 - 문서 어시스턴트에서 요약, 추출, 분류는 왜 서로 다른 출력 계약이 필요할까요?
 - 긴 문서는 언제 Map-Reduce 요약처럼 단계적으로 나눠야 할까요?
 - 추출과 분류 결과를 운영 코드가 믿으려면 어떤 검증이 필요할까요?
-
-## 큰 그림
-
-![짧은 문서 요약 흐름](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/03/03-01-short-document-summarization-flow.ko.png)
-
-*짧은 문서 요약 흐름*
-
-이 그림에서는 하나의 문서 입력이 요약, 추출, 분류라는 서로 다른 작업 경로로 갈라지는 흐름을 봅니다. 문서 어시스턴트의 안정성은 작업마다 다른 출력 형태와 검증 기준을 분리하는 데서 나옵니다.
-
-> 문서 어시스턴트는 대화형 시스템이 아니라, 긴 입력을 읽고 작업 목적에 맞는 짧은 출력으로 바꾸는 변환기입니다.
 
 ## 문서 요약
 

@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 bridge, host, overlay, none의 역할 차이와 함께, user-defined network와 DNS 이름 기반 연결이 왜 Compose와 Kubernetes의 공통 출발점인지 정리합니다.
 
+
+![Containers 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/06/06-01-concept-at-a-glance.ko.png)
+*Containers 101 6장 흐름 개요*
+> Network의 핵심은 포트 번호가 아니라 어떤 네트워크 드라이버를 선택했고, 컨테이너 간 또는 호스트와의 통신이 어떤 경로로 흐르는지입니다.
+
 ## 먼저 던지는 질문
 
 - bridge, host, overlay, none 모드는 무엇이 다를까요?
 - 같은 호스트의 컨테이너는 이름으로 어떻게 서로를 찾을까요?
 - `publish (-p)`와 `expose`는 어떻게 다를까요?
-
-## 큰 그림
-
-![Containers 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/06/06-01-concept-at-a-glance.ko.png)
-
-*Containers 101 6장 흐름 개요*
-
-컨테이너 네트워킹은 bridge, host, overlay 같은 드라이버별로 나뉘며, 각 드라이버는 다른 격리 수준과 성능 특성을 가집니다.
-
-> Network의 핵심은 포트 번호가 아니라 어떤 네트워크 드라이버를 선택했고, 컨테이너 간 또는 호스트와의 통신이 어떤 경로로 흐르는지입니다.
 
 ## 왜 중요한가
 

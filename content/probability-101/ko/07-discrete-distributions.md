@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 이 글은 Probability 101 시리즈의 7번째 글입니다. 여기서는 베르누이, 이항, 기하, 포아송 분포를 중심으로 각 분포의 의미, 모수, 평균과 분산, 그리고 어떤 현실 문제에 붙는지 정리하겠습니다.
 
+
+![Probability 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/07/07-01-diagram.ko.png)
+*Probability 101 7장 흐름 개요*
+> 이산분포은 구체적인 가정과 한계를 함께 봐야 합니다.
+
 ## 먼저 던지는 질문
 
 - 0과 1의 한 번 실험은 왜 베르누이분포로 시작할까요?
 - 여러 번의 성공 횟수는 언제 이항분포가 될까요?
 - 첫 성공까지의 시도 수는 왜 기하분포로 읽을까요?
-
-## 큰 그림
-
-![Probability 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/07/07-01-diagram.ko.png)
-
-*Probability 101 7장 흐름 개요*
-
-이 그림은 이 개념의 기본 구조를 보여줍니다.
-
-> 이산분포은 구체적인 가정과 한계를 함께 봐야 합니다.
 
 ## 왜 중요한가
 

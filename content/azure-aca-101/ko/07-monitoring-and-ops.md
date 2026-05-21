@@ -26,21 +26,15 @@ seo_description: ACA 관측성은 플랫폼, 애플리케이션, 사이드카라
 
 이 글은 Azure Container Apps 101 시리즈의 마지막 글입니다. 여기서는 Log Analytics와 Application Insights를 중심으로 그 계층을 지도처럼 정리하겠습니다.
 
+![Azure Container Apps 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/07/07-01-the-observability-map.ko.png)
+*Azure Container Apps 101 7장 흐름 개요*
+> 모니터링과 운영 — Log Analytics와 Application Insights의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - ACA 관측성은 어떤 계층 구조로 나뉠까요?
 - `ContainerAppConsoleLogs_CL`와 `ContainerAppSystemLogs_CL`는 무엇이 다를까요?
 - Log Analytics에서 Revision 기준으로 로그를 묶는 KQL 쿼리는 어떻게 작성할까요?
-
-## 큰 그림
-
-![Azure Container Apps 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/07/07-01-the-observability-map.ko.png)
-
-*Azure Container Apps 101 7장 흐름 개요*
-
-이 그림에서는 모니터링과 운영 — Log Analytics와 Application Insights를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 모니터링과 운영 — Log Analytics와 Application Insights의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 이 글이 답할 질문
 

@@ -26,17 +26,15 @@ last_reviewed: '2026-05-12'
 
 테스트 코드가 늘어나는 가장 흔한 이유는 검증 로직이 아니라 입력 데이터가 많아졌기 때문입니다. 이때 함수를 계속 복사하면 테스트는 금방 장황해지고, 케이스 하나를 추가할 때마다 중복도 함께 늘어납니다.
 
+
+![pytest 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/05/05-01-big-picture.ko.png)
+*pytest 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 같은 로직을 여러 입력으로 검증할 때 함수를 복사하지 않으려면 어떻게 해야 할까요?
 - `@pytest.mark.parametrize`의 기본 문법은 어떻게 읽어야 할까요?
 - 각 테스트 케이스에 읽기 좋은 이름을 붙이려면 어떻게 해야 할까요?
-
-## 큰 그림
-
-![pytest 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/05/05-01-big-picture.ko.png)
-
-*pytest 101 5장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 

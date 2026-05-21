@@ -27,19 +27,15 @@ Type hints do not improve code just because there are more of them. But if the i
 
 This is the final post in the Type Hints in Python 101 series. In this article, we will take one loose `order_service.py` module and run a full hardening pass on it: replacing `Any`, making return types explicit, narrowing unions with helper functions, and verifying the result with a checker so the advice ends as runnable code rather than placeholders.
 
+
+![Type Hints in Python 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/10/10-01-big-picture.en.png)
+*Type Hints in Python 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Type Hint Best Practices?
 - Which signal should the example or diagram make visible for Type Hint Best Practices?
 - What failure should be prevented first when Type Hint Best Practices reaches a real system?
-
-## Big Picture
-
-![Type Hints in Python 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/10/10-01-big-picture.en.png)
-
-*Type Hints in Python 101 chapter 10 flow overview*
-
-This picture places Type Hint Best Practices inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

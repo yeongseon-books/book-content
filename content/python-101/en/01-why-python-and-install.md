@@ -28,19 +28,15 @@ One computer can host many Pythons at once, and every project gets its own. If y
 
 This post is the first article in the Python 101 series. This is the first step in the series, where you set up the environment model the rest of the articles depend on.
 
+
+![Python 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/01/01-01-mental-model.en.png)
+*Python 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why "just installing Python" is risky, and why you must separate system Python from project Python?
 - How to install Python 3.12 safely on macOS, Windows, and Linux?
 - What a venv (virtual environment) actually solves?
-
-## Big Picture
-
-![Python 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/01/01-01-mental-model.en.png)
-
-*Python 101 chapter 1 flow overview*
-
-This picture places Why Python, and how to install and use venv inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

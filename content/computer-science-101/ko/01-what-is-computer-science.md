@@ -29,17 +29,15 @@ last_reviewed: '2026-05-12'
 
 여기서는 컴퓨터과학이 정확히 무엇을 다루는지, 왜 추상화가 이 분야의 공용 언어인지, 그리고 이후 글들이 어떤 지도를 따라 연결되는지 큰 그림부터 잡겠습니다.
 
+
+![Computer Science 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/01/01-01-concept-at-a-glance.ko.png)
+*Computer Science 101 1장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 컴퓨터과학은 프로그래밍과 어떻게 다르고, 정확히 무엇을 연구하는 학문일까요?
 - 왜 추상화가 컴퓨터과학의 가장 중요한 도구로 반복해서 등장할까요?
 - 알고리즘, 시스템, 응용 과목은 서로 어떤 계층 관계로 이어질까요?
-
-## 큰 그림
-
-![Computer Science 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/01/01-01-concept-at-a-glance.ko.png)
-
-*Computer Science 101 1장 흐름 개요*
 
 ## 이 글에서 배울 것
 

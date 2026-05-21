@@ -34,17 +34,14 @@ seo_description: aiosqlite는 SQLite를 비동기로 바꾸지 않는다. connec
 
 *aiosqlite로 비동기 SQLite 다루기*
 
+![Python DB-API 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/09/09-02-mental-model-aiosqlite-is-sqlite3-thread.ko.png)
+*Python DB-API 101 9장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - aiosqlite로 비동기 SQLite 다루기를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?
 - aiosqlite로 비동기 SQLite 다루기에서 예제나 다이어그램으로 검증해야 할 핵심 신호는 무엇일까요?
 - aiosqlite로 비동기 SQLite 다루기를 실제 시스템에 적용할 때 어떤 실패를 먼저 막아야 할까요?
-
-## 큰 그림
-
-![Python DB-API 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/09/09-02-mental-model-aiosqlite-is-sqlite3-thread.ko.png)
-
-*Python DB-API 101 9장 흐름 개요*
 
 ## Mental Model: aiosqlite는 sqlite3 + thread + Future
 

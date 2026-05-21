@@ -29,19 +29,15 @@ seo_description: OpenAPI 3와 Swagger UI로 계약을 문서, 검증, SDK로 연
 
 여기서는 OpenAPI와 Swagger를 문서 도구가 아니라 계약 자동화 체계로 봅니다. 하나의 spec이 validation, 예제, SDK, mock server까지 연결되어야만 단일 진실 원본이라는 말이 실제 운영 습관으로 이어집니다.
 
+
+![API Design 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/08/08-01-concept-at-a-glance.ko.png)
+*OpenAPI spec 하나가 문서, 검증, SDK, mock을 동시에 구동하는 구조*
+
 ## 먼저 던지는 질문
 
 - OpenAPI 3 문서는 어떤 구조로 이루어질까요?
 - Swagger UI와 Redoc은 각각 어떤 역할을 할까요?
 - code-first와 schema-first는 어떤 차이가 있을까요?
-
-## 큰 그림
-
-![API Design 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/08/08-01-concept-at-a-glance.ko.png)
-
-*OpenAPI spec 하나가 문서, 검증, SDK, mock을 동시에 구동하는 구조*
-
-OpenAPI spec 파일(`openapi.yaml`)을 중심에 두면 여러 산출물이 자동으로 파생됩니다. Swagger UI와 Redoc은 사람이 읽는 문서를 렌더링하고, openapi-generator는 클라이언트 SDK를 생성하며, Prism 같은 도구는 mock server를 띄웁니다. 서버 코드의 request validation도 같은 spec에서 schema를 가져와 적용합니다. 이 모든 것이 하나의 원본에서 나오기 때문에 "문서와 구현이 다른" 문제가 구조적으로 사라집니다.
 
 ## OpenAPI란 무엇인가
 

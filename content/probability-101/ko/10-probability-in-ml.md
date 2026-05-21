@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 이 글은 Probability 101 시리즈의 마지막 글입니다. 여기서는 확률이 손실함수, 모델 출력, 보정 지표, 베이지안 추론 안에 어떻게 들어가 있는지 한 흐름으로 묶어 보겠습니다.
 
+
+![Probability 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/10/10-01-diagram.ko.png)
+*Probability 101 10장 흐름 개요*
+> 머신러닝에서의 확률은 구체적인 가정과 한계를 함께 봐야 합니다.
+
 ## 먼저 던지는 질문
 
 - 머신러닝에서 확률은 정확히 어디에 숨어 있을까요?
 - 교차 엔트로피와 음의 로그가능도는 왜 같은 방향을 가리킬까요?
 - 분류 모델이 내놓는 0.8은 무엇을 뜻할까요?
-
-## 큰 그림
-
-![Probability 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/10/10-01-diagram.ko.png)
-
-*Probability 101 10장 흐름 개요*
-
-이 그림은 이 개념의 기본 구조를 보여줍니다.
-
-> 머신러닝에서의 확률은 구체적인 가정과 한계를 함께 봐야 합니다.
 
 ## 왜 중요한가
 

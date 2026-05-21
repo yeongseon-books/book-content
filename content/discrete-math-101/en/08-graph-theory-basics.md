@@ -31,19 +31,15 @@ This is post 8 in the Discrete Math 101 series.
 
 > A graph is a set of vertices and edges, the most general structure for representing relationships. From this simple definition flows an enormous range of applications — routing, recommendations, dependency resolution, circuit design, game AI. This article covers the definitions, representations, degree, paths, connectivity, and the special graphs (complete, bipartite, DAG).
 
+
+![discrete math 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/08/08-01-graph-representations.en.png)
+*discrete math 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Graph Theory Basics?
 - Which signal should the example or diagram make visible for Graph Theory Basics?
 - What failure should be prevented first when Graph Theory Basics reaches a real system?
-
-## Big Picture
-
-![discrete math 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/08/08-01-graph-representations.en.png)
-
-*discrete math 101 chapter 8 flow overview*
-
-This picture places Graph Theory Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

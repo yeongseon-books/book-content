@@ -30,19 +30,15 @@ Here, we will frame Helm as a repeatable deployment unit that separates shared s
 
 > Helm becomes valuable when the chart expresses the common contract and the values file is the only place where environments diverge.
 
+
+![kubernetes 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/09/09-01-concept-at-a-glance.en.png)
+*kubernetes 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - the layout of a *Chart?
 - how *values.yaml* works?
 - install / upgrade / rollback?
-
-## Big Picture
-
-![kubernetes 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/09/09-01-concept-at-a-glance.en.png)
-
-*kubernetes 101 chapter 9 flow overview*
-
-This picture places Helm inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

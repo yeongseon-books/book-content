@@ -25,21 +25,15 @@ Most document ingestion pipelines fail earlier than people expect. If the very f
 
 This is the first post in the Document Ingestion 101 series. Here, we start with a reproducible PDF sample and inspect what useful text and page-level metadata come out of it.
 
+![PDF generation and extraction flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/01/01-01-pdf-parsing-flow.en.png)
+*PDF generation and extraction flow*
+> The first goal of PDF parsing is to turn a visual document into a verifiable list of strings.
+
 ## Questions to Keep in Mind
 
 - Why can a PDF not be treated like a plain text file?
 - What breaks in RAG when page structure and metadata are not preserved during extraction?
 - What should be validated even when extracted text looks good?
-
-## Big Picture
-
-![PDF generation and extraction flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/01/01-01-pdf-parsing-flow.en.png)
-
-*PDF generation and extraction flow*
-
-This picture shows a PDF loaded as page-structured content with metadata before extracted text becomes input for chunking and retrieval. The first ingestion failure often starts at the document-reading boundary, not in the model.
-
-> The first goal of PDF parsing is to turn a visual document into a verifiable list of strings.
 
 ## PDF parsing flow
 

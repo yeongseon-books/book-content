@@ -25,21 +25,15 @@ As soon as an LLM needs current data, calculations, or side effects, prompt engi
 
 This is the fourth post in the LangChain 101 series. It shows how tool metadata, execution loops, and result reinjection turn model output into real function calls.
 
+![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/04/04-02-the-flow-at-a-glance.en.png)
+*The flow at a glance*
+> Tool calling works when the model stops pretending to do the work itself and starts choosing which real function should do it.
+
 ## Questions to Keep in Mind
 
 - Does `bind_tools()` give the model execution power, or define a call format?
 - What must be validated before a tool call becomes a real function call?
 - What failures should a dispatcher prevent when several tools are available?
-
-## Big Picture
-
-![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/04/04-02-the-flow-at-a-glance.en.png)
-
-*The flow at a glance*
-
-This picture shows the model producing a tool-call request inside an allowed schema while the application validates and executes it. LangChain tool calling still keeps execution authority on the application side.
-
-> Tool calling works when the model stops pretending to do the work itself and starts choosing which real function should do it.
 
 ## Minimal runnable example
 

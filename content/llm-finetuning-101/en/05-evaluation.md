@@ -27,19 +27,14 @@ Evaluation is where many fine-tuning demos become misleading. This article separ
 
 This is the fifth post in the LLM Fine-tuning 101 series.
 
+![LLM Fine-tuning 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/05/05-02-the-right-way-to-read-perplexity.en.png)
+*LLM Fine-tuning 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - How do you compute perplexity, the first quantitative signal to look at right after fine-tuning?
 - Why is comparing perplexity before and after training not a complete quality evaluation?
 - Why keep a separate evaluation loop even in a tiny model demo?
-
-## Big Picture
-
-![LLM Fine-tuning 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/05/05-02-the-right-way-to-read-perplexity.en.png)
-
-*LLM Fine-tuning 101 chapter 5 flow overview*
-
-This picture places Model Evaluation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

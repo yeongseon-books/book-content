@@ -28,21 +28,15 @@ Context engineering is the process of clearly telling the agent "who you are, wh
 
 This is post 2 in the AI Agent 101 series. Here we cover context components, system prompt writing principles, role definition methods, knowledge boundary setting, and context injection patterns.
 
+![Context map](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/02/02-01-context-map.en.png)
+*Context map*
+> Context is not just input text for the model; it is the execution contract that tells the agent what role it plays, what it may do, and what it must not do.
+
 ## Questions to Keep in Mind
 
 - When an agent behaves strangely, which context boundary should you inspect before rewriting prompt wording?
 - What responsibilities are split across the system prompt, conversation history, tool descriptions, and current state?
 - As context grows, how do you decide what to keep and what to drop?
-
-## Big Picture
-
-![Context map](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/02/02-01-context-map.en.png)
-
-*Context map*
-
-This picture splits the context that drives an agent into the system prompt, history, tool descriptions, and current state. Context engineering is not prompt decoration; it is designing the behavior contract the agent reads.
-
-> Context is not just input text for the model; it is the execution contract that tells the agent what role it plays, what it may do, and what it must not do.
 
 ## Context Components
 

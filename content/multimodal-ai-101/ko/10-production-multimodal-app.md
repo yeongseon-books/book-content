@@ -35,21 +35,16 @@ seo_description: 지금까지 9편에 걸쳐 image encoder, VLM 아키텍처, ca
 
 좋은 production 시스템은 모델 성능보다 먼저 요청 흐름과 실패 경로를 명확히 보여 줍니다.
 
+
+![Multimodal AI 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/10/10-01-big-picture.ko.png)
+*Multimodal AI 101 10장 흐름 개요*
+> Production Multimodal Application 구축의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - production 멀티모달 앱은 어떤 end-to-end 구성 요소를 반드시 분리해서 설계해야 할까요?
 - FastAPI 입구, inference worker, cache, object storage, observability는 어떤 순서로 연결되는 편이 안정적일까요?
 - 동기 처리와 비동기 처리 경계는 어떤 기준으로 나누는 것이 현실적일까요?
-
-## 큰 그림
-
-![Multimodal AI 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/10/10-01-big-picture.ko.png)
-
-*Multimodal AI 101 10장 흐름 개요*
-
-이 그림에서는 Production Multimodal Application 구축를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> Production Multimodal Application 구축의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

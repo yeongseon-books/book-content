@@ -29,19 +29,15 @@ This is post 2 in the Computer Science 101 series.
 
 In this article, we'll connect the formal definition of computation, the idea of uncomputable problems, and the way programming languages express those computations for humans.
 
+
+![Computer Science 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/02/02-01-concept-at-a-glance.en.png)
+*Computer Science 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Computation and Programs?
 - Which signal should the example or diagram make visible for Computation and Programs?
 - What failure should be prevented first when Computation and Programs reaches a real system?
-
-## Big Picture
-
-![Computer Science 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/02/02-01-concept-at-a-glance.en.png)
-
-*Computer Science 101 chapter 2 flow overview*
-
-This picture places Computation and Programs inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions This Article Answers
 

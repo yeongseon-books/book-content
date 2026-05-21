@@ -28,21 +28,16 @@ Window functions solve exactly that problem. They let you add group-aware calcul
 
 This is post 7 in the SQL 101 series. Here we focus on the row-preserving calculations that make SQL useful for ranking and time-based analysis.
 
+
+![sql 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/07/07-01-window-calculation-flow.en.png)
+*sql 101 chapter 7 flow overview*
+> Window functions let you compute context (rank, running total, comparison) for each row while keeping all the original rows. It's analytical power without aggregation.
+
 ## Questions to Keep in Mind
 
 - What does OVER (PARTITION BY ...) really mean?
 - How do ROW_NUMBER, RANK, and DENSE_RANK differ?
 - Why are LAG and LEAD so common in time-series analysis?
-
-## Big Picture
-
-![sql 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/07/07-01-window-calculation-flow.en.png)
-
-*sql 101 chapter 7 flow overview*
-
-Window functions calculate a value for each row using other rows in a defined window, without collapsing multiple rows into one like GROUP BY does.
-
-> Window functions let you compute context (rank, running total, comparison) for each row while keeping all the original rows. It's analytical power without aggregation.
 
 ## Why It Matters
 

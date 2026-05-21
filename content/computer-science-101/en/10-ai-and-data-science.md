@@ -29,19 +29,15 @@ This is the final post in the Computer Science 101 series.
 
 In this article, we'll connect the previous nine posts to machine learning and data science work, then turn that map into a concrete study roadmap.
 
+
+![Computer Science 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/10/10-01-concept-at-a-glance.en.png)
+*Computer Science 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying From CS to AI and Data Science?
 - Which signal should the example or diagram make visible for From CS to AI and Data Science?
 - What failure should be prevented first when From CS to AI and Data Science reaches a real system?
-
-## Big Picture
-
-![Computer Science 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/10/10-01-concept-at-a-glance.en.png)
-
-*Computer Science 101 chapter 10 flow overview*
-
-This picture places From CS to AI and Data Science inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions This Article Answers
 

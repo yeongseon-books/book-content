@@ -28,19 +28,15 @@ The practical question is not “how many checks can we add?” It is “how cle
 
 This is the final post in the GitHub Actions 101 series. In this post, we will combine the earlier topics into a reusable CI/CD shape that separates PR, `main`, and tag responsibilities without losing traceability.
 
+
+![github actions 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/10/10-01-concept-at-a-glance.en.png)
+*github actions 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying A Real-World CI/CD Pipeline?
 - Which signal should the example or diagram make visible for A Real-World CI/CD Pipeline?
 - What failure should be prevented first when A Real-World CI/CD Pipeline reaches a real system?
-
-## Big Picture
-
-![github actions 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/10/10-01-concept-at-a-glance.en.png)
-
-*github actions 101 chapter 10 flow overview*
-
-This picture places A Real-World CI/CD Pipeline inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

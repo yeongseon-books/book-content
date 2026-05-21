@@ -27,17 +27,14 @@ seo_description: README는 패키지의 현관문이고, API Reference는 모든
 
 이 글은 Python Package 101 시리즈의 9번째 글입니다. 여기서는 좋은 README의 구조, MkDocs 기반 문서 사이트, docstring에서 API Reference를 생성하는 흐름을 정리하겠습니다.
 
+![Python Package 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/09/09-01-mental-model.ko.png)
+*Python Package 101 9장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 좋은 README에는 무엇이 들어가야 할까요?
 - MkDocs와 Sphinx는 무엇이 다를까요?
 - docstring에서 API Reference를 자동 생성하려면 어떻게 해야 할까요?
-
-## 큰 그림
-
-![Python Package 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/09/09-01-mental-model.ko.png)
-
-*Python Package 101 9장 흐름 개요*
 
 ## 이 글에서 배우는 내용
 
@@ -74,7 +71,7 @@ docs/api.md        →  detailed reference: specs for every function/class
 
 ## Before / After
 
-**Before (no documentation)**
+**Before (문서 없음)**
 
 ```text
 README.md:
@@ -82,7 +79,7 @@ README.md:
 A Python library.
 ```
 
-**After (structured documentation)**
+**After (구조화된 문서)**
 
 ```text
 README.md:

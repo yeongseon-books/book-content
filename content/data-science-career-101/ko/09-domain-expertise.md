@@ -31,21 +31,16 @@ last_reviewed: '2026-05-14'
 
 이 글은 Data Science Career 101 시리즈의 아홉 번째 글입니다.
 
+
+![Data Science Career 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/09/09-01-concept-at-a-glance.ko.png)
+*Data Science Career 101 9장 흐름 개요*
+> 도메인 전문성에서 가장 중요한 것은 무엇을 할 수 있는가가 아니라 무엇을 물어봐야 하고 어떻게 답해야 하는가입니다.
+
 ## 먼저 던지는 질문
 
 - 데이터 직무에서 도메인 전문성이 왜 중요한지 설명합니다?
 - 용어집과 KPI를 어떻게 익히면 좋은지 정리합니다?
 - 현장 관찰이 숫자 해석 능력을 왜 높이는지 짚습니다?
-
-## 큰 그림
-
-![Data Science Career 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/09/09-01-concept-at-a-glance.ko.png)
-
-*Data Science Career 101 9장 흐름 개요*
-
-이 그림은 도메인 전문성을 단계별로 보여줍니다. 각 단계에서 무엇을 중심으로 봐야 하는지가 중요합니다.
-
-> 도메인 전문성에서 가장 중요한 것은 무엇을 할 수 있는가가 아니라 무엇을 물어봐야 하고 어떻게 답해야 하는가입니다.
 
 ## 이 글에서 배우는 내용
 

@@ -26,21 +26,15 @@ seo_description: 다중 포맷 파이프라인의 본질은 서로 다른 입력
 
 여기서는 여러 형식을 각자 다른 로더로 읽고, 최종적으로는 하나의 공통 `Document` 계약으로 정규화합니다.
 
+![Loader routing by file format](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/05/05-01-loader-routing-by-file-format.ko.png)
+*Loader routing by file format*
+> 다중 포맷 파이프라인의 본질은 서로 다른 입력을 하나의 공통 `Document` 계약으로 밀어 넣는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - PDF, Markdown, HTML을 한 파이프라인에 넣으려면 무엇을 먼저 공통 계약으로 맞춰야 할까요?
 - 파일 형식별 loader routing은 어디까지 분기하고 어디서 다시 합쳐져야 할까요?
 - 정규화 계층이 없으면 후속 청킹과 메타데이터 필터링에서 어떤 문제가 생길까요?
-
-## 큰 그림
-
-![Loader routing by file format](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/05/05-01-loader-routing-by-file-format.ko.png)
-
-*Loader routing by file format*
-
-이 그림에서는 파일 형식별 loader가 서로 다른 원문을 읽고, 정규화 계층이 공통 Document 계약으로 다시 맞추는 흐름을 봅니다. 다중 포맷 파이프라인은 분기를 많이 만드는 것이 아니라 분기 뒤에 다시 합칠 기준을 고정하는 일입니다.
-
-> 다중 포맷 파이프라인의 본질은 서로 다른 입력을 하나의 공통 `Document` 계약으로 밀어 넣는 데 있습니다.
 
 ## 파일 형식별 로더 라우팅
 

@@ -28,21 +28,16 @@ This is the first post in the Pandas 101 series.
 
 In this post, I want to define Pandas by role rather than by feature list. Pandas is the standard environment for reading, inspecting, reshaping, and summarizing in-memory tabular data with short, expressive code.
 
+
+![pandas 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/01/01-01-concept-at-a-glance.en.png)
+*pandas 101 chapter 1 flow overview*
+> *Pandas is the standard language for reading, exploring, reshaping, and summarizing tabular data* within the memory you have. Master this layer first.
+
 ## Questions to Keep in Mind
 
 - The *definition* of *Pandas* and where it sits?
 - The intuition behind *Series* and *DataFrame?
 - The basic *load → inspect → summarize* workflow?
-
-## Big Picture
-
-![pandas 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/01/01-01-concept-at-a-glance.en.png)
-
-*pandas 101 chapter 1 flow overview*
-
-This picture places What Is Pandas? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> *Pandas is the standard language for reading, exploring, reshaping, and summarizing tabular data* within the memory you have. Master this layer first.
 
 ## Why It Matters
 

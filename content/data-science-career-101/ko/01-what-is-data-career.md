@@ -30,21 +30,15 @@ last_reviewed: '2026-05-14'
 특히 같은 회사 안에서도 데이터 직무 정의가 제각각이라 더 헷갈립니다. 어떤 팀은 분석가가 실험 설계까지 맡고, 어떤 팀은 엔지니어가 지표 테이블까지 책임집니다. 그래서 처음에는 직함보다 질문, 산출물, 협업 상대를 기준으로 지형을 읽는 편이 훨씬 안전합니다.
 
 
+![Data Science Career 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/01/01-01-concept-at-a-glance.ko.png)
+*Data Science Career 101 1장 흐름 개요*
+> 데이터 직무의 핵심은 직함이 아니라 책임 경계입니다. 각 역할이 어떤 문제를 맡고 어떤 산출물을 만드는지가 진입 기준이 되어야 합니다.
+
 ## 먼저 던지는 질문
 
 - 데이터 직무라고 할 때 실제로 어떤 역할들이 함께 묶이는지 정리합니다?
 - 직함보다 책임과 산출물로 역할을 구분해야 하는 이유를 설명합니다?
 - 입문자가 먼저 구분해야 할 다섯 가지 핵심 역할을 살펴봅니다?
-
-## 큰 그림
-
-![Data Science Career 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/01/01-01-concept-at-a-glance.ko.png)
-
-*Data Science Career 101 1장 흐름 개요*
-
-이 그림은 데이터 직무를 질문부터 의사결정까지의 흐름으로 보고, 각 역할이 어느 구간을 책임지는지 보여줍니다. 같은 데이터라도 역할마다 그 책임 경계가 다르다는 점이 가장 중요합니다.
-
-> 데이터 직무의 핵심은 직함이 아니라 책임 경계입니다. 각 역할이 어떤 문제를 맡고 어떤 산출물을 만드는지가 진입 기준이 되어야 합니다.
 
 ## 이 글에서 배우는 내용
 

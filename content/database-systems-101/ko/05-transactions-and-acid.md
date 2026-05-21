@@ -29,17 +29,15 @@ last_reviewed: '2026-05-12'
 
 트랜잭션은 이런 여러 SQL 문을 하나의 작업 단위로 묶는 장치입니다. 그리고 ACID는 그 약속을 네 가지 관점에서 더 정밀하게 설명하는 언어입니다. 이 글에서는 “전부 또는 전무”라는 문장이 실제 시스템에서 어떻게 구현되는지, 그리고 WAL과 무결성 제약이 왜 그 약속의 핵심 메커니즘인지 연결해 보겠습니다.
 
+
+![Database Systems 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/05/05-01-big-picture.ko.png)
+*Database Systems 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 트랜잭션은 정확히 무엇이며 왜 필요할까요?
 - ACID 네 글자는 실제로 무엇을 보장할까요?
 - `BEGIN`, `COMMIT`, `ROLLBACK`은 어떻게 사용해야 할까요?
-
-## 큰 그림
-
-![Database Systems 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/05/05-01-big-picture.ko.png)
-
-*Database Systems 101 5장 흐름 개요*
 
 ## 이 글에서 배울 내용
 

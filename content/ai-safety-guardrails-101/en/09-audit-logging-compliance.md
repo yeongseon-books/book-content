@@ -26,21 +26,16 @@ In an LLM system, audit logs are not just verbose application logs. They are the
 
 This is post 9 in the AI Safety & Guardrails 101 series. It lays out what an audit log has to preserve and why its schema, access model, and retention rules differ from ordinary app logging.
 
+
+![Audit logging and compliance flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/09/09-01-big-picture.en.png)
+*Audit logging and compliance flow*
+> An audit log is not more logging; it is evidence that lets you reconstruct who did what and why.
+
 ## Questions to Keep in Mind
 
 - How must audit logs differ from ordinary debug logs to support compliance?
 - What evidence is preserved by PII masking, append-only storage, and decision rationale?
 - What must be fixed in the log schema to produce automatic compliance reports?
-
-## Big Picture
-
-![Audit logging and compliance flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/09/09-01-big-picture.en.png)
-
-*Audit logging and compliance flow*
-
-This picture connects request tracing, PII masking, append-only logs, decision rationale, and audit reports into one audit flow. Audit logging is not for debugging convenience; it is an integrity model for reconstructing and explaining a run later.
-
-> An audit log is not more logging; it is evidence that lets you reconstruct who did what and why.
 
 ## Why Audit Logs Differ From Application Logs
 

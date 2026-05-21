@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 사용자가 5분 안에 프로젝트를 이해하고 실행할 수 있게 만드는 좋은 리드미 문서의 기본 구조를 정리하겠습니다.
 
+
+![Open Source 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/05/05-01-follow-the-reader-s-order.ko.png)
+*Open Source 101 5장 흐름 개요*
+> 좋은 README는 기술 정보를 나열하는 문서가 아닙니다. **이 프로젝트가 뭐하는 것이고, 나는 언제 쓰고, 어떻게 시작할 수 있는지**를 5분 안에 이해시키는 프로젝트 대표입니다.
+
 ## 먼저 던지는 질문
 
 - 처음 방문한 사용자가 리드미 문서에서 가장 먼저 찾는 정보는 무엇일까요?
 - 제목, 한 줄 설명, 설치, 사용 예시, 라이선스는 왜 핵심 섹션일까요?
 - 배지와 스크린샷은 언제 도움이 되고 언제 방해가 될까요?
-
-## 큰 그림
-
-![Open Source 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/05/05-01-follow-the-reader-s-order.ko.png)
-
-*Open Source 101 5장 흐름 개요*
-
-이 그림은 README가 프로젝트의 입구 역할을 하는 방식을 보여줍니다. 기능 설명, 설치 방법, 예제, 기여 경로가 모두 한 곳에서 정리되어야 신규 사용자와 기여자가 들어올 수 있습니다.
-
-> 좋은 README는 기술 정보를 나열하는 문서가 아닙니다. **이 프로젝트가 뭐하는 것이고, 나는 언제 쓰고, 어떻게 시작할 수 있는지**를 5분 안에 이해시키는 프로젝트 대표입니다.
 
 ## 왜 중요한가
 

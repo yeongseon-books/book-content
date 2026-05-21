@@ -28,19 +28,15 @@ The goal of lint and type checks is not to slow developers down. It is to remove
 
 This is post 5 in the GitHub Actions 101 series. In this post, we will use Ruff, Mypy, and pre-commit to turn style and type rules into an explicit CI gate instead of an informal team habit.
 
+
+![github actions 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/05/05-01-concept-at-a-glance.en.png)
+*github actions 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Lint and Type Check?
 - Which signal should the example or diagram make visible for Lint and Type Check?
 - What failure should be prevented first when Lint and Type Check reaches a real system?
-
-## Big Picture
-
-![github actions 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/05/05-01-concept-at-a-glance.en.png)
-
-*github actions 101 chapter 5 flow overview*
-
-This picture places Lint and Type Check inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

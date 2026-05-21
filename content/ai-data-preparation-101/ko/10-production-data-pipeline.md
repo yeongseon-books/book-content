@@ -46,21 +46,16 @@ seo_description: Ep1~9에서 cleaning, dedup, PII redaction, tokenization, chunk
 
 프로덕션 데이터 파이프라인은 결국 데이터셋을 코드처럼 다루는 문제입니다. 버전, 캐시, lineage, schema validation, scheduler, retry가 모두 필요합니다. 한 단계라도 임시 스크립트로 남겨 두면 파이프라인 전체의 신뢰도가 떨어집니다.
 
+
+![Architecture - a 6-stage pipeline](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/10/10-01-6-stage-pipeline.ko.png)
+*Architecture - a 6-stage pipeline*
+> 프로덕션 데이터 파이프라인 구축의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - 여러 데이터 준비 단계를 실제 운영 가능한 하나의 파이프라인으로 묶으려면 어떤 시스템 속성이 필요할까요?
 - DVC와 stage fingerprint는 데이터 버전 관리와 idempotency를 어떻게 함께 해결할까요?
 - Airflow 같은 오케스트레이터는 단순 스케줄링 외에 어떤 운영 가치를 줄까요?
-
-## 큰 그림
-
-![Architecture - a 6-stage pipeline](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/10/10-01-6-stage-pipeline.ko.png)
-
-*Architecture - a 6-stage pipeline*
-
-이 그림에서는 프로덕션 데이터 파이프라인 구축를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 프로덕션 데이터 파이프라인 구축의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

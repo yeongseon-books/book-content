@@ -31,19 +31,15 @@ This is post 2 in the Compilers 101 series.
 
 > Lexical analysis (or lexing) is the step that cuts a raw string into meaningful pieces called **tokens**. When this step is well defined, every step above it (parser, semantic analyzer) works on clean units instead of raw text.
 
+
+![compilers 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/02/02-01-big-picture.en.png)
+*compilers 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying lexical analysis?
 - Which signal should the example or diagram make visible for lexical analysis?
 - What failure should be prevented first when lexical analysis reaches a real system?
-
-## Big Picture
-
-![compilers 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/02/02-01-big-picture.en.png)
-
-*compilers 101 chapter 2 flow overview*
-
-This picture places lexical analysis inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

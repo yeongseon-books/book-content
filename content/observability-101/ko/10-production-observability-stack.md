@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 이 글은 Observability 101 시리즈의 마지막 글입니다.
 
+
+![Observability 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/10/10-01-concept-at-a-glance.ko.png)
+*Observability 101 10장 흐름 개요*
+> 운영 가능한 관측성 스택의 핵심은 도구 선택이 아니라, 언제 어디서 이 신호를 남기고 어떻게 해석할 것인가 하는 설계입니다.
+
 ## 먼저 던지는 질문
 
 - 작은 팀이 바로 시작할 수 있는 최소 관측성 스택은 어떤 모습일까요?
 - OpenTelemetry 수집기를 왜 중심에 두는 편이 좋을까요?
 - 메트릭, 로그, 트레이스를 한 화면에서 연결하려면 무엇이 필요할까요?
-
-## 큰 그림
-
-![Observability 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/10/10-01-concept-at-a-glance.ko.png)
-
-*Observability 101 10장 흐름 개요*
-
-운영 가능한 관측성 스택를 다루는 이번 장에서는 주요 개념과 실무 패턴을 봅니다. 시스템이 복잡해질수록 이 개념들이 어디에서 시작되고 어떤 결과를 만드는지 이해하는 것이 중요합니다.
-
-> 운영 가능한 관측성 스택의 핵심은 도구 선택이 아니라, 언제 어디서 이 신호를 남기고 어떻게 해석할 것인가 하는 설계입니다.
 
 ## 왜 중요한가
 

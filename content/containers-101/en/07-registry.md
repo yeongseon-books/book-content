@@ -31,21 +31,16 @@ In this chapter, we treat the registry as the center of deployment identity, cov
 
 > A registry is not just storage. It is the identity system for what actually gets deployed.
 
+
+![containers 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/07/07-01-concept-at-a-glance.en.png)
+*containers 101 chapter 7 flow overview*
+> A registry is not a backup folder; it is the distribution contract that binds tags, digests, manifests, and policy into one reproducible handoff.
+
 ## Questions to Keep in Mind
 
 - The role of a *registry?
 - The *push / pull* flow?
 - Tagging* strategy?
-
-## Big Picture
-
-![containers 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/07/07-01-concept-at-a-glance.en.png)
-
-*containers 101 chapter 7 flow overview*
-
-This picture places Registry inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A registry is not a backup folder; it is the distribution contract that binds tags, digests, manifests, and policy into one reproducible handoff.
 
 ## Why It Matters
 

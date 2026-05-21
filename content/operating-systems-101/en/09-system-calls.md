@@ -29,19 +29,15 @@ System calls are also where performance, debugging, and security meet. Once you 
 
 This is post 9 in the Operating Systems 101 series. It explains the user/kernel boundary, syscall cost, how to inspect real calls, and how batching and vDSO reduce overhead.
 
+
+![operating systems 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/09/09-01-the-privilege-boundary-a-syscall-crosses.en.png)
+*operating systems 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying System Calls?
 - Which signal should the example or diagram make visible for System Calls?
 - What failure should be prevented first when System Calls reaches a real system?
-
-## Big Picture
-
-![operating systems 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/09/09-01-the-privilege-boundary-a-syscall-crosses.en.png)
-
-*operating systems 101 chapter 9 flow overview*
-
-This picture places System Calls inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions this article answers
 

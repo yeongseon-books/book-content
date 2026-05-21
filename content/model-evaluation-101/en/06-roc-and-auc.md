@@ -28,19 +28,15 @@ ROC curves and AUC are useful when you want to compare candidate models before c
 
 This rewrite finishes that story. We will use ROC-AUC as a ranking-quality summary, compare it with PR-AUC on the same imbalanced dataset, then turn an `FPR <= 0.05` policy into a concrete threshold, confusion matrix, precision/recall pair, and simple decision cost.
 
+
+![model evaluation 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/06/06-01-concept-at-a-glance.en.png)
+*model evaluation 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying ROC and AUC?
 - Which signal should the example or diagram make visible for ROC and AUC?
 - What failure should be prevented first when ROC and AUC reaches a real system?
-
-## Big Picture
-
-![model evaluation 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/06/06-01-concept-at-a-glance.en.png)
-
-*model evaluation 101 chapter 6 flow overview*
-
-This picture places ROC and AUC inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## This post answers
 

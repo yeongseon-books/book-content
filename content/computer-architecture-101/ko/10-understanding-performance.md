@@ -27,17 +27,15 @@ last_reviewed: '2026-05-12'
 
 성능 문제는 거의 항상 추측에서 시작됩니다. 하지만 시니어 엔지니어는 측정 없이 코드를 바꾸지 않습니다. 최적화는 신념이 아니라 증거 위에서만 성립하기 때문입니다.
 
+
+![Computer Architecture 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/10/10-01-big-picture.ko.png)
+*Computer Architecture 101 10장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 지연시간과 처리량은 어떻게 다를까요?
 - USE 방법론은 병목을 어떻게 찾을까요?
 - 샘플링 프로파일링과 계측은 무엇이 다를까요?
-
-## 큰 그림
-
-![Computer Architecture 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/10/10-01-big-picture.ko.png)
-
-*Computer Architecture 101 10장 흐름 개요*
 
 ## 왜 중요한가
 

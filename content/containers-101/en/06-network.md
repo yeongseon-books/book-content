@@ -31,21 +31,16 @@ In this chapter, we compare bridge, host, overlay, and none, then explain why us
 
 > Stable container networking starts with names and boundaries, not with memorized IP addresses.
 
+
+![containers 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/06/06-01-concept-at-a-glance.en.png)
+*containers 101 chapter 6 flow overview*
+> Container networking is not just about port mapping; it is about choosing which containers can see each other and how traffic flows between them.
+
 ## Questions to Keep in Mind
 
 - The bridge / host / overlay / none modes?
 - Container-to-container DNS?
 - Publish (-p) vs expose?
-
-## Big Picture
-
-![containers 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/06/06-01-concept-at-a-glance.en.png)
-
-*containers 101 chapter 6 flow overview*
-
-This picture places Network inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Container networking is not just about port mapping; it is about choosing which containers can see each other and how traffic flows between them.
 
 ## Why It Matters
 

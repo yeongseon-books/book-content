@@ -26,21 +26,15 @@ This is post 3 in the Vector Search 101 series.
 
 This post implements all three metrics from scratch, shows why normalization matters, and builds a brute-force nearest-neighbor search without any external library.
 
+![Cosine dot and euclidean comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/03/03-01-cosine-similarity-and-vector-search-comp.en.png)
+*Cosine dot and euclidean comparison structure*
+> In vector search, the similarity function is not just a math formula. It is a retrieval policy that decides what counts as similar.
+
 ## Questions to Keep in Mind
 
 - If you already have vectors, why is choosing a distance metric still part of the search design?
 - How do cosine similarity, inner product, and L2 distance change ranking behavior?
 - Why does normalization affect both ranking results and FAISS index choice?
-
-## Big Picture
-
-![Cosine dot and euclidean comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/03/03-01-cosine-similarity-and-vector-search-comp.en.png)
-
-*Cosine dot and euclidean comparison structure*
-
-This picture shows that the same vectors can produce different ranking decisions depending on the distance metric. Retrieval quality depends not only on the embedding model but also on the rule used to compare vectors.
-
-> In vector search, the similarity function is not just a math formula. It is a retrieval policy that decides what counts as similar.
 
 ## Three distance metrics
 

@@ -28,21 +28,16 @@ The real skill is not collecting more signals. It is choosing the right one for 
 
 This is post 2 in the Observability 101 series.
 
+
+![observability 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/02/02-01-concept-at-a-glance.en.png)
+*observability 101 chapter 2 flow overview*
+> Metrics, Logs, and Traces is about the boundary decision, not the tool choice.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Metrics, Logs, and Traces?
 - Which signal should the example or diagram make visible for Metrics, Logs, and Traces?
 - What failure should be prevented first when Metrics, Logs, and Traces reaches a real system?
-
-## Big Picture
-
-![observability 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/02/02-01-concept-at-a-glance.en.png)
-
-*observability 101 chapter 2 flow overview*
-
-This picture places Metrics, Logs, and Traces inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Metrics, Logs, and Traces is about the boundary decision, not the tool choice.
 
 ## What You Will Learn
 

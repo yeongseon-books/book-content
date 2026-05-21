@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 Backend Development 101 시리즈의 일곱 번째 글입니다. 여기서는 구조화 로그, request_id, 글로벌 예외 처리라는 세 가지 축을 중심으로 운영에서 읽히는 백엔드를 만드는 방법을 정리해 보겠습니다.
 
+
+![Backend Development 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/07/07-01-concept-at-a-glance.ko.png)
+*Backend Development 101 7장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 왜 `print` 대신 logger를 써야 할까요?
 - 구조화 로그는 어떤 모양이어야 운영에서 쓸모가 있을까요?
 - 글로벌 예외 처리는 왜 응답 일관성을 지켜 줄까요?
-
-## 큰 그림
-
-![Backend Development 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/07/07-01-concept-at-a-glance.ko.png)
-
-*Backend Development 101 7장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -471,7 +469,6 @@ services:
 5. 장애 로그만으로 요청 식별자, 사용자 식별자, 실패 경로를 역추적할 수 있는지 확인합니다.
 
 이 기준선을 매 글의 주제에 연결해 두면 학습이 단발성 지식으로 끝나지 않습니다. 라우팅을 배울 때도, 테스트를 배울 때도, 배포를 배울 때도 같은 운영 질문으로 품질을 판별하게 됩니다.
-
 
 
 ### 장애 복구 훈련 시나리오

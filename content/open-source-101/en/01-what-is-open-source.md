@@ -28,21 +28,16 @@ This is the first post in the Open Source 101 series.
 
 Here, we will define open source not as code that happens to be public, but as a system of rights, responsibilities, and collaboration patterns that let people read, change, and redistribute software together.
 
+
+![open source 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/01/01-01-a-concept-map-you-can-keep-in-your-head.en.png)
+*open source 101 chapter 1 flow overview*
+> Open source is a rights model, not a pricing model. When you understand it this way, the rest of this series connects naturally.
+
 ## Questions to Keep in Mind
 
 - Why does the “free code” definition keep creating misunderstandings?
 - How should you distinguish terms such as *free software*, *upstream*, *fork*, and *contributor*?
 - Why do docs, translations, and reproducible bug reports count as real contribution?
-
-## Big Picture
-
-![open source 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/01/01-01-a-concept-map-you-can-keep-in-your-head.en.png)
-
-*open source 101 chapter 1 flow overview*
-
-This picture places What Is Open Source inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Open source is a rights model, not a pricing model. When you understand it this way, the rest of this series connects naturally.
 
 ## Why It Matters
 

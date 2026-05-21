@@ -26,21 +26,15 @@ This is the fifth post in the LLM Apps Ops 101 series. Here, we will make a Fast
 
 A believable example should bring up the server, pass health, and complete one representative request without manual glue.
 
+![Self-test flow for health and chat](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/05/05-01-big-picture.en.png)
+*Self-test flow for health and chat*
+> Deployment verification for an LLM app starts not with server startup, but with one real request passing end to end.
+
 ## Questions to Keep in Mind
 
 - Why should a pre-deployment self-test verify both health checks and real chat requests?
 - What failure boundary appears between an async endpoint and a synchronous model call?
 - What minimum artifacts should exist before container deployment?
-
-## Big Picture
-
-![Self-test flow for health and chat](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/05/05-01-big-picture.en.png)
-
-*Self-test flow for health and chat*
-
-This picture shows the self-test verifying startup, health endpoint, chat request, and provider call in order. Deploying an LLM app is not only about whether the container starts; it is about whether the real model-call boundary works.
-
-> Deployment verification for an LLM app starts not with server startup, but with one real request passing end to end.
 
 ## Why this layer matters
 ![Startup verification reaches health check](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/05/05-02-why-this-layer-matters.en.png)

@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 선형대수를 벡터, 행렬, 선형변환을 한 줄로 묶는 언어로 이해해 보겠습니다.
 
+
+![Linear Algebra 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/01/01-01-concept-at-a-glance.ko.png)
+*Linear Algebra 101 1장 흐름 개요*
+> 선형대수는 숫자 계산이 아니라, 벡터 공간 변환을 체계적으로 다루는 수학적 언어입니다. 벡터와 행렬의 기하학적 의미를 이해하면 공식보다 구조가 먼저 보입니다.
+
 ## 먼저 던지는 질문
 
 - 선형대수는 정확히 무엇을 다루는 학문일까요?
 - 벡터와 행렬은 왜 머신러닝, 그래픽스, 통계에서 반복해서 등장할까요?
 - 행렬 곱을 왜 변환의 합성으로 읽어야 할까요?
-
-## 큰 그림
-
-![Linear Algebra 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/01/01-01-concept-at-a-glance.ko.png)
-
-*Linear Algebra 101 1장 흐름 개요*
-
-선형대수 전체는 세 개 주제의 조화입니다. 벡터는 공간 속의 점을 나타내고, 행렬은 벡터를 다른 벡터로 보내는 규칙입니다. 행렬 곱은 이러한 규칙들을 차례로 적용하는 합성입니다. 이후 글에서 다룰 기저, 고유값, 분해, PCA도 모두 이 세 축 위의 다른 관점입니다.
-
-> 선형대수는 숫자 계산이 아니라, 벡터 공간 변환을 체계적으로 다루는 수학적 언어입니다. 벡터와 행렬의 기하학적 의미를 이해하면 공식보다 구조가 먼저 보입니다.
 
 ## 왜 중요한가
 

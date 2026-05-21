@@ -28,19 +28,15 @@ When teammates generate revisions in parallel, the graph naturally forks into mu
 
 This is post 5 in the Alembic 101 series. Here we will cover why branches appear and how `alembic merge` brings the graph back to a single head.
 
+
+![alembic 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/05/05-01-diagram-merging-multiple-heads-back-to-o.en.png)
+*alembic 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - When the alembic revision graph forks into branches?
 - The exact role of `branch_labels` and `depends_on`?
 - How to consolidate two heads with `alembic merge`?
-
-## Big Picture
-
-![alembic 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/05/05-01-diagram-merging-multiple-heads-back-to-o.en.png)
-
-*alembic 101 chapter 5 flow overview*
-
-This picture places branches and merges: combining revisions made in parallel inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

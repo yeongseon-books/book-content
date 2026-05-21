@@ -28,19 +28,15 @@ The hardest OOP decision is often not "which class should I add?" but "should th
 
 Python gives you functions, modules, `dataclass`, `NamedTuple`, `TypedDict`, and callables for a reason. In this chapter, we will start with a class-heavy reporting mini-app, simplify it in stages, and then mark the exact point where a class becomes useful again.
 
+
+![Object-Oriented Programming 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/10/10-01-concept-overview.en.png)
+*Object-Oriented Programming 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying When to Avoid OOP?
 - Which signal should the example or diagram make visible for When to Avoid OOP?
 - What failure should be prevented first when When to Avoid OOP reaches a real system?
-
-## Big Picture
-
-![Object-Oriented Programming 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/10/10-01-concept-overview.en.png)
-
-*Object-Oriented Programming 101 chapter 10 flow overview*
-
-This picture places When to Avoid OOP inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions This Article Answers
 

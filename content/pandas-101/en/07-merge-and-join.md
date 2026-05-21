@@ -28,21 +28,16 @@ This is post 7 in the Pandas 101 series.
 
 Here we will treat `merge` and `join` as tools for validating relationships between key systems, not just for gluing columns together. Row counts and key assumptions matter as much as the output table itself.
 
+
+![pandas 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/07/07-01-concept-at-a-glance.en.png)
+*pandas 101 chapter 7 flow overview*
+> *Merge is not just combining tables — it's validating relationships. Duplicate keys, unmatched rows, row explosion — most of this is *preventable by checking your keys first.
+
 ## Questions to Keep in Mind
 
 - inner / left / right / outer / cross* joins?
 - The difference between *merge* and *join?
 - Options *suffixes / indicator / validate?
-
-## Big Picture
-
-![pandas 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/07/07-01-concept-at-a-glance.en.png)
-
-*pandas 101 chapter 7 flow overview*
-
-This picture places Merge and Join inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> *Merge is not just combining tables — it's validating relationships. Duplicate keys, unmatched rows, row explosion — most of this is *preventable by checking your keys first.
 
 ## Why It Matters
 

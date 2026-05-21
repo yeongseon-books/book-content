@@ -28,21 +28,15 @@ This is post 5 in the Vector Search 101 series.
 
 Here chunking is treated as a retrieval design choice, not a preprocessing afterthought.
 
+![Chunk size and overlap structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/05/05-01-chunking-strategies-how-to-split-long-do.en.png)
+*Chunk size and overlap structure*
+> Chunking is not just extra preprocessing work. It is a design step where you decide what unit of context your retrieval system will remember.
+
 ## Questions to Keep in Mind
 
 - Why split long documents into chunks instead of embedding them as one piece?
 - How do chunk_size and overlap trade retrieval quality against cost?
 - What breaks in the answer path when chunks do not carry metadata?
-
-## Big Picture
-
-![Chunk size and overlap structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/05/05-01-chunking-strategies-how-to-split-long-do.en.png)
-
-*Chunk size and overlap structure*
-
-This picture shows a long document being split into chunks, then embedded as searchable units. Chunking is not just preprocessing; it defines retrieval units, cost, and source traceability.
-
-> Chunking is not just extra preprocessing work. It is a design step where you decide what unit of context your retrieval system will remember.
 
 ## Chunk size and overlap
 

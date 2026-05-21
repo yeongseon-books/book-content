@@ -28,21 +28,16 @@ This is post 6 in the Data Warehouse 101 series.
 
 In this post, we compare ETL and ELT from an operational point of view: where transformation happens, why modern warehouse teams prefer replayable SQL, and what that choice changes in day-to-day debugging.
 
+
+![data warehouse 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/06/06-01-concept-at-a-glance.en.png)
+*data warehouse 101 chapter 6 flow overview*
+> ETL transforms before loading; ELT loads first and transforms in-warehouse. Each has different cost, flexibility, and operational tradeoffs.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying ETL and ELT?
 - Which signal should the example or diagram make visible for ETL and ELT?
 - What failure should be prevented first when ETL and ELT reaches a real system?
-
-## Big Picture
-
-![data warehouse 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/06/06-01-concept-at-a-glance.en.png)
-
-*data warehouse 101 chapter 6 flow overview*
-
-This picture places ETL and ELT inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> ETL transforms before loading; ELT loads first and transforms in-warehouse. Each has different cost, flexibility, and operational tradeoffs.
 
 ## Questions this article answers
 

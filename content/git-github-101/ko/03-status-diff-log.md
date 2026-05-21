@@ -27,17 +27,15 @@ Git을 잘 쓰는 사람은 대개 치기 전에 먼저 읽습니다. `status`, 
 
 이 글은 Git/GitHub 101 시리즈의 세 번째 글입니다. 여기서는 현재 상태를 읽는 `status`, 줄 단위 차이를 읽는 `diff`, 이미 저장된 이력을 읽는 `log`를 한 흐름으로 정리합니다.
 
+
+![Git & GitHub 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/03/03-01-mental-model.ko.png)
+*Git & GitHub 101 3장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - `git status`의 긴 출력과 짧은 출력은 각각 무엇을 보여 줄까요?
 - `git diff`, `git diff --cached`, `git diff HEAD`는 어느 영역끼리 비교할까요?
 - 두 commit을 직접 비교할 때는 어떤 순서로 hash를 넣어야 할까요?
-
-## 큰 그림
-
-![Git & GitHub 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/03/03-01-mental-model.ko.png)
-
-*Git & GitHub 101 3장 흐름 개요*
 
 ## 왜 중요한가
 

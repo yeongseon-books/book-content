@@ -34,21 +34,16 @@ seo_description: 전형적인 RAG 시스템은 documents를 chunk로 나누고, 
 
 검색 대상이 넓어질수록 인덱싱과 평가 전략을 먼저 고정하는 편이 훨씬 안전합니다.
 
+
+![Multimodal AI 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/05/05-01-big-picture.ko.png)
+*Multimodal AI 101 5장 흐름 개요*
+> Multimodal RAG: 이미지와 텍스트를 함께 검색하기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - 텍스트 RAG는 왜 이미지, 표, 레이아웃 정보가 중요한 질문에서 곧바로 성능 한계를 드러낼까요?
 - 멀티모달 검색을 위해 원본 이미지, caption/OCR, dual index를 쓰는 세 가지 전략은 어떻게 다를까요?
 - 검색 결과를 최종 답변 단계에서 VLM에 넘길 때 어떤 입력 조합이 가장 실용적일까요?
-
-## 큰 그림
-
-![Multimodal AI 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/05/05-01-big-picture.ko.png)
-
-*Multimodal AI 101 5장 흐름 개요*
-
-이 그림에서는 Multimodal RAG: 이미지와 텍스트를 함께 검색하기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> Multimodal RAG: 이미지와 텍스트를 함께 검색하기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

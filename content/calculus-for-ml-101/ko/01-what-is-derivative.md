@@ -32,17 +32,15 @@ last_reviewed: '2026-05-12'
 
 끝까지 읽고 나면 미분을 "공식 조작"이 아니라 "학습 방향을 읽는 첫 번째 센서"로 이해하게 될 것입니다.
 
+
+![Calculus for ML 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.ko.png)
+*Calculus for ML 101 1장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 머신러닝에서 말하는 학습은 왜 미분과 직접 연결될까요?
 - 평균 변화율과 순간 변화율은 무엇이 다르고, 왜 둘을 구분해야 할까요?
 - 접선의 기울기와 도함수는 어떤 관계로 이해하면 가장 실용적일까요?
-
-## 큰 그림
-
-![Calculus for ML 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.ko.png)
-
-*Calculus for ML 101 1장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 

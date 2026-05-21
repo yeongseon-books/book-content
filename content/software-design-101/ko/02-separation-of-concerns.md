@@ -32,17 +32,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 관심사 분리를 “파일을 많이 쪼개는 일”이 아니라, 다른 이유로 바뀌는 책임을 다른 경계로 나누는 설계 원칙으로 설명합니다. 결합도와 응집도가 왜 함께 나오는지, 횡단 관심사는 어디에 두어야 하는지, 분리와 통합 사이의 균형은 어떻게 잡아야 하는지도 차례로 보겠습니다.
 
+
+![Software Design 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/02/02-01-concept-at-a-glance.ko.png)
+*Software Design 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 관심사란 정확히 무엇일까요?
 - 한 모듈이 너무 많은 일을 하는지 어떻게 알아낼 수 있을까요?
 - 결합도와 응집도는 관심사 분리와 어떤 관계가 있을까요?
-
-## 큰 그림
-
-![Software Design 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/02/02-01-concept-at-a-glance.ko.png)
-
-*Software Design 101 2장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -452,7 +450,6 @@ class PlaceOrderService:
 - 인프라 계층: 외부 API 오류율, DB 지연 시간
 
 지표를 계층별로 분리해 보면 어디를 고쳐야 하는지가 명확해집니다. 모든 지표가 한 대시보드에서 섞여 있으면 "느리다"는 사실만 보이고 원인은 보이지 않습니다. 설계 경계를 운영 지표 경계와 맞추면 개선 사이클이 빠르게 돌아갑니다.
-
 
 
 ## 리뷰와 리팩터링을 위한 실전 질문 세트

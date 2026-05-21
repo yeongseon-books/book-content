@@ -29,19 +29,15 @@ This is the first post in the Design Patterns 101 series.
 
 In this post, we'll treat design patterns not as an answer catalog but as shared vocabulary for recurring design problems. The goal is to understand the problem shape, the solution shape, and the tradeoffs that come with the pattern name.
 
+
+![design patterns 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/01/01-01-concept-at-a-glance.en.png)
+*design patterns 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - A working definition of a design pattern?
 - The GoF classification of 23 patterns?
 - The real problems patterns try to solve?
-
-## Big Picture
-
-![design patterns 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/01/01-01-concept-at-a-glance.en.png)
-
-*design patterns 101 chapter 1 flow overview*
-
-This picture places What Are Design Patterns? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

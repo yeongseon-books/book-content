@@ -26,19 +26,15 @@ At the start of a project, it feels harmless to hand-pick one color for one butt
 
 This is post 8 in the Frontend Development 101 series. Here we look at styling as a system for operating consistency rather than as ad hoc CSS. Colors, spacing, and typography need shared tokens and shared components if the UI is going to stay coherent over time.
 
+
+![frontend development 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/08/08-01-concept-at-a-glance.en.png)
+*frontend development 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Styling and Design Systems?
 - Which signal should the example or diagram make visible for Styling and Design Systems?
 - What failure should be prevented first when Styling and Design Systems reaches a real system?
-
-## Big Picture
-
-![frontend development 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/08/08-01-concept-at-a-glance.en.png)
-
-*frontend development 101 chapter 8 flow overview*
-
-This picture places Styling and Design Systems inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

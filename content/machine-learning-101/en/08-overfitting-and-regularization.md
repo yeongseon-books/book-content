@@ -26,19 +26,15 @@ When the train score soars and the test score collapses, â€œthe model is smartâ€
 
 This is post 8 in the Machine Learning 101 series. Here we will diagnose underfitting versus overfitting, connect that diagnosis to the bias-variance trade-off, and use Ridge, Lasso, and related regularization tools to recover generalization.
 
+
+![machine learning 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/08/08-01-concept-at-a-glance.en.png)
+*machine learning 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - Which signals separate overfitting from underfitting?
 - What does the bias-variance trade-off actually mean in practice?
 - How do Ridge, Lasso, and ElasticNet differ?
-
-## Big Picture
-
-![machine learning 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/08/08-01-concept-at-a-glance.en.png)
-
-*machine learning 101 chapter 8 flow overview*
-
-This picture places Overfitting and Regularization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

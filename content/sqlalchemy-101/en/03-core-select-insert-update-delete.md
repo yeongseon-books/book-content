@@ -40,19 +40,14 @@ This post walks through SQLAlchemy 2.x style `select()`, `insert()`, `update()`,
 
 *SQLAlchemy core - select, insert, update, delete in 2.x style*
 
+![sqlalchemy 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/03/03-02-why-this-matters.en.png)
+*sqlalchemy 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - The unified 2.x `select()` shape: `select(...)`, `where()`, `order_by()`, `limit()`, `offset()`, `group_by()`, `having()`?
 - The `Result` object and the meaning of `.all()`, `.first()`, `.one()`, `.one_or_none()`, `.scalars()`, `.mappings()`?
 - `insert(table).values(...)` and the `executemany`-style list-of-dicts form?
-
-## Big Picture
-
-![sqlalchemy 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/03/03-02-why-this-matters.en.png)
-
-*sqlalchemy 101 chapter 3 flow overview*
-
-This picture places SQLAlchemy Core - select, insert, update, delete in 2.x Style inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

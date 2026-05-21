@@ -28,19 +28,15 @@ Compose matters because it turns that memory into a checked-in declaration. Serv
 
 This is post 5 in the Docker 101 series. It shows how to express a multi-container environment in Compose, what `depends_on` can and cannot guarantee, and which verification steps tell you the stack is actually ready.
 
+
+![docker 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/05/05-01-concept-at-a-glance.en.png)
+*docker 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - Defining *services / networks / volumes?
 - depends_on* and healthchecks?
 - profiles* for *selective execution?
-
-## Big Picture
-
-![docker 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/05/05-01-concept-at-a-glance.en.png)
-
-*docker 101 chapter 5 flow overview*
-
-This picture places Docker Compose inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

@@ -30,19 +30,15 @@ This is the first post in the pytest 101 series.
 
 > Tests don't slow you down — they remove the fear of change and ultimately speed you up. This article explains why tests matter, what kinds exist, and why pytest is the go-to tool for Python testing.
 
+
+![pytest 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/01/01-01-big-picture.en.png)
+*pytest 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Why Write Tests??
 - Which signal should the example or diagram make visible for Why Write Tests??
 - What failure should be prevented first when Why Write Tests? reaches a real system?
-
-## Big Picture
-
-![pytest 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/01/01-01-big-picture.en.png)
-
-*pytest 101 chapter 1 flow overview*
-
-This picture places Why Write Tests? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

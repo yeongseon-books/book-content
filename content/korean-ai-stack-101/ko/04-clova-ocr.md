@@ -26,17 +26,14 @@ seo_description: 쓸 만한 OCR 결과는 평문이 아니라, 의미 있는 줄
 
 이 글은 Korean AI Stack 101 시리즈의 4번째 글입니다. 여기서는 CLOVA OCR 응답을 줄 단위 텍스트로 재구성해, 검색 코퍼스에 안전하게 넣을 수 있는 형태로 만드는 과정을 다룹니다.
 
+![Korean AI Stack 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-01-core-flow.ko.png)
+*Korean AI Stack 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - OCR을 붙일 때는 텍스트 정확도부터 봐야 할까요, 아니면 응답 구조부터 봐야 할까요?
 - bounding box와 `lineBreak` 힌트는 후처리에서 왜 그렇게 중요할까요?
 - 실제 API 키가 없어도 OCR 파이프라인의 대부분을 왜 검증할 수 있을까요?
-
-## 큰 그림
-
-![Korean AI Stack 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-01-core-flow.ko.png)
-
-*Korean AI Stack 101 4장 흐름 개요*
 
 ## 왜 이 단계가 중요한가
 

@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 LU, QR, 고유분해, SVD를 같은 지도 위에서 정리해 보겠습니다.
 
+
+![Linear Algebra 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/08/08-01-concept-at-a-glance.ko.png)
+*Linear Algebra 101 8장 흐름 개요*
+> 행렬 분해는 다양한 수치 계산 문제를 푸는 열쇠입니다. 상황에 맞는 분해를 선택해야 안정적이고 효율적인 계산을 할 수 있습니다.
+
 ## 먼저 던지는 질문
 
 - 왜 역행렬보다 분해를 먼저 떠올려야 할까요?
 - LU, QR, 고유분해, SVD는 각각 어디에 잘 맞을까요?
 - 모든 분해가 모든 행렬에 적용되는 것은 아닐까요?
-
-## 큰 그림
-
-![Linear Algebra 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/08/08-01-concept-at-a-glance.ko.png)
-
-*Linear Algebra 101 8장 흐름 개요*
-
-행렬 분해는 복잡한 행렬을 더 단순한 형태로 쪼개는 기술입니다. LU 분해는 선형 연립방정식을 푸는 데 쓰고, QR은 최소제곱 문제에 쓰며, SVD는 데이터 압축과 노이즈 제거에 쓰입니다.
-
-> 행렬 분해는 다양한 수치 계산 문제를 푸는 열쇠입니다. 상황에 맞는 분해를 선택해야 안정적이고 효율적인 계산을 할 수 있습니다.
 
 ## 왜 중요한가
 

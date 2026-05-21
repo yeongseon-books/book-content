@@ -30,21 +30,15 @@ Microsoft Learn이 Environment를 설명할 때 반복하는 문장이 있습니
 
 이제 Environment를 “상위 폴더”가 아니라 “플랫폼 경계”로 보겠습니다.
 
+![Azure Container Apps Deep Dive 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/02/02-01-the-environment-is-the-platform-s-isolat.ko.png)
+*Azure Container Apps Deep Dive 2장 흐름 개요*
+> Environment 내부 — 네트워크·관측·Dapr 스코프의 경계의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - Environment는 왜 단순한 부모 리소스가 아니라 실제 격리 경계일까요?
 - 네트워크 범위는 Revision이나 App이 아니라 왜 Environment에서 시작될까요?
 - Log Analytics workspace를 Environment 수준에서 공유한다는 말은 운영상 무엇을 뜻할까요?
-
-## 큰 그림
-
-![Azure Container Apps Deep Dive 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/02/02-01-the-environment-is-the-platform-s-isolat.ko.png)
-
-*Azure Container Apps Deep Dive 2장 흐름 개요*
-
-이 그림에서는 Environment 내부 — 네트워크·관측·Dapr 스코프의 경계를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> Environment 내부 — 네트워크·관측·Dapr 스코프의 경계의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

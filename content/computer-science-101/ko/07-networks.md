@@ -29,17 +29,15 @@ last_reviewed: '2026-05-12'
 
 여기서는 TCP/IP 계층, HTTP 요청과 응답, DNS 이름 해석, 그리고 소켓 프로그래밍의 기초를 통해 네트워크를 구조적으로 이해해 보겠습니다.
 
+
+![Computer Science 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/07/07-01-concept-at-a-glance.ko.png)
+*Computer Science 101 7장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 브라우저에 주소를 입력했을 때 데이터가 내 화면까지 오는 경로는 어떻게 구성될까요?
 - IP, TCP, HTTP, DNS는 각각 어느 층에서 어떤 역할을 맡을까요?
 - HTTP 요청과 응답은 선 위에서 어떤 형태로 오갈까요?
-
-## 큰 그림
-
-![Computer Science 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/07/07-01-concept-at-a-glance.ko.png)
-
-*Computer Science 101 7장 흐름 개요*
 
 ## 이 글에서 배울 것
 

@@ -28,19 +28,15 @@ Code history tells you what changed, but teams also need a place to record what 
 
 This is the eighth post in the Git & GitHub 101 series. Here, we connect issues, pull requests, and project boards into one visible work-tracking flow.
 
+
+![Git & GitHub 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/08/08-01-mental-model.en.png)
+*Git & GitHub 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - What a GitHub Issue is, and how it differs from a commit or a Pull Request?
 - How to open an issue and attach labels, an assignee, and a milestone?
 - How a single line like `Closes #42` in a PR body auto-closes an issue on merge?
-
-## Big Picture
-
-![Git & GitHub 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/08/08-01-mental-model.en.png)
-
-*Git & GitHub 101 chapter 8 flow overview*
-
-This picture places Tracking Work with Issues and Projects - How GitHub Records What's Next inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

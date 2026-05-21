@@ -30,19 +30,15 @@ This is post 3 in the pytest 101 series.
 
 > pytest rewrites `assert` statements internally, showing the left-hand and right-hand values in detail when a test fails. This article covers various assert patterns and exception testing with `pytest.raises`.
 
+
+![pytest 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/03/03-01-big-picture.en.png)
+*pytest 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Assert and Exception Testing?
 - Which signal should the example or diagram make visible for Assert and Exception Testing?
 - What failure should be prevented first when Assert and Exception Testing reaches a real system?
-
-## Big Picture
-
-![pytest 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/03/03-01-big-picture.en.png)
-
-*pytest 101 chapter 3 flow overview*
-
-This picture places Assert and Exception Testing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

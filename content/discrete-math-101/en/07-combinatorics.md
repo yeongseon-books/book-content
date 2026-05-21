@@ -31,19 +31,15 @@ This is post 7 in the Discrete Math 101 series.
 
 > Combinatorics is the math of counting "how many cases are there?" Permutations, combinations, the binomial theorem, and the pigeonhole principle are the tools we use to size an algorithm's input space, a cipher's key space, or the probability of a hash collision. This article walks through the basic counting laws, the pigeonhole principle, and inclusion-exclusion, with code to verify each result.
 
+
+![discrete math 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/07/07-01-big-picture.en.png)
+*discrete math 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Combinatorics?
 - Which signal should the example or diagram make visible for Combinatorics?
 - What failure should be prevented first when Combinatorics reaches a real system?
-
-## Big Picture
-
-![discrete math 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/07/07-01-big-picture.en.png)
-
-*discrete math 101 chapter 7 flow overview*
-
-This picture places Combinatorics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

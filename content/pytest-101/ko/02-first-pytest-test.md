@@ -26,17 +26,15 @@ last_reviewed: '2026-05-12'
 
 테스트를 잘 써도 pytest가 파일과 함수를 발견하지 못하면 아무 의미가 없습니다. 그래서 테스트 작성의 출발점은 문법보다 구조입니다. 파일 위치, 이름 규칙, import 경로가 맞아야 팀 전체가 같은 방식으로 테스트를 실행할 수 있습니다.
 
+
+![pytest 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/02/02-01-big-picture.ko.png)
+*pytest 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - pytest는 테스트 파일과 함수를 어떤 규칙으로 자동 탐색할까요?
 - 프로덕션 코드와 테스트 코드는 어떤 디렉터리 구조로 나누는 편이 좋을까요?
 - `pyproject.toml`은 왜 필요한가요?
-
-## 큰 그림
-
-![pytest 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/02/02-01-big-picture.ko.png)
-
-*pytest 101 2장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 

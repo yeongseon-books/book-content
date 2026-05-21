@@ -30,21 +30,16 @@ incident라고 부를 기준이 생겨도 아직 한 단계가 더 남습니다.
 
 이 글은 Incident Response 101 시리즈의 2번째 글입니다. 여기서는 SEV1·SEV2·SEV3를 나누는 영향 축, 등급과 호출 정책을 연결하는 방법, 그리고 경계 사례를 문서화하는 실무 원칙을 다룹니다.
 
+
+![Incident Response 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/02/02-01-diagram-at-a-glance.ko.png)
+*Incident Response 101 2장 흐름 개요*
+> Severity는 단순 라벨이 아니라, 행동 규칙과 함께 이해되는 운영 언어입니다. 같은 단어를 다르게 쓰면 대응은 엇나갑니다.
+
 ## 먼저 던지는 질문
 
 - severity는 무엇을 위한 언어일까요?
 - SEV1, SEV2, SEV3는 어떤 기준으로 갈라야 할까요?
 - 사용자 수, 범위, 금전 손실 같은 영향 축은 왜 필요할까요?
-
-## 큰 그림
-
-![Incident Response 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/02/02-01-diagram-at-a-glance.ko.png)
-
-*Incident Response 101 2장 흐름 개요*
-
-Severity 등급은 SEV1, SEV2, SEV3로 나누면 호출 대상과 업데이트 비도가 함께 결정되는 중요한 의사결정 축입니다.
-
-> Severity는 단순 라벨이 아니라, 행동 규칙과 함께 이해되는 운영 언어입니다. 같은 단어를 다르게 쓰면 대응은 엇나갑니다.
 
 ## 왜 이 주제가 중요한가
 

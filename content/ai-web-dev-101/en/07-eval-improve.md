@@ -27,19 +27,15 @@ This is the final post in the AI Web Development 101 series.
 
 Here, we will turn “it feels better” into a repeatable evaluation and improvement loop.
 
+
+![AI Web Development 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/07/evaluation-three-axes.en.png)
+*AI Web Development 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why is evaluation part of operations rather than an optional extra?
 - Which quality axes should you measure first?
 - How do you start with the smallest automatic evaluation?
-
-## Big Picture
-
-![AI Web Development 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/07/evaluation-three-axes.en.png)
-
-*AI Web Development 101 chapter 7 flow overview*
-
-This picture places Evaluating and improving an AI app — measuring quality over time inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why evaluation is necessary
 

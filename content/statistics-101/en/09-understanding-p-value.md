@@ -28,21 +28,16 @@ The p-value does none of those jobs. It only answers one question: assuming the 
 
 This is post 9 in the Statistics 101 series. Here we will define the p-value carefully, walk through the most common misreadings, explain why p-hacking breaks the procedure, and show why effect size and confidence intervals belong next to p-value in any serious report.
 
+
+![statistics 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/09/09-01-concept-at-a-glance.en.png)
+*statistics 101 chapter 9 flow overview*
+> The p-value is *not* the probability your result is true—it is the probability your *data* would appear this extreme if the null were true.
+
 ## Questions to Keep in Mind
 
 - What does the p-value actually mean?
 - Why is it so often misread?
 - How is p-value different from effect size?
-
-## Big Picture
-
-![statistics 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/09/09-01-concept-at-a-glance.en.png)
-
-*statistics 101 chapter 9 flow overview*
-
-This picture places Understanding p-value inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> The p-value is *not* the probability your result is true—it is the probability your *data* would appear this extreme if the null were true.
 
 ## Why It Matters
 

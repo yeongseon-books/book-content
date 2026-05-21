@@ -32,7 +32,7 @@
 1. Title (H1)
 2. Intro hook (독자가 겪는 문제 상황) — 시리즈 인트로 한 문장 포함
 3. Opening questions (`## 먼저 던지는 질문` / `## Questions to Keep in Mind`)
-4. Big Picture (짧은 다이어그램 + 한 줄 caption + 2-4문장 해설)
+4. Intro diagram (Opening Questions 직전, 다이어그램 + caption, 별도 섹션 헤딩 없음)
 5. Main Explanation (핵심 개념마다 concrete anchor 포함)
 6. Practical Example / Common Mistakes / Checklist
 7. Summary
@@ -46,7 +46,7 @@
 
 신규 글과 대규모 리라이트 글은 **Question Loop** 구조를 우선 적용한다. 기존 글 전체에 즉시 강제하지 않고, 품질 개선 작업에서 점진적으로 맞춘다.
 
-목표는 단순한 학습 목표 나열이 아니다. 글 초반에 독자가 품고 읽을 질문을 만들고, 본문에서 큰 그림·개념·예시로 답을 쌓은 뒤, 본문 마지막에서 질문별 답을 명시적으로 회수한다.
+목표는 단순한 학습 목표 나열이 아니다. 글 초반에 독자가 품고 읽을 질문을 만들고, 본문에서 다이어그램·개념·예시로 답을 쌓은 뒤, 본문 마지막에서 질문별 답을 명시적으로 회수한다.
 
 **표준 흐름**
 
@@ -54,7 +54,7 @@
 Hook
 → Series intro line
 → 먼저 던지는 질문 / Questions to Keep in Mind
-→ 큰 그림 / Big Picture
+→ Intro diagram (별도 섹션 헤딩 없이 Opening Questions 직전에 배치)
 → 핵심 개념 + concrete anchor
 → 실무에서 헷갈리는 지점 / checklist
 → 정리
@@ -74,14 +74,12 @@ Hook
 - en은 `Questions to Keep in Mind`처럼 질문형을 자연스럽게 사용할 수 있다.
 - 마지막 `처음 질문으로 돌아가기` / `Answering the Opening Questions` 섹션에서 질문과 답이 1:1로 대응되어야 한다.
 
-**큰 그림 규칙**
+**Intro diagram 규칙**
 
-- `## 큰 그림` / `## Big Picture`에는 다이어그램 1개를 우선 둔다.
-- 다이어그램 내부 제목, alt text, visible caption은 섹션명을 반복하지 않는다. `큰 그림`, `Big Picture` 대신 `요청 흐름`, `책임 경계`, `실행 순서`, `데이터 이동 경로`처럼 그림이 실제로 보여주는 대상을 쓴다.
-- 캡션은 visible italic caption 한 줄로 쓴다.
-- 그림 해설은 2-4문장으로 제한한다.
-- 그림은 구조, 흐름, 경계, 책임 분리 중 하나를 보여준다. 단순 요약 문장 3개를 박스로 만든 그림은 피한다.
-- 긴 설명은 큰 그림 아래가 아니라 다음 개념 섹션에서 한다.
+- Opening Questions(`## 먼저 던지는 질문` / `## Questions to Keep in Mind`) 직전에 다이어그램 1개를 둔다. `## 큰 그림` / `## Big Picture` 같은 별도 섹션 헤딩은 사용하지 않는다.
+- 다이어그램 내부 제목, alt text, visible caption은 `요청 흐름`, `책임 경계`, `실행 순서`, `데이터 이동 경로`처럼 그림이 실제로 보여주는 대상을 쓴다.
+- caption 바로 아래에 blockquote 형태의 mental model 한 문장을 둘 수 있다.
+- 긴 설명은 다이어그램 아래가 아니라 다음 개념 섹션에서 한다.
 
 **Concrete anchor 규칙**
 
@@ -242,12 +240,12 @@ Program.cs
 
 ### 권장 섹션 구조 — Question Loop
 
-다음 흐름을 표준으로 한다. 글의 성격에 따라 일부 섹션은 합치거나 생략할 수 있지만, 신규 글과 대규모 리라이트 글은 **opening questions, big picture, concrete anchors, question return** 네 가지를 갖춰야 한다.
+다음 흐름을 표준으로 한다. 글의 성격에 따라 일부 섹션은 합치거나 생략할 수 있지만, 신규 글과 대규모 리라이트 글은 **opening questions, intro diagram, concrete anchors, question return** 네 가지를 갖춰야 한다.
 
 1. **Hook** — 정의가 아니라 독자가 겪을 문제 상황에서 시작
 2. **Series intro line** — 현재 글이 시리즈의 몇 번째 글인지 안내. 도입부에 다음 글 링크는 넣지 않음
 3. **먼저 던지는 질문 / Questions to Keep in Mind** — 독자가 답을 찾으며 읽을 질문 2-3개
-4. **큰 그림 / Big Picture** — 다이어그램 1개 + 한 줄 caption + 2-4문장 해설
+4. **Intro diagram** — Opening Questions 직전, 다이어그램 1개 + 한 줄 caption (별도 섹션 헤딩 없음)
 5. **핵심 개념** — 각 개념마다 concrete anchor 포함
 6. **실습 또는 구체 예시** — 글의 성격에 맞게 코드, 표, 로그, 요청/응답, CLI 출력, before/after 등을 사용
 7. **자주 하는 실수 / 헷갈리는 지점** — 3-5개의 흔한 함정과 회피법

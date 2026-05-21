@@ -28,19 +28,15 @@ Closures start to feel practical the moment you need a callback, decorator, or h
 
 This is post 6 in the Functional Programming 101 series.
 
+
+![Functional Programming 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/06/06-01-closure-vs-partial-decision-flow.en.png)
+*Functional Programming 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Closures and Partial Application?
 - Which signal should the example or diagram make visible for Closures and Partial Application?
 - What failure should be prevented first when Closures and Partial Application reaches a real system?
-
-## Big Picture
-
-![Functional Programming 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/06/06-01-closure-vs-partial-decision-flow.en.png)
-
-*Functional Programming 101 chapter 6 flow overview*
-
-This picture places Closures and Partial Application inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

@@ -30,19 +30,15 @@ In this chapter, we will treat authorization as a server-side decision over acto
 
 > Authorization is not a visibility rule. It is a repeated server-side decision over who wants to do what to which resource.
 
+
+![secure coding 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/04/04-01-concept-at-a-glance.en.png)
+*secure coding 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Authorization and Permissions?
 - Which signal should the example or diagram make visible for Authorization and Permissions?
 - What failure should be prevented first when Authorization and Permissions reaches a real system?
-
-## Big Picture
-
-![secure coding 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/04/04-01-concept-at-a-glance.en.png)
-
-*secure coding 101 chapter 4 flow overview*
-
-This picture places Authorization and Permissions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions This Chapter Answers
 

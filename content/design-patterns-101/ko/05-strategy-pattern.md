@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 이번 글에서는 Strategy 패턴을 “알고리즘을 교체 가능한 단위로 분리하는 방법”으로 보겠습니다. 핵심은 분기를 계속 늘리는 대신, 알고리즘을 객체나 함수로 바꾸고 그것을 컨텍스트에 주입하는 것입니다.
 
+
+![Design Patterns 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/05/05-01-concept-at-a-glance.ko.png)
+*Design Patterns 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - Strategy 패턴은 어떤 종류의 분기 폭발을 줄여 줄까요?
 - Open/Closed Principle과 Strategy는 어떻게 이어질까요?
 - Python에서는 클래스 Strategy와 함수 Strategy를 어떻게 구분할까요?
-
-## 큰 그림
-
-![Design Patterns 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/05/05-01-concept-at-a-glance.ko.png)
-
-*Design Patterns 101 5장 흐름 개요*
 
 ## 왜 중요한가
 

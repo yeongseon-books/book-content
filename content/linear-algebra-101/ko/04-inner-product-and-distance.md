@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 내적, 코사인 유사도, 유클리드 거리와 맨해튼 거리를 한 흐름으로 연결해 보겠습니다.
 
+
+![Linear Algebra 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/04/04-01-concept-at-a-glance.ko.png)
+*Linear Algebra 101 4장 흐름 개요*
+> 내적과 거리는 벡터 비교의 두 기초입니다. 내적은 방향 관계를 재고, 거리는 점 사이의 차이를 잽니다. 어느 것을 쓸지는 문제의 특성에 따라 달라집니다.
+
 ## 먼저 던지는 질문
 
 - 내적은 왜 숫자 하나로 나올까요?
 - 코사인 유사도는 내적과 어떻게 연결될까요?
 - 유클리드 거리와 맨해튼 거리는 무엇이 다를까요?
-
-## 큰 그림
-
-![Linear Algebra 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/04/04-01-concept-at-a-glance.ko.png)
-
-*Linear Algebra 101 4장 흐름 개요*
-
-내적과 거리는 벡터를 비교하는 두 가지 주요 방식입니다. 내적은 두 벡터의 방향 관계를 측정하고, 거리는 데이터 점들 사이의 차이를 정량화합니다. 정규화된 임베딩 검색에서는 코사인 유사도를 쓰고, 클러스터링에서는 유클리드 거리를 씁니다.
-
-> 내적과 거리는 벡터 비교의 두 기초입니다. 내적은 방향 관계를 재고, 거리는 점 사이의 차이를 잽니다. 어느 것을 쓸지는 문제의 특성에 따라 달라집니다.
 
 ## 왜 중요한가
 

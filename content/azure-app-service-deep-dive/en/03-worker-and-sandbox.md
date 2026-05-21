@@ -53,19 +53,14 @@ Linux containers work,
 but Windows code apps do not.
 All of those symptoms start here.
 
+![azure app service deep dive chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/03/03-01-the-two-worker-models-that-matter.en.png)
+*azure app service deep dive chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - Inside what sandbox does the Worker process run, and what does that sandbox actually block?
 - How do sandbox restrictions appear in file system, network, and process spawning?
 - When a worker dies, who starts healing on what signal?
-
-## Big Picture
-
-![azure app service deep dive chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/03/03-01-the-two-worker-models-that-matter.en.png)
-
-*azure app service deep dive chapter 3 flow overview*
-
-This picture places Workers and the sandbox — where user code actually runs inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## The two worker models that matter
 

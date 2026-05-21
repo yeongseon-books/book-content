@@ -28,21 +28,15 @@ Agent evaluation is divided into three levels. Individual tool call accuracy (To
 
 This is post 7 in the AI Agent 101 series. Here we cover agent evaluation metrics, trajectory evaluation methods, tool calling accuracy measurement, end-to-end test strategies, and benchmarking methods.
 
+![Evaluation signal path](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/07/07-01-evaluation-signal-path.en.png)
+*Evaluation signal path*
+> Agent evaluation is not answer grading; it is diagnosis across trajectory, tool use, and final outcome.
+
 ## Questions to Keep in Mind
 
 - Why is final-answer grading not enough for agent evaluation?
 - What failures do trajectory evaluation, tool-call accuracy, and end-to-end success each catch?
 - What real requests and failure cases belong in an eval set before production?
-
-## Big Picture
-
-![Evaluation signal path](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/07/07-01-evaluation-signal-path.en.png)
-
-*Evaluation signal path*
-
-This picture follows evaluation signals from the user request through tool calls, intermediate trajectory, and final result. Agent evaluation must judge not only whether the answer is correct, but whether the path to it is safe and reproducible.
-
-> Agent evaluation is not answer grading; it is diagnosis across trajectory, tool use, and final outcome.
 
 ## Agent Evaluation Metrics
 

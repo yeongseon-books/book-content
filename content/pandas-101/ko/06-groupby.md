@@ -29,21 +29,16 @@ last_reviewed: '2026-05-15'
 
 이번 글에서는 `groupby`를 SQL 문법의 대응물로만 보지 않고, 분할하고 적용한 뒤 다시 결합하는 분석 패턴으로 이해해 보겠습니다.
 
+
+![Pandas 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/06/06-01-concept-at-a-glance.ko.png)
+*Pandas 101 6장 흐름 개요*
+> **집계는 분할의 선택으로 시작**합니다. 같은 데이터프레임을 고객별, 날짜별, 지역별로 묶으면 전혀 다른 지표가 나옵니다.
+
 ## 먼저 던지는 질문
 
 - `groupby`는 어떤 흐름으로 동작할까요?
 - 집계, 변환, 필터는 왜 서로 다른 얼굴일까요?
 - 여러 통계를 한 번에 계산할 때는 어떻게 쓰는 편이 좋을까요?
-
-## 큰 그림
-
-![Pandas 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/06/06-01-concept-at-a-glance.ko.png)
-
-*Pandas 101 6장 흐름 개요*
-
-이 그림은 분할-적용-결합 패턴을 보여줍니다. 같은 데이터도 어떤 열을 기준으로 그룹 지으냐, 그룹 내에서 어떤 통계를 계산하냐에 따라 완전히 다른 의미를 갖습니다.
-
-> **집계는 분할의 선택으로 시작**합니다. 같은 데이터프레임을 고객별, 날짜별, 지역별로 묶으면 전혀 다른 지표가 나옵니다.
 
 ## 왜 중요한가
 

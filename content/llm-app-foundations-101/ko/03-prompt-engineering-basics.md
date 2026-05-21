@@ -29,19 +29,14 @@ last_reviewed: '2026-05-15'
 
 여기서는 역할 기반 메시지 배열을 프롬프트의 기본 단위로 보고, 안정적인 입력 구조를 만드는 방법을 정리하겠습니다.
 
+![역할 기반 프롬프트 구성의 전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-01-prompt-engineering-basics-system-user-an.ko.png)
+*역할 기반 프롬프트 구성의 전체 그림*
+
 ## 먼저 던지는 질문
 
 - system, user, assistant 역할은 각각 어떤 책임을 맡을까요?
 - system message는 왜 단순한 첫 문장보다 강한 기준이 될까요?
 - temperature, top_p, few-shot은 답변 안정성에 어떤 영향을 줄까요?
-
-## 큰 그림
-
-![역할 기반 프롬프트 구성의 전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-01-prompt-engineering-basics-system-user-an.ko.png)
-
-*역할 기반 프롬프트 구성의 전체 그림*
-
-이 그림에서는 하나의 프롬프트가 아니라 messages 배열 안의 역할 경계를 봅니다. 정책, 현재 요청, 과거 답변을 나눠야 모델의 응답 기준도 안정됩니다.
 
 ## 왜 이 글이 중요한가
 

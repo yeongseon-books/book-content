@@ -26,19 +26,14 @@ Once you introduce a Korean-first generation model, the hard part is not the mod
 
 This is the fifth post in the Korean AI Stack 101 series. Here, we map out safe calling patterns for Korean LLM APIs such as HyperCLOVA X and Solar.
 
+![Korean AI Stack 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/05/05-01-core-flow.en.png)
+*Korean AI Stack 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - What API contract should you lock down before you start prompt tuning?
 - What should you validate first when introducing Korean-first generation APIs such as HyperCLOVA X or Solar?
 - Why does the runnable example use Groq `llama-3.1-8b-instant` as a stand-in?
-
-## Big Picture
-
-![Korean AI Stack 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/05/05-01-core-flow.en.png)
-
-*Korean AI Stack 101 chapter 5 flow overview*
-
-This picture places Using HyperCLOVA X and Solar API inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

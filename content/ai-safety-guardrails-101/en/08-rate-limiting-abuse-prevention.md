@@ -26,21 +26,16 @@ Rate limiting for LLM APIs is not just about requests per second. Token volume, 
 
 This is post 8 in the AI Safety & Guardrails 101 series. It maps out the quota dimensions and burst-detection patterns that make sense for LLM traffic.
 
+
+![Rate limiting and abuse prevention flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/08/08-01-big-picture.en.png)
+*Rate limiting and abuse prevention flow*
+> The unit of LLM rate limiting is not just a request; it is the resource that actually gets exhausted: tokens, cost, and tool calls.
+
 ## Questions to Keep in Mind
 
 - Why should LLM rate limiting measure resource consumption instead of only request count?
 - What abuse is controlled by token, cost, user, and key-level limits?
 - How should hard blocking and degraded responses be separated when limits are exceeded?
-
-## Big Picture
-
-![Rate limiting and abuse prevention flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/08/08-01-big-picture.en.png)
-
-*Rate limiting and abuse prevention flow*
-
-This picture meters tokens and cost for each request, debits a bucket, and then blocks or degrades when limits are exceeded. LLM abuse prevention should be designed around consumed resources rather than request count alone.
-
-> The unit of LLM rate limiting is not just a request; it is the resource that actually gets exhausted: tokens, cost, and tool calls.
 
 ## Why Rate Limiting Is Different for LLM APIs
 

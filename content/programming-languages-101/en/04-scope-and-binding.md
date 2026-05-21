@@ -29,19 +29,15 @@ This is post 4 in the Programming Languages 101 series.
 
 In this post, we will look at binding — attaching a value to a name — and scope — the region where that attachment is visible. Once lexical scope feels concrete, closures, modules, and shadowing stop looking like separate topics.
 
+
+![programming languages 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/04/04-01-concept-at-a-glance.en.png)
+*programming languages 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Scope and Binding?
 - Which signal should the example or diagram make visible for Scope and Binding?
 - What failure should be prevented first when Scope and Binding reaches a real system?
-
-## Big Picture
-
-![programming languages 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/04/04-01-concept-at-a-glance.en.png)
-
-*programming languages 101 chapter 4 flow overview*
-
-This picture places Scope and Binding inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions this article answers
 

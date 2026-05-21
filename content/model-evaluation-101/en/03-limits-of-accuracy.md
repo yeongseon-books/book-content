@@ -28,19 +28,15 @@ Accuracy is easy to compute and easy to explain, which is exactly why teams trus
 
 That is the structure of this rewrite. We will treat accuracy as the **last summary number**, not the first verdict. In other words, we are fixing the weakness identified in `ko/03-limits-of-accuracy.md:64-69,115-131`: the article now moves in the order a reviewer would actually use when deciding whether accuracy is still safe to report.
 
+
+![model evaluation 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/03/03-01-concept-at-a-glance.en.png)
+*model evaluation 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying The Limits of Accuracy?
 - Which signal should the example or diagram make visible for The Limits of Accuracy?
 - What failure should be prevented first when The Limits of Accuracy reaches a real system?
-
-## Big Picture
-
-![model evaluation 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/03/03-01-concept-at-a-glance.en.png)
-
-*model evaluation 101 chapter 3 flow overview*
-
-This picture places The Limits of Accuracy inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## This post answers
 

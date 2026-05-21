@@ -30,19 +30,15 @@ In this chapter, we will treat secret handling as an operating model rather than
 
 > Secrets belong outside the codebase, with short lifetimes, explicit access control, and a rotation path you can execute under pressure.
 
+
+![secure coding 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/06/06-01-concept-at-a-glance.en.png)
+*secure coding 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Secret and Key Management?
 - Which signal should the example or diagram make visible for Secret and Key Management?
 - What failure should be prevented first when Secret and Key Management reaches a real system?
-
-## Big Picture
-
-![secure coding 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/06/06-01-concept-at-a-glance.en.png)
-
-*secure coding 101 chapter 6 flow overview*
-
-This picture places Secret and Key Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions This Chapter Answers
 

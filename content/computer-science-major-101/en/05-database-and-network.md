@@ -31,21 +31,16 @@ last_reviewed: '2026-05-14'
 
 This is post 5 in the Computer Science Major 101 series.
 
+
+![computer science major 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/05/05-01-request-to-database-flow.en.png)
+*computer science major 101 chapter 5 flow overview*
+> Databases and networks are not separate concerns—they collaborate. Understanding their *boundary* tells you where consistency, latency, and failure happen.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Database and Network?
 - Which signal should the example or diagram make visible for Database and Network?
 - What failure should be prevented first when Database and Network reaches a real system?
-
-## Big Picture
-
-![computer science major 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/05/05-01-request-to-database-flow.en.png)
-
-*computer science major 101 chapter 5 flow overview*
-
-This picture places Database and Network inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Databases and networks are not separate concerns—they collaborate. Understanding their *boundary* tells you where consistency, latency, and failure happen.
 
 ## What You Will Learn
 

@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 이번 글에서는 Creational 패턴을 “객체를 멋지게 만드는 기법”이 아니라, 생성 책임을 한곳에 모아 결합도를 낮추는 설계 도구로 보겠습니다. 무엇을 만들지보다, 누가 만들고 어디서 조립하는지가 더 중요합니다.
 
+
+![Design Patterns 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/02/02-01-concept-at-a-glance.ko.png)
+*Design Patterns 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - Creational 패턴은 정확히 어떤 설계 문제를 풀까요?
 - Factory Method와 Abstract Factory는 어디서 갈릴까요?
 - Builder는 언제 필요하고 언제 과할까요?
-
-## 큰 그림
-
-![Design Patterns 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/02/02-01-concept-at-a-glance.ko.png)
-
-*Design Patterns 101 2장 흐름 개요*
 
 ## 왜 중요한가
 

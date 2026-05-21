@@ -39,19 +39,14 @@ That channel is a single **bidirectional gRPC stream**. In this post, we'll walk
 > - Host: [`Azure/azure-functions-host` @ `5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7)
 > - Protocol: [`Azure/azure-functions-language-worker-protobuf`](https://github.com/Azure/azure-functions-language-worker-protobuf) — the protocol lives in a separate repo.
 
+![azure functions deep dive chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/03/03-01-all-on-one-screen.en.png)
+*azure functions deep dive chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - What kinds of messages does the host-to-worker gRPC stream carry, and how?
 - When the stream drops, what does the host assume, and what does the worker assume?
 - How do large payloads flow over the stream, and where are the hard limits?
-
-## Big Picture
-
-![azure functions deep dive chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/03/03-01-all-on-one-screen.en.png)
-
-*azure functions deep dive chapter 3 flow overview*
-
-This picture places The gRPC Event Stream — What Do the Host and Worker Actually Exchange? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## One host-worker event stream
 

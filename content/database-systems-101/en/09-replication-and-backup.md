@@ -31,19 +31,15 @@ This is post 9 in the Database Systems 101 series.
 
 > Replication keeps live nodes in lock step on the same data; backups are insurance you can rewind to. Both solve availability and durability, but on different time axes. Neither is enough on its own.
 
+
+![database systems 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/09/09-01-big-picture.en.png)
+*database systems 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Replication and Backup?
 - Which signal should the example or diagram make visible for Replication and Backup?
 - What failure should be prevented first when Replication and Backup reaches a real system?
-
-## Big Picture
-
-![database systems 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/09/09-01-big-picture.en.png)
-
-*database systems 101 chapter 9 flow overview*
-
-This picture places Replication and Backup inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

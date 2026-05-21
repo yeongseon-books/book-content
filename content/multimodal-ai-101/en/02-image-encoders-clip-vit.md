@@ -29,19 +29,15 @@ This is post 2 in the Multimodal AI 101 series.
 
 Here we focus on the layer that turns pixels into something searchable and comparable: ViT as the tokenization scheme for images, and CLIP as the shared space that lets text and images meet.
 
+
+![Multimodal AI 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/02/02-01-mental-model-encode-first-decide-later.en.png)
+*Multimodal AI 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why is the image encoder usually the first subsystem to debug when multimodal quality feels unstable?
 - How does ViT turn an image into tokens, and why does that matter for retrieval and VLM design?
 - What exactly does CLIP align, and why does that enable zero-shot classification and cross-modal search?
-
-## Big Picture
-
-![Multimodal AI 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/02/02-01-mental-model-encode-first-decide-later.en.png)
-
-*Multimodal AI 101 chapter 2 flow overview*
-
-This picture places Image Encoders: CLIP and ViT inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why start with the image encoder
 

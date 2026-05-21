@@ -27,21 +27,16 @@ People often start by mapping a developer career to company names, years of expe
 
 This is the first post in the Developer Career 101 series.
 
+
+![developer career 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/01/01-01-concept-at-a-glance.en.png)
+*developer career 101 chapter 1 flow overview*
+> Career growth has three axes: role (what level of work you own), skill (which of technical, collaborative, or domain understanding is weakest), and impact (who benefits from your work).
+
 ## Questions to Keep in Mind
 
 - Why is a developer career easier to manage when you treat it as a growth structure rather than a title ladder?
 - What actually changes between junior, mid-level, senior, and staff-like expectations?
 - Why do skill, influence, and written evidence matter together instead of separately?
-
-## Big Picture
-
-![developer career 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/01/01-01-concept-at-a-glance.en.png)
-
-*developer career 101 chapter 1 flow overview*
-
-This picture places What Is a Developer Career inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Career growth has three axes: role (what level of work you own), skill (which of technical, collaborative, or domain understanding is weakest), and impact (who benefits from your work).
 
 ## What You Will Learn
 

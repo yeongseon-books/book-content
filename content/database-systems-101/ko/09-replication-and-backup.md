@@ -29,17 +29,15 @@ last_reviewed: '2026-05-12'
 
 복제와 백업은 모두 데이터를 지키는 수단이지만, 보호하는 축이 다릅니다. 복제는 같은 시점의 데이터를 여러 노드에 퍼뜨려 가용성을 높이고, 백업은 시간을 거슬러 복원할 수 있게 해 줍니다. 둘 중 하나만으로는 충분하지 않습니다.
 
+
+![Database Systems 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/09/09-01-big-picture.ko.png)
+*Database Systems 101 9장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - Primary-Replica 복제는 어떻게 동작하고 각 노드는 무슨 역할을 할까요?
 - 동기 복제와 비동기 복제는 무엇을 주고받을까요?
 - 전체 백업, 증분 백업, WAL 기반 PITR은 어떻게 다를까요?
-
-## 큰 그림
-
-![Database Systems 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/09/09-01-big-picture.ko.png)
-
-*Database Systems 101 9장 흐름 개요*
 
 ## 이 글에서 배울 내용
 

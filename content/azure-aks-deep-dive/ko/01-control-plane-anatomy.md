@@ -34,21 +34,15 @@ self-managed Kubernetes라면 `etcd` 백업 전략, `kube-apiserver` 플래그, 
 오히려 control plane과 data plane의 경계를 먼저 고정하고, 그 위에서 이후 글들의 kubelet, CNI, scheduler, autoscaling 이야기가 정확히 어디에 걸리는지 보이게 만드는 데 있습니다.
 이제 AKS에서 보이는 control plane과 보이지 않는 control plane을 같은 지도 위에 올려 보겠습니다.
 
+![Azure Kubernetes Service Deep Dive 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/01/01-01-aks-control-vs-data-plane.ko.png)
+*Azure Kubernetes Service Deep Dive 1장 흐름 개요*
+> Control Plane 해부 — AKS가 사용자에게서 가린 것의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - AKS control plane은 정확히 어떤 컴포넌트로 이루어져 있고, 사용자는 그중 무엇을 직접 볼 수 있을까요?
 - 관리형 control plane이라는 약속은 어디까지를 의미하고, 어디부터는 여전히 사용자의 운영 책임일까요?
 - API server SLA를 읽을 때 왜 `etcd`, scheduler, controller-manager의 내부 구현보다 API 표면을 먼저 봐야 할까요?
-
-## 큰 그림
-
-![Azure Kubernetes Service Deep Dive 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/01/01-01-aks-control-vs-data-plane.ko.png)
-
-*Azure Kubernetes Service Deep Dive 1장 흐름 개요*
-
-이 그림에서는 Control Plane 해부 — AKS가 사용자에게서 가린 것를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> Control Plane 해부 — AKS가 사용자에게서 가린 것의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

@@ -31,19 +31,15 @@ This is post 4 in the Discrete Math 101 series.
 
 > A relation is a subset of a Cartesian product expressing "some connection" between two elements. Combinations of properties (reflexive, symmetric, transitive) define equivalence relations and partial orders, which underpin partitions, ordering, and hierarchies. This article covers relations, their properties, equivalence classes, and topological sort.
 
+
+![discrete math 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/04/04-01-big-picture.en.png)
+*discrete math 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Relations and Equivalence?
 - Which signal should the example or diagram make visible for Relations and Equivalence?
 - What failure should be prevented first when Relations and Equivalence reaches a real system?
-
-## Big Picture
-
-![discrete math 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/04/04-01-big-picture.en.png)
-
-*discrete math 101 chapter 4 flow overview*
-
-This picture places Relations and Equivalence inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

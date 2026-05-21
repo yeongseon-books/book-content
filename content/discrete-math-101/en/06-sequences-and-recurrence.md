@@ -31,19 +31,15 @@ This is post 6 in the Discrete Math 101 series.
 
 > A sequence is an ordered list of numbers, and a recurrence is an equation that defines each term using earlier terms. The running time of a recursive function is itself a recurrence, and techniques like substitution, recursion trees, and the Master Theorem turn that recurrence into a closed form. This article covers the definitions, the solving methods, and how they apply directly to algorithm analysis.
 
+
+![discrete math 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/06/06-01-big-picture.en.png)
+*discrete math 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Sequences and Recurrence?
 - Which signal should the example or diagram make visible for Sequences and Recurrence?
 - What failure should be prevented first when Sequences and Recurrence reaches a real system?
-
-## Big Picture
-
-![discrete math 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/06/06-01-big-picture.en.png)
-
-*discrete math 101 chapter 6 flow overview*
-
-This picture places Sequences and Recurrence inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

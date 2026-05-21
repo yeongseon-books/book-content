@@ -30,21 +30,16 @@ This is post 6 in the Testing 101 series. Here we use `unittest.mock` to separat
 
 > Decide what question the test must answer before deciding whether a Mock or a Stub belongs in the room.
 
+
+![testing 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/06/06-01-concept-at-a-glance.en.png)
+*testing 101 chapter 6 flow overview*
+> The distinction matters: a Stub proves the result; a Mock proves the interaction happened.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Mock and Stub?
 - Which signal should the example or diagram make visible for Mock and Stub?
 - What failure should be prevented first when Mock and Stub reaches a real system?
-
-## Big Picture
-
-![testing 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/06/06-01-concept-at-a-glance.en.png)
-
-*testing 101 chapter 6 flow overview*
-
-This picture places Mock and Stub inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> The distinction matters: a Stub proves the result; a Mock proves the interaction happened.
 
 ## What You Will Learn
 

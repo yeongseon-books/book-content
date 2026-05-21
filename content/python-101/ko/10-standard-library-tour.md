@@ -28,21 +28,16 @@ seo_description: 표준 라이브러리는 "자주 쓰는 일을 두 번 짜지 
 
 이 글은 Python 101 시리즈의 마지막 글입니다.
 
+
+![Python 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-101/10/10-01-mental-model.ko.png)
+*Python 101 10장 흐름 개요*
+> 표준 라이브러리 투어: datetime, pathlib, json, collections, itertools의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - 외부 의존성을 줄일 수 있습니다.** 작은 스크립트에 패키지를 추가하기 전에 표준 라이브러리부터 살펴보면, requirements 파일을 더 가볍게 유지할 수 있습니다?
 - 코드가 짧고 익숙해집니다.** 다른 Python 개발자도 같은 도구를 알고 있으므로 리뷰가 빨라집니다?
 - 버전 관리가 단순합니다.** Python 인터프리터 버전만 맞추면 동일한 동작을 기대할 수 있습니다?
-
-## 큰 그림
-
-![Python 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-101/10/10-01-mental-model.ko.png)
-
-*Python 101 10장 흐름 개요*
-
-이 그림에서는 표준 라이브러리 투어: datetime, pathlib, json, collections, itertools를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 표준 라이브러리 투어: datetime, pathlib, json, collections, itertools의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 멘탈 모델
 

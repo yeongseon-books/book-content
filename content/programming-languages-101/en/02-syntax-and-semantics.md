@@ -29,19 +29,15 @@ This is post 2 in the Programming Languages 101 series.
 
 In this post, we will separate the two axes every language stands on: syntax and semantics. Once you can tell “is this legal text?” apart from “what does this legal text mean?”, compile errors, runtime bugs, and later topics like type systems become much easier to reason about.
 
+
+![programming languages 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/02/02-01-concept-at-a-glance.en.png)
+*programming languages 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Syntax and Semantics?
 - Which signal should the example or diagram make visible for Syntax and Semantics?
 - What failure should be prevented first when Syntax and Semantics reaches a real system?
-
-## Big Picture
-
-![programming languages 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/02/02-01-concept-at-a-glance.en.png)
-
-*programming languages 101 chapter 2 flow overview*
-
-This picture places Syntax and Semantics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions this article answers
 

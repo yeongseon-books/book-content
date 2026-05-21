@@ -29,19 +29,15 @@ What makes race conditions hard is not that they fail once, but that the result 
 
 This is post 4 in the Operating Systems 101 series. It explains race conditions through atomicity, visibility, and ordering so you can describe the bug before you try to fix it.
 
+
+![operating systems 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/04/04-01-how-one-increment-gets-lost.en.png)
+*operating systems 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Concurrency and Race Conditions?
 - Which signal should the example or diagram make visible for Concurrency and Race Conditions?
 - What failure should be prevented first when Concurrency and Race Conditions reaches a real system?
-
-## Big Picture
-
-![operating systems 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/04/04-01-how-one-increment-gets-lost.en.png)
-
-*operating systems 101 chapter 4 flow overview*
-
-This picture places Concurrency and Race Conditions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions this article answers
 

@@ -33,17 +33,14 @@ sqlite3는 편의를 위해 트랜잭션을 암묵적으로 시작합니다. 이
 
 *Transaction과 isolation level (sqlite3, PEP 249)*
 
+![Python DB-API 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-02-mental-model-connection-is-the-transacti.ko.png)
+*Python DB-API 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - Transaction과 isolation level (sqlite3, PEP 249)를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?
 - Transaction과 isolation level (sqlite3, PEP 249)에서 예제나 다이어그램으로 검증해야 할 핵심 신호는 무엇일까요?
 - Transaction과 isolation level (sqlite3, PEP 249)를 실제 시스템에 적용할 때 어떤 실패를 먼저 막아야 할까요?
-
-## 큰 그림
-
-![Python DB-API 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-02-mental-model-connection-is-the-transacti.ko.png)
-
-*Python DB-API 101 5장 흐름 개요*
 
 ## Mental Model — connection이 transaction 단위
 

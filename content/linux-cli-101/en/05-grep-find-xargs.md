@@ -28,19 +28,15 @@ Once a project stops fitting in your head, search becomes a workflow, not a conv
 
 This is post 5 in the Linux CLI 101 series.
 
+
+![Linux CLI 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/05/05-01-mental-model.en.png)
+*Linux CLI 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - Searching for strings inside files with `grep`?
 - Finding files by name, size, and modification time with `find`?
 - Passing search results as arguments to other commands with `xargs`?
-
-## Big Picture
-
-![Linux CLI 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/05/05-01-mental-model.en.png)
-
-*Linux CLI 101 chapter 5 flow overview*
-
-This picture places grep, find, xargs — The Search Trio inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

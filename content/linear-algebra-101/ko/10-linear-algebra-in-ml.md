@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 선형회귀, 신경망, 임베딩, 그래디언트, PCA를 한 흐름으로 묶어 시리즈를 마무리하겠습니다.
 
+
+![Linear Algebra 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/10/10-01-concept-at-a-glance.ko.png)
+*Linear Algebra 101 10장 흐름 개요*
+> 선형대수는 머신러닝 언어의 기초입니다. 회귀·분류·차원 축소가 모두 벡터와 행렬 연산으로 표현됩니다.
+
 ## 먼저 던지는 질문
 
 - 머신러닝 파이프라인의 어디에서 벡터와 행렬이 등장할까요?
 - 선형회귀와 신경망은 선형대수 관점에서 어떻게 읽을 수 있을까요?
 - 임베딩 유사도와 그래디언트 계산은 왜 선형대수 문제일까요?
-
-## 큰 그림
-
-![Linear Algebra 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/10/10-01-concept-at-a-glance.ko.png)
-
-*Linear Algebra 101 10장 흐름 개요*
-
-선형대수는 머신러닝의 거의 모든 단계에서 나타납니다. 회귀는 선형변환과 최소제곱, 신경망은 행렬 곱, 임베딩은 벡터 공간의 구조, 최적화는 그래디언트 계산입니다.
-
-> 선형대수는 머신러닝 언어의 기초입니다. 회귀·분류·차원 축소가 모두 벡터와 행렬 연산으로 표현됩니다.
 
 ## 왜 중요한가
 

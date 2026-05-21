@@ -26,17 +26,15 @@ last_reviewed: '2026-05-12'
 
 핵심은 실제 외부 시스템을 호출하지 않고도 코드의 동작 계약을 검증하는 것입니다. 어떤 값을 반환해야 하는지, 어떤 파라미터로 호출해야 하는지, 실패 상황에서 예외를 어떻게 처리해야 하는지를 테스트 안에서 통제할 수 있어야 합니다.
 
+
+![pytest 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/06/06-01-big-picture.ko.png)
+*pytest 101 6장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - mock과 monkeypatch는 무엇이 다를까요?
 - `patch()`는 어디를 기준으로 적용해야 할까요?
 - 외부 호출이 실패하는 상황은 어떻게 재현할 수 있을까요?
-
-## 큰 그림
-
-![pytest 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/06/06-01-big-picture.ko.png)
-
-*pytest 101 6장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 
@@ -720,7 +718,6 @@ pytest -q
 ```text
 PASS
 ```
-
 
 
 추가 메모: 테스트는 실행 결과를 남기고, 실패 입력을 재현 가능한 형태로 보존해야 운영에서 같은 문제를 다시 만나지 않습니다. 이 문단은 바이트 기준 보강과 함께 실무 원칙을 다시 고정하기 위한 메모입니다.

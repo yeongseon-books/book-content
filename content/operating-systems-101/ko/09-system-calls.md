@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 Operating Systems 101 시리즈의 9번째 글입니다.
 
+
+![Operating Systems 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/09/09-01-the-privilege-boundary-a-syscall-crosses.ko.png)
+*Operating Systems 101 9장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 사용자 공간과 커널 공간은 무엇이 다를까요?
 - 시스템 콜 한 번에는 어떤 전환 비용이 들어갈까요?
 - `strace`는 왜 OS 문제를 볼 때 가장 빠른 도구일까요?
-
-## 큰 그림
-
-![Operating Systems 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/09/09-01-the-privilege-boundary-a-syscall-crosses.ko.png)
-
-*Operating Systems 101 9장 흐름 개요*
 
 ## 기본 모델
 > 사용자 공간은 일반 프로그램이 도는 곳, 커널 공간은 OS의 핵심 코드가 도는 곳입니다. 둘 사이에는 권한 경계가 있고, 사용자 코드는 시스템 콜이라는 좁은 진입점만 통해 커널로 진입합니다. 진입할 때마다 컨텍스트 전환과 보안 검증이 일어나기 때문에 비쌉니다.

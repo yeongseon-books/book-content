@@ -25,17 +25,15 @@ last_reviewed: '2026-05-12'
 
 이 글은 Discrete Math 101 시리즈의 7번째 글입니다.
 
+
+![Discrete Math 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/07/07-01-big-picture.ko.png)
+*Discrete Math 101 7장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 곱의 법칙과 합의 법칙은 어떻게 구분할까요?
 - 순열과 조합은 언제 달라질까요?
 - 이항계수와 파스칼 삼각형은 왜 중요한가요?
-
-## 큰 그림
-
-![Discrete Math 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/07/07-01-big-picture.ko.png)
-
-*Discrete Math 101 7장 흐름 개요*
 
 ## 왜 중요한가
 

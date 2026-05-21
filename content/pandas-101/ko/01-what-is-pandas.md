@@ -29,21 +29,16 @@ last_reviewed: '2026-05-15'
 
 Pandas를 제대로 이해하려면 기능 이름보다 먼저 역할을 잡아야 합니다. Pandas는 표 데이터를 메모리 안에서 읽고, 살펴보고, 변형하고, 집계하는 기본 작업을 매우 짧은 코드로 풀어내게 해 주는 표준 도구입니다.
 
+
+![Pandas 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/01/01-01-concept-at-a-glance.ko.png)
+*Pandas 101 1장 흐름 개요*
+> Pandas는 표 데이터를 다루는 **입력 → 점검 → 변형 → 출력**의 기본 공정입니다. 이 원리를 이해하면 뒷장의 모든 기능이 자연스럽게 연결됩니다.
+
 ## 먼저 던지는 질문
 
 - Pandas는 정확히 어떤 문제를 해결하는 라이브러리일까요?
 - Series와 DataFrame은 어떤 관계로 이해해야 할까요?
 - 왜 많은 분석 작업이 Pandas에서 시작될까요?
-
-## 큰 그림
-
-![Pandas 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/01/01-01-concept-at-a-glance.ko.png)
-
-*Pandas 101 1장 흐름 개요*
-
-이 그림은 데이터를 처음 받았을 때의 기본 점검 순서를 보여 줍니다. CSV나 Excel 파일이 들어오면 가장 먼저 크기와 자료형을 확인합니다. 이후 모든 선택과 연산은 이 기본기 위에 세워집니다.
-
-> Pandas는 표 데이터를 다루는 **입력 → 점검 → 변형 → 출력**의 기본 공정입니다. 이 원리를 이해하면 뒷장의 모든 기능이 자연스럽게 연결됩니다.
 
 ## 왜 중요한가
 
@@ -340,8 +335,6 @@ result = df.filter(pl.col("x") > 10)
 ### Dask
 
 Dask는 Pandas API를 그대로 유지하면서 병렬 처리를 지원합니다. 메모리보다 큰 데이터를 다룰 때 유용하지만, 단일 머신 환경에서는 Pandas가 더 빠르고 간편합니다.
-
-
 
 
 ### 선택 기준

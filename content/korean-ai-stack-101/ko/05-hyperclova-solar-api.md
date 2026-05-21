@@ -26,17 +26,14 @@ seo_description: 공급자를 바꾸는 일은 모델 이름 교체가 아니라
 
 이 글은 Korean AI Stack 101 시리즈의 5번째 글입니다. 여기서는 HyperCLOVA X와 Solar 같은 한국어 LLM API를 안전하게 호출하는 패턴을 정리합니다.
 
+![Korean AI Stack 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/05/05-01-core-flow.ko.png)
+*Korean AI Stack 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 프롬프트 튜닝보다 먼저 고정해야 할 API 계약은 무엇일까요?
 - HyperCLOVA X나 Solar 같은 한국어 생성 API를 도입할 때는 무엇부터 검증해야 할까요?
 - 실행 예제가 왜 Groq `llama-3.1-8b-instant`를 대체 모델로 쓰는 걸까요?
-
-## 큰 그림
-
-![Korean AI Stack 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/05/05-01-core-flow.ko.png)
-
-*Korean AI Stack 101 5장 흐름 개요*
 
 ## 왜 이 단계가 중요한가
 

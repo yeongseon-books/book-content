@@ -27,22 +27,15 @@ last_reviewed: '2026-05-15'
 개별 개념을 따로 이해하는 것과 실제로 하나의 Warehouse를 설계하는 일은 다릅니다. 하나의 도메인을 처음부터 끝까지 따라가 보면 grain, dimension, schema, 적재 흐름, mart가 왜 그 자리에 놓이는지 훨씬 분명해집니다. 이 마지막 글은 앞선 개념을 한 번에 조립해 보는 예제입니다.
 
 
+![Data Warehouse 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/10/10-01-concept-at-a-glance.ko.png)
+*Data Warehouse 101 10장 흐름 개요*
+> 실제 설계는 교과서와 달리 '현재 비용 제약 → 다음 목표 → 마이그레이션 경로'를 순서대로 결정하는 연속입니다.
 
 ## 먼저 던지는 질문
 
 - Warehouse 설계는 왜 grain 한 줄에서 시작해야 할까요?
 - fact, dimension, schema, partition, ETL, mart는 어떤 순서로 연결될까요?
 - 전자상거래 도메인에서 어떤 dimension을 공통 자산으로 볼 수 있을까요?
-
-## 큰 그림
-
-![Data Warehouse 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/10/10-01-concept-at-a-glance.ko.png)
-
-*Data Warehouse 101 10장 흐름 개요*
-
-실제 온라인 쇼핑몰 데이터 웨어하우스 설계를 예제로, 지금까지의 개념들이 어떻게 조합되고 생명 주기를 따라 어떻게 변하는지 봅니다. 설계 결정의 이유와 트레이드오프를 이해하면 자신의 환경에 맞는 구조를 만들 수 있습니다.
-
-> 실제 설계는 교과서와 달리 '현재 비용 제약 → 다음 목표 → 마이그레이션 경로'를 순서대로 결정하는 연속입니다.
 
 ## 이 글에서 배울 것
 
@@ -333,7 +326,6 @@ WHERE order_id IS NULL OR amount IS NULL;
 이제는 grain에서 시작해 dimension, fact, partition, 적재 흐름, mart, 대시보드까지 하나의 흐름으로 연결해서 볼 수 있어야 합니다. 개별 개념을 외우는 단계보다 중요한 것은 이 연결 관계를 이해하는 일입니다. 다음 시리즈에서는 이렇게 준비한 데이터를 바탕으로 Data Science와 MLOps로 한 걸음 더 나아가겠습니다.
 
 
-
 ## 모던 데이터 스택 관점에서 설계 확장
 
 마지막 예제에서는 전통적 DW 모델에 더해 현대 데이터 스택 구성요소를 함께 놓고 보는 것이 유익합니다. 도구 이름이 핵심은 아니며, 계층 간 책임을 분명히 두는 것이 핵심입니다.
@@ -400,7 +392,6 @@ decision_log:
 이 검증을 자동화하면 설계는 문서가 아니라 운영 가능한 시스템으로 완성됩니다.
 
 
-
 ## 아키텍처 대안 비교
 
 같은 도메인이라도 팀 규모와 요구사항에 따라 설계 경로가 달라집니다. 아래 비교는 자주 선택되는 두 가지 경로입니다.
@@ -428,7 +419,6 @@ decision_log:
 ## 모던 스택 구성요소 비교 메모
 
 모던 데이터 스택은 도구 다양성이 크기 때문에, 특정 벤더 기능보다 데이터 계약과 운영 규칙을 우선해야 합니다. 예를 들어 ingestion 교체가 필요해도 raw 계약과 mart 계약이 안정적이면 하위 계층만 교체해도 전체 서비스 품질을 유지할 수 있습니다.
-
 
 
 ## 실무 적용 메모

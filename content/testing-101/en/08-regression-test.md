@@ -30,21 +30,16 @@ This is post 8 in the Testing 101 series. Here we walk through the bug → repro
 
 > A regression test is a bug report that learned how to execute itself.
 
+
+![testing 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/08/08-01-concept-at-a-glance.en.png)
+*testing 101 chapter 8 flow overview*
+> Every bug-fix PR should include a test that fails before the fix and passes after.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Regression Test?
 - Which signal should the example or diagram make visible for Regression Test?
 - What failure should be prevented first when Regression Test reaches a real system?
-
-## Big Picture
-
-![testing 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/08/08-01-concept-at-a-glance.en.png)
-
-*testing 101 chapter 8 flow overview*
-
-This picture places Regression Test inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Every bug-fix PR should include a test that fails before the fix and passes after.
 
 ## What You Will Learn
 

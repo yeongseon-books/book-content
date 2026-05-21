@@ -28,21 +28,17 @@ Strong portfolios do something simpler and harder: they show a problem worth sol
 
 This is post 4 in the Data Science Career 101 series.
 
+
+![data science career 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/04/04-01-concept-at-a-glance.en.png)
+*data science career 101 chapter 4 flow overview*
+> In portfolio strategy, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
+
 ## Questions to Keep in Mind
 
 - What mix of projects gives a beginner portfolio better signal?
 - Why do code-only repositories usually feel weak in interviews?
 - What should a strong README explain first?
 
-## Big Picture
-
-![data science career 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/04/04-01-concept-at-a-glance.en.png)
-
-*data science career 101 chapter 4 flow overview*
-
-This picture places The Data Portfolio inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> In portfolio strategy, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
 ## What You Will Learn
 
 - The shape of *three projects*

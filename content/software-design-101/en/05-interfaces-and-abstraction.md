@@ -31,19 +31,15 @@ In this post, we treat interfaces as contracts written in the caller's language.
 
 > A good interface speaks in user intent and stays stable while implementations change underneath.
 
+
+![software design 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/05/05-01-concept-at-a-glance.en.png)
+*software design 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Interfaces and Abstraction?
 - Which signal should the example or diagram make visible for Interfaces and Abstraction?
 - What failure should be prevented first when Interfaces and Abstraction reaches a real system?
-
-## Big Picture
-
-![software design 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/05/05-01-concept-at-a-glance.en.png)
-
-*software design 101 chapter 5 flow overview*
-
-This picture places Interfaces and Abstraction inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

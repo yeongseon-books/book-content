@@ -29,17 +29,15 @@ last_reviewed: '2026-05-12'
 
 OLTP와 OLAP를 구분하면 이 질문이 훨씬 명확해집니다. 운영 쿼리는 한두 행을 빠르게 읽고 쓰는 데 최적화되어야 하고, 분석 쿼리는 수백만 행을 넓게 스캔하고 집계하는 데 최적화되어야 합니다. 이 글에서는 그 차이가 왜 데이터 모델, 저장 형식, 인덱스 전략, 시스템 분리로 이어지는지 정리합니다.
 
+
+![Database Systems 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/10/10-01-big-picture.ko.png)
+*Database Systems 101 10장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - OLTP와 OLAP 워크로드의 근본 차이는 무엇일까요?
 - 행 저장과 컬럼 저장은 어떤 트레이드오프를 가질까요?
 - 데이터 웨어하우스와 ETL/ELT는 왜 필요한가요?
-
-## 큰 그림
-
-![Database Systems 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/10/10-01-big-picture.ko.png)
-
-*Database Systems 101 10장 흐름 개요*
 
 ## 이 글에서 배울 내용
 

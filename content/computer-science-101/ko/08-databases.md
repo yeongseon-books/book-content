@@ -29,17 +29,15 @@ last_reviewed: '2026-05-12'
 
 여기서는 관계형 데이터베이스의 기본 개념, SQL 조회와 수정, 인덱스, 트랜잭션과 ACID를 실무 중심으로 정리하겠습니다.
 
+
+![Computer Science 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/08/08-01-concept-at-a-glance.ko.png)
+*Computer Science 101 8장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 데이터베이스는 많은 데이터를 어떻게 영구 저장하고 동시에 안전하게 읽고 쓸까요?
 - 인덱스는 왜 조회 속도를 급격하게 바꿀까요?
 - SQL 한 줄과 실제 실행 계획 사이에는 어떤 차이가 있을까요?
-
-## 큰 그림
-
-![Computer Science 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/08/08-01-concept-at-a-glance.ko.png)
-
-*Computer Science 101 8장 흐름 개요*
 
 ## 이 글에서 배울 것
 

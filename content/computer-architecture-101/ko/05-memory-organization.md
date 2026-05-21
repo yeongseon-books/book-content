@@ -27,17 +27,15 @@ last_reviewed: '2026-05-12'
 
 메모리 모델이 머릿속에 없으면 스택 오버플로, 메모리 누수, 정렬 문제, 페이지 폴트가 전부 제각각의 현상처럼 보입니다. 하지만 주소 공간, 페이지, 스택, 힙이라는 그림을 잡아 두면 이 문제들은 같은 지도 위에서 읽히기 시작합니다.
 
+
+![Computer Architecture 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/05/05-01-big-picture.ko.png)
+*Computer Architecture 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - RAM은 어떤 주소 모델로 보일까요?
 - 가상 주소와 물리 주소는 어떻게 다를까요?
 - 한 프로세스의 text, data, heap, stack은 어떻게 배치될까요?
-
-## 큰 그림
-
-![Computer Architecture 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/05/05-01-big-picture.ko.png)
-
-*Computer Architecture 101 5장 흐름 개요*
 
 ## 왜 중요한가
 

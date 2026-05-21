@@ -28,19 +28,15 @@ The standard library is the toolbox that keeps you from rewriting common routine
 
 This post is the final article in the Python 101 series. This is the final stop in the series, where you tie the core language to the tools Python already ships with.
 
+
+![Python 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/10/10-01-mental-model.en.png)
+*Python 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - How to handle dates and times with `datetime`?
 - How to treat file paths as objects with `pathlib.Path`?
 - How to convert between dicts and JSON strings using `json`?
-
-## Big Picture
-
-![Python 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/10/10-01-mental-model.en.png)
-
-*Python 101 chapter 10 flow overview*
-
-This picture places Standard library tour: datetime, pathlib, json, collections, itertools inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

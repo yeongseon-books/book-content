@@ -30,21 +30,15 @@ Azure Container Apps의 배포 경험은 생각보다 부드럽습니다. 이미
 
 이제 Revision을 배포 이력이 아니라 런타임 스냅샷으로 읽어 보겠습니다.
 
+![Azure Container Apps Deep Dive 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/03/03-01-a-revision-is-an-immutable-runtime-snaps.ko.png)
+*Azure Container Apps Deep Dive 3장 흐름 개요*
+> Revision과 트래픽 분할 — Envoy 가중치는 어디에서 오는가의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - 어떤 변경은 새 Revision을 만들고, 어떤 변경은 만들지 않을까요?
 - single revision mode와 multiple revision mode는 운영상 무엇을 바꿀까요?
 - label과 traffic weight는 각각 어떤 다른 라우팅 문제를 풀까요?
-
-## 큰 그림
-
-![Azure Container Apps Deep Dive 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/03/03-01-a-revision-is-an-immutable-runtime-snaps.ko.png)
-
-*Azure Container Apps Deep Dive 3장 흐름 개요*
-
-이 그림에서는 Revision과 트래픽 분할 — Envoy 가중치는 어디에서 오는가를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> Revision과 트래픽 분할 — Envoy 가중치는 어디에서 오는가의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

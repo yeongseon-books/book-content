@@ -24,23 +24,16 @@ VectorStoreRetriever and MMR define how a retriever trades off relevance against
 
 This is post 3 in the RAG Deep Dive series.
 
+![Invoke path into retriever callbacks](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/03/03-01-base-retriever-invoke-flow.en.png)
+*Invoke path into retriever callbacks*
+> A retriever is not just a nearest-neighbor fetcher. It is the policy layer that decides how candidate evidence becomes final context.
+
 ## Questions to Keep in Mind
 
 - What call contract does `BaseRetriever` standardize across retrieval implementations?
 - Which retrieval failure does `similarity`, `similarity_score_threshold`, or `mmr` try to reduce?
 - What clues do callbacks and parameter logs give when retrieval results look wrong?
 
-## Big Picture
-
-![Invoke path into retriever callbacks](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/03/03-01-base-retriever-invoke-flow.en.png)
-
-*Invoke path into retriever callbacks*
-
-This picture shows a retriever call entering through a common `invoke()` boundary and dispatching internally by search type. Retriever design keeps the outer chain contract stable while allowing the retrieval strategy to change.
-
-> A retriever is not just a nearest-neighbor fetcher. It is the policy layer that decides how candidate evidence becomes final context.
-
-<!-- a-grade-example:begin -->
 ## Minimal runnable example
 
 Example file: `en/03-retriever-design/main.py`

@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 이번 글에서는 디자인 패턴을 “정답 모음집”이 아니라, 반복되는 설계 문제를 빠르게 설명하고 합의하기 위한 공통 어휘로 정리해 보겠습니다. 핵심은 패턴 이름보다 먼저, 그 이름이 어떤 문제와 어떤 트레이드오프를 함께 불러오는지 이해하는 것입니다.
 
+
+![Design Patterns 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/01/01-01-concept-at-a-glance.ko.png)
+*Design Patterns 101 1장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 디자인 패턴을 한 문장으로 정의하면 무엇일까요?
 - GoF가 정리한 23개 패턴은 어떤 기준으로 나뉠까요?
 - 패턴은 왜 코드보다 대화에서 먼저 가치를 만들까요?
-
-## 큰 그림
-
-![Design Patterns 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/01/01-01-concept-at-a-glance.ko.png)
-
-*Design Patterns 101 1장 흐름 개요*
 
 ## 왜 중요한가
 

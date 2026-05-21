@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 crash, omission, timing, Byzantine을 설계 언어로 정리하고, 뒤이어 나오는 CAP와 합의 이야기가 어떤 가정 위에 서는지 분명히 잡습니다.
 
+
+![Distributed Systems 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/02/02-01-concept-at-a-glance.ko.png)
+*Distributed Systems 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 장애 모델이란 무엇이며 왜 장애를 모델링해야 할까요?
 - crash, omission, timing, Byzantine은 어떻게 다를까요?
 - 네트워크 파티션은 왜 별도 범주로 봐야 할까요?
-
-## 큰 그림
-
-![Distributed Systems 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/02/02-01-concept-at-a-glance.ko.png)
-
-*Distributed Systems 101 2장 흐름 개요*
 
 ## 왜 중요한가
 

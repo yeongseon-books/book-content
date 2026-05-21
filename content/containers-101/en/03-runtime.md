@@ -31,21 +31,16 @@ In this chapter, we separate the user-facing layer, lifecycle daemon, low-level 
 
 > Runtime trouble gets easier to debug once you know which layer owns UX, lifecycle, and process execution.
 
+
+![containers 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/03/03-01-concept-at-a-glance.en.png)
+*containers 101 chapter 3 flow overview*
+> The runtime is really three layers: high-level (Docker, containerd) for image and storage; low-level (runc) for process spawning; and orchestration glue (CRI) for Kubernetes.
+
 ## Questions to Keep in Mind
 
 - High-level vs low-level runtimes?
 - The Docker → containerd → runc flow?
 - The role of CRI?
-
-## Big Picture
-
-![containers 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/03/03-01-concept-at-a-glance.en.png)
-
-*containers 101 chapter 3 flow overview*
-
-This picture places Runtime inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> The runtime is really three layers: high-level (Docker, containerd) for image and storage; low-level (runc) for process spawning; and orchestration glue (CRI) for Kubernetes.
 
 ## Why It Matters
 

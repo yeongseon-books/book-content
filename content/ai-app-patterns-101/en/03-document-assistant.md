@@ -25,21 +25,15 @@ Document-processing tasks look different on the surface, but they usually reduce
 
 This is post 3 in the AI App Patterns 101 series. Here we cover the document assistant pattern through summarization, structured extraction, and classification flows.
 
+![Short document summarization flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/03/03-01-short-document-summarization-flow.en.png)
+*Short document summarization flow*
+> A document assistant is not a conversational system; it is a transformer that turns long input into short, task-shaped output.
+
 ## Questions to Keep in Mind
 
 - Why do summarization, extraction, and classification need different output contracts in a document assistant?
 - When should a long document be split into staged Map-Reduce summarization?
 - What validation is needed before production code trusts extraction or classification output?
-
-## Big Picture
-
-![Short document summarization flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/03/03-01-short-document-summarization-flow.en.png)
-
-*Short document summarization flow*
-
-This picture shows one document input branching into summarization, extraction, and classification paths. A reliable document assistant separates output shape and validation rules for each task.
-
-> A document assistant is not a conversational system; it is a transformer that turns long input into short, task-shaped output.
 
 ## Document summarization
 

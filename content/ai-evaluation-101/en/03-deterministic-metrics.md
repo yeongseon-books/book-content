@@ -25,21 +25,16 @@ Deterministic metrics are fast and reproducible, but they penalize different wor
 
 This is post 3 in the AI Evaluation 101 series. Here we cover when to use Exact Match, F1, BLEU, and ROUGE — and when not to.
 
+
+![Deterministic metrics - exact Match, BLEU, ROUGE](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/03/03-01-deterministic-metrics-exact-match-bleu-r.en.png)
+*Deterministic metrics - exact Match, BLEU, ROUGE*
+> Deterministic metrics are fast and reproducible, but speed does not make them the final judge of semantic quality.
+
 ## Questions to Keep in Mind
 
 - When are deterministic metrics such as Exact Match, BLEU, and ROUGE useful as fast filters?
 - What mistake appears when deterministic metrics are treated as semantic judges?
 - What complementary evaluation is needed when you gain speed and interpretability from these metrics?
-
-## Big Picture
-
-![Deterministic metrics - exact Match, BLEU, ROUGE](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/03/03-01-deterministic-metrics-exact-match-bleu-r.en.png)
-
-*Deterministic metrics - exact Match, BLEU, ROUGE*
-
-This picture shows deterministic metrics such as Exact Match, BLEU, and ROUGE quickly filtering candidates without replacing full semantic judgment. Deterministic metrics are a starting point for evaluation, not the final verdict.
-
-> Deterministic metrics are fast and reproducible, but speed does not make them the final judge of semantic quality.
 
 ## What Are Deterministic Metrics?
 

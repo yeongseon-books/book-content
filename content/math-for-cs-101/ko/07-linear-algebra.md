@@ -30,20 +30,16 @@ seo_description: 선형대수로 데이터와 변환을 한 문법으로 읽는 
 
 여기서는 선형대수를 데이터와 변환을 같은 문법으로 다루는 도구로 보고, 벡터, 행렬, 내적, 전치, 행렬곱의 감각을 실전 쪽으로 연결해 보겠습니다.
 
+
+![Math for CS 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/07/07-01-concept-at-a-glance.ko.png)
+*Math for CS 101 7장 흐름 개요*
+> 벡터와 행렬은 데이터 변환을 구조화하고, 추천 시스템과 신경망의 핵심 언어가 됩니다.
+
 ## 먼저 던지는 질문
 
 - 벡터와 행렬은 데이터를 어떻게 표현할까요?
 - 내적은 왜 유사도 계산의 핵심 연산일까요?
 - 행렬곱은 단순 반복 계산과 무엇이 다를까요?
-
-## 큰 그림
-
-![Math for CS 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/07/07-01-concept-at-a-glance.ko.png)
-
-*Math for CS 101 7장 흐름 개요*
-이 그림은 선형대수를 벡터 공간과 변환으로 이해하고, 추천 시스템과 머신러닝에 어떻게 쓰이는지 보여줍니다.
-
-> 벡터와 행렬은 데이터 변환을 구조화하고, 추천 시스템과 신경망의 핵심 언어가 됩니다.
 
 ## 왜 중요한가
 

@@ -28,17 +28,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 dependency 관리를 버전 업데이트 작업으로만 보지 않고, lockfile, SCA, SBOM, 자동 업데이트, 재현 가능한 빌드까지 포함한 공급망 보안 흐름으로 정리하겠습니다. 이 관점을 이해하면 왜 lockfile 하나가 운영 안정성과 사고 대응 속도까지 좌우하는지도 선명해집니다.
 
+
+![Secure Coding 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/09/09-01-concept-at-a-glance.ko.png)
+*Secure Coding 101 9장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - SCA는 정확히 무엇을 검사할까요?
 - SBOM은 언제 실무에서 큰 힘을 발휘할까요?
 - lockfile은 왜 선택이 아니라 필수일까요?
-
-## 큰 그림
-
-![Secure Coding 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/09/09-01-concept-at-a-glance.ko.png)
-
-*Secure Coding 101 9장 흐름 개요*
 
 ## 왜 중요한가
 

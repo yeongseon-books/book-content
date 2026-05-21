@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 lease와 fencing token을 함께 써서, 리더를 고르는 문제를 넘어 예전 리더의 영향력을 끊는 운영 안전장치로 설명합니다.
 
+
+![Distributed Systems 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/07/07-01-concept-at-a-glance.ko.png)
+*Distributed Systems 101 7장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 왜 리더 선출이 필요하며 어떤 안전 조건이 필요할까요?
 - lease와 heartbeat는 각각 어떤 역할을 할까요?
 - fencing token은 왜 이전 리더를 막는 핵심 장치일까요?
-
-## 큰 그림
-
-![Distributed Systems 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/07/07-01-concept-at-a-glance.ko.png)
-
-*Distributed Systems 101 7장 흐름 개요*
 
 ## 왜 중요한가
 

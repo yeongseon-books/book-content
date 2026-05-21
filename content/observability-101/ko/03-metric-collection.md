@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 이 글은 Observability 101 시리즈의 3번째 글입니다.
 
+
+![Observability 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/03/03-01-concept-at-a-glance.ko.png)
+*Observability 101 3장 흐름 개요*
+> 메트릭 수집과 시각화의 핵심은 도구 선택이 아니라, 언제 어디서 이 신호를 남기고 어떻게 해석할 것인가 하는 설계입니다.
+
 ## 먼저 던지는 질문
 
 - 메트릭은 어떻게 수집되고 그래프로 바뀔까요?
 - pull 방식과 push 방식은 무엇이 다를까요?
 - `/metrics` 엔드포인트는 어떤 역할을 할까요?
-
-## 큰 그림
-
-![Observability 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/03/03-01-concept-at-a-glance.ko.png)
-
-*Observability 101 3장 흐름 개요*
-
-메트릭 수집과 시각화를 다루는 이번 장에서는 주요 개념과 실무 패턴을 봅니다. 시스템이 복잡해질수록 이 개념들이 어디에서 시작되고 어떤 결과를 만드는지 이해하는 것이 중요합니다.
-
-> 메트릭 수집과 시각화의 핵심은 도구 선택이 아니라, 언제 어디서 이 신호를 남기고 어떻게 해석할 것인가 하는 설계입니다.
 
 ## 왜 중요한가
 

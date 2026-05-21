@@ -26,21 +26,15 @@ Embedding comparison is only credible when you change one variable at a time. Ke
 
 This is the 3rd article in the RAG Evaluation and Benchmarking 101 series.
 
+![Fixed-corpus embedding comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/03/03-01-fixed-corpus-embedding-comparison-struct.en.png)
+*Fixed-corpus embedding comparison structure*
+> Comparing embedding models is not about which one is "smarter". It is about which one **places relevant documents earlier in the same retrieval pipeline**.
+
 ## Questions to Keep in Mind
 
 - Why is it risky to choose an embedding model from leaderboard scores alone?
 - What conditions must stay fixed when only the model changes over the same corpus and queries?
 - How should you judge a model that improves quality but increases latency or cost?
-
-## Big Picture
-
-![Fixed-corpus embedding comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/03/03-01-fixed-corpus-embedding-comparison-struct.en.png)
-
-*Fixed-corpus embedding comparison structure*
-
-This picture compares retrieval results and metrics while changing only the embedding model over the same queries and corpus. Model comparison is an experiment over quality, latency, and cost under fixed conditions.
-
-> Comparing embedding models is not about which one is "smarter". It is about which one **places relevant documents earlier in the same retrieval pipeline**.
 
 ## Why this matters
 

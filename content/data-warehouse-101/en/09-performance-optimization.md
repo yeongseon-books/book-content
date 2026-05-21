@@ -28,21 +28,16 @@ This is post 9 in the Data Warehouse 101 series.
 
 In this post, we treat optimization as a measurement discipline instead of a bag of tricks. The goal is to read the plan, locate the expensive stage, and change the query shape before cost becomes a surprise.
 
+
+![data warehouse 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/09/09-01-concept-at-a-glance.en.png)
+*data warehouse 101 chapter 9 flow overview*
+> Performance tuning follows a cycle: measure, find the bottleneck, improve, and measure again. Start with the query plan, not your intuition.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Performance Optimization?
 - Which signal should the example or diagram make visible for Performance Optimization?
 - What failure should be prevented first when Performance Optimization reaches a real system?
-
-## Big Picture
-
-![data warehouse 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/09/09-01-concept-at-a-glance.en.png)
-
-*data warehouse 101 chapter 9 flow overview*
-
-This picture places Performance Optimization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Performance tuning follows a cycle: measure, find the bottleneck, improve, and measure again. Start with the query plan, not your intuition.
 
 ## Questions this article answers
 

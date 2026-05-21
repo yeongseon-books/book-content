@@ -26,19 +26,15 @@ last_reviewed: '2026-05-15'
 
 This is post 9 in the Machine Learning 101 series. Here we will connect confusion matrices, ROC and PR curves, regression metrics, and threshold choices back to the more important decision: what kind of failure matters most in the real system.
 
+
+![machine learning 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/09/09-01-concept-at-a-glance.en.png)
+*machine learning 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - Which metrics belong to classification versus regression?
 - What does each cell of the confusion matrix tell you operationally?
 - When should PR outrank ROC in your analysis?
-
-## Big Picture
-
-![machine learning 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/09/09-01-concept-at-a-glance.en.png)
-
-*machine learning 101 chapter 9 flow overview*
-
-This picture places Model Evaluation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

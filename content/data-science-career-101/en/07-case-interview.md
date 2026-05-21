@@ -28,21 +28,17 @@ What interviewers usually want instead is a visible thinking process. Can you cl
 
 This is post 7 in the Data Science Career 101 series.
 
+
+![data science career 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/07/07-01-concept-at-a-glance.en.png)
+*data science career 101 chapter 7 flow overview*
+> In case interviews, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
+
 ## Questions to Keep in Mind
 
 - What does a case interview actually test in a data candidate?
 - Why should clarification come before analysis?
 - How do you choose a north star metric and supporting metrics?
 
-## Big Picture
-
-![data science career 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/07/07-01-concept-at-a-glance.en.png)
-
-*data science career 101 chapter 7 flow overview*
-
-This picture places The Case Interview inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> In case interviews, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
 ## What You Will Learn
 
 - Case *types*

@@ -29,19 +29,14 @@ The goal is simple: **understand what each plan gives you, what it constrains, a
 
 This is the fifth post in the Azure Functions 101 series. Here, we compare the hosting plans in terms of real workload trade-offs instead of product labels.
 
+![azure functions 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/05/05-01-big-picture.en.png)
+*azure functions 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - What does each plan (Consumption, Premium, Dedicated) bill against?
 - When should cold-start tolerance drive the plan choice instead of price?
 - Which platform features (VNet integration, always-ready instances) lock you into Premium or Dedicated?
-
-## Big Picture
-
-![azure functions 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/05/05-01-big-picture.en.png)
-
-*azure functions 101 chapter 5 flow overview*
-
-This picture places Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## One-line definitions
 

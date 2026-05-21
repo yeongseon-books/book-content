@@ -29,21 +29,15 @@ URL은 한 번 공개되면 데이터베이스 컬럼명보다 훨씬 오래 살
 
 여기서는 좋은 REST URL을 예쁜 문자열이 아니라 리소스 모델의 결과물로 봅니다. 컬렉션 경계, 하위 리소스, 식별자 노출 범위를 먼저 정해야 뒤의 메서드와 문서가 함께 안정됩니다.
 
+
+![API Design 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/03/03-01-concept-at-a-glance.ko.png)
+*API Design 101 3장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 리소스의 경계는 어떻게 나눠야 할까요?
 - 명사형 이름, 복수형, 계층 구조는 어떤 원칙으로 잡아야 할까요?
 - 하위 리소스는 언제 쓰고 어디까지 깊게 들어가야 할까요?
-
-## 큰 그림
-
-![API Design 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/03/03-01-concept-at-a-glance.ko.png)
-
-*API Design 101 3장 흐름 개요*
-
-클라이언트가 `/users/42/orders`를 호출하면 URL 자체가 "42번 사용자의 주문 목록"이라는 의미를 전달합니다. 이 경로 구조가 곧 리소스 모델이고, 모델이 흔들리면 메서드·상태 코드·문서 구조까지 함께 흔들립니다.
-
-그림은 도메인 객체(User, Order, Item)를 컬렉션-아이템 계층으로 매핑하는 과정을 보여줍니다. 도메인에서 "소유" 관계가 있으면 하위 리소스로 표현하고, 독립적이면 최상위 컬렉션으로 분리합니다.
 
 ## 왜 중요한가
 

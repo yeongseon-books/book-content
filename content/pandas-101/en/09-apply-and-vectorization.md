@@ -28,21 +28,16 @@ This is post 9 in the Pandas 101 series.
 
 In this chapter, I do not want to ban `apply` as a slogan. I want to explain why vectorized column-wise computation is the default fast path, and when `map`, NumPy operations, or direct Series math are the better tools.
 
+
+![pandas 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/09/09-01-concept-at-a-glance.en.png)
+*pandas 101 chapter 9 flow overview*
+> *Vectorization is Pandas' *superpower. Reach for `apply` only after built-in methods, list comprehensions, and NumPy fail you.
+
 ## Questions to Keep in Mind
 
 - The meaning of *vectorization?
 - The difference between *apply / map / vectorize?
 - Interop* with *NumPy?
-
-## Big Picture
-
-![pandas 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/09/09-01-concept-at-a-glance.en.png)
-
-*pandas 101 chapter 9 flow overview*
-
-This picture places Apply and Vectorization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> *Vectorization is Pandas' *superpower. Reach for `apply` only after built-in methods, list comprehensions, and NumPy fail you.
 
 ## Why It Matters
 

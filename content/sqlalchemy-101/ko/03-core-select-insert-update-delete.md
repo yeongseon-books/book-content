@@ -33,21 +33,15 @@ SQLAlchemy Core를 쓸 때 진짜 생산성이 나오는 지점은 문자열 SQL
 
 *SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기*
 
+![SQLAlchemy 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/03/03-02-why-this-matters.ko.png)
+*SQLAlchemy 101 3장 흐름 개요*
+> SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - `select()`는 어떤 순서로 조립되고, `Result`는 어떻게 읽어야 할까요?
 - `insert`, `update`, `delete`를 2.x 트랜잭션 모델과 함께 어떻게 써야 할까요?
 - `JOIN`, 서브쿼리, CTE, 집계 함수는 Core에서 어떻게 표현할까요?
-
-## 큰 그림
-
-![SQLAlchemy 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/03/03-02-why-this-matters.ko.png)
-
-*SQLAlchemy 101 3장 흐름 개요*
-
-이 그림에서는 SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 

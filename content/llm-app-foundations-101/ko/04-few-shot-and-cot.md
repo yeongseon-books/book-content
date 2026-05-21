@@ -29,19 +29,14 @@ last_reviewed: '2026-05-15'
 
 여기서는 few-shot과 chain-of-thought를 예시 기반 유도와 단계 기반 유도로 나누어 보고, 각각이 언제 효과적인지 정리하겠습니다.
 
+![예시 기반 유도와 단계적 추론의 전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/04/04-01-few-shot-and-chain-of-thought-steering-b.ko.png)
+*예시 기반 유도와 단계적 추론의 전체 그림*
+
 ## 먼저 던지는 질문
 
 - few-shot은 무엇을 가르치고 chain-of-thought는 무엇을 가르칠까요?
 - zero-shot, few-shot, CoT 중 언제 어떤 도구를 골라야 할까요?
 - 예시 품질이 나쁘면 왜 오히려 답변을 망칠까요?
-
-## 큰 그림
-
-![예시 기반 유도와 단계적 추론의 전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/04/04-01-few-shot-and-chain-of-thought-steering-b.ko.png)
-
-*예시 기반 유도와 단계적 추론의 전체 그림*
-
-이 그림에서는 답변 형식을 보여 주는 축과 풀이 순서를 보여 주는 축을 나눠 봅니다. few-shot과 CoT는 같은 프롬프트 기법처럼 보여도 안정시키는 대상이 다릅니다.
 
 ## 왜 이 글이 중요한가
 

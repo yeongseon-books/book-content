@@ -42,21 +42,15 @@ The central idea is simple: **LLM applications run on token budgets, not on raw 
 
 ---
 
+![Understanding tokens: cost, limits, and context windows](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/02/02-01-understanding-tokens-cost-limits-and-con.en.png)
+*Understanding tokens: cost, limits, and context windows*
+> Tokens are the budget line that connects cost, limits, and response shape.
+
 ## Questions to Keep in Mind
 
 - Why should you treat tokens as budget units instead of word-like pieces?
 - What do `prompt_tokens`, `completion_tokens`, and `total_tokens` each tell you?
 - Where do the context window, `max_tokens`, and `finish_reason` collide?
-
-## Big Picture
-
-![Understanding tokens: cost, limits, and context windows](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/02/02-01-understanding-tokens-cost-limits-and-con.en.png)
-
-*Understanding tokens: cost, limits, and context windows*
-
-This picture connects tokens to input size, output size, cost, and context limits. Once tokens become the budget unit, usage fields and length failures become one operational problem.
-
-> Tokens are the budget line that connects cost, limits, and response shape.
 
 ## What a token actually is
 

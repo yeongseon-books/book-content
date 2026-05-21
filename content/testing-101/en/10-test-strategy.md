@@ -30,21 +30,16 @@ This is the final post in the Testing 101 series. Here we connect the earlier la
 
 > Test strategy is not about proving you test a lot. It is about proving you spend testing effort where failure would hurt most.
 
+
+![testing 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/10/10-01-concept-at-a-glance.en.png)
+*testing 101 chapter 10 flow overview*
+> A strategy without measurement is just a wish; a measurement without strategy is just a metric.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Building a Test Strategy?
 - Which signal should the example or diagram make visible for Building a Test Strategy?
 - What failure should be prevented first when Building a Test Strategy reaches a real system?
-
-## Big Picture
-
-![testing 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/10/10-01-concept-at-a-glance.en.png)
-
-*testing 101 chapter 10 flow overview*
-
-This picture places Building a Test Strategy inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A strategy without measurement is just a wish; a measurement without strategy is just a metric.
 
 ## What You Will Learn
 

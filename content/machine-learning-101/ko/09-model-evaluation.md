@@ -26,21 +26,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 머신러닝 101 시리즈의 9번째 글입니다. 여기서는 분류와 회귀 지표를 함께 정리하고, 혼동 행렬, ROC-AUC, PR-AUC, MAE, RMSE, R-squared를 언제 어떻게 읽어야 하는지 살펴보겠습니다.
 
+
+![Machine Learning 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/09/09-01-diagram.ko.png)
+*Machine Learning 101 9장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 분류에서는 어떤 지표를 언제 써야 할까요?
 - 회귀에서는 MAE, MSE, RMSE, R-squared를 어떻게 나눠 읽을까요?
 - 혼동 행렬은 어떤 구조를 보여 줄까요?
-
-## 큰 그림
-
-![Machine Learning 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/09/09-01-diagram.ko.png)
-
-*Machine Learning 101 9장 흐름 개요*
-
-이 그림은 이 장의 핵심 개념들이 어떻게 연결되는지 보여줍니다.
-
-
 
 ## 왜 중요한가
 

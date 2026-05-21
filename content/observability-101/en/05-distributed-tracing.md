@@ -28,21 +28,16 @@ Distributed tracing answers that by breaking one request into spans, preserving 
 
 This is post 5 in the Observability 101 series.
 
+
+![observability 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/05/05-01-concept-at-a-glance.en.png)
+*observability 101 chapter 5 flow overview*
+> Distributed Tracing Basics is about the boundary decision, not the tool choice.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Distributed Tracing Basics?
 - Which signal should the example or diagram make visible for Distributed Tracing Basics?
 - What failure should be prevented first when Distributed Tracing Basics reaches a real system?
-
-## Big Picture
-
-![observability 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/05/05-01-concept-at-a-glance.en.png)
-
-*observability 101 chapter 5 flow overview*
-
-This picture places Distributed Tracing Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Distributed Tracing Basics is about the boundary decision, not the tool choice.
 
 ## Questions this article answers
 

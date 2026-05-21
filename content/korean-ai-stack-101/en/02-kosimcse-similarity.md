@@ -26,19 +26,14 @@ The first working retrieval loop should be small enough to inspect with your own
 
 This is the second post in the Korean AI Stack 101 series. Here, we build a minimal Korean sentence-similarity search flow with KoSimCSE and make the retrieval mechanics explicit.
 
+![Korean AI Stack 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/02/02-01-core-flow.en.png)
+*Korean AI Stack 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - Where does KoSimCSE usually pay off first in Korean retrieval work?
 - Why is indexing FAQ questions alone a clean first version of search?
 - Why do normalized embeddings pair so well with `IndexFlatIP`?
-
-## Big Picture
-
-![Korean AI Stack 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/02/02-01-core-flow.en.png)
-
-*Korean AI Stack 101 chapter 2 flow overview*
-
-This picture places Building sentence similarity search with KoSimCSE inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

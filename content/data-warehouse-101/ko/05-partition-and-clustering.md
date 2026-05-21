@@ -27,22 +27,15 @@ last_reviewed: '2026-05-15'
 Warehouse fact는 수십억 행까지 커지는 일이 흔합니다. 이때 중요한 것은 더 빨리 읽는 것만이 아니라 아예 읽지 않아도 되는 데이터를 건너뛰는 일입니다. 날짜 기준 partition만 잘 잡아도 대부분의 데이터를 스캔하지 않고 넘어갈 수 있고, 그만큼 비용도 바로 줄어듭니다.
 
 
+![Data Warehouse 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/05/05-01-concept-at-a-glance.ko.png)
+*Data Warehouse 101 5장 흐름 개요*
+> Partition은 메타데이터 기반 스캔 범위 축소, Clustering은 물리적 배치 기반 I/O 축소로 각각 다른 방식으로 성능을 높입니다.
 
 ## 먼저 던지는 질문
 
 - Partition과 Clustering은 각각 어떤 문제를 해결할까요?
 - Pruning은 실제로 어떻게 비용을 줄일까요?
 - Partition key와 cluster key는 어떤 기준으로 고를까요?
-
-## 큰 그림
-
-![Data Warehouse 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/05/05-01-concept-at-a-glance.ko.png)
-
-*Data Warehouse 101 5장 흐름 개요*
-
-Partition은 큰 테이블을 범위 기준(보통 날짜)으로 나누어 필요한 부분만 스캔하고, Clustering은 같은 값들을 물리적으로 가깝게 배치해 필터링 성능을 높입니다. 둘을 함께 쓰면 대용량 테이블의 쿼리 성능이 획기적으로 개선됩니다.
-
-> Partition은 메타데이터 기반 스캔 범위 축소, Clustering은 물리적 배치 기반 I/O 축소로 각각 다른 방식으로 성능을 높입니다.
 
 ## 이 글에서 배울 것
 
@@ -176,7 +169,6 @@ BigQuery, Snowflake, Redshift 모두 partition과 clustering을 핵심 최적화
 Partition과 Clustering은 큰 테이블에서 비용과 속도를 함께 다루는 기본 장치입니다. 핵심은 데이터를 전부 읽지 않도록 설계하는 데 있습니다. 다음 글에서는 이렇게 설계한 Warehouse에 데이터를 어떤 흐름으로 넣을지, ETL과 ELT를 살펴보겠습니다.
 
 
-
 ## 파티셔닝 전략을 표로 정리하기
 
 Partition과 Clustering은 "빠르게 읽는 기술"이 아니라 "불필요한 읽기를 줄이는 기술"입니다. 설계 단계에서 키를 잘못 고르면 쿼리 최적화 여지가 크게 줄어듭니다.
@@ -247,7 +239,6 @@ CLUSTER BY user_key, product_key;
 핵심은 partition key를 질의의 기본 축과 일치시키는 것입니다. 대부분의 도메인에서 시간 축이 가장 안정적이므로 날짜를 기본값으로 삼고, 두 번째 축은 실제 필터 빈도 기준으로 고르는 편이 안전합니다.
 
 
-
 ## 파티션 DDL 실전 패턴
 
 실제 운영에서는 적재 전략과 파티션 키를 함께 설계해야 합니다. 아래 예시는 일 단위 적재와 월 단위 조회를 동시에 고려한 패턴입니다.
@@ -281,7 +272,6 @@ CLUSTER BY user_key, event_type;
 ## 클러스터 키 선정 가이드
 
 클러스터 키는 "자주 쓰는 필터, 낮은 변경 빈도"를 기준으로 고르는 편이 좋습니다. 반대로 무작위성이 큰 컬럼이나 거의 필터링하지 않는 컬럼은 키 후보에서 제외하는 것이 안전합니다.
-
 
 
 ## 실무 적용 메모

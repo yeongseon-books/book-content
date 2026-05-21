@@ -26,19 +26,15 @@ A small screen can survive on a few lines of JavaScript and direct DOM manipulat
 
 This is post 4 in the Frontend Development 101 series. Here we introduce components and state as the basic structure that keeps growing screens readable. The goal is simple: split the UI into small functions, and let each function own only the input and state it is responsible for.
 
+
+![frontend development 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/04/04-01-concept-at-a-glance.en.png)
+*frontend development 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Components and State?
 - Which signal should the example or diagram make visible for Components and State?
 - What failure should be prevented first when Components and State reaches a real system?
-
-## Big Picture
-
-![frontend development 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/04/04-01-concept-at-a-glance.en.png)
-
-*frontend development 101 chapter 4 flow overview*
-
-This picture places Components and State inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

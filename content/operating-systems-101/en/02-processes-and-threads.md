@@ -29,19 +29,15 @@ Processes and threads look like two ways to do concurrency, but they answer diff
 
 This is post 2 in the Operating Systems 101 series. It explains what a process actually owns, what a thread borrows from that process, and how to choose between them in practice.
 
+
+![operating systems 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/02/02-01-what-the-process-shares-and-what-each-th.en.png)
+*operating systems 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Processes and Threads?
 - Which signal should the example or diagram make visible for Processes and Threads?
 - What failure should be prevented first when Processes and Threads reaches a real system?
-
-## Big Picture
-
-![operating systems 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/02/02-01-what-the-process-shares-and-what-each-th.en.png)
-
-*operating systems 101 chapter 2 flow overview*
-
-This picture places Processes and Threads inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions this article answers
 

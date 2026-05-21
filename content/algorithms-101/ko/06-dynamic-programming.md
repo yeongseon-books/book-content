@@ -27,17 +27,15 @@ last_reviewed: '2026-05-12'
 
 왜 우리는 같은 부분 문제를 자꾸 다시 풀게 될까요? 그리고 그 패턴은 어떻게 알아챌 수 있을까요? 여기서는 DP가 적용되는 조건, 메모이제이션과 타뷸레이션의 차이, 그리고 상태를 설계하는 감각을 다룹니다.
 
+
+![Algorithms 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/06/06-01-big-picture.ko.png)
+*Algorithms 101 6장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 동적 계획법이 성립하려면 어떤 두 조건이 필요할까요?
 - 메모이제이션과 타뷸레이션은 어떻게 다를까요?
 - 상태는 어떻게 정의하고 점화식은 어떻게 세워야 할까요?
-
-## 큰 그림
-
-![Algorithms 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/06/06-01-big-picture.ko.png)
-
-*Algorithms 101 6장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -293,7 +291,6 @@ for t in trace:
 5. 마지막에 복잡도와 메모리 사용량을 한 줄로 기록합니다.
 
 이 루틴을 습관화하면 "코드가 돌아간다"와 "운영에서도 안전하다" 사이의 간격이 크게 줄어듭니다.
-
 
 
 ## 추가 보강: 검증 가능한 예제 세트

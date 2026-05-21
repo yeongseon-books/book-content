@@ -28,19 +28,14 @@ Repeating the same package setup by hand is where team standards drift. A good t
 
 This is the final post in the Python Package 101 series. Here we combine structure, testing, typing, documentation, and CI into a reusable template that can produce a production-ready package skeleton in minutes.
 
+![Python Package 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/10/10-01-mental-model.en.png)
+*Python Package 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - How do you automate the repetitive setup that comes with every new package?
 - What is the difference between cookiecutter and copier?
 - When should you use a GitHub Template Repository?
-
-## Big Picture
-
-![Python Package 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/10/10-01-mental-model.en.png)
-
-*Python Package 101 chapter 10 flow overview*
-
-This picture places Production Package Template inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What you will learn
 

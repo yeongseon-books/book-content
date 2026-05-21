@@ -30,21 +30,15 @@ seo_description: supervisor와 worker 패턴으로 책임을 분리하는 멀티
 
 이 관점을 잡아 두면 마지막 글도 훨씬 쉬워집니다. 완성형 LangGraph는 결국 상태, 분기, 도구 호출, 멀티 에이전트를 하나의 운영 가능한 그래프로 합친 구조이기 때문입니다. 반대로 멀티 에이전트를 단지 “agent를 여러 개 쓰는 것” 정도로 보면, supervisor 설계와 shared state 경계가 왜 핵심인지 끝까지 흐릿하게 남습니다.
 
+![supervisor가 worker에게 위임하는 구조](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/05/05-01-minimal-runnable-example.ko.png)
+*supervisor가 worker에게 위임하는 구조*
+> Multi-agent의 품질은 에이전트 수가 아니라, 각 노드가 맡은 책임과 넘겨주는 state가 얼마나 분명한지에서 갈립니다.
+
 ## 먼저 던지는 질문
 
 - 멀티 에이전트는 여러 모델을 붙이는 일이 아니라 어떤 책임 분리 구조일까요?
 - 각 에이전트 노드가 공유 state를 읽고 쓸 때 무엇을 제한해야 할까요?
 - handoff나 supervisor 경계가 흐리면 어떤 운영 문제가 생길까요?
-
-## 큰 그림
-
-![supervisor가 worker에게 위임하는 구조](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/05/05-01-minimal-runnable-example.ko.png)
-
-*supervisor가 worker에게 위임하는 구조*
-
-이 그림에서는 역할이 다른 에이전트 노드들이 공유 state를 통해 협력하고, supervisor나 routing 경계가 다음 작업자를 고르는 흐름을 봅니다. 멀티 에이전트 설계는 병렬성보다 책임과 handoff를 명확히 나누는 일입니다.
-
-> Multi-agent의 품질은 에이전트 수가 아니라, 각 노드가 맡은 책임과 넘겨주는 state가 얼마나 분명한지에서 갈립니다.
 
 ## 왜 이 구조가 중요한가
 

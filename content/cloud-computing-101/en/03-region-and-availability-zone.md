@@ -32,21 +32,16 @@ In this post, we'll separate Regions, Availability Zones, and edge locations, th
 
 > A Region is geography, an AZ is a failure boundary inside that geography, and most availability conversations should start with AZ distribution before they escalate to Multi-Region.
 
+
+![cloud computing 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/03/03-01-concept-at-a-glance.en.png)
+*cloud computing 101 chapter 3 flow overview*
+> Decisions about regions and zones shape your latency, cost, resilience, and compliance. They are not neutral.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Region and Availability Zone?
 - Which signal should the example or diagram make visible for Region and Availability Zone?
 - What failure should be prevented first when Region and Availability Zone reaches a real system?
-
-## Big Picture
-
-![cloud computing 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/03/03-01-concept-at-a-glance.en.png)
-
-*cloud computing 101 chapter 3 flow overview*
-
-This picture places Region and Availability Zone inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Decisions about regions and zones shape your latency, cost, resilience, and compliance. They are not neutral.
 
 ## Questions This Chapter Answers
 

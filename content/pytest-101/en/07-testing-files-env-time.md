@@ -30,19 +30,15 @@ This is post 7 in the pytest 101 series.
 
 > pytest's `tmp_path` fixture manages temporary files, `monkeypatch` isolates environment variables, and `freezegun` freezes the clock. This article covers patterns for testing code that depends on system resources.
 
+
+![pytest 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/07/07-01-big-picture.en.png)
+*pytest 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Testing Files, Environment Variables, and Time?
 - Which signal should the example or diagram make visible for Testing Files, Environment Variables, and Time?
 - What failure should be prevented first when Testing Files, Environment Variables, and Time reaches a real system?
-
-## Big Picture
-
-![pytest 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/07/07-01-big-picture.en.png)
-
-*pytest 101 chapter 7 flow overview*
-
-This picture places Testing Files, Environment Variables, and Time inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

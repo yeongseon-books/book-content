@@ -28,19 +28,15 @@ The better model is simpler: keep the image immutable and move environment-speci
 
 This is post 6 in the Docker 101 series. It covers the contract between image and environment, including `ENV` vs `ARG`, runtime injection patterns, secret externalization, and the startup checks that keep missing variables from becoming late incidents.
 
+
+![docker 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/06/06-01-concept-at-a-glance.en.png)
+*docker 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - The difference between *ENV* and *ARG?
 - Splitting *env vars / config files / secrets?
 - Wiring *Compose* to *external secret tools?
-
-## Big Picture
-
-![docker 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/06/06-01-concept-at-a-glance.en.png)
-
-*docker 101 chapter 6 flow overview*
-
-This picture places Environment Variables and Configuration inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

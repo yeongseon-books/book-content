@@ -29,17 +29,15 @@ last_reviewed: '2026-05-12'
 
 여기서는 테스트, 버전 관리, 코드 리뷰, 리팩터링이라는 네 기둥을 통해 코딩이 엔지니어링으로 확장되는 지점을 살펴보겠습니다.
 
+
+![Computer Science 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/09/09-01-concept-at-a-glance.ko.png)
+*Computer Science 101 9장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 코딩과 소프트웨어 엔지니어링의 차이는 어디에서 생길까요?
 - 테스트는 왜 변경을 안전하게 만드는 최소 장치일까요?
 - Git 기반 협업 흐름은 어떤 단위와 습관으로 유지될까요?
-
-## 큰 그림
-
-![Computer Science 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/09/09-01-concept-at-a-glance.ko.png)
-
-*Computer Science 101 9장 흐름 개요*
 
 ## 이 글에서 배울 것
 

@@ -24,21 +24,16 @@ last_reviewed: '2026-05-12'
 
 이 글은 DevOps 101 시리즈의 여섯 번째 글입니다.
 
+
+![DevOps 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/06/06-01-diagram.ko.png)
+*DevOps 101 6장 흐름 개요*
+> 컨테이너와 빌드 자동화의 핵심은 개발 환경의 '내 컴퓨터에서는 되는데'를 없애는 것입니다.
+
 ## 먼저 던지는 질문
 
 - 컨테이너는 VM과 무엇이 다르고 왜 배포 재현성에 유리할까요?
 - Dockerfile에서 꼭 이해해야 할 기본 명령은 무엇일까요?
 - multi-stage build는 이미지 크기와 보안에 어떤 차이를 만들까요?
-
-## 큰 그림
-
-![DevOps 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/06/06-01-diagram.ko.png)
-
-*DevOps 101 6장 흐름 개요*
-
-이 그림은 코드 변경부터 컨테이너 이미지 빌드, 푸시까지의 자동화 흐름을 보여줍니다. 빌드가 빠르고 일관성 있을수록 배포 신뢰도가 올라갑니다.
-
-> 컨테이너와 빌드 자동화의 핵심은 개발 환경의 '내 컴퓨터에서는 되는데'를 없애는 것입니다.
 
 ## 왜 중요한가
 
@@ -64,7 +59,7 @@ last_reviewed: '2026-05-12'
 
 ## 전환 전후
 
-**Before (host-dependent)**
+**Before (호스트 의존)**
 
 ```bash
 # Install directly on the server

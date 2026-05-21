@@ -28,19 +28,15 @@ Those details are easy to skip because the app still starts without them. They o
 
 This is post 7 in the Docker 101 series. It turns a simple FastAPI example into an operationally credible container by focusing on PID 1, signals, healthchecks, and least-privilege execution.
 
+
+![docker 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/07/07-01-concept-at-a-glance.en.png)
+*docker 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - Containerizing *FastAPI + uvicorn?
 - Signal handling at PID 1* (SIGTERM)?
 - Adding a *healthcheck?
-
-## Big Picture
-
-![docker 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/07/07-01-concept-at-a-glance.en.png)
-
-*docker 101 chapter 7 flow overview*
-
-This picture places Containerizing a Python App inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

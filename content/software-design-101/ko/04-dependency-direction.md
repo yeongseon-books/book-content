@@ -32,17 +32,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 의존성이 결합도와 어떻게 이어지는지, 안정적인 모듈과 변동이 큰 모듈은 어떻게 구분하는지, DIP와 포트·어댑터 패턴이 왜 실무에서 자주 쓰이는지 정리합니다. 설계에서 “방향”이 왜 자유를 사는 문제인지도 함께 보겠습니다.
 
+
+![Software Design 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/04/04-01-concept-at-a-glance.ko.png)
+*Software Design 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 의존성 방향은 왜 변경 비용을 크게 좌우할까요?
 - 안정적인 모듈과 변동이 큰 모듈은 어떻게 구분할까요?
 - 도메인이 세부 구현을 모르게 만드는 방법은 무엇일까요?
-
-## 큰 그림
-
-![Software Design 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/04/04-01-concept-at-a-glance.ko.png)
-
-*Software Design 101 4장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -454,7 +452,6 @@ class PlaceOrderService:
 - 인프라 계층: 외부 API 오류율, DB 지연 시간
 
 지표를 계층별로 분리해 보면 어디를 고쳐야 하는지가 명확해집니다. 모든 지표가 한 대시보드에서 섞여 있으면 "느리다"는 사실만 보이고 원인은 보이지 않습니다. 설계 경계를 운영 지표 경계와 맞추면 개선 사이클이 빠르게 돌아갑니다.
-
 
 
 ## 리뷰와 리팩터링을 위한 실전 질문 세트

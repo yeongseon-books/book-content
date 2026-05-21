@@ -32,19 +32,14 @@ This is the 5th article in the SQLAlchemy 101 series.
 
 *Session in Depth: how unit of work and identity map actually work*
 
+![sqlalchemy 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/05/05-02-why-it-matters.en.png)
+*sqlalchemy 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - How does a `Session` relate to connections and transactions?
 - What is the Unit of Work, and when is SQL actually emitted?
 - How are `flush()` and `commit()` different?
-
-## Big Picture
-
-![sqlalchemy 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/05/05-02-why-it-matters.en.png)
-
-*sqlalchemy 101 chapter 5 flow overview*
-
-This picture places Session in Depth: How Unit of Work and Identity Map Actually Work inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

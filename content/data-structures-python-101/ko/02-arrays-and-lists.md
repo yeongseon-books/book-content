@@ -24,17 +24,15 @@ last_reviewed: '2026-05-17'
 
 이 글은 Data Structures with Python 101 시리즈의 두 번째 글입니다.
 
+
+![Data Structures with Python 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/02/02-01-capacity.ko.png)
+*Data Structures with Python 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - Python의 `list`는 배열일까요, 연결 리스트일까요?
 - `append()`는 list가 계속 커져도 왜 대체로 빠를까요?
 - `insert(0, x)`와 중간 삭제는 왜 비쌀까요?
-
-## 큰 그림
-
-![Data Structures with Python 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/02/02-01-capacity.ko.png)
-
-*Data Structures with Python 101 2장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 
@@ -250,7 +248,6 @@ print(mixed)
 ## 정리 및 다음 글 안내
 
 Python `list`는 논리 길이와 예약 capacity를 분리해 관리하는 동적 배열입니다. 그래서 인덱스 접근은 O(1), `append()`는 평균적으로 O(1), 앞 삽입은 원소 이동 때문에 비쌉니다. 다음 글에서는 이 저장 모델 위에 자주 구현되는 스택과 큐를 살펴보겠습니다.
-
 
 
 ## 타입 힌트 기반 동적 배열 구현

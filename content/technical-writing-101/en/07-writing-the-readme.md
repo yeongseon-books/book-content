@@ -28,21 +28,16 @@ A strong README does not try to explain everything. It lowers entry friction. It
 
 This is post 7 in the Technical Writing 101 series. It focuses on designing that five-minute first-run experience.
 
+
+![technical writing 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/07/07-01-concept-at-a-glance.en.png)
+*technical writing 101 chapter 7 flow overview*
+> A README succeeds when a first-time visitor reaches a visible success without leaving the screen.
+
 ## Questions to Keep in Mind
 
 - The *five part* structure?
 - Writing the *Quick Start?
 - Using *badges?
-
-## Big Picture
-
-![technical writing 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/07/07-01-concept-at-a-glance.en.png)
-
-*technical writing 101 chapter 7 flow overview*
-
-This picture places Writing the README inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A README succeeds when a first-time visitor reaches a visible success without leaving the screen.
 
 ## Why It Matters
 

@@ -30,19 +30,15 @@ Here, we will treat secure coding not as a final review step but as a developmen
 
 > Secure coding is not a coating you apply after the feature ships. It is the daily habit of shrinking the attack surface while keeping the system predictable under stress.
 
+
+![secure coding 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/01/01-01-concept-at-a-glance.en.png)
+*secure coding 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What Is Secure Coding??
 - Which signal should the example or diagram make visible for What Is Secure Coding??
 - What failure should be prevented first when What Is Secure Coding? reaches a real system?
-
-## Big Picture
-
-![secure coding 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/01/01-01-concept-at-a-glance.en.png)
-
-*secure coding 101 chapter 1 flow overview*
-
-This picture places What Is Secure Coding? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions This Chapter Answers
 

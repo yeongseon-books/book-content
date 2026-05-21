@@ -30,21 +30,16 @@ This is post 8 in the Portfolio Project 101 series. Here we will turn a project 
 
 > Good technical posts do not paste the whole codebase. They explain why a problem mattered, how it was approached, and what result or lesson came out of it.
 
+
+![portfolio project 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/08/08-01-concept-at-a-glance.en.png)
+*portfolio project 101 chapter 8 flow overview*
+> The experience of building a project is your private asset. When you write it as an essay, it becomes a shareable asset for other developers.
+
 ## Questions to Keep in Mind
 
 - Why does a problem-first structure work better than a code-first structure in technical writing?
 - How should code excerpts and repository links divide responsibility?
 - Why do numbers make a blog post more persuasive?
-
-## Big Picture
-
-![portfolio project 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/08/08-01-concept-at-a-glance.en.png)
-
-*portfolio project 101 chapter 8 flow overview*
-
-This picture places Summarizing as Blog Posts inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> The experience of building a project is your private asset. When you write it as an essay, it becomes a shareable asset for other developers.
 
 ## Why It Matters
 

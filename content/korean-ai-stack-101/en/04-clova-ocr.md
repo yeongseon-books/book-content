@@ -26,19 +26,14 @@ Korean search and RAG pipelines often fail long before retrieval because the sou
 
 This is the fourth post in the Korean AI Stack 101 series. Here, we turn CLOVA OCR responses into line-level text that can safely enter a retrieval corpus.
 
+![Korean AI Stack 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-01-core-flow.en.png)
+*Korean AI Stack 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - When you add OCR, should you inspect text accuracy first, or response structure first?
 - Why do bounding boxes and `lineBreak` hints matter so much in post-processing?
 - Why can you validate most of the OCR pipeline even without a real API key?
-
-## Big Picture
-
-![Korean AI Stack 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-01-core-flow.en.png)
-
-*Korean AI Stack 101 chapter 4 flow overview*
-
-This picture places Document text extraction with CLOVA OCR API inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

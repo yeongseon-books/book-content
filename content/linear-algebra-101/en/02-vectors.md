@@ -26,21 +26,16 @@ In machine learning, one row of data is a vector, an embedding is a vector, and 
 
 This is post 2 in the Linear Algebra 101 series. Here we will read vectors through three lenses at once: coordinates, arrows, and data representations.
 
+
+![linear algebra 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/02/02-01-concept-at-a-glance.en.png)
+*linear algebra 101 chapter 2 flow overview*
+> A vector is both a container of numbers and the smallest unit of direction in a space. You need both views to connect linear algebra to machine learning.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Vectors?
 - Which signal should the example or diagram make visible for Vectors?
 - What failure should be prevented first when Vectors reaches a real system?
-
-## Big Picture
-
-![linear algebra 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/02/02-01-concept-at-a-glance.en.png)
-
-*linear algebra 101 chapter 2 flow overview*
-
-This picture places Vectors inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A vector is both a container of numbers and the smallest unit of direction in a space. You need both views to connect linear algebra to machine learning.
 
 ## Questions This Post Answers
 

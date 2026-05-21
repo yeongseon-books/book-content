@@ -25,17 +25,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 Computer Networks 101 시리즈의 7번째 글입니다.
 
+
+![Computer Networks 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/07/07-01-concept-at-a-glance.ko.png)
+*Computer Networks 101 7장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 라우팅 테이블은 어떻게 읽어야 할까요?
 - default gateway와 longest-prefix match는 어떻게 동작할까요?
 - NAT는 출발지 IP와 포트를 어떻게 바꿀까요?
-
-## 큰 그림
-
-![Computer Networks 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/07/07-01-concept-at-a-glance.ko.png)
-
-*Computer Networks 101 7장 흐름 개요*
 
 ## 왜 중요한가
 

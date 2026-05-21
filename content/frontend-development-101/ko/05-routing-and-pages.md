@@ -26,17 +26,15 @@ last_reviewed: '2026-05-12'
 
 한 화면짜리 앱은 비교적 단순합니다. 하지만 제품이 커지면 홈, 상세, 설정, 검색 결과처럼 여러 화면이 생기고, 사용자는 뒤로 가기와 새로고침과 링크 공유가 모두 자연스럽게 되기를 기대합니다. 이 기대를 만족시키는 핵심이 라우팅입니다.
 
+
+![Frontend Development 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/05/05-01-diagram.ko.png)
+*Frontend Development 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 단일 페이지 앱이 여러 화면을 보여 주는 원리는 무엇일까요?
 - 경로(path)는 컴포넌트와 어떤 식으로 매핑될까요?
 - 중첩 라우트와 동적 파라미터는 왜 필요한가요?
-
-## 큰 그림
-
-![Frontend Development 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/05/05-01-diagram.ko.png)
-
-*Frontend Development 101 5장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -58,7 +56,7 @@ last_reviewed: '2026-05-12'
 
 ## 전통 방식과 현대 방식 비교
 
-**Before (server routing, full reload)**
+**Before (서버 라우팅, 전체 새로고침)**
 
 ```html
 <a href="/about">About</a>
@@ -350,7 +348,6 @@ export default defineConfig({
 ### 실무 연결 포인트
 
 프론트엔드는 더 이상 단순 화면 기술이 아닙니다. API 계약, 번들 최적화, 브라우저 성능, 접근성, 운영 관측이 모두 만나는 실행 계층입니다. 따라서 작은 예제라도 HTML/CSS/JS 코드, 컴포넌트 패턴, 빌드 설정을 한 번에 다뤄 보는 연습이 필요합니다. 이 연습을 반복하면 도구가 바뀌어도 구조를 잃지 않고, 신규 기능을 추가할 때도 안정적으로 확장할 수 있습니다.
-
 
 
 ## 실무 앵커 모음: 프레임워크, 레이아웃, 디버깅, 성능

@@ -25,21 +25,15 @@ Rebuilding an entire index is simple, but it stops scaling surprisingly quickly.
 
 This is the fourth post in the Document Ingestion 101 series. Here, we use file hashes and a small state store to separate added, unchanged, and updated documents.
 
+![Incremental scan and change detection flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/04/04-01-incremental-scan-and-change-detection.en.png)
+*Incremental scan and change detection flow*
+> Incremental indexing is less a vector-store trick and more an operational memory problem.
+
 ## Questions to Keep in Mind
 
 - What cost appears when every small document change rebuilds the full index?
 - Why are content hashes and a state store safer than file timestamps for change detection?
 - How should deleted documents and modified chunks be separated in the index?
-
-## Big Picture
-
-![Incremental scan and change detection flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/04/04-01-incremental-scan-and-change-detection.en.png)
-
-*Incremental scan and change detection flow*
-
-This picture compares current document state with the previous indexing state so only additions, updates, and deletions are processed. Incremental indexing is not just a speed optimization; it is an operational contract that keeps index and source in sync.
-
-> Incremental indexing is less a vector-store trick and more an operational memory problem.
 
 ## Incremental scan and change detection
 

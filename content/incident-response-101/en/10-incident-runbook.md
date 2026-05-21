@@ -28,21 +28,16 @@ A runbook is valuable because it turns those fragments into one executable opera
 
 This is the final post in the Incident Response 101 series. This capstone post shows how to assemble a runbook as code so response logic, templates, ownership, and drill practice evolve together.
 
+
+![incident response 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/10/10-01-diagram-at-a-glance.en.png)
+*incident response 101 chapter 10 flow overview*
+> A runbook is experience written down. The second time you face a problem, you are faster because the first time taught you.
+
 ## Questions to Keep in Mind
 
 - Why does runbook quality show up most clearly at 3 a.m.?
 - How should severity policy connect to on-call ownership and templates?
 - Why is runbooks-as-code better than keeping everything in a wiki?
-
-## Big Picture
-
-![incident response 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/10/10-01-diagram-at-a-glance.en.png)
-
-*incident response 101 chapter 10 flow overview*
-
-This picture places Building an Incident Runbook inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A runbook is experience written down. The second time you face a problem, you are faster because the first time taught you.
 
 ## Why this topic matters
 

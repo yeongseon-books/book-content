@@ -27,19 +27,14 @@ This chapter revisits the hosting-plan decision from an operations angle. When t
 
 This is the sixth post in the Azure Functions 101 series. Here, we turn scaling and cold starts into concrete operational trade-offs.
 
+![azure functions 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/06/06-01-scaling-has-two-axes-instance-count-and.en.png)
+*azure functions 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - What signals does the Functions scale controller use to add instances?
 - Where exactly does cold start happen, and what do you measure to see it?
 - How much cold start does Premium's always-ready instances actually erase?
-
-## Big Picture
-
-![azure functions 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/06/06-01-scaling-has-two-axes-instance-count-and.en.png)
-
-*azure functions 101 chapter 6 flow overview*
-
-This picture places Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Scaling Has Two Axes — Instance Count and In-Instance Concurrency
 

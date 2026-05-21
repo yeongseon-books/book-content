@@ -28,19 +28,14 @@ As soon as a Python project stops fitting in one file, you start importing code 
 
 This is the first post in the Python Package 101 series. Here we define modules, packages, and distributions, trace what `pip install` actually installs, and set the baseline for the rest of the series.
 
+![Python Package 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/01/01-01-mental-model.en.png)
+*Python Package 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What is the difference between a module and a package?
 - What happens when you run `import requests`?
 - What does `pip install` actually install?
-
-## Big Picture
-
-![Python Package 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/01/01-01-mental-model.en.png)
-
-*Python Package 101 chapter 1 flow overview*
-
-This picture places What Is a Python Package? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What you will learn
 

@@ -28,21 +28,16 @@ A good problem statement becomes the project's anchor. Requirements, MVP scope, 
 
 This is post 3 in the Capstone Project 101 series. It separates feature talk from problem definition and shows how to build a problem card with users, assumptions, and metrics.
 
+
+![capstone project 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/03/03-01-the-flow-at-a-glance.en.png)
+*capstone project 101 chapter 3 flow overview*
+> A problem statement earns its clarity by testing against real usage patterns. Good problems narrow toward specific users and specific pain.
+
 ## Questions to Keep in Mind
 
 - Why does an unclear problem statement destabilize the solution?
 - How is a problem definition different from feature description?
 - How much detail do users and assumptions need?
-
-## Big Picture
-
-![capstone project 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/03/03-01-the-flow-at-a-glance.en.png)
-
-*capstone project 101 chapter 3 flow overview*
-
-This picture places Defining the Problem inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A problem statement earns its clarity by testing against real usage patterns. Good problems narrow toward specific users and specific pain.
 
 ## What You Will Learn
 

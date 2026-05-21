@@ -25,21 +25,15 @@ RAG is easier to reason about when you stop treating it as a smarter model and s
 
 This is post 2 in the AI App Patterns 101 series. Here we build the smallest useful RAG Q&A pipeline and walk through how retrieval and generation fit together.
 
+![Offline indexing pipeline](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/02/02-01-offline-indexing-pipeline.en.png)
+*Offline indexing pipeline*
+> RAG is not a model that memorizes answers; it is a pipeline that injects retrieved documents into the prompt before generation.
+
 ## Questions to Keep in Mind
 
 - Why should retrieval results be inspected before judging answer quality in RAG?
 - What failure appears when the model is allowed to answer with weak evidence?
 - Where should chunks and metadata be preserved so answers can return sources?
-
-## Big Picture
-
-![Offline indexing pipeline](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/02/02-01-offline-indexing-pipeline.en.png)
-
-*Offline indexing pipeline*
-
-This picture shows a question turning into retrieved document chunks, which then become evidence for generation. RAG Q&A is safer when the retrieval boundary and evidence quality are inspected before the model call.
-
-> RAG is not a model that memorizes answers; it is a pipeline that injects retrieved documents into the prompt before generation.
 
 ## The two phases of RAG
 

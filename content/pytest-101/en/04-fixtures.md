@@ -30,19 +30,15 @@ This is post 4 in the pytest 101 series.
 
 > pytest fixtures define test data and state as functions, injecting them automatically by parameter name. This article covers fixture creation, scope management, and yield-based teardown.
 
+
+![pytest 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/04/04-01-big-picture.en.png)
+*pytest 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Understanding Fixtures?
 - Which signal should the example or diagram make visible for Understanding Fixtures?
 - What failure should be prevented first when Understanding Fixtures reaches a real system?
-
-## Big Picture
-
-![pytest 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/04/04-01-big-picture.en.png)
-
-*pytest 101 chapter 4 flow overview*
-
-This picture places Understanding Fixtures inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

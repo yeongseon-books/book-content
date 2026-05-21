@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 Backend Development 101 시리즈의 마지막 글입니다. 여기서는 운영 가능한 백엔드가 왜 결국 구조의 문제로 귀결되는지 정리하고, 지금까지 배운 레이어를 하나의 프로젝트에 배치하는 기준을 살펴보겠습니다.
 
+
+![Backend Development 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/10/10-01-concept-at-a-glance.ko.png)
+*Backend Development 101 10장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 지금까지 배운 아홉 개 레이어를 하나의 프로젝트 구조로 어떻게 배치할까요?
 - dev, staging, prod 설정은 어떤 방식으로 나눠야 할까요?
 - observability의 세 기둥은 프로젝트 안에서 어디에 놓일까요?
-
-## 큰 그림
-
-![Backend Development 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/10/10-01-concept-at-a-glance.ko.png)
-
-*Backend Development 101 10장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -482,7 +480,6 @@ services:
 5. 장애 로그만으로 요청 식별자, 사용자 식별자, 실패 경로를 역추적할 수 있는지 확인합니다.
 
 이 기준선을 매 글의 주제에 연결해 두면 학습이 단발성 지식으로 끝나지 않습니다. 라우팅을 배울 때도, 테스트를 배울 때도, 배포를 배울 때도 같은 운영 질문으로 품질을 판별하게 됩니다.
-
 
 
 ### 장애 복구 훈련 시나리오

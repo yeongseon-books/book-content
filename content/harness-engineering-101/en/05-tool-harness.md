@@ -27,21 +27,15 @@ Most production incidents in agent systems are not caused by poetic model failur
 
 This is post 5 in the Harness Engineering 101 series. Here we design tool surfaces that are narrow, honest, and difficult to misuse.
 
+![Tool harness - designing safe tools for agents](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/05/05-01-tool-harness-designing-safe-tools-for-ag.en.png)
+*Tool harness - designing safe tools for agents*
+> The quality of a Tool Harness is shown not by whether the agent can use a tool, but by whether it is hard to use the tool incorrectly.
+
 ## Questions to Keep in Mind
 
 - What surface should a Tool Harness create so the agent can use tools correctly?
 - What operational problems do schema design, idempotency, and actionable errors each reduce?
 - What boundaries are needed when dangerous tools must run inside a sandbox?
-
-## Big Picture
-
-![Tool harness - designing safe tools for agents](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/05/05-01-tool-harness-designing-safe-tools-for-ag.en.png)
-
-*Tool harness - designing safe tools for agents*
-
-This picture shows tool names, schemas, errors, permissions, and sandboxes designed so the agent can choose and call tools safely. A good tool is not just an interface for a smart model; it is a work surface that is hard to misuse.
-
-> The quality of a Tool Harness is shown not by whether the agent can use a tool, but by whether it is hard to use the tool incorrectly.
 
 ## Tools Are an Agent's Hands and Feet
 

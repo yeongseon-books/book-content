@@ -30,21 +30,16 @@ This is the first post in the Math for CS 101 series.
 
 Here we start with the big picture: math in CS is less about memorizing formulas and more about building a language for abstraction, proof, modeling, and analysis.
 
+
+![math for cs 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/01/01-01-concept-at-a-glance.en.png)
+*math for cs 101 chapter 1 flow overview*
+> Math is not a subject about memorizing formulas; it is about building a language for abstraction, proof, modeling, and analysis that spans code, systems, and engineering decisions.
+
 ## Questions to Keep in Mind
 
 - Why do you need math even if you can already write code?
 - How do abstraction, proof, modeling, and analysis show up in day-to-day engineering work?
 - What changes when you can restate a problem mathematically instead of relying on intuition alone?
-
-## Big Picture
-
-![math for cs 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/01/01-01-concept-at-a-glance.en.png)
-
-*math for cs 101 chapter 1 flow overview*
-
-This picture places Why Math for CS inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Math is not a subject about memorizing formulas; it is about building a language for abstraction, proof, modeling, and analysis that spans code, systems, and engineering decisions.
 
 ## Why It Matters
 

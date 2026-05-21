@@ -28,19 +28,15 @@ That makes secret handling a design problem rather than a convenience feature. Y
 
 This is post 9 in the GitHub Actions 101 series. In this post, we will use scope, least privilege, OIDC, and runtime masking to treat secrets as operational resources instead of YAML variables.
 
+
+![github actions 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/09/09-01-concept-at-a-glance.en.png)
+*github actions 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Secret Management?
 - Which signal should the example or diagram make visible for Secret Management?
 - What failure should be prevented first when Secret Management reaches a real system?
-
-## Big Picture
-
-![github actions 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/09/09-01-concept-at-a-glance.en.png)
-
-*github actions 101 chapter 9 flow overview*
-
-This picture places Secret Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

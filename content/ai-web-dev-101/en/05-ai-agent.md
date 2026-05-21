@@ -27,19 +27,15 @@ This is post 5 in the AI Web Development 101 series.
 
 Here, we will focus on tool use, function calling, and the boundary between model judgment and application execution.
 
+
+![AI Web Development 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/05/assistant-vs-agent.en.png)
+*AI Web Development 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - What makes an agent different from a normal chatbot?
 - How does function calling work as a contract?
 - How does the model ask for a function invocation?
-
-## Big Picture
-
-![AI Web Development 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/05/assistant-vs-agent.en.png)
-
-*AI Web Development 101 chapter 5 flow overview*
-
-This picture places First steps with AI agents — making the model use tools inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Chatbot versus agent
 

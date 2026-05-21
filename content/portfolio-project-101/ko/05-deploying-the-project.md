@@ -26,21 +26,16 @@ last_reviewed: '2026-05-15'
 
 이 글은 Portfolio Project 101 시리즈의 5번째 글입니다. 여기서는 포트폴리오 배포를 거대한 인프라 설계가 아니라 공개 URL, 환경 변수 분리, 재배포 가능한 흐름, 상태 확인 경로를 갖추는 일로 보고 정리해 보겠습니다.
 
+
+![Portfolio Project 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/05/05-01-diagram.ko.png)
+*Portfolio Project 101 5장 흐름 개요*
+> 로컬에서만 동작하는 코드는 증거가 아닙니다. 배포되어 모든 사람이 접근할 수 있을 때, 비로소 '끝까지 완성한 프로젝트'로 읽힙니다.
+
 ## 먼저 던지는 질문
 
 - 포트폴리오 프로젝트에서 공개 URL이 왜 필수에 가까울까요?
 - 호스팅 플랫폼은 화려함보다 어떤 기준으로 골라야 할까요?
 - 시크릿과 환경 변수는 왜 코드가 아니라 배포 환경에서 관리해야 할까요?
-
-## 큰 그림
-
-![Portfolio Project 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/05/05-01-diagram.ko.png)
-
-*Portfolio Project 101 5장 흐름 개요*
-
-이 그림에서는 로컬 개발 환경에서 공개 배포까지의 경로를 봅니다. 배포는 개발의 끝이 아니라, 프로젝트를 검증 가능한 상태로 만드는 필수 단계입니다.
-
-> 로컬에서만 동작하는 코드는 증거가 아닙니다. 배포되어 모든 사람이 접근할 수 있을 때, 비로소 '끝까지 완성한 프로젝트'로 읽힙니다.
 
 ## 왜 중요한가
 

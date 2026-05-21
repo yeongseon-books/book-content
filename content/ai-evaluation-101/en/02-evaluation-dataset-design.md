@@ -25,21 +25,16 @@ A good evaluation dataset mirrors production traffic distribution while includin
 
 This is post 2 in the AI Evaluation 101 series. Here we cover the principles for designing a starter eval set of 50-200 examples and how to collect the data.
 
+
+![Designing evaluation datasets](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/02/02-01-designing-evaluation-datasets.en.png)
+*Designing evaluation datasets*
+> An evaluation dataset is not an exam paper for the model; it is a compressed sample of what the product actually meets.
+
 ## Questions to Keep in Mind
 
 - Why should a good evaluation dataset be an operating sample rather than a model exam?
 - How should representative cases and failure cases be mixed to reveal real quality changes?
 - What judgment becomes blurry when the eval set is not version-controlled?
-
-## Big Picture
-
-![Designing evaluation datasets](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/02/02-01-designing-evaluation-datasets.en.png)
-
-*Designing evaluation datasets*
-
-This picture shows production requests, edge cases, and failures being organized into an evaluation dataset. A good eval set measures average quality while also preserving the incidents you do not want to forget.
-
-> An evaluation dataset is not an exam paper for the model; it is a compressed sample of what the product actually meets.
 
 ## What Makes a Good Evaluation Dataset?
 

@@ -29,17 +29,15 @@ last_reviewed: '2026-05-12'
 
 격리성은 켜고 끄는 스위치가 아니라, 안전성과 처리량 사이를 조정하는 다이얼에 가깝습니다. 너무 느슨하면 이상 현상이 남고, 너무 엄격하면 처리량이 급격히 떨어집니다. 이 글에서는 그 다이얼을 어떻게 읽어야 하는지, 그리고 MVCC와 행 잠금이 어떤 역할을 하는지 정리합니다.
 
+
+![Database Systems 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/06/06-01-big-picture.ko.png)
+*Database Systems 101 6장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 고전적인 동시성 이상 현상 네 가지는 무엇일까요?
 - READ UNCOMMITTED, READ COMMITTED, REPEATABLE READ, SERIALIZABLE은 무엇이 다를까요?
 - MVCC는 어떻게 일관된 읽기를 잠금 없이 제공할까요?
-
-## 큰 그림
-
-![Database Systems 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/06/06-01-big-picture.ko.png)
-
-*Database Systems 101 6장 흐름 개요*
 
 ## 이 글에서 배울 내용
 

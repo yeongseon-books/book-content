@@ -31,19 +31,14 @@ This is the 5th article in the Python DB-API 101 series.
 
 *Transactions and isolation levels (sqlite3, PEP 249)*
 
+![python db-api 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-02-mental-model-connection-is-the-transacti.en.png)
+*python db-api 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why does sqlite3 issue an implicit BEGIN by default?
 - What does `isolation_level=None` actually mean?
 - How do `BEGIN DEFERRED`, `IMMEDIATE`, and `EXCLUSIVE` differ in lock behaviour?
-
-## Big Picture
-
-![python db-api 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-02-mental-model-connection-is-the-transacti.en.png)
-
-*python db-api 101 chapter 5 flow overview*
-
-This picture places Transactions and isolation levels (sqlite3, PEP 249) inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What you will learn
 

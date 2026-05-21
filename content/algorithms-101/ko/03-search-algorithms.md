@@ -27,17 +27,15 @@ last_reviewed: '2026-05-12'
 
 정렬된 정수 백만 개가 있을 때, 원하는 값을 찾으려면 처음부터 끝까지 다 봐야 할까요? 여기서는 선형 탐색, 이진 탐색, Python의 `bisect`, 그리고 답 자체를 이진 탐색하는 parametric search까지 다룹니다.
 
+
+![Algorithms 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/03/03-01-big-picture.ko.png)
+*Algorithms 101 3장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 선형 탐색과 이진 탐색의 비용 차이는 얼마나 클까요?
 - 정렬 여부 하나가 왜 알고리즘 계층을 바꿀까요?
 - lower bound와 upper bound는 각각 어디에 쓰일까요?
-
-## 큰 그림
-
-![Algorithms 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/03/03-01-big-picture.ko.png)
-
-*Algorithms 101 3장 흐름 개요*
 
 ## 왜 중요한가
 

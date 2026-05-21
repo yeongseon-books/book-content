@@ -26,21 +26,16 @@ last_reviewed: '2026-05-14'
 
 이 글은 Developer Career 101 시리즈의 5번째 글입니다.
 
+
+![Developer Career 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/05/05-01-concept-at-a-glance.ko.png)
+*Developer Career 101 5장 흐름 개요*
+> 코딩 인터뷰 준비의 핵심은 정답을 외우는 것이 아니라, 제약 조건 속에서 트레이드오프를 인식하고 설명하는 능력을 기르는 것입니다.
+
 ## 먼저 던지는 질문
 
 - 문제를 많이 푸는 것만으로 코딩 인터뷰 준비가 충분하지 않은 이유는 무엇일까요?
 - 자주 나오는 문제 패턴을 어떻게 묶어 공부해야 시간 낭비를 줄일 수 있을까요?
 - 풀이 과정에서 말하기, 복잡도 설명, 시간 관리가 왜 점수에 큰 영향을 줄까요?
-
-## 큰 그림
-
-![Developer Career 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/05/05-01-concept-at-a-glance.ko.png)
-
-*Developer Career 101 5장 흐름 개요*
-
-코딩 인터뷰는 문제 해결 능력뿐 아니라 사고 과정을 드러내는 방식이 평가 대상입니다.
-
-> 코딩 인터뷰 준비의 핵심은 정답을 외우는 것이 아니라, 제약 조건 속에서 트레이드오프를 인식하고 설명하는 능력을 기르는 것입니다.
 
 ## 이 글에서 배울 것
 
@@ -428,7 +423,6 @@ print("Pass")
 ## 실천 메모
 
 이 섹션은 본문의 핵심을 실무 행동으로 전환하기 위한 메모입니다. 이번 주에 바로 실행할 한 가지를 정하고, 실행 결과를 수치 또는 관찰 가능한 문장으로 남기면 다음 회고에서 방향을 빠르게 수정할 수 있습니다. 계획은 길수록 좋은 것이 아니라, 반복 가능한 행동으로 내려올수록 강해집니다.
-
 
 
 ## 면접 준비 주간 운영표

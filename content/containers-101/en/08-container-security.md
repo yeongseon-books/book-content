@@ -31,21 +31,16 @@ In this chapter, we build a practical baseline around non-root users, capability
 
 > Container security improves when defaults get narrower: fewer privileges, fewer writable paths, fewer blind spots.
 
+
+![containers 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/08/08-01-concept-at-a-glance.en.png)
+*containers 101 chapter 8 flow overview*
+> Container security is not one choice but layers: no root, minimal privileges, image scanning, runtime policies, and host isolation — break any layer and risk grows.
+
 ## Questions to Keep in Mind
 
 - What *non-root* means?
 - Capabilities* and *seccomp?
 - Image scanning?
-
-## Big Picture
-
-![containers 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/08/08-01-concept-at-a-glance.en.png)
-
-*containers 101 chapter 8 flow overview*
-
-This picture places Container Security inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Container security is not one choice but layers: no root, minimal privileges, image scanning, runtime policies, and host isolation — break any layer and risk grows.
 
 ## Why It Matters
 

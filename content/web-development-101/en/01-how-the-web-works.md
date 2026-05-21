@@ -27,19 +27,15 @@ When a page loads slowly or fails entirely, the hardest part for a new developer
 
 This is the first post in the Web Development 101 series. Here we build the full URL-to-pixels mental model so later topics like HTML, APIs, authentication, deployment, and caching all fit into one continuous request path.
 
+
+![web development 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/01/01-01-concept-at-a-glance.en.png)
+*web development 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - The full path from URL to pixels on the screen?
 - The role of DNS, HTTP, and the browser renderer?
 - Where the client ends and the server begins?
-
-## Big Picture
-
-![web development 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/01/01-01-concept-at-a-glance.en.png)
-
-*web development 101 chapter 1 flow overview*
-
-This picture places How the Web Works inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

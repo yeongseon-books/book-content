@@ -25,21 +25,15 @@ Long model responses feel slow even when total latency is acceptable. Streaming 
 
 This is the fifth post in the LangChain 101 series. It covers `stream()`, `astream()`, and the practical patterns for delivering partial output to users.
 
+![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/05/05-02-the-flow-at-a-glance.en.png)
+*The flow at a glance*
+> Streaming is not a different chain design; it is a different way of consuming the chain while the model is still generating.
+
 ## Questions to Keep in Mind
 
 - How do `stream()` and `astream()` change user experience and server structure?
 - When collecting chunks, how should empty chunks and mid-stream errors be handled?
 - Where should a FastAPI streaming endpoint handle backpressure and exceptions?
-
-## Big Picture
-
-![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/05/05-02-the-flow-at-a-glance.en.png)
-
-*The flow at a glance*
-
-This picture shows model output moving through the chain as small chunks instead of one final response. Streaming changes not only output timing but also error handling and server boundaries.
-
-> Streaming is not a different chain design; it is a different way of consuming the chain while the model is still generating.
 
 ## Minimal runnable example
 

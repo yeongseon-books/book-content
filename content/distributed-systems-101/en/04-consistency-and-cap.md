@@ -29,19 +29,15 @@ This is post 4 in the Distributed Systems 101 series.
 
 Here we map the consistency spectrum, then use CAP and PACELC to turn a vague tradeoff into a concrete design vocabulary.
 
+
+![distributed systems 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/04/04-01-concept-at-a-glance.en.png)
+*distributed systems 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - The many meanings of consistency (different from the C in transactions)?
 - The spectrum from linearizable to sequential to causal to eventual?
 - The CAP theorem and the misunderstandings around it?
-
-## Big Picture
-
-![distributed systems 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/04/04-01-concept-at-a-glance.en.png)
-
-*distributed systems 101 chapter 4 flow overview*
-
-This picture places Consistency and CAP inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

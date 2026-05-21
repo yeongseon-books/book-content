@@ -28,19 +28,15 @@ That is why cross validation is better understood as an uncertainty tool than as
 
 This is post 8 in the Model Evaluation 101 series. In this post, we use fold-based evaluation to separate stable comparisons from noisy ones and to spot leakage that survives a single split.
 
+
+![model evaluation 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/08/08-01-concept-at-a-glance.en.png)
+*model evaluation 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - The meaning and trade-offs of K-Fold?
 - Why stratified is the default?
 - GroupKFold and time-series splits?
-
-## Big Picture
-
-![model evaluation 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/08/08-01-concept-at-a-glance.en.png)
-
-*model evaluation 101 chapter 8 flow overview*
-
-This picture places Cross Validation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

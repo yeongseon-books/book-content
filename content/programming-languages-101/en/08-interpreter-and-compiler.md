@@ -29,19 +29,15 @@ This is post 8 in the Programming Languages 101 series.
 
 In this post, we will treat interpreters and compilers as two strategies for the same translation problem. We will use Python bytecode as the concrete example, then connect that path to AOT and JIT so the execution model feels like an engineering choice instead of a slogan.
 
+
+![programming languages 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/08/08-01-concept-at-a-glance.en.png)
+*programming languages 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Interpreters and Compilers?
 - Which signal should the example or diagram make visible for Interpreters and Compilers?
 - What failure should be prevented first when Interpreters and Compilers reaches a real system?
-
-## Big Picture
-
-![programming languages 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/08/08-01-concept-at-a-glance.en.png)
-
-*programming languages 101 chapter 8 flow overview*
-
-This picture places Interpreters and Compilers inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions this article answers
 

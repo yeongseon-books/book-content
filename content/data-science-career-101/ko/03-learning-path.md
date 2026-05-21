@@ -31,21 +31,16 @@ last_reviewed: '2026-05-14'
 
 이 글은 Data Science Career 101 시리즈의 세 번째 글입니다.
 
+
+![Data Science Career 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/03/03-01-concept-at-a-glance.ko.png)
+*Data Science Career 101 3장 흐름 개요*
+> 들래짓팅 결정적일수록 다씬 달래 기준은 '1주빠니 산출물을 남드는면 마다 단계나 날아간다'라는 것입니다.
+
 ## 먼저 던지는 질문
 
 - 데이터 직무 입문자는 무엇을 어떤 순서로 배워야 하는지 정리합니다?
 - 12주 로드맵을 기초, 분석, 모델링 단계로 나누는 이유를 설명합니다?
 - 매주 남기는 산출물이 왜 중요한지 짚습니다?
-
-## 큰 그림
-
-![Data Science Career 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/03/03-01-concept-at-a-glance.ko.png)
-
-*Data Science Career 101 3장 흐름 개요*
-
-이 그림은 단순한 12주 약도를 보여줍니다. 기초-분석-모델링 순서로 단계를 밟으면 매주 중면에 중단되나 오른 멈른 실력도 렌여난 꾸나 다승성 상단하기작 맛닙니다.
-
-> 들래짓팅 결정적일수록 다씬 달래 기준은 '1주빠니 산출물을 남드는면 마다 단계나 날아간다'라는 것입니다.
 
 ## 이 글에서 배우는 내용
 

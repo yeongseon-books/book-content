@@ -28,21 +28,16 @@ In probability, the sample space and the event are closer to grammar than to dec
 
 This is post 2 in the Probability 101 series. Here we define sample spaces and events in set language, then use unions, intersections, complements, and independence to show why a careful setup often does half the work for you.
 
+
+![probability 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/02/02-01-concept-at-a-glance.en.png)
+*probability 101 chapter 2 flow overview*
+> Events and Sample Space requires both definition and intuition, learned through concrete examples.
+
 ## Questions to Keep in Mind
 
 - Why the sample space must come before the probability?
 - How events become subsets once the setup is explicit?
 - What union, intersection, and complement mean in practice?
-
-## Big Picture
-
-![probability 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/02/02-01-concept-at-a-glance.en.png)
-
-*probability 101 chapter 2 flow overview*
-
-This picture places Events and Sample Space inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Events and Sample Space requires both definition and intuition, learned through concrete examples.
 
 ## Why It Matters
 

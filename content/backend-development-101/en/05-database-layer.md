@@ -26,19 +26,15 @@ The moment services start writing SQL directly, query duplication and data-acces
 
 This is post 5 in the Backend Development 101 series. Here, we use the repository pattern to separate the database layer and then walk through ORM basics, migrations, transaction boundaries, and the N+1 problem.
 
+
+![backend development 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/05/05-01-concept-at-a-glance.en.png)
+*backend development 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - The role of the repository pattern?
 - Why we use an ORM and where its *traps* live?
 - The flow of transactions, commits, and rollbacks?
-
-## Big Picture
-
-![backend development 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/05/05-01-concept-at-a-glance.en.png)
-
-*backend development 101 chapter 5 flow overview*
-
-This picture places The Database Layer inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

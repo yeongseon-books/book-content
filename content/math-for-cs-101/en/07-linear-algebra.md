@@ -30,21 +30,16 @@ This is post 7 in the Math for CS 101 series.
 
 Here we use linear algebra as a practical language for data, similarity, and transformation.
 
+
+![math for cs 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/07/07-01-concept-at-a-glance.en.png)
+*math for cs 101 chapter 7 flow overview*
+> Vectors and matrices structure data transformations and form the foundation of machine learning, recommender systems, and optimization.
+
 ## Questions to Keep in Mind
 
 - How do vectors and matrices represent data in a useful way?
 - Why is the dot product so central to similarity and scoring?
 - What is the difference between a matrix as a table and a matrix as a transform?
-
-## Big Picture
-
-![math for cs 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/07/07-01-concept-at-a-glance.en.png)
-
-*math for cs 101 chapter 7 flow overview*
-
-This picture places Linear Algebra inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Vectors and matrices structure data transformations and form the foundation of machine learning, recommender systems, and optimization.
 
 ## Why It Matters
 

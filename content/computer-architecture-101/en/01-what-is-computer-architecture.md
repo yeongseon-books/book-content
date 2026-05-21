@@ -31,19 +31,15 @@ last_reviewed: '2026-05-04'
 
 This is the first post in the Computer Architecture 101 series.
 
+
+![computer architecture 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/01/01-01-big-picture.en.png)
+*computer architecture 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What Is Computer Architecture??
 - Which signal should the example or diagram make visible for What Is Computer Architecture??
 - What failure should be prevented first when What Is Computer Architecture? reaches a real system?
-
-## Big Picture
-
-![computer architecture 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/01/01-01-big-picture.en.png)
-
-*computer architecture 101 chapter 1 flow overview*
-
-This picture places What Is Computer Architecture? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

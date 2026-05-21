@@ -24,21 +24,16 @@ last_reviewed: '2026-05-12'
 
 이 글은 DevOps 101 시리즈의 일곱 번째 글입니다.
 
+
+![DevOps 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/07/07-01-diagram.ko.png)
+*DevOps 101 7장 흐름 개요*
+> 모니터링의 핵심은 모든 것을 보는 것이 아니라, 운영팀이 빠르게 행동할 수 있는 신호를 고르는 것입니다.
+
 ## 먼저 던지는 질문
 
 - 모니터링의 세 신호인 로그, 메트릭, 트레이스는 어떻게 역할이 다를까요?
 - Prometheus와 Grafana는 어떤 흐름으로 함께 동작할까요?
 - RED와 USE 같은 메트릭 패턴은 왜 운영에서 자주 언급될까요?
-
-## 큰 그림
-
-![DevOps 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/07/07-01-diagram.ko.png)
-
-*DevOps 101 7장 흐름 개요*
-
-이 그림은 시스템 상태를 지표로 수집하고, 임계값 기준 알림을 보내는 모니터링 흐름을 보여줍니다. 좋은 지표는 문제를 빨리 드러내고, 거짓 알람은 줄입니다.
-
-> 모니터링의 핵심은 모든 것을 보는 것이 아니라, 운영팀이 빠르게 행동할 수 있는 신호를 고르는 것입니다.
 
 ## 왜 중요한가
 
@@ -64,7 +59,7 @@ last_reviewed: '2026-05-12'
 
 ## 전환 전후
 
-**Before (logs only)**
+**Before (로그만 확인)**
 
 ```text
 - During an incident, you *grep -i error*
@@ -74,7 +69,7 @@ last_reviewed: '2026-05-12'
 
 이 상태에서는 문제를 발견하는 주체가 팀이 아니라 고객이 됩니다. 그리고 장애가 나도 현재 상태만 볼 수 있을 뿐, 10분 전부터 어떤 추세가 쌓였는지는 알기 어렵습니다.
 
-**After (metrics + alerts)**
+**After (메트릭 + 알림)**
 
 ```python
 from prometheus_client import Counter, Histogram

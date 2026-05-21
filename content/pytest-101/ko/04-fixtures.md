@@ -26,17 +26,15 @@ last_reviewed: '2026-05-12'
 
 테스트마다 같은 객체 생성 코드가 반복되기 시작하면, 테스트 본문이 무엇을 검증하는지보다 무엇을 준비하는지가 더 눈에 띄게 됩니다. fixture는 이 준비 코드를 밖으로 빼내어 테스트를 더 짧고 명확하게 만들어 줍니다.
 
+
+![pytest 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/04/04-01-big-picture.ko.png)
+*pytest 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - fixture는 일반 함수와 무엇이 다를까요?
 - fixture를 테스트 함수에 어떻게 자동으로 주입할까요?
 - `function`, `module`, `session` scope는 언제 선택해야 할까요?
-
-## 큰 그림
-
-![pytest 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/04/04-01-big-picture.ko.png)
-
-*pytest 101 4장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 
@@ -732,7 +730,6 @@ pytest -q
 ```text
 PASS
 ```
-
 
 
 추가 메모: 테스트는 실행 결과를 남기고, 실패 입력을 재현 가능한 형태로 보존해야 운영에서 같은 문제를 다시 만나지 않습니다. 이 문단은 바이트 기준 보강과 함께 실무 원칙을 다시 고정하기 위한 메모입니다.

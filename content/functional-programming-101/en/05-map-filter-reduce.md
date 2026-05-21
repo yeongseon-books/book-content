@@ -30,19 +30,15 @@ This is post 5 in the Functional Programming 101 series.
 
 > `map`, `filter`, and `reduce` are the three core operations of functional programming. They hide loop details and enable declarative data processing that focuses on "what" rather than "how." This article covers each function's mechanics, Python usage, and comparison with list comprehensions.
 
+
+![Functional Programming 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/05/05-01-big-picture.en.png)
+*Functional Programming 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying map, filter, reduce?
 - Which signal should the example or diagram make visible for map, filter, reduce?
 - What failure should be prevented first when map, filter, reduce reaches a real system?
-
-## Big Picture
-
-![Functional Programming 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/05/05-01-big-picture.en.png)
-
-*Functional Programming 101 chapter 5 flow overview*
-
-This picture places map, filter, reduce inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

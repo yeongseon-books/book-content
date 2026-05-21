@@ -26,17 +26,15 @@ last_reviewed: '2026-05-12'
 
 프론트엔드 코드는 개발할 때는 수십, 수백 개 파일로 흩어져 있습니다. 그런데 사용자의 브라우저는 그 모든 구조를 그대로 이해하지 않습니다. 결국 누군가는 import 그래프를 따라가고, 필요한 코드를 변환하고, 묶고, 쪼개고, 캐시 가능한 형태로 내보내야 합니다. 그 역할을 맡는 것이 빌드 도구입니다.
 
+
+![Frontend Development 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/09/09-01-diagram.ko.png)
+*Frontend Development 101 9장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 번들러는 import 그래프를 따라 어떤 일을 할까요?
 - Vite와 esbuild는 왜 빠르다고 평가될까요?
 - tree shaking과 dead code elimination은 어떤 비용을 줄여 줄까요?
-
-## 큰 그림
-
-![Frontend Development 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/09/09-01-diagram.ko.png)
-
-*Frontend Development 101 9장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -58,7 +56,7 @@ last_reviewed: '2026-05-12'
 
 ## 전통 방식과 현대 방식 비교
 
-**Before (dozens of `<script>` tags)**
+**Before (수십 개 `<script>` 태그)**
 
 ```html
 <script src="utils.js"></script>
@@ -66,7 +64,7 @@ last_reviewed: '2026-05-12'
 <script src="app.js"></script>
 ```
 
-**After (one `<script>` plus automatic split)**
+**After (`<script>` 하나 + 자동 분할)**
 
 ```html
 <script type="module" src="/dist/index-[hash].js"></script>
@@ -350,7 +348,6 @@ export default defineConfig({
 ### 실무 연결 포인트
 
 프론트엔드는 더 이상 단순 화면 기술이 아닙니다. API 계약, 번들 최적화, 브라우저 성능, 접근성, 운영 관측이 모두 만나는 실행 계층입니다. 따라서 작은 예제라도 HTML/CSS/JS 코드, 컴포넌트 패턴, 빌드 설정을 한 번에 다뤄 보는 연습이 필요합니다. 이 연습을 반복하면 도구가 바뀌어도 구조를 잃지 않고, 신규 기능을 추가할 때도 안정적으로 확장할 수 있습니다.
-
 
 
 ## 실무 앵커 모음: 프레임워크, 레이아웃, 디버깅, 성능

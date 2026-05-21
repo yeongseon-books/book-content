@@ -25,17 +25,15 @@ last_reviewed: '2026-05-12'
 
 이 글은 Discrete Math 101 시리즈의 6번째 글입니다.
 
+
+![Discrete Math 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/06/06-01-big-picture.ko.png)
+*Discrete Math 101 6장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 수열과 닫힌 형식은 어떻게 연결될까요?
 - 점화식은 어떤 수학적 표기인가요?
 - 치환법과 재귀 트리법은 언제 유용할까요?
-
-## 큰 그림
-
-![Discrete Math 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/06/06-01-big-picture.ko.png)
-
-*Discrete Math 101 6장 흐름 개요*
 
 ## 왜 중요한가
 

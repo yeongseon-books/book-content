@@ -28,21 +28,16 @@ This is post 3 in the Open Source 101 series.
 
 Here, we will treat a GitHub issue not as a generic to-do item, but as a shared record of problem definition, reproduction evidence, and team agreement.
 
+
+![open source 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/03/03-01-fix-the-reading-order-first.en.png)
+*open source 101 chapter 3 flow overview*
+> Issues are where the project's public thoughts happen. Learning to read issues well teaches you how real teams work.
+
 ## Questions to Keep in Mind
 
 - Why do contributions drift when you judge an issue by the title alone?
 - What roles do labels, reproduction steps, assignees, and comment threads each play?
 - When is a `good first issue` still a poor first contribution choice?
-
-## Big Picture
-
-![open source 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/03/03-01-fix-the-reading-order-first.en.png)
-
-*open source 101 chapter 3 flow overview*
-
-This picture places Reading Issues inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Issues are where the project's public thoughts happen. Learning to read issues well teaches you how real teams work.
 
 ## Why It Matters
 

@@ -28,19 +28,15 @@ Every repository eventually reaches the point where the code alone is not enough
 
 This is the ninth post in the Git & GitHub 101 series. Here, we look at message structure, Conventional Commits, and the habits that keep `git log` useful.
 
+
+![Git & GitHub 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/09/09-01-mental-model.en.png)
+*Git & GitHub 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why a good commit message is an asset that pays off as much as the code itself?
 - How to structure a commit message with a subject, body, and footer?
 - How Conventional Commits (`feat`, `fix`, `docs`, etc.) signal the kind of change at a glance?
-
-## Big Picture
-
-![Git & GitHub 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/09/09-01-mental-model.en.png)
-
-*Git & GitHub 101 chapter 9 flow overview*
-
-This picture places Writing Good Commit Messages: Conventional Commits and Useful Bodies inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

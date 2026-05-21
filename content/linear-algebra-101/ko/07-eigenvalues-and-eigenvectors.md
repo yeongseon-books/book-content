@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 고유값과 고유벡터를 변환의 자연스러운 축이라는 관점으로 읽어 보겠습니다.
 
+
+![Linear Algebra 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/07/07-01-concept-at-a-glance.ko.png)
+*Linear Algebra 101 7장 흐름 개요*
+> 고유값과 고유벡터는 선형변환의 본질입니다. 고유벡터는 변환 후에도 방향이 같고, 고유값은 그 방향에서의 확대율입니다.
+
 ## 먼저 던지는 질문
 
 - 행렬을 반복해서 적용할 때 왜 어떤 방향은 유지될까요?
 - 고유벡터와 고유값은 각각 무엇을 뜻할까요?
 - 대칭행렬에서 결과가 특히 깔끔해지는 이유는 무엇일까요?
-
-## 큰 그림
-
-![Linear Algebra 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/07/07-01-concept-at-a-glance.ko.png)
-
-*Linear Algebra 101 7장 흐름 개요*
-
-고유값과 고유벡터는 선형변환에서 가장 중요한 불변량입니다. 고유벡터는 방향이 바뀌지 않는 벡터이고, 고유값은 그 방향에서 벡터가 얼마나 확대되는지 보여줍니다.
-
-> 고유값과 고유벡터는 선형변환의 본질입니다. 고유벡터는 변환 후에도 방향이 같고, 고유값은 그 방향에서의 확대율입니다.
 
 ## 왜 중요한가
 

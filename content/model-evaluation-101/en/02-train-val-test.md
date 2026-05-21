@@ -28,19 +28,15 @@ That is why train, validation, and test are not textbook ceremony. They are a di
 
 This is post 2 in the Model Evaluation 101 series. In this post, we define what each split is allowed to do and where leakage usually sneaks in.
 
+
+![model evaluation 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/02/02-01-concept-at-a-glance.en.png)
+*model evaluation 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - The role of each dataset?
 - Different forms of data leakage?
 - Principles for splitting time-series data?
-
-## Big Picture
-
-![model evaluation 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/02/02-01-concept-at-a-glance.en.png)
-
-*model evaluation 101 chapter 2 flow overview*
-
-This picture places Train, Validation, and Test inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

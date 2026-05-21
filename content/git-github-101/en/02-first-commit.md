@@ -28,19 +28,15 @@ The first commit is where Git stops being abstract. Once you walk one change all
 
 This is the second post in the Git & GitHub 101 series. Here, we go through the full init -> add -> commit cycle by hand.
 
+
+![Git & GitHub 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/02/02-01-mental-model.en.png)
+*Git & GitHub 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - How to create an empty repository with `git init`?
 - How to read your current state with `git status`?
 - What `git add` actually means when it stages a change?
-
-## Big Picture
-
-![Git & GitHub 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/02/02-01-mental-model.en.png)
-
-*Git & GitHub 101 chapter 2 flow overview*
-
-This picture places Your first commit - init, status, add, commit inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

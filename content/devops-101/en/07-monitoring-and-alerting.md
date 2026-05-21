@@ -28,21 +28,16 @@ Good monitoring shortens two loops at once: how quickly you notice trouble and h
 
 This is post 7 in the DevOps 101 series. In this chapter, we build the operational view around Prometheus, Grafana, RED metrics, and alerts that actually deserve to wake someone up.
 
+
+![devops 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/07/07-01-concept-at-a-glance.en.png)
+*devops 101 chapter 7 flow overview*
+> Effective monitoring *doesn't show everything*—it surfaces *the few signals* that let the team *act decisively*.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Monitoring and Alerting?
 - Which signal should the example or diagram make visible for Monitoring and Alerting?
 - What failure should be prevented first when Monitoring and Alerting reaches a real system?
-
-## Big Picture
-
-![devops 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/07/07-01-concept-at-a-glance.en.png)
-
-*devops 101 chapter 7 flow overview*
-
-This picture places Monitoring and Alerting inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Effective monitoring *doesn't show everything*—it surfaces *the few signals* that let the team *act decisively*.
 
 ## Questions this article answers
 

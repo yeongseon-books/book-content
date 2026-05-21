@@ -28,19 +28,15 @@ Toil matters because it quietly taxes improvement. The more time a team spends r
 
 This is post 8 in the SRE 101 series. Here we define toil in operational terms, measure its cost, rank automation candidates, and decide where automation actually pays back.
 
+
+![sre 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/08/08-01-concept-at-a-glance.en.png)
+*sre 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - What separates toil from valuable operational work that still takes time?
 - How can a team measure how much capacity is disappearing into repetitive work?
 - Which automation candidates should move first if time is limited?
-
-## Big Picture
-
-![sre 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/08/08-01-concept-at-a-glance.en.png)
-
-*sre 101 chapter 8 flow overview*
-
-This picture places Reducing Toil inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this topic matters
 

@@ -30,21 +30,15 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 이제 호스트가 언어 런타임을 실제 워커 프로세스로 구체화하는 경로를 소스 기준으로 고정하겠습니다.
 
+![Azure Functions Deep Dive 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/02/02-01-one-level-up-workerconfigfactory.ko.png)
+*Azure Functions Deep Dive 2장 흐름 개요*
+> Worker 프로세스 — 한 호스트에서 여러 언어 런타임이 같이 사는 법의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - 워커 프로세스 모델은 언어마다 어떻게 다르며, 운영적으로 무엇을 뜻할까요?
 - 워커는 상태가 없다고 봐야 할까요, 아니면 인프로세스 상태를 어느 정도 믿어도 될까요?
 - 워커가 OOM이나 hang에 빠지면 호스트는 어떤 신호로 그것을 감지할까요?
-
-## 큰 그림
-
-![Azure Functions Deep Dive 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/02/02-01-one-level-up-workerconfigfactory.ko.png)
-
-*Azure Functions Deep Dive 2장 흐름 개요*
-
-이 그림에서는 Worker 프로세스 — 한 호스트에서 여러 언어 런타임이 같이 사는 법를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> Worker 프로세스 — 한 호스트에서 여러 언어 런타임이 같이 사는 법의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

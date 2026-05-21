@@ -32,19 +32,14 @@ This is the 3rd article in the Python DB-API 101 series.
 
 *execute, executemany, and fetch patterns*
 
+![python db-api 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/03/03-02-1-execute-one-statement-at-a-time.en.png)
+*python db-api 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - When do you reach for execute, executemany, fetchone, fetchall, vs fetchmany?
 - How do you process large result sets without blowing up memory?
 - What metadata does cursor.description expose?
-
-## Big Picture
-
-![python db-api 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/03/03-02-1-execute-one-statement-at-a-time.en.png)
-
-*python db-api 101 chapter 3 flow overview*
-
-This picture places execute, executemany, and Fetch Patterns inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## 1. execute - one statement at a time
 

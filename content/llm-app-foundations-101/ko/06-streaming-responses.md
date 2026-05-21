@@ -29,19 +29,14 @@ LLM 애플리케이션을 느리게 만드는 가장 쉬운 방법 중 하나는
 
 여기서는 스트리밍을 성능 트릭이 아니라 사용자에게 생성 과정을 드러내는 응답 전달 방식으로 보고, Groq SDK 기준의 기본 패턴을 정리하겠습니다.
 
+![스트리밍 응답의 전체 이벤트 흐름](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-01-handling-streaming-responses-real-time-o.ko.png)
+*스트리밍 응답의 전체 이벤트 흐름*
+
 ## 먼저 던지는 질문
 
 - streaming은 응답을 더 빨리 끝내는 기술일까요, 생성 흐름을 먼저 보여주는 기술일까요?
 - chunk에서 텍스트, 종료 신호, 사용량을 어떻게 읽어야 할까요?
 - FastAPI 같은 서버는 모델 스트림을 사용자에게 어떻게 중계할까요?
-
-## 큰 그림
-
-![스트리밍 응답의 전체 이벤트 흐름](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-01-handling-streaming-responses-real-time-o.ko.png)
-
-*스트리밍 응답의 전체 이벤트 흐름*
-
-이 그림에서는 완성된 응답 하나가 아니라 생성 중인 이벤트가 연속해서 도착하는 흐름을 봅니다. 스트리밍은 대기 시간을 없애는 기술이 아니라, 기다리는 동안 진행 상황을 보여 주는 인터페이스입니다.
 
 ## 왜 이 글이 중요한가
 

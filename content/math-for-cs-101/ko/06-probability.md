@@ -30,20 +30,16 @@ title: "Math for CS 101 (6/10): 확률"
 
 여기서는 확률을 숫자 놀음이 아니라, 불확실성을 설명하는 언어로 보고 표본공간, 조건부 확률, 베이즈 정리, 기댓값, 분산을 차근차근 연결해 보겠습니다.
 
+
+![Math for CS 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/06/06-01-concept-at-a-glance.ko.png)
+*Math for CS 101 6장 흐름 개요*
+> 확률은 불확실성을 감으로 다루는 대신, 기댓값과 분포로 정량적 의사결정을 가능하게 합니다.
+
 ## 먼저 던지는 질문
 
 - 불확실성을 감으로 넘기지 않고 어떻게 수치로 다룰까요?
 - 표본공간과 사건은 무엇이 다를까요?
 - 조건부 확률은 왜 문맥을 붙인 확률이라고 할 수 있을까요?
-
-## 큰 그림
-
-![Math for CS 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/06/06-01-concept-at-a-glance.ko.png)
-
-*Math for CS 101 6장 흐름 개요*
-이 그림은 불확실성을 수치로 다루는 확률의 기초와, 조건부 확률이 실제 판단에 미치는 영향을 보여줍니다.
-
-> 확률은 불확실성을 감으로 다루는 대신, 기댓값과 분포로 정량적 의사결정을 가능하게 합니다.
 
 ## 왜 중요한가
 

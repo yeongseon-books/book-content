@@ -29,19 +29,15 @@ This is post 6 in the Distributed Systems 101 series.
 
 Here we use Raft to make the consensus problem concrete: terms, logs, quorums, and the exact point where a value becomes durable enough to trust.
 
+
+![distributed systems 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/06/06-01-concept-at-a-glance.en.png)
+*distributed systems 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - The definition of the consensus problem and its safety/liveness properties?
 - The three roles in Raft (leader, follower, candidate)?
 - The meaning of term, log, index, and commit?
-
-## Big Picture
-
-![distributed systems 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/06/06-01-concept-at-a-glance.en.png)
-
-*distributed systems 101 chapter 6 flow overview*
-
-This picture places Consensus and Raft inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

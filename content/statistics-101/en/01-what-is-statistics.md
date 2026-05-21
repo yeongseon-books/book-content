@@ -28,21 +28,16 @@ Statistics is the tool that closes that gap. It is not just a way to format numb
 
 This is the first post in the Statistics 101 series. Here we will split statistics into its two major branches—descriptive and inferential statistics—and build the basic flow that connects data to a decision.
 
+
+![statistics 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/01/01-01-concept-at-a-glance.en.png)
+*statistics 101 chapter 1 flow overview*
+> Statistics is the bridge between data and decisions — making decisions that are *less uncertain*.
+
 ## Questions to Keep in Mind
 
 - What does statistics actually study?
 - How are descriptive statistics and inferential statistics different?
 - How does statistics connect numbers to decision-making?
-
-## Big Picture
-
-![statistics 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/01/01-01-concept-at-a-glance.en.png)
-
-*statistics 101 chapter 1 flow overview*
-
-This picture places What Is Statistics? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Statistics is the bridge between data and decisions — making decisions that are *less uncertain*.
 
 ## Why It Matters
 

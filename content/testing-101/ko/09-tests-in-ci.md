@@ -30,21 +30,16 @@ last_reviewed: '2026-05-12'
 
 이 글은 Testing 101 시리즈의 아홉 번째 글입니다. 여기서는 CI의 목적, GitHub Actions 워크플로의 기본 구조, 매트릭스와 캐시로 속도를 줄이는 방법, 그리고 테스트 결과를 팀 공통 신호로 운영하는 감각을 정리하겠습니다.
 
+
+![Testing 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/09/09-01-diagram.ko.png)
+*Testing 101 9장 흐름 개요*
+> CI 없는 테스트는 개발자의 책임이지만, CI가 있는 테스트는 팀의 안전망이 됩니다.
+
 ## 먼저 던지는 질문
 
 - CI는 왜 필요한 공통 검증 장치일까요?
 - GitHub Actions 워크플로는 어떤 구조로 작성할까요?
 - 파이썬 버전 매트릭스와 캐시는 언제 도움이 될까요?
-
-## 큰 그림
-
-![Testing 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/09/09-01-diagram.ko.png)
-
-*Testing 101 9장 흐름 개요*
-
-이 그림에서는 개발자의 로컬 머신에서가 아니라 중립적인 CI 환경에서 모든 테스트가 실행되는 과정을 보여줍니다. 머지 전에 팀 기준이 지켜지는지 자동으로 검증합니다.
-
-> CI 없는 테스트는 개발자의 책임이지만, CI가 있는 테스트는 팀의 안전망이 됩니다.
 
 ## 왜 중요한가
 

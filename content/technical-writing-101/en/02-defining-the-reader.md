@@ -28,21 +28,16 @@ Once the reader is blurry, everything else drifts with it: how much background t
 
 This is post 2 in the Technical Writing 101 series. Here we turn the reader into a working model with persona, prior knowledge, goal, and non-goal.
 
+
+![technical writing 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/02/02-01-concept-at-a-glance.en.png)
+*technical writing 101 chapter 2 flow overview*
+> When the reader is blurry, everything else—depth, vocabulary, scope—drifts with it.
+
 ## Questions to Keep in Mind
 
 - Building a *persona?
 - Mapping *prior knowledge?
 - Aligning the *goal?
-
-## Big Picture
-
-![technical writing 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/02/02-01-concept-at-a-glance.en.png)
-
-*technical writing 101 chapter 2 flow overview*
-
-This picture places Defining the Reader inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> When the reader is blurry, everything else—depth, vocabulary, scope—drifts with it.
 
 ## Why It Matters
 

@@ -28,21 +28,16 @@ This is post 7 in the Open Source 101 series.
 
 Here, we will focus on the practical basics of community management: code of conduct, contribution guide, discussion spaces, response expectations, and visible welcome habits.
 
+
+![open source 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/07/07-01-the-smallest-structure-that-still-works.en.png)
+*open source 101 chapter 7 flow overview*
+> Community happens when people feel safe, know the rules, and trust that maintainers listen.
+
 ## Questions to Keep in Mind
 
 - Why does a project need a code of conduct?
 - What does a contribution guide do beyond listing steps?
 - Why is it useful to separate issues from general discussion?
-
-## Big Picture
-
-![open source 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/07/07-01-the-smallest-structure-that-still-works.en.png)
-
-*open source 101 chapter 7 flow overview*
-
-This picture places Community Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Community happens when people feel safe, know the rules, and trust that maintainers listen.
 
 ## Why It Matters
 

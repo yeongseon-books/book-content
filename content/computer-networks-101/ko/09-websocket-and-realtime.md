@@ -25,17 +25,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 Computer Networks 101 시리즈의 9번째 글입니다.
 
+
+![Computer Networks 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/09/09-01-concept-at-a-glance.ko.png)
+*Computer Networks 101 9장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - WebSocket 연결은 HTTP에서 어떻게 업그레이드될까요?
 - WebSocket, SSE, long-polling 중 언제 무엇을 골라야 할까요?
 - ping/pong, 재연결, backpressure는 왜 운영의 핵심일까요?
-
-## 큰 그림
-
-![Computer Networks 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/09/09-01-concept-at-a-glance.ko.png)
-
-*Computer Networks 101 9장 흐름 개요*
 
 ## 왜 중요한가
 

@@ -28,21 +28,16 @@ That is why WHERE deserves more attention than its short syntax suggests. It dec
 
 This is post 3 in the SQL 101 series. Here we treat WHERE as the gate that controls both accuracy and performance.
 
+
+![sql 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/03/03-01-where-evaluation-flow.en.png)
+*sql 101 chapter 3 flow overview*
+> WHERE determines which rows even make it into the result. Getting the logic right is non-negotiable; getting the performance is about knowing when the database can use an index.
+
 ## Questions to Keep in Mind
 
 - How should you read comparison operators and predicates?
 - Why do AND and OR precedence mistakes keep showing up in production?
 - When do IN, BETWEEN, and LIKE fit best?
-
-## Big Picture
-
-![sql 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/03/03-01-where-evaluation-flow.en.png)
-
-*sql 101 chapter 3 flow overview*
-
-WHERE filters rows based on conditions. The correctness of those conditions and whether an index can speed them up makes the difference between a fast query and a slow one.
-
-> WHERE determines which rows even make it into the result. Getting the logic right is non-negotiable; getting the performance is about knowing when the database can use an index.
 
 ## Why It Matters
 

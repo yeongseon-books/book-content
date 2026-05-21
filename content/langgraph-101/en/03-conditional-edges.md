@@ -31,21 +31,15 @@ This is the third article in the LangGraph 101 series. Here I want to frame cond
 
 Once that perspective is clear, the next chapter on tool-calling agents becomes much easier to read. Tool loops are still just “look at the current state, then choose the next behavior.” If branching stays mentally downgraded to a small runtime `if`, fallback routes, loop termination, and observability never feel as central as they actually are.
 
+![Three way branch from classify node](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/03/03-01-minimal-runnable-example.en.png)
+*Three way branch from classify node*
+> A conditional edge is not prettier branching syntax; it is the routing contract that explains why the graph took a path.
+
 ## Questions to Keep in Mind
 
 - How does a conditional edge control graph execution differently from an ordinary if statement?
 - What failure appears when the routing function returns an unexpected value?
 - What debugging becomes easier when the default route is explicit in code?
-
-## Big Picture
-
-![Three way branch from classify node](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/03/03-01-minimal-runnable-example.en.png)
-
-*Three way branch from classify node*
-
-This picture shows a routing function reading state, choosing the next node, and changing the execution path through an edge. A conditional edge turns the decision after model output into an explicit routing contract.
-
-> A conditional edge is not prettier branching syntax; it is the routing contract that explains why the graph took a path.
 
 ## Why this structure matters
 

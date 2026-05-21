@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 이 글은 Probability 101 시리즈의 8번째 글입니다. 여기서는 균등분포, 정규분포, 지수분포, 감마분포를 중심으로 연속분포의 기본 직관과 실무적 해석 포인트를 정리하겠습니다.
 
+
+![Probability 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/08/08-01-diagram.ko.png)
+*Probability 101 8장 흐름 개요*
+> 연속분포은 구체적인 가정과 한계를 함께 봐야 합니다.
+
 ## 먼저 던지는 질문
 
 - 연속형 값을 확률적으로 모델링한다는 말은 무엇일까요?
 - 확률밀도함수는 왜 확률처럼 보이지만 확률이 아닐까요?
 - 균등, 정규, 지수, 감마분포는 각각 어떤 상황에서 쓰일까요?
-
-## 큰 그림
-
-![Probability 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/08/08-01-diagram.ko.png)
-
-*Probability 101 8장 흐름 개요*
-
-이 그림은 이 개념의 기본 구조를 보여줍니다.
-
-> 연속분포은 구체적인 가정과 한계를 함께 봐야 합니다.
 
 ## 왜 중요한가
 

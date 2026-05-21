@@ -31,19 +31,15 @@ In this post, we connect the open/closed principle with expand-contract and feat
 
 > The safest evolution path is usually: expand, compare, migrate, and only then clean up.
 
+
+![software design 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/08/08-01-concept-at-a-glance.en.png)
+*software design 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Reducing Change Impact?
 - Which signal should the example or diagram make visible for Reducing Change Impact?
 - What failure should be prevented first when Reducing Change Impact reaches a real system?
-
-## Big Picture
-
-![software design 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/08/08-01-concept-at-a-glance.en.png)
-
-*software design 101 chapter 8 flow overview*
-
-This picture places Reducing Change Impact inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

@@ -29,21 +29,16 @@ This is post 9 in the API Design 101 series.
 
 Here, we treat versioning as change-management discipline rather than just `/v1` syntax. First define what counts as breaking. Then choose how URLs, headers, deprecation notices, and sunset timelines make that policy visible.
 
+
+![api design 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/09/09-01-concept-at-a-glance.en.png)
+*api design 101 chapter 9 flow overview*
+> API versioning is not admitting defeat — it is the contract recognizing that both client and server evolve, and building compatibility into that evolution from the start.
+
 ## Questions to Keep in Mind
 
 - Distinguishing breaking from non-breaking changes?
 - URL versioning vs header versioning?
 - Compatibility policy (semver, calver)?
-
-## Big Picture
-
-![api design 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/09/09-01-concept-at-a-glance.en.png)
-
-*api design 101 chapter 9 flow overview*
-
-The diagram shows multiple API versions coexisting: v1 and v2 run in parallel so old clients stay on v1 while new clients migrate to v2 at their own pace; sunset dates let outdated versions retire gracefully.
-
-> API versioning is not admitting defeat — it is the contract recognizing that both client and server evolve, and building compatibility into that evolution from the start.
 
 ## Why It Matters
 

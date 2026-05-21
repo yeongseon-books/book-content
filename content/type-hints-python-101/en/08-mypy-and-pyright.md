@@ -27,19 +27,15 @@ Writing type hints is only half the job. If nobody runs a checker, a wrong retur
 
 This is post 8 in the Type Hints in Python 101 series. In this article, we will follow one small repository from broken code to mypy output, pyright output, stricter configuration, and finally a CI gate so the same workflow stays enforceable after the first local fix.
 
+
+![Type Hints in Python 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/08/08-01-concept-at-a-glance.en.png)
+*Type Hints in Python 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Using mypy and pyright?
 - Which signal should the example or diagram make visible for Using mypy and pyright?
 - What failure should be prevented first when Using mypy and pyright reaches a real system?
-
-## Big Picture
-
-![Type Hints in Python 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/08/08-01-concept-at-a-glance.en.png)
-
-*Type Hints in Python 101 chapter 8 flow overview*
-
-This picture places Using mypy and pyright inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

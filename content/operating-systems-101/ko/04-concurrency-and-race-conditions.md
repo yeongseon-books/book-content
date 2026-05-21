@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 Operating Systems 101 시리즈의 4번째 글입니다.
 
+
+![Operating Systems 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/04/04-01-how-one-increment-gets-lost.ko.png)
+*Operating Systems 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 경쟁 상태는 정확히 언제 발생한다고 말할 수 있을까요?
 - 원자성, 가시성, 순서성은 어떤 식으로 서로 다른 실패를 만들까요?
 - 왜 "한 줄짜리 코드"도 안전하다고 볼 수 없을까요?
-
-## 큰 그림
-
-![Operating Systems 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/04/04-01-how-one-increment-gets-lost.ko.png)
-
-*Operating Systems 101 4장 흐름 개요*
 
 ## 기본 모델
 > 두 스레드가 같은 변수에 동시에 접근하면, OS의 스케줄러가 임의의 시점에 흐름을 끊을 수 있습니다. 그 결과 한 작업의 중간 단계가 다른 작업의 단계와 섞여 실행되고, 최종 상태는 우리가 의도한 것과 다를 수 있습니다.

@@ -31,21 +31,16 @@ Hallucination이라는 말은 너무 넓게 쓰여서 운영 설계를 어렵게
 
 이 글에서는 claim 추출, NLI entailment, judge 보강, citation 형식 강제, 회귀 지표를 묶어 grounding 검증 구조를 설명합니다.
 
+
+![Hallucination guardrail의 핵심: 답변을 주장 단위로 분해해 근거와 대조](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/07/07-01-hallucination-guardrail.ko.png)
+*Hallucination guardrail의 핵심: 답변을 주장 단위로 분해해 근거와 대조*
+> Hallucination을 줄이려면 답변을 문장 덩어리가 아니라 검증 가능한 주장 집합으로 봐야 합니다.
+
 ## 먼저 던지는 질문
 
 - Hallucination guardrail은 왜 답변 전체가 아니라 주장 단위로 봐야 할까요?
 - claim extraction, entailment check, citation format은 각각 무엇을 검증할까요?
 - 근거가 부족한 답변은 차단, 수정, 보류 중 어디로 보내야 할까요?
-
-## 큰 그림
-
-![Hallucination guardrail의 핵심: 답변을 주장 단위로 분해해 근거와 대조](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/07/07-01-hallucination-guardrail.ko.png)
-
-*Hallucination guardrail의 핵심: 답변을 주장 단위로 분해해 근거와 대조*
-
-이 그림에서는 답변을 주장 단위로 분해하고 각 주장을 근거와 대조해 통과 여부를 판단하는 흐름을 봅니다. Hallucination guardrail은 답변의 말투가 아니라 주장과 근거의 관계를 검증해야 합니다.
-
-> Hallucination을 줄이려면 답변을 문장 덩어리가 아니라 검증 가능한 주장 집합으로 봐야 합니다.
 
 ## 왜 이 글이 중요한가
 

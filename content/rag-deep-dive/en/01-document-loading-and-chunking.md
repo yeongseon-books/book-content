@@ -24,23 +24,16 @@ PyPDFLoader and RecursiveCharacterTextSplitter decide where a document becomes r
 
 This is the first post in the RAG Deep Dive series.
 
+![Loader metadata flow into documents](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/01/01-01-loader-metadata-flow.en.png)
+*Loader metadata flow into documents*
+> Chunking is not just slicing text smaller. It is freezing the semantic boundary you hope retrieval can recover later.
+
 ## Questions to Keep in Mind
 
 - Before similarity search starts, why do loader and splitter boundaries control retrieval quality?
 - How do Character, Recursive, and Token splitters cut the same text differently?
 - When `chunk_overlap` looks less exact than configured, where should you inspect first?
 
-## Big Picture
-
-![Loader metadata flow into documents](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/01/01-01-loader-metadata-flow.en.png)
-
-*Loader metadata flow into documents*
-
-This picture follows a loader turning source text and metadata into Documents, then a splitter freezing the boundaries retrieval will later recover. RAG quality is shaped heavily at this document-boundary stage, before the vector index is involved.
-
-> Chunking is not just slicing text smaller. It is freezing the semantic boundary you hope retrieval can recover later.
-
-<!-- a-grade-example:begin -->
 ## Minimal runnable example
 
 Example file: `en/01-document-loading-and-chunking/main.py`

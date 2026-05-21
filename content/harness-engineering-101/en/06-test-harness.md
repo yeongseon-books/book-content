@@ -27,21 +27,15 @@ That is why “the agent says it is done” is not evidence. Completion must be 
 
 This is post 6 in the Harness Engineering 101 series. Here we turn completion criteria into repeatable unit, integration, and eval checks.
 
+![Test harness - turning completion criteria into tests](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/06/06-01-test-harness-turning-completion-criteria.en.png)
+*Test harness - turning completion criteria into tests*
+> A Test Harness matters less because the agent passed once, and more because it proves future changes still meet the same criteria.
+
 ## Questions to Keep in Mind
 
 - What should a Test Harness turn natural-language completion promises into?
 - What agent failures do unit, trajectory, and end-to-end tests each catch?
 - How should eval datasets and regression checks connect before production?
-
-## Big Picture
-
-![Test harness - turning completion criteria into tests](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/06/06-01-test-harness-turning-completion-criteria.en.png)
-
-*Test harness - turning completion criteria into tests*
-
-This picture shows completion criteria becoming tests, eval datasets, and regression checks. A Test Harness turns “it seems to work” into executable evidence that makes agent changes safer.
-
-> A Test Harness matters less because the agent passed once, and more because it proves future changes still meet the same criteria.
 
 ## "It Works" Is Not Evidence
 

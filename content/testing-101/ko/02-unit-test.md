@@ -30,21 +30,16 @@ last_reviewed: '2026-05-12'
 
 이 글은 Testing 101 시리즈의 두 번째 글입니다. 여기서는 단위 테스트의 범위, AAA 패턴, `pytest`의 기본 작성법, 그리고 좋은 단위 테스트가 갖춰야 할 조건을 정리하겠습니다.
 
+
+![Testing 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/02/02-01-diagram.ko.png)
+*Testing 101 2장 흐름 개요*
+> 단위 테스트는 한 가지 동작만 검증하고, 같은 동작을 여러 번 실행해도 같은 결과가 나와야 합니다.
+
 ## 먼저 던지는 질문
 
 - 단위 테스트는 정확히 어디까지를 검증할까요?
 - AAA 패턴은 왜 많이 쓰일까요?
 - `pytest`의 fixture와 parametrize는 언제 도움이 될까요?
-
-## 큰 그림
-
-![Testing 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/02/02-01-diagram.ko.png)
-
-*Testing 101 2장 흐름 개요*
-
-이 그림에서는 단위 테스트가 가장 작은 단위로서 가장 빠른 피드백을 주는 이유와, 좋은 단위 테스트가 갖춰야 할 조건을 보여줍니다.
-
-> 단위 테스트는 한 가지 동작만 검증하고, 같은 동작을 여러 번 실행해도 같은 결과가 나와야 합니다.
 
 ## 왜 중요한가
 

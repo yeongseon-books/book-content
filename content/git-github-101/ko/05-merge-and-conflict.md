@@ -27,17 +27,15 @@ branch를 나누는 일보다 더 중요한 것은 다시 합치는 일입니다
 
 이 글은 Git/GitHub 101 시리즈의 다섯 번째 글입니다. 여기서는 fast-forward, three-way merge, conflict 해결 흐름을 한 번에 정리합니다.
 
+
+![Git & GitHub 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/05/05-01-mental-model.ko.png)
+*Git & GitHub 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - fast-forward merge는 언제 일어날까요?
 - three-way merge는 왜 부모가 두 개인 commit을 만들까요?
 - conflict marker의 `HEAD` 쪽과 incoming branch 쪽은 어떻게 읽을까요?
-
-## 큰 그림
-
-![Git & GitHub 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/05/05-01-mental-model.ko.png)
-
-*Git & GitHub 101 5장 흐름 개요*
 
 ## 왜 중요한가
 

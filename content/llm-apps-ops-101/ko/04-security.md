@@ -28,21 +28,15 @@ LLM 보안은 응답이 나온 뒤에야 문제를 발견하는 순간부터 갑
 
 실무에서 중요한 목표는 완벽한 차단이 아니라 실패 시점을 앞당기는 것입니다. 프롬프트 인젝션과 민감 정보 노출은 모델만의 문제가 아닙니다. 한 번 안쪽으로 들어오면 로그, 캐시, 분석 파이프라인까지 오염시킬 수 있기 때문입니다.
 
+![LLM 앱 보안 레이어 구성](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/04/04-01-big-picture.ko.png)
+*LLM 앱 보안 레이어 구성*
+> 입력은 지시가 될 수 있고 출력은 데이터 유출이 될 수 있으므로, 양쪽 경계가 모두 필요합니다.
+
 ## 먼저 던지는 질문
 
 - LLM 앱 보안은 왜 입력 guard와 출력 filter를 나눠 봐야 할까요?
 - prompt injection 탐지와 PII masking은 코드에서 어떤 책임을 가져야 할까요?
 - 차단율이 오르거나 줄어들 때 어떤 로그를 먼저 확인해야 할까요?
-
-## 큰 그림
-
-![LLM 앱 보안 레이어 구성](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/04/04-01-big-picture.ko.png)
-
-*LLM 앱 보안 레이어 구성*
-
-이 그림에서는 입력 guard가 prompt injection을 막고 출력 filter가 PII와 정책 위반을 다시 검사하는 양방향 보안 흐름을 봅니다. LLM 앱 보안은 모델에게 안전하라고 말하는 것이 아니라 데이터가 오가는 경계마다 검증을 두는 일입니다.
-
-> 입력은 지시가 될 수 있고 출력은 데이터 유출이 될 수 있으므로, 양쪽 경계가 모두 필요합니다.
 
 ## 왜 이 레이어가 중요한가
 

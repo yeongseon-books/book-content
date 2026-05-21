@@ -29,21 +29,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 함수가 충분히 작다는 말이 실제로 무엇을 뜻하는지, 그리고 큰 함수를 어떻게 안전하게 쪼갤 수 있는지 살펴보겠습니다.
 
+
+![Clean Code 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/03/03-01-concept-at-a-glance.ko.png)
+*Clean Code 101 3장 흐름 개요*
+> 작은 함수는 설명의 필요성을 줄이고, 테스트 가능성을 높입니다.
+
 ## 먼저 던지는 질문
 
 - 작은 함수가 주는 효과는 무엇일까요?
 - Extract Function은 어떤 순서로 적용해야 안전할까요?
 - 부수 효과를 줄이는 대표 패턴은 무엇일까요?
-
-## 큰 그림
-
-![Clean Code 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/03/03-01-concept-at-a-glance.ko.png)
-
-*Clean Code 101 3장 흐름 개요*
-
-이 그림은 추출(Extract Function)이 이름을 가능하게 하고, 좋은 이름이 다시 재사용과 테스트를 쉽게 만드는 선순환을 보여 줍니다. 함수가 한 가지 일만 할 때 모든 것이 명확해집니다.
-
-> 작은 함수는 설명의 필요성을 줄이고, 테스트 가능성을 높입니다.
 
 ## 왜 중요한가
 

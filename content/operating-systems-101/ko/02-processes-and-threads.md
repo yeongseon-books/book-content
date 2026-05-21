@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 Operating Systems 101 시리즈의 2번째 글입니다.
 
+
+![Operating Systems 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/02/02-01-what-the-process-shares-and-what-each-th.ko.png)
+*Operating Systems 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 프로세스는 어떤 자원을 자기 것으로 가지고 있을까요?
 - 스레드는 무엇을 공유하고 무엇은 따로 가질까요?
 - `fork`와 `exec`는 왜 두 단계로 나뉘어 있을까요?
-
-## 큰 그림
-
-![Operating Systems 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/02/02-01-what-the-process-shares-and-what-each-th.ko.png)
-
-*Operating Systems 101 2장 흐름 개요*
 
 ## 기본 모델
 > 한 프로세스는 자기만의 가상 주소 공간, 파일 디스크립터 테이블, 신호 처리기, 권한을 가집니다. 그 안에 한 개 이상의 스레드가 있고, 스레드는 메모리와 fd는 공유하지만 자신만의 스택과 레지스터 상태를 갖습니다.

@@ -27,19 +27,15 @@ Python has always leaned on duck typing. If an object has `close()`, we close it
 
 This is post 6 in the Type Hints in Python 101 series. In this article, we will look at how `Protocol` captures “this shape is enough” without forcing inheritance, and how that changes interface design in real Python code.
 
+
+![Type Hints in Python 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/06/06-01-concept-at-a-glance.en.png)
+*Type Hints in Python 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Protocol and Structural Typing?
 - Which signal should the example or diagram make visible for Protocol and Structural Typing?
 - What failure should be prevented first when Protocol and Structural Typing reaches a real system?
-
-## Big Picture
-
-![Type Hints in Python 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/06/06-01-concept-at-a-glance.en.png)
-
-*Type Hints in Python 101 chapter 6 flow overview*
-
-This picture places Protocol and Structural Typing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

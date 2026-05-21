@@ -31,19 +31,15 @@ In this post, we use layered architecture to separate presentation, application 
 
 > Put code that changes for the same reason in the same layer, and keep unrelated churn out of the core.
 
+
+![software design 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/06/06-01-concept-at-a-glance.en.png)
+*software design 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Layered Architecture?
 - Which signal should the example or diagram make visible for Layered Architecture?
 - What failure should be prevented first when Layered Architecture reaches a real system?
-
-## Big Picture
-
-![software design 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/06/06-01-concept-at-a-glance.en.png)
-
-*software design 101 chapter 6 flow overview*
-
-This picture places Layered Architecture inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

@@ -27,21 +27,16 @@ Saying "I want to be a developer" is still too broad to guide real decisions. Fr
 
 This is post 2 in the Developer Career 101 series.
 
+
+![developer career 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/02/02-01-concept-at-a-glance.en.png)
+*developer career 101 chapter 2 flow overview*
+> The key to understanding roles is recognizing that the same title can mean different scope, responsibility, and tooling across companies and teams.
+
 ## Questions to Keep in Mind
 
 - What actually differs across frontend, backend, data, SRE, ML, and mobile roles?
 - Why do responsibilities, tools, and metrics diverge so sharply under the same "developer" label?
 - How can you tell whether your current role fits you or whether a transition is worth exploring?
-
-## Big Picture
-
-![developer career 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/02/02-01-concept-at-a-glance.en.png)
-
-*developer career 101 chapter 2 flow overview*
-
-This picture places Understanding Roles inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> The key to understanding roles is recognizing that the same title can mean different scope, responsibility, and tooling across companies and teams.
 
 ## What You Will Learn
 

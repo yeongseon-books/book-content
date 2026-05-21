@@ -25,21 +25,16 @@ When humans cannot grade every response, you can delegate scoring to a strong LL
 
 This is post 4 in the AI Evaluation 101 series. Here we cover writing judge prompts, controlling bias, and measuring agreement with human evaluators.
 
+
+![LLM-as-Judge - evaluating models with models](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-01-llm-as-judge-evaluating-models-with-mode.en.png)
+*LLM-as-Judge - evaluating models with models*
+> An LLM judge is powerful, but without baselines and bias control it becomes automated confidence rather than automated evaluation.
+
 ## Questions to Keep in Mind
 
 - When can LLM-as-Judge help with quality judgments that humans cannot score every time?
 - What biases affect an automatic judge when the judge prompt and rubric are weak?
 - How do human baselines and agreement checks make judge results trustworthy?
-
-## Big Picture
-
-![LLM-as-Judge - evaluating models with models](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-01-llm-as-judge-evaluating-models-with-mode.en.png)
-
-*LLM-as-Judge - evaluating models with models*
-
-This picture shows a judge model scoring candidate answers against a rubric while human baselines and bias checks calibrate the result. LLM-as-Judge is not a magic grader; it is a peer reviewer that must be managed.
-
-> An LLM judge is powerful, but without baselines and bias control it becomes automated confidence rather than automated evaluation.
 
 ## Why LLM-as-Judge
 

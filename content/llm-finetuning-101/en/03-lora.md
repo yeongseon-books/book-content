@@ -26,19 +26,14 @@ A LoRA adapter does not replace the model; it adds a narrow correction path besi
 
 This is the third post in the LLM Fine-tuning 101 series.
 
+![LLM Fine-tuning 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/03/03-02-the-fields-with-real-operational-impact.en.png)
+*LLM Fine-tuning 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - Which `LoraConfig` fields actually need to be understood?
 - What goes wrong when `target_modules` is mis-specified?
 - For a tiny GPT-2 class model, how low does the trainable parameter ratio go?
-
-## Big Picture
-
-![LLM Fine-tuning 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/03/03-02-the-fields-with-real-operational-impact.en.png)
-
-*LLM Fine-tuning 101 chapter 3 flow overview*
-
-This picture places Configuring LoRA Adapters inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

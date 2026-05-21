@@ -31,19 +31,15 @@ In this post, we look at dependency direction as the mechanism that keeps a stab
 
 > Stable code should define what it needs; volatile code should adapt to it.
 
+
+![software design 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/04/04-01-concept-at-a-glance.en.png)
+*software design 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Dependency Direction?
 - Which signal should the example or diagram make visible for Dependency Direction?
 - What failure should be prevented first when Dependency Direction reaches a real system?
-
-## Big Picture
-
-![software design 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/04/04-01-concept-at-a-glance.en.png)
-
-*software design 101 chapter 4 flow overview*
-
-This picture places Dependency Direction inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

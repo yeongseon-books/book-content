@@ -30,21 +30,16 @@ last_reviewed: '2026-05-14'
 
 여기서는 객체, 블록, 파일, 아카이브 스토리지를 어떤 기준으로 구분해야 하는지 살펴보겠습니다.
 
+
+![Cloud Computing 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/05/05-01-concept-at-a-glance.ko.png)
+*Cloud Computing 101 5장 흐름 개요*
+> 스토리지 선택은 데이터의 구조, 접근 패턴, 내구성 요구사항을 함께 고려하는 결정입니다.
+
 ## 먼저 던지는 질문
 
 - 객체, 블록, 파일, 아카이브 스토리지는 각각 무엇이 다를까요?
 - 내구성과 가용성은 왜 같은 말이 아닐까요?
 - S3 라이프사이클 정책은 어떤 문제를 해결할까요?
-
-## 큰 그림
-
-![Cloud Computing 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/05/05-01-concept-at-a-glance.ko.png)
-
-*Cloud Computing 101 5장 흐름 개요*
-
-Block Storage는 VM에 직접 부착되는 디스크로, OS 설치나 데이터베이스 처리에 사용합니다. Object Storage는 파일 업로드, 백업, 정적 콘텐츠 배포에 최적화됩니다. File Storage는 여러 VM이 동시에 접근해야 할 때 씁니다. Database는 구조화된 데이터와 쿼리가 필요할 때 고르고, Archive는 거의 접근하지 않는 오래된 데이터를 저장할 때 선택합니다.
-
-> 스토리지 선택은 데이터의 구조, 접근 패턴, 내구성 요구사항을 함께 고려하는 결정입니다.
 
 ## 왜 중요한가
 

@@ -26,17 +26,15 @@ last_reviewed: '2026-05-17'
 
 로컬에서는 통과했는데 PR에서 깨지는 상황은 테스트가 없어서가 아니라 검증 경로가 운영으로 연결되지 않았기 때문에 자주 생깁니다. 이 글에서는 push와 pull request마다 같은 테스트를 자동으로 돌리고, Python 버전별 결과와 커버리지 아티팩트까지 한 번에 확인하는 CI 흐름을 정리합니다.
 
+
+![pytest 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/09/09-01-github-actions-workflow-overview.ko.png)
+*pytest 101 9장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - PR을 열 때마다 테스트를 수동으로 실행하는 습관에 의존하지 않으려면 어떻게 해야 할까요?
 - GitHub Actions workflow를 여러 조각이 아니라 하나의 최종 파일로 어떻게 조립할까요?
 - Python 3.10, 3.11, 3.12를 동시에 검증하면서도 피드백 속도를 유지하려면 무엇을 신경 써야 할까요?
-
-## 큰 그림
-
-![pytest 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/09/09-01-github-actions-workflow-overview.ko.png)
-
-*pytest 101 9장 흐름 개요*
 
 ## 왜 중요한가
 

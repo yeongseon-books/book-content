@@ -28,19 +28,15 @@ But monitoring gets better when it becomes more selective, not more crowded. A m
 
 This is post 5 in the SRE 101 series. Here we treat monitoring as action-oriented measurement, then connect the four golden signals to alert rules, dashboard design, and incident response.
 
+
+![sre 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/05/05-01-concept-at-a-glance.en.png)
+*sre 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - How is monitoring different from simply collecting a large amount of telemetry?
 - Why do latency, traffic, errors, and saturation have to be read together?
 - What questions do metrics answer better than logs, and where does that boundary flip?
-
-## Big Picture
-
-![sre 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/05/05-01-concept-at-a-glance.en.png)
-
-*sre 101 chapter 5 flow overview*
-
-This picture places Monitoring inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this topic matters
 

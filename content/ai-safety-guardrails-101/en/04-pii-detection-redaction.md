@@ -26,21 +26,16 @@ LLM applications handle personal data in both directions. Users send sensitive i
 
 This is post 4 in the AI Safety & Guardrails 101 series. It defines the PII surface area first, then walks through detection and redaction patterns that hold up in production.
 
+
+![section 1: PII categories](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/04/04-01-section-1-pii-categories.en.png)
+*section 1: PII categories*
+> The core of PII protection is not simply hiding data; it is separating what the model may see from what the system must retain.
+
 ## Questions to Keep in Mind
 
 - Why must PII protection separate what is sent to the model from what is stored internally?
 - Where are regex, Presidio, and reversible tokenization each useful?
 - What leak appears if outbound responses are not checked again?
-
-## Big Picture
-
-![section 1: PII categories](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/04/04-01-section-1-pii-categories.en.png)
-
-*section 1: PII categories*
-
-This picture shows PII detected and replaced before model calls while stored internal data stays separate from model input. A PII guardrail is not a one-time masking function; it protects both inbound and outbound data boundaries.
-
-> The core of PII protection is not simply hiding data; it is separating what the model may see from what the system must retain.
 
 ## "Did You Mask the Email?"
 

@@ -30,17 +30,14 @@ last_reviewed: '2026-05-15'
 설계와 구현을 같은 일로 취급하면 두 단계가 함께 흐려집니다. 무엇을 분리할지, 어떤 책임을 어디에 둘지, 어떤 선택을 되돌릴 수 있게 만들지 같은 질문이 코드 안에 묻혀 버리기 때문입니다. 그러면 구현은 열심히 했는데도 나중에 왜 그렇게 만들었는지 설명하기 어려운 시스템이 남습니다.
 
 
+![Software Engineering 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/03/03-01-concept-at-a-glance.ko.png)
+*Software Engineering 101 3장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 잘 작성된 코드와 잘 설계된 시스템은 무엇이 다를까요?
 - 설계는 “무엇을”, 구현은 “어떻게”라는 말은 실제로 무슨 뜻일까요?
 - ADR은 언제 쓰고, 어떤 수준으로 남겨야 할까요?
-
-## 큰 그림
-
-![Software Engineering 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/03/03-01-concept-at-a-glance.ko.png)
-
-*Software Engineering 101 3장 흐름 개요*
 
 ## 왜 중요한가
 

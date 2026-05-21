@@ -28,21 +28,15 @@ AKS는 배포가 끝났다고 운영이 끝나는 서비스가 아닙니다. 오
 
 여기서는 앞선 여섯 화에서 본 클러스터, 워크로드, 네트워크, 스케일링 이야기를 운영 관점에서 하나로 묶겠습니다. **Container Insights, Log Analytics, kube-state-metrics, 알람 계층**을 중심으로 AKS day-2 운영의 기본 시야를 정리하겠습니다.
 
+![Azure Kubernetes Service 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/07/07-01-the-operations-view-in-one-diagram.ko.png)
+*Azure Kubernetes Service 101 7장 흐름 개요*
+> 모니터링과 운영 — Container Insights, 로그, 알람의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - Container Insights는 AKS 운영에서 무엇을 가장 빠르게 보여 줄까요?
 - 로그와 메트릭은 왜 같은 관측 데이터가 아니라 서로 다른 질문에 답할까요?
 - Log Analytics에서 어떤 KQL 테이블과 쿼리부터 익히는 편이 좋을까요?
-
-## 큰 그림
-
-![Azure Kubernetes Service 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/07/07-01-the-operations-view-in-one-diagram.ko.png)
-
-*Azure Kubernetes Service 101 7장 흐름 개요*
-
-이 그림에서는 모니터링과 운영 — Container Insights, 로그, 알람를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 모니터링과 운영 — Container Insights, 로그, 알람의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

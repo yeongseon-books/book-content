@@ -31,19 +31,15 @@ last_reviewed: '2026-05-15'
 
 This is the first post in the Computer Networks 101 series.
 
+
+![computer networks 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/01/01-01-concept-at-a-glance.en.png)
+*computer networks 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What Is a Network??
 - Which signal should the example or diagram make visible for What Is a Network??
 - What failure should be prevented first when What Is a Network? reaches a real system?
-
-## Big Picture
-
-![computer networks 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/01/01-01-concept-at-a-glance.en.png)
-
-*computer networks 101 chapter 1 flow overview*
-
-This picture places What Is a Network? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

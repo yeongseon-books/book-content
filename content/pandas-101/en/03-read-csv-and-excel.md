@@ -28,21 +28,16 @@ This is post 3 in the Pandas 101 series.
 
 In this chapter, we will treat `read_csv` and `read_excel` as data-loading contracts rather than convenience helpers. The goal is to make data land in memory the way you intended on the first read.
 
+
+![pandas 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/03/03-01-concept-at-a-glance.en.png)
+*pandas 101 chapter 3 flow overview*
+> *Reading is not just opening a file — it's your **first quality gate**. Encoding, delimiter, dtype, datetime parsing — get these right here or pay for it later.
+
 ## Questions to Keep in Mind
 
 - The *core options* of *read_csv* and *read_excel?
 - Handling *encoding* and *separators?
 - The value of explicit *dtype?
-
-## Big Picture
-
-![pandas 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/03/03-01-concept-at-a-glance.en.png)
-
-*pandas 101 chapter 3 flow overview*
-
-This picture places Reading CSV and Excel inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> *Reading is not just opening a file — it's your **first quality gate**. Encoding, delimiter, dtype, datetime parsing — get these right here or pay for it later.
 
 ## Why It Matters
 

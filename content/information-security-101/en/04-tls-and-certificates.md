@@ -31,21 +31,16 @@ last_reviewed: '2026-05-04'
 
 This is post 4 in the Information Security 101 series.
 
+
+![information security 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/04/04-01-big-picture.en.png)
+*information security 101 chapter 4 flow overview*
+> TLS is not just encryption in transit. It is about proving "this server is really example.com" via a chain of trust, and preventing a middle node from breaking into the conversation.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying TLS and Certificates?
 - Which signal should the example or diagram make visible for TLS and Certificates?
 - What failure should be prevented first when TLS and Certificates reaches a real system?
-
-## Big Picture
-
-![information security 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/04/04-01-big-picture.en.png)
-
-*information security 101 chapter 4 flow overview*
-
-This picture places TLS and Certificates inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> TLS is not just encryption in transit. It is about proving "this server is really example.com" via a chain of trust, and preventing a middle node from breaking into the conversation.
 
 ## What You Will Learn
 

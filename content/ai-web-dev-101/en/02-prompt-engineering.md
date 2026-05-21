@@ -27,19 +27,15 @@ This is post 2 in the AI Web Development 101 series.
 
 Here, we will treat prompts as executable contracts, not clever sentences.
 
+
+![AI Web Development 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/02/prompt-role-layering.en.png)
+*AI Web Development 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - How is a prompt different from just asking a question?
 - What responsibilities belong to `system` and `user` messages?
 - Which ingredients make prompts stable enough for application code?
-
-## Big Picture
-
-![AI Web Development 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/02/prompt-role-layering.en.png)
-
-*AI Web Development 101 chapter 2 flow overview*
-
-This picture places Prompt engineering basics — getting the answer you actually want inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why prompt engineering deserves separate attention
 

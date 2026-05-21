@@ -30,19 +30,15 @@ Here, we will frame Kubernetes as an orchestrator that continuously pushes the c
 
 > Kubernetes is most useful when you stop thinking in terms of “start this container now” and start thinking in terms of “keep the cluster in this desired state over time.”
 
+
+![kubernetes 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/01/01-01-concept-at-a-glance.en.png)
+*kubernetes 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - The meaning of *orchestration?
 - Control plane* vs *worker nodes?
 - The *desired state* model?
-
-## Big Picture
-
-![kubernetes 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/01/01-01-concept-at-a-glance.en.png)
-
-*kubernetes 101 chapter 1 flow overview*
-
-This picture places What is Kubernetes? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

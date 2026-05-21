@@ -28,21 +28,17 @@ That is why strong ML interview answers sound less like a glossary and more like
 
 This is post 6 in the Data Science Career 101 series.
 
+
+![data science career 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/06/06-01-concept-at-a-glance.en.png)
+*data science career 101 chapter 6 flow overview*
+> In ML interviews, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
+
 ## Questions to Keep in Mind
 
 - What topics do ML interviews usually cover besides algorithm basics?
 - How should you explain model choice in a way that reflects real trade-offs?
 - Why can metric selection not be separated from the problem definition?
 
-## Big Picture
-
-![data science career 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/06/06-01-concept-at-a-glance.en.png)
-
-*data science career 101 chapter 6 flow overview*
-
-This picture places The ML Interview inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> In ML interviews, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
 ## What You Will Learn
 
 - *Fundamentals* questions

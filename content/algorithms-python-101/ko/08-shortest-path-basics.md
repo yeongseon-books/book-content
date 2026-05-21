@@ -28,17 +28,15 @@ last_reviewed: '2026-05-12'
 
 간선 가중치가 중요해지는 순간 BFS만으로는 부족합니다. 다음에 볼 후보 경로를 우선순위로 관리해야 하고, 그 지점에서 다익스트라 알고리즘이 힘을 발휘합니다.
 
+
+![Algorithms with Python 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/08/08-01-concept-overview.ko.png)
+*Algorithms with Python 101 8장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 가중치 그래프의 최단 경로 문제는 어떻게 정의할까요?
 - 다익스트라 알고리즘은 어떤 원리로 동작할까요?
 - Python의 `heapq`로 우선순위 큐를 어떻게 구현할까요?
-
-## 큰 그림
-
-![Algorithms with Python 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/08/08-01-concept-overview.ko.png)
-
-*Algorithms with Python 101 8장 흐름 개요*
 
 ## 왜 중요한가
 

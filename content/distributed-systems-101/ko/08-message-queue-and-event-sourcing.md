@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 메시지 큐와 이벤트 로그를 통해 시간이 어떻게 설계 도구가 되는지, 그리고 replay와 idempotency가 왜 운영 언어가 되는지 설명합니다.
 
+
+![Distributed Systems 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/08/08-01-concept-at-a-glance.ko.png)
+*Distributed Systems 101 8장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 메시지 큐는 어떤 결합 해소와 전달 보장을 제공할까요?
 - at-most-once, at-least-once, exactly-once는 각각 무엇을 뜻할까요?
 - 이벤트 소싱은 무엇이며 CQRS와는 어떤 관계일까요?
-
-## 큰 그림
-
-![Distributed Systems 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/08/08-01-concept-at-a-glance.ko.png)
-
-*Distributed Systems 101 8장 흐름 개요*
 
 ## 왜 중요한가
 

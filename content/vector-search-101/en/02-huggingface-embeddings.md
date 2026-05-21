@@ -28,21 +28,15 @@ This is post 2 in the Vector Search 101 series.
 
 Here we turn local embeddings into a reusable workflow: initialize once, encode in batch, persist the vectors, and reload them safely.
 
+![Single query embedding call flow](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/02/02-01-huggingface-embeddings-in-practice-creat.en.png)
+*Single query embedding call flow*
+> The core of HuggingFace embedding practice is not just learning to call one model well. It is learning a repeatable flow that produces the same vectors and lets you reuse them.
+
 ## Questions to Keep in Mind
 
 - Where do you verify that vectors from sentence-transformers are actually usable for search?
 - What changes in production when you move from one-by-one encoding to batch encoding?
 - What metadata must travel with saved vectors so the result can be reproduced later?
-
-## Big Picture
-
-![Single query embedding call flow](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/02/02-01-huggingface-embeddings-in-practice-creat.en.png)
-
-*Single query embedding call flow*
-
-This picture follows text through an embedding model into fixed-length vectors that can be stored and reused. The practical point is not just producing numbers; it is keeping model and dimension information with those numbers.
-
-> The core of HuggingFace embedding practice is not just learning to call one model well. It is learning a repeatable flow that produces the same vectors and lets you reuse them.
 
 ## Installation
 

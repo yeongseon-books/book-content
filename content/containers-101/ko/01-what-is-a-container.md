@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 컨테이너를 호스트 커널을 공유하는 격리된 프로세스 묶음으로 정의하고, VM과의 차이와 `docker run`이 실제로 만드는 실행 단위를 함께 정리합니다.
 
+
+![Containers 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/01/01-01-concept-at-a-glance.ko.png)
+*Containers 101 1장 흐름 개요*
+> 컨테이너의 가치는 휴대성입니다. "내 로컬에서는 되는데"가 아니라 "어디서나 같게 된다"가 핵심입니다.
+
 ## 먼저 던지는 질문
 
 - 컨테이너를 한 문장으로 정확히 어떻게 정의해야 할까요?
 - 컨테이너는 호스트와 무엇을 공유하고, 무엇을 격리할까요?
 - VM과의 결정적인 차이는 어디에서 생길까요?
-
-## 큰 그림
-
-![Containers 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/01/01-01-concept-at-a-glance.ko.png)
-
-*Containers 101 1장 흐름 개요*
-
-이 그림은 컨테이너의 정의가 추상적이 아니라 호스트 커널을 공유하면서 얼마나 격리되는지에 달려 있다는 점을 보여줍니다. 컨테이너 하나가 생성되는 흐름, 리소스 제약, 그리고 운영 신호가 어떻게 드러나는지 추적할 수 있습니다.
-
-> 컨테이너의 가치는 휴대성입니다. "내 로컬에서는 되는데"가 아니라 "어디서나 같게 된다"가 핵심입니다.
 
 ## 왜 중요한가
 

@@ -28,21 +28,16 @@ Once you understand that path, Prometheus and Grafana stop looking like tools yo
 
 This is post 3 in the Observability 101 series.
 
+
+![observability 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/03/03-01-concept-at-a-glance.en.png)
+*observability 101 chapter 3 flow overview*
+> Collecting and Visualizing Metrics is about the boundary decision, not the tool choice.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Collecting and Visualizing Metrics?
 - Which signal should the example or diagram make visible for Collecting and Visualizing Metrics?
 - What failure should be prevented first when Collecting and Visualizing Metrics reaches a real system?
-
-## Big Picture
-
-![observability 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/03/03-01-concept-at-a-glance.en.png)
-
-*observability 101 chapter 3 flow overview*
-
-This picture places Collecting and Visualizing Metrics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Collecting and Visualizing Metrics is about the boundary decision, not the tool choice.
 
 ## Questions this article answers
 

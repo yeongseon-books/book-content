@@ -30,21 +30,16 @@ This is post 9 in the MLOps 101 series.
 
 Here, we will treat a feature store not as a storage box for features, but as the contract layer that lets training and serving share the same definitions.
 
+
+![mlops 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/09/09-01-see-the-flow-first.en.png)
+*mlops 101 chapter 9 flow overview*
+> A feature store is not a data warehouse. It is a definition layer that guarantees training uses the same features as serving, eliminating one large class of production bugs.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Feature Store?
 - Which signal should the example or diagram make visible for Feature Store?
 - What failure should be prevented first when Feature Store reaches a real system?
-
-## Big Picture
-
-![mlops 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/09/09-01-see-the-flow-first.en.png)
-
-*mlops 101 chapter 9 flow overview*
-
-This picture places Feature Store inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A feature store is not a data warehouse. It is a definition layer that guarantees training uses the same features as serving, eliminating one large class of production bugs.
 
 ## Questions this article answers
 

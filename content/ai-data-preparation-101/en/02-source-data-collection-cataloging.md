@@ -25,19 +25,15 @@ The painful moment usually comes months later: you need to retrain a model, but 
 
 This is post 2 in the AI Data Preparation 101 series. Here we cover how to collect source data in a way that preserves cataloging and provenance from day one.
 
+
+![AI data preparation chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/02/02-01-big-picture.en.png)
+*AI data preparation chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What metadata must exist the moment a dataset lands on disk?
 - How do public datasets, web scraping, and vendor feeds differ in operational risk?
 - Why should collection and dataset-card creation happen in one transaction?
-
-## Big Picture
-
-![AI data preparation chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/02/02-01-big-picture.en.png)
-
-*AI data preparation chapter 2 flow overview*
-
-This picture places Source Data Collection and Cataloging inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## "I Don't Remember Where This Data Came From"
 

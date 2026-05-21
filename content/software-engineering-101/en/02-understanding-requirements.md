@@ -29,19 +29,15 @@ That is why requirement mistakes are so expensive. A bug found during implementa
 
 This is post 2 in the Software Engineering 101 series. In this chapter, we turn vague requests into testable statements by connecting user stories, acceptance criteria, non-functional requirements, and the question patterns that expose ambiguity early.
 
+
+![software engineering 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/02/02-01-concept-at-a-glance.en.png)
+*software engineering 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Understanding Requirements?
 - Which signal should the example or diagram make visible for Understanding Requirements?
 - What failure should be prevented first when Understanding Requirements reaches a real system?
-
-## Big Picture
-
-![software engineering 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/02/02-01-concept-at-a-glance.en.png)
-
-*software engineering 101 chapter 2 flow overview*
-
-This picture places Understanding Requirements inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

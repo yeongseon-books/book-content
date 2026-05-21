@@ -28,21 +28,16 @@ Those goals often pull in opposite directions. The right stack is therefore not 
 
 This is post 7 in the Capstone Project 101 series. It defines a practical stack-selection rubric built on familiarity, learning cost, operational burden, and documentation strength.
 
+
+![capstone project 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/07/07-01-the-flow-at-a-glance.en.png)
+*capstone project 101 chapter 7 flow overview*
+> Stack choices matter less than knowing why you picked each piece and how to explain it in a demo.
+
 ## Questions to Keep in Mind
 
 - Why is the newest technology not automatically the best choice?
 - How does familiarity map directly to schedule risk?
 - How should teams separate learning cost from operational burden?
-
-## Big Picture
-
-![capstone project 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/07/07-01-the-flow-at-a-glance.en.png)
-
-*capstone project 101 chapter 7 flow overview*
-
-This picture places Choosing the Tech Stack inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Stack choices matter less than knowing why you picked each piece and how to explain it in a demo.
 
 ## What You Will Learn
 

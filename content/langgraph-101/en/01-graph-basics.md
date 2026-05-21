@@ -31,21 +31,15 @@ Once that click happens, the later pieces start to make more sense. Checkpointin
 
 I've seen that difference decide whether LangGraph feels obvious or frustrating. Memorizing `StateGraph`, `add_node()`, `add_edge()`, and `invoke()` is not the same thing as understanding why a graph is easier to operate. The real win is learning to read where state changes, why the next step was selected, and which stage to inspect when the final answer looks wrong.
 
+![Basic graph flow from START to END](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/01/01-01-minimal-runnable-example.en.png)
+*Basic graph flow from START to END*
+> LangGraph is not valuable because the graph has a shape; it is valuable because state changes and next-step choices stay visible in code.
+
 ## Questions to Keep in Mind
 
 - Why is LangGraph easier to reason about as an explicit state machine than as a longer chain?
 - What responsibilities do nodes, edges, and state each carry in the execution flow?
 - After running the first graph, which state values should be checked before trusting the final prose?
-
-## Big Picture
-
-![Basic graph flow from START to END](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/01/01-01-minimal-runnable-example.en.png)
-
-*Basic graph flow from START to END*
-
-This picture shows input state being updated by nodes while edges choose the next execution point. The core of LangGraph is not a bigger prompt; it is making state transitions explicit in code.
-
-> LangGraph is not valuable because the graph has a shape; it is valuable because state changes and next-step choices stay visible in code.
 
 ## Why this structure matters
 

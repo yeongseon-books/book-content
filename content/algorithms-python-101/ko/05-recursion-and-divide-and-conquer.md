@@ -28,17 +28,15 @@ last_reviewed: '2026-05-12'
 
 분할 정복은 그 패턴 가운데에서도 특히 중요합니다. 이진 탐색, 병합 정렬, 퀵 정렬처럼 이미 본 알고리즘들이 모두 이 아이디어 위에 서 있습니다.
 
+
+![Algorithms with Python 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/05/05-01-big-picture.ko.png)
+*Algorithms with Python 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 재귀 함수는 어떻게 동작하고 호출 스택은 어떤 모양일까요?
 - 기저 조건은 왜 그렇게 중요할까요?
 - 분할 정복의 세 단계는 어떻게 구분할 수 있을까요?
-
-## 큰 그림
-
-![Algorithms with Python 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/05/05-01-big-picture.ko.png)
-
-*Algorithms with Python 101 5장 흐름 개요*
 
 ## 왜 중요한가
 

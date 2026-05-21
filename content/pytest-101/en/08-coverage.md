@@ -31,19 +31,15 @@ This is post 8 in the pytest 101 series.
 
 > Code coverage measures the proportion of lines your tests run. With pytest-cov, you can measure coverage, find untested lines, and fill the gaps. This article covers setup, interpretation, and CI enforcement.
 
+
+![pytest 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/08/08-01-big-picture.en.png)
+*pytest 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Coverage and Test Quality?
 - Which signal should the example or diagram make visible for Coverage and Test Quality?
 - What failure should be prevented first when Coverage and Test Quality reaches a real system?
-
-## Big Picture
-
-![pytest 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/08/08-01-big-picture.en.png)
-
-*pytest 101 chapter 8 flow overview*
-
-This picture places Coverage and Test Quality inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

@@ -34,17 +34,14 @@ Python으로 데이터베이스를 다룬 적이 있다면 `sqlite3`, `psycopg`,
 
 *Why DB-API 2.0 - the problem PEP 249 solved*
 
+![Python DB-API 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-02-1-the-chaos-before-db-api.ko.png)
+*Python DB-API 101 1장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - PEP 249 이전에는 Python의 데이터베이스 접근 코드가 왜 그렇게 제각각이었을까요?
 - DB-API 2.0은 정확히 어떤 다섯 가지를 표준화했을까요?
 - driver마다 `paramstyle`이 다른데도 왜 애플리케이션 코드는 대부분 그대로 옮겨질까요?
-
-## 큰 그림
-
-![Python DB-API 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-02-1-the-chaos-before-db-api.ko.png)
-
-*Python DB-API 101 1장 흐름 개요*
 
 ## 1. DB-API 이전의 혼돈
 

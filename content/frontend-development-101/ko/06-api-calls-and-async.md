@@ -26,17 +26,15 @@ last_reviewed: '2026-05-12'
 
 프론트엔드는 거의 항상 서버와 대화합니다. 사용자 목록을 불러오고 검색 결과를 받고 저장 버튼을 누르면 데이터를 전송합니다. 문제는 이 모든 일이 즉시 끝나지 않는다는 점입니다. 네트워크는 느릴 수 있고 실패할 수 있으며 요청 순서가 뒤집힐 수도 있습니다.
 
+
+![Frontend Development 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/06/06-01-diagram.ko.png)
+*Frontend Development 101 6장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - `fetch`와 `async/await`는 어떤 최소 패턴으로 시작하면 될까요?
 - 로딩 상태와 에러 상태를 왜 반드시 화면에 드러내야 할까요?
 - 컴포넌트가 사라질 때 요청 취소가 왜 필요할까요?
-
-## 큰 그림
-
-![Frontend Development 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/06/06-01-diagram.ko.png)
-
-*Frontend Development 101 6장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -58,7 +56,7 @@ last_reviewed: '2026-05-12'
 
 ## 전통 방식과 현대 방식 비교
 
-**Before (callback hell)**
+**Before (콜백 지옥)**
 
 ```javascript
 fetch(url, (res) => {
@@ -370,7 +368,6 @@ export default defineConfig({
 ### 실무 연결 포인트
 
 프론트엔드는 더 이상 단순 화면 기술이 아닙니다. API 계약, 번들 최적화, 브라우저 성능, 접근성, 운영 관측이 모두 만나는 실행 계층입니다. 따라서 작은 예제라도 HTML/CSS/JS 코드, 컴포넌트 패턴, 빌드 설정을 한 번에 다뤄 보는 연습이 필요합니다. 이 연습을 반복하면 도구가 바뀌어도 구조를 잃지 않고, 신규 기능을 추가할 때도 안정적으로 확장할 수 있습니다.
-
 
 
 ## 실무 앵커 모음: 프레임워크, 레이아웃, 디버깅, 성능

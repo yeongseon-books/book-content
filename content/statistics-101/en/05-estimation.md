@@ -28,21 +28,16 @@ That is why a good estimate never reports only the value. It reports the value t
 
 This is post 5 in the Statistics 101 series. Here we will compare point estimation and interval estimation, define standard error, and show how sample size changes the stability of an estimate.
 
+
+![statistics 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/05/05-01-concept-at-a-glance.en.png)
+*statistics 101 chapter 5 flow overview*
+> An estimate is not a guess—it is a *procedure* that produces a *best guess plus a measure of how far off it might be*.
+
 ## Questions to Keep in Mind
 
 - How well can a sample mean stand in for a population mean?
 - What is the difference between point estimation and interval estimation?
 - How is standard error different from standard deviation?
-
-## Big Picture
-
-![statistics 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/05/05-01-concept-at-a-glance.en.png)
-
-*statistics 101 chapter 5 flow overview*
-
-This picture places Estimation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> An estimate is not a guess—it is a *procedure* that produces a *best guess plus a measure of how far off it might be*.
 
 ## Why It Matters
 

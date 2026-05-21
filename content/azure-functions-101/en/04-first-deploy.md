@@ -36,19 +36,14 @@ One framing note before we start: this walkthrough uses **Flex Consumption as th
 
 This is the fourth post in the Azure Functions 101 series. Here, we take a function from local development to a real Azure endpoint you can call.
 
+![azure functions 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/04/04-01-the-full-flow-on-one-page.en.png)
+*azure functions 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - Which parameters absolutely must be settled before the first Function App is created?
 - Should you start with zip deploy, GitHub Actions, or VS Code direct deploy?
 - How does the Function App bind to its associated Storage account, and why does it need one?
-
-## Big Picture
-
-![azure functions 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/04/04-01-the-full-flow-on-one-page.en.png)
-
-*azure functions 101 chapter 4 flow overview*
-
-This picture places Deploy a Function App — From Localhost to Azure inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Tooling — three pieces
 

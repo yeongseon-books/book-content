@@ -30,21 +30,15 @@ We will cover five things: why natural-language parsing breaks under production 
 
 This is the first post in the LLM API Production 101 series. Here we focus on building a structured-output contract with JSON mode and response schemas.
 
+![Structured output: JSON mode and response schemas](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/01/01-01-structured-output-json-mode-and-response.en.png)
+*Structured output: JSON mode and response schemas*
+> Structured output in production is not prettier model text; it is a failure boundary the application can trust.
+
 ## Questions to Keep in Mind
 
 - Why does free-form text parsing break so quickly in production?
 - What does JSON mode guarantee, and what does schema validation still need to guarantee?
 - When the structured-output contract fails, where should the system stop and what should it log?
-
-## Big Picture
-
-![Structured output: JSON mode and response schemas](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/01/01-01-structured-output-json-mode-and-response.en.png)
-
-*Structured output: JSON mode and response schemas*
-
-This picture treats model output as an application contract instead of free text. JSON mode narrows the response shape, and Pydantic validation checks whether the values are safe for the application to accept.
-
-> Structured output in production is not prettier model text; it is a failure boundary the application can trust.
 
 ## Runtime setup
 

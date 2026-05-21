@@ -25,21 +25,15 @@ The first mistake in chatbot design is assuming the model remembers anything bet
 
 This is the first post in the AI App Patterns 101 series. Here we cover the smallest reliable chatbot pattern and the state-management decisions that make multi-turn behavior work.
 
+![Stateless call with replayed history](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/01/01-01-stateless-call-with-replayed-history.en.png)
+*Stateless call with replayed history*
+> A chatbot is not a model with memory; it is an application loop that keeps replaying the accumulated messages list.
+
 ## Questions to Keep in Mind
 
 - If the model does not remember previous turns, where should chatbot memory live?
 - When does replaying history make cost and latency a bigger problem than answer quality?
 - When should session history stay in memory, and when should it move to external storage?
-
-## Big Picture
-
-![Stateless call with replayed history](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/01/01-01-stateless-call-with-replayed-history.en.png)
-
-*Stateless call with replayed history*
-
-This picture shows multi-turn behavior coming from the application replaying message history, not from model memory. The chatbot pattern is about deciding what to store, trim, summarize, and separate by session.
-
-> A chatbot is not a model with memory; it is an application loop that keeps replaying the accumulated messages list.
 
 ## Basic chatbot: manual history
 

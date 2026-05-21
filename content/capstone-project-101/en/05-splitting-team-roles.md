@@ -28,21 +28,16 @@ In a capstone, role splitting is not about drawing boxes around people. It is ab
 
 This is post 5 in the Capstone Project 101 series. It outlines a simple role model that uses primary owners, backups, and explicit decision rights to keep collaboration moving.
 
+
+![capstone project 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/05/05-01-the-flow-at-a-glance.en.png)
+*capstone project 101 chapter 5 flow overview*
+> Role clarity matters most when communication breaks down. Each role owns specific outcomes and handoff points.
+
 ## Questions to Keep in Mind
 
 - Why do overlapping roles slow decisions down?
 - How should teams assign primary owners and backups?
 - How is a lead different from a code owner?
-
-## Big Picture
-
-![capstone project 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/05/05-01-the-flow-at-a-glance.en.png)
-
-*capstone project 101 chapter 5 flow overview*
-
-This picture places Splitting Team Roles inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Role clarity matters most when communication breaks down. Each role owns specific outcomes and handoff points.
 
 ## What You Will Learn
 

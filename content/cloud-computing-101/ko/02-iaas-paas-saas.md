@@ -30,21 +30,16 @@ last_reviewed: '2026-05-14'
 
 여기서는 IaaS, PaaS, SaaS를 기능 이름이 아니라 책임 경계의 관점에서 정리하겠습니다.
 
+
+![Cloud Computing 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/02/02-01-concept-at-a-glance.ko.png)
+*Cloud Computing 101 2장 흐름 개요*
+> IaaS, PaaS, SaaS는 각 서비스 모델마다 공급자와 사용자가 맡는 책임의 경계가 다릅니다. 이 경계를 명확히 이해해야 올바른 기술을 선택할 수 있습니다.
+
 ## 먼저 던지는 질문
 
 - EC2, Heroku, Notion처럼 모두 클라우드에 속하는 서비스가 왜 이렇게 다르게 느껴질까요?
 - IaaS, PaaS, SaaS는 각각 어디까지를 사용자가 운영하고, 어디부터 공급자가 맡을까요?
 - 조직 규모와 워크로드 특성에 따라 어떤 모델을 선택해야 할까요?
-
-## 큰 그림
-
-![Cloud Computing 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/02/02-01-concept-at-a-glance.ko.png)
-
-*Cloud Computing 101 2장 흐름 개요*
-
-IaaS, PaaS, SaaS의 차이는 사용자가 운영 책임을 가지는 범위의 차이입니다. IaaS는 가상 머신, PaaS는 런타임, SaaS는 완성된 애플리케이션을 제공합니다.
-
-> IaaS, PaaS, SaaS는 각 서비스 모델마다 공급자와 사용자가 맡는 책임의 경계가 다릅니다. 이 경계를 명확히 이해해야 올바른 기술을 선택할 수 있습니다.
 
 ## 왜 중요한가
 

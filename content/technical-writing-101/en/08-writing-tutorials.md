@@ -28,21 +28,16 @@ A tutorial earns trust by making success predictable. Each step should leave beh
 
 This is post 8 in the Technical Writing 101 series. It turns tutorials into verified step-by-step paths instead of broad conceptual overviews.
 
+
+![technical writing 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/08/08-01-concept-at-a-glance.en.png)
+*technical writing 101 chapter 8 flow overview*
+> A tutorial step is only strong when it leaves behind a checkpoint the reader can verify before moving on.
+
 ## Questions to Keep in Mind
 
 - Where a tutorial sits in *Diátaxis?
 - Stating *prerequisites?
 - Designing a *small win?
-
-## Big Picture
-
-![technical writing 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/08/08-01-concept-at-a-glance.en.png)
-
-*technical writing 101 chapter 8 flow overview*
-
-This picture places Writing Tutorials inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A tutorial step is only strong when it leaves behind a checkpoint the reader can verify before moving on.
 
 ## Why It Matters
 

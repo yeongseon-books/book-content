@@ -42,19 +42,14 @@ ACA's internal implementation is not published by Microsoft, so these versions a
 - **Inferred from upstream behavior**: those weights most plausibly become Envoy-style weighted upstream routing rules.
 - **Out of bounds**: the exact private config objects ACA generates to express revision routing internally.
 
+![azure container apps deep dive chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/03/03-01-a-revision-is-an-immutable-runtime-snaps.en.png)
+*azure container apps deep dive chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - Revisions are immutable — exactly which field changes spawn a new revision?
 - Where in the ingress layer does traffic split happen, and can it be session-sticky?
 - Where does the cap on simultaneously active revisions come from, and why that number?
-
-## Big Picture
-
-![azure container apps deep dive chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/03/03-01-a-revision-is-an-immutable-runtime-snaps.en.png)
-
-*azure container apps deep dive chapter 3 flow overview*
-
-This picture places Revisions and traffic splitting — where Envoy weights come from inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## A revision is an immutable runtime snapshot
 

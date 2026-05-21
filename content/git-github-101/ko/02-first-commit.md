@@ -27,17 +27,15 @@ Git은 첫 commit을 직접 만들어 보는 순간부터 추상적인 개념에
 
 이 글은 Git/GitHub 101 시리즈의 두 번째 글입니다. 여기서는 `git init`부터 첫 `git commit`까지의 흐름을 손으로 따라가며 Git의 세 영역이 실제로 어떻게 움직이는지 확인합니다.
 
+
+![Git & GitHub 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/02/02-01-mental-model.ko.png)
+*Git & GitHub 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - `git init`은 현재 디렉터리에 정확히 무엇을 만들까요?
 - `git status`는 파일 상태를 어떤 말로 보여 줄까요?
 - `git add`는 단순히 "파일을 추가한다"는 뜻일까요, 아니면 더 정확한 의미가 있을까요?
-
-## 큰 그림
-
-![Git & GitHub 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/02/02-01-mental-model.ko.png)
-
-*Git & GitHub 101 2장 흐름 개요*
 
 ## 왜 중요한가
 

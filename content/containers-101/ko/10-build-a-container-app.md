@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 FastAPI와 Postgres를 예시로 Dockerfile, Compose, healthcheck, 시크릿 분리, 로그 확인을 하나의 실행 스택으로 연결합니다.
 
+
+![Containers 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/10/10-01-concept-at-a-glance.ko.png)
+*Containers 101 10장 흐름 개요*
+> 실전 컨테이너 앱의 핵심은 개별 명령이 아니라, 로컬 개발 → CI 빌드 → 배포 → 운영 전체 파이프라인에서 재현성과 관찰성을 유지하는 것입니다.
+
 ## 먼저 던지는 질문
 
 - FastAPI 앱용 Dockerfile은 어떤 기준으로 작성해야 할까요?
 - Compose로 앱과 DB를 어떻게 함께 묶을 수 있을까요?
 - healthcheck는 왜 orchestration 신호로 중요할까요?
-
-## 큰 그림
-
-![Containers 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/10/10-01-concept-at-a-glance.ko.png)
-
-*Containers 101 10장 흐름 개요*
-
-실전 컨테이너 앱은 로컬 개발부터 프로덕션 배포까지, Dockerfile · Registry · Runtime · Network · Volume 모든 개념을 한 번에 엮어야 합니다.
-
-> 실전 컨테이너 앱의 핵심은 개별 명령이 아니라, 로컬 개발 → CI 빌드 → 배포 → 운영 전체 파이프라인에서 재현성과 관찰성을 유지하는 것입니다.
 
 ## 왜 중요한가
 

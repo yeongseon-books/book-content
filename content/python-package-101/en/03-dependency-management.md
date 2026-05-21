@@ -28,19 +28,14 @@ The same code can behave differently just because two environments installed dif
 
 This is post 3 in the Python Package 101 series. Here we cover virtual environments, the different jobs of `requirements.txt` and `pyproject.toml`, and why `uv` is becoming the fast path for new Python projects.
 
+![Python Package 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/03/03-01-mental-model.en.png)
+*Python Package 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why do we need virtual environments and how do they work?
 - What is the relationship between `pip freeze` and `requirements.txt`?
 - How does `uv` differ from `pip`?
-
-## Big Picture
-
-![Python Package 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/03/03-01-mental-model.en.png)
-
-*Python Package 101 chapter 3 flow overview*
-
-This picture places Dependency Management — venv, pip, uv, requirements inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What you will learn
 

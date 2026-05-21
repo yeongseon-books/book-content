@@ -26,21 +26,15 @@ seo_description: 청킹은 텍스트를 작게 자르는 일이 아니라 검색
 
 여기서는 문서 형태별 청킹 프리셋을 비교하고, 분할 결과를 신뢰해도 되는지 빠르게 판단할 수 있는 신호를 살펴봅니다.
 
+![Chunking strategy selection flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/02/02-01-chunking-flow-by-document-type.ko.png)
+*Chunking strategy selection flow*
+> 청킹은 텍스트를 작게 자르는 일이 아니라 검색이 아직 신뢰할 수 있는 최소 문맥 단위를 설계하는 일입니다.
+
 ## 먼저 던지는 질문
 
 - 모든 문서에 같은 chunk_size를 쓰면 왜 검색 품질이 흔들릴까요?
 - Recursive splitter는 어떤 순서로 경계를 포기하며 텍스트를 나눌까요?
 - 임베딩 전에 청크 품질을 빠르게 검토하려면 무엇을 봐야 할까요?
-
-## 큰 그림
-
-![Chunking strategy selection flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/02/02-01-chunking-flow-by-document-type.ko.png)
-
-*Chunking strategy selection flow*
-
-이 그림에서는 문서 유형마다 다른 구조를 가진 원문이 splitter 설정을 거쳐 검색 가능한 청크로 바뀌는 흐름을 봅니다. 좋은 청킹은 크기 하나를 고르는 일이 아니라 문서 구조와 검색 질문을 함께 맞추는 일입니다.
-
-> 청킹은 텍스트를 작게 자르는 일이 아니라 검색이 아직 신뢰할 수 있는 최소 문맥 단위를 설계하는 일입니다.
 
 ## 문서 유형별 청킹 흐름
 

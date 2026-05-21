@@ -28,21 +28,16 @@ A capstone is better understood as a small product-delivery exercise. The team d
 
 This is the first post in the Capstone Project 101 series. It defines what separates a capstone from ordinary coursework and establishes the delivery flow used throughout the series.
 
+
+![capstone project 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/01/01-01-the-flow-at-a-glance.en.png)
+*capstone project 101 chapter 1 flow overview*
+> The real distinction in a capstone is that you control the entire flow: problem choice, scope, demo shape, and retrospective. That control is the main learning.
+
 ## Questions to Keep in Mind
 
 - How is a capstone project different from a regular class assignment?
 - Why do some teams build features but still finish with a weak project story?
 - What should you evaluate besides feature count?
-
-## Big Picture
-
-![capstone project 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/01/01-01-the-flow-at-a-glance.en.png)
-
-*capstone project 101 chapter 1 flow overview*
-
-This picture places What is a Capstone Project inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> The real distinction in a capstone is that you control the entire flow: problem choice, scope, demo shape, and retrospective. That control is the main learning.
 
 ## What You Will Learn
 

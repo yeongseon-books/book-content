@@ -28,17 +28,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 ConfigMap과 Secret을 단순한 키/값 저장소가 아니라, 이미지를 환경별 차이와 민감한 값에서 분리하기 위한 기본 운영 도구라는 관점에서 정리하겠습니다.
 
+
+![Kubernetes 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/06/06-01-concept-at-a-glance.ko.png)
+*Kubernetes 101 6장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 이미지 안에 설정과 비밀번호를 같이 넣으면 왜 운영이 어려워질까요?
 - ConfigMap과 Secret은 무엇이 다르고 어디서 나뉠까요?
 - 환경 변수 주입과 파일 마운트는 언제 다르게 선택할까요?
-
-## 큰 그림
-
-![Kubernetes 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/06/06-01-concept-at-a-glance.ko.png)
-
-*Kubernetes 101 6장 흐름 개요*
 
 ## 왜 중요한가
 

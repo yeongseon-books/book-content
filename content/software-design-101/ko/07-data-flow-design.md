@@ -32,17 +32,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 데이터 흐름을 설계한다는 말이 무엇인지, 입력에서 출력까지 한 방향 흐름을 어떻게 만들지, 작은 변환 함수의 파이프라인은 왜 유리한지, 불변 데이터와 부수효과 분리가 구조를 어떻게 단순하게 만드는지 살펴봅니다.
 
+
+![Software Design 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/07/07-01-concept-at-a-glance.ko.png)
+*Software Design 101 7장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 데이터 흐름을 설계한다는 말은 구체적으로 무엇일까요?
 - 입력과 출력 사이를 왜 한 방향으로만 흐르게 해야 할까요?
 - 변환 단계와 부수효과는 어떻게 나누는 편이 좋을까요?
-
-## 큰 그림
-
-![Software Design 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/07/07-01-concept-at-a-glance.ko.png)
-
-*Software Design 101 7장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -451,7 +449,6 @@ class PlaceOrderService:
 - 인프라 계층: 외부 API 오류율, DB 지연 시간
 
 지표를 계층별로 분리해 보면 어디를 고쳐야 하는지가 명확해집니다. 모든 지표가 한 대시보드에서 섞여 있으면 "느리다"는 사실만 보이고 원인은 보이지 않습니다. 설계 경계를 운영 지표 경계와 맞추면 개선 사이클이 빠르게 돌아갑니다.
-
 
 
 ## 리뷰와 리팩터링을 위한 실전 질문 세트

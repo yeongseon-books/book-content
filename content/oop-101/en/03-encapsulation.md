@@ -30,19 +30,15 @@ This is post 3 in the Object-Oriented Programming 101 series.
 
 > Encapsulation shields an object's internal state from direct external modification, exposing it only through a controlled interface. Python has no enforced access control, but naming conventions and the property decorator provide effective encapsulation.
 
+
+![Object-Oriented Programming 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/03/03-01-big-picture.en.png)
+*Object-Oriented Programming 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Encapsulation?
 - Which signal should the example or diagram make visible for Encapsulation?
 - What failure should be prevented first when Encapsulation reaches a real system?
-
-## Big Picture
-
-![Object-Oriented Programming 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/03/03-01-big-picture.en.png)
-
-*Object-Oriented Programming 101 chapter 3 flow overview*
-
-This picture places Encapsulation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

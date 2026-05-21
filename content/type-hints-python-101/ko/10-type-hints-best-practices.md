@@ -27,17 +27,15 @@ last_reviewed: '2026-05-17'
 
 이 글은 Type Hints (Python) 101 시리즈의 마지막 글입니다. 여기서는 느슨한 주문 처리 모듈 하나를 출발점으로 삼아, `Any`가 퍼진 코드와 빈약한 시그니처를 어떻게 정리하는지, 왜 그 순서가 실무적으로 효과적인지, 그리고 마지막에 어떤 검증 단계까지 연결해야 하는지를 runnable한 before/after 흐름으로 정리합니다.
 
+
+![Type Hints in Python 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/10/10-01-big-picture.ko.png)
+*Type Hints in Python 101 10장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 타입 힌트는 어디에 먼저 붙여야 투자 대비 효과가 클까요?
 - `Any`가 퍼진 코드는 어떤 순서로 줄여야 할까요?
 - 반환 타입, 공개 API, 내부 헬퍼 중 무엇을 먼저 단단하게 만들어야 할까요?
-
-## 큰 그림
-
-![Type Hints in Python 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/10/10-01-big-picture.ko.png)
-
-*Type Hints in Python 101 10장 흐름 개요*
 
 ## 왜 이 주제가 중요한가
 
@@ -414,7 +412,6 @@ after 상태에서는 호출부 타입 불일치를 정확히 보고합니다.
 | 예외 관리 | `type: ignore`에 사유와 코드 기재 |
 
 
-
 ## mypy 오류를 읽는 순서
 
 실무에서는 오류 개수보다 읽는 순서가 더 중요합니다. 다음 순서를 고정하면 수정 시간이 크게 줄어듭니다.
@@ -545,7 +542,6 @@ Success: no issues found in N source files
 위 결과가 나오더라도 끝이 아닙니다. 새로운 기능을 추가할 때 같은 원칙을 반복해 계약을 유지해야 타입 힌트가 장기적으로 품질을 지켜 줍니다.
 
 
-
 ## 추가 사례: 주문 처리 모듈 타입 하드닝
 
 아래 코드는 실제로 자주 보는 레거시 패턴입니다.
@@ -620,7 +616,6 @@ service.py:36: error: Missing key "user" for TypedDict "InvoicePayload"  [typedd
 - 외부 입력 파싱 함수에는 `Optional`/`Union` 처리 분기를 강제합니다.
 - 리뷰에서 `Any` 추가가 보이면 대체 타입 후보를 함께 요구합니다.
 - CI에서는 타입 검사 실패를 테스트 실패와 동등하게 취급합니다.
-
 
 
 ## 최종 운영 규칙 요약

@@ -30,21 +30,16 @@ last_reviewed: '2026-05-12'
 
 여기서는 모델 모니터링을 시스템 메트릭, 모델 메트릭, 비즈니스 메트릭이 만나는 관측 계층으로 보고, Prometheus 중심의 최소 구성을 정리하겠습니다.
 
+
+![MLOps 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/06/06-01-see-the-flow-first.ko.png)
+*MLOps 101 6장 흐름 개요*
+> 로그드 메트릭 링크가 배포 직후부터 끝답 초까지 리두머드 되기 때문에 단순한 로그 서칙 난제도 큰 문제가 된 수 있습니다.
+
 ## 먼저 던지는 질문
 
 - 정확도만 봐서는 왜 운영 문제를 너무 늦게 알게 될까요?
 - 메트릭, 로그, 트레이스는 무엇이 다를까요?
 - Prometheus와 Grafana는 모델 운영에서 어떤 역할을 할까요?
-
-## 큰 그림
-
-![MLOps 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/06/06-01-see-the-flow-first.ko.png)
-
-*MLOps 101 6장 흐름 개요*
-
-이 그림은 메트릭, 로그, 트레이스 간 일대일 대응을 보여줍니다. 빠른 실넘는 메트릭 링크가 배포 직후부터 끝답 초까지 리두머드 되기 때문에 단순한 로그 서칙 난제도 큰 문제가 된 수 있습니다.
-
-> 로그드 메트릭 링크가 배포 직후부터 끝답 초까지 리두머드 되기 때문에 단순한 로그 서칙 난제도 큰 문제가 된 수 있습니다.
 
 ## 왜 중요한가
 

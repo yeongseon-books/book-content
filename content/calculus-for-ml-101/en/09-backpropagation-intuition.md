@@ -30,19 +30,15 @@ In this post, we'll use computation graphs, forward and backward passes, local d
 
 > Backpropagation is not new math. It is the chain rule executed systematically over a computation graph, with cached forward values and accumulated backward signals.
 
+
+![calculus for ml 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/09/09-01-concept-at-a-glance.en.png)
+*calculus for ml 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Backpropagation Intuition?
 - Which signal should the example or diagram make visible for Backpropagation Intuition?
 - What failure should be prevented first when Backpropagation Intuition reaches a real system?
-
-## Big Picture
-
-![calculus for ml 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/09/09-01-concept-at-a-glance.en.png)
-
-*calculus for ml 101 chapter 9 flow overview*
-
-This picture places Backpropagation Intuition inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions this article answers
 

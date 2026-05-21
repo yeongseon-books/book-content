@@ -30,19 +30,15 @@ Here, we will treat SQL injection as a structural error in how code combines syn
 
 > SQL injection almost always comes from the same root cause: building SQL by string composition instead of sending data as data.
 
+
+![secure coding 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/07/07-01-concept-at-a-glance.en.png)
+*secure coding 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying SQL Injection and Safe ORM Usage?
 - Which signal should the example or diagram make visible for SQL Injection and Safe ORM Usage?
 - What failure should be prevented first when SQL Injection and Safe ORM Usage reaches a real system?
-
-## Big Picture
-
-![secure coding 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/07/07-01-concept-at-a-glance.en.png)
-
-*secure coding 101 chapter 7 flow overview*
-
-This picture places SQL Injection and Safe ORM Usage inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions This Chapter Answers
 

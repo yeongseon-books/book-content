@@ -29,19 +29,15 @@ Time and space complexity describe how an algorithm's cost grows with input size
 
 This is post 2 in the Algorithms 101 series. Here we cover Big-O and related notation, plus the cost model you need to compare algorithms before you benchmark them.
 
+
+![algorithms 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/02/02-01-big-picture.en.png)
+*algorithms 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Time and Space Complexity?
 - Which signal should the example or diagram make visible for Time and Space Complexity?
 - What failure should be prevented first when Time and Space Complexity reaches a real system?
-
-## Big Picture
-
-![algorithms 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/02/02-01-big-picture.en.png)
-
-*algorithms 101 chapter 2 flow overview*
-
-This picture places Time and Space Complexity inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

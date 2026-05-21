@@ -30,17 +30,14 @@ last_reviewed: '2026-05-15'
 좋은 소프트웨어를 판단할 때 흔히 코드 스타일이나 추상화 수준에 먼저 시선이 갑니다. 물론 중요합니다. 하지만 실제로 더 큰 신호는 변경 리드 타임, 사고 복구 속도, 신규 입사자의 적응 시간, 사용자 만족도처럼 코드 바깥에서 드러나는 경우가 많습니다. 품질은 내부 구조와 외부 결과가 함께 맞아야 합니다.
 
 
+![Software Engineering 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/10/10-01-concept-at-a-glance.ko.png)
+*Software Engineering 101 10장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 좋은 코드와 좋은 소프트웨어는 왜 같은 말이 아닐까요?
 - 품질 속성은 어떤 축으로 나뉘고, 왜 균형이 중요할까요?
 - SOLID 원칙은 실무에서 어떤 기준으로 읽어야 할까요?
-
-## 큰 그림
-
-![Software Engineering 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/10/10-01-concept-at-a-glance.ko.png)
-
-*Software Engineering 101 10장 흐름 개요*
 
 ## 왜 중요한가
 

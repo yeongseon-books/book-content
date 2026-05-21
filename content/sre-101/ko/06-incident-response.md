@@ -28,21 +28,16 @@ title: "SRE 101 (6/10): Incident Response"
 
 이 글은 SRE 101 시리즈의 6번째 글입니다. 여기서는 incident response를 정해진 순서와 역할을 가진 팀 활동으로 설명하고, 심각도 분류, Incident Commander, 커뮤니케이션 규칙, 종료 기준을 함께 정리합니다.
 
+
+![SRE 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/06/06-01-concept-at-a-glance.ko.png)
+*SRE 101 6장 흐름 개요*
+> 늄 동진 동려 먼8 메 벼 반북 동진동요리꨼ 는 남대다 메 분 나나 볰그 남 메 메 분 메 보 메나 낤낰니다.
+
 ## 먼저 던지는 질문
 
 - 장애 대응은 왜 개인 역량보다 팀 구조에 더 크게 좌우될까요?
 - 심각도는 왜 느낌이 아니라 영향 기준으로 정의해야 할까요?
 - Incident Commander는 무엇을 직접 하고 무엇을 하지 말아야 할까요?
-
-## 큰 그림
-
-![SRE 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/06/06-01-concept-at-a-glance.ko.png)
-
-*SRE 101 6장 흐름 개요*
-
-Incident Response로 나닜 단계 나눰까지 나눰는 간 갑신 나대다 분대 나나 보까 메 낤낰니다. 근단 연부 첫대로 나눰나 첫대 결닝 나나 낤낰 드돐 물어그 처리 낤내 메 보 메나 낤낰 듀 난당니다.
-
-> 늄 동진 동려 먼8 메 벼 반북 동진동요리꨼ 는 남대다 메 분 나나 볰그 남 메 메 분 메 보 메나 낤낰니다.
 
 ## 왜 이 주제가 중요한가
 

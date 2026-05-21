@@ -25,19 +25,15 @@ It is easy to think the job ends once you download a dataset, run `pandas.read_c
 
 This is the first post in the AI Data Preparation 101 series. Here we cover why data preparation has outsized impact on model quality and which early mistakes tend to compound later.
 
+
+![AI data preparation chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/01/01-01-big-picture.en.png)
+*AI data preparation chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - When does data preparation create more lift than another round of model tuning?
 - Which data failures make offline metrics look healthy while production quality degrades?
 - Why is data preparation better treated as one pipeline than as a few disconnected preprocessing scripts?
-
-## Big Picture
-
-![AI data preparation chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/01/01-01-big-picture.en.png)
-
-*AI data preparation chapter 1 flow overview*
-
-This picture places Why Data Preparation Determines Model Quality inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## "Can't I Just Grab Some Data and Train?"
 

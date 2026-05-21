@@ -26,19 +26,15 @@ After using frameworks for a while, it is easy to forget what an HTTP server is 
 
 This is post 2 in the Backend Development 101 series. Here, we start from the fact that HTTP is text over a socket and use both a raw socket server and FastAPI to rebuild that mental model from the bottom up.
 
+
+![backend development 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/02/02-01-concept-at-a-glance.en.png)
+*backend development 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - The actual shape of an HTTP request and response?
 - How HTTP rides on top of TCP?
 - The meaning of status codes and headers?
-
-## Big Picture
-
-![backend development 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/02/02-01-concept-at-a-glance.en.png)
-
-*backend development 101 chapter 2 flow overview*
-
-This picture places Building an HTTP Server inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

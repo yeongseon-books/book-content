@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 Operating Systems 101 시리즈의 8번째 글입니다.
 
+
+![Operating Systems 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/08/08-01-the-path-from-write-to-durable-storage.ko.png)
+*Operating Systems 101 8장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - inode와 디렉터리 엔트리는 파일을 어떻게 표현할까요?
 - 페이지 캐시와 `fsync`는 각각 어디까지를 보장할까요?
 - 저널링은 충돌 이후 어떤 복구를 가능하게 할까요?
-
-## 큰 그림
-
-![Operating Systems 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/08/08-01-the-path-from-write-to-durable-storage.ko.png)
-
-*Operating Systems 101 8장 흐름 개요*
 
 ## 기본 모델
 > 파일은 inode라는 메타데이터 구조와 데이터 블록의 조합입니다. 디렉터리는 이름과 inode 번호의 매핑일 뿐입니다. write는 보통 페이지 캐시에만 쓰이고, 실제 디스크에는 나중에 내려갑니다. fsync는 "지금 디스크에 내려라"고 OS에 요청하는 호출입니다.

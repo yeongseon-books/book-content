@@ -28,19 +28,14 @@ Packaging becomes much more tangible once `pip install` gives a user an actual c
 
 This is post 7 in the Python Package 101 series. Here we connect `[project.scripts]` entry points to real Python functions, compare `argparse` with `click`, and design CLIs that hold up in everyday tooling.
 
+![Python Package 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/07/07-01-mental-model.en.png)
+*Python Package 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - How do you create a command that runs directly in the terminal after `pip install`?
 - How does a `[project.scripts]` entry point work?
 - What is the difference between `argparse` and `click`?
-
-## Big Picture
-
-![Python Package 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/07/07-01-mental-model.en.png)
-
-*Python Package 101 chapter 7 flow overview*
-
-This picture places CLI Packages inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What you will learn
 

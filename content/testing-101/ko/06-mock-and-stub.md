@@ -30,21 +30,16 @@ last_reviewed: '2026-05-12'
 
 이 글은 Testing 101 시리즈의 여섯 번째 글입니다. 여기서는 `unittest.mock` 예제를 바탕으로 Mock과 Stub의 목적 차이, 상태 검증과 상호작용 검증의 차이, 그리고 과한 Mock 사용이 보내는 설계 신호를 정리하겠습니다.
 
+
+![Testing 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/06/06-01-diagram.ko.png)
+*Testing 101 6장 흐름 개요*
+> Stub은 응답을 제어하고, Mock은 호출 자체를 검증합니다.
+
 ## 먼저 던지는 질문
 
 - Stub과 Mock은 정확히 무엇이 다를까요?
 - 상태 검증과 상호작용 검증은 어떻게 구분할까요?
 - `MagicMock`, `patch`, `side_effect`는 언제 쓰일까요?
-
-## 큰 그림
-
-![Testing 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/06/06-01-diagram.ko.png)
-
-*Testing 101 6장 흐름 개요*
-
-이 그림에서는 stub이 값을 돌려주는 것에 집중하는 반면, mock은 호출 여부와 호출 방식을 검증하는 차이를 보여줍니다. 같은 대체 객체지만 목표가 다릅니다.
-
-> Stub은 응답을 제어하고, Mock은 호출 자체를 검증합니다.
 
 ## 왜 중요한가
 

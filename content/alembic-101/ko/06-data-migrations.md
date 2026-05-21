@@ -27,17 +27,15 @@ seo_description: 데이터 마이그레이션은 "schema는 그대로 두고 row
 
 데이터 마이그레이션은 주변의 schema 변경보다 더 느리고, 더 비가역적이며, 실패했을 때 복구가 더 어렵습니다. 그래서 row 변환을 revision 안에 어떻게 격리하느냐가 lock 시간과 재실행 안정성을 좌우합니다.
 
+
+![Alembic 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/06/06-01-diagram-the-three-stage-split-for-data-m.ko.png)
+*Alembic 101 6장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - data migration은 schema migration과 무엇이 다를까요?
 - `op.execute`는 raw SQL과 SQLAlchemy Core 중 어떤 스타일로 쓸 수 있을까요?
 - 큰 데이터셋은 어떤 batch 패턴으로 나누어 처리해야 할까요?
-
-## 큰 그림
-
-![Alembic 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/06/06-01-diagram-the-three-stage-split-for-data-m.ko.png)
-
-*Alembic 101 6장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -450,7 +448,6 @@ table already exists -> baseline/stamp 전략 점검 필요
 원칙을 문서가 아니라 PR 템플릿과 CI로 강제하는 것이 핵심입니다.
 
 
-
 ## 확장 부록: 배포/복구 실습 시나리오
 
 ### 시나리오 A: add column + backfill + tighten
@@ -521,7 +518,6 @@ alembic upgrade head --sql > /tmp/migration-preview.sql
 이 게이트들은 Alembic 자체 기능이라기보다 팀 운영 안전장치입니다.
 
 
-
 ## 보강 메모: 검증 중심 운영 노트
 
 Alembic 운영에서 가장 큰 차이는 "명령 실행"이 아니라 "검증 기록"입니다. 같은 `upgrade head`를 실행해도 검증 쿼리, SQL preview, head 개수 확인을 함께 남기면 문제 재현성이 크게 높아집니다.
@@ -556,7 +552,6 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 이 네 단계는 엔진(SQLite/PostgreSQL)과 무관하게 공통으로 적용됩니다.
 
 
-
 ## 보강 메모: 검증 중심 운영 노트
 
 Alembic 운영에서 가장 큰 차이는 "명령 실행"이 아니라 "검증 기록"입니다. 같은 `upgrade head`를 실행해도 검증 쿼리, SQL preview, head 개수 확인을 함께 남기면 문제 재현성이 크게 높아집니다.
@@ -589,7 +584,6 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 ```
 
 이 네 단계는 엔진(SQLite/PostgreSQL)과 무관하게 공통으로 적용됩니다.
-
 
 
 ## 보강 메모: 검증 중심 운영 노트

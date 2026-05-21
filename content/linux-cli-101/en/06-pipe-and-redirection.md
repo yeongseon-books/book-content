@@ -28,19 +28,15 @@ Single commands are useful, but real CLI work usually starts when you connect th
 
 This is post 6 in the Linux CLI 101 series.
 
+
+![Linux CLI 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/06/06-01-mental-model.en.png)
+*Linux CLI 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - Passing the output of one command as input to the next with pipe (`|`)?
 - Saving output to a file with `>` (overwrite) and `>>` (append)?
 - The meaning of stdin (0), stdout (1), and stderr (2) file descriptors?
-
-## Big Picture
-
-![Linux CLI 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/06/06-01-mental-model.en.png)
-
-*Linux CLI 101 chapter 6 flow overview*
-
-This picture places Pipes and Redirection inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

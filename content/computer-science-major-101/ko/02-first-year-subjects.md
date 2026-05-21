@@ -28,21 +28,15 @@ last_reviewed: '2026-05-14'
 1학년 시간표를 보면 전공다운 이름보다 수학과 기초 과목이 먼저 눈에 들어옵니다. 코딩을 배우러 왔다고 생각한 학생에게는 이 구성이 다소 멀게 느껴질 수 있습니다.
 
 
+![Computer Science Major 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/02/02-01-first-year-foundation-map.ko.png)
+*컴퓨터학과 전공 가이드 2장 흐름 개요*
+> 1학년의 핵심은 각 과목을 따로 결들 기본씨 난중 비중 단순히 돌링음이 되는 것이 아니라, 각 것이 다음 게 다식 눈을 되넘수 있는 부분의 네이라는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - 왜 1학년 과목은 수학과 프로그래밍 비중이 유난히 클까요?
 - 미적분, 선형대수, 이산수학, 프로그래밍 입문은 각각 어떤 역할을 맡을까요?
 - 지금은 진로와 멀어 보이는 과목이 왜 2학년 이후 성과를 가를까요?
-
-## 큰 그림
-
-![Computer Science Major 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/02/02-01-first-year-foundation-map.ko.png)
-
-*컴퓨터학과 전공 가이드 2장 흐름 개요*
-
-이 그림에서 보이듯 1학년 과목은 기초를 다지면서 리나 모든 전공의 뿌리를 괭습니다. 각 시간에 두는 것이 나중에 왜 결과로 나타나는지 이해하는 것이 중요합니다.
-
-> 1학년의 핵심은 각 과목을 따로 결들 기본씨 난중 비중 단순히 돌링음이 되는 것이 아니라, 각 것이 다음 게 다식 눈을 되넘수 있는 부분의 네이라는 데 있습니다.
 
 ## 이 글에서 배울 것
 

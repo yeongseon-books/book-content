@@ -26,17 +26,15 @@ last_reviewed: '2026-05-12'
 
 화면이 작을 때는 JavaScript 몇 줄과 DOM 조작만으로도 충분합니다. 하지만 화면이 커지고 기능이 늘어나면 금방 한 파일에 모든 로직이 몰립니다. 그 순간부터는 코드를 실행하는 것보다 읽는 일이 더 힘들어집니다.
 
+
+![Frontend Development 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/04/04-01-diagram.ko.png)
+*Frontend Development 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 컴포넌트 사고방식은 단순히 React 문법을 넘어서 무엇을 바꿔 줄까요?
 - props와 state는 어떤 기준으로 구분해야 할까요?
 - 단방향 데이터 흐름은 왜 대부분의 현대 프론트엔드 프레임워크의 기본 전제일까요?
-
-## 큰 그림
-
-![Frontend Development 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/04/04-01-diagram.ko.png)
-
-*Frontend Development 101 4장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -58,7 +56,7 @@ last_reviewed: '2026-05-12'
 
 ## 전통 방식과 현대 방식 비교
 
-**Before (everything in one file)**
+**Before (모든 것이 한 파일에)**
 
 ```html
 <script>
@@ -66,7 +64,7 @@ last_reviewed: '2026-05-12'
 </script>
 ```
 
-**After (split into components)**
+**After (컴포넌트로 분리)**
 
 ```jsx
 function App()    { ... }
@@ -357,7 +355,6 @@ export default defineConfig({
 ### 실무 연결 포인트
 
 프론트엔드는 더 이상 단순 화면 기술이 아닙니다. API 계약, 번들 최적화, 브라우저 성능, 접근성, 운영 관측이 모두 만나는 실행 계층입니다. 따라서 작은 예제라도 HTML/CSS/JS 코드, 컴포넌트 패턴, 빌드 설정을 한 번에 다뤄 보는 연습이 필요합니다. 이 연습을 반복하면 도구가 바뀌어도 구조를 잃지 않고, 신규 기능을 추가할 때도 안정적으로 확장할 수 있습니다.
-
 
 
 ## 실무 앵커 모음: 프레임워크, 레이아웃, 디버깅, 성능

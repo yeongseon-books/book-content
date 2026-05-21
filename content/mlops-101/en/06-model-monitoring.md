@@ -30,21 +30,16 @@ This is post 6 in the MLOps 101 series.
 
 Here, we will treat monitoring as the observation layer where system metrics, model metrics, and business metrics meet, starting from a practical Prometheus-based baseline.
 
+
+![mlops 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/06/06-01-see-the-flow-first.en.png)
+*mlops 101 chapter 6 flow overview*
+> Model monitoring is not watching a dashboard. It is catching production anomalies fast enough to prevent silent performance loss from compounding into a large incident.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Model Monitoring?
 - Which signal should the example or diagram make visible for Model Monitoring?
 - What failure should be prevented first when Model Monitoring reaches a real system?
-
-## Big Picture
-
-![mlops 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/06/06-01-see-the-flow-first.en.png)
-
-*mlops 101 chapter 6 flow overview*
-
-This picture places Model Monitoring inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Model monitoring is not watching a dashboard. It is catching production anomalies fast enough to prevent silent performance loss from compounding into a large incident.
 
 ## Questions this article answers
 

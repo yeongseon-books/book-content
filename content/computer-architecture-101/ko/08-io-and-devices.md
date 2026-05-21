@@ -27,17 +27,15 @@ last_reviewed: '2026-05-12'
 
 이 주제는 단순히 하드웨어 교양에 머물지 않습니다. `select`, `epoll`, `async/await`, 이벤트 루프, 시스템 콜 같은 운영체제와 애플리케이션 설계의 핵심이 모두 여기서 출발하기 때문입니다.
 
+
+![Computer Architecture 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/08/08-01-big-picture.ko.png)
+*Computer Architecture 101 8장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - CPU와 장치의 속도 차이는 얼마나 클까요?
 - 폴링과 인터럽트는 어떻게 다를까요?
 - DMA는 왜 CPU를 더 자유롭게 만들까요?
-
-## 큰 그림
-
-![Computer Architecture 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/08/08-01-big-picture.ko.png)
-
-*Computer Architecture 101 8장 흐름 개요*
 
 ## 왜 중요한가
 

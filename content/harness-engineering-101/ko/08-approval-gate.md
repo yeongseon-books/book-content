@@ -24,21 +24,16 @@ seo_description: 어떤 행동은 자동으로 실행되어서는 안 됩니다.
 Approval Gate는 사람이 개입해야 하는 지점을 설계하는 층입니다. 위험 행동 앞에 명시적인 정지선을 두고, dry-run preview와 결정 로그를 남기며, 승인·거절·timeout을 모두 시스템 흐름에 포함시켜야 합니다.
 이 글은 Harness Engineering 101 시리즈의 8번째 글입니다.
 자동화의 가치는 모든 것을 자동화하는 데 있지 않고, 자동화하면 안 되는 지점을 정확히 고르는 데 있습니다.
+
+![Approval Gate - 사람 승인이 필요한 지점 설계하기](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/08/08-01-approval-gates-designing-where-humans-mu.ko.png)
+*Approval Gate - 사람 승인이 필요한 지점 설계하기*
+> Approval Gate의 목적은 자동화를 포기하는 것이 아니라, 되돌리기 어려운 행동에 사람의 결정권을 명시적으로 넣는 것입니다.
+
 ## 먼저 던지는 질문
 
 - Approval Gate는 자동화를 멈추는 방해물이 아니라 어떤 결정 권한을 구조화할까요?
 - 어떤 행동은 dry-run으로 충분하고 어떤 행동은 사람 승인이 필요할까요?
 - 승인 로그에는 나중에 무엇을 재구성할 수 있도록 남겨야 할까요?
-
-## 큰 그림
-
-![Approval Gate - 사람 승인이 필요한 지점 설계하기](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/08/08-01-approval-gates-designing-where-humans-mu.ko.png)
-
-*Approval Gate - 사람 승인이 필요한 지점 설계하기*
-
-이 그림에서는 자동화 흐름 안에서 위험한 행동이 승인 지점에 멈추고, 사람이 근거를 보고 승인·거절하는 구조를 봅니다. Approval Gate는 agent를 느리게 만드는 장치가 아니라 권한 있는 결정을 안전하게 남기는 경계입니다.
-
-> Approval Gate의 목적은 자동화를 포기하는 것이 아니라, 되돌리기 어려운 행동에 사람의 결정권을 명시적으로 넣는 것입니다.
 
 ## 왜 이 글이 중요한가
 Approval Gate가 중요한 첫 번째 이유는 책임 경계입니다. 에이전트가 실제 세계에 영향을 주는 순간, 누가 언제 어떤 근거로 멈췄는지가 남아 있어야 합니다.

@@ -27,17 +27,15 @@ last_reviewed: '2026-05-12'
 
 재귀는 왜 어렵게 느껴질까요? 그리고 mergesort 같은 분할 정복 알고리즘은 왜 "올바른 이유로" 빠를까요? 여기서는 호출 스택, 점화식 기반 비용 분석, 그리고 분할 정복의 핵심 멘탈 모델을 정리합니다.
 
+
+![Algorithms 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/05/05-01-big-picture.ko.png)
+*Algorithms 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 올바른 재귀가 되기 위한 세 가지 규칙은 무엇일까요?
 - 호출 스택은 어떻게 동작하며, `RecursionError`는 왜 생길까요?
 - 분할 정복 점화식은 어떻게 읽어야 할까요?
-
-## 큰 그림
-
-![Algorithms 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/05/05-01-big-picture.ko.png)
-
-*Algorithms 101 5장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -300,7 +298,6 @@ for t in trace:
 5. 마지막에 복잡도와 메모리 사용량을 한 줄로 기록합니다.
 
 이 루틴을 습관화하면 "코드가 돌아간다"와 "운영에서도 안전하다" 사이의 간격이 크게 줄어듭니다.
-
 
 
 ## 추가 보강: 검증 가능한 예제 세트

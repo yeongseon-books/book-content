@@ -27,17 +27,15 @@ seo_description: alembic revision graph는 git 브랜치와 똑같이 DAG(direct
 
 팀에서 동시에 PR을 열면 revision graph가 갈라지는 일은 예외가 아니라 정상 상태입니다. 이 사실을 모르고 있으면 처음 만나는 `Multiple head revisions are present` 에러가 실제보다 훨씬 더 위협적으로 느껴집니다.
 
+
+![Alembic 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/05/05-01-diagram-merging-multiple-heads-back-to-o.ko.png)
+*Alembic 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 언제 Alembic revision graph가 branch로 갈라질까요?
 - `branch_labels`와 `depends_on`은 각각 정확히 무슨 역할일까요?
 - 두 개의 head를 `alembic merge`로 어떻게 합칠까요?
-
-## 큰 그림
-
-![Alembic 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/05/05-01-diagram-merging-multiple-heads-back-to-o.ko.png)
-
-*Alembic 101 5장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -445,7 +443,6 @@ table already exists -> baseline/stamp 전략 점검 필요
 원칙을 문서가 아니라 PR 템플릿과 CI로 강제하는 것이 핵심입니다.
 
 
-
 ## 확장 부록: 배포/복구 실습 시나리오
 
 ### 시나리오 A: add column + backfill + tighten
@@ -516,6 +513,39 @@ alembic upgrade head --sql > /tmp/migration-preview.sql
 이 게이트들은 Alembic 자체 기능이라기보다 팀 운영 안전장치입니다.
 
 
+## 보강 메모: 검증 중심 운영 노트
+
+Alembic 운영에서 가장 큰 차이는 "명령 실행"이 아니라 "검증 기록"입니다. 같은 `upgrade head`를 실행해도 검증 쿼리, SQL preview, head 개수 확인을 함께 남기면 문제 재현성이 크게 높아집니다.
+
+```bash
+alembic heads
+alembic current
+alembic upgrade head --sql > /tmp/ddl.sql
+```
+
+```sql
+SELECT version_num FROM alembic_version;
+```
+
+또한 data migration이 포함된 경우에는 진행률을 관찰 가능한 숫자로 남겨야 합니다.
+
+```sql
+SELECT COUNT(*) FROM users WHERE tier IS NULL;
+```
+
+운영자는 이 숫자를 기준으로 tighten 단계 진행 여부를 결정해야 합니다. 값이 0이 아니면 단계 진행을 멈추고 backfill을 계속해야 합니다.
+
+배포 실패 대응의 기본 원칙은 다음과 같습니다.
+
+```text
+1) 현재 revision 위치를 먼저 확정한다.
+2) graph 상태(single head인지)를 확인한다.
+3) backward-compatible 여부를 판단한다.
+4) 가능하면 forward-fix revision으로 복구한다.
+```
+
+이 네 단계는 엔진(SQLite/PostgreSQL)과 무관하게 공통으로 적용됩니다.
+
 
 ## 보강 메모: 검증 중심 운영 노트
 
@@ -551,7 +581,6 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 이 네 단계는 엔진(SQLite/PostgreSQL)과 무관하게 공통으로 적용됩니다.
 
 
-
 ## 보강 메모: 검증 중심 운영 노트
 
 Alembic 운영에서 가장 큰 차이는 "명령 실행"이 아니라 "검증 기록"입니다. 같은 `upgrade head`를 실행해도 검증 쿼리, SQL preview, head 개수 확인을 함께 남기면 문제 재현성이 크게 높아집니다.
@@ -584,42 +613,6 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 ```
 
 이 네 단계는 엔진(SQLite/PostgreSQL)과 무관하게 공통으로 적용됩니다.
-
-
-
-## 보강 메모: 검증 중심 운영 노트
-
-Alembic 운영에서 가장 큰 차이는 "명령 실행"이 아니라 "검증 기록"입니다. 같은 `upgrade head`를 실행해도 검증 쿼리, SQL preview, head 개수 확인을 함께 남기면 문제 재현성이 크게 높아집니다.
-
-```bash
-alembic heads
-alembic current
-alembic upgrade head --sql > /tmp/ddl.sql
-```
-
-```sql
-SELECT version_num FROM alembic_version;
-```
-
-또한 data migration이 포함된 경우에는 진행률을 관찰 가능한 숫자로 남겨야 합니다.
-
-```sql
-SELECT COUNT(*) FROM users WHERE tier IS NULL;
-```
-
-운영자는 이 숫자를 기준으로 tighten 단계 진행 여부를 결정해야 합니다. 값이 0이 아니면 단계 진행을 멈추고 backfill을 계속해야 합니다.
-
-배포 실패 대응의 기본 원칙은 다음과 같습니다.
-
-```text
-1) 현재 revision 위치를 먼저 확정한다.
-2) graph 상태(single head인지)를 확인한다.
-3) backward-compatible 여부를 판단한다.
-4) 가능하면 forward-fix revision으로 복구한다.
-```
-
-이 네 단계는 엔진(SQLite/PostgreSQL)과 무관하게 공통으로 적용됩니다.
-
 
 
 ## 보강 메모: 검증 중심 운영 노트

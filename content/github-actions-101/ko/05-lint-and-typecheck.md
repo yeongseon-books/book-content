@@ -26,17 +26,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 GitHub Actions 101 시리즈의 5번째 글입니다. 여기서는 Ruff와 Mypy, pre-commit을 이용해 코드 품질 게이트를 만들고, PR 리뷰가 스타일 교정이 아니라 로직 검토에 집중되도록 하는 방법을 설명하겠습니다.
 
+
+![GitHub Actions 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/05/05-01-diagram.ko.png)
+*GitHub Actions 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - Ruff는 왜 여러 도구를 하나로 줄이는 데 유용할까요?
 - Mypy는 어느 시점부터 엄격 모드로 가져가는 편이 좋을까요?
 - pre-commit은 왜 CI와 짝을 이뤄야 할까요?
-
-## 큰 그림
-
-![GitHub Actions 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/05/05-01-diagram.ko.png)
-
-*GitHub Actions 101 5장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -169,7 +167,6 @@ repos:
 린트와 타입 검사는 사람이 반복해서 볼 가치가 낮은 오류를 미리 걷어 내는 게이트입니다. Ruff로 스타일과 포맷을 통일하고, Mypy로 타입 경계를 점검하고, pre-commit으로 로컬과 CI의 기준을 맞추면 리뷰의 밀도가 높아집니다.
 
 다음 글에서는 빌드 아티팩트를 다룹니다. 코드 품질을 검증했다면, 이제 그 결과물인 빌드 산출물을 어떻게 저장하고 다음 단계로 넘길지 살펴볼 차례입니다.
-
 
 
 ---

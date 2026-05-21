@@ -26,17 +26,15 @@ GitHub Actions를 조금만 써 보면 금방 이런 고민이 생깁니다. “
 
 이 글은 GitHub Actions 101 시리즈의 2번째 글입니다. 여기서는 워크플로, 잡, 스텝이 어떻게 계층을 이루는지부터 시작해, 병렬성과 의존성을 어떤 기준으로 설계해야 하는지 정리해 보겠습니다.
 
+
+![GitHub Actions 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/02/02-01-diagram.ko.png)
+*GitHub Actions 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - Workflow, Job, Step은 각각 무엇을 담당할까요?
 - `needs`는 왜 단순한 옵션이 아니라 파이프라인 설계 도구일까요?
 - `matrix`는 언제 유용하고 언제 비용 폭탄이 될까요?
-
-## 큰 그림
-
-![GitHub Actions 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/02/02-01-diagram.ko.png)
-
-*GitHub Actions 101 2장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -193,7 +191,6 @@ jobs:
 워크플로는 자동화의 바깥 틀이고, 잡 그래프가 파이프라인의 실제 뼈대입니다. 무엇을 병렬로 돌릴지, 무엇에 순서를 걸지, 어떤 값만 다음 단계로 넘길지 정하는 일이 곧 좋은 CI 설계입니다.
 
 다음 글에서는 이 그래프가 언제 실행돼야 하는지, 즉 트리거 설계를 다룹니다. 좋은 잡 구조도 적절한 시점에만 실행될 때 비로소 가치가 있습니다.
-
 
 
 ---

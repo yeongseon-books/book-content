@@ -27,21 +27,16 @@ seo_description: 정보보안의 출발점인 CIA, STRIDE, 위험 평가를 한 
 
 이 글은 Information Security 101 시리즈의 첫 번째 글입니다.
 
+
+![Information Security 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/01/01-01-big-picture.ko.png)
+*Information Security 101 1장 흐름 개요*
+> 정보보안은 기술 이름을 아는 것이 아니라 "무엇을 보호하고, 어떤 위협을 먼저 줄일지"를 명확히 말할 수 있는 상태를 만드는 것입니다.
+
 ## 먼저 던지는 질문
 
 - 정보보안은 정확히 무엇을 뜻할까요?
 - CIA, 위협, 취약점, 위험은 어떻게 연결될까요?
 - STRIDE는 왜 입문자에게도 유용한 체크리스트일까요?
-
-## 큰 그림
-
-![Information Security 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/01/01-01-big-picture.ko.png)
-
-*Information Security 101 1장 흐름 개요*
-
-그림은 자산(asset)이 위협(threat)과 취약점(vulnerability)을 만날 때 위험(risk)으로 변환되고, 이 위험을 통제(control)로 관리하는 흐름을 보여줍니다. 정보보안은 결국 이 네 요소를 명확히 정의하고 우선순위를 정하는 의사결정 과정입니다.
-
-> 정보보안은 기술 이름을 아는 것이 아니라 "무엇을 보호하고, 어떤 위협을 먼저 줄일지"를 명확히 말할 수 있는 상태를 만드는 것입니다.
 
 ## 왜 중요한가
 
@@ -278,7 +273,6 @@ for i in sorted(items, key=lambda x: x.score, reverse=True):
 - 예외 승인에는 만료일이 반드시 있어야 합니다.
 
 보안은 단발성 프로젝트가 아니라 운영 루프입니다. 같은 점검을 반복해도 기준이 유지될 때 품질이 올라갑니다.
-
 
 
 ## 운영 점검 루프와 문서화 기준

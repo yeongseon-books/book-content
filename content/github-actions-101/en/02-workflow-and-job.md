@@ -28,19 +28,15 @@ Those questions are really about pipeline design. A workflow file is only the co
 
 This is post 2 in the GitHub Actions 101 series. In this post, we will map the relationship between workflows, jobs, and steps, then use `needs`, `matrix`, and `outputs` to design a graph that is fast without becoming fragile.
 
+
+![github actions 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/02/02-01-concept-at-a-glance.en.png)
+*github actions 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Workflows and Jobs?
 - Which signal should the example or diagram make visible for Workflows and Jobs?
 - What failure should be prevented first when Workflows and Jobs reaches a real system?
-
-## Big Picture
-
-![github actions 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/02/02-01-concept-at-a-glance.en.png)
-
-*github actions 101 chapter 2 flow overview*
-
-This picture places Workflows and Jobs inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

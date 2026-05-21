@@ -26,21 +26,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 머신러닝 101 시리즈의 7번째 글입니다. 여기서는 KMeans와 DBSCAN의 차이, `K`를 고르는 감각, 표준화가 군집 결과를 왜 바꿔 놓는지, 그리고 군집을 왜 정답이 아니라 가설로 봐야 하는지를 정리하겠습니다.
 
+
+![Machine Learning 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/07/07-01-diagram.ko.png)
+*Machine Learning 101 7장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 정답 레이블이 없는데 군집이 좋은지 어떻게 판단할까요?
 - KMeans와 DBSCAN은 어떤 상황에서 다르게 써야 할까요?
 - `K`는 어떤 기준으로 정해야 할까요?
-
-## 큰 그림
-
-![Machine Learning 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/07/07-01-diagram.ko.png)
-
-*Machine Learning 101 7장 흐름 개요*
-
-이 그림은 이 장의 핵심 개념들이 어떻게 연결되는지 보여줍니다.
-
-
 
 ## 왜 중요한가
 

@@ -34,7 +34,7 @@
 1. H1 제목 (SEO 키워드 포함)
 2. Series intro line (H1 직후 도입 단락 안에 한 문장 — 표준 템플릿 STYLE_GUIDE §1.1)
 3. 먼저 던지는 질문 / Questions to Keep in Mind
-4. 큰 그림 / Big Picture (다이어그램 1개 + caption + 짧은 해설)
+4. Intro diagram (Opening Questions 직전, 다이어그램 + caption, 별도 섹션 헤딩 없음)
 5. 배경 설명 (이 글 하나로 충분한 최소 맥락)
 6. 본문 설명 (개념 → concrete anchor → 해석)
 7. 실무에서 헷갈리는 지점 / 체크리스트
@@ -79,12 +79,11 @@
   - 실행은 함수 코드 안에서 시작되지 않습니다. 런타임이 이벤트를 감지하고 Trigger 계약에 따라 함수를 호출합니다.
 ```
 
-### Big Picture and concrete anchors
+### Intro diagram and concrete anchors
 
-`## 큰 그림` / `## Big Picture` 섹션은 본문에 들어가기 전 지도를 주는 곳이다.
+Opening Questions 직전에 다이어그램 1개 + caption을 둔다. `## 큰 그림` / `## Big Picture` 같은 별도 섹션 헤딩은 사용하지 않는다.
 
-- 다이어그램은 1개를 우선 둔다.
-- 다이어그램 내부 제목, alt text, visible italic caption은 섹션명을 반복하지 않는다. `큰 그림`, `Big Picture` 대신 `요청 흐름`, `책임 경계`, `실행 순서`, `데이터 이동 경로`처럼 그림이 실제로 보여주는 대상을 쓴다.
+- 다이어그램 내부 제목, alt text, visible italic caption은 `요청 흐름`, `책임 경계`, `실행 순서`, `데이터 이동 경로`처럼 그림이 실제로 보여주는 대상을 쓴다.
 - visible italic caption은 한 줄로 쓴다.
 - 그림 해설은 2-4문장으로 제한한다.
 - 그림은 구조, 흐름, 경계, 책임 분리 중 하나를 보여준다.

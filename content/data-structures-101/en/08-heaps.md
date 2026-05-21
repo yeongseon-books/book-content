@@ -29,19 +29,15 @@ This is the eighth post in the Data Structures 101 series.
 
 > A heap is a complete binary tree with one rule: the parent is always less than or equal to its children (min-heap) or greater than or equal to them (max-heap). That single rule lets you read the minimum (or maximum) in O(1) and remove it in O(log n). The heap is the standard implementation of a priority queue, and Python ships it as the `heapq` module. This article walks through how heaps work, how they map onto an array, and how to implement one yourself.
 
+
+![data structures 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/08/08-01-heap-array-mapping.en.png)
+*data structures 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Heaps?
 - Which signal should the example or diagram make visible for Heaps?
 - What failure should be prevented first when Heaps reaches a real system?
-
-## Big Picture
-
-![data structures 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/08/08-01-heap-array-mapping.en.png)
-
-*data structures 101 chapter 8 flow overview*
-
-This picture places Heaps inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

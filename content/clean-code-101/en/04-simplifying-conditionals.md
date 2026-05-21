@@ -29,21 +29,16 @@ This is post 4 in the Clean Code 101 series.
 
 Here we will flatten the easy cases with guard clauses, then move the harder cases into polymorphism, strategy objects, and tables so the main path stays visible.
 
+
+![clean code 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/04/04-01-concept-at-a-glance.en.png)
+*clean code 101 chapter 4 flow overview*
+> As your tools grow, branch count falls and flow flattens.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Simplifying Conditionals?
 - Which signal should the example or diagram make visible for Simplifying Conditionals?
 - What failure should be prevented first when Simplifying Conditionals reaches a real system?
-
-## Big Picture
-
-![clean code 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/04/04-01-concept-at-a-glance.en.png)
-
-*clean code 101 chapter 4 flow overview*
-
-This picture places Simplifying Conditionals inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> As your tools grow, branch count falls and flow flattens.
 
 ## Questions this article answers
 

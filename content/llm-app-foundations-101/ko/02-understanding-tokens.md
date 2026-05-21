@@ -29,19 +29,14 @@ LLM API를 처음 연결하면 대개 답변 품질에 먼저 눈이 갑니다. 
 
 여기서는 토큰을 문자열의 부속 개념이 아니라 비용·속도·한계를 함께 묶는 운영 단위로 보겠습니다.
 
+![토큰이 비용과 한계로 이어지는 전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/02/02-01-understanding-tokens-cost-limits-and-con.ko.png)
+*토큰이 비용과 한계로 이어지는 전체 그림*
+
 ## 먼저 던지는 질문
 
 - 토큰은 단어가 아니라 왜 예산 단위로 봐야 할까요?
 - `prompt_tokens`, `completion_tokens`, `total_tokens`는 각각 어떤 비용을 보여 줄까요?
 - context window와 `max_tokens`, `finish_reason`은 어디서 충돌할까요?
-
-## 큰 그림
-
-![토큰이 비용과 한계로 이어지는 전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/02/02-01-understanding-tokens-cost-limits-and-con.ko.png)
-
-*토큰이 비용과 한계로 이어지는 전체 그림*
-
-이 그림에서는 토큰이 입력 길이, 출력 길이, 비용, 컨텍스트 한계로 이어지는 경로만 봅니다. 토큰을 예산 단위로 보면 사용량 필드와 길이 제한이 같은 문제로 묶입니다.
 
 ## 왜 이 글이 중요한가
 

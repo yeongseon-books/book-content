@@ -31,17 +31,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 소프트웨어 설계를 “예쁘게 코드를 쓰는 습관”이 아니라, 다음 변경의 비용을 좌우하는 결정의 묶음으로 정리합니다. 좋은 설계가 무엇인지, 나쁜 설계는 어떤 증상으로 드러나는지, 왜 설계가 시간이 갈수록 더 큰 차이를 만드는지도 함께 보겠습니다.
 
+
+![Software Design 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/01/01-01-concept-at-a-glance.ko.png)
+*Software Design 101 1장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 좋은 코딩과 좋은 설계는 무엇이 다를까요?
 - 설계 품질은 어떤 신호로 판단할 수 있을까요?
 - 설계 실패는 코드베이스에서 어떤 증상으로 드러날까요?
-
-## 큰 그림
-
-![Software Design 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/01/01-01-concept-at-a-glance.ko.png)
-
-*Software Design 101 1장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -435,7 +433,6 @@ class PlaceOrderService:
 - 인프라 계층: 외부 API 오류율, DB 지연 시간
 
 지표를 계층별로 분리해 보면 어디를 고쳐야 하는지가 명확해집니다. 모든 지표가 한 대시보드에서 섞여 있으면 "느리다"는 사실만 보이고 원인은 보이지 않습니다. 설계 경계를 운영 지표 경계와 맞추면 개선 사이클이 빠르게 돌아갑니다.
-
 
 
 ## 리뷰와 리팩터링을 위한 실전 질문 세트

@@ -42,19 +42,14 @@ ACA's internal implementation is not published by Microsoft, so these versions a
 - **Inferred from upstream behavior**: sidecar injection details, port behavior, and mTLS/control-plane plumbing follow upstream Dapr patterns unless ACA documents otherwise.
 - **Out of bounds**: ACA-specific webhook internals, hidden cert distribution details, and private runtime arguments Microsoft does not publish.
 
+![azure container apps deep dive chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/05/05-01-the-shortest-accurate-sentence.en.png)
+*azure container apps deep dive chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - What lifecycle does the Dapr sidecar have in ACA, and how does it stay in sync with the app container?
 - Service invocation gives you mTLS, retry, and timeout 'for free' — where does the bill actually land?
 - Are state-store and pub/sub component definitions environment-scoped or app-scoped?
-
-## Big Picture
-
-![azure container apps deep dive chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/05/05-01-the-shortest-accurate-sentence.en.png)
-
-*azure container apps deep dive chapter 5 flow overview*
-
-This picture places Dapr sidecar internals — the Go process that lives next to your container inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## The shortest accurate sentence
 

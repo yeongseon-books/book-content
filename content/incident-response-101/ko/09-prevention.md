@@ -30,21 +30,16 @@ title: "Incident Response 101 (9/10): 재발 방지"
 
 이 글은 Incident Response 101 시리즈의 9번째 글입니다. 여기서는 후속 조치 추적, 회귀 테스트, guardrail, chaos 실험을 하나의 예방 루프로 묶는 방법을 다룹니다.
 
+
+![Incident Response 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/09/09-01-diagram-at-a-glance.ko.png)
+*Incident Response 101 9장 흐름 개요*
+> 재발 방지 항목이 구체적일수록 다음 대응이 빠릅니다. 작은 변경도 큰 영향을 줍니다.
+
 ## 먼저 던지는 질문
 
 - 사후 분석 뒤에 왜 같은 incident가 다시 반복될까요?
 - 후속 조치 추적이 없으면 어떤 문제가 생길까요?
 - 회귀 테스트는 왜 재발 방지의 핵심일까요?
-
-## 큰 그림
-
-![Incident Response 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/09/09-01-diagram-at-a-glance.ko.png)
-
-*Incident Response 101 9장 흐름 개요*
-
-재발 방지는 postmortem의 행동 단계입니다. 코드, 모니터링, 문서 개선으로 다음 사건을 빠르게 처리합니다.
-
-> 재발 방지 항목이 구체적일수록 다음 대응이 빠릅니다. 작은 변경도 큰 영향을 줍니다.
 
 ## 왜 이 주제가 중요한가
 

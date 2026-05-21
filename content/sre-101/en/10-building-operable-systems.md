@@ -28,19 +28,15 @@ That delay is expensive because operability compounds. Systems that are easy to 
 
 This is the final post in the SRE 101 series. It gathers the earlier ideas into one design lens: observability, safe change, resilience, and automation should be built into the system the same way functional behavior is.
 
+
+![sre 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/10/10-01-concept-at-a-glance.en.png)
+*sre 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why is operability a design property instead of a post-launch enhancement?
 - Why do observability, automation, safe change, and resilience need to be judged together?
 - What should a team ask first when auditing whether a system is truly operable?
-
-## Big Picture
-
-![sre 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/10/10-01-concept-at-a-glance.en.png)
-
-*sre 101 chapter 10 flow overview*
-
-This picture places Building Operable Systems inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this topic matters
 

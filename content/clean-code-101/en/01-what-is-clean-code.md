@@ -29,21 +29,16 @@ This is the first post in the Clean Code 101 series.
 
 Here we will separate working code from readable code and from code that stays cheap to change, then turn that difference into concrete signals you can inspect in a real codebase.
 
+
+![clean code 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/01/01-01-concept-at-a-glance.en.png)
+*clean code 101 chapter 1 flow overview*
+> The code we write once gets read a hundred times. Clean code is the discipline of saving the next person's time.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What Is Clean Code??
 - Which signal should the example or diagram make visible for What Is Clean Code??
 - What failure should be prevented first when What Is Clean Code? reaches a real system?
-
-## Big Picture
-
-![clean code 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/01/01-01-concept-at-a-glance.en.png)
-
-*clean code 101 chapter 1 flow overview*
-
-This picture places What Is Clean Code? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> The code we write once gets read a hundred times. Clean code is the discipline of saving the next person's time.
 
 ## Questions this article answers
 

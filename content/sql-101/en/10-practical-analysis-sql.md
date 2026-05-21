@@ -28,21 +28,16 @@ That is why the final chapter is best approached as pattern assembly. The goal i
 
 This is the final post in the SQL 101 series. It ties the earlier clauses together into practical query patterns for analysis work.
 
+
+![sql 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/10/10-01-analytics-query-layering-flow.en.png)
+*sql 101 chapter 10 flow overview*
+> A production analysis query is built from the pieces you've learned: filters that are correct, joins that produce the right cardinality, aggregations that answer the actual question, and windows that add rank or context without losing rows.
+
 ## Questions to Keep in Mind
 
 - What do DAU, WAU, and MAU queries usually look like?
 - How do you structure cohort and retention logic in layers?
 - What is the cleanest shape for a funnel query?
-
-## Big Picture
-
-![sql 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/10/10-01-analytics-query-layering-flow.en.png)
-
-*sql 101 chapter 10 flow overview*
-
-Real analysis queries combine SELECT, filtering, joins, aggregation, and often window functions. The challenge isn't any single clause; it's breaking the problem into clear, testable steps.
-
-> A production analysis query is built from the pieces you've learned: filters that are correct, joins that produce the right cardinality, aggregations that answer the actual question, and windows that add rank or context without losing rows.
 
 ## Why It Matters
 

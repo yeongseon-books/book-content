@@ -28,21 +28,17 @@ That is domain expertise. It is easy to postpone because there is always another
 
 This is post 9 in the Data Science Career 101 series.
 
+
+![data science career 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/09/09-01-concept-at-a-glance.en.png)
+*data science career 101 chapter 9 flow overview*
+> In domain knowledge, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
+
 ## Questions to Keep in Mind
 
 - Why does domain expertise change the quality of data work so much?
 - How should you start learning the vocabulary and KPI structure of an industry?
 - Why does field observation improve metric interpretation?
 
-## Big Picture
-
-![data science career 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/09/09-01-concept-at-a-glance.en.png)
-
-*data science career 101 chapter 9 flow overview*
-
-This picture places Building Domain Expertise inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> In domain knowledge, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
 ## What You Will Learn
 
 - The definition of *domain*

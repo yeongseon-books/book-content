@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 Operating Systems 101 시리즈의 5번째 글입니다.
 
+
+![Operating Systems 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/05/05-01-how-synchronization-tools-gate-entry.ko.png)
+*Operating Systems 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 뮤텍스, 재진입 락, 세마포어, 조건 변수는 무엇이 다를까요?
 - 데드락은 어떤 조건이 겹칠 때 만들어질까요?
 - 락을 오래 잡으면 왜 처리량과 지연 시간이 같이 나빠질까요?
-
-## 큰 그림
-
-![Operating Systems 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/05/05-01-how-synchronization-tools-gate-entry.ko.png)
-
-*Operating Systems 101 5장 흐름 개요*
 
 ## 기본 모델
 > Mutex는 한 시점에 한 흐름만 임계 구역에 들어가게 합니다. Semaphore는 N개까지 동시에 들어갈 수 있게 합니다. RLock(재진입 락)은 같은 흐름이 같은 락을 여러 번 잡을 수 있게 합니다. Condition variable은 "어떤 조건이 충족될 때까지" 기다리고 깨우는 메커니즘입니다.

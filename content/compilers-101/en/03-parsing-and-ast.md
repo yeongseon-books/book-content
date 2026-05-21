@@ -31,19 +31,15 @@ last_reviewed: '2026-05-04'
 
 This is post 3 in the Compilers 101 series.
 
+
+![compilers 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/03/03-01-big-picture.en.png)
+*compilers 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying parsing and AST?
 - Which signal should the example or diagram make visible for parsing and AST?
 - What failure should be prevented first when parsing and AST reaches a real system?
-
-## Big Picture
-
-![compilers 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/03/03-01-big-picture.en.png)
-
-*compilers 101 chapter 3 flow overview*
-
-This picture places parsing and AST inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

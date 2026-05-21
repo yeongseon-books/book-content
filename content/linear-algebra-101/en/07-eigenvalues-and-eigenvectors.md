@@ -26,21 +26,16 @@ If you apply the same linear transformation again and again, some directions beh
 
 This is post 7 in the Linear Algebra 101 series. Here we will read eigenvalues and eigenvectors as the natural axes of a transformation.
 
+
+![linear algebra 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/07/07-01-concept-at-a-glance.en.png)
+*linear algebra 101 chapter 7 flow overview*
+> Eigenvalues and eigenvectors are the essence of a linear transformation. An eigenvector keeps its direction; an eigenvalue is how much it stretches in that direction.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Eigenvalues and Eigenvectors?
 - Which signal should the example or diagram make visible for Eigenvalues and Eigenvectors?
 - What failure should be prevented first when Eigenvalues and Eigenvectors reaches a real system?
-
-## Big Picture
-
-![linear algebra 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/07/07-01-concept-at-a-glance.en.png)
-
-*linear algebra 101 chapter 7 flow overview*
-
-This picture places Eigenvalues and Eigenvectors inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Eigenvalues and eigenvectors are the essence of a linear transformation. An eigenvector keeps its direction; an eigenvalue is how much it stretches in that direction.
 
 ## Questions This Post Answers
 

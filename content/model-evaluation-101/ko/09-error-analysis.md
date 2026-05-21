@@ -29,17 +29,14 @@ last_reviewed: '2026-05-15'
 그래서 개선 작업의 출발점은 종종 더 좋은 지표를 찾는 일이 아니라, 틀린 예측을 더 잘 분해하는 일입니다. 오류 분석은 평균 점수 뒤에 숨어 있는 패턴을 꺼내서 다음 실험의 우선순위를 정하게 도와줍니다.
 
 
+![Model Evaluation 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/09/09-01-concept-at-a-glance.ko.png)
+*Model Evaluation 101 9장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 전체 점수가 비슷한 두 모델은 어디에서 다르게 실패할까요?
 - 슬라이스 분석은 어떤 약점을 드러내 줄까요?
 - false positive와 false negative를 왜 나눠 봐야 할까요?
-
-## 큰 그림
-
-![Model Evaluation 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/09/09-01-concept-at-a-glance.ko.png)
-
-*Model Evaluation 101 9장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 

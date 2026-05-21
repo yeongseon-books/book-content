@@ -29,19 +29,15 @@ This is post 7 in the Design Patterns 101 series.
 
 In this post, we'll look at Observer as a way to turn direct calls into notifications. The goal is to let a publisher announce what happened while subscribers decide whether and how to react.
 
+
+![design patterns 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/07/07-01-concept-at-a-glance.en.png)
+*design patterns 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - The problem Observer solves (tight coupling)?
 - Subject, Observer, subscribe, notify?
 - Synchronous vs asynchronous notification?
-
-## Big Picture
-
-![design patterns 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/07/07-01-concept-at-a-glance.en.png)
-
-*design patterns 101 chapter 7 flow overview*
-
-This picture places The Observer Pattern inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

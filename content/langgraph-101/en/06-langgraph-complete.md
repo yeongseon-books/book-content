@@ -29,21 +29,15 @@ This is the final post in the LangGraph 101 series.
 
 So this chapter is not about adding one more feature. It is about combining the ideas from the earlier posts into one operational skeleton. Checkpoints remember context. A supervisor decides whether the request needs a direct answer or a tool path. The tool loop stays isolated instead of infecting the whole graph. That combination is what starts to feel usable outside a tutorial.
 
+![Combined graph with supervisor and tool loop](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/06/06-01-minimal-runnable-example.en.png)
+*Combined graph with supervisor and tool loop*
+> A complete agent is not defined by having every feature attached; it is defined by explainable routing, tool execution, and state recovery.
+
 ## Questions to Keep in Mind
 
 - Why should a complete LangGraph app be read as a cooperating state machine instead of one giant prompt?
 - What state contract must remain stable even after checkpoints, routing, tool calls, and multi-turn history are combined?
 - What logs and verification points make graph execution explainable in production?
-
-## Big Picture
-
-![Combined graph with supervisor and tool loop](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/06/06-01-minimal-runnable-example.en.png)
-
-*Combined graph with supervisor and tool loop*
-
-This picture shows state, checkpoints, conditional edges, tool nodes, and the final response connected as one execution graph. A complete LangGraph is judged less by feature count than by whether each boundary is observable and recoverable.
-
-> A complete agent is not defined by having every feature attached; it is defined by explainable routing, tool execution, and state recovery.
 
 ## Why this structure matters
 

@@ -29,19 +29,15 @@ This is post 2 in the Distributed Systems 101 series.
 
 Here we name those realities precisely so later topics such as consensus, leases, and CAP stop sounding like abstract theory and start reading like concrete design choices.
 
+
+![distributed systems 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/02/02-01-concept-at-a-glance.en.png)
+*distributed systems 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What a failure model is and why we model failure?
 - The differences between crash, omission, timing, and Byzantine?
 - Why network partition deserves its own category?
-
-## Big Picture
-
-![distributed systems 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/02/02-01-concept-at-a-glance.en.png)
-
-*distributed systems 101 chapter 2 flow overview*
-
-This picture places Failure Models inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

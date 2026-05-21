@@ -42,19 +42,14 @@ ACA's internal implementation is not published by Microsoft, so these versions a
 - **Inferred from upstream behavior**: the hidden substrate most plausibly composes Kubernetes primitives with Envoy, KEDA, and Dapr-like runtime pieces.
 - **Out of bounds**: exact cluster topology, private control-plane binaries, and per-environment implementation details Microsoft does not publish.
 
+![azure container apps deep dive chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/01/01-01-the-big-picture-one-container-apps-envir.en.png)
+*azure container apps deep dive chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What abstractions does ACA stack on top of which abstractions, exactly?
 - Who owns and upgrades the managed components (KEDA, Dapr, Envoy) inside an environment?
 - ACA runs on AKS under the hood — what obligations does that move to Microsoft, and what stays with you?
-
-## Big Picture
-
-![azure container apps deep dive chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/01/01-01-the-big-picture-one-container-apps-envir.en.png)
-
-*azure container apps deep dive chapter 1 flow overview*
-
-This picture places ACA architecture — what Microsoft layered on a hidden Kubernetes inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## One Container Apps environment
 

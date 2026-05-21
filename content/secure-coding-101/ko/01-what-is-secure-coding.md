@@ -28,17 +28,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 secure coding을 기능 개발 뒤에 덧칠하는 작업이 아니라, 입력 경계와 권한, 저장, 로그를 처음부터 함께 설계하는 습관으로 보겠습니다. 이 관점을 잡아 두면 이후 글에서 다룰 입력 검증, 인증, 인가, 저장, 로깅이 서로 어떻게 이어지는지도 훨씬 선명해집니다.
 
+
+![Secure Coding 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/01/01-01-concept-at-a-glance.ko.png)
+*Secure Coding 101 1장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - secure coding은 정확히 무엇을 뜻할까요?
 - 위협 모델과 공격 표면은 코드 설계와 어떤 관계가 있을까요?
 - OWASP Top 10은 입문자가 어떤 관점으로 읽어야 할까요?
-
-## 큰 그림
-
-![Secure Coding 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/01/01-01-concept-at-a-glance.ko.png)
-
-*Secure Coding 101 1장 흐름 개요*
 
 ## 왜 중요한가
 

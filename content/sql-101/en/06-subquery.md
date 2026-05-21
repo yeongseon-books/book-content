@@ -28,21 +28,16 @@ Subqueries and CTEs are the tools that let you split that complexity into readab
 
 This is post 6 in the SQL 101 series. Here we focus on breaking layered questions into SQL that another engineer can still read from top to bottom.
 
+
+![sql 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/06/06-01-subquery-layering-flow.en.png)
+*sql 101 chapter 6 flow overview*
+> Subqueries and CTEs don't add new capabilities; they add clarity. They let you name each step, test each piece separately, and build the final query without nesting everything into one unreadable line.
+
 ## Questions to Keep in Mind
 
 - When is a subquery enough, and when is a CTE the better fit?
 - What is the difference between a scalar subquery and an inline view?
 - How do IN and EXISTS differ in intent and behavior?
-
-## Big Picture
-
-![sql 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/06/06-01-subquery-layering-flow.en.png)
-
-*sql 101 chapter 6 flow overview*
-
-Subqueries and CTEs (WITH clauses) let you break complex logic into named, reusable steps. A CTE is like giving a temporary name to a subquery result so you can reference it multiple times.
-
-> Subqueries and CTEs don't add new capabilities; they add clarity. They let you name each step, test each piece separately, and build the final query without nesting everything into one unreadable line.
 
 ## Why It Matters
 

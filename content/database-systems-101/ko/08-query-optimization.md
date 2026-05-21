@@ -29,17 +29,15 @@ last_reviewed: '2026-05-12'
 
 그래서 쿼리 최적화의 핵심은 “더 멋진 SQL을 쓰는 법”보다 “옵티마이저가 무슨 근거로 이 계획을 골랐는지 읽는 법”에 가깝습니다. 이 글에서는 통계, 비용 모델, 계획 노드, EXPLAIN ANALYZE를 하나의 흐름으로 묶어 보겠습니다.
 
+
+![Database Systems 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/08/08-01-big-picture.ko.png)
+*Database Systems 101 8장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 옵티마이저는 어떤 큰 그림으로 실행 계획을 고를까요?
 - 통계는 왜 그렇게 결정적인 역할을 할까요?
 - EXPLAIN과 EXPLAIN ANALYZE는 어떻게 읽어야 할까요?
-
-## 큰 그림
-
-![Database Systems 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/08/08-01-big-picture.ko.png)
-
-*Database Systems 101 8장 흐름 개요*
 
 ## 이 글에서 배울 내용
 

@@ -27,17 +27,14 @@ seo_description: SemVer는 버전 번호에 의미를 부여하는 규칙이고,
 
 이 글은 Python Package 101 시리즈의 6번째 글입니다. 여기서는 SemVer 규칙, 버전을 코드와 메타데이터에 동기화하는 방법, 그리고 릴리스 기록을 남기는 기본 흐름을 정리하겠습니다.
 
+![Python Package 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/06/06-01-mental-model.ko.png)
+*Python Package 101 6장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - SemVer의 MAJOR.MINOR.PATCH는 언제 올려야 할까요?
 - 버전은 코드의 어디에 기록해야 할까요?
 - Git 태그와 릴리스는 어떤 관계일까요?
-
-## 큰 그림
-
-![Python Package 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/06/06-01-mental-model.ko.png)
-
-*Python Package 101 6장 흐름 개요*
 
 ## 이 글에서 배우는 내용
 
@@ -77,7 +74,7 @@ MAJOR  (1.3.0 → 2.0.0): API changed or removed (breaking)
 
 ## Before / After
 
-**Before (no version management)**
+**Before (버전 관리 없음)**
 
 ```text
 # commit messages only

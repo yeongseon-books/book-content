@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 메인테이너를 뛰어난 개발자 한 명이 아니라, 프로젝트의 흐름과 책임을 오래 유지하게 만드는 운영 책임자로 정리하겠습니다.
 
+
+![Open Source 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/08/08-01-the-maintainer-loop-in-one-line.ko.png)
+*Open Source 101 8장 흐름 개요*
+> 메인테이너는 기술 결정만 합니다이 아니라 **커뮤니티 건강, 방향성, 지속 가능성**을 함께 고민하는 역할입니다.
+
 ## 먼저 던지는 질문
 
 - 메인테이너는 실제로 어떤 책임을 지고 있을까요?
 - triage, review, release는 왜 하나의 루틴으로 묶어 봐야 할까요?
 - 권한 위임과 후계자 육성은 왜 선택이 아니라 지속성 문제일까요?
-
-## 큰 그림
-
-![Open Source 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/08/08-01-the-maintainer-loop-in-one-line.ko.png)
-
-*Open Source 101 8장 흐름 개요*
-
-이 그림은 메인테이너의 역할이 단순 코드 관리를 넘어 **기술, 커뮤니티, 지속성**을 함께 책임지는 일임을 보여줍니다. 메인테이너가 번아웃되면 프로젝트 전체가 위험해집니다.
-
-> 메인테이너는 기술 결정만 합니다이 아니라 **커뮤니티 건강, 방향성, 지속 가능성**을 함께 고민하는 역할입니다.
 
 ## 왜 중요한가
 

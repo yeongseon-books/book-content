@@ -29,19 +29,15 @@ This is post 9 in the Design Patterns 101 series.
 
 In this post, we'll focus on the difference between knowing patterns and using them well. The right direction is not “apply patterns first,” but “let repeated change justify the abstraction.”
 
+
+![design patterns 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/09/09-01-concept-at-a-glance.en.png)
+*design patterns 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - The antipattern that "patterns first" creates?
 - The power of the simpler alternative?
 - YAGNI and how it relates to patterns?
-
-## Big Picture
-
-![design patterns 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/09/09-01-concept-at-a-glance.en.png)
-
-*design patterns 101 chapter 9 flow overview*
-
-This picture places Avoiding Pattern Overuse inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

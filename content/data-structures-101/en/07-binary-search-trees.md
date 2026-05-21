@@ -29,19 +29,15 @@ This is the seventh post in the Data Structures 101 series.
 
 > A binary search tree (BST) is a binary tree with one simple rule: the left child is smaller than its parent and the right child is larger. That single rule gives you average O(log n) search, insert, and delete. But when the tree leans to one side, performance collapses to O(n), which is why production systems use balanced variants such as AVL or red-black trees. This article walks through how a BST works, where it breaks, and why balanced trees exist.
 
+
+![data structures 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/07/07-01-bst-balanced-vs-skewed.en.png)
+*data structures 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Binary Search Trees?
 - Which signal should the example or diagram make visible for Binary Search Trees?
 - What failure should be prevented first when Binary Search Trees reaches a real system?
-
-## Big Picture
-
-![data structures 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/07/07-01-bst-balanced-vs-skewed.en.png)
-
-*data structures 101 chapter 7 flow overview*
-
-This picture places Binary Search Trees inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

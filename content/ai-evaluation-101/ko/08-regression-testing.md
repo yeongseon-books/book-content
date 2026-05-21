@@ -30,21 +30,16 @@ LLM 팀이 평가를 갖추고도 계속 흔들리는 이유는 실행 시점이
 
 여기서는 회귀 테스트용 Golden dataset을 어떻게 만들고, 임계값을 어떻게 두고, GitHub Actions로 어떻게 매 PR 방어선에 올릴지 정리하겠습니다.
 
+
+![회귀 테스트 - 어제 잘 되던 게 오늘 망가지지 않게](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/08/08-01-regression-testing-don-t-let-yesterday-s.ko.png)
+*회귀 테스트 - 어제 잘 되던 게 오늘 망가지지 않게*
+> 회귀 테스트는 평가를 한 번 하는 절차가 아니라, 변경이 들어올 때마다 품질을 지키는 방어선입니다.
+
 ## 먼저 던지는 질문
 
 - 회귀 테스트는 왜 LLM 평가를 배포 전 행사가 아니라 PR 방어선으로 옮겨야 할까요?
 - golden dataset과 threshold는 어떤 변경을 막아야 할까요?
 - non-determinism 때문에 eval이 흔들릴 때 어떤 tolerance와 fail policy가 필요할까요?
-
-## 큰 그림
-
-![회귀 테스트 - 어제 잘 되던 게 오늘 망가지지 않게](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/08/08-01-regression-testing-don-t-let-yesterday-s.ko.png)
-
-*회귀 테스트 - 어제 잘 되던 게 오늘 망가지지 않게*
-
-이 그림에서는 golden dataset과 평가 threshold가 PR마다 실행되어 어제 통과한 품질이 오늘 깨지지 않게 막는 흐름을 봅니다. 회귀 테스트는 LLM 품질을 감각이 아니라 배포 안전장치로 옮기는 과정입니다.
-
-> 회귀 테스트는 평가를 한 번 하는 절차가 아니라, 변경이 들어올 때마다 품질을 지키는 방어선입니다.
 
 ## 왜 이 글이 중요한가
 

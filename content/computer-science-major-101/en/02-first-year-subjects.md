@@ -31,21 +31,16 @@ last_reviewed: '2026-05-14'
 
 This is post 2 in the Computer Science Major 101 series.
 
+
+![computer science major 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/02/02-01-first-year-foundation-map.en.png)
+*computer science major 101 chapter 2 flow overview*
+> First-year subjects are not obstacles to 'real' CS—they are the ground floor. Each hour spent on calculus, linear algebra, discrete math, and intro programming saves you days of rework in upper courses.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Understanding First Year Subjects?
 - Which signal should the example or diagram make visible for Understanding First Year Subjects?
 - What failure should be prevented first when Understanding First Year Subjects reaches a real system?
-
-## Big Picture
-
-![computer science major 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/02/02-01-first-year-foundation-map.en.png)
-
-*computer science major 101 chapter 2 flow overview*
-
-This picture places Understanding First Year Subjects inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> First-year subjects are not obstacles to 'real' CS—they are the ground floor. Each hour spent on calculus, linear algebra, discrete math, and intro programming saves you days of rework in upper courses.
 
 ## What You Will Learn
 

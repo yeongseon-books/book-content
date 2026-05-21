@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 MIT, Apache 2.0, GPL을 중심으로, 오픈소스 라이선스를 이름 암기가 아니라 권한과 의무를 읽는 기준으로 정리하겠습니다.
 
+
+![Open Source 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/02/02-01-draw-the-license-map-first.ko.png)
+*Open Source 101 2장 흐름 개요*
+> 라이선스는 기술 문서가 아닙니다. 공동으로 소프트웨어를 개발하는 사람들 사이의 **신뢰 계약**입니다.
+
 ## 먼저 던지는 질문
 
 - permissive와 copyleft는 무엇이 다를까요?
 - MIT, Apache 2.0, GPL v3는 어떤 상황에서 부담이 달라질까요?
 - SPDX 식별자는 왜 문서화와 자동화에서 중요할까요?
-
-## 큰 그림
-
-![Open Source 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/02/02-01-draw-the-license-map-first.ko.png)
-
-*Open Source 101 2장 흐름 개요*
-
-이 그림은 오픈소스 라이선스 구조를 세 가지 축으로 정리합니다: 사용 범위, 수정 허용 여부, 재배포 조건입니다. 어떤 라이선스를 고르느냐에 따라 프로젝트의 향방이 달라집니다.
-
-> 라이선스는 기술 문서가 아닙니다. 공동으로 소프트웨어를 개발하는 사람들 사이의 **신뢰 계약**입니다.
 
 ## 라이선스 선택 결정 트리
 

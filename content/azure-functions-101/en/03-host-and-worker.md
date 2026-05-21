@@ -33,19 +33,14 @@ Let’s unpack that line with diagrams.
 
 This is the third post in the Azure Functions 101 series. Here, we trace how the Host and Worker split turns your code into a real execution model.
 
+![azure functions 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/03/03-01-the-big-picture-two-processes.en.png)
+*azure functions 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why are the Functions Host and the language worker separate processes?
 - What message flow runs over the gRPC channel between Host and worker?
 - How many function instances does one worker run concurrently?
-
-## Big Picture
-
-![azure functions 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/03/03-01-the-big-picture-two-processes.en.png)
-
-*azure functions 101 chapter 3 flow overview*
-
-This picture places Host and Worker — Who Actually Runs Your Functions? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Host and worker as two processes
 

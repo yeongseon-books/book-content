@@ -28,21 +28,17 @@ The overlap is real, but the center of gravity is different. Each role is hired 
 
 This is post 2 in the Data Science Career 101 series.
 
+
+![data science career 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/02/02-01-concept-at-a-glance.en.png)
+*data science career 101 chapter 2 flow overview*
+> In role clarity, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
+
 ## Questions to Keep in Mind
 
 - What goal sits at the center of analyst, scientist, and engineer work?
 - What deliverables most clearly reveal the difference between the three roles?
 - Why do similar tools still lead to very different day-to-day jobs?
 
-## Big Picture
-
-![data science career 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/02/02-01-concept-at-a-glance.en.png)
-
-*data science career 101 chapter 2 flow overview*
-
-This picture places Analyst vs Scientist vs Engineer inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> In role clarity, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
 ## What You Will Learn
 
 - The *purpose* of each role

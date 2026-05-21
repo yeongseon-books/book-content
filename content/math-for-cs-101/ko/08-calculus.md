@@ -30,20 +30,16 @@ seo_description: 미분의 도함수와 그래디언트를 학습하고, 연쇄 
 
 여기서는 미분을 변화율과 최적화의 언어로 보고, 극한, 도함수, 그래디언트, 연쇄 법칙, 경사하강법을 하나의 흐름으로 묶어 보겠습니다.
 
+
+![Math for CS 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/08/08-01-concept-at-a-glance.ko.png)
+*Math for CS 101 8장 흐름 개요*
+> 미분과 적분은 연속 변화를 다루는 도구이며, 최적화와 머신러닝의 기초를 이룹니다.
+
 ## 먼저 던지는 질문
 
 - 변화량을 왜 한 점의 기울기로 요약할 수 있을까요?
 - 극한과 도함수는 어떤 관계를 가질까요?
 - 기울기와 그래디언트는 무엇이 다를까요?
-
-## 큰 그림
-
-![Math for CS 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/08/08-01-concept-at-a-glance.ko.png)
-
-*Math for CS 101 8장 흐름 개요*
-이 그림은 미분을 변화율로 읽고, 최적화 문제에서 극값을 찾는 기초가 되는 방법을 보여줍니다.
-
-> 미분과 적분은 연속 변화를 다루는 도구이며, 최적화와 머신러닝의 기초를 이룹니다.
 
 ## 왜 중요한가
 

@@ -29,17 +29,14 @@ last_reviewed: '2026-05-15'
 좋은 평가 리포트는 그래서 문서 작업이 아니라 의사결정 기록입니다. 리뷰, 감사, 사고 후 분석이 모두 같은 문서를 참고할 수 있어야 팀의 속도도 유지되고 책임 경계도 분명해집니다.
 
 
+![Model Evaluation 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/10/10-01-concept-at-a-glance.ko.png)
+*Model Evaluation 101 10장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 모델 배포 전에 어떤 평가 정보를 한곳에 모아야 할까요?
 - 평가 리포트와 Model Card는 무엇이 다를까요?
 - 임계값, 슬라이스, 재현성 정보는 왜 빠지면 안 될까요?
-
-## 큰 그림
-
-![Model Evaluation 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/10/10-01-concept-at-a-glance.ko.png)
-
-*Model Evaluation 101 10장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 

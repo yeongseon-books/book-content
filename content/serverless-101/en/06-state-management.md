@@ -28,19 +28,15 @@ The important distinction is simple: the business still has state, but the funct
 
 This is post 6 in the Serverless 101 series.
 
+
+![serverless 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/06/06-01-concept-at-a-glance.en.png)
+*serverless 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying State Management?
 - Which signal should the example or diagram make visible for State Management?
 - What failure should be prevented first when State Management reaches a real system?
-
-## Big Picture
-
-![serverless 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/06/06-01-concept-at-a-glance.en.png)
-
-*serverless 101 chapter 6 flow overview*
-
-This picture places State Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

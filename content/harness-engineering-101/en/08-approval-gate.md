@@ -27,21 +27,15 @@ Payments, deploys, deletes, and outbound communication are not just another clas
 
 This is post 8 in the Harness Engineering 101 series. It defines Approval Gates as an operating protocol inside the agent loop rather than a vague promise of manual review.
 
+![Approval gates - designing where humans must approve](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/08/08-01-approval-gates-designing-where-humans-mu.en.png)
+*Approval gates - designing where humans must approve*
+> The purpose of an Approval Gate is not to abandon automation, but to put human decision authority at irreversible or high-risk actions.
+
 ## Questions to Keep in Mind
 
 - What decision authority does an Approval Gate structure instead of merely blocking automation?
 - Which actions can stay in dry-run, and which require human approval?
 - What must approval logs preserve so the decision can be reconstructed later?
-
-## Big Picture
-
-![Approval gates - designing where humans must approve](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/08/08-01-approval-gates-designing-where-humans-mu.en.png)
-
-*Approval gates - designing where humans must approve*
-
-This picture shows risky actions pausing at an approval point where a human reviews evidence and approves or rejects the step. An Approval Gate is not just a speed bump; it is the boundary that preserves authorized decisions safely.
-
-> The purpose of an Approval Gate is not to abandon automation, but to put human decision authority at irreversible or high-risk actions.
 
 ## What Is an Approval Gate?
 

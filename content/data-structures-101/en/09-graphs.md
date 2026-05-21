@@ -29,19 +29,15 @@ This is the ninth post in the Data Structures 101 series.
 
 > A graph is a data structure that captures arbitrary relationships between vertices using edges. A tree is just a special case of a graph (a connected, acyclic graph), and graphs are the basic vocabulary of nearly all relational modelling. This article walks through how to represent a graph, the basic properties (direction, weight, connectivity), and the two foundational traversal algorithms — BFS and DFS — by implementing them by hand.
 
+
+![data structures 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/09/09-01-graph-representations.en.png)
+*data structures 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Graphs?
 - Which signal should the example or diagram make visible for Graphs?
 - What failure should be prevented first when Graphs reaches a real system?
-
-## Big Picture
-
-![data structures 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/09/09-01-graph-representations.en.png)
-
-*data structures 101 chapter 9 flow overview*
-
-This picture places Graphs inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

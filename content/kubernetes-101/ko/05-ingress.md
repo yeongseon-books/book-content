@@ -28,17 +28,15 @@ Service까지 배우면 클러스터 내부 통신은 어느 정도 정리됩니
 
 여기서는 Ingress를 단순한 외부 노출 기능이 아니라, 여러 서비스를 하나의 진입점 뒤에 두고 HTTP 계층에서 라우팅 규칙과 TLS 종료를 모으는 구조로 정리하겠습니다.
 
+
+![Kubernetes 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/05/05-01-concept-at-a-glance.ko.png)
+*Kubernetes 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - Ingress와 IngressController는 왜 따로 이해해야 할까요?
 - 여러 서비스를 하나의 도메인 아래에서 어떻게 나눌 수 있을까요?
 - `host`, `path`, `pathType`은 어떤 차이를 만들까요?
-
-## 큰 그림
-
-![Kubernetes 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/05/05-01-concept-at-a-glance.ko.png)
-
-*Kubernetes 101 5장 흐름 개요*
 
 ## 왜 중요한가
 

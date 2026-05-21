@@ -32,21 +32,16 @@ In this post, we'll use a four-step mental model — isolate, place, allow, dist
 
 > Cloud networking is mostly boundary design: isolate with VPCs, place with subnets, define trust with SGs and NACLs, and shape traffic with load balancers.
 
+
+![cloud computing 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/06/06-01-concept-at-a-glance.en.png)
+*cloud computing 101 chapter 6 flow overview*
+> Good network design prevents failures from cascading and makes debugging possible when things break.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Network?
 - Which signal should the example or diagram make visible for Network?
 - What failure should be prevented first when Network reaches a real system?
-
-## Big Picture
-
-![cloud computing 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/06/06-01-concept-at-a-glance.en.png)
-
-*cloud computing 101 chapter 6 flow overview*
-
-This picture places Network inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Good network design prevents failures from cascading and makes debugging possible when things break.
 
 ## Questions This Chapter Answers
 

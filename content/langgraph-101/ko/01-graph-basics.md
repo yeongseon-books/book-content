@@ -32,21 +32,15 @@ LangChain 스타일의 에이전트를 처음 묶기 시작하면 많은 팀이 
 
 LangGraph 입문에서 가장 큰 차이는 문법 암기가 아니라 멘탈 모델입니다. `StateGraph`, `add_node()`, `add_edge()`, `invoke()`를 외우는 것만으로는 운영 감각이 생기지 않습니다. 반대로 “상태가 어디서 바뀌고, 왜 다음 단계가 선택됐는가”를 읽는 눈이 생기면, 작은 예제도 곧바로 실무 구조의 축소판으로 보이기 시작합니다.
 
+![START에서 END로 이어지는 기본 그래프 흐름](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/01/01-01-minimal-runnable-example.ko.png)
+*START에서 END로 이어지는 기본 그래프 흐름*
+> LangGraph의 핵심은 그래프 모양이 아니라, 어떤 상태가 어디서 바뀌고 다음 단계가 왜 선택됐는지 코드 구조에 남기는 일입니다.
+
 ## 먼저 던지는 질문
 
 - LangGraph는 왜 단순 체인보다 명시적인 상태 기계로 보는 편이 좋을까요?
 - 노드와 엣지, state는 각각 실행 흐름에서 어떤 책임을 나눌까요?
 - 첫 그래프를 실행한 뒤에는 최종 문장보다 어떤 state 값을 먼저 확인해야 할까요?
-
-## 큰 그림
-
-![START에서 END로 이어지는 기본 그래프 흐름](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/01/01-01-minimal-runnable-example.ko.png)
-
-*START에서 END로 이어지는 기본 그래프 흐름*
-
-이 그림에서는 입력 state가 노드를 지나며 갱신되고, 엣지가 다음 실행 지점을 고르는 기본 그래프 흐름을 봅니다. LangGraph의 핵심은 프롬프트가 아니라 state 전환을 코드로 드러내는 데 있습니다.
-
-> LangGraph의 핵심은 그래프 모양이 아니라, 어떤 상태가 어디서 바뀌고 다음 단계가 왜 선택됐는지 코드 구조에 남기는 일입니다.
 
 ## 왜 이 구조가 중요한가
 

@@ -35,19 +35,14 @@ This is the 4th article in the LLM from Scratch 101 series.
 
 ---
 
+![LLM from Scratch 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/04/04-01-layernorm-pre-norm-vs-post-norm.en.png)
+*LLM from Scratch 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why is a 2-layer MLP enough for FeedForward?
 - How do residual connections rescue training?
 - What's the practical difference between pre-norm and post-norm?
-
-## Big Picture
-
-![LLM from Scratch 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/04/04-01-layernorm-pre-norm-vs-post-norm.en.png)
-
-*LLM from Scratch 101 chapter 4 flow overview*
-
-This picture places The Transformer Block: A Unit of Depth inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## FeedForward is Just a 2-layer MLP
 

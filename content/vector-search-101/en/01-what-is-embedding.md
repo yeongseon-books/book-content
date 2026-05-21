@@ -28,21 +28,15 @@ This is the first post in the Vector Search 101 series.
 
 This post focuses on the concept and intuition behind embeddings. Code stays minimal, but we still build real vectors and read real similarity scores.
 
+![Keyword search and embedding search contrast](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/01/01-01-what-is-an-embedding-converting-text-int.en.png)
+*Keyword search and embedding search contrast*
+> An embedding is not a format for storing text. It is a representation that makes meaning comparable by distance.
+
 ## Questions to Keep in Mind
 
 - When keyword search misses documents with the same meaning but different wording, what is missing?
 - What does it actually mean for two embedding vectors to be close?
 - When choosing a first embedding model, which limits should you check before tuning anything else?
-
-## Big Picture
-
-![Keyword search and embedding search contrast](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/01/01-01-what-is-an-embedding-converting-text-int.en.png)
-
-*Keyword search and embedding search contrast*
-
-This picture shows the shift from keyword matching to comparison in semantic space. Embeddings turn text into vectors so a search system can find nearby meaning even when the same words do not appear.
-
-> An embedding is not a format for storing text. It is a representation that makes meaning comparable by distance.
 
 ## The ceiling of keyword search
 

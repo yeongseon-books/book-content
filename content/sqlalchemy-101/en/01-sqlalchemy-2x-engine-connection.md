@@ -40,19 +40,14 @@ This series walks through SQLAlchemy 2.x using SQLite, end to end. The first pos
 
 *Getting started with SQLAlchemy 2.x - engine and connection demystified*
 
+![sqlalchemy 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/01/01-02-why-this-matters.en.png)
+*sqlalchemy 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - That SQLAlchemy is split into two layers, Core and ORM, and that Engine and Connection are the entry points to Core?
 - That `create_engine()` returns a factory bundling a dialect, the DB-API driver, a connection pool, and a parsed URL?
 - How the 1.x to 2.x transition changed defaults: `future=True` everywhere, unified `select()`, `Mapped[]` typing, native async?
-
-## Big Picture
-
-![sqlalchemy 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/01/01-02-why-this-matters.en.png)
-
-*sqlalchemy 101 chapter 1 flow overview*
-
-This picture places Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

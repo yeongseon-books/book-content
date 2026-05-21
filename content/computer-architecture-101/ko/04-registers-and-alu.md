@@ -29,17 +29,15 @@ last_reviewed: '2026-05-12'
 
 레지스터 수와 ALU 처리량은 코드의 성능 상한을 직접 결정합니다. 변수가 레지스터에 머물면 빠르고, 스택이나 메모리로 밀려나면 느려집니다. 그래서 핫 패스 최적화의 출발점은 종종 "이 변수는 지금 레지스터에 있나"입니다.
 
+
+![Computer Architecture 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/04/04-01-registers-alu-dataflow.ko.png)
+*Computer Architecture 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 레지스터는 메모리와 무엇이 다를까요?
 - 일반 목적 레지스터와 특수 레지스터는 어떻게 나뉠까요?
 - ALU는 어떤 연산을 실제로 수행할까요?
-
-## 큰 그림
-
-![Computer Architecture 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/04/04-01-registers-alu-dataflow.ko.png)
-
-*Computer Architecture 101 4장 흐름 개요*
 
 ## 왜 중요한가
 

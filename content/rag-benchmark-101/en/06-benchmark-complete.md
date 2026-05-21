@@ -26,21 +26,15 @@ A finished benchmark has to encode its experimental knobs in configuration and r
 
 This is the final article in the RAG Evaluation and Benchmarking 101 series.
 
+![End-to-end benchmark pipeline in one run](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/06/06-01-end-to-end-benchmark-pipeline-in-one-run.en.png)
+*End-to-end benchmark pipeline in one run*
+> A finished RAG benchmark is **not a single number**. It is a reproducible pipeline that splits retrieval and generation and runs them under the same fixed experimental conditions, on demand.
+
 ## Questions to Keep in Mind
 
 - What turns a one-off benchmark script into a repeatable decision tool?
 - Which failure cases should an automatic report show beyond average scores?
 - What regression thresholds should become blockers when the benchmark runs in CI?
-
-## Big Picture
-
-![End-to-end benchmark pipeline in one run](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/06/06-01-end-to-end-benchmark-pipeline-in-one-run.en.png)
-
-*End-to-end benchmark pipeline in one run*
-
-This picture connects dataset, runner, metric calculation, report, and CI gate into one repeatable benchmark. A complete benchmark is not a score table; it is an operational tool for change decisions.
-
-> A finished RAG benchmark is **not a single number**. It is a reproducible pipeline that splits retrieval and generation and runs them under the same fixed experimental conditions, on demand.
 
 ## Why this matters
 

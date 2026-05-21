@@ -28,19 +28,15 @@ What matters operationally is the separation. You need one layer that defines wh
 
 This is post 3 in the SRE 101 series. Here we separate measurement, internal objective, and external agreement so later error-budget and alerting decisions have a clean contract underneath them.
 
+
+![sre 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/03/03-01-concept-at-a-glance.en.png)
+*sre 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - Where exactly is the line between an indicator, an objective, and an external agreement?
 - Why should internal targets and customer-facing promises almost never be the same document?
 - What information makes an SLO operational instead of decorative?
-
-## Big Picture
-
-![sre 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/03/03-01-concept-at-a-glance.en.png)
-
-*sre 101 chapter 3 flow overview*
-
-This picture places SLI, SLO, SLA inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this topic matters
 

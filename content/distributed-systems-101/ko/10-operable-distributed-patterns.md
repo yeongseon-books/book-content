@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 분산 시스템 이론을 day-2 운영으로 바꾸는 패턴들, 즉 timeout budget, circuit breaker, load shedding, observability를 하나의 운영 경계로 묶어 봅니다.
 
+
+![Distributed Systems 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/10/10-01-concept-at-a-glance.ko.png)
+*Distributed Systems 101 10장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - bulkhead로 장애를 어떻게 격리할 수 있을까요?
 - circuit breaker는 연쇄 장애를 어떻게 끊어 줄까요?
 - backpressure는 언제 부하를 안전하게 거절해야 할까요?
-
-## 큰 그림
-
-![Distributed Systems 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/10/10-01-concept-at-a-glance.ko.png)
-
-*Distributed Systems 101 10장 흐름 개요*
 
 ## 왜 중요한가
 

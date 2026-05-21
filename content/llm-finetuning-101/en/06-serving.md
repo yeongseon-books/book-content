@@ -26,19 +26,14 @@ Serving forces a different set of trade-offs than training. This article breaks 
 
 This is the final post in the LLM Fine-tuning 101 series.
 
+![LLM Fine-tuning 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/06/06-02-what-this-demo-isolates-on-purpose.en.png)
+*LLM Fine-tuning 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - What is the minimum structure for wrapping a fine-tuned small model behind a FastAPI endpoint?
 - In serving code, where do you draw the line between training and inference?
 - How can you validate the endpoint without opening a browser?
-
-## Big Picture
-
-![LLM Fine-tuning 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/06/06-02-what-this-demo-isolates-on-purpose.en.png)
-
-*LLM Fine-tuning 101 chapter 6 flow overview*
-
-This picture places Model Serving inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

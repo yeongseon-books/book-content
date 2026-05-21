@@ -40,21 +40,15 @@ The main idea is simple: **streaming does not make the model smarter or faster, 
 
 ---
 
+![Handling streaming responses: real-time output](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-01-handling-streaming-responses-real-time-o.en.png)
+*Handling streaming responses: real-time output*
+> Streaming exposes generation as a sequence of events, not as a faster final answer.
+
 ## Questions to Keep in Mind
 
 - Does streaming finish the answer sooner, or show the generation flow earlier?
 - How do you read text, finish signals, and usage from chunks?
 - How does a FastAPI server relay the model stream to a user?
-
-## Big Picture
-
-![Handling streaming responses: real-time output](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-01-handling-streaming-responses-real-time-o.en.png)
-
-*Handling streaming responses: real-time output*
-
-This picture shows generation as a stream of events instead of one completed response body. Streaming does not remove the work; it exposes progress while the work is happening.
-
-> Streaming exposes generation as a sequence of events, not as a faster final answer.
 
 ## Why streaming matters
 

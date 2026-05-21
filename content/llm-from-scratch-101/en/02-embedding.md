@@ -35,19 +35,14 @@ This is the 2nd article in the LLM from Scratch 101 series.
 
 ---
 
+![LLM from Scratch 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/02/02-01-sinusoidal-vs-learned-positional-embeddi.en.png)
+*LLM from Scratch 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What operation does nn.Embedding actually perform?
 - Why isn't token embedding alone enough?
 - How do sinusoidal and learned positional embeddings differ?
-
-## Big Picture
-
-![LLM from Scratch 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/02/02-01-sinusoidal-vs-learned-positional-embeddi.en.png)
-
-*LLM from Scratch 101 chapter 2 flow overview*
-
-This picture places From Integers to Vectors and Positions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## nn.Embedding is Just a Lookup Table
 

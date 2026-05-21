@@ -28,21 +28,15 @@ LangChain을 처음 보면 용어가 먼저 몰려옵니다. LCEL, Runnable, Cha
 
 ---
 
+![전체 흐름 한눈에 보기](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/01/01-02-the-flow-at-a-glance.ko.png)
+*전체 흐름 한눈에 보기*
+> LangChain에서는 입력과 출력 모양만 맞으면, 많은 컴포넌트를 서로 바꿔 끼울 수 있습니다.
+
 ## 먼저 던지는 질문
 
 - LCEL은 프롬프트, 모델, 파서를 어떤 공통 계약으로 묶어 줄까요?
 - `prompt | llm | parser` 안에서는 단계마다 어떤 데이터 모양이 오갈까요?
 - `invoke()`, `batch()`, `stream()`은 같은 체인에서 각각 언제 써야 할까요?
-
-## 큰 그림
-
-![전체 흐름 한눈에 보기](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/01/01-02-the-flow-at-a-glance.ko.png)
-
-*전체 흐름 한눈에 보기*
-
-이 그림에서는 입력 dict가 프롬프트, 모델, 파서를 지나 애플리케이션이 쓰는 문자열로 바뀌는 기본 파이프라인을 봅니다. 핵심은 각 단계가 Runnable 계약을 공유해서 같은 실행 메서드로 다뤄진다는 점입니다.
-
-> LangChain에서는 입력과 출력 모양만 맞으면, 많은 컴포넌트를 서로 바꿔 끼울 수 있습니다.
 
 ## 최소 실행 예제
 

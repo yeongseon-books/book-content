@@ -26,21 +26,15 @@ End-to-end evaluation only becomes useful when question, context, and answer are
 
 This is the 5th article in the RAG Evaluation and Benchmarking 101 series.
 
+![Dataset structure for end-to-end evaluation](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/05/05-01-dataset-structure-for-end-to-end-evaluat.en.png)
+*Dataset structure for end-to-end evaluation*
+> End-to-end evaluation is not "does the answer look right?". It is a structured score for **whether the answer is grounded in the context and actually addresses the question**.
+
 ## Questions to Keep in Mind
 
 - If retrieval metrics improve but final answers are poor, which layer should be inspected next?
 - What debugging becomes easier when retrieval, generation, and grounding scores are reported together?
 - Why is using LLM-as-judge or RAGAS scores risky without a baseline?
-
-## Big Picture
-
-![Dataset structure for end-to-end evaluation](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/05/05-01-dataset-structure-for-end-to-end-evaluat.en.png)
-
-*Dataset structure for end-to-end evaluation*
-
-This picture reads retrieval metrics, answer quality, and grounding evaluation inside one pipeline. End-to-end evaluation is less a final score than a diagnostic tool for locating the failing layer.
-
-> End-to-end evaluation is not "does the answer look right?". It is a structured score for **whether the answer is grounded in the context and actually addresses the question**.
 
 ## Why this matters
 

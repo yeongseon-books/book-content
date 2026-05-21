@@ -26,19 +26,15 @@ This is the final post in the pytest 101 series.
 
 When testing feels painful, the problem is often not pytest. It is that one function is trying to calculate totals, call a payment API, write to storage, stamp the current time, and notify a user all at once. In this article, we'll make that pain concrete and then show how to redraw the boundary so the important rules become easy to verify.
 
+
+![pytest 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/10/10-01-testable-code-boundary.en.png)
+*pytest 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Writing Testable Code?
 - Which signal should the example or diagram make visible for Writing Testable Code?
 - What failure should be prevented first when Writing Testable Code reaches a real system?
-
-## Big Picture
-
-![pytest 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/10/10-01-testable-code-boundary.en.png)
-
-*pytest 101 chapter 10 flow overview*
-
-This picture places Writing Testable Code inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What This Article Covers
 

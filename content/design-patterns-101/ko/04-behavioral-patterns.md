@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 이번 글에서는 Behavioral 패턴을 객체 사이의 협력 방식을 설명하는 공통 언어로 정리해 보겠습니다. 핵심은 if/elif로 흩어진 흐름을 이름 붙은 구조로 바꿔, 협력이 어떻게 일어나는지 코드 위에 드러나게 만드는 것입니다.
 
+
+![Design Patterns 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/04/04-01-concept-at-a-glance.ko.png)
+*Design Patterns 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - Behavioral 패턴은 어떤 행위 문제를 다룰까요?
 - Strategy, Observer, Command는 각각 흐름을 어떻게 분리할까요?
 - State와 Iterator는 무엇을 객체로 끌어올릴까요?
-
-## 큰 그림
-
-![Design Patterns 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/04/04-01-concept-at-a-glance.ko.png)
-
-*Design Patterns 101 4장 흐름 개요*
 
 ## 왜 중요한가
 

@@ -26,21 +26,16 @@ Prompt injection works because system and user messages end up in the same conte
 
 This is post 2 in the AI Safety & Guardrails 101 series. It breaks down why "ignore previous instructions" works and how to build layered defenses instead of relying on prompt wording alone.
 
+
+![Prompt injection defense flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/02/02-01-big-picture.en.png)
+*Prompt injection defense flow*
+> Prompt injection is not just a bad sentence; it is a boundary failure where untrusted data becomes executable instruction.
+
 ## Questions to Keep in Mind
 
 - When does prompt injection begin by turning data into instructions?
 - How do direct and indirect injection differ in where they must be defended?
 - What should be recorded when red-team cases become a regression set?
-
-## Big Picture
-
-![Prompt injection defense flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/02/02-01-big-picture.en.png)
-
-*Prompt injection defense flow*
-
-This picture routes user input and external documents through instruction boundaries, risk decisions, and safe execution so data is not mistaken for commands. Prompt-injection defense is structural separation of data and instructions, not merely telling the model to be careful.
-
-> Prompt injection is not just a bad sentence; it is a boundary failure where untrusted data becomes executable instruction.
 
 ## Why "Ignore Previous Instructions" Works
 

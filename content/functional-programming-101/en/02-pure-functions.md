@@ -30,19 +30,15 @@ This is post 2 in the Functional Programming 101 series.
 
 > A pure function does not depend on external state and does not modify external state. Separating side effects from pure logic makes code easier to test and reason about. This article covers the definition of pure functions, how to identify side effects, and patterns for managing them.
 
+
+![Functional Programming 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/02/02-01-big-picture.en.png)
+*Functional Programming 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Pure Functions and Side Effects?
 - Which signal should the example or diagram make visible for Pure Functions and Side Effects?
 - What failure should be prevented first when Pure Functions and Side Effects reaches a real system?
-
-## Big Picture
-
-![Functional Programming 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/02/02-01-big-picture.en.png)
-
-*Functional Programming 101 chapter 2 flow overview*
-
-This picture places Pure Functions and Side Effects inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

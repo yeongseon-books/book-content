@@ -25,21 +25,15 @@ Real ingestion work rarely stays inside one file format. Teams usually need to m
 
 This is the fifth post in the Document Ingestion 101 series. Here, we route multiple formats through separate loaders and normalize them into one shared `Document` contract.
 
+![Loader routing by file format](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/05/05-01-loader-routing-by-file-format.en.png)
+*Loader routing by file format*
+> The essence of a multi-format pipeline is forcing varied inputs into one shared `Document` contract.
+
 ## Questions to Keep in Mind
 
 - What shared contract must come first when PDF, Markdown, and HTML enter one pipeline?
 - Where should loader routing branch by file format, and where should it merge again?
 - What breaks in chunking and metadata filtering without a normalization layer?
-
-## Big Picture
-
-![Loader routing by file format](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/05/05-01-loader-routing-by-file-format.en.png)
-
-*Loader routing by file format*
-
-This picture shows format-specific loaders reading different sources and a normalization layer bringing them back to one Document contract. A multi-format pipeline is about fixing the merge point after format-specific branches.
-
-> The essence of a multi-format pipeline is forcing varied inputs into one shared `Document` contract.
 
 ## Loader routing by file format
 

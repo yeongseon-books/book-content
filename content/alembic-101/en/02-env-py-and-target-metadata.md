@@ -28,19 +28,15 @@ seo_description: env.py is a boot script Alembic runs on every command. For each
 
 This is post 2 in the Alembic 101 series. Here we will pin down when `env.py` runs and what `target_metadata` must provide in practice.
 
+
+![alembic 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/02/02-01-diagram-where-env-py-assembles-metadata.en.png)
+*alembic 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What `env.py` actually is and when it runs?
 - Why `target_metadata` is mandatory (it is the basis for autogenerate)?
 - A safe pattern for reading the DB URL from an environment variable?
-
-## Big Picture
-
-![alembic 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/02/02-01-diagram-where-env-py-assembles-metadata.en.png)
-
-*alembic 101 chapter 2 flow overview*
-
-This picture places env.py and target_metadata: wiring models to migrations inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

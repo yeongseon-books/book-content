@@ -28,21 +28,16 @@ Infrastructure as Code fixes that by moving cloud changes into the same review-a
 
 This is post 5 in the DevOps 101 series. In this chapter, we use Terraform to explain plan, apply, state, and remote backends as the operating model behind reproducible infrastructure.
 
+
+![devops 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/05/05-01-concept-at-a-glance.en.png)
+*devops 101 chapter 5 flow overview*
+> Infrastructure becomes an *asset*—not a hero's memory—when it *lives in code*, *passes review*, and *stays in sync* with reality.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Infrastructure as Code?
 - Which signal should the example or diagram make visible for Infrastructure as Code?
 - What failure should be prevented first when Infrastructure as Code reaches a real system?
-
-## Big Picture
-
-![devops 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/05/05-01-concept-at-a-glance.en.png)
-
-*devops 101 chapter 5 flow overview*
-
-This picture places Infrastructure as Code inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Infrastructure becomes an *asset*—not a hero's memory—when it *lives in code*, *passes review*, and *stays in sync* with reality.
 
 ## Questions this article answers
 

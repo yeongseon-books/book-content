@@ -28,21 +28,15 @@ last_reviewed: '2026-05-14'
 AI와 데이터사이언스는 가장 화려해 보이는 분야이지만, 막상 들어가 보면 통계와 데이터 정리, 평가와 검증 같은 기초 작업이 훨씬 더 많은 비중을 차지합니다. 모델 이름만 외우는 방식으로는 오래 버티기 어렵습니다.
 
 
+![Computer Science Major 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/06/06-01-ai-learning-pipeline.ko.png)
+*컴퓨터학과 전공 가이드 6장 흐름 개요*
+> AI와 데이터사이언스의 핵심은 모델이나 기법이 아니라, 데이터의 가정과 문제 상황을 올바르게 짝지어 선택하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - AI와 데이터사이언스는 전공 안에서 어떻게 나뉘고 어떻게 연결될까요?
 - 통계, 머신러닝, 딥러닝, 데이터 분석은 어떤 흐름으로 이어질까요?
 - 모델만 보는 공부가 왜 금방 한계에 부딪힐까요?
-
-## 큰 그림
-
-![Computer Science Major 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/06/06-01-ai-learning-pipeline.ko.png)
-
-*컴퓨터학과 전공 가이드 6장 흐름 개요*
-
-이 그림에서 보이듯 AI와 데이터사이언스는 수학과 통계 위에 최적화와 학습 이론이 쌓이고, 실제 데이터와 만나는 지점입니다. 각 모델이 어떤 가정 위에서 작동하고 어떤 경계에서 실패할 수 있는지 이해하는 것이 중요합니다.
-
-> AI와 데이터사이언스의 핵심은 모델이나 기법이 아니라, 데이터의 가정과 문제 상황을 올바르게 짝지어 선택하는 데 있습니다.
 
 ## 이 글에서 배울 것
 

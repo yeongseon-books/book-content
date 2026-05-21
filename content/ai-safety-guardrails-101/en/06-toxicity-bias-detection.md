@@ -26,21 +26,16 @@ Toxicity and bias often get grouped together, but they are not the same operatio
 
 This is post 6 in the AI Safety & Guardrails 101 series. It explains why those concerns need different guardrail workflows and different evaluation loops.
 
+
+![Toxicity and bias guardrail flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/06/06-01-big-picture.en.png)
+*Toxicity and bias guardrail flow*
+> Toxicity is an immediate risk to block; bias is a system tendency to measure and reduce over time.
+
 ## Questions to Keep in Mind
 
 - Why should toxicity blocking and bias measurement not be treated as the same problem?
 - What signals should inline moderation and offline audits each own?
 - What must be monitored to reduce false positives without weakening protection?
-
-## Big Picture
-
-![Toxicity and bias guardrail flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/06/06-01-big-picture.en.png)
-
-*Toxicity and bias guardrail flow*
-
-This picture separates inline toxicity blocking from long-running bias sampling and audits that feed policy improvement. Toxicity and bias guardrails must distinguish immediate harm from imbalance that must be measured over time.
-
-> Toxicity is an immediate risk to block; bias is a system tendency to measure and reduce over time.
 
 ## Toxicity and Bias Are Different Problems
 

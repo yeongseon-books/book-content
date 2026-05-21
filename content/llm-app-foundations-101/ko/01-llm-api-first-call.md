@@ -29,19 +29,14 @@ LLM 애플리케이션을 처음 만들 때 가장 먼저 흐려지는 지점은
 
 여기서는 Groq Python SDK로 가장 작은 성공 경로를 만들고, 첫 호출을 운영 가능한 멘탈 모델로 바꾸겠습니다.
 
+![첫 번째 LLM API 호출의 최소 왕복 구조](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/01/01-01-llm-api-first-call-sending-your-first-re.ko.png)
+*첫 번째 LLM API 호출의 최소 왕복 구조*
+
 ## 먼저 던지는 질문
 
 - LLM API 호출은 SDK 아래에서 어떤 요청-응답 구조로 움직일까요?
 - API 키와 모델 ID, 메시지 형식 중 첫 실패에서 어디부터 봐야 할까요?
 - 응답에서 본문, 사용량, 모델명을 어떻게 읽어야 할까요?
-
-## 큰 그림
-
-![첫 번째 LLM API 호출의 최소 왕복 구조](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/01/01-01-llm-api-first-call-sending-your-first-re.ko.png)
-
-*첫 번째 LLM API 호출의 최소 왕복 구조*
-
-이 그림에서는 애플리케이션이 모델 서비스로 요청을 보내고 JSON 응답을 받는 최소 왕복만 봅니다. 인증, 모델 ID, 메시지, 응답 필드는 모두 이 경계 위에서 확인합니다.
 
 ## 왜 이 글이 중요한가
 

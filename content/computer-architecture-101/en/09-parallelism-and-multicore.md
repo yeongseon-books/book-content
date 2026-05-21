@@ -31,19 +31,15 @@ last_reviewed: '2026-05-04'
 
 This is post 9 in the Computer Architecture 101 series.
 
+
+![computer architecture 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/09/09-01-big-picture.en.png)
+*computer architecture 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Parallelism and Multicore?
 - Which signal should the example or diagram make visible for Parallelism and Multicore?
 - What failure should be prevented first when Parallelism and Multicore reaches a real system?
-
-## Big Picture
-
-![computer architecture 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/09/09-01-big-picture.en.png)
-
-*computer architecture 101 chapter 9 flow overview*
-
-This picture places Parallelism and Multicore inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

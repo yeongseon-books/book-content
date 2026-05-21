@@ -28,21 +28,16 @@ list, tuple, set, dict는 비슷해 보여도 가변성, 순서, 중복 허용, 
 
 이 글은 Python 101 시리즈의 네 번째 글입니다.
 
+
+![Python 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-101/04/04-01-mental-model.ko.png)
+*Python 101 4장 흐름 개요*
+> list, tuple, set, dict의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - list를 `=`으로 "복사"한 뒤 한쪽을 바꿨는데 양쪽이 함께 바뀌는 alias 사고?
 - 함수의 기본 인자로 `def f(items=[]):`를 썼다가, 호출이 누적될수록 리스트가 자라는 문제?
 - dict에서 없는 키를 `d[key]`로 꺼내다가 `KeyError`로 멈추는 일?
-
-## 큰 그림
-
-![Python 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-101/04/04-01-mental-model.ko.png)
-
-*Python 101 4장 흐름 개요*
-
-이 그림에서는 list, tuple, set, dict를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> list, tuple, set, dict의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 멘탈 모델
 

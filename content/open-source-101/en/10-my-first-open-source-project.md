@@ -28,21 +28,16 @@ This is the final post in the Open Source 101 series.
 
 Here, we will walk through the smallest complete path from idea to MVP, docs, first release, and feedback loop for a first open source project.
 
+
+![open source 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/10/10-01-the-smallest-path-to-publication.en.png)
+*open source 101 chapter 10 flow overview*
+> Your first open source project does not need to be unique. It needs to be honest, documented, and responsive to contributors.
+
 ## Questions to Keep in Mind
 
 - How large should a first open source project be?
 - What order works well for idea, scope, MVP, docs, and release?
 - Why do docs and licensing become more important right before publication?
-
-## Big Picture
-
-![open source 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/10/10-01-the-smallest-path-to-publication.en.png)
-
-*open source 101 chapter 10 flow overview*
-
-This picture places My First Open Source Project inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Your first open source project does not need to be unique. It needs to be honest, documented, and responsive to contributors.
 
 ## Why It Matters
 

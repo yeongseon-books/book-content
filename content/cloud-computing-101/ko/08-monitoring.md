@@ -30,21 +30,16 @@ last_reviewed: '2026-05-14'
 
 여기서는 메트릭, 로그, 트레이스가 각각 어떤 질문에 답하는지부터 시작해 CloudWatch 알람까지 정리해 보겠습니다.
 
+
+![Cloud Computing 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/08/08-01-concept-at-a-glance.ko.png)
+*Cloud Computing 101 8장 흐름 개요*
+> 모니터링의 핵심은 문제를 빨리 감지하고, 원인을 빨리 찾는 운영 신호 체계를 만드는 것입니다.
+
 ## 먼저 던지는 질문
 
 - 메트릭, 로그, 트레이스는 각각 어떤 질문에 답할까요?
 - CloudWatch는 어떤 기본 기능을 제공할까요?
 - 알람과 SNS 알림은 어떻게 연결될까요?
-
-## 큰 그림
-
-![Cloud Computing 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/08/08-01-concept-at-a-glance.ko.png)
-
-*Cloud Computing 101 8장 흐름 개요*
-
-메트릭(Metric)은 CPU, 메모리, 네트워크 같은 수치적 신호입니다. 로그(Log)는 애플리케이션이 기록한 이벤트 텍스트입니다. 트레이스(Trace)는 요청 하나가 여러 서비스를 거쳐 가면서 남긴 기록입니다. 대시보드는 이들을 시각화하고, 알람은 임계값을 넘으면 자동으로 알려줍니다.
-
-> 모니터링의 핵심은 문제를 빨리 감지하고, 원인을 빨리 찾는 운영 신호 체계를 만드는 것입니다.
 
 ## 왜 중요한가
 

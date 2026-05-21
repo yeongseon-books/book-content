@@ -31,19 +31,15 @@ This is post 4 in the Type Hints in Python 101 series.
 
 > Python treats functions as first-class objects. You can pass them as arguments, return them from other functions, and store them in variables. But how do you tell the type checker what kind of function is expected? `Callable` describes function signatures as types, `@overload` handles functions with multiple valid signatures, and `ParamSpec` preserves decorator signatures. This article covers these advanced function-level type hints.
 
+
+![Type Hints in Python 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/04/04-01-big-picture.en.png)
+*Type Hints in Python 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Function Type Hints?
 - Which signal should the example or diagram make visible for Function Type Hints?
 - What failure should be prevented first when Function Type Hints reaches a real system?
-
-## Big Picture
-
-![Type Hints in Python 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/04/04-01-big-picture.en.png)
-
-*Type Hints in Python 101 chapter 4 flow overview*
-
-This picture places Function Type Hints inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

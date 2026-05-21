@@ -25,21 +25,15 @@ Some problems stop fitting a fixed chain the moment the next step depends on wha
 
 This is post 4 in the AI App Patterns 101 series. Here we examine when the agent-and-tool pattern is justified and how to make tool selection observable and debuggable.
 
+![Fixed chain versus dynamic agent](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/04/04-01-fixed-chain-versus-dynamic-agent.en.png)
+*Fixed chain versus dynamic agent*
+> An agent is a controller that lets the model choose tool-call paths at runtime instead of hardcoding every step ahead of time.
+
 ## Questions to Keep in Mind
 
 - When an agent chooses a tool, how much autonomy does it really have?
 - What risk appears if tool names and arguments are not validated before execution?
 - How can ReAct traces narrow agent failures faster?
-
-## Big Picture
-
-![Fixed chain versus dynamic agent](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/04/04-01-fixed-chain-versus-dynamic-agent.en.png)
-
-*Fixed chain versus dynamic agent*
-
-This picture shows an agent looping through reasoning, tool choice, execution result, and observation while actual execution stays inside the application boundary. Autonomy means choosing among allowed tools, not unrestricted action.
-
-> An agent is a controller that lets the model choose tool-call paths at runtime instead of hardcoding every step ahead of time.
 
 ## Agent vs chain
 

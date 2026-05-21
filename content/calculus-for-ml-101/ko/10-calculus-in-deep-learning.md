@@ -32,17 +32,15 @@ last_reviewed: '2026-05-12'
 
 끝까지 읽고 나면 딥러닝 훈련 코드를 볼 때 각 줄이 어떤 수학적 의미를 갖는지, 그리고 왜 미분이 그 전체 루프의 중심인지 선명하게 보이게 됩니다.
 
+
+![Calculus for ML 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/10/10-01-concept-at-a-glance.ko.png)
+*Calculus for ML 101 10장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 딥러닝 학습 루프는 어떤 단계로 구성되고 각 단계에서 미분은 어디에 등장할까요?
 - forward pass와 loss computation은 backward를 위해 무엇을 준비할까요?
 - gradient 계산과 optimizer update는 어떻게 연결될까요?
-
-## 큰 그림
-
-![Calculus for ML 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/10/10-01-concept-at-a-glance.ko.png)
-
-*Calculus for ML 101 10장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 
@@ -179,7 +177,6 @@ with torch.no_grad():
 이 시리즈에서 본 미분, 편미분, 그래디언트, 연쇄 법칙, 손실 함수, 경사하강법, 최적화, 역전파는 모두 이 하나의 루프 안에서 각자 자리를 갖습니다. 그래서 딥러닝을 이해한다면 결국 이 루프의 각 단계가 어떤 수학적 역할을 맡는지 설명할 수 있어야 합니다.
 
 이 글로 Calculus for ML 101 시리즈를 마칩니다. 이제 이후 어떤 모델이나 프레임워크를 보더라도, 그 안에서 학습이 실제로 어떻게 일어나는지 미분의 언어로 다시 읽어 낼 수 있을 것입니다.
-
 
 
 ## 자동미분의 실제 동작: Forward mode와 Reverse mode

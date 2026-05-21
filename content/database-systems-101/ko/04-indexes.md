@@ -29,17 +29,15 @@ last_reviewed: '2026-05-12'
 
 그래서 인덱스를 배울 때 중요한 것은 “어디에 하나 더 붙일까?”보다 “어떤 쿼리에 정말 필요한가, 어디에는 일부러 만들지 말아야 하는가”를 먼저 보는 감각입니다. 이 글에서는 B-tree 인덱스의 직관, 선택성, 복합 인덱스의 선두 컬럼, 커버링 인덱스까지 한 번에 연결해 보겠습니다.
 
+
+![Database Systems 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/04/04-01-big-picture.ko.png)
+*Database Systems 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - B-tree 인덱스는 어떤 직관으로 이해하면 좋을까요?
 - 단일 인덱스, 복합 인덱스, 커버링 인덱스는 무엇이 다를까요?
 - 어떤 경우에는 인덱스가 사실상 의미가 없어질까요?
-
-## 큰 그림
-
-![Database Systems 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/04/04-01-big-picture.ko.png)
-
-*Database Systems 101 4장 흐름 개요*
 
 ## 이 글에서 배울 내용
 

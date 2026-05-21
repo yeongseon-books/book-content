@@ -29,19 +29,15 @@ This is the final post in the Distributed Systems 101 series.
 
 Here we gather the patterns that turn distributed-system theory into day-two operations: timeout budgets, circuit breaking, load shedding, and observability tied back to SLOs.
 
+
+![distributed systems 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/10/10-01-concept-at-a-glance.en.png)
+*distributed systems 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - How to isolate failure with bulkheads?
 - How to break cascade failures with a circuit breaker?
 - How to safely refuse load with backpressure?
-
-## Big Picture
-
-![distributed systems 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/10/10-01-concept-at-a-glance.en.png)
-
-*distributed systems 101 chapter 10 flow overview*
-
-This picture places Patterns for Operable Distributed Systems inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

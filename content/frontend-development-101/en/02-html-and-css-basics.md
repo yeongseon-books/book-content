@@ -26,19 +26,15 @@ One lesson shows up quickly when you study frontend work: building a screen fast
 
 This is post 2 in the Frontend Development 101 series. Here we treat HTML as the page skeleton and CSS as the rule system layered on top of that skeleton. Keeping meaning in HTML and appearance in CSS is what makes layout, accessibility, and SEO improve together instead of fighting each other later.
 
+
+![frontend development 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/02/02-01-concept-at-a-glance.en.png)
+*frontend development 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying HTML and CSS Basics?
 - Which signal should the example or diagram make visible for HTML and CSS Basics?
 - What failure should be prevented first when HTML and CSS Basics reaches a real system?
-
-## Big Picture
-
-![frontend development 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/02/02-01-concept-at-a-glance.en.png)
-
-*frontend development 101 chapter 2 flow overview*
-
-This picture places HTML and CSS Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

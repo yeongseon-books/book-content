@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 이 글은 Observability 101 시리즈의 7번째 글입니다.
 
+
+![Observability 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/07/07-01-concept-at-a-glance.ko.png)
+*Observability 101 7장 흐름 개요*
+> 경보와 온콜의 핵심은 도구 선택이 아니라, 언제 어디서 이 신호를 남기고 어떻게 해석할 것인가 하는 설계입니다.
+
 ## 먼저 던지는 질문
 
 - 새벽에 사람을 깨울 만한 경보는 어떤 조건을 가져야 할까요?
 - 경보 피로는 왜 생기고 어떻게 줄일 수 있을까요?
 - 증상 경보와 원인 경보는 어떻게 다를까요?
-
-## 큰 그림
-
-![Observability 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/07/07-01-concept-at-a-glance.ko.png)
-
-*Observability 101 7장 흐름 개요*
-
-경보와 온콜를 다루는 이번 장에서는 주요 개념과 실무 패턴을 봅니다. 시스템이 복잡해질수록 이 개념들이 어디에서 시작되고 어떤 결과를 만드는지 이해하는 것이 중요합니다.
-
-> 경보와 온콜의 핵심은 도구 선택이 아니라, 언제 어디서 이 신호를 남기고 어떻게 해석할 것인가 하는 설계입니다.
 
 ## 왜 중요한가
 

@@ -30,19 +30,15 @@ This is post 6 in the pytest 101 series.
 
 > A mock replaces real dependencies with fake objects to isolate the code under test. Monkeypatch temporarily swaps functions, attributes, and environment variables within the test scope. This article covers the differences between the two tools and their usage patterns.
 
+
+![pytest 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/06/06-01-big-picture.en.png)
+*pytest 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Mock and Monkeypatch?
 - Which signal should the example or diagram make visible for Mock and Monkeypatch?
 - What failure should be prevented first when Mock and Monkeypatch reaches a real system?
-
-## Big Picture
-
-![pytest 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/06/06-01-big-picture.en.png)
-
-*pytest 101 chapter 6 flow overview*
-
-This picture places Mock and Monkeypatch inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

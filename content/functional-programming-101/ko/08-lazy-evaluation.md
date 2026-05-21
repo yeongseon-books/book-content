@@ -28,17 +28,15 @@ last_reviewed: '2026-05-12'
 
 지연 평가는 "값이 정말 필요해질 때까지 계산하지 않는다"는 전략입니다. Python에서는 제너레이터와 iterator 프로토콜이 이 전략의 핵심 도구입니다. 이 글을 이해하면 `range`, `map`, `filter`, 파일 객체가 왜 메모리 효율적인지까지 함께 연결됩니다.
 
+
+![Functional Programming 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/08/08-01-lazy-pipeline-pull-model.ko.png)
+*Functional Programming 101 8장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - eager evaluation과 lazy evaluation은 무엇이 다를까요?
 - 제너레이터 함수와 제너레이터 표현식은 어떤 상황에서 유용할까요?
 - 무한 시퀀스와 큰 데이터를 Python에서는 어떻게 안전하게 다룰 수 있을까요?
-
-## 큰 그림
-
-![Functional Programming 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/08/08-01-lazy-pipeline-pull-model.ko.png)
-
-*Functional Programming 101 8장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -554,7 +552,6 @@ def test_sum_matches_builtin(xs: list[int]) -> None:
 - 불변 객체를 기본값으로 두고, 변경이 필요할 때만 새 객체를 만듭니다.
 
 이 원칙을 지키면 코드 리뷰에서 "무엇이 바뀌었는가"가 아니라 "어디에서 부수효과가 발생하는가"를 빠르게 확인할 수 있습니다.
-
 
 
 ## 검증 시나리오: 경계 조건을 먼저 잠그기

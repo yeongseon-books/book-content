@@ -28,17 +28,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 인가를 역할 이름 몇 개로 끝내지 않고, 요청마다 자원과 행위를 함께 보는 서버 쪽 결정으로 정리하겠습니다. 이 관점을 잡으면 RBAC와 ABAC의 차이, IDOR 방어, 목록 API 필터링, 기본 거부 정책이 왜 한 세트로 묶이는지도 자연스럽게 보입니다.
 
+
+![Secure Coding 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/04/04-01-concept-at-a-glance.ko.png)
+*Secure Coding 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - RBAC와 ABAC는 어떤 차이가 있을까요?
 - IDOR는 왜 흔하고도 위험한 인가 취약점일까요?
 - 인가 판단은 라우트 수준과 자원 수준에서 어떻게 나눠 봐야 할까요?
-
-## 큰 그림
-
-![Secure Coding 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/04/04-01-concept-at-a-glance.ko.png)
-
-*Secure Coding 101 4장 흐름 개요*
 
 ## 왜 중요한가
 

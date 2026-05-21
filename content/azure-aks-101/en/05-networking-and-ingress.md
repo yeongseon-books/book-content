@@ -28,19 +28,14 @@ They get easier once you separate two layers: how pod IPs are assigned, and how 
 
 This is the fifth post in the Azure Kubernetes Service 101 series. Here, we connect the workload model to AKS networking by separating pod IP design from Ingress and external traffic flow.
 
+![azure kubernetes service 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/05/05-01-start-with-the-request-path.en.png)
+*azure kubernetes service 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - How does pod IP assignment differ from external HTTP routing, and why keep them separate?
 - When does kubenet beat Azure CNI, and when does Azure CNI Overlay sidestep both tradeoffs?
 - What does an Ingress controller add that a plain Service cannot?
-
-## Big Picture
-
-![azure kubernetes service 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/05/05-01-start-with-the-request-path.en.png)
-
-*azure kubernetes service 101 chapter 5 flow overview*
-
-This picture places Networking and Ingress — the path in and out of the cluster inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Start with the request path
 

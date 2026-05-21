@@ -30,21 +30,15 @@ App Service 장애를 애플리케이션 코드부터 의심하는 습관은 생
 
 이제 공개 진입점에서 worker 선택까지의 경로를 단계별로 따라가 보겠습니다.
 
+![Azure App Service Deep Dive 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/02/02-01-the-routing-path-in-three-stages.ko.png)
+*Azure App Service Deep Dive 2장 흐름 개요*
+> Front-End과 ARR — 요청은 어떻게 워커에 도달하는가의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - Front-End는 단순 로드밸런서를 넘어 실제로 어떤 종류의 결정을 먼저 내릴까요?
 - ARR Affinity 쿠키는 애플리케이션 세션 쿠키와 무엇이 다를까요?
 - 요청이 어느 앱과 어느 슬롯에 속하는지 정하는 단계와 worker를 고르는 단계는 어떻게 다를까요?
-
-## 큰 그림
-
-![Azure App Service Deep Dive 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/02/02-01-the-routing-path-in-three-stages.ko.png)
-
-*Azure App Service Deep Dive 2장 흐름 개요*
-
-이 그림에서는 Front-End과 ARR — 요청은 어떻게 워커에 도달하는가를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> Front-End과 ARR — 요청은 어떻게 워커에 도달하는가의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

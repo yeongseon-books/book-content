@@ -25,19 +25,15 @@ Training-data leaks are no longer theoretical once email addresses, phone number
 
 This is post 4 in the AI Data Preparation 101 series. Here we cover the stages required to detect, anonymize, and verify PII handling in training data.
 
+
+![AI data preparation chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/04/04-01-big-picture.en.png)
+*AI data preparation chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why should PII handling be split into detection, classification, anonymization, and audit?
 - What does regex catch quickly, and where do you need NER or review queues?
 - When should you redact, mask, pseudonymize, or synthesize instead?
-
-## Big Picture
-
-![AI data preparation chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/04/04-01-big-picture.en.png)
-
-*AI data preparation chapter 4 flow overview*
-
-This picture places PII Detection and Anonymization for Training Data inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## "We Can't Have PII in Training Data, Right?"
 

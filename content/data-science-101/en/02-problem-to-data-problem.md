@@ -28,21 +28,16 @@ Strong data work starts before SQL, notebooks, or models. It starts when the tea
 
 This is post 2 in the Data Science 101 series. In this chapter, we turn problem framing into an explicit workflow you can reuse before any collection, EDA, or modeling begins.
 
+
+![data science 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/02/02-01-concept-at-a-glance.en.png)
+*data science 101 chapter 2 flow overview*
+> At its core, Turning a Problem into a Data Problem is about deciding what enters a system, where validation happens, and which signals stay for the next cycle—not about feature names.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Turning a Problem into a Data Problem?
 - Which signal should the example or diagram make visible for Turning a Problem into a Data Problem?
 - What failure should be prevented first when Turning a Problem into a Data Problem reaches a real system?
-
-## Big Picture
-
-![data science 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/02/02-01-concept-at-a-glance.en.png)
-
-*data science 101 chapter 2 flow overview*
-
-This picture places Turning a Problem into a Data Problem inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> At its core, Turning a Problem into a Data Problem is about deciding what enters a system, where validation happens, and which signals stay for the next cycle—not about feature names.
 
 ## Questions This Post Answers
 

@@ -30,21 +30,16 @@ LLM judge를 도입한 팀이 다음으로 맞닥뜨리는 문제는 '그래서 
 
 여기서는 평가 차원을 어떻게 뽑고, anchor를 어떻게 쓰고, 평균 하나로 뭉개지지 않게 집계를 어떻게 설계해야 하는지 정리하겠습니다.
 
+
+![Rubric 기반 채점 설계](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-01-designing-rubric-based-scoring.ko.png)
+*Rubric 기반 채점 설계*
+> Rubric의 가치는 점수를 예쁘게 만드는 데 있지 않고, 어디가 망가졌는지 분해해서 보여 주는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - 단일 점수 하나로 LLM 품질을 말하면 어떤 고장 위치가 가려질까요?
 - 좋은 rubric 차원은 어떻게 서로 겹치지 않게 나눠야 할까요?
 - rubric 점수를 집계할 때 평균만 보면 어떤 위험을 놓칠까요?
-
-## 큰 그림
-
-![Rubric 기반 채점 설계](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-01-designing-rubric-based-scoring.ko.png)
-
-*Rubric 기반 채점 설계*
-
-이 그림에서는 하나의 총점 대신 정확성, 근거성, 완성도, 안전성 같은 차원으로 품질을 분해하는 흐름을 봅니다. Rubric은 점수를 늘리는 형식이 아니라 고장 위치를 찾기 위한 설계입니다.
-
-> Rubric의 가치는 점수를 예쁘게 만드는 데 있지 않고, 어디가 망가졌는지 분해해서 보여 주는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

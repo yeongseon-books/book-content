@@ -29,21 +29,16 @@ This is post 3 in the API Design 101 series.
 
 Here, we treat a good REST path as the output of a solid resource model rather than a naming exercise. Once the resource boundary, hierarchy, and identifier strategy are clear, methods, docs, and caching rules become much easier to keep coherent.
 
+
+![api design 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/03/03-01-concept-at-a-glance.en.png)
+*api design 101 chapter 3 flow overview*
+> Resource design is not about naming — it is about finding the natural hierarchy in your domain and making that hierarchy visible in every URL.
+
 ## Questions to Keep in Mind
 
 - How to draw resource boundaries?
 - Rules for nouns, plurals, and hierarchy?
 - Modeling sub-resources?
-
-## Big Picture
-
-![api design 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/03/03-01-concept-at-a-glance.en.png)
-
-*api design 101 chapter 3 flow overview*
-
-The diagram shows how resources nest and relate: users have orders, orders have items, and the path structure `/users/{id}/orders/{order_id}` reflects those relationships, making the API predictable.
-
-> Resource design is not about naming — it is about finding the natural hierarchy in your domain and making that hierarchy visible in every URL.
 
 ## Why It Matters
 

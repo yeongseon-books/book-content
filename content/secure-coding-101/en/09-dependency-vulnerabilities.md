@@ -30,19 +30,15 @@ Here, we will frame dependency management as supply-chain control rather than oc
 
 > Dependencies are not attachments around our code. Once deployed, they are part of our codebase and part of our responsibility.
 
+
+![secure coding 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/09/09-01-concept-at-a-glance.en.png)
+*secure coding 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Managing Dependency Vulnerabilities?
 - Which signal should the example or diagram make visible for Managing Dependency Vulnerabilities?
 - What failure should be prevented first when Managing Dependency Vulnerabilities reaches a real system?
-
-## Big Picture
-
-![secure coding 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/09/09-01-concept-at-a-glance.en.png)
-
-*secure coding 101 chapter 9 flow overview*
-
-This picture places Managing Dependency Vulnerabilities inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions This Chapter Answers
 

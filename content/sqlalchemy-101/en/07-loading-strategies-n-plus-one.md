@@ -32,19 +32,14 @@ This is the 7th article in the SQLAlchemy 101 series.
 
 *Loading strategies and the N+1 Problem: when to pick lazy, joined, or selectin*
 
+![sqlalchemy 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/07/07-02-why-it-matters.en.png)
+*sqlalchemy 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - What code, exactly, produces an N+1 query pattern?
 - How do `lazy="select"` (the default), `joinedload`, and `selectinload` differ at the SQL level?
 - Why is `selectinload` typically the safer default for collections (one-to-many, many-to-many)?
-
-## Big Picture
-
-![sqlalchemy 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/07/07-02-why-it-matters.en.png)
-
-*sqlalchemy 101 chapter 7 flow overview*
-
-This picture places Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

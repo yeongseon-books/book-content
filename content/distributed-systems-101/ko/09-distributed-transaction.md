@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 2PC의 강한 모델과 Saga, outbox, 멱등적 복구 같은 현실적 대안을 비교해, 부분 실패를 어떻게 살아남는지에 초점을 맞춥니다.
 
+
+![Distributed Systems 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/09/09-01-concept-at-a-glance.ko.png)
+*Distributed Systems 101 9장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 단일 노드 트랜잭션과 분산 트랜잭션은 무엇이 다를까요?
 - 2-phase commit은 어떻게 동작하고 어디서 약할까요?
 - Saga의 핵심인 보상 트랜잭션은 무엇일까요?
-
-## 큰 그림
-
-![Distributed Systems 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/09/09-01-concept-at-a-glance.ko.png)
-
-*Distributed Systems 101 9장 흐름 개요*
 
 ## 왜 중요한가
 

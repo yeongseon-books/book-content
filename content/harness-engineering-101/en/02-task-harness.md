@@ -27,21 +27,15 @@ Those blanks quickly turn into concrete risk: the wrong data source, the wrong o
 
 This is post 2 in the Harness Engineering 101 series. Here we turn business goals into executable TaskSpecs so later harnesses have something stable to operate on.
 
+![Task harness - turning vague work into executable tasks](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/02/02-01-task-harness-turning-vague-work-into-exe.en.png)
+*Task harness - turning vague work into executable tasks*
+> A Task Harness turns “what do we want?” into “what must be executed, and how will completion be proven?”
+
 ## Questions to Keep in Mind
 
 - What breaks at execution time when a vague goal is handed directly to an agent?
 - What executable unit and completion criteria should a Task Harness translate the goal into?
 - What evidence should a good task spec leave for the next agent run and for human review?
-
-## Big Picture
-
-![Task harness - turning vague work into executable tasks](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/02/02-01-task-harness-turning-vague-work-into-exe.en.png)
-
-*Task harness - turning vague work into executable tasks*
-
-This picture shows a vague request passing through the Task Harness and becoming an executable task with inputs, constraints, and completion criteria. An agent works better when a goal is translated into a task instead of thrown at the model as-is.
-
-> A Task Harness turns “what do we want?” into “what must be executed, and how will completion be proven?”
 
 ## Vague Work Cannot Be Executed
 

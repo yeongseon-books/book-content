@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 Operating Systems 101 시리즈의 7번째 글입니다.
 
+
+![Operating Systems 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/07/07-01-how-a-virtual-address-reaches-ram.ko.png)
+*Operating Systems 101 7장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 가상 주소와 물리 주소는 왜 굳이 분리되어 있을까요?
 - 페이지, 페이지 테이블, TLB는 어떤 역할 분담을 할까요?
 - minor fault와 major fault는 비용이 어떻게 다를까요?
-
-## 큰 그림
-
-![Operating Systems 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/07/07-01-how-a-virtual-address-reaches-ram.ko.png)
-
-*Operating Systems 101 7장 흐름 개요*
 
 ## 기본 모델
 > 모든 프로세스는 자신만의 가상 주소 공간을 가집니다. 가상 주소는 페이지 단위(보통 4KB)로 잘려 페이지 테이블을 통해 물리 주소로 매핑됩니다. CPU는 이 변환을 빠르게 하기 위해 TLB라는 캐시를 가집니다. 매핑이 없거나 페이지가 디스크에 있으면 page fault가 발생합니다.

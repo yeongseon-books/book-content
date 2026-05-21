@@ -30,17 +30,14 @@ last_reviewed: '2026-05-15'
 실무에서 중요한 것은 “코드를 쓸 수 있는가”보다 “시간과 사람의 변화 속에서도 시스템을 운영 가능한 상태로 유지할 수 있는가”입니다. 같은 함수 하나를 작성하더라도 요구사항, 테스트, 배포, 운영, 문서화, 협업까지 함께 책임져야 비로소 엔지니어링이라는 말이 맞아집니다.
 
 
+![Software Engineering 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/01/01-01-concept-at-a-glance.ko.png)
+*Software Engineering 101 1장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 코드를 작성하는 일과 소프트웨어 엔지니어링은 무엇이 다를까요?
 - 엔지니어는 코드 외에 어떤 영역까지 책임져야 할까요?
 - “맞는 일을 고르는 것”과 “일을 제대로 만드는 것”은 어떻게 다를까요?
-
-## 큰 그림
-
-![Software Engineering 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/01/01-01-concept-at-a-glance.ko.png)
-
-*Software Engineering 101 1장 흐름 개요*
 
 ## 왜 중요한가
 

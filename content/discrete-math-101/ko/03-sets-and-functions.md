@@ -25,17 +25,15 @@ last_reviewed: '2026-05-12'
 
 이 글은 Discrete Math 101 시리즈의 3번째 글입니다.
 
+
+![Discrete Math 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/03/03-01-big-picture.ko.png)
+*Discrete Math 101 3장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 집합 표기와 기본 연산은 어떻게 읽어야 할까요?
 - 합집합, 교집합, 차집합, 곱집합은 실무에서 어디에 쓰일까요?
 - 함수의 정의역, 공역, 치역은 무엇이 다를까요?
-
-## 큰 그림
-
-![Discrete Math 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/03/03-01-big-picture.ko.png)
-
-*Discrete Math 101 3장 흐름 개요*
 
 ## 왜 중요한가
 

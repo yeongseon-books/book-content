@@ -31,19 +31,15 @@ This is post 4 in the Database Systems 101 series.
 
 > An index is a separate data structure that pre-sorts "value to row location." That is why a full scan is O(N) while an index lookup is O(log N). But indexes are not free. They cost writes and disk space. Good index design is less about "where to add one" and more about "where not to add one."
 
+
+![database systems 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/04/04-01-big-picture.en.png)
+*database systems 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Indexes?
 - Which signal should the example or diagram make visible for Indexes?
 - What failure should be prevented first when Indexes reaches a real system?
-
-## Big Picture
-
-![database systems 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/04/04-01-big-picture.en.png)
-
-*database systems 101 chapter 4 flow overview*
-
-This picture places Indexes inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

@@ -31,21 +31,16 @@ In this chapter, we assemble a FastAPI app and Postgres into one stack with Dock
 
 > A one-command stack is where container theory becomes an operational habit you can repeat.
 
+
+![containers 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/10/10-01-concept-at-a-glance.en.png)
+*containers 101 chapter 10 flow overview*
+> Building a container app means weaving together development, testing, registry push, orchestration, and observability into one reproducible pipeline.
+
 ## Questions to Keep in Mind
 
 - A *Dockerfile* for a *FastAPI* app?
 - Compose* with a *DB* connection?
 - Defining a *healthcheck?
-
-## Big Picture
-
-![containers 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/10/10-01-concept-at-a-glance.en.png)
-
-*containers 101 chapter 10 flow overview*
-
-This picture places Build a Container App inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Building a container app means weaving together development, testing, registry push, orchestration, and observability into one reproducible pipeline.
 
 ## Why It Matters
 

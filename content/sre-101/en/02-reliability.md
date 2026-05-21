@@ -28,19 +28,15 @@ Reliability gets clearer when you stop treating it like mood and start treating 
 
 This is post 2 in the SRE 101 series. Here we break reliability into measurable dimensions so later topics like SLOs, error budgets, and monitoring rest on something more concrete than “it seems okay.”
 
+
+![sre 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/02/02-01-concept-at-a-glance.en.png)
+*sre 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What does it mean to describe reliability as a measurable property instead of a general sense of stability?
 - Why are availability and latency related but not interchangeable?
 - When do correctness and durability matter more than raw uptime?
-
-## Big Picture
-
-![sre 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/02/02-01-concept-at-a-glance.en.png)
-
-*sre 101 chapter 2 flow overview*
-
-This picture places Reliability inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this topic matters
 

@@ -25,17 +25,15 @@ last_reviewed: '2026-05-12'
 
 이 글은 Discrete Math 101 시리즈의 8번째 글입니다.
 
+
+![Discrete Math 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/08/08-01-graph-representations.ko.png)
+*Discrete Math 101 8장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 그래프의 정의와 종류는 무엇일까요?
 - 인접 리스트와 인접 행렬은 어떻게 다를까요?
 - 차수, 경로, 사이클, 연결성은 왜 중요한가요?
-
-## 큰 그림
-
-![Discrete Math 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/08/08-01-graph-representations.ko.png)
-
-*Discrete Math 101 8장 흐름 개요*
 
 ## 왜 중요한가
 

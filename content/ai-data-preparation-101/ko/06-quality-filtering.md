@@ -35,21 +35,16 @@ title: "AI Data Preparation 101 (6/10): 데이터 품질 필터링 — Heuristic
 
 여기서는 heuristic과 classifier를 조합해 품질 필터를 설계하는 방법과, 언어 감지·perplexity·quality score를 어떤 순서로 배치해야 효율적인지 설명하겠습니다.
 
+
+![AI 데이터 준비 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/06/06-01-big-picture.ko.png)
+*AI 데이터 준비 6장 흐름 개요*
+> 데이터 품질 필터링 — Heuristic과 Classifier의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - 왜 수집된 데이터와 학습 가능한 데이터는 같은 집합이 아닐까요?
 - 길이, symbol ratio, digit ratio, repetition 같은 heuristic signal은 무엇을 빠르게 잡아낼까요?
 - 언어 감지와 perplexity filter는 각각 어떤 종류의 오염을 제거할까요?
-
-## 큰 그림
-
-![AI 데이터 준비 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/06/06-01-big-picture.ko.png)
-
-*AI 데이터 준비 6장 흐름 개요*
-
-이 그림에서는 데이터 품질 필터링 — Heuristic과 Classifier를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 데이터 품질 필터링 — Heuristic과 Classifier의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

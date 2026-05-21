@@ -48,19 +48,14 @@ It defines what the AKS control plane really is,
 where the data plane starts,
 and why the only control-plane surface most users ever see is the API server endpoint.
 
+![azure kubernetes service deep dive chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/01/01-01-the-big-picture-aks-control-vs-data-plan.en.png)
+*azure kubernetes service deep dive chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What components make up the AKS control plane, and who exactly notices when each one fails?
 - How far does the 'managed control plane' promise extend — etcd backup, upgrades, multi-zone availability?
 - Which scenarios surface API-server throttling first, and where does your workload create the pressure?
-
-## Big Picture
-
-![azure kubernetes service deep dive chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/01/01-01-the-big-picture-aks-control-vs-data-plan.en.png)
-
-*azure kubernetes service deep dive chapter 1 flow overview*
-
-This picture places Control plane anatomy — what AKS hides from you inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## AKS control vs data plane
 

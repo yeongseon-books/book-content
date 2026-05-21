@@ -28,19 +28,14 @@ This post is about reading that boundary. We'll look at what the control plane d
 
 This is the second post in the Azure Kubernetes Service 101 series. Here, we turn the managed-Kubernetes boundary into a concrete cluster shape by looking at the control plane, node pools, and their operational roles.
 
+![azure kubernetes service 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/02/02-01-cut-the-cluster-in-half.en.png)
+*azure kubernetes service 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What does each control-plane component (API server, scheduler, controller manager, etcd) actually do?
 - How does the kubelet, kube-proxy, and container runtime path on a node fit together?
 - Where do AKS managed identity and RBAC plug into the authn/authz flow?
-
-## Big Picture
-
-![azure kubernetes service 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/02/02-01-cut-the-cluster-in-half.en.png)
-
-*azure kubernetes service 101 chapter 2 flow overview*
-
-This picture places Cluster architecture — control plane and node pools inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Cut the cluster in half
 

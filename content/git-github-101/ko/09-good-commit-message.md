@@ -27,17 +27,15 @@ seo_description: 좋은 commit message 구조와 Conventional Commits 실무 규
 
 이 글은 Git/GitHub 101 시리즈의 아홉 번째 글입니다. 여기서는 subject, body, footer 구조와 Conventional Commits, 그리고 message 품질을 지키는 습관을 정리합니다.
 
+
+![Git & GitHub 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/09/09-01-mental-model.ko.png)
+*Git & GitHub 101 9장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 좋은 commit message는 왜 코드만큼 중요한 자산일까요?
 - subject, body, footer는 각각 무엇을 담아야 할까요?
 - Conventional Commits의 `feat`, `fix`, `docs` 같은 type은 무엇을 해결할까요?
-
-## 큰 그림
-
-![Git & GitHub 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/09/09-01-mental-model.ko.png)
-
-*Git & GitHub 101 9장 흐름 개요*
 
 ## 왜 중요한가
 

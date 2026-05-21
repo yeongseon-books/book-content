@@ -51,19 +51,14 @@ That is the boundary line:
 Functions Deep Dive looked inside the host process;
 this series looks at the platform that hosts it.
 
+![azure app service deep dive chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/01/01-01-the-big-picture-one-request-through-app.en.png)
+*azure app service deep dive chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What layers really make up App Service's 'platform'?
 - Is an App Service Plan just a price tag, or is it an isolation unit?
 - Who owns the Front-End pool and the Worker pool, and where exactly does your code run?
-
-## Big Picture
-
-![azure app service deep dive chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/01/01-01-the-big-picture-one-request-through-app.en.png)
-
-*azure app service deep dive chapter 1 flow overview*
-
-This picture places App Service platform architecture — Front-End, Worker, File Server inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## One request through App Service
 

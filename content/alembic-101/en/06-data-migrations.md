@@ -28,19 +28,15 @@ Data migrations are often slower and more irreversible than the schema changes a
 
 This is post 6 in the Alembic 101 series. Here we will focus on why schema changes and data changes should be split, and what safe execution patterns look like.
 
+
+![alembic 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/06/06-01-diagram-the-three-stage-split-for-data-m.en.png)
+*alembic 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - How a "data migration" is different from a schema migration?
 - Two writing styles for `op.execute` — raw SQL and SQLAlchemy core?
 - A pattern for splitting a large dataset into batches?
-
-## Big Picture
-
-![alembic 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/06/06-01-diagram-the-three-stage-split-for-data-m.en.png)
-
-*alembic 101 chapter 6 flow overview*
-
-This picture places Data migrations: separating schema changes from data changes inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

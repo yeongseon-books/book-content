@@ -30,21 +30,16 @@ This is the final post in the Portfolio Project 101 series. Here we will walk th
 
 > Finishing a portfolio is mostly about removing the points where a first-time visitor is likely to stop.
 
+
+![portfolio project 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/10/10-01-concept-at-a-glance.en.png)
+*portfolio project 101 chapter 10 flow overview*
+> Portfolio improvement isn't about perfecting everything at once. Improving systematically—from problem statement through demo through documentation to deployment—is more realistic.
+
 ## Questions to Keep in Mind
 
 - What are the most important areas to check before sharing a project publicly?
 - Why should README, demo, code, story, and publishing links be reviewed separately?
 - Where do the author's assumptions usually diverge most from a first-time visitor’s experience?
-
-## Big Picture
-
-![portfolio project 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/10/10-01-concept-at-a-glance.en.png)
-
-*portfolio project 101 chapter 10 flow overview*
-
-This picture places Portfolio Improvement Checklist inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Portfolio improvement isn't about perfecting everything at once. Improving systematically—from problem statement through demo through documentation to deployment—is more realistic.
 
 ## Why It Matters
 

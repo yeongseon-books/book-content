@@ -26,19 +26,15 @@ This is the final post in the Algorithms with Python 101 series. Knowing algorit
 
 This chapter connects the earlier posts through one continuous flow: read constraints first, reject the wrong complexity first, then carry the problem all the way through implementation and verification. A repeatable approach matters because it saves time, reduces avoidable mistakes, and helps you recover even when the problem is unfamiliar.
 
+
+![Algorithms with Python 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/10/10-01-big-picture.en.png)
+*Algorithms with Python 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Coding Test Problem-Solving Strategies?
 - Which signal should the example or diagram make visible for Coding Test Problem-Solving Strategies?
 - What failure should be prevented first when Coding Test Problem-Solving Strategies reaches a real system?
-
-## Big Picture
-
-![Algorithms with Python 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/10/10-01-big-picture.en.png)
-
-*Algorithms with Python 101 chapter 10 flow overview*
-
-This picture places Coding Test Problem-Solving Strategies inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

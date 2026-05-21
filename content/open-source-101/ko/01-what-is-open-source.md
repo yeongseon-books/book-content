@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 오픈소스를 단순한 코드 공개가 아니라, 읽고 고치고 다시 나눌 수 있는 권리와 그 권리를 실제 협업으로 굴리는 문화까지 포함한 개념으로 정리하겠습니다.
 
+
+![Open Source 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/01/01-01-a-concept-map-you-can-keep-in-your-head.ko.png)
+*Open Source 101 1장 흐름 개요*
+> 오픈소스를 이해한다는 것은 기술 선택을 넘어 법적 조건, 참여 경로, 커뮤니티 문화까지 함께 읽는 능력입니다.
+
 ## 먼저 던지는 질문
 
 - 오픈소스를 공짜 코드라고만 보면 왜 계속 오해가 생길까요?
 - free software, upstream, fork, contributor 같은 기본 용어는 어떻게 구분해야 할까요?
 - 코드 작성 외에도 왜 문서, 번역, 재현 절차 정리가 모두 기여가 될까요?
-
-## 큰 그림
-
-![Open Source 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/01/01-01-a-concept-map-you-can-keep-in-your-head.ko.png)
-
-*Open Source 101 1장 흐름 개요*
-
-이 그림은 오픈소스의 생태계를 구성하는 네 가지 축—권리, 기여자, 라이선스, 커뮤니티—을 보여줍니다. 순환 구조이며, 이 글에서 우리가 가장 중점적으로 지켜볼 부분입니다.
-
-> 오픈소스를 이해한다는 것은 기술 선택을 넘어 법적 조건, 참여 경로, 커뮤니티 문화까지 함께 읽는 능력입니다.
 
 ## 오픈소스 사용자와 기여자의 차이
 

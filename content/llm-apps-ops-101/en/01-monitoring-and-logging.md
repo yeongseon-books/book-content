@@ -25,21 +25,15 @@ Once an LLM app moves beyond a demo, the first real operations problem is not th
 
 This is the first post in the LLM Apps Ops 101 series. Here, we will define the logging and monitoring baseline that makes each model call traceable after the fact.
 
+![Monitoring and logging component layout](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/01/01-01-big-picture.en.png)
+*Monitoring and logging component layout*
+> Treat one log line as the operating contract for one LLM call, and cost, latency, and debugging questions stop fragmenting.
+
 ## Questions to Keep in Mind
 
 - Which fields belong in every LLM request log?
 - How do you tie latency, token usage, and response preview into one record?
 - What log shape survives a later move to Datadog, BigQuery, or Elasticsearch?
-
-## Big Picture
-
-![Monitoring and logging component layout](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/01/01-01-big-picture.en.png)
-
-*Monitoring and logging component layout*
-
-This picture connects the application, LLM provider, log storage, and operations dashboard into one observability flow. The first operating baseline for an LLM app is not a dashboard; it is a log shape that can explain one request later.
-
-> Treat one log line as the operating contract for one LLM call, and cost, latency, and debugging questions stop fragmenting.
 
 ## Why this layer matters
 ![Request and response logs per call](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/01/01-01-why-this-layer-matters.en.png)

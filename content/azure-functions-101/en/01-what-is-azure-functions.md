@@ -28,19 +28,14 @@ This series is an introductory guide for developers who are picking up Azure Fun
 
 This is the first post in the Azure Functions 101 series. Here, we build the core mental model that makes the rest of the platform easier to reason about.
 
+![azure functions 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/01/01-01-start-with-the-smallest-example-hello-fu.en.png)
+*azure functions 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What model of serverless compute is Azure Functions, exactly?
 - Does per-execution billing actually save money, and when does it backfire?
 - Where does Functions sit in an event-driven architecture?
-
-## Big Picture
-
-![azure functions 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/01/01-01-start-with-the-smallest-example-hello-fu.en.png)
-
-*azure functions 101 chapter 1 flow overview*
-
-This picture places What Is Azure Functions? — A World Where Events Call Your Code inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## A One-Sentence Definition — "An event arrives, my function runs, and then it's gone"
 

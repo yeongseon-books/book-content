@@ -28,19 +28,15 @@ Synthetic data generation is not a trick for inflating dataset size. In practice
 
 To address the weakness called out in issue #779, this chapter is no longer a loose catalog of patterns. It is rebuilt around one reproducible synthetic-data batch workflow. Self-Instruct, Evol-Instruct, RAG eval pair generation, and distillation now appear as decision branches inside the same pipeline.
 
+
+![AI data preparation chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/07/07-01-big-picture.en.png)
+*AI data preparation chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - What should a real synthetic-data batch start with and end with?
 - When do you choose Self-Instruct, Evol-Instruct, RAG eval generation, or distillation?
 - Which validation gates must a generated JSON artifact pass before it becomes training data?
-
-## Big Picture
-
-![AI data preparation chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/07/07-01-big-picture.en.png)
-
-*AI data preparation chapter 7 flow overview*
-
-This picture places Synthetic Data Generation - From Self-Instruct to Distillation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this chapter matters
 

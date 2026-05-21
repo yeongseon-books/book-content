@@ -28,21 +28,16 @@ Interpretation is not about making numbers sound impressive. It is about adding 
 
 This is post 9 in the Data Science 101 series. Here we turn raw analytical results into decision-ready language without overstating what the data can support.
 
+
+![data science 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/09/09-01-concept-at-a-glance.en.png)
+*data science 101 chapter 9 flow overview*
+> At its core, Result Interpretation is about deciding what enters a system, where validation happens, and which signals stay for the next cycle—not about feature names.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Result Interpretation?
 - Which signal should the example or diagram make visible for Result Interpretation?
 - What failure should be prevented first when Result Interpretation reaches a real system?
-
-## Big Picture
-
-![data science 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/09/09-01-concept-at-a-glance.en.png)
-
-*data science 101 chapter 9 flow overview*
-
-This picture places Result Interpretation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> At its core, Result Interpretation is about deciding what enters a system, where validation happens, and which signals stay for the next cycle—not about feature names.
 
 ## Questions This Post Answers
 

@@ -32,21 +32,16 @@ In this post, we'll pull the series together through the Well-Architected pillar
 
 > Cloud architecture is the discipline of turning separate service choices into one coherent operating system for reliability, security, performance, and cost.
 
+
+![cloud computing 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/10/10-01-concept-at-a-glance.en.png)
+*cloud computing 101 chapter 10 flow overview*
+> Architecture is not about perfect design. It is about deliberate tradeoffs and systems that are easy to debug and repair.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Cloud Architecture Basics?
 - Which signal should the example or diagram make visible for Cloud Architecture Basics?
 - What failure should be prevented first when Cloud Architecture Basics reaches a real system?
-
-## Big Picture
-
-![cloud computing 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/10/10-01-concept-at-a-glance.en.png)
-
-*cloud computing 101 chapter 10 flow overview*
-
-This picture places Cloud Architecture Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Architecture is not about perfect design. It is about deliberate tradeoffs and systems that are easy to debug and repair.
 
 ## Questions This Chapter Answers
 

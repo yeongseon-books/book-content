@@ -26,17 +26,15 @@ last_reviewed: '2026-05-12'
 
 이번 글에서는 앞선 내용을 "제약을 먼저 읽고, 틀린 복잡도를 먼저 버린 뒤, 구현과 검증까지 이어 가는 하나의 풀이 흐름"으로 묶어 보겠습니다. 반복 가능한 접근법이 중요한 이유는 시간을 아끼고, 불필요한 실수를 줄이고, 처음 보는 문제에서도 다시 복구할 수 있게 해 주기 때문입니다.
 
+
+![Algorithms with Python 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/10/10-01-big-picture.ko.png)
+*Algorithms with Python 101 10장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 입력 크기 제약을 보고 어떤 알고리즘을 먼저 버려야 할까요?
 - 문제 유형을 알고리즘에 어떻게 연결할까요?
 - 한 문제를 이해, 계획, 구현, 검증으로 어떻게 끝까지 끌고 갈까요?
-
-## 큰 그림
-
-![Algorithms with Python 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/10/10-01-big-picture.ko.png)
-
-*Algorithms with Python 101 10장 흐름 개요*
 
 ## 왜 중요한가
 

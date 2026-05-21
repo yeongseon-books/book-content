@@ -30,17 +30,14 @@ last_reviewed: '2026-05-15'
 테스트 전략은 테스트를 많이 쓰는 문제가 아니라, 올바른 층에 올바른 종류를 배치하는 문제입니다. 어떤 테스트가 실패했을 때 어디를 먼저 봐야 하는지 분명해야 하고, CI 피드백 시간이 팀의 작업 흐름을 막지 않아야 하며, flaky 테스트는 조용히 무시되지 않고 고쳐져야 합니다.
 
 
+![Software Engineering 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/05/05-01-concept-at-a-glance.ko.png)
+*Software Engineering 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 단위 테스트, 통합 테스트, E2E 테스트는 각각 어떤 역할을 맡을까요?
 - 테스트 피라미드와 아이스크림 콘 구조는 무엇이 다를까요?
 - 커버리지 수치가 높아도 불안한 시스템이 나오는 이유는 무엇일까요?
-
-## 큰 그림
-
-![Software Engineering 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/05/05-01-concept-at-a-glance.ko.png)
-
-*Software Engineering 101 5장 흐름 개요*
 
 ## 왜 중요한가
 

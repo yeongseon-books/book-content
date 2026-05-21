@@ -30,17 +30,14 @@ last_reviewed: '2026-05-15'
 그래서 요구사항 단계의 실수는 위험합니다. 구현 초반에는 작은 오해처럼 보여도, 나중에는 구조와 테스트와 릴리스 계획 전체를 다시 쓰게 만들 수 있습니다. 코드 결함의 상당수가 요구사항 단계에서 시작된다는 말이 반복되는 이유도 여기에 있습니다.
 
 
+![Software Engineering 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/02/02-01-concept-at-a-glance.ko.png)
+*Software Engineering 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 좋은 요구사항은 어떤 조건을 만족해야 할까요?
 - 사용자 스토리와 인수 기준은 각각 무엇을 맡을까요?
 - 기능 요구사항과 비기능 요구사항은 왜 따로 적어야 할까요?
-
-## 큰 그림
-
-![Software Engineering 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/02/02-01-concept-at-a-glance.ko.png)
-
-*Software Engineering 101 2장 흐름 개요*
 
 ## 왜 중요한가
 

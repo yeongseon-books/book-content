@@ -28,21 +28,16 @@ Teams that stop at documentation keep relearning the same lesson. Teams that att
 
 This is post 9 in the Incident Response 101 series. This post explains how to prioritize prevention work and how to make follow-up items survive beyond the week after the outage.
 
+
+![incident response 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/09/09-01-diagram-at-a-glance.en.png)
+*incident response 101 chapter 9 flow overview*
+> Prevention items that are specific + measurable + assigned = items that actually get done.
+
 ## Questions to Keep in Mind
 
 - Why do incidents repeat even after strong postmortems?
 - Which follow-up items deserve regression tests first?
 - How do guardrails differ from warnings or documentation?
-
-## Big Picture
-
-![incident response 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/09/09-01-diagram-at-a-glance.en.png)
-
-*incident response 101 chapter 9 flow overview*
-
-This picture places Prevention inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Prevention items that are specific + measurable + assigned = items that actually get done.
 
 ## Why this topic matters
 

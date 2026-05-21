@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 Operating Systems 101 시리즈의 6번째 글입니다.
 
+
+![Operating Systems 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/06/06-01-the-four-major-regions-of-process-memory.ko.png)
+*Operating Systems 101 6장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 프로세스 메모리는 어떤 구역으로 나뉘어 있을까요?
 - `malloc`과 `free`, 가비지 컬렉션은 각각 무엇을 맡을까요?
 - 메모리 누수와 단편화는 어떻게 다른 문제일까요?
-
-## 큰 그림
-
-![Operating Systems 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/06/06-01-the-four-major-regions-of-process-memory.ko.png)
-
-*Operating Systems 101 6장 흐름 개요*
 
 ## 기본 모델
 > 프로세스 메모리는 크게 네 영역으로 나뉩니다. 코드(text), 전역 변수(data/bss), heap, stack. heap은 동적 할당, stack은 함수 호출에 따라 자동으로 자라고 줄어듭니다. OS는 가상 주소를 줘서 모든 프로세스가 자신만의 메모리를 가진 것처럼 보이게 합니다.

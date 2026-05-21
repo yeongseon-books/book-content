@@ -28,17 +28,15 @@ last_reviewed: '2026-05-12'
 
 현업에서 이 패턴이 중요한 이유는 테스트성과 변경 용이성 때문입니다. 거대한 함수 하나에 모든 로직을 넣는 대신, 각 단계가 하나의 변환만 맡게 만들면 수정 범위가 작아지고 파이프라인 전체를 안전하게 재구성할 수 있습니다.
 
+
+![Functional Programming 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/09/09-01-how-a-readable-pipeline-flows.ko.png)
+*Functional Programming 101 9장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 함수 합성은 수학적으로 어떤 의미를 가지며 Python에서는 어떻게 구현할까요?
 - `compose`와 `pipe`는 무엇이 다르고, 왜 `pipe`가 더 읽기 쉬운 경우가 많을까요?
 - 데이터 처리와 텍스트 처리에서 파이프라인은 어떤 장점을 줄까요?
-
-## 큰 그림
-
-![Functional Programming 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/09/09-01-how-a-readable-pipeline-flows.ko.png)
-
-*Functional Programming 101 9장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -595,7 +593,6 @@ def test_fee_never_negative(amount: int) -> None:
 ```
 
 테스트에서 중요한 것은 "예제가 맞다"가 아니라 "성질이 유지된다"입니다. 이 관점을 유지하면 OOP와 FP를 섞어도 설계 품질이 흔들리지 않습니다.
-
 
 
 ## 검증 시나리오: 경계 조건을 먼저 잠그기

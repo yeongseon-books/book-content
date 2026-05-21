@@ -29,21 +29,16 @@ This is post 7 in the Clean Code 101 series.
 
 Here we will separate the explanations that belong in naming and structure from the few that belong in intent comments, warnings, docstrings, and contributor-facing docs.
 
+
+![clean code 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/07/07-01-concept-at-a-glance.en.png)
+*clean code 101 chapter 7 flow overview*
+> If you need explanation, try fixing code first. Only then add comments.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Comments and Documentation?
 - Which signal should the example or diagram make visible for Comments and Documentation?
 - What failure should be prevented first when Comments and Documentation reaches a real system?
-
-## Big Picture
-
-![clean code 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/07/07-01-concept-at-a-glance.en.png)
-
-*clean code 101 chapter 7 flow overview*
-
-This picture places Comments and Documentation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> If you need explanation, try fixing code first. Only then add comments.
 
 ## Questions this article answers
 

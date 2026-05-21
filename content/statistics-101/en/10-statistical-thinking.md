@@ -28,21 +28,16 @@ So the last step in the series is not one more formula. It is seeing how the ear
 
 This is the final post in the Statistics 101 series. Here we will rewrite the series as a mindset rather than a list of tools and walk once more through the practical flow from question to decision.
 
+
+![statistics 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/10/10-01-concept-at-a-glance.en.png)
+*statistics 101 chapter 10 flow overview*
+> Statistical thinking is the *discipline* of turning *questions into data, data into insight, and insight into action*.
+
 ## Questions to Keep in Mind
 
 - Is statistics a collection of formulas or a way of thinking?
 - How do question, data, distribution, estimation, and testing connect?
 - How should p-value, effect size, and business cost come together in one decision?
-
-## Big Picture
-
-![statistics 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/10/10-01-concept-at-a-glance.en.png)
-
-*statistics 101 chapter 10 flow overview*
-
-This picture places Statistical Thinking inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Statistical thinking is the *discipline* of turning *questions into data, data into insight, and insight into action*.
 
 ## Why It Matters
 

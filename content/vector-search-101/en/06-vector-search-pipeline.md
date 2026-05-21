@@ -28,21 +28,15 @@ This is the final post in the Vector Search 101 series.
 
 The emphasis here is not on one component in isolation, but on how the whole retrieval system moves from raw documents to ranked answers.
 
+![End to end indexing and retrieval flow](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/06/06-01-vector-search-pipeline-from-document-ing.en.png)
+*End to end indexing and retrieval flow*
+> A vector search pipeline is not one monolithic feature. It is a structure that separates indexing from retrieval so each part can be replaced independently.
+
 ## Questions to Keep in Mind
 
 - What stages make vector search a pipeline rather than one embedding call?
 - When is hybrid search safer than pure vector search?
 - When documents change, what should drive reindexing and operational logs?
-
-## Big Picture
-
-![End to end indexing and retrieval flow](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/06/06-01-vector-search-pipeline-from-document-ing.en.png)
-
-*End to end indexing and retrieval flow*
-
-This picture connects ingestion, chunking, embedding, indexing, querying, and result assembly into one retrieval path. Thinking in pipeline stages makes quality problems traceable across boundaries instead of inside one embedding call.
-
-> A vector search pipeline is not one monolithic feature. It is a structure that separates indexing from retrieval so each part can be replaced independently.
 
 ## Pipeline structure
 

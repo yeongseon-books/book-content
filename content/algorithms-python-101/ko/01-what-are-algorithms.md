@@ -28,17 +28,15 @@ last_reviewed: '2026-05-12'
 
 알고리즘은 코딩 테스트에서만 중요한 주제가 아닙니다. 성능 최적화, 데이터 처리, 시스템에서의 트레이드오프 판단까지, 개발자가 실무에서 문제를 바라보는 방식 자체를 바꿉니다.
 
+
+![Algorithms with Python 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/01/01-01-big-picture.ko.png)
+*Algorithms with Python 101 1장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 알고리즘은 정확히 무엇이며, 어떤 성질을 가져야 할까요?
 - 알고리즘을 의사코드나 Python 코드로 어떻게 표현할 수 있을까요?
 - 같은 문제를 푸는 두 알고리즘은 왜 효율이 크게 달라질까요?
-
-## 큰 그림
-
-![Algorithms with Python 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/01/01-01-big-picture.ko.png)
-
-*Algorithms with Python 101 1장 흐름 개요*
 
 ## 왜 중요한가
 

@@ -29,19 +29,15 @@ That is why scheduler behavior matters long before you start reading kernel code
 
 This is post 3 in the Operating Systems 101 series. It introduces the scheduler as the policy engine that keeps trading off responsiveness, throughput, fairness, and power.
 
+
+![operating systems 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/03/03-01-how-tasks-move-through-the-scheduler.en.png)
+*operating systems 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Scheduling?
 - Which signal should the example or diagram make visible for Scheduling?
 - What failure should be prevented first when Scheduling reaches a real system?
-
-## Big Picture
-
-![operating systems 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/03/03-01-how-tasks-move-through-the-scheduler.en.png)
-
-*operating systems 101 chapter 3 flow overview*
-
-This picture places Scheduling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions this article answers
 

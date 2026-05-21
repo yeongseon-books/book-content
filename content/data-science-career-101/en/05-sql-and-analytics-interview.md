@@ -28,21 +28,17 @@ That gap exists because SQL interviews are usually reasoning interviews in disgu
 
 This is post 5 in the Data Science Career 101 series.
 
+
+![data science career 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/05/05-01-concept-at-a-glance.en.png)
+*data science career 101 chapter 5 flow overview*
+> In SQL interviews, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
+
 ## Questions to Keep in Mind
 
 - What do SQL and analytics interviews actually evaluate beyond syntax?
 - How should you break a business question into query steps?
 - What are the recurring patterns around JOINs, aggregation, windows, and funnels?
 
-## Big Picture
-
-![data science career 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/05/05-01-concept-at-a-glance.en.png)
-
-*data science career 101 chapter 5 flow overview*
-
-This picture places SQL and Analytics Interviews inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> In SQL interviews, what matters most is not knowing every tool or concept, but asking the right questions at each stage and knowing when you have a good answer.
 ## What You Will Learn
 
 - Core *SQL* patterns

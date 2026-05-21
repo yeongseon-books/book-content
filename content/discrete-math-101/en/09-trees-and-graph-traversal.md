@@ -31,19 +31,15 @@ This is post 9 in the Discrete Math 101 series.
 
 > A tree is a connected acyclic graph — the most common substructure in graph algorithms. This article walks through the two fundamental graph traversals, breadth-first search (BFS) and depth-first search (DFS), and the concepts of spanning trees and minimum spanning trees (MST), with working code.
 
+
+![discrete math 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/09/09-01-big-picture.en.png)
+*discrete math 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Trees and Graph Traversal?
 - Which signal should the example or diagram make visible for Trees and Graph Traversal?
 - What failure should be prevented first when Trees and Graph Traversal reaches a real system?
-
-## Big Picture
-
-![discrete math 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/09/09-01-big-picture.en.png)
-
-*discrete math 101 chapter 9 flow overview*
-
-This picture places Trees and Graph Traversal inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

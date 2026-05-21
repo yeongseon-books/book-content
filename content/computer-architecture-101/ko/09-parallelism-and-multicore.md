@@ -27,17 +27,15 @@ last_reviewed: '2026-05-12'
 
 클럭 속도 상승이 멈춘 뒤 성능 향상의 대부분은 코어를 더하는 방향으로 왔습니다. 하지만 코어를 더하는 것과 코드를 빠르게 만드는 것은 전혀 같은 일이 아닙니다.
 
+
+![Computer Architecture 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/09/09-01-big-picture.ko.png)
+*Computer Architecture 101 9장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 동시성과 병렬성은 무엇이 다를까요?
 - 멀티코어에서는 어떤 비용이 새로 생길까요?
 - 락 경합과 false sharing은 왜 위험할까요?
-
-## 큰 그림
-
-![Computer Architecture 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/09/09-01-big-picture.ko.png)
-
-*Computer Architecture 101 9장 흐름 개요*
 
 ## 왜 중요한가
 

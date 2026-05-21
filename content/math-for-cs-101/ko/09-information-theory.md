@@ -30,20 +30,16 @@ title: "Math for CS 101 (9/10): 정보이론"
 
 여기서는 정보이론을 압축, 통신, 머신러닝 손실 함수 뒤에 놓인 공통 언어로 보고 정보량, 엔트로피, 교차 엔트로피, KL 발산의 감각을 정리해 보겠습니다.
 
+
+![Math for CS 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/09/09-01-concept-at-a-glance.ko.png)
+*Math for CS 101 9장 흐름 개요*
+> 엔트로피와 정보량은 통신, 압축, 암호화의 이론적 한계를 설명하는 언어입니다.
+
 ## 먼저 던지는 질문
 
 - 정보의 양은 무엇으로 측정할까요?
 - 엔트로피는 왜 평균 정보량이라고 부를까요?
 - 교차 엔트로피는 왜 손실 함수로 자주 쓰일까요?
-
-## 큰 그림
-
-![Math for CS 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/09/09-01-concept-at-a-glance.ko.png)
-
-*Math for CS 101 9장 흐름 개요*
-이 그림은 정보량을 엔트로피로 측정하고, 압축과 통신 효율의 한계를 설명하는 원리를 보여줍니다.
-
-> 엔트로피와 정보량은 통신, 압축, 암호화의 이론적 한계를 설명하는 언어입니다.
 
 ## 왜 중요한가
 

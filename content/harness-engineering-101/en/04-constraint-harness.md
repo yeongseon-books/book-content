@@ -27,21 +27,15 @@ Humans infer boundaries from policy and habit. Agents do not. If a dangerous act
 
 This is post 4 in the Harness Engineering 101 series. Here we treat constraints as enforceable runtime contracts, not polite prompt wording.
 
+![Constraint harness - defining rules, boundaries, and forbidden actions](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/04/04-01-constraint-harness-defining-rules-bounda.en.png)
+*Constraint harness - defining rules, boundaries, and forbidden actions*
+> A Constraint Harness does not merely tell the agent “do not do that”; it builds system boundaries that make the action impossible or auditable.
+
 ## Questions to Keep in Mind
 
 - How must a Constraint Harness differ from prompt rules if it is going to limit agent behavior for real?
 - What risks do capability, resource, behavior, and scope constraints each control?
 - What must appear in code and logs for constraints to become an execution contract?
-
-## Big Picture
-
-![Constraint harness - defining rules, boundaries, and forbidden actions](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/04/04-01-constraint-harness-defining-rules-bounda.en.png)
-
-*Constraint harness - defining rules, boundaries, and forbidden actions*
-
-This picture shows rules, boundaries, and forbidden actions turning into validation points before and after execution. Constraints should not be polite instructions; they should be boundaries the agent cannot actually cross.
-
-> A Constraint Harness does not merely tell the agent “do not do that”; it builds system boundaries that make the action impossible or auditable.
 
 ## Agents Try Everything They Are Allowed To
 

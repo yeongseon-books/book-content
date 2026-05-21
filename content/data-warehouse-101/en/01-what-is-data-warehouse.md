@@ -28,21 +28,16 @@ This is the first post in the Data Warehouse 101 series.
 
 In this post, we build the mental model for that split. The goal is to see why analytics needs its own store, what changes once you separate it from the service database, and how that choice protects both systems.
 
+
+![data warehouse 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/01/01-01-concept-at-a-glance.en.png)
+*data warehouse 101 chapter 1 flow overview*
+> A data warehouse separates operational reads (OLTP) from analytical reads (OLAP). This split lets each system optimize for what it does best.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What Is a Data Warehouse??
 - Which signal should the example or diagram make visible for What Is a Data Warehouse??
 - What failure should be prevented first when What Is a Data Warehouse? reaches a real system?
-
-## Big Picture
-
-![data warehouse 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/01/01-01-concept-at-a-glance.en.png)
-
-*data warehouse 101 chapter 1 flow overview*
-
-This picture places What Is a Data Warehouse? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A data warehouse separates operational reads (OLTP) from analytical reads (OLAP). This split lets each system optimize for what it does best.
 
 ## Questions this article answers
 

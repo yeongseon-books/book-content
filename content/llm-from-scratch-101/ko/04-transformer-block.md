@@ -32,17 +32,14 @@ seo_description: 지난 글에서 CausalSelfAttention까지 만들고 나면 한
 
 이제 블록 하나를 제대로 이해하면 다음 글에서 GPT 전체 클래스를 조립하는 일이 훨씬 단순해집니다.
 
+![LLM from Scratch 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/04/04-01-layernorm-pre-norm-vs-post-norm.ko.png)
+*LLM from Scratch 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - FeedForward는 왜 `Linear(C, 4C) -> GELU -> Linear(4C, C)` 형태를 많이 쓸까요?
 - residual connection은 학습을 어떻게 안정화할까요?
 - pre-norm과 post-norm은 실전에서 어떤 차이를 만들까요?
-
-## 큰 그림
-
-![LLM from Scratch 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/04/04-01-layernorm-pre-norm-vs-post-norm.ko.png)
-
-*LLM from Scratch 101 4장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 

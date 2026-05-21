@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 Frontend와 Backend의 역할을 나눠 보고, SPA와 SSR이 어떤 차이를 가지는지, 두 세계를 잇는 API 계약이 왜 중요한지 정리하겠습니다.
 
+
+![Web Development 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/05/05-01-concept-at-a-glance.ko.png)
+*Web Development 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - Frontend와 Backend의 일은 어디서 갈릴까요?
 - 데이터의 진실은 어느 쪽이 가져야 할까요?
 - SPA와 SSR은 무엇이 다를까요?
-
-## 큰 그림
-
-![Web Development 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/05/05-01-concept-at-a-glance.ko.png)
-
-*Web Development 101 5장 흐름 개요*
 
 ## 왜 이 경계가 중요한가
 
@@ -71,13 +69,13 @@ last_reviewed: '2026-05-15'
 
 ## 전후 비교로 보는 책임 배치
 
-**Before (password check on the frontend)**
+**Before (프론트엔드에서 비밀번호 확인)**
 
 ```js
 if (password === "admin1234") { login(); }  // anyone can read this
 ```
 
-**After (check on the backend)**
+**After (백엔드에서 확인)**
 
 ```python
 # 서버에서만 비교

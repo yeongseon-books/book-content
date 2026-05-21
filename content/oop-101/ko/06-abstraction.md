@@ -26,17 +26,15 @@ seo_description: ABC와 abstractmethod로 공통 인터페이스를 강제하는
 
 Python에서 추상화는 이론 용어로 끝나지 않습니다. 어떤 메서드를 반드시 구현해야 하는지, 어떤 단계는 부모가 공통으로 가져가야 하는지, 어디까지를 팀의 계약으로 강제할지를 정하는 실무 설계 문제에 더 가깝습니다.
 
+
+![Object-Oriented Programming 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/06/06-01-concept-overview.ko.png)
+*Object-Oriented Programming 101 6장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 덕 타이핑 관례만으로는 언제부터 부족해질까요?
 - 추상 클래스는 어떤 메서드와 프로퍼티를 반드시 강제해야 할까요?
 - 템플릿 메서드 패턴은 부모가 흐름을 지키고 자식이 세부 구현을 맡게 만드는 데 어떻게 도움이 될까요?
-
-## 큰 그림
-
-![Object-Oriented Programming 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/06/06-01-concept-overview.ko.png)
-
-*Object-Oriented Programming 101 6장 흐름 개요*
 
 ## 핵심 개념 잡기
 

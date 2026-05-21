@@ -30,17 +30,14 @@ seo_description: 모델 클래스를 완성하고 나면 가장 무거워 보이
 
 이 글은 LLM from Scratch 101 시리즈의 여섯 번째 글입니다. 여기서는 `train.py`를 만들어 AdamW, warmup, cosine decay, gradient clipping, 주기적 평가, 체크포인트 저장까지 포함한 최소 학습 루프를 구현합니다.
 
+![LLM from Scratch 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/06/06-01-the-5-line-core-of-the-training-loop.ko.png)
+*LLM from Scratch 101 6장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 학습 루프를 움직이는 핵심 다섯 줄은 무엇일까요?
 - transformer 학습에서 AdamW는 왜 SGD보다 다루기 쉬울까요?
 - warmup과 cosine decay는 학습 안정성에 어떤 도움을 줄까요?
-
-## 큰 그림
-
-![LLM from Scratch 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/06/06-01-the-5-line-core-of-the-training-loop.ko.png)
-
-*LLM from Scratch 101 6장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 

@@ -27,21 +27,15 @@ ACA에서는 Environment, Container App, Revision이라는 세 단어를 계속 
 
 이 글은 Azure Container Apps 101 시리즈의 2번째 글입니다. 여기서는 운영자 관점에서 이 세 단어를 분명히 갈라 보겠습니다.
 
+![Azure Container Apps 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/02/02-01-start-with-the-hierarchy.ko.png)
+*Azure Container Apps 101 2장 흐름 개요*
+> Environment, Container App, Revision — ACA in three words의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - ACA의 세 가지 운영 단위인 Environment, Container App, Revision은 정확히 어떤 책임을 가질까요?
 - 어떤 변경은 새 Revision을 만들고, 어떤 변경은 만들지 않을까요?
 - Single Revision mode와 Multiple Revision mode는 무엇이 다르고, 각각 언제 맞을까요?
-
-## 큰 그림
-
-![Azure Container Apps 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/02/02-01-start-with-the-hierarchy.ko.png)
-
-*Azure Container Apps 101 2장 흐름 개요*
-
-이 그림에서는 Environment, Container App, Revision — ACA in three words를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> Environment, Container App, Revision — ACA in three words의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

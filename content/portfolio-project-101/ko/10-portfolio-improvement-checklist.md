@@ -26,21 +26,16 @@ last_reviewed: '2026-05-15'
 
 이 글은 Portfolio Project 101 시리즈의 마지막 글입니다. 여기서는 공개 직전에 무엇을 점검하면 포트폴리오 전체 완성도를 끌어올릴 수 있는지, 처음 방문한 사람의 시선으로 다시 보는 체크리스트를 정리하겠습니다.
 
+
+![Portfolio Project 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/10/10-01-diagram.ko.png)
+*Portfolio Project 101 10장 흐름 개요*
+> 포트폴리오 개선은 한 번에 모든 것을 완벽하게 만드는 것이 아닙니다. 문제 → 데모 → 문서 → 배포 순서로 단계별 완성도를 높이는 것이 현실적입니다.
+
 ## 먼저 던지는 질문
 
 - 공개 전 마지막으로 확인해야 할 핵심 영역은 무엇일까요?
 - README, 데모, 코드, 서사, 공개 채널은 왜 따로 점검해야 할까요?
 - 작성자 시선과 처음 방문한 사람의 시선은 어디에서 가장 크게 어긋날까요?
-
-## 큰 그림
-
-![Portfolio Project 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/10/10-01-diagram.ko.png)
-
-*Portfolio Project 101 10장 흐름 개요*
-
-이 그림에서는 포트폴리오를 개선할 때 체계적으로 어디부터 점검해야 하는지 봅니다. 무작위 개선보다는 우선순위가 있는 체크리스트가 효율적습니다.
-
-> 포트폴리오 개선은 한 번에 모든 것을 완벽하게 만드는 것이 아닙니다. 문제 → 데모 → 문서 → 배포 순서로 단계별 완성도를 높이는 것이 현실적입니다.
 
 ## 왜 중요한가
 

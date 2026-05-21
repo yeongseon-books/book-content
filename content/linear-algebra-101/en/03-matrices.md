@@ -26,21 +26,16 @@ Matrices are the notation you see most often in linear algebra. Sometimes they l
 
 This is post 3 in the Linear Algebra 101 series. Here we will read matrices through two linked perspectives: shape and transformation.
 
+
+![linear algebra 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/03/03-01-concept-at-a-glance.en.png)
+*linear algebra 101 chapter 3 flow overview*
+> A matrix is not just a number grid. It is a transformation rule, and its structure (especially the number of rows and columns) defines not just the size but the very spaces of input and output.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Matrices?
 - Which signal should the example or diagram make visible for Matrices?
 - What failure should be prevented first when Matrices reaches a real system?
-
-## Big Picture
-
-![linear algebra 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/03/03-01-concept-at-a-glance.en.png)
-
-*linear algebra 101 chapter 3 flow overview*
-
-This picture places Matrices inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A matrix is not just a number grid. It is a transformation rule, and its structure (especially the number of rows and columns) defines not just the size but the very spaces of input and output.
 
 ## Questions This Post Answers
 

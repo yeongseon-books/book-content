@@ -35,21 +35,16 @@ title: "AI Data Preparation 101 (9/10): 학습/평가/테스트 분할과 Contam
 
 여기서는 random, stratified, group, temporal split의 적용 기준과, LLM 평가에서 contamination을 어떻게 감지하고 방어할지 정리하겠습니다.
 
+
+![AI 데이터 준비 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/09/09-01-big-picture.ko.png)
+*AI 데이터 준비 9장 흐름 개요*
+> 학습/평가/테스트 분할과 Contamination 통제의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - 단순 `train_test_split`이 실제 운영 조건을 놓치는 대표적인 경우는 무엇일까요?
 - 클래스 불균형, 사용자 누수, 시계열 데이터는 왜 서로 다른 split 전략을 요구할까요?
 - LLM benchmark contamination은 기존 데이터 누수와 무엇이 다르고 왜 더 위험할까요?
-
-## 큰 그림
-
-![AI 데이터 준비 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/09/09-01-big-picture.ko.png)
-
-*AI 데이터 준비 9장 흐름 개요*
-
-이 그림에서는 학습/평가/테스트 분할과 Contamination 통제를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 학습/평가/테스트 분할과 Contamination 통제의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

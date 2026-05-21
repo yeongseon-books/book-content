@@ -43,19 +43,14 @@ In AKS, both loops belong to the managed control-plane story even though they ac
 HPA runs inside `kube-controller-manager` and computes desired replicas from metrics.
 Cluster Autoscaler is operated by Microsoft as part of the AKS managed control plane. You configure it with the cluster autoscaler profile, for example via `az aks update --cluster-autoscaler-profile`, but you do not deploy or manage CA pods yourself.
 
+![azure kubernetes service deep dive chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/05/05-01-put-both-loops-in-one-diagram.en.png)
+*azure kubernetes service deep dive chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - From what metric sources does HPA read on what cadence, and how does it decide?
 - What signals tell the Cluster Autoscaler that new nodes are required?
 - When HPA and CA move at the same time, how does the race appear and how do you tame it?
-
-## Big Picture
-
-![azure kubernetes service deep dive chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/05/05-01-put-both-loops-in-one-diagram.en.png)
-
-*azure kubernetes service deep dive chapter 5 flow overview*
-
-This picture places HPA and Cluster Autoscaler internals — two control loops inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Put both loops in one diagram
 

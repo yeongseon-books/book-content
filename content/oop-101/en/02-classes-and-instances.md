@@ -30,19 +30,15 @@ This is post 2 in the Object-Oriented Programming 101 series.
 
 > A class is the blueprint; an instance is the actual object built from it. This article covers constructors, instance methods, class methods, static methods, and Python's special dunder methods — the building blocks of any class.
 
+
+![Object-Oriented Programming 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/02/02-01-big-picture.en.png)
+*Object-Oriented Programming 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Classes and Instances?
 - Which signal should the example or diagram make visible for Classes and Instances?
 - What failure should be prevented first when Classes and Instances reaches a real system?
-
-## Big Picture
-
-![Object-Oriented Programming 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/02/02-01-big-picture.en.png)
-
-*Object-Oriented Programming 101 chapter 2 flow overview*
-
-This picture places Classes and Instances inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

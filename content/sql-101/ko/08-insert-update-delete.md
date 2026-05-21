@@ -26,21 +26,16 @@ last_reviewed: '2026-05-15'
 
 지금까지는 주로 데이터를 읽는 SQL을 다뤘습니다. 하지만 운영 환경에서 더 긴장되는 순간은 데이터를 바꿀 때입니다. 한 줄의 `UPDATE`나 `DELETE`가 서비스 데이터 전체에 영향을 줄 수 있기 때문입니다. 그래서 데이터를 바꾸는 SQL은 읽는 SQL보다 훨씬 더 보수적으로 다뤄야 합니다.
 
+
+![SQL 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/08/08-01-safe-data-change-flow.ko.png)
+*SQL 101 8장 흐름 개요*
+> INSERT, UPDATE, DELETE의 핵심은 데이터 변경의 문법이 아니라, 어떤 행을 어떤 순서로 변경할 때 데이터 일관성과 비즈니스 규칙이 깨지지 않는지 사전에 검증하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - `INSERT`, `UPDATE`, `DELETE`의 기본 형태는 무엇일까요?
 - 트랜잭션은 왜 데이터 변경 작업의 기본 안전망일까요?
 - `RETURNING`은 왜 실무에서 특히 유용할까요?
-
-## 큰 그림
-
-![SQL 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/08/08-01-safe-data-change-flow.ko.png)
-
-*SQL 101 8장 흐름 개요*
-
-이 그림에서는 INSERT, UPDATE, DELETE가 데이터를 어떻게 변경하고, 각 작업이 트랜잭션과 제약 조건에 어떻게 영향을 받는지 봅니다. 데이터 변경은 조회보다 신중해야 합니다.
-
-> INSERT, UPDATE, DELETE의 핵심은 데이터 변경의 문법이 아니라, 어떤 행을 어떤 순서로 변경할 때 데이터 일관성과 비즈니스 규칙이 깨지지 않는지 사전에 검증하는 데 있습니다.
 
 ## 왜 중요한가
 

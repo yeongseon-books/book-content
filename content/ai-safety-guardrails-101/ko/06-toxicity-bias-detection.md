@@ -30,21 +30,16 @@ seo_description: 따라서 toxicity는 inline guardrail로, bias는 offline audi
 
 이 글에서는 독성 분류기 선택, 실시간 차단, 스트리밍 보호, counterfactual 편향 평가, 공정성 지표를 함께 정리합니다.
 
+
+![독성·편향 guardrail 흐름](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/06/06-01-big-picture.ko.png)
+*독성·편향 guardrail 흐름*
+> 독성은 지금 막아야 할 위험이고, 편향은 오래 측정해 줄여야 할 시스템 성향입니다.
+
 ## 먼저 던지는 질문
 
 - 독성 차단과 편향 측정은 왜 같은 문제로 묶으면 안 될까요?
 - 실시간 moderation과 offline audit은 각각 어떤 신호를 담당해야 할까요?
 - false positive를 줄이면서 보호 기준을 유지하려면 무엇을 모니터링해야 할까요?
-
-## 큰 그림
-
-![독성·편향 guardrail 흐름](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/06/06-01-big-picture.ko.png)
-
-*독성·편향 guardrail 흐름*
-
-이 그림에서는 실시간 독성 차단과 장기 편향 샘플링·감사를 분리해 정책 개선으로 되돌리는 흐름을 봅니다. 독성과 편향 guardrail은 즉시 차단할 위험과 오래 측정해야 할 불균형을 나눠 봐야 합니다.
-
-> 독성은 지금 막아야 할 위험이고, 편향은 오래 측정해 줄여야 할 시스템 성향입니다.
 
 ## 왜 이 글이 중요한가
 

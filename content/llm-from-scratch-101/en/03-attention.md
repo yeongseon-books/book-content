@@ -28,19 +28,14 @@ In this post, we will add `CausalSelfAttention` to `model.py` and read it as a t
 
 This is post 3 in the LLM from Scratch 101 series. Here we connect QKV projection, score calculation, causal masking, and multi-head recombination into one runnable path.
 
+![LLM from Scratch 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/03/03-01-causal-mask-no-peeking-at-the-future.en.png)
+*LLM from Scratch 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why do Q, K, and V come from the same input but play different roles?
 - Why do attention scores use `Q · K^T / sqrt(d)`?
 - What breaks in autoregressive training if the causal mask is missing?
-
-## Big Picture
-
-![LLM from Scratch 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/03/03-01-causal-mask-no-peeking-at-the-future.en.png)
-
-*LLM from Scratch 101 chapter 3 flow overview*
-
-This picture places Deciding Which Tokens to Focus On inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

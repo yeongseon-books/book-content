@@ -28,21 +28,16 @@ A strong CI pipeline turns quality rules into an executable contract. Every PR s
 
 This is post 2 in the DevOps 101 series. Here we focus on the first hard feedback gate in the DevOps loop: how to design CI so it fails fast, explains itself clearly, and earns the team's trust.
 
+
+![devops 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/02/02-01-concept-at-a-glance.en.png)
+*devops 101 chapter 2 flow overview*
+> A CI pipeline decides *what to verify*, *when*, and *how long to wait*—so quality depends on *system defaults*, not reviewer diligence.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying CI Pipeline?
 - Which signal should the example or diagram make visible for CI Pipeline?
 - What failure should be prevented first when CI Pipeline reaches a real system?
-
-## Big Picture
-
-![devops 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/02/02-01-concept-at-a-glance.en.png)
-
-*devops 101 chapter 2 flow overview*
-
-This picture places CI Pipeline inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A CI pipeline decides *what to verify*, *when*, and *how long to wait*—so quality depends on *system defaults*, not reviewer diligence.
 
 ## Questions this article answers
 

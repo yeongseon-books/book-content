@@ -29,19 +29,15 @@ This is post 3 in the Design Patterns 101 series.
 
 In this post, we'll treat structural patterns as named ways of assembling objects through composition and delegation. The real goal is to keep change local instead of freezing the whole design into an inheritance tree.
 
+
+![design patterns 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/03/03-01-concept-at-a-glance.en.png)
+*design patterns 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - The problem structural patterns solve?
 - Adapter, Decorator, Facade?
 - Where Proxy fits?
-
-## Big Picture
-
-![design patterns 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/03/03-01-concept-at-a-glance.en.png)
-
-*design patterns 101 chapter 3 flow overview*
-
-This picture places Structural Patterns inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

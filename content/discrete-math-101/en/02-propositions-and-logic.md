@@ -31,19 +31,15 @@ This is post 2 in the Discrete Math 101 series.
 
 > Propositional logic deals with sentences that are unambiguously true or false (propositions) and the operators (AND, OR, NOT) that combine them. Every conditional in every programming language, every SQL `WHERE` clause, and every digital logic gate is a direct application. This article covers propositions, truth tables, equivalence transformations, and predicate logic.
 
+
+![discrete math 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/02/02-01-big-picture.en.png)
+*discrete math 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Propositions and Logic?
 - Which signal should the example or diagram make visible for Propositions and Logic?
 - What failure should be prevented first when Propositions and Logic reaches a real system?
-
-## Big Picture
-
-![discrete math 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/02/02-01-big-picture.en.png)
-
-*discrete math 101 chapter 2 flow overview*
-
-This picture places Propositions and Logic inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

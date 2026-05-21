@@ -32,21 +32,16 @@ In this post, we'll connect metrics, logs, traces, CloudWatch, and alert routing
 
 > Monitoring works when numbers, events, and request flow answer different questions but reinforce one another during diagnosis.
 
+
+![cloud computing 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/08/08-01-concept-at-a-glance.en.png)
+*cloud computing 101 chapter 8 flow overview*
+> Good monitoring answers 'what is broken and where is the break' faster than the alternative: downtime without clues.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Monitoring?
 - Which signal should the example or diagram make visible for Monitoring?
 - What failure should be prevented first when Monitoring reaches a real system?
-
-## Big Picture
-
-![cloud computing 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/08/08-01-concept-at-a-glance.en.png)
-
-*cloud computing 101 chapter 8 flow overview*
-
-This picture places Monitoring inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Good monitoring answers 'what is broken and where is the break' faster than the alternative: downtime without clues.
 
 ## Questions This Chapter Answers
 

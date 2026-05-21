@@ -29,19 +29,15 @@ Dynamic programming (DP) applies when the same subproblems repeat and the optima
 
 This is post 6 in the Algorithms 101 series. Here we cover when DP applies, how memoization differs from tabulation, and how to build intuition for state design.
 
+
+![algorithms 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/06/06-01-big-picture.en.png)
+*algorithms 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Dynamic Programming?
 - Which signal should the example or diagram make visible for Dynamic Programming?
 - What failure should be prevented first when Dynamic Programming reaches a real system?
-
-## Big Picture
-
-![algorithms 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/06/06-01-big-picture.en.png)
-
-*algorithms 101 chapter 6 flow overview*
-
-This picture places Dynamic Programming inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

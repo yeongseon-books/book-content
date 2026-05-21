@@ -29,19 +29,15 @@ This is the final post in the Design Patterns 101 series.
 
 In this post, we'll look at how Python's own tools can express classic pattern ideas with less code and less inheritance. The point is not to reject patterns, but to translate their intent into forms that read naturally in Python.
 
+
+![design patterns 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/10/10-01-concept-at-a-glance.en.png)
+*design patterns 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why a module is already a Singleton?
 - Strategy and Command expressed as functions?
 - Interfaces expressed as Protocols?
-
-## Big Picture
-
-![design patterns 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/10/10-01-concept-at-a-glance.en.png)
-
-*design patterns 101 chapter 10 flow overview*
-
-This picture places Pythonic Patterns inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

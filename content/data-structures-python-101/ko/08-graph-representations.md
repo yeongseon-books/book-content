@@ -24,17 +24,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 Data Structures with Python 101 시리즈의 여덟 번째 글입니다.
 
+
+![Data Structures with Python 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/08/08-01-graph-representation-at-a-glance.ko.png)
+*Data Structures with Python 101 8장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 소셜 네트워크, 지도, 의존성 관계는 코드에서 어떻게 표현할 수 있을까요?
 - 인접 리스트와 인접 행렬은 각각 언제 유리할까요?
 - BFS와 DFS는 무엇이 다르고 어디에 쓰일까요?
-
-## 큰 그림
-
-![Data Structures with Python 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/08/08-01-graph-representation-at-a-glance.ko.png)
-
-*Data Structures with Python 101 8장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 
@@ -311,7 +309,6 @@ print(distances)  # {'A': 0, 'C': 2, 'B': 4, 'D': 3, 'E': 8}
 ## 정리 및 다음 글 안내
 
 그래프는 관계를 표현하는 범용 자료구조입니다. 인접 리스트와 인접 행렬로 표현할 수 있고, BFS와 DFS로 순회할 수 있으며, 가중치가 붙으면 최단 경로 문제로 확장됩니다. 다음 글에서는 중복 제거와 집합 연산에 강한 set을 살펴보겠습니다.
-
 
 
 ## 타입 힌트 기반 그래프 구현

@@ -29,19 +29,14 @@ This is the first post in the LLM Fine-tuning 101 series.
 
 This article frames that decision around three variables so the rest of the series has a stable mental model. If you skip this framing and jump straight into GPUs and loss curves, learning rate, dataset format, and adapter rank all start wobbling at once.
 
+![LLM Fine-tuning 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/01/01-02-what-to-understand-first.en.png)
+*LLM Fine-tuning 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - How can we calculate why LoRA is so much lighter than full fine-tuning?
 - How do we tell apart problems that need fine-tuning from those a prompt can solve?
 - What can we verify in post 1 without a GPU?
-
-## Big Picture
-
-![LLM Fine-tuning 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/01/01-02-what-to-understand-first.en.png)
-
-*LLM Fine-tuning 101 chapter 1 flow overview*
-
-This picture places LLM Fine-tuning Primer inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

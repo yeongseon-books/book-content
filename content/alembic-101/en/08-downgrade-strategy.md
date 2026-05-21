@@ -28,19 +28,15 @@ The existence of a `downgrade()` function does not make a change safe to reverse
 
 This is post 8 in the Alembic 101 series. Here we will separate reversible from irreversible changes and show how to encode that policy honestly.
 
+
+![alembic 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/08/08-01-diagram-deciding-between-reversible-and.en.png)
+*alembic 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - When a production downgrade is possible and when it is effectively impossible?
 - The kinds of irreversible changes and how to handle them?
 - How the expand-contract pattern restores the ability to downgrade?
-
-## Big Picture
-
-![alembic 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/08/08-01-diagram-deciding-between-reversible-and.en.png)
-
-*alembic 101 chapter 8 flow overview*
-
-This picture places Downgrade strategy: when to write it for real and when to forbid it inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

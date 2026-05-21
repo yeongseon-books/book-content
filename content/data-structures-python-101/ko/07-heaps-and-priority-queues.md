@@ -24,17 +24,15 @@ title: "Data Structures with Python 101 (7/10): 힙과 우선순위 큐"
 
 이 글은 Data Structures with Python 101 시리즈의 일곱 번째 글입니다.
 
+
+![Data Structures with Python 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/07/07-01-big-picture.ko.png)
+*Data Structures with Python 101 7장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 가장 작은 값이나 가장 큰 값을 빠르게 꺼내려면 어떤 구조가 필요할까요?
 - 힙은 왜 정렬보다 우선순위 처리에 유리할까요?
 - Python의 `heapq`는 왜 최소 힙만 제공할까요?
-
-## 큰 그림
-
-![Data Structures with Python 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/07/07-01-big-picture.ko.png)
-
-*Data Structures with Python 101 7장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 
@@ -248,7 +246,6 @@ print(merged)  # [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 ## 정리 및 다음 글 안내
 
 힙은 최솟값과 최댓값을 효율적으로 관리하기 위한 구조이고, Python에서는 `heapq`가 그 기능을 간결하게 제공합니다. 핵심은 전체 정렬이 아니라, 우선순위가 가장 높은 하나를 계속 빠르게 꺼내는 데 있습니다. 다음 글에서는 노드와 간선으로 관계를 표현하는 그래프를 살펴보겠습니다.
-
 
 
 ## 타입 힌트 기반 우선순위 큐 구현

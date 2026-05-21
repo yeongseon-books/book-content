@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 HTML, CSS, JavaScript가 각각 무엇을 맡고, 왜 세 층을 분리하는 편이 유지보수와 협업에 유리한지 정리하겠습니다.
 
+
+![Web Development 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/02/02-01-concept-at-a-glance.ko.png)
+*Web Development 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 웹 페이지는 왜 세 가지 언어로 나뉠까요?
 - HTML, CSS, JavaScript는 각각 무엇을 책임질까요?
 - 세 언어가 함께 동작할 때 어떤 연결 지점이 생길까요?
-
-## 큰 그림
-
-![Web Development 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/02/02-01-concept-at-a-glance.ko.png)
-
-*Web Development 101 2장 흐름 개요*
 
 ## 왜 이 구분이 중요한가
 
@@ -71,13 +69,13 @@ last_reviewed: '2026-05-15'
 
 ## 전후 비교로 보는 분리의 가치
 
-**Before (everything mixed)**
+**Before (모든 것이 혼합)**
 
 ```html
 <h1 style="color:red" onclick="alert('hi')">Title</h1>
 ```
 
-**After (roles separated)**
+**After (역할 분리)**
 
 ```html
 <h1 class="title">Title</h1>

@@ -27,21 +27,16 @@ seo_description: 동일 출처 정책, CORS, CSP, 쿠키 플래그를 웹 보안
 
 이 글은 Information Security 101 시리즈의 5번째 글입니다.
 
+
+![Information Security 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/05/05-01-big-picture.ko.png)
+*Information Security 101 5장 흐름 개요*
+> 웹 보안의 기초는 HTTPS만으로는 부족합니다. 입력 검증, 세션 토큰, 쿠키 설정(HttpOnly/Secure/SameSite), 에러 메시지가 정보를 새지 않게 하는 것이 얼마나 일관되는지가 전부입니다.
+
 ## 먼저 던지는 질문
 
 - 동일 출처 정책은 정확히 무엇을 뜻할까요?
 - CORS는 무엇을 허용하고 무엇을 허용하지 않을까요?
 - CSP는 왜 XSS 피해를 줄이는 데 중요할까요?
-
-## 큰 그림
-
-![Information Security 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/05/05-01-big-picture.ko.png)
-
-*Information Security 101 5장 흐름 개요*
-
-그림은 브라우저 입력 → HTTP 통신 → 애플리케이션 라우팅 및 인증 → 데이터 저장 또는 렌더링 → 응답 전달의 흐름에서, 각 층에서 어디서 검증되고 로그되는지를 보여줍니다. 책임 경계가 명확할 때 공격 표면을 줄일 수 있습니다.
-
-> 웹 보안의 기초는 HTTPS만으로는 부족합니다. 입력 검증, 세션 토큰, 쿠키 설정(HttpOnly/Secure/SameSite), 에러 메시지가 정보를 새지 않게 하는 것이 얼마나 일관되는지가 전부입니다.
 
 ## 왜 중요한가
 
@@ -272,14 +267,10 @@ CORS는 공격을 막는 도구가 아니라 브라우저가 요청을 허용할
 보안은 단발성 프로젝트가 아니라 운영 루프입니다. 같은 점검을 반복해도 기준이 유지될 때 품질이 올라갑니다.
 
 
-
-
 ## 서브리소스 무결성 검증(SRI)
 
 
-
 외부 CDN에서 스크립트나 스타일시트를 불러올 때, CDN이 침해되면 악성 코드가 삽입될 수 있습니다. SRI는 브라우저가 다운로드된 리소스의 해시를 검증해 변조된 파일을 차단합니다.
-
 
 
 ```html
@@ -295,17 +286,13 @@ CORS는 공격을 막는 도구가 아니라 브라우저가 요청을 허용할
 ```
 
 
-
 SRI를 적용하면 CDN 공급망 공격으로부터 클라이언트를 보호할 수 있습니다. 다만 리소스 업데이트 시 해시값도 함께 갱신해야 하므로 배포 파이프라인에 포함시키는 것이 좋습니다.
-
 
 
 ## CSP 위반 리포팅 설정
 
 
-
 CSP를 처음 도입할 때는 Enforce 대신 Report-Only로 시작해야 서비스 장애를 피할 수 있습니다. 리포팅 엔드포인트를 마련하고 수집된 위반 데이터를 분석한 뒤 정책을 좀혀 나갑니다.
-
 
 
 ```python
@@ -317,11 +304,7 @@ from flask import Flask, request, jsonify
 import json
 
 
-
 app = Flask(__name__)
-
-
-
 
 
 @app.post("/csp-report")
@@ -339,9 +322,7 @@ def csp_report():
 ```
 
 
-
 수집된 리포트에서 빈도가 높은 위반을 정리한 뒤, 허용 목록을 조정하거나 정말로 차단해야 하는 스크립트를 확인할 수 있습니다. 이 반복 루프가 CSP 도입의 핵심입니다.
-
 
 
 ## OWASP Top 10 관점에서 보는 웹 기본 통제

@@ -26,19 +26,15 @@ This is post 4 in the Algorithms with Python 101 series. Sorting sits underneath
 
 This chapter uses one practical question as its spine: why is Python's built-in `sorted()` usually the default in real work? We will still implement classic algorithms, but as contrast material that helps explain performance, stability, and `key` design rather than as the main payoff.
 
+
+![Algorithms with Python 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/04/04-01-big-picture.en.png)
+*Algorithms with Python 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Sorting Algorithms?
 - Which signal should the example or diagram make visible for Sorting Algorithms?
 - What failure should be prevented first when Sorting Algorithms reaches a real system?
-
-## Big Picture
-
-![Algorithms with Python 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/04/04-01-big-picture.en.png)
-
-*Algorithms with Python 101 chapter 4 flow overview*
-
-This picture places Sorting Algorithms inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

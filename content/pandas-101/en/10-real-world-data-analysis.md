@@ -28,21 +28,16 @@ This is the final post in the Pandas 101 series.
 
 In this chapter, we will connect everything into one standard workflow: load, clean, enrich, aggregate, and visualize. The goal is not a flashy notebook. It is a pipeline you can rerun, review, and share with confidence.
 
+
+![pandas 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/10/10-01-concept-at-a-glance.en.png)
+*pandas 101 chapter 10 flow overview*
+> *Analysis is *iteration*. First read is never perfect, first aggregation is never final, you always come back to re-validate.
+
 ## Questions to Keep in Mind
 
 - The standard *EDA workflow?
 - The value of *function-level separation?
 - Building *reproducible analysis?
-
-## Big Picture
-
-![pandas 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/10/10-01-concept-at-a-glance.en.png)
-
-*pandas 101 chapter 10 flow overview*
-
-This picture places Real-World Data Analysis inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> *Analysis is *iteration*. First read is never perfect, first aggregation is never final, you always come back to re-validate.
 
 ## Why It Matters
 

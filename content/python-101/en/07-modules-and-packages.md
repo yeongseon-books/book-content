@@ -28,19 +28,15 @@ In Python, a module is a namespace that is loaded once and cached, and a package
 
 This post is the 7th article in the Python 101 series. This is the part of the series where single files turn into a real project layout.
 
+
+![Python 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/07/07-01-mental-model.en.png)
+*Python 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - Treat any `.py` file as a module and pull it into another file with `import`?
 - Turn a directory into a package by adding `__init__.py`, and group modules inside it?
 - Explain the difference between `import x`, `from x import y`, and `import x as alias`?
-
-## Big Picture
-
-![Python 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/07/07-01-mental-model.en.png)
-
-*Python 101 chapter 7 flow overview*
-
-This picture places Modules and packages: import, __init__, __name__ inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

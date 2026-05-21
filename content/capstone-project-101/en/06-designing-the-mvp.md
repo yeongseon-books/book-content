@@ -28,21 +28,16 @@ An MVP is better understood as the cheapest meaningful test of the project's mai
 
 This is post 6 in the Capstone Project 101 series. It designs the MVP as a package of one core flow, an explicit out-of-scope list, a demo bar, and a feedback loop.
 
+
+![capstone project 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/06/06-01-the-flow-at-a-glance.en.png)
+*capstone project 101 chapter 6 flow overview*
+> An MVP is not a small feature set; it is a single user flow that creates enough confidence to proceed. A good MVP fits one scenario completely.
+
 ## Questions to Keep in Mind
 
 - Why is an MVP closer to a learning tool than a small product?
 - What does picking one core flow force the team to remove?
 - Why must the out-of-scope list be documented?
-
-## Big Picture
-
-![capstone project 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/06/06-01-the-flow-at-a-glance.en.png)
-
-*capstone project 101 chapter 6 flow overview*
-
-This picture places Designing the MVP inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> An MVP is not a small feature set; it is a single user flow that creates enough confidence to proceed. A good MVP fits one scenario completely.
 
 ## What You Will Learn
 

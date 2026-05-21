@@ -30,17 +30,14 @@ last_reviewed: '2026-05-15'
 즉, 프로덕션은 개별 기술 체크리스트의 합이 아니라 시스템입니다. 이미지를 어떻게 만들었는지, 어디에 저장하는지, 어떤 권한으로 실행하는지, 실패를 어떻게 관찰하는지가 동시에 맞물려야 합니다. 이 글은 그 마지막 기준선을 정리합니다.
 
 
+![Docker 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/10/10-01-concept-at-a-glance.ko.png)
+*Docker 101 10장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 프로덕션에서는 어떤 이미지 태그 정책을 가져가야 할까요?
 - 레지스트리와 이미지 서명은 왜 공급망 신뢰의 일부일까요?
 - read-only, capability 제한, non-root는 어떤 식으로 결합해야 할까요?
-
-## 큰 그림
-
-![Docker 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/10/10-01-concept-at-a-glance.ko.png)
-
-*Docker 101 10장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 

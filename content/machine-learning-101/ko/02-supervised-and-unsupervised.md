@@ -26,19 +26,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 머신러닝 101 시리즈의 2번째 글입니다. 여기서는 지도학습과 비지도학습의 경계를 정리하고, 분류·회귀·군집이 각각 어떤 질문에 답하는지 비교해 보겠습니다.
 
+
+![Machine Learning 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/02/02-01-diagram.ko.png)
+*Machine Learning 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 레이블이 있을 때와 없을 때 같은 알고리즘을 써도 될까요?
 - 분류와 회귀는 둘 다 지도학습인데 무엇이 다를까요?
 - 군집화는 분류와 왜 전혀 다른 문제로 취급할까요?
-
-## 큰 그림
-
-![Machine Learning 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/02/02-01-diagram.ko.png)
-
-*Machine Learning 101 2장 흐름 개요*
-
-이 그림은 이 장의 핵심 개념들이 어떻게 연결되는지 보여줍니다.
 
 ## ML 패러다임 비교
 

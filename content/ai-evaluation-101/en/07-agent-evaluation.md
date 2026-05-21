@@ -25,21 +25,16 @@ Agents reach answers through multiple steps. You need to evaluate not just the f
 
 This is post 7 in the AI Evaluation 101 series. Here we cover trajectory-level evaluation.
 
+
+![Evaluating agents - Trajectories, not single responses](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/07/07-01-evaluating-agents-trajectories-not-singl.en.png)
+*Evaluating agents - Trajectories, not single responses*
+> Agent evaluation becomes operational only when it evaluates the path as well as the answer.
+
 ## Questions to Keep in Mind
 
 - Why should agent evaluation inspect trajectory along with the single final response?
 - What operational risk is caught by tool selection, step count, and recovery metrics?
 - Which step-level signals belong on an agent evaluation dashboard?
-
-## Big Picture
-
-![Evaluating agents - Trajectories, not single responses](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/07/07-01-evaluating-agents-trajectories-not-singl.en.png)
-
-*Evaluating agents - Trajectories, not single responses*
-
-This picture shows agent evaluation looking at trajectory, tool choice, step efficiency, and recovery rather than only the final response. The execution path itself must be evaluated because it creates product cost and risk.
-
-> Agent evaluation becomes operational only when it evaluates the path as well as the answer.
 
 ## Why Agent Evaluation Is Different
 

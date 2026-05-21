@@ -28,20 +28,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 벡터를 좌표, 화살표, 데이터 표현이라는 세 관점으로 함께 읽어 보겠습니다.
 
+
+![Linear Algebra 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/02/02-01-concept-at-a-glance.ko.png)
+*Linear Algebra 101 2장 흐름 개요*
+>벡터는 단순한 수치 배열이 아니라, 크기와 방향을 가진 기하학적 대상입니다. 덧셈과 스칼라곱이 정의되어 있어야만 벡터라고 부를 수 있습니다.
+
 ## 먼저 던지는 질문
 
 - 벡터는 단순한 리스트와 무엇이 다를까요?
 - 벡터 덧셈과 스칼라곱은 기하학적으로 무엇을 뜻할까요?
 - 노름은 왜 길이 이상의 의미를 가질까요?
-
-## 큰 그림
-
-![Linear Algebra 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/02/02-01-concept-at-a-glance.ko.png)
-
-*Linear Algebra 101 2장 흐름 개요*
-
-벡터는 세 가지 해석이 만나는 지점입니다. 기하학에서는 화살표이고, 대수에서는 좌표 묶음이며, 머신러닝에서는 데이터 한 행입니다. 이 세 관점을 함께 이해해야 벡터를 정말 다루는 것이지, 공식만 외우는 것이 아닙니다.
->벡터는 단순한 수치 배열이 아니라, 크기와 방향을 가진 기하학적 대상입니다. 덧셈과 스칼라곱이 정의되어 있어야만 벡터라고 부를 수 있습니다.
 
 ## 왜 중요한가
 

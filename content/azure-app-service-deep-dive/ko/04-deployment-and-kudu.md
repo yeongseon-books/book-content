@@ -30,21 +30,15 @@ App Service에서 "배포가 성공했다"는 말은 실제로는 꽤 많은 단
 
 이제 artifact가 worker가 보는 런타임 경로까지 도달하는 과정을 차례로 따라가 보겠습니다.
 
+![Azure App Service Deep Dive 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/04/04-01-the-deployment-pipeline-in-one-picture.ko.png)
+*Azure App Service Deep Dive 4장 흐름 개요*
+> 배포와 Kudu — 빌드·동기화·릴리스의 안쪽의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - Kudu는 App Service에서 정확히 어떤 공개 표면을 제공할까요?
 - ZipDeploy는 단순히 ZIP을 풀어 놓는 동작과 어떻게 다를까요?
 - Windows code app의 고전적인 Kudu 경로와 Linux code app의 Oryx 경로는 어디서 갈릴까요?
-
-## 큰 그림
-
-![Azure App Service Deep Dive 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/04/04-01-the-deployment-pipeline-in-one-picture.ko.png)
-
-*Azure App Service Deep Dive 4장 흐름 개요*
-
-이 그림에서는 배포와 Kudu — 빌드·동기화·릴리스의 안쪽를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 배포와 Kudu — 빌드·동기화·릴리스의 안쪽의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

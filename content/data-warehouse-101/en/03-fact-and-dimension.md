@@ -28,21 +28,16 @@ This is post 3 in the Data Warehouse 101 series.
 
 In this post, we split measures from attributes on purpose. That separation is what keeps aggregations stable, lets context evolve without rewriting history, and gives the warehouse a reusable modeling vocabulary.
 
+
+![data warehouse 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/03/03-01-concept-at-a-glance.en.png)
+*data warehouse 101 chapter 3 flow overview*
+> A fact table records immutable events; dimension tables define how to view them. This separation makes schema changes cheaper and queries more readable.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Fact and Dimension?
 - Which signal should the example or diagram make visible for Fact and Dimension?
 - What failure should be prevented first when Fact and Dimension reaches a real system?
-
-## Big Picture
-
-![data warehouse 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/03/03-01-concept-at-a-glance.en.png)
-
-*data warehouse 101 chapter 3 flow overview*
-
-This picture places Fact and Dimension inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A fact table records immutable events; dimension tables define how to view them. This separation makes schema changes cheaper and queries more readable.
 
 ## Questions this article answers
 

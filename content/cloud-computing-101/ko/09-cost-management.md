@@ -30,21 +30,16 @@ last_reviewed: '2026-05-14'
 
 여기서는 태그, 예산, Savings Plans, 라이트사이징을 중심으로 비용 관리를 엔지니어링의 일부로 보는 관점을 정리하겠습니다.
 
+
+![Cloud Computing 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/09/09-01-concept-at-a-glance.ko.png)
+*Cloud Computing 101 9장 흐름 개요*
+> 비용 관리는 기술 선택이 아니라 가시성과 통제권을 확보하는 운영 결정입니다.
+
 ## 먼저 던지는 질문
 
 - 클라우드 비용은 왜 예상보다 자주 높게 나올까요?
 - 태그는 비용 배분에서 어떤 역할을 할까요?
 - 예산 알림은 언제 만들어야 할까요?
-
-## 큰 그림
-
-![Cloud Computing 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/09/09-01-concept-at-a-glance.ko.png)
-
-*Cloud Computing 101 9장 흐름 개요*
-
-예약 인스턴스(Reserved Instance)는 1년 또는 3년 약정으로 할인을 받는 방식입니다. 스팟 인스턴스(Spot)는 남는 용량을 대폭 할인된 가격에 사용하되, 언제든 중단될 수 있습니다. 저장소(Storage)와 데이터 전송(Data Transfer) 비용도 누적되면 큽니다. 리소스 태그와 비용 배분이 없으면 누가 어디에 돈을 쓰는지 알 수 없습니다.
-
-> 비용 관리는 기술 선택이 아니라 가시성과 통제권을 확보하는 운영 결정입니다.
 
 ## 왜 중요한가
 

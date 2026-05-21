@@ -28,21 +28,15 @@ last_reviewed: '2026-05-14'
 서비스를 만든다는 말은 결국 데이터를 저장하고, 그 데이터를 네트워크를 통해 주고받는다는 뜻입니다. 화면과 코드만으로는 서비스가 완성되지 않는 이유도 여기에 있습니다.
 
 
+![Computer Science Major 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/05/05-01-request-to-database-flow.ko.png)
+*컴퓨터학과 전공 가이드 5장 흐름 개요*
+> 데이터베이스와 네트워크의 핵심은 기술 이름이 아니라 어떤 경계에서 무엇을 일관되게 제공해야 하는지를 이해하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - 데이터베이스와 네트워크는 왜 거의 모든 서비스의 바닥에 놓일까요?
 - SQL, 테이블, 인덱스는 실제 성능과 어떻게 연결될까요?
 - TCP/IP와 HTTP는 어떤 층에서 역할을 나눌까요?
-
-## 큰 그림
-
-![Computer Science Major 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/05/05-01-request-to-database-flow.ko.png)
-
-*컴퓨터학과 전공 가이드 5장 흐름 개요*
-
-이 그림에서 보이듯 데이터베이스와 네트워크는 실전 시스템에서 데이터가 어디에서 생기고, 어떻게 이동하고, 어떻게 보관되는지를 보여줍니다. 각 기술이 어떤 경계에서 신뢰성과 성능을 담당하는지 이해하는 것이 핵심입니다.
-
-> 데이터베이스와 네트워크의 핵심은 기술 이름이 아니라 어떤 경계에서 무엇을 일관되게 제공해야 하는지를 이해하는 데 있습니다.
 
 ## 이 글에서 배울 것
 

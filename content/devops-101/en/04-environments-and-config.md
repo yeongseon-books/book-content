@@ -28,21 +28,16 @@ Good configuration management prevents that drift. The code stays the same, the 
 
 This is post 4 in the DevOps 101 series. Here we look at how to separate code from configuration, treat secrets differently from ordinary settings, and keep environment changes reviewable.
 
+
+![devops 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/04/04-01-concept-at-a-glance.en.png)
+*devops 101 chapter 4 flow overview*
+> Environment drift kills confidence. *Code-defined environments* make failures *repeatable* and *fixable*.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Environments and Configuration?
 - Which signal should the example or diagram make visible for Environments and Configuration?
 - What failure should be prevented first when Environments and Configuration reaches a real system?
-
-## Big Picture
-
-![devops 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/04/04-01-concept-at-a-glance.en.png)
-
-*devops 101 chapter 4 flow overview*
-
-This picture places Environments and Configuration inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Environment drift kills confidence. *Code-defined environments* make failures *repeatable* and *fixable*.
 
 ## Questions this article answers
 

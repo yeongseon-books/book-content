@@ -28,17 +28,15 @@ last_reviewed: '2026-05-12'
 
 이진 탐색은 교과서 예제에만 머물지 않습니다. 정확히 같은 값을 찾는 문제뿐 아니라, 어떤 조건을 처음 만족하는 지점을 찾는 문제에도 자주 확장됩니다.
 
+
+![Algorithms with Python 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/03/03-01-big-picture.ko.png)
+*Algorithms with Python 101 3장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 선형 탐색은 어떻게 동작하고, 한계는 무엇일까요?
 - 이진 탐색은 어떤 원리로 동작하며 어떻게 구현할까요?
 - Python의 `bisect` 모듈은 언제 유용할까요?
-
-## 큰 그림
-
-![Algorithms with Python 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/03/03-01-big-picture.ko.png)
-
-*Algorithms with Python 101 3장 흐름 개요*
 
 ## 왜 중요한가
 

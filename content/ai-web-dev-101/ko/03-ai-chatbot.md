@@ -29,17 +29,15 @@ seo_description: Next.js와 Vercel AI SDK로 스트리밍 채팅 UI를 만들며
 
 여기서는 브라우저에서 AI와 실시간으로 대화하는 챗봇 UI를 구현해 보겠습니다. 이 편은 시리즈 안에서 잠시 프론트엔드로 이동하는 글이므로 Node.js, npm, React 기본기와 Next.js App Router 구조를 안다는 전제로 설명합니다.
 
+
+![AI Web Development 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/03/chatbot-architecture-overview.ko.png)
+*AI Web Development 101 3장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 터미널 예제를 브라우저 UI로 옮기려면 어떤 구성이 필요할까요?
 - 왜 Next.js와 Vercel AI SDK 조합이 입문에 잘 맞을까요?
 - `/api/chat` 경로는 어떤 역할을 맡아야 할까요?
-
-## 큰 그림
-
-![AI Web Development 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/03/chatbot-architecture-overview.ko.png)
-
-*AI Web Development 101 3장 흐름 개요*
 
 ## 왜 Next.js와 Vercel AI SDK인가
 
@@ -438,7 +436,6 @@ vercel env add AI_MODEL production
 - "도움이 되지 않았다" 피드백 비율
 
 이 다섯 가지 지표만 있어도 프론트 문제인지, 모델 문제인지, 검색 문제인지 빠르게 분류할 수 있습니다.
-
 
 
 ## 장애 대응을 위한 사용자 메시지 정책

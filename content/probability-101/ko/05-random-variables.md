@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 이 글은 Probability 101 시리즈의 5번째 글입니다. 여기서는 확률변수의 정의, 이산형과 연속형의 차이, PMF·PDF·CDF의 역할, 그리고 샘플링으로 분포를 확인하는 방법을 정리하겠습니다.
 
+
+![Probability 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/05/05-01-diagram.ko.png)
+*Probability 101 5장 흐름 개요*
+> 확률변수은 구체적인 가정과 한계를 함께 봐야 합니다.
+
 ## 먼저 던지는 질문
 
 - 확률변수는 왜 사건보다 한 단계 더 강한 표현일까요?
 - 이산형과 연속형은 무엇이 다를까요?
 - PMF, PDF, CDF는 각각 어떤 질문에 답할까요?
-
-## 큰 그림
-
-![Probability 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/05/05-01-diagram.ko.png)
-
-*Probability 101 5장 흐름 개요*
-
-이 그림은 이 개념의 기본 구조를 보여줍니다.
-
-> 확률변수은 구체적인 가정과 한계를 함께 봐야 합니다.
 
 ## 왜 중요한가
 

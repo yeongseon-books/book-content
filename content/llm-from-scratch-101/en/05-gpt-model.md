@@ -35,19 +35,14 @@ This is the 5th article in the LLM from Scratch 101 series.
 
 ---
 
+![LLM from Scratch 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/05/05-01-the-forward-pass-at-a-glance.en.png)
+*LLM from Scratch 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - In what order does the GPT class call its components?
 - Why does weight tying shrink parameters without hurting quality?
 - Why does cross-entropy loss fit on one line?
-
-## Big Picture
-
-![LLM from Scratch 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/05/05-01-the-forward-pass-at-a-glance.en.png)
-
-*LLM from Scratch 101 chapter 5 flow overview*
-
-This picture places Assembly: Completing the GPT Model Class inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## The Forward Pass at a Glance
 

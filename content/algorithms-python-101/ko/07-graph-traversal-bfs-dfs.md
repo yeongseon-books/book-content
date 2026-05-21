@@ -28,17 +28,15 @@ last_reviewed: '2026-05-12'
 
 BFS와 DFS는 그래프 탐색의 두 기초 전략입니다. 둘의 차이를 분명히 이해하면 최단 경로, 사이클 검사, 연결 요소 문제를 훨씬 쉽게 다룰 수 있습니다.
 
+
+![Algorithms with Python 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/07/07-01-concept-overview.ko.png)
+*Algorithms with Python 101 7장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 그래프의 기본 개념과 Python에서의 표현 방식은 무엇일까요?
 - BFS는 어떤 원리로 동작하고 언제 써야 할까요?
 - DFS는 어떤 원리로 동작하고 언제 써야 할까요?
-
-## 큰 그림
-
-![Algorithms with Python 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/07/07-01-concept-overview.ko.png)
-
-*Algorithms with Python 101 7장 흐름 개요*
 
 ## 왜 중요한가
 

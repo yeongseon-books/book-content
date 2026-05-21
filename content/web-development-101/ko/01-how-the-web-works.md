@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 브라우저, DNS, HTTP, 서버, 렌더링이 어떤 순서로 맞물리는지 전체 지도를 먼저 잡겠습니다.
 
+
+![Web Development 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/01/01-01-concept-at-a-glance.ko.png)
+*Web Development 101 1장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - URL을 입력한 뒤 화면이 보일 때까지 어떤 단계가 지나갈까요?
 - DNS와 HTTP는 각각 어떤 역할을 맡을까요?
 - 서버가 응답을 보내면 브라우저는 그 데이터를 어떻게 화면으로 바꿀까요?
-
-## 큰 그림
-
-![Web Development 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/01/01-01-concept-at-a-glance.ko.png)
-
-*Web Development 101 1장 흐름 개요*
 
 ## 왜 이 흐름이 중요한가
 
@@ -71,7 +69,7 @@ last_reviewed: '2026-05-15'
 
 ## 전후 비교로 보는 감각 차이
 
-**Before (raw IP)**
+**Before (IP 직접 입력)**
 
 ```python
 # 외우기 어렵다
@@ -79,7 +77,7 @@ import socket
 ip = "93.184.216.34"
 ```
 
-**After (use a domain)**
+**After (도메인 사용)**
 
 ```python
 import socket

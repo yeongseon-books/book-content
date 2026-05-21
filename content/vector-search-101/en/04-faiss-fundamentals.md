@@ -28,21 +28,15 @@ This is post 4 in the Vector Search 101 series.
 
 This post covers the baseline FAISS workflow you need before tuning larger ANN deployments.
 
+![FAISS index type comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/04/04-01-faiss-fundamentals-fast-approximate-near.en.png)
+*FAISS index type comparison structure*
+> The best way to understand FAISS is not as a smarter database, but as a compute engine dedicated to vector search.
+
 ## Questions to Keep in Mind
 
 - Where does a simple loop over vectors stop being good enough?
 - What assumption should decide between IndexFlatIP and IndexFlatL2?
 - When saving and reloading an index, how do vectors and metadata stay aligned?
-
-## Big Picture
-
-![FAISS index type comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/04/04-01-faiss-fundamentals-fast-approximate-near.en.png)
-
-*FAISS index type comparison structure*
-
-This picture follows a query vector through a FAISS index to retrieve nearest vector ids, then reconnect those ids to source metadata. FAISS handles fast lookup, but the application still owns metric choice and metadata alignment.
-
-> The best way to understand FAISS is not as a smarter database, but as a compute engine dedicated to vector search.
 
 ## Installation
 

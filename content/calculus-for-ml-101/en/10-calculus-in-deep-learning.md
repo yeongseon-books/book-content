@@ -30,19 +30,15 @@ In this post, we'll walk through the forward pass, loss computation, backward pa
 
 > In deep learning, calculus is the common language that turns prediction error into parameter movement, one training step at a time.
 
+
+![calculus for ml 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/10/10-01-concept-at-a-glance.en.png)
+*calculus for ml 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Calculus in Deep Learning?
 - Which signal should the example or diagram make visible for Calculus in Deep Learning?
 - What failure should be prevented first when Calculus in Deep Learning reaches a real system?
-
-## Big Picture
-
-![calculus for ml 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/10/10-01-concept-at-a-glance.en.png)
-
-*calculus for ml 101 chapter 10 flow overview*
-
-This picture places Calculus in Deep Learning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions this article answers
 

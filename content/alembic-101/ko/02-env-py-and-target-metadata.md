@@ -27,17 +27,15 @@ seo_description: Alembic의 부트 스크립트인 env.py 설정법과 target_me
 
 1편에서 `alembic init`까지 마쳤더라도 그 상태의 Alembic은 여러분 모델을 모릅니다. 이 연결을 `env.py`에서 제대로 하지 못하면 `alembic revision --autogenerate`는 즉시 신뢰를 잃습니다.
 
+
+![Alembic 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/02/02-01-diagram-where-env-py-assembles-metadata.ko.png)
+*Alembic 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - `env.py`는 정확히 무엇이고 언제 실행될까요?
 - 왜 `target_metadata`는 선택 사항이 아니라 필수일까요?
 - DB URL을 환경 변수에서 안전하게 읽는 패턴은 어떻게 만들까요?
-
-## 큰 그림
-
-![Alembic 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/02/02-01-diagram-where-env-py-assembles-metadata.ko.png)
-
-*Alembic 101 2장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -477,7 +475,6 @@ table already exists -> baseline/stamp 전략 점검 필요
 원칙을 문서가 아니라 PR 템플릿과 CI로 강제하는 것이 핵심입니다.
 
 
-
 ## 확장 부록: 배포/복구 실습 시나리오
 
 ### 시나리오 A: add column + backfill + tighten
@@ -546,7 +543,6 @@ alembic upgrade head --sql > /tmp/migration-preview.sql
 ```
 
 이 게이트들은 Alembic 자체 기능이라기보다 팀 운영 안전장치입니다.
-
 
 
 ## 보강 메모: 검증 중심 운영 노트

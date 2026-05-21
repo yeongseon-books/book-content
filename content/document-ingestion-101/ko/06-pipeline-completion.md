@@ -26,21 +26,15 @@ seo_description: 완성된 수집 파이프라인은 단계 수보다 단계 간
 
 여기서는 앞선 조각들을 하나의 재현 가능한 흐름으로 연결하고, 인덱스를 저장한 뒤 다시 불러와 검색까지 되는지 확인합니다.
 
+![End-to-end ingestion pipeline flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/06/06-01-end-to-end-ingestion-pipeline.ko.png)
+*End-to-end ingestion pipeline flow*
+> 완성된 수집 파이프라인은 단계 수가 아니라, 각 단계가 다음 단계로 깨지지 않고 넘겨지는지로 판단해야 합니다.
+
 ## 먼저 던지는 질문
 
 - 완성된 문서 수집 파이프라인은 어떤 단계별 검증 체크포인트를 가져야 할까요?
 - 파싱, 정규화, 청킹, 인덱싱 중 어디서 실패했는지 어떻게 빠르게 알 수 있을까요?
 - 운영에서 재실행 가능한 파이프라인으로 만들려면 어떤 산출물을 남겨야 할까요?
-
-## 큰 그림
-
-![End-to-end ingestion pipeline flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/06/06-01-end-to-end-ingestion-pipeline.ko.png)
-
-*End-to-end ingestion pipeline flow*
-
-이 그림에서는 파일 수집부터 파싱, 정규화, 청킹, 임베딩, 인덱싱, 검증 리포트까지 이어지는 전체 흐름을 봅니다. 완성된 파이프라인은 한 번 성공하는 스크립트가 아니라 단계별로 멈추고 재실행할 수 있는 구조입니다.
-
-> 완성된 수집 파이프라인은 단계 수가 아니라, 각 단계가 다음 단계로 깨지지 않고 넘겨지는지로 판단해야 합니다.
 
 ## 엔드투엔드 수집 파이프라인
 

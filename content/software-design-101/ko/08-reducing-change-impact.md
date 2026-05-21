@@ -32,17 +32,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 변경의 폭발 반경을 어떻게 줄일지, OCP를 실무에서 어떻게 해석해야 할지, expand-contract 패턴과 feature flag를 어떻게 조합할지, 운영 중인 시스템에서 새 경로와 옛 경로를 병행하는 감각은 무엇인지 설명합니다.
 
+
+![Software Design 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/08/08-01-concept-at-a-glance.ko.png)
+*Software Design 101 8장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 한 번의 변경이 얼마나 넓게 퍼지는지 어떻게 가늠할까요?
 - OCP는 실제 코드에서 어떤 모습으로 나타날까요?
 - 새 경로를 추가할 때 왜 기존 경로를 바로 지우지 않을까요?
-
-## 큰 그림
-
-![Software Design 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/08/08-01-concept-at-a-glance.ko.png)
-
-*Software Design 101 8장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -446,7 +444,6 @@ class PlaceOrderService:
 - 인프라 계층: 외부 API 오류율, DB 지연 시간
 
 지표를 계층별로 분리해 보면 어디를 고쳐야 하는지가 명확해집니다. 모든 지표가 한 대시보드에서 섞여 있으면 "느리다"는 사실만 보이고 원인은 보이지 않습니다. 설계 경계를 운영 지표 경계와 맞추면 개선 사이클이 빠르게 돌아갑니다.
-
 
 
 ## 리뷰와 리팩터링을 위한 실전 질문 세트

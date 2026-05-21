@@ -24,21 +24,16 @@ The guardrails in Episodes 1 through 9 are useful on their own, but production d
 
 This is the final post in the AI Safety & Guardrails 101 series. It turns the earlier guardrails into a single production architecture you can reason about end to end.
 
+
+![Four-Layer Architecture](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/10/10-01-four-layer-architecture.en.png)
+*Four-Layer Architecture*
+> A production guardrail system is not one place where risk is stopped; it is a pipeline where each boundary controls a different failure.
+
 ## Questions to Keep in Mind
 
 - Why should a production guardrail system be a boundary-specific pipeline instead of one filter?
 - By what risk criteria should fail-open and fail-closed behavior be chosen?
 - How do performance budgets, observability, and CI regression fit into one system?
-
-## Big Picture
-
-![Four-Layer Architecture](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/10/10-01-four-layer-architecture.en.png)
-
-*Four-Layer Architecture*
-
-This picture splits guardrail responsibility across input, retrieval/context, model output, and tool/action layers. A production guardrail is not one universal filter; it is a system that controls different risks at different boundaries.
-
-> A production guardrail system is not one place where risk is stopped; it is a pipeline where each boundary controls a different failure.
 
 ## Wiring Nine Components Into One System
 

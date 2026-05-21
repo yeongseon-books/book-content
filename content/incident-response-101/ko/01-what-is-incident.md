@@ -30,21 +30,16 @@ last_reviewed: '2026-05-15'
 
 이 글은 Incident Response 101 시리즈의 첫 번째 글입니다. 여기서는 장애와 일반 버그를 가르는 기준, 고객 영향 중심의 정의, 그리고 초보 온콜 담당자가 처음부터 붙잡아야 할 판단 축을 정리합니다.
 
+
+![Incident Response 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/01/01-01-diagram-at-a-glance.ko.png)
+*Incident Response 101 1장 흐름 개요*
+> Incident 판정의 핵심은 사람의 감각이 아니라 합의한 임계값입니다. 팀이 정한 기준이 있을 때 반복 가능하고 일관된 대응이 가능합니다.
+
 ## 먼저 던지는 질문
 
 - 어떤 문제를 incident라고 불러야 할까요?
 - alert와 incident는 무엇이 다를까요?
 - 고객 영향은 어떤 식으로 수치화해야 할까요?
-
-## 큰 그림
-
-![Incident Response 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/01/01-01-diagram-at-a-glance.ko.png)
-
-*Incident Response 101 1장 흐름 개요*
-
-이 그림의 핵심은 모든 알림이 incident는 아니라는 점입니다. 고객 영향이라는 기준이 있어야 alert, bug, outage를 구분하고, 누구를 깨울지 결정할 수 있습니다.
-
-> Incident 판정의 핵심은 사람의 감각이 아니라 합의한 임계값입니다. 팀이 정한 기준이 있을 때 반복 가능하고 일관된 대응이 가능합니다.
 
 ## 왜 이 주제가 중요한가
 

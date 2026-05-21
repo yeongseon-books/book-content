@@ -30,20 +30,16 @@ title: "Math for CS 101 (3/10): 집합과 함수"
 
 여기서는 집합과 함수를 자료구조와 데이터 모델의 바닥 문법으로 보고, 코드와 연결되는 감각을 분명하게 잡아 보겠습니다.
 
+
+![Math for CS 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/03/03-01-concept-at-a-glance.ko.png)
+*Math for CS 101 3장 흐름 개요*
+> 집합과 함수는 추상적 개념이 아니라, 타입 시스템과 데이터 매핑의 수학적 기초입니다.
+
 ## 먼저 던지는 질문
 
 - 집합은 왜 자료구조와 데이터 모델의 기초라고 할까요?
 - 합집합, 교집합, 차집합은 코드에서 어떻게 보일까요?
 - 함수와 관계는 무엇이 다를까요?
-
-## 큰 그림
-
-![Math for CS 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/03/03-01-concept-at-a-glance.ko.png)
-
-*Math for CS 101 3장 흐름 개요*
-이 그림은 집합과 함수를 프로그래머 관점에서 타입과 매핑으로 읽는 방법을 보여줍니다.
-
-> 집합과 함수는 추상적 개념이 아니라, 타입 시스템과 데이터 매핑의 수학적 기초입니다.
 
 ## 왜 중요한가
 

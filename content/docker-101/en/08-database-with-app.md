@@ -28,19 +28,15 @@ That is why a dependable database setup has a rhythm: persist the data, wait for
 
 This is post 8 in the Docker 101 series. It uses PostgreSQL and FastAPI to show how Compose, healthchecks, migrations, and idempotent seeding fit together when the goal is not just “it boots” but “it boots predictably.”
 
+
+![docker 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/08/08-01-concept-at-a-glance.en.png)
+*docker 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - Running *PostgreSQL with Compose?
 - Healthchecks* and *startup order?
 - Automating *Alembic migrations?
-
-## Big Picture
-
-![docker 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/08/08-01-concept-at-a-glance.en.png)
-
-*docker 101 chapter 8 flow overview*
-
-This picture places Running with a Database inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

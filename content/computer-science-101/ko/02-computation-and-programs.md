@@ -29,17 +29,15 @@ last_reviewed: '2026-05-12'
 
 여기서는 계산의 이론적 정의, 계산할 수 없는 문제, 그리고 프로그래밍 언어와 패러다임이 그 계산을 어떻게 사람의 언어로 옮기는지 함께 살펴보겠습니다.
 
+
+![Computer Science 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/02/02-01-concept-at-a-glance.ko.png)
+*Computer Science 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 무엇을 두고 계산 가능하다고 말할 수 있을까요?
 - 튜링 기계는 왜 오늘날의 컴퓨터를 설명하는 기준 모델로 남아 있을까요?
 - 정지 문제처럼 원리적으로 풀 수 없는 문제는 무엇을 의미할까요?
-
-## 큰 그림
-
-![Computer Science 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/02/02-01-concept-at-a-glance.ko.png)
-
-*Computer Science 101 2장 흐름 개요*
 
 ## 이 글에서 배울 것
 

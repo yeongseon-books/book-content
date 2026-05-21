@@ -25,17 +25,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 Computer Networks 101 시리즈의 5번째 글입니다.
 
+
+![Computer Networks 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/05/05-01-concept-at-a-glance.ko.png)
+*Computer Networks 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - HTTP 메시지는 어떤 모양으로 구성될까요?
 - 메서드와 상태 코드는 왜 의미를 정확히 지켜야 할까요?
 - `Content-Type`, `Cache-Control`, `Authorization` 같은 헤더는 왜 중요할까요?
-
-## 큰 그림
-
-![Computer Networks 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/05/05-01-concept-at-a-glance.ko.png)
-
-*Computer Networks 101 5장 흐름 개요*
 
 ## 왜 중요한가
 

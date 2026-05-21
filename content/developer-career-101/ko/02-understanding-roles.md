@@ -26,21 +26,16 @@ last_reviewed: '2026-05-14'
 
 이 글은 Developer Career 101 시리즈의 2번째 글입니다.
 
+
+![Developer Career 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/02/02-01-concept-at-a-glance.ko.png)
+*Developer Career 101 2장 흐름 개요*
+> 직무를 선택할 때 중요한 것은 회사 규모가 아니라, 주어지는 문제의 크기와 그 문제를 혼자 풀 수 있는지, 팀과 함께 풀어야 하는지입니다.
+
 ## 먼저 던지는 질문
 
 - 프론트엔드, 백엔드, 데이터, SRE, ML, 모바일 직무는 실제로 무엇이 다를까요?
 - 같은 개발자라는 이름 아래에서도 책임, 도구, 지표가 왜 완전히 달라질까요?
 - 지금 역할이 나와 맞는지, 아니면 전환을 고민해야 하는지 어떻게 판단할 수 있을까요?
-
-## 큰 그림
-
-![Developer Career 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/02/02-01-concept-at-a-glance.ko.png)
-
-*Developer Career 101 2장 흐름 개요*
-
-직무별로 요구하는 문제 해결 수준과 협업 범위가 다릅니다. 직함은 같아도 실제 일하는 방식이 크게 달라질 수 있습니다.
-
-> 직무를 선택할 때 중요한 것은 회사 규모가 아니라, 주어지는 문제의 크기와 그 문제를 혼자 풀 수 있는지, 팀과 함께 풀어야 하는지입니다.
 
 ## 이 글에서 배울 것
 
@@ -383,7 +378,6 @@ task = PythonOperator(task_id="extract", python_callable=extract_orders, dag=dag
 ## 실천 메모
 
 이 섹션은 본문의 핵심을 실무 행동으로 전환하기 위한 메모입니다. 이번 주에 바로 실행할 한 가지를 정하고, 실행 결과를 수치 또는 관찰 가능한 문장으로 남기면 다음 회고에서 방향을 빠르게 수정할 수 있습니다. 계획은 길수록 좋은 것이 아니라, 반복 가능한 행동으로 내려올수록 강해집니다.
-
 
 
 ## 채용 공고 기반 직무 적합도 매트릭스

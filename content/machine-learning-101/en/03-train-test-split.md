@@ -26,19 +26,15 @@ A model can brag about 99% training accuracy and still be useless the moment it 
 
 This is post 3 in the Machine Learning 101 series. Here we will use train/test splits, stratification, seeds, and cross-validation to turn “the model seems good” into an experiment that measures generalization.
 
+
+![machine learning 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/03/03-01-concept-at-a-glance.en.png)
+*machine learning 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - What do the train, validation, and test sets each protect?
 - Why should `random_state` be fixed even in small experiments?
 - How does `stratify` help on imbalanced classes?
-
-## Big Picture
-
-![machine learning 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/03/03-01-concept-at-a-glance.en.png)
-
-*machine learning 101 chapter 3 flow overview*
-
-This picture places Train/Test Split inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

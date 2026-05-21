@@ -27,19 +27,15 @@ Cleaning, deduplication, PII handling, tokenization, filtering, and splitting al
 
 This is the final post in the AI Data Preparation 101 series. Here we cover how to turn the earlier stages into a production data pipeline with reproducibility and observability built in.
 
+
+![Architecture - a 6-stage pipeline](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/10/10-01-architecture-a-6-stage-pipeline.en.png)
+*Architecture - a 6-stage pipeline*
+
 ## Questions to Keep in Mind
 
 - Which system properties turn a set of preprocessing scripts into a production pipeline?
 - How do versioning, fingerprints, and cache keys work together to preserve reproducibility?
 - What operational value do orchestrators such as Airflow add beyond a cron job?
-
-## Big Picture
-
-![Architecture - a 6-stage pipeline](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/10/10-01-architecture-a-6-stage-pipeline.en.png)
-
-*Architecture - a 6-stage pipeline*
-
-This picture places Building a Production Data Pipeline inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## "How do I tie everything we learned into one pipeline?"
 

@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 포크, 브랜치, 커밋, 설명, 리뷰 대응까지 포함해 메인테이너가 반기는 작은 풀 리퀘스트를 만드는 기본 절차를 정리하겠습니다.
 
+
+![Open Source 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/04/04-01-put-the-flow-in-your-head-first.ko.png)
+*Open Source 101 4장 흐름 개요*
+> PR을 보내는 것은 완성된 코드를 제출하는 일이 아닙니다. **피드백을 받으면서 함께 코드를 개선하는 과정**입니다.
+
 ## 먼저 던지는 질문
 
 - 메인테이너가 반기는 풀 리퀘스트는 어떤 모양일까요?
 - 포크, 브랜치, 커밋, 풀 리퀘스트 흐름을 왜 매번 분리해야 할까요?
 - 커밋 메시지와 풀 리퀘스트 설명은 각각 어떤 역할을 할까요?
-
-## 큰 그림
-
-![Open Source 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/04/04-01-put-the-flow-in-your-head-first.ko.png)
-
-*Open Source 101 4장 흐름 개요*
-
-이 그림은 PR이 단순한 코드 제출이 아니라 **공동 검토 프로세스**임을 보여줍니다. 제안, 토론, 수정, 최종 승인이 모두 기록되고, 이 흐름 자체가 문화를 만듭니다.
-
-> PR을 보내는 것은 완성된 코드를 제출하는 일이 아닙니다. **피드백을 받으면서 함께 코드를 개선하는 과정**입니다.
 
 ## 왜 중요한가
 

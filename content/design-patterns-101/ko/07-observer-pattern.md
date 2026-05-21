@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 이번 글에서는 Observer 패턴을 직접 호출을 통지로 바꾸는 구조로 설명하겠습니다. 핵심은 발행자가 구독자를 몰라도 되게 만들어, 변경의 파급을 느슨한 연결로 바꾸는 것입니다.
 
+
+![Design Patterns 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/07/07-01-concept-at-a-glance.ko.png)
+*Design Patterns 101 7장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - Observer 패턴은 어떤 결합 문제를 줄여 줄까요?
 - Subject, Observer, subscribe, notify는 각각 어떤 역할일까요?
 - 동기 알림과 비동기 알림은 어디서 갈릴까요?
-
-## 큰 그림
-
-![Design Patterns 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/07/07-01-concept-at-a-glance.ko.png)
-
-*Design Patterns 101 7장 흐름 개요*
 
 ## 왜 중요한가
 

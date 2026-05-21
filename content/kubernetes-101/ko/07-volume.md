@@ -28,17 +28,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 Volume을 단순히 디스크를 붙이는 기능이 아니라, 파드의 수명과 데이터의 수명을 분리해 stateful 워크로드를 운영 가능하게 만드는 저장소 모델로 정리하겠습니다.
 
+
+![Kubernetes 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/07/07-01-concept-at-a-glance.ko.png)
+*Kubernetes 101 7장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 파드가 재시작되면 컨테이너 파일시스템은 왜 사라질까요?
 - `emptyDir`와 PVC는 어떤 순간에 갈라질까요?
 - StorageClass는 단순 옵션이 아니라 무엇을 결정할까요?
-
-## 큰 그림
-
-![Kubernetes 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/07/07-01-concept-at-a-glance.ko.png)
-
-*Kubernetes 101 7장 흐름 개요*
 
 ## 왜 중요한가
 

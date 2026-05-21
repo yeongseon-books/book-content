@@ -30,19 +30,15 @@ Here, we will treat HPA as a control loop that adjusts Deployment replica count 
 
 > HPA is only as good as the metrics it can trust and the cluster capacity that can satisfy the scaling decision.
 
+
+![kubernetes 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/08/08-01-concept-at-a-glance.en.png)
+*kubernetes 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - where *HPA* fits?
 - why *metrics-server* matters?
 - CPU/memory* targets?
-
-## Big Picture
-
-![kubernetes 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/08/08-01-concept-at-a-glance.en.png)
-
-*kubernetes 101 chapter 8 flow overview*
-
-This picture places HPA inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

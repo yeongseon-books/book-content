@@ -30,19 +30,15 @@ This is post 4 in the Object-Oriented Programming 101 series.
 
 > Inheritance lets a new class (child) receive attributes and methods from an existing class (parent). It reduces code duplication and expresses hierarchical relationships. This article covers single inheritance, method overriding, `super()`, and multiple inheritance with MRO.
 
+
+![Object-Oriented Programming 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/04/04-01-concept-overview.en.png)
+*Object-Oriented Programming 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Inheritance?
 - Which signal should the example or diagram make visible for Inheritance?
 - What failure should be prevented first when Inheritance reaches a real system?
-
-## Big Picture
-
-![Object-Oriented Programming 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/04/04-01-concept-overview.en.png)
-
-*Object-Oriented Programming 101 chapter 4 flow overview*
-
-This picture places Inheritance inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

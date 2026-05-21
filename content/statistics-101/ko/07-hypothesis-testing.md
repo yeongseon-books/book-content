@@ -30,21 +30,16 @@ last_reviewed: '2026-05-12'
 
 이 글은 Statistics 101 시리즈의 7번째 글입니다. 여기서는 귀무가설과 대립가설, t-test의 기본 흐름, 1종 오류와 2종 오류, 검정력이 왜 실무에서 빠지면 안 되는 개념인지 정리하겠습니다.
 
+
+![Statistics 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/07/07-01-concept-at-a-glance.ko.png)
+*Statistics 101 7장 흐름 개요*
+> 가설검정의 목표는 p-value 찾기가 아니라, 증거의 강도로 판단을 명확히 하는 것입니다.
+
 ## 먼저 던지는 질문
 
 - 데이터로 “차이가 있다”는 말을 어디까지 할 수 있을까요?
 - 귀무가설 H0와 대립가설 H1은 무엇을 뜻할까요?
 - p-value만으로 판단하면 왜 부족할까요?
-
-## 큰 그림
-
-![Statistics 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/07/07-01-concept-at-a-glance.ko.png)
-
-*Statistics 101 7장 흐름 개요*
-
-가설검정은 '관찰한 차이가 우연의 범위 안에 있는가, 아니면 진짜 변화인가'를 판단하는 절차입니다. 통계학이 의사결정을 직접 내려주지는 않지만, 불확실성 수준을 정량화합니다.
-
-> 가설검정의 목표는 p-value 찾기가 아니라, 증거의 강도로 판단을 명확히 하는 것입니다.
 
 ## 왜 중요한가
 

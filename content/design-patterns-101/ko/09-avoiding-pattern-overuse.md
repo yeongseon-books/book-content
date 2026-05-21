@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 이번 글에서는 패턴을 잘 아는 것과 패턴을 잘 쓰는 것이 왜 다른지 정리하겠습니다. 핵심은 패턴이 문제를 부르는 것이 아니라, 반복되는 문제가 패턴을 불러야 한다는 사실입니다.
 
+
+![Design Patterns 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/09/09-01-concept-at-a-glance.ko.png)
+*Design Patterns 101 9장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 좋은 패턴이 어떻게 나쁜 코드로 바뀔까요?
 - 단순한 대안은 왜 종종 더 강할까요?
 - YAGNI는 패턴 선택과 어떤 관계가 있을까요?
-
-## 큰 그림
-
-![Design Patterns 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/09/09-01-concept-at-a-glance.ko.png)
-
-*Design Patterns 101 9장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -59,7 +57,7 @@ last_reviewed: '2026-05-15'
 
 ## 변경 전후 비교
 
-**Before (overdone)**
+**Before (과도한 적용)**
 
 ```python
 # Just one algorithm — but Strategy plus Factory plus Builder
@@ -69,7 +67,7 @@ class GreetFactory: ...
 class GreetBuilder: ...
 ```
 
-**After (simple)**
+**After (단순한 구조)**
 
 ```python
 def greet(name): return f"Hello, {name}"

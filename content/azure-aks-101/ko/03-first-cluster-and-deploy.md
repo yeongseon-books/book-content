@@ -28,21 +28,15 @@ Kubernetes는 개념만 오래 붙들고 있으면 필요 이상으로 추상적
 
 여기서는 앞의 두 글에서 본 구조를 실제 배포 흐름으로 연결하겠습니다. **작은 AKS 클러스터를 만들고, user node pool을 추가하고, FastAPI 앱을 컨테이너로 빌드해 Deployment와 Service로 올리는 과정**을 통해 AKS의 기본 운영 언어를 손에 익히겠습니다.
 
+![Azure Kubernetes Service 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/03/03-01-today-s-flow.ko.png)
+*Azure Kubernetes Service 101 3장 흐름 개요*
+> 첫 클러스터 만들고 앱 배포하기 — Python/FastAPI의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - 실습용 AKS 클러스터를 만들 때 최소한 무엇을 결정해야 할까요?
 - 기본 system pool 외에 user node pool을 왜 별도로 추가하는 편이 좋을까요?
 - `az aks get-credentials` 이후 `kubectl`이 실제로 어떤 계층과 대화하게 될까요?
-
-## 큰 그림
-
-![Azure Kubernetes Service 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/03/03-01-today-s-flow.ko.png)
-
-*Azure Kubernetes Service 101 3장 흐름 개요*
-
-이 그림에서는 첫 클러스터 만들고 앱 배포하기 — Python/FastAPI를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 첫 클러스터 만들고 앱 배포하기 — Python/FastAPI의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

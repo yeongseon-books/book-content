@@ -31,19 +31,15 @@ In this post, we look at separation of concerns as a way to split code by reason
 
 > When one module changes for more than one reason, it already does too much.
 
+
+![software design 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/02/02-01-concept-at-a-glance.en.png)
+*software design 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Separation of Concerns?
 - Which signal should the example or diagram make visible for Separation of Concerns?
 - What failure should be prevented first when Separation of Concerns reaches a real system?
-
-## Big Picture
-
-![software design 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/02/02-01-concept-at-a-glance.en.png)
-
-*software design 101 chapter 2 flow overview*
-
-This picture places Separation of Concerns inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

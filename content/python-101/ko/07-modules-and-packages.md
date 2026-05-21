@@ -28,21 +28,16 @@ Python에서 모듈은 한 번 실행되면 캐시되는 namespace이고, 패키
 
 이 글은 Python 101 시리즈의 일곱 번째 글입니다.
 
+
+![Python 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-101/07/07-01-mental-model.ko.png)
+*Python 101 7장 흐름 개요*
+> 모듈과 패키지: import, __init__, __name__의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - 같은 이름의 함수와 변수가 충돌합니다?
 - 어떤 함수가 어디서 정의됐는지 찾기 어렵습니다?
 - 다른 프로젝트에서 같은 코드를 재사용하기 힘듭니다?
-
-## 큰 그림
-
-![Python 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-101/07/07-01-mental-model.ko.png)
-
-*Python 101 7장 흐름 개요*
-
-이 그림에서는 모듈과 패키지: import, __init__, __name__를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 모듈과 패키지: import, __init__, __name__의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 멘탈 모델
 

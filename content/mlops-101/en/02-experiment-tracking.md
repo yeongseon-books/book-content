@@ -30,21 +30,16 @@ This is post 2 in the MLOps 101 series.
 
 Here, we will treat experiment tracking as the team's short-term memory and focus on what must be recorded so results can be reproduced and compared.
 
+
+![mlops 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/02/02-01-see-the-flow-first.en.png)
+*mlops 101 chapter 2 flow overview*
+> An experiment tracker is not a pretty dashboard. It is the shared memory system that stores each training run in one comparable format so the team never repeats the same mistake twice.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Experiment Tracking?
 - Which signal should the example or diagram make visible for Experiment Tracking?
 - What failure should be prevented first when Experiment Tracking reaches a real system?
-
-## Big Picture
-
-![mlops 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/02/02-01-see-the-flow-first.en.png)
-
-*mlops 101 chapter 2 flow overview*
-
-This picture places Experiment Tracking inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> An experiment tracker is not a pretty dashboard. It is the shared memory system that stores each training run in one comparable format so the team never repeats the same mistake twice.
 
 ## Questions this article answers
 

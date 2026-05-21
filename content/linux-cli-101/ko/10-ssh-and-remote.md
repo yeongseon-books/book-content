@@ -28,17 +28,14 @@ seo_description: SSH 접속, 키 인증, scp와 rsync를 통한 원격 작업의
 개발한 코드를 서버에 배포하고, 서버 로그를 확인하고, 데이터베이스에 접속하는 일은 모두 원격 접속에서 시작됩니다. SSH는 이 모든 원격 작업의 기반입니다.
 
 
+![Linux CLI 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/10/10-01-big-picture.ko.png)
+*Linux CLI 101 10장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - SSH는 Telnet 대신 왜 기본 원격 접속 수단이 되었을까요?
 - 비밀번호 인증과 키 기반 인증은 어떤 차이를 만들까요?
 - `~/.ssh/config`는 접속 흐름을 어떻게 단순하게 만들까요?
-
-## 큰 그림
-
-![Linux CLI 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/10/10-01-big-picture.ko.png)
-
-*Linux CLI 101 10장 흐름 개요*
 
 ## 머릿속에 먼저 그릴 그림
 

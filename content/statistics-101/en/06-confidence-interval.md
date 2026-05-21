@@ -28,21 +28,16 @@ Confidence belongs to the procedure that generated the interval, not to the one 
 
 This is post 6 in the Statistics 101 series. Here we will pin down what a 95% confidence interval actually means, why small samples push us toward the t-distribution, and when bootstrap intervals are the more natural fallback.
 
+
+![statistics 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/06/06-01-concept-at-a-glance.en.png)
+*statistics 101 chapter 6 flow overview*
+> A confidence interval transforms *uncertainty* into a *range*—a way to communicate what you know and don't know.
+
 ## Questions to Keep in Mind
 
 - What does a 95% confidence interval really mean?
 - Why should we switch to the t-distribution on small samples?
 - What can we use when the distribution is skewed?
-
-## Big Picture
-
-![statistics 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/06/06-01-concept-at-a-glance.en.png)
-
-*statistics 101 chapter 6 flow overview*
-
-This picture places Confidence Interval inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A confidence interval transforms *uncertainty* into a *range*—a way to communicate what you know and don't know.
 
 ## Why It Matters
 

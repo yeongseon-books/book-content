@@ -26,17 +26,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 GitHub Actions 101 시리즈의 첫 번째 글입니다. 여기서는 GitHub Actions를 단순한 자동화 버튼이 아니라, 코드 저장소 바로 옆에서 반복 작업을 실행하는 실행 플랫폼으로 이해해 보겠습니다.
 
+
+![GitHub Actions 실행 흐름](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/01/01-01-diagram.ko.png)
+*이벤트가 워크플로우를 깨우고, 잡이 러너 위에서 스텝을 순서대로 실행하는 흐름*
+
 ## 먼저 던지는 질문
 
 - GitHub Actions는 정확히 무엇이고 CI/CD에서 어디에 놓일까요?
 - Workflow, Job, Step은 어떤 계층 구조로 이해해야 할까요?
 - 첫 워크플로우는 어떤 최소 구성으로 시작하는 편이 좋을까요?
-
-## 큰 그림
-
-![GitHub Actions 실행 흐름](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/01/01-01-diagram.ko.png)
-
-*이벤트가 워크플로우를 깨우고, 잡이 러너 위에서 스텝을 순서대로 실행하는 흐름*
 
 ## 왜 중요한가
 

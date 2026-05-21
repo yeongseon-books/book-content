@@ -26,17 +26,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 GitHub Actions 101 시리즈의 9번째 글입니다. 여기서는 repository, environment, organization secret의 차이와 `GITHUB_TOKEN` 최소 권한, OIDC, 동적 값 마스킹을 중심으로 GitHub Actions에서 비밀값을 다루는 기준을 정리하겠습니다.
 
+
+![GitHub Actions 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/09/09-01-secret.ko.png)
+*GitHub Actions 101 9장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - repository, environment, organization secret은 어떻게 구분할까요?
 - `GITHUB_TOKEN` 권한은 왜 가능한 한 좁혀야 할까요?
 - OIDC는 장기 키 문제를 어떻게 줄여 줄까요?
-
-## 큰 그림
-
-![GitHub Actions 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/09/09-01-secret.ko.png)
-
-*GitHub Actions 101 9장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -166,7 +164,6 @@ Settings > Secrets > Dependabot
 GitHub Actions에서 secret 관리는 저장, 노출, 권한, 회전을 함께 설계하는 일입니다. secret을 코드 밖에 두고, 환경별로 범위를 좁히고, `GITHUB_TOKEN`과 클라우드 인증 권한을 최소화하면 대부분의 사고 가능성을 크게 줄일 수 있습니다.
 
 다음 글에서는 지금까지 배운 모든 요소를 하나의 실전 CI/CD 파이프라인으로 묶어 보겠습니다. 트리거, 테스트, 품질 게이트, 아티팩트, Docker, 배포, secret이 실제로 어떻게 연결되는지 보는 마지막 단계입니다.
-
 
 
 ---

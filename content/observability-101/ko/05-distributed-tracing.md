@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 이 글은 Observability 101 시리즈의 5번째 글입니다.
 
+
+![Observability 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/05/05-01-concept-at-a-glance.ko.png)
+*Observability 101 5장 흐름 개요*
+> 분산 트레이싱 기초의 핵심은 도구 선택이 아니라, 언제 어디서 이 신호를 남기고 어떻게 해석할 것인가 하는 설계입니다.
+
 ## 먼저 던지는 질문
 
 - 스팬과 트레이스는 각각 무엇일까요?
 - 요청이 여러 서비스를 지날 때 문맥 전파는 왜 중요할까요?
 - 샘플링은 왜 비용 통제의 핵심일까요?
-
-## 큰 그림
-
-![Observability 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/05/05-01-concept-at-a-glance.ko.png)
-
-*Observability 101 5장 흐름 개요*
-
-분산 트레이싱 기초를 다루는 이번 장에서는 주요 개념과 실무 패턴을 봅니다. 시스템이 복잡해질수록 이 개념들이 어디에서 시작되고 어떤 결과를 만드는지 이해하는 것이 중요합니다.
-
-> 분산 트레이싱 기초의 핵심은 도구 선택이 아니라, 언제 어디서 이 신호를 남기고 어떻게 해석할 것인가 하는 설계입니다.
 
 ## 왜 중요한가
 

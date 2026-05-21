@@ -32,21 +32,16 @@ In this post, we'll compare VMs, containers, serverless, and bare metal, then co
 
 > Compute choices trade control for automation. The right answer depends less on fashion and more on the failure modes and operating rhythm of the workload.
 
+
+![cloud computing 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/04/04-01-concept-at-a-glance.en.png)
+*cloud computing 101 chapter 4 flow overview*
+> The compute choice you make cascades through cost, operational complexity, and what kinds of problems you can solve.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Compute?
 - Which signal should the example or diagram make visible for Compute?
 - What failure should be prevented first when Compute reaches a real system?
-
-## Big Picture
-
-![cloud computing 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/04/04-01-concept-at-a-glance.en.png)
-
-*cloud computing 101 chapter 4 flow overview*
-
-This picture places Compute inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> The compute choice you make cascades through cost, operational complexity, and what kinds of problems you can solve.
 
 ## Questions This Chapter Answers
 

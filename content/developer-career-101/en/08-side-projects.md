@@ -27,21 +27,16 @@ The hardest part of side projects is usually not finding ideas. It is choosing a
 
 This is post 8 in the Developer Career 101 series.
 
+
+![developer career 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/08/08-01-concept-at-a-glance.en.png)
+*developer career 101 chapter 8 flow overview*
+> Side projects are valuable not for the technology stack, but for owning the full responsibility: from gathering requirements to running production.
+
 ## Questions to Keep in Mind
 
 - What makes a side project compatible with a full-time job?
 - Why does a small MVP beat a grand vision for long-term learning?
 - How do time boxes, public releases, and feedback loops keep the work sustainable?
-
-## Big Picture
-
-![developer career 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/08/08-01-concept-at-a-glance.en.png)
-
-*developer career 101 chapter 8 flow overview*
-
-This picture places Side Projects and Learning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Side projects are valuable not for the technology stack, but for owning the full responsibility: from gathering requirements to running production.
 
 ## What You Will Learn
 

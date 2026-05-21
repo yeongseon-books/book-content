@@ -28,21 +28,16 @@ That is why logging is not just about emitting more text. It is about structure,
 
 This is post 8 in the DevOps 101 series. Here we turn logs into an operational record by using structured output, correlation IDs, and centralized analysis with tools such as Loki and Elasticsearch.
 
+
+![devops 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/08/08-01-concept-at-a-glance.en.png)
+*devops 101 chapter 8 flow overview*
+> Logs are your *time machine*: structure them so you can *replay* what went wrong *minutes* after it happened.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Logging and Analysis?
 - Which signal should the example or diagram make visible for Logging and Analysis?
 - What failure should be prevented first when Logging and Analysis reaches a real system?
-
-## Big Picture
-
-![devops 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/08/08-01-concept-at-a-glance.en.png)
-
-*devops 101 chapter 8 flow overview*
-
-This picture places Logging and Analysis inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Logs are your *time machine*: structure them so you can *replay* what went wrong *minutes* after it happened.
 
 ## Questions this article answers
 

@@ -27,19 +27,15 @@ A loop can look unchanged in source code and still slow down because one more li
 
 This is post 4 in the Computer Architecture 101 series. Here we look at registers, FLAGS, and the ALU as the CPU's immediate working set, then use real assembly to show what register pressure and spills look like in practice.
 
+
+![computer architecture 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/04/04-01-registers-alu-dataflow.en.png)
+*computer architecture 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Registers and the ALU?
 - Which signal should the example or diagram make visible for Registers and the ALU?
 - What failure should be prevented first when Registers and the ALU reaches a real system?
-
-## Big Picture
-
-![computer architecture 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/04/04-01-registers-alu-dataflow.en.png)
-
-*computer architecture 101 chapter 4 flow overview*
-
-This picture places Registers and the ALU inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

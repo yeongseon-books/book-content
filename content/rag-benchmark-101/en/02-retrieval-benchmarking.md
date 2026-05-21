@@ -26,21 +26,15 @@ A retrieval benchmark works only when questions, gold documents, ranked results,
 
 This is post 2 in the RAG Evaluation and Benchmarking 101 series.
 
+![Benchmark loop for queries and latency](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/02/02-01-benchmark-loop-for-queries-and-latency.en.png)
+*Benchmark loop for queries and latency*
+> The core of retrieval benchmarking is not the vector DB or index. It is the **repeatable loop of query, gold document, and metric collection** that lets you observe the same retriever again and again.
+
 ## Questions to Keep in Mind
 
 - What must stay fixed to turn retrieval performance from a feeling into a benchmark loop?
 - What different aspects of a retriever do hit rate, MRR, and latency measure?
 - Can a small gold set still create a meaningful regression check?
-
-## Big Picture
-
-![Benchmark loop for queries and latency](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/02/02-01-benchmark-loop-for-queries-and-latency.en.png)
-
-*Benchmark loop for queries and latency*
-
-This picture ties questions, gold documents, retrieved results, and metric calculation into one repeatable loop. A benchmark is not a specific retriever; it is the fixed loop that lets the same system be observed again.
-
-> The core of retrieval benchmarking is not the vector DB or index. It is the **repeatable loop of query, gold document, and metric collection** that lets you observe the same retriever again and again.
 
 ## Why this matters
 

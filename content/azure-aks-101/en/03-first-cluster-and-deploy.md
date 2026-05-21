@@ -28,19 +28,14 @@ This post creates a small AKS cluster, adds a user node pool, and deploys a mini
 
 This is the third post in the Azure Kubernetes Service 101 series. Here, we take the cluster model from the earlier posts and turn it into a working AKS deployment with a small FastAPI app.
 
+![azure kubernetes service 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/03/03-01-today-s-flow.en.png)
+*azure kubernetes service 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - What parameters absolutely must be decided when creating a minimal AKS cluster?
 - Should you reach for `az aks create` or Bicep/Terraform for your first cluster?
 - What permission model wires ACR (Azure Container Registry) to AKS?
-
-## Big Picture
-
-![azure kubernetes service 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/03/03-01-today-s-flow.en.png)
-
-*azure kubernetes service 101 chapter 3 flow overview*
-
-This picture places Your first cluster, your first deploy — Python/FastAPI inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Today's flow
 

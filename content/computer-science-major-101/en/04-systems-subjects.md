@@ -31,21 +31,16 @@ last_reviewed: '2026-05-14'
 
 This is post 4 in the Computer Science Major 101 series.
 
+
+![computer science major 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/04/04-01-systems-stack-map.en.png)
+*computer science major 101 chapter 4 flow overview*
+> Systems courses are not just theory—they bridge the gap between what you code and how the hardware actually runs it. That gap is where debugging happens.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Understanding Systems Subjects?
 - Which signal should the example or diagram make visible for Understanding Systems Subjects?
 - What failure should be prevented first when Understanding Systems Subjects reaches a real system?
-
-## Big Picture
-
-![computer science major 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/04/04-01-systems-stack-map.en.png)
-
-*computer science major 101 chapter 4 flow overview*
-
-This picture places Understanding Systems Subjects inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Systems courses are not just theory—they bridge the gap between what you code and how the hardware actually runs it. That gap is where debugging happens.
 
 ## What You Will Learn
 

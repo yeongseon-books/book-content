@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 RPC와 메시지 전달을 각각 하나의 통신 계약으로 보고, 어느 경계에서 어떤 방식을 택해야 하는지 선택 기준을 세웁니다.
 
+
+![Distributed Systems 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/03/03-01-concept-at-a-glance.ko.png)
+*Distributed Systems 101 3장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - RPC와 메시지 전달은 각각 무엇이며 어떻게 다를까요?
 - 동기와 비동기, 요청-응답과 발행-구독은 어디서 갈릴까요?
 - 두 모델은 각각 어떤 장단점이 있고 어디에 어울릴까요?
-
-## 큰 그림
-
-![Distributed Systems 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/03/03-01-concept-at-a-glance.ko.png)
-
-*Distributed Systems 101 3장 흐름 개요*
 
 ## 왜 중요한가
 

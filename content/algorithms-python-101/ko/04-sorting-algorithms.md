@@ -26,17 +26,15 @@ last_reviewed: '2026-05-12'
 
 이번 글에서는 "실무에서는 왜 대부분 `sorted()`를 쓰는가?"라는 질문을 중심축으로 잡고, 고전 정렬 알고리즘을 비교 재료로 활용하겠습니다. 즉, 구현 자체보다도 언제 내장 정렬이 기본 선택이고, 언제 안정성과 `key` 설계가 진짜 핵심인지까지 연결해 보겠습니다.
 
+
+![Algorithms with Python 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/04/04-01-big-picture.ko.png)
+*Algorithms with Python 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 실무에서 직접 정렬 알고리즘을 구현하는 대신 `sorted()`를 우선해야 하는 이유는 무엇일까요?
 - 세 가지 `O(n^2)` 정렬 알고리즘은 어떤 원리로 동작하며 어디까지 학습용으로 봐야 할까요?
 - 병합 정렬과 퀵 정렬은 분할 정복을 어떻게 활용할까요?
-
-## 큰 그림
-
-![Algorithms with Python 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/04/04-01-big-picture.ko.png)
-
-*Algorithms with Python 101 4장 흐름 개요*
 
 ## 왜 중요한가
 

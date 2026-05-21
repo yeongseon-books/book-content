@@ -34,19 +34,15 @@ Episode 5 covered the big picture of multimodal RAG. This episode goes deeper in
 
 We will cover how multimodal embeddings are produced, compare OpenCLIP, SigLIP, ImageBind, and Jina CLIP, build a cross-modal index with FAISS, and walk through five production pitfalls.
 
+
+![Multimodal AI 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/08/08-01-big-picture.en.png)
+*Multimodal AI 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Multimodal Embeddings and Cross-modal Search?
 - Which signal should the example or diagram make visible for Multimodal Embeddings and Cross-modal Search?
 - What failure should be prevented first when Multimodal Embeddings and Cross-modal Search reaches a real system?
-
-## Big Picture
-
-![Multimodal AI 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/08/08-01-big-picture.en.png)
-
-*Multimodal AI 101 chapter 8 flow overview*
-
-This picture places Multimodal Embeddings and Cross-modal Search inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## 1. What Is a Multimodal Embedding
 

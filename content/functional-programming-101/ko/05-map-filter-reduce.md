@@ -28,17 +28,15 @@ last_reviewed: '2026-05-12'
 
 Python에서는 리스트 컴프리헨션이 더 자주 쓰이기 때문에 이 세 함수를 낡은 문법처럼 오해하기도 합니다. 하지만 개념 자체는 여전히 중요합니다. pandas, SQL, Spark 같은 도구를 이해할 때도 결국 같은 사고방식이 반복되기 때문입니다.
 
+
+![Functional Programming 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/05/05-01-big-picture.ko.png)
+*Functional Programming 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - `map`, `filter`, `reduce`는 각각 어떤 역할을 맡을까요?
 - 반복문으로 쓰던 데이터를 선언형 파이프라인으로 어떻게 바꿀 수 있을까요?
 - 리스트 컴프리헨션과 `map`/`filter`는 언제 각각 더 적합할까요?
-
-## 큰 그림
-
-![Functional Programming 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/05/05-01-big-picture.ko.png)
-
-*Functional Programming 101 5장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -518,7 +516,6 @@ def test_sum_matches_builtin(xs: list[int]) -> None:
 이 원칙을 지키면 코드 리뷰에서 "무엇이 바뀌었는가"가 아니라 "어디에서 부수효과가 발생하는가"를 빠르게 확인할 수 있습니다.
 
 
-
 ## 검증 시나리오: 경계 조건을 먼저 잠그기
 
 실무에서 함수형 스타일이 유지되는 팀은 구현보다 먼저 검증 포인트를 고정합니다. 입력 경계, 빈 컬렉션, 정렬 안정성, 타입 변환 실패를 먼저 적어 두면 리팩터링 과정에서도 동작이 흔들리지 않습니다.
@@ -567,7 +564,6 @@ print("Pass")
 이런 검증 코드는 예제 코드가 아니라 운영 안전장치입니다. 새 규칙을 추가할 때도 기존 성질이 유지되는지 빠르게 확인할 수 있습니다.
 
 
-
 ## 리뷰 포인트: 코드 리뷰에서 바로 확인할 항목
 
 함수형 스타일을 적용한 코드 리뷰에서는 다음 네 가지를 빠르게 확인합니다. 첫째, 계산 함수가 외부 상태를 직접 읽거나 쓰지 않는지 확인합니다. 둘째, mutable 인자를 제자리에서 수정하지 않는지 확인합니다. 셋째, 파이프라인 단계의 입력과 출력 타입이 자연스럽게 연결되는지 확인합니다. 넷째, 실패 경로가 값으로 표현되는지 확인합니다.
@@ -588,7 +584,6 @@ print("Pass")
 이 항목을 PR 템플릿에 고정해 두면 스타일 논쟁보다 설계 품질을 빠르게 맞출 수 있습니다.
 
 
-
 ## 추가 메모: reduce를 안전하게 쓰는 기준
 
 `reduce`를 사용할 때는 반드시 초기값을 명시하고, 축약 연산이 결합법칙을 만족하는지 먼저 확인하는 편이 안전합니다. 이 기준을 지키면 빈 입력과 부분 집계 병합에서 버그가 크게 줄어듭니다.
@@ -601,7 +596,6 @@ assert reduce(lambda a, b: a + b, values, 0) == 15
 assert reduce(lambda a, b: a + b, [], 0) == 0
 print("Pass")
 ```
-
 
 
 ### 체크 포인트 한 줄 요약

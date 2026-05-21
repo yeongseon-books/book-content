@@ -28,19 +28,15 @@ SOLID starts making sense when one service keeps growing until every new require
 
 Rather than treating SOLID as five isolated slogans, we will use one checkout workflow and refactor it step by step. Each principle will answer a concrete design smell, not just define a rule.
 
+
+![Object-Oriented Programming 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/08/08-01-concept-overview.en.png)
+*Object-Oriented Programming 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying SOLID Principles Basics?
 - Which signal should the example or diagram make visible for SOLID Principles Basics?
 - What failure should be prevented first when SOLID Principles Basics reaches a real system?
-
-## Big Picture
-
-![Object-Oriented Programming 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/08/08-01-concept-overview.en.png)
-
-*Object-Oriented Programming 101 chapter 8 flow overview*
-
-This picture places SOLID Principles Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions This Article Answers
 

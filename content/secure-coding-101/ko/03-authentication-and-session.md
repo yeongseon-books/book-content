@@ -28,17 +28,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 인증과 세션을 한 덩어리로 보지 않고, 신원을 확인하는 단계와 그 신원을 기억하는 단계를 분리해서 보겠습니다. 이 차이를 분명히 이해해야 JWT와 세션 쿠키의 선택 기준, 로그아웃 처리, MFA 적용 지점도 함께 정리됩니다.
 
+
+![Secure Coding 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/03/03-01-concept-at-a-glance.ko.png)
+*Secure Coding 101 3장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 인증과 인가는 무엇이 다를까요?
 - 비밀번호 해시는 왜 의도적으로 느린 알고리즘을 써야 할까요?
 - 세션 쿠키와 JWT는 어떤 장단점이 있을까요?
-
-## 큰 그림
-
-![Secure Coding 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/03/03-01-concept-at-a-glance.ko.png)
-
-*Secure Coding 101 3장 흐름 개요*
 
 ## 왜 중요한가
 

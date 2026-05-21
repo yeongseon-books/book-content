@@ -24,21 +24,16 @@ last_reviewed: '2026-05-12'
 
 이 글은 DevOps 101 시리즈의 첫 번째 글입니다.
 
+
+![DevOps 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/01/01-01-diagram.ko.png)
+*DevOps 101 1장 흐름 개요*
+> DevOps의 핵심은 속도나 도구가 아니라, 빠른 배포와 안정적인 운영을 상충하지 않는 같은 목표로 함께 추구하는 것입니다.
+
 ## 먼저 던지는 질문
 
 - DevOps는 무엇이며, 왜 개발과 운영을 따로 보는 방식이 한계에 부딪혔을까요?
 - DevOps를 도구가 아니라 문화라고 말하는 이유는 무엇일까요?
 - CI, CD, SRE 같은 용어는 DevOps 흐름 안에서 어떤 역할을 할까요?
-
-## 큰 그림
-
-![DevOps 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/01/01-01-diagram.ko.png)
-
-*DevOps 101 1장 흐름 개요*
-
-이 그림은 개발과 운영 조직 사이의 경계를 보여줍니다. DevOps는 이 경계를 낮추고, 둘이 함께 보고 배울 수 있도록 만드는 접근입니다.
-
-> DevOps의 핵심은 속도나 도구가 아니라, 빠른 배포와 안정적인 운영을 상충하지 않는 같은 목표로 함께 추구하는 것입니다.
 
 ## 왜 중요한가
 

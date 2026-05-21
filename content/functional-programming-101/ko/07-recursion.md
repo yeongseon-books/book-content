@@ -28,17 +28,15 @@ last_reviewed: '2026-05-12'
 
 특히 Python은 꼬리 호출 최적화(TCO)를 지원하지 않습니다. 그래서 함수형 언어에서 자연스럽게 쓰는 재귀 패턴도 Python에서는 깊이에 따라 위험해질 수 있습니다. 이 차이를 이해해야 재귀를 예쁘기만 한 코드가 아니라 안전한 도구로 사용할 수 있습니다.
 
+
+![Functional Programming 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/07/07-01-big-picture.ko.png)
+*Functional Programming 101 7장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 재귀 함수는 어떤 구조를 가져야 안전하게 동작할까요?
 - base case는 왜 항상 먼저 생각해야 할까요?
 - Python에서 꼬리 재귀는 왜 이론만큼 실용적이지 않을까요?
-
-## 큰 그림
-
-![Functional Programming 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/07/07-01-big-picture.ko.png)
-
-*Functional Programming 101 7장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -550,7 +548,6 @@ def test_sum_matches_builtin(xs: list[int]) -> None:
 이 원칙을 지키면 코드 리뷰에서 "무엇이 바뀌었는가"가 아니라 "어디에서 부수효과가 발생하는가"를 빠르게 확인할 수 있습니다.
 
 
-
 ## 검증 시나리오: 경계 조건을 먼저 잠그기
 
 실무에서 함수형 스타일이 유지되는 팀은 구현보다 먼저 검증 포인트를 고정합니다. 입력 경계, 빈 컬렉션, 정렬 안정성, 타입 변환 실패를 먼저 적어 두면 리팩터링 과정에서도 동작이 흔들리지 않습니다.
@@ -597,7 +594,6 @@ print("Pass")
 ```
 
 이런 검증 코드는 예제 코드가 아니라 운영 안전장치입니다. 새 규칙을 추가할 때도 기존 성질이 유지되는지 빠르게 확인할 수 있습니다.
-
 
 
 ## 리뷰 포인트: 코드 리뷰에서 바로 확인할 항목

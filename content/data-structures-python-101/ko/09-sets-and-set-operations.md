@@ -24,17 +24,15 @@ last_reviewed: '2026-05-17'
 
 이 글은 Data Structures with Python 101 시리즈의 아홉 번째 글입니다.
 
+
+![Data Structures with Python 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/09/09-01-set.ko.png)
+*Data Structures with Python 101 9장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - `set`은 왜 중복 제거와 membership test에 강할까요?
 - 충돌과 hashability는 set에서 어떤 의미를 가질까요?
 - 왜 `frozenset`은 set 원소나 dict 키가 될 수 있고 plain `set`은 안 될까요?
-
-## 큰 그림
-
-![Data Structures with Python 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/09/09-01-set.ko.png)
-
-*Data Structures with Python 101 9장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 
@@ -249,7 +247,6 @@ print([article["title"] for article in matches])
 ## 정리 및 다음 글 안내
 
 Python `set`은 key-only hash table입니다. 그래서 빠른 membership test, 자동 dedup, 간결한 집합 연산이 모두 같은 저장 모델에서 나옵니다. 그리고 그 정확성은 안정적인 해시와 equality에 달려 있습니다. 다음 글에서는 시리즈를 마무리하며 상황별로 어떤 자료구조를 선택해야 하는지 기준을 정리하겠습니다.
-
 
 
 ## 타입 힌트 기반 집합 구현

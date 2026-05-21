@@ -30,19 +30,15 @@ Here, we will use ConfigMap and Secret to split environment-specific values from
 
 > Configuration becomes operationally useful only when the image can stay the same while the environment-specific values change outside it.
 
+
+![kubernetes 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/06/06-01-concept-at-a-glance.en.png)
+*kubernetes 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - Splitting *ConfigMap* and *Secret?
 - Env vars* vs *file mounts?
 - The *base64* fact and the *encryption gap?
-
-## Big Picture
-
-![kubernetes 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/06/06-01-concept-at-a-glance.en.png)
-
-*kubernetes 101 chapter 6 flow overview*
-
-This picture places ConfigMap and Secret inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

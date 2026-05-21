@@ -31,19 +31,15 @@ This is the first post in the Database Systems 101 series.
 
 > A database management system (DBMS) is not just storage. It is software that solves four hard problems together — **concurrent access, crash recovery, consistency, and querying**. A flat file works until two users, a power failure, or a non-trivial question shows up. After that, it does not. This first episode draws that boundary.
 
+
+![database systems 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/01/01-01-big-picture.en.png)
+*database systems 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What Is a Database System??
 - Which signal should the example or diagram make visible for What Is a Database System??
 - What failure should be prevented first when What Is a Database System? reaches a real system?
-
-## Big Picture
-
-![database systems 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/01/01-01-big-picture.en.png)
-
-*database systems 101 chapter 1 flow overview*
-
-This picture places What Is a Database System? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

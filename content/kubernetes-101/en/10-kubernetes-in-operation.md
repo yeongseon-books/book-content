@@ -30,19 +30,15 @@ Here, we will connect probes, RBAC, network boundaries, observability, GitOps, a
 
 > Kubernetes operations become reliable only when traffic rules, permissions, telemetry, and change procedures reinforce each other.
 
+
+![kubernetes 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/10/10-01-concept-at-a-glance.en.png)
+*kubernetes 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - liveness/readiness/startup* probes?
 - RBAC* and *NetworkPolicy?
 - metrics/logs/traces?
-
-## Big Picture
-
-![kubernetes 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/10/10-01-concept-at-a-glance.en.png)
-
-*kubernetes 101 chapter 10 flow overview*
-
-This picture places Kubernetes in Operation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

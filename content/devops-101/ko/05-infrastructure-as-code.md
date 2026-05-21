@@ -24,21 +24,16 @@ last_reviewed: '2026-05-12'
 
 이 글은 DevOps 101 시리즈의 다섯 번째 글입니다.
 
+
+![DevOps 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/05/05-01-diagram.ko.png)
+*DevOps 101 5장 흐름 개요*
+> IaC의 핵심은 문법이 아니라, 인프라를 단일 출처(SSOT)로 관리하고 변경을 추적하는 문화입니다.
+
 ## 먼저 던지는 질문
 
 - 콘솔에서 클릭해 만든 인프라는 왜 다른 환경에서 재현하기 어려울까요?
 - IaC는 운영팀의 편의가 아니라 팀 전체의 변경 품질과 어떻게 연결될까요?
 - Terraform의 기본 흐름은 plan과 apply를 중심으로 어떻게 이해하면 좋을까요?
-
-## 큰 그림
-
-![DevOps 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/05/05-01-diagram.ko.png)
-
-*DevOps 101 5장 흐름 개요*
-
-이 그림은 코드 정의 → 계획 검토 → 실제 적용 → 상태 기록의 IaC 흐름을 보여줍니다. 코드화가 되면 인프라 변경도 리뷰와 이력의 대상이 됩니다.
-
-> IaC의 핵심은 문법이 아니라, 인프라를 단일 출처(SSOT)로 관리하고 변경을 추적하는 문화입니다.
 
 ## 왜 중요한가
 
@@ -189,7 +184,7 @@ verifier:
 이 세 레벨을 모두 갖추면 IaC는 단순한 자동화가 아니라 테스트 가능한 인프라가 됩니다.
 ## 전환 전후
 
-**Before (console clicks)**
+**Before (콘솔 클릭 작업)**
 
 ```text
 - No record of *who* created what *when*

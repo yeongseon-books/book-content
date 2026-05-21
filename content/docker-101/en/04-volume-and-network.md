@@ -28,19 +28,15 @@ Docker gives you separate tools for the two problems on purpose. Volumes control
 
 This is post 4 in the Docker 101 series. It focuses on when to use named volumes, bind mounts, and user-defined bridge networks, plus the concrete checks you should run before you trust persistence or name-based communication.
 
+
+![docker 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/04/04-01-concept-at-a-glance.en.png)
+*docker 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - The difference between *volume / bind mount / tmpfs?
 - Bridge / host / none* network modes?
 - Communicating *by container name?
-
-## Big Picture
-
-![docker 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/04/04-01-concept-at-a-glance.en.png)
-
-*docker 101 chapter 4 flow overview*
-
-This picture places Volumes and Networks inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

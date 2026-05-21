@@ -26,17 +26,15 @@ CI를 돌려서 빌드까지 성공했는데 결과물이 그대로 사라진다
 
 이 글은 GitHub Actions 101 시리즈의 6번째 글입니다. 여기서는 artifact를 이용해 빌드 산출물을 보관하고, 잡 사이에 전달하고, 필요하면 Release까지 연결하는 기본 패턴을 정리하겠습니다.
 
+
+![GitHub Actions 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/06/06-01-diagram.ko.png)
+*GitHub Actions 101 6장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - `upload-artifact`와 `download-artifact`는 각각 언제 쓰일까요?
 - 잡 사이에서 결과물을 넘길 때 아티팩트가 왜 유용할까요?
 - `retention-days`는 비용과 어떤 관계가 있을까요?
-
-## 큰 그림
-
-![GitHub Actions 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/06/06-01-diagram.ko.png)
-
-*GitHub Actions 101 6장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -175,7 +173,6 @@ deploy:
 아티팩트는 빌드 결과를 잡 사이에 전달하고, 실행 흔적을 남기고, 릴리스로 이어 주는 핵심 연결 고리입니다. 빌드 성공만으로 끝내지 말고, 무엇이 만들어졌는지 남기는 습관까지 파이프라인에 넣어야 실무에서 재현 가능성이 생깁니다.
 
 다음 글에서는 Docker 빌드를 다룹니다. 아티팩트로 일반 파일 산출물을 다뤘다면, 이제 컨테이너 이미지를 어떻게 효율적으로 빌드하고 레지스트리에 올릴지 살펴볼 차례입니다.
-
 
 
 ---

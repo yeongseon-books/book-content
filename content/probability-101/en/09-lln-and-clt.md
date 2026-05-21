@@ -28,21 +28,16 @@ The Law of Large Numbers and the Central Limit Theorem are the two main answers.
 
 This is post 9 in the Probability 101 series. Here we build intuition for the LLN and the CLT, connect them to standard error, and show with simulations why non-normal populations can still produce nearly normal sample means.
 
+
+![probability 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/09/09-01-concept-at-a-glance.en.png)
+*probability 101 chapter 9 flow overview*
+> Law of Large Numbers and CLT requires both definition and intuition, learned through concrete examples.
+
 ## Questions to Keep in Mind
 
 - Why sample means stabilize as the sample grows?
 - How the LLN and CLT answer different questions?
 - Why standard error is not the same thing as standard deviation?
-
-## Big Picture
-
-![probability 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/09/09-01-concept-at-a-glance.en.png)
-
-*probability 101 chapter 9 flow overview*
-
-This picture places Law of Large Numbers and CLT inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Law of Large Numbers and CLT requires both definition and intuition, learned through concrete examples.
 
 ## Why It Matters
 

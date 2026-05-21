@@ -28,19 +28,15 @@ Control flow gets easier when you break every branch and loop into two questions
 
 This post is the 5th article in the Python 101 series. This is the point in the series where Python code starts to branch, loop, and compress repeated patterns.
 
+
+![Python 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/05/05-01-mental-model.en.png)
+*Python 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - How to handle truthy and falsy values deliberately when writing `if`/`elif`/`else`?
 - A first-cut decision rule for choosing between `for` and `while`?
 - How to combine `range`, `enumerate`, and `zip` for loops that read well?
-
-## Big Picture
-
-![Python 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/05/05-01-mental-model.en.png)
-
-*Python 101 chapter 5 flow overview*
-
-This picture places Control flow: if, for, while, comprehension inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

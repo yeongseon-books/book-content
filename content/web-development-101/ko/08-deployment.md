@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 환경 분리, 환경 변수와 비밀 관리, 빌드 산출물, PaaS와 IaaS의 차이, 그리고 기본적인 CI/CD 흐름을 함께 정리하겠습니다.
 
+
+![Web Development 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/08/08-01-concept-at-a-glance.ko.png)
+*Web Development 101 8장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 노트북에서만 돌던 앱을 어떻게 운영 환경으로 옮길까요?
 - 개발, 스테이징, 운영 환경은 왜 나눌까요?
 - 환경 변수와 비밀 값은 왜 저장소 바깥에서 관리할까요?
-
-## 큰 그림
-
-![Web Development 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/08/08-01-concept-at-a-glance.ko.png)
-
-*Web Development 101 8장 흐름 개요*
 
 ## 왜 배포를 따로 배워야 하는가
 

@@ -33,19 +33,14 @@ This is the final post in the Azure Container Apps 101 series. Here, we'll map t
 - How to write KQL queries that group logs by Revision in Log Analytics.
 - How to wire Application Insights into a FastAPI app via OpenTelemetry.
 
+![azure container apps 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/07/07-01-the-observability-map.en.png)
+*azure container apps 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - What three layers does ACA observability split into, and what does each layer own?
 - What events does `ContainerAppConsoleLogs_CL` capture compared to `ContainerAppSystemLogs_CL`?
 - How do you write a KQL query that groups logs by Revision in Log Analytics?
-
-## Big Picture
-
-![azure container apps 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/07/07-01-the-observability-map.en.png)
-
-*azure container apps 101 chapter 7 flow overview*
-
-This picture places Monitoring and ops — Log Analytics and Application Insights inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

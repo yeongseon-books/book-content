@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 이 글은 Probability 101 시리즈의 9번째 글입니다. 여기서는 대수의 법칙과 중심극한정리의 직관, 표준오차, 비정규 모집단에서도 평균이 왜 정규에 가까워지는지 코드와 함께 정리하겠습니다.
 
+
+![Probability 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/09/09-01-diagram.ko.png)
+*Probability 101 9장 흐름 개요*
+> 대수의 법칙과 중심극한정리은 구체적인 가정과 한계를 함께 봐야 합니다.
+
 ## 먼저 던지는 질문
 
 - 표본평균은 왜 표본 수가 커질수록 안정될까요?
 - 대수의 법칙과 중심극한정리는 무엇이 다를까요?
 - 표준오차는 표준편차와 어떻게 다를까요?
-
-## 큰 그림
-
-![Probability 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/09/09-01-diagram.ko.png)
-
-*Probability 101 9장 흐름 개요*
-
-이 그림은 이 개념의 기본 구조를 보여줍니다.
-
-> 대수의 법칙과 중심극한정리은 구체적인 가정과 한계를 함께 봐야 합니다.
 
 ## 왜 중요한가
 

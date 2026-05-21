@@ -26,17 +26,15 @@ last_reviewed: '2026-05-12'
 
 개념을 따로따로 이해하는 것과 실제 앱으로 끝까지 묶는 것은 완전히 다른 경험입니다. 라우팅도 알고 폼도 알고 API 호출도 이해했는데, 막상 하나의 프로젝트로 합치려면 어디서부터 파일을 나누고 어떤 순서로 조립해야 할지 막막해지는 경우가 많습니다.
 
+
+![Frontend Development 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/10/10-01-diagram.ko.png)
+*Frontend Development 101 10장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 작은 프로젝트에서는 어떤 폴더 구조가 가장 읽기 쉬울까요?
 - 앞선 1~9화 개념은 실제 앱 안에서 어떻게 이어질까요?
 - 개발, 빌드, 배포 흐름은 어떤 순서로 정리되는 편이 좋을까요?
-
-## 큰 그림
-
-![Frontend Development 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/10/10-01-diagram.ko.png)
-
-*Frontend Development 101 10장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -57,14 +55,14 @@ last_reviewed: '2026-05-12'
 
 ## 전통 방식과 현대 방식 비교
 
-**Before (you only know the concepts)**
+**Before (개념만 아는 상태)**
 
 ```text
 "I know routing, I know forms, I know APIs."
 "But I have never combined them all to *build an app*."
 ```
 
-**After (a small app is alive on the internet)**
+**After (작은 앱이 인터넷에서 동작)**
 
 ```text
 https://my-notes.netlify.app
@@ -405,7 +403,6 @@ export default defineConfig({
 ### 실무 연결 포인트
 
 프론트엔드는 더 이상 단순 화면 기술이 아닙니다. API 계약, 번들 최적화, 브라우저 성능, 접근성, 운영 관측이 모두 만나는 실행 계층입니다. 따라서 작은 예제라도 HTML/CSS/JS 코드, 컴포넌트 패턴, 빌드 설정을 한 번에 다뤄 보는 연습이 필요합니다. 이 연습을 반복하면 도구가 바뀌어도 구조를 잃지 않고, 신규 기능을 추가할 때도 안정적으로 확장할 수 있습니다.
-
 
 
 ## 실무 앵커 모음: 프레임워크, 레이아웃, 디버깅, 성능

@@ -28,21 +28,16 @@ The hard part is representativeness. If the sample does not resemble the populat
 
 This is post 4 in the Statistics 101 series. Here we will clarify the relationship between population, sample, parameter, and statistic, then explain why random sampling and sampling bias sit at the foundation of statistical work.
 
+
+![statistics 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/04/04-01-concept-at-a-glance.en.png)
+*statistics 101 chapter 4 flow overview*
+> You can *never* measure the entire population — so statistics teaches you how to *measure the sample* and *speak confidently* about the whole.
+
 ## Questions to Keep in Mind
 
 - How do population and sample differ?
 - What makes a sample representative enough to trust?
 - Why does random sampling appear so often in statistics?
-
-## Big Picture
-
-![statistics 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/04/04-01-concept-at-a-glance.en.png)
-
-*statistics 101 chapter 4 flow overview*
-
-This picture places Sample and Population inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> You can *never* measure the entire population — so statistics teaches you how to *measure the sample* and *speak confidently* about the whole.
 
 ## Why It Matters
 

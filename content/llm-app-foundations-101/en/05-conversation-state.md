@@ -42,21 +42,15 @@ The main idea is simple: **conversation memory lives in your application layer, 
 
 ---
 
+![Managing conversation state: building a multi-turn chatbot](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/05/05-01-managing-conversation-state-building-a-m.en.png)
+*Managing conversation state: building a multi-turn chatbot*
+> Conversation memory is application state replayed into each request.
+
 ## Questions to Keep in Mind
 
 - Does multi-turn memory live inside the model or inside the request?
 - When do full history, sliding windows, and summary compression split apart?
 - How can you detect context overflow before the request fails?
-
-## Big Picture
-
-![Managing conversation state: building a multi-turn chatbot](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/05/05-01-managing-conversation-state-building-a-m.en.png)
-
-*Managing conversation state: building a multi-turn chatbot*
-
-This picture treats conversation memory as replayed message history, not hidden model state. The application owns which turns to send again on each request.
-
-> Conversation memory is application state replayed into each request.
 
 ## Why LLM calls are stateless
 

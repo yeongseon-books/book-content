@@ -28,17 +28,15 @@ Pod를 여러 개 띄우기 시작하면 다음 문제가 바로 등장합니다
 
 여기서는 Service를 단순한 포트 노출 기능이 아니라, 라벨로 선택된 파드 집합에 안정적인 가상 IP와 DNS 이름을 부여하는 네트워킹 기본 객체라는 관점에서 정리하겠습니다.
 
+
+![Kubernetes 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/04/04-01-concept-at-a-glance.ko.png)
+*Kubernetes 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - Service는 정확히 어떤 문제를 해결할까요?
 - ClusterIP, NodePort, LoadBalancer는 언제 갈라질까요?
 - selector와 labels는 왜 정확히 맞아야 할까요?
-
-## 큰 그림
-
-![Kubernetes 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/04/04-01-concept-at-a-glance.ko.png)
-
-*Kubernetes 101 4장 흐름 개요*
 
 ## 왜 중요한가
 

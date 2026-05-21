@@ -26,17 +26,15 @@ last_reviewed: '2026-05-12'
 
 초기 프로젝트에서는 버튼 하나쯤 직접 색을 주고 간격을 맞춰도 큰 문제가 없어 보입니다. 하지만 화면이 늘어나고 팀원이 늘어나면 작은 차이가 금방 누적됩니다. 페이지마다 파란색이 조금씩 다르고, 간격 기준이 섞이고, 다크 모드는 나중에 붙이려다 전체를 다시 만지게 됩니다.
 
+
+![Frontend Development 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/08/08-01-diagram.ko.png)
+*Frontend Development 101 8장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 글로벌 CSS, CSS Modules, CSS-in-JS, Tailwind는 어떤 차이를 가질까요?
 - 디자인 토큰은 왜 프로젝트가 커질수록 더 중요해질까요?
 - 컴포넌트 라이브러리는 어떤 구조로 운영되는 편이 좋을까요?
-
-## 큰 그림
-
-![Frontend Development 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/08/08-01-diagram.ko.png)
-
-*Frontend Development 101 8장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -58,14 +56,14 @@ last_reviewed: '2026-05-12'
 
 ## 전통 방식과 현대 방식 비교
 
-**Before (different colors per page)**
+**Before (페이지마다 다른 색상)**
 
 ```css
 .btn-a { background: #1d72ff; }   /* page A */
 .btn-b { background: #1d70ff; }   /* page B (typo) */
 ```
 
-**After (design token)**
+**After (디자인 토큰)**
 
 ```css
 :root { --color-primary: #1d72ff; }
@@ -351,7 +349,6 @@ export default defineConfig({
 ### 실무 연결 포인트
 
 프론트엔드는 더 이상 단순 화면 기술이 아닙니다. API 계약, 번들 최적화, 브라우저 성능, 접근성, 운영 관측이 모두 만나는 실행 계층입니다. 따라서 작은 예제라도 HTML/CSS/JS 코드, 컴포넌트 패턴, 빌드 설정을 한 번에 다뤄 보는 연습이 필요합니다. 이 연습을 반복하면 도구가 바뀌어도 구조를 잃지 않고, 신규 기능을 추가할 때도 안정적으로 확장할 수 있습니다.
-
 
 
 ## 실무 앵커 모음: 프레임워크, 레이아웃, 디버깅, 성능

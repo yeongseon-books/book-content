@@ -30,21 +30,16 @@ This is post 7 in the Portfolio Project 101 series. Here we will use a lightweig
 
 > A good decision note does not declare a perfect answer. It records what options existed, why one was chosen, and what consequences came with it.
 
+
+![portfolio project 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/07/07-01-concept-at-a-glance.en.png)
+*portfolio project 101 chapter 7 flow overview*
+> Recording technology choices shows why you picked each tool. Without explanation, you look like you chase trends. With explanation, you show judgment.
+
 ## Questions to Keep in Mind
 
 - Why do technical choices usually stay invisible if you only show code?
 - How do alternatives and consequences make a project more persuasive?
 - How lightweight can an ADR be and still be useful?
-
-## Big Picture
-
-![portfolio project 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/07/07-01-concept-at-a-glance.en.png)
-
-*portfolio project 101 chapter 7 flow overview*
-
-This picture places Recording Tech Decisions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Recording technology choices shows why you picked each tool. Without explanation, you look like you chase trends. With explanation, you show judgment.
 
 ## Why It Matters
 

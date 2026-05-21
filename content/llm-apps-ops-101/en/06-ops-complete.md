@@ -26,21 +26,15 @@ Individual operational layers can look fine in isolation and still leave inciden
 
 This is the final post in the LLM Apps Ops 101 series. Here, we will connect the earlier pieces into one integrated operations pipeline.
 
+![LLM ops pipeline complete overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/06/06-01-big-picture.en.png)
+*LLM ops pipeline complete overview*
+> LLM operations is not adding many layers; it is explaining one request across cost, quality, security, and deployment signals.
+
 ## Questions to Keep in Mind
 
 - Which layers must a complete LLM operations pipeline connect inside one request?
 - What operations gap appears when monitoring, cost, evaluation, security, and deployment stay separate?
 - What cumulative signals should the health state of a minimal operations app expose?
-
-## Big Picture
-
-![LLM ops pipeline complete overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/06/06-01-big-picture.en.png)
-
-*LLM ops pipeline complete overview*
-
-This picture connects input validation, model calls, cost calculation, evaluation, logging, and health state into one operations pipeline. The core of a complete ops structure is not listing features; it is joining signals under the same request_id.
-
-> LLM operations is not adding many layers; it is explaining one request across cost, quality, security, and deployment signals.
 
 ## Why this layer matters
 ![Ops flow from validation to logging](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/06/06-01-why-this-layer-matters.en.png)

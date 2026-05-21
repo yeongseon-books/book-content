@@ -56,7 +56,7 @@ Every source post (`ko/*.md`, `en/*.md`) MUST have, top to bottom:
 1. **Hook** — 독자가 겪는 문제 상황으로 시작한다.
 2. **Series intro** — 현재 글이 시리즈의 몇 번째 글인지 밝힌다. 도입부에 다음 글 링크는 넣지 않는다.
 3. **Opening questions** — ko는 `## 먼저 던지는 질문`, en은 `## Questions to Keep in Mind`를 사용한다. 질문은 2-3개를 권장하고, 마지막 답변과 1:1로 대응시킨다.
-4. **Big picture** — 짧은 다이어그램 1개, visible caption 1줄, 해설 2-4문장으로 구조·흐름·경계 중 하나를 보여준다. 다이어그램 내부 제목/alt/caption은 `큰 그림`/`Big Picture`를 반복하지 말고 `흐름`, `구조`, `책임 경계`, `요청 경로`처럼 그림이 실제로 보여주는 대상을 쓴다.
+4. **Intro diagram** — Opening Questions 직전에 다이어그램 1개 + visible caption 1줄을 둔다. 별도 섹션 헤딩(`## 큰 그림` 등)은 사용하지 않는다. 다이어그램 내부 제목/alt/caption은 `흐름`, `구조`, `책임 경계`, `요청 경로`처럼 그림이 실제로 보여주는 대상을 쓴다.
 5. **Concept sections** — 핵심 개념은 설명만으로 끝내지 않는다. 코드, 다이어그램, 표, before/after, 로그, 요청/응답, CLI 출력, 설정 예시 등 글의 성격에 맞는 concrete anchor를 하나 이상 둔다.
 6. **Return to questions** — ko는 `## 처음 질문으로 돌아가기`, en은 `## Answering the Opening Questions`를 본문 마지막에 둔다. 새 개념을 추가하지 말고 본문에서 만든 답을 압축해 회수한다.
 7. **TOC / References / Tags** — 이후 순서는 기존 mandatory order를 따른다.

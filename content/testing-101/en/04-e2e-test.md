@@ -30,21 +30,16 @@ This is post 4 in the Testing 101 series. Here we walk through the role of E2E t
 
 > E2E is the user’s final contract with your system. Treat it as a scarce but high-value signal.
 
+
+![testing 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/04/04-01-concept-at-a-glance.en.png)
+*testing 101 chapter 4 flow overview*
+> E2E tests prove that the user can actually complete the flow, not just that the code says the flow should work.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying E2E Test?
 - Which signal should the example or diagram make visible for E2E Test?
 - What failure should be prevented first when E2E Test reaches a real system?
-
-## Big Picture
-
-![testing 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/04/04-01-concept-at-a-glance.en.png)
-
-*testing 101 chapter 4 flow overview*
-
-This picture places E2E Test inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> E2E tests prove that the user can actually complete the flow, not just that the code says the flow should work.
 
 ## What You Will Learn
 

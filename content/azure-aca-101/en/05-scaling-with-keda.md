@@ -33,19 +33,14 @@ This is post 5 in the Azure Container Apps 101 series. Here, we'll unpack KEDA s
 - When `min-replicas 0` (scale-to-zero) is safe and when it is dangerous.
 - How to configure both an HTTP API and a Service Bus queue worker using `az containerapp` commands.
 
+![azure container apps 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/05/05-01-the-scaling-path.en.png)
+*azure container apps 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - What signals does Azure Container Apps use to decide replica counts, and where is the decision made?
 - When should you reach for built-in HTTP/TCP rules versus custom KEDA scalers?
 - When is `min-replicas 0` (scale-to-zero) safe, and when is it dangerous?
-
-## Big Picture
-
-![azure container apps 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/05/05-01-the-scaling-path.en.png)
-
-*azure container apps 101 chapter 5 flow overview*
-
-This picture places Scaling — KEDA scalers and zero-to-N inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

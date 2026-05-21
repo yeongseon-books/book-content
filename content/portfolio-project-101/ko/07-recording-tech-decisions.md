@@ -26,21 +26,16 @@ last_reviewed: '2026-05-15'
 
 이 글은 Portfolio Project 101 시리즈의 7번째 글입니다. 여기서는 가벼운 ADR 형식으로 기술 선택의 이유를 남기는 방법을 살펴보고, 왜 이 기록이 포트폴리오에서 판단력을 보여 주는 강한 근거가 되는지 정리해 보겠습니다.
 
+
+![Portfolio Project 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/07/07-01-diagram.ko.png)
+*Portfolio Project 101 7장 흐름 개요*
+> 기술 선택의 기록은 '왜 이 도구인가'를 설명합니다. 설명이 없으면 유행만 따라가는 것처럼 보이고, 설명이 있으면 판단 능력을 보여 줍니다.
+
 ## 먼저 던지는 질문
 
 - 기술 선택의 이유는 왜 코드만으로 충분히 드러나지 않을까요?
 - 대안 비교와 결과 기록은 어떤 설득력을 더할까요?
 - ADR은 얼마나 가볍게 시작해도 의미가 있을까요?
-
-## 큰 그림
-
-![Portfolio Project 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/07/07-01-diagram.ko.png)
-
-*Portfolio Project 101 7장 흐름 개요*
-
-이 그림에서는 기술 선택이 프로젝트의 어느 지점부터 의사결정으로 기록되어야 하는지 봅니다. 선택의 이유를 남기는 것이 미래 검토의 근거가 됩니다.
-
-> 기술 선택의 기록은 '왜 이 도구인가'를 설명합니다. 설명이 없으면 유행만 따라가는 것처럼 보이고, 설명이 있으면 판단 능력을 보여 줍니다.
 
 ## 왜 중요한가
 

@@ -41,19 +41,14 @@ Two objects play the leading roles in the answer: `IFunctionInvocationDispatcher
 
 > All code references are pinned to [`Azure/azure-functions-host` @ `5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7).
 
+![azure functions deep dive chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/04/04-01-the-big-picture-from-trigger-to-worker.en.png)
+*azure functions deep dive chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - Through what stages does the dispatcher split a single invocation?
 - Where is the invocation context born, and who tears it down?
 - Where in the dispatcher do concurrency controls (maxConcurrentRequests, batchSize) take effect?
-
-## Big Picture
-
-![azure functions deep dive chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/04/04-01-the-big-picture-from-trigger-to-worker.en.png)
-
-*azure functions deep dive chapter 4 flow overview*
-
-This picture places Dispatcher and Invocation — How a Function Call Reaches the Worker inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## From trigger to worker
 

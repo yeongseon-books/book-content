@@ -31,19 +31,15 @@ last_reviewed: '2026-05-04'
 
 This is the final post in the Computer Architecture 101 series.
 
+
+![computer architecture 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/10/10-01-big-picture.en.png)
+*computer architecture 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Understanding Performance?
 - Which signal should the example or diagram make visible for Understanding Performance?
 - What failure should be prevented first when Understanding Performance reaches a real system?
-
-## Big Picture
-
-![computer architecture 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/10/10-01-big-picture.en.png)
-
-*computer architecture 101 chapter 10 flow overview*
-
-This picture places Understanding Performance inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

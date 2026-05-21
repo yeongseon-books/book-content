@@ -28,19 +28,15 @@ That is why the capstone topic is not another isolated feature. It is compositio
 
 This is the final post in the Serverless 101 series.
 
+
+![serverless 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/10/10-01-concept-at-a-glance.en.png)
+*serverless 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Designing a Serverless App?
 - Which signal should the example or diagram make visible for Designing a Serverless App?
 - What failure should be prevented first when Designing a Serverless App reaches a real system?
-
-## Big Picture
-
-![serverless 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/10/10-01-concept-at-a-glance.en.png)
-
-*serverless 101 chapter 10 flow overview*
-
-This picture places Designing a Serverless App inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

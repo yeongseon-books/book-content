@@ -32,21 +32,16 @@ In this post, we'll use tags, budgets, Savings Plans, and rightsizing as a pract
 
 > FinOps starts with visibility, not discounts. Make cost attributable first, then automate alerts, commitments, and cleanup around real usage patterns.
 
+
+![cloud computing 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/09/09-01-concept-at-a-glance.en.png)
+*cloud computing 101 chapter 9 flow overview*
+> Cost control is not about spending less. It is about spending intentionally and knowing where your money goes.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Cost Management?
 - Which signal should the example or diagram make visible for Cost Management?
 - What failure should be prevented first when Cost Management reaches a real system?
-
-## Big Picture
-
-![cloud computing 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/09/09-01-concept-at-a-glance.en.png)
-
-*cloud computing 101 chapter 9 flow overview*
-
-This picture places Cost Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Cost control is not about spending less. It is about spending intentionally and knowing where your money goes.
 
 ## Questions This Chapter Answers
 

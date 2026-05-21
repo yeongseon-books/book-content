@@ -28,19 +28,15 @@ In Python 3, `str` is an immutable sequence of Unicode code points, while `bytes
 
 This post is the 3rd article in the Python 101 series. This is the part of the series where text, bytes, and representation stop being interchangeable.
 
+
+![Python 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/03/03-01-mental-model.en.png)
+*Python 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why Python 3's `str` is a Unicode string and how it differs from `bytes`?
 - When to reach for single, double, triple, raw, or byte literals?
 - The core methods `split`, `join`, `strip`, `replace`, `find`, `startswith`?
-
-## Big Picture
-
-![Python 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/03/03-01-mental-model.en.png)
-
-*Python 101 chapter 3 flow overview*
-
-This picture places Strings and formatting inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

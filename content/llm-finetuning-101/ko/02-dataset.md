@@ -26,17 +26,14 @@ seo_description: 파인튜닝 데이터셋의 실패 원인인 형식 문제를 
 
 같은 1,000개 샘플이어도 형식이 일관되면 LoRA `r=8`로 충분할 수 있고, 형식이 섞이면 더 큰 랭크와 더 많은 데이터로도 수렴이 흔들릴 수 있습니다. 2편의 목표는 데이터 양을 늘리는 방법이 아니라, 모델이 정확히 무엇을 모방해야 하는지 분명하게 만드는 것입니다.
 
+![LLM Fine-tuning 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/02/02-02-the-three-layers-of-dataset-preparation.ko.png)
+*LLM Fine-tuning 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - `instruction / input / output` 세 필드를 어떤 형태로 잡아야 할까요?
 - Hugging Face `datasets`로 작은 JSONL 파일을 어떻게 바로 읽을 수 있을까요?
 - 전처리 단계에서 반드시 확인해야 할 최소 검증 포인트는 무엇일까요?
-
-## 큰 그림
-
-![LLM Fine-tuning 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/02/02-02-the-three-layers-of-dataset-preparation.ko.png)
-
-*LLM Fine-tuning 101 2장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 

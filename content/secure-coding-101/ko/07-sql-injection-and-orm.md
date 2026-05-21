@@ -28,17 +28,15 @@ SQL injection은 오래된 취약점이지만 아직도 가장 비싼 사고를 
 
 여기서는 SQL injection을 ORM을 쓰면 자동으로 사라지는 문제로 보지 않고, SQL과 데이터를 문법적으로 분리하지 않았을 때 생기는 구조적 문제로 정리하겠습니다. 이 관점을 잡아 두면 raw SQL, ORM, 정렬 컬럼, DB 계정 권한을 한 흐름에서 함께 볼 수 있습니다.
 
+
+![Secure Coding 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/07/07-01-concept-at-a-glance.ko.png)
+*Secure Coding 101 7장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - SQL injection은 정확히 어떤 식으로 SQL 의미를 바꿀까요?
 - parameterized query는 왜 가장 중요한 기본기일까요?
 - ORM을 써도 SQL injection이 생기는 경우는 언제일까요?
-
-## 큰 그림
-
-![Secure Coding 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/07/07-01-concept-at-a-glance.ko.png)
-
-*Secure Coding 101 7장 흐름 개요*
 
 ## 왜 중요한가
 

@@ -24,21 +24,16 @@ seo_description: 도구는 Agent의 손과 발입니다. 잘못 설계한 도구
 Tool Harness는 단순히 함수 목록을 나열하는 작업이 아닙니다. 에이전트가 올바르게 호출하기 쉬운 인터페이스, 잘못 호출해도 사고가 적은 실행 방식, 실패했을 때 다음 행동을 결정할 수 있는 에러 모델을 설계하는 일입니다.
 이 글은 Harness Engineering 101 시리즈의 5번째 글입니다.
 강한 기능보다 좁고 정직한 인터페이스가 더 중요하다는 점이 이 글의 중심입니다.
+
+![Tool Harness - Agent가 사용할 도구를 안전하게 설계하기](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/05/05-01-tool-harness-designing-safe-tools-for-ag.ko.png)
+*Tool Harness - Agent가 사용할 도구를 안전하게 설계하기*
+> Tool Harness의 품질은 agent가 도구를 쓸 수 있는지가 아니라, 잘못 쓰기 어려운지에서 드러납니다.
+
 ## 먼저 던지는 질문
 
 - Tool Harness는 agent가 도구를 올바르게 쓰기 쉽도록 어떤 표면을 만들어야 할까요?
 - schema, idempotency, actionable error는 각각 어떤 운영 문제를 줄일까요?
 - 위험한 tool을 sandbox 안에 넣으려면 어떤 경계가 필요할까요?
-
-## 큰 그림
-
-![Tool Harness - Agent가 사용할 도구를 안전하게 설계하기](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/05/05-01-tool-harness-designing-safe-tools-for-ag.ko.png)
-
-*Tool Harness - Agent가 사용할 도구를 안전하게 설계하기*
-
-이 그림에서는 agent가 tool을 안전하게 고르고 호출하도록 이름, schema, 오류, 권한, sandbox를 설계하는 흐름을 봅니다. 좋은 tool은 똑똑한 모델에게 맡기는 인터페이스가 아니라 실수하기 어려운 작업 표면입니다.
-
-> Tool Harness의 품질은 agent가 도구를 쓸 수 있는지가 아니라, 잘못 쓰기 어려운지에서 드러납니다.
 
 ## 왜 이 글이 중요한가
 에이전트의 행동 범위는 결국 도구의 행동 범위입니다. 좋은 프롬프트와 제약을 갖춘 시스템도 도구가 모호하거나 과도한 권한을 갖고 있으면 한 번의 호출로 쉽게 무너집니다.

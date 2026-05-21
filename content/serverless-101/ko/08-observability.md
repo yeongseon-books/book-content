@@ -27,17 +27,15 @@ last_reviewed: '2026-05-12'
 
 서버리스 시스템은 짧고 분산되어 있습니다. 한 요청이 하나의 함수에서 끝나지 않고 여러 함수, 큐, 데이터 저장소를 거칠 수 있습니다. 그래서 문제를 볼 때 로그만 보거나 메트릭만 봐서는 자주 길을 잃습니다.
 
+
+![Serverless 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/08/08-01-concept-at-a-glance.ko.png)
+*Serverless 101 8장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 함수가 왜 느렸는지, 어디서 느렸는지 어떻게 알 수 있을까요?
 - 로그, 지표, 분산 추적은 각각 어떤 역할을 맡을까요?
 - 상관관계 ID는 왜 거의 필수일까요?
-
-## 큰 그림
-
-![Serverless 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/08/08-01-concept-at-a-glance.ko.png)
-
-*Serverless 101 8장 흐름 개요*
 
 ## 왜 이 주제가 중요한가
 

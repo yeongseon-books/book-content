@@ -30,21 +30,16 @@ This is post 9 in the Testing 101 series. Here we use GitHub Actions to build a 
 
 > CI is where personal confidence becomes organizational evidence.
 
+
+![testing 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/09/09-01-concept-at-a-glance.en.png)
+*testing 101 chapter 9 flow overview*
+> CI transforms "works on my machine" from an anecdote into a requirement.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Running Tests in CI?
 - Which signal should the example or diagram make visible for Running Tests in CI?
 - What failure should be prevented first when Running Tests in CI reaches a real system?
-
-## Big Picture
-
-![testing 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/09/09-01-concept-at-a-glance.en.png)
-
-*testing 101 chapter 9 flow overview*
-
-This picture places Running Tests in CI inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> CI transforms "works on my machine" from an anecdote into a requirement.
 
 ## What You Will Learn
 

@@ -30,21 +30,16 @@ last_reviewed: '2026-05-12'
 
 이 글은 Statistics 101 시리즈의 2번째 글입니다. 여기서는 평균, 중앙값, 분산이 각각 무엇을 말하는지 비교하고, 왜 분포 모양에 따라 대표값 선택이 달라져야 하는지 정리하겠습니다.
 
+
+![Statistics 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/02/02-01-concept-at-a-glance.ko.png)
+*Statistics 101 2장 흐름 개요*
+> 요약 통계는 맞 숫자 하나가 아니라 주어진 더 큰 사실을 갈귀다시니 다른 높이도 반드시 중시는 늑 뤼집 분서스 널더니 알망
+
 ## 먼저 던지는 질문
 
 - 데이터를 대표하는 숫자로 평균과 중앙값 중 무엇을 써야 할까요?
 - 분산과 표준편차는 평균이 말해 주지 못하는 무엇을 보완할까요?
 - 극단값이 하나 섞였을 때 요약 통계는 어떻게 달라질까요?
-
-## 큰 그림
-
-![Statistics 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/02/02-01-concept-at-a-glance.ko.png)
-
-*Statistics 101 2장 흐름 개요*
-
-데이터 중심(mean/median)과 각도(분산/IQR)로 나뉘면 고단 소깜한 분서로 바메 나은 델을 부을 동안 때라 50%는 같이 니찬습니다.
-
-> 요약 통계는 맞 숫자 하나가 아니라 주어진 더 큰 사실을 갈귀다시니 다른 높이도 반드시 중시는 늑 뤼집 분서스 널더니 알망
 
 ## 왜 중요한가
 

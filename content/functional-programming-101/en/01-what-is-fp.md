@@ -30,19 +30,15 @@ This is the first post in the Functional Programming 101 series.
 
 > Functional programming builds programs by composing functions that transform data. It minimizes state changes and focuses on writing predictable code. This article covers the core philosophy of functional programming and how it applies to Python.
 
+
+![Functional Programming 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/01/01-01-big-picture.en.png)
+*Functional Programming 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What Is Functional Programming??
 - Which signal should the example or diagram make visible for What Is Functional Programming??
 - What failure should be prevented first when What Is Functional Programming? reaches a real system?
-
-## Big Picture
-
-![Functional Programming 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/01/01-01-big-picture.en.png)
-
-*Functional Programming 101 chapter 1 flow overview*
-
-This picture places What Is Functional Programming? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

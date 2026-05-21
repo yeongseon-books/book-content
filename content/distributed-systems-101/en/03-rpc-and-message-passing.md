@@ -29,19 +29,15 @@ This is post 3 in the Distributed Systems 101 series.
 
 Here we compare RPC and message passing as two different contracts: one optimized for immediate answers, the other for decoupling time, failure, and load.
 
+
+![distributed systems 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/03/03-01-concept-at-a-glance.en.png)
+*distributed systems 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - The definitions and differences of RPC and message passing?
 - Synchronous vs asynchronous, request/response vs publish/subscribe?
 - Strengths and weaknesses of each model and where each fits?
-
-## Big Picture
-
-![distributed systems 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/03/03-01-concept-at-a-glance.en.png)
-
-*distributed systems 101 chapter 3 flow overview*
-
-This picture places RPC and Message Passing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

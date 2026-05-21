@@ -27,17 +27,15 @@ last_reviewed: '2026-05-12'
 
 알고리즘을 잘한다는 말은 많은 풀이를 외운다는 뜻일까요, 아니면 새로운 문제를 분해하는 절차를 갖고 있다는 뜻일까요? 여기서는 제약을 읽고, 도구를 고르고, 코딩 전에 접근을 검증하는 실전 절차로 시리즈를 마무리합니다.
 
+
+![Algorithms 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/10/10-01-big-picture.ko.png)
+*Algorithms 101 10장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 어떤 알고리즘 문제에도 적용할 수 있는 표준 사고 절차는 무엇일까요?
 - 입력 크기만 보고 허용 복잡도를 어떻게 추정할까요?
 - 어떤 신호가 어떤 도구를 떠올리게 할까요?
-
-## 큰 그림
-
-![Algorithms 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/10/10-01-big-picture.ko.png)
-
-*Algorithms 101 10장 흐름 개요*
 
 ## 왜 중요한가
 

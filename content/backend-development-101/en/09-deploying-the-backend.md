@@ -26,19 +26,15 @@ The reason code works on your laptop and fails in production is usually not the 
 
 This is post 9 in the Backend Development 101 series. Here, we treat deployment as a reproducibility problem and use Docker, environment variables, healthchecks, and rolling updates to make backend delivery predictable.
 
+
+![backend development 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/09/09-01-concept-at-a-glance.en.png)
+*backend development 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - The pieces that make up a deployment environment?
 - How a Dockerfile creates a *reproducible environment?
 - How to manage env vars and secrets?
-
-## Big Picture
-
-![backend development 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/09/09-01-concept-at-a-glance.en.png)
-
-*backend development 101 chapter 9 flow overview*
-
-This picture places Deploying the Backend inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

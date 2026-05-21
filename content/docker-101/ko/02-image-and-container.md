@@ -30,17 +30,14 @@ Docker를 조금만 써 보면 가장 먼저 헷갈리는 지점이 image와 con
 실무에서 발생하는 많은 컨테이너 문제는 복잡한 기술보다 기본 오해에서 출발합니다. 컨테이너 내부에서 뭔가를 바꿔 놓고 "왜 재시작했더니 사라졌지?"라고 묻는 장면이 대표적입니다. 이미지는 불변이고, 컨테이너의 변경은 일시적이라는 감각을 잡아야 Docker를 제대로 다룰 수 있습니다.
 
 
+![Docker 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/02/02-01-concept-at-a-glance.ko.png)
+*Docker 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - image와 container는 정확히 무엇이 다를까요?
 - layer와 copy-on-write는 왜 중요한 개념일까요?
 - 컨테이너의 수명 주기는 어떤 흐름으로 흘러갈까요?
-
-## 큰 그림
-
-![Docker 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/02/02-01-concept-at-a-glance.ko.png)
-
-*Docker 101 2장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 

@@ -32,21 +32,15 @@ This is the second post in the LLM API Production 101 series. Here we focus on c
 
 The main idea is straightforward: **tool calling is not model autonomy, it is an execution boundary designed by the application**.
 
+![Tool calling: connecting functions to the model](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/02/02-01-tool-calling-connecting-functions-to-the.en.png)
+*Tool calling: connecting functions to the model*
+> Tool calling is not model autonomy; it is an application-owned execution boundary.
+
 ## Questions to Keep in Mind
 
 - Is tool calling model autonomy, or an execution boundary designed by the application?
 - What should you validate in the `tools` definition and the returned `tool_calls`?
 - What guardrails close the function-execution loop safely in production?
-
-## Big Picture
-
-![Tool calling: connecting functions to the model](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/02/02-01-tool-calling-connecting-functions-to-the.en.png)
-
-*Tool calling: connecting functions to the model*
-
-This picture shows tool calling as a structured execution request, not direct model control over your code. The model chooses within the contract; the application validates and executes inside its own boundary.
-
-> Tool calling is not model autonomy; it is an application-owned execution boundary.
 
 ## Runtime setup
 

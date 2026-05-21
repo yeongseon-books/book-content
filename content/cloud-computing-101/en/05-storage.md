@@ -32,21 +32,16 @@ In this post, we'll compare object, block, file, and archive storage and connect
 
 > Storage is not just where data sits. It is part of the operating contract for latency, recovery time, cost, and sharing semantics.
 
+
+![cloud computing 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/05/05-01-concept-at-a-glance.en.png)
+*cloud computing 101 chapter 5 flow overview*
+> Storage decisions lock in performance characteristics, cost patterns, and operational constraints that are hard to change later.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Storage?
 - Which signal should the example or diagram make visible for Storage?
 - What failure should be prevented first when Storage reaches a real system?
-
-## Big Picture
-
-![cloud computing 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/05/05-01-concept-at-a-glance.en.png)
-
-*cloud computing 101 chapter 5 flow overview*
-
-This picture places Storage inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Storage decisions lock in performance characteristics, cost patterns, and operational constraints that are hard to change later.
 
 ## Questions This Chapter Answers
 

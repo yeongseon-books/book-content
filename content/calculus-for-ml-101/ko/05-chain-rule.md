@@ -32,17 +32,15 @@ last_reviewed: '2026-05-12'
 
 끝까지 읽고 나면 연쇄 법칙을 “복잡한 함수 미분법”이 아니라 “깊은 네트워크에서 gradient가 전달되는 유일한 길”로 보게 될 것입니다.
 
+
+![Calculus for ML 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/05/05-01-concept-at-a-glance.ko.png)
+*Calculus for ML 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 함수가 다른 함수 안에 들어갈 때 전체 미분은 왜 단순 합이 아니라 곱으로 연결될까요?
 - 바깥 함수와 안쪽 함수를 구분하는 가장 실용적인 방법은 무엇일까요?
 - 단계가 여러 개인 합성함수에서 gradient는 어떤 순서로 전달될까요?
-
-## 큰 그림
-
-![Calculus for ML 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/05/05-01-concept-at-a-glance.ko.png)
-
-*Calculus for ML 101 5장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 
@@ -150,7 +148,6 @@ def chain(*derivs):
 실무에서 gradient가 사라지거나 폭발하는 현상도 연쇄 법칙 구조 위에서 이해하는 편이 가장 정확합니다. 여러 단계의 미분이 곱해지므로, 어떤 activation과 initialization을 선택하느냐가 gradient 전달 품질을 좌우합니다.
 
 다음 글에서는 이 gradient가 최종적으로 무엇을 최적화하고 있는지, 즉 손실 함수가 어떤 숫자를 만들고 왜 그 설계가 모델 품질을 결정하는지 보겠습니다.
-
 
 
 ## 연쇄 법칙 계산 예제: sin(x^2)와 중첩 함수

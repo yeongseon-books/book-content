@@ -28,21 +28,16 @@ This is post 5 in the Pandas 101 series.
 
 In this chapter, I will treat `NaN` as a signal to interpret before it becomes a value to drop or fill. The right first question is not “which method should I use?” but “why is this value missing at all?”
 
+
+![pandas 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/05/05-01-concept-at-a-glance.en.png)
+*pandas 101 chapter 5 flow overview*
+> *NaN is not garbage — it's a signal. Whether you drop, fill, or interpolate *changes your distribution and your sample size. Choose mindfully.
+
 ## Questions to Keep in Mind
 
 - The meaning of *NaN* and its *dtype* impact?
 - How to use *isna / dropna / fillna?
 - The intuition behind *interpolate?
-
-## Big Picture
-
-![pandas 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/05/05-01-concept-at-a-glance.en.png)
-
-*pandas 101 chapter 5 flow overview*
-
-This picture places Handling Missing Values inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> *NaN is not garbage — it's a signal. Whether you drop, fill, or interpolate *changes your distribution and your sample size. Choose mindfully.
 
 ## Why It Matters
 

@@ -30,21 +30,16 @@ This is post 7 in the Testing 101 series. Here we separate line, branch, and fun
 
 > Coverage is a dashboard light. It tells you where to inspect, not what conclusion to declare.
 
+
+![testing 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/07/07-01-concept-at-a-glance.en.png)
+*testing 101 chapter 7 flow overview*
+> Coverage is a diagnostic tool that reveals blind spots — not a scorecard that proves correctness.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Test Coverage?
 - Which signal should the example or diagram make visible for Test Coverage?
 - What failure should be prevented first when Test Coverage reaches a real system?
-
-## Big Picture
-
-![testing 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/07/07-01-concept-at-a-glance.en.png)
-
-*testing 101 chapter 7 flow overview*
-
-This picture places Test Coverage inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Coverage is a diagnostic tool that reveals blind spots — not a scorecard that proves correctness.
 
 ## What You Will Learn
 

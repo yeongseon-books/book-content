@@ -30,19 +30,15 @@ last_reviewed: '2026-05-04'
 
 This is post 8 in the Compilers 101 series.
 
+
+![compilers 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/08/08-01-big-picture.en.png)
+*compilers 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying code generation?
 - Which signal should the example or diagram make visible for code generation?
 - What failure should be prevented first when code generation reaches a real system?
-
-## Big Picture
-
-![compilers 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/08/08-01-big-picture.en.png)
-
-*compilers 101 chapter 8 flow overview*
-
-This picture places code generation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

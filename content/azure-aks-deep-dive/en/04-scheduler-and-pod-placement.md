@@ -48,19 +48,14 @@ It filters impossible nodes,
 scores feasible ones,
 and records a Binding.
 
+![azure kubernetes service deep dive chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/04/04-01-the-three-steps.en.png)
+*azure kubernetes service deep dive chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - Through which stages does kube-scheduler narrow down nodes for a single Pod?
 - What intent originally drove nodeSelector, affinity, taints/tolerations, and topologySpreadConstraints?
 - PriorityClass and preemption protect the SLO — who pays the side-effect bill?
-
-## Big Picture
-
-![azure kubernetes service deep dive chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/04/04-01-the-three-steps.en.png)
-
-*azure kubernetes service deep dive chapter 4 flow overview*
-
-This picture places Scheduler and Pod placement — who decides which node inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters in real AKS operations
 

@@ -26,17 +26,15 @@ last_reviewed: '2026-05-17'
 
 테스트가 힘든 이유는 pytest 기능이 부족해서가 아니라 코드가 결제, 저장, 알림, 시간 조회 같은 바깥세상 의존성을 한 함수 안에 뒤섞어 놓았기 때문인 경우가 많습니다. 이 글에서는 mock이 많아지는 구조를 어떻게 읽어야 하는지, 그리고 어떤 경계에서 순수 로직과 부작용을 분리해야 테스트가 짧아지는지 구체적인 예제로 살펴봅니다.
 
+
+![pytest 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/10/10-01-testable-code-boundary.ko.png)
+*pytest 101 10장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 왜 어떤 함수는 테스트 하나에 patch와 mock이 여러 개씩 필요할까요?
 - 의존성 주입은 어떤 지점에 적용해야 실제로 테스트가 단순해질까요?
 - 순수 함수, Protocol, Fake 객체는 각각 어떤 역할을 맡으면 좋을까요?
-
-## 큰 그림
-
-![pytest 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/10/10-01-testable-code-boundary.ko.png)
-
-*pytest 101 10장 흐름 개요*
 
 ## 왜 중요한가
 

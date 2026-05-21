@@ -28,17 +28,15 @@ last_reviewed: '2026-05-12'
 
 Python은 순수 함수형 언어가 아닙니다. 그래서 오히려 배우기 좋습니다. 명령형 코드와 함수형 코드를 같은 프로젝트 안에서 비교해 볼 수 있고, 어느 지점에서 함수형 사고가 유지보수성을 높이는지도 현실적으로 판단할 수 있기 때문입니다.
 
+
+![Functional Programming 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/01/01-01-big-picture.ko.png)
+*Functional Programming 101 1장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 함수형 프로그래밍은 정확히 무엇이며, 명령형 프로그래밍과 무엇이 다를까요?
 - Python에서 함수형 스타일은 어떤 기본 도구로 표현할 수 있을까요?
 - 데이터 변환을 함수 조합으로 바라보면 코드가 왜 더 읽기 쉬워질까요?
-
-## 큰 그림
-
-![Functional Programming 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/01/01-01-big-picture.ko.png)
-
-*Functional Programming 101 1장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -483,7 +481,6 @@ def test_sum_matches_builtin(xs: list[int]) -> None:
 이 원칙을 지키면 코드 리뷰에서 "무엇이 바뀌었는가"가 아니라 "어디에서 부수효과가 발생하는가"를 빠르게 확인할 수 있습니다.
 
 
-
 ## 검증 시나리오: 경계 조건을 먼저 잠그기
 
 실무에서 함수형 스타일이 유지되는 팀은 구현보다 먼저 검증 포인트를 고정합니다. 입력 경계, 빈 컬렉션, 정렬 안정성, 타입 변환 실패를 먼저 적어 두면 리팩터링 과정에서도 동작이 흔들리지 않습니다.
@@ -530,7 +527,6 @@ print("Pass")
 ```
 
 이런 검증 코드는 예제 코드가 아니라 운영 안전장치입니다. 새 규칙을 추가할 때도 기존 성질이 유지되는지 빠르게 확인할 수 있습니다.
-
 
 
 ## 리뷰 포인트: 코드 리뷰에서 바로 확인할 항목

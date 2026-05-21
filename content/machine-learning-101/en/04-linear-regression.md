@@ -26,19 +26,15 @@ When people call linear regression “too simple,” they usually mean “easy t
 
 This is post 4 in the Machine Learning 101 series. Here we will treat linear regression as both a prediction model and a diagnostic tool by reading coefficients, residuals, MSE, and `R^2` together.
 
+
+![machine learning 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/04/04-01-concept-at-a-glance.en.png)
+*machine learning 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - How does the linear regression equation produce a prediction?
 - What does least squares actually minimize?
 - What does `R^2` explain, and what does it hide?
-
-## Big Picture
-
-![machine learning 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/04/04-01-concept-at-a-glance.en.png)
-
-*machine learning 101 chapter 4 flow overview*
-
-This picture places Linear Regression inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

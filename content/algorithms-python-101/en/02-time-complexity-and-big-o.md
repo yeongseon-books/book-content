@@ -28,19 +28,15 @@ Big-O gives you a practical language for comparing that growth before the code e
 
 This is post 2 in the Algorithms with Python 101 series. Here, we'll build an intuition for time complexity and use Big-O notation to compare algorithms more rigorously.
 
+
+![Algorithms with Python 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/02/02-01-big-picture.en.png)
+*Algorithms with Python 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Time Complexity and Big-O?
 - Which signal should the example or diagram make visible for Time Complexity and Big-O?
 - What failure should be prevented first when Time Complexity and Big-O reaches a real system?
-
-## Big Picture
-
-![Algorithms with Python 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/02/02-01-big-picture.en.png)
-
-*Algorithms with Python 101 chapter 2 flow overview*
-
-This picture places Time Complexity and Big-O inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

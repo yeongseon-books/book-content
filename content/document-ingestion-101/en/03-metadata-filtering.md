@@ -25,21 +25,15 @@ Good retrieval is not only about semantic similarity. In production, engineers a
 
 This is the third post in the Document Ingestion 101 series. Here, we design a practical metadata shape and show how filtering changes retrieval behavior in a visible way.
 
+![Retrieval metadata schema flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/03/03-01-metadata-schema-design.en.png)
+*Retrieval metadata schema flow*
+> Metadata is not decoration around the text; it is the first index that shrinks the candidate set.
+
 ## Questions to Keep in Mind
 
 - Why should metadata schema be designed during ingestion rather than after embedding?
 - How do filters change the candidate set before vector similarity search?
 - What breaks in retrieval and citation when required metadata is missing?
-
-## Big Picture
-
-![Retrieval metadata schema flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/03/03-01-metadata-schema-design.en.png)
-
-*Retrieval metadata schema flow*
-
-This picture shows documents receiving a shared metadata schema while filters narrow the candidate set before vector search. Metadata is not decoration; it is the contract for retrieval scope and source explanation.
-
-> Metadata is not decoration around the text; it is the first index that shrinks the candidate set.
 
 ## Metadata schema design
 

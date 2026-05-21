@@ -30,21 +30,16 @@ last_reviewed: '2026-05-15'
 
 이 글은 Incident Response 101 시리즈의 마지막 글입니다. 여기서는 severity, 온콜, 커뮤니케이션, 대응 단계, postmortem 연결을 하나의 runbook으로 통합하는 방법을 정리합니다.
 
+
+![Incident Response 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/10/10-01-diagram-at-a-glance.ko.png)
+*Incident Response 101 10장 흐름 개요*
+> Runbook은 경험을 마지막 사건으로 정리하는 것입니다. Git에 관리하고 정기적으로 검토합니다.
+
 ## 먼저 던지는 질문
 
 - incident 대응 지식을 왜 한 runbook으로 묶어야 할까요?
 - severity 표와 온콜 일정은 runbook 안에서 어떻게 연결될까요?
 - 커뮤니케이션 템플릿과 대응 단계는 어떤 식으로 함께 관리해야 할까요?
-
-## 큰 그림
-
-![Incident Response 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/10/10-01-diagram-at-a-glance.ko.png)
-
-*Incident Response 101 10장 흐름 개요*
-
-Incident Runbook은 대응 매뉴얼입니다. 흐름도, 체크리스트, 연락처를 한 곳에 정리해서 반복 속도를 높입니다.
-
-> Runbook은 경험을 마지막 사건으로 정리하는 것입니다. Git에 관리하고 정기적으로 검토합니다.
 
 ## 왜 이 주제가 중요한가
 

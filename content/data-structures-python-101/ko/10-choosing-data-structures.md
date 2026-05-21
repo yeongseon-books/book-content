@@ -24,17 +24,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 Data Structures with Python 101 시리즈의 마지막 글입니다.
 
+
+![Data Structures with Python 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/10/10-01-decision-flow-at-a-glance.ko.png)
+*Data Structures with Python 101 10장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - list, dict, set 중 무엇을 선택해야 할지 어떤 기준으로 판단할까요?
 - 자료구조 선택에서 가장 먼저 봐야 할 연산은 무엇일까요?
 - 여러 구조를 조합해 요구사항을 동시에 만족시키는 방법은 무엇일까요?
-
-## 큰 그림
-
-![Data Structures with Python 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/10/10-01-decision-flow-at-a-glance.ko.png)
-
-*Data Structures with Python 101 10장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 
@@ -306,7 +304,6 @@ for scenario, choice in scenarios.items():
 ## 정리 및 다음 단계
 
 이 시리즈에서는 list, dict, set, deque, 스택, 큐, 연결 리스트, 트리, 힙, 그래프를 차례로 살펴봤습니다. 결국 좋은 자료구조 선택의 기준은 하나로 모입니다. “내가 가장 자주 수행하는 연산은 무엇인가?” 이 질문에 답할 수 있으면, 코드 구조와 성능은 훨씬 예측 가능해집니다.
-
 
 
 ## 구조 선택 의사결정 트리

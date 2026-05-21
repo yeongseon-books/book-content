@@ -28,19 +28,15 @@ Data augmentation is not about inventing brand-new samples. It is about widening
 
 To fix the weaknesses called out in issue #779, this chapter is rebuilt around one concrete augmentation decision path instead of a loose survey. It also repairs the untrustworthy AST rename example and makes the Korean-language warning operational by tying it to actual morphology-aware tooling and references.
 
+
+![AI data preparation chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/08/08-01-big-picture.en.png)
+*AI data preparation chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - How is augmentation different from synthetic generation?
 - What decision path should you follow for minority-class support and typo robustness?
 - When should you choose EDA, back-translation, paraphrasing, or AST transforms?
-
-## Big Picture
-
-![AI data preparation chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/08/08-01-big-picture.en.png)
-
-*AI data preparation chapter 8 flow overview*
-
-This picture places Data Augmentation - From EDA to Back-Translation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this chapter matters
 

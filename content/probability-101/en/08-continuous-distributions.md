@@ -28,21 +28,16 @@ Once continuous distributions click, several things become easier at once: why a
 
 This is post 8 in the Probability 101 series. Here we use Uniform, Normal, Exponential, and Gamma distributions to build intuition for density, interval probability, waiting-time models, and standardized comparisons.
 
+
+![probability 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/08/08-01-concept-at-a-glance.en.png)
+*probability 101 chapter 8 flow overview*
+> Continuous Distributions requires both definition and intuition, learned through concrete examples.
+
 ## Questions to Keep in Mind
 
 - What it means to model a continuous quantity probabilistically?
 - Why a density is not the same thing as a probability?
 - When Uniform, Normal, Exponential, and Gamma distributions make sense?
-
-## Big Picture
-
-![probability 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/08/08-01-concept-at-a-glance.en.png)
-
-*probability 101 chapter 8 flow overview*
-
-This picture places Continuous Distributions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Continuous Distributions requires both definition and intuition, learned through concrete examples.
 
 ## Why It Matters
 

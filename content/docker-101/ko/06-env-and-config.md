@@ -30,17 +30,14 @@ last_reviewed: '2026-05-15'
 좋은 컨테이너 운영의 핵심은 이미지와 환경을 분리하는 것입니다. 이미지는 불변 산출물로 유지하고, 환경별 차이는 런타임 설정으로 주입해야 합니다. 이 원칙이 바로 Twelve-Factor의 config 원칙과도 맞닿아 있습니다.
 
 
+![Docker 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/06/06-01-concept-at-a-glance.ko.png)
+*Docker 101 6장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 하나의 이미지로 여러 환경을 어떻게 지원할 수 있을까요?
 - `ENV`와 `ARG`는 무엇이 다를까요?
 - 환경변수, 설정 파일, secret은 어떻게 구분하는 편이 좋을까요?
-
-## 큰 그림
-
-![Docker 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/06/06-01-concept-at-a-glance.ko.png)
-
-*Docker 101 6장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 

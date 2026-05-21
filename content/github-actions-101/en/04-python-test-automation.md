@@ -28,19 +28,15 @@ The important line is not “tests exist.” It is “the repository runs the sa
 
 This is post 4 in the GitHub Actions 101 series. In this post, we will build a practical Python test workflow around `setup-python`, caching, reports, coverage, and version matrices.
 
+
+![github actions 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/04/04-01-concept-at-a-glance.en.png)
+*github actions 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Python Test Automation?
 - Which signal should the example or diagram make visible for Python Test Automation?
 - What failure should be prevented first when Python Test Automation reaches a real system?
-
-## Big Picture
-
-![github actions 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/04/04-01-concept-at-a-glance.en.png)
-
-*github actions 101 chapter 4 flow overview*
-
-This picture places Python Test Automation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

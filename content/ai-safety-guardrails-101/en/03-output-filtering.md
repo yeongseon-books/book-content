@@ -26,21 +26,16 @@ Model vendors ship safety training, but the output is still untrusted data. A su
 
 This is post 3 in the AI Safety & Guardrails 101 series. It focuses on treating model output as something you validate independently before it reaches a user.
 
+
+![Output filtering flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/03/03-01-big-picture.en.png)
+*Output filtering flow*
+> A model response is not finished just because the model produced it; it is data that must be validated before delivery.
+
 ## Questions to Keep in Mind
 
 - Why should model output be validated again as data before users see it?
 - Where should policy violations, sensitive data, and streaming responses each be filtered?
 - What fallback is needed when a blocked response becomes part of user experience?
-
-## Big Picture
-
-![Output filtering flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/03/03-01-big-picture.en.png)
-
-*Output filtering flow*
-
-This picture shows model output passing through policy checks, redaction or blocking, fallback replies, and monitoring. Output filtering is not decorative post-processing; it is the last safety boundary before the user sees the response.
-
-> A model response is not finished just because the model produced it; it is data that must be validated before delivery.
 
 ## The Model Does Not Promise Safety
 

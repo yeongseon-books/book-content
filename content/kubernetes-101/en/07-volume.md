@@ -30,19 +30,15 @@ Here, we will connect Volumes, PersistentVolumeClaims, and StorageClasses into o
 
 > Kubernetes can restart a Pod for you. It preserves data only when you attach the right storage contract outside the Pod.
 
+
+![kubernetes 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/07/07-01-concept-at-a-glance.en.png)
+*kubernetes 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - emptyDir* vs *PV/PVC?
 - The role of *StorageClass?
 - Dynamic provisioning?
-
-## Big Picture
-
-![kubernetes 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/07/07-01-concept-at-a-glance.en.png)
-
-*kubernetes 101 chapter 7 flow overview*
-
-This picture places Volume inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

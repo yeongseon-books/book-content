@@ -33,19 +33,14 @@ This is the 8th article in the LLM from Scratch 101 series.
 
 ---
 
+![LLM from Scratch 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/08/08-01-pre-training-vs-fine-tuning-vs-rlhf-a-qu.en.png)
+*LLM from Scratch 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - What separates pre-training, fine-tuning, and RLHF?
 - What fields make up a single instruction-data row?
 - Why does loss masking exclude the instruction portion from training?
-
-## Big Picture
-
-![LLM from Scratch 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/08/08-01-pre-training-vs-fine-tuning-vs-rlhf-a-qu.en.png)
-
-*LLM from Scratch 101 chapter 8 flow overview*
-
-This picture places Adapting the Base Model to Specific Tasks inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Pre-training vs Fine-tuning vs RLHF — A Quick Summary
 

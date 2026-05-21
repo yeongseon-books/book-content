@@ -28,19 +28,15 @@ Issue #772 called out that this chapter repeated the same mid-series narrative r
 
 So this rewrite is structured as a threshold decision memo. Precision and recall are not here as terms to memorize. They are here as the numbers you use to decide how many alerts to send and how many real cases you can afford to miss.
 
+
+![model evaluation 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/04/04-01-concept-at-a-glance.en.png)
+*model evaluation 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Precision and Recall?
 - Which signal should the example or diagram make visible for Precision and Recall?
 - What failure should be prevented first when Precision and Recall reaches a real system?
-
-## Big Picture
-
-![model evaluation 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/04/04-01-concept-at-a-glance.en.png)
-
-*model evaluation 101 chapter 4 flow overview*
-
-This picture places Precision and Recall inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## This post answers
 

@@ -29,19 +29,15 @@ This is post 5 in the Distributed Systems 101 series.
 
 Here we look at replication as the layer that turns durability, availability, and stale-read behavior into explicit knobs.
 
+
+![distributed systems 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/05/05-01-concept-at-a-glance.en.png)
+*distributed systems 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why we replicate, what kinds exist, and the tradeoffs?
 - The leader-follower, multi-leader, and leaderless models?
 - Sync vs async replication and the risk of data loss?
-
-## Big Picture
-
-![distributed systems 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/05/05-01-concept-at-a-glance.en.png)
-
-*distributed systems 101 chapter 5 flow overview*
-
-This picture places Replication inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

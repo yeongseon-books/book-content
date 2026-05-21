@@ -30,21 +30,16 @@ This is post 5 in the Math for CS 101 series.
 
 Here we treat combinatorics as the language of counting behind complexity and probability, not as a bag of disconnected formulas.
 
+
+![math for cs 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/05/05-01-concept-at-a-glance.en.png)
+*math for cs 101 chapter 5 flow overview*
+> Combinatorial counting becomes essential the moment you face an exponential search space; it shifts you from guessing to systematic enumeration.
+
 ## Questions to Keep in Mind
 
 - Why can we count accurately without enumerating every case?
 - When should you use the product rule versus the sum rule?
 - What is the practical difference between permutations and combinations?
-
-## Big Picture
-
-![math for cs 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/05/05-01-concept-at-a-glance.en.png)
-
-*math for cs 101 chapter 5 flow overview*
-
-This picture places Combinatorics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Combinatorial counting becomes essential the moment you face an exponential search space; it shifts you from guessing to systematic enumeration.
 
 ## Why It Matters
 

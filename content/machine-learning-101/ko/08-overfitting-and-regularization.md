@@ -26,21 +26,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 머신러닝 101 시리즈의 8번째 글입니다. 여기서는 과적합과 과소적합의 신호, 편향-분산 트레이드오프, Ridge·Lasso·ElasticNet 같은 정규화 기법이 일반화를 어떻게 되찾아 주는지 살펴보겠습니다.
 
+
+![Machine Learning 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/08/08-01-diagram.ko.png)
+*Machine Learning 101 8장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 과적합과 과소적합은 어떤 신호로 구분할까요?
 - 편향-분산 트레이드오프는 무엇을 뜻할까요?
 - Ridge, Lasso, ElasticNet은 어떻게 다를까요?
-
-## 큰 그림
-
-![Machine Learning 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/08/08-01-diagram.ko.png)
-
-*Machine Learning 101 8장 흐름 개요*
-
-이 그림은 이 장의 핵심 개념들이 어떻게 연결되는지 보여줍니다.
-
-
 
 ## 왜 중요한가
 

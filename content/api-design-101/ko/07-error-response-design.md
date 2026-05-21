@@ -29,19 +29,15 @@ seo_description: 일관된 error response를 만드는 envelope, code, validatio
 
 여기서는 에러를 부가 정보가 아니라 정식 계약으로 다룹니다. 상태 코드, machine-readable code, validation detail, trace id가 어떻게 함께 움직여야 디버깅과 보안이 동시에 버틸 수 있는지 정리합니다.
 
+
+![API Design 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/07/07-01-concept-at-a-glance.ko.png)
+*에러가 발생하면 status code → error code → detail → trace id 순서로 응답이 구성되는 흐름*
+
 ## 먼저 던지는 질문
 
 - 좋은 error response는 어떤 요소로 이루어질까요?
 - RFC 7807 `application/problem+json`은 왜 유용할까요?
 - validation error는 어떤 모양으로 표현해야 할까요?
-
-## 큰 그림
-
-![API Design 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/07/07-01-concept-at-a-glance.ko.png)
-
-*에러가 발생하면 status code → error code → detail → trace id 순서로 응답이 구성되는 흐름*
-
-클라이언트 요청이 서버에 도착하면 인증, 입력 검증, 비즈니스 로직, 외부 시스템 호출 등 여러 단계를 지나갑니다. 각 단계에서 실패가 발생하면 같은 envelope 안에 해당 단계의 에러 정보를 담아 반환합니다. 중요한 것은 어느 단계에서 실패하든 응답 모양이 동일하다는 것입니다. 클라이언트는 단일 파서로 모든 에러를 처리할 수 있어야 합니다.
 
 ## 에러 응답이 API의 두 번째 얼굴인 이유
 

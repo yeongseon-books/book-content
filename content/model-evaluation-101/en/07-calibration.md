@@ -28,19 +28,15 @@ This matters most when probabilities flow directly into pricing, prioritization,
 
 This is post 7 in the Model Evaluation 101 series. In this post, we separate ranking quality from probability quality and walk through reliability curves, Brier score, and post-fit calibration.
 
+
+![model evaluation 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/07/07-01-concept-at-a-glance.en.png)
+*model evaluation 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - The definition and purpose of calibration?
 - How to read a reliability diagram?
 - The meaning of Brier score?
-
-## Big Picture
-
-![model evaluation 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/07/07-01-concept-at-a-glance.en.png)
-
-*model evaluation 101 chapter 7 flow overview*
-
-This picture places Calibration inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

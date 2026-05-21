@@ -28,19 +28,15 @@ Environment variables sit behind a lot of everyday confusion: a command installs
 
 This is post 8 in the Linux CLI 101 series.
 
+
+![Linux CLI 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/08/08-01-big-picture.en.png)
+*Linux CLI 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - Viewing and setting environment variables with `echo`, `env`, `export`?
 - How PATH drives command lookup?
 - Adding permanent settings to `.bashrc` and `.bash_profile`?
-
-## Big Picture
-
-![Linux CLI 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/08/08-01-big-picture.en.png)
-
-*Linux CLI 101 chapter 8 flow overview*
-
-This picture places Environment Variables and PATH inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

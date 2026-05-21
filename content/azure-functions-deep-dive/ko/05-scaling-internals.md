@@ -30,21 +30,15 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 이제 외부 scale-out 결정과 인스턴스 내부 worker concurrency를 분리해서 보는 운영 모델을 고정하겠습니다.
 
+![Azure Functions Deep Dive 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/05/05-01-the-big-picture-where-scaling-decisions.ko.png)
+*Azure Functions Deep Dive 5장 흐름 개요*
+> 스케일링 내부 동작 — Scale Controller, ScaleMonitor, 그리고 플랜별 차이의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - Consumption, Premium, Dedicated 플랜은 같은 스케일 의사결정 트리를 공유할까요?
 - Scale Controller가 인스턴스를 더 늘리기로 결정하게 만드는 신호는 무엇일까요?
 - burst 트래픽에서 scale-out 지연은 어디에 가장 많이 쌓일까요?
-
-## 큰 그림
-
-![Azure Functions Deep Dive 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/05/05-01-the-big-picture-where-scaling-decisions.ko.png)
-
-*Azure Functions Deep Dive 5장 흐름 개요*
-
-이 그림에서는 스케일링 내부 동작 — Scale Controller, ScaleMonitor, 그리고 플랜별 차이를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 스케일링 내부 동작 — Scale Controller, ScaleMonitor, 그리고 플랜별 차이의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

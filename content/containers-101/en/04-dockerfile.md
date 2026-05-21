@@ -31,21 +31,16 @@ In this chapter, we focus on cache-friendly instruction order, multi-stage build
 
 > Dockerfile quality is really cache quality, image quality, and runtime safety compressed into one file.
 
+
+![containers 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/04/04-01-concept-at-a-glance.en.png)
+*containers 101 chapter 4 flow overview*
+> The quality of a Dockerfile lives or dies by cache efficiency. Change a layer deep in the file, and you rebuild everything below it.
+
 ## Questions to Keep in Mind
 
 - The role and order of instructions?
 - Cache-friendly authoring?
 - Multi-stage builds?
-
-## Big Picture
-
-![containers 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/04/04-01-concept-at-a-glance.en.png)
-
-*containers 101 chapter 4 flow overview*
-
-This picture places Dockerfile inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> The quality of a Dockerfile lives or dies by cache efficiency. Change a layer deep in the file, and you rebuild everything below it.
 
 ## Why It Matters
 

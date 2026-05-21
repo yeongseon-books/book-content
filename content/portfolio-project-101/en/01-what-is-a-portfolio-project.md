@@ -32,21 +32,16 @@ This is the first post in the Portfolio Project 101 series. Here we will define 
 
 > A portfolio project is not a pile of features. It is a public case study that makes the problem, the judgment, and the result visible at a glance.
 
+
+![portfolio project 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/01/01-01-concept-at-a-glance.en.png)
+*portfolio project 101 chapter 1 flow overview*
+> A portfolio project is not a pile of features. It is a public case study that makes the problem, the judgment, and the result visible at a glance.
+
 ## Questions to Keep in Mind
 
 - What is the difference between a portfolio project and a simple practice repository?
 - What do hiring managers or reviewers usually look for before they ever read the code?
 - What is the minimum structure that makes even a small project feel worth reviewing?
-
-## Big Picture
-
-![portfolio project 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/01/01-01-concept-at-a-glance.en.png)
-
-*portfolio project 101 chapter 1 flow overview*
-
-This picture places What is a Portfolio Project inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A portfolio project is not a pile of features. It is a public case study that makes the problem, the judgment, and the result visible at a glance.
 
 ## Why It Matters
 

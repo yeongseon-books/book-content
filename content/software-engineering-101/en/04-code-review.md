@@ -29,19 +29,15 @@ A strong review is not just a search for bugs. It is a checkpoint for intent, sy
 
 This is post 4 in the Software Engineering 101 series. In this chapter, we look at how to make a PR reviewable, what humans should still review after automation, and how teams keep review focused on decisions instead of noise.
 
+
+![software engineering 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/04/04-01-concept-at-a-glance.en.png)
+*software engineering 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Code Review?
 - Which signal should the example or diagram make visible for Code Review?
 - What failure should be prevented first when Code Review reaches a real system?
-
-## Big Picture
-
-![software engineering 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/04/04-01-concept-at-a-glance.en.png)
-
-*software engineering 101 chapter 4 flow overview*
-
-This picture places Code Review inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

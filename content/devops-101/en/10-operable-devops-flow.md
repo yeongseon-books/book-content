@@ -28,21 +28,16 @@ Operational maturity appears when those parts stop behaving like isolated tools 
 
 This is the final post in the DevOps 101 series. Here we connect the earlier chapters into one operable feedback loop and show how a team can measure, review, and improve the whole path from pull request to postmortem.
 
+
+![devops 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/10/10-01-concept-at-a-glance.en.png)
+*devops 101 chapter 10 flow overview*
+> DevOps is complete when *build*, *deploy*, *monitor*, and *respond to failure* form *one feedback loop* the whole team closes together.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying An Operable DevOps Flow?
 - Which signal should the example or diagram make visible for An Operable DevOps Flow?
 - What failure should be prevented first when An Operable DevOps Flow reaches a real system?
-
-## Big Picture
-
-![devops 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/10/10-01-concept-at-a-glance.en.png)
-
-*devops 101 chapter 10 flow overview*
-
-This picture places An Operable DevOps Flow inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> DevOps is complete when *build*, *deploy*, *monitor*, and *respond to failure* form *one feedback loop* the whole team closes together.
 
 ## What You Will Learn
 

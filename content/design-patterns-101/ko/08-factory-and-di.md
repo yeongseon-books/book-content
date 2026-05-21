@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 이번 글에서는 Factory와 Dependency Injection을 함께 보겠습니다. 핵심은 조립은 바깥 한곳에서 하고, 도메인은 주어진 의존성을 사용만 하게 만드는 것입니다. 그 조립 지점을 Composition Root라고 부릅니다.
 
+
+![Design Patterns 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/08/08-01-concept-at-a-glance.ko.png)
+*Design Patterns 101 8장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 생성 책임이 흩어져 있으면 왜 변경 비용이 커질까요?
 - Factory는 어떤 생성 분기를 캡슐화할까요?
 - Dependency Injection은 어떤 사고방식을 요구할까요?
-
-## 큰 그림
-
-![Design Patterns 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/08/08-01-concept-at-a-glance.ko.png)
-
-*Design Patterns 101 8장 흐름 개요*
 
 ## 왜 중요한가
 

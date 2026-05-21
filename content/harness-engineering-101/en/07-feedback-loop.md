@@ -27,21 +27,15 @@ Retrying blindly is usually just a cost amplifier. Returning the raw failure to 
 
 This is post 7 in the Harness Engineering 101 series. Here we treat failure as structured input for the next attempt rather than as the end of the run.
 
+![Feedback loops - building structures that let agents recover from failure](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/07/07-01-feedback-loops-building-structures-that.en.png)
+*Feedback loops - building structures that let agents recover from failure*
+> A good feedback loop does not merely try again; it makes the next attempt different because the system knows why the previous one failed.
+
 ## Questions to Keep in Mind
 
 - What input should a Feedback Loop turn failure into instead of treating it as a stop signal?
 - Where do simple retry and reflection diverge, and when should each be used?
 - What limits and memory must remain inside the loop to prevent infinite retries?
-
-## Big Picture
-
-![Feedback loops - building structures that let agents recover from failure](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/07/07-01-feedback-loops-building-structures-that.en.png)
-
-*Feedback loops - building structures that let agents recover from failure*
-
-This picture shows failure being structured into retry or reflection messages that become input for the next attempt. A Feedback Loop is not a device for running the agent forever; it is a control structure that turns failure into a better next action.
-
-> A good feedback loop does not merely try again; it makes the next attempt different because the system knows why the previous one failed.
 
 ## No Agent Succeeds on the First Try
 

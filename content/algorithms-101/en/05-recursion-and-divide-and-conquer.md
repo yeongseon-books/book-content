@@ -29,19 +29,15 @@ Recursion expresses a problem in terms of smaller versions of itself. Three rule
 
 This is post 5 in the Algorithms 101 series. Here we cover the call stack, recurrence-based cost analysis, and the mental model behind divide-and-conquer algorithms.
 
+
+![algorithms 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/05/05-01-big-picture.en.png)
+*algorithms 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Recursion and Divide and Conquer?
 - Which signal should the example or diagram make visible for Recursion and Divide and Conquer?
 - What failure should be prevented first when Recursion and Divide and Conquer reaches a real system?
-
-## Big Picture
-
-![algorithms 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/05/05-01-big-picture.en.png)
-
-*algorithms 101 chapter 5 flow overview*
-
-This picture places Recursion and Divide and Conquer inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

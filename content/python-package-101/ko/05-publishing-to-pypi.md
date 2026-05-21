@@ -27,17 +27,14 @@ seo_description: PyPI는 Python 패키지의 앱스토어이고, twine은 빌드
 
 이 글은 Python Package 101 시리즈의 5번째 글입니다. 여기서는 TestPyPI와 PyPI의 역할 차이, `twine` 업로드 흐름, 그리고 배포 실패를 피하기 위한 기본 원칙을 정리하겠습니다.
 
+![Python Package 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/05/05-01-mental-model.ko.png)
+*Python Package 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - PyPI와 TestPyPI는 무엇이 다를까요?
 - `twine`은 정확히 어떤 역할을 할까요?
 - API 토큰은 어떻게 만들고 관리할까요?
-
-## 큰 그림
-
-![Python Package 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/05/05-01-mental-model.ko.png)
-
-*Python Package 101 5장 흐름 개요*
 
 ## 이 글에서 배우는 내용
 
@@ -82,7 +79,7 @@ python -m build → dist/*.whl, dist/*.tar.gz
 
 ## Before / After
 
-**Before (install directly from Git)**
+**Before (Git에서 직접 설치)**
 
 ```bash
 pip install git+https://github.com/team/mylib.git@main
@@ -91,7 +88,7 @@ pip install git+https://github.com/team/mylib.git@main
 # → hard to pin versions
 ```
 
-**After (install from PyPI)**
+**After (PyPI에서 설치)**
 
 ```bash
 pip install mylib==0.1.0

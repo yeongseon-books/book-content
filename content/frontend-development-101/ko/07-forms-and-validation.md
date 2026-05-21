@@ -26,17 +26,15 @@ last_reviewed: '2026-05-12'
 
 사용자는 폼을 통해 제품과 가장 길게 대화합니다. 회원가입, 로그인, 결제, 검색, 설정 변경까지 대부분의 중요한 순간이 폼에서 일어납니다. 그런데도 많은 폼은 제출 버튼을 누른 뒤에야 뒤늦게 오류를 보여 줍니다.
 
+
+![Frontend Development 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/07/07-01-diagram.ko.png)
+*Frontend Development 101 7장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - controlled input과 uncontrolled input은 어떤 차이가 있을까요?
 - 유효성 검사는 형식, 비즈니스 규칙, 서버 검증으로 왜 나눠 생각해야 할까요?
 - 에러 메시지는 어디에, 언제 보여 주는 편이 가장 친절할까요?
-
-## 큰 그림
-
-![Frontend Development 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/07/07-01-diagram.ko.png)
-
-*Frontend Development 101 7장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -58,7 +56,7 @@ last_reviewed: '2026-05-12'
 
 ## 전통 방식과 현대 방식 비교
 
-**Before (validate only on submit)**
+**Before (제출 시에만 검증)**
 
 ```javascript
 form.onsubmit = () => {
@@ -66,7 +64,7 @@ form.onsubmit = () => {
 };
 ```
 
-**After (real-time inline check + friendly message)**
+**After (실시간 인라인 검증 + 친절한 메시지)**
 
 ```jsx
 {!isEmail(email) && <p className="error">That doesn't look like an email</p>}
@@ -349,7 +347,6 @@ export default defineConfig({
 ### 실무 연결 포인트
 
 프론트엔드는 더 이상 단순 화면 기술이 아닙니다. API 계약, 번들 최적화, 브라우저 성능, 접근성, 운영 관측이 모두 만나는 실행 계층입니다. 따라서 작은 예제라도 HTML/CSS/JS 코드, 컴포넌트 패턴, 빌드 설정을 한 번에 다뤄 보는 연습이 필요합니다. 이 연습을 반복하면 도구가 바뀌어도 구조를 잃지 않고, 신규 기능을 추가할 때도 안정적으로 확장할 수 있습니다.
-
 
 
 ## 실무 앵커 모음: 프레임워크, 레이아웃, 디버깅, 성능

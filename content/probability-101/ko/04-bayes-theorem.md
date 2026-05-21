@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 이 글은 Probability 101 시리즈의 4번째 글입니다. 여기서는 베이즈 정리의 구조를 사전확률·우도·사후확률로 나눠 보고, 진단 예시와 순차 갱신, 오즈 형태까지 연결해서 정리하겠습니다.
 
+
+![Probability 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/04/04-01-diagram.ko.png)
+*Probability 101 4장 흐름 개요*
+> 베이즈 정리은 구체적인 가정과 한계를 함께 봐야 합니다.
+
 ## 먼저 던지는 질문
 
 - 베이즈 정리는 어떤 질문에 답하는 식일까요?
 - 사전확률, 우도, 사후확률은 각각 무엇을 뜻할까요?
 - 기저율이 작으면 왜 양성 판정의 의미가 달라질까요?
-
-## 큰 그림
-
-![Probability 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/04/04-01-diagram.ko.png)
-
-*Probability 101 4장 흐름 개요*
-
-이 그림은 이 개념의 기본 구조를 보여줍니다.
-
-> 베이즈 정리은 구체적인 가정과 한계를 함께 봐야 합니다.
 
 ## 왜 중요한가
 

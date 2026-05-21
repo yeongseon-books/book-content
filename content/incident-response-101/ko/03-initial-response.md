@@ -30,21 +30,16 @@ incident가 발생했을 때 처음 몇 분은 유난히 짧고도 길게 느껴
 
 이 글은 Incident Response 101 시리즈의 3번째 글입니다. 여기서는 첫 5분 안에 해야 할 확인, 채널 개설, 역할 배정, 안정화 우선순위를 운영 관점에서 정리합니다.
 
+
+![Incident Response 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/03/03-01-diagram-at-a-glance.ko.png)
+*Incident Response 101 3장 흐름 개요*
+> 초기 대응은 먼저 영향을 명확히 파악하고, 그 다음 원인을 찾습니다. 순서를 바꾸면 문제 해결이 오래 걸립니다.
+
 ## 먼저 던지는 질문
 
 - 알림이 온 뒤 첫 5분에 무엇부터 해야 할까요?
 - 왜 진단보다 안정화가 먼저일까요?
 - 영향은 어떤 숫자로 표현해야 할까요?
-
-## 큰 그림
-
-![Incident Response 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/03/03-01-diagram-at-a-glance.ko.png)
-
-*Incident Response 101 3장 흐름 개요*
-
-초기 대응 단계는 단기 안정화를 먼저 합니다. 왜냐하면 지금 이 순간 고객 영향이 계속 커지고 있기 때문입니다.
-
-> 초기 대응은 먼저 영향을 명확히 파악하고, 그 다음 원인을 찾습니다. 순서를 바꾸면 문제 해결이 오래 걸립니다.
 
 ## 왜 이 주제가 중요한가
 

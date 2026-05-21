@@ -34,21 +34,16 @@ Diffusion이 중요한 이유는 생성 품질만이 아닙니다. 텍스트 조
 
 생성 품질을 올리는 일과 운영 위험을 낮추는 일은 항상 함께 가야 합니다.
 
+
+![Multimodal AI 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/07/07-01-big-picture.ko.png)
+*Multimodal AI 101 7장 흐름 개요*
+> Diffusion으로 Text-to-Image 생성의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - 왜 diffusion이 GAN을 빠르게 밀어내고 시각 생성의 기본 구조가 되었을까요?
 - forward process와 reverse process를 어떤 멘탈 모델로 이해하면 가장 실용적일까요?
 - Stable Diffusion의 text encoder, UNet, VAE는 각각 어떤 역할을 맡을까요?
-
-## 큰 그림
-
-![Multimodal AI 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/07/07-01-big-picture.ko.png)
-
-*Multimodal AI 101 7장 흐름 개요*
-
-이 그림에서는 Diffusion으로 Text-to-Image 생성를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> Diffusion으로 Text-to-Image 생성의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

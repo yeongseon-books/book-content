@@ -28,17 +28,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 Kubernetes 운영을 기능 목록이 아니라 probes, 접근 권한, 네트워크 경계, 관측성, GitOps, 런북이 함께 맞물려야 성립하는 운영 모델로 정리하겠습니다.
 
+
+![Kubernetes 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/10/10-01-concept-at-a-glance.ko.png)
+*Kubernetes 101 10장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - liveness, readiness, startup probe는 어떤 역할을 나눌까요?
 - RBAC와 NetworkPolicy는 왜 운영의 기본 경계일까요?
 - 메트릭, 로그, 트레이스는 왜 함께 봐야 할까요?
-
-## 큰 그림
-
-![Kubernetes 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/10/10-01-concept-at-a-glance.ko.png)
-
-*Kubernetes 101 10장 흐름 개요*
 
 ## 왜 중요한가
 

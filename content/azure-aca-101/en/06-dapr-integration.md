@@ -33,19 +33,14 @@ This is post 6 in the Azure Container Apps 101 series. Here, we'll examine what 
 - The role of the four core building blocks: Service invocation, Pub/Sub, State store, Secret store.
 - How to configure a real Dapr integration with `--enable-dapr` and component YAML.
 
+![azure container apps 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/06/06-01-where-dapr-sits.en.png)
+*azure container apps 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - Where exactly does the Dapr sidecar attach inside an ACA pod, and what endpoint does the app call?
 - Why are App-level `--enable-dapr` settings separated from Environment-level components?
 - What problems do Service invocation, Pub/Sub, State store, and Secret store each solve?
-
-## Big Picture
-
-![azure container apps 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/06/06-01-where-dapr-sits.en.png)
-
-*azure container apps 101 chapter 6 flow overview*
-
-This picture places Dapr integration — what you get from a sidecar inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

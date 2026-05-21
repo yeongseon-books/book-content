@@ -29,21 +29,16 @@ Pandas를 익히다 보면 같은 표에서 원하는 부분을 고르는 방법
 
 이번 글에서는 행과 열을 고르는 네 가지 방식을 기능 목록이 아니라 의도에 맞는 도구 상자로 정리해 보겠습니다.
 
+
+![Pandas 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/04/04-01-concept-at-a-glance.ko.png)
+*Pandas 101 4장 흐름 개요*
+> **선택은 의도에 맞는 도구**입니다. 같은 데이터를 고르더라도 `loc`, `iloc`, 조건 마스크, `query` 중 어떤 것을 선택하느냐에 따라 코드의 명확성과 유지보수 비용이 달라집니다.
+
 ## 먼저 던지는 질문
 
 - `loc`와 `iloc`는 언제 구분해서 써야 할까요?
 - 조건 마스크는 어떤 상황에서 가장 자연스러울까요?
 - 표현식이 길어질수록 `query`가 왜 읽기 쉬워질까요?
-
-## 큰 그림
-
-![Pandas 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/04/04-01-concept-at-a-glance.ko.png)
-
-*Pandas 101 4장 흐름 개요*
-
-이 그림은 데이터를 고르는 네 가지 방식의 의도 차이를 보여 줍니다. 레이블로 고르기(`loc`), 위치로 고르기(`iloc`), 조건으로 고르기(불리언 마스크), 식으로 고르기(`query`) 각각은 다른 상황에서 가장 자연스럽습니다.
-
-> **선택은 의도에 맞는 도구**입니다. 같은 데이터를 고르더라도 `loc`, `iloc`, 조건 마스크, `query` 중 어떤 것을 선택하느냐에 따라 코드의 명확성과 유지보수 비용이 달라집니다.
 
 ## 왜 중요한가
 
@@ -335,8 +330,6 @@ df["result"] = df["x"].where(df["x"] <= 10, df["x"] * 2)
 가능하면 apply 대신 벡터화 연산을 사용하세요.
 
 
-
-
 ### 체이닝 인덱싱 경고 해결
 
 ```python
@@ -352,7 +345,6 @@ subset["y"] = 100
 ```
 
 loc를 사용하거나 명시적 복사본을 만드는 것이 안전합니다.
-
 
 
 ## 고급 인덱싱 패턴
@@ -374,7 +366,6 @@ print(result)
 ```
 
 MultiIndex를 다룰 때 IndexSlice를 사용하면 슬라이싱이 더 직관적입니다.
-
 
 
 MultiIndex는 복잡해 보이지만, 계층적 데이터를 표현하는 강력한 도구입니다. groupby 결과도 종종 MultiIndex를 반환합니다.

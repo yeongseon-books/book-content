@@ -24,21 +24,16 @@ The first version of an LLM app feels simple. Pass user input to the model and r
 
 This is the first post in the AI Safety & Guardrails 101 series. It frames why guardrails are not optional polish around a prompt but part of the core operating model for an LLM application.
 
+
+![section 4: four guardrail locations](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/01/01-01-section-4-four-guardrail-locations.en.png)
+*section 4: four guardrail locations*
+> An LLM call is not a safe function call; it is an untrusted data boundary.
+
 ## Questions to Keep in Mind
 
 - What risk do you miss when an LLM call is treated as inside the trust boundary?
 - How must a guardrail differ from a prompt rule to become a real safety control?
 - Where should the first minimum production guardrail sit?
-
-## Big Picture
-
-![section 4: four guardrail locations](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/01/01-01-section-4-four-guardrail-locations.en.png)
-
-*section 4: four guardrail locations*
-
-This picture treats the LLM call as an untrusted boundary and places guardrails around input, model calls, output, and operational logs. AI safety starts by validating model-produced data instead of trusting it.
-
-> An LLM call is not a safe function call; it is an untrusted data boundary.
 
 ## "Just Call the LLM API, Right?"
 

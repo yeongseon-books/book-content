@@ -29,21 +29,16 @@ This is the final post in the API Design 101 series.
 
 Here, we treat documentation as the full adoption path rather than as a reference dump. Getting Started, scenario tutorials, example-rich reference pages, changelogs, and SDK guidance all need to support the same journey.
 
+
+![api design 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/10/10-01-concept-at-a-glance.en.png)
+*api design 101 chapter 10 flow overview*
+> Documentation is not optional — it is the primary way clients discover what they can do with your API, so it must be accurate, complete, and up-to-date by construction.
+
 ## Questions to Keep in Mind
 
 - The five axes of documentation?
 - Reaching the first call in *under five minutes?
 - The weight of examples?
-
-## Big Picture
-
-![api design 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/10/10-01-concept-at-a-glance.en.png)
-
-*api design 101 chapter 10 flow overview*
-
-The diagram shows documentation as the living contract: it specifies endpoint paths, required parameters, response schemas, and example calls; when it is auto-generated from OpenAPI, code and docs stay synchronized.
-
-> Documentation is not optional — it is the primary way clients discover what they can do with your API, so it must be accurate, complete, and up-to-date by construction.
 
 ## Why It Matters
 

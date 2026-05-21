@@ -47,19 +47,14 @@ you understand when ARR Affinity should be turned off,
 why only some users keep hitting a bad instance,
 and why App Service keeps pushing you toward stateless design.
 
+![azure app service deep dive chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/02/02-01-the-routing-path-in-three-stages.en.png)
+*azure app service deep dive chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What does a Front-End node actually do, and where does ARR (Application Request Routing) sit inside it?
 - Is the ARR Affinity cookie just a sticky session, or more than that?
 - How do TLS termination and SNI handling flow through the Front End?
-
-## Big Picture
-
-![azure app service deep dive chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/02/02-01-the-routing-path-in-three-stages.en.png)
-
-*azure app service deep dive chapter 2 flow overview*
-
-This picture places Front-End and ARR — how a request reaches a worker inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## The routing path in three stages
 

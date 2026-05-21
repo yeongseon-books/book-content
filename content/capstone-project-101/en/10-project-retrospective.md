@@ -28,21 +28,16 @@ A retrospective is valuable because it converts feelings into facts, causes, and
 
 This is the final post in the Capstone Project 101 series. It shows how to combine KPT, data, cause analysis, and next actions into a retrospective that the next project can actually use.
 
+
+![capstone project 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/10/10-01-the-flow-at-a-glance.en.png)
+*capstone project 101 chapter 10 flow overview*
+> A retrospective done well becomes a bridge to the next project. Bad retros feel like filing a report; good ones feel like unpacking lessons.
+
 ## Questions to Keep in Mind
 
 - What keeps a retrospective from turning into blame allocation?
 - Why does the KPT format work well for beginner teams?
 - How does data make retrospective discussion more stable?
-
-## Big Picture
-
-![capstone project 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/10/10-01-the-flow-at-a-glance.en.png)
-
-*capstone project 101 chapter 10 flow overview*
-
-This picture places Project Retrospective inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A retrospective done well becomes a bridge to the next project. Bad retros feel like filing a report; good ones feel like unpacking lessons.
 
 ## What You Will Learn
 

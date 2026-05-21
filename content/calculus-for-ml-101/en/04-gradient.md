@@ -30,19 +30,15 @@ In this post, we'll treat the gradient as a direction vector on a loss landscape
 
 > A gradient is not just a list of slopes. It is the direction-and-strength signal that tells an optimizer how the loss surface is pushing back at the current point.
 
+
+![calculus for ml 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/04/04-01-concept-at-a-glance.en.png)
+*calculus for ml 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Gradient?
 - Which signal should the example or diagram make visible for Gradient?
 - What failure should be prevented first when Gradient reaches a real system?
-
-## Big Picture
-
-![calculus for ml 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/04/04-01-concept-at-a-glance.en.png)
-
-*calculus for ml 101 chapter 4 flow overview*
-
-This picture places Gradient inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions this article answers
 

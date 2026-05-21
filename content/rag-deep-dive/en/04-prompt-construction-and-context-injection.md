@@ -24,23 +24,16 @@ PromptTemplate and MessagesPlaceholder turn retrieved context into the exact inp
 
 This is post 4 in the RAG Deep Dive series.
 
+![String and chat prompt hierarchy](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/04/04-01-prompt-template-class-hierarchy.en.png)
+*String and chat prompt hierarchy*
+> The prompt layer is where structured retrieval output becomes the exact contract the model will read.
+
 ## Questions to Keep in Mind
 
 - What input contract does a prompt template validate beyond string formatting?
 - Why do missing variables, message order, and roles matter when injecting retrieved context?
 - What debugging problem appears when a RAG prompt does not separate question and evidence?
 
-## Big Picture
-
-![String and chat prompt hierarchy](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/04/04-01-prompt-template-class-hierarchy.en.png)
-
-*String and chat prompt hierarchy*
-
-This picture shows PromptTemplate and ChatPromptTemplate validating input variables, then assembling retrieved context and the user question into structured messages. A RAG prompt must preserve the boundary between evidence and question before optimizing wording.
-
-> The prompt layer is where structured retrieval output becomes the exact contract the model will read.
-
-<!-- a-grade-example:begin -->
 ## Minimal runnable example
 
 Example file: `en/04-prompt-construction-and-context-injection/main.py`

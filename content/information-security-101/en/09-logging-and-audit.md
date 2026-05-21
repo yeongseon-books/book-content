@@ -31,21 +31,16 @@ last_reviewed: '2026-05-04'
 
 This is post 9 in the Information Security 101 series.
 
+
+![information security 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/09/09-01-big-picture.en.png)
+*information security 101 chapter 9 flow overview*
+> Logging and audit are not post-incident analysis tools. They are real-time detection systems that catch anomalies as they happen and trigger immediate response.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Logging and Audit?
 - Which signal should the example or diagram make visible for Logging and Audit?
 - What failure should be prevented first when Logging and Audit reaches a real system?
-
-## Big Picture
-
-![information security 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/09/09-01-big-picture.en.png)
-
-*information security 101 chapter 9 flow overview*
-
-This picture places Logging and Audit inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Logging and audit are not post-incident analysis tools. They are real-time detection systems that catch anomalies as they happen and trigger immediate response.
 
 ## What You Will Learn
 

@@ -27,19 +27,14 @@ This chapter draws that line clearly. We’ll cover the main trigger types, the 
 
 This is the second post in the Azure Functions 101 series. Here, we make the boundary between triggers and bindings concrete so function I/O stops feeling magical.
 
+![azure functions 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/02/02-01-a-trigger-is-the-cause-that-wakes-a-func.en.png)
+*azure functions 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What is fundamentally different about a trigger versus a binding, and why are they split?
 - How much code do input/output bindings remove, and what flexibility do you give up?
 - Can multiple triggers attach to one function, and if not, why?
-
-## Big Picture
-
-![azure functions 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/02/02-01-a-trigger-is-the-cause-that-wakes-a-func.en.png)
-
-*azure functions 101 chapter 2 flow overview*
-
-This picture places Triggers and Bindings — Everything About Function I/O inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## A trigger is the “cause” that wakes a function up
 

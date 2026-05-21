@@ -26,17 +26,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 GitHub Actions 101 시리즈의 3번째 글입니다. 여기서는 push, pull_request, schedule, workflow_dispatch를 어떻게 나눠 써야 하는지, 그리고 paths 필터와 concurrency로 불필요한 실행을 어떻게 줄이는지 살펴보겠습니다.
 
+
+![GitHub Actions 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/03/03-01-diagram.ko.png)
+*GitHub Actions 101 3장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - push와 pull_request는 어떤 차이로 써야 할까요?
 - schedule은 왜 로컬 시간이 아니라 UTC로 이해해야 할까요?
 - workflow_dispatch는 언제 유용하고 무엇을 문서화해야 할까요?
-
-## 큰 그림
-
-![GitHub Actions 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/03/03-01-diagram.ko.png)
-
-*GitHub Actions 101 3장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -172,7 +170,6 @@ concurrency:
 트리거는 워크플로우의 시작 시점을 정하는 기능이지만, 실제로는 비용과 신뢰를 함께 설계하는 장치입니다. 언제 실행할지뿐 아니라 언제 실행하지 않을지까지 분명히 정해야 좋은 자동화가 됩니다.
 
 다음 글에서는 Python 테스트 자동화를 다룹니다. 적절한 시점에 워크플로우를 깨우는 법을 이해했다면, 이제 그 안에서 어떤 테스트를 어떻게 돌릴지 구체화할 차례입니다.
-
 
 
 ---

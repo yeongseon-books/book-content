@@ -33,19 +33,14 @@ This is the 7th article in the LLM from Scratch 101 series.
 
 ---
 
+![LLM from Scratch 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/07/07-01-autoregressive-generation-one-token-at-a.en.png)
+*LLM from Scratch 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - What does the autoregressive generation loop iterate over?
 - How do temperature, top-k, and top-p each manipulate the logits?
 - Why does greedy decoding produce monotonous text?
-
-## Big Picture
-
-![LLM from Scratch 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/07/07-01-autoregressive-generation-one-token-at-a.en.png)
-
-*LLM from Scratch 101 chapter 7 flow overview*
-
-This picture places Sampling — Generating Text from a Trained Model inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Autoregressive Generation — One Token at a Time
 

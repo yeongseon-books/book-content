@@ -28,21 +28,16 @@ A pre-publish pass is not perfectionism. It is a cost-control routine. One round
 
 This is the final post in the Technical Writing 101 series. It turns that last-pass review into a repeatable workflow for titles, links, code, visuals, and post-publish follow-up.
 
+
+![technical writing 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/10/10-01-concept-at-a-glance.en.png)
+*technical writing 101 chapter 10 flow overview*
+> A pre-publish pass is the difference between a fix that costs 24 hours (before readers see it) and a fix that costs a week (after they do).
+
 ## Questions to Keep in Mind
 
 - Title* review?
 - Link* validation?
 - Code* execution?
-
-## Big Picture
-
-![technical writing 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/10/10-01-concept-at-a-glance.en.png)
-
-*technical writing 101 chapter 10 flow overview*
-
-This picture places Pre-publish Checklist inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A pre-publish pass is the difference between a fix that costs 24 hours (before readers see it) and a fix that costs a week (after they do).
 
 ## Why It Matters
 

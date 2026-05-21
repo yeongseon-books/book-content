@@ -31,21 +31,15 @@ This is the fifth article in the LangGraph 101 series. Here I want to frame mult
 
 Once that lens is in place, the final chapter becomes easier too. A complete LangGraph system is really just state, branching, tool use, and multi-agent orchestration combined into one operational graph. If multi-agent still feels like “a lot of agents doing things,” the supervisor design and shared-state boundaries stay vague much longer than they should.
 
+![Supervisor worker delegation structure](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/05/05-01-minimal-runnable-example.en.png)
+*Supervisor worker delegation structure*
+> The quality of a multi-agent graph comes from clear responsibilities and handoff state, not from the number of agents.
+
 ## Questions to Keep in Mind
 
 - What role-separation structure does multi-agent design require beyond connecting several models?
 - What should be limited when each agent node reads and writes shared state?
 - What operational problem appears when handoff or supervisor boundaries are blurry?
-
-## Big Picture
-
-![Supervisor worker delegation structure](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/05/05-01-minimal-runnable-example.en.png)
-
-*Supervisor worker delegation structure*
-
-This picture shows role-specific agent nodes cooperating through shared state while a supervisor or routing boundary chooses the next worker. Multi-agent design is less about parallelism than about clear responsibility and handoff.
-
-> The quality of a multi-agent graph comes from clear responsibilities and handoff state, not from the number of agents.
 
 ## Why this structure matters
 

@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 이번 글에서는 Structural 패턴을 “객체 합성의 이름표”로 보겠습니다. 핵심은 상속을 늘리는 대신 합성과 위임으로 구조를 조립해, 변경이 와도 전체 설계가 쉽게 굳어 버리지 않게 만드는 것입니다.
 
+
+![Design Patterns 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/03/03-01-concept-at-a-glance.ko.png)
+*Design Patterns 101 3장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - Structural 패턴은 어떤 구조적 문제를 풀까요?
 - Adapter, Decorator, Facade는 각각 무엇을 단순화할까요?
 - Proxy는 실제 객체 앞에서 어떤 책임을 대신 맡을까요?
-
-## 큰 그림
-
-![Design Patterns 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/03/03-01-concept-at-a-glance.ko.png)
-
-*Design Patterns 101 3장 흐름 개요*
 
 ## 왜 중요한가
 

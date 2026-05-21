@@ -32,21 +32,16 @@ This is post 2 in the Portfolio Project 101 series. Here we will look at the tra
 
 > Good projects win with focus, visible results, and repeatable verification—not with an endless feature list.
 
+
+![portfolio project 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/02/02-01-concept-at-a-glance.en.png)
+*portfolio project 101 chapter 2 flow overview*
+> Good projects don't emerge from the latest stack. They emerge from clear problem statements and well-organized explanations.
+
 ## Questions to Keep in Mind
 
 - Why is a bigger project not automatically a better portfolio project?
 - How do problem clarity, measurable results, maintainability, and reproducibility show up in practice?
 - What makes a small project still feel strong and credible?
-
-## Big Picture
-
-![portfolio project 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/02/02-01-concept-at-a-glance.en.png)
-
-*portfolio project 101 chapter 2 flow overview*
-
-This picture places Traits of a Good Project inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Good projects don't emerge from the latest stack. They emerge from clear problem statements and well-organized explanations.
 
 ## Why It Matters
 

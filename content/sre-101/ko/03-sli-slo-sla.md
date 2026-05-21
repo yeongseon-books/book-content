@@ -28,21 +28,16 @@ last_reviewed: '2026-05-14'
 
 이 글은 SRE 101 시리즈의 3번째 글입니다. 여기서는 SLI, SLO, SLA를 측정, 목표, 약속의 순서로 구분하고, 각 문서에 무엇이 빠지면 안 되는지 정리합니다.
 
+
+![SRE 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/03/03-01-concept-at-a-glance.ko.png)
+*SRE 101 3장 흐름 개요*
+> SLI는 무엇을 측정할지 정하고, SLO는 그 지표의 목표치와 오너를 명시하며, SLA는 외부 약속으로 보상과 예외를 포함합니다.
+
 ## 먼저 던지는 질문
 
 - SLI, SLO, SLA는 각각 어떤 역할을 맡고 어디서 경계가 갈릴까요?
 - 내부 목표와 외부 약속은 왜 같은 문서가 아니어야 할까요?
 - 좋은 SLO에는 목표 수치 외에 어떤 정보가 반드시 들어가야 할까요?
-
-## 큰 그림
-
-![SRE 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/03/03-01-concept-at-a-glance.ko.png)
-
-*SRE 101 3장 흐름 개요*
-
-SLI, SLO, SLA로 나누면 각각이 다른 역할을 맡으며 측정, 목표, 약속이라는 세 단계로 분리됩니다.
-
-> SLI는 무엇을 측정할지 정하고, SLO는 그 지표의 목표치와 오너를 명시하며, SLA는 외부 약속으로 보상과 예외를 포함합니다.
 
 ## 왜 이 주제가 중요한가
 

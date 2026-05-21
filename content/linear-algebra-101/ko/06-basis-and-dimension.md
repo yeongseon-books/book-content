@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 선형독립, 기저, 차원, 랭크를 하나의 그림으로 묶어 보겠습니다.
 
+
+![Linear Algebra 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/06/06-01-concept-at-a-glance.ko.png)
+*Linear Algebra 101 6장 흐름 개요*
+> 기저와 차원은 벡터 공간의 언어를 정의합니다. 기저가 정해지면 그 공간의 모든 점을 고유하게 표현할 수 있습니다.
+
 ## 먼저 던지는 질문
 
 - 어떤 벡터 집합이 공간을 충분히 설명한다는 말은 무슨 뜻일까요?
 - 선형독립은 왜 기저의 핵심 조건일까요?
 - 차원과 랭크는 어떻게 연결될까요?
-
-## 큰 그림
-
-![Linear Algebra 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/06/06-01-concept-at-a-glance.ko.png)
-
-*Linear Algebra 101 6장 흐름 개요*
-
-기저는 벡터 공간을 표현하는 최소한의 축 집합이고, 차원은 그 기저의 원소 개수입니다. 선형독립과 랭크는 이 개념과 긴밀하게 연결되어 있습니다.
-
-> 기저와 차원은 벡터 공간의 언어를 정의합니다. 기저가 정해지면 그 공간의 모든 점을 고유하게 표현할 수 있습니다.
 
 ## 왜 중요한가
 

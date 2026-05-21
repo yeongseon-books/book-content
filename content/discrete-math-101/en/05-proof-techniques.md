@@ -31,19 +31,15 @@ This is post 5 in the Discrete Math 101 series.
 
 > A proof is a rigorous argument that a statement holds in every possible case. Direct proof, contrapositive, contradiction, and mathematical induction are the four core techniques in discrete math, and they are the same tools used to prove algorithm correctness and termination. This article walks through each technique and shows how it applies to real code verification.
 
+
+![discrete math 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/05/05-01-big-picture.en.png)
+*discrete math 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Proof Techniques?
 - Which signal should the example or diagram make visible for Proof Techniques?
 - What failure should be prevented first when Proof Techniques reaches a real system?
-
-## Big Picture
-
-![discrete math 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/05/05-01-big-picture.en.png)
-
-*discrete math 101 chapter 5 flow overview*
-
-This picture places Proof Techniques inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

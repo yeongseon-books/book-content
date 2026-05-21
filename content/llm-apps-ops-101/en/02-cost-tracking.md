@@ -26,21 +26,15 @@ This is the second post in the LLM Apps Ops 101 series. Here, we will turn token
 
 Cost optimization does not work as a slogan. You need to know which calls create spend before you can decide what to compress, cache, reroute, or rate-limit.
 
+![Cost tracking flow and optimization points](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/02/02-01-big-picture.en.png)
+*Cost tracking flow and optimization points*
+> Cost is not a number to discover at month end; it is an operating signal to record on every request.
+
 ## Questions to Keep in Mind
 
 - Why should LLM cost be tracked per call instead of waiting for the monthly bill?
 - What operations experiments become easier when the price card is separated in code?
 - How do you decide whether to cut cost first with caching, model changes, or prompt compression?
-
-## Big Picture
-
-![Cost tracking flow and optimization points](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/02/02-01-big-picture.en.png)
-
-*Cost tracking flow and optimization points*
-
-This picture shows per-call token usage passing through a price card into cost records, then pointing to cache, model, and prompt optimization points. Cost tracking is not a savings tip; it is the operating layer that explains unit economics.
-
-> Cost is not a number to discover at month end; it is an operating signal to record on every request.
 
 ## Why this layer matters
 ![Per-call tokens become cumulative cost](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/02/02-01-why-this-layer-matters.en.png)

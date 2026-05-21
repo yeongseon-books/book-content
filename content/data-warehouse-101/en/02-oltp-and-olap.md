@@ -28,21 +28,16 @@ This is post 2 in the Data Warehouse 101 series.
 
 In this post, we compare those workloads directly. The important question is not whether both systems can run queries, but what kind of query pattern each engine is optimized to carry all day.
 
+
+![data warehouse 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/02/02-01-concept-at-a-glance.en.png)
+*data warehouse 101 chapter 2 flow overview*
+> OLTP and OLAP have opposite optimization goals: OLTP for single-row speed, OLAP for bulk-read throughput. A single engine cannot do both well.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying OLTP and OLAP?
 - Which signal should the example or diagram make visible for OLTP and OLAP?
 - What failure should be prevented first when OLTP and OLAP reaches a real system?
-
-## Big Picture
-
-![data warehouse 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/02/02-01-concept-at-a-glance.en.png)
-
-*data warehouse 101 chapter 2 flow overview*
-
-This picture places OLTP and OLAP inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> OLTP and OLAP have opposite optimization goals: OLTP for single-row speed, OLAP for bulk-read throughput. A single engine cannot do both well.
 
 ## Questions this article answers
 

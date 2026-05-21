@@ -32,17 +32,15 @@ last_reviewed: '2026-05-12'
 
 끝까지 읽고 나면 optimizer 선택을 “유명하니까 Adam” 수준이 아니라, 현재 손실 지형과 학습 단계에 맞는 설계 판단으로 볼 수 있게 됩니다.
 
+
+![Calculus for ML 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/08/08-01-concept-at-a-glance.ko.png)
+*Calculus for ML 101 8장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - plain gradient descent는 실제 딥러닝 학습에서 어떤 약점을 드러낼까요?
 - momentum은 왜 관성이라는 비유로 설명하는 편이 가장 이해가 쉬울까요?
 - RMSProp과 Adam은 좌표별 gradient scale 차이를 어떻게 완화할까요?
-
-## 큰 그림
-
-![Calculus for ML 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/08/08-01-concept-at-a-glance.ko.png)
-
-*Calculus for ML 101 8장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 
@@ -143,7 +141,6 @@ L2 regularization은 파라미터가 과도하게 커지는 것을 억제해 일
 실무에서는 optimizer 이름보다 recipe 전체가 더 중요할 때가 많습니다. learning rate, warmup, weight decay, gradient clipping이 함께 설계되어야 같은 모델도 제대로 학습됩니다. 그래서 optimization은 “어떤 알고리즘을 썼는가”보다 “gradient를 어떻게 다뤘는가”의 문제에 가깝습니다.
 
 다음 글에서는 이 optimization에 들어가는 gradient가 네트워크 전체에서 어떻게 계산되는지, 즉 backpropagation을 계산 그래프 관점에서 다시 보겠습니다.
-
 
 
 ## Adam을 식으로 다시 전개하기

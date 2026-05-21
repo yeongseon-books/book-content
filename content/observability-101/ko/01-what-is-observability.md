@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 이 글은 Observability 101 시리즈의 첫 번째 글입니다.
 
+
+![Observability 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/01/01-01-concept-at-a-glance.ko.png)
+*Observability 101 1장 흐름 개요*
+> 관측성의 핵심은 도구가 아니라 시스템을 어느 계층에서 어떤 관점으로 볼지 정하는 경계 설계입니다.
+
 ## 먼저 던지는 질문
 
 - 관측성과 모니터링은 무엇이 다를까요?
 - 메트릭, 로그, 트레이스는 각각 어떤 질문에 답할까요?
 - 왜 세 신호를 함께 봐야 할까요?
-
-## 큰 그림
-
-![Observability 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/01/01-01-concept-at-a-glance.ko.png)
-
-*Observability 101 1장 흐름 개요*
-
-이 그림은 관측성의 출발점을 보여줍니다. 외부에서만 볼 수 있는 신호(메트릭, 로그, 트레이스)가 내부 상태를 어떻게 드러내는지, 그리고 시스템이 복잡해질수록 이 신호들이 얼마나 중요한지 알 수 있습니다.
-
-> 관측성의 핵심은 도구가 아니라 시스템을 어느 계층에서 어떤 관점으로 볼지 정하는 경계 설계입니다.
 
 ## 왜 중요한가
 

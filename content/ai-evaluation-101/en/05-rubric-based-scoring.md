@@ -25,21 +25,16 @@ Per-dimension rubrics like 'accuracy', 'safety', and 'tone' are far more useful 
 
 This is post 5 in the AI Evaluation 101 series. Here we cover defining evaluation dimensions, writing anchors for each, and aggregating scores.
 
+
+![Designing Rubric-Based scoring](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-01-designing-rubric-based-scoring.en.png)
+*Designing Rubric-Based scoring*
+> The value of a rubric is not prettier scoring; it is showing which part of the output failed.
+
 ## Questions to Keep in Mind
 
 - What failure location is hidden when LLM quality is reduced to one score?
 - How should good rubric dimensions be separated so they do not overlap?
 - What risk is missed when rubric scores are aggregated only by the mean?
-
-## Big Picture
-
-![Designing Rubric-Based scoring](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-01-designing-rubric-based-scoring.en.png)
-
-*Designing Rubric-Based scoring*
-
-This picture shows quality split into dimensions such as correctness, grounding, completeness, and safety instead of one total score. A rubric is not ceremony for producing more numbers; it is a design for locating failure.
-
-> The value of a rubric is not prettier scoring; it is showing which part of the output failed.
 
 ## The Limits of Single Scores
 

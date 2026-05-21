@@ -26,21 +26,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 머신러닝 101 시리즈의 5번째 글입니다. 여기서는 시그모이드 함수, 임계값, 정밀도·재현율·F1의 의미를 함께 보면서 로지스틱 회귀를 분류의 가장 기본적인 기준선으로 정리해 보겠습니다.
 
+
+![Machine Learning 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/05/05-01-diagram.ko.png)
+*Machine Learning 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 0 또는 1을 예측하는데 왜 이름은 회귀일까요?
 - 시그모이드는 선형 점수를 어떻게 확률로 바꿀까요?
 - 왜 0.5 임계값을 항상 정답처럼 쓰면 안 될까요?
-
-## 큰 그림
-
-![Machine Learning 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/05/05-01-diagram.ko.png)
-
-*Machine Learning 101 5장 흐름 개요*
-
-이 그림은 이 장의 핵심 개념들이 어떻게 연결되는지 보여줍니다.
-
-
 
 ## 시그모이드 함수의 직관
 

@@ -28,21 +28,15 @@ seo_description: 청크 크기와 오버랩이 검색 품질에 미치는 영향
 
 여기서는 단순히 텍스트를 자르는 법이 아니라, 검색 시스템이 어떤 문맥 단위를 기억하게 만들지 설계하는 관점으로 청킹을 봅니다.
 
+![Chunk size and overlap structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/05/05-01-chunking-strategies-how-to-split-long-do.ko.png)
+*청크 크기와 오버랩 구조*
+> 청킹은 전처리 부가 작업이 아니라, 검색 시스템이 어떤 문맥 단위를 기억할지 결정하는 설계 단계입니다.
+
 ## 먼저 던지는 질문
 
 - 긴 문서를 그대로 임베딩하지 않고 왜 청크로 나눠야 할까요?
 - chunk_size와 overlap은 검색 품질과 비용 사이에서 어떤 균형을 만들까요?
 - 청크에 메타데이터를 붙이지 않으면 답변 경로에서 무엇이 막힐까요?
-
-## 큰 그림
-
-![Chunk size and overlap structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/05/05-01-chunking-strategies-how-to-split-long-do.ko.png)
-
-*청크 크기와 오버랩 구조*
-
-이 그림에서는 긴 문서를 작은 청크로 나누고, 각 청크를 임베딩해 검색 가능한 단위로 만드는 흐름을 봅니다. 청크 전략은 단순 전처리가 아니라 검색 단위, 비용, 출처 추적을 함께 결정합니다.
-
-> 청킹은 전처리 부가 작업이 아니라, 검색 시스템이 어떤 문맥 단위를 기억할지 결정하는 설계 단계입니다.
 
 ## 청크 크기와 오버랩
 

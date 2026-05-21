@@ -29,19 +29,15 @@ Synchronization primitives are simple only on the surface. Safety depends on the
 
 This is post 5 in the Operating Systems 101 series. It breaks down mutexes, semaphores, reentrant locks, and condition variables, then shows how deadlock appears and how to avoid it.
 
+
+![operating systems 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/05/05-01-how-synchronization-tools-gate-entry.en.png)
+*operating systems 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Locks, Mutexes, and Semaphores?
 - Which signal should the example or diagram make visible for Locks, Mutexes, and Semaphores?
 - What failure should be prevented first when Locks, Mutexes, and Semaphores reaches a real system?
-
-## Big Picture
-
-![operating systems 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/05/05-01-how-synchronization-tools-gate-entry.en.png)
-
-*operating systems 101 chapter 5 flow overview*
-
-This picture places Locks, Mutexes, and Semaphores inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions this article answers
 

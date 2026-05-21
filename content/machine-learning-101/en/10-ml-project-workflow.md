@@ -26,19 +26,15 @@ Many ML projects die after the notebook victory lap. The score looked good, the 
 
 This is the final post in the Machine Learning 101 series. Here we will connect problem framing, data preparation, modeling, evaluation, deployment, and monitoring into one workflow so the model score becomes only one checkpoint in a larger loop.
 
+
+![machine learning 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/10/10-01-concept-at-a-glance.en.png)
+*machine learning 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why do so many ML projects fail even after promising offline scores?
 - Why should problem definition, data, modeling, deployment, and monitoring be treated as one loop?
 - How does `Pipeline` protect you from preprocessing leakage?
-
-## Big Picture
-
-![machine learning 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/10/10-01-concept-at-a-glance.en.png)
-
-*machine learning 101 chapter 10 flow overview*
-
-This picture places The ML Project Workflow inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

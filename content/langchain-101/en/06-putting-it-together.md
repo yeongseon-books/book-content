@@ -25,21 +25,15 @@ By the time you reach a real LangChain application, the challenge is no longer u
 
 This is the final post in the LangChain 101 series. It assembles the earlier pieces into one executable RAG chain without losing the boundaries that make the system maintainable.
 
+![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-02-the-flow-at-a-glance.en.png)
+*The flow at a glance*
+> The integrated chain is not a new abstraction; it is the same Runnables from earlier posts lined up in input-output order.
+
 ## Questions to Keep in Mind
 
 - How should one RAG chain separate document indexing from query execution?
 - What guard can run before the model call when retrieval returns nothing useful?
 - What should be recorded so streaming, chat history, and a self-contained app do not blur the structure?
-
-## Big Picture
-
-![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/06/06-02-the-flow-at-a-glance.en.png)
-
-*The flow at a glance*
-
-This picture connects document indexing, retrieval, prompt assembly, model calls, and streaming output into one RAG application. The practical goal is to keep each boundary visible even when the demo fits in one file.
-
-> The integrated chain is not a new abstraction; it is the same Runnables from earlier posts lined up in input-output order.
 
 ## Minimal runnable example
 

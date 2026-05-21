@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 이미지가 왜 레이어 스택으로 설계되는지, OverlayFS와 캐시, digest 기반 재현성이 왜 이 구조에서 나오는지 설명합니다.
 
+
+![Containers 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/02/02-01-concept-at-a-glance.ko.png)
+*Containers 101 2장 흐름 개요*
+> 레이어는 단순한 저장 형식이 아니라 빌드 캐시, 전송 효율, 보안 표면을 동시에 결정하는 설계 단위입니다. "무엇이 바뀌었는가"를 레이어 단위로 추적할 수 있으면 빌드와 배포의 문제 추적이 해시 단위로 가능해집니다.
+
 ## 먼저 던지는 질문
 
 - 컨테이너 이미지는 왜 굳이 여러 레이어로 나뉠까요?
 - 레이어 하나는 정확히 어떤 역할을 할까요?
 - OverlayFS는 이 레이어들을 어떻게 겹쳐 보이게 만들까요?
-
-## 큰 그림
-
-![Containers 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/02/02-01-concept-at-a-glance.ko.png)
-
-*Containers 101 2장 흐름 개요*
-
-이 그림은 이미지가 여러 레이어로 구성되며, 각 레이어가 특정 Dockerfile 명령에 대응한다는 점을 보여 줍니다. 변경된 레이어만 다시 빌드하고, 나머지는 캐시를 재사용하는 흐름을 추적할 수 있습니다.
-
-> 레이어는 단순한 저장 형식이 아니라 빌드 캐시, 전송 효율, 보안 표면을 동시에 결정하는 설계 단위입니다. "무엇이 바뀌었는가"를 레이어 단위로 추적할 수 있으면 빌드와 배포의 문제 추적이 해시 단위로 가능해집니다.
 
 ## 왜 중요한가
 

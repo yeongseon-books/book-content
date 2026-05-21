@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 Raft를 통해 합의 문제를 사람이 읽을 수 있는 수준으로 풀어 보고, term, log, quorum, commit이 어떤 약속을 만드는지 짚습니다.
 
+
+![Distributed Systems 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/06/06-01-concept-at-a-glance.ko.png)
+*Distributed Systems 101 6장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 합의 문제란 무엇이며 어떤 안전성과 진행성 속성을 가질까요?
 - Raft의 세 역할인 leader, follower, candidate는 어떻게 나뉠까요?
 - term, log, index, commit은 각각 무엇을 뜻할까요?
-
-## 큰 그림
-
-![Distributed Systems 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/06/06-01-concept-at-a-glance.ko.png)
-
-*Distributed Systems 101 6장 흐름 개요*
 
 ## 왜 중요한가
 

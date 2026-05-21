@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 Todo 앱 하나를 만들면서 HTML, Flask, SQLite, 환경 변수, 헬스 체크, 컨테이너 실행까지 한 흐름으로 연결하겠습니다.
 
+
+![Web Development 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/10/10-01-concept-at-a-glance.ko.png)
+*Web Development 101 10장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 앞선 아홉 개 개념은 한 앱 안에서 어떻게 연결될까요?
 - 작은 풀스택 프로젝트는 어떤 폴더 구조로 시작하면 좋을까요?
 - Frontend, Backend, 데이터베이스는 어떤 API 계약으로 묶일까요?
-
-## 큰 그림
-
-![Web Development 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/10/10-01-concept-at-a-glance.ko.png)
-
-*Web Development 101 10장 흐름 개요*
 
 ## 왜 마지막 글이 중요한가
 
@@ -71,13 +69,13 @@ last_reviewed: '2026-05-15'
 
 ## 전후 비교로 보는 범위 변화
 
-**Before (one-line script)**
+**Before (한 줄 스크립트)**
 
 ```python
 print("hello")
 ```
 
-**After (one app)**
+**After (하나의 앱)**
 
 ```text
 todo-app/

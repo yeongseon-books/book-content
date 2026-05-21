@@ -28,21 +28,16 @@ Even a die shows why the pair matters. Knowing that the average face value is 3.
 
 This is post 6 in the Probability 101 series. Here we define expectation and variance, compute them in code, use linearity to simplify reasoning, and connect the formulas to the way engineers read noisy metrics and model behavior.
 
+
+![probability 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/06/06-01-concept-at-a-glance.en.png)
+*probability 101 chapter 6 flow overview*
+> Expectation and Variance requires both definition and intuition, learned through concrete examples.
+
 ## Questions to Keep in Mind
 
 - Why expectation is called the center of a distribution?
 - What variance measures and why standard deviation is often easier to interpret?
 - How linearity of expectation simplifies many problems?
-
-## Big Picture
-
-![probability 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/06/06-01-concept-at-a-glance.en.png)
-
-*probability 101 chapter 6 flow overview*
-
-This picture places Expectation and Variance inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Expectation and Variance requires both definition and intuition, learned through concrete examples.
 
 ## Why It Matters
 

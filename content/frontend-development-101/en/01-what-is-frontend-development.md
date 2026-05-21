@@ -26,19 +26,15 @@ Most people enter frontend development through the visual door. They see buttons
 
 This is the first post in the Frontend Development 101 series. In this chapter, we treat the frontend as the product layer that runs inside the browser rather than as a pile of UI tweaks. The key mental model is that the frontend draws what users see and directly shapes the speed, trust, and feedback they feel.
 
+
+![frontend development 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/01/01-01-concept-at-a-glance.en.png)
+*frontend development 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What Is Frontend Development??
 - Which signal should the example or diagram make visible for What Is Frontend Development??
 - What failure should be prevented first when What Is Frontend Development? reaches a real system?
-
-## Big Picture
-
-![frontend development 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/01/01-01-concept-at-a-glance.en.png)
-
-*frontend development 101 chapter 1 flow overview*
-
-This picture places What Is Frontend Development? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

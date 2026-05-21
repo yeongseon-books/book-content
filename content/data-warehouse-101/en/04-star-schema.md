@@ -28,21 +28,16 @@ This is post 4 in the Data Warehouse 101 series.
 
 In this post, we look at why the star shape became the default warehouse pattern, where it beats further normalization, and how its simplicity turns directly into faster drill-downs and clearer SQL.
 
+
+![data warehouse 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/04/04-01-concept-at-a-glance.en.png)
+*data warehouse 101 chapter 4 flow overview*
+> A star schema balances normalization for write efficiency with denormalization for read speed. The result is predictable join cost and readable queries.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Star Schema?
 - Which signal should the example or diagram make visible for Star Schema?
 - What failure should be prevented first when Star Schema reaches a real system?
-
-## Big Picture
-
-![data warehouse 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/04/04-01-concept-at-a-glance.en.png)
-
-*data warehouse 101 chapter 4 flow overview*
-
-This picture places Star Schema inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A star schema balances normalization for write efficiency with denormalization for read speed. The result is predictable join cost and readable queries.
 
 ## Questions this article answers
 

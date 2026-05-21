@@ -30,21 +30,16 @@ Prompt injection은 프롬프트를 잘못 쓴 실수가 아니라 입력 경계
 
 이 글에서는 “Ignore previous instructions”가 왜 통하는지와, regex·임베딩·LLM judge를 결합한 다층 방어 구조를 설명합니다.
 
+
+![Prompt injection 방어 흐름](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/02/02-01-big-picture.ko.png)
+*Prompt injection 방어 흐름*
+> Prompt injection은 나쁜 문장이 아니라, 비신뢰 데이터가 실행 지시로 승격되는 경계 실패입니다.
+
 ## 먼저 던지는 질문
 
 - Prompt injection은 언제 데이터가 지시로 바뀌면서 시작될까요?
 - 직접 injection과 간접 injection은 방어 위치가 어떻게 다를까요?
 - Red team 사례를 regression set으로 남기려면 무엇을 기록해야 할까요?
-
-## 큰 그림
-
-![Prompt injection 방어 흐름](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/02/02-01-big-picture.ko.png)
-
-*Prompt injection 방어 흐름*
-
-이 그림에서는 사용자 입력과 외부 문서가 명령으로 오인되지 않도록 instruction boundary, risk decision, safe execution을 거치는 흐름을 봅니다. Prompt injection 방어의 핵심은 모델에게 조심하라고 말하는 것이 아니라 데이터와 지시를 구조적으로 분리하는 일입니다.
-
-> Prompt injection은 나쁜 문장이 아니라, 비신뢰 데이터가 실행 지시로 승격되는 경계 실패입니다.
 
 ## 왜 이 글이 중요한가
 

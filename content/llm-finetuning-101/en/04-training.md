@@ -28,19 +28,14 @@ This is the fourth post in the LLM Fine-tuning 101 series.
 
 This article breaks one training step into its six moving parts so you can reason about convergence and hyperparameters from first principles. The goal is not to chase a low loss number yet. The goal is to prove that one honest weight update actually happened.
 
+![LLM Fine-tuning 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/04/04-02-what-you-can-shrink-and-what-you-cannot.en.png)
+*LLM Fine-tuning 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - What is the minimum you must set in `TrainingArguments` for a single training step to run?
 - Why do `labels` and a data collator matter even in tiny experiments?
 - When debugging a training loop, which output should you read first?
-
-## Big Picture
-
-![LLM Fine-tuning 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/04/04-02-what-you-can-shrink-and-what-you-cannot.en.png)
-
-*LLM Fine-tuning 101 chapter 4 flow overview*
-
-This picture places Training Loop and Hyperparameters inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

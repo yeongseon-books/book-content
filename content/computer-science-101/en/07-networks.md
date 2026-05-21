@@ -29,19 +29,15 @@ This is post 7 in the Computer Science 101 series.
 
 In this article, we'll build a practical network model through the TCP/IP layers, HTTP messages, DNS lookups, and direct socket examples.
 
+
+![Computer Science 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/07/07-01-concept-at-a-glance.en.png)
+*Computer Science 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Networks?
 - Which signal should the example or diagram make visible for Networks?
 - What failure should be prevented first when Networks reaches a real system?
-
-## Big Picture
-
-![Computer Science 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/07/07-01-concept-at-a-glance.en.png)
-
-*Computer Science 101 chapter 7 flow overview*
-
-This picture places Networks inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions This Article Answers
 

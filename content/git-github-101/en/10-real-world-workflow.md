@@ -28,19 +28,15 @@ Knowing isolated Git commands is not the same as knowing how a team actually shi
 
 This is the final post in the Git & GitHub 101 series. Here, we stitch the earlier lessons into one practical workflow from issue to release.
 
+
+![Git & GitHub 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/10/10-01-mental-model.en.png)
+*Git & GitHub 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - How the commands from Episodes 1–9 fit together as one realistic workflow?
 - How to walk a single change through issue, branch, commit, PR, review, merge, tag, and close?
 - Which recovery commands to reach for when something goes wrong mid-flow?
-
-## Big Picture
-
-![Git & GitHub 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/10/10-01-mental-model.en.png)
-
-*Git & GitHub 101 chapter 10 flow overview*
-
-This picture places Building a real-world Git workflow: from issue to release in one cycle inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

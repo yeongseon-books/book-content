@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 named volume, bind mount, tmpfs가 각각 어떤 수명주기와 위험을 가지는지, 백업과 복구를 어떤 절차로 표준화해야 하는지 설명합니다.
 
+
+![Containers 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/05/05-01-concept-at-a-glance.ko.png)
+*Containers 101 5장 흐름 개요*
+> Volume의 핵심은 컨테이너를 지워도 데이터를 남기는 메커니즘입니다. 비상태 컨테이너와 상태를 가진 데이터 저장소를 분리하는 것이 설계의 출발점입니다.
+
 ## 먼저 던지는 질문
 
 - volume, bind mount, tmpfs는 무엇이 다를까요?
 - 컨테이너를 지워도 데이터를 남기려면 어떤 선택을 해야 할까요?
 - 백업과 복구는 어떤 방식으로 접근해야 할까요?
-
-## 큰 그림
-
-![Containers 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/05/05-01-concept-at-a-glance.ko.png)
-
-*Containers 101 5장 흐름 개요*
-
-volume, bind mount, tmpfs는 각각 다른 생명주기와 접근 방식을 가지며, 어떤 데이터를 어디에 저장할지는 이 선택에 따라 결정됩니다.
-
-> Volume의 핵심은 컨테이너를 지워도 데이터를 남기는 메커니즘입니다. 비상태 컨테이너와 상태를 가진 데이터 저장소를 분리하는 것이 설계의 출발점입니다.
 
 ## 왜 중요한가
 

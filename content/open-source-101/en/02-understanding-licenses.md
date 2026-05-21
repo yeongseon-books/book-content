@@ -28,21 +28,16 @@ This is post 2 in the Open Source 101 series.
 
 Here, we will use MIT, Apache 2.0, and GPL as the main reference points and learn to read licenses as permission-and-obligation documents rather than brand names.
 
+
+![open source 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/02/02-01-draw-the-license-map-first.en.png)
+*open source 101 chapter 2 flow overview*
+> A license is not just a legal document. It is a contract that lets people collaborate safely because everyone knows the boundaries.
+
 ## Questions to Keep in Mind
 
 - What is the practical difference between *permissive* and *copyleft* licenses?
 - How do MIT, Apache 2.0, and GPL v3 create different operational burdens?
 - Why does an SPDX identifier matter for automation and compliance work?
-
-## Big Picture
-
-![open source 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/02/02-01-draw-the-license-map-first.en.png)
-
-*open source 101 chapter 2 flow overview*
-
-This picture places Understanding Licenses inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A license is not just a legal document. It is a contract that lets people collaborate safely because everyone knows the boundaries.
 
 ## Why It Matters
 

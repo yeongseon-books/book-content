@@ -24,23 +24,16 @@ VectorStoreRetriever와 MMR은 관련성과 다양성 사이 균형점을 retrie
 
 이 글은 RAG Deep Dive 시리즈의 세 번째 글입니다.
 
+![invoke와 callback이 이어지는 호출 흐름](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/03/03-01-base-retriever-invoke-flow.ko.png)
+*invoke와 callback이 이어지는 호출 흐름*
+> Retriever는 최근접 이웃 몇 개를 가져오는 도구가 아닙니다. 후보 근거를 최종 컨텍스트로 바꾸는 정책 계층입니다.
+
 ## 먼저 던지는 질문
 
 - `BaseRetriever`는 검색 구현마다 무엇을 같은 호출 계약으로 묶어 줄까요?
 - `similarity`, `similarity_score_threshold`, `mmr`는 각각 어떤 검색 실패를 줄이려는 선택일까요?
 - 검색 결과가 이상할 때 callback과 파라미터 로그는 어떤 단서를 줄까요?
 
-## 큰 그림
-
-![invoke와 callback이 이어지는 호출 흐름](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/03/03-01-base-retriever-invoke-flow.ko.png)
-
-*invoke와 callback이 이어지는 호출 흐름*
-
-이 그림에서는 retriever 호출이 공통 `invoke()` 경계로 들어가고, 내부에서 search type별로 다른 검색 경로가 선택되는 흐름을 봅니다. Retriever 설계의 핵심은 검색 알고리즘을 바꾸더라도 체인 바깥의 호출 계약을 유지하는 것입니다.
-
-> Retriever는 최근접 이웃 몇 개를 가져오는 도구가 아닙니다. 후보 근거를 최종 컨텍스트로 바꾸는 정책 계층입니다.
-
-<!-- a-grade-example:begin -->
 ## 최소 실행 예제
 
 예제 파일: `en/03-retriever-design/main.py`

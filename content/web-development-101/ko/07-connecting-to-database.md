@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 SQL의 기본 작업, ORM의 역할, 연결과 연결 풀, 트랜잭션이 왜 필요한지 정리하면서 웹앱이 데이터를 오래 보관하는 방식을 살펴보겠습니다.
 
+
+![Web Development 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/07/07-01-concept-at-a-glance.ko.png)
+*Web Development 101 7장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 웹앱은 왜 파일이 아니라 데이터베이스를 쓸까요?
 - SQL의 네 가지 기본 작업은 무엇일까요?
 - ORM은 어디서 편하고 어디서 한계가 생길까요?
-
-## 큰 그림
-
-![Web Development 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/07/07-01-concept-at-a-glance.ko.png)
-
-*Web Development 101 7장 흐름 개요*
 
 ## 왜 이 주제가 중요한가
 
@@ -71,13 +69,13 @@ last_reviewed: '2026-05-15'
 
 ## 전후 비교로 보는 저장 방식
 
-**Before (write to a file)**
+**Before (파일에 기록)**
 
 ```python
 open("users.txt", "a").write("alice\n")  # 동시 접근이 겹치면 깨집니다
 ```
 
-**After (write to a DB)**
+**After (DB에 기록)**
 
 ```python
 import sqlite3

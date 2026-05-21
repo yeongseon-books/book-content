@@ -25,21 +25,15 @@ Once LCEL makes sense, the next question is where the real chain logic actually 
 
 This is the second post in the LangChain 101 series. It shows how prompt templates, parsers, and passthrough steps turn LCEL basics into a practical first chain.
 
+![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/02/02-02-the-flow-at-a-glance.en.png)
+*The flow at a glance*
+> A prompt chain is not string concatenation with extra steps; it is a typed conversion from app inputs into model-ready messages.
+
 ## Questions to Keep in Mind
 
 - How is ChatPromptTemplate different from plain string formatting?
 - How do multiple prompt variables and parsers change chain input and output shapes?
 - Which failures should fallback hide, and which failures should remain visible?
-
-## Big Picture
-
-![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/02/02-02-the-flow-at-a-glance.en.png)
-
-*The flow at a glance*
-
-This picture shows user input becoming prompt messages, then passing through the model and parser into a final value. The first chain is not just about shorter code; it is about making each input and output boundary explicit.
-
-> A prompt chain is not string concatenation with extra steps; it is a typed conversion from app inputs into model-ready messages.
 
 ## Minimal runnable example
 

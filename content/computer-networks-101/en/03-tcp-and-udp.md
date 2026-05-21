@@ -31,19 +31,15 @@ last_reviewed: '2026-05-15'
 
 This is post 3 in the Computer Networks 101 series.
 
+
+![computer networks 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/03/03-01-concept-at-a-glance.en.png)
+*computer networks 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying TCP and UDP?
 - Which signal should the example or diagram make visible for TCP and UDP?
 - What failure should be prevented first when TCP and UDP reaches a real system?
-
-## Big Picture
-
-![computer networks 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/03/03-01-concept-at-a-glance.en.png)
-
-*computer networks 101 chapter 3 flow overview*
-
-This picture places TCP and UDP inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

@@ -28,21 +28,16 @@ This is post 2 in the Pandas 101 series.
 
 The core idea in this chapter is simple. A DataFrame is a collection of Series that share the same label system. Once that model clicks, many Pandas behaviors stop feeling magical and start feeling consistent.
 
+
+![pandas 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/02/02-01-concept-at-a-glance.en.png)
+*pandas 101 chapter 2 flow overview*
+> *DataFrame is really a *collection of Series* that share the same index. Understand this, and alignment, broadcasting, and method chaining all make sense.
+
 ## Questions to Keep in Mind
 
 - The *internal structure* of a *Series?
 - Column-oriented* thinking with *DataFrame?
 - The role of the *Index?
-
-## Big Picture
-
-![pandas 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/02/02-01-concept-at-a-glance.en.png)
-
-*pandas 101 chapter 2 flow overview*
-
-This picture places Series and DataFrame inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> *DataFrame is really a *collection of Series* that share the same index. Understand this, and alignment, broadcasting, and method chaining all make sense.
 
 ## Why It Matters
 

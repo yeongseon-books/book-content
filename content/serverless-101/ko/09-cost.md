@@ -27,17 +27,15 @@ last_reviewed: '2026-05-12'
 
 서버리스는 종종 저렴한 선택지처럼 소개됩니다. 호출이 있을 때만 돈을 내니 당연해 보이기도 합니다. 그런데 막상 청구서를 보면 생각보다 빠르게 커지는 경우가 많습니다. 이유는 호출 단가만으로는 전체 비용을 설명할 수 없기 때문입니다.
 
+
+![Serverless 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/09/09-01-concept-at-a-glance.ko.png)
+*Serverless 101 9장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 서버리스 비용은 어떤 항목들의 합으로 결정될까요?
 - 메모리 설정은 왜 성능뿐 아니라 비용에도 직접 연결될까요?
 - 데이터 전송과 연계 서비스 비용은 왜 자주 놓칠까요?
-
-## 큰 그림
-
-![Serverless 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/09/09-01-concept-at-a-glance.ko.png)
-
-*Serverless 101 9장 흐름 개요*
 
 ## 왜 이 주제가 중요한가
 

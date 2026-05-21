@@ -28,19 +28,15 @@ That is why capacity planning belongs with reliability, not just cost control. I
 
 This is post 9 in the SRE 101 series. Here we connect demand forecasting, headroom, load testing, scaling units, and cost so growth does not turn into a preventable outage.
 
+
+![sre 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/09/09-01-concept-at-a-glance.en.png)
+*sre 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why is capacity planning a future-demand problem instead of a past-usage replay?
 - Why is headroom closer to insurance than to waste?
 - How should load tests be used to correct a forecast model?
-
-## Big Picture
-
-![sre 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/09/09-01-concept-at-a-glance.en.png)
-
-*sre 101 chapter 9 flow overview*
-
-This picture places Capacity Planning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this topic matters
 

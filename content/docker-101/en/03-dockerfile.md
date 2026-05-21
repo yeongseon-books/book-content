@@ -28,19 +28,15 @@ The difference is often not the choice of commands but the order of commands. Wh
 
 This is post 3 in the Docker 101 series. It explains the role of the core Dockerfile instructions, then turns that syntax into build strategy through cache-aware ordering, `.dockerignore`, and non-root execution.
 
+
+![docker 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/03/03-01-concept-at-a-glance.en.png)
+*docker 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - What *FROM / RUN / COPY / CMD* mean?
 - An *ordering strategy* for the *layer cache?
 - The importance of *.dockerignore?
-
-## Big Picture
-
-![docker 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/03/03-01-concept-at-a-glance.en.png)
-
-*docker 101 chapter 3 flow overview*
-
-This picture places Writing a Dockerfile inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

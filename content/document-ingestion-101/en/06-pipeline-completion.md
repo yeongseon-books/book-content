@@ -25,21 +25,15 @@ The value of an ingestion pipeline appears only when the handoff between stages 
 
 This is the final post in the Document Ingestion 101 series. Here, we connect the earlier pieces into one reproducible flow and verify that the index can be saved, reloaded, and queried.
 
+![End-to-end ingestion pipeline flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/06/06-01-end-to-end-ingestion-pipeline.en.png)
+*End-to-end ingestion pipeline flow*
+> A complete ingestion pipeline is not defined by how many stages exist but by whether each stage hands off cleanly to the next.
+
 ## Questions to Keep in Mind
 
 - What stage-level verification checkpoints should a complete ingestion pipeline have?
 - How can you quickly tell whether parsing, normalization, chunking, or indexing failed?
 - What artifacts make the pipeline rerunnable in production?
-
-## Big Picture
-
-![End-to-end ingestion pipeline flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/06/06-01-end-to-end-ingestion-pipeline.en.png)
-
-*End-to-end ingestion pipeline flow*
-
-This picture connects file collection, parsing, normalization, chunking, embedding, indexing, and verification reports. A complete pipeline is not a script that succeeds once; it is a staged process that can stop, explain, and rerun.
-
-> A complete ingestion pipeline is not defined by how many stages exist but by whether each stage hands off cleanly to the next.
 
 ## End-to-end ingestion pipeline
 

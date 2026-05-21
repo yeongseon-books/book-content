@@ -25,17 +25,15 @@ last_reviewed: '2026-05-12'
 
 이 글은 Discrete Math 101 시리즈의 1번째 글입니다.
 
+
+![Discrete Math 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/01/01-01-big-picture.ko.png)
+*Discrete Math 101 1장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 이산수학과 연속 수학은 무엇이 다를까요?
 - 이산수학의 다섯 축은 어떻게 연결될까요?
 - 컴퓨터공학 커리큘럼에서 왜 이산수학이 필수일까요?
-
-## 큰 그림
-
-![Discrete Math 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/01/01-01-big-picture.ko.png)
-
-*Discrete Math 101 1장 흐름 개요*
 
 ## 왜 중요한가
 

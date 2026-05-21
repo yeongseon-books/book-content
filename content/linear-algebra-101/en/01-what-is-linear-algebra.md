@@ -26,21 +26,16 @@ If you learn machine learning through formulas, there is usually a moment when t
 
 This is the first post in the Linear Algebra 101 series. Here we will treat linear algebra as the language that ties vectors, matrices, and linear transformations into one picture.
 
+
+![linear algebra 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/01/01-01-concept-at-a-glance.en.png)
+*linear algebra 101 chapter 1 flow overview*
+> Linear algebra is not a bag of calculations. It is a language for expressing space with coordinates and turning geometric rules into computation.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What Is Linear Algebra??
 - Which signal should the example or diagram make visible for What Is Linear Algebra??
 - What failure should be prevented first when What Is Linear Algebra? reaches a real system?
-
-## Big Picture
-
-![linear algebra 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/01/01-01-concept-at-a-glance.en.png)
-
-*linear algebra 101 chapter 1 flow overview*
-
-This picture places What Is Linear Algebra? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Linear algebra is not a bag of calculations. It is a language for expressing space with coordinates and turning geometric rules into computation.
 
 ## Questions This Post Answers
 

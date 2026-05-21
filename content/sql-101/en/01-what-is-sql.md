@@ -28,21 +28,16 @@ If you start from that angle, the basic clauses stop looking like trivia. They s
 
 This is the first post in the SQL 101 series. It establishes the declarative mental model that makes later topics like filtering, joins, aggregation, and query plans easier to reason about.
 
+
+![sql 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/01/01-01-query-flow-at-a-glance.en.png)
+*sql 101 chapter 1 flow overview*
+> SQL's power isn't in memorizing syntax, but in understanding how the relational model and declarative execution model work together to keep data reliable and queries portable across systems.
+
 ## Questions to Keep in Mind
 
 - What kind of language is SQL, exactly?
 - Why is the relational model still the default foundation for analytical and application data?
 - What does it mean that SQL is declarative?
-
-## Big Picture
-
-![sql 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/01/01-01-query-flow-at-a-glance.en.png)
-
-*sql 101 chapter 1 flow overview*
-
-SQL's strength is that you describe the rows and columns you need, and the database engine figures out the fastest way to get them.
-
-> SQL's power isn't in memorizing syntax, but in understanding how the relational model and declarative execution model work together to keep data reliable and queries portable across systems.
 
 ## Why It Matters
 

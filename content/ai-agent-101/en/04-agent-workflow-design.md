@@ -28,21 +28,15 @@ Representative workflow patterns include ReAct (Reasoning + Acting), Plan-and-Ex
 
 This is post 4 in the AI Agent 101 series. Here we cover major workflow patterns, task decomposition strategies, state management methods, and factors to consider when designing workflows.
 
+![Draw the control flow before you tune the prompt](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/04/04-01-draw-the-control-flow-before-you-tune-th.en.png)
+*Draw the control flow before you tune the prompt*
+> A workflow is not just a name for a reasoning style; it is the control structure that decides action order and stopping conditions.
+
 ## Questions to Keep in Mind
 
 - What flow should be drawn before prompt tuning when you choose an agent workflow?
 - Which failure conditions make ReAct, Plan-and-Execute, or Reflexion a better fit?
 - Where should state and validation live inside a workflow if you want it to be operable?
-
-## Big Picture
-
-![Draw the control flow before you tune the prompt](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/04/04-01-draw-the-control-flow-before-you-tune-th.en.png)
-
-*Draw the control flow before you tune the prompt*
-
-This picture fixes an agent workflow first as control flow: plan, execute, validate, and replan. The core of workflow design is not a longer prompt; it is making explicit which stage is allowed to choose the next action.
-
-> A workflow is not just a name for a reasoning style; it is the control structure that decides action order and stopping conditions.
 
 ## Key Workflow Patterns
 

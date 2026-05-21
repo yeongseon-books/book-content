@@ -28,17 +28,15 @@ last_reviewed: '2026-05-12'
 
 Big-O는 코드를 실서비스에 넣기 전이나 코딩 테스트 화이트보드 앞에 서기 전에도 성장 패턴을 비교할 수 있게 해 주는 실용적인 언어입니다.
 
+
+![Algorithms with Python 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/02/02-01-big-picture.ko.png)
+*Algorithms with Python 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 시간 복잡도는 무엇이며, 실제 실행 시간만으로는 왜 부족할까요?
 - Big-O 표기법은 어떻게 읽고 써야 할까요?
 - `O(1)`부터 `O(n!)`까지의 대표 복잡도는 어떻게 구분할까요?
-
-## 큰 그림
-
-![Algorithms with Python 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/02/02-01-big-picture.ko.png)
-
-*Algorithms with Python 101 2장 흐름 개요*
 
 ## 왜 중요한가
 

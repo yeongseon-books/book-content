@@ -29,19 +29,15 @@ This is post 5 in the Programming Languages 101 series.
 
 In this post, we will treat closures as an ordinary consequence of lexical scope plus first-class functions. Once you see that a closure captures bindings rather than copied values, callbacks, decorators, and late-binding bugs all become much easier to reason about.
 
+
+![programming languages 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/05/05-01-concept-at-a-glance.en.png)
+*programming languages 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Functions and Closures?
 - Which signal should the example or diagram make visible for Functions and Closures?
 - What failure should be prevented first when Functions and Closures reaches a real system?
-
-## Big Picture
-
-![programming languages 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/05/05-01-concept-at-a-glance.en.png)
-
-*programming languages 101 chapter 5 flow overview*
-
-This picture places Functions and Closures inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions this article answers
 

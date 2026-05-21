@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 PCA를 분산이 가장 큰 축을 찾고 그 축으로 데이터를 다시 표현하는 방법으로 이해해 보겠습니다.
 
+
+![Linear Algebra 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/09/09-01-concept-at-a-glance.ko.png)
+*Linear Algebra 101 9장 흐름 개요*
+> PCA는 고유값과 고유벡터를 실제로 쓰는 가장 직관적인 사례입니다. 주성분은 데이터 변동이 가장 큰 축이고, 몇 개 주성분만으로도 데이터의 대부분 정보를 유지할 수 있습니다.
+
 ## 먼저 던지는 질문
 
 - PCA는 왜 중요한 방향을 찾아낸다고 말할 수 있을까요?
 - 공분산 관점과 SVD 관점은 어떻게 연결될까요?
 - 왜 중심화가 빠지면 안 될까요?
-
-## 큰 그림
-
-![Linear Algebra 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/09/09-01-concept-at-a-glance.ko.png)
-
-*Linear Algebra 101 9장 흐름 개요*
-
-PCA(주성분분석)는 데이터의 분산이 큰 방향을 찾아 차원을 줄이는 기법입니다. 공분산 행렬의 고유벡터가 주성분이 되고, 고유값이 분산을 나타냅니다.
-
-> PCA는 고유값과 고유벡터를 실제로 쓰는 가장 직관적인 사례입니다. 주성분은 데이터 변동이 가장 큰 축이고, 몇 개 주성분만으로도 데이터의 대부분 정보를 유지할 수 있습니다.
 
 ## 왜 중요한가
 

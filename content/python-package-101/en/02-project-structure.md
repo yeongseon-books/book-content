@@ -28,19 +28,14 @@ Project structure is where many packaging bugs begin. If tests read local source
 
 This is post 2 in the Python Package 101 series. Here we compare flat layout and src layout, explain why `pyproject.toml` replaced `setup.py`, and build a minimal package skeleton that behaves like a real install.
 
+![Python Package 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/02/02-01-mental-model.en.png)
+*Python Package 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What is the difference between flat layout and src layout?
 - What is `pyproject.toml` and why does it replace `setup.py`?
 - What goes in `[build-system]` and `[project]`?
-
-## Big Picture
-
-![Python Package 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/02/02-01-mental-model.en.png)
-
-*Python Package 101 chapter 2 flow overview*
-
-This picture places Project Structure — src layout and pyproject.toml inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What you will learn
 

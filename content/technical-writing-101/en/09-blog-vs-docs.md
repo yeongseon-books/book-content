@@ -28,21 +28,16 @@ Strong teams do not force one format to replace the other. They separate ownersh
 
 This is post 9 in the Technical Writing 101 series. It distinguishes blogs from documentation by role, lifespan, and canonical ownership.
 
+
+![technical writing 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/09/09-01-concept-at-a-glance.en.png)
+*technical writing 101 chapter 9 flow overview*
+> Blogs preserve experience and interpretation; documentation preserves the current operational truth.
+
 ## Questions to Keep in Mind
 
 - The four quadrants of *Diátaxis?
 - The *lifespan* of blog vs docs?
 - What *blogs* do well?
-
-## Big Picture
-
-![technical writing 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/09/09-01-concept-at-a-glance.en.png)
-
-*technical writing 101 chapter 9 flow overview*
-
-This picture places Blog vs Documentation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Blogs preserve experience and interpretation; documentation preserves the current operational truth.
 
 ## Why It Matters
 

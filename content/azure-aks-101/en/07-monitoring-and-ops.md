@@ -28,19 +28,14 @@ This final post is a 101-level operations map for AKS: what Container Insights g
 
 This is the final post in the Azure Kubernetes Service 101 series. Here, we tie the earlier cluster, traffic, and scaling model together from an observability and day-2 operations perspective.
 
+![azure kubernetes service 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/07/07-01-the-operations-view-in-one-diagram.en.png)
+*azure kubernetes service 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Monitoring and ops — Container Insights, logs, alerts?
 - Which signal should the example or diagram make visible for Monitoring and ops — Container Insights, logs, alerts?
 - What failure should be prevented first when Monitoring and ops — Container Insights, logs, alerts reaches a real system?
-
-## Big Picture
-
-![azure kubernetes service 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/07/07-01-the-operations-view-in-one-diagram.en.png)
-
-*azure kubernetes service 101 chapter 7 flow overview*
-
-This picture places Monitoring and ops — Container Insights, logs, alerts inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## The operations view in one diagram
 

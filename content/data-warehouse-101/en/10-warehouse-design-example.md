@@ -28,21 +28,16 @@ This is the final post in the Data Warehouse 101 series.
 
 In this post, we assemble the whole picture with a single e-commerce example. The point is not to memorize one schema, but to see the order in which design choices lock each other in.
 
+
+![data warehouse 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/10/10-01-concept-at-a-glance.en.png)
+*data warehouse 101 chapter 10 flow overview*
+> A real warehouse design balances current constraints with future goals. Most decisions are reversible if you plan the transition path.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Warehouse Design Example?
 - Which signal should the example or diagram make visible for Warehouse Design Example?
 - What failure should be prevented first when Warehouse Design Example reaches a real system?
-
-## Big Picture
-
-![data warehouse 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/10/10-01-concept-at-a-glance.en.png)
-
-*data warehouse 101 chapter 10 flow overview*
-
-This picture places Warehouse Design Example inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A real warehouse design balances current constraints with future goals. Most decisions are reversible if you plan the transition path.
 
 ## Questions this article answers
 

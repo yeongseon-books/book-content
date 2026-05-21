@@ -29,19 +29,15 @@ This is post 7 in the Programming Languages 101 series.
 
 In this post, we will treat memory management as the rule for deciding when an object is alive and when it is gone. That means walking through stack and heap, reference counting, garbage collection, weak references, and why leaks still happen even in languages that “have GC.”
 
+
+![programming languages 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/07/07-01-concept-at-a-glance.en.png)
+*programming languages 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Memory Management?
 - Which signal should the example or diagram make visible for Memory Management?
 - What failure should be prevented first when Memory Management reaches a real system?
-
-## Big Picture
-
-![programming languages 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/07/07-01-concept-at-a-glance.en.png)
-
-*programming languages 101 chapter 7 flow overview*
-
-This picture places Memory Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions this article answers
 

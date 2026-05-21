@@ -47,19 +47,14 @@ This installment has three goals:
 
 > All code citations are pinned to [`Azure/azure-functions-host` @ `5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7).
 
+![azure functions deep dive chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/05/05-01-the-big-picture-where-scaling-decisions.en.png)
+*azure functions deep dive chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - Do the Consumption, Premium, and Dedicated plan scalers share the same decision tree?
 - What signal makes the Scale Controller decide to add another instance?
 - Where does scale-out latency pile up most in burst traffic?
-
-## Big Picture
-
-![azure functions deep dive chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/05/05-01-the-big-picture-where-scaling-decisions.en.png)
-
-*azure functions deep dive chapter 5 flow overview*
-
-This picture places Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Where scaling decisions are made
 

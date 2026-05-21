@@ -26,17 +26,15 @@ last_reviewed: '2026-05-12'
 
 프론트엔드를 처음 배우면 대개 화면을 예쁘게 만드는 일부터 떠올립니다. 물론 맞는 설명입니다. 하지만 실무에서 프론트엔드는 그보다 훨씬 넓습니다. 브라우저가 화면을 어떻게 그리는지, 사용자 입력을 어떤 흐름으로 처리하는지, 서버와 어떤 경계로 연결되는지까지 함께 이해해야 비로소 전체 그림이 잡힙니다.
 
+
+![Frontend Development 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/01/01-01-diagram.ko.png)
+*Frontend Development 101 1장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 프론트엔드와 백엔드의 경계는 정확히 어디에서 나뉠까요?
 - 브라우저는 HTML, CSS, JavaScript를 어떤 순서와 역할로 조합할까요?
 - DOM, 렌더링, SPA 같은 단어는 왜 프론트엔드 입문에서 계속 등장할까요?
-
-## 큰 그림
-
-![Frontend Development 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/01/01-01-diagram.ko.png)
-
-*Frontend Development 101 1장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -65,7 +63,7 @@ last_reviewed: '2026-05-12'
 <a href="/about.html">About</a>
 ```
 
-**After (modern SPA, 2025)**
+**After (모던 SPA, 2025)**
 
 ```javascript
 // A router swaps the screen inside one page
@@ -341,7 +339,6 @@ export default defineConfig({
 ### 실무 연결 포인트
 
 프론트엔드는 더 이상 단순 화면 기술이 아닙니다. API 계약, 번들 최적화, 브라우저 성능, 접근성, 운영 관측이 모두 만나는 실행 계층입니다. 따라서 작은 예제라도 HTML/CSS/JS 코드, 컴포넌트 패턴, 빌드 설정을 한 번에 다뤄 보는 연습이 필요합니다. 이 연습을 반복하면 도구가 바뀌어도 구조를 잃지 않고, 신규 기능을 추가할 때도 안정적으로 확장할 수 있습니다.
-
 
 
 ## 실무 앵커 모음: 프레임워크, 레이아웃, 디버깅, 성능

@@ -28,21 +28,16 @@ Observability is what closes that gap. It is the difference between watching a k
 
 This is the first post in the Observability 101 series.
 
+
+![observability 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/01/01-01-concept-at-a-glance.en.png)
+*observability 101 chapter 1 flow overview*
+> What Is Observability is about the boundary decision, not the tool choice.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What Is Observability??
 - Which signal should the example or diagram make visible for What Is Observability??
 - What failure should be prevented first when What Is Observability? reaches a real system?
-
-## Big Picture
-
-![observability 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/01/01-01-concept-at-a-glance.en.png)
-
-*observability 101 chapter 1 flow overview*
-
-This picture places What Is Observability? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> What Is Observability is about the boundary decision, not the tool choice.
 
 ## Questions this article answers
 

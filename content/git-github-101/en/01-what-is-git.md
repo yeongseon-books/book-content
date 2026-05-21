@@ -28,19 +28,15 @@ If version control still feels like a tool you are supposed to learn before real
 
 This is the first post in the Git & GitHub 101 series. Here, we build the mental model behind Git itself before moving on to the everyday commands.
 
+
+![Git & GitHub 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/01/01-01-mental-model.en.png)
+*Git & GitHub 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - The problem that a version control system (VCS) solves?
 - Why Git is a distributed VCS?
 - The "snapshot" model and how it differs from line-by-line tracking?
-
-## Big Picture
-
-![Git & GitHub 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/01/01-01-mental-model.en.png)
-
-*Git & GitHub 101 chapter 1 flow overview*
-
-This picture places What is Git? Version control fundamentals inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

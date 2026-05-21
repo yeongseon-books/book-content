@@ -31,21 +31,15 @@ Azure Functions 운영이 특히 어려워 보이는 이유는 이벤트 기반 
 
 이제 “무엇이 평소와 다른가”를 가장 빨리 드러내는 화면과 쿼리부터 정리하겠습니다.
 
+![Azure Functions 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/07/07-01-the-first-screen-to-open-during-an-incid.ko.png)
+*Azure Functions 101 7장 흐름 개요*
+> 모니터링과 운영 기초의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - Application Insights와 Log Analytics는 Azure Functions 운영에서 어떤 역할로 나뉠까요?
 - 함수별 지연, 실패율, 의존성 호출을 보려면 어떤 쿼리를 먼저 갖고 있어야 할까요?
 - Live Metrics와 stream logs는 언제 각각 더 유리할까요?
-
-## 큰 그림
-
-![Azure Functions 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-101/07/07-01-the-first-screen-to-open-during-an-incid.ko.png)
-
-*Azure Functions 101 7장 흐름 개요*
-
-이 그림에서는 모니터링과 운영 기초를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 모니터링과 운영 기초의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

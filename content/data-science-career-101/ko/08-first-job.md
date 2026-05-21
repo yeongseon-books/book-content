@@ -31,21 +31,16 @@ last_reviewed: '2026-05-14'
 
 이 글은 Data Science Career 101 시리즈의 여덟 번째 글입니다.
 
+
+![Data Science Career 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/08/08-01-concept-at-a-glance.ko.png)
+*Data Science Career 101 8장 흐름 개요*
+> 첫 직장 적응에서 가장 중요한 것은 무엇을 할 수 있는가가 아니라 무엇을 물어봐야 하고 어떻게 답해야 하는가입니다.
+
 ## 먼저 던지는 질문
 
 - 첫 90일을 어떤 단계로 나눠 봐야 하는지 정리합니다?
 - 초반에 무엇을 듣고 기록해야 하는지 설명합니다?
 - 데이터 지도와 이해관계자를 왜 빨리 파악해야 하는지 짚습니다?
-
-## 큰 그림
-
-![Data Science Career 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/08/08-01-concept-at-a-glance.ko.png)
-
-*Data Science Career 101 8장 흐름 개요*
-
-이 그림은 첫 직장 적응을 단계별로 보여줍니다. 각 단계에서 무엇을 중심으로 봐야 하는지가 중요합니다.
-
-> 첫 직장 적응에서 가장 중요한 것은 무엇을 할 수 있는가가 아니라 무엇을 물어봐야 하고 어떻게 답해야 하는가입니다.
 
 ## 이 글에서 배우는 내용
 

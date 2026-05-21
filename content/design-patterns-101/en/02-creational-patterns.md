@@ -29,19 +29,15 @@ This is post 2 in the Design Patterns 101 series.
 
 In this post, we'll look at creational patterns as tools for concentrating construction responsibility in one place. The important question is not just what gets built, but who builds it and how much the caller needs to know.
 
+
+![design patterns 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/02/02-01-concept-at-a-glance.en.png)
+*design patterns 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - The problem creational patterns solve?
 - Factory Method and Abstract Factory?
 - When you actually need a Builder?
-
-## Big Picture
-
-![design patterns 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/02/02-01-concept-at-a-glance.en.png)
-
-*design patterns 101 chapter 2 flow overview*
-
-This picture places Creational Patterns inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

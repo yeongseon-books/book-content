@@ -43,19 +43,14 @@ Azure CNI Pod Subnet is the current flat-networking path for new clusters,
 Azure CNI Node Subnet is the older flat model,
 and Azure CNI Overlay keeps Pod IPs on a separate overlay CIDR while the VNet mostly sees node IPs.
 
+![azure kubernetes service deep dive chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/03/03-01-put-both-models-side-by-side.en.png)
+*azure kubernetes service deep dive chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - How do kubenet, Azure CNI, and Azure CNI Overlay differ in IP consumption and routing?
 - What operational limits emerge when Pod IPs consume real VNet IPs directly?
 - In Overlay mode, what is the SNAT path for outbound traffic?
-
-## Big Picture
-
-![azure kubernetes service deep dive chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/03/03-01-put-both-models-side-by-side.en.png)
-
-*azure kubernetes service deep dive chapter 3 flow overview*
-
-This picture places CNI and Azure CNI Overlay — where Pod IPs come from inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters in real AKS operations
 

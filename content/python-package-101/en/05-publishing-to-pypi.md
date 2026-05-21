@@ -28,19 +28,14 @@ Publishing is where packaging shifts from local correctness to operational disci
 
 This is post 5 in the Python Package 101 series. Here we separate TestPyPI from PyPI, walk through the `twine` upload flow, and build a safer release habit around staging-first validation.
 
+![Python Package 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/05/05-01-mental-model.en.png)
+*Python Package 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - What is the difference between PyPI and TestPyPI?
 - What role does `twine` play?
 - How do you generate and manage API tokens?
-
-## Big Picture
-
-![Python Package 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/05/05-01-mental-model.en.png)
-
-*Python Package 101 chapter 5 flow overview*
-
-This picture places Publishing to PyPI — from TestPyPI to production inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What you will learn
 

@@ -30,21 +30,16 @@ last_reviewed: '2026-05-12'
 
 이 글은 Statistics 101 시리즈의 8번째 글입니다. 여기서는 상관계수와 단순 선형 회귀를 나란히 놓고, R²와 잔차가 왜 중요한지, 그리고 왜 상관과 인과를 절대 섞어 읽으면 안 되는지 정리하겠습니다.
 
+
+![Statistics 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/08/08-01-concept-at-a-glance.ko.png)
+*Statistics 101 8장 흐름 개요*
+> 두 변수가 함께 움직인다는 것이 한 변수가 다른 변수를 일으킨다는 뜻은 아닙니다.
+
 ## 먼저 던지는 질문
 
 - 상관계수는 무엇을 말하고 무엇은 말하지 못할까요?
 - 회귀식은 상관계수보다 어떤 정보를 더 줄까요?
 - R²는 어떤 범위에서 어떻게 읽어야 할까요?
-
-## 큰 그림
-
-![Statistics 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/08/08-01-concept-at-a-glance.ko.png)
-
-*Statistics 101 8장 흐름 개요*
-
-상관과 회귀는 변수들 간의 관계를 수량화하는 도구입니다. 상관은 강도를, 회귀는 방향과 예측력을 보여줍니다.
-
-> 두 변수가 함께 움직인다는 것이 한 변수가 다른 변수를 일으킨다는 뜻은 아닙니다.
 
 ## 왜 중요한가
 

@@ -30,21 +30,16 @@ This is post 3 in the Testing 101 series. Here we show what integration tests ve
 
 > Unit tests validate parts in isolation. Integration tests validate whether the assembled path still behaves like one coherent system.
 
+
+![testing 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/03/03-01-concept-at-a-glance.en.png)
+*testing 101 chapter 3 flow overview*
+> Integration tests verify that the contract between modules stays intact as they evolve.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Integration Test?
 - Which signal should the example or diagram make visible for Integration Test?
 - What failure should be prevented first when Integration Test reaches a real system?
-
-## Big Picture
-
-![testing 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/03/03-01-concept-at-a-glance.en.png)
-
-*testing 101 chapter 3 flow overview*
-
-This picture places Integration Test inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Integration tests verify that the contract between modules stays intact as they evolve.
 
 ## What You Will Learn
 

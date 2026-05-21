@@ -30,19 +30,15 @@ In this chapter, we will frame validation as a contract that makes the system pr
 
 > Input validation is the first security control most systems execute, and the first reliability control they cannot afford to skip.
 
+
+![secure coding 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/02/02-01-concept-at-a-glance.en.png)
+*secure coding 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Input Validation?
 - Which signal should the example or diagram make visible for Input Validation?
 - What failure should be prevented first when Input Validation reaches a real system?
-
-## Big Picture
-
-![secure coding 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/02/02-01-concept-at-a-glance.en.png)
-
-*secure coding 101 chapter 2 flow overview*
-
-This picture places Input Validation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions This Chapter Answers
 

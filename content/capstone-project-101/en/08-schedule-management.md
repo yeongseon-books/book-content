@@ -28,21 +28,16 @@ A good schedule is not a beautiful timeline. It is a system that repeatedly expo
 
 This is post 8 in the Capstone Project 101 series. It explains how to combine milestones, weekly planning, standups, and risk buffer into a realistic execution rhythm.
 
+
+![capstone project 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/08/08-01-the-flow-at-a-glance.en.png)
+*capstone project 101 chapter 8 flow overview*
+> The real skill in Schedule Management is knowing which decision points matter most for your team and how to recognize them in real projects.
+
 ## Questions to Keep in Mind
 
 - Why do polished-looking plans still fail in practice?
 - How do milestones differ from weekly plans?
 - Why should blockers be exposed as early as possible?
-
-## Big Picture
-
-![capstone project 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/08/08-01-the-flow-at-a-glance.en.png)
-
-*capstone project 101 chapter 8 flow overview*
-
-This picture places Schedule Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> The real skill in Schedule Management is knowing which decision points matter most for your team and how to recognize them in real projects.
 
 ## What You Will Learn
 

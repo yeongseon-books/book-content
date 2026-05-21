@@ -24,19 +24,15 @@ last_reviewed: '2026-05-17'
 
 This is the second post in the Data Structures with Python 101 series.
 
+
+![Data Structures with Python 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/02/02-01-list-capacity-growth.en.png)
+*Data Structures with Python 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Arrays and Lists?
 - Which signal should the example or diagram make visible for Arrays and Lists?
 - What failure should be prevented first when Arrays and Lists reaches a real system?
-
-## Big Picture
-
-![Data Structures with Python 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/02/02-01-list-capacity-growth.en.png)
-
-*Data Structures with Python 101 chapter 2 flow overview*
-
-This picture places Arrays and Lists inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What This Article Answers
 

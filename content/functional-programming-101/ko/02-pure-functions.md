@@ -28,17 +28,15 @@ last_reviewed: '2026-05-12'
 
 현업에서는 모든 함수를 순수하게 만들 수는 없습니다. 파일을 저장해야 하고, 로그를 남겨야 하고, 데이터베이스도 호출해야 합니다. 그래서 핵심은 부수효과를 없애는 것이 아니라, 어디에 두고 어떻게 격리할지를 설계하는 것입니다.
 
+
+![Functional Programming 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/02/02-01-big-picture.ko.png)
+*Functional Programming 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 어떤 조건을 만족해야 함수를 순수 함수라고 부를 수 있을까요?
 - 코드에서 부수효과는 어떤 형태로 나타나며 어떻게 식별할 수 있을까요?
 - 순수한 계산과 IO를 분리하면 테스트는 어떻게 단순해질까요?
-
-## 큰 그림
-
-![Functional Programming 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/02/02-01-big-picture.ko.png)
-
-*Functional Programming 101 2장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -528,7 +526,6 @@ def test_sum_matches_builtin(xs: list[int]) -> None:
 이 원칙을 지키면 코드 리뷰에서 "무엇이 바뀌었는가"가 아니라 "어디에서 부수효과가 발생하는가"를 빠르게 확인할 수 있습니다.
 
 
-
 ## 검증 시나리오: 경계 조건을 먼저 잠그기
 
 실무에서 함수형 스타일이 유지되는 팀은 구현보다 먼저 검증 포인트를 고정합니다. 입력 경계, 빈 컬렉션, 정렬 안정성, 타입 변환 실패를 먼저 적어 두면 리팩터링 과정에서도 동작이 흔들리지 않습니다.
@@ -575,7 +572,6 @@ print("Pass")
 ```
 
 이런 검증 코드는 예제 코드가 아니라 운영 안전장치입니다. 새 규칙을 추가할 때도 기존 성질이 유지되는지 빠르게 확인할 수 있습니다.
-
 
 
 ## 리뷰 포인트: 코드 리뷰에서 바로 확인할 항목

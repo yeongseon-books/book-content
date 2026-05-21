@@ -29,17 +29,14 @@ last_reviewed: '2026-05-15'
 순위 성능이 좋은 모델이 곧 확률까지 정직한 모델인 것은 아닙니다. AUC가 높아도 확률값은 과신하거나 과소신할 수 있습니다. 광고 입찰, 보험 심사, 리스크 스코어링처럼 확률값 그 자체를 비용 계산에 쓰는 시스템에서는 이 차이가 곧 손실로 이어집니다.
 
 
+![Model Evaluation 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/07/07-01-concept-at-a-glance.ko.png)
+*Model Evaluation 101 7장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 모델이 예측한 확률을 왜 그대로 믿으면 안 될까요?
 - 신뢰도 곡선은 무엇을 보여 줄까요?
 - Brier 점수는 어떤 종류의 오류를 요약할까요?
-
-## 큰 그림
-
-![Model Evaluation 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/07/07-01-concept-at-a-glance.ko.png)
-
-*Model Evaluation 101 7장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 

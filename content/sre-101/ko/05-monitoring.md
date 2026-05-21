@@ -28,21 +28,16 @@ title: "SRE 101 (5/10): Monitoring"
 
 이 글은 SRE 101 시리즈의 5번째 글입니다. 여기서는 monitoring을 행동으로 이어지는 측정으로 정의하고, 네 가지 핵심 운영 신호, 알림 설계 원칙, 대시보드 구성 방식, 알림 피로를 줄이는 관점을 정리합니다.
 
+
+![SRE 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/05/05-01-concept-at-a-glance.ko.png)
+*SRE 101 5장 흐름 개요*
+> 메트릭은 현재 상태를 숫자로 보여 주고, 로그는 구체적인 사건을 기록하며, 알림은 기준 위반 시 즉시 행동을 요구합니다.
+
 ## 먼저 던지는 질문
 
 - monitoring은 단순 수집과 어떻게 다를까요?
 - latency, traffic, errors, saturation은 왜 함께 봐야 할까요?
 - 메트릭과 로그는 각각 어떤 질문에 답할까요?
-
-## 큰 그림
-
-![SRE 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/05/05-01-concept-at-a-glance.ko.png)
-
-*SRE 101 5장 흐름 개요*
-
-Monitoring을 세 층으로 분해하면 수집 단계, 판단 단계, 대응 단계로 나뇉니다. 메트릭과 로그는 수집을 담당하고, 알림은 판단을 보조하며, 대시보드는 상황 파악과 신속한 대응을 돕습니다.
-
-> 메트릭은 현재 상태를 숫자로 보여 주고, 로그는 구체적인 사건을 기록하며, 알림은 기준 위반 시 즉시 행동을 요구합니다.
 
 ## 왜 이 주제가 중요한가
 

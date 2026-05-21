@@ -28,19 +28,15 @@ The error budget is useful because it turns that argument into policy. It gives 
 
 This is post 4 in the SRE 101 series. Here we connect SLO math to release policy, burn-rate alerting, and the day-to-day trade-off between stability work and product change.
 
+
+![sre 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/04/04-01-concept-at-a-glance.en.png)
+*sre 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why does an error budget become the common language between speed and stability?
 - How do you calculate the allowed failure from an SLO target?
 - Why do total budget spend and burn rate answer different operating questions?
-
-## Big Picture
-
-![sre 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/04/04-01-concept-at-a-glance.en.png)
-
-*sre 101 chapter 4 flow overview*
-
-This picture places Error Budget inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this topic matters
 

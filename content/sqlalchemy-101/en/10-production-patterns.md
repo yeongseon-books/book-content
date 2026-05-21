@@ -32,19 +32,14 @@ This is the final article in the SQLAlchemy 101 series.
 
 *Production patterns: pools, observability, migrations, and deploys*
 
+![sqlalchemy 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/10/10-02-why-this-matters.en.png)
+*sqlalchemy 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - The core connection pool options (`pool_size`, `max_overflow`, `pool_pre_ping`, `pool_recycle`)?
 - How to choose between `QueuePool`, `NullPool`, and `StaticPool`, especially for SQLite?
 - How to wire SQL queries into traces with OpenTelemetry?
-
-## Big Picture
-
-![sqlalchemy 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/10/10-02-why-this-matters.en.png)
-
-*sqlalchemy 101 chapter 10 flow overview*
-
-This picture places Production patterns: pools, observability, migrations, and deploys inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

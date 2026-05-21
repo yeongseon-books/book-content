@@ -28,21 +28,16 @@ title: "SRE 101 (9/10): Capacity Planning"
 
 이 글은 SRE 101 시리즈의 9번째 글입니다. 여기서는 capacity planning을 수요 예측, 헤드룸 설정, 부하 테스트, 확장 단위 계산, 비용 판단의 흐름으로 설명하고, 리드 타임과 반복 보정의 중요성까지 정리합니다.
 
+
+![SRE 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/09/09-01-concept-at-a-glance.ko.png)
+*SRE 101 9장 흐름 개요*
+> 용량 계획은 미리 다다를 상황을 숫자로 예측하고, 언제까지 버틸 수 있는지 보여주는 체계입니다.
+
 ## 먼저 던지는 질문
 
 - 용량 계획은 왜 과거 복제가 아니라 미래 수요 예측일까요?
 - 헤드룸은 왜 낭비가 아니라 보험에 가까울까요?
 - 부하 테스트는 예측 모델을 어떻게 보정할까요?
-
-## 큰 그림
-
-![SRE 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/09/09-01-concept-at-a-glance.ko.png)
-
-*SRE 101 9장 흐름 개요*
-
-Capacity Planning을 현재 상태, 미래 요구, 한계 지점으로 나누어 봅니다.
-
-> 용량 계획은 미리 다다를 상황을 숫자로 예측하고, 언제까지 버틸 수 있는지 보여주는 체계입니다.
 
 ## 왜 이 주제가 중요한가
 

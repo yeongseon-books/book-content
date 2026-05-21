@@ -31,19 +31,15 @@ This is post 7 in the Database Systems 101 series.
 
 > Normalization is the principle "record each fact in exactly one place." Done well, it removes update anomalies and gives everyone a single, agreed-on home for each piece of truth. 1NF, 2NF, and 3NF are the step-by-step checklist that codifies the principle.
 
+
+![database systems 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/07/07-01-big-picture.en.png)
+*database systems 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Normalization and Modeling?
 - Which signal should the example or diagram make visible for Normalization and Modeling?
 - What failure should be prevented first when Normalization and Modeling reaches a real system?
-
-## Big Picture
-
-![database systems 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/07/07-01-big-picture.en.png)
-
-*database systems 101 chapter 7 flow overview*
-
-This picture places Normalization and Modeling inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

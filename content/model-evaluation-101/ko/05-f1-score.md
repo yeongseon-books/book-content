@@ -29,17 +29,15 @@ last_reviewed: '2026-05-17'
 
 이번 글은 그 약점을 바로잡습니다. F1은 여전히 유용한 요약 숫자이지만, 임계값 선택은 반드시 **train → validation → test** 순서로 분리해야 합니다. 동시에 macro, micro, weighted 평균이 서로 다른 질문에 답한다는 점도 운영 관점에서 다시 정리하겠습니다.
 
+
+![Model Evaluation 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/05/05-01-concept-at-a-glance.ko.png)
+*Model Evaluation 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - F1 점수를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?
 - F1 점수에서 예제나 다이어그램으로 검증해야 할 핵심 신호는 무엇일까요?
 - F1 점수를 실제 시스템에 적용할 때 어떤 실패를 먼저 막아야 할까요?
-
-## 큰 그림
-
-![Model Evaluation 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/05/05-01-concept-at-a-glance.ko.png)
-
-*Model Evaluation 101 5장 흐름 개요*
 
 ## 이 글이 답하는 질문
 

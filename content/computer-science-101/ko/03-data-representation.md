@@ -29,17 +29,15 @@ last_reviewed: '2026-05-12'
 
 여기서는 비트와 바이트, 문자 인코딩, 정수와 부동소수점 표현을 따라가며 데이터가 어떻게 의미를 얻는지 정리하겠습니다.
 
+
+![Computer Science 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/03/03-01-concept-at-a-glance.ko.png)
+*Computer Science 101 3장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 컴퓨터는 0과 1만으로 숫자, 문자, 이미지를 어떻게 저장할까요?
 - ASCII와 UTF-8은 무엇이 다르고 왜 바이트 수가 달라질까요?
 - 음수는 왜 2의 보수 방식으로 표현할까요?
-
-## 큰 그림
-
-![Computer Science 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/03/03-01-concept-at-a-glance.ko.png)
-
-*Computer Science 101 3장 흐름 개요*
 
 ## 이 글에서 배울 것
 

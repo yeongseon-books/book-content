@@ -24,23 +24,16 @@ PromptTemplate과 MessagesPlaceholder는 검색된 컨텍스트를 LLM이 읽는
 
 이 글은 RAG Deep Dive 시리즈의 네 번째 글입니다.
 
+![문자열 프롬프트와 채팅 프롬프트 계층 구조](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/04/04-01-prompt-template-class-hierarchy.ko.png)
+*문자열 프롬프트와 채팅 프롬프트 계층 구조*
+> 프롬프트 계층은 구조화된 retrieval 결과가 모델이 실제로 읽는 입력 계약으로 바뀌는 곳입니다.
+
 ## 먼저 던지는 질문
 
 - 프롬프트 템플릿은 문자열 포맷팅이 아니라 어떤 입력 계약을 검증할까요?
 - 검색된 context를 메시지에 주입할 때 누락·순서·역할은 왜 중요할까요?
 - RAG 프롬프트에서 질문과 근거를 분리하지 않으면 어떤 디버깅 문제가 생길까요?
 
-## 큰 그림
-
-![문자열 프롬프트와 채팅 프롬프트 계층 구조](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/04/04-01-prompt-template-class-hierarchy.ko.png)
-
-*문자열 프롬프트와 채팅 프롬프트 계층 구조*
-
-이 그림에서는 PromptTemplate과 ChatPromptTemplate이 입력 변수를 검증하고, 검색된 context와 사용자 질문을 메시지 구조로 조립하는 흐름을 봅니다. RAG 프롬프트는 문장 품질보다 근거와 질문의 경계를 명확히 유지하는 일이 먼저입니다.
-
-> 프롬프트 계층은 구조화된 retrieval 결과가 모델이 실제로 읽는 입력 계약으로 바뀌는 곳입니다.
-
-<!-- a-grade-example:begin -->
 ## 최소 실행 예제
 
 예제 파일: `en/04-prompt-construction-and-context-injection/main.py`

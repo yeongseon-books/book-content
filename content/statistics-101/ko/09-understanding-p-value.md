@@ -30,21 +30,16 @@ p-value는 그렇게 많은 일을 대신해 주는 숫자가 아닙니다. 이 
 
 이 글은 Statistics 101 시리즈의 9번째 글입니다. 여기서는 p-value의 정확한 정의, 자주 반복되는 오해, p-hacking이 왜 위험한지, 그리고 효과 크기와 신뢰구간을 함께 봐야 하는 이유를 정리하겠습니다.
 
+
+![Statistics 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/09/09-01-concept-at-a-glance.ko.png)
+*Statistics 101 9장 흐름 개요*
+> p-value는 효과 크기가 아니고, 진실의 확률도 아닙니다. 단지 증거의 강도입니다.
+
 ## 먼저 던지는 질문
 
 - p-value는 정확히 무엇을 뜻할까요?
 - 왜 많은 사람이 p-value를 잘못 읽을까요?
 - p-value와 효과 크기는 어떻게 다를까요?
-
-## 큰 그림
-
-![Statistics 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/09/09-01-concept-at-a-glance.ko.png)
-
-*Statistics 101 9장 흐름 개요*
-
-p-value는 '귀무가설이 참일 때 현재 데이터만큼 극단적인 결과가 나올 확률'입니다. 작을수록 데이터가 귀무가설과 맞지 않다는 뜻이며, 그것이 통계적 유의성의 기준입니다.
-
-> p-value는 효과 크기가 아니고, 진실의 확률도 아닙니다. 단지 증거의 강도입니다.
 
 ## 왜 중요한가
 

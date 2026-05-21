@@ -26,21 +26,16 @@ last_reviewed: '2026-05-15'
 
 이 글은 Portfolio Project 101 시리즈의 4번째 글입니다. 여기서는 포트폴리오 데모를 기능 전시장처럼 만드는 대신, 처음 들어온 사람이 30초 안에 핵심 가치를 느낄 수 있게 구성하는 방법을 살펴보겠습니다.
 
+
+![Portfolio Project 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/04/04-01-diagram.ko.png)
+*Portfolio Project 101 4장 흐름 개요*
+> 코드 없이 말로만 설명하면 신뢰하지 않습니다. 실제로 동작하는 데모를 본 사용자는 '끝까지 마무리하는 사람'이라는 신호를 받습니다.
+
 ## 먼저 던지는 질문
 
 - 데모 첫 화면은 왜 가장 중요한 평가 지점일까요?
 - 시드 데이터와 공유 계정은 무엇을 해결해 줄까요?
 - 라이브 데모와 백업 영상은 어떤 역할 차이가 있을까요?
-
-## 큰 그림
-
-![Portfolio Project 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/04/04-01-diagram.ko.png)
-
-*Portfolio Project 101 4장 흐름 개요*
-
-이 그림에서는 데모가 코드와 사용자 사이에서 어떤 역할을 하는지 봅니다. 데모는 설명이 아니라 체험이며, 방문자가 직접 눌러 볼 때 비로소 신뢰가 생깁니다.
-
-> 코드 없이 말로만 설명하면 신뢰하지 않습니다. 실제로 동작하는 데모를 본 사용자는 '끝까지 마무리하는 사람'이라는 신호를 받습니다.
 
 ## 왜 중요한가
 

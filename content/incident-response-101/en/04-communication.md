@@ -28,21 +28,16 @@ Customers, executives, and responders do not need the same message. They need th
 
 This is post 4 in the Incident Response 101 series. This post covers how to separate audiences, when to use Slack versus a status page, and how to keep updates short, honest, and operationally useful.
 
+
+![incident response 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/04/04-01-diagram-at-a-glance.en.png)
+*incident response 101 chapter 4 flow overview*
+> Clear channels + fixed cadence + escalation rules = a team that stays coordinated even under pressure.
+
 ## Questions to Keep in Mind
 
 - Who needs updates during an incident, and what should each audience hear?
 - Why is a fast imperfect first update usually better than a delayed perfect one?
 - How should severity shape the update cadence?
-
-## Big Picture
-
-![incident response 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/04/04-01-diagram-at-a-glance.en.png)
-
-*incident response 101 chapter 4 flow overview*
-
-This picture places Communication inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Clear channels + fixed cadence + escalation rules = a team that stays coordinated even under pressure.
 
 ## Why this topic matters
 

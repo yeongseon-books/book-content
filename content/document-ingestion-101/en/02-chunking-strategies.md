@@ -25,21 +25,15 @@ Chunking is where many retrieval systems quietly lose quality. A splitter that w
 
 This is the second post in the Document Ingestion 101 series. Here, we compare chunking presets by document shape and look at the quick signals that tell you whether a split is trustworthy.
 
+![Chunking strategy selection flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/02/02-01-chunking-flow-by-document-type.en.png)
+*Chunking strategy selection flow*
+> Chunking is not just cutting text smaller; it is designing the smallest context unit retrieval can still trust.
+
 ## Questions to Keep in Mind
 
 - Why does one chunk_size for every document type make retrieval quality unstable?
 - In what order does a Recursive splitter give up boundaries while splitting text?
 - What should be reviewed before embedding to catch bad chunks quickly?
-
-## Big Picture
-
-![Chunking strategy selection flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/02/02-01-chunking-flow-by-document-type.en.png)
-
-*Chunking strategy selection flow*
-
-This picture shows different document types passing through splitter settings into searchable chunks. Good chunking is not choosing one size; it is matching document structure to retrieval questions.
-
-> Chunking is not just cutting text smaller; it is designing the smallest context unit retrieval can still trust.
 
 ## Chunking flow by document type
 

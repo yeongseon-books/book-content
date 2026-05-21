@@ -30,21 +30,16 @@ This is post 4 in the Portfolio Project 101 series. Here we will treat the demo 
 
 > A good demo does not need to show everything. It needs to make the core value obvious quickly.
 
+
+![portfolio project 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/04/04-01-concept-at-a-glance.en.png)
+*portfolio project 101 chapter 4 flow overview*
+> Code without demonstration doesn't convince anyone. A live proof that the project actually runs, and can be inspected by any visitor, creates trust.
+
 ## Questions to Keep in Mind
 
 - Why is the first screen the most important part of a portfolio demo?
 - What do seed data and a shared demo account solve?
 - What role does a backup video play when the live demo is not enough?
-
-## Big Picture
-
-![portfolio project 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/04/04-01-concept-at-a-glance.en.png)
-
-*portfolio project 101 chapter 4 flow overview*
-
-This picture places Building the Demo inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Code without demonstration doesn't convince anyone. A live proof that the project actually runs, and can be inspected by any visitor, creates trust.
 
 ## Why It Matters
 

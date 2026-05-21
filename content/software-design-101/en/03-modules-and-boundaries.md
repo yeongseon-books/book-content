@@ -31,19 +31,15 @@ In this post, we focus on deep modules, small public surfaces, and information h
 
 > A strong boundary lets the caller know less while still getting more useful work done.
 
+
+![software design 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/03/03-01-concept-at-a-glance.en.png)
+*software design 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Modules and Boundaries?
 - Which signal should the example or diagram make visible for Modules and Boundaries?
 - What failure should be prevented first when Modules and Boundaries reaches a real system?
-
-## Big Picture
-
-![software design 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/03/03-01-concept-at-a-glance.en.png)
-
-*software design 101 chapter 3 flow overview*
-
-This picture places Modules and Boundaries inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

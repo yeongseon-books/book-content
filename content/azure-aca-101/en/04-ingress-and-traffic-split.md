@@ -28,19 +28,14 @@ Ingress and traffic splitting are two of the most important operational levers i
 
 This is post 4 in the Azure Container Apps 101 series. Here, we'll connect ingress design to revision-based deployment strategy.
 
+![azure container apps 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/04/04-01-the-request-path.en.png)
+*azure container apps 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - What ACA's managed Ingress owns (TLS, external/internal exposure, Revision routing) and what it does not?
 - The exact difference between `external`, `internal`, and `disabled` ingress modes?
 - How Single mode and Multiple mode change traffic distribution behavior?
-
-## Big Picture
-
-![azure container apps 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/04/04-01-the-request-path.en.png)
-
-*azure container apps 101 chapter 4 flow overview*
-
-This picture places Ingress and traffic splitting — revision-based deployment strategies inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

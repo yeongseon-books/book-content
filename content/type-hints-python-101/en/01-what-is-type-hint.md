@@ -31,19 +31,15 @@ This is the first post in the Type Hints in Python 101 series.
 
 > Python is dynamically typed — variables can hold any value, and types are checked at runtime. This flexibility is powerful but makes it harder to catch bugs early. Type hints, introduced in PEP 484, let you annotate expected types without changing how Python runs. Static analysis tools then verify these annotations before your code ever executes. This article introduces what type hints are, why they matter, and how to start using them.
 
+
+![Type Hints in Python 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/01/01-01-big-picture.en.png)
+*Type Hints in Python 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What Are Python Type Hints??
 - Which signal should the example or diagram make visible for What Are Python Type Hints??
 - What failure should be prevented first when What Are Python Type Hints? reaches a real system?
-
-## Big Picture
-
-![Type Hints in Python 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/01/01-01-big-picture.en.png)
-
-*Type Hints in Python 101 chapter 1 flow overview*
-
-This picture places What Are Python Type Hints? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

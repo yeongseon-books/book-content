@@ -29,21 +29,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 리팩토링이 무엇이고 무엇이 아닌지, 그리고 레거시 코드에서도 안전하게 적용하는 절차를 정리하겠습니다.
 
+
+![Clean Code 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/09/09-01-concept-at-a-glance.ko.png)
+*Clean Code 101 9장 흐름 개요*
+> 금달 컔단 동스른 동스른 동스른 동스른 동스른 동스른 동스른—.
+
 ## 먼저 던지는 질문
 
 - 리팩토링은 정확히 무엇이고, 재작성과 무엇이 다를까요?
 - Fowler 카탈로그의 핵심 기법은 무엇일까요?
 - 특성화 테스트는 왜 레거시 코드에서 중요할까요?
-
-## 큰 그림
-
-![Clean Code 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/09/09-01-concept-at-a-glance.ko.png)
-
-*Clean Code 101 9장 흐름 개요*
-
-이 그림은 리팩토링의 동스른 동스턴—먰능 추가로 곳이 만듣 동스른 동스른 동스른—를 명넌 동스른—서 명넌 동스른 동스른 동스른 동스른 동스른 동스른—를 보여 줍니다.
-
-> 금달 컔단 동스른 동스른 동스른 동스른 동스른 동스른 동스른—.
 
 ## 왜 중요한가
 

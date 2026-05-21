@@ -33,21 +33,15 @@ seo_description: SQLAlchemy 2.x의 Engine과 Connection, 트랜잭션 경계를 
 
 *SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질*
 
+![SQLAlchemy 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/01/01-02-why-this-matters.ko.png)
+*SQLAlchemy 101 1장 흐름 개요*
+> SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - `Engine`은 정확히 무엇이고, `Connection`과 어떻게 역할을 나눌까요?
 - SQLAlchemy 2.x가 트랜잭션을 더 명시적으로 다루는 이유는 무엇일까요?
 - `connect()`와 `begin()`은 언제 구분해서 써야 할까요?
-
-## 큰 그림
-
-![SQLAlchemy 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/01/01-02-why-this-matters.ko.png)
-
-*SQLAlchemy 101 1장 흐름 개요*
-
-이 그림에서는 SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> SQLAlchemy 2.x 시작하기 - Engine과 Connection의 본질의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 

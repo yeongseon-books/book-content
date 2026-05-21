@@ -25,19 +25,14 @@ Choosing a Korean embedding model is rarely about chasing the prettiest benchmar
 
 This is the first post in the Korean AI Stack 101 series. Here, we build a reproducible comparison frame for Korean embedding models so later retrieval decisions have a clear baseline.
 
+![Korean AI Stack 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/01/01-01-core-flow.en.png)
+*Korean AI Stack 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - Where do English-first embedding models usually fail on Korean-heavy data?
 - Why is a separation gap between similar and unrelated pairs more useful than one pretty cosine score?
 - What should you test first when Korean text regularly mixes with English technical terms?
-
-## Big Picture
-
-![Korean AI Stack 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/01/01-01-core-flow.en.png)
-
-*Korean AI Stack 101 chapter 1 flow overview*
-
-This picture places Korean embedding models compared — KoSimCSE, BGE-M3, Solar inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Core flow
 

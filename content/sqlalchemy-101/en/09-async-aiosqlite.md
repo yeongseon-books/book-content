@@ -32,19 +32,14 @@ This is the 9th article in the SQLAlchemy 101 series.
 
 *Async SQLAlchemy with aiosqlite and AsyncSession*
 
+![sqlalchemy 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/09/09-02-why-this-matters.en.png)
+*sqlalchemy 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - The shape of SQLAlchemy 2.x's async stack: `create_async_engine`, `AsyncEngine`, `AsyncSession`?
 - How to wire the `aiosqlite` driver to use SQLite from async code?
 - A one-to-one mapping from sync patterns to async (`session.execute`, `session.scalars`)?
-
-## Big Picture
-
-![sqlalchemy 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/09/09-02-why-this-matters.en.png)
-
-*sqlalchemy 101 chapter 9 flow overview*
-
-This picture places Async SQLAlchemy with aiosqlite and AsyncSession inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

@@ -28,21 +28,16 @@ That is why continuous delivery is not just about automation. It is about making
 
 This is post 3 in the DevOps 101 series. In this chapter, we compare deployment strategies, separate code deployment from feature release, and show what a safe promotion and rollback path looks like in practice.
 
+
+![devops 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/03/03-01-concept-at-a-glance.en.png)
+*devops 101 chapter 3 flow overview*
+> Safe deployment *shrinks the blast radius*: deploy often, *observe*, *expand gradually*, and *roll back instantly* when needed.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying CD and Deployment Strategies?
 - Which signal should the example or diagram make visible for CD and Deployment Strategies?
 - What failure should be prevented first when CD and Deployment Strategies reaches a real system?
-
-## Big Picture
-
-![devops 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/03/03-01-concept-at-a-glance.en.png)
-
-*devops 101 chapter 3 flow overview*
-
-This picture places CD and Deployment Strategies inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Safe deployment *shrinks the blast radius*: deploy often, *observe*, *expand gradually*, and *roll back instantly* when needed.
 
 ## Questions this article answers
 

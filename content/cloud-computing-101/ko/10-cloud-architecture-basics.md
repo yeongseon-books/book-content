@@ -30,21 +30,16 @@ last_reviewed: '2026-05-21'
 
 여기서는 Well-Architected의 여섯 가지 관점을 기준으로, 앞선 내용이 하나의 클라우드 아키텍처로 어떻게 이어지는지 정리하겠습니다.
 
+
+![Cloud Computing 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/10/10-01-concept-at-a-glance.ko.png)
+*Cloud Computing 101 10장 흐름 개요*
+> 좋은 아키텍처는 완벽한 설계가 아니라, 운영 과정에서 계속 배우고 개선하는 문화입니다.
+
 ## 먼저 던지는 질문
 
 - Well-Architected의 여섯 기둥은 각각 무엇을 보라고 말할까요?
 - 기본적인 다층 웹 아키텍처는 어떤 모습일까요?
 - Stateless와 Stateful을 왜 분리해야 할까요?
-
-## 큰 그림
-
-![Cloud Computing 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/10/10-01-concept-at-a-glance.ko.png)
-
-*Cloud Computing 101 10장 흐름 개요*
-
-고가용성(High Availability)은 시스템이 장애를 견디고 계속 동작하는 능력입니다. 확장성(Scalability)은 트래픽 증가에 따라 성능을 유지하는 능력입니다. 느슨한 결합(Loose Coupling)은 서비스들이 독립적으로 동작하도록 설계하는 원칙입니다. 오토메이션(Automation)은 반복적인 운영 작업을 자동화해 사람의 실수를 줄입니다.
-
-> 좋은 아키텍처는 완벽한 설계가 아니라, 운영 과정에서 계속 배우고 개선하는 문화입니다.
 
 ## 왜 중요한가
 

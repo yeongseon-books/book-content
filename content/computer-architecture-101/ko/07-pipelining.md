@@ -27,17 +27,15 @@ last_reviewed: '2026-05-12'
 
 파이프라인은 평균을 빠르게 만듭니다. 하지만 그 평균은 분기 예측 한 번이 틀리는 순간 무너질 수 있습니다. 그래서 핫 루프의 분기 패턴을 이해하는 습관이 생각보다 큰 성능 차이를 만듭니다.
 
+
+![Computer Architecture 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/07/07-01-big-picture.ko.png)
+*Computer Architecture 101 7장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 파이프라인은 어떻게 처리량을 높일까요?
 - 데이터 해저드와 제어 해저드는 무엇이 다를까요?
 - 분기 예측은 어떤 가정을 바탕으로 동작할까요?
-
-## 큰 그림
-
-![Computer Architecture 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/07/07-01-big-picture.ko.png)
-
-*Computer Architecture 101 7장 흐름 개요*
 
 ## 왜 중요한가
 

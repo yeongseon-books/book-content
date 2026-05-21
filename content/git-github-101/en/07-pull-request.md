@@ -28,19 +28,15 @@ Once a second person is involved, a branch is no longer just your workspace. It 
 
 This is the seventh post in the Git & GitHub 101 series. Here, we follow one change from feature branch to review to merge on `main`.
 
+
+![Git & GitHub 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/07/07-01-mental-model.en.png)
+*Git & GitHub 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - What a Pull Request (PR) really is, and how it differs from a plain `git merge`?
 - The order of operations: feature branch, commit, push, open PR?
 - How to respond to review comments by adding more commits to the same branch?
-
-## Big Picture
-
-![Git & GitHub 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/07/07-01-mental-model.en.png)
-
-*Git & GitHub 101 chapter 7 flow overview*
-
-This picture places Collaborating with Pull Requests - From Branch to Review to Main inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

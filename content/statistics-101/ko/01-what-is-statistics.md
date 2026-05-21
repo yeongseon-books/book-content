@@ -30,21 +30,16 @@ last_reviewed: '2026-05-12'
 
 이 글은 Statistics 101 시리즈의 첫 번째 글입니다. 여기서는 통계를 기술 통계와 추론 통계라는 두 축으로 나누어 보고, 데이터에서 판단까지 이어지는 기본 흐름을 잡아 보겠습니다.
 
+
+![Statistics 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/01/01-01-concept-at-a-glance.ko.png)
+*Statistics 101 1장 흐름 개요*
+> 통계의 핵심은 숫자를 정렬하는 기술이 아니라, 불확실한 상황에서도 판단을 더 분명하게 만드는 사고 체계입니다.
+
 ## 먼저 던지는 질문
 
 - 통계는 정확히 무엇을 다루는 학문일까요?
 - 기술 통계와 추론 통계는 어떻게 역할이 다를까요?
 - 통계는 숫자 계산이 아니라 의사결정과 어떻게 연결될까요?
-
-## 큰 그림
-
-![Statistics 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/01/01-01-concept-at-a-glance.ko.png)
-
-*Statistics 101 1장 흐름 개요*
-
-이 그림에서는 데이터로부터 판단까지 이어지는 삼단계 흐름을 봅니다. 먼저 데이터를 요약하고, 그다음 표본 너머를 추론하며, 마지막에 행동으로 마무리합니다.
-
-> 통계의 핵심은 숫자를 정렬하는 기술이 아니라, 불확실한 상황에서도 판단을 더 분명하게 만드는 사고 체계입니다.
 
 ## 왜 중요한가
 

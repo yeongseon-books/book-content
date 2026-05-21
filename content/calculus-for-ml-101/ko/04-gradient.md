@@ -32,17 +32,15 @@ Gradient는 바로 그때 필요한 표현입니다. 여러 편미분을 순서 
 
 끝까지 읽고 나면 gradient를 벡터 기호가 아니라 손실 지형 위에서 길을 찾는 지도처럼 해석하게 될 것입니다.
 
+
+![Calculus for ML 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/04/04-01-concept-at-a-glance.ko.png)
+*Calculus for ML 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 여러 편미분을 하나의 gradient vector로 묶는다는 것은 정확히 무엇을 뜻할까요?
 - gradient의 방향과 크기는 각각 어떤 실무 의미를 가질까요?
 - 왜 gradient는 손실이 가장 빠르게 증가하는 방향을 가리킬까요?
-
-## 큰 그림
-
-![Calculus for ML 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/04/04-01-concept-at-a-glance.ko.png)
-
-*Calculus for ML 101 4장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 
@@ -140,7 +138,6 @@ Gradient는 여러 편미분을 한데 묶은 벡터이며, 현재 지점에서 
 경사하강법은 이 gradient를 반대로 따라갑니다. 즉 gradient를 이해하는 것은 “왜 optimizer가 저 방향으로 움직였는가”를 이해하는 일과 같습니다. 실무에서 gradient norm, clipping, exploding gradient 같은 표현이 자연스럽게 쓰이는 이유도 모두 이 벡터 관점에서 설명됩니다.
 
 다음 글에서는 함수가 함수 안에 들어가는 합성 구조에서 gradient가 어떻게 전달되는지 보겠습니다. 그러면 chain rule이 왜 backpropagation의 핵심인지 훨씬 분명해집니다.
-
 
 
 ## gradient 하강 경로를 수치로 시각화하기

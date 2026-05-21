@@ -31,19 +31,15 @@ This is post 2 in the Type Hints in Python 101 series.
 
 > Annotating a function parameter as `list` tells the type checker it is a list — but not what the list contains. A `list[int]` is fundamentally different from a `list[str]` when it comes to the operations you can perform on its elements. This article covers Python's basic scalar types and how to parameterize collection types for precise type checking.
 
+
+![Type Hints in Python 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/02/02-01-big-picture.en.png)
+*Type Hints in Python 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Basic Types and Collection Types?
 - Which signal should the example or diagram make visible for Basic Types and Collection Types?
 - What failure should be prevented first when Basic Types and Collection Types reaches a real system?
-
-## Big Picture
-
-![Type Hints in Python 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/02/02-01-big-picture.en.png)
-
-*Type Hints in Python 101 chapter 2 flow overview*
-
-This picture places Basic Types and Collection Types inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

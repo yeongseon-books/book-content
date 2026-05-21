@@ -29,17 +29,15 @@ last_reviewed: '2026-05-12'
 
 SQL은 절차를 적는 언어가 아닙니다. 원하는 결과를 선언하면 DBMS가 그것을 파싱하고, 의미를 해석하고, 가능한 실행 계획들 중 하나를 고른 뒤, 실제로 행을 만들어 냅니다. 이 글의 목표는 SQL 문법을 다시 가르치는 것이 아니라, SQL 텍스트가 결과 행이 되기까지의 내부 경로를 EXPLAIN이라는 창으로 읽을 수 있게 만드는 데 있습니다.
 
+
+![Database Systems 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/03/03-01-big-picture.ko.png)
+*Database Systems 101 3장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - SQL이 선언형 언어라는 사실은 어떤 결과를 낳을까요?
 - 쿼리는 어떤 네 단계를 거쳐 실행될까요?
 - 가장 단순한 `EXPLAIN` 출력은 어떻게 읽어야 할까요?
-
-## 큰 그림
-
-![Database Systems 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/03/03-01-big-picture.ko.png)
-
-*Database Systems 101 3장 흐름 개요*
 
 ## 이 글에서 배울 내용
 

@@ -28,21 +28,16 @@ This is post 6 in the Pandas 101 series.
 
 In this chapter, we will frame `groupby` as the split-apply-combine workflow. That gives you a clearer mental model for when to reach for `agg`, `transform`, or `filter`.
 
+
+![pandas 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/06/06-01-concept-at-a-glance.en.png)
+*pandas 101 chapter 6 flow overview*
+> *Aggregation starts with the split. Group by customer, by date, or by region on the same data — you get completely different answers. Choose your grain first.
+
 ## Questions to Keep in Mind
 
 - The *split-apply-combine* model?
 - The difference between *agg / transform / filter?
 - Multi-key grouping?
-
-## Big Picture
-
-![pandas 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/pandas-101/06/06-01-concept-at-a-glance.en.png)
-
-*pandas 101 chapter 6 flow overview*
-
-This picture places Groupby and Aggregation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> *Aggregation starts with the split. Group by customer, by date, or by region on the same data — you get completely different answers. Choose your grain first.
 
 ## Why It Matters
 

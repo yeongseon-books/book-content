@@ -28,21 +28,16 @@ Figures are strongest when the reader needs direction, sequence, or system shape
 
 This is post 6 in the Technical Writing 101 series. It covers when to use figures, when to use tables, and how captions and alt text make them readable.
 
+
+![technical writing 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/06/06-01-concept-at-a-glance.en.png)
+*technical writing 101 chapter 6 flow overview*
+> A figure answers one question; a table makes side-by-side comparison possible; captions tie them both to the text.
+
 ## Questions to Keep in Mind
 
 - Flowcharts* and *sequence diagrams?
 - Comparison* and *decision* tables?
 - Writing *captions?
-
-## Big Picture
-
-![technical writing 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/06/06-01-concept-at-a-glance.en.png)
-
-*technical writing 101 chapter 6 flow overview*
-
-This picture places Using Figures and Tables inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A figure answers one question; a table makes side-by-side comparison possible; captions tie them both to the text.
 
 ## Why It Matters
 

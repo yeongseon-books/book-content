@@ -27,21 +27,16 @@ seo_description: 환경 변수, Vault, KMS, 회전 정책으로 비밀 정보를
 
 이 글은 Information Security 101 시리즈의 7번째 글입니다.
 
+
+![Information Security 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/07/07-01-big-picture.ko.png)
+*Information Security 101 7장 흐름 개요*
+> 비밀을 암호화하고 저장하는 것은 절반입니다. '누가, 언제, 어느 환경에서' 비밀을 사용했는지 기록하고, 비밀 유출 흔적을 감시하는 것이 나머지 절반입니다.
+
 ## 먼저 던지는 질문
 
 - 정적 비밀 정보와 동적 비밀 정보는 어떻게 다를까요?
 - 환경 변수는 어디까지 유효할까요?
 - Vault와 KMS는 각각 어떤 역할을 맡을까요?
-
-## 큰 그림
-
-![Information Security 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/07/07-01-big-picture.ko.png)
-
-*Information Security 101 7장 흐름 개요*
-
-그림은 비밀 저장소 → 접근 제어 → 사용 → 로테이션 → 감시의 주기를 보여줍니다. 비밀을 저장하는 것뿐 아니라 누가 언제 접근했는지, 예상대로 사용되었는지 추적하는 것이 핵심입니다.
-
-> 비밀을 암호화하고 저장하는 것은 절반입니다. '누가, 언제, 어느 환경에서' 비밀을 사용했는지 기록하고, 비밀 유출 흔적을 감시하는 것이 나머지 절반입니다.
 
 ## 왜 중요한가
 
@@ -410,7 +405,6 @@ def load_db_credential() -> dict:
 - 예외 승인에는 만료일이 반드시 있어야 합니다.
 
 보안은 단발성 프로젝트가 아니라 운영 루프입니다. 같은 점검을 반복해도 기준이 유지될 때 품질이 올라갑니다.
-
 
 
 ## 운영 점검 루프와 문서화 기준

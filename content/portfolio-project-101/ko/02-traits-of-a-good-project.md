@@ -26,21 +26,16 @@ last_reviewed: '2026-05-15'
 
 이 글은 Portfolio Project 101 시리즈의 2번째 글입니다. 여기서는 채용 관점에서 좋은 프로젝트를 가르는 조건이 무엇인지, 왜 완성도와 문제 선명도가 기능 개수보다 더 중요하게 읽히는지 살펴보겠습니다.
 
+
+![Portfolio Project 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/02/02-01-diagram.ko.png)
+*Portfolio Project 101 2장 흐름 개요*
+> 좋은 포트폴리오 프로젝트는 스택의 최신성으로 만들어지지 않습니다. 문제의 명확함과 설명의 정돈 정도로 만들어집니다.
+
 ## 먼저 던지는 질문
 
 - 왜 큰 프로젝트가 항상 더 좋은 포트폴리오가 되지는 않을까요?
 - 문제 정의, 결과 지표, 유지보수성, 재현성은 각각 어떻게 드러날까요?
 - 기능이 적어도 강한 프로젝트로 읽히게 만드는 기준은 무엇일까요?
-
-## 큰 그림
-
-![Portfolio Project 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/02/02-01-diagram.ko.png)
-
-*Portfolio Project 101 2장 흐름 개요*
-
-이 그림에서는 좋은 프로젝트를 만드는 조건들이 어떤 계층에 속하는지 봅니다. 기능의 화려함 대신 문제 정의의 명확함, 완성도의 성실함, 설명의 정돈 정도가 훨씬 더 중요합니다.
-
-> 좋은 포트폴리오 프로젝트는 스택의 최신성으로 만들어지지 않습니다. 문제의 명확함과 설명의 정돈 정도로 만들어집니다.
 
 ## 왜 중요한가
 

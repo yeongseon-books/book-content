@@ -28,21 +28,16 @@ The tricky part is not writing SUM or COUNT. It is deciding what a group actuall
 
 This is post 5 in the SQL 101 series. Here we focus on how aggregation turns many rows into interpretable metrics.
 
+
+![sql 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/05/05-01-aggregation-flow.en.png)
+*sql 101 chapter 5 flow overview*
+> GROUP BY's value is not in the aggregate function names, but in deciding the right grouping level so that your summary answers the actual business question.
+
 ## Questions to Keep in Mind
 
 - When does GROUP BY run, and what exactly gets grouped?
 - How do SUM, COUNT, and AVG differ in practice?
 - What is the real split between WHERE and HAVING?
-
-## Big Picture
-
-![sql 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/05/05-01-aggregation-flow.en.png)
-
-*sql 101 chapter 5 flow overview*
-
-GROUP BY divides rows into groups and aggregate functions (SUM, COUNT, AVG) summarize each group down to a single row.
-
-> GROUP BY's value is not in the aggregate function names, but in deciding the right grouping level so that your summary answers the actual business question.
 
 ## Why It Matters
 

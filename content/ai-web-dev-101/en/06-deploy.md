@@ -27,19 +27,15 @@ This is post 6 in the AI Web Development 101 series.
 
 Here, we will walk through the first deployment path for a frontend-heavy app on Vercel and a Python backend on Azure App Service.
 
+
+![AI Web Development 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/06/local-to-live-deployment.en.png)
+*AI Web Development 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why is deployment more than uploading source code?
 - When does Vercel fit better, and when does Azure App Service fit better?
 - What should you verify first in Vercel?
-
-## Big Picture
-
-![AI Web Development 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/06/local-to-live-deployment.en.png)
-
-*AI Web Development 101 chapter 6 flow overview*
-
-This picture places Deploying an AI web app — shipping to Vercel and Azure inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What to prepare before deployment
 

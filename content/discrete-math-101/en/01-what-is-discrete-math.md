@@ -31,19 +31,15 @@ This is the first post in the Discrete Math 101 series.
 
 > Discrete mathematics studies "countable" objects — integers, propositions, sets, graphs — entities that come in distinct, separated units. Computers are inherently discrete machines, so every theory in computer science is built on discrete math. This article maps the field, contrasts it with continuous math, and previews the topics covered in this series.
 
+
+![discrete math 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/01/01-01-big-picture.en.png)
+*discrete math 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What Is Discrete Mathematics??
 - Which signal should the example or diagram make visible for What Is Discrete Mathematics??
 - What failure should be prevented first when What Is Discrete Mathematics? reaches a real system?
-
-## Big Picture
-
-![discrete math 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/discrete-math-101/01/01-01-big-picture.en.png)
-
-*discrete math 101 chapter 1 flow overview*
-
-This picture places What Is Discrete Mathematics? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

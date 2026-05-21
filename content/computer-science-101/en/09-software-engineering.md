@@ -29,19 +29,15 @@ This is post 9 in the Computer Science 101 series.
 
 In this article, we'll use testing, version control, code review, and refactoring to show where coding turns into engineering.
 
+
+![Computer Science 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/09/09-01-concept-at-a-glance.en.png)
+*Computer Science 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Software Engineering?
 - Which signal should the example or diagram make visible for Software Engineering?
 - What failure should be prevented first when Software Engineering reaches a real system?
-
-## Big Picture
-
-![Computer Science 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/09/09-01-concept-at-a-glance.en.png)
-
-*Computer Science 101 chapter 9 flow overview*
-
-This picture places Software Engineering inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions This Article Answers
 

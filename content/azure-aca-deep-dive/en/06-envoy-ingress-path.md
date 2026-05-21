@@ -42,19 +42,14 @@ ACA's internal implementation is not published by Microsoft, so these versions a
 - **Inferred from upstream behavior**: Envoy-style routing and Kubernetes-style service hops from ingress state to ready revision replicas.
 - **Out of bounds**: the exact private 0 -> 1 request path, buffering behavior, and hidden ingress control-plane topology.
 
+![azure container apps deep dive chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/06/06-01-start-with-the-full-path-not-with-the-ap.en.png)
+*azure container apps deep dive chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - Is ACA's ingress just one layer of Envoy, or is there another proxy on top?
 - How does the same hostname split between external and internal ingress?
 - Where does TLS terminate, and how is mTLS to the backend actually guaranteed?
-
-## Big Picture
-
-![azure container apps deep dive chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/06/06-01-start-with-the-full-path-not-with-the-ap.en.png)
-
-*azure container apps deep dive chapter 6 flow overview*
-
-This picture places The Envoy ingress path — how the first request reaches your container inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Start with the full path, not with the app
 

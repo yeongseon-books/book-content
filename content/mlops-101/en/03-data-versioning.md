@@ -30,21 +30,16 @@ This is post 3 in the MLOps 101 series.
 
 Here, we will treat data versioning not as file backup, but as a reproducibility contract that lets the whole team pull the same inputs in the same state.
 
+
+![mlops 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/03/03-01-see-the-flow-first.en.png)
+*mlops 101 chapter 3 flow overview*
+> Data versioning is not a tool that forces large files into git. It is a pointer-plus-storage system that identifies the exact input state so the whole team can pull the same data in the same moment in time.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Data Versioning?
 - Which signal should the example or diagram make visible for Data Versioning?
 - What failure should be prevented first when Data Versioning reaches a real system?
-
-## Big Picture
-
-![mlops 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/03/03-01-see-the-flow-first.en.png)
-
-*mlops 101 chapter 3 flow overview*
-
-This picture places Data Versioning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Data versioning is not a tool that forces large files into git. It is a pointer-plus-storage system that identifies the exact input state so the whole team can pull the same data in the same moment in time.
 
 ## Questions this article answers
 

@@ -26,19 +26,14 @@ Dataset work fails less often because of size than because of shape. This articl
 
 This is the second post in the LLM Fine-tuning 101 series.
 
+![LLM Fine-tuning 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/02/02-02-the-three-layers-of-dataset-preparation.en.png)
+*LLM Fine-tuning 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - How should we shape the three fields instruction / input / output?
 - How do we read a small JSONL file directly with Hugging Face datasets?
 - What minimum verification points must we hit during preprocessing?
-
-## Big Picture
-
-![LLM Fine-tuning 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/02/02-02-the-three-layers-of-dataset-preparation.en.png)
-
-*LLM Fine-tuning 101 chapter 2 flow overview*
-
-This picture places Dataset Preparation and Preprocessing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

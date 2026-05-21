@@ -32,17 +32,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 좋은 인터페이스가 무엇인지, 추상화 수준을 어떻게 맞춰야 하는지, 다형성이 분기를 어떻게 줄이는지, LSP와 ISP가 왜 인터페이스 품질을 판단하는 기준이 되는지 설명합니다. 구현 교체가 쉬운 구조가 어떻게 만들어지는지도 함께 보겠습니다.
 
+
+![Software Design 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/05/05-01-concept-at-a-glance.ko.png)
+*Software Design 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 더 나은 인터페이스는 무엇으로 판단할 수 있을까요?
 - 추상화 수준이 너무 낮거나 높으면 어떤 문제가 생길까요?
 - 다형성은 분기문을 어떻게 줄여 줄까요?
-
-## 큰 그림
-
-![Software Design 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/05/05-01-concept-at-a-glance.ko.png)
-
-*Software Design 101 5장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -447,7 +445,6 @@ class PlaceOrderService:
 - 인프라 계층: 외부 API 오류율, DB 지연 시간
 
 지표를 계층별로 분리해 보면 어디를 고쳐야 하는지가 명확해집니다. 모든 지표가 한 대시보드에서 섞여 있으면 "느리다"는 사실만 보이고 원인은 보이지 않습니다. 설계 경계를 운영 지표 경계와 맞추면 개선 사이클이 빠르게 돌아갑니다.
-
 
 
 ## 리뷰와 리팩터링을 위한 실전 질문 세트

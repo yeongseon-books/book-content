@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 측정의 출발점, HTTP 캐시와 CDN, lazy loading과 code splitting, 데이터베이스 인덱스와 N+1 문제를 함께 보며 느린 웹앱을 빠르게 만드는 기본 원칙을 정리하겠습니다.
 
+
+![Web Development 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/09/09-01-concept-at-a-glance.ko.png)
+*Web Development 101 9장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 느린 페이지를 만나면 어디서부터 봐야 할까요?
 - 브라우저 캐시와 CDN은 각각 어떤 역할을 할까요?
 - lazy loading은 무엇을 늦추고 왜 유용할까요?
-
-## 큰 그림
-
-![Web Development 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/09/09-01-concept-at-a-glance.ko.png)
-
-*Web Development 101 9장 흐름 개요*
 
 ## 왜 성능은 측정부터 시작하는가
 
@@ -79,7 +77,7 @@ def popular():
     return db.fetch("SELECT * FROM posts ORDER BY views DESC LIMIT 10")
 ```
 
-**After (cache for 1 minute)**
+**After (1분간 캐시)**
 
 ```python
 import time

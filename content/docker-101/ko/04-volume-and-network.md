@@ -30,17 +30,14 @@ last_reviewed: '2026-05-15'
 Docker에서 이 문제를 푸는 핵심 개념이 volume과 network입니다. volume은 상태의 수명을 결정하고, network는 컨테이너 간 통신 경로를 결정합니다. 결국 이 둘은 컨테이너 운영의 가장 기본적인 인프라입니다.
 
 
+![Docker 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/04/04-01-concept-at-a-glance.ko.png)
+*Docker 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - volume, bind mount, tmpfs는 각각 언제 써야 할까요?
 - 컨테이너 데이터는 왜 기본적으로 휘발된다고 봐야 할까요?
 - 브리지 네트워크는 어떻게 컨테이너 이름 기반 통신을 가능하게 할까요?
-
-## 큰 그림
-
-![Docker 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/04/04-01-concept-at-a-glance.ko.png)
-
-*Docker 101 4장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 

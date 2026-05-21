@@ -27,17 +27,15 @@ branch가 개인 작업 공간이라면 Pull Request는 그 작업을 팀에 설
 
 이 글은 Git/GitHub 101 시리즈의 일곱 번째 글입니다. 여기서는 feature branch에서 시작해 review를 거쳐 `main`으로 돌아오는 PR 한 사이클을 따라갑니다.
 
+
+![Git & GitHub 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/07/07-01-mental-model.ko.png)
+*Git & GitHub 101 7장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - Pull Request는 plain `git merge`와 무엇이 다를까요?
 - branch를 만들고 commit한 뒤 PR을 열기까지의 순서는 어떻게 될까요?
 - review comment에는 왜 같은 branch에 commit을 더하는 방식으로 답할까요?
-
-## 큰 그림
-
-![Git & GitHub 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/07/07-01-mental-model.ko.png)
-
-*Git & GitHub 101 7장 흐름 개요*
 
 ## 왜 중요한가
 

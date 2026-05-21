@@ -27,17 +27,15 @@ last_reviewed: '2026-05-12'
 
 컴퓨터 구조를 배운다는 것은 회로 설계자가 되겠다는 뜻이 아닙니다. 개발자가 코드를 더 빠르게 만들고, 병목을 더 정확히 찾고, 추상화 아래에서 무슨 일이 벌어지는지 설명할 수 있게 되는 쪽에 가깝습니다. 같은 알고리즘도 메모리 접근 패턴, 분기, 명령어 수에 따라 전혀 다른 성능을 보이는 이유가 여기서 시작됩니다.
 
+
+![Computer Architecture 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/01/01-01-big-picture.ko.png)
+*Computer Architecture 101 1장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 컴퓨터 구조를 한 문장으로 정의하면 무엇일까요?
 - 폰 노이만 모델의 다섯 구성 요소는 어떻게 연결될까요?
 - Python 같은 고수준 코드가 실제 하드웨어까지 내려가는 경로는 어떻게 생겼을까요?
-
-## 큰 그림
-
-![Computer Architecture 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/01/01-01-big-picture.ko.png)
-
-*Computer Architecture 101 1장 흐름 개요*
 
 ## 왜 중요한가
 

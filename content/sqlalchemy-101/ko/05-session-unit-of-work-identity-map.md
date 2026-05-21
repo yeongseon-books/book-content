@@ -33,21 +33,15 @@ ORM 모델을 정의했다고 해서 곧바로 안전한 데이터 작업이 되
 
 *Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리*
 
+![SQLAlchemy 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/05/05-02-why-it-matters.ko.png)
+*SQLAlchemy 101 5장 흐름 개요*
+> Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - `Session`은 단순한 connection 래퍼가 아니라 무엇을 관리할까요?
 - Unit of Work는 변경을 어떻게 모으고, 언제 SQL로 내보낼까요?
 - `flush()`와 `commit()`은 어떤 순서와 의미 차이가 있을까요?
-
-## 큰 그림
-
-![SQLAlchemy 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/05/05-02-why-it-matters.ko.png)
-
-*SQLAlchemy 101 5장 흐름 개요*
-
-이 그림에서는 Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> Session 깊이 보기: Unit of Work와 Identity Map의 동작 원리의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 중요한가
 

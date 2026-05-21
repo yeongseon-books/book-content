@@ -28,19 +28,15 @@ When people first hear *serverless*, they usually compress it into one shortcut:
 
 That is why the first question should not be “how do I write a function?” It should be **“is this workload a good candidate for serverless in the first place?”** Once that is clear, topics like *FaaS*, *triggers*, *cold starts*, and *cost* stop feeling like scattered caveats and start reading like one operating model.
 
+
+![serverless 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/01/01-01-concept-at-a-glance.en.png)
+*serverless 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What is Serverless??
 - Which signal should the example or diagram make visible for What is Serverless??
 - What failure should be prevented first when What is Serverless? reaches a real system?
-
-## Big Picture
-
-![serverless 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/01/01-01-concept-at-a-glance.en.png)
-
-*serverless 101 chapter 1 flow overview*
-
-This picture places What is Serverless? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

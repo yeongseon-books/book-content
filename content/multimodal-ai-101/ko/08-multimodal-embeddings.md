@@ -35,21 +35,16 @@ seo_description: 5편에서 multimodal RAG의 큰 그림을 살펴봤다면, 이
 
 임베딩 공간을 잘 설계한 팀은 거대한 모델보다 먼저 검색 경험을 안정적으로 개선합니다.
 
+
+![Multimodal AI 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/08/08-01-big-picture.ko.png)
+*Multimodal AI 101 8장 흐름 개요*
+> Multimodal Embedding과 Cross-modal 검색의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - Multimodal embedding은 텍스트 임베딩과 무엇이 다르고, 왜 cross-modal search의 핵심일까요?
 - CLIP, SigLIP, ImageBind는 어떤 공통점과 차이를 가지며 무엇을 기준으로 선택해야 할까요?
 - OpenCLIP으로 벡터를 추출할 때 preprocessing과 normalization은 왜 계약 수준으로 중요할까요?
-
-## 큰 그림
-
-![Multimodal AI 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/08/08-01-big-picture.ko.png)
-
-*Multimodal AI 101 8장 흐름 개요*
-
-이 그림에서는 Multimodal Embedding과 Cross-modal 검색를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> Multimodal Embedding과 Cross-modal 검색의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

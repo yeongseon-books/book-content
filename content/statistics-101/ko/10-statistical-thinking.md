@@ -30,21 +30,16 @@ last_reviewed: '2026-05-12'
 
 이 글은 Statistics 101 시리즈의 마지막 글입니다. 여기서는 통계를 도구 상자가 아니라 사고방식으로 다시 정리하고, 질문에서 결정까지 이어지는 실전 흐름을 한 번에 묶어 보겠습니다.
 
+
+![Statistics 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/10/10-01-concept-at-a-glance.ko.png)
+*Statistics 101 10장 흐름 개요*
+> 통계적 사고의 궁극 목표는 아름다운 숫자가 아니라 좋은 결정입니다.
+
 ## 먼저 던지는 질문
 
 - 통계는 공식 모음일까요, 아니면 사고방식일까요?
 - 질문, 데이터, 분포, 추정, 검정은 어떤 순서로 이어질까요?
 - p-value와 효과 크기, 비용은 어떻게 함께 판단에 들어갈까요?
-
-## 큰 그림
-
-![Statistics 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/10/10-01-concept-at-a-glance.ko.png)
-
-*Statistics 101 10장 흐름 개요*
-
-통계적 사고는 불확실한 세상에서 데이터로 근거를 세우는 방식입니다. 이 시리즈를 통해 배운 여러 도구는 모두 '질문 → 데이터 → 판단' 흐름 안의 한 부분입니다.
-
-> 통계적 사고의 궁극 목표는 아름다운 숫자가 아니라 좋은 결정입니다.
 
 ## 왜 중요한가
 

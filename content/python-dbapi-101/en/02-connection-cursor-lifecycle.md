@@ -32,19 +32,14 @@ This is the 2nd article in the Python DB-API 101 series.
 
 *Connection and cursor lifecycle*
 
+![python db-api 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/02/02-02-1-what-a-connection-is.en.png)
+*python db-api 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - What are the distinct responsibilities of Connection vs Cursor?
 - How does the `with` context manager protect connection and cursor resources?
 - What is the trade-off between opening a new connection per call vs reusing one?
-
-## Big Picture
-
-![python db-api 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/02/02-02-1-what-a-connection-is.en.png)
-
-*python db-api 101 chapter 2 flow overview*
-
-This picture places Connection and Cursor Lifecycle inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## 1. What a Connection Is
 

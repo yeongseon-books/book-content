@@ -30,21 +30,16 @@ This is post 5 in the MLOps 101 series.
 
 Here, we will wrap a trained artifact in an API and a container, then connect that runtime to the rollout and rollback decisions needed in production.
 
+
+![mlops 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/05/05-01-see-the-flow-first.en.png)
+*mlops 101 chapter 5 flow overview*
+> Model deployment is not copying a model file to a server. It is wrapping the model, code, dependencies, and a rollback plan into one reproducible versioned unit.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Model Deployment?
 - Which signal should the example or diagram make visible for Model Deployment?
 - What failure should be prevented first when Model Deployment reaches a real system?
-
-## Big Picture
-
-![mlops 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/05/05-01-see-the-flow-first.en.png)
-
-*mlops 101 chapter 5 flow overview*
-
-This picture places Model Deployment inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Model deployment is not copying a model file to a server. It is wrapping the model, code, dependencies, and a rollback plan into one reproducible versioned unit.
 
 ## Questions this article answers
 

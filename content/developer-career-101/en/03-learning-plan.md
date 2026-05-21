@@ -27,21 +27,16 @@ Most developers do not struggle because learning resources are unavailable. They
 
 This is post 3 in the Developer Career 101 series.
 
+
+![developer career 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/03/03-01-concept-at-a-glance.en.png)
+*developer career 101 chapter 3 flow overview*
+> Learning plans matter most when paired with concrete projects that exercise the full cycle: requirements, design, implementation, test, and deployment feedback.
+
 ## Questions to Keep in Mind
 
 - What structure keeps learning sustainable during a busy quarter?
 - How should quarterly goals and weekly time blocks connect to each other?
 - How do you choose books, courses, and codebases without drowning in input?
-
-## Big Picture
-
-![developer career 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/03/03-01-concept-at-a-glance.en.png)
-
-*developer career 101 chapter 3 flow overview*
-
-This picture places Building a Learning Plan inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Learning plans matter most when paired with concrete projects that exercise the full cycle: requirements, design, implementation, test, and deployment feedback.
 
 ## What You Will Learn
 

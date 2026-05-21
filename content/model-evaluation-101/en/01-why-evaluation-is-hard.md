@@ -28,19 +28,15 @@ When evaluation gets shaky, model selection gets shaky with it. The real danger 
 
 This is the first post in the Model Evaluation 101 series. In this post, we build the mental model you need before train/validation/test splits, class-specific metrics, and reporting start to matter.
 
+
+![model evaluation 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/01/01-01-concept-at-a-glance.en.png)
+*model evaluation 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - Four reasons evaluation is hard?
 - Why metrics are not business value?
 - The threat of distribution drift?
-
-## Big Picture
-
-![model evaluation 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/01/01-01-concept-at-a-glance.en.png)
-
-*model evaluation 101 chapter 1 flow overview*
-
-This picture places Why Model Evaluation Is Hard inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

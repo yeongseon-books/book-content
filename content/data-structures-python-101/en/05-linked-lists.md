@@ -30,19 +30,15 @@ last_reviewed: '2026-05-15'
 
 This is post 5 in the Data Structures with Python 101 series.
 
+
+![Data Structures with Python 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/05/05-01-linked-structure-at-a-glance.en.png)
+*Data Structures with Python 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Linked Lists?
 - Which signal should the example or diagram make visible for Linked Lists?
 - What failure should be prevented first when Linked Lists reaches a real system?
-
-## Big Picture
-
-![Data Structures with Python 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/05/05-01-linked-structure-at-a-glance.en.png)
-
-*Data Structures with Python 101 chapter 5 flow overview*
-
-This picture places Linked Lists inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

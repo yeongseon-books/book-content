@@ -29,19 +29,15 @@ An algorithm is a finite sequence of clear, unambiguous steps that takes a well-
 
 This is the first post in the Algorithms 101 series. Here we define what an algorithm is, how it differs from a program, and which core terms the rest of the series will build on.
 
+
+![algorithms 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/01/01-01-big-picture.en.png)
+*algorithms 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What Is an Algorithm??
 - Which signal should the example or diagram make visible for What Is an Algorithm??
 - What failure should be prevented first when What Is an Algorithm? reaches a real system?
-
-## Big Picture
-
-![algorithms 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/01/01-01-big-picture.en.png)
-
-*algorithms 101 chapter 1 flow overview*
-
-This picture places What Is an Algorithm? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

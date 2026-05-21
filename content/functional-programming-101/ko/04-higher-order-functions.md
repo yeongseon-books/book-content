@@ -28,17 +28,15 @@ last_reviewed: '2026-05-12'
 
 중요한 이유는 단순합니다. 코드에서 반복되는 것은 종종 데이터가 아니라 "동작의 뼈대"이기 때문입니다. 변하는 부분을 함수로 분리해 인자로 넘기거나, 설정이 들어간 새 함수를 만들어 반환하면 중복을 줄이면서도 유연성을 확보할 수 있습니다.
 
+
+![Functional Programming 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/04/04-01-big-picture.ko.png)
+*Functional Programming 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 고차 함수는 어떤 두 형태로 나타날까요?
 - `sorted`, `map`, `filter`는 왜 고차 함수의 대표 예시일까요?
 - 함수를 반환하는 팩토리 패턴은 어떤 상황에서 유용할까요?
-
-## 큰 그림
-
-![Functional Programming 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/04/04-01-big-picture.ko.png)
-
-*Functional Programming 101 4장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -556,7 +554,6 @@ def test_sum_matches_builtin(xs: list[int]) -> None:
 이 원칙을 지키면 코드 리뷰에서 "무엇이 바뀌었는가"가 아니라 "어디에서 부수효과가 발생하는가"를 빠르게 확인할 수 있습니다.
 
 
-
 ## 검증 시나리오: 경계 조건을 먼저 잠그기
 
 실무에서 함수형 스타일이 유지되는 팀은 구현보다 먼저 검증 포인트를 고정합니다. 입력 경계, 빈 컬렉션, 정렬 안정성, 타입 변환 실패를 먼저 적어 두면 리팩터링 과정에서도 동작이 흔들리지 않습니다.
@@ -603,7 +600,6 @@ print("Pass")
 ```
 
 이런 검증 코드는 예제 코드가 아니라 운영 안전장치입니다. 새 규칙을 추가할 때도 기존 성질이 유지되는지 빠르게 확인할 수 있습니다.
-
 
 
 ## 리뷰 포인트: 코드 리뷰에서 바로 확인할 항목

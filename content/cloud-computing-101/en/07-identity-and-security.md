@@ -32,21 +32,16 @@ In this post, we'll break down users, groups, roles, policies, MFA, and KMS thro
 
 > Cloud security starts by shrinking blast radius: prefer temporary credentials, keep permissions narrow, and make encryption plus audit trails the default.
 
+
+![cloud computing 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/07/07-01-concept-at-a-glance.en.png)
+*cloud computing 101 chapter 7 flow overview*
+> Security is not a feature added at the end. It is a set of boundaries you decide to enforce from the start.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Identity and Security?
 - Which signal should the example or diagram make visible for Identity and Security?
 - What failure should be prevented first when Identity and Security reaches a real system?
-
-## Big Picture
-
-![cloud computing 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/07/07-01-concept-at-a-glance.en.png)
-
-*cloud computing 101 chapter 7 flow overview*
-
-This picture places Identity and Security inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Security is not a feature added at the end. It is a set of boundaries you decide to enforce from the start.
 
 ## Questions This Chapter Answers
 

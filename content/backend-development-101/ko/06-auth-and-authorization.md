@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 Backend Development 101 시리즈의 여섯 번째 글입니다. 여기서는 authentication과 authorization을 분리해서 이해하고, FastAPI에서 안전한 기본 흐름을 어떻게 잡는지 살펴보겠습니다.
 
+
+![Backend Development 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/06/06-01-concept-at-a-glance.ko.png)
+*Backend Development 101 6장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - authentication과 authorization은 무엇이 다를까요?
 - 비밀번호 저장에서 최소한으로 지켜야 할 안전 기준은 무엇일까요?
 - session과 JWT는 각각 언제 더 자연스러울까요?
-
-## 큰 그림
-
-![Backend Development 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/06/06-01-concept-at-a-glance.ko.png)
-
-*Backend Development 101 6장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -458,7 +456,6 @@ services:
 5. 장애 로그만으로 요청 식별자, 사용자 식별자, 실패 경로를 역추적할 수 있는지 확인합니다.
 
 이 기준선을 매 글의 주제에 연결해 두면 학습이 단발성 지식으로 끝나지 않습니다. 라우팅을 배울 때도, 테스트를 배울 때도, 배포를 배울 때도 같은 운영 질문으로 품질을 판별하게 됩니다.
-
 
 
 ### 장애 복구 훈련 시나리오

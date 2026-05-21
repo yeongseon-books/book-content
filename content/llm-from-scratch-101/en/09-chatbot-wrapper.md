@@ -33,19 +33,14 @@ This is the final article in the LLM from Scratch 101 series.
 
 ---
 
+![LLM from Scratch 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/09/09-01-chatbot-model-history-streaming-ui.en.png)
+*LLM from Scratch 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - What does a chatbot need beyond the model itself?
 - Why design the multi-turn prompt format yourself?
 - What do you gain by loading the model once via FastAPI lifespan?
-
-## Big Picture
-
-![LLM from Scratch 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/09/09-01-chatbot-model-history-streaming-ui.en.png)
-
-*LLM from Scratch 101 chapter 9 flow overview*
-
-This picture places Turning Your LLM into a Chatbot — FastAPI + Streaming inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Chatbot = Model + History + Streaming + UI
 

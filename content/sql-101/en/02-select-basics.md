@@ -28,21 +28,16 @@ Good SELECT habits pay off long after the query leaves your editor. The column l
 
 This is post 2 in the SQL 101 series. Here we treat SELECT as the tool that shapes the result set, not as a throwaway read statement.
 
+
+![sql 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/02/02-01-select-evaluation-flow.en.png)
+*sql 101 chapter 2 flow overview*
+> SELECT is your first tool for designing result sets. Explicit column lists, meaningful aliases, and clear sorting make the difference between a query that gets answered fast and one that creates confusion downstream.
+
 ## Questions to Keep in Mind
 
 - What is the safest way to read a SELECT statement?
 - Why is naming columns explicitly more than a style preference?
 - Where do aliases work, and where do they not?
-
-## Big Picture
-
-![sql 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/02/02-01-select-evaluation-flow.en.png)
-
-*sql 101 chapter 2 flow overview*
-
-SELECT shapes the result set by choosing which columns to pull, renaming them for clarity, and optionally sorting or limiting the output.
-
-> SELECT is your first tool for designing result sets. Explicit column lists, meaningful aliases, and clear sorting make the difference between a query that gets answered fast and one that creates confusion downstream.
 
 ## Why It Matters
 

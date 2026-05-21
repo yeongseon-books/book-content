@@ -29,21 +29,16 @@ This is post 9 in the Clean Code 101 series.
 
 Here we will use characterization tests, rename and extraction moves, and the “two hats” rule to turn legacy cleanup into a sequence of reviewable, reversible steps.
 
+
+![clean code 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/09/09-01-concept-at-a-glance.en.png)
+*clean code 101 chapter 9 flow overview*
+> Move from one green state to the next green state, one small step at a time.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Refactoring Basics?
 - Which signal should the example or diagram make visible for Refactoring Basics?
 - What failure should be prevented first when Refactoring Basics reaches a real system?
-
-## Big Picture
-
-![clean code 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/09/09-01-concept-at-a-glance.en.png)
-
-*clean code 101 chapter 9 flow overview*
-
-This picture places Refactoring Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Move from one green state to the next green state, one small step at a time.
 
 ## Questions this article answers
 

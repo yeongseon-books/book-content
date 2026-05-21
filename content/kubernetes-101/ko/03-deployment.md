@@ -28,17 +28,15 @@ Pod를 이해한 다음 바로 마주치는 질문은 이것입니다. 파드가
 
 여기서는 Deployment를 파드를 여러 개 띄우는 단순 설정이 아니라, 원하는 개수를 유지하고 버전 교체와 롤백까지 책임지는 기본 워크로드 컨트롤러라는 관점에서 정리하겠습니다.
 
+
+![Kubernetes 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/03/03-01-concept-at-a-glance.ko.png)
+*Kubernetes 101 3장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - Deployment와 ReplicaSet은 어떤 관계일까요?
 - `replicas`는 단순 숫자 이상의 어떤 의미를 가질까요?
 - 이미지 변경이 왜 무중단 배포 흐름으로 이어질까요?
-
-## 큰 그림
-
-![Kubernetes 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/03/03-01-concept-at-a-glance.ko.png)
-
-*Kubernetes 101 3장 흐름 개요*
 
 ## 왜 중요한가
 

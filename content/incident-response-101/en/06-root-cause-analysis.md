@@ -28,21 +28,16 @@ That reaction is understandable, but it is usually shallow. The trigger explains
 
 This is post 6 in the Incident Response 101 series. This post shows how to separate triggers from structural causes, collect contributing factors, and turn an RCA into follow-up work that can actually be verified.
 
+
+![incident response 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/06/06-01-diagram-at-a-glance.en.png)
+*incident response 101 chapter 6 flow overview*
+> RCA is not blame. It is a map of how multiple small gaps aligned to create impact.
+
 ## Questions to Keep in Mind
 
 - How do you distinguish a trigger from a root cause?
 - Why does the Five Whys method still help even in modern systems?
 - Which contributing-factor axes are worth tracking explicitly?
-
-## Big Picture
-
-![incident response 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/06/06-01-diagram-at-a-glance.en.png)
-
-*incident response 101 chapter 6 flow overview*
-
-This picture places Root Cause Analysis inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> RCA is not blame. It is a map of how multiple small gaps aligned to create impact.
 
 ## Why this topic matters
 

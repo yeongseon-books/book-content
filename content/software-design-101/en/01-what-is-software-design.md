@@ -31,19 +31,15 @@ In this post, we treat software design not as code prettiness but as a bundle of
 
 > Good code makes one line easier to read; good design makes the whole code base easier to change.
 
+
+![software design 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/01/01-01-concept-at-a-glance.en.png)
+*software design 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What Is Software Design??
 - Which signal should the example or diagram make visible for What Is Software Design??
 - What failure should be prevented first when What Is Software Design? reaches a real system?
-
-## Big Picture
-
-![software design 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/01/01-01-concept-at-a-glance.en.png)
-
-*software design 101 chapter 1 flow overview*
-
-This picture places What Is Software Design? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

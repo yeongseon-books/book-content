@@ -24,21 +24,16 @@ last_reviewed: '2026-05-12'
 
 이 글은 DevOps 101 시리즈의 여덟 번째 글입니다.
 
+
+![DevOps 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/08/08-01-diagram.ko.png)
+*DevOps 101 8장 흐름 개요*
+> 로그 수집과 분석의 핵심은 양이 아니라, 문제가 발생했을 때 빠르게 원인을 찾을 수 있도록 구조화하는 것입니다.
+
 ## 먼저 던지는 질문
 
 - 구조화 로그와 비구조화 로그는 실무에서 무엇이 다를까요?
 - 여러 서버의 로그를 한곳에 모아야 하는 이유는 무엇일까요?
 - Loki와 ELK는 어떤 관점에서 비교하면 좋을까요?
-
-## 큰 그림
-
-![DevOps 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/08/08-01-diagram.ko.png)
-
-*DevOps 101 8장 흐름 개요*
-
-이 그림은 애플리케이션 로그 수집, 중앙 집계, 검색 및 분석까지의 로그 파이프라인을 보여줍니다. 로그 없이는 장애 원인 파악이 추측에 가깝습니다.
-
-> 로그 수집과 분석의 핵심은 양이 아니라, 문제가 발생했을 때 빠르게 원인을 찾을 수 있도록 구조화하는 것입니다.
 
 ## 왜 중요한가
 
@@ -64,7 +59,7 @@ last_reviewed: '2026-05-12'
 
 ## 전환 전후
 
-**Before (print-style logs)**
+**Before (print 스타일 로그)**
 
 ```python
 print("user logged in", user_id)
@@ -73,7 +68,7 @@ print("user logged in", user_id)
 
 이 방식은 서버가 하나일 때만 겨우 버팁니다. 서비스가 분산되면 어떤 요청이 어느 서버를 지났는지 금방 놓치게 됩니다.
 
-**After (structured + central collection)**
+**After (구조화 + 중앙 수집)**
 
 ```python
 import structlog

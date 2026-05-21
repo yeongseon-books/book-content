@@ -25,21 +25,16 @@ How do you decide which of two prompts is better?
 
 This is post 9 in the AI Evaluation 101 series. Here we cover paired comparison, win rate, statistical significance, and sample size calculation — the practical side of LLM A/B testing.
 
+
+![A/B testing LLMs - which prompt is Better](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/09/09-01-a-b-testing-llms-which-prompt-is-better.en.png)
+*A/B testing LLMs - which prompt is Better*
+> The goal of LLM A/B testing is not to pick what looks better; it is to produce evidence that one option is better.
+
 ## Questions to Keep in Mind
 
 - Why must LLM A/B testing be a statistical decision instead of “it looks better”?
 - What decisions do win rate, sample size, and statistical significance each support?
 - What guardrail metrics reduce user risk in online A/B tests?
-
-## Big Picture
-
-![A/B testing LLMs - which prompt is Better](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/09/09-01-a-b-testing-llms-which-prompt-is-better.en.png)
-
-*A/B testing LLMs - which prompt is Better*
-
-This picture shows two prompt or model candidates compared pairwise, then judged with win rate and statistical significance for rollout decisions. A/B testing is not a taste contest; it is experiment design that reduces uncertainty.
-
-> The goal of LLM A/B testing is not to pick what looks better; it is to produce evidence that one option is better.
 
 ## "Looks Better" Is Not Evidence
 

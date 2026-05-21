@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 이 글은 Probability 101 시리즈의 3번째 글입니다. 여기서는 조건부확률의 정의, 곱셈정리, 독립과 종속의 차이, 그리고 기저율이 왜 해석을 바꾸는지 코드와 함께 정리하겠습니다.
 
+
+![Probability 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/03/03-01-diagram.ko.png)
+*Probability 101 3장 흐름 개요*
+> 조건부확률은 구체적인 가정과 한계를 함께 봐야 합니다.
+
 ## 먼저 던지는 질문
 
 - 조건부확률은 왜 분모가 바뀌는 문제일까요?
 - `P(A|B)`와 `P(B|A)`는 왜 전혀 다른 값일 수 있을까요?
 - 곱셈정리는 어떤 상황에서 자연스럽게 등장할까요?
-
-## 큰 그림
-
-![Probability 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/03/03-01-diagram.ko.png)
-
-*Probability 101 3장 흐름 개요*
-
-이 그림은 이 개념의 기본 구조를 보여줍니다.
-
-> 조건부확률은 구체적인 가정과 한계를 함께 봐야 합니다.
 
 ## 왜 중요한가
 

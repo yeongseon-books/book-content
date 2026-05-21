@@ -29,19 +29,15 @@ That is why memory management is really a conversation about ownership and relea
 
 This is post 6 in the Operating Systems 101 series. It connects process memory layout, leaks, fragmentation, and container memory limits into one practical model.
 
+
+![operating systems 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/06/06-01-the-four-major-regions-of-process-memory.en.png)
+*operating systems 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Memory Management?
 - Which signal should the example or diagram make visible for Memory Management?
 - What failure should be prevented first when Memory Management reaches a real system?
-
-## Big Picture
-
-![operating systems 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/06/06-01-the-four-major-regions-of-process-memory.en.png)
-
-*operating systems 101 chapter 6 flow overview*
-
-This picture places Memory Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions this article answers
 

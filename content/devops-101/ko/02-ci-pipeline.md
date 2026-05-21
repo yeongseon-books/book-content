@@ -24,21 +24,16 @@ last_reviewed: '2026-05-12'
 
 이 글은 DevOps 101 시리즈의 두 번째 글입니다.
 
+
+![DevOps 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/02/02-01-diagram.ko.png)
+*DevOps 101 2장 흐름 개요*
+> CI의 핵심은 무엇을 검증하고, 어떤 순서로, 언제까지 기다릴지를 결정하는 것입니다.
+
 ## 먼저 던지는 질문
 
 - CI 파이프라인은 단순한 테스트 자동화와 어떻게 다를까요?
 - build, test, lint, scan 단계를 왜 한 흐름으로 묶어야 할까요?
 - 빠른 피드백을 주는 파이프라인은 어떤 순서로 설계해야 할까요?
-
-## 큰 그림
-
-![DevOps 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/02/02-01-diagram.ko.png)
-
-*DevOps 101 2장 흐름 개요*
-
-이 그림은 PR이 제출되는 순간부터 통과 또는 거절될 때까지의 자동 검증 흐름을 보여줍니다. 좋은 CI는 코드 품질을 사람의 성실성이 아니라 시스템이 보장합니다.
-
-> CI의 핵심은 무엇을 검증하고, 어떤 순서로, 언제까지 기다릴지를 결정하는 것입니다.
 
 ## 왜 중요한가
 

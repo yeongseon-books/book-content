@@ -26,19 +26,15 @@ A single file feels fine when your API only has a few endpoints. Once features s
 
 This is post 3 in the Backend Development 101 series. Here, we split routers from controllers, separate path, query, and body parameters, and build the first structure that still reads cleanly after the endpoint count grows.
 
+
+![backend development 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/03/03-01-concept-at-a-glance.en.png)
+*backend development 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - The difference between routers and controllers?
 - The difference between path, query, and body parameters?
 - How to design REST-style endpoints?
-
-## Big Picture
-
-![backend development 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/03/03-01-concept-at-a-glance.en.png)
-
-*backend development 101 chapter 3 flow overview*
-
-This picture places Routing and Controllers inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

@@ -25,21 +25,16 @@ RAG requires evaluating both retrieval and generation stages.
 
 This is post 6 in the AI Evaluation 101 series. Here we cover RAG-specific metrics like retrieval recall, context precision, faithfulness, and answer relevance.
 
+
+![Evaluating RAG systems](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/06/06-01-evaluating-rag-systems.en.png)
+*Evaluating RAG systems*
+> RAG evaluation must separate whether the system found good evidence from whether it used that evidence faithfully.
+
 ## Questions to Keep in Mind
 
 - Why should RAG evaluation separate retrieval and generation instead of judging only the final answer?
 - What do context precision, context recall, faithfulness, and answer relevance each diagnose?
 - How do you narrow whether retrieval or generation is the broken part?
-
-## Big Picture
-
-![Evaluating RAG systems](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/06/06-01-evaluating-rag-systems.en.png)
-
-*Evaluating RAG systems*
-
-This picture splits a RAG system into retrieval, context construction, and answer generation, then attaches metrics to each stage. RAG evaluation must be pipeline diagnosis, not just an answer score, if you want to know what to fix.
-
-> RAG evaluation must separate whether the system found good evidence from whether it used that evidence faithfully.
 
 ## RAG Is a Pipeline, Not a Single Model
 

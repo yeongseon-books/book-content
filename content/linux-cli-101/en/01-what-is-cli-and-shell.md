@@ -28,19 +28,15 @@ Sooner or later every developer lands on a machine with nothing to click: a clou
 
 This is the first post in the Linux CLI 101 series.
 
+
+![Linux CLI 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/01/01-01-big-picture.en.png)
+*Linux CLI 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - The exact difference between CLI, Shell, and Terminal?
 - How to run your first commands in a Bash shell?
 - How to read command structure: command, option, argument?
-
-## Big Picture
-
-![Linux CLI 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/01/01-01-big-picture.en.png)
-
-*Linux CLI 101 chapter 1 flow overview*
-
-This picture places What Is the CLI and Shell? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

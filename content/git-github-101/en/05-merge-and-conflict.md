@@ -36,19 +36,15 @@ This is the fifth post in the Git & GitHub 101 series. Here, we look at fast-for
 - What `git status` tells you in the middle of a conflict
 - How `git merge --abort` rolls back safely
 
+
+![Git & GitHub 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/05/05-01-mental-model.en.png)
+*Git & GitHub 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - When does a fast-forward merge happen, and when does Git create a three-way merge instead?
 - Why does a merge commit have two parents?
 - Which side of a conflict marker (`<<<<<<<` / `=======` / `>>>>>>>`) belongs to which branch?
-
-## Big Picture
-
-![Git & GitHub 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/05/05-01-mental-model.en.png)
-
-*Git & GitHub 101 chapter 5 flow overview*
-
-This picture places Merge and Conflict Resolution - Bringing Two Lines Back Together inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

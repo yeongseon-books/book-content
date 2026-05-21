@@ -31,19 +31,15 @@ This is post 5 in the Type Hints in Python 101 series.
 
 > Dictionaries are everywhere in Python — API responses, config files, database rows. But `dict[str, Any]` tells the type checker nothing about which keys exist or what their values are. `TypedDict` solves this by defining expected keys and their types. For richer data models, `dataclass` generates boilerplate methods while keeping full type support. This article covers both tools and when to use each.
 
+
+![Type Hints in Python 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/05/05-01-big-picture.en.png)
+*Type Hints in Python 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying TypedDict and dataclass?
 - Which signal should the example or diagram make visible for TypedDict and dataclass?
 - What failure should be prevented first when TypedDict and dataclass reaches a real system?
-
-## Big Picture
-
-![Type Hints in Python 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/05/05-01-big-picture.en.png)
-
-*Type Hints in Python 101 chapter 5 flow overview*
-
-This picture places TypedDict and dataclass inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

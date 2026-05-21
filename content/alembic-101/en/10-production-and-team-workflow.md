@@ -28,19 +28,15 @@ In production, a migration is more irreversible than ordinary application code. 
 
 This is the final post in the Alembic 101 series. Here we will pull the series together into a practical operating model for PRs, CI, monitoring, and incident response.
 
+
+![alembic 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/10/10-01-diagram-the-team-level-alembic-operating.en.png)
+*alembic 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - The one-revision-per-PR rule and why it matters?
 - How to compose an Alembic-aware PR template and the matching CI checks?
 - How to manage multiple environments where dev=SQLite and staging+prod=PostgreSQL?
-
-## Big Picture
-
-![alembic 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/10/10-01-diagram-the-team-level-alembic-operating.en.png)
-
-*alembic 101 chapter 10 flow overview*
-
-This picture places Production and team workflow: PR, CI, monitoring, and incident response inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

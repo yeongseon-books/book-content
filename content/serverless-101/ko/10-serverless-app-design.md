@@ -27,17 +27,15 @@ last_reviewed: '2026-05-12'
 
 함수 하나만 보면 서버리스는 단순합니다. 이벤트를 받아 코드를 실행하고 끝내면 됩니다. 하지만 실제 제품은 함수 하나로 끝나지 않습니다. 업로드를 받고, 후속 처리를 큐에 넘기고, 변환 결과를 저장하고, 알림을 보내고, 실패를 격리해야 합니다. 이 순간부터 우리는 여전히 분산 시스템을 설계하는 중입니다.
 
+
+![Serverless 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/10/10-01-concept-at-a-glance.ko.png)
+*Serverless 101 10장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 여러 개의 작은 함수를 어떻게 하나의 애플리케이션으로 엮어야 할까요?
 - 업로드, 변환, 알림을 왜 한 함수에 몰아넣지 말아야 할까요?
 - 큐, 멱등 키, DLQ는 설계 원칙에서 어떤 역할을 맡을까요?
-
-## 큰 그림
-
-![Serverless 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/10/10-01-concept-at-a-glance.ko.png)
-
-*Serverless 101 10장 흐름 개요*
 
 ## 왜 이 주제가 중요한가
 

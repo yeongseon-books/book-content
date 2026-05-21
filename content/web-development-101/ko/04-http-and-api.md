@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 HTTP 요청과 응답이 어떤 형태를 가지는지, method와 status code와 header가 각각 어떤 의미를 가지는지, API 호출이 페이지 요청과 무엇이 다른지 정리하겠습니다.
 
+
+![Web Development 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/04/04-01-concept-at-a-glance.ko.png)
+*Web Development 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 클라이언트와 서버는 실제로 무엇을 주고받을까요?
 - HTTP 요청과 응답은 어떤 요소로 구성될까요?
 - GET, POST, PUT, DELETE는 각각 어떤 의미일까요?
-
-## 큰 그림
-
-![Web Development 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/04/04-01-concept-at-a-glance.ko.png)
-
-*Web Development 101 4장 흐름 개요*
 
 ## 왜 이 구조를 알아야 하는가
 

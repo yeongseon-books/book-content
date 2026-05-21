@@ -29,19 +29,15 @@ This is post 8 in the Design Patterns 101 series.
 
 In this post, we'll look at Factory and Dependency Injection as two parts of the same move. Assembly should happen at an outside entry point, while domain code should receive collaborators and focus on using them.
 
+
+![design patterns 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/08/08-01-concept-at-a-glance.en.png)
+*design patterns 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - The cost of scattered creation responsibility?
 - The role of the Factory?
 - The thinking behind Dependency Injection?
-
-## Big Picture
-
-![design patterns 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/08/08-01-concept-at-a-glance.en.png)
-
-*design patterns 101 chapter 8 flow overview*
-
-This picture places Factory and Dependency Injection inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

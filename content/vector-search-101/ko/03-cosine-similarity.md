@@ -26,21 +26,15 @@ seo_description: 코사인 유사도와 내적, L2 거리를 비교하며 벡터
 
 여기서는 세 가지 척도를 직접 구현하고, 정규화가 왜 중요한지 보여 주며, 외부 라이브러리 없이 브루트 포스 최근접 이웃 검색까지 만들어 봅니다.
 
+![Cosine dot and euclidean comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/03/03-01-cosine-similarity-and-vector-search-comp.ko.png)
+*코사인, 내적, 유클리드 비교 구조*
+> 벡터 검색에서 유사도 함수는 단순한 수학 공식이 아니라, 무엇을 비슷하다고 볼지 정하는 검색 정책입니다.
+
 ## 먼저 던지는 질문
 
 - 벡터가 있으면 왜 바로 검색이 끝나는 게 아니라 거리 척도를 골라야 할까요?
 - 코사인 유사도와 내적, L2 거리는 결과를 어떻게 다르게 만들까요?
 - 정규화 여부가 검색 순위와 FAISS 인덱스 선택에 왜 영향을 줄까요?
-
-## 큰 그림
-
-![Cosine dot and euclidean comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/03/03-01-cosine-similarity-and-vector-search-comp.ko.png)
-
-*코사인, 내적, 유클리드 비교 구조*
-
-이 그림에서는 같은 벡터라도 어떤 거리 척도로 비교하느냐에 따라 순위 판단이 달라지는 흐름을 봅니다. 검색 품질은 임베딩 모델뿐 아니라 유사도를 계산하는 규칙에도 의존합니다.
-
-> 벡터 검색에서 유사도 함수는 단순한 수학 공식이 아니라, 무엇을 비슷하다고 볼지 정하는 검색 정책입니다.
 
 ## 세 가지 거리 척도
 

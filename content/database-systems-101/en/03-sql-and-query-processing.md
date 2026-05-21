@@ -31,19 +31,15 @@ This is post 3 in the Database Systems 101 series.
 
 > SQL only states **what** you want. The DBMS turns it into rows in four stages — **parse → analyze → plan → execute** — and the optimizer is allowed to find a cheaper way to compute the same answer. This episode walks those stages and the user-facing window into them: `EXPLAIN`.
 
+
+![database systems 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/03/03-01-big-picture.en.png)
+*database systems 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying SQL and Query Processing?
 - Which signal should the example or diagram make visible for SQL and Query Processing?
 - What failure should be prevented first when SQL and Query Processing reaches a real system?
-
-## Big Picture
-
-![database systems 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/03/03-01-big-picture.en.png)
-
-*database systems 101 chapter 3 flow overview*
-
-This picture places SQL and Query Processing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

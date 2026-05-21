@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 Operating Systems 101 시리즈의 첫 번째 글입니다.
 
+
+![Operating Systems 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/01/01-01-diagram.ko.png)
+*Operating Systems 101 1장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 운영체제는 정확히 어떤 문제를 해결하려고 존재할까요?
 - 커널 모드와 사용자 모드는 왜 굳이 분리되어 있을까요?
 - 프로세스, 파일, 소켓 같은 추상화는 실제로 무엇을 감추고 있을까요?
-
-## 큰 그림
-
-![Operating Systems 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/01/01-01-diagram.ko.png)
-
-*Operating Systems 101 1장 흐름 개요*
 
 ## 기본 모델
 > 운영체제는 사용자 프로그램과 하드웨어 사이에 위치하는 소프트웨어 계층입니다. 위로는 응용 프로그램에게 시스템 콜을 통해 단순한 인터페이스를 제공하고, 아래로는 CPU 스케줄링, 메모리 할당, 디바이스 드라이버, 파일 시스템을 통해 하드웨어를 직접 다룹니다.

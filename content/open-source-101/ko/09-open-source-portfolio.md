@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 깃허브 활동을 단순한 이력 나열이 아니라, 문제 선택과 해결 방식과 지속성을 보여 주는 포트폴리오로 정리하는 기준을 살펴보겠습니다.
 
+
+![Open Source 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/09/09-01-the-smallest-portfolio-structure.ko.png)
+*Open Source 101 9장 흐름 개요*
+> 오픈소스 포트폴리오의 강점은 **코드 목록이 아니라 협업 과정이 공개되어 있다**는 점입니다. 채용담당자는 코드와 함께 당신의 의사소통을 읽을 수 있습니다.
+
 ## 먼저 던지는 질문
 
 - 오픈소스 기여가 어떻게 포트폴리오가 될 수 있을까요?
 - 프로필 소개 문서와 고정 저장소는 각각 무엇을 보여 줄까요?
 - 수많은 활동 중 어떤 풀 리퀘스트를 대표 사례로 골라야 할까요?
-
-## 큰 그림
-
-![Open Source 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/09/09-01-the-smallest-portfolio-structure.ko.png)
-
-*Open Source 101 9장 흐름 개요*
-
-이 그림은 오픈소스 포트폴리오가 어떻게 채용과 커리어로 이어지는지 보여줍니다. 코드 품질, 협업 능력, 문제 해결 과정이 모두 드러나는 공개 기록입니다.
-
-> 오픈소스 포트폴리오의 강점은 **코드 목록이 아니라 협업 과정이 공개되어 있다**는 점입니다. 채용담당자는 코드와 함께 당신의 의사소통을 읽을 수 있습니다.
 
 ## 왜 중요한가
 

@@ -30,17 +30,14 @@ last_reviewed: '2026-05-15'
 좋은 최적화는 한 가지 트릭으로 끝나지 않습니다. 베이스 이미지 선택, 멀티스테이지 빌드, 캐시 전략이 함께 맞물려야 효과가 큽니다. 이 글에서는 그 세 가지를 한 번에 묶어 보겠습니다.
 
 
+![Docker 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/09/09-01-concept-at-a-glance.ko.png)
+*Docker 101 9장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 멀티스테이지 빌드는 왜 build와 runtime을 분리할까요?
 - BuildKit cache mount는 어떤 식으로 재빌드를 빠르게 만들까요?
 - slim, alpine, distroless는 각각 어떤 trade-off가 있을까요?
-
-## 큰 그림
-
-![Docker 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/09/09-01-concept-at-a-glance.ko.png)
-
-*Docker 101 9장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 

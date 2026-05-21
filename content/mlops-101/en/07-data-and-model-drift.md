@@ -30,21 +30,16 @@ This is post 7 in the MLOps 101 series.
 
 Here, we will separate data drift from model drift and connect statistical signals such as PSI and KS to concrete operating thresholds.
 
+
+![mlops 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/07/07-01-see-the-flow-first.en.png)
+*mlops 101 chapter 7 flow overview*
+> Drift detection is not a single metric threshold. It is an early warning system that catches data and model changes before they cascade into visible business failure.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Data Drift and Model Drift?
 - Which signal should the example or diagram make visible for Data Drift and Model Drift?
 - What failure should be prevented first when Data Drift and Model Drift reaches a real system?
-
-## Big Picture
-
-![mlops 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/07/07-01-see-the-flow-first.en.png)
-
-*mlops 101 chapter 7 flow overview*
-
-This picture places Data Drift and Model Drift inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Drift detection is not a single metric threshold. It is an early warning system that catches data and model changes before they cascade into visible business failure.
 
 ## Questions this article answers
 

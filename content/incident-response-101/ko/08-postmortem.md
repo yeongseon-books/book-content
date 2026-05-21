@@ -30,21 +30,16 @@ incident가 끝나면 팀은 잠깐 안도합니다. 서비스가 복구됐고, 
 
 이 글은 Incident Response 101 시리즈의 8번째 글입니다. 여기서는 비난 없는 postmortem 구조, 영향과 원인을 수치와 사실로 남기는 법, owner와 due date가 있는 후속 조치 추적을 다룹니다.
 
+
+![Incident Response 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/08/08-01-diagram-at-a-glance.ko.png)
+*Incident Response 101 8장 흐름 개요*
+> Postmortem의 가치는 대응 중 배운 것을 팀이 함께 공유하고, 재발 방지 항목으로 구체화하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - postmortem은 왜 incident 종료 뒤에 꼭 필요할까요?
 - 비난 없는 원칙은 책임 없음과 어떻게 다를까요?
 - 매번 새 양식을 만드는 대신 템플릿을 고정해야 하는 이유는 무엇일까요?
-
-## 큰 그림
-
-![Incident Response 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/08/08-01-diagram-at-a-glance.ko.png)
-
-*Incident Response 101 8장 흐름 개요*
-
-Postmortem은 다음을 막기 위한 학습 기회입니다. 책임 추궁이 아니라 시스템 개선이 목표입니다.
-
-> Postmortem의 가치는 대응 중 배운 것을 팀이 함께 공유하고, 재발 방지 항목으로 구체화하는 데 있습니다.
 
 ## 왜 이 주제가 중요한가
 

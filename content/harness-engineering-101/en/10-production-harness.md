@@ -27,21 +27,15 @@ That is why the final step is not “add one more pattern.” It is defining how
 
 This is the final post in the Harness Engineering 101 series. It binds Task, Context, Constraint, Tool, Test, Feedback, Approval, and Observability into one deployable operating stack.
 
+![Production harness - building operational environments for agents](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/10/10-01-production-harness-building-operational.en.png)
+*Production harness - building operational environments for agents*
+> A Production Harness is not final decoration for an agent; it is the operating stack that lets changes be deployed, rolled back, and explained safely.
+
 ## Questions to Keep in Mind
 
 - How does a Production Harness tie the separate harnesses into one deployable operating stack?
 - Why must gradual rollout and rollback be part of agent-system design?
 - What execution information must a runbook contain for a 3 AM incident?
-
-## Big Picture
-
-![Production harness - building operational environments for agents](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/10/10-01-production-harness-building-operational.en.png)
-
-*Production harness - building operational environments for agents*
-
-This picture connects task, context, constraints, tools, tests, feedback, approval, and observability into a deployable Production Harness. An operable agent needs the individual harnesses plus rollout, rollback, and on-call procedures as one system.
-
-> A Production Harness is not final decoration for an agent; it is the operating stack that lets changes be deployed, rolled back, and explained safely.
 
 ## What Is the Production Harness?
 

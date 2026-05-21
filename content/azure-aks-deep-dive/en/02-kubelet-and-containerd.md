@@ -48,19 +48,14 @@ calls the CRI over a Unix socket,
 containerd creates the sandbox and containers,
 and `runc` finally spawns the real process.
 
+![azure kubernetes service deep dive chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/02/02-01-the-execution-path-in-one-picture.en.png)
+*azure kubernetes service deep dive chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - On exactly what interval does the kubelet poll what, and how do you tune that interval?
 - Once containerd replaced dockershim, why did docker commands vanish, and how did debugging shift?
 - Are image pulls cached per node, and who authenticates the pull?
-
-## Big Picture
-
-![azure kubernetes service deep dive chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-deep-dive/02/02-01-the-execution-path-in-one-picture.en.png)
-
-*azure kubernetes service deep dive chapter 2 flow overview*
-
-This picture places kubelet and containerd — how a container actually starts on a node inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## The execution path in one picture
 

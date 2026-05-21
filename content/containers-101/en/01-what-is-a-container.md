@@ -31,21 +31,16 @@ In this chapter, we define a container as an isolated process tree sharing the h
 
 > A container is not a tiny VM. It is an isolated process tree sharing the host kernel.
 
+
+![containers 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/01/01-01-concept-at-a-glance.en.png)
+*containers 101 chapter 1 flow overview*
+> The real question is: which parts are shared with the host kernel, which parts are isolated, and what happens when that isolation breaks.
+
 ## Questions to Keep in Mind
 
 - The definition of a container?
 - What gets shared with the host?
 - The decisive difference from a VM?
-
-## Big Picture
-
-![containers 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/01/01-01-concept-at-a-glance.en.png)
-
-*containers 101 chapter 1 flow overview*
-
-This picture places What is a Container? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> The real question is: which parts are shared with the host kernel, which parts are isolated, and what happens when that isolation breaks.
 
 ## Why It Matters
 

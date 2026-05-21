@@ -24,21 +24,16 @@ last_reviewed: '2026-05-12'
 
 이 글은 DevOps 101 시리즈의 세 번째 글입니다.
 
+
+![DevOps 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/03/03-01-diagram.ko.png)
+*DevOps 101 3장 흐름 개요*
+> CD의 핵심은 배포 가능성과 기능 활성화를 분리하여 더 자주, 더 안전하게 배포하는 것입니다.
+
 ## 먼저 던지는 질문
 
 - CD는 CI와 무엇이 같고 무엇이 다를까요?
 - Rolling, Blue-Green, Canary 전략은 각각 어떤 위험을 줄이기 위해 쓰일까요?
 - 코드 배포와 기능 활성화를 왜 분리해야 할까요?
-
-## 큰 그림
-
-![DevOps 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/03/03-01-diagram.ko.png)
-
-*DevOps 101 3장 흐름 개요*
-
-이 그림은 스테이징에서 프로덕션 배포까지의 배포 전략을 보여줍니다. 배포와 기능 공개는 분리되어야 하고, 실패했을 때 영향 범위를 얼마나 작게 제한할지가 중요합니다.
-
-> CD의 핵심은 배포 가능성과 기능 활성화를 분리하여 더 자주, 더 안전하게 배포하는 것입니다.
 
 ## 왜 중요한가
 
@@ -168,7 +163,7 @@ jobs:
 이 파이프라인은 스테이징 성공 후에만 프로덕션 배포를 진행합니다. Canary 지표가 임계값을 넘으면 자동으로 롤백합니다. 이것이 안전한 CD의 핵심입니다.
 ## 전환 전후
 
-**Before (big-bang deploy)**
+**Before (빅뱅 배포)**
 
 ```text
 - All servers move to the new version *at once*

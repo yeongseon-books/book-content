@@ -30,21 +30,16 @@ This is post 4 in the MLOps 101 series.
 
 Here, we will distinguish a training pipeline from simple script automation and show why stage boundaries and a DAG matter.
 
+
+![mlops 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/04/04-01-see-the-flow-first.en.png)
+*mlops 101 chapter 4 flow overview*
+> A training pipeline is not a large script with a scheduler attached. It is a DAG of small stages with clear inputs and outputs, designed so failed stages do not force the whole run to restart.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Model Training Pipeline?
 - Which signal should the example or diagram make visible for Model Training Pipeline?
 - What failure should be prevented first when Model Training Pipeline reaches a real system?
-
-## Big Picture
-
-![mlops 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/04/04-01-see-the-flow-first.en.png)
-
-*mlops 101 chapter 4 flow overview*
-
-This picture places Model Training Pipeline inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A training pipeline is not a large script with a scheduler attached. It is a DAG of small stages with clear inputs and outputs, designed so failed stages do not force the whole run to restart.
 
 ## Questions this article answers
 

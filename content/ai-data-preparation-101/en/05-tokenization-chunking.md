@@ -27,19 +27,15 @@ In LLM systems, the tokenizer is not a minor preprocessing detail. It defines th
 
 This is post 5 in the AI Data Preparation 101 series. Here we cover how tokenization affects quality and cost, and how to split long documents into usable chunks.
 
+
+![AI data preparation chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/05/05-01-big-picture.en.png)
+*AI data preparation chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why do Korean, English, and code consume the context window so differently?
 - When should you stay with a general-purpose tokenizer and when should you train your own?
 - What trade-offs separate fixed-size, sentence-aware, recursive, and semantic chunking?
-
-## Big Picture
-
-![AI data preparation chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/05/05-01-big-picture.en.png)
-
-*AI data preparation chapter 5 flow overview*
-
-This picture places Tokenization and Chunking Strategies inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## "The tokenizer decides model quality?"
 

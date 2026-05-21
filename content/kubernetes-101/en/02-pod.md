@@ -30,19 +30,15 @@ Here, we will define a Pod as the smallest deployable execution bundle in Kubern
 
 > A Pod is not a prettier name for one container. It is the boundary Kubernetes uses when scheduling, networking, and replacing a unit of work.
 
+
+![kubernetes 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/02/02-01-concept-at-a-glance.en.png)
+*kubernetes 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - The definition of a *Pod?
 - How it differs from a *container?
 - The *sidecar* pattern?
-
-## Big Picture
-
-![kubernetes 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/02/02-01-concept-at-a-glance.en.png)
-
-*kubernetes 101 chapter 2 flow overview*
-
-This picture places Pod inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

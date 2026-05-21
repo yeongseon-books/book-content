@@ -28,19 +28,15 @@ This is the final post in the Functional Programming 101 series.
 
 Python gives you a practical escape hatch because it does not force a single paradigm. You can model long-lived state with objects, keep business rules in pure functions, and leave persistence or messaging at the edge. The hard part is not choosing a side. It is deciding where each concern belongs.
 
+
+![Functional Programming 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/10/10-01-where-to-draw-the-oop-fp-boundary.en.png)
+*Functional Programming 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Balancing OOP and Functional Programming?
 - Which signal should the example or diagram make visible for Balancing OOP and Functional Programming?
 - What failure should be prevented first when Balancing OOP and Functional Programming reaches a real system?
-
-## Big Picture
-
-![Functional Programming 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/10/10-01-where-to-draw-the-oop-fp-boundary.en.png)
-
-*Functional Programming 101 chapter 10 flow overview*
-
-This picture places Balancing OOP and Functional Programming inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

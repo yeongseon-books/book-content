@@ -30,21 +30,16 @@ This is the first post in the Testing 101 series. Here we define what a test is,
 
 > A test is executable memory for a codebase. It keeps the team from re-learning the same failure by hand.
 
+
+![testing 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/01/01-01-concept-at-a-glance.en.png)
+*testing 101 chapter 1 flow overview*
+> Without tests, every change carries hidden risk — testing is how a team avoids repeating the same failure.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What Is Testing??
 - Which signal should the example or diagram make visible for What Is Testing??
 - What failure should be prevented first when What Is Testing? reaches a real system?
-
-## Big Picture
-
-![testing 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/01/01-01-concept-at-a-glance.en.png)
-
-*testing 101 chapter 1 flow overview*
-
-This picture places What Is Testing? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Without tests, every change carries hidden risk — testing is how a team avoids repeating the same failure.
 
 ## What You Will Learn
 

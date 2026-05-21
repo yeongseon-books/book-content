@@ -28,21 +28,16 @@ Good code walkthroughs are intentionally small. They isolate the interesting lin
 
 This is post 5 in the Technical Writing 101 series. It shows how to choose a minimal example, explain it, and prove that it works.
 
+
+![technical writing 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/05/05-01-concept-at-a-glance.en.png)
+*technical writing 101 chapter 5 flow overview*
+> A snippet only teaches when the reader can isolate the interesting lines, understand them, and verify the result with one command.
+
 ## Questions to Keep in Mind
 
 - A *minimal* example?
 - Where to place *comments?
 - Writing a *callout line?
-
-## Big Picture
-
-![technical writing 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/05/05-01-concept-at-a-glance.en.png)
-
-*technical writing 101 chapter 5 flow overview*
-
-This picture places Explaining Example Code inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A snippet only teaches when the reader can isolate the interesting lines, understand them, and verify the result with one command.
 
 ## Why It Matters
 

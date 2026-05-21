@@ -24,23 +24,16 @@ RetrievalQA는 편하지만 많은 단계를 감춥니다. 여기서는 LCEL 파
 
 이 글은 RAG Deep Dive 시리즈의 다섯 번째 글입니다.
 
+![RetrievalQA가 chain_type별 조립 경로를 고르는 분기](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-01-retrieval-qa-chain-type-dispatch.ko.png)
+*RetrievalQA가 chain_type별 조립 경로를 고르는 분기*
+> RAG 체인은 질문에서 근거, 프롬프트, 답변으로 이어지는 실행 그래프이며, LCEL은 그 경계를 더 명시적으로 드러냅니다.
+
 ## 먼저 던지는 질문
 
 - `RetrievalQA` 같은 고전 API와 LCEL 조립은 각각 어떤 경계를 숨기고 드러낼까요?
 - retriever, prompt, llm, parser를 직접 이으면 디버깅에서 무엇이 쉬워질까요?
 - 체인 조립 후 source document를 잃지 않으려면 어디서 결과 형태를 고정해야 할까요?
 
-## 큰 그림
-
-![RetrievalQA가 chain_type별 조립 경로를 고르는 분기](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-01-retrieval-qa-chain-type-dispatch.ko.png)
-
-*RetrievalQA가 chain_type별 조립 경로를 고르는 분기*
-
-이 그림에서는 `RetrievalQA`가 내부에서 조립 경로를 고르는 방식과 LCEL이 runnable 순서를 명시적으로 드러내는 방식을 비교합니다. RAG 체인 조립에서는 편의성보다 경계 관찰성이 더 중요해지는 순간이 있습니다.
-
-> RAG 체인은 질문에서 근거, 프롬프트, 답변으로 이어지는 실행 그래프이며, LCEL은 그 경계를 더 명시적으로 드러냅니다.
-
-<!-- a-grade-example:begin -->
 ## 최소 실행 예제
 
 예제 파일: `en/05-rag-chain-assembly/main.py`

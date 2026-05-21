@@ -28,21 +28,16 @@ Mitigation and resolution have different goals, different owners, and sometimes 
 
 This is post 7 in the Incident Response 101 series. This post explains how to choose between rollback, scale-out, throttling, and kill switches, and how to prove that the service is truly healthy before you close the incident.
 
+
+![incident response 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/07/07-01-diagram-at-a-glance.en.png)
+*incident response 101 chapter 7 flow overview*
+> Mitigation stops the bleeding now. Resolution fixes the cause later. Separate them and you double your speed.
+
 ## Questions to Keep in Mind
 
 - What makes rollback such a powerful mitigation tool?
 - When should you scale out, throttle, or use a kill switch instead?
 - Why is “impact reduced” not enough to declare resolution?
-
-## Big Picture
-
-![incident response 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/07/07-01-diagram-at-a-glance.en.png)
-
-*incident response 101 chapter 7 flow overview*
-
-This picture places Mitigation and Resolution inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Mitigation stops the bleeding now. Resolution fixes the cause later. Separate them and you double your speed.
 
 ## Why this topic matters
 

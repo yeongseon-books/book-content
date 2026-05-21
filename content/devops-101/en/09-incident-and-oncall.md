@@ -28,21 +28,16 @@ A good incident process reduces cognitive load before the alert even fires. Seve
 
 This is post 9 in the DevOps 101 series. In this chapter, we turn incident response into an operational system with severity definitions, runbooks, escalation rules, and blameless follow-up.
 
+
+![devops 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/09/09-01-concept-at-a-glance.en.png)
+*devops 101 chapter 9 flow overview*
+> On-call teaches a team to *trust each other* and *learn together*—when both happen, incidents become *feedback*, not *blame*.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Incident Response and On-Call?
 - Which signal should the example or diagram make visible for Incident Response and On-Call?
 - What failure should be prevented first when Incident Response and On-Call reaches a real system?
-
-## Big Picture
-
-![devops 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/09/09-01-concept-at-a-glance.en.png)
-
-*devops 101 chapter 9 flow overview*
-
-This picture places Incident Response and On-Call inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> On-call teaches a team to *trust each other* and *learn together*—when both happen, incidents become *feedback*, not *blame*.
 
 ## Questions this article answers
 

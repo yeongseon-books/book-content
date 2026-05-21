@@ -29,19 +29,15 @@ Search algorithms locate a value inside a collection. With unsorted data, linear
 
 This is post 3 in the Algorithms 101 series. Here we cover linear search, binary search, Python's `bisect`, and the broader idea of parametric search.
 
+
+![algorithms 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/03/03-01-big-picture.en.png)
+*algorithms 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Search Algorithms?
 - Which signal should the example or diagram make visible for Search Algorithms?
 - What failure should be prevented first when Search Algorithms reaches a real system?
-
-## Big Picture
-
-![algorithms 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/03/03-01-big-picture.en.png)
-
-*algorithms 101 chapter 3 flow overview*
-
-This picture places Search Algorithms inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

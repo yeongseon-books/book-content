@@ -28,21 +28,16 @@ That choice becomes especially important when the data has outliers or a long ta
 
 This is post 2 in the Statistics 101 series. Here we will compare mean, median, and variance, and clarify why the right summary statistic depends on the shape of the data.
 
+
+![statistics 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/02/02-01-concept-at-a-glance.en.png)
+*statistics 101 chapter 2 flow overview*
+> The *right* summary statistic depends on the *shape* of your data — not just the *math*, but the *meaning*.
+
 ## Questions to Keep in Mind
 
 - When should we use the mean, and when should we use the median?
 - What do variance and standard deviation tell us that the mean cannot?
 - What happens to summary statistics when one extreme outlier appears?
-
-## Big Picture
-
-![statistics 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/02/02-01-concept-at-a-glance.en.png)
-
-*statistics 101 chapter 2 flow overview*
-
-This picture places Mean, Median, and Variance inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> The *right* summary statistic depends on the *shape* of your data — not just the *math*, but the *meaning*.
 
 ## Why It Matters
 

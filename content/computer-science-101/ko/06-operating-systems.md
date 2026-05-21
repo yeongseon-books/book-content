@@ -29,17 +29,15 @@ last_reviewed: '2026-05-12'
 
 여기서는 프로세스와 스레드, 가상 메모리, 시스템 콜, 동시성과 병렬성의 차이를 실전 감각으로 정리하겠습니다.
 
+
+![Computer Science 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/06/06-01-concept-at-a-glance.ko.png)
+*Computer Science 101 6장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 하나의 머신에서 많은 프로그램이 동시에 실행되는 것처럼 보이는 이유는 무엇일까요?
 - 프로세스와 스레드는 메모리와 격리 측면에서 어떻게 다를까요?
 - 가상 메모리는 왜 필요한 추상화일까요?
-
-## 큰 그림
-
-![Computer Science 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/06/06-01-concept-at-a-glance.ko.png)
-
-*Computer Science 101 6장 흐름 개요*
 
 ## 이 글에서 배울 것
 

@@ -30,21 +30,16 @@ last_reviewed: '2026-05-12'
 
 이 글은 Statistics 101 시리즈의 5번째 글입니다. 여기서는 점 추정과 구간 추정의 차이, 표준오차의 의미, 표본 수가 추정 안정성에 주는 영향을 차례대로 살펴보겠습니다.
 
+
+![Statistics 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/05/05-01-concept-at-a-glance.ko.png)
+*Statistics 101 5장 흐름 개요*
+> 좋은 추정값은 큰 숫자 하나가 아니라 범위와 함께 말해집니다.
+
 ## 먼저 던지는 질문
 
 - 표본평균은 모집단 평균을 얼마나 잘 대신할 수 있을까요?
 - 점 추정과 구간 추정은 어떤 차이가 있을까요?
 - 표준오차는 표준편차와 어떻게 다를까요?
-
-## 큰 그림
-
-![Statistics 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/05/05-01-concept-at-a-glance.ko.png)
-
-*Statistics 101 5장 흐름 개요*
-
-추정은 표본으로부터 모집단의 참값에 최대한 가까운 숫자를 찾아가는 과정입니다. 하지만 우리가 구한 추정값은 항상 참값 근처 어딘가이지, 정확한 참값 그 자체가 아닙니다.
-
-> 좋은 추정값은 큰 숫자 하나가 아니라 범위와 함께 말해집니다.
 
 ## 왜 중요한가
 

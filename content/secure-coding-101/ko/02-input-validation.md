@@ -28,17 +28,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 입력값 검증을 단순한 if 문 모음이 아니라, 신뢰 경계에서 시스템을 예측 가능하게 만드는 계약으로 보겠습니다. 이 관점을 잡으면 검증 로직을 여기저기 흩뿌리지 않고, 스키마와 경계 설계로 정리하는 이유도 자연스럽게 이해할 수 있습니다.
 
+
+![Secure Coding 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/02/02-01-concept-at-a-glance.ko.png)
+*Secure Coding 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - allowlist와 denylist는 무엇이 다를까요?
 - 입력 스키마를 쓰면 ad-hoc 검증보다 무엇이 좋아질까요?
 - 입력 경계는 정확히 어디라고 봐야 할까요?
-
-## 큰 그림
-
-![Secure Coding 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/02/02-01-concept-at-a-glance.ko.png)
-
-*Secure Coding 101 2장 흐름 개요*
 
 ## 왜 중요한가
 

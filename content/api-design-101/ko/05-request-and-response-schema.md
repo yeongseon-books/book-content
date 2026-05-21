@@ -29,19 +29,15 @@ seo_description: 요청과 응답 schema를 흔들림 없이 설계하는 기준
 
 여기서는 schema를 단순 문서 항목이 아니라 경계에서 강제해야 할 계약으로 다룹니다. 입력 검증, 응답 직렬화, 시간과 금액 표현을 함께 정리해야 나중에 버전 관리 비용도 줄어듭니다.
 
+
+![API Design 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/05/05-01-concept-at-a-glance.ko.png)
+*API Design 101 5장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - JSON과 content type은 어떤 식으로 계약에 들어갈까요?
 - 필드 이름 규칙은 어떻게 정해야 할까요?
 - validation은 어디에서, 어떤 방식으로 해야 할까요?
-
-## 큰 그림
-
-![API Design 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/05/05-01-concept-at-a-glance.ko.png)
-
-*API Design 101 5장 흐름 개요*
-
-요청이 들어오면 Content-Type을 확인하고, schema로 검증한 뒤, 처리 결과를 응답 schema로 직렬화하는 흐름을 보여줍니다. 입력 schema와 출력 schema를 분리하면 handler는 비즈니스 로직에 집중하고, 경계에서 모든 검증이 끝납니다.
 
 ## 왜 중요한가
 

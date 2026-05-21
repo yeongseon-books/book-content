@@ -27,17 +27,15 @@ last_reviewed: '2026-05-12'
 
 문자열 안에서 패턴 하나 찾는 일이 단순해 보이는데, 왜 알고리즘이 그렇게 많을까요? 여기서는 단순 매칭, KMP, 트라이, 그리고 실무 정규식의 비용 감각을 정리합니다.
 
+
+![Algorithms 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/09/09-01-big-picture.ko.png)
+*Algorithms 101 9장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 단순 매칭은 왜 최악에 O(nm)까지 갈까요?
 - KMP의 실패 함수는 어떤 직관으로 이해해야 할까요?
 - 트라이는 어떤 문제에서 특히 강할까요?
-
-## 큰 그림
-
-![Algorithms 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/09/09-01-big-picture.ko.png)
-
-*Algorithms 101 9장 흐름 개요*
 
 ## 왜 중요한가
 

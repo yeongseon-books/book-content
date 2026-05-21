@@ -29,19 +29,15 @@ This is post 7 in the Distributed Systems 101 series.
 
 Here we treat leader election as an operational safety problem: leases decide who is allowed to lead, and fencing tokens decide whose writes are still valid.
 
+
+![distributed systems 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/07/07-01-concept-at-a-glance.en.png)
+*distributed systems 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why leader election is needed and what its safety conditions are?
 - The roles of lease and heartbeat?
 - How to use a fencing token to block an old leader?
-
-## Big Picture
-
-![distributed systems 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/07/07-01-concept-at-a-glance.en.png)
-
-*distributed systems 101 chapter 7 flow overview*
-
-This picture places Leader Election inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

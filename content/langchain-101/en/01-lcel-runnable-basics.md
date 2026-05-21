@@ -25,21 +25,15 @@ LangChain gets easier once you stop treating it as a pile of abstractions and st
 
 This is the first post in the LangChain 101 series. It explains LCEL and the Runnable interface as the execution model behind a basic LangChain pipeline.
 
+![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/01/01-02-the-flow-at-a-glance.en.png)
+*The flow at a glance*
+> In LangChain, most components become interchangeable once their input and output shapes line up.
+
 ## Questions to Keep in Mind
 
 - What common contract lets LCEL connect prompts, models, and parsers?
 - What data shape moves through each step of `prompt | llm | parser`?
 - When should the same chain use `invoke()`, `batch()`, or `stream()`?
-
-## Big Picture
-
-![The flow at a glance](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/01/01-02-the-flow-at-a-glance.en.png)
-
-*The flow at a glance*
-
-This picture follows an input dictionary through a prompt, model, and parser until the application receives a plain string. The key is that each step shares the Runnable contract, so the same execution methods work across the chain.
-
-> In LangChain, most components become interchangeable once their input and output shapes line up.
 
 ## Minimal runnable example
 

@@ -26,21 +26,16 @@ last_reviewed: '2026-05-15'
 
 `GROUP BY`를 배우고 나면 자연스럽게 다음 질문이 나옵니다. 그룹별 합계나 평균은 구할 수 있는데, 원본 행은 그대로 두면서 그 합계나 순위를 옆에 붙일 수는 없을까 하는 질문입니다. 이 지점에서 윈도 함수가 등장합니다.
 
+
+![SQL 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/07/07-01-window-calculation-flow.ko.png)
+*SQL 101 7장 흐름 개요*
+> 윈도 함수의 핵심은 행 개수를 줄이지 않으면서 전체 데이터의 맥락 속에서 각 행의 위치나 값을 계산한다는 점입니다.
+
 ## 먼저 던지는 질문
 
 - `OVER (PARTITION BY ...)`는 무엇을 뜻할까요?
 - `ROW_NUMBER`, `RANK`, `DENSE_RANK`는 어떻게 다를까요?
 - `LAG`, `LEAD`는 왜 시계열 분석에서 자주 쓰일까요?
-
-## 큰 그림
-
-![SQL 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/07/07-01-window-calculation-flow.ko.png)
-
-*SQL 101 7장 흐름 개요*
-
-이 그림에서는 윈도 함수가 행을 집계하지 않으면서도 행별로 전체 데이터에 대한 계산 값을 어떻게 붙이는지 봅니다. 윈도 함수는 GROUP BY와 다르게 원본 행의 개수를 유지하면서 분석 열을 추가합니다.
-
-> 윈도 함수의 핵심은 행 개수를 줄이지 않으면서 전체 데이터의 맥락 속에서 각 행의 위치나 값을 계산한다는 점입니다.
 
 ## 왜 중요한가
 

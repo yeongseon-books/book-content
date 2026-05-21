@@ -26,21 +26,15 @@ ACA의 스케일링은 단순히 replica 수를 늘리는 기능이 아닙니다
 
 이 글은 Azure Container Apps 101 시리즈의 5번째 글입니다. 여기서는 KEDA scaler와 zero-to-N 모델을 운영 관점에서 풀어 보겠습니다.
 
+![Azure Container Apps 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/05/05-01-the-scaling-path.ko.png)
+*Azure Container Apps 101 5장 흐름 개요*
+> 스케일링 — KEDA scaler와 zero-to-N의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - Azure Container Apps는 선언형 스케일링 신호를 바탕으로 replica 수를 어떻게 결정할까요?
 - 내장 HTTP/TCP 규칙과 사용자 정의 KEDA scaler의 차이는 무엇일까요?
 - `min-replicas 0`(scale-to-zero)는 언제 안전하고, 언제 위험할까요?
-
-## 큰 그림
-
-![Azure Container Apps 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/05/05-01-the-scaling-path.ko.png)
-
-*Azure Container Apps 101 5장 흐름 개요*
-
-이 그림에서는 스케일링 — KEDA scaler와 zero-to-N를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 스케일링 — KEDA scaler와 zero-to-N의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 이 글이 답할 질문
 

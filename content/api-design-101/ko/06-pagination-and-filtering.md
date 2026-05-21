@@ -29,19 +29,15 @@ seo_description: 목록 API의 pagination, sorting, filtering 설계 원칙과 t
 
 여기서는 pagination, sorting, filtering을 단순 옵션 모음이 아니라 성능과 정확성을 함께 지키는 계약으로 정리합니다. 특히 offset과 cursor의 선택이 어떤 운영 비용을 만드는지까지 같이 봅니다.
 
+
+![API Design 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/06/06-01-concept-at-a-glance.ko.png)
+*클라이언트 요청이 filter → sort → paginate 순서로 처리되는 흐름*
+
 ## 먼저 던지는 질문
 
 - offset / limit 방식은 어디까지 단순하고 어디서부터 한계가 드러날까요?
 - cursor 기반 pagination은 어떤 문제를 해결하며 어떤 것을 포기할까요?
 - sorting, filtering, searching은 어떤 규칙으로 분리해야 할까요?
-
-## 큰 그림
-
-![API Design 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/06/06-01-concept-at-a-glance.ko.png)
-
-*클라이언트 요청이 filter → sort → paginate 순서로 처리되는 흐름*
-
-클라이언트가 `GET /orders?status=paid&sort=created_at:desc&limit=20&cursor=abc` 같은 요청을 보내면 서버 내부에서는 세 단계가 순서대로 진행됩니다. 먼저 WHERE 절이 rows를 걸러내고(filter), ORDER BY가 정렬하고(sort), 마지막에 cursor 조건과 LIMIT가 한 페이지 분량을 잘라냅니다(paginate). 이 순서를 뒤집으면 결과가 달라질 수 있으므로, API 파라미터 설계도 이 실행 순서를 반영해야 합니다.
 
 ## 왜 pagination이 API에서 가장 먼저 흔들리는가
 

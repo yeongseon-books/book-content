@@ -29,21 +29,16 @@ This is post 7 in the API Design 101 series.
 
 Here, we treat errors as first-class contract design. Status codes, machine-readable codes, validation details, and trace IDs have to work together if you want debugging speed without leaking the wrong information.
 
+
+![api design 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/07/07-01-concept-at-a-glance.en.png)
+*api design 101 chapter 7 flow overview*
+> A good error response tells the client not just that something failed, but why, and what it can do about it.
+
 ## Questions to Keep in Mind
 
 - The four parts of an error response?
 - RFC 7807 `application/problem+json`?
 - How to express validation errors?
-
-## Big Picture
-
-![api design 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/07/07-01-concept-at-a-glance.en.png)
-
-*api design 101 chapter 7 flow overview*
-
-The diagram shows error responses as structured data: a status code signals the category (4xx for client error, 5xx for server error), and the body explains the specific reason in a consistent format that clients can parse and handle.
-
-> A good error response tells the client not just that something failed, but why, and what it can do about it.
 
 ## Why It Matters
 

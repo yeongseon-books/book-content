@@ -28,21 +28,16 @@ Technical writing matters because it keeps working after the meeting ends. A REA
 
 This is the first post in the Technical Writing 101 series. It establishes the reader-task-output-boundary frame that the rest of the series builds on.
 
+
+![technical writing 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/01/01-01-concept-at-a-glance.en.png)
+*technical writing 101 chapter 1 flow overview*
+> Technical writing succeeds when it changes what readers can do, not just what they know.
+
 ## Questions to Keep in Mind
 
 - A definition of *technical writing?
 - The difference from *everyday* prose?
 - The *three purposes?
-
-## Big Picture
-
-![technical writing 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/01/01-01-concept-at-a-glance.en.png)
-
-*technical writing 101 chapter 1 flow overview*
-
-This picture places What Is Technical Writing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Technical writing succeeds when it changes what readers can do, not just what they know.
 
 ## Why It Matters
 

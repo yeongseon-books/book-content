@@ -25,21 +25,16 @@ LLMs return different answers for the same input. Without evaluation, you cannot
 
 This is the first post in the AI Evaluation 101 series. Here we cover why LLM evaluation differs from regular software testing and what to measure.
 
+
+![Why evaluate LLM applications](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/01/01-01-why-evaluate-llm-applications.en.png)
+*Why evaluate LLM applications*
+> LLM evaluation is not decorative testing; it is the dashboard that lets you keep reading quality changes.
+
 ## Questions to Keep in Mind
 
 - Why is regular feature testing not enough to judge the quality of an LLM app?
 - What problems show up too late when an LLM app runs without evaluation?
 - What small unit should a first evaluation pipeline start with?
-
-## Big Picture
-
-![Why evaluate LLM applications](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/01/01-01-why-evaluate-llm-applications.en.png)
-
-*Why evaluate LLM applications*
-
-This picture shows LLM app quality managed through an evaluation loop that considers inputs, outputs, expected criteria, and production signals rather than a simple pass/fail test. Once evaluation is attached, an LLM feature becomes a traceable system instead of a demo.
-
-> LLM evaluation is not decorative testing; it is the dashboard that lets you keep reading quality changes.
 
 ## Why Is LLM Evaluation Different from Regular Testing?
 

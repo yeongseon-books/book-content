@@ -34,19 +34,15 @@ An image is a single frame; a video is a frame sequence with a time axis. A one-
 
 This episode covers frame sampling strategies, the core temporal models (VideoMAE, TimeSformer, Video-LLaVA), an action recognition pipeline, and production pitfalls.
 
+
+![Multimodal AI 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/09/09-01-big-picture.en.png)
+*Multimodal AI 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Video Understanding - From Frame Sampling to Video-LLaVA?
 - Which signal should the example or diagram make visible for Video Understanding - From Frame Sampling to Video-LLaVA?
 - What failure should be prevented first when Video Understanding - From Frame Sampling to Video-LLaVA reaches a real system?
-
-## Big Picture
-
-![Multimodal AI 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/09/09-01-big-picture.en.png)
-
-*Multimodal AI 101 chapter 9 flow overview*
-
-This picture places Video Understanding - From Frame Sampling to Video-LLaVA inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions this article answers
 

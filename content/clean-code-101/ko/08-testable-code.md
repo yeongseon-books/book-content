@@ -29,21 +29,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 그 차이가 어디서 오는지, 그리고 설계를 바꾸면 왜 테스트가 자연스럽게 따라오는지 설명하겠습니다.
 
+
+![Clean Code 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/08/08-01-concept-at-a-glance.ko.png)
+*Clean Code 101 8장 흐름 개요*
+> 숐주되고 멍멠른 먼진이 명넌 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른.
+
 ## 먼저 던지는 질문
 
 - 순수 로직과 부수 효과는 어떻게 분리해야 할까요?
 - 의존성 주입은 어떻게 테스트용 이음새를 만들까요?
 - Fake와 Spy는 각각 언제 쓰는 편이 좋을까요?
-
-## 큰 그림
-
-![Clean Code 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/08/08-01-concept-at-a-glance.ko.png)
-
-*Clean Code 101 8장 흐름 개요*
-
-이 그림은 테스트 가능성을 질갠릌 단순명—단순 동스턴, 재사용 공곋, 비대추—차 단늵 반복 동스른—과 구리된 동스른 동스른 동스른 동스른 동스른—를 보여 줍니다.
-
-> 숐주되고 멍멠른 먼진이 명넌 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른.
 
 ## 왜 중요한가
 

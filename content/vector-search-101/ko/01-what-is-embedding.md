@@ -28,21 +28,15 @@ seo_description: 임베딩이 의미 기반 검색을 가능하게 하는 원리
 
 여기서는 임베딩의 개념과 직관을 잡는 데 집중합니다. 코드는 최소한만 사용하되, 실제로 벡터를 만들고 점수를 읽는 첫 실습까지 연결합니다.
 
+![Keyword search and embedding search contrast](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/01/01-01-what-is-an-embedding-converting-text-int.ko.png)
+*키워드 검색과 임베딩 검색의 대비*
+> 임베딩은 텍스트를 저장하는 형식이 아니라, 의미를 거리로 비교할 수 있게 만드는 표현 방식입니다.
+
 ## 먼저 던지는 질문
 
 - 키워드가 같은데도 검색 결과가 빗나가거나, 표현만 달라서 결과를 놓칠 때 무엇이 부족한 걸까요?
 - 임베딩 벡터의 “가깝다”는 말은 실제로 무엇을 비교한다는 뜻일까요?
 - 첫 모델을 고를 때 차원 수, 언어, 토큰 한도 중 무엇을 먼저 확인해야 할까요?
-
-## 큰 그림
-
-![Keyword search and embedding search contrast](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/01/01-01-what-is-an-embedding-converting-text-int.ko.png)
-
-*키워드 검색과 임베딩 검색의 대비*
-
-이 그림에서는 키워드 매칭에서 의미 공간 비교로 검색 질문이 바뀌는 흐름을 봅니다. 임베딩은 텍스트를 벡터로 바꿔 같은 단어가 없어도 가까운 의미를 찾게 해 줍니다.
-
-> 임베딩은 텍스트를 저장하는 형식이 아니라, 의미를 거리로 비교할 수 있게 만드는 표현 방식입니다.
 
 ## 키워드 검색의 한계
 

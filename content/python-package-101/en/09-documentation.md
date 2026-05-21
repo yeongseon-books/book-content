@@ -28,19 +28,14 @@ Even a solid package gets ignored if a reader cannot figure out installation and
 
 This is post 9 in the Python Package 101 series. Here we connect README, guides, and API reference into a documentation stack that helps users decide, start, and verify.
 
+![Python Package 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/09/09-01-mental-model.en.png)
+*Python Package 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - What should a good README include?
 - What is the difference between MkDocs and Sphinx?
 - How do you auto-generate an API Reference from docstrings?
-
-## Big Picture
-
-![Python Package 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/09/09-01-mental-model.en.png)
-
-*Python Package 101 chapter 9 flow overview*
-
-This picture places Documentation — README, MkDocs, API Reference inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What you will learn
 

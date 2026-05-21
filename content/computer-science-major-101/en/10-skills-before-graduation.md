@@ -27,21 +27,16 @@ As graduation gets closer, many students feel the same anxiety. They have almost
 
 This is the final post in the Computer Science Major 101 series.
 
+
+![computer science major 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/10/10-01-graduation-skill-map.en.png)
+*computer science major 101 chapter 10 flow overview*
+> Before graduation, you need more than code—you need *judgment*. When to use what technology, and why.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Skills to Have Before Graduation?
 - Which signal should the example or diagram make visible for Skills to Have Before Graduation?
 - What failure should be prevented first when Skills to Have Before Graduation reaches a real system?
-
-## Big Picture
-
-![computer science major 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/10/10-01-graduation-skill-map.en.png)
-
-*computer science major 101 chapter 10 flow overview*
-
-This picture places Skills to Have Before Graduation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Before graduation, you need more than code—you need *judgment*. When to use what technology, and why.
 
 ## Questions This Post Answers
 

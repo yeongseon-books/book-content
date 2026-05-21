@@ -28,19 +28,14 @@ Once your package structure is stable, the next question is whether you can prod
 
 This is post 4 in the Python Package 101 series. Here we compare wheel and sdist, inspect what `python -m build` actually produces, and validate the output in a fresh environment before publishing anything.
 
+![Python Package 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/04/04-01-mental-model.en.png)
+*Python Package 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - What is the difference between wheel and sdist?
 - What files does `python -m build` generate?
 - What is inside a `.whl` file?
-
-## Big Picture
-
-![Python Package 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/04/04-01-mental-model.en.png)
-
-*Python Package 101 chapter 4 flow overview*
-
-This picture places Building Packages — wheel and sdist inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What you will learn
 

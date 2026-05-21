@@ -26,21 +26,16 @@ When data lives in many dimensions, not every axis matters equally. Some directi
 
 This is post 9 in the Linear Algebra 101 series. Here we will treat PCA as the process of finding the directions with the largest variance and expressing the data in that new coordinate system.
 
+
+![linear algebra 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/09/09-01-concept-at-a-glance.en.png)
+*linear algebra 101 chapter 9 flow overview*
+> PCA is the most intuitive place where you see eigenvalues and eigenvectors in action. Principal components are the axes along which data varies the most, and a few components often preserve most information while cutting dimensionality.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying PCA?
 - Which signal should the example or diagram make visible for PCA?
 - What failure should be prevented first when PCA reaches a real system?
-
-## Big Picture
-
-![linear algebra 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/09/09-01-concept-at-a-glance.en.png)
-
-*linear algebra 101 chapter 9 flow overview*
-
-This picture places PCA inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> PCA is the most intuitive place where you see eigenvalues and eigenvectors in action. Principal components are the axes along which data varies the most, and a few components often preserve most information while cutting dimensionality.
 
 ## Questions This Post Answers
 

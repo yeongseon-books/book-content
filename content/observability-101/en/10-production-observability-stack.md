@@ -28,21 +28,16 @@ A good first stack is less about completeness and more about operability. Collec
 
 This is the final post in the Observability 101 series.
 
+
+![observability 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/10/10-01-concept-at-a-glance.en.png)
+*observability 101 chapter 10 flow overview*
+> A Production-Ready Observability Stack is about the boundary decision, not the tool choice.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying A Production-Ready Observability Stack?
 - Which signal should the example or diagram make visible for A Production-Ready Observability Stack?
 - What failure should be prevented first when A Production-Ready Observability Stack reaches a real system?
-
-## Big Picture
-
-![observability 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/10/10-01-concept-at-a-glance.en.png)
-
-*observability 101 chapter 10 flow overview*
-
-This picture places A Production-Ready Observability Stack inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A Production-Ready Observability Stack is about the boundary decision, not the tool choice.
 
 ## Questions this article answers
 

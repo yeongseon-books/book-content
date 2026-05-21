@@ -30,17 +30,14 @@ last_reviewed: '2026-05-15'
 회의를 많이 한다고 협업이 좋아지는 것도 아닙니다. 오히려 기록이 없는 긴 회의는 같은 논쟁을 반복하게 만들고, 팀의 시간을 가장 비싼 방식으로 사용하게 만듭니다. 좋은 프로세스는 사람의 시간을 보호하고, 결정의 흔적을 남기고, 동기식 대화를 정말 필요한 순간에만 쓰게 만듭니다.
 
 
+![Software Engineering 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/08/08-01-concept-at-a-glance.ko.png)
+*Software Engineering 101 8장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - RFC는 어떤 구조로 쓰면 충분할까요?
 - 언제 비동기로 논의하고, 언제 짧은 동기 회의를 해야 할까요?
 - 회의 시간을 줄이면서도 명확성을 잃지 않으려면 어떤 패턴이 필요할까요?
-
-## 큰 그림
-
-![Software Engineering 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/08/08-01-concept-at-a-glance.ko.png)
-
-*Software Engineering 101 8장 흐름 개요*
 
 ## 왜 중요한가
 

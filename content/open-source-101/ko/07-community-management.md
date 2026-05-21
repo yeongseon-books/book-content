@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 행동 강령, 기여 안내, 토론 공간, 응답 속도, 환영 메시지를 중심으로 건강한 오픈소스 커뮤니티를 유지하는 기본기를 정리하겠습니다.
 
+
+![Open Source 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/07/07-01-the-smallest-structure-that-still-works.ko.png)
+*Open Source 101 7장 흐름 개요*
+> 커뮤니티 운영은 "좋은 사람만 모이면 자동으로 잘 된다"는 식이 아닙니다. **명확한 기준, 일관된 응답, 보이는 규칙**이 있어야 신뢰가 쌓입니다.
+
 ## 먼저 던지는 질문
 
 - 프로젝트에 행동 강령이 왜 필요할까요?
 - 기여 안내 문서는 단순 절차 문서가 아니라 어떤 역할을 할까요?
 - 이슈와 토론 공간을 분리하면 무엇이 좋아질까요?
-
-## 큰 그림
-
-![Open Source 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/07/07-01-the-smallest-structure-that-still-works.ko.png)
-
-*Open Source 101 7장 흐름 개요*
-
-이 그림은 커뮤니티 운영이 어떤 역할을 하는지 보여줍니다. 이슈 트리아지, 응답 시간, 톤(tone)의 일관성, 기여 문화가 모두 프로젝트의 건강도를 결정합니다.
-
-> 커뮤니티 운영은 "좋은 사람만 모이면 자동으로 잘 된다"는 식이 아닙니다. **명확한 기준, 일관된 응답, 보이는 규칙**이 있어야 신뢰가 쌓입니다.
 
 ## 왜 중요한가
 

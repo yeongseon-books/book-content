@@ -28,19 +28,15 @@ Teams that decide those things during the outage usually lose time in confusion.
 
 This is post 6 in the SRE 101 series. Here we treat incident response as a team system with roles, severity levels, communication rules, and explicit closure criteria.
 
+
+![sre 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/06/06-01-concept-at-a-glance.en.png)
+*sre 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why does incident response depend so heavily on team structure instead of only on technical skill?
 - Why should severity be defined by impact rather than intuition?
 - What should an Incident Commander do directly, and what should they deliberately avoid doing?
-
-## Big Picture
-
-![sre 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/06/06-01-concept-at-a-glance.en.png)
-
-*sre 101 chapter 6 flow overview*
-
-This picture places Incident Response inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this topic matters
 

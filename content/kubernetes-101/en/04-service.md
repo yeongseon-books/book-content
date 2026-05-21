@@ -30,19 +30,15 @@ Here, we will look at Service as the networking contract that hides changing Pod
 
 > A Service is the answer to “how do I keep calling this workload after the Pods behind it change?”
 
+
+![kubernetes 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/04/04-01-concept-at-a-glance.en.png)
+*kubernetes 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - The problem a *Service* solves?
 - ClusterIP / NodePort / LoadBalancer?
 - How *selectors* match?
-
-## Big Picture
-
-![kubernetes 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/04/04-01-concept-at-a-glance.en.png)
-
-*kubernetes 101 chapter 4 flow overview*
-
-This picture places Service inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

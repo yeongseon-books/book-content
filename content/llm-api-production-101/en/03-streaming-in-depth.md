@@ -30,21 +30,15 @@ This is the third post in the LLM API Production 101 series. Here we focus on ch
 
 The goal is not a clever UI effect. The goal is a streaming consumer that can explain what happened when the stream is incomplete.
 
+![Streaming in depth: chunk handling and error recovery](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/03/03-01-streaming-in-depth-chunk-handling-and-er.en.png)
+*Streaming in depth: chunk handling and error recovery*
+> A stream is not one late string; it is partial state that can succeed, fail, or remain incomplete.
+
 ## Questions to Keep in Mind
 
 - Why should streaming be treated as a session with partial state instead of one final string?
 - How should empty chunks and mid-stream failures be represented?
 - After a streaming failure, what should be preserved and what should be rebuilt?
-
-## Big Picture
-
-![Streaming in depth: chunk handling and error recovery](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/03/03-01-streaming-in-depth-chunk-handling-and-er.en.png)
-
-*Streaming in depth: chunk handling and error recovery*
-
-This picture treats a stream as accumulated session state. When a failure happens mid-response, the application needs to know what arrived, what ended cleanly, and what still needs recovery.
-
-> A stream is not one late string; it is partial state that can succeed, fail, or remain incomplete.
 
 ## Runtime setup
 

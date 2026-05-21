@@ -28,21 +28,16 @@ DevOps is the attempt to remove that handoff cost. It gives one team a shared fe
 
 This is the first post in the DevOps 101 series. In this chapter, we set the mental model for the rest of the series: DevOps is not a tool purchase but a way to shorten the path from change to feedback.
 
+
+![devops 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/01/01-01-concept-at-a-glance.en.png)
+*devops 101 chapter 1 flow overview*
+> DevOps succeeds when you treat *deployment speed* and *operational stability* as *one goal*, not opposing forces.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What Is DevOps??
 - Which signal should the example or diagram make visible for What Is DevOps??
 - What failure should be prevented first when What Is DevOps? reaches a real system?
-
-## Big Picture
-
-![devops 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/01/01-01-concept-at-a-glance.en.png)
-
-*devops 101 chapter 1 flow overview*
-
-This picture places What Is DevOps? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> DevOps succeeds when you treat *deployment speed* and *operational stability* as *one goal*, not opposing forces.
 
 ## Questions this article answers
 

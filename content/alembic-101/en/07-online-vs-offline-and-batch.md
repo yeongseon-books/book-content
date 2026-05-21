@@ -28,19 +28,15 @@ Before a production deploy, there are times when you need to see the exact SQL a
 
 This is post 7 in the Alembic 101 series. Here we will connect online execution, offline SQL preview, and SQLite batch handling into one workflow.
 
+
+![alembic 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/07/07-01-diagram-how-online-offline-and-batch-mod.en.png)
+*alembic 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - The two execution modes alembic offers — online and offline?
 - How to preview the actual SQL with `--sql`?
 - A workflow for producing SQL scripts that a DBA can review?
-
-## Big Picture
-
-![alembic 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/07/07-01-diagram-how-online-offline-and-batch-mod.en.png)
-
-*alembic 101 chapter 7 flow overview*
-
-This picture places Online and offline modes: previewing DDL with --sql and handling SQLite batch inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

@@ -32,21 +32,16 @@ In this post, we'll compare service models through control, speed, lock-in, and 
 
 > Cloud service models are easiest to understand as operating boundaries: the more the provider runs for you, the less control you keep and the faster you usually move.
 
+
+![cloud computing 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/02/02-01-concept-at-a-glance.en.png)
+*cloud computing 101 chapter 2 flow overview*
+> The choice between IaaS, PaaS, and SaaS is a statement about who runs what, not about which is objectively better.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying IaaS, PaaS, SaaS?
 - Which signal should the example or diagram make visible for IaaS, PaaS, SaaS?
 - What failure should be prevented first when IaaS, PaaS, SaaS reaches a real system?
-
-## Big Picture
-
-![cloud computing 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/02/02-01-concept-at-a-glance.en.png)
-
-*cloud computing 101 chapter 2 flow overview*
-
-This picture places IaaS, PaaS, SaaS inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> The choice between IaaS, PaaS, and SaaS is a statement about who runs what, not about which is objectively better.
 
 ## Questions This Chapter Answers
 

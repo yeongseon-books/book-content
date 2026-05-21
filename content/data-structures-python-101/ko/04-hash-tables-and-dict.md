@@ -24,17 +24,15 @@ last_reviewed: '2026-05-17'
 
 이 글은 Data Structures with Python 101 시리즈의 네 번째 글입니다.
 
+
+![Data Structures with Python 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/04/04-01-dict-probe-resize.ko.png)
+*Data Structures with Python 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - `dict`는 수많은 키 중에서 값을 어떻게 그렇게 빨리 찾을까요?
 - 해시, 충돌, probe, resize는 각각 어떤 역할을 할까요?
 - 어떤 객체는 dict 키가 될 수 있고, 어떤 객체는 왜 안 될까요?
-
-## 큰 그림
-
-![Data Structures with Python 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/04/04-01-dict-probe-resize.ko.png)
-
-*Data Structures with Python 101 4장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 
@@ -255,7 +253,6 @@ print(counter.most_common(2))
 ## 정리 및 다음 글 안내
 
 Python dict는 안정적인 해시, 짧은 probe path, 주기적인 resize가 함께 작동할 때 빠른 성능을 내는 해시 테이블 기반 매핑입니다. 이 모델이 잡히면 충돌과 삽입 순서 유지가 더 이상 모순처럼 보이지 않습니다. 다음 글에서는 배열·해시 테이블과는 전혀 다른 방식으로 데이터를 잇는 연결 리스트를 살펴보겠습니다.
-
 
 
 ## 타입 힌트 기반 해시 테이블 구현

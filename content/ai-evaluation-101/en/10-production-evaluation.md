@@ -25,21 +25,16 @@ Evaluation is not a one-shot pre-deploy check; it must run continuously in produ
 
 This is the final post in the AI Evaluation 101 series. Here we cover sampling evaluation cases from production traces, monitoring online metrics, and detecting drift.
 
+
+![Continuous evaluation in production](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/10/10-01-continuous-evaluation-in-production.en.png)
+*Continuous evaluation in production*
+> Production evaluation is not a new activity after deployment; it is where pre-release evaluation meets real user signals.
+
 ## Questions to Keep in Mind
 
 - What continuous loop should production evaluation close after pre-release evaluation?
 - What signals do production trace sampling, drift detection, and shadow mode each catch?
 - How do you control evaluation cost while recycling failures into the regression set?
-
-## Big Picture
-
-![Continuous evaluation in production](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/10/10-01-continuous-evaluation-in-production.en.png)
-
-*Continuous evaluation in production*
-
-This picture shows a continuous evaluation loop that samples production traces, watches online metrics and drift, and sends failures back into the regression set. Production evaluation closes pre-release checks with real service signals.
-
-> Production evaluation is not a new activity after deployment; it is where pre-release evaluation meets real user signals.
 
 ## Deployment Is Where It Starts
 

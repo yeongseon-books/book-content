@@ -29,19 +29,15 @@ That is why storage bugs are rarely about syntax. They are about knowing exactly
 
 This is post 8 in the Operating Systems 101 series. It explains inode lookup, page cache behavior, fsync, journaling, and the atomic rename pattern used in real systems.
 
+
+![operating systems 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/08/08-01-the-path-from-write-to-durable-storage.en.png)
+*operating systems 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying File Systems?
 - Which signal should the example or diagram make visible for File Systems?
 - What failure should be prevented first when File Systems reaches a real system?
-
-## Big Picture
-
-![operating systems 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/08/08-01-the-path-from-write-to-durable-storage.en.png)
-
-*operating systems 101 chapter 8 flow overview*
-
-This picture places File Systems inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions this article answers
 

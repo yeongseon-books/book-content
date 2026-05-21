@@ -26,21 +26,16 @@ GitHub 저장소는 결과물을 보여 주는 장소이지만, 검색으로 사
 
 이 글은 Portfolio Project 101 시리즈의 8번째 글입니다. 여기서는 프로젝트를 코드 나열이 아니라 문제, 접근, 결과, 학습이 있는 블로그 글로 바꾸는 방법을 살펴보겠습니다. 목표는 프로젝트를 더 많이 포장하는 것이 아니라, 더 많은 사람이 제대로 이해할 수 있게 만드는 데 있습니다.
 
+
+![Portfolio Project 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/08/08-01-diagram.ko.png)
+*Portfolio Project 101 8장 흐름 개요*
+> 프로젝트를 만든 경험은 개인의 자산입니다. 그 경험을 글로 쓸 때, 비로소 다른 개발자에게 공유 가능한 자산이 됩니다.
+
 ## 먼저 던지는 질문
 
 - 프로젝트를 블로그 글로 바꿀 때 왜 문제 중심 구조가 필요할까요?
 - 코드 발췌와 저장소 링크는 어떻게 역할을 나누면 좋을까요?
 - 결과를 숫자로 남기는 일이 왜 글의 설득력을 키울까요?
-
-## 큰 그림
-
-![Portfolio Project 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/08/08-01-diagram.ko.png)
-
-*Portfolio Project 101 8장 흐름 개요*
-
-이 그림에서는 포트폴리오 프로젝트의 경험을 블로그 글로 재정의하는 과정을 봅니다. 블로그 글은 프로젝트의 배경이 된 학습을 다른 개발자와 나누는 채널입니다.
-
-> 프로젝트를 만든 경험은 개인의 자산입니다. 그 경험을 글로 쓸 때, 비로소 다른 개발자에게 공유 가능한 자산이 됩니다.
 
 ## 왜 중요한가
 

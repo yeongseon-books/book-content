@@ -26,19 +26,15 @@ Abstraction matters the moment one workflow has multiple implementations and the
 
 In Python, abstraction is not mainly about sounding theoretical. It is about deciding which methods are mandatory, which steps should stay shared, and when a team should require explicit inheritance instead of relying on "it probably has the right shape."
 
+
+![Object-Oriented Programming 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/06/06-01-concept-overview.en.png)
+*Object-Oriented Programming 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Abstraction?
 - Which signal should the example or diagram make visible for Abstraction?
 - What failure should be prevented first when Abstraction reaches a real system?
-
-## Big Picture
-
-![Object-Oriented Programming 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/06/06-01-concept-overview.en.png)
-
-*Object-Oriented Programming 101 chapter 6 flow overview*
-
-This picture places Abstraction inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What This Article Tries to Solve
 

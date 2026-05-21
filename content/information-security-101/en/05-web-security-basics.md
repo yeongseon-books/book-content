@@ -31,21 +31,16 @@ last_reviewed: '2026-05-04'
 
 This is post 5 in the Information Security 101 series.
 
+
+![information security 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/05/05-01-big-picture.en.png)
+*information security 101 chapter 5 flow overview*
+> Web security is not about HTTPS alone. It is about ensuring that at every layer—HTTP headers, authentication checks, SQL composition, browser rendering—untrusted input cannot become a command.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Web Security Basics?
 - Which signal should the example or diagram make visible for Web Security Basics?
 - What failure should be prevented first when Web Security Basics reaches a real system?
-
-## Big Picture
-
-![information security 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/05/05-01-big-picture.en.png)
-
-*information security 101 chapter 5 flow overview*
-
-This picture places Web Security Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Web security is not about HTTPS alone. It is about ensuring that at every layer—HTTP headers, authentication checks, SQL composition, browser rendering—untrusted input cannot become a command.
 
 ## What You Will Learn
 

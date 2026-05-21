@@ -35,19 +35,14 @@ This is the first article in the LLM from Scratch 101 series.
 
 ---
 
+![LLM from Scratch 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/01/01-01-word-level-vs-subword-the-trade-off.en.png)
+*LLM from Scratch 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why do models take integers instead of raw text?
 - What are the trade-offs between character, word, and subword tokenization?
 - How does BPE actually build a vocabulary step by step?
-
-## Big Picture
-
-![LLM from Scratch 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/01/01-01-word-level-vs-subword-the-trade-off.en.png)
-
-*LLM from Scratch 101 chapter 1 flow overview*
-
-This picture places Turning Text into Numbers inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why Can't We Just Input Text?
 

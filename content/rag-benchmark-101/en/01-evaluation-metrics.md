@@ -26,21 +26,15 @@ Retrieval metrics compare a gold document set with a ranked result list. Once yo
 
 This is the first post in the RAG Evaluation and Benchmarking 101 series.
 
+![Top-k overlap and metric calculation flow](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/01/01-02-top-k-overlap-and-metric-calculation-flo.en.png)
+*Top-k overlap and metric calculation flow*
+> The core mental model for retrieval metrics is to separate the gold set from the ranked result list. Even on the same data, Precision@k, Recall@k, and MRR expose different kinds of failure.
+
 ## Questions to Keep in Mind
 
 - When a RAG answer is wrong, how can retrieval failure be separated from generation failure?
 - What different failures do Precision@k, Recall@k, and MRR reveal from the same ranked list?
 - Why can average scores hide per-query failure patterns?
-
-## Big Picture
-
-![Top-k overlap and metric calculation flow](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/01/01-02-top-k-overlap-and-metric-calculation-flo.en.png)
-
-*Top-k overlap and metric calculation flow*
-
-This picture shows retrieval quality being computed from the overlap between a gold document set and a ranked result list. RAG evaluation needs this retrieval layer isolated before generation quality can be interpreted.
-
-> The core mental model for retrieval metrics is to separate the gold set from the ranked result list. Even on the same data, Precision@k, Recall@k, and MRR expose different kinds of failure.
 
 ## Why this matters
 

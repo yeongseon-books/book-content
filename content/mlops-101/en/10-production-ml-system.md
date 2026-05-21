@@ -30,21 +30,16 @@ This is the final post in the MLOps 101 series.
 
 Here, we will connect the previous nine pieces into one closed operational loop and end with a practical maturity checklist.
 
+
+![mlops 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/10/10-01-see-the-loop-first.en.png)
+*mlops 101 chapter 10 flow overview*
+> Production ML is not one tool or one team. It is a system where data integrity, model quality, deployment safety, and operational alertness all work together so a model can stay alive and useful in production.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Building a Production ML System?
 - Which signal should the example or diagram make visible for Building a Production ML System?
 - What failure should be prevented first when Building a Production ML System reaches a real system?
-
-## Big Picture
-
-![mlops 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/10/10-01-see-the-loop-first.en.png)
-
-*mlops 101 chapter 10 flow overview*
-
-This picture places Building a Production ML System inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Production ML is not one tool or one team. It is a system where data integrity, model quality, deployment safety, and operational alertness all work together so a model can stay alive and useful in production.
 
 ## Questions this article answers
 

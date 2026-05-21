@@ -26,21 +26,15 @@ VectorDB comparison is really a comparison of index behavior under the same vect
 
 This is the 4th article in the RAG Evaluation and Benchmarking 101 series.
 
+![same vectors compared across flat and IVF indexes](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/04/04-01-same-vector-flat-and-ivf-comparison-stru.en.png)
+*same vectors compared across flat and IVF indexes*
+> Choosing a vector database is **not a brand comparison**. It is an experiment that measures how the same embedding vectors behave when placed inside different index structures.
+
 ## Questions to Keep in Mind
 
 - Which operating conditions should compare VectorDBs beyond feature lists?
 - What must stay fixed when changing only the VectorDB over the same embeddings and corpus?
 - How should you decide when accuracy, latency, filtering, and operational complexity conflict?
-
-## Big Picture
-
-![same vectors compared across flat and IVF indexes](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/04/04-01-same-vector-flat-and-ivf-comparison-stru.en.png)
-
-*same vectors compared across flat and IVF indexes*
-
-This picture runs the same vectors and queries through multiple VectorDB candidates, then compares quality, latency, and filtering behavior. VectorDB selection should follow measured operating conditions, not tool preference.
-
-> Choosing a vector database is **not a brand comparison**. It is an experiment that measures how the same embedding vectors behave when placed inside different index structures.
 
 ## Why this matters
 

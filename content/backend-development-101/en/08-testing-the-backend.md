@@ -26,19 +26,15 @@ Changing backend code without tests is a bet every single time. As a system grow
 
 This is post 8 in the Backend Development 101 series. Here, we split tests into unit, integration, and end-to-end layers and use pytest plus FastAPI TestClient to build a backend that stays safe to modify.
 
+
+![backend development 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/08/08-01-concept-at-a-glance.en.png)
+*backend development 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - The difference between unit, integration, and E2E tests?
 - How to test a service with pytest?
 - How to call endpoints with FastAPI's `TestClient`?
-
-## Big Picture
-
-![backend development 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/08/08-01-concept-at-a-glance.en.png)
-
-*backend development 101 chapter 8 flow overview*
-
-This picture places Testing the Backend inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

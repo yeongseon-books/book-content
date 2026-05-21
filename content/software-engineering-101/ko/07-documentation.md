@@ -30,17 +30,14 @@ last_reviewed: '2026-05-15'
 문서가 없을 때 생기는 가장 큰 문제는 정보가 특정 사람을 거쳐서만 이동한다는 점입니다. 그러면 질문은 늘 특정 사람에게 몰리고, 그 사람이 바쁜 시간대에는 팀 전체가 느려집니다. 문서화는 친절의 문제가 아니라 비동기 협업의 기반입니다.
 
 
+![Software Engineering 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/07/07-01-concept-at-a-glance.ko.png)
+*Software Engineering 101 7장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 좋은 README는 최소한 어떤 블록을 가져야 할까요?
 - ADR은 무엇을 남기고, 코드 주석과 어떻게 다를까요?
 - docstring과 타입 힌트는 문서화에서 어떤 역할을 할까요?
-
-## 큰 그림
-
-![Software Engineering 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/07/07-01-concept-at-a-glance.ko.png)
-
-*Software Engineering 101 7장 흐름 개요*
 
 ## 왜 중요한가
 

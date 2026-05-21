@@ -29,19 +29,15 @@ The real problem is not test quantity. It is test placement. A healthy test syst
 
 This is post 5 in the Software Engineering 101 series. In this chapter, we use the test pyramid as a decision tool, then connect it to verification speed, expected output, and the failure modes that make CI untrustworthy.
 
+
+![software engineering 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/05/05-01-concept-at-a-glance.en.png)
+*software engineering 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Testing Strategy?
 - Which signal should the example or diagram make visible for Testing Strategy?
 - What failure should be prevented first when Testing Strategy reaches a real system?
-
-## Big Picture
-
-![software engineering 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/05/05-01-concept-at-a-glance.en.png)
-
-*software engineering 101 chapter 5 flow overview*
-
-This picture places Testing Strategy inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

@@ -30,19 +30,15 @@ This is post 9 in the Object-Oriented Programming 101 series.
 
 > Theory alone does not produce good design. This article incrementally designs an online bookstore order system, applying encapsulation, inheritance, polymorphism, composition, and SOLID principles in practice.
 
+
+![Object-Oriented Programming 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/09/09-01-concept-overview.en.png)
+*Object-Oriented Programming 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying OOP Design Example?
 - Which signal should the example or diagram make visible for OOP Design Example?
 - What failure should be prevented first when OOP Design Example reaches a real system?
-
-## Big Picture
-
-![Object-Oriented Programming 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/09/09-01-concept-overview.en.png)
-
-*Object-Oriented Programming 101 chapter 9 flow overview*
-
-This picture places OOP Design Example inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

@@ -30,21 +30,16 @@ last_reviewed: '2026-05-14'
 
 여기서는 클라우드 보안을 최소 권한과 역할 기반 위임이라는 관점에서 정리하겠습니다.
 
+
+![Cloud Computing 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/07/07-01-concept-at-a-glance.ko.png)
+*Cloud Computing 101 7장 흐름 개요*
+> IAM은 기능 이름이 아니라, 어떤 경계에서 누가 무엇을 할 수 있는지 명확히 정하는 결정입니다.
+
 ## 먼저 던지는 질문
 
 - IAM 사용자, 그룹, 역할, 정책은 어떻게 구분할까요?
 - 최소 권한 원칙은 왜 기본값이어야 할까요?
 - MFA와 키 회전은 왜 운영 루틴이 되어야 할까요?
-
-## 큰 그림
-
-![Cloud Computing 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/07/07-01-concept-at-a-glance.ko.png)
-
-*Cloud Computing 101 7장 흐름 개요*
-
-IAM은 '누가' 클라우드 리소스에 접근할 수 있는지를 제어합니다. 권한(Permission)은 구체적인 액션(예: s3:GetObject), 리소스(어느 S3 버킷), 조건(IP 범위, 시간)을 명시합니다. 역할(Role)은 권한의 집합이고, 사용자나 서비스가 역할을 맡습니다. 정책(Policy)은 역할에 붙는 권한 문서입니다.
-
-> IAM은 기능 이름이 아니라, 어떤 경계에서 누가 무엇을 할 수 있는지 명확히 정하는 결정입니다.
 
 ## 왜 중요한가
 

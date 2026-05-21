@@ -27,21 +27,15 @@ seo_description: ACA는 "컨테이너용 App Service"라는 비유로 가장 빠
 
 이 글은 Azure Container Apps 101 시리즈의 첫 번째 글입니다. 여기서는 ACA를 Azure 컨테이너 서비스 지도 위에 올려놓고, 어떤 워크로드에 가장 잘 맞는지부터 정리합니다.
 
+![Azure Container Apps 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/01/01-01-the-big-picture-one-aca-environment-at-a.ko.png)
+*Azure Container Apps 101 1장 흐름 개요*
+> Azure Container Apps란? — Kubernetes 없이 컨테이너 운영하기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - Azure Container Apps(ACA)는 다른 Azure 컨테이너 서비스(App Service, AKS, Functions)와 무엇이 다를까요?
 - ACA의 세 가지 핵심 구성 요소인 Environment, Container App, Revision은 각각 어떤 역할을 할까요?
 - 어떤 워크로드는 ACA에 잘 맞고, 어떤 워크로드는 다른 서비스에 두는 편이 나을까요?
-
-## 큰 그림
-
-![Azure Container Apps 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/01/01-01-the-big-picture-one-aca-environment-at-a.ko.png)
-
-*Azure Container Apps 101 1장 흐름 개요*
-
-이 그림에서는 Azure Container Apps란? — Kubernetes 없이 컨테이너 운영하기를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> Azure Container Apps란? — Kubernetes 없이 컨테이너 운영하기의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

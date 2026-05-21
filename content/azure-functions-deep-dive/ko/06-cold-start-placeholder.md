@@ -30,21 +30,15 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 이제 사용자가 실제로 체감하는 cold start가 어떤 코드 경로의 합으로 만들어지는지 끝까지 따라가겠습니다.
 
+![Azure Functions Deep Dive 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/06/06-01-why-cold-start-is-expensive-decomposing.ko.png)
+*Azure Functions Deep Dive 6장 흐름 개요*
+> 콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
+
 ## 먼저 던지는 질문
 
 - 호스트 부팅, 워커 시작, JIT 중 어느 부분이 cold start에서 가장 비쌀까요?
 - Placeholder 인스턴스는 정확히 무엇을 미리 준비해 둘까요?
 - Premium의 always-ready 인스턴스는 placeholder와 무엇이 다를까요?
-
-## 큰 그림
-
-![Azure Functions Deep Dive 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/06/06-01-why-cold-start-is-expensive-decomposing.ko.png)
-
-*Azure Functions Deep Dive 6장 흐름 개요*
-
-이 그림에서는 콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때를 운영 흐름 안에서 어디에 배치해야 하는지 봅니다. 핵심은 개념을 따로 외우는 것이 아니라 입력, 처리, 검증, 운영 신호가 어떤 경계로 이어지는지 확인하는 데 있습니다.
-
-> 콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때의 핵심은 기능 이름이 아니라, 어떤 경계에서 무엇을 검증하고 어떤 신호를 남길지 정하는 데 있습니다.
 
 ## 왜 이 글이 중요한가
 

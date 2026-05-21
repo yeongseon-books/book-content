@@ -29,21 +29,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 예외와 반환값을 언제 구분해서 써야 하는지, 그리고 재시도와 경계 처리까지 어떤 기준으로 설계해야 하는지 정리하겠습니다.
 
+
+![Clean Code 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/06/06-01-concept-at-a-glance.ko.png)
+*Clean Code 101 6장 흐름 개요*
+> 입력 검증을 먼저, 흐름을 잃은 순간에만 예외를 쓰세요.
+
 ## 먼저 던지는 질문
 
 - 예외를 던질지 값을 반환할지 어떻게 판단할까요?
 - Fail Fast는 어떤 상황에서 특히 중요할까요?
 - "값으로서의 오류" 패턴은 언제 유용할까요?
-
-## 큰 그림
-
-![Clean Code 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/06/06-01-concept-at-a-glance.ko.png)
-
-*Clean Code 101 6장 흐름 개요*
-
-오류 처리는 시스템 견고함을 결정하지만, 동시에 가독성을 망칠 수도 있습니다. 오류처리, 도메인 예외, 외부 호출 재시도, API 경계 매핑이 각각 다른 책임입니다.
-
-> 입력 검증을 먼저, 흐름을 잃은 순간에만 예외를 쓰세요.
 
 ## 왜 중요한가
 

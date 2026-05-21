@@ -30,21 +30,16 @@ This is post 2 in the Testing 101 series. Here we define the scope of a unit tes
 
 > A strong unit test is small enough to fail loudly and fast, but precise enough to explain exactly what contract broke.
 
+
+![testing 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/02/02-01-concept-at-a-glance.en.png)
+*testing 101 chapter 2 flow overview*
+> A good unit test fails loudly when the contract breaks, and passes silently when it holds.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Unit Test?
 - Which signal should the example or diagram make visible for Unit Test?
 - What failure should be prevented first when Unit Test reaches a real system?
-
-## Big Picture
-
-![testing 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/02/02-01-concept-at-a-glance.en.png)
-
-*testing 101 chapter 2 flow overview*
-
-This picture places Unit Test inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A good unit test fails loudly when the contract breaks, and passes silently when it holds.
 
 ## What You Will Learn
 

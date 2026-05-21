@@ -29,17 +29,15 @@ last_reviewed: '2026-05-16'
 
 그래서 이번 글은 이벤트 분류표만 나열하지 않습니다. 대신 하나의 운영 흐름을 끝까지 따라가 보겠습니다. **HTTP 요청이 큐 메시지로 바뀌고, 소비자가 이를 처리하고, 중복 메시지는 멱등성 저장소에서 건너뛰고, 반복 실패 메시지는 DLQ로 보내고, 운영자는 그 메시지를 다시 재처리하는 흐름**입니다. 이 한 흐름을 이해하면 트리거 이야기가 더 이상 추상적이지 않습니다.
 
+
+![Serverless 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/03/03-01-concept-at-a-glance.ko.png)
+*Serverless 101 3장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - HTTP, 큐, 스케줄 트리거는 호출 의미가 어떻게 다를까요?
 - 비동기 소비자에서는 왜 멱등성이 기본 전제가 될까요?
 - DLQ는 단순한 보조 기능이 아니라 왜 운영의 핵심 관찰 지점일까요?
-
-## 큰 그림
-
-![Serverless 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/03/03-01-concept-at-a-glance.ko.png)
-
-*Serverless 101 3장 흐름 개요*
 
 ## 왜 이 주제가 중요한가
 

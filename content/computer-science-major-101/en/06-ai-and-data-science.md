@@ -31,21 +31,16 @@ last_reviewed: '2026-05-14'
 
 This is post 6 in the Computer Science Major 101 series.
 
+
+![computer science major 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/06/06-01-ai-learning-pipeline.en.png)
+*computer science major 101 chapter 6 flow overview*
+> AI and data science are not about algorithms—they are about matching the *right model* to the *right problem*, given the *right constraints*.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying AI and Data Science?
 - Which signal should the example or diagram make visible for AI and Data Science?
 - What failure should be prevented first when AI and Data Science reaches a real system?
-
-## Big Picture
-
-![computer science major 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/06/06-01-ai-learning-pipeline.en.png)
-
-*computer science major 101 chapter 6 flow overview*
-
-This picture places AI and Data Science inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> AI and data science are not about algorithms—they are about matching the *right model* to the *right problem*, given the *right constraints*.
 
 ## What You Will Learn
 

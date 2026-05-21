@@ -40,19 +40,15 @@ By the end of this chapter you will be able to explain and code the following yo
 
 This chapter targets Python 3.12. Blocks shown as REPL sessions (with the `>>>` prompt) run line by line in an activated venv. Short snippets without the prompt are illustrative excerpts and assume surrounding names are defined.
 
+
+![Python 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/02/02-01-mental-model.en.png)
+*Python 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why is a Python variable a name tag attached to an object rather than a box that holds a value?
 - What does each of the five primitive types — `int`, `float`, `str`, `bool`, `None` — actually guarantee?
 - Where does dynamic typing meet type hints, and how do hints make that freedom safer?
-
-## Big Picture
-
-![Python 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/02/02-01-mental-model.en.png)
-
-*Python 101 chapter 2 flow overview*
-
-This picture places Variables, types, and operators inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

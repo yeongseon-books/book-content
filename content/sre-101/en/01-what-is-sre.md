@@ -28,19 +28,15 @@ SRE starts by changing the frame. Instead of treating operations as heroics, it 
 
 This is the first post in the SRE 101 series. It sets up the mental model for the rest of the series: reliability is part of the product, and operating it well requires code, metrics, and deliberate policies.
 
+
+![sre 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/01/01-01-concept-at-a-glance.en.png)
+*sre 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What does SRE actually mean beyond “the people who handle incidents”?
 - How is SRE different from DevOps even though the two ideas often overlap?
 - Why does SRE treat reliability work as a software problem instead of a staffing problem?
-
-## Big Picture
-
-![sre 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/01/01-01-concept-at-a-glance.en.png)
-
-*sre 101 chapter 1 flow overview*
-
-This picture places What is SRE? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this topic matters
 

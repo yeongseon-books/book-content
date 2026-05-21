@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 일관성 모델을 스펙트럼으로 보고, CAP와 PACELC를 통해 설계 문서와 데이터베이스 문장을 읽는 기준을 만듭니다.
 
+
+![Distributed Systems 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/04/04-01-concept-at-a-glance.ko.png)
+*Distributed Systems 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 여기서 말하는 일관성은 정확히 무엇이며 트랜잭션의 C와 어떻게 다를까요?
 - linearizable, sequential, causal, eventual은 어떤 스펙트럼을 이룰까요?
 - CAP 정리는 무엇을 말하며, 어디서 자주 오해될까요?
-
-## 큰 그림
-
-![Distributed Systems 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/04/04-01-concept-at-a-glance.ko.png)
-
-*Distributed Systems 101 4장 흐름 개요*
 
 ## 왜 중요한가
 

@@ -28,19 +28,15 @@ A class is not just a mold for data; it is a shared definition of behavior for o
 
 This post is the 9th article in the Python 101 series. This is the stage in the series where behavior, state, and object design come together.
 
+
+![Python 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/09/09-01-mental-model.en.png)
+*Python 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - Define a class with the `class` statement and create instances from it?
 - Explain the role of `__init__` in instance initialization?
 - Explain what `self` refers to and why it is the first parameter of a method?
-
-## Big Picture
-
-![Python 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/09/09-01-mental-model.en.png)
-
-*Python 101 chapter 9 flow overview*
-
-This picture places Classes and objects: bundling data with behavior inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

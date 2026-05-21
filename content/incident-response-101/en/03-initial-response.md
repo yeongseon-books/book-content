@@ -28,21 +28,16 @@ Teams that survive this window well do not start with perfect answers. They star
 
 This is post 3 in the Incident Response 101 series. This post breaks down that first-response sequence so the team can stop the bleeding before it tries to explain every detail.
 
+
+![incident response 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/03/03-01-diagram-at-a-glance.en.png)
+*incident response 101 chapter 3 flow overview*
+> Initial response prioritizes stabilization over diagnosis. The cost of delay is real; the cost of a wrong direction is usually recoverable.
+
 ## Questions to Keep in Mind
 
 - What should happen first after a page is acknowledged?
 - Why is stabilization usually more urgent than diagnosis?
 - How much impact estimation is enough for the first update?
-
-## Big Picture
-
-![incident response 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/03/03-01-diagram-at-a-glance.en.png)
-
-*incident response 101 chapter 3 flow overview*
-
-This picture places Initial Response inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Initial response prioritizes stabilization over diagnosis. The cost of delay is real; the cost of a wrong direction is usually recoverable.
 
 ## Why this topic matters
 

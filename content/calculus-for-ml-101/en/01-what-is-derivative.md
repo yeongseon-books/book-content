@@ -30,19 +30,15 @@ In this post, we'll connect average rate of change, tangent lines, limits, and n
 
 > A derivative is not mainly about symbol manipulation. It is the local signal that tells you how a function reacts near the point where you are standing.
 
+
+![calculus for ml 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.en.png)
+*calculus for ml 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What Is a Derivative?
 - Which signal should the example or diagram make visible for What Is a Derivative?
 - What failure should be prevented first when What Is a Derivative reaches a real system?
-
-## Big Picture
-
-![calculus for ml 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.en.png)
-
-*calculus for ml 101 chapter 1 flow overview*
-
-This picture places What Is a Derivative inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions this article answers
 

@@ -28,21 +28,16 @@ Once you understand random variables, expectation, variance, distributions, and 
 
 This is post 5 in the Probability 101 series. Here we define random variables, separate discrete and continuous cases, compare PMF, PDF, and CDF, and use sampling to make the abstractions easier to see.
 
+
+![probability 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/05/05-01-concept-at-a-glance.en.png)
+*probability 101 chapter 5 flow overview*
+> Random Variables requires both definition and intuition, learned through concrete examples.
+
 ## Questions to Keep in Mind
 
 - Why random variables are more expressive than raw events?
 - How discrete and continuous variables differ?
 - What PMF, PDF, and CDF each answer?
-
-## Big Picture
-
-![probability 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/05/05-01-concept-at-a-glance.en.png)
-
-*probability 101 chapter 5 flow overview*
-
-This picture places Random Variables inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Random Variables requires both definition and intuition, learned through concrete examples.
 
 ## Why It Matters
 

@@ -28,19 +28,15 @@ Git starts to feel powerful the moment you realize separate lines of work do not
 
 This is the fourth post in the Git & GitHub 101 series. Here, we focus on creating, switching, and comparing branches before we get to merging them.
 
+
+![Git & GitHub 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/04/04-01-mental-model.en.png)
+*Git & GitHub 101 chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - What a branch actually is (it is not a folder copy)?
 - How to list and create branches with `git branch`?
 - How to move between branches with `git switch` (and how it relates to `git checkout`)?
-
-## Big Picture
-
-![Git & GitHub 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/04/04-01-mental-model.en.png)
-
-*Git & GitHub 101 chapter 4 flow overview*
-
-This picture places Branch basics - create, switch, and compare inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 Operating Systems 101 시리즈의 3번째 글입니다.
 
+
+![Operating Systems 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/03/03-01-how-tasks-move-through-the-scheduler.ko.png)
+*Operating Systems 101 3장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 스케줄러는 어떤 목표들 사이에서 균형을 잡을까요?
 - 선점, 타임 슬라이스, 우선순위는 실제로 어떤 차이를 만들까요?
 - 컨텍스트 스위치는 왜 보이지 않아도 비용이 클까요?
-
-## 큰 그림
-
-![Operating Systems 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/03/03-01-how-tasks-move-through-the-scheduler.ko.png)
-
-*Operating Systems 101 3장 흐름 개요*
 
 ## 기본 모델
 > 스케줄러는 실행 가능한(runnable) 작업의 큐에서 다음에 실행할 작업을 골라 CPU에 올립니다. 작업이 I/O를 기다리거나, 시간 할당량을 다 쓰거나, 더 높은 우선순위의 작업이 깨어날 때 스케줄러가 다시 호출됩니다.

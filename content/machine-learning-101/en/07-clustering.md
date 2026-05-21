@@ -26,19 +26,15 @@ Clustering feels less certain than classification because there is no answer she
 
 This is post 7 in the Machine Learning 101 series. Here we will compare KMeans and DBSCAN, use elbow and silhouette scores as guide rails, and keep the main discipline in view: clusters are hypotheses that still need interpretation.
 
+
+![machine learning 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/07/07-01-concept-at-a-glance.en.png)
+*machine learning 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - Without labels, how do you judge whether the clusters are any good?
 - When should you prefer KMeans over DBSCAN?
 - How do you choose `K` without pretending the metric picks it for you?
-
-## Big Picture
-
-![machine learning 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/07/07-01-concept-at-a-glance.en.png)
-
-*machine learning 101 chapter 7 flow overview*
-
-This picture places Clustering inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

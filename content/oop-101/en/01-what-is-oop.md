@@ -30,19 +30,15 @@ This is the first post in the Object-Oriented Programming 101 series.
 
 > Programming paradigms define how we structure code. Procedural programming centers on functions; object-oriented programming bundles data and behavior into objects. This article explains what OOP is, why it emerged, and when it is the right choice.
 
+
+![Object-Oriented Programming 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/01/01-01-big-picture.en.png)
+*Object-Oriented Programming 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What Is Object-Oriented Programming??
 - Which signal should the example or diagram make visible for What Is Object-Oriented Programming??
 - What failure should be prevented first when What Is Object-Oriented Programming? reaches a real system?
-
-## Big Picture
-
-![Object-Oriented Programming 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/01/01-01-big-picture.en.png)
-
-*Object-Oriented Programming 101 chapter 1 flow overview*
-
-This picture places What Is Object-Oriented Programming? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

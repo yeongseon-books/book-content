@@ -30,19 +30,15 @@ In this post, we'll use MSE, cross entropy, and gradient-based training signals 
 
 > A loss function does not merely report error after the fact. It creates the pressure signal that pushes the model toward a different set of parameters.
 
+
+![calculus for ml 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/06/06-01-concept-at-a-glance.en.png)
+*calculus for ml 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Loss Function?
 - Which signal should the example or diagram make visible for Loss Function?
 - What failure should be prevented first when Loss Function reaches a real system?
-
-## Big Picture
-
-![calculus for ml 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/06/06-01-concept-at-a-glance.en.png)
-
-*calculus for ml 101 chapter 6 flow overview*
-
-This picture places Loss Function inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions this article answers
 

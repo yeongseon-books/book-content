@@ -26,19 +26,15 @@ Knowing each concept in isolation is very different from tying those concepts in
 
 This is the final post in the Frontend Development 101 series. Here we assemble a small notes app that pulls together the earlier chapters. The goal is not perfection. The goal is to turn separate concepts into one living product flow and ship it all the way to a public URL.
 
+
+![frontend development 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/10/10-01-concept-at-a-glance.en.png)
+*frontend development 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Building a Small Frontend App?
 - Which signal should the example or diagram make visible for Building a Small Frontend App?
 - What failure should be prevented first when Building a Small Frontend App reaches a real system?
-
-## Big Picture
-
-![frontend development 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/10/10-01-concept-at-a-glance.en.png)
-
-*frontend development 101 chapter 10 flow overview*
-
-This picture places Building a Small Frontend App inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

@@ -42,19 +42,14 @@ ACA's internal implementation is not published by Microsoft, so these versions a
 - **Inferred from upstream behavior**: those rules most likely materialize as KEDA/HPA-style control loops behind the service boundary.
 - **Out of bounds**: the exact managed KEDA deployment shape and private wiring Microsoft uses inside ACA.
 
+![azure container apps deep dive chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/04/04-01-the-short-version-a-scale-rule-is-not-th.en.png)
+*azure container apps deep dive chapter 4 flow overview*
+
 ## Questions to Keep in Mind
 
 - What is the same and what is restricted between ACA's KEDA and stock KEDA?
 - Where is the boundary between triggers that scale to zero and triggers that cannot?
 - How do polling interval, cooldown, and max replicas trade cost against latency?
-
-## Big Picture
-
-![azure container apps deep dive chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/04/04-01-the-short-version-a-scale-rule-is-not-th.en.png)
-
-*azure container apps deep dive chapter 4 flow overview*
-
-This picture places KEDA inside ACA — what a scale rule actually creates inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## The short version: a scale rule is not the scaler itself
 

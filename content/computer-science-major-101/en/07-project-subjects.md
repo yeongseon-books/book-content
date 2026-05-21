@@ -27,21 +27,16 @@ Many students reach the later years of the major and realize that knowing indivi
 
 This is post 7 in the Computer Science Major 101 series.
 
+
+![computer science major 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/07/07-01-project-delivery-flow.en.png)
+*computer science major 101 chapter 7 flow overview*
+> Project courses are not about perfection—they are about *recording decisions*. Why did you choose this architecture? What would you do differently?
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Project Subjects?
 - Which signal should the example or diagram make visible for Project Subjects?
 - What failure should be prevented first when Project Subjects reaches a real system?
-
-## Big Picture
-
-![computer science major 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/07/07-01-project-delivery-flow.en.png)
-
-*computer science major 101 chapter 7 flow overview*
-
-This picture places Project Subjects inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Project courses are not about perfection—they are about *recording decisions*. Why did you choose this architecture? What would you do differently?
 
 ## Questions This Post Answers
 

@@ -27,19 +27,15 @@ This is the first post in the AI Web Development 101 series.
 
 Here, we will build the smallest successful OpenAI API call and turn it into a practical mental model you can reuse in later chapters.
 
+
+![AI Web Development 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/01/api-call-overview.en.png)
+*AI Web Development 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - What is different between using ChatGPT on the web and integrating an AI API into my own service?
 - What is the minimum setup for the OpenAI API?
 - What does the first request look like, and where do I read the response?
-
-## Big Picture
-
-![AI Web Development 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/01/api-call-overview.en.png)
-
-*AI Web Development 101 chapter 1 flow overview*
-
-This picture places AI API first steps — sending your first request with the OpenAI API inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why the first call matters more than it seems
 

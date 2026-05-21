@@ -29,19 +29,15 @@ Teams often judge quality first by style or abstraction. Those signals matter, b
 
 This is the final post in the Software Engineering 101 series. In this chapter, we tie the series together by looking at quality attributes, practical readings of SOLID, and the operational signals senior engineers use when they say a system is healthy.
 
+
+![software engineering 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/10/10-01-concept-at-a-glance.en.png)
+*software engineering 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What Makes Good Software?
 - Which signal should the example or diagram make visible for What Makes Good Software?
 - What failure should be prevented first when What Makes Good Software reaches a real system?
-
-## Big Picture
-
-![software engineering 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/10/10-01-concept-at-a-glance.en.png)
-
-*software engineering 101 chapter 10 flow overview*
-
-This picture places What Makes Good Software inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

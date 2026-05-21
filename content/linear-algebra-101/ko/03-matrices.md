@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 행렬을 형상과 변환이라는 두 관점으로 함께 이해해 보겠습니다.
 
+
+![Linear Algebra 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/03/03-01-concept-at-a-glance.ko.png)
+*Linear Algebra 101 3장 흐름 개요*
+> 행렬은 단순한 숫자 표가 아니라 변환 규칙이자 벡터들의 집합입니다. 그래서 행렬의 구조(특히 행 개수와 열 개수)는 단순한 크기가 아니라 입력과 출력이 살고 있는 공간 자체를 정의합니다.
+
 ## 먼저 던지는 질문
 
 - 행렬은 단순한 숫자 표와 무엇이 다를까요?
 - 행렬 곱은 왜 변환의 합성으로 읽어야 할까요?
 - 전치와 항등행렬, 역행렬은 각각 무엇을 뜻할까요?
-
-## 큰 그림
-
-![Linear Algebra 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/03/03-01-concept-at-a-glance.ko.png)
-
-*Linear Algebra 101 3장 흐름 개요*
-
-행렬은 벡터 여러 개를 모은 표이면서 동시에 벡터 공간에 작용하는 변환 규칙입니다. 행렬의 형태(shape)와 역행렬의 존재 여부는 입력과 출력 차원을 결정합니다. 이 구조가 없으면 선형변환을 다룰 수 없습니다.
-
-> 행렬은 단순한 숫자 표가 아니라 변환 규칙이자 벡터들의 집합입니다. 그래서 행렬의 구조(특히 행 개수와 열 개수)는 단순한 크기가 아니라 입력과 출력이 살고 있는 공간 자체를 정의합니다.
 
 ## 왜 중요한가
 

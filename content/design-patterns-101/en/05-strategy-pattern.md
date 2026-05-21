@@ -29,19 +29,15 @@ This is post 5 in the Design Patterns 101 series.
 
 In this post, we'll look at Strategy as a way to turn algorithms into swappable units that a context can receive from the outside. In Python, that often means using a function before reaching for a class hierarchy.
 
+
+![design patterns 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/05/05-01-concept-at-a-glance.en.png)
+*design patterns 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - The problem Strategy solves (branch explosion)?
 - Strategy and the Open/Closed Principle?
 - Class Strategy vs function Strategy?
-
-## Big Picture
-
-![design patterns 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/05/05-01-concept-at-a-glance.en.png)
-
-*design patterns 101 chapter 5 flow overview*
-
-This picture places The Strategy Pattern inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

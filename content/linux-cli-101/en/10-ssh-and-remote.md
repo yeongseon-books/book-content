@@ -28,19 +28,15 @@ The CLI becomes truly operational the moment you leave your own machine. Deployi
 
 This is the final post in the Linux CLI 101 series.
 
+
+![Linux CLI 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/10/10-01-big-picture.en.png)
+*Linux CLI 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - The basic SSH connection flow and key-based authentication setup?
 - Generating a key pair with `ssh-keygen` and registering it on a server?
 - Creating connection aliases with `~/.ssh/config`?
-
-## Big Picture
-
-![Linux CLI 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/10/10-01-big-picture.en.png)
-
-*Linux CLI 101 chapter 10 flow overview*
-
-This picture places SSH and Remote Access inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

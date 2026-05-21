@@ -28,19 +28,15 @@ That is why binary search shows up far beyond textbook examples. The same patter
 
 This is post 3 in the Algorithms with Python 101 series. Here, we'll implement linear search and binary search side by side and compare when each approach makes sense.
 
+
+![Algorithms with Python 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/03/03-01-big-picture.en.png)
+*Algorithms with Python 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Linear Search and Binary Search?
 - Which signal should the example or diagram make visible for Linear Search and Binary Search?
 - What failure should be prevented first when Linear Search and Binary Search reaches a real system?
-
-## Big Picture
-
-![Algorithms with Python 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/03/03-01-big-picture.en.png)
-
-*Algorithms with Python 101 chapter 3 flow overview*
-
-This picture places Linear Search and Binary Search inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

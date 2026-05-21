@@ -27,19 +27,15 @@ New developers often memorize technology names before they learn responsibility 
 
 This is post 5 in the Web Development 101 series. Here we draw the boundary between frontend and backend around source of truth, rendering style, and API contracts so full-stack decisions become easier to justify.
 
+
+![web development 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/05/05-01-concept-at-a-glance.en.png)
+*web development 101 chapter 5 flow overview*
+
 ## Questions to Keep in Mind
 
 - How responsibility splits between frontend and backend?
 - SPA (Single Page App) vs SSR (Server-Side Rendering)?
 - How the API contract bridges the two worlds?
-
-## Big Picture
-
-![web development 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/05/05-01-concept-at-a-glance.en.png)
-
-*web development 101 chapter 5 flow overview*
-
-This picture places Frontend and Backend inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

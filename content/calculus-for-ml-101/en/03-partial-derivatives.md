@@ -30,19 +30,15 @@ In this post, we'll use multivariable functions, fixed variables, and per-parame
 
 > A partial derivative is the rule that lets you ask one focused question at a time: if only this variable moved, how would the loss respond?
 
+
+![calculus for ml 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/03/03-01-concept-at-a-glance.en.png)
+*calculus for ml 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Partial Derivatives?
 - Which signal should the example or diagram make visible for Partial Derivatives?
 - What failure should be prevented first when Partial Derivatives reaches a real system?
-
-## Big Picture
-
-![calculus for ml 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/03/03-01-concept-at-a-glance.en.png)
-
-*calculus for ml 101 chapter 3 flow overview*
-
-This picture places Partial Derivatives inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions this article answers
 

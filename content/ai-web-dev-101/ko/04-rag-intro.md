@@ -29,17 +29,15 @@ seo_description: RAG의 검색·임베딩·생성 흐름을 이해하고, 근거
 
 여기서는 모델이 모르는 최신 정보와 내부 문서를 답변에 연결하는 RAG의 기본 구조와 디버깅 포인트를 설명합니다.
 
+
+![AI Web Development 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/04/plain-llm-vs-rag.ko.png)
+*AI Web Development 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 모델은 왜 회사 문서나 최신 뉴스를 바로 답하지 못할까요?
 - 파인튜닝보다 RAG가 먼저 쓰이는 이유는 무엇일까요?
 - 임베딩과 벡터 검색은 어떤 역할을 할까요?
-
-## 큰 그림
-
-![AI Web Development 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/04/plain-llm-vs-rag.ko.png)
-
-*AI Web Development 101 4장 흐름 개요*
 
 ## 왜 RAG가 필요한가
 
@@ -392,7 +390,6 @@ RAG를 운영으로 가져갈 때는 최소한 아래 지표를 수집해야 합
 | 답변이 너무 일반적 | 검색 점수 임계치 없음 | 점수 하한 미달 시 "근거 없음" 처리 |
 | 오래된 정보 답변 | 문서 갱신 메타데이터 없음 | 최신 버전 우선 가중치 적용 |
 | 느린 응답 | 무조건 top-k 크게 설정 | 질문 유형별 동적 k 사용 |
-
 
 
 ## 문서 갱신 파이프라인 기본 형태

@@ -34,19 +34,14 @@ This is the final article in the Python DB-API 101 series.
 
 *SQLite production Patterns: retry, timeout, observability, backup*
 
+![python db-api 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/10/10-02-mental-model-sqlite-is-still-a-dbms.en.png)
+*python db-api 101 chapter 10 flow overview*
+
 ## Questions to Keep in Mind
 
 - How should retry, timeout, and `busy_timeout` be configured together?
 - How do you automate slow-query logging, and how do you pick the threshold?
 - How do you instrument SQLite calls with OpenTelemetry?
-
-## Big Picture
-
-![python db-api 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/10/10-02-mental-model-sqlite-is-still-a-dbms.en.png)
-
-*python db-api 101 chapter 10 flow overview*
-
-This picture places SQLite Production Patterns: retry, timeout, observability, backup inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

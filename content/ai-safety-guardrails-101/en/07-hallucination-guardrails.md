@@ -26,21 +26,16 @@ People use "hallucination" for any confident mistake, but production guardrails 
 
 This is post 7 in the AI Safety & Guardrails 101 series. It focuses on closed-domain hallucinations and the grounding checks that catch them reliably.
 
+
+![what grounding actually means](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/07/07-01-what-grounding-actually-means.en.png)
+*what grounding actually means*
+> To reduce hallucination, treat an answer as a set of verifiable claims, not as one fluent paragraph.
+
 ## Questions to Keep in Mind
 
 - Why should a hallucination guardrail inspect claims instead of the whole answer at once?
 - What do claim extraction, entailment checks, and citation format each verify?
 - When evidence is weak, should the answer be blocked, revised, or held?
-
-## Big Picture
-
-![what grounding actually means](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/07/07-01-what-grounding-actually-means.en.png)
-
-*what grounding actually means*
-
-This picture breaks an answer into claims and checks each claim against evidence before deciding whether it passes. A hallucination guardrail must verify the relationship between claims and evidence, not the confidence of the prose.
-
-> To reduce hallucination, treat an answer as a set of verifiable claims, not as one fluent paragraph.
 
 ## The Trap in the Word "Hallucination"
 

@@ -31,21 +31,16 @@ last_reviewed: '2026-05-14'
 
 This is the first post in the Computer Science Major 101 series.
 
+
+![computer science major 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/01/01-01-major-learning-map.en.png)
+*computer science major 101 chapter 1 flow overview*
+> The CS major is not a collection of topic names—it is a foundation of *math* and *programming*, layered with *systems*, *data*, *AI*, and *capstone projects*, where each layer depends on what came before.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying What Computer Science Majors Learn?
 - Which signal should the example or diagram make visible for What Computer Science Majors Learn?
 - What failure should be prevented first when What Computer Science Majors Learn reaches a real system?
-
-## Big Picture
-
-![computer science major 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/01/01-01-major-learning-map.en.png)
-
-*computer science major 101 chapter 1 flow overview*
-
-This picture places What Computer Science Majors Learn inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> The CS major is not a collection of topic names—it is a foundation of *math* and *programming*, layered with *systems*, *data*, *AI*, and *capstone projects*, where each layer depends on what came before.
 
 ## What You Will Learn
 

@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 이 글은 Probability 101 시리즈의 6번째 글입니다. 여기서는 기대값과 분산의 정의, 계산 공식, 선형성, 표준편차의 의미를 코드와 함께 정리하겠습니다.
 
+
+![Probability 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/06/06-01-diagram.ko.png)
+*Probability 101 6장 흐름 개요*
+> 기대값과 분산은 구체적인 가정과 한계를 함께 봐야 합니다.
+
 ## 먼저 던지는 질문
 
 - 기대값은 왜 분포의 중심이라고 부를까요?
 - 분산은 무엇을 얼마나 측정하는 값일까요?
 - 표준편차는 분산과 어떻게 다를까요?
-
-## 큰 그림
-
-![Probability 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/06/06-01-diagram.ko.png)
-
-*Probability 101 6장 흐름 개요*
-
-이 그림은 이 개념의 기본 구조를 보여줍니다.
-
-> 기대값과 분산은 구체적인 가정과 한계를 함께 봐야 합니다.
 
 ## 왜 중요한가
 

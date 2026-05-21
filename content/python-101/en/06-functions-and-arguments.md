@@ -28,19 +28,15 @@ A function signature is a contract: what the caller must supply and what the fun
 
 This post is the 6th article in the Python 101 series. This is the point in the series where reusable code turns into explicit interfaces.
 
+
+![Python 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/06/06-01-mental-model.en.png)
+*Python 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - How to define a function with `def` and control what `return` hands back?
 - The five argument forms — positional, keyword, default, `*args`, `**kwargs` — and how they bind at call time?
 - How positional-only (`/`) and keyword-only (`*`) markers shape an API?
-
-## Big Picture
-
-![Python 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-101/06/06-01-mental-model.en.png)
-
-*Python 101 chapter 6 flow overview*
-
-This picture places Functions and arguments: def, args, kwargs, default, lambda inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

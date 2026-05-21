@@ -28,19 +28,14 @@ A first deploy is where ACA stops being a diagram and starts becoming an operati
 
 This is post 3 in the Azure Container Apps 101 series. Here, we'll walk a Python/FastAPI app through that full path.
 
+![azure container apps 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/03/03-01-the-end-to-end-path.en.png)
+*azure container apps 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - The full path from local FastAPI code to a live ACA Revision?
 - That ACA does not build images for you — and what that means for division of responsibility?
 - The four-step dependency chain: ACR → ACA Environment → Container App → Revision?
-
-## Big Picture
-
-![azure container apps 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/03/03-01-the-end-to-end-path.en.png)
-
-*azure container apps 101 chapter 3 flow overview*
-
-This picture places Your first deploy — Python/FastAPI inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this matters
 

@@ -26,19 +26,15 @@ Login looks small from the UI, but the server has to answer two separate questio
 
 This is post 6 in the Backend Development 101 series. Here, we separate authentication from authorization and build a safe baseline with password hashing, JWT verification, and explicit role checks in FastAPI.
 
+
+![backend development 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/06/06-01-concept-at-a-glance.en.png)
+*backend development 101 chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - The difference between authentication and authorization?
 - Minimum safe practices for password storage?
 - Sessions vs JWT — when to use which?
-
-## Big Picture
-
-![backend development 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/06/06-01-concept-at-a-glance.en.png)
-
-*backend development 101 chapter 6 flow overview*
-
-This picture places Authentication and Authorization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

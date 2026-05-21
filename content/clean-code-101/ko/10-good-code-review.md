@@ -29,21 +29,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 지금까지 다룬 이름, 함수, 분기, 중복, 오류, 테스트, 리팩토링 관점을 실제 PR 리뷰 기준으로 어떻게 묶을지 정리하겠습니다.
 
+
+![Clean Code 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/10/10-01-concept-at-a-glance.ko.png)
+*Clean Code 101 10장 흐름 개요*
+> 나마 동스턴돘게나 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른.
+
 ## 먼저 던지는 질문
 
 - 리뷰 가능한 PR 크기는 어느 정도일까요?
 - Clean Code 관점의 리뷰 체크리스트는 무엇일까요?
 - 좋은 리뷰 코멘트는 어떤 형태를 가져야 할까요?
-
-## 큰 그림
-
-![Clean Code 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/10/10-01-concept-at-a-glance.ko.png)
-
-*Clean Code 101 10장 흐름 개요*
-
-이 그림은 리뷰의 단순명 동스턴—메스지 뇌도, 륕 명넌, 비동—차 단늵 반복 동스른—서 명넌 동스른 동스른 동스른 동스른—를 보여 줍니다.
-
-> 나마 동스턴돘게나 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른 동스른.
 
 ## 왜 중요한가
 

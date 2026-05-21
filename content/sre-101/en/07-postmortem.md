@@ -28,19 +28,15 @@ Postmortems matter because they capture what was visible, what was missing, why 
 
 This is post 7 in the SRE 101 series. Here we treat postmortems as a learning system built from blameless analysis, reusable structure, and tracked follow-up work.
 
+
+![sre 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/07/07-01-concept-at-a-glance.en.png)
+*sre 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - Why is a postmortem closer to an organizational learning tool than to a simple report?
 - Why does blame suppress the very context a team needs to improve?
 - What sections should a useful postmortem always contain?
-
-## Big Picture
-
-![sre 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/07/07-01-concept-at-a-glance.en.png)
-
-*sre 101 chapter 7 flow overview*
-
-This picture places Postmortem inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why this topic matters
 

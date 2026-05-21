@@ -29,21 +29,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 중첩된 if를 평평하게 만들고, 분기 자체를 다른 구조로 옮기는 방법을 정리하겠습니다.
 
+
+![Clean Code 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/04/04-01-concept-at-a-glance.ko.png)
+*Clean Code 101 4장 흐름 개요*
+> 분기 깊이보다 분기 책임을 먼저 나누세요.
+
 ## 먼저 던지는 질문
 
 - 가드 절과 조기 반환은 어떤 상황에서 가장 효과적일까요?
 - 부정형 조건과 이중 부정은 왜 읽기 어렵게 만들까요?
 - if/else 체인은 언제 다형성으로 바꾸는 편이 좋을까요?
-
-## 큰 그림
-
-![Clean Code 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/04/04-01-concept-at-a-glance.ko.png)
-
-*Clean Code 101 4장 흐름 개요*
-
-이 그림은 조건문 단순화의 세 가지 도구—가드 절, 다형성, 테이블 기반—가 어떻게 중첩을 평평하게 만드는지 보여 줍니다. 도구가 늘어날수록 분기 복잡도는 줄어듭니다.
-
-> 분기 깊이보다 분기 책임을 먼저 나누세요.
 
 ## 왜 중요한가
 

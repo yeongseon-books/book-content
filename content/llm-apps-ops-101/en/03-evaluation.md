@@ -26,21 +26,15 @@ This is the third post in the LLM Apps Ops 101 series. Here, we will build a min
 
 Early in an ops pipeline, the pragmatic move is not to build a brilliant judge. It is to fail obvious bad output cheaply, consistently, and with enough detail to act on it.
 
+![LLM output quality evaluation pipeline](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/03/03-01-big-picture.en.png)
+*LLM output quality evaluation pipeline*
+> Rule-based checks are the first filter for obvious failures; semantic quality judgment belongs in the next layer.
+
 ## Questions to Keep in Mind
 
 - Why should LLM output evaluation not stop at rule-based checks?
 - What failures become visible faster when format, length, and keyword checks are separated?
 - What decision standard should a batch evaluation report provide for operations?
-
-## Big Picture
-
-![LLM output quality evaluation pipeline](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/03/03-01-big-picture.en.png)
-
-*LLM output quality evaluation pipeline*
-
-This picture shows LLM output passing through fast checks such as format, length, and keywords before deeper quality evaluation. Evaluation is not a pre-release event; it is the layer that reads quality change during operations.
-
-> Rule-based checks are the first filter for obvious failures; semantic quality judgment belongs in the next layer.
 
 ## Why this layer matters
 ![Rule checks catch obvious failures first](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/03/03-01-why-this-layer-matters.en.png)

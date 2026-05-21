@@ -27,19 +27,15 @@ last_reviewed: '2026-05-15'
 
 This is post 8 in the Web Development 101 series. Here we treat deployment as a reproducible release process rather than a copy-and-paste ritual so the same build can move safely across environments.
 
+
+![web development 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/08/08-01-concept-at-a-glance.en.png)
+*web development 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - Splitting dev / staging / production environments?
 - Managing environment variables and secrets?
 - The meaning of build and artifact?
-
-## Big Picture
-
-![web development 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/08/08-01-concept-at-a-glance.en.png)
-
-*web development 101 chapter 8 flow overview*
-
-This picture places Deployment inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

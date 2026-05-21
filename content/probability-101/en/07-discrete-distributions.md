@@ -28,21 +28,16 @@ The important thing to memorize is not the names but the situations. What kind o
 
 This is post 7 in the Probability 101 series. Here we use Bernoulli, Binomial, Geometric, and Poisson distributions to build a reusable vocabulary for count data, then connect each distribution to the kind of engineering question it models well.
 
+
+![probability 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/07/07-01-concept-at-a-glance.en.png)
+*probability 101 chapter 7 flow overview*
+> Discrete Distributions requires both definition and intuition, learned through concrete examples.
+
 ## Questions to Keep in Mind
 
 - Why a single 0/1 trial starts with Bernoulli?
 - When repeated successes turn into Binomial?
 - Why waiting for the first success leads to Geometric?
-
-## Big Picture
-
-![probability 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/07/07-01-concept-at-a-glance.en.png)
-
-*probability 101 chapter 7 flow overview*
-
-This picture places Discrete Distributions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Discrete Distributions requires both definition and intuition, learned through concrete examples.
 
 ## Why It Matters
 

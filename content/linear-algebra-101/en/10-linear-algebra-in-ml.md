@@ -26,21 +26,16 @@ If you have followed the series this far, one question remains: where does all o
 
 This is the final post in the Linear Algebra 101 series. Here we will pull linear regression, neural-network layers, embeddings, gradients, and PCA into one closing picture.
 
+
+![linear algebra 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/10/10-01-concept-at-a-glance.en.png)
+*linear algebra 101 chapter 10 flow overview*
+> Linear algebra is the language beneath machine learning. Regression, classification, and dimensionality reduction are all expressed through vector and matrix operations, and the concepts of eigenvalues, decomposition, and orthogonality decide algorithmic efficiency and stability.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Linear Algebra in Machine Learning?
 - Which signal should the example or diagram make visible for Linear Algebra in Machine Learning?
 - What failure should be prevented first when Linear Algebra in Machine Learning reaches a real system?
-
-## Big Picture
-
-![linear algebra 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/10/10-01-concept-at-a-glance.en.png)
-
-*linear algebra 101 chapter 10 flow overview*
-
-This picture places Linear Algebra in Machine Learning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Linear algebra is the language beneath machine learning. Regression, classification, and dimensionality reduction are all expressed through vector and matrix operations, and the concepts of eigenvalues, decomposition, and orthogonality decide algorithmic efficiency and stability.
 
 ## Questions This Post Answers
 

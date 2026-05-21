@@ -27,21 +27,15 @@ The real issue is usually not that the model can use tools. The issue is whether
 
 This is the fourth article in the LangGraph 101 series. Here I want to frame a tool-calling agent not as “a model that knows how to use tools,” but as **a safe execution envelope that separates LLM judgment from actual tool execution**. That distinction matters. **A tool-calling agent is a control loop built from an LLM node, a ToolNode, and explicit termination rules.**
 
+![Tool loop between agent and tools](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/04/04-01-minimal-runnable-example.en.png)
+*Tool loop between agent and tools*
+> The core of a tool-calling agent is not that the model knows tools; it is that tool execution repeats inside a boundary you can validate.
+
 ## Questions to Keep in Mind
 
 - Why should a LangGraph tool-calling agent be read as an LLM plus a separate tool execution envelope?
 - When tool calls repeat, what execution trace should remain in state?
 - What risk appears when tool calls run without a safe dispatcher?
-
-## Big Picture
-
-![Tool loop between agent and tools](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/04/04-01-minimal-runnable-example.en.png)
-
-*Tool loop between agent and tools*
-
-This picture shows an LLM node producing a tool call, a tool execution node running only validated calls, and the result returning to state. The safety of a LangGraph agent comes less from autonomy than from the boundary around execution.
-
-> The core of a tool-calling agent is not that the model knows tools; it is that tool execution repeats inside a boundary you can validate.
 
 ## Why this structure matters
 

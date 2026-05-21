@@ -31,19 +31,15 @@ This is post 8 in the Database Systems 101 series.
 
 > The optimizer is code that estimates costs from statistics and picks the cheapest-looking execution plan. When statistics are stale or the data distribution shifts, the optimizer takes the wrong road. The skill of reading EXPLAIN is the skill of auditing that decision after the fact.
 
+
+![database systems 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/08/08-01-big-picture.en.png)
+*database systems 101 chapter 8 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Query Optimization?
 - Which signal should the example or diagram make visible for Query Optimization?
 - What failure should be prevented first when Query Optimization reaches a real system?
-
-## Big Picture
-
-![database systems 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/08/08-01-big-picture.en.png)
-
-*database systems 101 chapter 8 flow overview*
-
-This picture places Query Optimization inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## What You Will Learn
 

@@ -29,19 +29,15 @@ This is post 9 in the Distributed Systems 101 series.
 
 Here we compare the heavyweight answer of 2PC with the more common production answers: Saga, outbox relay, and idempotent recovery.
 
+
+![distributed systems 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/09/09-01-concept-at-a-glance.en.png)
+*distributed systems 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - The difference between a single-node and a distributed transaction?
 - How 2-phase commit works and where it falls short?
 - The core of Saga — compensating transactions?
-
-## Big Picture
-
-![distributed systems 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/09/09-01-concept-at-a-glance.en.png)
-
-*distributed systems 101 chapter 9 flow overview*
-
-This picture places Distributed Transactions inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

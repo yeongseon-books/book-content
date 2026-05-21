@@ -34,19 +34,14 @@ This is the first article in the Python DB-API 101 series.
 
 *Why DB-API 2.0 - the problem PEP 249 solved*
 
+![python db-api 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-02-1-the-chaos-before-db-api.en.png)
+*python db-api 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - How was database access done in Python before PEP 249?
 - What five things did DB-API 2.0 actually standardize?
 - Why does paramstyle differ across drivers, and how do you protect your code?
-
-## Big Picture
-
-![python db-api 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-02-1-the-chaos-before-db-api.en.png)
-
-*python db-api 101 chapter 1 flow overview*
-
-This picture places Why DB-API 2.0 - The Problem PEP 249 Solved inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## 1. The Chaos Before DB-API
 

@@ -28,19 +28,15 @@ When that reproducibility is missing, debugging turns vague very quickly. You st
 
 This is the first post in the Docker 101 series. It sets the mental model for the rest of the series by clarifying what Docker is, how containers differ from virtual machines, and what you should verify when you run your first container.
 
+
+![docker 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/01/01-01-concept-at-a-glance.en.png)
+*docker 101 chapter 1 flow overview*
+
 ## Questions to Keep in Mind
 
 - The difference between *containers* and *virtual machines?
 - The *environment-drift* problem Docker solves?
 - The big picture of *image / container / registry?
-
-## Big Picture
-
-![docker 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/01/01-01-concept-at-a-glance.en.png)
-
-*docker 101 chapter 1 flow overview*
-
-This picture places What Is Docker? inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why It Matters
 

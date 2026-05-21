@@ -29,19 +29,15 @@ This is post 3 in the Programming Languages 101 series.
 
 In this post, we will treat a type system not as simple data labeling but as a way to reject nonsensical combinations before they run. We will compare static and dynamic typing, strong and weak typing, and then look at why inference and generics raise productivity instead of just adding ceremony.
 
+
+![programming languages 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/03/03-01-concept-at-a-glance.en.png)
+*programming languages 101 chapter 3 flow overview*
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Type Systems?
 - Which signal should the example or diagram make visible for Type Systems?
 - What failure should be prevented first when Type Systems reaches a real system?
-
-## Big Picture
-
-![programming languages 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/03/03-01-concept-at-a-glance.en.png)
-
-*programming languages 101 chapter 3 flow overview*
-
-This picture places Type Systems inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Questions this article answers
 

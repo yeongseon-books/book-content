@@ -30,21 +30,16 @@ This is post 8 in the MLOps 101 series.
 
 Here, we will treat retraining as an operating loop that starts from an explicit trigger, produces a challenger, and separates retraining from promotion.
 
+
+![mlops 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/08/08-01-see-the-flow-first.en.png)
+*mlops 101 chapter 8 flow overview*
+> Retraining is not automatic just because you built the trigger. It is a policy question: which signals justify training, how good must the new model be to promote, and what happens if everything fails?
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Retraining?
 - Which signal should the example or diagram make visible for Retraining?
 - What failure should be prevented first when Retraining reaches a real system?
-
-## Big Picture
-
-![mlops 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/08/08-01-see-the-flow-first.en.png)
-
-*mlops 101 chapter 8 flow overview*
-
-This picture places Retraining inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Retraining is not automatic just because you built the trigger. It is a policy question: which signals justify training, how good must the new model be to promote, and what happens if everything fails?
 
 ## Questions this article answers
 

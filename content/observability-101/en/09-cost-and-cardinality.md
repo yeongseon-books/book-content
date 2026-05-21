@@ -28,21 +28,16 @@ The answer is usually structural, not accidental: too many unique labels, too mu
 
 This is post 9 in the Observability 101 series.
 
+
+![observability 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/09/09-01-concept-at-a-glance.en.png)
+*observability 101 chapter 9 flow overview*
+> Cost and Cardinality is about the boundary decision, not the tool choice.
+
 ## Questions to Keep in Mind
 
 - What boundary should you inspect first when applying Cost and Cardinality?
 - Which signal should the example or diagram make visible for Cost and Cardinality?
 - What failure should be prevented first when Cost and Cardinality reaches a real system?
-
-## Big Picture
-
-![observability 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/09/09-01-concept-at-a-glance.en.png)
-
-*observability 101 chapter 9 flow overview*
-
-This picture places Cost and Cardinality inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Cost and Cardinality is about the boundary decision, not the tool choice.
 
 ## Questions this article answers
 

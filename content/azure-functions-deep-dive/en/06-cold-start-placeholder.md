@@ -39,19 +39,14 @@ The answer to that question is **Placeholder Mode**. This part follows the code 
 
 > All code citations reference [`Azure/azure-functions-host` @ `5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7).
 
+![azure functions deep dive chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/06/06-01-why-cold-start-is-expensive-decomposing.en.png)
+*azure functions deep dive chapter 6 flow overview*
+
 ## Questions to Keep in Mind
 
 - Of host bootstrap, worker start, and JIT, which is the most expensive part of a Functions cold start?
 - What exactly does the Placeholder instance prepare in advance?
 - How does a Premium-plan always-ready instance differ from a placeholder?
-
-## Big Picture
-
-![azure functions deep dive chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/06/06-01-why-cold-start-is-expensive-decomposing.en.png)
-
-*azure functions deep dive chapter 6 flow overview*
-
-This picture places Cold Start and Placeholder Mode — What Happens When a New Instance Is Born inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why Cold Start Is Expensive — Decomposing the Bootstrap Cost
 

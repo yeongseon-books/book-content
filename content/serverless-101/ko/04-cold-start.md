@@ -27,17 +27,15 @@ last_reviewed: '2026-05-12'
 
 서버리스 함수를 처음 호출했을 때만 유독 느려지는 순간이 있습니다. 평균 지표만 보면 잘 안 보이지만, 실제 사용자 경험과 SLO에는 크게 영향을 줍니다. 그래서 콜드 스타트는 입문자가 가장 늦게 이해하면 안 되는 주제 중 하나입니다.
 
+
+![Serverless 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/04/04-01-concept-at-a-glance.ko.png)
+*Serverless 101 4장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 함수의 첫 호출은 왜 느릴까요?
 - 콜드 스타트는 어떤 단계들의 합으로 생길까요?
 - 평균이 아니라 p99를 봐야 하는 이유는 무엇일까요?
-
-## 큰 그림
-
-![Serverless 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/04/04-01-concept-at-a-glance.ko.png)
-
-*Serverless 101 4장 흐름 개요*
 
 ## 왜 이 주제가 중요한가
 

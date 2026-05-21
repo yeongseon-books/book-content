@@ -29,21 +29,16 @@ This is the first post in the API Design 101 series.
 
 Here, we frame an API as a long-lived external contract rather than a bag of functions or URLs. That mental model is what makes the later topics—REST, resources, status codes, schemas, and documentation—fit together instead of feeling like isolated rules.
 
+
+![api design 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/01/01-01-concept-at-a-glance.en.png)
+*api design 101 chapter 1 flow overview*
+> An API is not code you call — it is a contract you commit to maintaining.
+
 ## Questions to Keep in Mind
 
 - The definition and kinds of APIs?
 - Five conditions for a "good API"?
 - Library API vs web API?
-
-## Big Picture
-
-![api design 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/01/01-01-concept-at-a-glance.en.png)
-
-*api design 101 chapter 1 flow overview*
-
-The diagram shows the path from client request through the server boundary to response: the API contract sits exactly at that boundary, defining what the server promises and what clients must rely on.
-
-> An API is not code you call — it is a contract you commit to maintaining.
 
 ## Why It Matters
 

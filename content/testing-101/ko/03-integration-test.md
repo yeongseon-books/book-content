@@ -30,21 +30,16 @@ last_reviewed: '2026-05-12'
 
 이 글은 Testing 101 시리즈의 세 번째 글입니다. 여기서는 통합 테스트가 단위 테스트와 어떻게 다른지, 실제 DB와 HTTP 계층을 왜 붙여 보는지, 그리고 느린 테스트를 어떻게 다루는지 정리하겠습니다.
 
+
+![Testing 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/03/03-01-diagram.ko.png)
+*Testing 101 3장 흐름 개요*
+> 통합 테스트는 부품 조립 상태의 계약 위반을 감시합니다.
+
 ## 먼저 던지는 질문
 
 - 통합 테스트는 무엇을 함께 검증할까요?
 - 실제 DB나 HTTP 계층은 왜 붙여 봐야 할까요?
 - 테스트 컨테이너와 픽스처는 어떤 상황에서 유용할까요?
-
-## 큰 그림
-
-![Testing 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/testing-101/03/03-01-diagram.ko.png)
-
-*Testing 101 3장 흐름 개요*
-
-이 그림에서는 여러 부품의 연결 지점에서 드러나는 버그를 보여줍니다. 단위 테스트가 모두 통과해도 실제 데이터베이스나 외부 시스템을 연결하면 다른 문제가 생길 수 있습니다.
-
-> 통합 테스트는 부품 조립 상태의 계약 위반을 감시합니다.
 
 ## 왜 중요한가
 

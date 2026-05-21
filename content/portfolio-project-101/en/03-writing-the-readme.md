@@ -32,21 +32,16 @@ This is post 3 in the Portfolio Project 101 series. Here we will treat the READM
 
 > A strong README is not just a repository description. It is an entry document that helps a first-time visitor decide what to do next.
 
+
+![portfolio project 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/03/03-01-concept-at-a-glance.en.png)
+*portfolio project 101 chapter 3 flow overview*
+> A README is the face of a repository. If you can explain the problem and solution within a minute, the visitor gains momentum to read code.
+
 ## Questions to Keep in Mind
 
 - What information should a portfolio README show first?
 - Why does the order pitch → demo → stack → run → next feel easy to scan?
 - Why can a README still feel weak even when it contains many screenshots?
-
-## Big Picture
-
-![portfolio project 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/03/03-01-concept-at-a-glance.en.png)
-
-*portfolio project 101 chapter 3 flow overview*
-
-This picture places Writing the README inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A README is the face of a repository. If you can explain the problem and solution within a minute, the visitor gains momentum to read code.
 
 ## Why It Matters
 

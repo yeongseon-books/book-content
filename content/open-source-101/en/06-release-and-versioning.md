@@ -28,21 +28,16 @@ This is post 6 in the Open Source 101 series.
 
 Here, we will connect semantic versioning, changelogs, tags, and release notes into one practical release discipline that users can actually trust.
 
+
+![open source 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/06/06-01-the-basic-release-map.en.png)
+*open source 101 chapter 6 flow overview*
+> Version numbers are not arbitrary. They are promises to users about stability and when to upgrade.
+
 ## Questions to Keep in Mind
 
 - What do the three numbers in semantic versioning actually signal to users?
 - When should you use pre-release labels, and why does skipping them create risk?
 - How should changelogs and release notes work together?
-
-## Big Picture
-
-![open source 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/06/06-01-the-basic-release-map.en.png)
-
-*open source 101 chapter 6 flow overview*
-
-This picture places Release and Versioning inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Version numbers are not arbitrary. They are promises to users about stability and when to upgrade.
 
 ## Why It Matters
 

@@ -28,21 +28,16 @@ last_reviewed: '2026-05-15'
 
 이 글은 Probability 101 시리즈의 2번째 글입니다. 여기서는 표본공간과 사건을 집합 관점에서 정의하고, 합사건·곱사건·여사건·독립 같은 기본 연산을 코드와 함께 정리하겠습니다.
 
+
+![Probability 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/02/02-01-diagram.ko.png)
+*Probability 101 2장 흐름 개요*
+> 차 다른 인수는 육략원소를 중심으로 분류할 때 분명한 기중장이 됩니다.
+
 ## 먼저 던지는 질문
 
 - 표본공간은 왜 확률 계산보다 먼저 나와야 할까요?
 - 사건을 집합으로 쓰면 무엇이 쉬워질까요?
 - 합사건, 곱사건, 여사건은 각각 무엇을 뜻할까요?
-
-## 큰 그림
-
-![Probability 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/02/02-01-diagram.ko.png)
-
-*Probability 101 2장 흐름 개요*
-
-이 그림은 표본공간과 사건을 집합 개념으로 소개합니다. 표본공간이 주어지는 순간, 차 다른 인수가 결정되면 사건과 확률자도 명확해집니다.
-
-> 차 다른 인수는 육략원소를 중심으로 분류할 때 분명한 기중장이 됩니다.
 
 ## 왜 중요한가
 

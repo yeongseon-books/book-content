@@ -30,21 +30,16 @@ This is post 6 in the Portfolio Project 101 series. Here we will look at the lev
 
 > Working code is only a claim until another person can verify it through tests, docs, and repeatable checks.
 
+
+![portfolio project 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/06/06-01-concept-at-a-glance.en.png)
+*portfolio project 101 chapter 6 flow overview*
+> Tests are your record of every verification you have ever done, run automatically. Documentation is the map that lets the next developer—or you—understand again.
+
 ## Questions to Keep in Mind
 
 - What do unit tests, integration tests, and end-to-end checks each prove?
 - Why does even a small portfolio project benefit from automated verification?
 - What kinds of docs make a repository easier to trust and adopt?
-
-## Big Picture
-
-![portfolio project 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/portfolio-project-101/06/06-01-concept-at-a-glance.en.png)
-
-*portfolio project 101 chapter 6 flow overview*
-
-This picture places Tests and Documentation inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Tests are your record of every verification you have ever done, run automatically. Documentation is the map that lets the next developer—or you—understand again.
 
 ## Why It Matters
 

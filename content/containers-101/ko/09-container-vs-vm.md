@@ -29,21 +29,16 @@ last_reviewed: '2026-05-15'
 
 여기서는 호스트 커널 공유와 하이퍼바이저 기반 격리를 대비시키고, 어떤 워크로드에서 컨테이너·VM·microVM을 각각 먼저 검토해야 하는지 살펴봅니다.
 
+
+![Containers 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/09/09-01-concept-at-a-glance.ko.png)
+*Containers 101 9장 흐름 개요*
+> Containers vs VMs의 핵심은 '어느 게 낫다'는 게 아니라, 격리 수준과 리소스 오버헤드를 어느 정도 감수할지에 따라 선택하는 것입니다.
+
 ## 먼저 던지는 질문
 
 - 컨테이너와 VM은 어떤 격리 모델 차이를 가질까요?
 - 커널 공유와 하이퍼바이저 차이는 왜 중요한가요?
 - 시작 속도와 자원 사용량은 얼마나 다르게 느껴질까요?
-
-## 큰 그림
-
-![Containers 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/09/09-01-concept-at-a-glance.ko.png)
-
-*Containers 101 9장 흐름 개요*
-
-컨테이너와 VM은 개념적으로 다른 격리 수준과 리소스 공유 방식을 가집니다. 더 빠르거나 느린 게 아니라 설계 목표가 다릅니다.
-
-> Containers vs VMs의 핵심은 '어느 게 낫다'는 게 아니라, 격리 수준과 리소스 오버헤드를 어느 정도 감수할지에 따라 선택하는 것입니다.
 
 ## 왜 중요한가
 

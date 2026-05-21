@@ -27,17 +27,15 @@ last_reviewed: '2026-05-12'
 
 알고리즘이 이미 정해졌다면 그다음 질문은 종종 "이 코드는 캐시 친화적인가"입니다. 현대 CPU에서는 클럭 속도보다 캐시 미스율이 성능을 훨씬 더 크게 좌우하는 경우가 많기 때문입니다.
 
+
+![Computer Architecture 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/06/06-01-big-picture.ko.png)
+*Computer Architecture 101 6장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 캐시는 메모리 계층 어디에 놓일까요?
 - 시간 지역성과 공간 지역성은 무엇이 다를까요?
 - 캐시 라인은 왜 중요한 비용 단위일까요?
-
-## 큰 그림
-
-![Computer Architecture 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/06/06-01-big-picture.ko.png)
-
-*Computer Architecture 101 6장 흐름 개요*
 
 ## 왜 중요한가
 

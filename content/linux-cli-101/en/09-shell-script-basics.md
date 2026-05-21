@@ -28,19 +28,15 @@ Repeated command sequences are where the CLI starts to pay back the learning cos
 
 This is post 9 in the Linux CLI 101 series.
 
+
+![Linux CLI 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/09/09-01-big-picture.en.png)
+*Linux CLI 101 chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - The basic flow of writing and running a shell script?
 - Bash syntax for variables, `if/else`, and `for` loops?
 - Script arguments (`$1`, `$2`, `$#`) and exit codes (`$?`)?
-
-## Big Picture
-
-![Linux CLI 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/09/09-01-big-picture.en.png)
-
-*Linux CLI 101 chapter 9 flow overview*
-
-This picture places Shell Script Basics inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

@@ -25,17 +25,15 @@ last_reviewed: '2026-05-15'
 
 이 글은 Computer Networks 101 시리즈의 6번째 글입니다.
 
+
+![Computer Networks 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/06/06-01-concept-at-a-glance.ko.png)
+*Computer Networks 101 6장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - TLS가 보장하는 세 가지는 무엇일까요?
 - 핸드셰이크는 어떤 순서로 진행될까요?
 - 인증서, CA, 체인, trust store는 어떤 관계일까요?
-
-## 큰 그림
-
-![Computer Networks 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/06/06-01-concept-at-a-glance.ko.png)
-
-*Computer Networks 101 6장 흐름 개요*
 
 ## 왜 중요한가
 

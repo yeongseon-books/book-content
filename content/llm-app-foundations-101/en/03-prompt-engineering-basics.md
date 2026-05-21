@@ -38,21 +38,15 @@ The main idea is simple: **good prompts start as structured message roles, not a
 
 ---
 
+![Prompt engineering basics: system, user, and assistant roles](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-01-prompt-engineering-basics-system-user-an.en.png)
+*Prompt engineering basics: system, user, and assistant roles*
+> Prompt engineering starts with role boundaries, not nicer wording.
+
 ## Questions to Keep in Mind
 
 - What responsibility belongs to `system`, `user`, and `assistant` messages?
 - Why is a system message stronger than just writing one more first sentence?
 - How do temperature, top_p, and few-shot examples affect answer stability?
-
-## Big Picture
-
-![Prompt engineering basics: system, user, and assistant roles](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-01-prompt-engineering-basics-system-user-an.en.png)
-
-*Prompt engineering basics: system, user, and assistant roles*
-
-This picture shows prompt engineering as role separation inside the messages array. Policy, current request, and prior assistant output need different slots if the answer should stay stable.
-
-> Prompt engineering starts with role boundaries, not nicer wording.
 
 ## Why prompt engineering is more than wording
 

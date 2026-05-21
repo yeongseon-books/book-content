@@ -25,21 +25,16 @@ seo_description: Agent에게 자유를 주면 창의적이지만 위험합니다
 Constraint Harness는 프롬프트에 적힌 훈계문이 아니라 시스템이 반드시 통과해야 하는 강제 장치의 모음입니다. 어떤 도구를 보일지, 얼마나 오래 실행할지, 어떤 출력은 차단할지, 어떤 데이터 범위 밖으로는 못 나가게 할지를 따로 설계해야 합니다.
 이 글은 Harness Engineering 101 시리즈의 4번째 글입니다.
 안전한 에이전트는 착한 프롬프트보다 우회하기 어려운 제약에서 나옵니다.
+
+![Constraint Harness - 규칙, 경계, 금지 행동 정의하기](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/04/04-01-constraint-harness-defining-rules-bounda.ko.png)
+*Constraint Harness - 규칙, 경계, 금지 행동 정의하기*
+> Constraint Harness는 agent에게 “하지 마”라고 말하는 것이 아니라, 할 수 없는 경계를 시스템에 만드는 일입니다.
+
 ## 먼저 던지는 질문
 
 - Constraint Harness는 prompt 규칙과 무엇이 달라야 실제로 agent 행동을 제한할까요?
 - capability, resource, behavior, scope 제약은 각각 어떤 위험을 막을까요?
 - 제약이 실행 계약이 되려면 코드와 로그에 무엇이 남아야 할까요?
-
-## 큰 그림
-
-![Constraint Harness - 규칙, 경계, 금지 행동 정의하기](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/04/04-01-constraint-harness-defining-rules-bounda.ko.png)
-
-*Constraint Harness - 규칙, 경계, 금지 행동 정의하기*
-
-이 그림에서는 규칙, 경계, 금지 행동이 Constraint Harness 안에서 실행 전후의 검증 지점으로 바뀌는 흐름을 봅니다. 제약은 좋은 말투의 지시가 아니라 agent가 실제로 넘을 수 없는 경계여야 합니다.
-
-> Constraint Harness는 agent에게 “하지 마”라고 말하는 것이 아니라, 할 수 없는 경계를 시스템에 만드는 일입니다.
 
 ## 왜 이 글이 중요한가
 Constraint Harness가 중요한 첫 번째 이유는 사고 반경입니다. 잘못된 판단 하나가 데이터 수정, 외부 발송, 비용 폭증으로 이어질 수 있기 때문입니다.

@@ -28,19 +28,15 @@ Most server work is not glamorous. You move release bundles, back up config file
 
 This is post 2 in the Linux CLI 101 series.
 
+
+![Linux CLI 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/02/02-01-big-picture.en.png)
+*Linux CLI 101 chapter 2 flow overview*
+
 ## Questions to Keep in Mind
 
 - The Linux file system hierarchy (`/`, `/home`, `/etc`, `/var`)?
 - Checking your current location and navigating with `pwd`, `cd`, `ls`?
 - Manipulating files and directories with `mkdir`, `touch`, `cp`, `mv`, `rm`?
-
-## Big Picture
-
-![Linux CLI 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/02/02-01-big-picture.en.png)
-
-*Linux CLI 101 chapter 2 flow overview*
-
-This picture places Files and Directories inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 

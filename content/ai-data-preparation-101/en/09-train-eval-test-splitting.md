@@ -27,19 +27,15 @@ Many experiments look healthy right up until they meet production traffic becaus
 
 This is post 9 in the AI Data Preparation 101 series. Here we cover practical split strategies and the checks that keep contamination from invalidating evaluation.
 
+
+![AI data preparation chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/09/09-01-big-picture.en.png)
+*AI data preparation chapter 9 flow overview*
+
 ## Questions to Keep in Mind
 
 - When does a random split stop representing the production problem you actually care about?
 - How do stratified, group, and temporal splits protect against different leakage patterns?
 - Why is contamination now a first-class evaluation problem for LLMs?
-
-## Big Picture
-
-![AI data preparation chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/09/09-01-big-picture.en.png)
-
-*AI data preparation chapter 9 flow overview*
-
-This picture places Train/Eval/Test Splitting and Contamination Control inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## "Doesn't random_split cover it?"
 

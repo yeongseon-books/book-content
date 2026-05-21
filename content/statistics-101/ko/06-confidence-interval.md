@@ -30,21 +30,16 @@ last_reviewed: '2026-05-12'
 
 이 글은 Statistics 101 시리즈의 6번째 글입니다. 여기서는 95% 신뢰구간의 정확한 뜻, 작은 표본에서 t-분포를 써야 하는 이유, 분포 가정이 약할 때 bootstrap이 어떤 대안이 되는지 정리하겠습니다.
 
+
+![Statistics 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/06/06-01-concept-at-a-glance.ko.png)
+*Statistics 101 6장 흐름 개요*
+> 신뢰구간이 좁을수록 추정이 더 정확하고, 운영 결정도 더 분명해집니다.
+
 ## 먼저 던지는 질문
 
 - 95% 신뢰구간은 정확히 무엇을 뜻할까요?
 - 왜 같은 95%라도 작은 표본에서는 t-분포를 써야 할까요?
 - 분포가 비대칭이면 어떤 방식으로 구간을 만들 수 있을까요?
-
-## 큰 그림
-
-![Statistics 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/06/06-01-concept-at-a-glance.ko.png)
-
-*Statistics 101 6장 흐름 개요*
-
-신뢰구간은 '모집단 참값이 이 범위에 있을 확률이 95%(또는 99%) 정도'라고 말하는 방식입니다. 불확실성을 수치화하여 경계로 표현합니다.
-
-> 신뢰구간이 좁을수록 추정이 더 정확하고, 운영 결정도 더 분명해집니다.
 
 ## 왜 중요한가
 

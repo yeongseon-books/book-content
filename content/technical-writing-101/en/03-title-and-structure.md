@@ -28,21 +28,16 @@ A strong title is not just marketing copy. It compresses the reader action and t
 
 This is post 3 in the Technical Writing 101 series. It focuses on shaping titles, outlines, headings, and summaries as one system.
 
+
+![technical writing 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/03/03-01-concept-at-a-glance.en.png)
+*technical writing 101 chapter 3 flow overview*
+> A title makes the promise, and the section headings prove you can deliver it.
+
 ## Questions to Keep in Mind
 
 - SEO* titles?
 - H heading* hierarchy?
 - Intro, body, summary* shape?
-
-## Big Picture
-
-![technical writing 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/03/03-01-concept-at-a-glance.en.png)
-
-*technical writing 101 chapter 3 flow overview*
-
-This picture places Title and Structure inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> A title makes the promise, and the section headings prove you can deliver it.
 
 ## Why It Matters
 

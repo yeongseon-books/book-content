@@ -28,21 +28,15 @@ The core of multi-agent systems is coordination and delegation. Patterns include
 
 This is post 6 in the AI Agent 101 series. Here we cover multi-agent patterns, inter-agent communication protocols, delegation strategies, and when to use multi-agent systems.
 
+![Multi-Agent Patterns](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/06/06-01-multi-agent-patterns.en.png)
+*Multi-Agent Patterns*
+> You need multiple agents not when you want more agents, but when responsibilities conflict inside one agent.
+
 ## Questions to Keep in Mind
 
 - Where is the line between a task that fits one agent and a task that needs multiple agents?
 - What responsibilities should the supervisor, workers, and handoff contract each own?
 - How do cost and failure points grow as you split work across more agents?
-
-## Big Picture
-
-![Multi-Agent Patterns](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/06/06-01-multi-agent-patterns.en.png)
-
-*Multi-Agent Patterns*
-
-This picture shows a supervisor splitting work and role-specific agents exchanging results through a handoff contract. Multi-agent design is not making collaboration look impressive; it is separating responsibility and cost boundaries.
-
-> You need multiple agents not when you want more agents, but when responsibilities conflict inside one agent.
 
 ## Multi-Agent Patterns
 

@@ -26,17 +26,15 @@ last_reviewed: '2026-05-12'
 
 커버리지는 버그가 없음을 증명하지는 않지만, 적어도 어떤 코드가 전혀 실행되지 않았는지는 객관적으로 보여 줍니다. 그래서 테스트 품질을 이야기할 때 커버리지는 출발점으로 매우 유용합니다.
 
+
+![pytest 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/08/08-01-big-picture.ko.png)
+*pytest 101 8장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - 코드 커버리지는 정확히 무엇을 측정할까요?
 - 라인 커버리지와 브랜치 커버리지는 어떻게 다를까요?
 - `pytest-cov`로 누락 라인을 어떻게 확인할 수 있을까요?
-
-## 큰 그림
-
-![pytest 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/pytest-101/08/08-01-big-picture.ko.png)
-
-*pytest 101 8장 흐름 개요*
 
 ## 왜 이 글이 중요한가
 
@@ -698,7 +696,6 @@ pytest -q
 ```text
 PASS
 ```
-
 
 
 추가 메모: 테스트는 실행 결과를 남기고, 실패 입력을 재현 가능한 형태로 보존해야 운영에서 같은 문제를 다시 만나지 않습니다. 이 문단은 바이트 기준 보강과 함께 실무 원칙을 다시 고정하기 위한 메모입니다.

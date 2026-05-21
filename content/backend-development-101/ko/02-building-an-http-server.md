@@ -29,17 +29,15 @@ last_reviewed: '2026-05-15'
 
 여기서는 요청과 응답이 결국 텍스트라는 사실부터 시작해, raw socket과 FastAPI를 함께 보면서 서버의 가장 바닥 구조를 잡아 보겠습니다.
 
+
+![Backend Development 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/02/02-01-concept-at-a-glance.ko.png)
+*Backend Development 101 2장 흐름 개요*
+
 ## 먼저 던지는 질문
 
 - HTTP 요청과 응답은 실제로 어떤 모양의 텍스트일까요?
 - HTTP는 TCP 위에서 어떻게 동작할까요?
 - status code와 header는 왜 단순 장식이 아니라 계약일까요?
-
-## 큰 그림
-
-![Backend Development 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/02/02-01-concept-at-a-glance.ko.png)
-
-*Backend Development 101 2장 흐름 개요*
 
 ## 왜 중요한가
 
@@ -460,7 +458,6 @@ services:
 5. 장애 로그만으로 요청 식별자, 사용자 식별자, 실패 경로를 역추적할 수 있는지 확인합니다.
 
 이 기준선을 매 글의 주제에 연결해 두면 학습이 단발성 지식으로 끝나지 않습니다. 라우팅을 배울 때도, 테스트를 배울 때도, 배포를 배울 때도 같은 운영 질문으로 품질을 판별하게 됩니다.
-
 
 
 ### 장애 복구 훈련 시나리오

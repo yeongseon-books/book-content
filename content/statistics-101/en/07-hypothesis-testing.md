@@ -28,21 +28,16 @@ Hypothesis testing exists because visible differences are not automatically mean
 
 This is post 7 in the Statistics 101 series. Here we will define the null and alternative hypotheses, walk through the basic t-test flow, and explain why Type I error, Type II error, and statistical power matter in real decision-making.
 
+
+![statistics 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/07/07-01-concept-at-a-glance.en.png)
+*statistics 101 chapter 7 flow overview*
+> Hypothesis testing answers: *Is this difference real or just noise?* It does not prove truth—it *measures evidence*.
+
 ## Questions to Keep in Mind
 
 - How far can data support the claim that a difference exists?
 - What do H0 and H1 actually mean?
 - Why is p-value alone not enough?
-
-## Big Picture
-
-![statistics 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/07/07-01-concept-at-a-glance.en.png)
-
-*statistics 101 chapter 7 flow overview*
-
-This picture places Hypothesis Testing inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
-
-> Hypothesis testing answers: *Is this difference real or just noise?* It does not prove truth—it *measures evidence*.
 
 ## Why It Matters
 

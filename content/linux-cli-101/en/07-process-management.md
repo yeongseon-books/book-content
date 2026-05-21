@@ -28,19 +28,15 @@ Process problems show up in very practical ways: a port is already in use, CPU s
 
 This is post 7 in the Linux CLI 101 series.
 
+
+![Linux CLI 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/07/07-01-mental-model.en.png)
+*Linux CLI 101 chapter 7 flow overview*
+
 ## Questions to Keep in Mind
 
 - Checking running processes with `ps` and `top`?
 - Terminating processes with `kill` and `kill -9`?
 - Switching between background and foreground with `&`, `bg`, `fg`, `jobs`?
-
-## Big Picture
-
-![Linux CLI 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/07/07-01-mental-model.en.png)
-
-*Linux CLI 101 chapter 7 flow overview*
-
-This picture places Process Management inside an operating flow. The point is not to memorize the concept in isolation, but to see how input, processing, verification, and operational signals connect across boundaries.
 
 ## Why it matters
 
