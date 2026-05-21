@@ -343,6 +343,370 @@ def test_not_billing_day():
 
 `tmp_path`, `monkeypatch`, `freezegun`을 익히면 시스템 리소스에 의존하는 코드도 충분히 안정적으로 테스트할 수 있습니다. 다음 글에서는 이제 테스트가 실제로 어디까지 코드를 실행하는지, coverage를 통해 객관적으로 확인해 보겠습니다.
 
+## 파일/환경/시간 테스트 통합 시나리오
+
+아래 코드는 보고서 파일 생성 시각과 실행 모드를 함께 기록합니다.
+
+```python
+# reporter.py
+from datetime import datetime
+from pathlib import Path
+import os
+
+
+def write_report(path: Path, message: str) -> None:
+    mode = os.getenv("APP_MODE", "dev")
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    path.write_text(f"[{mode}] {now} {message}\n", encoding="utf-8")
+```
+
+```python
+# test_reporter.py
+from datetime import datetime
+from unittest.mock import patch
+from reporter import write_report
+
+
+def test_write_report(tmp_path, monkeypatch):
+    monkeypatch.setenv("APP_MODE", "prod")
+    out = tmp_path / "report.log"
+
+    with patch("reporter.datetime") as mock_dt:
+        mock_dt.now.return_value = datetime(2025, 5, 1, 9, 30, 0)
+        write_report(out, "job-start")
+
+    text = out.read_text(encoding="utf-8")
+    assert "[prod]" in text
+    assert "2025-05-01 09:30:00" in text
+    assert "job-start" in text
+```
+
+## freezegun 버전
+
+```python
+from freezegun import freeze_time
+from reporter import write_report
+
+
+@freeze_time("2025-05-01 09:30:00")
+def test_write_report_with_freezegun(tmp_path, monkeypatch):
+    monkeypatch.setenv("APP_MODE", "prod")
+    out = tmp_path / "report.log"
+    write_report(out, "job-start")
+    assert "2025-05-01 09:30:00" in out.read_text(encoding="utf-8")
+```
+
+## CLI 출력 예시
+
+```bash
+pytest test_reporter.py -v
+```
+
+```text
+test_reporter.py::test_write_report PASSED
+test_reporter.py::test_write_report_with_freezegun PASSED
+========================= 2 passed =========================
+```
+
+## 실수와 수정
+
+| 실수 | 증상 | 수정 |
+|---|---|---|
+| 고정 경로 `/tmp/report.log` 사용 | 테스트 충돌, 권한 실패 | `tmp_path` 사용 |
+| `os.environ[...] = ...` 직접 수정 | 다른 테스트 오염 | `monkeypatch.setenv/delenv` |
+| `datetime.now()` 직접 비교 | 날짜 바뀌면 실패 | patch 또는 freezegun |
+| 로컬 타임존 가정 | CI에서 불일치 | UTC 또는 명시 정책 |
+
+## Before/After 리팩터링
+
+```python
+# before
+
+def is_expired(expiry_str: str) -> bool:
+    from datetime import datetime
+    expiry = datetime.fromisoformat(expiry_str)
+    return datetime.now() > expiry
+```
+
+```python
+# after
+
+def is_expired(expiry_str: str, now_fn):
+    from datetime import datetime
+    expiry = datetime.fromisoformat(expiry_str)
+    return now_fn() > expiry
+```
+
+두 번째 방식은 테스트가 더 단순합니다.
+
+```python
+from datetime import datetime
+
+
+def test_is_expired():
+    now = lambda: datetime(2025, 1, 10, 0, 0, 0)
+    assert is_expired("2025-01-09T00:00:00", now) is True
+```
+
+
+## 시간대와 경계값 테스트
+
+시간 의존 로직은 날짜 경계에서 자주 실패합니다.
+
+```python
+# scheduler.py
+from datetime import datetime
+
+
+def is_month_end(now: datetime) -> bool:
+    next_day = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    from datetime import timedelta
+    tomorrow = next_day + timedelta(days=1)
+    return tomorrow.month != now.month
+```
+
+```python
+from datetime import datetime
+import pytest
+from scheduler import is_month_end
+
+@pytest.mark.parametrize(
+    "now,expected",
+    [
+        (datetime(2025, 1, 31, 23, 0, 0), True),
+        (datetime(2025, 1, 30, 23, 0, 0), False),
+        (datetime(2024, 2, 29, 10, 0, 0), True),
+    ],
+)
+def test_is_month_end(now, expected):
+    assert is_month_end(now) is expected
+```
+
+## 환경 분기 통합 테스트
+
+```python
+# feature_flag.py
+import os
+
+def use_new_checkout() -> bool:
+    return os.getenv("FEATURE_NEW_CHECKOUT", "off") == "on"
+```
+
+```python
+from feature_flag import use_new_checkout
+
+
+def test_feature_off(monkeypatch):
+    monkeypatch.setenv("FEATURE_NEW_CHECKOUT", "off")
+    assert use_new_checkout() is False
+
+
+def test_feature_on(monkeypatch):
+    monkeypatch.setenv("FEATURE_NEW_CHECKOUT", "on")
+    assert use_new_checkout() is True
+```
+
+## 파일 테스트 안정성 체크
+
+- 인코딩(`utf-8`)을 명시했는가
+- 줄바꿈 차이를 고려했는가
+- 테스트 간 파일명 충돌이 없는가
+- 임시 디렉터리 정리를 수동으로 하지 않는가
+
+
+## 심화 실습 세트: 실패를 빠르게 재현하고 고정하는 루틴
+
+아래 실습은 글 주제와 무관하게 pytest 프로젝트에서 반복적으로 쓰는 루틴입니다. 핵심은 실패를 의도적으로 만들고, 실패 메시지를 읽고, 테스트를 보강하고, 다시 통과시키는 사이클을 짧게 반복하는 것입니다.
+
+### 실습 A: 입력 검증 함수
+
+```python
+# app/input_guard.py
+
+def require_non_empty(value: str) -> str:
+    if value is None:
+        raise TypeError("value cannot be None")
+    if value.strip() == "":
+        raise ValueError("value cannot be blank")
+    return value.strip()
+```
+
+```python
+# tests/test_input_guard.py
+import pytest
+from app.input_guard import require_non_empty
+
+
+def test_require_non_empty_ok():
+    assert require_non_empty("  hello  ") == "hello"
+
+
+@pytest.mark.parametrize("bad", ["", "   ", "\n\t"])
+def test_require_non_empty_blank(bad):
+    with pytest.raises(ValueError, match="blank"):
+        require_non_empty(bad)
+
+
+def test_require_non_empty_none():
+    with pytest.raises(TypeError, match="None"):
+        require_non_empty(None)
+```
+
+```bash
+pytest tests/test_input_guard.py -v
+```
+
+```text
+tests/test_input_guard.py::test_require_non_empty_ok PASSED
+tests/test_input_guard.py::test_require_non_empty_blank[] PASSED
+tests/test_input_guard.py::test_require_non_empty_blank[   ] PASSED
+tests/test_input_guard.py::test_require_non_empty_blank[\n\t] PASSED
+tests/test_input_guard.py::test_require_non_empty_none PASSED
+========================= 5 passed =========================
+```
+
+### 실습 B: 실패 유도 후 원인 파악
+
+함수 구현을 일부러 아래처럼 바꿉니다.
+
+```python
+# 잘못된 구현 예시
+# if value.strip() == "":
+#     return value
+```
+
+다시 실행하면 실패가 즉시 재현됩니다.
+
+```text
+FAILED tests/test_input_guard.py::test_require_non_empty_blank[]
+E   Failed: DID NOT RAISE <class 'ValueError'>
+```
+
+이 출력 하나로 계약 위반 지점을 바로 확인할 수 있습니다.
+
+### 실습 C: 리팩터링 안정성 확인
+
+```python
+# app/input_guard.py (refactor)
+
+def require_non_empty(value: str) -> str:
+    if value is None:
+        raise TypeError("value cannot be None")
+    normalized = value.strip()
+    if normalized == "":
+        raise ValueError("value cannot be blank")
+    return normalized
+```
+
+같은 테스트를 실행해 모두 통과하면, 구조를 바꿔도 계약은 유지된 것입니다.
+
+## 터미널 옵션 조합
+
+| 명령 | 목적 |
+|---|---|
+| `pytest -q` | 빠른 성공/실패 확인 |
+| `pytest -v` | 케이스별 통과/실패 확인 |
+| `pytest -x` | 첫 실패에서 즉시 중단 |
+| `pytest -k "keyword"` | 특정 범위만 선택 실행 |
+| `pytest --maxfail=3` | 최대 실패 수 제한 |
+
+## 운영 회귀 테스트 템플릿
+
+```python
+import pytest
+
+BUG_CASES = [
+    ("", ValueError),
+    ("   ", ValueError),
+    (None, TypeError),
+]
+
+@pytest.mark.parametrize("raw,exc", BUG_CASES)
+def test_regression_cases(raw, exc):
+    with pytest.raises(exc):
+        require_non_empty(raw)
+```
+
+이 템플릿은 버그 이슈를 테스트 코드로 영구 보존하는 가장 단순한 형태입니다.
+
+## 품질 체크 질문
+
+- 실패 메시지만 보고 원인을 추론할 수 있는가
+- 테스트가 실행 순서에 의존하지 않는가
+- 경계값 입력이 포함되어 있는가
+- 정상/오류 경로를 모두 검증하는가
+- 테스트 추가가 함수 복사 대신 데이터 추가로 끝나는가
+
+
+## 추가 케이스 스터디: PR 리뷰에서 자주 보는 개선 포인트
+
+### 코드 예시
+
+```python
+# app/discount.py
+
+def discount_price(price: int, rate: float) -> int:
+    if price < 0:
+        raise ValueError("price must be >= 0")
+    if not 0 <= rate <= 1:
+        raise ValueError("rate must be between 0 and 1")
+    return int(price * (1 - rate))
+```
+
+```python
+# tests/test_discount.py
+import pytest
+from app.discount import discount_price
+
+@pytest.mark.parametrize(
+    "price,rate,expected",
+    [
+        (10000, 0.0, 10000),
+        (10000, 0.1, 9000),
+        (10000, 1.0, 0),
+    ],
+)
+def test_discount_price(price, rate, expected):
+    assert discount_price(price, rate) == expected
+
+@pytest.mark.parametrize("price,rate", [(-1, 0.1), (1000, -0.1), (1000, 1.1)])
+def test_discount_price_invalid(price, rate):
+    with pytest.raises(ValueError):
+        discount_price(price, rate)
+```
+
+### 출력 예시
+
+```bash
+pytest tests/test_discount.py -v
+```
+
+```text
+tests/test_discount.py::test_discount_price[10000-0.0-10000] PASSED
+tests/test_discount.py::test_discount_price[10000-0.1-9000] PASSED
+tests/test_discount.py::test_discount_price[10000-1.0-0] PASSED
+tests/test_discount.py::test_discount_price_invalid[-1-0.1] PASSED
+tests/test_discount.py::test_discount_price_invalid[1000--0.1] PASSED
+tests/test_discount.py::test_discount_price_invalid[1000-1.1] PASSED
+========================= 6 passed =========================
+```
+
+### 리뷰 포인트
+
+- 경계값(`0`, `1.0`)이 포함되어 있는가
+- 예외 타입이 구체적인가
+- 실패 시 메시지로 원인을 알 수 있는가
+- 데이터 추가만으로 케이스 확장이 가능한 구조인가
+
+
+## 미니 점검표
+
+- 실패 케이스를 최소 3개 이상 유지합니다.
+- 경계값(최소/최대/빈값)을 포함합니다.
+- 실패 메시지가 의미 있는지 확인합니다.
+- CI에서 동일 명령으로 재현 가능한지 확인합니다.
+
+
 ## 처음 질문으로 돌아가기
 
 - **파일 테스트에서 왜 실제 경로 대신 `tmp_path`를 써야 할까요?**

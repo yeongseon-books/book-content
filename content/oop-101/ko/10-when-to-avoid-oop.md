@@ -366,6 +366,225 @@ config = {"minimum_score": 80, "chnanel": "email"}  # dict 키 오타가 숨어 
 
 객체지향을 피해야 하는 순간은 클래스가 보호보다 의식을 더 많이 늘릴 때입니다. 이번 리포트 워크플로에서는 상태 없는 헬퍼를 함수로, 데이터 보관용 클래스를 가벼운 구조로, 사소한 전략을 콜러블로 바꾸면서 전체를 직접적인 파이프라인으로 만들었습니다. 동시에 상태와 불변식이 함께 움직이기 시작하면 다시 클래스로 올라가야 하는 기준도 얻었습니다.
 
+## 객체지향을 피해야 하는 신호를 구조로 정리
+
+객체지향을 피해야 하는 상황은 반객체지향이 아니라, 문제 형태와 해법이 맞지 않는 경우입니다.
+
+```text
+입력 변환 파이프라인
+[read_csv] -> [normalize_row] -> [filter_invalid] -> [aggregate] -> [write_report]
+
+도메인 상태 모델
+[Account]
+  + open()
+  + suspend()
+  + close()
+```
+
+첫 번째 형태는 함수 조합이 자연스럽고, 두 번째 형태는 상태 모델 객체가 자연스럽습니다.
+
+## before/after: 과도한 클래스화에서 함수 중심으로
+
+```python
+# before
+class CsvReader:
+    def run(self, path: str) -> list[dict]:
+        ...
+
+class RowNormalizer:
+    def run(self, rows: list[dict]) -> list[dict]:
+        ...
+
+class InvalidFilter:
+    def run(self, rows: list[dict]) -> list[dict]:
+        ...
+```
+
+```python
+# after
+from collections.abc import Iterable
+
+
+def read_csv(path: str) -> list[dict]:
+    ...
+
+
+def normalize_row(row: dict) -> dict:
+    ...
+
+
+def filter_invalid(rows: Iterable[dict]) -> list[dict]:
+    return [r for r in rows if r.get('price', 0) > 0]
+
+
+def pipeline(path: str) -> list[dict]:
+    rows = read_csv(path)
+    normalized = [normalize_row(r) for r in rows]
+    return filter_invalid(normalized)
+```
+
+## 원칙 위반 관점
+
+| 위반 | 증상 | 수정 |
+|---|---|---|
+| 클래스가 데이터 없이 정적 메서드만 가짐 | 사실상 네임스페이스 포장 | 함수 모듈로 단순화 |
+| 생성자 의존성만 8개 이상 | 조립 비용 과다 | use case 분리 또는 함수 파이프라인 |
+| 작은 변환 로직도 객체 1개씩 생성 | 인지 부하 증가 | 순수 함수로 전환 |
+
+## 비교표: 함수형 접근과 객체지향 접근
+
+| 질문 | 함수형 접근 유리 | 객체지향 접근 유리 |
+|---|---|---|
+| 상태 전이가 핵심인가 | 아니오 | 예 |
+| 입력→출력 변환이 반복되는가 | 예 | 아니오 |
+| 규칙이 객체 생명주기에 묶이는가 | 아니오 | 예 |
+| 테스트를 데이터 중심으로 작성하는가 | 예 | 상황별 |
+
+## 혼합 전략
+
+실무에서는 둘 중 하나만 고집하지 않습니다. 도메인 상태는 객체로 모델링하고, 데이터 변환은 순수 함수로 처리하는 혼합 전략이 유지보수 비용을 가장 낮추는 경우가 많습니다.
+
+## 실전 시나리오: 요구사항 변경을 견디는 구조로 바꾸기
+
+현업에서는 기능 추가보다 규칙 변경이 더 자주 발생합니다. 따라서 클래스 구조를 평가할 때는 "지금 동작하는가"보다 "다음 변경을 어디까지 건드려야 하는가"를 기준으로 보는 편이 안전합니다.
+
+```python
+from dataclasses import dataclass
+from typing import Protocol
+
+
+@dataclass
+class LineItem:
+    name: str
+    quantity: int
+    unit_price: int
+
+    def subtotal(self) -> int:
+        return self.quantity * self.unit_price
+
+
+class DiscountPolicy(Protocol):
+    def apply(self, amount: int) -> int:
+        ...
+
+
+class NoDiscount:
+    def apply(self, amount: int) -> int:
+        return amount
+
+
+class PercentDiscount:
+    def __init__(self, percent: int) -> None:
+        if not 0 <= percent <= 100:
+            raise ValueError('percent must be 0..100')
+        self.percent = percent
+
+    def apply(self, amount: int) -> int:
+        return int(amount * (100 - self.percent) / 100)
+
+
+class Invoice:
+    def __init__(self, items: list[LineItem], policy: DiscountPolicy) -> None:
+        self.items = items
+        self.policy = policy
+
+    def total(self) -> int:
+        base = sum(i.subtotal() for i in self.items)
+        return self.policy.apply(base)
+```
+
+이 코드는 할인 규칙이 바뀌어도 `Invoice.total()`을 수정할 필요가 없습니다. 확장은 구현 클래스 추가로 닫히고, 핵심 흐름은 안정적으로 유지됩니다.
+
+## UML 스타일로 보는 협력 관계
+
+```text
+[Invoice]
+  - items: list[LineItem]
+  - policy: DiscountPolicy
+  + total()
+
+[LineItem]
+  + subtotal()
+
+[DiscountPolicy] <<interface>>
+  + apply(amount)
+      ^
+      +-- [NoDiscount]
+      +-- [PercentDiscount]
+```
+
+협력 구조를 이렇게 텍스트로 적어 두면 코드 리뷰에서 "어디가 정책 축이고 어디가 도메인 축인가"를 빠르게 맞출 수 있습니다.
+
+## 안티패턴과 교정 절차
+
+| 안티패턴 | 발견 신호 | 교정 순서 |
+|---|---|---|
+| 거대 클래스(God Object) | 메서드가 20개 이상, 변경 이력이 분산됨 | 책임 축 분해 → 협력 인터페이스 도출 |
+| 데이터만 가진 빈 클래스 | 메서드 없이 getter/setter만 존재 | 규칙 메서드 이동 또는 dataclass로 단순화 |
+| 상속 트리 우회 분기 | 하위 클래스 타입 체크 분기 존재 | 다형성 계약 재정의 |
+| 인프라 타입 누수 | 도메인 계층이 SDK 응답 객체 의존 | DTO 변환 계층 추가 |
+
+## 전후 비교: 테스트 유지비
+
+| 항목 | 리팩터링 전 | 리팩터링 후 |
+|---|---|---|
+| 테스트 준비 | 전역 상태 초기화 필요 | 객체 단위 상태 생성 |
+| 실패 원인 추적 | 함수 체인 전체 역추적 | 클래스 메서드 단위 추적 |
+| 회귀 범위 | 넓고 불명확 | 좁고 예측 가능 |
+
+## 팀 적용 체크리스트
+
+- 도메인 용어와 클래스 이름이 일치하는지 확인합니다.
+- 인스턴스 생성 시점에 불변식이 완성되는지 확인합니다.
+- 정책 변경이 기존 코드 수정이 아닌 구현 추가로 가능한지 점검합니다.
+- 코드 리뷰에서 UML 텍스트 10줄로 협력 구조를 먼저 합의합니다.
+- 테스트 이름이 메서드명보다 비즈니스 규칙을 설명하는지 확인합니다.
+
+## 미니 케이스 스터디: 규칙 추가 한 번으로 검증하기
+
+아래 예시는 정책 확장을 기존 코드 수정 없이 추가하는 최소 단위입니다.
+
+```python
+class WeekendPolicy:
+    def apply(self, amount: int, is_weekend: bool) -> int:
+        if is_weekend:
+            return int(amount * 0.95)
+        return amount
+
+
+def estimate(amount: int, is_weekend: bool) -> int:
+    policy = WeekendPolicy()
+    return policy.apply(amount, is_weekend)
+```
+
+핵심은 새로운 정책이 호출 경로를 깨지 않고 들어온다는 점입니다. 변경 이력이 정책 클래스에만 남도록 경계를 유지하면 회귀 위험이 줄어듭니다.
+
+| 확인 질문 | Pass 기준 |
+|---|---|
+| 새 정책 추가 시 기존 함수 수정이 필요한가 | 아니오 |
+| 예외 정책이 기존 계약과 같은가 | 예 |
+| 테스트가 정책별로 분리되어 있는가 | 예 |
+
+## 검증 노트: 객체 설계 품질을 점검하는 질문
+
+아래 질문은 구현 이후 리뷰에서 반복적으로 사용하는 기준입니다.
+
+- 이 메서드가 실패할 때 예외 타입과 메시지가 호출자 계약과 일치하는가.
+- 같은 규칙이 다른 클래스나 함수에 중복되어 있지 않은가.
+- 상태 변경이 메서드 한 경로로만 이루어지는가.
+- 외부 의존성 없이 단위 테스트가 가능한가.
+
+```python
+def review_signal(duplicate_rules: int, mutable_paths: int) -> str:
+    if duplicate_rules > 0:
+        return '중복 규칙 제거 필요'
+    if mutable_paths > 1:
+        return '상태 변경 경로 통합 필요'
+    return '구조 안정'
+```
+
+이런 체크를 글 단위 예제에도 적용하면, 객체지향을 문법이 아니라 유지보수 전략으로 이해하는 데 도움이 됩니다.
+
 ## 처음 질문으로 돌아가기
 
 - **어떤 신호가 보이면 클래스 기반 설계가 대부분 의식적인 장식에 가깝다고 판단할 수 있을까요?**

@@ -301,6 +301,364 @@ indexed = index_by_key(repo.all())
 
 이 패턴의 장점은 구현 교체 비용이 낮다는 점입니다. `Repository[User]` 계약만 지키면 메모리 저장소를 DB 저장소로 바꿔도 상위 서비스 타입 시그니처를 유지할 수 있습니다. 또한 Protocol 기반 설계는 상속 계층 없이도 구조적 타이핑으로 계약을 검사할 수 있어, 기존 코드에 점진적으로 타입 안전성을 도입할 때 특히 유리합니다.
 
+
+## TypedDict와 dataclass 선택 실전표
+
+| 상황 | TypedDict | dataclass |
+| --- | --- | --- |
+| JSON 입출력 중심 | Pass | 제한적 |
+| 메서드/동작 포함 모델 | 제한적 | Pass |
+| 불변 값 객체 | 어려움 | `frozen=True`로 용이 |
+| 키 오타 탐지 | Pass | 해당 없음 |
+| 직렬화 편의 | dict 그대로 | `asdict()` 필요 |
+
+## mypy 오류와 수정
+
+```python
+from typing import TypedDict
+
+class Profile(TypedDict):
+    username: str
+    age: int
+
+profile: Profile = {"username": "min", "age": "20"}
+```
+
+```text
+example.py:7: error: Incompatible types (expression has type "str", TypedDict item "age" has type "int")  [typeddict-item]
+```
+
+```python
+profile: Profile = {"username": "min", "age": 20}
+```
+
+## dataclass before/after
+
+```python
+# before
+class Point:
+    def __init__(self, x: float, y: float) -> None:
+        self.x = x
+        self.y = y
+```
+
+```python
+# after
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class Point:
+    x: float
+    y: float
+```
+
+코드량이 줄고 비교/표현 계약이 명확해집니다.
+
+
+## mypy 오류를 읽는 순서
+
+실무에서는 오류 개수보다 읽는 순서가 더 중요합니다. 다음 순서를 고정하면 수정 시간이 크게 줄어듭니다.
+
+1. `error:` 뒤의 핵심 문장을 먼저 읽고, 기대 타입과 실제 타입을 분리합니다.
+2. 함수 시그니처 오류인지, 호출부 오류인지 위치를 구분합니다.
+3. `Any`가 끼어 있는지 확인합니다. `Any`가 있으면 오류 메시지가 흐려집니다.
+4. 마지막으로 수정 코드를 넣고 같은 파일만 다시 검사합니다.
+
+```bash
+mypy content/type-hints-python-101/examples/episode.py
+```
+
+```text
+example.py:42: error: Incompatible return value type (got "str", expected "int")  [return-value]
+example.py:51: error: Item "None" of "str | None" has no attribute "upper"  [union-attr]
+Found 2 errors in 1 file (checked 1 source file)
+```
+
+위 출력에서 첫 줄은 반환 계약 위반, 둘째 줄은 Optional 처리 누락입니다. 즉, 타입 힌트 작성과 별개로 **오류를 분류해서 고치는 습관**이 필요합니다.
+
+## 팀 적용 체크포인트
+
+| 항목 | 느슨한 상태 | 권장 상태 |
+| --- | --- | --- |
+| 공개 함수 시그니처 | 일부 누락 | 모두 명시 |
+| `Any` 사용 | 편의상 광범위 사용 | 경계에서만 제한적 사용 |
+| Optional 처리 | 호출부 임의 처리 | `None` 분기 패턴 고정 |
+| 정적 검사 | 로컬 선택 실행 | CI 필수 게이트 |
+| 코드 리뷰 | 스타일 중심 | 타입 계약 위반 중심 |
+
+이 체크포인트를 팀 규칙으로 두면 신규 코드와 레거시 코드의 품질 편차를 줄일 수 있습니다.
+
+
+## 실전 보강: 타입 힌트 + mypy 오류 해결 루프
+
+아래 예시는 타입 힌트가 문서가 아니라 검증 가능한 계약이라는 점을 분명하게 보여 줍니다.
+
+```python
+from typing import TypedDict
+
+class Payment(TypedDict):
+    order_id: int
+    amount: int
+    currency: str
+
+
+def normalize_amount(raw: int | str) -> int:
+    if isinstance(raw, int):
+        return raw
+    if raw.isdigit():
+        return int(raw)
+    raise ValueError("amount must be int or numeric string")
+
+
+def build_payment(order_id: int, amount: int | str, currency: str | None) -> Payment:
+    if currency is None:
+        raise ValueError("currency is required")
+    return {
+        "order_id": order_id,
+        "amount": normalize_amount(amount),
+        "currency": currency.upper(),
+    }
+```
+
+```python
+# 오류를 일부러 넣은 버전
+
+def build_payment(order_id: int, amount: int | str, currency: str | None) -> Payment:
+    return {
+        "order_id": str(order_id),
+        "amount": amount,
+        "currency": currency.upper(),
+    }
+```
+
+```text
+example.py:24: error: Incompatible types (expression has type "str", TypedDict item "order_id" has type "int")  [typeddict-item]
+example.py:25: error: Incompatible types (expression has type "int | str", TypedDict item "amount" has type "int")  [typeddict-item]
+example.py:26: error: Item "None" of "str | None" has no attribute "upper"  [union-attr]
+Found 3 errors in 1 file (checked 1 source file)
+```
+
+위 메시지는 각각 키 타입 불일치, Union 좁히기 누락, Optional 처리 누락을 의미합니다. 즉, 정적 분석기가 실제 운영 버그 후보를 실행 전에 보여 준다는 뜻입니다.
+
+## before/after 요약
+
+| 구분 | before (느슨한 타입) | after (구체 타입) |
+| --- | --- | --- |
+| 입력 계약 | `dict`, `Any` 위주 | `TypedDict`, `Union`, `Optional` 명시 |
+| 오류 발견 시점 | 테스트/운영 단계 | 커밋 전 타입 검사 단계 |
+| 코드 리뷰 초점 | 스타일/명명 | 계약 위반/경계 검증 |
+| 리팩터링 안정성 | 변경 영향 추적 어려움 | 시그니처 기반 영향 추적 가능 |
+
+## Optional vs Union 판단 표
+
+| 상황 | 권장 타입 | 이유 |
+| --- | --- | --- |
+| 값이 없을 수 있음 | `T | None` | 부재 가능성을 명시적으로 표현 |
+| 입력 포맷이 둘 이상 | `T1 | T2` | 허용 범위를 코드로 고정 |
+| 외부 입력 정규화 | `str | int` -> `int` | 경계에서 한 번만 변환 |
+| 내부 도메인 모델 | 가능한 단일 타입 유지 | 분기 복잡도 축소 |
+
+## Protocol vs ABC 판단 표
+
+| 기준 | Protocol | ABC |
+| --- | --- | --- |
+| 호환성 기준 | 구조(메서드/속성) | 명시적 상속 |
+| 외부 클래스 수용 | 유리함 | 불리함 |
+| 공통 구현 제공 | 제한적 | 유리함 |
+| 대규모 플러그인 구조 | 유리함 | 상황별 |
+
+## 실무 패턴: 타입 힌트 적용 순서
+
+1. 공개 함수와 반환 타입부터 고정합니다.
+2. `Any`를 반환하는 경계 함수를 구체 타입으로 줄입니다.
+3. `Optional`과 `Union` 분기를 helper 함수로 끌어올립니다.
+4. mypy/pyright를 CI에 연결해 회귀를 막습니다.
+
+```bash
+mypy content/type-hints-python-101/ko
+```
+
+```text
+Success: no issues found in N source files
+```
+
+위 결과가 나오더라도 끝이 아닙니다. 새로운 기능을 추가할 때 같은 원칙을 반복해 계약을 유지해야 타입 힌트가 장기적으로 품질을 지켜 줍니다.
+
+
+
+## 추가 사례: 주문 처리 모듈 타입 하드닝
+
+아래 코드는 실제로 자주 보는 레거시 패턴입니다.
+
+```python
+from typing import Any
+
+
+def build_invoice(payload: dict[str, Any]) -> dict[str, Any]:
+    user = payload.get("user")
+    total = payload.get("total")
+    return {
+        "email": user.get("email"),
+        "total": int(total),
+    }
+```
+
+이 구현은 `user` 누락, `total` 비정상 값, 잘못된 타입을 조용히 통과시킵니다. 아래처럼 경계를 분리하면 검증 경로가 명확해집니다.
+
+```python
+from typing import TypedDict
+
+class UserInfo(TypedDict):
+    email: str
+
+class InvoicePayload(TypedDict):
+    user: UserInfo
+    total: int | str
+
+class InvoiceResult(TypedDict):
+    email: str
+    total: int
+
+
+def parse_total(raw: int | str) -> int:
+    if isinstance(raw, int):
+        return raw
+    if raw.isdigit():
+        return int(raw)
+    raise ValueError("total must be int or numeric string")
+
+
+def build_invoice(payload: InvoicePayload) -> InvoiceResult:
+    return {
+        "email": payload["user"]["email"],
+        "total": parse_total(payload["total"]),
+    }
+```
+
+```text
+before: 런타임 오류 중심
+after: 타입 오류 + 명시적 예외 중심
+```
+
+## mypy 출력 해석 연습
+
+```text
+service.py:18: error: Key "email" of TypedDict "UserInfo" cannot be deleted  [misc]
+service.py:29: error: Argument 1 to "parse_total" has incompatible type "float"; expected "int | str"  [arg-type]
+service.py:36: error: Missing key "user" for TypedDict "InvoicePayload"  [typeddict-item]
+```
+
+- 첫 번째 오류는 구조적 계약 위반입니다.
+- 두 번째 오류는 허용 타입 범위를 벗어난 호출입니다.
+- 세 번째 오류는 필수 필드 누락입니다.
+
+즉, 오류는 단순 문법 문제가 아니라 **도메인 계약 위반 지표**로 해석해야 합니다.
+
+## 운영 적용 포인트
+
+- 새 기능 PR에서는 최소한 공개 함수의 반환 타입을 반드시 명시합니다.
+- 외부 입력 파싱 함수에는 `Optional`/`Union` 처리 분기를 강제합니다.
+- 리뷰에서 `Any` 추가가 보이면 대체 타입 후보를 함께 요구합니다.
+- CI에서는 타입 검사 실패를 테스트 실패와 동등하게 취급합니다.
+
+
+
+## 보강 메모: 실전 리뷰에서 확인하는 타입 힌트 패턴
+
+### 패턴 1: 경계 파싱 함수를 별도로 둡니다
+
+```python
+def parse_positive_int(raw: int | str) -> int:
+    if isinstance(raw, int):
+        value = raw
+    elif raw.isdigit():
+        value = int(raw)
+    else:
+        raise ValueError("value must be int or numeric string")
+
+    if value <= 0:
+        raise ValueError("value must be positive")
+    return value
+```
+
+이 방식은 서비스 본문에서 반복되는 분기와 형변환을 줄여 줍니다.
+
+### 패턴 2: Optional 값을 바로 사용하지 않습니다
+
+```python
+def normalize_display_name(value: str | None) -> str:
+    if value is None:
+        return "anonymous"
+    stripped = value.strip()
+    if stripped == "":
+        return "anonymous"
+    return stripped
+```
+
+### 패턴 3: 검증 결과 타입을 반환 타입에 고정합니다
+
+```python
+from typing import TypedDict
+
+class NormalizedUser(TypedDict):
+    id: int
+    email: str
+
+
+def build_user(user_id: int, email: str) -> NormalizedUser:
+    return {"id": user_id, "email": email.lower()}
+```
+
+반환 타입 고정은 호출부의 예측 가능성을 크게 높입니다.
+
+## 코드 리뷰 체크 질문
+
+- 이 함수 시그니처만 보고 입력/출력을 이해할 수 있는가?
+- `None` 가능성은 본문에서 실제로 처리되었는가?
+- `Any`가 도입되면 대체 가능한 구체 타입은 없는가?
+- mypy 오류를 숨기는 `type: ignore`가 정말 필요한가?
+
+
+
+
+## 짧은 실전 확인
+
+아래 명령으로 수정 직후 타입 검사를 바로 확인합니다.
+
+```bash
+mypy path/to/example.py
+```
+
+검사 결과가 통과해도 `Optional` 분기와 예외 메시지 품질까지 함께 점검해야 실제 운영에서 디버깅 비용을 줄일 수 있습니다.
+
+
+
+TypedDict와 dataclass를 함께 쓰는 팀에서는 보통 외부 입출력 경계는 TypedDict로, 내부 계산 모델은 dataclass로 분리합니다. 이렇게 두 계층을 나누면 직렬화 형식 변화와 도메인 로직 변경을 독립적으로 다룰 수 있어 유지보수성이 높아집니다.
+
+
+## 비교 기준 보강: TypedDict vs dataclass
+
+| 비교 항목 | TypedDict | dataclass |
+| --- | --- | --- |
+| 런타임 형태 | `dict` | 클래스 인스턴스 |
+| 키/필드 오타 탐지 | 강함(정적) | 필드명 기준(정적/런타임) |
+| 메서드 추가 | 제한적 | 자연스러움 |
+| 불변성 모델링 | 직접 구현 필요 | `frozen=True`로 간결 |
+
+```python
+from dataclasses import dataclass
+from typing import TypedDict
+
+class PaymentRow(TypedDict):
+    amount: int
+    currency: str
+
+@dataclass(frozen=True)
+class Payment:
+    amount: int
+    currency: str
+```
+
 ## 처음 질문으로 돌아가기
 
 - **이름 있는 키와 값 타입을 가진 딕셔너리는 어떻게 표현할까요?**

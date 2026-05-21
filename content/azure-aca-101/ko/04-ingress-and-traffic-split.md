@@ -228,6 +228,215 @@ ACA traffic split은 비율 기반입니다. "이 user-agent만 v2로 보내기"
 - 두 Revision의 `min-replicas`를 같게 유지 — cold start 편향을 피해야 합니다
 - 의미 있는 Revision suffix 사용 — 단순 `v2`보다 `v2-fix-bug-1234`가 낫습니다
 
+## 트래픽 정책 심화 — 구성 예시와 검증 흐름
+
+Ingress를 열고 가중치를 나누는 작업은 한 번의 명령으로 끝나지 않습니다. 설정, 관측, 복귀 조건을 세트로 가져가야 안전합니다.
+
+### 아키텍처 다이어그램 — 정문과 Revision 분기
+
+```mermaid
+flowchart LR
+  C["Client"] --> I["ACA Ingress (TLS 종료)"]
+  I -->|90%| R1["Revision v1"]
+  I -->|10%| R2["Revision v2"]
+  R1 --> LA["Log Analytics"]
+  R2 --> LA
+```
+
+*Revision 가중치 분기와 로그 수집*
+
+### traffic split ARM 예시
+
+```json
+{
+  "configuration": {
+    "activeRevisionsMode": "Multiple",
+    "ingress": {
+      "external": true,
+      "targetPort": 8000,
+      "traffic": [
+        { "revisionName": "myapi--v1", "weight": 90 },
+        { "revisionName": "myapi--v2", "weight": 10 }
+      ]
+    }
+  }
+}
+```
+
+### 검증 루틴 예시
+
+```bash
+# 가중치 확인
+az containerapp ingress traffic show --name myapi --resource-group $RG --output table
+
+# 200회 샘플 호출 후 분포 확인(헤더 기반 revision 식별 로그가 있다는 가정)
+for i in $(seq 1 200); do curl -s https://$FQDN/ >/dev/null; done
+```
+
+예상 관찰:
+
+```text
+revision v1: 176 requests
+revision v2: 24 requests
+```
+
+분포가 정확히 90/10으로 고정되지는 않습니다. 작은 표본에서는 오차가 생기며, 1000회 이상 집계하면 목표값에 수렴합니다.
+
+### 복귀 조건 문서 예시
+
+- 5분 이동 평균 `5xx > 1%`면 즉시 `100/0` 복귀
+- p95 latency가 기준 대비 20% 이상 상승하면 확장 중단
+- 시스템 로그에 probe 실패가 연속 3회 나오면 신규 revision 트래픽 동결
+
+이 기준을 사전에 문서화하면 배포 중 의사결정이 개인 감각이 아니라 팀 규칙으로 바뀝니다.
+
+## 고급 배포 전략 — 기능 플래그와 트래픽 분할 결합
+
+트래픽 분할만으로 모든 위험을 제어할 수는 없습니다. 새 revision 내부에서도 기능 플래그를 같이 써야 blast radius를 더 줄일 수 있습니다.
+
+### 결합 전략 예시
+
+1. v2 배포 후 트래픽 5%
+2. v2 내부 기능 플래그는 OFF 유지
+3. 안정성 확인 후 플래그 ON
+4. 트래픽 50% 확대
+5. 최종 100% 전환
+
+이 방식은 "코드 배포 위험"과 "기능 노출 위험"을 분리합니다.
+
+### CLI 구성 템플릿
+
+```bash
+# v2 배포
+az containerapp update --name myapi --resource-group $RG \
+  --image myregistry.azurecr.io/myapi:v2 --revision-suffix v2
+
+# 95/5
+az containerapp ingress traffic set --name myapi --resource-group $RG \
+  --revision-weight myapi--v1=95 myapi--v2=5
+
+# 상태 확인
+az containerapp ingress traffic show --name myapi --resource-group $RG -o json
+```
+
+### 운영 지표 기준선
+
+- 성공률: 99.9% 이상 유지
+- p95 latency: 기준선 +15% 이내
+- 재시도율: 기준선 +20% 이내
+- 시스템 로그 probe 실패: 0에 가까워야 함
+
+지표를 숫자로 두지 않으면 "괜찮아 보인다" 수준의 판단이 반복됩니다.
+
+### 트러블슈팅 루트
+
+- 분할 비율은 맞는데 v2 요청이 거의 없을 때: 표본 수 부족 또는 캐시 경로 확인
+- v2만 502가 날 때: target-port, startup probe, dependency timeout 순으로 확인
+- rollback 후에도 오류 지속: 트래픽 문제가 아니라 공통 의존성 장애 가능성
+
+### ARM 파라미터화 예시
+
+```json
+{
+  "trafficV1": { "value": 90 },
+  "trafficV2": { "value": 10 }
+}
+```
+
+파라미터화하면 환경별로 같은 템플릿을 재사용하면서도 분할 비율만 안전하게 조정할 수 있습니다.
+
+## 실전 FAQ
+
+### Q1. 포털에서는 정상인데 실제 응답은 불안정한 이유는 무엇일까요?
+
+포털의 Provisioning 성공은 control plane 기준 신호입니다. 실제 사용자 품질은 data plane에서 결정됩니다. 따라서 항상 FQDN 호출 결과, revision health, system log를 함께 봐야 합니다. 운영 체크는 "설정이 저장됐는가"가 아니라 "요청이 안정적으로 처리되는가"로 마무리해야 합니다.
+
+### Q2. `latest` 태그를 쓰면 왜 문제가 될까요?
+
+`latest`는 사람이 보기에는 편하지만 감사/롤백/재현성에 모두 불리합니다. 같은 태그가 다른 이미지를 가리킬 수 있기 때문입니다. 프로덕션에서는 `v1.2.3` 또는 commit SHA처럼 불변 태그를 사용해야 합니다.
+
+### Q3. 스케일과 배포를 동시에 바꾸면 어떤 위험이 있나요?
+
+문제 원인 분리가 어려워집니다. 예를 들어 새 이미지와 새 스케일 규칙을 동시에 올리면 오류가 코드 문제인지 스케일 정책 문제인지 즉시 구분하기 어렵습니다. 안전한 팀은 배포와 스케일 변경을 분리하고, 각 변경마다 관측 지표를 따로 확인합니다.
+
+### Q4. 멀티 서비스에서 네이밍 규칙은 어느 정도로 엄격해야 하나요?
+
+매우 엄격해야 합니다. `orders-api--v12`처럼 서비스명과 revision suffix 패턴을 고정하면 로그, 알림, 런북 자동화가 쉬워집니다. 네이밍이 흔들리면 같은 쿼리를 서비스마다 다르게 써야 하고, 온콜 대응 속도가 느려집니다.
+
+### Q5. 운영 문서에는 최소 무엇이 들어가야 하나요?
+
+- 생성/변경 명령
+- 예상 출력
+- 실패 시 증상
+- 확인할 로그 위치
+- 즉시 복구 명령
+
+이 다섯 가지를 글과 저장소 문서에 같이 유지하면, 팀 내 경험 차이가 있어도 대응 품질이 크게 흔들리지 않습니다.
+
+## 참고용 명령 모음
+
+```bash
+# 앱 목록
+az containerapp list --resource-group $RG -o table
+
+# 단일 앱 상세
+az containerapp show --name $APP --resource-group $RG -o json
+
+# revision 목록
+az containerapp revision list --name $APP --resource-group $RG -o table
+
+# 트래픽 가중치
+az containerapp ingress traffic show --name $APP --resource-group $RG -o table
+
+# 최근 로그
+az containerapp logs show --name $APP --resource-group $RG --tail 100
+```
+
+운영에서 중요한 것은 명령의 개수가 아니라 실행 순서입니다. 앱 상세 → revision 상태 → 트래픽 가중치 → 로그 순서로 보면 대부분의 이슈를 짧은 시간에 분류할 수 있습니다.
+
+트래픽 분할은 비율 조정 기능이지만, 운영 관점에서는 위험 예산을 나누는 도구입니다. 10% canary는 트래픽 10%를 보내는 것이 아니라 장애 영향을 10%로 제한하는 계약입니다. 이 관점을 팀이 공유하면 배포 논의가 훨씬 명확해집니다.
+
+또한 canary 단계마다 관측 기준이 다를 수 있습니다. 초기 5~10% 구간에서는 오류율을, 30~50% 구간에서는 지연 시간과 재시도율을 더 엄격히 보는 식으로 단계별 판단 기준을 둬야 합니다.
+
+실제 운영에서는 배포 자동화보다 롤백 자동화가 더 중요합니다. 이상 신호 감지 후 30초 내에 가중치를 복귀할 수 있어야 blast radius를 작게 유지할 수 있습니다.
+
+## 운영 메모 — 팀 합의가 필요한 항목
+
+실제 운영에서는 기술 선택만큼 팀 합의가 중요합니다. 아래 항목은 서비스별로 값이 달라도 되지만, 같은 서비스 안에서는 반드시 고정해야 합니다.
+
+- 배포 단위: 이미지 태그 규칙, revision suffix 규칙
+- 검증 단위: healthz 통과 기준, canary 관찰 시간
+- 복구 단위: 즉시 rollback 임계치, 단계적 복구 절차
+- 기록 단위: 변경 이력, 영향 범위, 후속 액션
+
+합의가 없는 상태에서는 같은 장애라도 담당자마다 전혀 다른 대응을 하게 됩니다. 반대로 합의를 문서와 자동화에 같이 넣으면, 야간 온콜에서도 대응 품질이 안정적으로 유지됩니다.
+
+### 권장 문서 구조
+
+1. 아키텍처 개요와 경계
+2. 배포 절차와 검증 절차
+3. 장애 분류와 즉시 조치
+4. 모니터링 쿼리와 알림 임계치
+5. 사후 분석(RCA) 템플릿
+
+이 다섯 장이 준비되면 서비스 성숙도는 빠르게 올라갑니다. 특히 신입 엔지니어가 투입되어도 동일한 기준으로 운영할 수 있어 팀 전체의 평균 대응 시간이 짧아집니다.
+
+## 추가 시나리오 — 내부 트래픽만 허용하는 서비스
+
+BFF나 내부 API는 external ingress가 필요 없는 경우가 많습니다. 이때는 `internal` 모드를 쓰고, 호출 주체를 같은 Environment 앱으로 제한하면 표면적 공격면을 줄일 수 있습니다. 내부 서비스라도 revision split 전략은 동일하게 적용할 수 있으므로, 운영 안정성을 희생하지 않고 보안 경계를 강화할 수 있습니다.
+
+```bash
+az containerapp ingress enable \
+  --name internal-api --resource-group $RG \
+  --type internal --target-port 8080
+```
+
+전환 절차는 external 서비스와 같습니다. 새 revision을 10%로 시작하고, 내부 호출 성공률을 확인한 뒤 100%로 올립니다. 차이는 검증 트래픽이 인터넷이 아니라 서비스 간 호출에서 나온다는 점입니다.
+
+운영 경험상 ingress 정책은 애플리케이션 코드보다 변경 빈도가 낮아야 합니다. 잦은 ingress 정책 변경은 DNS, 캐시, 클라이언트 재시도 정책과 결합되어 예상치 못한 장애를 만들 수 있습니다. 그래서 팀은 월 단위로 ingress 변경 창을 묶고, 그 외 기간에는 revision 트래픽 가중치만 조정하는 방식으로 안정성을 확보하는 경우가 많습니다.
+
+추가로, 배포 직후 5분과 30분 지표를 모두 확인해야 단기 이상과 장기 이상을 구분할 수 있습니다.
+
 ## 체크리스트
 
 - [ ] external/internal/disabled ingress mode 차이를 설명할 수 있습니다

@@ -395,6 +395,416 @@ def debug_config():
 
 ## Best Practices Checklist
 
+---
+
+## 설정 변경의 위험 구간과 배포 창 관리
+
+App Service에서 설정 저장은 단순 메타데이터 변경이 아니라 런타임 이벤트입니다. 특히 트래픽이 높은 시간대에는 설정 하나가 가용성에 직접 영향을 줄 수 있습니다.
+
+### 위험이 큰 변경
+
+- 데이터베이스 연결 문자열 교체
+- 인증 관련 시크릿 교체
+- startup command 관련 설정 변경
+- feature flag의 기본값 전환
+
+### 운영 절차 권장안
+
+1. staging 슬롯에 먼저 적용
+2. smoke test 수행
+3. 프로덕션 반영(또는 swap)
+4. 15분간 오류율/지연시간 관찰
+
+```bash
+# staging 슬롯에만 적용
+az webapp config appsettings set \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --slot staging \
+  --settings LOG_LEVEL=INFO FEATURE_X=true
+
+# staging에서 값 확인
+az webapp config appsettings list \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --slot staging \
+  --query "[?name=='FEATURE_X']"
+```
+
+---
+
+## Key Vault 참조 장애 시나리오
+
+Key Vault reference를 도입하면 보안은 좋아지지만, 권한과 네트워크 제약으로 새 장애 유형이 생깁니다.
+
+### 대표 오류 메시지
+
+```text
+KeyVaultReferenceException: Unable to resolve secret reference.
+
+Access denied to Key Vault.
+
+SecretNotFound: A secret with (name/id) was not found in this key vault.
+```
+
+### 1차 점검 순서
+
+1. App Service 관리 ID 활성화 여부
+2. `Key Vault Secrets User` 권한 부여 여부
+3. Secret URI 오타/버전 만료 여부
+4. Key Vault 네트워크 제한(Private endpoint, firewall)
+
+```bash
+az webapp identity show --resource-group $RG --name $APP_NAME --output json
+az role assignment list --assignee $PRINCIPAL_ID --scope $KEYVAULT_ID --output table
+az keyvault secret show --vault-name $KEYVAULT_NAME --name DbPassword --output json
+```
+
+---
+
+## 설정 스냅샷 백업과 복원
+
+운영 중에는 설정 실수보다 복구 지연이 더 큰 비용을 만듭니다. 배포 전에 설정 스냅샷을 남겨 두면 복구 시간이 줄어듭니다.
+
+### 스냅샷 저장
+
+```bash
+az webapp config appsettings list \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --output json > appsettings-backup.json
+```
+
+### 필요한 키만 복원
+
+```bash
+az webapp config appsettings set \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --settings APP_ENV=production LOG_LEVEL=INFO
+```
+
+대규모 환경에서는 이 과정을 IaC 파이프라인으로 자동화하는 편이 안전합니다.
+
+---
+
+## JSON 기반 설정 정책 예시
+
+설정 소스를 코드와 분리하되, 비밀 값은 파일에 직접 두지 않는 패턴입니다.
+
+```json
+{
+  "environment": "production",
+  "required_settings": [
+    "APP_ENV",
+    "DATABASE_URL",
+    "LOG_LEVEL",
+    "APPLICATIONINSIGHTS_CONNECTION_STRING"
+  ],
+  "secret_settings": [
+    "DB_PASSWORD",
+    "JWT_SIGNING_KEY",
+    "PAYMENT_API_KEY"
+  ],
+  "slot_sticky": [
+    "APP_ENV",
+    "DATABASE_URL",
+    "FEATURE_X"
+  ]
+}
+```
+
+이 정책 파일은 문서와 점검 스크립트의 기준점으로 활용할 수 있습니다.
+
+---
+
+## Before/After: 설정이 코드에 섞인 팀 vs 분리된 팀
+
+### Before
+
+- 코드 내부 상수로 API 키와 URL을 관리합니다.
+- 환경별 분기 코드가 늘어나고, PR 리뷰가 어려워집니다.
+- 장애 시 어떤 값이 실제로 적용됐는지 확인이 늦습니다.
+
+### After
+
+- 코드와 설정의 책임이 분리됩니다.
+- 민감 값은 Key Vault, 일반 값은 App Settings로 분류됩니다.
+- 슬롯 sticky 설정으로 swap 후에도 환경 경계가 유지됩니다.
+
+결국 설정 품질은 보안뿐 아니라 배포 안정성과 직결됩니다.
+
+---
+
+## Mermaid로 보는 설정 주입 경로
+
+```mermaid
+flowchart LR
+    A["Portal/CLI/IaC"] --> B["App Settings"]
+    A --> C["Key Vault Secret"]
+    C --> D["Key Vault Reference"]
+    D --> B
+    B --> E["App Process Environment"]
+    E --> F["Flask os.environ"]
+```
+
+설정 입력 경로를 분리해서 보면, 어느 지점에서 장애가 생겼는지 빠르게 좁힐 수 있습니다.
+
+---
+
+## 설정 스키마 검증 자동화 예시
+
+앱 시작 전 검사와 별개로, 배포 파이프라인 단계에서 설정 정책과 실제 App Settings를 비교하면 휴먼 에러를 크게 줄일 수 있습니다.
+
+```python
+import os
+import sys
+
+required = {"APP_ENV", "DATABASE_URL", "LOG_LEVEL"}
+secrets = {"DB_PASSWORD", "JWT_SIGNING_KEY", "PAYMENT_API_KEY"}
+
+actual = set(os.environ.keys())
+missing = sorted(required - actual)
+plain_secret = sorted([k for k in secrets if os.environ.get(k, "").startswith("plain-")])
+
+if missing:
+    print(f"Missing required settings: {', '.join(missing)}")
+    sys.exit(1)
+
+if plain_secret:
+    print(f"Potential plain-text secret values: {', '.join(plain_secret)}")
+    sys.exit(1)
+
+print("Configuration validation passed")
+```
+
+## Key Vault reference 운영 체크 포인트
+
+```bash
+az webapp identity show --resource-group $RG --name $APP_NAME --query "{principalId:principalId,tenantId:tenantId}" --output json
+
+az keyvault secret show --vault-name $KEYVAULT_NAME --name DbPassword --query "{id:id,attributes:attributes}" --output json
+
+az webapp config appsettings list \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --query "[?name=='DB_PASSWORD'].[name,value]" \
+  --output table
+```
+
+참조 문자열이 맞는데도 값 해석이 실패하면 RBAC 역할 범위와 Key Vault 네트워크 제한을 함께 확인해야 합니다.
+
+## slot swap 전후 설정 차이 리뷰 템플릿
+
+```yaml
+config_change_review:
+  change_id: CFG-2026-05-12-01
+  target_slot: production
+  restart_expected: true
+  changed_keys:
+    - LOG_LEVEL
+    - FEATURE_X
+  sticky_keys_checked:
+    - APP_ENV
+    - DATABASE_URL
+  rollback_plan:
+    method: appsettings-backup-restore
+  verification:
+    - health_endpoint_200
+    - error_rate_stable_15m
+```
+
+설정 변경을 코드 변경처럼 리뷰하면 운영 중 가장 흔한 설정 사고를 구조적으로 줄일 수 있습니다.
+
+---
+
+## 설정 키 네이밍 규칙 예시
+
+```text
+APP_ENV, LOG_LEVEL, FEATURE_X_ENABLED
+DATABASE_URL, REDIS_HOST
+PAYMENT_API_KEY (Key Vault reference)
+```
+
+키 이름 규칙을 고정하면 팀 간 전달 시 오타와 의미 충돌을 줄일 수 있습니다.
+
+---
+
+## 처음 질문으로 돌아가기
+
+- app setting, connection string, env var는 어떻게 노출되는가? -> 최종적으로 앱 프로세스의 환경 변수로 주입됩니다.
+- slot-sticky는 언제 도움이 되는가? -> staging과 production이 다른 값을 유지해야 할 때 필수입니다.
+- Key Vault reference와 일반 setting 차이는? -> 값 저장 위치와 접근 권한, 감사 추적 가능성이 다릅니다.
+- 어떤 변경이 재시작을 유발하는가? -> 대부분의 App Settings 변경은 재시작을 동반하므로 변경 배치를 권장합니다.
+- 저장 시 암호화돼도 왜 secret를 직접 두지 않는가? -> 권한 관리, 감사, 회전 주기 측면에서 Key Vault가 운영에 더 안전합니다.
+
+---
+
+## 설정 유효성 검사 코드를 앱 시작 시점에 넣기
+
+운영 장애를 줄이려면 필수 설정 누락을 트래픽 수신 전에 막아야 합니다.
+
+```python
+import os
+
+REQUIRED_SETTINGS = [
+    "APP_ENV",
+    "DATABASE_URL",
+    "LOG_LEVEL",
+]
+
+def validate_settings() -> None:
+    missing = [k for k in REQUIRED_SETTINGS if not os.environ.get(k)]
+    if missing:
+        raise RuntimeError(f"Missing required settings: {', '.join(missing)}")
+
+validate_settings()
+```
+
+이 패턴을 쓰면 "배포는 성공했지만 런타임에서만 실패"하는 유형을 조기에 차단할 수 있습니다.
+
+---
+
+## 환경별 설정 표준 예시
+
+```yaml
+environment_profiles:
+  development:
+    APP_ENV: development
+    LOG_LEVEL: DEBUG
+    FEATURE_X: "false"
+  staging:
+    APP_ENV: staging
+    LOG_LEVEL: INFO
+    FEATURE_X: "true"
+  production:
+    APP_ENV: production
+    LOG_LEVEL: INFO
+    FEATURE_X: "true"
+```
+
+여기서 민감 값은 제외하고 Key Vault reference로 분리합니다.
+
+---
+
+## 흔한 설정 사고 3가지
+
+1. **slot-sticky 누락**
+   - staging DB 설정이 swap 후 production에 노출되는 사고
+2. **키 이름 불일치**
+   - `DB_URL`과 `DATABASE_URL` 혼용으로 런타임 실패
+3. **단건 변경 반복**
+   - 여러 번 재시작이 연쇄적으로 발생
+
+```bash
+# 단건 반복 대신 배치 변경
+az webapp config appsettings set \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --settings APP_ENV=production LOG_LEVEL=INFO FEATURE_X=true
+```
+
+설정 변경 단위를 줄이는 것만으로도 재시작 리스크를 크게 낮출 수 있습니다.
+
+---
+
+## Portal 작업 순서: 사람 실수를 줄이는 방법
+
+1. Configuration 화면에서 변경 전 현재 값 스크린샷/내보내기
+2. 변경 키를 한 번에 입력
+3. slot setting 여부 재확인
+4. Save 후 재시작 이벤트 시점 기록
+5. health endpoint와 핵심 API smoke test
+
+### 확인 질문
+
+- 이 값이 slot별로 달라야 하는가?
+- 민감 정보인가, 일반 설정인가?
+- rollback 시 원복 값이 준비되어 있는가?
+
+운영 중에는 기술 오류보다 절차 오류가 더 자주 발생합니다. 작업 순서를 문서화하면 복구 시간이 짧아집니다.
+
+---
+
+## 진단용 엔드포인트 운용 원칙
+
+설정 검증을 위해 debug endpoint를 쓰더라도, 노출 통제를 반드시 적용해야 합니다.
+
+```python
+@app.route('/internal/config-check')
+def internal_config_check():
+    if os.environ.get("APP_ENV") == "production":
+        return {"error": "forbidden"}, 403
+    return {
+        "APP_ENV": os.environ.get("APP_ENV"),
+        "LOG_LEVEL": os.environ.get("LOG_LEVEL"),
+        "DATABASE_URL_PRESENT": bool(os.environ.get("DATABASE_URL"))
+    }
+```
+
+프로덕션에서는 endpoint 자체를 제거하거나 접근 제한(IP allowlist)을 함께 적용합니다.
+
+---
+
+## 설정 변경 승인 체크리스트
+
+설정은 코드 변경보다 작은 작업처럼 보이지만, 실제 장애 비중은 결코 작지 않습니다. 변경 승인 전에 아래를 확인합니다.
+
+1. 변경 키 목록과 목적이 문서화되었는가
+2. slot-sticky 여부가 명시되었는가
+3. 민감 값이 Key Vault reference인지 확인했는가
+4. 롤백 값과 복구 절차가 준비되었는가
+5. 변경 후 관찰할 메트릭이 정의되었는가
+
+```yaml
+config_change_request:
+  app: myapp-prod
+  keys:
+    - LOG_LEVEL
+    - FEATURE_X
+  slot_sticky:
+    - FEATURE_X
+  rollback:
+    LOG_LEVEL: INFO
+    FEATURE_X: "false"
+  observe:
+    - Http5xx
+    - ResponseTimeP95
+```
+
+이 형식은 변경 승인과 회고를 동시에 단순화합니다.
+
+---
+
+## Key Vault secret 회전 시나리오
+
+secret 회전은 보안 작업이지만, 잘못하면 즉시 장애로 이어집니다.
+
+### 안전한 순서
+
+1. Key Vault에 새 secret 버전 생성
+2. staging 슬롯에서 참조/연결 테스트
+3. production에 적용
+4. 일정 시간 모니터링 후 구버전 폐기
+
+```bash
+# 새 버전 저장
+az keyvault secret set --vault-name $KEYVAULT_NAME --name DbPassword --value "new-password-2026-05"
+
+# 앱 재시작 전후 동작 확인
+az webapp restart --resource-group $RG --name $APP_NAME
+```
+
+회전 후에는 인증 실패율과 DB 연결 오류를 반드시 확인합니다.
+
+### 회전 검증 체크
+
+- 앱 재시작 후 첫 5분 오류율
+- 로그인/결제/주요 API 인증 성공률
+- 이전 secret 버전 제거 전 fallback 테스트 여부
+
+이 체크를 생략하면 회전 직후에는 정상처럼 보여도, 일정 시간 뒤 인증 실패가 누적될 수 있습니다.
+
 ### DO
 
 - [ ] Store sensitive values in Key Vault

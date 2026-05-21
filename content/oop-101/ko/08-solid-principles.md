@@ -479,6 +479,124 @@ python solid_checkout.py
 
 SOLID는 다섯 슬로건을 따로 암기할 때보다, 하나의 취약한 워크플로에 순서대로 적용할 때 실용성이 훨씬 커집니다. 이번 결제 예제에서는 SRP가 책임을 나누고, OCP가 할인 규칙을 확장 가능하게 만들고, LSP가 계약을 정직하게 지키게 하고, ISP가 의존을 좁히고, DIP가 정책 테스트를 쉽게 만들었습니다. 다음 글에서는 이런 기준을 더 큰 설계 예제에 한 번에 적용해 봅니다.
 
+## SOLID를 한 화면에 묶어 보는 구조
+
+SOLID는 다섯 문장을 외우는 과목이 아니라, 변경 비용을 줄이는 설계 규칙입니다.
+
+```text
+[OrderFacade]
+  + place_order()
+    |
+    +--> [Validator]      (SRP)
+    +--> [PricePolicy]    (OCP)
+    +--> [Notifier]       (DIP)
+
+[PricePolicy]
+  ^
+  +-- [DefaultPolicy]
+  +-- [CampaignPolicy]    (LSP)
+```
+
+## before/after: 다중 위반 코드 정리
+
+```python
+# before
+class OrderManager:
+    def place(self, user, items, channel):
+        # 검증, 할인 계산, 저장, 알림 발송이 한 메서드에 혼재
+        ...
+```
+
+```python
+# after
+class OrderValidator:
+    def validate(self, items: list[dict]) -> None:
+        if not items:
+            raise ValueError('items required')
+
+class PricePolicy:
+    def total(self, items: list[dict]) -> int:
+        return sum(x['qty'] * x['price'] for x in items)
+
+class Notifier:
+    def send(self, channel: str, text: str) -> None:
+        if channel not in {'email', 'slack'}:
+            raise ValueError('unsupported channel')
+
+class OrderManager:
+    def __init__(self, validator: OrderValidator, policy: PricePolicy, notifier: Notifier) -> None:
+        self.validator = validator
+        self.policy = policy
+        self.notifier = notifier
+
+    def place(self, items: list[dict], channel: str) -> int:
+        self.validator.validate(items)
+        amount = self.policy.total(items)
+        self.notifier.send(channel, f'ordered:{amount}')
+        return amount
+```
+
+## 원칙별 점검표
+
+| 원칙 | 위반 신호 | 빠른 교정 |
+|---|---|---|
+| SRP | 클래스 변경 이유가 3개 이상 | 역할별 클래스로 분리 |
+| OCP | 기능 추가마다 기존 if 수정 | 전략 구현 추가로 확장 |
+| LSP | 하위 타입이 예외를 임의로 바꿈 | 계약 테스트 작성 |
+| ISP | 인터페이스 메서드 다수가 미사용 | 작은 인터페이스로 분할 |
+| DIP | 상위 계층이 SDK에 직접 의존 | 추상 포트 주입 |
+
+## SOLID 적용의 실제 경계: 원칙 간 충돌을 조정하기
+
+실무에서 SRP를 강하게 적용하면 클래스 수가 급증하고, 반대로 단순화를 우선하면 책임이 뭉칩니다. 중요한 점은 원칙을 동시에 100점으로 맞추는 것이 아니라 변경 비용이 큰 지점을 먼저 줄이는 것입니다.
+
+```python
+class ShippingFeePolicy:
+    def fee(self, region: str, weight: float) -> int:
+        if region == 'KR':
+            return 3000 if weight < 3 else 5000
+        return 12000
+
+
+class FreeShippingPolicy(ShippingFeePolicy):
+    def fee(self, region: str, weight: float) -> int:
+        return 0
+```
+
+위 구조에서 OCP를 확보했더라도, 호출자가 하위 타입별 예외 처리를 추가하면 LSP가 깨집니다. 계약 테스트를 두어 모든 정책이 동일한 입력 도메인과 예외 정책을 지키도록 맞춰야 합니다.
+
+| 상황 | 우선 원칙 | 이유 |
+|---|---|---|
+| 배포 직전 급한 기능 추가 | OCP | 기존 코드 수정 최소화 |
+| 장애 원인 추적이 어려움 | SRP | 책임 분리로 디버깅 경로 단축 |
+| 테스트 더블 작성이 과도함 | ISP | 인터페이스를 작게 나눠 결합 축소 |
+| 외부 SDK 교체 예정 | DIP | 상위 계층 안정화 |
+
+## 미니 케이스 스터디: 규칙 추가 한 번으로 검증하기
+
+아래 예시는 정책 확장을 기존 코드 수정 없이 추가하는 최소 단위입니다.
+
+```python
+class WeekendPolicy:
+    def apply(self, amount: int, is_weekend: bool) -> int:
+        if is_weekend:
+            return int(amount * 0.95)
+        return amount
+
+
+def estimate(amount: int, is_weekend: bool) -> int:
+    policy = WeekendPolicy()
+    return policy.apply(amount, is_weekend)
+```
+
+핵심은 새로운 정책이 호출 경로를 깨지 않고 들어온다는 점입니다. 변경 이력이 정책 클래스에만 남도록 경계를 유지하면 회귀 위험이 줄어듭니다.
+
+| 확인 질문 | Pass 기준 |
+|---|---|
+| 새 정책 추가 시 기존 함수 수정이 필요한가 | 아니오 |
+| 예외 정책이 기존 계약과 같은가 | 예 |
+| 테스트가 정책별로 분리되어 있는가 | 예 |
+
 ## 처음 질문으로 돌아가기
 
 - **지금 보이는 증상에 어떤 원칙이 연결되는지 어떻게 판단할까요?**

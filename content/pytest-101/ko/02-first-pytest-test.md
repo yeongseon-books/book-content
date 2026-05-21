@@ -329,6 +329,424 @@ def test_place_rejects_invalid_quantity(order_service: OrderService) -> None:
 
 또한 fixture scope를 무조건 넓히지 않는 편이 안전합니다. DB 연결이나 임시 디렉터리처럼 생성 비용이 큰 자원만 `module` 또는 `session`으로 올리고, 나머지는 `function` scope로 두어 테스트 독립성을 유지하는 것이 좋습니다.
 
+## 실전 구조 설계: 작은 프로젝트를 테스트 가능한 형태로 시작하기
+
+다음 구조는 입문 단계에서 가장 실수가 적은 형태입니다.
+
+```text
+myapp/
+├── pyproject.toml
+├── src/
+│   └── myapp/
+│       ├── __init__.py
+│       ├── parser.py
+│       └── service.py
+└── tests/
+    ├── conftest.py
+    ├── test_parser.py
+    └── test_service.py
+```
+
+`parser.py`와 `service.py`를 분리하면, 순수 로직과 외부 의존 경계를 분리해 테스트하기 쉽습니다.
+
+```python
+# src/myapp/parser.py
+
+def parse_limit(value: str) -> int:
+    num = int(value)
+    if num <= 0:
+        raise ValueError("limit must be positive")
+    return num
+```
+
+```python
+# src/myapp/service.py
+from myapp.parser import parse_limit
+
+
+def build_query(limit: str) -> str:
+    n = parse_limit(limit)
+    return f"SELECT * FROM users LIMIT {n}"
+```
+
+```python
+# tests/test_service.py
+import pytest
+from myapp.service import build_query
+
+
+def test_build_query():
+    assert build_query("10") == "SELECT * FROM users LIMIT 10"
+
+
+def test_build_query_rejects_non_positive():
+    with pytest.raises(ValueError, match="positive"):
+        build_query("0")
+```
+
+## pytest 실행 패턴과 출력 읽기
+
+```bash
+pytest -q
+```
+
+```text
+..                                                                   [100%]
+2 passed in 0.03s
+```
+
+```bash
+pytest -v tests/test_service.py::test_build_query
+```
+
+```text
+tests/test_service.py::test_build_query PASSED
+========================= 1 passed =========================
+```
+
+실패 출력도 익숙해져야 합니다.
+
+```python
+def test_build_query():
+    assert build_query("10") == "SELECT * FROM users LIMIT 20"
+```
+
+```text
+E       AssertionError: assert 'SELECT * FROM users LIMIT 10' == 'SELECT * FROM users LIMIT 20'
+```
+
+## discovery 관련 실수 재현과 수정
+
+### 실수 1: 파일명 규칙 위반
+
+`tests/service_testcase.py`처럼 작성하면 기본 규칙에서 누락될 수 있습니다.
+
+해결: `test_service.py` 또는 `service_test.py`를 사용합니다.
+
+### 실수 2: 클래스명 규칙 위반
+
+```python
+class ServiceTests:
+    def test_build_query(self):
+        ...
+```
+
+해결: `class TestService:` 형태를 사용합니다.
+
+### 실수 3: 잘못된 import 경로
+
+```python
+from src.myapp.service import build_query
+```
+
+이 방식은 로컬에서는 우연히 통과해도 CI에서 실패하기 쉽습니다.
+
+해결: `pythonpath = ["src"]`를 설정하고 `from myapp.service import ...`를 사용합니다.
+
+## conftest.py를 이용한 공통 준비
+
+```python
+# tests/conftest.py
+import pytest
+
+@pytest.fixture
+def sample_limits():
+    return ["1", "10", "100"]
+```
+
+```python
+# tests/test_parser.py
+from myapp.parser import parse_limit
+
+
+def test_parse_limit_values(sample_limits):
+    assert [parse_limit(x) for x in sample_limits] == [1, 10, 100]
+```
+
+이 구조를 초기에 잡으면 이후 fixture, parametrization, mock을 추가해도 디렉터리 규칙이 흔들리지 않습니다.
+
+
+## 프로젝트 부팅 체크: 처음부터 흔들리지 않는 pytest 셋업
+
+처음 셋업에서 흔들리면 이후 모든 글의 실습이 불안정해집니다. 아래 순서로 고정하면 실패 확률이 크게 줄어듭니다.
+
+### pyproject.toml 예시
+
+```toml
+[project]
+name = "myapp"
+version = "0.1.0"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-ra -q"
+```
+
+### 최소 코드와 테스트
+
+```python
+# src/myapp/math_ops.py
+
+def multiply(a: int, b: int) -> int:
+    return a * b
+```
+
+```python
+# tests/test_math_ops.py
+from myapp.math_ops import multiply
+
+
+def test_multiply_positive():
+    assert multiply(3, 4) == 12
+
+
+def test_multiply_zero():
+    assert multiply(3, 0) == 0
+```
+
+### 실행 출력
+
+```bash
+pytest -v
+```
+
+```text
+tests/test_math_ops.py::test_multiply_positive PASSED
+tests/test_math_ops.py::test_multiply_zero PASSED
+========================= 2 passed =========================
+```
+
+## discovery 디버깅 루틴
+
+1. `pytest --collect-only -q`로 수집 노드를 확인합니다.
+2. 기대한 파일/함수가 없으면 이름 규칙을 먼저 점검합니다.
+3. 그다음 import 경로(`pythonpath`)를 확인합니다.
+
+```bash
+pytest --collect-only -q
+```
+
+```text
+tests/test_math_ops.py::test_multiply_positive
+tests/test_math_ops.py::test_multiply_zero
+```
+
+## Before/After: 구조 개편 예시
+
+```text
+# before
+project/
+├── app.py
+├── util_test_final.py
+└── something.py
+```
+
+```text
+# after
+project/
+├── src/myapp/
+│   ├── __init__.py
+│   └── something.py
+└── tests/
+    └── test_something.py
+```
+
+이 변경은 테스트 발견 실패, import 오류, 실행 방법 불일치 문제를 동시에 줄입니다.
+
+## 팀 규칙 템플릿
+
+- 테스트 파일명: `test_*.py`
+- 테스트 함수명: `test_*`
+- 기능 수정 PR: 최소 1개 테스트 추가
+- 버그 수정 PR: 재현 테스트 필수
+
+
+## 심화 실습 세트: 실패를 빠르게 재현하고 고정하는 루틴
+
+아래 실습은 글 주제와 무관하게 pytest 프로젝트에서 반복적으로 쓰는 루틴입니다. 핵심은 실패를 의도적으로 만들고, 실패 메시지를 읽고, 테스트를 보강하고, 다시 통과시키는 사이클을 짧게 반복하는 것입니다.
+
+### 실습 A: 입력 검증 함수
+
+```python
+# app/input_guard.py
+
+def require_non_empty(value: str) -> str:
+    if value is None:
+        raise TypeError("value cannot be None")
+    if value.strip() == "":
+        raise ValueError("value cannot be blank")
+    return value.strip()
+```
+
+```python
+# tests/test_input_guard.py
+import pytest
+from app.input_guard import require_non_empty
+
+
+def test_require_non_empty_ok():
+    assert require_non_empty("  hello  ") == "hello"
+
+
+@pytest.mark.parametrize("bad", ["", "   ", "\n\t"])
+def test_require_non_empty_blank(bad):
+    with pytest.raises(ValueError, match="blank"):
+        require_non_empty(bad)
+
+
+def test_require_non_empty_none():
+    with pytest.raises(TypeError, match="None"):
+        require_non_empty(None)
+```
+
+```bash
+pytest tests/test_input_guard.py -v
+```
+
+```text
+tests/test_input_guard.py::test_require_non_empty_ok PASSED
+tests/test_input_guard.py::test_require_non_empty_blank[] PASSED
+tests/test_input_guard.py::test_require_non_empty_blank[   ] PASSED
+tests/test_input_guard.py::test_require_non_empty_blank[\n\t] PASSED
+tests/test_input_guard.py::test_require_non_empty_none PASSED
+========================= 5 passed =========================
+```
+
+### 실습 B: 실패 유도 후 원인 파악
+
+함수 구현을 일부러 아래처럼 바꿉니다.
+
+```python
+# 잘못된 구현 예시
+# if value.strip() == "":
+#     return value
+```
+
+다시 실행하면 실패가 즉시 재현됩니다.
+
+```text
+FAILED tests/test_input_guard.py::test_require_non_empty_blank[]
+E   Failed: DID NOT RAISE <class 'ValueError'>
+```
+
+이 출력 하나로 계약 위반 지점을 바로 확인할 수 있습니다.
+
+### 실습 C: 리팩터링 안정성 확인
+
+```python
+# app/input_guard.py (refactor)
+
+def require_non_empty(value: str) -> str:
+    if value is None:
+        raise TypeError("value cannot be None")
+    normalized = value.strip()
+    if normalized == "":
+        raise ValueError("value cannot be blank")
+    return normalized
+```
+
+같은 테스트를 실행해 모두 통과하면, 구조를 바꿔도 계약은 유지된 것입니다.
+
+## 터미널 옵션 조합
+
+| 명령 | 목적 |
+|---|---|
+| `pytest -q` | 빠른 성공/실패 확인 |
+| `pytest -v` | 케이스별 통과/실패 확인 |
+| `pytest -x` | 첫 실패에서 즉시 중단 |
+| `pytest -k "keyword"` | 특정 범위만 선택 실행 |
+| `pytest --maxfail=3` | 최대 실패 수 제한 |
+
+## 운영 회귀 테스트 템플릿
+
+```python
+import pytest
+
+BUG_CASES = [
+    ("", ValueError),
+    ("   ", ValueError),
+    (None, TypeError),
+]
+
+@pytest.mark.parametrize("raw,exc", BUG_CASES)
+def test_regression_cases(raw, exc):
+    with pytest.raises(exc):
+        require_non_empty(raw)
+```
+
+이 템플릿은 버그 이슈를 테스트 코드로 영구 보존하는 가장 단순한 형태입니다.
+
+## 품질 체크 질문
+
+- 실패 메시지만 보고 원인을 추론할 수 있는가
+- 테스트가 실행 순서에 의존하지 않는가
+- 경계값 입력이 포함되어 있는가
+- 정상/오류 경로를 모두 검증하는가
+- 테스트 추가가 함수 복사 대신 데이터 추가로 끝나는가
+
+
+## 추가 케이스 스터디: PR 리뷰에서 자주 보는 개선 포인트
+
+### 코드 예시
+
+```python
+# app/discount.py
+
+def discount_price(price: int, rate: float) -> int:
+    if price < 0:
+        raise ValueError("price must be >= 0")
+    if not 0 <= rate <= 1:
+        raise ValueError("rate must be between 0 and 1")
+    return int(price * (1 - rate))
+```
+
+```python
+# tests/test_discount.py
+import pytest
+from app.discount import discount_price
+
+@pytest.mark.parametrize(
+    "price,rate,expected",
+    [
+        (10000, 0.0, 10000),
+        (10000, 0.1, 9000),
+        (10000, 1.0, 0),
+    ],
+)
+def test_discount_price(price, rate, expected):
+    assert discount_price(price, rate) == expected
+
+@pytest.mark.parametrize("price,rate", [(-1, 0.1), (1000, -0.1), (1000, 1.1)])
+def test_discount_price_invalid(price, rate):
+    with pytest.raises(ValueError):
+        discount_price(price, rate)
+```
+
+### 출력 예시
+
+```bash
+pytest tests/test_discount.py -v
+```
+
+```text
+tests/test_discount.py::test_discount_price[10000-0.0-10000] PASSED
+tests/test_discount.py::test_discount_price[10000-0.1-9000] PASSED
+tests/test_discount.py::test_discount_price[10000-1.0-0] PASSED
+tests/test_discount.py::test_discount_price_invalid[-1-0.1] PASSED
+tests/test_discount.py::test_discount_price_invalid[1000--0.1] PASSED
+tests/test_discount.py::test_discount_price_invalid[1000-1.1] PASSED
+========================= 6 passed =========================
+```
+
+### 리뷰 포인트
+
+- 경계값(`0`, `1.0`)이 포함되어 있는가
+- 예외 타입이 구체적인가
+- 실패 시 메시지로 원인을 알 수 있는가
+- 데이터 추가만으로 케이스 확장이 가능한 구조인가
+
+
 ## 처음 질문으로 돌아가기
 
 - **pytest는 테스트 파일과 함수를 어떤 규칙으로 자동 탐색할까요?**

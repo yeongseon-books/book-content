@@ -307,6 +307,402 @@ def test_place_rejects_invalid_quantity(order_service: OrderService) -> None:
 
 또한 fixture scope를 무조건 넓히지 않는 편이 안전합니다. DB 연결이나 임시 디렉터리처럼 생성 비용이 큰 자원만 `module` 또는 `session`으로 올리고, 나머지는 `function` scope로 두어 테스트 독립성을 유지하는 것이 좋습니다.
 
+## coverage 리포트를 실제 개선으로 연결하는 흐름
+
+커버리지 숫자만 보는 단계에서 멈추지 않고, 누락 라인을 테스트 추가로 연결해야 품질이 올라갑니다.
+
+```python
+# src/myapp/score.py
+
+def grade(score: int) -> str:
+    if score < 0 or score > 100:
+        raise ValueError("score out of range")
+    if score >= 90:
+        return "A"
+    if score >= 80:
+        return "B"
+    if score >= 70:
+        return "C"
+    if score >= 60:
+        return "D"
+    return "F"
+```
+
+```python
+# tests/test_score.py (초기)
+from myapp.score import grade
+
+
+def test_grade_a():
+    assert grade(95) == "A"
+```
+
+```bash
+pytest --cov=src/myapp --cov-report=term-missing
+```
+
+```text
+Name                Stmts   Miss  Cover   Missing
+src/myapp/score.py     11      8    27%   4-11
+```
+
+누락 분기를 채우면 수치와 신뢰가 함께 올라갑니다.
+
+```python
+# tests/test_score.py (보강)
+import pytest
+from myapp.score import grade
+
+@pytest.mark.parametrize(
+    "score,expected",
+    [
+        (95, "A"),
+        (85, "B"),
+        (75, "C"),
+        (65, "D"),
+        (10, "F"),
+    ],
+)
+def test_grade_bands(score, expected):
+    assert grade(score) == expected
+
+@pytest.mark.parametrize("bad", [-1, 101])
+def test_grade_range_error(bad):
+    with pytest.raises(ValueError, match="out of range"):
+        grade(bad)
+```
+
+```bash
+pytest --cov=src/myapp --cov-report=term-missing --cov-branch
+```
+
+```text
+Name                Stmts   Miss Branch BrPart  Cover   Missing
+src/myapp/score.py     11      0      6      0   100%
+```
+
+## 커버리지 기준선 운영 예시
+
+```toml
+# pyproject.toml
+[tool.pytest.ini_options]
+addopts = "--cov=src/myapp --cov-report=term-missing --cov-fail-under=85"
+```
+
+이 설정으로 PR에서 기준 미달을 즉시 차단할 수 있습니다.
+
+## 라인 커버리지 vs 브랜치 커버리지
+
+| 항목 | 라인 커버리지 | 브랜치 커버리지 |
+|---|---|---|
+| 의미 | 코드 줄 실행 여부 | 조건 분기 실행 여부 |
+| 놓치기 쉬운 문제 | if의 else 미실행 | 상대적으로 적음 |
+| 권장 사용 | 기본 측정 | 핵심 모듈에 함께 적용 |
+
+## 흔한 오해 정리
+
+- 커버리지 100%여도 assert가 약하면 품질이 낮을 수 있습니다.
+- 커버리지 70%여도 핵심 경계를 잘 잡으면 실무 가치가 클 수 있습니다.
+- 숫자 자체보다 누락 라인의 성격이 더 중요합니다.
+
+## Before/After: 커버리지 주도 리팩터링
+
+```python
+# before: 분기 많은 함수 한 덩어리
+
+def shipping_label(country: str, express: bool) -> str:
+    if country == "KR":
+        if express:
+            return "KR-EXP"
+        return "KR-STD"
+    if country == "US":
+        if express:
+            return "US-EXP"
+        return "US-STD"
+    return "INTL"
+```
+
+테스트로 분기를 고정한 뒤 데이터 맵으로 단순화할 수 있습니다.
+
+```python
+# after
+MAP = {
+    ("KR", True): "KR-EXP",
+    ("KR", False): "KR-STD",
+    ("US", True): "US-EXP",
+    ("US", False): "US-STD",
+}
+
+
+def shipping_label(country: str, express: bool) -> str:
+    return MAP.get((country, express), "INTL")
+```
+
+동작을 보존하면서 코드 가독성과 테스트 가시성을 동시에 높일 수 있습니다.
+
+
+## 커버리지 리포트 읽는 순서
+
+1. TOTAL 수치보다 `Missing` 라인부터 확인합니다.
+2. 누락 라인이 핵심 로직인지, 단순 보일러플레이트인지 구분합니다.
+3. 핵심 로직 누락이면 테스트를 먼저 추가합니다.
+4. 분기 많은 함수는 `--cov-branch`를 같이 봅니다.
+
+## HTML 리포트 활용
+
+```bash
+pytest --cov=src/myapp --cov-report=html
+```
+
+실행 후 `htmlcov/index.html`을 열어 빨간 줄(미실행)을 우선 처리합니다.
+
+## 실패 기준 강제
+
+```bash
+pytest --cov=src/myapp --cov-fail-under=90
+```
+
+```text
+ERROR: Coverage failure: total of 84 is less than fail-under=90
+```
+
+이 실패는 테스트 품질 회귀를 막는 안전장치입니다.
+
+## 제외 규칙은 최소화
+
+```ini
+# .coveragerc
+[run]
+source = src/myapp
+
+[report]
+omit =
+    */__init__.py
+```
+
+무분별한 omit 설정은 숫자를 좋게 보이게만 만들고 실제 위험을 숨길 수 있습니다.
+
+## 운영 기준 예시
+
+| 항목 | 기준 |
+|---|---|
+| 신규 모듈 | 90% 이상 |
+| 핵심 도메인 모듈 | 95% 이상 + branch |
+| 레거시 모듈 | 점진적 상향 |
+| PR 품질 게이트 | fail-under 적용 |
+
+## 결론 패턴
+
+커버리지는 통과/실패 숫자가 아니라 누락 구간 탐지 도구입니다. 누락된 라인을 테스트로 메우는 루프를 반복할 때 품질이 올라갑니다.
+
+
+## 심화 실습 세트: 실패를 빠르게 재현하고 고정하는 루틴
+
+아래 실습은 글 주제와 무관하게 pytest 프로젝트에서 반복적으로 쓰는 루틴입니다. 핵심은 실패를 의도적으로 만들고, 실패 메시지를 읽고, 테스트를 보강하고, 다시 통과시키는 사이클을 짧게 반복하는 것입니다.
+
+### 실습 A: 입력 검증 함수
+
+```python
+# app/input_guard.py
+
+def require_non_empty(value: str) -> str:
+    if value is None:
+        raise TypeError("value cannot be None")
+    if value.strip() == "":
+        raise ValueError("value cannot be blank")
+    return value.strip()
+```
+
+```python
+# tests/test_input_guard.py
+import pytest
+from app.input_guard import require_non_empty
+
+
+def test_require_non_empty_ok():
+    assert require_non_empty("  hello  ") == "hello"
+
+
+@pytest.mark.parametrize("bad", ["", "   ", "\n\t"])
+def test_require_non_empty_blank(bad):
+    with pytest.raises(ValueError, match="blank"):
+        require_non_empty(bad)
+
+
+def test_require_non_empty_none():
+    with pytest.raises(TypeError, match="None"):
+        require_non_empty(None)
+```
+
+```bash
+pytest tests/test_input_guard.py -v
+```
+
+```text
+tests/test_input_guard.py::test_require_non_empty_ok PASSED
+tests/test_input_guard.py::test_require_non_empty_blank[] PASSED
+tests/test_input_guard.py::test_require_non_empty_blank[   ] PASSED
+tests/test_input_guard.py::test_require_non_empty_blank[\n\t] PASSED
+tests/test_input_guard.py::test_require_non_empty_none PASSED
+========================= 5 passed =========================
+```
+
+### 실습 B: 실패 유도 후 원인 파악
+
+함수 구현을 일부러 아래처럼 바꿉니다.
+
+```python
+# 잘못된 구현 예시
+# if value.strip() == "":
+#     return value
+```
+
+다시 실행하면 실패가 즉시 재현됩니다.
+
+```text
+FAILED tests/test_input_guard.py::test_require_non_empty_blank[]
+E   Failed: DID NOT RAISE <class 'ValueError'>
+```
+
+이 출력 하나로 계약 위반 지점을 바로 확인할 수 있습니다.
+
+### 실습 C: 리팩터링 안정성 확인
+
+```python
+# app/input_guard.py (refactor)
+
+def require_non_empty(value: str) -> str:
+    if value is None:
+        raise TypeError("value cannot be None")
+    normalized = value.strip()
+    if normalized == "":
+        raise ValueError("value cannot be blank")
+    return normalized
+```
+
+같은 테스트를 실행해 모두 통과하면, 구조를 바꿔도 계약은 유지된 것입니다.
+
+## 터미널 옵션 조합
+
+| 명령 | 목적 |
+|---|---|
+| `pytest -q` | 빠른 성공/실패 확인 |
+| `pytest -v` | 케이스별 통과/실패 확인 |
+| `pytest -x` | 첫 실패에서 즉시 중단 |
+| `pytest -k "keyword"` | 특정 범위만 선택 실행 |
+| `pytest --maxfail=3` | 최대 실패 수 제한 |
+
+## 운영 회귀 테스트 템플릿
+
+```python
+import pytest
+
+BUG_CASES = [
+    ("", ValueError),
+    ("   ", ValueError),
+    (None, TypeError),
+]
+
+@pytest.mark.parametrize("raw,exc", BUG_CASES)
+def test_regression_cases(raw, exc):
+    with pytest.raises(exc):
+        require_non_empty(raw)
+```
+
+이 템플릿은 버그 이슈를 테스트 코드로 영구 보존하는 가장 단순한 형태입니다.
+
+## 품질 체크 질문
+
+- 실패 메시지만 보고 원인을 추론할 수 있는가
+- 테스트가 실행 순서에 의존하지 않는가
+- 경계값 입력이 포함되어 있는가
+- 정상/오류 경로를 모두 검증하는가
+- 테스트 추가가 함수 복사 대신 데이터 추가로 끝나는가
+
+
+## 추가 케이스 스터디: PR 리뷰에서 자주 보는 개선 포인트
+
+### 코드 예시
+
+```python
+# app/discount.py
+
+def discount_price(price: int, rate: float) -> int:
+    if price < 0:
+        raise ValueError("price must be >= 0")
+    if not 0 <= rate <= 1:
+        raise ValueError("rate must be between 0 and 1")
+    return int(price * (1 - rate))
+```
+
+```python
+# tests/test_discount.py
+import pytest
+from app.discount import discount_price
+
+@pytest.mark.parametrize(
+    "price,rate,expected",
+    [
+        (10000, 0.0, 10000),
+        (10000, 0.1, 9000),
+        (10000, 1.0, 0),
+    ],
+)
+def test_discount_price(price, rate, expected):
+    assert discount_price(price, rate) == expected
+
+@pytest.mark.parametrize("price,rate", [(-1, 0.1), (1000, -0.1), (1000, 1.1)])
+def test_discount_price_invalid(price, rate):
+    with pytest.raises(ValueError):
+        discount_price(price, rate)
+```
+
+### 출력 예시
+
+```bash
+pytest tests/test_discount.py -v
+```
+
+```text
+tests/test_discount.py::test_discount_price[10000-0.0-10000] PASSED
+tests/test_discount.py::test_discount_price[10000-0.1-9000] PASSED
+tests/test_discount.py::test_discount_price[10000-1.0-0] PASSED
+tests/test_discount.py::test_discount_price_invalid[-1-0.1] PASSED
+tests/test_discount.py::test_discount_price_invalid[1000--0.1] PASSED
+tests/test_discount.py::test_discount_price_invalid[1000-1.1] PASSED
+========================= 6 passed =========================
+```
+
+### 리뷰 포인트
+
+- 경계값(`0`, `1.0`)이 포함되어 있는가
+- 예외 타입이 구체적인가
+- 실패 시 메시지로 원인을 알 수 있는가
+- 데이터 추가만으로 케이스 확장이 가능한 구조인가
+
+
+## 미니 점검표
+
+- 실패 케이스를 최소 3개 이상 유지합니다.
+- 경계값(최소/최대/빈값)을 포함합니다.
+- 실패 메시지가 의미 있는지 확인합니다.
+- CI에서 동일 명령으로 재현 가능한지 확인합니다.
+
+
+## 짧은 확인
+
+```bash
+pytest -q
+```
+
+```text
+PASS
+```
+
+
+
+추가 메모: 테스트는 실행 결과를 남기고, 실패 입력을 재현 가능한 형태로 보존해야 운영에서 같은 문제를 다시 만나지 않습니다. 이 문단은 바이트 기준 보강과 함께 실무 원칙을 다시 고정하기 위한 메모입니다.
+
 ## 처음 질문으로 돌아가기
 
 - **코드 커버리지는 정확히 무엇을 측정할까요?**

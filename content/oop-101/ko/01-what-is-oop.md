@@ -317,6 +317,280 @@ class PaymentService:
 
 새 결제 수단을 추가할 때 `PaymentService`는 수정하지 않고 `PaymentGateway` 계약을 구현한 클래스를 하나 더 추가하면 됩니다. 이것이 OCP의 실제 효과입니다. 또한 상속을 억지로 사용하지 않고 Protocol + 조합을 사용했기 때문에, 런타임 교체와 테스트 더블 주입이 쉬워집니다. 객체지향의 목적은 계층 깊이를 늘리는 것이 아니라 변경 파급을 줄이는 데 있다는 점을 항상 기준으로 두는 편이 좋습니다.
 
+## 설계 경계를 텍스트 UML로 그려 보기
+
+객체지향 입문에서 클래스 문법보다 먼저 잡아야 하는 감각은 경계입니다. 경계가 선명하면 어떤 데이터가 어디에서 바뀌는지 추적할 수 있고, 요구사항이 바뀌어도 수정 범위를 예측하기 쉬워집니다.
+
+```text
+[OrderService]
+  - place_order(cart, payment)
+  - cancel_order(order_id)
+        |
+        | uses
+        v
+[Order]
+  - id: str
+  - lines: list[OrderLine]
+  - status: OrderStatus
+  - total_amount()
+        |
+        | has many
+        v
+[OrderLine]
+  - product_id: str
+  - quantity: int
+  - unit_price: int
+```
+
+이 구조의 핵심은 `OrderService`가 흐름을 조정하고, `Order`가 도메인 규칙을 책임진다는 점입니다. 서비스가 모든 계산을 들고 있으면 규칙이 흩어지고, 엔티티가 외부 인프라를 알면 경계가 무너집니다.
+
+## 절차지향 코드에서 객체 경계로 이동하는 리팩터링
+
+아래 코드는 초기에 빠르게 만들기 쉬운 형태입니다. 문제는 주문 금액 계산, 쿠폰 적용, 상태 변경 규칙이 한 함수에 섞여 있다는 점입니다.
+
+```python
+# before
+
+def checkout(order_dict: dict, coupon: dict | None) -> dict:
+    if order_dict['status'] != 'draft':
+        raise ValueError('invalid status')
+
+    total = 0
+    for line in order_dict['lines']:
+        total += line['quantity'] * line['unit_price']
+
+    if coupon and coupon['type'] == 'percent':
+        total = int(total * (100 - coupon['value']) / 100)
+
+    order_dict['total'] = total
+    order_dict['status'] = 'placed'
+    return order_dict
+```
+
+```python
+# after
+from dataclasses import dataclass
+from enum import Enum
+
+
+class OrderStatus(str, Enum):
+    DRAFT = 'draft'
+    PLACED = 'placed'
+
+
+@dataclass(frozen=True)
+class OrderLine:
+    product_id: str
+    quantity: int
+    unit_price: int
+
+    def amount(self) -> int:
+        return self.quantity * self.unit_price
+
+
+class Order:
+    def __init__(self, lines: list[OrderLine]) -> None:
+        self.lines = lines
+        self.status = OrderStatus.DRAFT
+        self._discount_rate = 0
+
+    def apply_percent_coupon(self, value: int) -> None:
+        if not 0 <= value <= 100:
+            raise ValueError('coupon percent must be 0..100')
+        self._discount_rate = value
+
+    def total_amount(self) -> int:
+        subtotal = sum(line.amount() for line in self.lines)
+        return int(subtotal * (100 - self._discount_rate) / 100)
+
+    def place(self) -> None:
+        if self.status != OrderStatus.DRAFT:
+            raise ValueError('only draft can be placed')
+        self.status = OrderStatus.PLACED
+```
+
+절차지향 코드에서 객체지향 코드로 바뀌며 생긴 가장 큰 차이는 계산식이 아니라 규칙 위치입니다. 쿠폰 검증, 상태 전이, 금액 계산이 `Order` 내부로 모여 테스트 단위가 명확해졌습니다.
+
+## 원칙 위반 시그널과 수정 방법
+
+| 위반 시그널 | 어떤 문제가 생기나 | 수정 방향 |
+|---|---|---|
+| 서비스 함수가 200줄 이상으로 비대해짐 | 정책 변경 시 함수 전체를 읽어야 함 | 도메인 클래스로 규칙 이동 |
+| 같은 키 문자열(`'status'`, `'total'`)이 여러 파일에 중복 | 오타가 런타임까지 숨어 있음 | 속성을 가진 타입으로 치환 |
+| 검증 로직이 API, 서비스, 배치에 각각 존재 | 규칙 불일치로 장애 발생 | 객체 메서드에 단일 규칙 정의 |
+| 테스트가 입력 딕셔너리 조립에 집중 | 의미보다 형태를 검증 | 행위를 검증하는 메서드 테스트로 전환 |
+
+## 비교표: 함수 중심과 객체 중심의 유지보수 비용
+
+| 관점 | 함수 중심 코드 | 객체 중심 코드 |
+|---|---|---|
+| 규칙 탐색 | 여러 함수와 전역 상수 추적 필요 | 클래스 내부 메서드에서 집중 확인 |
+| 변경 영향도 | 호출 그래프를 넓게 따라가야 함 | 해당 객체와 협력 객체 위주로 좁아짐 |
+| 타입 안정성 | 딕셔너리 키 오타가 늦게 발견 | 속성, 메서드 계약으로 빨리 드러남 |
+| 온보딩 | 파일 순서에 따라 이해 편차 큼 | 도메인 용어 단위로 학습 가능 |
+
+## 실무 체크: 객체를 도입할 타이밍
+
+- 같은 데이터 묶음이 세 곳 이상에서 함께 바뀌면 클래스로 묶는 편이 유리합니다.
+- 상태 전이가 중요하면 enum + 메서드로 전이 규칙을 명시하는 편이 안전합니다.
+- 입출력 스키마와 도메인 규칙을 분리하면 API 변경이 도메인 전체로 전파되는 일을 줄일 수 있습니다.
+- 클래스 수를 늘리는 것보다 변경 이유를 분리하는 것이 우선입니다.
+
+## 실전 시나리오: 요구사항 변경을 견디는 구조로 바꾸기
+
+현업에서는 기능 추가보다 규칙 변경이 더 자주 발생합니다. 따라서 클래스 구조를 평가할 때는 "지금 동작하는가"보다 "다음 변경을 어디까지 건드려야 하는가"를 기준으로 보는 편이 안전합니다.
+
+```python
+from dataclasses import dataclass
+from typing import Protocol
+
+
+@dataclass
+class LineItem:
+    name: str
+    quantity: int
+    unit_price: int
+
+    def subtotal(self) -> int:
+        return self.quantity * self.unit_price
+
+
+class DiscountPolicy(Protocol):
+    def apply(self, amount: int) -> int:
+        ...
+
+
+class NoDiscount:
+    def apply(self, amount: int) -> int:
+        return amount
+
+
+class PercentDiscount:
+    def __init__(self, percent: int) -> None:
+        if not 0 <= percent <= 100:
+            raise ValueError('percent must be 0..100')
+        self.percent = percent
+
+    def apply(self, amount: int) -> int:
+        return int(amount * (100 - self.percent) / 100)
+
+
+class Invoice:
+    def __init__(self, items: list[LineItem], policy: DiscountPolicy) -> None:
+        self.items = items
+        self.policy = policy
+
+    def total(self) -> int:
+        base = sum(i.subtotal() for i in self.items)
+        return self.policy.apply(base)
+```
+
+이 코드는 할인 규칙이 바뀌어도 `Invoice.total()`을 수정할 필요가 없습니다. 확장은 구현 클래스 추가로 닫히고, 핵심 흐름은 안정적으로 유지됩니다.
+
+## UML 스타일로 보는 협력 관계
+
+```text
+[Invoice]
+  - items: list[LineItem]
+  - policy: DiscountPolicy
+  + total()
+
+[LineItem]
+  + subtotal()
+
+[DiscountPolicy] <<interface>>
+  + apply(amount)
+      ^
+      +-- [NoDiscount]
+      +-- [PercentDiscount]
+```
+
+협력 구조를 이렇게 텍스트로 적어 두면 코드 리뷰에서 "어디가 정책 축이고 어디가 도메인 축인가"를 빠르게 맞출 수 있습니다.
+
+## 안티패턴과 교정 절차
+
+| 안티패턴 | 발견 신호 | 교정 순서 |
+|---|---|---|
+| 거대 클래스(God Object) | 메서드가 20개 이상, 변경 이력이 분산됨 | 책임 축 분해 → 협력 인터페이스 도출 |
+| 데이터만 가진 빈 클래스 | 메서드 없이 getter/setter만 존재 | 규칙 메서드 이동 또는 dataclass로 단순화 |
+| 상속 트리 우회 분기 | 하위 클래스 타입 체크 분기 존재 | 다형성 계약 재정의 |
+| 인프라 타입 누수 | 도메인 계층이 SDK 응답 객체 의존 | DTO 변환 계층 추가 |
+
+## 전후 비교: 테스트 유지비
+
+| 항목 | 리팩터링 전 | 리팩터링 후 |
+|---|---|---|
+| 테스트 준비 | 전역 상태 초기화 필요 | 객체 단위 상태 생성 |
+| 실패 원인 추적 | 함수 체인 전체 역추적 | 클래스 메서드 단위 추적 |
+| 회귀 범위 | 넓고 불명확 | 좁고 예측 가능 |
+
+## 팀 적용 체크리스트
+
+- 도메인 용어와 클래스 이름이 일치하는지 확인합니다.
+- 인스턴스 생성 시점에 불변식이 완성되는지 확인합니다.
+- 정책 변경이 기존 코드 수정이 아닌 구현 추가로 가능한지 점검합니다.
+- 코드 리뷰에서 UML 텍스트 10줄로 협력 구조를 먼저 합의합니다.
+- 테스트 이름이 메서드명보다 비즈니스 규칙을 설명하는지 확인합니다.
+
+## 미니 케이스 스터디: 규칙 추가 한 번으로 검증하기
+
+아래 예시는 정책 확장을 기존 코드 수정 없이 추가하는 최소 단위입니다.
+
+```python
+class WeekendPolicy:
+    def apply(self, amount: int, is_weekend: bool) -> int:
+        if is_weekend:
+            return int(amount * 0.95)
+        return amount
+
+
+def estimate(amount: int, is_weekend: bool) -> int:
+    policy = WeekendPolicy()
+    return policy.apply(amount, is_weekend)
+```
+
+핵심은 새로운 정책이 호출 경로를 깨지 않고 들어온다는 점입니다. 변경 이력이 정책 클래스에만 남도록 경계를 유지하면 회귀 위험이 줄어듭니다.
+
+| 확인 질문 | Pass 기준 |
+|---|---|
+| 새 정책 추가 시 기존 함수 수정이 필요한가 | 아니오 |
+| 예외 정책이 기존 계약과 같은가 | 예 |
+| 테스트가 정책별로 분리되어 있는가 | 예 |
+
+## 검증 노트: 객체 설계 품질을 점검하는 질문
+
+아래 질문은 구현 이후 리뷰에서 반복적으로 사용하는 기준입니다.
+
+- 이 메서드가 실패할 때 예외 타입과 메시지가 호출자 계약과 일치하는가.
+- 같은 규칙이 다른 클래스나 함수에 중복되어 있지 않은가.
+- 상태 변경이 메서드 한 경로로만 이루어지는가.
+- 외부 의존성 없이 단위 테스트가 가능한가.
+
+```python
+def review_signal(duplicate_rules: int, mutable_paths: int) -> str:
+    if duplicate_rules > 0:
+        return '중복 규칙 제거 필요'
+    if mutable_paths > 1:
+        return '상태 변경 경로 통합 필요'
+    return '구조 안정'
+```
+
+이런 체크를 글 단위 예제에도 적용하면, 객체지향을 문법이 아니라 유지보수 전략으로 이해하는 데 도움이 됩니다.
+
+## 추가 비교: 변경 요청 대응 시간
+
+| 변경 요청 | 경계가 약한 코드 | 경계가 선명한 코드 |
+|---|---|---|
+| 할인 규칙 추가 | 분기문 탐색 후 다중 수정 | 정책 구현 추가 |
+| 상태 전이 수정 | 여러 함수 동시 수정 | 도메인 메서드 수정 |
+| 테스트 보강 | 통합 테스트 중심 | 단위 테스트 우선 |
+
+이 비교는 성능 수치가 아니라 유지보수 리드타임을 줄이는 관점에서 중요합니다.
+
+## 보강 메모
+
+설계 선택은 정답 찾기가 아니라 변경 비용을 낮추는 의사결정입니다. 같은 기능이라도 경계를 먼저 정의하면 리뷰와 테스트가 단순해집니다.
+
 ## 처음 질문으로 돌아가기
 
 - **객체지향은 절차지향과 무엇이 다르고, 왜 등장했을까요?**

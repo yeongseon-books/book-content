@@ -374,6 +374,321 @@ Plan을 고르기 전에 아래를 점검합니다.
 
 ## 운영 체크리스트
 
+---
+
+## 호스팅 모델별 시작 실패 패턴
+
+호스팅 모델은 선택 시점에만 중요한 것이 아니라, 장애 패턴을 결정합니다. 아래는 운영에서 자주 만나는 실패 유형입니다.
+
+| 모델 | 대표 실패 메시지 | 첫 진단 포인트 |
+|---|---|---|
+| Linux Code | `ModuleNotFoundError` | Oryx 빌드 로그, `requirements.txt` |
+| Linux Code | `Container didn't respond to HTTP pings on port` | startup command, `PORT` 바인딩 |
+| Linux Custom Container | `Image pull failed` | ACR 인증, 태그 존재 여부 |
+| Windows Code | `HTTP Error 500.30` | 프로세스 시작 로그, 런타임 버전 |
+
+모델이 다르면 "같은 502"라도 확인해야 할 출발점이 달라집니다.
+
+---
+
+## 배포 방식별 롤백 전략
+
+ZIP/Oryx와 컨테이너 배포는 롤백 단위가 다릅니다.
+
+### ZIP/Oryx 배포
+
+- 롤백 단위: 이전 배포 아티팩트 또는 slot swap
+- 핵심 로그: Kudu deployment log, Oryx build log
+- 복구 속도: staging slot이 있으면 빠름
+
+```bash
+# 최근 배포 이력 확인
+az webapp log deployment list \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --output table
+
+# staging 슬롯과 swap
+az webapp deployment slot swap \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --slot staging \
+  --target-slot production
+```
+
+### 컨테이너 배포
+
+- 롤백 단위: 이미지 태그 또는 digest
+- 핵심 로그: image pull, container startup log
+- 복구 속도: 태그 관리 품질에 좌우
+
+```bash
+# 이전 안정 태그로 되돌리기
+az webapp config container set \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --container-image-name myregistry.azurecr.io/myapp:2026-05-10-stable
+```
+
+운영에서 중요한 원칙은 `latest` 단일 태그를 피하고, 재현 가능한 버전 태그를 강제하는 것입니다.
+
+---
+
+## Portal 의사결정 체크: 만들기 전에 막는 실수
+
+Portal에서 App Service를 생성할 때 아래 세 항목에서 실수가 많이 납니다.
+
+1. **Publish**: `Code`와 `Docker Container`를 혼동
+2. **Operating System**: 팀 표준과 다르게 선택
+3. **Pricing Plan**: 프로덕션인데 Basic으로 시작
+
+### 실수 A: Code 앱에 컨테이너 명령어를 넣는 경우
+
+```text
+Startup command: gunicorn ...
+App stack: Node.js
+```
+
+이 조합은 실행 계약이 맞지 않아 시작 실패로 이어집니다. 런타임 스택과 startup command를 항상 같이 검증해야 합니다.
+
+### 실수 B: 같은 Plan에 성격이 다른 앱을 과도하게 묶는 경우
+
+관리 페이지와 API, 배치성 앱을 한 Plan에 몰아넣으면 노이즈 네이버가 쉽게 발생합니다.
+
+```mermaid
+flowchart LR
+    A["Plan S1"] --> B["Public API"]
+    A --> C["Admin Web"]
+    A --> D["Batch-like endpoint"]
+    D -. "CPU Spike" .-> B
+    D -. "Memory Pressure" .-> C
+```
+
+업무 중요도와 트래픽 패턴이 크게 다르면 Plan 분리를 먼저 검토하는 편이 안전합니다.
+
+---
+
+## Linux Custom Container 운영 최소 설정
+
+컨테이너를 택했다면 아래 설정이 기본선입니다.
+
+```bash
+# ACR pull 권한을 위한 관리 ID 활성화
+az webapp identity assign \
+  --resource-group $RG \
+  --name $APP_NAME
+
+# App Service storage 유지(필요 시)
+az webapp config appsettings set \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --settings WEBSITES_ENABLE_APP_SERVICE_STORAGE=true
+
+# 앱 포트 명시
+az webapp config appsettings set \
+  --resource-group $RG \
+  --name $APP_NAME \
+  --settings WEBSITES_PORT=8000
+```
+
+**예상 오류 메시지 예시**
+
+```text
+ERROR - Image pull failed. Verify docker image configuration and credentials.
+ERROR - Container myapp_0 for site myapp did not start within expected time limit.
+```
+
+첫 번째는 인증/이미지 참조 문제, 두 번째는 startup/포트/앱 초기화 문제로 보는 것이 일반적입니다.
+
+---
+
+## Before/After: 티어 중심 선택에서 제약 중심 선택으로
+
+### Before
+
+- 비용표만 보고 S1/B1를 먼저 고릅니다.
+- 나중에 슬롯, autoscale, 네트워킹 제약을 발견합니다.
+
+### After
+
+- OS/배포 모델/필수 기능을 먼저 확정합니다.
+- 그 제약을 만족하는 최소 티어를 고릅니다.
+- 생성 직후 CLI로 실제 SKU와 worker 수를 검증합니다.
+
+```bash
+az appservice plan show \
+  --resource-group $RG \
+  --name $PLAN_NAME \
+  --query "{tier:sku.tier, sku:sku.name, workers:numberOfWorkers, max:maximumNumberOfWorkers}" \
+  --output json
+```
+
+이 흐름으로 바꾸면 "생성은 됐는데 필수 기능이 없다"는 사고를 대부분 예방할 수 있습니다.
+
+---
+
+## IaC로 호스팅 모델을 고정하는 예시
+
+호스팅 모델 결정이 문서에만 있으면 다음 분기 배포에서 쉽게 흐려집니다. Bicep으로 OS, 런타임, 플랜 SKU를 함께 고정하면 선택 실수를 줄일 수 있습니다.
+
+```bicep
+param location string = 'koreacentral'
+param planName string
+param appName string
+
+resource plan 'Microsoft.Web/serverfarms@2023-12-01' = {
+  name: planName
+  location: location
+  sku: {
+    name: 'S1'
+    tier: 'Standard'
+    capacity: 2
+  }
+  properties: {
+    reserved: true
+  }
+}
+
+resource app 'Microsoft.Web/sites@2023-12-01' = {
+  name: appName
+  location: location
+  properties: {
+    serverFarmId: plan.id
+    siteConfig: {
+      linuxFxVersion: 'PYTHON|3.11'
+      appCommandLine: 'gunicorn --bind=0.0.0.0:$PORT src.app:app'
+    }
+  }
+}
+```
+
+`reserved: true`는 Linux Plan을 의미합니다. 이 한 줄이 빠지면 동일한 템플릿이라도 다른 실행 모델로 만들어질 수 있습니다.
+
+## 코드 배포와 컨테이너 배포의 운영 로그 비교
+
+두 모델을 동시에 다루는 팀에서는 "어떤 로그를 먼저 봐야 하는가"를 표준화해 두는 편이 좋습니다.
+
+| 상황 | Code 배포 우선 로그 | Container 배포 우선 로그 |
+|---|---|---|
+| 배포 직후 502 | Oryx build log, startup command | image pull log, container startup log |
+| 특정 모듈 import 실패 | `requirements.txt`, 런타임 버전 | 이미지 내부 패키지 버전, Dockerfile 레이어 |
+| rollback 필요 | 슬롯 swap, 이전 ZIP 아티팩트 | 이전 태그 또는 digest 재지정 |
+
+운영 비용은 장애 빈도보다 진단 시작점의 일관성에서 크게 줄어듭니다.
+
+## 실제 배포 로그 패턴 예시
+
+```text
+Running oryx build...
+Detected platform: python 3.11
+Installing dependencies from requirements.txt
+Collecting flask==3.1.3
+Successfully installed flask-3.1.3 gunicorn-25.3.0
+```
+
+```text
+Pulling image: myregistry.azurecr.io/myapp:2026-05-12
+Image pull succeeded
+Starting container for site
+Container didn't respond to HTTP pings on port: 8000
+```
+
+앞 로그는 빌드/의존성 계층, 뒤 로그는 기동/포트 계층 문제입니다. 같은 `502`라도 장애 레이어가 다릅니다.
+
+---
+
+## 처음 질문으로 돌아가기
+
+- 코드 배포, 빌트인 컨테이너, 커스텀 컨테이너 차이는 무엇인가? -> 제어권과 운영 책임 경계가 다르며 롤백 단위까지 달라집니다.
+- Linux 컨테이너 startup command는 어떻게 결정되는가? -> 이미지 기본 CMD/ENTRYPOINT와 App Service 설정이 결합되어 최종 명령이 확정됩니다.
+- Windows 컨테이너가 왜 제한적인가? -> 지원 SKU와 런타임 조합 제약이 크므로 사전 검증이 필수입니다.
+- ZIP 배포와 컨테이너 배포 롤백 차이는? -> ZIP은 배포 아티팩트/slot 기준, 컨테이너는 이미지 태그/digest 기준입니다.
+- 혼합 운영이 가치 있는 시점은? -> 핵심 서비스 격리와 팀별 표준이 충돌할 때, Plan/모델 분리가 운영 리스크를 줄입니다.
+
+---
+
+## 모델 선택 실습: 세 가지 가상 서비스
+
+### 서비스 A: 내부 백오피스(낮은 트래픽)
+
+- 권장: Linux Code + Basic/Standard
+- 이유: 단순 배포, 운영 비용 최소화
+
+### 서비스 B: 외부 공개 API(트래픽 변동 큼)
+
+- 권장: Linux Code + Standard 이상 + Autoscale
+- 이유: 슬롯/오토스케일/알림이 필수
+
+### 서비스 C: OS 패키지 의존성이 강한 앱
+
+- 권장: Linux Custom Container + Premium 계열 검토
+- 이유: 런타임 제어권 필요, 이미지 거버넌스 필요
+
+```text
+의사결정 원칙
+1) 기능 제약(슬롯/네트워크) 확인
+2) 운영 책임 범위(Code vs Container) 확정
+3) 비용 상한과 확장 계획 설정
+```
+
+---
+
+## 실전 실패 복기 템플릿
+
+호스팅 모델 관련 장애를 반복하지 않으려면 아래 항목을 남깁니다.
+
+```yaml
+incident_template:
+  symptom: "예: 배포 후 502"
+  hosting_model: "linux-code | linux-container | windows-code"
+  first_signal: "deployment log | startup log | metric"
+  root_cause: "예: PORT 바인딩 불일치"
+  corrective_action: "startup command 수정"
+  prevention: "배포 전 smoke test 자동화"
+```
+
+모델마다 실패 지점이 달라서, 복기 템플릿도 모델 정보를 포함해야 재사용성이 높습니다.
+
+---
+
+## 비용 추정 감각: Plan 공유와 분리
+
+정확한 가격은 공식 계산기를 따르되, 운영 의사결정에서는 아래 구조를 먼저 봅니다.
+
+```text
+공유 Plan
+- 장점: 초기 고정비 절감
+- 단점: 장애 전파 범위 확대
+
+분리 Plan
+- 장점: 장애 격리, 예측 가능성 향상
+- 단점: 고정비 증가
+```
+
+### 분리 기준 예시
+
+- 외부 고객 트래픽을 받는 서비스
+- SLA가 명확한 서비스
+- 릴리즈 주기가 매우 다른 서비스
+
+---
+
+## 운영 질문에 답하는 체크 Q&A
+
+Q. Linux Code에서 시작해서 나중에 컨테이너로 옮겨도 되는가?
+
+A. 가능합니다. 다만 startup 계약, 로깅 경로, 배포/롤백 단위가 바뀌므로 전환 체크리스트를 분리해야 합니다.
+
+Q. Standard와 Premium 경계는 어디에서 체감되는가?
+
+A. 스케일 한도, 네트워킹, 성능 여유에서 체감됩니다. 트래픽 피크에서 P95가 흔들리면 Premium 전환 검토 시점입니다.
+
+Q. 같은 Plan에 몇 개 앱까지 올려도 되는가?
+
+A. 고정 숫자보다 CPU/메모리/배포 빈도 충돌을 기준으로 판단합니다. 임계치 근처라면 앱 수가 적어도 분리하는 편이 안전합니다.
+
+추가로, 같은 Plan에 올릴 앱은 "동시 피크가 겹치는가"를 반드시 확인해야 합니다. 피크가 겹치면 비용 절감보다 장애 위험이 먼저 커집니다.
+
 - [ ] 선택한 hosting model을 왜 골랐는지 기록했다
 - [ ] startup command와 env var의 단일 출처(IaC)를 정했다
 - [ ] Managed Identity로 registry 인증을 구성했다

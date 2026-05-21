@@ -324,6 +324,381 @@ def test_place_rejects_invalid_quantity(order_service: OrderService) -> None:
 
 또한 fixture scope를 무조건 넓히지 않는 편이 안전합니다. DB 연결이나 임시 디렉터리처럼 생성 비용이 큰 자원만 `module` 또는 `session`으로 올리고, 나머지는 `function` scope로 두어 테스트 독립성을 유지하는 것이 좋습니다.
 
+## 파라미터 설계 심화: 데이터만 바꾸고 검증 로직은 유지하기
+
+parametrize의 장점은 테스트 함수 수를 늘리지 않고 입력 공간을 넓히는 점입니다.
+
+```python
+# validator.py
+
+def validate_username(name: str) -> bool:
+    if not 3 <= len(name) <= 20:
+        return False
+    return name.replace("_", "").isalnum()
+```
+
+```python
+# test_validator.py
+import pytest
+from validator import validate_username
+
+@pytest.mark.parametrize(
+    "name,expected",
+    [
+        pytest.param("abc", True, id="min-length"),
+        pytest.param("ab", False, id="too-short"),
+        pytest.param("user_name", True, id="underscore"),
+        pytest.param("bad name", False, id="space"),
+        pytest.param("x" * 21, False, id="too-long"),
+    ],
+)
+def test_validate_username(name, expected):
+    assert validate_username(name) is expected
+```
+
+## CLI 출력 확인
+
+```bash
+pytest test_validator.py -v
+```
+
+```text
+test_validator.py::test_validate_username[min-length] PASSED
+test_validator.py::test_validate_username[too-short] PASSED
+...
+========================= 5 passed =========================
+```
+
+## 정상/실패 케이스를 한 함수에서 다루는 패턴
+
+```python
+# parser.py
+
+def parse_port(value: str) -> int:
+    port = int(value)
+    if not 1 <= port <= 65535:
+        raise ValueError("port out of range")
+    return port
+```
+
+```python
+# test_parser.py
+import pytest
+from parser import parse_port
+
+@pytest.mark.parametrize("value,expected", [("80", 80), ("443", 443)])
+def test_parse_port_ok(value, expected):
+    assert parse_port(value) == expected
+
+@pytest.mark.parametrize("value", ["0", "70000", "-1"])
+def test_parse_port_fail(value):
+    with pytest.raises(ValueError, match="out of range"):
+        parse_port(value)
+```
+
+## 조합 폭발 제어
+
+중첩 parametrize는 강력하지만 조합 수가 빠르게 커집니다.
+
+| method 수 | status 수 | 생성 테스트 수 |
+|---|---|---|
+| 3 | 3 | 9 |
+| 5 | 6 | 30 |
+| 8 | 10 | 80 |
+
+필요한 경계만 추려 조합을 제한해야 테스트 시간이 유지됩니다.
+
+## Before/After 리팩터링
+
+```python
+# before
+
+def test_price_case1():
+    assert discount(10000, "VIP") == 9000
+
+def test_price_case2():
+    assert discount(10000, "NEW") == 9500
+
+def test_price_case3():
+    assert discount(10000, "NONE") == 10000
+```
+
+```python
+# after
+import pytest
+
+@pytest.mark.parametrize(
+    "price,tier,expected",
+    [
+        (10000, "VIP", 9000),
+        (10000, "NEW", 9500),
+        (10000, "NONE", 10000),
+    ],
+)
+def test_discount(price, tier, expected):
+    assert discount(price, tier) == expected
+```
+
+테스트 추가는 함수 복사가 아니라 데이터 한 줄 추가로 끝납니다.
+
+
+## 데이터셋 관리 패턴
+
+파라미터 목록이 길어지면 테스트 파일 가독성이 떨어집니다. 범주별로 묶어 분리합니다.
+
+```python
+VALID_CASES = [
+    ("alice", True),
+    ("bob_01", True),
+]
+
+INVALID_CASES = [
+    ("ab", False),
+    ("bad name", False),
+    ("x" * 30, False),
+]
+```
+
+```python
+import pytest
+from validator import validate_username
+
+@pytest.mark.parametrize("name,expected", VALID_CASES, ids=["alice", "bob_01"])
+def test_username_valid(name, expected):
+    assert validate_username(name) is expected
+
+@pytest.mark.parametrize("name,expected", INVALID_CASES, ids=["short", "space", "long"])
+def test_username_invalid(name, expected):
+    assert validate_username(name) is expected
+```
+
+## 실패 출력 해석
+
+```text
+FAILED test_username_invalid[space] - assert True is False
+```
+
+ID가 있으면 어떤 케이스가 실패했는지 바로 읽을 수 있습니다.
+
+## parametrize + raises 결합
+
+```python
+import pytest
+
+
+def to_int(v: str) -> int:
+    if not v.strip().isdigit():
+        raise ValueError("not integer")
+    return int(v)
+
+
+@pytest.mark.parametrize("bad", ["", "a1", "-1", "1.2"])
+def test_to_int_invalid(bad):
+    with pytest.raises(ValueError):
+        to_int(bad)
+```
+
+## 리팩터링 체크리스트
+
+- 테스트 함수 복사가 시작되면 parametrize 전환 고려
+- 케이스별 id 부여
+- 정상/오류 케이스 분리
+- 조합 폭발 시 범주별 샘플링
+
+
+## 심화 실습 세트: 실패를 빠르게 재현하고 고정하는 루틴
+
+아래 실습은 글 주제와 무관하게 pytest 프로젝트에서 반복적으로 쓰는 루틴입니다. 핵심은 실패를 의도적으로 만들고, 실패 메시지를 읽고, 테스트를 보강하고, 다시 통과시키는 사이클을 짧게 반복하는 것입니다.
+
+### 실습 A: 입력 검증 함수
+
+```python
+# app/input_guard.py
+
+def require_non_empty(value: str) -> str:
+    if value is None:
+        raise TypeError("value cannot be None")
+    if value.strip() == "":
+        raise ValueError("value cannot be blank")
+    return value.strip()
+```
+
+```python
+# tests/test_input_guard.py
+import pytest
+from app.input_guard import require_non_empty
+
+
+def test_require_non_empty_ok():
+    assert require_non_empty("  hello  ") == "hello"
+
+
+@pytest.mark.parametrize("bad", ["", "   ", "\n\t"])
+def test_require_non_empty_blank(bad):
+    with pytest.raises(ValueError, match="blank"):
+        require_non_empty(bad)
+
+
+def test_require_non_empty_none():
+    with pytest.raises(TypeError, match="None"):
+        require_non_empty(None)
+```
+
+```bash
+pytest tests/test_input_guard.py -v
+```
+
+```text
+tests/test_input_guard.py::test_require_non_empty_ok PASSED
+tests/test_input_guard.py::test_require_non_empty_blank[] PASSED
+tests/test_input_guard.py::test_require_non_empty_blank[   ] PASSED
+tests/test_input_guard.py::test_require_non_empty_blank[\n\t] PASSED
+tests/test_input_guard.py::test_require_non_empty_none PASSED
+========================= 5 passed =========================
+```
+
+### 실습 B: 실패 유도 후 원인 파악
+
+함수 구현을 일부러 아래처럼 바꿉니다.
+
+```python
+# 잘못된 구현 예시
+# if value.strip() == "":
+#     return value
+```
+
+다시 실행하면 실패가 즉시 재현됩니다.
+
+```text
+FAILED tests/test_input_guard.py::test_require_non_empty_blank[]
+E   Failed: DID NOT RAISE <class 'ValueError'>
+```
+
+이 출력 하나로 계약 위반 지점을 바로 확인할 수 있습니다.
+
+### 실습 C: 리팩터링 안정성 확인
+
+```python
+# app/input_guard.py (refactor)
+
+def require_non_empty(value: str) -> str:
+    if value is None:
+        raise TypeError("value cannot be None")
+    normalized = value.strip()
+    if normalized == "":
+        raise ValueError("value cannot be blank")
+    return normalized
+```
+
+같은 테스트를 실행해 모두 통과하면, 구조를 바꿔도 계약은 유지된 것입니다.
+
+## 터미널 옵션 조합
+
+| 명령 | 목적 |
+|---|---|
+| `pytest -q` | 빠른 성공/실패 확인 |
+| `pytest -v` | 케이스별 통과/실패 확인 |
+| `pytest -x` | 첫 실패에서 즉시 중단 |
+| `pytest -k "keyword"` | 특정 범위만 선택 실행 |
+| `pytest --maxfail=3` | 최대 실패 수 제한 |
+
+## 운영 회귀 테스트 템플릿
+
+```python
+import pytest
+
+BUG_CASES = [
+    ("", ValueError),
+    ("   ", ValueError),
+    (None, TypeError),
+]
+
+@pytest.mark.parametrize("raw,exc", BUG_CASES)
+def test_regression_cases(raw, exc):
+    with pytest.raises(exc):
+        require_non_empty(raw)
+```
+
+이 템플릿은 버그 이슈를 테스트 코드로 영구 보존하는 가장 단순한 형태입니다.
+
+## 품질 체크 질문
+
+- 실패 메시지만 보고 원인을 추론할 수 있는가
+- 테스트가 실행 순서에 의존하지 않는가
+- 경계값 입력이 포함되어 있는가
+- 정상/오류 경로를 모두 검증하는가
+- 테스트 추가가 함수 복사 대신 데이터 추가로 끝나는가
+
+
+## 추가 케이스 스터디: PR 리뷰에서 자주 보는 개선 포인트
+
+### 코드 예시
+
+```python
+# app/discount.py
+
+def discount_price(price: int, rate: float) -> int:
+    if price < 0:
+        raise ValueError("price must be >= 0")
+    if not 0 <= rate <= 1:
+        raise ValueError("rate must be between 0 and 1")
+    return int(price * (1 - rate))
+```
+
+```python
+# tests/test_discount.py
+import pytest
+from app.discount import discount_price
+
+@pytest.mark.parametrize(
+    "price,rate,expected",
+    [
+        (10000, 0.0, 10000),
+        (10000, 0.1, 9000),
+        (10000, 1.0, 0),
+    ],
+)
+def test_discount_price(price, rate, expected):
+    assert discount_price(price, rate) == expected
+
+@pytest.mark.parametrize("price,rate", [(-1, 0.1), (1000, -0.1), (1000, 1.1)])
+def test_discount_price_invalid(price, rate):
+    with pytest.raises(ValueError):
+        discount_price(price, rate)
+```
+
+### 출력 예시
+
+```bash
+pytest tests/test_discount.py -v
+```
+
+```text
+tests/test_discount.py::test_discount_price[10000-0.0-10000] PASSED
+tests/test_discount.py::test_discount_price[10000-0.1-9000] PASSED
+tests/test_discount.py::test_discount_price[10000-1.0-0] PASSED
+tests/test_discount.py::test_discount_price_invalid[-1-0.1] PASSED
+tests/test_discount.py::test_discount_price_invalid[1000--0.1] PASSED
+tests/test_discount.py::test_discount_price_invalid[1000-1.1] PASSED
+========================= 6 passed =========================
+```
+
+### 리뷰 포인트
+
+- 경계값(`0`, `1.0`)이 포함되어 있는가
+- 예외 타입이 구체적인가
+- 실패 시 메시지로 원인을 알 수 있는가
+- 데이터 추가만으로 케이스 확장이 가능한 구조인가
+
+
+## 미니 점검표
+
+- 실패 케이스를 최소 3개 이상 유지합니다.
+- 경계값(최소/최대/빈값)을 포함합니다.
+- 실패 메시지가 의미 있는지 확인합니다.
+- CI에서 동일 명령으로 재현 가능한지 확인합니다.
+
+
 ## 처음 질문으로 돌아가기
 
 - **같은 로직을 여러 입력으로 검증할 때 함수를 복사하지 않으려면 어떻게 해야 할까요?**

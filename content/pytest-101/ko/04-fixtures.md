@@ -340,6 +340,403 @@ def test_place_rejects_invalid_quantity(order_service: OrderService) -> None:
 
 또한 fixture scope를 무조건 넓히지 않는 편이 안전합니다. DB 연결이나 임시 디렉터리처럼 생성 비용이 큰 자원만 `module` 또는 `session`으로 올리고, 나머지는 `function` scope로 두어 테스트 독립성을 유지하는 것이 좋습니다.
 
+## fixture 설계 심화: 준비 코드의 중복을 끊는 기준
+
+fixture를 제대로 쓰면 테스트 본문은 요구사항 문장처럼 읽힙니다.
+
+```python
+# app/users.py
+
+def filter_adults(users: list[dict]) -> list[str]:
+    return [u["name"] for u in users if u["age"] >= 20]
+```
+
+```python
+# tests/conftest.py
+import pytest
+
+@pytest.fixture
+def users_data():
+    return [
+        {"name": "Alice", "age": 30},
+        {"name": "Bob", "age": 19},
+        {"name": "Chris", "age": 25},
+    ]
+
+@pytest.fixture
+def empty_users_data():
+    return []
+```
+
+```python
+# tests/test_users.py
+from app.users import filter_adults
+
+
+def test_filter_adults(users_data):
+    assert filter_adults(users_data) == ["Alice", "Chris"]
+
+
+def test_filter_adults_empty(empty_users_data):
+    assert filter_adults(empty_users_data) == []
+```
+
+## scope 비교 표
+
+| scope | 생성 시점 | 해제 시점 | 사용 추천 |
+|---|---|---|---|
+| function | 각 테스트 시작 | 각 테스트 종료 | 기본값, 독립성 최우선 |
+| class | 클래스 시작 | 클래스 종료 | 클래스 단위 공유 데이터 |
+| module | 파일 시작 | 파일 종료 | 비용 큰 초기화 |
+| session | 테스트 세션 시작 | 세션 종료 | 외부 서버, 테스트 DB |
+
+## yield 기반 정리 패턴
+
+```python
+import sqlite3
+import pytest
+
+@pytest.fixture
+def db_conn():
+    conn = sqlite3.connect(":memory:")
+    conn.execute("CREATE TABLE logs (id INTEGER PRIMARY KEY, msg TEXT)")
+    yield conn
+    conn.close()
+```
+
+```python
+def test_insert_log(db_conn):
+    db_conn.execute("INSERT INTO logs (msg) VALUES ('ok')")
+    row = db_conn.execute("SELECT COUNT(*) FROM logs").fetchone()
+    assert row[0] == 1
+```
+
+## fixture factory 패턴
+
+동일한 구조의 데이터를 여러 변형으로 만들 때는 factory fixture가 편합니다.
+
+```python
+import pytest
+
+@pytest.fixture
+def user_factory():
+    def _make(name="Alice", age=30, role="dev"):
+        return {"name": name, "age": age, "role": role}
+    return _make
+```
+
+```python
+def test_user_factory_defaults(user_factory):
+    user = user_factory()
+    assert user["name"] == "Alice"
+
+
+def test_user_factory_override(user_factory):
+    user = user_factory(name="Dana", age=22)
+    assert user == {"name": "Dana", "age": 22, "role": "dev"}
+```
+
+## 흔한 실패 시나리오
+
+```python
+# 문제 코드: mutable 기본값 공유
+@pytest.fixture(scope="module")
+def shared_list():
+    return []
+
+
+def test_a(shared_list):
+    shared_list.append(1)
+    assert shared_list == [1]
+
+
+def test_b(shared_list):
+    # 순서에 따라 실패 가능
+    assert shared_list == []
+```
+
+해결: `function` scope로 내리거나, 매 테스트에서 복사본을 사용합니다.
+
+
+## fixture 운영 규칙: 팀에서 합의해 두면 좋은 항목
+
+### naming 규칙
+
+- 데이터 fixture: `sample_*`, `*_data`
+- 리소스 fixture: `db_conn`, `api_client`, `tmp_workspace`
+- factory fixture: `*_factory`
+
+### fixture 구조 예시
+
+```python
+# tests/conftest.py
+import pytest
+
+@pytest.fixture
+def sample_order():
+    return {"id": 1, "amount": 10000, "status": "new"}
+
+@pytest.fixture
+def order_factory():
+    def _make(**kwargs):
+        base = {"id": 1, "amount": 10000, "status": "new"}
+        base.update(kwargs)
+        return base
+    return _make
+```
+
+```python
+# tests/test_orders.py
+
+def test_order_defaults(sample_order):
+    assert sample_order["status"] == "new"
+
+
+def test_order_override(order_factory):
+    order = order_factory(status="paid")
+    assert order["status"] == "paid"
+```
+
+## scope 선택 실수와 수정
+
+```python
+# 실수: session scope에 가변 상태 보관
+@pytest.fixture(scope="session")
+def mutable_cache():
+    return {}
+```
+
+이 경우 테스트 간 상태 오염이 발생합니다.
+
+해결: function scope 기본값 유지, 필요한 경우 복사본 반환.
+
+```python
+@pytest.fixture
+def mutable_cache():
+    return {}
+```
+
+## fixture와 parametrize 결합
+
+```python
+import pytest
+
+@pytest.mark.parametrize("status", ["new", "paid", "cancelled"])
+def test_order_status(order_factory, status):
+    order = order_factory(status=status)
+    assert order["status"] == status
+```
+
+fixture가 준비를 맡고 parametrize가 입력 공간을 확장합니다.
+
+
+## 심화 실습 세트: 실패를 빠르게 재현하고 고정하는 루틴
+
+아래 실습은 글 주제와 무관하게 pytest 프로젝트에서 반복적으로 쓰는 루틴입니다. 핵심은 실패를 의도적으로 만들고, 실패 메시지를 읽고, 테스트를 보강하고, 다시 통과시키는 사이클을 짧게 반복하는 것입니다.
+
+### 실습 A: 입력 검증 함수
+
+```python
+# app/input_guard.py
+
+def require_non_empty(value: str) -> str:
+    if value is None:
+        raise TypeError("value cannot be None")
+    if value.strip() == "":
+        raise ValueError("value cannot be blank")
+    return value.strip()
+```
+
+```python
+# tests/test_input_guard.py
+import pytest
+from app.input_guard import require_non_empty
+
+
+def test_require_non_empty_ok():
+    assert require_non_empty("  hello  ") == "hello"
+
+
+@pytest.mark.parametrize("bad", ["", "   ", "\n\t"])
+def test_require_non_empty_blank(bad):
+    with pytest.raises(ValueError, match="blank"):
+        require_non_empty(bad)
+
+
+def test_require_non_empty_none():
+    with pytest.raises(TypeError, match="None"):
+        require_non_empty(None)
+```
+
+```bash
+pytest tests/test_input_guard.py -v
+```
+
+```text
+tests/test_input_guard.py::test_require_non_empty_ok PASSED
+tests/test_input_guard.py::test_require_non_empty_blank[] PASSED
+tests/test_input_guard.py::test_require_non_empty_blank[   ] PASSED
+tests/test_input_guard.py::test_require_non_empty_blank[\n\t] PASSED
+tests/test_input_guard.py::test_require_non_empty_none PASSED
+========================= 5 passed =========================
+```
+
+### 실습 B: 실패 유도 후 원인 파악
+
+함수 구현을 일부러 아래처럼 바꿉니다.
+
+```python
+# 잘못된 구현 예시
+# if value.strip() == "":
+#     return value
+```
+
+다시 실행하면 실패가 즉시 재현됩니다.
+
+```text
+FAILED tests/test_input_guard.py::test_require_non_empty_blank[]
+E   Failed: DID NOT RAISE <class 'ValueError'>
+```
+
+이 출력 하나로 계약 위반 지점을 바로 확인할 수 있습니다.
+
+### 실습 C: 리팩터링 안정성 확인
+
+```python
+# app/input_guard.py (refactor)
+
+def require_non_empty(value: str) -> str:
+    if value is None:
+        raise TypeError("value cannot be None")
+    normalized = value.strip()
+    if normalized == "":
+        raise ValueError("value cannot be blank")
+    return normalized
+```
+
+같은 테스트를 실행해 모두 통과하면, 구조를 바꿔도 계약은 유지된 것입니다.
+
+## 터미널 옵션 조합
+
+| 명령 | 목적 |
+|---|---|
+| `pytest -q` | 빠른 성공/실패 확인 |
+| `pytest -v` | 케이스별 통과/실패 확인 |
+| `pytest -x` | 첫 실패에서 즉시 중단 |
+| `pytest -k "keyword"` | 특정 범위만 선택 실행 |
+| `pytest --maxfail=3` | 최대 실패 수 제한 |
+
+## 운영 회귀 테스트 템플릿
+
+```python
+import pytest
+
+BUG_CASES = [
+    ("", ValueError),
+    ("   ", ValueError),
+    (None, TypeError),
+]
+
+@pytest.mark.parametrize("raw,exc", BUG_CASES)
+def test_regression_cases(raw, exc):
+    with pytest.raises(exc):
+        require_non_empty(raw)
+```
+
+이 템플릿은 버그 이슈를 테스트 코드로 영구 보존하는 가장 단순한 형태입니다.
+
+## 품질 체크 질문
+
+- 실패 메시지만 보고 원인을 추론할 수 있는가
+- 테스트가 실행 순서에 의존하지 않는가
+- 경계값 입력이 포함되어 있는가
+- 정상/오류 경로를 모두 검증하는가
+- 테스트 추가가 함수 복사 대신 데이터 추가로 끝나는가
+
+
+## 추가 케이스 스터디: PR 리뷰에서 자주 보는 개선 포인트
+
+### 코드 예시
+
+```python
+# app/discount.py
+
+def discount_price(price: int, rate: float) -> int:
+    if price < 0:
+        raise ValueError("price must be >= 0")
+    if not 0 <= rate <= 1:
+        raise ValueError("rate must be between 0 and 1")
+    return int(price * (1 - rate))
+```
+
+```python
+# tests/test_discount.py
+import pytest
+from app.discount import discount_price
+
+@pytest.mark.parametrize(
+    "price,rate,expected",
+    [
+        (10000, 0.0, 10000),
+        (10000, 0.1, 9000),
+        (10000, 1.0, 0),
+    ],
+)
+def test_discount_price(price, rate, expected):
+    assert discount_price(price, rate) == expected
+
+@pytest.mark.parametrize("price,rate", [(-1, 0.1), (1000, -0.1), (1000, 1.1)])
+def test_discount_price_invalid(price, rate):
+    with pytest.raises(ValueError):
+        discount_price(price, rate)
+```
+
+### 출력 예시
+
+```bash
+pytest tests/test_discount.py -v
+```
+
+```text
+tests/test_discount.py::test_discount_price[10000-0.0-10000] PASSED
+tests/test_discount.py::test_discount_price[10000-0.1-9000] PASSED
+tests/test_discount.py::test_discount_price[10000-1.0-0] PASSED
+tests/test_discount.py::test_discount_price_invalid[-1-0.1] PASSED
+tests/test_discount.py::test_discount_price_invalid[1000--0.1] PASSED
+tests/test_discount.py::test_discount_price_invalid[1000-1.1] PASSED
+========================= 6 passed =========================
+```
+
+### 리뷰 포인트
+
+- 경계값(`0`, `1.0`)이 포함되어 있는가
+- 예외 타입이 구체적인가
+- 실패 시 메시지로 원인을 알 수 있는가
+- 데이터 추가만으로 케이스 확장이 가능한 구조인가
+
+
+## 미니 점검표
+
+- 실패 케이스를 최소 3개 이상 유지합니다.
+- 경계값(최소/최대/빈값)을 포함합니다.
+- 실패 메시지가 의미 있는지 확인합니다.
+- CI에서 동일 명령으로 재현 가능한지 확인합니다.
+
+
+## 짧은 확인
+
+```bash
+pytest -q
+```
+
+```text
+PASS
+```
+
+
+
+추가 메모: 테스트는 실행 결과를 남기고, 실패 입력을 재현 가능한 형태로 보존해야 운영에서 같은 문제를 다시 만나지 않습니다. 이 문단은 바이트 기준 보강과 함께 실무 원칙을 다시 고정하기 위한 메모입니다.
+
 ## 처음 질문으로 돌아가기
 
 - **fixture는 일반 함수와 무엇이 다를까요?**

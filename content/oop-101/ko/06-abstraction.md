@@ -375,6 +375,224 @@ TypeError: Can't instantiate abstract class BrokenPipeline with abstract method 
 
 추상화는 하나의 워크플로에 여러 구현체가 들어오는 순간부터 가치가 커집니다. 팀 계약과 공통 기본 동작이 중요하면 ABC를 쓰고, 상속보다 호환성이 중요하면 Protocol을 선택하면 됩니다. 다음 글에서는 합성과 상속을 비교하면서, 이 계약을 어디에 배치하는 것이 더 자연스러운지 이어서 살펴봅니다.
 
+## 추상화의 품질은 숨긴 양이 아니라 남긴 계약으로 결정됩니다
+
+좋은 추상화는 세부 구현을 감추되, 호출자가 의존해야 하는 규칙은 명확하게 남깁니다.
+
+```text
+[OrderUseCase]
+  + execute(command)
+     |
+     +--> [OrderRepository] (abstract)
+     +--> [PaymentGateway] (abstract)
+
+구현체
+OrderRepository <- SqlOrderRepository, InMemoryOrderRepository
+PaymentGateway  <- MockGateway, RealGateway
+```
+
+## before/after: 구체 구현 의존에서 포트-어댑터 구조로
+
+```python
+# before
+class OrderUseCase:
+    def execute(self, order_id: str, amount: int) -> str:
+        conn = sqlite3.connect('orders.db')
+        # 저장, 결제, 로그가 모두 혼재
+        return 'ok'
+```
+
+```python
+# after
+from abc import ABC, abstractmethod
+
+class OrderRepository(ABC):
+    @abstractmethod
+    def save(self, order_id: str, amount: int) -> None:
+        pass
+
+class PaymentGateway(ABC):
+    @abstractmethod
+    def charge(self, order_id: str, amount: int) -> str:
+        pass
+
+class OrderUseCase:
+    def __init__(self, repo: OrderRepository, gateway: PaymentGateway) -> None:
+        self.repo = repo
+        self.gateway = gateway
+
+    def execute(self, order_id: str, amount: int) -> str:
+        if amount <= 0:
+            raise ValueError('amount must be positive')
+        self.repo.save(order_id, amount)
+        return self.gateway.charge(order_id, amount)
+```
+
+## 위반 사례
+
+| 위반 | 증상 | 수정 |
+|---|---|---|
+| 추상 클래스에 구체 SQL가 섞임 | 계층 경계 붕괴 | 포트에는 계약만 남김 |
+| use case가 외부 SDK 타입을 직접 반환 | 상위 계층 오염 | 도메인 DTO로 변환 |
+| 추상화가 너무 세분화됨 | 구현 클래스 폭증 | 변경 축 기준으로 인터페이스 통합 |
+
+## 비교표: 얕은 추상화 vs 과도한 추상화
+
+| 항목 | 얕은 추상화 | 과도한 추상화 |
+|---|---|---|
+| 장점 | 이해가 빠름 | 교체 유연성 큼 |
+| 단점 | 구현 누수 가능 | 학습 비용 큼 |
+| 적용 기준 | 변동이 적은 내부 코드 | 외부 의존성, 교체 가능성 높은 영역 |
+
+## 실전 시나리오: 요구사항 변경을 견디는 구조로 바꾸기
+
+현업에서는 기능 추가보다 규칙 변경이 더 자주 발생합니다. 따라서 클래스 구조를 평가할 때는 "지금 동작하는가"보다 "다음 변경을 어디까지 건드려야 하는가"를 기준으로 보는 편이 안전합니다.
+
+```python
+from dataclasses import dataclass
+from typing import Protocol
+
+
+@dataclass
+class LineItem:
+    name: str
+    quantity: int
+    unit_price: int
+
+    def subtotal(self) -> int:
+        return self.quantity * self.unit_price
+
+
+class DiscountPolicy(Protocol):
+    def apply(self, amount: int) -> int:
+        ...
+
+
+class NoDiscount:
+    def apply(self, amount: int) -> int:
+        return amount
+
+
+class PercentDiscount:
+    def __init__(self, percent: int) -> None:
+        if not 0 <= percent <= 100:
+            raise ValueError('percent must be 0..100')
+        self.percent = percent
+
+    def apply(self, amount: int) -> int:
+        return int(amount * (100 - self.percent) / 100)
+
+
+class Invoice:
+    def __init__(self, items: list[LineItem], policy: DiscountPolicy) -> None:
+        self.items = items
+        self.policy = policy
+
+    def total(self) -> int:
+        base = sum(i.subtotal() for i in self.items)
+        return self.policy.apply(base)
+```
+
+이 코드는 할인 규칙이 바뀌어도 `Invoice.total()`을 수정할 필요가 없습니다. 확장은 구현 클래스 추가로 닫히고, 핵심 흐름은 안정적으로 유지됩니다.
+
+## UML 스타일로 보는 협력 관계
+
+```text
+[Invoice]
+  - items: list[LineItem]
+  - policy: DiscountPolicy
+  + total()
+
+[LineItem]
+  + subtotal()
+
+[DiscountPolicy] <<interface>>
+  + apply(amount)
+      ^
+      +-- [NoDiscount]
+      +-- [PercentDiscount]
+```
+
+협력 구조를 이렇게 텍스트로 적어 두면 코드 리뷰에서 "어디가 정책 축이고 어디가 도메인 축인가"를 빠르게 맞출 수 있습니다.
+
+## 안티패턴과 교정 절차
+
+| 안티패턴 | 발견 신호 | 교정 순서 |
+|---|---|---|
+| 거대 클래스(God Object) | 메서드가 20개 이상, 변경 이력이 분산됨 | 책임 축 분해 → 협력 인터페이스 도출 |
+| 데이터만 가진 빈 클래스 | 메서드 없이 getter/setter만 존재 | 규칙 메서드 이동 또는 dataclass로 단순화 |
+| 상속 트리 우회 분기 | 하위 클래스 타입 체크 분기 존재 | 다형성 계약 재정의 |
+| 인프라 타입 누수 | 도메인 계층이 SDK 응답 객체 의존 | DTO 변환 계층 추가 |
+
+## 전후 비교: 테스트 유지비
+
+| 항목 | 리팩터링 전 | 리팩터링 후 |
+|---|---|---|
+| 테스트 준비 | 전역 상태 초기화 필요 | 객체 단위 상태 생성 |
+| 실패 원인 추적 | 함수 체인 전체 역추적 | 클래스 메서드 단위 추적 |
+| 회귀 범위 | 넓고 불명확 | 좁고 예측 가능 |
+
+## 팀 적용 체크리스트
+
+- 도메인 용어와 클래스 이름이 일치하는지 확인합니다.
+- 인스턴스 생성 시점에 불변식이 완성되는지 확인합니다.
+- 정책 변경이 기존 코드 수정이 아닌 구현 추가로 가능한지 점검합니다.
+- 코드 리뷰에서 UML 텍스트 10줄로 협력 구조를 먼저 합의합니다.
+- 테스트 이름이 메서드명보다 비즈니스 규칙을 설명하는지 확인합니다.
+
+## 미니 케이스 스터디: 규칙 추가 한 번으로 검증하기
+
+아래 예시는 정책 확장을 기존 코드 수정 없이 추가하는 최소 단위입니다.
+
+```python
+class WeekendPolicy:
+    def apply(self, amount: int, is_weekend: bool) -> int:
+        if is_weekend:
+            return int(amount * 0.95)
+        return amount
+
+
+def estimate(amount: int, is_weekend: bool) -> int:
+    policy = WeekendPolicy()
+    return policy.apply(amount, is_weekend)
+```
+
+핵심은 새로운 정책이 호출 경로를 깨지 않고 들어온다는 점입니다. 변경 이력이 정책 클래스에만 남도록 경계를 유지하면 회귀 위험이 줄어듭니다.
+
+| 확인 질문 | Pass 기준 |
+|---|---|
+| 새 정책 추가 시 기존 함수 수정이 필요한가 | 아니오 |
+| 예외 정책이 기존 계약과 같은가 | 예 |
+| 테스트가 정책별로 분리되어 있는가 | 예 |
+
+## 검증 노트: 객체 설계 품질을 점검하는 질문
+
+아래 질문은 구현 이후 리뷰에서 반복적으로 사용하는 기준입니다.
+
+- 이 메서드가 실패할 때 예외 타입과 메시지가 호출자 계약과 일치하는가.
+- 같은 규칙이 다른 클래스나 함수에 중복되어 있지 않은가.
+- 상태 변경이 메서드 한 경로로만 이루어지는가.
+- 외부 의존성 없이 단위 테스트가 가능한가.
+
+```python
+def review_signal(duplicate_rules: int, mutable_paths: int) -> str:
+    if duplicate_rules > 0:
+        return '중복 규칙 제거 필요'
+    if mutable_paths > 1:
+        return '상태 변경 경로 통합 필요'
+    return '구조 안정'
+```
+
+이런 체크를 글 단위 예제에도 적용하면, 객체지향을 문법이 아니라 유지보수 전략으로 이해하는 데 도움이 됩니다.
+
+## 한 줄 정리 확장
+
+객체지향 품질은 클래스 개수가 아니라 변경 영향 범위를 얼마나 줄였는지로 판단합니다.
+
+## 보강 메모
+
+설계 선택은 정답 찾기가 아니라 변경 비용을 낮추는 의사결정입니다. 같은 기능이라도 경계를 먼저 정의하면 리뷰와 테스트가 단순해집니다.
+
 ## 처음 질문으로 돌아가기
 
 - **덕 타이핑 관례만으로는 언제부터 부족해질까요?**

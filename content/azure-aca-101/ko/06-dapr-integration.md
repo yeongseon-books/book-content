@@ -222,6 +222,229 @@ Dapr를 써야 할 때와 건너뛸 때는 대개 아래처럼 나뉩니다.
 
 ACA는 Dapr 버전을 플랫폼 차원에서 관리합니다. 메이저 업그레이드가 있을 때는 breaking change가 없는지 release note를 확인해야 합니다.
 
+## Dapr 실전 예시 — Invocation, Pub/Sub, State
+
+Dapr를 도입할 때는 한 번에 모든 building block을 켜기보다, 호출 경로와 오류 처리 규칙이 분명한 것부터 시작하는 편이 안전합니다.
+
+### 서비스 호출 아키텍처
+
+```mermaid
+flowchart LR
+  A["api-app"] --> D1["daprd :3500"]
+  D1 --> D2["daprd :3500"]
+  D2 --> B["worker-app :8000"]
+  D1 --> SB["Service Bus Component"]
+  D1 --> ST["State Store"]
+```
+
+*Dapr 사이드카 간 호출과 백엔드 연결*
+
+### Service invocation 예시(FastAPI)
+
+```python
+import requests
+
+def call_worker(order_id: str) -> dict:
+    resp = requests.post(
+        "http://localhost:3500/v1.0/invoke/worker-app/method/process",
+        json={"orderId": order_id},
+        timeout=3,
+    )
+    resp.raise_for_status()
+    return resp.json()
+```
+
+### State store 읽기/쓰기 예시
+
+```python
+import requests
+
+def save_state(key: str, value: dict) -> None:
+    requests.post(
+        "http://localhost:3500/v1.0/state/orderstate",
+        json=[{"key": key, "value": value}],
+        timeout=3,
+    ).raise_for_status()
+
+def load_state(key: str) -> dict:
+    r = requests.get(f"http://localhost:3500/v1.0/state/orderstate/{key}", timeout=3)
+    if r.status_code == 204:
+        return {}
+    r.raise_for_status()
+    return r.json()
+```
+
+### Component 배포 CLI 출력 확인
+
+```bash
+az containerapp env dapr-component list --name $ACA_ENV --resource-group $RG --output table
+```
+
+예상 출력:
+
+```text
+Name         ComponentType                     Scopes
+-----------  --------------------------------  -------------------
+orderpubsub  pubsub.azure.servicebus.queues    api-app,worker-app
+orderstate   state.redis                       api-app,worker-app
+```
+
+### 오류 시나리오
+
+- scope 누락: 특정 앱에서 `ERR_STATE_STORE_NOT_CONFIGURED` 발생
+- secretRef 오타: component는 등록되지만 호출 시 인증 실패
+- app-id 불일치: invocation URL은 404를 반환
+
+이 오류는 대부분 IaC 검토 단계에서 잡을 수 있습니다. component 이름, scope, secretRef를 리뷰 체크리스트에 고정하면 런타임 장애를 크게 줄일 수 있습니다.
+
+## 보안과 신뢰성 — Dapr 도입 시 필수 점검
+
+Dapr는 개발 속도를 올려 주지만, 컴포넌트 경계가 늘어나므로 보안 점검 항목도 함께 늘어납니다.
+
+### 권장 보안 구성
+
+- component secret은 Key Vault 기반 secret store로 이동
+- scopes를 앱 단위 최소 권한으로 제한
+- 재시도 정책과 타임아웃을 명시
+- dead-letter 경로를 메시지 시스템 쪽에서 준비
+
+### Component 예시(Secret store + Pub/Sub)
+
+```yaml
+componentType: secretstores.azure.keyvault
+version: v1
+metadata:
+  - name: vaultName
+    value: my-kv
+scopes:
+  - api-app
+  - worker-app
+```
+
+```yaml
+componentType: pubsub.azure.servicebus.queues
+version: v1
+metadata:
+  - name: namespaceName
+    value: mybus.servicebus.windows.net
+  - name: connectionString
+    secretRef: sb-conn
+secrets:
+  - name: sb-conn
+    value: "<REDACTED>"
+scopes:
+  - api-app
+  - worker-app
+```
+
+### 실패 복원 시나리오
+
+- pub/sub publish 실패 시: 앱은 로컬 재시도 후 실패 이벤트를 별도 저장
+- invocation timeout 시: idempotency key를 포함해 재호출
+- state write 충돌 시: ETag 기반 낙관적 동시성 사용
+
+### 운영 확인 명령
+
+```bash
+az containerapp env dapr-component list --name $ACA_ENV --resource-group $RG -o json
+az containerapp logs show --name api-app --resource-group $RG --follow
+```
+
+로그에서 `ERR_` 패턴을 초기에 수집해 분류하면, 도입 초기 장애를 빠르게 패턴화할 수 있습니다.
+
+### 도입 순서 권장안
+
+1. service invocation만 먼저 적용
+2. pub/sub 추가
+3. state store 추가
+4. secret store와 정책 고도화
+
+이 순서는 디버깅 범위를 단계적으로 넓혀 줍니다. 처음부터 네 가지를 동시에 넣으면 장애 원인 분리가 매우 어려워집니다.
+
+## 실전 FAQ
+
+### Q1. 포털에서는 정상인데 실제 응답은 불안정한 이유는 무엇일까요?
+
+포털의 Provisioning 성공은 control plane 기준 신호입니다. 실제 사용자 품질은 data plane에서 결정됩니다. 따라서 항상 FQDN 호출 결과, revision health, system log를 함께 봐야 합니다. 운영 체크는 "설정이 저장됐는가"가 아니라 "요청이 안정적으로 처리되는가"로 마무리해야 합니다.
+
+### Q2. `latest` 태그를 쓰면 왜 문제가 될까요?
+
+`latest`는 사람이 보기에는 편하지만 감사/롤백/재현성에 모두 불리합니다. 같은 태그가 다른 이미지를 가리킬 수 있기 때문입니다. 프로덕션에서는 `v1.2.3` 또는 commit SHA처럼 불변 태그를 사용해야 합니다.
+
+### Q3. 스케일과 배포를 동시에 바꾸면 어떤 위험이 있나요?
+
+문제 원인 분리가 어려워집니다. 예를 들어 새 이미지와 새 스케일 규칙을 동시에 올리면 오류가 코드 문제인지 스케일 정책 문제인지 즉시 구분하기 어렵습니다. 안전한 팀은 배포와 스케일 변경을 분리하고, 각 변경마다 관측 지표를 따로 확인합니다.
+
+### Q4. 멀티 서비스에서 네이밍 규칙은 어느 정도로 엄격해야 하나요?
+
+매우 엄격해야 합니다. `orders-api--v12`처럼 서비스명과 revision suffix 패턴을 고정하면 로그, 알림, 런북 자동화가 쉬워집니다. 네이밍이 흔들리면 같은 쿼리를 서비스마다 다르게 써야 하고, 온콜 대응 속도가 느려집니다.
+
+### Q5. 운영 문서에는 최소 무엇이 들어가야 하나요?
+
+- 생성/변경 명령
+- 예상 출력
+- 실패 시 증상
+- 확인할 로그 위치
+- 즉시 복구 명령
+
+이 다섯 가지를 글과 저장소 문서에 같이 유지하면, 팀 내 경험 차이가 있어도 대응 품질이 크게 흔들리지 않습니다.
+
+## 참고용 명령 모음
+
+```bash
+# 앱 목록
+az containerapp list --resource-group $RG -o table
+
+# 단일 앱 상세
+az containerapp show --name $APP --resource-group $RG -o json
+
+# revision 목록
+az containerapp revision list --name $APP --resource-group $RG -o table
+
+# 트래픽 가중치
+az containerapp ingress traffic show --name $APP --resource-group $RG -o table
+
+# 최근 로그
+az containerapp logs show --name $APP --resource-group $RG --tail 100
+```
+
+운영에서 중요한 것은 명령의 개수가 아니라 실행 순서입니다. 앱 상세 → revision 상태 → 트래픽 가중치 → 로그 순서로 보면 대부분의 이슈를 짧은 시간에 분류할 수 있습니다.
+
+Dapr를 도입하면 애플리케이션 코드는 단순해지지만, 런타임 관찰 포인트는 늘어납니다. 앱 로그, 사이드카 로그, 백엔드 서비스 상태를 함께 봐야 하므로 관측 대시보드를 미리 구성해 두는 편이 좋습니다.
+
+또한 Dapr를 쓰는 서비스와 쓰지 않는 서비스를 혼합 운영할 때 경계 문서가 중요합니다. 어떤 호출은 Dapr invocation으로 가고, 어떤 호출은 직접 HTTP로 가는지 일관된 규칙이 없으면 트러블슈팅이 길어집니다.
+
+도입 초기에는 "한 기능씩" 원칙이 가장 안전합니다. invocation 안정화 후 pub/sub, 그다음 state store를 추가하면 장애 범위를 통제하기 쉽고 팀 학습도 빠르게 진행됩니다.
+
+## 운영 메모 — 팀 합의가 필요한 항목
+
+실제 운영에서는 기술 선택만큼 팀 합의가 중요합니다. 아래 항목은 서비스별로 값이 달라도 되지만, 같은 서비스 안에서는 반드시 고정해야 합니다.
+
+- 배포 단위: 이미지 태그 규칙, revision suffix 규칙
+- 검증 단위: healthz 통과 기준, canary 관찰 시간
+- 복구 단위: 즉시 rollback 임계치, 단계적 복구 절차
+- 기록 단위: 변경 이력, 영향 범위, 후속 액션
+
+합의가 없는 상태에서는 같은 장애라도 담당자마다 전혀 다른 대응을 하게 됩니다. 반대로 합의를 문서와 자동화에 같이 넣으면, 야간 온콜에서도 대응 품질이 안정적으로 유지됩니다.
+
+### 권장 문서 구조
+
+1. 아키텍처 개요와 경계
+2. 배포 절차와 검증 절차
+3. 장애 분류와 즉시 조치
+4. 모니터링 쿼리와 알림 임계치
+5. 사후 분석(RCA) 템플릿
+
+이 다섯 장이 준비되면 서비스 성숙도는 빠르게 올라갑니다. 특히 신입 엔지니어가 투입되어도 동일한 기준으로 운영할 수 있어 팀 전체의 평균 대응 시간이 짧아집니다.
+
+## 추가 시나리오 — 점진 도입 후 무중단 전환
+
+기존 SDK 호출 코드를 한 번에 Dapr로 바꾸기 어렵다면, 동일 기능을 두 경로로 잠시 병행한 뒤 트래픽 기반으로 전환할 수 있습니다. 예를 들어 API는 먼저 Dapr invocation 경로를 추가하고, worker는 기존 경로를 유지합니다. 이후 모니터링 지표가 안정적이면 기존 SDK 경로를 제거합니다.
+
+이 방식은 변경 범위를 줄여 장애 가능성을 낮춥니다. 다만 병행 기간에는 로그 분류가 복잡해지므로, 요청마다 `path=legacy` 또는 `path=dapr` 같은 태그를 반드시 남겨야 분석이 가능합니다.
+
+Dapr 전환 후에는 앱 로그에 component 이름을 함께 남기는 습관이 중요합니다. 같은 publish 실패라도 어떤 component에서 실패했는지 알 수 있어야 복구 시간이 짧아집니다. 운영 로그 스키마에 `dapr_component`, `dapr_operation` 필드를 넣어 두면 분석 속도가 크게 좋아집니다.
+
 ## 체크리스트
 
 - [ ] `--enable-dapr true`, `--dapr-app-id`, `--dapr-app-port`를 설정했습니까?

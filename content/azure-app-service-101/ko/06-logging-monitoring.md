@@ -477,6 +477,366 @@ AppTraces
 
 ## 운영 체크리스트
 
+---
+
+## 모니터링 아키텍처를 텍스트 다이어그램으로 고정하기
+
+운영팀이 바뀌어도 같은 관측 모델을 쓰려면 로그/메트릭/트레이스 흐름을 명시적으로 남겨야 합니다.
+
+```mermaid
+flowchart LR
+    A["App stdout stderr"] --> B["App Service Log Pipeline"]
+    B --> C["/home/LogFiles"]
+    B --> D["Log Stream"]
+    A --> E["OpenTelemetry SDK"]
+    E --> F["Application Insights"]
+    F --> G["KQL Dashboard"]
+    F --> H["Alert Rules"]
+```
+
+이 구조를 문서화하면 "이 신호는 어디서 봐야 하는가"에 대한 팀 내 논쟁이 크게 줄어듭니다.
+
+---
+
+## 장애 초동 5분 체크리스트
+
+"앱이 느리다"는 제보를 받았을 때 초동 5분 루틴을 고정합니다.
+
+1. Metrics에서 `Http 5xx`, `Response time`, `Requests`를 같은 시간축으로 확인
+2. Log stream으로 실시간 오류 패턴 파악
+3. App Insights에서 같은 시간대 `AppRequests`, `AppDependencies` 조회
+4. Health Check 상태와 인스턴스 수 변화 확인
+
+```bash
+az monitor metrics list \
+  --resource "/subscriptions/$SUB/resourceGroups/$RG/providers/Microsoft.Web/sites/$APP_NAME" \
+  --metric "Http5xx,HttpResponseTime,Requests" \
+  --interval PT1M \
+  --aggregation Average Total
+```
+
+---
+
+## 대표 로그 패턴과 해석
+
+```text
+WARNING - Container cpu usage high: 92%
+ERROR - Exception in dependency call: timeout
+INFO - GET /health 200 3ms
+ERROR - GET /api/orders 500 1834ms correlationId=ab12...
+```
+
+| 로그 패턴 | 해석 | 우선 대응 |
+|---|---|---|
+| `cpu usage high` 반복 | compute 포화 가능성 | scale out 검토, 느린 endpoint 확인 |
+| `dependency timeout` 증가 | 외부 의존성 병목 | DB/API latency, retry 정책 점검 |
+| `/health 200` 유지 + 사용자 오류 증가 | 부분 장애 가능성 | 핵심 endpoint 별도 모니터링 |
+| `500` + 긴 duration | 앱/의존성 공통 원인 | correlationId 기반 추적 |
+
+---
+
+## KQL 심화 예시: 원인 후보를 좁히는 질의
+
+### 1) 느린 요청 상위 endpoint
+
+```kql
+AppRequests
+| where TimeGenerated > ago(30m)
+| summarize p95=percentile(DurationMs, 95), count=count() by Name
+| order by p95 desc
+| take 10
+```
+
+### 2) 5xx와 의존성 실패의 상관
+
+```kql
+let req = AppRequests
+| where TimeGenerated > ago(1h)
+| summarize reqFailed=countif(Success == false) by bin(TimeGenerated, 5m);
+let dep = AppDependencies
+| where TimeGenerated > ago(1h)
+| summarize depFailed=countif(Success == false) by bin(TimeGenerated, 5m);
+req
+| join kind=inner dep on TimeGenerated
+| project TimeGenerated, reqFailed, depFailed
+| order by TimeGenerated asc
+```
+
+### 3) 특정 인스턴스 편향 확인
+
+```kql
+AppRequests
+| where TimeGenerated > ago(1h)
+| summarize total=count(), failed=countif(Success == false) by CloudRoleInstance
+| extend errorRate = failed * 100.0 / total
+| order by errorRate desc
+```
+
+한 인스턴스만 실패율이 높으면 앱 코드보다 인스턴스 상태나 warm-up 이슈를 먼저 의심합니다.
+
+---
+
+## Portal 알림 설계: 너무 민감하지도 둔하지도 않게
+
+### 권장 시작값
+
+- `Http 5xx > 5` (5분 평균, 1분 평가)
+- `Response Time p95 > 2000ms` (10분)
+- `Memory Percentage > 85` (5분)
+- `Instance Count > 비용 상한` (즉시)
+
+### 잘못된 설정 예
+
+- 1분 스파이크에도 즉시 P1 알람 발송
+- 업무시간/야간 구분 없이 동일 임계치 사용
+- 자동 scale과 알람 조건이 서로 충돌
+
+알람은 "많이 울리는 것"보다 "행동 가능한 신호"가 중요합니다.
+
+---
+
+## Before/After: 로그는 있는데 답을 못하는 상태에서 벗어나기
+
+### Before
+
+- 텍스트 로그가 섞여 있어 검색이 어렵습니다.
+- correlation id가 없어 사용자 제보와 로그를 연결하지 못합니다.
+- 알람이 과도하거나 무의미해 피로도가 높습니다.
+
+### After
+
+- JSON 구조화 로그로 필터링과 집계가 쉬워집니다.
+- 요청 단위 추적이 가능해 RCA 속도가 빨라집니다.
+- App Insights/KQL 대시보드로 반복 장애 패턴을 설명할 수 있습니다.
+
+---
+
+## Diagnostic Settings로 중앙 수집 연결하기
+
+App Service 단일 리소스에서 보는 로그만으로는 시리즈 운영이 길어질수록 한계가 생깁니다. 중앙 Log Analytics Workspace로 모아 두면 교차 분석이 쉬워집니다.
+
+```bash
+WORKSPACE_ID=$(az monitor log-analytics workspace show \
+  --resource-group $RG \
+  --workspace-name $LAW_NAME \
+  --query id \
+  --output tsv)
+
+az monitor diagnostic-settings create \
+  --name appservice-diag \
+  --resource "/subscriptions/$SUB/resourceGroups/$RG/providers/Microsoft.Web/sites/$APP_NAME" \
+  --workspace "$WORKSPACE_ID" \
+  --logs '[{"category":"AppServiceHTTPLogs","enabled":true},{"category":"AppServiceConsoleLogs","enabled":true}]' \
+  --metrics '[{"category":"AllMetrics","enabled":true}]'
+```
+
+이 구성을 해 두면 앱별 로그를 넘어서 리소스 그룹 단위 장애 상관관계를 볼 수 있습니다.
+
+## 요청/의존성 상관 분석 예시
+
+```kql
+AppRequests
+| where TimeGenerated > ago(30m)
+| summarize req=count(), p95=percentile(DurationMs, 95), fail=countif(Success == false) by bin(TimeGenerated, 5m)
+| extend failRate = fail * 100.0 / req
+| join kind=leftouter (
+    AppDependencies
+    | where TimeGenerated > ago(30m)
+    | summarize depFail=countif(Success == false) by bin(TimeGenerated, 5m)
+) on TimeGenerated
+| project TimeGenerated, req, p95, failRate, depFail
+| order by TimeGenerated asc
+```
+
+요청 실패율과 dependency 실패율이 동시에 오르면 앱 코드보다 외부 의존성 병목을 먼저 보는 것이 일반적으로 빠릅니다.
+
+## 로그 보존 정책을 운영 문서로 명시하기
+
+```yaml
+observability_policy:
+  filesystem_logs:
+    retention_days: 7
+    retention_mb: 100
+    purpose: short_term_debug
+  app_insights:
+    retention_days: 90
+    purpose: trend_and_alert
+  log_analytics:
+    retention_days: 30
+    purpose: cross_service_correlation
+```
+
+보존 정책이 문서화되어 있지 않으면 장애 복기 시점에 필요한 로그가 이미 사라져 있는 경우가 자주 발생합니다.
+
+---
+
+## 처음 질문으로 돌아가기
+
+- App Service diagnostic log는 어디에 쌓이는가? -> `/home/LogFiles`와 모니터링 백엔드로 나뉘어 저장됩니다.
+- App Insights, Log Analytics, Diagnostic Settings 책임은? -> 실시간 확인, 장기 분석, 중앙 수집의 역할이 분리됩니다.
+- live tail의 한계는? -> 현재 상태 파악에는 강하지만 장기 추세 분석에는 약합니다.
+- memory/5xx/response time 알림 기준은? -> 행동 가능한 임계치부터 시작해 트래픽 패턴에 맞게 보정합니다.
+- disk quota/dependency failure 신호는? -> 파일시스템 사용량, dependency failure율, timeout 로그를 함께 봐야 합니다.
+
+---
+
+## 운영 대시보드 최소 구성
+
+대시보드를 크게 시작하면 유지가 어렵습니다. App Service 입문 단계에서는 아래 6개 패널이 실용적입니다.
+
+1. 요청 수(분당)
+2. HTTP 5xx 비율
+3. p95 응답 시간
+4. 인스턴스 수 변화
+5. dependency 실패율
+6. 최근 20개 오류 로그
+
+```kql
+AppRequests
+| where TimeGenerated > ago(15m)
+| summarize req=count(), fail=countif(Success == false), p95=percentile(DurationMs,95) by bin(TimeGenerated, 1m)
+| extend failRate = fail * 100.0 / req
+| project TimeGenerated, req, failRate, p95
+```
+
+---
+
+## 배포 직후 로그 검증 루틴
+
+배포가 끝난 뒤에는 아래 순서로 로그 채널을 확인합니다.
+
+```bash
+# 1) 로그 설정 확인
+az webapp log show --resource-group $RG --name $APP_NAME --output json
+
+# 2) 실시간 스트림 연결
+az webapp log tail --resource-group $RG --name $APP_NAME
+
+# 3) 요청 발생(다른 터미널)
+curl -sS "https://$APP_HOST/health"
+```
+
+로그가 보이지 않으면 앱 자체보다 먼저 로그 파이프라인 활성화 여부를 의심해야 합니다.
+
+---
+
+## 알림 잡음 줄이기 가이드
+
+### 안티패턴
+
+- 동일 조건의 알림을 여러 리소스에 중복 생성
+- severity 구분 없이 모두 동일 채널로 전송
+- 자동 스케일 이벤트와 장애 알림을 구분하지 않음
+
+### 권장 패턴
+
+- `정보성`, `주의`, `긴급` 액션 그룹 분리
+- 야간에는 긴급 알림만 호출
+- 동일 원인의 중복 알림을 suppression으로 정리
+
+모니터링의 목적은 알람 수가 아니라 대응 품질입니다.
+
+---
+
+## 로그 보존 정책 예시
+
+로그를 무기한 쌓으면 비용과 검색 성능이 함께 악화됩니다. 보존 기간은 목적별로 분리합니다.
+
+| 로그 유형 | 보존 기간 예시 | 목적 |
+|---|---|---|
+| 실시간 파일시스템 로그 | 7일 | 배포 직후/장애 초동 |
+| App Insights Trace | 30~90일 | 추세 분석, RCA |
+| 감사/보안 로그 | 조직 정책 기준 | 규정 준수 |
+
+### 운영 팁
+
+- 장기 보관이 필요한 로그는 중앙 저장소(Log Analytics, Storage)로 내보냅니다.
+- 개인정보가 포함될 수 있는 필드는 애플리케이션 레벨에서 마스킹합니다.
+
+---
+
+## 요청 한 건을 끝까지 추적하는 절차
+
+1. 사용자에게 `X-Correlation-ID`를 받습니다.
+2. App Insights에서 동일 ID의 trace/request/dependency를 조회합니다.
+3. 실패 지점이 앱인지 의존성인지 분리합니다.
+4. 동일 패턴이 다른 요청에서도 반복되는지 확인합니다.
+
+```kql
+let target = "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
+AppRequests
+| where TimeGenerated > ago(24h)
+| where tostring(Properties["correlationId"]) == target
+| project TimeGenerated, Name, DurationMs, ResultCode
+| order by TimeGenerated asc
+```
+
+요청 단위 추적이 가능해지면 "느리다"는 제보를 재현 가능한 데이터로 바꿀 수 있습니다.
+
+---
+
+## 장애 커뮤니케이션용 데이터 묶음
+
+장애 대응 중에는 기술 분석과 동시에 커뮤니케이션 품질이 중요합니다. 아래 항목을 고정하면 업데이트가 빨라집니다.
+
+| 항목 | 예시 |
+|---|---|
+| 영향 시간 | 10:02 ~ 10:19 KST |
+| 영향 범위 | `/api/orders` 요청의 18% 실패 |
+| 대표 오류 | dependency timeout |
+| 현재 상태 | 복구 완료, 모니터링 중 |
+| 다음 조치 | DB pool 상향, 알림 임계치 보정 |
+
+### 추출 명령 예시
+
+```kql
+AppRequests
+| where TimeGenerated between(datetime(2026-05-21 01:00:00)..datetime(2026-05-21 01:30:00))
+| summarize total=count(), failed=countif(Success == false), p95=percentile(DurationMs,95) by Name
+| extend failRate = failed * 100.0 / total
+| order by failRate desc
+```
+
+이 데이터는 RCA 문서의 핵심 근거가 됩니다.
+
+---
+
+## 운영 단계별 관측 성숙도
+
+```text
+단계 1: 로그 수집만 함
+단계 2: 구조화 로그 + correlation id
+단계 3: App Insights + KQL 대시보드
+단계 4: 알림 튜닝 + runbook 자동화
+```
+
+팀이 어느 단계에 있는지 명확히 정의하면, 다음 투자 우선순위가 선명해집니다.
+
+---
+
+## runbook 예시: 5xx 급증 대응
+
+```text
+Trigger: Http 5xx > 5 (5m)
+Owner: On-call backend engineer
+
+Step 1 (0-2분)
+- Metrics에서 5xx/latency/requests 동시 확인
+
+Step 2 (2-5분)
+- Log stream으로 최근 오류 패턴 수집
+- App Insights에서 dependency 실패율 조회
+
+Step 3 (5-10분)
+- 원인 후보를 Frontend/Worker/App/Dependency로 분류
+- 임시 완화 조치(스케일 조정, 기능 플래그, 재시작) 실행
+
+Step 4 (10분 이후)
+- 영향 공지, RCA 초안 작성 시작
+```
+
+runbook이 있으면 대응 속도보다 대응 품질의 편차를 줄일 수 있습니다.
+
 - [ ] App Service diagnostic log를 Log Analytics에 중앙화했다
 - [ ] Application Insights를 켜고 sampling 정책을 정했다
 - [ ] memory, 5xx, latency 알림 기준을 정했다
