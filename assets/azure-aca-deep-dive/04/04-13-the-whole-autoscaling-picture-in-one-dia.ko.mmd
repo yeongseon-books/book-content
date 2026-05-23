@@ -1,7 +1,0 @@
-flowchart TD
-  Events["외부 이벤트"] --> Adapter["KEDA 메트릭 어댑터"]
-  HTTP["HTTP 트래픽"] --> Envoy["Envoy 프록시 메트릭"]
-  Envoy --> Adapter
-  Adapter --> API["메트릭 API"]
-  API --> HPA["HPA"]
-  HPA --> Replicas["앱 레플리카 (0~N개)"]

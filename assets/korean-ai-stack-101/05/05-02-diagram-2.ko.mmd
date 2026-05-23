@@ -1,9 +1,0 @@
-flowchart TD
-    A["생성 API 운영"] --> B["호출 계약\nauth / endpoint / retry"]
-    A --> C["메시지 계약\nsystem / user / role"]
-    A --> D["샘플링 계약\ntemperature / max_tokens"]
-    A --> E["응답 계약\nJSON / validation / masking"]
-    B --> F["공급자 바뀌면 다시 점검"]
-    C --> G["모델이 바뀌어도 대부분 재사용"]
-    D --> G
-    E --> G
