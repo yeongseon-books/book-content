@@ -111,9 +111,9 @@ sqlite3는 `qmark`와 `named`를 모두 지원합니다. `import sqlite3; print(
 
 placeholder는 값 자리에만 쓸 수 있습니다. 다음은 binding 대상이 아닙니다.
 
-- table name (`FROM ?` ❌)
-- column name (`SELECT ? FROM users` ❌)
-- ORDER BY 방향 (`ORDER BY age ?` ❌)
+- table name (`FROM ?` Fail)
+- column name (`SELECT ? FROM users` Fail)
+- ORDER BY 방향 (`ORDER BY age ?` Fail)
 - LIMIT/OFFSET (sqlite3는 일부 지원, 다른 driver는 미지원)
 
 이런 자리에는 whitelist 검증을 거쳐 직접 문자열로 삽입합니다.

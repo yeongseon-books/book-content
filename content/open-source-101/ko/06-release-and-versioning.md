@@ -260,7 +260,7 @@ jobs:
 
 ## Breaking Changes
 
-⚠️ If you're upgrading from v1.x:
+주의️ If you're upgrading from v1.x:
 
 1. `connect()` is now async — add `await`
 2. Config format changed — see migration guide below

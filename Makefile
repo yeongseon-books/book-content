@@ -30,6 +30,7 @@ check-content:
 	python3 scripts/check_no_trailing_colon_heading.py
 	python3 scripts/check_no_empty_links.py
 	python3 scripts/check_intro_no_next_link.py
+	python3 scripts/check_no_emoji.py
 
 # Validate generated outputs (Medium HTML, exports)
 check-generated:

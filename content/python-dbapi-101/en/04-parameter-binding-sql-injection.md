@@ -133,9 +133,9 @@ sqlite3 supports both `qmark` and `named`. `import sqlite3; print(sqlite3.params
 
 Placeholders only fill **value** positions. The following are NOT bindable.
 
-- table names (`FROM ?` ❌)
-- column names (`SELECT ? FROM users` ❌)
-- ORDER BY direction (`ORDER BY age ?` ❌)
+- table names (`FROM ?` Fail)
+- column names (`SELECT ? FROM users` Fail)
+- ORDER BY direction (`ORDER BY age ?` Fail)
 - LIMIT/OFFSET (sqlite3 supports binding here, but many drivers do not)
 
 For these positions, validate against a whitelist and inject as a string.
