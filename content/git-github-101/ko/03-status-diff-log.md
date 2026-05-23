@@ -638,17 +638,11 @@ git push
 ## 처음 질문으로 돌아가기
 
 - **`git status`의 긴 출력과 짧은 출력은 각각 무엇을 보여 줄까요?**
-  - 본문의 기준은 변경 사항 확인하기 - status, diff, log로 읽기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 본문에서 본 것처럼 `git status` 긴 출력은 작업 위치와 다음 행동 힌트를 문장으로 보여 주고, `git status -s`는 파일별 XY 코드(예: `M `, `??`, `A `, ` M`)로 상태를 한눈에 빠르게 보여 줍니다. 스크립트로 상태를 파싱해야 할 때는 `-s` 형식이 안정적입니다.
 - **`git diff`, `git diff --cached`, `git diff HEAD`는 어느 영역끼리 비교할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 본문 예시처럼 `git diff`는 Working Directory vs Index(아직 stage 안 한 변경), `git diff --cached`는 Index vs HEAD(이번 commit에 들어갈 변경), `git diff HEAD`는 Working Directory + Index vs HEAD(아직 commit 안 된 모든 변경)를 비교합니다. 세 명령의 차이가 곧 Git의 세 영역 모델 그 자체입니다.
 - **두 commit을 직접 비교할 때는 어떤 순서로 hash를 넣어야 할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
-
-질문에 대한 실전형 답을 짧게 정리하면 아래와 같습니다.
-
-- `git status` 긴 출력은 작업 위치와 다음 행동 힌트를 문장으로 보여 주고, `git status -s`는 파일별 XY 코드로 상태를 빠르게 보여 줍니다.
-- `git diff`는 Working Directory vs Index, `git diff --cached`는 Index vs HEAD, `git diff HEAD`는 Working Directory + Index vs HEAD를 비교합니다.
-- 두 commit 비교는 보통 `git diff <old> <new>` 순서로 읽습니다. 순서를 바꾸면 `+`/`-` 해석도 반대로 바뀝니다.
+  - 본문에서 강조했듯이 보통 `git diff <old> <new>` 순서로 읽습니다. 그래야 `+` 라인이 "새 commit에서 추가된 줄", `-` 라인이 "이전 commit에서 사라진 줄"로 자연스럽게 해석되고, 순서를 바꾸면 `+`/`-` 의미가 정반대로 뒤집힙니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
