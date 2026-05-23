@@ -486,11 +486,11 @@ az containerapp logs show --name $APP --resource-group $RG --tail 100
 ## 처음 질문으로 돌아가기
 
 - **로컬 FastAPI 코드가 실제 ACA Revision으로 살아나기까지의 전체 경로는 어떻게 될까요?**
-  - 본문의 기준은 첫 배포하기 — Python/FastAPI를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 이 글의 경로는 `app/main.py`와 `Dockerfile` 작성에서 시작해, `az acr build --registry $ACR_NAME --image fastapi-hello:v1 .`로 이미지를 만들고, `az containerapp env create`로 Environment를 만든 뒤, `az containerapp create --image $IMAGE`로 첫 Revision을 띄우는 순서였습니다. 마지막 검증도 포털이 아니라 `FQDN=$(az containerapp show ...)`, `curl https://$FQDN/healthz`, `az containerapp revision list ... healthState`로 끝냈습니다. 즉 로컬 코드가 살아나는 경로는 소스 → 이미지 → 레지스트리 → Environment → Revision입니다.
 - **ACA가 이미지를 직접 빌드해 주지 않는다는 사실은 책임 분담에 어떤 의미를 가질까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - ACA는 `Source code → image build`를 맡지 않고, 이미 존재하는 이미지 참조만 소비합니다. 그래서 빌드와 푸시는 개발자나 CI의 책임이고, ACA는 그 뒤의 image pull, ingress, TLS, scale-to-zero, restart를 담당한다고 표로 나눠 설명했습니다. 이 책임 분리가 명확해야 `az acr build`, 불변 이미지 태그, `github.sha` 기반 배포 파이프라인을 먼저 고정할 수 있습니다.
 - **ACR → ACA Environment → Container App → Revision이라는 네 단계 의존성 체인은 어떻게 이어질까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - ACR에 `fastapi-hello:v1`가 올라가야 Container App이 pull할 수 있고, 그 Container App은 반드시 특정 `managedEnvironmentId` 안에서 Revision으로 실행됩니다. 본문 Bicep 예시에서도 `registries.server`, `managedEnvironmentId`, `template.containers[].image`가 한 줄 체인으로 연결돼 있었고, 실패 시에는 `ImagePull`, 포트 불일치, `AcrPull` 권한 누락을 순서대로 점검하도록 정리했습니다. 즉 네 단계는 느슨한 개념이 아니라 실제 배포 성공 조건의 연결 고리입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

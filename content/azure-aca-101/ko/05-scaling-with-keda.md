@@ -431,11 +431,11 @@ az containerapp logs show --name $APP --resource-group $RG --tail 100
 ## 처음 질문으로 돌아가기
 
 - **Azure Container Apps는 선언형 스케일링 신호를 바탕으로 replica 수를 어떻게 결정할까요?**
-  - 본문의 기준은 스케일링 — KEDA scaler와 zero-to-N를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 이 글의 정리는 `Signal → Rule → Bounds`였습니다. ACA는 HTTP 동시 요청 수나 Service Bus 큐 길이 같은 신호를 보고, `--scale-rule-type http` 또는 `azure-servicebus` 같은 규칙으로 해석한 뒤, `--min-replicas`와 `--max-replicas` 사이에서 replica 수를 결정합니다. 즉 replica 수는 직접 계산해 넣는 값이 아니라 신호와 상한·하한을 선언한 결과로 만들어집니다.
 - **내장 HTTP/TCP 규칙과 사용자 정의 KEDA scaler의 차이는 무엇일까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - HTTP/TCP 규칙은 ACA ingress가 직접 측정하므로 별도 인증 없이 `--scale-rule-http-concurrency 100` 같은 값만 주면 됩니다. 반면 Service Bus 같은 custom KEDA rule은 외부 리소스를 polling해야 하므로 `--scale-rule-auth connection=sb-connection`과 `queueName`, `namespace`, `messageCount` 메타데이터를 함께 줘야 합니다. 본문에서 공개 API와 `queue-worker` 예시를 분리한 이유도 바로 이 입력 경계 차이를 보여 주기 위해서였습니다.
 - **`min-replicas 0`(scale-to-zero)는 언제 안전하고, 언제 위험할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - `min-replicas 0`은 유휴 비용을 거의 없애 주지만 첫 요청에 cold start를 만들기 때문에, 사용자 대면 API에는 위험하고 큐 worker나 야간 배치에는 안전한 선택이 될 수 있습니다. 그래서 이 글은 공개 REST API에 `min=1, max=10`, 주문 처리 worker에 `min=0, max=20`, Service Bus `messageCount=10` 같은 기준선을 따로 제시했습니다. 또한 CPU와 memory scaler는 replica가 있어야 측정할 수 있으므로, custom 범주라도 scale-to-zero 대상이 아니라는 점을 함께 기억해야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

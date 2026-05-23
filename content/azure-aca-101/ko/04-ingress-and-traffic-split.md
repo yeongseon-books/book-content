@@ -456,11 +456,11 @@ az containerapp ingress enable \
 ## 처음 질문으로 돌아가기
 
 - **ACA의 관리형 Ingress는 무엇을 책임지고(TLS, external/internal 노출, Revision 라우팅), 무엇은 책임지지 않을까요?**
-  - 본문의 기준은 Ingress와 트래픽 분할 — revision 기반 배포 전략를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 관리형 Ingress는 `https://<app>...azurecontainerapps.io`에서 TLS를 종료하고, `external` 또는 `internal` 노출 범위를 결정한 뒤, active Revision 가중치 테이블에 따라 요청을 보냅니다. 하지만 header/cookie 기반 라우팅이나 앱 내부 포트 결정은 대신 해 주지 않으므로 `--target-port 8000`처럼 컨테이너가 실제로 듣는 포트는 우리가 맞춰야 합니다. 그래서 이 글은 Ingress를 정문, traffic split을 엘리베이터 배차로 나눠 설명했습니다.
 - **`external`, `internal`, `disabled` ingress mode의 차이는 정확히 무엇일까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - `external`은 퍼블릭 인터넷에 FQDN을 열고, `internal`은 같은 Environment 안의 서비스 호출만 허용하며, `disabled`는 worker처럼 아예 HTTP 진입점을 만들지 않는 모드입니다. 본문에서 `az containerapp ingress enable --type external --target-port 8000 --transport auto`와 `--type internal --target-port 8080` 예시를 따로 둔 이유도 그 차이를 실제 명령 수준에서 보여 주기 위해서였습니다. 어떤 모드를 고르느냐는 URL 노출 범위와 공격면을 동시에 정하는 선택입니다.
 - **Single mode와 Multiple mode는 트래픽 분배 동작을 어떻게 바꿀까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - Single mode에서는 새 Revision 배포 순간 트래픽 100%가 즉시 새 버전으로 넘어가므로 canary가 성립하지 않습니다. Multiple mode에서는 `az containerapp revision set-mode --mode multiple` 후 `--revision-weight $APP--v1=90 $APP--v2=10`처럼 비율을 직접 조절할 수 있고, rollback도 `100/0`으로 수 초 안에 끝납니다. 그래서 이 글의 실습도 90/10 → 50/50 → 0/100과 즉시 복귀를 하나의 운영 시나리오로 묶었습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

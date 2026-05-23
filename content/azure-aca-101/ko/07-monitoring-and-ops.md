@@ -473,11 +473,11 @@ ACA에서는 revision 단위로 신호가 정리되므로, 알림과 런북을 r
 ## 처음 질문으로 돌아가기
 
 - **ACA 관측성은 어떤 계층 구조로 나뉠까요?**
-  - 본문의 기준은 모니터링과 운영 — Log Analytics와 Application Insights를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 이 글은 ACA 관측성을 platform, application, sidecar 세 계층으로 나눴습니다. 플랫폼 계층은 Log Analytics의 `_CL` 테이블로 자동 수집되고, 애플리케이션 계층은 `APPLICATIONINSIGHTS_CONNECTION_STRING`과 `configure_azure_monitor()` 같은 OpenTelemetry 계측이 있어야 생기며, 사이드카 계층은 Dapr를 쓸 때의 telemetry입니다. 그래서 먼저 "지금 보는 신호가 어느 계층 것인가"를 구분해야 진단 속도가 빨라집니다.
 - **`ContainerAppConsoleLogs_CL`와 `ContainerAppSystemLogs_CL`는 무엇이 다를까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - `ContainerAppConsoleLogs_CL`는 컨테이너의 stdout/stderr를 담아 앱 로그와 비즈니스 오류를 보는 데 쓰고, `ContainerAppSystemLogs_CL`는 스케일, revision 변경, probe 실패 같은 ACA 플랫폼 이벤트를 담습니다. 본문 KQL 예시도 console 쪽은 `Log_s contains "ERROR"`, system 쪽은 `Log_s has_any ("scale", "replica", "probe")`로 나눠 조회했습니다. 즉 두 테이블의 차이는 저장 위치보다, 누가 그 로그를 만들었는가에 있습니다.
 - **Log Analytics에서 Revision 기준으로 로그를 묶는 KQL 쿼리는 어떻게 작성할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 핵심 그룹 키는 `RevisionName_s`입니다. 본문에서는 `summarize ErrorCount=count() by RevisionName_s`, 그리고 최근 15분 오류율 계산에서는 `join`과 `extend errorRate = todouble(err) / todouble(total)`로 revision별 5xx 비율을 구했습니다. ACA 사고 대응이 revision 중심으로 설계돼야 한다고 한 이유도, rollback과 KQL 알림이 모두 이 필드 위에서 가장 빠르게 연결되기 때문입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
