@@ -248,11 +248,11 @@ done
 ## 처음 질문으로 돌아가기
 
 - **Kudu는 App Service에서 정확히 어떤 공개 표면을 제공할까요?**
-  - 본문의 기준은 배포와 Kudu — 빌드·동기화·릴리스의 안쪽를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - Kudu는 "배포가 돌아가는 어딘가"가 아니라 `zipdeploy`, `publish`, `vfs`, `deployments`를 노출하는 실제 SCM 사이트입니다. 그래서 배포 이력 확인, `wwwroot` 파일 배치 확인, 특정 deployment log 추적이 모두 Kudu API에서 이어지고, Kudu success는 우선 artifact 수신과 orchestration 성공으로 읽는 편이 맞습니다.
 - **ZipDeploy는 단순히 ZIP을 풀어 놓는 동작과 어떻게 다를까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - ZipDeploy는 ZIP 파일을 받아 배포 작업으로 넘기는 진입점이지, 언제나 압축 해제 후 바로 실행으로 끝나는 기능이 아닙니다. `SCM_DO_BUILD_DURING_DEPLOYMENT`가 켜지면 build 단계가 들어오고, run-from-package가 켜지면 결과는 파일 복사본이 아니라 읽기 전용 `wwwroot` mounted package가 됩니다.
 - **Windows code app의 고전적인 Kudu 경로와 Linux code app의 Oryx 경로는 어디서 갈릴까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - Windows code app은 Kudu가 artifact를 받고 deployment script를 실행해 `wwwroot`에 결과를 맞추는 비교적 직선적인 경로로 설명할 수 있습니다. 반면 Linux code app은 그 사이에 Oryx가 detect-build-startup을 끼워 넣기 때문에, Kudu 배포 자체는 성공했어도 Oryx가 만든 startup script가 런타임 계약과 어긋나면 마지막 readiness에서 멈출 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

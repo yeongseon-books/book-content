@@ -257,11 +257,11 @@ az webapp config appsettings list -n my-app -g my-rg   --query "[?name=='WEBSITE
 ## 처음 질문으로 돌아가기
 
 - **App Service의 worker는 실제로 어떤 실행 경계를 의미할까요?**
-  - 본문의 기준은 Worker 인스턴스와 샌드박스 — 사용자 코드를 어디에 가두는가를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - worker는 포털에 보이는 인스턴스 숫자의 다른 이름이 아니라, 사용자 코드가 실제로 실행되고 제한을 받는 경계입니다. Windows에서는 IIS와 App Service sandbox 안의 프로세스가 그 경계이고, Linux에서는 포트 바인딩과 startup contract를 지키는 컨테이너가 그 경계입니다.
 - **Windows code app에서 App Service sandbox는 무엇을 허용하고 무엇을 제한할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - sandbox는 일반적인 웹앱 실행은 허용하지만, 다중 테넌트 품질을 지키기 위해 OS 기능 접근을 의도적으로 좁혀 둡니다. 그래서 IIS 위에서 앱은 정상적으로 돌 수 있어도 registry write, graphics subsystem, 일부 local communication을 전제로 한 라이브러리는 같은 방식으로 들여오면 바로 경계에 막힐 수 있습니다.
 - **왜 registry write와 GDI/User32 계열 제약이 Windows App Service에서 자주 문제를 만들까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 많은 Windows 라이브러리가 로컬 서버에서는 registry, GDI, User32를 자연스러운 전제로 삼고 있기 때문입니다. 하지만 App Service sandbox는 그 전제를 유지해 주지 않으므로 HTML-to-PDF, 폰트 렌더링, `System.Drawing`, 브라우저 자동화 계열 코드가 특히 자주 실행 경계와 충돌합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
