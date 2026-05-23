@@ -215,11 +215,11 @@ docker compose exec db pg_dump -U postgres app > app.sql
 ## 처음 질문으로 돌아가기
 
 - **Compose로 PostgreSQL과 앱을 어떻게 함께 띄울까요?**
-  - 본문의 기준은 데이터베이스와 함께 실행하기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 본문 예시처럼 `services:` 아래에 `db`(postgres 이미지)와 `api`(앱 이미지)를 두고, db에는 named volume을 붙여 데이터가 재기동 후에도 남도록 하며, api는 환경변수로 `DATABASE_URL=postgresql://...@db:5432/...`처럼 service 이름 기반 호스트로 접속합니다. 한 `docker compose up`으로 전체 스택이 재현되는 것이 핵심 가치입니다.
 - **healthcheck와 시작 순서는 어떻게 연결해야 할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 본문에서 강조했듯이 db가 컨테이너로 떴다고 해서 곧바로 접속을 받지는 않습니다. 그래서 db service에 `healthcheck: pg_isready -U ...`를 두고, api service에 `depends_on: db: condition: service_healthy`를 적어야 api가 실제로 접속 가능한 db만 보고 시작합니다.
 - **Alembic migration은 어떤 방식으로 자동화하는 편이 좋을까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 본문에서 본 것처럼 마이그레이션을 앱 부팅 시점에 끼워 넣지 말고, Compose에 별도 `migrate` service(또는 `command: alembic upgrade head`로 끝나는 일회성 컨테이너)를 두고 api가 그 service에 의존하도록 구성하는 편이 안전합니다. 이렇게 분리하면 멀티 인스턴스 배포에서 마이그레이션이 한 번만 돌고, 실패 시 롤백 분기도 명확해집니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
