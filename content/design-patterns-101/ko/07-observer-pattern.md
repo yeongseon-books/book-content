@@ -18,259 +18,402 @@ tags:
   - Events
   - Behavioral
 seo_description: Observer 패턴으로 직접 호출을 통지 구조로 바꾸어 결합도를 낮추고 확장 지점을 분리하는 방법을 설명합니다.
-last_reviewed: '2026-05-15'
+last_reviewed: '2026-05-23'
 ---
 
 # 디자인 패턴 101 (7/10): 옵저버 패턴
 
-한 객체의 변화에 여러 후속 동작이 매달리기 시작하면 코드는 쉽게 직접 호출 사슬로 굳습니다. 주문이 제출되면 메일을 보내고, 슬랙에 알리고, 창고를 예약하는 식의 작업이 전부 `Order.submit()` 안에 들어가면, 주문 객체는 자기 일보다 주변 시스템을 더 많이 알게 됩니다.
+주문이 제출되면 메일을 보내고, 슬랙에 알리고, 창고를 예약합니다. 처음에는 `Order.submit()` 안에 세 줄을 추가하면 끝입니다. 그런데 한 달 뒤 SMS 알림이 추가되고, 분석 이벤트 전송이 추가되고, 포인트 적립이 추가됩니다. 이제 `Order`는 주문 처리보다 후속 작업을 더 많이 알고 있습니다. 후속 작업 하나가 느려지면 주문 전체가 느려지고, 후속 작업 하나가 예외를 던지면 주문이 실패합니다. 저는 이 상황을 여러 프로젝트에서 반복해서 봤습니다.
 
-이 글은 Design Patterns 101 시리즈의 7번째 글입니다.
+이 글은 Design Patterns 101 시리즈의 일곱 번째 글입니다. 4장에서 Observer를 개요 수준으로 소개했으니, 여기서는 동기/비동기 차이, 메모리 누수, 에러 격리, 메시지 큐와의 경계까지 깊이 들어갑니다.
 
-이번 글에서는 Observer 패턴을 직접 호출을 통지로 바꾸는 구조로 설명하겠습니다. 핵심은 발행자가 구독자를 몰라도 되게 만들어, 변경의 파급을 느슨한 연결로 바꾸는 것입니다.
-
-![Design Patterns 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/07/07-01-concept-at-a-glance.ko.png)
-*Design Patterns 101 7장 흐름 개요*
+![Observer 패턴 발행자와 구독자의 결합 끊기](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/07/07-01-concept-at-a-glance.ko.png)
+*발행자가 구독자를 모르는 상태에서 이벤트를 전파하는 구조*
 
 ## 먼저 던지는 질문
 
-- Observer 패턴은 어떤 결합 문제를 줄여 줄까요?
-- Subject, Observer, subscribe, notify는 각각 어떤 역할일까요?
-- 동기 알림과 비동기 알림은 어디서 갈릴까요?
+- Observer 패턴을 도입하면 정확히 어떤 결합이 끊어지고, 대신 어떤 비용이 생길까요?
+- 동기 Observer와 비동기 이벤트 버스는 언제 갈라져야 할까요?
+- 구독자가 예외를 던지거나 느려지면 발행자에게 무슨 일이 생길까요?
 
-## 왜 중요한가
+## Observer가 풀려는 진짜 문제: 발신자와 수신자의 결합 끊기
 
-발행자가 후속 처리기를 직접 호출하면, 변화 하나가 곧 의존성 목록의 확장을 뜻합니다. 알림 채널이 추가될 때마다 원래 객체를 열어야 하고, 어떤 후속 작업이 느려지거나 실패하면 발행자까지 영향을 받기 쉽습니다.
+직접 호출은 가장 단순한 통신입니다. `A`가 `B.do()`를 부르면 끝입니다. 문제는 `A`가 `B`, `C`, `D`, `E`를 전부 알아야 할 때 시작됩니다. 수신자가 늘어날 때마다 발신자를 열어야 하고, 수신자 하나를 제거할 때도 발신자를 수정해야 합니다.
 
-Observer는 이 연결을 약하게 만듭니다. 발행자는 “무슨 일이 일어났다”만 알리고, 누가 들을지는 바깥으로 밀어냅니다. 이때부터 확장은 발행자 수정이 아니라 구독자 추가로 바뀝니다.
-
-## 한눈에 보는 개념
-
-## 핵심 용어
-
-- **Subject**: 변화를 발행하는 주체입니다.
-- **Observer**: 통지를 받아 반응하는 구독자입니다.
-- **Subscribe / Unsubscribe**: 구독자 등록과 해지입니다.
-- **Event**: 통지되는 데이터 단위입니다.
-- **Sync / Async**: 같은 프로세스 안의 즉시 호출인지, 큐를 거친 비동기 처리인지의 차이입니다.
-
-## 변경 전후 비교
-
-**Before**
+Observer는 이 관계를 뒤집습니다. 발신자(Subject)는 "무슨 일이 일어났다"만 알리고, 누가 듣는지는 모릅니다. 수신자(Observer)는 자기가 관심 있는 이벤트에 스스로 등록합니다. 이제 확장은 발신자 수정이 아니라 구독자 추가로 이루어집니다.
 
 ```python
+# before: Order가 모든 후속 작업을 직접 호출
 class Order:
     def submit(self):
         self.save()
-        send_email_to(self.user)        # direct call
-        slack_notify(self.user)         # direct call
-        warehouse.reserve(self.items)   # direct call
+        send_email(self.user)
+        slack_notify(self.channel)
+        warehouse.reserve(self.items)
+        analytics.track("order_submitted", self.id)
+        points.accrue(self.user, self.total)
 ```
 
-**After**
-
 ```python
+# after: Order는 이벤트만 발행
 class Order:
-    def __init__(self, bus): self.bus = bus
-    def submit(self):
+    def __init__(self, bus: "EventBus") -> None:
+        self.bus = bus
+
+    def submit(self) -> None:
         self.save()
-        self.bus.publish("order_submitted", {"user": self.user, "items": self.items})
+        self.bus.publish(OrderSubmitted(user=self.user, items=self.items))
 ```
 
-이제 `Order`는 누가 듣는지 몰라도 됩니다. 메일, 슬랙, 창고 예약은 모두 구독자 쪽으로 이동합니다.
+`Order`의 책임이 "주문 저장 + 이벤트 발행"으로 줄었습니다. 메일, 슬랙, 창고, 분석, 포인트는 각자 구독자로 존재합니다. 이 분리가 Observer의 전부입니다.
 
-## 옵저버 패턴을 익히는 5단계
+## Python에서 Observer를 표현하는 세 가지 방식
 
-### 1단계 — 가장 작은 이벤트 버스부터 만듭니다
+### 방식 1: 콜백 리스트 — 가장 작은 구현
 
 ```python
-# 1_bus.py
+from dataclasses import dataclass, field
+from typing import Any, Callable
+
+@dataclass
 class EventBus:
-    def __init__(self): self._subs = {}
-    def subscribe(self, topic, fn): self._subs.setdefault(topic, []).append(fn)
-    def publish(self, topic, event):
+    _subs: dict[str, list[Callable]] = field(default_factory=dict)
+
+    def subscribe(self, topic: str, fn: Callable) -> None:
+        self._subs.setdefault(topic, []).append(fn)
+
+    def unsubscribe(self, topic: str, fn: Callable) -> None:
+        self._subs.get(topic, []).remove(fn)
+
+    def publish(self, topic: str, event: Any) -> None:
         for fn in self._subs.get(topic, []):
             fn(event)
 ```
 
-복잡한 프레임워크가 꼭 필요한 것은 아닙니다. 토픽별 구독자 목록을 저장하고 순회하는 최소 구조만으로도 Observer의 핵심이 드러납니다.
+15줄이면 동작하는 Observer입니다. 토픽별 콜백 리스트를 순회하며 호출합니다. 단순하지만 실무에서 이대로 쓰면 세 가지 문제가 생깁니다. 에러 격리가 없고, 느린 구독자가 발행자를 블로킹하고, 구독 해지를 잊으면 메모리가 샙니다. 이 문제들은 뒤에서 하나씩 다룹니다.
 
-### 2단계 — 구독자를 등록합니다
+### 방식 2: Protocol 기반 — 타입 안전한 Observer
 
 ```python
-# 2_subscribe.py
-bus = EventBus()
-bus.subscribe("order_submitted", lambda e: print("EMAIL:", e["user"]))
-bus.subscribe("order_submitted", lambda e: print("SLACK:", e["user"]))
+from typing import Protocol
+from dataclasses import dataclass
+
+@dataclass
+class OrderSubmitted:
+    user: str
+    items: list[str]
+
+class OrderObserver(Protocol):
+    def on_order_submitted(self, event: OrderSubmitted) -> None: ...
+
+class EmailNotifier:
+    def on_order_submitted(self, event: OrderSubmitted) -> None:
+        print(f"메일 발송: {event.user}")
+
+class SlackNotifier:
+    def on_order_submitted(self, event: OrderSubmitted) -> None:
+        print(f"슬랙 알림: #{event.user}")
+
+@dataclass
+class OrderService:
+    observers: list[OrderObserver]
+
+    def submit(self, user: str, items: list[str]) -> None:
+        event = OrderSubmitted(user=user, items=items)
+        for obs in self.observers:
+            obs.on_order_submitted(event)
 ```
 
-새 채널을 추가해도 Subject는 바뀌지 않습니다. 확장이 발행자 수정이 아니라 구독자 추가로 이동하는 지점이 중요합니다.
+Protocol을 쓰면 IDE가 구독자의 메서드 시그니처를 검증합니다. 이벤트가 `dataclass`이므로 payload 구조도 명시적입니다. 이 방식은 이벤트 종류가 적고 구독자 인터페이스를 엄격하게 관리하고 싶을 때 적합합니다.
 
-### 3단계 — 서브젝트에서 이벤트를 발행합니다
+### 방식 3: 데코레이터 등록 — Django signals 스타일
 
 ```python
-# 3_publish.py
-bus.publish("order_submitted", {"user": "u1", "items": ["a", "b"]})
+from dataclasses import dataclass, field
+from typing import Any, Callable
+
+@dataclass
+class Signal:
+    _receivers: list[Callable] = field(default_factory=list)
+
+    def connect(self, fn: Callable) -> Callable:
+        self._receivers.append(fn)
+        return fn
+
+    def send(self, **kwargs: Any) -> list[Any]:
+        return [fn(**kwargs) for fn in self._receivers]
+
+order_submitted = Signal()
+
+@order_submitted.connect
+def notify_email(user: str, **kwargs: Any) -> None:
+    print(f"메일: {user}")
+
+@order_submitted.connect
+def notify_slack(user: str, **kwargs: Any) -> None:
+    print(f"슬랙: {user}")
+
+# 발행
+order_submitted.send(user="alice", items=["book", "pen"])
 ```
 
-Subject는 “무슨 일이 일어났는가”만 알립니다. 후속 동작을 직접 열거하지 않기 때문에 책임이 훨씬 선명해집니다.
+데코레이터로 등록하면 구독자가 선언 시점에 바로 연결됩니다. Django의 `django.dispatch.Signal`이 정확히 이 구조입니다.
 
-### 4단계 — 동기와 비동기를 분리합니다
+## 동기 Observer와 비동기 이벤트 버스의 차이
+
+동기 Observer는 `publish()`가 모든 구독자를 순차 호출한 뒤에야 리턴합니다. 구독자가 10ms씩 걸리는 게 5개면 발행자는 50ms를 기다립니다. 이 지연이 허용 가능한지가 동기/비동기를 가르는 기준입니다.
 
 ```python
-# 4_async.py
-import queue, threading
-q = queue.Queue()
+import asyncio
+from dataclasses import dataclass, field
+from typing import Any, Callable, Coroutine
 
-def worker():
-    while True:
-        topic, event = q.get()
-        for fn in bus._subs.get(topic, []):
+@dataclass
+class AsyncEventBus:
+    _subs: dict[str, list[Callable[..., Coroutine]]] = field(default_factory=dict)
+
+    def subscribe(self, topic: str, fn: Callable[..., Coroutine]) -> None:
+        self._subs.setdefault(topic, []).append(fn)
+
+    async def publish(self, topic: str, event: Any) -> None:
+        tasks = [fn(event) for fn in self._subs.get(topic, [])]
+        await asyncio.gather(*tasks, return_exceptions=True)
+```
+
+`asyncio.gather`에 `return_exceptions=True`를 넘기면 한 구독자의 예외가 다른 구독자를 중단시키지 않습니다. 동기 버전에서는 이 격리를 직접 구현해야 합니다.
+
+**판단 기준 정리:**
+
+| 조건 | 선택 |
+| --- | --- |
+| 구독자 실행 시간 합 < 요청 SLA | 동기 Observer |
+| 구독자 중 하나라도 네트워크 I/O 포함 | 비동기 이벤트 버스 |
+| 구독자 실패가 발행자 트랜잭션에 영향 주면 안 됨 | 비동기 + 별도 재시도 |
+| 이벤트 순서 보장 필수 | 동기 또는 단일 consumer 큐 |
+
+## Observer가 조용히 만드는 세 가지 장애
+
+### 장애 1: 느린 구독자가 발행자를 블로킹
+
+동기 Observer에서 구독자 하나가 외부 API를 호출하며 3초를 기다리면, 발행자도 3초를 기다립니다. 주문 API의 응답 시간이 갑자기 3초가 되는 겁니다. 원인을 추적하면 `Order.submit()` → `EventBus.publish()` → `AnalyticsTracker.on_order()` → 외부 HTTP 호출로 이어지는 체인이 나옵니다.
+
+**해결:** 네트워크 I/O가 있는 구독자는 비동기로 분리하거나, 동기 Observer 안에서 timeout을 겁니다.
+
+### 장애 2: 한 구독자의 예외가 나머지를 중단
+
+콜백 리스트를 순회하다가 두 번째 구독자가 `ValueError`를 던지면, 세 번째 이후 구독자는 실행되지 않습니다.
+
+```python
+# 에러 격리가 있는 publish
+import logging
+
+logger = logging.getLogger(__name__)
+
+def publish_safe(self, topic: str, event: Any) -> None:
+    for fn in self._subs.get(topic, []):
+        try:
             fn(event)
-
-threading.Thread(target=worker, daemon=True).start()
-
-def async_publish(topic, event): q.put((topic, event))
+        except Exception:
+            logger.exception("Observer failed: %s on topic %s", fn, topic)
 ```
 
-비동기로 넘기면 발행자는 핸들러 지연 시간에 덜 묶입니다. 다만 순서, 재시도, 에러 보고 같은 운영 문제가 새로 생긴다는 점도 함께 봐야 합니다.
+`try/except`로 감싸고 로깅하면 나머지 구독자는 정상 실행됩니다. 실패한 구독자는 별도 알림 채널로 보고합니다.
 
-### 5단계 — 구독 해지를 지원합니다
+### 장애 3: 구독 해지를 잊으면 메모리가 샌다
+
+구독자 객체가 이벤트 버스의 콜백 리스트에 참조로 남아 있으면, 해당 객체는 가비지 컬렉션 대상이 되지 않습니다. 웹 프레임워크에서 요청마다 구독자를 생성하고 해지하지 않으면, 메모리가 요청 수에 비례해 증가합니다.
+
+## WeakRef로 메모리 누수 막기
+
+Python의 `weakref` 모듈은 참조 카운트를 증가시키지 않는 약한 참조를 제공합니다. 구독자가 다른 곳에서 더 이상 참조되지 않으면 자동으로 사라집니다.
 
 ```python
-# 5_unsubscribe.py
-def unsubscribe(bus, topic, fn):
-    bus._subs.get(topic, []).remove(fn)
+import weakref
+from dataclasses import dataclass, field
+from typing import Any, Callable
+
+@dataclass
+class WeakEventBus:
+    _subs: dict[str, list[weakref.WeakMethod | weakref.ref]] = field(
+        default_factory=dict
+    )
+
+    def subscribe(self, topic: str, fn: Callable) -> None:
+        if hasattr(fn, "__self__"):
+            ref = weakref.WeakMethod(fn, self._make_cleanup(topic))
+        else:
+            ref = weakref.ref(fn, self._make_cleanup(topic))
+        self._subs.setdefault(topic, []).append(ref)
+
+    def _make_cleanup(self, topic: str) -> Callable:
+        def cleanup(ref: weakref.ref) -> None:
+            self._subs.get(topic, []).remove(ref)  # type: ignore[arg-type]
+        return cleanup
+
+    def publish(self, topic: str, event: Any) -> None:
+        for ref in list(self._subs.get(topic, [])):
+            fn = ref()
+            if fn is not None:
+                fn(event)
 ```
 
-테스트나 동적 핸들러 환경에서는 해지가 반드시 필요합니다. 구독만 있고 해지가 없으면 시스템 수명 주기 관리가 금방 지저분해집니다.
+`WeakMethod`는 바운드 메서드에 대한 약한 참조입니다. 객체가 소멸되면 `cleanup` 콜백이 호출되어 구독 리스트에서 자동 제거됩니다. Django signals도 내부적으로 `weakref`를 사용합니다.
 
-## 이 코드에서 주목할 점
+**주의:** 람다나 클로저는 `weakref`로 감싸면 즉시 수거됩니다. 다른 곳에서 강한 참조를 유지하지 않기 때문입니다. `weakref` 기반 버스에는 바운드 메서드나 모듈 수준 함수를 등록해야 합니다.
 
-- Subject는 구독자의 수와 종류를 모릅니다.
-- 새 동작 추가가 Subject 변경으로 이어지지 않습니다.
-- 구조를 크게 바꾸지 않고도 비동기 알림으로 확장할 길이 열려 있습니다.
+## Observer가 메시지 큐와 갈라지는 지점
 
-## 자주 하는 실수 5가지
+Observer와 메시지 큐(RabbitMQ, Kafka, Redis Streams)는 둘 다 발행-구독 구조입니다. 그런데 운영 특성이 완전히 다릅니다.
 
-1. **순환 알림이 생기는 경우**: A→B→A 루프가 끝나지 않습니다.
-2. **동기 알림 안에서 무거운 작업을 하는 경우**: Subject까지 느려집니다.
-3. **Observer가 Subject를 직접 다시 바꾸는 경우**: 단방향 통지가 양방향 결합으로 변합니다.
-4. **이벤트 스키마를 즉흥적인 dict로만 두는 경우**: 생산자와 소비자가 쉽게 어긋납니다.
-5. **핸들러 실패를 조용히 삼키는 경우**: 실패한 Observer가 사라진 것처럼 보입니다.
-
-## 실무에서는 이렇게 드러납니다
-
-Django signals, Kafka/Redis pub-sub, GitHub Webhook, Spring의 이벤트 발행기는 전부 Observer의 확장판으로 볼 수 있습니다. 특히 도메인 이벤트를 설계할 때 Observer를 이해하고 있으면, “무슨 일이 일어났는가”와 “그 뒤에 무엇을 할 것인가”를 명확히 분리하기 쉬워집니다.
-
-## 빠르게 검증해 보기
-
-Observer가 결합을 제대로 줄이고 있는지 다음 기준으로 확인해 보세요.
-
-- 발행자가 현재 몇 개의 후속 작업을 직접 호출하는지 셉니다.
-- 구독자 하나를 잠시 비활성화해도 발행자의 핵심 책임이 그대로 끝나는지 확인합니다.
-- 이벤트 이름과 payload만 봐도 “무슨 일이 일어났는지” 설명되는지 점검합니다.
-
-**기대 결과:** 구독자는 선택적인 확장 지점이 되고, 발행자는 누가 듣는지 몰라도 자신의 일을 마칠 수 있어야 합니다.
-
-## 시니어 엔지니어는 이렇게 판단합니다
-
-- 통지 흐름을 한 방향으로만 흘리게 합니다.
-- 이벤트 이름은 과거형으로 붙입니다.
-- 스키마를 명시적으로 둡니다.
-- 핸들러 실패는 별도 채널로 보고합니다.
-- 나중에 비동기로 넘길 수 있는 경로를 열어 둡니다.
-
-## 체크리스트
-
-- [ ] Subject가 구독자를 직접 알지 않는가?
-- [ ] 알림이 한 방향으로만 흐르는가?
-- [ ] 이벤트 이름이 “무슨 일이 일어났는가”를 설명하는가?
-- [ ] 핸들러 실패가 격리되는가?
-- [ ] 필요할 때 비동기로 확장할 수 있는가?
-
-## 연습 문제
-
-1. 결제 성공 후 메일·슬랙·재고 예약을 Observer로 분리해 봅니다.
-2. `dataclass` 기반 이벤트 스키마를 EventBus에 적용해 봅니다.
-3. `unsubscribe`를 구현하고 단위 테스트를 작성해 봅니다.
-
-## 정리 및 다음 글
-
-Observer는 직접 호출을 통지로 바꿔 결합을 녹여 냅니다. 다음 글에서는 객체 생성 책임을 어디에 둘지 다루는 Factory와 의존성 주입으로 넘어가겠습니다.
-
-## 실무 케이스 스터디: 장고/플라스크에서 패턴 선택 기준
-
-패턴 선택은 프레임워크보다 요구사항의 변화 양상에 의해 결정됩니다. 다음 기준은 두 프레임워크에서 공통으로 유효합니다.
-
-### 판단 기준 표
-
-| 질문 | 선택 기준 | 권장 패턴 |
+| 특성 | In-process Observer | 메시지 큐 |
 | --- | --- | --- |
-| 조건 분기가 월 단위로 늘어나는가 | 정책 확장이 핵심 | Strategy |
-| 외부 API 계약이 자주 바뀌는가 | 경계 안정화가 핵심 | Adapter |
-| 객체 조립 단계가 많고 옵션이 많은가 | 생성 과정을 명시화 | Builder/Factory |
-| 이벤트 수신자가 유동적인가 | 발행/구독 분리 | Observer |
+| 전달 보장 | 없음 (프로세스 죽으면 유실) | 있음 (디스크 영속) |
+| 순서 보장 | 등록 순서 (결정적) | 파티션/큐 단위 |
+| 재시도 | 직접 구현 | 브로커가 제공 |
+| 지연 | 함수 호출 수준 (ns~μs) | 네트워크 왕복 (ms) |
+| 배포 경계 | 단일 프로세스 | 프로세스/서버 간 |
+| 확장 | 구독자 수 = 함수 호출 수 | consumer 수평 확장 |
 
-### 파이썬 구현 앵커
+**판단 기준:** 같은 프로세스 안에서 결합만 끊으면 되면 Observer로 충분합니다. 프로세스가 죽어도 이벤트가 유실되면 안 되거나, 구독자가 별도 서비스에 있으면 메시지 큐가 필요합니다.
+
+저는 이 경계를 "Observer는 설계 패턴이고, 메시지 큐는 인프라"라고 구분합니다. Observer로 시작해서 나중에 큐로 교체하는 경로가 자연스럽습니다. 이벤트 이름과 payload 구조를 처음부터 `dataclass`로 명시해 두면, 나중에 직렬화해서 큐에 넣을 때 변환 비용이 거의 없습니다.
+
+## Django signals와 Flask blinker — 실무에서 쓰이는 Observer
+
+### Django signals
+
+```python
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from myapp.models import Order
+
+@receiver(post_save, sender=Order)
+def on_order_saved(sender, instance, created, **kwargs):
+    if created:
+        send_welcome_email(instance.user)
+        track_analytics("order_created", instance.id)
+```
+
+Django signals는 모델 저장, 요청 시작/종료, 마이그레이션 등 프레임워크 내부 이벤트에 훅을 거는 Observer입니다. `@receiver` 데코레이터가 구독을 선언합니다.
+
+**실무 주의점:** Django signals는 동기 실행입니다. `on_order_saved` 안에서 외부 API를 호출하면 HTTP 응답이 그만큼 느려집니다. 무거운 작업은 Celery task로 위임하는 게 일반적입니다.
+
+### Flask blinker
+
+```python
+from blinker import signal
+
+order_created = signal("order-created")
+
+@order_created.connect
+def handle_email(sender, **kwargs):
+    print(f"메일 발송: {kwargs['user']}")
+
+@order_created.connect
+def handle_analytics(sender, **kwargs):
+    print(f"분석 이벤트: {kwargs['order_id']}")
+
+# 발행
+order_created.send(current_app._get_current_object(), user="alice", order_id=42)
+```
+
+blinker는 Flask의 기본 시그널 라이브러리입니다. `weakref`를 내부적으로 사용하므로 구독자 객체가 소멸되면 자동 해지됩니다.
+
+### pyee — Node.js EventEmitter의 Python 포트
+
+```python
+from pyee.base import EventEmitter
+
+ee = EventEmitter()
+
+@ee.on("order_submitted")
+def on_order(event):
+    print(f"처리: {event}")
+
+ee.emit("order_submitted", {"user": "bob", "total": 50000})
+```
+
+pyee는 `on`, `emit`, `once`, `remove_listener` 등 Node.js EventEmitter API를 그대로 제공합니다. asyncio 버전(`AsyncIOEventEmitter`)도 있어서 비동기 구독자를 자연스럽게 등록할 수 있습니다.
+
+## 이벤트 설계: 순서, 재생, 멱등성
+
+Observer를 도입하면 이벤트가 시스템의 계약이 됩니다. 이 계약을 제대로 설계하지 않으면 나중에 디버깅이 극도로 어려워집니다.
+
+**이벤트 이름은 과거형으로 짓습니다.** `order_submitted`, `payment_completed`, `user_registered`. 과거형은 "이미 일어난 사실"을 뜻하므로, 구독자가 이벤트를 받았을 때 발행자의 상태가 이미 확정되었음을 보장합니다.
+
+**이벤트 payload는 dataclass로 명시합니다.**
 
 ```python
 from dataclasses import dataclass
-from typing import Protocol
+from datetime import datetime
+from uuid import UUID, uuid4
 
-class Sender(Protocol):
-    def send(self, msg: str) -> None: ...
-
-@dataclass
-class SlackSender:
-    webhook: str
-
-    def send(self, msg: str) -> None:
-        # requests.post(self.webhook, json={"text": msg})
-        pass
-
-class SenderAdapter:
-    def __init__(self, sender: Sender) -> None:
-        self.sender = sender
-
-    def notify(self, message: str) -> None:
-        self.sender.send(message)
+@dataclass(frozen=True)
+class OrderSubmitted:
+    order_id: UUID
+    user: str
+    items: list[str]
+    total: int
+    occurred_at: datetime
+    event_id: UUID = field(default_factory=uuid4)
 ```
 
-### 유엠엘 유사 구조
+`frozen=True`로 불변성을 보장하고, `event_id`로 중복 처리를 방지합니다.
+
+**멱등성:** 같은 이벤트가 두 번 전달되어도 결과가 같아야 합니다. 네트워크 재시도, 프로세스 재시작 등으로 이벤트가 중복 전달되는 상황은 분산 시스템에서 흔합니다. 구독자는 `event_id`를 기준으로 이미 처리한 이벤트를 건너뛰는 로직을 갖추는 게 안전합니다.
+
+```python
+processed_events: set[UUID] = set()
+
+def handle_order(event: OrderSubmitted) -> None:
+    if event.event_id in processed_events:
+        return
+    processed_events.add(event.event_id)
+    # 실제 처리
+```
+
+**순서 보장:** 동기 Observer는 등록 순서대로 실행됩니다. 비동기에서는 `asyncio.gather`가 동시 실행하므로 순서가 보장되지 않습니다. 순서가 중요한 구독자는 동기로 유지하거나, 단일 consumer 큐를 사용합니다.
+
+## Observer에서 이벤트 드리븐 아키텍처로
+
+Observer 패턴은 이벤트 드리븐 아키텍처(EDA)의 출발점입니다. 단일 프로세스 안의 콜백 리스트에서 시작해, 프로세스 간 메시지 브로커로, 서비스 간 이벤트 스트림으로 확장되는 경로가 자연스럽습니다.
 
 ```text
-[UseCase] --> [Notifier]
-[Notifier] --> <<interface>> [Sender]
-[SlackSender] --implements--> [Sender]
-[SenderAdapter] --wraps--> [Sender]
+콜백 리스트 (in-process)
+    ↓ 구독자가 느려짐
+asyncio.Queue (in-process, 비동기)
+    ↓ 프로세스 장애 시 유실 불가
+Redis Pub/Sub (cross-process, 비영속)
+    ↓ 이벤트 재생·감사 필요
+Kafka / RabbitMQ (cross-service, 영속)
 ```
 
-### 변경 전후 비교
+각 단계에서 이벤트 이름과 payload 구조가 동일하면 전환 비용이 낮습니다. 처음부터 `dataclass` 이벤트를 정의하고, 직렬화 가능한 필드만 사용하는 습관이 이 확장을 가능하게 합니다.
 
-- 변경 전: 라우트/서비스 내부에서 외부 SDK를 직접 호출해 테스트와 교체 비용이 큽니다.
-- 변경 후: 인터페이스 경계를 두고 패턴을 적용해 변경이 한 계층에서 끝납니다.
+## Observer의 비용: 무엇을 잃는가
 
-### 솔리드 점검표
+Observer는 공짜가 아닙니다. 도입하면 다음을 잃습니다.
 
-| 원칙 | 점검 질문 |
-| --- | --- |
-| SRP | 클래스가 생성/정책/전송을 동시에 담당하지 않는가 |
-| OCP | 새 요구를 기존 코드 수정 없이 추가할 수 있는가 |
-| LSP | 대체 구현이 같은 계약을 유지하는가 |
-| ISP | 과도하게 큰 인터페이스를 강요하지 않는가 |
-| DIP | 상위 계층이 구체 구현 대신 추상에 의존하는가 |
+**흐름 추적이 어려워집니다.** 직접 호출은 IDE에서 "Go to Definition"으로 따라갈 수 있습니다. Observer를 거치면 "이 이벤트를 누가 구독하고 있지?"를 grep으로 찾아야 합니다. 구독자가 10개를 넘으면 전체 흐름을 머릿속에 그리기 어렵습니다.
 
-이 점검표를 PR 템플릿에 넣으면 패턴 적용 품질이 팀 단위로 안정됩니다.
+**에러 전파가 복잡해집니다.** 직접 호출은 예외가 호출자에게 바로 올라갑니다. Observer에서는 구독자의 예외를 어디로 보낼지 별도로 설계해야 합니다. 삼키면 장애가 숨고, 올리면 발행자가 영향받습니다.
+
+**디버깅 시간이 늘어납니다.** "주문 후 메일이 안 갔다"는 버그를 추적할 때, 직접 호출이면 `Order.submit()` 안을 보면 됩니다. Observer면 이벤트가 발행되었는지, 구독자가 등록되어 있는지, 구독자 안에서 예외가 발생했는지를 순서대로 확인해야 합니다.
+
+**순서 의존성이 숨겨집니다.** 구독자 A가 구독자 B보다 먼저 실행되어야 하는 암묵적 의존이 있으면, 등록 순서에 의존하는 취약한 코드가 됩니다.
+
+저는 이 비용을 감수할 가치가 있는 기준을 이렇게 잡습니다. **후속 작업이 3개 이상이고, 앞으로 더 늘어날 가능성이 높으며, 후속 작업의 실패가 발행자의 핵심 책임을 중단시키면 안 될 때.** 이 조건을 만족하지 않으면 직접 호출이 더 낫습니다.
 
 ## 처음 질문으로 돌아가기
 
-- **Observer 패턴은 어떤 결합 문제를 줄여 줄까요?**
-  - 본문의 기준은 Observer 패턴를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
-- **Subject, Observer, subscribe, notify는 각각 어떤 역할일까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
-- **동기 알림과 비동기 알림은 어디서 갈릴까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+- **Observer 패턴을 도입하면 정확히 어떤 결합이 끊어지고, 대신 어떤 비용이 생길까요?**
+  - 발행자가 구독자의 존재와 수를 모르게 되므로, 후속 작업 추가/제거가 발행자 수정 없이 가능해집니다. 대신 흐름 추적이 grep 의존으로 바뀌고, 에러 전파 경로를 별도로 설계해야 하며, 순서 의존성이 암묵적으로 숨겨지는 비용이 생깁니다.
+
+- **동기 Observer와 비동기 이벤트 버스는 언제 갈라져야 할까요?**
+  - 구독자 실행 시간의 합이 요청 SLA를 넘기거나, 구독자 중 네트워크 I/O가 포함된 것이 하나라도 있으면 비동기로 분리해야 합니다. 본문의 `AsyncEventBus` 예시처럼 `asyncio.gather`와 `return_exceptions=True`를 조합하면 격리와 동시성을 함께 얻습니다.
+
+- **구독자가 예외를 던지거나 느려지면 발행자에게 무슨 일이 생길까요?**
+  - 동기 Observer에서 에러 격리 없이 순회하면, 예외를 던진 구독자 이후의 모든 구독자가 실행되지 않습니다. 느린 구독자는 발행자의 응답 시간을 그대로 늘립니다. `try/except` 격리와 timeout, 또는 비동기 분리가 해법입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
@@ -295,12 +438,13 @@ class SenderAdapter:
 - [Observer Pattern (refactoring.guru)](https://refactoring.guru/design-patterns/observer)
 - [Domain Events (Martin Fowler)](https://martinfowler.com/eaaDev/DomainEvent.html)
 - [Django Signals](https://docs.djangoproject.com/en/stable/topics/signals/)
+- [Python weakref — Weak references (Python docs)](https://docs.python.org/3/library/weakref.html)
 
 ### 실무 확장 읽을거리
 
 - [Publish-Subscribe Pattern (Wikipedia)](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern)
-- [dataclasses — Data Classes (Python docs)](https://docs.python.org/3/library/dataclasses.html)
-
+- [blinker — Fast Python in-process signal/event dispatching](https://blinker.readthedocs.io/)
+- [pyee — A port of Node.js EventEmitter](https://pyee.readthedocs.io/)
 - [이 시리즈의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/design-patterns-101/ko)
 
 Tags: Computer Science, DesignPatterns, Observer, PubSub, Events, Behavioral
