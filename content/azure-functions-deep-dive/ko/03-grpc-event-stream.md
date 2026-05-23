@@ -309,11 +309,11 @@ RpcLogMessagesPerInvocation=2.9
 ## 처음 질문으로 돌아가기
 
 - **호스트-워커 gRPC 스트림에는 어떤 메시지가 어떤 방식으로 실릴까요?**
-  - 본문의 기준은 gRPC 이벤트 스트림 — 호스트와 워커는 무엇을 주고받는가를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 호스트와 워커는 `FunctionRpc.EventStream` 하나를 공유하고, 그 위에 `StreamingMessage.oneof`로 생명주기·함수 로드·invocation·로그·상태 메시지를 다중화합니다. `StartStream`, `WorkerInitRequest/Response`, `FunctionLoadRequest`, `InvocationRequest/Response`처럼 서로 다른 단계 메시지가 같은 양방향 스트림을 타되, `request_id`와 워커별 채널 맥락으로 구분됩니다.
 - **스트림이 끊기면 호스트와 워커는 각각 무엇을 가정할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 호스트 쪽에서는 outbound write 실패나 inbound reader 종료를 워커별 채널 계약이 깨진 신호로 보고 채널을 닫은 뒤 재연결 또는 워커 재시작 경로로 넘어갑니다. 즉 단순 네트워크 흔들림보다 먼저, 방금 연결된 그 워커와의 `EventStream`이 더 이상 유효하지 않다고 가정하는 것이 핵심입니다.
 - **큰 페이로드는 이 스트림 위를 어떻게 지나가며, 어디에서 한계가 드러날까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 기본 경로에서는 `TypedData`로 gRPC 프레임 안에 직접 실리지만, 호스트와 워커가 capability를 모두 광고하면 `RpcSharedMemory` 위치 정보만 보내는 shared memory 경로를 사용할 수 있습니다. 그래서 한계는 단순 메시지 타입이 아니라 payload 크기, 직렬화 비용, 워커 구현체가 shared memory를 실제로 지원하는지 여부에서 드러납니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

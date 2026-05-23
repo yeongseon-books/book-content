@@ -230,11 +230,11 @@ az functionapp log tail -n my-func -g my-rg
 ## 처음 질문으로 돌아가기
 
 - **Functions Host는 정확히 어떤 프로세스이며, 어떤 순서로 부팅될까요?**
-  - 본문의 기준은 호스트 부팅 — `WebJobsScriptHostService`부터 따라가기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - Functions Host는 ASP.NET Core 프로세스 안에서 `WebJobsScriptHostService`가 수명주기를 관리하고, 내부의 `ScriptHost`가 실제 함수 앱 준비를 맡는 구조입니다. 순서는 `WebJobsScriptHostService.StartAsync` 진입, `ScriptHost` 생성, `InitializeAsync`에서 설정 로드와 메타데이터 인덱싱 수행, 그 뒤 `base.StartAsyncCore()`로 리스너 시작 단계 진입입니다.
 - **`host.json`은 단순 설정 파일일까요, 아니면 런타임 동작을 바꾸는 실제 구성 입력일까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - `host.json`은 문서용 파일이 아니라 `HostJsonFileConfigurationSource`를 통해 `IConfiguration` 트리에 들어가는 실제 런타임 입력입니다. 그래서 `functionTimeout`, 동시성, 확장 설정은 옵션 객체로 직접 매핑되고, 같은 트리에 들어온 앱 설정이 있으면 그 값이 최종 동작을 바꿉니다.
 - **호스트 시작 실패는 어디에 기록되고, 첫 번째 진단 지점은 어디일까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 첫 진단 지점은 `WebJobsScriptHostService`가 부팅을 어디까지 진행했는지와 `ScriptHost.InitializeAsync`가 끝났는지 여부입니다. 시작 직후 예외, 함수 메타데이터 인덱싱 실패, 리스너 시작 직전 실패가 서로 다른 단계이므로 `WebJobsScriptHostService`, `FunctionMetadataManager`, `StartAsyncCore` 주변 로그를 순서대로 보는 것이 맞습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

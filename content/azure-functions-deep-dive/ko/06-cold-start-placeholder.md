@@ -360,11 +360,11 @@ host code를 따라가고 나면 어떤 레버가 어느 단계를 줄이는지 
 ## 처음 질문으로 돌아가기
 
 - **호스트 부팅, 워커 시작, JIT 중 어느 부분이 cold start에서 가장 비쌀까요?**
-  - 본문의 기준은 콜드 스타트와 Placeholder Mode — 새 인스턴스가 만들어질 때를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 이 글의 기준에서는 cold start를 한 항목으로 뭉뚱그리지 않고 placeholder 공통 준비와 specialization 이후 비용으로 나눠 봐야 합니다. 실제로 사용자가 크게 체감하는 구간은 `SpecializeHostCoreAsync` 안에서 환경을 다시 읽고 워커를 specialize한 뒤 `RestartHostAsync`와 `DelayUntilHostReadyAsync`를 기다리는 단계입니다.
 - **Placeholder 인스턴스는 정확히 무엇을 미리 준비해 둘까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - Placeholder 인스턴스는 빈 껍데기가 아니라 `InitializedFromPlaceholder` 표시, `WarmUp` 함수 파일 생성, specialization 감지 타이머, JIT warmup 경로까지 미리 갖춘 호스트입니다. 즉 VM 할당 뒤 공통 bootstrap과 warmup 준비를 먼저 끝내 두고, 사용자 앱이 배정되면 그 위에 specialization만 올리는 구조입니다.
 - **Premium의 always-ready 인스턴스는 placeholder와 무엇이 다를까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - placeholder는 공통 준비만 끝낸 뒤 나중에 specialization을 수행할 인스턴스이고, Flex Consumption의 Always Ready나 Premium pre-warmed는 specialization까지 끝난 인스턴스를 더 오래 유지하는 쪽에 가깝습니다. 그래서 Consumption에서는 placeholder → specialization 비용을 자주 맞고, Always Ready나 pre-warmed를 쓰면 그 경로 자체를 덜 타게 됩니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

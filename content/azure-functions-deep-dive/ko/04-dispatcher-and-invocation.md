@@ -248,11 +248,11 @@ TotalMs=425
 ## 처음 질문으로 돌아가기
 
 - **dispatcher는 한 번의 invocation을 어떤 단계로 나눠 처리할까요?**
-  - 본문의 기준은 Dispatcher와 Invocation — 함수 호출이 워커에 도달하기까지를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 한 번의 invocation은 트리거 감지 뒤 `WorkerFunctionInvoker`가 `ScriptInvocationContext`를 만들고, dispatcher가 그것을 `InvocationRequest`로 직렬화해 워커별 outbound 채널로 보내는 단계로 나뉩니다. 이후 워커 응답은 inbound 채널로 돌아와 `invocation_id`로 원래 `TaskCompletionSource`를 깨우고, 마지막에 SDK가 큐 삭제나 HTTP 응답 같은 후속 처리를 마칩니다.
 - **invocation context는 어디서 만들어지고 누가 해제할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - invocation context는 out-of-proc 경로에서 `WorkerFunctionInvoker`가 만들고, 그 안에 함수 메타데이터, 입력 데이터, trace context, 취소 토큰, 결과를 기다릴 `TaskCompletionSource`까지 담깁니다. 해제도 별도 마법이 아니라 워커 응답이 `invocation_id`로 매칭되어 해당 `TaskCompletionSource`가 완료될 때 자연스럽게 호출 수명주기가 닫히는 방식입니다.
 - **`maxConcurrentRequests`, `batchSize` 같은 동시성 제어는 어디에서 실제로 영향을 줄까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - `batchSize`는 트리거 listener 앞단에서 한 번에 읽어오는 작업량을 바꾸고, `maxConcurrentRequests`는 HTTP 요청 동시 처리 상한에 걸립니다. 반면 워커 수와 `WorkerChannelThrottleProvider`는 invocation이 워커 채널로 밀려나기 직전 병렬성을 조절하므로, 같은 동시성 설정처럼 보여도 실제 영향을 주는 계층이 서로 다릅니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
