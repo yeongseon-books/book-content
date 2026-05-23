@@ -26,12 +26,9 @@ last_reviewed: '2026-05-12'
 
 처음 미분을 배울 때 많은 사람이 공식을 먼저 외웁니다. 하지만 실무에서 더 오래 남는 것은 공식보다 멘탈 모델입니다. 미분은 함수값 자체를 보는 도구가 아니라, 함수가 한 점 근처에서 어떤 움직임을 보이는지를 읽는 도구라는 관점을 먼저 잡아야 이후의 gradient, backpropagation, optimizer가 자연스럽게 이어집니다.
 
-이 글은 Calculus for ML 101 시리즈의 첫 번째 글입니다.
-
 이 글에서는 평균 변화율, 접선, 극한, 수치 미분을 하나의 흐름으로 묶어 미분을 설명하겠습니다. 여기서 미분을 제대로 잡아 두면 이후 글에서 나오는 손실 함수의 gradient를 더 이상 추상적인 숫자로 보지 않게 됩니다.
 
 끝까지 읽고 나면 미분을 "공식 조작"이 아니라 "학습 방향을 읽는 첫 번째 센서"로 이해하게 될 것입니다.
-
 
 ![Calculus for ML 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/calculus-for-ml-101/01/01-01-concept-at-a-glance.ko.png)
 *Calculus for ML 101 1장 흐름 개요*

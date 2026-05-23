@@ -28,10 +28,7 @@ title: "AI Data Preparation 101 (3/10): 데이터 정제와 중복 제거"
 
 데이터 정제와 dedup은 단순히 파일 크기를 줄이는 작업이 아니라, 모델이 반복 학습과 누수에서 얼마나 자유로울지를 결정하는 작업입니다.
 
-이 글은 AI Data Preparation 101 시리즈의 3번째 글입니다.
-
 여기서는 원문 정제의 기본 변환과 exact·near·semantic dedup의 차이를 정리하고, 특히 train/eval cross-dedup이 왜 핵심인지 설명하겠습니다.
-
 
 ![AI 데이터 준비 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/03/03-01-big-picture.ko.png)
 *AI 데이터 준비 3장 흐름 개요*

@@ -26,8 +26,6 @@ seo_description: 사람이 모든 응답을 평가할 수 없을 때, 강력한 
 
 현업에서 저는 LLM judge를 붙인 뒤 오히려 더 자신 있게 잘못된 결론을 내리는 팀도 봤습니다. 사람 기준선 없이 judge 점수만 높다고 배포를 밀어붙였기 때문입니다. 반대로 프롬프트를 몇 차례 다듬고 사람과의 일치도를 재보는 팀은 놀랄 만큼 빠르게 품질 판단 속도를 끌어올립니다.
 
-이 글은 AI Evaluation 101 시리즈의 4번째 글입니다.
-
 여기서는 judge 프롬프트를 어떻게 쓰고, 어떤 편향을 통제하고, 사람 채점과 어느 정도 일치해야 실무에서 믿고 쓸 수 있는지 정리하겠습니다.
 
 ![LLM-as-Judge - 모델로 모델을 평가하기](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-01-llm-as-judge-evaluating-models-with-mode.ko.png)

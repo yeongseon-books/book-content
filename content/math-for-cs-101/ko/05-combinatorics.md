@@ -26,8 +26,6 @@ seo_description: 조합론으로 경우의 수를 세고 복잡도와 확률의 
 
 조합론은 바로 이 지점에서 힘을 발휘합니다. 순서가 중요한지, 중복이 허용되는지, 선택이 서로 겹치는지 같은 구조만 정확히 잡으면, 경우의 수를 직접 늘어놓지 않고도 계산할 수 있습니다.
 
-이 글은 Math for CS 101 시리즈의 5번째 글입니다.
-
 여기서는 조합론을 공식 암기 과목으로 보지 않고, 복잡도 분석과 확률 계산의 바닥에서 쓰는 셈의 언어로 정리해 보겠습니다.
 
 ![Math for CS 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/05/05-01-concept-at-a-glance.ko.png)

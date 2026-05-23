@@ -25,8 +25,6 @@ last_reviewed: '2026-05-15'
 
 이때 중요한 오해도 함께 정리해야 합니다. 예시를 많이 넣는다고 자동으로 좋아지지 않고, “step by step”이라는 문장을 붙인다고 없던 지식이 생기지도 않습니다. 결국 핵심은 어떤 작업에 어떤 유도 장치가 필요한지 구분하는 데 있습니다.
 
-이 글은 LLM App Foundations 101 시리즈의 네 번째 글입니다.
-
 여기서는 few-shot과 chain-of-thought를 예시 기반 유도와 단계 기반 유도로 나누어 보고, 각각이 언제 효과적인지 정리하겠습니다.
 
 ![예시 기반 유도와 단계적 추론의 전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/04/04-01-few-shot-and-chain-of-thought-steering-b.ko.png)

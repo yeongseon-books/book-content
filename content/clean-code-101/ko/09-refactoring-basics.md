@@ -25,10 +25,7 @@ last_reviewed: '2026-05-15'
 
 리팩토링은 코드를 다시 쓰는 작업처럼 보이기 쉽지만, 실제로는 훨씬 더 작은 단위의 개선을 반복하는 일입니다.
 
-이 글은 Clean Code 101 시리즈의 9번째 글입니다.
-
 여기서는 리팩토링이 무엇이고 무엇이 아닌지, 그리고 레거시 코드에서도 안전하게 적용하는 절차를 정리하겠습니다.
-
 
 ![Clean Code 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/09/09-01-concept-at-a-glance.ko.png)
 *Clean Code 101 9장 흐름 개요*
@@ -199,7 +196,6 @@ python -m pytest -q tests/test_legacy_characterization.py
 
 리팩토링은 다음 변경의 비용을 낮추는 투자입니다. 마지막 글에서는 이 시리즈 전체를 한 번에 점검하는 좋은 코드 리뷰 기준으로 마무리합니다.
 
-
 ## 리팩토링 카탈로그를 실무에 매핑하기
 
 리팩토링은 이름을 아는 것보다 순서가 중요합니다. 아래 표는 자주 쓰는 기법과 적용 목적을 정리한 카탈로그입니다.
@@ -243,7 +239,6 @@ class Order:
     def total_with_tax(self) -> int:
         return int(self.subtotal() * (1 + self.tax_rate))
 
-
 class OrderService:
     def __init__(self, order: Order):
         self.order = order
@@ -270,7 +265,6 @@ class RefactorStep:
     name: str
     done: bool = False
 
-
 def next_refactor_step(steps: list[RefactorStep]) -> str | None:
     for step in steps:
         if not step.done:
@@ -279,7 +273,6 @@ def next_refactor_step(steps: list[RefactorStep]) -> str | None:
 ```
 
 이런 방식으로 리팩토링 계획을 명시하면, 큰 변경도 안전하게 작게 나눌 수 있습니다. 결국 리팩토링의 품질은 기법 지식보다 단계 관리에서 결정됩니다.
-
 
 ## 실무 적용 메모
 
@@ -302,7 +295,6 @@ class QualityGate:
     has_small_functions: bool
     has_review_notes: bool
 
-
 def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
     missing = []
     if not gate.has_tests:
@@ -321,7 +313,6 @@ def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
 이 체크 함수는 단순하지만, 품질 기준을 코드로 표현하는 출발점이 됩니다. 팀이 기준을 말로만 합의하면 시간이 지나며 흐려집니다. 반대로 코드와 템플릿과 자동화 규칙으로 남기면 신규 멤버가 들어와도 동일한 기준이 유지됩니다.
 
 또한 개선 활동은 단발성 이벤트가 아니라 루프여야 합니다. 한 번의 대청소보다 매 PR마다 작은 개선을 추가하는 편이 장기적으로 더 강합니다. 이름 하나, 함수 하나, 분기 하나를 매번 더 낫게 만드는 습관이 쌓이면 코드베이스의 평균 품질이 올라가고, 장애 대응 속도도 실제로 빨라집니다.
-
 
 ## 리팩토링 카탈로그: 작은 변경을 안전하게 누적하기
 
@@ -346,15 +337,12 @@ def make_report(users):
             result.append({"id": u["id"], "segment": "engaged"})
     return result
 
-
 # after
 def make_report(users):
     return [to_engaged_entry(user) for user in users if is_recent_active_user(user)]
 
-
 def is_recent_active_user(user: dict) -> bool:
     return user["active"] and user["last_login_days"] < 30
-
 
 def to_engaged_entry(user: dict) -> dict:
     return {"id": user["id"], "segment": "engaged"}
@@ -367,7 +355,6 @@ from typing import Protocol
 
 class SegmentPolicy(Protocol):
     def matches(self, user: dict) -> bool: ...
-
 
 def filter_users(users: list[dict], policy: SegmentPolicy) -> list[dict]:
     return [user for user in users if policy.matches(user)]
@@ -389,7 +376,6 @@ ruff check app/ tests/
 
 리팩토링 PR은 기능 PR과 분리하고, 검증 로그를 PR 본문에 남겨야 추적 가능성이 올라갑니다. 이 규칙이 장기 유지보수 비용을 결정합니다.
 
-
 ## 심화 실습: 레거시 모듈 점진 개선 계획
 
 레거시 모듈은 "한 번에 교체"보다 "행동 고정 후 점진 개선"이 안전합니다. 먼저 Characterization Test로 현재 동작을 고정하고, 작은 리팩토링을 반복합니다.
@@ -410,6 +396,32 @@ def migrate_refactor_step(step_name: str, is_verified: bool) -> str:
 
 리팩토링은 속도보다 신뢰가 먼저입니다. 각 단계마다 검증 로그를 남기면 다음 변경의 출발 비용이 줄어듭니다.
 
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
 ### 심화 사례: 변경 전파 경로 점검
 
@@ -438,6 +450,32 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 
 점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
 ### 심화 사례: 변경 전파 경로 점검
 
@@ -466,7 +504,6 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 
 점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
-
 ### 심화 사례: 변경 전파 경로 점검
 
 아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
@@ -494,7 +531,6 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 
 점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
-
 ### 심화 사례: 변경 전파 경로 점검
 
 아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
@@ -521,63 +557,6 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 | 13+ | 단계별 배포와 롤백 계획 포함 |
 
 점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
-
-
-### 심화 사례: 변경 전파 경로 점검
-
-아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
-
-- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
-- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
-- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
-- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
-
-```python
-def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
-    score = callers * 2
-    if contract_changed:
-        score += 5
-    if exception_changed:
-        score += 3
-    return score
-```
-
-| 점수 구간 | 권장 전략 |
-| --- | --- |
-| 0-5 | 단일 PR로 진행 |
-| 6-12 | 리팩토링 PR과 기능 PR 분리 |
-| 13+ | 단계별 배포와 롤백 계획 포함 |
-
-점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
-
-
-### 심화 사례: 변경 전파 경로 점검
-
-아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
-
-- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
-- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
-- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
-- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
-
-```python
-def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
-    score = callers * 2
-    if contract_changed:
-        score += 5
-    if exception_changed:
-        score += 3
-    return score
-```
-
-| 점수 구간 | 권장 전략 |
-| --- | --- |
-| 0-5 | 단일 PR로 진행 |
-| 6-12 | 리팩토링 PR과 기능 PR 분리 |
-| 13+ | 단계별 배포와 롤백 계획 포함 |
-
-점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
-
 
 ### 심화 사례: 변경 전파 경로 점검
 

@@ -26,8 +26,6 @@ last_reviewed: '2026-05-12'
 
 학습이 사람 손을 탈수록 재현성과 운영 속도는 함께 떨어집니다. 그래서 MLOps에서 파이프라인은 편의 기능이 아니라, 학습을 단계로 분해해 다시 실행 가능하게 만드는 기본 구조입니다.
 
-이 글은 MLOps 101 시리즈의 4번째 글입니다.
-
 여기서는 학습 파이프라인을 스크립트 자동화와 구분해서 보고, 왜 단계 분리와 DAG가 중요한지 작은 예제로 정리하겠습니다.
 
 ![MLOps 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/04/04-01-see-the-flow-first.ko.png)

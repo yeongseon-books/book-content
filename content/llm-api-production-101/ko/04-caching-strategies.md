@@ -28,8 +28,6 @@ LLM 기능이 실제 트래픽을 받기 시작하면 비용 문제는 생각보
 
 이번 글에서는 가장 작은 운영형 캐시부터 출발하겠습니다. 요청 payload를 정규화해 해시 키를 만들고, TTL 기반 인메모리 캐시를 붙여 비용과 지연 시간을 줄이는 패턴을 정리합니다.
 
-이 글은 LLM API Production 101 시리즈의 네 번째 글입니다.
-
 여기서는 요청 해시와 TTL을 기반으로 같은 작업의 재계산을 피하는 캐싱 전략을 봅니다.
 
 ![캐싱 전략: 비용과 지연 시간 줄이기](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/04/04-01-caching-strategies-reducing-cost-and-lat.ko.png)

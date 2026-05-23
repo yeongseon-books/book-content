@@ -25,8 +25,6 @@ last_reviewed: '2026-05-15'
 
 같은 변수 이름이 함수 안팎에서 서로 다른 값을 가리키는데도 프로그램은 대체로 예측 가능하게 동작합니다. 이 당연해 보이는 일이 사실은 언어 설계에서 아주 중요한 규칙 위에 서 있습니다.
 
-이 글은 Programming Languages 101 시리즈의 네 번째 글입니다.
-
 이 글에서는 이름에 값을 붙이는 바인딩과, 그 바인딩이 보이는 범위인 스코프를 함께 보겠습니다. 특히 현대 언어 대부분이 택한 렉시컬 스코프가 왜 읽기 좋은 코드를 만들고, 어디서 흔히 헷갈리는지도 같이 정리하겠습니다.
 
 ![Programming Languages 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/04/04-01-concept-at-a-glance.ko.png)

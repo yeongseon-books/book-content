@@ -23,8 +23,6 @@ last_reviewed: '2026-05-12'
 
 # Algorithms 101 (9/10): 문자열 알고리즘 기초
 
-이 글은 Algorithms 101 시리즈의 9번째 글입니다.
-
 문자열 안에서 패턴 하나 찾는 일이 단순해 보이는데, 왜 알고리즘이 그렇게 많을까요? 여기서는 단순 매칭, KMP, 트라이, 그리고 실무 정규식의 비용 감각을 정리합니다.
 
 ![Algorithms 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/09/09-01-big-picture.ko.png)

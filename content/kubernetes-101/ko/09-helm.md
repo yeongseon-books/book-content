@@ -24,10 +24,7 @@ last_reviewed: '2026-05-15'
 
 Kubernetes를 실제로 쓰기 시작하면 YAML이 빠르게 늘어납니다. 개발, 스테이징, 운영 환경이 갈라지고, 이미지 태그와 replica 수, 서비스 타입이 조금씩 달라지면 복사한 매니페스트가 금방 쌓입니다. 시간이 지나면 어떤 파일이 기준인지조차 흐려지기 쉽습니다.
 
-이 글은 Kubernetes 101 시리즈의 9번째 글입니다.
-
 여기서는 Helm을 단순한 패키지 매니저가 아니라, 공통 템플릿과 환경별 값을 분리해 Kubernetes 배포를 반복 가능하게 만드는 배포 단위라는 관점에서 정리하겠습니다.
-
 
 ![Kubernetes 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/09/09-01-concept-at-a-glance.ko.png)
 *Kubernetes 101 9장 흐름 개요*
@@ -184,7 +181,6 @@ helm history web
 
 다음 글에서는 시리즈를 마무리하며, 실제 운영 관점에서 probes, RBAC, 관측성, GitOps를 어떻게 함께 봐야 하는지 정리하겠습니다.
 
-
 ## 매니페스트 중심 운영 예시
 
 Kubernetes의 강점은 명령형 조작보다 선언형 매니페스트에 있습니다. 아래 예시는 Deployment, Service, Ingress를 분리해 책임 경계를 명확히 둔 기본 형태입니다.
@@ -290,7 +286,6 @@ kubectl get events -n prod --sort-by=.metadata.creationTimestamp
 5. 배포 후 `kubectl rollout history`를 확인해 복구 경로를 문서화합니다.
 
 Kubernetes는 기능이 많아서 어려운 도구가 아니라, 경계를 나누어 관찰하지 않으면 쉽게 혼란스러워지는 도구입니다. 매니페스트, 관찰 명령, 아키텍처 경계를 함께 묶어 운영하면 학습 속도와 안정성이 동시에 올라갑니다.
-
 
 ## 운영 관찰 지표 추가
 

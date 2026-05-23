@@ -25,8 +25,6 @@ title: "Programming Languages 101 (9/10): 정적 언어와 동적 언어"
 
 정적 타입이 더 안전하다는 말은 자주 듣지만, 그 안전이 정확히 무엇을 덮는지 묻는 순간 답이 흐려지는 경우가 많습니다. 반대로 동적 언어가 더 빠르다는 말도 자주 나오지만, 실제로는 어떤 종류의 속도를 말하는지 구분이 필요합니다.
 
-이 글은 Programming Languages 101 시리즈의 아홉 번째 글입니다.
-
 이 글에서는 정적 언어와 동적 언어를 우열의 문제가 아니라 검사 시점의 선택으로 보겠습니다. 같은 함수를 타입 힌트 없이 쓴 버전과 명시적으로 쓴 버전을 나란히 놓고, 어떤 종류의 오류를 언제 잡을 수 있는지 현실적으로 정리하겠습니다.
 
 ![Programming Languages 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/09/09-01-concept-at-a-glance.ko.png)

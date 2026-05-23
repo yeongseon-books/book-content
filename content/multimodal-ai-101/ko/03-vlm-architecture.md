@@ -30,10 +30,7 @@ seo_description: 2편에서 본 CLIP은 image와 text를 같은 공간에 정렬
 
 이 글에서는 VLM을 “LLM에 눈을 다는 마법”이 아니라, image encoder의 출력을 LLM이 소비 가능한 형태로 연결하는 설계 계열로 정리합니다.
 
-이 글은 Multimodal AI 101 시리즈의 3번째 글입니다.
-
 세 학파의 공통 뼈대를 먼저 이해하면 모델 이름이 바뀌어도 판단 기준은 크게 흔들리지 않습니다.
-
 
 ![Multimodal AI 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/03/03-01-big-picture.ko.png)
 *Multimodal AI 101 3장 흐름 개요*

@@ -23,8 +23,6 @@ last_reviewed: '2026-05-14'
 
 # Computer Science Major 101 (10/10): 졸업 전 갖춰야 할 역량
 
-이 글은 Computer Science Major 101 시리즈의 마지막 글입니다.
-
 졸업이 가까워질수록 많은 학생이 비슷한 불안을 느낍니다. 과목은 거의 다 들었는데, 정말 현업에 들어갈 준비가 되었는지는 잘 모르겠다는 감각입니다.
 
 ![Computer Science Major 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/10/10-01-graduation-skill-map.ko.png)

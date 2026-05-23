@@ -25,10 +25,7 @@ last_reviewed: '2026-05-15'
 
 리더 선출에서 가장 위험한 장면은 "누가 이기느냐"가 아닙니다. 죽었다고 믿었던 예전 리더가 늦게 깨어나 다시 쓰기를 시도하는 순간입니다. 이 장면을 막지 못하면 시스템은 아주 짧은 순간에도 두 리더를 허용하게 됩니다.
 
-이 글은 Distributed Systems 101 시리즈의 일곱 번째 글입니다.
-
 여기서는 lease와 fencing token을 함께 써서, 리더를 고르는 문제를 넘어 예전 리더의 영향력을 끊는 운영 안전장치로 설명합니다.
-
 
 ![Distributed Systems 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/07/07-01-concept-at-a-glance.ko.png)
 *Distributed Systems 101 7장 흐름 개요*
@@ -198,7 +195,6 @@ Kubernetes의 `kube-controller-manager`와 `kube-scheduler`는 etcd lease를 사
 
 리더 선출은 lease와 fencing을 이용해 한 시점에 한 리더라는 약속을 유지하는 작업입니다. 다음 글에서는 리더 없이도 작업을 분배하고 시간을 축으로 설계하는 도구, 메시지 큐와 이벤트 소싱을 살펴봅니다.
 
-
 ## 실전 설계 확장: 리더 선출 패턴과 운영 안전장치
 
 앞에서 lease, heartbeat, fencing token의 기본 동작을 확인했다면, 이제는 실제 시스템에서 어떤 선출 패턴을 고르고 어떻게 운영 안정성을 붙일지 결정해야 합니다. 리더 선출은 알고리즘 자체보다 "오래 멈췄던 예전 리더가 복귀했을 때도 안전한가"라는 질문으로 평가해야 합니다.
@@ -227,13 +223,11 @@ Kubernetes의 `kube-controller-manager`와 `kube-scheduler`는 etcd lease를 사
 from dataclasses import dataclass
 from time import monotonic
 
-
 @dataclass
 class LeaseState:
     owner_id: str | None = None
     expires_at: float = 0.0
     token: int = 0
-
 
 class LeaseElection:
     def __init__(self, ttl_seconds: float):
@@ -299,11 +293,9 @@ app = FastAPI()
 last_token = 0
 state: dict[str, str] = {}
 
-
 class WriteRequest(BaseModel):
     key: str
     value: str
-
 
 @app.post("/write")
 def write(req: WriteRequest, x_fencing_token: int = Header(...)):
@@ -472,7 +464,6 @@ leaseDuration >= maxGCPause + maxNetworkRTT + clockSkew + safetyMargin
 예를 들어 JVM 서비스(G1GC, maxGCPause=1s)가 같은 리전(RTT=2ms, clockSkew=50ms)에서 동작한다면 최소 TTL은 `(1000 + 2 + 50) * 3 = ~3.2s`이므로 5초가 합리적 시작점입니다. heartbeat 주기는 TTL의 1/3인 약 1.5-2초로 설정하면 한두 번의 갱신 실패를 흡수할 수 있습니다.
 
 TTL이 너무 짧으면 네트워크 순간 지연에 불필요한 리더 전환(flapping)이 일어나고, 너무 길면 실제 장애 시 복구 시간이 길어집니다. 운영 초기에는 보수적으로 잡고, `leader_election_transitions_total` 메트릭을 관찰하며 점진적으로 줄여 가는 것이 안전합니다.
-
 
 ## 처음 질문으로 돌아가기
 

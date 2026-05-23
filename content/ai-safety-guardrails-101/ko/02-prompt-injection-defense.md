@@ -26,10 +26,7 @@ Prompt injection은 프롬프트를 잘못 쓴 실수가 아니라 입력 경계
 
 그래서 prompt injection 방어는 패턴 하나를 막는 일이 아닙니다. 무엇을 신뢰할 수 있고 무엇을 신뢰할 수 없는지, 어떤 입력이 추가 검증으로 라우팅되어야 하는지, 어떤 외부 데이터를 반드시 구조화해서 감싸야 하는지를 명확히 하는 아키텍처 문제입니다.
 
-이 글은 AI Safety & Guardrails 101 시리즈의 2번째 글입니다.
-
 이 글에서는 “Ignore previous instructions”가 왜 통하는지와, regex·임베딩·LLM judge를 결합한 다층 방어 구조를 설명합니다.
-
 
 ![Prompt injection 방어 흐름](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/02/02-01-big-picture.ko.png)
 *Prompt injection 방어 흐름*

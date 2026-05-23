@@ -26,8 +26,6 @@ title: "Math for CS 101 (3/10): 집합과 함수"
 
 현업에서는 이 두 생각이 따로 놀지 않습니다. 중복 제거, 권한 계산, 데이터 전처리, 키 매핑, 직렬화 파이프라인이 모두 집합과 함수의 언어로 다시 읽힙니다. 그래서 이 주제를 잡아 두면 코드의 모양보다 구조가 먼저 보이기 시작합니다.
 
-이 글은 Math for CS 101 시리즈의 3번째 글입니다.
-
 여기서는 집합과 함수를 자료구조와 데이터 모델의 바닥 문법으로 보고, 코드와 연결되는 감각을 분명하게 잡아 보겠습니다.
 
 ![Math for CS 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/03/03-01-concept-at-a-glance.ko.png)

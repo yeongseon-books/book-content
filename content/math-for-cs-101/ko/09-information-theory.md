@@ -26,8 +26,6 @@ title: "Math for CS 101 (9/10): 정보이론"
 
 정보이론은 정보를 감각적인 표현이 아니라 측정 가능한 양으로 다룹니다. 어떤 사건이 얼마나 놀라운지, 어떤 분포가 얼마나 불확실한지, 압축이 어디까지 가능한지 같은 질문을 비트 단위로 말하게 해 줍니다.
 
-이 글은 Math for CS 101 시리즈의 9번째 글입니다.
-
 여기서는 정보이론을 압축, 통신, 머신러닝 손실 함수 뒤에 놓인 공통 언어로 보고 정보량, 엔트로피, 교차 엔트로피, KL 발산의 감각을 정리해 보겠습니다.
 
 ![Math for CS 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/09/09-01-concept-at-a-glance.ko.png)

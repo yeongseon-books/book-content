@@ -24,8 +24,6 @@ App Service에서 "배포가 성공했다"는 말은 실제로는 꽤 많은 단
 
 운영에서 시간이 길어지는 이유도 대개 여기 있습니다. Kudu deployment history에는 success가 찍혀 있는데 앱은 502를 내고, ZIP 업로드는 끝났는데 startup command가 어긋나며, slot swap은 끝났는데 production에서 첫 요청이 느립니다. 이 모든 경우에 "배포 실패"라는 한 문장만으로는 아무것도 설명되지 않습니다.
 
-이 글은 Azure App Service Deep Dive 시리즈의 네 번째 글입니다.
-
 이번 글에서는 Kudu, Oryx, run-from-package, slot warm-up을 하나의 배포 경로로 묶어 보겠습니다. 배포를 upload, build, placement, startup readiness라는 네 단계로 나눠 보면 어디서 성공했고 어디서 실패했는지 훨씬 더 빠르게 읽을 수 있습니다.
 
 이제 artifact가 worker가 보는 런타임 경로까지 도달하는 과정을 차례로 따라가 보겠습니다.

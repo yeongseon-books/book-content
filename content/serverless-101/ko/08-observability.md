@@ -22,8 +22,6 @@ last_reviewed: '2026-05-12'
 
 # Serverless 101 (8/10): 관측성
 
-이 글은 Serverless 101 시리즈의 8번째 글입니다.
-
 서버리스 시스템은 짧고 분산되어 있습니다. 한 요청이 하나의 함수에서 끝나지 않고 여러 함수, 큐, 데이터 저장소를 거칠 수 있습니다. 그래서 문제를 볼 때 로그만 보거나 메트릭만 봐서는 자주 길을 잃습니다.
 
 ![Serverless 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/08/08-01-concept-at-a-glance.ko.png)

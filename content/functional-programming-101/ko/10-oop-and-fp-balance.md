@@ -22,12 +22,9 @@ last_reviewed: '2026-05-12'
 
 # Functional Programming 101 (10/10): 객체지향과 함수형의 균형
 
-이 글은 Functional Programming 101 시리즈의 마지막 글입니다.
-
 함수형 프로그래밍을 배우다 보면 어느 순간 "그럼 객체지향은 버려야 하나?"라는 질문이 나옵니다. 반대로 객체지향에 익숙한 팀에서는 함수형 기법을 도입할 때 "결국 클래스가 더 익숙한데 굳이 왜?"라는 반응도 나옵니다. 둘 다 문제를 너무 이분법으로 보는 시선입니다.
 
 Python은 애초에 다중 패러다임 언어입니다. 데이터 모델은 객체지향적으로 두고, 핵심 계산은 순수 함수로 분리하고, 프레임워크 경계에서는 다시 클래스나 핸들러를 쓰는 식의 혼합 설계가 가장 현실적입니다. 중요한 것은 신념이 아니라 선택 기준입니다.
-
 
 ![Functional Programming 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/10/10-01-where-to-draw-the-oop-fp-boundary.ko.png)
 *Functional Programming 101 10장 흐름 개요*
@@ -443,7 +440,6 @@ Bad port: validation failed: ['port must be 1-65535']
 
 객체지향과 함수형은 경쟁 관계가 아니라 상호 보완 관계입니다. Python에서는 불변 값 객체(OOP) + 순수 함수(FP) + 얇은 클래스 셸이라는 조합이 가장 실용적인 경우가 많습니다. 이 시리즈에서 다룬 함수형 도구들을 적절히 섞어 쓰면 더 읽기 쉽고 테스트하기 쉬운 코드를 만들 수 있습니다.
 
-
 ## 심화 앵커: 하이브리드 설계를 검증 가능한 형태로 고정하기
 
 여기서는 시리즈 전체에서 다룬 패턴을 하나의 실행 흐름으로 묶습니다. 핵심은 클래스 경계와 함수 경계를 분리하는 것입니다. 상태를 가진 객체는 조립과 라이프사이클을 담당하고, 계산은 순수 함수 파이프라인으로 고정합니다.
@@ -466,19 +462,15 @@ class LedgerRow:
     fee: int
     net: int
 
-
 def normalize(event: Event) -> Event:
     return replace(event, kind=event.kind.strip().lower())
-
 
 def paid_only(event: Event) -> bool:
     return event.kind == "paid"
 
-
 def to_ledger(event: Event) -> LedgerRow:
     fee = int(event.amount * 0.02)
     return LedgerRow(event_id=event.event_id, gross=event.amount, fee=fee, net=event.amount - fee)
-
 
 def summarize(rows: list[LedgerRow]) -> dict[str, int]:
     return reduce(
@@ -491,7 +483,6 @@ def summarize(rows: list[LedgerRow]) -> dict[str, int]:
         rows,
         {"count": 0, "gross": 0, "fee": 0, "net": 0},
     )
-
 
 def settle(events: list[Event]) -> dict[str, int]:
     normalized = map(normalize, events)
@@ -522,7 +513,6 @@ def test_fee_never_negative(amount: int) -> None:
 ```
 
 테스트에서 중요한 것은 "예제가 맞다"가 아니라 "성질이 유지된다"입니다. 이 관점을 유지하면 OOP와 FP를 섞어도 설계 품질이 흔들리지 않습니다.
-
 
 ## 검증 시나리오: 경계 조건을 먼저 잠그기
 
@@ -570,7 +560,6 @@ print("Pass")
 ```
 
 이런 검증 코드는 예제 코드가 아니라 운영 안전장치입니다. 새 규칙을 추가할 때도 기존 성질이 유지되는지 빠르게 확인할 수 있습니다.
-
 
 ## 처음 질문으로 돌아가기
 

@@ -31,10 +31,7 @@ seo_description: 지금까지 9편에 걸쳐 image encoder, VLM 아키텍처, ca
 
 이 글은 시리즈의 마지막 글로서, 앞선 9편의 개념을 실제 시스템 아키텍처로 묶습니다. 핵심은 하나입니다. 멀티모달 앱은 모델 집합이 아니라 운영 가능한 파이프라인이어야 합니다.
 
-이 글은 Multimodal AI 101 시리즈의 마지막 글입니다.
-
 좋은 production 시스템은 모델 성능보다 먼저 요청 흐름과 실패 경로를 명확히 보여 줍니다.
-
 
 ![Multimodal AI 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/10/10-01-big-picture.ko.png)
 *Multimodal AI 101 10장 흐름 개요*
@@ -261,7 +258,6 @@ img = ImageOps.exif_transpose(Image.open(path))
 ```python
 class StepFailure(Exception):
     pass
-
 
 def degrade_response(caption: str | None, ocr_text: str | None, docs: list[str]) -> str:
     parts = []

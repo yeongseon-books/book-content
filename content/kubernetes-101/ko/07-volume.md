@@ -24,10 +24,7 @@ last_reviewed: '2026-05-15'
 
 컨테이너는 가볍고 교체가 쉽다는 장점이 있습니다. 하지만 그 장점은 동시에 컨테이너 파일시스템이 영구 저장소가 아니라는 뜻이기도 합니다. 파드가 다시 스케줄되거나 새 컨테이너로 교체되면, 그 안에만 저장한 데이터는 함께 사라집니다.
 
-이 글은 Kubernetes 101 시리즈의 7번째 글입니다.
-
 여기서는 Volume을 단순히 디스크를 붙이는 기능이 아니라, 파드의 수명과 데이터의 수명을 분리해 stateful 워크로드를 운영 가능하게 만드는 저장소 모델로 정리하겠습니다.
-
 
 ![Kubernetes 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/07/07-01-concept-at-a-glance.ko.png)
 *Kubernetes 101 7장 흐름 개요*
@@ -189,7 +186,6 @@ kubectl get pv
 
 다음 글에서는 저장소가 아니라 트래픽 변화에 따라 파드 수를 자동으로 조절하는 방법, HPA를 보겠습니다.
 
-
 ## 매니페스트 중심 운영 예시
 
 Kubernetes의 강점은 명령형 조작보다 선언형 매니페스트에 있습니다. 아래 예시는 Deployment, Service, Ingress를 분리해 책임 경계를 명확히 둔 기본 형태입니다.
@@ -295,7 +291,6 @@ kubectl get events -n prod --sort-by=.metadata.creationTimestamp
 5. 배포 후 `kubectl rollout history`를 확인해 복구 경로를 문서화합니다.
 
 Kubernetes는 기능이 많아서 어려운 도구가 아니라, 경계를 나누어 관찰하지 않으면 쉽게 혼란스러워지는 도구입니다. 매니페스트, 관찰 명령, 아키텍처 경계를 함께 묶어 운영하면 학습 속도와 안정성이 동시에 올라갑니다.
-
 
 ## 운영 관찰 지표 추가
 

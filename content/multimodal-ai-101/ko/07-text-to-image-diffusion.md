@@ -30,10 +30,7 @@ Diffusion이 중요한 이유는 생성 품질만이 아닙니다. 텍스트 조
 
 이 글에서는 diffusion을 “이미지를 그려 주는 모델”이 아니라, 노이즈를 점진적으로 제어 가능한 시각 표현으로 되돌리는 생성 프레임워크로 정리합니다.
 
-이 글은 Multimodal AI 101 시리즈의 7번째 글입니다.
-
 생성 품질을 올리는 일과 운영 위험을 낮추는 일은 항상 함께 가야 합니다.
-
 
 ![Multimodal AI 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/07/07-01-big-picture.ko.png)
 *Multimodal AI 101 7장 흐름 개요*

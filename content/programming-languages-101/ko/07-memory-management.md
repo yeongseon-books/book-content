@@ -25,8 +25,6 @@ last_reviewed: '2026-05-15'
 
 `del x`를 썼다고 해서 그 줄에서 객체가 바로 사라지는 것은 아닙니다. 이름과 객체, 참조와 수명은 서로 다른 층위에 있고, 언어는 그 관계를 각자 다른 방식으로 관리합니다.
 
-이 글은 Programming Languages 101 시리즈의 일곱 번째 글입니다.
-
 이 글에서는 메모리 관리를 “이 객체는 언제 살아 있고 언제 죽는가”를 정하는 규칙으로 보겠습니다. 스택과 힙, 참조 카운팅, 가비지 컬렉션, 약한 참조를 차례로 보면서 GC가 있어도 누수가 생기는 이유까지 함께 정리하겠습니다.
 
 ![Programming Languages 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/07/07-01-concept-at-a-glance.ko.png)

@@ -26,8 +26,6 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 이번 글은 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준으로 `StandbyManager`, `PlaceholderSpecializationMiddleware`, `HostWarmupMiddleware`를 따라 placeholder 초기화, warmup, specialization, host restart까지 이어지는 경로를 정리합니다. 시리즈 마지막 글로서 앞선 다섯 편의 설명이 모두 여기로 모입니다.
 
-이 글은 Azure Functions Deep Dive 시리즈의 마지막 글입니다.
-
 이제 사용자가 실제로 체감하는 cold start가 어떤 코드 경로의 합으로 만들어지는지 끝까지 따라가겠습니다.
 
 ![Azure Functions Deep Dive 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/06/06-01-why-cold-start-is-expensive-decomposing.ko.png)

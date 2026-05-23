@@ -26,8 +26,6 @@ last_reviewed: '2026-05-15'
 
 좋은 README는 모든 것을 설명하려 하지 않습니다. 이 프로젝트가 무엇인지, 왜 필요한지, 가장 짧게 어떻게 돌려 보는지, 실제로 어떤 결과가 나와야 하는지부터 차례로 보여 주며 독자의 첫 5분을 설계합니다.
 
-이 글은 기술 글쓰기 101 시리즈의 7번째 글입니다.
-
 여기서는 처음 방문한 사람이 5분 안에 성공 경험을 얻도록 README를 구성하는 기준을 다룹니다.
 
 ![Technical Writing 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/07/07-01-concept-at-a-glance.ko.png)

@@ -26,10 +26,7 @@ last_reviewed: '2026-05-14'
 
 좋은 모니터링은 데이터를 많이 모으는 일이 아닙니다. 지금 무슨 일이 일어나는지, 왜 일어나는지, 누구에게 알려야 하는지를 빠르게 연결하는 일입니다.
 
-이 글은 Cloud Computing 101 시리즈의 8번째 글입니다.
-
 여기서는 메트릭, 로그, 트레이스가 각각 어떤 질문에 답하는지부터 시작해 CloudWatch 알람까지 정리해 보겠습니다.
-
 
 ![Cloud Computing 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/08/08-01-concept-at-a-glance.ko.png)
 *Cloud Computing 101 8장 흐름 개요*
@@ -269,7 +266,6 @@ def get_cpu_stats(instance_id, hours=1):
     )
     return sorted(response["Datapoints"], key=lambda d: d["Timestamp"])
 
-
 def check_threshold(datapoints, warn=60.0, critical=80.0):
     """각 데이터포인트의 평균값을 임계값과 비교합니다."""
     results = []
@@ -288,7 +284,6 @@ def check_threshold(datapoints, warn=60.0, critical=80.0):
             "level": level,
         })
     return results
-
 
 if __name__ == "__main__":
     instance_id = "i-0abc123def456"

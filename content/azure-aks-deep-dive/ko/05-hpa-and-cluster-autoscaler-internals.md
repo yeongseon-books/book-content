@@ -28,8 +28,6 @@ seo_description: AKS HPA와 Cluster Autoscaler의 작동 원리를 루프별로 
 HPA는 이미 replica를 올렸지만 scheduler가 새 Pod를 놓을 빈자리가 없어서 Pending이 생길 수 있습니다.
 그 다음에야 Cluster Autoscaler가 unschedulable Pod를 보고 새 node를 준비하므로, 두 단계 사이의 기다림은 구조적으로 자연스러운 현상입니다.
 
-이 글은 Azure AKS Deep Dive 시리즈의 다섯 번째 글입니다.
-
 이번 글의 목표는 HPA와 Cluster Autoscaler를 하나의 autoscaling 블랙박스로 보지 않고, 서로 다른 제어 루프로 분리해서 읽는 것입니다.
 그래야 replica 조정과 node 조정을 각각 다른 mental bucket에 넣고, 어디서 race window가 생기는지 분리해서 볼 수 있습니다.
 이제 두 루프가 어디서 만나고 왜 race window가 생기는지 보겠습니다.

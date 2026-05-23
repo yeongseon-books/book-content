@@ -24,8 +24,6 @@ AKS는 배포가 끝났다고 운영이 끝나는 서비스가 아닙니다. 오
 
 특히 AKS 운영은 단순히 로그 몇 줄을 보는 일이 아닙니다. Kubernetes 객체 상태, 노드 압력, 애플리케이션 에러율, 스케일링 신호, 외부 이벤트 backlog를 서로 다른 계층에서 함께 읽어야 합니다. 로그만으로는 추세가 보이지 않고, 메트릭만으로는 원인이 보이지 않습니다.
 
-이 글은 Azure AKS 101 시리즈의 마지막 글입니다.
-
 여기서는 앞선 여섯 화에서 본 클러스터, 워크로드, 네트워크, 스케일링 이야기를 운영 관점에서 하나로 묶겠습니다. **Container Insights, Log Analytics, kube-state-metrics, 알람 계층**을 중심으로 AKS day-2 운영의 기본 시야를 정리하겠습니다.
 
 ![Azure Kubernetes Service 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/07/07-01-the-operations-view-in-one-diagram.ko.png)

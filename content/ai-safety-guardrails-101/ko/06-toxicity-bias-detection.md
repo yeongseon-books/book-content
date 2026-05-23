@@ -26,10 +26,7 @@ seo_description: 따라서 toxicity는 inline guardrail로, bias는 offline audi
 
 그래서 이 글에서는 toxicity를 inline guardrail로, bias를 offline audit로 나눠 보는 관점을 중심에 둡니다. 이 분리가 있어야 차단과 개선, 운영과 평가를 각각 제대로 설계할 수 있습니다.
 
-이 글은 AI Safety & Guardrails 101 시리즈의 6번째 글입니다.
-
 이 글에서는 독성 분류기 선택, 실시간 차단, 스트리밍 보호, counterfactual 편향 평가, 공정성 지표를 함께 정리합니다.
-
 
 ![독성·편향 guardrail 흐름](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/06/06-01-big-picture.ko.png)
 *독성·편향 guardrail 흐름*
@@ -191,7 +188,6 @@ def tpr_by_group(y_true: list[int], y_pred: list[int], groups: list[str]) -> dic
         tp = sum(1 for i in positives if y_pred[i] == 1)
         out[g] = tp / len(positives)
     return out
-
 
 def equal_opportunity_gap(y_true, y_pred, groups) -> float:
     tprs = tpr_by_group(y_true, y_pred, groups)

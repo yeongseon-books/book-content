@@ -26,8 +26,6 @@ seo_description: 선형대수로 데이터와 변환을 한 문법으로 읽는 
 
 추천 시스템의 임베딩, 차원 축소, 카메라 변환, 신경망의 순전파는 모두 벡터와 행렬 연산으로 다시 읽을 수 있습니다. 결국 숫자 묶음을 어떻게 표현하고 어떻게 변환할지를 다루는 문제이기 때문입니다.
 
-이 글은 Math for CS 101 시리즈의 7번째 글입니다.
-
 여기서는 선형대수를 데이터와 변환을 같은 문법으로 다루는 도구로 보고, 벡터, 행렬, 내적, 전치, 행렬곱의 감각을 실전 쪽으로 연결해 보겠습니다.
 
 ![Math for CS 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/07/07-01-concept-at-a-glance.ko.png)

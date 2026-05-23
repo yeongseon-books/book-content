@@ -24,8 +24,6 @@ seo_description: 처음 Kubernetes YAML을 보면 비슷해 보이는 객체가 
 
 AKS를 쓰더라도 이 구조는 Kubernetes 자체의 언어로 그대로 남습니다. 따라서 Pod, Deployment, Service가 흐릿하면 Ingress와 HPA도 함께 흐릿해집니다. 반대로 이 셋만 정확히 구분해도 워크로드 모델의 절반 이상이 정리됩니다.
 
-이 글은 Azure AKS 101 시리즈의 4번째 글입니다.
-
 여기서는 3화에서 실제로 사용한 Pod, Deployment, Service를 각각 어떤 문제를 푸는 객체인지 분리해서 보겠습니다. **스케줄링 단위, 원하는 상태 관리자, 안정적인 네트워크 정체성**이라는 세 층으로 나누어 이해하는 것이 핵심입니다.
 
 ![Azure Kubernetes Service 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/04/04-01-one-picture-first.ko.png)

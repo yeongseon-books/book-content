@@ -25,10 +25,7 @@ last_reviewed: '2026-05-15'
 
 중복은 보이면 바로 없애야 할 것처럼 느껴지지만, 실제로는 그렇게 단순하지 않습니다.
 
-이 글은 Clean Code 101 시리즈의 5번째 글입니다.
-
 여기서는 DRY가 정말 뜻하는 것이 무엇인지, 그리고 어떤 중복은 남겨 두고 어떤 중복만 제거해야 하는지 분명하게 정리하겠습니다.
-
 
 ![Clean Code 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/05/05-01-concept-at-a-glance.ko.png)
 *Clean Code 101 5장 흐름 개요*
@@ -198,7 +195,6 @@ API 정책, 폼 검증 규칙, 요금제 정보처럼 사실상 데이터인 영
 
 DRY는 코드 줄 수가 아니라 변화의 출처를 하나로 유지하는 원칙입니다. 다음 글에서는 또 다른 부패 지점인 오류 처리를 정리합니다.
 
-
 ## 중복 제거 기법을 단계별로 적용하기
 
 중복 제거는 "한 번에 크게 추상화"가 아니라, 변경 이유를 확인하면서 작은 단계로 진행해야 안전합니다. 아래 표는 대표 기법과 적용 타이밍입니다.
@@ -223,13 +219,11 @@ class PricingRule:
     name: str
     multiplier: float
 
-
 PRICING_RULES = {
     "kr": PricingRule(name="kr", multiplier=1.10),
     "jp": PricingRule(name="jp", multiplier=1.08),
     "us": PricingRule(name="us", multiplier=1.07),
 }
-
 
 def apply_tax(base_price: int, country_code: str) -> int:
     rule = PRICING_RULES[country_code]
@@ -269,7 +263,6 @@ def is_essential_duplication(
 
 잘못된 추상화를 되돌리면 코드가 잠시 중복돼 보일 수 있지만, 변경 이유가 분리되면서 장기 비용은 오히려 내려갑니다.
 
-
 ## 실무 적용 메모
 
 아래 메모는 팀 내 합의 문서에 그대로 옮겨 적어도 되는 수준의 운영 규칙입니다.
@@ -291,7 +284,6 @@ class QualityGate:
     has_small_functions: bool
     has_review_notes: bool
 
-
 def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
     missing = []
     if not gate.has_tests:
@@ -311,7 +303,6 @@ def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
 
 또한 개선 활동은 단발성 이벤트가 아니라 루프여야 합니다. 한 번의 대청소보다 매 PR마다 작은 개선을 추가하는 편이 장기적으로 더 강합니다. 이름 하나, 함수 하나, 분기 하나를 매번 더 낫게 만드는 습관이 쌓이면 코드베이스의 평균 품질이 올라가고, 장애 대응 속도도 실제로 빨라집니다.
 
-
 ## 중복 유형 분류표: 같은 모양과 같은 의미를 구분하기
 
 중복 제거에서 가장 큰 실수는 모양이 비슷하다는 이유로 성급히 추상화하는 것입니다. 의미 중복인지 우연한 유사성인지 먼저 분류해야 합니다.
@@ -330,22 +321,17 @@ def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
 def order_tax(amount_cents: int) -> int:
     return int(amount_cents * 0.1)
 
-
 def refund_tax(amount_cents: int) -> int:
     return int(amount_cents * 0.1)
-
 
 # after
 TAX_RATE = 0.1
 
-
 def calculate_tax(amount_cents: int, rate: float = TAX_RATE) -> int:
     return int(amount_cents * rate)
 
-
 def order_tax(amount_cents: int) -> int:
     return calculate_tax(amount_cents)
-
 
 def refund_tax(amount_cents: int) -> int:
     return calculate_tax(amount_cents)
@@ -380,7 +366,6 @@ max-args = 5
 
 인자 수 제한은 과도한 공통화의 조기 경보로 유용합니다. 함수가 모든 케이스를 흡수하려는 순간 경고가 발생해 구조를 다시 점검하게 만듭니다.
 
-
 ## 심화 실습: 중복 제거 스프린트 운영안
 
 중복 제거는 기능 개발 사이에 끼워 넣는 방식보다 스프린트 목표로 명시하는 편이 성공률이 높습니다. 한 번에 모든 중복을 없애지 말고, 변경이 잦은 흐름부터 우선 제거합니다.
@@ -404,6 +389,32 @@ def build_error_response(code: str, message: str) -> dict:
 
 중복 제거의 성패는 추상화의 정확도보다 운영 지표 개선으로 판단해야 합니다. 충돌이 줄고 리뷰 시간이 줄면 올바른 방향입니다.
 
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
 ### 심화 사례: 변경 전파 경로 점검
 
@@ -432,6 +443,32 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 
 점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
 ### 심화 사례: 변경 전파 경로 점검
 
@@ -460,7 +497,6 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 
 점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
-
 ### 심화 사례: 변경 전파 경로 점검
 
 아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
@@ -488,7 +524,6 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 
 점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
-
 ### 심화 사례: 변경 전파 경로 점검
 
 아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
@@ -515,63 +550,6 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 | 13+ | 단계별 배포와 롤백 계획 포함 |
 
 점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
-
-
-### 심화 사례: 변경 전파 경로 점검
-
-아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
-
-- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
-- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
-- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
-- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
-
-```python
-def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
-    score = callers * 2
-    if contract_changed:
-        score += 5
-    if exception_changed:
-        score += 3
-    return score
-```
-
-| 점수 구간 | 권장 전략 |
-| --- | --- |
-| 0-5 | 단일 PR로 진행 |
-| 6-12 | 리팩토링 PR과 기능 PR 분리 |
-| 13+ | 단계별 배포와 롤백 계획 포함 |
-
-점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
-
-
-### 심화 사례: 변경 전파 경로 점검
-
-아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
-
-- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
-- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
-- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
-- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
-
-```python
-def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
-    score = callers * 2
-    if contract_changed:
-        score += 5
-    if exception_changed:
-        score += 3
-    return score
-```
-
-| 점수 구간 | 권장 전략 |
-| --- | --- |
-| 0-5 | 단일 PR로 진행 |
-| 6-12 | 리팩토링 PR과 기능 PR 분리 |
-| 13+ | 단계별 배포와 롤백 계획 포함 |
-
-점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
-
 
 ### 심화 사례: 변경 전파 경로 점검
 

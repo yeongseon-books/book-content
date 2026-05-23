@@ -25,8 +25,6 @@ last_reviewed: '2026-05-15'
 
 특히 채팅 API에서는 `system`, `user`, `assistant`가 단순한 라벨이 아닙니다. 애플리케이션 정책, 현재 요청, 누적 이력을 분리하는 최소 단위입니다. 이 세 층을 분명히 구분하면 같은 모델이어도 훨씬 예측 가능한 동작을 끌어낼 수 있습니다.
 
-이 글은 LLM App Foundations 101 시리즈의 세 번째 글입니다.
-
 여기서는 역할 기반 메시지 배열을 프롬프트의 기본 단위로 보고, 안정적인 입력 구조를 만드는 방법을 정리하겠습니다.
 
 ![역할 기반 프롬프트 구성의 전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-01-prompt-engineering-basics-system-user-an.ko.png)

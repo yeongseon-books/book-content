@@ -26,8 +26,6 @@ last_reviewed: '2026-05-12'
 
 팀 단위로 작업할 때는 더 심각해집니다. 누군가는 `final_v2_really.pkl`을 남기고, 누군가는 메트릭을 슬랙에만 적어 두고, 누군가는 실패한 실험을 아예 기록하지 않습니다. 이 상태에서는 모델 개선보다 과거 복원이 더 어려운 일이 됩니다.
 
-이 글은 MLOps 101 시리즈의 2번째 글입니다.
-
 여기서는 실험 관리를 팀의 단기 기억 장치로 보고, 어떤 정보를 어떻게 남겨야 재현과 비교가 가능해지는지 정리하겠습니다.
 
 ![MLOps 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/02/02-01-see-the-flow-first.ko.png)

@@ -26,8 +26,6 @@ last_reviewed: '2026-05-15'
 
 좋은 그림은 문장을 장식하지 않고 문장을 줄여 줍니다. 좋은 표는 선택지를 예쁘게 나열하는 대신 의사결정 기준을 한눈에 드러냅니다. 그래서 시각 자료는 글의 말미에 덧붙이는 부록이 아니라 본문 설계의 일부로 다루는 편이 낫습니다.
 
-이 글은 기술 글쓰기 101 시리즈의 6번째 글입니다.
-
 여기서는 그림과 표를 언제 고르고, 캡션과 대체 텍스트를 어떻게 써야 하는지 정리합니다.
 
 ![Technical Writing 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/06/06-01-concept-at-a-glance.ko.png)

@@ -26,8 +26,6 @@ last_reviewed: '2026-05-12'
 
 그래서 모델 모니터링은 단순 운영 부가 기능이 아닙니다. 모델이 살아 있다는 사실만 확인하는 것이 아니라, 지금 이 모델이 정상적으로 예측하고 있는지, 곧 문제가 생길 조짐은 없는지를 계속 읽는 장치입니다.
 
-이 글은 MLOps 101 시리즈의 6번째 글입니다.
-
 여기서는 모델 모니터링을 시스템 메트릭, 모델 메트릭, 비즈니스 메트릭이 만나는 관측 계층으로 보고, Prometheus 중심의 최소 구성을 정리하겠습니다.
 
 ![MLOps 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/06/06-01-see-the-flow-first.ko.png)

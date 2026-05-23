@@ -22,14 +22,11 @@ last_reviewed: '2026-05-15'
 
 # Incident Response 101 (1/10): Incident란 무엇인가?
 
-이 글은 Incident Response 101 시리즈의 첫 번째 글입니다.
-
 온콜에 처음 들어가면 가장 먼저 흔들리는 질문이 있습니다. 알림이 울렸을 때 이것을 정말 incident로 봐야 하는지, 아니면 일반 버그나 경고로 남겨도 되는지 빠르게 판단하기 어렵기 때문입니다.
 
 기준이 없으면 어떤 팀은 과하게 반응하고, 어떤 팀은 너무 늦게 움직입니다. incident 대응의 출발점은 기술 스택보다 먼저, 고객 영향과 대응 임계값을 같은 언어로 합의하는 일입니다.
 
 이 글은 Incident Response 101 시리즈의 첫 번째 글입니다. 여기서는 장애와 일반 버그를 가르는 기준, 고객 영향 중심의 정의, 그리고 초보 온콜 담당자가 처음부터 붙잡아야 할 판단 축을 정리합니다.
-
 
 ![Incident Response 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/01/01-01-diagram-at-a-glance.ko.png)
 *Incident Response 101 1장 흐름 개요*
@@ -179,7 +176,6 @@ incident는 “이상한 일”이 아니라, 고객 영향이 합의한 선을 
 
 다음 글에서는 incident의 심각도를 공통 언어로 표현하는 방법, 즉 severity 분류를 다루겠습니다.
 
-
 ## 운영 기준 심화: Incident 판정 매트릭스
 
 초기 판정에서 가장 어려운 지점은 "불편"과 "장애"의 경계입니다. 이 경계를 사람의 감각에만 맡기면 같은 상황에서 다른 결론이 반복됩니다. 그래서 팀은 최소한 세 축을 고정해야 합니다. 첫째는 고객 수, 둘째는 핵심 경로 영향 여부, 셋째는 지속 시간입니다. 이 세 축은 복잡한 모델이 아니라, 누구나 같은 값을 보고 같은 질문을 던지게 만드는 공통 프레임입니다.
@@ -228,7 +224,6 @@ class IncidentSignal:
     minutes: int
     core_path_impacted: bool
     error_ratio: float
-
 
 def decide(signal: IncidentSignal) -> str:
     if signal.core_path_impacted and signal.error_ratio >= 0.05:
@@ -346,7 +341,6 @@ next_update_utc: 2026-05-21T01:30:00Z
 - recovery_verification_metrics:
 - postmortem_linked: true/false
 ```
-
 
 ## 운영 메모: 점검 루프
 

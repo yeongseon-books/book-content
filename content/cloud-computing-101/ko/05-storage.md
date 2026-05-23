@@ -26,10 +26,7 @@ last_reviewed: '2026-05-14'
 
 저장소를 잘못 고르면 비용이 늘고 성능이 흔들리며 복구 전략까지 취약해집니다. 반대로 처음에 맞는 저장소를 고르면 오랫동안 큰 수정 없이 안정적으로 운영할 수 있습니다.
 
-이 글은 Cloud Computing 101 시리즈의 5번째 글입니다.
-
 여기서는 객체, 블록, 파일, 아카이브 스토리지를 어떤 기준으로 구분해야 하는지 봅니다.
-
 
 ![Cloud Computing 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/05/05-01-concept-at-a-glance.ko.png)
 *Cloud Computing 101 5장 흐름 개요*
@@ -254,7 +251,6 @@ PRICE_PER_GB = {
     "DEEP_ARCHIVE": 0.00099,
 }
 
-
 def get_bucket_size_by_class(bucket: str) -> dict[str, float]:
     """CloudWatch에서 스토리지 클래스별 버킷 크기를 조회합니다."""
     result = {}
@@ -276,14 +272,12 @@ def get_bucket_size_by_class(bucket: str) -> dict[str, float]:
             result[storage_class] = points[0]["Average"] / (1024**3)
     return result
 
-
 def estimate_monthly_cost(size_by_class: dict[str, float]) -> float:
     """현재 스토리지 클래스 분포 기준 월 비용을 계산합니다."""
     total = 0.0
     for cls, gb in size_by_class.items():
         total += gb * PRICE_PER_GB.get(cls, 0.023)
     return total
-
 
 def estimate_optimized_cost(
     size_by_class: dict[str, float],
@@ -300,7 +294,6 @@ def estimate_optimized_cost(
         + ia_gb * PRICE_PER_GB["STANDARD_IA"]
         + glacier_gb * PRICE_PER_GB["GLACIER"]
     )
-
 
 if __name__ == "__main__":
     bucket_name = "my-app-prod"
@@ -380,7 +373,6 @@ from datetime import datetime, timezone, timedelta
 ec2 = boto3.client("ec2")
 RETENTION_DAYS = 14
 
-
 def create_snapshots(tag_key: str = "Backup", tag_value: str = "true"):
     """태그 기준으로 EBS 볼륨을 찾아 스냅샷을 생성합니다."""
     volumes = ec2.describe_volumes(
@@ -403,7 +395,6 @@ def create_snapshots(tag_key: str = "Backup", tag_value: str = "true"):
         created.append(snap["SnapshotId"])
     return created
 
-
 def cleanup_old_snapshots():
     """보관 기간이 지난 자동 스냅샷을 삭제합니다."""
     cutoff = datetime.now(timezone.utc) - timedelta(days=RETENTION_DAYS)
@@ -417,7 +408,6 @@ def cleanup_old_snapshots():
             ec2.delete_snapshot(SnapshotId=snap["SnapshotId"])
             deleted.append(snap["SnapshotId"])
     return deleted
-
 
 if __name__ == "__main__":
     new_snaps = create_snapshots()

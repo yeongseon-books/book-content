@@ -28,10 +28,7 @@ title: "AI Data Preparation 101 (1/10): 데이터 준비가 모델 품질을 결
 
 처음부터 이 관점을 잡아 두면 이후 수집, 정제, PII 처리, 토큰화, 분할, 파이프라인 자동화를 각각 따로 배우더라도 하나의 시스템으로 연결해서 이해할 수 있습니다.
 
-이 글은 AI Data Preparation 101 시리즈의 첫 번째 글입니다.
-
 여기서는 왜 데이터 준비가 모델 품질을 사실상 결정하는지, 그리고 초기에 놓치면 뒤에서 크게 돌아오는 함정을 어떤 순서로 봐야 하는지 정리하겠습니다.
-
 
 ![AI 데이터 준비 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/01/01-01-big-picture.ko.png)
 *AI 데이터 준비 1장 흐름 개요*

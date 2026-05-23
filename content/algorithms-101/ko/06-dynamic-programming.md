@@ -23,8 +23,6 @@ last_reviewed: '2026-05-12'
 
 # Algorithms 101 (6/10): 동적 계획법
 
-이 글은 Algorithms 101 시리즈의 6번째 글입니다.
-
 왜 우리는 같은 부분 문제를 자꾸 다시 풀게 될까요? 그리고 그 패턴은 어떻게 알아챌 수 있을까요? 여기서는 DP가 적용되는 조건, 메모이제이션과 타뷸레이션의 차이, 그리고 상태를 설계하는 감각을 다룹니다.
 
 ![Algorithms 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/06/06-01-big-picture.ko.png)

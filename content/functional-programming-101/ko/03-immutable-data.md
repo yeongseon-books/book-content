@@ -22,8 +22,6 @@ last_reviewed: '2026-05-12'
 
 # Functional Programming 101 (3/10): immutable 데이터
 
-이 글은 Functional Programming 101 시리즈의 세 번째 글입니다.
-
 상태 관련 버그를 줄이는 가장 강력한 방법 중 하나는 아예 기존 데이터를 바꾸지 않는 것입니다. 이미 생성한 값을 직접 수정하지 않고, 필요할 때마다 새 값을 만들어 쓰는 방식으로 사고를 전환하면 코드의 추적 가능성이 크게 좋아집니다.
 
 Python은 기본적으로 mutable 객체를 많이 쓰는 언어이지만, 동시에 `tuple`, `frozenset`, `NamedTuple`, `frozen dataclass` 같은 좋은 불변 도구도 제공합니다. 중요한 것은 "무조건 복사하라"가 아니라, 바뀌지 않아야 하는 값을 명확하게 모델링하는 감각입니다.

@@ -25,10 +25,7 @@ last_reviewed: '2026-05-15'
 
 코드는 일단 동작하면 끝난 것처럼 보이지만, 실제 비용은 그다음 변경에서 드러납니다.
 
-이 글은 Clean Code 101 시리즈의 첫 번째 글입니다.
-
 여기서는 동작하는 코드와 읽기 쉬운 코드, 그리고 바꾸기 쉬운 코드가 어떻게 다른지 한 번에 정리하겠습니다.
-
 
 ![Clean Code 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/01/01-01-concept-at-a-glance.ko.png)
 *Clean Code 101 1장 흐름 개요*
@@ -188,7 +185,6 @@ ruff check app/
 
 Clean Code는 추상적인 취향이 아니라, 측정 가능한 작은 원칙의 합입니다. 다음 글에서는 그중에서도 가장 즉각적인 효과를 내는 주제인 이름 짓기를 다룹니다.
 
-
 ## 코드 품질 지표를 숫자로 다루는 방법
 
 좋은 코드는 감각으로도 구분할 수 있지만, 팀 단위 개선에서는 숫자가 반드시 필요합니다. 숫자는 논쟁을 줄이고 우선순위를 정해 줍니다. 아래 표는 Clean Code 관점에서 자주 쓰는 지표와 해석 기준입니다.
@@ -218,13 +214,11 @@ class RefactorCost:
     delay_months: int
     outage_risk_cost: float
 
-
 def estimate_total_cost(cost: RefactorCost) -> float:
     # 지연할수록 수정 시간이 복리로 증가한다고 가정합니다.
     future_hours = cost.current_hours * ((1 + cost.monthly_growth_rate) ** cost.delay_months)
     engineering_cost = future_hours * 100_000  # 시간당 10만 원 가정
     return engineering_cost + cost.outage_risk_cost
-
 
 def compare_now_vs_later() -> tuple[float, float]:
     now = RefactorCost(
@@ -256,7 +250,6 @@ def compare_now_vs_later() -> tuple[float, float]:
 
 핵심은 "어디부터 고칠지"가 바로 보이게 만드는 것입니다. 좋은 대시보드는 문제를 미학적으로 보여 주는 것이 아니라, 다음 행동을 즉시 고르게 도와줍니다. 따라서 지표를 많이 모으기보다, 행동으로 이어지는 지표를 작게 유지하는 쪽이 낫습니다.
 
-
 ## 실무 적용 메모
 
 아래 메모는 팀 내 합의 문서에 그대로 옮겨 적어도 되는 수준의 운영 규칙입니다.
@@ -278,7 +271,6 @@ class QualityGate:
     has_small_functions: bool
     has_review_notes: bool
 
-
 def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
     missing = []
     if not gate.has_tests:
@@ -298,7 +290,6 @@ def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
 
 또한 개선 활동은 단발성 이벤트가 아니라 루프여야 합니다. 한 번의 대청소보다 매 PR마다 작은 개선을 추가하는 편이 장기적으로 더 강합니다. 이름 하나, 함수 하나, 분기 하나를 매번 더 낫게 만드는 습관이 쌓이면 코드베이스의 평균 품질이 올라가고, 장애 대응 속도도 실제로 빨라집니다.
 
-
 ## 추가 사례: 변경 비용 예측 스프린트 회고
 
 스프린트 회고에서 아래 세 질문을 반복하면 품질 개선 항목이 구체화됩니다.
@@ -315,7 +306,6 @@ def estimate_next_month_effort(current_hours: float, reduction_goal: float) -> f
 ```
 
 이런 질문과 간단한 계산만으로도 "감" 중심 회고를 "계획" 중심 회고로 바꿀 수 있습니다.
-
 
 ## 코드 스멜 카탈로그와 우선순위 결정
 
@@ -351,7 +341,6 @@ def process_signup(request, mailer, repo, logger):
     logger.info("signup-created", extra={"email": email})
     return {"ok": True}
 
-
 # after
 def process_signup(request, mailer, repo, logger):
     email = normalize_email(request)
@@ -362,10 +351,8 @@ def process_signup(request, mailer, repo, logger):
     logger.info("signup-created", extra={"email": user["email"]})
     return {"ok": True}
 
-
 def normalize_email(request: dict) -> str:
     return request.get("email", "").strip().lower()
-
 
 def validate_signup_preconditions(email: str, repo) -> None:
     if not email or "@" not in email:
@@ -397,7 +384,6 @@ classmethod-decorators = ["classmethod"]
 
 린터 규칙은 합의의 자동화입니다. 팀 규칙이 문서에만 있으면 신규 멤버 온보딩 때마다 기준이 흔들립니다. 반대로 린터에 들어가면 코드 리뷰는 "스타일 지적"에서 "설계 판단"으로 이동합니다.
 
-
 ## 심화 실습: 코드 품질 기준선을 팀에 도입하기
 
 클린 코드 원칙은 개인 습관으로 끝나면 유지되지 않습니다. 팀 단위 운영 규칙으로 정착해야 실제 효과가 납니다. 첫 주에는 "기준선 만들기"에만 집중하는 것이 좋습니다. 기존 코드를 한 번에 고치지 말고, 새로 바뀌는 파일부터 규칙을 적용합니다.
@@ -418,7 +404,6 @@ class QualityBaseline:
     max_cyclomatic_complexity: int = 10
     max_arguments: int = 4
     require_domain_terms: bool = True
-
 
 def evaluate_module_metrics(function_lines: int, complexity: int, arguments: int) -> list[str]:
     issues: list[str] = []
@@ -446,7 +431,6 @@ def evaluate_module_metrics(function_lines: int, complexity: int, arguments: int
 
 변경 비용 로그를 남기면 품질 개선이 감각이 아니라 데이터가 됩니다. 팀이 "왜 이 원칙을 지키는지"를 설명할 수 있어야 규칙이 오래 갑니다.
 
-
 ### 심화 사례: 변경 전파 경로 점검
 
 아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
@@ -474,7 +458,6 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 
 점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
-
 ### 심화 사례: 변경 전파 경로 점검
 
 아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
@@ -501,7 +484,6 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 | 13+ | 단계별 배포와 롤백 계획 포함 |
 
 점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
-
 
 ### 심화 사례: 변경 전파 경로 점검
 

@@ -24,10 +24,7 @@ last_reviewed: '2026-05-15'
 
 사용자가 로그인했다는 사실만으로는 아직 아무것도 끝나지 않습니다. 그 사용자가 이 문서를 읽어도 되는지, 저 게시글을 수정해도 되는지, 다른 사람 주문 내역을 내려받아도 되는지는 별도의 판단이 필요합니다. 보안 사고에서 가장 자주 보이는 broken access control도 바로 이 지점에서 시작합니다.
 
-이 글은 Secure Coding 101 시리즈의 4번째 글입니다.
-
 여기서는 인가를 역할 이름 몇 개로 끝내지 않고, 요청마다 자원과 행위를 함께 보는 서버 쪽 결정으로 정리하겠습니다. 이 관점을 잡으면 RBAC와 ABAC의 차이, IDOR 방어, 목록 API 필터링, 기본 거부 정책이 왜 한 세트로 묶이는지도 자연스럽게 보입니다.
-
 
 ![Secure Coding 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/04/04-01-concept-at-a-glance.ko.png)
 *Secure Coding 101 4장 흐름 개요*
@@ -182,7 +179,6 @@ def get_order(order_id: int, user=Depends(get_current_user)):
         raise HTTPException(status_code=404)
     return order  # 누구의 주문이든 반환
 
-
 # 방어 패턴 — 소유권 조건을 쿼리에 포함
 @app.get("/orders/{order_id}")
 def get_order(order_id: int, user=Depends(get_current_user)):
@@ -218,7 +214,6 @@ def require_role(*allowed_roles):
         return wrapper
     return decorator
 
-
 @app.delete("/admin/users/{user_id}")
 @require_role("admin", "superadmin")
 def delete_user(user_id: int, user=Depends(get_current_user)):
@@ -245,11 +240,9 @@ from sqlalchemy.orm import Query
 # 현재 요청의 테넌트 ID를 컨텍스트 변수로 관리
 current_tenant: ContextVar[str] = ContextVar("current_tenant")
 
-
 class TenantMixin:
     """모든 테넌트 소속 모델이 상속하는 믹스인"""
     tenant_id: str
-
 
 # SQLAlchemy 이벤트로 쿼리에 자동 필터 적용
 @event.listens_for(Query, "before_compile", retval=True)
@@ -265,7 +258,6 @@ def add_tenant_filter(query):
         if entity and hasattr(entity, "tenant_id"):
             query = query.filter(entity.tenant_id == tenant_id)
     return query
-
 
 # 미들웨어에서 테넌트 컨텍스트 설정
 @app.middleware("http")
@@ -314,7 +306,6 @@ import httpx
 
 OPA_URL = "http://localhost:8181/v1/data/myapp/authz/allow"
 
-
 async def check_opa(user: dict, action: str, resource: dict) -> bool:
     """OPA에 인가 질의를 보냅니다."""
     payload = {
@@ -327,7 +318,6 @@ async def check_opa(user: dict, action: str, resource: dict) -> bool:
     resp = await httpx.AsyncClient().post(OPA_URL, json=payload)
     result = resp.json()
     return result.get("result", False)
-
 
 # 사용 예시
 @app.put("/documents/{doc_id}")
@@ -386,7 +376,6 @@ def audit_authz_decision(
 from sqlalchemy import and_
 from fastapi import Query as QueryParam
 
-
 @app.get("/documents")
 def list_documents(
     user=Depends(get_current_user),
@@ -428,14 +417,12 @@ def list_documents(
 ```python
 from datetime import datetime, timezone
 
-
 class TemporaryGrant:
     def __init__(self, user_id: str, permission: str, expires_at: datetime, reason: str):
         self.user_id = user_id
         self.permission = permission
         self.expires_at = expires_at
         self.reason = reason
-
 
 def check_temporary_grant(user_id: str, permission: str) -> bool:
     """임시 권한 부여를 확인합니다. 만료 시 자동 거부."""
@@ -445,7 +432,6 @@ def check_temporary_grant(user_id: str, permission: str) -> bool:
         TemporaryGrant.expires_at > datetime.now(timezone.utc),
     ).first()
     return grant is not None
-
 
 def grant_temporary_access(
     admin_id: str,
@@ -487,7 +473,6 @@ def grant_temporary_access(
 
 ```python
 import pytest
-
 
 class TestOrderAuthorization:
     def test_owner_can_view_own_order(self, client, user_alice, order_of_alice):

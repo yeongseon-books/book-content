@@ -23,8 +23,6 @@ last_reviewed: '2026-05-12'
 
 # Compilers 101 (9/10): JIT vs AOT
 
-이 글은 Compilers 101 시리즈의 아홉 번째 글입니다.
-
 같은 JavaScript 코드가 처음에는 느리다가 어느 순간 빨라지는 이유를 이해하면, 컴파일러 선택이 아니라 **컴파일 시점 선택**이 성능 경험을 바꾼다는 사실이 보이기 시작합니다.
 
 ![Compilers 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/09/09-01-big-picture.ko.png)

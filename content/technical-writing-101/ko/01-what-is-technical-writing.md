@@ -26,8 +26,6 @@ title: "Technical Writing 101 (1/10): 기술 글쓰기란 무엇인가"
 
 팀 문서, README, 튜토리얼, 장애 대응 메모가 모두 같은 이유로 중요합니다. 읽는 사람이 그 글을 바탕으로 설치하고, 실행하고, 비교하고, 복구해야 하기 때문입니다. 기술 글은 정보를 전달하는 글이면서 동시에 행동을 설계하는 글입니다.
 
-이 글은 기술 글쓰기 101 시리즈의 1번째 글입니다.
-
 여기서는 기술 글을 독자, 작업, 결과, 범위로 나누어 보는 기본 틀을 먼저 세웁니다.
 
 ![Technical Writing 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/01/01-01-concept-at-a-glance.ko.png)

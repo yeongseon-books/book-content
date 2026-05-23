@@ -22,14 +22,11 @@ title: "Incident Response 101 (9/10): 재발 방지"
 
 # Incident Response 101 (9/10): 재발 방지
 
-이 글은 Incident Response 101 시리즈의 아홉 번째 글입니다.
-
 사후 분석 문서까지 마쳤다고 해서 incident 대응이 끝난 것은 아닙니다. 그 문서가 다시 코드, 테스트, 운영 규칙으로 돌아가지 않으면 조직은 같은 실수를 반복합니다.
 
 그래서 재발 방지는 좋은 회고를 남기는 일이 아니라, 학습을 시스템에 박아 넣는 일에 가깝습니다. 기억보다 테스트와 guardrail이 먼저 막아 주는 상태를 만들어야 합니다.
 
 이 글은 Incident Response 101 시리즈의 9번째 글입니다. 여기서는 후속 조치 추적, 회귀 테스트, guardrail, chaos 실험을 하나의 예방 루프로 묶는 방법을 다룹니다.
-
 
 ![Incident Response 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/09/09-01-diagram-at-a-glance.ko.png)
 *Incident Response 101 9장 흐름 개요*
@@ -162,7 +159,6 @@ chaos 실험을 쉽게 시작하려면 toxiproxy 같은 도구를 쓸 수 있습
 import requests
 import json
 
-
 def setup_toxiproxy(proxy_name, listen, upstream):
     """
     toxiproxy를 통해 프록시를 생성합니다.
@@ -176,7 +172,6 @@ def setup_toxiproxy(proxy_name, listen, upstream):
     }
     response = requests.post(f"{toxiproxy_url}/proxies", json=payload)
     return response.json()
-
 
 def inject_latency(proxy_name, latency_ms, jitter_ms=0):
     """
@@ -196,7 +191,6 @@ def inject_latency(proxy_name, latency_ms, jitter_ms=0):
     )
     return response.json()
 
-
 def inject_timeout(proxy_name, timeout_ms):
     """
     특정 프록시에 timeout을 주입합니다.
@@ -213,7 +207,6 @@ def inject_timeout(proxy_name, timeout_ms):
         json=toxic_payload,
     )
     return response.json()
-
 
 # 사용 예시
 # 1. 결제 API에 대한 proxy 설정
@@ -286,7 +279,6 @@ chaos 실험의 핵심 요소는 다음과 같습니다.
 
 다음 글에서는 시리즈의 마무리로, 지금까지 배운 severity, 대응, communication, postmortem, prevention을 하나의 incident runbook으로 묶는 방법을 다루겠습니다.
 
-
 ## 예방 심화: MTTA/MTTR 계산과 개선 추적 표
 
 재발 방지는 구호가 아니라 측정 가능한 개선 활동입니다. 특히 incident 대응 체계에서는 시간 기반 지표가 유용합니다. 탐지-인식-완화-복구 구간을 분리해 보면 어디서 병목이 생기는지 명확해집니다.
@@ -304,12 +296,10 @@ chaos 실험의 핵심 요소는 다음과 같습니다.
 ```python
 from datetime import datetime
 
-
 def minutes(a: str, b: str) -> float:
     t1 = datetime.fromisoformat(a)
     t2 = datetime.fromisoformat(b)
     return (t2 - t1).total_seconds() / 60.0
-
 
 def metrics(incident: dict) -> dict:
     detected = incident["detected"]

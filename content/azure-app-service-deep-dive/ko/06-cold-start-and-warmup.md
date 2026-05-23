@@ -24,8 +24,6 @@ seo_description: Always On, warm-up path, health check로 App Service 첫 요청
 
 그래서 Always On, warm-up path, health check를 모두 켰는데도 기대한 만큼 빨라지지 않는 장면이 자주 나옵니다. 이 셋은 관련은 있지만 같은 기능이 아니기 때문입니다. idle coldness를 줄이는 일, startup 직후 readiness를 여는 일, 이미 서비스 중인 인스턴스가 계속 traffic을 받을 자격이 있는지 판단하는 일은 각기 다른 질문입니다.
 
-이 글은 Azure App Service Deep Dive 시리즈의 마지막 글입니다.
-
 이번 글에서는 Windows와 Linux에서 warm-up 신호가 어떻게 다른지, Always On이 실제로 줄여 주는 비용과 줄여 주지 못하는 비용이 무엇인지, 좋은 warm-up endpoint는 어떤 성질을 가져야 하는지, 그리고 deployment slot이 왜 cold-start 비용을 production URL 밖으로 밀어내는지 정리하겠습니다.
 
 이제 새 worker가 실제 사용자 요청을 안전하게 받을 수 있기까지의 마지막 준비 시간을 보겠습니다.

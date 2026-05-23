@@ -25,8 +25,6 @@ LLM 애플리케이션을 처음 만들 때 가장 먼저 흐려지는 지점은
 
 특히 입문 단계에서는 프롬프트를 얼마나 영리하게 쓰느냐보다, 어떤 필드가 요청 본문에 들어가고 어떤 필드가 응답으로 돌아오는지부터 익히는 편이 좋습니다. 모델은 원격 서비스이고, 원격 서비스는 항상 명시적 계약과 실패 모드를 갖습니다. 이 감각이 있어야 이후 단계에서 문제를 추측이 아니라 로그와 구조로 설명할 수 있습니다.
 
-이 글은 LLM App Foundations 101 시리즈의 첫 번째 글입니다.
-
 여기서는 Groq Python SDK로 가장 작은 성공 경로를 만들고, 첫 호출을 운영 가능한 멘탈 모델로 바꾸겠습니다.
 
 ![첫 번째 LLM API 호출의 최소 왕복 구조](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/01/01-01-llm-api-first-call-sending-your-first-re.ko.png)

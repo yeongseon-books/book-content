@@ -23,8 +23,6 @@ last_reviewed: '2026-05-12'
 
 # Algorithms 101 (3/10): 탐색 알고리즘
 
-이 글은 Algorithms 101 시리즈의 3번째 글입니다.
-
 정렬된 정수 백만 개가 있을 때, 원하는 값을 찾으려면 처음부터 끝까지 다 봐야 할까요? 여기서는 선형 탐색, 이진 탐색, Python의 `bisect`, 그리고 답 자체를 이진 탐색하는 parametric search까지 다룹니다.
 
 ![Algorithms 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/03/03-01-big-picture.ko.png)

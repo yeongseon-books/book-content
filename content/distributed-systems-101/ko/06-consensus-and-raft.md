@@ -25,10 +25,7 @@ last_reviewed: '2026-05-15'
 
 "클러스터가 동의하면 된다"는 말은 쉽지만, 실제로는 가장 까다로운 요구 사항 중 하나입니다. 리더가 중간에 사라지고 메시지가 늦게 도착하는 상황에서도 모두가 같은 로그를 본다고 약속해야 하기 때문입니다.
 
-이 글은 Distributed Systems 101 시리즈의 여섯 번째 글입니다.
-
 여기서는 Raft를 통해 합의 문제를 사람이 읽을 수 있는 수준으로 풀어 보고, term, log, quorum, commit이 어떤 약속을 만드는지 짚습니다.
-
 
 ![Distributed Systems 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/06/06-01-concept-at-a-glance.ko.png)
 *Distributed Systems 101 6장 흐름 개요*
@@ -190,7 +187,6 @@ etcd, Consul, ZooKeeper의 ZAB, CockroachDB, TiKV는 모두 합의 알고리즘 
 ## 정리와 다음 글
 
 합의는 분산 시스템의 가장 단단한 문제이고, Raft는 그 문제를 사람이 읽을 수 있게 정리한 형태입니다. 다음 글에서는 합의 위에서 실제 리더를 안전하게 뽑고 교체하는 문제, 즉 leader election을 다룹니다.
-
 
 ## 실전 설계 확장: Raft를 운영 가능한 시스템으로 만드는 방법
 
@@ -502,7 +498,6 @@ from fastapi import FastAPI, HTTPException
 
 app = FastAPI()
 applied_requests: dict[str, dict] = {}
-
 
 @app.post("/write")
 async def write(idempotency_key: str, payload: dict):

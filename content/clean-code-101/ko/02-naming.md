@@ -25,10 +25,7 @@ last_reviewed: '2026-05-15'
 
 코드에서 가장 자주 읽히는 것은 로직보다 이름입니다.
 
-이 글은 Clean Code 101 시리즈의 2번째 글입니다.
-
 여기서는 좋은 이름이 왜 주석을 줄이고 검색 비용을 낮추는지, 그리고 변수·함수·클래스 이름을 어떻게 다르게 다뤄야 하는지 정리하겠습니다.
-
 
 ![Clean Code 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/02/02-01-concept-at-a-glance.ko.png)
 *Clean Code 101 2장 흐름 개요*
@@ -183,7 +180,6 @@ python -m pytest -q tests/test_naming_examples.py
 
 이름 짓기는 가독성에서 가장 레버리지가 큰 도구입니다. 다음 글에서는 그 이름이 가리키는 단위를 더 작게 만드는 방법, 즉 작은 함수를 다룹니다.
 
-
 ## 변수·함수·클래스 이름 규칙을 실제로 적용하기
 
 이름은 형식이 아니라 계약입니다. 호출자가 이름을 읽는 순간 무엇을 기대해야 하는지가 정해집니다. 아래 표는 실무에서 가장 자주 쓰는 이름 규칙을 정리한 것입니다.
@@ -214,10 +210,8 @@ def p(u, o, c):
         return t
     return None
 
-
 # after
 from typing import Iterable
-
 
 def calculate_order_total(user_id: str, line_items: Iterable[dict], has_coupon: bool) -> int | None:
     if not user_id or not line_items:
@@ -255,7 +249,6 @@ def normalize_variable_name(raw_name: str) -> str:
 
 위 유틸리티처럼 이름 정규화 규칙을 도구화하면 대규모 리네임 작업에서도 일관성을 유지하기 쉽습니다. 결국 이름 품질은 개인 취향보다 팀 합의와 자동화 수준에 크게 좌우됩니다.
 
-
 ## 실무 적용 메모
 
 아래 메모는 팀 내 합의 문서에 그대로 옮겨 적어도 되는 수준의 운영 규칙입니다.
@@ -277,7 +270,6 @@ class QualityGate:
     has_small_functions: bool
     has_review_notes: bool
 
-
 def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
     missing = []
     if not gate.has_tests:
@@ -297,7 +289,6 @@ def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
 
 또한 개선 활동은 단발성 이벤트가 아니라 루프여야 합니다. 한 번의 대청소보다 매 PR마다 작은 개선을 추가하는 편이 장기적으로 더 강합니다. 이름 하나, 함수 하나, 분기 하나를 매번 더 낫게 만드는 습관이 쌓이면 코드베이스의 평균 품질이 올라가고, 장애 대응 속도도 실제로 빨라집니다.
 
-
 ## 추가 사례: 변경 비용 예측 스프린트 회고
 
 스프린트 회고에서 아래 세 질문을 반복하면 품질 개선 항목이 구체화됩니다.
@@ -314,7 +305,6 @@ def estimate_next_month_effort(current_hours: float, reduction_goal: float) -> f
 ```
 
 이런 질문과 간단한 계산만으로도 "감" 중심 회고를 "계획" 중심 회고로 바꿀 수 있습니다.
-
 
 ## 명명 규칙 표준안: 팀 합의를 코드로 고정하기
 
@@ -337,13 +327,11 @@ def run(a, b, c):
         return b * c * 0.9
     return 0
 
-
 # after
 def calculate_discounted_total(has_membership: bool, item_price_cents: int, quantity: int) -> int:
     if not is_discount_eligible(has_membership, item_price_cents, quantity):
         return 0
     return int(item_price_cents * quantity * 0.9)
-
 
 def is_discount_eligible(has_membership: bool, item_price_cents: int, quantity: int) -> bool:
     return has_membership and item_price_cents > 0 and quantity > 0
@@ -375,7 +363,6 @@ ignore-names = ["setUp", "tearDown"]
 
 명명 규칙을 린터에 넣으면 리뷰어가 반복적으로 "이름을 바꾸세요"라고 말할 필요가 없습니다. 리뷰 코멘트는 설계 의사결정과 위험 평가에 집중하게 됩니다.
 
-
 ## 심화 실습: 명명 규칙 마이그레이션 계획
 
 대규모 저장소에서 이름 개선은 한 번에 끝낼 수 없습니다. 영역별로 우선순위를 나누어 점진적으로 진행해야 리스크가 작습니다. 보통은 공개 API, 핵심 도메인, 보조 유틸리티 순서로 진행합니다.
@@ -394,7 +381,6 @@ RENAME_MAP = {
     "dt": "created_at",
 }
 
-
 def suggest_renamed_identifier(identifier: str) -> str:
     return RENAME_MAP.get(identifier, identifier)
 ```
@@ -409,6 +395,32 @@ def suggest_renamed_identifier(identifier: str) -> str:
 
 이 방식은 공격적인 표현을 피하면서도 변경 이유를 분명하게 전달합니다. 리뷰 언어도 코드 품질의 일부입니다.
 
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
 ### 심화 사례: 변경 전파 경로 점검
 
@@ -437,6 +449,32 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 
 점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
 ### 심화 사례: 변경 전파 경로 점검
 
@@ -465,7 +503,6 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 
 점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
-
 ### 심화 사례: 변경 전파 경로 점검
 
 아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
@@ -492,63 +529,6 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 | 13+ | 단계별 배포와 롤백 계획 포함 |
 
 점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
-
-
-### 심화 사례: 변경 전파 경로 점검
-
-아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
-
-- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
-- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
-- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
-- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
-
-```python
-def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
-    score = callers * 2
-    if contract_changed:
-        score += 5
-    if exception_changed:
-        score += 3
-    return score
-```
-
-| 점수 구간 | 권장 전략 |
-| --- | --- |
-| 0-5 | 단일 PR로 진행 |
-| 6-12 | 리팩토링 PR과 기능 PR 분리 |
-| 13+ | 단계별 배포와 롤백 계획 포함 |
-
-점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
-
-
-### 심화 사례: 변경 전파 경로 점검
-
-아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
-
-- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
-- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
-- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
-- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
-
-```python
-def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
-    score = callers * 2
-    if contract_changed:
-        score += 5
-    if exception_changed:
-        score += 3
-    return score
-```
-
-| 점수 구간 | 권장 전략 |
-| --- | --- |
-| 0-5 | 단일 PR로 진행 |
-| 6-12 | 리팩토링 PR과 기능 PR 분리 |
-| 13+ | 단계별 배포와 롤백 계획 포함 |
-
-점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
-
 
 ### 심화 사례: 변경 전파 경로 점검
 

@@ -24,10 +24,7 @@ last_reviewed: '2026-05-15'
 
 인증이 무너지면 그 위에 쌓인 권한도 함께 무너집니다. 비밀번호 저장 방식이 약하거나, 세션 쿠키 설정이 느슨하거나, 로그인 실패 처리로 계정 존재 여부를 노출하면 기능은 멀쩡해 보여도 시스템 전체가 흔들립니다. 공격자는 복잡한 취약점보다 이런 기본 경로를 먼저 노립니다.
 
-이 글은 Secure Coding 101 시리즈의 3번째 글입니다.
-
 여기서는 인증과 세션을 한 덩어리로 보지 않고, 신원을 확인하는 단계와 그 신원을 기억하는 단계를 분리해서 보겠습니다. 이 차이를 분명히 이해해야 JWT와 세션 쿠키의 선택 기준, 로그아웃 처리, MFA 적용 지점도 함께 정리됩니다.
-
 
 ![Secure Coding 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/03/03-01-concept-at-a-glance.ko.png)
 *Secure Coding 101 3장 흐름 개요*
@@ -259,7 +256,6 @@ def check_credential_stuffing(ip: str, username: str) -> bool:
 
     return True
 
-
 def login_with_protection(ip: str, username: str, password: str):
     if not check_credential_stuffing(ip, username):
         # 의도적으로 같은 메시지 — 계정 열거 방지
@@ -300,7 +296,6 @@ from datetime import datetime, timedelta, timezone
 SECRET_KEY = os.environ["JWT_SECRET"]
 ALGORITHM = "HS256"  # 알고리즘 고정 — none, RS256 혼용 방지
 
-
 def create_access_token(user_id: str, roles: list[str]) -> str:
     now = datetime.now(timezone.utc)
     payload = {
@@ -311,7 +306,6 @@ def create_access_token(user_id: str, roles: list[str]) -> str:
         "iss": "myapp",
     }
     return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
-
 
 def verify_token(token: str) -> dict:
     """검증 순서: 알고리즘 → 서명 → 만료 → 클레임"""
@@ -386,7 +380,6 @@ def log_auth_event(
 - 동일 사용자가 5분간 서로 다른 5개 IP에서 로그인 성공: 계정 공유 또는 탈취 의심
 - refresh token 재사용 감지: 토큰 탈취 확정 → 전체 세션 무효화
 
-
 ### MFA 구현 시 주의점
 
 MFA는 비밀번호가 유출되어도 계정을 보호하는 마지막 방어선입니다. 하지만 잘못 구현하면 오히려 사용자 경험만 나빠지고 보안 효과는 미미합니다.
@@ -406,7 +399,6 @@ def setup_totp(user_id: str) -> str:
         issuer_name="MyApp",
     )
     return uri
-
 
 def verify_totp(user_id: str, code: str) -> bool:
     """TOTP 코드를 검증합니다. 시간 오차 1단계 허용."""
@@ -436,7 +428,6 @@ MFA 구현에서 자주 놓치는 점:
 import secrets
 from datetime import datetime, timedelta, timezone
 
-
 def request_password_reset(email: str) -> None:
     """비밀번호 재설정 토큰을 발급합니다."""
     user = users.find_by_email(email)
@@ -453,7 +444,6 @@ def request_password_reset(email: str) -> None:
 
     save_reset_token(user.id, token, expires_at)
     send_reset_email(email, token)  # HTTPS 링크
-
 
 def complete_password_reset(token: str, new_password: str) -> None:
     """토큰 검증 후 비밀번호를 변경합니다."""

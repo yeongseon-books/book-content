@@ -26,8 +26,6 @@ title: "Technical Writing 101 (3/10): 제목과 구조 잡기"
 
 좋은 제목은 클릭을 유도하는 문구가 아니라 글의 목적을 압축한 설계 문장입니다. 구조는 그 약속을 독자가 가장 짧게 따라가도록 만든 경로입니다. 그래서 제목과 구조는 초안 단계부터 같이 다루는 편이 훨씬 안전합니다.
 
-이 글은 기술 글쓰기 101 시리즈의 3번째 글입니다.
-
 여기서는 제목, 개요, 헤딩, 정리를 한 세트로 설계하는 기준을 정리합니다.
 
 ![Technical Writing 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/03/03-01-concept-at-a-glance.ko.png)

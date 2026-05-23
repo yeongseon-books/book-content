@@ -25,8 +25,6 @@ last_reviewed: '2026-05-15'
 
 빌드는 통과했는데 프로그램이 이상하게 동작하는 경우가 있습니다. 반대로 쉼표 하나 빠졌다는 이유로 아예 실행조차 못 하는 경우도 있습니다. 둘 다 에러이지만 같은 종류의 에러는 아닙니다.
 
-이 글은 Programming Languages 101 시리즈의 두 번째 글입니다.
-
 이 글에서는 언어를 이루는 두 축인 구문과 의미를 분리해서 보겠습니다. 문자가 합법적으로 배열됐는지와, 그 배열이 실제로 무엇을 뜻하는지는 다른 질문이라는 점을 분명히 잡아 두면 이후의 타입 시스템, 스코프, 클로저도 훨씬 쉽게 읽힙니다.
 
 ![Programming Languages 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/02/02-01-concept-at-a-glance.ko.png)

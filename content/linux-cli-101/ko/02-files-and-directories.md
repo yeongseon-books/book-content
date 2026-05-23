@@ -23,8 +23,6 @@ seo_description: 리눅스 트리 구조를 파악하고 cd, ls부터 cp, mv, rm
 
 # Linux CLI 101 (2/10): 파일과 디렉터리 다루기
 
-이 글은 Linux CLI 101 시리즈의 2번째 글입니다.
-
 개발자의 일상은 파일을 만들고, 옮기고, 복사하고, 삭제하는 것의 연속입니다. 코드 파일을 정리하고, 설정 파일을 복사하고, 빌드 산출물을 삭제합니다. GUI에서는 드래그 앤 드롭으로 하지만, 서버에서는 모두 명령어입니다.
 
 ![Linux CLI 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/02/02-01-big-picture.ko.png)

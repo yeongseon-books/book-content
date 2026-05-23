@@ -22,12 +22,9 @@ last_reviewed: '2026-05-15'
 
 # Containers 101 (6/10): Network
 
-이 글은 Containers 101 시리즈의 여섯 번째 글입니다.
-
 컨테이너 네트워크는 처음에는 포트를 열고 IP를 확인하는 문제처럼 보입니다. 하지만 실제 운영에서는 컨테이너가 재시작되고 다시 배치되기 때문에, 어떤 네트워크 모드 위에서 어떤 이름 체계로 서로를 찾게 만들지부터 잡아야 연결 모델이 오래 갑니다.
 
 여기서는 bridge, host, overlay, none의 역할 차이와 함께, user-defined network와 DNS 이름 기반 연결이 왜 Compose와 Kubernetes의 공통 출발점인지 정리합니다.
-
 
 ![Containers 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/06/06-01-concept-at-a-glance.ko.png)
 *Containers 101 6장 흐름 개요*
@@ -264,7 +261,6 @@ PR 리뷰 체크리스트 예시:
 
 다음 글에서는 실행할 이미지를 어디에 저장하고 어떻게 다시 가져오는지, 즉 Registry를 봅니다.
 
-
 ## 심화: 네트워크 모드 비교와 포트 매핑 운영 패턴
 
 컨테이너 네트워크는 기능이 아니라 경계 설계입니다. 특히 "통신만 되면 된다"는 기준으로 구성하면, 외부 노출 범위가 불분명해지고 장애 시 원인 분리가 어려워집니다. 실무에서는 네트워크 모드 선택, 이름 해석 전략, 포트 공개 정책을 함께 다뤄야 합니다.
@@ -335,7 +331,6 @@ docker exec -it api sh -c "nc -zv db 5432"
 
 이 기준이 있으면 Compose에서 Kubernetes로 확장할 때도 연결 개념을 거의 그대로 가져갈 수 있습니다.
 
-
 ## 추가 실무 노트: 서비스 경계와 네트워크 정책
 
 네트워크는 기능 연결보다 경계 정의가 먼저입니다. 특히 내부 서비스와 외부 진입점(API Gateway, Ingress)을 분리하지 않으면 보안 사고 확률이 높아집니다.
@@ -351,7 +346,6 @@ docker run -d --name admin --network app-net -p 127.0.0.1:9000:9000 myorg/admin:
 ```
 
 위 예시는 관리 포트를 로컬 루프백에만 바인딩해 노출 범위를 줄이는 패턴입니다.
-
 
 ## 추가 정리: 운영 적용 전 최종 점검 질문
 

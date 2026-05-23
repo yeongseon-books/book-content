@@ -25,10 +25,7 @@ last_reviewed: '2026-05-15'
 
 마지막 질문은 장애를 없애는 방법이 아닙니다. 느린 upstream 하나가 전체 장애로 번지지 않게 막고, 운영자가 사용자보다 먼저 이상 신호를 읽게 만드는 방법이 핵심입니다.
 
-이 글은 Distributed Systems 101 시리즈의 마지막 글입니다.
-
 여기서는 분산 시스템 이론을 day-2 운영으로 바꾸는 패턴들, 즉 timeout budget, circuit breaker, load shedding, observability를 하나의 운영 경계로 묶어 봅니다.
-
 
 ![Distributed Systems 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/10/10-01-concept-at-a-glance.ko.png)
 *Distributed Systems 101 10장 흐름 개요*
@@ -205,7 +202,6 @@ Hystrix의 역사적 패턴, resilience4j, Envoy와 Istio의 retry 및 circuit b
 ## 정리와 다음 학습
 
 분산 시스템의 거의 모든 도구는 결국 운영 가능성으로 수렴합니다. 이 시리즈를 한 문장으로 묶으면 이렇습니다. 실패는 흔하고, 좋은 시스템은 실패를 평범하게 다룹니다. 다음 학습 주제로는 secure-by-design, observability, SRE 시리즈를 권합니다.
-
 
 ## 실전 설계 확장: 운영 패턴 심화
 
@@ -530,7 +526,6 @@ Grafana 대시보드에서 이 메트릭을 조합하면 다음 질문에 즉시
 - rate limit에 걸리는 클라이언트가 특정 IP에 집중되어 있는가?
 - 큐 적재량이 증가 추세인가, 안정 상태인가?
 
-
 운영에서 이 지표를 SLO와 연결하면 "breaker가 열린 시간 / 전체 시간"을 error budget 소진으로 환산할 수 있고, budget 잔여량이 임계치 아래로 떨어지면 자동으로 on-call에 페이지를 보냅니다. 이 접근의 장점은 단순 장애 횟수가 아니라 "사용자에게 노출된 장애 시간"으로 심각성을 판단한다는 점입니다. 동일한 장애라도 circuit breaker가 빠르게 열린 경우와 느리게 열린 경우의 사용자 영향은 크게 다르므로, 열림 시간 기반 지표가 더 정확한 판단을 돕습니다.
 
 Grafana alert rule 예시로 breaker open 상태를 감지하는 PromQL은 다음과 같습니다.
@@ -548,7 +543,6 @@ ALERT CircuitBreakerStuck
 ```
 
 alert에 runbook URL을 포함시키면 on-call 엔지니어가 알림을 받는 즉시 대응 절차로 진입할 수 있습니다. 알림과 런북이 분리되어 있으면 장애 초기 대응 시간이 수 분 늘어납니다.
-
 
 ## 처음 질문으로 돌아가기
 

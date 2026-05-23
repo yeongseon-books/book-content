@@ -26,10 +26,7 @@ seo_description: 좋은 평가 데이터셋은 production 트래픽의 분포를
 
 제가 본 강한 팀들은 평가 데이터셋을 정답 모음집으로 만들지 않았습니다. 대신 사용자 분포를 닮은 본류 사례와, 자주 오지는 않지만 깨지면 큰일 나는 실패 사례를 함께 관리했습니다. 이 균형이 없으면 평균 점수는 좋아도 서비스는 계속 흔들립니다.
 
-이 글은 AI Evaluation 101 시리즈의 2번째 글입니다.
-
 여기서는 50~200건 규모의 출발용 평가 데이터셋을 어떻게 설계하고, 어디서 수집하고, 어떤 방식으로 라벨을 붙여야 하는지 정리하겠습니다.
-
 
 ![평가 데이터셋 설계하기](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/02/02-01-designing-evaluation-datasets.ko.png)
 *평가 데이터셋 설계하기*

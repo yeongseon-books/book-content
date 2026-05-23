@@ -26,8 +26,6 @@ LLM 팀이 평가를 갖추고도 계속 흔들리는 이유는 실행 시점이
 
 현업에서는 여기서 Golden dataset의 크기와 임계값 정책이 중요해집니다. 너무 크면 PR이 느려지고 비싸집니다. 너무 느슨하면 회귀를 놓칩니다. 이 균형을 코드와 정책으로 굳혀야 지속됩니다.
 
-이 글은 AI Evaluation 101 시리즈의 8번째 글입니다.
-
 여기서는 회귀 테스트용 Golden dataset을 어떻게 만들고, 임계값을 어떻게 두고, GitHub Actions로 어떻게 매 PR 방어선에 올릴지 정리하겠습니다.
 
 ![회귀 테스트 - 어제 잘 되던 게 오늘 망가지지 않게](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/08/08-01-regression-testing-don-t-let-yesterday-s.ko.png)

@@ -25,10 +25,7 @@ last_reviewed: '2026-05-15'
 
 분산 트랜잭션의 진짜 난점은 모두가 정상일 때가 아닙니다. 한쪽은 이미 커밋했고 다른 쪽은 타임아웃 난 상태에서, 비즈니스는 여전히 하나의 결과를 요구하는 그 순간이 문제를 만듭니다.
 
-이 글은 Distributed Systems 101 시리즈의 아홉 번째 글입니다.
-
 여기서는 2PC의 강한 모델과 Saga, outbox, 멱등적 복구 같은 현실적 대안을 비교해, 부분 실패를 어떻게 살아남는지에 초점을 맞춥니다.
-
 
 ![Distributed Systems 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/09/09-01-concept-at-a-glance.ko.png)
 *Distributed Systems 101 9장 흐름 개요*
@@ -207,7 +204,6 @@ XA와 2PC는 여전히 일부 RDBMS 클러스터와 브로커에서 쓰입니다
 
 분산 트랜잭션은 ACID를 그대로 복제하는 일이 아니라 결국 합의된 상태로 수렴하도록 설계하는 일입니다. 다음 마지막 글에서는 지금까지의 도구를 묶어 운영 가능한 분산 시스템 패턴으로 정리합니다.
 
-
 ## 실전 설계 확장: 2PC, Saga, Outbox, TCC
 
 이제부터는 "분산 트랜잭션이 실제로 어떻게 깨지고 어떻게 복구되는가"를 패턴별로 구체화합니다. 핵심은 단일 정답을 찾는 것이 아니라, 도메인 제약과 장애 모델에 맞는 실패 계약을 선택하는 것입니다.
@@ -227,11 +223,9 @@ from enum import Enum
 from dataclasses import dataclass
 from typing import Dict, List
 
-
 class Vote(str, Enum):
     YES = "YES"
     NO = "NO"
-
 
 @dataclass
 class ParticipantClient:
@@ -247,7 +241,6 @@ class ParticipantClient:
     def abort(self, tx_id: str) -> None:
         pass
 
-
 class DecisionLog:
     def __init__(self) -> None:
         self.records: Dict[str, str] = {}
@@ -257,7 +250,6 @@ class DecisionLog:
 
     def read(self, tx_id: str) -> str | None:
         return self.records.get(tx_id)
-
 
 def run_2pc(tx_id: str, payload: dict, participants: List[ParticipantClient], log: DecisionLog) -> str:
     log.write(tx_id, "PREPARING")
@@ -328,7 +320,6 @@ import requests
 
 app = FastAPI()
 
-
 @app.post("/checkout")
 def checkout(order_id: str, user_id: str, amount: int):
     reserve = requests.post("http://inventory/reserve", json={"order_id": order_id}).json()
@@ -368,7 +359,6 @@ def on_inventory_reserved(event):
     else:
         publish("PaymentFailed", {"order_id": order_id, "reason": "insufficient_funds"})
 
-
 def on_shipping_failed(event):
     order_id = event["order_id"]
     refund(order_id=order_id)
@@ -390,7 +380,6 @@ def on_shipping_failed(event):
 ```python
 # compensation_policy.py
 from datetime import datetime, timedelta
-
 
 def compensate_payment(payment, now: datetime):
     if payment.status != "captured":
@@ -430,7 +419,6 @@ import json
 import sqlite3
 import uuid
 from datetime import datetime
-
 
 def create_order_with_outbox(db: sqlite3.Connection, order_id: str, user_id: str, amount: int):
     with db:
@@ -485,7 +473,6 @@ from fastapi import FastAPI, HTTPException
 app = FastAPI()
 reservations = {}
 
-
 @app.post("/tcc/try")
 def try_reserve(order_id: str, sku: str, qty: int):
     if not has_available_stock(sku, qty):
@@ -493,7 +480,6 @@ def try_reserve(order_id: str, sku: str, qty: int):
     token = hold_stock(order_id=order_id, sku=sku, qty=qty)
     reservations[order_id] = token
     return {"status": "tried", "token": token}
-
 
 @app.post("/tcc/confirm")
 def confirm(order_id: str):
@@ -503,7 +489,6 @@ def confirm(order_id: str):
     confirm_stock(token)
     reservations.pop(order_id, None)
     return {"status": "confirmed"}
-
 
 @app.post("/tcc/cancel")
 def cancel(order_id: str):
@@ -557,7 +542,6 @@ alerts:
 ```
 
 운영 런북에는 "어떤 버튼을 누르는가"까지 있어야 합니다. 예를 들어 `tx_in_doubt_total > 0`이면 coordinator 결정 로그 점검, 참여자 상태 질의, commit/abort 재전파 순서로 자동화 스크립트를 실행하도록 명시합니다. Saga 보상 실패는 재시도 한도를 넘은 건을 수동 큐로 보내고, 도메인 담당자가 환불/재고/알림 상태를 교차 확인하는 절차를 포함해야 합니다.
-
 
 ## 처음 질문으로 돌아가기
 

@@ -22,8 +22,6 @@ last_reviewed: '2026-05-12'
 
 # Compilers 101 (7/10): 최적화 기초
 
-이 글은 Compilers 101 시리즈의 일곱 번째 글입니다.
-
 컴파일러가 `2 + 3 * 4`를 실행할 때마다 계산하지 않고 미리 `14`로 바꿔 둘 수 있다는 사실을 이해하면, 최적화가 “더 빠르게”만이 아니라 “의미를 절대 바꾸지 않으면서” 수행되는 정교한 변환이라는 점이 드러납니다.
 
 ![Compilers 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/07/07-01-big-picture.ko.png)

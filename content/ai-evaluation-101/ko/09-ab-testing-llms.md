@@ -26,8 +26,6 @@ LLM에서는 특히 표현 자유도가 높아 단순 평균 점수보다 pairwi
 
 현업에서 저는 표본 크기와 effect size를 빼먹은 A/B 테스트가 가장 자주 오판을 낳는다고 느꼈습니다. 작은 표본에서 얻은 승률은 과장되기 쉽고, 반대로 엄청 큰 표본에서는 실무적으로 의미 없는 차이도 통계적으로만 유의해질 수 있습니다.
 
-이 글은 AI Evaluation 101 시리즈의 9번째 글입니다.
-
 여기서는 pairwise win rate, 표본 크기 계산, 통계적 유의성, effect size, 그리고 운영 트래픽 기반 online A/B까지 실무 흐름으로 정리하겠습니다.
 
 ![LLM A/B 테스팅 - prompt 비교](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/09/09-01-a-b-testing-llms-which-prompt-is-better.ko.png)

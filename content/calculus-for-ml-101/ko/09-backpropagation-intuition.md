@@ -26,8 +26,6 @@ last_reviewed: '2026-05-12'
 
 역전파는 이 문제에 대한 계산적 해법입니다. 계산 그래프를 따라 순전파에서 값을 만들고, 역방향으로 chain rule을 적용해 각 파라미터의 gradient를 효율적으로 누적합니다. 즉 역전파는 새로운 수학이 아니라, 이미 본 연쇄 법칙을 대규모 계산 그래프에 맞게 실행하는 절차입니다.
 
-이 글은 Calculus for ML 101 시리즈의 아홉 번째 글입니다.
-
 이 글에서는 계산 그래프, forward pass, backward pass, gradient accumulation, autograd 직관을 중심으로 설명하겠습니다. 목표는 프레임워크 내부 동작을 완전히 구현하는 것이 아니라, backward가 왜 한 번의 패스로 전체 gradient를 만들 수 있는지 이해하는 것입니다.
 
 끝까지 읽고 나면 `zero_grad`, gradient accumulation, graph retention 같은 실무 용어가 더 이상 API 암기가 아니라 자연스러운 운영 개념으로 보이게 됩니다.

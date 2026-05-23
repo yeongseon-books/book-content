@@ -24,8 +24,6 @@ seo_description: Windows 샌드박스와 Linux 컨테이너 경계를 비교해 
 
 특히 Windows에서는 sandbox라는 단어를 보안 기능 정도로만 읽기 쉽습니다. 그러나 운영에서는 그것이 OS 기능 접근, 라이브러리 호환성, 파일시스템 기대, 프로세스 생명주기까지 바꾸는 실행 계약으로 작용합니다. Linux에서는 같은 질문이 registry나 GDI가 아니라 container startup contract와 `/home` storage semantics 쪽으로 옮겨갑니다.
 
-이 글은 Azure App Service Deep Dive 시리즈의 세 번째 글입니다.
-
 이번 글의 목적은 worker를 포털의 인스턴스 수라는 추상어가 아니라, 사용자 코드가 실제로 갇혀 실행되는 경계로 다시 이해하는 것입니다. 이 관점이 있어야 배포는 성공했는데 특정 라이브러리만 실패하는 문제, Windows에서만 깨지는 문제, Linux에서만 startup loop가 생기는 문제를 같은 바구니에 넣지 않게 됩니다.
 
 이제 worker 안쪽에서 사용자 코드가 실제로 어디에 놓이는지 보겠습니다.

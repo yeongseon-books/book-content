@@ -26,8 +26,6 @@ last_reviewed: '2026-05-12'
 
 중요한 것은 경사하강법이 단순한 수학 장난이 아니라, 현대 optimizer들의 공통 뼈대라는 점입니다. Adam, Momentum, RMSProp도 결국 기본 경사하강법을 더 안정적이고 빠르게 만들기 위한 변형입니다.
 
-이 글은 Calculus for ML 101 시리즈의 일곱 번째 글입니다.
-
 이 글에서는 경사하강법의 기본 업데이트 식, learning rate의 역할, 수렴과 발산, SGD와 mini-batch 직관을 중심으로 설명하겠습니다. 목표는 “gradient가 있으니 이제 움직인다”를 단순한 문장이 아니라 반복 가능한 학습 절차로 이해하는 것입니다.
 
 끝까지 읽고 나면 optimizer 로그에서 loss curve를 볼 때 왜 learning rate가 가장 먼저 의심되는지 자연스럽게 설명할 수 있게 됩니다.

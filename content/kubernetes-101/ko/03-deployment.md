@@ -24,10 +24,7 @@ last_reviewed: '2026-05-15'
 
 Pod를 이해한 다음 바로 마주치는 질문은 이것입니다. 파드가 죽었을 때 누가 다시 띄우는가입니다. Pod 자체는 실행 단위일 뿐이고, 스스로 자신의 개수를 유지하거나 버전을 안전하게 교체하지는 못합니다.
 
-이 글은 Kubernetes 101 시리즈의 3번째 글입니다.
-
 여기서는 Deployment를 파드를 여러 개 띄우는 단순 설정이 아니라, 원하는 개수를 유지하고 버전 교체와 롤백까지 책임지는 기본 워크로드 컨트롤러라는 관점에서 정리하겠습니다.
-
 
 ![Kubernetes 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/03/03-01-concept-at-a-glance.ko.png)
 *Kubernetes 101 3장 흐름 개요*
@@ -189,7 +186,6 @@ kubectl rollout history deployment/web
 이 글에서는 Deployment를 파드 개수 유지, 롤링 업데이트, 롤백을 맡는 기본 워크로드 컨트롤러로 정리했습니다. Pod만 직접 다룰 때보다 운영이 훨씬 안정되고, 배포를 반복 가능한 절차로 바꾸는 출발점도 바로 여기입니다.
 
 다음 글에서는 이렇게 떠 있는 파드 집합을 내부와 외부에서 어떻게 안정적으로 찾고 호출하는지, Service를 중심으로 보겠습니다.
-
 
 ## 매니페스트 중심 운영 예시
 

@@ -22,8 +22,6 @@ last_reviewed: '2026-05-15'
 
 # Backend Development 101 (9/10): 백엔드 배포
 
-이 글은 Backend Development 101 시리즈의 9번째 글입니다.
-
 로컬에서 잘 돌아가는 백엔드가 운영에서 실패하는 장면은 드물지 않습니다. 코드가 틀렸기 때문이 아니라, 실행 환경이 재현되지 않았기 때문인 경우가 더 많습니다. 배포를 "코드를 서버에 올리는 일"로 이해하면 이 실패를 설명하기 어렵고, 배포를 "실행 환경을 버전으로 고정하는 일"로 이해하면 실패 원인과 해결 순서가 선명해집니다.
 
 이번 글에서는 재현 가능한 배포를 중심에 두고 Docker, 환경 변수, health check, rolling update, CI/CD, reverse proxy, 로컬 compose 운영까지 한 번에 연결하겠습니다. 목표는 명령어 암기가 아니라 "왜 이 순서로 설계해야 운영에서 안전한가"를 이해하는 것입니다.
@@ -141,7 +139,6 @@ reports
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')
 
@@ -156,7 +153,6 @@ class Settings(BaseSettings):
 
     jwt_secret: str = Field(alias='JWT_SECRET')
     redis_url: str = Field(alias='REDIS_URL')
-
 
 settings = Settings()
 ```
@@ -192,12 +188,10 @@ from sqlalchemy import text
 
 app = FastAPI()
 
-
 @app.get('/health/live')
 def liveness() -> dict[str, str]:
     # 프로세스 생존만 확인
     return {'status': 'alive'}
-
 
 @app.get('/health/ready')
 def readiness() -> dict[str, str]:
@@ -238,7 +232,6 @@ import asyncio
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # 시작 시 리소스 초기화
@@ -247,7 +240,6 @@ async def lifespan(app: FastAPI):
     # 종료 시 신규 요청 차단 및 리소스 정리
     app.state.is_draining = True
     await asyncio.sleep(5)
-
 
 app = FastAPI(lifespan=lifespan)
 ```

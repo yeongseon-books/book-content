@@ -29,8 +29,6 @@ seo_description: chatbot과 agent를 가르는 기준과 기본 실행 루프를
 
 그래서 현업에서는 chatbot과 agent를 같은 범주로 두지 않습니다. 둘 다 LLM을 쓰더라도 운영 관점에서 보는 추상화 수준이 다르기 때문입니다. chatbot은 응답 품질이 중심이고, agent는 목표 달성 과정 전체가 중심입니다.
 
-이 글은 AI Agent 101 시리즈의 첫 번째 글입니다.
-
 이 글에서는 AI Agent를 "말을 잘하는 모델"이 아니라 "목표를 받고 작업 루프를 실행하는 시스템"으로 이해해 보겠습니다.
 
 ![agent 루프 한눈에 보기](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/01/01-01-agent-loop-at-a-glance.ko.png)

@@ -31,10 +31,7 @@ title: "AI Data Preparation 101 (6/10): 데이터 품질 필터링 — Heuristic
 
 좋은 품질 필터는 완벽한 판정을 약속하지 않습니다. 대신 값싼 순서로 많은 샘플을 걸러내고, 어떤 규칙 때문에 빠졌는지 통계로 남겨 나중에 threshold를 조정할 수 있게 만듭니다.
 
-이 글은 AI Data Preparation 101 시리즈의 6번째 글입니다.
-
 여기서는 heuristic과 classifier를 조합해 품질 필터를 설계하는 방법과, 언어 감지·perplexity·quality score를 어떤 순서로 배치해야 효율적인지 설명하겠습니다.
-
 
 ![AI 데이터 준비 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/06/06-01-big-picture.ko.png)
 *AI 데이터 준비 6장 흐름 개요*

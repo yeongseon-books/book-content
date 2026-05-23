@@ -24,8 +24,6 @@ seo_description: 청크 크기와 오버랩이 검색 품질에 미치는 영향
 
 청킹은 긴 문서를 임베딩 가능한 크기의 조각으로 나누는 작업입니다. 어떻게 나누느냐가 검색 품질에 직접 영향을 줍니다. 청크가 너무 작으면 문맥을 잃고, 너무 크면 서로 무관한 내용이 섞입니다.
 
-이 글은 Vector Search 101 시리즈의 다섯 번째 글입니다.
-
 여기서는 단순히 텍스트를 자르는 법이 아니라, 검색 시스템이 어떤 문맥 단위를 기억하게 만들지 설계하는 관점으로 청킹을 봅니다.
 
 ![Chunk size and overlap structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/05/05-01-chunking-strategies-how-to-split-long-do.ko.png)

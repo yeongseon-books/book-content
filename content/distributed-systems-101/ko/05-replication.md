@@ -25,10 +25,7 @@ last_reviewed: '2026-05-15'
 
 데이터를 여러 노드에 복사해 두면 안전할 것 같지만, 실제 운영 질문은 그 다음부터 시작됩니다. 어떤 복제본이 기준인지, 얼마만큼의 지연을 허용할지, 리더가 죽을 때 최근 쓰기를 얼마나 잃을 수 있는지가 모두 복제 설정에서 갈립니다.
 
-이 글은 Distributed Systems 101 시리즈의 다섯 번째 글입니다.
-
 여기서는 복제를 저장소의 뒷단 구현이 아니라, 시스템이 사용자에게 약속하는 안전성과 지연 특성을 결정하는 설계 레이어로 봅니다.
-
 
 ![Distributed Systems 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/05/05-01-concept-at-a-glance.ko.png)
 *Distributed Systems 101 5장 흐름 개요*
@@ -191,7 +188,6 @@ PostgreSQL과 MySQL은 기본적으로 leader-follower 복제를 사용합니다
 
 복제는 분산 데이터의 토대입니다. 다음 글에서는 여러 노드가 다음 값이 무엇인지 함께 동의하는 문제, 즉 합의와 Raft를 다룹니다.
 
-
 ## 실전 설계 확장: 복제 토폴로지와 장애 복구
 
 복제를 운영 관점에서 깊게 보면 질문은 다섯 가지로 압축됩니다. "어떤 노드가 어떤 키를 책임지는가", "쓰기 성공을 어디에서 확정할 것인가", "복제 지연을 어떻게 수치화할 것인가", "리더 장애 때 승격 순서를 어떻게 강제할 것인가", "복구 후 정합성을 어떤 순서로 회복할 것인가"입니다. 이 섹션에서는 바로 이 다섯 질문을 설계 문서와 런북 수준으로 구체화합니다.
@@ -246,11 +242,9 @@ leader_store: dict[str, dict] = {}
 follower_a_store: dict[str, dict] = {}
 follower_b_store: dict[str, dict] = {}
 
-
 async def replicate_to_follower(target: dict[str, dict], key: str, value: dict, delay_ms: int) -> None:
     await asyncio.sleep(delay_ms / 1000)
     target[key] = value
-
 
 @app.post("/sync/items/{key}")
 async def write_sync(key: str, payload: dict):
@@ -263,7 +257,6 @@ async def write_sync(key: str, payload: dict):
     except Exception as exc:
         raise HTTPException(status_code=503, detail=f"sync replication failed: {exc}")
     return {"mode": "sync", "ack": "committed_on_3_nodes"}
-
 
 @app.post("/async/items/{key}")
 async def write_async(key: str, payload: dict):
@@ -346,7 +339,6 @@ state = {
     },
 }
 
-
 def refresh_replication_metrics(cluster: str = "orders-prod") -> None:
     leader_lsn = state["leader_lsn"]
     now = time.time()
@@ -355,7 +347,6 @@ def refresh_replication_metrics(cluster: str = "orders-prod") -> None:
         apply_delay = max(now - follower["applied_at"], 0)
         replication_lag_lsn.labels(cluster=cluster, follower=name).set(lag)
         replication_apply_delay_seconds.labels(cluster=cluster, follower=name).set(apply_delay)
-
 
 @app.get("/metrics")
 def metrics():
@@ -440,12 +431,10 @@ from fastapi import FastAPI, Query
 
 app = FastAPI()
 
-
 class ReadConsistency(str, Enum):
     STRONG = "strong"       # leader에서만 읽음
     BOUNDED = "bounded"     # 최대 N초 이내 stale 허용
     EVENTUAL = "eventual"   # 아무 복제본에서 읽음
-
 
 @app.get("/items/{key}")
 async def read_item(key: str, consistency: ReadConsistency = Query(default=ReadConsistency.BOUNDED)):
@@ -488,13 +477,11 @@ FOLLOWER_STATUS = {
 
 MAX_ACCEPTABLE_LAG = 3.0  # seconds
 
-
 def healthy_followers() -> list[str]:
     return [
         name for name, status in FOLLOWER_STATUS.items()
         if status["lag_seconds"] <= MAX_ACCEPTABLE_LAG
     ]
-
 
 def select_follower_within_lag(max_lag_seconds: float) -> str:
     candidates = [

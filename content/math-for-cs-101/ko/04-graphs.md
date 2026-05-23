@@ -26,8 +26,6 @@ title: "Math for CS 101 (4/10): 그래프"
 
 그래프는 바로 그 관계를 다루는 기본 모델입니다. 소셜 네트워크, 지도 서비스, 빌드 의존성, 추천 시스템은 겉으로 달라 보여도 조금만 추상화하면 정점과 간선으로 다시 쓸 수 있습니다.
 
-이 글은 Math for CS 101 시리즈의 4번째 글입니다.
-
 여기서는 그래프를 알고리즘 이름 모음이 아니라 관계 중심 데이터를 설명하는 공통 문법으로 보고, 표현과 탐색의 기초를 정리해 보겠습니다.
 
 ![Math for CS 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/math-for-cs-101/04/04-01-concept-at-a-glance.ko.png)

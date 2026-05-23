@@ -22,8 +22,6 @@ last_reviewed: '2026-05-12'
 
 # Compilers 101 (4/10): 시맨틱 분석
 
-이 글은 Compilers 101 시리즈의 네 번째 글입니다.
-
 문법은 맞지만 의미가 틀린 코드가 왜 거부되는지 이해하는 순간, 컴파일러가 단순한 문장 검사기가 아니라 프로그램 의미를 판정하는 도구라는 점이 분명해집니다.
 
 ![Compilers 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/04/04-01-big-picture.ko.png)

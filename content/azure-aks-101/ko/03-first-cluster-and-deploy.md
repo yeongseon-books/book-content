@@ -24,8 +24,6 @@ Kubernetes는 개념만 오래 붙들고 있으면 필요 이상으로 추상적
 
 특히 AKS 입문에서는 `az`와 `kubectl`의 경계가 몸으로 들어오는 경험이 중요합니다. Azure 리소스를 만드는 일과 Kubernetes API에 원하는 상태를 선언하는 일은 이어져 있지만 같은 작업이 아닙니다. 이 분리가 눈에 익으면 이후 운영 문맥도 훨씬 잘 잡힙니다.
 
-이 글은 Azure AKS 101 시리즈의 3번째 글입니다.
-
 여기서는 앞의 두 글에서 본 구조를 실제 배포 흐름으로 연결하겠습니다. **작은 AKS 클러스터를 만들고, user node pool을 추가하고, FastAPI 앱을 컨테이너로 빌드해 Deployment와 Service로 올리는 과정**을 통해 AKS의 기본 운영 언어를 손에 익히겠습니다.
 
 ![Azure Kubernetes Service 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/03/03-01-today-s-flow.ko.png)

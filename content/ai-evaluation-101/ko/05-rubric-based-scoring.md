@@ -26,8 +26,6 @@ LLM judge를 도입한 팀이 다음으로 맞닥뜨리는 문제는 '그래서 
 
 제가 본 강한 팀들은 이 지점에서 rubric으로 넘어갔습니다. 사용자 가치에 맞는 차원을 3~5개로 나누고, 각 차원마다 1점·3점·5점의 기준 예시를 써 두면 judge도 사람도 훨씬 일관되게 평가할 수 있습니다.
 
-이 글은 AI Evaluation 101 시리즈의 5번째 글입니다.
-
 여기서는 평가 차원을 어떻게 뽑고, anchor를 어떻게 쓰고, 평균 하나로 뭉개지지 않게 집계를 어떻게 설계해야 하는지 정리하겠습니다.
 
 ![Rubric 기반 채점 설계](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-01-designing-rubric-based-scoring.ko.png)

@@ -24,10 +24,7 @@ last_reviewed: '2026-05-15'
 
 Service까지 배우면 클러스터 내부 통신은 어느 정도 정리됩니다. 하지만 사용자가 브라우저나 앱에서 요청을 보내기 시작하면 다른 질문이 생깁니다. 외부 트래픽을 어디서 받을지, 여러 서비스를 어떤 규칙으로 나눌지, TLS 인증서를 어디에서 종료할지를 정해야 합니다.
 
-이 글은 Kubernetes 101 시리즈의 5번째 글입니다.
-
 여기서는 Ingress를 단순한 외부 노출 기능이 아니라, 여러 서비스를 하나의 진입점 뒤에 두고 HTTP 계층에서 라우팅 규칙과 TLS 종료를 모으는 구조로 정리하겠습니다.
-
 
 ![Kubernetes 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/05/05-01-concept-at-a-glance.ko.png)
 *Kubernetes 101 5장 흐름 개요*
@@ -194,7 +191,6 @@ curl -sk -H 'Host: example.com' https://<ingress-address>/api
 이 글에서는 Ingress를 여러 서비스를 하나의 외부 진입점 뒤에 두고, 도메인과 경로 기준으로 HTTP 요청을 나누는 규칙 객체로 정리했습니다. 실제 동작은 IngressController가 책임지고, TLS 종료까지 이 지점에 모으면 외부 노출 구조가 훨씬 단순해집니다.
 
 다음 글에서는 네트워크 경로가 아니라 애플리케이션 설정과 민감한 값을 어떻게 분리하는지, ConfigMap과 Secret을 보겠습니다.
-
 
 ## 매니페스트 중심 운영 예시
 

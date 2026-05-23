@@ -24,10 +24,7 @@ last_reviewed: '2026-05-15'
 
 기능이 동작하는 것과 공격을 버티는 것은 다른 문제입니다. 로그인은 되는데 계정 탈취에 약할 수 있고, 파일 업로드는 되는데 경로 조작에 무너질 수 있습니다. 보안 사고 대부분은 낯선 암호학 이론보다 입력 검증 누락, 비밀값 노출, 권한 확인 누락처럼 익숙한 개발 실수에서 시작합니다.
 
-이 글은 Secure Coding 101 시리즈의 첫 번째 글입니다.
-
 여기서는 secure coding을 기능 개발 뒤에 덧칠하는 작업이 아니라, 입력 경계와 권한, 저장, 로그를 처음부터 함께 설계하는 습관으로 보겠습니다. 이 관점을 잡아 두면 이후 글에서 다룰 입력 검증, 인증, 인가, 저장, 로깅이 서로 어떻게 이어지는지도 훨씬 선명해집니다.
-
 
 ![Secure Coding 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/01/01-01-concept-at-a-glance.ko.png)
 *Secure Coding 101 1장 흐름 개요*
@@ -191,14 +188,12 @@ secure coding 원칙이 실제 설계로 이어지려면 "무엇이 위험한가
 from fastapi import FastAPI
 from dataclasses import dataclass
 
-
 @dataclass
 class EntryPoint:
     method: str
     path: str
     auth_required: bool
     input_sources: list[str]  # body, query, path, header, cookie
-
 
 def map_attack_surface(app: FastAPI) -> list[EntryPoint]:
     """등록된 라우트에서 공격 표면 목록을 추출합니다."""
@@ -225,7 +220,6 @@ def map_attack_surface(app: FastAPI) -> list[EntryPoint]:
                 input_sources=sources,
             ))
     return entries
-
 
 def print_surface_report(entries: list[EntryPoint]) -> None:
     """공격 표면 보고서를 표 형태로 출력합니다."""
@@ -320,18 +314,15 @@ jobs:
 from pydantic import BaseModel, Field
 from fastapi import FastAPI, Depends, HTTPException
 
-
 # 1층: 입력 경계 — 스키마가 형식과 범위를 강제합니다
 class OrderRequest(BaseModel):
     product_id: str = Field(pattern=r"^[A-Z0-9]{8}$")
     quantity: int = Field(ge=1, le=100)
 
-
 # 2층: 인가 — 서버가 사용자 권한을 확인합니다
 def check_can_order(user, product_id: str) -> None:
     if product_id.startswith("RESTRICTED") and "premium" not in user.roles:
         raise HTTPException(status_code=403, detail="premium only")
-
 
 # 3층: 비즈니스 규칙 — 재고와 한도를 다시 검증합니다
 def validate_stock(product_id: str, quantity: int) -> None:
@@ -339,9 +330,7 @@ def validate_stock(product_id: str, quantity: int) -> None:
     if quantity > stock:
         raise HTTPException(status_code=409, detail="insufficient stock")
 
-
 app = FastAPI()
-
 
 @app.post("/orders")
 def create_order(

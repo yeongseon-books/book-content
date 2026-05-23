@@ -22,8 +22,6 @@ last_reviewed: '2026-05-12'
 
 # Serverless 101 (9/10): 비용
 
-이 글은 Serverless 101 시리즈의 9번째 글입니다.
-
 서버리스는 종종 저렴한 선택지처럼 소개됩니다. 호출이 있을 때만 돈을 내니 당연해 보이기도 합니다. 그런데 막상 청구서를 보면 생각보다 빠르게 커지는 경우가 많습니다. 이유는 호출 단가만으로는 전체 비용을 설명할 수 없기 때문입니다.
 
 ![Serverless 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/09/09-01-concept-at-a-glance.ko.png)

@@ -25,10 +25,7 @@ last_reviewed: '2026-05-15'
 
 주석은 친절해 보이지만, 잘못 쓰이면 가장 빨리 낡는 설명이 됩니다.
 
-이 글은 Clean Code 101 시리즈의 7번째 글입니다.
-
 여기서는 코드가 스스로 설명해야 하는 부분과, 주석이나 문서가 꼭 맡아야 하는 부분을 구분해 보겠습니다.
-
 
 ![Clean Code 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/07/07-01-concept-at-a-glance.ko.png)
 *Clean Code 101 7장 흐름 개요*
@@ -208,7 +205,6 @@ python -m pytest -q tests/test_public_api_docs.py
 
 좋은 주석은 적고 정확합니다. 다음 글에서는 코드베이스의 운명을 크게 좌우하는 테스트 가능성, 즉 테스트 가능한 코드를 다룹니다.
 
-
 ## 주석 vs 자기문서화 코드 비교 기준
 
 좋은 주석은 적고 정확합니다. 더 좋은 코드는 주석이 거의 필요 없습니다. 아래 표는 언제 주석을 쓰고, 언제 코드 개선을 우선해야 하는지 구분하는 기준입니다.
@@ -287,7 +283,6 @@ def should_keep_comment(comment_text: str, explains_why: bool, duplicates_code: 
 
 이 기준을 코드 리뷰 체크리스트에 넣으면, 소음 주석은 줄고 핵심 문서화 품질은 올라갑니다.
 
-
 ## 실무 적용 메모
 
 아래 메모는 팀 내 합의 문서에 그대로 옮겨 적어도 되는 수준의 운영 규칙입니다.
@@ -309,7 +304,6 @@ class QualityGate:
     has_small_functions: bool
     has_review_notes: bool
 
-
 def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
     missing = []
     if not gate.has_tests:
@@ -328,7 +322,6 @@ def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
 이 체크 함수는 단순하지만, 품질 기준을 코드로 표현하는 출발점이 됩니다. 팀이 기준을 말로만 합의하면 시간이 지나며 흐려집니다. 반대로 코드와 템플릿과 자동화 규칙으로 남기면 신규 멤버가 들어와도 동일한 기준이 유지됩니다.
 
 또한 개선 활동은 단발성 이벤트가 아니라 루프여야 합니다. 한 번의 대청소보다 매 PR마다 작은 개선을 추가하는 편이 장기적으로 더 강합니다. 이름 하나, 함수 하나, 분기 하나를 매번 더 낫게 만드는 습관이 쌓이면 코드베이스의 평균 품질이 올라가고, 장애 대응 속도도 실제로 빨라집니다.
-
 
 ## 주석 품질 판정표
 
@@ -350,7 +343,6 @@ def p(a, b):
     if a and b > 0:
         return True
     return False
-
 
 # after
 def can_purchase(is_active_user: bool, stock_quantity: int) -> bool:
@@ -383,7 +375,6 @@ ignore = ["D203", "D213"]
 
 문서 문자열 규칙을 자동화하면 함수 수준 문서 누락이 초기에 발견됩니다. 이 과정은 문서 품질의 균질화를 돕습니다.
 
-
 ## 심화 실습: 문서 부채 상환 루틴
 
 문서 품질을 유지하려면 기능 개발과 같은 리듬으로 문서 점검이 이루어져야 합니다. 월 1회 대청소보다 주간 루틴이 더 효과적입니다.
@@ -403,6 +394,32 @@ ignore = ["D203", "D213"]
 
 문서 부채를 기술 부채처럼 추적하면 신규 멤버 온보딩 속도가 빨라지고, 장애 대응 시 의사결정 시간이 줄어듭니다.
 
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
 ### 심화 사례: 변경 전파 경로 점검
 
@@ -431,6 +448,32 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 
 점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
 ### 심화 사례: 변경 전파 경로 점검
 
@@ -459,7 +502,6 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 
 점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
-
 ### 심화 사례: 변경 전파 경로 점검
 
 아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
@@ -487,7 +529,6 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 
 점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
-
 ### 심화 사례: 변경 전파 경로 점검
 
 아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
@@ -514,63 +555,6 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 | 13+ | 단계별 배포와 롤백 계획 포함 |
 
 점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
-
-
-### 심화 사례: 변경 전파 경로 점검
-
-아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
-
-- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
-- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
-- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
-- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
-
-```python
-def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
-    score = callers * 2
-    if contract_changed:
-        score += 5
-    if exception_changed:
-        score += 3
-    return score
-```
-
-| 점수 구간 | 권장 전략 |
-| --- | --- |
-| 0-5 | 단일 PR로 진행 |
-| 6-12 | 리팩토링 PR과 기능 PR 분리 |
-| 13+ | 단계별 배포와 롤백 계획 포함 |
-
-점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
-
-
-### 심화 사례: 변경 전파 경로 점검
-
-아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
-
-- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
-- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
-- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
-- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
-
-```python
-def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
-    score = callers * 2
-    if contract_changed:
-        score += 5
-    if exception_changed:
-        score += 3
-    return score
-```
-
-| 점수 구간 | 권장 전략 |
-| --- | --- |
-| 0-5 | 단일 PR로 진행 |
-| 6-12 | 리팩토링 PR과 기능 PR 분리 |
-| 13+ | 단계별 배포와 롤백 계획 포함 |
-
-점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
-
 
 ### 심화 사례: 변경 전파 경로 점검
 

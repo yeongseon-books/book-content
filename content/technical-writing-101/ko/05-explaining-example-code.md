@@ -26,8 +26,6 @@ last_reviewed: '2026-05-15'
 
 좋은 코드 설명은 많은 줄을 보여 주는 데 있지 않습니다. 가장 작은 예제를 먼저 제시하고, 왜 그 줄이 필요한지 짚고, 실제 실행과 검증 결과로 독자의 불안을 줄이는 데 있습니다.
 
-이 글은 기술 글쓰기 101 시리즈의 5번째 글입니다.
-
 여기서는 최소 실행 예제를 고르고, 설명 줄과 실행 결과를 연결하는 코드 워크스루 방식을 정리합니다.
 
 ![Technical Writing 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/05/05-01-concept-at-a-glance.ko.png)

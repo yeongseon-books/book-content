@@ -26,8 +26,6 @@ title: "Technical Writing 101 (4/10): 개념 설명하기"
 
 현업에서 통하는 개념 설명은 정의 하나로 끝나지 않습니다. 어디까지가 맞는지, 어디서부터 틀리는지, 실제 코드나 운영 판단에서는 어떤 모양으로 드러나는지를 함께 보여 줘야 개념이 손에 잡힙니다.
 
-이 글은 기술 글쓰기 101 시리즈의 4번째 글입니다.
-
 여기서는 정의, 비유, 반례, 예시를 묶어 처음 보는 독자에게 개념을 설명하는 방법을 다룹니다.
 
 ![Technical Writing 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/04/04-01-concept-at-a-glance.ko.png)

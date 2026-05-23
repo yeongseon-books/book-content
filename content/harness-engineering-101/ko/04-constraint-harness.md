@@ -23,7 +23,6 @@ seo_description: Agent에게 자유를 주면 창의적이지만 위험합니다
 에이전트에 도구와 권한을 붙이는 순간 시스템은 유능해지지만 동시에 위험해집니다. 읽기 전용이어야 할 작업이 쓰기 권한을 갖고, 초안만 작성해야 할 작업이 실제 발송까지 하는 식의 사고가 여기서 시작됩니다.
 사람은 상식과 조직 규범으로 경계를 어느 정도 추론합니다. 에이전트는 그렇지 않습니다. 명시적으로 금지되지 않은 행동은 허용된 행동으로 해석하는 쪽에 가깝습니다.
 Constraint Harness는 프롬프트에 적힌 훈계문이 아니라 시스템이 반드시 통과해야 하는 강제 장치의 모음입니다. 어떤 도구를 보일지, 얼마나 오래 실행할지, 어떤 출력은 차단할지, 어떤 데이터 범위 밖으로는 못 나가게 할지를 따로 설계해야 합니다.
-이 글은 Harness Engineering 101 시리즈의 4번째 글입니다.
 안전한 에이전트는 착한 프롬프트보다 우회하기 어려운 제약에서 나옵니다.
 
 ![Constraint Harness - 규칙, 경계, 금지 행동 정의하기](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/04/04-01-constraint-harness-defining-rules-bounda.ko.png)

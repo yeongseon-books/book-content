@@ -23,8 +23,6 @@ last_reviewed: '2026-05-14'
 
 # Computer Science Major 101 (7/10): 프로젝트 과목
 
-이 글은 Computer Science Major 101 시리즈의 7번째 글입니다.
-
 전공 후반부에 들어가면 많은 학생이 비슷한 질문을 합니다. 이제까지 배운 것을 어디에 써 보아야 하는지, 과목별 지식을 어떻게 하나의 결과물로 묶어야 하는지 감이 잘 오지 않기 때문입니다.
 
 ![Computer Science Major 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/07/07-01-project-delivery-flow.ko.png)

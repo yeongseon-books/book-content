@@ -25,10 +25,7 @@ last_reviewed: '2026-05-15'
 
 긴 함수는 처음에는 편하지만 시간이 갈수록 설명과 예외 처리가 한데 뭉치면서 읽기 어려워집니다.
 
-이 글은 Clean Code 101 시리즈의 3번째 글입니다.
-
 여기서는 함수가 충분히 작다는 말이 실제로 무엇을 뜻하는지, 그리고 큰 함수를 어떻게 안전하게 쪼갤 수 있는지 봅니다.
-
 
 ![Clean Code 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/03/03-01-concept-at-a-glance.ko.png)
 *Clean Code 101 3장 흐름 개요*
@@ -197,7 +194,6 @@ python -m pytest -q tests/test_checkout.py
 
 작은 함수는 좋은 이름과 테스트를 가능하게 만듭니다. 다음 글에서는 큰 함수를 키우는 가장 흔한 원인인 조건문을 어떻게 단순화할지 다룹니다.
 
-
 ## 함수 분리 원칙: 어디까지 쪼개야 충분한가
 
 함수 분리는 "짧게 만들기" 자체가 목적이 아닙니다. 핵심은 변경 이유를 분리하는 것입니다. 아래 표는 함수를 분리할지 판단할 때 사용하는 기준입니다.
@@ -242,14 +238,11 @@ def checkout(order, user, mailer, repository):
 def calculate_subtotal(items) -> int:
     return sum(item.price * item.quantity for item in items)
 
-
 def apply_membership_discount(amount: int, is_member: bool) -> int:
     return int(amount * 0.9) if is_member else amount
 
-
 def apply_coupon(amount: int, coupon_code: str | None) -> int:
     return amount - 1000 if coupon_code else amount
-
 
 def checkout(order, user, mailer, repository) -> int:
     if not order.items:
@@ -277,7 +270,6 @@ class FunctionSplitDecision:
     has_side_effects: bool
     argument_count: int
 
-
 def should_split_function(decision: FunctionSplitDecision) -> bool:
     if decision.has_multiple_policies:
         return True
@@ -287,7 +279,6 @@ def should_split_function(decision: FunctionSplitDecision) -> bool:
 ```
 
 이런 식의 단순한 규칙만 있어도 리뷰 기준이 선명해집니다. "왜 나누는가"를 설명할 때 감정이 아니라 기준으로 대화할 수 있기 때문입니다.
-
 
 ## 실무 적용 메모
 
@@ -310,7 +301,6 @@ class QualityGate:
     has_small_functions: bool
     has_review_notes: bool
 
-
 def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
     missing = []
     if not gate.has_tests:
@@ -329,7 +319,6 @@ def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
 이 체크 함수는 단순하지만, 품질 기준을 코드로 표현하는 출발점이 됩니다. 팀이 기준을 말로만 합의하면 시간이 지나며 흐려집니다. 반대로 코드와 템플릿과 자동화 규칙으로 남기면 신규 멤버가 들어와도 동일한 기준이 유지됩니다.
 
 또한 개선 활동은 단발성 이벤트가 아니라 루프여야 합니다. 한 번의 대청소보다 매 PR마다 작은 개선을 추가하는 편이 장기적으로 더 강합니다. 이름 하나, 함수 하나, 분기 하나를 매번 더 낫게 만드는 습관이 쌓이면 코드베이스의 평균 품질이 올라가고, 장애 대응 속도도 실제로 빨라집니다.
-
 
 ## 함수 추출 기준: 분리 시점 판단표
 
@@ -357,7 +346,6 @@ def checkout(order, payment_gateway, inventory, notifier):
     notifier.send(order["user_id"], "checkout-complete")
     return {"total": total}
 
-
 # after
 def checkout(order, payment_gateway, inventory, notifier):
     validate_order(order)
@@ -381,7 +369,6 @@ from typing import Protocol
 class PaymentGateway(Protocol):
     def charge(self, user_id: str, amount_cents: int) -> None: ...
 
-
 def charge_payment(user_id: str, amount_cents: int, gateway: PaymentGateway) -> None:
     gateway.charge(user_id, amount_cents)
 ```
@@ -397,7 +384,6 @@ max-complexity = 8
 ```
 
 복잡도 임계치를 낮추면 큰 함수가 자동으로 경고 대상이 됩니다. 작은 함수 문화는 교육보다 도구 설정에서 먼저 시작되는 경우가 많습니다.
-
 
 ## 심화 실습: 함수 추출 워크숍
 
@@ -430,6 +416,32 @@ def place_order(payload, repo, payment, notifier):
 
 정책은 절대 규칙이 아니라 경고 기준입니다. 다만 경고가 누적되면 구조를 다시 설계해야 한다는 신호로 받아야 합니다.
 
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
 ### 심화 사례: 변경 전파 경로 점검
 
@@ -458,6 +470,32 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 
 점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
 ### 심화 사례: 변경 전파 경로 점검
 
@@ -486,7 +524,6 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 
 점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
-
 ### 심화 사례: 변경 전파 경로 점검
 
 아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
@@ -513,63 +550,6 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 | 13+ | 단계별 배포와 롤백 계획 포함 |
 
 점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
-
-
-### 심화 사례: 변경 전파 경로 점검
-
-아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
-
-- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
-- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
-- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
-- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
-
-```python
-def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
-    score = callers * 2
-    if contract_changed:
-        score += 5
-    if exception_changed:
-        score += 3
-    return score
-```
-
-| 점수 구간 | 권장 전략 |
-| --- | --- |
-| 0-5 | 단일 PR로 진행 |
-| 6-12 | 리팩토링 PR과 기능 PR 분리 |
-| 13+ | 단계별 배포와 롤백 계획 포함 |
-
-점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
-
-
-### 심화 사례: 변경 전파 경로 점검
-
-아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
-
-- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
-- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
-- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
-- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
-
-```python
-def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
-    score = callers * 2
-    if contract_changed:
-        score += 5
-    if exception_changed:
-        score += 3
-    return score
-```
-
-| 점수 구간 | 권장 전략 |
-| --- | --- |
-| 0-5 | 단일 PR로 진행 |
-| 6-12 | 리팩토링 PR과 기능 PR 분리 |
-| 13+ | 단계별 배포와 롤백 계획 포함 |
-
-점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
-
 
 ### 심화 사례: 변경 전파 경로 점검
 

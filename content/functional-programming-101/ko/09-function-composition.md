@@ -22,12 +22,9 @@ last_reviewed: '2026-05-12'
 
 # Functional Programming 101 (9/10): 함수 합성과 파이프라인
 
-이 글은 Functional Programming 101 시리즈의 아홉 번째 글입니다.
-
 작은 함수는 이해하기 쉽습니다. 문제는 그런 함수가 많아졌을 때입니다. 함수가 많아질수록 오히려 흩어지고 읽기 어려워질 수도 있습니다. 함수 합성과 파이프라인은 그 작은 조각들을 의미 있는 흐름으로 다시 묶는 방법입니다.
 
 현업에서 이 패턴이 중요한 이유는 테스트성과 변경 용이성 때문입니다. 거대한 함수 하나에 모든 로직을 넣는 대신, 각 단계가 하나의 변환만 맡게 만들면 수정 범위가 작아지고 파이프라인 전체를 안전하게 재구성할 수 있습니다.
-
 
 ![Functional Programming 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/09/09-01-how-a-readable-pipeline-flows.ko.png)
 *Functional Programming 101 9장 흐름 개요*
@@ -513,7 +510,6 @@ Python에는 Haskell의 `.` 같은 내장 합성 연산자가 없지만, 그건 
 
 함수 합성은 작은 함수를 결합해 큰 변환을 만드는 방법입니다. 특히 `pipe`는 코드 순서와 실행 순서를 맞춰 주기 때문에 Python에서 읽기 좋은 파이프라인을 만들기 좋습니다. 다음 글에서는 시리즈를 마무리하며 **객체지향과 함수형의 균형**을 다룹니다.
 
-
 ## 심화 앵커: 하이브리드 설계를 검증 가능한 형태로 고정하기
 
 여기서는 시리즈 전체에서 다룬 패턴을 하나의 실행 흐름으로 묶습니다. 핵심은 클래스 경계와 함수 경계를 분리하는 것입니다. 상태를 가진 객체는 조립과 라이프사이클을 담당하고, 계산은 순수 함수 파이프라인으로 고정합니다.
@@ -536,19 +532,15 @@ class LedgerRow:
     fee: int
     net: int
 
-
 def normalize(event: Event) -> Event:
     return replace(event, kind=event.kind.strip().lower())
-
 
 def paid_only(event: Event) -> bool:
     return event.kind == "paid"
 
-
 def to_ledger(event: Event) -> LedgerRow:
     fee = int(event.amount * 0.02)
     return LedgerRow(event_id=event.event_id, gross=event.amount, fee=fee, net=event.amount - fee)
-
 
 def summarize(rows: list[LedgerRow]) -> dict[str, int]:
     return reduce(
@@ -561,7 +553,6 @@ def summarize(rows: list[LedgerRow]) -> dict[str, int]:
         rows,
         {"count": 0, "gross": 0, "fee": 0, "net": 0},
     )
-
 
 def settle(events: list[Event]) -> dict[str, int]:
     normalized = map(normalize, events)
@@ -592,7 +583,6 @@ def test_fee_never_negative(amount: int) -> None:
 ```
 
 테스트에서 중요한 것은 "예제가 맞다"가 아니라 "성질이 유지된다"입니다. 이 관점을 유지하면 OOP와 FP를 섞어도 설계 품질이 흔들리지 않습니다.
-
 
 ## 검증 시나리오: 경계 조건을 먼저 잠그기
 
@@ -640,7 +630,6 @@ print("Pass")
 ```
 
 이런 검증 코드는 예제 코드가 아니라 운영 안전장치입니다. 새 규칙을 추가할 때도 기존 성질이 유지되는지 빠르게 확인할 수 있습니다.
-
 
 ## 처음 질문으로 돌아가기
 

@@ -23,8 +23,6 @@ last_reviewed: '2026-05-15'
 
 # Web Development 101 (5/10): Frontend와 Backend
 
-이 글은 Web Development 101 시리즈의 다섯 번째 글입니다.
-
 웹 개발을 배우다 보면 Frontend와 Backend를 서로 다른 기술 묶음처럼만 보기 쉽습니다. 하지만 실무에서 더 중요한 것은 도구 이름이 아니라 책임 경계입니다. 누가 데이터를 보여 주고, 누가 저장하고, 누가 권한을 검증하는지 구분되지 않으면 작은 서비스도 금방 지저분해집니다.
 
 여기서는 Frontend와 Backend의 역할을 나눠 보고, SPA와 SSR이 어떤 차이를 가지는지, 두 세계를 잇는 API 계약이 왜 중요한지 정리하겠습니다.

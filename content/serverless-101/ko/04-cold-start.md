@@ -22,8 +22,6 @@ last_reviewed: '2026-05-12'
 
 # Serverless 101 (4/10): 콜드 스타트
 
-이 글은 Serverless 101 시리즈의 4번째 글입니다.
-
 서버리스 함수를 처음 호출했을 때만 유독 느려지는 순간이 있습니다. 평균 지표만 보면 잘 안 보이지만, 실제 사용자 경험과 SLO에는 크게 영향을 줍니다. 그래서 콜드 스타트는 입문자가 가장 늦게 이해하면 안 되는 주제 중 하나입니다.
 
 ![Serverless 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/04/04-01-concept-at-a-glance.ko.png)

@@ -22,14 +22,11 @@ last_reviewed: '2026-05-15'
 
 # Incident Response 101 (10/10): Incident Runbook 만들기
 
-이 글은 Incident Response 101 시리즈의 마지막 글입니다.
-
 사고 대응 문서가 여기저기 흩어져 있으면 실제 incident 순간에는 거의 도움이 되지 않습니다. severity 표는 위키 한쪽에 있고, 온콜 일정은 다른 도구에 있고, 고객 공지 템플릿은 누군가의 개인 문서에 있고, postmortem 양식은 예전 링크 속에 숨어 있습니다.
 
 낮에는 찾을 수 있어도 새벽 3시에는 시작점조차 헷갈립니다. 좋은 runbook은 흩어진 지식을 한 저장소 안에서 바로 실행 가능한 흐름으로 묶어 둔 운영 인터페이스여야 합니다.
 
 이 글은 Incident Response 101 시리즈의 마지막 글입니다. 여기서는 severity, 온콜, 커뮤니케이션, 대응 단계, postmortem 연결을 하나의 runbook으로 통합하는 방법을 정리합니다.
-
 
 ![Incident Response 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/10/10-01-diagram-at-a-glance.ko.png)
 *Incident Response 101 10장 흐름 개요*
@@ -192,7 +189,6 @@ runbook/
 ```python
 from jinja2 import Template
 
-
 RUNBOOK_TEMPLATE = """
 # 런북: {{ service_name }}
 
@@ -230,11 +226,9 @@ RUNBOOK_TEMPLATE = """
 {{ escalation }}
 """
 
-
 def generate_runbook(config):
     template = Template(RUNBOOK_TEMPLATE)
     return template.render(**config)
-
 
 # 사용 예시
 payment_runbook_config = {
@@ -339,7 +333,6 @@ runbook이 현장에서 도움이 되려면 필수 요소들을 모두 포함해
 runbook은 흩어진 운영 지식을 한곳에 모아 incident 순간 바로 실행할 수 있게 만든 코드형 문서입니다. severity, 온콜, 커뮤니케이션, 대응 단계, postmortem 템플릿이 한 흐름으로 연결돼 있어야 하고, 저장소 안에서 PR과 모의 훈련으로 계속 다듬어야 합니다.
 
 이 시리즈는 여기서 마무리합니다. 다음에는 SRE 101, Information Security 101 같은 시리즈로 범위를 넓혀 신뢰성과 보안을 함께 키워 가면 좋습니다.
-
 
 ## 캡스톤 확장: 사고 대응 성숙도 모델과 훈련 시나리오 설계
 
@@ -501,7 +494,6 @@ next_review_date:
 - recovery_verification_metrics:
 - postmortem_linked: true/false
 ```
-
 
 ## 처음 질문으로 돌아가기
 

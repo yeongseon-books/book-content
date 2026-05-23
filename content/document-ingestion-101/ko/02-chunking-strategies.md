@@ -22,8 +22,6 @@ seo_description: 청킹은 텍스트를 작게 자르는 일이 아니라 검색
 
 청킹은 많은 검색 시스템이 조용히 품질을 잃는 지점입니다. FAQ에 잘 맞는 분할기가 매뉴얼이나 정책 문서의 구조를 그대로 망가뜨리는 일은 흔합니다.
 
-이 글은 Document Ingestion 101 시리즈의 두 번째 글입니다.
-
 여기서는 문서 형태별 청킹 프리셋을 비교하고, 분할 결과를 신뢰해도 되는지 빠르게 판단할 수 있는 신호를 살펴봅니다.
 
 ![Chunking strategy selection flow](https://yeongseon-books.github.io/book-public-assets/assets/document-ingestion-101/02/02-01-chunking-flow-by-document-type.ko.png)

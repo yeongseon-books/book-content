@@ -25,10 +25,7 @@ last_reviewed: '2026-05-15'
 
 조건문은 작은 기능을 빠르게 만들 때는 편하지만, 책임이 섞이기 시작하면 가장 먼저 복잡도를 폭발시키는 지점이 됩니다.
 
-이 글은 Clean Code 101 시리즈의 4번째 글입니다.
-
 여기서는 중첩된 if를 평평하게 만들고, 분기 자체를 다른 구조로 옮기는 방법을 정리하겠습니다.
-
 
 ![Clean Code 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/04/04-01-concept-at-a-glance.ko.png)
 *Clean Code 101 4장 흐름 개요*
@@ -220,7 +217,6 @@ python -m pytest -q tests/test_pricing.py
 
 조건문이 줄어들수록 코드의 핵심 흐름은 더 또렷해집니다. 다음 글에서는 또 하나의 큰 적인 중복을 어떻게 다뤄야 하는지 봅니다.
 
-
 ## 조건문 단순화 패턴을 체계적으로 고르는 법
 
 조건문을 단순화할 때는 한 가지 기법만 고집하지 않는 편이 좋습니다. 분기의 성격에 따라 패턴을 골라야 합니다.
@@ -272,17 +268,14 @@ class MemberPolicy:
     def discount(self, amount: int) -> int:
         return int(amount * 0.9)
 
-
 class GuestPolicy:
     def discount(self, amount: int) -> int:
         return amount
-
 
 POLICIES = {
     "member": MemberPolicy(),
     "guest": GuestPolicy(),
 }
-
 
 def apply_discount(amount: int, user_type: str) -> int:
     policy = POLICIES[user_type]
@@ -311,7 +304,6 @@ def max_indentation_depth(lines: list[str]) -> int:
 
 수치를 함께 보면 조건문 개선이 실제로 효과를 냈는지 더 명확하게 판단할 수 있습니다.
 
-
 ## 실무 적용 메모
 
 아래 메모는 팀 내 합의 문서에 그대로 옮겨 적어도 되는 수준의 운영 규칙입니다.
@@ -333,7 +325,6 @@ class QualityGate:
     has_small_functions: bool
     has_review_notes: bool
 
-
 def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
     missing = []
     if not gate.has_tests:
@@ -352,7 +343,6 @@ def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
 이 체크 함수는 단순하지만, 품질 기준을 코드로 표현하는 출발점이 됩니다. 팀이 기준을 말로만 합의하면 시간이 지나며 흐려집니다. 반대로 코드와 템플릿과 자동화 규칙으로 남기면 신규 멤버가 들어와도 동일한 기준이 유지됩니다.
 
 또한 개선 활동은 단발성 이벤트가 아니라 루프여야 합니다. 한 번의 대청소보다 매 PR마다 작은 개선을 추가하는 편이 장기적으로 더 강합니다. 이름 하나, 함수 하나, 분기 하나를 매번 더 낫게 만드는 습관이 쌓이면 코드베이스의 평균 품질이 올라가고, 장애 대응 속도도 실제로 빨라집니다.
-
 
 ## 조건문 단순화 패턴 카탈로그
 
@@ -385,14 +375,12 @@ def shipping_fee(country: str, amount_cents: int) -> int:
         return 9000
     return 15000
 
-
 # after
 FREE_SHIPPING_POLICY = {
     "KR": (50000, 3000),
     "JP": (80000, 5000),
     "US": (100000, 9000),
 }
-
 
 def shipping_fee(country: str, amount_cents: int) -> int:
     threshold, fee = FREE_SHIPPING_POLICY.get(country, (10**12, 15000))
@@ -429,7 +417,6 @@ max-complexity = 7
 
 복잡도 한도를 낮추면 분기 폭발이 기능 출시 전에 드러납니다. 나중에 대청소하는 방식보다 예방 비용이 훨씬 작습니다.
 
-
 ## 심화 실습: 분기 폭발을 예방하는 설계 루틴
 
 분기가 늘어나는 근본 원인은 정책이 코드 안쪽에 하드코딩되기 때문입니다. 정책을 데이터 또는 객체로 분리하면 if/elif 체인이 자연스럽게 줄어듭니다.
@@ -440,7 +427,6 @@ RISK_POLICY = {
     "silver": 0.02,
     "gold": 0.01,
 }
-
 
 def calculate_fee_by_tier(tier: str, amount_cents: int) -> int:
     rate = RISK_POLICY.get(tier, 0.05)
@@ -457,6 +443,32 @@ def calculate_fee_by_tier(tier: str, amount_cents: int) -> int:
 
 분기 코드는 기능이 늘수록 기하급수적으로 복잡해집니다. 먼저 줄이는 습관이 비용을 크게 절감합니다.
 
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
 ### 심화 사례: 변경 전파 경로 점검
 
@@ -485,6 +497,32 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 
 점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
 ### 심화 사례: 변경 전파 경로 점검
 
@@ -513,7 +551,6 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 
 점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
-
 ### 심화 사례: 변경 전파 경로 점검
 
 아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
@@ -541,7 +578,6 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 
 점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
-
 ### 심화 사례: 변경 전파 경로 점검
 
 아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
@@ -568,63 +604,6 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 | 13+ | 단계별 배포와 롤백 계획 포함 |
 
 점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
-
-
-### 심화 사례: 변경 전파 경로 점검
-
-아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
-
-- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
-- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
-- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
-- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
-
-```python
-def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
-    score = callers * 2
-    if contract_changed:
-        score += 5
-    if exception_changed:
-        score += 3
-    return score
-```
-
-| 점수 구간 | 권장 전략 |
-| --- | --- |
-| 0-5 | 단일 PR로 진행 |
-| 6-12 | 리팩토링 PR과 기능 PR 분리 |
-| 13+ | 단계별 배포와 롤백 계획 포함 |
-
-점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
-
-
-### 심화 사례: 변경 전파 경로 점검
-
-아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
-
-- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
-- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
-- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
-- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
-
-```python
-def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
-    score = callers * 2
-    if contract_changed:
-        score += 5
-    if exception_changed:
-        score += 3
-    return score
-```
-
-| 점수 구간 | 권장 전략 |
-| --- | --- |
-| 0-5 | 단일 PR로 진행 |
-| 6-12 | 리팩토링 PR과 기능 PR 분리 |
-| 13+ | 단계별 배포와 롤백 계획 포함 |
-
-점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
-
 
 ### 심화 사례: 변경 전파 경로 점검
 

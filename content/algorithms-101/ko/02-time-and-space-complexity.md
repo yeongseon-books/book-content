@@ -23,8 +23,6 @@ last_reviewed: '2026-05-12'
 
 # Algorithms 101 (2/10): 시간 복잡도와 공간 복잡도
 
-이 글은 Algorithms 101 시리즈의 2번째 글입니다.
-
 코드를 쓰기 전에도 이 알고리즘이 충분히 빠를지 예측할 수 있을까요? 여기서는 Big-O와 관련 표기법, 그리고 벤치마크 전에 알고리즘을 비교하기 위한 비용 모델을 정리합니다.
 
 ![Algorithms 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/02/02-01-big-picture.ko.png)

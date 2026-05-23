@@ -26,8 +26,6 @@ last_reviewed: '2026-05-15'
 
 문서를 읽는 사람을 한 덩어리로 놓고 쓰기 시작하면 예제 길이, 용어 수준, 생략 가능한 배경지식이 모두 흔들립니다. 반대로 독자를 한 사람처럼 구체화하면 무엇을 설명하고 무엇을 과감히 버려야 할지가 빠르게 정리됩니다.
 
-이 글은 기술 글쓰기 101 시리즈의 2번째 글입니다.
-
 여기서는 독자 모델을 페르소나, 전제 지식, 목표, 비목표로 나누어 글의 범위를 좁히는 방법을 다룹니다.
 
 ![Technical Writing 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/02/02-01-concept-at-a-glance.ko.png)

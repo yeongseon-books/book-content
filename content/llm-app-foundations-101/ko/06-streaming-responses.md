@@ -25,8 +25,6 @@ LLM 애플리케이션을 느리게 만드는 가장 쉬운 방법 중 하나는
 
 스트리밍의 가치는 바로 여기에 있습니다. 모델을 더 똑똑하게 만들지도, 총 생성 시간을 마법처럼 줄이지도 않습니다. 대신 기다림을 눈에 보이게 바꿉니다. 긴 답변일수록 이 차이는 더 커지고, 챗봇·초안 작성·브라우저 UI 같은 경로에서는 거의 제품 경험의 일부가 됩니다.
 
-이 글은 LLM App Foundations 101 시리즈의 마지막 글입니다.
-
 여기서는 스트리밍을 성능 트릭이 아니라 사용자에게 생성 과정을 드러내는 응답 전달 방식으로 보고, Groq SDK 기준의 기본 패턴을 정리하겠습니다.
 
 ![스트리밍 응답의 전체 이벤트 흐름](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/06/06-01-handling-streaming-responses-real-time-o.ko.png)

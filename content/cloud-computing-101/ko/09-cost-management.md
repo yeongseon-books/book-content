@@ -26,10 +26,7 @@ last_reviewed: '2026-05-14'
 
 비용을 뒤늦게 확인하는 회계 숫자로만 보면 이미 대응이 늦습니다. 비용을 설계와 운영이 남긴 결과로 읽어야 합니다. 보이지 않는 비용은 줄일 수 없고, 책임이 배정되지 않은 비용은 계속 커집니다.
 
-이 글은 Cloud Computing 101 시리즈의 9번째 글입니다.
-
 여기서는 태그, 예산, Savings Plans, 라이트사이징을 중심으로 비용 관리를 엔지니어링의 일부로 보는 관점을 정리하겠습니다.
-
 
 ![Cloud Computing 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/09/09-01-concept-at-a-glance.ko.png)
 *Cloud Computing 101 9장 흐름 개요*
@@ -218,7 +215,6 @@ from datetime import datetime, timedelta, timezone
 ec2 = boto3.client("ec2")
 cloudwatch = boto3.client("cloudwatch")
 
-
 def find_unattached_ebs() -> list[dict]:
     """연결되지 않은 EBS 볼륨 목록을 반환합니다."""
     volumes = ec2.describe_volumes(
@@ -232,7 +228,6 @@ def find_unattached_ebs() -> list[dict]:
             "CreateTime": vol["CreateTime"].isoformat(),
         })
     return results
-
 
 def find_idle_ec2(cpu_threshold: float = 5.0, days: int = 7) -> list[dict]:
     """평균 CPU 사용률이 임계값 이하인 인스턴스를 반환합니다."""
@@ -267,7 +262,6 @@ def find_idle_ec2(cpu_threshold: float = 5.0, days: int = 7) -> list[dict]:
                     })
     return idle
 
-
 def find_unused_eips() -> list[dict]:
     """연결되지 않은 Elastic IP를 반환합니다."""
     addresses = ec2.describe_addresses()["Addresses"]
@@ -276,7 +270,6 @@ def find_unused_eips() -> list[dict]:
         for addr in addresses
         if "AssociationId" not in addr
     ]
-
 
 if __name__ == "__main__":
     print("=== Unattached EBS Volumes ===")
@@ -480,7 +473,6 @@ aws ce create-anomaly-subscription \
 ```python
 from dataclasses import dataclass
 
-
 @dataclass
 class UnitEconomics:
     total_cost_usd: float
@@ -512,7 +504,6 @@ class UnitEconomics:
             f"Cost/User:        ${self.cost_per_user:.4f}\n"
             f"Cost/Transaction: ${self.cost_per_transaction:.4f}"
         )
-
 
 # 사용 예시
 may = UnitEconomics(

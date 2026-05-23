@@ -23,8 +23,6 @@ last_reviewed: '2026-05-14'
 
 # Computer Science Major 101 (1/10): 컴퓨터학과에서는 무엇을 배우는가
 
-이 글은 Computer Science Major 101 시리즈의 1번째 글입니다.
-
 처음 전공 과목표를 펼치면 이름부터 서로 너무 다르게 보입니다. 수학, 프로그래밍, 시스템, 데이터, AI, 프로젝트가 한 학과 안에 왜 함께 들어 있는지 감이 잘 오지 않습니다.
 
 ![Computer Science Major 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/01/01-01-major-learning-map.ko.png)

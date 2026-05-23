@@ -22,14 +22,11 @@ last_reviewed: '2026-05-15'
 
 # Incident Response 101 (6/10): Root Cause Analysis
 
-이 글은 Incident Response 101 시리즈의 여섯 번째 글입니다.
-
 incident가 일어나면 누구나 빨리 원인을 찾고 싶어 합니다. 그런데 현장에서는 가장 먼저 눈에 보인 사건을 곧바로 근본 원인으로 받아들이는 경우가 많습니다.
 
 배포 직후 장애가 났다면 배포가 원인처럼 보이고, 누군가 잘못된 명령을 실행했다면 그 사람이 원인처럼 보입니다. 하지만 그 한 단계 아래를 더 내려가 보면, 실제로는 보호 장치와 프로세스 빈틈이 함께 드러나는 경우가 대부분입니다.
 
 이 글은 Incident Response 101 시리즈의 6번째 글입니다. 여기서는 trigger와 root cause를 구분하는 기준, 5 Whys를 운영 문서에 남기는 방법, 그리고 검증 가능한 action item으로 이어지는 RCA 흐름을 다룹니다.
-
 
 ![Incident Response 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/06/06-01-diagram-at-a-glance.ko.png)
 *Incident Response 101 6장 흐름 개요*
@@ -210,7 +207,6 @@ def build_cause_graph():
     }
     return graph
 
-
 def find_root_paths(graph, target="고객 영향"):
     # 타겟 노드까지 이어지는 모든 경로를 찾습니다
     def backtrack(node, path):
@@ -223,7 +219,6 @@ def find_root_paths(graph, target="고객 영향"):
         return paths
 
     return backtrack(target, [target])
-
 
 # 분석 실행
 g = build_cause_graph()
@@ -248,7 +243,6 @@ staging 부하 테스트 부재 → 잘못된 timeout → 결제 API 지연 → 
 RCA의 목적은 마지막 계기를 찾는 데서 끝나지 않습니다. trigger와 root cause를 구분하고, 여러 기여 요인을 함께 보고, 검증 가능한 action item으로 이어져야 incident가 다시 반복되는 일을 줄일 수 있습니다.
 
 다음 글에서는 피해를 멈추는 mitigation과 원인을 제거하는 resolution을 어떻게 구분하고 운영할지 다루겠습니다.
-
 
 ## RCA 심화: 5 Whys 사례와 피시본 다이어그램 해설
 
@@ -303,7 +297,6 @@ def classify_cause(evidence_count: int, repeated: bool) -> str:
     if evidence_count >= 1:
         return "trigger_or_factor"
     return "unknown"
-
 
 def actionable(text: str) -> bool:
     verbs = ("add ", "fix ", "remove ", "test ", "enforce ")
@@ -406,7 +399,6 @@ RCA 품질은 원인 문장보다 검증 문장에서 더 잘 드러납니다.
 - recovery_verification_metrics:
 - postmortem_linked: true/false
 ```
-
 
 ## 운영 메모: 점검 루프
 

@@ -26,8 +26,6 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 이번 글 역시 기준은 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7)입니다. 1화에서 `InitializeAsync` 안쪽의 “worker channel preparation” 박스만 남겨 두었는데, 이번에는 그 박스를 끝까지 열어 실제 `Process.Start()` 호출 직전까지 따라갑니다.
 
-이 글은 Azure Functions Deep Dive 시리즈의 두 번째 글입니다.
-
 이제 호스트가 언어 런타임을 실제 워커 프로세스로 구체화하는 경로를 소스 기준으로 고정하겠습니다.
 
 ![Azure Functions Deep Dive 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/02/02-01-one-level-up-workerconfigfactory.ko.png)

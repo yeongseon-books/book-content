@@ -26,8 +26,6 @@ seo_description: 결정적 지표는 빠르고 재현 가능하지만, 의미가
 
 현업에서는 여기서 자주 오판이 생깁니다. BLEU가 낮으니 모델이 나쁘다고 결론 내렸는데 실제로는 문장 표현만 달라졌던 경우입니다. 반대로 Exact Match가 높으니 안전하다고 믿었는데, 사용자가 체감하는 설명 품질은 크게 떨어진 경우도 있습니다.
 
-이 글은 AI Evaluation 101 시리즈의 3번째 글입니다.
-
 여기서는 결정적 지표가 무엇인지, 각각이 어떤 문제에 맞는지, 그리고 언제 LLM-as-judge나 사람 검토로 넘어가야 하는지 기준을 세워 보겠습니다.
 
 ![결정적 지표 - Exact Match, BLEU, ROUGE](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/03/03-01-deterministic-metrics-exact-match-bleu-r.ko.png)

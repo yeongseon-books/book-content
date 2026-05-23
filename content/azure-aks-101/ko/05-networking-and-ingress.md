@@ -25,8 +25,6 @@ AKS를 쓰다 막히는 지점은 대개 네트워크입니다. Pod끼리는 통
 
 이 주제를 정리하려면 먼저 두 가지를 분리해야 합니다. 하나는 Pod가 어떤 주소 체계를 쓰는지, 다른 하나는 외부 HTTP 요청이 어떤 경로로 클러스터 안 Service까지 들어오는지입니다. IP 할당 모델과 트래픽 진입 계층을 섞어 보면 Ingress와 CNI 이야기가 모두 흐려집니다.
 
-이 글은 Azure AKS 101 시리즈의 5번째 글입니다.
-
 여기서는 **Pod IP 설계와 외부 HTTP 라우팅을 분리해서** AKS 네트워킹을 정리하겠습니다. Azure CNI Overlay가 왜 새 클러스터의 자연스러운 기본 선택지인지, 그리고 Service와 Ingress가 왜 L4와 L7이라는 서로 다른 층에 놓이는지 차례로 보겠습니다.
 
 ![Azure Kubernetes Service 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aks-101/05/05-01-start-with-the-request-path.ko.png)

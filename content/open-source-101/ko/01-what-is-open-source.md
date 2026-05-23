@@ -24,8 +24,6 @@ last_reviewed: '2026-05-15'
 
 처음 오픈소스를 접하면 대개 가격부터 떠올립니다. 무료로 내려받아 쓸 수 있는 코드라는 감각은 출발점으로는 맞습니다. 하지만 그 설명만으로는 왜 라이선스를 읽어야 하는지, 왜 이슈와 PR이 중요한지, 왜 메인테이너와 커뮤니티 문화가 프로젝트 품질에 직접 영향을 주는지 설명되지 않습니다.
 
-이 글은 Open Source 101 시리즈의 첫 번째 글입니다.
-
 여기서는 오픈소스를 단순한 코드 공개가 아니라, 읽고 고치고 다시 나눌 수 있는 권리와 그 권리를 실제 협업으로 굴리는 문화까지 포함한 개념으로 정리하겠습니다.
 
 ![Open Source 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/01/01-01-a-concept-map-you-can-keep-in-your-head.ko.png)

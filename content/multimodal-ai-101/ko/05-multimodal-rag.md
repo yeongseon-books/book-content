@@ -30,10 +30,7 @@ seo_description: 전형적인 RAG 시스템은 documents를 chunk로 나누고, 
 
 이 글에서는 multimodal RAG를 “이미지까지 검색하는 RAG”가 아니라, 검색 표현과 생성 입력을 함께 다시 설계하는 확장형 retrieval 시스템으로 정리합니다.
 
-이 글은 Multimodal AI 101 시리즈의 5번째 글입니다.
-
 검색 대상이 넓어질수록 인덱싱과 평가 전략을 먼저 고정하는 편이 훨씬 안전합니다.
-
 
 ![Multimodal AI 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/05/05-01-big-picture.ko.png)
 *Multimodal AI 101 5장 흐름 개요*
@@ -259,7 +256,6 @@ benchmark = [
 ```python
 def fuse_scores(clip_score: float, text_score: float, beta: float = 0.55) -> float:
     return beta * clip_score + (1 - beta) * text_score
-
 
 def should_rerank_with_vlm(query_type: str, top1_margin: float) -> bool:
     if query_type in {"numeric", "mixed"}:

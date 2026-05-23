@@ -22,8 +22,6 @@ last_reviewed: '2026-05-12'
 
 # Serverless 101 (7/10): 큐와 이벤트 기반 아키텍처
 
-이 글은 Serverless 101 시리즈의 7번째 글입니다.
-
 서비스가 늘어나면 가장 먼저 무거워지는 것은 코드가 아니라 연결 방식입니다. A 서비스가 B를 직접 부르고, B가 다시 C를 부르는 동기 호출 사슬은 평소에는 단순해 보여도 한 지점이 느려지거나 실패하는 순간 전체를 함께 흔듭니다.
 
 ![Serverless 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/07/07-01-concept-at-a-glance.ko.png)

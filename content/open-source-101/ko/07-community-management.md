@@ -24,8 +24,6 @@ last_reviewed: '2026-05-15'
 
 오픈소스 프로젝트는 코드만으로 유지되지 않습니다. 처음 저장소를 공개할 때는 기능과 문서가 가장 중요해 보이지만, 사용자가 늘고 기여자가 생기기 시작하면 커뮤니티 운영 방식이 프로젝트의 분위기와 지속 가능성을 결정합니다. 응답이 느리거나, 경계가 모호하거나, 신규 기여자를 방치하면 코드가 좋아도 사람은 떠납니다.
 
-이 글은 Open Source 101 시리즈의 일곱 번째 글입니다.
-
 여기서는 행동 강령, 기여 안내, 토론 공간, 응답 속도, 환영 메시지를 중심으로 건강한 오픈소스 커뮤니티를 유지하는 기본기를 정리하겠습니다.
 
 ![Open Source 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/07/07-01-the-smallest-structure-that-still-works.ko.png)

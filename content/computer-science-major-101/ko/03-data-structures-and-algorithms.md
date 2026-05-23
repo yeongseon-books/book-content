@@ -23,8 +23,6 @@ last_reviewed: '2026-05-14'
 
 # Computer Science Major 101 (3/10): 자료구조와 알고리즘
 
-이 글은 Computer Science Major 101 시리즈의 3번째 글입니다.
-
 많은 학생이 이 과목에서 처음으로 전공다운 중심축을 만났다고 느낍니다. 이전까지가 준비 운동이었다면, 여기서는 이제 문제를 더 좋은 방식으로 푸는 기준을 배우기 시작합니다.
 
 ![Computer Science Major 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/03/03-01-dsa-problem-solving-map.ko.png)

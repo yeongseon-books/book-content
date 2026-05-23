@@ -26,10 +26,7 @@ last_reviewed: '2026-05-14'
 
 좋은 네트워크 설계는 화려한 구성이 아니라 기본값을 얼마나 안전하게 잡았는가에서 드러납니다. 특히 외부에 공개되는 지점과 내부 자원이 구분되어야 이후의 보안과 운영이 훨씬 쉬워집니다.
 
-이 글은 Cloud Computing 101 시리즈의 6번째 글입니다.
-
 여기서는 클라우드 네트워크를 격리, 배치, 허용, 분산이라는 네 단계로 이해해 보겠습니다.
-
 
 ![Cloud Computing 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/06/06-01-concept-at-a-glance.ko.png)
 *Cloud Computing 101 6장 흐름 개요*
@@ -113,7 +110,6 @@ import boto3
 
 ec2 = boto3.client("ec2")
 
-
 def create_vpc(cidr: str, name: str) -> str:
     resp = ec2.create_vpc(CidrBlock=cidr)
     vpc_id = resp["Vpc"]["VpcId"]
@@ -167,7 +163,6 @@ def create_sg(vpc_id: str, name: str) -> str:
     )
     return resp["GroupId"]
 
-
 def allow_https(sg_id: str) -> None:
     ec2.authorize_security_group_ingress(
         GroupId=sg_id,
@@ -176,7 +171,6 @@ def allow_https(sg_id: str) -> None:
             "IpRanges": [{"CidrIp": "0.0.0.0/0"}],
         }],
     )
-
 
 def allow_from_sg(sg_id: str, source_sg: str, port: int) -> None:
     ec2.authorize_security_group_ingress(

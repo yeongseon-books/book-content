@@ -25,8 +25,6 @@ last_reviewed: '2026-05-15'
 
 어떤 언어를 두고 “잘 설계됐다”라고 말할 때가 있습니다. 하지만 그 말이 구체적으로 무엇을 뜻하는지는 막상 설명하기 어렵습니다. 빠르다는 뜻인지, 배우기 쉽다는 뜻인지, 실수를 잘 막는다는 뜻인지가 섞여 있기 때문입니다.
 
-이 글은 Programming Languages 101 시리즈의 마지막 글입니다.
-
 이 글에서는 좋은 언어 설계를 만능 정답으로 보지 않고, 분명한 우선순위를 가진 트레이드오프로 보겠습니다. 지금까지 다룬 구문, 타입, 스코프, 클로저, 객체, 메모리, 실행 모델, 정적과 동적의 차이를 모두 설계 축 위에 다시 올려 보겠습니다.
 
 ![Programming Languages 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/10/10-01-concept-at-a-glance.ko.png)

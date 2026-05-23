@@ -22,8 +22,6 @@ last_reviewed: '2026-05-15'
 
 # Backend Development 101 (10/10): 운영 가능한 백엔드 구조
 
-이 글은 Backend Development 101 시리즈의 10번째 글입니다.
-
 기능이 돌아가는 백엔드와 운영 가능한 백엔드는 같은 단계가 아닙니다. 운영 가능한 백엔드는 트래픽 증가, 장애 대응, 배포 복구를 예측 가능한 절차로 처리할 수 있어야 합니다.
 
 이번 글은 시리즈 1~9편에서 나눠 다뤘던 서버, 라우팅, 서비스 레이어, 데이터베이스, 인증, 로깅, 테스트, 배포를 하나의 프로덕션 구조로 묶는 캡스톤입니다. 핵심은 "기능 목록"이 아니라 "운영 성숙도"입니다. 운영 성숙도는 관측 가능성(Observable), 배포 가능성(Deployable), 테스트 가능성(Testable), 복구 가능성(Recoverable) 네 축으로 확인할 수 있습니다.
@@ -123,7 +121,6 @@ from functools import lru_cache
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-
 class Settings(BaseSettings):
     # 운영 환경
     env: str = Field(default="dev", alias="APP_ENV")
@@ -154,7 +151,6 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
@@ -179,7 +175,6 @@ from app.core.config import get_settings
 from app.core.logging import configure_logging
 from app.observability.metrics import setup_metrics
 
-
 def create_app() -> FastAPI:
     settings = get_settings()
 
@@ -199,7 +194,6 @@ def create_app() -> FastAPI:
     register_lifecycle_events(app)
     return app
 
-
 app = create_app()
 ```
 
@@ -213,7 +207,6 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 logger = logging.getLogger(__name__)
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -255,7 +248,6 @@ import time
 from collections import defaultdict, deque
 from fastapi import HTTPException, Request
 
-
 class SlidingWindowRateLimiter:
     def __init__(self, limit: int, window_seconds: int):
         self.limit = limit
@@ -276,9 +268,7 @@ class SlidingWindowRateLimiter:
 
         q.append(now)
 
-
 rate_limiter = SlidingWindowRateLimiter(limit=100, window_seconds=60)
-
 
 def enforce_rate_limit(request: Request) -> None:
     client_ip = request.client.host if request.client else "unknown"
@@ -295,7 +285,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
-
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
         response = await call_next(request)
@@ -305,7 +294,6 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
         response.headers["Content-Security-Policy"] = "default-src 'self'"
         return response
-
 
 def configure_security(app: FastAPI, allow_origins: list[str]) -> None:
     app.add_middleware(
@@ -339,14 +327,12 @@ from app.db.session import SessionLocal
 from app.repositories.user_repository import UserRepository
 from app.services.user_service import UserService
 
-
 def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
-
 
 def get_user_service(db: Session) -> UserService:
     user_repo = UserRepository(db)
@@ -361,7 +347,6 @@ from app.api.deps import get_db, get_user_service
 from app.services.user_service import UserService
 
 router = APIRouter(prefix="/users", tags=["users"])
-
 
 @router.get("/{user_id}")
 def get_user(user_id: int, db: Session = Depends(get_db)):
@@ -403,7 +388,6 @@ REQUEST_LATENCY = Histogram(
     buckets=(0.01, 0.05, 0.1, 0.3, 0.5, 1.0, 2.0, 5.0),
 )
 
-
 def setup_metrics(app: FastAPI) -> None:
     @app.middleware("http")
     async def metrics_middleware(request: Request, call_next):
@@ -440,12 +424,10 @@ from app.db.session import SessionLocal
 
 router = APIRouter(tags=["health"])
 
-
 @router.get("/health/live")
 def liveness_check():
     # 프로세스가 살아 있는지만 확인
     return {"status": "alive"}
-
 
 @router.get("/health/ready")
 def readiness_check():
@@ -520,7 +502,6 @@ from app.observability.metrics import setup_metrics
 
 logger = logging.getLogger(__name__)
 
-
 class RequestContextMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         # 요청 단위 공통 컨텍스트 처리
@@ -540,7 +521,6 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
         response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
         return response
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # 시작 단계: 리소스 초기화
@@ -557,7 +537,6 @@ async def lifespan(app: FastAPI):
         logger.info("app.stop.begin")
         close_engine()
         logger.info("app.stop.complete")
-
 
 def create_app() -> FastAPI:
     settings = get_settings()
@@ -600,7 +579,6 @@ def create_app() -> FastAPI:
         return {"service": settings.project_name, "env": settings.env}
 
     return app
-
 
 app = create_app()
 ```

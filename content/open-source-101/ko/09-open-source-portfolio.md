@@ -24,8 +24,6 @@ last_reviewed: '2026-05-15'
 
 오픈소스 활동을 조금 시작하고 나면 이런 고민이 생깁니다. 내 깃허브가 그냥 저장소 창고로 보이는지, 아니면 내가 어떤 문제를 어떻게 풀어 왔는지 보여 주는 포트폴리오로 보이는지입니다. 기여 횟수만 많다고 좋은 포트폴리오가 되지는 않습니다. 보는 사람은 숫자보다 맥락과 지속성을 더 봅니다.
 
-이 글은 Open Source 101 시리즈의 아홉 번째 글입니다.
-
 여기서는 깃허브 활동을 단순한 이력 나열이 아니라, 문제 선택과 해결 방식과 지속성을 보여 주는 포트폴리오로 정리하는 기준을 봅니다.
 
 ![Open Source 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/09/09-01-the-smallest-portfolio-structure.ko.png)

@@ -25,10 +25,7 @@ last_reviewed: '2026-05-15'
 
 오류 처리는 꼭 필요하지만, 그 코드가 비즈니스 로직보다 더 눈에 띄기 시작하면 구조가 이미 흐려진 경우가 많습니다.
 
-이 글은 Clean Code 101 시리즈의 6번째 글입니다.
-
 여기서는 예외와 반환값을 언제 구분해서 써야 하는지, 그리고 재시도와 경계 처리까지 어떤 기준으로 설계해야 하는지 정리하겠습니다.
-
 
 ![Clean Code 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/06/06-01-concept-at-a-glance.ko.png)
 *Clean Code 101 6장 흐름 개요*
@@ -217,7 +214,6 @@ API 서버에서는 핸들러가 보통 경계가 됩니다. 도메인 로직은
 
 오류 처리는 일급 시민이어야 하지만, 주인공이 되어서는 안 됩니다. 다음 글에서는 자주 오해되고 남용되기 쉬운 주석과 문서화를 다룹니다.
 
-
 ## 오류 처리 패턴 비교표
 
 오류 처리는 하나의 정답이 아니라 상황별 트레이드오프입니다. 아래 표는 자주 쓰는 패턴의 선택 기준을 정리한 것입니다.
@@ -238,22 +234,17 @@ API 서버에서는 핸들러가 보통 경계가 됩니다. 도메인 로직은
 class AppError(Exception):
     """애플리케이션 최상위 예외"""
 
-
 class DomainError(AppError):
     """비즈니스 규칙 위반"""
-
 
 class ValidationError(DomainError):
     """입력 검증 실패"""
 
-
 class PricingError(DomainError):
     """가격 계산 실패"""
 
-
 class InfraError(AppError):
     """외부 시스템/인프라 오류"""
-
 
 class TimeoutInfraError(InfraError):
     """타임아웃"""
@@ -268,12 +259,10 @@ import random
 import time
 from dataclasses import dataclass
 
-
 @dataclass
 class HttpResponse:
     status: int
     body: dict
-
 
 def with_retry(operation, attempts: int = 3):
     for attempt in range(attempts):
@@ -284,7 +273,6 @@ def with_retry(operation, attempts: int = 3):
                 raise TimeoutInfraError("retry exhausted") from error
             sleep_seconds = (2 ** attempt) + random.random()
             time.sleep(sleep_seconds)
-
 
 def handle_http_request(payload: dict) -> HttpResponse:
     try:
@@ -305,7 +293,6 @@ def handle_http_request(payload: dict) -> HttpResponse:
 ```
 
 위 구조에서는 내부 함수가 자신의 실패 의미를 예외 타입으로 전달하고, API 경계가 외부 계약으로 변환합니다. 이 분리가 되어 있으면 장애 시 대응도 단순해집니다.
-
 
 ## 실무 적용 메모
 
@@ -328,7 +315,6 @@ class QualityGate:
     has_small_functions: bool
     has_review_notes: bool
 
-
 def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
     missing = []
     if not gate.has_tests:
@@ -347,7 +333,6 @@ def evaluate_gate(gate: QualityGate) -> tuple[bool, list[str]]:
 이 체크 함수는 단순하지만, 품질 기준을 코드로 표현하는 출발점이 됩니다. 팀이 기준을 말로만 합의하면 시간이 지나며 흐려집니다. 반대로 코드와 템플릿과 자동화 규칙으로 남기면 신규 멤버가 들어와도 동일한 기준이 유지됩니다.
 
 또한 개선 활동은 단발성 이벤트가 아니라 루프여야 합니다. 한 번의 대청소보다 매 PR마다 작은 개선을 추가하는 편이 장기적으로 더 강합니다. 이름 하나, 함수 하나, 분기 하나를 매번 더 낫게 만드는 습관이 쌓이면 코드베이스의 평균 품질이 올라가고, 장애 대응 속도도 실제로 빨라집니다.
-
 
 ## 오류 처리 설계표: 어디서 던지고 어디서 잡을 것인가
 
@@ -370,11 +355,9 @@ def create_order(payload, repo):
     except Exception:
         return {"ok": False}
 
-
 # after
 class DuplicateOrderError(Exception):
     pass
-
 
 def create_order(payload, repo):
     try:
@@ -415,7 +398,6 @@ logger.error("order-create-failed", extra={"order_id": order_id, "error": str(ex
 
 예외 타입과 로그 이벤트 이름을 함께 표준화하면 장애 대응 시간(MTTR)을 눈에 띄게 줄일 수 있습니다.
 
-
 ## 심화 실습: 오류 예산과 예외 정책 연결
 
 오류 처리 품질은 코드 내부에서만 측정하지 않습니다. 서비스 오류 예산과 연결해야 우선순위가 명확해집니다.
@@ -430,10 +412,8 @@ logger.error("order-create-failed", extra={"order_id": order_id, "error": str(ex
 class DomainError(Exception):
     pass
 
-
 class ValidationError(DomainError):
     pass
-
 
 class ExternalDependencyError(DomainError):
     pass
@@ -441,6 +421,32 @@ class ExternalDependencyError(DomainError):
 
 예외 계층이 명확하면 경보 라우팅도 쉬워집니다. 예를 들어 `ValidationError`는 개발팀, `ExternalDependencyError`는 SRE와 함께 대응하도록 채널을 분리할 수 있습니다.
 
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
 ### 심화 사례: 변경 전파 경로 점검
 
@@ -469,6 +475,32 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 
 점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
+### 심화 사례: 변경 전파 경로 점검
+
+아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
+
+- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
+- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
+- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
+- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| 점수 구간 | 권장 전략 |
+| --- | --- |
+| 0-5 | 단일 PR로 진행 |
+| 6-12 | 리팩토링 PR과 기능 PR 분리 |
+| 13+ | 단계별 배포와 롤백 계획 포함 |
+
+점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
 ### 심화 사례: 변경 전파 경로 점검
 
@@ -497,7 +529,6 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 
 점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
 
-
 ### 심화 사례: 변경 전파 경로 점검
 
 아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
@@ -524,63 +555,6 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 | 13+ | 단계별 배포와 롤백 계획 포함 |
 
 점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
-
-
-### 심화 사례: 변경 전파 경로 점검
-
-아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
-
-- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
-- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
-- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
-- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
-
-```python
-def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
-    score = callers * 2
-    if contract_changed:
-        score += 5
-    if exception_changed:
-        score += 3
-    return score
-```
-
-| 점수 구간 | 권장 전략 |
-| --- | --- |
-| 0-5 | 단일 PR로 진행 |
-| 6-12 | 리팩토링 PR과 기능 PR 분리 |
-| 13+ | 단계별 배포와 롤백 계획 포함 |
-
-점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
-
-
-### 심화 사례: 변경 전파 경로 점검
-
-아래 체크는 변경 전파를 예측하기 위한 최소 루틴입니다.
-
-- 변경 대상 함수의 호출자 수를 먼저 확인합니다.
-- 입력/출력 계약이 바뀌는지 여부를 분리합니다.
-- 예외 타입과 로그 이벤트 이름의 변경 여부를 기록합니다.
-- 테스트 케이스가 입력 경계와 실패 경계를 모두 포함하는지 확인합니다.
-
-```python
-def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
-    score = callers * 2
-    if contract_changed:
-        score += 5
-    if exception_changed:
-        score += 3
-    return score
-```
-
-| 점수 구간 | 권장 전략 |
-| --- | --- |
-| 0-5 | 단일 PR로 진행 |
-| 6-12 | 리팩토링 PR과 기능 PR 분리 |
-| 13+ | 단계별 배포와 롤백 계획 포함 |
-
-점수를 수치로 남기면 리뷰 대화가 감각에서 근거 중심으로 이동합니다.
-
 
 ### 심화 사례: 변경 전파 경로 점검
 

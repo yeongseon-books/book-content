@@ -25,8 +25,6 @@ seo_description: 목록 API의 pagination, sorting, filtering 설계 원칙과 t
 
 목록 API는 처음에는 금방 만들 수 있어 보여도, 데이터가 쌓이는 순간 가장 먼저 흔들리는 지점이 됩니다. 느려진 쿼리, 중복 응답, 누락된 항목이 한꺼번에 나타나기 시작하면 파라미터 이름 하나도 쉽게 바꾸지 못합니다.
 
-이 글은 API Design 101 시리즈의 여섯 번째 글입니다.
-
 여기서는 pagination, sorting, filtering을 단순 옵션 모음이 아니라 성능과 정확성을 함께 지키는 계약으로 정리합니다. 특히 offset과 cursor의 선택이 어떤 운영 비용을 만드는지까지 같이 봅니다.
 
 ![API Design 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/06/06-01-concept-at-a-glance.ko.png)

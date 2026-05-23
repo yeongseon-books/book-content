@@ -22,14 +22,11 @@ last_reviewed: '2026-05-15'
 
 # Incident Response 101 (3/10): 초기 대응
 
-이 글은 Incident Response 101 시리즈의 세 번째 글입니다.
-
 incident가 발생했을 때 처음 몇 분은 유난히 짧고도 길게 느껴집니다. 알림은 이미 울렸고, 아직 정보는 부족하고, 누군가는 원인을 찾자고 하고 누군가는 고객 공지를 걱정합니다.
 
 이때 무엇부터 할지 정해 두지 않으면 팀은 빠르게 분산됩니다. 초기 대응의 품질은 완벽한 진단보다 먼저, 안정화와 역할 분리를 얼마나 빨리 실행했는지에서 갈립니다.
 
 이 글은 Incident Response 101 시리즈의 3번째 글입니다. 여기서는 첫 5분 안에 해야 할 확인, 채널 개설, 역할 배정, 안정화 우선순위를 운영 관점에서 정리합니다.
-
 
 ![Incident Response 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/03/03-01-diagram-at-a-glance.ko.png)
 *Incident Response 101 3장 흐름 개요*
@@ -173,7 +170,6 @@ def stabilize(actions):
 초기 대응의 목적은 모든 원인을 알아내는 것이 아니라 대응 구조를 세우고 피해를 줄이는 것입니다. 호출 확인, 영향 추정, 채널 개설, 역할 배정, 안정화라는 순서를 지키면 incident 초반의 혼선을 크게 줄일 수 있습니다.
 
 다음 글에서는 incident 중 누가 어떤 메시지를 언제 받아야 하는지, 즉 커뮤니케이션 원칙을 다루겠습니다.
-
 
 ## 초기 대응 확장: 첫 10분 체크리스트와 역할 배분 표
 
@@ -362,7 +358,6 @@ def initial_response(alert_id: str, team: list[str]) -> dict:
 - recovery_verification_metrics:
 - postmortem_linked: true/false
 ```
-
 
 ## 운영 메모: 점검 루프
 

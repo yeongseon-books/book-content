@@ -22,12 +22,9 @@ last_reviewed: '2026-05-15'
 
 # Containers 101 (3/10): Runtime
 
-이 글은 Containers 101 시리즈의 세 번째 글입니다.
-
 컨테이너 문제를 만났을 때 Docker CLI만 보면 답이 나올 것처럼 느껴질 때가 많습니다. 하지만 운영 환경으로 가면 Docker, containerd, runc, CRI가 서로 다른 계층으로 분리되어 있어 어디를 보고 있는지부터 구분해야 합니다.
 
 여기서는 사용자 도구, 런타임 데몬, 저수준 실행기, Kubernetes 인터페이스를 각각 어떤 책임으로 나눠 이해해야 하는지 살펴봅니다.
-
 
 ![Containers 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/03/03-01-concept-at-a-glance.ko.png)
 *Containers 101 3장 흐름 개요*
@@ -292,7 +289,6 @@ docker inspect --format '{{.HostConfig.SecurityOpt}}' <container>
 
 다음 글에서는 이렇게 실행할 이미지를 실제로 어떻게 작성하는지, 즉 Dockerfile을 봅니다.
 
-
 ## 심화: Docker Runtime과 네트워크 모드의 연결 지점
 
 런타임을 배우는 단계에서 자주 놓치는 부분이 네트워크 모드입니다. 실제 운영에서 컨테이너 장애는 프로세스 실행 문제와 네트워크 연결 문제가 함께 나타나는 경우가 많기 때문입니다. Docker, containerd, runc의 책임을 이해한 뒤에는 네트워크 모드가 실행 결과에 어떤 영향을 주는지까지 연결해서 봐야 실전 대응이 가능해집니다.
@@ -362,7 +358,6 @@ crictl inspect <container-id>
 
 이 기준을 문서화하지 않으면 팀마다 임의로 모드를 선택해 보안 경계가 흔들립니다. 런타임 설계는 "실행된다"가 아니라 "예측 가능한 방식으로 실행된다"를 목표로 해야 합니다.
 
-
 ## 추가 실무 노트: 런타임 계층별 장애 대응 플레이북
 
 운영 중에는 "컨테이너가 안 뜬다"라는 동일한 증상도 원인이 완전히 다를 수 있습니다. 다음 플레이북은 계층별로 확인 순서를 고정해 문제를 줄이는 방법입니다.
@@ -380,7 +375,6 @@ crictl ps -a
 ```
 
 이 순서를 팀 런북에 넣어 두면, 장애 초동 대응 속도가 크게 좋아집니다.
-
 
 ## 추가 정리: 운영 적용 전 최종 점검 질문
 

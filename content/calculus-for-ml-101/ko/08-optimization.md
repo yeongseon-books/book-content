@@ -26,8 +26,6 @@ last_reviewed: '2026-05-12'
 
 현대 optimizer들은 이 한계를 보완하기 위해 만들어졌습니다. momentum은 관성을 더하고, RMSProp은 좌표별 scale 차이를 흡수하고, Adam은 둘을 결합합니다. 여기에 learning-rate schedule과 regularization이 더해져 실제 훈련 루프가 구성됩니다.
 
-이 글은 Calculus for ML 101 시리즈의 여덟 번째 글입니다.
-
 이 글에서는 momentum, RMSProp, Adam, schedule, L2 regularization을 하나의 optimization toolkit으로 묶어 설명하겠습니다. 핵심은 이름을 외우는 것이 아니라 plain GD의 어떤 약점을 각각 보완하는지 이해하는 것입니다.
 
 끝까지 읽고 나면 optimizer 선택을 “유명하니까 Adam” 수준이 아니라, 현재 손실 지형과 학습 단계에 맞는 설계 판단으로 볼 수 있게 됩니다.

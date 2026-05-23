@@ -23,8 +23,6 @@ last_reviewed: '2026-05-14'
 
 # Computer Science Major 101 (4/10): 시스템 과목 이해하기
 
-이 글은 Computer Science Major 101 시리즈의 4번째 글입니다.
-
 코드를 오래 쓰다 보면 결국 같은 질문으로 돌아옵니다. 이 한 줄이 왜 이렇게 동작하는지, 왜 느린지, 왜 같은 코드인데 환경에 따라 다르게 보이는지 궁금해지는 순간이 옵니다.
 
 ![Computer Science Major 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/04/04-01-systems-stack-map.ko.png)

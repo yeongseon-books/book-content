@@ -22,8 +22,6 @@ last_reviewed: '2026-05-15'
 
 # Backend Development 101 (7/10): Logging과 Error Handling
 
-이 글은 Backend Development 101 시리즈의 7번째 글입니다.
-
 새벽 3시에 on-call 알림이 울렸는데, 알림 제목이 `500 error spike` 한 줄뿐이고 로그에는 `Exception occurred`만 반복된다면 장애 대응은 사실상 추측 게임이 됩니다. 반대로 요청 단위 식별자, 일관된 에러 코드, 구조화된 로그 필드가 갖춰진 시스템에서는 같은 장애를 훨씬 짧은 시간 안에 설명할 수 있습니다. 운영에서 중요한 능력은 에러를 "없애는" 능력보다 에러를 "관측 가능한 신호"로 바꾸는 능력입니다.
 
 이 글에서는 운영 관측성 관점에서 Logging과 Error Handling을 하나의 설계 문제로 다룹니다. JSON 구조화 로그, 로그 레벨 정책, request ID/correlation ID, FastAPI 글로벌 예외 처리기, 도메인 예외와 인프라 예외 분리, 응답 스키마 표준화, 로그 보존/로테이션, 알림 기준, 샘플링 전략까지 실제 운영에서 바로 적용 가능한 단위로 정리하겠습니다.
@@ -226,7 +224,6 @@ import structlog
 app = FastAPI()
 log = structlog.get_logger("api")
 
-
 def error_payload(code: str, detail: str, request_id: str) -> dict:
     return {
         "error": "request_failed",
@@ -234,7 +231,6 @@ def error_payload(code: str, detail: str, request_id: str) -> dict:
         "detail": detail,
         "request_id": request_id,
     }
-
 
 @app.exception_handler(RequestValidationError)
 async def validation_handler(request: Request, exc: RequestValidationError):
@@ -245,7 +241,6 @@ async def validation_handler(request: Request, exc: RequestValidationError):
         content=error_payload("VALIDATION_ERROR", "입력값이 유효하지 않습니다.", request_id),
     )
 
-
 @app.exception_handler(StarletteHTTPException)
 async def http_handler(request: Request, exc: StarletteHTTPException):
     request_id = request.headers.get("X-Request-ID", "unknown")
@@ -254,7 +249,6 @@ async def http_handler(request: Request, exc: StarletteHTTPException):
         status_code=exc.status_code,
         content=error_payload("HTTP_ERROR", str(exc.detail), request_id),
     )
-
 
 @app.exception_handler(Exception)
 async def unhandled_handler(request: Request, exc: Exception):
@@ -284,12 +278,10 @@ class DomainError(Exception):
         self.code = code
         self.detail = detail
 
-
 class InfrastructureError(Exception):
     def __init__(self, code: str, detail: str):
         self.code = code
         self.detail = detail
-
 
 def create_order(command):
     # 비즈니스 규칙 위반

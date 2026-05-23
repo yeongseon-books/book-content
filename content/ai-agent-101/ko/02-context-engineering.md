@@ -26,8 +26,6 @@ LLM은 현재 prompt 안에 들어온 정보만 보고 판단합니다. system p
 
 그래서 context engineering은 단순한 "프롬프트 잘 쓰기"가 아닙니다. agent가 어떤 정보를 어떤 순서로 보고, 무엇을 절대 하지 말아야 하며, 어느 범위까지 스스로 결정할 수 있는지를 시스템적으로 설계하는 일입니다.
 
-이 글은 AI Agent 101 시리즈의 두 번째 글입니다.
-
 이 글에서는 컨텍스트를 역할, 규칙, 도구 설명, 상태 정보의 계약으로 나눠서 보는 관점을 정리하겠습니다.
 
 ![컨텍스트 구성 지도](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/02/02-01-context-map.ko.png)

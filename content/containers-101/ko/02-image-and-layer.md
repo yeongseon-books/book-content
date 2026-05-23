@@ -22,12 +22,9 @@ last_reviewed: '2026-05-15'
 
 # Containers 101 (2/10): Image와 Layer
 
-이 글은 Containers 101 시리즈의 두 번째 글입니다.
-
 이미지는 파일 하나처럼 보이지만, 레이어 순서 하나가 빌드 시간과 전송 비용, 취약점 표면까지 바꿉니다. 같은 앱인데도 어떤 팀은 캐시를 거의 못 쓰고, 어떤 팀은 바뀐 부분만 다시 만들어 빠르게 배포하는 이유가 여기서 갈립니다.
 
 여기서는 이미지가 왜 레이어 스택으로 설계되는지, OverlayFS와 캐시, digest 기반 재현성이 왜 이 구조에서 나오는지 설명합니다.
-
 
 ![Containers 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/02/02-01-concept-at-a-glance.ko.png)
 *Containers 101 2장 흐름 개요*
@@ -273,7 +270,6 @@ docker history myapp:v2.3.1 --no-trunc | grep -i "apt-get"
 이미지는 여러 레이어가 쌓여 만들어지는 정적 아티팩트입니다. 이 구조를 이해하면 Dockerfile을 왜 특정 순서로 써야 하는지, 왜 캐시가 깨지는지, 왜 운영에서 digest를 중요하게 보는지가 자연스럽게 연결됩니다.
 
 다음 글에서는 이렇게 준비된 이미지를 실제로 누가 어떻게 실행하는지, 즉 Runtime 계층을 봅니다.
-
 
 ## 심화: 멀티스테이지 빌드와 레이어 캐싱을 실전으로 연결하기
 

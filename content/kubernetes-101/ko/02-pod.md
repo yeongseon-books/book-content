@@ -24,10 +24,7 @@ last_reviewed: '2026-05-15'
 
 Kubernetes를 처음 배우면 가장 먼저 헷갈리는 지점이 있습니다. 컨테이너를 실행하는 플랫폼이라면서 왜 가장 작은 단위가 컨테이너가 아니라 Pod인지입니다. Docker를 먼저 익힌 사람일수록 이 질문이 더 자연스럽습니다.
 
-이 글은 Kubernetes 101 시리즈의 2번째 글입니다.
-
 여기서는 Pod를 단순히 "컨테이너 하나를 싸는 껍데기"로 보지 않고, 함께 뜨고 함께 내려가며 네트워크와 볼륨을 공유하는 실행 묶음이라는 관점에서 정리하겠습니다.
-
 
 ![Kubernetes 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/02/02-01-concept-at-a-glance.ko.png)
 *Kubernetes 101 2장 흐름 개요*
@@ -185,7 +182,6 @@ kubectl logs web
 
 다음 글에서는 이 Pod를 사람이 직접 관리하지 않고, 원하는 개수를 유지하고 롤링 업데이트까지 맡는 Deployment를 보겠습니다.
 
-
 ## 매니페스트 중심 운영 예시
 
 Kubernetes의 강점은 명령형 조작보다 선언형 매니페스트에 있습니다. 아래 예시는 Deployment, Service, Ingress를 분리해 책임 경계를 명확히 둔 기본 형태입니다.
@@ -291,7 +287,6 @@ kubectl get events -n prod --sort-by=.metadata.creationTimestamp
 5. 배포 후 `kubectl rollout history`를 확인해 복구 경로를 문서화합니다.
 
 Kubernetes는 기능이 많아서 어려운 도구가 아니라, 경계를 나누어 관찰하지 않으면 쉽게 혼란스러워지는 도구입니다. 매니페스트, 관찰 명령, 아키텍처 경계를 함께 묶어 운영하면 학습 속도와 안정성이 동시에 올라갑니다.
-
 
 ## 운영 관찰 지표 추가
 

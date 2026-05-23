@@ -26,10 +26,7 @@ last_reviewed: '2026-05-14'
 
 입문 단계에서는 보안을 "막는 기술"로만 보기 쉽습니다. 하지만 실제로는 누가 무엇을 언제 할 수 있는지 명확히 모델링하는 작업에 더 가깝습니다.
 
-이 글은 Cloud Computing 101 시리즈의 7번째 글입니다.
-
 여기서는 클라우드 보안을 최소 권한과 역할 기반 위임이라는 관점에서 정리하겠습니다.
-
 
 ![Cloud Computing 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/07/07-01-concept-at-a-glance.ko.png)
 *Cloud Computing 101 7장 흐름 개요*

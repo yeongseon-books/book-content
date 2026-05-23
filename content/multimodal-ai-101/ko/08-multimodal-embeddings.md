@@ -31,10 +31,7 @@ seo_description: 5편에서 multimodal RAG의 큰 그림을 살펴봤다면, 이
 
 이 글에서는 multimodal embedding을 “모든 것을 벡터로 만드는 기술”이 아니라, 서로 다른 입력을 하나의 검색 인터페이스 아래로 수렴시키는 설계 층으로 정리합니다.
 
-이 글은 Multimodal AI 101 시리즈의 8번째 글입니다.
-
 임베딩 공간을 잘 설계한 팀은 거대한 모델보다 먼저 검색 경험을 안정적으로 개선합니다.
-
 
 ![Multimodal AI 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/08/08-01-big-picture.ko.png)
 *Multimodal AI 101 8장 흐름 개요*
@@ -235,7 +232,6 @@ def hybrid_score(query: str, doc, alpha: float = 0.6) -> float:
 from collections import defaultdict
 
 stats = defaultdict(int)
-
 
 def log_search_event(query_type: str, clicked: bool, reformulated: bool) -> None:
     stats[f"{query_type}_total"] += 1

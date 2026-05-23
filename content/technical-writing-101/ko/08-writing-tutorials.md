@@ -26,8 +26,6 @@ last_reviewed: '2026-05-15'
 
 좋은 튜토리얼은 단계가 짧고, 검증 지점이 분명하고, 막히는 지점에서 바로 복구 힌트를 줍니다. 독자가 중간에 실패하더라도 무엇을 다시 확인해야 하는지 한 줄이라도 보여 주면 완주율이 크게 달라집니다.
 
-이 글은 기술 글쓰기 101 시리즈의 8번째 글입니다.
-
 여기서는 첫 성공을 빠르게 만들고 검증 가능한 단계로 나누는 튜토리얼 설계법을 정리합니다.
 
 ![Technical Writing 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/08/08-01-concept-at-a-glance.ko.png)

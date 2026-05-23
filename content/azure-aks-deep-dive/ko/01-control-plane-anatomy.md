@@ -28,8 +28,6 @@ AKS에서 특히 어려운 점은 control plane이 보이지 않는다는 사실
 self-managed Kubernetes라면 `etcd` 백업 전략, `kube-apiserver` 플래그, scheduler 프로세스 상태를 직접 다루면서 감을 쌓을 수 있습니다.
 반대로 AKS에서는 API endpoint, 객체 상태, 진단 로그, 그리고 AKS가 노출한 설정 표면만 가지고 내부를 추론해야 합니다.
 
-이 글은 Azure AKS Deep Dive 시리즈의 첫 번째 글입니다.
-
 그래서 이 글의 목적은 control plane을 더 추상적으로 설명하는 데 있지 않습니다.
 오히려 control plane과 data plane의 경계를 먼저 고정하고, 그 위에서 이후 글들의 kubelet, CNI, scheduler, autoscaling 이야기가 정확히 어디에 걸리는지 보이게 만드는 데 있습니다.
 이제 AKS에서 보이는 control plane과 보이지 않는 control plane을 같은 지도 위에 올려 보겠습니다.

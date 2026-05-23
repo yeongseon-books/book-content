@@ -25,10 +25,7 @@ last_reviewed: '2026-05-15'
 
 운영 채널에서 "서버가 죽었습니다"라고 말할 때, 실제로는 여러 종류의 사건이 한 문장에 섞여 있습니다. 프로세스가 멈춘 것인지, 패킷이 빠지는 것인지, 아니면 너무 느려서 살아 있어도 죽은 것처럼 보이는 것인지부터 갈라야 설계가 흔들리지 않습니다.
 
-이 글은 Distributed Systems 101 시리즈의 두 번째 글입니다.
-
 여기서는 crash, omission, timing, Byzantine을 설계 언어로 정리하고, 뒤이어 나오는 CAP와 합의 이야기가 어떤 가정 위에 서는지 분명히 잡습니다.
-
 
 ![Distributed Systems 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/02/02-01-concept-at-a-glance.ko.png)
 *Distributed Systems 101 2장 흐름 개요*

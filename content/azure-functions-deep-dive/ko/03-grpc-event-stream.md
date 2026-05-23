@@ -26,8 +26,6 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 특히 이번 글은 “gRPC를 쓴다”는 일반론이 아니라, 실제로 서비스가 하나이고 RPC도 하나이며 그 위에 dozens of message types가 `oneof`로 다중화된다는 사실을 구조적으로 정리합니다. 그리고 호스트 내부에서는 이 스트림이 일반 이벤트 버스보다 **워커별 채널 쌍 + gRPC 펌프**에 더 가깝게 구현되어 있다는 점을 보겠습니다.
 
-이 글은 Azure Functions Deep Dive 시리즈의 세 번째 글입니다.
-
 이제 워커가 연결된 뒤 호스트와 워커 사이에 놓이는 실제 wire protocol 경계를 선명하게 보겠습니다.
 
 ![Azure Functions Deep Dive 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/03/03-01-all-on-one-screen.ko.png)

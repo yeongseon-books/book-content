@@ -26,10 +26,7 @@ last_reviewed: '2026-05-14'
 
 핵심 질문은 단순합니다. 누가 무엇을 운영하는가입니다. 이 한 문장을 붙잡고 보면 EC2, Heroku, Notion이 왜 모두 클라우드이면서도 전혀 다르게 느껴지는지 설명할 수 있습니다.
 
-이 글은 Cloud Computing 101 시리즈의 2번째 글입니다.
-
 여기서는 IaaS, PaaS, SaaS를 기능 이름이 아니라 책임 경계의 관점에서 정리하겠습니다.
-
 
 ![Cloud Computing 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/02/02-01-concept-at-a-glance.ko.png)
 *Cloud Computing 101 2장 흐름 개요*
@@ -267,7 +264,6 @@ print(monthly_tco(9, ops_hours=0.5)) # total: $34
 
 운영 인건비를 포함하면 IaaS의 실질 비용은 인프라 가격의 10배 이상이 될 수 있습니다. 이것이 "IaaS가 가장 싸다"는 직관이 실무에서 자주 뒤집히는 이유입니다.
 
-
 ## 선택 기준 5가지
 
 1. 우리 팀은 운영 체제와 네트워크까지 직접 다룰 역량과 시간이 있는가.
@@ -295,7 +291,6 @@ print(monthly_tco(9, ops_hours=0.5)) # total: $34
 - SaaS의 가격에는 기능뿐 아니라 공급사 리스크도 포함됩니다.
 - FaaS는 이벤트 기반 작업에 강력하지만 만능은 아닙니다.
 - 추상화는 자유를 주지만 동시에 락인도 만듭니다.
-
 
 이 다섯 가지 원칙을 더 구체적으로 풀어 보겠습니다.
 
@@ -343,7 +338,6 @@ print(monthly_tco(9, ops_hours=0.5)) # total: $34
 ## 정리 및 다음 단계
 
 IaaS, PaaS, SaaS의 차이는 기능 이름보다 책임 경계에서 분명해집니다. 어디까지를 우리가 운영하고, 어디부터를 공급자가 맡는지 이해하면 모델 선택이 훨씬 쉬워집니다. 다음 글에서는 모델을 골랐다면 그다음에 따라오는 질문, 즉 어디에서 실행할지를 보겠습니다.
-
 
 ## 선택 기준을 숫자로 만드는 방법
 

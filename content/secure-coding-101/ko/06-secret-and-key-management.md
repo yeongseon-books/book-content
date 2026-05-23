@@ -24,10 +24,7 @@ last_reviewed: '2026-05-15'
 
 비밀값은 유출되기 전까지는 잘 보이지 않지만, 한 번 새면 복구 비용이 크게 튀는 자산입니다. 데이터베이스 비밀번호, API 키, 서명 키, 액세스 토큰이 코드 저장소나 CI 로그, 채팅창, 운영 문서에 흩어져 있으면 시스템은 기능적으로 정상이어도 운영 복원력은 아주 약해집니다.
 
-이 글은 Secure Coding 101 시리즈의 6번째 글입니다.
-
 여기서는 secret 관리를 단순히 환경 변수에 넣는 방법으로 끝내지 않고, 코드 분리, 비밀 저장소, 회전, 접근 감사, 마스킹까지 이어지는 운영 체계로 정리하겠습니다. 이 관점을 이해하면 왜 하드코딩이 위험한지뿐 아니라, 왜 회전 가능성이 secret 설계의 핵심인지도 분명해집니다.
-
 
 ![Secure Coding 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/06/06-01-concept-at-a-glance.ko.png)
 *Secure Coding 101 6장 흐름 개요*

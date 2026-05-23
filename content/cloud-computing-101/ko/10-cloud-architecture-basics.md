@@ -26,10 +26,7 @@ last_reviewed: '2026-05-21'
 
 좋은 아키텍처는 화려한 서비스 조합이 아니라 변경이 안전하고, 장애가 국소화되며, 운영이 반복 가능하다는 점에서 드러납니다. 그래서 마지막 글에서는 기능 목록보다 구조적 원칙에 집중하는 편이 더 중요합니다.
 
-이 글은 Cloud Computing 101 시리즈의 마지막 글입니다.
-
 여기서는 Well-Architected의 여섯 가지 관점을 기준으로, 앞선 내용이 하나의 클라우드 아키텍처로 어떻게 이어지는지 정리하겠습니다.
-
 
 ![Cloud Computing 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/10/10-01-concept-at-a-glance.ko.png)
 *Cloud Computing 101 10장 흐름 개요*
@@ -252,7 +249,6 @@ app = FastAPI()
 
 DATABASE_URL = "postgresql://user:pass@db-host:5432/mydb"
 REDIS_URL = "redis://cache-host:6379/0"
-
 
 @app.get("/health")
 async def health_check():

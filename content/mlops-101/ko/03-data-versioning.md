@@ -26,8 +26,6 @@ last_reviewed: '2026-05-12'
 
 같은 코드라도 데이터가 달라지면 다른 모델이 나옵니다. 그래서 데이터 버전 관리가 빠진 MLOps는 절반만 완성된 체계에 가깝습니다. 코드를 재현할 수 있어도 학습 결과를 재현할 수는 없기 때문입니다.
 
-이 글은 MLOps 101 시리즈의 3번째 글입니다.
-
 여기서는 데이터 버전 관리를 파일 백업이 아니라, 팀이 같은 입력을 같은 방식으로 다시 가져올 수 있게 만드는 재현성 계약으로 보겠습니다.
 
 ![MLOps 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/03/03-01-see-the-flow-first.ko.png)

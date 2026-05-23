@@ -26,8 +26,6 @@ last_reviewed: '2026-05-15'
 
 발행 전 점검은 글을 완벽하게 꾸미는 과정이 아니라 수정 비용을 앞당겨 줄이는 운영 루틴입니다. 한 번의 자동 검증과 한 번의 사람 눈 검토가 있으면, 발행 뒤 급하게 고칠 일을 상당수 줄일 수 있습니다.
 
-이 글은 기술 글쓰기 101 시리즈의 10번째 글입니다.
-
 여기서는 제목, 링크, 코드, 이미지, 발행 후 대응까지 한 번에 점검하는 마지막 루틴을 정리합니다.
 
 ![Technical Writing 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/10/10-01-concept-at-a-glance.ko.png)

@@ -24,8 +24,6 @@ last_reviewed: '2026-05-15'
 
 오픈소스를 처음 볼 때는 메인테이너를 코드를 가장 잘 아는 사람 정도로 생각하기 쉽습니다. 물론 기술적인 판단도 중요합니다. 하지만 실제로 메인테이너가 하는 일은 훨씬 넓습니다. 이슈를 정리하고, 리뷰 우선순위를 잡고, 릴리스를 내고, 사람 사이의 경계를 조율하고, 후계자를 키우는 일까지 포함됩니다.
 
-이 글은 Open Source 101 시리즈의 여덟 번째 글입니다.
-
 여기서는 메인테이너를 뛰어난 개발자 한 명이 아니라, 프로젝트의 흐름과 책임을 오래 유지하게 만드는 운영 책임자로 정리하겠습니다.
 
 ![Open Source 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/08/08-01-the-maintainer-loop-in-one-line.ko.png)

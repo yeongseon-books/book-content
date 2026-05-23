@@ -22,10 +22,7 @@ last_reviewed: '2026-05-15'
 
 # Data Warehouse 101 (3/10): Fact와 Dimension
 
-이 글은 데이터 웨어하우스 101 시리즈의 3번째 글입니다.
-
 분석 질문은 대부분 얼마를 어떤 기준으로 보고 싶은지로 정리됩니다. 매출, 수량, 건수 같은 측정값과 사용자, 상품, 날짜 같은 속성을 분리해 두면 집계는 단순해지고 속성 변경도 더 유연하게 처리할 수 있습니다.
-
 
 ![Data Warehouse 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/03/03-01-concept-at-a-glance.ko.png)
 *Data Warehouse 101 3장 흐름 개요*
@@ -168,7 +165,6 @@ ORDER BY 1, 2;
 
 Fact와 Dimension을 분리하는 일은 분석 모델의 출발점입니다. 무엇을 세고 무엇으로 자를지 분명해지면 이후 설계가 훨씬 단순해집니다. 다음 글에서는 이 구조를 가장 널리 쓰는 형태로 정리한 Star Schema를 봅니다.
 
-
 ## Fact와 Dimension 설계를 코드로 구체화하기
 
 Fact와 Dimension을 분리하는 이유는 "정규화가 좋아서"가 아니라, 측정과 맥락의 변경 주기가 다르기 때문입니다. 주문 금액은 이벤트 발생 시점에 확정되지만, 사용자 등급이나 상품 분류는 시간이 지나며 바뀝니다. 이 둘을 한 테이블에 섞으면 과거 재현이 어려워집니다.
@@ -238,7 +234,6 @@ Dimension을 잘 설계해도 쿼리 작성 규칙이 없으면 결과가 흔들
 
 이 원칙을 지키면 "같은 매출인데 대시보드마다 값이 다름" 문제를 크게 줄일 수 있습니다.
 
-
 ## Fact/Dimension 품질 검증 규칙
 
 모델이 커질수록 "정의는 맞는데 데이터가 틀린" 문제가 늘어납니다. 아래와 같은 검증 SQL을 정기 실행하면 품질 문제를 조기에 잡을 수 있습니다.
@@ -273,7 +268,6 @@ dimension_change_policy:
 ```
 
 정책이 명확하면 "어떤 컬럼 변경을 이력으로 남길지"를 팀마다 다르게 해석하는 문제를 줄일 수 있습니다. 결국 모델 신뢰도는 테이블 개수가 아니라 변경 규칙의 일관성에서 나옵니다.
-
 
 ## 실무 적용 메모
 
@@ -313,7 +307,6 @@ operating_baseline:
 이 기준을 프로젝트 초기에 합의하면, 시리즈에서 다룬 개념이 문서 지식으로 끝나지 않고 운영 습관으로 정착됩니다. 특히 신규 팀원이 합류했을 때 학습 속도가 빨라지고, 장애나 지표 충돌 같은 사건이 생겨도 공통된 기준으로 빠르게 의사결정을 내릴 수 있습니다.
 
 또한 분기 단위 회고에서는 기술 성능 지표뿐 아니라 의사결정 지표도 함께 보는 것이 좋습니다. 예를 들어 "대시보드 숫자 논쟁으로 소모된 회의 시간", "지표 정의 변경 후 영향 범위 확인 시간", "재처리 요청 처리 리드타임" 같은 운영 지표를 추적하면 데이터 조직의 성숙도를 더 현실적으로 파악할 수 있습니다.
-
 
 ## 실전 앵커: 모델, 파이프라인, 성능 검증
 
@@ -417,6 +410,40 @@ WHEN NOT MATCHED THEN INSERT (
 
 이 패턴을 기준선으로 두면, 모델 변경이나 파이프라인 장애가 생겨도 영향을 계층별로 좁혀 복구할 수 있습니다. 데이터 웨어하우스 운영은 쿼리 한두 개의 튜닝보다, 반복 가능한 설계 계약을 지키는 과정에 더 가깝습니다.
 
+### 운영 확장 메모
+
+데이터 웨어하우스를 오래 운영하면 기술 선택보다 운영 규율이 성능과 신뢰도를 좌우합니다. 다음 예시는 팀에서 반복적으로 사용하는 점검 묶음입니다.
+
+```sql
+-- 파티션 필터 누락 탐지용 예시
+EXPLAIN
+SELECT category, SUM(amount) AS revenue
+FROM fact_sales
+WHERE date_key BETWEEN 20260101 AND 20260131
+GROUP BY category;
+```
+
+```yaml
+review_policy:
+  query_rules:
+    - require_partition_filter: true
+    - block_select_star_on_fact: true
+    - require_owner_for_metric_change: true
+  incident_rules:
+    - classify: [schema_change, pipeline_lag, quality_failure]
+    - first_response_minutes: 15
+```
+
+```mermaid
+flowchart LR
+    A["모델 변경 요청"] --> B["영향 범위 분석"]
+    B --> C["샘플 검증 쿼리"]
+    C --> D["배치 재실행"]
+    D --> E["지표 대조"]
+    E --> F["배포 승인"]
+```
+
+아키텍처가 단순해 보여도, 계약과 검증 루프를 문서화해 두면 신규 인원이 합류해도 같은 품질을 유지할 수 있습니다.
 
 ### 운영 확장 메모
 
@@ -453,6 +480,40 @@ flowchart LR
 
 아키텍처가 단순해 보여도, 계약과 검증 루프를 문서화해 두면 신규 인원이 합류해도 같은 품질을 유지할 수 있습니다.
 
+### 운영 확장 메모
+
+데이터 웨어하우스를 오래 운영하면 기술 선택보다 운영 규율이 성능과 신뢰도를 좌우합니다. 다음 예시는 팀에서 반복적으로 사용하는 점검 묶음입니다.
+
+```sql
+-- 파티션 필터 누락 탐지용 예시
+EXPLAIN
+SELECT category, SUM(amount) AS revenue
+FROM fact_sales
+WHERE date_key BETWEEN 20260101 AND 20260131
+GROUP BY category;
+```
+
+```yaml
+review_policy:
+  query_rules:
+    - require_partition_filter: true
+    - block_select_star_on_fact: true
+    - require_owner_for_metric_change: true
+  incident_rules:
+    - classify: [schema_change, pipeline_lag, quality_failure]
+    - first_response_minutes: 15
+```
+
+```mermaid
+flowchart LR
+    A["모델 변경 요청"] --> B["영향 범위 분석"]
+    B --> C["샘플 검증 쿼리"]
+    C --> D["배치 재실행"]
+    D --> E["지표 대조"]
+    E --> F["배포 승인"]
+```
+
+아키텍처가 단순해 보여도, 계약과 검증 루프를 문서화해 두면 신규 인원이 합류해도 같은 품질을 유지할 수 있습니다.
 
 ### 운영 확장 메모
 
@@ -489,7 +550,6 @@ flowchart LR
 
 아키텍처가 단순해 보여도, 계약과 검증 루프를 문서화해 두면 신규 인원이 합류해도 같은 품질을 유지할 수 있습니다.
 
-
 ### 운영 확장 메모
 
 데이터 웨어하우스를 오래 운영하면 기술 선택보다 운영 규율이 성능과 신뢰도를 좌우합니다. 다음 예시는 팀에서 반복적으로 사용하는 점검 묶음입니다.
@@ -524,79 +584,6 @@ flowchart LR
 ```
 
 아키텍처가 단순해 보여도, 계약과 검증 루프를 문서화해 두면 신규 인원이 합류해도 같은 품질을 유지할 수 있습니다.
-
-
-### 운영 확장 메모
-
-데이터 웨어하우스를 오래 운영하면 기술 선택보다 운영 규율이 성능과 신뢰도를 좌우합니다. 다음 예시는 팀에서 반복적으로 사용하는 점검 묶음입니다.
-
-```sql
--- 파티션 필터 누락 탐지용 예시
-EXPLAIN
-SELECT category, SUM(amount) AS revenue
-FROM fact_sales
-WHERE date_key BETWEEN 20260101 AND 20260131
-GROUP BY category;
-```
-
-```yaml
-review_policy:
-  query_rules:
-    - require_partition_filter: true
-    - block_select_star_on_fact: true
-    - require_owner_for_metric_change: true
-  incident_rules:
-    - classify: [schema_change, pipeline_lag, quality_failure]
-    - first_response_minutes: 15
-```
-
-```mermaid
-flowchart LR
-    A["모델 변경 요청"] --> B["영향 범위 분석"]
-    B --> C["샘플 검증 쿼리"]
-    C --> D["배치 재실행"]
-    D --> E["지표 대조"]
-    E --> F["배포 승인"]
-```
-
-아키텍처가 단순해 보여도, 계약과 검증 루프를 문서화해 두면 신규 인원이 합류해도 같은 품질을 유지할 수 있습니다.
-
-
-### 운영 확장 메모
-
-데이터 웨어하우스를 오래 운영하면 기술 선택보다 운영 규율이 성능과 신뢰도를 좌우합니다. 다음 예시는 팀에서 반복적으로 사용하는 점검 묶음입니다.
-
-```sql
--- 파티션 필터 누락 탐지용 예시
-EXPLAIN
-SELECT category, SUM(amount) AS revenue
-FROM fact_sales
-WHERE date_key BETWEEN 20260101 AND 20260131
-GROUP BY category;
-```
-
-```yaml
-review_policy:
-  query_rules:
-    - require_partition_filter: true
-    - block_select_star_on_fact: true
-    - require_owner_for_metric_change: true
-  incident_rules:
-    - classify: [schema_change, pipeline_lag, quality_failure]
-    - first_response_minutes: 15
-```
-
-```mermaid
-flowchart LR
-    A["모델 변경 요청"] --> B["영향 범위 분석"]
-    B --> C["샘플 검증 쿼리"]
-    C --> D["배치 재실행"]
-    D --> E["지표 대조"]
-    E --> F["배포 승인"]
-```
-
-아키텍처가 단순해 보여도, 계약과 검증 루프를 문서화해 두면 신규 인원이 합류해도 같은 품질을 유지할 수 있습니다.
-
 
 ### 운영 확장 메모
 

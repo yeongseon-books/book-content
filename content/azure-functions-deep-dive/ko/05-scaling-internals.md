@@ -26,8 +26,6 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 이번 글은 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준으로 호스트가 바깥으로 내보내는 scale signal만 다룹니다. 의도적으로 Azure 내부 Scale Controller의 비공개 구현을 추측하지 않고, host repo 안에 있는 것과 없는 것을 명확히 나눕니다.
 
-이 글은 Azure Functions Deep Dive 시리즈의 다섯 번째 글입니다.
-
 이제 외부 scale-out 결정과 인스턴스 내부 worker concurrency를 분리해서 보는 운영 모델을 고정하겠습니다.
 
 ![Azure Functions Deep Dive 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/05/05-01-the-big-picture-where-scaling-decisions.ko.png)

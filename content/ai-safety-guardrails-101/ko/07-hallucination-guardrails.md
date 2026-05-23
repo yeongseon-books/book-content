@@ -27,10 +27,7 @@ Hallucination이라는 말은 너무 넓게 쓰여서 운영 설계를 어렵게
 
 그래서 이 글은 hallucination을 막연한 “헛소리”가 아니라 닫힌 문맥에서 검증 가능한 grounding 실패로 좁혀 다룹니다. 이 정의를 잡아야 측정과 차단, fallback 설계가 가능해집니다.
 
-이 글은 AI Safety & Guardrails 101 시리즈의 7번째 글입니다.
-
 이 글에서는 claim 추출, NLI entailment, judge 보강, citation 형식 강제, 회귀 지표를 묶어 grounding 검증 구조를 설명합니다.
-
 
 ![Hallucination guardrail의 핵심: 답변을 주장 단위로 분해해 근거와 대조](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/07/07-01-hallucination-guardrail.ko.png)
 *Hallucination guardrail의 핵심: 답변을 주장 단위로 분해해 근거와 대조*

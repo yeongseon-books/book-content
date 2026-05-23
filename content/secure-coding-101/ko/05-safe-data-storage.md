@@ -24,10 +24,7 @@ last_reviewed: '2026-05-15'
 
 민감한 데이터를 저장하는 순간부터 애플리케이션은 기능 시스템이면서 동시에 보관 시스템이 됩니다. 사용자 입장에서는 회원가입 한 번이지만, 운영자 입장에서는 주민등록번호, 주소, 카드 정보, 비밀번호 해시, 백업 파일처럼 사고 비용이 큰 자산을 떠안는 셈입니다. 그래서 저장 보안은 데이터베이스 옵션 하나로 끝나지 않습니다.
 
-이 글은 Secure Coding 101 시리즈의 5번째 글입니다.
-
 여기서는 저장 보안을 디스크 암호화만으로 보지 않고, 어떤 데이터를 모을지부터 전송 구간, 저장 구간, 키 분리, 백업 보호까지 이어지는 흐름으로 정리하겠습니다. 이 관점을 잡아 두면 민감 데이터가 왜 가장 비싼 사고 자산인지, 그리고 왜 백업까지 같은 수준으로 봐야 하는지도 자연스럽게 이해할 수 있습니다.
-
 
 ![Secure Coding 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/05/05-01-concept-at-a-glance.ko.png)
 *Secure Coding 101 5장 흐름 개요*
@@ -176,7 +173,6 @@ import base64
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
-
 class EnvelopeEncryption:
     def __init__(self, kms_client):
         self.kms = kms_client
@@ -233,7 +229,6 @@ class EnvelopeEncryption:
 from sqlalchemy import TypeDecorator, String
 import json
 
-
 class EncryptedField(TypeDecorator):
     """SQLAlchemy 컬럼 타입 — 투명한 필드 암호화/복호화"""
     impl = String
@@ -257,7 +252,6 @@ class EncryptedField(TypeDecorator):
             return None
         envelope = json.loads(value)
         return self.enc.decrypt(envelope).decode("utf-8")
-
 
 # 사용 예시
 class Patient(Base):
@@ -354,13 +348,11 @@ GDPR의 삭제권(Right to Erasure)이나 개인정보보호법의 파기 요청
 from datetime import datetime, timezone
 from enum import Enum
 
-
 class DeletionStatus(str, Enum):
     REQUESTED = "requested"
     IN_PROGRESS = "in_progress"
     COMPLETED = "completed"
     FAILED = "failed"
-
 
 class DeletionRequest:
     id: str
@@ -368,7 +360,6 @@ class DeletionRequest:
     requested_at: datetime
     status: DeletionStatus
     affected_systems: list[str]
-
 
 def process_deletion_request(request_id: str):
     """삭제 요청을 처리합니다. 모든 저장소에서 데이터를 제거합니다."""
@@ -420,7 +411,6 @@ def process_deletion_request(request_id: str):
 import subprocess
 from datetime import datetime
 
-
 def create_encrypted_backup(db_url: str, backup_dir: str, kms_key_id: str) -> str:
     """데이터베이스를 덤프하고 봉투 암호화로 보호합니다."""
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -446,7 +436,6 @@ def create_encrypted_backup(db_url: str, backup_dir: str, kms_key_id: str) -> st
     os.unlink(dump_file)
 
     return encrypted_file
-
 
 def verify_backup_restore(encrypted_file: str) -> bool:
     """백업 복구 가능성을 검증합니다. 월 1회 자동 실행 권장."""

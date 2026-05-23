@@ -26,8 +26,6 @@ title: "Technical Writing 101 (9/10): 블로그와 문서 차이"
 
 그래서 강한 팀은 블로그와 문서를 경쟁시키지 않고 역할을 나눕니다. 경험과 해석은 블로그에 남기고, 현재의 기준과 절차는 문서에 고정한 뒤 서로를 정확하게 링크합니다.
 
-이 글은 기술 글쓰기 101 시리즈의 9번째 글입니다.
-
 여기서는 블로그와 문서를 역할, 최신성, 소유권 관점에서 구분하는 기준을 다룹니다.
 
 ![Technical Writing 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/09/09-01-concept-at-a-glance.ko.png)

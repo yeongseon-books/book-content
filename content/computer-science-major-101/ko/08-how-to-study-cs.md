@@ -23,8 +23,6 @@ last_reviewed: '2026-05-14'
 
 # Computer Science Major 101 (8/10): 전공 공부 방법
 
-이 글은 Computer Science Major 101 시리즈의 8번째 글입니다.
-
 같은 시간을 써도 어떤 학생은 개념이 남고, 어떤 학생은 강의 직후부터 빠르게 잊어버립니다. 차이를 만드는 것은 재능보다 공부 방법의 구조인 경우가 많습니다.
 
 ![Computer Science Major 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/08/08-01-study-loop.ko.png)

@@ -31,10 +31,7 @@ title: "AI Data Preparation 101 (9/10): 학습/평가/테스트 분할과 Contam
 
 시니어 엔지니어 관점에서 좋은 분할은 “편하게 나눴다”가 아니라 “실제 서빙 조건을 최대한 닮게 나눴다”로 평가해야 합니다.
 
-이 글은 AI Data Preparation 101 시리즈의 9번째 글입니다.
-
 여기서는 random, stratified, group, temporal split의 적용 기준과, LLM 평가에서 contamination을 어떻게 감지하고 방어할지 정리하겠습니다.
-
 
 ![AI 데이터 준비 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/09/09-01-big-picture.ko.png)
 *AI 데이터 준비 9장 흐름 개요*

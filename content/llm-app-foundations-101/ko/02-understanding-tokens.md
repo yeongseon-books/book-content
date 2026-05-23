@@ -25,8 +25,6 @@ LLM API를 처음 연결하면 대개 답변 품질에 먼저 눈이 갑니다. 
 
 운영 관점에서는 이 차이를 빨리 체득해야 합니다. 토큰은 단순한 이론 용어가 아니라 비용 계산 단위이고, 지연 시간의 첫 번째 설명 변수이며, 길이 제한의 경계선입니다. 이 감각이 생기면 “왜 이번 요청이 무거웠는가”를 감이 아니라 숫자로 설명할 수 있습니다.
 
-이 글은 LLM App Foundations 101 시리즈의 두 번째 글입니다.
-
 여기서는 토큰을 문자열의 부속 개념이 아니라 비용·속도·한계를 함께 묶는 운영 단위로 보겠습니다.
 
 ![토큰이 비용과 한계로 이어지는 전체 그림](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/02/02-01-understanding-tokens-cost-limits-and-con.ko.png)

@@ -26,8 +26,6 @@ last_reviewed: '2026-05-12'
 
 많은 팀이 정확도 하락 하나만 보고 뒤늦게 문제를 인지합니다. 하지만 실제 현장에서는 입력 분포 변화가 먼저 나타나고, 그다음에야 비즈니스 손실이나 성능 저하가 보이는 경우가 많습니다.
 
-이 글은 MLOps 101 시리즈의 7번째 글입니다.
-
 여기서는 데이터 드리프트와 모델 드리프트를 분리해서 이해하고, PSI와 KS 같은 통계 도구를 어떻게 운영 경보로 연결할지 봅니다.
 
 ![MLOps 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/07/07-01-see-the-flow-first.ko.png)

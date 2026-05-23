@@ -24,8 +24,6 @@ last_reviewed: '2026-05-15'
 
 오픈소스를 고를 때 초보자는 기능부터 봅니다. 당장 문제를 해결해 줄 수 있는지, 설치가 쉬운지, 예제가 잘 돼 있는지가 먼저 눈에 들어옵니다. 그런데 실무에서는 코드보다 먼저 읽어야 하는 문서가 있습니다. 바로 라이선스입니다. 어떤 권리가 허용되는지, 어떤 고지를 남겨야 하는지, 어디까지 재배포할 수 있는지가 모두 여기에서 갈립니다.
 
-이 글은 Open Source 101 시리즈의 두 번째 글입니다.
-
 여기서는 MIT, Apache 2.0, GPL을 중심으로, 오픈소스 라이선스를 이름 암기가 아니라 권한과 의무를 읽는 기준으로 정리하겠습니다.
 
 ![Open Source 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/02/02-01-draw-the-license-map-first.ko.png)
