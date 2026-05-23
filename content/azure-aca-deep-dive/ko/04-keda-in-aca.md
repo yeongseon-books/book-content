@@ -259,11 +259,11 @@ ACA의 스케일링은 단순한 제품 편의 기능이 아닙니다. 사용자
 ## 처음 질문으로 돌아가기
 
 - **ACA의 scale rule은 KEDA에서 어떤 형태의 제어 루프로 읽는 편이 가장 정확할까요?**
-  - 본문의 기준은 ACA 안의 KEDA — Scale Rule이 만드는 것를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - ACA의 scale rule은 scaler object 그 자체가 아니라, `minReplicas`, `maxReplicas`, trigger metadata, auth를 KEDA형 autoscaling loop로 번역하라는 제품 설정입니다. 그래서 실제 replica 변화는 polling, activation, cooldown, HPA류 결정과 metrics answer path를 거친 결과로 읽는 편이 가장 정확합니다.
 - **왜 scale rule은 app-scope가 아니라 revision-scope에 속할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - scale은 메인 URL 정책이 아니라 특정 불변 Revision 뒤의 런타임 행동이기 때문에 revision-scope에 붙습니다. canary Revision이 stable Revision과 다른 concurrency threshold나 max replica를 가질 수 있어야 하므로, scale rule 변경이 새 Revision 생성으로 이어지는 구조가 자연스럽습니다.
 - **`minReplicas: 0`이 가능하다는 사실은 스케일 모델을 어떻게 바꿀까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - `minReplicas: 0`이 허용되면 스케일링은 단순 비율 조정이 아니라 wake-from-zero activation 모델이 됩니다. 이때는 1→0으로 내려가는 cooldown과 0→1 첫 기동 지연이 별도 운영 의미를 가지므로, steady-state HPA보다 KEDA형 event-driven mental model이 더 잘 맞습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
