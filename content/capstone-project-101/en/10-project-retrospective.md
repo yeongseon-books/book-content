@@ -90,33 +90,23 @@ Action | add a deployment checklist template to the repository | backend owner |
 
 ### Step 1 — KPT
 
-```python
-kpt = {"keep": [], "problem": [], "try": []}
-```
+The KPT template only needs three columns: `keep`, `problem`, and `try`.
 
 ### Step 2 — Data
 
-```python
-metrics = {"velocity": 12, "bugs": 5, "review_time": 1.5}
-```
+Record retrospective metrics in numbers, such as `velocity=12`, `bugs=5`, and `review_time=1.5`, so the discussion stays tied to facts.
 
 ### Step 3 — Five Whys
 
-```python
-whys = ["bug_at_demo", "missed_test", "no_ci", "no_template", "first_time"]
-```
+Cause tracing becomes easier to read when you write it as a chain such as `bug_at_demo -> missed_test -> no_ci -> no_template -> first_time`.
 
 ### Step 4 — Next actions
 
-```python
-actions = [{"who": "A", "what": "add_ci", "by": "next_sprint"}]
-```
+Write each next action on one line with an owner, an action, and a deadline, such as `who=A`, `what=add_ci`, and `by=next_sprint`.
 
 ### Step 5 — Learning summary
 
-```python
-lessons = ["scope_first", "ci_early", "demo_dryrun"]
-```
+Summarize the learning as short reusable lines such as `scope_first`, `ci_early`, and `demo_dryrun`.
 
 ## What to Notice in This Code
 

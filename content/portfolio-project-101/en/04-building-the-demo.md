@@ -75,9 +75,12 @@ The goal is not completeness. It is immediate legibility.
 
 Start by compressing the core journey into a few steps.
 
-```python
-flow = ["land", "sample", "action", "result"]
-```
+The demo flow is usually clear enough when you reduce it to these four stages:
+
+- `land`
+- `sample`
+- `action`
+- `result`
 
 This protects the demo from turning into a feature maze.
 
@@ -85,9 +88,7 @@ This protects the demo from turning into a feature maze.
 
 Blank states are often terrible portfolio experiences.
 
-```python
-seed = {"users": 5, "tasks": 12}
-```
+Even seed data as small as `5 users` and `12 tasks` can make the first screen feel much more real.
 
 The seed gives the visitor context immediately. A scheduling app should show schedules. An analytics app should show a realistic example result.
 
@@ -95,9 +96,7 @@ The seed gives the visitor context immediately. A scheduling app should show sch
 
 The project is much easier to inspect when the reviewer can try it without setup friction.
 
-```python
-demo = {"id": "guest@demo", "pw": "demo1234"}
-```
+For example, you can offer a shared demo account such as `guest@demo / demo1234`.
 
 A shared account or another guided access path keeps the reviewer from burning time before they reach the actual value.
 

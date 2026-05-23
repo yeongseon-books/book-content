@@ -95,9 +95,7 @@ Write the title as one clear line, such as *course schedule conflict checker*.
 
 ### Step 2 — Users
 
-```python
-users = ["student", "advisor"]
-```
+List the first user candidates briefly, such as `student` and `advisor`, so the scope stays visible.
 
 ### Step 3 — Value
 

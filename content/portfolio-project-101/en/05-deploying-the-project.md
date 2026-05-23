@@ -83,9 +83,7 @@ The best beginner choice is usually the platform you can understand, redeploy, a
 
 Public repositories should never carry real secrets.
 
-```python
-env = {"DATABASE_URL": "...", "SECRET_KEY": "..."}
-```
+For example, values such as `DATABASE_URL` and `SECRET_KEY` should live in deployment environment variables rather than in code.
 
 This separation is both a security baseline and an operational baseline. It lets you distinguish local, test, and production settings cleanly.
 

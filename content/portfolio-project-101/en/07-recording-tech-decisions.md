@@ -83,9 +83,7 @@ This prevents hindsight from flattening every decision into a generic “best pr
 
 Comparison gives the final choice weight.
 
-```python
-options = ["FastAPI", "Flask", "Django"]
-```
+For example, listing only `FastAPI`, `Flask`, and `Django` is already enough to make the comparison real.
 
 You do not need a giant matrix. Two or three realistic options are enough.
 
@@ -101,9 +99,11 @@ The power comes from placing that line after the context and the options.
 
 The explanation is stronger when it uses criteria rather than taste.
 
-```python
-why = ["async", "type_hints", "swagger_auto"]
-```
+It helps to state the reasoning as criteria right away:
+
+- `async`
+- `type_hints`
+- `swagger_auto`
 
 Those criteria are easy to connect back to the problem and the constraints.
 
@@ -111,9 +111,7 @@ Those criteria are easy to connect back to the problem and the constraints.
 
 Good notes include both gains and costs.
 
-```python
-result = {"build_time": "fast", "trade": "smaller_ecosystem"}
-```
+For example, you can write that `build time was faster` while the trade-off was a `smaller ecosystem`.
 
 That honesty is what makes the note feel like judgment instead of self-promotion.
 

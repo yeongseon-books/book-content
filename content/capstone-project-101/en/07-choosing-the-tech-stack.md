@@ -91,33 +91,23 @@ Review trigger: reconsider if authentication, async APIs, or admin features expa
 
 ### Step 1 — List candidates
 
-```python
-candidates = ["FastAPI", "Flask", "Django"]
-```
+Keep the candidates to a comparable shortlist such as `FastAPI`, `Flask`, and `Django`.
 
 ### Step 2 — Score familiarity
 
-```python
-familiar = {"FastAPI": 4, "Flask": 5, "Django": 2}
-```
+Score familiarity in numbers, for example `FastAPI=4`, `Flask=5`, and `Django=2`, so the speed difference stays visible.
 
 ### Step 3 — Estimate learning cost
 
-```python
-learning_cost = {"FastAPI": 2, "Flask": 1, "Django": 4}
-```
+Use the same scale for learning cost, such as `FastAPI=2`, `Flask=1`, and `Django=4`.
 
 ### Step 4 — Estimate ops burden
 
-```python
-ops = {"FastAPI": 2, "Flask": 1, "Django": 3}
-```
+Estimate ops burden in the same way, for example `FastAPI=2`, `Flask=1`, and `Django=3`, including deploy and incident response costs.
 
 ### Step 5 — Compute scores
 
-```python
-score = {k: familiar[k] - learning_cost[k] - ops[k] for k in candidates}
-```
+For a simple comparison, it is enough to subtract learning cost and ops burden from familiarity.
 
 ## What to Notice in This Code
 

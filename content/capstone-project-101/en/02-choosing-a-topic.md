@@ -91,33 +91,23 @@ Conclusion: the schedule conflict checker is the smallest option with the cleare
 
 ### Step 1 — Candidates
 
-```python
-ideas = ["schedule_checker", "mood_diary", "campus_map"]
-```
+Start the comparison with at least three candidates such as `schedule_checker`, `mood_diary`, and `campus_map`.
 
 ### Step 2 — Score axes
 
-```python
-axes = ["impact", "feasibility", "interest"]
-```
+Split the score axes into distinct criteria such as `impact`, `feasibility`, and `interest`.
 
 ### Step 3 — Score table
 
-```python
-score = {"schedule_checker": [4, 5, 4], "mood_diary": [3, 4, 5], "campus_map": [4, 3, 3]}
-```
+For example, you might score `schedule_checker` as `(4, 5, 4)`, `mood_diary` as `(3, 4, 5)`, and `campus_map` as `(4, 3, 3)` so the reasoning stays visible.
 
 ### Step 4 — Totals
 
-```python
-total = {k: sum(v) for k, v in score.items()}
-```
+Summarize the totals by adding each candidate's scores, but keep in mind that totals are only a quick comparison aid.
 
 ### Step 5 — Pick
 
-```python
-pick = max(total, key=total.get)
-```
+You can describe the final pick as the candidate with the highest total, but also leave one or two sentences explaining why it won.
 
 ## What to Notice in This Code
 

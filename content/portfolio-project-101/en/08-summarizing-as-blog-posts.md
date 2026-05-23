@@ -85,9 +85,12 @@ That one line gives the whole post a center of gravity.
 
 Explain the reasoning path, not just the final code.
 
-```python
-approach = ["observe", "hypothesis", "MVP", "deploy"]
-```
+The approach is usually clear enough when you summarize it in this order:
+
+- `observe`
+- `hypothesis`
+- `MVP`
+- `deploy`
 
 Readers often care more about the order of decisions than the raw list of tools.
 
@@ -106,9 +109,7 @@ The rest can live in the repository. The post should keep the narrative readable
 
 Specific outcomes are easier to trust than vague success claims.
 
-```python
-result = {"users": 30, "latency_ms": 120}
-```
+For example, record the outcome with numbers such as `30 users` and `120ms latency`.
 
 Even small metrics help because they give the reader something concrete to evaluate.
 

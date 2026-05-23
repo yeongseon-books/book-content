@@ -95,27 +95,27 @@ Write the story in plain user language: as a student, I want instant conflict de
 
 ### Step 2 — Acceptance criteria
 
-```python
-accept = ["input 5s", "result 1s", "error clear"]
-```
+Summarize the acceptance criteria as a short checklist:
+
+- `input 5s`
+- `result 1s`
+- `error clear`
 
 ### Step 3 — Non-functional
 
-```python
-nf = ["mobile", "no_signup", "korean_first"]
-```
+Keep the non-functional constraints separate as well:
+
+- `mobile`
+- `no_signup`
+- `korean_first`
 
 ### Step 4 — Priority
 
-```python
-prio = {"core": "Must", "share": "Should", "ai": "Could"}
-```
+Record priority in one consistent format, for example `core=Must`, `share=Should`, and `ai=Could`.
 
 ### Step 5 — Trace
 
-```python
-trace = {"ST-1": ["F-1", "F-2"]}
-```
+Write trace links directly, such as `ST-1 -> F-1, F-2`, so requirement IDs connect to implementation items.
 
 ## What to Notice in This Code
 

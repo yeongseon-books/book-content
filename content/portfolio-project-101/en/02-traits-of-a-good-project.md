@@ -77,9 +77,7 @@ The second project is stronger because the reviewer can see what was attempted, 
 
 A portfolio project should be small enough to finish deliberately.
 
-```python
-focus = 5
-```
+As a rough check, limit the core feature count to around `five` so the scope does not quietly sprawl.
 
 The number itself is not important. What matters is whether the core features all point at one problem instead of splitting the project into unrelated directions.
 
@@ -87,9 +85,7 @@ The number itself is not important. What matters is whether the core features al
 
 A vague project idea creates vague engineering choices.
 
-```python
-problem_score = 4
-```
+One useful self-check is to ask whether the problem statement is around `4 out of 5` in specificity.
 
 “Schedule management app” is weak. “A tool that pulls scattered team schedules into one view” is much stronger because it tells the reviewer why the project exists.
 
@@ -97,9 +93,7 @@ problem_score = 4
 
 Good projects talk about outcomes with data, even if the numbers are small.
 
-```python
-result = {"latency_ms": 120, "users": 30}
-```
+For example, leave concrete results such as `latency 120ms` and `30 users`.
 
 Metrics make it easier to ask better questions. They also keep the project grounded in observable behavior instead of abstract satisfaction.
 
@@ -107,9 +101,7 @@ Metrics make it easier to ask better questions. They also keep the project groun
 
 Running once is not enough. A project should show signs that it can survive later edits.
 
-```python
-maintainable = {"tests": True, "docs": True}
-```
+At minimum, the project should clearly show signals such as `tests present` and `docs present`.
 
 Tests and documentation are small but strong signals. They show that the project was not left in a one-off state.
 
@@ -117,9 +109,7 @@ Tests and documentation are small but strong signals. They show that the project
 
 A reviewer should not have to rely on your laptop state.
 
-```python
-reproducible = {"docker": True, "seed": True}
-```
+For example, make the reproduction path explicit with items such as `Docker provided` and `seed data provided`.
 
 Container setup, seed data, and explicit run commands all reduce ambiguity. A project that only works in the author’s environment usually gets weaker the more you explain it.
 

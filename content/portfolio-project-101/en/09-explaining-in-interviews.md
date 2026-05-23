@@ -91,9 +91,11 @@ That line clarifies scope and makes later trade-offs easier to explain.
 
 Describe what you actually did and why that path made sense.
 
-```python
-action = ["Flask API", "PostgreSQL", "Deploy to Render"]
-```
+In the action step, it is usually enough to name the key choices:
+
+- `Flask API`
+- `PostgreSQL`
+- `Deploy to Render`
 
 The tools matter less than the reason they were chosen. One sentence about why you picked the path often does more work than three sentences of implementation detail.
 
@@ -101,9 +103,7 @@ The tools matter less than the reason they were chosen. One sentence about why y
 
 Give the interviewer at least one number.
 
-```python
-result = {"users": 30, "latency_ms": 120}
-```
+For example, attach numbers such as `30 users` and `120ms average latency`.
 
 Metrics create evidence. They do not need to be huge. They need to be real.
 

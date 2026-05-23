@@ -75,9 +75,13 @@ Portfolio quality is often felt through friction count more than feature count.
 
 The README should answer what the project is, why it exists, how to run it, where the demo is, and what its usage or license conditions are.
 
-```python
-readme = ["What", "Why", "How", "Demo", "License"]
-```
+The README usually needs these five elements:
+
+- `What`
+- `Why`
+- `How`
+- `Demo`
+- `License`
 
 Those five elements give a first-time visitor the minimum context to interpret the repository.
 
@@ -85,9 +89,7 @@ Those five elements give a first-time visitor the minimum context to interpret t
 
 Do not stop at checking whether the link opens. Check whether the core flow is still understandable.
 
-```python
-demo = {"url": "https://demo.example.com", "uptime": 0.99}
-```
+For example, check whether the `demo URL is live`, whether the `core flow still works`, and whether `uptime is stable enough`.
 
 A working but confusing demo can still waste the reviewer’s short attention window.
 
@@ -95,9 +97,7 @@ A working but confusing demo can still waste the reviewer’s short attention wi
 
 The public version of the code should still be in a state you can defend.
 
-```python
-code = {"tests": True, "lint": True, "ci": True}
-```
+Before sharing, it helps to confirm at least `tests pass`, `lint passes`, and `CI runs`.
 
 If the verification path is broken, the rest of the project becomes harder to trust.
 
@@ -105,9 +105,12 @@ If the verification path is broken, the rest of the project becomes harder to tr
 
 The repository, blog post, and interview answer should all tell the same story.
 
-```python
-story = ["Problem", "Solution", "Result", "Lesson"]
-```
+The project story should still compress into four words:
+
+- `Problem`
+- `Solution`
+- `Result`
+- `Lesson`
 
 If those elements drift apart, the project starts to feel fragmented even when the code is fine.
 
@@ -115,9 +118,7 @@ If those elements drift apart, the project starts to feel fragmented even when t
 
 Finally, check how the project will be shared and rediscovered.
 
-```python
-launch = ["GitHub", "Blog", "LinkedIn"]
-```
+It also helps to decide the main launch channels up front, such as `GitHub`, `Blog`, and `LinkedIn`.
 
 Each channel plays a different role, so the links between them should feel deliberate rather than accidental.
 

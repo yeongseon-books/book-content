@@ -97,9 +97,7 @@ Even one integration test gives the reviewer a stronger signal that the project 
 
 You do not need dozens of E2E flows. You do need one meaningful one.
 
-```python
-e2e_steps = ["login", "create", "delete"]
-```
+For example, define the core end-to-end path as `login -> create -> delete`.
 
 A single core user path tells people what the project considers essential.
 
@@ -120,9 +118,11 @@ CI is especially persuasive in a portfolio because it shows you treat verificati
 
 The README is the entrance, but not the whole documentation story.
 
-```python
-docs = ["README", "API.md", "CHANGELOG.md"]
-```
+The documentation baseline is usually strong enough with these three files:
+
+- `README`
+- `API.md`
+- `CHANGELOG.md`
 
 An API note, a changelog, or a short architecture page helps the reviewer see that the project can be understood and maintained over time.
 

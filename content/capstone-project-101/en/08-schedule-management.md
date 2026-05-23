@@ -90,33 +90,27 @@ Week 4 | finalize deck | Q&A ready | none | 0.5 day
 
 ### Step 1 — Milestones
 
-```python
-milestones = ["MVP", "Demo", "Final"]
-```
+Lock the milestones around visible outcomes such as `MVP`, `Demo`, and `Final`.
 
 ### Step 2 — Weekly plan
 
-```python
-weeks = {1: "setup", 2: "core", 3: "polish"}
-```
+Write the weekly plan as a one-line summary, for example `week 1=setup`, `week 2=core`, and `week 3=polish`.
 
 ### Step 3 — Standup format
 
-```python
-standup = ["yesterday", "today", "blockers"]
-```
+The standup format only needs these three repeated prompts:
+
+- `yesterday`
+- `today`
+- `blockers`
 
 ### Step 4 — Risk buffer
 
-```python
-buffer_days = 0.2 * 21
-```
+Calculate the risk buffer in advance, for example as 20% of a 21-day schedule.
 
 ### Step 5 — Progress snapshot
 
-```python
-progress = {"done": 12, "todo": 8, "blocked": 2}
-```
+Capture progress in numbers such as `done=12`, `todo=8`, and `blocked=2` so blocked work is immediately visible.
 
 ## What to Notice in This Code
 

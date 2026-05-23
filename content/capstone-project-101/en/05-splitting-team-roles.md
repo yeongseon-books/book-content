@@ -90,27 +90,19 @@ Deployment check | Backend owner | Frontend owner | Must follow deployment check
 
 ### Step 1 — List members
 
-```python
-members = ["A", "B", "C", "D"]
-```
+List the team members clearly first, such as `A`, `B`, `C`, and `D`, so you can judge role overlap realistically.
 
 ### Step 2 — Map primary roles
 
-```python
-primary = {"A": "lead", "B": "backend", "C": "frontend", "D": "data"}
-```
+Map the primary roles explicitly, for example `A=lead`, `B=backend`, `C=frontend`, and `D=data`.
 
 ### Step 3 — Map backups
 
-```python
-backup = {"backend": "C", "frontend": "B", "data": "A"}
-```
+Define the backup mapping early too, such as `backend=C`, `frontend=B`, and `data=A`.
 
 ### Step 4 — Responsibility table
 
-```python
-raci = {"deploy": ("A", "B"), "test": ("D", "C")}
-```
+For the responsibility table, concise pairings such as `deploy=(A, B)` and `test=(D, C)` are usually enough.
 
 ### Step 5 — Review cadence
 

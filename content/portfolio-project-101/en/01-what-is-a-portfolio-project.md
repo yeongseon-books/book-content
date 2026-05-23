@@ -77,9 +77,7 @@ The second version is stronger even if the underlying codebase is small. The rea
 
 A portfolio project should start from the problem it is trying to solve, not from the framework name.
 
-```python
-project = {"name": "task-tracker", "problem": "lost team schedules"}
-```
+For example, you can state the project name as `task-tracker` and the problem as `lost team schedules` right away.
 
 That single field matters because it gives every later choice a reason. A reviewer needs to understand the target problem before they can judge whether the design and trade-offs make sense.
 
@@ -95,9 +93,13 @@ A live URL moves the project from explanation to proof. It also signals that you
 
 A README should guide the visitor through the repository in the right order.
 
-```python
-sections = ["problem", "demo", "stack", "run", "next"]
-```
+These five README sections are usually enough:
+
+- `problem`
+- `demo`
+- `stack`
+- `run`
+- `next`
 
 Those five sections already create a much better first impression than a title and a setup command. They tell the visitor what the project is, how to inspect it, and where it stands today.
 
@@ -105,9 +107,7 @@ Those five sections already create a much better first impression than a title a
 
 Good portfolio projects do not show only the outcome. They show judgment.
 
-```python
-decisions = [{"why": "FastAPI", "trade": "less_admin"}]
-```
+For example, you might note that you chose `FastAPI` and accepted the trade-off of having less built-in admin support.
 
 Two projects can ship the same feature. The one that explains why a framework was chosen and what trade-off came with it will usually feel much more mature.
 

@@ -91,33 +91,23 @@ Q&A | 4 min | explain stack, testing, and scope cuts | ADR and retrospective not
 
 ### Step 1 — Build the narrative
 
-```python
-story = ["problem", "solution", "demo", "result", "next"]
-```
+Fix the presentation narrative in five steps first: `problem`, `solution`, `demo`, `result`, and `next`.
 
 ### Step 2 — Slide counts
 
-```python
-slides = {"problem": 2, "solution": 3, "demo": 1, "result": 2, "next": 1}
-```
+Allocate slide counts by section in advance, for example `problem=2`, `solution=3`, `demo=1`, `result=2`, and `next=1`.
 
 ### Step 3 — Demo script
 
-```python
-demo_steps = ["login", "core_action", "result_view"]
-```
+Keep the demo scenes to three steps or fewer, such as `login`, `core_action`, and `result_view`.
 
 ### Step 4 — Q&A prep
 
-```python
-qna = ["why_this_stack", "how_we_tested", "what_we_cut"]
-```
+List likely questions in advance, such as `why_this_stack`, `how_we_tested`, and `what_we_cut`, and prepare the evidence for each answer.
 
 ### Step 5 — Time allocation
 
-```python
-minutes = {"talk": 8, "demo": 5, "qna": 7}
-```
+Write time allocation in numbers, for example `talk=8`, `demo=5`, and `qna=7`, so the ending does not get rushed.
 
 ## What to Notice in This Code
 

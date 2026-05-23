@@ -94,27 +94,23 @@ Reduce the core flow to one readable sentence, for example: register, upload, th
 
 ### Step 2 — Out of scope list
 
-```python
-out = ["payment", "i18n", "admin"]
-```
+Write the out-of-scope items down explicitly:
+
+- `payment`
+- `i18n`
+- `admin`
 
 ### Step 3 — Demo scenario
 
-```python
-demo = ["login_demo_user", "upload_sample", "show_share_link"]
-```
+Write the demo sequence in the same order you will show it, such as `login_demo_user`, `upload_sample`, and `show_share_link`.
 
 ### Step 4 — Success criteria
 
-```python
-success = {"happy_path": "<= 60s", "errors": 0}
-```
+Make the success criteria immediately checkable, such as `happy_path <= 60s` and `errors = 0`.
 
 ### Step 5 — Feedback form
 
-```python
-form = ["clarity", "speed", "value"]
-```
+Keep the feedback prompts short and repeatable, such as `clarity`, `speed`, and `value`.
 
 ## What to Notice in This Code
 
