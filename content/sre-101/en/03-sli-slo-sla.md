@@ -46,8 +46,6 @@ Separating them makes ownership and consequences clearer. The indicator tells yo
 
 > SLI is the indicator, SLO is the internal goal, and SLA is the external promise.
 
-## Concept at a glance
-
 ## Key Terms
 
 - **SLI**: a *service-level indicator*.

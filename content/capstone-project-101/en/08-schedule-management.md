@@ -53,8 +53,6 @@ Milestones without weekly plans stay abstract, while weekly plans without milest
 
 Buffer matters because student projects absorb many external shocks at once: exams, conflicting calendars, and surprise bugs. Without spare capacity, small slips turn into schedule-wide failure very quickly.
 
-## The flow at a glance
-
 ## Practical artifact: a weekly execution board
 
 A board like this often shows reality faster than a polished Gantt chart.

@@ -46,8 +46,6 @@ With a budget, the discussion becomes more precise. If the service still has roo
 
 > An error budget is the allowed distance between the reliability goal and actual behavior.
 
-## Concept at a glance
-
 ## Key Terms
 
 - **error budget**: the *allowed amount of failure*.

@@ -53,8 +53,6 @@ Trying new technology is not inherently bad. The risk appears when the team trea
 
 Operational burden matters separately too. A tool that feels simple on a laptop may become fragile in a demo environment. Deployment steps, configuration drift, and error handling all belong in the decision.
 
-## The flow at a glance
-
 ## Practical artifact: a lightweight ADR
 
 Stack decisions get revisited constantly when they only exist in conversation. A short ADR like the one below preserves the context.

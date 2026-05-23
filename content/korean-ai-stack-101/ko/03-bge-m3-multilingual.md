@@ -98,8 +98,6 @@ query = '배포 실패 시 쿠버네티스 롤백 절차를 찾고 싶습니다.
 
 중요한 점은 세 가지입니다. 첫째, 한국어 질의가 영어 runbook을 top-1로 끌어올립니다. 둘째, 같은 의미의 한국어 문서도 top-2에서 가깝게 따라옵니다. 셋째, top-3과의 점수 간격이 커서 cut-off 임계값을 실제로 적용할 수 있습니다.
 
-## 핵심 흐름
-
 ## 왜 dense 기준선부터 시작할까
 
 ![최소 실행 예제](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/03/03-01-minimal-runnable-example.ko.png)

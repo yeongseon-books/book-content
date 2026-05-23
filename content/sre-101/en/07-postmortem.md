@@ -46,8 +46,6 @@ Good postmortems turn one painful event into shared operating knowledge. That is
 
 > A postmortem is a learning system, not a document.
 
-## Concept at a glance
-
 ## Key Terms
 
 - **postmortem**: a *post-incident analysis* document.

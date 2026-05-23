@@ -46,8 +46,6 @@ The response process also shapes trust. Customers, leadership, and the team itse
 
 > Incident response is a team activity with fixed roles and a fixed order.
 
-## Concept at a glance
-
 ## Key Terms
 
 - **incident**: an *abnormal* condition with *impact*.

@@ -53,8 +53,6 @@ Clear primary ownership speeds up decisions because the team knows exactly where
 
 Backup ownership matters just as much. Student teams are vulnerable to exams, interviews, and conflicting schedules, so a single absent owner can quickly turn into a project-wide slowdown.
 
-## The flow at a glance
-
 ## Practical artifact: a responsibility matrix
 
 Even a small team benefits from writing responsibility lines like these before implementation starts.

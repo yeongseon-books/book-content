@@ -97,8 +97,6 @@ Two more facts:
 
 What matters: (1) the same key concepts ("의미", "임베딩", "토큰") appear every time, (2) wording varies but facts stay consistent, (3) length stays predictable so post-processing cost is bounded.
 
-## Core flow
-
 ## Why a provider-substitution exercise still helps
 
 ![Minimal runnable example](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/05/05-01-minimal-runnable-example.en.png)

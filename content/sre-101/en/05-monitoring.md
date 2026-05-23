@@ -46,8 +46,6 @@ Good monitoring reduces decision time. It tells the team whether there is user i
 
 > Monitoring is measurement that leads to action.
 
-## Concept at a glance
-
 ## Key Terms
 
 - **golden signals**: *latency, traffic, errors, saturation*.

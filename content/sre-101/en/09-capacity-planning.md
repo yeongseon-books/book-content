@@ -46,8 +46,6 @@ At the same time, excess capacity is not free. Good planning explains how much u
 
 > Capacity planning is the work of aligning supply with demand using numbers.
 
-## Concept at a glance
-
 ## Key Terms
 
 - **demand forecast**: predicted *future demand*.

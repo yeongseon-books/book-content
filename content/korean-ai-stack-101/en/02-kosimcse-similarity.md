@@ -94,8 +94,6 @@ query = '로그인 비밀번호를 다시 설정하고 싶어요.'  # "I want to
 
 What matters is (1) queries without the exact keyword "재설정" still match, (2) there is a large score gap between top-1 and top-2, and (3) you can manually inspect candidate meanings.
 
-## Core flow
-
 ## Why index only the questions first
 
 If you embed both questions and answers on day one, debugging becomes harder. A bad match may come from the query text, the answer wording, or the fact that long answer sentences drift semantically. Start with questions only and join the answer at display time.

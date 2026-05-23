@@ -53,8 +53,6 @@ A simple format such as KPT keeps the conversation grounded. Separating what to 
 
 Data and next actions strengthen the discussion further. Metrics such as bug counts, review latency, or rehearsal attempts make the team's pain points concrete, while owned actions turn insight into change.
 
-## The flow at a glance
-
 ## Practical artifact: a retrospective action log
 
 Retrospectives lead to change only when next actions are small and explicit enough to survive after the meeting.

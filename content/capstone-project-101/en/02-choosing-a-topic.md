@@ -53,8 +53,6 @@ When the topic is fuzzy, later requirements and scheduling become unstable too. 
 
 A shared comparison method makes those conversations faster. Instead of arguing from preference, the team can discuss impact, feasibility, risk, and demo clarity using the same rubric.
 
-## The flow at a glance
-
 ## Practical artifact: a topic comparison matrix
 
 Keeping at least three candidates and scoring them on the same axes quickly reveals whether the team has a decision or just a favorite idea.

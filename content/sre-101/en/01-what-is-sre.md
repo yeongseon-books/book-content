@@ -46,8 +46,6 @@ Teams that ignore this usually become dependent on memory, heroics, and manual r
 
 > SRE is the discipline that treats operations as a software problem.
 
-## Concept at a glance
-
 ## Key Terms
 
 - **reliability**: the *fraction* of time the system behaves as *expected*.

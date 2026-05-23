@@ -53,8 +53,6 @@ A clear statement lets the team ask the same question whenever a new feature app
 
 Writing assumptions and metrics next to the problem also strengthens the eventual demo and retrospective. The team can compare what it believed at kickoff with what it later observed.
 
-## The flow at a glance
-
 ## Practical artifact: a problem card
 
 A short problem card can dramatically improve solution discussions. The fields below are the minimum useful set.

@@ -36,6 +36,7 @@ check-content:
 	python3 scripts/check_ko_ai_cliches.py
 	python3 scripts/check_ko_translation_residue.py
 	python3 scripts/check_caption_presence.py
+	python3 scripts/check_empty_boilerplate_headings.py
 
 # Validate generated outputs (Medium HTML, exports)
 check-generated:

@@ -99,8 +99,6 @@ seo_description: 공급자를 바꾸는 일은 모델 이름 교체가 아니라
 
 중요한 점은 세 가지입니다. 첫째, “의미”, “임베딩”, “토큰” 같은 핵심 개념이 매번 유지됩니다. 둘째, 표현은 달라도 사실은 안정적으로 유지됩니다. 셋째, 응답 길이가 예측 가능해 후처리 비용을 통제할 수 있습니다.
 
-## 핵심 흐름
-
 ## 왜 공급자 대체 실습도 충분히 도움이 될까
 
 ![최소 실행 예제](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/05/05-01-minimal-runnable-example.ko.png)

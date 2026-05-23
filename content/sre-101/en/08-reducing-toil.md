@@ -46,8 +46,6 @@ Reducing toil is therefore not just a productivity topic. It is a reliability to
 
 > Toil is manual labor that automation can remove.
 
-## Concept at a glance
-
 ## Key Terms
 
 - **toil**: *repetitive, automatable* work.

@@ -53,8 +53,6 @@ Without acceptance criteria, teams can finish implementation and still disagree 
 
 Non-functional constraints deserve their own space too. Requirements such as mobile usability, no-sign-up flow, or response-time targets disappear quickly when they are buried inside generic feature bullets.
 
-## The flow at a glance
-
 ## Practical artifact: a requirements sheet
 
 Adding IDs like the sheet below makes it much easier to connect implementation tasks and later test checks.

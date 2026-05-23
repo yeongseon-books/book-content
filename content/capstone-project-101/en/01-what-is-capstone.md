@@ -53,8 +53,6 @@ The framing in this post affects every later project document. Once a team treat
 
 The same pattern appears in real product work. Teams define the problem, commit to a narrow flow, prepare a demo, and capture lessons for the next iteration. Treating the capstone this way makes the bridge from school to delivery much shorter.
 
-## The flow at a glance
-
 ## Practical artifact: a one-page project brief
 
 One simple way to separate a capstone from a generic assignment is to ask whether the team can produce a short brief like the one below before building features.

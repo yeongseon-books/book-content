@@ -46,8 +46,6 @@ Strong teams therefore design the operational path on purpose. They ask not only
 
 > Operability should be designed in like a feature, not bolted on later.
 
-## Concept at a glance
-
 ## Key Terms
 
 - **operability**: how *easy* it is to *operate* the system.

@@ -53,8 +53,6 @@ An MVP with one complete flow is also stronger on demo day. A user who can sign 
 
 The out-of-scope list protects that flow. Naming postponed items such as payments, admin tools, or internationalization keeps the team from quietly rebuilding the project every week.
 
-## The flow at a glance
-
 ## Practical artifact: an MVP contract
 
 One of the best tools for protecting scope is a short MVP contract that states the current boundary in plain language.

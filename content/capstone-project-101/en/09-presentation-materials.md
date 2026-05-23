@@ -53,8 +53,6 @@ A problem-solution-result arc gives the audience context immediately, which mean
 
 Separating demo planning and Q&A planning also makes the talk more resilient. Presentation-week failures are often caused less by missing features than by broken flow, time overruns, or unprepared questions.
 
-## The flow at a glance
-
 ## Practical artifact: a presentation run sheet
 
 Creating a run sheet like this before polishing slides often improves the talk more than visual tweaks do.

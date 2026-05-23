@@ -99,8 +99,6 @@ OCR 파이프라인은 네 단계로 분해됩니다.
 
 중요한 점은 세 가지입니다. 첫째, 줄이 의미 단위로 묶여 있어 BGE-M3가 올바른 줄을 검색할 수 있습니다. 둘째, 줄별 최소 confidence를 보존하면 후속 검토 우선순위를 만들 수 있습니다. 셋째, raw payload를 남겨 두면 나중에 OCR 모델을 교체해도 재처리가 단순합니다.
 
-## 핵심 흐름
-
 ## 왜 mock payload부터 시작할까
 
 ![최소 실행 예제](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-01-minimal-runnable-example.ko.png)

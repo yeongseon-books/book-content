@@ -46,8 +46,6 @@ Once the dimensions are explicit, reliability becomes easier to discuss as produ
 
 > Reliability is the work of proving a customer promise with numbers.
 
-## Concept at a glance
-
 ## Key Terms
 
 - **availability**: the *fraction of time* the system works.
