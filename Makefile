@@ -28,6 +28,7 @@ check-content:
 	python3 scripts/check_code_comments.py
 	python3 scripts/check_no_boilerplate_duplication.py
 	python3 scripts/check_no_trailing_colon_heading.py
+	python3 scripts/check_no_empty_links.py
 
 # Validate generated outputs (Medium HTML, exports)
 check-generated:
