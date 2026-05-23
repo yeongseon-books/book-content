@@ -375,11 +375,11 @@ kubectl get pods -l app=fastapi-hello -w
 ## 처음 질문으로 돌아가기
 
 - **Pod와 컨테이너는 왜 같은 말이 아니며, 왜 Kubernetes는 Pod를 스케줄링 단위로 볼까요?**
-  - 본문의 기준은 Pod·Deployment·Service — 워크로드를 표현하는 세 가지 방식를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - Kubernetes는 `containerPort: 8000` 같은 컨테이너 설정을 담더라도 실제 배치는 Pod 단위로 합니다. Pod는 네트워크 네임스페이스와 볼륨, 수명주기를 함께 공유하므로, 컨테이너 하나 예제라도 스케줄링과 복구의 최소 단위는 컨테이너가 아니라 Pod입니다.
 - **Deployment는 Pod를 직접 여러 개 만드는 것과 무엇이 다를까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - `replicas: 3`, `strategy.rollingUpdate.maxSurge: 1`, `maxUnavailable: 0`처럼 원하는 개수와 업데이트 방식을 선언하는 것이 Deployment의 역할입니다. Pod를 손으로 여러 개 띄우는 방식과 달리 Deployment는 죽은 Pod 복구, 롤링 업데이트, `kubectl rollout status deployment/fastapi-hello` 같은 운영 경로를 함께 제공합니다.
 - **Service는 왜 Pod IP를 직접 쓰지 않게 만드는 걸까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - Pod IP는 교체될 수 있지만 `Service`는 `selector: app: fastapi-hello`와 `targetPort: 8000`으로 안정적인 접근 지점을 남깁니다. 그래서 `kubectl get endpoints fastapi-hello`를 보면 현재 Ready Pod 집합이 바뀌어도 클라이언트는 `fastapi-hello`라는 이름으로 계속 붙을 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

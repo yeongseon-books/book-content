@@ -346,11 +346,11 @@ kubectl get nodes -L kubernetes.azure.com/mode,kubernetes.azure.com/agentpool
 ## 처음 질문으로 돌아가기
 
 - **API server, scheduler, controller manager, etcd는 각각 어떤 일을 할까요?**
-  - 본문의 기준은 클러스터 아키텍처 — Control Plane과 Node Pool를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - `API server`는 선언과 조회의 출입구이고, `etcd`는 그 상태를 저장하며, `scheduler`는 `Pod -> Node` 배치를 기록합니다. `controller loops`는 Deployment와 Endpoint 같은 객체를 원하는 상태로 계속 수렴시키므로, 네 컴포넌트는 모두 Control Plane 안에서 서로 다른 결정을 맡습니다.
 - **Node Pool은 단순한 VM 묶음 이상으로 왜 중요한 관리 단위일까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - Node Pool은 `vmSize`, `count`, `osType`, autoscaler 범위를 같이 묶어 관리하는 실행 계층입니다. 그래서 `az aks nodepool list --query "[].{name:name, mode:mode, count:count, vmSize:vmSize, osType:osType}"` 출력이 곧 비용, 용량, 배치 전략을 읽는 표가 됩니다.
 - **system node pool과 user node pool을 분리해야 하는 실무적 이유는 무엇일까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - `CoreDNS`, `metrics-server` 같은 시스템 Pod가 올라가는 system pool과 애플리케이션 Pod가 올라가는 user pool을 나누면 blast radius가 작아집니다. `CriticalAddonsOnly=true:NoSchedule` taint나 `kubernetes.azure.com/mode: user` 같은 기준을 두면 user workload 폭주가 클러스터 기반 계층까지 같이 흔드는 일을 줄일 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

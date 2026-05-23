@@ -281,11 +281,11 @@ kubectl get pods -n kube-system -o wide
 ## 처음 질문으로 돌아가기
 
 - **AKS는 self-managed Kubernetes와 비교할 때 정확히 무엇을 대신 운영해 줄까요?**
-  - 본문의 기준은 Azure Kubernetes Service란? — 직접 운영하지 않아도 되는 Kubernetes를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - AKS는 `API server`, `scheduler`, `etcd`가 있는 Control Plane 운영을 Azure가 맡아 주는 서비스입니다. 대신 `kubectl get nodes -o wide`로 보게 되는 Node Pool 용량, `Deployment`·`Service`·`Ingress`로 표현하는 워크로드, 그리고 스케일링과 관측 설계는 여전히 사용자 책임입니다.
 - **관리형 Kubernetes라고 해도 왜 여전히 `kubectl`, YAML, Service, Ingress를 이해해야 할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - AKS를 써도 앱은 결국 `kubectl get svc -A`, `kubectl get pods -n kube-system -o wide` 같은 Kubernetes 표면에서 운영합니다. Azure는 Control Plane을 숨겨 주지만 `Service`, `Ingress`, YAML 선언, probe 품질 같은 워크로드 문법까지 대신 결정해 주지는 않습니다.
 - **AKS 비용은 어디에서 발생하고, 왜 “클러스터 요금”보다 노드와 주변 리소스가 더 중요할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 본문에서 정리했듯이 비용의 중심은 `--node-count 1` 같은 노드 수와 Node Pool VM, 디스크, `Load Balancer`, `Public IP`입니다. 여기에 `Azure Container Registry`, `Log Analytics`, `Container Insights`, `Managed Prometheus`까지 붙기 때문에, AKS는 클러스터 사용료보다 주변 리소스 설계를 읽는 서비스에 가깝습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -368,11 +368,11 @@ kubectl get pods -n default -o wide
 ## 처음 질문으로 돌아가기
 
 - **Container Insights는 AKS 운영에서 무엇을 가장 빠르게 보여 줄까요?**
-  - 본문의 기준은 모니터링과 운영 — Container Insights, 로그, 알람를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - Container Insights는 노드, Pod, 컨테이너 상태를 한 화면에서 보여 주므로 “지금 클러스터가 어디서 흔들리는가”를 가장 빨리 파악하게 해 줍니다. 특히 restart 패턴이나 특정 Deployment의 불안정 징후를 본 뒤 `kubectl describe pod`나 KQL로 바로 내려가는 출발점 역할을 합니다.
 - **로그와 메트릭은 왜 같은 관측 데이터가 아니라 서로 다른 질문에 답할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - `ContainerLogV2`와 `KubeEvents`는 왜 실패했는지, 어느 시점에 어떤 예외가 있었는지 같은 문맥을 줍니다. 반면 `kube-state-metrics`가 보여 주는 `desired replicas`와 `available replicas`, HPA 상태, Node condition은 문제가 얼마나 오래, 얼마나 넓게 이어지는지 같은 추세를 읽게 해 줍니다.
 - **Log Analytics에서 어떤 KQL 테이블과 쿼리부터 익히는 편이 좋을까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 입문 단계에서는 `ContainerLogV2`, `KubeEvents`, `KubePodInventory`, `KubeNodeInventory` 네 테이블부터 익히는 편이 가장 실용적입니다. 본문에 나온 `PodNamespace == "default"` 로그 조회, `PodStatus == "Failed"` 조회, 최근 이벤트 `take 50` 같은 기본 쿼리만 있어도 첫 번째 triage 루프를 충분히 돌릴 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

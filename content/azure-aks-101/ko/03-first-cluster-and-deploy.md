@@ -482,11 +482,11 @@ kubectl get events -A --sort-by=.lastTimestamp
 ## 처음 질문으로 돌아가기
 
 - **실습용 AKS 클러스터를 만들 때 최소한 무엇을 결정해야 할까요?**
-  - 본문의 기준은 첫 클러스터 만들고 앱 배포하기 — Python/FastAPI를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 최소한 `RESOURCE_GROUP`, `LOCATION`, `CLUSTER_NAME`, `USER_POOL`과 `az aks create --node-count 1`로 시작할 노드 규모는 정해야 합니다. 이후 `--generate-ssh-keys`, 레지스트리 위치, 그리고 `LoadBalancer`로 공개할지 `ClusterIP + Ingress`로 갈지도 같이 잡아야 배포 흐름이 흔들리지 않습니다.
 - **기본 system pool 외에 user node pool을 왜 별도로 추가하는 편이 좋을까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 본문 예시의 `nodeSelector: kubernetes.azure.com/mode: user`처럼 앱 Pod를 user pool에 올리면 system pool과 역할이 분리됩니다. `az aks nodepool add --mode User`를 먼저 밟아 두면 이후 `fastapi-hello` Deployment가 어디에 배치되어야 하는지와 운영 기준이 함께 선명해집니다.
 - **`az aks get-credentials` 이후 `kubectl`이 실제로 어떤 계층과 대화하게 될까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - `az aks get-credentials --resource-group $RESOURCE_GROUP --name $CLUSTER_NAME` 이후의 `kubectl`은 Azure CLI가 아니라 Kubernetes API와 대화합니다. 그래서 `kubectl apply -f fastapi-hello.yaml`, `kubectl get deployments`, `kubectl get service fastapi-hello`는 클러스터 안 원하는 상태와 실제 배치 결과를 확인하는 단계입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
