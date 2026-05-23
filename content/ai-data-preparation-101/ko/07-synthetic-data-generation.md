@@ -405,11 +405,11 @@ Self-Instruct는 coverage를 넓히고, Evol-Instruct는 난도를 높이고, RA
 ## 처음 질문으로 돌아가기
 
 - **도메인 파인튜닝용 synthetic batch는 어떤 입력에서 시작해 어떤 산출물로 끝나야 할까요?**
-  - 본문의 기준은 합성 데이터 생성 — Self-Instruct부터 Distillation까지를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 이 글의 흐름에서는 `SEED_TASKS`와 `FAQ_CHUNKS`에서 시작해 `generate_batch()`를 거친 뒤, `validate_batch()`를 통과한 `accepted.jsonl`로 끝나야 합니다. 즉, 모델 출력 텍스트가 아니라 검증 가능한 JSON artifact가 최종 산출물입니다.
 - **Self-Instruct, Evol-Instruct, RAG eval, distillation은 어느 시점에 선택해야 할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - coverage를 넓히면 `self_instruct`, 난도를 올리면 `evol_instruct`, 근거 일치성을 따로 재면 `rag_eval`, teacher 출력 재사용 정책이 통과된 뒤에만 `distillation`을 고릅니다. 본문에서 `BRANCH_GUIDE`와 `require_policy_review()`를 따로 둔 이유가 그 분기 기준을 코드로 고정하기 위해서입니다.
 - **생성된 JSON 산출물은 어떤 검증 게이트를 통과해야 실제 데이터셋에 편입할 수 있을까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - `validate_item()`이 필수 키, `evidence`, refusal 문구, 길이를 검사하고, `validate_batch()`가 `accept_ratio`, `unique_ratio`, `refusal_ratio`까지 닫아 줍니다. 이 숫자를 넘지 못하면 배치는 많아 보여도 `reject_batch`로 끝나야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

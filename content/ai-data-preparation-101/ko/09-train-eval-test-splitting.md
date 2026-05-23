@@ -444,11 +444,11 @@ LLM 시대에는 contamination 통제가 여기에 추가됩니다. benchmark가
 ## 처음 질문으로 돌아가기
 
 - **단순 `train_test_split`이 실제 운영 조건을 놓치는 대표적인 경우는 무엇일까요?**
-  - 본문의 기준은 학습/평가/테스트 분할과 Contamination 통제를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 기본 `train_test_split(data, test_size=0.3)`은 iid를 가정하므로 시간 순서, 사용자 반복, 소수 클래스 문제를 그대로 놓칩니다. 그래서 본문은 temporal split, `GroupShuffleSplit`, `StratifiedShuffleSplit`을 각각 따로 꺼냈습니다.
 - **클래스 불균형, 사용자 누수, 시계열 데이터는 왜 서로 다른 split 전략을 요구할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 라벨 비율이 문제면 `stratify=y`, 같은 `user_id` 누수가 문제면 group split, 미래 정보 유입이 문제면 `timestamp` 기준 분할이 필요합니다. 세 상황은 깨지는 이유가 다르기 때문에 한 가지 split으로 동시에 해결되지 않습니다.
 - **LLM benchmark contamination은 기존 데이터 누수와 무엇이 다르고 왜 더 위험할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 기존 누수는 train과 eval이 직접 겹치는 문제라면, contamination은 pretraining corpus 안에 benchmark 문장이 이미 들어 있었는지를 묻는 문제입니다. 그래서 본문도 `make_ngrams()`와 `contamination_overlap()`으로 13-gram 겹침을 따로 보고, split 뒤에 decontamination 단계를 DAG로 강제했습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

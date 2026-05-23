@@ -451,11 +451,11 @@ def release_readiness(summary: dict) -> tuple[bool, list[str]]:
 ## 처음 질문으로 돌아가기
 
 - **재학습 시점에 “이 데이터가 어디서 왔는지”를 바로 답하려면 무엇을 남겨야 할까요?**
-  - 본문의 기준은 원본 데이터 수집과 카탈로깅를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - `DatasetCard`에 `source_type`, `source_url`, `snapshot_date`, `row_count`, `sha256`를 남기고 `fingerprint_file()` 결과를 같이 저장해야 합니다. 그래야 재학습 때도 “이 CSV가 어떤 시점의 어떤 원본이었는가”를 카드 한 장으로 바로 설명할 수 있습니다.
 - **first-party, 공개 데이터셋, 스크레이핑, 벤더 데이터는 어떤 위험이 각각 다를까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - first-party는 consent와 retention이 핵심이고, 공개 데이터셋은 라이선스와 재배포 범위가, 스크레이핑은 `robots.txt`와 rate limit 준수가, 벤더 데이터는 계약 범위와 provenance 추적이 핵심입니다. 그래서 글에서도 `PoliteScraper`, license 필드, `USAGE_POLICY`를 각각 따로 확인했습니다.
 - **DatasetCard에는 최소 어떤 필드가 있어야 운영과 규제 대응이 가능할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 이 글 기준 최소 필드는 이름, 버전, source 정보, license, snapshot 시점, `sha256`, schema, owner입니다. 여기에 `pii_fields`와 `retention_days`까지 들어가야 이후 익명화 단계와 규제 대응이 끊기지 않습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
