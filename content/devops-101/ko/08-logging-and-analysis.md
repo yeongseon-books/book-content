@@ -365,6 +365,7 @@ scrape_configs:
 
 결국 로그 품질은 장애 대응 품질과 같습니다. 같은 사건을 더 빠르게 재구성할 수 있을수록 MTTR이 줄어듭니다.
 
+```text
 ## 0-5분
 1. SEV 판정 (SEV1/SEV2)
 2. incident 채널 개설

@@ -541,7 +541,6 @@ def test_leader_crash_during_commit():
     # 새 리더의 commit index에 해당 엔트리가 없어야 함
     assert not new_leader.has_committed({"cmd": "set x=1"})
 ```
-```
 
 이런 장애 시나리오 테스트 없이 합의 구현체를 선택하면, 운영 중 예상치 못한 엣지 케이스에서 데이터 손실이 발생할 수 있습니다. Jepsen 같은 도구가 존재하는 이유이기도 합니다.
 

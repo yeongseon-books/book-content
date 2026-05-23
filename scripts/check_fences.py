@@ -21,15 +21,15 @@ def check_file(path: str) -> str | None:
     in_fence = False
     fence_char = None
     for line in lines:
+        stripped = line.rstrip()
         if not in_fence:
-            if line.startswith("```"):
-                in_fence = True
-                fence_char = "```"
-            elif line.startswith("~~~"):
-                in_fence = True
-                fence_char = "~~~"
+            for marker in ("````", "```", "~~~~", "~~~"):
+                if line.startswith(marker):
+                    in_fence = True
+                    fence_char = marker
+                    break
         else:
-            if line.strip() == fence_char:
+            if stripped == fence_char:
                 in_fence = False
                 fence_char = None
     return fence_char if in_fence else None

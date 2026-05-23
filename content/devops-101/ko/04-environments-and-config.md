@@ -427,6 +427,7 @@ config_change_flow:
 
 추가로 설정 키 명명 규칙을 통일하면 운영 효율이 좋아집니다. 예를 들어 모든 외부 API 키를 `EXTERNAL_<SERVICE>_API_KEY` 형식으로 고정하면 검색, 감사, 회전 자동화가 쉬워집니다. 작은 규칙이지만 장기 운영에서 큰 차이를 만듭니다.
 
+```text
 ## 0-5분
 1. SEV 판정 (SEV1/SEV2)
 2. incident 채널 개설

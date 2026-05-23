@@ -771,7 +771,7 @@ https://acme.github.io/acme-utils/ 업데이트
 
 MkDocs Material에서 admonition(경고/정보 박스)을 활용하면 문서의 가독성이 크게 높아집니다.
 
-```markdown
+````markdown
 !!! tip "Best Practice"
     설정값은 환경 변수에서 읽되, 기본값을 항상 제공하세요.
 
@@ -786,7 +786,7 @@ MkDocs Material에서 admonition(경고/정보 박스)을 활용하면 문서의
 
 !!! note
     이 기능은 Python 3.11 이상에서만 사용할 수 있습니다.
-```
+````
 
 이 문법은 Markdown의 표준이 아니라 MkDocs Material 확장입니다. Sphinx에서는 `.. note::`, `.. warning::` 디렉티브가 같은 역할을 합니다.
 
