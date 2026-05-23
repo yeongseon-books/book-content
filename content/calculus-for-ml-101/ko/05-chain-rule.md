@@ -473,6 +473,7 @@ def gradcheck_scalar(fn, x, d_analytic, h=1e-6):
 - **단계가 여러 개인 합성함수에서 gradient는 어떤 순서로 전달될까요?**
   - forward의 역순으로 전달됩니다. 출력에서 시작한 상류 gradient를 각 노드의 local derivative와 곱해 이전 노드로 보냅니다. Jacobian 관점에서는 이 과정이 행렬 곱 체인으로 일반화되며, 역전파는 그 연산을 효율적으로 수행한 구현입니다.
 
+<!-- toc:begin -->
 ## 시리즈 목차
 
 - [Calculus for ML 101 (1/10): 미분이란 무엇인가](./01-what-is-derivative.md)

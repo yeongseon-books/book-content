@@ -444,6 +444,7 @@ def finite_check(loss_fn, inputs):
 - **손실 함수의 gradient는 왜 학습 신호라고 불릴까요?**
   - gradient는 "얼마나 틀렸는가"를 "어느 방향으로 얼마나 움직일 것인가"로 변환합니다. 손실 지형, 커스텀 손실 항, 수치 안정화 규칙까지 포함해 이 신호 품질을 관리해야 실제 학습이 안정적으로 진행됩니다.
 
+<!-- toc:begin -->
 ## 시리즈 목차
 
 - [Calculus for ML 101 (1/10): 미분이란 무엇인가](./01-what-is-derivative.md)
