@@ -345,11 +345,11 @@ az webapp log tail --name $APP --resource-group $RG
 ## 처음 질문으로 돌아가기
 
 - **첫 번째 Function App을 만들기 전에 어떤 파라미터를 먼저 확정해야 할까요?**
-  - 본문의 기준은 함수 하나 배포하기 — 로컬에서 Azure까지를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 먼저 `RG`, `LOC`, `SA`, `APP`처럼 Resource Group, 리전, Storage Account, Function App 이름을 정해야 합니다. 여기에 `--runtime-version 3.11`, `--flexconsumption-location $LOC`, `--instance-memory 2048`, `--maximum-instance-count 100`까지 확정해야 배포 후 스케일과 런타임 동작이 일관됩니다.
 - **zip deploy, GitHub Actions, VS Code 직접 배포 중에서 무엇부터 시작하는 편이 좋을까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 첫 흐름은 `func azure functionapp publish $APP`처럼 CLI publish로 시작하는 편이 가장 단순합니다. 이 경로를 한 번 밟아 두면 나중에 `--build remote`, zip deploy, GitHub Actions, VS Code 자동화가 실제로는 같은 Function App 게시 과정을 다른 래퍼로 감싼 것이라는 점이 더 잘 보입니다.
 - **Function App은 왜 연결된 Storage Account를 반드시 필요로 할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - Function App이 쓰는 Storage Account는 비즈니스 데이터 저장소가 아니라 Host 동작에 필요한 필수 인프라입니다. 본문에서 설명했듯이 트리거 락, invocation 메타데이터, Timer 스케줄 상태 같은 런타임 정보가 여기에 들어가므로 `AzureWebJobsStorage`가 없으면 앱 자체가 제대로 기동하지 못할 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

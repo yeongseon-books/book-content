@@ -263,11 +263,11 @@ az functionapp plan create \
 ## 처음 질문으로 돌아가기
 
 - **각 플랜은 정확히 무엇을 기준으로 과금하고 무엇을 제약할까요?**
-  - 본문의 기준은 어떤 플랜을 선택해야 할까 — Consumption / Flex / Premium / Dedicated를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - `Consumption`과 `Flex Consumption`은 실행 기반 종량제가 중심이지만, Flex는 `Always Ready`를 켜면 그 warm 용량에도 비용이 붙습니다. `Premium`은 최소 인스턴스 비용을 내고 warm capacity를 확보하는 모델이고, `Dedicated`는 App Service Plan SKU 기준으로 과금되므로, 플랜마다 scale to zero 가능 여부와 고정비 구조가 함께 달라집니다.
 - **플랜 선택에서 가격보다 콜드 스타트 허용 범위가 먼저 중요해지는 경우는 언제일까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 첫 요청 지연이 비즈니스적으로 허용되지 않는 HTTP 경로라면 가격표보다 warm baseline이 더 먼저 중요합니다. 이럴 때는 `Premium`의 최소 인스턴스나 `Flex Consumption`의 `Always Ready`처럼 cold start를 줄이는 레버가 있는지부터 봐야 하고, 그다음 비용을 비교하는 편이 맞습니다.
 - **VNet 통합, Always Ready 같은 플랫폼 기능은 어떤 플랜 선택을 사실상 강제할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - `VNet` 통합이 필수면 classic `Consumption`은 바로 후보에서 빠지고 `Flex`, `Premium`, `Dedicated` 쪽으로 좁혀집니다. 여기에 Windows 요구나 배포 슬롯까지 필요하면 `Premium` 또는 `Dedicated`가 더 자연스럽고, Linux 기반 새 서버리스 앱에서 `Always Ready`와 per-function scaling이 핵심이면 `Flex Consumption`이 기본 후보가 됩니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

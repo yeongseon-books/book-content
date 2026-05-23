@@ -241,11 +241,11 @@ python ... azure_functions_worker ...
 ## 처음 질문으로 돌아가기
 
 - **Functions Host와 언어 Worker는 왜 같은 프로세스가 아니라 분리된 프로세스일까요?**
-  - 본문의 기준은 Host와 Worker — 함수는 누가 실행하는가를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - Host가 `CPython`, `V8`, `JVM`을 한 프로세스 안에 직접 품는 대신, Azure Functions는 Host와 언어 Worker를 분리해 언어별 런타임 충돌을 줄입니다. 그래서 Host는 트리거와 바인딩, 스케일 신호를 맡고 실제 사용자 코드는 `azure_functions_worker` 같은 별도 프로세스에서 실행됩니다.
 - **Host와 Worker 사이의 gRPC 채널에서는 어떤 메시지 흐름이 오갈까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - Host는 트리거를 감지한 뒤 함수 이름, 입력 페이로드, 바인딩 해석 결과를 gRPC로 Worker에 넘깁니다. Worker는 그 호출을 실행한 뒤 반환값과 예외, 로그 신호를 다시 Host로 돌려주므로, `func start --verbose`에서 보이는 초기화 메시지와 실제 함수 호출은 이 채널 위에서 이어집니다.
 - **한 Worker 프로세스는 동시에 몇 개의 함수 호출을 처리할 수 있을까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - Python Worker는 단순히 “항상 한 번에 하나”로 끝나지 않습니다. 동기 `def`는 thread pool에서 겹칠 수 있고, `async def`는 하나의 event loop를 공유하며, 필요하면 `FUNCTIONS_WORKER_PROCESS_COUNT`와 `host.json`의 `maxConcurrentRequests` 같은 설정으로 인스턴스 내부 동시성을 더 조절할 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

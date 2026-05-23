@@ -332,11 +332,11 @@ az monitor app-insights events show \
 ## 처음 질문으로 돌아가기
 
 - **Application Insights와 Log Analytics는 Azure Functions 운영에서 어떤 역할로 나뉠까요?**
-  - 본문의 기준은 모니터링과 운영 기초를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - Application Insights는 `requests`, `exceptions`, `dependencies`, `traces`를 중심으로 함수 호출과 예외 흐름을 바로 읽게 해 주는 1차 운영 표면입니다. 여기서 본 이상 징후를 더 긴 시간축의 쿼리와 메트릭으로 이어 붙일 때 Log Analytics와 KQL이 실질적인 분석 도구가 됩니다.
 - **함수별 지연, 실패율, 의존성 호출을 보려면 어떤 쿼리를 먼저 갖고 있어야 할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 본문에 나온 기본형이면 충분합니다. `requests`에서 `Failed=countif(success == false)`와 `percentile(duration, 95)`를 보고, `dependencies`에서 `target`, `resultCode`, `FailureRate`를 함께 보면 어느 함수가 느린지와 어떤 외부 시스템이 실패를 만드는지 빠르게 좁힐 수 있습니다.
 - **Live Metrics와 stream logs는 언제 각각 더 유리할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - Live Metrics는 인스턴스 수, 실패율, 응답 시간처럼 “지금 무슨 일이 벌어지는가”를 30초 안에 보는 데 가장 좋습니다. 반대로 `az webapp log tail --name $APP --resource-group $RG` 같은 stream logs나 `traces` 조회는 배포 직후 인덱싱 실패, Host 시작 문제, 특정 함수 예외처럼 원인 문맥을 바로 확인할 때 더 유리합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
