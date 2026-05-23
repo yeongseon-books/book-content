@@ -130,7 +130,7 @@ class CanaryDeployer:
 
 ![Rollback - "되돌릴 수 있어야" 배포다](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/10/10-04-rollback-a-deploy-is-only-a-deploy-if-yo.ko.png)
 
-배포 후 30초 안에 이전 버전으로 되돌릴 수 없다면 그것은 배포가 아니라 사고입니다.
+배포 후 30초 안에 이전 버전으로 되돌릴 수 없다면 그건 배포가 아니라 사고입니다.
 
 ```python
 class HarnessVersion:
