@@ -38,9 +38,9 @@ sqlite3는 편의를 위해 트랜잭션을 암묵적으로 시작합니다. 이
 
 ## 먼저 던지는 질문
 
-- Transaction과 isolation level (sqlite3, PEP 249)를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?
-- Transaction과 isolation level (sqlite3, PEP 249)에서 예제나 다이어그램으로 검증해야 할 핵심 신호는 무엇일까요?
-- Transaction과 isolation level (sqlite3, PEP 249)를 실제 시스템에 적용할 때 어떤 실패를 먼저 막아야 할까요?
+- sqlite3는 정확히 언제 암묵적 `BEGIN`을 시작하고 `con.in_transaction`은 그 경계를 어떻게 보여 줄까요?
+- `DEFERRED`, `IMMEDIATE`, `EXCLUSIVE`와 WAL mode를 함께 보면 write 충돌 시점이 어떻게 달라질까요?
+- commit 누락, 장시간 lock 대기, nested 작업은 이 글의 어떤 패턴으로 각각 다뤄야 할까요?
 
 ## Mental Model — connection이 transaction 단위
 
@@ -367,12 +367,12 @@ sqlite3의 transaction은 driver가 친절하게 자동 관리해 주지만, 그
 
 ## 처음 질문으로 돌아가기
 
-- **Transaction과 isolation level (sqlite3, PEP 249)를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?**
-  - 먼저 봐야 할 경계는 transaction이 connection 어디서 열리고 `commit()` 또는 `rollback()`으로 어디서 닫히는지입니다. sqlite3는 첫 DML 직전에 implicit `BEGIN`을 거는 driver이므로, 이 자동 경계를 모르면 `con.close()`만 호출하고 데이터를 잃거나 lock 대기를 뒤늦게 맞게 됩니다.
-- **Transaction과 isolation level (sqlite3, PEP 249)에서 예제나 다이어그램으로 검증해야 할 핵심 신호는 무엇일까요?**
-  - 본문에서 가장 중요한 신호는 `con.in_transaction` 값, `isolation_level`별 BEGIN 방식, 그리고 `DEFERRED`·`IMMEDIATE`·`EXCLUSIVE`가 락을 잡는 시점입니다. 여기에 `PRAGMA journal_mode=WAL`과 Python 3.12의 `autocommit=False` 예제를 함께 보면, 읽기/쓰기 혼합 워크로드에서 어떤 설정이 충돌을 앞당기고 어떤 설정이 동시성을 높이는지 바로 드러납니다.
-- **Transaction과 isolation level (sqlite3, PEP 249)를 실제 시스템에 적용할 때 어떤 실패를 먼저 막아야 할까요?**
-  - 우선 막아야 할 실패는 commit 누락으로 인한 데이터 유실, 장시간 DEFERRED 트랜잭션으로 인한 `SQLITE_BUSY`, 그리고 WAL 없이 writer가 reader를 오래 막는 상황입니다. 그래서 이 글은 write 경로의 `IMMEDIATE`, 운영 기본값으로 `WAL + synchronous=NORMAL + busy_timeout`, 그리고 nested 작업용 `SAVEPOINT`를 실무 기본 패턴으로 묶었습니다.
+- **sqlite3는 정확히 언제 암묵적 `BEGIN`을 시작하고 `con.in_transaction`은 그 경계를 어떻게 보여 줄까요?**
+  - 본문 실습에서는 `SELECT`만 실행할 때 `con.in_transaction`이 `False`로 남고, 첫 `INSERT` 직후에 `True`로 바뀌는 흐름을 그대로 보여 줬습니다. 즉 sqlite3 기본 모드에서는 첫 DML 직전에 transaction이 열리고, `commit()`이나 `rollback()` 뒤에 다시 닫히는 경계를 `con.in_transaction`으로 바로 확인할 수 있습니다.
+- **`DEFERRED`, `IMMEDIATE`, `EXCLUSIVE`와 WAL mode를 함께 보면 write 충돌 시점이 어떻게 달라질까요?**
+  - 글은 `DEFERRED`가 첫 write 시점까지 충돌을 미루고, `IMMEDIATE`는 `BEGIN` 시점에 RESERVED lock을 잡아 writer 충돌을 앞당기며, `EXCLUSIVE`는 reader까지 막는다고 비교했습니다. 여기에 WAL을 켜면 reader와 writer가 더 오래 공존할 수 있으므로, 운영 기본값은 대개 `IMMEDIATE`와 `WAL`의 조합이 됩니다.
+- **commit 누락, 장시간 lock 대기, nested 작업은 이 글의 어떤 패턴으로 각각 다뤄야 할까요?**
+  - commit 누락은 `with sqlite3.connect(...) as con:` 패턴으로 줄이고, 장시간 lock 대기는 `timeout`, `busy_timeout`, `isolation_level='IMMEDIATE'`, WAL 설정으로 앞에서 흡수하도록 정리했습니다. nested 작업은 PEP 249 기본 기능이 아니라 SQLite `SAVEPOINT` 예제로 부분 rollback을 만드는 방식으로 다뤘습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

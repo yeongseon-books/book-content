@@ -34,9 +34,9 @@ Python은 한 대의 컴퓨터에 여러 개가 동시에 존재할 수 있고, 
 
 ## 먼저 던지는 질문
 
-- 왜 Python인가, 그리고 설치와 venv를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?
-- 왜 Python인가, 그리고 설치와 venv에서 예제나 다이어그램으로 검증해야 할 핵심 신호는 무엇일까요?
-- 왜 Python인가, 그리고 설치와 venv를 실제 시스템에 적용할 때 어떤 실패를 먼저 막아야 할까요?
+- 왜 system Python과 프로젝트용 `.venv`를 분리해야 하고, 그 경계는 어떤 명령으로 바로 확인할 수 있을까요?
+- 활성화가 정말 성공했다는 사실을 `which python`, `sys.executable`, `pip --version` 출력에서 어떻게 읽어야 할까요?
+- `sudo pip install`, 버전 없는 `python3 -m venv`, `.venv/` 커밋 같은 실수는 왜 재현성과 협업을 망가뜨릴까요?
 
 ## 멘탈 모델
 
@@ -460,12 +460,12 @@ venv: .venv
 
 ## 처음 질문으로 돌아가기
 
-- **왜 Python인가, 그리고 설치와 venv를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?**
-  - 먼저 system Python과 프로젝트 전용 `.venv`의 경계를 분리해서 봐야 합니다. `python3.12 -m venv .venv`로 환경을 만들고 `which python`, `sys.executable`, `pip --version`이 모두 `.venv` 안 경로를 가리키는지 확인해야 OS 영역 오염과 프로젝트 의존성 혼선을 막을 수 있습니다.
-- **왜 Python인가, 그리고 설치와 venv에서 예제나 다이어그램으로 검증해야 할 핵심 신호는 무엇일까요?**
-  - 핵심 신호는 프롬프트의 `(.venv)` 표시보다도 실제 인터프리터 경로와 설치 위치입니다. `hello.py`가 `Interpreter path: /.../.venv/bin/python`을 출력하고 `pip freeze > requirements.txt`에 `requests==2.32.3` 같은 고정 버전이 남는지를 보면 환경 격리와 재현 가능성을 함께 검증할 수 있습니다.
-- **왜 Python인가, 그리고 설치와 venv를 실제 시스템에 적용할 때 어떤 실패를 먼저 막아야 할까요?**
-  - 가장 먼저 막아야 할 실패는 `sudo pip install`로 system Python을 오염시키는 일과, venv를 만들어 놓고 활성화하지 않은 채 패키지를 설치하는 일입니다. Windows의 PowerShell 실행 정책 문제, `.venv/`를 git에 올리는 실수, `python3` 대신 버전 없는 명령을 써서 다른 인터프리터를 잡는 문제도 초반 체크리스트로 차단해야 합니다.
+- **왜 system Python과 프로젝트용 `.venv`를 분리해야 하고, 그 경계는 어떤 명령으로 바로 확인할 수 있을까요?**
+  - 이 글은 OS가 쓰는 system Python과 프로젝트가 따로 들고 가는 `.venv`를 분리해야 패키지 충돌과 권한 문제를 피할 수 있다고 설명했습니다. `python3.12 -m venv .venv`로 환경을 만든 뒤 `which python` 또는 Windows의 `where python`으로 경로가 프로젝트 내부를 가리키는지 바로 확인하는 흐름이 핵심입니다.
+- **활성화가 정말 성공했다는 사실을 `which python`, `sys.executable`, `pip --version` 출력에서 어떻게 읽어야 할까요?**
+  - 프롬프트의 `(.venv)` 표시는 힌트일 뿐이고, 진짜 검증은 세 명령이 모두 `.venv` 안 경로를 가리키는지 보는 것입니다. 본문에서는 `hello.py`의 `Interpreter path` 출력과 `pip --version`, `pip freeze > requirements.txt` 결과까지 묶어 인터프리터·패키지 설치 위치·재현 가능성을 함께 확인했습니다.
+- **`sudo pip install`, 버전 없는 `python3 -m venv`, `.venv/` 커밋 같은 실수는 왜 재현성과 협업을 망가뜨릴까요?**
+  - `sudo pip install`은 system Python을 오염시키고, 버전이 모호한 명령으로 만든 venv는 팀마다 다른 인터프리터를 물고 들어올 수 있습니다. `.venv/`는 컴퓨터마다 다른 바이너리 묶음이므로 커밋 대상이 아니며, 협업은 `requirements.txt`와 명시된 Python 버전으로 맞추는 것이 이 글의 결론입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

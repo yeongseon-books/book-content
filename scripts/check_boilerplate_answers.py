@@ -19,9 +19,14 @@ ROOT = Path(__file__).resolve().parent.parent
 CONTENT = ROOT / "content"
 
 BANNED = (
+    # #1260: generic answer bullets
     "한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호",
     "예제와 그림에서는 어떤 값이 들어오고",
     "운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨",
+    # #1261: generic opening questions (paired with #1260 answers)
+    "운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요",
+    "예제나 다이어그램으로 검증해야 할 핵심 신호는 무엇일까요",
+    "실제 시스템에 적용할 때 어떤 실패를 먼저 막아야 할까요",
 )
 
 

@@ -38,9 +38,9 @@ seo_description: '[col1, col2, col3] row_factory │ ─────────
 
 ## 먼저 던지는 질문
 
-- Row factory와 type adapter (sqlite3, PEP 249)를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?
-- Row factory와 type adapter (sqlite3, PEP 249)에서 예제나 다이어그램으로 검증해야 할 핵심 신호는 무엇일까요?
-- Row factory와 type adapter (sqlite3, PEP 249)를 실제 시스템에 적용할 때 어떤 실패를 먼저 막아야 할까요?
+- `sqlite3.Row`, dict, dataclass, Pydantic row factory는 어떤 상황에서 각각 선택해야 할까요?
+- `Decimal`, `Enum`, JSON 값을 SQLite와 안전하게 왕복하려면 adapter, converter, `detect_types`를 어떻게 묶어야 할까요?
+- 컬럼 순서 변경, `REAL` 금액 저장, view/join 결과 타입 유실 같은 문제를 이 글의 패턴으로 어떻게 줄일 수 있을까요?
 
 ## Mental Model — 두 단계 변환
 
@@ -346,12 +346,12 @@ row factory는 **shape**, adapter/converter는 **value**를 다룬다는 두 축
 
 ## 처음 질문으로 돌아가기
 
-- **Row factory와 type adapter (sqlite3, PEP 249)를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?**
-  - 먼저 확인할 경계는 값 단위 변환과 행 단위 변환을 섞지 않았는지입니다. 이 글에서 adapter/converter는 `Decimal`, `Enum`, JSON 같은 단일 값의 왕복을 맡고, row factory는 tuple을 `sqlite3.Row`나 Pydantic 모델 같은 shape로 바꾸는 층으로 분리했습니다.
-- **Row factory와 type adapter (sqlite3, PEP 249)에서 예제나 다이어그램으로 검증해야 할 핵심 신호는 무엇일까요?**
-  - 검증할 핵심 신호는 `detect_types=PARSE_DECLTYPES | PARSE_COLNAMES`가 실제로 converter를 호출하는지, 그리고 `con.row_factory = sqlite3.Row` 또는 Pydantic 팩토리가 원하는 shape를 안정적으로 만드는지입니다. 특히 `Decimal`을 `REAL`이 아니라 adapter/converter로 왕복시키는 예시는 정밀도와 스키마 안정성을 동시에 확인하는 기준이 됩니다.
-- **Row factory와 type adapter (sqlite3, PEP 249)를 실제 시스템에 적용할 때 어떤 실패를 먼저 막아야 할까요?**
-  - 가장 먼저 막아야 할 실패는 `row[0]`, `row[2]` 같은 컬럼 인덱스 의존, 금액을 `REAL`로 저장하는 정밀도 사고, 그리고 converter를 등록해 놓고 `detect_types`를 빼먹는 실수입니다. 그래서 본문은 connection 팩토리 한 곳에 `row_factory`, adapter, converter를 모아 두고 repository 바깥으로 SQLite storage class가 새지 않게 하라고 권합니다.
+- **`sqlite3.Row`, dict, dataclass, Pydantic row factory는 어떤 상황에서 각각 선택해야 할까요?**
+  - 글은 `sqlite3.Row`를 가장 가벼운 기본값으로 두고, 이름 접근이 필요하지만 성능도 챙겨야 할 때 적합하다고 설명했습니다. 반면 dict는 단순 직렬화, dataclass와 Pydantic은 타입 검증과 IDE 지원이 중요한 API·도메인 계층에 맞는 선택지로 정리했습니다.
+- **`Decimal`, `Enum`, JSON 값을 SQLite와 안전하게 왕복하려면 adapter, converter, `detect_types`를 어떻게 묶어야 할까요?**
+  - 본문은 `sqlite3.register_adapter()`와 `sqlite3.register_converter()`를 connection 팩토리 수준에서 한 번 등록하고, `detect_types=PARSE_DECLTYPES | PARSE_COLNAMES`로 실제 변환을 켜는 패턴을 제시했습니다. 그래서 `Decimal`은 정밀도를 잃지 않고, `Enum`과 JSON도 repository 밖에서 문자열이나 bytes로 새지 않게 만들 수 있습니다.
+- **컬럼 순서 변경, `REAL` 금액 저장, view/join 결과 타입 유실 같은 문제를 이 글의 패턴으로 어떻게 줄일 수 있을까요?**
+  - 컬럼 순서 문제는 `row[0]` 대신 이름 기반 row factory로 줄이고, 금액은 `REAL` 대신 `Decimal` adapter와 `TEXT` 또는 `INTEGER` 저장 전략으로 다뤄야 한다고 설명했습니다. 또 선언 타입이 사라지는 view나 join 결과는 `AS "x [type]"` 별칭과 `PARSE_COLNAMES`를 써서 converter를 다시 강제하라고 정리했습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

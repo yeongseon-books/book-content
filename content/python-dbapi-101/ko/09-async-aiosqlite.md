@@ -39,9 +39,9 @@ seo_description: aiosqlite는 SQLite를 비동기로 바꾸지 않는다. connec
 
 ## 먼저 던지는 질문
 
-- aiosqlite로 비동기 SQLite 다루기를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?
-- aiosqlite로 비동기 SQLite 다루기에서 예제나 다이어그램으로 검증해야 할 핵심 신호는 무엇일까요?
-- aiosqlite로 비동기 SQLite 다루기를 실제 시스템에 적용할 때 어떤 실패를 먼저 막아야 할까요?
+- `aiosqlite`는 SQLite를 진짜 비동기로 만드는 것이 아니라면 정확히 무엇을 비동기로 바꿔 주는 걸까요?
+- `async with aiosqlite.connect(...)`, `transactional()`, `SQLitePool`은 각각 어떤 경계를 맡고 왜 분리해야 할까요?
+- async 핸들러에서 동기 `sqlite3`를 쓰거나, 한 `aiosqlite` connection을 여러 코루틴이 같이 잡으면 어떤 문제가 생길까요?
 
 ## Mental Model: aiosqlite는 sqlite3 + thread + Future
 
@@ -362,12 +362,12 @@ async def tx(conn: aiosqlite.Connection):
 
 ## 처음 질문으로 돌아가기
 
-- **aiosqlite로 비동기 SQLite 다루기를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?**
-  - 먼저 확인할 경계는 "이벤트 루프를 보호하는 것"과 "SQLite 자체가 빨라지는 것"을 혼동하지 않았는지입니다. 이 글이 강조한 대로 `aiosqlite`는 connection마다 백그라운드 스레드를 두고 sqlite3 호출을 위임할 뿐이므로, async 전환의 목표는 처리량 증가가 아니라 loop block 제거입니다.
-- **aiosqlite로 비동기 SQLite 다루기에서 예제나 다이어그램으로 검증해야 할 핵심 신호는 무엇일까요?**
-  - 검증할 핵심 신호는 `async with aiosqlite.connect(...)`, `await db.execute(...)`, `async for row in cur`가 실제로 요청 경계와 맞물리는지, 그리고 pool을 만들었다면 `_queue.qsize()`와 pool wait time이 안정적인지입니다. 동시에 `BEGIN IMMEDIATE` 트랜잭션과 `SQLITE_BUSY` 비율을 함께 보면, 비동기화 이후에도 단일 writer 제약이 그대로 남아 있다는 점이 분명해집니다.
-- **aiosqlite로 비동기 SQLite 다루기를 실제 시스템에 적용할 때 어떤 실패를 먼저 막아야 할까요?**
-  - 가장 먼저 막아야 할 실패는 async 핸들러 안에서 동기 `sqlite3`를 직접 호출해 이벤트 루프를 멈추는 것과, 한 `aiosqlite` connection을 여러 코루틴이 동시에 잡는 구조입니다. 그래서 글에서는 lifespan에서 풀을 초기화하고, `transactional()` 헬퍼로 `BEGIN`·`commit`·`rollback`을 감싸며, 진짜 async I/O가 없는 경로라면 차라리 `def` 핸들러 + sqlite3가 더 단순하다고 선을 그었습니다.
+- **`aiosqlite`는 SQLite를 진짜 비동기로 만드는 것이 아니라면 정확히 무엇을 비동기로 바꿔 주는 걸까요?**
+  - 본문은 `aiosqlite`를 sqlite3 호출을 connection별 백그라운드 스레드로 넘기고 결과를 Future로 돌려주는 어댑터라고 설명했습니다. 그래서 바뀌는 것은 이벤트 루프가 막히지 않는 실행 방식이지, SQLite 엔진의 단일 writer 제약이나 connection 내부 직렬 실행 모델 자체는 아닙니다.
+- **`async with aiosqlite.connect(...)`, `transactional()`, `SQLitePool`은 각각 어떤 경계를 맡고 왜 분리해야 할까요?**
+  - `async with aiosqlite.connect(...)`는 connection 생성과 close 경계를 맡고, `transactional()`은 `BEGIN IMMEDIATE`부터 `commit()`·`rollback()`까지 transaction 경계를 맡습니다. `SQLitePool`은 그 바깥에서 connection 재사용만 담당하므로, 수명 관리와 transaction 관리와 대기열 제어가 서로 섞이지 않게 분리할 수 있습니다.
+- **async 핸들러에서 동기 `sqlite3`를 쓰거나, 한 `aiosqlite` connection을 여러 코루틴이 같이 잡으면 어떤 문제가 생길까요?**
+  - 동기 `sqlite3`를 async path에 두면 `execute()` 동안 이벤트 루프가 멈춰 같은 워커의 다른 요청도 같이 막히고, 이것이 `aiosqlite` 도입 이유 자체를 무너뜨립니다. 또 한 connection을 여러 코루틴이 동시에 잡으면 호출 순서와 transaction 경계가 꼬일 수 있으므로, 글은 풀에서 한 번에 한 코루틴만 connection을 빌리고 lifespan에서 초기화·종료를 고정하라고 정리했습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
