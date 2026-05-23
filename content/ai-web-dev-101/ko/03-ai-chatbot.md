@@ -504,11 +504,11 @@ await fetch("/api/chat", {
 ## 처음 질문으로 돌아가기
 
 - **터미널 예제를 브라우저 UI로 옮기려면 어떤 구성이 필요할까요?**
-  - 본문의 기준은 AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 브라우저 쪽에는 `app/page.tsx`의 `useChat()`과 `useState`가 필요하고, 서버 쪽에는 `app/api/chat/route.ts`가 필요합니다. 사용자는 `sendMessage({ text: input })`로 메시지를 보내고, 서버는 `convertToModelMessages(messages)`와 `streamText(...)`로 모델 호출을 중계한 뒤 `toUIMessageStreamResponse()` 또는 `toDataStreamResponse()`로 다시 돌려줍니다. 즉 터미널의 단일 함수 호출이 브라우저에서는 상태 관리, API 경계, 스트리밍 응답의 세 층으로 나뉩니다.
 - **왜 Next.js와 Vercel AI SDK 조합이 입문에 잘 맞을까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 이 조합은 `useChat`이 메시지 목록, `status`, 전송 흐름을 기본으로 제공하고, `streamText`가 스트리밍 응답을 바로 연결해 주기 때문에 입문자가 SSE를 직접 조립하지 않아도 됩니다. 본문에서 `status === "submitted" || status === "streaming"`일 때 입력을 잠그고, `Assistant가 답변을 작성하는 중입니다...` 같은 UI를 곧바로 붙일 수 있었던 이유도 그 추상화 덕분입니다. 처음부터 Fetch, 상태 경합, 스트림 파서를 모두 직접 짜는 것보다 전체 경계를 먼저 익히기에 훨씬 유리합니다.
 - **`/api/chat` 경로는 어떤 역할을 맡아야 할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - `/api/chat`은 모델 키를 숨긴 채 브라우저 메시지를 모델 메시지로 바꾸고, 모델 스트림을 다시 UI 스트림으로 감싸는 서버 경계입니다. 그래서 `runtime = "edge"`, `maxDuration = 30`, `temperature: 0.2`, `maxTokens: 600` 같은 운영 설정도 이 파일에 모으는 편이 안전합니다. 이후 `request_id` 헤더, 레이트 리밋, 지표 수집을 붙이는 위치도 모두 이 경계라는 점이 본문 전체의 핵심이었습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
