@@ -485,11 +485,11 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 ## 처음 질문으로 돌아가기
 
 - **migration-first와 code-first deploy ordering은 어떻게 다를까요?**
-  - 본문의 기준은 배포 순서와 blue/green: schema와 application code의 안전한 동기화를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 이 글의 기준에서는 expand 단계에서는 migration-first가 맞습니다. `phone` 같은 새 컬럼을 nullable로 먼저 추가해 두어야 이후 코드가 값을 쓰기 시작해도 old version과 new version이 동시에 버틸 수 있습니다.
 - **왜 blue/green deploy는 두 앱 버전과 동시에 호환되는 schema를 요구할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 본문 타임라인의 `t2`처럼 blue(v1)와 green(v2)가 같이 떠 있는 동안 둘 다 S2를 읽고 써야 하기 때문입니다. 그래서 schema는 항상 한 버전만 만족시키는 형태가 아니라 두 버전의 겹치는 안전 구간을 먼저 만들어야 합니다.
 - **NOT NULL 강화는 왜 두 단계로 나눠야 할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - `nullable=True`로 먼저 추가하고, `SELECT COUNT(*) FROM users WHERE phone IS NULL`이 0이 된 뒤에만 `nullable=False`로 조이는 것이 본문이 제시한 답입니다. 이 gate 없이 한 revision에 몰아넣으면 overlap 중인 old row 때문에 blue/green 전환이 바로 깨질 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -507,11 +507,11 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 ## 처음 질문으로 돌아가기
 
 - **production에서 downgrade는 언제 가능하고 언제 사실상 불가능할까요?**
-  - 본문의 기준은 downgrade 전략: 언제 진심으로 작성하고 언제 막을 것인가를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - `sa.Column("nickname", ..., nullable=True)`를 추가하는 정도의 가역 변경은 실제 `downgrade()`를 써 둘 수 있지만, `op.drop_column("users", "legacy_token")`처럼 데이터를 지우는 순간은 사실상 비가역입니다. 그래서 본문도 production 사고의 기본값을 downgrade보다 forward-fix에 두었습니다.
 - **어떤 종류의 변경이 irreversible하며, 어떻게 다뤄야 할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 컬럼 drop, 의미 있는 데이터 backfill, 길이 축소 같은 변경은 되돌려도 원래 값을 복원할 수 없으므로 `raise NotImplementedError(...)`로 명시하는 편이 안전합니다. `pass`로 비워 두는 것보다 훨씬 낫다고 한 이유도 잘못된 성공을 막기 위해서입니다.
 - **expand-contract는 downgrade 가능성을 어떻게 회복시킬까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - `display_name`을 먼저 추가하고, 그다음 backfill하고, 마지막에 `name`을 지우는 식으로 쪼개면 phase 4 전까지는 충분한 안전 구간이 생깁니다. 즉, 한 revision에 rename을 몰아넣지 않고 reversible한 구간을 길게 유지하는 것이 이 패턴의 가치입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

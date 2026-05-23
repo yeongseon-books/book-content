@@ -399,11 +399,11 @@ SELECT COUNT(*) FROM users WHERE phone IS NULL;
 ## 처음 질문으로 돌아가기
 
 - **one-revision-per-PR 원칙은 왜 중요할까요?**
-  - 본문의 기준은 Production과 team workflow: PR, CI, 모니터링, 그리고 incident response를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - PR 하나에 revision 하나만 두면 리뷰어는 `upgrade()`와 `downgrade()` 한 쌍만 보면 되고, 실패했을 때 blast radius도 그 revision 하나로 제한됩니다. 본문이 expand·migrate·contract를 phase별 PR로 나누라고 한 이유도 같은 맥락입니다.
 - **Alembic-aware PR template과 CI checks는 어떻게 구성할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 최소한 `alembic check`, `alembic upgrade head && alembic downgrade -1 && alembic upgrade head`, single-head guard, `--sql` preview, fresh DB smoke가 들어가야 합니다. 이 체크들이 통과해야만 “모델 drift가 없는지, downgrade가 깨지지 않는지, 새 DB가 head까지 부팅되는지”를 한 번에 답할 수 있습니다.
 - **dev=SQLite, staging+prod=PostgreSQL 같은 multi-environment 전략은 어떻게 가져갈까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - dev에서는 `render_as_batch=True`로 SQLite 제약을 흡수하고, staging과 prod에서는 PostgreSQL에 `compare_type=True`, `compare_server_default=True`를 켜 같은 엔진에서 검증하는 방식이 이 글의 답입니다. 빠른 실험은 dev에서 하고, 엔진 차이 때문에 생길 문제는 staging에서 먼저 잡아야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -499,11 +499,11 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 ## 처음 질문으로 돌아가기
 
 - **`alembic revision`이 만들어 주는 파일 구조는 어떻게 생겼을까요?**
-  - 본문의 기준은 첫 revision: upgrade와 downgrade를 손으로 작성를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 본문 예시처럼 revision 파일은 `revision`, `down_revision`, 그리고 `upgrade()`·`downgrade()` 함수 네 축으로 읽으면 됩니다. 즉, 이 파일은 “누구의 다음 변경인가”와 “올릴 때/내릴 때 무엇을 할까”를 같이 담는 단위입니다.
 - **`op.create_table`, `op.add_column`, `op.drop_column`, `op.execute`는 각각 언제 쓸까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 새 구조를 만들면 `op.create_table`, 기존 테이블에 필드를 더하면 `op.add_column`, 되돌릴 때 없애면 `op.drop_column`, helper로 표현하기 어려운 SQL은 `op.execute`를 씁니다. 이 글은 DDL helper를 먼저 쓰고, 정말 필요한 부분만 raw SQL로 내려가라는 감각을 보여 줍니다.
 - **`upgrade()`와 `downgrade()`를 어떻게 대칭으로 유지할 수 있을까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - `upgrade(): N → N+1`, `downgrade(): N+1 → N`이라는 본문 표현 그대로, 올릴 때 추가한 것을 내릴 때 제거하는 식으로 짝을 맞추면 됩니다. `users.tier` 예시에서 `op.add_column(...)`과 `op.drop_column(...)`이 서로 거울처럼 배치된 이유가 바로 그 대칭성입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

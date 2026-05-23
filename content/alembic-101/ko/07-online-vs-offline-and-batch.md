@@ -537,11 +537,11 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 ## 처음 질문으로 돌아가기
 
 - **Alembic이 제공하는 두 실행 모드, online과 offline은 어떻게 다를까요?**
-  - 본문의 기준은 online과 offline 모드: --sql로 DDL을 미리 보고 SQLite batch 다루기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - online은 `alembic upgrade head`처럼 DB에 직접 연결해 SQL을 실행하고, offline은 `alembic upgrade head --sql`처럼 SQL 텍스트만 출력합니다. 하나는 적용용이고 다른 하나는 리뷰용이라는 역할 구분이 이 글의 핵심입니다.
 - **`--sql`로 실제 SQL을 어떻게 미리 볼 수 있을까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - `alembic upgrade <from>:<to> --sql > review.sql`처럼 구간을 명시해 출력하면 됩니다. 본문이 `<from>:<to>` 문법을 강조한 이유는 `head`만 쓰면 이미 적용된 구간까지 전부 뽑혀 리뷰 대상이 흐려지기 때문입니다.
 - **DBA 리뷰용 SQL 스크립트는 어떤 흐름으로 만들까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - PR 단계에서 `review.sql`을 붙여 DBA가 실제 DDL을 읽고, 배포 시점에는 여전히 online 모드로 `alembic upgrade head`를 실행하는 흐름이 이 글의 답입니다. 이렇게 해야 SQL preview와 `alembic_version` 갱신이 같은 배포 단위로 이어집니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

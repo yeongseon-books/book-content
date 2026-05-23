@@ -509,11 +509,11 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 ## 처음 질문으로 돌아가기
 
 - **data migration은 schema migration과 무엇이 다를까요?**
-  - 본문의 기준은 데이터 마이그레이션: schema 변경과 데이터 변경을 분리하기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - schema migration은 `op.add_column()`처럼 구조를 바꾸는 작업이고, data migration은 `UPDATE users SET tier = 'free'`처럼 이미 있는 row 값을 바꾸는 작업입니다. 그래서 본문도 schema add, backfill, schema tighten을 서로 다른 revision으로 나누라고 권했습니다.
 - **`op.execute`는 raw SQL과 SQLAlchemy Core 중 어떤 스타일로 쓸 수 있을까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 간단한 한 줄이면 raw SQL이 빠르지만, `table("users", column("tier", String))`처럼 SQLAlchemy Core로 쓰면 dialect 차이에 덜 묶이고 의도가 더 또렷해집니다. 본문이 live 모델 import를 피하고 inline table/column 정의를 쓴 이유도 과거 migration을 미래 모델 변화에서 분리하기 위해서입니다.
 - **큰 데이터셋은 어떤 batch 패턴으로 나누어 처리해야 할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 본문 예시처럼 `LIMIT 1000`으로 `id` 묶음을 끊어 `while True` 루프로 backfill하는 방식이 기본입니다. 한 번에 100M row를 업데이트하기보다 batch로 나누어 lock과 transaction log를 줄이는 것이 핵심입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

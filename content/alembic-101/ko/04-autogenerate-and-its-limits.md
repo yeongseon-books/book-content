@@ -498,11 +498,11 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 ## 처음 질문으로 돌아가기
 
 - **`alembic revision --autogenerate`는 내부에서 무엇을 비교할까요?**
-  - 본문의 기준은 autogenerate: 잡는 것과 못 잡는 것의 경계를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 이 명령은 `env.py`가 만든 connection으로 현재 DB를 `Inspector`로 읽고, 그 결과를 `target_metadata`와 비교한 뒤 `MigrationOps`를 `op` 호출로 렌더링합니다. 즉, 본문 표현대로 ground truth와 desired state의 diff를 파일로 직렬화하는 과정입니다.
 - **어떤 변경은 잘 잡고, 어떤 변경은 놓치거나 옵션이 필요할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 새 테이블·새 컬럼·`nullable` 변경은 잘 잡지만, rename은 `drop_column` + `add_column`으로 잘못 읽고 데이터 변경은 아예 보지 못합니다. 그래서 `display_name` 예시처럼 generated file을 그대로 커밋하면 안 되고 사람이 마지막에 의도를 복원해야 합니다.
 - **`compare_type`, `compare_server_default`, `include_object`, `include_name`은 언제 필요할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - `String(50)`에서 `String(100)`으로 바뀌거나 `server_default`가 바뀌는 변경을 잡으려면 앞의 두 옵션이 필요합니다. 반대로 `legacy_` 같은 외부 소유 테이블이 diff를 오염시키면 `include_object`나 `include_name`으로 비교 대상에서 빼는 것이 이 글의 실무 답안입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -537,11 +537,11 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 ## 처음 질문으로 돌아가기
 
 - **언제 Alembic revision graph가 branch로 갈라질까요?**
-  - 본문의 기준은 branch와 merge: 동시에 만든 revision을 합치는 법를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 같은 `down_revision`을 부모로 두고 Alice의 `D`와 Bob의 `E`처럼 두 revision이 동시에 생기면 graph가 갈라지고 `alembic heads`에 head가 두 개 보입니다. 본문에서 `Multiple head revisions are present` 오류가 나는 이유도 그 동시 생성 때문입니다.
 - **`branch_labels`와 `depends_on`은 각각 정확히 무슨 역할일까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - `branch_labels = ("billing",)`는 이 revision이 어느 branch에 속하는지 이름을 붙이고, `depends_on = ("e7f8...")`는 다른 branch의 특정 revision이 먼저 필요하다는 뜻입니다. 둘 다 일반적인 팀 개발에서는 자주 쓰지 않지만, cross-branch 의존성을 문서화해야 할 때는 분명한 표식이 됩니다.
 - **두 개의 head를 `alembic merge`로 어떻게 합칠까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - `alembic merge -m "merge billing and audit branches" d1e2... e7f8...`를 실행하면 `down_revision`이 튜플인 merge revision이 하나 생성됩니다. 그 revision의 `upgrade()`와 `downgrade()`가 `pass`여도 graph는 다시 단일 head로 닫힙니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

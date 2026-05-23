@@ -427,11 +427,11 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 ## 처음 질문으로 돌아가기
 
 - **마이그레이션 도구가 실제로 해결하는 문제는 무엇일까요?**
-  - 본문의 기준은 왜 Alembic인가, 그리고 init까지를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - `alembic revision -m "add users.tier"`와 `alembic upgrade head`가 해결하는 것은 SQL 한 줄 실행 자체가 아니라 변경 이력, 코드 리뷰, 환경 동기화입니다. revision 파일이 곧 변경 로그가 되므로 누가 언제 어떤 schema를 올렸는지 다시 구성할 수 있습니다.
 - **왜 `Base.metadata.create_all`만으로는 운영 환경을 버틸 수 없을까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - `create_all`은 지금 필요한 테이블을 만들 수는 있어도 `ALTER TABLE`의 순서와 rollback 경로를 남기지 못합니다. 운영에서는 이미 존재하는 DB를 조금씩 바꿔야 하므로 upgrade/downgrade 체인이 없는 상태가 바로 한계가 됩니다.
 - **revision, head, `alembic_version` 테이블은 각각 어떤 역할을 할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - revision은 개별 변경 단위이고, head는 현재 그래프의 끝이며, `alembic_version`은 DB가 지금 어느 revision까지 적용됐는지 기록합니다. `upgrade head`가 가능한 이유도 코드 쪽 head와 DB 안의 version row를 서로 맞추기 때문입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

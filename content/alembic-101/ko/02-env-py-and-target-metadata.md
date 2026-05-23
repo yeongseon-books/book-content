@@ -470,11 +470,11 @@ SELECT COUNT(*) FROM users WHERE tier IS NULL;
 ## 처음 질문으로 돌아가기
 
 - **`env.py`는 정확히 무엇이고 언제 실행될까요?**
-  - 본문의 기준은 env.py와 target_metadata: 모델과 마이그레이션 연결를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - `env.py`는 Alembic이 `upgrade`, `revision --autogenerate`, `--sql` 같은 모든 명령마다 실행하는 부트 스크립트입니다. 여기서 `run_migrations_online()`과 `run_migrations_offline()`이 갈리고, 실제 connection과 설정이 이 파일에서 조립됩니다.
 - **왜 `target_metadata`는 선택 사항이 아니라 필수일까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - `target_metadata = Base.metadata`가 있어야 Alembic이 live DB와 모델 정의를 비교해 `op.add_column(...)` 같은 diff를 만들 수 있습니다. 본문이 강조했듯 `target_metadata = None`이면 autogenerate는 조용히 빈 파일만 냅니다.
 - **DB URL을 환경 변수에서 안전하게 읽는 패턴은 어떻게 만들까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - `db_url = os.environ.get("DATABASE_URL")`로 읽고 `config.set_main_option("sqlalchemy.url", db_url)`로 `alembic.ini`를 덮어쓰는 패턴이 이 글의 답입니다. 이렇게 해야 local 기본값은 남기면서 staging·production credential은 git 밖에 둘 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
