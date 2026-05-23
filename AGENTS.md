@@ -112,7 +112,10 @@ python3 scripts/check_article_structure.py     # article structure (A-grade) che
 
 ## Image Conventions
 
-- Path: `assets/<series>/<NN>/<NN>-<idx>-<slug>.{ko|en}.png`
+- Path: `assets/<series>/<NN>/<idx>-<slug>.{ko|en}.png`
+  - `<NN>` is the article number (`01`, `02`, ...) and matches the article filename prefix.
+  - `<idx>` is a 2-digit sequence number per article (`01`, `02`, ...) for ordering images within the article.
+  - Example: `assets/azure-app-service-101/02/01-full-request-lifecycle.ko.png`
 - Diagrams: Mermaid → PNG via `.sisyphus/medium/mermaid-to-png.py`
 - Caption policy: [`STYLE_GUIDE.md`](./STYLE_GUIDE.md) 참조.
 
