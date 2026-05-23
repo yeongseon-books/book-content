@@ -421,11 +421,11 @@ curl -fsS https://app.example.com/healthz
 ## 처음 질문으로 돌아가기
 
 - **Service는 정확히 어떤 문제를 해결할까요?**
-  - 본문의 기준은 Service를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - Pod IP는 재시작·재스케줄에 따라 계속 바뀌기 때문에, 클라이언트가 IP를 직접 잡으면 통신이 자주 끊깁니다. Service는 selector로 묶인 Pod 집합 앞에 안정적인 가상 IP와 이름을 두어, 호출하는 쪽이 "현재 어떤 Pod인지"를 신경 쓰지 않아도 되게 만듭니다.
 - **ClusterIP, NodePort, LoadBalancer는 언제 갈라질까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 본문 예시처럼 ClusterIP는 클러스터 내부에서만 닿을 때, NodePort는 노드의 특정 포트로 외부 접근을 열어 둘 때, LoadBalancer는 클라우드 LB와 연동해 공개 트래픽을 받을 때 선택합니다. 즉 "어디서 들어오는 트래픽인지"가 type을 가르는 기준입니다.
 - **selector와 labels는 왜 정확히 맞아야 할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - Service는 selector로 Pod를 찾고 그 결과를 Endpoints로 묶어 라우팅합니다. selector와 Pod의 label이 한 글자라도 어긋나면 Endpoints가 비어 트래픽이 어디로도 가지 못하는 블랙홀 상태가 되기 때문에, `kubectl get endpoints`로 확인하는 습관이 운영 기본이 됩니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
