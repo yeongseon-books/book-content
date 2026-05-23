@@ -336,7 +336,7 @@ def load_shipping_strategies() -> dict[str, ShippingStrategy]:
 
 ## 런타임 교체와 A/B 테스트가 Strategy에서 자연스러운 이유
 
-Strategy의 핵심 특성은 컨텍스트가 알고리즘 내부를 모른다는 것입니다. 이 특성 덕분에 런타임에 Strategy를 바꿔도 컨텍스트 코드는 전혀 변경할 필요가 없습니다.
+Strategy의 핵심 특성은 컨텍스트가 알고리즘 내부를 모른다는 사실입니다. 이 특성 덕분에 런타임에 Strategy를 바꿔도 컨텍스트 코드는 전혀 변경할 필요가 없습니다.
 
 ```python
 import random
@@ -379,7 +379,7 @@ Feature flag 시스템(LaunchDarkly, Unleash, 자체 구현)과 결합하면 배
 
 ## Strategy가 테스트를 단순하게 만드는 구조
 
-Strategy 패턴의 가장 실용적인 이점 중 하나는 테스트에서 외부 의존성을 잘라내기 쉽다는 점입니다.
+Strategy 패턴의 가장 실용적인 이점 중 하나는 테스트에서 외부 의존성을 잘라내기 쉽다는 사실입니다.
 
 ```python
 def test_order_total_uses_injected_strategy():

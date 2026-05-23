@@ -457,7 +457,7 @@ def deactivate_user(conn, user_id: int) -> int:
     ).rowcount
 ```
 
-이 패턴에서 중요한 점은 함수가 `Connection`을 인자로 받는다는 점입니다. transaction 경계는 호출 측이 결정하므로 같은 함수가 한 transaction 안에서 다른 함수와 함께 호출될 수 있습니다. ORM의 Session도 같은 원칙으로 동작합니다(5편에서 다룹니다).
+이 패턴에서 중요한 점은 함수가 `Connection`을 인자로 받는다는 사실입니다. transaction 경계는 호출 측이 결정하므로 같은 함수가 한 transaction 안에서 다른 함수와 함께 호출될 수 있습니다. ORM의 Session도 같은 원칙으로 동작합니다(5편에서 다룹니다).
 
 읽기 함수가 list를 반환할 때는 `.all()`이 아닌 `.scalars().all()`이나 `.mappings().all()`이 더 다루기 쉬울 때가 많습니다. JSON 응답으로 그대로 직렬화하려면 `.mappings().all()`이 가장 자연스럽습니다.
 

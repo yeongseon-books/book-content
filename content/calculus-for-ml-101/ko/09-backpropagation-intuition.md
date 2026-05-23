@@ -69,7 +69,7 @@ class Node:
         self.grad = 0.0
 ```
 
-노드는 현재 값과 부모 노드들, 그리고 역전파 과정에서 채워질 gradient 저장 공간을 가집니다. 실제 프레임워크는 훨씬 복잡하지만, 핵심은 각 연산 결과가 자신의 계산 이력을 알고 있다는 점입니다.
+노드는 현재 값과 부모 노드들, 그리고 역전파 과정에서 채워질 gradient 저장 공간을 가집니다. 실제 프레임워크는 훨씬 복잡하지만, 핵심은 각 연산 결과가 자신의 계산 이력을 알고 있다는 사실입니다.
 
 ### 덧셈 노드는 local derivative가 단순합니다
 
@@ -80,7 +80,7 @@ def add(a, b):
     return n
 ```
 
-덧셈의 경우 출력이 각 입력에 대해 갖는 local derivative는 1입니다. 중요한 것은 노드가 forward에서 결과값만 만드는 것이 아니라, backward 때 쓸 local derivative도 함께 기록한다는 점입니다.
+덧셈의 경우 출력이 각 입력에 대해 갖는 local derivative는 1입니다. 중요한 것은 노드가 forward에서 결과값만 만드는 것이 아니라, backward 때 쓸 local derivative도 함께 기록한다는 사실입니다.
 
 ### 곱셈 노드는 상대편 값을 local derivative로 가집니다
 

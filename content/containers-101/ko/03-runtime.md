@@ -70,7 +70,7 @@ pstree -p $(docker inspect -f '{{.State.Pid}}' rt-demo)
 # nginx master → nginx worker 구조가 보임
 ```
 
-이 출력에서 핵심은 runc가 보이지 않는다는 점입니다. runc는 컨테이너를 만든 뒤 즉시 종료되고, shim이 그 역할을 이어받습니다.
+이 출력에서 핵심은 runc가 보이지 않는다는 사실입니다. runc는 컨테이너를 만든 뒤 즉시 종료되고, shim이 그 역할을 이어받습니다.
 
 ## 핵심 용어
 

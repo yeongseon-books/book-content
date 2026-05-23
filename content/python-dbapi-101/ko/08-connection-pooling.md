@@ -113,7 +113,7 @@ threading.Thread(target=worker).start()
 
 ### 왜 SQLite에는 큰 connection pool이 어울리지 않는가
 
-PostgreSQL용 pool은 (1) connection 핸드셰이크 비용을 아끼고, (2) 서버의 동시 connection 한도를 보호하기 위해 존재합니다. SQLite에는 (1) 핸드셰이크가 없고, (2) 서버 프로세스가 없으므로 한도라는 개념이 다릅니다. 대신 SQLite의 한도는 **writer 1명**이라는 점입니다. 30개의 connection을 풀에 띄워도 쓰기 처리량은 늘어나지 않습니다. 오히려 writer 경쟁이 늘어 BUSY 에러만 더 자주 봅니다.
+PostgreSQL용 pool은 (1) connection 핸드셰이크 비용을 아끼고, (2) 서버의 동시 connection 한도를 보호하기 위해 존재합니다. SQLite에는 (1) 핸드셰이크가 없고, (2) 서버 프로세스가 없으므로 한도라는 개념이 다릅니다. 대신 SQLite의 한도는 **writer 1명**이라는 사실입니다. 30개의 connection을 풀에 띄워도 쓰기 처리량은 늘어나지 않습니다. 오히려 writer 경쟁이 늘어 BUSY 에러만 더 자주 봅니다.
 
 따라서 "큰 풀"이 아니라 "역할별로 나뉜 작은 풀"이 어울립니다. 예: read connection 다수 + write connection 1개.
 

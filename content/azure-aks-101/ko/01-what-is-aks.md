@@ -270,7 +270,7 @@ kubectl get pods -n kube-system -o wide
 
 ## 정리
 
-이 글의 핵심은 AKS를 “Azure에서 Kubernetes를 쓰는 서비스”로만 보지 않는 것입니다. 더 정확한 설명은 Azure가 Control Plane 운영의 상당 부분을 맡고, 사용자는 Node Pool과 워크로드, 네트워크, 관측성, 비용 설계를 중심으로 운영하는 관리형 Kubernetes라는 것입니다.
+이 글의 핵심은 AKS를 “Azure에서 Kubernetes를 쓰는 서비스”로만 보지 않는 것입니다. 더 정확한 설명은 Azure가 Control Plane 운영의 상당 부분을 맡고, 사용자는 Node Pool과 워크로드, 네트워크, 관측성, 비용 설계를 중심으로 운영하는 관리형 Kubernetes라는 사실입니다.
 
 이 관점을 먼저 잡아 두면 뒤의 모든 주제가 더 현실적으로 이어집니다. 클러스터 아키텍처는 책임 경계의 구체적 형태가 되고, 첫 배포 실습은 그 경계 위에 워크로드를 올리는 일이 되며, 네트워킹과 스케일링과 운영은 모두 같은 모델의 다른 층으로 읽히게 됩니다.
 

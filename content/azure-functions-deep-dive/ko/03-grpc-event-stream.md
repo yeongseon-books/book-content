@@ -246,7 +246,7 @@ message RpcSharedMemory {
 }
 ```
 
-핵심은 이것이 "항상 더 빠른" 경로가 아니라는 점입니다. 페이로드 크기, 워커 구현체, 플랫폼 제약에 따라 효과가 달라집니다. 따라서 성능 튜닝 시에는 payload size 구간별로 inline(`TypedData`)과 shared memory를 나눠 측정해야 합니다.
+핵심은 이것이 "항상 더 빠른" 경로가 아니라는 사실입니다. 페이로드 크기, 워커 구현체, 플랫폼 제약에 따라 효과가 달라집니다. 따라서 성능 튜닝 시에는 payload size 구간별로 inline(`TypedData`)과 shared memory를 나눠 측정해야 합니다.
 
 ### 스트림 단절 시나리오를 단계별로 기록해야 재현이 쉽습니다
 

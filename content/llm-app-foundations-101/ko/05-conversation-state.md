@@ -265,7 +265,7 @@ def enforce_budget(messages: list[dict[str, str]], max_input_tokens: int = 6000)
     raise ValueError("Conversation is too long. A more aggressive summary is required.")
 ```
 
-이제 이를 하나의 CLI 챗봇으로 합치면 상태 위치가 더 또렷해집니다. 핵심은 `system_message`, `recent_turns`, `summary_text`, `MAX_INPUT_TOKENS` 같은 값이 모두 애플리케이션 쪽 상태라는 점입니다. 실제 구현에서는 `/reset`, `/summary`, `/quit` 같은 명령을 제공하고, 요청 전 길이를 점검한 뒤 초과 시 오래된 턴을 요약으로 접는 흐름이 기본 골격이 됩니다. 프로덕션 환경이라면 이 상태를 메모리 변수 대신 Redis나 데이터베이스로 옮기고, 요약 성공 여부와 토큰 사용량을 함께 로깅하는 편이 안전합니다.
+이제 이를 하나의 CLI 챗봇으로 합치면 상태 위치가 더 또렷해집니다. 핵심은 `system_message`, `recent_turns`, `summary_text`, `MAX_INPUT_TOKENS` 같은 값이 모두 애플리케이션 쪽 상태라는 사실입니다. 실제 구현에서는 `/reset`, `/summary`, `/quit` 같은 명령을 제공하고, 요청 전 길이를 점검한 뒤 초과 시 오래된 턴을 요약으로 접는 흐름이 기본 골격이 됩니다. 프로덕션 환경이라면 이 상태를 메모리 변수 대신 Redis나 데이터베이스로 옮기고, 요약 성공 여부와 토큰 사용량을 함께 로깅하는 편이 안전합니다.
 
 ## 흔히 헷갈리는 지점
 

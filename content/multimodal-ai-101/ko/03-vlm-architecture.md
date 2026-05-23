@@ -52,7 +52,7 @@ VLM 아키텍처를 이해하면 모델 선택이 훨씬 덜 감에 의존하게
 
 ## 핵심 관점
 
-VLM을 설명할 때 흔히 “LLM에 눈을 달았다”는 표현을 씁니다. 직관에는 도움이 되지만, 실제 구현을 이해하기에는 너무 모호합니다. 더 정확한 설명은 image encoder가 만든 시각 토큰을 LLM이 이해할 수 있는 계약으로 재매핑한다는 것입니다.
+VLM을 설명할 때 흔히 “LLM에 눈을 달았다”는 표현을 씁니다. 직관에는 도움이 되지만, 실제 구현을 이해하기에는 너무 모호합니다. 더 정확한 설명은 image encoder가 만든 시각 토큰을 LLM이 이해할 수 있는 계약으로 재매핑한다는 사실입니다.
 
 이 계약을 얼마나 단순하게 둘지, 얼마나 압축할지, 어느 층에서 반복 상호작용하게 만들지가 LLaVA·BLIP-2·Flamingo를 나누는 핵심입니다. 즉 차이는 모델의 목적이 아니라 시각 정보를 텍스트 중심 LLM에 흘려 넣는 연결 방식에 있습니다.
 
@@ -111,7 +111,7 @@ class LLaVAProjector(nn.Module):
 1. **Stage 1 (alignment)**: vision encoder와 LLM은 frozen, projection layer만 학습. 데이터는 (image, caption) 쌍.
 2. **Stage 2 (instruction tuning)**: LLM과 projection을 함께 학습 (vision encoder는 여전히 frozen). 데이터는 GPT-4가 생성한 (image, instruction, answer) 쌍.
 
-장점은 단순함과 빠른 학습입니다. LLaVA-1.5는 8xA100에서 1일 학습으로 GPT-4V 수준 reasoning 일부를 따라잡았습니다. 단점은 visual token 수가 그대로 LLM context에 누적된다는 점입니다 (576 token은 long-context model이 아니면 부담입니다).
+장점은 단순함과 빠른 학습입니다. LLaVA-1.5는 8xA100에서 1일 학습으로 GPT-4V 수준 reasoning 일부를 따라잡았습니다. 단점은 visual token 수가 그대로 LLM context에 누적된다는 사실입니다 (576 token은 long-context model이 아니면 부담입니다).
 
 ### 학파 2: BLIP-2 - Q-Former로 token 압축
 
@@ -179,7 +179,7 @@ class GatedCrossAttention(nn.Module):
         return x
 ```
 
-장점은 multi-image / video 입력에 가장 자연스럽다는 점입니다. cross-attention이라 sequence 길이를 늘리지 않습니다. 단점은 LLM 내부에 손을 대야 해서, 이미 학습된 LLM에 plug-in하기가 LLaVA보다 어렵습니다.
+장점은 multi-image / video 입력에 가장 자연스럽다는 사실입니다. cross-attention이라 sequence 길이를 늘리지 않습니다. 단점은 LLM 내부에 손을 대야 해서, 이미 학습된 LLM에 plug-in하기가 LLaVA보다 어렵습니다.
 
 ### 세 학파 비교
 

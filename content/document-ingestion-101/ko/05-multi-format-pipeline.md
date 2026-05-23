@@ -122,7 +122,7 @@ source=notes.txt format=txt preview=TXT source: queue backlog grew overnight. ..
 source=runbook.md format=md preview=# Runbook MD source: restart the worker ...
 ```
 
-이 출력의 핵심은 세 줄이 모두 비슷한 형식으로 떨어진다는 점입니다. 뒤 단계가 파일 형식을 몰라도 되는 이유는 바로 이 **정규화된 출력 계약** 덕분입니다.
+이 출력의 핵심은 세 줄이 모두 비슷한 형식으로 떨어진다는 사실입니다. 뒤 단계가 파일 형식을 몰라도 되는 이유는 바로 이 **정규화된 출력 계약** 덕분입니다.
 
 ## 공통 계약을 먼저 고정하는 이유
 

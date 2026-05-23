@@ -323,7 +323,7 @@ Link: <https://api.example.com/orders?cursor=eyJ...&limit=20>; rel="next",
       <https://api.example.com/orders?cursor=eyK...&limit=20>; rel="prev"
 ```
 
-이 방식의 장점은 응답 본문 스키마를 변경하지 않아도 pagination 메타데이터를 전달할 수 있다는 것입니다. 클라이언트는 `Link` header를 파싱해서 `rel="next"` URL을 그대로 호출하면 됩니다. 단점은 브라우저 JavaScript에서 header 접근이 CORS 설정(`Access-Control-Expose-Headers: Link`)을 추가로 요구한다는 것입니다.
+이 방식의 장점은 응답 본문 스키마를 변경하지 않아도 pagination 메타데이터를 전달할 수 있다는 사실입니다. 클라이언트는 `Link` header를 파싱해서 `rel="next"` URL을 그대로 호출하면 됩니다. 단점은 브라우저 JavaScript에서 header 접근이 CORS 설정(`Access-Control-Expose-Headers: Link`)을 추가로 요구한다는 사실입니다.
 
 ### 본문 vs Header — 언제 어느 쪽을 쓸까?
 

@@ -199,7 +199,7 @@ faithfulness 계산은 2단계로 움직입니다. 첫 단계에서 RAGAS는 답
 faithfulness\_score = \frac{|supported\_claims|}{|total\_claims|}
 \]
 
-즉 지원된 주장 수를 전체 주장 수로 나눈 값입니다. 소스에서 `faithful_statements / num_statements`로 바로 구현되어 있고, statement가 하나도 생성되지 않으면 `NaN`으로 떨어집니다. 중요한 것은 이 점수가 “답변 전체가 마음에 드는가”를 묻지 않는다는 점입니다. 문장이 매끄러운지, 표현이 간결한지, 질문에 친절히 답했는지는 관심사가 아닙니다. 오직 **답변이 자기 근거로 제공된 `contexts` 안에서 지지되는 주장들로만 이루어져 있는가**만 봅니다.
+즉 지원된 주장 수를 전체 주장 수로 나눈 값입니다. 소스에서 `faithful_statements / num_statements`로 바로 구현되어 있고, statement가 하나도 생성되지 않으면 `NaN`으로 떨어집니다. 중요한 것은 이 점수가 “답변 전체가 마음에 드는가”를 묻지 않는다는 사실입니다. 문장이 매끄러운지, 표현이 간결한지, 질문에 친절히 답했는지는 관심사가 아닙니다. 오직 **답변이 자기 근거로 제공된 `contexts` 안에서 지지되는 주장들로만 이루어져 있는가**만 봅니다.
 
 이때 hallucination도 운영적으로 다시 정의됩니다. 보통 사람은 hallucination을 “거짓말”로 받아들이지만, faithfulness는 더 좁고 더 실무적인 정의를 씁니다. `contexts`로 직접 지지되지 않는 statement는 점수를 깎습니다. 그 statement가 세상 전체 기준으로 사실일 수도 있습니다. 하지만 현재 RAG 호출의 근거 묶음 안에 없으면, 이 메트릭에서는 faithfulness 위반입니다. 이 정의가 중요한 이유는 RAG의 계약이 “모델이 세상에서 맞는 말을 하라”가 아니라 “이번에 검색된 근거 위에서 답하라”이기 때문입니다.
 
@@ -236,7 +236,7 @@ print(faithfulness_score(verdicts))
 
 ## 3. Answer Relevancy: 역질문 생성은 정확도가 아니라 초점도를 잰다
 
-faithfulness가 “근거 안에서만 말했는가”를 본다면, answer relevancy는 다른 질문을 합니다. **이 답변이 원래 질문을 곧장 겨냥하고 있는가**입니다. 여기서 중요한 것은 이 메트릭이 사실 정확성을 직접 채점하지 않는다는 점입니다. `ragas/metrics/_answer_relevance.py`를 보면 그 이유가 구현에 그대로 들어 있습니다.
+faithfulness가 “근거 안에서만 말했는가”를 본다면, answer relevancy는 다른 질문을 합니다. **이 답변이 원래 질문을 곧장 겨냥하고 있는가**입니다. 여기서 중요한 것은 이 메트릭이 사실 정확성을 직접 채점하지 않는다는 사실입니다. `ragas/metrics/_answer_relevance.py`를 보면 그 이유가 구현에 그대로 들어 있습니다.
 
 RAGAS는 먼저 답변을 보고 “이 답변이 어떤 질문의 답처럼 보이는가?”를 거꾸로 생성합니다. `QUESTION_GEN` 프롬프트는 `answer`와 `context`를 함께 입력으로 받아 질문 하나와 `noncommittal` 플래그를 JSON으로 내놓게 만듭니다. `strictness` 기본값이 3이므로, 보통은 한 답변에 대해 역질문을 여러 개 생성합니다. 그런 다음 `_calculate_score()`는 원래 질문 `row["question"]`의 임베딩과 생성된 질문들 임베딩 사이의 코사인 유사도를 계산해 평균을 냅니다.
 

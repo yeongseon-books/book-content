@@ -354,7 +354,7 @@ class CreateCouponService:
         self.repo.save(command.code, command.discount_percent)
 ```
 
-핵심은 서비스가 저장소의 구체 구현을 모른다는 점입니다. SQLAlchemy를 쓰든, 파일 저장을 쓰든, 외부 API를 쓰든 서비스 규칙은 바뀌지 않습니다. 그래서 정책 변경과 기술 변경이 서로 다른 속도로 진화할 수 있습니다.
+핵심은 서비스가 저장소의 구체 구현을 모른다는 사실입니다. SQLAlchemy를 쓰든, 파일 저장을 쓰든, 외부 API를 쓰든 서비스 규칙은 바뀌지 않습니다. 그래서 정책 변경과 기술 변경이 서로 다른 속도로 진화할 수 있습니다.
 
 ## 설계 부채를 남기지 않는 배포 순서
 

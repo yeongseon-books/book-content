@@ -170,7 +170,7 @@ Merge made by the 'ort' strategy.
  create mode 100644 header.md
 ```
 
-three-way merge에서 핵심은 "공통 조상(base), 현재 branch 끝(ours), 합치려는 branch 끝(theirs)"의 세 점을 동시에 비교한다는 점입니다. 그래서 branch가 갈라져 독립적으로 진화한 경우에도 Git은 단순 덮어쓰기가 아니라 변경 의도를 최대한 보존하려고 시도합니다.
+three-way merge의 핵심은 "공통 조상(base), 현재 branch 끝(ours), 합치려는 branch 끝(theirs)"의 세 점을 동시에 비교하는 데 있습니다. 그래서 branch가 갈라져 독립적으로 진화한 경우에도 Git은 단순 덮어쓰기가 아니라 변경 의도를 최대한 보존하려고 시도합니다.
 
 ### 4-1. fast-forward와 `--no-ff` 비교
 

@@ -245,7 +245,7 @@ message ChargeResponse {
 }
 ```
 
-gRPC는 HTTP/2 위에서 바이너리 직렬화(Protocol Buffers)를 사용하므로 JSON 기반 REST보다 페이로드가 작고 파싱이 빠릅니다. 하지만 진짜 이점은 `.proto` 파일 하나로 클라이언트와 서버의 계약이 코드 생성까지 자동화된다는 점입니다.
+gRPC는 HTTP/2 위에서 바이너리 직렬화(Protocol Buffers)를 사용하므로 JSON 기반 REST보다 페이로드가 작고 파싱이 빠릅니다. 하지만 진짜 이점은 `.proto` 파일 하나로 클라이언트와 서버의 계약이 코드 생성까지 자동화된다는 사실입니다.
 
 ### Envoy 사이드카 구성
 

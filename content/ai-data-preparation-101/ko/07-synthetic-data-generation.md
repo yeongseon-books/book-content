@@ -286,7 +286,7 @@ print({"run_id": run_id, "status": "accepted", "dataset_path": str(dataset_path)
 }
 ```
 
-여기서 중요한 점은 JSON이 예쁘게 생겼다는 사실이 아니라, 각 항목에 reject 가능한 근거가 들어 있다는 점입니다. `source_type`, `difficulty`, `evidence`, `reasons`가 없으면 operator는 배치 실패 원인을 추적하기 어렵습니다.
+여기서 중요한 점은 JSON이 예쁘게 생겼다는 사실이 아니라, 각 항목에 reject 가능한 근거가 들어 있다는 사실입니다. `source_type`, `difficulty`, `evidence`, `reasons`가 없으면 operator는 배치 실패 원인을 추적하기 어렵습니다.
 
 ## reject logic을 먼저 설계해야 합니다
 

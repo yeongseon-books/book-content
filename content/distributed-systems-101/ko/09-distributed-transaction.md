@@ -270,7 +270,7 @@ def run_2pc(tx_id: str, payload: dict, participants: List[ParticipantClient], lo
     return "COMMIT"
 ```
 
-실무에서 중요한 포인트는 `PREPARING`과 `COMMIT/ABORT`가 모두 durable 로그여야 한다는 점입니다. 메모리 상태만으로 운영하면 coordinator 재시작 후 결정을 잃어 in-doubt 상태를 과도하게 만들 수 있습니다.
+실무에서 중요한 포인트는 `PREPARING`과 `COMMIT/ABORT`가 모두 durable 로그여야 한다는 사실입니다. 메모리 상태만으로 운영하면 coordinator 재시작 후 결정을 잃어 in-doubt 상태를 과도하게 만들 수 있습니다.
 
 ### 2PC coordinator 장애 처리: in-doubt를 줄이는 설계
 
@@ -343,7 +343,7 @@ def checkout(order_id: str, user_id: str, amount: int):
     return {"status": "completed", "order_id": order_id}
 ```
 
-장점은 흐름 가시성이 높고 실패 분기가 한곳에 모인다는 점입니다. 단점은 오케스트레이터가 비대해지면 배포 속도와 변경 충돌이 커진다는 점입니다.
+장점은 흐름 가시성이 높고 실패 분기가 한곳에 모인다는 사실입니다. 단점은 오케스트레이터가 비대해지면 배포 속도와 변경 충돌이 커진다는 사실입니다.
 
 #### 코레오그래피 방식
 
@@ -365,7 +365,7 @@ def on_shipping_failed(event):
     publish("PaymentRefunded", {"order_id": order_id})
 ```
 
-장점은 서비스 자율성이 높고 중앙 병목이 줄어든다는 점입니다. 단점은 전체 흐름 추적이 어려워 분산 트레이싱과 상관관계 키(correlation id)가 사실상 필수라는 점입니다.
+장점은 서비스 자율성이 높고 중앙 병목이 줄어든다는 사실입니다. 단점은 전체 흐름 추적이 어려워 분산 트레이싱과 상관관계 키(correlation id)가 사실상 필수라는 사실입니다.
 
 ### Saga 보상 로직: 취소가 아니라 역방향 도메인 명령
 

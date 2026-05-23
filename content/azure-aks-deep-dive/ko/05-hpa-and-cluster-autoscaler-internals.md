@@ -79,7 +79,7 @@ HPA가 먼저 Pod를 늘리고, scheduler가 빈자리를 못 찾아 Pending을 
 Pod 수를 다루는 루프와 node 수를 다루는 루프가 같은 화면에 놓여 있어야 race window가 왜 생기는지 자연스럽게 보입니다.
 특히 scheduler가 중간에 들어간다는 점이 중요합니다.
 
-이 그림을 읽는 핵심은 HPA가 replica를 늘려도 곧바로 node가 생기는 것은 아니라는 점입니다.
+이 그림을 읽는 핵심은 HPA가 replica를 늘려도 곧바로 node가 생기는 것은 아니라는 사실입니다.
 중간에 placement와 unschedulable 판정이 있어야 CA가 움직입니다.
 
 ### HPA는 메트릭 비율을 replica 수로 바꾸는 빠른 루프입니다
@@ -367,7 +367,7 @@ AKS autoscaling을 정확히 이해하려면 먼저 HPA와 Cluster Autoscaler를
 HPA는 메트릭을 읽고 replica 수를 조정하는 빠른 루프이고, Cluster Autoscaler는 unschedulable Pod를 보고 node 수를 조정하는 느리고 보수적인 루프입니다.
 둘은 같은 umbrella 아래 있지만 서로 다른 질문에 답합니다.
 
-이 글에서 가장 중요한 운영 감각은 race window가 정상적이라는 점입니다.
+이 글에서 가장 중요한 운영 감각은 race window가 정상적이라는 사실입니다.
 HPA가 먼저 움직이고, scheduler가 빈자리를 못 찾고, CA가 나중에 node를 더하는 동안 Pending Pod가 잠시 남을 수 있습니다.
 따라서 autoscaling 문제를 볼 때는 어떤 루프가 지금 움직였고 어떤 루프가 아직 따라오지 않았는지를 먼저 구분해야 합니다.
 

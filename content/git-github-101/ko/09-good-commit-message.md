@@ -177,7 +177,7 @@ $ git log --oneline --decorate --graph -10
 | 테스트만 보강 | `more tests` | `test(auth): add regression test for expired token reuse` |
 | 파괴적 API 변경 | `change api` | `feat(api)!: rename /v1/orders to /v2/orders` |
 
-좋은 message의 공통점은 화려한 문장이 아니라 "판단에 필요한 최소 맥락"이 있다는 점입니다. 어떤 컴포넌트인지(scope), 무슨 종류 변경인지(type), 무엇이 바뀌는지(subject)가 1초 안에 읽혀야 합니다.
+좋은 message의 공통점은 화려한 문장이 아니라 "판단에 필요한 최소 맥락"이 있다는 사실입니다. 어떤 컴포넌트인지(scope), 무슨 종류 변경인지(type), 무엇이 바뀌는지(subject)가 1초 안에 읽혀야 합니다.
 
 ## commit 단위를 자르는 기준
 

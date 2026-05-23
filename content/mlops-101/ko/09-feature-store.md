@@ -389,7 +389,7 @@ def compare_feature_value(train_value: float, serve_value: float, tolerance: flo
 | 품질 점검 | 누락률, 스키마, 시점 일치 | 신선도, 적재 지연, TTL 만료 |
 | 대표 기술 | Parquet/S3, BigQuery, Snowflake | Redis, DynamoDB, Cassandra |
 
-팀이 가장 자주 놓치는 부분은 오프라인 데이터 품질 기준과 온라인 신선도 기준이 다르다는 점입니다. 학습 데이터가 깨끗해도 온라인 적재가 늦으면 서빙 품질은 바로 떨어질 수 있습니다.
+팀이 가장 자주 놓치는 부분은 오프라인 데이터 품질 기준과 온라인 신선도 기준이 다르다는 사실입니다. 학습 데이터가 깨끗해도 온라인 적재가 늦으면 서빙 품질은 바로 떨어질 수 있습니다.
 
 ## Feast 조회 코드 패턴
 

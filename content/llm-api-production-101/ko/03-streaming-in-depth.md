@@ -323,7 +323,7 @@ def stream_answer(q: str):
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 ```
 
-이 구성의 장점은 화면과 로그가 같은 상태 모델을 공유한다는 점입니다. 프런트엔드는 `token` 이벤트를 누적해 즉시 렌더링하고, `error` 이벤트에서 `partial_text`를 유지한 채 재시도 버튼만 보여 줄 수 있습니다. 운영자는 같은 이벤트 타입으로 장애 패턴을 집계할 수 있습니다.
+이 구성의 장점은 화면과 로그가 같은 상태 모델을 공유한다는 사실입니다. 프런트엔드는 `token` 이벤트를 누적해 즉시 렌더링하고, `error` 이벤트에서 `partial_text`를 유지한 채 재시도 버튼만 보여 줄 수 있습니다. 운영자는 같은 이벤트 타입으로 장애 패턴을 집계할 수 있습니다.
 
 ### 클라이언트 재연결을 위한 이벤트 ID 전략
 

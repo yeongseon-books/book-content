@@ -476,7 +476,7 @@ def filter_deleted(results, deleted_ids: set[str]):
 
 ## 검색 정확도 기준선 구축
 
-ANN 인덱스 튜닝에서 가장 중요한 원칙은 항상 기준선이 있어야 한다는 점입니다. 기준선은 보통 `IndexFlatIP` 또는 `IndexFlatL2`로 만든 정확 검색 결과입니다. 이후 HNSW/IVF 결과를 이 기준선과 비교해 Recall@k를 계산합니다.
+ANN 인덱스 튜닝에서 가장 중요한 원칙은 항상 기준선이 있어야 한다는 사실입니다. 기준선은 보통 `IndexFlatIP` 또는 `IndexFlatL2`로 만든 정확 검색 결과입니다. 이후 HNSW/IVF 결과를 이 기준선과 비교해 Recall@k를 계산합니다.
 
 ```python
 def build_ground_truth(flat_index, queries, k=10):

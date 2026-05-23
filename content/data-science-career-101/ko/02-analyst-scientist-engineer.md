@@ -30,7 +30,7 @@ last_reviewed: '2026-05-14'
 
 ![Data Science Career 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/02/02-01-concept-at-a-glance.ko.png)
 *Data Science Career 101 2장 흐름 개요*
-> 둘 또는 세 역할을 구분하는 가장 달래 기중은 '차이가 뭐니 도구와 사람의 넓'을 보는 동맥싶'목적과 산출물'을 보는 동맥다는 것입니다.
+> 둘 또는 세 역할을 구분하는 가장 달래 기중은 '차이가 뭐니 도구와 사람의 넓'을 보는 동맥싶'목적과 산출물'을 보는 동맥다는 사실입니다.
 
 ## 먼저 던지는 질문
 

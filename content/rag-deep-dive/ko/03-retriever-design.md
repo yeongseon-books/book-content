@@ -196,7 +196,7 @@ if __name__ == "__main__":
 
 `fetch_k`는 오직 MMR 계열에서 의미가 있습니다. `VectorStoreRetriever` 자신은 이 값을 해석하지 않고 그대로 vector store로 넘깁니다. FAISS 구현을 기준으로 보면 `max_marginal_relevance_search()`가 질의를 임베딩한 뒤 `max_marginal_relevance_search_by_vector()`로 넘기고, 거기서 다시 `max_marginal_relevance_search_with_score_by_vector()`가 실제 후보 `fetch_k`개를 index search로 가져옵니다. 따라서 `fetch_k`는 retriever 계층의 옵션이지만, 실제 소비 지점은 store의 MMR 구현입니다.
 
-`score_threshold`는 threshold 검색에서만 의미가 있고, 더 정확히는 `similarity_search_with_relevance_scores()` 경로에서 해석됩니다. 여기서 중요한 점은 `VectorStoreRetriever`가 raw FAISS distance를 직접 비교하지 않는다는 것입니다. 먼저 vector store가 raw distance를 relevance score로 변환하고, 그다음 threshold를 적용합니다. 같은 이름의 파라미터라도 raw distance 기준인지, normalized relevance 기준인지가 다를 수 있으므로 이 호출 체인을 분리해서 봐야 합니다.
+`score_threshold`는 threshold 검색에서만 의미가 있고, 더 정확히는 `similarity_search_with_relevance_scores()` 경로에서 해석됩니다. 여기서 중요한 점은 `VectorStoreRetriever`가 raw FAISS distance를 직접 비교하지 않는다는 사실입니다. 먼저 vector store가 raw distance를 relevance score로 변환하고, 그다음 threshold를 적용합니다. 같은 이름의 파라미터라도 raw distance 기준인지, normalized relevance 기준인지가 다를 수 있으므로 이 호출 체인을 분리해서 봐야 합니다.
 
 이 경로를 가장 작은 코드로 보면 아래와 같습니다.
 

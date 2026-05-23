@@ -193,7 +193,7 @@ print(f"CPU result: {total}")
 print(f"buffer after DMA: {len(shared_buffer)}")
 ```
 
-실제 DMA는 더 정교하지만, 본질은 데이터 이동에서조차 CPU 사이클을 거의 쓰지 않는다는 점입니다.
+실제 DMA는 더 정교하지만, 본질은 데이터 이동에서조차 CPU 사이클을 거의 쓰지 않는다는 사실입니다.
 
 ### 5단계: `select`로 실제 패턴 보기
 

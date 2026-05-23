@@ -323,7 +323,7 @@ class OrderService:
         return order
 ```
 
-이 구조의 장점은 실패 지점이 명확하다는 것입니다. 인가 실패는 `PermissionDenied`, 규칙 위반은 `DomainError`, 영속화 실패는 Repository 예외로 구분됩니다. 관측성과 재시도 정책을 계층별로 설계할 수 있어 운영 대응이 빨라집니다.
+이 구조의 장점은 실패 지점이 명확하다는 사실입니다. 인가 실패는 `PermissionDenied`, 규칙 위반은 `DomainError`, 영속화 실패는 Repository 예외로 구분됩니다. 관측성과 재시도 정책을 계층별로 설계할 수 있어 운영 대응이 빨라집니다.
 
 ## 실전 핸즈온: FastAPI로 5단계 구축하기
 

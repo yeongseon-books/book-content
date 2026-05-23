@@ -377,7 +377,7 @@ if __name__ == "__main__":
 
 ## 4. `RunnablePassthrough.assign()`: 답만 주지 말고 출처도 같이 돌려주기
 
-LCEL로 체인을 짜다 보면 곧바로 부딪히는 요구가 있습니다. 최종 답변 문자열만으로는 부족하다는 점입니다. 운영용 RAG에서는 최소한 출처 목록, 사용한 문서 ID, 점수, 때로는 최종 prompt까지 같이 보고 싶습니다. 그런데 기본 `prompt | llm | parser` 패턴은 마지막에 문자열 하나만 남깁니다. 이때 유용한 도구가 `langchain_core.runnables.passthrough.py`의 `RunnablePassthrough.assign()`입니다.
+LCEL로 체인을 짜다 보면 곧바로 부딪히는 요구가 있습니다. 최종 답변 문자열만으로는 부족하다는 사실입니다. 운영용 RAG에서는 최소한 출처 목록, 사용한 문서 ID, 점수, 때로는 최종 prompt까지 같이 보고 싶습니다. 그런데 기본 `prompt | llm | parser` 패턴은 마지막에 문자열 하나만 남깁니다. 이때 유용한 도구가 `langchain_core.runnables.passthrough.py`의 `RunnablePassthrough.assign()`입니다.
 
 ![assign이 답변 출력에 출처를 합치는 구조](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-04-passthrough-assign-output-enrichment.ko.png)
 
@@ -392,7 +392,7 @@ RAG에서는 보통 이런 순서가 됩니다.
 3. 또 한 번 `assign(answer=...)`로 `context`와 `question`을 prompt·llm·parser에 태워 답변 문자열을 만듭니다.
 4. 마지막에 `RunnableLambda`나 `pick()`으로 필요한 필드만 남겨 `{"answer": ..., "sources": ...}`를 반환합니다.
 
-이 방식의 좋은 점은 retrieval 결과를 두 번 재계산하지 않는다는 것입니다. `RetrievalQA`에서는 `return_source_documents=True`가 내부 옵션이라 답과 docs를 같이 받을 수는 있지만, 그 docs가 어느 중간 단계에서 어떻게 조정되었는지 체인 바깥에서 풍부하게 확장하기 어렵습니다. LCEL에서는 source documents를 초기에 한 번 구해 dict에 올려 두고, 그 뒤 계산 단계마다 재사용하면 됩니다.
+이 방식의 좋은 점은 retrieval 결과를 두 번 재계산하지 않는다는 사실입니다. `RetrievalQA`에서는 `return_source_documents=True`가 내부 옵션이라 답과 docs를 같이 받을 수는 있지만, 그 docs가 어느 중간 단계에서 어떻게 조정되었는지 체인 바깥에서 풍부하게 확장하기 어렵습니다. LCEL에서는 source documents를 초기에 한 번 구해 dict에 올려 두고, 그 뒤 계산 단계마다 재사용하면 됩니다.
 
 또 이 섹션에서 `with_types()`가 다시 의미를 가집니다. 출력이 더 이상 문자열 하나가 아니라 `answer`와 `sources`를 가진 dict라면, 체인 자체에 그 모양을 선언해 두는 편이 좋습니다. 그러면 `output_schema`가 즉시 읽을 수 있는 문서가 되고, API 계층에서도 응답 구조를 안정적으로 재사용할 수 있습니다.
 
@@ -469,7 +469,7 @@ if __name__ == "__main__":
     main()
 ```
 
-이 예제에서 중요한 것은 `assign()`이 문법 설탕 이상이라는 점입니다. 앞단에서 만든 `sources`를 유지한 채 `context`와 `answer`를 순차적으로 덧붙이기 때문에, retrieval 결과를 잃지 않고 chain output을 점점 풍부하게 만들 수 있습니다. RAG를 API나 UI에 연결할 때 이 차이는 큽니다. 사용자에게는 답변을 보여 주면서, 개발자에게는 source list와 schema를 동시에 제공할 수 있기 때문입니다.
+이 예제에서 중요한 것은 `assign()`이 문법 설탕 이상이라는 사실입니다. 앞단에서 만든 `sources`를 유지한 채 `context`와 `answer`를 순차적으로 덧붙이기 때문에, retrieval 결과를 잃지 않고 chain output을 점점 풍부하게 만들 수 있습니다. RAG를 API나 UI에 연결할 때 이 차이는 큽니다. 사용자에게는 답변을 보여 주면서, 개발자에게는 source list와 schema를 동시에 제공할 수 있기 때문입니다.
 
 ---
 

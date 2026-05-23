@@ -363,7 +363,7 @@ def _outbox_order_created(session, flush_context, instances):
             session.add(OutboxEvent(topic="order.created", payload={"order_id": obj.id}))
 ```
 
-주의할 점은 `obj.id`가 아직 없을 수 있다는 것입니다. 이 경우 `after_flush_postexec`를 사용해 PK가 채워진 뒤 outbox를 만드는 방식도 검토해야 합니다.
+주의할 점은 `obj.id`가 아직 없을 수 있다는 사실입니다. 이 경우 `after_flush_postexec`를 사용해 PK가 채워진 뒤 outbox를 만드는 방식도 검토해야 합니다.
 
 ## 엔진 이벤트 기반 성능 프로파일링
 

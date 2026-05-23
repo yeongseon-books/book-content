@@ -99,7 +99,7 @@ def search_bst(node, target):
         return search_bst(node.right, target)
 ```
 
-BST의 장점은 매 단계에서 볼 필요 없는 절반을 버릴 수 있다는 점입니다. 그래서 정렬 규칙은 단순한 예쁜 성질이 아니라, 탐색 비용을 줄이는 핵심 계약입니다.
+BST의 장점은 매 단계에서 볼 필요 없는 절반을 버릴 수 있다는 사실입니다. 그래서 정렬 규칙은 단순한 예쁜 성질이 아니라, 탐색 비용을 줄이는 핵심 계약입니다.
 
 ## 단계별 실습
 
@@ -442,7 +442,7 @@ print(f"sorted list ({n}): {list_size:>10} bytes")
 print(f"BST overhead: {bst_size / list_size:.1f}x")
 ```
 
-BST는 노드 객체마다 `__dict__` + left/right 포인터가 필요하므로 정렬된 list보다 3-5배 메모리를 씁니다. BST를 선택하는 이유는 메모리 효율이 아니라, O(log n) 삽입/검색/삭제를 동시에 제공한다는 점입니다.
+BST는 노드 객체마다 `__dict__` + left/right 포인터가 필요하므로 정렬된 list보다 3-5배 메모리를 씁니다. BST를 선택하는 이유는 메모리 효율이 아니라, O(log n) 삽입/검색/삭제를 동시에 제공한다는 사실입니다.
 
 ## 성능 벤치마크: BST vs sorted list 검색
 

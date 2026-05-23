@@ -160,7 +160,7 @@ Raw Kubernetes 위의 upstream Dapr에서는 component, configuration, injector,
 
 *Shared control loops terminating at environment boundary*
 
-이 그림의 중요한 점은 중심에 단일 Revision이 없다는 것입니다. Environment는 하나의 런타임 객체가 아니라, 여러 앱에 동시에 제약과 공유 자원을 배포하는 control surface입니다. 그래서 강력하지만, 잘못 그으면 위험합니다.
+이 그림의 중요한 점은 중심에 단일 Revision이 없다는 사실입니다. Environment는 하나의 런타임 객체가 아니라, 여러 앱에 동시에 제약과 공유 자원을 배포하는 control surface입니다. 그래서 강력하지만, 잘못 그으면 위험합니다.
 
 ### 아키텍트가 바로 써먹을 수 있는 경계 테스트
 

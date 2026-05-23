@@ -201,7 +201,7 @@ spec:
                   number: 80
 ```
 
-이 예시는 `api.example.com/` 요청을 `fastapi-hello` Service로 보냅니다. 핵심은 Ingress가 Pod와 직접 대화하지 않는다는 점입니다. Ingress는 일반적으로 **Service를 대상으로 삼아** HTTP 계층의 라우팅을 구성합니다.
+이 예시는 `api.example.com/` 요청을 `fastapi-hello` Service로 보냅니다. 핵심은 Ingress가 Pod와 직접 대화하지 않는다는 사실입니다. Ingress는 일반적으로 **Service를 대상으로 삼아** HTTP 계층의 라우팅을 구성합니다.
 
 ### NGINX와 AGIC는 “어디에 프록시를 두는가”의 감각이 다릅니다
 

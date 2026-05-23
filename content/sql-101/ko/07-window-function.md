@@ -28,7 +28,7 @@ last_reviewed: '2026-05-15'
 
 ![SQL 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/07/07-01-window-calculation-flow.ko.png)
 *SQL 101 7장 흐름 개요*
-> 윈도 함수의 핵심은 행 개수를 줄이지 않으면서 전체 데이터의 맥락 속에서 각 행의 위치나 값을 계산한다는 점입니다.
+> 윈도 함수의 핵심은 행 개수를 줄이지 않으면서 전체 데이터의 맥락 속에서 각 행의 위치나 값을 계산한다는 사실입니다.
 
 ## 먼저 던지는 질문
 

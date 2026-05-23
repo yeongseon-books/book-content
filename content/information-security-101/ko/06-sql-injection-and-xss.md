@@ -336,7 +336,7 @@ def validate_limit(limit: int) -> int:
     return limit
 ```
 
-이 코드에서 중요한 점은 방어 레이어가 다르다는 것입니다.
+이 코드에서 중요한 점은 방어 레이어가 다르다는 사실입니다.
 
 - SQL 방어: 쿼리 작성 단계
 - XSS 방어: 렌더링 단계

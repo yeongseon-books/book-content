@@ -126,7 +126,7 @@ src/accounts.py:14: error: Item "None" of "str | None" has no attribute "upper" 
 Found 2 errors in 1 file (checked 1 source file)
 ```
 
-mypy는 반환 타입 오류와 `None` 가능성 누락을 바로 분리해서 보여 줍니다. 이 단계의 장점은 "무엇이 틀렸는지"를 코드 리뷰 전에 명확하게 확인할 수 있다는 점입니다.
+mypy는 반환 타입 오류와 `None` 가능성 누락을 바로 분리해서 보여 줍니다. 이 단계의 장점은 "무엇이 틀렸는지"를 코드 리뷰 전에 명확하게 확인할 수 있다는 사실입니다.
 
 ### 3단계: 같은 코드에 pyright를 실행해 두 번째 관점을 얻기
 

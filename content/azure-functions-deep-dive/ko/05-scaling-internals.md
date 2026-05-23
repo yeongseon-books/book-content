@@ -60,7 +60,7 @@ Functions를 운영하면서 가장 자주 만나는 오해 중 하나는 “호
 
 먼저 전체 구조를 한 장으로 보겠습니다.
 
-핵심은 두 개의 다른 결정이 서로 다른 곳에서 일어난다는 점입니다.
+핵심은 두 개의 다른 결정이 서로 다른 곳에서 일어난다는 사실입니다.
 
 | Decision | Decided by | Signal | Result |
 |---|---|---|---|
@@ -186,7 +186,7 @@ health ping이 “지금 더 받을 수 있나”에 대한 호스트 쪽 답변
 
 즉 `FUNCTIONS_WORKER_PROCESS_COUNT`는 인스턴스당 정적 워커 수 설정이고, `WorkerConcurrencyOptions`는 지연 시간 히스토리를 기준으로 **워커를 하나 더 추가할지** 판단하는 동적 루프입니다. 둘은 대체 관계가 아닙니다.
 
-`IsOverloaded`는 queue depth를 보지 않습니다. `LatencyHistory`에서 최근 샘플을 보고, 임계치 이상 비율이 `NewWorkerThreshold`를 넘으면 과부하라고 봅니다. 그 다음 `NewWorkerIsRequired`가 최소 한 워커가 과부하이고 현재 워커 수가 `MaxWorkerCount` 미만일 때만 새 워커를 추가합니다. 중요한 점은 이 코드에 대칭적인 scale-in 경로가 없다는 것입니다. 이것은 **외부 scale-out의 축소판이 아니라, 인스턴스 내부 병렬성 확장 루프**입니다.
+`IsOverloaded`는 queue depth를 보지 않습니다. `LatencyHistory`에서 최근 샘플을 보고, 임계치 이상 비율이 `NewWorkerThreshold`를 넘으면 과부하라고 봅니다. 그 다음 `NewWorkerIsRequired`가 최소 한 워커가 과부하이고 현재 워커 수가 `MaxWorkerCount` 미만일 때만 새 워커를 추가합니다. 중요한 점은 이 코드에 대칭적인 scale-in 경로가 없다는 사실입니다. 이것은 **외부 scale-out의 축소판이 아니라, 인스턴스 내부 병렬성 확장 루프**입니다.
 
 | Aspect | Instance scale-out | Worker concurrency |
 |---|---|---|

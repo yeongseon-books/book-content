@@ -71,7 +71,7 @@ def checkout(price: int, strategy: PricingStrategy = no_discount) -> int:
 
 **Observer**는 한 객체의 상태 변화를 여러 구독자에게 전파합니다. 발행자는 구독자가 누구인지 모르고, 구독자는 발행자의 내부를 모릅니다. Django signals, JavaScript의 `addEventListener`, Redis Pub/Sub 모두 이 구조입니다.
 
-두 패턴의 공통점은 **간접 호출을 도입해 결합을 끊는다**는 것이고, 차이는 Strategy가 1:1 교체인 반면 Observer는 1:N 전파라는 점입니다.
+두 패턴의 공통점은 **간접 호출을 도입해 결합을 끊는다**는 것이고, 차이는 Strategy가 1:1 교체인 반면 Observer는 1:N 전파라는 사실입니다.
 
 ## Command가 단순한 함수 호출과 다른 점
 

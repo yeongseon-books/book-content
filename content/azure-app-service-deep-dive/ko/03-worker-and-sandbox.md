@@ -256,7 +256,7 @@ az webapp config appsettings list -n my-app -g my-rg   --query "[?name=='WEBSITE
 
 ## 정리
 
-3화의 핵심은 worker가 추상적인 인스턴스 수가 아니라는 점입니다. Windows App Service에서는 사용자 코드가 IIS와 App Service sandbox 안에서 실행되며, registry write와 많은 User32/GDI32 호출이 제약됩니다. Linux App Service에서는 container가 핵심 경계이고, startup contract와 `/home` storage semantics가 더 직접적인 변수로 등장합니다.
+3화의 핵심은 worker가 추상적인 인스턴스 수가 아니라는 사실입니다. Windows App Service에서는 사용자 코드가 IIS와 App Service sandbox 안에서 실행되며, registry write와 많은 User32/GDI32 호출이 제약됩니다. Linux App Service에서는 container가 핵심 경계이고, startup contract와 `/home` storage semantics가 더 직접적인 변수로 등장합니다.
 
 운영자가 얻어야 할 가장 중요한 감각은 같은 서비스 이름이 같은 첫 질문을 보장하지 않는다는 사실입니다. Windows라면 "이 라이브러리가 sandbox 계약을 어기는가"를 먼저 봐야 하고, Linux라면 "컨테이너가 올바르게 준비되고 있는가"를 먼저 봐야 합니다. 이 순서가 바뀌면 진단 시간이 길어집니다.
 

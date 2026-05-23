@@ -148,7 +148,7 @@ for label, name in MODEL_NAMES.items():
 
 ## KoSimCSE, BGE-M3, Solar를 같은 프레임으로 다시 비교하기
 
-아래 예제는 세 모델을 같은 문장 쌍으로 비교합니다. KoSimCSE와 BGE-M3는 로컬에서 바로 실행할 수 있고, Solar는 Upstage 임베딩 API 키가 있으면 실제 호출을 사용하고 없으면 mock 점수로 흐름만 재현합니다. 핵심은 세 모델 모두 **같은 pair set**를 보고, 출력 형식도 동일하게 맞춘다는 점입니다.
+아래 예제는 세 모델을 같은 문장 쌍으로 비교합니다. KoSimCSE와 BGE-M3는 로컬에서 바로 실행할 수 있고, Solar는 Upstage 임베딩 API 키가 있으면 실제 호출을 사용하고 없으면 mock 점수로 흐름만 재현합니다. 핵심은 세 모델 모두 **같은 pair set**를 보고, 출력 형식도 동일하게 맞춘다는 사실입니다.
 
 ```python
 import os

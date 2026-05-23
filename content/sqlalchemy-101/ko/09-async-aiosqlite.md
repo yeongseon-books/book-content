@@ -473,7 +473,7 @@ class UserRepository:
         return u
 ```
 
-핵심은 repository가 트랜잭션 경계를 갖지 않는다는 점입니다. 트랜잭션은 상위 서비스 계층에서 `async with session.begin()`으로 관리합니다.
+핵심은 repository가 트랜잭션 경계를 갖지 않는다는 사실입니다. 트랜잭션은 상위 서비스 계층에서 `async with session.begin()`으로 관리합니다.
 
 ## 보강 앵커: 종료 시그널과 엔진 정리
 

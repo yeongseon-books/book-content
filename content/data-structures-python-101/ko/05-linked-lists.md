@@ -408,7 +408,7 @@ class DoublyLinkedList(Generic[T]):
 
 1. **sentinel 노드**: head와 tail에 더미 노드를 두면, 삽입/삭제 시 "리스트가 비어있는가?"를 별도로 확인할 필요가 없습니다. 모든 실제 노드는 항상 predecessor와 successor를 갖습니다.
 2. **`_insert_between`과 `_remove_node`**: 모든 삽입/삭제를 이 두 메서드로 위임하면, 포인터 조작 로직이 한 곳에 집중됩니다. append, prepend, pop_front, pop_back은 모두 이 메서드의 얇은 wrapper입니다.
-3. **`__reversed__` 구현**: 이중 연결 리스트의 장점은 역방향 순회가 O(n)에 가능하다는 점입니다. `reversed()` 내장 함수와 자연스럽게 연동됩니다.
+3. **`__reversed__` 구현**: 이중 연결 리스트의 장점은 역방향 순회가 O(n)에 가능하다는 사실입니다. `reversed()` 내장 함수와 자연스럽게 연동됩니다.
 
 ## 메모리 프로파일링: list vs 연결 리스트
 

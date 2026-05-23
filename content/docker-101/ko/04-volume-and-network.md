@@ -88,7 +88,7 @@ docker run -d --network app-net --name api -e DB_HOST=db myapp
 # api can reach the host 'db'
 ```
 
-이 단계의 핵심은 `db`라는 이름이 곧 접속 대상이 된다는 점입니다. user-defined bridge는 컨테이너 이름 기반 DNS를 제공하므로, IP 주소를 직접 관리할 필요가 없습니다.
+이 단계의 핵심은 `db`라는 이름이 곧 접속 대상이 된다는 사실입니다. user-defined bridge는 컨테이너 이름 기반 DNS를 제공하므로, IP 주소를 직접 관리할 필요가 없습니다.
 
 ### 4단계 — 통신 확인하기
 

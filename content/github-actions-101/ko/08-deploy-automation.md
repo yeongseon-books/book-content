@@ -99,7 +99,7 @@ deploy-production:
     - run: kubectl apply -f k8s/production/
 ```
 
-여기서 중요한 것은 `environment` 한 줄이 단순한 라벨이 아니라 정책과 연결된다는 점입니다. production에 required reviewers를 걸어 두었다면, 이 잡은 승인 없이는 आगे로 못 갑니다.
+여기서 중요한 것은 `environment` 한 줄이 단순한 라벨이 아니라 정책과 연결된다는 사실입니다. production에 required reviewers를 걸어 두었다면, 이 잡은 승인 없이는 आगे로 못 갑니다.
 
 ### 4단계 — OIDC로 단기 자격 증명 쓰기
 

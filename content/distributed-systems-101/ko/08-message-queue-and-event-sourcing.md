@@ -383,7 +383,7 @@ def rebuild_order_projection(conn: Connection) -> None:
 
 ### Consumer Group 리밸런싱을 이해해야 하는 이유
 
-Kafka consumer group은 인스턴스가 늘거나 줄 때 partition 할당을 다시 계산합니다. 이 순간을 리밸런싱이라고 부릅니다. 문제는 리밸런싱 동안 해당 consumer가 잠시 읽기를 멈출 수 있다는 점입니다. 트래픽이 높은 시간대에 리밸런싱이 잦으면 lag가 계단형으로 증가합니다.
+Kafka consumer group은 인스턴스가 늘거나 줄 때 partition 할당을 다시 계산합니다. 이 순간을 리밸런싱이라고 부릅니다. 문제는 리밸런싱 동안 해당 consumer가 잠시 읽기를 멈출 수 있다는 사실입니다. 트래픽이 높은 시간대에 리밸런싱이 잦으면 lag가 계단형으로 증가합니다.
 
 운영 설계에서 반드시 정해야 할 항목은 다음입니다.
 
@@ -490,7 +490,7 @@ def normalize_order_paid(event: dict) -> dict:
     raise ValueError("unsupported_schema_version")
 ```
 
-이 접근의 장점은 재빌드 시점에도 동일 projector 코드를 재사용할 수 있다는 점입니다. 즉, 스키마 진화 전략은 평시 처리와 복구 처리 모두를 지배합니다.
+이 접근의 장점은 재빌드 시점에도 동일 projector 코드를 재사용할 수 있다는 사실입니다. 즉, 스키마 진화 전략은 평시 처리와 복구 처리 모두를 지배합니다.
 
 ### 운영 메트릭: lag, 처리량, DLQ
 

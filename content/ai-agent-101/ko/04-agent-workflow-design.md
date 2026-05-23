@@ -113,7 +113,7 @@ def react_agent(user_query: str, tools: List[Dict], max_steps: int = 10) -> str:
     return "Max steps reached without solution."
 ```
 
-ReAct의 장점은 중간 관찰에 따라 방향을 바꾸기 쉽다는 점입니다. 검색 결과가 기대와 다르면 다음 행동을 즉시 바꿀 수 있습니다. 대신 upfront planning이 약해 복잡한 작업에서는 시행착오가 길어질 수 있습니다.
+ReAct는 중간 관찰에 따라 방향을 바꾸기 쉽습니다. 검색 결과가 기대와 다르면 다음 행동을 즉시 바꿀 수 있습니다. 대신 upfront planning이 약해 복잡한 작업에서는 시행착오가 길어질 수 있습니다.
 
 ### Plan-and-Execute는 전체 그림을 먼저 고정합니다
 
@@ -350,7 +350,7 @@ graph.add_edge("finish", END)
 graph.add_edge("fallback", END)
 ```
 
-이 구조의 장점은 stop reason이 자연어가 아니라 전이 규칙으로 남는다는 점입니다. 장애 분석 시 "왜 끝났는가"를 코드로 설명할 수 있습니다.
+이 구조에서는 stop reason이 자연어가 아니라 전이 규칙으로 남습니다. 장애 분석 시 "왜 끝났는가"를 코드로 설명할 수 있습니다.
 
 ### 승인 게이트를 포함한 배포 전 워크플로우
 

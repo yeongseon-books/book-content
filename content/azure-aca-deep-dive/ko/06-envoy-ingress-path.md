@@ -110,7 +110,7 @@ TLS 종료가 끝나면 프록시는 upstream destination을 골라야 합니다
 
 *Revision routing before the service hop*
 
-Envoy upstream 동작을 기준으로 보면, 가장 방어 가능한 설명은 weighted upstream selection입니다. 핵심은 선택이 여기서 일어나야 한다는 점입니다. 앱 안에 들어간 뒤에는 이미 어떤 Revision인지 결정된 뒤이기 때문입니다.
+Envoy upstream 동작을 기준으로 보면, 가장 방어 가능한 설명은 weighted upstream selection입니다. 핵심은 선택이 여기서 일어나야 한다는 사실입니다. 앱 안에 들어간 뒤에는 이미 어떤 Revision인지 결정된 뒤이기 때문입니다.
 
 ### Envoy의 weight는 upstream cluster weight입니다
 
@@ -124,7 +124,7 @@ Envoy upstream 동작을 기준으로 보면, 가장 방어 가능한 설명은 
 
 ### ACA가 Kubernetes를 감춰도 service-style hop은 사라지지 않습니다
 
-사용자 시점에서는 요청이 “그 Revision”으로 간다고 느껴집니다. 하지만 숨은 data plane을 설명하는 가장 방어 가능한 모델은 ingress routing 뒤에 service-style hop이 있다는 것입니다. 선택된 upstream은 보통 개별 Pod 하나가 아니라, ready replica 집합을 향한 endpoint set으로 보는 편이 Kubernetes 패턴과 가장 잘 맞습니다.
+사용자 시점에서는 요청이 “그 Revision”으로 간다고 느껴집니다. 하지만 숨은 data plane을 설명하는 가장 방어 가능한 모델은 ingress routing 뒤에 service-style hop이 있다는 사실입니다. 선택된 upstream은 보통 개별 Pod 하나가 아니라, ready replica 집합을 향한 endpoint set으로 보는 편이 Kubernetes 패턴과 가장 잘 맞습니다.
 
 ![Service-style fan-out behind ingress routing](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-deep-dive/06/06-07-the-service-hop-is-easy-to-forget-becaus.ko.png)
 
@@ -238,7 +238,7 @@ static_resources:
                                   weight: 20
 ```
 
-이 예시는 ACA의 실제 내부 파일이 아니라 "왜 트래픽 분할이 ingress 라우팅 상태로 읽혀야 하는가"를 설명하기 위한 기준 모델입니다. 핵심은 weighted 선택이 앱 컨테이너 이전 단계에서 일어난다는 점입니다.
+이 예시는 ACA의 실제 내부 파일이 아니라 "왜 트래픽 분할이 ingress 라우팅 상태로 읽혀야 하는가"를 설명하기 위한 기준 모델입니다. 핵심은 weighted 선택이 앱 컨테이너 이전 단계에서 일어난다는 사실입니다.
 
 ### 요청 추적 출력은 ingress와 앱 로그를 같은 trace 키로 묶어야 합니다
 

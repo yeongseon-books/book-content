@@ -124,7 +124,7 @@ log = structlog.get_logger("app")
 log.info("startup", component="api")
 ```
 
-`structlog`의 장점은 "로그 문자열"이 아니라 "이벤트 + 속성" 중심으로 사고하게 만든다는 점입니다. 팀 단위로 필드 표준을 맞추기 좋고, contextvars 기반으로 request_id를 자동 주입하기도 쉽습니다.
+`structlog`의 장점은 "로그 문자열"이 아니라 "이벤트 + 속성" 중심으로 사고하게 만든다는 사실입니다. 팀 단위로 필드 표준을 맞추기 좋고, contextvars 기반으로 request_id를 자동 주입하기도 쉽습니다.
 
 ## 로그 레벨은 심각도가 아니라 운영 계약입니다
 

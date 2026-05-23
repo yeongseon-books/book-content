@@ -100,7 +100,7 @@ print(detect_pii(text))
 # [('us_phone', 12, 24, '555-123-4567'), ('이메일', 28, 45, 'alice@example.com')]
 ```
 
-regex의 장점은 빠르고 explainable하다는 점입니다. 다만 이름, 주소, 의료 표현처럼 형식이 고정되지 않은 정보는 잘 잡지 못합니다. 카드 번호도 Luhn 검증 없이 정규식만 쓰면 false positive가 많습니다.
+regex는 빠르고 explainable합니다. 다만 이름, 주소, 의료 표현처럼 형식이 고정되지 않은 정보는 잘 잡지 못합니다. 카드 번호도 Luhn 검증 없이 정규식만 쓰면 false positive가 많습니다.
 
 ### Presidio는 비정형 PII 탐지에 유용합니다
 

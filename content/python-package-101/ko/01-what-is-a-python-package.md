@@ -482,7 +482,7 @@ print(mylib.__file__)
 # /home/user/projects/mylib/src/mylib/__init__.py (원본 번역!)
 ```
 
-editable install의 장점은 소스를 수정하면 다시 설치하지 않아도 변경이 즉시 반영된다는 것입니다. 개발-테스트 사이클이 빨라집니다.
+editable install의 장점은 소스를 수정하면 다시 설치하지 않아도 변경이 즉시 반영된다는 사실입니다. 개발-테스트 사이클이 빨라집니다.
 
 ### 모던 Editable Install (PEP 660)
 

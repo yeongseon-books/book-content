@@ -38,7 +38,7 @@ seo_description: 데이터 마이그레이션은 "schema는 그대로 두고 row
 
 ## 왜 중요한가
 
-`ALTER TABLE`만 migration은 아닙니다. column rename, enum 값 변경, JSON 구조 변환처럼 schema와 함께 데이터도 바뀌는 작업이 많습니다. 문제는 이런 data migration을 schema revision 안에 그대로 섞으면 큰 데이터셋에서 lock과 timeout이 폭발하고, `downgrade`는 사실상 불가능해진다는 점입니다.
+`ALTER TABLE`만 migration은 아닙니다. column rename, enum 값 변경, JSON 구조 변환처럼 schema와 함께 데이터도 바뀌는 작업이 많습니다. 문제는 이런 data migration을 schema revision 안에 그대로 섞으면 큰 데이터셋에서 lock과 timeout이 폭발하고, `downgrade`는 사실상 불가능해진다는 사실입니다.
 
 ## 멘탈 모델
 
@@ -75,7 +75,7 @@ def upgrade() -> None:
     )
 ```
 
-조금 길지만 dialect-agnostic하고, 변환 로직이 복잡할수록 더 안전합니다. 중요한 점은 migration 안에서 live 모델을 import하지 않는다는 것입니다. 미래에 모델이 바뀌면 과거 migration이 깨질 수 있으므로 `table()`과 `column()`으로 그 시점의 schema만 inline으로 표현해야 합니다.
+조금 길지만 dialect-agnostic하고, 변환 로직이 복잡할수록 더 안전합니다. 중요한 점은 migration 안에서 live 모델을 import하지 않는다는 사실입니다. 미래에 모델이 바뀌면 과거 migration이 깨질 수 있으므로 `table()`과 `column()`으로 그 시점의 schema만 inline으로 표현해야 합니다.
 
 ### batch 처리
 

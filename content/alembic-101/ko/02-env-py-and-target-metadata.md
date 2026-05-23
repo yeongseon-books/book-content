@@ -46,7 +46,7 @@ seo_description: Alembic의 부트 스크립트인 env.py 설정법과 target_me
 
 > `env.py`는 Alembic이 **모든 명령마다 실행하는 부트 스크립트**입니다. 각 실행(`upgrade`, `revision --autogenerate` 등)에서 Alembic은 (1) `alembic.ini`를 읽고, (2) `env.py`를 실행해 connection과 metadata를 얻고, (3) `versions/` 아래의 revision을 적용합니다.
 
-여기서 가장 중요한 사실은 매번 실행된다는 점입니다. 환경 변수도 매번 다시 읽히고, 모델 import도 매번 일어납니다. 이 흐름을 받아들이면 `env.py`의 책임이 훨씬 또렷해집니다.
+여기서 가장 중요한 사실은 매번 실행된다는 사실입니다. 환경 변수도 매번 다시 읽히고, 모델 import도 매번 일어납니다. 이 흐름을 받아들이면 `env.py`의 책임이 훨씬 또렷해집니다.
 
 ### 다이어그램: `env.py`가 metadata와 연결을 조립하는 위치
 

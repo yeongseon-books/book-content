@@ -171,7 +171,7 @@ def llama_guard_check(response: str) -> tuple[bool, list[str]]:
     return is_safe_flag, [c.strip() for c in categories]
 ```
 
-Llama Guard의 장점은 정책 텍스트를 직접 수정할 수 있다는 점입니다. “환불 확정 금지”, “경쟁사 언급 금지” 같은 회사 정책과 결합하기 좋습니다.
+Llama Guard는 정책 텍스트를 직접 수정할 수 있습니다. “환불 확정 금지”, “경쟁사 언급 금지” 같은 회사 정책과 결합하기 좋습니다.
 
 ### 회사 고유 정책은 별도 judge로 분리하는 편이 낫습니다
 

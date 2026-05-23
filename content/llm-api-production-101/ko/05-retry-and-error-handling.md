@@ -171,7 +171,7 @@ except RetryableLLMError as exc:
 
 <!-- injected-output:end -->
 
-여기서 세 가지가 중요합니다. `retry_if_exception_type(RetryableLLMError)`로 재시도 범위를 좁혔다는 점, `wait_exponential_jitter`로 점점 느려지는 백오프와 지터를 함께 적용했다는 점, `reraise=True`로 최종 실패를 숨기지 않는다는 점입니다.
+여기서 세 가지가 중요합니다. `retry_if_exception_type(RetryableLLMError)`로 재시도 범위를 좁혔다는 사실, `wait_exponential_jitter`로 점점 느려지는 백오프와 지터를 함께 적용했다는 사실, `reraise=True`로 최종 실패를 숨기지 않는다는 사실입니다.
 
 ### 어떤 실패가 재시도 대상인가
 
