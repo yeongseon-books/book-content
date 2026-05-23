@@ -30,7 +30,7 @@ seo_description: 지난 글에서 CausalSelfAttention까지 만들고 나면 한
 
 이번 글에서는 `Block(nn.Module)`을 구현하면서 FeedForward, Residual, LayerNorm, 그리고 블록 반복이 어떤 역할 분담을 가지는지 정리하겠습니다. 여기서부터 GPT는 단일 어텐션 예제를 넘어 실제 모델 구조를 갖추기 시작합니다.
 
-이제 블록 하나를 제대로 이해하면 다음 글에서 GPT 전체 클래스를 조립하는 일이 훨씬 단순해집니다.
+블록 하나의 역할 분담을 정확히 잡으면, 같은 블록을 N번 쌓아 모델 깊이를 늘리는 일이 단순한 반복으로 환원됩니다.
 
 ![LLM from Scratch 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/04/04-01-layernorm-pre-norm-vs-post-norm.ko.png)
 *LLM from Scratch 101 4장 흐름 개요*

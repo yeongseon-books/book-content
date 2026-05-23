@@ -29,7 +29,7 @@ Add loops on top of that, and the cost grows faster. A bad route can bounce exec
 
 This is the third article in the LangGraph 101 series. Here I want to frame conditional edges not as a convenient syntax feature, but as **the decision points that let a graph choose its next node in the open**. That distinction matters. **A conditional edge reads state, translates that state into a route, and makes the routing boundary visible instead of hiding it inside execution code.**
 
-Once that perspective is clear, the next chapter on tool-calling agents becomes much easier to read. Tool loops are still just “look at the current state, then choose the next behavior.” If branching stays mentally downgraded to a small runtime `if`, fallback routes, loop termination, and observability never feel as central as they actually are.
+Once that perspective is clear, more complex patterns like tool-calling agents become much easier to read. They are still just “look at the current state, then choose the next behavior.” If branching stays mentally downgraded to a small runtime `if`, fallback routes, loop termination, and observability never feel as central as they actually are.
 
 ![Three way branch from classify node](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/03/03-01-minimal-runnable-example.en.png)
 *Three way branch from classify node*

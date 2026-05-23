@@ -30,7 +30,7 @@ seo_description: 토크나이저까지 만들고 나면 잠깐 멍해집니다. 
 
 이번 글에서는 `nn.Embedding`을 거창한 수학 객체가 아니라 룩업 테이블로 이해하고, 토큰 의미와 위치 정보를 더해 `(B, T, C)` 입력 텐서를 만드는 과정을 `model.py` 수준에서 정리하겠습니다.
 
-이제 숫자 ID를 실제 표현 벡터로 바꾸는 입구를 이해하면, 다음 글의 어텐션도 훨씬 자연스럽게 이어집니다.
+이 입구를 정확히 잡아야 위쪽에 쌓이는 어텐션과 블록이 모두 같은 텐서 형상 위에서 동작한다는 점을 흔들리지 않고 읽을 수 있습니다.
 
 ![LLM from Scratch 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/02/02-01-sinusoidal-vs-learned-positional-embeddi.ko.png)
 *LLM from Scratch 101 2장 흐름 개요*

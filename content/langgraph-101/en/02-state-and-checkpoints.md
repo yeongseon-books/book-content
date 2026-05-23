@@ -29,7 +29,7 @@ Once tool calls and multi-turn behavior enter the picture, the naïve fallback�
 
 This is the second article in the LangGraph 101 series. Here I want to frame checkpointing not as a friendly memory feature, but as a **runtime layer that saves state and lets execution continue from the same conversation timeline**. That distinction matters. **State is the graph’s single source of truth, and a checkpoint is the mechanism that preserves that truth across calls.**
 
-Once that model is clear, the next chapter becomes easier too. Conditional edges stop looking like isolated branching logic and start looking like routing decisions made from saved state. Tool loops become repeated state transitions on top of the same timeline. If checkpointing remains a fuzzy “memory-like thing,” `thread_id`, merge rules, replay, and time travel all stay fuzzier than they should.
+Once that model is clear, the rest of the graph speaks the same language. Conditional edges stop looking like isolated branching logic and start looking like routing decisions made from saved state. Tool loops become repeated state transitions on top of the same timeline. If checkpointing remains a fuzzy “memory-like thing,” `thread_id`, merge rules, replay, and time travel all stay fuzzier than they should.
 
 ![Resume flow through thread_id](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/02/02-01-minimal-runnable-example.en.png)
 *Resume flow through thread_id*
