@@ -75,9 +75,7 @@ The second project reads like an operating service instead of a local exercise.
 
 You do not need a complex platform to make a portfolio project credible.
 
-```python
-host = "fly.io"  # or render, railway
-```
+Pick one understandable platform first—Fly.io, Render, or Railway are all reasonable beginner choices.
 
 The best beginner choice is usually the platform you can understand, redeploy, and afford to keep alive.
 
@@ -115,9 +113,7 @@ Repeatability matters because portfolio demos age quickly. If updating the demo 
 
 Deployment is not complete until you have a quick signal for service state.
 
-```python
-url = "https://app.fly.dev/healthz"
-```
+That signal can be as simple as a health-check URL such as `https://app.fly.dev/healthz`.
 
 That small route gives you a first check when something looks wrong, and it makes operations feel less guess-driven.
 

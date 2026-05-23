@@ -91,9 +91,7 @@ Success signal: a first-time user completes the main flow without explanation
 
 ### Step 1 — One-line title
 
-```python
-title = "course schedule conflict checker"
-```
+Write the title as one clear line, such as *course schedule conflict checker*.
 
 ### Step 2 — Users
 
@@ -103,21 +101,15 @@ users = ["student", "advisor"]
 
 ### Step 3 — Value
 
-```python
-value = "cuts time spent on registration"
-```
+Describe the value as a user-visible change: it cuts the time spent on registration.
 
 ### Step 4 — Metric
 
-```python
-metric = "users confirm conflicts in 30 seconds"
-```
+Make the metric measurable: users should be able to confirm conflicts within 30 seconds.
 
 ### Step 5 — Demo
 
-```python
-demo = "demo.mp4 + readme.md"
-```
+Decide on the demo package early, even if it is as simple as `demo.mp4` plus `README.md`.
 
 ## What to Notice in This Code
 

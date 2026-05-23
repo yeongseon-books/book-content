@@ -42,6 +42,7 @@ check-content:
 	python3 scripts/check_ko_typos.py
 	python3 scripts/check_fences.py
 	python3 scripts/check_no_big_picture_section.py
+	python3 scripts/check_trivial_code.py
 
 # Validate generated outputs (Medium HTML, exports)
 check-generated:

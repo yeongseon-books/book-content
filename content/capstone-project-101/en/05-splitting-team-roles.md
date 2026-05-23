@@ -114,9 +114,7 @@ raci = {"deploy": ("A", "B"), "test": ("D", "C")}
 
 ### Step 5 — Review cadence
 
-```python
-review = "weekly"
-```
+Set the review cadence explicitly; a weekly role review is usually enough to catch drift early.
 
 ## What to Notice in This Code
 

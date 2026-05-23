@@ -75,9 +75,7 @@ Both may be true, but the second answer gives the interviewer a problem, a desig
 
 Open with the real context that made the project worth building.
 
-```python
-situation = "The team schedule kept getting lost across tools"
-```
+For example, you might open with the real pain point: the team schedule kept getting lost across tools.
 
 The situation should be concrete enough that the interviewer can picture the pain quickly.
 
@@ -85,9 +83,7 @@ The situation should be concrete enough that the interviewer can picture the pai
 
 State what the project needed to accomplish.
 
-```python
-task = "Show every schedule on a single screen"
-```
+Then name the task clearly: show every schedule on a single screen.
 
 That line clarifies scope and makes later trade-offs easier to explain.
 
@@ -115,9 +111,7 @@ Metrics create evidence. They do not need to be huge. They need to be real.
 
 Close with what the project taught you.
 
-```python
-lesson = "Small MVPs survive"
-```
+Close with the lesson you would reuse: small MVPs survive.
 
 That line is often what turns a build log into an engineering answer.
 

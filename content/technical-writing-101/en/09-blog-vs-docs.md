@@ -76,27 +76,19 @@ The difference matters operationally more than stylistically. A deployment blog 
 
 ### Step 1 — Tutorial
 
-```python
-tutorial = "First-time learning"
-```
+Use **tutorial** for first-time learning.
 
 ### Step 2 — How-to
 
-```python
-how_to = "Solving a specific problem"
-```
+Use **how-to** for solving a specific problem.
 
 ### Step 3 — Reference
 
-```python
-reference = "API specification"
-```
+Use **reference** for API specifications and other authoritative lookups.
 
 ### Step 4 — Explanation
 
-```python
-explanation = "Why a design was chosen"
-```
+Use **explanation** when the goal is to show why a design was chosen.
 
 ### Step 5 — Blog vs docs
 

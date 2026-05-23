@@ -116,9 +116,7 @@ Even small metrics help because they give the reader something concrete to evalu
 
 Close with a principle you would apply again.
 
-```python
-lesson = "MVP only survives when small"
-```
+One strong closing lesson is simple: MVPs survive only when they stay small.
 
 That line keeps the article from ending as a diary entry. It turns the project into a transferable lesson.
 

@@ -90,9 +90,7 @@ Feedback prompts: was the flow clear, was it fast enough, would you use it in re
 
 ### Step 1 — Pick the core flow
 
-```python
-flow = "register -> upload -> share"
-```
+Reduce the core flow to one readable sentence, for example: register, upload, then share.
 
 ### Step 2 — Out of scope list
 

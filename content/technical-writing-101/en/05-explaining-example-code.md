@@ -98,9 +98,7 @@ def add(a, b):
 
 ### Step 2 — Callout
 
-```python
-# Highlight: take two numbers and return their sum
-```
+Add the callout in prose outside the snippet: this function takes two numbers and returns their sum.
 
 ### Step 3 — Run
 
@@ -116,9 +114,7 @@ python3 -c "from m import add; print(add(2, 3))"
 
 ### Step 5 — Link the full code
 
-```python
-full_code_url = "https://github.com/example/repo/blob/main/m.py"
-```
+Link the full code separately, for example by pointing readers to `https://github.com/example/repo/blob/main/m.py`.
 
 ## What to Notice in This Code
 

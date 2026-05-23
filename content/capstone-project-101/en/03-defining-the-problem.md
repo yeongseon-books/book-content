@@ -90,33 +90,23 @@ Success metric: a first-time user confirms conflicts within 30 seconds
 
 ### Step 1 — Observation
 
-```python
-obs = "schedule conflicts during course registration"
-```
+Start with a concrete observation, such as schedule conflicts during course registration.
 
 ### Step 2 — User
 
-```python
-user = "freshmen plus double-major students"
-```
+Name the primary users explicitly: freshmen and double-major students.
 
 ### Step 3 — Value
 
-```python
-value = "spot conflicts fast"
-```
+Describe the value in outcome language: help users spot conflicts quickly.
 
 ### Step 4 — Assumption
 
-```python
-assume = "users can paste timetables as text"
-```
+Pull the key assumption into the open: users can paste timetables as text.
 
 ### Step 5 — Metric
 
-```python
-metric = "conflict found within 30s"
-```
+Tie the goal to a measurable threshold: a conflict should be found within 30 seconds.
 
 ## What to Notice in This Code
 

@@ -75,9 +75,7 @@ The second project makes judgment much easier to see.
 
 A choice only becomes meaningful when its constraints are visible.
 
-```python
-context = "solo dev, 2-week deadline, Python familiar"
-```
+Write the context in plain language first: solo developer, two-week deadline, and strong familiarity with Python.
 
 This prevents hindsight from flattening every decision into a generic “best practice.”
 
@@ -95,9 +93,7 @@ You do not need a giant matrix. Two or three realistic options are enough.
 
 The final choice should be plain and unambiguous.
 
-```python
-decision = "FastAPI"
-```
+Then state the decision directly: choose FastAPI.
 
 The power comes from placing that line after the context and the options.
 

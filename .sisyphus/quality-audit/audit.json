@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-05-20T12:05:37+00:00",
+  "generated_at": "2026-05-23T23:04:41+00:00",
   "series_count": 92,
-  "problem_series_count": 0,
+  "problem_series_count": 16,
   "series_with_5_plus": 0,
   "gate": null,
   "gate_failed_series": [],
@@ -9,40 +9,1060 @@
   "warnings": [],
   "totals": {
     "BadImg": 0,
-    "Synt": 0,
+    "Synt": 27,
     "BrkLink": 0,
-    "Shrt": 0,
+    "Shrt": 1,
     "NoEn": 0,
-    "all": 0
+    "all": 28
   },
   "results": [
     {
-      "series": "ai-agent-101",
+      "series": "llm-finetuning-101",
       "counts": {
-        "Synt": 0,
+        "Synt": 4,
         "BrkLink": 0,
         "Shrt": 0,
         "NoEn": 0,
         "BadImg": 0
       },
-      "total": 0,
+      "total": 4,
       "max_issue_kind": "Synt",
-      "examples": {},
-      "items": {}
+      "examples": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/llm-finetuning-101/ko/02-dataset.md",
+            "line": 349,
+            "message": "unterminated string literal (detected at line 14)",
+            "article": "02-dataset.md",
+            "lang": "ko",
+            "code": "from dataclasses import dataclass",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          },
+          {
+            "kind": "Synt",
+            "path": "content/llm-finetuning-101/ko/03-lora.md",
+            "line": 318,
+            "message": "unterminated string literal (detected at line 14)",
+            "article": "03-lora.md",
+            "lang": "ko",
+            "code": "from dataclasses import dataclass",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          },
+          {
+            "kind": "Synt",
+            "path": "content/llm-finetuning-101/ko/05-evaluation.md",
+            "line": 331,
+            "message": "unterminated string literal (detected at line 14)",
+            "article": "05-evaluation.md",
+            "lang": "ko",
+            "code": "from dataclasses import dataclass",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          },
+          {
+            "kind": "Synt",
+            "path": "content/llm-finetuning-101/ko/06-serving.md",
+            "line": 343,
+            "message": "unterminated string literal (detected at line 14)",
+            "article": "06-serving.md",
+            "lang": "ko",
+            "code": "from dataclasses import dataclass",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      },
+      "items": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/llm-finetuning-101/ko/02-dataset.md",
+            "line": 349,
+            "message": "unterminated string literal (detected at line 14)",
+            "article": "02-dataset.md",
+            "lang": "ko",
+            "code": "from dataclasses import dataclass",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          },
+          {
+            "kind": "Synt",
+            "path": "content/llm-finetuning-101/ko/03-lora.md",
+            "line": 318,
+            "message": "unterminated string literal (detected at line 14)",
+            "article": "03-lora.md",
+            "lang": "ko",
+            "code": "from dataclasses import dataclass",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          },
+          {
+            "kind": "Synt",
+            "path": "content/llm-finetuning-101/ko/05-evaluation.md",
+            "line": 331,
+            "message": "unterminated string literal (detected at line 14)",
+            "article": "05-evaluation.md",
+            "lang": "ko",
+            "code": "from dataclasses import dataclass",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          },
+          {
+            "kind": "Synt",
+            "path": "content/llm-finetuning-101/ko/06-serving.md",
+            "line": 343,
+            "message": "unterminated string literal (detected at line 14)",
+            "article": "06-serving.md",
+            "lang": "ko",
+            "code": "from dataclasses import dataclass",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      }
+    },
+    {
+      "series": "multimodal-ai-101",
+      "counts": {
+        "Synt": 4,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 4,
+      "max_issue_kind": "Synt",
+      "examples": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/multimodal-ai-101/ko/02-image-encoders-clip-vit.md",
+            "line": 273,
+            "message": "unterminated string literal (detected at line 17)",
+            "article": "02-image-encoders-clip-vit.md",
+            "lang": "ko",
+            "code": "from openai import OpenAI",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          },
+          {
+            "kind": "Synt",
+            "path": "content/multimodal-ai-101/ko/04-captioning-ocr-pipelines.md",
+            "line": 314,
+            "message": "unterminated string literal (detected at line 5)",
+            "article": "04-captioning-ocr-pipelines.md",
+            "lang": "ko",
+            "code": "def build_validation_prompt(caption: str, ocr_text: str) -> str:",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          },
+          {
+            "kind": "Synt",
+            "path": "content/multimodal-ai-101/ko/10-production-multimodal-app.md",
+            "line": 270,
+            "message": "unterminated string literal (detected at line 12)",
+            "article": "10-production-multimodal-app.md",
+            "lang": "ko",
+            "code": "class StepFailure(Exception):",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          },
+          {
+            "kind": "Synt",
+            "path": "content/multimodal-ai-101/ko/10-production-multimodal-app.md",
+            "line": 314,
+            "message": "unterminated string literal (detected at line 2)",
+            "article": "10-production-multimodal-app.md",
+            "lang": "ko",
+            "code": "ALLOWED_MAGIC = {",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      },
+      "items": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/multimodal-ai-101/ko/02-image-encoders-clip-vit.md",
+            "line": 273,
+            "message": "unterminated string literal (detected at line 17)",
+            "article": "02-image-encoders-clip-vit.md",
+            "lang": "ko",
+            "code": "from openai import OpenAI",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          },
+          {
+            "kind": "Synt",
+            "path": "content/multimodal-ai-101/ko/04-captioning-ocr-pipelines.md",
+            "line": 314,
+            "message": "unterminated string literal (detected at line 5)",
+            "article": "04-captioning-ocr-pipelines.md",
+            "lang": "ko",
+            "code": "def build_validation_prompt(caption: str, ocr_text: str) -> str:",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          },
+          {
+            "kind": "Synt",
+            "path": "content/multimodal-ai-101/ko/10-production-multimodal-app.md",
+            "line": 270,
+            "message": "unterminated string literal (detected at line 12)",
+            "article": "10-production-multimodal-app.md",
+            "lang": "ko",
+            "code": "class StepFailure(Exception):",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          },
+          {
+            "kind": "Synt",
+            "path": "content/multimodal-ai-101/ko/10-production-multimodal-app.md",
+            "line": 314,
+            "message": "unterminated string literal (detected at line 2)",
+            "article": "10-production-multimodal-app.md",
+            "lang": "ko",
+            "code": "ALLOWED_MAGIC = {",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      }
+    },
+    {
+      "series": "python-101",
+      "counts": {
+        "Synt": 3,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 3,
+      "max_issue_kind": "Synt",
+      "examples": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/python-101/ko/03-strings-and-formatting.md",
+            "line": 456,
+            "message": "unterminated string literal (detected at line 7)",
+            "article": "03-strings-and-formatting.md",
+            "lang": "ko",
+            "code": "import pdb",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          },
+          {
+            "kind": "Synt",
+            "path": "content/python-101/ko/05-control-flow.md",
+            "line": 421,
+            "message": "unterminated string literal (detected at line 3)",
+            "article": "05-control-flow.md",
+            "lang": "ko",
+            "code": "import timeit",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          },
+          {
+            "kind": "Synt",
+            "path": "content/python-101/ko/08-file-io-and-exceptions.md",
+            "line": 335,
+            "message": "unterminated string literal (detected at line 5)",
+            "article": "08-file-io-and-exceptions.md",
+            "lang": "ko",
+            "code": "from pathlib import Path",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      },
+      "items": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/python-101/ko/03-strings-and-formatting.md",
+            "line": 456,
+            "message": "unterminated string literal (detected at line 7)",
+            "article": "03-strings-and-formatting.md",
+            "lang": "ko",
+            "code": "import pdb",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          },
+          {
+            "kind": "Synt",
+            "path": "content/python-101/ko/05-control-flow.md",
+            "line": 421,
+            "message": "unterminated string literal (detected at line 3)",
+            "article": "05-control-flow.md",
+            "lang": "ko",
+            "code": "import timeit",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          },
+          {
+            "kind": "Synt",
+            "path": "content/python-101/ko/08-file-io-and-exceptions.md",
+            "line": 335,
+            "message": "unterminated string literal (detected at line 5)",
+            "article": "08-file-io-and-exceptions.md",
+            "lang": "ko",
+            "code": "from pathlib import Path",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      }
     },
     {
       "series": "ai-app-patterns-101",
       "counts": {
-        "Synt": 0,
+        "Synt": 2,
         "BrkLink": 0,
         "Shrt": 0,
         "NoEn": 0,
         "BadImg": 0
       },
-      "total": 0,
+      "total": 2,
       "max_issue_kind": "Synt",
-      "examples": {},
-      "items": {}
+      "examples": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/ai-app-patterns-101/ko/01-chatbot-pattern.md",
+            "line": 356,
+            "message": "unterminated f-string literal (detected at line 27)",
+            "article": "01-chatbot-pattern.md",
+            "lang": "ko",
+            "code": "from fastapi import FastAPI, HTTPException",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          },
+          {
+            "kind": "Synt",
+            "path": "content/ai-app-patterns-101/ko/02-rag-qa-pattern.md",
+            "line": 431,
+            "message": "unterminated string literal (detected at line 17)",
+            "article": "02-rag-qa-pattern.md",
+            "lang": "ko",
+            "code": "from fastapi import FastAPI",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      },
+      "items": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/ai-app-patterns-101/ko/01-chatbot-pattern.md",
+            "line": 356,
+            "message": "unterminated f-string literal (detected at line 27)",
+            "article": "01-chatbot-pattern.md",
+            "lang": "ko",
+            "code": "from fastapi import FastAPI, HTTPException",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          },
+          {
+            "kind": "Synt",
+            "path": "content/ai-app-patterns-101/ko/02-rag-qa-pattern.md",
+            "line": 431,
+            "message": "unterminated string literal (detected at line 17)",
+            "article": "02-rag-qa-pattern.md",
+            "lang": "ko",
+            "code": "from fastapi import FastAPI",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      }
+    },
+    {
+      "series": "document-ingestion-101",
+      "counts": {
+        "Synt": 2,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 2,
+      "max_issue_kind": "Synt",
+      "examples": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/document-ingestion-101/ko/02-chunking-strategies.md",
+            "line": 226,
+            "message": "unterminated string literal (detected at line 13)",
+            "article": "02-chunking-strategies.md",
+            "lang": "ko",
+            "code": "from __future__ import annotations",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          },
+          {
+            "kind": "Synt",
+            "path": "content/document-ingestion-101/ko/05-multi-format-pipeline.md",
+            "line": 405,
+            "message": "unterminated string literal (detected at line 10)",
+            "article": "05-multi-format-pipeline.md",
+            "lang": "ko",
+            "code": "from __future__ import annotations",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      },
+      "items": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/document-ingestion-101/ko/02-chunking-strategies.md",
+            "line": 226,
+            "message": "unterminated string literal (detected at line 13)",
+            "article": "02-chunking-strategies.md",
+            "lang": "ko",
+            "code": "from __future__ import annotations",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          },
+          {
+            "kind": "Synt",
+            "path": "content/document-ingestion-101/ko/05-multi-format-pipeline.md",
+            "line": 405,
+            "message": "unterminated string literal (detected at line 10)",
+            "article": "05-multi-format-pipeline.md",
+            "lang": "ko",
+            "code": "from __future__ import annotations",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      }
+    },
+    {
+      "series": "linear-algebra-101",
+      "counts": {
+        "Synt": 2,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 2,
+      "max_issue_kind": "Synt",
+      "examples": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/linear-algebra-101/ko/05-linear-transformation.md",
+            "line": 278,
+            "message": "unterminated string literal (detected at line 17)",
+            "article": "05-linear-transformation.md",
+            "lang": "ko",
+            "code": "import numpy as np",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          },
+          {
+            "kind": "Synt",
+            "path": "content/linear-algebra-101/ko/05-linear-transformation.md",
+            "line": 517,
+            "message": "unterminated string literal (detected at line 11)",
+            "article": "05-linear-transformation.md",
+            "lang": "ko",
+            "code": "import numpy as np",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      },
+      "items": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/linear-algebra-101/ko/05-linear-transformation.md",
+            "line": 278,
+            "message": "unterminated string literal (detected at line 17)",
+            "article": "05-linear-transformation.md",
+            "lang": "ko",
+            "code": "import numpy as np",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          },
+          {
+            "kind": "Synt",
+            "path": "content/linear-algebra-101/ko/05-linear-transformation.md",
+            "line": 517,
+            "message": "unterminated string literal (detected at line 11)",
+            "article": "05-linear-transformation.md",
+            "lang": "ko",
+            "code": "import numpy as np",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      }
+    },
+    {
+      "series": "testing-101",
+      "counts": {
+        "Synt": 2,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 2,
+      "max_issue_kind": "Synt",
+      "examples": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/testing-101/ko/04-e2e-test.md",
+            "line": 106,
+            "message": "unmatched ')'",
+            "article": "04-e2e-test.md",
+            "lang": "ko",
+            "code": "# tests/e2e/test_user_flow.py",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          },
+          {
+            "kind": "Synt",
+            "path": "content/testing-101/ko/05-test-double.md",
+            "line": 282,
+            "message": "positional argument follows keyword argument",
+            "article": "05-test-double.md",
+            "lang": "ko",
+            "code": "def test_order_creation():",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      },
+      "items": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/testing-101/ko/04-e2e-test.md",
+            "line": 106,
+            "message": "unmatched ')'",
+            "article": "04-e2e-test.md",
+            "lang": "ko",
+            "code": "# tests/e2e/test_user_flow.py",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          },
+          {
+            "kind": "Synt",
+            "path": "content/testing-101/ko/05-test-double.md",
+            "line": 282,
+            "message": "positional argument follows keyword argument",
+            "article": "05-test-double.md",
+            "lang": "ko",
+            "code": "def test_order_creation():",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      }
+    },
+    {
+      "series": "ai-agent-101",
+      "counts": {
+        "Synt": 1,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 1,
+      "max_issue_kind": "Synt",
+      "examples": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/ai-agent-101/ko/02-context-engineering.md",
+            "line": 276,
+            "message": "unterminated string literal (detected at line 5)",
+            "article": "02-context-engineering.md",
+            "lang": "ko",
+            "code": "from langchain_core.prompts import ChatPromptTemplate",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      },
+      "items": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/ai-agent-101/ko/02-context-engineering.md",
+            "line": 276,
+            "message": "unterminated string literal (detected at line 5)",
+            "article": "02-context-engineering.md",
+            "lang": "ko",
+            "code": "from langchain_core.prompts import ChatPromptTemplate",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      }
+    },
+    {
+      "series": "ai-safety-guardrails-101",
+      "counts": {
+        "Synt": 1,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 1,
+      "max_issue_kind": "Synt",
+      "examples": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/ai-safety-guardrails-101/ko/05-jailbreak-detection.md",
+            "line": 285,
+            "message": "unterminated string literal (detected at line 2)",
+            "article": "05-jailbreak-detection.md",
+            "lang": "ko",
+            "code": "def conversation_risk_score(history: list[str]) -> float:",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      },
+      "items": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/ai-safety-guardrails-101/ko/05-jailbreak-detection.md",
+            "line": 285,
+            "message": "unterminated string literal (detected at line 2)",
+            "article": "05-jailbreak-detection.md",
+            "lang": "ko",
+            "code": "def conversation_risk_score(history: list[str]) -> float:",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      }
+    },
+    {
+      "series": "api-design-101",
+      "counts": {
+        "Synt": 1,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 1,
+      "max_issue_kind": "Synt",
+      "examples": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/api-design-101/ko/02-rest-basics.md",
+            "line": 68,
+            "message": "invalid syntax",
+            "article": "02-rest-basics.md",
+            "lang": "ko",
+            "code": "# Stateless: 매 요청에 인증 정보를 포함",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      },
+      "items": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/api-design-101/ko/02-rest-basics.md",
+            "line": 68,
+            "message": "invalid syntax",
+            "article": "02-rest-basics.md",
+            "lang": "ko",
+            "code": "# Stateless: 매 요청에 인증 정보를 포함",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      }
+    },
+    {
+      "series": "backend-development-101",
+      "counts": {
+        "Synt": 1,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 1,
+      "max_issue_kind": "Synt",
+      "examples": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/backend-development-101/ko/02-building-an-http-server.md",
+            "line": 198,
+            "message": "unterminated string literal (detected at line 13)",
+            "article": "02-building-an-http-server.md",
+            "lang": "ko",
+            "code": "# 학습용: 요청/응답 경계를 직접 확인",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      },
+      "items": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/backend-development-101/ko/02-building-an-http-server.md",
+            "line": 198,
+            "message": "unterminated string literal (detected at line 13)",
+            "article": "02-building-an-http-server.md",
+            "lang": "ko",
+            "code": "# 학습용: 요청/응답 경계를 직접 확인",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      }
+    },
+    {
+      "series": "devops-101",
+      "counts": {
+        "Synt": 1,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 1,
+      "max_issue_kind": "Synt",
+      "examples": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/devops-101/ko/05-infrastructure-as-code.md",
+            "line": 150,
+            "message": "invalid syntax",
+            "article": "05-infrastructure-as-code.md",
+            "lang": "ko",
+            "code": "# OPA 정책 예시(Rego)",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      },
+      "items": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/devops-101/ko/05-infrastructure-as-code.md",
+            "line": 150,
+            "message": "invalid syntax",
+            "article": "05-infrastructure-as-code.md",
+            "lang": "ko",
+            "code": "# OPA 정책 예시(Rego)",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      }
+    },
+    {
+      "series": "incident-response-101",
+      "counts": {
+        "Synt": 1,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 1,
+      "max_issue_kind": "Synt",
+      "examples": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/incident-response-101/ko/10-incident-runbook.md",
+            "line": 192,
+            "message": "unterminated triple-quoted string literal (detected at line 15)",
+            "article": "10-incident-runbook.md",
+            "lang": "ko",
+            "code": "from jinja2 import Template",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      },
+      "items": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/incident-response-101/ko/10-incident-runbook.md",
+            "line": 192,
+            "message": "unterminated triple-quoted string literal (detected at line 15)",
+            "article": "10-incident-runbook.md",
+            "lang": "ko",
+            "code": "from jinja2 import Template",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      }
+    },
+    {
+      "series": "mlops-101",
+      "counts": {
+        "Synt": 1,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 1,
+      "max_issue_kind": "Synt",
+      "examples": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/mlops-101/ko/03-data-versioning.md",
+            "line": 113,
+            "message": "positional argument follows keyword argument",
+            "article": "03-data-versioning.md",
+            "lang": "ko",
+            "code": "# 초기 버전",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      },
+      "items": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/mlops-101/ko/03-data-versioning.md",
+            "line": 113,
+            "message": "positional argument follows keyword argument",
+            "article": "03-data-versioning.md",
+            "lang": "ko",
+            "code": "# 초기 버전",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      }
+    },
+    {
+      "series": "pandas-101",
+      "counts": {
+        "Synt": 1,
+        "BrkLink": 0,
+        "Shrt": 0,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 1,
+      "max_issue_kind": "Synt",
+      "examples": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/pandas-101/ko/01-what-is-pandas.md",
+            "line": 66,
+            "message": "invalid syntax",
+            "article": "01-what-is-pandas.md",
+            "lang": "ko",
+            "code": "!pip install pandas",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      },
+      "items": {
+        "Synt": [
+          {
+            "kind": "Synt",
+            "path": "content/pandas-101/ko/01-what-is-pandas.md",
+            "line": 66,
+            "message": "invalid syntax",
+            "article": "01-what-is-pandas.md",
+            "lang": "ko",
+            "code": "!pip install pandas",
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      }
+    },
+    {
+      "series": "model-evaluation-101",
+      "counts": {
+        "Synt": 0,
+        "BrkLink": 0,
+        "Shrt": 1,
+        "NoEn": 0,
+        "BadImg": 0
+      },
+      "total": 1,
+      "max_issue_kind": "Shrt",
+      "examples": {
+        "Shrt": [
+          {
+            "kind": "Shrt",
+            "path": "content/model-evaluation-101/ko/01-why-evaluation-is-hard.md",
+            "line": 22,
+            "message": "markdown body has 149 lines (< 150)",
+            "article": "01-why-evaluation-is-hard.md",
+            "lang": "ko",
+            "code": null,
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      },
+      "items": {
+        "Shrt": [
+          {
+            "kind": "Shrt",
+            "path": "content/model-evaluation-101/ko/01-why-evaluation-is-hard.md",
+            "line": 22,
+            "message": "markdown body has 149 lines (< 150)",
+            "article": "01-why-evaluation-is-hard.md",
+            "lang": "ko",
+            "code": null,
+            "image": null,
+            "width": null,
+            "height": null,
+            "repo": null
+          }
+        ]
+      }
     },
     {
       "series": "ai-data-preparation-101",
@@ -60,20 +1080,6 @@
     },
     {
       "series": "ai-evaluation-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 0
-      },
-      "total": 0,
-      "max_issue_kind": "Synt",
-      "examples": {},
-      "items": {}
-    },
-    {
-      "series": "ai-safety-guardrails-101",
       "counts": {
         "Synt": 0,
         "BrkLink": 0,
@@ -130,20 +1136,6 @@
     },
     {
       "series": "algorithms-python-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 0
-      },
-      "total": 0,
-      "max_issue_kind": "Synt",
-      "examples": {},
-      "items": {}
-    },
-    {
-      "series": "api-design-101",
       "counts": {
         "Synt": 0,
         "BrkLink": 0,
@@ -256,20 +1248,6 @@
     },
     {
       "series": "azure-functions-deep-dive",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 0
-      },
-      "total": 0,
-      "max_issue_kind": "Synt",
-      "examples": {},
-      "items": {}
-    },
-    {
-      "series": "backend-development-101",
       "counts": {
         "Synt": 0,
         "BrkLink": 0,
@@ -535,20 +1513,6 @@
       "items": {}
     },
     {
-      "series": "devops-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 0
-      },
-      "total": 0,
-      "max_issue_kind": "Synt",
-      "examples": {},
-      "items": {}
-    },
-    {
       "series": "discrete-math-101",
       "counts": {
         "Synt": 0,
@@ -578,20 +1542,6 @@
     },
     {
       "series": "docker-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 0
-      },
-      "total": 0,
-      "max_issue_kind": "Synt",
-      "examples": {},
-      "items": {}
-    },
-    {
-      "series": "document-ingestion-101",
       "counts": {
         "Synt": 0,
         "BrkLink": 0,
@@ -675,20 +1625,6 @@
       "items": {}
     },
     {
-      "series": "incident-response-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 0
-      },
-      "total": 0,
-      "max_issue_kind": "Synt",
-      "examples": {},
-      "items": {}
-    },
-    {
       "series": "information-security-101",
       "counts": {
         "Synt": 0,
@@ -759,20 +1695,6 @@
       "items": {}
     },
     {
-      "series": "linear-algebra-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 0
-      },
-      "total": 0,
-      "max_issue_kind": "Synt",
-      "examples": {},
-      "items": {}
-    },
-    {
       "series": "linux-cli-101",
       "counts": {
         "Synt": 0,
@@ -829,20 +1751,6 @@
       "items": {}
     },
     {
-      "series": "llm-finetuning-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 0
-      },
-      "total": 0,
-      "max_issue_kind": "Synt",
-      "examples": {},
-      "items": {}
-    },
-    {
       "series": "llm-from-scratch-101",
       "counts": {
         "Synt": 0,
@@ -872,48 +1780,6 @@
     },
     {
       "series": "math-for-cs-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 0
-      },
-      "total": 0,
-      "max_issue_kind": "Synt",
-      "examples": {},
-      "items": {}
-    },
-    {
-      "series": "mlops-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 0
-      },
-      "total": 0,
-      "max_issue_kind": "Synt",
-      "examples": {},
-      "items": {}
-    },
-    {
-      "series": "model-evaluation-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 0
-      },
-      "total": 0,
-      "max_issue_kind": "Synt",
-      "examples": {},
-      "items": {}
-    },
-    {
-      "series": "multimodal-ai-101",
       "counts": {
         "Synt": 0,
         "BrkLink": 0,
@@ -983,20 +1849,6 @@
       "items": {}
     },
     {
-      "series": "pandas-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 0
-      },
-      "total": 0,
-      "max_issue_kind": "Synt",
-      "examples": {},
-      "items": {}
-    },
-    {
       "series": "portfolio-project-101",
       "counts": {
         "Synt": 0,
@@ -1040,20 +1892,6 @@
     },
     {
       "series": "pytest-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 0
-      },
-      "total": 0,
-      "max_issue_kind": "Synt",
-      "examples": {},
-      "items": {}
-    },
-    {
-      "series": "python-101",
       "counts": {
         "Synt": 0,
         "BrkLink": 0,
@@ -1236,20 +2074,6 @@
     },
     {
       "series": "technical-writing-101",
-      "counts": {
-        "Synt": 0,
-        "BrkLink": 0,
-        "Shrt": 0,
-        "NoEn": 0,
-        "BadImg": 0
-      },
-      "total": 0,
-      "max_issue_kind": "Synt",
-      "examples": {},
-      "items": {}
-    },
-    {
-      "series": "testing-101",
       "counts": {
         "Synt": 0,
         "BrkLink": 0,

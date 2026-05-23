@@ -89,9 +89,7 @@ The second outline is stronger because the headings expose the route. The title 
 
 ### Step 1 — Title
 
-```python
-title = "Ship your first FastAPI endpoint in five minutes"
-```
+The title should make a specific promise, such as *Ship your first FastAPI endpoint in five minutes*.
 
 ### Step 2 — Outline
 
@@ -101,9 +99,7 @@ outline = ["Install", "Code", "Run", "Verify", "Next step"]
 
 ### Step 3 — First paragraph
 
-```python
-lede = "Hello World in five minutes"
-```
+The opening paragraph should immediately set the pace, for example by promising a Hello World result in five minutes.
 
 ### Step 4 — Body headings
 
@@ -115,9 +111,7 @@ lede = "Hello World in five minutes"
 
 ### Step 5 — Summary
 
-```python
-summary = "Now you can ship your own endpoint"
-```
+The summary should hand the reader back an action, such as: now you can ship your own endpoint.
 
 ## What to Notice in This Code
 

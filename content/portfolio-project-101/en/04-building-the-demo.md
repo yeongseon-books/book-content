@@ -105,9 +105,7 @@ A shared account or another guided access path keeps the reviewer from burning t
 
 Live demos are powerful, but they are not always reliable.
 
-```python
-video_url = "https://youtu.be/example"
-```
+Keep a backup video link ready, such as `https://youtu.be/example`.
 
 A short backup video prevents one hosting hiccup from turning into a total explanation failure.
 
@@ -115,9 +113,7 @@ A short backup video prevents one hosting hiccup from turning into a total expla
 
 You need a quick way to separate “the link is broken” from “the app is down.”
 
-```python
-health = "/healthz"
-```
+A small route like `/healthz` is often enough for that first check.
 
 Health checks are not just for infrastructure. They help you keep the demo trustworthy over time.
 

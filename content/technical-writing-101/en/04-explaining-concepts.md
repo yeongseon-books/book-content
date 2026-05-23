@@ -81,21 +81,15 @@ A strong concept explanation helps the reader classify the next example without 
 
 ### Step 1 — Definition
 
-```python
-definition = "A cache stores frequent answers ahead of time"
-```
+Start with a direct definition: a cache stores frequent answers ahead of time.
 
 ### Step 2 — Analogy
 
-```python
-analogy = "Side dishes you keep at the front of the fridge"
-```
+An everyday analogy helps here: think of the side dishes you keep at the front of the fridge because you reach for them often.
 
 ### Step 3 — Counterexample
 
-```python
-counterexample = "Data you read only once does not belong in a cache"
-```
+Then draw the boundary with a counterexample: data you read only once usually does not belong in a cache.
 
 ### Step 4 — Code example
 
@@ -106,9 +100,7 @@ cache["user:1"] = {"name": "Jimin"}
 
 ### Step 5 — Common misconception
 
-```python
-misconception = "A cache can grow forever"
-```
+A useful misconception to break early is the idea that a cache can grow forever.
 
 ## What to Notice in This Code
 

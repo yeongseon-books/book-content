@@ -75,15 +75,11 @@ This table matters because technical vagueness usually begins in the opening pro
 
 ### Step 1 — Pick the audience
 
-```python
-audience = "Python beginners"
-```
+Start by naming the audience plainly: Python beginners.
 
 ### Step 2 — Pick the task
 
-```python
-task = "Create and activate a virtual environment"
-```
+Then narrow the task to one concrete action: create and activate a virtual environment.
 
 ### Step 3 — The commands
 
@@ -94,15 +90,11 @@ source .venv/bin/activate
 
 ### Step 4 — The result
 
-```python
-result = "(.venv) shows up in the prompt"
-```
+State the visible result as part of the prose: the prompt should now show `(.venv)`.
 
 ### Step 5 — The next action
 
-```python
-next_step = "pip install requests"
-```
+End with the next action so the reader knows where to go next: `pip install requests`.
 
 ## What to Notice in This Code
 

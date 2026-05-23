@@ -91,9 +91,7 @@ Linked features: F-1 timetable input, F-2 conflict engine, F-3 results view
 
 ### Step 1 — User story
 
-```python
-story = "as a student I want instant conflict detection"
-```
+Write the story in plain user language: as a student, I want instant conflict detection.
 
 ### Step 2 — Acceptance criteria
 

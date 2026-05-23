@@ -87,9 +87,7 @@ That single field matters because it gives every later choice a reason. A review
 
 A claim becomes much stronger when another person can verify it directly.
 
-```python
-demo_url = "https://demo.example.com"
-```
+That usually means exposing a clear demo URL such as `https://demo.example.com`.
 
 A live URL moves the project from explanation to proof. It also signals that you did not stop at local implementation.
 
@@ -117,9 +115,7 @@ Two projects can ship the same feature. The one that explains why a framework wa
 
 You should be able to describe the project in one tight sentence.
 
-```python
-pitch = "A mini SaaS that fixes lost team schedules"
-```
+One workable pitch would be: a mini SaaS that fixes lost team schedules.
 
 That sentence becomes the spine for the README, the blog post, and the interview answer. If the one-line pitch is vague, everything downstream tends to become vague too.
 

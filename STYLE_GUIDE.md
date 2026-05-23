@@ -194,6 +194,44 @@ ko 글의 H1/H2/H3는 **한국어 우선**이다.
 - `## Before vs. After`는 `## 적용 전후 비교`로 번역한다.
 - Guard: `scripts/check_ko_headings.py`가 CI에서 위반을 차단한다.
 
+### 코드 펜스 사용 규칙
+
+코드 펜스(```` ```python `` 등)는 **실행 가능한 코드, CLI 명령, 또는 설정**에만 사용한다. 개념 메모를 코드처럼 보이게 하려고 펜스로 감싸지 않는다.
+
+금지 패턴 (AI slop, 이슈 #1227):
+
+```python
+flow = "register -> upload -> share"
+```
+
+```python
+value = "spot conflicts fast"
+```
+
+위와 같은 `<이름> = "<문자열 메모>"` 1줄 펜스는 코드가 아니라 메모이며, syntax highlighter도 의도와 다르게 동작한다. 본문 문장으로 풀어 쓰거나 불릿으로 정리한다.
+
+허용 패턴 (실제 실행 가능한 1줄):
+
+```python
+cur.execute("SELECT * FROM users WHERE name=%s", (name,))
+```
+
+```sql
+SELECT COUNT(*) FROM users WHERE deleted_at IS NULL;
+```
+
+```http
+GET /users/42
+```
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+- Guard: `scripts/check_trivial_code.py`가 `<이름> = "<문자열>"` 형태의 python 메모 펜스를 차단한다.
+
+---
+
 ### 소스 코드 블록 안 주석 언어 규칙
 
 ko 글의 source-code 블록(`python`, `javascript`, `typescript`, `go`, `rust`, `java`, `c`, `cpp` 등) 안 **설명 주석은 한국어로 작성**한다.

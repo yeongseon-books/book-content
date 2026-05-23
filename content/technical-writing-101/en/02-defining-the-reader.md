@@ -92,9 +92,7 @@ unknown = ["async", "type hints"]
 
 ### Step 4 — Goal
 
-```python
-goal = "Ship the first FastAPI endpoint"
-```
+Write the goal as a concrete next action: ship the first FastAPI endpoint.
 
 ### Step 5 — Non-goal
 
