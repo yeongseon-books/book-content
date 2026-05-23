@@ -71,9 +71,7 @@ last_reviewed: '2026-05-15'
 
 먼저 왜 이 프로젝트가 필요했는지 설명합니다.
 
-```python
-situation = "The team schedule kept getting lost across tools"
-```
+예를 들어 `팀 일정이 여러 도구에 흩어져 계속 놓치는 문제`처럼 상황을 한 문장으로 말할 수 있어야 합니다.
 
 상황 설명은 길게 할 필요가 없습니다. 다만 너무 추상적이면 뒤 설명이 힘을 잃습니다. 실제 불편이 느껴지는 문장으로 적는 편이 좋습니다.
 
@@ -81,9 +79,7 @@ situation = "The team schedule kept getting lost across tools"
 
 그 상황에서 무엇을 해결해야 했는지 분명하게 말합니다.
 
-```python
-task = "Show every schedule on a single screen"
-```
+과제도 `모든 일정을 한 화면에서 보이게 만드는 것`처럼 짧게 정리하는 편이 좋습니다.
 
 과제는 프로젝트 범위를 정리해 줍니다. 무엇을 해결하지 않았는지도 함께 암시되기 때문에, 범위 감각이 있는 답변으로 들리게 만듭니다.
 
@@ -91,9 +87,11 @@ task = "Show every schedule on a single screen"
 
 이제 여러분이 실제로 한 일을 말합니다.
 
-```python
-action = ["Flask API", "PostgreSQL", "Deploy to Render"]
-```
+행동 단계에서는 보통 아래처럼 핵심 선택만 추려 말하면 충분합니다.
+
+- Flask API 구현
+- PostgreSQL 사용
+- Render 배포
 
 여기서 중요한 것은 기술 이름 자체보다 선택과 기여입니다. 왜 이 구성을 택했는지, 어떤 대안을 버렸는지를 한 문장 곁들이면 답변이 훨씬 살아납니다.
 
@@ -101,9 +99,7 @@ action = ["Flask API", "PostgreSQL", "Deploy to Render"]
 
 결과는 가능한 한 숫자로 남깁니다.
 
-```python
-result = {"users": 30, "latency_ms": 120}
-```
+예를 들어 `사용자 30명`, `평균 응답 시간 120ms`처럼 숫자로 결과를 붙이면 답변이 훨씬 강해집니다.
 
 숫자는 답변의 증거 역할을 합니다. 사용량, 응답 시간, 배포 횟수, 오류율 감소처럼 무엇이든 좋습니다. 결과가 없으면 설명은 성실해 보여도 설득력은 약해집니다.
 
@@ -111,9 +107,7 @@ result = {"users": 30, "latency_ms": 120}
 
 마지막에는 프로젝트를 통해 얻은 판단을 말합니다.
 
-```python
-lesson = "Small MVPs survive"
-```
+마지막은 `작은 MVP가 끝까지 살아남는다`처럼 배운 점 한 문장으로 닫으면 됩니다.
 
 이 한 문장이 답변을 닫습니다. 면접관은 기술 사용 경험뿐 아니라, 그 경험에서 무엇을 배웠는지도 듣고 싶어 합니다. 그래서 마지막 학습 문장은 꽤 중요합니다.
 

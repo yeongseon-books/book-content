@@ -335,34 +335,24 @@ Diátaxis 프레임워크는 글을 네 가지 목적으로 분류합니다.
 
 ### 1단계 — Tutorial
 
-```python
-tutorial = "First-time learning"
-```
+- Tutorial: `First-time learning`
 
 ### 2단계 — How-to
 
-```python
-how_to = "Solving a specific problem"
-```
+- How-to: `Solving a specific problem`
 
 ### 3단계 — Reference
 
-```python
-reference = "API specification"
-```
+- Reference: `API specification`
 
 ### 4단계 — Explanation
 
-```python
-explanation = "Why a design was chosen"
-```
+- Explanation: `Why a design was chosen`
 
 ### 5단계 — 블로그와 문서
 
-```python
-blog = "My experience and opinion"
-docs = "The team's official truth"
-```
+- 블로그: `My experience and opinion`
+- 문서: `The team's official truth`
 
 ## 이 코드에서 먼저 볼 점
 

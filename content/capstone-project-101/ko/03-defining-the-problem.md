@@ -90,41 +90,31 @@ last_reviewed: '2026-05-14'
 
 ### 1단계 — 관찰
 
-```python
-obs = "schedule conflicts during course registration"
-```
+관찰 문장은 `schedule conflicts during course registration`처럼 실제 상황이 바로 떠오르게 적습니다.
 
 관찰은 추상적 주장보다 실제 상황에 가까워야 합니다. 출발점이 구체적일수록 뒤 문장도 구체적으로 이어집니다.
 
 ### 2단계 — 사용자
 
-```python
-user = "freshmen plus double-major students"
-```
+핵심 사용자는 `freshmen plus double-major students`처럼 구체적 집단으로 좁혀 적습니다.
 
 사용자를 좁히는 이유는 배제가 아니라 집중입니다. 모두를 사용자로 잡는 순간 맥락이 사라집니다.
 
 ### 3단계 — 가치
 
-```python
-value = "spot conflicts fast"
-```
+가치는 `spot conflicts fast`처럼 사용자가 얻게 될 변화를 짧게 적습니다.
 
 가치는 기능 설명과 다릅니다. 달력 화면이 아니라 충돌을 빨리 찾게 해 주는 변화가 가치입니다.
 
 ### 4단계 — 가정
 
-```python
-assume = "users can paste timetables as text"
-```
+핵심 가정은 `users can paste timetables as text`처럼 숨기지 말고 문서에 바로 올립니다.
 
 가정을 숨기면 구현 단계에서 갑자기 복잡도가 커집니다. 입력 방식, 데이터 출처, 사용자 행동처럼 숨어 있는 전제를 문서에 올려야 합니다.
 
 ### 5단계 — 지표
 
-```python
-metric = "conflict found within 30s"
-```
+성공 지표는 `conflict found within 30s`처럼 시간 기준이 드러나는 문장으로 적습니다.
 
 지표는 잘 만들었는지 판단하는 최소 기준입니다. 숫자가 들어가야 데모와 테스트가 쉬워집니다.
 

@@ -91,41 +91,31 @@ Q&A | 4분 | 스택, 테스트, 범위 컷 설명 | ADR, 회고 메모
 
 ### 1단계 — 서사 만들기
 
-```python
-story = ["problem", "solution", "demo", "result", "next"]
-```
+발표 서사는 `problem`, `solution`, `demo`, `result`, `next`처럼 다섯 단계로 먼저 고정합니다.
 
 이 다섯 단계만 정리해도 발표의 뼈대가 잡힙니다. 기능은 이 흐름 안에서 필요한 만큼만 보여 주면 됩니다.
 
 ### 2단계 — 슬라이드 수 배분
 
-```python
-slides = {"problem": 2, "solution": 3, "demo": 1, "result": 2, "next": 1}
-```
+슬라이드 수는 `problem=2`, `solution=3`, `demo=1`, `result=2`, `next=1`처럼 구간별로 미리 배분합니다.
 
 슬라이드 수를 미리 정해 두면 특정 구간이 과하게 길어지는 것을 막을 수 있습니다.
 
 ### 3단계 — 데모 각본
 
-```python
-demo_steps = ["login", "core_action", "result_view"]
-```
+데모 장면은 `login`, `core_action`, `result_view`처럼 세 단계 이내로 줄여 두는 편이 안전합니다.
 
 데모는 욕심내기보다 세 단계 이내의 핵심 장면으로 줄이는 편이 안전합니다. 길어질수록 실패 가능성도 커집니다.
 
 ### 4단계 — Q&A 준비
 
-```python
-qna = ["why_this_stack", "how_we_tested", "what_we_cut"]
-```
+예상 질문은 `why_this_stack`, `how_we_tested`, `what_we_cut`처럼 미리 목록화해 답변 근거를 준비합니다.
 
 Q&A는 즉흥 대응만 믿지 말고, 예상 질문과 답변을 미리 정리해 두는 편이 좋습니다. 특히 왜 이 기술을 골랐는지, 무엇을 의도적으로 뺐는지는 자주 묻는 질문입니다.
 
 ### 5단계 — 시간 분배
 
-```python
-minutes = {"talk": 8, "demo": 5, "qna": 7}
-```
+시간 배분은 `talk=8`, `demo=5`, `qna=7`처럼 숫자로 적어 둬야 발표 후반이 급해지지 않습니다.
 
 시간 분배가 없으면 발표는 뒤로 갈수록 급해집니다. 발표 시간도 설계 대상이라고 보는 편이 좋습니다.
 

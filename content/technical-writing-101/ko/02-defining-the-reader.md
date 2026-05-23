@@ -278,33 +278,23 @@ persona = {
 
 ### 1단계 — 이름과 역할
 
-```python
-persona = {"name": "Jimin", "role": "First-year Python backend"}
-```
+- 페르소나: `{"name": "Jimin", "role": "First-year Python backend"}`
 
 ### 2단계 — 전제 지식
 
-```python
-knows = ["variables", "functions", "git basics"]
-```
+- 알고 있는 것: `variables`, `functions`, `git basics`
 
 ### 3단계 — 빈칸
 
-```python
-unknown = ["async", "type hints"]
-```
+- 아직 낯선 것: `async`, `type hints`
 
 ### 4단계 — 목표
 
-```python
-goal = "Ship the first FastAPI endpoint"
-```
+- 목표: `Ship the first FastAPI endpoint`
 
 ### 5단계 — 비목표
 
-```python
-non_goal = ["deployment", "DB migrations"]
-```
+- 비목표: `deployment`, `DB migrations`
 
 ## 이 코드에서 먼저 볼 점
 

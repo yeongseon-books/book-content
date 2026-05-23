@@ -396,9 +396,10 @@ python3 scripts/check_links.py --external
 
 ### 1단계 — 제목 다시 보기
 
-```python
-title_ok = ["has a verb", "fits 55 chars", "uses reader words"]
-```
+- 제목 점검 기준:
+  - `has a verb`
+  - `fits 55 chars`
+  - `uses reader words`
 
 ### 2단계 — 링크 검증
 
@@ -414,15 +415,13 @@ python3 -c "from m import add; assert add(2,3) == 5"
 
 ### 4단계 — 이미지 점검
 
-```python
-images = {"caption": True, "alt_text": True, "resolution": "2x"}
-```
+- 이미지 점검 기준: `{"caption": True, "alt_text": True, "resolution": "2x"}`
 
 ### 5단계 — 발행 후 검토
 
-```python
-post = ["fix typos within 24h", "reply to reader comments"]
-```
+- 발행 후 점검:
+  - `fix typos within 24h`
+  - `reply to reader comments`
 
 ## 이 코드에서 먼저 볼 점
 

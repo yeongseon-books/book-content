@@ -71,41 +71,31 @@ last_reviewed: '2026-05-14'
 
 ### 1단계 — 자료구조
 
-```python
-fund = ["array", "list", "tree", "graph", "hash"]
-```
+`fund = ["array", "list", "tree", "graph", "hash"]`
 
 기초 역량은 결국 설명 가능한 개념 목록으로 확인할 수 있습니다. 각 항목을 말로 풀 수 있는지, 장단점을 설명할 수 있는지 점검해 보아야 합니다.
 
 ### 2단계 — 시스템
 
-```python
-sys_topics = ["process", "memory", "io", "network"]
-```
+`sys_topics = ["process", "memory", "io", "network"]`
 
 시스템 감각은 디버깅 실력과 직접 연결됩니다. 코드가 어디에서 어떤 비용을 쓰는지 감을 잡는 축이기 때문입니다.
 
 ### 3단계 — 데이터
 
-```python
-data_topics = ["sql", "stats", "ml_basic"]
-```
+`data_topics = ["sql", "stats", "ml_basic"]`
 
 데이터 저장과 해석의 기본은 거의 모든 현대 소프트웨어 팀에서 다시 등장합니다. SQL과 통계는 생각보다 훨씬 자주 마주칩니다.
 
 ### 4단계 — 협업
 
-```python
-collab = ["git", "review", "issues", "ci"]
-```
+`collab = ["git", "review", "issues", "ci"]`
 
 협업 도구 경험은 입사 후 적응 속도에 큰 영향을 줍니다. 혼자 작성한 코드와 팀이 함께 다루는 코드는 요구 조건이 다릅니다.
 
 ### 5단계 — 문서화
 
-```python
-docs = ["readme", "design_doc", "post_mortem"]
-```
+`docs = ["readme", "design_doc", "post_mortem"]`
 
 문서 목록은 곧 증거 목록입니다. 코드만으로 설명하기 어려운 판단을 문서가 보완해 주기 때문에, 글쓰기는 부가 능력이 아니라 핵심 역량에 가깝습니다.
 

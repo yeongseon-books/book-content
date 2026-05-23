@@ -301,21 +301,15 @@ r.get("user:1")
 
 ### 1단계 — 정의
 
-```python
-definition = "A cache stores frequent answers ahead of time"
-```
+- 정의: `A cache stores frequent answers ahead of time`
 
 ### 2단계 — 비유
 
-```python
-analogy = "Side dishes you keep at the front of the fridge"
-```
+- 비유: `Side dishes you keep at the front of the fridge`
 
 ### 3단계 — 반례
 
-```python
-counterexample = "Data you read only once does not belong in a cache"
-```
+- 반례: `Data you read only once does not belong in a cache`
 
 ### 4단계 — 코드 예시
 
@@ -326,9 +320,7 @@ cache["user:1"] = {"name": "Jimin"}
 
 ### 5단계 — 흔한 오해
 
-```python
-misconception = "A cache can grow forever"
-```
+- 흔한 오해: `A cache can grow forever`
 
 ## 이 코드에서 먼저 볼 점
 

@@ -264,15 +264,11 @@ title: "Technical Writing 101 (1/10): 기술 글쓰기란 무엇인가"
 
 ### 1단계 — 독자 고르기
 
-```python
-audience = "Python beginners"
-```
+- 독자: `Python beginners`
 
 ### 2단계 — 작업 고르기
 
-```python
-task = "Create and activate a virtual environment"
-```
+- 작업: `Create and activate a virtual environment`
 
 ### 3단계 — 명령 제시하기
 
@@ -283,15 +279,11 @@ source .venv/bin/activate
 
 ### 4단계 — 결과 적기
 
-```python
-result = "(.venv) shows up in the prompt"
-```
+- 결과: `(.venv) shows up in the prompt`
 
 ### 5단계 — 다음 행동 적기
 
-```python
-next_step = "pip install requests"
-```
+- 다음 단계: `pip install requests`
 
 ## 이 코드에서 먼저 볼 점
 

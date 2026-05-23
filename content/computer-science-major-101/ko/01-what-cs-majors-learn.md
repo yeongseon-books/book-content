@@ -71,41 +71,31 @@ last_reviewed: '2026-05-14'
 
 ### 1단계 — 영역 정의
 
-```python
-areas = ["math", "programming", "systems", "data", "ai", "project"]
-```
+`areas = ["math", "programming", "systems", "data", "ai", "project"]`
 
 먼저 과목을 세부 이름보다 큰 영역으로 나눕니다. 처음부터 모든 과목을 외우기보다 어떤 축이 있는지부터 잡는 편이 훨씬 실용적입니다.
 
 ### 2단계 — 학년별 배치
 
-```python
-plan = {1: ["math", "programming"], 2: ["systems"], 3: ["data", "ai"], 4: ["project"]}
-```
+`plan = {1: ["math", "programming"], 2: ["systems"], 3: ["data", "ai"], 4: ["project"]}`
 
 학교마다 세부 순서는 다르지만, 대체로 1학년은 기초, 2학년은 시스템과 핵심 전공, 3학년은 데이터와 응용, 4학년은 프로젝트와 심화로 무게가 이동합니다.
 
 ### 3단계 — 학점 배분
 
-```python
-credits = {a: 6 for a in areas}
-```
+`credits = {a: 6 for a in areas}`
 
 이 코드는 실제 학점표가 아니라 균형 감각을 보기 위한 장난감 모델입니다. 특정 축이 지나치게 비어 있지는 않은지 확인하는 데 도움이 됩니다.
 
 ### 4단계 — 균형 점검
 
-```python
-total = sum(credits.values())  # 36
-```
+`total = sum(credits.values())  # 36`
 
 합계를 보면 내가 전공을 한 방향으로만 보고 있지 않은지 확인할 수 있습니다. 실전에서는 특정 분야를 좋아하더라도 바탕이 되는 축을 비워 두면 후반부에 반드시 비용을 치르게 됩니다.
 
 ### 5단계 — 약한 영역 찾기
 
-```python
-weak = [a for a, c in credits.items() if c < 6]
-```
+`weak = [a for a, c in credits.items() if c < 6]`
 
 약한 영역을 눈에 보이게 만들어 두면 보강 계획을 세우기 쉽습니다. 예를 들어 프로그래밍은 좋아하지만 수학을 계속 미루면 알고리즘이나 AI에서 갑자기 벽을 만나기 쉽습니다.
 

@@ -73,41 +73,31 @@ last_reviewed: '2026-05-14'
 
 ### 1단계 — 과목 나열
 
-```python
-courses = ["calculus", "linalg", "discrete", "intro_prog"]
-```
+`courses = ["calculus", "linalg", "discrete", "intro_prog"]`
 
 학교마다 과목명은 조금씩 달라도 1학년 핵심 축은 대체로 이 범위에서 크게 벗어나지 않습니다.
 
 ### 2단계 — 상위 과목 연결
 
-```python
-maps = {"calculus": "ml", "linalg": "ml", "discrete": "algorithms", "intro_prog": "all"}
-```
+`maps = {"calculus": "ml", "linalg": "ml", "discrete": "algorithms", "intro_prog": "all"}`
 
 각 과목이 어디로 이어지는지 적어 보면 목적이 분명해집니다. 특히 프로그래밍 입문은 사실상 모든 후속 과목의 공통 기반입니다.
 
 ### 3단계 — 주당 학습 시간
 
-```python
-hours = {c: 6 for c in courses}
-```
+`hours = {c: 6 for c in courses}`
 
 기초 과목은 감으로 공부하면 쉽게 밀립니다. 주당 시간을 먼저 배정해 두면 체감 난이도에 따라 한 과목만 붙잡는 실수를 줄일 수 있습니다.
 
 ### 4단계 — 실습 비중
 
-```python
-labs = {"intro_prog": 4, "discrete": 1}
-```
+`labs = {"intro_prog": 4, "discrete": 1}`
 
 프로그래밍은 강의를 이해하는 것과 직접 손을 움직이는 것이 별개입니다. 실습 시간을 따로 확보하지 않으면 문법은 아는데 구현이 안 되는 상태가 오래 갑니다.
 
 ### 5단계 — 약점 표시
 
-```python
-weak = [c for c, h in hours.items() if h < 5]
-```
+`weak = [c for c, h in hours.items() if h < 5]`
 
 약한 과목을 빨리 찾는 편이 유리합니다. 초반 약점은 시간이 갈수록 더 비싼 복습 비용으로 돌아오기 때문입니다.
 

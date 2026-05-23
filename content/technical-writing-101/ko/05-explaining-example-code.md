@@ -351,9 +351,7 @@ def add(a, b):
 
 ### 2단계 — 설명 줄
 
-```python
-# 핵심: 두 수를 받아 합을 반환
-```
+- 설명 줄: `두 수를 받아 합을 반환`
 
 ### 3단계 — 실행
 
@@ -369,9 +367,7 @@ python3 -c "from m import add; print(add(2, 3))"
 
 ### 5단계 — 전체 코드 링크
 
-```python
-full_code_url = "https://github.com/example/repo/blob/main/m.py"
-```
+- 전체 코드 링크: `https://github.com/example/repo/blob/main/m.py`
 
 ## 이 코드에서 먼저 볼 점
 

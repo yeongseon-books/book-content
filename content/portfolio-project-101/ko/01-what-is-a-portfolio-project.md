@@ -71,9 +71,7 @@ last_reviewed: '2026-05-15'
 
 포트폴리오 프로젝트는 기술 이름보다 문제에서 출발해야 합니다.
 
-```python
-project = {"name": "task-tracker", "problem": "lost team schedules"}
-```
+예를 들어 프로젝트 이름은 `task-tracker`, 해결하려는 문제는 `팀 일정이 자꾸 흩어져 보이는 불편`처럼 바로 적을 수 있습니다.
 
 이 한 줄이 중요한 이유는 프로젝트의 목적을 정하기 때문입니다. 리뷰어는 "무엇을 만들었나"보다 "무슨 문제를 해결하려 했나"를 먼저 이해해야 이후 선택을 해석할 수 있습니다.
 
@@ -81,9 +79,7 @@ project = {"name": "task-tracker", "problem": "lost team schedules"}
 
 설명만으로는 충분하지 않습니다. 직접 열어 볼 수 있는 경로가 있어야 합니다.
 
-```python
-demo_url = "https://demo.example.com"
-```
+예를 들어 `https://demo.example.com` 같은 데모 주소를 README와 소개 글에 함께 드러내 두는 방식입니다.
 
 데모 URL은 프로젝트를 주장 단계에서 증명 단계로 옮깁니다. 링크 하나가 살아 있으면 구현 품질뿐 아니라 마무리 능력도 함께 드러납니다.
 
@@ -91,9 +87,13 @@ demo_url = "https://demo.example.com"
 
 README는 방문자가 프로젝트를 읽는 순서를 설계하는 문서입니다.
 
-```python
-sections = ["problem", "demo", "stack", "run", "next"]
-```
+README에는 보통 다음 다섯 섹션이 있으면 충분합니다.
+
+- 문제
+- 데모
+- 기술 스택
+- 실행 방법
+- 다음 작업
 
 이 다섯 섹션만 있어도 저장소의 입구가 훨씬 선명해집니다. 문제, 데모, 스택, 실행 방법, 다음 작업이 보이면 프로젝트의 현재 상태를 빠르게 해석할 수 있습니다.
 
@@ -101,9 +101,7 @@ sections = ["problem", "demo", "stack", "run", "next"]
 
 좋은 포트폴리오는 결과만이 아니라 판단도 남깁니다.
 
-```python
-decisions = [{"why": "FastAPI", "trade": "less_admin"}]
-```
+예를 들어 `FastAPI를 골랐고, 대신 관리 기능은 적다는 점을 감수했다`처럼 선택과 트레이드오프를 함께 남기면 됩니다.
 
 같은 기능을 만든 두 저장소가 있을 때, 왜 FastAPI를 골랐고 무엇을 포기했는지 적어 둔 쪽이 훨씬 강하게 읽힙니다. 채용에서는 정답보다 판단 기준을 더 궁금해하는 경우가 많습니다.
 
@@ -111,9 +109,7 @@ decisions = [{"why": "FastAPI", "trade": "less_admin"}]
 
 프로젝트를 한 문장으로 설명할 수 있어야 합니다.
 
-```python
-pitch = "A mini SaaS that fixes lost team schedules"
-```
+예를 들어 `흩어진 팀 일정을 한곳에서 보게 해 주는 작은 협업 도구`처럼 한 문장으로 소개할 수 있어야 합니다.
 
 이 문장은 README, 블로그 글, 면접 답변까지 모두 이어지는 중심축이 됩니다. 설명이 길어질수록 프로젝트가 흐려지는 경우가 많기 때문에, 짧고 정확한 소개 문장을 먼저 다듬는 편이 좋습니다.
 

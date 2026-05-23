@@ -91,41 +91,39 @@ ID: ST-1
 
 ### 1단계 — 사용자 스토리
 
-```python
-story = "as a student I want instant conflict detection"
-```
+사용자 스토리는 `as a student I want instant conflict detection`처럼 사용자와 원하는 행동이 함께 보이게 적습니다.
 
 스토리는 기능 이름보다 사용자 행동이 드러나야 합니다. 누가 무엇을 원하고 왜 필요한지 읽혀야 합니다.
 
 ### 2단계 — 수용 기준
 
-```python
-accept = ["input 5s", "result 1s", "error clear"]
-```
+수용 기준은 다음처럼 짧은 점검 목록으로 정리합니다.
+
+- `input 5s`
+- `result 1s`
+- `error clear`
 
 수용 기준은 애매한 표현보다 시간, 결과, 오류 처리처럼 확인 가능한 문장으로 적는 편이 좋습니다.
 
 ### 3단계 — 비기능
 
-```python
-nf = ["mobile", "no_signup", "korean_first"]
-```
+비기능 조건도 다음처럼 따로 분리해 적습니다.
+
+- `mobile`
+- `no_signup`
+- `korean_first`
 
 비기능 요건은 기능 설명에 섞지 말고 따로 분리해야 합니다. 그래야 구현 범위와 품질 기준을 함께 볼 수 있습니다.
 
 ### 4단계 — 우선순위
 
-```python
-prio = {"core": "Must", "share": "Should", "ai": "Could"}
-```
+우선순위는 `core=Must`, `share=Should`, `ai=Could`처럼 같은 형식으로 나눠 두면 일정 조정이 쉬워집니다.
 
 우선순위는 일정이 흔들릴 때 가장 큰 힘을 발휘합니다. 모든 항목이 중요해 보이더라도 반드시 나눠 두어야 합니다.
 
 ### 5단계 — 추적
 
-```python
-trace = {"ST-1": ["F-1", "F-2"]}
-```
+추적 관계는 `ST-1 -> F-1, F-2`처럼 요구사항 ID와 구현 항목을 직접 연결해 둡니다.
 
 요구사항 ID와 구현 항목을 연결해 두면 나중에 변경 영향 범위를 빠르게 파악할 수 있습니다.
 

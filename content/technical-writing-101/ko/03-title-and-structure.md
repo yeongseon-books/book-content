@@ -368,21 +368,20 @@ H2 다음에 바로 H4를 쓰지 맙니다. H2 → H3 → H4 순서를 지킵니
 
 ### 1단계 — 제목
 
-```python
-title = "Ship your first FastAPI endpoint in five minutes"
-```
+- 제목 초안: `Ship your first FastAPI endpoint in five minutes`
 
 ### 2단계 — 개요
 
-```python
-outline = ["Install", "Code", "Run", "Verify", "Next step"]
-```
+- 개요:
+  - `Install`
+  - `Code`
+  - `Run`
+  - `Verify`
+  - `Next step`
 
 ### 3단계 — 첫 단락
 
-```python
-lede = "Hello World in five minutes"
-```
+- 첫 단락 요지: `Hello World in five minutes`
 
 ### 4단계 — 본문 헤딩
 
@@ -394,9 +393,7 @@ lede = "Hello World in five minutes"
 
 ### 5단계 — 정리
 
-```python
-summary = "Now you can ship your own endpoint"
-```
+- 정리 문장: `Now you can ship your own endpoint`
 
 ## 자주 하는 실수 5가지
 

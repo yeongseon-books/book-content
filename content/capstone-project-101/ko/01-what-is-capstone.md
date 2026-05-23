@@ -91,41 +91,31 @@ last_reviewed: '2026-05-14'
 
 ### 1단계 — 한 줄 제목
 
-```python
-title = "course schedule conflict checker"
-```
+제목 초안은 `course schedule conflict checker`처럼 한 줄로 적습니다.
 
 프로젝트 제목은 화려할수록 좋은 것이 아니라, 무엇을 하는지 바로 이해될수록 좋습니다. 한 줄 제목이 선명해야 팀의 대화도 선명해집니다.
 
 ### 2단계 — 사용자
 
-```python
-users = ["student", "advisor"]
-```
+첫 사용자 후보는 `student`, `advisor`처럼 짧게 적어 범위를 눈에 보이게 만듭니다.
 
 사용자를 좁히면 요구사항도 함께 좁혀집니다. 반대로 모두를 사용자로 잡으면 프로젝트는 빠르게 커집니다.
 
 ### 3단계 — 가치
 
-```python
-value = "cuts time spent on registration"
-```
+핵심 가치는 `cuts time spent on registration`처럼 변화 중심 문장으로 정리합니다.
 
 가치는 기능 설명이 아니라 변화 설명이어야 합니다. 무엇을 만들었는지가 아니라, 무엇이 더 쉬워지는지를 적는 편이 좋습니다.
 
 ### 4단계 — 지표
 
-```python
-metric = "users confirm conflicts in 30 seconds"
-```
+성공 지표는 `users confirm conflicts in 30 seconds`처럼 시간과 행동이 함께 드러나게 적습니다.
 
 지표가 들어가면 프로젝트의 성공 기준이 명확해집니다. 막연히 편하다는 표현보다, 얼마 안에 무엇을 할 수 있는지가 더 강한 기준입니다.
 
 ### 5단계 — 데모
 
-```python
-demo = "demo.mp4 + readme.md"
-```
+데모 산출물은 `demo.mp4 + readme.md`처럼 미리 적어 두면 발표 준비 기준이 분명해집니다.
 
 데모 형식을 미리 적어 두면 어떤 흐름을 반드시 완성해야 하는지가 자연스럽게 드러납니다. 발표 직전 급히 정리하는 팀일수록 핵심 흐름이 흔들리기 쉽습니다.
 
