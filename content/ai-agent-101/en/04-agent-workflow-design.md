@@ -40,7 +40,7 @@ This is post 4 in the AI Agent 101 series. Here we cover major workflow patterns
 
 ## Key Workflow Patterns
 
-Agents need systematic workflows to handle complex tasks. Let's explore the main patterns.
+Agents need systematic workflows to handle complex tasks. This section covers the main patterns.
 
 ### Draw the control flow before you tune the prompt
 
@@ -281,7 +281,7 @@ In production, these patterns are often combined. For example, use Plan-and-Exec
 
 ## Task Decomposition Strategy
 
-Breaking complex tasks into smaller steps is key to workflow design. Let's explore effective decomposition strategies.
+Breaking complex tasks into smaller steps is key to workflow design. The strategies below outline effective decomposition approaches.
 
 ### Top-Down Decomposition
 

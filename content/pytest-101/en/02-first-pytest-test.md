@@ -268,7 +268,7 @@ In practice, the `src/` layout is used to clearly separate production code from 
 
 ## Summary and Next
 
-You've learned pytest's test discovery rules and project structure. The `test_` prefix and `src/` layout are the foundation. Next, we'll dive deep into `assert` patterns and exception testing.
+You've learned pytest's test discovery rules and project structure. The `test_` prefix and `src/` layout are the foundation. Next, we'll cover `assert` patterns and exception testing in depth.
 
 ## Answering the Opening Questions
 

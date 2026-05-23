@@ -140,7 +140,7 @@ A *platform team* ships a *common operability* template; *product teams* focus o
 
 ## Wrap-up and Next Steps
 
-Congrats on finishing the series. Next, head into *Incident Response 101* and dive deeper into the *operations floor*.
+Congrats on finishing the series. Next, head into *Incident Response 101* and step onto the *operations floor*.
 
 ## Answering the Opening Questions
 

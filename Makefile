@@ -31,6 +31,7 @@ check-content:
 	python3 scripts/check_no_empty_links.py
 	python3 scripts/check_intro_no_next_link.py
 	python3 scripts/check_no_emoji.py
+	python3 scripts/check_en_ai_slop.py
 
 # Validate generated outputs (Medium HTML, exports)
 check-generated:

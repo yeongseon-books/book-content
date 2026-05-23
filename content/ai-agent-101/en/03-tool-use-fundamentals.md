@@ -40,7 +40,7 @@ This is post 3 in the AI Agent 101 series. Here we cover the basic flow of funct
 
 ## Function Calling Basic Flow
 
-The core mechanism that enables AI agents to interact with external systems is Function Calling (or Tool Use). Let's explore how this works step-by-step.
+The core mechanism that enables AI agents to interact with external systems is Function Calling (or Tool Use). The steps below walk through how this works end-to-end.
 
 ### Tool-calling loop
 
