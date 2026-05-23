@@ -18,302 +18,415 @@ tags:
   - Observer
   - Command
 seo_description: Behavioral 패턴으로 객체 협력과 흐름을 읽기 쉬운 구조로 바꾸는 방법을 설명합니다.
-last_reviewed: '2026-05-15'
+last_reviewed: '2026-05-23'
 ---
 
 # 디자인 패턴 101 (4/10): 행위 패턴
 
-객체를 잘 나누는 것만으로는 충분하지 않을 때가 있습니다. 누가 누구에게 알릴지, 어떤 알고리즘을 바꿔 끼울지, 요청을 어떻게 객체로 다룰지, 상태 변화에 따라 행동을 어떻게 나눌지가 결국 시스템의 읽기 쉬움과 변경 비용을 좌우하기 때문입니다.
+코드를 잘 나눠 놓았는데도 변경이 어려운 순간이 있습니다. 클래스 하나를 고치면 알림 로직이 깨지고, 상태 전이를 추가하면 기존 분기가 흔들리고, 정렬 방식을 바꾸려면 호출부 전체를 뒤져야 합니다. 이런 문제는 구조가 아니라 **객체 사이의 책임 흐름**이 꼬여 있을 때 나타납니다. Behavioral 패턴은 바로 이 흐름에 이름을 붙이고, 변경이 번지지 않도록 경계를 만드는 도구입니다.
 
-이 글은 Design Patterns 101 시리즈의 4번째 글입니다.
+이 글은 Design Patterns 101 시리즈의 네 번째 글입니다. Strategy와 Observer는 뒤에 각각 독립 장(5장, 7장)이 있으므로 여기서는 개요 수준으로 다루고, Command, Iterator, State, Template Method, Chain of Responsibility에 더 많은 지면을 할애합니다.
 
-이번 글에서는 Behavioral 패턴을 객체 사이의 협력 방식을 설명하는 공통 언어로 정리해 보겠습니다. 핵심은 if/elif로 흩어진 흐름을 이름 붙은 구조로 바꿔, 협력이 어떻게 일어나는지 코드 위에 드러나게 만드는 것입니다.
-
-![Design Patterns 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/04/04-01-concept-at-a-glance.ko.png)
-*Design Patterns 101 4장 흐름 개요*
+![행위 패턴 책임 흐름](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/04/04-01-concept-at-a-glance.ko.png)
+*행위 패턴이 다루는 책임 분배 — 알고리즘 교체, 이벤트 전파, 요청 객체화, 상태 전이, 순회 추상화*
 
 ## 먼저 던지는 질문
 
-- Behavioral 패턴은 어떤 행위 문제를 다룰까요?
-- Strategy, Observer, Command는 각각 흐름을 어떻게 분리할까요?
-- State와 Iterator는 무엇을 객체로 끌어올릴까요?
+- Command가 단순한 함수 호출과 다른 점은 무엇일까요?
+- State와 Strategy는 코드 모양이 거의 같은데, 왜 별도 패턴으로 분류될까요?
+- Python에서 Iterator 패턴을 명시적으로 구현할 일이 거의 없는 이유는 무엇일까요?
 
-## 왜 중요한가
+## 객체 간 책임 분배가 어려운 이유
 
-객체 협력이 커질수록 분기와 조건은 눈에 띄지 않게 퍼집니다. 처음에는 단순한 `if/elif`였던 코드가 어느새 정책 선택, 알림 호출, 상태 전이, 순회 로직을 한곳에 끌어안게 되면, 변경 하나가 여러 조건문에 번지는 구조가 됩니다.
+Creational 패턴은 "누가 만드는가", Structural 패턴은 "어떻게 묶는가"를 다룹니다. Behavioral 패턴은 그 다음 질문입니다. **만들어진 객체들이 서로 어떻게 대화하고, 누가 어떤 결정을 내리는가.**
 
-Behavioral 패턴은 이런 흐름에 이름과 모양을 줍니다. 알고리즘은 Strategy로, 알림은 Observer로, 요청은 Command로, 상태별 행동은 State로, 순회는 Iterator로 분리하면 책임 경계가 훨씬 선명해집니다.
+저는 이 문제가 어려운 이유를 두 가지로 봅니다.
 
-## 한눈에 보는 개념
+첫째, 책임 흐름은 코드에 명시적으로 드러나지 않습니다. 클래스 다이어그램에는 "A가 B를 호출한다"는 화살표가 보이지만, "A가 B에게 알릴지 말지를 누가 결정하는가", "A의 알고리즘을 런타임에 바꿀 수 있는가"는 보이지 않습니다.
 
-## 핵심 용어
+둘째, 책임 분배를 잘못하면 변경이 연쇄적으로 번집니다. 결제 상태를 하나 추가했을 뿐인데 알림 로직, 로깅 로직, UI 렌더링 로직이 동시에 깨지는 경험을 해 본 적이 있다면, 그게 바로 책임 경계가 없는 상태입니다.
 
-- **Strategy**: 알고리즘을 객체나 함수로 분리해 교체 가능하게 만듭니다.
-- **Observer**: 한 객체의 변화가 여러 구독자에게 통지되게 만듭니다.
-- **Command**: 요청 자체를 객체로 만들어 큐잉, 재시도, 취소 같은 처리를 쉽게 합니다.
-- **State**: 상태별 행동을 상태 객체로 분리합니다.
-- **Iterator**: 내부 구조를 노출하지 않고 컬렉션을 순회합니다.
+Behavioral 패턴 10개는 이 문제를 각각 다른 각도에서 풉니다. 이 글에서는 실무에서 가장 자주 만나는 7개를 다룹니다.
 
-## 변경 전후 비교
+## Strategy와 Observer — 개요
 
-**Before**
+이 두 패턴은 5장과 7장에서 깊게 다루므로 여기서는 핵심만 짚습니다.
+
+**Strategy**는 알고리즘을 호출부에서 분리해 교체 가능하게 만듭니다. Python에서는 함수가 일급 객체이므로 클래스 없이도 Strategy를 적용할 수 있습니다.
 
 ```python
-def discount(kind, price):
-    if kind == "vip":
-        return price * 0.7
-    elif kind == "member":
-        return price * 0.9
+from typing import Callable
+
+PricingStrategy = Callable[[int], int]
+
+def no_discount(price: int) -> int:
     return price
+
+def vip_discount(price: int) -> int:
+    return int(price * 0.7)
+
+def checkout(price: int, strategy: PricingStrategy = no_discount) -> int:
+    return strategy(price)
 ```
 
-**After**
+**Observer**는 한 객체의 상태 변화를 여러 구독자에게 전파합니다. 발행자는 구독자가 누구인지 모르고, 구독자는 발행자의 내부를 모릅니다. Django signals, JavaScript의 `addEventListener`, Redis Pub/Sub 모두 이 구조입니다.
+
+두 패턴의 공통점은 **간접 호출을 도입해 결합을 끊는다**는 것이고, 차이는 Strategy가 1:1 교체인 반면 Observer는 1:N 전파라는 점입니다.
+
+## Command가 단순한 함수 호출과 다른 점
+
+함수를 호출하면 그 자리에서 실행되고 끝납니다. Command 패턴은 "실행할 행위"를 객체로 만들어 **저장, 전달, 지연 실행, 취소**를 가능하게 합니다.
+
+저는 이 차이를 "전화 통화 vs. 편지"에 비유합니다. 전화는 즉시 연결되지만 기록이 남지 않습니다. 편지는 보관할 수 있고, 순서를 바꿀 수 있고, 나중에 열어볼 수 있습니다.
+
+### Undo 스택 예시
 
 ```python
-class Discount:
-    def apply(self, p): return p
+from __future__ import annotations
+from dataclasses import dataclass, field
+from typing import Protocol
 
-class Vip(Discount):
-    def apply(self, p): return p * 0.7
 
-class Member(Discount):
-    def apply(self, p): return p * 0.9
+class Command(Protocol):
+    def execute(self) -> None: ...
+    def undo(self) -> None: ...
+
+
+@dataclass
+class InsertText:
+    document: list[str]
+    position: int
+    text: str
+
+    def execute(self) -> None:
+        self.document.insert(self.position, self.text)
+
+    def undo(self) -> None:
+        self.document.pop(self.position)
+
+
+@dataclass
+class Editor:
+    document: list[str] = field(default_factory=list)
+    history: list[Command] = field(default_factory=list)
+
+    def run(self, cmd: Command) -> None:
+        cmd.execute()
+        self.history.append(cmd)
+
+    def undo_last(self) -> None:
+        if self.history:
+            self.history.pop().undo()
 ```
 
-새 등급이 생겨도 기존 분기를 뜯어고치지 않아도 됩니다. 행위가 이름 붙은 구조로 분리되면 확장 지점도 훨씬 명확해집니다.
-
-## 행위 패턴을 익히는 5단계
-
-### 1단계 — 전략로 알고리즘을 바꿔 끼웁니다
-
 ```python
-# 1_strategy.py
-class Sorter:
-    def __init__(self, strategy): self.strategy = strategy
-    def sort(self, data): return self.strategy(data)
+editor = Editor()
+editor.run(InsertText(editor.document, 0, "Hello"))
+editor.run(InsertText(editor.document, 1, "World"))
+assert editor.document == ["Hello", "World"]
 
-asc = Sorter(sorted)
-desc = Sorter(lambda d: sorted(d, reverse=True))
+editor.undo_last()
+assert editor.document == ["Hello"]
 ```
 
-Python에서는 함수가 일급 객체이기 때문에 Strategy가 꼭 클래스로 시작할 필요는 없습니다. 알고리즘을 분리할 수 있다는 사실이 더 중요합니다.
+Command가 함수 호출과 결정적으로 다른 지점은 세 가지입니다.
 
-### 2단계 — 옵저버로 알림을 분리합니다
+1. **직렬화 가능** — Command 객체를 JSON이나 DB에 저장하면 작업 큐가 됩니다.
+2. **취소 가능** — `undo` 메서드를 구현하면 실행을 되돌릴 수 있습니다.
+3. **조합 가능** — 여러 Command를 묶어 트랜잭션처럼 다룰 수 있습니다.
+
+### 잃는 것
+
+Command를 도입하면 단순한 메서드 호출 하나가 클래스 하나로 바뀝니다. 행위가 10개면 클래스도 10개입니다. 취소가 필요 없고 큐잉도 필요 없다면 이 비용은 정당화되지 않습니다.
+
+## State와 Strategy는 왜 코드 모양이 같아 보이는가
+
+둘 다 "행위를 별도 객체에 위임한다"는 구조입니다. 클래스 다이어그램만 보면 거의 동일합니다. 차이는 **의도**에 있습니다.
+
+- **Strategy**: 호출자가 알고리즘을 선택합니다. 한번 주입하면 보통 바뀌지 않습니다.
+- **State**: 객체 스스로가 내부 상태에 따라 행위를 전환합니다. 전환은 런타임에 반복적으로 일어납니다.
+
+### TCP 연결 상태 머신
 
 ```python
-# 2_observer.py
-class Subject:
-    def __init__(self): self._subs = []
-    def subscribe(self, fn): self._subs.append(fn)
-    def notify(self, e):
-        for fn in self._subs: fn(e)
+from __future__ import annotations
+from typing import Protocol
 
-s = Subject()
-s.subscribe(lambda e: print("LOG:", e))
-s.notify("created")
+
+class ConnectionState(Protocol):
+    def open(self, ctx: Connection) -> None: ...
+    def close(self, ctx: Connection) -> None: ...
+    def send(self, ctx: Connection, data: bytes) -> None: ...
+
+
+class Closed:
+    def open(self, ctx: Connection) -> None:
+        print("Opening connection...")
+        ctx.state = Established()
+
+    def close(self, ctx: Connection) -> None:
+        print("Already closed.")
+
+    def send(self, ctx: Connection, data: bytes) -> None:
+        raise RuntimeError("Cannot send on closed connection")
+
+
+class Established:
+    def open(self, ctx: Connection) -> None:
+        print("Already open.")
+
+    def close(self, ctx: Connection) -> None:
+        print("Closing connection...")
+        ctx.state = Closed()
+
+    def send(self, ctx: Connection, data: bytes) -> None:
+        print(f"Sending {len(data)} bytes")
+
+
+class Connection:
+    def __init__(self) -> None:
+        self.state: ConnectionState = Closed()
+
+    def open(self) -> None:
+        self.state.open(self)
+
+    def close(self) -> None:
+        self.state.close(self)
+
+    def send(self, data: bytes) -> None:
+        self.state.send(self, data)
 ```
 
-이 구조의 이점은 Subject가 구독자를 몰라도 된다는 점입니다. 발행자는 “무슨 일이 일어났는지”만 알리고, 누가 반응할지는 바깥으로 밀어낼 수 있습니다.
+`Connection`은 자신의 상태를 모릅니다. 각 상태 객체가 "다음에 어떤 상태로 갈지"를 결정합니다. 이 구조 덕분에 새 상태(예: `Listening`)를 추가할 때 기존 상태 클래스를 수정하지 않아도 됩니다.
 
-### 3단계 — 커맨드로 요청을 객체로 만듭니다
+### 잃는 것
 
-```python
-# 3_command.py
-class Command:
-    def execute(self): ...
+상태가 3개 이하이고 전이가 단순하면 `if/elif`가 더 읽기 쉽습니다. State 패턴은 상태 수가 5개 이상이거나, 전이 규칙이 복잡해서 표로 그려야 이해되는 수준일 때 비용을 회수합니다.
 
-class SendEmail(Command):
-    def __init__(self, to, body): self.to, self.body = to, body
-    def execute(self): mailer.send(self.to, self.body)
+## Iterator는 왜 Python에서 거의 등장하지 않는가
 
-queue = [SendEmail("a@x", "hi"), SendEmail("b@x", "hi")]
-for c in queue: c.execute()
-```
-
-요청이 객체가 되는 순간 큐잉, 재시도, 지연 실행 같은 운영 관점의 기능을 붙이기 쉬워집니다. 단순 함수 호출을 실행 가능한 데이터로 바꾸는 셈입니다.
-
-### 4단계 — 상태로 상태 전이를 분리합니다
+GoF의 Iterator 패턴은 "내부 구조를 노출하지 않고 컬렉션을 순회하는 방법"을 제공합니다. Java에서는 `Iterator<T>` 인터페이스를 직접 구현해야 하지만, Python은 이 패턴을 **언어 자체에 녹여 넣었습니다.**
 
 ```python
-# 4_state.py
-class Order:
-    def __init__(self): self.state = Draft()
-    def submit(self): self.state = self.state.submit()
+class SensorReadings:
+    """최근 N개의 센서 값을 순환 버퍼로 저장합니다."""
 
-class Draft:
-    def submit(self): return Pending()
+    def __init__(self, capacity: int) -> None:
+        self._buf: list[float] = []
+        self._capacity = capacity
 
-class Pending:
-    def submit(self): return self  # idempotent
-```
+    def add(self, value: float) -> None:
+        if len(self._buf) >= self._capacity:
+            self._buf.pop(0)
+        self._buf.append(value)
 
-상태 전이가 복잡해질수록 분기문은 급격히 읽기 어려워집니다. 상태 객체로 분리하면 어떤 상태에서 어떤 전이가 가능한지 훨씬 잘 보입니다.
-
-### 5단계 — 이터레이터로 순회 계약을 노출합니다
-
-```python
-# 5_iterator.py
-class Bag:
-    def __init__(self, items): self.items = items
     def __iter__(self):
-        for x in self.items: yield x
+        """내부 버퍼 구조를 노출하지 않고 순회를 허용합니다."""
+        return iter(self._buf)
 
-for x in Bag([1, 2, 3]):
-    print(x)
+    def __len__(self) -> int:
+        return len(self._buf)
 ```
 
-호출자에게 내부 자료구조를 보여 주지 않고도 순회를 허용할 수 있습니다. 이는 데이터 구조 변경 비용을 낮추는 아주 실용적인 계약입니다.
+`__iter__`를 구현하는 순간 `for` 루프, `list()`, `sum()`, 언패킹 등 Python의 모든 이터레이션 프로토콜과 호환됩니다. 별도 `Iterator` 클래스를 만들 필요가 없습니다.
 
-## 이 코드에서 주목할 점
-
-- if/elif에 숨어 있던 흐름이 객체나 함수로 올라옵니다.
-- 알고리즘과 그것을 사용하는 컨텍스트가 분리됩니다.
-- 요청과 알림이 데이터처럼 다뤄져 저장, 큐잉, 재실행이 가능해집니다.
-
-## 자주 하는 실수 5가지
-
-1. **사소한 로직까지 Strategy 클래스로 만드는 경우**: 함수로도 충분한데 구조만 무거워집니다.
-2. **Observer에 순환 알림이 생기는 경우**: A→B→A 루프가 끝나지 않습니다.
-3. **Command 안에 비즈니스 로직을 잔뜩 넣는 경우**: 요청 표현과 정책이 섞입니다.
-4. **State 객체가 서로 내부를 과도하게 아는 경우**: 결합도가 다시 높아집니다.
-5. **Iterator 대신 인덱스와 내부 구조를 그대로 노출하는 경우**: 캡슐화가 깨집니다.
-
-## 실무에서는 이렇게 드러납니다
-
-Django signals는 Observer 모양이고, Celery task는 Command로 읽을 수 있으며, 상태 머신 라이브러리는 State 패턴을 전면에 드러냅니다. Python 컬렉션이 `__iter__`를 제공하는 방식은 Iterator의 일상적인 예입니다. Behavioral 패턴은 프레임워크 속에 이미 많이 들어와 있습니다.
-
-## 빠르게 검증해 보기
-
-Behavioral 패턴이 흐름을 정말 단순하게 만드는지 확인해 보세요.
-
-- 하나의 비즈니스 동작이 몇 개의 분기와 직접 호출로 퍼지는지 따라가 봅니다.
-- 그 흐름을 알고리즘, 알림, 요청, 상태 전이, 순회 중 무엇으로 설명할 수 있는지 정리합니다.
-- 행동 하나를 바꿀 때 관련 없는 호출자까지 함께 수정해야 하는지 점검합니다.
-
-**기대 결과:** 주 흐름을 추적하기 쉬워지고, 한 종류의 행동 변화가 긴 조건문 전체를 다시 열게 만들지 않아야 합니다.
-
-## 시니어 엔지니어는 이렇게 판단합니다
-
-- Strategy의 첫 후보는 클래스가 아니라 함수라고 봅니다.
-- Observer 알림은 한 방향으로만 흐르게 합니다.
-- 단순 요청에 Command를 과하게 올리지 않습니다.
-- 실제 상태 머신일 때만 State를 도입합니다.
-- Iterator를 내부 구조를 숨기는 계약으로 이해합니다.
-
-## 체크리스트
-
-- [ ] Strategy가 꼭 클래스여야 하는가?
-- [ ] Observer 알림에 순환 경로가 없는가?
-- [ ] Command가 요청 그 자체만 표현하는가?
-- [ ] 상태 전이가 한눈에 보이는가?
-- [ ] Iterator가 내부 구조를 가리고 있는가?
-
-## 연습 문제
-
-1. 현재의 if/elif 분기 하나를 Strategy로 바꿔 봅니다.
-2. 결제 성공 후 메일·슬랙·재고 처리를 Observer 구조로 나눠 봅니다.
-3. 외부 API 호출 큐를 Command 객체 형태로 표현해 봅니다.
-
-## 정리 및 다음 글
-
-행동을 객체와 함수로 드러내면 분기가 줄고 협력 구조가 보이기 시작합니다. 다음 글에서는 Behavioral 패턴 가운데 가장 자주 손에 잡히는 Strategy 패턴을 따로 확대해 봅니다.
-
-## 실무 케이스 스터디: 장고/플라스크에서 패턴 선택 기준
-
-패턴 선택은 프레임워크보다 요구사항의 변화 양상에 의해 결정됩니다. 다음 기준은 두 프레임워크에서 공통으로 유효합니다.
-
-### 판단 기준 표
-
-| 질문 | 선택 기준 | 권장 패턴 |
-| --- | --- | --- |
-| 조건 분기가 월 단위로 늘어나는가 | 정책 확장이 핵심 | Strategy |
-| 외부 API 계약이 자주 바뀌는가 | 경계 안정화가 핵심 | Adapter |
-| 객체 조립 단계가 많고 옵션이 많은가 | 생성 과정을 명시화 | Builder/Factory |
-| 이벤트 수신자가 유동적인가 | 발행/구독 분리 | Observer |
-
-### 파이썬 구현 앵커
+더 복잡한 순회가 필요하면 제너레이터가 있습니다.
 
 ```python
+from pathlib import Path
+from typing import Iterator
+
+
+def walk_python_files(root: Path) -> Iterator[Path]:
+    """디렉터리를 재귀 순회하되 .py 파일만 yield합니다."""
+    for child in sorted(root.iterdir()):
+        if child.is_dir() and not child.name.startswith("."):
+            yield from walk_python_files(child)
+        elif child.suffix == ".py":
+            yield child
+```
+
+제너레이터는 상태를 자동으로 관리하고, `yield`에서 멈췄다가 다음 호출에서 이어갑니다. GoF Iterator가 풀려던 문제를 언어가 이미 해결한 셈입니다.
+
+### 잃는 것
+
+Python에서 Iterator 패턴을 "잃는다"기보다는, 패턴을 의식하지 않아도 되는 대신 **`__iter__`를 빠뜨리는 실수**가 생깁니다. 커스텀 컬렉션을 만들 때 `__iter__`를 구현하지 않으면 `for` 루프에서 `TypeError`가 나고, 디버깅에 시간을 씁니다.
+
+## Template Method를 함수형으로 다시 보면
+
+Template Method는 알고리즘의 뼈대를 부모 클래스에 고정하고, 세부 단계를 자식 클래스가 채우는 패턴입니다. GoF 시절에는 상속이 유일한 선택지였지만, Python에서는 함수를 넘기는 방식이 더 자연스러울 때가 많습니다.
+
+### 상속 기반 — ETL 파이프라인
+
+```python
+from abc import ABC, abstractmethod
+from typing import Any
+
+
+class ETLPipeline(ABC):
+    """뼈대: extract → transform → load 순서는 고정."""
+
+    def run(self) -> None:
+        raw = self.extract()
+        cleaned = self.transform(raw)
+        self.load(cleaned)
+
+    @abstractmethod
+    def extract(self) -> list[dict[str, Any]]: ...
+
+    @abstractmethod
+    def transform(self, data: list[dict[str, Any]]) -> list[dict[str, Any]]: ...
+
+    @abstractmethod
+    def load(self, data: list[dict[str, Any]]) -> None: ...
+
+
+class CsvToPostgres(ETLPipeline):
+    def extract(self) -> list[dict[str, Any]]:
+        # CSV 파일 읽기
+        return [{"name": "Alice", "age": "30"}]
+
+    def transform(self, data: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        return [{"name": r["name"], "age": int(r["age"])} for r in data]
+
+    def load(self, data: list[dict[str, Any]]) -> None:
+        print(f"Inserting {len(data)} rows into PostgreSQL")
+```
+
+### 함수 합성 기반 — 같은 문제, 다른 모양
+
+```python
+from typing import Any, Callable
+
+ExtractFn = Callable[[], list[dict[str, Any]]]
+TransformFn = Callable[[list[dict[str, Any]]], list[dict[str, Any]]]
+LoadFn = Callable[[list[dict[str, Any]]], None]
+
+
+def run_etl(extract: ExtractFn, transform: TransformFn, load: LoadFn) -> None:
+    load(transform(extract()))
+```
+
+함수 합성 버전은 상속 계층이 없고, 각 단계를 독립적으로 테스트하기 쉽습니다. 단, 단계 간 공유 상태가 많거나 단계 수가 7-8개로 늘어나면 클래스 기반이 더 읽기 쉬워집니다.
+
+### 잃는 것
+
+Template Method는 상속을 강제합니다. Python에서 깊은 상속 계층은 디버깅을 어렵게 만듭니다. 단계가 3개 이하이고 공유 상태가 없다면 함수 합성이 더 낫습니다.
+
+## Chain of Responsibility — 요청을 누가 처리할지 모를 때
+
+Chain of Responsibility는 요청을 처리할 수 있는 객체들을 체인으로 연결하고, 요청이 체인을 따라 흐르다가 처리 가능한 핸들러를 만나면 멈추는 구조입니다.
+
+저는 이 패턴을 웹 프레임워크의 미들웨어 스택에서 가장 자주 봅니다. Django의 미들웨어, Express의 `next()`, FastAPI의 dependency chain 모두 이 구조입니다.
+
+```python
+from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol
 
-class Sender(Protocol):
-    def send(self, msg: str) -> None: ...
 
 @dataclass
-class SlackSender:
-    webhook: str
+class Request:
+    path: str
+    headers: dict[str, str]
+    user: str | None = None
 
-    def send(self, msg: str) -> None:
-        # requests.post(self.webhook, json={"text": msg})
-        pass
 
-class SenderAdapter:
-    def __init__(self, sender: Sender) -> None:
-        self.sender = sender
+class Handler(Protocol):
+    def handle(self, request: Request) -> str | None: ...
 
-    def notify(self, message: str) -> None:
-        self.sender.send(message)
+
+@dataclass
+class AuthHandler:
+    next_handler: Handler | None = None
+
+    def handle(self, request: Request) -> str | None:
+        token = request.headers.get("Authorization")
+        if not token:
+            return "401 Unauthorized"
+        request.user = token.split(" ")[-1]  # 단순화
+        if self.next_handler:
+            return self.next_handler.handle(request)
+        return None
+
+
+@dataclass
+class RateLimitHandler:
+    next_handler: Handler | None = None
+    _counter: int = 0
+
+    def handle(self, request: Request) -> str | None:
+        self._counter += 1
+        if self._counter > 100:
+            return "429 Too Many Requests"
+        if self.next_handler:
+            return self.next_handler.handle(request)
+        return None
+
+
+@dataclass
+class RouteHandler:
+    next_handler: Handler | None = None
+
+    def handle(self, request: Request) -> str | None:
+        return f"200 OK — {request.path} by {request.user}"
 ```
 
-### 유엠엘 유사 구조
+```python
+# 체인 조립
+chain = AuthHandler(next_handler=RateLimitHandler(next_handler=RouteHandler()))
 
-```text
-[UseCase] --> [Notifier]
-[Notifier] --> <<interface>> [Sender]
-[SlackSender] --implements--> [Sender]
-[SenderAdapter] --wraps--> [Sender]
+req = Request(path="/api/data", headers={"Authorization": "Bearer alice"})
+result = chain.handle(req)
+assert result == "200 OK — /api/data by alice"
 ```
 
-### 변경 전후 비교
+### 잃는 것
 
-- 변경 전: 라우트/서비스 내부에서 외부 SDK를 직접 호출해 테스트와 교체 비용이 큽니다.
-- 변경 후: 인터페이스 경계를 두고 패턴을 적용해 변경이 한 계층에서 끝납니다.
+체인이 길어지면 "이 요청이 어디서 처리됐는지" 추적이 어렵습니다. 디버깅할 때 체인의 모든 핸들러를 순서대로 따라가야 합니다. 핸들러가 3개 이하라면 단순한 `if/elif`가 더 명확합니다.
 
-### 솔리드 점검표
+## Mediator와 Memento — 간략 소개
 
-| 원칙 | 점검 질문 |
-| --- | --- |
-| SRP | 클래스가 생성/정책/전송을 동시에 담당하지 않는가 |
-| OCP | 새 요구를 기존 코드 수정 없이 추가할 수 있는가 |
-| LSP | 대체 구현이 같은 계약을 유지하는가 |
-| ISP | 과도하게 큰 인터페이스를 강요하지 않는가 |
-| DIP | 상위 계층이 구체 구현 대신 추상에 의존하는가 |
+**Mediator**는 객체들이 서로 직접 참조하지 않고 중재자를 통해 소통하게 만듭니다. 채팅방이 대표적입니다. 사용자 A가 메시지를 보내면 채팅방(Mediator)이 다른 사용자들에게 전달합니다. GUI 프레임워크에서 폼 컴포넌트 간 상호작용을 조율할 때도 이 구조가 나타납니다.
 
-이 점검표를 PR 템플릿에 넣으면 패턴 적용 품질이 팀 단위로 안정됩니다.
+**Memento**는 객체의 내부 상태를 외부에 저장했다가 복원하는 패턴입니다. 텍스트 에디터의 undo, 게임의 세이브/로드가 전형적인 예입니다. Command의 `undo`와 비슷해 보이지만, Command는 "행위의 역연산"이고 Memento는 "상태의 스냅샷"이라는 점이 다릅니다.
 
-## 추가 검증 메모: 리팩터링 품질을 수치로 확인하기
+## Visitor — 구조를 바꾸지 않고 연산을 추가하기
 
-패턴 리팩터링은 체감만으로 평가하면 흔들리기 쉽습니다. 아래 지표를 배포 전후로 비교하면 패턴 도입 효과를 더 객관적으로 확인할 수 있습니다.
+Visitor는 객체 구조(예: AST, 파일 트리)를 순회하면서 각 노드 타입에 맞는 연산을 수행합니다. Python에서는 `functools.singledispatch`나 패턴 매칭(`match/case`)이 비슷한 역할을 하므로 GoF 스타일의 Visitor를 직접 구현할 일은 드뭅니다.
 
-- 변경 파일 수: 신규 요구 1건당 수정 파일 수가 줄어드는지 확인합니다.
-- 테스트 시간: 단위 테스트 비중이 늘어 통합 테스트 의존이 줄어드는지 봅니다.
-- 장애 복구 시간: 로그만으로 실패 계층을 특정하는 시간이 단축되는지 측정합니다.
+## 패턴별 트레이드오프 정리
 
-```text
-평가 주기: 2주
-지표 1: 평균 PR 수정 파일 수
-지표 2: 테스트 실패 원인 분류 가능 비율
-지표 3: 회귀 버그 재발률
-```
-
-이 지표가 개선되지 않는다면 패턴 자체가 아니라 경계 설정 또는 인터페이스 설계가 잘못되었을 가능성이 큽니다. 이 경우 패턴을 더 추가하기보다 책임 분리 기준을 먼저 재정의하는 편이 안전합니다.
+| 패턴 | 얻는 것 | 잃는 것 |
+| --- | --- | --- |
+| Strategy | 알고리즘 교체가 한 줄 | 간접 호출 추가, 전략 객체 관리 |
+| Observer | 발행자-구독자 완전 분리 | 순환 알림 위험, 디버깅 어려움 |
+| Command | 저장·취소·큐잉 가능 | 행위 하나당 클래스 하나 |
+| State | 상태 전이 규칙이 명시적 | 상태 수만큼 클래스 증가 |
+| Iterator | 내부 구조 은닉 | Python에서는 언어가 이미 제공 |
+| Template Method | 알고리즘 뼈대 고정 | 상속 강제, 깊은 계층 위험 |
+| Chain of Responsibility | 핸들러 추가/제거 유연 | 요청 추적 어려움 |
+| Mediator | 객체 간 직접 결합 제거 | 중재자가 God Object가 될 위험 |
+| Memento | 상태 복원 가능 | 메모리 사용량 증가 |
+| Visitor | 구조 변경 없이 연산 추가 | 새 노드 타입 추가 시 모든 Visitor 수정 |
 
 ## 처음 질문으로 돌아가기
 
-- **Behavioral 패턴은 어떤 행위 문제를 다룰까요?**
-  - 본문의 기준은 Behavioral 패턴를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
-- **Strategy, Observer, Command는 각각 흐름을 어떻게 분리할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
-- **State와 Iterator는 무엇을 객체로 끌어올릴까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+- **Command가 단순한 함수 호출과 다른 점은 무엇일까요?**
+  - 함수 호출은 즉시 실행되고 사라지지만, Command는 행위를 객체로 만들어 저장·전달·취소를 가능하게 합니다. Editor 예시에서 `InsertText` 객체를 `history` 리스트에 쌓아 두고 `undo_last()`로 되돌린 것이 그 차이입니다. 큐잉이나 재시도가 필요한 순간 Command의 가치가 드러납니다.
+
+- **State와 Strategy는 코드 모양이 거의 같은데, 왜 별도 패턴으로 분류될까요?**
+  - 둘 다 행위를 위임하지만, Strategy는 호출자가 외부에서 알고리즘을 선택하고 보통 한번 주입하면 바뀌지 않습니다. State는 객체 자신이 내부 상태에 따라 행위를 반복적으로 전환합니다. TCP Connection 예시에서 `Closed`가 스스로 `Established`로 전이하는 것이 Strategy에는 없는 특징입니다.
+
+- **Python에서 Iterator 패턴을 명시적으로 구현할 일이 거의 없는 이유는 무엇일까요?**
+  - Python이 `__iter__`/`__next__` 프로토콜과 제너레이터를 언어 수준에서 제공하기 때문입니다. `SensorReadings` 예시처럼 `__iter__`만 구현하면 `for` 루프, `sum()`, 언패킹 등 모든 이터레이션 인프라와 자동으로 호환됩니다. GoF가 별도 Iterator 클래스로 풀었던 문제를 언어가 이미 해결한 셈입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
 
-- [Design Patterns 101 (1/10): 디자인 패턴이란 무엇인가?](./01-what-are-design-patterns.md)
-- [Design Patterns 101 (2/10): Creational 패턴](./02-creational-patterns.md)
-- [Design Patterns 101 (3/10): Structural 패턴](./03-structural-patterns.md)
+- [디자인 패턴이란 무엇인가?](./01-what-are-design-patterns.md)
+- [Creational 패턴](./02-creational-patterns.md)
+- [Structural 패턴](./03-structural-patterns.md)
 - **Behavioral 패턴 (현재 글)**
 - Strategy 패턴 (예정)
 - Adapter 패턴 (예정)
@@ -332,11 +445,12 @@ class SenderAdapter:
 - [Observer Pattern (refactoring.guru)](https://refactoring.guru/design-patterns/observer)
 - [Command Pattern (refactoring.guru)](https://refactoring.guru/design-patterns/command)
 - [State Pattern (refactoring.guru)](https://refactoring.guru/design-patterns/state)
+- [Chain of Responsibility (refactoring.guru)](https://refactoring.guru/design-patterns/chain-of-responsibility)
 
 ### 실무 확장 읽을거리
 
 - [The Python Language Reference — Data model (`__iter__`)](https://docs.python.org/3/reference/datamodel.html)
-
+- [Python `functools.singledispatch`](https://docs.python.org/3/library/functools.html#functools.singledispatch)
 - [이 시리즈의 예제 코드 (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/design-patterns-101/ko)
 
 Tags: Computer Science, DesignPatterns, Behavioral, Strategy, Observer, Command
