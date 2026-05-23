@@ -246,7 +246,7 @@ print(max_cut_length([802, 743, 457, 539], 11))   # 200
 
 탐색 비용은 데이터에 구조가 있는지에 따라 크게 달라집니다. 정렬이 있으면 O(n)을 O(log n)으로 줄일 수 있고, 같은 발상은 parametric search로 확장됩니다. lower/upper bound 템플릿을 몸에 익히고, 일상적인 작업에는 `bisect`를 적극적으로 활용하는 것이 좋습니다.
 
-다음 글에서는 정렬 알고리즘을 다룹니다. mergesort, quicksort, heapsort의 트레이드오프와 Python의 `sorted`가 왜 Timsort를 쓰는지 살펴보겠습니다.
+다음 글에서는 정렬 알고리즘을 다룹니다. mergesort, quicksort, heapsort의 트레이드오프와 Python의 `sorted`가 왜 Timsort를 쓰는지 봅니다.
 
 ## 실전 확장 워크북
 

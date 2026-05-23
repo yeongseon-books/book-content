@@ -24,7 +24,7 @@ seo_description: Dapr는 앱 수준 설정과 Environment 수준 컴포넌트를
 
 Dapr는 마이크로서비스에서 반복되는 배관 작업을 많이 줄여 주지만, 아키텍처의 트레이드오프 자체를 지워 주지는 않습니다. 어디까지가 플랫폼의 몫이고 어디서부터 설계의 몫인지 보려면 App 수준 설정과 Environment 수준 component를 분리해서 봐야 합니다.
 
-이 글은 Azure Container Apps 101 시리즈의 6번째 글입니다. 여기서는 ACA에서 사이드카가 무엇을 제공하고, 무엇은 여전히 여러분이 책임져야 하는지 살펴보겠습니다.
+이 글은 Azure Container Apps 101 시리즈의 6번째 글입니다. 여기서는 ACA에서 사이드카가 무엇을 제공하고, 무엇은 여전히 여러분이 책임져야 하는지 봅니다.
 
 ![Azure Container Apps 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/06/06-01-where-dapr-sits.ko.png)
 *Azure Container Apps 101 6장 흐름 개요*

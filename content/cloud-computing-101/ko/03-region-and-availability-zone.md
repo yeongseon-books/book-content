@@ -28,7 +28,7 @@ last_reviewed: '2026-05-14'
 
 이 글은 Cloud Computing 101 시리즈의 3번째 글입니다.
 
-여기서는 Region, Availability Zone, Edge의 차이를 정리하고, 가용성을 위해 무엇을 기본값으로 생각해야 하는지 살펴보겠습니다.
+여기서는 Region, Availability Zone, Edge의 차이를 정리하고, 가용성을 위해 무엇을 기본값으로 생각해야 하는지 봅니다.
 
 
 ![Cloud Computing 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/03/03-01-concept-at-a-glance.ko.png)

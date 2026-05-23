@@ -27,7 +27,7 @@ last_reviewed: '2026-05-12'
 
 이 글은 Computer Science 101 시리즈의 9번째 글입니다.
 
-여기서는 테스트, 버전 관리, 코드 리뷰, 리팩터링이라는 네 기둥을 통해 코딩이 엔지니어링으로 확장되는 지점을 살펴보겠습니다.
+여기서는 테스트, 버전 관리, 코드 리뷰, 리팩터링이라는 네 기둥을 통해 코딩이 엔지니어링으로 확장되는 지점을 봅니다.
 
 
 ![Computer Science 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/09/09-01-concept-at-a-glance.ko.png)

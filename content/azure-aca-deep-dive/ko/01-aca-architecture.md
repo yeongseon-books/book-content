@@ -244,7 +244,7 @@ az containerapp show \
 
 이 관점을 잡으면 뒤의 기능들이 더 이상 따로 놀지 않습니다. 트래픽 분할은 Revision과 Envoy 이야기이고, scale-to-zero는 Revision과 KEDA 이야기이며, Dapr component scope는 Environment와 sidecar 이야기입니다. 즉 각 기능은 하나의 런타임 구조 안에서 만납니다.
 
-다음 글부터는 이 큰 그림의 박스를 하나씩 확대합니다. 먼저 Environment를 깊게 보면서 네트워크, 관측, Dapr 스코프가 왜 모두 같은 경계에서 묶이는지 살펴보겠습니다.
+다음 글부터는 이 큰 그림의 박스를 하나씩 확대합니다. 먼저 Environment를 깊게 보면서 네트워크, 관측, Dapr 스코프가 왜 모두 같은 경계에서 묶이는지 봅니다.
 
 ## 처음 질문으로 돌아가기
 

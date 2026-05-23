@@ -30,7 +30,7 @@ seo_description: Groq tools와 Pydantic 검증으로 안전한 툴 호출 루프
 
 이 글은 LLM API Production 101 시리즈의 두 번째 글입니다.
 
-여기서는 모델 응답을 안전한 함수 실행 경계로 연결하는 툴 호출 루프를 살펴보겠습니다.
+여기서는 모델 응답을 안전한 함수 실행 경계로 연결하는 툴 호출 루프를 봅니다.
 
 ![툴 호출: 함수를 모델에 연결하기](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/02/02-01-tool-calling-connecting-functions-to-the.ko.png)
 *툴 호출: 함수를 모델에 연결하기*

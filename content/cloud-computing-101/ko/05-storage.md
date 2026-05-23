@@ -28,7 +28,7 @@ last_reviewed: '2026-05-14'
 
 이 글은 Cloud Computing 101 시리즈의 5번째 글입니다.
 
-여기서는 객체, 블록, 파일, 아카이브 스토리지를 어떤 기준으로 구분해야 하는지 살펴보겠습니다.
+여기서는 객체, 블록, 파일, 아카이브 스토리지를 어떤 기준으로 구분해야 하는지 봅니다.
 
 
 ![Cloud Computing 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/cloud-computing-101/05/05-01-concept-at-a-glance.ko.png)

@@ -27,7 +27,7 @@ last_reviewed: '2026-05-12'
 
 이 글은 Computer Science 101 시리즈의 2번째 글입니다.
 
-여기서는 계산의 이론적 정의, 계산할 수 없는 문제, 그리고 프로그래밍 언어와 패러다임이 그 계산을 어떻게 사람의 언어로 옮기는지 함께 살펴보겠습니다.
+여기서는 계산의 이론적 정의, 계산할 수 없는 문제, 그리고 프로그래밍 언어와 패러다임이 그 계산을 어떻게 사람의 언어로 옮기는지 함께 봅니다.
 
 
 ![Computer Science 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/02/02-01-concept-at-a-glance.ko.png)

@@ -290,7 +290,7 @@ docker inspect --format '{{.HostConfig.SecurityOpt}}' <container>
 
 컨테이너 실행은 Docker 하나가 모두 맡는 단일 구조가 아닙니다. 사용자 경험, 생명주기 관리, 저수준 실행이 계층으로 나뉘어 있고, Kubernetes는 그 위에 CRI를 통해 올라탑니다. 이 구조를 이해해야 컨테이너 운영이 비로소 선명해집니다.
 
-다음 글에서는 이렇게 실행할 이미지를 실제로 어떻게 작성하는지, 즉 Dockerfile을 살펴보겠습니다.
+다음 글에서는 이렇게 실행할 이미지를 실제로 어떻게 작성하는지, 즉 Dockerfile을 봅니다.
 
 
 ## 심화: Docker Runtime과 네트워크 모드의 연결 지점

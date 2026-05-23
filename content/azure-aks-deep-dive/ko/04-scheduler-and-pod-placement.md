@@ -400,7 +400,7 @@ Filter와 Score는 서로 다른 질문에 답합니다.
 그리고 Priority, topology, volume 같은 제약은 placement를 단순한 자원 계산보다 훨씬 정책적인 문제로 만듭니다.
 
 다음 글에서는 이 배치 결과를 입력으로 받아 움직이는 autoscaling 두 루프를 봅니다.
-HPA가 replica를 늘리고, Cluster Autoscaler가 node를 늘릴 때 왜 race window가 생기는지 이어서 살펴보겠습니다.
+HPA가 replica를 늘리고, Cluster Autoscaler가 node를 늘릴 때 왜 race window가 생기는지 이어서 봅니다.
 
 ## 정리
 

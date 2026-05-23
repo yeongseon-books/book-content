@@ -219,7 +219,7 @@ python -m build    # build from a clean state
 
 ## 빌드 과정 내부 동작
 
-`python -m build`를 실행하면 내부적으로 어떤 일이 일어나는지 단계별로 살펴보겠습니다.
+`python -m build`를 실행하면 내부적으로 어떤 일이 일어나는지 단계별로 봅니다.
 
 ### 빌드 격리 환경
 

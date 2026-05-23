@@ -351,7 +351,7 @@ ProgrammingError -> 즉시 수정 대상
 - retry는 BUSY/LOCKED 계열에만 적용하고, `IntegrityError`는 도메인 예외로 변환해 4xx로 돌려줍니다.
 - 트랜잭션은 retry 단위 안에 두고, `max_attempts`와 jitter를 반드시 설정합니다.
 
-다음 글에서는 connection 자체를 다룹니다. SQLite의 thread-safety 모드, `check_same_thread`, per-thread vs shared connection, 그리고 FastAPI에서의 connection 관리 패턴을 살펴보겠습니다.
+다음 글에서는 connection 자체를 다룹니다. SQLite의 thread-safety 모드, `check_same_thread`, per-thread vs shared connection, 그리고 FastAPI에서의 connection 관리 패턴을 봅니다.
 
 ## 처음 질문으로 돌아가기
 

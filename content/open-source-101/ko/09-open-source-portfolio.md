@@ -26,7 +26,7 @@ last_reviewed: '2026-05-15'
 
 이 글은 Open Source 101 시리즈의 아홉 번째 글입니다.
 
-여기서는 깃허브 활동을 단순한 이력 나열이 아니라, 문제 선택과 해결 방식과 지속성을 보여 주는 포트폴리오로 정리하는 기준을 살펴보겠습니다.
+여기서는 깃허브 활동을 단순한 이력 나열이 아니라, 문제 선택과 해결 방식과 지속성을 보여 주는 포트폴리오로 정리하는 기준을 봅니다.
 
 ![Open Source 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/open-source-101/09/09-01-the-smallest-portfolio-structure.ko.png)
 *Open Source 101 9장 흐름 개요*

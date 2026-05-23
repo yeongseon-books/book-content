@@ -237,7 +237,7 @@ print(order)  # Order(customer='Alice', items=['Python Book'], total=0)
 
 `TypedDict`는 딕셔너리 형태를 유지한 채 키와 값 타입을 고정하고, `dataclass`는 구조화된 객체를 적은 코드로 만들게 해 줍니다. 두 도구 모두 타입 검사기와 잘 맞지만, 문제를 푸는 방식은 다릅니다. 데이터를 dict로 볼지 객체로 볼지 먼저 결정하면 선택이 쉬워집니다.
 
-다음 글에서는 상속 없이 인터페이스를 정의하는 `Protocol`과 structural typing을 살펴보겠습니다.
+다음 글에서는 상속 없이 인터페이스를 정의하는 `Protocol`과 structural typing을 봅니다.
 
 ## 실전 패턴 추가: TypeVar, Generic, Protocol을 함께 쓰는 방법
 

@@ -28,7 +28,7 @@ last_reviewed: '2026-05-12'
 
 이 글은 MLOps 101 시리즈의 7번째 글입니다.
 
-여기서는 데이터 드리프트와 모델 드리프트를 분리해서 이해하고, PSI와 KS 같은 통계 도구를 어떻게 운영 경보로 연결할지 살펴보겠습니다.
+여기서는 데이터 드리프트와 모델 드리프트를 분리해서 이해하고, PSI와 KS 같은 통계 도구를 어떻게 운영 경보로 연결할지 봅니다.
 
 ![MLOps 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/mlops-101/07/07-01-see-the-flow-first.ko.png)
 *MLOps 101 7장 흐름 개요*

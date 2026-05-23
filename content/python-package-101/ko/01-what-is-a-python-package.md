@@ -538,7 +538,7 @@ curl -s https://pypi.org/pypi/my-desired-name/json | python -m json.tool
 
 ## pip install 전체 흐름
 
-`pip install requests`를 실행하면 실제로 어떤 단계를 거치는지 살펴보겠습니다.
+`pip install requests`를 실행하면 실제로 어떤 단계를 거치는지 봅니다.
 
 ```text
 pip install requests

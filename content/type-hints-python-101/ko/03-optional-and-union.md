@@ -232,7 +232,7 @@ print(greet("Alice", "Dr."))      # Hello, Dr. Alice!
 
 `Optional[T]`는 값이 `None`일 수 있음을, `Union[T1, T2]`는 여러 타입 중 하나가 올 수 있음을 적는 방법입니다. 중요한 점은 타입을 적는 데서 끝나지 않고, 분기 안에서 그 가능성을 실제로 처리하는 것입니다. `isinstance`와 `is None`은 그 계약을 코드로 드러내는 가장 기본적인 패턴입니다.
 
-다음 글에서는 함수 자체를 값처럼 다룰 때 필요한 `Callable`, `*args`, `**kwargs`, `@overload`를 살펴보겠습니다.
+다음 글에서는 함수 자체를 값처럼 다룰 때 필요한 `Callable`, `*args`, `**kwargs`, `@overload`를 봅니다.
 
 ## 실전 패턴 추가: TypeVar, Generic, Protocol을 함께 쓰는 방법
 

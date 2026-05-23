@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 배포를 사람이 직접 수행하는 팀은 결국 같은 문제를 겪습니다. 누가 어떤 명령을 쳤는지 기록이 없고, staging은 자동인데 production은 메신저로 승인받고, 롤백 절차는 문서 어딘가에만 남아 있어 새벽 장애 때 바로 찾지 못합니다. 배포는 빨라야 하지만, 그보다 먼저 재현 가능해야 합니다.
 
-이 글은 GitHub Actions 101 시리즈의 8번째 글입니다. 여기서는 GitHub Environments, 승인 게이트, OIDC, 롤백 워크플로우를 중심으로 배포 자동화를 어떻게 안전하게 설계할지 살펴보겠습니다.
+이 글은 GitHub Actions 101 시리즈의 8번째 글입니다. 여기서는 GitHub Environments, 승인 게이트, OIDC, 롤백 워크플로우를 중심으로 배포 자동화를 어떻게 안전하게 설계할지 봅니다.
 
 ![GitHub Actions 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/08/08-01-diagram.ko.png)
 *GitHub Actions 101 8장 흐름 개요*

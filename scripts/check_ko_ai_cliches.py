@@ -29,6 +29,9 @@ PATTERNS = [
     re.compile(r"^\s{0,3}다시 한번 강조"),
     re.compile(r"^\s{0,3}간단히 말해"),
     re.compile(r"^\s{0,3}쉽게 말해"),
+    re.compile(r"살펴보겠습니다"),
+    re.compile(r"흥미롭게도"),
+    re.compile(r"다음과 같습니다[:：]\s*$"),
 ]
 
 

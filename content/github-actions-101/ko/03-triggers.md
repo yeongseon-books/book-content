@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 자동화가 늘어나면 곧 새로운 문제가 생깁니다. “왜 문서 한 줄 바꿨는데 전체 빌드가 도는 거지?”, “왜 같은 PR에 push를 여러 번 하니까 대기열이 꽉 차지?”, “야간 검사는 한국 시간 새벽 2시에 돌고 싶은데 왜 엉뚱한 시각에 실행되지?” GitHub Actions에서 트리거 설계는 비용과 소음을 함께 다루는 문제입니다.
 
-이 글은 GitHub Actions 101 시리즈의 3번째 글입니다. 여기서는 push, pull_request, schedule, workflow_dispatch를 어떻게 나눠 써야 하는지, 그리고 paths 필터와 concurrency로 불필요한 실행을 어떻게 줄이는지 살펴보겠습니다.
+이 글은 GitHub Actions 101 시리즈의 3번째 글입니다. 여기서는 push, pull_request, schedule, workflow_dispatch를 어떻게 나눠 써야 하는지, 그리고 paths 필터와 concurrency로 불필요한 실행을 어떻게 줄이는지 봅니다.
 
 ![GitHub Actions 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/03/03-01-diagram.ko.png)
 *GitHub Actions 101 3장 흐름 개요*

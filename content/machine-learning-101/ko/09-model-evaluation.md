@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 누군가 "어떤 모델이 더 좋나요?"라고 묻는데 "어떤 지표 기준으로요?"라고 되묻지 않는다면 이미 곤란한 상황입니다. 머신러닝에서 평가는 숫자 하나를 출력하는 절차가 아니라, 무엇을 좋은 모델로 볼지 먼저 정의하는 과정입니다. 비즈니스 비용과 지표가 어긋나는 순간, 종이 위에서는 좋아 보이는 모델이 실제로는 나쁜 선택이 될 수 있습니다.
 
-이 글은 머신러닝 101 시리즈의 9번째 글입니다. 여기서는 분류와 회귀 지표를 함께 정리하고, 혼동 행렬, ROC-AUC, PR-AUC, MAE, RMSE, R-squared를 언제 어떻게 읽어야 하는지 살펴보겠습니다.
+이 글은 머신러닝 101 시리즈의 9번째 글입니다. 여기서는 분류와 회귀 지표를 함께 정리하고, 혼동 행렬, ROC-AUC, PR-AUC, MAE, RMSE, R-squared를 언제 어떻게 읽어야 하는지 봅니다.
 
 ![Machine Learning 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/09/09-01-diagram.ko.png)
 *Machine Learning 101 9장 흐름 개요*

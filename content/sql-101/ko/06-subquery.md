@@ -126,7 +126,7 @@ REFRESH MATERIALIZED VIEW user_order_summary;
 
 Materialized View는 복잡한 집계를 미리 계산해 두고, 빠른 조회가 필요할 때 사용합니다. 대신 데이터가 변경되면 수동 또는 스케줄러로 갱신해야 합니다. 실시간성을 포기하는 대신 조회 성능을 얻는 절충입니다.
 
-일반 VIEW와 비교하면 다음과 같습니다:
+일반 VIEW와 비교하면 이렇습니다:
 
 - **VIEW**: 매번 쿼리 재실행, 항상 최신 데이터, 저장 공간 불필요
 - **Materialized View**: 결과 저장, 갱신 전까지 오래된 데이터, 디스크 공간 필요

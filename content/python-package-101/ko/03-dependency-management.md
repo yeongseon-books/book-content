@@ -248,7 +248,7 @@ dependencies = ["requests>=2.28"]
 
 ## 가상 환경 내부 구조
 
-`python -m venv .venv`를 실행하면 실제로 어떤 디렉터리와 파일이 생성되는지 살펴보겠습니다.
+`python -m venv .venv`를 실행하면 실제로 어떤 디렉터리와 파일이 생성되는지 봅니다.
 
 ```bash
 python -m venv .venv

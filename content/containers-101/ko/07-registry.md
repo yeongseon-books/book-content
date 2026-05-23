@@ -255,7 +255,7 @@ gh api orgs/myorg/packages/container/myapp/versions --jq '.[].metadata.container
 
 실무에서 레지스트리를 제대로 쓰려면 세 가지를 순서대로 정하면 됩니다. 첫째, tag 체계를 팀 표준으로 고정합니다. 둘째, 배포는 반드시 digest로 고정합니다. 셋째, push 권한을 CI로 제한합니다. 이 세 가지가 갖춰지면 레지스트리는 단순 저장소가 아니라 배포 신뢰 체계의 중심이 됩니다.
 
-다음 글에서는 이 이미지를 어떻게 더 안전하게 실행할지, 즉 Container Security를 살펴보겠습니다.
+다음 글에서는 이 이미지를 어떻게 더 안전하게 실행할지, 즉 Container Security를 봅니다.
 
 
 ## 심화: 레지스트리를 배포 계약으로 다루는 방법

@@ -277,7 +277,7 @@ def first_item(page: Page[T]) -> T:
 
 Generic은 하나의 함수나 클래스가 여러 타입을 다루더라도 타입 관계를 보존하게 해 줍니다. `TypeVar`는 그 관계를 선언하고, `Generic`은 클래스 수준으로 확장하며, bound와 constraint는 허용 범위를 정밀하게 조절합니다. 잘 쓴 Generic은 재사용성과 타입 안전성을 함께 가져옵니다.
 
-다음 글에서는 지금까지 붙인 타입 힌트를 실제로 검증하는 mypy와 pyright를 살펴보겠습니다.
+다음 글에서는 지금까지 붙인 타입 힌트를 실제로 검증하는 mypy와 pyright를 봅니다.
 
 ## 실전 패턴 추가: TypeVar, Generic, Protocol을 함께 쓰는 방법
 
