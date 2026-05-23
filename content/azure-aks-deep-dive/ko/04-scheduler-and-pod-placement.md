@@ -407,11 +407,11 @@ HPA가 replica를 늘리고, Cluster Autoscaler가 node를 늘릴 때 왜 race w
 ## 처음 질문으로 돌아가기
 
 - **kube-scheduler는 하나의 Pod에 대해 어떤 단계로 노드 후보를 좁혀 갈까요?**
-  - 본문의 기준은 Scheduler와 Pod 배치 — 어느 노드로 갈지 누가 정하는가를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 본문에서 본 기본 흐름은 scheduling cycle과 binding cycle로 나뉘며, 그 안에서 먼저 Filter가 불가능한 노드를 제거하고 Score가 남은 후보를 순위화합니다. 그다음 binding cycle이 선택 결과를 API server에 기록해야 비로소 kubelet의 node-local 실행 경로가 시작됩니다. 즉 scheduler의 출력은 실행 중인 Pod가 아니라 `Pod -> Node` 결정입니다.
 - **`nodeSelector`, affinity, taint/toleration, topology spread는 서로 어떤 다른 의도를 표현할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - `nodeSelector`와 affinity는 어떤 노드가 후보가 될 수 있는지를 표현하지만, affinity는 zone이나 특정 특성 같은 더 풍부한 배치 의도를 담을 수 있습니다. taint와 toleration은 특정 node pool을 보호해 아무 Pod나 올라오지 못하게 하는 경계이고, topology spread는 feasible node 중에서도 어느 zone이나 호스트에 얼마나 고르게 퍼질지를 제어합니다. 그래서 이 네 가지는 모두 placement 정책이지만, 하나는 후보 제한에, 하나는 격리에, 하나는 분산에 더 강하게 초점이 있습니다.
 - **Filter에서 모두 탈락한 경우와 feasible node는 있었지만 Binding이 실패한 경우는 어떻게 구분할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - Filter에서 모두 탈락하면 본문 예시처럼 `0/12 nodes are available`와 함께 메모리 부족, affinity 불일치, untolerated taint 같은 실패 이유가 `FailedScheduling` 이벤트에 바로 드러납니다. 반대로 feasible node는 있었는데 Binding이 실패한 경우라면 후보 선택은 끝났지만 선택 결과를 API server에 커밋하는 단계가 흔들린 것이므로, placement 계산과 기록 단계를 분리해서 봐야 합니다. 이 차이를 알아야 Pending을 무조건 kubelet이나 runtime 문제로 밀어 버리지 않게 됩니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

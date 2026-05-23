@@ -360,11 +360,11 @@ Azure CNI Pod Subnet은 Pod 전용 subnet을 쓰는 flat 모델이고, Azure CNI
 ## 처음 질문으로 돌아가기
 
 - **kubenet, Azure CNI Pod Subnet, Azure CNI Node Subnet, Azure CNI Overlay는 IP 소비와 라우팅 면에서 무엇이 다를까요?**
-  - 본문의 기준은 CNI와 Azure CNI Overlay — Pod IP가 어디서 오는가를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 본문에서는 kubenet을 장기 기본값으로 보기 어렵다고 짚고, 실제 운영 비교 축을 Azure CNI Pod Subnet, Node Subnet, Overlay에 두었습니다. Pod Subnet은 Pod가 전용 pod subnet에서 VNet-routable IP를 받고, Node Subnet은 Pod와 노드가 같은 subnet 주소를 함께 쓰며, Overlay는 Pod가 별도 overlay CIDR에서 IP를 받고 외부로 나갈 때 node IP 기준으로 보입니다. 결국 차이는 이름보다 Pod IP가 VNet 공간을 직접 쓰는지, 아니면 overlay CIDR에 머무는지에서 갈립니다.
 - **Pod IP가 실제 VNet 공간을 직접 소비할 때 어떤 운영 한계가 가장 먼저 드러날까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - flat 모델에서는 subnet 여유가 가장 먼저 희소 자원이 됩니다. 특히 Azure CNI Node Subnet처럼 Pod와 노드가 같은 subnet을 공유하면 Pod 증가와 node 증설이 같은 주소 풀을 동시에 갉아먹기 때문에 IP 고갈 압박이 빨리 드러납니다. 그래서 본문에서도 “현재 충분해 보이는가”가 아니라 예상 최대 Pod 수와 node 수 증가를 감당하는지로 주소 계획을 잡아야 한다고 강조했습니다.
 - **Overlay 모드에서는 Pod에서 외부로 나가는 트래픽이 어떤 SNAT 경로를 거칠까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - Overlay에서는 Pod가 overlay CIDR IP를 쓰더라도 클러스터 밖으로 나갈 때는 그 주소가 그대로 보이지 않습니다. 본문 다이어그램처럼 Pod 트래픽은 node를 거치며 node IP 기준으로 SNAT되어 VNet이나 Internet 방향으로 나갑니다. 그래서 Overlay 운영에서는 VNet IP 절약 대신 NAT Gateway SNAT 포트 사용률과 outbound 실패율을 더 중요한 관측 지점으로 봐야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -385,11 +385,11 @@ control plane 지도, node 실행 경로, Pod 네트워킹, scheduler의 placeme
 ## 처음 질문으로 돌아가기
 
 - **KEDA는 ScaledObject를 어떻게 generated HPA로 바꾸고, 그 과정에서 무엇을 보장할까요?**
-  - 본문의 기준은 KEDA 내부 — ScaledObject가 HPA를 만드는 방식를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 본문에서 본 operator는 `scaledobject_controller.go` 경로에서 target이 `/scale` subresource를 노출하는지 확인하고, 필요한 라벨을 맞춘 뒤 generated HPA를 만들거나 갱신합니다. 그래서 ScaledObject는 선언이고, Kubernetes 안에서 실제 autoscaling 산출물은 generated HPA라는 구조가 성립합니다. 운영자가 여기서 확인해야 할 보장은 “선언이 유효하면 HPA가 concrete artifact로 생성돼 target workload와 연결되는가”입니다.
 - **metrics adapter는 external metrics 경로에서 어디까지를 책임질까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - metrics adapter는 `v1beta1.external.metrics.k8s.io` API 표면을 열고, `scaledobject.keda.sh/name` selector를 읽어 metrics service에 gRPC로 질의한 뒤 HPA가 읽을 값을 돌려줍니다. 즉 external metric을 HPA가 소비할 수 있는 Kubernetes API 경로로 번역하는 것이 adapter의 핵심 책임입니다. 반대로 target workload의 실제 replica 변경까지 직접 수행하는 주체는 아니며, 그 단계는 generated HPA와 KEDA의 `0 ↔ 1` 제어 경계로 넘어갑니다.
 - **scaler 인터페이스는 이벤트 소스에 어떤 질문을 던질까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 본문이 요약한 대로 scaler 인터페이스는 이벤트 소스에 세 가지를 묻습니다. 지금 이 소스가 active 상태인지, HPA에 어떤 metric spec을 넘겨야 하는지, 그리고 adapter가 반환할 실제 metric 값은 무엇인지입니다. 그래서 scaler는 단순 숫자 수집기가 아니라 activation 판단과 metric 번역을 함께 맡는 계층입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
