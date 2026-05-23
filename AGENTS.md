@@ -94,7 +94,27 @@ python3 scripts/check_frontmatter.py           # front matter validation
 python3 scripts/check_links.py                 # internal link check
 python3 scripts/lint_captions.py               # image caption lint
 python3 scripts/check_article_structure.py     # article structure (A-grade) check
+python3 scripts/check_ko_en_ratio.py           # ko/en byte ratio (#1226 baseline 87 warn)
+python3 scripts/check_short_h2.py              # short H2 sections (#1237 baseline 7311 warn)
 ```
+
+## ko/en Byte Ratio Policy (#1226)
+
+골든 reference (`azure-app-service-101`)의 ko/en 본문 byte 비율은 **2.1-2.5x**가 정상이다.
+
+- `ratio >= 3.0x` → **WARN**. 본문 outline 정렬 검토 대상.
+- `ratio >= 4.5x` → **FAIL**. 보일러플레이트 확산으로 간주, 작은 쪽을 부풀리지 말고 큰 쪽을 압축한다.
+- 시리즈를 새로 expand할 때 byte target 달성을 위해 보일러플레이트를 복사·삽입하면 Prime Directive §1/§7 위반이다.
+
+검출: `python3 scripts/check_ko_en_ratio.py`. baseline은 `WARN 87 / FAIL 0` (#1226 close 시점 기준).
+
+## H2 Body Length Policy (#1237)
+
+비-wrapper H2 섹션 본문은 최소 200자 이상을 권장한다. 미만이면 골든 voice에서 벗어난 부실 섹션으로 분류한다.
+
+Wrapper 섹션(자동 제외): `먼저 던지는 질문`, `Questions to Keep in Mind`, `처음 질문으로 돌아가기`, `Answering the Opening Questions`, `핵심 용어`, `Key Terms`, `체크리스트`, `Checklist`, `연습 문제`, `Exercises`, `정리와 다음 글`, `Wrap-Up`, `이 글에서 배우는 내용`, `What You'll Learn`, `참고 자료`, `References`, `이 시리즈에서 다루는 글`, `Series Index`.
+
+검출: `python3 scripts/check_short_h2.py`. baseline은 `WARN 7311 sections / 1362 files` (#1237 close 시점 기준).
 
 ## Audit Issue Close Protocol
 
