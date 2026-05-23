@@ -18,230 +18,348 @@ tags:
   - Decorator
   - Facade
 seo_description: How structural patterns use composition and delegation to connect objects without freezing the design too early.
-last_reviewed: '2026-05-15'
+last_reviewed: '2026-05-23'
 ---
 
 # Design Patterns 101 (3/10): Structural Patterns
 
-Once object creation is under control, the next question is how those objects should connect. Do you expose an external SDK directly to the domain, wrap an object to add behavior, or place a simpler entry point in front of a subsystem? Those are structure decisions, and they show up in almost every real codebase.
+Once object creation is sorted out, the next wall is "how do I wire existing objects together?" In my experience the three situations where this wall appears most often are: connecting an external SDK to the domain, bolting logging or caching onto an existing object, and presenting a complex subsystem through a simple entry point. All three are assembly problems, and GoF grouped them under the name Structural patterns.
 
-This is post 3 in the Design Patterns 101 series.
+This is the third article in the Design Patterns 101 series. It covers Adapter, Bridge, Composite, Decorator, Facade, Flyweight, and Proxy. Adapter gets a dedicated deep-dive in episode 6, so here it stays at overview level.
 
-In this post, we'll treat structural patterns as named ways of assembling objects through composition and delegation. The real goal is to keep change local instead of freezing the whole design into an inheritance tree.
+![Structural pattern responsibility boundaries](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/03/03-01-concept-at-a-glance.en.png)
 
-
-![design patterns 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/03/03-01-concept-at-a-glance.en.png)
-*design patterns 101 chapter 3 flow overview*
+*The boundary structural patterns create between caller and implementation*
 
 ## Questions to Keep in Mind
 
-- The problem structural patterns solve?
-- Adapter, Decorator, Facade?
-- Where Proxy fits?
+- What concretely changes when composition replaces inheritance?
+- Decorator and Proxy both "wrap" an object — when should each be chosen?
+- What do structural patterns cost?
 
-## Why It Matters
+## Two Recurring Problems When Connecting Objects
 
-Inheritance freezes the structure quickly. Composition lets you assemble responsibilities and stay flexible to change.
+Two problems show up repeatedly when designing structure.
 
-> Favor composition over inheritance.
+**First, interface mismatch.** The method signature an external library exposes differs from the signature the domain expects. Translating at every call site scatters conversion logic across the codebase.
 
-## Key Terms
+**Second, responsibility accumulation.** When cross-cutting concerns like logging, caching, access control, and lazy loading pile onto a single object, the class bloats. Inheritance leads to combinatorial explosion; conditionals lead to endless branching.
 
-- **Adapter**: convert an existing interface to the shape we want.
-- **Decorator**: dynamically add responsibility to an object.
-- **Facade**: a simple entry point in front of a complex subsystem.
-- **Proxy**: a stand-in that controls access, caching, or lazy load.
-- **Composite**: treat single objects and groups uniformly.
+Structural patterns solve both problems through **composition**. They wrap, translate, or tree-compose objects so that the interface callers see stays stable while the internals remain swappable.
 
-## Before/After
+## Adapter and Facade Solve the Same Problem at Different Distances
 
-**Before**
+Adapter translates **one interface** into another. Facade hides **multiple subsystems** behind a single simple entry point. Both aim to reduce what the caller needs to know, but they operate at different distances.
 
-```python
-# external library calls leak into the domain
-import boto3
-s3 = boto3.client("s3")
-s3.put_object(Bucket="b", Key="k", Body=data)
-```
+### Adapter: Contract Translation
 
-**After**
+Suppose a legacy payment SDK requires `execute_payment(merchant_id, cents, currency_code)`, but the domain expects `PaymentGateway.charge(order: Order)`.
 
 ```python
-# Adapter aligns the dependency to a domain interface
-class FileStore:
-    def put(self, key, data): ...
+from typing import Protocol
+from dataclasses import dataclass
 
-class S3FileStore(FileStore):
-    def put(self, key, data): self._s3.put_object(...)
+
+@dataclass
+class Order:
+    merchant: str
+    amount_cents: int
+    currency: str
+
+
+class PaymentGateway(Protocol):
+    def charge(self, order: Order) -> str: ...
+
+
+class LegacySDKAdapter:
+    """Thin translation layer mapping the legacy SDK to the domain interface."""
+
+    def __init__(self, sdk) -> None:
+        self._sdk = sdk
+
+    def charge(self, order: Order) -> str:
+        return self._sdk.execute_payment(
+            order.merchant, order.amount_cents, order.currency
+        )
 ```
 
-The domain no longer knows about the external library.
+There is no business logic inside the Adapter — only signature translation. The moment business logic creeps in, the Adapter stops being a "translator" and becomes a "policy maker," making it harder to test and replace. Episode 6 explores this boundary in depth.
 
-## Hands-on: Five Steps to Practice Structural Patterns
+### Facade: Subsystem Simplification
 
-### Step 1 — Adapter
+If order processing requires inventory check, payment, shipping reservation, and notification, having the caller orchestrate four systems directly is a burden.
 
 ```python
-# 1_adapter.py
-class LegacyPrinter:
-    def write_line(self, s): ...
+class OrderFacade:
+    def __init__(self, inventory, payment, shipping, notifier) -> None:
+        self._inventory = inventory
+        self._payment = payment
+        self._shipping = shipping
+        self._notifier = notifier
 
-class NewPrinter:
-    def print(self, s): ...
-
-class PrinterAdapter(NewPrinter):
-    def __init__(self, legacy): self.legacy = legacy
-    def print(self, s): self.legacy.write_line(s)
+    def place_order(self, user_id: str, item_id: str, amount: int) -> str:
+        self._inventory.reserve(item_id)
+        tx_id = self._payment.charge(user_id, amount)
+        tracking = self._shipping.schedule(user_id, item_id)
+        self._notifier.send(user_id, f"Order confirmed: {tracking}")
+        return tx_id
 ```
 
-Match the old object to the new contract.
+The trap with Facade is the temptation "it is convenient, so let us add more logic here." Once a Facade starts housing new business rules it becomes a God Object. A Facade should **orchestrate only**; decisions stay in the subsystems.
 
-### Step 2 — Decorator
+## Why Decorator Feels Natural in Python
+
+Python has `@decorator` syntax built into the language, so GoF's Decorator pattern integrates more naturally than in most other languages. The core idea is the same: **wrap an object while preserving its interface, adding responsibility.**
+
+Below is an example chaining logging, retry, and timing onto an HTTP client.
 
 ```python
-# 2_decorator.py
-class Logger:
-    def __init__(self, inner): self.inner = inner
-    def send(self, msg):
-        print("LOG:", msg); self.inner.send(msg)
+from typing import Protocol
+import time
 
-notifier = Logger(EmailNotifier())
+
+class HttpClient(Protocol):
+    def get(self, url: str) -> bytes: ...
+
+
+class LoggingClient:
+    def __init__(self, inner: HttpClient) -> None:
+        self._inner = inner
+
+    def get(self, url: str) -> bytes:
+        print(f"[REQ] GET {url}")
+        result = self._inner.get(url)
+        print(f"[RES] {len(result)} bytes")
+        return result
+
+
+class RetryClient:
+    def __init__(self, inner: HttpClient, max_retries: int = 3) -> None:
+        self._inner = inner
+        self._max_retries = max_retries
+
+    def get(self, url: str) -> bytes:
+        for attempt in range(self._max_retries):
+            try:
+                return self._inner.get(url)
+            except OSError:
+                if attempt == self._max_retries - 1:
+                    raise
+                time.sleep(2 ** attempt)
+        raise RuntimeError("unreachable")
+
+
+class TimingClient:
+    def __init__(self, inner: HttpClient) -> None:
+        self._inner = inner
+
+    def get(self, url: str) -> bytes:
+        start = time.perf_counter()
+        result = self._inner.get(url)
+        elapsed = time.perf_counter() - start
+        print(f"[TIME] {url} -> {elapsed:.3f}s")
+        return result
 ```
 
-Wrap to add behavior.
-
-### Step 3 — Facade
+Assembly is one line.
 
 ```python
-# 3_facade.py
-class CheckoutFacade:
-    def buy(self, user, item):
-        cart.add(user, item); pay.charge(user); ship.send(user, item)
+client = TimingClient(RetryClient(LoggingClient(RealHttpClient())))
 ```
 
-A single entry point for a complex flow.
+Changing the order changes behavior. Placing `TimingClient` outermost measures total time including retries; placing it inside `RetryClient` measures individual attempt time. This order control is the key advantage of Decorator chaining — and simultaneously the reason debugging gets harder.
 
-### Step 4 — Proxy
+I recommend keeping Decorator chains to three layers or fewer. Beyond four, stack traces become painful to read.
+
+## The One Thing to Evaluate Before Introducing Proxy
+
+Proxy exposes the **same interface** as the real object while performing access control, caching, or lazy loading in front of it. It looks similar to Decorator, but the intent differs. Decorator "adds functionality"; Proxy "controls access."
+
+The one thing to evaluate before introducing Proxy is **transparency**. The caller must not be aware it is using a Proxy. If the signature changes, exception types shift, or return-value semantics subtly differ, it is not a Proxy — it is a separate service.
 
 ```python
-# 4_proxy.py
-class CachedRepo:
-    def __init__(self, real): self.real = real; self.cache = {}
-    def get(self, k):
-        if k not in self.cache: self.cache[k] = self.real.get(k)
-        return self.cache[k]
+from typing import Protocol
+
+
+class UserRepository(Protocol):
+    def find(self, user_id: str) -> dict: ...
+
+
+class CachedUserRepository:
+    """Lazy-loading + cache Proxy."""
+
+    def __init__(self, real: UserRepository) -> None:
+        self._real = real
+        self._cache: dict[str, dict] = {}
+
+    def find(self, user_id: str) -> dict:
+        if user_id not in self._cache:
+            self._cache[user_id] = self._real.find(user_id)
+        return self._cache[user_id]
 ```
 
-Stand in for the real object and add a responsibility.
+From the caller's perspective this Proxy behaves identically to `UserRepository`. Add a cache-invalidation policy and it is production-ready.
 
-### Step 5 — Composite
+## Why Composite Shines Only in Tree Structures
+
+Composite lets single objects and collections of objects be treated through the **same interface**. File-system files/folders, UI widgets/containers, and menu items/submenus are textbook examples.
 
 ```python
-# 5_composite.py
-class Node:
-    def total(self): ...
+from __future__ import annotations
+from dataclasses import dataclass, field
 
-class File(Node):
-    def __init__(self, size): self.size = size
-    def total(self): return self.size
 
-class Folder(Node):
-    def __init__(self, children): self.children = children
-    def total(self): return sum(c.total() for c in self.children)
+@dataclass
+class MenuItem:
+    name: str
+    price: int
+
+    def total(self) -> int:
+        return self.price
+
+    def display(self, indent: int = 0) -> str:
+        return f"{'  ' * indent}{self.name}: ${self.price / 100:.2f}"
+
+
+@dataclass
+class Menu:
+    name: str
+    children: list[MenuItem | Menu] = field(default_factory=list)
+
+    def total(self) -> int:
+        return sum(child.total() for child in self.children)
+
+    def display(self, indent: int = 0) -> str:
+        lines = [f"{'  ' * indent}[{self.name}]"]
+        for child in self.children:
+            lines.append(child.display(indent + 1))
+        return "\n".join(lines)
 ```
 
-Single items and groups behave alike.
+```python
+lunch = Menu("Lunch Set", [
+    MenuItem("Soup", 800),
+    MenuItem("Rice", 200),
+    Menu("Sides", [
+        MenuItem("Egg Roll", 350),
+        MenuItem("Kimchi", 0),
+    ]),
+])
 
-## What to Notice in This Code
+print(lunch.display())
+print(f"Total: ${lunch.total() / 100:.2f}")
+```
 
-- Every pattern uses *composition* as its tool.
-- Interfaces stay stable while implementations swap in and out.
-- The inheritance tree barely grows.
+Output:
 
-## Five Common Mistakes
+```text
+[Lunch Set]
+  Soup: $8.00
+  Rice: $2.00
+  [Sides]
+    Egg Roll: $3.50
+    Kimchi: $0.00
+Total: $13.50
+```
 
-1. **Business logic in the Adapter.** Translation and policy get tangled.
-2. **Stacking Decorators too deep.** Debugging becomes painful.
-3. **Facade growing into a god object.** Responsibilities explode.
-4. **Proxy with a different signature than the real object.** Callers break.
-5. **Forcing Composite where there is no real tree.** Awkward fit.
+The condition under which Composite shines is clear: **the data is actually tree-shaped.** If the data is a graph or a flat list and Composite is forced onto it, parent-child relationships must be manufactured and the model becomes unnatural.
 
-## How This Shows Up in Production
+## Bridge and Flyweight: Rarely Used but Worth Knowing
 
-Flask middleware is a Decorator chain. The `requests.Session` object is a Facade. ORM lazy proxies are Proxies. Structural patterns sit quietly inside almost every library you use.
+### Bridge
 
-## Quick verification
+Bridge separates abstraction from implementation so each can evolve independently. When "Shape" and "Renderer" each need to grow independently, inheritance produces `CircleSVGRenderer`, `CircleCanvasRenderer`, `RectSVGRenderer`... — combinatorial explosion. Bridge splits the two axes.
 
-Run this check before introducing a structural pattern.
+```python
+class Renderer(Protocol):
+    def render_circle(self, x: int, y: int, radius: int) -> str: ...
 
-- Identify the boundary, wrapper, or subsystem that is making the current code hard to change.
-- Verify that the new structure keeps the caller-facing contract simpler or more stable.
-- Confirm that composition removes knowledge from the caller instead of just moving the same complexity sideways.
+class SVGRenderer:
+    def render_circle(self, x: int, y: int, radius: int) -> str:
+        return f'<circle cx="{x}" cy="{y}" r="{radius}"/>'
 
-**Expected outcome:** after the refactor, the caller should depend on a cleaner seam while implementation-specific wiring stays behind the structural boundary.
+class Shape:
+    def __init__(self, renderer: Renderer) -> None:
+        self._renderer = renderer
 
-## How a Senior Engineer Thinks
+    def draw(self) -> str:
+        raise NotImplementedError
 
-- Composition is the default.
-- Adapter belongs at external boundaries.
-- Decorators stack on the same interface.
-- Facade is *simplification*, not extra features.
-- Composite only where the data is genuinely a tree.
+class Circle(Shape):
+    def __init__(self, renderer: Renderer, x: int, y: int, radius: int) -> None:
+        super().__init__(renderer)
+        self._x, self._y, self._radius = x, y, radius
 
-## Checklist
+    def draw(self) -> str:
+        return self._renderer.render_circle(self._x, self._y, self._radius)
+```
 
-- [ ] Are Adapters at the external boundary?
-- [ ] Is the Decorator stack at a reasonable depth?
-- [ ] Does the Facade simplify rather than add features?
-- [ ] Does the Proxy share the real object's signature?
-- [ ] Does the Composite model a real tree?
+Explicitly introducing Bridge in production is rare. But DB driver abstractions (`sqlalchemy.Engine` + each dialect) and logging handlers (`logging.Handler` + each output target) already use Bridge structure under the hood.
 
-## Practice Problems
+### Flyweight
 
-1. Wrap an external SaaS call behind a domain interface and an Adapter.
-2. Add a Logger Decorator to an existing Notifier.
-3. Model a folder/file structure with Composite.
+Flyweight saves memory when large numbers of similar objects consume too much of it, by separating shared state (intrinsic) from per-instance state (extrinsic). Thousands of bullets in a game sharing the same texture, or a text editor reusing the same glyph objects, are classic examples.
 
-## Wrap-up and Next Steps
+In Python, `__slots__`, string interning (`sys.intern`), and `functools.lru_cache` already embody the Flyweight spirit, so explicitly implementing the pattern is uncommon.
 
-Composition keeps structure ready for change. The next post moves from structure to *behavior* — the Behavioral patterns.
+## The Cost Each Pattern Demands
+
+Patterns are not free. Knowing what is lost before introducing one matters.
+
+| Pattern | Gained | Lost |
+| --- | --- | --- |
+| Adapter | Interface compatibility, easy replacement | One extra indirection layer, possible translation bugs |
+| Bridge | Independent extension of abstraction/implementation | Higher initial design complexity |
+| Composite | Uniform tree traversal | Blurred leaf/container distinction |
+| Decorator | Dynamic responsibility addition, free combination | Complex stack traces, order dependence |
+| Facade | Caller simplification | Harder access to subsystem details |
+| Flyweight | Memory savings | Complex state-separation logic, thread-safety concerns |
+| Proxy | Access control, caching, lazy loading | Cache invalidation complexity, harder real-object tracing during debugging |
+
+I recommend that whenever a team introduces a structural pattern, they write one sentence answering "is what this pattern costs less than the cost of the current problem?" If the sentence cannot be written, it is not yet time to introduce the pattern.
 
 ## Answering the Opening Questions
 
-- **The problem structural patterns solve?**
-  - The article treats Structural Patterns as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Adapter, Decorator, Facade?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Where Proxy fits?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What concretely changes when composition replaces inheritance?**
+  - The interface stays stable while only the implementation swaps. The Adapter wrapping a legacy SDK without touching a single line of domain code, and the Decorator chain whose behavior changes just by reordering layers — both are composition's flexibility in action. With inheritance, the entire class hierarchy would need redesigning.
+
+- **Decorator and Proxy both "wrap" an object — when should each be chosen?**
+  - Distinguish by intent. "Add functionality" means Decorator; "control access" means Proxy. `TimingClient` added measurement as functionality, so it is a Decorator. `CachedUserRepository` controlled actual DB access (lazy + cache), so it is a Proxy. The implementation shape is similar, but using distinct names communicates intent clearly in code review.
+
+- **What do structural patterns cost?**
+  - Indirection increases, and during debugging it takes one or two extra hops to find where behavior actually lives. As the cost table showed, Decorator complicates stack traces, Facade obscures subsystem details, and Proxy makes cache invalidation harder. A pattern is worth introducing only when that cost is smaller than the pain of the current structural problem.
 
 <!-- toc:begin -->
-## In this series
+## Series Table of Contents
 
-- [Design Patterns 101 (1/10): What Are Design Patterns?](./01-what-are-design-patterns.md)
-- [Design Patterns 101 (2/10): Creational Patterns](./02-creational-patterns.md)
+- [What Are Design Patterns?](./01-what-are-design-patterns.md)
+- [Creational Patterns](./02-creational-patterns.md)
 - **Structural Patterns (current)**
 - Behavioral Patterns (upcoming)
-- The Strategy Pattern (upcoming)
-- The Adapter Pattern (upcoming)
-- The Observer Pattern (upcoming)
+- Strategy Pattern (upcoming)
+- Adapter Pattern (upcoming)
+- Observer Pattern (upcoming)
 - Factory and Dependency Injection (upcoming)
-- Avoiding Pattern Overuse (upcoming)
-- Pythonic Patterns (upcoming)
+- When Not to Use Patterns (upcoming)
+- Patterns That Suit Python (upcoming)
 
 <!-- toc:end -->
 
 ## References
 
-### Core references
+### Core References
 
+- [Design Patterns: Elements of Reusable Object-Oriented Software (GoF)](https://en.wikipedia.org/wiki/Design_Patterns)
 - [Adapter Pattern (refactoring.guru)](https://refactoring.guru/design-patterns/adapter)
 - [Decorator Pattern (refactoring.guru)](https://refactoring.guru/design-patterns/decorator)
 - [Facade Pattern (refactoring.guru)](https://refactoring.guru/design-patterns/facade)
 - [Composite Pattern (refactoring.guru)](https://refactoring.guru/design-patterns/composite)
+- [Proxy Pattern (refactoring.guru)](https://refactoring.guru/design-patterns/proxy)
 
-### Practical follow-up
+### Practical Extensions
 
-- [The Python Tutorial — Classes (Python docs)](https://docs.python.org/3/tutorial/classes.html)
+- [Python typing — Protocol (Python docs)](https://docs.python.org/3/library/typing.html#typing.Protocol)
+- [Head First Design Patterns — Structural Patterns](https://www.oreilly.com/library/view/head-first-design/9781492077992/)
+- [Example code for this series (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/design-patterns-101/en)
 
 Tags: Computer Science, DesignPatterns, Structural, Adapter, Decorator, Facade
