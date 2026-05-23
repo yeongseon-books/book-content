@@ -48,6 +48,13 @@ def strip_code_fences(text: str) -> str:
     return "\n".join(out)
 
 
+INLINE_CODE_RE = re.compile(r"`[^`\n]+`")
+
+
+def strip_inline_code(text: str) -> str:
+    return INLINE_CODE_RE.sub(lambda m: " " * len(m.group(0)), text)
+
+
 def is_external(target: str) -> bool:
     return target.startswith(("http://", "https://", "mailto:", "#", "/"))
 
@@ -61,7 +68,7 @@ def resolve(src_md: Path, target: str) -> Path | None:
 
 def check_file(md: Path) -> list[str]:
     errors: list[str] = []
-    text = strip_code_fences(md.read_text(encoding="utf-8"))
+    text = strip_inline_code(strip_code_fences(md.read_text(encoding="utf-8")))
     for m in LINK_RE.finditer(text):
         target = m.group(3).strip()
         if is_external(target):
