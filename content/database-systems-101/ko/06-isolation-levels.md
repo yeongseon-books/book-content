@@ -368,11 +368,11 @@ SELECT COUNT(*) FROM users WHERE deleted_at IS NULL;
 ## 처음 질문으로 돌아가기
 
 - **고전적인 동시성 이상 현상 네 가지는 무엇일까요?**
-  - 본문의 기준은 격리 수준를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 이 글은 Dirty Read, Non-repeatable Read, Phantom Read, Lost Update를 고전적인 네 가지 이상 현상으로 정리했습니다. 특히 `counter` 예시에서 두 세션이 모두 0을 읽고 1을 써서 최종 값이 2가 아니라 1이 되는 장면이 Lost Update를 가장 직접적으로 보여 줍니다.
 - **READ UNCOMMITTED, READ COMMITTED, REPEATABLE READ, SERIALIZABLE은 무엇이 다를까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 왼쪽에서 오른쪽으로 갈수록 더 많은 이상 현상을 막지만 처리량 비용도 커집니다. READ COMMITTED는 보통 기본값으로 쓰이고, REPEATABLE READ는 같은 트랜잭션 안에서 같은 스냅샷을 유지하며, SERIALIZABLE은 가장 안전한 대신 충돌 시 `SQLSTATE 40001` 재시도를 애플리케이션이 감당해야 합니다.
 - **MVCC는 어떻게 일관된 읽기를 잠금 없이 제공할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - MVCC는 한 행의 여러 버전을 유지해 읽기 트랜잭션이 시작 시점의 스냅샷을 계속 보게 만듭니다. 그래서 PostgreSQL의 REPEATABLE READ 예시처럼 다른 세션이 `INSERT`를 커밋해도 현재 트랜잭션은 기존 결과를 유지할 수 있고, 대신 오래 열린 트랜잭션은 정리되지 못한 버전을 붙잡는 비용을 남깁니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

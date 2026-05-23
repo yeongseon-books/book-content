@@ -641,11 +641,11 @@ $ pyright src/decorators.py
 ## 처음 질문으로 돌아가기
 
 - **함수 자체를 인자로 받는 매개변수는 어떻게 타입을 붙일까요?**
-  - 본문의 기준은 함수 타입 힌트를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 함수 값은 `Callable[[인자 타입들], 반환 타입]`으로 적습니다. 본문에서 `apply_operation(values: list[int], op: Callable[[int], int])`와 `retry(func: Callable[[], T], attempts: int) -> T`를 사용해 콜백 시그니처와 반환 타입 연결을 구체적으로 보여 줬습니다.
 - **`*args`, `**kwargs`는 무엇에 타입을 붙이는 걸까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - `*args: str`은 각 위치 인자가 문자열이라는 뜻이고, `**kwargs: int`는 각 키워드 값이 정수라는 뜻입니다. 그래서 `log_call(*args: str, **kwargs: int)` 예시에서 분석기는 `args`를 `tuple[str, ...]`로, `kwargs` 값을 `int`로 추론합니다.
 - **입력 타입에 따라 반환 타입이 달라지는 함수는 어떻게 표현할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 이런 함수는 `@overload`로 합법적인 호출 시그니처를 먼저 나열하고, 마지막에 실제 구현 하나를 둡니다. `parse_value(raw: str) -> dict[str, str]`와 `parse_value(raw: bytes) -> dict[str, bytes]`를 분리해 적은 뒤 구현에서 `str | bytes`를 함께 처리한 패턴이 그 예입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

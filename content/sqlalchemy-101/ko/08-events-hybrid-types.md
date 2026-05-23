@@ -455,11 +455,11 @@ def test_jsontext_roundtrip(session: Session):
 ## 처음 질문으로 돌아가기
 
 - **이벤트, 속성, 타입 확장점은 각각 어떤 책임을 맡아야 할까요?**
-  - 본문의 기준은 이벤트, hybrid_property, 그리고 커스텀 타입를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 이 글은 확장점을 타입 층, 속성 층, 이벤트 층으로 나눴습니다. `TypeDecorator`는 `LowerString`과 `JSONText`처럼 DB에 쓰고 읽을 때 값을 바꾸고, `hybrid_property`는 `full_name`·`net_amount`처럼 Python 속성과 SQL 표현을 같이 제공하며, 이벤트는 `before_insert`, `before_flush`, `before_cursor_execute`처럼 특정 라이프사이클 순간에 개입합니다.
 - **`@validates`와 mapper 이벤트는 언제 선택이 갈릴까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - `@validates`는 `email`, `score`처럼 setter 시점에 바로 검증·정규화해야 하는 값에 적합하고, 잘못된 데이터가 세션에 들어오기 전에 막아 줍니다. 반면 mapper 이벤트는 `before_insert`에서 timestamp를 채우거나 `before_update`에서 audit 값을 계산하는 식으로 flush 직전 공통 후처리를 걸 때 더 자연스럽습니다.
 - **`hybrid_property`는 왜 Python 속성과 SQL 표현을 함께 제공할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 같은 도메인 규칙을 객체와 쿼리에서 따로 다시 쓰지 않게 하려는 것이 핵심입니다. 본문에서 `Person.full_name`과 `Invoice.net_amount`를 예로 든 것처럼, 인스턴스에서는 속성처럼 읽고 `select(...).where(...)`에서는 SQL 식으로 재사용해야 검색과 필터 조건이 같은 의미를 유지합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -532,11 +532,11 @@ tests/test_discount.py::test_discount_price_invalid[1000-1.1] PASSED
 ## 처음 질문으로 돌아가기
 
 - **같은 로직을 여러 입력으로 검증할 때 함수를 복사하지 않으려면 어떻게 해야 할까요?**
-  - 본문의 기준은 parametrization으로 테스트 케이스 늘리기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - `test_is_palindrome_radar`, `test_is_palindrome_hello`처럼 함수를 늘리는 대신 `@pytest.mark.parametrize`에 입력과 기대값을 데이터로 추가하면 됩니다. 이 글의 `validate_username`, `discount`, `parse_port` 예시처럼 검증 로직은 하나로 유지하고 케이스만 확장하면 테스트가 훨씬 짧고 일관되게 남습니다.
 - **`@pytest.mark.parametrize`의 기본 문법은 어떻게 읽어야 할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - `@pytest.mark.parametrize("a,b,expected", [(1, 2, 3), (0, 0, 0)])`는 테스트 함수 한 개를 각 튜플마다 독립 실행하겠다는 뜻입니다. 정상 케이스와 `with pytest.raises(ValueError, match="out of range")` 같은 오류 케이스를 별도 함수로 나누면, 어떤 조합이 어떤 계약을 검증하는지도 출력에서 바로 읽힙니다.
 - **각 테스트 케이스에 읽기 좋은 이름을 붙이려면 어떻게 해야 할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - `pytest.param(..., id="min-length")`나 `ids=["alice", "bob_01"]`를 쓰면 실패 로그가 데이터 덩어리 대신 의미 있는 이름으로 찍힙니다. 그래서 `FAILED test_username_invalid[space]`처럼 어떤 입력이 문제였는지 즉시 보이고, 회귀 입력을 목록에 추가해도 추적이 쉬워집니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

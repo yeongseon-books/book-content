@@ -565,11 +565,11 @@ PASS
 ## 처음 질문으로 돌아가기
 
 - **fixture는 일반 함수와 무엇이 다를까요?**
-  - 본문의 기준은 fixture 이해하기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - fixture는 값을 반환하는 일반 함수처럼 보이지만, pytest가 테스트 실행 전후의 준비와 정리 수명주기까지 함께 관리한다는 점이 다릅니다. `db_connection()`에서 `yield` 앞에 SQLite 메모리 DB를 만들고 뒤에서 `conn.close()`를 호출하거나, `tmp_path`가 임시 파일을 자동 정리하는 예제가 그 차이를 보여 줍니다.
 - **fixture를 테스트 함수에 어떻게 자동으로 주입할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 테스트 함수 인자 이름이 fixture 이름과 같으면 pytest가 `sample_user`, `sample_users`, `api_client`를 자동으로 넣어 줍니다. 또한 `api_client(base_url, auth_headers)`처럼 fixture끼리도 의존할 수 있고, `conftest.py`에 두면 별도 import 없이 여러 파일에서 같은 준비 코드를 재사용할 수 있습니다.
 - **`function`, `module`, `session` scope는 언제 선택해야 할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 기본값인 `function` scope는 테스트 독립성이 가장 중요할 때 안전하고, `expensive_resource`처럼 생성 비용이 큰 불변 자원은 `module`이나 `session` scope를 검토할 수 있습니다. 다만 `shared_list` 예시처럼 가변 상태를 넓은 scope에 두면 테스트 순서 오염이 생기므로, 공유해도 안전한 자원인지부터 판단해야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -356,11 +356,11 @@ ProgrammingError -> 즉시 수정 대상
 ## 처음 질문으로 돌아가기
 
 - **PEP 249 예외 계층과 SQLite 에러 처리를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?**
-  - 본문의 기준은 PEP 249 예외 계층과 SQLite 에러 처리를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 먼저 봐야 할 경계는 예외를 코드 버그, 비즈니스 규칙 위반, 일시적 환경 문제 중 어디에 둘 것인지입니다. 글에서는 `ProgrammingError`·`InterfaceError`는 즉시 수정 대상, `IntegrityError`는 4xx 응답 후보, `OperationalError` 중 BUSY/LOCKED만 제한적 retry 후보로 다시 묶었습니다.
 - **PEP 249 예외 계층과 SQLite 에러 처리에서 예제나 다이어그램으로 검증해야 할 핵심 신호는 무엇일까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 핵심 신호는 예외 클래스 자체와 함께 `sqlite_errorname`·`sqlite_errorcode`까지 읽어 BUSY, LOCKED, CONSTRAINT_UNIQUE, CORRUPT를 구분하는 것입니다. `create_user()` 예제에서 `DuplicateEmail`과 `TransientDBError`를 분리한 이유도, 같은 DB 에러라도 사용자 응답과 retry 정책이 완전히 다르기 때문입니다.
 - **PEP 249 예외 계층과 SQLite 에러 처리를 실제 시스템에 적용할 때 어떤 실패를 먼저 막아야 할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 가장 먼저 막아야 할 실패는 `except Exception`으로 모든 예외를 삼키는 패턴과, `IntegrityError`까지 무작정 retry하는 패턴입니다. 그래서 본문은 `is_retryable()`로 BUSY/LOCKED만 좁게 판별하고, retry 전체를 `with conn:` 트랜잭션 안쪽에 넣어 원자성이 깨지지 않게 했습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

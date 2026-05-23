@@ -365,11 +365,11 @@ def timed(fn, *args, **kwargs):
 ## 처음 질문으로 돌아가기
 
 - **`execute`, `executemany`, `fetchone`, `fetchall`, `fetchmany`는 각각 언제 써야 할까요?**
-  - 본문의 기준은 execute, executemany, fetch 패턴를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 단일 SQL 한 번은 `execute()`, 같은 INSERT/UPDATE를 여러 파라미터로 반복할 때는 `executemany()`가 기준입니다. 조회는 PK lookup이면 `fetchone()`, 작은 결과셋이면 `fetchall()`, 배치 처리면 `fetchmany()`나 `for row in cur`를 선택해야 메모리와 왕복 횟수를 함께 통제할 수 있습니다.
 - **큰 결과셋을 메모리를 터뜨리지 않고 처리하려면 어떤 패턴을 써야 할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 이 글의 기본 답은 `fetchall()` 대신 cursor iteration이나 `fetchmany(chunk)`를 쓰는 것입니다. `export_notes()` 예제처럼 `cur.arraysize = chunk`를 두고 `while True: rows = cur.fetchmany(chunk)`로 흘리면 row 수와 무관하게 일정한 메모리만 사용합니다.
 - **`cursor.description`은 어떤 메타데이터를 제공할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - `cursor.description`은 마지막 SELECT 결과의 컬럼 메타데이터를 7-tuple 목록으로 제공하며, 예제에서는 `col[0]`과 `col[1]`로 name과 type_code를 확인했습니다. 그래서 dict 변환이나 row factory를 도입하기 전에도 결과 컬럼 이름을 코드로 안전하게 읽어 낼 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

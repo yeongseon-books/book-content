@@ -363,11 +363,11 @@ async def tx(conn: aiosqlite.Connection):
 ## 처음 질문으로 돌아가기
 
 - **aiosqlite로 비동기 SQLite 다루기를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?**
-  - 본문의 기준은 aiosqlite로 비동기 SQLite 다루기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 먼저 확인할 경계는 "이벤트 루프를 보호하는 것"과 "SQLite 자체가 빨라지는 것"을 혼동하지 않았는지입니다. 이 글이 강조한 대로 `aiosqlite`는 connection마다 백그라운드 스레드를 두고 sqlite3 호출을 위임할 뿐이므로, async 전환의 목표는 처리량 증가가 아니라 loop block 제거입니다.
 - **aiosqlite로 비동기 SQLite 다루기에서 예제나 다이어그램으로 검증해야 할 핵심 신호는 무엇일까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 검증할 핵심 신호는 `async with aiosqlite.connect(...)`, `await db.execute(...)`, `async for row in cur`가 실제로 요청 경계와 맞물리는지, 그리고 pool을 만들었다면 `_queue.qsize()`와 pool wait time이 안정적인지입니다. 동시에 `BEGIN IMMEDIATE` 트랜잭션과 `SQLITE_BUSY` 비율을 함께 보면, 비동기화 이후에도 단일 writer 제약이 그대로 남아 있다는 점이 분명해집니다.
 - **aiosqlite로 비동기 SQLite 다루기를 실제 시스템에 적용할 때 어떤 실패를 먼저 막아야 할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 가장 먼저 막아야 할 실패는 async 핸들러 안에서 동기 `sqlite3`를 직접 호출해 이벤트 루프를 멈추는 것과, 한 `aiosqlite` connection을 여러 코루틴이 동시에 잡는 구조입니다. 그래서 글에서는 lifespan에서 풀을 초기화하고, `transactional()` 헬퍼로 `BEGIN`·`commit`·`rollback`을 감싸며, 진짜 async I/O가 없는 경로라면 차라리 `def` 핸들러 + sqlite3가 더 단순하다고 선을 그었습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

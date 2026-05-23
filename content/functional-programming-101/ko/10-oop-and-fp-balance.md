@@ -564,11 +564,11 @@ print("Pass")
 ## 처음 질문으로 돌아가기
 
 - **객체지향과 함수형은 각각 어떤 문제에 더 잘 맞을까요?**
-  - 본문의 기준은 객체지향과 함수형의 균형를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 이 글은 오래 유지되는 상태와 프레임워크 인터페이스는 객체지향이, 입력을 받아 값을 바꾸는 계산은 함수형이 더 잘 맞는다고 정리합니다. `ShoppingCart`와 `AppServer`는 상태와 라이프사이클을 맡고, `transform_prices()`, `validate_email()`, `normalize_config()` 같은 함수는 순수 변환 규칙을 맡는 예제가 그 기준입니다.
 - **두 패러다임을 섞을 때 가장 실용적인 기본 패턴은 무엇일까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 가장 실용적인 패턴은 불변 값 객체와 순수 함수를 조합하고, 필요할 때만 클래스 셸을 두는 방식입니다. `Money`와 `Percentage`를 순수 함수 `apply_discount()`와 `add_tax()`에 넘기거나, `DataPipeline` 클래스가 인터페이스만 제공하고 실제 단계는 순수 함수로 실행하는 구조가 대표 예시입니다.
 - **Functional Core, Imperative Shell은 Python에서 어떻게 적용할 수 있을까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - Python에서는 정규화·검증 같은 핵심 규칙을 `create_user_data()`나 `validate_config()` 같은 순수 함수로 두고, 출력·서버 시작 같은 부수효과는 `handle_registration()`이나 `AppServer.start()`로 밀어내면 됩니다. `boot()`가 먼저 `normalize_config()`와 `validate_config()`를 통과시킨 뒤에만 `AppServer`를 만드는 흐름이 바로 Functional Core, Imperative Shell의 적용 예입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

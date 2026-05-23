@@ -622,11 +622,11 @@ OK
 ## 처음 질문으로 돌아가기
 
 - **mock과 monkeypatch는 무엇이 다를까요?**
-  - 본문의 기준은 mock과 monkeypatch를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - `patch()`와 `MagicMock`은 외부 호출의 반환값, 호출 횟수, 인자를 세밀하게 검증할 때 강하고, `monkeypatch`는 환경변수나 전역 속성을 테스트 범위 안에서 간단히 바꾸고 자동 원복할 때 유리합니다. 본문에서도 `payment.requests.post` 호출 검증은 mock으로, `APP_MODE`나 `SERVICE_FEE` 변경은 monkeypatch로 다루며 역할 차이를 분명히 보여 줍니다.
 - **`patch()`는 어디를 기준으로 적용해야 할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - patch 경로는 함수가 정의된 원본이 아니라, 테스트 대상 코드가 그 객체를 실제로 참조하는 모듈을 기준으로 잡아야 합니다. 그래서 `weather.requests.get`, `payment.requests.post`, `service.fetch_user`는 맞지만, 같은 상황에서 단순히 `requests.post`를 patch하면 실제 네트워크 호출이 남아 테스트가 깨집니다.
 - **외부 호출이 실패하는 상황은 어떻게 재현할 수 있을까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - `side_effect`에 `requests.Timeout`, `requests.ConnectionError`, `ValueError("Invalid JSON")`를 넣으면 실패 경로를 결정적으로 재현할 수 있습니다. 그 위에 `pytest.raises(RuntimeError, match="payment failed")` 같은 검증을 얹으면, 외부 서비스가 흔들려도 우리 코드가 어떤 예외 계약을 지켜야 하는지 테스트로 고정됩니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

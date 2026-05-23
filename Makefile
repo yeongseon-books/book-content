@@ -38,6 +38,7 @@ check-content:
 	python3 scripts/check_caption_presence.py
 	python3 scripts/check_empty_boilerplate_headings.py
 	python3 scripts/check_duplicate_series_intro.py
+	python3 scripts/check_boilerplate_answers.py
 
 # Validate generated outputs (Medium HTML, exports)
 check-generated:

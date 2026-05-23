@@ -458,11 +458,11 @@ SessionLocal = sessionmaker(bind=engine, expire_on_commit=False, autoflush=True)
 ## 처음 질문으로 돌아가기
 
 - **connection pool은 어떤 기준으로 크기와 재사용 정책을 정해야 할까요?**
-  - 본문의 기준은 프로덕션 패턴: 풀, 관측, 마이그레이션, 배포를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 글에서는 평균 동시 요청 수, 요청당 DB 보유 시간, 워커 수, DB의 `max_connections`를 같이 보고 `pool_size`와 `max_overflow`를 정하라고 정리했습니다. 또한 SQLite는 단일 writer 제약이 강하므로 큰 `QueuePool`보다 `StaticPool`이나 더 작은 풀 설정이 현실적이라는 점까지 함께 짚었습니다.
 - **`pool_pre_ping`, `pool_recycle`은 어떤 장애를 줄여 줄까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - `pool_pre_ping=True`는 풀에서 꺼낸 연결이 이미 죽었는지 `SELECT 1`로 확인해 새벽 stale connection 5xx를 줄이고, `pool_recycle=1800`은 오래 idle 상태였던 연결을 재사용 전에 교체해 DB나 로드밸런서 timeout과 부딪히는 문제를 완화합니다. 본문의 운영 기본 설정 스니펫이 바로 이 두 옵션을 항상 포함하는 이유입니다.
 - **N+1 회귀나 느린 쿼리를 운영에서 어떻게 관측할 수 있을까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 엔진 이벤트로 `before_cursor_execute`와 `after_cursor_execute`를 걸어 쿼리 수와 지연 시간을 구조화 로그로 남기고, 테스트에서는 query budget assertion으로 N+1을 CI에서 먼저 막을 수 있습니다. 운영 단계에서는 여기에 OpenTelemetry trace, 풀 대기 시간, P95/P99 SQL latency 대시보드를 붙여 어떤 릴리스가 병목을 만들었는지 추적하는 것이 핵심입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

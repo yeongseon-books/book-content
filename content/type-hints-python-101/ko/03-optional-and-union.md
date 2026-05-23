@@ -651,11 +651,11 @@ Success: no issues found in 1 source file
 ## 처음 질문으로 돌아가기
 
 - **반환값이 `None`일 수 있다는 사실을 타입에 어떻게 드러낼까요?**
-  - 본문의 기준은 Optional과 Union를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 조회 실패 가능성은 `Optional[str]` 또는 `str | None`처럼 반환 타입에 직접 적어야 합니다. 본문의 `find_by_name()`과 `find_user()` 예시처럼 `None` 가능성을 시그니처에 올려 두면, 호출부는 `if email is not None` 같은 분기를 반드시 넣게 됩니다.
 - **하나의 값이 여러 타입 중 하나일 수 있을 때 어떤 문법을 써야 할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 이런 경우에는 `Union[int, str]` 또는 Python 3.10+의 `int | str` 문법을 씁니다. `format_id(value: int | str)`와 `parse_user_id(raw: str | int)`처럼 허용 범위를 먼저 적고, 본문처럼 `isinstance` 분기로 실제 처리 경로를 나누는 방식이 안전합니다.
 - **Python 3.10+의 `X | Y` 문법은 언제 유용할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - `Optional[str]` 대신 `str | None`, `Union[int, str]` 대신 `int | str`처럼 더 짧고 읽기 쉬운 시그니처를 만들 때 특히 유용합니다. 이 글의 `process(value: int | str)`와 `greet(name: str, title: str | None = None)`처럼 `typing` 임포트를 줄이면서도 의미를 그대로 유지할 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

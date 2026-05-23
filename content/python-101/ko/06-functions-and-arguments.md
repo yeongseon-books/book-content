@@ -494,11 +494,11 @@ venv: .venv
 ## 처음 질문으로 돌아가기
 
 - **함수와 인자: def, args, kwargs, default, lambda를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?**
-  - 본문의 기준은 함수와 인자: def, args, kwargs, default, lambda를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 먼저 함수가 어떤 값을 positional로 받고 어떤 옵션을 keyword로 받는지, 즉 시그니처 계약을 확인해야 합니다. `make_greeting(name, *, lang="en", formal=False, ...)`처럼 핵심 입력과 부가 옵션을 나누고, `make_url(host, /, *, scheme="https", path="/")`처럼 `/`와 `*`로 호출 형태를 잠가 두면 호출부 실수를 크게 줄일 수 있습니다.
 - **함수와 인자: def, args, kwargs, default, lambda에서 예제나 다이어그램으로 검증해야 할 핵심 신호는 무엇일까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 검증해야 할 핵심 신호는 인자 묶음과 반환값이 실제로 어떻게 생기는지입니다. `show(1, 2, x=10)`에서 `args = (1, 2)`, `kwargs = {'x': 10}`이 나오는지, `add3(*nums)`와 `add3(**kw)`가 같은 6을 돌려주는지, `sorted(users, key=lambda u: u["score"], reverse=True)`가 점수 기준으로 정렬되는지를 직접 확인해야 합니다.
 - **함수와 인자: def, args, kwargs, default, lambda를 실제 시스템에 적용할 때 어떤 실패를 먼저 막아야 할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 가장 먼저 막아야 할 실패는 `def buggy(item, items=[])`처럼 mutable 기본값이 호출 사이에 공유되는 문제와, `return`을 빠뜨려 호출부에 `None`이 흘러가는 문제입니다. 여기에 `*args`/`**kwargs` 남용으로 시그니처가 흐려지는 상황, `lambda`에 두 줄짜리 로직을 욱여넣는 상황, positional과 keyword 인자를 충돌시키는 호출까지 같이 경계해야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

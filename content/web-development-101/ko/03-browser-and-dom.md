@@ -341,11 +341,11 @@ Cache-Control: public, max-age=31536000, immutable
 ## 처음 질문으로 돌아가기
 
 - **DOM은 정확히 무엇이며 어떻게 만들어질까요?**
-  - 본문의 기준은 브라우저와 DOM를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - DOM은 HTML을 브라우저가 객체 트리로 바꿔 놓은 결과물이며, 글의 예시에서는 `ul#list` 아래에 두 개의 `li`가 달린 구조로 만들어집니다. 그래서 JavaScript가 `getElementById("list")`나 `querySelectorAll("li")`로 노드를 읽고 조작할 수 있습니다.
 - **브라우저 렌더링 파이프라인은 어떤 단계로 이어질까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 브라우저는 DOM을 만든 뒤 계산된 스타일을 합쳐 render tree를 만들고, 이어서 layout으로 위치와 크기를 계산한 뒤 paint로 픽셀을 그립니다. `appendChild`처럼 DOM을 바꾸면 일부 layout과 paint가 다시 일어나므로 Performance 탭에서 재렌더링 비용을 확인할 수 있습니다.
 - **JavaScript는 DOM을 어떻게 읽고 바꿀까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - JavaScript는 `createElement`, `textContent`, `appendChild` 같은 DOM API로 새 노드를 만들고 붙이며, `addEventListener`로 이벤트 위임도 처리합니다. `console.log("1")`, `setTimeout(..., 0)`, `console.log("3")` 예시처럼 비동기 콜백은 이벤트 루프를 거쳐 나중에 실행되므로 DOM 변경 시점도 그 순서 안에서 읽어야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

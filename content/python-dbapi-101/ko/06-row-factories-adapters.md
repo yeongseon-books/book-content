@@ -347,11 +347,11 @@ row factory는 **shape**, adapter/converter는 **value**를 다룬다는 두 축
 ## 처음 질문으로 돌아가기
 
 - **Row factory와 type adapter (sqlite3, PEP 249)를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?**
-  - 본문의 기준은 Row factory와 type adapter (sqlite3, PEP 249)를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 먼저 확인할 경계는 값 단위 변환과 행 단위 변환을 섞지 않았는지입니다. 이 글에서 adapter/converter는 `Decimal`, `Enum`, JSON 같은 단일 값의 왕복을 맡고, row factory는 tuple을 `sqlite3.Row`나 Pydantic 모델 같은 shape로 바꾸는 층으로 분리했습니다.
 - **Row factory와 type adapter (sqlite3, PEP 249)에서 예제나 다이어그램으로 검증해야 할 핵심 신호는 무엇일까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 검증할 핵심 신호는 `detect_types=PARSE_DECLTYPES | PARSE_COLNAMES`가 실제로 converter를 호출하는지, 그리고 `con.row_factory = sqlite3.Row` 또는 Pydantic 팩토리가 원하는 shape를 안정적으로 만드는지입니다. 특히 `Decimal`을 `REAL`이 아니라 adapter/converter로 왕복시키는 예시는 정밀도와 스키마 안정성을 동시에 확인하는 기준이 됩니다.
 - **Row factory와 type adapter (sqlite3, PEP 249)를 실제 시스템에 적용할 때 어떤 실패를 먼저 막아야 할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 가장 먼저 막아야 할 실패는 `row[0]`, `row[2]` 같은 컬럼 인덱스 의존, 금액을 `REAL`로 저장하는 정밀도 사고, 그리고 converter를 등록해 놓고 `detect_types`를 빼먹는 실수입니다. 그래서 본문은 connection 팩토리 한 곳에 `row_factory`, adapter, converter를 모아 두고 repository 바깥으로 SQLite storage class가 새지 않게 하라고 권합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

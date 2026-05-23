@@ -402,11 +402,11 @@ weekly_health = {
 ## 처음 질문으로 돌아가기
 
 - **production 멀티모달 앱은 어떤 end-to-end 구성 요소를 반드시 분리해서 설계해야 할까요?**
-  - 본문의 기준은 Production Multimodal Application 구축를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - API 입구, 이미지 전처리, caption/OCR/embedding 추출, VLM 추론 worker, 벡터 검색, 캐시, object storage, 관측성을 분리해야 장애와 비용을 제어할 수 있습니다. 본문 시스템 그림처럼 FastAPI는 orchestration을 맡고 GPU 추론은 별도 worker로 분리해야 모델 교체, 큐 제어, fallback 설계가 쉬워집니다.
 - **FastAPI 입구, inference worker, cache, object storage, observability는 어떤 순서로 연결되는 편이 안정적일까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 글의 기본 흐름은 업로드 수신과 검증 후 object storage 저장, L1/L2/L3 cache 확인, `asyncio.gather`로 caption·OCR·embedding 병렬 추출, 검색과 VLM 호출, 마지막으로 streaming 응답과 metric 기록입니다. 이렇게 순서를 고정하면 `image_hash`, feature cache, Prometheus metric을 같은 요청 경로에 묶어 지연과 비용의 원인을 단계별로 추적할 수 있습니다.
 - **동기 처리와 비동기 처리 경계는 어떤 기준으로 나누는 것이 현실적일까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 인증, 입력 검증, 예산 검사처럼 짧고 실패가 명확한 단계는 동기로 끝내고, OCR·caption·VLM처럼 오래 걸리거나 병렬 이득이 큰 작업은 비동기 worker로 넘기는 편이 현실적입니다. 본문이 제시한 backpressure, 단계별 timeout, degraded response 정책까지 함께 두면 요청 취소나 worker 과부하 상황에서도 전체 서비스를 축소 응답으로 유지할 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

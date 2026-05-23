@@ -368,11 +368,11 @@ sqlite3의 transaction은 driver가 친절하게 자동 관리해 주지만, 그
 ## 처음 질문으로 돌아가기
 
 - **Transaction과 isolation level (sqlite3, PEP 249)를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?**
-  - 본문의 기준은 Transaction과 isolation level (sqlite3, PEP 249)를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 먼저 봐야 할 경계는 transaction이 connection 어디서 열리고 `commit()` 또는 `rollback()`으로 어디서 닫히는지입니다. sqlite3는 첫 DML 직전에 implicit `BEGIN`을 거는 driver이므로, 이 자동 경계를 모르면 `con.close()`만 호출하고 데이터를 잃거나 lock 대기를 뒤늦게 맞게 됩니다.
 - **Transaction과 isolation level (sqlite3, PEP 249)에서 예제나 다이어그램으로 검증해야 할 핵심 신호는 무엇일까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 본문에서 가장 중요한 신호는 `con.in_transaction` 값, `isolation_level`별 BEGIN 방식, 그리고 `DEFERRED`·`IMMEDIATE`·`EXCLUSIVE`가 락을 잡는 시점입니다. 여기에 `PRAGMA journal_mode=WAL`과 Python 3.12의 `autocommit=False` 예제를 함께 보면, 읽기/쓰기 혼합 워크로드에서 어떤 설정이 충돌을 앞당기고 어떤 설정이 동시성을 높이는지 바로 드러납니다.
 - **Transaction과 isolation level (sqlite3, PEP 249)를 실제 시스템에 적용할 때 어떤 실패를 먼저 막아야 할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 우선 막아야 할 실패는 commit 누락으로 인한 데이터 유실, 장시간 DEFERRED 트랜잭션으로 인한 `SQLITE_BUSY`, 그리고 WAL 없이 writer가 reader를 오래 막는 상황입니다. 그래서 이 글은 write 경로의 `IMMEDIATE`, 운영 기본값으로 `WAL + synchronous=NORMAL + busy_timeout`, 그리고 nested 작업용 `SAVEPOINT`를 실무 기본 패턴으로 묶었습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -601,11 +601,11 @@ pyright: 로컬 편집 단계에서 즉시 피드백 제공
 ## 처음 질문으로 돌아가기
 
 - **타입 힌트를 코드 실행 없이 어떻게 검증할까요?**
-  - 본문의 기준은 mypy와 pyright 사용하기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - `mypy src`와 `pyright src`처럼 정적 검사기를 실행하면 됩니다. 본문에서는 `normalize_user_id()`가 `int` 대신 `str`을 반환하고 `build_greeting()`이 `display_name`의 `None` 가능성을 무시한 예제를 두 도구로 각각 실패시키고, 수정 후 둘 다 통과시키는 흐름을 보여 줬습니다.
 - **mypy와 pyright는 같은 코드에서 어떤 식으로 오류를 보여 줄까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 둘 다 같은 버그를 잡지만 메시지 형식과 오류 코드가 다릅니다. mypy는 `[return-value]`, `[union-attr]`처럼 범주를 붙여 주고, pyright는 `reportReturnType`, `reportOptionalMemberAccess`처럼 에디터 친화적인 진단명을 보여 준다는 점을 실제 출력으로 비교했습니다.
 - **strict 모드는 기존 저장소에 어떻게 점진적으로 도입할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 본문은 저장소 전체에 한 번에 strict를 켜지 말고 `src.accounts` 같은 핵심 모듈만 override로 먼저 올리라고 제안했습니다. `pyproject.toml`의 `[[tool.mypy.overrides]]`, `pyrightconfig.json`의 `strict`, `exclude`, 그리고 CI 워크플로를 함께 두어 새 코드부터 실패하게 만드는 순서가 핵심입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

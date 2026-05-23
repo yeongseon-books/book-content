@@ -545,11 +545,11 @@ tests/test_checkout.py::test_apply_coupon_handles_edge_values[INVALID] PASSED
 ## 처음 질문으로 돌아가기
 
 - **PR을 열 때마다 테스트를 수동으로 실행하는 습관에 의존하지 않으려면 어떻게 해야 할까요?**
-  - 본문의 기준은 GitHub Actions에서 테스트 자동화하기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - `.github/workflows/test.yml`에 `push`와 `pull_request` 트리거를 모두 걸고, 이 workflow를 필수 상태 검사로 연결하면 테스트 실행이 개인 습관이 아니라 저장소 규칙이 됩니다. 그러면 PR마다 같은 `pytest --cov --cov-fail-under=80` 명령이 자동으로 돌고, 통과 전에는 머지할 수 없게 됩니다.
 - **GitHub Actions workflow를 여러 조각이 아니라 하나의 최종 파일로 어떻게 조립할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 이 글은 조각난 YAML 대신 완성된 `test.yml` 전체를 먼저 보여 주고, 그 안에서 checkout, `actions/setup-python`, `pip install -e ".[test]"`, pytest 실행, HTML coverage 업로드가 어떻게 이어지는지 해설했습니다. 실무에서도 이렇게 최종 파일을 기준으로 읽어야 trigger, 설치, 테스트, artifact 단계가 한 흐름으로 보입니다.
 - **Python 3.10, 3.11, 3.12를 동시에 검증하면서도 피드백 속도를 유지하려면 무엇을 신경 써야 할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - `matrix.python-version`으로 세 버전을 병렬 실행하되 `fail-fast: false`로 전체 결과를 끝까지 수집하고, pip 캐시는 `setup-python` 내장 기능으로 단순하게 관리하는 구성이 실용적입니다. 또 HTML coverage artifact는 대표 실행인 3.12에서만 올리면 로그와 저장 공간을 줄이면서도 리뷰에 필요한 정보는 그대로 남길 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

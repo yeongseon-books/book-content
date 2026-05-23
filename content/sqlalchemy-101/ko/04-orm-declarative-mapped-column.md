@@ -424,11 +424,11 @@ target_metadata = Base.metadata
 ## 처음 질문으로 돌아가기
 
 - **`DeclarativeBase`는 어떤 역할을 하고 왜 `MetaData`와 함께 묶일까요?**
-  - 본문의 기준은 ORM 기초: DeclarativeBase와 mapped_column으로 모델 정의하기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - `DeclarativeBase`는 ORM 모델들의 공통 부모이면서 `Base.metadata`를 품은 그릇이라서, 모델 클래스를 선언하는 순간 내부 `Table`이 같은 카탈로그에 등록됩니다. 그래서 ORM으로 정의한 `User`와 `Order`도 결국 `Base.metadata.create_all(engine)` 한 번으로 생성되며, naming convention도 이 지점에서 함께 통일됩니다.
 - **`Mapped[T]`와 `mapped_column`은 타입 힌트, 컬럼 정의와 어떻게 연결될까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - `Mapped[int] = mapped_column(primary_key=True)`는 파이썬 타입 힌트와 SQL 컬럼 정의를 한 줄에 묶어 주고, `Mapped[str | None]`처럼 `None`이 포함되면 nullable 의도도 함께 드러납니다. 본문에서 `email`, `nickname`, `String(255)` 예시로 보여 준 것처럼, ORM 모델 정의가 사실상 Core `Column(...)`을 더 읽기 좋게 감싼 형태입니다.
 - **`__tablename__`, `__table_args__`, `repr`는 언제부터 필요해질까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - `__tablename__`은 자동 추론에 맡기지 않고 테이블 이름을 고정할 때 바로 필요하고, `__table_args__`는 `UniqueConstraint`, `Index`, `sqlite_autoincrement` 같은 제약을 모델 옆에 명시할 때 중요해집니다. `__repr__`은 `User(id=..., email=...)`처럼 객체 로그를 바로 읽게 해 주므로, Session과 디버깅이 많아지는 순간부터 비용 대비 효과가 큽니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

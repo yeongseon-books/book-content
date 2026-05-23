@@ -655,11 +655,11 @@ class Payment:
 ## 처음 질문으로 돌아가기
 
 - **이름 있는 키와 값 타입을 가진 딕셔너리는 어떻게 표현할까요?**
-  - 본문의 기준은 TypedDict와 dataclass를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - `TypedDict`로 키 이름과 값 타입을 고정하면 됩니다. 본문에서는 `class UserProfile(TypedDict): name: str; age: int; email: str`와 `class User(TypedDict)` 예시를 통해 키 오타와 필수 키 누락을 mypy 단계에서 잡을 수 있음을 보여 줬습니다.
 - **자동 생성된 `__init__`, `__repr__`, `__eq__`가 필요한 가벼운 데이터 객체는 어떻게 만들까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 이 경우에는 `@dataclass`가 맞습니다. `Product(name: str, price: int, quantity: int = 0)`처럼 필드만 선언해도 생성자와 비교가 자동으로 생기고, `Point` 예시처럼 `frozen=True`를 주면 불변 값 객체로도 바로 쓸 수 있습니다.
 - **선택 키, 상속, 불변 객체 같은 패턴은 어디서 쓸까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 선택 키는 `ExtendedProfile(UserProfile, total=False)`처럼 `TypedDict` 상속에 `total=False`를 더해 표현했습니다. 불변 객체와 mutable 기본값 문제는 `@dataclass(frozen=True)`와 `field(default_factory=list)`로 다뤘고, 외부 입출력은 `TypedDict`, 내부 계산 모델은 `dataclass`로 나누는 기준도 함께 제시했습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

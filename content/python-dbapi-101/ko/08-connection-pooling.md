@@ -369,11 +369,11 @@ class Pool:
 ## 처음 질문으로 돌아가기
 
 - **SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?**
-  - 본문의 기준은 SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 먼저 확인할 경계는 connection 하나를 누가 소유하고 어디까지 공유하는지입니다. SQLite connection은 서버 세션보다 파일 핸들에 가까워도 트랜잭션 상태와 statement 캐시를 들고 있으므로, 요청별·스레드별·단일 shared 전략 중 하나를 분명히 정해야 합니다.
 - **SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링에서 예제나 다이어그램으로 검증해야 할 핵심 신호는 무엇일까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 핵심 신호는 `sqlite3.threadsafety` 값, `check_same_thread=True/False`의 의미, 그리고 WAL·timeout 설정 아래에서 BUSY가 얼마나 나는지입니다. FastAPI 예제의 `Depends(get_db)`, `open_conn(readonly=False)`, 동시 쓰기 시뮬레이션은 요청 단위 connection이 실제로 더 단순하고 안전한지 검증하는 기준으로 쓰였습니다.
 - **SQLite Connection 관리: thread-safety, check_same_thread, 그리고 풀링를 실제 시스템에 적용할 때 어떤 실패를 먼저 막아야 할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 우선 막아야 할 실패는 전역 connection 하나에 `check_same_thread=False`만 켜 놓고 여러 스레드가 동시에 `execute()`와 `commit()`를 섞어 쓰는 구조입니다. 글에서 권한 기본값으로 둔 것은 요청 단위 open/close, `journal_mode=WAL`, 단일 writer 큐 같은 패턴이며, 큰 pool로 writer 수를 늘리려는 접근은 오히려 BUSY만 키운다고 정리했습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

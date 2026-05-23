@@ -560,11 +560,11 @@ def change_impact_score(callers: int, contract_changed: bool, exception_changed:
 ## 처음 질문으로 돌아가기
 
 - **좋은 이름을 판단할 때 어떤 신호를 봐야 할까요?**
-  - 본문의 기준은 이름 짓기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 이 글에서는 intention-revealing, searchable, pronounceable, domain term이라는 네 가지 신호를 중심으로 이름을 판단했습니다. `SECONDS_PER_DAY`, `DEFAULT_SALES_TAX_RATE`, `calculate_invoice_subtotal`처럼 뜻과 검색성이 동시에 살아 있는 이름이 기준입니다.
 - **변수 이름과 함수 이름, 클래스 이름은 무엇이 다를까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 변수는 `invoice_total_cents`처럼 값의 의미와 단위를 드러내야 하고, 함수는 `calculate_order_total`처럼 동사와 목적을 함께 담아야 하며, 클래스는 `InvoiceRepository`처럼 역할 중심 명사여야 합니다. 같은 명명 규칙을 모든 대상에 똑같이 적용하는 것이 아니라, 호출자에게 무엇을 약속하는지에 따라 기준이 달라집니다.
 - **도메인 용어를 코드 안으로 어떻게 자연스럽게 가져올 수 있을까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 글의 도메인 용어 테이블처럼 사용자 표현과 코드 용어를 1:1로 맞추고, `order_total_cents`, `payment_confirmed`, `discount_coupon` 같은 이름을 테스트와 API 스키마에도 같은 단어로 쓰는 방식이 효과적입니다. 이렇게 맞춰 두면 회의, PR, 장애 대응에서 번역 비용이 줄고 이름 변경의 범위도 더 분명해집니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

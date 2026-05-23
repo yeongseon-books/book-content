@@ -350,11 +350,11 @@ Cache-Control: public, max-age=31536000, immutable
 ## 처음 질문으로 돌아가기
 
 - **웹 페이지는 왜 세 가지 언어로 나뉠까요?**
-  - 본문의 기준은 HTML, CSS, JavaScript를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 구조, 스타일, 동작을 한 파일에 섞어 두면 제목 색 하나를 바꾸는 일도 HTML과 스크립트를 함께 읽어야 해서 변경 범위가 커집니다. `style="..."`와 `onclick="..."`를 걷어 내고 HTML·CSS·JavaScript를 분리하면 역할이 선명해지고 캐시와 코드 리뷰도 쉬워집니다.
 - **HTML, CSS, JavaScript는 각각 무엇을 책임질까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - HTML은 `<h1 class="title">`와 `<button id="say">`처럼 페이지 골격을 선언하고, CSS는 `.title { color: steelblue; }`와 `button { padding: 8px 16px; }`처럼 보이는 규칙을 정합니다. JavaScript는 `getElementById("say")`에 클릭 리스너를 붙여 `alert("Nice to meet you")`를 띄우는 식으로 사용자 반응을 담당합니다.
 - **세 언어가 함께 동작할 때 어떤 연결 지점이 생길까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - HTML의 `class`와 `id`가 CSS selector와 JavaScript DOM API가 만나는 연결점입니다. `<link rel="stylesheet" href="style.css">`와 `<script src="app.js" defer></script>`가 붙으면 같은 문서를 기준으로 스타일과 동작이 각각 결합되고, Elements 탭에서 그 결합 결과를 바로 확인할 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

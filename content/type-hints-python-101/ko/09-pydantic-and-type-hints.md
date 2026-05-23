@@ -652,11 +652,11 @@ POST /users 422 응답 핵심
 ## 처음 질문으로 돌아가기
 
 - **타입 힌트를 런타임 검증으로 어떻게 연결할 수 있을까요?**
-  - 본문의 기준은 Pydantic과 타입 힌트를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - `CreateUserRequest(BaseModel)`와 `UserResponse(BaseModel)`처럼 요청·응답 모델을 선언하면 타입 힌트가 FastAPI 경계에서 실제 검증 규칙으로 바뀝니다. 이 글은 잘못된 JSON이 엔드포인트 본문에 들어오기 전에 차단되고, 통과한 값만 `UserResponse`까지 이어지는 전체 흐름을 한 요청 생명주기로 설명했습니다.
 - **`Field`, `field_validator`, `model_validator`는 한 요청 흐름에서 각각 어디에 들어갈까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - `Field`는 `username: str = Field(min_length=3, max_length=20)`나 `age: int = Field(ge=13, le=120)`처럼 기본 제약을 선언하는 첫 경계입니다. 그다음 `field_validator("username")`는 공백 제거와 소문자 정규화를 맡고, `model_validator(mode="after")`는 `password`와 `password_confirm` 일치 여부처럼 필드 간 관계를 검사합니다.
 - **FastAPI는 잘못된 요청을 실제로 어떤 422 응답으로 돌려줄까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 본문에서는 `username`, `email`, `age`, `password`가 각각 어떤 규칙을 어겼는지 `detail` 배열로 돌려주는 422 JSON을 그대로 보여 줬습니다. 특히 모델 전체 검사 실패는 `loc: ["body"]`, 메시지는 `password_confirm must match password`처럼 응답되어, 어느 경계에서 거절됐는지 바로 추적할 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

@@ -609,11 +609,11 @@ def review_signal(duplicate_rules: int, mutable_paths: int) -> str:
 ## 처음 질문으로 돌아가기
 
 - **요구사항에서 어떤 클래스를 도출하고, 어떤 책임을 어디에 둘지 어떻게 판단할까요?**
-  - 본문의 기준은 객체지향 설계 예제를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 이 글은 온라인 서점 주문 시스템에서 장바구니, 할인, 결제, 저장을 먼저 협력 구조로 나눈 뒤 `OrderService`는 조립과 흐름, `Cart`는 항목 관리, `Money`는 금액 연산을 맡기는 식으로 책임을 배치했습니다. 뒤이어 티켓 예제의 `TicketService`, `AssignmentPolicy`, `NotificationPort` UML까지 보여 주면서, 클래스 도출의 기준이 도메인 용어와 변경 축이라는 점을 분명히 했습니다.
 - **값 객체, 엔티티, 서비스 클래스는 어떤 식으로 역할을 나누면 좋을까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - `Money`는 `__add__`, `apply_discount()`를 가진 불변 값 객체라서 금액 그 자체의 규칙을 들고 있고, `Book`은 `book_id`로 동일성을 판단하는 엔티티입니다. `OrderService`는 이 둘을 대신하지 않고 `BulkDiscount`, `CardPayment`, `InMemoryOrderRepo` 같은 협력 객체를 엮어 checkout 흐름만 조정하므로, 서비스 클래스는 규칙 저장소가 아니라 오케스트레이터에 가깝다는 점을 보여 줍니다.
 - **할인 정책, 결제 수단, 저장소처럼 바뀌기 쉬운 요소는 어떻게 분리해야 할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 본문은 `DiscountPolicy`, `PaymentGateway`, `OrderRepository`를 모두 Protocol 경계 뒤로 밀어 두고 `PercentDiscount`, `BulkDiscount`, `CardPayment`, `BankTransfer`, `InMemoryOrderRepo`를 교체 가능한 구현으로 배치했습니다. 그래서 PG사 교체나 할인 실험이 생겨도 `Cart`와 `Money` 같은 핵심 도메인 객체를 흔들지 않고, 조립 코드에서 구현만 바꾸면 되는 구조가 됩니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

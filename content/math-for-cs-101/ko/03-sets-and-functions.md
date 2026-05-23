@@ -452,11 +452,11 @@ print(result)
 ## 처음 질문으로 돌아가기
 
 - **집합은 왜 자료구조와 데이터 모델의 기초라고 할까요?**
-  - 본문의 기준은 집합과 함수를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 집합은 무엇이 허용되고 무엇이 빠지는지 경계를 직접 표현하기 때문에 데이터 모델의 바닥이 됩니다. `can_access(user_scopes, required_scopes)`, `validate_schema(required, optional, actual)`, `power_set(features)` 예시는 권한, 스키마, 설정 조합을 모두 포함 여부의 언어로 설명할 수 있음을 보여 줍니다.
 - **합집합, 교집합, 차집합은 코드에서 어떻게 보일까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 이 글은 `A | B`, `A & B`, `A - B`를 그대로 코드에 옮겼고, `resolve_permissions(allowed, requested, blocked)`에서 `(allowed & requested) - blocked`로 최종 승인 집합을 계산했습니다. `validate_schema`에서는 누락 필드는 `required - actual`, 예상 밖 필드는 `actual - (required | optional)`로 분리해 집합 연산이 곧 검증 규칙이 됨을 보여 주었습니다.
 - **함수와 관계는 무엇이 다를까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 함수는 입력 하나마다 출력 하나가 정해지는 결정적 규칙이라서 `square(x)`나 `compose(trim, lower, remove_space)` 같은 파이프라인으로 다룰 수 있습니다. 반면 한 사용자에게 여러 즐겨찾기가 매달리거나 `team_members(users, team)`처럼 한 입력이 여러 결과를 낳는 구조는 관계이므로 계약과 테스트 전략도 달라집니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

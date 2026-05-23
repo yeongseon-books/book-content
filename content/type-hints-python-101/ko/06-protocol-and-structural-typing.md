@@ -620,11 +620,11 @@ Success: no issues found in 1 source file
 ## 처음 질문으로 돌아가기
 
 - **상속 없이 인터페이스 계약을 적을 수 있을까요?**
-  - 본문의 기준은 Protocol과 structural typing를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 가능합니다. `class Closeable(Protocol): def close(self) -> None: ...`처럼 계약만 적어 두면 `FileHandler`가 이를 상속하지 않아도 `close()` 구조가 맞는 순간 `cleanup(resource: Closeable)`에 그대로 넘길 수 있습니다.
 - **ABC와 Protocol은 무엇이 다를까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - ABC는 `BasePlugin` 예시처럼 공통 구현과 명시적 상속을 전제로 하고, Protocol은 `Executable`처럼 구조만 맞으면 외부 클래스도 받을 수 있습니다. 그래서 본문은 공통 로직을 줄 때는 ABC, 느슨한 인터페이스 경계와 외부 타입 수용이 중요할 때는 Protocol을 선택하라고 정리했습니다.
 - **속성만으로도 Protocol을 만족시킬 수 있을까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 가능합니다. `class Named(Protocol): name: str`처럼 속성 계약만 둔 뒤 `User`와 `Product`가 `self.name`만 제공해도 `greet(entity: Named)`에 모두 통과했습니다. 즉, Protocol은 메서드뿐 아니라 속성 구조도 계약의 일부로 다룰 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

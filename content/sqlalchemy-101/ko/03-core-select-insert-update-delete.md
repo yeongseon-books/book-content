@@ -522,11 +522,11 @@ INFO sqlalchemy.engine.Engine COMMIT
 ## 처음 질문으로 돌아가기
 
 - **`select()`는 어떤 순서로 조립되고, `Result`는 어떻게 읽어야 할까요?**
-  - 본문의 기준은 SQLAlchemy Core - select·insert·update·delete를 2.x style로 다루기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - `select(users.c.id, users.c.name).where(...).order_by(...).limit(...)`처럼 절을 체이닝할 때마다 새로운 immutable statement가 만들어지고, 마지막에 `conn.execute(stmt)`가 `Result`를 돌려줍니다. 이후에는 `Row`, `.scalar_one()`, `.scalars().all()`, `.mappings().all()` 가운데 무엇이 필요한지 선택해 읽어야 하며, `Result`가 일회용이라는 점도 함께 기억해야 합니다.
 - **`insert`, `update`, `delete`를 2.x 트랜잭션 모델과 함께 어떻게 써야 할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 쓰기 작업은 본문 예시처럼 `with engine.begin() as conn:` 안에서 실행하는 것이 기본이고, 필요하면 `insert(...).returning(...)`, `update(...).rowcount`처럼 결과도 바로 확인할 수 있습니다. 특히 WHERE 없는 `delete(users)`가 전체 삭제로 이어진다는 점 때문에, 글에서는 `safe_delete` 헬퍼처럼 애플리케이션 레벨 안전장치까지 같이 제안했습니다.
 - **`JOIN`, 서브쿼리, CTE, 집계 함수는 Core에서 어떻게 표현할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - Core에서는 `join`, `subquery()`, `cte("recent")`, `func.count(...).label("post_count")`를 조합해 복잡한 SQL도 같은 표현식 체계 안에서 만들 수 있습니다. 예시의 `users`와 `posts` JOIN, `%news%` 서브쿼리, 사용자별 게시글 수 집계가 바로 그 패턴을 보여 줍니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

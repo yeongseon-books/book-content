@@ -577,11 +577,11 @@ tests/test_discount.py::test_discount_price_invalid[1000-1.1] PASSED
 ## 처음 질문으로 돌아가기
 
 - **pytest는 테스트 파일과 함수를 어떤 규칙으로 자동 탐색할까요?**
-  - 본문의 기준은 첫 번째 pytest 테스트 작성하기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - pytest는 `test_*.py`, `*_test.py`, `test_*` 함수, `Test*` 클래스 규칙을 따라 테스트를 수집합니다. `pytest --collect-only -q`와 `tests/test_string_utils.py::TestReverseString::test_basic` 같은 노드 ID 예시가 보여 주듯, 이름 규칙이 맞아야 원하는 테스트를 정확히 발견하고 선택 실행할 수 있습니다.
 - **프로덕션 코드와 테스트 코드는 어떤 디렉터리 구조로 나누는 편이 좋을까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 이 글에서는 `src/myapp/` 아래에 프로덕션 코드를 두고 `tests/` 아래에 `test_string_utils.py`, `conftest.py`를 분리하는 `src/` 레이아웃을 기준으로 설명했습니다. 이렇게 나누면 배포 패키지 경계가 선명해지고, 공통 fixture는 `conftest.py`에 모아도 import 경로와 테스트 위치가 흔들리지 않습니다.
 - **`pyproject.toml`은 왜 필요한가요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - `pyproject.toml`의 `testpaths = ["tests"]`, `pythonpath = ["src"]`, `addopts = "-ra -q"` 같은 설정이 있으면 로컬과 CI가 같은 기준으로 테스트를 찾고 실행합니다. 특히 `from myapp.service import build_query`처럼 패키지 기준 import를 안정적으로 유지하려면 `pythonpath` 설정이 사실상 구조의 일부입니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

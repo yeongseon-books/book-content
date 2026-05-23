@@ -362,11 +362,11 @@ def timed(fn, *args, **kwargs):
 ## 처음 질문으로 돌아가기
 
 - **PEP 249 이전에는 Python의 데이터베이스 접근 코드가 왜 그렇게 제각각이었을까요?**
-  - 본문의 기준은 왜 DB-API 2.0인가 - PEP 249가 푼 문제를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 표준이 없던 시절에는 `oracle.open()`, `oracle.run_sql()`, `mysql.connect()`, `db.send()`처럼 driver마다 함수 이름, 인자 순서, 반환 타입이 모두 달랐습니다. 그래서 같은 `SELECT * FROM users`라도 Oracle 코드와 MySQL 코드를 따로 써야 했고, DB 교체는 사실상 애플리케이션 재작성에 가까웠습니다.
 - **DB-API 2.0은 정확히 어떤 다섯 가지를 표준화했을까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 이 글에서 정리한 다섯 축은 module-level constants, connection 객체, cursor 객체, type objects, exception hierarchy입니다. 덕분에 `connect()`, `cursor()`, `execute()`, `fetchall()`, `commit()` 같은 핵심 흐름과 `OperationalError`·`IntegrityError` 같은 예외 분류를 driver를 바꿔도 같은 틀로 다룰 수 있습니다.
 - **driver마다 `paramstyle`이 다른데도 왜 애플리케이션 코드는 대부분 그대로 옮겨질까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - SQLite 예제를 psycopg로 옮길 때 바뀐 것은 `import`, `connect()` 인자, 그리고 `?`를 `%s`로 바꾸는 자리뿐이었습니다. `execute → fetchall → commit` 같은 애플리케이션 로직은 그대로 유지되므로, `paramstyle` 차이만 흡수하면 대부분의 코드를 재사용할 수 있습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

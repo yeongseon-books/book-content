@@ -665,11 +665,11 @@ $ pyright src/repository.py
 ## 처음 질문으로 돌아가기
 
 - **입력 타입을 그대로 반환 타입에 연결하려면 어떻게 적을까요?**
-  - 본문의 기준은 Generic 이해하기를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - `T = TypeVar("T")`를 선언한 뒤 `def identity(value: T) -> T`나 `def first(items: list[T]) -> T`처럼 같은 타입 변수를 입력과 반환에 함께 쓰면 됩니다. 그래서 `first([1, 2, 3])`는 `int`, `identity("hello")`는 `str`로 추론되며 `Any`처럼 정보가 사라지지 않습니다.
 - **재사용 가능한 컨테이너 클래스를 타입 안전하게 만들려면 무엇이 필요할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 클래스에 `Generic[T]`를 붙여 타입 매개변수를 올려야 합니다. 본문의 `Stack(Generic[T])`, `Page[T]`, `Repository[T]` 예시처럼 `push`, `pop`, `items`, `all()`이 같은 `T`를 공유해야 컨테이너 전체 계약이 무너지지 않습니다.
 - **bound와 constraint는 어떤 차이가 있을까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - `bound=Comparable`은 상한 타입을 두어 그 계열 안에서만 허용하는 방식이고, `TypeVar("Number", int, float)`는 허용 가능한 타입 목록을 직접 제한하는 constraint입니다. 본문의 `find_min(items: list[C]) -> C`와 `add(a: Number, b: Number) -> Number`가 이 차이를 각각 보여 줍니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

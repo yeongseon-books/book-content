@@ -369,11 +369,11 @@ def open_prod_conn(path: str) -> sqlite3.Connection:
 ## 처음 질문으로 돌아가기
 
 - **SQLite Production 패턴: retry, timeout, 관측성, 백업를 운영 관점에서 볼 때 먼저 어떤 경계를 확인해야 할까요?**
-  - 본문의 기준은 SQLite Production 패턴: retry, timeout, 관측성, 백업를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 먼저 확인할 경계는 resilience, bounded latency, observability, recoverability 네 축이 한 모듈 안에서 모두 닫혀 있는지입니다. 이 글의 `open_conn()`은 WAL·`busy_timeout`·`foreign_keys`를 한곳에 묶고, retry와 slow query 측정까지 합쳐 운영 기본값을 코드로 고정했습니다.
 - **SQLite Production 패턴: retry, timeout, 관측성, 백업에서 예제나 다이어그램으로 검증해야 할 핵심 신호는 무엇일까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - 핵심 신호는 `busy_timeout`과 애플리케이션 retry가 각각 어느 층에서 지연을 제어하는지, slow query가 `SLOW_QUERY_THRESHOLD_MS`를 넘는지, 그리고 OpenTelemetry span과 백업 복구 검증이 실제로 남는지입니다. 본문은 `retry()` 데코레이터, `timed_query()`, `trace_query()`, `restore_check()`를 한 흐름으로 연결해 운영 지표가 어디서 나와야 하는지까지 보여 줬습니다.
 - **SQLite Production 패턴: retry, timeout, 관측성, 백업를 실제 시스템에 적용할 때 어떤 실패를 먼저 막아야 할까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - 가장 먼저 막아야 할 실패는 `cp app.db backup.db` 같은 비일관 백업, BUSY를 무제한 재시도하는 코드, 그리고 복구 검증 없는 형식적 백업입니다. 그래서 이 글은 `Connection.backup()` 기반 백업, `max_attempts`와 jitter를 둔 retry, `PRAGMA integrity_check`와 row count까지 포함한 복구 점검을 production 최소선으로 제시했습니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차

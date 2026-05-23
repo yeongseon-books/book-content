@@ -365,11 +365,11 @@ weekly_health = {
 ## 처음 질문으로 돌아가기
 
 - **왜 비디오 이해에서 frame sampling이 가장 먼저 결정해야 할 핵심 변수일까요?**
-  - 본문의 기준은 Video 이해 - Frame Sampling에서 Video-LLaVA까지를 한 덩어리 개념으로 보지 않고 입력, 처리, 검증, 운영 신호가 만나는 경계로 나누어 확인하는 것입니다.
+  - 10분 30fps 영상은 약 18,000 frame이라 그대로 넣으면 수백만 token으로 불어나기 때문에, 어떤 순간을 남길지 먼저 정하지 않으면 어떤 큰 모델도 감당하기 어렵습니다. 글이 강조한 것처럼 uniform 8~32 frame, keyframe, dense sampling은 단순 최적화가 아니라 어떤 사건을 보존하고 어떤 사건을 버릴지 정하는 제품 정책입니다.
 - **PyAV와 scene change 기반 keyframe extraction은 각각 어떤 장면에서 유용할까요?**
-  - 예제와 그림에서는 어떤 값이 들어오고, 어느 단계에서 바뀌며, 어떤 기준으로 통과 또는 실패하는지를 먼저 확인해야 합니다.
+  - `sample_uniform_frames()`처럼 PyAV로 균등 간격 샘플을 뽑는 방식은 영상 전체 개요를 빠르게 훑는 Q&A와 요약에 적합합니다. 반면 `extract_keyframes()`처럼 히스토그램 차이로 scene change를 잡는 방식은 장면 전환이 분명한 영상에서 더 효율적이지만, 임계값과 최대 frame cap을 잘못 잡으면 중요한 순간을 놓치거나 과도한 frame이 생길 수 있습니다.
 - **VideoMAE, TimeSformer, X-CLIP 같은 video encoder는 어떤 trade-off를 보여 줄까요?**
-  - 운영에서는 이 판단을 체크리스트, 로그, 테스트로 남겨 다음 변경에서도 같은 실패가 반복되지 않게 막아야 합니다.
+  - TimeSformer는 space-time attention으로 동작 인식에 강하고, VideoMAE는 16 frame 기반 feature extractor로 fine-tuning 출발점이 좋으며, X-CLIP은 CLIP을 확장해 zero-shot action 인식에 유리합니다. 여기에 Video-LLaVA는 8 frame을 비디오 토큰으로 압축해 Q&A까지 가능하게 하지만, 긴 영상은 본문이 설명한 것처럼 청크 분할과 요약 병합을 별도로 설계해야 합니다.
 
 <!-- toc:begin -->
 ## 시리즈 목차
