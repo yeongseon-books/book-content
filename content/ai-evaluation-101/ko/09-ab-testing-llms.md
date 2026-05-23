@@ -30,7 +30,6 @@ LLM에서는 특히 표현 자유도가 높아 단순 평균 점수보다 pairwi
 
 여기서는 pairwise win rate, 표본 크기 계산, 통계적 유의성, effect size, 그리고 운영 트래픽 기반 online A/B까지 실무 흐름으로 정리하겠습니다.
 
-
 ![LLM A/B 테스팅 - prompt 비교](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/09/09-01-a-b-testing-llms-which-prompt-is-better.ko.png)
 *LLM A/B 테스팅 - prompt 비교*
 > LLM A/B 테스트의 목표는 더 좋아 보이는 후보를 고르는 것이 아니라, 더 낫다고 말할 근거를 만드는 것입니다.
@@ -65,7 +64,8 @@ LLM A/B 테스팅 - prompt 비교
 
 !["더 나아 보인다"는 증거가 아닙니다](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/09/09-01-looks-better-is-not-evidence.ko.png)
 
-"더 나아 보인다"는 증거가 아닙니다
+*"더 나아 보인다"는 증거가 아닙니다*
+
 새 prompt 또는 새 모델로 바꾸면 흔히 다음과 같이 평가합니다.
 
 > "GPT-4o로 바꿨더니 답변이 더 자연스러워 보여요. 출시합시다."
@@ -83,7 +83,8 @@ A/B 테스트는 두 가지 변형(A, B)을 같은 입력에 적용하고 어느
 
 ![Pairwise Comparison으로 Win Rate 측정](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/09/09-03-pairwise-comparison-and-win-rate.ko.png)
 
-Pairwise Comparison으로 Win Rate 측정
+*Pairwise Comparison으로 Win Rate 측정*
+
 Ep4에서 본 pairwise judge를 활용합니다. 같은 입력에 모델 A와 B의 응답을 받고, judge가 어느 쪽이 나은지 판정합니다.
 
 ```python
@@ -144,7 +145,8 @@ def ab_test(questions: list[str], model_a: str, model_b: str) -> dict:
 
 ![표본 크기 - 필요 샘플 수](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/09/09-04-sample-size-how-many-to-evaluate.ko.png)
 
-표본 크기 - 필요 샘플 수
+*표본 크기 - 필요 샘플 수*
+
 10개로 60% vs 40%면 우연일 수 있습니다. 1000개로 같은 비율이면 확실히 다릅니다. 필요한 표본 크기는 **검출하려는 차이(effect size)**에 따라 결정됩니다.
 
 ```python
@@ -184,7 +186,8 @@ print(required_sample_size(0.7, 0.5))  # ~93
 
 ![통계적 유의성 검증 - Two-Proportion Z-Test](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/09/09-05-statistical-significance-two-proportion.ko.png)
 
-통계적 유의성 검증 - Two-Proportion Z-Test
+*통계적 유의성 검증 - Two-Proportion Z-Test*
+
 Win rate를 비교할 때는 **two-proportion z-test**를 씁니다. 두 모델의 승률이 같은지를 귀무가설로 하고, p-value를 봅니다.
 
 ```python

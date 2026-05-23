@@ -158,6 +158,8 @@ health ping이 “지금 더 받을 수 있나”에 대한 호스트 쪽 답변
 
 ![Trigger metrics flowing into scale decisions](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/05/05-02-scalemonitor-and-targetscaler-the-signal.ko.png)
 
+*Trigger metrics flowing into scale decisions*
+
 두 모드는 성격이 다릅니다.
 
 `IScaleMonitor`는 기존 증분형 모델입니다. 각 monitor가 자기 메트릭을 보고 `ScaleVote`를 던지며, 한 라운드에 최대 1개 인스턴스만 증감합니다. 모든 trigger가 지원합니다.
@@ -201,6 +203,8 @@ health ping이 “지금 더 받을 수 있나”에 대한 호스트 쪽 답변
 아래 그림은 같은 코드가 플랜마다 다른 운영 의미를 갖는 이유를 보여 줍니다.
 
 ![Plan-specific scaling decision differences](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/05/05-03-plan-by-plan-same-code-different-behavio.ko.png)
+
+*Plan-specific scaling decision differences*
 
 #### Consumption
 

@@ -30,7 +30,6 @@ seo_description: 사람이 모든 응답을 평가할 수 없을 때, 강력한 
 
 여기서는 judge 프롬프트를 어떻게 쓰고, 어떤 편향을 통제하고, 사람 채점과 어느 정도 일치해야 실무에서 믿고 쓸 수 있는지 정리하겠습니다.
 
-
 ![LLM-as-Judge - 모델로 모델을 평가하기](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-01-llm-as-judge-evaluating-models-with-mode.ko.png)
 *LLM-as-Judge - 모델로 모델을 평가하기*
 > LLM judge는 강력하지만, 기준선과 편향 통제 없이 쓰면 평가 자동화가 아니라 자동화된 착각이 됩니다.
@@ -65,7 +64,8 @@ LLM-as-Judge - 모델로 모델을 평가하기
 
 ![LLM-as-judge가 필요한 이유](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-02-why-llm-as-judge.ko.png)
 
-LLM-as-judge가 필요한 이유
+*LLM-as-judge가 필요한 이유*
+
 Ep3에서 다룬 결정적 지표(BLEU, ROUGE, Exact Match)는 정답이 짧고 명확할 때만 잘 작동합니다. 하지만 실제 LLM 응답은 다음과 같은 경우가 많습니다.
 
 - 정답이 여러 개인 자유 형식 답변 (예: "이 코드를 설명해 줘")
@@ -84,7 +84,8 @@ Ep3에서 다룬 결정적 지표(BLEU, ROUGE, Exact Match)는 정답이 짧고 
 
 ![Judge prompt 설계 - 3가지 패턴](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-03-judge-prompt-design-three-patterns.ko.png)
 
-Judge prompt 설계 - 3가지 패턴
+*Judge prompt 설계 - 3가지 패턴*
+
 ### 패턴 1: Single scoring (1~5점 척도)
 
 가장 단순한 방식입니다. judge에게 응답 하나를 보여주고 점수를 매기게 합니다.
@@ -190,7 +191,8 @@ Write a one-sentence reasoning, then output only 'Result: PASS' or 'Result: FAIL
 
 ![Bias 3가지와 통제 방법](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-04-three-biases-and-how-to-control-them.ko.png)
 
-Bias 3가지와 통제 방법
+*Bias 3가지와 통제 방법*
+
 LLM judge는 사람과 다른 방식으로 편향됩니다. 다음 3가지 bias를 알아야 합니다.
 
 ### Bias 1: Position bias (위치 편향)
@@ -230,7 +232,8 @@ GPT-4가 GPT-4 응답을 채점하면, 다른 모델 응답보다 자기 모델 
 
 ![사람과의 일치도 측정 - Cohen's kappa](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-05-measuring-agreement-with-humans-cohen-s.ko.png)
 
-사람과의 일치도 측정 - Cohen's kappa
+*사람과의 일치도 측정 - Cohen's kappa*
+
 Judge가 실제로 믿을 만한지 어떻게 압니까? **사람이 채점한 50~100건과 judge 점수를 비교**해서 일치도를 측정합니다. 단순 정확도(percentage agreement)는 우연히 맞는 경우를 보정하지 못하므로, **Cohen's kappa**를 사용합니다.
 
 ```python

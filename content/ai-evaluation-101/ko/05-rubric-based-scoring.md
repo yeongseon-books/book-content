@@ -30,7 +30,6 @@ LLM judge를 도입한 팀이 다음으로 맞닥뜨리는 문제는 '그래서 
 
 여기서는 평가 차원을 어떻게 뽑고, anchor를 어떻게 쓰고, 평균 하나로 뭉개지지 않게 집계를 어떻게 설계해야 하는지 정리하겠습니다.
 
-
 ![Rubric 기반 채점 설계](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-01-designing-rubric-based-scoring.ko.png)
 *Rubric 기반 채점 설계*
 > Rubric의 가치는 점수를 예쁘게 만드는 데 있지 않고, 어디가 망가졌는지 분해해서 보여 주는 데 있습니다.
@@ -65,7 +64,8 @@ Rubric 기반 채점 설계
 
 ![단일 점수의 한계](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-02-the-limits-of-single-scores.ko.png)
 
-단일 점수의 한계
+*단일 점수의 한계*
+
 Ep4의 single scoring은 응답에 1~5점을 매깁니다. 그런데 "3점"이 무슨 뜻일까요? 사실이 부정확해서 3점일 수도 있고, 정확하지만 톤이 어색해서 3점일 수도 있습니다. **단일 점수는 무엇이 잘못됐는지 알려주지 않습니다.**
 
 Rubric 기반 채점은 응답을 여러 차원으로 나눠서 각각 점수를 매깁니다. 예를 들어 LLM 챗봇 응답을 다음 4가지로 평가합니다.
@@ -83,7 +83,8 @@ Rubric 기반 채점은 응답을 여러 차원으로 나눠서 각각 점수를
 
 ![Rubric 차원 정의 - 4단계 프로세스](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-03-defining-rubric-dimensions-a-four-step-p.ko.png)
 
-Rubric 차원 정의 - 4단계 프로세스
+*Rubric 차원 정의 - 4단계 프로세스*
+
 좋은 rubric은 즉흥적으로 만들 수 없습니다. 다음 4단계를 따릅니다.
 
 ### 단계 1: 사용자 가치에서 차원 도출
@@ -143,7 +144,8 @@ print(df.corr())
 
 ![Judge prompt에 rubric 넣기](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-04-putting-the-rubric-into-the-judge-prompt.ko.png)
 
-Judge prompt에 rubric 넣기
+*Judge prompt에 rubric 넣기*
+
 Ep4의 single scoring prompt를 rubric으로 확장합니다.
 
 ```python
@@ -200,7 +202,8 @@ if __name__ == "__main__":
 
 ![점수 집계 - 평균이 답이 아닙니다](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-05-aggregating-scores-the-mean-is-not-the-a.ko.png)
 
-점수 집계 - 평균이 답이 아닙니다
+*점수 집계 - 평균이 답이 아닙니다*
+
 차원별 점수를 어떻게 하나로 합칠까요? 흔한 실수는 **단순 평균**입니다. 이는 약점을 가립니다.
 
 | 응답 | Correct | Complete | Clarity | Tone | 평균 | 진실 |

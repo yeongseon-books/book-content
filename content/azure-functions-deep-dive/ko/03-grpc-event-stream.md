@@ -219,6 +219,8 @@ message FunctionLoadRequest {
 
 ![Per-worker channel pairs and gRPC pump](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/03/03-02-the-channel-layout-closer-to-per-worker.ko.png)
 
+*Per-worker channel pairs and gRPC pump*
+
 따라서 `FunctionRpcService`는 실제 gRPC 스트림과 호스트 내부 워커별 큐 사이의 펌프입니다. `IScriptEventManager`가 있기는 하지만, 적어도 함수 호출 트래픽을 이해하는 데는 “워커별 큐 + gRPC 펌프”라는 멘탈 모델이 소스와 가장 잘 맞습니다.
 
 ### 결국 한 invocation이 타는 통신 인프라는 이렇게 요약됩니다

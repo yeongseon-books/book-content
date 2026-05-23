@@ -72,6 +72,8 @@ Learn 문서가 설명하듯 scale-up은 더 큰 CPU, memory, features를 가진
 
 ![scale up과 scale out이 바꾸는 대상 비교](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/05/05-02-what-scale-up-and-scale-out-actually-cha.ko.png)
 
+*scale up과 scale out이 바꾸는 대상 비교*
+
 이 구분은 느림의 원인을 읽을 때 특히 중요합니다. 메모리 부족과 동시성 병목은 둘 다 "느리다"로 보일 수 있지만, 전자는 scale-up이 더 맞고 후자는 scale-out이 더 맞을 수 있습니다. 같은 증상처럼 보여도 대응 축이 다릅니다.
 
 ### autoscale rule은 app이 아니라 plan에 붙습니다
@@ -80,6 +82,8 @@ Learn 문서가 설명하듯 scale-up은 더 큰 CPU, memory, features를 가진
 
 ![autoscale 규칙이 앱이 아닌 plan에 붙는 구조](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/05/05-03-autoscale-attaches-to-the-plan-not-the-a.ko.png)
 
+*autoscale 규칙이 앱이 아닌 plan에 붙는 구조*
+
 이 구조 때문에 같은 plan에 여러 앱이 있으면 서로 영향을 줍니다. 한 앱의 급격한 부하가 plan 전체 확장을 유도하고, 추가된 capacity는 같은 plan의 다른 앱도 공유합니다. 따라서 scaling behavior를 이해할 때는 앱의 메트릭뿐 아니라 plan의 resource curve를 같이 봐야 합니다.
 
 ### Azure Monitor autoscale은 주기적 rule engine입니다
@@ -87,6 +91,8 @@ Learn 문서가 설명하듯 scale-up은 더 큰 CPU, memory, features를 가진
 Azure Monitor autoscale 문서는 역할을 꽤 명확하게 설명합니다. 메트릭 또는 스케줄 기반으로 규칙을 평가하고, minimum, default, maximum instance count를 유지하며, scale-out은 조건 중 하나만 만족해도 실행될 수 있고, scale-in은 모든 scale-in rule이 만족되어야 합니다.
 
 ![메트릭 평가와 cooldown으로 움직이는 autoscale 루프](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/05/05-04-what-azure-monitor-autoscale-actually-do.ko.png)
+
+*메트릭 평가와 cooldown으로 움직이는 autoscale 루프*
 
 운영적으로 이 말은 매우 중요합니다. scale-out은 OR처럼, scale-in은 AND처럼 행동합니다. 그래서 확장은 상대적으로 빠르게, 축소는 더 보수적으로 설계됩니다. 여기에 autoscale job은 리소스 종류에 따라 대략 30~60초마다 실행되고, scale action 뒤에는 cooldown 동안 다시 같은 종류의 판단을 서두르지 않습니다.
 
@@ -102,6 +108,8 @@ autoscale rule은 단순 threshold만 보지 않습니다. `timeGrain`, `timeWin
 
 ![목표 인스턴스 수가 새 worker로 반영되는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/05/05-05-what-adding-a-worker-means-in-practice.ko.png)
 
+*목표 인스턴스 수가 새 worker로 반영되는 흐름*
+
 중요한 것은 포털 숫자와 traffic eligibility를 분리해서 보는 태도입니다. 인스턴스 수가 늘었다고 바로 사용자 요청이 그 worker로 들어가는 것은 아닙니다. startup과 health gate를 통과해야 비로소 routing 대상이 됩니다.
 
 ### autoscale은 예측기가 아니라 feedback loop입니다
@@ -110,6 +118,8 @@ autoscale은 예언이 아니라 반응입니다. metrics가 쌓이고, rules가
 
 ![메트릭 지연과 cooldown이 끼는 확장 피드백 루프](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/05/05-06-why-autoscale-should-be-read-as-a-feedba.ko.png)
 
+*메트릭 지연과 cooldown이 끼는 확장 피드백 루프*
+
 이 사실을 무시하면 "autoscale은 켰는데도 첫 5분이 아프다"는 불만이 반복됩니다. autoscale은 트래픽 급등의 첫 순간을 막는 마법이 아니라, 이미 관측된 신호를 바탕으로 capacity를 조정하는 제어 루프입니다.
 
 ### scale-out의 진짜 끝은 readiness입니다
@@ -117,6 +127,8 @@ autoscale은 예언이 아니라 반응입니다. metrics가 쌓이고, rules가
 새 worker를 하나 더 확보했다고 바로 요청을 보내면 안 됩니다. Front-End 입장에서는 그 worker가 실제로 받아도 되는 상태여야 합니다. 결국 scale-out의 마지막 마감선은 인스턴스 count 자체가 아니라 그 worker가 healthy routing pool에 들어오는 시점입니다.
 
 ![새 worker가 healthy pool에 들어가는 마지막 단계](https://yeongseon-books.github.io/book-public-assets/assets/azure-app-service-deep-dive/05/05-07-health-and-readiness-are-the-real-end-of.ko.png)
+
+*새 worker가 healthy pool에 들어가는 마지막 단계*
 
 이 지점에서 5화와 6화가 연결됩니다. 공개 문서가 보여 주는 scale-out 설명은 여기까지이고, 그다음 사용자 체감 지연은 새 worker가 startup과 warm-up을 끝내 traffic-eligible 상태가 되는 readiness window에 남아 있습니다.
 

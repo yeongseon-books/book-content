@@ -163,6 +163,8 @@ gRPC stream
 
 ![Concurrent invocation handling in one worker](https://yeongseon-books.github.io/book-public-assets/assets/azure-functions-deep-dive/04/04-02-concurrent-invocations-one-worker-handle.ko.png)
 
+*Concurrent invocation handling in one worker*
+
 다만 같은 invocation 내부의 메시지 순서는 필요합니다. 그래서 `OrderedInvocationMessageDispatcher.cs`가 존재합니다. 동일 `invocation_id` 안의 메시지는 도착 순서를 지키고, 다른 invocation끼리는 병렬성을 유지하는 구조입니다.
 
 ### worker concurrency와 HTTP proxying은 invocation 파이프라인을 완전히 바꾸지 않습니다
