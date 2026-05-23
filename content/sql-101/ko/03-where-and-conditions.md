@@ -155,7 +155,7 @@ SELECT name, age FROM users WHERE age BETWEEN 18 AND 30;
 SELECT * FROM orders WHERE order_date BETWEEN '2026-01-01' AND '2026-01-31';
 ```
 
-`BETWEEN`은 양 끝을 포함하는 범위 조건입니다. `age >= 18 AND age <= 30`과 같은 의미이지만, 읽기 더 쉬습니다.
+`BETWEEN`은 양 끝을 포함하는 범위 조건입니다. `age >= 18 AND age <= 30`과 같은 의미이지만, 읽기 더 쉽습니다.
 
 ### IN으로 목록 매칭
 
