@@ -96,6 +96,18 @@ python3 scripts/lint_captions.py               # image caption lint
 python3 scripts/check_article_structure.py     # article structure (A-grade) check
 ```
 
+## Audit Issue Close Protocol
+
+Audit issue (label: `audit` / `type/series-audit`)를 `Closes #NNNN`으로 닫는 commit은 다음을 만족해야 한다 (#1225):
+
+1. **Fix 적용 직후 같은 audit 스크립트를 다시 돌려 0건 또는 의도적 잔존 화이트리스트 확인.**
+2. **0건이 아니면 두 가지 선택:**
+   - (a) 잔존을 모두 처리하고 다시 돌린다.
+   - (b) 의도적 유지면 가드 스크립트에 화이트리스트를 추가하거나 false-positive 사유를 commit/issue body에 명시한다.
+3. **Commit body에 audit re-run 결과를 명시한다.** 예: `Audit re-run: scripts/check_xxx.py → 0 hits (before: N hits)`.
+4. **Audit 결함을 재도입하지 않기 위해, 같은 commit 또는 짧은 후속 commit에서 `scripts/check_*.py` 가드를 `Makefile`의 `check-content` 타깃에 wire-in 한다.**
+5. **False positive로 close할 때는** 검증 명령(grep / Python 스크립트 결과 0건)을 close comment에 명시한다.
+
 ## Status Rules
 
 - 신규 글은 `ready`를 사용하지 않고 `publish-ready`를 사용한다.

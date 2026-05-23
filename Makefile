@@ -40,6 +40,8 @@ check-content:
 	python3 scripts/check_duplicate_series_intro.py
 	python3 scripts/check_boilerplate_answers.py
 	python3 scripts/check_ko_typos.py
+	python3 scripts/check_fences.py
+	python3 scripts/check_no_big_picture_section.py
 
 # Validate generated outputs (Medium HTML, exports)
 check-generated:
