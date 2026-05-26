@@ -1,3 +1,0 @@
-- 2026-05-11: Review found regressions against `BLOG_WRITING_GUIDE.md §3`: 6 transformed posts lost code blocks (all `content/rag-deep-dive/ko/*.md`), 33 lost one image/diagram, 27 lost `## 체크리스트`, and `content/testing-101/ko/05-test-double.md` still contains `## 핵심 용어 정리 (Meszaros 5종)`.
-- 2026-05-11 (Round 4 / commit `57f24bd6`): Critical code/checklist regression is fixed (`code_drop=0`, `checklist_loss=0` across 840 transformed `ko` posts), but 33 files still lose one image each and 6 `rag-deep-dive` files have orphaned `<!-- a-grade-example:end -->` markers.
-- 2026-05-11 (Round 4): `content/testing-101/ko/05-test-double.md` still contains banned heading `## 핵심 용어 정리 (Meszaros 5종)`.

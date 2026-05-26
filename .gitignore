@@ -27,4 +27,6 @@ medium-test.html
 # Local Sisyphus session state (not for commit)
 .sisyphus/*.local.md
 .sisyphus/**/*.local.md
+.sisyphus/run-continuation/
+.sisyphus/notepads/
 

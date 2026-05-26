@@ -30,36 +30,8 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt -r requirements-dev.txt
 
-      - name: Check finalize-posts idempotency
-        run: |
-          python3 .sisyphus/medium/finalize-posts.py
-          git diff --exit-code content/ || {
-            echo "finalize-posts.py made changes — commit the updated files."
-            exit 1
-          }
-
-      - name: Check Korean style
-        run: bash .sisyphus/style/check-ko.sh
-
-      - name: Verify series.yaml paths exist
-        run: python3 scripts/check_catalog.py
-
-      - name: Verify medium HTML artifacts
-        run: python3 scripts/check_exports.py
-
-      - name: Validate front matter
-        run: python3 scripts/check_frontmatter.py
-
-      - name: Lint image captions
-        run: python3 scripts/lint_captions.py
-
-      - name: Check internal links
-        run: python3 scripts/check_links.py
-
-      - name: Check article structure
-        run: python3 scripts/check_article_structure.py
+      - name: Validate content, generated outputs, and links
+        run: make check
 
       - name: Build MkDocs (strict)
-        run: |
-          python3 scripts/build_docs.py
-          mkdocs build --strict
+        run: make docs-build
