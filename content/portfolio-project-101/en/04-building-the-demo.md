@@ -157,6 +157,299 @@ A strong demo does not have to show every feature. It should show context on the
 
 Next, we will look at deployment and at what makes a portfolio project verifiable from a public URL instead of only from your machine.
 
+## Appendix: User Story and Acceptance Criteria Example
+
+Start with a clear user story that drives the demo design.
+
+```markdown
+- As a team lead,
+  I want to see all team schedules in one calendar,
+  so that I can finalize weekly planning in 10 minutes.
+
+Acceptance Criteria:
+1. After login, the weekly view loads immediately.
+2. When I select a team member filter, schedules update within 1 second.
+3. After generating a share link, the same view opens in another browser.
+```
+
+A story-driven design connects demo prep to test cases. It also makes it easy to explain later why you showed this flow.
+
+## Appendix: Demo Script by Duration
+
+In real demos, time is always scarce. Prepare two scripts: one for 30 seconds, one for 90 seconds.
+
+| Section | 30s Script | 90s Script |
+| --- | --- | --- |
+| Setup | Problem (1 sentence) | Problem + existing workaround |
+| Showcase | One core action | Two actions + one edge case |
+| Outcome | Result screen | Result + metrics + architecture |
+
+**30-second script:**
+
+```markdown
+1. "Team schedules are scattered across three tools, making weekly planning take 40+ minutes."
+2. "Here when I select the team, the weekly view filters instantly."
+3. "Planning time dropped from 40 to 18 minutes."
+```
+
+Pre-written scripts prevent nervous stumbles. They also keep the focus on value, not feature count.
+
+## Appendix: Pre-Demo Failure Checklist
+
+Most demo failures are preventable. This checklist catches the common ones.
+
+| Failure Point | Root Cause | Prevention |
+| --- | --- | --- |
+| Blank landing | No seed data | Auto-load sample data |
+| Login block | No shared account | Document guest credentials |
+| Slow response | Overloaded init | Add cache layer / loading message |
+| Demo crashes | Deployment instability | Keep backup video + health check |
+
+Demos are closer to UX design than engineering showcase. Focus on whether a visitor can feel the value within 30 seconds.
+
+## Appendix: Demo Video Scripting by Duration
+
+When the live demo is risky, a short backup video is essential. Make it a 30-second or 90-second proof of value, not a full feature tour.
+
+**30-second video template**
+
+```text
+[0:00-0:05] Problem statement (caption or voiceover)
+  'Team schedules spread across Notion, Google Calendar, and Jira took 40+ minutes to consolidate.'
+
+[0:05-0:20] One core action
+  - Open browser -> select team -> filter schedules
+  - Move cursor slowly so viewers can follow
+
+[0:20-0:30] Result + CTA
+  'Planning time reduced from 40 to 18 minutes. Check the README to run locally.'
+  - Show GitHub repo URL on screen
+```
+
+**90-second video template**
+
+```text
+[0:00-0:10] Problem + existing workaround
+  'Consolidating schedules from three tools into a weekly plan.'
+
+[0:10-0:40] Two core actions
+  Action 1: select team -> auto-filter (weekly view)
+  Action 2: detect conflict -> auto-create alert
+
+[0:40-0:55] Edge case handling
+  - Network offline -> local cache works
+  - New team member with no data -> handled gracefully
+
+[0:55-1:10] Results + architecture
+  'FastAPI + React + PostgreSQL. Planning time down 55%. After adding conflict alerts, meeting cancellations dropped 70%.'
+
+[1:10-1:30] Next steps + CTA
+  'OAuth and Slack alerts coming next. See README for how to run locally.'
+```
+
+The difference is clear: 30s shows problem-action-result once. 90s adds edge cases and depth. In interviews, start with 30s and ask 'Want to see more?'
+
+## Appendix: Recording Environment Setup
+
+Video quality matters. Use this config to keep quality high with free tools.
+
+```yaml
+# demo-recording-config.yml
+recording:
+  tool: OBS Studio (free) or macOS QuickTime
+  resolution: 1920x1080
+  fps: 30
+  format: MP4 (H.264)
+  max_file_size: 50MB  # GitHub README embedding limit
+
+browser:
+  zoom: 110%  # improve text readability
+  bookmarks_bar: hidden
+  extensions: disabled  # remove icon clutter
+  tab_count: 1  # only demo tab open
+
+terminal:
+  font_size: 16pt
+  theme: dark (high contrast)
+  prompt: $ only (no path noise)
+  history: clear  # hide previous commands
+
+post_processing:
+  tool: FFmpeg (free)
+  trim_silence: true
+  speed_up_typing: 1.5x  # cut typing wait time
+  add_subtitles: true  # support muted environments
+```
+
+**Pre-recording checklist:**
+
+```text
+[ ] Disable all notifications (Slack, mail, OS)
+[ ] Clean desktop (hide personal files)
+[ ] Use incognito browser or fresh profile
+[ ] Confirm resolution at 1920x1080
+[ ] Test microphone (if narrating)
+[ ] Verify seed data loads
+[ ] Set recording area (full screen or app window)
+```
+
+After recording, always play it back muted. If the flow is clear without sound, it will work in an office or on mobile.
+
+## Appendix: GIF vs Video — When to Use Each
+
+README demos can use GIF or video link. Choose based on context.
+
+| Criteria | GIF | Video (YouTube/Loom) |
+| --- | --- | --- |
+| Auto-play | Auto in GitHub | Click required |
+| File size | 5-15MB (10s) | Unlimited |
+| Length | 10s max recommended | Unlimited |
+| Narration | No | Yes |
+| Edit flexibility | Re-record | Trim clips |
+| Best use | Single action | Full workflow |
+
+The most effective strategy: GIF at the top (5-10s, one core action) + 'Full video' link below. GIF catches attention, video provides depth.
+
+**GIF creation from video:**
+
+```bash
+# FFmpeg: MP4 -> GIF (10 sec, 800px width)
+ffmpeg -i demo.mp4 -t 10 -vf "fps=15,scale=800:-1:flags=lanczos" \
+  -gifflags +transdiff demo.gif
+
+# If file size exceeds 10MB, reduce frame rate
+ffmpeg -i demo.mp4 -t 8 -vf "fps=10,scale=640:-1:flags=lanczos" \
+  -gifflags +transdiff demo-small.gif
+```
+
+## Appendix: Seed Data Design
+
+Empty screens are a demo killer. Good seed data makes the first view meaningful.
+
+```python
+# scripts/seed_demo_data.py
+"""Generate demo seed data.
+
+Run: python scripts/seed_demo_data.py
+Goal: first-time visitors see meaningful data, not blank screens
+"""
+import json
+from pathlib import Path
+
+SEED_DATA = {
+    "teams": [
+        {"name": "Backend", "members": ["Alice", "Bob", "Charlie"]},
+        {"name": "Frontend", "members": ["Diana", "Eve"]},
+    ],
+    "tasks": [
+        {
+            "title": "Implement API response caching",
+            "assignee": "Alice",
+            "status": "in_progress",
+            "due": "2024-03-20",
+        },
+        {
+            "title": "Redesign login page",
+            "assignee": "Diana",
+            "status": "done",
+            "due": "2024-03-15",
+        },
+        {
+            "title": "Add E2E tests",
+            "assignee": "Bob",
+            "status": "todo",
+            "due": "2024-03-25",
+        },
+    ],
+}
+
+
+def seed(output_path: Path = Path("data/seed.json")) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(json.dumps(SEED_DATA, ensure_ascii=False, indent=2))
+    print(f"Seed data written to {output_path}")
+
+
+if __name__ == "__main__":
+    seed()
+```
+
+**Seed data principles:**
+
+1. **Real-looking names and values**: use actual domain words, not 'test1' or 'foo'.
+2. **Variety of states**: mix todo, in_progress, done so the screen looks rich.
+3. **Right quantity**: not too sparse, not too crowded. 5-15 items usually works.
+4. **Reproducible**: script it so you can reset to clean slate anytime.
+
+## Appendix: Demo Health Check Automation
+
+A dead live link is worse than no link. Keep a simple health check running.
+
+```yaml
+# .github/workflows/demo-health.yml
+name: Demo Health Check
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # every Monday at 9am
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check demo is alive
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://my-demo.vercel.app)
+          if [ "$STATUS" != "200" ]; then
+            echo "Demo is down! Status: $STATUS"
+            exit 1
+          fi
+          echo "Demo is healthy (HTTP $STATUS)"
+
+      - name: Notify on failure
+        if: failure()
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {"text": "Portfolio demo is down! Check https://my-demo.vercel.app"}
+```
+
+A weekly check prevents 'it died last month and I didn't notice.' Reviewers need to find it alive the moment they click.
+
+## Appendix: Demo Context Template
+
+Never share a demo link alone. Always provide context.
+
+**Email/chat template:**
+
+```text
+Hi,
+
+I built a team schedule unification tool.
+- Live demo: https://task-tracker-demo.vercel.app
+- Guest account: guest@demo.com / demo1234
+- 30-second video: https://youtube.com/watch?v=xxx
+
+The core feature is selecting a team, then seeing the filtered weekly schedule.
+Happy to answer questions.
+```
+
+**README demo section:**
+
+```markdown
+## Demo
+
+| Format | Link | Note |
+|--------|------|------|
+| Live | [task-tracker.vercel.app](url) | Guest: guest@demo.com / demo1234 |
+| Video | [30-second demo](youtube-url) | Captions included, muted-friendly |
+| GIF | See below | One core action |
+
+![Core feature](./assets/demo.gif)
+```
+
+The goal is simple: whether the reviewer clicks live, watches video, or opens GIF, they see value in 30 seconds. Demo is about speed of understanding, not feature count.
+
 ## Answering the Opening Questions
 
 - **Why is the first screen the most important part of a portfolio demo?**
