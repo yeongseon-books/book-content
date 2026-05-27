@@ -29,6 +29,7 @@ This is the 8th post in the Machine Learning 101 series. Here we will diagnose u
 
 ![machine learning 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/08/08-01-concept-at-a-glance.en.png)
 *machine learning 101 chapter 8 flow overview*
+> Overfitting is the model memorizing noise; regularization is the penalty that nudges the model back toward patterns that generalize.
 
 ## Questions to Keep in Mind
 

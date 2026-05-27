@@ -28,6 +28,7 @@ last_reviewed: '2026-05-15'
 
 ![Machine Learning 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/04/04-01-diagram.ko.png)
 *Machine Learning 101 4장 흐름 개요*
+> 선형 회귀는 모든 데이터까지의 제곱 거리가 가장 작은 단 하나의 직선을 그리는 일이고, 계수·R²·잔차는 모두 그 직선을 다른 각도에서 읽는 도구입니다.
 
 ## 먼저 던지는 질문
 

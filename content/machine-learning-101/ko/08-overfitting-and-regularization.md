@@ -28,6 +28,7 @@ last_reviewed: '2026-05-15'
 
 ![Machine Learning 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/08/08-01-diagram.ko.png)
 *Machine Learning 101 8장 흐름 개요*
+> 과적합은 모델이 노이즈를 외워 버리는 현상이고, 정규화는 그 모델을 일반화되는 패턴 쪽으로 다시 끌어당기는 페널티입니다.
 
 ## 먼저 던지는 질문
 

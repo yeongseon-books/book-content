@@ -29,6 +29,7 @@ This is the 2nd post in the Machine Learning 101 series. Here we will separate s
 
 ![machine learning 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/02/02-01-concept-at-a-glance.en.png)
 *machine learning 101 chapter 2 flow overview*
+> The line between supervised and unsupervised learning is whether the data carries labels; classification, regression, and clustering all follow from that one fact.
 
 ## Questions to Keep in Mind
 

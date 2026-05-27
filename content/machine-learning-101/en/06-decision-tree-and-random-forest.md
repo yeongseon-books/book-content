@@ -29,6 +29,7 @@ This is the 6th post in the Machine Learning 101 series. Here we will look at wh
 
 ![machine learning 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/06/06-01-concept-at-a-glance.en.png)
 *machine learning 101 chapter 6 flow overview*
+> A decision tree splits the feature space into rectangles; a random forest is many such trees voting together so no single tree's mistakes dominate.
 
 ## Questions to Keep in Mind
 

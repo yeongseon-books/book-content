@@ -28,6 +28,7 @@ last_reviewed: '2026-05-15'
 
 ![Machine Learning 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/02/02-01-diagram.ko.png)
 *Machine Learning 101 2장 흐름 개요*
+> 지도학습과 비지도학습의 경계는 데이터에 라벨이 있는지 하나로 갈리고, 분류·회귀·군집 같은 모든 갈래는 거기서 파생됩니다.
 
 ## 먼저 던지는 질문
 

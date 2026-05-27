@@ -28,6 +28,7 @@ last_reviewed: '2026-05-15'
 
 ![Machine Learning 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/06/06-01-diagram.ko.png)
 *Machine Learning 101 6장 흐름 개요*
+> 결정 트리는 피처 공간을 사각형으로 잘라 나가는 모델이고, 랜덤 포레스트는 이런 트리 여러 그루의 다수결로 한 그루의 실수를 가립니다.
 
 ## 먼저 던지는 질문
 

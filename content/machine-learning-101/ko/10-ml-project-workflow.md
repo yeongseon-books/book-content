@@ -28,6 +28,7 @@ last_reviewed: '2026-05-15'
 
 ![Machine Learning 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/10/10-01-diagram.ko.png)
 *Machine Learning 101 10장 흐름 개요*
+> ML 프로젝트는 직선이 아닌 루프이고, 문제 정의·데이터·모델링·평가·배포·모니터링이 서로의 출력을 입력으로 받습니다.
 
 ## 먼저 던지는 질문
 

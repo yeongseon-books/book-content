@@ -29,6 +29,7 @@ This is the final post in the Machine Learning 101 series. Here we will connect 
 
 ![machine learning 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/10/10-01-concept-at-a-glance.en.png)
 *machine learning 101 chapter 10 flow overview*
+> An ML project is a loop, not a line — problem framing, data, modeling, evaluation, deployment, and monitoring each feed back into the others.
 
 ## Questions to Keep in Mind
 

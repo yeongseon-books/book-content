@@ -28,6 +28,7 @@ last_reviewed: '2026-05-15'
 
 ![Machine Learning 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/05/05-01-diagram.ko.png)
 *Machine Learning 101 5장 흐름 개요*
+> 로지스틱 회귀는 선형 점수를 확률로 짜낸 다음, 두 클래스 사이 어디에 경계선을 그을지 결정하는 모델입니다.
 
 ## 먼저 던지는 질문
 

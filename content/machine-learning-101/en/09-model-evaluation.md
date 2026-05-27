@@ -29,6 +29,7 @@ This is the 9th post in the Machine Learning 101 series. Here we will connect co
 
 ![machine learning 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/09/09-01-concept-at-a-glance.en.png)
 *machine learning 101 chapter 9 flow overview*
+> The right metric depends on which mistake costs you the most — accuracy lies on imbalanced data, while precision, recall, and ROC each answer a different operating question.
 
 ## Questions to Keep in Mind
 

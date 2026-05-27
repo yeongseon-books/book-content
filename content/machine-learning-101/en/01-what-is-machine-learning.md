@@ -29,6 +29,7 @@ This is the first post in the Machine Learning 101 series. Here we will pin the 
 
 ![machine learning 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/01/01-01-concept-at-a-glance.en.png)
 *machine learning 101 chapter 1 flow overview*
+> Machine learning replaces hand-written rules with a function fit from data, then judges that function by how well it works on inputs it has never seen.
 
 ## Questions to Keep in Mind
 

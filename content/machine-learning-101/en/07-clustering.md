@@ -29,6 +29,7 @@ This is the 7th post in the Machine Learning 101 series. Here we will compare KM
 
 ![machine learning 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/07/07-01-concept-at-a-glance.en.png)
 *machine learning 101 chapter 7 flow overview*
+> Clustering finds groups in unlabeled data, but the groups only make sense once every feature is on the same scale and you have a way to judge whether K is right.
 
 ## Questions to Keep in Mind
 

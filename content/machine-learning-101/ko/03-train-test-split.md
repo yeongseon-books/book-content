@@ -28,6 +28,7 @@ last_reviewed: '2026-05-15'
 
 ![Machine Learning 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/03/03-01-diagram.ko.png)
 *Machine Learning 101 3장 흐름 개요*
+> Train/Test split은 모델이 처음 보는 데이터에서 어떻게 동작할지 가늠하는 유일하게 정직한 방법이고, 여기서 한 번이라도 새면 측정값 전체가 흔들립니다.
 
 ## 먼저 던지는 질문
 

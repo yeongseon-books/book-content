@@ -28,6 +28,7 @@ last_reviewed: '2026-05-15'
 
 ![Machine Learning 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/07/07-01-diagram.ko.png)
 *Machine Learning 101 7장 흐름 개요*
+> 군집화는 라벨 없는 데이터에서 그룹을 찾아내는 작업이지만, 피처 스케일과 K 결정 기준이 갖춰지지 않으면 의미 있는 그룹은 보이지 않습니다.
 
 ## 먼저 던지는 질문
 

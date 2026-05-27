@@ -29,6 +29,7 @@ This is the 3rd post in the Machine Learning 101 series. Here we will use train/
 
 ![machine learning 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/03/03-01-concept-at-a-glance.en.png)
 *machine learning 101 chapter 3 flow overview*
+> A train/test split is the only honest way to estimate how a model will behave on data it has not seen — every shortcut here leaks future performance into the present.
 
 ## Questions to Keep in Mind
 

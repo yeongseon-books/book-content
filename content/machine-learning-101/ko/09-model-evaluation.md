@@ -28,6 +28,7 @@ last_reviewed: '2026-05-15'
 
 ![Machine Learning 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/09/09-01-diagram.ko.png)
 *Machine Learning 101 9장 흐름 개요*
+> 올바른 지표는 어떤 오류가 가장 비싼지에 따라 정해지고, 불균형 데이터에서는 정확도가 거짓말을 하기 때문에 정밀도·재현율·ROC가 각자 다른 운영 질문에 답합니다.
 
 ## 먼저 던지는 질문
 

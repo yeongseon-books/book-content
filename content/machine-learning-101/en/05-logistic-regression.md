@@ -29,6 +29,7 @@ This is the 5th post in the Machine Learning 101 series. Here we will treat logi
 
 ![machine learning 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/05/05-01-concept-at-a-glance.en.png)
 *machine learning 101 chapter 5 flow overview*
+> Logistic regression is linear regression that squashes its score into a probability, then lets you choose where to draw the line between two classes.
 
 ## Questions to Keep in Mind
 

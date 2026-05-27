@@ -29,6 +29,7 @@ This is the 4th post in the Machine Learning 101 series. Here we will treat line
 
 ![machine learning 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/04/04-01-concept-at-a-glance.en.png)
 *machine learning 101 chapter 4 flow overview*
+> Linear regression draws the single line whose squared distance to every data point is smallest; coefficients, R², and residuals are just different ways of reading that line.
 
 ## Questions to Keep in Mind
 
