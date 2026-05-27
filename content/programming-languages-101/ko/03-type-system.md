@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Programming Languages 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/03/03-01-concept-at-a-glance.ko.png)
 *Programming Languages 101 3장 흐름 개요*
 
+> 타입 시스템은 런타임 에러를 컴파일 타임으로 끌어오는 '시간 이동 장치'입니다 — 정적/동적, 강/약, nominal/structural 같은 축을 머릿속에 잡아 두면 Python type hint·TypeScript·Rust가 같은 그림의 서로 다른 좌표라는 것이 보입니다.
+
 ## 먼저 던지는 질문
 
 - 타입은 정확히 어떤 역할을 할까요?

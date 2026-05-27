@@ -32,6 +32,8 @@ Python을 흔히 인터프리터 언어라고 부릅니다. 그런데 `.pyc` 파
 ![Programming Languages 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/08/08-01-concept-at-a-glance.ko.png)
 *Programming Languages 101 8장 흐름 개요*
 
+> 인터프리터와 컴파일러의 경계는 흐릿하고, 현대 언어는 거의 다 그 사이 어딘가에 있습니다 — Python은 bytecode 컴파일 + VM 인터프리터, JS는 JIT, Java는 AOT+JIT, 이 스펙트럼이 머릿속에 있어야 '왜 빠르고 왜 느린지'를 설명할 수 있습니다.
+
 ## 먼저 던지는 질문
 
 - 인터프리터와 컴파일러의 가장 짧은 차이는 무엇일까요?

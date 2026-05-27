@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Programming Languages 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/05/05-01-concept-at-a-glance.ko.png)
 *Programming Languages 101 5장 흐름 개요*
 
+> 함수는 '코드 한 덩어리'가 아니라 '코드 + 그 코드를 둘러싼 환경'입니다 — 이 환경 포획이 closure이고, 콜백·데코레이터·partial application·이벤트 핸들러가 같은 한 가지 기계에서 파생된다는 사실을 알면 함수형 패턴이 갑자기 가까워집니다.
+
 ## 먼저 던지는 질문
 
 - 일급 함수와 고차 함수는 무엇이 다를까요?

@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Programming Languages 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/04/04-01-concept-at-a-glance.ko.png)
 *Programming Languages 101 4장 흐름 개요*
 
+> '이 변수 이름이 가리키는 값은 어디서 결정되는가'라는 질문 하나가 lexical scope·dynamic scope·closure·hoisting을 모두 같은 그림으로 묶어 줍니다 — JavaScript의 `this`나 Python의 late binding은 이 한 모델 위에서만 일관되게 설명됩니다.
+
 ## 먼저 던지는 질문
 
 - 스코프와 바인딩은 정확히 무엇이 다를까요?

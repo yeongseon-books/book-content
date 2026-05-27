@@ -32,6 +32,8 @@ title: "Programming Languages 101 (9/10): 정적 언어와 동적 언어"
 ![Programming Languages 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/09/09-01-concept-at-a-glance.ko.png)
 *Programming Languages 101 9장 흐름 개요*
 
+> '정적 vs 동적'은 한 축이 아니라 '타입 / 바인딩 / 디스패치' 세 축에서 각각 다르게 갈라집니다 — Python은 동적 타입이지만 정적 바인딩이고, JS는 동적 타입·동적 바인딩이며, Java는 그 반대편입니다. 이 축들이 분리되어야 언어 비교가 흙탕물에서 빠져나옵니다.
+
 ## 먼저 던지는 질문
 
 - 정적과 동적의 가장 짧은 정의는 무엇일까요?

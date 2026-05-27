@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Programming Languages 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/07/07-01-concept-at-a-glance.ko.png)
 *Programming Languages 101 7장 흐름 개요*
 
+> 메모리 관리는 '누가 free를 부르는가'라는 한 질문의 답입니다 — 사람(C/C++) / GC(Java/Python) / 컴파일러+소유권(Rust) 세 가지 답이 있고, 이 차이가 곧 언어의 성격·성능 상한·안전성 보장을 결정합니다.
+
 ## 먼저 던지는 질문
 
 - 스택과 힙은 어떻게 다를까요?

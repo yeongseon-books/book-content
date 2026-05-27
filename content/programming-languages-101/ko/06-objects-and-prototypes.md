@@ -32,6 +32,8 @@ Java의 클래스도 객체지향이고, JavaScript의 프로토타입도 객체
 ![Programming Languages 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/06/06-01-concept-at-a-glance.ko.png)
 *Programming Languages 101 6장 흐름 개요*
 
+> 객체 시스템에는 클래스 기반과 프로토타입 기반 두 종류가 있고, 둘 다 결국 '메서드 디스패치를 어디로 위임할 것인가'라는 한 가지 질문을 다르게 푸는 답입니다 — JavaScript의 prototype chain과 Python의 MRO가 닮아 보이는 건 우연이 아닙니다.
+
 ## 먼저 던지는 질문
 
 - 객체를 가장 간단히 정의하면 무엇일까요?

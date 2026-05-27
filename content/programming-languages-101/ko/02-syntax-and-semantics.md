@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Programming Languages 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/02/02-01-concept-at-a-glance.ko.png)
 *Programming Languages 101 2장 흐름 개요*
 
+> 문법(syntax)이 같아도 의미(semantics)가 다른 두 언어가 있고, 문법은 달라도 의미가 같은 두 언어가 있습니다 — 파서 에러는 syntax 문제이지만 'Python에서 됐는데 JS에서 안 된다' 부류의 버그는 거의 항상 semantics 차이입니다.
+
 ## 먼저 던지는 질문
 
 - 구문과 의미의 경계는 정확히 어디일까요?
