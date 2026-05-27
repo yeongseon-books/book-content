@@ -31,6 +31,8 @@ last_reviewed: '2026-05-15'
 ![Docker 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/06/06-01-concept-at-a-glance.ko.png)
 *Docker 101 6장 흐름 개요*
 
+> 컨테이너 운영의 핵심 규칙은 '이미지와 환경을 분리'하는 것입니다 — 환경마다 다른 이미지를 빌드하기 시작하면 재현성이 바로 무너지므로, 이미지는 불변 산출물로 유지하고 환경별 차이는 런타임 환경변수와 외부 설정으로 주입해야 합니다(Twelve-Factor config).
+
 ## 먼저 던지는 질문
 
 - 하나의 이미지로 여러 환경을 어떻게 지원할 수 있을까요?

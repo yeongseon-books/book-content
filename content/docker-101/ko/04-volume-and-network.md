@@ -31,6 +31,8 @@ Docker에서 이 문제를 푸는 핵심 개념이 volume과 network입니다. v
 ![Docker 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/04/04-01-concept-at-a-glance.ko.png)
 *Docker 101 4장 흐름 개요*
 
+> Volume과 Network는 부가 옵션이 아니라 컨테이너 운영의 두 기본 축입니다 — volume은 '상태의 수명을 컨테이너 수명에서 분리'하고, network는 '컨테이너가 서로를 어떻게 찾고 부르느냐'를 결정합니다. 이 둘 없이 컨테이너는 한 번 죽으면 자기 자리도 데이터도 잃습니다.
+
 ## 먼저 던지는 질문
 
 - volume, bind mount, tmpfs는 각각 언제 써야 할까요?

@@ -31,6 +31,8 @@ last_reviewed: '2026-05-15'
 ![Docker 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/09/09-01-concept-at-a-glance.ko.png)
 *Docker 101 9장 흐름 개요*
 
+> 이미지 크기는 미적 취향이 아니라 운영 지표입니다 — 배포 시간·CI 속도·보안 표면·디버깅 방식이 모두 함께 움직이기 때문에, 베이스 이미지 선택·멀티스테이지 빌드·캐시 전략은 따로 떨어진 트릭이 아니라 같은 목표의 세 축으로 함께 봐야 효과가 큽니다.
+
 ## 먼저 던지는 질문
 
 - 멀티스테이지 빌드는 왜 build와 runtime을 분리할까요?

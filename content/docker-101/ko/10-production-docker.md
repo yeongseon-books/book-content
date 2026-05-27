@@ -31,6 +31,8 @@ last_reviewed: '2026-05-15'
 ![Docker 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/10/10-01-concept-at-a-glance.ko.png)
 *Docker 101 10장 흐름 개요*
 
+> 프로덕션은 체크리스트의 합이 아니라 시스템입니다 — 이미지 태그 정책·레지스트리·실행 권한·로그 수집·런타임 보안이 동시에 맞물려야 '무엇이 어디에 배포됐고, 실패했을 때 어떻게 알 수 있는가'에 대한 답이 비로소 존재합니다.
+
 ## 먼저 던지는 질문
 
 - 프로덕션에서는 어떤 이미지 태그 정책을 가져가야 할까요?

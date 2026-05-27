@@ -31,6 +31,8 @@ Docker를 조금만 써 보면 가장 먼저 헷갈리는 지점이 image와 con
 ![Docker 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/02/02-01-concept-at-a-glance.ko.png)
 *Docker 101 2장 흐름 개요*
 
+> Image와 Container 혼동은 대부분 한 가지 사실에서 풀립니다 — 이미지는 불변 snapshot이고, 컨테이너는 그 위에 만들어진 '쓰기 가능 레이어 + 실행 프로세스'입니다. 그래서 컨테이너 안 변경은 기본적으로 일시적이고, 재시작·재생성 시 사라지는 것이 정상입니다.
+
 ## 먼저 던지는 질문
 
 - image와 container는 정확히 무엇이 다를까요?

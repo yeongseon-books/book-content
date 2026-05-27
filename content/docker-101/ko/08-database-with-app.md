@@ -31,6 +31,8 @@ last_reviewed: '2026-05-15'
 ![Docker 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/08/08-01-concept-at-a-glance.ko.png)
 *Docker 101 8장 흐름 개요*
 
+> 앱과 DB를 함께 실행하는 구조에서는 세 가지 리듬이 항상 같이 갑니다 — 데이터 영속성(volume), 준비 상태 확인(healthcheck/depends_on), 그리고 마이그레이션 자동화. 이 셋 중 하나라도 빠지면 배포마다 사람이 들어가야 하고, 환경이 점점 일관성을 잃습니다.
+
 ## 먼저 던지는 질문
 
 - Compose로 PostgreSQL과 앱을 어떻게 함께 띄울까요?
