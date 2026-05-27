@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Software Design 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/02/02-01-concept-at-a-glance.ko.png)
 *Software Design 101 2장 흐름 개요*
 
+> 관심사 분리는 파일을 많이 쪼개는 일이 아니라, '다른 이유로 바뀌는 책임'을 다른 경계로 나누는 일입니다 — 한 함수 안에서 같이 바뀌어야 응집이고, 함께 바뀔 이유가 없는데 묶여 있으면 결합입니다.
+
 ## 먼저 던지는 질문
 
 - 관심사란 정확히 무엇일까요?

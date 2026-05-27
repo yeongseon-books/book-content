@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Software Design 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/05/05-01-concept-at-a-glance.ko.png)
 *Software Design 101 5장 흐름 개요*
 
+> 좋은 인터페이스는 호출자가 원하는 것을 말하게 하고, 어떻게 할지는 숨깁니다 — `notify('email', ...)` 같은 분기가 늘어나는 것은 인터페이스가 구현 세부를 바깥으로 흘리고 있다는 신호입니다.
+
 ## 먼저 던지는 질문
 
 - 더 나은 인터페이스는 무엇으로 판단할 수 있을까요?

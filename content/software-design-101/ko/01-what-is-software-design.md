@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Software Design 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/01/01-01-concept-at-a-glance.ko.png)
 *Software Design 101 1장 흐름 개요*
 
+> 설계는 코드를 예쁘게 쓰는 습관이 아니라 다음 변경의 비용을 미리 정하는 결정의 묶음입니다 — 같은 기능을 만든 두 코드베이스의 차이는 문법이 아니라, 변경이 들어왔을 때 손대야 하는 파일 수와 두려움의 크기에서 드러납니다.
+
 ## 먼저 던지는 질문
 
 - 좋은 코딩과 좋은 설계는 무엇이 다를까요?

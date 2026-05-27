@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Software Design 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/10/10-01-concept-at-a-glance.ko.png)
 *Software Design 101 10장 흐름 개요*
 
+> 설계 감각은 큰 시스템이 아니라 작은 코드에서 자란다는 점이 중요합니다 — URL 단축기 같은 작은 예제에서도 관심사 분리·의존성 방향·계층·데이터 흐름·포트와 어댑터를 의식적으로 적용해 보아야, 더 큰 시스템에서도 같은 도구가 손에 익습니다.
+
 ## 먼저 던지는 질문
 
 - 작은 프로젝트는 어디서부터 설계를 시작해야 할까요?

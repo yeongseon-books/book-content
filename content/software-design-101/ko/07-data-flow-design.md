@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Software Design 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/07/07-01-concept-at-a-glance.ko.png)
 *Software Design 101 7장 흐름 개요*
 
+> 데이터 흐름 설계는 '같은 객체를 여러 곳에서 고치게 두지 않는 일'입니다 — 입력에서 출력까지 한 방향으로 흐르고, 변환은 작은 함수로, 부수효과는 가장자리에 모일 때 디버깅과 테스트가 비로소 단순해집니다.
+
 ## 먼저 던지는 질문
 
 - 데이터 흐름을 설계한다는 말은 구체적으로 무엇일까요?

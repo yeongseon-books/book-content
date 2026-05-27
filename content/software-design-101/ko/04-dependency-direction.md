@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Software Design 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/04/04-01-concept-at-a-glance.ko.png)
 *Software Design 101 4장 흐름 개요*
 
+> 결합은 '연결의 유무'가 아니라 '화살표의 방향' 문제입니다 — 도메인이 인프라를 향하느냐, 인프라가 도메인을 향하느냐의 차이가 변경의 자유와 테스트 가능성을 결정합니다.
+
 ## 먼저 던지는 질문
 
 - 의존성 방향은 왜 변경 비용을 크게 좌우할까요?

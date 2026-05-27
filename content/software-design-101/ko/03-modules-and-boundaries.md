@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Software Design 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/03/03-01-concept-at-a-glance.ko.png)
 *Software Design 101 3장 흐름 개요*
 
+> 좋은 모듈은 기능을 숨기는 것이 아니라 복잡도를 안으로 가두고 바깥에는 작은 약속만 드러냅니다 — 깊은 모듈일수록 인터페이스는 좁고 구현은 풍부하며, 얕은 모듈일수록 인터페이스가 구현을 그대로 노출해 경계가 사라집니다.
+
 ## 먼저 던지는 질문
 
 - 좋은 모듈 경계는 어떤 조건을 갖춰야 할까요?

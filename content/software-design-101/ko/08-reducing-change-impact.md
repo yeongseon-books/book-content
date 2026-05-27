@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Software Design 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/08/08-01-concept-at-a-glance.ko.png)
 *Software Design 101 8장 흐름 개요*
 
+> 좋은 설계는 변경을 없애는 것이 아니라 변경의 폭발 반경을 작게 만드는 일입니다 — 새 카테고리 하나에 `if-elif`를 덧붙이는 대신 확장 지점을 미리 열어 두고, expand-contract로 옛 경로와 새 경로를 잠시 병행시키는 감각이 운영 중 변경을 가능하게 합니다.
+
 ## 먼저 던지는 질문
 
 - 한 번의 변경이 얼마나 넓게 퍼지는지 어떻게 가늠할까요?

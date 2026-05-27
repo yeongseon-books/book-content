@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Software Design 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-design-101/06/06-01-concept-at-a-glance.ko.png)
 *Software Design 101 6장 흐름 개요*
 
+> 계층 아키텍처의 핵심은 '계층을 나눴다'가 아니라 '의존성이 한 방향으로만 흐른다'입니다 — presentation·application·domain·infrastructure 중 안쪽 계층이 바깥쪽을 모를 때만 비로소 채널을 추가하거나 저장소를 바꾸는 변경이 한곳에 머무릅니다.
+
 ## 먼저 던지는 질문
 
 - 계층을 왜 나누고, 무엇을 기준으로 나눌까요?
