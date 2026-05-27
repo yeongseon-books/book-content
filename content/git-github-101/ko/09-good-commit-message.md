@@ -31,6 +31,8 @@ seo_description: 좋은 commit message 구조와 Conventional Commits 실무 규
 ![Git & GitHub 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/09/09-01-mental-model.ko.png)
 *Git & GitHub 101 9장 흐름 개요*
 
+> 좋은 commit message는 친절의 문제가 아니라 'history가 문서로 기능하느냐'의 문제입니다 — subject·body·footer 구조와 Conventional Commits는 '무엇을·왜·어떤 영향과 함께' 바꿨는지를 미래의 자신과 동료가 PR을 다시 열지 않고도 읽게 만드는 장치입니다.
+
 ## 먼저 던지는 질문
 
 - 좋은 commit message는 왜 코드만큼 중요한 자산일까요?

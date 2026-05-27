@@ -31,6 +31,8 @@ branch가 개인 작업 공간이라면 Pull Request는 그 작업을 팀에 설
 ![Git & GitHub 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/07/07-01-mental-model.ko.png)
 *Git & GitHub 101 7장 흐름 개요*
 
+> Pull Request는 단순한 merge 버튼이 아니라 '변경을 팀에 설명하고 합의하는 자리'입니다 — branch가 개인 작업 공간이라면 PR은 그 작업의 이유·범위·위험을 기록으로 남기는 공간이고, 이 기록이 좋아져야 merge 이후 history가 비로소 문서로 기능합니다.
+
 ## 먼저 던지는 질문
 
 - Pull Request는 plain `git merge`와 무엇이 다를까요?

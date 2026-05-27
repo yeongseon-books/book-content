@@ -31,6 +31,8 @@ Git을 잘 쓰는 사람은 대개 치기 전에 먼저 읽습니다. `status`, 
 ![Git & GitHub 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/03/03-01-mental-model.ko.png)
 *Git & GitHub 101 3장 흐름 개요*
 
+> Git을 잘 쓰는 사람은 치기 전에 먼저 읽습니다 — `status`는 지금 어디에 있는지, `diff`는 무엇이 달라졌는지, `log`는 무엇이 저장됐는지를 보여 주고, 이 세 명령이 끝나기 전에 만들어진 commit은 대개 다시 손볼 일이 생깁니다.
+
 ## 먼저 던지는 질문
 
 - `git status`의 긴 출력과 짧은 출력은 각각 무엇을 보여 줄까요?

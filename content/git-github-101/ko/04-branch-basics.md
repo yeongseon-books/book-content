@@ -31,6 +31,8 @@ branch를 이해하는 순간 Git은 백업 도구에서 병렬 작업 도구로
 ![Git & GitHub 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/04/04-01-mental-model.ko.png)
 *Git & GitHub 101 4장 흐름 개요*
 
+> branch는 새로운 폴더가 아니라 '특정 commit을 가리키는 가벼운 포인터'입니다 — 이 한 가지 사실만 정확히 잡으면 만들기·전환·비교가 모두 '포인터를 어디에 두고 무엇을 비교할 것인가'라는 같은 질문으로 정리됩니다.
+
 ## 먼저 던지는 질문
 
 - branch는 왜 파일 복사본이 아니라 포인터라고 할까요?

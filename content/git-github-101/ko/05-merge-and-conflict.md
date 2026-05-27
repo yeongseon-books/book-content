@@ -31,6 +31,8 @@ branch를 나누는 일보다 더 중요한 것은 다시 합치는 일입니다
 ![Git & GitHub 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/05/05-01-mental-model.ko.png)
 *Git & GitHub 101 5장 흐름 개요*
 
+> merge는 'commit을 섞는 일'이 아니라 '두 history를 어디서 만나게 할지 결정하는 일'입니다 — 같은 줄을 양쪽에서 다르게 고쳤다면 Git이 답을 만들지 못하고, conflict는 도구의 실패가 아니라 사람의 결정이 필요한 정상적인 상태 표시입니다.
+
 ## 먼저 던지는 질문
 
 - fast-forward merge는 언제 일어날까요?

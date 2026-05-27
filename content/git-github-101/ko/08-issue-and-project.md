@@ -31,6 +31,8 @@ seo_description: GitHub Issue와 Project로 일감 흐름을 추적하는 방법
 ![Git & GitHub 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/08/08-01-mental-model.ko.png)
 *Git & GitHub 101 8장 흐름 개요*
 
+> Issue·PR·Project board를 따로 쓰면 일감과 코드가 따로 흐릅니다 — '무엇을 해야 하는지(Issue)', '무엇을 했는지(PR)', '어디까지 왔는지(Project)'를 같은 저장소 안에 묶어야 작업 추적이 사람의 기억이 아니라 시스템 위에서 흐릅니다.
+
 ## 먼저 던지는 질문
 
 - GitHub Issue는 commit이나 PR과 어떻게 다를까요?

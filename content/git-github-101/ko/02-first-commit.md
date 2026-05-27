@@ -31,6 +31,8 @@ Git은 첫 commit을 직접 만들어 보는 순간부터 추상적인 개념에
 ![Git & GitHub 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/git-github-101/02/02-01-mental-model.ko.png)
 *Git & GitHub 101 2장 흐름 개요*
 
+> 첫 commit은 'snapshot 하나를 만드는 의식'이 아니라 'working directory → staging → repository' 한 사이클을 손으로 끝까지 따라가 보는 일입니다 — 이 흐름을 한 번이라도 직접 거치면 이후 거의 모든 명령이 같은 세 영역 위의 이동으로 읽히기 시작합니다.
+
 ## 먼저 던지는 질문
 
 - `git init`은 현재 디렉터리에 정확히 무엇을 만들까요?
