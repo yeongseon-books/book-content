@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Plain gradient descent gives you the basic learning loop, but real deep learning losses are rougher than that simple picture suggests. Valleys can be long and narrow, gradient scale can vary by coordinate, and the first few hundred steps may need very different behavior from the last few thousand.
 
-This is post 8 in the Calculus for ML 101 series.
+This is the 8th post in the Calculus for ML 101 series.
 
 In this post, we'll treat momentum, RMSProp, Adam, schedules, and regularization as one optimization toolkit. The goal is not to memorize optimizer names, but to see which weakness of plain gradient descent each tool is trying to fix.
 

@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 The reason code works on your laptop and fails in production is usually not the code alone. It is the difference in operating system, dependencies, secrets, networking, and startup assumptions that never got frozen into something reproducible.
 
-This is post 9 in the Backend Development 101 series. Here, we treat deployment as a reproducibility problem and use Docker, environment variables, healthchecks, and rolling updates to make backend delivery predictable.
+This is the 9th post in the Backend Development 101 series. Here, we treat deployment as a reproducibility problem and use Docker, environment variables, healthchecks, and rolling updates to make backend delivery predictable.
 
 
 ![backend development 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/09/09-01-concept-at-a-glance.en.png)

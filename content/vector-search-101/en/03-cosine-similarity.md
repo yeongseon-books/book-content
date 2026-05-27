@@ -22,7 +22,7 @@ seo_description: Compare cosine similarity, dot product, and Euclidean distance 
 
 Once you have vectors, the next question is how to compare them. Several distance metrics exist, and the one you choose changes search results. Cosine similarity is the most common, but dot product and Euclidean distance (L2) each have cases where they fit better.
 
-This is post 3 in the Vector Search 101 series.
+This is the 3rd post in the Vector Search 101 series.
 
 This post implements all three metrics from scratch, shows why normalization matters, and builds a brute-force nearest-neighbor search without any external library.
 

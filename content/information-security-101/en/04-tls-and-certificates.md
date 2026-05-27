@@ -29,7 +29,7 @@ last_reviewed: '2026-05-04'
 
 > TLS bundles three things — secrecy, integrity, and origin. Drop one and the padlock starts lying.
 
-This is post 4 in the Information Security 101 series.
+This is the 4th post in the Information Security 101 series.
 
 
 ![information security 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/04/04-01-big-picture.en.png)

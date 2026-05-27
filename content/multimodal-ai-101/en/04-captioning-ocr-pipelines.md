@@ -24,7 +24,7 @@ seo_description: Build efficient image captioning and OCR pipelines. Learn about
 
 Teams new to document and screenshot understanding often think OCR is the whole problem. In practice, OCR gives you strings, but it does not preserve scene meaning, emphasis, layout hierarchy, or the fact that two nearby labels belonged to the same visual unit.
 
-This is post 4 in the Multimodal AI 101 series.
+This is the 4th post in the Multimodal AI 101 series.
 
 Here we treat captioning and OCR as complementary stages rather than competing tools, then build the hybrid pipeline that most real systems end up shipping.
 

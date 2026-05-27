@@ -26,7 +26,7 @@ It is easy to say metrics matter and still have no reliable path from applicatio
 
 Once you understand that path, Prometheus and Grafana stop looking like tools you install and start looking like parts of one measurement pipeline.
 
-This is post 3 in the Observability 101 series.
+This is the 3rd post in the Observability 101 series.
 
 
 ![observability 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/03/03-01-concept-at-a-glance.en.png)

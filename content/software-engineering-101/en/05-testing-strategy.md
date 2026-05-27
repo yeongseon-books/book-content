@@ -27,7 +27,7 @@ Most teams agree that tests matter. Disagreement starts immediately after that. 
 
 The real problem is not test quantity. It is test placement. A healthy test system tells you where to look when something breaks, keeps PR feedback short enough to preserve flow, and treats flaky tests as defects in the delivery system rather than background noise.
 
-This is post 5 in the Software Engineering 101 series. In this chapter, we use the test pyramid as a decision tool, then connect it to verification speed, expected output, and the failure modes that make CI untrustworthy.
+This is the 5th post in the Software Engineering 101 series. In this chapter, we use the test pyramid as a decision tool, then connect it to verification speed, expected output, and the failure modes that make CI untrustworthy.
 
 
 ![software engineering 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/05/05-01-concept-at-a-glance.en.png)

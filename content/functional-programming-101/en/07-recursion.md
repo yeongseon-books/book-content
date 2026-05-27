@@ -22,7 +22,7 @@ last_reviewed: '2026-05-04'
 
 # Functional Programming 101 (7/10): Recursion and Tail Calls
 
-This is post 7 in the Functional Programming 101 series.
+This is the 7th post in the Functional Programming 101 series.
 
 > Functional Programming 101 Series (7/10)
 

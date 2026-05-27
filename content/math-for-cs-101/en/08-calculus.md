@@ -26,7 +26,7 @@ When a model trains by reducing a loss, when a numerical method searches for a b
 
 Calculus gives you that directional sense. You do not need to understand an entire curve at once to learn something useful. Often it is enough to understand how the value wants to change right here, right now, at a single point.
 
-This is post 8 in the Math for CS 101 series.
+This is the 8th post in the Math for CS 101 series.
 
 Here we connect limits, derivatives, gradients, the chain rule, and gradient descent into one practical story about change and optimization.
 

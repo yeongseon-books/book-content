@@ -29,7 +29,7 @@ last_reviewed: '2026-05-04'
 
 > Logs are the system's memory. A system without memory does not even know it was breached.
 
-This is post 9 in the Information Security 101 series.
+This is the 9th post in the Information Security 101 series.
 
 
 ![information security 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/09/09-01-big-picture.en.png)

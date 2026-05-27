@@ -26,7 +26,7 @@ seo_description: Environment variables are name tags attached to processes, and 
 
 Environment variables sit behind a lot of everyday confusion: a command installs successfully but cannot be found, a script sees a variable in your shell but not in Python, or a setting works in one terminal and disappears in the next.
 
-This is post 8 in the Linux CLI 101 series.
+This is the 8th post in the Linux CLI 101 series.
 
 
 ![Linux CLI 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/08/08-01-big-picture.en.png)

@@ -26,7 +26,7 @@ When a feature with the same name starts being calculated separately in training
 
 Train-serve skew is difficult precisely because it is not always obvious. Offline evaluation can still look healthy while production behavior is already weaker because the feature path changed.
 
-This is post 9 in the MLOps 101 series.
+This is the 9th post in the MLOps 101 series.
 
 Here, we will treat a feature store not as a storage box for features, but as the contract layer that lets training and serving share the same definitions.
 

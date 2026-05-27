@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 At first, schemas look like a minor JSON-formatting concern. A few months later, they are often where APIs hurt the most: field names drift, time zones disagree, and one silent nullability change breaks multiple clients at once.
 
-This is post 5 in the API Design 101 series.
+This is the 5th post in the API Design 101 series.
 
 Here, we treat schemas as boundary contracts that must be enforced, not as optional documentation. Input validation, response serialization, and standard handling for time and money all need to line up if you want later versioning to stay manageable.
 

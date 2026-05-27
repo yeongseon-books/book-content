@@ -25,7 +25,7 @@ last_reviewed: '2026-05-17'
 
 Writing type hints is only half the job. If nobody runs a checker, a wrong return type or a missing `None` guard can sit quietly in the repository until runtime finally exposes it.
 
-This is post 8 in the Type Hints in Python 101 series. In this article, we will follow one small repository from broken code to mypy output, pyright output, stricter configuration, and finally a CI gate so the same workflow stays enforceable after the first local fix.
+This is the 8th post in the Type Hints in Python 101 series. In this article, we will follow one small repository from broken code to mypy output, pyright output, stricter configuration, and finally a CI gate so the same workflow stays enforceable after the first local fix.
 
 
 ![Type Hints in Python 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/08/08-01-concept-at-a-glance.en.png)

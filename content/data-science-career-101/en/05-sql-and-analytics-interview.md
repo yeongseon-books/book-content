@@ -26,7 +26,7 @@ Many candidates prepare for SQL interviews as if they were grammar exams. They m
 
 That gap exists because SQL interviews are usually reasoning interviews in disguise. The query matters, but so do the assumptions behind it: the metric definition, the NULL behavior, the time boundary, and the interpretation that turns a result set into an insight.
 
-This is post 5 in the Data Science Career 101 series.
+This is the 5th post in the Data Science Career 101 series.
 
 
 ![data science career 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/05/05-01-concept-at-a-glance.en.png)

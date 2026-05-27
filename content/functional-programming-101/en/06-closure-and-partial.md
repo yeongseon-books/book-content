@@ -26,7 +26,7 @@ Closures start to feel practical the moment you need a callback, decorator, or h
 
 `functools.partial` solves a nearby problem from a different angle. Instead of remembering mutable context, it pre-fills stable arguments of an existing function. That distinction matters in production code because it tells you whether you are carrying state or simply specializing configuration.
 
-This is post 6 in the Functional Programming 101 series.
+This is the 6th post in the Functional Programming 101 series.
 
 
 ![Functional Programming 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/06/06-01-closure-vs-partial-decision-flow.en.png)

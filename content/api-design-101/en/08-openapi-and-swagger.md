@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Once documentation starts lagging behind the code, teams quietly stop trusting it. They probe the API directly, SDKs fall out of sync, and review conversations move away from the contract that callers are supposed to rely on.
 
-This is post 8 in the API Design 101 series.
+This is the 8th post in the API Design 101 series.
 
 Here, we treat OpenAPI and Swagger as contract automation, not just documentation tooling. A single spec needs to drive validation, examples, SDK generation, and mock behavior if it is going to be the source of truth in practice.
 

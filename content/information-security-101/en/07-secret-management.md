@@ -29,7 +29,7 @@ last_reviewed: '2026-05-04'
 
 > Secret management is not about where you put them; it is about how you rotate them.
 
-This is post 7 in the Information Security 101 series.
+This is the 7th post in the Information Security 101 series.
 
 
 ![information security 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/07/07-01-big-picture.en.png)

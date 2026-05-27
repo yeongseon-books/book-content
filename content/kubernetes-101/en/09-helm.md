@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Kubernetes YAML usually starts tidy and then multiplies across environments. Before long, the real problem is no longer writing manifests but keeping the right differences in the right places without copying entire files forever.
 
-This is post 9 in the Kubernetes 101 series.
+This is the 9th post in the Kubernetes 101 series.
 
 Here, we will frame Helm as a repeatable deployment unit that separates shared structure from environment-specific values and gives you install, upgrade, and rollback workflows that are easier to reason about.
 

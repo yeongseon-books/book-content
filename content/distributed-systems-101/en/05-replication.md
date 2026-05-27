@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Copying data sounds easy until you ask the operational questions that follow. Which copy is authoritative? How long can replicas trail? What is acceptable to lose after a crash? The answers are not implementation details; they are the promises your system makes.
 
-This is post 5 in the Distributed Systems 101 series.
+This is the 5th post in the Distributed Systems 101 series.
 
 Here we look at replication as the layer that turns durability, availability, and stale-read behavior into explicit knobs.
 

@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 HTTP does not remember who you are between requests, but real products absolutely need memory: who signed in, what permissions they have, and whether this request should be trusted. That gap is where many early security mistakes happen.
 
-This is post 6 in the Web Development 101 series. Here we connect cookies, sessions, JWTs, and OAuth into one practical model so login stops looking like a black box and starts looking like a set of explicit trade-offs.
+This is the 6th post in the Web Development 101 series. Here we connect cookies, sessions, JWTs, and OAuth into one practical model so login stops looking like a black box and starts looking like a set of explicit trade-offs.
 
 
 ![web development 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/06/06-01-concept-at-a-glance.en.png)

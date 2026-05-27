@@ -25,7 +25,7 @@ last_reviewed: '2026-05-14'
 
 Assignments and projects disappear faster than most students expect if they are left inside local folders with no explanation. A year later, even the person who built them may struggle to remember what they did and why it mattered.
 
-This is post 9 in the Computer Science Major 101 series.
+This is the 9th post in the Computer Science Major 101 series.
 
 
 ![computer science major 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/09/09-01-portfolio-publishing-flow.en.png)

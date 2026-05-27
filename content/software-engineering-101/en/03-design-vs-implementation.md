@@ -27,7 +27,7 @@ Sometimes you review a change and think, "The code is clean, but the structure s
 
 Treat design and implementation as the same activity, and the important decisions disappear into the code. Responsibility boundaries, reversibility, failure handling, and trade-offs stop being explicit choices and start becoming accidental side effects. That is how teams end up with a lot of code and very little shared reasoning.
 
-This is post 3 in the Software Engineering 101 series. In this chapter, we separate the questions design answers from the questions implementation answers, then use ADRs and small examples to show how to keep that boundary visible.
+This is the 3rd post in the Software Engineering 101 series. In this chapter, we separate the questions design answers from the questions implementation answers, then use ADRs and small examples to show how to keep that boundary visible.
 
 
 ![software engineering 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/03/03-01-concept-at-a-glance.en.png)

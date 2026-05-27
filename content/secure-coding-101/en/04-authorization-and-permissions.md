@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Logging in does not answer the question that matters most to a secure application: may this user touch this resource right now? Reading another person's order, editing a document, or downloading an internal report all need a separate decision. Broken access control keeps ranking near the top of real-world incident lists because teams often stop at authentication and never finish the authorization model behind it.
 
-This is post 4 in the Secure Coding 101 series.
+This is the 4th post in the Secure Coding 101 series.
 
 In this chapter, we will treat authorization as a server-side decision over actor, action, and resource, not as a UI rule or a handful of role names. That framing makes RBAC, ABAC, IDOR defense, list filtering, and default-deny behavior fit together cleanly.
 

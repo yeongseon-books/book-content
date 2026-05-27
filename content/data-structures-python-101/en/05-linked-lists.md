@@ -28,7 +28,7 @@ last_reviewed: '2026-05-15'
 
 > Python list is array-based, so mid-list insertion and deletion are O(n). Linked lists connect nodes with pointers, achieving O(1) insertion and deletion. This article implements singly and doubly linked lists in Python and compares them with arrays.
 
-This is post 5 in the Data Structures with Python 101 series.
+This is the 5th post in the Data Structures with Python 101 series.
 
 
 ![Data Structures with Python 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/05/05-01-linked-structure-at-a-glance.en.png)

@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 Search algorithms locate a value inside a collection. With unsorted data, linear scan at O(n) is the only option. With sorted data, binary search discards half the candidates each step, reaching the answer in O(log n). One precondition — sortedness — changes the algorithmic class.
 
-This is post 3 in the Algorithms 101 series. Here we cover linear search, binary search, Python's `bisect`, and the broader idea of parametric search.
+This is the 3rd post in the Algorithms 101 series. Here we cover linear search, binary search, Python's `bisect`, and the broader idea of parametric search.
 
 
 ![algorithms 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/03/03-01-big-picture.en.png)

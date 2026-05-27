@@ -26,7 +26,7 @@ A postmortem article can be excellent context and still be the wrong place to st
 
 Strong teams do not force one format to replace the other. They separate ownership, freshness rules, and publication goals, then connect the two with deliberate links.
 
-This is post 9 in the Technical Writing 101 series. It distinguishes blogs from documentation by role, lifespan, and canonical ownership.
+This is the 9th post in the Technical Writing 101 series. It distinguishes blogs from documentation by role, lifespan, and canonical ownership.
 
 
 ![technical writing 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/09/09-01-concept-at-a-glance.en.png)

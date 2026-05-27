@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 A lot of analysis work goes wrong long before modeling or visualization starts. If text encoding breaks, numeric columns land as strings, or dates stay as plain text, every downstream calculation becomes less trustworthy. File loading is not a throwaway pre-step. It is where data quality gets its first serious test.
 
-This is post 3 in the Pandas 101 series.
+This is the 3rd post in the Pandas 101 series.
 
 In this chapter, we will treat `read_csv` and `read_excel` as data-loading contracts rather than convenience helpers. The goal is to make data land in memory the way you intended on the first read.
 

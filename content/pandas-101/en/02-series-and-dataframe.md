@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Very early in Pandas, most people run into the same question: are Series and DataFrame just two names for similar containers, or are they different views of one data model? If that relationship stays fuzzy, column selection, arithmetic, sorting, and joins all feel like memorized syntax instead of predictable behavior.
 
-This is post 2 in the Pandas 101 series.
+This is the 2nd post in the Pandas 101 series.
 
 The core idea in this chapter is simple. A DataFrame is a collection of Series that share the same label system. Once that model clicks, many Pandas behaviors stop feeling magical and start feeling consistent.
 

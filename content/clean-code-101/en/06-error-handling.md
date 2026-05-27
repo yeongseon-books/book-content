@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Error handling becomes dangerous when it is everywhere and nowhere at the same time. The code catches broadly, logs vaguely, and leaves the caller guessing which failures still matter.
 
-This is post 6 in the Clean Code 101 series.
+This is the 6th post in the Clean Code 101 series.
 
 Here we will set boundaries for validation, typed exceptions, return-value failures, and retries so that robustness increases without letting the happy path disappear.
 

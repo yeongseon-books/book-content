@@ -26,7 +26,7 @@ Reliability conversations often go in circles because each side is speaking from
 
 SLIs and SLOs solve that by turning service quality into a number, a target, and a budget the team can spend or protect.
 
-This is post 8 in the Observability 101 series.
+This is the 8th post in the Observability 101 series.
 
 
 ![observability 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/08/08-01-concept-at-a-glance.en.png)

@@ -26,7 +26,7 @@ At some point in probability, simple calculation stops being the whole story. Th
 
 It matters not just because the equation is elegant, but because the same structure appears in medical diagnosis, spam filtering, recommender systems, A/B testing, and reinforcement learning. Any time evidence arrives and a belief needs to move, Bayes is somewhere in the background.
 
-This is post 4 in the Probability 101 series. Here we break Bayes' theorem into prior, likelihood, evidence, and posterior, then walk through a screening example, sequential updates, and the odds form that often makes the mechanics easier to see.
+This is the 4th post in the Probability 101 series. Here we break Bayes' theorem into prior, likelihood, evidence, and posterior, then walk through a screening example, sequential updates, and the odds form that often makes the mechanics easier to see.
 
 
 ![probability 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/04/04-01-concept-at-a-glance.en.png)

@@ -25,7 +25,7 @@ last_reviewed: '2026-05-14'
 
 The first developer job often creates pressure to prove yourself immediately. Most teams are not looking for instant mastery in the first ninety days. They are looking for how fast you learn the context, how clearly you ask for help, and whether you can turn that help into small reliable contributions.
 
-This is post 7 in the Developer Career 101 series.
+This is the 7th post in the Developer Career 101 series.
 
 
 ![developer career 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/07/07-01-concept-at-a-glance.en.png)

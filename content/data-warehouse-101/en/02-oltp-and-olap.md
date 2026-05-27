@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 From far away, both systems speak SQL. Up close, they solve opposite problems. One is built to confirm a payment in milliseconds. The other is built to scan months of history without dragging production down with it.
 
-This is post 2 in the Data Warehouse 101 series.
+This is the 2nd post in the Data Warehouse 101 series.
 
 In this post, we compare those workloads directly. The important question is not whether both systems can run queries, but what kind of query pattern each engine is optimized to carry all day.
 

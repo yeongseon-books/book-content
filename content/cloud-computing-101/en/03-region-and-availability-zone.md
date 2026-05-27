@@ -26,7 +26,7 @@ Two teams can run the same service on the same cloud and get very different outa
 
 Region and Availability Zone are geographic boundaries. A region is a city or continent. An AZ is a failure domain within a region — data centers separated so that failure in one does not cascade to another. Multi-AZ deployment is a foundation of reliability; Multi-Region is only for specific needs.
 
-This is post 3 in the Cloud Computing 101 series.
+This is the 3rd post in the Cloud Computing 101 series.
 
 In this post, we'll separate Regions, Availability Zones, and edge locations, then use that model to reason about Multi-AZ and Multi-Region designs.
 

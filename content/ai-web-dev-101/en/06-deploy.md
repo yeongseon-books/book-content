@@ -23,7 +23,7 @@ seo_description: Deploy a local AI app to Vercel and Azure App Service while han
 
 An AI app that only works on your laptop is still a local experiment. Once other people need to access it, deployment turns secrets, startup commands, logging, and budget control into real operational concerns.
 
-This is post 6 in the AI Web Development 101 series.
+This is the 6th post in the AI Web Development 101 series.
 
 Here, we will walk through the first deployment path for a frontend-heavy app on Vercel and a Python backend on Azure App Service.
 

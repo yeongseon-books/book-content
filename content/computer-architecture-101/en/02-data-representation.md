@@ -29,7 +29,7 @@ last_reviewed: '2026-05-04'
 
 > Computers store everything as bundles of zeros and ones. Integers use two's complement, real numbers use IEEE 754 floating point, and both come with limits on range and precision. This article walks through how those limits show up in real code and how to handle them deliberately.
 
-This is post 2 in the Computer Architecture 101 series.
+This is the 2nd post in the Computer Architecture 101 series.
 
 
 ![computer architecture 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/02/02-01-big-picture.en.png)

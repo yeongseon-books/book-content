@@ -26,7 +26,7 @@ SELECT is usually the first SQL statement people become comfortable with, and th
 
 Good SELECT habits pay off long after the query leaves your editor. The column list explains the business question, aliases make the result readable, and LIMIT keeps exploration fast instead of noisy.
 
-This is post 2 in the SQL 101 series. Here we treat SELECT as the tool that shapes the result set, not as a throwaway read statement.
+This is the 2nd post in the SQL 101 series. Here we treat SELECT as the tool that shapes the result set, not as a throwaway read statement.
 
 
 ![sql 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/02/02-01-select-evaluation-flow.en.png)

@@ -26,7 +26,7 @@ Many teams assume incident communication is secondary work that can wait until t
 
 Customers, executives, and responders do not need the same message. They need the same facts translated into different levels of detail and delivered on a predictable cadence.
 
-This is post 4 in the Incident Response 101 series. This post covers how to separate audiences, when to use Slack versus a status page, and how to keep updates short, honest, and operationally useful.
+This is the 4th post in the Incident Response 101 series. This post covers how to separate audiences, when to use Slack versus a status page, and how to keep updates short, honest, and operationally useful.
 
 
 ![incident response 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/04/04-01-diagram-at-a-glance.en.png)

@@ -22,7 +22,7 @@ last_reviewed: '2026-05-04'
 
 # Functional Programming 101 (4/10): Higher-Order Functions
 
-This is post 4 in the Functional Programming 101 series.
+This is the 4th post in the Functional Programming 101 series.
 
 > Functional Programming 101 Series (4/10)
 

@@ -27,7 +27,7 @@ On a busy machine, many tasks are ready to run at once, but the number of CPU co
 
 That is why scheduler behavior matters long before you start reading kernel code. It explains why a system feels sluggish, why identical runs vary, and why container CPU limits can make software feel uneven.
 
-This is post 3 in the Operating Systems 101 series. It introduces the scheduler as the policy engine that keeps trading off responsiveness, throughput, fairness, and power.
+This is the 3rd post in the Operating Systems 101 series. It introduces the scheduler as the policy engine that keeps trading off responsiveness, throughput, fairness, and power.
 
 
 ![operating systems 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/03/03-01-how-tasks-move-through-the-scheduler.en.png)

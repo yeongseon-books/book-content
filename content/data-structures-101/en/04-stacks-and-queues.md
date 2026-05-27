@@ -29,7 +29,7 @@ last_reviewed: '2026-05-04'
 
 > A stack is last-in-first-out (LIFO); a queue is first-in-first-out (FIFO). The two ADTs are simple, but they sit at the heart of nearly every system: function calls, tree traversal, task scheduling, message passing. This article walks through both by implementing them and then shows how they appear in production software.
 
-This is post 4 in the Data Structures 101 series.
+This is the 4th post in the Data Structures 101 series.
 
 
 ![data structures 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/04/04-01-big-picture.en.png)

@@ -26,7 +26,7 @@ Presentation decks usually become bloated because teams try to show every featur
 
 A strong deck is not a catalog of screens. It is a concise story about the problem, the chosen solution, the demonstrated result, and the next insight the team gained.
 
-This is post 9 in the Capstone Project 101 series. It uses a problem-solution-result arc for the deck and folds in demo fallback planning plus Q&A preparation.
+This is the 9th post in the Capstone Project 101 series. It uses a problem-solution-result arc for the deck and folds in demo fallback planning plus Q&A preparation.
 
 
 ![capstone project 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/09/09-01-the-flow-at-a-glance.en.png)

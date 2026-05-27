@@ -26,7 +26,7 @@ Two SQL statements can look almost identical and still differ by orders of magni
 
 If you cannot read that path, tuning stays stuck at guesswork. Indexes become cargo-cult fixes, and every slow query turns into trial and error instead of a repeatable investigation.
 
-This is post 9 in the SQL 101 series. Here we focus on how indexes, selectivity, and EXPLAIN fit together into a practical tuning workflow.
+This is the 9th post in the SQL 101 series. Here we focus on how indexes, selectivity, and EXPLAIN fit together into a practical tuning workflow.
 
 
 ![sql 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/09/09-01-plan-selection-flow.en.png)

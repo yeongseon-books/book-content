@@ -26,7 +26,7 @@ seo_description: cat dumps a file all at once like pouring a bucket, and less le
 
 When you work on servers, reading files efficiently matters almost as much as editing them. Logs, config files, CSVs, and generated output all need different reading habits, and using the wrong command can waste time or flood your terminal.
 
-This is post 4 in the Linux CLI 101 series.
+This is the 4th post in the Linux CLI 101 series.
 
 
 ![Linux CLI 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/04/04-01-big-picture.en.png)

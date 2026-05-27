@@ -22,7 +22,7 @@ last_reviewed: '2026-05-04'
 
 # Compilers 101 (4/10): semantic analysis
 
-This is post 4 in the Compilers 101 series.
+This is the 4th post in the Compilers 101 series.
 
 > Compilers 101 series (4/10)
 

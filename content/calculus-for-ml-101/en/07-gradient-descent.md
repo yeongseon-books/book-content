@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Knowing the gradient does not train a model by itself. The remaining question is procedural: how do you convert that directional signal into repeated parameter movement that reliably lowers loss? Gradient descent is the basic answer.
 
-This is post 7 in the Calculus for ML 101 series.
+This is the 7th post in the Calculus for ML 101 series.
 
 In this post, we'll look at the update rule itself, the role of the learning rate, and the difference between full-batch, stochastic, and mini-batch behavior. Once that clicks, loss curves stop feeling like random charts and start looking like readable optimization traces.
 

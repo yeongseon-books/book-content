@@ -25,7 +25,7 @@ last_reviewed: '2026-05-14'
 
 The hardest part of side projects is usually not finding ideas. It is choosing a scope that can survive real life. A project that competes with your day job, drifts without a finish line, or ignores IP boundaries often becomes a source of fatigue instead of a source of growth.
 
-This is post 8 in the Developer Career 101 series.
+This is the 8th post in the Developer Career 101 series.
 
 
 ![developer career 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/08/08-01-concept-at-a-glance.en.png)

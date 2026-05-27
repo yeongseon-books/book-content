@@ -26,7 +26,7 @@ Linear algebra often feels intimidating to beginners because the notation become
 
 Embeddings, dimensionality reduction, camera transforms, and neural network forward passes all become easier to understand once vectors and matrices stop looking like mysterious tables and start looking like data plus movement rules.
 
-This is post 7 in the Math for CS 101 series.
+This is the 7th post in the Math for CS 101 series.
 
 Here we use linear algebra as a practical language for data, similarity, and transformation.
 

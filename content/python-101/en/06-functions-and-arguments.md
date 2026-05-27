@@ -26,6 +26,8 @@ seo_description: 'A function signature is a contract: what the caller must suppl
 
 A function signature is a contract: what the caller must supply and what the function returns. Argument forms, plus `/` and `*`, let you make that contract clearer and harder to misuse.
 
+This is the 6th post in the Python 101 series.
+
 This post is the 6th article in the Python 101 series. This is the point in the series where reusable code turns into explicit interfaces.
 
 

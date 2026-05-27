@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 As soon as you go one step deeper into linear algebra, a natural question appears: why can one space be described by multiple sets of axes, and how many axes do you really need? Basis and dimension answer that question. Rank, PCA, and rank-deficient models all come back here.
 
-This is post 6 in the Linear Algebra 101 series. Here we will tie linear independence, basis, dimension, and rank into one picture.
+This is the 6th post in the Linear Algebra 101 series. Here we will tie linear independence, basis, dimension, and rank into one picture.
 
 
 ![linear algebra 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/06/06-01-concept-at-a-glance.en.png)

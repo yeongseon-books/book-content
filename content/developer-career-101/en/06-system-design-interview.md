@@ -25,7 +25,7 @@ last_reviewed: '2026-05-14'
 
 System design interviews can look like a whiteboard drawing exercise from the outside. What interviewers actually value is whether you can frame requirements, make rough estimates, propose a plausible architecture, and explain trade-offs in a way that shows judgment under constraints.
 
-This is post 6 in the Developer Career 101 series.
+This is the 6th post in the Developer Career 101 series.
 
 
 ![developer career 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/06/06-01-concept-at-a-glance.en.png)

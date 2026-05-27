@@ -26,7 +26,7 @@ EC2, Heroku, and Notion are all cloud services, but they feel nothing alike when
 
 IaaS, PaaS, and SaaS differ in what part of the stack the provider manages. With IaaS, you manage the OS and runtime. With PaaS, the platform handles more. With SaaS, you use a finished product. Picking the right level requires knowing what tradeoff you're making.
 
-This is post 2 in the Cloud Computing 101 series.
+This is the 2nd post in the Cloud Computing 101 series.
 
 In this post, we'll compare service models through control, speed, lock-in, and operational burden so you can match them to real workloads.
 

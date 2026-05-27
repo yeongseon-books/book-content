@@ -26,7 +26,7 @@ Image optimization is often presented as an aesthetic preference for smaller num
 
 The important point is that optimization is rarely one trick. Base image choice, multi-stage separation, and BuildKit cache reuse work together. If you optimize only one of them, the result is usually smaller than it should be.
 
-This is post 9 in the Docker 101 series. It walks through multi-stage builds, cache mounts, and base-image trade-offs so you can reason about build speed, runtime simplicity, and debugging cost at the same time.
+This is the 9th post in the Docker 101 series. It walks through multi-stage builds, cache mounts, and base-image trade-offs so you can reason about build speed, runtime simplicity, and debugging cost at the same time.
 
 
 ![docker 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/09/09-01-concept-at-a-glance.en.png)

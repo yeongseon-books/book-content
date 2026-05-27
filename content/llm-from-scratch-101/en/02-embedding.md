@@ -31,7 +31,7 @@ Today, we're starting `model.py`. We won't build the Transformer blocks yet, but
 
 Today's mental model is this: **The input vector for a token is the sum of its token embedding and its positional embedding.**
 
-This is the 2nd article in the LLM from Scratch 101 series.
+This is the 2nd post in the LLM from Scratch 101 series.
 
 ---
 

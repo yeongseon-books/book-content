@@ -26,7 +26,7 @@ Once a team agrees on what counts as an incident, the next question is how serio
 
 That is why severity is more than a label. It is the shorthand that turns impact into response behavior, escalation paths, and communication timing.
 
-This is post 2 in the Incident Response 101 series. This post shows how to define SEV levels, how to map them to concrete actions, and how to keep boundary cases from turning into live arguments during an outage.
+This is the 2nd post in the Incident Response 101 series. This post shows how to define SEV levels, how to map them to concrete actions, and how to keep boundary cases from turning into live arguments during an outage.
 
 
 ![incident response 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/02/02-01-diagram-at-a-glance.en.png)

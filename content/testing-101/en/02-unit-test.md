@@ -26,7 +26,7 @@ When people first hear “unit test,” they often agree on the word *test* but 
 
 Unit testing is mostly an exercise in shrinking the problem. Remove external dependencies, isolate one behavior, and get feedback in seconds instead of minutes.
 
-This is post 2 in the Testing 101 series. Here we define the scope of a unit test, walk through the AAA pattern and core `pytest` features, and show what makes a unit test genuinely useful in a growing codebase.
+This is the 2nd post in the Testing 101 series. Here we define the scope of a unit test, walk through the AAA pattern and core `pytest` features, and show what makes a unit test genuinely useful in a growing codebase.
 
 > A strong unit test is small enough to fail loudly and fast, but precise enough to explain exactly what contract broke.
 

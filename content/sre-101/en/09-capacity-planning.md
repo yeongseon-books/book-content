@@ -26,7 +26,7 @@ Capacity conversations often start with the last traffic graph because it is the
 
 That is why capacity planning belongs with reliability, not just cost control. If you wait until traffic has already risen, the most important decision has already been made for you by production behavior.
 
-This is post 9 in the SRE 101 series. Here we connect demand forecasting, headroom, load testing, scaling units, and cost so growth does not turn into a preventable outage.
+This is the 9th post in the SRE 101 series. Here we connect demand forecasting, headroom, load testing, scaling units, and cost so growth does not turn into a preventable outage.
 
 
 ![sre 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/09/09-01-concept-at-a-glance.en.png)

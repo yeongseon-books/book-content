@@ -24,7 +24,7 @@ Embedding models have a hard token limit. `all-MiniLM-L6-v2` processes at most 2
 
 Chunking is the process of splitting a long document into embedding-sized pieces. How you split directly affects retrieval quality. Chunks that are too small lose context; chunks that are too large mix unrelated content.
 
-This is post 5 in the Vector Search 101 series.
+This is the 5th post in the Vector Search 101 series.
 
 Here chunking is treated as a retrieval design choice, not a preprocessing afterthought.
 

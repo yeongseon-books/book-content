@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Refactoring looks risky when it is approached as a rewrite. It becomes manageable when every step is small enough that a failing test can tell you exactly where the move went wrong.
 
-This is post 9 in the Clean Code 101 series.
+This is the 9th post in the Clean Code 101 series.
 
 Here we will use characterization tests, rename and extraction moves, and the “two hats” rule to turn legacy cleanup into a sequence of reviewable, reversible steps.
 

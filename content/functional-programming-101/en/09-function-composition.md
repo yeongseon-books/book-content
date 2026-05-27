@@ -24,7 +24,7 @@ last_reviewed: '2026-05-04'
 
 Small functions are easy to understand in isolation. The real challenge starts when a system grows into ten or twenty transformation steps and nobody can quickly tell which stage normalized the payload, which stage filtered it out, and which stage produced the final report. That is the moment composition stops being a math term and becomes an operations problem.
 
-This is post 9 in the Functional Programming 101 series.
+This is the 9th post in the Functional Programming 101 series.
 
 Pipelines help because they make execution order visible. Instead of nesting calls from the inside out, you let data move across named stages. That shift is especially valuable in production data flows, where debugging means asking which step changed the value and why.
 

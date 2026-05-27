@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 When people call linear regression “too simple,” they usually mean “easy to underestimate.” A straight line that explains most of the variation is already an operationally strong baseline, and it often teaches you more about the data than a more complex model that scores slightly higher but hides why.
 
-This is post 4 in the Machine Learning 101 series. Here we will treat linear regression as both a prediction model and a diagnostic tool by reading coefficients, residuals, MSE, and `R^2` together.
+This is the 4th post in the Machine Learning 101 series. Here we will treat linear regression as both a prediction model and a diagnostic tool by reading coefficients, residuals, MSE, and `R^2` together.
 
 
 ![machine learning 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/04/04-01-concept-at-a-glance.en.png)

@@ -27,7 +27,7 @@ You can write solid code and pass every test, then still lose user trust at rele
 
 Teams get into trouble when they think of release as a single event: bump a version, write notes, deploy, done. Resilient teams treat release as a recoverable process. They ship smaller changes more often, verify on narrow traffic first, and assume rollback must work under pressure, not only in theory.
 
-This is post 6 in the Software Engineering 101 series. In this chapter, we connect commit conventions, semantic versioning, changelogs, canary rollout, and rollback drills into one release flow you can reason about end to end.
+This is the 6th post in the Software Engineering 101 series. In this chapter, we connect commit conventions, semantic versioning, changelogs, canary rollout, and rollback drills into one release flow you can reason about end to end.
 
 
 ![software engineering 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/06/06-01-concept-at-a-glance.en.png)

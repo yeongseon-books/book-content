@@ -28,7 +28,7 @@ last_reviewed: '2026-05-15'
 
 > Trees naturally represent hierarchical relationships. Binary search trees (BSTs) enable O(log n) lookups on sorted data. This article covers tree concepts, binary tree implementation, traversal algorithms, and binary search trees.
 
-This is post 6 in the Data Structures with Python 101 series.
+This is the 6th post in the Data Structures with Python 101 series.
 
 
 ![Data Structures with Python 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/06/06-01-tree-shape-at-a-glance.en.png)

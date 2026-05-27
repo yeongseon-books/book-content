@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 A GitHub repository is a strong place to show the finished artifact, but it is not usually where people discover the work in the first place. Most readers search for the problem, the debugging path, or the lesson behind the project. If your portfolio stops at the repository, the result is visible, but the process and judgment are much harder to find.
 
-This is post 8 in the Portfolio Project 101 series. Here we will turn a project into a technical blog post that emphasizes problem, approach, result, and learning instead of dumping the entire implementation into prose.
+This is the 8th post in the Portfolio Project 101 series. Here we will turn a project into a technical blog post that emphasizes problem, approach, result, and learning instead of dumping the entire implementation into prose.
 
 ---
 

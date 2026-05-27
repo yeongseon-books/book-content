@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Some code takes one line to test and some code fights back with clocks, networks, databases, and hidden globals. That difference is usually a design decision, not a testing-library problem.
 
-This is post 8 in the Clean Code 101 series.
+This is the 8th post in the Clean Code 101 series.
 
 Here we will push time, IO, and randomness to the boundaries, then use seams, fakes, and adapters to make tests fast enough that they can guide everyday refactoring.
 

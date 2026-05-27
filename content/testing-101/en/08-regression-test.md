@@ -26,7 +26,7 @@ A bug is rarely expensive only once. The real cost comes when the same failure r
 
 Regression tests are that encoded lesson. They turn a bug report into a failing example, then keep the example around so the same path cannot silently break again.
 
-This is post 8 in the Testing 101 series. Here we walk through the bug → repro test → fix workflow and show how to keep regression tests small, traceable, and cheap enough to live close to the code they protect.
+This is the 8th post in the Testing 101 series. Here we walk through the bug → repro test → fix workflow and show how to keep regression tests small, traceable, and cheap enough to live close to the code they protect.
 
 > A regression test is a bug report that learned how to execute itself.
 

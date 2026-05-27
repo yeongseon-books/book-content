@@ -25,7 +25,7 @@ last_reviewed: '2026-05-23'
 
 The day comes when a payment SDK has to be replaced. I have been through this three times. The first was swapping Stripe for Toss Payments. The second was moving email delivery from SES to SendGrid. The third was when an internal auth server migrated to the OAuth2 standard. All three left the same lesson: when an external SDK's signatures are scattered across domain code, replacing the SDK is not "swap one library" but "refactor the entire service."
 
-This is the sixth article in the Design Patterns 101 series. Article 3 introduced Adapter at overview level, so here we dig into the boundaries Adapter creates in production and the costs those boundaries carry.
+This is the 6th post in the Design Patterns 101 series. Article 3 introduced Adapter at overview level, so here we dig into the boundaries Adapter creates in production and the costs those boundaries carry.
 
 ![Design Patterns 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/06/06-01-concept-at-a-glance.en.png)
 *How an external SDK call passes through the Adapter boundary to reach the domain*

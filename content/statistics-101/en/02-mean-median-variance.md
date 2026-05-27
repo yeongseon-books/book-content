@@ -26,7 +26,7 @@ The moment you compress a dataset into one or two numbers, you are already shapi
 
 That choice becomes especially important when the data has outliers or a long tail. In those cases, the mean can move far away from what most observations actually look like.
 
-This is post 2 in the Statistics 101 series. Here we will compare mean, median, and variance, and clarify why the right summary statistic depends on the shape of the data.
+This is the 2nd post in the Statistics 101 series. Here we will compare mean, median, and variance, and clarify why the right summary statistic depends on the shape of the data.
 
 
 ![statistics 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/02/02-01-concept-at-a-glance.en.png)

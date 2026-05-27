@@ -25,7 +25,7 @@ last_reviewed: '2026-05-23'
 
 The most frequent comment I leave in code reviews is "does this object really need to create that collaborator itself?" When a service class instantiates its own dependencies — opening DB connections, connecting to SMTP servers, initializing external SDKs — right in the middle of business logic, testing that service means spinning up the entire infrastructure. The fix is surprisingly simple: separate the act of making things from the act of using them.
 
-This is the eighth article in the Design Patterns 101 series. In article 2, Factory Method was introduced as "delegating creation decisions to subclasses." Here, we follow Factory as it meets Dependency Injection and evolves into the Composition Root — the practical structure that production codebases actually rely on.
+This is the 8th post in the Design Patterns 101 series. In article 2, Factory Method was introduced as "delegating creation decisions to subclasses." Here, we follow Factory as it meets Dependency Injection and evolves into the Composition Root — the practical structure that production codebases actually rely on.
 
 ![Assembly flow from Factory to Composition Root](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/08/08-01-concept-at-a-glance.en.png)
 

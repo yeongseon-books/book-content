@@ -26,7 +26,7 @@ Lists and tables are not enough once the important question becomes who is conne
 
 Graphs are the standard way to make those relationships explicit. Social networks, road systems, build pipelines, service dependencies, and recommendation paths all look different on the surface, but a graph often exposes the common structure underneath.
 
-This is post 4 in the Math for CS 101 series.
+This is the 4th post in the Math for CS 101 series.
 
 Here we treat graphs as the baseline language for relationship-heavy systems, with a focus on representation and traversal.
 

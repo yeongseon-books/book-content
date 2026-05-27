@@ -26,7 +26,7 @@ Teams that deploy by hand usually end up with the same blind spots. Staging is a
 
 Good deployment automation is not about removing every human decision. It is about automating the safe, repeatable path while making the risky path explicit through approval rules, environment policy, and short-lived credentials.
 
-This is post 8 in the GitHub Actions 101 series. In this post, we will design a deployment flow around GitHub Environments, required reviewers, OIDC, and codified rollback.
+This is the 8th post in the GitHub Actions 101 series. In this post, we will design a deployment flow around GitHub Environments, required reviewers, OIDC, and codified rollback.
 
 
 ![github actions 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/08/08-01-concept-at-a-glance.en.png)

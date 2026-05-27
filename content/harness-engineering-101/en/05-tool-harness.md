@@ -25,7 +25,7 @@ Once an agent starts reading databases, writing files, calling APIs, or executin
 
 Most production incidents in agent systems are not caused by poetic model failures. They happen because a tool name hid a side effect, a schema allowed ambiguous arguments, or a retry repeated a non-idempotent write.
 
-This is post 5 in the Harness Engineering 101 series. Here we design tool surfaces that are narrow, honest, and difficult to misuse.
+This is the 5th post in the Harness Engineering 101 series. Here we design tool surfaces that are narrow, honest, and difficult to misuse.
 
 ![Tool harness - designing safe tools for agents](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/05/05-01-tool-harness-designing-safe-tools-for-ag.en.png)
 *Tool harness - designing safe tools for agents*

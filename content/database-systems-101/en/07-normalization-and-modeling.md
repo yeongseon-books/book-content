@@ -23,7 +23,7 @@ last_reviewed: '2026-05-04'
 
 # Database Systems 101 (7/10): Normalization and Modeling
 
-This is post 7 in the Database Systems 101 series.
+This is the 7th post in the Database Systems 101 series.
 
 > Database Systems 101 series (7/10)
 

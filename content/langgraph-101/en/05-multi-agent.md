@@ -27,7 +27,7 @@ The operational version of that problem is even more obvious. One request gets r
 
 Things get especially messy when no real supervisor exists. If nobody clearly owns routing, fallback, and stop conditions, the system can look collaborative from the outside while behaving like a broken prompt collage underneath. One worker calls another, that worker reframes the request again, and before long you have multiple agents participating without any clear answer to who was actually responsible for the decision.
 
-This is the fifth article in the LangGraph 101 series. Here I want to frame multi-agent design not as “more LLM calls,” but as **a graph structure in which a supervisor coordinates a cluster of role-separated nodes**. That is the shift that matters. **Multi-agent quality is less about model count and more about how clearly role boundaries, handoffs, and state contracts are separated.**
+This is the 5th post in the LangGraph 101 series. Here I want to frame multi-agent design not as “more LLM calls,” but as **a graph structure in which a supervisor coordinates a cluster of role-separated nodes**. That is the shift that matters. **Multi-agent quality is less about model count and more about how clearly role boundaries, handoffs, and state contracts are separated.**
 
 Once that lens is in place, the final chapter becomes easier too. A complete LangGraph system is really just state, branching, tool use, and multi-agent orchestration combined into one operational graph. If multi-agent still feels like “a lot of agents doing things,” the supervisor design and shared-state boundaries stay vague much longer than they should.
 

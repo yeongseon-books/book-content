@@ -26,7 +26,7 @@ Some posts earn the click and lose the reader two scrolls later. Others contain 
 
 A strong title is not just marketing copy. It compresses the reader action and the payoff. The structure is the route that gets the reader there with the least friction. That is why these two pieces should be designed together, not fixed separately at the end.
 
-This is post 3 in the Technical Writing 101 series. It focuses on shaping titles, outlines, headings, and summaries as one system.
+This is the 3rd post in the Technical Writing 101 series. It focuses on shaping titles, outlines, headings, and summaries as one system.
 
 
 ![technical writing 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/03/03-01-concept-at-a-glance.en.png)

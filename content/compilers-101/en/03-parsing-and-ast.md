@@ -29,7 +29,7 @@ last_reviewed: '2026-05-04'
 
 > A parser takes a token stream as input and builds a **tree (AST)** that captures structure. Operator precedence, associativity, and error reporting are all decided in this step.
 
-This is post 3 in the Compilers 101 series.
+This is the 3rd post in the Compilers 101 series.
 
 
 ![compilers 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/03/03-01-big-picture.en.png)

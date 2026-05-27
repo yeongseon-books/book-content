@@ -24,7 +24,7 @@ seo_description: Protect user privacy and maintain GDPR compliance by redacting 
 
 LLM applications handle personal data in both directions. Users send sensitive information into the model, and other people's data can leak back out through logs, context, or responses.
 
-This is post 4 in the AI Safety & Guardrails 101 series. It defines the PII surface area first, then walks through detection and redaction patterns that hold up in production.
+This is the 4th post in the AI Safety & Guardrails 101 series. It defines the PII surface area first, then walks through detection and redaction patterns that hold up in production.
 
 
 ![section 1: PII categories](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/04/04-01-section-1-pii-categories.en.png)

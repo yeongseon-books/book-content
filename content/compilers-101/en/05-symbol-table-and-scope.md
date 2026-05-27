@@ -28,7 +28,7 @@ last_reviewed: '2026-05-04'
 
 > A symbol table is the compiler's memory of "which name points to which declaration." Nested scope and shadowing are expressed directly by the shape of this data structure.
 
-This is post 5 in the Compilers 101 series.
+This is the 5th post in the Compilers 101 series.
 
 
 ![compilers 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/05/05-01-big-picture.en.png)

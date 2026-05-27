@@ -26,7 +26,7 @@ seo_description: An ORM model class is the marriage of "a Python class plus a Co
 
 In Core we worked directly with `Table` and `select()` to compose SQL expressions. The ORM lays one more layer on top: it maps rows to Python objects, tracks attribute changes, and emits SQL at the right moment. SQLAlchemy 2.x's ORM lets you express almost any model with three tools - `DeclarativeBase`, `Mapped[T]`, and `mapped_column(...)`. This article focuses on those three and shows, in concrete terms, how an ORM model is wired to a Core `Table`.
 
-This is the 4th article in the SQLAlchemy 101 series.
+This is the 4th post in the SQLAlchemy 101 series.
 
 ![ORM Basics: defining models with DeclarativeBase and mapped_column](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/04/04-01-orm-basics-defining-models-with-declarat.en.png)
 

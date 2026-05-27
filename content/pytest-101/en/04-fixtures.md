@@ -22,7 +22,7 @@ last_reviewed: '2026-05-04'
 
 # pytest 101 (4/10): Understanding Fixtures
 
-This is post 4 in the pytest 101 series.
+This is the 4th post in the pytest 101 series.
 
 > pytest 101 series (4/10)
 

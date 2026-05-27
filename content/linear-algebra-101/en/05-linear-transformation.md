@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 After learning matrices, the natural follow-up is simple: what do those matrices actually do to a space? Linear transformation is the idea that answers that question. A matrix is the coordinate form of a transformation rule.
 
-This is post 5 in the Linear Algebra 101 series. Here we will read linear transformations geometrically through rotation, scaling, reflection, and shear.
+This is the 5th post in the Linear Algebra 101 series. Here we will read linear transformations geometrically through rotation, scaling, reflection, and shear.
 
 
 ![linear algebra 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/05/05-01-concept-at-a-glance.en.png)

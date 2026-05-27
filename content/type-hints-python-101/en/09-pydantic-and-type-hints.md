@@ -25,7 +25,7 @@ last_reviewed: '2026-05-17'
 
 Static type checking protects the person writing the code. Real services also need protection from the data entering the system. A malformed email, an underage signup, or mismatched password fields are runtime boundary problems, not mypy problems.
 
-This is post 9 in the Type Hints in Python 101 series. In this article, we will build one continuous `CreateUserRequest` → FastAPI endpoint → `UserResponse` workflow so you can see how Pydantic turns type hints into runtime validation, how a bad request becomes a 422 response, and how the corrected request becomes a successful response.
+This is the 9th post in the Type Hints in Python 101 series. In this article, we will build one continuous `CreateUserRequest` → FastAPI endpoint → `UserResponse` workflow so you can see how Pydantic turns type hints into runtime validation, how a bad request becomes a 422 response, and how the corrected request becomes a successful response.
 
 
 ![Type Hints in Python 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/09/09-01-big-picture.en.png)

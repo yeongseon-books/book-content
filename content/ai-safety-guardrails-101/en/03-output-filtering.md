@@ -24,7 +24,7 @@ seo_description: Implement independent output filtering and content moderation u
 
 Model vendors ship safety training, but the output is still untrusted data. A subtle jailbreak, quoted profanity, or unsafe advice can slip through unless you moderate the response as a separate step.
 
-This is post 3 in the AI Safety & Guardrails 101 series. It focuses on treating model output as something you validate independently before it reaches a user.
+This is the 3rd post in the AI Safety & Guardrails 101 series. It focuses on treating model output as something you validate independently before it reaches a user.
 
 
 ![Output filtering flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/03/03-01-big-picture.en.png)

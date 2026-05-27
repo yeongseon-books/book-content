@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 The dangerous moment in leader election is not the happy path where one node wins. It is the messy moment where the old leader wakes up late, still thinks it owns the world, and tries to write after a new leader has already taken over.
 
-This is post 7 in the Distributed Systems 101 series.
+This is the 7th post in the Distributed Systems 101 series.
 
 Here we treat leader election as an operational safety problem: leases decide who is allowed to lead, and fencing tokens decide whose writes are still valid.
 

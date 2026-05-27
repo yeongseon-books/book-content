@@ -26,7 +26,7 @@ seo_description: MetaData is a catalog of your schema. It's a container that hol
 
 MetaData is the catalog that holds the schema your application knows about. This post shows why that container becomes the starting point for SQLAlchemy Core.
 
-This is the 2nd article in the SQLAlchemy 101 series.
+This is the 2nd post in the SQLAlchemy 101 series.
 
 > SQLAlchemy 101 series (2/10)
 

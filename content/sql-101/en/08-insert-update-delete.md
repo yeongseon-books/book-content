@@ -26,7 +26,7 @@ So far the series has mostly focused on reading data. Writing data is different.
 
 That is why data-changing SQL is less about syntax and more about safety procedure. Transactions, preview queries, RETURNING, and rollback habits matter as much as the actual INSERT, UPDATE, or DELETE statement.
 
-This is post 8 in the SQL 101 series. Here we focus on how to change rows safely instead of treating DML as just another clause to memorize.
+This is the 8th post in the SQL 101 series. Here we focus on how to change rows safely instead of treating DML as just another clause to memorize.
 
 
 ![sql 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/08/08-01-safe-data-change-flow.en.png)

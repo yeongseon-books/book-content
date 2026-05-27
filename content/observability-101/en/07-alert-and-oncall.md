@@ -26,7 +26,7 @@ More alerts do not make a system safer by default. Once the team stops trusting 
 
 That is why alerting design is partly a technical problem and partly a human one. It spends sleep, focus, and trust, so it must be tied to user impact and clear action.
 
-This is post 7 in the Observability 101 series.
+This is the 7th post in the Observability 101 series.
 
 
 ![observability 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/07/07-01-concept-at-a-glance.en.png)

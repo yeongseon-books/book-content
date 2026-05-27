@@ -22,7 +22,7 @@ last_reviewed: '2026-05-15'
 
 # Object-Oriented Programming 101 (4/10): Inheritance
 
-This is post 4 in the Object-Oriented Programming 101 series.
+This is the 4th post in the Object-Oriented Programming 101 series.
 
 > Object-Oriented Programming 101 Series (4/10)
 

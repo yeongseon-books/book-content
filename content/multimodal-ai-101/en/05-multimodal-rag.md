@@ -25,7 +25,7 @@ seo_description: A typical RAG system splits documents into chunks, embeds them 
 
 Classic text RAG starts to wobble the moment the answer depends on layout, iconography, or visual resemblance. Asking for "the slide where the red warning icon appears" or "the invoice that looks like this photo" is not a chunking problem. It is a representation problem.
 
-This is post 5 in the Multimodal AI 101 series.
+This is the 5th post in the Multimodal AI 101 series.
 
 Here we treat multimodal RAG as a retrieval redesign: what to index, what to keep out of the prompt, and how to keep image-aware search from becoming an expensive latency trap.
 

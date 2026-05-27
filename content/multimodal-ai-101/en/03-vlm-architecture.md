@@ -25,7 +25,7 @@ seo_description: Episode 2 covered CLIP, which aligns image and text in the same
 
 Most VLM discussions get lost in model names too early. The useful question is simpler: once an image encoder has emitted visual features, how do those features enter the LLM without blowing up context length, training cost, or multilingual behavior?
 
-This is post 3 in the Multimodal AI 101 series.
+This is the 3rd post in the Multimodal AI 101 series.
 
 Here we compare the three connection patterns that dominate modern VLMs: simple projection, token compression, and cross-attention insertion.
 

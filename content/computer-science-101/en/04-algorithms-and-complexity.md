@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Code that feels fine on 100 records can collapse in production once the data grows by three orders of magnitude. At that point, the first explanation is rarely “the machine is slow.” It is usually that the algorithmic cost was hidden while the input stayed small.
 
-This is post 4 in the Computer Science 101 series.
+This is the 4th post in the Computer Science 101 series.
 
 In this article, we'll define algorithms, read time and space complexity, and show how data-structure choice changes performance long before micro-optimization matters.
 

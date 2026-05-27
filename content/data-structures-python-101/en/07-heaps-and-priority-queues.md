@@ -28,7 +28,7 @@ last_reviewed: '2026-05-04'
 
 > A heap retrieves the minimum or maximum in O(1) and inserts or removes in O(log n). Python's heapq module makes heaps easy to use. This article covers heap internals, heapq usage, and priority queue patterns.
 
-This is post 7 in the Data Structures with Python 101 series.
+This is the 7th post in the Data Structures with Python 101 series.
 
 
 ![Data Structures with Python 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/07/07-01-big-picture.en.png)

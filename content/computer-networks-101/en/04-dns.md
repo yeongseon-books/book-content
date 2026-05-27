@@ -29,7 +29,7 @@ last_reviewed: '2026-05-15'
 
 > DNS is a "name to address" translation system. It is not a single server but a worldwide hierarchy — root, TLD, authoritative — with resolvers and caches in between so the same query is not repeated. That caching is both the source of the Internet's speed and the source of its most frequent incidents.
 
-This is post 4 in the Computer Networks 101 series.
+This is the 4th post in the Computer Networks 101 series.
 
 
 ![computer networks 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/04/04-01-concept-at-a-glance.en.png)

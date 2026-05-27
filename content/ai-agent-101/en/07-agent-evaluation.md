@@ -26,7 +26,7 @@ What's harder than building an agent is evaluating "whether this agent works pro
 
 Agent evaluation is divided into three levels. Individual tool call accuracy (Tool Use Accuracy), task path efficiency (Trajectory Evaluation), and final result accuracy (End-to-End Success Rate).
 
-This is post 7 in the AI Agent 101 series. Here we cover agent evaluation metrics, trajectory evaluation methods, tool calling accuracy measurement, end-to-end test strategies, and benchmarking methods.
+This is the 7th post in the AI Agent 101 series. Here we cover agent evaluation metrics, trajectory evaluation methods, tool calling accuracy measurement, end-to-end test strategies, and benchmarking methods.
 
 ![Evaluation signal path](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/07/07-01-evaluation-signal-path.en.png)
 *Evaluation signal path*

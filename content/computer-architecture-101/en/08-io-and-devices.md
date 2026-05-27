@@ -29,7 +29,7 @@ last_reviewed: '2026-05-04'
 
 > The CPU is fast and devices are slow. Keyboards live at human speed, disks at milliseconds, networks somewhere beyond. Polling, interrupts, and DMA are the mechanisms that bridge the gap, and memory-mapped I/O is how the CPU sees a device as just another set of addresses. This article looks inside, and ties together the starting point for every system call and every async program.
 
-This is post 8 in the Computer Architecture 101 series.
+This is the 8th post in the Computer Architecture 101 series.
 
 
 ![computer architecture 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/08/08-01-big-picture.en.png)

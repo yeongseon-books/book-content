@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 When authentication fails, every permission layered on top of it fails with it. Weak password hashing, overly long-lived tokens, missing cookie flags, and login flows that reveal whether an account exists all create quiet failures that often stay invisible until the first takeover or credential-stuffing wave lands.
 
-This is post 3 in the Secure Coding 101 series.
+This is the 3rd post in the Secure Coding 101 series.
 
 Here, we will separate two concerns that are easy to blur together: proving who the user is and remembering that proof safely on later requests. Once you keep those apart, the trade-offs between session cookies and JWTs, logout design, MFA placement, and rate limiting become much easier to reason about.
 

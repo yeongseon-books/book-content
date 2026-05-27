@@ -25,7 +25,7 @@ seo_description: The quality of any multimodal system ultimately rides on the qu
 
 Many teams jump straight to GPT-4o, Qwen2-VL, or LLaVA because that is where the user-visible magic happens. But most multimodal quality issues start lower in the stack. If the image encoder loses the wrong detail, every downstream classifier, retriever, and VLM adapter inherits the mistake.
 
-This is post 2 in the Multimodal AI 101 series.
+This is the 2nd post in the Multimodal AI 101 series.
 
 Here we focus on the layer that turns pixels into something searchable and comparable: ViT as the tokenization scheme for images, and CLIP as the shared space that lets text and images meet.
 

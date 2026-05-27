@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 A function sometimes appears to remember variables from the place it was defined. At first that feels like magic. In practice it is the natural result of the scope rules from the previous chapter meeting the fact that functions can be treated as values.
 
-This is post 5 in the Programming Languages 101 series.
+This is the 5th post in the Programming Languages 101 series.
 
 In this post, we will treat closures as an ordinary consequence of lexical scope plus first-class functions. Once you see that a closure captures bindings rather than copied values, callbacks, decorators, and late-binding bugs all become much easier to reason about.
 

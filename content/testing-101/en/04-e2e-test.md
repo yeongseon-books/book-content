@@ -26,7 +26,7 @@ It is entirely possible for the UI team to say the page renders, the backend tea
 
 They are expensive because they run through the most surface area: browser, frontend, backend, and storage. That cost is precisely why they need to be selective and operationally disciplined.
 
-This is post 4 in the Testing 101 series. Here we walk through the role of E2E tests, build a first Playwright scenario, and focus on the maintenance habits that keep browser tests from turning flaky and slow.
+This is the 4th post in the Testing 101 series. Here we walk through the role of E2E tests, build a first Playwright scenario, and focus on the maintenance habits that keep browser tests from turning flaky and slow.
 
 > E2E is the user’s final contract with your system. Treat it as a scarce but high-value signal.
 

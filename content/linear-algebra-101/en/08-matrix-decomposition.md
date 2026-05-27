@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Once you work with matrices long enough, direct manipulation starts to hit limits. Computing an inverse can be slow or unstable, and different problems prefer different computational paths. Matrix decomposition enters at that point: break one complicated matrix into pieces that are easier to solve with, interpret, or approximate.
 
-This is post 8 in the Linear Algebra 101 series. Here we will place LU, QR, eigendecomposition, and SVD on the same map.
+This is the 8th post in the Linear Algebra 101 series. Here we will place LU, QR, eigendecomposition, and SVD on the same map.
 
 
 ![linear algebra 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/08/08-01-concept-at-a-glance.en.png)

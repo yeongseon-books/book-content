@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 So far in this series, we've built the math behind derivatives, partial derivatives, gradients, the chain rule, loss, and optimization. The remaining practical question is computational: how do you produce gradients for thousands or millions of weights without numerically perturbing each one?
 
-This is post 9 in the Calculus for ML 101 series.
+This is the 9th post in the Calculus for ML 101 series.
 
 In this post, we'll use computation graphs, forward and backward passes, local derivatives, and gradient accumulation to explain backpropagation. The goal is not to reimplement a deep learning framework, but to understand why one backward pass can still recover the full gradient efficiently.
 

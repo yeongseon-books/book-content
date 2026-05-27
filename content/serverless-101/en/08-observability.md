@@ -26,7 +26,7 @@ Serverless systems are short-lived and distributed. One user request may cross m
 
 Observability is the discipline that turns those short-lived hops into something you can still debug. In serverless, that means connecting logs, metrics, and traces well enough that you can reconstruct what happened after the fact.
 
-This is post 8 in the Serverless 101 series.
+This is the 8th post in the Serverless 101 series.
 
 
 ![serverless 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/08/08-01-concept-at-a-glance.en.png)

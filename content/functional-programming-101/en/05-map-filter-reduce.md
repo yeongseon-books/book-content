@@ -22,7 +22,7 @@ last_reviewed: '2026-05-04'
 
 # Functional Programming 101 (5/10): map, filter, reduce
 
-This is post 5 in the Functional Programming 101 series.
+This is the 5th post in the Functional Programming 101 series.
 
 > Functional Programming 101 Series (5/10)
 

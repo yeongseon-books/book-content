@@ -26,7 +26,7 @@ Wall-clock time on your laptop is not a reliable way to judge an algorithm. Hard
 
 Big-O gives you a practical language for comparing that growth before the code ever reaches production or an interview whiteboard.
 
-This is post 2 in the Algorithms with Python 101 series. Here, we'll build an intuition for time complexity and use Big-O notation to compare algorithms more rigorously.
+This is the 2nd post in the Algorithms with Python 101 series. Here, we'll build an intuition for time complexity and use Big-O notation to compare algorithms more rigorously.
 
 
 ![Algorithms with Python 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/02/02-01-big-picture.en.png)

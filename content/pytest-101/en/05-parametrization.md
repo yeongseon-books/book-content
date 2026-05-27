@@ -22,7 +22,7 @@ last_reviewed: '2026-05-04'
 
 # pytest 101 (5/10): Parametrization
 
-This is post 5 in the pytest 101 series.
+This is the 5th post in the pytest 101 series.
 
 > pytest 101 series (5/10)
 

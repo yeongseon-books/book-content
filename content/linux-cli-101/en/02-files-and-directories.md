@@ -26,7 +26,7 @@ seo_description: The Linux file system is a giant tree that starts from a single
 
 Most server work is not glamorous. You move release bundles, back up config files, clean up logs, and figure out where a missing file actually lives. If your path sense is weak, even simple maintenance work slows down fast.
 
-This is post 2 in the Linux CLI 101 series.
+This is the 2nd post in the Linux CLI 101 series.
 
 
 ![Linux CLI 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/02/02-01-big-picture.en.png)

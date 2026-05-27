@@ -24,7 +24,7 @@ last_reviewed: '2026-05-04'
 
 During development, frontend code lives as dozens or hundreds of separate files. Browsers do not consume that source tree directly. Something has to resolve the import graph, transform the syntax, split the output, and emit files that are fast to download and easy to cache. That "something" is the build toolchain.
 
-This is post 9 in the Frontend Development 101 series. Here we treat build tools as a performance layer, not just as developer convenience. The shape of the bundle is one of the clearest predictors of how quickly a user sees and uses the first screen.
+This is the 9th post in the Frontend Development 101 series. Here we treat build tools as a performance layer, not just as developer convenience. The shape of the bundle is one of the clearest predictors of how quickly a user sees and uses the first screen.
 
 
 ![frontend development 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/09/09-01-concept-at-a-glance.en.png)

@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 A Dockerfile is not just a text file that happens to build an image. Instruction order changes cache hit rate, base-image choice changes image size and CVE count, and one user directive can change the security posture of the runtime.
 
-This is post 4 in the Containers 101 series.
+This is the 4th post in the Containers 101 series.
 
 In this chapter, we focus on cache-friendly instruction order, multi-stage builds, non-root defaults, and secret handling so the resulting image is faster, smaller, and safer to ship.
 

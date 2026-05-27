@@ -26,7 +26,7 @@ The most common failure in concept writing is accuracy without traction. The def
 
 Useful concept writing needs more than a polished sentence. It needs a boundary. That usually means pairing a definition with an analogy, a counterexample, and a worked example so the reader can test the idea instead of just memorizing it.
 
-This is post 4 in the Technical Writing 101 series. Here we build that four-part concept explanation pattern.
+This is the 4th post in the Technical Writing 101 series. Here we build that four-part concept explanation pattern.
 
 
 ![technical writing 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/04/04-01-concept-at-a-glance.en.png)

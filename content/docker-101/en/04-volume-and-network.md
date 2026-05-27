@@ -26,7 +26,7 @@ Running one container is the easy part. The real operational questions begin as 
 
 Docker gives you separate tools for the two problems on purpose. Volumes control data lifetime. Networks control communication paths. Keeping those concerns separate is what prevents “the database disappeared” and “the app cannot find the database” from becoming routine incidents.
 
-This is post 4 in the Docker 101 series. It focuses on when to use named volumes, bind mounts, and user-defined bridge networks, plus the concrete checks you should run before you trust persistence or name-based communication.
+This is the 4th post in the Docker 101 series. It focuses on when to use named volumes, bind mounts, and user-defined bridge networks, plus the concrete checks you should run before you trust persistence or name-based communication.
 
 
 ![docker 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/04/04-01-concept-at-a-glance.en.png)

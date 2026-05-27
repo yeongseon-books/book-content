@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Even a strong project makes a weak first impression if the README is confusing. In open source, the README is the product page, installation guide, and often the first indicator of a maintainer's care. Most visitors read it before they read the code.
 
-This is post 5 in the Open Source 101 series.
+This is the 5th post in the Open Source 101 series.
 
 Here, we will define a good README as the document that helps a first-time visitor understand and run the project within the first five minutes.
 

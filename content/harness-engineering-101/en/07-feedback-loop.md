@@ -25,7 +25,7 @@ Agents frequently fail on the first attempt. They choose the wrong tool, pass th
 
 Retrying blindly is usually just a cost amplifier. Returning the raw failure to the user is even worse. Productive feedback loops classify failure, choose the right recovery path, and stop before one task turns into an unbounded loop.
 
-This is post 7 in the Harness Engineering 101 series. Here we treat failure as structured input for the next attempt rather than as the end of the run.
+This is the 7th post in the Harness Engineering 101 series. Here we treat failure as structured input for the next attempt rather than as the end of the run.
 
 ![Feedback loops - building structures that let agents recover from failure](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/07/07-01-feedback-loops-building-structures-that.en.png)
 *Feedback loops - building structures that let agents recover from failure*

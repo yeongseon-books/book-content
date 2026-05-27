@@ -28,7 +28,7 @@ last_reviewed: '2026-05-04'
 
 > list implements stacks efficiently, but using list as a queue means popping from the front is O(n). This article covers the concepts of stack (LIFO) and queue (FIFO), Python implementations, and efficient queue implementation with deque.
 
-This is post 3 in the Data Structures with Python 101 series.
+This is the 3rd post in the Data Structures with Python 101 series.
 
 
 ![Data Structures with Python 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/03/03-01-big-picture.en.png)

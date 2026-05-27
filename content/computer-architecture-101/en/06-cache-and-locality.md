@@ -29,7 +29,7 @@ last_reviewed: '2026-05-04'
 
 > The speed gap between the CPU and main memory is more than 100x. Caches close that gap, but caches only help if your code respects temporal and spatial locality. This article covers how caches work, the two kinds of locality, and the difference between cache-friendly and cache-hostile code.
 
-This is post 6 in the Computer Architecture 101 series.
+This is the 6th post in the Computer Architecture 101 series.
 
 
 ![computer architecture 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/06/06-01-big-picture.en.png)

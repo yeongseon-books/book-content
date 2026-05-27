@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 Time and space complexity describe how an algorithm's cost grows with input size. They abstract away hardware, language, and constants so we can compare algorithms on equal footing. Once you can read the asymptotic class of an algorithm at a glance, you can decide whether it scales before writing it.
 
-This is post 2 in the Algorithms 101 series. Here we cover Big-O and related notation, plus the cost model you need to compare algorithms before you benchmark them.
+This is the 2nd post in the Algorithms 101 series. Here we cover Big-O and related notation, plus the cost model you need to compare algorithms before you benchmark them.
 
 
 ![algorithms 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/02/02-01-big-picture.en.png)

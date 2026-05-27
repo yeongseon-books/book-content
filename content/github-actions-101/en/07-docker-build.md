@@ -26,7 +26,7 @@ Docker build is usually the slowest and most failure-prone stage in a GitHub Act
 
 That is why container automation is not just “run `docker build` in CI.” It is a design problem that combines Buildx, cache layout, registry authentication, and branch-specific push policy.
 
-This is post 7 in the GitHub Actions 101 series. In this post, we will build a practical Docker workflow around Buildx, GitHub Actions cache, GHCR authentication, multi-platform builds, and tagging strategy.
+This is the 7th post in the GitHub Actions 101 series. In this post, we will build a practical Docker workflow around Buildx, GitHub Actions cache, GHCR authentication, multi-platform builds, and tagging strategy.
 
 
 ![github actions 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/07/07-01-concept-at-a-glance.en.png)

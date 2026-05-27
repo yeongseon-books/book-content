@@ -26,7 +26,7 @@ Agent behavior is determined by context. System prompts, conversation history, t
 
 Context engineering is the process of clearly telling the agent "who you are, what you should do, how you should behave, and what you shouldn't do." It's not just about writing good prompts—it's about designing the entire environment in which the agent operates.
 
-This is post 2 in the AI Agent 101 series. Here we cover context components, system prompt writing principles, role definition methods, knowledge boundary setting, and context injection patterns.
+This is the 2nd post in the AI Agent 101 series. Here we cover context components, system prompt writing principles, role definition methods, knowledge boundary setting, and context injection patterns.
 
 ![Context map](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/02/02-01-context-map.en.png)
 *Context map*

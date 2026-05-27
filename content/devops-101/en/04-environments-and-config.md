@@ -26,7 +26,7 @@ Teams usually notice configuration discipline only after it breaks. The applicat
 
 Good configuration management prevents that drift. The code stays the same, the build artifact stays the same, and only environment-specific values change. That is what makes deployments repeatable instead of fragile.
 
-This is post 4 in the DevOps 101 series. Here we look at how to separate code from configuration, treat secrets differently from ordinary settings, and keep environment changes reviewable.
+This is the 4th post in the DevOps 101 series. Here we look at how to separate code from configuration, treat secrets differently from ordinary settings, and keep environment changes reviewable.
 
 
 ![devops 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/04/04-01-concept-at-a-glance.en.png)

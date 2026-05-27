@@ -26,7 +26,7 @@ A few `docker run` commands are manageable when you have only one service. The m
 
 Compose matters because it turns that memory into a checked-in declaration. Services, ports, volumes, healthchecks, and optional profiles become reviewable configuration instead of setup folklore.
 
-This is post 5 in the Docker 101 series. It shows how to express a multi-container environment in Compose, what `depends_on` can and cannot guarantee, and which verification steps tell you the stack is actually ready.
+This is the 5th post in the Docker 101 series. It shows how to express a multi-container environment in Compose, what `depends_on` can and cannot guarantee, and which verification steps tell you the stack is actually ready.
 
 
 ![docker 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/05/05-01-concept-at-a-glance.en.png)

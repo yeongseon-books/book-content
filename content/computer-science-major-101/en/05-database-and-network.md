@@ -29,7 +29,7 @@ last_reviewed: '2026-05-14'
 
 > *Data* is *stored* and the *network* *delivers* it — together they *are* the service.
 
-This is post 5 in the Computer Science Major 101 series.
+This is the 5th post in the Computer Science Major 101 series.
 
 
 ![computer science major 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/05/05-01-request-to-database-flow.en.png)

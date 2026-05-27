@@ -22,7 +22,7 @@ last_reviewed: '2026-05-17'
 
 # Model Evaluation 101 (4/10): Precision and Recall
 
-This is post 4 in the Model Evaluation 101 series.
+This is the 4th post in the Model Evaluation 101 series.
 
 Issue #772 called out that this chapter repeated the same mid-series narrative rhythm as its neighbors. The real weakness was not the definitions. It was that `ko/04-precision-and-recall.md:43-68` never centered the question an operator actually asks: **what happens if we lower the threshold, and what do we give up if we raise it?**
 

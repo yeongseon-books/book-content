@@ -26,7 +26,7 @@ Networks, maps, dependency trees, and recommendation systems all reduce to relat
 
 BFS and DFS are the two foundational traversal strategies. If you can tell when to use each one, shortest paths, cycle checks, and connected-component problems become much easier to reason about.
 
-This is post 7 in the Algorithms with Python 101 series. Here, we'll represent graphs in Python and implement both BFS and DFS with practical use cases in mind.
+This is the 7th post in the Algorithms with Python 101 series. Here, we'll represent graphs in Python and implement both BFS and DFS with practical use cases in mind.
 
 
 ![Algorithms with Python 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/07/07-01-concept-overview.en.png)

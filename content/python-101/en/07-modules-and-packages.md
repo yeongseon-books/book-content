@@ -26,6 +26,8 @@ seo_description: A module in Python is "a namespace that is loaded once and cach
 
 In Python, a module is a namespace that is loaded once and cached, and a package is the directory-level unit that groups related modules. Once you see what `import` really loads and names, project structure becomes less mysterious.
 
+This is the 7th post in the Python 101 series.
+
 This post is the 7th article in the Python 101 series. This is the part of the series where single files turn into a real project layout.
 
 

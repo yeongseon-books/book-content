@@ -25,7 +25,7 @@ Azure Container Apps makes rollout mechanics look gentler than they are. You upd
 
 That surface is clean because the product hides several lower-level steps. An immutable revision has to be created, it has to become active, and somewhere in the request path those weights have to become real routing behavior.
 
-This is post 3 in the Azure Container Apps Deep Dive series. Here, I trace how revision immutability and traffic splitting most likely meet at the Envoy routing layer.
+This is the 3rd post in the Azure Container Apps Deep Dive series. Here, I trace how revision immutability and traffic splitting most likely meet at the Envoy routing layer.
 
 ## Source Version
 

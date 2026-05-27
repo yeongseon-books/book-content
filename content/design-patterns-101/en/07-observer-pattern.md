@@ -25,7 +25,7 @@ last_reviewed: '2026-05-23'
 
 When an order is submitted, the system sends an email, posts to Slack, and reserves warehouse inventory. At first it is three lines inside `Order.submit()`. A month later SMS notifications arrive, then analytics tracking, then loyalty points. Now `Order` knows more about downstream side effects than about orders themselves. If one side effect slows down, the entire order slows down. If one side effect throws, the order fails. I have watched this happen across multiple projects.
 
-This is the seventh article in the Design Patterns 101 series. Article 4 introduced Observer at overview level; here we go deeper into sync vs async differences, memory leaks, error isolation, and the boundary with message queues.
+This is the 7th post in the Design Patterns 101 series. Article 4 introduced Observer at overview level; here we go deeper into sync vs async differences, memory leaks, error isolation, and the boundary with message queues.
 
 ![Observer pattern: decoupling publisher from subscribers](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/07/07-01-concept-at-a-glance.en.png)
 *A publisher propagates events without knowing who listens*

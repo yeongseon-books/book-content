@@ -23,7 +23,7 @@ seo_description: An agent is a controller that lets the model choose tool-call p
 
 Some problems stop fitting a fixed chain the moment the next step depends on what the model discovers during execution. At that point, the real design question is not whether agents are powerful, but how narrowly you can define the tool choices and the control loop around them.
 
-This is post 4 in the AI App Patterns 101 series. Here we examine when the agent-and-tool pattern is justified and how to make tool selection observable and debuggable.
+This is the 4th post in the AI App Patterns 101 series. Here we examine when the agent-and-tool pattern is justified and how to make tool selection observable and debuggable.
 
 ![Fixed chain versus dynamic agent](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/04/04-01-fixed-chain-versus-dynamic-agent.en.png)
 *Fixed chain versus dynamic agent*

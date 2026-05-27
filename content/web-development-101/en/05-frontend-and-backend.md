@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 New developers often memorize technology names before they learn responsibility boundaries. That makes it easy to build something that works once and much harder to keep data ownership, authorization, and rendering decisions clean when the product grows.
 
-This is post 5 in the Web Development 101 series. Here we draw the boundary between frontend and backend around source of truth, rendering style, and API contracts so full-stack decisions become easier to justify.
+This is the 5th post in the Web Development 101 series. Here we draw the boundary between frontend and backend around source of truth, rendering style, and API contracts so full-stack decisions become easier to justify.
 
 
 ![web development 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/05/05-01-concept-at-a-glance.en.png)

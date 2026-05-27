@@ -27,7 +27,7 @@ User code cannot touch the disk controller or network card directly. Every reque
 
 System calls are also where performance, debugging, and security meet. Once you can see them, many OS-level mysteries stop being mysterious.
 
-This is post 9 in the Operating Systems 101 series. It explains the user/kernel boundary, syscall cost, how to inspect real calls, and how batching and vDSO reduce overhead.
+This is the 9th post in the Operating Systems 101 series. It explains the user/kernel boundary, syscall cost, how to inspect real calls, and how batching and vDSO reduce overhead.
 
 
 ![operating systems 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/09/09-01-the-privilege-boundary-a-syscall-crosses.en.png)

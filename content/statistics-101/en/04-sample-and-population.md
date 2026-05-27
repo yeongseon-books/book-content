@@ -26,7 +26,7 @@ Statistics usually begins without complete information. We cannot survey every c
 
 The hard part is representativeness. If the sample does not resemble the population closely enough, even a careful analysis starts from the wrong place.
 
-This is post 4 in the Statistics 101 series. Here we will clarify the relationship between population, sample, parameter, and statistic, then explain why random sampling and sampling bias sit at the foundation of statistical work.
+This is the 4th post in the Statistics 101 series. Here we will clarify the relationship between population, sample, parameter, and statistic, then explain why random sampling and sampling bias sit at the foundation of statistical work.
 
 
 ![statistics 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/04/04-01-concept-at-a-glance.en.png)

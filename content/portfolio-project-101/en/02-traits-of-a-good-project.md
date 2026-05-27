@@ -26,7 +26,7 @@ It is tempting to think a portfolio project becomes stronger as you keep adding 
 
 The projects that leave a strong impression are rarely the biggest ones. They are the ones that stay focused, reach a clear endpoint, and make their outcome easy to verify.
 
-This is post 2 in the Portfolio Project 101 series. Here we will look at the traits that make a project feel strong from a hiring perspective, and why completion, clarity, and reproducibility usually matter more than sheer feature count.
+This is the 2nd post in the Portfolio Project 101 series. Here we will look at the traits that make a project feel strong from a hiring perspective, and why completion, clarity, and reproducibility usually matter more than sheer feature count.
 
 ---
 

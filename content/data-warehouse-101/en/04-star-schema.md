@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Analytical models become fragile the moment every answer needs another hop through another lookup table. A star schema works because it keeps the path from question to answer short enough that both humans and BI tools can follow it without hesitation.
 
-This is post 4 in the Data Warehouse 101 series.
+This is the 4th post in the Data Warehouse 101 series.
 
 In this post, we look at why the star shape became the default warehouse pattern, where it beats further normalization, and how its simplicity turns directly into faster drill-downs and clearer SQL.
 

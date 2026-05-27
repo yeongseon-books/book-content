@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Data flow becomes painful when values change silently in the middle of the request and no one can explain where the mutation happened. That is a design problem long before it becomes a debugging problem.
 
-This is post 7 in the Software Design 101 series.
+This is the 7th post in the Software Design 101 series.
 
 In this post, we design the path from input to output so each transformation step stays visible. The goal is to make data move one way, keep side effects at the edge, and make debugging a step-by-step question instead of a scavenger hunt.
 

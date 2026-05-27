@@ -26,7 +26,7 @@ In statistical work, we constantly run into questions about differences. Did the
 
 Hypothesis testing exists because visible differences are not automatically meaningful differences. Samples always wobble. Without a formal procedure, it is easy to mistake random fluctuation for evidence.
 
-This is post 7 in the Statistics 101 series. Here we will define the null and alternative hypotheses, walk through the basic t-test flow, and explain why Type I error, Type II error, and statistical power matter in real decision-making.
+This is the 7th post in the Statistics 101 series. Here we will define the null and alternative hypotheses, walk through the basic t-test flow, and explain why Type I error, Type II error, and statistical power matter in real decision-making.
 
 
 ![statistics 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/07/07-01-concept-at-a-glance.en.png)

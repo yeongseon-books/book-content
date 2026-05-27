@@ -26,7 +26,7 @@ Configuration is where reproducibility quietly breaks. If a team builds one imag
 
 The better model is simpler: keep the image immutable and move environment-specific behavior to runtime configuration. That is also where secret handling becomes a security decision instead of a convenience shortcut.
 
-This is post 6 in the Docker 101 series. It covers the contract between image and environment, including `ENV` vs `ARG`, runtime injection patterns, secret externalization, and the startup checks that keep missing variables from becoming late incidents.
+This is the 6th post in the Docker 101 series. It covers the contract between image and environment, including `ENV` vs `ARG`, runtime injection patterns, secret externalization, and the startup checks that keep missing variables from becoming late incidents.
 
 
 ![docker 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/06/06-01-concept-at-a-glance.en.png)

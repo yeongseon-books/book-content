@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Duplication is expensive, but wrong abstractions are expensive in a different way. The hard part is not spotting repetition. It is proving that the same knowledge really changes together.
 
-This is post 5 in the Clean Code 101 series.
+This is the 5th post in the Clean Code 101 series.
 
 Here we will separate shared change reasons from accidental similarity, then verify when extraction, parameterization, or a data table actually reduces future maintenance cost.
 

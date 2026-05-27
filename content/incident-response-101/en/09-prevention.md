@@ -26,7 +26,7 @@ An incident is not truly closed when the postmortem is published. It is closed w
 
 Teams that stop at documentation keep relearning the same lesson. Teams that attach regression tests, guardrails, and review loops turn each incident into a measurable reliability improvement.
 
-This is post 9 in the Incident Response 101 series. This post explains how to prioritize prevention work and how to make follow-up items survive beyond the week after the outage.
+This is the 9th post in the Incident Response 101 series. This post explains how to prioritize prevention work and how to make follow-up items survive beyond the week after the outage.
 
 
 ![incident response 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/09/09-01-diagram-at-a-glance.en.png)

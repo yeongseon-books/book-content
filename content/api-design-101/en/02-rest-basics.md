@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Two APIs can both look "REST-ish" in screenshots and still feel completely different in production. The difference is usually not the path shape alone. It is whether the client can predict what each call means without re-learning the rules every time.
 
-This is post 2 in the API Design 101 series.
+This is the 2nd post in the API Design 101 series.
 
 Here, we treat REST as a set of architectural constraints rather than a fashionable URL style. That is the lens you need before resource design, method selection, caching, and documentation start to reinforce each other.
 

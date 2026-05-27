@@ -26,7 +26,7 @@ Episode 1 drew the stack. This episode narrows the focus to one resource that lo
 
 If you keep one sentence from the Microsoft Learn documentation in your head, make it this one: the environment is the secure boundary around one or more container apps and jobs. That single idea explains network scope, logging scope, and where Dapr components are shared.
 
-This is post 2 in the Azure Container Apps Deep Dive series. Here, I read the Container Apps environment as the isolation boundary for networking, observability, and Dapr scope.
+This is the 2nd post in the Azure Container Apps Deep Dive series. Here, I read the Container Apps environment as the isolation boundary for networking, observability, and Dapr scope.
 
 ## Source Version
 

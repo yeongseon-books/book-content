@@ -25,7 +25,7 @@ last_reviewed: '2026-05-14'
 
 Strong experience still gets ignored if it is hard to scan. Hiring teams usually decide within the first minute whether to keep reading, so the first job of a resume is not to tell your whole story. It is to make your role, your best evidence, and your likely interview topics obvious at a glance.
 
-This is post 4 in the Developer Career 101 series.
+This is the 4th post in the Developer Career 101 series.
 
 
 ![developer career 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/04/04-01-concept-at-a-glance.en.png)

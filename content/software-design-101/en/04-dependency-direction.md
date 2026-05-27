@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 The expensive part of a dependency is not the line of code that imports something. It is the direction of the arrow and who now has to absorb future change.
 
-This is post 4 in the Software Design 101 series.
+This is the 4th post in the Software Design 101 series.
 
 In this post, we look at dependency direction as the mechanism that keeps a stable core from depending on volatile details. DIP and ports-and-adapters matter because they buy freedom where vendors, databases, and SDKs churn fastest.
 

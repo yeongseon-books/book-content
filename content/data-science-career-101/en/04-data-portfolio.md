@@ -26,7 +26,7 @@ One of the fastest ways to weaken a data portfolio is to mistake code volume for
 
 Strong portfolios do something simpler and harder: they show a problem worth solving, a clean path through the data, a result that matters, and a reproducible way for someone else to inspect the work. That combination tells a much stronger story than “here is a model I trained.”
 
-This is post 4 in the Data Science Career 101 series.
+This is the 4th post in the Data Science Career 101 series.
 
 
 ![data science career 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/04/04-01-concept-at-a-glance.en.png)

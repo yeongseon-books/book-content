@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 A README alone is not enough. A portfolio project becomes much more convincing when another person can click around and feel the value directly. If there is no demo, or if the first screen is empty, or if the login step blocks everything, the reviewer often leaves before the project has a chance to explain itself.
 
-This is post 4 in the Portfolio Project 101 series. Here we will treat the demo not as a feature showroom, but as a short experience that lets a first-time visitor understand the core value within the first few clicks.
+This is the 4th post in the Portfolio Project 101 series. Here we will treat the demo not as a feature showroom, but as a short experience that lets a first-time visitor understand the core value within the first few clicks.
 
 ---
 

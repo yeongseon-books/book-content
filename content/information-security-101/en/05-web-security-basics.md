@@ -29,7 +29,7 @@ last_reviewed: '2026-05-04'
 
 > Browser security revolves around the concept of origin. Once origin clicks, CORS, CSP, and cookies all line up.
 
-This is post 5 in the Information Security 101 series.
+This is the 5th post in the Information Security 101 series.
 
 
 ![information security 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/05/05-01-big-picture.en.png)

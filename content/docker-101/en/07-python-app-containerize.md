@@ -26,7 +26,7 @@ A Python app running inside a container is not the same thing as a production-re
 
 Those details are easy to skip because the app still starts without them. They only become visible when a deployment drains live traffic, a container hangs on shutdown, or an orchestrator keeps restarting something that looked healthy on a laptop.
 
-This is post 7 in the Docker 101 series. It turns a simple FastAPI example into an operationally credible container by focusing on PID 1, signals, healthchecks, and least-privilege execution.
+This is the 7th post in the Docker 101 series. It turns a simple FastAPI example into an operationally credible container by focusing on PID 1, signals, healthchecks, and least-privilege execution.
 
 
 ![docker 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/07/07-01-concept-at-a-glance.en.png)

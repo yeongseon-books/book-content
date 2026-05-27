@@ -26,7 +26,7 @@ seo_description: '[col1, col2, col3] row_factory │ ─────────
 
 Tuple-shaped rows are fast, but they turn schema changes and type drift into subtle bugs. This post shows how row factories and adapters let you centralize both result shape and value conversion before the repository layer gets messy.
 
-This is the 6th article in the Python DB-API 101 series.
+This is the 6th post in the Python DB-API 101 series.
 
 ![Row factories and type adapters (sqlite3, PEP 249)](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-01-row-factories-and-type-adapters-sqlite3.en.png)
 

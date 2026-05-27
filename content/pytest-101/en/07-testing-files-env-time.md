@@ -22,7 +22,7 @@ last_reviewed: '2026-05-04'
 
 # pytest 101 (7/10): Testing Files, Environment Variables, and Time
 
-This is post 7 in the pytest 101 series.
+This is the 7th post in the pytest 101 series.
 
 > pytest 101 series (7/10)
 

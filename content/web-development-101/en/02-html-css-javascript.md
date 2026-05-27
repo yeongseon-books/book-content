@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 At first glance, splitting one page across three languages can feel like unnecessary ceremony. In practice, though, every production frontend becomes easier to debug once you can answer three separate questions: what is the structure, what controls the visual result, and what changes behavior after the page loads.
 
-This is post 2 in the Web Development 101 series. Here we separate structure, style, and behavior on purpose so you can see why maintainable frontend code starts with clear responsibility boundaries rather than clever framework tricks.
+This is the 2nd post in the Web Development 101 series. Here we separate structure, style, and behavior on purpose so you can see why maintainable frontend code starts with clear responsibility boundaries rather than clever framework tricks.
 
 
 ![web development 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/02/02-01-concept-at-a-glance.en.png)

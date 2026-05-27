@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Containers are easy to replace because their local filesystem is disposable. That convenience becomes a liability the moment your workload owns state that cannot disappear on the next reschedule.
 
-This is post 7 in the Kubernetes 101 series.
+This is the 7th post in the Kubernetes 101 series.
 
 Here, we will connect Volumes, PersistentVolumeClaims, and StorageClasses into one storage model so you can separate Pod lifetime from data lifetime before stateful workloads become fragile.
 

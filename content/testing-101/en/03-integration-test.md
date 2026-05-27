@@ -26,7 +26,7 @@ A fully green unit-test suite can still leave you staring at a production 500. T
 
 Integration tests exist to exercise those seams on purpose. They cost more than unit tests, but they catch the exact kinds of contract drift that only appear once components start touching each other.
 
-This is post 3 in the Testing 101 series. Here we show what integration tests verify, when to use a real DB or HTTP layer, and how to keep the suite useful without turning every PR into a long wait.
+This is the 3rd post in the Testing 101 series. Here we show what integration tests verify, when to use a real DB or HTTP layer, and how to keep the suite useful without turning every PR into a long wait.
 
 > Unit tests validate parts in isolation. Integration tests validate whether the assembled path still behaves like one coherent system.
 

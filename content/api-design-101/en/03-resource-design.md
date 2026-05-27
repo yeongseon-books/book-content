@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Public URLs usually outlive the database tables and controller names that inspired them. A sloppy path chosen in week one can still be sitting in SDKs, logs, dashboards, and customer code a year later.
 
-This is post 3 in the API Design 101 series.
+This is the 3rd post in the API Design 101 series.
 
 Here, we treat a good REST path as the output of a solid resource model rather than a naming exercise. Once the resource boundary, hierarchy, and identifier strategy are clear, methods, docs, and caching rules become much easier to keep coherent.
 

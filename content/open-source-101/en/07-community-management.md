@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Open source projects are not sustained by code alone. At first, features and docs seem like the primary concern. Once users and contributors arrive, the way the community is run begins to shape the project's mood and long-term survival. Slow responses, unclear boundaries, and neglect of first-time contributors can drive people away even when the code is strong.
 
-This is post 7 in the Open Source 101 series.
+This is the 7th post in the Open Source 101 series.
 
 Here, we will focus on the practical basics of community management: code of conduct, contribution guide, discussion spaces, response expectations, and visible welcome habits.
 

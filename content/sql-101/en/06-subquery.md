@@ -26,7 +26,7 @@ Real SQL rarely stays flat. One question turns into a smaller question about big
 
 Subqueries and CTEs are the tools that let you split that complexity into readable steps. They matter less because they are advanced syntax and more because they let you express a multi-stage thought process without losing control of the result.
 
-This is post 6 in the SQL 101 series. Here we focus on breaking layered questions into SQL that another engineer can still read from top to bottom.
+This is the 6th post in the SQL 101 series. Here we focus on breaking layered questions into SQL that another engineer can still read from top to bottom.
 
 
 ![sql 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/06/06-01-subquery-layering-flow.en.png)

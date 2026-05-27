@@ -27,7 +27,7 @@ Concurrency bugs are usually quiet in development and loud in production. They p
 
 What makes race conditions hard is not that they fail once, but that the result depends on interleaving you did not explicitly write.
 
-This is post 4 in the Operating Systems 101 series. It explains race conditions through atomicity, visibility, and ordering so you can describe the bug before you try to fix it.
+This is the 4th post in the Operating Systems 101 series. It explains race conditions through atomicity, visibility, and ordering so you can describe the bug before you try to fix it.
 
 
 ![operating systems 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/04/04-01-how-one-increment-gets-lost.en.png)

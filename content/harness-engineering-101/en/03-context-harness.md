@@ -25,7 +25,7 @@ Teams often assume context is free: add more chat history, more retrieved docume
 
 An agent does not see one abstract “window.” It sees a contested budget shared by system prompts, task specs, conversation history, retrieved documents, tool schemas, and recent tool outputs.
 
-This is post 3 in the Harness Engineering 101 series. Here we treat context as an allocation problem instead of a dumping ground.
+This is the 3rd post in the Harness Engineering 101 series. Here we treat context as an allocation problem instead of a dumping ground.
 
 ![Context harness - designing what the agent should know and not know](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/03/03-01-context-harness-designing-what-the-agent.en.png)
 *Context harness - designing what the agent should know and not know*

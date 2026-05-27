@@ -24,7 +24,7 @@ seo_description: Detect and block jailbreak attempts by combining known pattern 
 
 A jailbreak does more than override a system instruction. It tries to peel back the model's safety alignment itself, and once a successful prompt escapes into the wild it gets copied at scale.
 
-This is post 5 in the AI Safety & Guardrails 101 series. It covers the signals that make jailbreak attempts detectable and how to combine detectors without depending on a single classifier.
+This is the 5th post in the AI Safety & Guardrails 101 series. It covers the signals that make jailbreak attempts detectable and how to combine detectors without depending on a single classifier.
 
 
 ![Jailbreak detection layers](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/05/05-01-big-picture.en.png)

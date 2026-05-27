@@ -26,7 +26,7 @@ seo_description: A process is a running instance of a program, each with a uniqu
 
 Process problems show up in very practical ways: a port is already in use, CPU spikes to 100 percent, or a long-running job dies the moment your SSH session closes. If you cannot inspect and control processes, those problems stay mysterious longer than they should.
 
-This is post 7 in the Linux CLI 101 series.
+This is the 7th post in the Linux CLI 101 series.
 
 
 ![Linux CLI 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/07/07-01-mental-model.en.png)

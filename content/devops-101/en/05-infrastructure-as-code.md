@@ -26,7 +26,7 @@ Console-built infrastructure feels fast right up until you need the same environ
 
 Infrastructure as Code fixes that by moving cloud changes into the same review-and-history model we already expect from application code. The value is not the syntax itself. The value is repeatability, visibility, and safer change control.
 
-This is post 5 in the DevOps 101 series. In this chapter, we use Terraform to explain plan, apply, state, and remote backends as the operating model behind reproducible infrastructure.
+This is the 5th post in the DevOps 101 series. In this chapter, we use Terraform to explain plan, apply, state, and remote backends as the operating model behind reproducible infrastructure.
 
 
 ![devops 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/05/05-01-concept-at-a-glance.en.png)

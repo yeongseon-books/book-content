@@ -23,7 +23,7 @@ last_reviewed: '2026-05-04'
 
 # Discrete Math 101 (5/10): Proof Techniques
 
-This is post 5 in the Discrete Math 101 series.
+This is the 5th post in the Discrete Math 101 series.
 
 > Discrete Math 101 series (5/10)
 

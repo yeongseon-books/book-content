@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Most applications first become unstable at the input boundary. A login form, search box, JSON body, file name, or query string may look harmless, but the moment the server trusts it too early, ordinary bugs and attack paths start to overlap. SQL injection, XSS, path traversal, and unsafe deserialization all begin with the same mistake: giving external input more trust than it deserves.
 
-This is post 2 in the Secure Coding 101 series.
+This is the 2nd post in the Secure Coding 101 series.
 
 In this chapter, we will frame validation as a contract that makes the system predictable at every trust boundary, not as a scattered pile of `if` statements. Once that idea is clear, schema validation, allowlists, normalization, and safe error handling stop feeling like separate tricks and start looking like one coherent design choice.
 

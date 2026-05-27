@@ -26,7 +26,7 @@ Case interviews often feel abstract because they do not offer the comforting sha
 
 What interviewers usually want instead is a visible thinking process. Can you clarify the problem, choose the metric that matters, generate competing hypotheses, propose a concrete data plan, and still close with a decision rather than an endless list of possibilities?
 
-This is post 7 in the Data Science Career 101 series.
+This is the 7th post in the Data Science Career 101 series.
 
 
 ![data science career 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/07/07-01-concept-at-a-glance.en.png)

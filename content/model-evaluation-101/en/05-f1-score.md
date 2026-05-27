@@ -22,7 +22,7 @@ last_reviewed: '2026-05-17'
 
 # Model Evaluation 101 (5/10): F1 Score
 
-This is post 5 in the Model Evaluation 101 series.
+This is the 5th post in the Model Evaluation 101 series.
 
 Once precision and recall are framed as a threshold memo, teams immediately ask for one compact number. F1 is usually the answer. The problem is that the earlier version of this chapter used `ko/05-f1-score.md:109-118` to sweep thresholds on the same binary data that was used for training, which teaches exactly the optimistic tuning pattern the series should avoid.
 

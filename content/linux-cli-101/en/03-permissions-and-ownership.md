@@ -26,7 +26,7 @@ seo_description: Linux file permissions are like a door with three locks. The ow
 
 Permission problems often look misleading. A file is right there, but the script will not run. A config path exists, but the process still cannot read it. Until you can read `rwx` fluently, these errors feel arbitrary.
 
-This is post 3 in the Linux CLI 101 series.
+This is the 3rd post in the Linux CLI 101 series.
 
 
 ![Linux CLI 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/03/03-01-big-picture.en.png)

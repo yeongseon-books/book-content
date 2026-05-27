@@ -26,7 +26,7 @@ seo_description: grep is a detective that finds text inside file contents, and f
 
 Once a project stops fitting in your head, search becomes a workflow, not a convenience. You need to answer questions like "Where is this called?", "Which logs changed today?", and "Which matching files should I delete?" without opening everything one by one.
 
-This is post 5 in the Linux CLI 101 series.
+This is the 5th post in the Linux CLI 101 series.
 
 
 ![Linux CLI 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/05/05-01-mental-model.en.png)

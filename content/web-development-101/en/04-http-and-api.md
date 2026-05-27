@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Most web bugs eventually reduce to one question: what exactly did the client send, and what exactly did the server send back? If you cannot picture the request line, headers, body, and status code, debugging a frontend fetch call or a backend route quickly turns into guesswork.
 
-This is post 4 in the Web Development 101 series. Here we treat HTTP as the shared contract between browser, script, and server so you can read methods, status codes, headers, and JSON payloads with much more confidence.
+This is the 4th post in the Web Development 101 series. Here we treat HTTP as the shared contract between browser, script, and server so you can read methods, status codes, headers, and JSON payloads with much more confidence.
 
 
 ![web development 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/04/04-01-concept-at-a-glance.en.png)

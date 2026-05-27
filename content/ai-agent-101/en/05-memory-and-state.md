@@ -26,7 +26,7 @@ For agents to perform multi-step tasks, they must remember what they did in prev
 
 However, model context windows are limited. You can't keep including all conversation history, so you must selectively maintain important information or leverage external storage (vector DB, general DB).
 
-This is post 5 in the AI Agent 101 series. Here we cover the difference between short-term and long-term memory, conversation history management strategies, context window management methods, and external memory storage utilization patterns.
+This is the 5th post in the AI Agent 101 series. Here we cover the difference between short-term and long-term memory, conversation history management strategies, context window management methods, and external memory storage utilization patterns.
 
 ![Memory and state split](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/05/05-01-memory-and-state-split.en.png)
 *Memory and state split*

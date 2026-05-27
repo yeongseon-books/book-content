@@ -26,7 +26,7 @@ Many teams say they use all three signals, but still send every question to the 
 
 The real skill is not collecting more signals. It is choosing the right one for the question in front of you.
 
-This is post 2 in the Observability 101 series.
+This is the 2nd post in the Observability 101 series.
 
 
 ![observability 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/02/02-01-concept-at-a-glance.en.png)

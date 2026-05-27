@@ -23,7 +23,7 @@ last_reviewed: '2026-05-04'
 
 # Database Systems 101 (6/10): Isolation Levels
 
-This is post 6 in the Database Systems 101 series.
+This is the 6th post in the Database Systems 101 series.
 
 > Database Systems 101 series (6/10)
 

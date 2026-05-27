@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 List endpoints look simple right up until the dataset gets large enough to expose every weak assumption at once. Slow scans, duplicate rows across pages, and missing items often show up together—and by then the public parameter contract is already in use.
 
-This is post 6 in the API Design 101 series.
+This is the 6th post in the API Design 101 series.
 
 Here, we treat pagination, sorting, and filtering as part of the API's correctness and performance contract. The central design choice is whether offset or cursor behavior gives you a safer operating model for the collection you are exposing.
 

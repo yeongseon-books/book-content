@@ -26,7 +26,7 @@ As systems grow, what gets heavy first is often not the code but the connections
 
 Queues and event buses help because they separate responsibilities in both time and failure scope. In a serverless system, that separation is often what keeps a short function from turning into a long, fragile request path.
 
-This is post 7 in the Serverless 101 series.
+This is the 7th post in the Serverless 101 series.
 
 
 ![serverless 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/07/07-01-concept-at-a-glance.en.png)

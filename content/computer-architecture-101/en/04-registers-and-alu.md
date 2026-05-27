@@ -25,7 +25,7 @@ last_reviewed: '2026-05-04'
 
 A loop can look unchanged in source code and still slow down because one more live variable forced the compiler to spill a value to the stack. When that happens, the story is no longer just "the ALU did an add." It is about where values lived, which instruction set FLAGS, and how often execution had to leave the register file.
 
-This is post 4 in the Computer Architecture 101 series. Here we look at registers, FLAGS, and the ALU as the CPU's immediate working set, then use real assembly to show what register pressure and spills look like in practice.
+This is the 4th post in the Computer Architecture 101 series. Here we look at registers, FLAGS, and the ALU as the CPU's immediate working set, then use real assembly to show what register pressure and spills look like in practice.
 
 
 ![computer architecture 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/04/04-01-registers-alu-dataflow.en.png)

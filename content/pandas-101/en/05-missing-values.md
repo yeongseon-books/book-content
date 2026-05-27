@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Real datasets are rarely complete. Sensors miss readings, surveys leave blanks behind, and transaction pipelines drop fields at inconvenient moments. That means missing-value handling is not cosmetic cleanup. It is one of the choices that most directly shapes the credibility of your analysis.
 
-This is post 5 in the Pandas 101 series.
+This is the 5th post in the Pandas 101 series.
 
 In this chapter, I will treat `NaN` as a signal to interpret before it becomes a value to drop or fill. The right first question is not “which method should I use?” but “why is this value missing at all?”
 

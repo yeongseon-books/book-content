@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Modern services depend more on external code than on code written directly by the team shipping the feature. HTTP clients, template engines, ORM layers, CLI tooling, and build dependencies all become part of the runtime we are responsible for. When one of them fails, the incident does not belong to a vendor anymore. It belongs to the service that deployed it.
 
-This is post 9 in the Secure Coding 101 series.
+This is the 9th post in the Secure Coding 101 series.
 
 Here, we will frame dependency management as supply-chain control rather than occasional version cleanup. Lockfiles, SBOMs, SCA gates, and small automated updates all serve one goal: keeping the build reproducible and the incident blast radius knowable.
 

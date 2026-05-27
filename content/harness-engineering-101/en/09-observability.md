@@ -25,7 +25,7 @@ Many agent systems still preserve only the final answer string. That is enough t
 
 Operationally, the real requirement is stronger: after a bad run, you must be able to reconstruct what the agent saw, what it decided, what it called, how long each step took, and where the cost spiked.
 
-This is post 9 in the Harness Engineering 101 series. Here we treat observability as a replayable execution model, not as a collection of ad hoc logs.
+This is the 9th post in the Harness Engineering 101 series. Here we treat observability as a replayable execution model, not as a collection of ad hoc logs.
 
 ![Observability - tracing and replaying agent work](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/09/09-01-observability-tracing-and-replaying-agen.en.png)
 *Observability - tracing and replaying agent work*

@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Comments feel helpful precisely when the code is hardest to read. That is why comments become risky so quickly: they often preserve a bad structure instead of forcing it to improve.
 
-This is post 7 in the Clean Code 101 series.
+This is the 7th post in the Clean Code 101 series.
 
 Here we will separate the explanations that belong in naming and structure from the few that belong in intent comments, warnings, docstrings, and contributor-facing docs.
 

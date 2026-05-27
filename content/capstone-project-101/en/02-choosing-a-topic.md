@@ -26,7 +26,7 @@ It is easy to generate impressive ideas. It is much harder to find an idea a stu
 
 A good capstone topic is not the flashiest topic. It is the one your team can explain, scope, build, and present without collapsing under delivery risk.
 
-This is post 2 in the Capstone Project 101 series. It explains how to compare candidate topics and how to shrink an attractive idea into a semester-sized project.
+This is the 2nd post in the Capstone Project 101 series. It explains how to compare candidate topics and how to shrink an attractive idea into a semester-sized project.
 
 
 ![capstone project 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/02/02-01-the-flow-at-a-glance.en.png)

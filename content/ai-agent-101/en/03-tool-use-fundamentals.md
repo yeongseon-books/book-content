@@ -26,7 +26,7 @@ Agents differ from simple conversational models because they can use tools. They
 
 The core of tool use is function calling. When the model determines "I need to check the weather now," it returns a function call request matching a predefined tool schema. The application interprets this request, calls the actual API, and passes the result back to the model.
 
-This is post 3 in the AI Agent 101 series. Here we cover the basic flow of function calling, tool schema design principles, error handling patterns, and tool selection strategies.
+This is the 3rd post in the AI Agent 101 series. Here we cover the basic flow of function calling, tool schema design principles, error handling patterns, and tool selection strategies.
 
 ![Tool-calling loop](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/03/03-01-tool-calling-loop.en.png)
 *Tool-calling loop*

@@ -26,7 +26,7 @@ Many candidates prepare for ML interviews by collecting model names and metric d
 
 That is why strong ML interview answers sound less like a glossary and more like a decision process. They begin with the problem, move through model choice and evaluation, and then widen into failure modes, retraining, and system behavior over time.
 
-This is post 6 in the Data Science Career 101 series.
+This is the 6th post in the Data Science Career 101 series.
 
 
 ![data science career 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/06/06-01-concept-at-a-glance.en.png)

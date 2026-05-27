@@ -22,7 +22,7 @@ last_reviewed: '2026-05-17'
 
 # Object-Oriented Programming 101 (8/10): SOLID Principles Basics
 
-This is post 8 in the Object-Oriented Programming 101 series.
+This is the 8th post in the Object-Oriented Programming 101 series.
 
 SOLID starts making sense when one service keeps growing until every new requirement shakes unrelated code.
 

@@ -26,7 +26,7 @@ Two datasets can share the same mean and still behave in completely different wa
 
 In statistics, the distribution is the shape of the data. If you misread that shape, later decisions about averages, confidence intervals, tests, or SLAs start to drift.
 
-This is post 3 in the Statistics 101 series. Here we will build intuition for reading data shape and explain why assuming normality too quickly causes real problems.
+This is the 3rd post in the Statistics 101 series. Here we will build intuition for reading data shape and explain why assuming normality too quickly causes real problems.
 
 
 ![statistics 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/03/03-01-concept-at-a-glance.en.png)

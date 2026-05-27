@@ -22,7 +22,7 @@ last_reviewed: '2026-05-15'
 
 # Object-Oriented Programming 101 (9/10): OOP Design Example
 
-This is post 9 in the Object-Oriented Programming 101 series.
+This is the 9th post in the Object-Oriented Programming 101 series.
 
 > Object-Oriented Programming 101 Series (9/10)
 

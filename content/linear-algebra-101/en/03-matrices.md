@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Matrices are the notation you see most often in linear algebra. Sometimes they look like tables that hold data. Sometimes they act like rules that move one vector into another. If you only remember the table view, you can still run the arithmetic without understanding why multiplication deserves so much attention.
 
-This is post 3 in the Linear Algebra 101 series. Here we will read matrices through two linked perspectives: shape and transformation.
+This is the 3rd post in the Linear Algebra 101 series. Here we will read matrices through two linked perspectives: shape and transformation.
 
 
 ![linear algebra 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/03/03-01-concept-at-a-glance.en.png)

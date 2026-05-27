@@ -27,7 +27,7 @@ Every codebase gets awkward over time. A quick branch added under pressure, a du
 
 Tech debt is not automatically a failure. Sometimes it is a conscious trade: speed now, cleanup later. The dangerous version is debt without explicit ownership, measurement, or repayment intent. That kind of debt quietly taxes reliability, lead time, and team confidence all at once.
 
-This is post 9 in the Software Engineering 101 series. In this chapter, we classify debt, prioritize repayment, and use phased replacement and deprecation patterns to keep maintenance work recoverable.
+This is the 9th post in the Software Engineering 101 series. In this chapter, we classify debt, prioritize repayment, and use phased replacement and deprecation patterns to keep maintenance work recoverable.
 
 
 ![software engineering 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/09/09-01-concept-at-a-glance.en.png)

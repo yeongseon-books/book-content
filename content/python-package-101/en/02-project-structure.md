@@ -26,7 +26,7 @@ seo_description: src layout separates source code from the project root to enfor
 
 Project structure is where many packaging bugs begin. If tests read local source by accident, you can ship a package that only works on your machine.
 
-This is post 2 in the Python Package 101 series. Here we compare flat layout and src layout, explain why `pyproject.toml` replaced `setup.py`, and build a minimal package skeleton that behaves like a real install.
+This is the 2nd post in the Python Package 101 series. Here we compare flat layout and src layout, explain why `pyproject.toml` replaced `setup.py`, and build a minimal package skeleton that behaves like a real install.
 
 ![Python Package 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/02/02-01-mental-model.en.png)
 *Python Package 101 chapter 2 flow overview*

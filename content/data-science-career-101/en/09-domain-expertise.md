@@ -26,7 +26,7 @@ At some point in a data career, technical competence stops being the main differ
 
 That is domain expertise. It is easy to postpone because there is always another technical topic to study, but even a modest amount of domain understanding can dramatically improve the quality of your questions, your prioritization, and your interpretation of the same numbers.
 
-This is post 9 in the Data Science Career 101 series.
+This is the 9th post in the Data Science Career 101 series.
 
 
 ![data science career 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/09/09-01-concept-at-a-glance.en.png)

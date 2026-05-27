@@ -26,7 +26,7 @@ If you cannot see a system clearly, your customers end up doing the detection fo
 
 Metrics tell you what is happening (CPU, memory, requests). Logs tell you why (application events, errors). Traces show you how a request flowed through your system. Dashboards make patterns visible. Alerts wake you up. Together, they form the feedback loop that lets you operate a system.
 
-This is post 8 in the Cloud Computing 101 series.
+This is the 8th post in the Cloud Computing 101 series.
 
 In this post, we'll connect metrics, logs, traces, CloudWatch, and alert routing into one practical observability baseline.
 

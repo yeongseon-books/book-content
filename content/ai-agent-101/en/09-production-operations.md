@@ -26,7 +26,7 @@ When you deploy agents to production, new problems arise. You need to monitor ho
 
 The core of agent operations is observability. You must track all agent steps, measure cost and latency, and detect anomalies. Scaling strategies and cost optimization are also important.
 
-This is post 9 in the AI Agent 101 series. Here we cover agent observability, cost tracking, latency optimization, scaling patterns, and production checklists.
+This is the 9th post in the AI Agent 101 series. Here we cover agent observability, cost tracking, latency optimization, scaling patterns, and production checklists.
 
 ![Observability](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/09/09-01-observability.en.png)
 *Observability*

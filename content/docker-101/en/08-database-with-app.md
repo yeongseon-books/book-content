@@ -26,7 +26,7 @@ The app-database boundary is where container demos turn into real systems. A web
 
 That is why a dependable database setup has a rhythm: persist the data, wait for honest readiness, then apply migrations in a controlled place before the application begins serving traffic.
 
-This is post 8 in the Docker 101 series. It uses PostgreSQL and FastAPI to show how Compose, healthchecks, migrations, and idempotent seeding fit together when the goal is not just “it boots” but “it boots predictably.”
+This is the 8th post in the Docker 101 series. It uses PostgreSQL and FastAPI to show how Compose, healthchecks, migrations, and idempotent seeding fit together when the goal is not just “it boots” but “it boots predictably.”
 
 
 ![docker 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/08/08-01-concept-at-a-glance.en.png)

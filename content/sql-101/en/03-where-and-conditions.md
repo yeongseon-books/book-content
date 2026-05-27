@@ -26,7 +26,7 @@ Most SQL mistakes do not come from exotic syntax. They come from one condition t
 
 That is why WHERE deserves more attention than its short syntax suggests. It decides both correctness and cost, and it is often the line that determines whether a query stays cheap or turns into a production incident.
 
-This is post 3 in the SQL 101 series. Here we treat WHERE as the gate that controls both accuracy and performance.
+This is the 3rd post in the SQL 101 series. Here we treat WHERE as the gate that controls both accuracy and performance.
 
 
 ![sql 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/03/03-01-where-evaluation-flow.en.png)

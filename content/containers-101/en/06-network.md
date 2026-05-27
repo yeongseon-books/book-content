@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Container networking can look like a matter of ports and IP addresses. In practice, restart and rescheduling pressure make name-based discovery and boundary design much more important than memorizing one static address.
 
-This is post 6 in the Containers 101 series.
+This is the 6th post in the Containers 101 series.
 
 In this chapter, we compare bridge, host, overlay, and none, then explain why user-defined networks and DNS names are the stable foundation behind both Compose and Kubernetes.
 

@@ -23,7 +23,7 @@ last_reviewed: '2026-05-04'
 
 # Discrete Math 101 (3/10): Sets and Functions
 
-This is post 3 in the Discrete Math 101 series.
+This is the 3rd post in the Discrete Math 101 series.
 
 > Discrete Math 101 series (3/10)
 

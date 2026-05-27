@@ -26,7 +26,7 @@ S3, EBS, EFS, and Glacier exist separately for a reason. They may all hold data,
 
 Block storage is for OS disks and databases. Object storage is for files, backups, and archives. File storage is for NFS-like shared access. Databases are for structured data with queries. Archive is for data you almost never touch. Each has a different cost curve, latency profile, and use case.
 
-This is post 5 in the Cloud Computing 101 series.
+This is the 5th post in the Cloud Computing 101 series.
 
 In this post, we'll compare object, block, file, and archive storage and connect each one to the workload shape it actually fits.
 

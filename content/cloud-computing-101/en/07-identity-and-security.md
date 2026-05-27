@@ -26,7 +26,7 @@ Most cloud security incidents do not begin with a cinematic attack chain. They b
 
 IAM defines who can do what on which resources. Authentication proves who you are. Encryption protects data in transit and at rest. The shared responsibility model splits ownership: the provider secures the hardware and platform; you secure your applications, keys, and access rules.
 
-This is post 7 in the Cloud Computing 101 series.
+This is the 7th post in the Cloud Computing 101 series.
 
 In this post, we'll break down users, groups, roles, policies, MFA, and KMS through the lens of least privilege and temporary credentials.
 

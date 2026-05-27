@@ -29,7 +29,7 @@ last_reviewed: '2026-05-15'
 
 > A router decides only the "next hop" for each packet. The routing table is the rule book for that decision. To reach the public Internet from a private IP, NAT rewrites the source IP and port into the router's public address. Half of the Internet is routing; the other half is NAT.
 
-This is post 7 in the Computer Networks 101 series.
+This is the 7th post in the Computer Networks 101 series.
 
 
 ![computer networks 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/07/07-01-concept-at-a-glance.en.png)

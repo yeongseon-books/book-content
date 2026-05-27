@@ -26,7 +26,7 @@ Compute is where cloud architecture becomes tangible. The same application can r
 
 VMs, containers, serverless, and bare metal sit on a spectrum. More control on one end, more abstraction on the other. The best choice for you depends on your workload, team, and constraints — not on what is trendy.
 
-This is post 4 in the Cloud Computing 101 series.
+This is the 4th post in the Cloud Computing 101 series.
 
 In this post, we'll compare VMs, containers, serverless, and bare metal, then connect those choices to Auto Scaling and pricing models.
 

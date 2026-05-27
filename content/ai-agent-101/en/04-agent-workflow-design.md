@@ -26,7 +26,7 @@ To perform complex tasks, agents must break work into steps, execute each step i
 
 Representative workflow patterns include ReAct (Reasoning + Acting), Plan-and-Execute, and Reflexion. Each pattern has pros and cons depending on task characteristics, and agent designers must choose patterns that match the task type.
 
-This is post 4 in the AI Agent 101 series. Here we cover major workflow patterns, task decomposition strategies, state management methods, and factors to consider when designing workflows.
+This is the 4th post in the AI Agent 101 series. Here we cover major workflow patterns, task decomposition strategies, state management methods, and factors to consider when designing workflows.
 
 ![Draw the control flow before you tune the prompt](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/04/04-01-draw-the-control-flow-before-you-tune-th.en.png)
 *Draw the control flow before you tune the prompt*

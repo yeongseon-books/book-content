@@ -26,7 +26,7 @@ If you read enough statistical reports, you will keep running into lines like p 
 
 The p-value does none of those jobs. It only answers one question: assuming the null hypothesis is true, how surprising is the observed data?
 
-This is post 9 in the Statistics 101 series. Here we will define the p-value carefully, walk through the most common misreadings, explain why p-hacking breaks the procedure, and show why effect size and confidence intervals belong next to p-value in any serious report.
+This is the 9th post in the Statistics 101 series. Here we will define the p-value carefully, walk through the most common misreadings, explain why p-hacking breaks the procedure, and show why effect size and confidence intervals belong next to p-value in any serious report.
 
 
 ![statistics 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/09/09-01-concept-at-a-glance.en.png)

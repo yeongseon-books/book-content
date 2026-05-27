@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 The instant one value exists in more than one place, "read the latest version" stops being a trivial promise. Now the answer depends on replica lag, partition policy, and how much waiting you are willing to buy with user-facing latency.
 
-This is post 4 in the Distributed Systems 101 series.
+This is the 4th post in the Distributed Systems 101 series.
 
 Here we map the consistency spectrum, then use CAP and PACELC to turn a vague tradeoff into a concrete design vocabulary.
 

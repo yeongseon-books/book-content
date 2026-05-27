@@ -24,7 +24,7 @@ seo_description: Address toxicity with real-time blocking and manage systematic 
 
 Toxicity and bias often get grouped together, but they are not the same operational problem. Toxicity is an inline blocking decision; bias is a measurement and audit problem that shows up over many responses.
 
-This is post 6 in the AI Safety & Guardrails 101 series. It explains why those concerns need different guardrail workflows and different evaluation loops.
+This is the 6th post in the AI Safety & Guardrails 101 series. It explains why those concerns need different guardrail workflows and different evaluation loops.
 
 
 ![Toxicity and bias guardrail flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/06/06-01-big-picture.en.png)

@@ -26,7 +26,7 @@ Long code samples often look generous, but they are one of the fastest ways to l
 
 Good code walkthroughs are intentionally small. They isolate the interesting lines, pair them with a short callout, and close the loop with an actual command and visible output. That is what turns a snippet into a reusable learning step.
 
-This is post 5 in the Technical Writing 101 series. It shows how to choose a minimal example, explain it, and prove that it works.
+This is the 5th post in the Technical Writing 101 series. It shows how to choose a minimal example, explain it, and prove that it works.
 
 
 ![technical writing 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/05/05-01-concept-at-a-glance.en.png)

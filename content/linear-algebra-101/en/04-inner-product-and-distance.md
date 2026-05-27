@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Once vectors are in play, the next question comes immediately: how similar are two vectors, and how far apart are they? Recommenders, embedding search, and nearest-neighbor lookups are all versions of that question turned into numbers.
 
-This is post 4 in the Linear Algebra 101 series. Here we will connect the inner product, cosine similarity, Euclidean distance, and Manhattan distance into one comparison toolkit.
+This is the 4th post in the Linear Algebra 101 series. Here we will connect the inner product, cosine similarity, Euclidean distance, and Manhattan distance into one comparison toolkit.
 
 
 ![linear algebra 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/04/04-01-concept-at-a-glance.en.png)

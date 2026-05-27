@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Interview answers do not get stronger just because they get longer. In most cases, a tighter explanation of the problem, the decision, and the result is much more persuasive than a broad tour of every library in the stack. Interviewers usually want to hear judgment, not a dependency list.
 
-This is post 9 in the Portfolio Project 101 series. Here we will shape a portfolio project into a short interview answer that makes the problem, the action, and the result easy to follow under time pressure.
+This is the 9th post in the Portfolio Project 101 series. Here we will shape a portfolio project into a short interview answer that makes the problem, the action, and the result easy to follow under time pressure.
 
 ---
 

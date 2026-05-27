@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Writing `del x` does not necessarily mean the object disappears on that line. Names, objects, references, and lifetimes sit at different layers, and languages manage the relationship among those layers in different ways.
 
-This is post 7 in the Programming Languages 101 series.
+This is the 7th post in the Programming Languages 101 series.
 
 In this post, we will treat memory management as the rule for deciding when an object is alive and when it is gone. That means walking through stack and heap, reference counting, garbage collection, weak references, and why leaks still happen even in languages that “have GC.”
 

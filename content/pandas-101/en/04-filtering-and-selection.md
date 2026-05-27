@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Pandas gets confusing fast when you notice that there are several ways to pick rows and columns from the same table. `loc`, `iloc`, boolean masks, and `query` can look interchangeable at first, but they are not. If you do not separate them by intent, selection code becomes harder to read and assignment bugs show up sooner than you expect.
 
-This is post 4 in the Pandas 101 series.
+This is the 4th post in the Pandas 101 series.
 
 My goal here is to organize selection tools as a small decision framework: labels, positions, and conditions. Once you think that way, the syntax choices become much easier to justify.
 

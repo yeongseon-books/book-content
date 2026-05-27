@@ -23,6 +23,8 @@ seo_description: This is where the series turns into a real deployment. We will 
 
 This is where the series turns into a real deployment. We will deploy a Flask app to Azure App Service and verify the full runtime path.
 
+This is the 4th post in the Azure App Service 101 series.
+
 This post covers the entire process from local development environment setup to Azure deployment and verifying everything works.
 
 ---

@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Real ML losses are not single-input functions. They depend on many weights, biases, activations, and inputs at once. If you want to know which parameter is responsible for a change in loss, you need a way to isolate one variable without pretending the others disappeared.
 
-This is post 3 in the Calculus for ML 101 series.
+This is the 3rd post in the Calculus for ML 101 series.
 
 In this post, we'll use multivariable functions, fixed variables, and per-parameter responsibility to build intuition for partial derivatives. That is the conceptual step that turns "a derivative" into "a gradient for every trainable weight."
 

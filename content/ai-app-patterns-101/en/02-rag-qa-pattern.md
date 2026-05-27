@@ -23,7 +23,7 @@ seo_description: RAG is not a model that memorizes answers; it is a pipeline tha
 
 RAG is easier to reason about when you stop treating it as a smarter model and start treating it as a retrieval pipeline. Answer quality depends less on model mystique and more on whether the right chunks are found and injected at the right moment.
 
-This is post 2 in the AI App Patterns 101 series. Here we build the smallest useful RAG Q&A pipeline and walk through how retrieval and generation fit together.
+This is the 2nd post in the AI App Patterns 101 series. Here we build the smallest useful RAG Q&A pipeline and walk through how retrieval and generation fit together.
 
 ![Offline indexing pipeline](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/02/02-01-offline-indexing-pipeline.en.png)
 *Offline indexing pipeline*

@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Clustering feels less certain than classification because there is no answer sheet waiting in the test set. That uncertainty is exactly why teams misuse it. A clean-looking cluster plot can tempt you into believing you discovered truth when you may only have discovered the geometry created by scaling choices.
 
-This is post 7 in the Machine Learning 101 series. Here we will compare KMeans and DBSCAN, use elbow and silhouette scores as guide rails, and keep the main discipline in view: clusters are hypotheses that still need interpretation.
+This is the 7th post in the Machine Learning 101 series. Here we will compare KMeans and DBSCAN, use elbow and silhouette scores as guide rails, and keep the main discipline in view: clusters are hypotheses that still need interpretation.
 
 
 ![machine learning 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/07/07-01-concept-at-a-glance.en.png)

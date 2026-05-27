@@ -26,7 +26,7 @@ Most analytics requests arrive as loose complaints, not well-formed questions. â
 
 Strong data work starts before SQL, notebooks, or models. It starts when the team rewrites a vague request into a sentence that could be proven wrong. That single rewrite usually decides whether the rest of the project is fast and reliable or slow and argumentative.
 
-This is post 2 in the Data Science 101 series. In this chapter, we turn problem framing into an explicit workflow you can reuse before any collection, EDA, or modeling begins.
+This is the 2nd post in the Data Science 101 series. In this chapter, we turn problem framing into an explicit workflow you can reuse before any collection, EDA, or modeling begins.
 
 
 ![data science 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/02/02-01-concept-at-a-glance.en.png)

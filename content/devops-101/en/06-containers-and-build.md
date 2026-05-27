@@ -26,7 +26,7 @@ last_reviewed: '2026-05-15'
 
 Containers reduce that gap by freezing the runtime environment into an image. Once the image becomes the deployable unit, teams can reason about versioning, rollback, and promotion much more cleanly.
 
-This is post 6 in the DevOps 101 series. Here we focus on how Dockerfiles, layer caching, multi-stage builds, and non-root execution turn containerization into a real operational advantage.
+This is the 6th post in the DevOps 101 series. Here we focus on how Dockerfiles, layer caching, multi-stage builds, and non-root execution turn containerization into a real operational advantage.
 
 
 ![devops 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/06/06-01-concept-at-a-glance.en.png)

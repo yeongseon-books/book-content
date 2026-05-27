@@ -23,7 +23,7 @@ seo_description: Learn how tool use works, how function calls are structured, an
 
 So far, the AI features in this series only exchanged text. They could answer questions, but they could not actually fetch live weather, run a calculator, or query an external system. To move beyond text-only answers, you need a loop where the model can request tools.
 
-This is post 5 in the AI Web Development 101 series.
+This is the 5th post in the AI Web Development 101 series.
 
 Here, we will focus on tool use, function calling, and the boundary between model judgment and application execution.
 

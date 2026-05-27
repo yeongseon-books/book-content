@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 If you apply the same linear transformation again and again, some directions behave differently from the rest. Most directions get mixed or bent, but a few keep their direction and only change length. Eigenvalues and eigenvectors are the tools that describe those privileged axes.
 
-This is post 7 in the Linear Algebra 101 series. Here we will read eigenvalues and eigenvectors as the natural axes of a transformation.
+This is the 7th post in the Linear Algebra 101 series. Here we will read eigenvalues and eigenvectors as the natural axes of a transformation.
 
 
 ![linear algebra 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/07/07-01-concept-at-a-glance.en.png)

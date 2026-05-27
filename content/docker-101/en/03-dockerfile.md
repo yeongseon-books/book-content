@@ -26,7 +26,7 @@ A Dockerfile is easy to underestimate because it looks like a short text file wi
 
 The difference is often not the choice of commands but the order of commands. What you copy first, what you install before code changes, and what you exclude from the build context determine whether Docker can reuse expensive layers or has to recalculate everything.
 
-This is post 3 in the Docker 101 series. It explains the role of the core Dockerfile instructions, then turns that syntax into build strategy through cache-aware ordering, `.dockerignore`, and non-root execution.
+This is the 3rd post in the Docker 101 series. It explains the role of the core Dockerfile instructions, then turns that syntax into build strategy through cache-aware ordering, `.dockerignore`, and non-root execution.
 
 
 ![docker 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/03/03-01-concept-at-a-glance.en.png)

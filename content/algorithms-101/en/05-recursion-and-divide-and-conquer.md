@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 Recursion expresses a problem in terms of smaller versions of itself. Three rules make it work: a base case that is reachable, strict progress toward that base case, and no shared mutable state. Divide and conquer is the most useful pattern built on recursion — divide, conquer, combine.
 
-This is post 5 in the Algorithms 101 series. Here we cover the call stack, recurrence-based cost analysis, and the mental model behind divide-and-conquer algorithms.
+This is the 5th post in the Algorithms 101 series. Here we cover the call stack, recurrence-based cost analysis, and the mental model behind divide-and-conquer algorithms.
 
 
 ![algorithms 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/05/05-01-big-picture.en.png)

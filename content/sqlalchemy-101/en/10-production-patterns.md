@@ -26,7 +26,7 @@ seo_description: Production SQLAlchemy has three knobs. The pool sets concurrenc
 
 Production SQLAlchemy has three knobs: the pool, observability, and deployment sequencing. This post focuses on the decisions in those areas that most often turn into real incidents.
 
-This is the final article in the SQLAlchemy 101 series.
+This is the final post in the SQLAlchemy 101 series.
 
 ![Production patterns: pools, observability, migrations, and deploys](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/10/10-01-production-patterns-pools-observability.en.png)
 

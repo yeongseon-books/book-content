@@ -26,7 +26,7 @@ seo_description: PyPI is the app store for Python packages and twine is the tool
 
 Publishing is where packaging shifts from local correctness to operational discipline. Account setup, token handling, staging uploads, and install verification all matter before you expose a package to real users.
 
-This is post 5 in the Python Package 101 series. Here we separate TestPyPI from PyPI, walk through the `twine` upload flow, and build a safer release habit around staging-first validation.
+This is the 5th post in the Python Package 101 series. Here we separate TestPyPI from PyPI, walk through the `twine` upload flow, and build a safer release habit around staging-first validation.
 
 ![Python Package 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/05/05-01-mental-model.en.png)
 *Python Package 101 chapter 5 flow overview*

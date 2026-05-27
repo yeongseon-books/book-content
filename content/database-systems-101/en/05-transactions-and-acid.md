@@ -23,7 +23,7 @@ last_reviewed: '2026-05-04'
 
 # Database Systems 101 (5/10): Transactions and ACID
 
-This is post 5 in the Database Systems 101 series.
+This is the 5th post in the Database Systems 101 series.
 
 > Database Systems 101 series (5/10)
 

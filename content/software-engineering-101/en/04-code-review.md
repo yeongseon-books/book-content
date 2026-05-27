@@ -27,7 +27,7 @@ Code review is one of the most common collaboration rituals in software teams, a
 
 A strong review is not just a search for bugs. It is a checkpoint for intent, system impact, and team understanding. The practical question is not whether review is valuable. It is whether the pull request, the automation, and the comment culture make human judgment possible in the first place.
 
-This is post 4 in the Software Engineering 101 series. In this chapter, we look at how to make a PR reviewable, what humans should still review after automation, and how teams keep review focused on decisions instead of noise.
+This is the 4th post in the Software Engineering 101 series. In this chapter, we look at how to make a PR reviewable, what humans should still review after automation, and how teams keep review focused on decisions instead of noise.
 
 
 ![software engineering 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/04/04-01-concept-at-a-glance.en.png)

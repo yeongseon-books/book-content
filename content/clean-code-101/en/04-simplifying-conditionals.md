@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Nested conditionals usually reveal a deeper problem than awkward indentation. They show one function is carrying validation, policy, and type dispatch at the same time.
 
-This is post 4 in the Clean Code 101 series.
+This is the 4th post in the Clean Code 101 series.
 
 Here we will flatten the easy cases with guard clauses, then move the harder cases into polymorphism, strategy objects, and tables so the main path stays visible.
 

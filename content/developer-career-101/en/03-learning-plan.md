@@ -25,7 +25,7 @@ last_reviewed: '2026-05-14'
 
 Most developers do not struggle because learning resources are unavailable. They struggle because books, courses, and repos pile up faster than calendar time, so learning turns into a backlog of intentions instead of a repeatable system.
 
-This is post 3 in the Developer Career 101 series.
+This is the 3rd post in the Developer Career 101 series.
 
 
 ![developer career 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/03/03-01-concept-at-a-glance.en.png)

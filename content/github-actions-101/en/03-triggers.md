@@ -26,7 +26,7 @@ As automation grows, a new kind of waste appears. Why did a docs-only edit trigg
 
 Trigger design is where GitHub Actions stops being just syntax and becomes policy. The practical question is not only when a workflow should run, but when it should stay silent so cost, queue time, and alert noise remain under control.
 
-This is post 3 in the GitHub Actions 101 series. In this post, we will use `push`, `pull_request`, `schedule`, `workflow_dispatch`, path filters, and `concurrency` to make workflows run at the right moment and only at the right moment.
+This is the 3rd post in the GitHub Actions 101 series. In this post, we will use `push`, `pull_request`, `schedule`, `workflow_dispatch`, path filters, and `concurrency` to make workflows run at the right moment and only at the right moment.
 
 
 ![github actions 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/03/03-01-concept-at-a-glance.en.png)

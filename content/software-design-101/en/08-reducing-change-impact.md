@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 A change feels scary when one new branch, one schema update, or one pricing tweak can rattle the whole system. Good design does not stop change. It narrows the blast radius.
 
-This is post 8 in the Software Design 101 series.
+This is the 8th post in the Software Design 101 series.
 
 In this post, we connect the open/closed principle with expand-contract and feature flags. The aim is to make live changes observable, reversible, and small enough to ship without turning every deployment into a cliff edge.
 

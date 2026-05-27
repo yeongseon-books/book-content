@@ -23,7 +23,7 @@ seo_description: Per-dimension rubrics like 'accuracy', 'safety', and 'tone' are
 
 Per-dimension rubrics like 'accuracy', 'safety', and 'tone' are far more useful than a single 1-5 score.
 
-This is post 5 in the AI Evaluation 101 series. Here we cover defining evaluation dimensions, writing anchors for each, and aggregating scores.
+This is the 5th post in the AI Evaluation 101 series. Here we cover defining evaluation dimensions, writing anchors for each, and aggregating scores.
 
 
 ![Designing Rubric-Based scoring](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/05/05-01-designing-rubric-based-scoring.en.png)

@@ -26,7 +26,7 @@ When a live model stops feeling as reliable as it used to, the cause is rarely o
 
 Teams often notice the problem only after a business metric drops. In practice, the input distribution usually changes first, and only later do the performance and business losses become obvious.
 
-This is post 7 in the MLOps 101 series.
+This is the 7th post in the MLOps 101 series.
 
 Here, we will separate data drift from model drift and connect statistical signals such as PSI and KS to concrete operating thresholds.
 

@@ -26,7 +26,7 @@ Teams usually remember to keep code in git and sometimes remember to save model 
 
 The same code with different data produces a different model. That means MLOps without data versioning is only half built. You might be able to reproduce the code path, but you still cannot reproduce the outcome.
 
-This is post 3 in the MLOps 101 series.
+This is the 3rd post in the MLOps 101 series.
 
 Here, we will treat data versioning not as file backup, but as a reproducibility contract that lets the whole team pull the same inputs in the same state.
 

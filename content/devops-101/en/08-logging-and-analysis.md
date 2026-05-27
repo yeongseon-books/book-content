@@ -26,7 +26,7 @@ Logs become valuable long after they are written. When an incident starts at 3 A
 
 That is why logging is not just about emitting more text. It is about structure, retention, central collection, and the fields that make later investigation possible.
 
-This is post 8 in the DevOps 101 series. Here we turn logs into an operational record by using structured output, correlation IDs, and centralized analysis with tools such as Loki and Elasticsearch.
+This is the 8th post in the DevOps 101 series. Here we turn logs into an operational record by using structured output, correlation IDs, and centralized analysis with tools such as Loki and Elasticsearch.
 
 
 ![devops 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/08/08-01-concept-at-a-glance.en.png)

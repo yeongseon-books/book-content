@@ -24,7 +24,7 @@ last_reviewed: '2026-05-04'
 
 A small screen can survive on a few lines of JavaScript and direct DOM manipulation. As the screen grows, that approach collapses under its own weight. Logic piles into one file, every change feels risky, and reading the code becomes harder than writing the next feature.
 
-This is post 4 in the Frontend Development 101 series. Here we introduce components and state as the basic structure that keeps growing screens readable. The goal is simple: split the UI into small functions, and let each function own only the input and state it is responsible for.
+This is the 4th post in the Frontend Development 101 series. Here we introduce components and state as the basic structure that keeps growing screens readable. The goal is simple: split the UI into small functions, and let each function own only the input and state it is responsible for.
 
 
 ![frontend development 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/04/04-01-concept-at-a-glance.en.png)

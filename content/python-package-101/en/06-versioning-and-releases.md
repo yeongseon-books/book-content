@@ -26,7 +26,7 @@ seo_description: SemVer assigns meaning to version numbers, and Git tags mark sp
 
 After the first public release, users stop asking only “does it work?” and start asking “is this update safe?” Version numbers, tags, and changelogs are the signals they rely on.
 
-This is post 6 in the Python Package 101 series. Here we translate code changes into SemVer decisions, keep package metadata in sync, and turn release history into something users can trust.
+This is the 6th post in the Python Package 101 series. Here we translate code changes into SemVer decisions, keep package metadata in sync, and turn release history into something users can trust.
 
 ![Python Package 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/06/06-01-mental-model.en.png)
 *Python Package 101 chapter 6 flow overview*

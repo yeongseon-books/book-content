@@ -26,7 +26,7 @@ seo_description: Async SQLAlchemy is a thin awaitable wrapper around the existin
 
 Async SQLAlchemy is a thin awaitable wrapper around the existing ORM stack. This post shows what stays familiar, and what changes, when you move to `AsyncSession` and `aiosqlite`.
 
-This is the 9th article in the SQLAlchemy 101 series.
+This is the 9th post in the SQLAlchemy 101 series.
 
 ![Async SQLAlchemy with aiosqlite and AsyncSession](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/09/09-01-async-sqlalchemy-with-aiosqlite-and-asyn.en.png)
 

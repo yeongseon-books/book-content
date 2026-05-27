@@ -26,7 +26,7 @@ Observability rarely looks expensive at the beginning. A few counters, a few log
 
 The answer is usually structural, not accidental: too many unique labels, too much retention, and too little sampling discipline.
 
-This is post 9 in the Observability 101 series.
+This is the 9th post in the Observability 101 series.
 
 
 ![observability 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/09/09-01-concept-at-a-glance.en.png)

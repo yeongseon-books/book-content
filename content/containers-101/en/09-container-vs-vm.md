@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 The container-versus-VM decision is not a speed contest. It is a boundary decision about isolation strength, boot cost, density, and which workloads deserve a harder separation line.
 
-This is post 9 in the Containers 101 series.
+This is the 9th post in the Containers 101 series.
 
 In this chapter, we compare shared-kernel isolation with hypervisor-based isolation, then map those differences to service workloads, multi-tenant boundaries, and hybrid options such as microVMs.
 

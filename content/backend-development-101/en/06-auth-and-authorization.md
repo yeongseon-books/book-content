@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Login looks small from the UI, but the server has to answer two separate questions on every protected request. It must know who the user is, and it must decide what that user is allowed to do right now.
 
-This is post 6 in the Backend Development 101 series. Here, we separate authentication from authorization and build a safe baseline with password hashing, JWT verification, and explicit role checks in FastAPI.
+This is the 6th post in the Backend Development 101 series. Here, we separate authentication from authorization and build a safe baseline with password hashing, JWT verification, and explicit role checks in FastAPI.
 
 
 ![backend development 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/06/06-01-concept-at-a-glance.en.png)

@@ -22,7 +22,7 @@ last_reviewed: '2026-05-04'
 
 # Algorithms with Python 101 (4/10): Sorting Algorithms
 
-This is post 4 in the Algorithms with Python 101 series. Sorting sits underneath far more problems than most beginners expect, and binary search, ranking, grouping, and deduplication all become easier once data is in order.
+This is the 4th post in the Algorithms with Python 101 series. Sorting sits underneath far more problems than most beginners expect, and binary search, ranking, grouping, and deduplication all become easier once data is in order.
 
 This chapter uses one practical question as its spine: why is Python's built-in `sorted()` usually the default in real work? We will still implement classic algorithms, but as contrast material that helps explain performance, stability, and `key` design rather than as the main payoff.
 

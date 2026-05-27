@@ -23,7 +23,7 @@ seo_description: Learn how role, context, output format, and validation routines
 
 Two developers can use the same model and get very different results. In practice, the difference usually comes from request structure rather than model intelligence. The model does not read your mind. You have to supply context, role, constraints, and output expectations explicitly.
 
-This is post 2 in the AI Web Development 101 series.
+This is the 2nd post in the AI Web Development 101 series.
 
 Here, we will treat prompts as executable contracts, not clever sentences.
 

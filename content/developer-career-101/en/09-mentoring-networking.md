@@ -25,7 +25,7 @@ last_reviewed: '2026-05-14'
 
 Solo learning gets you started, but it rarely gives you fast feedback on judgment. Mentors, peers, and communities compress the time between a mistake and a better mental model, provided that you approach them with clear questions, useful follow-up, and a habit of contributing back.
 
-This is post 9 in the Developer Career 101 series.
+This is the 9th post in the Developer Career 101 series.
 
 
 ![developer career 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/09/09-01-concept-at-a-glance.en.png)

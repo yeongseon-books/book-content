@@ -22,7 +22,7 @@ last_reviewed: '2026-05-17'
 
 # pytest 101 (9/10): Test Automation with GitHub Actions
 
-This is post 9 in the pytest 101 series.
+This is the 9th post in the pytest 101 series.
 
 Local green tests are not enough when pull requests can still ship unverified combinations of Python versions, dependencies, and coverage regressions. In this article, we'll turn pytest into an operational gate by wiring one coherent GitHub Actions workflow to every push and pull request.
 

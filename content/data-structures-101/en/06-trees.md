@@ -29,7 +29,7 @@ last_reviewed: '2026-05-04'
 
 > A tree branches out from a starting node into multiple children, forming a hierarchy. With just two rules — no cycles and exactly one parent per node — you can express almost any hierarchy. This article walks through tree terminology, two representations, and the three classic depth-first traversals (preorder, inorder, postorder) implemented from scratch.
 
-This is post 6 in the Data Structures 101 series.
+This is the 6th post in the Data Structures 101 series.
 
 
 ![data structures 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/06/06-01-big-picture.en.png)

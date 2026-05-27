@@ -26,7 +26,7 @@ When a model predicts 0.8, most teams instinctively read that as "about an 80% c
 
 This matters most when probabilities flow directly into pricing, prioritization, or expected-value calculations. A model can have strong AUC and still overstate or understate risk badly enough to damage downstream decisions.
 
-This is post 7 in the Model Evaluation 101 series. In this post, we separate ranking quality from probability quality and walk through reliability curves, Brier score, and post-fit calibration.
+This is the 7th post in the Model Evaluation 101 series. In this post, we separate ranking quality from probability quality and walk through reliability curves, Brier score, and post-fit calibration.
 
 
 ![model evaluation 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/07/07-01-concept-at-a-glance.en.png)

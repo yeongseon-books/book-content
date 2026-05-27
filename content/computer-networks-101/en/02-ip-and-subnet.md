@@ -29,7 +29,7 @@ last_reviewed: '2026-05-15'
 
 > An IP address has to be read as two parts — which network, and which host inside that network. The subnet mask defines that split, and CIDR is the short way to write it. Routing, NAT, firewall rules, and container networks all run on top of this split.
 
-This is post 2 in the Computer Networks 101 series.
+This is the 2nd post in the Computer Networks 101 series.
 
 
 ![computer networks 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/02/02-01-concept-at-a-glance.en.png)

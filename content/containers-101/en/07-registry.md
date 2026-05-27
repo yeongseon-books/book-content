@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 A well-built image is still useless if no one can pull the exact same artifact back later. Teams usually feel this when tags drift, push permissions are too broad, or deployment history can no longer prove what actually ran.
 
-This is post 7 in the Containers 101 series.
+This is the 7th post in the Containers 101 series.
 
 In this chapter, we treat the registry as the center of deployment identity, covering push and pull flow, digest pinning, permission separation, and the first steps toward image signing.
 

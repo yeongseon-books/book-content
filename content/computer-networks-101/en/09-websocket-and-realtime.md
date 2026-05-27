@@ -29,7 +29,7 @@ last_reviewed: '2026-05-15'
 
 > WebSocket starts as an HTTP request and then turns the same TCP connection into a bidirectional frame stream. The server can push at any time, and you no longer pay the header cost on every message. The trade-off is that long-lived connections create new pressure on load balancers, deploys, and resource accounting.
 
-This is post 9 in the Computer Networks 101 series.
+This is the 9th post in the Computer Networks 101 series.
 
 
 ![computer networks 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/09/09-01-concept-at-a-glance.en.png)

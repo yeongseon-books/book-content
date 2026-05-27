@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 When data lives in many dimensions, not every axis matters equally. Some directions carry most of the structure, while others mostly carry noise. PCA is the classic way to make that distinction explicit.
 
-This is post 9 in the Linear Algebra 101 series. Here we will treat PCA as the process of finding the directions with the largest variance and expressing the data in that new coordinate system.
+This is the 9th post in the Linear Algebra 101 series. Here we will treat PCA as the process of finding the directions with the largest variance and expressing the data in that new coordinate system.
 
 
 ![linear algebra 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/09/09-01-concept-at-a-glance.en.png)

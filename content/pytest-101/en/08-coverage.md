@@ -23,7 +23,7 @@ title: "pytest 101 (8/10): Coverage and Test Quality"
 
 # pytest 101 (8/10): Coverage and Test Quality
 
-This is post 8 in the pytest 101 series.
+This is the 8th post in the pytest 101 series.
 
 > pytest 101 series (8/10)
 

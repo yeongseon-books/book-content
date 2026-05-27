@@ -26,7 +26,7 @@ seo_description: The Engine in SQLAlchemy is "the ability to talk to a database,
 
 The Engine in SQLAlchemy is the capability to talk to a database, packaged as an object. This post starts by separating that abstraction from the concrete communication channel called Connection.
 
-This is the first article in the SQLAlchemy 101 series.
+This is the first post in the SQLAlchemy 101 series.
 
 > SQLAlchemy 101 series (1/10)
 

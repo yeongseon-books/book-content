@@ -24,7 +24,7 @@ Once documents number in the thousands or tens of thousands, NumPy brute-force s
 
 FAISS (Facebook AI Similarity Search) was built for this problem. It supports approximate nearest-neighbor (ANN) search that trades a small accuracy cost for a large speed gain. It handles billion-scale vector collections and runs fast on both CPU and GPU.
 
-This is post 4 in the Vector Search 101 series.
+This is the 4th post in the Vector Search 101 series.
 
 This post covers the baseline FAISS workflow you need before tuning larger ANN deployments.
 

@@ -25,7 +25,7 @@ last_reviewed: '2026-05-23'
 
 In article 4 we surveyed Behavioral patterns and introduced Strategy as "the pattern that separates algorithms so they can be swapped." That one-liner is enough for a catalog entry, but the moment I try to apply Strategy in production, questions pile up fast. Is this branch really a Strategy candidate? Should it be a class or just a function? How do I handle a default? Is runtime swapping safe? I will answer each of these questions while digging deep into Strategy.
 
-This is the fifth article in the Design Patterns 101 series.
+This is the 5th post in the Design Patterns 101 series.
 
 ![Strategy pattern structure](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/05/05-01-concept-at-a-glance.en.png)
 *Context depends only on the Strategy interface; concrete algorithms are replaced independently*

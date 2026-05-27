@@ -26,7 +26,7 @@ The first data job often creates pressure in the wrong place. New hires feel the
 
 That usually slows the ramp instead of accelerating it. In the first 90 days, the highest-leverage work is often quieter: mapping the data, meeting stakeholders, finding one or two small wins, and leaving behind documentation that makes future work easier for everyone.
 
-This is post 8 in the Data Science Career 101 series.
+This is the 8th post in the Data Science Career 101 series.
 
 
 ![data science career 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/08/08-01-concept-at-a-glance.en.png)

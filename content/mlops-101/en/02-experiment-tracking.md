@@ -26,7 +26,7 @@ Once a team trains a model a few times, memory usually fails before compute does
 
 The problem gets worse when multiple people are involved. One person leaves metrics in Slack, another stores only the best model, and someone else never records failed runs at all. At that point, reconstructing the past becomes harder than improving the model.
 
-This is post 2 in the MLOps 101 series.
+This is the 2nd post in the MLOps 101 series.
 
 Here, we will treat experiment tracking as the team's short-term memory and focus on what must be recorded so results can be reproduced and compared.
 

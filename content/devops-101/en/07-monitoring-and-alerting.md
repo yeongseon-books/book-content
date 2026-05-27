@@ -26,7 +26,7 @@ The most painful monitoring failure is not a missing dashboard. It is learning a
 
 Good monitoring shortens two loops at once: how quickly you notice trouble and how quickly you narrow it down. Metrics, dashboards, and alerts matter because they help the team answer "what changed?" and "where do we look first?" under pressure.
 
-This is post 7 in the DevOps 101 series. In this chapter, we build the operational view around Prometheus, Grafana, RED metrics, and alerts that actually deserve to wake someone up.
+This is the 7th post in the DevOps 101 series. In this chapter, we build the operational view around Prometheus, Grafana, RED metrics, and alerts that actually deserve to wake someone up.
 
 
 ![devops 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/07/07-01-concept-at-a-glance.en.png)

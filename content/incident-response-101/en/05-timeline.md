@@ -26,7 +26,7 @@ One of the most expensive mistakes after an incident is trusting memory more tha
 
 A useful timeline is not a polished story reconstructed after the fact. It is a fact log captured during the response and cleaned up later without mixing observation and interpretation.
 
-This is post 5 in the Incident Response 101 series. This post explains how to record incident events in real time, merge multiple channels into one chronology, and anchor the moments that matter for later RCA and postmortem work.
+This is the 5th post in the Incident Response 101 series. This post explains how to record incident events in real time, merge multiple channels into one chronology, and anchor the moments that matter for later RCA and postmortem work.
 
 
 ![incident response 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/05/05-01-diagram-at-a-glance.en.png)

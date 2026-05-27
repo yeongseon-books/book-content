@@ -24,7 +24,7 @@ seo_description: Defend against direct and indirect prompt injection using a lay
 
 Prompt injection works because system and user messages end up in the same context window. If you treat user input as harmless text, an attacker can turn it into an instruction channel.
 
-This is post 2 in the AI Safety & Guardrails 101 series. It breaks down why "ignore previous instructions" works and how to build layered defenses instead of relying on prompt wording alone.
+This is the 2nd post in the AI Safety & Guardrails 101 series. It breaks down why "ignore previous instructions" works and how to build layered defenses instead of relying on prompt wording alone.
 
 
 ![Prompt injection defense flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/02/02-01-big-picture.en.png)

@@ -26,7 +26,7 @@ Many teams say they fear deployment, but the deeper fear is usually rollback. If
 
 That is why continuous delivery is not just about automation. It is about making releases small, observable, and reversible so production changes become a routine operating motion instead of a high-drama event.
 
-This is post 3 in the DevOps 101 series. In this chapter, we compare deployment strategies, separate code deployment from feature release, and show what a safe promotion and rollback path looks like in practice.
+This is the 3rd post in the DevOps 101 series. In this chapter, we compare deployment strategies, separate code deployment from feature release, and show what a safe promotion and rollback path looks like in practice.
 
 
 ![devops 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/03/03-01-concept-at-a-glance.en.png)

@@ -26,7 +26,7 @@ Learning a distribution is not the same as being able to summarize it. In practi
 
 Even a die shows why the pair matters. Knowing that the average face value is 3.5 is useful, but it says nothing about how much the values swing. Variance and standard deviation supply that second coordinate.
 
-This is post 6 in the Probability 101 series. Here we define expectation and variance, compute them in code, use linearity to simplify reasoning, and connect the formulas to the way engineers read noisy metrics and model behavior.
+This is the 6th post in the Probability 101 series. Here we define expectation and variance, compute them in code, use linearity to simplify reasoning, and connect the formulas to the way engineers read noisy metrics and model behavior.
 
 
 ![probability 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/06/06-01-concept-at-a-glance.en.png)

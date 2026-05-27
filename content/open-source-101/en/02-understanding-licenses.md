@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Beginners usually look at features first when they evaluate an open source project. They want to know whether it solves today's problem, whether installation is easy, and whether examples are good. In real production work, though, there is often one document you should read before all of that: the license. It defines what you may do, what notice you must keep, and how redistribution works.
 
-This is post 2 in the Open Source 101 series.
+This is the 2nd post in the Open Source 101 series.
 
 Here, we will use MIT, Apache 2.0, and GPL as the main reference points and learn to read licenses as permission-and-obligation documents rather than brand names.
 

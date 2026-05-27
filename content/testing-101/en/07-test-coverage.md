@@ -26,7 +26,7 @@ Ask a team how much they tested, and someone will usually answer with a percenta
 
 Coverage helps when it reveals blind spots. It hurts when it becomes a vanity metric that rewards shallow tests and distracts from risky branches or exception paths.
 
-This is post 7 in the Testing 101 series. Here we separate line, branch, and function coverage, run `pytest-cov`, and focus on how to turn a report into better decisions rather than prettier dashboards.
+This is the 7th post in the Testing 101 series. Here we separate line, branch, and function coverage, run `pytest-cov`, and focus on how to turn a report into better decisions rather than prettier dashboards.
 
 > Coverage is a dashboard light. It tells you where to inspect, not what conclusion to declare.
 

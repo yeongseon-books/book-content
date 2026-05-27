@@ -26,7 +26,7 @@ seo_description: ForeignKey is the SQL-level reference; relationship() is the ob
 
 One of the most common database tasks is "fetch the related rows together": a user's orders, a post's comments, a post tagged with several labels. SQL handles this with JOINs, but in the ORM you express it as attribute access (`user.orders`). The bridge that makes that work is `relationship()`, and `back_populates` is the device that keeps both sides of a bidirectional link consistent. This article walks through one-to-many, many-to-one, and many-to-many in turn, and lays down the patterns that keep both sides synchronized.
 
-This is the 6th article in the SQLAlchemy 101 series.
+This is the 6th post in the SQLAlchemy 101 series.
 
 ![ORM Relationships: connecting both sides safely with relationship and back_populates](https://yeongseon-books.github.io/book-public-assets/assets/sqlalchemy-101/06/06-01-orm-relationships-connecting-both-sides.en.png)
 

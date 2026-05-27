@@ -24,7 +24,7 @@ last_reviewed: '2026-05-04'
 
 A one-screen app is easy to reason about. Real products are not. As soon as you add a home page, detail page, settings, and search results, users expect refresh, back navigation, and shareable links to work as if those screens were always separate places. Routing is the layer that makes that expectation feel natural.
 
-This is post 5 in the Frontend Development 101 series. Here we explain SPA navigation through the lens of URLs. The important idea is that a URL is not only an address. It is the portable description of the current screen state, and the router is the layer that maps that state to the component tree.
+This is the 5th post in the Frontend Development 101 series. Here we explain SPA navigation through the lens of URLs. The important idea is that a URL is not only an address. It is the portable description of the current screen state, and the router is the layer that maps that state to the component tree.
 
 
 ![frontend development 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/05/05-01-concept-at-a-glance.en.png)

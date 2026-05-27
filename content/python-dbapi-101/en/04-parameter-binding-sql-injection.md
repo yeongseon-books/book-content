@@ -28,7 +28,7 @@ seo_description: 'The key point: SQL tokenization happens before binding. ? tell
 
 SQL injection starts the moment query text and user input become the same string. This post uses sqlite3 to show how PEP 249 parameter binding keeps them separate and why that design matters in production.
 
-This is the 4th article in the Python DB-API 101 series.
+This is the 4th post in the Python DB-API 101 series.
 
 ![Parameter binding and SQL injection defense (sqlite3, PEP 249)](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/04/04-01-parameter-binding-and-sql-injection-defe.en.png)
 

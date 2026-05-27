@@ -26,7 +26,7 @@ Not every dense paragraph should become a diagram. Not every list of options des
 
 Figures are strongest when the reader needs direction, sequence, or system shape. Tables are strongest when the reader needs side-by-side differences, limits, and trade-offs. Once you see that split, visual choices stop feeling decorative and start feeling editorial.
 
-This is post 6 in the Technical Writing 101 series. It covers when to use figures, when to use tables, and how captions and alt text make them readable.
+This is the 6th post in the Technical Writing 101 series. It covers when to use figures, when to use tables, and how captions and alt text make them readable.
 
 
 ![technical writing 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/06/06-01-concept-at-a-glance.en.png)

@@ -26,7 +26,7 @@ Cloud networking looks simple until you have to change it. VPCs, subnets, securi
 
 A VPC is your network boundary. Inside, subnets partition the address space. Security groups and network ACLs filter traffic. Load balancers distribute it. VPN and Direct Connect bring on-prem into the picture. Networking often stays abstract until something breaks, then becomes very real.
 
-This is post 6 in the Cloud Computing 101 series.
+This is the 6th post in the Cloud Computing 101 series.
 
 In this post, we'll use a four-step mental model — isolate, place, allow, distribute — to make the core cloud networking pieces easier to reason about.
 

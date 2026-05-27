@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 When the train score soars and the test score collapses, “the model is smart” is usually the wrong interpretation. More often, the model found ways to memorize noise, shortcut the split, or overreact to feature quirks that do not survive new data.
 
-This is post 8 in the Machine Learning 101 series. Here we will diagnose underfitting versus overfitting, connect that diagnosis to the bias-variance trade-off, and use Ridge, Lasso, and related regularization tools to recover generalization.
+This is the 8th post in the Machine Learning 101 series. Here we will diagnose underfitting versus overfitting, connect that diagnosis to the bias-variance trade-off, and use Ridge, Lasso, and related regularization tools to recover generalization.
 
 
 ![machine learning 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/08/08-01-concept-at-a-glance.en.png)

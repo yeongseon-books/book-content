@@ -26,7 +26,7 @@ Sooner or later, serverless beginners hit the same objection. “If functions mu
 
 The important distinction is simple: the business still has state, but the function process is not the place to trust that state. Once you accept that, the rest becomes an architecture exercise about choosing the right external stores.
 
-This is post 6 in the Serverless 101 series.
+This is the 6th post in the Serverless 101 series.
 
 
 ![serverless 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/06/06-01-concept-at-a-glance.en.png)

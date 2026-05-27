@@ -23,7 +23,7 @@ seo_description: RAG requires evaluating both retrieval and generation stages. T
 
 RAG requires evaluating both retrieval and generation stages.
 
-This is post 6 in the AI Evaluation 101 series. Here we cover RAG-specific metrics like retrieval recall, context precision, faithfulness, and answer relevance.
+This is the 6th post in the AI Evaluation 101 series. Here we cover RAG-specific metrics like retrieval recall, context precision, faithfulness, and answer relevance.
 
 
 ![Evaluating RAG systems](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/06/06-01-evaluating-rag-systems.en.png)

@@ -26,7 +26,7 @@ Once an incident is over, the emotional temptation is to move on quickly. The ch
 
 That is exactly when the most valuable learning can be lost. A good postmortem converts a stressful event into an organizational asset instead of a fading memory or a blame ritual.
 
-This is post 8 in the Incident Response 101 series. This post covers blameless postmortem structure, quantified impact, actionable follow-up items, and the review loop that keeps the document from becoming shelfware.
+This is the 8th post in the Incident Response 101 series. This post covers blameless postmortem structure, quantified impact, actionable follow-up items, and the review loop that keeps the document from becoming shelfware.
 
 
 ![incident response 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/08/08-01-diagram-at-a-glance.en.png)

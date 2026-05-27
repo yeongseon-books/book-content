@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Once you start contributing to open source, a new question appears: does your GitHub profile look like a random warehouse of repositories, or does it show how you choose problems and follow them through? A large number of contributions does not automatically become a strong portfolio. People trust context and continuity more than raw counts.
 
-This is post 9 in the Open Source 101 series.
+This is the 9th post in the Open Source 101 series.
 
 Here, we will look at how to turn GitHub activity into a portfolio that shows problem selection, execution style, and sustained evidence rather than just activity noise.
 

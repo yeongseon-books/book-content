@@ -29,7 +29,7 @@ last_reviewed: '2026-05-04'
 
 > Least privilege defines your blast radius when an incident happens.
 
-This is post 8 in the Information Security 101 series.
+This is the 8th post in the Information Security 101 series.
 
 
 ![information security 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/08/08-01-big-picture.en.png)

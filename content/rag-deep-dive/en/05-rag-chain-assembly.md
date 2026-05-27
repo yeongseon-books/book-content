@@ -22,7 +22,7 @@ seo_description: Why RetrievalQA falls short and how LCEL pipelines express the 
 
 RetrievalQA is convenient, but it hides too much of the pipeline. This post compares it with LCEL to show the same RAG flow more explicitly.
 
-This is post 5 in the RAG Deep Dive series.
+This is the 5th post in the RAG Deep Dive series.
 
 ![RetrievalQA chain-type dispatch path](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/05/05-01-retrieval-qa-chain-type-dispatch.en.png)
 *RetrievalQA chain-type dispatch path*

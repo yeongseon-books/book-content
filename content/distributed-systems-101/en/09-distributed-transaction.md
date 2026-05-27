@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 The painful part of a distributed transaction is not the success path where every service behaves. It is the partial-failure path where one side committed, another side timed out, and the business still expects a single answer.
 
-This is post 9 in the Distributed Systems 101 series.
+This is the 9th post in the Distributed Systems 101 series.
 
 Here we compare the heavyweight answer of 2PC with the more common production answers: Saga, outbox relay, and idempotent recovery.
 

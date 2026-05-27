@@ -23,7 +23,7 @@ seo_description: Build a streaming chat UI with Next.js and the Vercel AI SDK, a
 
 Once a terminal call works, the next step is building something a user can actually touch. That is where browser state, streaming responses, server routes, and user experience start interacting.
 
-This is post 3 in the AI Web Development 101 series.
+This is the 3rd post in the AI Web Development 101 series.
 
 Here, we will build a browser chatbot and focus on the boundary between client UI state and the server route that talks to the model.
 

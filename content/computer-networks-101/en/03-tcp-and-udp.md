@@ -29,7 +29,7 @@ last_reviewed: '2026-05-15'
 
 > Both are transport-layer protocols on top of IP. TCP handles connection, order, retransmission, and flow and congestion control. UDP pushes all of that onto the application and just throws packets. There is no winner — there is only the right choice for a workload.
 
-This is post 3 in the Computer Networks 101 series.
+This is the 3rd post in the Computer Networks 101 series.
 
 
 ![computer networks 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/03/03-01-concept-at-a-glance.en.png)

@@ -22,7 +22,7 @@ last_reviewed: '2026-05-04'
 
 # Object-Oriented Programming 101 (3/10): Encapsulation
 
-This is post 3 in the Object-Oriented Programming 101 series.
+This is the 3rd post in the Object-Oriented Programming 101 series.
 
 > Object-Oriented Programming 101 Series (3/10)
 

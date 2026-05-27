@@ -26,7 +26,7 @@ As soon as a team writes down an SLO, the next practical question shows up: how 
 
 The error budget is useful because it turns that argument into policy. It gives the team a shared number for how much reliability risk remains, and that number should change release behavior before emotions do.
 
-This is post 4 in the SRE 101 series. Here we connect SLO math to release policy, burn-rate alerting, and the day-to-day trade-off between stability work and product change.
+This is the 4th post in the SRE 101 series. Here we connect SLO math to release policy, burn-rate alerting, and the day-to-day trade-off between stability work and product change.
 
 
 ![sre 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/04/04-01-concept-at-a-glance.en.png)

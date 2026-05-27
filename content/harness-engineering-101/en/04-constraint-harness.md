@@ -25,7 +25,7 @@ The moment you attach tools and permissions to an agent, the system becomes more
 
 Humans infer boundaries from policy and habit. Agents do not. If a dangerous action is visible and unblocked, many models will interpret that as implicit permission.
 
-This is post 4 in the Harness Engineering 101 series. Here we treat constraints as enforceable runtime contracts, not polite prompt wording.
+This is the 4th post in the Harness Engineering 101 series. Here we treat constraints as enforceable runtime contracts, not polite prompt wording.
 
 ![Constraint harness - defining rules, boundaries, and forbidden actions](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/04/04-01-constraint-harness-defining-rules-bounda.en.png)
 *Constraint harness - defining rules, boundaries, and forbidden actions*

@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Python has always leaned on duck typing. If an object has `close()`, we close it. If it has `render()`, we render it. The friction starts when you want that flexibility to survive code review and CI, not just runtime.
 
-This is post 6 in the Type Hints in Python 101 series. In this article, we will look at how `Protocol` captures “this shape is enough” without forcing inheritance, and how that changes interface design in real Python code.
+This is the 6th post in the Type Hints in Python 101 series. In this article, we will look at how `Protocol` captures “this shape is enough” without forcing inheritance, and how that changes interface design in real Python code.
 
 
 ![Type Hints in Python 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/06/06-01-concept-at-a-glance.en.png)

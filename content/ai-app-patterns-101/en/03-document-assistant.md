@@ -23,7 +23,7 @@ seo_description: A document assistant is not a conversational system; it is a tr
 
 Document-processing tasks look different on the surface, but they usually reduce to the same engineering problem: take long input, shape it for the model, and return compact output with a clear contract. That framing makes summarization, extraction, and classification easier to design as one family of patterns.
 
-This is post 3 in the AI App Patterns 101 series. Here we cover the document assistant pattern through summarization, structured extraction, and classification flows.
+This is the 3rd post in the AI App Patterns 101 series. Here we cover the document assistant pattern through summarization, structured extraction, and classification flows.
 
 ![Short document summarization flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/03/03-01-short-document-summarization-flow.en.png)
 *Short document summarization flow*

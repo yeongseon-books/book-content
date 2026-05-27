@@ -23,7 +23,7 @@ seo_description: Agents reach answers through multiple steps. You need to evalua
 
 Agents reach answers through multiple steps. You need to evaluate not just the final response but 'which tools, in what order, how many times.'
 
-This is post 7 in the AI Evaluation 101 series. Here we cover trajectory-level evaluation.
+This is the 7th post in the AI Evaluation 101 series. Here we cover trajectory-level evaluation.
 
 
 ![Evaluating agents - Trajectories, not single responses](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/07/07-01-evaluating-agents-trajectories-not-singl.en.png)

@@ -26,7 +26,7 @@ seo_description: A pipe connects commands like plumbing, and redirection changes
 
 Single commands are useful, but real CLI work usually starts when you connect them. Filtering logs, saving build output, and separating failures from normal output all depend on understanding where stdin, stdout, and stderr are flowing.
 
-This is post 6 in the Linux CLI 101 series.
+This is the 6th post in the Linux CLI 101 series.
 
 
 ![Linux CLI 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/06/06-01-mental-model.en.png)

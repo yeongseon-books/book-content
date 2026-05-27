@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 “Works on my laptop” usually means the application is still missing part of its operating model. Once code leaves a personal machine, configuration, secrets, repeatable builds, health checks, and rollback paths all become part of the feature.
 
-This is post 8 in the Web Development 101 series. Here we treat deployment as a reproducible release process rather than a copy-and-paste ritual so the same build can move safely across environments.
+This is the 8th post in the Web Development 101 series. Here we treat deployment as a reproducible release process rather than a copy-and-paste ritual so the same build can move safely across environments.
 
 
 ![web development 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/08/08-01-concept-at-a-glance.en.png)

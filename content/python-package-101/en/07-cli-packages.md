@@ -26,7 +26,7 @@ seo_description: An entry point registers a terminal command that runs after pip
 
 Packaging becomes much more tangible once `pip install` gives a user an actual command to run. A polished CLI turns your package from shared code into a repeatable workflow.
 
-This is post 7 in the Python Package 101 series. Here we connect `[project.scripts]` entry points to real Python functions, compare `argparse` with `click`, and design CLIs that hold up in everyday tooling.
+This is the 7th post in the Python Package 101 series. Here we connect `[project.scripts]` entry points to real Python functions, compare `argparse` with `click`, and design CLIs that hold up in everyday tooling.
 
 ![Python Package 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/07/07-01-mental-model.en.png)
 *Python Package 101 chapter 7 flow overview*

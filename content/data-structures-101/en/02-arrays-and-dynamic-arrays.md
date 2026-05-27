@@ -29,7 +29,7 @@ last_reviewed: '2026-05-04'
 
 > An array stores elements of the same type contiguously in memory. Indexing is instant, but the size is fixed. A dynamic array breaks that limit by allocating a larger block and copying existing elements when capacity runs out. This article walks through both structures, their time complexity, and how Python's list is actually implemented.
 
-This is post 2 in the Data Structures 101 series.
+This is the 2nd post in the Data Structures 101 series.
 
 
 ![data structures 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/02/02-01-big-picture.en.png)

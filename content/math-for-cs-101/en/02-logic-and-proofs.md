@@ -26,7 +26,7 @@ Developers make logical claims all the time: this condition is sufficient, that 
 
 As the number of branches and state transitions grows, writing more tests alone is not enough. You also need a clean way to separate the claim itself, the assumptions behind it, and the counterexamples that would invalidate it.
 
-This is post 2 in the Math for CS 101 series.
+This is the 2nd post in the Math for CS 101 series.
 
 Here we treat logic and proof as a practical grammar for explaining correctness in code, not as an isolated math ritual.
 

@@ -25,7 +25,7 @@ The moment agent automation starts creating real business value, a harder questi
 
 Payments, deploys, deletes, and outbound communication are not just another class of output. They are irreversible or high-liability actions. The right question is not “is the model usually right?” but “where does a human decision belong even when the model looks confident?”
 
-This is post 8 in the Harness Engineering 101 series. It defines Approval Gates as an operating protocol inside the agent loop rather than a vague promise of manual review.
+This is the 8th post in the Harness Engineering 101 series. It defines Approval Gates as an operating protocol inside the agent loop rather than a vague promise of manual review.
 
 ![Approval gates - designing where humans must approve](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/08/08-01-approval-gates-designing-where-humans-mu.en.png)
 *Approval gates - designing where humans must approve*

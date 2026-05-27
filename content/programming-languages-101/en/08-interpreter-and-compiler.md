@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Python is often called an interpreted language, yet it still produces `.pyc` files. That tension is a useful clue. It means the common “interpreted vs compiled” contrast is too blunt to describe what actually happens at runtime.
 
-This is post 8 in the Programming Languages 101 series.
+This is the 8th post in the Programming Languages 101 series.
 
 In this post, we will treat interpreters and compilers as two strategies for the same translation problem. We will use Python bytecode as the concrete example, then connect that path to AOT and JIT so the execution model feels like an engineering choice instead of a slogan.
 

@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Production data rarely lives in one perfect table. Customer attributes sit in one dataset, orders in another, and campaign or event data somewhere else. That means the skill of combining tables safely is not optional. It is one of the most important parts of analysis work.
 
-This is post 7 in the Pandas 101 series.
+This is the 7th post in the Pandas 101 series.
 
 Here we will treat `merge` and `join` as tools for validating relationships between key systems, not just for gluing columns together. Row counts and key assumptions matter as much as the output table itself.
 

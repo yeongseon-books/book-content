@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 A portfolio project is only halfway finished if it runs on localhost and nowhere else. There is a big difference between saying the project works and giving another person a URL where they can verify it. Without that public path, the project still depends on explanation.
 
-This is post 5 in the Portfolio Project 101 series. Here we will treat deployment not as a giant infrastructure project, but as the discipline of creating a public URL, separating secrets, keeping a repeatable release path, and exposing a basic health check.
+This is the 5th post in the Portfolio Project 101 series. Here we will treat deployment not as a giant infrastructure project, but as the discipline of creating a public URL, separating secrets, keeping a repeatable release path, and exposing a basic health check.
 
 ---
 

@@ -24,7 +24,7 @@ Post 1 covered the concept. This post is about running real code. Moving from th
 
 `HuggingFaceEmbeddings` from `langchain-huggingface` wraps `sentence-transformers` behind a LangChain-compatible interface. Even if you are not building a LangChain pipeline, the wrapper pattern itself is worth understanding — it shows how embedding models are typically integrated into larger application stacks.
 
-This is post 2 in the Vector Search 101 series.
+This is the 2nd post in the Vector Search 101 series.
 
 Here we turn local embeddings into a reusable workflow: initialize once, encode in batch, persist the vectors, and reload them safely.
 

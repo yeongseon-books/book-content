@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 “Which model is better?” is an incomplete question until someone adds a metric and a business cost. Without that context, evaluation becomes theater: numbers move, dashboards look scientific, and the organization still cannot decide which errors it is willing to pay for.
 
-This is post 9 in the Machine Learning 101 series. Here we will connect confusion matrices, ROC and PR curves, regression metrics, and threshold choices back to the more important decision: what kind of failure matters most in the real system.
+This is the 9th post in the Machine Learning 101 series. Here we will connect confusion matrices, ROC and PR curves, regression metrics, and threshold choices back to the more important decision: what kind of failure matters most in the real system.
 
 
 ![machine learning 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/09/09-01-concept-at-a-glance.en.png)

@@ -24,7 +24,7 @@ last_reviewed: '2026-05-04'
 
 Forms are where products have their longest conversation with users. Sign-up, login, payment, search, and settings changes all pass through fields, buttons, and validation messages. When that conversation is awkward, users feel it immediately.
 
-This is post 7 in the Frontend Development 101 series. Here we treat a form as a guided interaction rather than as a bag of inputs. A good form helps while the user is typing, shows errors in plain language, and makes correction easier than failure.
+This is the 7th post in the Frontend Development 101 series. Here we treat a form as a guided interaction rather than as a bag of inputs. A good form helps while the user is typing, shows errors in plain language, and makes correction easier than failure.
 
 
 ![frontend development 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/07/07-01-concept-at-a-glance.en.png)

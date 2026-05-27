@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Once a system is split into services, the next hard question is no longer "what code should I write?" but "how should these parts talk?" The answer determines whether latency piles up in a synchronous chain or gets absorbed behind a queue boundary.
 
-This is post 3 in the Distributed Systems 101 series.
+This is the 3rd post in the Distributed Systems 101 series.
 
 Here we compare RPC and message passing as two different contracts: one optimized for immediate answers, the other for decoupling time, failure, and load.
 

@@ -29,7 +29,7 @@ last_reviewed: '2026-05-04'
 
 > Both bugs share one root: never let input be interpreted as code.
 
-This is post 6 in the Information Security 101 series.
+This is the 6th post in the Information Security 101 series.
 
 
 ![information security 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/06/06-01-big-picture.en.png)

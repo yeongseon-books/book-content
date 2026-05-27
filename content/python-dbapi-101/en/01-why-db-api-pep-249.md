@@ -28,7 +28,7 @@ If you have used Python with a database, you have probably touched `sqlite3`, `p
 
 This first episode walks through why DB-API 2.0 exists, what it standardizes, why we use SQLite throughout the series, and how the same code transfers to other drivers like PostgreSQL or MySQL.
 
-This is the first article in the Python DB-API 101 series.
+This is the first post in the Python DB-API 101 series.
 
 ![Why DB-API 2.0 - the problem PEP 249 solved](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-01-why-db-api-2-0-the-problem-pep-249-solve.en.png)
 

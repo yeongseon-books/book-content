@@ -29,7 +29,7 @@ last_reviewed: '2026-05-04'
 
 > A CPU pipeline is the same idea as a car assembly line. Processing one instruction takes several stages, but if you overlap stages so different instructions occupy them at the same time, throughput rises by the number of stages. The enemies of this trick are branches, data dependencies, and memory latency — and branch prediction is the most interesting weapon in that fight.
 
-This is post 7 in the Computer Architecture 101 series.
+This is the 7th post in the Computer Architecture 101 series.
 
 
 ![computer architecture 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/07/07-01-big-picture.en.png)

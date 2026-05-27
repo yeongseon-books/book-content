@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Isolation does not make a container automatically safe. Default settings can still leave you with a root process, excess capabilities, weak secret handling, and unsigned artifacts moving through production.
 
-This is post 8 in the Containers 101 series.
+This is the 8th post in the Containers 101 series.
 
 In this chapter, we build a practical baseline around non-root users, capability reduction, seccomp, read-only filesystems, image scanning, and signature-aware delivery.
 

@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Typing a domain into a browser does not trigger one magical request. It kicks off a layered exchange where DNS, TCP, TLS, and HTTP each do a different job. Engineers who can draw those layers mentally usually find latency and failure faster.
 
-This is post 7 in the Computer Science 101 series.
+This is the 7th post in the Computer Science 101 series.
 
 In this article, we'll build a practical network model through the TCP/IP layers, HTTP messages, DNS lookups, and direct socket examples.
 

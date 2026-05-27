@@ -27,7 +27,7 @@ The operational version of this problem is harsher. One session resumes correctl
 
 Once tool calls and multi-turn behavior enter the picture, the naïve fallback—“just resend the last user message”—breaks down quickly. Message accumulation rules vanish. Turn counters vanish. Summary state vanishes. External tool results vanish. Teams I've worked with often discover too late that what looked like a harmless retry path was actually a brand-new execution wearing the clothes of a resumed session.
 
-This is the second article in the LangGraph 101 series. Here I want to frame checkpointing not as a friendly memory feature, but as a **runtime layer that saves state and lets execution continue from the same conversation timeline**. That distinction matters. **State is the graph’s single source of truth, and a checkpoint is the mechanism that preserves that truth across calls.**
+This is the 2nd post in the LangGraph 101 series. Here I want to frame checkpointing not as a friendly memory feature, but as a **runtime layer that saves state and lets execution continue from the same conversation timeline**. That distinction matters. **State is the graph’s single source of truth, and a checkpoint is the mechanism that preserves that truth across calls.**
 
 Once that model is clear, the rest of the graph speaks the same language. Conditional edges stop looking like isolated branching logic and start looking like routing decisions made from saved state. Tool loops become repeated state transitions on top of the same timeline. If checkpointing remains a fuzzy “memory-like thing,” `thread_id`, merge rules, replay, and time travel all stay fuzzier than they should.
 

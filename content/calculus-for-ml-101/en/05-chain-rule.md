@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Neural networks are not single functions. They are functions composed inside other functions, layer after layer, until a final loss is produced. In that setting, the key question is no longer "can I differentiate this formula?" but "how does a change at one stage travel through the whole path?"
 
-This is post 5 in the Calculus for ML 101 series.
+This is the 5th post in the Calculus for ML 101 series.
 
 In this post, we'll use outer and inner functions, stage-by-stage derivatives, and broken gradient paths to explain the chain rule. The point is not to memorize a formula, but to see why backpropagation is fundamentally a disciplined application of local derivatives.
 

@@ -28,7 +28,7 @@ The previous nine posts covered nearly every behavior of SQLite and PEP 249. Thi
 
 This post does not introduce many new ideas. It composes the patterns from earlier posts into a single production-ready shape that you can copy into a service.
 
-This is the final article in the Python DB-API 101 series.
+This is the final post in the Python DB-API 101 series.
 
 ![SQLite production Patterns: retry, timeout, observability, backup](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/10/10-01-sqlite-production-patterns-retry-timeout.en.png)
 

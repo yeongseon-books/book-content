@@ -22,7 +22,7 @@ seo_description: Augmentation is not about creating more rows. It is about choos
 
 # AI Data Preparation 101 (8/10): Data Augmentation - From EDA to Back-Translation
 
-This is post 8 in the AI Data Preparation 101 series.
+This is the 8th post in the AI Data Preparation 101 series.
 
 Data augmentation is not about inventing brand-new samples. It is about widening the training distribution while preserving the original label semantics. In practice, that means the important question is not “Which techniques exist?” but “Which technique fits this dataset problem, and does it survive held-out evaluation?”
 

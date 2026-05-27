@@ -24,7 +24,7 @@ seo_description: Compare VectorDB indexes fairly. Learn to balance accuracy, lat
 
 VectorDB comparison is really a comparison of index behavior under the same vectors and the same queries. Hold that frame steady and the trade-offs across accuracy, latency, and memory become hard to ignore.
 
-This is the 4th article in the RAG Evaluation and Benchmarking 101 series.
+This is the 4th post in the RAG Evaluation and Benchmarking 101 series.
 
 ![same vectors compared across flat and IVF indexes](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/04/04-01-same-vector-flat-and-ivf-comparison-stru.en.png)
 *same vectors compared across flat and IVF indexes*

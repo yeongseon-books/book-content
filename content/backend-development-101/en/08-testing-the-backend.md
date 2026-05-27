@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Changing backend code without tests is a bet every single time. As a system grows, the real skill is not writing perfect code once, but making sure you can change it later without breaking the parts that already matter.
 
-This is post 8 in the Backend Development 101 series. Here, we split tests into unit, integration, and end-to-end layers and use pytest plus FastAPI TestClient to build a backend that stays safe to modify.
+This is the 8th post in the Backend Development 101 series. Here, we split tests into unit, integration, and end-to-end layers and use pytest plus FastAPI TestClient to build a backend that stays safe to modify.
 
 
 ![backend development 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/08/08-01-concept-at-a-glance.en.png)

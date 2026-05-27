@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Once several Pods are running, their IP addresses stop being a stable integration surface. Pods restart, move, and get recreated, but callers still need one name and one contract that keeps working.
 
-This is post 4 in the Kubernetes 101 series.
+This is the 4th post in the Kubernetes 101 series.
 
 Here, we will look at Service as the networking contract that hides changing Pod membership behind a stable virtual IP and DNS name for both internal and external traffic patterns.
 

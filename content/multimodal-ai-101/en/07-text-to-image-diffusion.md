@@ -23,7 +23,7 @@ seo_description: From 2014 to around 2020, GANs were the default for image gener
 
 # Multimodal AI 101 (7/10): Text-to-Image with Diffusion
 
-This is post 7 in the Multimodal AI 101 series.
+This is the 7th post in the Multimodal AI 101 series.
 
 > Multimodal AI 101 series (7/10)
 

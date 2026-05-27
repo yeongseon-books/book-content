@@ -27,7 +27,7 @@ Calling `write()` does not mean your data is safe yet. Between the page cache, t
 
 That is why storage bugs are rarely about syntax. They are about knowing exactly which guarantee the file system is making at each step.
 
-This is post 8 in the Operating Systems 101 series. It explains inode lookup, page cache behavior, fsync, journaling, and the atomic rename pattern used in real systems.
+This is the 8th post in the Operating Systems 101 series. It explains inode lookup, page cache behavior, fsync, journaling, and the atomic rename pattern used in real systems.
 
 
 ![operating systems 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/08/08-01-the-path-from-write-to-durable-storage.en.png)

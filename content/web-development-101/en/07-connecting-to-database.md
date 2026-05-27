@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 A web app can feel complete while everything still lives in process memory, right up until the first restart, the first concurrent write, or the first report that data disappeared. Durable storage changes how you design correctness, concurrency, and performance.
 
-This is post 7 in the Web Development 101 series. Here we move from in-memory thinking to database thinking by covering SQL basics, ORMs, connection pools, and transactions as the backbone of persistent application state.
+This is the 7th post in the Web Development 101 series. Here we move from in-memory thinking to database thinking by covering SQL basics, ORMs, connection pools, and transactions as the backbone of persistent application state.
 
 
 ![web development 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/07/07-01-concept-at-a-glance.en.png)

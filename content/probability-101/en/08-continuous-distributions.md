@@ -26,7 +26,7 @@ In discrete distributions, you can count the possible values one by one. Many re
 
 Once continuous distributions click, several things become easier at once: why a PDF value is not itself a probability, why the normal distribution appears so often, and why standardization is such a common move in analysis and machine learning.
 
-This is post 8 in the Probability 101 series. Here we use Uniform, Normal, Exponential, and Gamma distributions to build intuition for density, interval probability, waiting-time models, and standardized comparisons.
+This is the 8th post in the Probability 101 series. Here we use Uniform, Normal, Exponential, and Gamma distributions to build intuition for density, interval probability, waiting-time models, and standardized comparisons.
 
 
 ![probability 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/08/08-01-concept-at-a-glance.en.png)

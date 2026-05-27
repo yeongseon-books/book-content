@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Interface design usually breaks long before the implementation does. You can see it the moment the caller needs to know too much about channels, protocols, or internal branching.
 
-This is post 5 in the Software Design 101 series.
+This is the 5th post in the Software Design 101 series.
 
 In this post, we treat interfaces as contracts written in the caller's language. The focus is on abstraction level, polymorphism, and the signals that tell you when a contract is leaking implementation detail.
 

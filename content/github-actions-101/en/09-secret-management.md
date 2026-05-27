@@ -26,7 +26,7 @@ As automation becomes more capable, more sensitive values start flowing through 
 
 That makes secret handling a design problem rather than a convenience feature. You need to decide where secrets live, which environments can read them, how much power `GITHUB_TOKEN` gets, and how to avoid turning one careless debug command into a permanent leak.
 
-This is post 9 in the GitHub Actions 101 series. In this post, we will use scope, least privilege, OIDC, and runtime masking to treat secrets as operational resources instead of YAML variables.
+This is the 9th post in the GitHub Actions 101 series. In this post, we will use scope, least privilege, OIDC, and runtime masking to treat secrets as operational resources instead of YAML variables.
 
 
 ![github actions 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/09/09-01-concept-at-a-glance.en.png)

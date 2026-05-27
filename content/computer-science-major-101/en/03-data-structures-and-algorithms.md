@@ -29,7 +29,7 @@ last_reviewed: '2026-05-14'
 
 > Because they are the *common language* of *problem solving*.
 
-This is post 3 in the Computer Science Major 101 series.
+This is the 3rd post in the Computer Science Major 101 series.
 
 
 ![computer science major 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/03/03-01-dsa-problem-solving-map.en.png)

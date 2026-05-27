@@ -26,7 +26,7 @@ seo_description: Environment is "the building," Container App is "the office," R
 
 Environment, Container App, and Revision show up everywhere in ACA. The names sound close, but they carry different lifetimes and responsibilities, and that distinction drives how you deploy and operate the platform.
 
-This is post 2 in the Azure Container Apps 101 series. Here, we'll separate those three terms from an operator's point of view.
+This is the 2nd post in the Azure Container Apps 101 series. Here, we'll separate those three terms from an operator's point of view.
 
 ![azure container apps 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/azure-aca-101/02/02-01-start-with-the-hierarchy.en.png)
 *azure container apps 101 chapter 2 flow overview*

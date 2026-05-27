@@ -25,7 +25,7 @@ When teams wire their first LangChain-style agent together, they usually hit the
 
 That problem gets louder once you start operating the thing instead of demoing it. One request finishes cleanly, another calls the same tool twice, a third cannot be reproduced because the intermediate state never got captured anywhere. Teams I've worked with often describe this as “the agent feels unstable,” but in production the deeper issue is usually simpler: the workflow is real, yet the workflow is not visible in the code structure.
 
-This is the first article in the LangGraph 101 series. Here I want to frame LangGraph not as a convenient agent utility, but as a **graph runtime where state moves explicitly from step to step**. That is the mental shift that matters. **LangGraph is less about writing clever prompts and more about refusing to hide state transitions.**
+This is the first post in the LangGraph 101 series. Here I want to frame LangGraph not as a convenient agent utility, but as a **graph runtime where state moves explicitly from step to step**. That is the mental shift that matters. **LangGraph is less about writing clever prompts and more about refusing to hide state transitions.**
 
 Once that click happens, the later pieces start to make more sense. Checkpointing stops looking like “memory magic” and starts reading like state snapshot storage. Conditional edges stop looking like a dressed-up `if` statement and start reading like runtime routing rules. Tool loops change too. Teams that separate node, edge, and state tend to debug by tracing stages. Teams that keep thinking in one long chain usually jump straight to the final string.
 

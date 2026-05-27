@@ -22,7 +22,7 @@ seo_description: How PromptTemplate and MessagesPlaceholder turn retrieved conte
 
 PromptTemplate and MessagesPlaceholder turn retrieved context into the exact input contract an LLM will read. This post traces that transformation in code.
 
-This is post 4 in the RAG Deep Dive series.
+This is the 4th post in the RAG Deep Dive series.
 
 ![String and chat prompt hierarchy](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/04/04-01-prompt-template-class-hierarchy.en.png)
 *String and chat prompt hierarchy*

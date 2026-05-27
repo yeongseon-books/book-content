@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Containers are supposed to be easy to replace. Data is not. If you blur that line, local demos may still work while production quietly accumulates backup gaps, permission collisions, and data-loss risk.
 
-This is post 5 in the Containers 101 series.
+This is the 5th post in the Containers 101 series.
 
 In this chapter, we compare named volumes, bind mounts, and tmpfs by lifecycle and failure mode, then turn that model into backup and restore habits you can keep in operations.
 

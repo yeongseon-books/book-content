@@ -25,7 +25,7 @@ Agent demos usually look fine because the inputs were carefully chosen and the p
 
 That is why “the agent says it is done” is not evidence. Completion must be decided by an external test surface that can run again after every prompt, tool, or model change.
 
-This is post 6 in the Harness Engineering 101 series. Here we turn completion criteria into repeatable unit, integration, and eval checks.
+This is the 6th post in the Harness Engineering 101 series. Here we turn completion criteria into repeatable unit, integration, and eval checks.
 
 ![Test harness - turning completion criteria into tests](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/06/06-01-test-harness-turning-completion-criteria.en.png)
 *Test harness - turning completion criteria into tests*

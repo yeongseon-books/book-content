@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 People often say static typing is safer, but the moment you ask what that safety really covers, the answer gets fuzzy. The same thing happens on the other side: dynamic languages are called faster, when the real question is faster in what sense and for which stage of work.
 
-This is post 9 in the Programming Languages 101 series.
+This is the 9th post in the Programming Languages 101 series.
 
 In this post, we will compare static and dynamic languages as a choice about when type promises are checked, not as a contest between good and bad. Side by side, the same function will show which errors move earlier, which ones stay at runtime, and why gradual typing became the compromise many teams adopted.
 

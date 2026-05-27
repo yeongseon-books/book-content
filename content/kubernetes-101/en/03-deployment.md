@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 A Pod can run your application, but it does not promise that the right number of copies stays alive or that a version change will happen safely. The minute you care about self-healing and controlled rollout, you need a controller that owns those guarantees.
 
-This is post 3 in the Kubernetes 101 series.
+This is the 3rd post in the Kubernetes 101 series.
 
 Here, we will treat Deployment as the default stateless workload controller that keeps replica count stable, rolls new versions gradually, and gives you a rollback path when a release goes wrong.
 

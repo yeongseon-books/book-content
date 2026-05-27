@@ -26,7 +26,7 @@ The moment you start writing unit tests seriously, real dependencies show up: em
 
 “Test double” is the umbrella term, but the umbrella hides important differences. Returning a canned answer, recording a call, and behaving like a lightweight real implementation are not the same job.
 
-This is post 5 in the Testing 101 series. Here we separate Dummy, Stub, Spy, Mock, and Fake, and focus on choosing the lightest double that still proves the behavior you actually care about.
+This is the 5th post in the Testing 101 series. Here we separate Dummy, Stub, Spy, Mock, and Fake, and focus on choosing the lightest double that still proves the behavior you actually care about.
 
 > A good double reduces external cost without distorting the contract you are trying to verify.
 

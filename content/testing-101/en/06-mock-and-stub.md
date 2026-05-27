@@ -26,7 +26,7 @@ After learning the broader test-double family, many engineers still blur togethe
 
 The distinction is smaller than a new tool and bigger than a naming preference: it is a choice about whether the core signal is the system’s output or the dependency call itself.
 
-This is post 6 in the Testing 101 series. Here we use `unittest.mock` to separate state verification from interaction verification and show when a Mock is the right instrument rather than just the most available one.
+This is the 6th post in the Testing 101 series. Here we use `unittest.mock` to separate state verification from interaction verification and show when a Mock is the right instrument rather than just the most available one.
 
 > Decide what question the test must answer before deciding whether a Mock or a Stub belongs in the room.
 

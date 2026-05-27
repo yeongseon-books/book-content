@@ -26,7 +26,7 @@ seo_description: Type hints declare the input and output types of functions, and
 
 The moment other developers import your package, they need more than working code. They need a contract they can read quickly, and type hints are the fastest way to make that contract visible to both humans and tools.
 
-This is post 8 in the Python Package 101 series. Here we use type hints, `mypy`, and `py.typed` to turn Python packaging into something safer to consume and easier to refactor.
+This is the 8th post in the Python Package 101 series. Here we use type hints, `mypy`, and `py.typed` to turn Python packaging into something safer to consume and easier to refactor.
 
 ![Python Package 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/08/08-01-mental-model.en.png)
 *Python Package 101 chapter 8 flow overview*

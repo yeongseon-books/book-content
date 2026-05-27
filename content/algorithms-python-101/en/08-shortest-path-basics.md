@@ -26,7 +26,7 @@ Route planning, network latency, and logistics optimization all come down to the
 
 Once edge weights matter, breadth-first search is no longer enough. You need a better model for prioritizing the next candidate path, and that is where Dijkstra's algorithm earns its place.
 
-This is post 8 in the Algorithms with Python 101 series. Here, we'll frame the shortest-path problem on weighted graphs and implement Dijkstra's algorithm in Python with `heapq`.
+This is the 8th post in the Algorithms with Python 101 series. Here, we'll frame the shortest-path problem on weighted graphs and implement Dijkstra's algorithm in Python with `heapq`.
 
 
 ![Algorithms with Python 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/08/08-01-concept-overview.en.png)

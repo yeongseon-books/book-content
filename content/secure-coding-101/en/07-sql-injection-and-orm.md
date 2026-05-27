@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 SQL injection is old, but it remains expensive because one mistake can hand over not just a page or a user account, but the entire database behind the application. A single f-string in the wrong place can become an authentication bypass, a data dump, and a destructive write path at the same time.
 
-This is post 7 in the Secure Coding 101 series.
+This is the 7th post in the Secure Coding 101 series.
 
 Here, we will treat SQL injection as a structural error in how code combines syntax and data, not as a problem that disappears automatically once an ORM is in place. That distinction is what helps you reason clearly about raw SQL, dynamic identifiers, ORM escape hatches, and database account permissions.
 

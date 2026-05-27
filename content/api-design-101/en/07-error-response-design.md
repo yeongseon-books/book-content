@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Success responses can stay quiet for a long time even when they are mediocre. Error responses cannot. The moment they drift, support tickets multiply, client exception logic forks, and logs stop telling one coherent story.
 
-This is post 7 in the API Design 101 series.
+This is the 7th post in the API Design 101 series.
 
 Here, we treat errors as first-class contract design. Status codes, machine-readable codes, validation details, and trace IDs have to work together if you want debugging speed without leaking the wrong information.
 

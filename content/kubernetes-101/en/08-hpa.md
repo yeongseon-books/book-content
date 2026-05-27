@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Traffic rarely stays flat. If humans resize replicas by hand, they react too late during spikes and waste money during quiet periods. Autoscaling helps, but only if the metrics and resource requests underneath it are trustworthy.
 
-This is post 8 in the Kubernetes 101 series.
+This is the 8th post in the Kubernetes 101 series.
 
 Here, we will treat HPA as a control loop that adjusts Deployment replica count from metrics, then connect that loop to requests, metrics-server, and node-level capacity limits.
 

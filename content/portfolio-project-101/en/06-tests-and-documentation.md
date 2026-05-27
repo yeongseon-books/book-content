@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Saying that a project works is very different from showing that it has been verified. If a reviewer opens the repository and finds no tests and no docs beyond a short README, the whole project starts to look like practice code—even if the app itself is functional.
 
-This is post 6 in the Portfolio Project 101 series. Here we will look at the level of testing and documentation that makes a small portfolio project feel trustworthy instead of accidental.
+This is the 6th post in the Portfolio Project 101 series. Here we will look at the level of testing and documentation that makes a small portfolio project feel trustworthy instead of accidental.
 
 ---
 

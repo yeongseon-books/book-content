@@ -25,7 +25,7 @@ seo_description: 'The pattern of train_test_split(data, test_size=0.2) failing i
 
 Many experiments look healthy right up until they meet production traffic because a simple random split hid the real failure mode. If your split ignores time, users, or benchmark contamination, validation scores can tell the wrong story.
 
-This is post 9 in the AI Data Preparation 101 series. Here we cover practical split strategies and the checks that keep contamination from invalidating evaluation.
+This is the 9th post in the AI Data Preparation 101 series. Here we cover practical split strategies and the checks that keep contamination from invalidating evaluation.
 
 
 ![AI data preparation chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/09/09-01-big-picture.en.png)

@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Sales, traffic, sensor, and financial data often stop behaving like ordinary tables once time becomes the main organizing dimension. If dates stay as strings, comparisons feel awkward and weekly summaries or moving averages become noisier to implement than they should be. The whole experience changes once time becomes the index.
 
-This is post 8 in the Pandas 101 series.
+This is the 8th post in the Pandas 101 series.
 
 In this chapter, we will keep time series work inside core Pandas patterns. The focus is on DatetimeIndex, time-aware grouping, rolling windows, and explicit time-zone handling.
 

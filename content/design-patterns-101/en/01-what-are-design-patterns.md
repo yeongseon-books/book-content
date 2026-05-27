@@ -25,7 +25,7 @@ last_reviewed: '2026-05-23'
 
 When I first learned design patterns, I started by memorizing names. Singleton, Strategy, Adapter, Observer, Factory. The GoF book lines up 23 of them, so the natural impression is "I need to know all of these to write good code." But the moment patterns actually prove their worth in practice is different. It is not on an exam. It is in a code review, when someone writes "this branching keeps growing — how about pulling it into a Strategy?" and every person on the team pictures the same structure instantly.
 
-This is the first article in the Design Patterns 101 series. I want to redefine design patterns not as "23 answers to memorize" but as **shared vocabulary for naming recurring design problems and reaching agreement quickly**. The weight of the names comes after that.
+This is the first post in the Design Patterns 101 series. I want to redefine design patterns not as "23 answers to memorize" but as **shared vocabulary for naming recurring design problems and reaching agreement quickly**. The weight of the names comes after that.
 
 ![Design Patterns 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/01/01-01-concept-at-a-glance.en.png)
 

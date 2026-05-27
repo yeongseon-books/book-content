@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 Sorting is the preprocessing step of almost every other algorithm. Comparison-based sorts have an information-theoretic lower bound of O(n log n). Within that envelope, mergesort, quicksort, and heapsort differ in stability, memory, and cache behaviour.
 
-This is post 4 in the Algorithms 101 series. Here we cover the trade-offs among textbook sorting algorithms and why Timsort wins so often in production code.
+This is the 4th post in the Algorithms 101 series. Here we cover the trade-offs among textbook sorting algorithms and why Timsort wins so often in production code.
 
 
 ![algorithms 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/04/04-01-big-picture.en.png)

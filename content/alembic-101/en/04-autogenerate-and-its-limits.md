@@ -26,7 +26,7 @@ seo_description: Autogenerate is a tool that diffs the live database (ground tru
 
 Autogenerate can diff the live database against `target_metadata`, but it cannot infer your intent. Renames are the classic example: the tool sees structural change, while you still have to judge safety.
 
-This is post 4 in the Alembic 101 series. Here we will separate what autogenerate handles well from the cases that still need a human pass.
+This is the 4th post in the Alembic 101 series. Here we will separate what autogenerate handles well from the cases that still need a human pass.
 
 
 ![alembic 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/04/04-01-diagram-the-autogenerate-diff-pipeline.en.png)

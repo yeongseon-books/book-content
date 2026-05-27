@@ -26,7 +26,7 @@ Large dashboards often look impressive right until an incident starts. The scree
 
 Good dashboard design fixes that. The first screen should compress the system into a small number of questions that lead directly to the next action.
 
-This is post 6 in the Observability 101 series.
+This is the 6th post in the Observability 101 series.
 
 
 ![observability 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/06/06-01-concept-at-a-glance.en.png)

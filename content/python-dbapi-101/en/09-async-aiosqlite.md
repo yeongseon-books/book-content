@@ -28,7 +28,7 @@ What happens if you call `sqlite3.connect()` directly inside `asyncio` code? The
 
 `aiosqlite` solves this. But it is important to understand what "solve" means here. The library does not make SQLite truly asynchronous. It is an **adapter that runs each sqlite3 call in a background thread per connection and returns a Future to the event loop**. The loop stays unblocked, but SQLite's single-writer constraint is unchanged.
 
-This is the 9th article in the Python DB-API 101 series.
+This is the 9th post in the Python DB-API 101 series.
 
 ![Asynchronous SQLite with aiosqlite](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/09/09-01-asynchronous-sqlite-with-aiosqlite.en.png)
 

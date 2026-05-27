@@ -27,7 +27,7 @@ Requirements often sound obvious at first. "Add search." "Improve response time.
 
 That is why requirement mistakes are so expensive. A bug found during implementation can usually be fixed. A misunderstood requirement can force you to rewrite the code, the tests, the rollout plan, and the user expectation all at once. The cost is not just rework. It is false progress.
 
-This is post 2 in the Software Engineering 101 series. In this chapter, we turn vague requests into testable statements by connecting user stories, acceptance criteria, non-functional requirements, and the question patterns that expose ambiguity early.
+This is the 2nd post in the Software Engineering 101 series. In this chapter, we turn vague requests into testable statements by connecting user stories, acceptance criteria, non-functional requirements, and the question patterns that expose ambiguity early.
 
 
 ![software engineering 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/02/02-01-concept-at-a-glance.en.png)

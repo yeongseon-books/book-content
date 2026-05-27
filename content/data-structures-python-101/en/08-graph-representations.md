@@ -28,7 +28,7 @@ last_reviewed: '2026-05-15'
 
 > Graphs represent relationships using nodes (vertices) and edges. In Python, you implement adjacency lists with dict and adjacency matrices with 2D lists. This article covers graph representation methods and BFS/DFS traversals.
 
-This is post 8 in the Data Structures with Python 101 series.
+This is the 8th post in the Data Structures with Python 101 series.
 
 
 ![Data Structures with Python 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-python-101/08/08-01-graph-representation-at-a-glance.en.png)

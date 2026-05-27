@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Sometimes a build passes and the program still behaves strangely. Other times a single missing comma prevents the code from running at all. Both are errors, but they are not the same kind of error.
 
-This is post 2 in the Programming Languages 101 series.
+This is the 2nd post in the Programming Languages 101 series.
 
 In this post, we will separate the two axes every language stands on: syntax and semantics. Once you can tell “is this legal text?” apart from “what does this legal text mean?”, compile errors, runtime bugs, and later topics like type systems become much easier to reason about.
 

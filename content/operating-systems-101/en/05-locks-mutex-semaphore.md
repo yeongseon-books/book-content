@@ -27,7 +27,7 @@ Once you realize a race condition is real, the next instinct is usually "add a l
 
 Synchronization primitives are simple only on the surface. Safety depends on the exact rules around ownership, order, and duration.
 
-This is post 5 in the Operating Systems 101 series. It breaks down mutexes, semaphores, reentrant locks, and condition variables, then shows how deadlock appears and how to avoid it.
+This is the 5th post in the Operating Systems 101 series. It breaks down mutexes, semaphores, reentrant locks, and condition variables, then shows how deadlock appears and how to avoid it.
 
 
 ![operating systems 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/05/05-01-how-synchronization-tools-gate-entry.en.png)

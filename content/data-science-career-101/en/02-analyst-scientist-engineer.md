@@ -26,7 +26,7 @@ The most common early-career confusion in data work is not “Which language sho
 
 The overlap is real, but the center of gravity is different. Each role is hired to reduce a different kind of uncertainty: business interpretation, experimental confidence, or pipeline reliability. If you miss that distinction, your learning plan becomes broad in a way that looks ambitious but produces weak signal.
 
-This is post 2 in the Data Science Career 101 series.
+This is the 2nd post in the Data Science Career 101 series.
 
 
 ![data science career 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/02/02-01-concept-at-a-glance.en.png)

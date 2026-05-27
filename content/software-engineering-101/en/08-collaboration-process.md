@@ -27,7 +27,7 @@ Products are never built by code alone. Requirements, design decisions, risk che
 
 More meetings do not solve that problem. They often make it worse by consuming the most expensive resource in the team at the same time: focused human hours. Strong collaboration processes protect that resource by making discussion searchable, narrowing sync time to actual decisions, and leaving a trail that survives time zones and handoffs.
 
-This is post 8 in the Software Engineering 101 series. In this chapter, we treat RFCs, async comments, decision logs, and handoff notes as concrete engineering tools rather than management overhead.
+This is the 8th post in the Software Engineering 101 series. In this chapter, we treat RFCs, async comments, decision logs, and handoff notes as concrete engineering tools rather than management overhead.
 
 
 ![software engineering 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/08/08-01-concept-at-a-glance.en.png)

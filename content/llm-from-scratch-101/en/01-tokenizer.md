@@ -31,7 +31,7 @@ In this series, we're building a small GPT model from scratch using TinyShakespe
 
 Today's mental model is simple: **The model doesn't read text. It reads integer sequences created by the tokenizer.**
 
-This is the first article in the LLM from Scratch 101 series.
+This is the first post in the LLM from Scratch 101 series.
 
 ---
 

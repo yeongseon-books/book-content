@@ -26,7 +26,7 @@ Incidents rarely become chaotic because the engineers are weak. They become chao
 
 A good incident process reduces cognitive load before the alert even fires. Severity levels, on-call rotations, incident commanders, and postmortems give the team a repeatable way to recover under pressure.
 
-This is post 9 in the DevOps 101 series. In this chapter, we turn incident response into an operational system with severity definitions, runbooks, escalation rules, and blameless follow-up.
+This is the 9th post in the DevOps 101 series. In this chapter, we turn incident response into an operational system with severity definitions, runbooks, escalation rules, and blameless follow-up.
 
 
 ![devops 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/devops-101/09/09-01-concept-at-a-glance.en.png)

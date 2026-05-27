@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 In machine learning, one row of data is a vector, an embedding is a vector, and a gradient is a vector too. But if you treat vectors as plain number bundles, the calculations may still work while the meaning slips away. A vector is both algebraic notation and a geometric object.
 
-This is post 2 in the Linear Algebra 101 series. Here we will read vectors through three lenses at once: coordinates, arrows, and data representations.
+This is the 2nd post in the Linear Algebra 101 series. Here we will read vectors through three lenses at once: coordinates, arrows, and data representations.
 
 
 ![linear algebra 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/02/02-01-concept-at-a-glance.en.png)

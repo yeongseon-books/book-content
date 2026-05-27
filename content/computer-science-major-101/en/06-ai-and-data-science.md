@@ -29,7 +29,7 @@ last_reviewed: '2026-05-14'
 
 > *Data* is the *common input*, *AI* is the *model*, *analysis* is the *interpretation*.
 
-This is post 6 in the Computer Science Major 101 series.
+This is the 6th post in the Computer Science Major 101 series.
 
 
 ![computer science major 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/06/06-01-ai-learning-pipeline.en.png)

@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 The moment one machine seems to run many programs at once, you are already living inside an operating-system abstraction. The same perspective explains why a web server stalls, why a memory leak becomes visible, and why threads do not always make Python faster.
 
-This is post 6 in the Computer Science 101 series.
+This is the 6th post in the Computer Science 101 series.
 
 In this article, we'll turn processes, threads, virtual memory, system calls, and concurrency into a practical model you can use while debugging and designing software.
 

@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 In open source, the pull request is the most visible output of contribution. That is why beginners often feel like the work is done once the PR is open. From a maintainer's point of view, though, a pull request is not a blob of code. It is a change proposal that must be easy to review, easy to trust, and safe to merge.
 
-This is post 4 in the Open Source 101 series.
+This is the 4th post in the Open Source 101 series.
 
 Here, we will walk through the full contribution path from fork and branch to commit history, description, review response, and post-merge cleanup.
 

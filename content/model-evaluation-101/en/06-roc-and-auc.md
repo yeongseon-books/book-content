@@ -22,7 +22,7 @@ last_reviewed: '2026-05-17'
 
 # Model Evaluation 101 (6/10): ROC and AUC
 
-This is post 6 in the Model Evaluation 101 series.
+This is the 6th post in the Model Evaluation 101 series.
 
 ROC curves and AUC are useful when you want to compare candidate models before committing to one production threshold. But issue #772 correctly pointed out that the earlier version stopped at `ko/06-roc-and-auc.md:84-115`: it showed `thr[:3]`, AUC, PR-AUC, and one `FPR<=0.05` lookup, then never landed on an actual operating decision.
 

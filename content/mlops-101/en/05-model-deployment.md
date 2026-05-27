@@ -26,7 +26,7 @@ Finishing model training does not automatically create a service. If nobody has 
 
 When engineers say deployment is hard, they are usually not describing the model itself. They are describing environment drift, missing version traceability, and the lack of a safe rollback path. That is why model deployment is really about a reproducible runtime plus a controlled release policy.
 
-This is post 5 in the MLOps 101 series.
+This is the 5th post in the MLOps 101 series.
 
 Here, we will wrap a trained artifact in an API and a container, then connect that runtime to the rollout and rollback decisions needed in production.
 

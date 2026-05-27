@@ -23,7 +23,7 @@ seo_description: Learn the retrieval-augmentation-generation pipeline and build 
 
 No matter how capable a model is, it does not automatically know your latest policy docs, internal manuals, or yesterday's product changes. In real services, the critical question is often not “Is the model smart enough?” but “Can we attach the right evidence at the right moment?”
 
-This is post 4 in the AI Web Development 101 series.
+This is the 4th post in the AI Web Development 101 series.
 
 Here, we will build the mental model for retrieval-augmented generation and implement the smallest useful FAQ-style RAG flow.
 

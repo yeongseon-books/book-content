@@ -24,7 +24,7 @@ last_reviewed: '2026-05-04'
 
 JavaScript feels endless when you first meet it. There are many array methods, multiple ways to declare functions, and a long list of DOM APIs that all look important. Many beginners lose momentum because they try to memorize the whole language before building anything real.
 
-This is post 3 in the Frontend Development 101 series. Here we focus on the five slices that open most frontend work quickly: variables, functions, collection transforms, DOM access, and events. Once those pieces feel natural, framework code stops looking magical.
+This is the 3rd post in the Frontend Development 101 series. Here we focus on the five slices that open most frontend work quickly: variables, functions, collection transforms, DOM access, and events. Once those pieces feel natural, framework code stops looking magical.
 
 
 ![frontend development 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/03/03-01-concept-at-a-glance.en.png)

@@ -28,7 +28,7 @@ last_reviewed: '2026-05-04'
 
 > Code generation turns IR into real instructions. The two core jobs are instruction selection (which instructions?) and register allocation (where do values live?).
 
-This is post 8 in the Compilers 101 series.
+This is the 8th post in the Compilers 101 series.
 
 
 ![compilers 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/08/08-01-big-picture.en.png)

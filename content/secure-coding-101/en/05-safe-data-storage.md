@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 The moment an application stores sensitive data, it stops being only a feature system and becomes a custody system as well. From the user's perspective, it may be a simple signup flow. From the operator's perspective, it may already include password hashes, address history, export files, and backups that become extremely expensive the moment they leak.
 
-This is post 5 in the Secure Coding 101 series.
+This is the 5th post in the Secure Coding 101 series.
 
 Here, we will look past the usual shorthand of "turn on disk encryption" and treat storage security as a chain: data classification, transport protection, storage encryption, key separation, and backup handling. That is the level where real incident cost is determined.
 

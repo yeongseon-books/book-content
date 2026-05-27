@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 A greedy algorithm makes the locally best choice at every step and never reconsiders it. To be correct, two properties must hold: the greedy-choice property and optimal substructure. The standard tool for proving both is the exchange argument.
 
-This is post 7 in the Algorithms 101 series. Here we cover when greedy algorithms are correct, how to justify them, and where greedy-looking problems quietly turn into DP.
+This is the 7th post in the Algorithms 101 series. Here we cover when greedy algorithms are correct, how to justify them, and where greedy-looking problems quietly turn into DP.
 
 
 ![algorithms 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/07/07-01-big-picture.en.png)

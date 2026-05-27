@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 Almost every piece of software does string matching, but the naive comparison can be O(nm). KMP uses a failure function so it never re-examines the same character, getting O(n+m). Tries and regex engines introduce a different kind of trade-off: convenience vs cost awareness.
 
-This is post 9 in the Algorithms 101 series. Here we cover naive matching, KMP, trie-based lookups, and the cost pitfalls that show up in production regex.
+This is the 9th post in the Algorithms 101 series. Here we cover naive matching, KMP, trie-based lookups, and the cost pitfalls that show up in production regex.
 
 
 ![algorithms 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/09/09-01-big-picture.en.png)

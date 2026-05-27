@@ -23,7 +23,7 @@ last_reviewed: '2026-05-04'
 
 # Type Hints in Python 101 (2/10): Basic Types and Collection Types
 
-This is post 2 in the Type Hints in Python 101 series.
+This is the 2nd post in the Type Hints in Python 101 series.
 
 > Type Hints in Python 101 Series (2/10)
 

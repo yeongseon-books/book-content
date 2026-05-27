@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Reusable Python code often fails at exactly one point: you can make it accept many types, but you accidentally erase the relationship between the input type and the output type. `Any` makes the code flexible but blind.
 
-This is post 7 in the Type Hints in Python 101 series. In this article, we will use `TypeVar` and `Generic` to preserve those type relationships, then look at where Generics help in real service code and where they become unnecessary abstraction.
+This is the 7th post in the Type Hints in Python 101 series. In this article, we will use `TypeVar` and `Generic` to preserve those type relationships, then look at where Generics help in real service code and where they become unnecessary abstraction.
 
 
 ![Type Hints in Python 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/07/07-01-concept-at-a-glance.en.png)

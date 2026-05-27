@@ -29,7 +29,7 @@ last_reviewed: '2026-05-04'
 
 > JIT (just-in-time) compiles during execution and AOT (ahead-of-time) compiles before it. That single difference shapes startup time, peak performance, and even how you ship the program.
 
-This is post 9 in the Compilers 101 series.
+This is the 9th post in the Compilers 101 series.
 
 
 ![compilers 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/09/09-01-big-picture.en.png)

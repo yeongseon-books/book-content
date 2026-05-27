@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 The argument is not really about acronym order. It is about where you want complexity to live when a pipeline fails at 2 a.m. If raw data disappears before you can replay it, the recovery story gets expensive fast.
 
-This is post 6 in the Data Warehouse 101 series.
+This is the 6th post in the Data Warehouse 101 series.
 
 In this post, we compare ETL and ELT from an operational point of view: where transformation happens, why modern warehouse teams prefer replayable SQL, and what that choice changes in day-to-day debugging.
 

@@ -25,7 +25,7 @@ last_reviewed: '2026-05-23'
 
 Code can be neatly separated into classes and still resist change. Modify one class and the notification logic breaks. Add a state transition and existing branches wobble. Swap a sorting strategy and every call site needs updating. These problems surface not because the structure is wrong, but because the **flow of responsibility between objects** is tangled. Behavioral patterns name that flow and draw boundaries so that change does not cascade.
 
-This is the fourth article in the Design Patterns 101 series. Strategy and Observer each get their own deep-dive chapters later (chapters 5 and 7), so here they receive only an overview. The bulk of the discussion goes to Command, Iterator, State, Template Method, and Chain of Responsibility.
+This is the 4th post in the Design Patterns 101 series. Strategy and Observer each get their own deep-dive chapters later (chapters 5 and 7), so here they receive only an overview. The bulk of the discussion goes to Command, Iterator, State, Template Method, and Chain of Responsibility.
 
 ![Behavioral pattern responsibility flow](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/04/04-01-concept-at-a-glance.en.png)
 *Responsibility distribution in behavioral patterns — algorithm swap, event propagation, request objectification, state transition, traversal abstraction*

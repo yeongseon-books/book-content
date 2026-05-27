@@ -25,7 +25,7 @@ last_reviewed: '2026-05-23'
 
 Early in a project, object-creation code stays invisible. Call `SomeService(config)` and move on. Then the service needs a different DB connection per environment, tests demand a fake repository, and constructor arguments creep past ten. At that point, the code that creates objects becomes the most frequently changed spot in the system. I call this the moment "creation responsibility starts screaming."
 
-This is the second article in the Design Patterns 101 series. It covers the five Creational patterns classified by the GoF — Factory Method, Abstract Factory, Builder, Prototype, Singleton — examining what problem each solves and what it costs, with Python code throughout.
+This is the 2nd post in the Design Patterns 101 series. It covers the five Creational patterns classified by the GoF — Factory Method, Abstract Factory, Builder, Prototype, Singleton — examining what problem each solves and what it costs, with Python code throughout.
 
 ![Responsibility boundaries of the five Creational patterns](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/02/02-01-concept-at-a-glance.en.png)
 

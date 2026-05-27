@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 An image can look like one opaque artifact until build time starts to hurt. Then layer order, cache reuse, transfer size, and vulnerability surface suddenly become operational concerns instead of implementation detail.
 
-This is post 2 in the Containers 101 series.
+This is the 2nd post in the Containers 101 series.
 
 In this chapter, we unpack why images are split into layers, how OverlayFS makes the stack look like one filesystem, and why Dockerfile optimization and digest-based reproducibility both depend on that structure.
 

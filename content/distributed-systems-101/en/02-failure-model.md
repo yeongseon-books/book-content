@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 When an incident channel says "the service is down," that sentence hides several very different realities. A node may be dead, the network may be dropping packets, or the node may simply be so slow that every peer mistakes it for dead.
 
-This is post 2 in the Distributed Systems 101 series.
+This is the 2nd post in the Distributed Systems 101 series.
 
 Here we name those realities precisely so later topics such as consensus, leases, and CAP stop sounding like abstract theory and start reading like concrete design choices.
 

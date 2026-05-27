@@ -26,7 +26,7 @@ Teams can be very busy and still spend too much of their time on work that shoul
 
 Toil matters because it quietly taxes improvement. The more time a team spends repeating automatable work, the less room it has for safer releases, better observability, and structural fixes.
 
-This is post 8 in the SRE 101 series. Here we define toil in operational terms, measure its cost, rank automation candidates, and decide where automation actually pays back.
+This is the 8th post in the SRE 101 series. Here we define toil in operational terms, measure its cost, rank automation candidates, and decide where automation actually pays back.
 
 
 ![sre 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/08/08-01-concept-at-a-glance.en.png)

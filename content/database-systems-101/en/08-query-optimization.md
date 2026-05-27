@@ -23,7 +23,7 @@ last_reviewed: '2026-05-04'
 
 # Database Systems 101 (8/10): Query Optimization
 
-This is post 8 in the Database Systems 101 series.
+This is the 8th post in the Database Systems 101 series.
 
 > Database Systems 101 series (8/10)
 

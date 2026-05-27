@@ -25,7 +25,7 @@ last_reviewed: '2026-05-04'
 
 When a hot loop shows up in a profiler, the next useful question is not "what syntax did I write?" but "what instructions did the compiler emit, and how is the CPU stepping through them?" That is the moment when fetch, decode, execute, and branch behavior stop sounding like textbook terms and start explaining real performance.
 
-This is post 3 in the Computer Architecture 101 series. Here we use x86-64, ARM64, and RISC-V as concrete examples of the ISA contract, then follow one small function down to the instruction stream the CPU actually runs.
+This is the 3rd post in the Computer Architecture 101 series. Here we use x86-64, ARM64, and RISC-V as concrete examples of the ISA contract, then follow one small function down to the instruction stream the CPU actually runs.
 
 
 ![computer architecture 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/03/03-01-cpu-fetch-decode-execute.en.png)

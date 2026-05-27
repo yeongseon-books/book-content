@@ -26,6 +26,8 @@ seo_description: 'The four collections differ along four axes: mutability, order
 
 These four collections diverge along four axes: mutability, order, duplicates, and hashability. Picking the right one is really about choosing which trade-offs matter for the job.
 
+This is the 4th post in the Python 101 series.
+
 This post is the 4th article in the Python 101 series. This is the stage in the series where collection trade-offs become concrete.
 
 

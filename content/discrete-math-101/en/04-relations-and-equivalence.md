@@ -23,7 +23,7 @@ last_reviewed: '2026-05-04'
 
 # Discrete Math 101 (4/10): Relations and Equivalence
 
-This is post 4 in the Discrete Math 101 series.
+This is the 4th post in the Discrete Math 101 series.
 
 > Discrete Math 101 series (4/10)
 

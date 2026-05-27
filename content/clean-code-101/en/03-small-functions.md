@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Large functions rarely fail because of one dramatic bug. They fail because reading them feels like switching tasks every three lines.
 
-This is post 3 in the Clean Code 101 series.
+This is the 3rd post in the Clean Code 101 series.
 
 Here we will define what “small enough” really means, walk through a safe extraction sequence, and show how side effects and argument growth tell you when to stop.
 

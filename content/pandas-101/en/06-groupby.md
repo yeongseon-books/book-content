@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Analysis almost never ends with reading a table. Sooner or later you need sales by city, conversion rate by segment, or monthly KPI summaries. That is why `groupby` is not just another Pandas method. It is one of the main ways raw tables become decisions.
 
-This is post 6 in the Pandas 101 series.
+This is the 6th post in the Pandas 101 series.
 
 In this chapter, we will frame `groupby` as the split-apply-combine workflow. That gives you a clearer mental model for when to reach for `agg`, `transform`, or `filter`.
 

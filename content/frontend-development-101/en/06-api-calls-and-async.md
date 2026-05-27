@@ -24,7 +24,7 @@ last_reviewed: '2026-05-04'
 
 Frontend code almost always talks to a server. It loads a user list, fetches search results, and sends data when the user clicks Save. The hard part is not writing `fetch`. The hard part is that networks are slow, unreliable, and capable of returning responses in an order you did not expect.
 
-This is post 6 in the Frontend Development 101 series. Here we frame async work around explicit UI state. In practice, most async bugs get easier once you separate loading, success, and failure as first-class screen states instead of as afterthoughts.
+This is the 6th post in the Frontend Development 101 series. Here we frame async work around explicit UI state. In practice, most async bugs get easier once you separate loading, success, and failure as first-class screen states instead of as afterthoughts.
 
 
 ![frontend development 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/06/06-01-concept-at-a-glance.en.png)

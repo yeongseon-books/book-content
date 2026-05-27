@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Two APIs can expose the same feature and still feel radically different to a client. In one, the next action is obvious. In the other, the client has to re-interpret whether the call really succeeded, whether a retry is safe, or whether the user can fix the error.
 
-This is post 4 in the API Design 101 series.
+This is the 4th post in the API Design 101 series.
 
 Here, we treat HTTP methods and status codes as the client-side branching model of the API. The method communicates intent, and the status code tells the caller what happened in a way that retries, caching, and error handling can trust.
 

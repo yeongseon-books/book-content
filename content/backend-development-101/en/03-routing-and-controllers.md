@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 A single file feels fine when your API only has a few endpoints. Once features start stacking up, though, the real problem is not line count but the constant question of where each new path, validation rule, and response shape should live.
 
-This is post 3 in the Backend Development 101 series. Here, we split routers from controllers, separate path, query, and body parameters, and build the first structure that still reads cleanly after the endpoint count grows.
+This is the 3rd post in the Backend Development 101 series. Here, we split routers from controllers, separate path, query, and body parameters, and build the first structure that still reads cleanly after the endpoint count grows.
 
 
 ![backend development 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/03/03-01-concept-at-a-glance.en.png)

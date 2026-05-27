@@ -23,7 +23,7 @@ last_reviewed: '2026-05-04'
 
 # Compilers 101 (2/10): lexical analysis
 
-This is post 2 in the Compilers 101 series.
+This is the 2nd post in the Compilers 101 series.
 
 > Compilers 101 series (2/10)
 

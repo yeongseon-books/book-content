@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 A request handler that parses input, validates rules, writes to the database, sends notifications, and shapes the HTTP response may still work today. The problem is how expensive tomorrow's small change becomes.
 
-This is post 2 in the Software Design 101 series.
+This is the 2nd post in the Software Design 101 series.
 
 In this post, we look at separation of concerns as a way to split code by reasons to change. The goal is not more files. The goal is keeping pricing, persistence, and communication from shaking each other every time one of them moves.
 

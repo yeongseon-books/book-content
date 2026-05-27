@@ -22,7 +22,7 @@ last_reviewed: '2026-05-17'
 
 # Model Evaluation 101 (3/10): The Limits of Accuracy
 
-This is post 3 in the Model Evaluation 101 series.
+This is the 3rd post in the Model Evaluation 101 series.
 
 Accuracy is easy to compute and easy to explain, which is exactly why teams trust it too early. Issue #772 called out that this chapter explained the limitation of accuracy but did not walk the reader through the real operator sequence: base rate → dummy baseline → minority recall → balanced accuracy → final review.
 

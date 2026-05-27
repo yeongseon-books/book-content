@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Finding one row out of millions in milliseconds is rarely about the SQL sentence alone. It is about the data structures, execution plan, and locking behavior hidden underneath that sentence. That is why so many production incidents end up tracing back to the database layer.
 
-This is post 8 in the Computer Science 101 series.
+This is the 8th post in the Computer Science 101 series.
 
 In this article, we'll connect SQL, indexes, execution plans, and ACID transactions so that database behavior stops feeling like a black box.
 

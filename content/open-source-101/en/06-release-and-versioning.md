@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 When a project is new, it is easy to think that working code is enough. As soon as users appear, a new problem shows up. Does this release break compatibility? Is it only a bug fix? Is it safe to upgrade now? How do you communicate those answers clearly?
 
-This is post 6 in the Open Source 101 series.
+This is the 6th post in the Open Source 101 series.
 
 Here, we will connect semantic versioning, changelogs, tags, and release notes into one practical release discipline that users can actually trust.
 

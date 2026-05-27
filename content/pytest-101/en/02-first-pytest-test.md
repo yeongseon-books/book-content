@@ -22,7 +22,7 @@ last_reviewed: '2026-05-04'
 
 # pytest 101 (2/10): Writing Your First pytest Test
 
-This is post 2 in the pytest 101 series.
+This is the 2nd post in the pytest 101 series.
 
 > pytest 101 series (2/10)
 

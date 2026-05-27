@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 One of the most common beginner mistakes in open source is trying to fix a problem before understanding it. People read only the title, skip the full comment thread, or open a pull request without noticing that someone else is already working on the issue.
 
-This is post 3 in the Open Source 101 series.
+This is the 3rd post in the Open Source 101 series.
 
 Here, we will treat a GitHub issue not as a generic to-do item, but as a shared record of problem definition, reproduction evidence, and team agreement.
 

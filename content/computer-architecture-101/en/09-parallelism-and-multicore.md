@@ -29,7 +29,7 @@ last_reviewed: '2026-05-04'
 
 > Clock speed stopped climbing around 2005, and every gain in performance since has come from adding cores and exploiting parallelism. But adding cores does not automatically make code faster. Some work is inherently sequential, and communication between cores is never free. This article lays out the mental model for using multicore well: concurrency vs parallelism, the cost of synchronization, and Amdahl's law.
 
-This is post 9 in the Computer Architecture 101 series.
+This is the 9th post in the Computer Architecture 101 series.
 
 
 ![computer architecture 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/09/09-01-big-picture.en.png)

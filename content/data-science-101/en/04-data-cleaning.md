@@ -26,7 +26,7 @@ Cleaning is where data projects quietly win or lose. Most teams do not fail beca
 
 That is why cleaning should feel less like “tidying up” and more like quality control. You are not polishing data for presentation. You are deciding which evidence is safe enough to carry into EDA, metrics, and models.
 
-This is post 4 in the Data Science 101 series. In this chapter, we turn the messy middle of tabular work into a repeatable sequence for types, duplicates, missingness, outliers, and validation.
+This is the 4th post in the Data Science 101 series. In this chapter, we turn the messy middle of tabular work into a repeatable sequence for types, duplicates, missingness, outliers, and validation.
 
 
 ![data science 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/04/04-01-concept-at-a-glance.en.png)

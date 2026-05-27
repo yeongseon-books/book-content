@@ -26,6 +26,8 @@ seo_description: A class is not a mold for data; it is the definition of behavio
 
 A class is not just a mold for data; it is a shared definition of behavior for objects of the same kind. An instance is one concrete object carrying that behavior with its own state.
 
+This is the 9th post in the Python 101 series.
+
 This post is the 9th article in the Python 101 series. This is the stage in the series where behavior, state, and object design come together.
 
 

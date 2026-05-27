@@ -29,7 +29,7 @@ last_reviewed: '2026-05-04'
 
 > Memory looks like a giant array of addressed bytes, but the memory a process sees is not real RAM. It is a virtual address space that the operating system and the CPU's MMU build together. On top of that space, code, data, stack, and heap each take their assigned region, and every variable lives somewhere inside it. This article draws that map.
 
-This is post 5 in the Computer Architecture 101 series.
+This is the 5th post in the Computer Architecture 101 series.
 
 
 ![computer architecture 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/05/05-01-big-picture.en.png)

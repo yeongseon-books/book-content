@@ -29,7 +29,7 @@ last_reviewed: '2026-05-04'
 
 > Encryption and hashing do different jobs. A strong algorithm used wrongly is the same as no algorithm — sometimes worse.
 
-This is post 3 in the Information Security 101 series.
+This is the 3rd post in the Information Security 101 series.
 
 
 ![information security 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/03/03-01-big-picture.en.png)

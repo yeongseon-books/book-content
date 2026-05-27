@@ -26,7 +26,7 @@ Once you start using GitHub Actions, the next question is rarely about YAML synt
 
 Those questions are really about pipeline design. A workflow file is only the container. The actual pipeline is the graph of jobs inside it, and the quality of that graph determines both feedback speed and operational safety.
 
-This is post 2 in the GitHub Actions 101 series. In this post, we will map the relationship between workflows, jobs, and steps, then use `needs`, `matrix`, and `outputs` to design a graph that is fast without becoming fragile.
+This is the 2nd post in the GitHub Actions 101 series. In this post, we will map the relationship between workflows, jobs, and steps, then use `needs`, `matrix`, and `outputs` to design a graph that is fast without becoming fragile.
 
 
 ![github actions 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/02/02-01-concept-at-a-glance.en.png)

@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Dynamic languages run perfectly well for a long time. Then the project grows, the team grows, and people start adding type hints, CI checks, and tighter interfaces again. That repeated move is a clue: types solve a practical problem that only becomes more obvious at scale.
 
-This is post 3 in the Programming Languages 101 series.
+This is the 3rd post in the Programming Languages 101 series.
 
 In this post, we will treat a type system not as simple data labeling but as a way to reject nonsensical combinations before they run. We will compare static and dynamic typing, strong and weak typing, and then look at why inference and generics raise productivity instead of just adding ceremony.
 

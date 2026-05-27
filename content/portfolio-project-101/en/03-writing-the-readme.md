@@ -26,7 +26,7 @@ A good project can still lose power at the entrance if the README is weak. Most 
 
 If those answers are buried or missing, the reviewer often leaves before your implementation quality gets a chance to matter.
 
-This is post 3 in the Portfolio Project 101 series. Here we will treat the README as the project's first demo and look at how to arrange it so a reviewer can understand the value in about a minute.
+This is the 3rd post in the Portfolio Project 101 series. Here we will treat the README as the project's first demo and look at how to arrange it so a reviewer can understand the value in about a minute.
 
 ---
 

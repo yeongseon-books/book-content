@@ -26,7 +26,7 @@ Deploying a model once is not the end of the job. Input distributions move, user
 
 If retraining depends only on human instinct, it becomes slow and inconsistent. One team retrains on a schedule, another retrains only after an incident, and another swaps in a new model without proving it is actually better.
 
-This is post 8 in the MLOps 101 series.
+This is the 8th post in the MLOps 101 series.
 
 Here, we will treat retraining as an operating loop that starts from an explicit trigger, produces a challenger, and separates retraining from promotion.
 

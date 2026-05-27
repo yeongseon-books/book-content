@@ -29,7 +29,7 @@ last_reviewed: '2026-05-14'
 
 > Because *foundation strength* must be built in *one year* before upper courses pile on top.
 
-This is post 2 in the Computer Science Major 101 series.
+This is the 2nd post in the Computer Science Major 101 series.
 
 
 ![computer science major 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/02/02-01-first-year-foundation-map.en.png)

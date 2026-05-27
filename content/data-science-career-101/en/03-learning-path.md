@@ -26,7 +26,7 @@ Many beginners do not fail because they study too little. They fail because they
 
 In data work, sequence matters. If you jump into modeling before you are comfortable with SQL, data cleaning, and basic statistics, you end up building on a surface that cannot support the kinds of questions interviews and real projects actually ask.
 
-This is post 3 in the Data Science Career 101 series.
+This is the 3rd post in the Data Science Career 101 series.
 
 
 ![data science career 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/03/03-01-concept-at-a-glance.en.png)

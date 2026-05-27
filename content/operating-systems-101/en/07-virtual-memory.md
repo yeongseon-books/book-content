@@ -27,7 +27,7 @@ Every process appears to own a huge private memory space even though the machine
 
 To understand those failures, you have to understand the machinery that builds the illusion in the first place.
 
-This is post 7 in the Operating Systems 101 series. It explains virtual addresses, page tables, the TLB, page faults, and the production implications of swap and access locality.
+This is the 7th post in the Operating Systems 101 series. It explains virtual addresses, page tables, the TLB, page faults, and the production implications of swap and access locality.
 
 
 ![operating systems 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/07/07-01-how-a-virtual-address-reaches-ram.en.png)

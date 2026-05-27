@@ -26,7 +26,7 @@ The reassuring part is that the core loop is short. You pull a batch, compute a 
 
 TinyShakespeare is especially helpful here because the numbers move quickly enough to watch. The loss starts around 4 and gradually drops, which is often the first moment when the model stops feeling like a static class definition and starts feeling like a learner.
 
-This is post 6 in the LLM from Scratch 101 series. Here we will build a compact but usable `train.py` with AdamW, warmup, cosine decay, gradient clipping, periodic evaluation, and checkpoint saving.
+This is the 6th post in the LLM from Scratch 101 series. Here we will build a compact but usable `train.py` with AdamW, warmup, cosine decay, gradient clipping, periodic evaluation, and checkpoint saving.
 
 ![LLM from Scratch 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/06/06-01-the-5-line-core-of-the-training-loop.en.png)
 *LLM from Scratch 101 chapter 6 flow overview*

@@ -26,7 +26,7 @@ When an incident hurts production, the first visible event often gets blamed as 
 
 That reaction is understandable, but it is usually shallow. The trigger explains what fired last. The root cause explains why the system was still able to fail that way.
 
-This is post 6 in the Incident Response 101 series. This post shows how to separate triggers from structural causes, collect contributing factors, and turn an RCA into follow-up work that can actually be verified.
+This is the 6th post in the Incident Response 101 series. This post shows how to separate triggers from structural causes, collect contributing factors, and turn an RCA into follow-up work that can actually be verified.
 
 
 ![incident response 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/06/06-01-diagram-at-a-glance.en.png)

@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 On tabular data, a stack of well-chosen `if-else` rules often beats more fashionable models. That feels counterintuitive until you remember what trees do well: they capture nonlinear structure, handle mixed feature behavior naturally, and produce a baseline that is hard to embarrass.
 
-This is post 6 in the Machine Learning 101 series. Here we will look at what a single decision tree learns, why that tree overfits so easily, and how a random forest stabilizes the same idea by averaging many trees together.
+This is the 6th post in the Machine Learning 101 series. Here we will look at what a single decision tree learns, why that tree overfits so easily, and how a random forest stabilizes the same idea by averaging many trees together.
 
 
 ![machine learning 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/06/06-01-concept-at-a-glance.en.png)

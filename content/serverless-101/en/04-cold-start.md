@@ -26,7 +26,7 @@ You usually notice *cold start* from the outside first. A function that feels fa
 
 That is why cold start is one of the earliest serverless topics worth understanding well. It shapes *p99 latency*, user-visible reliability, and the cost you are willing to pay to keep latency stable.
 
-This is post 4 in the Serverless 101 series.
+This is the 4th post in the Serverless 101 series.
 
 
 ![serverless 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/04/04-01-concept-at-a-glance.en.png)

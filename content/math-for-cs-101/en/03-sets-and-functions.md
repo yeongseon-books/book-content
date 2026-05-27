@@ -26,7 +26,7 @@ When you learn data structures, you usually start with lists, dictionaries, mapp
 
 In real systems these two ideas rarely stay separate. Deduplication, permission checks, feature preprocessing, key mapping, and serialization pipelines all become easier to reason about once you can describe them as set boundaries plus transformation rules.
 
-This is post 3 in the Math for CS 101 series.
+This is the 3rd post in the Math for CS 101 series.
 
 Here we use sets and functions as the foundation for data modeling and transformation, not just as definitions to memorize.
 

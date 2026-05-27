@@ -31,7 +31,7 @@ Details matter, of course. Without practical mechanisms like input length valida
 
 The mental model for today is this: **GPT is an autoregressive model that stacks blocks on top of embeddings and converts the final hidden states into the next token distribution.**
 
-This is the 5th article in the LLM from Scratch 101 series.
+This is the 5th post in the LLM from Scratch 101 series.
 
 ---
 

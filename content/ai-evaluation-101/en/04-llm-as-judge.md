@@ -23,7 +23,7 @@ seo_description: When humans cannot grade every response, you can delegate scori
 
 When humans cannot grade every response, you can delegate scoring to a strong LLM.
 
-This is post 4 in the AI Evaluation 101 series. Here we cover writing judge prompts, controlling bias, and measuring agreement with human evaluators.
+This is the 4th post in the AI Evaluation 101 series. Here we cover writing judge prompts, controlling bias, and measuring agreement with human evaluators.
 
 
 ![LLM-as-Judge - evaluating models with models](https://yeongseon-books.github.io/book-public-assets/assets/ai-evaluation-101/04/04-01-llm-as-judge-evaluating-models-with-mode.en.png)

@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 An ML model is ultimately a stack of functions. Linear layers are functions, activations are functions, and the final prediction is the output of a long composition. To read training behavior well, you need to see both what a function maps and how sharply it reacts.
 
-This is post 2 in the Calculus for ML 101 series.
+This is the 2nd post in the Calculus for ML 101 series.
 
 In this post, we'll treat a function as both an input-output contract and a geometric shape. That viewpoint makes it easier to explain why linear and nonlinear functions behave differently during learning, and why activation choice shows up directly in gradient flow.
 

@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 When a container fails, many beginners assume the Docker CLI is always the first place to look. In real clusters, that mental model breaks quickly because Docker, containerd, runc, and CRI sit at different layers with different responsibilities.
 
-This is post 3 in the Containers 101 series.
+This is the 3rd post in the Containers 101 series.
 
 In this chapter, we separate the user-facing layer, lifecycle daemon, low-level executor, and Kubernetes runtime interface so you know which layer is actually failing when the node misbehaves.
 

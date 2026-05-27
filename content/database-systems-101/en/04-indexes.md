@@ -23,7 +23,7 @@ last_reviewed: '2026-05-04'
 
 # Database Systems 101 (4/10): Indexes
 
-This is post 4 in the Database Systems 101 series.
+This is the 4th post in the Database Systems 101 series.
 
 > Database Systems 101 series (4/10)
 

@@ -28,7 +28,7 @@ last_reviewed: '2026-05-04'
 
 > An optimizer is a transformation from IR to IR. It produces faster, smaller code while preserving meaning. The starting points are constant folding and dead code elimination.
 
-This is post 7 in the Compilers 101 series.
+This is the 7th post in the Compilers 101 series.
 
 
 ![compilers 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/07/07-01-big-picture.en.png)

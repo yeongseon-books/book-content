@@ -24,7 +24,7 @@ seo_description: Build a RAG retrieval benchmark loop. Measure hit rate, MRR, an
 
 A retrieval benchmark works only when questions, gold documents, ranked results, and metrics stay in the same loop. Fix those inputs and you can tell whether a retriever change improved the system or just changed the feel of a few examples.
 
-This is post 2 in the RAG Evaluation and Benchmarking 101 series.
+This is the 2nd post in the RAG Evaluation and Benchmarking 101 series.
 
 ![Benchmark loop for queries and latency](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/02/02-01-benchmark-loop-for-queries-and-latency.en.png)
 *Benchmark loop for queries and latency*

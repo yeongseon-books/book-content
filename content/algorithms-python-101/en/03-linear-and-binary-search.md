@@ -26,7 +26,7 @@ Searching is one of the most common operations in programming. On a small list, 
 
 That is why binary search shows up far beyond textbook examples. The same pattern appears whenever you need the first value that satisfies a condition, not just an exact match.
 
-This is post 3 in the Algorithms with Python 101 series. Here, we'll implement linear search and binary search side by side and compare when each approach makes sense.
+This is the 3rd post in the Algorithms with Python 101 series. Here, we'll implement linear search and binary search side by side and compare when each approach makes sense.
 
 
 ![Algorithms with Python 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/03/03-01-big-picture.en.png)

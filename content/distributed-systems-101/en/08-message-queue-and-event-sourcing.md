@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Direct calls force every participant to be healthy at the same moment. Queues and logs change that rule: one side can finish now, the other can catch up later, and the system can still preserve a trustworthy history.
 
-This is post 8 in the Distributed Systems 101 series.
+This is the 8th post in the Distributed Systems 101 series.
 
 Here we use queues, offsets, and event logs to show how distributed systems turn time and replay into design tools rather than accidental side effects.
 

@@ -26,7 +26,7 @@ Many incident reviews reveal the same problem: logs existed, but the team still 
 
 Structured logging fixes that by turning log lines into data with fields you can filter, aggregate, and join with traces.
 
-This is post 4 in the Observability 101 series.
+This is the 4th post in the Observability 101 series.
 
 
 ![observability 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/04/04-01-concept-at-a-glance.en.png)

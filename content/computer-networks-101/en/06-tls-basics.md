@@ -29,7 +29,7 @@ last_reviewed: '2026-05-15'
 
 > TLS combines three techniques in one beat. Asymmetric crypto handles identity and key agreement, symmetric crypto handles fast bulk encryption, and AEAD handles integrity. Certificates and PKI prove "this key really belongs to this domain". With that picture in your head, expired certificates, self-signed servers, and MITM all fit on the same diagram.
 
-This is post 6 in the Computer Networks 101 series.
+This is the 6th post in the Computer Networks 101 series.
 
 
 ![computer networks 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/06/06-01-concept-at-a-glance.en.png)

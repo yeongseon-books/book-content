@@ -29,7 +29,7 @@ last_reviewed: '2026-05-15'
 
 > HTTP is a simple text-based request and response protocol. Method, path, headers, body — those four parts are enough to read every REST API and every website. HTTPS slips TLS underneath to stop eavesdropping, tampering, and impersonation. We cover TLS in detail in episode 6; today we just see its shadow.
 
-This is post 5 in the Computer Networks 101 series.
+This is the 5th post in the Computer Networks 101 series.
 
 
 ![computer networks 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/05/05-01-concept-at-a-glance.en.png)

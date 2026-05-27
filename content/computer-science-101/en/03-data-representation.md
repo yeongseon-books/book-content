@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 People often say that computers only understand 0 and 1, but that sentence does not become useful until you can connect it to real bugs. Garbled text, wrong money totals, and surprising overflows all start to make sense once you understand how raw bits get meaning.
 
-This is post 3 in the Computer Science 101 series.
+This is the 3rd post in the Computer Science 101 series.
 
 In this article, we'll walk through bits and bytes, character encoding, signed integers, and floating-point limits so you can reason from representation to behavior.
 

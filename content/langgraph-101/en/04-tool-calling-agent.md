@@ -25,7 +25,7 @@ Tool-using agents always look smart in demos. If a question needs arithmetic, th
 
 The real issue is usually not that the model can use tools. The issue is whether the loop around tool usage is explicit, inspectable, and controllable. Once tool invocation is left as an opaque inner habit of the model, failed tool retries, successful tool follow-up, and final answer synthesis blur together. Reproduction gets harder. Logging boundaries get weaker. The place where cost starts exploding gets harder to isolate.
 
-This is the fourth article in the LangGraph 101 series. Here I want to frame a tool-calling agent not as “a model that knows how to use tools,” but as **a safe execution envelope that separates LLM judgment from actual tool execution**. That distinction matters. **A tool-calling agent is a control loop built from an LLM node, a ToolNode, and explicit termination rules.**
+This is the 4th post in the LangGraph 101 series. Here I want to frame a tool-calling agent not as “a model that knows how to use tools,” but as **a safe execution envelope that separates LLM judgment from actual tool execution**. That distinction matters. **A tool-calling agent is a control loop built from an LLM node, a ToolNode, and explicit termination rules.**
 
 ![Tool loop between agent and tools](https://yeongseon-books.github.io/book-public-assets/assets/langgraph-101/04/04-01-minimal-runnable-example.en.png)
 *Tool loop between agent and tools*

@@ -26,7 +26,7 @@ If you want to explain why an algorithm suddenly becomes too slow, why test case
 
 Combinatorics is what lets you count without listing everything. Once you know whether order matters, whether repetition is allowed, and whether choices are independent or exclusive, the structure often tells you how to count.
 
-This is post 5 in the Math for CS 101 series.
+This is the 5th post in the Math for CS 101 series.
 
 Here we treat combinatorics as the language of counting behind complexity and probability, not as a bag of disconnected formulas.
 

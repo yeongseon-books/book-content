@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 When the pager goes off at 3 a.m., re-reading the code is rarely the fastest path to an answer. What matters in production is whether the system leaves enough evidence behind to explain a failed request from logs and error responses alone.
 
-This is post 7 in the Backend Development 101 series. Here, we focus on three operating basics — structured logs, request IDs, and global exception handling — so incidents become something you can read instead of reconstructing from memory.
+This is the 7th post in the Backend Development 101 series. Here, we focus on three operating basics — structured logs, request IDs, and global exception handling — so incidents become something you can read instead of reconstructing from memory.
 
 
 ![backend development 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/07/07-01-concept-at-a-glance.en.png)

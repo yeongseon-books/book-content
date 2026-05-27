@@ -29,7 +29,7 @@ The process is straightforward: pick a character, append it to the sequence, and
 
 Today's mental model is simple. **Generation is an autoregressive loop where you pick one token from the next-token distribution and feed that result back as input.**
 
-This is the 7th article in the LLM from Scratch 101 series.
+This is the 7th post in the LLM from Scratch 101 series.
 
 ---
 

@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Java classes and JavaScript prototypes are both called object-oriented, but their surfaces look very different. The interesting question is not whether one is “real OOP.” It is what both systems are actually trying to solve underneath.
 
-This is post 6 in the Programming Languages 101 series.
+This is the 6th post in the Programming Languages 101 series.
 
 In this post, we will define an object first as a bundle of state and behavior, then compare the two common ways languages build that bundle: classes and prototypes. The key difference is not marketing or syntax. It is where a method lookup goes next when the current object does not have the answer.
 

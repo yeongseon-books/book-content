@@ -26,7 +26,7 @@ People often miss probability questions not because the arithmetic is hard, but 
 
 In probability, the sample space and the event are closer to grammar than to decoration. If that grammar is shaky, the final number can look clean while meaning something else entirely.
 
-This is post 2 in the Probability 101 series. Here we define sample spaces and events in set language, then use unions, intersections, complements, and independence to show why a careful setup often does half the work for you.
+This is the 2nd post in the Probability 101 series. Here we define sample spaces and events in set language, then use unions, intersections, complements, and independence to show why a careful setup often does half the work for you.
 
 
 ![probability 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/02/02-01-concept-at-a-glance.en.png)

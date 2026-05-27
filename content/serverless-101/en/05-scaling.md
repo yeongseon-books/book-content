@@ -26,7 +26,7 @@ Serverless often gets introduced with a seductive sentence: “it scales automat
 
 That means scaling is not just a story about how far the platform can stretch. It is a story about how much downstream pressure your system can survive without turning a traffic spike into a reliability incident.
 
-This is post 5 in the Serverless 101 series.
+This is the 5th post in the Serverless 101 series.
 
 
 ![serverless 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/05/05-01-concept-at-a-glance.en.png)

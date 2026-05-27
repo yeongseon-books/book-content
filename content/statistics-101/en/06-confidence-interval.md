@@ -26,7 +26,7 @@ The phrase “95% confidence interval” shows up everywhere in statistical repo
 
 Confidence belongs to the procedure that generated the interval, not to the one interval you happen to be looking at. Keeping that distinction clear prevents a lot of later confusion about significance, uncertainty, and effect interpretation.
 
-This is post 6 in the Statistics 101 series. Here we will pin down what a 95% confidence interval actually means, why small samples push us toward the t-distribution, and when bootstrap intervals are the more natural fallback.
+This is the 6th post in the Statistics 101 series. Here we will pin down what a 95% confidence interval actually means, why small samples push us toward the t-distribution, and when bootstrap intervals are the more natural fallback.
 
 
 ![statistics 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/statistics-101/06/06-01-concept-at-a-glance.en.png)

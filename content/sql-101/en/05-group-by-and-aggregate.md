@@ -26,7 +26,7 @@ As soon as someone asks for daily revenue, users per country, or the average ord
 
 The tricky part is not writing SUM or COUNT. It is deciding what a group actually means, what detail disappears when rows collapse, and whether the resulting number still matches the business question you thought you were answering.
 
-This is post 5 in the SQL 101 series. Here we focus on how aggregation turns many rows into interpretable metrics.
+This is the 5th post in the SQL 101 series. Here we focus on how aggregation turns many rows into interpretable metrics.
 
 
 ![sql 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/05/05-01-aggregation-flow.en.png)

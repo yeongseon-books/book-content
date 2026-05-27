@@ -23,7 +23,7 @@ seo_description: Workflow automation removes model choice and replaces it with a
 
 When a task has predictable stages, giving the model more freedom usually makes the system harder to trust. A workflow earns its keep by fixing the handoff points, the intermediate data shape, and the places where failures must be surfaced.
 
-This is post 5 in the AI App Patterns 101 series. Here we cover how to design multi-step LLM workflows with explicit stages and clean data contracts.
+This is the 5th post in the AI App Patterns 101 series. Here we cover how to design multi-step LLM workflows with explicit stages and clean data contracts.
 
 ![Sequential handoff across stages](https://yeongseon-books.github.io/book-public-assets/assets/ai-app-patterns-101/05/05-01-sequential-handoff-across-stages.en.png)
 *Sequential handoff across stages*

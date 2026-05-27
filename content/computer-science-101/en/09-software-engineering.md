@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 There is a big difference between a script that runs once for you and a system that many people can keep changing for years. Software engineering is the set of habits that preserves “still works” while time passes, teammates change, and requirements shift.
 
-This is post 9 in the Computer Science 101 series.
+This is the 9th post in the Computer Science 101 series.
 
 In this article, we'll use testing, version control, code review, and refactoring to show where coding turns into engineering.
 

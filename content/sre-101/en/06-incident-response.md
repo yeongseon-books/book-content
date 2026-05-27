@@ -26,7 +26,7 @@ When an outage starts, the technical problem is only half the problem. The other
 
 Teams that decide those things during the outage usually lose time in confusion. Teams that decide them beforehand recover faster because the response structure is already available when stress is highest.
 
-This is post 6 in the SRE 101 series. Here we treat incident response as a team system with roles, severity levels, communication rules, and explicit closure criteria.
+This is the 6th post in the SRE 101 series. Here we treat incident response as a team system with roles, severity levels, communication rules, and explicit closure criteria.
 
 
 ![sre 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/06/06-01-concept-at-a-glance.en.png)

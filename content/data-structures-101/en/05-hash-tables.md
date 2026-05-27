@@ -29,7 +29,7 @@ last_reviewed: '2026-05-04'
 
 > A hash table converts a key to an integer index using a hash function, and then jumps straight into an array. Average time complexity is O(1) — astonishing performance — but you must handle collisions, rehashing, and hash quality carefully. This article walks through how a hash table works, two collision strategies (chaining and open addressing), and the design ideas inside Python's dict.
 
-This is post 5 in the Data Structures 101 series.
+This is the 5th post in the Data Structures 101 series.
 
 
 ![data structures 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/05/05-01-big-picture.en.png)

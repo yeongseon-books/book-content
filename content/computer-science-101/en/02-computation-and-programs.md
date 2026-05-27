@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 “Can a program solve this?” sounds simple until you ask where the boundary of computability really is. The answer does not stop at theory. It also shapes how we organize code, choose a paradigm, and reason about what a programming language is even doing for us.
 
-This is post 2 in the Computer Science 101 series.
+This is the 2nd post in the Computer Science 101 series.
 
 In this article, we'll connect the formal definition of computation, the idea of uncomputable problems, and the way programming languages express those computations for humans.
 

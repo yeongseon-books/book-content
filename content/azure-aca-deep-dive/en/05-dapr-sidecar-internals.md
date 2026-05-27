@@ -25,7 +25,7 @@ When you first enable Dapr in Azure Container Apps, the feature looks deceptivel
 
 But the surface is much smaller than the runtime change behind it. What actually happened is that the platform arranged for the upstream Dapr sidecar process, `daprd`, to run next to your user container with its own ports, args, probes, certificates, and component-loading behavior.
 
-This is post 5 in the Azure Container Apps Deep Dive series. Here, I follow that sidecar path from pod mutation to localhost API calls.
+This is the 5th post in the Azure Container Apps Deep Dive series. Here, I follow that sidecar path from pod mutation to localhost API calls.
 
 ## Source Version
 

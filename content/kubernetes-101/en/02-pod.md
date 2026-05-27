@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 The first thing that confuses many Docker users is that Kubernetes does not treat the container itself as the base unit. That design choice looks odd until you hit the real operational problems: shared networking, helper processes, startup ordering, and the fact that several containers sometimes have to live and die together.
 
-This is post 2 in the Kubernetes 101 series.
+This is the 2nd post in the Kubernetes 101 series.
 
 Here, we will define a Pod as the smallest deployable execution bundle in Kubernetes and connect that idea to sidecars, shared storage, and the Pod lifecycle you debug in production.
 

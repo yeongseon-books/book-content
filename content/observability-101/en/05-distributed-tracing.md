@@ -26,7 +26,7 @@ Metrics can tell you a request got slower, and logs can tell you a timeout happe
 
 Distributed tracing answers that by breaking one request into spans, preserving parent-child relationships, and carrying context across service boundaries.
 
-This is post 5 in the Observability 101 series.
+This is the 5th post in the Observability 101 series.
 
 
 ![observability 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/observability-101/05/05-01-concept-at-a-glance.en.png)

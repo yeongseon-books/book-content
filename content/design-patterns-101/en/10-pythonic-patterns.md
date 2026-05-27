@@ -25,7 +25,7 @@ last_reviewed: '2026-05-23'
 
 When the GoF book appeared in 1994, its authors worked primarily in C++ and Smalltalk. Java later became the de facto language for pattern education, and many developers unconsciously absorbed the idea that patterns mean "class hierarchies." The first time I implemented Strategy in Python, I created an ABC and three concrete classes — then a colleague asked in code review, "Why not just pass a function?" That was the moment I internalized that when the language changes, the expression of a pattern must change with it.
 
-This is the final article in the Design Patterns 101 series. It closes with a single question that runs through the entire series: **How lightly can we express GoF pattern intent using tools Python already provides?** And when is that lightness inappropriate?
+This is the final post in the Design Patterns 101 series. It closes with a single question that runs through the entire series: **How lightly can we express GoF pattern intent using tools Python already provides?** And when is that lightness inappropriate?
 
 ![Design Patterns 101 chapter 10 concept overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/10/10-01-concept-at-a-glance.en.png)
 

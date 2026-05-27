@@ -29,7 +29,7 @@ last_reviewed: '2026-05-04'
 
 > Authentication is about identity. Authorization is about permission. Mix them up and half of your security collapses.
 
-This is post 2 in the Information Security 101 series.
+This is the 2nd post in the Information Security 101 series.
 
 
 ![information security 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/information-security-101/02/02-01-big-picture.en.png)

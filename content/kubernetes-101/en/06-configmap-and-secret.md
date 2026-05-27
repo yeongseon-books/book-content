@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 It is easy to hardcode configuration and passwords when an application has only one environment. That shortcut becomes expensive as soon as you want the same image to move through dev, staging, and production without carrying secrets inside the artifact.
 
-This is post 6 in the Kubernetes 101 series.
+This is the 6th post in the Kubernetes 101 series.
 
 Here, we will use ConfigMap and Secret to split environment-specific values from the image and connect that split to injection methods, restart behavior, and external secret managers.
 

@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Exposing one service to the outside world is simple enough. Exposing several services, under one domain, with TLS and path-based routing is where copy-paste load balancers start turning into cost and operational drift.
 
-This is post 5 in the Kubernetes 101 series.
+This is the 5th post in the Kubernetes 101 series.
 
 Here, we will separate the declarative Ingress rule from the controller that enforces it, then use that split to reason about host routing, path routing, and TLS termination.
 

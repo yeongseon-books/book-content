@@ -28,7 +28,7 @@ last_reviewed: '2026-05-04'
 
 > An intermediate representation (IR) is a language simpler than an AST and more abstract than machine code. Optimization and multi-backend support all live on top of it.
 
-This is post 6 in the Compilers 101 series.
+This is the 6th post in the Compilers 101 series.
 
 
 ![compilers 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/06/06-01-big-picture.en.png)

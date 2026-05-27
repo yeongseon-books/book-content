@@ -22,7 +22,7 @@ seo_description: How VectorStoreRetriever and MMR balance relevance and diversit
 
 VectorStoreRetriever and MMR define how a retriever trades off relevance against coverage. This post walks that policy layer through LangChain internals.
 
-This is post 3 in the RAG Deep Dive series.
+This is the 3rd post in the RAG Deep Dive series.
 
 ![Invoke path into retriever callbacks](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/03/03-01-base-retriever-invoke-flow.en.png)
 *Invoke path into retriever callbacks*

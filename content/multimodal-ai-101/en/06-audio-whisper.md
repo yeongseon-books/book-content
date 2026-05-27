@@ -23,7 +23,7 @@ seo_description: Before OpenAI Whisper landed in September 2022, production STT 
 
 # Multimodal AI 101 (6/10): Audio Processing and Whisper STT
 
-This is post 6 in the Multimodal AI 101 series.
+This is the 6th post in the Multimodal AI 101 series.
 
 > Multimodal AI 101 series (6/10)
 

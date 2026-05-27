@@ -26,7 +26,7 @@ Early in an operations journey, teams often feel safer when they collect everyth
 
 But monitoring gets better when it becomes more selective, not more crowded. A metric is valuable when it helps someone decide what to do next, and an alert is valuable when it changes behavior quickly enough to reduce user impact.
 
-This is post 5 in the SRE 101 series. Here we treat monitoring as action-oriented measurement, then connect the four golden signals to alert rules, dashboard design, and incident response.
+This is the 5th post in the SRE 101 series. Here we treat monitoring as action-oriented measurement, then connect the four golden signals to alert rules, dashboard design, and incident response.
 
 
 ![sre 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sre-101/05/05-01-concept-at-a-glance.en.png)

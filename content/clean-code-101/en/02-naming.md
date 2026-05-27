@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Bad names waste time before any logic is understood. A reviewer pauses at `data`, guesses what it means, and rereads the same block twice.
 
-This is post 2 in the Clean Code 101 series.
+This is the 2nd post in the Clean Code 101 series.
 
 Here we will look at the signals of a strong name, how variable, function, and class names play different roles, and how domain language lowers search and review cost.
 

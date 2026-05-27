@@ -26,7 +26,7 @@ Once a model is deployed, it can look calm from the outside. Requests still succ
 
 That is why model monitoring is not an optional operations add-on. It is the layer that tells you not only whether the model is alive, but what kind of state it is alive in right now and whether a problem is already forming.
 
-This is post 6 in the MLOps 101 series.
+This is the 6th post in the MLOps 101 series.
 
 Here, we will treat monitoring as the observation layer where system metrics, model metrics, and business metrics meet, starting from a practical Prometheus-based baseline.
 

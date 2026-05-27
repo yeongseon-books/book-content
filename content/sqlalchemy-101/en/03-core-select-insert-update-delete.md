@@ -26,7 +26,7 @@ seo_description: In 2.x style, building SQL means stacking clauses through metho
 
 In 2.x style, you build SQL by stacking clauses through method chaining. This post turns that idea into concrete `select`, `insert`, `update`, and `delete` patterns.
 
-This is the 3rd article in the SQLAlchemy 101 series.
+This is the 3rd post in the SQLAlchemy 101 series.
 
 > SQLAlchemy 101 series (3/10)
 

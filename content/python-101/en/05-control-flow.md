@@ -26,6 +26,8 @@ seo_description: 'When wiring up control flow, split each branch and loop into t
 
 Control flow gets easier when you break every branch and loop into two questions: what decision is being made, and what ends the loop. That framing keeps `if`, `for`, `while`, and comprehensions from turning into guesswork.
 
+This is the 5th post in the Python 101 series.
+
 This post is the 5th article in the Python 101 series. This is the point in the series where Python code starts to branch, loop, and compress repeated patterns.
 
 

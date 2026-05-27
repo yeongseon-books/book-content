@@ -25,7 +25,7 @@ last_reviewed: '2026-05-14'
 
 Some students remember concepts weeks later, while others lose them almost as soon as the lecture ends. The gap is often less about talent than about whether their study method has a repeatable structure.
 
-This is post 8 in the Computer Science Major 101 series.
+This is the 8th post in the Computer Science Major 101 series.
 
 
 ![computer science major 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/08/08-01-study-loop.en.png)

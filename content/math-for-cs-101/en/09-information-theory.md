@@ -26,7 +26,7 @@ To understand why compression works, why cross entropy appears in classifier los
 
 Information theory treats information as something measurable instead of something merely descriptive. It lets you ask how surprising an event is, how uncertain a distribution is, and how far a predictive distribution is from the real one, all in a shared quantitative language.
 
-This is post 9 in the Math for CS 101 series.
+This is the 9th post in the Math for CS 101 series.
 
 Here we connect information content, entropy, cross entropy, KL divergence, and compression limits into one mental model.
 

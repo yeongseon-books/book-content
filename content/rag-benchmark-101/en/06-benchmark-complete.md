@@ -24,7 +24,7 @@ seo_description: Integrate RAG evaluation into a repeatable benchmark. Build a C
 
 A finished benchmark has to encode its experimental knobs in configuration and reproduce the same result from the same inputs. That is what turns scattered evaluation code into something you can use for regression checks, candidate comparison, and operational tracking.
 
-This is the final article in the RAG Evaluation and Benchmarking 101 series.
+This is the final post in the RAG Evaluation and Benchmarking 101 series.
 
 ![End-to-end benchmark pipeline in one run](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/06/06-01-end-to-end-benchmark-pipeline-in-one-run.en.png)
 *End-to-end benchmark pipeline in one run*

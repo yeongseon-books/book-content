@@ -23,7 +23,7 @@ last_reviewed: '2026-05-04'
 
 # Type Hints in Python 101 (4/10): Function Type Hints
 
-This is post 4 in the Type Hints in Python 101 series.
+This is the 4th post in the Type Hints in Python 101 series.
 
 > Type Hints in Python 101 Series (4/10)
 

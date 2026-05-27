@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 The browser is a convenience layer for legitimate users, but it is also one of the most effective execution environments available to an attacker. A single comment rendered unsafely can become script execution, and a state-changing endpoint that trusts cookies alone can turn a different site into a trigger for actions the user never intended to perform.
 
-This is post 8 in the Secure Coding 101 series.
+This is the 8th post in the Secure Coding 101 series.
 
 In this chapter, we will treat browser security as a system of output escaping, CSP, cookie policy, and request verification rather than as a single sanitization trick. That framing makes it easier to see when the browser is acting on the application's behalf and when it has effectively become the attacker's tool.
 

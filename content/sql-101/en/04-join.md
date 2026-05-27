@@ -26,7 +26,7 @@ Once you leave single-table questions behind, SQL gets more powerful and more da
 
 That is why JOIN is less about memorizing keywords and more about thinking in relationships. The real skill is predicting how many matches each row can have before you trust any aggregate built on top of the result.
 
-This is post 4 in the SQL 101 series. Here we treat JOIN as a relationship operation between row sets, not as a formatting trick for columns.
+This is the 4th post in the SQL 101 series. Here we treat JOIN as a relationship operation between row sets, not as a formatting trick for columns.
 
 
 ![sql 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/04/04-01-join-result-flow.en.png)

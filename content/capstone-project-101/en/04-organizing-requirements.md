@@ -26,7 +26,7 @@ A feature list alone does not help when the schedule slips. It does not tell the
 
 A useful requirements document behaves more like a compact delivery contract. It links user stories, acceptance criteria, non-functional constraints, and priority labels in one place.
 
-This is post 4 in the Capstone Project 101 series. It turns the problem statement into implementable requirements and explicit verification criteria.
+This is the 4th post in the Capstone Project 101 series. It turns the problem statement into implementable requirements and explicit verification criteria.
 
 
 ![capstone project 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/capstone-project-101/04/04-01-the-flow-at-a-glance.en.png)

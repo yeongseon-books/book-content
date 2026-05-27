@@ -26,7 +26,7 @@ Teams that run `pytest` only on local machines keep hitting the same failures. O
 
 The important line is not “tests exist.” It is “the repository runs the same tests in the same environment every time.” That shift is what turns test code into an actual safety mechanism for the team.
 
-This is post 4 in the GitHub Actions 101 series. In this post, we will build a practical Python test workflow around `setup-python`, caching, reports, coverage, and version matrices.
+This is the 4th post in the GitHub Actions 101 series. In this post, we will build a practical Python test workflow around `setup-python`, caching, reports, coverage, and version matrices.
 
 
 ![github actions 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/04/04-01-concept-at-a-glance.en.png)

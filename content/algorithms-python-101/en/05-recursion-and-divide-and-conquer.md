@@ -26,7 +26,7 @@ Recursion is one of those ideas that looks simple on the surface and confusing i
 
 Divide and conquer is one of the most important of those patterns. It shows up in binary search, merge sort, quick sort, and many problems that become manageable only after you split them into smaller parts.
 
-This is post 5 in the Algorithms with Python 101 series. Here, we'll make recursion concrete first, then use it to build an intuition for divide-and-conquer problem solving.
+This is the 5th post in the Algorithms with Python 101 series. Here, we'll make recursion concrete first, then use it to build an intuition for divide-and-conquer problem solving.
 
 
 ![Algorithms with Python 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/05/05-01-big-picture.en.png)

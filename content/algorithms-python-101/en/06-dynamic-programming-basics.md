@@ -26,7 +26,7 @@ Some problems stay hopelessly slow if you solve the same subproblem again and ag
 
 This topic also shows up constantly in interviews and competitive programming, but the real value is learning to recognize overlapping subproblems and reusable state.
 
-This is post 6 in the Algorithms with Python 101 series. Here, we'll introduce dynamic programming through memoization, tabulation, and a set of classic Python examples.
+This is the 6th post in the Algorithms with Python 101 series. Here, we'll introduce dynamic programming through memoization, tabulation, and a set of classic Python examples.
 
 
 ![Algorithms with Python 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-python-101/06/06-01-concept-overview.en.png)

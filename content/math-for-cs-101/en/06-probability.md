@@ -26,7 +26,7 @@ Engineering work is full of uncertainty. Was that A/B test result luck or a real
 
 Probability does not eliminate uncertainty. It gives you a structured way to compare and update beliefs under uncertainty. Once you separate the possible outcomes, the event you care about, and the conditions already known, fuzzy judgment becomes something you can reason about.
 
-This is post 6 in the Math for CS 101 series.
+This is the 6th post in the Math for CS 101 series.
 
 Here we use probability as the language for uncertainty in engineering decisions, connecting sample spaces, conditional probability, Bayes updates, expectation, and variance.
 

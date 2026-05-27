@@ -27,7 +27,7 @@ The uglier version shows up when branching fails quietly. One route label comes 
 
 Add loops on top of that, and the cost grows faster. A bad route can bounce execution between nodes that should never repeat, or keep a workflow moving when it should have stopped. I have seen teams describe this as model unpredictability, but in production the underlying issue is often simpler: the routing rules were never made explicit enough to operate safely.
 
-This is the third article in the LangGraph 101 series. Here I want to frame conditional edges not as a convenient syntax feature, but as **the decision points that let a graph choose its next node in the open**. That distinction matters. **A conditional edge reads state, translates that state into a route, and makes the routing boundary visible instead of hiding it inside execution code.**
+This is the 3rd post in the LangGraph 101 series. Here I want to frame conditional edges not as a convenient syntax feature, but as **the decision points that let a graph choose its next node in the open**. That distinction matters. **A conditional edge reads state, translates that state into a route, and makes the routing boundary visible instead of hiding it inside execution code.**
 
 Once that perspective is clear, more complex patterns like tool-calling agents become much easier to read. They are still just “look at the current state, then choose the next behavior.” If branching stays mentally downgraded to a small runtime `if`, fallback routes, loop termination, and observability never feel as central as they actually are.
 

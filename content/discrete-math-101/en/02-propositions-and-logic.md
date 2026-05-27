@@ -23,7 +23,7 @@ last_reviewed: '2026-05-04'
 
 # Discrete Math 101 (2/10): Propositions and Logic
 
-This is post 2 in the Discrete Math 101 series.
+This is the 2nd post in the Discrete Math 101 series.
 
 > Discrete Math 101 series (2/10)
 

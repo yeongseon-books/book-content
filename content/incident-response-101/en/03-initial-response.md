@@ -26,7 +26,7 @@ The first few minutes after an alert feel both compressed and chaotic. Data is i
 
 Teams that survive this window well do not start with perfect answers. They start with structure: acknowledge the page, estimate impact, open one channel, assign roles, and buy time with stabilization.
 
-This is post 3 in the Incident Response 101 series. This post breaks down that first-response sequence so the team can stop the bleeding before it tries to explain every detail.
+This is the 3rd post in the Incident Response 101 series. This post breaks down that first-response sequence so the team can stop the bleeding before it tries to explain every detail.
 
 
 ![incident response 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/03/03-01-diagram-at-a-glance.en.png)

@@ -29,7 +29,7 @@ last_reviewed: '2026-05-04'
 
 > A linked list stores each value in a node that holds a pointer to the next node. Even when scattered across memory, you can visit values in order by following the pointers. Inserting or removing a node only updates the two pointers around it — that is O(1). On the other hand, indexing must follow pointers from the head and is O(n). This article walks through singly and doubly linked lists and the trade-offs between them.
 
-This is post 3 in the Data Structures 101 series.
+This is the 3rd post in the Data Structures 101 series.
 
 
 ![data structures 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-structures-101/03/03-01-big-picture.en.png)

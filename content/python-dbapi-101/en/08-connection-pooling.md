@@ -28,7 +28,7 @@ Unlike most databases, SQLite has no separate server process. A connection is ju
 
 "Can I share one connection across all threads?" "Should I open a new one per thread?" "How do I hold a connection in an async framework like FastAPI?" This post answers those questions in order.
 
-This is the 8th article in the Python DB-API 101 series.
+This is the 8th post in the Python DB-API 101 series.
 
 ![SQLite connection Management: thread-safety, check_same_thread, and pooling](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/08/08-01-sqlite-connection-management-thread-safe.en.png)
 

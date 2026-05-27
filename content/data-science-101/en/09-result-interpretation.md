@@ -26,7 +26,7 @@ The model score is not the finish line. Someone still has to explain what change
 
 Interpretation is not about making numbers sound impressive. It is about adding context, uncertainty, and practical significance until the result is honest enough to trust and clear enough to act on.
 
-This is post 9 in the Data Science 101 series. Here we turn raw analytical results into decision-ready language without overstating what the data can support.
+This is the 9th post in the Data Science 101 series. Here we turn raw analytical results into decision-ready language without overstating what the data can support.
 
 
 ![data science 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/09/09-01-concept-at-a-glance.en.png)

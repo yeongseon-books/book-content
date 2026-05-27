@@ -26,7 +26,7 @@ A surprising amount of real-world data is really about counts. Did something suc
 
 The important thing to memorize is not the names but the situations. What kind of process makes a Bernoulli distribution natural? When should you reach for Binomial, Geometric, or Poisson instead? That mapping is where the practical value lives.
 
-This is post 7 in the Probability 101 series. Here we use Bernoulli, Binomial, Geometric, and Poisson distributions to build a reusable vocabulary for count data, then connect each distribution to the kind of engineering question it models well.
+This is the 7th post in the Probability 101 series. Here we use Bernoulli, Binomial, Geometric, and Poisson distributions to build a reusable vocabulary for count data, then connect each distribution to the kind of engineering question it models well.
 
 
 ![probability 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/07/07-01-concept-at-a-glance.en.png)

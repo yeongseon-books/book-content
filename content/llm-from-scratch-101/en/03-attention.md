@@ -26,7 +26,7 @@ That is where attention enters. Humans do something similar when reading. We do 
 
 In this post, we will add `CausalSelfAttention` to `model.py` and read it as a tensor pipeline rather than as a wall of symbols. For this series, traceability matters more than elegant shortcuts.
 
-This is post 3 in the LLM from Scratch 101 series. Here we connect QKV projection, score calculation, causal masking, and multi-head recombination into one runnable path.
+This is the 3rd post in the LLM from Scratch 101 series. Here we connect QKV projection, score calculation, causal masking, and multi-head recombination into one runnable path.
 
 ![LLM from Scratch 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/03/03-01-causal-mask-no-peeking-at-the-future.en.png)
 *LLM from Scratch 101 chapter 3 flow overview*

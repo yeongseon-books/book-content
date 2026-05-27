@@ -25,7 +25,7 @@ last_reviewed: '2026-05-23'
 
 Once object creation is sorted out, the next wall is "how do I wire existing objects together?" In my experience the three situations where this wall appears most often are: connecting an external SDK to the domain, bolting logging or caching onto an existing object, and presenting a complex subsystem through a simple entry point. All three are assembly problems, and GoF grouped them under the name Structural patterns.
 
-This is the third article in the Design Patterns 101 series. It covers Adapter, Bridge, Composite, Decorator, Facade, Flyweight, and Proxy. Adapter gets a dedicated deep-dive in episode 6, so here it stays at overview level.
+This is the 3rd post in the Design Patterns 101 series. It covers Adapter, Bridge, Composite, Decorator, Facade, Flyweight, and Proxy. Adapter gets a dedicated deep-dive in episode 6, so here it stays at overview level.
 
 ![Structural pattern responsibility boundaries](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/03/03-01-concept-at-a-glance.en.png)
 

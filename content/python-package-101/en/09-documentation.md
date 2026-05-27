@@ -26,7 +26,7 @@ seo_description: A README is the front door of your package and an API Reference
 
 Even a solid package gets ignored if a reader cannot figure out installation and the first useful call within half a minute. Documentation is not decoration around code; it is part of the product surface.
 
-This is post 9 in the Python Package 101 series. Here we connect README, guides, and API reference into a documentation stack that helps users decide, start, and verify.
+This is the 9th post in the Python Package 101 series. Here we connect README, guides, and API reference into a documentation stack that helps users decide, start, and verify.
 
 ![Python Package 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/09/09-01-mental-model.en.png)
 *Python Package 101 chapter 9 flow overview*

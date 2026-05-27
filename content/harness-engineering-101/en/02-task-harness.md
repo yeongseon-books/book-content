@@ -25,7 +25,7 @@ The fastest way to make an agent expensive is to ask it to do a vague job. Human
 
 Those blanks quickly turn into concrete risk: the wrong data source, the wrong output format, the wrong completion bar, or the wrong scope of work. Once that ambiguity reaches tool calls, quality issues become cost incidents.
 
-This is post 2 in the Harness Engineering 101 series. Here we turn business goals into executable TaskSpecs so later harnesses have something stable to operate on.
+This is the 2nd post in the Harness Engineering 101 series. Here we turn business goals into executable TaskSpecs so later harnesses have something stable to operate on.
 
 ![Task harness - turning vague work into executable tasks](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/02/02-01-task-harness-turning-vague-work-into-exe.en.png)
 *Task harness - turning vague work into executable tasks*

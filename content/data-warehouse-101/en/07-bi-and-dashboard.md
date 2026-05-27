@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Warehouses do not create decisions by themselves. Teams still need a screen that turns a broad question into one number, one comparison, and one obvious next drill-down. When that layer is noisy, even clean data models feel useless.
 
-This is post 7 in the Data Warehouse 101 series.
+This is the 7th post in the Data Warehouse 101 series.
 
 In this post, we move from storage to consumption. The focus is on how metric definitions, dashboard layout, and drill-down order determine whether a chart becomes an operating tool or just another report no one trusts.
 

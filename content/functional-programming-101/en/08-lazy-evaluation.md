@@ -24,7 +24,7 @@ last_reviewed: '2026-05-04'
 
 The first time a dataset stops fitting comfortably in memory, lazy evaluation stops looking like an abstract FP idea and starts looking like an operational survival skill. Log files, event exports, and large CSVs punish designs that insist on building every intermediate list up front.
 
-This is post 8 in the Functional Programming 101 series.
+This is the 8th post in the Functional Programming 101 series.
 
 Lazy evaluation means deferring computation until a consumer actually asks for the next value. In Python, generators and the iterator protocol turn that idea into a practical way to keep memory stable while data keeps moving.
 

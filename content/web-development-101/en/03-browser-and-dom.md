@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 A browser does much more than print HTML on the screen. It parses text into a tree, calculates styles, decides layout, paints pixels, and keeps the page interactive through the event loop. If that pipeline feels vague, performance bugs and UI glitches are hard to reason about.
 
-This is post 3 in the Web Development 101 series. Here we turn the browser into a concrete execution model so DOM updates, rendering costs, and event timing stop feeling magical and start feeling measurable.
+This is the 3rd post in the Web Development 101 series. Here we turn the browser into a concrete execution model so DOM updates, rendering costs, and event timing stop feeling magical and start feeling measurable.
 
 
 ![web development 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/03/03-01-concept-at-a-glance.en.png)

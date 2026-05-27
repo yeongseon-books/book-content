@@ -28,7 +28,7 @@ The most common line in database code is `try/except Exception`. Catching everyt
 
 This post is not about memorizing the mapping table. It is about turning the exception hierarchy into an operational decision tree: "Should I retry this?", "Should I roll back the transaction or leave it open?", "Is this a user input problem or a code bug?" Each PEP 249 class encodes one of those answers.
 
-This is the 7th article in the Python DB-API 101 series.
+This is the 7th post in the Python DB-API 101 series.
 
 ![PEP 249 exception hierarchy and SQLite error handling](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/07/07-01-pep-249-exception-hierarchy-and-sqlite-e.en.png)
 

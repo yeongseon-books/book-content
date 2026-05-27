@@ -29,7 +29,7 @@ last_reviewed: '2026-05-14'
 
 > Yes. *OS*, *architecture*, and *compilers* are the *stage* on which your code runs.
 
-This is post 4 in the Computer Science Major 101 series.
+This is the 4th post in the Computer Science Major 101 series.
 
 
 ![computer science major 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/04/04-01-systems-stack-map.en.png)

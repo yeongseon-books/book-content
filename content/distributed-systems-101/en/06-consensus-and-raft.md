@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 It is easy to say "the cluster should agree." It is much harder to make that sentence survive crashes, lost messages, and a leader that disappears in the middle of a write. Consensus is where distributed systems stop being intuitive and start being disciplined.
 
-This is post 6 in the Distributed Systems 101 series.
+This is the 6th post in the Distributed Systems 101 series.
 
 Here we use Raft to make the consensus problem concrete: terms, logs, quorums, and the exact point where a value becomes durable enough to trust.
 

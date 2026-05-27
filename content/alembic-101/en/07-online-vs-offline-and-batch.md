@@ -26,7 +26,7 @@ seo_description: Alembic runs in two modes. Online connects to the database and 
 
 Before a production deploy, there are times when you need to see the exact SQL a migration will emit. Add SQLite's DDL limits to the mix, and you need to understand offline mode and batch mode together.
 
-This is post 7 in the Alembic 101 series. Here we will connect online execution, offline SQL preview, and SQLite batch handling into one workflow.
+This is the 7th post in the Alembic 101 series. Here we will connect online execution, offline SQL preview, and SQLite batch handling into one workflow.
 
 
 ![alembic 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/07/07-01-diagram-how-online-offline-and-batch-mod.en.png)

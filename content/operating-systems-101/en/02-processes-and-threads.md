@@ -27,7 +27,7 @@ last_reviewed: '2026-05-15'
 
 Processes and threads look like two ways to do concurrency, but they answer different questions about memory sharing, isolation, and failure blast radius.
 
-This is post 2 in the Operating Systems 101 series. It explains what a process actually owns, what a thread borrows from that process, and how to choose between them in practice.
+This is the 2nd post in the Operating Systems 101 series. It explains what a process actually owns, what a thread borrows from that process, and how to choose between them in practice.
 
 
 ![operating systems 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/operating-systems-101/02/02-01-what-the-process-shares-and-what-each-th.en.png)

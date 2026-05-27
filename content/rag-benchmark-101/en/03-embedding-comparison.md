@@ -24,7 +24,7 @@ seo_description: Compare embedding models on your data. Learn to balance hit rat
 
 Embedding comparison is only credible when you change one variable at a time. Keep the corpus, queries, and top-k fixed, and the score gap starts to reflect the embedding model instead of the test setup.
 
-This is the 3rd article in the RAG Evaluation and Benchmarking 101 series.
+This is the 3rd post in the RAG Evaluation and Benchmarking 101 series.
 
 ![Fixed-corpus embedding comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/03/03-01-fixed-corpus-embedding-comparison-struct.en.png)
 *Fixed-corpus embedding comparison structure*

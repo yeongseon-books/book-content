@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 One warehouse rarely means one shared language. Sales, finance, and operations may start from the same source data, but they read it through different questions, different permissions, and different levels of aggregation.
 
-This is post 8 in the Data Warehouse 101 series.
+This is the 8th post in the Data Warehouse 101 series.
 
 In this post, we look at data marts as the layer that translates common warehouse assets into domain-ready analytical surfaces. The key is to narrow the interface without breaking the shared definitions underneath.
 

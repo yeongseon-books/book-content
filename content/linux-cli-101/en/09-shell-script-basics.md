@@ -26,7 +26,7 @@ seo_description: A shell script is a recipe file of CLI commands. Write it once,
 
 Repeated command sequences are where the CLI starts to pay back the learning cost. The moment you run the same deploy, backup, or setup steps twice, you are already paying interest on work that should become a script.
 
-This is post 9 in the Linux CLI 101 series.
+This is the 9th post in the Linux CLI 101 series.
 
 
 ![Linux CLI 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/09/09-01-big-picture.en.png)

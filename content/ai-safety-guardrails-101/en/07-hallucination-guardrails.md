@@ -24,7 +24,7 @@ seo_description: Reduce LLM hallucinations in RAG systems by implementing ground
 
 People use "hallucination" for any confident mistake, but production guardrails need a tighter target. In RAG systems, the practical question is whether the answer is actually grounded in the provided evidence.
 
-This is post 7 in the AI Safety & Guardrails 101 series. It focuses on closed-domain hallucinations and the grounding checks that catch them reliably.
+This is the 7th post in the AI Safety & Guardrails 101 series. It focuses on closed-domain hallucinations and the grounding checks that catch them reliably.
 
 
 ![what grounding actually means](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/07/07-01-what-grounding-actually-means.en.png)

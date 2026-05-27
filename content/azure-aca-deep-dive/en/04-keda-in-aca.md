@@ -25,7 +25,7 @@ At the product surface, scaling in Azure Container Apps is only a handful of fie
 
 That surface is intentionally terse, but the real question is what the platform has to create underneath for those rules to turn into replica counts. Microsoft's own documentation points straight at KEDA because that hidden translation layer matters.
 
-This is post 4 in the Azure Container Apps Deep Dive series. Here, I follow how an ACA scale rule most likely turns into a KEDA-style control loop.
+This is the 4th post in the Azure Container Apps Deep Dive series. Here, I follow how an ACA scale rule most likely turns into a KEDA-style control loop.
 
 ## Source Version
 

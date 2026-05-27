@@ -22,7 +22,7 @@ seo_description: When labeled data runs short, synthetic-data quality depends on
 
 # AI Data Preparation 101 (7/10): Synthetic Data Generation - From Self-Instruct to Distillation
 
-This is post 7 in the AI Data Preparation 101 series.
+This is the 7th post in the AI Data Preparation 101 series.
 
 Synthetic data generation is not a trick for inflating dataset size. In practice, it is an operating procedure for expanding narrow-domain supervision in a controlled way. The critical question is usually not “What should we generate?” but “Which batches do we reject, and which ones are good enough to enter the training set?”
 

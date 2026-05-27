@@ -24,7 +24,7 @@ seo_description: Prevent LLM API abuse and cost overruns by tracking requests, t
 
 Rate limiting for LLM APIs is not just about requests per second. Token volume, streaming output, and cost all move independently, so abuse control has to watch more than one meter.
 
-This is post 8 in the AI Safety & Guardrails 101 series. It maps out the quota dimensions and burst-detection patterns that make sense for LLM traffic.
+This is the 8th post in the AI Safety & Guardrails 101 series. It maps out the quota dimensions and burst-detection patterns that make sense for LLM traffic.
 
 
 ![Rate limiting and abuse prevention flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/08/08-01-big-picture.en.png)

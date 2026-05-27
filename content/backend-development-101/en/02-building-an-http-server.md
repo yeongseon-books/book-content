@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 After using frameworks for a while, it is easy to forget what an HTTP server is actually doing. The moment a response gets truncated, a header disappears, or behavior changes behind a proxy, you have to go back down to raw requests and responses.
 
-This is post 2 in the Backend Development 101 series. Here, we start from the fact that HTTP is text over a socket and use both a raw socket server and FastAPI to rebuild that mental model from the bottom up.
+This is the 2nd post in the Backend Development 101 series. Here, we start from the fact that HTTP is text over a socket and use both a raw socket server and FastAPI to rebuild that mental model from the bottom up.
 
 
 ![backend development 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/02/02-01-concept-at-a-glance.en.png)

@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Producing a prediction is not enough to start learning. You still need a numerical rule that says how wrong that prediction was, and a differentiable way to turn that error into an update signal. That rule is the loss function.
 
-This is post 6 in the Calculus for ML 101 series.
+This is the 6th post in the Calculus for ML 101 series.
 
 In this post, we'll use MSE, cross entropy, and gradient-based training signals to show that a loss function is more than a scoreboard. It is the concrete definition of what you want the model to become good at, and its design shapes every update that follows.
 

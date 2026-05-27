@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Once you get comfortable with Pandas syntax, the next big lesson is that “working code” and “fast code” are not the same thing. `apply(axis=1)` often feels natural because it resembles row-by-row reasoning, but it becomes a bottleneck surprisingly quickly as datasets grow. Performance improves once you understand what Pandas is optimized to do well.
 
-This is post 9 in the Pandas 101 series.
+This is the 9th post in the Pandas 101 series.
 
 In this chapter, I do not want to ban `apply` as a slogan. I want to explain why vectorized column-wise computation is the default fast path, and when `map`, NumPy operations, or direct Series math are the better tools.
 

@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 A graph encodes relationships as nodes and edges, and almost every system can be reasoned about on top of one. The core algorithms are BFS, DFS, Dijkstra, and MST, and their cost depends on the graph representation you choose.
 
-This is post 8 in the Algorithms 101 series. Here we cover graph representations, traversal patterns, shortest paths, and minimum spanning trees.
+This is the 8th post in the Algorithms 101 series. Here we cover graph representations, traversal patterns, shortest paths, and minimum spanning trees.
 
 
 ![algorithms 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/08/08-01-big-picture.en.png)

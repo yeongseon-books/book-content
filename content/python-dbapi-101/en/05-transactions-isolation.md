@@ -25,7 +25,7 @@ seo_description: Master Python sqlite3 transactions and isolation levels. Learn 
 
 sqlite3 starts transactions for you, which is convenient until an implicit `BEGIN` quietly holds a lock or a missing `commit()` drops data on exit. This post maps that behavior to PEP 249 so isolation levels and autocommit stop feeling magical.
 
-This is the 5th article in the Python DB-API 101 series.
+This is the 5th post in the Python DB-API 101 series.
 
 ![Transactions and isolation levels (sqlite3, PEP 249)](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-01-transactions-and-isolation-levels-sqlite.en.png)
 

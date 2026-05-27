@@ -25,7 +25,7 @@ last_reviewed: '2026-05-14'
 
 Many students reach the later years of the major and realize that knowing individual subjects is not the same thing as turning them into one working result. Project subjects are where scattered knowledge finally has to survive deadlines, teammates, testing, and a live demo.
 
-This is post 7 in the Computer Science Major 101 series.
+This is the 7th post in the Computer Science Major 101 series.
 
 
 ![computer science major 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/07/07-01-project-delivery-flow.en.png)

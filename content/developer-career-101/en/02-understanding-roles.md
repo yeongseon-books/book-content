@@ -25,7 +25,7 @@ last_reviewed: '2026-05-14'
 
 Saying "I want to be a developer" is still too broad to guide real decisions. Frontend, backend, data, SRE, ML, and mobile roles all ship software, but they optimize for different outcomes, carry different failure modes, and measure success with different signals.
 
-This is post 2 in the Developer Career 101 series.
+This is the 2nd post in the Developer Career 101 series.
 
 
 ![developer career 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/02/02-01-concept-at-a-glance.en.png)

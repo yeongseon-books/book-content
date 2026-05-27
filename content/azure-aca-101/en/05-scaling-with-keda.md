@@ -24,7 +24,7 @@ seo_description: Master Azure Container Apps (ACA) scaling with KEDA. Learn to c
 
 Scaling in ACA is not just about adding replicas. The moment you decide which signals matter and whether the platform can scale to zero, you are also setting your cost policy and your latency policy.
 
-This is post 5 in the Azure Container Apps 101 series. Here, we'll unpack KEDA scalers and the zero-to-N model from an operational angle.
+This is the 5th post in the Azure Container Apps 101 series. Here, we'll unpack KEDA scalers and the zero-to-N model from an operational angle.
 
 ## What you'll learn
 

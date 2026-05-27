@@ -24,7 +24,7 @@ seo_description: Evaluate the RAG pipeline with RAGAS. Measure Faithfulness and 
 
 End-to-end evaluation only becomes useful when question, context, and answer are observed as one flow. Measure retrieval and generation on that shared path, and you can tell which layer is actually responsible for quality loss.
 
-This is the 5th article in the RAG Evaluation and Benchmarking 101 series.
+This is the 5th post in the RAG Evaluation and Benchmarking 101 series.
 
 ![Dataset structure for end-to-end evaluation](https://yeongseon-books.github.io/book-public-assets/assets/rag-benchmark-101/05/05-01-dataset-structure-for-end-to-end-evaluat.en.png)
 *Dataset structure for end-to-end evaluation*

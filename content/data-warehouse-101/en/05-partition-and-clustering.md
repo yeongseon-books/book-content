@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Warehouse performance is often less about reading faster than about refusing to read what you do not need. On large fact tables, that one design choice is the difference between a cheap daily dashboard refresh and an expensive full-table scan.
 
-This is post 5 in the Data Warehouse 101 series.
+This is the 5th post in the Data Warehouse 101 series.
 
 In this post, we focus on how partitioning and clustering help the engine skip work. The useful mental model is simple: first narrow the chunks, then organize what remains inside each chunk.
 

@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 When people first look at open source, they often think a maintainer is simply the person who knows the code best. Technical judgment is part of the job, but the real role is wider. Maintainers triage issues, review contributions, cut releases, set community boundaries, and grow successors.
 
-This is post 8 in the Open Source 101 series.
+This is the 8th post in the Open Source 101 series.
 
 Here, we will define the maintainer not as a heroic programmer who does everything alone, but as the operator who keeps project flow and responsibility sustainable over time.
 

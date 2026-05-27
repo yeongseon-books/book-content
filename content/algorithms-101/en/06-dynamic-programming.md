@@ -27,7 +27,7 @@ last_reviewed: '2026-05-04'
 
 Dynamic programming (DP) applies when the same subproblems repeat and the optimal solutions of subproblems compose into the optimal solution of the whole. The work is to define the state, write a recurrence, and solve it either top-down with memoization or bottom-up with tabulation.
 
-This is post 6 in the Algorithms 101 series. Here we cover when DP applies, how memoization differs from tabulation, and how to build intuition for state design.
+This is the 6th post in the Algorithms 101 series. Here we cover when DP applies, how memoization differs from tabulation, and how to build intuition for state design.
 
 
 ![algorithms 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/06/06-01-big-picture.en.png)

@@ -26,7 +26,7 @@ Statistics and machine learning lean on averages constantly: average response ti
 
 The Law of Large Numbers and the Central Limit Theorem are the two main answers. One explains where the mean goes. The other explains what shape its error takes while it is getting there.
 
-This is post 9 in the Probability 101 series. Here we build intuition for the LLN and the CLT, connect them to standard error, and show with simulations why non-normal populations can still produce nearly normal sample means.
+This is the 9th post in the Probability 101 series. Here we build intuition for the LLN and the CLT, connect them to standard error, and show with simulations why non-normal populations can still produce nearly normal sample means.
 
 
 ![probability 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/09/09-01-concept-at-a-glance.en.png)

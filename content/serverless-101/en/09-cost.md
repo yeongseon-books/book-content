@@ -26,7 +26,7 @@ Serverless often gets sold with the easiest line item to quote: the price per in
 
 Duration, memory, data transfer, provisioned capacity, and downstream managed services all shape the real total. Once traffic grows, the architecture decisions behind those numbers matter more than the tiny unit price that looked so attractive on day one.
 
-This is post 9 in the Serverless 101 series.
+This is the 9th post in the Serverless 101 series.
 
 
 ![serverless 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/09/09-01-concept-at-a-glance.en.png)

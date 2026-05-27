@@ -26,7 +26,7 @@ Scheduling one `train.py` file does not automatically give you an operable train
 
 The more the training process depends on manual steps, the faster reproducibility and recovery speed fall apart. In MLOps, a pipeline is not a convenience feature. It is the structure that turns training into explicit, repeatable stages.
 
-This is post 4 in the MLOps 101 series.
+This is the 4th post in the MLOps 101 series.
 
 Here, we will distinguish a training pipeline from simple script automation and show why stage boundaries and a DAG matter.
 

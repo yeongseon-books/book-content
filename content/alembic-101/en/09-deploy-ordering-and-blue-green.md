@@ -26,7 +26,7 @@ seo_description: A migration always ships "before the code, and with broader com
 
 Many schema incidents begin with deploy ordering, not with the migration code itself. In blue/green or rolling setups, two app versions may share one database, so compatibility width has to be designed up front.
 
-This is post 9 in the Alembic 101 series. Here we will pin down the safe order for shipping migrations and application code together.
+This is the 9th post in the Alembic 101 series. Here we will pin down the safe order for shipping migrations and application code together.
 
 
 ![alembic 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/alembic-101/09/09-01-diagram-the-blue-green-compatibility-win.en.png)

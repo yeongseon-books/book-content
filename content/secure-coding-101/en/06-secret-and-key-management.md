@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Secrets tend to stay invisible right up to the moment they become the most expensive line in the incident report. A database password in a repository, a signing key copied across environments, or a CI job that prints environment variables can leave a system operational on the surface while making it extremely fragile to recover once something leaks.
 
-This is post 6 in the Secure Coding 101 series.
+This is the 6th post in the Secure Coding 101 series.
 
 In this chapter, we will treat secret handling as an operating model rather than a storage trick: separation from code, central secret storage, access control, masking, rotation, and post-leak recovery. That wider frame is what distinguishes a merely hidden secret from a recoverable one.
 

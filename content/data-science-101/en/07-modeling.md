@@ -26,7 +26,7 @@ Modeling gets the spotlight, but it is easiest to misuse precisely because it lo
 
 The safe way to start modeling is to reduce the room for self-deception. Build the simplest reference first, keep training and evaluation cleanly separated, and only then ask whether a more capable model is actually earning its complexity.
 
-This is post 7 in the Data Science 101 series. Here we build that safer path: baseline first, pipeline second, and only then a model you can compare and trust.
+This is the 7th post in the Data Science 101 series. Here we build that safer path: baseline first, pipeline second, and only then a model you can compare and trust.
 
 
 ![data science 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/data-science-101/07/07-01-concept-at-a-glance.en.png)

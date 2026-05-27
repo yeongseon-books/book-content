@@ -29,7 +29,7 @@ last_reviewed: '2026-05-15'
 
 > A load balancer hides many backends behind one virtual IP, distributes traffic, and removes dead servers. An L4 LB balances based on IP and port. An L7 LB understands HTTP and routes by path or header. Both are the front door of modern services and the first line of reliability.
 
-This is post 8 in the Computer Networks 101 series.
+This is the 8th post in the Computer Networks 101 series.
 
 
 ![computer networks 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/computer-networks-101/08/08-01-concept-at-a-glance.en.png)

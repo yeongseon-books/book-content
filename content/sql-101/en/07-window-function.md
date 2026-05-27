@@ -26,7 +26,7 @@ After GROUP BY, many readers hit the same wall: they can compute one total per g
 
 Window functions solve exactly that problem. They let you add group-aware calculations to each row without collapsing the table, which is why they show up constantly in analytical work.
 
-This is post 7 in the SQL 101 series. Here we focus on the row-preserving calculations that make SQL useful for ranking and time-based analysis.
+This is the 7th post in the SQL 101 series. Here we focus on the row-preserving calculations that make SQL useful for ranking and time-based analysis.
 
 
 ![sql 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/sql-101/07/07-01-window-calculation-flow.en.png)

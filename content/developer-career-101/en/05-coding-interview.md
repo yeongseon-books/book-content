@@ -25,7 +25,7 @@ last_reviewed: '2026-05-14'
 
 Solving lots of problems does not automatically translate into strong interview performance. In a live coding interview, you are also being scored on how you narrow ambiguity, explain your plan, recover from mistakes, and manage the clock while still producing correct code.
 
-This is post 5 in the Developer Career 101 series.
+This is the 5th post in the Developer Career 101 series.
 
 
 ![developer career 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/developer-career-101/05/05-01-concept-at-a-glance.en.png)

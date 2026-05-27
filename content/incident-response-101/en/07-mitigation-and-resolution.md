@@ -26,7 +26,7 @@ Stopping customer pain is not the same as fixing the system. That distinction so
 
 Mitigation and resolution have different goals, different owners, and sometimes different timelines. Confusing them creates both technical and communication risk.
 
-This is post 7 in the Incident Response 101 series. This post explains how to choose between rollback, scale-out, throttling, and kill switches, and how to prove that the service is truly healthy before you close the incident.
+This is the 7th post in the Incident Response 101 series. This post explains how to choose between rollback, scale-out, throttling, and kill switches, and how to prove that the service is truly healthy before you close the incident.
 
 
 ![incident response 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/incident-response-101/07/07-01-diagram-at-a-glance.en.png)

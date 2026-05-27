@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 A code base can have many files and still have weak module boundaries. If callers must understand the internals to use a module safely, the boundary is mostly theater.
 
-This is post 3 in the Software Design 101 series.
+This is the 3rd post in the Software Design 101 series.
 
 In this post, we focus on deep modules, small public surfaces, and information hiding. The practical question is how to keep internal changes inside the module instead of leaking them into every caller.
 

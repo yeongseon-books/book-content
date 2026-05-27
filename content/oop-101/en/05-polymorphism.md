@@ -22,7 +22,7 @@ last_reviewed: '2026-05-04'
 
 # Object-Oriented Programming 101 (5/10): Polymorphism
 
-This is post 5 in the Object-Oriented Programming 101 series.
+This is the 5th post in the Object-Oriented Programming 101 series.
 
 > Object-Oriented Programming 101 Series (5/10)
 

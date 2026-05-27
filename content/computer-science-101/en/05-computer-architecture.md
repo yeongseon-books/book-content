@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Sometimes two implementations share the same Big-O and still feel very different in practice. Once that happens, the next question is not about asymptotic complexity anymore. It is about how the code touches the CPU, cache, and memory hierarchy underneath it.
 
-This is post 5 in the Computer Science 101 series.
+This is the 5th post in the Computer Science 101 series.
 
 In this article, we'll connect the von Neumann model, CPU execution, cache hierarchy, and memory locality to the performance differences you can observe in real programs.
 

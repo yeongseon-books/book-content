@@ -26,7 +26,7 @@ Cloud lets you create infrastructure quickly, which also means you can create co
 
 Cloud cost is not a single number; it is a sum of on-demand rates, reserved discounts, spot prices, storage tiers, data transfer charges, and managed service premiums. Without tagging and analysis, you cannot answer 'who spent what and why.' Without budgets, costs surprise you.
 
-This is post 9 in the Cloud Computing 101 series.
+This is the 9th post in the Cloud Computing 101 series.
 
 In this post, we'll use tags, budgets, Savings Plans, and rightsizing as a practical framework for engineering-led cost control.
 

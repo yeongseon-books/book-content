@@ -24,7 +24,7 @@ seo_description: An image is a single frame; a video is a frame sequence with a 
 
 # Multimodal AI 101 (9/10): Video Understanding - From Frame Sampling to Video-LLaVA
 
-This is post 9 in the Multimodal AI 101 series.
+This is the 9th post in the Multimodal AI 101 series.
 
 > Multimodal AI 101 series (9/10)
 

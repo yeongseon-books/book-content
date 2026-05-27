@@ -26,7 +26,7 @@ seo_description: A virtual environment gives each project its own package space,
 
 The same code can behave differently just because two environments installed different package versions. Dependency management is how you turn that uncertainty into something reproducible.
 
-This is post 3 in the Python Package 101 series. Here we cover virtual environments, the different jobs of `requirements.txt` and `pyproject.toml`, and why `uv` is becoming the fast path for new Python projects.
+This is the 3rd post in the Python Package 101 series. Here we cover virtual environments, the different jobs of `requirements.txt` and `pyproject.toml`, and why `uv` is becoming the fast path for new Python projects.
 
 ![Python Package 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/03/03-01-mental-model.en.png)
 *Python Package 101 chapter 3 flow overview*

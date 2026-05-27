@@ -26,7 +26,7 @@ Most readers decide whether to stay in a repository before they inspect a single
 
 A strong README does not try to explain everything. It lowers entry friction. It tells the reader what this project is, why it exists, how to try it quickly, and what result should appear when the happy path works.
 
-This is post 7 in the Technical Writing 101 series. It focuses on designing that five-minute first-run experience.
+This is the 7th post in the Technical Writing 101 series. It focuses on designing that five-minute first-run experience.
 
 
 ![technical writing 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/07/07-01-concept-at-a-glance.en.png)

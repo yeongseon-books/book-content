@@ -24,7 +24,7 @@ seo_description: Maintain decision traceability and compliance with GDPR and HIP
 
 In an LLM system, audit logs are not just verbose application logs. They are the record you rely on later for compliance, incident review, and decision traceability.
 
-This is post 9 in the AI Safety & Guardrails 101 series. It lays out what an audit log has to preserve and why its schema, access model, and retention rules differ from ordinary app logging.
+This is the 9th post in the AI Safety & Guardrails 101 series. It lays out what an audit log has to preserve and why its schema, access model, and retention rules differ from ordinary app logging.
 
 
 ![Audit logging and compliance flow](https://yeongseon-books.github.io/book-public-assets/assets/ai-safety-guardrails-101/09/09-01-big-picture.en.png)

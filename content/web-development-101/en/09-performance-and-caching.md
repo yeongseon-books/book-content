@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 When a page feels slow, the biggest risk is fixing the wrong layer first. The bottleneck might be the browser, the network, a missing cache, or an expensive database query. Without a measurement-first model, “optimization” easily becomes random code movement.
 
-This is post 9 in the Web Development 101 series. Here we connect performance measurement, HTTP caching, CDNs, lazy loading, and database indexing into one workflow for narrowing down slowness instead of guessing at it.
+This is the 9th post in the Web Development 101 series. Here we connect performance measurement, HTTP caching, CDNs, lazy loading, and database indexing into one workflow for narrowing down slowness instead of guessing at it.
 
 
 ![web development 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/09/09-01-concept-at-a-glance.en.png)

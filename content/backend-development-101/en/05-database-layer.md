@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 The moment services start writing SQL directly, query duplication and data-access drift begin to spread. It feels convenient at first, but the cost shows up later when you need to tune performance, add caching, or swap test storage.
 
-This is post 5 in the Backend Development 101 series. Here, we use the repository pattern to separate the database layer and then walk through ORM basics, migrations, transaction boundaries, and the N+1 problem.
+This is the 5th post in the Backend Development 101 series. Here, we use the repository pattern to separate the database layer and then walk through ORM basics, migrations, transaction boundaries, and the N+1 problem.
 
 
 ![backend development 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/05/05-01-concept-at-a-glance.en.png)

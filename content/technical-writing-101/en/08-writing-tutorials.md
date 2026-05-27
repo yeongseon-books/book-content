@@ -26,7 +26,7 @@ Writers often respond to uncertainty by adding more explanation. Tutorial reader
 
 A tutorial earns trust by making success predictable. Each step should leave behind a visible proof, and each likely failure should have at least one short recovery note. That is what keeps a hands-on chapter from turning into a lecture transcript.
 
-This is post 8 in the Technical Writing 101 series. It turns tutorials into verified step-by-step paths instead of broad conceptual overviews.
+This is the 8th post in the Technical Writing 101 series. It turns tutorials into verified step-by-step paths instead of broad conceptual overviews.
 
 
 ![technical writing 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/technical-writing-101/08/08-01-concept-at-a-glance.en.png)

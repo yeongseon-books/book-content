@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Layering is useful only when it protects different rates of change from colliding. If the router still knows the database, the folder names are not helping you.
 
-This is post 6 in the Software Design 101 series.
+This is the 6th post in the Software Design 101 series.
 
 In this post, we use layered architecture to separate presentation, application flow, domain rules, and infrastructure details. The important question is not how many layers to draw, but which changes you want to stop from leaking inward.
 

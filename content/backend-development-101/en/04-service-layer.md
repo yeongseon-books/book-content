@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Once controllers start doing too much, the same business rule gets copied into REST handlers, batch jobs, and other entry points. The first thing that breaks is not style — it is the existence of one reliable place where the rule lives.
 
-This is post 4 in the Backend Development 101 series. Here, we define what belongs in the service layer, why transactions usually start there, and how that boundary improves reuse, testing, and long-term operability.
+This is the 4th post in the Backend Development 101 series. Here, we define what belongs in the service layer, why transactions usually start there, and how that boundary improves reuse, testing, and long-term operability.
 
 
 ![backend development 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/04/04-01-concept-at-a-glance.en.png)

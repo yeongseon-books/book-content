@@ -26,7 +26,7 @@ The first serious confusion in Docker usually appears between images and contain
 
 Once that distinction is clear, a lot of troubleshooting gets easier. You can separate image build issues from runtime state issues, and you can explain why some changes belong in a Dockerfile while others belong in a volume or an environment variable.
 
-This is post 2 in the Docker 101 series. Here we use layers, copy-on-write, and lifecycle commands to build a durable mental model for image state, container state, and what actually survives a restart.
+This is the 2nd post in the Docker 101 series. Here we use layers, copy-on-write, and lifecycle commands to build a durable mental model for image state, container state, and what actually survives a restart.
 
 
 ![docker 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/docker-101/02/02-01-concept-at-a-glance.en.png)

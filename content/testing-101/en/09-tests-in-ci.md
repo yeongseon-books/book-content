@@ -26,7 +26,7 @@ A local green run is useful, but it is still only one machine, one dependency ca
 
 Continuous Integration exists to turn “works on my laptop” into a shared standard. The point is not just automation—it is consistent automation under conditions the whole team can trust.
 
-This is post 9 in the Testing 101 series. Here we use GitHub Actions to build a practical CI path, then look at the operational details that keep the pipeline fast enough to enforce and informative enough to debug.
+This is the 9th post in the Testing 101 series. Here we use GitHub Actions to build a practical CI path, then look at the operational details that keep the pipeline fast enough to enforce and informative enough to debug.
 
 > CI is where personal confidence becomes organizational evidence.
 

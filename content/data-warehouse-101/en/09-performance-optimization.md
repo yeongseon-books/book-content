@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Warehouse tuning starts when someone asks why two queries that look similar cost wildly different amounts. In practice, the answer is usually hiding in scan volume, shuffle volume, or work the engine had no chance to skip.
 
-This is post 9 in the Data Warehouse 101 series.
+This is the 9th post in the Data Warehouse 101 series.
 
 In this post, we treat optimization as a measurement discipline instead of a bag of tricks. The goal is to read the plan, locate the expensive stage, and change the query shape before cost becomes a surprise.
 

@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Running an API for a long time teaches the same lesson repeatedly: the hard part is not changing the contract, but changing it without breaking trust. A field tweak that feels minor to the backend can still be a production incident for clients that upgrade months later.
 
-This is post 9 in the API Design 101 series.
+This is the 9th post in the API Design 101 series.
 
 Here, we treat versioning as change-management discipline rather than just `/v1` syntax. First define what counts as breaking. Then choose how URLs, headers, deprecation notices, and sunset timelines make that policy visible.
 

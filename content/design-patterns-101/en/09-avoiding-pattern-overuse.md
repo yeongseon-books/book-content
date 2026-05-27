@@ -25,7 +25,7 @@ last_reviewed: '2026-05-23'
 
 I once went through a phase where every function got a Strategy wrapper, every object creation passed through a Factory, and every configuration value lived inside a Singleton class. It was the fever that follows learning patterns for the first time. Whenever a code reviewer asked "why is this so complicated?" I answered "for extensibility" — but that extension never arrived, not in two years. I ended up being the sole maintainer of abstractions I had invented for nobody.
 
-This is the ninth article in the Design Patterns 101 series. It explores why knowing patterns and restraining patterns are two different skills, and how to roll back over-applied patterns into simple code again.
+This is the 9th post in the Design Patterns 101 series. It explores why knowing patterns and restraining patterns are two different skills, and how to roll back over-applied patterns into simple code again.
 
 ![Flow from pattern overuse back to simple code](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/09/09-01-concept-at-a-glance.en.png)
 

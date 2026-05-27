@@ -26,7 +26,7 @@ Events and probabilities can already describe many problems, but once you need t
 
 Once you understand random variables, expectation, variance, distributions, and even model outputs in machine learning start to connect much more naturally. A lot of “statistics” is really probability after that translation into numbers has happened.
 
-This is post 5 in the Probability 101 series. Here we define random variables, separate discrete and continuous cases, compare PMF, PDF, and CDF, and use sampling to make the abstractions easier to see.
+This is the 5th post in the Probability 101 series. Here we define random variables, separate discrete and continuous cases, compare PMF, PDF, and CDF, and use sampling to make the abstractions easier to see.
 
 
 ![probability 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/probability-101/05/05-01-concept-at-a-glance.en.png)

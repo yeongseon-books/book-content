@@ -26,7 +26,7 @@ seo_description: A wheel is a pre-built package file and an sdist is a source ar
 
 Once your package structure is stable, the next question is whether you can produce artifacts that install cleanly outside your repository. That is where wheel, sdist, and post-build verification start to matter.
 
-This is post 4 in the Python Package 101 series. Here we compare wheel and sdist, inspect what `python -m build` actually produces, and validate the output in a fresh environment before publishing anything.
+This is the 4th post in the Python Package 101 series. Here we compare wheel and sdist, inspect what `python -m build` actually produces, and validate the output in a fresh environment before publishing anything.
 
 ![Python Package 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-package-101/04/04-01-mental-model.en.png)
 *Python Package 101 chapter 4 flow overview*

@@ -22,7 +22,7 @@ seo_description: How HuggingFaceEmbeddings and FAISS IndexFlatL2 turn text into 
 
 HuggingFaceEmbeddings and FAISS IndexFlatL2 turn raw text into search coordinates and ranked results. This post decomposes that path step by step.
 
-This is post 2 in the RAG Deep Dive series.
+This is the 2nd post in the RAG Deep Dive series.
 
 ![Document and query embedding flow](https://yeongseon-books.github.io/book-public-assets/assets/rag-deep-dive/02/02-01-embedding-call-flow.en.png)
 *Document and query embedding flow*

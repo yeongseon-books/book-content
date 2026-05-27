@@ -26,7 +26,7 @@ Model quality is often decided long before you compute the first metric. If the 
 
 That is why train, validation, and test are not textbook ceremony. They are a discipline for separating learning, selection, and final verification. Once those roles blur together, evaluation stops being evidence and starts becoming wishful thinking.
 
-This is post 2 in the Model Evaluation 101 series. In this post, we define what each split is allowed to do and where leakage usually sneaks in.
+This is the 2nd post in the Model Evaluation 101 series. In this post, we define what each split is allowed to do and where leakage usually sneaks in.
 
 
 ![model evaluation 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/02/02-01-concept-at-a-glance.en.png)

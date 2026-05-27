@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Most analytical questions hide the same structure: how much happened, and by which slice do you want to explain it? The moment you mix those two jobs in one wide table, every later change becomes more expensive than it needs to be.
 
-This is post 3 in the Data Warehouse 101 series.
+This is the 3rd post in the Data Warehouse 101 series.
 
 In this post, we split measures from attributes on purpose. That separation is what keeps aggregations stable, lets context evolve without rewriting history, and gives the warehouse a reusable modeling vocabulary.
 

@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 The same variable name can refer to different values inside and outside a function, and yet the program still behaves predictably. That ordinary-looking fact rests on one of the most important rule sets in language design.
 
-This is post 4 in the Programming Languages 101 series.
+This is the 4th post in the Programming Languages 101 series.
 
 In this post, we will look at binding — attaching a value to a name — and scope — the region where that attachment is visible. Once lexical scope feels concrete, closures, modules, and shadowing stop looking like separate topics.
 

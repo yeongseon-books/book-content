@@ -25,7 +25,7 @@ last_reviewed: '2026-05-15'
 
 Design principles sound abstract when treated as slogans. They become useful the moment a code smell forces you to ask what kind of structural mistake you are actually looking at.
 
-This is post 9 in the Software Design 101 series.
+This is the 9th post in the Software Design 101 series.
 
 In this post, we recast SOLID, KISS, YAGNI, DRY, and the Law of Demeter as diagnostic tools. The point is not memorization. The point is knowing which question to ask, and which refactoring direction follows from the answer.
 

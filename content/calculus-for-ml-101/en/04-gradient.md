@@ -24,7 +24,7 @@ last_reviewed: '2026-05-15'
 
 Once you have one partial derivative per variable, the next question is operational: how do you use all of them together? A model rarely updates one parameter in isolation. Training moves the whole parameter state at once, so you need a representation that preserves both per-coordinate responsibility and overall direction.
 
-This is post 4 in the Calculus for ML 101 series.
+This is the 4th post in the Calculus for ML 101 series.
 
 In this post, we'll treat the gradient as a direction vector on a loss landscape rather than as a bag of numbers. That makes it much easier to understand why gradient descent follows the negative gradient, why gradient norm matters, and why contour-line intuition is so useful in practice.
 
