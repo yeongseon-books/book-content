@@ -31,6 +31,8 @@ Here, we will build the mental model for retrieval-augmented generation and impl
 ![AI Web Development 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/04/plain-llm-vs-rag.en.png)
 *AI Web Development 101 chapter 4 flow overview*
 
+> RAG keeps the model general-purpose and attaches your evidence at request time — retrieve, augment, generate — so updating knowledge becomes a document update, not a retraining job.
+
 ## Questions to Keep in Mind
 
 - Why can a strong model still fail on company-specific or newly updated information?

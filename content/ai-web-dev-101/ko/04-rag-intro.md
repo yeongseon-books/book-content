@@ -30,6 +30,8 @@ seo_description: RAG의 검색·임베딩·생성 흐름을 이해하고, 근거
 ![AI Web Development 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/04/plain-llm-vs-rag.ko.png)
 *AI Web Development 101 4장 흐름 개요*
 
+> RAG는 모델을 범용 상태로 두고 요청 시점에 근거 문서를 붙이는 방식입니다 — 검색, 증강, 생성의 세 단계로 지식 업데이트가 모델 재학습이 아닌 문서 갱신 작업이 됩니다.
+
 ## 먼저 던지는 질문
 
 - 모델은 왜 회사 문서나 최신 뉴스를 바로 답하지 못할까요?

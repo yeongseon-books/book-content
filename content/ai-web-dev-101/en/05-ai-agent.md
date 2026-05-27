@@ -31,6 +31,8 @@ Here, we will focus on tool use, function calling, and the boundary between mode
 ![AI Web Development 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/05/assistant-vs-agent.en.png)
 *AI Web Development 101 chapter 5 flow overview*
 
+> An agent is a chatbot plus a tool-use loop — the model proposes which function to call, but the application owns validation and execution, and that boundary is the entire safety story.
+
 ## Questions to Keep in Mind
 
 - What makes an agent different from a normal chatbot?

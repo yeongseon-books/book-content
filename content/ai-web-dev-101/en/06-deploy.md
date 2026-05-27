@@ -31,6 +31,8 @@ Here, we will walk through the first deployment path for a frontend-heavy app on
 ![AI Web Development 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/06/local-to-live-deployment.en.png)
 *AI Web Development 101 chapter 6 flow overview*
 
+> Deploying an AI app is the moment secrets, startup commands, logs, and cost ceilings stop being local concerns — the platform you pick (Vercel for frontend, Azure for Python backend) decides which of those concerns is hardest.
+
 ## Questions to Keep in Mind
 
 - Why is deployment more than uploading source code?

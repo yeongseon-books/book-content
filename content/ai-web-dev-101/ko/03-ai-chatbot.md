@@ -30,6 +30,8 @@ seo_description: Next.js와 Vercel AI SDK로 스트리밍 채팅 UI를 만들며
 ![AI Web Development 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/03/chatbot-architecture-overview.ko.png)
 *AI Web Development 101 3장 흐름 개요*
 
+> 챗봇은 브라우저 상태와 서버 라우트 사이를 흐르는 스트리밍 파이프입니다 — UX 문제는 체감 지연이고, 아키텍처 문제는 클라이언트 메시지 상태와 서버의 모델 호출을 깔끔하게 분리해 두는 것입니다.
+
 ## 먼저 던지는 질문
 
 - 터미널 예제를 브라우저 UI로 옮기려면 어떤 구성이 필요할까요?

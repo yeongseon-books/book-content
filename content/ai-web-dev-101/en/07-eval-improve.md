@@ -31,6 +31,8 @@ Here, we will turn “it feels better” into a repeatable evaluation and improv
 ![AI Web Development 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/07/evaluation-three-axes.en.png)
 *AI Web Development 101 chapter 7 flow overview*
 
+> Evaluation is the operational loop that turns 'it feels better' into a measurable comparison across accuracy, relevance, and safety — without it, every prompt change is a guess that can silently regress yesterday's wins.
+
 ## Questions to Keep in Mind
 
 - Why is evaluation part of operations rather than an optional extra?

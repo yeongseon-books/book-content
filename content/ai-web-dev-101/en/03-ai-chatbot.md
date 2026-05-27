@@ -31,6 +31,8 @@ Here, we will build a browser chatbot and focus on the boundary between client U
 ![AI Web Development 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/03/chatbot-architecture-overview.en.png)
 *AI Web Development 101 chapter 3 flow overview*
 
+> A chatbot is a streaming pipe between browser state and a server route — the UX problem is perceived latency, and the architectural problem is keeping client message state and server model calls cleanly separated.
+
 ## Questions to Keep in Mind
 
 - What changes when you move a terminal example into a browser UI?

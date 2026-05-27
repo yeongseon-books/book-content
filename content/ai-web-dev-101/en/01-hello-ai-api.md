@@ -31,6 +31,8 @@ Here, we will build the smallest successful OpenAI API call and turn it into a p
 ![AI Web Development 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/01/api-call-overview.en.png)
 *AI Web Development 101 chapter 1 flow overview*
 
+> Calling an AI API is a normal HTTP round trip — once the auth, request shape, and response parsing are visible, every later AI feature becomes a variation of that same contract.
+
 ## Questions to Keep in Mind
 
 - What is different between using ChatGPT on the web and integrating an AI API into my own service?

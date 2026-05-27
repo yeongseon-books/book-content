@@ -31,6 +31,8 @@ Here, we will treat prompts as executable contracts, not clever sentences.
 ![AI Web Development 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-web-dev-101/02/prompt-role-layering.en.png)
 *AI Web Development 101 chapter 2 flow overview*
 
+> A prompt is an executable contract, not a clever sentence — the `system` layer carries long-lived rules and the `user` layer carries the current task, and that split is what makes model behavior stable in application code.
+
 ## Questions to Keep in Mind
 
 - How is a prompt different from just asking a question?
