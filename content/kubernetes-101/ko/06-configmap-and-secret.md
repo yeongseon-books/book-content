@@ -31,6 +31,8 @@ last_reviewed: '2026-05-15'
 ![Kubernetes 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/06/06-01-concept-at-a-glance.ko.png)
 *Kubernetes 101 6장 흐름 개요*
 
+> ConfigMap과 Secret은 단순한 키/값 저장소가 아니라 '이미지를 환경별 차이와 민감한 값에서 분리'하는 운영 도구입니다 — 같은 이미지를 dev·staging·prod에서 그대로 쓸 수 있어야 빌드 결정과 배포 결정이 비로소 깨끗하게 갈립니다.
+
 ## 먼저 던지는 질문
 
 - 이미지 안에 설정과 비밀번호를 같이 넣으면 왜 운영이 어려워질까요?

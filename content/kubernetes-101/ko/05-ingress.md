@@ -31,6 +31,8 @@ Service까지 배우면 클러스터 내부 통신은 어느 정도 정리됩니
 ![Kubernetes 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/05/05-01-concept-at-a-glance.ko.png)
 *Kubernetes 101 5장 흐름 개요*
 
+> Ingress는 외부 노출 기능이 아니라 '여러 서비스를 하나의 진입점 뒤에 두고 HTTP 계층에서 라우팅과 TLS를 모으는 자리'입니다 — 도메인·경로 규칙·인증서 종료가 각 Service에 흩어지지 않고 한 곳에 모일 때 운영 일관성이 비로소 생깁니다.
+
 ## 먼저 던지는 질문
 
 - Ingress와 IngressController는 왜 따로 이해해야 할까요?

@@ -31,6 +31,8 @@ Kubernetes를 처음 배우면 가장 먼저 헷갈리는 지점이 있습니다
 ![Kubernetes 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/02/02-01-concept-at-a-glance.ko.png)
 *Kubernetes 101 2장 흐름 개요*
 
+> Pod가 컨테이너가 아닌 이유는 '함께 살고 함께 죽는다'는 결정이 필요하기 때문입니다 — 같은 네트워크와 볼륨을 공유하며 한 단위로 스케줄·재시작되는 묶음이라야 사이드카·init 컨테이너·로컬 통신 같은 패턴이 비로소 자연스럽게 표현됩니다.
+
 ## 먼저 던지는 질문
 
 - Pod와 컨테이너는 정확히 어떻게 다를까요?

@@ -31,6 +31,8 @@ Pod를 이해한 다음 바로 마주치는 질문은 이것입니다. 파드가
 ![Kubernetes 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/03/03-01-concept-at-a-glance.ko.png)
 *Kubernetes 101 3장 흐름 개요*
 
+> Deployment는 '파드를 N개 띄우는 설정'이 아니라 '원하는 개수를 유지하고 버전 교체와 롤백을 책임지는 컨트롤러'입니다 — 직접 Pod를 만들지 않는 이유는 Pod가 죽었을 때 자기 자신을 다시 띄우지 못하기 때문이고, 이 빈자리를 컨트롤러가 채우는 것이 Kubernetes 워크로드의 기본 모델입니다.
+
 ## 먼저 던지는 질문
 
 - Deployment와 ReplicaSet은 어떤 관계일까요?

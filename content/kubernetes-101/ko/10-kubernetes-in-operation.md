@@ -31,6 +31,8 @@ last_reviewed: '2026-05-15'
 ![Kubernetes 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/10/10-01-concept-at-a-glance.ko.png)
 *Kubernetes 101 10장 흐름 개요*
 
+> '클러스터가 떠 있다'와 '운영 가능하다'는 다른 말입니다 — probes·접근 권한·네트워크 경계·관측성·GitOps·런북이 함께 맞물려야 비로소 사람의 기억이 아닌 시스템으로 장애 대응과 변경이 흘러갑니다.
+
 ## 먼저 던지는 질문
 
 - liveness, readiness, startup probe는 어떤 역할을 나눌까요?

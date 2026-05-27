@@ -31,6 +31,8 @@ last_reviewed: '2026-05-15'
 ![Kubernetes 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/07/07-01-concept-at-a-glance.ko.png)
 *Kubernetes 101 7장 흐름 개요*
 
+> Volume의 핵심은 '디스크를 붙인다'가 아니라 '파드의 수명과 데이터의 수명을 분리한다'입니다 — 컨테이너 파일시스템은 임시 작업 공간일 뿐이고, 영구 데이터는 PV/PVC 계층을 통해 파드 교체와 무관한 수명을 가져야 stateful 워크로드가 운영 가능해집니다.
+
 ## 먼저 던지는 질문
 
 - 파드가 재시작되면 컨테이너 파일시스템은 왜 사라질까요?

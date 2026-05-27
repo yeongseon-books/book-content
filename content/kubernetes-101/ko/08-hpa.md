@@ -31,6 +31,8 @@ last_reviewed: '2026-05-15'
 ![Kubernetes 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/08/08-01-concept-at-a-glance.ko.png)
 *Kubernetes 101 8장 흐름 개요*
 
+> HPA는 'CPU 높으면 파드 늘리는 기능'이 아니라 '메트릭을 입력으로 Deployment의 desired replicas를 조절하는 컨트롤러 루프'입니다 — 어떤 메트릭을 보느냐, 어떻게 안정화하느냐, 무엇을 최대로 두느냐가 자동화의 안정성을 결정합니다.
+
 ## 먼저 던지는 질문
 
 - 트래픽이 바뀔 때마다 사람이 직접 파드 수를 조절하면 왜 느리고 비싸질까요?

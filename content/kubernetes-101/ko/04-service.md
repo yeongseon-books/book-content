@@ -31,6 +31,8 @@ Pod를 여러 개 띄우기 시작하면 다음 문제가 바로 등장합니다
 ![Kubernetes 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/04/04-01-concept-at-a-glance.ko.png)
 *Kubernetes 101 4장 흐름 개요*
 
+> Service는 단순 포트 노출이 아니라 '라벨로 선택된 파드 집합'에 안정적인 가상 IP와 DNS 이름을 부여하는 추상화입니다 — Pod IP가 끊임없이 바뀌어도 호출자는 같은 이름으로 같은 역할을 호출할 수 있게 만든다는 점이 서비스 디스커버리의 핵심입니다.
+
 ## 먼저 던지는 질문
 
 - Service는 정확히 어떤 문제를 해결할까요?

@@ -31,6 +31,8 @@ last_reviewed: '2026-05-15'
 ![Kubernetes 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/01/01-01-concept-at-a-glance.ko.png)
 *Kubernetes 101 1장 흐름 개요*
 
+> Kubernetes는 '컨테이너를 많이 돌리는 도구'가 아니라 원하는 상태(desired state)를 선언하면 시스템이 그 상태로 계속 수렴하도록 만드는 오케스트레이터입니다 — 사람이 명령형으로 맞추던 일을 컨트롤러 루프에 위임한다는 한 가지 발상이 모든 리소스 설계의 출발점입니다.
+
 ## 먼저 던지는 질문
 
 - 오케스트레이션이라는 말은 실제로 무엇을 대신해 줄까요?
