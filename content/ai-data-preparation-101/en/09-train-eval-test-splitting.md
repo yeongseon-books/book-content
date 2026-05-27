@@ -31,6 +31,8 @@ This is the 9th post in the AI Data Preparation 101 series. Here we cover practi
 ![AI data preparation chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/09/09-01-big-picture.en.png)
 *AI data preparation chapter 9 flow overview*
 
+> Train/eval/test splitting is not a 70/20/10 ritual — it is the moment you decide what counts as 'unseen' for your model, and a leaky split here invalidates every metric you will ever compute downstream.
+
 ## Questions to Keep in Mind
 
 - When does a random split stop representing the production problem you actually care about?

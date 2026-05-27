@@ -29,6 +29,8 @@ This is the 3rd post in the AI Data Preparation 101 series. Here we cover the ba
 ![AI data preparation chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/03/03-01-big-picture.en.png)
 *AI data preparation chapter 3 flow overview*
 
+> Cleaning and deduplication are not chores you do before the real work — they are the real work, and skipping them is how training compute gets burned on noise the model then memorizes.
+
 ## Questions to Keep in Mind
 
 - Which text-cleaning transforms are worth keeping because they solve measurable problems?

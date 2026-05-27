@@ -29,6 +29,8 @@ This is the 4th post in the AI Data Preparation 101 series. Here we cover the st
 ![AI data preparation chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/04/04-01-big-picture.en.png)
 *AI data preparation chapter 4 flow overview*
 
+> PII handling is not a regex pass — it is a policy decision about what your model is allowed to remember, encoded as a pipeline stage that runs every time data enters training, eval, or fine-tuning.
+
 ## Questions to Keep in Mind
 
 - Why should PII handling be split into detection, classification, anonymization, and audit?

@@ -29,6 +29,8 @@ This is the first post in the AI Data Preparation 101 series. Here we cover why 
 ![AI data preparation chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/01/01-01-big-picture.en.png)
 *AI data preparation chapter 1 flow overview*
 
+> Model quality is bounded above by data quality — once that sinks in, every modeling decision starts looking downstream of a data preparation decision you either made deliberately or inherited by accident.
+
 ## Questions to Keep in Mind
 
 - When does data preparation create more lift than another round of model tuning?

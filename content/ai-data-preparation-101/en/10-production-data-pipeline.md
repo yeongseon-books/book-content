@@ -31,6 +31,8 @@ This is the final post in the AI Data Preparation 101 series. Here we cover how 
 ![Architecture - a 6-stage pipeline](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/10/10-01-architecture-a-6-stage-pipeline.en.png)
 *Architecture - a 6-stage pipeline*
 
+> A production data pipeline is not a script you run once — it is a versioned, observable, reproducible system where every dataset has a lineage, a hash, and an owner, because the next retrain depends on being able to recreate the last one.
+
 ## Questions to Keep in Mind
 
 - Which system properties turn a set of preprocessing scripts into a production pipeline?

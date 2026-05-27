@@ -31,6 +31,8 @@ This is the 6th post in the AI Data Preparation 101 series. Here we cover how he
 ![AI data preparation chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/06/06-01-big-picture.en.png)
 *AI data preparation chapter 6 flow overview*
 
+> Quality filtering is not 'remove obviously bad rows' — it is the explicit declaration of which slice of the internet (or your enterprise) the model is allowed to learn from, with every threshold a tradeoff between recall and capability.
+
 ## Questions to Keep in Mind
 
 - Which low-cost heuristics catch obvious junk before you spend model calls on it?

@@ -29,6 +29,8 @@ This is the 2nd post in the AI Data Preparation 101 series. Here we cover how to
 ![AI data preparation chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/02/02-01-big-picture.en.png)
 *AI data preparation chapter 2 flow overview*
 
+> A dataset without provenance is a liability disguised as an asset — until you can answer 'where did each row come from, on what date, under what license,' you cannot reproduce, audit, or safely retrain anything.
+
 ## Questions to Keep in Mind
 
 - What metadata must exist the moment a dataset lands on disk?

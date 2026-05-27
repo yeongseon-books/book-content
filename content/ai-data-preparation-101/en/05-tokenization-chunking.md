@@ -31,6 +31,8 @@ This is the 5th post in the AI Data Preparation 101 series. Here we cover how to
 ![AI data preparation chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/ai-data-preparation-101/05/05-01-big-picture.en.png)
 *AI data preparation chapter 5 flow overview*
 
+> Tokenization is where text stops being prose and starts being model input — chunking decisions made here silently set the upper bound on how well retrieval, context windows, and downstream eval can work.
+
 ## Questions to Keep in Mind
 
 - Why do Korean, English, and code consume the context window so differently?
