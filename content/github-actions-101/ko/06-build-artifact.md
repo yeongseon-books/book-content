@@ -29,6 +29,8 @@ CI를 돌려서 빌드까지 성공했는데 결과물이 그대로 사라진다
 ![GitHub Actions 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/06/06-01-diagram.ko.png)
 *GitHub Actions 101 6장 흐름 개요*
 
+> 아티팩트는 '결과물을 저장하는 옵션'이 아니라 '빌드 잡과 배포 잡을 분리하기 위한 인터페이스'입니다 — 빌드 결과를 보관하지 않으면 배포 잡은 같은 빌드를 반복하게 되고, 무엇이 실제로 배포됐는지에 대한 추적 가능성도 함께 사라집니다.
+
 ## 먼저 던지는 질문
 
 - `upload-artifact`와 `download-artifact`는 각각 언제 쓰일까요?

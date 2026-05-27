@@ -29,6 +29,8 @@ last_reviewed: '2026-05-15'
 ![GitHub Actions 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/08/08-01-diagram.ko.png)
 *GitHub Actions 101 8장 흐름 개요*
 
+> 배포는 빨라야 하지만 그보다 먼저 재현 가능해야 합니다 — Environments·승인 게이트·OIDC·롤백 워크플로는 권한과 흔적을 코드에 묶기 위한 장치이고, 새벽 장애 때 사람의 기억이 아니라 시스템이 답을 줄 수 있어야 자동화가 비로소 신뢰됩니다.
+
 ## 먼저 던지는 질문
 
 - staging 자동 배포와 production 승인 게이트는 어떻게 나눌까요?

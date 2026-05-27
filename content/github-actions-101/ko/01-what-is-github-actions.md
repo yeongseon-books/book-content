@@ -30,6 +30,8 @@ last_reviewed: '2026-05-15'
 ![GitHub Actions 실행 흐름](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/01/01-01-diagram.ko.png)
 *이벤트가 워크플로우를 깨우고, 잡이 러너 위에서 스텝을 순서대로 실행하는 흐름*
 
+> GitHub Actions는 'GitHub 안의 CI'가 아니라 코드 저장소 바로 옆에서 이벤트를 받아 작업을 실행하는 실행 플랫폼입니다 — 빌드·테스트뿐 아니라 라벨링·릴리스·문서 배포까지 같은 모델로 흡수된다는 점이 단순 CI 서비스와 다른 결정적 차이입니다.
+
 ## 먼저 던지는 질문
 
 - GitHub Actions는 정확히 무엇이고 CI/CD에서 어디에 놓일까요?

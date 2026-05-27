@@ -29,6 +29,8 @@ last_reviewed: '2026-05-15'
 ![GitHub Actions 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/05/05-01-diagram.ko.png)
 *GitHub Actions 101 5장 흐름 개요*
 
+> Lint와 type check를 CI에 두는 목적은 코드 스타일 통제가 아니라 '리뷰어가 설계와 위험에 집중할 수 있게 만드는 것'입니다 — 기계가 잡을 수 있는 지적은 PR이 열리기 전에 끝나야 사람의 리뷰 시간이 비로소 비싸지지 않습니다.
+
 ## 먼저 던지는 질문
 
 - Ruff는 왜 여러 도구를 하나로 줄이는 데 유용할까요?

@@ -29,6 +29,8 @@ last_reviewed: '2026-05-15'
 ![GitHub Actions 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/10/10-01-diagram.ko.png)
 *GitHub Actions 101 10장 흐름 개요*
 
+> 파이프라인은 부품의 개수가 아니라 부품들이 어떤 책임으로 연결돼 있는지를 설명하는 구조입니다 — PR·main·tag를 같은 워크플로의 다른 분기로 두지 말고 서로 다른 단계로 분리할 때, reusable workflow와 composite action도 비로소 자기 자리를 찾습니다.
+
 ## 먼저 던지는 질문
 
 - PR, main, tag를 왜 서로 다른 책임으로 나눠야 할까요?

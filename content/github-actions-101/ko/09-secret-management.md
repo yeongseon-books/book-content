@@ -29,6 +29,8 @@ last_reviewed: '2026-05-15'
 ![GitHub Actions 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/09/09-01-secret.ko.png)
 *GitHub Actions 101 9장 흐름 개요*
 
+> Secret 관리는 편의 기능이 아니라 기본 보안 설계입니다 — repository·environment·organization 수준의 범위를 의식적으로 나누고 `GITHUB_TOKEN`을 최소 권한으로 좁히는 일이, 결국 '유출됐을 때 영향이 어디까지 가는가'를 미리 정하는 일과 같습니다.
+
 ## 먼저 던지는 질문
 
 - repository, environment, organization secret은 어떻게 구분할까요?

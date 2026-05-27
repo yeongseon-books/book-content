@@ -29,6 +29,8 @@ GitHub Actions를 조금만 써 보면 금방 이런 고민이 생깁니다. “
 ![GitHub Actions 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/02/02-01-diagram.ko.png)
 *GitHub Actions 101 2장 흐름 개요*
 
+> 워크플로·잡·스텝은 단순한 YAML 계층이 아니라 '병렬성과 의존성의 단위'입니다 — 같이 끝나야 하는 일은 한 잡 안 스텝으로 묶고, 독립적으로 실패해도 되는 일은 잡으로 갈라야 실행 시간과 실패 위치를 한꺼번에 명확하게 만들 수 있습니다.
+
 ## 먼저 던지는 질문
 
 - Workflow, Job, Step은 각각 무엇을 담당할까요?

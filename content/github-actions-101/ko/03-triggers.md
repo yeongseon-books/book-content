@@ -29,6 +29,8 @@ last_reviewed: '2026-05-15'
 ![GitHub Actions 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/03/03-01-diagram.ko.png)
 *GitHub Actions 101 3장 흐름 개요*
 
+> 트리거 설계는 자동화의 시작이 아니라 비용과 소음을 다루는 문제입니다 — push·pull_request·schedule·workflow_dispatch를 무엇으로 받느냐와 paths·concurrency로 무엇을 거르느냐가 같은 워크플로를 '항상 도는 잡음'과 '필요할 때만 도는 신호'로 가릅니다.
+
 ## 먼저 던지는 질문
 
 - push와 pull_request는 어떤 차이로 써야 할까요?

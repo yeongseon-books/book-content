@@ -29,6 +29,8 @@ last_reviewed: '2026-05-15'
 ![GitHub Actions 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/github-actions-101/04/04-01-diagram.ko.png)
 *GitHub Actions 101 4장 흐름 개요*
 
+> 테스트가 존재하는 것과 자동으로 실행되는 것은 다른 단계입니다 — Python 버전·OS 매트릭스·캐시·리포트는 부가 기능이 아니라 'CI에서 항상 같은 조건으로 같은 결과가 나오는가'라는 한 가지 질문에 답하기 위한 도구입니다.
+
 ## 먼저 던지는 질문
 
 - `setup-python`과 pip 캐시는 왜 함께 다뤄야 할까요?
