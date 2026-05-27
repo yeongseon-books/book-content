@@ -32,9 +32,9 @@ This is the 5th post in the Frontend Development 101 series. Here we explain SPA
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying Routing and Pages?
-- Which signal should the example or diagram make visible for Routing and Pages?
-- What failure should be prevented first when Routing and Pages reaches a real system?
+- Why should a URL describe screen state instead of acting as a disposable implementation detail?
+- When does data belong in the path, and when does it belong in the query string?
+- What usually breaks first when routing works locally but fails after deployment?
 
 ## What You Will Learn
 
@@ -58,19 +58,23 @@ Routing makes *refresh-safe screens*, *shareable links*, and *back-button behavi
 - **Query string**: extra info *outside the route*, like `?q=react&page=2`.
 - **Lazy loading**: *splitting code per route* so it loads only when needed.
 
-## Before/After
+## From Full-Page Navigation to URL-Driven Screen State
 
-**Before (server routing, full reload)**
+Traditional sites treat each navigation as a new document request. SPA routing keeps the application shell alive and lets the URL describe which screen, params, and nested state should be visible. That difference is why refresh behavior, deep links, and back-button support all become routing concerns.
+
+**Browser asks the server for a new page**
 
 ```html
 <a href="/about">About</a>
 ```
 
-**After (SPA routing, smooth transition)**
+**Router swaps the screen inside one running app**
 
 ```jsx
 <Link to="/about">About</Link>
 ```
+
+The second model is smoother for users, but it also raises a deployment contract: the host must return your SPA entry page on refresh so the router can rebuild the correct screen from the URL.
 
 ## Hands-on: React Router in Five Steps
 
@@ -135,6 +139,17 @@ const Settings = lazy(() => import("./Settings"));
 - If the detail page is empty, check that the route pattern `/users/:id` matches the `useParams()` lookup exactly.
 - If refresh fails after deployment, verify whether your host needs SPA history-fallback configuration.
 
+```text
+# Netlify: public/_redirects
+/* /index.html 200
+```
+
+```json
+{
+  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
+}
+```
+
 ## What to Notice in This Code
 
 - `<Link>` updates router state *without a full page reload*.
@@ -181,12 +196,12 @@ URLs decide what users see. Next, we look at how those screens *fetch data from 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Routing and Pages?**
-  - The article treats Routing and Pages as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Routing and Pages?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Routing and Pages reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why should a URL describe screen state instead of acting as a disposable implementation detail?**
+  - A good URL preserves where the user is and what they are looking at, so refresh, sharing, and back navigation all work without special explanation. If the URL cannot describe the current screen, the product feels unreliable immediately.
+- **When does data belong in the path, and when does it belong in the query string?**
+  - Put identity in the path, such as `/users/42`, and put modifiers such as filters, sort order, or pagination in the query string. That split keeps links readable and makes state restoration much easier.
+- **What usually breaks first when routing works locally but fails after deployment?**
+  - Refresh handling is usually the first failure. The router works in development, but production hosting needs a history-fallback rule so `/users/42` still returns `index.html` instead of a 404.
 
 <!-- toc:begin -->
 ## In this series
