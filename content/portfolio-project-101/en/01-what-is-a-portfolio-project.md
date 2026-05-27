@@ -160,6 +160,93 @@ A portfolio project is more than public code. It becomes reviewable only when th
 
 In the next post, we will turn that definition into evaluation criteria and look at what makes one project feel much stronger than another.
 
+## Appendix: Topic Decision Log Example
+
+The example below shows how to organize topic decisions before coding.
+
+```markdown
+# Topic Decision Log
+
+## Candidate A: Team Schedule Unified Dashboard
+- Problem: schedules scattered across chat/calendar/docs increase lookup cost
+- Scope: lookup + filter + weekly view
+- Risk: OAuth integration complexity
+- Decision: adopted as first portfolio topic
+
+## Candidate B: Realtime Chat
+- Problem: clear but lacks differentiation
+- Scope: auth/rooms/messages/read-state
+- Risk: WebSocket operational complexity
+- Decision: hold (expand topic for v2)
+```
+
+Having this record lets you answer "why this topic?" in interviews without hesitation. It also gives you a reference when you need to shrink scope during development. Topic selection feels like a starting task but actually shapes project quality all the way through.
+
+## Appendix: GitHub Profile README Template
+
+A GitHub profile README is the self-introduction document that appears before the repository list. When it is polished, a visitor can quickly see what problems you care about and what results you have shipped. Without it or if it is auto-generated, viewers have to click through each repo individually.
+
+```markdown
+# Hi there, [Your Name] 👋
+
+## Focus Areas
+- Backend API design and operational automation
+- Data pipelines and observability systems
+
+## Featured Projects
+
+| Project | One-line | Stack | Demo |
+| --- | --- | --- | --- |
+| [task-tracker](link) | Unified team schedule tool | FastAPI, PostgreSQL | [demo](link) |
+| [log-viewer](link) | Reduced log search time by 80% | Python, Elasticsearch | [demo](link) |
+
+## Tech Stack
+- Language: Python, SQL
+- Framework: FastAPI, Flask
+- Infra: Docker, GitHub Actions, AWS EC2
+
+## Recent Activity
+- 📝 [Blog Title](link) - recent technical post
+- 🔧 [PR Title](link) - open source contribution
+```
+
+The centerpiece is the featured projects table. By putting name, one-liner, stack, and demo in a single row, a visitor can find and click to a project of interest within 3 seconds. If the stack list becomes too long, the focus tends to blur instead. Keep it to your core 3-5 technologies and let your projects do the proof.
+
+## Appendix: Portfolio Project Directory Structure
+
+A project directory structure acts as a map that shows the overall design before a reviewer opens a single file. When the structure is clean, a reviewer can find where the core logic lives, where the configuration is, and where the docs are.
+
+```text
+task-tracker/
+├── README.md                  # entry doc: problem, demo, run
+├── docs/
+│   ├── adr/                   # Architecture Decision Records
+│   │   └── 001-why-fastapi.md
+│   ├── architecture.md        # overall design
+│   └── api-spec.md            # endpoint reference
+├── src/
+│   ├── main.py                # app entrypoint
+│   ├── routes/                # HTTP routes
+│   ├── services/              # business logic
+│   ├── models/                # data models
+│   └── utils/                 # shared utilities
+├── tests/
+│   ├── unit/                  # unit tests
+│   ├── integration/           # integration tests
+│   └── conftest.py            # pytest fixtures
+├── .github/
+│   └── workflows/
+│       ├── ci.yml             # test + lint automation
+│       └── deploy.yml         # deploy pipeline
+├── Dockerfile                 # container image
+├── docker-compose.yml         # local dev setup
+├── pyproject.toml             # dependencies and build
+├── .env.example               # environment variables
+└── CHANGELOG.md               # version changelog
+```
+
+Three things stand out. First, a separate `docs/` folder keeps architectural decisions and API specs from cluttering the README. Second, `tests/` splits into `unit` and `integration`, so CI can run quick feedback (unit) and deeper validation (integration) independently. Third, `.github/workflows/` holds both CI and deploy pipelines, showing a reviewer that the project has automated verification in place. When they open the Actions tab and see a green badge, the completion signal is much stronger.
+
 ## Answering the Opening Questions
 
 - **What is the difference between a portfolio project and a simple practice repository?**
