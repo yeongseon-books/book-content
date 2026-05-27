@@ -115,13 +115,6 @@ retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 print(f"index vector count: {vectorstore.index.ntotal}")
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    index vector count: 4
-
-<!-- injected-output:end -->
-
 이 단계는 질의 처리 이전에 미리 해 두는 준비 작업입니다. 실전에서는 문서 수집, 청킹, 임베딩, 인덱스 저장이 별도 파이프라인으로 빠지는 경우가 많습니다. 한 파일 예제에서는 함께 보이지만, **비용이 큰 전처리와 요청당 실행되는 경로를 분리해서 생각하는 습관**이 중요합니다.
 
 ---
@@ -143,19 +136,6 @@ for query in queries:
         preview = doc.page_content.replace("\n", " ")[:90]
         print(f"  [{idx}] score={score:.4f} text={preview}...")
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    query: Where was FAISS developed?
-      [1] score=0.7851 text=FAISS is a high-speed vector search library developed at Facebook AI Research....
-      [2] score=1.1062 text=LangChain connects LLM components as a pipeline using LCEL....
-
-    query: How does vector search differ from keyword search?
-      [1] score=0.5128 text=Vector search converts text into numeric vectors for meaning-based retrieval....
-      [2] score=0.7440 text=RAG (Retrieval-Augmented Generation) combines retrieved documents with an LLM prompt....
-
-<!-- injected-output:end -->
 
 이 검증을 먼저 해 두면 문제를 세 갈래로 나눌 수 있습니다. 상위 문서가 틀리면 retrieval 문제이고, 문서는 맞는데 답이 틀리면 prompt나 model 문제이며, 문서 수가 너무 많아 잡음이 섞이면 `k`와 chunking 문제입니다. 통합 예제일수록 이 순서가 중요합니다.
 
@@ -234,13 +214,6 @@ guarded_chain = (
 
 print(guarded_chain.invoke("What does the corpus say about LangSmith?"))
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    The provided documents do not mention LangSmith, so I cannot answer that from this corpus.
-
-<!-- injected-output:end -->
 
 이 가드는 사소해 보이지만 효과가 큽니다. 근거가 없는 답변을 억지로 만들게 하기보다, "지금 인덱스에는 없는 내용"이라고 빨리 말하게 만드는 편이 운영 품질에 훨씬 유리합니다.
 

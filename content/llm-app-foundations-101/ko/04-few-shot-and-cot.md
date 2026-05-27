@@ -110,15 +110,6 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
-<!-- injected-output:start -->
-**출력 예시**
-
-    category: technical
-    priority: high
-    reason: The upload flow breaks on a core product action and needs technical investigation first.
-
-<!-- injected-output:end -->
-
 예시는 “관련 주제”가 아니라 “원하는 출력 패턴”을 보여 줘야 합니다. few-shot은 상식을 더하는 도구가 아니라 형식과 해석 리듬을 안정화하는 도구입니다.
 
 zero-shot과 few-shot을 같은 요청에 비교하면 이 차이가 더 잘 보입니다.
@@ -186,21 +177,6 @@ print()
 print("[few-shot]")
 print(few_shot.choices[0].message.content)
 ```
-
-<!-- injected-output:start -->
-**출력 예시**
-
-    [zero-shot]
-    category: billing
-    priority: high
-    reason: The invoice amount suggests an unexpected billing change that affects the customer financially.
-
-    [few-shot]
-    category: billing
-    priority: high
-    reason: Unexpected invoice inflation creates immediate billing risk and should be resolved quickly.
-
-<!-- injected-output:end -->
 
 few-shot의 가치는 정답률보다 반복 가능성에서 더 자주 드러납니다. 라벨 어휘, 줄 순서, 설명 길이, 애매한 케이스 해석이 더 안정적으로 맞춰집니다.
 
@@ -299,16 +275,6 @@ completion = client.chat.completions.create(
 
 print(completion.choices[0].message.content)
 ```
-
-<!-- injected-output:start -->
-**출력 예시**
-
-    1) 원가 120000원에서 10% 할인액은 12000원입니다.
-    2) 할인 적용 후 금액은 108000원입니다.
-    3) 여기에 부가세 10%인 10800원을 더합니다.
-    final_answer: 118800 won
-
-<!-- injected-output:end -->
 
 이 패턴은 특히 “먼저”, “그다음”, “예외적으로”, “조건이 맞으면만” 같은 순서 의존형 작업에서 유용합니다.
 

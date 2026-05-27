@@ -156,13 +156,6 @@ message = completion.choices[0].message
 print(message.tool_calls)
 ```
 
-<!-- injected-output:start -->
-**실행 결과**
-
-    [ChatCompletionMessageToolCall(id='1jcy87msp', function=Function(arguments='{"order_id":"ORD-1001"}', name='get_order_status'), type='function')]
-
-<!-- injected-output:end -->
-
 `tool_choice="auto"`는 모델이 필요할 때만 도구를 고르게 합니다. 이 시점의 응답은 최종 사용자 답이 아니라 실행 요청입니다. 애플리케이션이 아직 한 단계를 더 거쳐야 합니다.
 
 ### `tool_calls`를 파싱하고 안전하게 라우팅하기
@@ -234,13 +227,6 @@ for tool_call in message.tool_calls or []:
     result = available_tools[function_name](**validated_args.model_dump())
     print(function_name, arguments, result)
 ```
-
-<!-- injected-output:start -->
-**실행 결과**
-
-    get_order_status {'order_id': 'ORD-1001'} {'status': 'in_transit', 'eta_days': 2}
-
-<!-- injected-output:end -->
 
 이 단계는 아직 최종 답이 아닙니다. 모델은 툴 사용을 요청했고, 애플리케이션은 그 요청을 실행했습니다. 이제 그 결과를 다시 대화에 넣어야 사용자 응답이 완성됩니다.
 
@@ -396,14 +382,6 @@ def run_tool(function_name: str, raw_arguments: str) -> dict:
 print(run_tool("get_order_status", '{"order_id": 1001}'))
 print(run_tool("cancel_order", '{"order_id": "ORD-1001"}'))
 ```
-
-<!-- injected-output:start -->
-**실행 결과**
-
-    {'ok': False, 'error_type': 'invalid_arguments', 'message': 'Input should be a valid string'}
-    {'ok': False, 'error_type': 'unknown_tool', 'message': 'unsupported tool: cancel_order'}
-
-<!-- injected-output:end -->
 
 이 패턴이 실용적인 이유는 실패가 자연어 예외가 아니라 계약된 데이터로 돌아오기 때문입니다. 모델에게는 `ok: false`와 `error_type`을 보고 "주문 번호 형식이 잘못되었습니다" 같은 설명을 만들게 할 수 있고, 애플리케이션은 같은 필드로 메트릭과 알림을 모을 수 있습니다. 특히 상태 변경 도구에서는 이 표준화가 감사 로그와 재실행 금지 정책까지 자연스럽게 이어집니다.
 

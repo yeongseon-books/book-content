@@ -53,13 +53,6 @@ response = llm.bind_tools([add_numbers]).invoke("Add 13 and 29.")
 print(response.tool_calls)
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    [{'name': 'add_numbers', 'args': {'a': 13, 'b': 29}, 'id': '0r7b2zrqg', 'type': 'tool_call'}]
-
-<!-- injected-output:end -->
-
 ## Defining tools
 
 ![Function definition into tool metadata](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/04/04-01-defining-tools.en.png)
@@ -129,14 +122,6 @@ response = llm_with_tools.invoke("What is 15 plus 27?")
 print(f"content: {response.content!r}")
 print(f"tool_calls: {response.tool_calls}")
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    content: ''
-    tool_calls: [{'name': 'add_numbers', 'args': {'a': 15, 'b': 27}, 'id': 'yc5j64vch', 'type': 'tool_call'}]
-
-<!-- injected-output:end -->
 
 ---
 
@@ -219,24 +204,6 @@ for q in questions:
     print(f"answer: {answer}")
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    question: What is 15 plus 27?
-      executed: add_numbers({'a': 15, 'b': 27}) = 42.0
-    answer: 15 plus 27 is 42.
-
-    question: What is 7 times 8?
-      executed: multiply_numbers({'a': 7, 'b': 8}) = 56.0
-    answer: 7 times 8 is 56.
-
-    question: Add 5 and 3, then multiply the result by 4. What do you get?
-      executed: add_numbers({'a': 5, 'b': 3}) = 8.0
-      executed: multiply_numbers({'a': 8, 'b': 4}) = 32.0
-    answer: Add 5 and 3 to get 8, then multiply by 4 to get 32.
-
-<!-- injected-output:end -->
-
 The loop runs until the LLM produces a response with no tool calls. Each tool result is wrapped in a `ToolMessage` and appended to the conversation history. The system message matters too: it makes the success condition explicit, so a simple multiplication question is less likely to slip through as a plain text answer.
 
 ---
@@ -274,14 +241,6 @@ bad_call = {"name": "divide_numbers", "args": {"a": 10, "b": 5}, "id": "call_bad
 print(execute_tool_call(ok_call).content)
 print(execute_tool_call(bad_call).content)
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    15.0
-    ERROR: unknown tool 'divide_numbers'
-
-<!-- injected-output:end -->
 
 With this dispatcher in place, you can tell in one log line whether the failure came from tool routing, bad arguments, or an exception inside the tool itself.
 
@@ -342,18 +301,6 @@ print(run_with_tools("When is the support team available?"))
 print(run_with_tools("What is the BMI for someone weighing 70 kg at 1.75 m?"))
 print(run_with_tools("How many times does 'vector' appear in 'vector search makes vector retrieval practical'?"))
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-      get_office_hours({'team': 'support'}) = 09:00-18:00 KST
-    The support team is available from 09:00 to 18:00 KST.
-      calculate_bmi({'height_m': 1.75, 'weight_kg': 70}) = 22.86
-    The BMI for someone weighing 70 kg at 1.75 m is 22.86.
-      word_frequency({'text': 'vector search makes vector retrieval practical', 'word': 'vector'}) = 2
-    The word 'vector' appears 2 times.
-
-<!-- injected-output:end -->
 
 ---
 

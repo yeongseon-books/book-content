@@ -103,26 +103,6 @@ for i, chunk in enumerate(chunks):
     print(f"\n[{i}] {len(chunk)} chars: {chunk[:60]}...")
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    total text length: 439 chars
-    number of chunks: 6
-
-    [0] 100 chars: Vector search converts text into numeric vectors for meaning...
-
-    [1] 100 chars: bedding models place semantically similar text close togethe...
-
-    [2] 100 chars: AISS is a high-speed vector search library developed at Face...
-
-    [3] 100 chars: unking strategies split long documents into units the embedd...
-
-    [4] 100 chars: s. Choosing the right chunk size improves retrieval accuracy...
-
-    [5] 39 chars: educe context loss at chunk boundaries....
-
-<!-- injected-output:end -->
-
 This version is for illustration only. Splitting by raw character count often cuts sentences in the middle. For production use, the approach below works better.
 
 ---
@@ -168,30 +148,6 @@ for i, chunk in enumerate(chunks):
     print(f"\n[{i}] {len(chunk)} chars:")
     print(f"  {chunk[:80]}...")
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    number of chunks: 5
-
-    [0] 147 chars:
-      Vector search converts text into numeric vectors for meaning-based retrieval.
-    Un...
-
-    [1] 173 chars:
-      Embedding models place semantically similar text close together in vector space....
-
-    [2] 68 chars:
-      all-MiniLM-L6-v2 is a lightweight model practical for CPU inference....
-
-    [3] 160 chars:
-      FAISS is a high-speed vector search library developed at Facebook AI Research.
-    I...
-
-    [4] 94 chars:
-      IndexFlatIP is an exact inner-product index equivalent to cosine search on norma...
-
-<!-- injected-output:end -->
 
 The `separators` list is tried in order. If `\n\n` produces a piece within `chunk_size`, that split is used. Otherwise the splitter tries the next separator. The result is chunks that usually end at paragraph or sentence boundaries.
 
@@ -262,25 +218,6 @@ for query in ["how vector search works", "FAISS library features", "setting chun
         print(f"  [{rank}] {score:.4f} — {text[:60]}...")
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    chunks: 4
-
-    query: 'how vector search works'
-      [1] 0.6897 — Vector search converts text into numeric vectors for meaning...
-      [2] 0.5140 — FAISS is a high-speed vector search library developed at Fac...
-
-    query: 'FAISS library features'
-      [1] 0.5687 — FAISS is a high-speed vector search library developed at Fac...
-      [2] 0.1739 — Chunking strategies split long documents into units the embe...
-
-    query: 'setting chunk size'
-      [1] 0.5347 — Chunking strategies split long documents into units the embe...
-      [2] 0.0345 — FAISS is a high-speed vector search library developed at Fac...
-
-<!-- injected-output:end -->
-
 ---
 
 ## Storing metadata with each chunk
@@ -317,13 +254,6 @@ def build_chunk_records(chunks: list[str]) -> list[dict]:
 records = build_chunk_records(chunks)
 print(records[0])
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    {'chunk_id': 'doc-001-0', 'source': 'vector-search-notes.md', 'section': 'FAISS basics', 'offset': 0, 'text': 'Vector search converts text into numeric vectors for meaning-based retrieval.\nUnlike keyword search, it matches content even when phrasing differs.'}
-
-<!-- injected-output:end -->
 
 Metadata does not raise semantic accuracy by itself, but it raises operational quality. A retrieval result becomes much easier to inspect when you can see where it came from.
 
@@ -377,19 +307,6 @@ def run_experiment(chunk_size: int) -> None:
 run_experiment(120)
 run_experiment(260)
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    chunk_size=120, chunks=5
-      0.6908 | Chunking strategies decide how much context each vector should carry.
-      0.3707 | Large chunks preserve context but can mix unrelated details.
-
-    chunk_size=260, chunks=3
-      0.6402 | Chunking strategies decide how much context each vector should carry.
-      0.4684 | FAISS is a high-speed vector search library developed at Facebook AI Research.
-
-<!-- injected-output:end -->
 
 Small chunks surface direct answers more aggressively. Larger chunks keep more surrounding context, but they also pull in more neighboring detail. The right balance depends on the query shape: FAQ-style retrieval and long-form policy retrieval rarely want the same chunk size.
 

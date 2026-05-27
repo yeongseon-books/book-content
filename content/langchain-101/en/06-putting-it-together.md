@@ -109,13 +109,6 @@ retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
 print(f"index vector count: {vectorstore.index.ntotal}")
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    index vector count: 4
-
-<!-- injected-output:end -->
-
 ---
 
 ## Inspect retrieval before blaming the model
@@ -135,19 +128,6 @@ for query in queries:
         preview = doc.page_content.replace("\n", " ")[:90]
         print(f"  [{idx}] score={score:.4f} text={preview}...")
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    query: Where was FAISS developed?
-      [1] score=0.7851 text=FAISS is a high-speed vector search library developed at Facebook AI Research....
-      [2] score=1.1062 text=LangChain connects LLM components as a pipeline using LCEL....
-
-    query: How does vector search differ from keyword search?
-      [1] score=0.5128 text=Vector search converts text into numeric vectors for meaning-based retrieval....
-      [2] score=0.7440 text=RAG (Retrieval-Augmented Generation) combines retrieved documents with an LLM prompt....
-
-<!-- injected-output:end -->
 
 That one inspection step lets you separate three failure modes quickly: wrong top-k documents means a retrieval problem, correct documents with a bad answer means a prompt or model problem, and too many noisy documents means `k` or chunking needs work.
 
@@ -223,13 +203,6 @@ guarded_chain = (
 
 print(guarded_chain.invoke("What does the corpus say about LangSmith?"))
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    The provided documents do not mention LangSmith, so I cannot answer that from this corpus.
-
-<!-- injected-output:end -->
 
 This guard looks small, but it removes one of the most common failure patterns in demo RAG apps: forcing the model to guess when the index does not actually contain the answer.
 

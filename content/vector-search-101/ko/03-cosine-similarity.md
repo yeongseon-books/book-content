@@ -132,26 +132,6 @@ for text_a, text_b in pairs:
     print(f"  euclidean:  {l2:.4f}")
 ```
 
-<!-- injected-output:start -->
-**출력 결과**
-
-    'Python async programming' vs 'handling concurrency in P'
-      cosine:     0.6201
-      dot:        0.6201
-      euclidean:  0.8717
-
-    'Python async programming' vs 'training a machine learni'
-      cosine:     0.1399
-      dot:        0.1399
-      euclidean:  1.3115
-
-    'Python async programming' vs 'walking the dog in the pa'
-      cosine:     -0.0400
-      dot:        -0.0400
-      euclidean:  1.4423
-
-<!-- injected-output:end -->
-
 정규화된 벡터에서는 코사인 유사도와 내적이 정확히 일치합니다. 유클리드 거리는 반대 방향의 값이 나오지만 순위는 동일합니다.
 
 ---
@@ -189,20 +169,6 @@ print(f"raw dot:    {float(np.dot(a_raw, b_raw)):.4f}")
 print(f"\nnorm cosine: {cosine_similarity(a_norm, b_norm):.4f}")
 print(f"norm dot:    {float(np.dot(a_norm, b_norm)):.4f}")
 ```
-
-<!-- injected-output:start -->
-**출력 결과**
-
-    raw magnitudes: a=1.0000, b=1.0000
-    norm magnitudes: a=1.0000, b=1.0000
-
-    raw cosine: 0.6201
-    raw dot:    0.6201
-
-    norm cosine: 0.6201
-    norm dot:    0.6201
-
-<!-- injected-output:end -->
 
 설명 자체는 더 중요합니다. 정규화가 없으면 원시 내적은 벡터 크기의 영향을 크게 받습니다. 반면 정규화 후에는 내적과 코사인 유사도가 같은 값으로 수렴합니다. FAISS의 `IndexFlatIP`는 바로 이 등가성을 전제로 동작합니다. 그래서 이런 인덱스를 쓸 때 `normalize_embeddings=True`를 일관되게 적용하는 일은 선택 사항이 아니라 계약에 가깝습니다.
 
@@ -252,22 +218,6 @@ for rank, (score, text) in enumerate(results, start=1):
     print(f"[{rank}] score: {score:.4f}")
     print(f"    {text}\n")
 ```
-
-<!-- injected-output:start -->
-**출력 결과**
-
-    query: 'how vector search finds similar documents'
-
-    [1] score: 0.6824
-        Vector search captures semantic similarity that keyword search misses.
-
-    [2] score: 0.4593
-        Chunking strategies split long documents into searchable units.
-
-    [3] score: 0.4517
-        FAISS is a high-speed vector search library from Facebook AI Research.
-
-<!-- injected-output:end -->
 
 `doc_vectors @ query_vector`는 문서마다 코사인 유사도를 한 번씩 계산하는 행렬-벡터 내적입니다. NumPy가 전체 코퍼스에 대해 벡터화해 처리합니다. `np.argsort(scores)[::-1][:top_k]`는 점수 내림차순으로 상위 k개 인덱스를 반환합니다.
 

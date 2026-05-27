@@ -108,14 +108,6 @@ print(f"total vectors in index: {index.ntotal}")
 print(f"vector dimension: {dimension}")
 ```
 
-<!-- injected-output:start -->
-**출력 결과**
-
-    total vectors in index: 10
-    vector dimension: 384
-
-<!-- injected-output:end -->
-
 FAISS는 `float32` 배열을 요구합니다. `dtype=np.float32`를 명시하지 않으면 NumPy는 기본적으로 `float64`를 만들고, 그 상태로는 FAISS가 오류를 냅니다.
 
 ---
@@ -149,26 +141,6 @@ for query in queries:
     for rank, (score, text) in enumerate(results, start=1):
         print(f"  [{rank}] {score:.4f} — {text[:60]}")
 ```
-
-<!-- injected-output:start -->
-**출력 결과**
-
-    query: 'how vector search finds similar content'
-      [1] 0.6746 — Vector search captures semantic similarity that keyword sear
-      [2] 0.4981 — Cosine similarity measures the directional similarity betwee
-      [3] 0.4782 — FAISS is a high-speed vector search library from Facebook AI
-
-    query: 'what embedding models do'
-      [1] 0.6641 — Higher embedding dimensions can capture more information.
-      [2] 0.6437 — Embedding models project text into a high-dimensional vector
-      [3] 0.4751 — sentence-transformers specializes in sentence-level embeddin
-
-    query: 'splitting documents into pieces'
-      [1] 0.7226 — Chunking strategies split long documents into searchable uni
-      [2] 0.3137 — RAG combines retrieved documents with an LLM prompt.
-      [3] 0.2652 — Embedding models project text into a high-dimensional vector
-
-<!-- injected-output:end -->
 
 ---
 
@@ -226,18 +198,6 @@ for score, idx in zip(scores[0], indices[0]):
     print(f"  {score:.4f} — {loaded_documents[idx]}")
 ```
 
-<!-- injected-output:start -->
-**출력 결과**
-
-    saved: 3 vectors
-    reloaded: 3 vectors
-
-    results:
-      0.5446 — FAISS is a high-speed vector search library from Facebook AI Research.
-      0.4393 — Cosine similarity measures the directional similarity between two vectors.
-
-<!-- injected-output:end -->
-
 `faiss.write_index()`와 `faiss.read_index()`는 FAISS 전용 바이너리 포맷을 사용합니다. 큰 규모에서는 NumPy `.npy`보다 더 빠르게 로드됩니다.
 
 ---
@@ -283,19 +243,6 @@ print("\nIndexFlatL2 (lower = more similar):")
 for score, idx in zip(scores_l2[0], indices_l2[0]):
     print(f"  {score:.4f} — {sentences[idx]}")
 ```
-
-<!-- injected-output:start -->
-**출력 결과**
-
-    IndexFlatIP (higher = more similar):
-      0.9508 — handling concurrency in Python
-      0.6413 — Python async programming
-
-    IndexFlatL2 (lower = more similar):
-      0.0984 — handling concurrency in Python
-      0.7173 — Python async programming
-
-<!-- injected-output:end -->
 
 두 인덱스 모두 올바른 순위를 반환합니다. 텍스트 검색에서는 정규화된 벡터와 함께 `IndexFlatIP`를 쓰는 것이 표준적인 선택입니다.
 

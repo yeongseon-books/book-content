@@ -191,32 +191,6 @@ for query in queries:
         print(f"  [{rank}] {score:.4f} — {text.strip()[:70]}...")
 ```
 
-<!-- injected-output:start -->
-**출력 결과**
-
-    total chunks: 4
-    vector shape: (4, 384)
-    saved: faiss.index, chunks.json
-    loaded: 4 vectors
-
-    query: 'how vector search differs from keyword search'
-      [1] 0.7285 — Vector search converts text into numeric vectors for meaning-based ret...
-      [2] 0.4562 — RAG (Retrieval-Augmented Generation) combines retrieved documents with...
-
-    query: 'FAISS index types'
-      [1] 0.5547 — FAISS is a high-speed vector search library developed at Facebook AI R...
-      [2] 0.1110 — Vector search converts text into numeric vectors for meaning-based ret...
-
-    query: 'choosing chunk size'
-      [1] 0.4771 — Chunking strategies split long documents into units the embedding mode...
-      [2] 0.1839 — RAG (Retrieval-Augmented Generation) combines retrieved documents with...
-
-    query: 'role of retrieval in RAG'
-      [1] 0.5931 — RAG (Retrieval-Augmented Generation) combines retrieved documents with...
-      [2] 0.1908 — Chunking strategies split long documents into units the embedding mode...
-
-<!-- injected-output:end -->
-
 위 예제에서 청크 수가 4개로 끝나는 이유는 입력 문서 자체가 짧기 때문입니다. 실제 운영에서는 문서 길이와 `chunk_size`, `chunk_overlap` 설정에 따라 결과 청크 수가 크게 달라집니다. 따라서 출력 숫자 하나를 외우기보다, **문서 수 → 청크 수 → 인덱스 벡터 수가 일관되게 연결되는지**를 확인하는 편이 더 중요합니다.
 
 ---
@@ -290,19 +264,6 @@ for query in ["IndexFlatIP cosine search", "ERR_CONNECTION_REFUSED"]:
         print(f"  {score:.4f} — {text}")
 ```
 
-<!-- injected-output:start -->
-**출력 결과**
-
-    query: IndexFlatIP cosine search
-      0.9087 — FAISS IndexFlatIP supports exact inner-product search on normalized vectors.
-      0.2173 — Chunking strategy changes how much context each vector carries.
-
-    query: ERR_CONNECTION_REFUSED
-      0.7421 — Error code ERR_CONNECTION_REFUSED is usually better handled by exact keyword search.
-      0.1036 — FAISS IndexFlatIP supports exact inner-product search on normalized vectors.
-
-<!-- injected-output:end -->
-
 첫 번째 질의는 의미 기반과 키워드 기반이 같은 결과를 밀어 올립니다. 두 번째 질의는 정확 문자열이 핵심이라 BM25 쪽 신호가 더 강하게 작동합니다. 하이브리드 검색이 필요한 이유가 이 두 쿼리의 차이에 그대로 드러납니다.
 
 ## 재인덱싱을 언제 트리거할 것인가
@@ -332,13 +293,6 @@ with open("index-manifest.json", "w") as f:
 
 print(manifest)
 ```
-
-<!-- injected-output:start -->
-**출력 결과**
-
-    {'embedding_model': 'sentence-transformers/all-MiniLM-L6-v2', 'chunk_size': 300, 'chunk_overlap': 30, 'document_count': 4, 'index_type': 'IndexFlatIP'}
-
-<!-- injected-output:end -->
 
 이 매니페스트는 거창한 기능이 아닙니다. 하지만 운영 중 "왜 검색 결과가 어제와 다르지?"라는 질문이 나왔을 때 가장 먼저 비교할 근거를 만들어 줍니다.
 

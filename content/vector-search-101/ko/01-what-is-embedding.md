@@ -129,15 +129,6 @@ print(f"vector dimension: {embeddings[0].shape[0]}")
 print(f"first vector (first 5 values): {embeddings[0][:5]}")
 ```
 
-<!-- injected-output:start -->
-**출력 결과**
-
-    number of vectors: 3
-    vector dimension: 384
-    first vector (first 5 values): [-0.09979379  0.00370044 -0.10362536  0.14163396 -0.04871269]
-
-<!-- injected-output:end -->
-
 이제 세 쌍의 코사인 유사도를 직접 계산해 보겠습니다.
 
 ```python
@@ -160,14 +151,6 @@ embeddings = model.encode(sentences)
 print(f"[0] vs [1] (similar meaning): {cosine_similarity(embeddings[0], embeddings[1]):.4f}")
 print(f"[0] vs [2] (unrelated):       {cosine_similarity(embeddings[0], embeddings[2]):.4f}")
 ```
-
-<!-- injected-output:start -->
-**출력 결과**
-
-    [0] vs [1] (similar meaning): 0.6201
-    [0] vs [2] (unrelated):       0.0056
-
-<!-- injected-output:end -->
 
 "Python async programming"과 "handling concurrency in Python"은 공통 단어가 없어도 높은 유사도를 보입니다. 반면 "homemade dog treats recipe"는 거의 0에 가깝습니다. 이 숫자가 벡터 검색의 토대입니다. 쿼리 벡터와 문서 벡터의 코사인 유사도를 기준으로 문서를 정렬하면 의미 기반 검색이 됩니다.
 
@@ -216,16 +199,6 @@ for item in sorted(results, key=lambda x: (-x["keyword_overlap"], -x["cosine"]))
         f"keyword={item['keyword_overlap']} cosine={item['cosine']:.4f} | {item['document']}"
     )
 ```
-
-<!-- injected-output:start -->
-**출력 결과**
-
-    keyword=3 cosine=0.8551 | Python async programming patterns for web APIs
-    keyword=1 cosine=0.6934 | Handling concurrency in Python with asyncio tasks
-    keyword=0 cosine=0.0848 | Distributed tracing for Java microservices
-    keyword=0 cosine=0.0124 | Beginner recipe for homemade dog treats
-
-<!-- injected-output:end -->
 
 두 번째 문서는 쿼리와 단어를 거의 공유하지 않지만, 임베딩 점수는 높게 나옵니다. 이 차이가 바로 의미 기반 검색의 실전 가치입니다. 사용자 표현과 문서 표현이 다를수록 이런 효과는 더 커집니다.
 

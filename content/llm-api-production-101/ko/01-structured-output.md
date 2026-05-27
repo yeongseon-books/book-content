@@ -133,13 +133,6 @@ payload = json.loads(content)
 print(payload)
 ```
 
-<!-- injected-output:start -->
-**실행 결과**
-
-    {'category': 'billing', 'priority': 3, 'summary': 'Order missing from order history after successful payment'}
-
-<!-- injected-output:end -->
-
 여기서 눈여겨볼 점은 세 가지입니다. 프롬프트 안에서도 JSON 객체 하나를 반환하라고 다시 적어 계약을 읽기 쉽게 만들었다는 사실, `temperature=0`으로 변동성을 줄였다는 사실, 그리고 `json.loads()`는 파싱만 할 뿐 의미 검증은 하지 않는다는 사실입니다.
 
 ### Pydantic으로 응답을 잠그기
@@ -210,13 +203,6 @@ except ValidationError as exc:
 
 print(ticket.model_dump())
 ```
-
-<!-- injected-output:start -->
-**실행 결과**
-
-    {'category': <Category.bug: 'bug'>, 'priority': 5, 'summary': 'Password reset emails not arriving, urgent access restoration needed', 'customer_needs_followup': True}
-
-<!-- injected-output:end -->
 
 검증이 붙는 순간 응답 경계가 강해집니다. 허용되지 않은 카테고리, 잘못된 타입, 누락 필드가 모두 즉시 실패합니다. 운영에서는 조용한 오염보다 시끄러운 실패가 훨씬 안전합니다.
 
@@ -321,19 +307,6 @@ try:
 except ValidationError as exc:
     print(exc)
 ```
-
-<!-- injected-output:start -->
-**실행 결과**
-
-    3 validation errors for TicketClassification
-    category
-      Input should be 'billing', 'account', 'bug' or 'shipping'
-    priority
-      Input should be less than or equal to 5
-    summary
-      String should have at least 8 characters
-
-<!-- injected-output:end -->
 
 이 출력이 중요한 이유는 장애 분류 기준을 바로 코드화할 수 있기 때문입니다. enum 위반인지, 범위 위반인지, 문자열 길이 문제인지가 명확하게 드러나므로 재시도 대신 계약 보강이나 프롬프트 축소로 방향을 바로 잡을 수 있습니다. 회귀 테스트에는 이런 실패 payload를 일부러 포함하는 편이 훨씬 안전합니다.
 

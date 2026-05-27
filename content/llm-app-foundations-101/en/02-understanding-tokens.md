@@ -122,40 +122,6 @@ print(f"completion_tokens={usage.completion_tokens}")
 print(f"total_tokens={usage.total_tokens}")
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    **Introduction to Python Decorators**
-
-    Python decorators are a powerful feature in Python that allow developers to modify or extend the behavior of a function or class without permanently changing its implementation. A decorator is essentially a small function that takes another function as an argument and returns a new function that "wraps" the original function. This allows decorators to add additional functionality to the original function, such as logging, authentication, or caching, without modifying the function itself.
-
-    **Basic Decorator Syntax**
-
-    A basic decorator in Python typically follows this syntax:
-    ```python
-    def my_decorator(func):
-        def wrapper():
-            # Additional functionality or logic here
-            func()
-        return wrapper
-
-    @my_decorator
-    def my_function():
-        # Function implementation
-        pass
-    ```
-    Here, `my_decorator` is the decorator function, `wrapper` is the function returned by the decorator, and `my_function` is the original function being decorated. When `my_function` is called, it will actually execute `wrapper`, which includes the additional functionality provided by the decorator. This syntax, using the `@` symbol before the decorator name, is a shorthand for:
-    ```python
-    my_function = my_decorator(my_function)
-    ```
-
-    finish_reason=stop
-    prompt_tokens=46
-    completion_tokens=242
-    total_tokens=288
-
-<!-- injected-output:end -->
-
 Each field tells you something different.
 
 ### `prompt_tokens`
@@ -203,14 +169,6 @@ print(tokens)
 print(f"token_count={len(tokens)}")
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    [7979, 69774, 4037, 3160, 1603, 264, 1715, 3727, 10137, 11850, 30549, 13]
-    token_count=12
-
-<!-- injected-output:end -->
-
 There is one important caveat here. `cl100k_base` is a well-known encoding from the OpenAI ecosystem. It does not automatically mean that Groq's `llama-3.1-8b-instant` uses the exact same tokenizer internally. Because of that, treat this number as a **practical estimate**, not as the provider's billing source of truth. For billing and final accounting, the provider's `usage` field is authoritative.
 
 That does not make the estimate useless. In most applications, the first question is not “what is the exact invoice number for this one request?” The first question is “is this prompt short, large, or dangerously large?” An approximate count is often enough to trigger the right control flow.
@@ -236,18 +194,6 @@ print(serialized)
 print()
 print(f"estimated_prompt_tokens={estimated_prompt_tokens}")
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    system: You are a concise Python tutor.
-    user: Explain the difference between a list and a tuple.
-    assistant: Lists are mutable, while tuples are immutable.
-    user: Add one short code example too.
-
-    estimated_prompt_tokens=41
-
-<!-- injected-output:end -->
 
 This is not a provider-exact calculation. It is a useful operational estimate. For a chatbot, you can run this just before the API call and start trimming or summarizing once the estimate crosses a threshold.
 
@@ -306,26 +252,6 @@ print()
 print(f"completion_tokens={completion.usage.completion_tokens}")
 print(f"finish_reason={completion.choices[0].finish_reason}")
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    **Generators vs Lists in Python**
-    =====================================
-
-    Python generators and lists are two different data structures that can be used to store and retrieve collections of values. Here's a brief overview of their key differences:
-
-    **Lists**
-    ---------
-
-    A list is a data structure in Python that stores multiple values in a single variable. Lists are defined using square brackets `[]` and are ordered collections of values.
-
-    **
-
-    completion_tokens=80
-    finish_reason=length
-
-<!-- injected-output:end -->
 
 `max_tokens` affects more than length alone.
 
@@ -390,19 +316,6 @@ print(f"finish_reason={choice.finish_reason}")
 if choice.finish_reason == "length":
     print("Warning: the response stopped because it hit a length limit.")
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    estimated_prompt_tokens=3015
-    Unfortunately, there was no text provided to summarize. The text consisted of repeated sentences stating the same question numerous times. If you provide the actual text, I would be happy to assist you in summarizing the key points as 10 bullets for you.
-
-    prompt_tokens=3050
-    completion_tokens=51
-    total_tokens=3101
-    finish_reason=stop
-
-<!-- injected-output:end -->
 
 Three things matter here.
 

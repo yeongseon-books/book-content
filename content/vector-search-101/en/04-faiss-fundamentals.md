@@ -108,14 +108,6 @@ print(f"total vectors in index: {index.ntotal}")
 print(f"vector dimension: {dimension}")
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    total vectors in index: 10
-    vector dimension: 384
-
-<!-- injected-output:end -->
-
 FAISS requires `float32` arrays. Without the explicit `dtype=np.float32` cast, NumPy defaults to `float64` and FAISS raises an error.
 
 ---
@@ -149,26 +141,6 @@ for query in queries:
     for rank, (score, text) in enumerate(results, start=1):
         print(f"  [{rank}] {score:.4f} — {text[:60]}")
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    query: 'how vector search finds similar content'
-      [1] 0.6746 — Vector search captures semantic similarity that keyword sear
-      [2] 0.4981 — Cosine similarity measures the directional similarity betwee
-      [3] 0.4782 — FAISS is a high-speed vector search library from Facebook AI
-
-    query: 'what embedding models do'
-      [1] 0.6641 — Higher embedding dimensions can capture more information.
-      [2] 0.6437 — Embedding models project text into a high-dimensional vector
-      [3] 0.4751 — sentence-transformers specializes in sentence-level embeddin
-
-    query: 'splitting documents into pieces'
-      [1] 0.7226 — Chunking strategies split long documents into searchable uni
-      [2] 0.3137 — RAG combines retrieved documents with an LLM prompt.
-      [3] 0.2652 — Embedding models project text into a high-dimensional vector
-
-<!-- injected-output:end -->
 
 ---
 
@@ -226,18 +198,6 @@ for score, idx in zip(scores[0], indices[0]):
     print(f"  {score:.4f} — {loaded_documents[idx]}")
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    saved: 3 vectors
-    reloaded: 3 vectors
-
-    results:
-      0.5446 — FAISS is a high-speed vector search library from Facebook AI Research.
-      0.4393 — Cosine similarity measures the directional similarity between two vectors.
-
-<!-- injected-output:end -->
-
 `faiss.write_index()` and `faiss.read_index()` use FAISS's own binary format, which loads faster than NumPy `.npy` files at scale.
 
 ---
@@ -283,19 +243,6 @@ print("\nIndexFlatL2 (lower = more similar):")
 for score, idx in zip(scores_l2[0], indices_l2[0]):
     print(f"  {score:.4f} — {sentences[idx]}")
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    IndexFlatIP (higher = more similar):
-      0.9508 — handling concurrency in Python
-      0.6413 — Python async programming
-
-    IndexFlatL2 (lower = more similar):
-      0.0984 — handling concurrency in Python
-      0.7173 — Python async programming
-
-<!-- injected-output:end -->
 
 Both indexes return the correct ranking. For text retrieval, `IndexFlatIP` with normalized vectors is the standard choice.
 

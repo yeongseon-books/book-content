@@ -54,13 +54,6 @@ retriever = vectorstore.as_retriever(search_kwargs={"k": 1})
 print(retriever.invoke("What does a Retriever do?")[0].page_content)
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    A Retriever finds documents relevant to a question.
-
-<!-- injected-output:end -->
-
 이 짧은 예제의 핵심은 검색 엔진 내부 구현이 아니라 계약입니다. 임베딩 모델은 텍스트를 벡터로 만들고, VectorStore는 그것을 저장하고, Retriever는 질문을 받아 관련 문서 리스트를 돌려줍니다. 뒤쪽 체인은 이제 `question -> list[Document]`만 알면 됩니다.
 
 ## FAISS VectorStore 만들기
@@ -102,13 +95,6 @@ vectorstore = FAISS.from_texts(
 
 print(f"index vector count: {vectorstore.index.ntotal}")
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    index vector count: 7
-
-<!-- injected-output:end -->
 
 여기서 중요한 포인트는 검색 애플리케이션이 **인덱싱 시점**과 **질의 시점**으로 나뉜다는 사실입니다. 문서를 벡터로 바꾸고 저장하는 비용은 보통 미리 지불하고, 사용자 요청 시에는 그 인덱스를 조회합니다. 이 구분이 흐려지면 데모는 돌아가도 실서비스에서는 불필요하게 느려집니다.
 
@@ -231,20 +217,6 @@ for question in questions:
     print(f"answer: {answer}")
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    question: What is FAISS?
-    answer: FAISS is a high-speed vector search library developed at Facebook AI Research.
-
-    question: How does the RAG pattern work?
-    answer: According to the documents, RAG (Retrieval Augmented Generator) combines retrieved documents with an LLM (Large Language Model) prompt, but it doesn't explain the specifics of the pattern.
-
-    question: What do embedding models do?
-    answer: Embedding models project text into a high-dimensional vector space.
-
-<!-- injected-output:end -->
-
 체인에 넘기는 입력은 아래처럼 생깁니다.
 
 ```python
@@ -297,16 +269,6 @@ print(f"reloaded: {loaded_store.index.ntotal} vectors")
 results = loaded_store.similarity_search("vector search", k=1)
 print(f"\nresult: {results[0].page_content}")
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    saved
-    reloaded: 2 vectors
-
-    result: FAISS is a high-speed vector search library developed at Facebook AI Research.
-
-<!-- injected-output:end -->
 
 이 예제가 중요한 이유는 Retriever가 보통 일회성 메모리 데모 위에 있지 않기 때문입니다. 실제 서비스에서는 인덱스를 재사용하고, 색인 파이프라인과 질의 파이프라인을 분리하는 것이 기본입니다.
 

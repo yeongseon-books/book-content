@@ -115,18 +115,6 @@ print(f"completion_tokens={usage.completion_tokens}")
 print(f"total_tokens={usage.total_tokens}")
 ```
 
-<!-- injected-output:start -->
-**출력 예시**
-
-    Generators let Python produce values lazily, one item at a time, instead of building the entire result in memory first. A list stores every value immediately, while a generator yields values only when iteration asks for them. This usually makes generators a better fit for large streams of data or pipelines where you do not want to allocate the full result up front.
-
-    finish_reason=stop
-    prompt_tokens=44
-    completion_tokens=66
-    total_tokens=110
-
-<!-- injected-output:end -->
-
 `prompt_tokens`는 요청 입력 전체 길이이고, `completion_tokens`는 모델이 생성한 출력 길이이며, `total_tokens`는 둘의 합입니다. 큰 입력에 짧은 출력이 붙으면 프롬프트 비대화 신호일 수 있고, 짧은 입력에 긴 출력이 붙으면 길이 제어가 느슨한 상황일 수 있습니다.
 
 ![호출 전에 토큰 길이를 가늠하는 사전 경로](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/02/02-04-estimating-token-count-with-tiktoken.ko.png)
@@ -150,14 +138,6 @@ tokens = encoding.encode(text)
 print(tokens)
 print(f"token_count={len(tokens)}")
 ```
-
-<!-- injected-output:start -->
-**출력 예시**
-
-    [7979, 69774, 4037, 3160, 1603, 264, 1715, 3727, 10137, 11850, 30549, 13]
-    token_count=12
-
-<!-- injected-output:end -->
 
 메시지 묶음을 대략 추정할 때는 이렇게 볼 수 있습니다.
 
@@ -219,16 +199,6 @@ print(f"completion_tokens={completion.usage.completion_tokens}")
 print(f"finish_reason={completion.choices[0].finish_reason}")
 ```
 
-<!-- injected-output:start -->
-**출력 예시**
-
-    Generators produce values one by one when iteration requests them, while a list materializes every element immediately. That means generators usually use less memory for long sequences, but you can iterate through them only once unless you recreate them. Lists are easier to inspect and reuse, while generators are better for streaming-style workloads.
-
-    completion_tokens=80
-    finish_reason=length
-
-<!-- injected-output:end -->
-
 긴 입력과 작은 출력 상한을 함께 다루는 감시 패턴은 아래처럼 잡을 수 있습니다.
 
 ```python
@@ -275,19 +245,6 @@ print(f"finish_reason={choice.finish_reason}")
 if choice.finish_reason == "length":
     print("Warning: the response stopped because it hit a length limit.")
 ```
-
-<!-- injected-output:start -->
-**출력 예시**
-
-    estimated_prompt_tokens=3015
-    Request logs explain how traffic moved through the app, while exception logs explain where the code actually failed. Together they let operators separate user behavior from application faults and trace an incident from ingress to stack trace. Keeping both also makes it easier to correlate spikes in latency, 5xx responses, and concrete code paths.
-
-    prompt_tokens=3050
-    completion_tokens=51
-    total_tokens=3101
-    finish_reason=stop
-
-<!-- injected-output:end -->
 
 실무에서는 이 정도 정보만 찍어도 바로 행동 기준이 생깁니다. `estimated_prompt_tokens`와 실제 `prompt_tokens`가 크게 벌어지면 추정 방식이 거칠다는 뜻이고, `finish_reason=length`가 반복되면 입력 축약이나 `max_tokens` 재설계가 먼저입니다. 반대로 입력이 짧은데 `completion_tokens`만 계속 치솟으면 출력 형식 요구가 너무 느슨한 경우가 많습니다.
 

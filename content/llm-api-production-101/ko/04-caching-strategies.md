@@ -108,13 +108,6 @@ request_payload = {
 print(build_cache_key(request_payload))
 ```
 
-<!-- injected-output:start -->
-**실행 결과**
-
-    6b8029d33b678c483174d55c429edd51a4ab075fab3943a4069fbc89476a6d8f
-
-<!-- injected-output:end -->
-
 `sort_keys=True`는 딕셔너리 키 순서 차이로 같은 요청이 다른 키가 되는 일을 막아 줍니다. `separators`는 불필요한 공백 차이를 없앱니다. 결국 이 해시는 요청 계약 전체를 고정 길이 키로 압축한 결과입니다.
 
 ### TTL이 왜 필요한가
@@ -243,14 +236,6 @@ print(cached_completion(payload))
 print(cached_completion(payload))
 ```
 
-<!-- injected-output:start -->
-**실행 결과**
-
-    {'source': 'model', 'content': 'Python dataclasses are a feature introduced in Python 3.7 that allows you to create classes with minimal boilerplate code, making it easier to define simple data structures. They automatically generate special methods like `__init__`, `__repr__`, and `__eq__` for you, reducing the amount of code you need to write. Dataclasses can be used to create immutable or mutable data structures, and they support features like type hints and fields with default values.'}
-    {'source': 'cache', 'content': 'Python dataclasses are a feature introduced in Python 3.7 that allows you to create classes with minimal boilerplate code, making it easier to define simple data structures. They automatically generate special methods like `__init__`, `__repr__`, and `__eq__` for you, reducing the amount of code you need to write. Dataclasses can be used to create immutable or mutable data structures, and they support features like type hints and fields with default values.'}
-
-<!-- injected-output:end -->
-
 첫 번째 요청은 모델로 가고, 두 번째는 같은 payload이므로 캐시를 적중합니다. 여기서 `source`를 함께 반환하는 이유는 캐시 동작을 로그와 메트릭에서 관측 가능하게 만들기 위해서입니다.
 
 ### 어떤 경로는 캐시하지 말아야 한다
@@ -333,16 +318,6 @@ time.sleep(1.1)
 print(cache.get(key))
 print(cache.metrics)
 ```
-
-<!-- injected-output:start -->
-**실행 결과**
-
-    None
-    cached-response
-    None
-    {'hits': 1, 'misses': 2, 'expired': 1}
-
-<!-- injected-output:end -->
 
 이 정도만 있어도 운영 판단이 쉬워집니다. 적중률은 낮은데 만료가 거의 없다면 키가 너무 엄격할 수 있고, 만료가 자주 나는데도 오래된 응답 이슈가 생긴다면 TTL이 여전히 길 수 있습니다. 캐시는 성능 기능이면서 동시에 정확성 기능이기 때문에, hit/miss/expired를 함께 보는 습관이 필요합니다.
 

@@ -51,13 +51,6 @@ chain = prompt | llm | StrOutputParser()
 print(chain.invoke({"topic": "LCEL"}))
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    LCEL, or LangChain Expression Language, is a declarative way to compose chains in LangChain by piping together components — such as prompts, chat models, output parsers, and retrievers — using the `|` operator. Every component in an LCEL chain implements the same Runnable interface, which means you can invoke, batch, or stream the whole chain with a single method call without writing glue code between steps. Because LCEL is just function composition over a shared contract, the resulting chains are easy to reason about, swap parts in and out of, and run efficiently in parallel or async contexts.
-
-<!-- injected-output:end -->
-
 ## The problem LangChain addresses
 
 ![Repeated glue code and LCEL abstraction flow](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/01/01-01-the-problem-langchain-addresses.en.png)
@@ -106,13 +99,6 @@ response = llm.invoke("Explain the advantages of Python in two sentences.")
 print(response.content)
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    Python is a versatile and widely-used programming language that offers several advantages, including its simplicity, readability, and ease of use, making it an ideal choice for beginners and experienced developers alike. Additionally, Python's extensive libraries and frameworks, such as NumPy, pandas, and Django, provide a powerful toolset for data analysis, machine learning, web development, and more.
-
-<!-- injected-output:end -->
-
 `ChatGroq` implements Runnable, so `invoke()` is available directly.
 
 ---
@@ -159,13 +145,6 @@ chain = prompt | llm | parser
 result = chain.invoke({"topic": "embedding vectors"})
 print(result)
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    Embedding vectors is a technique in natural language processing and machine learning where high-dimensional data is represented as dense, fixed-size vectors in a lower-dimensional space, allowing for efficient computation and improved model performance. This is typically achieved through techniques like word2vec or GloVe, which map words or other inputs to vectors in a way that captures semantic relationships and word meanings.
-
-<!-- injected-output:end -->
 
 What each component does:
 
@@ -220,22 +199,6 @@ print(f"\n=== step 3: string ===")
 print(f"  {text}")
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    === step 1: messages ===
-      [system] You are an expert at concise explanations.
-      [human] Explain embedding vectors in two sentences.
-
-    === step 2: AIMessage ===
-      type: AIMessage
-      content: Embedding vectors is a technique in natural language processing (NLP) where word...
-
-    === step 3: string ===
-      Embedding vectors is a technique in natural language processing (NLP) where words or phrases are represented as numerical vectors in a high-dimensional space, allowing machines to capture semantic relationships and nuances between them. These vectors are often learned through neural networks, where similar words are mapped to nearby points in the vector space, enabling tasks like text classification, sentiment analysis, and language translation.
-
-<!-- injected-output:end -->
-
 ---
 
 ## RunnableLambda — wrapping a plain function
@@ -269,15 +232,6 @@ result = chain.invoke({
 })
 print(result)
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    Vector search converts text into numeric vectors, allowing for efficient and meaningful retrieval by comparing the semantic similarity between text inputs.
-
-    (character count: 155)
-
-<!-- injected-output:end -->
 
 `RunnableLambda` lets any plain Python function participate in a pipe chain. It is useful for output post-processing, logging, and lightweight transforms.
 
@@ -319,17 +273,6 @@ results = chain.batch(topics)
 for topic_dict, result in zip(topics, results):
     print(f"[{topic_dict['topic']}] {result}\n")
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    [embeddings] In machine learning and natural language processing, embeddings are a way of representing words, phrases, or other data as numerical vectors in a high-dimensional space, allowing similar concepts to be clustered together and enabling models to capture nuanced relationships and patterns.
-
-    [FAISS] FAISS (Facebook AI Similarity Search) is an open-source library developed by Facebook and Carnegie Mellon University for efficient similarity search and clustering of dense vectors, typically used in large-scale machine learning and data analytics applications.
-
-    [RAG] RAG stands for Red, Amber, and Green, which is a traffic-light system used to categorize and track project progress, risks, and issues, with Red indicating critical problems, Amber signifying potential issues, and Green denoting successful completion or progress.
-
-<!-- injected-output:end -->
 
 `batch()` attempts parallel processing internally. Use `max_concurrency` to cap simultaneous requests when working within API rate limits.
 

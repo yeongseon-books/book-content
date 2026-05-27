@@ -177,13 +177,6 @@ except RetryableLLMError as exc:
     logger.error("request still failed after retries: %s", exc)
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    Python context managers are used to manage resources such as files, connections, or locks, ensuring they are properly cleaned up after use, even if exceptions occur. They are implemented using the `with` statement, which automatically calls the `__enter__` method when entering the block and the `__exit__` method when exiting, allowing for resource acquisition and release. This approach helps prevent resource leaks and makes code more readable and maintainable.
-
-<!-- injected-output:end -->
-
 Three things matter here.
 
 First, `retry_if_exception_type(RetryableLLMError)` makes the retry scope explicit.

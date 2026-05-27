@@ -130,41 +130,6 @@ full_text = "".join(chunks)
 print(f"\n\ntotal characters: {len(full_text)}")
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    streaming: FAISS (Facebook AI Similarity Search) is an open-source library for efficient similarity search and clustering of dense vectors. It was initially developed by Facebook to enable fast similarity search in large-scale vector spaces.
-
-    FAISS is particularly useful in applications that involve searching for similar items in a high-dimensional space, such as:
-
-    1. **Nearest Neighbor Search**: Finding the most similar items to a query vector in a large dataset.
-    2. **Clustering**: Grouping similar vectors together to identify patterns or outliers.
-    3. **Anomaly Detection**: Identifying vectors that are significantly different from the rest of the dataset.
-
-    FAISS provides several benefits, including:
-
-    1. **Speed**: FAISS is designed to be highly efficient, with performance improvements over traditional similarity search algorithms.
-    2. **Scalability**: FAISS can handle large datasets and scale to thousands of nodes.
-    3. **Flexibility**: FAISS supports various similarity metrics (e.g., inner product, L2 norm, cosine similarity) and clustering algorithms (e.g., k-means, hierarchical clustering).
-
-    Some of the key features of FAISS include:
-
-    1. **Indexing**: FAISS supports various indexing techniques, such as IVF (Inverted File) and PQ (Product Quantization).
-    2. **Quantization**: FAISS provides efficient quantization methods to reduce the dimensionality of the data.
-    3. **Clustering**: FAISS supports various clustering algorithms, including k-means and hierarchical clustering.
-
-    FAISS is widely used in various applications, such as:
-
-    1. **Recommendation Systems**: FAISS is used in recommendation systems to find similar items to suggest to users.
-    2. **Computer Vision**: FAISS is used in computer vision applications, such as image and object recognition.
-    3. **Natural Language Processing**: FAISS is used in NLP applications, such as text similarity search and clustering.
-
-    Overall, FAISS is a powerful library for efficient similarity search and clustering of dense vectors, widely used in various applications across industries.
-
-    total characters: 2039
-
-<!-- injected-output:end -->
-
 ---
 
 ## astream() — async streaming

@@ -131,15 +131,6 @@ print("\n---")
 print(final_text)
 ```
 
-<!-- injected-output:start -->
-**출력 예시**
-
-    FastAPI is a modern Python framework for building APIs, while Flask is a minimal web framework that gives you more manual control. FastAPI includes data validation and automatic docs by default, whereas Flask starts smaller and lets you assemble those pieces yourself. Beginners often find FastAPI faster for API-first projects and Flask easier to understand when learning core web concepts.
-    ---
-    FastAPI is a modern Python framework for building APIs, while Flask is a minimal web framework that gives you more manual control. FastAPI includes data validation and automatic docs by default, whereas Flask starts smaller and lets you assemble those pieces yourself. Beginners often find FastAPI faster for API-first projects and Flask easier to understand when learning core web concepts.
-
-<!-- injected-output:end -->
-
 여기서 중요한 습관은 `delta.content`가 비어 있을 수 있음을 정상으로 취급하는 것입니다. 일부 청크는 텍스트가 아니라 역할 정보나 종료 신호만 담을 수 있습니다.
 
 스트리밍과 async는 같은 개념이 아닙니다.
@@ -185,15 +176,6 @@ async def main() -> None:
 
 asyncio.run(main())
 ```
-
-<!-- injected-output:start -->
-**출력 예시**
-
-    Asyncio helps web servers because one request can wait on network or database I/O without freezing the whole worker. While that request is waiting, the event loop can schedule other connections and keep throughput high. This matters most when your server spends more time waiting on external systems than using CPU.
-    ---
-    Asyncio helps web servers because one request can wait on network or database I/O without freezing the whole worker. While that request is waiting, the event loop can schedule other connections and keep throughput high. This matters most when your server spends more time waiting on external systems than using CPU.
-
-<!-- injected-output:end -->
 
 작은 CLI 도구라면 동기 스트리밍이 충분하고, FastAPI 같은 다중 사용자 서버라면 비동기 스트리밍이 더 자연스럽습니다.
 

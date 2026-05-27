@@ -134,13 +134,6 @@ api_key = os.environ["GROQ_API_KEY"]
 print(f"API key loaded: {api_key[:6]}...")
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    API key loaded: gsk_Z2...
-
-<!-- injected-output:end -->
-
 You would not print the full key in a real application. A short prefix is enough for local verification.
 
 ---
@@ -194,13 +187,6 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    Python list comprehensions are a concise way to create lists by performing an operation on each item in an existing list or other iterable. They consist of brackets containing an expression followed by a 'for' clause, which specifies the sequence of values to be processed, and an optional 'if' clause, which filters the values. The basic syntax is `[expression for element in iterable if condition]`, where `expression` is the operation to be performed on each element, `element` is the variable representing each item, `iterable` is the list or other iterable to be processed, and `condition` (if specified) is a filtering criterion. This syntax allows for efficient and readable creation of new lists by applying transformations and filters to existing data.
-
-<!-- injected-output:end -->
-
 Three lines matter most.
 
 `Groq(...)` creates the client object that will talk to the API.
@@ -242,45 +228,6 @@ completion = client.chat.completions.create(
 
 print(json.dumps(completion.to_dict(), indent=2, ensure_ascii=False))
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    {
-      "id": "chatcmpl-b73b1087-b403-4f96-85aa-53fdbeeeebaf",
-      "choices": [
-        {
-          "finish_reason": "stop",
-          "index": 0,
-          "logprobs": null,
-          "message": {
-            "content": "An HTTP API (Application Programming Interface) is a communication protocol that allows different systems to exchange data by sending HTTP requests and receiving responses, requiring manual parsing and handling of data on the client-side. An SDK (Software Development Kit), on the other hand, is a bundle of pre-built libraries, tools, and resources that provide a more integrated and higher-level interface to access the API, allowing for easier development and interaction with the API. While an HTTP API provides a raw interface for access, an SDK encapsulates this interface and provides a more user-friendly and productive way to use the API's functionality.",
-            "role": "assistant"
-          }
-        }
-      ],
-      "created": 1777648966,
-      "model": "llama-3.1-8b-instant",
-      "object": "chat.completion",
-      "service_tier": "on_demand",
-      "system_fingerprint": "fp_7ccc667439",
-      "usage": {
-        "completion_tokens": 121,
-        "prompt_tokens": 50,
-        "total_tokens": 171,
-        "completion_time": 0.244874086,
-        "prompt_time": 0.002372403,
-        "queue_time": 0.008387003,
-        "total_time": 0.247246489
-      },
-      "usage_breakdown": null,
-      "x_groq": {
-        "id": "req_01kqj256w6fhtb810jkg2hxy8t",
-        "seed": 180452821
-      }
-    }
-
-<!-- injected-output:end -->
 
 When you look through that output, pay attention to three fields first.
 
@@ -379,13 +326,6 @@ completion = client.chat.completions.create(
 
 print(completion.choices[0].message.content)
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    Asynchronous programming is a design approach in computer programming where a part of the program can run independently without blocking the main thread, allowing the program to perform multiple tasks concurrently and improving overall responsiveness. It enables the execution of tasks that do not depend on the completion of other tasks, such as network requests, database queries, or file I/O operations. Instead of waiting for these external operations to complete, the program continues executing other tasks, improving performance and reducing wait times. This allows developers to write more efficient and scalable code, as it allows the program to multitask and utilize system resources more effectively.
-
-<!-- injected-output:end -->
 
 And here is the async version. This block is also executable on its own.
 
@@ -494,25 +434,6 @@ def main() -> None:
 if __name__ == "__main__":
     main()
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    === answer ===
-    A Python function is a standalone block of code that performs a specific task, whereas a method is a function that belongs to a class or object. A method is typically used to modify or interact with the state of an object, whereas a function does not have access to the object's state. Functions are created using the `def` keyword, whereas methods are called using an object reference followed by the method name. In other words, a function is a general-purpose routine, while a method is an action performed on an object. 
-
-    ```python
-    # The `greet` function is similar to the `say_hello` method, but does not need to be bound to an instance of a class
-    greet = lambda: print("Hello!")
-    ```
-
-    === metadata ===
-    model: llama-3.1-8b-instant
-    prompt_tokens: 67
-    completion_tokens: 151
-    total_tokens: 218
-
-<!-- injected-output:end -->
 
 If you save it as `first_call.py`, run it with:
 

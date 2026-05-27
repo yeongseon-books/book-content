@@ -129,15 +129,6 @@ print(f"vector dimension: {embeddings[0].shape[0]}")
 print(f"first vector (first 5 values): {embeddings[0][:5]}")
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    number of vectors: 3
-    vector dimension: 384
-    first vector (first 5 values): [-0.09979379  0.00370044 -0.10362536  0.14163396 -0.04871269]
-
-<!-- injected-output:end -->
-
 Now compute cosine similarity between all three pairs.
 
 ```python
@@ -160,14 +151,6 @@ embeddings = model.encode(sentences)
 print(f"[0] vs [1] (similar meaning): {cosine_similarity(embeddings[0], embeddings[1]):.4f}")
 print(f"[0] vs [2] (unrelated):       {cosine_similarity(embeddings[0], embeddings[2]):.4f}")
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    [0] vs [1] (similar meaning): 0.6201
-    [0] vs [2] (unrelated):       0.0056
-
-<!-- injected-output:end -->
 
 "Python async programming" and "handling concurrency in Python" score highly despite sharing no exact words. "Homemade dog treats" lands near zero. These numbers are the foundation of vector search: rank documents by their cosine similarity to the query vector and return the top results.
 
@@ -216,16 +199,6 @@ for item in sorted(results, key=lambda x: (-x["keyword_overlap"], -x["cosine"]))
         f"keyword={item['keyword_overlap']} cosine={item['cosine']:.4f} | {item['document']}"
     )
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    keyword=3 cosine=0.8551 | Python async programming patterns for web APIs
-    keyword=1 cosine=0.6934 | Handling concurrency in Python with asyncio tasks
-    keyword=0 cosine=0.0848 | Distributed tracing for Java microservices
-    keyword=0 cosine=0.0124 | Beginner recipe for homemade dog treats
-
-<!-- injected-output:end -->
 
 The second document shares almost none of the query vocabulary, yet the embedding score is still strong. That is the practical value of semantic retrieval: useful matches survive wording changes.
 

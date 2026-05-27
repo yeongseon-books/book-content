@@ -56,13 +56,6 @@ chain = prompt | ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ
 print(chain.invoke({"audience": "junior backend engineers", "topic": "PromptTemplate"}))
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    In the context of OpenAI's API, a PromptTemplate is a pre-defined template used to generate human-like responses by providing a framework for constructing input prompts. By using a PromptTemplate, developers can create a structure for their input, including placeholders for specific information that can be filled in at runtime. This approach enables the model to generate more accurate and relevant responses by leveraging the context provided in the template.
-
-<!-- injected-output:end -->
-
 이 최소 예제는 두 가지를 바로 보여 줍니다. 첫째, 변수 관리는 문자열 조립 코드가 아니라 템플릿 레이어에서 합니다. 둘째, 출력 파서가 붙는 순간 이후 단계는 `AIMessage`가 아니라 평범한 문자열을 다룰 수 있습니다. 이 차이가 작아 보여도, 체인이 길어질수록 가독성과 디버깅 난이도를 크게 바꿉니다.
 
 ## ChatPromptTemplate 구조
@@ -104,56 +97,6 @@ response = chain.invoke({
 
 print(response.content)
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    **List Comprehensions vs For Loops**
-
-    List comprehensions and for loops are both used to create lists in Python, but they serve different purposes and have different use cases.
-
-    **When to Use List Comprehensions:**
-
-    1. **Concise Code:** List comprehensions are a more concise way to create lists, especially when the transformation of each element is simple.
-    2. **Performance:** List comprehensions are generally faster than for loops because they create a new list in a single operation.
-    3. **Readability:** List comprehensions can be more readable than for loops when the transformation of each element is complex, as they avoid the need for explicit loop control.
-
-    **When to Use For Loops:**
-
-    1. **Mutation:** If the list needs to be modified in place, a for loop is usually a better choice.
-    2. **Complex Logic:** When the logic for creating each element is complex and involves multiple conditional statements or functions, a for loop is often easier to read and understand.
-    3. **Debugging:** For loops provide more control over the loop and are often easier to debug than list comprehensions.
-
-    **Example Use Cases:**
-
-    ```python
-    # List comprehension
-    numbers = [1, 2, 3, 4, 5]
-    squared_numbers = [x**2 for x in numbers]
-    print(squared_numbers)  # [1, 4, 9, 16, 25]
-
-    # for 루프와 동일한 코드
-    numbers = [1, 2, 3, 4, 5]
-    squared_numbers = []
-    for x in numbers:
-        squared_numbers.append(x**2)
-    print(squared_numbers)  # [1, 4, 9, 16, 25]
-    ```
-
-    In this example, the list comprehension is a better choice because it is more concise and easier to read.
-
-    ```python
-    # 변이를 포함한 for 루프
-    numbers = [1, 2, 3, 4, 5]
-    numbers = [x**2 for x in numbers]
-    print(numbers)  # [1, 4, 9, 16, 25]
-    ```
-
-    In this example, the for loop is a better choice because it allows us to modify the original list in place.
-
-    In summary, list comprehensions are a better choice when you need to create a new list and the transformation of each element is simple. For loops are a better choice when the list needs to be modified in place, or when the logic for creating each element is complex.
-
-<!-- injected-output:end -->
 
 여기서 `invoke()`에 넘기는 dict 키 이름은 `{language}`, `{question}`과 정확히 맞아야 합니다. 이 규칙은 단순해 보이지만, 실제 디버깅에서 가장 자주 틀리는 지점 중 하나입니다.
 
@@ -252,16 +195,6 @@ print(f"description: {result.get('description')}")
 print(f"use_case: {result.get('use_case')}")
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    type: <class 'dict'>
-    name: FAISS
-    description: Facebook AI Similarity Search is an open-source library for efficient similarity search and clustering of dense vectors, written in C++ with optional Python bindings.
-    use_case: ['Anomaly detection in high-dimensional data', 'Image and video search', 'Recommendation systems', 'Clustering and dimensionality reduction', 'Nearest neighbor search in large datasets']
-
-<!-- injected-output:end -->
-
 운영 관점에서 보면 여기서 가장 중요한 질문은 "모델이 정확히 어떤 모양을 내야 다음 단계가 안전한가"입니다. 단순 렌더링이면 문자열이면 충분하지만, API 응답이나 후속 계산에 쓰려면 dict나 스키마 기반 구조가 필요합니다. JSON 파싱이 자주 흔들린다면 `with_structured_output()`처럼 더 강한 제약을 거는 방법을 고려해야 합니다.
 
 ---
@@ -297,13 +230,6 @@ result = chain.invoke({
 
 print(result)
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    FAISS was developed at Facebook AI Research.
-
-<!-- injected-output:end -->
 
 이 글 예제에서는 단순하게 보이지만, 다음 글의 Retriever 연결 패턴에서 `RunnablePassthrough()`가 왜 필요한지 훨씬 또렷해집니다. **질문은 질문대로 보존하고, 검색 결과만 따로 가공해서 prompt의 다른 키로 넣는다**는 것이 핵심입니다.
 
@@ -346,75 +272,6 @@ chain_with_fallback = primary_chain.with_fallbacks([fallback_chain])
 result = chain_with_fallback.invoke({"question": "How does Python handle exceptions?"})
 print(result)
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    **Handling Exceptions in Python**
-    =====================================
-
-    Python provides a robust exception handling mechanism to deal with runtime errors and other exceptional conditions. Here's an overview of how Python handles exceptions:
-
-    ### Types of Exceptions
-
-    Python has two types of exceptions:
-
-    1.  **Built-in Exceptions**: These are exceptions that are built into the Python language, such as `TypeError`, `ValueError`, `IndexError`, etc.
-    2.  **Custom Exceptions**: These are exceptions that are created by the developer to represent specific error conditions in their code.
-
-    ### Exception Handling
-
-    Python uses a `try`-`except` block to handle exceptions. The basic syntax is as follows:
-
-    ```python
-    try:
-        # Code that might raise an exception
-        pass
-    except ExceptionType:
-        # Code to handle the exception
-        pass
-    ```
-
-    Here's an example:
-
-    ```python
-    try:
-        x = 5 / 0
-    except ZeroDivisionError:
-        print("Cannot divide by zero!")
-    ```
-
-    In this example, the `try` block attempts to divide `5` by `0`, which raises a `ZeroDivisionError`. The `except` block catches this exception and prints an error message.
-
-    ### Multiple Except Blocks
-
-    You can have multiple `except` blocks to handle different types of exceptions:
-
-    ```python
-    try:
-        x = 5 / 0
-    except ZeroDivisionError:
-        print("Cannot divide by zero!")
-    except TypeError:
-        print("Invalid data type!")
-    ```
-
-    ### Raising Exceptions
-
-    You can raise exceptions using the `raise` keyword:
-
-    ```python
-    def divide(a, b):
-        if b == 0:
-            raise ZeroDivisionError("Cannot divide by zero!")
-        return a / b
-    ```
-
-    In this example, the `divide` function raises a `ZeroDivisionError` if the divisor is zero.
-
-    ... (truncated)
-
-<!-- injected-output:end -->
 
 이 패턴은 기본 모델이 일시적으로 불가능하거나 rate limit에 걸렸을 때 자동으로 다른 경로로 전환하게 해 줍니다. 다만 운영에서 정말 중요한 조건은 하나입니다. **fallback도 같은 출력 모양을 반환해야 한다**는 점입니다. 그렇지 않으면 장애 시점에만 다른 타입 버그가 터집니다.
 

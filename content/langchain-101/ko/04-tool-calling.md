@@ -56,13 +56,6 @@ response = llm.bind_tools([add_numbers]).invoke("Add 13 and 29.")
 print(response.tool_calls)
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    [{'name': 'add_numbers', 'args': {'a': 13, 'b': 29}, 'id': '0r7b2zrqg', 'type': 'tool_call'}]
-
-<!-- injected-output:end -->
-
 이 결과를 보면 핵심이 분명합니다. 모델은 `42`를 바로 출력한 것이 아니라, `add_numbers(a=13, b=29)`를 호출하겠다는 구조화된 요청을 보냈습니다. **도구 메타데이터를 보고 함수 호출 계획을 세운 것**이지, 함수를 실제로 실행한 것이 아닙니다.
 
 ## 도구 정의하기
@@ -138,14 +131,6 @@ response = llm_with_tools.invoke("What is 15 plus 27?")
 print(f"content: {response.content!r}")
 print(f"tool_calls: {response.tool_calls}")
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    content: ''
-    tool_calls: [{'name': 'add_numbers', 'args': {'a': 15, 'b': 27}, 'id': 'yc5j64vch', 'type': 'tool_call'}]
-
-<!-- injected-output:end -->
 
 여기서 `content`가 비어 있는 것은 이상한 일이 아닙니다. 아직 최종 답변을 한 것이 아니라, 먼저 도구를 호출해야 하기 때문입니다. Tool Calling에서는 **빈 텍스트와 도구 호출 요청이 정상적인 중간 상태**라는 점을 기억해야 합니다.
 
@@ -231,24 +216,6 @@ for q in questions:
     print(f"answer: {answer}")
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    question: What is 15 plus 27?
-      executed: add_numbers({'a': 15, 'b': 27}) = 42.0
-    answer: 15 plus 27 is 42.
-
-    question: What is 7 times 8?
-      executed: multiply_numbers({'a': 7, 'b': 8}) = 56.0
-    answer: 7 times 8 is 56.
-
-    question: Add 5 and 3, then multiply the result by 4. What do you get?
-      executed: add_numbers({'a': 5, 'b': 3}) = 8.0
-      executed: multiply_numbers({'a': 8, 'b': 4}) = 32.0
-    answer: Add 5 and 3 to get 8, then multiply by 4 to get 32.
-
-<!-- injected-output:end -->
-
 이 루프를 보면 Tool Calling의 책임 분리가 또렷해집니다. 특히 system 메시지로 “산수는 반드시 도구를 쓰라”는 기준을 명시했기 때문에, 두 번째 질문처럼 단순 계산도 텍스트 생성으로 얼버무리지 않고 실제 tool call로 이어집니다.
 
 - 모델: 어떤 도구를 어떤 인자로 호출할지 결정
@@ -292,14 +259,6 @@ bad_call = {"name": "divide_numbers", "args": {"a": 10, "b": 5}, "id": "call_bad
 print(execute_tool_call(ok_call).content)
 print(execute_tool_call(bad_call).content)
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    15.0
-    ERROR: unknown tool 'divide_numbers'
-
-<!-- injected-output:end -->
 
 이 작은 dispatcher 하나만 있어도 장애 분석이 쉬워집니다. 모델이 잘못된 이름을 골랐는지, 인자가 틀렸는지, 도구 안에서 예외가 터졌는지 로그 한 줄로 바로 구분할 수 있기 때문입니다.
 
@@ -360,18 +319,6 @@ print(run_with_tools("When is the support team available?"))
 print(run_with_tools("What is the BMI for someone weighing 70 kg at 1.75 m?"))
 print(run_with_tools("How many times does 'vector' appear in 'vector search makes vector retrieval practical'?"))
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-      get_office_hours({'team': 'support'}) = 09:00-18:00 KST
-    The support team is available from 09:00 to 18:00 KST.
-      calculate_bmi({'height_m': 1.75, 'weight_kg': 70}) = 22.86
-    The BMI for someone weighing 70 kg at 1.75 m is 22.86.
-      word_frequency({'text': 'vector search makes vector retrieval practical', 'word': 'vector'}) = 2
-    The word 'vector' appears 2 times.
-
-<!-- injected-output:end -->
 
 이 예제는 서로 다른 종류의 도구가 같은 loop 안에서 어떻게 다뤄지는지 보여 줍니다. 동시에 검증 포인트도 분명합니다. 실행 로그 한 줄만 봐도 어떤 질문이 어떤 도구로 라우팅됐는지, 인자가 어떻게 채워졌는지, 최종 답변이 도구 결과를 제대로 반영했는지 바로 확인할 수 있습니다.
 

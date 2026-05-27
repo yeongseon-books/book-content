@@ -53,13 +53,6 @@ chain = prompt | ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ
 print(chain.invoke({"audience": "junior backend engineers", "topic": "PromptTemplate"}))
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    In the context of OpenAI's API, a PromptTemplate is a pre-defined template used to generate human-like responses by providing a framework for constructing input prompts. By using a PromptTemplate, developers can create a structure for their input, including placeholders for specific information that can be filled in at runtime. This approach enables the model to generate more accurate and relevant responses by leveraging the context provided in the template.
-
-<!-- injected-output:end -->
-
 ## ChatPromptTemplate structure
 
 ![System human ai message roles](https://yeongseon-books.github.io/book-public-assets/assets/langchain-101/02/02-01-chatprompttemplate-structure.en.png)
@@ -98,56 +91,6 @@ response = chain.invoke({
 
 print(response.content)
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    **List Comprehensions vs For Loops**
-
-    List comprehensions and for loops are both used to create lists in Python, but they serve different purposes and have different use cases.
-
-    **When to Use List Comprehensions:**
-
-    1. **Concise Code:** List comprehensions are a more concise way to create lists, especially when the transformation of each element is simple.
-    2. **Performance:** List comprehensions are generally faster than for loops because they create a new list in a single operation.
-    3. **Readability:** List comprehensions can be more readable than for loops when the transformation of each element is complex, as they avoid the need for explicit loop control.
-
-    **When to Use For Loops:**
-
-    1. **Mutation:** If the list needs to be modified in place, a for loop is usually a better choice.
-    2. **Complex Logic:** When the logic for creating each element is complex and involves multiple conditional statements or functions, a for loop is often easier to read and understand.
-    3. **Debugging:** For loops provide more control over the loop and are often easier to debug than list comprehensions.
-
-    **Example Use Cases:**
-
-    ```python
-    # List comprehension
-    numbers = [1, 2, 3, 4, 5]
-    squared_numbers = [x**2 for x in numbers]
-    print(squared_numbers)  # [1, 4, 9, 16, 25]
-
-    # For loop equivalent
-    numbers = [1, 2, 3, 4, 5]
-    squared_numbers = []
-    for x in numbers:
-        squared_numbers.append(x**2)
-    print(squared_numbers)  # [1, 4, 9, 16, 25]
-    ```
-
-    In this example, the list comprehension is a better choice because it is more concise and easier to read.
-
-    ```python
-    # For loop with mutation
-    numbers = [1, 2, 3, 4, 5]
-    numbers = [x**2 for x in numbers]
-    print(numbers)  # [1, 4, 9, 16, 25]
-    ```
-
-    In this example, the for loop is a better choice because it allows us to modify the original list in place.
-
-    In summary, list comprehensions are a better choice when you need to create a new list and the transformation of each element is simple. For loops are a better choice when the list needs to be modified in place, or when the logic for creating each element is complex.
-
-<!-- injected-output:end -->
 
 Placeholder names like `{language}` and `{question}` must match the keys in the dict passed to `invoke()`.
 
@@ -243,16 +186,6 @@ print(f"description: {result.get('description')}")
 print(f"use_case: {result.get('use_case')}")
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    type: <class 'dict'>
-    name: FAISS
-    description: Facebook AI Similarity Search is an open-source library for efficient similarity search and clustering of dense vectors, written in C++ with optional Python bindings.
-    use_case: ['Anomaly detection in high-dimensional data', 'Image and video search', 'Recommendation systems', 'Clustering and dimensionality reduction', 'Nearest neighbor search in large datasets']
-
-<!-- injected-output:end -->
-
 If JSON parsing is unreliable, `with_structured_output()` is more robust. That method is covered in the llm-api-production-101 series.
 
 ---
@@ -288,13 +221,6 @@ result = chain.invoke({
 
 print(result)
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    FAISS was developed at Facebook AI Research.
-
-<!-- injected-output:end -->
 
 `RunnablePassthrough` appears most often when connecting a Retriever to a prompt. Post 3 shows that pattern in detail.
 
@@ -336,75 +262,6 @@ chain_with_fallback = primary_chain.with_fallbacks([fallback_chain])
 result = chain_with_fallback.invoke({"question": "How does Python handle exceptions?"})
 print(result)
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    **Handling Exceptions in Python**
-    =====================================
-
-    Python provides a robust exception handling mechanism to deal with runtime errors and other exceptional conditions. Here's an overview of how Python handles exceptions:
-
-    ### Types of Exceptions
-
-    Python has two types of exceptions:
-
-    1.  **Built-in Exceptions**: These are exceptions that are built into the Python language, such as `TypeError`, `ValueError`, `IndexError`, etc.
-    2.  **Custom Exceptions**: These are exceptions that are created by the developer to represent specific error conditions in their code.
-
-    ### Exception Handling
-
-    Python uses a `try`-`except` block to handle exceptions. The basic syntax is as follows:
-
-    ```python
-    try:
-        # Code that might raise an exception
-        pass
-    except ExceptionType:
-        # Code to handle the exception
-        pass
-    ```
-
-    Here's an example:
-
-    ```python
-    try:
-        x = 5 / 0
-    except ZeroDivisionError:
-        print("Cannot divide by zero!")
-    ```
-
-    In this example, the `try` block attempts to divide `5` by `0`, which raises a `ZeroDivisionError`. The `except` block catches this exception and prints an error message.
-
-    ### Multiple Except Blocks
-
-    You can have multiple `except` blocks to handle different types of exceptions:
-
-    ```python
-    try:
-        x = 5 / 0
-    except ZeroDivisionError:
-        print("Cannot divide by zero!")
-    except TypeError:
-        print("Invalid data type!")
-    ```
-
-    ### Raising Exceptions
-
-    You can raise exceptions using the `raise` keyword:
-
-    ```python
-    def divide(a, b):
-        if b == 0:
-            raise ZeroDivisionError("Cannot divide by zero!")
-        return a / b
-    ```
-
-    In this example, the `divide` function raises a `ZeroDivisionError` if the divisor is zero.
-
-    ... (truncated)
-
-<!-- injected-output:end -->
 
 This pattern switches automatically to the fallback model when the primary model is unavailable or rate-limited.
 

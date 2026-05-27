@@ -54,13 +54,6 @@ chain = prompt | llm | StrOutputParser()
 print(chain.invoke({"topic": "LCEL"}))
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    LCEL, or LangChain Expression Language, is a declarative way to compose chains in LangChain by piping together components — such as prompts, chat models, output parsers, and retrievers — using the `|` operator. Every component in an LCEL chain implements the same Runnable interface, which means you can invoke, batch, or stream the whole chain with a single method call without writing glue code between steps. Because LCEL is just function composition over a shared contract, the resulting chains are easy to reason about, swap parts in and out of, and run efficiently in parallel or async contexts.
-
-<!-- injected-output:end -->
-
 이 짧은 예제만 봐도 LangChain의 핵심 구조가 드러납니다. 프롬프트는 입력 dict를 메시지로 바꾸고, 모델은 그 메시지를 받아 응답을 만들고, 파서는 응답 객체를 애플리케이션이 다루기 쉬운 문자열로 바꿉니다. 세 단계가 모두 *Runnable* 계약을 따르기 때문에 `|` 하나로 연결됩니다.
 
 ## LangChain이 해결하려는 문제
@@ -117,13 +110,6 @@ response = llm.invoke("Explain the advantages of Python in two sentences.")
 print(response.content)
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    Python is a versatile and widely-used programming language that offers several advantages, including its simplicity, readability, and ease of use, making it an ideal choice for beginners and experienced developers alike. Additionally, Python's extensive libraries and frameworks, such as NumPy, pandas, and Django, provide a powerful toolset for data analysis, machine learning, web development, and more.
-
-<!-- injected-output:end -->
-
 여기서 눈여겨볼 점은 `ChatGroq` 자체가 이미 *Runnable*이라는 사실입니다. 즉, 체인을 만들기 전에도 `invoke()`로 바로 실행할 수 있습니다. 체인은 특별한 다른 세계가 아니라, 이런 *Runnable* 여러 개를 조합한 결과물일 뿐입니다.
 
 ---
@@ -171,13 +157,6 @@ chain = prompt | llm | parser
 result = chain.invoke({"topic": "embedding vectors"})
 print(result)
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    Embedding vectors is a technique in natural language processing and machine learning where high-dimensional data is represented as dense, fixed-size vectors in a lower-dimensional space, allowing for efficient computation and improved model performance. This is typically achieved through techniques like word2vec or GloVe, which map words or other inputs to vectors in a way that captures semantic relationships and word meanings.
-
-<!-- injected-output:end -->
 
 각 컴포넌트 역할을 나눠 보면 더 분명합니다.
 
@@ -230,22 +209,6 @@ print(f"\n=== step 3: string ===")
 print(f"  {text}")
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    === step 1: messages ===
-      [system] You are an expert at concise explanations.
-      [human] Explain embedding vectors in two sentences.
-
-    === step 2: AIMessage ===
-      type: AIMessage
-      content: Embedding vectors is a technique in natural language processing (NLP) where word...
-
-    === step 3: string ===
-      Embedding vectors is a technique in natural language processing (NLP) where words or phrases are represented as numerical vectors in a high-dimensional space, allowing machines to capture semantic relationships and nuances between them. These vectors are often learned through neural networks, where similar words are mapped to nearby points in the vector space, enabling tasks like text classification, sentiment analysis, and language translation.
-
-<!-- injected-output:end -->
-
 운영 관점에서 이 예제가 좋은 이유는 문제를 빨리 좁힐 수 있기 때문입니다. 결과가 이상할 때 프롬프트 렌더링이 잘못된 것인지, 모델 응답이 이상한 것인지, 파서 단계가 부적절한 것인지 한 단계씩 분리해서 확인할 수 있습니다.
 
 ---
@@ -281,15 +244,6 @@ result = chain.invoke({
 })
 print(result)
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    Vector search converts text into numeric vectors, allowing for efficient and meaningful retrieval by comparing the semantic similarity between text inputs.
-
-    (character count: 155)
-
-<!-- injected-output:end -->
 
 `RunnableLambda`는 출력 후처리, 짧은 로깅, 가벼운 포맷 변환에는 매우 편리합니다. 다만 여기서 흔히 생기는 실수는 비즈니스 로직 대부분을 체인 안에 욱여넣는 것입니다. 그러면 체인은 짧아 보여도, 실제 책임 분리는 오히려 나빠집니다. **짧은 변환은 체인에, 큰 애플리케이션 로직은 일반 함수나 서비스 계층에** 두는 편이 유지보수에 유리합니다.
 
@@ -332,17 +286,6 @@ results = chain.batch(topics)
 for topic_dict, result in zip(topics, results):
     print(f"[{topic_dict['topic']}] {result}\n")
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    [embeddings] In machine learning and natural language processing, embeddings are a way of representing words, phrases, or other data as numerical vectors in a high-dimensional space, allowing similar concepts to be clustered together and enabling models to capture nuanced relationships and patterns.
-
-    [FAISS] FAISS (Facebook AI Similarity Search) is an open-source library developed by Facebook and Carnegie Mellon University for efficient similarity search and clustering of dense vectors, typically used in large-scale machine learning and data analytics applications.
-
-    [RAG] RAG stands for Red, Amber, and Green, which is a traffic-light system used to categorize and track project progress, risks, and issues, with Red indicating critical problems, Amber signifying potential issues, and Green denoting successful completion or progress.
-
-<!-- injected-output:end -->
 
 실무에서는 여기에 API 한도 문제가 곧바로 따라옵니다. `batch()`는 내부적으로 병렬 처리를 시도할 수 있으므로, 공급자 rate limit에 맞춰 동시성을 제한해야 할 때가 많습니다.
 

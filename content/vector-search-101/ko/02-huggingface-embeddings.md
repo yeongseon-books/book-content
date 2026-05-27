@@ -80,15 +80,6 @@ print(f"dimension: {len(vector)}")
 print(f"first 5 values: {vector[:5]}")
 ```
 
-<!-- injected-output:start -->
-**출력 결과**
-
-    type: <class 'list'>
-    dimension: 384
-    first 5 values: [0.04267469793558121, 0.00979855377227068, -0.031552139669656754, -0.033105991780757904, 0.04774016514420509]
-
-<!-- injected-output:end -->
-
 `embed_query()`는 입력 하나를 처리하고 일반 Python 리스트를 반환합니다. NumPy 연산이 필요할 때는 `np.array()`로 바꿔 쓰면 됩니다.
 
 ---
@@ -129,14 +120,6 @@ print(f"matrix shape: {vectors_np.shape}")  # (5, 384)
 print(f"elapsed: {elapsed:.3f}s")
 ```
 
-<!-- injected-output:start -->
-**출력 결과**
-
-    matrix shape: (5, 384)
-    elapsed: 0.101s
-
-<!-- injected-output:end -->
-
 문서 수가 늘어날수록 배치 호출과 반복 호출의 차이는 더 커집니다. 코퍼스가 크다면 `embed_documents()`를 기본 선택으로 삼는 편이 좋습니다.
 
 ---
@@ -176,15 +159,6 @@ print(f"reloaded: {loaded.shape}")
 print(f"identical: {np.allclose(vectors, loaded)}")
 ```
 
-<!-- injected-output:start -->
-**출력 결과**
-
-    saved: (3, 384)
-    reloaded: (3, 384)
-    identical: True
-
-<!-- injected-output:end -->
-
 벡터만 저장하면 결과는 결국 인덱스 위치 번호에 불과합니다. 원문 텍스트도 함께 저장해야 검색 결과를 다시 사용자에게 읽을 수 있는 형태로 보여 줄 수 있습니다.
 
 ```python
@@ -212,13 +186,6 @@ with open("documents.json", "w") as f:
 
 print("saved embeddings and documents")
 ```
-
-<!-- injected-output:start -->
-**출력 결과**
-
-    saved embeddings and documents
-
-<!-- injected-output:end -->
 
 4편에서는 정확히 이 패턴을 이용해 실제 FAISS 검색 시스템을 만듭니다.
 
@@ -287,15 +254,6 @@ print(f"HuggingFaceEmbeddings shape: {hf_vector.shape}")
 print(f"SentenceTransformer shape:   {st_vector.shape}")
 print(f"max difference: {np.max(np.abs(hf_vector - st_vector)):.6f}")
 ```
-
-<!-- injected-output:start -->
-**출력 결과**
-
-    HuggingFaceEmbeddings shape: (384,)
-    SentenceTransformer shape:   (384,)
-    max difference: 0.000000
-
-<!-- injected-output:end -->
 
 부동소수점 반올림 수준의 차이를 제외하면 결과는 같습니다. LangChain 파이프라인을 만들 때는 `HuggingFaceEmbeddings`가 편하고, 추상화가 필요 없을 때는 `SentenceTransformer`를 직접 써도 됩니다.
 

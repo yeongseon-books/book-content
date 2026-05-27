@@ -103,26 +103,6 @@ for i, chunk in enumerate(chunks):
     print(f"\n[{i}] {len(chunk)} chars: {chunk[:60]}...")
 ```
 
-<!-- injected-output:start -->
-**출력 결과**
-
-    total text length: 439 chars
-    number of chunks: 6
-
-    [0] 100 chars: Vector search converts text into numeric vectors for meaning...
-
-    [1] 100 chars: bedding models place semantically similar text close togethe...
-
-    [2] 100 chars: AISS is a high-speed vector search library developed at Face...
-
-    [3] 100 chars: unking strategies split long documents into units the embedd...
-
-    [4] 100 chars: s. Choosing the right chunk size improves retrieval accuracy...
-
-    [5] 39 chars: educe context loss at chunk boundaries....
-
-<!-- injected-output:end -->
-
 이 구현은 설명용으로는 좋지만, 실제 서비스용으로는 부족합니다. 문자 수 기준으로 자르기 때문에 문장을 중간에서 잘라 버릴 수 있기 때문입니다. 실전에서는 다음 방식이 더 낫습니다.
 
 ---
@@ -168,30 +148,6 @@ for i, chunk in enumerate(chunks):
     print(f"\n[{i}] {len(chunk)} chars:")
     print(f"  {chunk[:80]}...")
 ```
-
-<!-- injected-output:start -->
-**출력 결과**
-
-    number of chunks: 5
-
-    [0] 147 chars:
-      Vector search converts text into numeric vectors for meaning-based retrieval.
-    Un...
-
-    [1] 173 chars:
-      Embedding models place semantically similar text close together in vector space....
-
-    [2] 68 chars:
-      all-MiniLM-L6-v2 is a lightweight model practical for CPU inference....
-
-    [3] 160 chars:
-      FAISS is a high-speed vector search library developed at Facebook AI Research.
-    I...
-
-    [4] 94 chars:
-      IndexFlatIP is an exact inner-product index equivalent to cosine search on norma...
-
-<!-- injected-output:end -->
 
 `separators` 리스트는 순서대로 시도됩니다. `\n\n`으로 나눈 결과가 `chunk_size` 안에 들어오면 그 분할을 사용하고, 아니면 다음 분리자를 시도합니다. 결과적으로 문단이나 문장 경계에서 끝나는 청크를 만들 가능성이 높아집니다.
 
@@ -262,25 +218,6 @@ for query in ["how vector search works", "FAISS library features", "setting chun
         print(f"  [{rank}] {score:.4f} — {text[:60]}...")
 ```
 
-<!-- injected-output:start -->
-**출력 결과**
-
-    chunks: 4
-
-    query: 'how vector search works'
-      [1] 0.6897 — Vector search converts text into numeric vectors for meaning...
-      [2] 0.5140 — FAISS is a high-speed vector search library developed at Fac...
-
-    query: 'FAISS library features'
-      [1] 0.5687 — FAISS is a high-speed vector search library developed at Fac...
-      [2] 0.1739 — Chunking strategies split long documents into units the embe...
-
-    query: 'setting chunk size'
-      [1] 0.5347 — Chunking strategies split long documents into units the embe...
-      [2] 0.0345 — FAISS is a high-speed vector search library developed at Fac...
-
-<!-- injected-output:end -->
-
 ---
 
 ## 청크에 메타데이터를 함께 저장하기
@@ -317,13 +254,6 @@ def build_chunk_records(chunks: list[str]) -> list[dict]:
 records = build_chunk_records(chunks)
 print(records[0])
 ```
-
-<!-- injected-output:start -->
-**출력 결과**
-
-    {'chunk_id': 'doc-001-0', 'source': 'vector-search-notes.md', 'section': 'FAISS basics', 'offset': 0, 'text': 'Vector search converts text into numeric vectors for meaning-based retrieval.\nUnlike keyword search, it matches content even when phrasing differs.'}
-
-<!-- injected-output:end -->
 
 이런 메타데이터는 검색 정확도를 직접 올리지는 않지만, 운영 품질을 크게 높입니다. 같은 결과라도 "어디에서 왔는지"가 보이면 사람이 훨씬 빠르게 검토할 수 있기 때문입니다.
 
@@ -377,19 +307,6 @@ def run_experiment(chunk_size: int) -> None:
 run_experiment(120)
 run_experiment(260)
 ```
-
-<!-- injected-output:start -->
-**출력 결과**
-
-    chunk_size=120, chunks=5
-      0.6908 | Chunking strategies decide how much context each vector should carry.
-      0.3707 | Large chunks preserve context but can mix unrelated details.
-
-    chunk_size=260, chunks=3
-      0.6402 | Chunking strategies decide how much context each vector should carry.
-      0.4684 | FAISS is a high-speed vector search library developed at Facebook AI Research.
-
-<!-- injected-output:end -->
 
 작은 청크는 더 직접적인 답을 올려 주지만, 큰 청크는 주변 문맥을 더 많이 끌고 옵니다. 실제 데이터에서 어느 쪽이 더 좋은지는 질문 유형에 따라 달라집니다. FAQ처럼 짧고 정확한 답을 찾는 시스템과 정책 문서를 길게 읽는 시스템은 최적값이 다를 수밖에 없습니다.
 

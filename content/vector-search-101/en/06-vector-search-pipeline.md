@@ -191,32 +191,6 @@ for query in queries:
         print(f"  [{rank}] {score:.4f} — {text.strip()[:70]}...")
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    total chunks: 4
-    vector shape: (4, 384)
-    saved: faiss.index, chunks.json
-    loaded: 4 vectors
-
-    query: 'how vector search differs from keyword search'
-      [1] 0.7285 — Vector search converts text into numeric vectors for meaning-based ret...
-      [2] 0.4562 — RAG (Retrieval-Augmented Generation) combines retrieved documents with...
-
-    query: 'FAISS index types'
-      [1] 0.5547 — FAISS is a high-speed vector search library developed at Facebook AI R...
-      [2] 0.1110 — Vector search converts text into numeric vectors for meaning-based ret...
-
-    query: 'choosing chunk size'
-      [1] 0.4771 — Chunking strategies split long documents into units the embedding mode...
-      [2] 0.1839 — RAG (Retrieval-Augmented Generation) combines retrieved documents with...
-
-    query: 'role of retrieval in RAG'
-      [1] 0.5931 — RAG (Retrieval-Augmented Generation) combines retrieved documents with...
-      [2] 0.1908 — Chunking strategies split long documents into units the embedding mode...
-
-<!-- injected-output:end -->
-
 This example ends with 4 chunks because the input corpus is intentionally small. In real systems, the absolute number is not what matters. The real check is whether **document count → chunk count → index vector count** changes in the way you expect after a pipeline update.
 
 ---
@@ -287,19 +261,6 @@ for query in ["IndexFlatIP cosine search", "ERR_CONNECTION_REFUSED"]:
         print(f"  {score:.4f} — {text}")
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    query: IndexFlatIP cosine search
-      0.9087 — FAISS IndexFlatIP supports exact inner-product search on normalized vectors.
-      0.2173 — Chunking strategy changes how much context each vector carries.
-
-    query: ERR_CONNECTION_REFUSED
-      0.7421 — Error code ERR_CONNECTION_REFUSED is usually better handled by exact keyword search.
-      0.1036 — FAISS IndexFlatIP supports exact inner-product search on normalized vectors.
-
-<!-- injected-output:end -->
-
 The first query benefits from both semantic and lexical signals pointing at the same chunk. The second depends much more on exact token matching. That contrast is exactly why hybrid search exists.
 
 ## When should reindexing run?
@@ -329,13 +290,6 @@ with open("index-manifest.json", "w") as f:
 
 print(manifest)
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    {'embedding_model': 'sentence-transformers/all-MiniLM-L6-v2', 'chunk_size': 300, 'chunk_overlap': 30, 'document_count': 4, 'index_type': 'IndexFlatIP'}
-
-<!-- injected-output:end -->
 
 This is not glamorous infrastructure, but it gives you the first thing to compare when someone asks why retrieval quality changed after a deployment.
 

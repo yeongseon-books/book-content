@@ -80,15 +80,6 @@ print(f"dimension: {len(vector)}")
 print(f"first 5 values: {vector[:5]}")
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    type: <class 'list'>
-    dimension: 384
-    first 5 values: [0.04267469793558121, 0.00979855377227068, -0.031552139669656754, -0.033105991780757904, 0.04774016514420509]
-
-<!-- injected-output:end -->
-
 `embed_query()` handles a single input and returns a plain Python list. Convert to `np.array()` when you need NumPy operations.
 
 ---
@@ -129,14 +120,6 @@ print(f"matrix shape: {vectors_np.shape}")  # (5, 384)
 print(f"elapsed: {elapsed:.3f}s")
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    matrix shape: (5, 384)
-    elapsed: 0.101s
-
-<!-- injected-output:end -->
-
 The gap between batch and loop grows with document count. For large corpora, always prefer `embed_documents()`.
 
 ---
@@ -176,15 +159,6 @@ print(f"reloaded: {loaded.shape}")
 print(f"identical: {np.allclose(vectors, loaded)}")
 ```
 
-<!-- injected-output:start -->
-**Output**
-
-    saved: (3, 384)
-    reloaded: (3, 384)
-    identical: True
-
-<!-- injected-output:end -->
-
 Save the source texts alongside the vectors. Without the original text, search results are just index positions.
 
 ```python
@@ -212,13 +186,6 @@ with open("documents.json", "w") as f:
 
 print("saved embeddings and documents")
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    saved embeddings and documents
-
-<!-- injected-output:end -->
 
 Post 4 uses exactly this pattern to build a working FAISS search system.
 
@@ -287,15 +254,6 @@ print(f"HuggingFaceEmbeddings shape: {hf_vector.shape}")
 print(f"SentenceTransformer shape:   {st_vector.shape}")
 print(f"max difference: {np.max(np.abs(hf_vector - st_vector)):.6f}")
 ```
-
-<!-- injected-output:start -->
-**Output**
-
-    HuggingFaceEmbeddings shape: (384,)
-    SentenceTransformer shape:   (384,)
-    max difference: 0.000000
-
-<!-- injected-output:end -->
 
 Floating-point rounding aside, the results are the same. Use `HuggingFaceEmbeddings` when building LangChain pipelines. Use `SentenceTransformer` directly when you do not need the abstraction.
 

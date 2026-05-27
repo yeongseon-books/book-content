@@ -166,13 +166,6 @@ except RetryableLLMError as exc:
     logger.error("request still failed after retries: %s", exc)
 ```
 
-<!-- injected-output:start -->
-**실행 결과**
-
-    Python context managers are used to manage resources such as files, connections, or locks, ensuring they are properly cleaned up after use, even if exceptions occur. They are implemented using the `with` statement, which automatically calls the `__enter__` method when entering the block and the `__exit__` method when exiting, allowing for resource acquisition and release. This approach helps prevent resource leaks and makes code more readable and maintainable.
-
-<!-- injected-output:end -->
-
 여기서 세 가지가 중요합니다. `retry_if_exception_type(RetryableLLMError)`로 재시도 범위를 좁혔다는 사실, `wait_exponential_jitter`로 점점 느려지는 백오프와 지터를 함께 적용했다는 사실, `reraise=True`로 최종 실패를 숨기지 않는다는 사실입니다.
 
 ### 어떤 실패가 재시도 대상인가
@@ -251,18 +244,6 @@ def flaky_lookup() -> str:
 print(flaky_lookup())
 ```
 
-<!-- injected-output:start -->
-**실행 결과**
-
-    INFO:retry-demo:attempt=1
-    WARNING:retry-demo:Retrying __main__.flaky_lookup in 1.0 seconds as it raised RetryableLLMError: temporary upstream timeout.
-    INFO:retry-demo:attempt=2
-    WARNING:retry-demo:Retrying __main__.flaky_lookup in 2.0 seconds as it raised RetryableLLMError: temporary upstream timeout.
-    INFO:retry-demo:attempt=3
-    recovered on third attempt
-
-<!-- injected-output:end -->
-
 이 예제는 장애 재현이 아니라 정책 검증에 가깝습니다. 로그에 시도 횟수, 대기 간격, 최종 성공 여부가 남기 때문에 운영 전에 “정말 세 번만 시도하는가”, “백오프가 겹치지 않는가”, “성공 뒤 불필요한 추가 시도가 없는가”를 바로 확인할 수 있습니다.
 
 ### 최종 실패를 사용자 메시지와 내부 로그로 분리하기
@@ -287,14 +268,6 @@ user_payload, log_payload = build_failure_response(RetryableLLMError("timeout"),
 print(user_payload)
 print(log_payload)
 ```
-
-<!-- injected-output:start -->
-**실행 결과**
-
-    {'message': '잠시 후 다시 시도해 주세요. 요청을 끝까지 처리하지 못했습니다.', 'retryable': True}
-    {'retryable': True, 'attempt_count': 3, 'final_error_type': 'RetryableLLMError', 'final_error_message': 'timeout'}
-
-<!-- injected-output:end -->
 
 이렇게 분리해 두면 사용자 경험은 안정적으로 유지되고, 운영자는 내부 로그에서 재시도 성격과 최종 실패 이유를 바로 볼 수 있습니다. 구조화 출력 검증 실패처럼 비재시도 오류가 들어오면 같은 함수로도 전혀 다른 후속 처리 정책을 붙일 수 있습니다.
 
