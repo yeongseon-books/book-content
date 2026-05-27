@@ -141,6 +141,20 @@ function Button({ children, variant = "primary" }) {
 - If only part of the UI changes, search for hard-coded colors or spacing values that bypass the token layer.
 - If dark mode does not apply, check the `darkMode` configuration and where the theme class is attached.
 
+## Practical Debug Loop
+
+Design-system regressions usually show up as naming drift before they show up as catastrophic UI bugs.
+
+1. **Token usage** - search for hard-coded colors or spacing values in the component before editing the design token file.
+2. **Component boundary** - confirm whether a visual change belongs in the shared component or only in one page layout.
+3. **Theme verification** - toggle dark mode and compare hover, focus, and disabled states instead of checking only the default screen.
+
+```bash
+grep -R "#1d72ff\|margin: 13px\|padding: 7px" src || true
+```
+
+Expected outcome: every shared visual rule can be traced either to a named token or to a justified page-level exception. If a change cannot be explained that way, the design system is already drifting.
+
 ## What to Notice in This Code
 
 - All colors appear by *name* (like `primary`) — change in *one place*.

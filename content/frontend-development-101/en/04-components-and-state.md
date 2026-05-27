@@ -149,6 +149,22 @@ function App() {
 - If state never changes, confirm the `useState` import and make sure the setter runs inside the click handler.
 - If parent and child fall out of sync, re-check where the state lives and whether the prop names still match.
 
+## Practical Debug Loop
+
+Component bugs often look mysterious until you label them as either ownership bugs or rendering bugs.
+
+1. **Props ownership** - verify which component should own the value before adding more state.
+2. **Render trigger** - confirm that the state setter actually runs and that the new value reaches the child tree.
+3. **Shared state** - if two widgets drift apart, move one level up and inspect whether the real source of truth already exists in the parent.
+
+```jsx
+useEffect(() => {
+  console.log("count changed:", count);
+}, [count]);
+```
+
+Expected outcome: you can answer three questions clearly - where the value lives, who is allowed to change it, and which render should happen after the change. That is the shortest route out of most component-state confusion.
+
 ## What to Notice in This Code
 
 - `props` are *input*; `state` is *internal memory*.

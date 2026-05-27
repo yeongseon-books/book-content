@@ -139,6 +139,23 @@ const url = import.meta.env.VITE_API_URL;
 - If `import.meta.env` is undefined, confirm the `VITE_` prefix and the location of `.env.production`.
 - If the bundle is unexpectedly large, inspect full-library imports, large images, and source-map exposure before chasing smaller details.
 
+## Practical Debug Loop
+
+Build tooling feels abstract until you inspect the emitted artifacts directly. That is where performance work starts to become concrete.
+
+1. **Production build** - run the build and inspect the real output directory rather than trusting the dev server.
+2. **Largest asset** - identify which generated asset is actually heavy before optimizing source code.
+3. **Chunk intent** - confirm that route-level lazy loading produces separate files instead of one swollen entry bundle.
+
+```bash
+npm run build
+ls -lh dist/assets
+# optional deeper look
+npx source-map-explorer "dist/assets/*.js"
+```
+
+Expected outcome: you know which artifact is large, whether the filenames are cacheable, and whether code splitting actually happened. That gives you a measurement-first path instead of a superstition-first path.
+
 ## What to Notice in This Code
 
 - The dev server serves *ESM directly*, so *startup is fast*.

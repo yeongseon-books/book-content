@@ -144,6 +144,23 @@ document.getElementById("list").addEventListener("click", (e) => {
 - 버튼이 동작하지 않으면 `render()` 호출이 빠지지 않았는지, `getElementById`가 `null`을 반환하지 않는지 봅니다.
 - 삭제가 꼬이면 event delegation 대상이 `LI`인지, 인덱스 계산이 현재 DOM 구조와 맞는지 확인합니다.
 
+## 실무 점검 루프
+
+순수 JavaScript 코드가 흔들릴 때는 데이터, 렌더링, 이벤트 흐름을 따로 떼어 보는 것이 가장 빠릅니다.
+
+1. **상태를 확인합니다.** 사용자 행동 전후의 데이터 구조를 먼저 로그로 확인합니다.
+2. **렌더링을 확인합니다.** 상태가 바뀐 뒤 `render()`가 실제로 호출되는지 확인합니다.
+3. **이벤트 경로를 확인합니다.** 클릭 위치가 이상하면 `event.target`을 직접 확인합니다.
+
+```javascript
+console.table(todos);
+document.getElementById("list").addEventListener("click", (event) => {
+  console.log("clicked:", event.target.tagName);
+});
+```
+
+기대 결과는 수정 전에 이미 문제를 "상태 문제인지, 렌더링 문제인지, 이벤트 타깃 문제인지"로 분류할 수 있는 상태입니다. 이 감각이 있어야 나중에 프레임워크를 써도 디버깅이 덜 막막해집니다.
+
 ## 이 코드에서 주목할 점
 
 - 상태(`todos`)와 렌더링(`render`)이 분리되어 있습니다.

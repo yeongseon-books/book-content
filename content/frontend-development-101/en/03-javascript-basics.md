@@ -139,6 +139,23 @@ document.getElementById("list").addEventListener("click", (e) => {
 - If the UI does not update, check whether `render()` is called after each state change and whether `getElementById()` returned `null`.
 - If deletion removes the wrong item, inspect the event target and confirm that the index calculation still matches the current DOM structure.
 
+## Practical Debug Loop
+
+Plain JavaScript starts to feel reliable when you can inspect data, render output, and event flow separately instead of treating them as one blur.
+
+1. **State** - log the data structure before and after the user action.
+2. **Render** - confirm that `render()` is called after each state mutation.
+3. **Event path** - inspect `event.target` when clicks do not land where you expect.
+
+```javascript
+console.table(todos);
+document.getElementById("list").addEventListener("click", (event) => {
+  console.log("clicked:", event.target.tagName);
+});
+```
+
+Expected outcome: you can explain whether the bug is a state bug, a render bug, or an event-target bug before you edit the code. That is the same discipline frameworks demand later; you are just practicing it without abstraction first.
+
 ## What to Notice in This Code
 
 - State (`todos`) and rendering (`render`) are *separated*.

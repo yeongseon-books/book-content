@@ -133,6 +133,22 @@ Press `F12` and inspect the Elements, Console, and Network tabs to see *what the
 - If the button does nothing, check the `app.js` path first and confirm that `id="b"` and `id="t"` still match the DOM.
 - If the page looks fine but the interaction fails, inspect the Console for syntax errors or `null` selector references.
 
+## Practical Debug Loop
+
+When a very small frontend page behaves strangely, the fastest path is to walk the browser pipeline in order instead of guessing.
+
+1. **Network first** - reload with DevTools Network open and confirm that `index.html`, `app.js`, and any CSS files return `200`.
+2. **DOM second** - inspect the Elements panel and confirm that the expected `id` attributes still exist after the page loads.
+3. **Behavior third** - run `document.getElementById("b")` in the Console and confirm it returns an element instead of `null`.
+
+```javascript
+console.log(document.readyState);
+console.log(document.getElementById("b"));
+console.log(document.getElementById("t")?.textContent);
+```
+
+Expected outcome: the button element exists, the heading text is readable, and the click handler changes only the DOM text instead of triggering a page reload. If one of those checks fails, you immediately know whether the problem lives in asset loading, selector wiring, or event behavior.
+
 ## What to Notice in This Code
 
 - HTML is *structure*, CSS is *appearance*, JS is *behavior*.

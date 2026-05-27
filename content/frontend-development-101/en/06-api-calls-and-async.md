@@ -165,6 +165,25 @@ if (!res.ok) throw new Error(`HTTP ${res.status}`);
 ```
 - If older responses overwrite newer ones, inspect your `AbortController` cleanup or the logic that decides which response is still current.
 
+## Practical Debug Loop
+
+Async frontend bugs almost always reveal themselves when you watch the request lifecycle and the UI state machine side by side.
+
+1. **Request result** - inspect the Network panel and confirm status code, response body, and timing before changing UI logic.
+2. **Visible state** - make sure loading, success, and error each render a different screen state.
+3. **Race safety** - type quickly or navigate away mid-request and confirm stale responses do not overwrite newer ones.
+
+```bash
+curl -i https://jsonplaceholder.typicode.com/users
+```
+
+```javascript
+const res = await fetch("/api/users");
+if (!res.ok) throw new Error(`HTTP ${res.status}`);
+```
+
+Expected outcome: you can name the exact failed stage - transport, response validation, state update, or cancellation - instead of filing all async issues under "fetch is broken."
+
 ## What to Notice in This Code
 
 - The state is *explicit*: `idle/loading/success/error`.

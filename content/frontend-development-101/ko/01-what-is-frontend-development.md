@@ -136,6 +136,22 @@ python3 -m http.server 8000
 - 버튼 클릭이 안 되면 `app.js` 경로와 `id="b"`, `id="t"` 선택자가 정확한지 먼저 확인합니다.
 - 콘솔 오류가 보이면 DevTools Console에서 문법 오류와 `null` 참조를 먼저 봅니다.
 
+## 실무 점검 루프
+
+아주 작은 프론트엔드 페이지도 브라우저 파이프라인 순서대로 보면 훨씬 빨리 원인을 좁힐 수 있습니다.
+
+1. **네트워크부터 확인합니다.** DevTools Network 탭을 열고 `index.html`, `app.js`, CSS 파일이 모두 `200`으로 내려오는지 봅니다.
+2. **DOM을 확인합니다.** Elements 패널에서 기대한 `id`가 실제로 렌더링된 노드에 붙어 있는지 확인합니다.
+3. **동작을 확인합니다.** Console에서 선택자가 `null`이 아닌지 직접 확인합니다.
+
+```javascript
+console.log(document.readyState);
+console.log(document.getElementById("b"));
+console.log(document.getElementById("t")?.textContent);
+```
+
+기대 결과는 단순합니다. 버튼 요소가 존재하고, 제목 텍스트를 읽을 수 있으며, 클릭 시 전체 새로고침 없이 DOM 텍스트만 바뀌어야 합니다. 이 세 가지를 분리해서 보면 문제가 정적 자산 로딩인지, 선택자 연결인지, 이벤트 동작인지 곧바로 드러납니다.
+
 ## 이 코드에서 주목할 점
 
 - HTML은 구조, CSS는 모양, JavaScript는 동작을 담당합니다.

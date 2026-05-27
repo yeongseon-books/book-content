@@ -145,6 +145,21 @@ main {
 - If the layout does not change, verify that the media query condition and selector names match the actual HTML.
 - If spacing feels wrong, inspect `gap`, `padding`, and `margin` in the box model instead of guessing from the visual result.
 
+## Practical Debug Loop
+
+HTML/CSS bugs usually become easier once you stop looking at the page as a picture and start checking structure, box model, and layout rules separately.
+
+1. **Structure** - in the Elements panel, verify that the semantic tag you expect really wraps the correct content.
+2. **Spacing** - inspect the box model to see whether the extra gap comes from `margin`, `padding`, or an inherited `display` rule.
+3. **Layout system** - confirm whether the container is actually using `display: flex` or `display: grid` before changing child styles.
+
+```css
+/* Temporary debugging rule */
+* { outline: 1px solid rgba(255, 0, 0, 0.2); }
+```
+
+Expected outcome: you can point to the exact element whose box is wrong and explain whether the bug comes from semantics, spacing, or layout mode. That discipline prevents the classic "change five CSS rules and hope" debugging style.
+
 ## What to Notice in This Code
 
 - Use *role-based class names* like `card`, not `red`.

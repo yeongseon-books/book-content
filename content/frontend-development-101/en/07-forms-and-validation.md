@@ -138,6 +138,21 @@ if (!result.success) showErrors(result.error.format());
 - If errors never clear, check the controlled state update path and the exact timing of your format validation.
 - If assistive feedback is weak, verify the `label`, `id`, and `aria-describedby` connections first.
 
+## Practical Debug Loop
+
+Good form debugging checks visual feedback, accessibility feedback, and submission behavior as one conversation.
+
+1. **Keyboard path** - complete the form with `Tab`, `Shift+Tab`, and `Enter` only.
+2. **Error clarity** - trigger one invalid state and confirm the message appears next to the right field, not only at the top of the form.
+3. **Submission contract** - verify that disabled buttons, loading text, and server-error handling all match the same state transition.
+
+```html
+<input aria-invalid="true" aria-describedby="email-error" />
+<p id="email-error">That doesn't look like an email.</p>
+```
+
+Expected outcome: a keyboard-only user, a screen-reader user, and a mouse user all receive the same validation signal at the same point in the flow. If those experiences diverge, the form is not truly finished yet.
+
 ## What to Notice in This Code
 
 - Validation happens *while the user types*.

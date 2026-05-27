@@ -193,6 +193,27 @@ When the deploy finishes you have a *public URL*. Share that URL *with the next 
 - If the deployed app cannot reach the API, check `VITE_API_URL`, CORS configuration, and the visible fetch error path first.
 - If another person cannot rerun the project quickly, treat the README and `.env.example` as broken parts of the product, not as optional extras.
 
+## Shipping Readiness Check
+
+A small frontend app is only truly finished when build, refresh, data flow, and run instructions all survive outside your own laptop.
+
+1. **Build contract** - run `npm run build` and serve the `dist` folder locally as if it were production.
+2. **Routing contract** - open a deep URL such as `/notes/1`, refresh it, and confirm that the host serves the SPA entry page instead of a 404.
+3. **Data contract** - create a note, reload the list, and confirm the persisted result comes back from the API rather than from stale client memory.
+4. **Handoff contract** - give the README and `.env.example` to another person and confirm they can run the project without private verbal instructions.
+
+```bash
+npm run build
+npx serve -s dist
+# then open http://localhost:3000/notes/1 and refresh
+```
+
+```bash
+curl -i "$VITE_API_URL/notes"
+```
+
+Expected outcome: the app builds, refreshes safely, reaches the API, and explains itself well enough that another developer can reproduce the environment. That is the minimum bar for saying the project is shipped rather than merely demonstrated.
+
 ## What to Notice in This Code
 
 - The folder layout is split *by role*, so you instantly know *where to edit*.

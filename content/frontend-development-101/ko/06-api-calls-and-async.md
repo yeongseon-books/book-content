@@ -165,6 +165,25 @@ function Users() {
 - 에러가 화면에 안 보이면 `res.ok` 검사와 `catch` 분기가 실제 렌더링으로 이어지는지 확인합니다.
 - 이전 응답이 덮어쓰면 `AbortController` cleanup이나 최신 요청만 반영하는 분기가 있는지 봅니다.
 
+## 실무 점검 루프
+
+비동기 UI 버그는 네트워크 결과와 화면 상태 머신을 같이 보면 훨씬 덜 모호합니다.
+
+1. **요청 결과를 봅니다.** UI를 고치기 전에 Network 탭에서 상태 코드, 응답 본문, 지연 시간을 먼저 확인합니다.
+2. **가시 상태를 봅니다.** 로딩, 성공, 실패가 모두 서로 다른 화면 상태로 렌더링되는지 확인합니다.
+3. **경쟁 상태를 봅니다.** 빠르게 타이핑하거나 화면을 떠날 때 오래된 응답이 최신 상태를 덮어쓰지 않는지 확인합니다.
+
+```bash
+curl -i https://jsonplaceholder.typicode.com/users
+```
+
+```javascript
+const res = await fetch("/api/users");
+if (!res.ok) throw new Error(`HTTP ${res.status}`);
+```
+
+기대 결과는 문제를 "전송 문제인지, 응답 검증 문제인지, 상태 갱신 문제인지, 취소 누락 문제인지"로 바로 부를 수 있는 상태입니다. 이렇게 봐야 `fetch` 하나에 모든 원인을 뭉뚱그리지 않게 됩니다.
+
 ## 이 코드에서 주목할 점
 
 - 상태가 `idle/loading/success/error`로 명확히 드러납니다.

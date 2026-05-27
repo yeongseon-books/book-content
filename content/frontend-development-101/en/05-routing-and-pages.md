@@ -150,6 +150,23 @@ const Settings = lazy(() => import("./Settings"));
 }
 ```
 
+## Practical Debug Loop
+
+Routing problems become tractable when you separate browser navigation, router matching, and host configuration into distinct checkpoints.
+
+1. **Link behavior** - click a route and confirm there is no full document reload in the Network panel.
+2. **Route matching** - log `useParams()` and verify it matches the route pattern exactly.
+3. **Host fallback** - open a deep URL directly in the browser and refresh it to confirm your hosting layer returns `index.html` instead of a 404.
+
+```bash
+# local production-style verification
+npm run build
+npx serve -s dist
+# then open /users/42 and hit refresh
+```
+
+Expected outcome: client-side clicks stay inside the SPA, dynamic params render the right value, and deep-link refresh works under a static host. If refresh fails, the bug is not in React Router first; it is in deployment fallback configuration.
+
 ## What to Notice in This Code
 
 - `<Link>` updates router state *without a full page reload*.
