@@ -31,6 +31,8 @@ last_reviewed: '2026-05-15'
 ![Backend Development 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/05/05-01-concept-at-a-glance.ko.png)
 *Backend Development 101 5장 흐름 개요*
 
+> DB layer의 목적은 'SQL을 잘 쓰는 것'이 아니라 '도메인 객체와 행(row) 사이의 경계를 한 곳에 모아 두는 것'입니다 — 이 경계가 위 계층으로 새는 순간 비즈니스 로직 안에서 SQL이 자라고, 테스트가 불가능해집니다.
+
 ## 먼저 던지는 질문
 
 - 왜 service가 SQL을 직접 작성하지 않는 편이 좋을까요?

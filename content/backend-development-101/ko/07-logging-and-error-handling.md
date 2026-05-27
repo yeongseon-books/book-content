@@ -31,6 +31,8 @@ last_reviewed: '2026-05-15'
 ![Backend Development 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/07/07-01-concept-at-a-glance.ko.png)
 *Backend Development 101 7장 흐름 개요*
 
+> 운영에서 로그는 '디버깅용 print'가 아니라 '미래의 나에게 보내는 증거'이고, 에러 처리는 '예외를 잡는 것'이 아니라 '실패를 비즈니스 결정으로 바꾸는 일'입니다 — 이 둘이 분리되어 있어야 새벽 3시 incident에서 살아남습니다.
+
 ## 먼저 던지는 질문
 
 - 왜 `print` 대신 logger를 써야 할까요?

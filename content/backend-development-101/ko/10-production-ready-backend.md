@@ -31,6 +31,8 @@ last_reviewed: '2026-05-15'
 ![Backend Development 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/10/10-01-concept-at-a-glance.ko.png)
 *Backend Development 101 10장 흐름 개요*
 
+> 'production-ready'는 '잘 돌아간다'가 아니라 '실패해도 살아남고, 실패한 사실이 보이고, 다시 일어설 수 있다'는 세 줄의 합입니다 — health check·observability·graceful shutdown·migration·rollback이 빠진 시스템은 production이 아니라 production 흉내입니다.
+
 ## 먼저 던지는 질문
 
 - 지금까지 배운 아홉 개 레이어를 하나의 프로젝트 구조로 어떻게 배치할까요?

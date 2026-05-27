@@ -33,6 +33,8 @@ last_reviewed: '2026-05-15'
 ![Backend Development 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/08/08-01-concept-at-a-glance.ko.png)
 *Backend Development 101 8장 흐름 개요*
 
+> 백엔드 테스트의 핵심 질문은 '커버리지 몇 %인가'가 아니라 '배포 직전에 이 테스트를 통과했다는 사실로부터 무엇을 보장할 수 있는가'입니다 — unit·integration·contract·E2E는 같은 코드를 반복 검증하는 게 아니라 서로 다른 보장을 제공합니다.
+
 ## 먼저 던지는 질문
 
 - unit, integration, E2E 테스트는 각각 무엇을 검증할까요?

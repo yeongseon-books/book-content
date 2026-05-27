@@ -29,6 +29,8 @@ last_reviewed: '2026-05-15'
 ![Backend Development 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/02/02-01-concept-at-a-glance.ko.png)
 *Backend Development 101 2장 흐름 개요*
 
+> HTTP 서버는 마법이 아니라 'TCP 위에서 요청을 받아 라우터로 보내고, 응답을 돌려주는 무한 루프'입니다 — 이 모델이 잡혀야 FastAPI·Flask·Express가 같은 일을 다르게 포장한 것이라는 게 보입니다.
+
 ## 먼저 던지는 질문
 
 - HTTP 요청과 응답은 실제로 어떤 모양의 텍스트일까요?

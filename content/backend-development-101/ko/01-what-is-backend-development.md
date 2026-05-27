@@ -29,6 +29,8 @@ last_reviewed: '2026-05-15'
 ![Backend Development 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/01/01-01-concept-at-a-glance.ko.png)
 *Backend Development 101 1장 흐름 개요*
 
+> 백엔드는 'API를 만드는 일'이기 전에 '요청 하나가 들어와서 응답 하나가 나갈 때까지, 그 사이에 일어나는 모든 일을 책임지는 자리'입니다 — 인증·DB·캐시·로깅·실패 처리가 모두 이 한 줄 안에 들어와야 합니다.
+
 ## 먼저 던지는 질문
 
 - 백엔드는 정확히 어떤 역할과 경계를 가지는 계층일까요?

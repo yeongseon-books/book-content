@@ -31,6 +31,8 @@ last_reviewed: '2026-05-15'
 ![Backend Development 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/09/09-01-concept-at-a-glance.ko.png)
 *Backend Development 101 9장 흐름 개요*
 
+> 배포는 '코드를 서버에 올리는 일'이 아니라 '실행 중인 시스템의 상태를 한 버전에서 다른 버전으로 안전하게 옮기는 일'입니다 — 이 관점이 잡혀야 rolling·blue-green·canary가 단순한 옵션이 아니라 위험을 분산시키는 서로 다른 전략으로 읽힙니다.
+
 ## 먼저 던지는 질문
 
 - 배포 환경은 어떤 요소들로 이루어질까요?
