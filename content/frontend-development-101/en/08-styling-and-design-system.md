@@ -32,9 +32,9 @@ This is the 8th post in the Frontend Development 101 series. Here we look at sty
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying Styling and Design Systems?
-- Which signal should the example or diagram make visible for Styling and Design Systems?
-- What failure should be prevented first when Styling and Design Systems reaches a real system?
+- Why do teams need design tokens instead of letting each component choose its own colors and spacing?
+- When does a styling decision belong in a reusable component and when does it belong at the page level?
+- How do dark mode and consistency become cheaper once styling is treated as a system?
 
 ## What You Will Learn
 
@@ -59,21 +59,25 @@ Even with consistent code, *inconsistent design* makes users *uneasy*. Buttons t
 - **Utility-first CSS**: small, composable classes (Tailwind).
 - **Component library**: a *reusable set of components* implementing the design system.
 
-## Before/After
+## From One-Off Styling to Shared Design Rules
 
-**Before (different colors per page)**
+Styling becomes expensive the moment a product needs consistency across screens, engineers, and themes. A design system reduces that cost by moving decisions from scattered CSS declarations into shared tokens and reusable components.
+
+**Each page improvises its own visual values**
 
 ```css
 .btn-a { background: #1d72ff; }   /* page A */
 .btn-b { background: #1d70ff; }   /* page B (typo) */
 ```
 
-**After (design token)**
+**A token defines the value once for the whole product**
 
 ```css
 :root { --color-primary: #1d72ff; }
 .btn  { background: var(--color-primary); }
 ```
+
+The second approach is not only about color accuracy. It is what makes dark mode, brand refreshes, and component library maintenance feel like a planned change instead of a repo-wide hunt.
 
 ## Hands-on: A Component With Tailwind in Five Steps
 
@@ -184,12 +188,12 @@ Even styling needs *shared vocabulary*. Next, we look at the build tools that tu
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Styling and Design Systems?**
-  - The article treats Styling and Design Systems as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Styling and Design Systems?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Styling and Design Systems reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why do teams need design tokens instead of letting each component choose its own colors and spacing?**
+  - Tokens turn visual decisions into shared names, so a color or spacing change happens once instead of in dozens of files. That is what keeps the UI coherent as the team and feature count grow.
+- **When does a styling decision belong in a reusable component and when does it belong at the page level?**
+  - Put stable interaction and visual rules into reusable components, but keep page-specific layout composition close to the page. Reusability helps when the rule is shared, not when it forces unrelated screens into the same mold.
+- **How do dark mode and consistency become cheaper once styling is treated as a system?**
+  - Once the product uses named tokens, dark mode is often a token swap rather than a component rewrite. The same structure that supports theming also supports code review, linting, and long-term consistency.
 
 <!-- toc:begin -->
 ## In this series
