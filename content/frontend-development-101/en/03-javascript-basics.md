@@ -32,9 +32,9 @@ This is the 3rd post in the Frontend Development 101 series. Here we focus on th
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying JavaScript Basics?
-- Which signal should the example or diagram make visible for JavaScript Basics?
-- What failure should be prevented first when JavaScript Basics reaches a real system?
+- Why do `const`, functions, and collection methods matter more than memorizing every JavaScript feature?
+- How does data move from state into the DOM and back again through events?
+- Which JavaScript habits keep a small script from turning into fragile frontend code?
 
 ## What You Will Learn
 
@@ -59,9 +59,11 @@ JavaScript stays the same *across frameworks*. Inside React components, inside V
 - **`map/filter/reduce`**: standard tools to transform collections *without for-loops*.
 - **Event delegation**: attach the listener *to the parent* and handle child events from there.
 
-## Before/After
+## From Loops and Mutation to Declarative JavaScript
 
-**Before (var and for)**
+Older frontend JavaScript often grows around mutable variables and hand-written loops. Modern JavaScript still does the same work, but it expresses intent more directly: transform the collection, then render the result. That difference matters because frontend code is usually read far more often than it is written.
+
+**Loop-first code with mutable state**
 
 ```javascript
 var arr = [1,2,3];
@@ -69,12 +71,14 @@ var doubled = [];
 for (var i = 0; i < arr.length; i++) doubled.push(arr[i] * 2);
 ```
 
-**After (modern JS)**
+**Declarative collection transform**
 
 ```javascript
 const arr = [1, 2, 3];
 const doubled = arr.map(n => n * 2);
 ```
+
+The newer version is not just shorter. It makes the transformation rule obvious, which is exactly what you want when event handlers, DOM updates, and async calls start piling into the same file.
 
 ## Hands-on: A Todo List in Five Steps
 
@@ -181,12 +185,12 @@ Plain JavaScript can build small apps on its own. As the screen grows, you need 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying JavaScript Basics?**
-  - The article treats JavaScript Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for JavaScript Basics?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when JavaScript Basics reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why do `const`, functions, and collection methods matter more than memorizing every JavaScript feature?**
+  - Those tools cover the majority of day-to-day frontend work: storing values safely, packaging behavior into small functions, and transforming data before it reaches the UI. Once those feel natural, larger APIs stop feeling random.
+- **How does data move from state into the DOM and back again through events?**
+  - In the todo example, state lives in `todos`, `render()` turns that state into DOM, and click events mutate state before calling `render()` again. That state -> DOM -> event -> state loop is the core frontend rhythm.
+- **Which JavaScript habits keep a small script from turning into fragile frontend code?**
+  - Prefer `const`, isolate one responsibility per function, keep state separate from rendering, and use patterns such as event delegation when the DOM grows. Those habits make later framework code feel like an extension of the same mental model.
 
 <!-- toc:begin -->
 ## In this series
