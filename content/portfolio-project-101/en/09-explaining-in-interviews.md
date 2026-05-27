@@ -156,6 +156,212 @@ Explaining a portfolio project well is about structure, not volume. When situati
 
 Next, we will close the series with a final checklist you can use before sharing a portfolio project publicly.
 
+### Postmortem Structure Comparison
+
+Teams use nearly identical structures when writing postmortems and retrospectives: situation, task, action, result, and lesson learned. Interview answers work well for the same reason.
+
+| Aspect | Postmortem | Interview Answer |
+| --- | --- | --- |
+| Situation | When incident occurred and scope of impact | Project context and problem |
+| Task | Recovery goal (MTTR, minimize impact) | Problem to solve |
+| Action | Timeline of steps taken | Technical choices and implementation |
+| Result | Time to recovery, affected users | Metrics, user response, deployment result |
+| Lesson | Actions to prevent recurrence | Learning from the project |
+
+```text
+Postmortem example (summary):
+- Situation: 2024-03-15 14:00 UTC, payment API timeout spike
+- Task: Restore 99.9% success rate within 30 minutes
+- Action: Identified DB connection pool exhaustion → increased pool size 20→50 → added slow query index
+- Result: Recovered at 14:22, ~1,200 affected users, zero revenue loss (retries succeeded)
+- Lesson: Add connection pool monitoring alerts, establish weekly slow query review
+```
+
+Apply that same structure to an interview answer:
+
+```text
+Interview answer conversion:
+"I experienced a payment API timeout spike. (Situation)
+We needed to restore normal response rates within 30 minutes. (Task)
+I identified connection pool exhaustion and expanded the pool size, then added an index on slow queries. (Action)
+We recovered in 22 minutes, and I added connection pool monitoring afterward. (Result)
+The lesson was that resources without monitoring can fail at any time."
+```
+
+If you have production experience, converting postmortems to STAR format is the most effective interview prep. For portfolio projects, you can reframe development challenges (bugs, architecture decisions, scope trade-offs) using the same structure.
+
+### Explaining Contribution in a Group Project
+
+The most common mistake when explaining a team project is starting with "we built...". Interviewers care far more about your personal contribution and decisions than about the team's aggregate output.
+
+**Three principles for making contribution clear:**
+
+1. **State role boundaries first**: "In a 4-person team, I owned the backend API and CI/CD pipeline."
+2. **Identify decision ownership**: "The choice I proposed and we adopted was..."
+3. **Quantify contribution**: "I made 87 of 250 commits (35%), built 8 of 12 API endpoints."
+
+```python
+# Team contribution template
+contribution = {
+    "team_size": 4,
+    "my_role": "Backend API + CI/CD pipeline",
+    "key_decisions": [
+        "DB choice: SQLite to PostgreSQL migration proposal",
+        "Test strategy: pytest + GitHub Actions CI adoption",
+    ],
+    "quantified": {
+        "commits": "87 / 250 (35%)",
+        "endpoints_built": "8 / 12",
+        "test_coverage_contribution": "45 unit tests written",
+    },
+}
+```
+
+**Phrases to avoid and alternatives:**
+
+| Avoid | Use Instead |
+| --- | --- |
+| "We built it together" | "The part I owned was..." |
+| "We all did everything" | "I proposed and implemented..." |
+| "Great teamwork" | "When opinions clashed, I bridged by..." |
+| "Good collaboration" | "I wrote the API spec so frontend could develop in parallel" |
+
+Being specific about your contribution in a group project does not diminish teammates. It helps the interviewer understand what kind of role you play in a team.
+
+### Creating Metrics When Numbers Are Scarce
+
+Portfolio projects may have few or no real users. You can still create numbers.
+
+**Types of measurable metrics:**
+
+| Category | Example Metrics | How to Measure |
+| --- | --- | --- |
+| Performance | Response time, throughput | k6, locust, time command |
+| Quality | Test coverage, lint pass rate | pytest --cov, ruff |
+| Scale | Lines of code, number of endpoints | cloc, manual count |
+| Efficiency | Dev time, commit count, PR count | git log --oneline \| wc -l |
+| Automation | CI build time, deployment frequency | GitHub Actions logs |
+
+```bash
+# Example: collect project metrics
+echo "=== Project Scale ==="
+cloc src/ --quiet
+echo ""
+echo "=== Test Coverage ==="
+pytest --cov=src --cov-report=term-missing --quiet 2>/dev/null | tail -3
+echo ""
+echo "=== Development Timeline ==="
+git log --format='%ai' | tail -1  # first commit
+git log --format='%ai' | head -1  # last commit
+echo ""
+echo "=== Commit Count ==="
+git log --oneline | wc -l
+```
+
+In an interview, you might say:
+
+- "I completed the MVP in two weeks with 87 commits."
+- "I maintained 82% test coverage across 12 API endpoints."
+- "I load-tested with k6 and confirmed the system handles 50 concurrent users with response times under 200ms."
+
+The size of the number matters less than the fact that you measured. "Performance is good" is a subjective claim, but "120ms average response time" is evidence. That shift changes how the interviewer hears your answer.
+
+As a bonus, if you forget the exact number on interview day, storing metrics in your README or ADRs reduces prep time significantly. And if you include measurement scripts in your CI, the numbers update on every deploy—no need to measure again the day before the interview.
+
+Interviews are ultimately a trust game. Numbers are the fastest tool to build it.
+
+### Demo Video Script Structure (for Interview Submission)
+
+More and more interviews now ask for a 2–3 minute demo video alongside your portfolio link. The video should show problem-solving narrative rather than feature listing.
+
+| Segment | Time | Core Message |
+| --- | --- | --- |
+| Opening | 20s | What problem does the project solve |
+| Core demo | 90s | The actual change the user sees |
+| Technical choice | 40s | Why you chose this architecture |
+| Results and learning | 30s | Metrics and next improvement ideas |
+
+```markdown
+Opening example:
+"I built this project to solve the problem of team schedules scattered across tools, which was eating up prep time for planning meetings."
+```
+
+This script is STAR-compatible. The structure you demonstrate in the video can be reused directly in the interview, reducing prep overhead.
+
+### Presentation Slide Structure (5-slide template)
+
+When an interview includes a presentation, slide density matters more than slide count. The 5-slide structure below is recommended:
+
+1. Problem definition: user, situation, inconvenience
+2. Solution approach: scope and architecture choices
+3. Core demo: the most critical user flow
+4. Results metrics: performance or usability improvement
+5. Retrospective: trade-offs and next steps
+
+| Slide | Include | Avoid |
+| --- | --- | --- |
+| Problem | Real user quote | List of tech stack |
+| Approach | Three decision criteria | Too many code screenshots |
+| Results | Before/after metrics | Vague "improved" language |
+
+Slides exist to invite good questions, not to hide depth. When you show core decisions upfront, follow-up questions tend to be more meaningful.
+
+### Expected Follow-up Questions Reference Table
+
+Interview prep is more effective with question taxonomy than memorization. Prepare basic answer axes by question type, and you can maintain structure even under pressure.
+
+| Question Type | Example | Answer Axis |
+| --- | --- | --- |
+| Problem definition | Why did you pick this problem? | User pain + scope impact |
+| Tech choice | Why FastAPI? | Constraints + alternative comparison |
+| Quality | How did you structure tests? | Unit / integration / CI flow |
+| Operations | What if deployment fails? | Runbook + rollback procedure |
+| Growth | What is next? | Priority + risk |
+
+With this table as a foundation, prepare two versions of each answer—a 1-minute version and a 3-minute version—and you can handle most interview formats. The interviewer's follow-ups will often fall into these buckets, so your prep translates directly.
+
+### 2-Minute Answer Template (structure, not memorization)
+
+In interviews, remember structure, not words. Fill in the template below with your project, and you can answer most opening questions:
+
+```markdown
+[Situation] One sentence about what user or team pain existed.
+[Task] One sentence about the goal.
+[Action] Two core choices + one reason.
+[Result] One or two metrics.
+[Lesson] One sentence about what you'd carry forward.
+```
+
+### Interview Type Strategy: Technical vs. Behavioral
+
+The same project emphasizes different things depending on interview type.
+
+| Aspect | Technical | Behavioral |
+| --- | --- | --- |
+| Core message | Architecture decisions and technical depth | Collaboration, overcoming challenges, growth |
+| Code mention | Handling logic, design choices | Minimal (context only) |
+| Metrics focus | Performance, reliability, scalability | User impact, team contribution |
+| Trade-offs | Technical alternatives | Priority decisions |
+| Expected follow-up | "How would you scale?" "How would you handle failure?" | "Any conflicts?" "What if you failed?" |
+
+To handle both, prepare two versions of your answer: the technical version emphasizes "why this architecture", the behavioral version emphasizes "what challenges did I overcome and what did I learn".
+
+### The Structure for "I Don't Know"
+
+When an unexpected question comes up in an interview, ending with "I don't know" closes the conversation. This structure keeps it open:
+
+```text
+1. Admit honestly: "I haven't had experience with that yet."
+2. Connect a similar experience: "But I have worked with..."
+3. Show learning intent: "Next, I'd explore..."
+```
+
+Example:
+- "I haven't handled large-scale traffic. However, I kept response time at 120ms for 30 concurrent users, and if scaling were needed, I'd start by adding a cache layer."
+
+This reframes "I don't know" as "I haven't had that experience, but I know how to learn."
+
+
 ## Answering the Opening Questions
 
 - **What do interviewers usually want to hear before they care about implementation detail?**
