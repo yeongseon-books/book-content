@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Software Engineering 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/01/01-01-concept-at-a-glance.ko.png)
 *Software Engineering 101 1장 흐름 개요*
 
+> 엔지니어링은 '코드를 쓸 수 있는가'가 아니라 '시간과 사람의 변화 속에서도 시스템을 운영 가능한 상태로 유지할 수 있는가'에 대한 답입니다 — 같은 함수 하나도 요구사항·테스트·배포·운영·문서까지 함께 책임져야 비로소 엔지니어링이라는 말이 맞아집니다.
+
 ## 먼저 던지는 질문
 
 - 코드를 작성하는 일과 소프트웨어 엔지니어링은 무엇이 다를까요?

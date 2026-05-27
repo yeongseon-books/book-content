@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Software Engineering 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/07/07-01-concept-at-a-glance.ko.png)
 *Software Engineering 101 7장 흐름 개요*
 
+> 문서화는 친절의 문제가 아니라 비동기 협업의 기반입니다 — 코드만으로는 '왜 이렇게 만들었는가·언제 따라야 하는가·새 사람이 어디서 시작해야 하는가'를 설명할 수 없고, 이 정보가 특정 사람을 거쳐서만 흐르는 순간 팀 속도가 한 사람의 일정에 묶입니다.
+
 ## 먼저 던지는 질문
 
 - 좋은 README는 최소한 어떤 블록을 가져야 할까요?

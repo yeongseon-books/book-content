@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Software Engineering 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/10/10-01-concept-at-a-glance.ko.png)
 *Software Engineering 101 10장 흐름 개요*
 
+> 기능이 동작하는 소프트웨어와 좋은 소프트웨어는 같은 말이 아닙니다 — 좋은 소프트웨어의 신호는 코드 스타일이 아니라 변경 리드 타임·사고 복구 속도·신규 입사자 적응 시간처럼 코드 바깥에서 드러나고, 품질은 내부 구조와 외부 결과가 함께 맞을 때 성립합니다.
+
 ## 먼저 던지는 질문
 
 - 좋은 코드와 좋은 소프트웨어는 왜 같은 말이 아닐까요?

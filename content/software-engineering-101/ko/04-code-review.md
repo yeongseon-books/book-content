@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Software Engineering 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/04/04-01-concept-at-a-glance.ko.png)
 *Software Engineering 101 4장 흐름 개요*
 
+> 좋은 코드 리뷰는 판결문이 아니라 합의 과정입니다 — 버그 발견뿐 아니라 변경의 의도·시스템 경계 영향·팀의 향후 이해 가능성을 함께 점검해야, 리뷰가 형식적 절차로 무너지지 않습니다.
+
 ## 먼저 던지는 질문
 
 - 코드 리뷰는 결함 탐지와 지식 공유 중 무엇이 더 중요할까요?

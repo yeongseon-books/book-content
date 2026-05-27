@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Software Engineering 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/03/03-01-concept-at-a-glance.ko.png)
 *Software Engineering 101 3장 흐름 개요*
 
+> 설계와 구현은 같은 일이 아닙니다 — 설계는 '무엇을 분리하고 어느 책임을 어디에 둘 것인가'를 정하는 단계이고, 이 질문이 코드 안에 묻혀 버리면 잘 작성된 코드도 왜 그렇게 만들었는지 설명하기 어려운 시스템이 됩니다.
+
 ## 먼저 던지는 질문
 
 - 잘 작성된 코드와 잘 설계된 시스템은 무엇이 다를까요?

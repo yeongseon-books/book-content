@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Software Engineering 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/02/02-01-concept-at-a-glance.ko.png)
 *Software Engineering 101 2장 흐름 개요*
 
+> 요구사항은 익숙한 말일수록 사람마다 다른 그림을 떠올립니다 — PM·디자이너·개발자·운영의 완료 기준을 한 문서 위에 명시적으로 일치시키지 않으면, 초반의 작은 오해가 나중에 구조·테스트·릴리스 전체를 다시 쓰게 만듭니다.
+
 ## 먼저 던지는 질문
 
 - 좋은 요구사항은 어떤 조건을 만족해야 할까요?

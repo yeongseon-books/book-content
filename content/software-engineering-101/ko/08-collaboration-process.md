@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Software Engineering 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/08/08-01-concept-at-a-glance.ko.png)
 *Software Engineering 101 8장 흐름 개요*
 
+> 좋은 협업 프로세스는 사람의 시간을 보호하고 결정의 흔적을 남깁니다 — 회의를 늘리는 것이 협업이 아니라, 동기식 대화를 정말 필요한 순간에만 쓰고 나머지는 기록과 비동기로 흐르게 만드는 것이 핵심입니다.
+
 ## 먼저 던지는 질문
 
 - RFC는 어떤 구조로 쓰면 충분할까요?

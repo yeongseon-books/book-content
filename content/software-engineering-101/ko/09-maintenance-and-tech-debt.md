@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Software Engineering 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/09/09-01-concept-at-a-glance.ko.png)
 *Software Engineering 101 9장 흐름 개요*
 
+> 기술부채는 존재 자체가 문제가 아니라 의식하지 못한 채 쌓이는 것이 문제입니다 — 의도적으로 진 빚인지, 누가 언제 갚을지 정해졌는지, 측정 가능한 항목으로 추적되는지 — 이 세 질문이 부채와 사고를 가르는 기준선입니다.
+
 ## 먼저 던지는 질문
 
 - 기술부채는 언제 도구이고, 언제 사고의 씨앗이 될까요?

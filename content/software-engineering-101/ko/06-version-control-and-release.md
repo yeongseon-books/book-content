@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Software Engineering 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/software-engineering-101/06/06-01-concept-at-a-glance.ko.png)
 *Software Engineering 101 6장 흐름 개요*
 
+> 릴리스는 한 번의 이벤트가 아니라 회복 가능한 과정입니다 — 작게 자주 보내고, 카나리로 먼저 노출하고, 신호가 나쁘면 즉시 되돌릴 수 있어야 사용자 신뢰가 실제로 형성됩니다.
+
 ## 먼저 던지는 질문
 
 - 브랜치 전략은 언제 trunk-based가 맞고, 언제 Git Flow가 맞을까요?
