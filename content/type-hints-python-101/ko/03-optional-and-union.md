@@ -31,6 +31,8 @@ last_reviewed: '2026-05-12'
 ![Type Hints in Python 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/03/03-01-big-picture.ko.png)
 *Type Hints in Python 101 3장 흐름 개요*
 
+> `Optional`과 `Union`은 '값이 없을 수도 있다·여러 형태일 수 있다'는 가능 범위를 타입에 명시적으로 적는 도구입니다 — 적지 않으면 가장 흔한 None/타입 분기 버그가 조용히 숨어듭니다.
+
 ## 먼저 던지는 질문
 
 - 반환값이 `None`일 수 있다는 사실을 타입에 어떻게 드러낼까요?

@@ -31,6 +31,8 @@ last_reviewed: '2026-05-15'
 ![Type Hints in Python 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/07/07-01-concept-at-a-glance.ko.png)
 *Type Hints in Python 101 7장 흐름 개요*
 
+> Generic은 '여러 타입에 재사용되지만 입력과 출력의 타입 관계는 유지해야 하는' 함수·클래스를 적기 위한 장치입니다 — `Any`로 도망가면 정보가 사라지고, 타입별로 함수를 복제하면 코드가 늘어나는 두 실패 모드를 한 번에 해결합니다.
+
 ## 먼저 던지는 질문
 
 - 입력 타입을 그대로 반환 타입에 연결하려면 어떻게 적을까요?

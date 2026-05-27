@@ -31,6 +31,8 @@ last_reviewed: '2026-05-12'
 ![Type Hints in Python 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/02/02-01-big-picture.ko.png)
 *Type Hints in Python 101 2장 흐름 개요*
 
+> 타입 힌트는 컨테이너 안쪽 타입까지 적어야 비로소 문서 수준에서 실제 오류 방지 도구로 바뀝니다 — `list`만 적는 것과 `list[User]`로 적는 것은 정적 검사기에게 완전히 다른 정보입니다.
+
 ## 먼저 던지는 질문
 
 - `int`, `str`, `float`, `bool`, `bytes`, `None`은 어떻게 적을까요?

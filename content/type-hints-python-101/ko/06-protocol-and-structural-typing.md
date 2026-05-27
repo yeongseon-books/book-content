@@ -31,6 +31,8 @@ Python은 오래전부터 덕 타이핑을 써 왔습니다. `close()`가 있으
 ![Type Hints in Python 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/06/06-01-concept-at-a-glance.ko.png)
 *Type Hints in Python 101 6장 흐름 개요*
 
+> Python의 덕 타이핑을 명시적 상속 없이 그대로 타입 시스템에 옮긴 것이 `Protocol`입니다 — '이 메서드만 있으면 충분하다'는 계약을 그대로 적을 수 있고, 그것이 구조적 타이핑의 의미입니다.
+
 ## 먼저 던지는 질문
 
 - 상속 없이 인터페이스 계약을 적을 수 있을까요?

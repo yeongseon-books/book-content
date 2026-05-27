@@ -31,6 +31,8 @@ last_reviewed: '2026-05-17'
 ![Type Hints in Python 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/08/08-01-concept-at-a-glance.ko.png)
 *Type Hints in Python 101 8장 흐름 개요*
 
+> 타입 힌트는 검사기를 돌리지 않으면 문서에만 머뭅니다 — mypy·pyright를 CI 게이트로 연결해야 비로소 계약이 강제되고, 설정은 점진적으로 strict로 끌어올리는 것이 현실적인 길입니다.
+
 ## 먼저 던지는 질문
 
 - 타입 힌트를 코드 실행 없이 어떻게 검증할까요?

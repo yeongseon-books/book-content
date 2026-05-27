@@ -31,6 +31,8 @@ last_reviewed: '2026-05-12'
 ![Type Hints in Python 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/05/05-01-big-picture.ko.png)
 *Type Hints in Python 101 5장 흐름 개요*
 
+> `dict[str, Any]`의 편함은 키 구조·값 타입·도메인 의미를 동시에 숨깁니다 — `TypedDict`는 딕셔너리 모양을 유지하면서 키 계약을 고정하고, `dataclass`는 동작을 가진 구조화 객체로 한 단계 끌어올립니다.
+
 ## 먼저 던지는 질문
 
 - 이름 있는 키와 값 타입을 가진 딕셔너리는 어떻게 표현할까요?

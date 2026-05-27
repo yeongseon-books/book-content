@@ -30,6 +30,8 @@ last_reviewed: '2026-05-17'
 ![Type Hints in Python 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/10/10-01-big-picture.ko.png)
 *Type Hints in Python 101 10장 흐름 개요*
 
+> 타입 힌트는 양이 아니라 위치가 핵심입니다 — 공개 시그니처와 모듈 경계를 먼저 단단히 하고, 내부 구현은 나중에 따라오게 하는 순서가 mypy·Pydantic이 실제로 힘을 쓸 수 있는 조건입니다.
+
 ## 먼저 던지는 질문
 
 - 타입 힌트는 어디에 먼저 붙여야 투자 대비 효과가 클까요?

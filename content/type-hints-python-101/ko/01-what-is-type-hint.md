@@ -31,6 +31,8 @@ last_reviewed: '2026-05-12'
 ![Type Hints in Python 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/01/01-01-big-picture.ko.png)
 *Type Hints in Python 101 1장 흐름 개요*
 
+> 타입 힌트는 Python의 동적 타이핑을 막는 것이 아니라, 호출자가 시그니처만 보고도 함수의 입·출력 계약을 읽을 수 있게 만드는 문서이자 정적 검사 대상입니다 — 코드가 여러 파일을 오갈수록 가치가 가파르게 드러납니다.
+
 ## 먼저 던지는 질문
 
 - 타입 힌트는 정적 타입 언어의 타입 선언과 무엇이 다를까요?

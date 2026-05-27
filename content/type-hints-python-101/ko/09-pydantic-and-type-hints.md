@@ -31,6 +31,8 @@ last_reviewed: '2026-05-17'
 ![Type Hints in Python 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/type-hints-python-101/09/09-01-big-picture.ko.png)
 *Type Hints in Python 101 9장 흐름 개요*
 
+> 정적 검사는 코드 안쪽을 지키지만 외부에서 들어오는 데이터는 런타임 경계에서 막아야 합니다 — Pydantic은 같은 타입 힌트를 런타임 검증으로 바꿔 잘못된 요청을 422로 거절하고 올바른 요청만 안쪽으로 통과시킵니다.
+
 ## 먼저 던지는 질문
 
 - 타입 힌트를 런타임 검증으로 어떻게 연결할 수 있을까요?
