@@ -29,6 +29,7 @@ This is the 4th post in the Design Patterns 101 series. Strategy and Observer ea
 
 ![Behavioral pattern responsibility flow](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/04/04-01-concept-at-a-glance.en.png)
 *Responsibility distribution in behavioral patterns — algorithm swap, event propagation, request objectification, state transition, traversal abstraction*
+> Behavioral patterns describe how objects collaborate at runtime — who initiates, who responds, who carries state — so responsibility flows cleanly through the system.
 
 ## Questions to Keep in Mind
 

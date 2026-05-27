@@ -30,6 +30,7 @@ GoF 책이 나온 1994년, 저자들이 주로 쓰던 언어는 C++과 Smalltalk
 ![Design Patterns 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/10/10-01-concept-at-a-glance.ko.png)
 
 *GoF 클래스 구조에서 Python 네이티브 표현으로의 전환 흐름*
+> GoF의 많은 패턴이 Python에서 단 한 줄로 줄어드는 이유는, 일급 함수·데코레이터·프로토콜이 정적 언어가 패턴으로 우회하던 문제를 이미 언어 차원에서 해결하기 때문입니다.
 
 ## 먼저 던지는 질문
 

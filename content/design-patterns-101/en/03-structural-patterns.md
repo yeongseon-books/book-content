@@ -30,6 +30,7 @@ This is the 3rd post in the Design Patterns 101 series. It covers Adapter, Bridg
 ![Structural pattern responsibility boundaries](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/03/03-01-concept-at-a-glance.en.png)
 
 *The boundary structural patterns create between caller and implementation*
+> Structural patterns are about how classes and objects fit together, so a system can grow without rewiring every connection.
 
 ## Questions to Keep in Mind
 

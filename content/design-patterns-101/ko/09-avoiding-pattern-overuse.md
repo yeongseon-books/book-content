@@ -30,6 +30,7 @@ last_reviewed: '2026-05-23'
 ![패턴 과잉 적용에서 단순 코드로 되돌리는 흐름](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/09/09-01-concept-at-a-glance.ko.png)
 
 *패턴 과잉 적용의 신호를 인식하고 단순 코드로 되돌리는 판단 흐름*
+> 패턴은 자신이 추가하는 복잡도보다 더 큰 고통을 덜어 줄 때만 가치 있고, 모든 간접화 계층은 유연성·테스트성·명료함 중 하나로 비용을 지불해야 합니다.
 
 ## 먼저 던지는 질문
 

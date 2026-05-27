@@ -29,6 +29,7 @@ last_reviewed: '2026-05-23'
 
 ![Observer 패턴 발행자와 구독자의 결합 끊기](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/07/07-01-concept-at-a-glance.ko.png)
 *발행자가 구독자를 모르는 상태에서 이벤트를 전파하는 구조*
+> Observer 패턴은 '무슨 일이 일어났다'와 '누가 그것에 반응하는가'를 떼어 놓아, 송신자는 수신자를 모르고 수신자는 송신자를 소유하지 않습니다.
 
 ## 먼저 던지는 질문
 

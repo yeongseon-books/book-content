@@ -29,6 +29,7 @@ last_reviewed: '2026-05-23'
 
 ![Design Patterns 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/06/06-01-concept-at-a-glance.ko.png)
 *외부 SDK 호출이 Adapter 경계를 거쳐 도메인에 도달하는 흐름*
+> Adapter 패턴은 어느 한쪽도 다시 쓰지 않고, 거의 맞지만 정확히는 다른 두 인터페이스 사이에 얇은 번역기를 끼워 넣는 도구입니다.
 
 ## 먼저 던지는 질문
 

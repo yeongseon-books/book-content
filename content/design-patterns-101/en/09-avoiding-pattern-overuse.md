@@ -30,6 +30,7 @@ This is the 9th post in the Design Patterns 101 series. It explores why knowing 
 ![Flow from pattern overuse back to simple code](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/09/09-01-concept-at-a-glance.en.png)
 
 *Recognizing the signals of pattern overuse and the decision flow back to simple code*
+> A pattern earns its keep only when it removes more pain than the pattern itself adds — every layer of indirection has to pay rent in flexibility, testability, or clarity.
 
 ## Questions to Keep in Mind
 

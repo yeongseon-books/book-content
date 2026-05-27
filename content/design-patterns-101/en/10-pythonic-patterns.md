@@ -30,6 +30,7 @@ This is the final post in the Design Patterns 101 series. It closes with a singl
 ![Design Patterns 101 chapter 10 concept overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/10/10-01-concept-at-a-glance.en.png)
 
 *Transition flow from GoF class structures to Python-native expressions*
+> Many classic GoF patterns shrink to one line in Python because first-class functions, decorators, and protocols already give you what the pattern was working around in static languages.
 
 ## Questions to Keep in Mind
 

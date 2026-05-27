@@ -29,6 +29,7 @@ This is the 6th post in the Design Patterns 101 series. Article 3 introduced Ada
 
 ![Design Patterns 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/06/06-01-concept-at-a-glance.en.png)
 *How an external SDK call passes through the Adapter boundary to reach the domain*
+> The Adapter pattern keeps you from rewriting either side of a mismatched interface; it slips a thin translator between two contracts that almost — but not quite — agree.
 
 ## Questions to Keep in Mind
 

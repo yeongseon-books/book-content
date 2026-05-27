@@ -30,6 +30,7 @@ last_reviewed: '2026-05-23'
 ![Structural 패턴 책임 경계](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/03/03-01-concept-at-a-glance.ko.png)
 
 *호출자와 구현 사이에 구조 패턴이 만드는 경계*
+> Structural 패턴은 클래스와 객체를 어떻게 조합하느냐에 관한 것이라, 시스템이 커져도 모든 연결을 다시 잇지 않아도 됩니다.
 
 ## 먼저 던지는 질문
 

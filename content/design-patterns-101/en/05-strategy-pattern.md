@@ -29,6 +29,7 @@ This is the 5th post in the Design Patterns 101 series.
 
 ![Strategy pattern structure](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/05/05-01-concept-at-a-glance.en.png)
 *Context depends only on the Strategy interface; concrete algorithms are replaced independently*
+> The Strategy pattern turns an `if/elif` chain over algorithms into a swappable object — adding a new algorithm means writing a new class instead of editing an old function.
 
 ## Questions to Keep in Mind
 

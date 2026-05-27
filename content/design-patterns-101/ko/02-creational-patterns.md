@@ -30,6 +30,7 @@ last_reviewed: '2026-05-23'
 ![Creational 패턴 다섯 가지의 책임 경계](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/02/02-01-concept-at-a-glance.ko.png)
 
 *다섯 Creational 패턴이 각각 담당하는 생성 책임의 범위*
+> Creational 패턴은 객체를 만드는 복잡한 과정을 숨겨, 호출하는 쪽이 '어떻게 만들지'가 아니라 '무엇이 필요한지'에 집중하게 합니다.
 
 ## 먼저 던지는 질문
 

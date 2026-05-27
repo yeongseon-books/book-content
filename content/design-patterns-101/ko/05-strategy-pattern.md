@@ -29,6 +29,7 @@ last_reviewed: '2026-05-23'
 
 ![Strategy 패턴 구조](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/05/05-01-concept-at-a-glance.ko.png)
 *Context가 Strategy 인터페이스에만 의존하고, 구체 알고리즘은 독립적으로 교체되는 구조*
+> Strategy 패턴은 알고리즘마다 분기되던 `if/elif` 체인을 교체 가능한 객체로 바꿔, 새 알고리즘을 추가할 때 기존 함수를 고치지 않고 새 클래스를 하나 추가하게 합니다.
 
 ## 먼저 던지는 질문
 

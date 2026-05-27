@@ -29,6 +29,7 @@ This is the 7th post in the Design Patterns 101 series. Article 4 introduced Obs
 
 ![Observer pattern: decoupling publisher from subscribers](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/07/07-01-concept-at-a-glance.en.png)
 *A publisher propagates events without knowing who listens*
+> The Observer pattern decouples 'something happened' from 'who cares' — the source publishes events without knowing its listeners, and listeners subscribe without owning the source.
 
 ## Questions to Keep in Mind
 

@@ -30,6 +30,7 @@ This is the 2nd post in the Design Patterns 101 series. It covers the five Creat
 ![Responsibility boundaries of the five Creational patterns](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/02/02-01-concept-at-a-glance.en.png)
 
 *The scope of creation responsibility each Creational pattern owns*
+> Creational patterns hide the messy work of building objects so the calling code can stay focused on what it needs, not on how to construct it.
 
 ## Questions to Keep in Mind
 

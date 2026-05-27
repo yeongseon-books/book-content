@@ -30,6 +30,7 @@ This is the 8th post in the Design Patterns 101 series. In article 2, Factory Me
 ![Assembly flow from Factory to Composition Root](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/08/08-01-concept-at-a-glance.en.png)
 
 *How assembly responsibility migrates out of domain code*
+> Factory and DI both answer the same question — 'who builds this object?' — by moving construction out of the code that uses the object, so testability and configurability stop fighting each other.
 
 ## Questions to Keep in Mind
 

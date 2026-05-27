@@ -29,6 +29,7 @@ last_reviewed: '2026-05-23'
 
 ![행위 패턴 책임 흐름](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/04/04-01-concept-at-a-glance.ko.png)
 *행위 패턴이 다루는 책임 분배 — 알고리즘 교체, 이벤트 전파, 요청 객체화, 상태 전이, 순회 추상화*
+> Behavioral 패턴은 런타임에 객체들이 어떻게 협업하는지를 다루고, 누가 시작하고 누가 응답하며 누가 상태를 들고 가는지를 깔끔하게 정리합니다.
 
 ## 먼저 던지는 질문
 

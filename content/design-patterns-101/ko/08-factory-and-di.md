@@ -30,6 +30,7 @@ last_reviewed: '2026-05-23'
 ![Factory에서 Composition Root까지의 조립 흐름](https://yeongseon-books.github.io/book-public-assets/assets/design-patterns-101/08/08-01-concept-at-a-glance.ko.png)
 
 *조립 책임이 도메인 밖으로 빠져나가는 과정*
+> Factory와 DI는 둘 다 '누가 이 객체를 만드는가?'라는 같은 질문에 답하면서, 객체 생성을 객체를 쓰는 자리 바깥으로 옮겨 테스트성과 설정 가능성을 동시에 살립니다.
 
 ## 먼저 던지는 질문
 
