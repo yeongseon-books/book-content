@@ -156,15 +156,312 @@ Portfolio deployment does not require giant infrastructure. A public URL, separa
 
 Next, we will turn that trust into explicit proof through tests, documentation, and automated verification.
 
+### CI/CD Pipeline YAML Example
+
+To raise deployment quality, you need "verified then deployed on every code change" rather than "deployed once successfully." The example below is a minimal CI/CD pipeline structure suitable for portfolio projects.
+
+```yaml
+name: ci-cd
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - run: pytest -q
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t app:${{ github.sha }} .
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - run: ./scripts/deploy.sh
+```
+
+The key is ordering. Tests gate the build, and builds gate the deploy. This alone dramatically reduces demo outages.
+
+### Test Strategy Table
+
+Writing many tests matters less than deciding which failures get caught where.
+
+| Test Type | Purpose | Example | When |
+| --- | --- | --- | --- |
+| Unit test | Catch logic errors early | Date normalization function | Every PR |
+| Integration test | Verify API-DB boundary | `/healthz`, `/schedule` responses | Every PR |
+| Smoke test | Confirm survival post-deploy | Main page and health check | Right after deploy |
+| Regression check | Preserve critical flows | Login-query-share scenario | Before release |
+
+Including this table in README or `docs/testing.md` signals that verification is designed, not accidental.
+
+### Deploy Failure Runbook (Minimal Version)
+
+A short runbook prevents panic when deploys fail. Even basic step-by-step checkpoints speed up problem classification.
+
+```markdown
+## Deploy Failure Runbook
+1. Check if CI test job failed
+2. Review Docker build logs for dependency/network errors
+3. Verify no environment variables are missing on the platform
+4. Check `/healthz` status code and response body
+5. Roll back to last known-good version
+```
+
+A runbook in a portfolio project is not overkill. It is strong evidence of operational thinking. Even a small project looks notably more complete when it has failure-handling standards.
+
+### Environment Variable Management Guide
+
+Environment variables are not just configuration. They are the boundary between security and operational quality.
+
+| Category | Example | Storage | Note |
+| --- | --- | --- | --- |
+| Secrets | SECRET_KEY, DB_PASSWORD | Platform secrets | Never commit to repo |
+| Per-environment | APP_ENV, LOG_LEVEL | Separate dev/prod | Specify defaults |
+| Public values | FEATURE_FLAG | Config file/docs | Explain purpose |
+
+```markdown
+.env.example principles
+- Use placeholders instead of real passwords
+- Separate required vs optional variables
+- Describe expected format and type
+```
+
+This organization alone dramatically speeds up migration to new environments and simplifies failure root-cause analysis.
+
+### Full GitHub Actions Deploy Pipeline
+
+A complete CI/CD setup for a FastAPI app deployed to Render:
+
+```yaml
+# .github/workflows/deploy.yml
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  PYTHON_VERSION: '3.11'
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Type check
+        run: mypy src/
+
+      - name: Test
+        run: pytest --cov=src --cov-report=xml
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          file: coverage.xml
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} .
+          docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy to Render
+        run: |
+          curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
+
+      - name: Wait for deploy
+        run: sleep 30
+
+      - name: Health check
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" ${{ secrets.APP_URL }}/healthz)
+          if [ "$STATUS" != "200" ]; then
+            echo "Deploy failed! Health check returned $STATUS"
+            exit 1
+          fi
+```
+
+The pipeline separates into three stages: test → build → deploy. If an earlier stage fails, later stages do not run. PRs run only tests; build/deploy trigger only on main push.
+
+### Dockerfile Basics
+
+A deployable project needs a Dockerfile. Below is a baseline for a FastAPI project.
+
+```dockerfile
+# Dockerfile
+FROM python:3.11-slim AS base
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY src/ ./src/
+COPY scripts/seed_demo_data.py ./scripts/
+
+# Generate demo seed data
+RUN python scripts/seed_demo_data.py
+
+EXPOSE 8000
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+Key points:
+
+1. **Slim image**: Smaller image means faster deploys.
+2. **Copy requirements.txt first**: Layer caching shortens build time.
+3. **Include seed data**: Prevents an empty screen in the demo environment.
+4. **Explicit port**: Documents which port the app uses.
+
+### Health Check Endpoint
+
+A health check endpoint is simple but high-impact:
+
+```python
+# src/health.py
+from fastapi import APIRouter
+
+router = APIRouter()
+
+
+@router.get("/healthz")
+def health_check():
+    return {"status": "ok", "version": "1.0.0"}
+```
+
+With this endpoint, CI/CD can automatically determine deploy success, and monitoring tools can detect downtime.
+
+### Hosting Cost Comparison
+
+Portfolio projects need to stay alive long-term, so cost matters. Most portfolio projects fit within free tiers.
+
+| Platform | Free Tier | Limitations | Best For |
+| --- | --- | --- | --- |
+| Vercel | Unlimited deploys | Serverless/static only | Frontend, Next.js |
+| Render | 750 hrs/month | Sleeps after 15 min inactivity | API servers |
+| Railway | $5 credit/month | Stops when exhausted | Full-stack |
+| Fly.io | 3 VMs | 256 MB RAM | Container-based |
+| GitHub Pages | Unlimited | Static sites only | Portfolio website |
+
+Recommended strategy: Vercel for frontend, Render or Railway for API, GitHub Pages for portfolio website. This runs at $0/month. Migrate when you actually hit limits.
+
+### Post-Deploy Checklist
+
+After deploy completes, verify in this order:
+
+```text
+[ ] Public URL loads first screen
+[ ] Health check endpoint returns 200
+[ ] No missing environment variables (check error logs)
+[ ] HTTPS applied (browser lock icon visible)
+[ ] Seed data displays correctly
+[ ] README demo URL matches deployed URL
+[ ] Mobile layout renders properly
+```
+
+Passing this checklist means the project meets minimum requirements as a deployed artifact. Recording this in the README shows reviewers your operational perspective.
+
+### Docker Compose for Local/Production Parity
+
+"Works on my machine" problems almost always come from environment differences. Docker Compose minimizes the gap between local and production.
+
+```yaml
+# docker-compose.yml
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://user:pass@db:5432/portfolio
+      - APP_ENV=development
+      - SECRET_KEY=${SECRET_KEY:-dev-secret-key}
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: portfolio
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user"]
+      interval: 5s
+      retries: 3
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
+```
+
+Add this to your README and anyone can reproduce the same environment:
+
+```bash
+# Local run (3 steps)
+git clone https://github.com/username/task-tracker.git
+cd task-tracker
+docker compose up --build
+# Verify at http://localhost:8000
+```
+
+The advantage is that dependency versions, OS, and runtime differences are all isolated in containers. It eliminates "works on my machine" conversations entirely.
+
 ## Answering the Opening Questions
 
 - **Why is a public URL close to mandatory for a portfolio project?**
-  - The article treats Deploying the Project as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - Without a URL, the reviewer cannot verify the project independently. A portfolio becomes evidence only when another person can inspect the result without the author present.
 - **What should you optimize for when choosing a hosting platform?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - Simplicity, cost sustainability, and redeploy speed. A platform you can afford to keep running and update easily is better than one that sounds impressive but costs too much to maintain.
 - **Why should secrets and environment configuration live outside the codebase?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+  - Public repositories are visible to everyone. Secrets in code are security incidents waiting to happen. Separation also enables distinct local/test/production configurations from the same codebase.
 <!-- toc:begin -->
 ## In this series
 

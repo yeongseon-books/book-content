@@ -165,15 +165,312 @@ A README is not just a summary page. It is the first user experience of the proj
 
 Next, we will move from the repository to the product surface itself and look at how to build a demo that reveals value quickly.
 
+### README Structure Template (Copy-Paste Starter)
+
+A README is the first screen where a visitor evaluates your project. Information placement matters more than document length. The template below contains the minimum structure a portfolio project needs and can be applied directly to any repository.
+
+```markdown
+# Project Name
+
+One-line intro: explain what user problem this project solves in a single sentence.
+
+## Demo
+- Live: https://...
+- Video: https://...
+- Test Account: guest@example.com / demo1234
+
+## Problem
+- User situation
+- Pain point with current approach
+- Goal of this project
+
+## Solution
+- Three core features
+- Brief rationale for tech choices
+
+## Tech Stack
+- Backend: FastAPI
+- DB: PostgreSQL
+- Infra: Docker, Render
+
+## Run Locally
+```bash
+cp .env.example .env
+docker compose up --build
+```
+
+## Test
+```bash
+pytest -q
+```
+
+## Roadmap
+- [x] MVP
+- [ ] Notification
+- [ ] Audit log
+```
+
+The key point of this template is following the reader's question order. What is this, does it work, why is it needed, how do I run it, and how far along is it. Answering those in sequence makes the README much stronger.
+
+### Good README vs Weak README Comparison
+
+The comparison below shows how document structure changes perception of the same project.
+
+| Aspect | Weak README | Good README |
+| --- | --- | --- |
+| Opening line | Technology-focused | Problem and user focused |
+| Demo info | Missing or buried at bottom | Immediately visible at top |
+| Run path | Missing or long paragraph | Copy-paste command block |
+| Current state | Packaged to look complete | Done/not-done clearly separated |
+| Verification | No test info | Test command and status included |
+
+A good README does not need fancy prose. It needs to make "what should I do next" immediately clear to the visitor.
+
+### README Quality Checkpoint
+
+After writing your README, use these five items as a self-check:
+
+1. Is the problem and demo link visible within 5 lines below the title?
+2. Does local setup finish in 3 steps or fewer?
+3. Does the environment variable description match `.env.example`?
+4. Is there a link to verify test/deploy status?
+5. Are TODOs managed in a realistic order?
+
+When all five are met, the README becomes a reviewable project entrance rather than a simple notice. Polishing just the README before an interview often makes a surprisingly large difference in project impression.
+
+### README Refactoring Procedure (1-Hour Version)
+
+To quickly improve an existing README, follow this order:
+
+1. Read only the top 20 lines and check if problem/demo/run path are visible.
+2. If not, add a one-line problem definition and demo link below the title.
+3. Convert run instructions from paragraphs to command blocks.
+4. State current status with checkboxes.
+5. Finally, verify all links and commands by actually running them.
+
+| Check Item | Before | After |
+| --- | --- | --- |
+| First-visit readability | Low | High |
+| Run reproducibility | Unclear | Clear |
+| Project state transparency | Low | High |
+
+This procedure is short but high-impact. Once the README is organized, code review entry rates go up and project trust improves together.
+
+### README Template Variants by Project Type
+
+Not every project fits the same README structure. The sections to emphasize differ by project type.
+
+**API Server Project**
+
+```markdown
+# task-tracker-api
+
+> Solves the problem of team schedules scattered across tools, increasing lookup cost.
+
+## Demo
+- Live: https://demo.example.com
+- API Docs: https://demo.example.com/docs (Swagger UI)
+
+## Key Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | /schedules | Fetch weekly schedule |
+| POST | /schedules | Create schedule |
+| GET | /schedules/shared/{token} | Shared link lookup |
+
+## Run
+```bash
+cp .env.example .env
+docker compose up -d
+open http://localhost:8000/docs
+```
+
+## Test
+```bash
+pytest --cov=src tests/
+```
+
+## Tech Choice Rationale
+- FastAPI: auto OpenAPI docs, async support
+- PostgreSQL: complex query performance, JSON field support
+
+## Next Steps
+- [ ] Calendar sync (Google Calendar API)
+- [ ] Email notifications
+```
+
+**Data Analysis Project**
+
+```markdown
+# sales-funnel-analysis
+
+> Identifies conversion drop-off stages in a B2B SaaS funnel to guide marketing budget allocation.
+
+## Results Summary
+- Funnel stage 3 conversion: 12% → 18% (after improvement)
+- Budget reallocation reduced CAC by 23%
+
+## Data
+- Sample data: `data/sample_funnel.csv` (10,000 rows, anonymized)
+- Original: private (NDA)
+
+## Run
+```bash
+pip install -r requirements.txt
+jupyter notebook notebooks/01-eda.ipynb
+```
+
+## Analysis Flow
+1. EDA → 2. Per-stage conversion calculation → 3. Bottleneck identification → 4. Improvement proposal → 5. A/B test design
+```
+
+The difference between these two templates shows that API projects emphasize endpoints and run commands, while data analysis projects emphasize results and analysis flow. Highlighting the right sections for your project type helps visitors find key information quickly.
+
+### Portfolio Website Structure
+
+A portfolio website is a top-level document that shows multiple projects from a single entrance. Separate from a GitHub profile README, building it as a static site lets you connect context across projects.
+
+```text
+portfolio-site/
+├── index.html              # visitor entry: intro + project list
+├── projects/
+│   ├── task-tracker.html   # project detail: problem, demo, stack, result
+│   └── sales-analysis.html
+├── blog/                   # tech post links (can link to external blog)
+├── about.html              # self-intro, career, interests
+└── assets/
+    ├── screenshots/        # project screenshots
+    └── resume.pdf          # PDF resume download
+```
+
+The most important page is `index.html`. It should show a one-line intro, 2-3 featured project cards, and contact info all at once. Project detail pages are essentially web versions of the README. They follow the same problem/demo/stack/result structure but allow freer placement of screenshots and GIFs.
+
+A common mistake when building a portfolio site is spending too much time on design. The purpose is not proving design ability but improving project accessibility. A minimal site deployable on GitHub Pages or Vercel in 30 minutes is enough.
+
+### README Self-Review Checklist
+
+After writing a README, always run a self-review. Following this checklist in order catches items that are easy to miss.
+
+```text
+[Self-Review Checklist]
+
+Phase 1: First Impression (5-second test)
+  □ Can someone guess what this project does from just the name?
+  □ Does the one-line description talk about the problem/value, not technology?
+  □ Is a demo GIF or live URL visible without scrolling?
+
+Phase 2: Runnability (3-minute test)
+  □ Can someone run the project from a fresh terminal using only README commands?
+  □ Are environment variable or API key setup instructions specified?
+  □ Are Python/Node version requirements stated?
+  □ Is docker-compose up or equivalent one-command execution possible?
+
+Phase 3: Context Delivery
+  □ Is there a one-paragraph explanation of why this project was built?
+  □ Is there at least one line on why the tech stack was chosen?
+  □ Is the current state (complete/in-progress/experimental) stated?
+
+Phase 4: Structural Quality
+  □ Is there a table of contents with clickable section links?
+  □ Do code blocks have language tags?
+  □ Do images have meaningful alt text?
+  □ Are all links valid? (no 404s)
+```
+
+Adding this checklist to your PR template reduces the need for reviewers to flag README quality separately. The "5-second test" in particular simulates a hiring manager's first glance, so showing your README to a colleague for 5 seconds and asking "what does this project do?" is the most effective validation.
+
+### README Version Management
+
+A README must evolve with the code. If code is updated but the README still describes a past version, it causes confusion. Here are practical ways to keep them in sync.
+
+**Method 1: Add README item to PR checklist**
+
+```markdown
+<!-- .github/pull_request_template.md -->
+## PR Checklist
+- [ ] Updated README if code changes affect it
+- [ ] Added new environment variables to README if applicable
+- [ ] Updated README examples if API endpoints changed
+```
+
+**Method 2: Validate README in CI**
+
+```yaml
+# .github/workflows/readme-check.yml
+name: README Validation
+on: [pull_request]
+jobs:
+  check-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check README links
+        run: |
+          pip install linkchecker
+          linkchecker README.md --check-extern
+      - name: Verify install commands work
+        run: |
+          # Extract and execute install command blocks from README
+          grep -A 3 '```bash' README.md | grep -v '```' | bash
+```
+
+**Method 3: Keep a recent-changes section**
+
+Maintaining the latest 3 changes at the bottom of the README lets visitors immediately judge whether the project is active.
+
+```markdown
+## Recent Changes
+- 2024-03-15: Added OAuth2 auth, 2 new env variables
+- 2024-03-01: Python 3.12 support, minimum version raised to 3.10
+- 2024-02-20: Docker Compose config added, one-command run supported
+```
+
+The core principle of README version management is "never let the README lie." Outdated install commands, deleted endpoints, or changed environment variables left in the README erode trust.
+
+### Section Priority by Project Type
+
+Applying the same README structure to every project can bury key information. Section placement priority differs by project type.
+
+| Section | Web App | CLI Tool | Library | Data Analysis | Infra/DevOps |
+| --- | --- | --- | --- | --- | --- |
+| Demo/Screenshots | 1st | 3rd | 4th | 2nd | 5th |
+| Install/Run | 2nd | 1st | 1st | 3rd | 2nd |
+| API/Usage Examples | 3rd | 2nd | 2nd | 5th | 4th |
+| Results/Metrics | 4th | 5th | 5th | 1st | 3rd |
+| Architecture Diagram | 5th | 4th | 3rd | 4th | 1st |
+
+The key insight is placing "what a visitor most wants to check for this project type" at the top. For a web app they want to see a working screen, for a CLI tool they want to install and try it, for data analysis they want to see results first.
+
+In practice, check your project type column in the table above and place the 1st-priority section immediately below H1, the 2nd next, and so on. Sections ranked 4th-5th can move to the bottom of the README or to separate docs (e.g., `docs/architecture.md`).
+
+### Connecting GitHub Profile README to Project READMEs
+
+A GitHub profile README (`username/username` repo) is the entry point of your portfolio. You need to design the path from there to your featured project READMEs.
+
+```markdown
+<!-- GitHub Profile README example -->
+## Featured Projects
+
+| Project | Description | Stack | Status |
+|---------|-------------|-------|--------|
+| [task-tracker](link) | Real-time team task progress dashboard | FastAPI, React, PostgreSQL | Production |
+| [sales-funnel](link) | B2B SaaS funnel conversion analysis | Python, Pandas, Plotly | Complete |
+| [deploy-bot](link) | Slack chatbot for deploy automation | Python, GitHub Actions | In Progress |
+```
+
+To reduce cognitive load when visitors move from the profile README to a project README, the one-line description in the profile and the one-line description in the project README should use the same sentence. Different wording makes visitors wonder "is this the same project?"
+
+Also, keep the project count in your profile README to 3 or fewer. Listing 5+ means none stands out as a signature work. Pin your 2-3 most complete projects and align them with the profile README table for a consistent impression.
+
 ## Answering the Opening Questions
 
 - **What information should a portfolio README show first?**
-  - The article treats Writing the README as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - A one-sentence problem definition. When "what does this solve" is clear, a visitor can judge whether the repository matches their interest.
 - **Why does the order pitch → demo → stack → run → next feel easy to scan?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - It follows the visitor's natural question sequence: what is this, does it work, what is it made of, can I try it, and what is left. Each answer builds on the previous one.
 - **Why can a README still feel weak even when it contains many screenshots?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+  - Screenshots without a live link or run path are one-directional proof. The visitor cannot verify, reproduce, or explore further. A README is strong when it enables action, not just observation.
 <!-- toc:begin -->
 ## In this series
 

@@ -163,19 +163,328 @@ A small project with one unit test, one important user flow, and clear docs can 
 
 ## Wrap-up and Next Steps
 
-In a portfolio project, tests and documentation are evidence. Unit checks create the fast safety net. Integration and user-flow checks raise confidence. Docs and CI make the whole thing reusable. Together they turn “it worked once” into “it can be verified again.”
+In a portfolio project, tests and documentation are evidence. Unit checks create the fast safety net. Integration and user-flow checks raise confidence. Docs and CI make the whole thing reusable. Together they turn "it worked once" into "it can be verified again."
 
 Next, we will look at how to record the technical decisions behind the project so reviewers can see not just the result, but the judgment behind it.
+
+### Deployment Environment Comparison (Learning Projects)
+
+Test and documentation quality connects to the deployment environment. If the environment is unstable, test result confidence also wavers.
+
+| Environment | Strengths | Watch Out | Best For |
+| --- | --- | --- | --- |
+| Local Docker Compose | High reproducibility, easy team sharing | Initial setup required | Dev/integration test baseline |
+| Render/Railway | Simple deploy, easy log access | Free tier may sleep | Public demo hosting |
+| Fly.io | Container-friendly, broad operational control | Config learning curve | API-focused demos |
+| Vercel (frontend) + separate API | Fast frontend deploys | Backend separation needed | SPA demo projects |
+
+The choice is not a right-or-wrong question. The key criterion is whether you can maintain test reproducibility and documentation consistency.
+
+### Docker Configuration Example (Test-Friendly)
+
+To strengthen testing and documentation, explicitly defining container start order and health checks helps.
+
+```yaml
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d app"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: .
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+    command: bash -lc "pytest -q && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+```
+
+The advantage of this setup is automating "verify then run." If tests break, the server does not count as successfully deployed.
+
+### Minimum Documentation Set
+
+A README alone cannot adequately convey test strategy and operational judgment. Adding three documents raises project trust significantly.
+
+1. `docs/testing.md` - Test scope, run commands, failure interpretation
+2. `docs/runbook.md` - Failure check order, rollback procedure, log locations
+3. `CHANGELOG.md` - Change history and user impact
+
+```markdown
+## docs/testing.md example sections
+- Test pyramid summary
+- Local run instructions
+- Tests that only run in CI
+- Flaky test handling rules
+```
+
+This document set is also useful in interviews. It lets you explain not just "I tested" but "how I managed failures."
+
+### Test Strategy Table (Pre-Release)
+
+Even in portfolio projects, defining pre-release test criteria stabilizes quality.
+
+| Phase | Required Tests | Pass Criteria |
+| --- | --- | --- |
+| Local dev | Unit tests | All core logic passes |
+| PR review | Unit + Integration | CI green |
+| Pre-deploy | Smoke tests | Key APIs respond normally |
+| Post-deploy | Real-user scenario | Login-query-result verified |
+
+### Documentation Update Rules
+
+Docs tend to lag behind code. These rules reduce documentation debt:
+
+1. Changes affecting user behavior require simultaneous README update
+2. API schema changes require simultaneous `API.md` update
+3. Deploy process changes require simultaneous `runbook.md` update
+4. Every release adds one line to `CHANGELOG.md`
+
+These rules are effective even in small projects. Reducing doc-code mismatch quickly raises reviewer trust.
+
+Tip: adding a "documentation updated?" checkbox to your PR template helps reviewers catch missing docs naturally. One line in `.github/PULL_REQUEST_TEMPLATE.md` is all it takes.
+
+### Project Documentation Directory Structure
+
+A project with both tests and docs well-organized typically has this `docs/` structure:
+
+```text
+docs/
+├── architecture.md      # system structure, layers, data flow
+├── testing.md           # test strategy, run instructions, coverage criteria
+├── api.md               # endpoints, request/response, error codes
+├── runbook.md           # failure response order, rollback, log locations
+└── decisions/           # ADR (Architecture Decision Records)
+    ├── 001-database-choice.md
+    └── 002-auth-strategy.md
+```
+
+Each document serves a different reader:
+
+| Document | Reader | Core Question |
+| --- | --- | --- |
+| architecture.md | New joiners | "How does this system work?" |
+| testing.md | Contributors/reviewers | "How do I run the tests?" |
+| api.md | Frontend developers | "What endpoints exist?" |
+| runbook.md | Operators | "What do I do during an outage?" |
+| decisions/ | Future self | "Why was this decided this way?" |
+
+You do not need all five in a portfolio project. Just `testing.md` and `architecture.md` already differentiate significantly.
+
+### docs/testing.md Full Template
+
+```markdown
+# Testing Strategy
+
+## Test Pyramid
+
+| Layer | Target | Tool | When |
+| --- | --- | --- | --- |
+| Unit | Pure functions, utilities | pytest | Every commit |
+| Integration | API endpoints | pytest + httpx | PR |
+| E2E | User scenarios | playwright | Pre-deploy |
+
+## Local Run
+
+```bash
+# Full test suite
+pytest
+
+# With coverage
+pytest --cov=src --cov-report=term-missing
+
+# Specific module only
+pytest tests/test_scheduler.py -v
+```
+
+## CI Test Configuration
+
+GitHub Actions runs `pytest` automatically.
+PRs do not merge unless CI is green.
+
+## Flaky Test Handling
+
+- Network-dependent tests: isolate with mock
+- Time-dependent tests: use freezegun
+- DB-dependent tests: apply transaction rollback
+```
+
+Copy this template directly or adapt it for your project. What matters is showing not "tests exist" but "a test strategy exists."
+
+### Test Report Template
+
+Recording test results lets you track quality changes over time.
+
+```markdown
+## Test Report - 2024-03-15
+
+| Metric | Value | Note |
+| --- | --- | --- |
+| Total tests | 47 | +5 from last week |
+| Passing | 45 | |
+| Failing | 0 | |
+| Skipped | 2 | E2E - external API dependency |
+| Coverage | 78% | Goal: 80% |
+| Run time | 12s | CI baseline |
+
+### Failure Analysis
+- None
+
+### Skip Reasons
+- test_external_webhook: External API rate limit (mock migration planned)
+- test_email_send: SMTP config required (CI env var addition planned)
+```
+
+Maintaining this report weekly proves the project is actively managed. In interviews you can say "I raised coverage from 60% to 78%" with actual numbers.
+
+### Adding CI Badges to README
+
+CI badges are small but strong signals. A green badge at the top of the README says "this project has automated verification."
+
+```markdown
+<!-- Top of README.md -->
+![CI](https://github.com/username/project/actions/workflows/ci.yml/badge.svg)
+![Coverage](https://codecov.io/gh/username/project/branch/main/graph/badge.svg)
+```
+
+To add badges:
+
+1. Create a GitHub Actions workflow file (`.github/workflows/ci.yml`)
+2. GitHub repo → Actions tab → select workflow → "…" menu → "Create status badge"
+3. Paste the generated Markdown at the top of your README
+
+For coverage badges, connect a service like Codecov or Coveralls. Both offer free tiers suitable for portfolio projects.
+
+### conftest.py Pattern: Test Fixture Organization
+
+Test code quality is also evaluated in portfolios. A well-organized conftest.py demonstrates test design ability.
+
+```python
+# tests/conftest.py
+import pytest
+from httpx import AsyncClient, ASGITransport
+from src.main import app
+from src.database import get_test_db, reset_db
+
+
+@pytest.fixture(scope="session")
+def anyio_backend():
+    return "asyncio"
+
+
+@pytest.fixture
+async def client():
+    """API test client."""
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        yield ac
+
+
+@pytest.fixture(autouse=True)
+def reset_database():
+    """Reset DB before and after each test."""
+    reset_db()
+    yield
+    reset_db()
+```
+
+Key points in this fixture setup:
+
+1. **Session scope control**: Separates one-time setup from per-test setup.
+2. **DB isolation**: Ensures each test runs independently.
+3. **Real API testing**: Uses httpx ASGITransport to simulate actual HTTP requests.
+
+### CHANGELOG Writing
+
+Change history is the most intuitive evidence that a project is actively maintained. Following [Keep a Changelog](https://keepachangelog.com/) format maintains consistency.
+
+```markdown
+# Changelog
+
+## [0.3.0] - 2024-03-15
+
+### Added
+- OAuth2 authentication support (Google, GitHub)
+- Automatic weekly report generation
+
+### Changed
+- Database connection pool optimization (5 → 10)
+- API response format unified to snake_case
+
+### Fixed
+- Bug where deleting a team member left tasks unassigned
+
+## [0.2.0] - 2024-02-28
+
+### Added
+- Dashboard basic UI
+- Seed data auto-generation script
+
+### Fixed
+- Docker Compose network configuration error
+```
+
+Important CHANGELOG principles:
+
+1. **Write from the user's perspective**: "Improved response time by 30%" instead of "refactored code."
+2. **Use version numbers**: Semantic versioning communicates change scale.
+3. **Date stamps**: Visually show project activity.
+
+### Common Testing Mistakes
+
+| Mistake | Symptom | Solution |
+| --- | --- | --- |
+| Testing implementation | Tests break on refactor | Verify behavior/results only |
+| Test interdependency | Changing order causes failure | Isolate with fixtures |
+| Direct external API calls | Fails without network | Use mock/stub |
+| Hard-coded magic numbers | Changing values breaks tests | Extract to variables/constants |
+| Testing everything | Maintenance cost explodes | Focus on core logic |
+
+In portfolios especially, "testing the most important thing well" beats "testing everything." Focus tests on core logic like scheduler time calculations, auth token validation, or payment amount computation. A small number of well-targeted tests delivers high trust.
+
+### Workflow for Keeping Tests and Docs in Sync
+
+Tests and docs drift apart quickly when managed separately. Including both in a PR checklist naturally synchronizes them.
+
+```markdown
+<!-- .github/pull_request_template.md -->
+## PR Checklist
+- [ ] Tests added/modified (new feature or bugfix)
+- [ ] No coverage decrease (pytest --cov verified)
+- [ ] README impact checked
+- [ ] docs/api.md updated if API changed
+- [ ] CHANGELOG entry added
+```
+
+This checklist structurally prevents "modified code but forgot docs." PR templates are useful even for solo projects—they are reminders to your future self.
+
+### Minimal Verification Strategy Without Tests
+
+If writing test code feels daunting, start gradually in this order:
+
+1. **Add a linter** (5 min): Just `ruff check .` creates a code quality baseline.
+2. **Type checking** (10 min): `mypy src/` catches type errors and prevents bugs.
+3. **One smoke test** (15 min): Write one test that sends a GET to your core API and checks for 200.
+4. **Business logic test** (30 min): Test your most important calculation/validation function.
+5. **CI integration** (20 min): Configure GitHub Actions to run the above automatically.
+
+The key is not "perfect testing" but "progressive verification culture." Even step 1 lets you write "Lint: ruff" in your README, and step 3 lets you add a CI badge. Starting small verification now beats waiting for perfection.
 
 ## Answering the Opening Questions
 
 - **What do unit tests, integration tests, and end-to-end checks each prove?**
-  - The article treats Tests and Documentation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - Unit tests prove individual logic units work correctly in isolation. Integration tests prove boundaries (API to DB, service to service) work together. E2E tests prove the critical user path completes successfully from start to finish.
 - **Why does even a small portfolio project benefit from automated verification?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - Automation turns a one-time success into repeatable proof. A reviewer sees that verification is a default habit, not something done once before demo day. CI also prevents regressions when you update the project later.
 - **What kinds of docs make a repository easier to trust and adopt?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+  - A testing.md that explains strategy, an architecture.md that maps the system, and a CHANGELOG that shows active maintenance. Together they lower the cost of understanding the project and signal that the author thinks about the next person, not just themselves.
 <!-- toc:begin -->
 ## In this series
 

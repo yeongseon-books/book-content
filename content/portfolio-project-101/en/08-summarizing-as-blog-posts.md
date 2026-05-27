@@ -163,15 +163,228 @@ When you turn a project into a blog post, clarity matters more than code volume.
 
 Next, we will take the same project and compress it into an interview answer that sounds clear under time pressure.
 
+### Full Post Template
+
+The template below helps you start without staring at a blank screen. Fill in each section and a structured post emerges.
+
+```markdown
+# [Tech keyword] to [problem verb]: achieving [result metric]
+
+## Problem
+- What situation caused what pain/bottleneck?
+- What happens if this problem stays unsolved?
+
+## Approach
+1. First attempt: (what was tried, why it fell short)
+2. Pivot: (what criteria drove the new direction)
+3. Final design: (one-line core architecture/tech choice)
+
+## Key Code
+- Not the full implementation — the critical 20 lines that solve the problem
+- One line of explanation above and below the code block
+
+## Result
+| Metric | Before | After | Change |
+| --- | ---: | ---: | ---: |
+| (metric 1) | | | |
+| (metric 2) | | | |
+
+## Lesson
+- 1-2 sentences of reusable judgment
+- Including "next time I would..." makes it stronger
+
+## References
+- [Repository link]()
+- [Live demo]()
+```
+
+The strength of this template is "fill the blanks and you have a post." With structure pre-set, the writing barrier drops significantly.
+
+### Technical Blog Post vs Development Diary
+
+Notes taken during a project and blog posts serve different purposes. Confusing them produces writing that does not fit its reader.
+
+| Aspect | Dev Diary | Blog Post |
+| --- | --- | --- |
+| Reader | Future self | Other developers with the same problem |
+| Structure | Chronological | Problem-approach-result |
+| Code | Full inclusion fine | Key excerpts only |
+| Context | Can omit (I already know) | Must provide (reader does not know) |
+| Length | Unlimited | 5-10 min read recommended |
+| Outcomes | Optional | Must be quantified |
+
+When converting a diary into a blog post, the core task is transforming "context only I know" into "background explanation the reader can follow." Rearranging chronological notes into problem-approach-result order gets you halfway there.
+
+### Pre-Publish Rehearsal Check
+
+Running these three steps before publishing noticeably raises quality:
+
+1. **3-minute read test**: Read the entire post aloud. If the core message does not land within 3 minutes, shorten the introduction.
+2. **Code copy test**: Copy every code block from the post and actually run it. Non-runnable code loses reader trust.
+3. **Link verification**: Click every repository URL, demo URL, and reference link. One broken link damages the entire post's impression.
+
+These three steps take 5 minutes but significantly raise professionalism. Runnable code blocks in particular are the strongest trust signal in technical blogging.
+
+### Metrics Table Design
+
+To make a blog post persuasive, present results as metrics rather than sentiment. Metrics need not be complex, but they must connect directly to the problem.
+
+| Area | Metric | Measurement Method | Report Format |
+| --- | --- | --- | --- |
+| Performance | Avg response time (ms) | APM/log aggregation | % change vs baseline |
+| Usability | Core task completion time | User scenario measurement | Before/After comparison |
+| Stability | Error rate (%) | Error log aggregation | Weekly trend |
+| Adoption | Weekly active users | Analytics tool | Cumulative/delta |
+
+The important criterion for choosing metrics is "can I explain this in an interview?" If you present a number but cannot explain how it was measured, it hurts rather than helps credibility.
+
+### Data Visualization Approach
+
+When data appears in a post, structure matters more than raw numbers. Use at least one of these three approaches:
+
+1. Period comparison table: before/after in one view
+2. One key graph: response time or error rate trend
+3. Summary box: "top 3 changes" compressed to text
+
+```markdown
+| Metric | Before | After | Change |
+| --- | ---: | ---: | ---: |
+| Avg response time | 280ms | 120ms | -57% |
+| Error rate | 3.2% | 0.8% | -75% |
+| Weekly active users | 12 | 31 | +158% |
+```
+
+This format helps readers interpret results at a glance. The most important thing in a blog post is the reader's experience of understanding quickly.
+
+### Case Study Post Structure (Problem-Solution-Result)
+
+Posts with outcomes are most persuasive when they follow this structure:
+
+```markdown
+## Problem
+Team schedule lookup scattered across tools, increasing planning time
+
+## Approach
+MVP scope reduction, FastAPI + PostgreSQL, weekly-view-focused UX
+
+## Result
+Response time improved 57%, planning time 40 min -> 18 min, 31 weekly active users
+
+## Lesson
+A scope-reduced MVP actually produces measurable improvement.
+```
+
+The advantage of this structure is that it connects directly to interview answers. When blog post and interview explanation share the same narrative, the project message stays much more consistent.
+
+### Evidence Bundle for Post Credibility
+
+To raise trust in a blog post, present claim-evidence-interpretation together.
+
+| Claim | Evidence | Interpretation |
+| --- | --- | --- |
+| Response time improved | Avg 280ms → 120ms | Cache strategy effective at bottleneck |
+| Usability improved | Task completion 40 min → 18 min | Single-screen integration reduced search cost |
+| Operational stability increased | Error rate 3.2% → 0.8% | Pre-deploy test automation effective |
+
+Claims without evidence are not remembered, and numbers without interpretation are meaningless. Using both together is what makes a post read as a case study.
+
+### Blog SEO Checklist
+
+Check these items before publishing to increase search traffic:
+
+| Item | Verification Question | Example |
+| --- | --- | --- |
+| Title | Matches search intent? | "FastAPI auth implementation" vs "My project intro" |
+| Introduction | Problem and result visible in 3 sentences? | "How I improved response time from 280ms to 120ms" |
+| H2 structure | Reader can predict content from headings alone? | "Problem / Approach / Result / Lesson" |
+| Links | Repository and demo URL included? | In references or inline |
+| Images | Screenshots/diagrams have alt text? | `![API response time trend graph](...)` |
+| Tags | 3-5 platform tags applied? | Python, FastAPI, PostgreSQL, Performance |
+
+One minute of pre-publish checking noticeably increases search visibility.
+
+### Content Calendar Template
+
+One project can produce multiple posts. This calendar spreads one project across 4 weeks and 4 posts:
+
+```text
+Week 1: "Why I chose this problem" — problem definition and motivation
+Week 2: "Building the MVP with FastAPI + PostgreSQL" — tech choices and implementation core
+Week 3: "Cutting response time by 57%" — performance improvement process and results
+Week 4: "What I learned from a 2-week project" — retrospective and next direction
+```
+
+This way one project gets multiple exposures, with each post capturing different search intents. The first post attracts readers searching for problem definition; the third attracts those looking for performance improvement methods.
+
+### Platform-Specific Publishing Strategy
+
+Each blog platform has different strengths. Adjust posts to match platform characteristics:
+
+| Platform | Strengths | Adjustment Point |
+| --- | --- | --- |
+| Tistory | Korean SEO, Naver traffic | Korean title, keyword-focused |
+| Hashnode | Developer community, English | English title, heavy code |
+| Medium | General audience, broad reach | More explanation, minimal code |
+| dev.to | Developer-only, tag-based discovery | 3-5 tags, shorter posts |
+
+Rather than posting identical content everywhere, keep the core message but adjust length and code ratio for each platform.
+
+### Title Formula
+
+Titles are the first gate of search traffic. Apply this formula to increase click probability:
+
+```text
+Formula: [Technology/Tool] + [Problem/Verb] + [Result/Metric]
+
+Good examples:
+- "Building an Auth API with FastAPI: Achieving 120ms Response Time"
+- "3x Query Speed with PostgreSQL Index Tuning"
+- "CI/CD with GitHub Actions: Deploy Time from 15 min to 3 min"
+
+Bad examples:
+- "My Project Introduction" (no search intent)
+- "Dev Diary #3" (no reader value)
+- "TIL" (topic unpredictable)
+```
+
+Titles with both a tech keyword and an outcome metric stand out in search results and improve click-through rates.
+
+### Post Closing CTA (Call to Action) Template
+
+End every post by suggesting a next action for the reader.
+
+```markdown
+---
+## Closing
+
+If this post was helpful:
+- Check the full code in the repository: [GitHub](https://github.com/...)
+- Next post: "Explaining this project in interviews"
+- Questions or feedback? Leave them in [Issues](https://github.com/.../issues)
+```
+
+A CTA turns the post from one-directional information delivery into the start of a conversation. When readers visit the repository or leave issues, that itself becomes evidence of portfolio activity.
+
+### Post-Publish Tracking Metrics
+
+After publishing, track at least these three things for 2 weeks:
+
+| Metric | Measurement | Target |
+| --- | --- | --- |
+| Views | Platform analytics | 100+ within 2 weeks |
+| Repo traffic | GitHub referrer stats | Increase after publication |
+| Reader engagement | Comments/likes/shares | At least 1 question or feedback |
+
+These metrics help you determine "is the title the problem, the content, or the platform?" High views but no repo traffic means the CTA is weak. Low views overall means revisit the title or publish timing.
+
 ## Answering the Opening Questions
 
 - **Why does a problem-first structure work better than a code-first structure in technical writing?**
-  - The article treats Summarizing as Blog Posts as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - Code listing without context gives readers no reason to read. Presenting "what problem and why solved this way" first gives readers motivation to look at the code. Structure matches reader curiosity: they need to understand the problem before they can evaluate the solution.
 - **How should code excerpts and repository links divide responsibility?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - The post body keeps only the critical code needed to support explanation. Full implementation lives in the repository link. This way the article's flow stays unbroken while readers can still access the complete code.
 - **Why do numbers make a blog post more persuasive?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+  - "Performance improved" is subjective and forgettable. "280ms to 120ms" is concrete and verifiable. Metrics make results stick in memory and raise the post's credibility from opinion to evidence.
 <!-- toc:begin -->
 ## In this series
 
