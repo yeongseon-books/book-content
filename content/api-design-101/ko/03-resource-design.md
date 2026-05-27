@@ -32,6 +32,8 @@ URL은 한 번 공개되면 데이터베이스 컬럼명보다 훨씬 오래 살
 ![API Design 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/03/03-01-concept-at-a-glance.ko.png)
 *API Design 101 3장 흐름 개요*
 
+> 리소스 설계는 'URL을 예쁘게 짓는 일'이 아니라 '도메인을 명사 단위로 잘라 외부에 노출할 경계를 정하는 일'입니다 — 여기서 잘못 그은 경계는 endpoint 100개로도 메우지 못합니다.
+
 ## 먼저 던지는 질문
 
 - 리소스의 경계는 어떻게 나눠야 할까요?

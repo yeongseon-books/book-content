@@ -33,6 +33,8 @@ Here we focus on the layer that turns pixels into something searchable and compa
 ![Multimodal AI 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/02/02-01-mental-model-encode-first-decide-later.en.png)
 *Multimodal AI 101 chapter 2 flow overview*
 
+> An image encoder turns pixels into a vector that lives in the same space as text — CLIP and ViT are not 'image models,' they are bridges, and everything multimodal downstream depends on how well that bridge is built.
+
 ## Questions to Keep in Mind
 
 - Why is the image encoder usually the first subsystem to debug when multimodal quality feels unstable?

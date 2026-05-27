@@ -29,6 +29,8 @@ This is the third post in the Korean AI Stack 101 series. Here, we use BGE-M3 to
 ![Korean AI Stack 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/03/03-01-core-flow.en.png)
 *Korean AI Stack 101 chapter 3 flow overview*
 
+> BGE-M3 is interesting not because it is multilingual but because it is multi-functional and multi-granular in one model — dense, sparse, and ColBERT-style scoring from the same encoder, which collapses three retrieval pipelines into one.
+
 ## Questions to Keep in Mind
 
 - Where does BGE-M3 outperform KoSimCSE on a corpus mixing Korean and English?

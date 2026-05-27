@@ -32,6 +32,8 @@ seo_description: OpenAPI 3와 Swagger UI로 계약을 문서, 검증, SDK로 연
 ![API Design 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/08/08-01-concept-at-a-glance.ko.png)
 *OpenAPI spec 하나가 문서, 검증, SDK, mock을 동시에 구동하는 구조*
 
+> OpenAPI 스펙은 '문서 자동 생성기'가 아니라 '서버·클라이언트·테스트·SDK가 모두 같은 진실을 바라보게 하는 계약서'입니다 — 코드에서 스펙을 만들든, 스펙에서 코드를 만들든, 둘 사이가 어긋나는 순간 통합 비용이 폭발합니다.
+
 ## 먼저 던지는 질문
 
 - OpenAPI 3 문서는 어떤 구조로 이루어질까요?

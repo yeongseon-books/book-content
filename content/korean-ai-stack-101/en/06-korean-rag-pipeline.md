@@ -29,6 +29,8 @@ This is the final post in the Korean AI Stack 101 series. Here, we connect the e
 ![Korean AI Stack 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/06/06-01-core-flow.en.png)
 *Korean AI Stack 101 chapter 6 flow overview*
 
+> A Korean RAG pipeline is not an English RAG pipeline with a different tokenizer — chunking, embedding choice, OCR quality, and reranker behavior all shift when the source text is Korean, and ignoring any one of them is how 'works in English, breaks in Korean' bugs are born.
+
 ## Questions to Keep in Mind
 
 - What stages are non-negotiable in a minimal Korean RAG pipeline?

@@ -29,6 +29,8 @@ This is the fourth post in the Korean AI Stack 101 series. Here, we turn CLOVA O
 ![Korean AI Stack 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/04/04-01-core-flow.en.png)
 *Korean AI Stack 101 chapter 4 flow overview*
 
+> Korean OCR is not a solved problem — vertical text, mixed-script receipts, and bank statements break general-purpose OCR in ways that only a domain-tuned engine like CLOVA reliably handles, and the gap shows up directly in downstream RAG quality.
+
 ## Questions to Keep in Mind
 
 - When you add OCR, should you inspect text accuracy first, or response structure first?

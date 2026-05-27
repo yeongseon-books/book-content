@@ -33,6 +33,8 @@ Here we treat multimodal RAG as a retrieval redesign: what to index, what to kee
 ![Multimodal AI 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/05/05-01-strategy-3-hybrid-both-image-and-text-ve.en.png)
 *Multimodal AI 101 chapter 5 flow overview*
 
+> Multimodal RAG is not 'RAG with images added' — every step (chunking, embedding, retrieval, reranking, generation) has to be rethought when half the corpus is pixels, and the failure mode is silently degrading to text-only behavior.
+
 ## Questions to Keep in Mind
 
 - Which questions fail first under text-only RAG once screenshots, charts, and scanned documents enter the corpus?

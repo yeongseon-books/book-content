@@ -31,6 +31,8 @@ This is the 3rd post in the LLM from Scratch 101 series. Here we connect QKV pro
 ![LLM from Scratch 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/03/03-01-causal-mask-no-peeking-at-the-future.en.png)
 *LLM from Scratch 101 chapter 3 flow overview*
 
+> Attention is not 'Q, K, V' as symbols — it is one sentence: each token decides how much information to pull from every other token. Once that lands, multi-head, causal masking, and KV cache stop being separate ideas and become parts of the same machine.
+
 ## Questions to Keep in Mind
 
 - Why do Q, K, and V come from the same input but play different roles?

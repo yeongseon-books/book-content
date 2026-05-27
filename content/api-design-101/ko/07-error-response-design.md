@@ -32,6 +32,8 @@ seo_description: 일관된 error response를 만드는 envelope, code, validatio
 ![API Design 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/07/07-01-concept-at-a-glance.ko.png)
 *에러가 발생하면 status code → error code → detail → trace id 순서로 응답이 구성되는 흐름*
 
+> 에러 응답 설계는 '실패를 알리는 일'이 아니라 '클라이언트가 다음 행동을 결정할 수 있게 실패를 분류해 주는 일'입니다 — code·message·details·trace_id가 한 자리에 모이지 않으면 5xx 폭주가 곧바로 운영 마비로 이어집니다.
+
 ## 먼저 던지는 질문
 
 - 좋은 error response는 어떤 요소로 이루어질까요?

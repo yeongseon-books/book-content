@@ -29,6 +29,8 @@ This is the second post in the Korean AI Stack 101 series. Here, we build a mini
 ![Korean AI Stack 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/02/02-01-core-flow.en.png)
 *Korean AI Stack 101 chapter 2 flow overview*
 
+> Sentence similarity in Korean is not 'cosine of two embeddings' — it is the question of which encoder was trained on text that looks like yours, and KoSimCSE exists because multilingual models routinely miss the meaning that Korean speakers actually share.
+
 ## Questions to Keep in Mind
 
 - Where does KoSimCSE usually pay off first in Korean retrieval work?

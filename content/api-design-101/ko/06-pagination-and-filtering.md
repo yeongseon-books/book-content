@@ -32,6 +32,8 @@ seo_description: 목록 API의 pagination, sorting, filtering 설계 원칙과 t
 ![API Design 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/06/06-01-concept-at-a-glance.ko.png)
 *클라이언트 요청이 filter → sort → paginate 순서로 처리되는 흐름*
 
+> 페이지네이션은 '결과를 잘라 주는 기능'이 아니라 '서버가 한 번에 책임지는 데이터 양의 상한을 클라이언트와 합의하는 계약'입니다 — offset/cursor 선택은 취향이 아니라 일관성·성능·재현 가능성의 트레이드오프입니다.
+
 ## 먼저 던지는 질문
 
 - offset / limit 방식은 어디까지 단순하고 어디서부터 한계가 드러날까요?

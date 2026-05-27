@@ -29,6 +29,8 @@ This is the fifth post in the Korean AI Stack 101 series. Here, we map out safe 
 ![Korean AI Stack 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/korean-ai-stack-101/05/05-01-core-flow.en.png)
 *Korean AI Stack 101 chapter 5 flow overview*
 
+> Choosing a Korean LLM API is not 'which model is smarter' — it is a four-axis decision over Korean fluency, price-per-1k-tokens, latency, and data-residency policy, and every production decision routes back through these four.
+
 ## Questions to Keep in Mind
 
 - What API contract should you lock down before you start prompt tuning?

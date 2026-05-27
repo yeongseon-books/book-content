@@ -32,6 +32,8 @@ Here we treat captioning and OCR as complementary stages rather than competing t
 ![Multimodal AI 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/04/04-01-ocr-vlm-hybrid-pipeline.en.png)
 *Multimodal AI 101 chapter 4 flow overview*
 
+> Captioning and OCR look similar but answer different questions — 'what is in this image' versus 'what text is on this image' — and the right pipeline is almost always both, run in parallel, with their outputs merged before they reach the LLM.
+
 ## Questions to Keep in Mind
 
 - Why does "extract the text and move on" fail on receipts, screenshots, and structured documents?

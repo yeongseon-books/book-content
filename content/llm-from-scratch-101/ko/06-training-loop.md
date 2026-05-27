@@ -31,6 +31,8 @@ seo_description: 모델 클래스를 완성하고 나면 가장 무거워 보이
 ![LLM from Scratch 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/06/06-01-the-5-line-core-of-the-training-loop.ko.png)
 *LLM from Scratch 101 6장 흐름 개요*
 
+> Training loop는 'forward → loss → backward → step'이라는 네 줄의 무한 반복이고, GPT를 학습시키는 일은 이 네 줄을 안정적으로 수십만 번 도는 일입니다 — gradient clipping·learning rate schedule·mixed precision은 모두 이 네 줄을 깨지지 않게 만드는 도구입니다.
+
 ## 먼저 던지는 질문
 
 - 학습 루프를 움직이는 핵심 다섯 줄은 무엇일까요?

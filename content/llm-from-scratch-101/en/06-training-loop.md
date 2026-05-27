@@ -31,6 +31,8 @@ This is the 6th post in the LLM from Scratch 101 series. Here we will build a co
 ![LLM from Scratch 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-from-scratch-101/06/06-01-the-5-line-core-of-the-training-loop.en.png)
 *LLM from Scratch 101 chapter 6 flow overview*
 
+> A training loop is four lines repeated — forward, loss, backward, step — and training a GPT is the engineering of keeping those four lines stable for hundreds of thousands of iterations. Gradient clipping, LR schedules, and mixed precision are not extras; they are what keeps the loop from collapsing.
+
 ## Questions to Keep in Mind
 
 - What are the five lines at the heart of the training loop?

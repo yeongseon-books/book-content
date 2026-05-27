@@ -33,6 +33,8 @@ Here we compare the three connection patterns that dominate modern VLMs: simple 
 ![Multimodal AI 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/03/03-01-common-skeleton-vision-encoder-adapter-l.en.png)
 *Multimodal AI 101 chapter 3 flow overview*
 
+> A vision-language model is not 'an LLM that can see' — it is an LLM with a learned projection from an image encoder's embedding space into its own token space, and the quality of that projection caps the quality of every multimodal answer.
+
 ## Questions to Keep in Mind
 
 - Where does a VLM actually spend its complexity: in the vision encoder, the adapter, or the LLM?

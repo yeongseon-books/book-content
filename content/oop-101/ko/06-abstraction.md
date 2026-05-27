@@ -30,6 +30,8 @@ Python에서 추상화는 이론 용어로 끝나지 않습니다. 어떤 메서
 ![Object-Oriented Programming 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/oop-101/06/06-01-concept-overview.ko.png)
 *Object-Oriented Programming 101 6장 흐름 개요*
 
+> 추상화는 '복잡한 걸 숨기는 일'이 아니라 '독자에게 필요한 결정만 남기고 나머지를 보이지 않게 옮기는 일'입니다 — 잘못된 추상화는 숨기는 게 아니라 미루는 일이고, 그 빚은 항상 한참 뒤에 청구됩니다.
+
 ## 먼저 던지는 질문
 
 - 덕 타이핑 관례만으로는 언제부터 부족해질까요?

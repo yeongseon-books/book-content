@@ -35,6 +35,8 @@ Here we set the mental model for the rest of the series: where text-only systems
 ![Multimodal AI 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/multimodal-ai-101/01/01-01-mental-model-multimodal-expands-the-reas.en.png)
 *Multimodal AI 101 chapter 1 flow overview*
 
+> Multimodal AI is not 'text plus images' — it is the bet that aligning different modalities in one embedding space gives you capabilities that no single-modality model can reach, and that bet is what justifies the extra engineering.
+
 ## Questions to Keep in Mind
 
 - Where do text-only LLM pipelines break first once real document and image input arrives?
