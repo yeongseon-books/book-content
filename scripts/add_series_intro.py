@@ -32,6 +32,20 @@ KO_SERIES_INTRO = re.compile(r"이\s*글은[^.\n]{2,200}시리즈", re.MULTILINE
 EN_SERIES_INTRO = re.compile(r"\b[Tt]his is\b[^.\n]{2,200}\bseries\b", re.MULTILINE)
 WINDOW = 25
 
+# Strict EN form mandated by AGENTS.md / STYLE_GUIDE §1.1:
+#   "This is the {first|Nth|final} post in the {Series Name} series."
+EN_STRICT_INTRO = re.compile(r"This is the [^.\n]+ post in the [^.\n]+ series")
+
+# Rewriteable legacy intro forms (in window): replace in place instead of insert.
+REWRITE_PATTERNS = [
+    re.compile(r"This is post \d+ in the [^.\n]+ series\."),
+    re.compile(
+        r"This is the (?:\d+(?:st|nd|rd|th)|first|second|third|fourth|fifth|sixth|seventh|"
+        r"eighth|ninth|tenth|eleventh|twelfth|final) article in the [^.\n]+ series\."
+    ),
+    re.compile(r"This is part \d+ of the [^.\n]+ series\."),
+]
+
 
 def ordinal_en(n: int) -> str:
     if 10 <= n % 100 <= 20:
@@ -82,7 +96,7 @@ def split_frontmatter(text: str):
     return fm_block, body, meta
 
 
-def process_file(path: Path, series_meta: dict, dry_run: bool = False):
+def process_file(path: Path, series_meta: dict, dry_run: bool = False, strict_en: bool = False):
     text = path.read_text(encoding="utf-8")
     parts = split_frontmatter(text)
     if not parts:
@@ -116,11 +130,36 @@ def process_file(path: Path, series_meta: dict, dry_run: bool = False):
     after_h1 = body[h1.end() :]
     window_lines = after_h1.splitlines()[:WINDOW]
     window_text = "\n".join(window_lines)
-    intro_re = KO_SERIES_INTRO if lang == "ko" else EN_SERIES_INTRO
+    if lang == "ko":
+        intro_re = KO_SERIES_INTRO
+    else:
+        intro_re = EN_STRICT_INTRO if strict_en else EN_SERIES_INTRO
     if intro_re.search(window_text):
         return False, "already present"
 
-    intro_line = build_intro(lang, title, episode, total)
+    intro_line_preview = build_intro(lang, title, episode, total)
+
+    # Strict-en rewrite mode: replace existing legacy intro in place when found.
+    if lang == "en" and strict_en:
+        for pat in REWRITE_PATTERNS:
+            m = pat.search(window_text)
+            if m:
+                # Compute absolute offset in body and rewrite the matched span.
+                window_start = h1.end()
+                # window_text was built from after_h1's first WINDOW lines joined by '\n'.
+                # Locate match in after_h1 directly to get accurate offset.
+                m2 = pat.search(after_h1)
+                if not m2:
+                    break
+                abs_start = window_start + m2.start()
+                abs_end = window_start + m2.end()
+                new_body = body[:abs_start] + intro_line_preview + body[abs_end:]
+                new_text = fm_block + new_body
+                if not dry_run:
+                    path.write_text(new_text, encoding="utf-8")
+                return True, f"REWRITE: {intro_line_preview}"
+
+    intro_line = intro_line_preview
 
     lines = after_h1.split("\n")
     i = 0
@@ -148,6 +187,12 @@ def main() -> int:
     parser.add_argument("--series", help="Limit to one series id")
     parser.add_argument("--lang", choices=["ko", "en"], help="Limit to language")
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument(
+        "--strict-en",
+        action="store_true",
+        help="Enforce strict EN intro form ('This is the X post in the Y series.') "
+        "and rewrite known legacy phrasings in place.",
+    )
     args = parser.parse_args()
 
     with open(REPO_ROOT / "series.yaml") as f:
@@ -175,7 +220,7 @@ def main() -> int:
     errors = 0
     for path in targets:
         try:
-            ok, reason = process_file(path, series_meta, dry_run=args.dry_run)
+            ok, reason = process_file(path, series_meta, dry_run=args.dry_run, strict_en=args.strict_en)
         except Exception as e:
             errors += 1
             print(f"ERROR {path}: {e}", file=sys.stderr)
