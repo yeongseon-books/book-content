@@ -29,6 +29,8 @@ last_reviewed: '2026-05-12'
 ![Frontend Development 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/09/09-01-diagram.ko.png)
 *Frontend Development 101 9장 흐름 개요*
 
+> Webpack·Vite·esbuild는 결국 한 가지 일을 합니다 — 'JS/TS/CSS/asset 그래프를 브라우저가 빠르게 받을 수 있는 형태로 변환하기.' bundle splitting·tree shaking·dev server HMR이 모두 이 한 문장의 변주라는 걸 알면 도구 비교가 단순해집니다.
+
 ## 먼저 던지는 질문
 
 - 번들러는 import 그래프를 따라 어떤 일을 할까요?

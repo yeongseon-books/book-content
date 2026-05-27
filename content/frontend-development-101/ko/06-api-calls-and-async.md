@@ -29,6 +29,8 @@ last_reviewed: '2026-05-12'
 ![Frontend Development 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/06/06-01-diagram.ko.png)
 *Frontend Development 101 6장 흐름 개요*
 
+> 프론트의 비동기 코드는 거의 항상 세 가지 상태를 동시에 관리합니다 — loading / data / error. 이 셋을 명시적으로 모델링하지 않으면 'fetch 한 번 했는데 UI가 깜빡거리는 / 실패가 안 보이는' 버그가 끝없이 재생산됩니다.
+
 ## 먼저 던지는 질문
 
 - `fetch`와 `async/await`는 어떤 최소 패턴으로 시작하면 될까요?

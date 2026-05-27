@@ -29,6 +29,8 @@ last_reviewed: '2026-05-12'
 ![Frontend Development 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/04/04-01-diagram.ko.png)
 *Frontend Development 101 4장 흐름 개요*
 
+> 컴포넌트는 'UI 조각'이 아니라 '상태(props/state)를 받아 화면을 돌려주는 함수'입니다 — 이 함수형 모델이 잡히면 prop drilling·lifting state up·전역 상태 라이브러리 선택이 모두 같은 문제(상태를 어디에 둘 것인가)의 답으로 정리됩니다.
+
 ## 먼저 던지는 질문
 
 - 컴포넌트 사고방식은 단순히 React 문법을 넘어서 무엇을 바꿔 줄까요?

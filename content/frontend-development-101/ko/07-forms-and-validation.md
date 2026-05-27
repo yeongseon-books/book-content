@@ -29,6 +29,8 @@ last_reviewed: '2026-05-12'
 ![Frontend Development 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/07/07-01-diagram.ko.png)
 *Frontend Development 101 7장 흐름 개요*
 
+> 폼은 '입력 받는 UI'가 아니라 '사용자 의도를 도메인 모델로 옮기는 좁은 통로'입니다 — controlled vs uncontrolled, 클라이언트 검증과 서버 검증의 역할 분리가 명확하지 않으면 보안·UX·접근성이 한꺼번에 무너집니다.
+
 ## 먼저 던지는 질문
 
 - controlled input과 uncontrolled input은 어떤 차이가 있을까요?

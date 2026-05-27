@@ -29,6 +29,8 @@ last_reviewed: '2026-05-12'
 ![Frontend Development 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/05/05-01-diagram.ko.png)
 *Frontend Development 101 5장 흐름 개요*
 
+> 라우팅은 'URL과 컴포넌트 트리를 매핑하는 일'입니다 — SPA / MPA / SSR / SSG 차이는 '이 매핑을 누가 언제 수행하는가(브라우저인가, 서버인가, 빌드 타임인가)'라는 한 가지 축으로 정리됩니다.
+
 ## 먼저 던지는 질문
 
 - 단일 페이지 앱이 여러 화면을 보여 주는 원리는 무엇일까요?

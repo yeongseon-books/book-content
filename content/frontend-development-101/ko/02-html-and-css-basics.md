@@ -29,6 +29,8 @@ last_reviewed: '2026-05-12'
 ![Frontend Development 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/02/02-01-diagram.ko.png)
 *Frontend Development 101 2장 흐름 개요*
 
+> HTML은 '문서 구조'이고 CSS는 '그 구조 위에 얹는 시각 규칙'입니다 — div를 남발하면 안 되는 이유와 시맨틱 태그가 접근성·SEO·유지보수를 동시에 결정하는 이유가 모두 이 분리에서 출발합니다.
+
 ## 먼저 던지는 질문
 
 - 시맨틱 HTML이 단순한 취향 문제가 아니라 기본 설계인 이유는 무엇일까요?

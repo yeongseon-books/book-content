@@ -29,6 +29,8 @@ last_reviewed: '2026-05-12'
 ![Frontend Development 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/08/08-01-diagram.ko.png)
 *Frontend Development 101 8장 흐름 개요*
 
+> 스타일링의 핵심 질문은 '문법 선택'이 아니라 '스타일의 범위(scope)와 결합도를 어떻게 통제할 것인가'입니다 — BEM·CSS Modules·Tailwind·CSS-in-JS는 같은 문제(전역 cascading)에 대한 서로 다른 답입니다.
+
 ## 먼저 던지는 질문
 
 - 글로벌 CSS, CSS Modules, CSS-in-JS, Tailwind는 어떤 차이를 가질까요?

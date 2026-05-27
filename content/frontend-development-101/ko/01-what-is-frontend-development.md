@@ -29,6 +29,8 @@ last_reviewed: '2026-05-12'
 ![Frontend Development 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/frontend-development-101/01/01-01-diagram.ko.png)
 *Frontend Development 101 1장 흐름 개요*
 
+> 프론트엔드는 'HTML/CSS/JS를 잘 다루는 일'이기 전에 '브라우저라는 런타임 위에서 상태와 화면을 동기화하는 일'입니다 — 이 한 줄이 잡히면 jQuery·React·Vue·Svelte가 같은 문제를 다르게 푸는 답으로 보입니다.
+
 ## 먼저 던지는 질문
 
 - 프론트엔드와 백엔드의 경계는 정확히 어디에서 나뉠까요?
