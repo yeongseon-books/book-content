@@ -117,24 +117,6 @@ def two_sum(nums, target):
 | Implementation stability | You recover from mistakes and re-read the code | Reserve the final three minutes for review |
 | Communication | You narrate decisions instead of coding silently | Record yourself explaining one solution each week |
 
-## Practice against the rubric, not just the problem set
-
-| Evaluation axis | Signal interviewers notice | Training habit |
-| --- | --- | --- |
-| Problem framing | You clarify constraints and edge cases early | Force yourself to ask two questions before coding |
-| Pattern choice | You can justify why this approach fits | Keep a notes page pairing pattern, trigger, and alternative |
-| Implementation stability | You recover from mistakes and re-read the code | Reserve the final three minutes for review |
-| Communication | You narrate decisions instead of coding silently | Record yourself explaining one solution each week |
-
-## Practice against the rubric, not just the problem set
-
-| Evaluation axis | Signal interviewers notice | Training habit |
-| --- | --- | --- |
-| Problem framing | You clarify constraints and edge cases early | Force yourself to ask two questions before coding |
-| Pattern choice | You can justify why this approach fits | Keep a notes page pairing pattern, trigger, and alternative |
-| Implementation stability | You recover from mistakes and re-read the code | Reserve the final three minutes for review |
-| Communication | You narrate decisions instead of coding silently | Record yourself explaining one solution each week |
-
 ## What to Notice in This Code
 
 - Patterns are shortcuts.

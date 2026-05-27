@@ -112,24 +112,6 @@ SQL vs KV: consistency vs performance
 | High-level design | Where does the first serious bottleneck appear? | Main flow and storage boundaries |
 | Deep dive | Which design choice creates the largest cost? | Caching, consistency, and recovery trade-offs |
 
-## Questions that make a design answer feel senior
-
-| Phase | Question to ask yourself | What must stay in the answer |
-| --- | --- | --- |
-| Requirements | Which user path matters most right now? | Functional vs non-functional split |
-| Estimate | How do read/write ratios change the storage choice? | QPS, storage, growth assumptions |
-| High-level design | Where does the first serious bottleneck appear? | Main flow and storage boundaries |
-| Deep dive | Which design choice creates the largest cost? | Caching, consistency, and recovery trade-offs |
-
-## Questions that make a design answer feel senior
-
-| Phase | Question to ask yourself | What must stay in the answer |
-| --- | --- | --- |
-| Requirements | Which user path matters most right now? | Functional vs non-functional split |
-| Estimate | How do read/write ratios change the storage choice? | QPS, storage, growth assumptions |
-| High-level design | Where does the first serious bottleneck appear? | Main flow and storage boundaries |
-| Deep dive | Which design choice creates the largest cost? | Caching, consistency, and recovery trade-offs |
-
 ## What to Notice in This Code
 
 - Requirements come first.

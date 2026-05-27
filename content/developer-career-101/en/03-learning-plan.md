@@ -115,26 +115,6 @@ Sat 09:00-11:00 (120 min)
 | Output | A repo, post, demo, or talk can be shown to someone else | Learning stays private and unverifiable |
 | Retro | Includes completion rate plus blockers | Ends as vague feelings only |
 
-## Operating criteria for a sustainable plan
-
-| Item | Strong version | Common failure |
-| --- | --- | --- |
-| Quarterly goal | Outcome and deadline fit in one sentence | "Study X" with no finish line |
-| Weekly routine | Day, hour, and duration are on the calendar | "I'll do it when I have time" |
-| Inputs | A book, a course, and a real codebase play different roles | Too many similar beginner materials |
-| Output | A repo, post, demo, or talk can be shown to someone else | Learning stays private and unverifiable |
-| Retro | Includes completion rate plus blockers | Ends as vague feelings only |
-
-## Operating criteria for a sustainable plan
-
-| Item | Strong version | Common failure |
-| --- | --- | --- |
-| Quarterly goal | Outcome and deadline fit in one sentence | "Study X" with no finish line |
-| Weekly routine | Day, hour, and duration are on the calendar | "I'll do it when I have time" |
-| Inputs | A book, a course, and a real codebase play different roles | Too many similar beginner materials |
-| Output | A repo, post, demo, or talk can be shown to someone else | Learning stays private and unverifiable |
-| Retro | Includes completion rate plus blockers | Ends as vague feelings only |
-
 ## What to Notice in This Code
 
 - Goals manifest as outputs.
