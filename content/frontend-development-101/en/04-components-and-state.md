@@ -32,9 +32,9 @@ This is the 4th post in the Frontend Development 101 series. Here we introduce c
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying Components and State?
-- Which signal should the example or diagram make visible for Components and State?
-- What failure should be prevented first when Components and State reaches a real system?
+- When should a growing screen be split into components instead of staying in one file?
+- How do props and state divide responsibility inside a component tree?
+- Why does one-way data flow make larger frontend screens easier to change?
 
 ## What You Will Learn
 
@@ -61,9 +61,11 @@ State flows *down*, events flow *up*.
 - **Unidirectional data flow**: data moves *only top-down*.
 - **Lifting state up**: when two children share state, *move it up to the parent*.
 
-## Before/After
+## From One Big Script to Component Boundaries
 
-**Before (everything in one file)**
+A screen can work for a while as one large file of DOM manipulation, but that approach collapses once multiple people and multiple features touch the same view. Components are not just a framework preference. They are a way to give every part of the screen a small, readable job.
+
+**One file owns everything**
 
 ```html
 <script>
@@ -71,7 +73,7 @@ State flows *down*, events flow *up*.
 </script>
 ```
 
-**After (split into components)**
+**Components split responsibilities**
 
 ```jsx
 function App()    { ... }
@@ -79,6 +81,8 @@ function Header() { ... }
 function List()   { ... }
 function Item()   { ... }
 ```
+
+The point of the second structure is not beauty. It is changeability. Once each component owns one responsibility, props and state have somewhere clear to live, and refactoring stops feeling like surgery on the whole page.
 
 ## Hands-on: A React Counter in Five Steps
 
@@ -191,12 +195,12 @@ Components and state make screens *composable*. Next, we connect multiple screen
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Components and State?**
-  - The article treats Components and State as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Components and State?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Components and State reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **When should a growing screen be split into components instead of staying in one file?**
+  - Split when one file starts mixing unrelated responsibilities such as layout, data fetching, input handling, and presentation details. A useful rule is that each component should represent one meaningful slice of the screen.
+- **How do props and state divide responsibility inside a component tree?**
+  - Props are read-only input coming from the parent, while state is the local memory a component owns itself. Once you keep that distinction sharp, it becomes much easier to reason about where each value should change.
+- **Why does one-way data flow make larger frontend screens easier to change?**
+  - One-way flow gives the team a predictable path: parents pass data down, children communicate back through events or callbacks. That predictability removes hidden side effects and makes debugging much faster.
 
 <!-- toc:begin -->
 ## In this series
