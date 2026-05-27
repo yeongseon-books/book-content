@@ -164,6 +164,210 @@ Final portfolio polish is mostly about removing friction. If you review the READ
 
 This closes the Portfolio Project 101 series. Reusing the same review loop on future projects is one of the easiest ways to raise your baseline quality over time.
 
+### Screenshots and Visual Assets Review
+
+If the README and blog posts lack screenshots, visitors cannot understand the project without running it themselves. A screenshot is a condensed version of the live demo.
+
+**Screenshot Checklist:**
+
+| Aspect | Verification |
+| --- | --- |
+| Existence | At least one screenshot of the core flow |
+| Currency | Screenshots match current UI |
+| Clarity | Text is readable, key elements visible |
+| Context | Captions or explanations before/after each screenshot |
+| Paths | Image links are not broken |
+
+Screenshots are the most direct proof that the project actually runs. For backend API projects without a UI, substitute a Swagger screenshot or test output screenshot.
+
+### Resume Integration
+
+The most often-missed piece when polishing a portfolio is the resume connection. Even a strong project becomes less credible if your resume refers to it but the numbers don't match, or if the resume uses different language than the repository.
+
+The connection principle is not about adding more links, but keeping the same message.
+
+| Resume Section | Connection | Writing Principle |
+| --- | --- | --- |
+| Project summary | Problem statement + demo link | Lead with result, not tool names |
+| Tech stack | Top 3-5 only | Must match project README |
+| Results | One or two numbers | Be able to explain how you measured |
+| Role | Your contribution scope | Distinguish team vs personal work |
+
+A strong example: "Reduced scheduling lookup time from 40 minutes to 18 minutes (demo link)" captures problem-action-result concisely. Weak example: "Implemented FastAPI project" has no result or credible outcome.
+
+### Pre-Launch Interview Readiness (Final Check)
+
+At the finish line, verify both portfolio polish and explanation readiness. Use this table to audit your preparedness for expected questions.
+
+| Question | Readiness Check | Strengthening Method |
+| --- | --- | --- |
+| Why this problem? | Explain problem context in 30 seconds | Add one user case study |
+| Why this technology? | Name two alternatives and trade-offs | Link to ADR or design doc |
+| What results? | Present one metric or more | Create before/after comparison chart |
+| Any failures? | Tell one failure or incident story | Write a short postmortem or lessons-learned doc |
+| What's next? | Name three next priorities | Update a Roadmap or Future Work section |
+
+This table is not just interview prep; it is a way to verify that your project documentation is complete. If you can't answer a question, it usually means the project explanation is missing something.
+
+### The 7-Day Final Sprint
+
+In the final week, stop adding features and repeat quality routines. Here is a daily breakdown:
+
+- Day 1: Verify README facts, check all links end-to-end
+- Day 2: Run demo scenario script, refresh backup videos or screenshots
+- Day 3: Stabilize tests, remove flaky failures
+- Day 4: Update ADRs and CHANGELOG
+- Day 5: Check resume-to-project message consistency
+- Day 6: Record yourself answering 10 expected questions
+- Day 7: Have one peer review the entire project
+
+```markdown
+## Final Week Goal
+- No new features
+- Improve quality, explanation, and verification
+- Plan maintenance for week 1 after launch
+```
+
+The goal is not "build more". It is "communicate what you have already built". Portfolio quality comes from delivery clarity, not feature count.
+
+### Final Launch Dashboard Template
+
+A single-page dashboard is more useful than scattered notes as you approach launch. Refresh this weekly to track status at a glance.
+
+| Area | Status | Evidence Link | Next Action |
+| --- | --- | --- | --- |
+| README current | Pass/Fail | README link | Refresh setup section |
+| Demo live | Pass/Fail | Demo URL | Seed data or troubleshoot |
+| Test reliability | Pass/Fail | CI link | Remove flaky tests |
+| Narrative consistent | Pass/Fail | Blog + Resume + GitHub | Align metrics across channels |
+| Interview ready | Pass/Fail | Q&A doc | Rehearse 2-minute answer |
+
+### Post-Launch Maintenance Checks
+
+A portfolio matters more after launch than at launch time. Using this maintenance schedule keeps link trust alive:
+
+- Weekly: Check demo URL health
+- Monthly: Verify README facts against current code
+- Quarterly: Update dependencies
+- Semi-annually: Recheck resume-project message alignment
+
+This maintenance routine is not glamorous, but it is practical. Long-lived portfolios compound more value in interviews and networking than high-effort, high-friction projects.
+
+### GitHub Profile README Optimization
+
+Your GitHub profile README is the first screen a visitor sees before choosing which repository to explore. Even a strong project gets lost if your profile is blank.
+
+```markdown
+# Hi, I'm [Your Name]
+
+## Focus Areas
+- Backend API design and deployment automation
+- Python, FastAPI, PostgreSQL, Docker
+
+## Featured Projects
+
+| Project | Description | Tech | Demo |
+| --- | --- | --- | --- |
+| schedule-hub | Unified team scheduling | FastAPI, Redis | [Live](https://...) |
+| log-analyzer | Server anomaly detection | Python, pandas | [Demo](https://...) |
+
+## Recent Blog Posts
+- [How to Explain Projects in Interviews](https://...)
+- [Building a CI/CD Pipeline from Scratch](https://...)
+```
+
+**Profile README principles:**
+
+1. **Narrow to 3 projects or fewer**: More options make the focus less clear.
+2. **Link to every demo**: One click should show the result.
+3. **Only list tech you actually used**: Misalignment with your resume costs credibility.
+4. **Refresh every 6 months**: A stale profile hurts more than it helps.
+
+### Portfolio Website Structure
+
+If you run a separate portfolio website, starting with this structure keeps things simple:
+
+```text
+portfolio-site/
+├── index.html          # intro + 3 featured projects
+├── projects/
+│   ├── schedule-hub.html   # project detail page
+│   └── log-analyzer.html
+├── blog/               # tech blog links or embedded posts
+├── resume/             # PDF download + online version
+└── assets/
+    ├── screenshots/    # project screenshots
+    └── diagrams/       # architecture diagrams
+```
+
+| Page | Must Include | Common Mistake |
+| --- | --- | --- |
+| Homepage | One-line intro, 3 project cards | listing 10+ projects |
+| Project detail | Problem-solution-result, demo link, screenshot | listing only tech stack |
+| Resume | PDF + online version preview | link-only, no preview |
+
+The key to a portfolio site is browsability, not flash. Success is when a visitor understands "what this person is strong at" within 30 seconds.
+
+### Maintenance Automation Setup
+
+After launch, the portfolio still needs care. Automate basic checks to minimize manual overhead.
+
+```yaml
+# .github/workflows/portfolio-health.yml
+name: Portfolio Health Check
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # every Monday 09:00 UTC
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check demo URL
+        run: |
+          curl -sf https://demo.example.com/health || echo '::warning::Demo is down'
+      - name: Run tests
+        run: |
+          pip install -r requirements.txt
+          pytest --tb=short
+      - name: Check links in README
+        run: |
+          pip install linkchecker
+          linkchecker README.md --check-extern
+```
+
+If this workflow fails, you get a GitHub notification immediately. Just a weekly health check catches broken demos, test failures, and dead links automatically.
+
+You can also automate dependency updates:
+
+```yaml
+# .github/dependabot.yml
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3
+```
+
+When Dependabot opens a PR every month, check if tests still pass and merge it. The ongoing maintenance work itself becomes evidence that you steward your projects, which also helps in interviews.
+
+### Message Alignment Across Channels
+
+The same project emphasizes different aspects depending on where it is shared. Use this table to align messaging while keeping each platform relevant:
+
+| Channel | Main Point | Scope | Link Direction |
+| --- | --- | --- | --- |
+| GitHub README | Problem, how to run, demo | 1-2 scrolls | → Blog, Demo |
+| Blog | Process, decisions, lessons | 2,000-4,000 words | → GitHub, Demo |
+| LinkedIn | Results, role, metrics | 3-5 lines | → GitHub, Blog |
+| Resume | Problem-result-tech | 2-3 lines | → GitHub |
+| Portfolio site | Visual summary, screenshots | One page | ↔ all channels |
+
+Misaligned messaging across channels confuses visitors. For example, if your resume says "50% performance improvement" but the GitHub README has no measurements, trust drops. Pick one source of truth and update all channels together.
+
 ## Answering the Opening Questions
 
 - **What are the most important areas to check before sharing a project publicly?**
