@@ -16,20 +16,23 @@ tags:
 - Coordination
 - Delegation
 last_reviewed: '2026-05-15'
-seo_description: Sometimes it's difficult to handle all tasks with a single agent.
-  This happens when tasks span multiple domains, require different expertise at each…
+seo_description: Separate roles, define delegation protocols, and keep complex multi-agent workflows explainable and debuggable.
 ---
 
 # AI Agent 101 (6/10): Multi-Agent Systems
 
-Sometimes it's difficult to handle all tasks with a single agent. This happens when tasks span multiple domains, require different expertise at each step, or need parallel processing. In such cases, coordinating multiple agents creates a multi-agent system.
+Giving one agent search, writing, review, planning, and final response sounds simple at first. But as requests grow and roles multiply, problems appear quickly. Who plans, who verifies, and who takes final responsibility all become unclear.
 
-The core of multi-agent systems is coordination and delegation. Patterns include the Orchestrator pattern where one agent coordinates everything, the Peer-to-Peer pattern where multiple agents cooperate as equals, and the Hierarchical pattern that divides work hierarchically.
+This is the 6th post in the AI Agent 101 series.
 
-This is the 6th post in the AI Agent 101 series. Here we cover multi-agent patterns, inter-agent communication protocols, delegation strategies, and when to use multi-agent systems.
+The solution is multi-agent systems. The key point, however, is that adding agents is never the goal itself. Good multi-agent makes the system more explainable by splitting roles; bad multi-agent makes it more complex by splitting roles.
 
-![Multi-Agent Patterns](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/06/06-01-multi-agent-patterns.en.png)
-*Multi-Agent Patterns*
+In practice, adopting multi-agent carelessly can increase token cost and handoff count while quality actually drops. So this topic should start not from "how to spin up multiple agents" but from "which tasks genuinely need a delegation structure."
+
+This post frames multi-agent not as a model-count problem but as a role-separation and delegation-protocol problem.
+
+![Multi-agent handoff graph](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/06/06-01-multi-agent-handoff-graph.en.png)
+*Multi-agent handoff graph*
 > You need multiple agents not when you want more agents, but when responsibilities conflict inside one agent.
 
 ## Questions to Keep in Mind
@@ -38,13 +41,32 @@ This is the 6th post in the AI Agent 101 series. Here we cover multi-agent patte
 - What responsibilities should the supervisor, workers, and handoff contract each own?
 - How do cost and failure points grow as you split work across more agents?
 
-## Multi-Agent Patterns
+## Why This Post Matters
 
-There are several patterns for handling complex tasks through cooperation among multiple agents.
+Multi-agent is often introduced as a performance tool, but in production it is closer to a tool for structured delegation. When which agent makes which kind of decision and leaves which artifacts is separated, the system stays readable as it grows.
 
-### Orchestrator Pattern (Centralized Coordination)
+Without role separation, adding agents only makes things worse. They pass the same questions to each other, duplicate searches, leave final-answer responsibility unclear, and make post-mortem tracing nearly impossible. The difficulty of multi-agent is not model count — it is protocol design.
 
-A single Orchestrator agent coordinates everything and delegates work to specialized Worker agents.
+This topic also connects directly to operations and evaluation. Route accuracy, handoff count, per-agent latency, shared state pollution, and unnecessary delegation ratio are metrics that only surface once a multi-agent structure exists. So if you introduce role separation, you must design observability alongside it.
+
+## Core Perspective
+
+Describing multi-agent as "multiple agents working together" is too abstract. A more practical description is a delegation graph where who owns which subtask and what results are left behind is defined. With this framing, the difference between supervisor and worker, reviewer and writer, manager and child agent becomes clear.
+
+Three things matter in this structure. First, who decides the route. Second, which part of the shared state each agent can read and write. Third, who returns the final answer to the user. If these three are ambiguous, adding agents makes the system harder to read, not easier.
+
+In practice, the reason to use multi-agent should be narrowing responsibility and shrinking failure blast radius — not looking sophisticated. That way the operational benefit justifies the extra cost.
+
+> The core of multi-agent is not "there are multiple agents" — it is "roles and handoff rules are explicit in code and state."
+
+## Core Concepts
+
+### Drawing the delegation graph first lets you judge multi-agent necessity faster
+
+![Delegation graph for judging multi-agent necessity](https://yeongseon-books.github.io/book-public-assets/assets/ai-agent-101/06/06-01-multi-agent-patterns.en.png)
+*A multi-agent system is safer to view not as multiple models lined up, but as a delegation graph defining who owns which subtask and what state is shared.*
+
+### The Orchestrator pattern is strong at central coordination
 
 ```python
 from typing import List, Dict
@@ -118,28 +140,11 @@ Respond in JSON format:
             if worker_name in self.workers:
                 results[worker_name] = self.workers[worker_name].execute(task)
         return results
-
-# Example usage
-orchestrator = OrchestratorAgent(api_key="your-key")
-
-# Register workers
-researcher = WorkerAgent("researcher", "research analyst", "your-key")
-writer = WorkerAgent("writer", "technical writer", "your-key")
-reviewer = WorkerAgent("reviewer", "content reviewer", "your-key")
-
-orchestrator.register_worker(researcher)
-orchestrator.register_worker(writer)
-orchestrator.register_worker(reviewer)
-
-# Handle a request
-result = orchestrator.handle("Write a blog post about Python async programming")
 ```
 
-The Orchestrator pattern fits cases where tasks have clear stages and central control is needed. The downside is that the Orchestrator becomes a single point of failure.
+The Orchestrator manages route and fallback centrally. Stages are clear, approval checkpoints are easy to insert, and logs collect in one place. The downside is creating a single bottleneck and single point of failure.
 
-### Peer-to-Peer Pattern (Equal Collaboration)
-
-Multiple agents cooperate as equals without a central coordinator. Each agent communicates directly with others.
+### Peer-to-Peer is flexible but blurs quickly without protocol
 
 ```python
 from typing import List, Optional
@@ -171,10 +176,7 @@ class PeerAgent:
 
     def receive_message(self, sender: "PeerAgent", message: str) -> str:
         """Receive a message and respond."""
-        prompt = f"""You are {self.name}, a {self.role}.
-Message from {sender.name}: {message}
-
-Respond appropriately. If you need help from another peer, mention it."""
+        prompt = f"""You are {self.name}, a {self.role}.\nMessage from {sender.name}: {message}\n\nRespond appropriately. If you need help from another peer, mention it."""
 
         response = self.client.chat.completions.create(
             model="gpt-4o",
@@ -190,835 +192,232 @@ Respond appropriately. If you need help from another peer, mention it."""
             "reply": reply
         })
         return reply
-
-    def collaborate(self, task: str) -> str:
-        """Collaborate with peers on a task."""
-        # Find a peer that can help
-        for peer in self.peers:
-            if self._needs_help_from(peer, task):
-                return self.send_message(peer, task)
-        # Handle alone if no help is needed
-        return self._handle_alone(task)
-
-    def _needs_help_from(self, peer: "PeerAgent", task: str) -> bool:
-        """Determine whether help from this peer is needed."""
-        # Simplified judgment logic
-        keywords = {
-            "writer": ["write", "draft", "compose"],
-            "reviewer": ["review", "check", "feedback"],
-            "researcher": ["research", "find", "investigate"]
-        }
-        for role, kws in keywords.items():
-            if role in peer.role.lower():
-                if any(kw in task.lower() for kw in kws):
-                    return True
-        return False
-
-    def _handle_alone(self, task: str) -> str:
-        """Handle the task alone."""
-        response = self.client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": f"You are {self.name}, a {self.role}."},
-                {"role": "user", "content": task}
-            ],
-            temperature=0.7
-        )
-        return response.choices[0].message.content
-
-# Example usage
-writer = PeerAgent("Writer", "technical writer", "your-key")
-reviewer = PeerAgent("Reviewer", "content reviewer", "your-key")
-
-# Register each other as peers
-writer.add_peer(reviewer)
-reviewer.add_peer(writer)
-
-# Start collaboration
-result = writer.collaborate("Write and review a blog post about REST APIs")
-# Writer drafts and hands off to Reviewer
-# Reviewer gives feedback and Writer revises
 ```
 
-The Peer-to-Peer pattern fits creative collaboration or peer-review style tasks. The downside is that without protocol design, it can lead to infinite loops or inconsistent outputs.
+This pattern is natural for creative collaboration or review-feedback flows. But without rules for who declares termination, when to escalate, or how to block duplicate requests, loops and redundancy appear quickly.
 
-### Hierarchical Pattern (Tree-shaped Structure)
+### Running a minimal handoff skeleton locally makes role boundaries visible
 
-Agents are arranged in a tree, where parents delegate to children and children report back to parents. Suitable for handling complex tasks across multiple levels.
-
-```python
-from typing import List, Optional
-
-class HierarchicalAgent:
-    """A hierarchical agent."""
-
-    def __init__(self, name: str, role: str, level: int, api_key: str):
-        self.name = name
-        self.role = role
-        self.level = level  # 0 = top, increases downward
-        self.client = OpenAI(api_key=api_key)
-        self.parent: Optional["HierarchicalAgent"] = None
-        self.children: List["HierarchicalAgent"] = []
-
-    def add_child(self, child: "HierarchicalAgent") -> None:
-        """Add a child agent."""
-        child.parent = self
-        self.children.append(child)
-
-    def execute(self, task: str) -> str:
-        """Execute a task."""
-        if not self.children:
-            # Leaf node: execute directly
-            return self._do_work(task)
-
-        # Internal node: split and delegate to children
-        subtasks = self._split_task(task)
-        results = []
-        for child, subtask in zip(self.children, subtasks):
-            result = child.execute(subtask)
-            results.append(result)
-
-        # Aggregate results
-        return self._aggregate_results(task, results)
-
-    def _split_task(self, task: str) -> List[str]:
-        """Split the task into subtasks for each child."""
-        children_info = "\n".join([
-            f"- {child.name}: {child.role}"
-            for child in self.children
-        ])
-        prompt = f"""Split the following task into subtasks for each child agent.
-
-Task: {task}
-
-Child agents:
-{children_info}
-
-Respond with one subtask per line, in the same order as the child agents."""
-
-        response = self.client.chat.completions.create(
-            model="gpt-4o",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.3
-        )
-        lines = response.choices[0].message.content.strip().split("\n")
-        # Pad with empty strings if fewer lines than children
-        while len(lines) < len(self.children):
-            lines.append("")
-        return lines[:len(self.children)]
-
-    def _do_work(self, task: str) -> str:
-        """Execute the task directly (leaf nodes)."""
-        response = self.client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": f"You are {self.name}, a {self.role}."},
-                {"role": "user", "content": task}
-            ],
-            temperature=0.7
-        )
-        return response.choices[0].message.content
-
-    def _aggregate_results(self, task: str, results: List[str]) -> str:
-        """Aggregate child results."""
-        results_text = "\n\n".join([
-            f"Result {i+1}: {r}" for i, r in enumerate(results)
-        ])
-        prompt = f"""Original task: {task}
-
-Subtask results:
-{results_text}
-
-Synthesize the results into a coherent final answer."""
-
-        response = self.client.chat.completions.create(
-            model="gpt-4o",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.5
-        )
-        return response.choices[0].message.content
-
-# Example usage
-# Top Manager
-ceo = HierarchicalAgent("CEO", "executive director", 0, "your-key")
-
-# Mid-level Managers
-eng_manager = HierarchicalAgent("EngManager", "engineering manager", 1, "your-key")
-product_manager = HierarchicalAgent("ProductManager", "product manager", 1, "your-key")
-
-# Workers
-backend_dev = HierarchicalAgent("BackendDev", "backend developer", 2, "your-key")
-frontend_dev = HierarchicalAgent("FrontendDev", "frontend developer", 2, "your-key")
-designer = HierarchicalAgent("Designer", "ux designer", 2, "your-key")
-
-# Build the hierarchy
-ceo.add_child(eng_manager)
-ceo.add_child(product_manager)
-eng_manager.add_child(backend_dev)
-eng_manager.add_child(frontend_dev)
-product_manager.add_child(designer)
-
-# Run a task
-result = ceo.execute("Plan a new user dashboard feature")
-```
-
-The Hierarchical pattern fits large projects or organizations with clear chains of responsibility. The downside is high communication overhead and slow response times.
-
-## Inter-Agent Communication Protocols
-
-Standardized communication is essential for agents to cooperate. Three protocols are common.
-
-### Message-based Communication
-
-Agents exchange information through structured messages. Each message has a sender, receiver, type, and content.
+The example below lets an orchestrator call child agents and verify what each writes to shared state — without any API calls.
 
 ```python
 from dataclasses import dataclass, field
-from datetime import datetime
-from enum import Enum
-from typing import Any, Dict, Optional
-import uuid
-
-class MessageType(Enum):
-    """Message types."""
-    REQUEST = "request"
-    RESPONSE = "response"
-    NOTIFICATION = "notification"
-    ERROR = "error"
 
 @dataclass
-class Message:
-    """Standard message format."""
-    sender: str
-    receiver: str
-    message_type: MessageType
-    content: Any
-    correlation_id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    timestamp: datetime = field(default_factory=datetime.now)
-    metadata: Dict = field(default_factory=dict)
+class SharedState:
+    topic: str
+    research_notes: list[str] = field(default_factory=list)
+    draft: str = ""
+    review_comment: str = ""
 
-    def to_dict(self) -> Dict:
-        """Convert to dictionary."""
-        return {
-            "sender": self.sender,
-            "receiver": self.receiver,
-            "type": self.message_type.value,
-            "content": self.content,
-            "correlation_id": self.correlation_id,
-            "timestamp": self.timestamp.isoformat(),
-            "metadata": self.metadata
-        }
+def researcher(state: SharedState) -> None:
+    state.research_notes = [
+        f"{state.topic} is a structure that bundles multiple tool calls into automation.",
+        "Without role separation, only handoff cost grows.",
+    ]
 
-    @classmethod
-    def from_dict(cls, data: Dict) -> "Message":
-        """Create from a dictionary."""
-        return cls(
-            sender=data["sender"],
-            receiver=data["receiver"],
-            message_type=MessageType(data["type"]),
-            content=data["content"],
-            correlation_id=data["correlation_id"],
-            timestamp=datetime.fromisoformat(data["timestamp"]),
-            metadata=data.get("metadata", {})
-        )
+def writer(state: SharedState) -> None:
+    state.draft = " ".join(state.research_notes)
 
-# Example usage
-msg = Message(
-    sender="AgentA",
-    receiver="AgentB",
-    message_type=MessageType.REQUEST,
-    content={"action": "analyze", "data": "sample.csv"},
-    metadata={"priority": "high"}
-)
+def reviewer(state: SharedState) -> None:
+    if "handoff" not in state.draft:
+        state.review_comment = "Handoff cost explanation is missing."
+    else:
+        state.review_comment = "Pass"
 
-# JSON serialization (for network transport)
-import json
-serialized = json.dumps(msg.to_dict())
-
-# Deserialize on the receiving end
-received = Message.from_dict(json.loads(serialized))
+state = SharedState(topic="multi-agent systems")
+researcher(state)
+writer(state)
+reviewer(state)
+print(state)
 ```
 
-A standard message format makes inter-agent communication consistent and tracking easier with `correlation_id`.
+**Expected output:**
 
-### Message Broker Pattern
-
-A central broker handles message routing. Senders only send messages to the broker, and the broker forwards them to recipients.
-
-```python
-from collections import defaultdict, deque
-from collections.abc import Callable
-from typing import Dict, List
-import threading
-
-class MessageBroker:
-    """A message broker."""
-
-    def __init__(self):
-        self.queues: Dict[str, deque] = defaultdict(deque)
-        self.handlers: Dict[str, Callable] = {}
-        self.lock = threading.Lock()
-        self.running = False
-
-    def register_agent(self, agent_name: str, handler: Callable) -> None:
-        """Register an agent and its message handler."""
-        with self.lock:
-            self.handlers[agent_name] = handler
-            if agent_name not in self.queues:
-                self.queues[agent_name] = deque()
-
-    def send(self, message: Message) -> None:
-        """Send a message."""
-        with self.lock:
-            self.queues[message.receiver].append(message)
-
-    def start(self) -> None:
-        """Start the broker."""
-        self.running = True
-        threading.Thread(target=self._dispatch_loop, daemon=True).start()
-
-    def stop(self) -> None:
-        """Stop the broker."""
-        self.running = False
-
-    def _dispatch_loop(self) -> None:
-        """Message dispatch loop."""
-        import time
-        while self.running:
-            with self.lock:
-                for agent_name, queue in self.queues.items():
-                    if queue and agent_name in self.handlers:
-                        message = queue.popleft()
-                        try:
-                            self.handlers[agent_name](message)
-                        except Exception as e:
-                            error_msg = Message(
-                                sender="broker",
-                                receiver=message.sender,
-                                message_type=MessageType.ERROR,
-                                content=str(e),
-                                correlation_id=message.correlation_id
-                            )
-                            self.queues[message.sender].append(error_msg)
-            time.sleep(0.01)
-
-# Example usage
-broker = MessageBroker()
-
-def agent_a_handler(msg: Message):
-    print(f"AgentA received: {msg.content}")
-
-def agent_b_handler(msg: Message):
-    print(f"AgentB received: {msg.content}")
-
-# Register agents
-broker.register_agent("AgentA", agent_a_handler)
-broker.register_agent("AgentB", agent_b_handler)
-
-# Start broker
-broker.start()
-
-# Send messages
-broker.send(Message(
-    sender="AgentA",
-    receiver="AgentB",
-    message_type=MessageType.REQUEST,
-    content="Please analyze this data"
-))
-
-# Wait for processing
-import time
-time.sleep(1)
-broker.stop()
+```text
+SharedState(topic='multi-agent systems', research_notes=['multi-agent systems is a structure that bundles multiple tool calls into automation.', 'Without role separation, only handoff cost grows.'], draft='multi-agent systems is a structure that bundles multiple tool calls into automation. Without role separation, only handoff cost grows.', review_comment='Pass')
 ```
 
-The broker pattern decouples agents and supports asynchronous communication. It's also easier to add new agents.
+Even this minimal skeleton immediately reveals whether each agent freely mutates the entire shared state or writes only to its own fields. Verifying these boundaries before attaching a real multi-agent framework is much safer.
 
-### Shared Memory Communication
+### The Hierarchical pattern resembles a large org chart
 
-Agents share information through shared state. Suitable when many agents need to access the same data.
+A parent agent delegates to children, and children handle even smaller subtasks. Useful for decomposing large work hierarchically, but as depth increases, context loss and reporting cost grow together. Child output contracts must be designed very narrowly.
 
-```python
-from threading import RLock
-from typing import Any, Dict, List
+### Shared state should expose only the minimum contract
 
-class SharedMemory:
-    """Shared memory."""
+- Share only core fields like `route`, `current_owner`, `worker_result`.
+- Do not expose each agent's private scratchpad to global shared state.
+- Fix input and output schemas per handoff.
+- Assign final assembly responsibility to one agent or a separate finalizer.
+- Log delegation rationale so route quality can be evaluated.
 
-    def __init__(self):
-        self.data: Dict[str, Any] = {}
-        self.lock = RLock()
-        self.access_log: List[Dict] = []
+### Handoff failures usually start from missing protocol
 
-    def write(self, key: str, value: Any, agent_name: str) -> None:
-        """Write data."""
-        with self.lock:
-            old_value = self.data.get(key)
-            self.data[key] = value
-            self.access_log.append({
-                "agent": agent_name,
-                "operation": "write",
-                "key": key,
-                "old_value": old_value,
-                "new_value": value,
-                "timestamp": datetime.now().isoformat()
-            })
+- If the orchestrator does not log the routing reason, post-hoc analysis of why a particular worker was chosen becomes impossible.
+- If workers return only free-form text, the next agent can read it but cannot validate it.
+- If the reviewer and writer overwrite the same shared state field concurrently, only the last write survives and root-cause tracing breaks.
+- If no termination condition exists, peer-to-peer structures easily send the same request bouncing between agents.
 
-    def read(self, key: str, agent_name: str) -> Any:
-        """Read data."""
-        with self.lock:
-            value = self.data.get(key)
-            self.access_log.append({
-                "agent": agent_name,
-                "operation": "read",
-                "key": key,
-                "value": value,
-                "timestamp": datetime.now().isoformat()
-            })
-            return value
+Before adding agents, fix four things: `input schema`, `output schema`, `max handoff count`, and `final responsible agent`. Only with these four does delegation remain an explainable structure.
 
-    def delete(self, key: str, agent_name: str) -> None:
-        """Delete data."""
-        with self.lock:
-            if key in self.data:
-                old_value = self.data[key]
-                del self.data[key]
-                self.access_log.append({
-                    "agent": agent_name,
-                    "operation": "delete",
-                    "key": key,
-                    "old_value": old_value,
-                    "timestamp": datetime.now().isoformat()
-                })
+## Production Design Details
 
-    def get_history(self, key: str = None) -> List[Dict]:
-        """View access history."""
-        with self.lock:
-            if key:
-                return [log for log in self.access_log if log.get("key") == key]
-            return list(self.access_log)
+### The separation criterion for roles is responsibility boundary, not model performance
 
-# Example usage
-shared_mem = SharedMemory()
+The common question when reviewing multi-agent composition is "does splitting models make it smarter?" The actually important criterion is responsibility boundary. If planner, executor, and reviewer responsibilities conflict, debugging becomes harder than with a single agent.
 
-# AgentA executes a task
-shared_mem.write("task_result", {"status": "completed"}, "AgentA")
+| Role | Input | Output | Failure Mode |
+| --- | --- | --- | --- |
+| Planner | Goal, policy | Execution plan | Over-decomposition |
+| Executor | Single task instruction | Tool result | Wrong tool selection |
+| Reviewer | Plan + result | Approve/revise instruction | Excessive rejection |
 
-# AgentB reads AgentA's result and continues work
-result = shared_mem.read("task_result", "AgentB")
-print(f"AgentB read: {result}")
+### Message bus schema example
 
-# View memory access history
-history = shared_mem.get_history("task_result")
-for log in history:
-    print(log)
-```
-
-Shared memory is useful but requires synchronization. Without proper locking, it can lead to race conditions or inconsistent state.
-
-## Delegation Strategies
-
-How an agent delegates work to other agents heavily impacts overall system performance.
-
-### Role-based Delegation
-
-Each agent has a clear role, and tasks are delegated based on role matching.
-
-```python
-class RoleBasedDelegator:
-    """Role-based delegator."""
-
-    def __init__(self):
-        self.agents_by_role: Dict[str, List[str]] = defaultdict(list)
-        self.agent_capabilities: Dict[str, Dict] = {}
-
-    def register(self, agent_name: str, roles: List[str], capabilities: Dict) -> None:
-        """Register an agent."""
-        for role in roles:
-            self.agents_by_role[role].append(agent_name)
-        self.agent_capabilities[agent_name] = capabilities
-
-    def find_agent_for_task(self, task: Dict) -> Optional[str]:
-        """Find an appropriate agent for the task."""
-        required_role = task.get("required_role")
-        if required_role and required_role in self.agents_by_role:
-            candidates = self.agents_by_role[required_role]
-            # Pick the agent with best capability match
-            best_agent = None
-            best_score = -1
-            for agent in candidates:
-                score = self._calculate_match_score(
-                    self.agent_capabilities[agent],
-                    task.get("requirements", {})
-                )
-                if score > best_score:
-                    best_score = score
-                    best_agent = agent
-            return best_agent
-        return None
-
-    def _calculate_match_score(self, capabilities: Dict, requirements: Dict) -> float:
-        """Calculate the capability match score."""
-        if not requirements:
-            return 1.0
-        matches = sum(
-            1 for k, v in requirements.items()
-            if capabilities.get(k) == v
-        )
-        return matches / len(requirements)
-
-# Example usage
-delegator = RoleBasedDelegator()
-delegator.register("DocWriter", ["documentation"], {"language": "ko", "format": "markdown"})
-delegator.register("CodeWriter", ["coding"], {"language": "python", "framework": "fastapi"})
-
-task = {
-    "required_role": "documentation",
-    "requirements": {"language": "ko", "format": "markdown"}
+```json
+{
+  "message_id": "uuid",
+  "trace_id": "uuid",
+  "from": "planner",
+  "to": "executor",
+  "intent": "run_tool",
+  "payload": {"tool": "search_docs", "args": {"q": "..."}},
+  "deadline_ms": 4000,
+  "retry": 0
 }
-selected = delegator.find_agent_for_task(task)
-# Identifies "documentation" role → delegates to DocWriter
 ```
 
-Role-based delegation is intuitive and easy to manage. The downside is that as roles fragment, management overhead grows.
+Leaving inter-agent communication as free text repeats parsing errors and responsibility shifting. Enforcing a structured envelope is what creates operational viability.
 
-### Capability-based Delegation
-
-Tasks are delegated based on each agent's specific capabilities (skills) rather than roles.
+### Supervisor pattern minimal implementation
 
 ```python
-from typing import Set
-
-class CapabilityRegistry:
-    """Capability registry."""
-
-    def __init__(self):
-        self.agent_capabilities: Dict[str, Dict[str, float]] = {}
-
-    def register(self, agent_name: str, capabilities: Dict[str, float]) -> None:
-        """Register an agent's capabilities (capability name → proficiency 0.0-1.0)."""
-        self.agent_capabilities[agent_name] = capabilities
-
-    def find_best_agent(
-        self,
-        required_capabilities: Set[str],
-        min_proficiency: float = 0.5
-    ) -> Optional[str]:
-        """Find the agent best matching the required capabilities."""
-        best_agent = None
-        best_score = 0.0
-
-        for agent, caps in self.agent_capabilities.items():
-            # Calculate average proficiency on required capabilities
-            scores = [
-                caps.get(cap, 0.0) for cap in required_capabilities
-                if caps.get(cap, 0.0) >= min_proficiency
-            ]
-            if len(scores) == len(required_capabilities):
-                avg_score = sum(scores) / len(scores)
-                if avg_score > best_score:
-                    best_score = avg_score
-                    best_agent = agent
-
-        return best_agent
-
-# Example usage
-registry = CapabilityRegistry()
-registry.register("AgentA", {
-    "python": 0.9,
-    "machine_learning": 0.7,
-    "data_analysis": 0.8
-})
-registry.register("AgentB", {
-    "python": 0.95,
-    "machine_learning": 0.9,
-    "deep_learning": 0.85
-})
-
-required = {"python", "machine_learning"}
-best = registry.find_best_agent(required)
-# Picks AgentB (python: 0.95, machine_learning: 0.9)
+def supervisor(goal: str):
+    plan = planner_agent(goal)
+    for task in plan["tasks"]:
+        result = executor_agent(task)
+        verdict = reviewer_agent(task=task, result=result)
+        if verdict["status"] == "retry":
+            result = executor_agent({**task, "hint": verdict.get("hint")})
+        if verdict["status"] == "fail":
+            return {"ok": False, "reason": "review_failed", "task": task}
+    return {"ok": True}
 ```
 
-Capability-based delegation enables fine-grained task assignment. The downside is the cost of designing and maintaining the capability model.
+The key is that the supervisor owns a retry budget and termination condition. Without a higher-level controller, each agent could spin in an infinite loop.
 
-### Load-based Delegation
+### Multi-agent observability metrics
 
-Tasks are distributed based on each agent's current workload.
+| Metric | Meaning |
+| --- | --- |
+| cross_agent_hops | Hops between agents per goal |
+| reviewer_reject_rate | Reviewer rejection ratio |
+| arbitration_latency | Supervisor mediation delay |
+| dead_letter_count | Messages that failed processing |
+
+Multi-agent has division-of-labor benefits but high communication and synchronization costs. Operating without metrics produces a system slower and more expensive than a single agent.
+
+## Operations Notes
+
+### Failure classification template
+
+In production you never close a failure with "the model got it wrong." Splitting failure axes makes improvement priorities clear.
+
+| Axis | Question | Example |
+| --- | --- | --- |
+| Planning failure | Was the goal decomposed wrong? | Unnecessary step repeated 6 times |
+| Execution failure | Did a tool call fail? | Timeout, 429, schema mismatch |
+| Verification failure | Was result checking insufficient? | Wrong observation adopted |
+| Policy failure | Was a safety boundary crossed? | Sensitive data sent externally |
+
+### Prompt and tool version pinning
+
+```json
+{
+  "run_id": "run_2026_05_21_001",
+  "model": "gpt-4.1-mini",
+  "prompt_version": "agent-101-en-v3",
+  "tool_schema_version": "tools-v5",
+  "policy_version": "policy-2026-05"
+}
+```
+
+Version fields alone dramatically speed up regression analysis — immediately narrowing whether a drop came from a model, prompt, or tool change.
+
+### Observability event example
 
 ```python
-import time
+import json
+from datetime import datetime
 
-class LoadBalancingDelegator:
-    """Load-based delegator."""
+def emit_event(event_type: str, payload: dict):
+    record = {
+        "ts": datetime.utcnow().isoformat() + "Z",
+        "event_type": event_type,
+        "payload": payload,
+    }
+    print(json.dumps(record, ensure_ascii=False))
 
-    def __init__(self):
-        self.agent_loads: Dict[str, int] = {}
-        self.agent_max_capacity: Dict[str, int] = {}
-        self.lock = threading.Lock()
-
-    def register(self, agent_name: str, max_capacity: int = 10) -> None:
-        """Register an agent."""
-        with self.lock:
-            self.agent_loads[agent_name] = 0
-            self.agent_max_capacity[agent_name] = max_capacity
-
-    def assign_task(self, task_id: str) -> Optional[str]:
-        """Assign a task to the agent with the lightest load."""
-        with self.lock:
-            available_agents = [
-                (name, load) for name, load in self.agent_loads.items()
-                if load < self.agent_max_capacity[name]
-            ]
-            if not available_agents:
-                return None
-            # Pick the agent with the lowest load
-            selected = min(available_agents, key=lambda x: x[1])[0]
-            self.agent_loads[selected] += 1
-            return selected
-
-    def complete_task(self, agent_name: str) -> None:
-        """Mark a task as completed."""
-        with self.lock:
-            if agent_name in self.agent_loads and self.agent_loads[agent_name] > 0:
-                self.agent_loads[agent_name] -= 1
-
-# Example usage
-balancer = LoadBalancingDelegator()
-balancer.register("AgentA", max_capacity=5)
-balancer.register("AgentB", max_capacity=5)
-balancer.register("AgentC", max_capacity=5)
-
-# Process several tasks concurrently
-for i in range(10):
-    agent = balancer.assign_task(f"task_{i}")
-    print(f"Task {i} assigned to {agent}")
-    # ... actually run the task ...
-    # balancer.complete_task(agent)
+emit_event("agent.step", {"step": 2, "tool": "search_docs", "latency_ms": 412})
 ```
 
-Load-based delegation maximizes overall system throughput. The downside is harder optimization when agents have different capabilities.
+Structured logs first, then expand to OpenTelemetry/ELK/Grafana later at low migration cost.
 
-## When to Use Multi-Agent Systems
+### Deployment checklist
 
-Multi-agent systems aren't always the right answer. Consider them in the following situations.
+- Confirm model API keys are separated into environment variables and Secret Manager.
+- Verify `max_steps`, `timeout_ms`, `retry_budget` defaults fit the production profile.
+- Check that fallback response wording does not give overconfident assurances during outages.
+- Keep alarm thresholds (`error_rate`, `p95_latency`, `policy_violation_rate`) identical in docs and code.
 
-### When Different Expertise Is Needed at Each Stage
+### Cost control points
 
-Use multi-agent when a single task spans several specialty areas.
+| Item | Description | Recommended Default |
+| --- | --- | --- |
+| max_steps | Max loops per execution | 4–8 |
+| max_tool_calls | Tool call ceiling | 3–6 |
+| input_token_budget | Input token budget | Per-service policy |
+| output_token_budget | Output token budget | Per-service policy |
 
-```python
-# Example: writing a project proposal
-# - Market research (ResearchAgent)
-# - Tech-stack recommendation (TechAgent)
-# - Cost estimation (FinanceAgent)
-# - Document writing (WriterAgent)
+### CI gate example
+
+```bash
+python3 scripts/eval_agent.py --dataset eval/agent_core_en.jsonl --min-success 0.82
+python3 scripts/check_tool_schema.py --strict
+python3 scripts/check_prompt_version.py --require-changelog
 ```
 
-A single agent struggles to deliver expertise in all these areas at once. Specialized agents working together produce a better outcome.
+## Common Misconceptions
 
-### When Parallel Processing Yields Big Gains
+- Adding more agents does not automatically improve quality — role boundaries come first.
+- Making the orchestrator handle every detail makes it indistinguishable from a single agent.
+- Opening shared state wide seems flexible but quickly explodes coupling and debug difficulty.
+- Peer-to-peer looks free but without termination rules, infinite handoff loops emerge easily.
+- Multi-agent looks expert-level but many problems are better solved with single-agent + better tools.
 
-Use multi-agent when independent tasks can run in parallel.
+## Operations Checklist
 
-```python
-# Example: crawl multiple websites simultaneously
-# - Agent1: crawls site1.com
-# - Agent2: crawls site2.com
-# - Agent3: crawls site3.com
-# - Orchestrator: merges results
-```
+- [ ] Compared multi-agent necessity against a single-agent alternative
+- [ ] Stated who decides the route and who owns the final answer
+- [ ] Defined handoff input/output schemas and termination conditions
+- [ ] Limited shared state to minimum fields
+- [ ] Measuring per-agent latency, route accuracy, and handoff count
 
-Multi-agent systems shine when each agent processes independent tasks in parallel.
+## Wrap-Up
 
-### When Mutual Validation Improves Quality
+Multi-agent is not a technique for bundling multiple models impressively. It is a method for separating roles, clarifying delegation boundaries, and fixing final responsibility location to create a more explainable automation structure. The core is protocol quality, not agent count.
 
-Use multi-agent when one agent's output needs to be reviewed by another.
+Good multi-agent design makes each agent smaller, shared state narrower, and the final assembly point sharper. Bad design makes it harder to tell who did what as agents increase.
 
-```python
-# Example: a content production pipeline
-# 1. Writer: drafts the post
-# 2. Reviewer: provides feedback
-# 3. Writer: revises
-# 4. Editor: final edit
-```
-
-Cross-checks among agents help catch errors and improve quality.
-
-### When Continuous Operation Is Required
-
-Use multi-agent when the system must operate 24/7.
-
-```python
-# Example: a continuous monitoring system
-# - MonitorAgent: watches system health 24/7
-# - AlertAgent: notifies on issues
-# - AnalysisAgent: analyzes logs and generates reports
-```
-
-When agents are split by responsibility, even if one agent fails, the others can keep the system running.
-
-### When NOT to Use Multi-Agent
-
-In the following cases, a single agent is better:
-
-- Simple tasks (e.g., FAQ answering, simple translation)
-- When low latency matters most (overhead is high)
-- When debugging difficulty matters more (multi-agent issues are hard to track)
-- When cost is critical (multiple LLM calls increase cost)
-
-A reasonable approach: start with a single agent and switch to multi-agent only when the limits become clear.
-
-## Common Mistakes
-
-### Mistake 1: Using Multi-Agent Where Not Needed
-
-Some teams introduce multi-agent for trivial tasks, leading to overengineering.
-
-```python
-# Bad example
-# Using 3 agents for a simple document summary
-agent1 = Agent("Reader")     # Reads the doc
-agent2 = Agent("Summarizer") # Summarizes
-agent3 = Agent("Formatter")  # Formats output
-# Overengineered: a single agent is sufficient
-
-# Good example
-# A single agent handles it
-agent = Agent("DocProcessor")
-result = agent.process_document(doc)
-```
-
-Multi-agent should only be introduced when truly necessary.
-
-### Mistake 2: Lack of Communication Protocol
-
-When agents communicate without standardized messages, the system becomes hard to maintain.
-
-```python
-# Bad example
-# Each agent passes free-form messages
-agent_a.send("Hey, can you check this?")
-agent_b.send({"task": "review", "content": "..."})
-agent_c.send("REVIEW_NEEDED:doc123")
-# Inconsistent formats make tracking and debugging hard
-
-# Good example
-# Use a standard message format
-message = Message(
-    sender="AgentA",
-    receiver="AgentB",
-    message_type=MessageType.REQUEST,
-    content={"action": "review", "data": "doc123"}
-)
-broker.send(message)
-```
-
-Standardized messages improve communication consistency and observability.
-
-### Mistake 3: No Infinite-Loop Prevention
-
-Without termination conditions, agents can endlessly exchange messages.
-
-```python
-# Bad example
-# AgentA and AgentB keep sending messages to each other
-# AgentA: "I need help" → AgentB
-# AgentB: "I need more info" → AgentA
-# AgentA: "What info?" → AgentB
-# AgentB: "I don't know" → AgentA
-# Infinite loop
-
-# Good example
-# Limit max iterations and message depth
-class LoopProtectedAgent:
-    MAX_DEPTH = 5
-
-    def communicate(self, message, depth=0):
-        if depth >= self.MAX_DEPTH:
-            return "Max depth reached. Terminating."
-        # ... handle message ...
-```
-
-Always design termination conditions and depth limits.
-
-### Mistake 4: Mixing Roles and Responsibilities
-
-When agent roles overlap, work is duplicated and conflicts arise.
-
-```python
-# Bad example
-# Orchestrator manages even Worker internals
-orchestrator.assign_task(code_agent, "Write a function")
-orchestrator.review_code(code_agent.result)  # Should be Reviewer's job
-orchestrator.refactor(code_agent.result)     # Removes Worker autonomy
-
-# Good example
-# Each agent has clear responsibilities
-orchestrator.delegate("write_code", code_agent)  # Orchestrator only says "what" to do
-# code_agent decides "how" to do it
-review_agent.review(code_agent.result)
-refactor_agent.refactor(code_agent.result)
-```
-
-Define each agent's responsibilities clearly and respect their autonomy.
-
-### Mistake 5: Missing Failure Handling
-
-When the system halts upon any agent's failure, reliability collapses.
-
-```python
-# Bad example
-# Whole system stops if any agent fails
-def run_pipeline():
-    result1 = agent1.execute(task)  # Failure here halts everything
-    result2 = agent2.execute(result1)
-    return result2
-
-# Good example
-# Add retry, fallback, and graceful-degradation logic
-def run_pipeline():
-    try:
-        result1 = agent1.execute(task)
-    except AgentError:
-        result1 = fallback_agent.execute(task)  # Alternative agent
-
-    try:
-        result2 = agent2.execute(result1)
-    except AgentError:
-        result2 = result1  # Fall back to previous step's result
-
-    return result2
-```
-
-Handling individual agent failures explicitly increases system reliability.
-
-## Key Takeaways
-
-- Multi-agent systems exist to solve complex tasks via cooperation; choose patterns based on the situation
-- The Orchestrator pattern fits central coordination, Peer-to-Peer fits equal collaboration, and Hierarchical fits tree-shaped task decomposition
-- Standardized messages and protocols are essential for stable inter-agent communication
-- Pick the delegation strategy (role-based, capability-based, load-based) that fits your task
-- Use multi-agent only when truly necessary; a single agent often suffices for simple tasks
-- Standard message formats, infinite-loop prevention, and failure handling are mandatory in production
-
-<!-- a-grade-example:begin -->
-
-## Checklist
-
-- [ ] Sorted tasks into single-agent vs multi-agent buckets with explicit criteria.
-- [ ] Implemented or sketched a Supervisor-pattern example.
-- [ ] Defined an explicit message schema between agents.
-- [ ] Tracked agent-to-agent calls and either reproduced or avoided a cost blowup.
-
-<!-- a-grade-example:end -->
+The next post covers how to evaluate these systems. Unless you measure whether routes were appropriate, trajectories were efficient, and final success rate holds, you cannot justify multi-agent cost.
 
 ## Answering the Opening Questions
 
 - **Where is the line between a task that fits one agent and a task that needs multiple agents?**
   - Consider multiple agents when domains, tools, success criteria, or task ownership are distinct enough that one prompt and state contract become overloaded.
 - **What responsibilities should the supervisor, workers, and handoff contract each own?**
-  - The supervisor owns routing and stopping decisions, workers own assigned execution, and the handoff contract owns the input and output shape passed between them.
+  - The supervisor owns routing and stopping decisions, workers own assigned execution, and the handoff contract owns the input/output shape passed between them.
 - **How do cost and failure points grow as you split work across more agents?**
   - More agents add LLM calls, handoff gaps, state mismatches, and supervisor bottlenecks. Split only when role separation pays for that overhead.
 
@@ -1040,9 +439,18 @@ Handling individual agent failures explicitly increases system reliability.
 
 ## References
 
+### Official Documentation
+
 - [Anthropic - Building effective agents](https://www.anthropic.com/research/building-effective-agents)
-- [LangGraph multi-agent workflows](https://langchain-ai.github.io/langgraph/tutorials/multi_agent/)
-- [CrewAI documentation](https://docs.crewai.com/)
-- [Semantic Kernel agents overview](https://learn.microsoft.com/en-us/semantic-kernel/frameworks/agent/)
+- [LangGraph - Multi-agent workflows](https://langchain-ai.github.io/langgraph/tutorials/multi_agent/)
+- [OpenAI Platform - Agents guide](https://platform.openai.com/docs/guides/agents)
+- [CrewAI Documentation](https://docs.crewai.com/)
+
+### Related Series
+
+- [LangGraph 101 - Multi-agent systems](../../langgraph-101/ko/05-multi-agent.md)
+- [AI Evaluation 101 - System evaluation perspective](../../ai-evaluation-101/ko/01-why-evaluate-llm-apps.md)
+
+- [Example code for this post (book-examples)](https://github.com/yeongseon-books/book-examples/tree/main/ai-agent-101/en/06-multi-agent-systems)
 
 Tags: AI Agent, LLM, Tool Use, Python
