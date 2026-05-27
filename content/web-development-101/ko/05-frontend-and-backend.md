@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Web Development 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/05/05-01-concept-at-a-glance.ko.png)
 *Web Development 101 5장 흐름 개요*
 
+> Frontend와 Backend는 기술 묶음이 아니라 책임 경계입니다 — 데이터의 진실은 백엔드, 표현과 즉각 반응은 프런트엔드가 가지고, 그 경계를 잇는 API 계약이 두 세계의 유일한 공식 통로입니다.
+
 ## 먼저 던지는 질문
 
 - Frontend와 Backend의 일은 어디서 갈릴까요?

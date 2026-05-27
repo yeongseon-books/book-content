@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Web Development 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/03/03-01-concept-at-a-glance.ko.png)
 *Web Development 101 3장 흐름 개요*
 
+> 브라우저는 HTML 텍스트를 DOM 트리로 바꾼 뒤 스타일·레이아웃·페인트·이벤트 루프를 거쳐야 비로소 클릭 가능한 화면이 됩니다 — 이 파이프라인을 알면 JavaScript가 무엇을 읽고 무엇을 바꾸는지가 명확해집니다.
+
 ## 먼저 던지는 질문
 
 - DOM은 정확히 무엇이며 어떻게 만들어질까요?

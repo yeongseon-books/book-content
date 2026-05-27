@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Web Development 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/08/08-01-concept-at-a-glance.ko.png)
 *Web Development 101 8장 흐름 개요*
 
+> 배포는 '내 노트북에서는 됩니다'를 '운영 환경에서 반복 가능하게 됩니다'로 바꾸는 단계입니다 — 환경 분리·환경 변수·비밀 관리·빌드 산출물·CI/CD는 모두 같은 코드가 어디서나 똑같이 실행되게 하기 위한 장치입니다.
+
 ## 먼저 던지는 질문
 
 - 노트북에서만 돌던 앱을 어떻게 운영 환경으로 옮길까요?

@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Web Development 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/02/02-01-concept-at-a-glance.ko.png)
 *Web Development 101 2장 흐름 개요*
 
+> HTML·CSS·JavaScript는 구조·표현·동작이라는 서로 다른 책임을 가진 세 층입니다 — 한 화면을 만들 때는 번거롭게 느껴지지만, 이 분리가 유지보수와 협업 비용을 좌우합니다.
+
 ## 먼저 던지는 질문
 
 - 웹 페이지는 왜 세 가지 언어로 나뉠까요?

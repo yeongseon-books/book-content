@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Web Development 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/10/10-01-concept-at-a-glance.ko.png)
 *Web Development 101 10장 흐름 개요*
 
+> 마지막 글은 시리즈의 모든 조각을 하나의 작은 앱 안에서 다시 연결하는 자리입니다 — HTML·Flask·SQLite·환경 변수·헬스 체크·컨테이너가 따로 배운 개념이 아닌 하나의 흐름임을 손으로 확인하는 단계입니다.
+
 ## 먼저 던지는 질문
 
 - 앞선 아홉 개 개념은 한 앱 안에서 어떻게 연결될까요?

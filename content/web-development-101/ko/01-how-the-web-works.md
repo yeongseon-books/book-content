@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Web Development 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/01/01-01-concept-at-a-glance.ko.png)
 *Web Development 101 1장 흐름 개요*
 
+> URL을 입력하고 화면이 보이기까지의 흐름은 브라우저·DNS·HTTP·서버·렌더링이 한 줄로 맞물린 파이프라인입니다 — 이 한 흐름이 머릿속에 그려져야 장애와 성능 문제를 추측 대신 단계 단위로 끊어서 읽을 수 있습니다.
+
 ## 먼저 던지는 질문
 
 - URL을 입력한 뒤 화면이 보일 때까지 어떤 단계가 지나갈까요?

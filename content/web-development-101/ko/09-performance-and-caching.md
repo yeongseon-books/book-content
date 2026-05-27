@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Web Development 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/09/09-01-concept-at-a-glance.ko.png)
 *Web Development 101 9장 흐름 개요*
 
+> 성능은 감각이 아니라 측정에서 시작합니다 — 어디가 느린지를 먼저 끊어 읽어야 캐시·CDN·lazy loading·인덱스·N+1 해결 같은 처방이 진단에 맞는 자리로 갑니다.
+
 ## 먼저 던지는 질문
 
 - 느린 페이지를 만나면 어디서부터 봐야 할까요?

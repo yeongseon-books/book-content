@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Web Development 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/04/04-01-concept-at-a-glance.ko.png)
 *Web Development 101 4장 흐름 개요*
 
+> HTTP는 method·status·header·body로 구성된 텍스트 메시지의 왕복이고, API 호출은 페이지 요청과 같은 프로토콜 위에서 데이터 모양만 달리한 호출일 뿐입니다 — 이 모양이 보이지 않으면 디버깅은 곧장 추측 게임이 됩니다.
+
 ## 먼저 던지는 질문
 
 - 클라이언트와 서버는 실제로 무엇을 주고받을까요?

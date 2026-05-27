@@ -32,6 +32,8 @@ last_reviewed: '2026-05-15'
 ![Web Development 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/07/07-01-concept-at-a-glance.ko.png)
 *Web Development 101 7장 흐름 개요*
 
+> 데이터베이스 연결은 웹앱의 거의 모든 요청이 통과하는 핵심 경로입니다 — SQL·ORM·연결 풀·트랜잭션은 각각 '무엇을 묻는가·어떻게 묻는가·연결을 어떻게 재사용하는가·실패 시 어디로 되돌리는가'라는 다른 문제를 답합니다.
+
 ## 먼저 던지는 질문
 
 - 웹앱은 왜 파일이 아니라 데이터베이스를 쓸까요?
