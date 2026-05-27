@@ -32,9 +32,9 @@ This is the final post in the Frontend Development 101 series. Here we assemble 
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying Building a Small Frontend App?
-- Which signal should the example or diagram make visible for Building a Small Frontend App?
-- What failure should be prevented first when Building a Small Frontend App reaches a real system?
+- How do routing, components, API calls, forms, styling, and build steps fit into one app flow?
+- Which project boundaries keep a small frontend app understandable after the first week?
+- What should be verified before you can honestly call the app shipped?
 
 ## What You Will Learn
 
@@ -56,23 +56,27 @@ Knowledge becomes *yours* only when it is *bound into a project*. The nine posts
 - **Deployment**: the act of putting build output *behind a public URL*.
 - **Roadmap**: a path showing *what to learn next*.
 
-## Before/After
+## From Isolated Concepts to a Shipped App
 
-**Before (you only know the concepts)**
+Knowing each topic separately is useful, but the real learning happens when those topics have to cooperate inside one repository, one build, and one deployment path. A small frontend app turns theory into a repeatable workflow the next project can build on.
+
+**Concepts live only as separate lessons**
 
 ```text
 "I know routing, I know forms, I know APIs."
-"But I have never combined them all to *build an app*."
+"But I have never combined them all to build an app."
 ```
 
-**After (a small app is alive on the internet)**
+**The concepts meet inside one deployed project**
 
 ```text
 https://my-notes.netlify.app
-- A user can *add/edit/delete* notes.
-- The code is *on GitHub*.
-- The next learner studies *on top of this code*.
+- A user can add/edit/delete notes.
+- The code is on GitHub.
+- The next learner studies on top of this code.
 ```
+
+That last step is what changes the lesson from knowledge into experience. Once the app builds, deploys, refreshes correctly, and explains itself through a README, the earlier concepts stop feeling isolated.
 
 ## Hands-on: A Small Notes App in Five Steps
 
@@ -241,12 +245,12 @@ If you made it here, *frontend onboarding is done*. Good companion series to rea
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Building a Small Frontend App?**
-  - The article treats Building a Small Frontend App as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Building a Small Frontend App?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Building a Small Frontend App reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do routing, components, API calls, forms, styling, and build steps fit into one app flow?**
+  - The notes app shows the stack in order: routes decide which page loads, components render the page, forms collect input, API calls persist it, styling keeps the UI coherent, and the build step turns the whole thing into deployable assets.
+- **Which project boundaries keep a small frontend app understandable after the first week?**
+  - Clear separation between `pages/`, `components/`, `api/`, `hooks/`, and `styles/` keeps the code navigable. Those boundaries matter more than clever abstractions in a beginner-friendly project.
+- **What should be verified before you can honestly call the app shipped?**
+  - Build success, deploy success, refresh-safe routing, visible error handling, readable setup docs, and a public URL someone else can open without help are the minimum bar.
 
 <!-- toc:begin -->
 ## In this series
