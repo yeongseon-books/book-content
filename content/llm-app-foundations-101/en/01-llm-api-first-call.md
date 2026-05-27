@@ -15,8 +15,7 @@ tags:
 - Prompt Engineering
 - Python
 last_reviewed: '2026-05-01'
-seo_description: '!Authentication rate limit and retry branches The SDK handles authentication
-  headers, JSON serialization, response parsing, and typed errors.'
+seo_description: 'Walk through your first Groq API call: how the SDK wraps an HTTP request, what fields to read in the response, and which numbers to log from day one.'
 ---
 
 # LLM App Foundations 101 (1/6): LLM API first call — sending your first request
