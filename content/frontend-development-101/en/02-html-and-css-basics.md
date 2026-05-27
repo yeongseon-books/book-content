@@ -32,9 +32,9 @@ This is the 2nd post in the Frontend Development 101 series. Here we treat HTML 
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying HTML and CSS Basics?
-- Which signal should the example or diagram make visible for HTML and CSS Basics?
-- What failure should be prevented first when HTML and CSS Basics reaches a real system?
+- Why is semantic HTML a design decision, not just a style preference?
+- Why does the box model explain so many CSS bugs faster than visual guessing?
+- When should you reach for Flexbox, and when does Grid describe the layout more directly?
 
 ## What You Will Learn
 
@@ -59,9 +59,11 @@ HTML and CSS are *long-lived skills*. Frameworks rotate every five years, but *s
 - **Grid**: a *two-axis* layout system that divides regions.
 - **Media query**: syntax that applies *different styles* per screen size.
 
-## Before/After
+## From Presentational Markup to Meaningful Structure
 
-**Before (a pile of meaningless divs)**
+Two pages can look almost identical in the browser and still have very different long-term quality. A page built from generic containers can be hard to navigate for assistive tools and hard to reason about for teammates. A page built from semantic elements carries its structure in the markup itself.
+
+**Presentational markup**
 
 ```html
 <div class="header">
@@ -70,13 +72,15 @@ HTML and CSS are *long-lived skills*. Frameworks rotate every five years, but *s
 <div class="content">...</div>
 ```
 
-**After (semantic structure)**
+**Semantic structure**
 
 ```html
 <header><nav>...</nav></header>
 <main>...</main>
 <footer>...</footer>
 ```
+
+The visible layout may be similar, but the second version communicates intent. Search engines, screen readers, and future maintainers can tell where navigation stops and main content begins. That is why semantic HTML belongs in the architecture discussion, not just the polishing phase.
 
 ## Hands-on: A Card Layout in Five Steps
 
@@ -187,12 +191,12 @@ HTML is *the skeleton*; CSS is *the clothes*. With the two clearly separated, be
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying HTML and CSS Basics?**
-  - The article treats HTML and CSS Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for HTML and CSS Basics?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when HTML and CSS Basics reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why is semantic HTML a design decision, not just a style preference?**
+  - Semantic tags such as `<header>`, `<main>`, and `<article>` make the structure of the page explicit. That improves accessibility, helps search engines understand the document, and gives the team a cleaner foundation than a tree of anonymous `<div>` elements.
+- **Why does the box model explain so many CSS bugs faster than visual guessing?**
+  - Most spacing and alignment problems come from misunderstanding which part of the box is growing: content, padding, border, or margin. When you inspect the box model in DevTools, you can stop guessing and identify whether the issue is inner spacing, outer spacing, or layout flow.
+- **When should you reach for Flexbox, and when does Grid describe the layout more directly?**
+  - Flexbox is usually the clearest choice when content flows mainly along one axis, such as rows of cards or navigation items. Grid becomes clearer when you need to control rows and columns together, especially for dashboard-like layouts or responsive card matrices.
 
 <!-- toc:begin -->
 ## In this series
