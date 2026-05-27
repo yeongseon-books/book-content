@@ -31,6 +31,8 @@ last_reviewed: '2026-05-12'
 ![Computer Architecture 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/01/01-01-big-picture.ko.png)
 *Computer Architecture 101 1장 흐름 개요*
 
+> 컴퓨터 구조를 배우는 목적은 회로 설계자가 되는 것이 아니라 '추상화 아래에서 무슨 일이 벌어지는지 설명할 수 있게 되는 것'입니다 — 같은 알고리즘의 성능이 메모리 접근 패턴·분기·명령어 수에 따라 갈리는 이유가 모두 이 한 층 아래에서 시작됩니다.
+
 ## 먼저 던지는 질문
 
 - 컴퓨터 구조를 한 문장으로 정의하면 무엇일까요?

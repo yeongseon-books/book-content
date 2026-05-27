@@ -31,6 +31,8 @@ last_reviewed: '2026-05-12'
 ![Computer Architecture 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/09/09-01-big-picture.ko.png)
 *Computer Architecture 101 9장 흐름 개요*
 
+> 코어를 더하는 것과 코드를 빠르게 만드는 것은 다른 일입니다 — 동기화 비용·캐시 일관성·Amdahl의 법칙 때문에 8코어가 곧 8배 속도를 뜻하지 않고, 어떤 부분을 병렬화할 수 있고 어떤 부분이 본질적으로 직렬인지 가르는 사고가 성능의 상한을 결정합니다.
+
 ## 먼저 던지는 질문
 
 - 동시성과 병렬성은 무엇이 다를까요?

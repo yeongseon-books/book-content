@@ -31,6 +31,8 @@ last_reviewed: '2026-05-12'
 ![Computer Architecture 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/08/08-01-big-picture.ko.png)
 *Computer Architecture 101 8장 흐름 개요*
 
+> 디스크 한 번 읽는 시간은 메모리 접근보다 수만 배 길 수 있습니다 — 그동안 CPU를 놀리지 않기 위해 만들어진 것이 폴링·인터럽트·DMA이고, `select`·`epoll`·`async/await`·이벤트 루프 같은 상위 추상화도 모두 이 한 가지 속도 차이에서 출발합니다.
+
 ## 먼저 던지는 질문
 
 - CPU와 장치의 속도 차이는 얼마나 클까요?

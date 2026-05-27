@@ -31,6 +31,8 @@ last_reviewed: '2026-05-12'
 ![Computer Architecture 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/06/06-01-big-picture.ko.png)
 *Computer Architecture 101 6장 흐름 개요*
 
+> 현대 CPU에서 성능을 좌우하는 것은 클럭 속도가 아니라 캐시 미스율인 경우가 많습니다 — 알고리즘이 정해진 뒤 그다음 질문은 거의 항상 '이 코드는 캐시 친화적인가', 즉 시간 지역성과 공간 지역성을 누리고 있는가입니다.
+
 ## 먼저 던지는 질문
 
 - 캐시는 메모리 계층 어디에 놓일까요?

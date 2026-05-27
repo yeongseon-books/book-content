@@ -31,6 +31,8 @@ last_reviewed: '2026-05-12'
 ![Computer Architecture 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/07/07-01-big-picture.ko.png)
 *Computer Architecture 101 7장 흐름 개요*
 
+> 파이프라인은 평균을 빠르게 만들지만, 그 평균은 분기 예측이 한 번 틀리는 순간 무너집니다 — '명령어 하나를 빨리 처리'가 아니라 '여러 명령어를 단계별로 겹쳐 처리'한다는 모델을 잡으면, 핫 루프의 분기 패턴이 왜 그토록 큰 차이를 만드는지 보입니다.
+
 ## 먼저 던지는 질문
 
 - 파이프라인은 어떻게 처리량을 높일까요?

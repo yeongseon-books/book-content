@@ -33,6 +33,8 @@ last_reviewed: '2026-05-12'
 ![Computer Architecture 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/04/04-01-registers-alu-dataflow.ko.png)
 *Computer Architecture 101 4장 흐름 개요*
 
+> 핫 패스 최적화의 출발점은 종종 한 가지 질문입니다 — '이 변수는 지금 레지스터에 있는가, 아니면 스택으로 밀려났는가.' 레지스터는 CPU의 즉시 작업 공간이고, 변수 하나가 더 살아 있다는 이유만으로 spill이 발생하면 같은 알고리즘도 갑자기 느려집니다.
+
 ## 먼저 던지는 질문
 
 - 레지스터는 메모리와 무엇이 다를까요?

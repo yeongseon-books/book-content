@@ -31,6 +31,8 @@ last_reviewed: '2026-05-12'
 ![Computer Architecture 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/10/10-01-big-picture.ko.png)
 *Computer Architecture 101 10장 흐름 개요*
 
+> 성능 문제는 거의 항상 추측에서 시작되지만, 시니어 엔지니어는 측정 없이 코드를 바꾸지 않습니다 — '느리다'는 말은 지연시간(latency)인지 처리량(throughput)인지, 어느 자원(USE)이 포화됐는지, 프로파일러에서 어디에 시간이 쌓이는지를 분리해 말할 때만 비로소 해결 가능한 문제가 됩니다.
+
 ## 먼저 던지는 질문
 
 - 지연시간과 처리량은 어떻게 다를까요?

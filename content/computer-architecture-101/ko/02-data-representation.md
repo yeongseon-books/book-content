@@ -31,6 +31,8 @@ last_reviewed: '2026-05-12'
 ![Computer Architecture 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/02/02-01-big-picture.ko.png)
 *Computer Architecture 101 2장 흐름 개요*
 
+> 장애는 종종 언어 문법보다 한 층 아래 '비트 패턴' 층에서 시작됩니다 — `0.1 + 0.2 != 0.3`, 정수 오버플로, 금액 계산 오차, 비트마스크 실수는 별개 버그가 아니라 'IEEE 754와 2의 보수가 메모리에 어떻게 생겼는가'를 놓친 같은 원인의 다른 출구입니다.
+
 ## 먼저 던지는 질문
 
 - 비트, 바이트, 워드는 각각 무엇일까요?

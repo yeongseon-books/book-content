@@ -31,6 +31,8 @@ last_reviewed: '2026-05-12'
 ![Computer Architecture 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/05/05-01-big-picture.ko.png)
 *Computer Architecture 101 5장 흐름 개요*
 
+> 메모리는 RAM 그 자체가 아니라 '프로세스마다 따로 보이는 가상 주소 공간'입니다 — 이 그림이 잡혀야 스택 오버플로·메모리 누수·정렬 문제·페이지 폴트가 제각각의 현상이 아니라 같은 지도(주소 공간·페이지·스택·힙) 위의 다른 자리에서 일어나는 일로 읽힙니다.
+
 ## 먼저 던지는 질문
 
 - RAM은 어떤 주소 모델로 보일까요?

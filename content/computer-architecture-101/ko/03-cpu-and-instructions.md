@@ -33,6 +33,8 @@ last_reviewed: '2026-05-12'
 ![Computer Architecture 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-architecture-101/03/03-01-cpu-fetch-decode-execute.ko.png)
 *Computer Architecture 101 3장 흐름 개요*
 
+> 성능 최적화는 결국 '이 코드는 몇 개의 명령어가 되었고, CPU는 그것을 얼마나 빨리 처리하는가'로 수렴합니다 — fetch–decode–execute라는 사이클과 ISA라는 계약을 머릿속에 잡아 두어야 프로파일러 출력과 어셈블리 리스트가 비로소 같은 그림으로 읽힙니다.
+
 ## 먼저 던지는 질문
 
 - CPU는 한 사이클에 정확히 무엇을 할까요?
