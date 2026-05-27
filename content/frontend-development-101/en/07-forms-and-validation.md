@@ -32,9 +32,9 @@ This is the 7th post in the Frontend Development 101 series. Here we treat a for
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying Forms and Validation?
-- Which signal should the example or diagram make visible for Forms and Validation?
-- What failure should be prevented first when Forms and Validation reaches a real system?
+- When should a form validate while the user types, and when should it wait until submit?
+- How do accessibility signals such as labels, focus order, and `aria-invalid` belong inside form validation?
+- Why must frontend validation and backend validation both exist in the same product flow?
 
 ## What You Will Learn
 
@@ -58,9 +58,11 @@ Forms drive *conversion*. Sign-up, payment, search — all forms. *Slightly awkw
 - **Inline error**: an error shown *next to the field*.
 - **`aria-invalid`**: ARIA attribute telling screen readers *the field is invalid*.
 
-## Before/After
+## From Last-Minute Validation to Guided Input
 
-**Before (validate only on submit)**
+A form can either wait until submit and punish the user with a late error, or it can guide the user toward a valid answer while they type. The second style is not just nicer. It reduces retries, lowers abandonment, and makes accessibility easier to design deliberately.
+
+**Validation appears only after submit**
 
 ```javascript
 form.onsubmit = () => {
@@ -68,11 +70,13 @@ form.onsubmit = () => {
 };
 ```
 
-**After (real-time inline check + friendly message)**
+**Validation gives immediate, local feedback**
 
 ```jsx
 {!isEmail(email) && <p className="error">That doesn't look like an email</p>}
 ```
+
+The better pattern still needs restraint. Good forms do not scream on the first keystroke; they reveal feedback when it becomes useful and keep the correction path obvious.
 
 ## Hands-on: A Sign-up Form in Five Steps
 
@@ -180,12 +184,12 @@ Forms are *the longest conversation with the user*. Next, we look at how the for
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Forms and Validation?**
-  - The article treats Forms and Validation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Forms and Validation?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Forms and Validation reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **When should a form validate while the user types, and when should it wait until submit?**
+  - Format-level checks such as email shape or password length usually help while typing, because they let the user recover early. Final business-rule or server validation still belongs at submit time because only the server knows the full truth.
+- **How do accessibility signals such as labels, focus order, and `aria-invalid` belong inside form validation?**
+  - Validation is not complete unless keyboard users and screen-reader users receive the same signal as sighted mouse users. Labels, focus movement, and ARIA attributes are part of the validation experience, not extra polish.
+- **Why must frontend validation and backend validation both exist in the same product flow?**
+  - Frontend validation protects the user experience by catching mistakes early, while backend validation protects correctness and security. Removing either one leaves a real gap in the system.
 
 <!-- toc:begin -->
 ## In this series
