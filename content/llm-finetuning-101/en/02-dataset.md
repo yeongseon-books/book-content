@@ -29,6 +29,8 @@ This is the second post in the LLM Fine-tuning 101 series.
 ![LLM Fine-tuning 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/02/02-02-the-three-layers-of-dataset-preparation.en.png)
 *LLM Fine-tuning 101 chapter 2 flow overview*
 
+> Dataset work fails on shape, not size — split the data into raw samples, templated text, and tokenized tensors so each layer is verifiable before the loss curve has a chance to lie to you.
+
 ## Questions to Keep in Mind
 
 - How should we shape the three fields instruction / input / output?

@@ -32,6 +32,8 @@ This article frames that decision around three variables so the rest of the seri
 ![LLM Fine-tuning 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/01/01-02-what-to-understand-first.en.png)
 *LLM Fine-tuning 101 chapter 1 flow overview*
 
+> Fine-tuning is a decision problem before it's a training problem — what changes, what stays fixed, and how those choices interact decide whether learning rate, dataset format, and adapter rank stop wobbling at once.
+
 ## Questions to Keep in Mind
 
 - How can we calculate why LoRA is so much lighter than full fine-tuning?

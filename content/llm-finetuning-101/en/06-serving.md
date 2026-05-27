@@ -29,6 +29,8 @@ This is the final post in the LLM Fine-tuning 101 series.
 ![LLM Fine-tuning 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/06/06-02-what-this-demo-isolates-on-purpose.en.png)
 *LLM Fine-tuning 101 chapter 6 flow overview*
 
+> Serving and training share weights but nothing else — training thinks in batches and epochs, serving thinks in per-request latency and concurrency, and that switch decides code structure, memory policy, and error handling.
+
 ## Questions to Keep in Mind
 
 - What is the minimum structure for wrapping a fine-tuned small model behind a FastAPI endpoint?

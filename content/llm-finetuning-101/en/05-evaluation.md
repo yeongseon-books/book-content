@@ -30,6 +30,8 @@ This is the fifth post in the LLM Fine-tuning 101 series.
 ![LLM Fine-tuning 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/05/05-02-the-right-way-to-read-perplexity.en.png)
 *LLM Fine-tuning 101 chapter 5 flow overview*
 
+> Evaluation is where fine-tuning demos start lying — quantitative signals like perplexity come first, generated samples come later, and the gap between the two is exactly where regressions hide.
+
 ## Questions to Keep in Mind
 
 - How do you compute perplexity, the first quantitative signal to look at right after fine-tuning?

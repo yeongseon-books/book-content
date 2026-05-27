@@ -31,6 +31,8 @@ This article breaks one training step into its six moving parts so you can reaso
 ![LLM Fine-tuning 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/04/04-02-what-you-can-shrink-and-what-you-cannot.en.png)
 *LLM Fine-tuning 101 chapter 4 flow overview*
 
+> A training step is six moving parts, not framework magic — your first goal isn't a low loss number, it's proving one honest weight update happened so future failures can be triaged into environment, data, or hyperparameter.
+
 ## Questions to Keep in Mind
 
 - What is the minimum you must set in `TrainingArguments` for a single training step to run?

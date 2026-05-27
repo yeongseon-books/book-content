@@ -29,6 +29,8 @@ seo_description: 파인튜닝 데이터셋의 실패 원인인 형식 문제를 
 ![LLM Fine-tuning 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/llm-finetuning-101/02/02-02-the-three-layers-of-dataset-preparation.ko.png)
 *LLM Fine-tuning 101 2장 흐름 개요*
 
+> 데이터셋 작업은 크기가 아니라 모양에서 무너집니다 — 원본 샘플·템플릿 텍스트·토큰 텐서의 세 층으로 나눠 각 층을 검증해야, 학습 중 손실 곡선이 거짓말할 여지를 줄일 수 있습니다.
+
 ## 먼저 던지는 질문
 
 - `instruction / input / output` 세 필드를 어떤 형태로 잡아야 할까요?
