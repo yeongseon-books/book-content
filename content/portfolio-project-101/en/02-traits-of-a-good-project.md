@@ -154,6 +154,143 @@ Strong portfolio projects do not need to be large. They need to be focused, meas
 
 Next, we will move to the repository entrance itself and look at how the README should present that value.
 
+## Appendix: Weekly Quality Report Example
+
+Tracking a project is easiest when you commit to a consistent check rhythm. Here is a format you can repeat weekly.
+
+```markdown
+## Weekly Quality Report
+- Core problem statement: reduce team schedule lookup time
+- Completed this week: weekly view filter, share link, README run section
+- Key metrics: lookup time 42s -> 19s
+- Quality issues: flaky integration test (2 cases)
+- Next week priority: remove flakiness, enhance demo seed data
+```
+
+What makes this document strong is consistency, not glamour. By checking project health repeatedly, you catch problems before scope explodes and finish with explainable results.
+
+## Appendix: Small Scope, High Polish — A Real Trade
+
+A schedule management project that combines calendar sync, notifications, permissions, and analytics in one go will miss its deadline. Shrinking the scope to just weekly view, team filter, and shared link creates three improvements:
+
+| Scope Strategy | Feature Count | Test Completion | Demo Stability | Explanation Difficulty |
+| --- | ---: | ---: | ---: | ---: |
+| Wide scope | 10 | Low | Low | High |
+| Focused scope | 3 | High | High | Low |
+
+Good projects are not defined by feature count. They are defined by explainable completion. A project that finishes a small scope deeply will hold up much better in interviews.
+
+## Appendix: Architecture Diagram Example
+
+Good projects show structure visually. A diagram tells the overall intent before a reviewer reads a single line of code. At portfolio level, a simple component diagram works better than complex UML.
+
+```text
+┌─────────────┐      ┌─────────────┐      ┌─────────────┐
+│   Client    │─────>│  API Server │─────>│  Database   │
+│   (React)   │      │  (FastAPI)  │      │  (PostgreSQL)│
+└─────────────┘      └──────┬──────┘      └─────────────┘
+                             │
+                      ┌─────┴───────┐
+                      │ External API│
+                      │(Google Cal) │
+                      └─────────────┘
+```
+
+This diagram reveals three things: component boundaries (frontend/backend/database split), data flow direction (request routing), and external dependency points (Google Calendar integration). A diagram in the README or `docs/architecture.md` helps a reviewer understand the shape without reading code. Use text-based tools like Mermaid or ASCII art for version control friendliness.
+
+## Appendix: Scope Evaluation Matrix
+
+Before starting or when adjusting scope mid-project, fill out a matrix to reduce guesswork.
+
+```markdown
+# Scope Evaluation Matrix
+
+## Project: [task-tracker]
+## Evaluated: 2026-05-21
+
+| Feature | Core Flow | Impl. Difficulty | Demo Impact | Include v1 |
+| --- | --- | --- | --- | --- |
+| Weekly view | High | Medium | High | Yes |
+| Team filter | High | Low | Medium | Yes |
+| Share link | Medium | Low | High | Yes |
+| Calendar sync | Low | High | Medium | No (v2) |
+| Notifications | Low | Medium | Low | No (hold) |
+| Permissions | Low | High | Low | No (hold) |
+
+## Decision Criteria
+- High core flow + medium+ demo impact -> include v1
+- High impl. difficulty + low core flow -> hold
+- Limit v1 to 3-5 features
+```
+
+The matrix has two advantages. First, you can objectively evaluate features instead of just picking what sounds cool. Second, in an interview, when someone asks "Why not add this?", you can show the matrix and explain the decision was strategy, not abandonment. Scoping is a starting-phase task that actually shapes project quality all the way through.
+
+## Appendix: Mid-Project Scope Adjustment Log
+
+If you reduced scope partway through, recording that decision helps in later interviews.
+
+```markdown
+# Scope Adjustment Decision
+
+## Date: 2026-05-15
+## Decision: Move calendar sync to v2
+
+### Context
+- 2 weeks left until v1 deadline
+- OAuth integration risk threatens core flow completion
+- Test coverage at 40%, need 80%+ for confidence
+
+### Decision Criteria
+- Complete core flow > add extra features
+- Target 80%+ test coverage for v1
+
+### Options Considered
+- A: Stub calendar sync -> low demo value
+- B: Defer to v2 + strengthen core -> chosen
+
+### Outcome
+- Core flow tests reached 85%
+- Demo stability confirmed
+- README 'Next Steps' section mentions calendar sync
+```
+
+With this record, you can answer "Why is this feature missing?" in interviews with evidence. Scope reduction is not failure. It is priority management. Teams that record these decisions demonstrate higher project maturity.
+
+## Appendix: Measuring Results with Code
+
+Good projects capture the outcome in measurement, not just hope. Here is an example measurement script.
+
+```python
+import time
+import httpx
+
+
+def benchmark_api(url: str, iterations: int = 100) -> dict:
+    """Measure API response latency."""
+    latencies = []
+    for _ in range(iterations):
+        start = time.perf_counter()
+        response = httpx.get(url)
+        elapsed = (time.perf_counter() - start) * 1000
+        latencies.append(elapsed)
+
+    latencies.sort()
+    return {
+        "mean_ms": sum(latencies) / len(latencies),
+        "p95_ms": latencies[int(len(latencies) * 0.95)],
+        "p99_ms": latencies[int(len(latencies) * 0.99)],
+        "success_rate": sum(1 for l in latencies if l < 500) / len(latencies),
+    }
+
+
+if __name__ == "__main__":
+    result = benchmark_api("https://demo.example.com/api/schedules")
+    print(f"Mean: {result['mean_ms']:.1f}ms, P95: {result['p95_ms']:.1f}ms")
+    print(f"Success rate: {result['success_rate']:.1%}")
+```
+
+Keep this in `scripts/benchmark.py` so it stays repeatable. Document the run command and results in the README so reviewers can verify the numbers themselves.
+
 ## Answering the Opening Questions
 
 - **Why is a bigger project not automatically a better portfolio project?**
