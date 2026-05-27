@@ -24,6 +24,8 @@ last_reviewed: '2026-05-12'
 
 서버리스 함수를 배우다 보면 곧바로 이런 질문이 나옵니다. “함수는 무상태여야 한다는데, 로그인 세션이나 주문 상태는 어디에 두라는 뜻일까?” 이 질문에 제대로 답하지 못하면 서버리스는 늘 불편한 제약처럼만 보입니다.
 
+이 글은 Serverless 101 시리즈의 6번째 글입니다.
+
 ![Serverless 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/06/06-01-concept-at-a-glance.ko.png)
 *Serverless 101 6장 흐름 개요*
 

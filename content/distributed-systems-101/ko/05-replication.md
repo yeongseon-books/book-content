@@ -25,6 +25,8 @@ last_reviewed: '2026-05-15'
 
 데이터를 여러 노드에 복사해 두면 안전할 것 같지만, 실제 운영 질문은 그 다음부터 시작됩니다. 어떤 복제본이 기준인지, 얼마만큼의 지연을 허용할지, 리더가 죽을 때 최근 쓰기를 얼마나 잃을 수 있는지가 모두 복제 설정에서 갈립니다.
 
+이 글은 Distributed Systems 101 시리즈의 5번째 글입니다.
+
 여기서는 복제를 저장소의 뒷단 구현이 아니라, 시스템이 사용자에게 약속하는 안전성과 지연 특성을 결정하는 설계 레이어로 봅니다.
 
 ![Distributed Systems 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/05/05-01-concept-at-a-glance.ko.png)

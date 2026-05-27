@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 머신러닝에서 데이터 한 행은 벡터이고, 임베딩도 벡터이며, 그래디언트도 결국 벡터입니다. 그런데 벡터를 숫자 묶음으로만 보면 계산은 따라가도 의미는 잘 남지 않습니다. 벡터는 대수적 표현이면서 동시에 공간 속 방향이기 때문입니다.
 
+이 글은 Linear Algebra 101 시리즈의 2번째 글입니다.
+
 여기서는 벡터를 좌표, 화살표, 데이터 표현이라는 세 관점으로 함께 읽어 보겠습니다.
 
 ![Linear Algebra 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/02/02-01-concept-at-a-glance.ko.png)

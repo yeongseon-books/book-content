@@ -25,6 +25,8 @@ last_reviewed: '2026-05-12'
 
 같은 SQL이 어제는 1ms였는데 오늘은 10초가 되는 일은 생각보다 흔합니다. 대부분의 경우 애플리케이션 코드가 갑자기 나빠진 것이 아니라, 옵티마이저가 다른 실행 계획을 골랐기 때문입니다. 통계가 낡았거나, 데이터 분포가 바뀌었거나, 인덱스가 추가되거나 사라졌거나, 파라미터 조건이 달라졌기 때문입니다.
 
+이 글은 Database Systems 101 시리즈의 8번째 글입니다.
+
 그래서 쿼리 최적화의 핵심은 “더 멋진 SQL을 쓰는 법”보다 “옵티마이저가 무슨 근거로 이 계획을 골랐는지 읽는 법”에 가깝습니다. 이 글에서는 통계, 비용 모델, 계획 노드, EXPLAIN ANALYZE를 하나의 흐름으로 묶어 보겠습니다.
 
 ![Database Systems 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/database-systems-101/08/08-01-big-picture.ko.png)

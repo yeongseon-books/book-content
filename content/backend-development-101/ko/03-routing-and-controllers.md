@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 엔드포인트가 세 개일 때는 구조가 없어도 서비스가 돌아갑니다. 엔드포인트가 서른 개를 넘기면 코드가 먼저 무너집니다. URL 패턴이 충돌하고, 인증 규칙이 섞이고, 동일한 검증 로직이 파일마다 복제되기 시작합니다. 장애는 종종 비즈니스 로직이 아니라 요청을 어디로 보낼지 정하는 경계에서 시작됩니다.
 
+이 글은 Backend Development 101 시리즈의 3번째 글입니다.
+
 ![Backend Development 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/03/03-01-concept-at-a-glance.ko.png)
 *Backend Development 101 3장 흐름 개요*
 

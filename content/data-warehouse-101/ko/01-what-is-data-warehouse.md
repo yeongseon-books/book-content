@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 서비스가 커지면 주문 한 건을 처리하는 데이터베이스와 어제 매출 합계를 빠르게 계산하는 데이터베이스가 서로 다른 요구를 받기 시작합니다. 같은 테이블과 같은 엔진으로 두 일을 동시에 처리하려고 하면 운영 쿼리도 느려지고 분석 쿼리도 느려집니다. 그래서 운영용 저장소와 분석용 저장소를 분리하는 사고방식이 필요합니다.
 
+이 글은 Data Warehouse 101 시리즈의 첫 번째 글입니다.
+
 ![Data Warehouse 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/01/01-01-concept-at-a-glance.ko.png)
 *Data Warehouse 101 1장 흐름 개요*
 > Data Warehouse 설계는 '여러 출처의 데이터를 모아 분석 관점으로 재정렬하되, 운영 부담 없이' 처리하는 방식으로 시작합니다.

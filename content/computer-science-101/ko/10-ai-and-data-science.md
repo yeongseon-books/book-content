@@ -25,6 +25,8 @@ last_reviewed: '2026-05-12'
 
 AI와 데이터사이언스는 갑자기 하늘에서 떨어진 별도 분야가 아닙니다. 데이터 표현, 알고리즘 비용, 메모리 계층, 데이터베이스, 엔지니어링 습관 위에 통계와 도메인 지식을 더한 결과에 가깝습니다.
 
+이 글은 Computer Science 101 시리즈의 마지막 글입니다.
+
 여기서는 머신러닝의 기본 구조를 훑고, 앞선 아홉 편이 AI/DS 실무와 어떻게 이어지는지 연결한 뒤, 다음에 무엇을 공부하면 좋을지 로드맵을 정리하겠습니다.
 
 ![Computer Science 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/10/10-01-concept-at-a-glance.ko.png)

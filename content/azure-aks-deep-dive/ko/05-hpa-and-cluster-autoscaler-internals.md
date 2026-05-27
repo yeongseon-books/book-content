@@ -24,6 +24,8 @@ seo_description: AKS HPA와 Cluster Autoscaler의 작동 원리를 루프별로 
 하지만 그 표현 안에는 사실 두 개의 서로 다른 루프가 숨어 있습니다.
 하나는 replica 수를 바꾸는 HPA이고, 다른 하나는 node 수를 바꾸는 Cluster Autoscaler이며, 둘은 다른 입력과 다른 시간축으로 움직입니다.
 
+이 글은 Azure Kubernetes Service Deep Dive 시리즈의 5번째 글입니다.
+
 이 두 루프를 분리하지 않으면 정상 지연도 장애처럼 보이기 쉽습니다.
 HPA는 이미 replica를 올렸지만 scheduler가 새 Pod를 놓을 빈자리가 없어서 Pending이 생길 수 있습니다.
 그 다음에야 Cluster Autoscaler가 unschedulable Pod를 보고 새 node를 준비하므로, 두 단계 사이의 기다림은 구조적으로 자연스러운 현상입니다.

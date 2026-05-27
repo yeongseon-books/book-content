@@ -24,6 +24,8 @@ last_reviewed: '2026-05-12'
 
 함수형 프로그래밍을 배우다 보면 어느 순간 "그럼 객체지향은 버려야 하나?"라는 질문이 나옵니다. 반대로 객체지향에 익숙한 팀에서는 함수형 기법을 도입할 때 "결국 클래스가 더 익숙한데 굳이 왜?"라는 반응도 나옵니다. 둘 다 문제를 너무 이분법으로 보는 시선입니다.
 
+이 글은 Functional Programming 101 시리즈의 마지막 글입니다.
+
 Python은 애초에 다중 패러다임 언어입니다. 데이터 모델은 객체지향적으로 두고, 핵심 계산은 순수 함수로 분리하고, 프레임워크 경계에서는 다시 클래스나 핸들러를 쓰는 식의 혼합 설계가 가장 현실적입니다. 중요한 것은 신념이 아니라 선택 기준입니다.
 
 ![Functional Programming 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/10/10-01-where-to-draw-the-oop-fp-boundary.ko.png)

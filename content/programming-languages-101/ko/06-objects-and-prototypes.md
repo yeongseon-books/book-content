@@ -25,6 +25,8 @@ last_reviewed: '2026-05-15'
 
 Java의 클래스도 객체지향이고, JavaScript의 프로토타입도 객체지향이라고 합니다. 그런데 둘의 표면은 꽤 다릅니다. 무엇이 같고 무엇이 다를까요.
 
+이 글은 Programming Languages 101 시리즈의 6번째 글입니다.
+
 이 글에서는 객체를 상태와 동작을 묶는 단위로 먼저 정의한 뒤, 그 묶음을 만드는 두 가지 대표 방식인 클래스 기반 모델과 프로토타입 기반 모델을 비교하겠습니다. 핵심 차이는 결국 메서드를 어디서 어떻게 찾느냐에 있습니다.
 
 ![Programming Languages 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/06/06-01-concept-at-a-glance.ko.png)

@@ -25,6 +25,8 @@ last_reviewed: '2026-05-15'
 
 브라우저는 HTML 파일을 그대로 화면에 붙이지 않습니다. 텍스트를 읽고 구조를 만들고, 스타일을 계산하고, 위치를 정하고, 픽셀을 그린 뒤에야 우리가 보는 페이지가 완성됩니다. 여기에 JavaScript의 이벤트 처리까지 얹히면 비로소 클릭 가능한 화면이 됩니다.
 
+이 글은 Web Development 101 시리즈의 3번째 글입니다.
+
 여기서는 브라우저가 HTML을 DOM으로 바꾸고, 렌더링 파이프라인과 이벤트 루프를 통해 살아 있는 화면을 만드는 과정을 정리하겠습니다.
 
 ![Web Development 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/web-development-101/03/03-01-concept-at-a-glance.ko.png)

@@ -22,6 +22,8 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 호스트 부팅 경계를 이해하고 나면 곧바로 다음 질문이 생깁니다. .NET으로 작성된 Functions Host가 언어 선택 정보를 어떻게 실제 Node.js, Python, Java, PowerShell 프로세스로 바꾸는지, 그리고 그 순간부터 무엇이 운영체제 수준의 프로세스 관리 문제가 되는지입니다.
 
+이 글은 Azure Functions Deep Dive 시리즈의 2번째 글입니다.
+
 이 질문은 단순한 내부 구현 호기심으로 끝나지 않습니다. 워커가 죽었을 때 누가 그것을 감지하는지, stdout에 찍힌 로그가 왜 Application Insights의 `traces`로 들어가는지, 한 인스턴스 안에서 워커 수를 늘리는 설정이 정확히 무엇을 의미하는지까지 전부 이 경로 위에서 설명됩니다.
 
 이번 글 역시 기준은 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7)입니다. 1화에서 `InitializeAsync` 안쪽의 “worker channel preparation” 박스만 남겨 두었는데, 이번에는 그 박스를 끝까지 열어 실제 `Process.Start()` 호출 직전까지 따라갑니다.

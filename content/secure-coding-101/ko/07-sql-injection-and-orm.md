@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 SQL injection은 오래된 취약점이지만 아직도 가장 비싼 사고를 만듭니다. 이유는 단순합니다. 한 번 뚫리면 개별 화면이 아니라 데이터베이스 전체가 보상으로 걸려 있기 때문입니다. 인증 우회, 데이터 유출, 데이터 조작이 한 줄의 문자열 연결에서 동시에 시작될 수 있습니다.
 
+이 글은 Secure Coding 101 시리즈의 7번째 글입니다.
+
 여기서는 SQL injection을 ORM을 쓰면 자동으로 사라지는 문제로 보지 않고, SQL과 데이터를 문법적으로 분리하지 않았을 때 생기는 구조적 문제로 정리하겠습니다. 이 관점을 잡아 두면 raw SQL, ORM, 정렬 컬럼, DB 계정 권한을 한 흐름에서 함께 볼 수 있습니다.
 
 ![Secure Coding 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/07/07-01-concept-at-a-glance.ko.png)

@@ -25,6 +25,8 @@ last_reviewed: '2026-05-15'
 
 어떤 코드는 테스트 한 줄로 끝나는데, 어떤 코드는 테스트를 쓰려는 순간부터 거대한 준비 작업이 필요합니다.
 
+이 글은 Clean Code 101 시리즈의 8번째 글입니다.
+
 여기서는 그 차이가 어디서 오는지, 그리고 설계를 바꾸면 왜 테스트가 자연스럽게 따라오는지 설명하겠습니다.
 
 ![Clean Code 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/08/08-01-concept-at-a-glance.ko.png)

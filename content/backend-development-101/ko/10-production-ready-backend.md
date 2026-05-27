@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 기능이 돌아가는 백엔드와 운영 가능한 백엔드는 같은 단계가 아닙니다. 운영 가능한 백엔드는 트래픽 증가, 장애 대응, 배포 복구를 예측 가능한 절차로 처리할 수 있어야 합니다.
 
+이 글은 Backend Development 101 시리즈의 마지막 글입니다.
+
 이번 글은 시리즈 1~9편에서 나눠 다뤘던 서버, 라우팅, 서비스 레이어, 데이터베이스, 인증, 로깅, 테스트, 배포를 하나의 프로덕션 구조로 묶는 캡스톤입니다. 핵심은 "기능 목록"이 아니라 "운영 성숙도"입니다. 운영 성숙도는 관측 가능성(Observable), 배포 가능성(Deployable), 테스트 가능성(Testable), 복구 가능성(Recoverable) 네 축으로 확인할 수 있습니다.
 
 ![Backend Development 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/10/10-01-concept-at-a-glance.ko.png)

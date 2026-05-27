@@ -25,6 +25,8 @@ seo_description: SSH 접속, 키 인증, scp와 rsync를 통한 원격 작업의
 
 개발한 코드를 서버에 배포하고, 서버 로그를 확인하고, 데이터베이스에 접속하는 일은 모두 원격 접속에서 시작됩니다. SSH는 이 모든 원격 작업의 기반입니다.
 
+이 글은 Linux CLI 101 시리즈의 마지막 글입니다.
+
 ![Linux CLI 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linux-cli-101/10/10-01-big-picture.ko.png)
 *Linux CLI 101 10장 흐름 개요*
 

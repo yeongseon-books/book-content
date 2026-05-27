@@ -25,6 +25,8 @@ seo_description: 요청과 응답 schema를 흔들림 없이 설계하는 기준
 
 처음에는 JSON 몇 줄만 맞추면 되는 것처럼 보여도, 시간이 지나면 가장 자주 깨지는 부분이 바로 schema입니다. 필드 이름 하나, 날짜 형식 하나, null 허용 여부 하나가 클라이언트 파싱 로직과 데이터 정합성 문제로 바로 이어집니다.
 
+이 글은 API Design 101 시리즈의 5번째 글입니다.
+
 여기서는 schema를 단순 문서 항목이 아니라 경계에서 강제해야 할 계약으로 다룹니다. 입력 검증, 응답 직렬화, 시간과 금액 표현을 함께 정리해야 나중에 버전 관리 비용도 줄어듭니다.
 
 ![API Design 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/05/05-01-concept-at-a-glance.ko.png)

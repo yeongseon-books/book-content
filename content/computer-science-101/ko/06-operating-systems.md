@@ -25,6 +25,8 @@ last_reviewed: '2026-05-12'
 
 한 대의 컴퓨터에서 수십 개 프로그램이 동시에 도는 것처럼 보이는 순간, 우리는 이미 운영체제의 추상화 위에서 일하고 있습니다. 웹 서버가 멈추는 이유도, 메모리 누수가 보이는 방식도, 스레드가 기대만큼 빨라지지 않는 이유도 결국 OS 관점으로 돌아옵니다.
 
+이 글은 Computer Science 101 시리즈의 6번째 글입니다.
+
 여기서는 프로세스와 스레드, 가상 메모리, 시스템 콜, 동시성과 병렬성의 차이를 실전 감각으로 정리하겠습니다.
 
 ![Computer Science 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/06/06-01-concept-at-a-glance.ko.png)

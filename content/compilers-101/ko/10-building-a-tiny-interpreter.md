@@ -25,6 +25,8 @@ last_reviewed: '2026-05-12'
 
 지금까지 따로 배운 렉서, 파서, 평가기가 한 파일 안에서 어떻게 연결되는지 직접 보면, 각 단계의 인터페이스가 실제로 어디에서 만나고 무엇을 주고받는지 한눈에 정리됩니다.
 
+이 글은 Compilers 101 시리즈의 마지막 글입니다.
+
 ![Compilers 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/10/10-01-big-picture.ko.png)
 *Compilers 101 10장 흐름 개요*
 

@@ -25,6 +25,8 @@ title: "Programming Languages 101 (8/10): 인터프리터와 컴파일러"
 
 Python을 흔히 인터프리터 언어라고 부릅니다. 그런데 `.pyc` 파일도 있습니다. 그렇다면 Python은 해석하는 언어일까요, 컴파일하는 언어일까요.
 
+이 글은 Programming Languages 101 시리즈의 8번째 글입니다.
+
 이 글에서는 인터프리터와 컴파일러를 서로 반대 진영으로 보지 않고, 번역이 언제 일어나는지가 다른 두 전략으로 보겠습니다. Python 바이트코드를 직접 들여다보고, AOT와 JIT가 어디서 갈라지는지도 함께 정리하겠습니다.
 
 ![Programming Languages 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/08/08-01-concept-at-a-glance.ko.png)

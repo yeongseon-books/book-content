@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 선형대수를 조금만 더 들어가면 공간을 표현하는 축은 왜 여러 개일 수 있는지, 또 그 축이 몇 개 필요한지가 궁금해집니다. 바로 이 질문에 답하는 개념이 기저와 차원입니다. 고유값, PCA, 랭크 부족 문제도 결국 여기서 다시 만납니다.
 
+이 글은 Linear Algebra 101 시리즈의 6번째 글입니다.
+
 여기서는 선형독립, 기저, 차원, 랭크를 하나의 그림으로 묶어 보겠습니다.
 
 ![Linear Algebra 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/06/06-01-concept-at-a-glance.ko.png)

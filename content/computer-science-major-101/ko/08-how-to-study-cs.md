@@ -25,6 +25,8 @@ last_reviewed: '2026-05-14'
 
 같은 시간을 써도 어떤 학생은 개념이 남고, 어떤 학생은 강의 직후부터 빠르게 잊어버립니다. 차이를 만드는 것은 재능보다 공부 방법의 구조인 경우가 많습니다.
 
+이 글은 컴퓨터학과 전공 학습 가이드 101 시리즈의 8번째 글입니다.
+
 ![Computer Science Major 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/08/08-01-study-loop.ko.png)
 *컴퓨터학과 전공 가이드 8장 흐름 개요*
 > 효과적인 학습의 핵심은 수동적 이해가 아니라, 문제를 풀고, 설명하고, 틀리고, 다시 하는 능동적 루프에 있습니다.

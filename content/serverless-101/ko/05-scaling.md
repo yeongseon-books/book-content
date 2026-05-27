@@ -24,6 +24,8 @@ last_reviewed: '2026-05-12'
 
 서버리스는 자주 “자동으로 무한 확장된다”는 말로 소개됩니다. 처음에는 맞는 말처럼 들리지만, 실무에서는 이 문장이 가장 위험한 오해가 되기도 합니다. 함수는 빠르게 늘어나도 데이터베이스와 외부 API, 연결 풀은 유한하기 때문입니다.
 
+이 글은 Serverless 101 시리즈의 5번째 글입니다.
+
 ![Serverless 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/05/05-01-concept-at-a-glance.ko.png)
 *Serverless 101 5장 흐름 개요*
 

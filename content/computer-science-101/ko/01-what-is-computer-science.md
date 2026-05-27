@@ -25,6 +25,8 @@ last_reviewed: '2026-05-12'
 
 처음 컴퓨터과학을 접하면 프로그래밍 문법을 더 많이 아는 일이 곧 CS를 잘하는 일처럼 보이기 쉽습니다. 하지만 실무에서 오래 버티는 엔지니어를 가르는 기준은 언어 숙련도보다, 계산을 어떻게 모델링하고 추상화하며 한계를 어디까지 읽어 내는지에 더 가깝습니다.
 
+이 글은 Computer Science 101 시리즈의 첫 번째 글입니다.
+
 여기서는 컴퓨터과학이 정확히 무엇을 다루는지, 왜 추상화가 이 분야의 공용 언어인지, 그리고 이후 글들이 어떤 지도를 따라 연결되는지 큰 그림부터 잡겠습니다.
 
 ![Computer Science 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/01/01-01-concept-at-a-glance.ko.png)

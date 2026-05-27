@@ -25,6 +25,8 @@ last_reviewed: '2026-05-15'
 
 리팩토링은 코드를 다시 쓰는 작업처럼 보이기 쉽지만, 실제로는 훨씬 더 작은 단위의 개선을 반복하는 일입니다.
 
+이 글은 Clean Code 101 시리즈의 9번째 글입니다.
+
 여기서는 리팩토링이 무엇이고 무엇이 아닌지, 그리고 레거시 코드에서도 안전하게 적용하는 절차를 정리하겠습니다.
 
 ![Clean Code 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/09/09-01-concept-at-a-glance.ko.png)

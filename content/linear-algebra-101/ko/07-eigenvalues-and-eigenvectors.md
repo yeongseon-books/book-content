@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 선형변환을 여러 번 적용해 보면 어떤 방향은 유독 특별하게 남습니다. 다른 방향은 비틀리고 섞이는데, 어떤 방향은 방향 자체는 유지한 채 길이만 바뀝니다. 고유값과 고유벡터는 바로 이 특별한 축을 설명하는 도구입니다.
 
+이 글은 Linear Algebra 101 시리즈의 7번째 글입니다.
+
 여기서는 고유값과 고유벡터를 변환의 자연스러운 축이라는 관점으로 읽어 보겠습니다.
 
 ![Linear Algebra 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/07/07-01-concept-at-a-glance.ko.png)

@@ -24,6 +24,8 @@ seo_description: 어떤 행동은 자동으로 실행되어서는 안 됩니다.
 Approval Gate는 사람이 개입해야 하는 지점을 설계하는 층입니다. 위험 행동 앞에 명시적인 정지선을 두고, dry-run preview와 결정 로그를 남기며, 승인·거절·timeout을 모두 시스템 흐름에 포함시켜야 합니다.
 자동화의 가치는 모든 것을 자동화하는 데 있지 않고, 자동화하면 안 되는 지점을 정확히 고르는 데 있습니다.
 
+이 글은 Harness Engineering 101 시리즈의 8번째 글입니다.
+
 ![Approval Gate - 사람 승인이 필요한 지점 설계하기](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/08/08-01-approval-gates-designing-where-humans-mu.ko.png)
 *Approval Gate - 사람 승인이 필요한 지점 설계하기*
 > Approval Gate의 목적은 자동화를 포기하는 것이 아니라, 되돌리기 어려운 행동에 사람의 결정권을 명시적으로 넣는 것입니다.

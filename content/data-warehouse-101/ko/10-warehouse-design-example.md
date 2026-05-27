@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 개별 개념을 따로 이해하는 것과 실제로 하나의 Warehouse를 설계하는 일은 다릅니다. 하나의 도메인을 처음부터 끝까지 따라가 보면 grain, dimension, schema, 적재 흐름, mart가 왜 그 자리에 놓이는지 훨씬 분명해집니다. 이 마지막 글은 앞선 개념을 한 번에 조립해 보는 예제입니다.
 
+이 글은 Data Warehouse 101 시리즈의 마지막 글입니다.
+
 ![Data Warehouse 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/10/10-01-concept-at-a-glance.ko.png)
 *Data Warehouse 101 10장 흐름 개요*
 > 실제 설계는 교과서와 달리 '현재 비용 제약 → 다음 목표 → 마이그레이션 경로'를 순서대로 결정하는 연속입니다.

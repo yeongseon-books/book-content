@@ -24,6 +24,8 @@ seo_description: 도구는 Agent의 손과 발입니다. 잘못 설계한 도구
 Tool Harness는 단순히 함수 목록을 나열하는 작업이 아닙니다. 에이전트가 올바르게 호출하기 쉬운 인터페이스, 잘못 호출해도 사고가 적은 실행 방식, 실패했을 때 다음 행동을 결정할 수 있는 에러 모델을 설계하는 일입니다.
 강한 기능보다 좁고 정직한 인터페이스가 더 중요하다는 점이 이 글의 중심입니다.
 
+이 글은 Harness Engineering 101 시리즈의 5번째 글입니다.
+
 ![Tool Harness - Agent가 사용할 도구를 안전하게 설계하기](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/05/05-01-tool-harness-designing-safe-tools-for-ag.ko.png)
 *Tool Harness - Agent가 사용할 도구를 안전하게 설계하기*
 > Tool Harness의 품질은 agent가 도구를 쓸 수 있는지가 아니라, 잘못 쓰기 어려운지에서 드러납니다.

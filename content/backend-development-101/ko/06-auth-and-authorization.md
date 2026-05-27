@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 로그인 기능은 단순해 보이지만, 서버는 매 요청마다 두 가지를 동시에 판단합니다. 지금 요청을 보낸 주체가 누구인지 확인해야 하고, 확인된 주체가 이 행동을 할 수 있는지도 검증해야 합니다. 인증과 권한을 한 덩어리로 다루면 코드가 빠르게 무너집니다. 반대로 경계를 분리하면 실패 원인을 분명히 설명할 수 있고, 운영 중 사고가 났을 때 대응 속도가 달라집니다.
 
+이 글은 Backend Development 101 시리즈의 6번째 글입니다.
+
 ![Backend Development 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/06/06-01-concept-at-a-glance.ko.png)
 *Backend Development 101 6장 흐름 개요*
 

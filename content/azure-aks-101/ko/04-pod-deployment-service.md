@@ -22,6 +22,8 @@ seo_description: 처음 Kubernetes YAML을 보면 비슷해 보이는 객체가 
 
 처음 Kubernetes 매니페스트를 보면 객체가 불필요하게 많아 보입니다. “컨테이너 하나 띄우면 되는데 왜 Pod가 있고 Deployment가 있고 Service까지 따로 있지?”라는 질문이 자연스럽습니다. 하지만 실제 운영에서는 이 셋을 분리해 둔 덕분에 배포와 복구와 네트워크 경계가 훨씬 명확해집니다.
 
+이 글은 Azure Kubernetes Service 101 시리즈의 4번째 글입니다.
+
 AKS를 쓰더라도 이 구조는 Kubernetes 자체의 언어로 그대로 남습니다. 따라서 Pod, Deployment, Service가 흐릿하면 Ingress와 HPA도 함께 흐릿해집니다. 반대로 이 셋만 정확히 구분해도 워크로드 모델의 절반 이상이 정리됩니다.
 
 여기서는 3화에서 실제로 사용한 Pod, Deployment, Service를 각각 어떤 문제를 푸는 객체인지 분리해서 보겠습니다. **스케줄링 단위, 원하는 상태 관리자, 안정적인 네트워크 정체성**이라는 세 층으로 나누어 이해하는 것이 핵심입니다.

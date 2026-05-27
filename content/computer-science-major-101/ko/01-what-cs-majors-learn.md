@@ -25,6 +25,8 @@ last_reviewed: '2026-05-14'
 
 처음 전공 과목표를 펼치면 이름부터 서로 너무 다르게 보입니다. 수학, 프로그래밍, 시스템, 데이터, AI, 프로젝트가 한 학과 안에 왜 함께 들어 있는지 감이 잘 오지 않습니다.
 
+이 글은 컴퓨터학과 전공 학습 가이드 101 시리즈의 첫 번째 글입니다.
+
 ![Computer Science Major 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/01/01-01-major-learning-map.ko.png)
 *컴퓨터학과 전공 가이드 1장 흐름 개요*
 > 컴퓨터학과의 핵심은 과목 이름을 외우는 것이 아니라, 각 영역이 다음 영역을 위한 기초가 되는 방식을 이해하는 데 있습니다.

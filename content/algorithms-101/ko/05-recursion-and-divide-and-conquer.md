@@ -25,6 +25,8 @@ last_reviewed: '2026-05-12'
 
 재귀는 왜 어렵게 느껴질까요? 그리고 mergesort 같은 분할 정복 알고리즘은 왜 "올바른 이유로" 빠를까요? 여기서는 호출 스택, 점화식 기반 비용 분석, 그리고 분할 정복의 핵심 멘탈 모델을 정리합니다.
 
+이 글은 Algorithms 101 시리즈의 5번째 글입니다.
+
 ![Algorithms 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/05/05-01-big-picture.ko.png)
 *Algorithms 101 5장 흐름 개요*
 

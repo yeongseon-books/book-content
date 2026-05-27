@@ -25,6 +25,8 @@ last_reviewed: '2026-05-15'
 
 조건문은 작은 기능을 빠르게 만들 때는 편하지만, 책임이 섞이기 시작하면 가장 먼저 복잡도를 폭발시키는 지점이 됩니다.
 
+이 글은 Clean Code 101 시리즈의 4번째 글입니다.
+
 여기서는 중첩된 if를 평평하게 만들고, 분기 자체를 다른 구조로 옮기는 방법을 정리하겠습니다.
 
 ![Clean Code 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/04/04-01-concept-at-a-glance.ko.png)

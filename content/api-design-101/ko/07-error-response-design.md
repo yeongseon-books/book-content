@@ -25,6 +25,8 @@ seo_description: 일관된 error response를 만드는 envelope, code, validatio
 
 성공 응답은 한두 개만 잘 맞춰도 눈에 잘 띄지 않지만, 에러 응답은 조금만 흔들려도 바로 운영 비용으로 돌아옵니다. 지원 요청은 늘고, 클라이언트는 예외 분기를 늘리고, 로그에서는 같은 실패가 여러 모양으로 찍히기 시작합니다.
 
+이 글은 API Design 101 시리즈의 7번째 글입니다.
+
 여기서는 에러를 부가 정보가 아니라 정식 계약으로 다룹니다. 상태 코드, machine-readable code, validation detail, trace id가 어떻게 함께 움직여야 디버깅과 보안이 동시에 버틸 수 있는지 정리합니다.
 
 ![API Design 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/07/07-01-concept-at-a-glance.ko.png)

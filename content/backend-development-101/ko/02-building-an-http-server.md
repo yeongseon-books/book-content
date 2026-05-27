@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 브라우저에서 버튼을 눌렀는데 응답이 끊기거나, 프록시를 거치자 인증이 갑자기 풀리거나, 모니터링은 전부 200인데 사용자 문의는 계속 들어오는 날이 있습니다. 이때 프레임워크 API만 보고 있으면 원인이 흐려집니다. 요청과 응답이 실제로 어떤 바이트로 오가는지, 그 바이트를 누가 어떤 규칙으로 해석하는지까지 내려가야 문제가 풀립니다.
 
+이 글은 Backend Development 101 시리즈의 2번째 글입니다.
+
 ![Backend Development 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/02/02-01-concept-at-a-glance.ko.png)
 *Backend Development 101 2장 흐름 개요*
 

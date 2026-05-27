@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 우리가 운영하는 서비스 대부분은 직접 쓴 코드보다 외부 라이브러리에 더 많이 기대고 있습니다. HTTP 클라이언트, ORM, 템플릿 엔진, 인증 라이브러리, 빌드 도구까지 모두 공급망의 일부입니다. 그래서 의존성 취약점은 남의 문제처럼 보여도 실제로는 우리 서비스의 취약점이 됩니다.
 
+이 글은 Secure Coding 101 시리즈의 9번째 글입니다.
+
 여기서는 dependency 관리를 버전 업데이트 작업으로만 보지 않고, lockfile, SCA, SBOM, 자동 업데이트, 재현 가능한 빌드까지 포함한 공급망 보안 흐름으로 정리하겠습니다. 이 관점을 이해하면 왜 lockfile 하나가 운영 안정성과 사고 대응 속도까지 좌우하는지도 선명해집니다.
 
 ![Secure Coding 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/09/09-01-concept-at-a-glance.ko.png)

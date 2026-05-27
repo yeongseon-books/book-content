@@ -24,6 +24,8 @@ last_reviewed: '2026-05-14'
 
 처음 데이터 커리어를 알아볼 때 가장 자주 생기는 혼란은 직함은 많은데, 실제로 누가 무슨 문제를 푸는지 잘 보이지 않는다는 사실입니다. 채용 공고에는 analyst, scientist, engineer가 모두 등장하지만, 막상 입문자 입장에서는 무엇부터 구분해야 하는지 막막해지기 쉽습니다.
 
+이 글은 Data Science Career 101 시리즈의 첫 번째 글입니다.
+
 특히 같은 회사 안에서도 데이터 직무 정의가 제각각이라 더 헷갈립니다. 어떤 팀은 분석가가 실험 설계까지 맡고, 어떤 팀은 엔지니어가 지표 테이블까지 책임집니다. 그래서 처음에는 직함보다 질문, 산출물, 협업 상대를 기준으로 지형을 읽는 편이 훨씬 안전합니다.
 
 ![Data Science Career 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-science-career-101/01/01-01-concept-at-a-glance.ko.png)

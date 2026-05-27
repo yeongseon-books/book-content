@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 컨테이너는 격리되어 있으니 기본적으로 안전할 것처럼 느껴집니다. 하지만 기본값 그대로 실행하면 root 사용자, 과한 capability, 느슨한 시크릿 처리, 검증 없는 이미지가 그대로 운영에 들어가기도 합니다.
 
+이 글은 Containers 101 시리즈의 8번째 글입니다.
+
 여기서는 non-root, capability 축소, seccomp, 읽기 전용 파일시스템, 이미지 스캔과 서명이 어떻게 하나의 보안 기본선으로 이어지는지 정리합니다.
 
 ![Containers 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/08/08-01-concept-at-a-glance.ko.png)

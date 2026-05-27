@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 분석 질문은 대부분 얼마를 어떤 기준으로 보고 싶은지로 정리됩니다. 매출, 수량, 건수 같은 측정값과 사용자, 상품, 날짜 같은 속성을 분리해 두면 집계는 단순해지고 속성 변경도 더 유연하게 처리할 수 있습니다.
 
+이 글은 Data Warehouse 101 시리즈의 3번째 글입니다.
+
 ![Data Warehouse 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/03/03-01-concept-at-a-glance.ko.png)
 *Data Warehouse 101 3장 흐름 개요*
 > Fact 테이블의 입력(이벤트)과 Dimension 테이블의 변경(속성 변경)이 명확히 분리되면 스키마 유지 비용이 획기적으로 낮아집니다.

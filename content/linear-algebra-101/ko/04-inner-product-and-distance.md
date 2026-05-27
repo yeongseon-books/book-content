@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 벡터를 표현할 수 있게 되면 다음 질문이 바로 따라옵니다. 두 벡터는 얼마나 비슷한가, 얼마나 떨어져 있는가 하는 질문입니다. 추천 시스템, 벡터 검색, 임베딩 비교가 모두 결국 이 질문을 수치로 바꾸는 작업입니다.
 
+이 글은 Linear Algebra 101 시리즈의 4번째 글입니다.
+
 여기서는 내적, 코사인 유사도, 유클리드 거리와 맨해튼 거리를 한 흐름으로 연결해 보겠습니다.
 
 ![Linear Algebra 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/04/04-01-concept-at-a-glance.ko.png)

@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 컨테이너 네트워크는 처음에는 포트를 열고 IP를 확인하는 문제처럼 보입니다. 하지만 실제 운영에서는 컨테이너가 재시작되고 다시 배치되기 때문에, 어떤 네트워크 모드 위에서 어떤 이름 체계로 서로를 찾게 만들지부터 잡아야 연결 모델이 오래 갑니다.
 
+이 글은 Containers 101 시리즈의 6번째 글입니다.
+
 여기서는 bridge, host, overlay, none의 역할 차이와 함께, user-defined network와 DNS 이름 기반 연결이 왜 Compose와 Kubernetes의 공통 출발점인지 정리합니다.
 
 ![Containers 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/06/06-01-concept-at-a-glance.ko.png)

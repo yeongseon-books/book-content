@@ -24,6 +24,8 @@ last_reviewed: '2026-05-12'
 
 함수형 프로그래밍을 이야기할 때 가장 먼저 제대로 잡아야 하는 개념이 순수 함수입니다. 같은 입력을 주면 항상 같은 결과가 나오는 함수, 그리고 함수 바깥의 상태를 바꾸지 않는 함수가 왜 중요한지 이해하면 이후에 나오는 불변성, 캐싱, 병렬 처리, 테스트 전략이 한 번에 연결됩니다.
 
+이 글은 Functional Programming 101 시리즈의 2번째 글입니다.
+
 현업에서는 모든 함수를 순수하게 만들 수는 없습니다. 파일을 저장해야 하고, 로그를 남겨야 하고, 데이터베이스도 호출해야 합니다. 그래서 핵심은 부수효과를 없애는 것이 아니라, 어디에 두고 어떻게 격리할지를 설계하는 것입니다.
 
 ![Functional Programming 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/02/02-01-big-picture.ko.png)

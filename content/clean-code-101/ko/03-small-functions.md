@@ -25,6 +25,8 @@ last_reviewed: '2026-05-15'
 
 긴 함수는 처음에는 편하지만 시간이 갈수록 설명과 예외 처리가 한데 뭉치면서 읽기 어려워집니다.
 
+이 글은 Clean Code 101 시리즈의 3번째 글입니다.
+
 여기서는 함수가 충분히 작다는 말이 실제로 무엇을 뜻하는지, 그리고 큰 함수를 어떻게 안전하게 쪼갤 수 있는지 봅니다.
 
 ![Clean Code 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/03/03-01-concept-at-a-glance.ko.png)

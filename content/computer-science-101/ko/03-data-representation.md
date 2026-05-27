@@ -25,6 +25,8 @@ last_reviewed: '2026-05-12'
 
 컴퓨터는 결국 0과 1만 다룬다는 말을 자주 듣지만, 이 문장을 실제 디버깅으로 연결하는 사람은 많지 않습니다. 글자가 깨지고, 금액 계산이 틀어지고, 다른 언어로 옮기자 정수가 넘치는 순간 비로소 데이터 표현이 운영 문제로 보이기 시작합니다.
 
+이 글은 Computer Science 101 시리즈의 3번째 글입니다.
+
 여기서는 비트와 바이트, 문자 인코딩, 정수와 부동소수점 표현을 따라가며 데이터가 어떻게 의미를 얻는지 정리하겠습니다.
 
 ![Computer Science 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/03/03-01-concept-at-a-glance.ko.png)

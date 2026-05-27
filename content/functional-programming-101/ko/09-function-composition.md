@@ -24,6 +24,8 @@ last_reviewed: '2026-05-12'
 
 작은 함수는 이해하기 쉽습니다. 문제는 그런 함수가 많아졌을 때입니다. 함수가 많아질수록 오히려 흩어지고 읽기 어려워질 수도 있습니다. 함수 합성과 파이프라인은 그 작은 조각들을 의미 있는 흐름으로 다시 묶는 방법입니다.
 
+이 글은 Functional Programming 101 시리즈의 9번째 글입니다.
+
 현업에서 이 패턴이 중요한 이유는 테스트성과 변경 용이성 때문입니다. 거대한 함수 하나에 모든 로직을 넣는 대신, 각 단계가 하나의 변환만 맡게 만들면 수정 범위가 작아지고 파이프라인 전체를 안전하게 재구성할 수 있습니다.
 
 ![Functional Programming 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/09/09-01-how-a-readable-pipeline-flows.ko.png)

@@ -25,6 +25,8 @@ last_reviewed: '2026-05-12'
 
 도로망, 소셜 네트워크, 의존성 그래프는 전혀 다른 문제처럼 보이는데 왜 같은 알고리즘으로 풀릴까요? 여기서는 그래프 표현, 순회, 최단 경로, 최소 신장 트리를 정리합니다.
 
+이 글은 Algorithms 101 시리즈의 8번째 글입니다.
+
 ![Algorithms 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/08/08-01-big-picture.ko.png)
 *Algorithms 101 8장 흐름 개요*
 

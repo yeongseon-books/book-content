@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 처음 컨테이너를 배우면 VM을 더 작고 빠르게 만든 기술이라고 이해하기 쉽습니다. 하지만 실제 운영에서 중요한 질문은 “무엇을 복제하는가”가 아니라 “무엇을 공유한 채 어디까지를 격리하는가”입니다.
 
+이 글은 Containers 101 시리즈의 첫 번째 글입니다.
+
 여기서는 컨테이너를 호스트 커널을 공유하는 격리된 프로세스 묶음으로 정의하고, VM과의 차이와 `docker run`이 실제로 만드는 실행 단위를 함께 정리합니다.
 
 ![Containers 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/01/01-01-concept-at-a-glance.ko.png)

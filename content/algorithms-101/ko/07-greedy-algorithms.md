@@ -25,6 +25,8 @@ last_reviewed: '2026-05-12'
 
 지금 당장 가장 좋아 보이는 선택을 계속 고르면 정말 전체 최적해에 도달할까요? 그리고 어떤 문제에서는 왜 그 방식이 조용히 실패할까요? 여기서는 그리디가 통하는 조건, 정당화 방법, 그리고 DP로 돌아서야 하는 경계선을 다룹니다.
 
+이 글은 Algorithms 101 시리즈의 7번째 글입니다.
+
 ![Algorithms 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/07/07-01-big-picture.ko.png)
 *Algorithms 101 7장 흐름 개요*
 

@@ -22,6 +22,8 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 앞선 네 편에서는 인스턴스 하나 안에서 벌어지는 일을 따라왔습니다. 호스트가 부팅되고, 언어 워커가 떠서, gRPC 스트림이 연결되고, invocation이 워커까지 왕복하는 경로를 확인했습니다. 하지만 실제 운영에서 더 어려운 질문은 그 다음 단계에서 나옵니다. **인스턴스 하나로 부족해졌을 때 누가 더 늘릴지를 결정하는가**입니다.
 
+이 글은 Azure Functions Deep Dive 시리즈의 5번째 글입니다.
+
 이 질문은 단순히 “자동 스케일이 된다”는 제품 설명으로는 답이 되지 않습니다. 호스트가 직접 인스턴스 수를 늘리는지, 외부 컴포넌트가 결정하는지, 같은 스케일링이라는 단어 아래에서 인스턴스 수와 인스턴스 내부 워커 수가 어떻게 구분되는지를 알아야 비용과 지연 시간을 함께 설계할 수 있습니다.
 
 이번 글은 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준으로 호스트가 바깥으로 내보내는 scale signal만 다룹니다. 의도적으로 Azure 내부 Scale Controller의 비공개 구현을 추측하지 않고, host repo 안에 있는 것과 없는 것을 명확히 나눕니다.

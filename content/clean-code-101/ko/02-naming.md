@@ -25,6 +25,8 @@ last_reviewed: '2026-05-15'
 
 코드에서 가장 자주 읽히는 것은 로직보다 이름입니다.
 
+이 글은 Clean Code 101 시리즈의 2번째 글입니다.
+
 여기서는 좋은 이름이 왜 주석을 줄이고 검색 비용을 낮추는지, 그리고 변수·함수·클래스 이름을 어떻게 다르게 다뤄야 하는지 정리하겠습니다.
 
 ![Clean Code 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/02/02-01-concept-at-a-glance.ko.png)

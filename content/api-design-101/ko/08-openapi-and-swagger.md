@@ -25,6 +25,8 @@ seo_description: OpenAPI 3와 Swagger UI로 계약을 문서, 검증, SDK로 연
 
 문서가 코드보다 늦게 갱신되기 시작하는 순간, 팀은 문서를 참고하지 않고 직접 호출해 보는 습관을 들이게 됩니다. 그 단계까지 가면 문서는 설명서가 아니라 의심 대상이 되고, SDK와 테스트도 같은 방향으로 어긋납니다.
 
+이 글은 API Design 101 시리즈의 8번째 글입니다.
+
 여기서는 OpenAPI와 Swagger를 문서 도구가 아니라 계약 자동화 체계로 봅니다. 하나의 spec이 validation, 예제, SDK, mock server까지 연결되어야만 단일 진실 원본이라는 말이 실제 운영 습관으로 이어집니다.
 
 ![API Design 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/api-design-101/08/08-01-concept-at-a-glance.ko.png)

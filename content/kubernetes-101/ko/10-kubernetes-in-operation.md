@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 클러스터가 떠 있다는 사실과 운영 가능하다는 사실은 다릅니다. 파드가 실행 중이어도 준비되지 않은 상태로 트래픽을 받을 수 있고, 로그가 쌓여도 누가 볼 수 있는지 정리가 안 돼 있을 수 있으며, 장애가 나도 대응 절차가 없으면 복구는 매번 사람 기억에 의존하게 됩니다.
 
+이 글은 Kubernetes 101 시리즈의 마지막 글입니다.
+
 여기서는 Kubernetes 운영을 기능 목록이 아니라 probes, 접근 권한, 네트워크 경계, 관측성, GitOps, 런북이 함께 맞물려야 성립하는 운영 모델로 정리하겠습니다.
 
 ![Kubernetes 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/10/10-01-concept-at-a-glance.ko.png)

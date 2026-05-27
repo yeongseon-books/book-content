@@ -24,6 +24,8 @@ last_reviewed: '2026-05-17'
 
 Abstraction matters the moment one workflow has multiple implementations and the caller starts guessing which method name to call. This article is the 6th post in the OOP 101 series.
 
+This is the 6th post in the Object-Oriented Programming 101 series.
+
 In Python, abstraction is not mainly about sounding theoretical. It is about deciding which methods are mandatory, which steps should stay shared, and when a team should require explicit inheritance instead of relying on "it probably has the right shape."
 
 

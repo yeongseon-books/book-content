@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 Service까지 배우면 클러스터 내부 통신은 어느 정도 정리됩니다. 하지만 사용자가 브라우저나 앱에서 요청을 보내기 시작하면 다른 질문이 생깁니다. 외부 트래픽을 어디서 받을지, 여러 서비스를 어떤 규칙으로 나눌지, TLS 인증서를 어디에서 종료할지를 정해야 합니다.
 
+이 글은 Kubernetes 101 시리즈의 5번째 글입니다.
+
 여기서는 Ingress를 단순한 외부 노출 기능이 아니라, 여러 서비스를 하나의 진입점 뒤에 두고 HTTP 계층에서 라우팅 규칙과 TLS 종료를 모으는 구조로 정리하겠습니다.
 
 ![Kubernetes 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/05/05-01-concept-at-a-glance.ko.png)

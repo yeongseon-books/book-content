@@ -25,6 +25,8 @@ last_reviewed: '2026-05-15'
 
 동적 언어로도 코드는 잘 돌아갑니다. 그런데 프로젝트가 커질수록 사람들은 다시 타입 힌트를 붙이고, 검사기를 CI에 넣고, 인터페이스를 더 정확히 적기 시작합니다. 왜 이런 수고를 되풀이할까요.
 
+이 글은 Programming Languages 101 시리즈의 3번째 글입니다.
+
 이 글에서는 타입 시스템을 단순한 자료형 표기가 아니라, 프로그램이 말도 안 되는 조합을 실행 전에 걸러 내는 장치로 보겠습니다. 정적 타입과 동적 타입, 강한 타입과 약한 타입, 타입 추론과 제네릭이 각각 무엇을 사고파는지 차분히 정리해 보겠습니다.
 
 ![Programming Languages 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/03/03-01-concept-at-a-glance.ko.png)

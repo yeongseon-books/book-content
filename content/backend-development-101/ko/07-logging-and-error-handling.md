@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 새벽 3시에 on-call 알림이 울렸는데, 알림 제목이 `500 error spike` 한 줄뿐이고 로그에는 `Exception occurred`만 반복된다면 장애 대응은 사실상 추측 게임이 됩니다. 반대로 요청 단위 식별자, 일관된 에러 코드, 구조화된 로그 필드가 갖춰진 시스템에서는 같은 장애를 훨씬 짧은 시간 안에 설명할 수 있습니다. 운영에서 중요한 능력은 에러를 "없애는" 능력보다 에러를 "관측 가능한 신호"로 바꾸는 능력입니다.
 
+이 글은 Backend Development 101 시리즈의 7번째 글입니다.
+
 이 글에서는 운영 관측성 관점에서 Logging과 Error Handling을 하나의 설계 문제로 다룹니다. JSON 구조화 로그, 로그 레벨 정책, request ID/correlation ID, FastAPI 글로벌 예외 처리기, 도메인 예외와 인프라 예외 분리, 응답 스키마 표준화, 로그 보존/로테이션, 알림 기준, 샘플링 전략까지 실제 운영에서 바로 적용 가능한 단위로 정리하겠습니다.
 
 ![Backend Development 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/07/07-01-concept-at-a-glance.ko.png)

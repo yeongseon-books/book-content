@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 회원가입은 잘 되는데 로그인은 가끔 실패하고, 주문은 접수됐는데 재고는 마이너스로 떨어지고, 배포 직후부터 API 지연이 급증하는 상황을 팀에서 한 번쯤 겪습니다. 화면은 멀쩡한데 서비스가 흔들릴 때 원인은 대부분 백엔드의 책임 경계가 흐려진 지점에서 시작됩니다. 이 글은 "백엔드가 데이터를 처리한다" 수준을 넘어, 운영에서 버티는 구조를 어떻게 이해해야 하는지에 집중합니다.
 
+이 글은 Backend Development 101 시리즈의 첫 번째 글입니다.
+
 ![Backend Development 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/01/01-01-concept-at-a-glance.ko.png)
 *Backend Development 101 1장 흐름 개요*
 

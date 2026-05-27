@@ -25,6 +25,8 @@ last_reviewed: '2026-05-15'
 
 중복은 보이면 바로 없애야 할 것처럼 느껴지지만, 실제로는 그렇게 단순하지 않습니다.
 
+이 글은 Clean Code 101 시리즈의 5번째 글입니다.
+
 여기서는 DRY가 정말 뜻하는 것이 무엇인지, 그리고 어떤 중복은 남겨 두고 어떤 중복만 제거해야 하는지 분명하게 정리하겠습니다.
 
 ![Clean Code 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/05/05-01-concept-at-a-glance.ko.png)

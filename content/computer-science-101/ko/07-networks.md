@@ -25,6 +25,8 @@ last_reviewed: '2026-05-12'
 
 브라우저 주소창에 도메인을 입력하고 화면에 응답이 뜨기까지는 하나의 마법 같은 요청이 아니라, 층별로 역할이 나뉜 프로토콜들이 차례로 일을 나눠 갖는 과정입니다. 느림과 오류를 빠르게 좁히는 엔지니어는 이 층을 머릿속에 그릴 수 있습니다.
 
+이 글은 Computer Science 101 시리즈의 7번째 글입니다.
+
 여기서는 TCP/IP 계층, HTTP 요청과 응답, DNS 이름 해석, 그리고 소켓 프로그래밍의 기초를 통해 네트워크를 구조적으로 이해해 보겠습니다.
 
 ![Computer Science 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/07/07-01-concept-at-a-glance.ko.png)

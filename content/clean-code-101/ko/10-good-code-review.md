@@ -25,6 +25,8 @@ last_reviewed: '2026-05-15'
 
 좋은 코드는 작성 단계에서만 만들어지지 않고, 리뷰 단계에서 팀의 기준으로 다시 다듬어집니다.
 
+이 글은 Clean Code 101 시리즈의 마지막 글입니다.
+
 여기서는 지금까지 다룬 이름, 함수, 분기, 중복, 오류, 테스트, 리팩토링 관점을 실제 PR 리뷰 기준으로 어떻게 묶을지 정리하겠습니다.
 
 ![Clean Code 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/10/10-01-concept-at-a-glance.ko.png)

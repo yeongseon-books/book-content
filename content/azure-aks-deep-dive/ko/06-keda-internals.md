@@ -24,6 +24,8 @@ seo_description: KEDA가 ScaledObject를 통해 HPA를 생성하고 0에서 1로
 하지만 내부 구조를 따라가 보면 더 정확한 그림이 나옵니다.
 KEDA는 HPA를 없애는 대신 그 위에 올라타 external metric 경로를 채우고, 특히 `0 ↔ 1` 경계에서만 직접 replica를 다루는 쪽에 가깝습니다.
 
+이 글은 Azure Kubernetes Service Deep Dive 시리즈의 마지막 글입니다.
+
 이 차이를 이해하지 못하면 KEDA를 과장해서 보게 됩니다.
 어떤 팀은 KEDA가 “HPA 없이도 다 알아서 하는 시스템”이라고 생각하고, 어떤 팀은 반대로 “결국 HPA니까 볼 게 없다”고 여깁니다.
 둘 다 반쯤만 맞습니다.

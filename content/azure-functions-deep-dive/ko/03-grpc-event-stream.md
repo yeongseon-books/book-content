@@ -22,6 +22,8 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 워커 프로세스를 띄웠다고 해서 Functions가 곧바로 동작하는 것은 아닙니다. 실제 시스템 경계는 호스트와 워커가 생명주기 메시지, 함수 메타데이터, invocation, 로그, 상태 신호를 어떤 전송 경로로 주고받는지에서 드러납니다. 이 경로를 모르면 out-of-proc 모델은 “프로세스가 따로 있다”는 설명 이상으로 내려가지 못합니다.
 
+이 글은 Azure Functions Deep Dive 시리즈의 3번째 글입니다.
+
 이 글의 범위는 하나입니다. `Process.Start()` 이후, 워커가 호스트와 처음 말을 트는 순간부터 시작해 실제 invocation이 오갈 준비가 될 때까지의 프로토콜 경계를 코드로 따라갑니다. 기준은 호스트 저장소 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7)와 프로토콜 저장소 [`Azure/azure-functions-language-worker-protobuf`](https://github.com/Azure/azure-functions-language-worker-protobuf)입니다.
 
 특히 이번 글은 “gRPC를 쓴다”는 일반론이 아니라, 실제로 서비스가 하나이고 RPC도 하나이며 그 위에 dozens of message types가 `oneof`로 다중화된다는 사실을 구조적으로 정리합니다. 그리고 호스트 내부에서는 이 스트림이 일반 이벤트 버스보다 **워커별 채널 쌍 + gRPC 펌프**에 더 가깝게 구현되어 있다는 점을 보겠습니다.

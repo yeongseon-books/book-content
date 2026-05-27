@@ -25,6 +25,8 @@ last_reviewed: '2026-05-12'
 
 Big-O가 같은데도 어떤 코드는 유난히 빠르고 어떤 코드는 묵직하게 느린 경우가 있습니다. 이 차이는 알고리즘 설명만으로는 부족하고, 코드가 하드웨어를 어떤 순서와 밀도로 건드리는지까지 봐야 풀립니다.
 
+이 글은 Computer Science 101 시리즈의 5번째 글입니다.
+
 여기서는 폰 노이만 구조, CPU 실행 단계, 메모리 계층, 캐시 친화성 같은 개념이 실제 코드 성능에 어떻게 드러나는지 정리하겠습니다.
 
 ![Computer Science 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/05/05-01-concept-at-a-glance.ko.png)

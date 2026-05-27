@@ -25,6 +25,8 @@ last_reviewed: '2026-05-15'
 
 컨테이너와 VM 비교는 속도만의 문제가 아닙니다. 어떤 격리 경계가 필요한지, 멀티테넌트 요구가 얼마나 강한지, 부팅 시간과 자원 밀도가 어디까지 중요한지에 따라 답이 달라집니다.
 
+이 글은 Containers 101 시리즈의 9번째 글입니다.
+
 여기서는 호스트 커널 공유와 하이퍼바이저 기반 격리를 대비시키고, 어떤 워크로드에서 컨테이너·VM·microVM을 각각 먼저 검토해야 하는지 살펴봅니다.
 
 ![Containers 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/09/09-01-concept-at-a-glance.ko.png)

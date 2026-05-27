@@ -25,6 +25,8 @@ last_reviewed: '2026-05-15'
 
 서비스를 둘로 나누는 순간, 같은 코드를 돌려도 더 이상 같은 세상에 살지 않습니다. 네트워크가 끼고, 한쪽만 느려지거나 죽을 수 있고, 각 노드가 보는 시간도 조금씩 다르기 때문입니다.
 
+이 글은 Distributed Systems 101 시리즈의 첫 번째 글입니다.
+
 여기서는 그 차이를 지연, 장애, 조정이라는 세 축으로 정리해 두고, 이후 글 전체를 읽을 때 기준점이 되는 멘탈 모델을 세웁니다.
 
 ![Distributed Systems 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/01/01-01-concept-at-a-glance.ko.png)

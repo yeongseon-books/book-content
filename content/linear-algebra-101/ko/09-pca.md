@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 차원이 큰 데이터를 다루다 보면 모든 축이 똑같이 중요하지 않다는 사실을 곧 느끼게 됩니다. 어떤 축은 정보가 많이 담겨 있고, 어떤 축은 노이즈에 가깝습니다. PCA는 이 차이를 가장 고전적이고 명확한 방식으로 다루는 도구입니다.
 
+이 글은 Linear Algebra 101 시리즈의 9번째 글입니다.
+
 여기서는 PCA를 분산이 가장 큰 축을 찾고 그 축으로 데이터를 다시 표현하는 방법으로 이해해 보겠습니다.
 
 ![Linear Algebra 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/09/09-01-concept-at-a-glance.ko.png)

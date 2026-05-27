@@ -22,6 +22,8 @@ seo_description: Always On, warm-up path, health check로 App Service 첫 요청
 
 첫 요청이 느리다는 말은 보통 그냥 latency가 컸다는 뜻이 아닙니다. 더 정확히 말하면 아직 준비되지 않은 실행 단위가 사용자 요청을 받기 직전에 급히 준비되었다는 뜻입니다. worker가 막 할당되었을 수도 있고, 프로세스나 컨테이너가 막 올라오고 있을 수도 있으며, readiness를 판정하는 warm-up 경로가 아직 끝나지 않았을 수도 있습니다.
 
+이 글은 Azure App Service Deep Dive 시리즈의 마지막 글입니다.
+
 그래서 Always On, warm-up path, health check를 모두 켰는데도 기대한 만큼 빨라지지 않는 장면이 자주 나옵니다. 이 셋은 관련은 있지만 같은 기능이 아니기 때문입니다. idle coldness를 줄이는 일, startup 직후 readiness를 여는 일, 이미 서비스 중인 인스턴스가 계속 traffic을 받을 자격이 있는지 판단하는 일은 각기 다른 질문입니다.
 
 이번 글에서는 Windows와 Linux에서 warm-up 신호가 어떻게 다른지, Always On이 실제로 줄여 주는 비용과 줄여 주지 못하는 비용이 무엇인지, 좋은 warm-up endpoint는 어떤 성질을 가져야 하는지, 그리고 deployment slot이 왜 cold-start 비용을 production URL 밖으로 밀어내는지 정리하겠습니다.

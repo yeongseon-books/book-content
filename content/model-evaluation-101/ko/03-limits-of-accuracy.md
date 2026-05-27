@@ -24,6 +24,8 @@ last_reviewed: '2026-05-17'
 
 정확도는 계산이 쉽고 설명도 편하지만, 그래서 오히려 너무 일찍 결론을 내리게 만드는 지표입니다. issue #772가 지적한 핵심도 여기에 있습니다. 기존 글은 정확도의 한계를 설명했지만, 실제 판단 순서인 베이스레이트 → 더미 기준선 → 소수 클래스 재현율 → 균형 정확도 → 최종 리뷰 흐름으로 독자를 끌고 가지 못했습니다.
 
+이 글은 Model Evaluation 101 시리즈의 3번째 글입니다.
+
 이번 글에서는 정확도를 맨 앞 숫자가 아니라 **마지막 확인 숫자**로 다루겠습니다. 특히 `ko/03-limits-of-accuracy.md:64-69,115-131`에서 약했던 부분을 보강해, 높은 정확도가 실제 개선인지 아니면 다수 클래스가 만든 착시인지 운영자 관점에서 판정하는 절차로 재구성하겠습니다.
 
 ![Model Evaluation 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/03/03-01-concept-at-a-glance.ko.png)

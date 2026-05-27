@@ -25,6 +25,8 @@ last_reviewed: '2026-05-14'
 
 전공 후반부에 들어가면 많은 학생이 비슷한 질문을 합니다. 이제까지 배운 것을 어디에 써 보아야 하는지, 과목별 지식을 어떻게 하나의 결과물로 묶어야 하는지 감이 잘 오지 않기 때문입니다.
 
+이 글은 컴퓨터학과 전공 학습 가이드 101 시리즈의 7번째 글입니다.
+
 ![Computer Science Major 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/07/07-01-project-delivery-flow.ko.png)
 *컴퓨터학과 전공 가이드 7장 흐름 개요*
 > 프로젝트 과목들의 핵심은 완벽한 결과가 아니라, 제약 조건 속에서 의사결정을 기록하고 배움을 남기는 데 있습니다.

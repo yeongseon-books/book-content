@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 시리즈를 여기까지 따라왔다면 이제 남은 질문은 하나입니다. 그래서 이 선형대수가 실제 머신러닝 안에서 어디에 나타나는가 하는 질문입니다. 답은 생각보다 단순합니다. 거의 모든 곳입니다. 데이터 표현, 모델 정의, 손실 계산, 최적화 과정이 모두 벡터와 행렬 위에서 돌아갑니다.
 
+이 글은 Linear Algebra 101 시리즈의 마지막 글입니다.
+
 여기서는 선형회귀, 신경망, 임베딩, 그래디언트, PCA를 한 흐름으로 묶어 시리즈를 마무리하겠습니다.
 
 ![Linear Algebra 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/10/10-01-concept-at-a-glance.ko.png)

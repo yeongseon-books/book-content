@@ -22,6 +22,8 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 Azure Functions를 운영하다 보면 가장 먼저 부딪히는 질문은 의외로 단순합니다. 새 인스턴스가 켜질 때 정확히 어디까지를 호스트 부팅이라고 부를 수 있는지, 그리고 어느 시점부터 함수가 실제 호출을 받을 준비가 끝났다고 봐야 하는지입니다. 이 경계를 모르면 시작 실패, 재시작, 리스너 활성화 지연 같은 현상이 한 덩어리로 보입니다.
 
+이 글은 Azure Functions Deep Dive 시리즈의 첫 번째 글입니다.
+
 이번 시리즈는 문서 요약이 아니라 호스트 소스를 직접 따라가며 그 경계를 고정하는 작업입니다. 기준은 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7)입니다. 이후 글들도 모두 같은 커밋에 고정해, 설명과 코드가 어긋나지 않도록 맞춥니다.
 
 이번 글의 초점은 부팅 직후입니다. `Program.cs`의 표면적인 진입점보다 한 단계 안쪽으로 들어가, `WebJobsScriptHostService`가 `ScriptHost`를 만들고 `InitializeAsync`를 끝낼 때까지 무슨 준비를 하는지 봅니다. 함수 메타데이터 인덱싱과 host.json 옵션 로딩이 정확히 어디에 들어가는지도 이 경로 안에서 확인합니다.

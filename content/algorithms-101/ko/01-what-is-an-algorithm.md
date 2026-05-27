@@ -25,6 +25,8 @@ last_reviewed: '2026-05-12'
 
 현대 하드웨어가 충분히 빠른데도 왜 여전히 좋은 알고리즘이 중요할까요? 여기서는 알고리즘이 무엇인지, 프로그램과 어떻게 다른지, 그리고 이후 시리즈 전체를 떠받치는 핵심 용어를 정리합니다.
 
+이 글은 Algorithms 101 시리즈의 첫 번째 글입니다.
+
 ![Algorithms 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/algorithms-101/01/01-01-big-picture.ko.png)
 *Algorithms 101 1장 흐름 개요*
 

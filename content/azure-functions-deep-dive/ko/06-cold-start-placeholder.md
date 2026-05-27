@@ -22,6 +22,8 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 스케일아웃은 왜 새 인스턴스가 생겼는지를 설명해 줍니다. 하지만 사용자가 체감하는 문제는 그 다음에 남습니다. 어떤 인스턴스는 첫 요청을 거의 즉시 처리하는데, 어떤 인스턴스는 몇 초를 기다리게 만듭니다. 이 차이는 새 인스턴스가 **placeholder 상태에서 specialization 상태로 넘어가는 경로**에 숨어 있습니다.
 
+이 글은 Azure Functions Deep Dive 시리즈의 마지막 글입니다.
+
 콜드 스타트는 종종 “서버리스는 느리다”는 한 문장으로 소비되지만, 실제 비용은 하나가 아닙니다. VM 할당, 호스트 부팅, DI 컨테이너 준비, 코드 주입, 워커 재구성, `ScriptHost` 재시작이 서로 다른 단계로 쌓입니다. 따라서 정확한 운영 판단을 하려면 “콜드 스타트가 있다”가 아니라 “콜드 스타트 비용의 어느 부분이 공통이고 어느 부분이 사용자별인지”를 봐야 합니다.
 
 이번 글은 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준으로 `StandbyManager`, `PlaceholderSpecializationMiddleware`, `HostWarmupMiddleware`를 따라 placeholder 초기화, warmup, specialization, host restart까지 이어지는 경로를 정리합니다. 시리즈 마지막 글로서 앞선 다섯 편의 설명이 모두 여기로 모입니다.

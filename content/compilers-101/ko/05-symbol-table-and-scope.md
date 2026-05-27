@@ -24,6 +24,8 @@ last_reviewed: '2026-05-12'
 
 함수 안의 `x`와 바깥의 `x`를 컴파일러가 어떻게 서로 다른 변수로 구분하는지 이해하면, 이름 해석이 결국 자료구조 설계 문제라는 사실이 선명해집니다.
 
+이 글은 Compilers 101 시리즈의 5번째 글입니다.
+
 ![Compilers 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/compilers-101/05/05-01-big-picture.ko.png)
 *Compilers 101 5장 흐름 개요*
 

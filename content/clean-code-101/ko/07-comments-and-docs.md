@@ -25,6 +25,8 @@ last_reviewed: '2026-05-15'
 
 주석은 친절해 보이지만, 잘못 쓰이면 가장 빨리 낡는 설명이 됩니다.
 
+이 글은 Clean Code 101 시리즈의 7번째 글입니다.
+
 여기서는 코드가 스스로 설명해야 하는 부분과, 주석이나 문서가 꼭 맡아야 하는 부분을 구분해 보겠습니다.
 
 ![Clean Code 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/07/07-01-concept-at-a-glance.ko.png)

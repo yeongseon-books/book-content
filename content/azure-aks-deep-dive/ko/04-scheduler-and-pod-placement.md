@@ -24,6 +24,8 @@ Pending Pod를 보면 많은 팀이 가장 먼저 노드 상태나 container run
 하지만 실제로는 그보다 더 앞단의 결정이 먼저 끝나야 합니다.
 kube-scheduler가 제약 조건을 계산해 가능한 후보를 좁히고, 최종 Binding을 기록해야만 node-local 실행 경로가 시작될 수 있기 때문입니다.
 
+이 글은 Azure Kubernetes Service Deep Dive 시리즈의 4번째 글입니다.
+
 스케줄링이 어려운 이유는 이것이 단순한 잔여 CPU 계산이 아니기 때문입니다.
 node affinity, taint와 toleration, topology spread, 볼륨 제약, 포트 충돌, 우선순위와 preemption이 모두 같은 판단 안으로 들어옵니다.
 따라서 Pending이라는 동일한 결과 뒤에는 완전히 다른 배치 실패 이유가 숨어 있을 수 있습니다.

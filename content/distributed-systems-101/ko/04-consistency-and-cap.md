@@ -25,6 +25,8 @@ last_reviewed: '2026-05-15'
 
 데이터가 한 군데에만 있을 때는 "최신값을 읽는다"는 말이 별일 아닙니다. 하지만 복제본이 둘 이상이 되는 순간부터는 어느 복제본을 읽는지, 파티션 중 무엇을 포기하는지에 따라 그 문장이 완전히 다른 뜻을 갖게 됩니다.
 
+이 글은 Distributed Systems 101 시리즈의 4번째 글입니다.
+
 여기서는 일관성 모델을 스펙트럼으로 보고, CAP와 PACELC를 통해 설계 문서와 데이터베이스 문장을 읽는 기준을 만듭니다.
 
 ![Distributed Systems 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/04/04-01-concept-at-a-glance.ko.png)

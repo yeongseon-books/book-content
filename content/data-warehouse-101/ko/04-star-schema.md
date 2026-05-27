@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 분석 쿼리는 조인 수가 늘어날수록 느려지기 쉽습니다. Star Schema는 중심 fact 하나와 그 주변 dimension으로 구조를 단순하게 만들기 때문에 읽기 성능과 이해 가능성을 함께 챙기기 좋습니다. BI 도구도 이런 별 모양을 전제로 drill-down 경험을 설계하는 경우가 많습니다.
 
+이 글은 Data Warehouse 101 시리즈의 4번째 글입니다.
+
 ![Data Warehouse 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/04/04-01-concept-at-a-glance.ko.png)
 *Data Warehouse 101 4장 흐름 개요*
 > Star Schema는 '정규화 vs 비정규화' 균형을 일관되게 유지해 쿼리 성능과 유지보수 비용 둘 다 낮춥니다.

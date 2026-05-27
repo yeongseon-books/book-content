@@ -25,6 +25,8 @@ seo_description: Agent는 한 번에 성공하지 못합니다. Feedback Loop는
 Feedback Loop는 실패를 다음 시도의 입력으로 바꾸는 층입니다. 어떤 실패는 retry로, 어떤 실패는 reflect로 보내고, 반복 실패는 결국 사람에게 escalate하는 구조를 설계해야 합니다.
 좋은 에이전트는 실패하지 않는 시스템이 아니라 실패를 개선 신호로 바꾸는 시스템입니다.
 
+이 글은 Harness Engineering 101 시리즈의 7번째 글입니다.
+
 ![Feedback Loop - 실패를 고치게 만드는 반복 구조](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/07/07-01-feedback-loops-building-structures-that.ko.png)
 *Feedback Loop - 실패를 고치게 만드는 반복 구조*
 > 좋은 feedback loop는 다시 시도하게 만드는 것이 아니라, 왜 실패했는지 알고 다르게 시도하게 만듭니다.

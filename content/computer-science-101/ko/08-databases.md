@@ -25,6 +25,8 @@ last_reviewed: '2026-05-12'
 
 수억 행 중 한 행을 1ms 안에 찾는 일은 SQL 문장 자체보다 그 뒤에 숨어 있는 자료구조와 실행 계획의 힘에 가깝습니다. 서비스 장애가 데이터베이스에서 시작되는 이유도, 짧은 쿼리 뒤에 깊은 비용이 숨어 있기 때문입니다.
 
+이 글은 Computer Science 101 시리즈의 8번째 글입니다.
+
 여기서는 관계형 데이터베이스의 기본 개념, SQL 조회와 수정, 인덱스, 트랜잭션과 ACID를 실무 중심으로 정리하겠습니다.
 
 ![Computer Science 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/08/08-01-concept-at-a-glance.ko.png)

@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 이전 글에서 본 이미지, 네트워크, 볼륨, 보안, 헬스체크는 따로 보면 개념으로만 남기 쉽습니다. 마지막 단계에서는 이 요소들을 하나의 앱 조립 흐름으로 묶어, 누구나 같은 명령으로 올리고 확인하고 정리할 수 있는 작은 시스템으로 바꿔 보는 것이 중요합니다.
 
+이 글은 Containers 101 시리즈의 마지막 글입니다.
+
 여기서는 FastAPI와 Postgres를 예시로 Dockerfile, Compose, healthcheck, 시크릿 분리, 로그 확인을 하나의 실행 스택으로 연결합니다.
 
 ![Containers 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/10/10-01-concept-at-a-glance.ko.png)

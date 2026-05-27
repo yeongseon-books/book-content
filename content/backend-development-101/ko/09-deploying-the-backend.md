@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 로컬에서 잘 돌아가는 백엔드가 운영에서 실패하는 장면은 드물지 않습니다. 코드가 틀렸기 때문이 아니라, 실행 환경이 재현되지 않았기 때문인 경우가 더 많습니다. 배포를 "코드를 서버에 올리는 일"로 이해하면 이 실패를 설명하기 어렵고, 배포를 "실행 환경을 버전으로 고정하는 일"로 이해하면 실패 원인과 해결 순서가 선명해집니다.
 
+이 글은 Backend Development 101 시리즈의 9번째 글입니다.
+
 이번 글에서는 재현 가능한 배포를 중심에 두고 Docker, 환경 변수, health check, rolling update, CI/CD, reverse proxy, 로컬 compose 운영까지 한 번에 연결하겠습니다. 목표는 명령어 암기가 아니라 "왜 이 순서로 설계해야 운영에서 안전한가"를 이해하는 것입니다.
 
 ![Backend Development 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/backend-development-101/09/09-01-concept-at-a-glance.ko.png)

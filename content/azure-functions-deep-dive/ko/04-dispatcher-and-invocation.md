@@ -22,6 +22,8 @@ seo_description: 이 글의 모든 코드 인용은 Azure/azure-functions-host @
 
 gRPC 채널이 준비되었다고 해서 설명이 끝난 것은 아닙니다. 운영자와 애플리케이션 개발자가 결국 궁금해하는 지점은 따로 있습니다. 큐 메시지 하나, HTTP 요청 하나, 타이머 신호 하나가 어떻게 실제 사용자 함수 한 번의 실행으로 바뀌고, 그 결과는 어떤 상관관계 경로를 따라 다시 호스트로 돌아오는가입니다.
 
+이 글은 Azure Functions Deep Dive 시리즈의 4번째 글입니다.
+
 이 질문은 시스템 경계를 추상적으로 이해하는 수준을 넘어섭니다. 어느 객체가 invocation context를 만들고, 누가 그것을 워커 쪽 메시지로 바꾸며, 응답은 어떤 키로 다시 매칭되는지를 알아야 timeout, retry, long-running invocation, HTTP proxying 같은 운영 문제도 올바르게 읽을 수 있습니다.
 
 이번 글은 [`Azure/azure-functions-host @ 5e59423`](https://github.com/Azure/azure-functions-host/tree/5e59423ba45491041d18224c3e72c168a4a5b7f7) 기준으로 `WorkerFunctionInvoker`, `IFunctionInvocationDispatcher`, `GrpcWorkerChannel`을 따라 한 번의 invocation 경로를 끝까지 추적합니다. 앞선 3화가 wire protocol 경계를 고정했다면, 이번 화는 그 위를 실제 호출이 어떻게 흐르는지 보여 줍니다.

@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 Pod를 여러 개 띄우기 시작하면 다음 문제가 바로 등장합니다. Pod IP가 계속 바뀌는데, 다른 서비스나 사용자는 그 파드를 어떻게 안정적으로 찾아야 할까 하는 문제입니다. 파드가 재시작되거나 새로 생성될 때마다 주소가 달라지면 애플리케이션끼리 서로를 부르기가 금방 불안정해집니다.
 
+이 글은 Kubernetes 101 시리즈의 4번째 글입니다.
+
 여기서는 Service를 단순한 포트 노출 기능이 아니라, 라벨로 선택된 파드 집합에 안정적인 가상 IP와 DNS 이름을 부여하는 네트워킹 기본 객체라는 관점에서 정리하겠습니다.
 
 ![Kubernetes 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/04/04-01-concept-at-a-glance.ko.png)

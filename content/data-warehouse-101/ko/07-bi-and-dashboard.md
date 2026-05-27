@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 데이터 웨어하우스에 데이터를 잘 쌓아도 마지막 화면이 시끄러우면 의사결정은 느려집니다. 결국 BI와 대시보드는 숫자를 저장하는 층이 아니라, 질문 하나를 화면 하나로 바꾸는 층입니다. 좋은 대시보드는 많이 보여 주는 화면이 아니라 빠르게 같은 결론에 도달하게 만드는 화면입니다.
 
+이 글은 Data Warehouse 101 시리즈의 7번째 글입니다.
+
 ![Data Warehouse 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/data-warehouse-101/07/07-01-concept-at-a-glance.ko.png)
 *Data Warehouse 101 7장 흐름 개요*
 > Dashboard 설계는 '무엇을 봐야 하는가'를 먼저 정하고, 그 다음에 '어디서 가져올 것인가'를 결정합니다.

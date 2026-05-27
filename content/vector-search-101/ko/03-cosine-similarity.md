@@ -22,6 +22,8 @@ seo_description: 코사인 유사도와 내적, L2 거리를 비교하며 벡터
 
 벡터를 만들었다면 다음 질문은 그것들을 어떻게 비교할지입니다. 거리 척도는 여러 가지가 있고, 어떤 척도를 선택하느냐에 따라 검색 결과도 달라집니다. 코사인 유사도가 가장 흔하지만, 내적과 유클리드 거리에도 더 잘 맞는 경우가 있습니다.
 
+이 글은 벡터 검색 101 시리즈의 3번째 글입니다.
+
 여기서는 세 가지 척도를 직접 구현하고, 정규화가 왜 중요한지 보여 주며, 외부 라이브러리 없이 브루트 포스 최근접 이웃 검색까지 만들어 봅니다.
 
 ![Cosine dot and euclidean comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/03/03-01-cosine-similarity-and-vector-search-comp.ko.png)

@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 전체 점수는 모델이 얼마나 잘하는지 대략 알려 줍니다. 하지만 모델을 실제로 고치려면 그 숫자만으로는 부족합니다. 정확도 92%라는 결과는 그럴듯하지만, 어디서 틀렸는지, 어떤 사용자 집단에서 약한지, false positive와 false negative 중 무엇이 더 큰지까지는 말해 주지 못합니다.
 
+이 글은 Model Evaluation 101 시리즈의 9번째 글입니다.
+
 그래서 개선 작업의 출발점은 종종 더 좋은 지표를 찾는 일이 아니라, 틀린 예측을 더 잘 분해하는 일입니다. 오류 분석은 평균 점수 뒤에 숨어 있는 패턴을 꺼내서 다음 실험의 우선순위를 정하게 도와줍니다.
 
 ![Model Evaluation 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/09/09-01-concept-at-a-glance.ko.png)

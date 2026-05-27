@@ -25,6 +25,8 @@ last_reviewed: '2026-05-15'
 
 Python을 쓰다 보면 언어를 그냥 도구처럼 여기기 쉽습니다. 그런데 같은 문제를 어셈블리로 풀 때와 Python으로 풀 때는 코드 길이만 달라지는 것이 아닙니다. 문제를 쪼개는 방식, 이름을 붙이는 방식, 상태를 다루는 방식까지 함께 달라집니다.
 
+이 글은 Programming Languages 101 시리즈의 첫 번째 글입니다.
+
 이 글에서는 프로그래밍 언어를 단순한 문법 집합이 아니라, 사람이 문제를 표현하는 틀로 보겠습니다. 같은 계산을 여러 패러다임으로 풀어 보면서 언어가 무엇을 감추고 무엇을 드러내는지부터 잡아 두겠습니다.
 
 ![Programming Languages 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/01/01-01-concept-at-a-glance.ko.png)

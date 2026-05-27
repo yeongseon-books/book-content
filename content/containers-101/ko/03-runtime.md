@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 컨테이너 문제를 만났을 때 Docker CLI만 보면 답이 나올 것처럼 느껴질 때가 많습니다. 하지만 운영 환경으로 가면 Docker, containerd, runc, CRI가 서로 다른 계층으로 분리되어 있어 어디를 보고 있는지부터 구분해야 합니다.
 
+이 글은 Containers 101 시리즈의 3번째 글입니다.
+
 여기서는 사용자 도구, 런타임 데몬, 저수준 실행기, Kubernetes 인터페이스를 각각 어떤 책임으로 나눠 이해해야 하는지 살펴봅니다.
 
 ![Containers 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/containers-101/03/03-01-concept-at-a-glance.ko.png)

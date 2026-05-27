@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 애플리케이션이 흔들리는 가장 흔한 시작점은 입력입니다. 로그인 폼, 검색창, JSON payload, 파일 이름, 쿼리 문자열처럼 겉보기에는 단순한 값도 서버가 그대로 믿는 순간 버그와 공격이 함께 들어옵니다. SQL injection, XSS, 경로 조작, 안전하지 않은 역직렬화가 모두 여기서 출발합니다.
 
+이 글은 Secure Coding 101 시리즈의 2번째 글입니다.
+
 여기서는 입력값 검증을 단순한 if 문 모음이 아니라, 신뢰 경계에서 시스템을 예측 가능하게 만드는 계약으로 보겠습니다. 이 관점을 잡으면 검증 로직을 여기저기 흩뿌리지 않고, 스키마와 경계 설계로 정리하는 이유도 자연스럽게 이해할 수 있습니다.
 
 ![Secure Coding 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/02/02-01-concept-at-a-glance.ko.png)

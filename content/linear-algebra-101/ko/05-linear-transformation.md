@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 행렬을 배우고 나면 다음 질문이 남습니다. 그래서 행렬이 실제로 공간에 무엇을 하는가 하는 질문입니다. 이 질문에 답하는 개념이 선형변환입니다. 행렬은 결국 선형변환을 좌표계 안에서 적어 놓은 표현이기 때문입니다.
 
+이 글은 Linear Algebra 101 시리즈의 5번째 글입니다.
+
 여기서는 회전, 확대, 반사, 전단을 예로 들어 선형변환을 기하학적으로 읽어 보겠습니다.
 
 ![Linear Algebra 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/05/05-01-concept-at-a-glance.ko.png)

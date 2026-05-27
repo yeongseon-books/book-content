@@ -25,6 +25,8 @@ last_reviewed: '2026-05-12'
 
 "프로그램으로 풀 수 있는 문제"라는 말은 익숙하지만, 어디까지가 계산 가능한 범위인지 정확히 묻기 시작하면 이야기가 달라집니다. 계산 가능성의 경계와 코드를 조직하는 방식은 생각보다 가까이 붙어 있습니다.
 
+이 글은 Computer Science 101 시리즈의 2번째 글입니다.
+
 여기서는 계산의 이론적 정의, 계산할 수 없는 문제, 그리고 프로그래밍 언어와 패러다임이 그 계산을 어떻게 사람의 언어로 옮기는지 함께 봅니다.
 
 ![Computer Science 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-101/02/02-01-concept-at-a-glance.ko.png)

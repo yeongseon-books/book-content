@@ -25,6 +25,8 @@ last_reviewed: '2026-05-14'
 
 서비스를 만든다는 말은 결국 데이터를 저장하고, 그 데이터를 네트워크를 통해 주고받는다는 뜻입니다. 화면과 코드만으로는 서비스가 완성되지 않는 이유도 여기에 있습니다.
 
+이 글은 컴퓨터학과 전공 학습 가이드 101 시리즈의 5번째 글입니다.
+
 ![Computer Science Major 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/computer-science-major-101/05/05-01-request-to-database-flow.ko.png)
 *컴퓨터학과 전공 가이드 5장 흐름 개요*
 > 데이터베이스와 네트워크의 핵심은 기술 이름이 아니라 어떤 경계에서 무엇을 일관되게 제공해야 하는지를 이해하는 데 있습니다.

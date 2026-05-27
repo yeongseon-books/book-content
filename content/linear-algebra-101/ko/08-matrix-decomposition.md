@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 행렬을 직접 다루다 보면 곧 한계를 만납니다. 역행렬을 바로 구하는 방식은 느리거나 불안정할 수 있고, 문제에 따라 더 적합한 계산 경로가 따로 있습니다. 이때 등장하는 것이 행렬 분해입니다. 복잡한 행렬을 해석 가능한 조각으로 나누어 계산을 더 안정적으로 만드는 방법입니다.
 
+이 글은 Linear Algebra 101 시리즈의 8번째 글입니다.
+
 여기서는 LU, QR, 고유분해, SVD를 같은 지도 위에서 정리해 보겠습니다.
 
 ![Linear Algebra 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/08/08-01-concept-at-a-glance.ko.png)

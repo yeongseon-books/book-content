@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 트래픽은 하루 종일 일정하지 않습니다. 어떤 시간에는 요청이 몰리고, 어떤 시간에는 거의 비어 있습니다. 이런 변화를 운영자가 수동으로 따라가면 대응은 늘 늦고, 넉넉하게 파드를 띄워 두면 비용이 계속 낭비됩니다.
 
+이 글은 Kubernetes 101 시리즈의 8번째 글입니다.
+
 여기서는 HPA를 단순히 CPU가 높으면 파드를 늘리는 기능이 아니라, 메트릭을 기준으로 Deployment의 원하는 개수를 자동 조절하는 운영 자동화 계층이라는 관점에서 정리하겠습니다.
 
 ![Kubernetes 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/kubernetes-101/08/08-01-concept-at-a-glance.ko.png)

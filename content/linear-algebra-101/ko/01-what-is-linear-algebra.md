@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 머신러닝을 공부하다 보면 수식이 갑자기 두꺼워지는 지점이 있습니다. 데이터는 벡터가 되고, 파라미터는 행렬이 되며, 모델의 한 레이어는 변환으로 읽히기 시작합니다. 이때 선형대수를 숫자 계산 모음으로만 보면 식은 외워도 구조는 잘 보이지 않습니다.
 
+이 글은 Linear Algebra 101 시리즈의 첫 번째 글입니다.
+
 여기서는 선형대수를 벡터, 행렬, 선형변환을 한 줄로 묶는 언어로 이해해 보겠습니다.
 
 ![Linear Algebra 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/01/01-01-concept-at-a-glance.ko.png)

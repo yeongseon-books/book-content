@@ -25,6 +25,8 @@ seo_description: Agent에게 자유를 주면 창의적이지만 위험합니다
 Constraint Harness는 프롬프트에 적힌 훈계문이 아니라 시스템이 반드시 통과해야 하는 강제 장치의 모음입니다. 어떤 도구를 보일지, 얼마나 오래 실행할지, 어떤 출력은 차단할지, 어떤 데이터 범위 밖으로는 못 나가게 할지를 따로 설계해야 합니다.
 안전한 에이전트는 착한 프롬프트보다 우회하기 어려운 제약에서 나옵니다.
 
+이 글은 Harness Engineering 101 시리즈의 4번째 글입니다.
+
 ![Constraint Harness - 규칙, 경계, 금지 행동 정의하기](https://yeongseon-books.github.io/book-public-assets/assets/harness-engineering-101/04/04-01-constraint-harness-defining-rules-bounda.ko.png)
 *Constraint Harness - 규칙, 경계, 금지 행동 정의하기*
 > Constraint Harness는 agent에게 “하지 마”라고 말하는 것이 아니라, 할 수 없는 경계를 시스템에 만드는 일입니다.

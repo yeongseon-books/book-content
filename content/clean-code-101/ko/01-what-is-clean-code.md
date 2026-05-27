@@ -25,6 +25,8 @@ last_reviewed: '2026-05-15'
 
 코드는 일단 동작하면 끝난 것처럼 보이지만, 실제 비용은 그다음 변경에서 드러납니다.
 
+이 글은 Clean Code 101 시리즈의 첫 번째 글입니다.
+
 여기서는 동작하는 코드와 읽기 쉬운 코드, 그리고 바꾸기 쉬운 코드가 어떻게 다른지 한 번에 정리하겠습니다.
 
 ![Clean Code 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/01/01-01-concept-at-a-glance.ko.png)

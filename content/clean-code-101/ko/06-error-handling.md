@@ -25,6 +25,8 @@ last_reviewed: '2026-05-15'
 
 오류 처리는 꼭 필요하지만, 그 코드가 비즈니스 로직보다 더 눈에 띄기 시작하면 구조가 이미 흐려진 경우가 많습니다.
 
+이 글은 Clean Code 101 시리즈의 6번째 글입니다.
+
 여기서는 예외와 반환값을 언제 구분해서 써야 하는지, 그리고 재시도와 경계 처리까지 어떤 기준으로 설계해야 하는지 정리하겠습니다.
 
 ![Clean Code 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/06/06-01-concept-at-a-glance.ko.png)

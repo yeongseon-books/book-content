@@ -25,6 +25,8 @@ last_reviewed: '2026-05-15'
 
 함수가 자신이 정의된 자리의 변수를 기억하는 것처럼 보일 때가 있습니다. 처음 보면 마법처럼 느껴지지만, 실제로는 지난 글의 스코프 규칙과 함수가 값처럼 다뤄질 수 있다는 사실이 자연스럽게 합쳐진 결과입니다.
 
+이 글은 Programming Languages 101 시리즈의 5번째 글입니다.
+
 이 글에서는 클로저를 “설명하기 어려운 특별한 기능”이 아니라, 렉시컬 스코프와 일급 함수가 만났을 때 생기는 평범한 결과로 보겠습니다. 함수가 값을 붙잡는 것이 아니라 바인딩을 붙잡는다는 점까지 분명히 이해하면 콜백, 데코레이터, 메모이제이션이 한 번에 연결됩니다.
 
 ![Programming Languages 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/programming-languages-101/05/05-01-concept-at-a-glance.ko.png)

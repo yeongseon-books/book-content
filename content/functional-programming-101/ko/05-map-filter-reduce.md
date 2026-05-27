@@ -24,6 +24,8 @@ last_reviewed: '2026-05-12'
 
 함수형 프로그래밍을 처음 배울 때 가장 먼저 만나는 실전 도구가 `map`, `filter`, `reduce`입니다. 셋 다 결국 반복을 다루지만, 중요한 것은 루프 문법이 아니라 역할 분담입니다. 값을 바꾸는지, 걸러내는지, 하나로 합치는지를 명시적으로 표현하게 해 줍니다.
 
+이 글은 Functional Programming 101 시리즈의 5번째 글입니다.
+
 Python에서는 리스트 컴프리헨션이 더 자주 쓰이기 때문에 이 세 함수를 낡은 문법처럼 오해하기도 합니다. 하지만 개념 자체는 여전히 중요합니다. pandas, SQL, Spark 같은 도구를 이해할 때도 결국 같은 사고방식이 반복되기 때문입니다.
 
 ![Functional Programming 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/functional-programming-101/05/05-01-big-picture.ko.png)

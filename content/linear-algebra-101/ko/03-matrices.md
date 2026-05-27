@@ -24,6 +24,8 @@ last_reviewed: '2026-05-15'
 
 행렬은 선형대수에서 가장 자주 보이는 표기입니다. 데이터셋을 담는 테이블처럼 보이기도 하고, 어떤 벡터를 다른 벡터로 보내는 규칙처럼 읽히기도 합니다. 그래서 행렬을 숫자판으로만 이해하면 계산은 따라가도 왜 곱하는지는 남지 않습니다.
 
+이 글은 Linear Algebra 101 시리즈의 3번째 글입니다.
+
 여기서는 행렬을 형상과 변환이라는 두 관점으로 함께 이해해 보겠습니다.
 
 ![Linear Algebra 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/linear-algebra-101/03/03-01-concept-at-a-glance.ko.png)

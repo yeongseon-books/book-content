@@ -25,6 +25,8 @@ last_reviewed: '2026-05-15'
 
 직접 호출은 참여하는 모든 서비스가 같은 순간에 건강해야 한다는 조건을 강하게 묶습니다. 반대로 큐와 로그를 사이에 두면 한쪽은 지금 끝내고, 다른 쪽은 나중에 따라와도 되며, 그 사이의 이력을 보존할 수 있습니다.
 
+이 글은 Distributed Systems 101 시리즈의 8번째 글입니다.
+
 여기서는 메시지 큐와 이벤트 로그를 통해 시간이 어떻게 설계 도구가 되는지, 그리고 replay와 idempotency가 왜 운영 언어가 되는지 설명합니다.
 
 ![Distributed Systems 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/distributed-systems-101/08/08-01-concept-at-a-glance.ko.png)
