@@ -32,9 +32,9 @@ This is the first post in the Frontend Development 101 series. In this chapter, 
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying What Is Frontend Development??
-- Which signal should the example or diagram make visible for What Is Frontend Development??
-- What failure should be prevented first when What Is Frontend Development? reaches a real system?
+- Where does the frontend stop and the backend begin in a real product?
+- How does the browser combine HTML, CSS, and JavaScript into one user-facing experience?
+- Why do concepts such as the DOM, rendering, and SPA keep showing up in frontend fundamentals?
 
 ## What You Will Learn
 
@@ -61,21 +61,25 @@ The browser *combines* the three languages to draw the screen.
 - **SPA (Single Page Application)**: an app whose screen changes *via JS*, with no page reload.
 - **Hydration**: the process of *attaching JS behavior* to server-rendered HTML.
 
-## Before/After
+## From Document Pages to App Navigation
 
-**Before (static website, 1995)**
+Early web pages behaved like separate documents. Clicking a link usually meant leaving the current page, requesting a new HTML file, and letting the browser rebuild the screen from scratch. That model still exists, but modern frontend work often treats the browser as an application runtime that swaps views inside one long-lived page.
+
+**Traditional page navigation**
 
 ```html
 <!-- Each page is its own .html file -->
 <a href="/about.html">About</a>
 ```
 
-**After (modern SPA, 2025)**
+**Application-style navigation**
 
 ```javascript
 // A router swaps the screen inside one page
 <Link to="/about">About</Link>
 ```
+
+Both approaches can be correct. The important change is the mental model: in a multipage site, the browser keeps loading whole documents, while in an SPA it keeps one application shell alive and lets JavaScript decide which screen fragment to render next. That shift is why routing, state, and bundling become core frontend topics instead of optional extras.
 
 ## Hands-on: Your First Page in Five Steps
 
@@ -175,12 +179,12 @@ The frontend is *the layer where the product meets the user inside the browser*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Is Frontend Development??**
-  - The article treats What Is Frontend Development? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Is Frontend Development??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Is Frontend Development? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Where does the frontend stop and the backend begin in a real product?**
+  - The frontend owns the browser-side experience: HTML structure, CSS presentation, JavaScript behavior, and the visible response to user input. The backend may provide data or business rules, but the moment a button click changes the DOM, starts a fetch, or updates the screen, you are in frontend territory.
+- **How does the browser combine HTML, CSS, and JavaScript into one user-facing experience?**
+  - HTML defines structure, CSS describes how that structure should look, and JavaScript reacts to user input and state changes. The browser turns that combination into a DOM tree, applies styles, paints pixels, and keeps re-running that loop as the user interacts with the page.
+- **Why do concepts such as the DOM, rendering, and SPA keep showing up in frontend fundamentals?**
+  - They are different names for different layers of the same runtime. The DOM explains how the browser represents structure, rendering explains how it turns structure into visible output, and SPA explains one common strategy for updating that output without a full page reload.
 
 <!-- toc:begin -->
 ## In this series
