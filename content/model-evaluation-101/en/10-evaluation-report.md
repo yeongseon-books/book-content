@@ -32,6 +32,8 @@ This is the final post in the Model Evaluation 101 series. In this post, we turn
 ![model evaluation 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/10/10-01-concept-at-a-glance.en.png)
 *model evaluation 101 chapter 10 flow overview*
 
+> An evaluation report is the operating record that prevents amnesia — it pins data, threshold, slices, and known risks to one document so reviews, audits, and post-incident analyses all read from the same evidence.
+
 ## Questions to Keep in Mind
 
 - The five sections of an evaluation report?

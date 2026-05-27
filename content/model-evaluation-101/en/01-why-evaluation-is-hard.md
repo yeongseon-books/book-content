@@ -32,6 +32,8 @@ This is the first post in the Model Evaluation 101 series. In this post, we buil
 ![model evaluation 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/01/01-01-concept-at-a-glance.en.png)
 *model evaluation 101 chapter 1 flow overview*
 
+> Evaluation is decision design, not metric calculation — the same score means different things across data distributions, error costs, and thresholds, so the real risk is a whole team optimizing toward the wrong number.
+
 ## Questions to Keep in Mind
 
 - Four reasons evaluation is hard?

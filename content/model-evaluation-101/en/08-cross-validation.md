@@ -32,6 +32,8 @@ This is the 8th post in the Model Evaluation 101 series. In this post, we use fo
 ![model evaluation 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/08/08-01-concept-at-a-glance.en.png)
 *model evaluation 101 chapter 8 flow overview*
 
+> Cross validation is an uncertainty tool, not a score factory — the spread across folds tells you whether a small lead between two models is real signal or just split noise.
+
 ## Questions to Keep in Mind
 
 - The meaning and trade-offs of K-Fold?

@@ -31,6 +31,8 @@ last_reviewed: '2026-05-15'
 ![Model Evaluation 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/09/09-01-concept-at-a-glance.ko.png)
 *Model Evaluation 101 9장 흐름 개요*
 
+> 개선은 더 높은 평균이 아니라 분해에서 시작합니다 — 오류 분석은 하나의 집계 점수를 슬라이스·신뢰도·오류 유형으로 쪼개, 다음 실험이 막연한 기대가 아닌 구체적인 표적을 갖게 해 줍니다.
+
 ## 먼저 던지는 질문
 
 - 전체 점수가 비슷한 두 모델은 어디에서 다르게 실패할까요?

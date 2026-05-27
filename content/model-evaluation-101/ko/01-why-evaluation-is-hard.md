@@ -31,6 +31,8 @@ last_reviewed: '2026-05-15'
 ![Model Evaluation 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/01/01-01-concept-at-a-glance.ko.png)
 *Model Evaluation 101 1장 흐름 개요*
 
+> 평가는 지표 계산이 아니라 의사결정 설계입니다 — 같은 점수도 데이터 분포·오류 비용·임계값에 따라 전혀 다른 의미를 가지므로, 진짜 위험은 팀 전체가 잘못된 숫자를 향해 최적화하는 것입니다.
+
 ## 먼저 던지는 질문
 
 - 왜 정확도 하나만으로 모델을 판단하면 위험할까요?

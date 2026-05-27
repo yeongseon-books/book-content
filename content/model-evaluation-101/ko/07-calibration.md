@@ -31,6 +31,8 @@ last_reviewed: '2026-05-15'
 ![Model Evaluation 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/07/07-01-concept-at-a-glance.ko.png)
 *Model Evaluation 101 7장 흐름 개요*
 
+> 캘리브레이션은 모델의 0.8 점수를 '약 80% 확률'로 읽을 수 있게 해 주는 성질입니다 — 순위 품질과 확률 품질은 다른 축이고, 확률에 비용을 곱해 결정하는 시스템은 AUC가 아닌 이 두 번째 축이 필요합니다.
+
 ## 먼저 던지는 질문
 
 - 모델이 예측한 확률을 왜 그대로 믿으면 안 될까요?

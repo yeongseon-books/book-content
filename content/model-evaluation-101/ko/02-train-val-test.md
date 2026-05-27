@@ -31,6 +31,8 @@ last_reviewed: '2026-05-15'
 ![Model Evaluation 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/02/02-01-concept-at-a-glance.ko.png)
 *Model Evaluation 101 2장 흐름 개요*
 
+> Train·validation·test는 학습·선택·최종 검증이라는 서로 다른 세 역할입니다 — 이 역할이 한 번 섞이면 이후 모든 숫자가 깔끔해 보이면서도 신뢰할 수 없는 상태가 됩니다.
+
 ## 먼저 던지는 질문
 
 - train, validation, test는 각각 무엇을 맡아야 할까요?

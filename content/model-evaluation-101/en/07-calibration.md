@@ -32,6 +32,8 @@ This is the 7th post in the Model Evaluation 101 series. In this post, we separa
 ![model evaluation 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/07/07-01-concept-at-a-glance.en.png)
 *model evaluation 101 chapter 7 flow overview*
 
+> Calibration is what lets you read a 0.8 score as 'about 80% probability' — ranking quality and probability quality are different axes, and any system that multiplies probabilities by costs needs the second one, not just AUC.
+
 ## Questions to Keep in Mind
 
 - The definition and purpose of calibration?

@@ -32,6 +32,8 @@ This is the 2nd post in the Model Evaluation 101 series. In this post, we define
 ![model evaluation 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/02/02-01-concept-at-a-glance.en.png)
 *model evaluation 101 chapter 2 flow overview*
 
+> Train / validation / test are three different jobs (learning, selection, final verification) — once those roles blur, every downstream number looks polished while being untrustworthy.
+
 ## Questions to Keep in Mind
 
 - The role of each dataset?

@@ -32,6 +32,8 @@ This is the 9th post in the Model Evaluation 101 series. In this post, we break 
 ![model evaluation 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/09/09-01-concept-at-a-glance.en.png)
 *model evaluation 101 chapter 9 flow overview*
 
+> Improvement starts with decomposition, not a higher average — error analysis breaks one aggregate score into slices, confidence bands, and error types so the next experiment has a concrete target instead of a vague hope.
+
 ## Questions to Keep in Mind
 
 - Decomposing performance by slice?

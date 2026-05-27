@@ -31,6 +31,8 @@ last_reviewed: '2026-05-15'
 ![Model Evaluation 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/model-evaluation-101/10/10-01-concept-at-a-glance.ko.png)
 *Model Evaluation 101 10장 흐름 개요*
 
+> 평가 보고서는 망각을 막는 운영 기록입니다 — 데이터·임계값·슬라이스·이미 알려진 리스크를 하나의 문서에 묶어 두어야 리뷰, 감사, 사후 분석이 모두 같은 근거를 참조할 수 있습니다.
+
 ## 먼저 던지는 질문
 
 - 모델 배포 전에 어떤 평가 정보를 한곳에 모아야 할까요?
