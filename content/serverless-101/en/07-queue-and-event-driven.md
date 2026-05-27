@@ -31,6 +31,7 @@ This is the 7th post in the Serverless 101 series.
 
 ![serverless 101 chapter 7 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/07/07-01-concept-at-a-glance.en.png)
 *serverless 101 chapter 7 flow overview*
+> Queues turn synchronous failures into asynchronous retries — they decouple the producer from the consumer so each can scale, fail, and recover on its own clock.
 
 ## Questions to Keep in Mind
 

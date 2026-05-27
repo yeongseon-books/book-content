@@ -28,6 +28,7 @@ last_reviewed: '2026-05-12'
 
 ![Serverless 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/10/10-01-concept-at-a-glance.ko.png)
 *Serverless 101 10장 흐름 개요*
+> 서버리스 앱은 트리거와 큐로 연결된 작은 함수들의 그래프이고, 아키텍처 작업의 핵심은 함수 안이 아니라 함수 사이의 간선에 있습니다.
 
 ## 먼저 던지는 질문
 

@@ -30,6 +30,7 @@ last_reviewed: '2026-05-16'
 
 ![Serverless 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/01/01-01-concept-at-a-glance.ko.png)
 *Serverless 101 1장 흐름 개요*
+> Serverless는 서버가 사라진 것이 아니라, 서버 관리·확장·과금의 단위가 요청 한 건 단위로 잘게 쪼개진 모델입니다.
 
 ## 먼저 던지는 질문
 

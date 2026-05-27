@@ -31,6 +31,7 @@ This is the 6th post in the Serverless 101 series.
 
 ![serverless 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/06/06-01-concept-at-a-glance.en.png)
 *serverless 101 chapter 6 flow overview*
+> Serverless functions are stateless by design — any 'state' you need lives in an external store (DB, cache, queue), and the function is just the code that reads and writes it.
 
 ## Questions to Keep in Mind
 

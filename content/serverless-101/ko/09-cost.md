@@ -28,6 +28,7 @@ last_reviewed: '2026-05-12'
 
 ![Serverless 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/09/09-01-concept-at-a-glance.ko.png)
 *Serverless 101 9장 흐름 개요*
+> 서버리스 비용은 호출 수 × 실행 시간 × 메모리의 곱이고, 모든 최적화는 결국 이 세 값 중 하나를 줄이는 일로 돌아옵니다.
 
 ## 먼저 던지는 질문
 

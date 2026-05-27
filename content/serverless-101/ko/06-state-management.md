@@ -28,6 +28,7 @@ last_reviewed: '2026-05-12'
 
 ![Serverless 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/06/06-01-concept-at-a-glance.ko.png)
 *Serverless 101 6장 흐름 개요*
+> 서버리스 함수는 본질적으로 stateless이므로, 필요한 '상태'는 외부 저장소(DB·캐시·큐)에 두고 함수는 그것을 읽고 쓰는 코드일 뿐입니다.
 
 ## 먼저 던지는 질문
 

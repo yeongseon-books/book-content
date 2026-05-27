@@ -28,6 +28,7 @@ last_reviewed: '2026-05-12'
 
 ![Serverless 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/08/08-01-concept-at-a-glance.ko.png)
 *Serverless 101 8장 흐름 개요*
+> 서버리스에서는 서버에 들어가 볼 수 없으므로, 관측성은 코드가 무엇을 했는지 보는 유일한 창이고 문제가 생기기 전에 미리 심어 두어야 합니다.
 
 ## 먼저 던지는 질문
 

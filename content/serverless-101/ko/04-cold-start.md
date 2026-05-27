@@ -28,6 +28,7 @@ last_reviewed: '2026-05-12'
 
 ![Serverless 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/04/04-01-concept-at-a-glance.ko.png)
 *Serverless 101 4장 흐름 개요*
+> Cold start는 플랫폼이 함수를 필요할 때 올리는 시간이고, 서버리스의 모든 아키텍처 결정은 호출 비용과 이 시작 세금 사이의 trade-off입니다.
 
 ## 먼저 던지는 질문
 

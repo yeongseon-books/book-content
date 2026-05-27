@@ -28,6 +28,7 @@ last_reviewed: '2026-05-12'
 
 ![Serverless 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/05/05-01-concept-at-a-glance.ko.png)
 *Serverless 101 5장 흐름 개요*
+> 서버리스는 같은 함수의 복사본을 더 많이 띄워 확장하므로, 확장 단위가 서버가 아닌 요청 한 건이고, 그 차이가 상태·제한·동시성에 대한 사고방식을 바꿉니다.
 
 ## 먼저 던지는 질문
 

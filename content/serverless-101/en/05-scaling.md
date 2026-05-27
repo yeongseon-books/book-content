@@ -31,6 +31,7 @@ This is the 5th post in the Serverless 101 series.
 
 ![serverless 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/05/05-01-concept-at-a-glance.en.png)
 *serverless 101 chapter 5 flow overview*
+> Serverless scales by spinning up more copies of the same function, so the unit of scale is one request, not one server — and that changes how you think about state, limits, and concurrency.
 
 ## Questions to Keep in Mind
 

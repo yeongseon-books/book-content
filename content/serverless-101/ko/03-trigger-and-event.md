@@ -30,6 +30,7 @@ last_reviewed: '2026-05-16'
 
 ![Serverless 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/03/03-01-concept-at-a-glance.ko.png)
 *Serverless 101 3장 흐름 개요*
+> Trigger는 함수를 깨우는 사건이고 Event는 그 사건이 가져오는 데이터입니다 — 서버리스 코드의 입력은 이 둘로만 들어옵니다.
 
 ## 먼저 던지는 질문
 

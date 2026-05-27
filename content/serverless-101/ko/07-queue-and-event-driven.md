@@ -28,6 +28,7 @@ last_reviewed: '2026-05-12'
 
 ![Serverless 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/07/07-01-concept-at-a-glance.ko.png)
 *Serverless 101 7장 흐름 개요*
+> 큐는 동기 실패를 비동기 재시도로 바꾸고, 생산자와 소비자를 분리해 각자의 시계로 확장·실패·복구할 수 있게 합니다.
 
 ## 먼저 던지는 질문
 

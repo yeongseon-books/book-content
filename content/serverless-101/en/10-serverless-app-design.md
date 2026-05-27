@@ -31,6 +31,7 @@ This is the final post in the Serverless 101 series.
 
 ![serverless 101 chapter 10 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/10/10-01-concept-at-a-glance.en.png)
 *serverless 101 chapter 10 flow overview*
+> A serverless app is a graph of small functions connected by triggers and queues — the architecture work lives in the edges between them, not inside the functions themselves.
 
 ## Questions to Keep in Mind
 

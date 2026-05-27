@@ -31,6 +31,7 @@ This is the 9th post in the Serverless 101 series.
 
 ![serverless 101 chapter 9 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/09/09-01-concept-at-a-glance.en.png)
 *serverless 101 chapter 9 flow overview*
+> Serverless cost is the product of invocations × duration × memory — every optimization comes back to making one of those three smaller.
 
 ## Questions to Keep in Mind
 

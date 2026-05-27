@@ -30,6 +30,7 @@ last_reviewed: '2026-05-16'
 
 ![Serverless 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/02/02-01-concept-at-a-glance.ko.png)
 *Serverless 101 2장 흐름 개요*
+> FaaS는 함수 하나를 배포 단위·실행 단위·과금 단위로 만들어, 서버 운영을 코드 안의 함수 정의 한 줄로 줄여 줍니다.
 
 ## 먼저 던지는 질문
 

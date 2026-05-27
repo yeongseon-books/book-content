@@ -31,6 +31,7 @@ This is the 8th post in the Serverless 101 series.
 
 ![serverless 101 chapter 8 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/08/08-01-concept-at-a-glance.en.png)
 *serverless 101 chapter 8 flow overview*
+> In serverless you cannot SSH into a box — observability is the only window into what your code did, and it has to be built in before something goes wrong.
 
 ## Questions to Keep in Mind
 

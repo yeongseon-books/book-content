@@ -31,6 +31,7 @@ This is the 4th post in the Serverless 101 series.
 
 ![serverless 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/serverless-101/04/04-01-concept-at-a-glance.en.png)
 *serverless 101 chapter 4 flow overview*
+> Cold start is the time the platform spends loading your function on demand — every architecture choice in serverless trades invocation cost against this startup tax.
 
 ## Questions to Keep in Mind
 
