@@ -32,9 +32,9 @@ This is the 6th post in the Frontend Development 101 series. Here we frame async
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying API Calls and Async?
-- Which signal should the example or diagram make visible for API Calls and Async?
-- What failure should be prevented first when API Calls and Async reaches a real system?
+- Why is async UI easier to reason about when loading, success, and failure are explicit screen states?
+- What race conditions appear when requests overlap or a screen unmounts mid-request?
+- Which checks turn a simple `fetch` demo into production-safe frontend behavior?
 
 ## What You Will Learn
 
@@ -59,9 +59,11 @@ Async bugs make up *half of frontend defects*. They hide on a fast network and e
 - **AbortController**: tool to *cancel a request mid-flight*.
 - **Stale-while-revalidate**: *show cached data first*, refresh in the background.
 
-## Before/After
+## From Callback Chains to Explicit Async State
 
-**Before (callback hell)**
+Async frontend work is not hard because `fetch` is complicated. It is hard because user-visible state has to stay coherent while the network is slow, reordered, canceled, or broken. Moving from callback-style control flow to explicit async state makes those failures much easier to reason about.
+
+**Nested async flow that hides state changes**
 
 ```javascript
 fetch(url, (res) => {
@@ -71,13 +73,15 @@ fetch(url, (res) => {
 });
 ```
 
-**After (async/await)**
+**Linear async flow that exposes state transitions**
 
 ```javascript
 const res = await fetch(url);
 const data = await res.json();
 render(data);
 ```
+
+The improved style matters because it leaves room for the real production concerns: checking `res.ok`, rendering loading and error states, and canceling stale requests before they overwrite fresher data.
 
 ## Hands-on: A User List in Five Steps
 
@@ -154,6 +158,11 @@ function Users() {
 ## If It Fails, Check This First
 
 - If errors disappear into the console, make sure `res.ok` is checked and the `catch` path updates visible UI state.
+
+```javascript
+const res = await fetch("/api/users");
+if (!res.ok) throw new Error(`HTTP ${res.status}`);
+```
 - If older responses overwrite newer ones, inspect your `AbortController` cleanup or the logic that decides which response is still current.
 
 ## What to Notice in This Code
@@ -202,12 +211,12 @@ Async is *state*. Next, we look at handling *user input* via forms and validatio
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying API Calls and Async?**
-  - The article treats API Calls and Async as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for API Calls and Async?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when API Calls and Async reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why is async UI easier to reason about when loading, success, and failure are explicit screen states?**
+  - Once each state has a visible UI, the user never has to guess whether the app is waiting, broken, or finished. It also gives the developer a much cleaner mental model than sprinkling `setState` calls through promise chains.
+- **What race conditions appear when requests overlap or a screen unmounts mid-request?**
+  - Older responses can overwrite newer input, and unmounted components can still try to update state if the request is not canceled. That is why `AbortController` and request ownership rules matter even in small apps.
+- **Which checks turn a simple `fetch` demo into production-safe frontend behavior?**
+  - Check `res.ok`, render an error state the user can see, cancel stale requests, and test under throttled network conditions. Those four checks catch many of the failures that stay invisible on a fast local machine.
 
 <!-- toc:begin -->
 ## In this series
