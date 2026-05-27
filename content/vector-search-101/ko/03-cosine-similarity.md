@@ -38,9 +38,9 @@ seo_description: 코사인 유사도와 내적, L2 거리를 비교하며 벡터
 
 ## 세 가지 거리 척도
 
-![Cosine dot and euclidean comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/03/03-01-three-distance-metrics.ko.png)
+![Cosine, dot, and Euclidean trade-offs](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/03/03-01-three-distance-metrics.ko.png)
 
-*코사인, 내적, 유클리드 비교 구조*
+*코사인, 내적, 유클리드 거리의 차이*
 ### 코사인 유사도
 
 코사인 유사도는 두 벡터가 이루는 각도를 측정합니다. 벡터의 크기는 무시하고 방향만 비교합니다.

@@ -40,9 +40,9 @@ The emphasis here is not on one component in isolation, but on how the whole ret
 
 ## Pipeline structure
 
-![End to end indexing and retrieval flow](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/06/06-01-pipeline-structure.en.png)
+![Ingestion, indexing, and retrieval stages](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/06/06-01-pipeline-structure.en.png)
 
-*End to end indexing and retrieval flow*
+*Ingestion, indexing, and retrieval stages*
 ![Pipeline component connection structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/06/06-02-pipeline-structure-2.en.png)
 
 *Pipeline component connection structure*

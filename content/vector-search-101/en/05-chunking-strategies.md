@@ -40,9 +40,9 @@ Here chunking is treated as a retrieval design choice, not a preprocessing after
 
 ## Chunk size and overlap
 
-![Chunk size and overlap structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/05/05-01-chunk-size-and-overlap.en.png)
+![How chunk size and overlap affect recall](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/05/05-01-chunk-size-and-overlap.en.png)
 
-*Chunk size and overlap structure*
+*How chunk size and overlap affect recall*
 Two parameters control chunking: `chunk_size` and `chunk_overlap`.
 
 **chunk_size**: the maximum length of one chunk, measured in characters or tokens. A common starting range is 200–500 tokens.

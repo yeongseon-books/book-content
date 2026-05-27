@@ -52,9 +52,9 @@ pip install langchain-huggingface sentence-transformers numpy
 
 ## 첫 번째 임베딩
 
-![Single query embedding call flow](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/02/02-01-first-embedding.ko.png)
+![From sentence to 384-dim vector](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/02/02-01-first-embedding.ko.png)
 
-*단일 쿼리 임베딩 호출 흐름*
+*문장이 384차원 벡터로 변환되는 흐름*
 모델을 초기화하고 문장 하나를 인코딩해 보겠습니다.
 
 ```python

@@ -52,9 +52,9 @@ Replace `faiss-cpu` with `faiss-gpu` if a compatible GPU is available.
 
 ## Understanding index types
 
-![FAISS index type comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/04/04-01-understanding-index-types.en.png)
+![Flat, IVF, and HNSW index trade-offs](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/04/04-01-understanding-index-types.en.png)
 
-*FAISS index type comparison structure*
+*Flat, IVF, and HNSW index trade-offs*
 FAISS supports many index types, each with different speed-accuracy tradeoffs. Two are essential at the start.
 
 **IndexFlatL2**: exact search using Euclidean distance. Compares every vector without skipping. Accuracy is 100%, but search time scales linearly with the number of vectors.

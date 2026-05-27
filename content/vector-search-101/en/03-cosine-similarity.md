@@ -38,9 +38,9 @@ This post implements all three metrics from scratch, shows why normalization mat
 
 ## Three distance metrics
 
-![Cosine dot and euclidean comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/03/03-01-three-distance-metrics.en.png)
+![Cosine, dot, and Euclidean trade-offs](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/03/03-01-three-distance-metrics.en.png)
 
-*Cosine dot and euclidean comparison structure*
+*Cosine, dot, and Euclidean trade-offs*
 ### Cosine similarity
 
 Cosine similarity measures the angle between two vectors, ignoring their magnitudes.

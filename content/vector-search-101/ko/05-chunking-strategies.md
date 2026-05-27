@@ -40,9 +40,9 @@ seo_description: 청크 크기와 오버랩이 검색 품질에 미치는 영향
 
 ## 청크 크기와 오버랩
 
-![Chunk size and overlap structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/05/05-01-chunk-size-and-overlap.ko.png)
+![How chunk size and overlap affect recall](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/05/05-01-chunk-size-and-overlap.ko.png)
 
-*청크 크기와 오버랩 구조*
+*청크 크기와 겹침이 검색 정확도에 미치는 영향*
 청킹을 제어하는 핵심 파라미터는 `chunk_size`와 `chunk_overlap` 두 가지입니다.
 
 **chunk_size**: 청크 하나의 최대 길이입니다. 문자 수나 토큰 수로 측정합니다. 흔한 시작 범위는 200~500 토큰입니다.

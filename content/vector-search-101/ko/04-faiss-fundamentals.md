@@ -52,9 +52,9 @@ pip install faiss-cpu sentence-transformers numpy
 
 ## 인덱스 유형 이해하기
 
-![FAISS index type comparison structure](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/04/04-01-understanding-index-types.ko.png)
+![Flat, IVF, and HNSW index trade-offs](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/04/04-01-understanding-index-types.ko.png)
 
-*FAISS 인덱스 유형 비교 구조*
+*Flat, IVF, HNSW 인덱스의 균형*
 FAISS는 속도와 정확도 사이의 균형이 다른 여러 인덱스 유형을 제공합니다. 시작 단계에서는 두 가지만 확실히 이해해도 충분합니다.
 
 **IndexFlatL2**: 유클리드 거리를 사용하는 정확 검색입니다. 모든 벡터를 하나도 건너뛰지 않고 비교합니다. 정확도는 100%지만, 검색 시간은 벡터 수에 선형으로 비례합니다.

@@ -52,9 +52,9 @@ pip install langchain-huggingface sentence-transformers numpy
 
 ## First embedding
 
-![Single query embedding call flow](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/02/02-01-first-embedding.en.png)
+![From sentence to 384-dim vector](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/02/02-01-first-embedding.en.png)
 
-*Single query embedding call flow*
+*From sentence to 384-dim vector*
 Initialize the model and encode a single sentence.
 
 ```python

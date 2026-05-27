@@ -40,9 +40,9 @@ This post focuses on the concept and intuition behind embeddings. Code stays min
 
 ## The ceiling of keyword search
 
-![Keyword search and embedding search contrast](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/01/01-01-the-ceiling-of-keyword-search.en.png)
+![Where exact keyword matching breaks down](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/01/01-01-the-ceiling-of-keyword-search.en.png)
 
-*Keyword search and embedding search contrast*
+*Where exact keyword matching breaks down*
 Traditional search ranks results by term frequency and position. TF-IDF and BM25 are the canonical examples. These methods are fast, interpretable, and accurate when the query shares vocabulary with the document.
 
 The problem is that language does not stay still. The same concept surfaces in many forms.

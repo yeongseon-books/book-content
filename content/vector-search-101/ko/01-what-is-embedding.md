@@ -40,9 +40,9 @@ seo_description: 임베딩이 의미 기반 검색을 가능하게 하는 원리
 
 ## 키워드 검색의 한계
 
-![Keyword search and embedding search contrast](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/01/01-01-the-ceiling-of-keyword-search.ko.png)
+![Where exact keyword matching breaks down](https://yeongseon-books.github.io/book-public-assets/assets/vector-search-101/01/01-01-the-ceiling-of-keyword-search.ko.png)
 
-*키워드 검색과 임베딩 검색의 대비*
+*키워드 매칭이 의미를 놓치는 지점*
 전통적인 검색은 단어 빈도와 위치를 기준으로 결과를 정렬합니다. TF-IDF와 BM25가 대표적인 예입니다. 이런 방식은 쿼리와 문서가 같은 어휘를 공유할 때 빠르고 해석 가능하며 정확합니다.
 
 문제는 언어가 그렇게 고정되어 있지 않다는 사실입니다. 같은 개념도 여러 표현으로 나타납니다.
