@@ -37,6 +37,8 @@ This is the 4th post in the Python DB-API 101 series.
 ![python db-api 101 chapter 4 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/04/04-02-mental-model-keep-query-string-and-value.en.png)
 *python db-api 101 chapter 4 flow overview*
 
+> Parameter binding is not 'escape and concatenate' — it sends the query text and the data as two separate things at the protocol level, and once that distinction is real to you, SQL injection stops being a discipline and becomes a structural impossibility.
+
 ## Questions to Keep in Mind
 
 - Why is building SQL with f-strings dangerous?

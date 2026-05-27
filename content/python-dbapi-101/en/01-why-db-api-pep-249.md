@@ -37,6 +37,8 @@ This is the first post in the Python DB-API 101 series.
 ![python db-api 101 chapter 1 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-02-1-the-chaos-before-db-api.en.png)
 *python db-api 101 chapter 1 flow overview*
 
+> Being able to swap drivers really means every RDBMS shares one lifecycle — `connect → cursor → execute → fetch → commit` — and that single shape is why PEP 249 has outlived almost every other Python data spec.
+
 ## Questions to Keep in Mind
 
 - How was database access done in Python before PEP 249?

@@ -34,6 +34,8 @@ This is the 5th post in the Python DB-API 101 series.
 ![python db-api 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/05/05-02-mental-model-connection-is-the-transacti.en.png)
 *python db-api 101 chapter 5 flow overview*
 
+> DB-API's default is that a transaction is already open the moment you connect — most 'why don't my new rows show up?' bugs are not driver weirdness, they are one forgotten `commit()` against a model you never internalized.
+
 ## Questions to Keep in Mind
 
 - Why does sqlite3 issue an implicit BEGIN by default?

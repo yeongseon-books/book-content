@@ -37,6 +37,8 @@ Python으로 데이터베이스를 다룬 적이 있다면 `sqlite3`, `psycopg`,
 ![Python DB-API 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/01/01-02-1-the-chaos-before-db-api.ko.png)
 *Python DB-API 101 1장 흐름 개요*
 
+> 드라이버를 갈아끼울 수 있다는 말은 'connect → cursor → execute → fetch → commit'이라는 한 가지 일생 주기를 모든 RDBMS가 공유한다는 뜻이고, 이것이 PEP 249가 지난 30년간 살아남은 진짜 이유입니다.
+
 ## 먼저 던지는 질문
 
 - PEP 249 이전에는 Python의 데이터베이스 접근 코드가 왜 그렇게 제각각이었을까요?

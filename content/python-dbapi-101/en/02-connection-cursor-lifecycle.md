@@ -35,6 +35,8 @@ This is the 2nd post in the Python DB-API 101 series.
 ![python db-api 101 chapter 2 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/02/02-02-1-what-a-connection-is.en.png)
 *python db-api 101 chapter 2 flow overview*
 
+> A Connection is a network session; a Cursor is the in-flight state of one query — once you stop conflating them, connection leaks, mystery rollbacks, and stale-fetch bugs all collapse into one diagnosable picture.
+
 ## Questions to Keep in Mind
 
 - What are the distinct responsibilities of Connection vs Cursor?

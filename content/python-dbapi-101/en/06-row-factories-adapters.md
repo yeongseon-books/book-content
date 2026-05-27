@@ -35,6 +35,8 @@ This is the 6th post in the Python DB-API 101 series.
 ![python db-api 101 chapter 6 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/06/06-02-mental-model-two-step-conversion.en.png)
 *python db-api 101 chapter 6 flow overview*
 
+> A row factory is the boundary translator between SQL rows and Python objects — whether you return a tuple, a dict, or a dataclass here decides the coupling, testability, and refactoring cost of every layer above it.
+
 ## Questions to Keep in Mind
 
 - How do you receive default tuple results as dict, dataclass, or Pydantic models?

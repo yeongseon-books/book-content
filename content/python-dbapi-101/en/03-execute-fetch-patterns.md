@@ -35,6 +35,8 @@ This is the 3rd post in the Python DB-API 101 series.
 ![python db-api 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/python-dbapi-101/03/03-02-1-execute-one-statement-at-a-time.en.png)
 *python db-api 101 chapter 3 flow overview*
 
+> Choosing `fetchone` / `fetchmany` / `fetchall` is not style — it is the decision to stream the result set or pull it into RAM in one go, and the same code that works on 1k rows will OOM on 1M rows the moment you pick wrong.
+
 ## Questions to Keep in Mind
 
 - When do you reach for execute, executemany, fetchone, fetchall, vs fetchmany?
