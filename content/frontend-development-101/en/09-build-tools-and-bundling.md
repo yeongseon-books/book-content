@@ -32,9 +32,9 @@ This is the 9th post in the Frontend Development 101 series. Here we treat build
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying Build Tools and Bundling?
-- Which signal should the example or diagram make visible for Build Tools and Bundling?
-- What failure should be prevented first when Build Tools and Bundling reaches a real system?
+- What jobs does the build tool perform before frontend code reaches the browser?
+- Why do bundle size and code splitting affect user experience directly instead of staying as internal tooling details?
+- Which measurements should you check before guessing at performance problems?
 
 ## What You Will Learn
 
@@ -58,9 +58,11 @@ Bundle size is paid *directly* by your users. A 1MB bundle is *eight seconds of 
 - **Source map**: the mapping that lets you debug built code *as the original*.
 - **HMR (Hot Module Replacement)**: applying changes during development *without a full page reload*.
 
-## Before/After
+## From Manual Script Ordering to a Build Pipeline
 
-**Before (dozens of `<script>` tags)**
+Older frontend pages often relied on the developer to decide script order and hope every dependency arrived in time. Modern build tools turn that manual work into a pipeline that understands the module graph, splits code, and emits cache-friendly assets for production.
+
+**Script order is maintained by hand**
 
 ```html
 <script src="utils.js"></script>
@@ -68,11 +70,13 @@ Bundle size is paid *directly* by your users. A 1MB bundle is *eight seconds of 
 <script src="app.js"></script>
 ```
 
-**After (one `<script>` plus automatic split)**
+**The bundler emits an optimized entry and chunks**
 
 ```html
 <script type="module" src="/dist/index-[hash].js"></script>
 ```
+
+The big shift is not just fewer `<script>` tags. It is that performance work becomes measurable: bundle size, cacheability, chunk boundaries, and environment-specific output all become explicit parts of the frontend system.
 
 ## Hands-on: Vite in Five Steps
 
@@ -181,12 +185,12 @@ Build tools decide *how fast the first screen the user sees becomes interactive*
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Build Tools and Bundling?**
-  - The article treats Build Tools and Bundling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Build Tools and Bundling?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Build Tools and Bundling reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What jobs does the build tool perform before frontend code reaches the browser?**
+  - The build tool resolves imports, transforms source code, splits output into chunks, injects environment-specific configuration, and emits cache-friendly assets. It is the layer that turns a source tree into a deployable frontend artifact.
+- **Why do bundle size and code splitting affect user experience directly instead of staying as internal tooling details?**
+  - Users pay for every unnecessary byte with slower startup, longer parse time, and delayed interaction. Build output is therefore a product-performance issue, not just an engineering nicety.
+- **Which measurements should you check before guessing at performance problems?**
+  - Start with the contents of `dist/`, the size of the main bundle, the analyzer view of the largest modules, and the chunk behavior in the browser network panel. Those measurements tell you where to optimize before instinct takes over.
 
 <!-- toc:begin -->
 ## In this series
