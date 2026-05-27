@@ -26,16 +26,6 @@ That is why Post 01 starts here. If you do not understand what goes into the req
 
 This is the first post in the LLM App Foundations 101 series. Here, we will build that first call with the Groq API. The setup is intentionally small. You need one environment variable, `GROQ_API_KEY`, and the official Python SDK, `groq`. The model for every example in this article is `llama-3.1-8b-instant`.
 
-We will cover seven things:
-
-- what an LLM API actually is
-- how to create a Groq account and issue an API key
-- how to install `groq`
-- how to send your first request with `client.chat.completions.create()`
-- how to read `choices[0].message.content`, `usage`, and `model`
-- how synchronous and asynchronous patterns differ
-- one complete executable example you can keep as a starting point
-
 The main idea is simple: **an LLM app begins with request and response structure, not with prompt cleverness**.
 
 ---

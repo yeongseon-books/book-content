@@ -26,8 +26,6 @@ Teams often lose time here because the early version looks deceptively easy. The
 
 This article turns that loose boundary into an explicit interface. We will use Groq's JSON mode with `response_format={"type": "json_object"}` and then validate the parsed object with a Pydantic model. Those two steps matter for different reasons. JSON mode narrows the syntactic shape of the output. Pydantic enforces semantic rules such as allowed values, ranges, and required fields. Together they give you a response path that can fail loudly instead of corrupting state quietly.
 
-We will cover five things: why natural-language parsing breaks under production pressure, what JSON mode does and does not guarantee, how to request structured output with the Groq Python SDK, how to validate it with Pydantic, and how to think about logging and recovery when the contract fails.
-
 This is the first post in the LLM API Production 101 series. Here we focus on building a structured-output contract with JSON mode and response schemas.
 
 ![Structured output: JSON mode and response schemas](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/01/01-01-structured-output-json-mode-and-response.en.png)

@@ -28,15 +28,7 @@ When people first connect an LLM API, they usually focus on answer quality. That
 
 A token is the unit the model uses to read and generate text. Humans think in sentences, paragraphs, and words. Models do not. They process smaller pieces, and those pieces do not map cleanly to words. That is why developers new to LLM systems often misjudge size. A prompt that looks short in plain text can still be expensive. A block of code can consume more tokens than expected. A Korean sentence can fragment differently from an English sentence.
 
-This is the second post in the LLM App Foundations 101 series. Here, we put token accounting in the center of the mental model. We will cover seven things:
-
-- what a token actually is
-- why words and tokens are not the same thing
-- why cost and latency move with token count
-- how to read `usage.prompt_tokens`, `completion_tokens`, and `total_tokens`
-- how to estimate prompt size with `tiktoken`
-- what a context window is, and what 128k means for `llama-3.1-8b-instant`
-- how to control output length with `max_tokens` and detect truncation with `finish_reason`
+This is the second post in the LLM App Foundations 101 series. Here, we put token accounting in the center of the mental model.
 
 The central idea is simple: **LLM applications run on token budgets, not on raw strings**.
 

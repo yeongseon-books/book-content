@@ -26,15 +26,7 @@ That is the real value of streaming. It does not magically reduce the model's to
 
 Streaming also changes how you think about the response itself. Without streaming, a completion is one object with one final text field. With streaming, the answer becomes a sequence of chunks. Each chunk may contain new text, metadata, or just a signal that generation is ending. Once you start building chat UIs, drafting tools, or browser-based copilots, that event-oriented model becomes much more natural than waiting for one large string.
 
-This is the final post in the LLM App Foundations 101 series. Here, we close the series by building that mental model with the Groq Python SDK. We will cover seven things:
-
-- why blocking calls create UX friction
-- how Groq streaming works with `stream=True` and `for chunk in stream:`
-- how to extract text from `chunk.choices[0].delta.content`
-- how streaming differs from synchronous and asynchronous execution models
-- how to read token usage from the final chunk's `x_groq` metadata or from separate aggregation
-- how to write streamed output to a file or pipe it into another stage
-- where to go next after the foundations series ends
+This is the final post in the LLM App Foundations 101 series. Here, we close the series by building that mental model with the Groq Python SDK.
 
 The main idea is simple: **streaming does not make the model smarter or faster, but it makes waiting legible**.
 
