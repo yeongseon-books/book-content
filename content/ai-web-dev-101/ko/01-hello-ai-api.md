@@ -19,6 +19,8 @@ last_reviewed: '2026-05-14'
 seo_description: OpenAI API로 첫 요청을 보내며 인증, 응답 구조, 실패 지점, 토큰 비용 감각까지 함께 익힙니다.
 ---
 
+> **Deprecation notice**: 이 시리즈는 [`llm-app-foundations-101`](../../llm-app-foundations-101/ko/)과 [`ai-app-patterns-101`](../../ai-app-patterns-101/ko/)로 대체되었습니다. 신규 독자는 후속 시리즈를 권장합니다.
+
 # AI Web Development 101 (1/7): AI API 첫 걸음 — OpenAI API로 첫 번째 요청 보내기
 
 이 글은 AI 웹 개발 입문 시리즈의 첫 번째 글입니다.

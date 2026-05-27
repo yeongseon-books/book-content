@@ -19,6 +19,8 @@ last_reviewed: '2026-05-14'
 seo_description: Learn how to evaluate accuracy, relevance, and safety, then turn those results into a repeatable improvement loop.
 ---
 
+> **Deprecation notice**: This series is superseded by [`llm-app-foundations-101`](../../llm-app-foundations-101/en/) and [`ai-app-patterns-101`](../../ai-app-patterns-101/en/). New readers are encouraged to start with the successor series.
+
 # AI Web Development 101 (7/7): Evaluating and improving an AI app — measuring quality over time
 
 An AI app is not finished when it is deployed. That is when users begin surfacing the real issues: strange answers, regressions after prompt changes, unnecessary verbosity, and brittle retrieval behavior.

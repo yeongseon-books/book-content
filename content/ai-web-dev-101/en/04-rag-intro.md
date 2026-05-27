@@ -19,6 +19,8 @@ last_reviewed: '2026-05-14'
 seo_description: Learn the retrieval-augmentation-generation pipeline and build a tiny FAQ bot that answers from your own documents.
 ---
 
+> **Deprecation notice**: This series is superseded by [`llm-app-foundations-101`](../../llm-app-foundations-101/en/) and [`ai-app-patterns-101`](../../ai-app-patterns-101/en/). New readers are encouraged to start with the successor series.
+
 # AI Web Development 101 (4/7): RAG introduction — answering with your own data
 
 No matter how capable a model is, it does not automatically know your latest policy docs, internal manuals, or yesterday's product changes. In real services, the critical question is often not “Is the model smart enough?” but “Can we attach the right evidence at the right moment?”

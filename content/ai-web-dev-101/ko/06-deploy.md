@@ -19,6 +19,8 @@ last_reviewed: '2026-05-14'
 seo_description: 로컬에서 만든 AI 웹 앱을 Vercel과 Azure App Service에 배포하며 환경 변수, 로그, 비용 관리의 기본을 익힙니다.
 ---
 
+> **Deprecation notice**: 이 시리즈는 [`llm-app-foundations-101`](../../llm-app-foundations-101/ko/)과 [`ai-app-patterns-101`](../../ai-app-patterns-101/ko/)로 대체되었습니다. 신규 독자는 후속 시리즈를 권장합니다.
+
 # AI Web Development 101 (6/7): AI 웹 앱 배포하기: Vercel과 Azure에 올리고 운영하기
 
 로컬에서 잘 돌아가던 AI 앱도, 다른 사람이 접속하려면 결국 인터넷에 올려야 합니다. 이때부터는 코드만이 아니라 환경 변수, 실행 명령, 로그 확인, 비용 통제 같은 운영 문제가 함께 따라옵니다.

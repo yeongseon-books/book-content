@@ -19,6 +19,8 @@ last_reviewed: '2026-05-14'
 seo_description: Deploy a local AI app to Vercel and Azure App Service while handling startup commands, environment variables, logs, and cost guardrails.
 ---
 
+> **Deprecation notice**: This series is superseded by [`llm-app-foundations-101`](../../llm-app-foundations-101/en/) and [`ai-app-patterns-101`](../../ai-app-patterns-101/en/). New readers are encouraged to start with the successor series.
+
 # AI Web Development 101 (6/7): Deploying an AI web app — shipping to Vercel and Azure
 
 An AI app that only works on your laptop is still a local experiment. Once other people need to access it, deployment turns secrets, startup commands, logging, and budget control into real operational concerns.

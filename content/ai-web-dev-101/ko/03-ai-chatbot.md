@@ -19,6 +19,8 @@ last_reviewed: '2026-05-14'
 seo_description: Next.js와 Vercel AI SDK로 스트리밍 채팅 UI를 만들며 브라우저와 모델 API를 연결하는 기본 구조를 익힙니다.
 ---
 
+> **Deprecation notice**: 이 시리즈는 [`llm-app-foundations-101`](../../llm-app-foundations-101/ko/)과 [`ai-app-patterns-101`](../../ai-app-patterns-101/ko/)로 대체되었습니다. 신규 독자는 후속 시리즈를 권장합니다.
+
 # AI Web Development 101 (3/7): AI 챗봇 만들기 — Next.js와 Vercel AI SDK로 실시간 채팅 구현
 
 터미널에서 AI를 호출하는 단계까지 왔다면, 이제 사용자가 직접 만질 수 있는 화면이 필요합니다. 여기서부터는 단순 API 호출을 넘어 입력 상태, 스트리밍 응답, 서버 경로, 사용자 경험이 함께 얽히기 시작합니다.

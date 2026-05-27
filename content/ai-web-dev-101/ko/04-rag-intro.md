@@ -19,6 +19,8 @@ last_reviewed: '2026-05-14'
 seo_description: RAG의 검색·임베딩·생성 흐름을 이해하고, 근거 검색과 실패 지점까지 보이는 작은 FAQ 챗봇을 구현합니다.
 ---
 
+> **Deprecation notice**: 이 시리즈는 [`llm-app-foundations-101`](../../llm-app-foundations-101/ko/)과 [`ai-app-patterns-101`](../../ai-app-patterns-101/ko/)로 대체되었습니다. 신규 독자는 후속 시리즈를 권장합니다.
+
 # AI Web Development 101 (4/7): RAG 입문 — 내 데이터로 답하는 AI 만들기
 
 모델이 아무리 좋아도, 학습 시점 이후에 생긴 정보나 우리 팀 내부 문서는 저절로 알지 못합니다. 그래서 실서비스에서는 “모델이 똑똑한가”보다 “필요한 근거를 제때 붙여 줄 수 있는가”가 더 중요해집니다.

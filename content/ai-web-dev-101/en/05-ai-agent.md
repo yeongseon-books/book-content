@@ -19,6 +19,8 @@ last_reviewed: '2026-05-14'
 seo_description: Learn how tool use works, how function calls are structured, and how to build a small multi-tool agent loop safely.
 ---
 
+> **Deprecation notice**: This series is superseded by [`llm-app-foundations-101`](../../llm-app-foundations-101/en/) and [`ai-app-patterns-101`](../../ai-app-patterns-101/en/). New readers are encouraged to start with the successor series.
+
 # AI Web Development 101 (5/7): First steps with AI agents — making the model use tools
 
 So far, the AI features in this series only exchanged text. They could answer questions, but they could not actually fetch live weather, run a calculator, or query an external system. To move beyond text-only answers, you need a loop where the model can request tools.

@@ -19,6 +19,8 @@ last_reviewed: '2026-05-14'
 seo_description: 배포 이후 AI 답변의 정확성, 관련성, 안전성을 평가하고 프롬프트와 RAG 품질을 개선하는 실전 루틴을 정리합니다.
 ---
 
+> **Deprecation notice**: 이 시리즈는 [`llm-app-foundations-101`](../../llm-app-foundations-101/ko/)과 [`ai-app-patterns-101`](../../ai-app-patterns-101/ko/)로 대체되었습니다. 신규 독자는 후속 시리즈를 권장합니다.
+
 # AI Web Development 101 (7/7): AI 앱의 평가와 개선, 품질을 측정하고 더 좋게 만드는 법
 
 이 글은 AI 웹 개발 입문 시리즈의 마지막 글입니다.

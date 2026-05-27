@@ -19,6 +19,8 @@ last_reviewed: '2026-05-14'
 seo_description: Build your first OpenAI API call and learn the request-response contract, failure modes, and token cost basics.
 ---
 
+> **Deprecation notice**: This series is superseded by [`llm-app-foundations-101`](../../llm-app-foundations-101/en/) and [`ai-app-patterns-101`](../../ai-app-patterns-101/en/). New readers are encouraged to start with the successor series.
+
 # AI Web Development 101 (1/7): AI API first steps — sending your first request with the OpenAI API
 
 Using ChatGPT in a browser and calling a model from your own service are two different experiences. One is a finished product. The other is application development: authentication, request shape, response parsing, timeouts, and cost tracking all become your responsibility.

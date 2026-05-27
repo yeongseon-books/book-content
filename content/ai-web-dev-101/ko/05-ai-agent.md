@@ -19,6 +19,8 @@ last_reviewed: '2026-05-14'
 seo_description: Tool Use와 Function Calling으로 모델이 외부 함수를 호출하는 구조를 이해하고 간단한 에이전트를 구현합니다.
 ---
 
+> **Deprecation notice**: 이 시리즈는 [`llm-app-foundations-101`](../../llm-app-foundations-101/ko/)과 [`ai-app-patterns-101`](../../ai-app-patterns-101/ko/)로 대체되었습니다. 신규 독자는 후속 시리즈를 권장합니다.
+
 # AI Web Development 101 (5/7): AI 에이전트 첫걸음 — Tool Use로 똑똑한 AI 만들기
 
 지금까지 만든 AI는 텍스트만 주고받았습니다. 질문을 던지면 그럴듯한 답을 내놓지만, 실제 날씨를 확인하거나 계산을 하거나 외부 시스템을 조회하는 일은 직접 하지 못했습니다. 실서비스에서 한 단계 더 나아가려면 모델이 필요할 때 도구를 꺼내 쓰는 구조가 필요합니다.

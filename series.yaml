@@ -1234,7 +1234,7 @@ series:
     mkdocs: true
     ebook: true
   level: 101
-  lifecycle: archived
+  lifecycle: superseded
   note: Superseded by llm-app-foundations-101 and ai-app-patterns-101. Do not add new posts. Existing content will be absorbed
     into the new series.
   path: content/ai-web-dev-101

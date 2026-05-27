@@ -19,6 +19,8 @@ last_reviewed: '2026-05-14'
 seo_description: Learn how role, context, output format, and validation routines change model behavior even when the model stays the same.
 ---
 
+> **Deprecation notice**: This series is superseded by [`llm-app-foundations-101`](../../llm-app-foundations-101/en/) and [`ai-app-patterns-101`](../../ai-app-patterns-101/en/). New readers are encouraged to start with the successor series.
+
 # AI Web Development 101 (2/7): Prompt engineering basics — getting the answer you actually want
 
 Two developers can use the same model and get very different results. In practice, the difference usually comes from request structure rather than model intelligence. The model does not read your mind. You have to supply context, role, constraints, and output expectations explicitly.
