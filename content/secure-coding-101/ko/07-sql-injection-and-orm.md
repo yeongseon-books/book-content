@@ -31,6 +31,8 @@ SQL injection은 오래된 취약점이지만 아직도 가장 비싼 사고를 
 ![Secure Coding 101 7장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/07/07-01-concept-at-a-glance.ko.png)
 *Secure Coding 101 7장 흐름 개요*
 
+> SQL injection은 ORM을 쓰면 사라지는 문제가 아니라 'SQL과 데이터를 문법적으로 분리하지 않았을 때' 생기는 구조적 문제입니다 — raw SQL이든 ORM이든 정렬 컬럼이든, 사용자 입력이 쿼리 문법의 일부가 되는 지점에서는 같은 취약점이 반복됩니다.
+
 ## 먼저 던지는 질문
 
 - SQL injection은 정확히 어떤 식으로 SQL 의미를 바꿀까요?

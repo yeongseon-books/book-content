@@ -31,6 +31,8 @@ last_reviewed: '2026-05-15'
 ![Secure Coding 101 2장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/02/02-01-concept-at-a-glance.ko.png)
 *Secure Coding 101 2장 흐름 개요*
 
+> 입력 검증은 if 문 모음이 아니라 신뢰 경계에서 시스템을 예측 가능하게 만드는 계약입니다 — SQL injection·XSS·경로 조작·역직렬화 사고는 다른 취약점이 아니라 '서버가 입력값을 그대로 믿는다'는 한 가지 원인이 다른 출구로 나오는 모습입니다.
+
 ## 먼저 던지는 질문
 
 - allowlist와 denylist는 무엇이 다를까요?

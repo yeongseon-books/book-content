@@ -31,6 +31,8 @@ last_reviewed: '2026-05-15'
 ![Secure Coding 101 10장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/10/10-01-concept-at-a-glance.ko.png)
 *Secure Coding 101 10장 흐름 개요*
 
+> 로깅은 디버깅 편의 기능이 아니라 사고 대응의 증거 체계입니다 — 비밀번호·토큰이 로그에 남거나, 중요한 이벤트가 일반 로그에 섞이거나, 공격자가 로그를 지울 수 있다면 기록은 증거가 아니라 새로운 위험이 됩니다.
+
 ## 먼저 던지는 질문
 
 - 애플리케이션 로그와 감사 로그는 무엇이 다를까요?

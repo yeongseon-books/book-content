@@ -31,6 +31,8 @@ last_reviewed: '2026-05-15'
 ![Secure Coding 101 4장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/04/04-01-concept-at-a-glance.ko.png)
 *Secure Coding 101 4장 흐름 개요*
 
+> 인가는 역할 이름 몇 개가 아니라 '요청마다 자원과 행위를 함께 보는 서버 쪽 결정'입니다 — broken access control 사고는 권한 모델이 빈약해서가 아니라, 매 요청에서 누가·무엇을·어떻게에 대한 답을 미루기 때문에 생깁니다.
+
 ## 먼저 던지는 질문
 
 - RBAC와 ABAC는 어떤 차이가 있을까요?

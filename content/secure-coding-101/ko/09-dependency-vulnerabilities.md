@@ -31,6 +31,8 @@ last_reviewed: '2026-05-15'
 ![Secure Coding 101 9장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/09/09-01-concept-at-a-glance.ko.png)
 *Secure Coding 101 9장 흐름 개요*
 
+> 의존성 취약점은 남의 코드의 문제가 아니라 우리 서비스의 취약점입니다 — lockfile·SCA·SBOM·자동 업데이트·재현 가능한 빌드는 별개 도구가 아니라 '지금 무엇이 깔려 있고, 새 CVE가 떴을 때 며칠 안에 패치할 수 있는가'에 답하기 위한 같은 흐름의 일부입니다.
+
 ## 먼저 던지는 질문
 
 - SCA는 정확히 무엇을 검사할까요?

@@ -31,6 +31,8 @@ last_reviewed: '2026-05-15'
 ![Secure Coding 101 8장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/08/08-01-concept-at-a-glance.ko.png)
 *Secure Coding 101 8장 흐름 개요*
 
+> 브라우저 공격 방어는 입력 정제만으로는 불완전합니다 — XSS는 출력 이스케이프와 CSP, CSRF는 쿠키 정책과 토큰 검증이라는 식으로 '들어올 때'와 '나갈 때', '내 사이트'와 '다른 사이트'의 경계를 모두 함께 설계해야 합니다.
+
 ## 먼저 던지는 질문
 
 - XSS는 어떤 종류로 나뉘고 각각 어디서 생길까요?

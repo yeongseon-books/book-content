@@ -31,6 +31,8 @@ last_reviewed: '2026-05-15'
 ![Secure Coding 101 5장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/05/05-01-concept-at-a-glance.ko.png)
 *Secure Coding 101 5장 흐름 개요*
 
+> 저장 보안은 디스크 암호화 옵션 하나로 끝나지 않습니다 — '무엇을 모을지'부터 전송 구간, 저장 구간, 키 분리, 백업 보호까지 한 흐름으로 봐야 하고, 백업이 본 데이터와 같은 수준으로 다뤄지지 않는 순간 모든 앞 단계가 무의미해집니다.
+
 ## 먼저 던지는 질문
 
 - 저장 중 암호화와 전송 중 암호화는 무엇이 다를까요?

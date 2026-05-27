@@ -31,6 +31,8 @@ last_reviewed: '2026-05-15'
 ![Secure Coding 101 1장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/01/01-01-concept-at-a-glance.ko.png)
 *Secure Coding 101 1장 흐름 개요*
 
+> 보안은 기능 개발 끝에 덧칠하는 작업이 아니라 입력 경계·권한·저장·로그를 처음부터 함께 설계하는 습관입니다 — 실제 사고 대부분은 낯선 암호학이 아니라 입력 검증 누락, 비밀값 노출, 권한 확인 누락처럼 익숙한 개발 실수에서 시작합니다.
+
 ## 먼저 던지는 질문
 
 - secure coding은 정확히 무엇을 뜻할까요?

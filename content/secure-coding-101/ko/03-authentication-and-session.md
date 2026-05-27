@@ -31,6 +31,8 @@ last_reviewed: '2026-05-15'
 ![Secure Coding 101 3장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/03/03-01-concept-at-a-glance.ko.png)
 *Secure Coding 101 3장 흐름 개요*
 
+> 인증과 세션은 한 덩어리가 아니라 '신원을 확인하는 단계'와 '그 신원을 기억하는 단계'로 나뉘는 두 결정입니다 — 이 둘을 분리해서 봐야 JWT와 세션 쿠키의 선택 기준, 로그아웃 처리, MFA 적용 지점이 한 자리에서 정렬됩니다.
+
 ## 먼저 던지는 질문
 
 - 인증과 인가는 무엇이 다를까요?

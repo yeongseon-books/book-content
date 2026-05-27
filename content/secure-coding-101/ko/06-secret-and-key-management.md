@@ -31,6 +31,8 @@ last_reviewed: '2026-05-15'
 ![Secure Coding 101 6장 흐름 개요](https://yeongseon-books.github.io/book-public-assets/assets/secure-coding-101/06/06-01-concept-at-a-glance.ko.png)
 *Secure Coding 101 6장 흐름 개요*
 
+> Secret 관리의 핵심은 '숨기기'가 아니라 '회전 가능성'입니다 — 코드 분리·비밀 저장소·접근 감사·마스킹은 결국 '유출됐을 때 몇 분 안에 새 키로 갈아끼울 수 있는가'라는 한 질문에 답하기 위한 운영 체계입니다.
+
 ## 먼저 던지는 질문
 
 - 어떤 값까지 secret으로 봐야 할까요?
