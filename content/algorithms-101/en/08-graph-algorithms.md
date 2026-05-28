@@ -284,12 +284,12 @@ The next article covers string algorithm basics: the cost of naive matching, KMP
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Graph Algorithms?**
-  - The article treats Graph Algorithms as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Graph Algorithms?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Graph Algorithms reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What trade-off exists between adjacency list and adjacency matrix?**
+  - Sparse graphs favor `defaultdict(list)` adjacency lists at O(V+E) memory; matrices cost O(V²) but give O(1) edge-existence checks. The `V=10000, E=30000` example showed how wasteful a matrix is for sparse graphs.
+- **When should you use BFS vs DFS?**
+  - `bfs(adj, 0)` suits unweighted shortest distance or level-order traversal; DFS suits connectivity, cycle detection, and topological sort where following depth structure matters.
+- **How does Dijkstra work and how is it implemented?**
+  - Pop the shortest-distance candidate from a `heapq` priority queue; skip stale entries with `if d > dist[u]: continue`; push neighbors when a shorter `nd` is found. This gives the standard single-source shortest path for non-negative edge weights.
 
 <!-- toc:begin -->
 ## In this series

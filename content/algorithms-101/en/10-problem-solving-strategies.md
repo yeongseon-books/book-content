@@ -235,12 +235,12 @@ This concludes the Algorithms 101 series. Natural next steps include advanced da
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Algorithm Problem-Solving Strategies?**
-  - The article treats Algorithm Problem-Solving Strategies as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Algorithm Problem-Solving Strategies?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Algorithm Problem-Solving Strategies reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What standard thinking procedure applies to any algorithmic problem?**
+  - Restate the problem; organize input/output/constraints; estimate allowed complexity; map signals to tools; hand-verify on a small example. The Kadane hand-trace showed how one walkthrough before coding significantly reduces wrong answers.
+- **How do you estimate allowed complexity from input size alone?**
+  - At `n = 10⁶`, discard O(n²) immediately and aim for O(n log n) or O(n). The article's table serves as a ceiling: input size isn't intuition—it's the strongest constraint for eliminating algorithm candidates.
+- **Which signals trigger which tools?**
+  - Sorted array → binary search; contiguous subarray → two pointers or Kadane; overlapping subproblems → DP; non-negative shortest path → Dijkstra. Problem-solving skill is less about memorizing solutions and more about quickly retrieving these signal-to-tool connections.
 
 <!-- toc:begin -->
 ## In this series

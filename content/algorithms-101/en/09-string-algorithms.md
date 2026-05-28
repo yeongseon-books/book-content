@@ -267,12 +267,12 @@ The next and final article in this series gathers algorithm problem-solving stra
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying String Algorithm Basics?**
-  - The article treats String Algorithm Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for String Algorithm Basics?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when String Algorithm Basics reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why does naive matching reach O(nm) in the worst case?**
+  - With `text = "a" * 100000 + "b"` and `pat = "a" * 1000 + "b"`, each starting position compares nearly m characters before failing at the last one. The `naive_match()` experiment directly showed this "almost matches then fails" worst case.
+- **What intuition should you use for KMP's failure function?**
+  - `compute_failure("ababaca")` pre-records where to retreat pattern pointer `j` on mismatch. KMP never backtracks the text pointer—`j = fail[j - 1]` alone maintains O(n+m).
+- **Where is a trie especially strong?**
+  - Prefix-sharing problems: autocomplete, prefix search, multi-pattern preprocessing. The example where `car`, `card`, `care`, `cargo` share structure via `Trie.starts_with("car")` compressed that advantage visually.
 
 <!-- toc:begin -->
 ## In this series

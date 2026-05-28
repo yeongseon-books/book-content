@@ -222,12 +222,12 @@ The next article applies this vocabulary to search algorithms, where the differe
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Time and Space Complexity?**
-  - The article treats Time and Space Complexity as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Time and Space Complexity?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Time and Space Complexity reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What do Big-O, Big-Omega, and Big-Theta each mean?**
+  - Big-O is the asymptotic upper bound, Big-Omega the lower bound, and Big-Theta the tight bound (both matching). The table placed all three together to distinguish *which direction* you're bounding cost—not just "roughly slow."
+- **How can you estimate complexity just by reading a code fragment?**
+  - `sum(arr)` is O(n); nested loops give O(n²); halving the search space (`binary_search()`) gives O(log n). Reading loop/recursion shape is the core skill—the `constant`, `linear`, `quadratic` examples were exactly that pattern-reading practice.
+- **Which cost tiers must you recall instantly?**
+  - `O(1)`, `O(log n)`, `O(n)`, `O(n log n)`, `O(n²)`, `O(2^n)`. At `n = 10⁶`, O(n²) is infeasible and you need O(n log n) or better—that intuition is the key takeaway.
 
 <!-- toc:begin -->
 ## In this series

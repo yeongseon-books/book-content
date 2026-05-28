@@ -250,12 +250,12 @@ The next article introduces dynamic programming proper — memoization vs tabula
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Recursion and Divide and Conquer?**
-  - The article treats Recursion and Divide and Conquer as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Recursion and Divide and Conquer?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Recursion and Divide and Conquer reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What three rules make recursion correct?**
+  - A base case must exist; input must shrink toward it; the function must call itself on that smaller input. Missing any one—like the broken `factorial(n)` example—turns recursion from design into accident.
+- **How does the call stack work, and why does `RecursionError` occur?**
+  - Each call pushes a stack frame; exceeding CPython's `sys.getrecursionlimit()` triggers `RecursionError`. The `deep(2000)` example demonstrated this directly. Deep problems require raising the limit or converting to iteration.
+- **How do you read a divide-and-conquer recurrence?**
+  - `T(n) = a · T(n/b) + f(n)` reads as "solve a subproblems of size n/b, then combine in f(n) work." Placing mergesort's `2T(n/2) + O(n)` beside binary search's `T(n/2) + O(1)` built that reading intuition.
 
 <!-- toc:begin -->
 ## In this series

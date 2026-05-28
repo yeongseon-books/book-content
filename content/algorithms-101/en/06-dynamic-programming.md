@@ -243,12 +243,12 @@ The next article covers greedy algorithms — when greedy actually works (exchan
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Dynamic Programming?**
-  - The article treats Dynamic Programming as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Dynamic Programming?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Dynamic Programming reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What two conditions must hold for DP to apply?**
+  - Overlapping subproblems (same subproblem recurs) and optimal substructure (subproblem optima compose into the global optimum). The article showed `fib_naive(20)` call count and the knapsack recurrence to make both conditions visible.
+- **How do memoization and tabulation differ?**
+  - Top-down with `@lru_cache` computes only needed states via recursion; bottom-up with `dp = [0] * (n + 1)` fills all states from smallest upward. Memoization is easier to understand; tabulation avoids recursion-depth limits.
+- **How do you define state and build a recurrence?**
+  - First state the meaning in prose: "`dp[i][cap]` = maximum value using the first i items with capacity cap." Then the recurrence—comparing `dp[i-1][cap]` and `dp[i-1][cap-w] + v`—follows almost automatically. The article repeatedly emphasized defining state meaning before writing transitions.
 
 <!-- toc:begin -->
 ## In this series

@@ -213,12 +213,12 @@ The next article introduces time and space complexity, the formal vocabulary use
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Is an Algorithm??**
-  - The article treats What Is an Algorithm? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Is an Algorithm??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Is an Algorithm? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What three conditions must an algorithm satisfy?**
+  - Correctness, finiteness, and efficiency. Like the `gcd(48, 36)` example: it must produce the right answer, `b` must shrink toward termination, and the cost must be explainable as input size `n` grows.
+- **How does an algorithm differ from a program?**
+  - An algorithm is the abstract procedure for solving a problem (`Problem → Algorithm → Program → Execution`); a program is that procedure translated into a language like Python. The same `find` problem can host linear search and `bisect.bisect_left`—different algorithms in different implementations.
+- **Why is pseudocode an important working language in algorithm design?**
+  - Writing `find smallest in array` as pseudocode first separates logic from syntax. The article emphasized the habit of clarifying "what to do in what order" before touching code.
 
 <!-- toc:begin -->
 ## In this series

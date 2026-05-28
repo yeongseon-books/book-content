@@ -260,12 +260,12 @@ The next article covers recursion and divide and conquer — call stacks, recurr
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Sorting Algorithms?**
-  - The article treats Sorting Algorithms as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Sorting Algorithms?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Sorting Algorithms reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why can't comparison-based sorting beat O(n log n)?**
+  - `log(n!) ≈ n log n` is the information-theoretic lower bound. When order is determined solely by comparisons, distinguishing all possible permutations requires at least that many comparisons.
+- **What does each of mergesort, quicksort, heapsort trade?**
+  - `mergesort()` guarantees O(n log n) and stability but costs O(n) extra memory. `quicksort_inplace()` is fast on average but degrades to O(n²) with bad pivots. `heapsort()` gives worst-case O(n log n) in-place but isn't stable. The article compared them in a trade-off table, not a single performance line.
+- **Why does the stable vs unstable distinction matter?**
+  - `people.sort(key=lambda p: p[0])` then `people.sort(key=lambda p: p[1])` preserves relative order only because Python's Timsort is stable. Multi-key sorting via successive stable sorts depends on this property.
 
 <!-- toc:begin -->
 ## In this series

@@ -245,12 +245,12 @@ The next article covers graph algorithms: the difference between BFS and DFS, Di
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Greedy Algorithms?**
-  - The article treats Greedy Algorithms as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Greedy Algorithms?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Greedy Algorithms reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What two conditions must a greedy algorithm satisfy to be correct?**
+  - An optimal solution that includes the greedy choice must exist (greedy-choice property), and the remaining subproblem must also be solvable the same way (optimal substructure). The counterexample `greedy_change([1,3,4], 6)` broke precisely because those conditions didn't hold.
+- **How does an exchange argument justify the greedy choice?**
+  - Assume an optimal solution OPT exists, then show that swapping its first choice for the greedy choice produces a solution that's still optimal. Activity selection's "earliest finish time" was justified this way most directly.
+- **What do activity selection, coin change, and Huffman coding demonstrate?**
+  - `activity_selection()` shows that the sorting key determines correctness; canonical coin systems show greedy works only under specific input conditions; the `heapq`-based Huffman shows priority queues as the core greedy data structure. Together they conclude: "greedy only when the structure is right."
 
 <!-- toc:begin -->
 ## In this series

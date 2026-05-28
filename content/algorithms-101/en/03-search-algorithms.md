@@ -258,12 +258,12 @@ The next article covers sorting algorithms — the trade-offs of mergesort, quic
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Search Algorithms?**
-  - The article treats Search Algorithms as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Search Algorithms?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Search Algorithms reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How large is the cost gap between linear and binary search?**
+  - `linear_search()` over `[3, 1, 4, 1, 5, 9, 2, 6]` is O(n)—up to 8 comparisons. `binary_search()` on a sorted array halves candidates each step for O(log n)—about 3 comparisons. The 8-element example made that gap visible.
+- **Why does sorting alone change the algorithm tier?**
+  - With sorted data, a single `arr[mid] < target` check discards half the array. Without sorting, that reasoning vanishes and even `contains(sorted_arr, x)` falls back to O(n).
+- **Where are lower bound and upper bound each used?**
+  - `lower_bound(arr, 2)` finds the first position ≥ target; `upper_bound(arr, 2)` finds the first position > target. Subtracting the two counts duplicates, and `bisect_left`/`bisect_right` directly give insertion positions.
 
 <!-- toc:begin -->
 ## In this series
