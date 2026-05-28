@@ -167,13 +167,12 @@ Data science is the *job of bridging* problems and data. Next, we will see how t
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Is Data Science??**
-  - The article treats What Is Data Science? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Is Data Science??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Is Data Science? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How can you understand data science in one sentence?**
+  - Data science is a feedback loop of reading problems, building evidence from data, and using that evidence to change decisions.
+- **What distinguishes data analysts, data scientists, ML engineers, and data engineers?**
+  - Analysts track metrics, scientists build models, and engineers put those models into production systems.
+- **Why must data work always start with problem definition?**
+  - A clear problem definition lets you collect only the necessary data and skip unnecessary analysis.
 <!-- toc:begin -->
 ## In this series
 

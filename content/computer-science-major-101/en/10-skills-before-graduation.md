@@ -178,13 +178,12 @@ Before graduation, it is more useful to check which abilities you can actually d
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Skills to Have Before Graduation?**
-  - The article treats Skills to Have Before Graduation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Skills to Have Before Graduation?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Skills to Have Before Graduation reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What competencies does a diploma alone fail to demonstrate?**
+  - As discussed in the article, a diploma only guarantees "this person completed certain courses." What actually gets evaluated in the field — reading system architecture, handling data, collaborating, and leaving documentation — are cumulative behaviors that don't reduce to course credits. You need to actively build those traces in code, writing, and records separately from your GPA.
+- **Why must the five pillars — fundamentals, systems, data, collaboration, and documentation — be viewed together?**
+  - Because they complement each other. As emphasized in the article, someone strong only in fundamentals stalls in real systems, someone who only touches systems can't verify with data, and without collaboration and documentation, your work never becomes organizational assets. Instead of going deep on one pillar, all five must rise above minimum thresholds together for you to become a trustworthy engineer.
+- **Why is it difficult to demonstrate ability through grades and certifications alone?**
+  - As shown in the article, grades and certifications only demonstrate standardized problem-solving ability. In actual hiring and evaluation, git history, technical writing, presentation materials, and small project outcomes — showing "how you solved problems you defined yourself" — are stronger signals. That's why the final period before graduation is most effective when you allocate time to creating such self-directed deliverables.
 <!-- toc:begin -->
 ## In this series
 

@@ -209,13 +209,12 @@ You cannot sustain CS study for long on motivation alone. Lectures, notes, revie
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying How to Study Computer Science?**
-  - The article treats How to Study Computer Science as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for How to Study Computer Science?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when How to Study Computer Science reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why do study methods produce vastly different results even with the same time investment?**
+  - Combining various learning paths — theory lectures, problem solving, collaborative discussion, senior advice, industry examples — according to the situation is what improves efficiency.
+- **What flow should connect lectures, notes, review, and coding practice?**
+  - Active loops of hands-on problem solving, making mistakes, thinking about why you were wrong, and trying again accelerate learning far more than passively watching videos and copying notes.
+- **Why does last-minute cramming work particularly poorly for CS courses?**
+  - Both studying alone and studying with a team have their own advantages. Finding that balance and knowing when to ask for help is itself part of studying CS.
 <!-- toc:begin -->
 ## In this series
 

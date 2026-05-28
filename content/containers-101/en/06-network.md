@@ -177,13 +177,12 @@ Once connectivity is solved, the next question is *where to keep images*. The ne
 
 ## Answering the Opening Questions
 
-- **The bridge / host / overlay / none modes?**
-  - The article treats Network as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Container-to-container DNS?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Publish (-p) vs expose?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What distinguishes bridge, host, overlay, and none modes?**
+  - Bridge is a virtual L2 network within a single host — user-defined bridges support DNS name resolution. Host shares the host network directly for no-NAT speed but weaker isolation. Overlay connects containers across multiple hosts into one logical network for distributed services. None blocks communication entirely for security testing or batch isolation.
+- **How do containers on the same host find each other by name?**
+  - Containers on a user-defined bridge resolve container names to IPs through Docker's built-in DNS server (127.0.0.11). Even if a container restarts and gets a new IP, the DNS record auto-updates so connection configurations need no changes.
+- **How do `publish (-p)` and `expose` differ?**
+  - `expose` is a documentation directive in the Dockerfile declaring "this container uses this port." It doesn't actually open the port. `-p` is a runtime decision mapping a host port to a container port — only this routes external traffic to the container. Internal services should use `expose` only, with `-p` reserved for entry-point services.
 <!-- toc:begin -->
 ## In this series
 

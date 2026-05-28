@@ -208,13 +208,12 @@ This is the *finale* of *Containers 101*. The next step is *Kubernetes 101*, whe
 
 ## Answering the Opening Questions
 
-- **A *Dockerfile* for a *FastAPI* app?**
-  - The article treats Build a Container App as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Compose* with a *DB* connection?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Defining a *healthcheck?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How should you structure Dockerfiles differently for development vs. production?**
+  - Development includes hot-reload and debugging tools; production includes only the minimal runtime. Multi-stage builds let you define both in a single Dockerfile.
+- **What role do containers play in CI/CD pipelines?**
+  - Build environment standardization, test environment isolation, and deployment artifact creation. The same Dockerfile is built in CI, pushed to the registry, and the same image runs in every environment.
+- **How do you handle monitoring and logging for containerized apps?**
+  - Output structured logs to STDOUT/STDERR and collect with `docker logs`. In production, centralize with log collection agents (Fluentd, Logstash, etc.) and collect metrics with systems like Prometheus.
 <!-- toc:begin -->
 ## In this series
 

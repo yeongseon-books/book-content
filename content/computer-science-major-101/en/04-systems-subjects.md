@@ -153,13 +153,12 @@ Next post: *Database and Network*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Understanding Systems Subjects?**
-  - The article treats Understanding Systems Subjects as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Understanding Systems Subjects?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Understanding Systems Subjects reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How far can systems courses explain what happens when a single line of code runs?**
+  - Operating systems explain how hardware and applications are mediated through resource management, computer architecture shows how CPUs execute instructions, and compilers reveal how high-level languages transform into machine code.
+- **Why should operating systems, computer architecture, and compilers be learned together?**
+  - Concepts like the difference between processes and threads, memory hierarchy (cache, RAM, disk), and pipeline hazards are not abstract ideas — they describe how actual hardware operates.
+- **Why are concepts like processes, memory, files, and time crucial for debugging and performance analysis?**
+  - Understanding system depth changes how you reason when debugging "why is this code slow" or "why does this bug occur." This is one of the biggest differences between junior and experienced engineers.
 <!-- toc:begin -->
 ## In this series
 

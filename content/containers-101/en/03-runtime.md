@@ -171,13 +171,12 @@ To run an image, you must build one. The next post covers Dockerfile.
 
 ## Answering the Opening Questions
 
-- **High-level vs low-level runtimes?**
-  - The article treats Runtime as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The Docker → containerd → runc flow?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The role of CRI?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why do Docker, containerd, and runc exist separately?**
+  - Each tier's responsibilities are isolated. Docker handles developer experience (image builds, CLI, Compose), containerd is the daemon managing container lifecycle on the host, and runc calls Linux kernel features (namespaces, cgroups) to actually isolate processes. This separation enables configurations like Kubernetes using containerd without Docker.
+- **What distinguishes high-level and low-level runtimes?**
+  - High-level runtimes (Docker, containerd) handle container execution preparation — image pulls, snapshot management, network setup, storage mounts. Low-level runtimes (runc) receive only a prepared rootfs and config.json, then create an isolated process via the clone(2) system call. The high level decides "what to run"; the low level executes "how to isolate."
+- **How does the Docker → containerd → runc flow connect?**
+  - A `docker run` command is received by the Docker daemon, which forwards it to containerd via gRPC. Containerd prepares the image as a snapshot and forks containerd-shim. The shim invokes runc to start the process, then runc exits and the shim manages container IO. In Kubernetes environments, kubelet calls containerd directly through CRI, bypassing the Docker daemon entirely.
 <!-- toc:begin -->
 ## In this series
 

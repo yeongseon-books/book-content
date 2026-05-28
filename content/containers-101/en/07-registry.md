@@ -171,13 +171,12 @@ Once you know *where* to fetch images, the next question is *how to run them saf
 
 ## Answering the Opening Questions
 
-- **The role of a *registry?**
-  - The article treats Registry as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The *push / pull* flow?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Tagging* strategy?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Where should you store built images?**
+  - In a dedicated container image registry (Docker Hub, GHCR, ECR, GCR, Harbor, etc.). Transferring via local files or scp makes version tracking impossible and integrity verification unavailable. A registry is not just storage — it's the foundation of deployment identity.
+- **What role do push and pull play in deployment?**
+  - Push uploads CI-built images to the registry; pull fetches those images to the production environment for execution. Between these two steps, the digest guarantees identity.
+- **Why must you distinguish between tags and digests?**
+  - A tag is a human-assigned name that can be reassigned to a different image at any time. A digest is the SHA-256 hash of the image content and is immutable. Production deployments must pin by digest to exactly reproduce "the version that worked yesterday."
 <!-- toc:begin -->
 ## In this series
 

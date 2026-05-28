@@ -170,13 +170,12 @@ If an image is a template, you have to understand its internals. The next post c
 
 ## Answering the Opening Questions
 
-- **The definition of a container?**
-  - The article treats What is a Container? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What gets shared with the host?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The decisive difference from a VM?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How can you precisely define a container in one sentence?**
+  - A container is an isolated bundle of processes sharing the host kernel. Unlike a VM with a completely independent OS, it shares the kernel but isolates processes via filesystem, network, and PID namespaces.
+- **What does a container share with the host, and what does it isolate?**
+  - It shares the kernel and system call interface. What gets isolated: PID space, filesystem root, network interfaces, and user ID mappings. The hands-on exercise checking `/proc/<PID>/ns` in the article directly showed this boundary.
+- **Where does the decisive difference from VMs arise?**
+  - The kernel boundary. VMs boot a separate guest kernel, resulting in high boot time and overhead but stronger isolation. Containers share the host kernel, starting in milliseconds with high density, but a kernel vulnerability becomes every container's vulnerability. In operational design, this tradeoff must be matched to workload characteristics.
 <!-- toc:begin -->
 ## In this series
 

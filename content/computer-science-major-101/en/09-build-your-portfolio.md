@@ -237,13 +237,12 @@ A portfolio is not a decorative extra for exceptional students. It is the work o
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Build Your Portfolio?**
-  - The article treats Build Your Portfolio as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Build Your Portfolio?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Build Your Portfolio reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How can coursework and projects become a portfolio?**
+  - What catches a hiring manager's eye is not the number of projects but what choices you made in each project and what you learned from them.
+- **Why are GitHub repositories, READMEs, setup instructions, and demo links all important?**
+  - Clean code, good READMEs, and deployed demos are the baseline. What makes it stronger is being able to explain what technical tradeoffs you considered and why you made those choices.
+- **What distinguishes just uploading code from publishing explainable deliverables?**
+  - Industry engineers look not only at a candidate's technical depth but also at how they decompose problems, communicate with teams, and make decisions under constraints. A portfolio project that demonstrates these qualities is ideal.
 <!-- toc:begin -->
 ## In this series
 

@@ -174,13 +174,12 @@ You can see how an image is built. Next, look at what runs it. The next post cov
 
 ## Answering the Opening Questions
 
-- **The physical structure of an image?**
-  - The article treats Image and Layer as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The job of a layer?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How OverlayFS stacks them?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What exactly does a single layer do?**
+  - Each Dockerfile instruction (`RUN`, `COPY`, `ADD`) creates one read-only change layer. It only contains files that differ from the previous layer, so there is no data duplication. You can verify each layer's source instruction and size with `docker history`.
+- **How can you tell why the cache broke?**
+  - Docker compares whether each layer's input (instruction + context files) matches the previous build. If `COPY . .` sits above app code, a one-line code change forces every layer below it to re-execute. That's why the article emphasized placing less-frequently-changing items lower and frequently-changing items higher.
+- **How does OverlayFS make these layers appear merged?**
+  - OverlayFS combines lowerdir (the read-only layer stack) and upperdir (the container's writable layer) into a single visible filesystem. Reads search top-down, writes always go to upperdir. Deletes are marked with whiteout files, so the actual layer originals remain unchanged.
 <!-- toc:begin -->
 ## In this series
 

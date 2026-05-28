@@ -147,13 +147,12 @@ Next post: *Data Structures and Algorithms*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Understanding First Year Subjects?**
-  - The article treats Understanding First Year Subjects as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Understanding First Year Subjects?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Understanding First Year Subjects reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why do first-year courses emphasize math and programming so heavily?**
+  - First-year courses lock in mathematical thinking and implementation habits simultaneously. Building a solid foundation early dramatically improves comprehension speed and stability in second-year courses and beyond.
+- **What roles do calculus, linear algebra, discrete math, and intro programming each play?**
+  - Calculus handles rates of change, linear algebra covers vector and matrix structures, discrete math provides logic and proofs, and intro programming teaches implementation fundamentals. The four courses serve different roles but connect to form the foundation for everything that follows.
+- **Why does a course that seems unrelated to your career now determine outcomes from second year onward?**
+  - Courses from second year onward are designed assuming first-year concepts. Weak fundamentals mean you spend time re-learning the same material repeatedly, and project implementation quality suffers as a result.
 <!-- toc:begin -->
 ## In this series
 

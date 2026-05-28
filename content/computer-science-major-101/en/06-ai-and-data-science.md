@@ -153,13 +153,12 @@ Next post: *Project Subjects*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying AI and Data Science?**
-  - The article treats AI and Data Science as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for AI and Data Science?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when AI and Data Science reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do AI and data science divide and connect within the CS major?**
+  - AI models are built on data and statistics plus optimization theory, while data science covers the entire cycle from problem definition to result interpretation — not just models. The two overlap in some areas and diverge in others.
+- **What flow connects statistics, machine learning, deep learning, and data analysis?**
+  - As model layers increase from linear regression to neural networks, complexity grows — but so does interpretive difficulty. The ability to distinguish between a simple model and a complex model appropriate for the problem is what matters.
+- **Why does studying only models quickly hit a ceiling?**
+  - Real data differs from textbook-clean data. Handling missing values, outliers, and class imbalance — and verifying whether model performance is luck or meaningful improvement — is the practical competency that matters.
 <!-- toc:begin -->
 ## In this series
 

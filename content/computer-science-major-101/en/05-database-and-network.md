@@ -150,13 +150,12 @@ Next post: *AI and Data Science*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Database and Network?**
-  - The article treats Database and Network as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Database and Network?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Database and Network reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why do databases and networks sit at the foundation of nearly every service?**
+  - Databases are responsible for data consistency and durability, while networks determine how data moves and where it can reach. When these two cooperate, real-time production systems become possible.
+- **How do SQL, tables, and indexes connect to actual performance?**
+  - Writing SQL queries is a skill; deciding which query to use is modeling. The reason database design and network architecture must be considered together — not separately — lies here.
+- **What roles do TCP/IP and HTTP play at which layers?**
+  - Most production issues like "it's slow," "it crashed," or "replication error" arise not from one technology's limits but at the boundaries between technologies. Understanding those boundaries is the core of production experience.
 <!-- toc:begin -->
 ## In this series
 

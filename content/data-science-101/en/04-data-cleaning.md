@@ -176,13 +176,12 @@ Cleaning is *quiet labor* that holds up *every conclusion* you will draw. Next w
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Data Cleaning?**
-  - The article treats Data Cleaning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Data Cleaning?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Data Cleaning reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What order should data cleaning follow?**
+  - This article's basic order is: type fixes → duplicate removal → missing value handling → outlier flagging → validation report. The `pd.to_datetime`, `drop_duplicates`, `dropna`/`fillna`, IQR-based `amount_flag`, and final `report` dictionary showed that order directly.
+- **Why must missing values, duplicates, outliers, and type mismatches be checked first?**
+  - These problems break aggregations and filters even before modeling. For example, if `signup_at` is a string, date comparisons break; if `user_id` duplicates or `df.isna().mean()` reveals missing values go unnoticed, all downstream metrics and features are contaminated from the start.
+- **Why is a simple treatment like filling with `0` dangerous?**
+  - `0` is often a meaningful actual value rather than "no value," so it conflates missing data with real zeros. That's why the article distinguished: drop rows with `dropna(subset=[...])` for key columns, and only use `fillna("UNKNOWN")` for auxiliary columns like `country`.
 <!-- toc:begin -->
 ## In this series
 

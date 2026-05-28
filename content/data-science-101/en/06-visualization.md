@@ -175,13 +175,12 @@ Visualization is the *bridge from analysis to decision*. Next we move into *mode
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Visualization?**
-  - The article treats Visualization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Visualization?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Visualization reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Which chart should you use for which message?**
+  - If the message is about distribution, use histograms; comparisons, `plot.barh`; trends, line charts; relationships, `sns.relplot` or scatter plots. This article was structured to build the habit of choosing charts by the question you want to answer, not the data type.
+- **Why do some graphs aid understanding while others create misunderstanding with the same data?**
+  - Even the same proportion data becomes hard to compare in a 3D pie chart due to area and perspective distortion, while switching to a horizontal bar chart makes length differences immediately readable. Charts themselves change data interpretation rules, so incorrect encoding creates misunderstanding even without hiding facts.
+- **Why are axes, colors, and labels core design elements rather than minor decoration?**
+  - Context annotations like `ax.axvline(pd.Timestamp("2026-04-01"), ...)` are needed to read pre/post campaign context, and colorblind-safe palettes with labels are needed to reliably distinguish categories. A chart's message is completed not by data points alone but by axis scale, legend, and text annotations combined.
 <!-- toc:begin -->
 ## In this series
 

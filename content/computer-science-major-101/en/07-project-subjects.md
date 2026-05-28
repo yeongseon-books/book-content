@@ -220,13 +220,12 @@ Next post: *How to Study Computer Science*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Project Subjects?**
-  - The article treats Project Subjects as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Project Subjects?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Project Subjects reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why are project courses considered the core of the later curriculum?**
+  - Team projects differ from individual assignments. The goal is experiencing collaboration skills like code division, progress synchronization, and conflict resolution, plus the full cycle from problem definition to deployment.
+- **How do team projects differ from individual assignments, and what additional preparation do they require?**
+  - System design, tradeoff analysis, and decision-making under constraints learned in capstone projects are abilities directly demanded in industry.
+- **Why are problem definition, scope control, schedule management, and demo preparation all important?**
+  - Projects that clearly record and explain "why we did it this way" have more portfolio value than those with perfect results.
 <!-- toc:begin -->
 ## In this series
 

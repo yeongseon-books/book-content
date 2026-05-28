@@ -181,13 +181,12 @@ With security principles in place, the next topic is the *fundamental difference
 
 ## Answering the Opening Questions
 
-- **What *non-root* means?**
-  - The article treats Container Security as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Capabilities* and *seccomp?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Image scanning?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why isn't an isolated container automatically secure?**
+  - Containers share the host kernel. Namespaces and cgroups provide resource isolation, but kernel vulnerabilities can bypass that isolation. Defaults include root execution, excessive capabilities, and a permissive seccomp profile, so the fact that you "used containers" alone does not make you secure. Isolation is one defense layer, not the whole story.
+- **What security meaning does non-root execution carry?**
+  - Running as root (UID 0) means container escape likely grants root on the host. Running as non-root (UID 1000, etc.) limits escape damage to regular user privileges. Inside the container too, file ownership, port binding, and device access are naturally restricted, reducing the tools available to an attacker.
+- **What do capabilities and seccomp reduce?**
+  - Capabilities control "what you can do" (mount, network config, system time changes, etc.), while seccomp controls "which kernel system calls you can invoke." Applied together, they dramatically shrink the range of actions an attacker can perform inside the container. Starting with `--cap-drop=ALL` and adding only what's needed, while maintaining the 44 system calls blocked by Docker's default seccomp profile, is the minimum standard.
 <!-- toc:begin -->
 ## In this series
 

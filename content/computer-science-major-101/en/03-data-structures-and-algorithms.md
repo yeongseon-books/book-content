@@ -169,13 +169,12 @@ Next post: *Understanding Systems Subjects*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Data Structures and Algorithms?**
-  - The article treats Data Structures and Algorithms as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Data Structures and Algorithms?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Data Structures and Algorithms reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why are data structures and algorithms core courses in nearly every CS program?**
+  - Data structures address how to store and efficiently access data, while algorithms address what sequence of computations to perform on that data. Their combination forms the backbone of practical programming.
+- **How do learning data structures and learning algorithms differ, and why must they go together?**
+  - Arrays work best for ordered data, hashes for fast lookups, trees for hierarchical structures, and graphs for connection relationships. The goal is building the intuition to automatically identify which data structure fits when you see a problem.
+- **What do time complexity and space complexity let you judge in real code?**
+  - Notations like O(n log n) sorting, O(1) hash lookup, and O(log n) tree search are not meant to be memorized — the point is understanding why they work that way structurally, and experiencing how much it matters in practice.
 <!-- toc:begin -->
 ## In this series
 

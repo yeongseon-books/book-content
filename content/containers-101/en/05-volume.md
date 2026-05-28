@@ -179,13 +179,12 @@ Once data has a home, communication is next. The next post covers Network.
 
 ## Answering the Opening Questions
 
-- **Volumes vs bind mounts vs tmpfs?**
-  - The article treats Volume as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Guaranteeing data persistence?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Backup and migration?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What distinguishes volumes, bind mounts, and tmpfs?**
+  - A volume is persistent storage where Docker manages the path — data survives container deletion. A bind mount directly exposes a specific host path to the container, creating strong host-environment dependency. tmpfs exists only in memory and disappears when the container stops, suitable for sensitive temporary data that shouldn't hit disk.
+- **What choice ensures data survives container deletion?**
+  - Use named volumes. Create with `docker volume create`, mount with `-v <name>:<path>`, and even after `docker rm` removes the container, the volume remains. Attach the same volume to a new container and the data is intact.
+- **How should you approach backup and recovery?**
+  - For regular files, the basic pattern is mounting the volume read-only in a separate container and compressing with `tar`. For databases, use application-level backups like `pg_dump`/`pg_restore` alongside. Most importantly, what matters is not whether backups exist but whether you practice recovery periodically.
 <!-- toc:begin -->
 ## In this series
 

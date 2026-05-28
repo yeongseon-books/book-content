@@ -158,13 +158,12 @@ Interpretation is the *final bridge* that carries *analysis into decisions*. The
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Result Interpretation?**
-  - The article treats Result Interpretation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Result Interpretation?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Result Interpretation reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How can you turn numerical results into decision sentences?**
+  - Follow this article's 5-step approach: bundle the raw figure, confidence interval, segment context, and action recommendation into one sentence. For example, writing `conversion 3.2% vs 3.6%`, `delta = +0.4pp`, `paid users`, `roll out` in one paragraph is the moment a number becomes a decision sentence.
+- **Why must numbers and context always be written together?**
+  - The same 2pp increase is easy to over-generalize without knowing who, when, and under what conditions it was measured. That's why the article specified writing `campaign window: 2 weeks; segment: paid users; device: desktop only` alongside numbers.
+- **Why must effect size and uncertainty be reported simultaneously?**
+  - `relative lift = +12.5%` alone can look large, but you need `95% CI: +0.2pp ~ +0.6pp` alongside to know how stable that difference is. Effect size shows the magnitude of action value; the confidence interval shows the risk of that judgment — with only one, decisions become either exaggerated or overly conservative.
 <!-- toc:begin -->
 ## In this series
 

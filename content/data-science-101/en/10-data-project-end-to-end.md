@@ -175,13 +175,12 @@ This series was an assembly journey through the *problem → data → model → 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying End-to-End Data Project Flow?**
-  - The article treats End-to-End Data Project Flow as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for End-to-End Data Project Flow?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when End-to-End Data Project Flow reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do the preceding nine stages connect within a single project?**
+  - This article closed one loop: problem definition → collection/cleaning → feature creation → modeling/evaluation → decision. Starting from `events.csv`, creating `features["days_since_last"]`, calculating risk scores with `LogisticRegression()`, and finishing with a campaign execution sentence — that flow is the connection itself.
+- **What deliverable does each stage — problem definition, collection, cleaning, EDA, modeling, evaluation, interpretation — leave behind?**
+  - Problem definition leaves a target sentence, collection and cleaning leave a reproducible dataset, EDA leaves feature candidate notes, modeling leaves baseline and training code, evaluation leaves a scorecard like AUC, and interpretation leaves an action memo. The article also materialized the final deliverable as a format including `target list`, `Expected churn reduction = 12%`, `Owner`, and `Review`.
+- **In a real example like churn prediction, what marks the decision point?**
+  - The decision point is not the moment model scores look good — it's when the criteria for converting predictions into actual actions are set. In this example, the moment `Top 10% risk segment = 3,200 users` and `send the re-engagement campaign this Friday` were written together was exactly the project's decision point.
 <!-- toc:begin -->
 ## In this series
 

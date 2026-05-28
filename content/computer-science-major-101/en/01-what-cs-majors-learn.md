@@ -147,13 +147,12 @@ Next post: *Understanding First Year Subjects*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Computer Science Majors Learn?**
-  - The article treats What Computer Science Majors Learn as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Computer Science Majors Learn?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Computer Science Majors Learn reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How can you understand the four-year CS curriculum as a big picture?**
+  - The major is built on six pillars (math, programming, systems, data, AI, projects), each supporting the next. Once you grasp this flow, individual courses make sense as connected steps rather than isolated subjects.
+- **Why are math, programming, systems, data, AI, and projects a continuous flow rather than separate courses?**
+  - Each pillar serves as the foundation for the next. Understanding this progression lets you see the meaning behind each course at a glance.
+- **What is the difference between memorizing course names and understanding the curriculum map?**
+  - You need to understand what problem each course solves and how it connects to the next. Then every new course becomes a piece fitting into the big picture, not just another assignment to complete.
 <!-- toc:begin -->
 ## In this series
 

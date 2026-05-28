@@ -176,13 +176,12 @@ It is time to *apply* every concept you have learned to *one real app*. The next
 
 ## Answering the Opening Questions
 
-- **Kernel sharing* vs *hypervisor?**
-  - The article treats Containers vs VMs as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Differences in *isolation level?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Startup time* and *resource* comparison?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What isolation model difference do containers and VMs have?**
+  - VMs boot a guest kernel on top of a hypervisor, running a completely different OS from the host. Containers share the host kernel and isolate processes with namespaces/cgroups. VMs provide kernel-level isolation but are heavy; containers are lightweight but exposed to kernel vulnerabilities. microVMs (Firecracker) are a middle ground attempting to bridge both.
+- **Why does the difference between kernel sharing and hypervisor matter?**
+  - Kernel sharing means starting just a process without booting — fast and memory-efficient. But sharing the same kernel means one kernel vulnerability affects all containers. A hypervisor gives each VM an independent kernel, so one VM's vulnerability doesn't affect others. This difference is decisive in multi-tenant environments.
+- **How differently do startup speed and resource usage feel?**
+  - Containers start in tens to hundreds of milliseconds and run on a few MB of memory. VMs take tens of seconds to minutes (including OS boot) and consume hundreds of MB to several GB. On the same host, you can run tens to hundreds of containers but only a few to tens of VMs. This density difference directly impacts infrastructure costs.
 <!-- toc:begin -->
 ## In this series
 

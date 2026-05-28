@@ -165,13 +165,12 @@ EDA is *time spent listening to the data*. Next we will look at *visualization* 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Exploratory Data Analysis?**
-  - The article treats Exploratory Data Analysis as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Exploratory Data Analysis?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Exploratory Data Analysis reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How can you quickly read the shape of data before building a model?**
+  - This article's EDA loop starts with `df.shape`, `df.dtypes`, `df.head()` for the overall outline, then checks distributions with `describe()` and histograms, followed by categorical unique values, scatter plots, missing rates, and correlation matrices. The key is not diving deep at once, but quickly scanning data size, distribution, relationships, and missingness.
+- **Why does looking only at a single mean often lead to misunderstanding?**
+  - Means easily hide long tails, skewness, and outliers — looking typical but poorly representing the actual distribution. That's why the article emphasized not just checking `df["amount"].describe()` but also building histogram and quantile/boxplot intuition alongside.
+- **What order works best for examining distributions, missing patterns, and correlations?**
+  - First read 1D distributions to understand value shapes, then check `df.isna().mean()` for empty regions, and finally examine `df.select_dtypes("number").corr().round(2)` for variable relationships. Looking at correlation before understanding distributions risks immediately misinterpreting spurious relationships created by outliers or missing patterns.
 <!-- toc:begin -->
 ## In this series
 

@@ -178,13 +178,12 @@ Once images exist, the next question is *where to put state*. The next post cove
 
 ## Answering the Opening Questions
 
-- **The role and order of instructions?**
-  - The article treats Dockerfile as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Cache-friendly authoring?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Multi-stage builds?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why does Dockerfile instruction order matter so much?**
+  - Docker creates each instruction as a layer, and if earlier layers cache-hit, subsequent instructions can be skipped entirely. Conversely, if one earlier instruction's input changes, every layer after it must be rebuilt. Therefore placing low-change-frequency instructions (base image, dependency install) above and frequently-changing instructions (source code copy) below is the core principle for reducing build time.
+- **How does a cache-friendly writing style change build time?**
+  - Copy source code last and install dependencies first. With this pattern, builds that only modify code can reuse the entire dependency layer, commonly reducing CI build time from 5 minutes to 30 seconds. In large monorepos, this difference accumulates across dozens of daily builds.
+- **What problem does multi-stage build solve?**
+  - It extracts only the final artifacts from a large build image containing build tools (gcc, npm, pytest, etc.) and moves them to a small runtime image. When a 900MB image shrinks to 80MB, transfer time, storage cost, and vulnerability surface area all improve.
 <!-- toc:begin -->
 ## In this series
 

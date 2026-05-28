@@ -181,13 +181,12 @@ Collection is the *recording step*. Next, we will look at how to *clean* the dat
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Data Collection?**
-  - The article treats Data Collection as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Data Collection?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Data Collection reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Where does data needed for analysis usually come from?**
+  - The four basic sources covered in this article are files, APIs, databases, and event logs. The `pd.read_csv("data/users-2026-05-04.csv")`, `requests.get(...)`, `pd.read_sql(...)`, and `events.jsonl` examples each demonstrated a representative path.
+- **Why must you distinguish between originals, copies, and snapshots?**
+  - Copies without provenance and extraction timestamps — like an Excel file a colleague gave you — cannot be reproduced months later. The `source of truth`, snapshot, and extraction SQL/hash records emphasized in the article are the minimum contract for re-running the same analysis with the same data.
+- **What characteristics do files, APIs, databases, and event logs each have?**
+  - Files are simple but vulnerable to manual edits and version confusion; APIs require attention to auth, rate limits, and response format changes; databases are the most reliable but require logging queries and read paths; event logs provide rich behavioral data but break silently when schema changes — like `events.jsonl` whose structure can shift without notice.
 <!-- toc:begin -->
 ## In this series
 

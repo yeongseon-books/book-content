@@ -171,13 +171,12 @@ Evaluation is the *conversation* between problem and model. Next we look at how 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Evaluation?**
-  - The article treats Evaluation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Evaluation?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Evaluation reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Does high accuracy truly mean a good model?**
+  - Not always. As the article's example showed, in fraud detection even 99% accuracy with 5% recall means most actual fraud is missed — so high accuracy alone cannot conclude a model is good.
+- **What do precision, recall, F1, and ROC AUC each tell you in classification problems?**
+  - Precision (as shown by `precision_score`) indicates the reliability of positive predictions, recall indicates actual positive capture rate, and F1 represents their balance. ROC AUC uses `model.predict_proba(X_test)[:, 1]` to read discrimination ability less tied to a single threshold, making it useful for comparing overall separability of classifiers.
+- **How do MAE, RMSE, and R² differ in regression problems?**
+  - MAE is mean absolute error with intuitive interpretation, RMSE is the square root of squared errors penalizing large mistakes more heavily. `r2_score` shows how much variance the model explains rather than error magnitude itself — so the three metrics reveal different failure aspects of the same predictions.
 <!-- toc:begin -->
 ## In this series
 

@@ -185,13 +185,12 @@ Modeling is a *conversation with the baseline*. Next we step into the world of *
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Modeling?**
-  - The article treats Modeling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Modeling?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Modeling reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why should you start with a baseline when building your first model?**
+  - A baseline is needed to judge whether a new model's score is an improvement or a regression. The article first established baseline accuracy with `DummyClassifier(strategy="most_frequent")` before comparing the logistic regression result — that's exactly why.
+- **What does train/test split protect against?**
+  - `train_test_split(..., stratify=y, random_state=42)` prevents the illusion of treating training data as correct answers again. Splitting while maintaining class ratios is especially important so test scores carry meaning closer to actual deployment.
+- **Why bundle preprocessing and model into a single Pipeline?**
+  - Bundling with `ColumnTransformer` and `Pipeline([("pre", pre), ("clf", LogisticRegression(...))])` ensures scaling and encoding rules are fit only on training data, with the same rules applied to the test set. Without this, test data statistics leak into preprocessing — the textbook definition of data leakage.
 <!-- toc:begin -->
 ## In this series
 

@@ -157,13 +157,12 @@ Only *answerable questions* are the start of analysis. Next, we will look at *ho
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Turning a Problem into a Data Problem?**
-  - The article treats Turning a Problem into a Data Problem as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Turning a Problem into a Data Problem?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Turning a Problem into a Data Problem reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why is a question like "Why did revenue drop?" hard to answer as-is?**
+  - As-is, it's missing `metric`, `window`, and `population` — so different teams write completely different queries for the same question. The moment we rewrote it as "Paid-subscriber monthly revenue dropped more than 5% in the last 30 days versus the prior 30 days," what to aggregate finally became fixed.
+- **Why are metric, time window, and target population the core of problem definition?**
+  - When all three axes are set — like `monthly_revenue`, `last 30 days vs previous 30 days`, `paid subscribers (excluding trials)` — the comparison baseline stops shifting. Without them, the same revenue-drop question yields entirely different conclusions depending on whether free users are included or whether you compare weekly vs. monthly.
+- **What form must a question take for data to answer it?**
+  - A question data can answer must be a single measurable, falsifiable sentence with metric, time window, and target population specified — something you can actually verify as true or false with `pd.read_csv("revenue_data.csv")` or a SQL aggregate.
 <!-- toc:begin -->
 ## In this series
 
