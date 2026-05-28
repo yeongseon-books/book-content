@@ -201,12 +201,12 @@ E2E is the *most realistic* signal. From the next post we cover *test doubles* f
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying E2E Test?**
-  - The article treats E2E Test as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for E2E Test?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when E2E Test reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do E2E tests differ from other test layers?**
+  E2E tests exercise the full stack including the browser, verifying the most realistic user flows possible.
+- **What does a test that launches an actual browser verify?**
+  It catches UI bugs, JavaScript errors, and async race conditions in the real environment—problems integration tests would miss.
+- **How do you write a first scenario with Playwright?**
+  Because execution is slow, you don't E2E-test every feature—focus on paths with the highest user value.
 
 <!-- toc:begin -->
 ## In this series

@@ -228,12 +228,12 @@ That is *Web Development 101*. Next steps are depth — Frontend Development 101
 
 ## Answering the Opening Questions
 
-- **See every concept from the series live *in one app?**
-  - The article treats Building a Small Web App as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **A folder layout for a small full-stack project?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The full build-and-deploy flow end to end?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do the nine preceding concepts connect inside one app?**
+  A user enters a task in a form, the browser sends `fetch("/api/todos")` as POST, Flask INSERTs into SQLite, then returns the list via GET. Adding `DB_PATH` environment variable and `/health` endpoint ties HTTP, DOM, database, and deployment concepts into one vertical slice.
+- **What folder structure should a small full-stack project start with?**
+  The article proposed `todo-app/` containing `app.py`, `templates/index.html`, `static/style.css`, `requirements.txt`, and `Dockerfile`. This minimal separation makes server code, view templates, static assets, dependencies, and deployment artifacts clearly bounded.
+- **What API contract binds Frontend, Backend, and database together?**
+  Frontend assumes `/api/todos` returns a JSON list—`load()` draws the screen from it, and form submission POSTs `{"text": ...}` to create items. Backend responds with `201` and JSON. The database maintains that same source of truth—three layers bound by one API shape.
 
 <!-- toc:begin -->
 ## In this series

@@ -198,12 +198,12 @@ Mock and Stub are *tools with different goals*. The next post measures *how much
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Mock and Stub?**
-  - The article treats Mock and Stub as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Mock and Stub?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Mock and Stub reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What exactly distinguishes a Stub from a Mock?**
+  A stub fixes the return value of an external dependency so the test receives only predetermined responses—it answers "given this input, return that output."
+- **How do state verification and interaction verification differ?**
+  A mock verifies that a function was called in exactly the expected way, confirming the calling contract—not just the result but the communication pattern.
+- **When are MagicMock, patch, and side_effect used?**
+  Sometimes only a stub is needed; other times a mock is necessary. Choose based on test intent—verify the result (stub) or verify the call pattern (mock).
 
 <!-- toc:begin -->
 ## In this series

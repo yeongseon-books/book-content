@@ -189,12 +189,12 @@ Test strategy is not *technique* but *decision-making*. With this we close out T
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Building a Test Strategy?**
-  - The article treats Building a Test Strategy as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Building a Test Strategy?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Building a Test Strategy reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why does the test pyramid's distribution matter?**
+  Faster tests can run more frequently, and more frequent runs catch regressions sooner. Unit tests are fastest and E2E slowest, so stacking fast tests thick at the bottom delivers sufficient confidence within reasonable time on every PR. An inverted "ice-cream cone" only inflates CI time and makes debugging harder.
+- **What ratio should you invest across unit, integration, and E2E layers?**
+  Start with the most fast unit tests, moderate integration, and fewest slow E2E. But absolute ratios aren't fixed—adjust by risk: payment and auth paths get thicker E2E; pure algorithm modules lean toward unit tests.
+- **How do you identify critical user paths?**
+  Identify flows where failure carries the highest revenue, trust, or legal risk. Payment completion, login/signup, and data integrity paths are typical. Don't aim for a perfect strategy upfront—start with a few high-priority E2E paths and expand coverage based on operational metrics (error rate, support ticket frequency).
 
 <!-- toc:begin -->
 ## In this series

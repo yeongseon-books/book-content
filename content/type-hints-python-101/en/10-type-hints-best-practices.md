@@ -389,12 +389,12 @@ This series covered the full working arc: basic annotations, unions, structured 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Type Hint Best Practices?**
-  - The article treats Type Hint Best Practices as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Type Hint Best Practices?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Type Hint Best Practices reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Where should you add type hints first for maximum return on investment?**
+  Public function signatures and return types first—not local variables. Fixing contracts like `find_user(user_id: int) -> UserRecord | None` that other modules read directly delivers the biggest refactoring benefit.
+- **In what order should you reduce Any spreading through code?**
+  Start with boundary functions like `get_config() -> Any`, replace with concrete types, then extract helpers like `parse_order_id()` and `require_user_email()` to lift Union/None handling. This breaks the `Any` propagation chain.
+- **Among return types, public APIs, and internal helpers—what should you harden first?**
+  Priority: public APIs and return types first; internal helpers follow to support those contracts. The article's hardening pass went: signature strengthening → Any removal → helper extraction → `mypy` pass verification.
 
 <!-- toc:begin -->
 ## In this series

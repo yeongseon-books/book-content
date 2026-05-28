@@ -183,12 +183,12 @@ HTTP is *a contract made of plain text*. Next, we look at the two sides of that 
 
 ## Answering the Opening Questions
 
-- **The shape of HTTP requests and responses?**
-  - The article treats HTTP and APIs as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Methods (GET/POST/PUT/DELETE) and status codes?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The role of headers?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What do client and server actually exchange?**
+  They exchange HTTP request and response messages containing method/URL/headers/body and status-code/headers/body respectively. `https://example.com` returns HTML; `https://api.github.com/repos/python/cpython` returns JSON—the difference is response format and contract.
+- **What elements compose an HTTP request and response?**
+  A request has a start line like `GET /get HTTP/1.1` plus headers and optional body. A response has a status line like `HTTP/1.1 200 OK` plus headers and body. The `curl -v` and `X-Custom` header examples show metadata exchanged in plain text.
+- **What does each of GET, POST, PUT, DELETE mean?**
+  GET expresses retrieval intent (`httpbin.org/get?lang=en`). POST sends a body to create or process, potentially changing server state. PUT and DELETE express update and deletion contracts on the same URL—distinguishing methods lets client and server communicate with shared semantics.
 
 <!-- toc:begin -->
 ## In this series

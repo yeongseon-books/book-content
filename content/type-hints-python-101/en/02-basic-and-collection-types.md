@@ -234,12 +234,12 @@ In the next article, we will explore `Optional` and `Union` types for handling v
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Basic Types and Collection Types?**
-  - The article treats Basic Types and Collection Types as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Basic Types and Collection Types?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Basic Types and Collection Types reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do you annotate int, str, float, bool, bytes, and None?**
+  Basic scalar types are written directly: `name: str`, `age: int`, `data: bytes`, `nothing: None = None`. These primitives become building blocks for compound types like `list[str]` and `dict[str, int]`.
+- **Why must list, dict, tuple, and set include element types?**
+  Writing just `list` or `dict` prevents analyzers from tracking internal elements—`item.price` or `sum()` safety can't be guaranteed. Only after writing `get_prices(items: list[Product]) -> dict[str, int]` can keys, values, and element attributes all be checked.
+- **How do fixed-length and variable-length tuples differ?**
+  `tuple[float, float]` or `tuple[str, int, bool]` are heterogeneous tuples with fixed length and positional meaning. `tuple[int, ...]` is a homogeneous tuple that can grow indefinitely—distinguishing coordinates from number sequences.
 
 <!-- toc:begin -->
 ## In this series

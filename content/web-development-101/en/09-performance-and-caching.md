@@ -189,12 +189,12 @@ Performance starts with *measurement*. In the final post we tie everything toget
 
 ## Answering the Opening Questions
 
-- **Basic performance measurement (browser and server)?**
-  - The article treats Performance and Caching as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **HTTP cache headers (Cache-Control, ETag)?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The role of a CDN?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **When facing a slow page, where should you look first?**
+  The first step is measuring, not optimizing. The article recommended Lighthouse, Performance tab, and `time.perf_counter()` or APM together because you must first separate whether the bottleneck is browser rendering, server TTFB, or database queries.
+- **What roles do browser cache and CDN each play?**
+  Browser cache makes responses reusable via `Cache-Control: public, max-age=31536000, immutable`—avoiding re-downloading the same CSS and images. CDN places those static assets closer to users, reducing transfer distance itself.
+- **What does lazy loading delay, and why is it useful?**
+  `loading="lazy"` on images and `await import("./editor.js")` for dynamic imports defer resources not immediately needed. Reducing initial download size improves perceived first-load speed, paying cost only when users actually need the resource.
 
 <!-- toc:begin -->
 ## In this series

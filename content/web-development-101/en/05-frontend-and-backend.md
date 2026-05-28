@@ -193,12 +193,12 @@ Boundaries are *promises about responsibility*. Next, we layer *authentication a
 
 ## Answering the Opening Questions
 
-- **How responsibility splits between frontend and backend?**
-  - The article treats Frontend and Backend as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **SPA (Single Page App) vs SSR (Server-Side Rendering)?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How the API contract bridges the two worlds?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Where does Frontend work end and Backend work begin?**
+  Frontend fetches JSON via `fetch("http://localhost:8000/api/items")` and renders `<li>` elements. Backend produces data like `[{"id": 1, "name": "apple"}]` at `/api/items`. Screen presentation and user interaction live in the browser; data processing and storage responsibility live on the server.
+- **Which side should own the source of truth for data?**
+  Backend owns data truth and sensitive decisions. The article emphasized doing password comparison server-side (`check_password(user, password)`) because browser code is readable and bypassable by anyone.
+- **How do SPA and SSR differ?**
+  SPA delivers HTML skeleton plus JavaScript first, then the browser fetches data and populates the DOM. SSR (like `render_template_string(...)`) has the server produce complete HTML per request. SSR favors initial load and SEO; SPA enables more flexible subsequent interactions.
 
 <!-- toc:begin -->
 ## In this series

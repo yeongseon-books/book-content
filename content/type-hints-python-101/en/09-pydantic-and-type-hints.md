@@ -397,12 +397,12 @@ In the final article, we will turn the series into an operating guide for applyi
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Pydantic and Type Hints?**
-  - The article treats Pydantic and Type Hints as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Pydantic and Type Hints?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Pydantic and Type Hints reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How can type hints become runtime validation?**
+  Declaring `CreateUserRequest(BaseModel)` and `UserResponse(BaseModel)` turns type hints into actual validation rules at FastAPI boundaries. Invalid JSON is blocked before reaching endpoint logic, and only validated values flow through to `UserResponse`.
+- **Where do Field, field_validator, and model_validator each fit in a request flow?**
+  `Field` declares basic constraints first (`min_length=3`, `ge=13`). Then `field_validator("username")` handles normalization (strip, lowercase). Finally `model_validator(mode="after")` checks cross-field relationships like password confirmation matching.
+- **What 422 response does FastAPI actually return for invalid requests?**
+  The article showed a `detail` array where each violation has `loc`, `msg`, and `type`—model-level failures appear as `loc: ["body"]` with messages like `password_confirm must match password`, making it traceable which boundary rejected the request.
 
 <!-- toc:begin -->
 ## In this series

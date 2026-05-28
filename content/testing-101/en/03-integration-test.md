@@ -220,12 +220,12 @@ Integration tests show what happens *when parts are connected*. The next post cl
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Integration Test?**
-  - The article treats Integration Test as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Integration Test?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Integration Test reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What does an integration test verify together?**
+  Integration tests verify data flow and state changes when multiple components operate together—catching issues that unit tests miss at boundaries.
+- **Why must you actually attach a real DB or HTTP layer?**
+  Attaching real DB or external APIs catches schema mismatches and protocol errors that unit tests with mocks would miss entirely.
+- **When are test containers and fixtures useful?**
+  Separating slow integration tests from the default run maintains developer feedback speed while CI still verifies thoroughly.
 
 <!-- toc:begin -->
 ## In this series

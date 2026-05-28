@@ -191,12 +191,12 @@ Coverage is a *health signal*, not *health itself*. The next post covers *regres
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Test Coverage?**
-  - The article treats Test Coverage as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Test Coverage?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Test Coverage reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do line, branch, and function coverage differ?**
+  Coverage tools measure which parts of code the tests actually executed—line coverage counts lines hit, branch coverage checks both sides of conditionals, function coverage confirms each function was called.
+- **How do you measure coverage with pytest-cov?**
+  The same coverage number can mean different things: line coverage may be 90% while branch coverage is only 70%, revealing untested conditional paths.
+- **How do you find code that tests haven't reached?**
+  Rather than chasing 100% coverage at all costs, verifying risky logic thoroughly first delivers better cost-efficiency.
 
 <!-- toc:begin -->
 ## In this series

@@ -187,12 +187,12 @@ Regression tests are *the team's memory*. In the next post we move all of these 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Regression Test?**
-  - The article treats Regression Test as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Regression Test?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Regression Test reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What does a regression test prevent?**
+  A regression test first reproduces the reported bug in test form—if the test fails, the bug exists; once fixed, the test guards against recurrence.
+- **What's the sequence for reproducing a bug and preserving it as a test?**
+  After fixing the bug, the regression test continues running permanently, watching for the same problem to reappear in future changes.
+- **Why is a minimal reproduction case important?**
+  As projects age, accumulated regression tests become increasingly valuable—making "bug fix = test addition" a habit ensures long-term protection.
 
 <!-- toc:begin -->
 ## In this series

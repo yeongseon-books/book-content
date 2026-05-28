@@ -350,12 +350,12 @@ In the next article, we will move from static verification to runtime validation
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Using mypy and pyright?**
-  - The article treats Using mypy and pyright as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Using mypy and pyright?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Using mypy and pyright reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do you verify type hints without running the code?**
+  Run `mypy src` or `pyright src`. The article demonstrated `normalize_user_id()` returning `str` instead of `int` and `build_greeting()` ignoring `display_name`'s None possibility—both tools caught these, and fixes made both pass.
+- **How do mypy and pyright show errors differently on the same code?**
+  Both catch the same bugs but differ in message format and error codes. mypy uses categories like `[return-value]` and `[union-attr]`; pyright uses editor-friendly diagnostic names like `reportReturnType` and `reportOptionalMemberAccess`.
+- **How do you introduce strict mode gradually to an existing repository?**
+  Don't enable strict across the entire repo at once. Start with core modules via overrides—`src.accounts` in `[[tool.mypy.overrides]]`, `strict` and `exclude` in `pyrightconfig.json`—plus CI workflows that fail new code first.
 
 <!-- toc:begin -->
 ## In this series

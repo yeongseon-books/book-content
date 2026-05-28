@@ -226,12 +226,12 @@ In the next article, we will explore basic types and collection types in detail,
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Are Python Type Hints??**
-  - The article treats What Are Python Type Hints? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Are Python Type Hints??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Are Python Type Hints? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do type hints differ from type declarations in statically typed languages?**
+  Type hints like `def greet(name: str) -> str` are optional annotations that Python's runtime doesn't enforce immediately. Instead, tools like mypy, pyright, and IDEs read these contracts for static analysis and autocompletion—unlike mandatory declarations in static languages.
+- **What problem was PEP 484 trying to solve?**
+  The core issue was signatures like `calculate_total(prices, tax_rate)` where input and return structure were unreadable from code alone. PEP 484 established a standard for placing public function contracts in code, enabling static analysis and safe refactoring across team codebases.
+- **What syntax attaches types to variables, parameters, and return values?**
+  Variables use `count: int = 0`, parameters use `name: str`, and return values use `-> str`. Collections use built-in generic syntax—`list[int]`, `dict[str, str]`, `tuple[float, float]`—to let tools track the actual contract.
 
 <!-- toc:begin -->
 ## In this series

@@ -199,12 +199,12 @@ Test doubles *tame external dependencies*. The next post zooms into the two most
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Test Double?**
-  - The article treats Test Double as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Test Double?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Test Double reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What does a test double replace?**
+  Test doubles substitute external dependencies to keep tests fast and isolated from infrastructure.
+- **How do Dummy, Stub, Spy, Mock, and Fake differ?**
+  Choosing the right double type (dummy, stub, spy, mock) for the situation lets you verify logic without unnecessary dependency calls.
+- **Which type should you pick in which situation?**
+  Overusing test doubles can prevent detecting contract changes with real dependencies—balance is needed between isolation and realism.
 
 <!-- toc:begin -->
 ## In this series

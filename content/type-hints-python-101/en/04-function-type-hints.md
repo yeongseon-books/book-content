@@ -263,12 +263,12 @@ In the next article, we will explore `TypedDict` and `dataclass` for typing stru
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Function Type Hints?**
-  - The article treats Function Type Hints as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Function Type Hints?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Function Type Hints reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do you type a parameter that receives a function itself?**
+  Use `Callable[[arg types], return type]`. The article showed `apply_operation(values: list[int], op: Callable[[int], int])` and `retry(func: Callable[[], T], attempts: int) -> T` connecting callback signatures to return types concretely.
+- **What do *args and **kwargs type annotations actually annotate?**
+  `*args: str` means each positional argument is a string; `**kwargs: int` means each keyword value is an integer. So in `log_call(*args: str, **kwargs: int)`, the analyzer infers `args` as `tuple[str, ...]` and `kwargs` values as `int`.
+- **How do you express a function whose return type varies by input type?**
+  Use `@overload` to list valid call signatures first, then provide one actual implementation. Separating `parse_value(raw: str) -> dict[str, str]` from `parse_value(raw: bytes) -> dict[str, bytes]` before a combined `str | bytes` implementation demonstrates the pattern.
 
 <!-- toc:begin -->
 ## In this series

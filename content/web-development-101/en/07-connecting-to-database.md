@@ -206,12 +206,12 @@ The DB is *the keeper of truth*. Next, we ship our app to the world — deployme
 
 ## Answering the Opening Questions
 
-- **Why we need a database in the first place?**
-  - The article treats Connecting to a Database as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The four basic SQL operations (SELECT/INSERT/UPDATE/DELETE)?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What an ORM is and when to use it?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why do web apps use databases instead of files?**
+  Appending strings to `open("users.txt", "a")` is vulnerable to concurrent access, lacks constraint enforcement, and has weak durability. Tables with `NOT NULL`, `UNIQUE` constraints, and `commit()` keep data and rules stable even across process restarts.
+- **What are SQL's four basic operations?**
+  `INSERT`, `SELECT`, `UPDATE`, and `DELETE` form CRUD. Using parameter binding (`VALUES (?, ?)`) ensures input is treated as values only—never breaking query structure.
+- **Where is an ORM convenient, and where does it hit limits?**
+  ORMs like SQLAlchemy let you write object-centric code with high productivity. But without knowing what SQL is generated, you miss N+1 queries and inefficient joins—ultimately you must be able to read generated SQL and transaction boundaries.
 
 <!-- toc:begin -->
 ## In this series

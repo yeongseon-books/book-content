@@ -187,12 +187,12 @@ Auth is *foundation*. Next, we look at the database connection that makes user d
 
 ## Answering the Opening Questions
 
-- **The difference between authentication and authorization?**
-  - The article treats Authentication and Sessions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How cookies and sessions actually work?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The structure of a JWT (token-based auth)?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do authentication and authorization differ?**
+  Authentication verifies identity at `/login` (who are you?). Authorization checks whether that authenticated user has permission to call a specific API (are you allowed?). Protected endpoints like `/me` must re-verify on every request regardless of login status.
+- **How does a server remember users over stateless HTTP?**
+  After successful login, the server stores state (`session["user"] = data["id"]`) and the browser sends the session cookie automatically on subsequent requests. Alternatively, JWT in `Authorization: Bearer ...` headers achieves the same over stateless HTTP.
+- **How do cookies and sessions interconnect?**
+  Session data lives in server-side storage; the cookie is merely the identifier delivery mechanism that finds that session again. The `curl -c c.txt` / `curl -b c.txt` examples and `session.clear()` for logout demonstrate this connection directly.
 
 <!-- toc:begin -->
 ## In this series

@@ -178,12 +178,12 @@ The browser is *a machine for drawing the DOM*. Next, we look at the bridge betw
 
 ## Answering the Opening Questions
 
-- **What the DOM is and how it gets built?**
-  - The article treats The Browser and the DOM as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The stages of the rendering pipeline?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How JavaScript manipulates the DOM?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What exactly is the DOM, and how is it created?**
+  The DOM is an object tree the browser builds from HTML text. In the article's example, `ul#list` has two `li` children. JavaScript then reads and manipulates nodes via `getElementById("list")` or `querySelectorAll("li")`.
+- **What stages make up the browser rendering pipeline?**
+  After building the DOM, the browser merges computed styles into a render tree, calculates positions/sizes in layout, then draws pixels in paint. DOM changes like `appendChild` trigger partial re-layout and re-paint—visible in the Performance tab.
+- **How does JavaScript read and modify the DOM?**
+  JavaScript uses DOM APIs—`createElement`, `textContent`, `appendChild`—to build and attach nodes, plus `addEventListener` for event delegation. The `console.log("1")`, `setTimeout(..., 0)`, `console.log("3")` example shows async callbacks execute via the event loop, so DOM change timing must be read within that order.
 
 <!-- toc:begin -->
 ## In this series

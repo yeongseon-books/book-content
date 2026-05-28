@@ -250,12 +250,12 @@ In the next article, we will explore function type hints in depth — including 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Optional and Union?**
-  - The article treats Optional and Union as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Optional and Union?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Optional and Union reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do you express in the type that a return value might be None?**
+  Use `Optional[str]` or `str | None` in the return type. As the `find_by_name()` and `find_user()` examples showed, putting None possibility in the signature forces callers to add `if email is not None` branches.
+- **What syntax covers a value that could be one of several types?**
+  Use `Union[int, str]` or Python 3.10+'s `int | str`. Write the allowed range first—like `format_id(value: int | str)`—then split processing paths with `isinstance` branches for safety.
+- **When is Python 3.10+'s X | Y syntax useful?**
+  It's especially useful for shorter, more readable signatures: `str | None` instead of `Optional[str]`, `int | str` instead of `Union[int, str]`. Reduces `typing` imports while preserving meaning.
 
 <!-- toc:begin -->
 ## In this series

@@ -204,12 +204,12 @@ Unit tests are *small, fast, and free of external dependencies*. The next post c
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Unit Test?**
-  - The article treats Unit Test as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Unit Test?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Unit Test reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What exactly does a unit test verify?**
+  A unit test is the smallest verification unit. It checks a single path through one function or method, so when it fails you immediately know which specific part broke.
+- **Why is the AAA pattern so widely used?**
+  AAA (Arrange, Act, Assert) cleanly separates the three phases, making tests readable. Following this pattern reveals test intent directly in code, easing maintenance.
+- **When do pytest's fixtures and parametrize help?**
+  Fixtures and parametrize reduce setup when multiple tests need the same data. To keep unit tests fast, they should use only in-memory data with no external dependencies.
 
 <!-- toc:begin -->
 ## In this series

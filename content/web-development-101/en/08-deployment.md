@@ -189,12 +189,12 @@ Deployment is *a habit*. Next, when the deployed app is *slow*, what do we look 
 
 ## Answering the Opening Questions
 
-- **Splitting dev / staging / production environments?**
-  - The article treats Deployment as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Managing environment variables and secrets?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The meaning of build and artifact?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do you move an app that only ran on a laptop to a production environment?**
+  Separate config into environment variables (`DATABASE_URL`), pin dependencies in `requirements.txt`, build a Docker image running `gunicorn`, then deploy via PaaS or CI/CD and verify with a `/health` endpoint.
+- **Why split into development, staging, and production environments?**
+  Separating environments lets you keep code identical while changing only config, lowering risk through verification stages. Promoting the same image from staging to production eliminates reproducibility problems from per-environment rebuilds.
+- **Why manage environment variables and secrets outside the repository?**
+  Code should only reference values (`os.environ["DATABASE_URL"]`) while actual secrets are injected externally—enabling revocation and rotation on exposure. Committing passwords or tokens makes environment switching harder and exposed secrets nearly impossible to recall.
 
 <!-- toc:begin -->
 ## In this series

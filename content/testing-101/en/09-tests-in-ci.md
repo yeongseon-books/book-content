@@ -195,12 +195,12 @@ CI is *the safety net for the whole team*. In the next post we tie everything to
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Running Tests in CI?**
-  - The article treats Running Tests in CI as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Running Tests in CI?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Running Tests in CI reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why is CI a necessary shared verification mechanism?**
+  Local environments differ per developer, and "it passes on my machine" has nearly zero value as verification. CI runs every PR in an identical clean environment with the same criteria, preventing false passes from environment differences and maintaining main branch quality at a level the entire team can trust.
+- **What structure does a GitHub Actions workflow follow?**
+  The standard form has `on:` (triggers: push/pull_request), `jobs:` with job units below, and each job containing `steps:` for checkout → dependency install → test execution. Heavy checks go in separate parallel jobs, and configuring signals for memory leaks or external dependency errors raises both merge speed and confidence.
+- **When do Python version matrices and caching help?**
+  Projects supporting multiple Python versions (libraries, tools) need `strategy: matrix: python-version: [3.10, 3.11, 3.12]` to verify all combinations and prevent regressions. Caching dependencies with `actions/setup-python`'s `cache: pip` avoids repeating heavy installs on every PR, speeding feedback.
 
 <!-- toc:begin -->
 ## In this series

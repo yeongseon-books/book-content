@@ -184,12 +184,12 @@ The web is a *concert of protocols*. Next, we look at the three things the brows
 
 ## Answering the Opening Questions
 
-- **The full path from URL to pixels on the screen?**
-  - The article treats How the Web Works as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The role of DNS, HTTP, and the browser renderer?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Where the client ends and the server begins?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What stages occur between entering a URL and seeing a page?**
+  The browser first resolves the domain to an IP (like `socket.gethostbyname("example.com")`), then sends an HTTPS request receiving status code, headers, and HTML body. After that it parses HTML and downloads additional resources (CSS, JavaScript) to build the DOM and render the page.
+- **What roles do DNS and HTTP each play?**
+  DNS converts names like `example.com` to connectable IP addresses. HTTP is the contract for exchanging request/response messages with the server at that address. Status codes and headers like `Content-Type` and `Cache-Control` visible in `curl -I` are core HTTP information.
+- **Once the server sends a response, how does the browser turn data into a visible page?**
+  The browser doesn't dump raw HTML—it parses the structure into a DOM, then layers CSS and JavaScript on top for layout and paint. The `re.search(r"<title>(.*?)</title>", html)` example extracting `<title>` demonstrates that responses are ultimately parseable text structures.
 
 <!-- toc:begin -->
 ## In this series

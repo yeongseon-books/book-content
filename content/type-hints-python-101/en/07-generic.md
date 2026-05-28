@@ -293,12 +293,12 @@ In the next article, we will cover mypy and pyright — the tools that actually 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Understanding Generics?**
-  - The article treats Understanding Generics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Understanding Generics?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Understanding Generics reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do you connect an input type directly to a return type?**
+  Declare `T = TypeVar("T")` then use it in both positions: `def identity(value: T) -> T` or `def first(items: list[T]) -> T`. So `first([1, 2, 3])` infers `int` and `identity("hello")` infers `str`—unlike `Any`, no information is lost.
+- **What's needed to make a reusable container class type-safe?**
+  Attach `Generic[T]` to the class to hoist the type parameter. The article's `Stack(Generic[T])`, `Page[T]`, and `Repository[T]` examples show `push`, `pop`, `items`, and `all()` sharing the same `T` to maintain the container's full contract.
+- **What's the difference between bound and constraint?**
+  `bound=Comparable` sets an upper type limit—only that type hierarchy is allowed. `TypeVar("Number", int, float)` directly lists permitted types as a constraint. The article's `find_min(items: list[C]) -> C` and `add(a: Number, b: Number) -> Number` demonstrate each.
 
 <!-- toc:begin -->
 ## In this series

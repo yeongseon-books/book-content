@@ -189,12 +189,12 @@ Tests turn *fear of change* into *confidence in change*. The next post starts at
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Is Testing??**
-  - The article treats What Is Testing? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Is Testing??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Is Testing? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What exactly does a test verify?**
+  A test records expected behavior in executable form. Unlike manual checks, once written it can be reused continuously—raising both team velocity and confidence in changes simultaneously.
+- **How does manual verification differ from automated testing?**
+  Manual verification is valid only at that moment; automated tests run again next week, even when someone else touches the code, applying the same criteria. This difference grows more critical as teams scale.
+- **How do unit, integration, and E2E tests differ?**
+  The three test types differ in verification scope and speed. Fast unit tests solidify core logic, integration tests confirm component connections, and E2E tests validate user flows.
 
 <!-- toc:begin -->
 ## In this series

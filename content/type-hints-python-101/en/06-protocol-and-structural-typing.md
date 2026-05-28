@@ -309,12 +309,12 @@ In the next article, we will explore Generics — parameterizing types with type
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Protocol and Structural Typing?**
-  - The article treats Protocol and Structural Typing as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Protocol and Structural Typing?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Protocol and Structural Typing reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Can you write an interface contract without inheritance?**
+  Yes. Define `class Closeable(Protocol): def close(self) -> None: ...` and any class with a matching `close()` structure—like `FileHandler`—passes as `Closeable` without explicit inheritance.
+- **How do ABC and Protocol differ?**
+  ABC (like `BasePlugin`) requires explicit inheritance and can share implementation. Protocol (like `Executable`) accepts any class with matching structure—including external ones. Use ABC for shared logic; Protocol for loose interface boundaries and external type acceptance.
+- **Can a Protocol be satisfied by attributes alone?**
+  Yes. `class Named(Protocol): name: str` as an attribute-only contract lets both `User` and `Product` pass as `Named` just by having `self.name`. Protocol covers both method and attribute contracts.
 
 <!-- toc:begin -->
 ## In this series

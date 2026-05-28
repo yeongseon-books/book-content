@@ -185,12 +185,12 @@ Three languages model the principle of *separation of concerns*. Next, we look a
 
 ## Answering the Opening Questions
 
-- **The *structure* HTML draws?**
-  - The article treats HTML, CSS, and JavaScript as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The *style* CSS applies?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The *behavior* JavaScript adds?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why is a web page split into three languages?**
+  Mixing structure, style, and behavior in one file means changing a heading color requires reading HTML and scripts together—expanding change scope. Removing `style="..."` and `onclick="..."` to separate HTML/CSS/JavaScript makes roles clear and simplifies both caching and code review.
+- **What does each of HTML, CSS, and JavaScript take responsibility for?**
+  HTML declares page skeleton (`<h1 class="title">`, `<button id="say">`). CSS defines visual rules (`.title { color: steelblue; }`). JavaScript handles user interaction—attaching a click listener to `getElementById("say")` that fires `alert("Nice to meet you")`.
+- **What connection points emerge when all three work together?**
+  HTML's `class` and `id` attributes are where CSS selectors and JavaScript DOM APIs meet. `<link href="style.css">` and `<script src="app.js" defer>` bind style and behavior to the same document, and the Elements tab shows the combined result.
 
 <!-- toc:begin -->
 ## In this series

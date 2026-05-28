@@ -260,12 +260,12 @@ In the next article, we will explore Protocol and structural typing — defining
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying TypedDict and dataclass?**
-  - The article treats TypedDict and dataclass as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for TypedDict and dataclass?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when TypedDict and dataclass reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do you express a dictionary with named keys and typed values?**
+  Use `TypedDict` to fix key names and value types. The article's `class UserProfile(TypedDict): name: str; age: int; email: str` example showed mypy catching key typos and missing required keys at analysis time.
+- **How do you create lightweight data objects with auto-generated __init__, __repr__, __eq__?**
+  `@dataclass` fits perfectly. Declaring `Product(name: str, price: int, quantity: int = 0)` auto-generates constructors and comparisons, and `frozen=True` (like the `Point` example) makes immutable value objects immediately.
+- **Where do patterns like optional keys, inheritance, and immutable objects apply?**
+  Optional keys use `TypedDict` inheritance with `total=False`. Immutable objects and mutable default issues use `@dataclass(frozen=True)` and `field(default_factory=list)`. The guideline: `TypedDict` for external I/O shapes, `dataclass` for internal computation models.
 
 <!-- toc:begin -->
 ## In this series
