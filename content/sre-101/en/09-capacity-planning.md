@@ -167,12 +167,12 @@ The final episode is *Building Operable Systems*.
 
 ## Answering the Opening Questions
 
-- **Why is capacity planning a future-demand problem instead of a past-usage replay?**
-  - The article treats Capacity Planning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why is headroom closer to insurance than to waste?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How should load tests be used to correct a forecast model?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why is capacity planning future demand forecasting, not past replication?**
+  Capacity planning looks at current utilization and future growth rate together, predicting when limits will be reached—not simply provisioning what was used last quarter.
+- **Why is headroom more like insurance than waste?**
+  Time-series metric data is needed to read trends, and business cycles plus seasonal variation must be factored in. Headroom absorbs unexpected spikes that would otherwise cause incidents.
+- **How does load testing calibrate prediction models?**
+  Responding after capacity runs out costs more than planning ahead. Load tests reveal actual breaking points vs. theoretical limits, correcting over-optimistic or over-pessimistic forecasts.
 
 <!-- toc:begin -->
 ## In this series

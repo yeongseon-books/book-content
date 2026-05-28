@@ -153,12 +153,12 @@ Confidence intervals are the tool for *visualizing uncertainty*. The next episod
 
 ## Answering the Opening Questions
 
-- **What does a 95% confidence interval really mean?**
-  - The article treats Confidence Interval as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why should we switch to the t-distribution on small samples?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What can we use when the distribution is skewed?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What does a 95% confidence interval actually mean?**
+  It means: if we repeated the sampling process many times, about 95% of the resulting intervals would contain the true population parameter. It's a statement about the procedure's reliability, not a probability that the parameter is "in" this specific interval.
+- **Why use a t-distribution instead of normal for the same 95% level with small samples?**
+  Small samples have more uncertainty about the true standard deviation, so the t-distribution's heavier tails account for this extra uncertainty. As sample size grows, t approaches normal.
+- **How can you construct intervals when the distribution is asymmetric?**
+  Bootstrap methods resample the data thousands of times to build empirical intervals without assuming normality. Narrow intervals enable faster decisions; wide intervals signal the need for more data.
 
 <!-- toc:begin -->
 ## In this series

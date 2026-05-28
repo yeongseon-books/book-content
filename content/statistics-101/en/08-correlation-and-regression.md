@@ -151,12 +151,12 @@ Correlation and regression are the most basic tools for *expressing relationship
 
 ## Answering the Opening Questions
 
-- **What does a correlation coefficient tell us, and what does it not tell us?**
-  - The article treats Correlation and Regression as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What extra information does a regression equation provide?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How should we interpret R²?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What does a correlation coefficient tell you, and what can't it tell?**
+  Correlation measures how strongly two variables move together (direction and strength). It cannot establish causation—two variables may correlate because of a shared hidden cause.
+- **What information does a regression equation provide beyond correlation?**
+  Regression gives a predictive formula: for each unit change in X, Y changes by the slope amount. But past patterns don't guarantee future outcomes, and extrapolation beyond observed data is risky.
+- **How should you read R² and within what range?**
+  R² (0 to 1) indicates the fraction of Y's variance explained by X. In operations, correlation and regression results should be periodically re-validated and models updated as new patterns emerge.
 
 <!-- toc:begin -->
 ## In this series

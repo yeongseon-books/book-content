@@ -147,12 +147,12 @@ The next post is *Explaining Example Code*.
 
 ## Answering the Opening Questions
 
-- **A *one line* definition?**
-  - The article treats Explaining Concepts as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Using an *analogy?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Using a *counterexample?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What should you show first to help a new reader understand a concept immediately?**
+  Anchor with a definition, open the door with an analogy, draw boundaries with a counter-example, and make it tangible with a concrete example—in that order.
+- **Why must analogies and counter-examples move together?**
+  Analogies create intuition, but counter-examples prevent over-generalization. Without counter-examples, readers extend the analogy beyond its valid scope.
+- **Why doesn't a one-line definition make an explanation stick?**
+  Definitions are abstract—readers struggle to apply them to real situations. Analogy, counter-example, and example together make concepts memorable and actionable.
 
 <!-- toc:begin -->
 ## In this series

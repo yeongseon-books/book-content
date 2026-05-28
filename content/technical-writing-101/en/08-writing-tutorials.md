@@ -168,12 +168,12 @@ The next post is *Blog vs Documentation*.
 
 ## Answering the Opening Questions
 
-- **Where a tutorial sits in *Diátaxis?**
-  - The article treats Writing Tutorials as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Stating *prerequisites?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Designing a *small win?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How does a tutorial differ from an explanation or a reference?**
+  A tutorial is learning-oriented: the reader follows steps to build something, gaining confidence through doing. Explanations provide understanding; references provide lookup. Mixing these confuses the reader's mode.
+- **How do you create a tutorial readers can follow and get working results?**
+  Every step must be executable with visible output. State prerequisites explicitly, keep steps small enough that failure is immediately localizable, and show expected results after each step.
+- **In what order should prerequisites, small wins, recovery guidance, and next steps appear?**
+  Prerequisites first (so readers don't start and fail), then progressive steps with small victories, recovery hints for common errors at each stage, and finally a pointer to what to learn next once they succeed.
 
 <!-- toc:begin -->
 ## In this series

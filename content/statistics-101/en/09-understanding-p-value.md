@@ -152,12 +152,12 @@ A p-value is *not proof*; it is a *measure of surprise*. The next episode wraps 
 
 ## Answering the Opening Questions
 
-- **What does the p-value actually mean?**
-  - The article treats Understanding p-value as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why is it so often misread?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How is p-value different from effect size?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What does a p-value precisely mean?**
+  A p-value is the probability of observing data at least as extreme as the current result, assuming the null hypothesis is true. It is NOT the probability that the null hypothesis is true.
+- **Why do many people misread p-values?**
+  Common misconceptions: "p < 0.05 means the effect is real" or "p = 0.05 is the universal threshold." The 0.05 threshold is convention—contexts may warrant stricter (0.01) or more lenient (0.10) cutoffs.
+- **How do p-value and effect size differ?**
+  P-value indicates statistical significance (could this be chance?); effect size indicates practical significance (how big is the difference?). In operations, report p-value, effect size, and confidence interval together for informed decisions.
 
 <!-- toc:begin -->
 ## In this series

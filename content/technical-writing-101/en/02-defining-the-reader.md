@@ -145,12 +145,12 @@ The next post is *Title and Structure*.
 
 ## Answering the Opening Questions
 
-- **Building a *persona?**
-  - The article treats Defining the Reader as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Mapping *prior knowledge?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Aligning the *goal?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why does writing "for everyone" end up helping no one properly?**
+  Targeting everyone means you can't decide explanation depth, terminology level, example difficulty, or non-goals. The result looks friendly but actually serves no one adequately.
+- **Why do sentences sharpen when you build a persona?**
+  A persona fixes your target reader as a clear reference point while writing. Every sentence aligns toward that reader—ambiguous phrasing becomes obvious when you ask "would my persona understand this?"
+- **How does writing prerequisites and goals first shrink scope?**
+  Listing non-goals alongside prerequisites clarifies what the document won't cover, enabling you to cut unnecessary explanations boldly.
 
 <!-- toc:begin -->
 ## In this series

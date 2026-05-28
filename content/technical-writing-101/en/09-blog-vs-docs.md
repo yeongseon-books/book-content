@@ -142,12 +142,12 @@ The next post is *Pre-publish Checklist*.
 
 ## Answering the Opening Questions
 
-- **The four quadrants of *Diátaxis?**
-  - The article treats Blog vs Documentation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The *lifespan* of blog vs docs?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What *blogs* do well?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why shouldn't blog posts and official docs be mixed?**
+  Blogs and docs serve different roles—mixing them erodes trust. Readers expect docs to be current and authoritative; blogs to be personal and time-stamped. When docs read like blog posts, readers question accuracy.
+- **How do their lifecycles and ownership differ?**
+  Blogs capture experience at a point in time (the author owns them, they age gracefully). Docs represent current truth (the team owns them, they must be updated or deleted). Different ownership means different update cadences.
+- **How does Diátaxis explain this difference?**
+  Diátaxis splits content into four zones by purpose: tutorials (learning), how-to guides (problem-solving), reference (lookup), and explanation (understanding). This framework prevents channel confusion by clarifying which zone each piece belongs to.
 
 <!-- toc:begin -->
 ## In this series

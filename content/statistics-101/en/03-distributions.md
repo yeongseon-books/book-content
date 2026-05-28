@@ -143,12 +143,12 @@ A distribution is the *personality of the data*. The next episode opens up *unce
 
 ## Answering the Opening Questions
 
-- **Why does the shape of a distribution matter?**
-  - The article treats Distributions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **Why does the shape of a data distribution matter?**
+  Histograms, boxplots, and QQ plots reveal the data's shape from multiple angles—without knowing the shape, you can't choose appropriate summary statistics or tests.
 - **How do normal, uniform, exponential, and power-law distributions differ?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  Knowing the distribution explains why different behaviors emerge from the same mean—exponential has rare extreme events while normal clusters around center.
 - **What do skewness and kurtosis tell us numerically?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  Unusual distributions can signal data collection errors, making them automatic alert criteria in operations. Skewness measures asymmetry; kurtosis measures tail heaviness.
 
 <!-- toc:begin -->
 ## In this series

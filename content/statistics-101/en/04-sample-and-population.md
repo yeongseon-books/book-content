@@ -142,12 +142,12 @@ Sample design is the *foundation of statistics*. The next episode enters the wor
 
 ## Answering the Opening Questions
 
-- **How do population and sample differ?**
-  - The article treats Sample and Population as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What makes a sample representative enough to trust?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why does random sampling appear so often in statistics?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do you distinguish a population from a sample?**
+  A population is the theoretical whole (e.g., all users on Earth); a sample is the actually measured subset (e.g., survey respondents collected so far).
+- **What's the key condition for making a sample resemble the population?**
+  Sample size and selection method (whether random or biased) determine inference accuracy. Larger random samples produce narrower confidence intervals.
+- **Why does random sampling appear so frequently?**
+  Conclusions from biased samples can backfire in production. Regularly verifying sample composition prevents systematic errors from propagating into decisions.
 
 <!-- toc:begin -->
 ## In this series

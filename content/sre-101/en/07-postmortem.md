@@ -149,12 +149,12 @@ Next, we cover *reducing toil*.
 
 ## Answering the Opening Questions
 
-- **Why is a postmortem closer to an organizational learning tool than to a simple report?**
-  - The article treats Postmortem as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why does blame suppress the very context a team needs to improve?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What sections should a useful postmortem always contain?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why is a postmortem closer to a learning device than a report?**
+  A postmortem divides the incident into timeline and action items, reframing individual technical failures as systemic design flaws—it's a process for understanding, not documenting.
+- **Why does critical information get omitted without blameless principles?**
+  In a blameless culture, people don't speak defensively. Information gaps, missing warning signals, and procedural holes—the real causes—surface naturally when no one fears punishment.
+- **What items must a good postmortem document always contain?**
+  A common template ensures everyone records facts, impact, causes, and follow-up actions in the same skeleton—relying on structure rather than writing skill.
 
 <!-- toc:begin -->
 ## In this series

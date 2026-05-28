@@ -143,12 +143,12 @@ Estimation is the act of *writing uncertainty as a number*. The next episode loo
 
 ## Answering the Opening Questions
 
-- **How well can a sample mean stand in for a population mean?**
-  - The article treats Estimation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What is the difference between point estimation and interval estimation?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How is standard error different from standard deviation?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How well can a sample mean stand in for the population mean?**
+  We use sample statistics (e.g., mean) to approach the unknown true population value. The sample mean is an unbiased estimator, but individual samples vary.
+- **What's the difference between point estimation and interval estimation?**
+  Point estimation gives a single best guess; interval estimation provides a range expressing uncertainty. Larger, more random samples make both more accurate.
+- **How does standard error differ from standard deviation?**
+  Standard deviation measures spread within one sample; standard error measures how much sample means vary across repeated samples. In operations, showing confidence ranges (e.g., ±2%) alongside estimates clarifies team judgment.
 
 <!-- toc:begin -->
 ## In this series

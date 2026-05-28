@@ -142,12 +142,12 @@ Congrats on finishing the series. Next, head into *Incident Response 101* and st
 
 ## Answering the Opening Questions
 
-- **Why is operability a design property instead of a post-launch enhancement?**
-  - The article treats Building Operable Systems as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why do observability, automation, safe change, and resilience need to be judged together?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What should a team ask first when auditing whether a system is truly operable?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why is operability a design element, not an option bolted on after features?**
+  Operability isn't achieved by "inserting" monitoring and alerts after code is written. Decisions about which signals to expose, which changes are safe, and how to recover from failure must happen at the interface, data-model, and deployment-structure stages to create systems operable without ongoing cost.
+- **Why must observability, automation, safe change, and resilience be viewed together?**
+  The four axes complement each other. Without observability, automation doesn't know what to do. Without safe change (canary/rollback), automation spreads incidents faster. Without resilience, observing problems doesn't help if you can't respond. One strong axis means nothing when another axis's weakness determines total operational cost.
+- **What questions should you ask first when checking whether a system is operable?**
+  Ask: "Where does failure happen, what signal reveals it, who notices, and how quickly?" "Can changes be applied and rolled back incrementally?" "How far does automatic recovery extend without waking someone at 3 AM?" Parts that can't answer clearly are next quarter's operational burden source—considering operations at design time dramatically reduces future manual work.
 
 <!-- toc:begin -->
 ## In this series

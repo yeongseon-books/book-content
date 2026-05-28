@@ -141,12 +141,12 @@ Next, we look at the *definition* and *models* of *reliability*.
 
 ## Answering the Opening Questions
 
-- **What does SRE actually mean beyond “the people who handle incidents”?**
-  - The article treats What is SRE? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How is SRE different from DevOps even though the two ideas often overlap?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why does SRE treat reliability work as a software problem instead of a staffing problem?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **SRE isn't just another name for the operations team—what does it actually mean?**
+  SRE distinguishes operational boundaries (input → validation → signal) and defines what to measure and decide at each boundary. It's a discipline that applies software engineering practices to operations problems.
+- **Why are SRE and DevOps frequently mentioned together but not synonymous?**
+  DevOps emphasizes collaboration culture; SRE concretizes that collaboration into measurable targets and automation. The step-by-step SLO construction in this article reveals exactly this difference.
+- **What practical difference does treating reliability as a product feature make?**
+  The core is using error budget—calculated failure headroom—as the reference point for both release velocity and stabilization work, placing two seemingly unrelated activities within the same decision framework.
 
 <!-- toc:begin -->
 ## In this series

@@ -161,12 +161,12 @@ The next post is *Using Figures and Tables*.
 
 ## Answering the Opening Questions
 
-- **A *minimal* example?**
-  - The article treats Explaining Example Code as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Where to place *comments?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Writing a *callout line?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why do readers get lost even when code is included?**
+  Without marking what's core, what to execute, and what output is normal, code becomes an obstacle rather than explanation.
+- **In what order should minimal example, explanation lines, and expected output be arranged?**
+  Code → run command → expected output → explanation lines. This lets readers execute and verify first, then understand—matching how practitioners actually learn.
+- **When should you split between in-code comments and prose explanation?**
+  Single-line essentials go in inline comments; overall flow and trade-offs go in surrounding prose. This prevents code blocks from becoming walls of comments while keeping context accessible.
 
 <!-- toc:begin -->
 ## In this series

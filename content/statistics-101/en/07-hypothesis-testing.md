@@ -153,12 +153,12 @@ Hypothesis testing is the *standard language of decisions*. The next episode loo
 
 ## Answering the Opening Questions
 
-- **How far can data support the claim that a difference exists?**
-  - The article treats Hypothesis Testing as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What do H0 and H1 actually mean?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why is p-value alone not enough?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How far can data support the claim that "a difference exists"?**
+  The null hypothesis states "no change." We look for evidence that the data is incompatible with this null—strong evidence lets us reject it, but absence of evidence isn't evidence of absence.
+- **What do H0 (null hypothesis) and H1 (alternative hypothesis) mean?**
+  H0 is the default assumption (no effect); H1 is what we suspect (there is an effect). A small p-value means the observation would be rare under H0, giving grounds to reject it.
+- **Why is p-value alone insufficient for decisions?**
+  In operations, you must also examine effect size and business impact alongside test results. A statistically significant but tiny effect may not justify action; a large effect with borderline p-value might.
 
 <!-- toc:begin -->
 ## In this series

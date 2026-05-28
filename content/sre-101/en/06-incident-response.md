@@ -146,12 +146,12 @@ Next, we cover *postmortems*.
 
 ## Answering the Opening Questions
 
-- **Why does incident response depend so heavily on team structure instead of only on technical skill?**
-  - The article treats Incident Response as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why should severity be defined by impact rather than intuition?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What should an Incident Commander do directly, and what should they deliberately avoid doing?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why is incident response driven more by team structure than individual skill?**
+  When roles are separated, the IC focuses on coordination, the ops lead on recovery, and the comms lead on announcements. Eliminating role conflicts enables faster response.
+- **Why must severity be defined by impact criteria, not gut feeling?**
+  Defining severity by affected user count, duration, and whether core functionality is down lets anyone reach a similar judgment. Response intensity and escalation scope then follow consistently.
+- **What should an Incident Commander do directly, and what should they not?**
+  The IC handles priority decisions, role assignment, timeline recording, escalation, and closure declaration. Technical work—code debugging, server access, log analysis—goes to the ops lead and subject-matter experts.
 
 <!-- toc:begin -->
 ## In this series

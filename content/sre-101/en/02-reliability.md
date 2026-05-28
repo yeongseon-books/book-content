@@ -147,12 +147,12 @@ Next, we cover the difference between *SLI*, *SLO*, and *SLA*.
 
 ## Answering the Opening Questions
 
-- **What does it mean to describe reliability as a measurable property instead of a general sense of stability?**
-  - The article treats Reliability as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why are availability and latency related but not interchangeable?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **When do correctness and durability matter more than raw uptime?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What's needed to see reliability as a measurable value rather than a vague sense of stability?**
+  Splitting reliability into four dimensions (availability, latency, correctness, durability) makes each measurable and enables judging current state by those values. It also helps catch problems missed when only a single metric is watched.
+- **Why do availability and latency look similar but represent different problems?**
+  Availability shows whether the service is alive; latency measures how long users actually waited. Using percentiles like p95 and p99 reveals perceived quality in the slower tail far better than averages.
+- **In which systems do correctness and durability become especially critical?**
+  Correctness and durability are the first dimensions to check in data-centric systems (payments, permissions, settlements, messaging). Being fast but wrong, or losing data, directly shakes business trust.
 
 <!-- toc:begin -->
 ## In this series

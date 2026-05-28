@@ -148,12 +148,12 @@ Statistics is the tool that moves *uncertainty* into *decisions*. The next episo
 
 ## Answering the Opening Questions
 
-- **What does statistics actually study?**
-  - The article treats What Is Statistics? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How are descriptive statistics and inferential statistics different?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How does statistics connect numbers to decision-making?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What exactly does statistics as a discipline deal with?**
+  Statistics divides into summarization (descriptive statistics) and inference (inferential statistics), and always concludes with a decision statement—not just numbers.
+- **How do descriptive and inferential statistics differ in role?**
+  As the five-step exercise showed: question → data check → summary → test → decision. Descriptive statistics handles steps 2-3; inferential statistics handles step 4; the decision connects them to action.
+- **How does statistics connect to decision-making rather than just number-crunching?**
+  In practice, when metrics like mean and variance appear on dashboards, they always show uncertainty ranges alongside—this is what earns team confidence in data-driven decisions.
 
 <!-- toc:begin -->
 ## In this series

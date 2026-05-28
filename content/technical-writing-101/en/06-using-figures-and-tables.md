@@ -149,12 +149,12 @@ The next post is *Writing the README*.
 
 ## Answering the Opening Questions
 
-- **Flowcharts* and *sequence diagrams?**
-  - The article treats Using Figures and Tables as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Comparison* and *decision* tables?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Writing *captions?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **When is a figure better than a paragraph?**
+  Figures convey structure faster than text when sequence and boundaries matter. Request flows, responsibility boundaries, and branching conditions—anything with directionality—transfer understanding faster as diagrams.
+- **When does a table show comparison more clearly?**
+  Tables place multiple options side by side against the same criteria, reducing decision time. Use them whenever readers need to compare 3+ items across 2+ dimensions.
+- **Why are captions and alt text part of the content, not decoration?**
+  Captions direct the reader's eye to what matters in the figure; alt text conveys meaning in accessibility contexts. Both contribute to content quality.
 
 <!-- toc:begin -->
 ## In this series

@@ -141,12 +141,12 @@ The next post is *Defining the Reader*.
 
 ## Answering the Opening Questions
 
-- **A definition of *technical writing?**
-  - The article treats What Is Technical Writing as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The difference from *everyday* prose?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The *three purposes?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How does technical writing differ from general writing?**
+  Technical writing doesn't end at explanation—it's designed so readers can act immediately. Every section should move the reader toward a concrete outcome.
+- **Why must technical writing extend beyond explanation to reader action?**
+  Because it must save reader time: commands should actually execute, results should be visible, and the reader should be able to verify success without guessing.
+- **What becomes clearer when you split a technical document's purpose into reader, task, outcome, and scope?**
+  Defining each element upfront prevents the writing from drifting in direction and makes scope boundaries explicit—you know what to include and what to exclude.
 
 <!-- toc:begin -->
 ## In this series

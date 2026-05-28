@@ -150,12 +150,12 @@ Statistics is the *language of uncertainty*, and statistical thinking is the *fl
 
 ## Answering the Opening Questions
 
-- **Is statistics a collection of formulas or a way of thinking?**
-  - The article treats Statistical Thinking as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How do question, data, distribution, estimation, and testing connect?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How should p-value, effect size, and business cost come together in one decision?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Is statistics a collection of formulas, or a way of thinking?**
+  Statistics is the bridge between raw numbers and informed judgment—without it, you have either just numbers or just feelings. It's fundamentally a thinking framework.
+- **How do question, data, distribution, estimation, and testing connect in sequence?**
+  The flow is: question → data collection → descriptive statistics → inference → decision. Never scramble this order—each step's output feeds the next.
+- **How do p-value, effect size, and cost enter judgment together?**
+  In operations, document the analysis process transparently, state assumptions explicitly, and validate periodically. Decisions combine statistical evidence with business context and implementation cost.
 
 <!-- toc:begin -->
 ## In this series

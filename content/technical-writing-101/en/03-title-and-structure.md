@@ -158,12 +158,12 @@ The next post is *Explaining Concepts*.
 
 ## Answering the Opening Questions
 
-- **SEO* titles?**
-  - The article treats Title and Structure as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **H heading* hierarchy?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Intro, body, summary* shape?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why must a good title and good structure always move together?**
+  The title promises a reader outcome; the structure delivers that promise step by step. A good title with blurry structure loses readers mid-way; good structure with a vague title never gets found in search. Design both as a set during the draft stage.
+- **How does a title become a promise, and how does structure deliver it?**
+  The title compresses the reader's destination into one sentence; structure arranges the shortest path to that destination via headings and paragraphs. As the flat vs. nested structure comparison showed, heading order and depth dramatically change the reader's time-to-destination.
+- **In what order should title, outline, body, and wrap-up interlock?**
+  The title makes the promise, the outline shows the path, the body explains along that path, and the wrap-up pushes the reader toward their next action. The "15-minute draft check routine" and "structure quality checklist" are inspection tools that prevent this sequence from breaking.
 
 <!-- toc:begin -->
 ## In this series

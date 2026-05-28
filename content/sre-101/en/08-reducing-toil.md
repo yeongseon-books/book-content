@@ -142,12 +142,12 @@ Next, we cover *capacity planning*.
 
 ## Answering the Opening Questions
 
-- **What separates toil from valuable operational work that still takes time?**
-  - The article treats Reducing Toil as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How can a team measure how much capacity is disappearing into repetitive work?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Which automation candidates should move first if time is limited?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How does toil differ from normal operational work?**
+  Toil is "repetitive, manual, automatable, scales linearly with service growth, yet produces no lasting value." Not all ops work is toil—design reviews, incident retrospectives, and system-understanding work aren't classified as toil even if repeated.
+- **How do you measure how much team time goes to repetitive manual work?**
+  Rather than vague feelings, label on-call tickets, repeated PRs, and manual ops tasks over one or two weeks and sum the hours. Compare against the SRE guideline of "under 50% of engineer time"—some toil isn't worth automating when you see automation cost vs. labor cost together.
+- **Which tasks should you automate first for maximum ROI?**
+  Prioritize tasks where frequency, time-per-occurrence, and error risk are all high. Without automation the team stays trapped in repetitive work and reliability improvements or feature development time shrinks. Items where "build once, save N hours/week + reduce human error" is clearest go to the automation backlog first.
 
 <!-- toc:begin -->
 ## In this series

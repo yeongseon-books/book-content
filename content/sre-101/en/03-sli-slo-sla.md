@@ -182,12 +182,12 @@ Next, we cover the *error budget*.
 
 ## Answering the Opening Questions
 
-- **Where exactly is the line between an indicator, an objective, and an external agreement?**
-  - The article treats SLI, SLO, SLA as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why should internal targets and customer-facing promises almost never be the same document?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What information makes an SLO operational instead of decorative?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What role does each of SLI, SLO, and SLA play, and where do their boundaries lie?**
+  SLI defines metrics at the measurement layer, SLO sets targets at the operational layer, and SLA establishes compensation at the contractual layer. They form three tiers: start with measurement, pass through operational targets, and finish with external promises.
+- **Why should internal targets and external promises not live in the same document?**
+  SLOs are operational criteria with explicit owners that let internal teams judge quickly and experiment. SLAs are contract documents specifying compensation liability to external customers. Different owners, different risks.
+- **What information must a good SLO contain beyond the target number?**
+  Numbers alone don't enable operational judgment. Measurement window, owner, and data source must all be present so that when the target is violated, someone knows what to look at and what action to take. These three make an SLO actionable rather than aspirational.
 
 <!-- toc:begin -->
 ## In this series

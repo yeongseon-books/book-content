@@ -164,12 +164,12 @@ The next post is *Writing Tutorials*.
 
 ## Answering the Opening Questions
 
-- **The *five part* structure?**
-  - The article treats Writing the README as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Writing the *Quick Start?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Using *badges?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Can a first-time visitor run the project within 5 minutes using only the README?**
+  A good README answers this with yes—through a quick-start block that shows exact commands, expected output, and prerequisites with no ambiguity.
+- **Why do README sections almost always repeat the same order?**
+  The pattern (What/Why → Quick Start → Configuration → Development → Further Reading) matches how developers scan: first they decide relevance, then they try running it, then they dig deeper only if needed.
+- **Why is a shorter Quick Start stronger?**
+  Every extra line in Quick Start is a potential failure point and a reason to abandon. Three commands that provably work beat ten that might work.
 
 <!-- toc:begin -->
 ## In this series

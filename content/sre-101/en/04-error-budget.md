@@ -146,12 +146,12 @@ Next, we cover the *fundamentals of monitoring*.
 
 ## Answering the Opening Questions
 
-- **Why does an error budget become the common language between speed and stability?**
-  - The article treats Error Budget as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How do you calculate the allowed failure from an SLO target?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why do total budget spend and burn rate answer different operating questions?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why does error budget become a shared language between velocity and stability?**
+  Error budget converts the abstract tension between "ship faster" and "don't break things" into a concrete number both sides can reference. When budget remains, teams can ship aggressively; when it's depleted, stability work takes priority—same metric, same decision framework.
+- **After setting an SLO, how do you calculate the allowable failure range?**
+  If your SLO is 99.9% availability over 30 days, the error budget is 0.1% × 30 days = ~43 minutes of allowed downtime. Dividing budget into time periods shows spending rate and lets you compare planned deployments against remaining headroom.
+- **Why do cumulative burn and burn rate answer different questions?**
+  Cumulative burn shows total budget consumed so far—useful for monthly reviews. Burn rate shows how fast you're consuming right now—useful for alerting. A high burn rate with plenty of remaining budget triggers a different response than a low burn rate near exhaustion.
 
 <!-- toc:begin -->
 ## In this series

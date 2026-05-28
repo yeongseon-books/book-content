@@ -145,12 +145,12 @@ Summary statistics is a tool for *briefly conveying the shape* of data. The next
 
 ## Answering the Opening Questions
 
-- **When should we use the mean, and when should we use the median?**
-  - The article treats Mean, Median, and Variance as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What do variance and standard deviation tell us that the mean cannot?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What happens to summary statistics when one extreme outlier appears?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **When representing data with a single number, should you use mean or median?**
+  Comparing mean and median on real data reveals whether the distribution is symmetric or skewed. When outliers pull the mean away from center, the median better represents typical values—as the exercise demonstrated.
+- **What do variance and standard deviation reveal that the mean cannot?**
+  Variance and standard deviation quantify spread—two datasets can share the same mean but have vastly different variability. IQR complements these by being robust to extreme values.
+- **How do summary statistics change when a single extreme value is mixed in?**
+  A single outlier can shift the mean dramatically while barely affecting the median. This is why robust measures (median, IQR) are preferred for skewed data in operational reporting.
 
 <!-- toc:begin -->
 ## In this series

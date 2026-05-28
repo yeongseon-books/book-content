@@ -165,12 +165,12 @@ Next, we cover *incident response*.
 
 ## Answering the Opening Questions
 
-- **How is monitoring different from simply collecting a large amount of telemetry?**
-  - The article treats Monitoring as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why do latency, traffic, errors, and saturation have to be read together?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What questions do metrics answer better than logs, and where does that boundary flip?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How does monitoring differ from mere data collection?**
+  Monitoring isn't just collecting data—it's a system for deciding whether to act immediately based on collected metrics. If an alert fires but no one knows what to do, that metric is merely a record, not monitoring.
+- **Why must latency, traffic, errors, and saturation be viewed together?**
+  Each metric answers a different question: latency asks "is it slow?", traffic asks "is demand normal?", errors asks "are failures rising?", saturation asks "are resources hitting limits?" Viewing just one easily leads to misreading the overall situation.
+- **What questions do metrics and logs each answer?**
+  Metrics show current state numerically and are suited for finding anomaly timing. Logs record specific requests, error messages, and stack traces for root-cause analysis. Use metrics to find *when* something went wrong, logs to find *why*.
 
 <!-- toc:begin -->
 ## In this series

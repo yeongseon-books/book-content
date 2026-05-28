@@ -159,12 +159,12 @@ This is the *final* post in *Technical Writing 101*. The next series covers *Ope
 
 ## Answering the Opening Questions
 
-- **Title* review?**
-  - The article treats Pre-publish Checklist as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Link* validation?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Code* execution?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What should you check last before hitting publish?**
+  Title accuracy, all links working, code blocks executing correctly, images loading, metadata complete—these are the minimum. A single broken link or non-running code example undermines the entire piece's credibility.
+- **Why should title, links, code, images, and post-publish response be treated as one routine?**
+  They form a single quality chain: a misleading title attracts wrong readers, broken links strand them, non-working code frustrates them, missing images confuse them, and no post-publish monitoring means you never learn about these failures.
+- **Why is post-publish fix cost far higher than pre-publish check cost?**
+  Once published, wrong information propagates through shares, bookmarks, and search indexes. Corrections require announcements, redirects, and reputation recovery. Five minutes of pre-publish checking prevents days of post-publish damage control.
 
 <!-- toc:begin -->
 ## In this series
