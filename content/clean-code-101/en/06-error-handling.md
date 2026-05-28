@@ -232,12 +232,12 @@ Treat errors as first-class but never as the lead role. Next: an often misused t
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Error Handling?**
-  - The article treats Error Handling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Error Handling?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Error Handling reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do you decide whether to throw an exception or return a value?**
+  - If the caller can branch and handle the failure on the spot, return a value like `Result(ok, value, error)`. If recovery is difficult and an upper layer must decide, raise an exception. The `parse_int`, `FetchError`, `ValidationError`, `InfraError` examples showed that boundary.
+- **When is Fail Fast especially important?**
+  - When invalid input would otherwise propagate deeper—blocking negative amounts in `transfer(amount)` or validating missing/zero `amount` at the entry of `handle_http_request`. Surfacing problems early preserves cause and prevents retry policies from attaching incorrectly.
+- **When is the "error as value" pattern useful?**
+  - For parsing, validation, and user-input processing where failure is expected and the caller needs to branch within normal flow. This pattern makes success/failure test cases easy to place side by side and prevents abusing exceptions for flow control.
 
 <!-- toc:begin -->
 ## In this series

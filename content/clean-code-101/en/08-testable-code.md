@@ -221,12 +221,12 @@ Testability mirrors design. Next: how to safely change code — refactoring basi
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Testable Code?**
-  - The article treats Testable Code as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Testable Code?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Testable Code reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How should pure logic and side effects be separated?**
+  - Extract computation-centric core as pure functions first; push time, HTTP, and DB side effects to thin adapters at the boundary. `total(items)` and `compute_invoice_total` stay in the core; `fetch_user(uid, http)` and adapter classes live at the edge.
+- **How does dependency injection create test seams?**
+  - Accepting external dependencies as arguments (`is_business_hour(now)`, `issue_coupon(user_id, clock)`, `fetch_user(uid, http)`) lets you substitute `FakeClock` or a fake HTTP client. Each injection point becomes a seam—the same logic wires differently in production vs test.
+- **When should you use Fake vs Spy?**
+  - Fake (`FakeRepo`, `FakePaymentGateway`) when you need a simplified stand-in that produces results. Spy (`EmailSpy`, `SpyNotifier`) when you need to verify call count and arguments. Simplify state/results → Fake. Verify interaction contract → Spy.
 
 <!-- toc:begin -->
 ## In this series

@@ -212,12 +212,12 @@ Small functions enable names and tests. Next, the chief reason for big functions
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Small Functions?**
-  - The article treats Small Functions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Small Functions?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Small Functions reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What effect do small functions produce?**
+  - The body reads like a table of contents rather than implementation detail. Splitting `checkout` into `validate_cart`, `price_with_tax`, `save_order`, `notify_user` makes reading, testing, and responsibility tracing all easier.
+- **In what order should Extract Function be applied safely?**
+  - Extract a meaningful unit (like a loop body) first, name it for intent, then progress to Command/Query separation and parameter objects. Like `line_total`, `Range`, and `should_split_function`—peel off chunks with clear responsibility one at a time rather than reshaping everything at once.
+- **What's the most representative pattern for reducing side effects?**
+  - Command-Query Separation (removing state changes from queries) and extracting calculations as pure functions. The more functions like `discount(price, rate)` that return the same output for the same input, the faster unit tests run and the further external dependencies are pushed to the boundary.
 
 <!-- toc:begin -->
 ## In this series

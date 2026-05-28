@@ -234,12 +234,12 @@ Fewer conditions, clearer code. Next we tackle the second great enemy: duplicati
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Simplifying Conditionals?**
-  - The article treats Simplifying Conditionals as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Simplifying Conditionals?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Simplifying Conditionals reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **When are guard clauses and early returns most effective?**
+  - When you need to filter out abnormal inputs or edge cases first, leaving the happy path clearly visible. The `approve_refund` and `price(user, item)` examples returned early on `None`, inactive users, and out-of-stock items—letting the core policy stand alone at the end.
+- **Why do negated conditions and double negatives hurt readability?**
+  - `if not is_not_empty(x)` forces the reader to flip the condition mentally, raising cognitive cost. The article recommended positive names with simple guards: `if not user.is_active: return False` reads in one direction without inversion.
+- **When should if/else chains be replaced with polymorphism?**
+  - When type branching repeats or rules like user tiers and regional policies are added frequently. `Shape.area()`, `POLICIES`, `FREE_SHIPPING_POLICY` show the goal: adding a new rule without touching existing `if/elif` bodies.
 
 <!-- toc:begin -->
 ## In this series

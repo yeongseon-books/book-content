@@ -209,12 +209,12 @@ A good review is a mirror of clean code. Names, functions, branches, duplication
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Good Code Review Standards?**
-  - The article treats Good Code Review Standards as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Good Code Review Standards?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Good Code Review Standards reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How large should a reviewable PR be?**
+  - Roughly 400 lines or less, carrying one responsibility. Splitting function extraction, rename, and policy addition into separate PRs—as the examples showed—lets reviewers read intent and risk quickly.
+- **What does a Clean Code review checklist include?**
+  - Are names and function boundaries clear? Are exception and failure boundaries explicit? Are tests and CI green? Does the PR description include What/Why/How/Risk? The checklist verifies evidence across correctness, readability, stability, extensibility, and operability—not just individual lines.
+- **What form should a good review comment take?**
+  - Priority tags like `MUST`, `SUGG`, `NIT`, `QUESTION` plus observation, risk, suggestion, and verification request together. The `order_total is 60 lines` example and `ReviewAction` template show comments that give the author clear next choices to act on.
 
 <!-- toc:begin -->
 ## In this series

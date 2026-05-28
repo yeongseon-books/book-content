@@ -203,12 +203,12 @@ Clean code is the sum of small, measurable principles. Next, we look at the sing
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Is Clean Code??**
-  - The article treats What Is Clean Code? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Is Clean Code??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Is Clean Code? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What signals should you check first when judging Clean Code?**
+  - Function length, argument count, nesting depth, name honesty, and cyclomatic complexity. Attaching measurable tools like `radon cc app/ -a -s` and `ruff check app/` turns quality judgment from opinion into evidence.
+- **What distinguishes working code from readable code?**
+  - Renaming `f(d, t)` to `total_with_tax(amount, tax_rate)` makes intent and units visible at the call site. Same behavior, but clear names and structure let the next person locate what to change far faster.
+- **Why do small principles create large differences in maintenance cost?**
+  - As the quality dashboard, `QualityGate`, and `change_impact_score` examples showed, small principles compound into review time, bug count, and change failure rate. Fixing one name and one branch builds a habit that lowers both exploration cost and incident risk for every subsequent change.
 
 <!-- toc:begin -->
 ## In this series

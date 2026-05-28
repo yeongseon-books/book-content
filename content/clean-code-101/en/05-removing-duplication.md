@@ -212,12 +212,12 @@ DRY is about a single source of change. Next, we tidy up another rotting place: 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Removing Duplication?**
-  - The article treats Removing Duplication as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Removing Duplication?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Removing Duplication reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What does DRY actually mean?**
+  - Not "reduce line count" but "keep each piece of knowledge in a single source." When policies like `PRICING_RULES`, `PLANS`, `calculate_tax` live in one place, changes don't create divergent truths.
+- **How do you distinguish accidental resemblance from essential duplication?**
+  - Essential duplication shares the same change trigger, domain term, failure impact, and deploy timing—as the `is_essential_duplication` example codified. Merging code that merely looks similar leads to bloated parameters and exception flags—failed abstractions.
+- **In what order should extraction and parameterization be applied?**
+  - Wait until the third repetition; extract common logic first; parameterize only when the difference truly reduces to a single value. `with_tax(price, rate)` and `greet(name, lang)` show parameters that keep call sites simple—avoiding mini-framework over-abstraction.
 
 <!-- toc:begin -->
 ## In this series

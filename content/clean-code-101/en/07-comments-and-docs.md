@@ -222,12 +222,12 @@ Good comments are few and accurate. Next we tackle what truly decides a codebase
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Comments and Documentation?**
-  - The article treats Comments and Documentation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Comments and Documentation?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Comments and Documentation reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **When is it better *not* to write a comment?**
+  - When names and structure alone convey intent. Instead of `# increment i by 1`, rename to `get_active_users()` or `can_purchase(is_active_user, stock_quantity)` so the code reads on its own—and outlasts comments that drift.
+- **How do intent comments and warning comments differ?**
+  - Intent comments explain *why* an implementation was chosen (e.g., payment gateway returns 200 but body status must still be checked). Warning comments alert callers to danger ("Do not call inside a transaction"). Neither repeats what the code does—both communicate background or risk that code alone can't convey.
+- **What rules should Python docstrings follow?**
+  - Treat docstrings as contract documents, not implementation descriptions. Specify `Args`, `Returns`, `Raises` with input units and exception conditions. The `discount` and `calculate_refund_amount` examples let callers know what to pass and what to expect—aligning tests and docs on the same contract.
 
 <!-- toc:begin -->
 ## In this series

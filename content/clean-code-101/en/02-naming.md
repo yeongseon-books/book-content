@@ -197,12 +197,12 @@ Naming is the single highest-leverage readability tool. Next we shrink the unit 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Naming?**
-  - The article treats Naming as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Naming?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Naming reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What signals identify a good name?**
+  - Intention-revealing, searchable, pronounceable, and domain-aligned. Names like `SECONDS_PER_DAY`, `DEFAULT_SALES_TAX_RATE`, `calculate_invoice_subtotal` satisfy meaning and searchability simultaneously.
+- **How do variable, function, and class naming differ?**
+  - Variables reveal value meaning and unit (`invoice_total_cents`); functions carry verb + purpose (`calculate_order_total`); classes are role-centered nouns (`InvoiceRepository`). The standard shifts based on what the name promises to callers—not one rule for all.
+- **How do you bring domain terms naturally into code?**
+  - Map user expressions to code terms 1:1 (as the domain-term table showed) and use the same words in tests and API schemas: `order_total_cents`, `payment_confirmed`, `discount_coupon`. Alignment cuts translation cost in meetings, PRs, and incident response, and makes rename scope obvious.
 
 <!-- toc:begin -->
 ## In this series

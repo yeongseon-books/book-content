@@ -213,12 +213,12 @@ Refactoring is an investment that lowers the next change's cost. The final episo
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Refactoring Basics?**
-  - The article treats Refactoring Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Refactoring Basics?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Refactoring Basics reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What exactly is refactoring, and how does it differ from rewriting?**
+  - Refactoring improves internal structure without changing external behavior. The difference from rewriting is moving in small steps between green tests. Splitting into `subtotal`, `with_coupon`, `with_member` keeps results identical while making read and change structure better.
+- **What are the core techniques from the Fowler catalog?**
+  - Extract Method, Rename, Move Field/Function, Introduce Parameter Object, Inline Function. The `Order.total_with_tax()`, `items_subtotal`, `next_refactor_step` examples concretely showed when to decompose long functions, relocate responsibility, and undo over-abstraction.
+- **Why are characterization tests important for legacy code?**
+  - Legacy code often must be touched before its behavior is fully understood. Tests like `test_legacy_total()` pin current behavior as a safety net, so subsequent extractions, renames, and moves can be judged as structural improvements rather than accidental behavior changes.
 
 <!-- toc:begin -->
 ## In this series
