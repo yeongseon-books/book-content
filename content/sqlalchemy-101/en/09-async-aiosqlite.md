@@ -268,11 +268,11 @@ The next episode covers production patterns: pool sizing, pre-ping, observabilit
 ## Answering the Opening Questions
 
 - **The shape of SQLAlchemy 2.x's async stack: `create_async_engine`, `AsyncEngine`, `AsyncSession`?**
-  - The article treats Async SQLAlchemy with aiosqlite and AsyncSession as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - The basic structure is nearly identical to the sync version — engine, session factory, and ORM patterns like `select(User)` carry over. The differences: `async with SessionLocal()` and `await session.execute(...)` are mandatory, DDL requires `await conn.run_sync(Base.metadata.create_all)` to wrap sync functions at async boundaries, and `expire_on_commit=False` is practically the default.
 - **How to wire the `aiosqlite` driver to use SQLite from async code?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - Specifying `sqlite+aiosqlite:///./app.db` rather than `sqlite:///` lets SQLAlchemy select the async DBAPI adapter and configure the `AsyncEngine` path. The article showed `postgresql+asyncpg` alongside to emphasize that the first step of async migration is the URL dialect+driver string.
 - **A one-to-one mapping from sync patterns to async (`session.execute`, `session.scalars`)?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - In sync code, lazy relationship access is just one extra SELECT. In async, that hidden IO immediately surfaces as a `MissingGreenlet` error. So eager loading like `selectinload(User.posts)`, explicit `await session.flush()`, and per-request session teardown — making every IO boundary explicit in code — are required to maintain predictable behaviour.
 
 <!-- toc:begin -->
 ## In this series

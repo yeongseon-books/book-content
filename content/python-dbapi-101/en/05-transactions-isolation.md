@@ -377,11 +377,11 @@ The next post covers **row factories and type adapters** — returning rows as d
 ## Answering the Opening Questions
 
 - **Why does sqlite3 issue an implicit BEGIN by default?**
-  - The article treats Transactions and isolation levels (sqlite3, PEP 249) as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - The hands-on section showed that `con.in_transaction` stays `False` after a plain `SELECT` and flips to `True` right after the first `INSERT`. In sqlite3's default mode, a transaction opens just before the first DML and closes after `commit()` or `rollback()` — and `con.in_transaction` lets you verify that boundary directly.
 - **What does `isolation_level=None` actually mean?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - The article compared `DEFERRED` (deferring conflict until the first write), `IMMEDIATE` (grabbing a RESERVED lock at `BEGIN` to surface writer conflicts earlier), and `EXCLUSIVE` (blocking even readers). Adding WAL lets readers and writers coexist longer, so the operational default is typically `IMMEDIATE` plus `WAL`.
 - **How do `BEGIN DEFERRED`, `IMMEDIATE`, and `EXCLUSIVE` differ in lock behaviour?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - Commit omissions are reduced with the `with sqlite3.connect(...) as con:` pattern; long lock waits are absorbed upstream with `timeout`, `busy_timeout`, `isolation_level='IMMEDIATE'`, and WAL settings. Nested operations are handled not through PEP 249 built-in features but via SQLite `SAVEPOINT` examples for partial rollback.
 
 <!-- toc:begin -->
 ## In this series

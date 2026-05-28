@@ -351,11 +351,11 @@ The next post (Episode 10, the series finale) consolidates production patterns: 
 ## Answering the Opening Questions
 
 - **How does `aiosqlite` work under the hood? Is it real async I/O?**
-  - The article treats Asynchronous SQLite with aiosqlite as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - The article described `aiosqlite` as an adapter that dispatches sqlite3 calls to a per-connection background thread and returns results as Futures. What changes is the execution style — the event loop is no longer blocked — not SQLite's single-writer constraint or the connection's internal serial execution model.
 - **How should you hold connections and transactions in an async path?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - `async with aiosqlite.connect(...)` manages the connection create/close boundary; `transactional()` manages the transaction boundary from `BEGIN IMMEDIATE` through `commit()`/`rollback()`. `SQLitePool` handles only connection reuse outside those, so lifetime management, transaction management, and queue control stay cleanly separated.
 - **What does the `async with` syntax guarantee, and what does it not?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - Putting synchronous `sqlite3` in an async path blocks the event loop during `execute()`, stalling all other requests on the same worker — defeating the very purpose of adopting `aiosqlite`. Sharing one connection across multiple coroutines can scramble call order and transaction boundaries, which is why the article recommended borrowing one connection per coroutine from a pool and fixing initialization/shutdown in the lifespan.
 
 <!-- toc:begin -->
 ## In this series

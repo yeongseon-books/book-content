@@ -295,11 +295,11 @@ The next episode moves the same patterns to async. We will use the `aiosqlite` d
 ## Answering the Opening Questions
 
 - **How to attach lifecycle hooks at the model, session, and engine levels using the SQLAlchemy event system?**
-  - The article treats Events, hybrid_property, and custom types as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - The article split extension points into three layers. `TypeDecorator` transforms values on write and read — like `LowerString` and `JSONText`. `hybrid_property` provides both a Python attribute and a SQL expression — like `full_name` and `net_amount`. Events hook into specific lifecycle moments — `before_insert`, `before_flush`, `before_cursor_execute`.
 - **How to validate inputs with `@validates`?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - `@validates` suits values like `email` and `score` that need immediate validation and normalization at setter time, blocking bad data before it enters the session. Mapper events are more natural for common post-processing at flush time — filling timestamps in `before_insert` or computing audit values in `before_update`.
 - **How to define `hybrid_property` so the same attribute works in Python and in SQL?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - The core goal is to avoid rewriting the same domain rule separately for objects and queries. As the `Person.full_name` and `Invoice.net_amount` examples showed, reading as a property on instances and reusing as a SQL expression in `select(...).where(...)` keeps search and filter conditions semantically consistent.
 
 <!-- toc:begin -->
 ## In this series

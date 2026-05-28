@@ -345,11 +345,11 @@ The next post moves from errors to connections themselves: SQLite's thread-safet
 ## Answering the Opening Questions
 
 - **What do the eight PEP 249 exceptions mean and how are they related?**
-  - The article treats PEP 249 Exception Hierarchy and SQLite Error Handling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - The article regrouped PEP 249 exceptions by operational decision: `IntegrityError` as business-rule violations, `OperationalError` as partial retry candidates, and `ProgrammingError`/`InterfaceError` as code bugs. The `create_user()` example converted a UNIQUE violation to `DuplicateEmail` and surfaced only transient lock issues as `TransientDBError`, letting callers choose different responses.
 - **How does `sqlite3` map SQLite error codes (SQLITE_BUSY, SQLITE_CONSTRAINT, ...) to PEP 249 classes?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - The table showed that BUSY and LOCKED, though in the same class, are retry candidates, while CORRUPT should enter a `DatabaseError` recovery procedure. So Python 3.11+'s `sqlite_errorname` and `sqlite_errorcode` are needed to accurately distinguish retryable lock contention from corruption requiring recovery.
 - **Which of `OperationalError`, `IntegrityError`, `ProgrammingError` is safe to retry and which one is a bug?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - The `transfer()` example placed the entire `with conn:` block inside the retry-target function so that on failure, the transaction restarts from scratch. Retrying only a partial `execute()` or `commit()` can mix already-changed and unchanged state, so the retry unit must always be the atomic transaction.
 
 <!-- toc:begin -->
 ## In this series

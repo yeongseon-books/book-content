@@ -376,11 +376,11 @@ That table is a fast reality check against the most common mistake in ACA archit
 ## Answering the Opening Questions
 
 - **How does a managed environment map internally to node pools and namespaces?**
-  - The article treats Environment internals — the network, observability, and Dapr scope boundary as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - An Environment is not a folder for apps but a secure boundary that determines whether apps share the same VNet perimeter, DNS suffix, Log Analytics workspace, and Dapr component registry. Once apps are placed in the same Environment, they share these platform boundaries before any individual app settings.
 - **Can you explain how many IPs the infrastructure subnet needs, and exactly why?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - Revisions are immutable runtime snapshots without their own network islands, and per-app external/internal ingress selection ultimately sits on top of the Environment's subnet, internal flag, static IP, and outbound type. Moving an app to a different Environment is therefore closer to changing its network identity and reachability contract than a simple placement change.
 - **If you swap the Log Analytics workspace, who breaks and what falls silent?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - Sharing a workspace at the Environment level means cross-app troubleshooting can happen in one place, but retention, access control, and cost attribution are also bundled. Since the actual signal producers are Apps, Revisions, and Dapr sidecars, operations must read shared collector boundary and individual producers separately.
 
 <!-- toc:begin -->
 ## In this series

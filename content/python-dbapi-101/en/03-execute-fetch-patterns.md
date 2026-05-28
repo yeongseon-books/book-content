@@ -223,11 +223,11 @@ The next episode covers parameter binding and SQL injection defense.
 ## Answering the Opening Questions
 
 - **When do you reach for execute, executemany, fetchone, fetchall, vs fetchmany?**
-  - The article treats execute, executemany, and Fetch Patterns as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - `execute()` for a single SQL statement, `executemany()` for the same INSERT/UPDATE with multiple parameter sets. For reads: `fetchone()` for PK lookups, `fetchall()` for small result sets, and `fetchmany()` or `for row in cur` for batch processing — controlling both memory and round-trip count.
 - **How do you process large result sets without blowing up memory?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - The basic answer is to replace `fetchall()` with cursor iteration or `fetchmany(chunk)`. As in the `export_notes()` example, setting `cur.arraysize = chunk` and looping `while True: rows = cur.fetchmany(chunk)` keeps memory constant regardless of row count.
 - **What metadata does cursor.description expose?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - `cursor.description` provides column metadata for the last SELECT result as a list of 7-tuples; the examples used `col[0]` and `col[1]` for name and type_code. This lets you safely read column names in code even before introducing a dict conversion or row factory.
 
 <!-- toc:begin -->
 ## In this series

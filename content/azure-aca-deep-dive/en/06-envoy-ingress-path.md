@@ -366,11 +366,11 @@ az containerapp hostname list -n my-app -g my-rg -o table
 ## Answering the Opening Questions
 
 - **Is ACA's ingress just one layer of Envoy, or is there another proxy on top?**
-  - The article treats The Envoy ingress path — how the first request reaches your container as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - FQDN, TLS termination, forwarded headers, traffic split, and session affinity — the parts Microsoft documents — should be read as the ACA-managed ingress surface. Behind that, weighted upstream selection and service-style fan-out reaching ready replica sets is the most defensible internal model, grounded in Envoy and Kubernetes patterns.
 - **How does the same hostname split between external and internal ingress?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - TLS terminates at the ingress point by default, not at the user container. The app receives internal HTTP requests along with `X-Forwarded-Proto`, `X-Forwarded-For`, and potentially `X-Forwarded-Client-Cert`. Absolute URL generation, scheme-aware redirects, and client-IP logging therefore require the framework to trust these proxy headers.
 - **Where does TLS terminate, and how is mTLS to the backend actually guaranteed?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - Revision traffic split becomes real not after the request enters the user container but at the ingress-routing step after TLS termination. Envoy-style weighted destinations first select upstreams like `rev-blue` and `rev-green`, and only then does a service-style hop reach the chosen Revision's ready replica set.
 
 <!-- toc:begin -->
 ## In this series

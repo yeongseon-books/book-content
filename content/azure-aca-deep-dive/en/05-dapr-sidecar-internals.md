@@ -425,11 +425,11 @@ az containerapp env dapr-component set \
 ## Answering the Opening Questions
 
 - **What lifecycle does the Dapr sidecar have in ACA, and how does it stay in sync with the app container?**
-  - The article treats Dapr sidecar internals — the Go process that lives next to your container as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - Enabling Dapr is not just adding a name to app settings — an actual `daprd`-family sidecar process is added alongside the user container. The result is a second runtime with localhost ports 3500 and 50001, sidecar health endpoint, separate log stream, component loading, and mTLS with trust material.
 - **Service invocation gives you mTLS, retry, and timeout 'for free' — where does the bill actually land?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - The most defensible reference point is upstream Dapr's pod mutation model. A mutating-admission-webhook-style injector computes values like app ID, app port, protocol, probe, trust anchor, and control-plane address, then attaches the `daprd` container and arguments — explaining ACA's hidden injection process without overstatement.
 - **Are state-store and pub/sub component definitions environment-scoped or app-scoped?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - These ports are the actual local contract between app and sidecar — apps send service-invocation, state, and pub/sub requests here, and operators check sidecar status at `/v1.0/healthz` and `/v1.0/metadata`. At the same time, a successful localhost call only means the request reached the sidecar, so it must be distinguished from external failures like missing component scope or backing-service timeouts.
 
 <!-- toc:begin -->
 ## In this series

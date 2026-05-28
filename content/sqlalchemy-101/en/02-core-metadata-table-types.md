@@ -468,11 +468,11 @@ Next post we use these schema objects to build SQL for real. We'll cover 2.x sty
 ## Answering the Opening Questions
 
 - **What a `MetaData` object is and why it becomes the single source of truth for your schema?**
-  - The article treats SQLAlchemy Core - Modeling Schema as Python Objects with MetaData, Table, and Column as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - `MetaData` is called a schema catalog because it gathers `Table` definitions like `users`, `posts`, and `memberships` in one in-memory location. That's why `metadata.create_all(engine)` can create the entire schema at once, and in Alembic the same object serves as `target_metadata` — the migration baseline.
 - **How to declare a `Table` in Python, and the key `Column` options (primary_key, nullable, unique, index, default, server_default)?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - With string-only SQL, a typo like `emai` surfaces late as an `OperationalError` in production. With object access like `users.c.email`, IDE autocomplete and `AttributeError` catch it earlier. Constraints like `UniqueConstraint`, `Index`, and `ForeignKey("users.id")` co-locate with the definition, keeping schema intent from scattering.
 - **How SQLAlchemy's generic types (`Integer`, `String`, `Text`, `Boolean`, `DateTime`, `Numeric`, `JSON`) map to SQLite affinities?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - Generic types like `String(100)`, `DateTime`, and `JSON` are expanded by SQLAlchemy into dialect-specific DDL, so the same model works across SQLite and other databases. However, as the article noted, SQLite's affinity model means `String(100)` does not enforce length — length validation must be reinforced separately in the application or via `CHECK` constraints.
 
 <!-- toc:begin -->
 ## In this series

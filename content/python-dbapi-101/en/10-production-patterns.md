@@ -359,11 +359,11 @@ Thanks for reading.
 ## Answering the Opening Questions
 
 - **How should retry, timeout, and `busy_timeout` be configured together?**
-  - The article treats SQLite Production Patterns: retry, timeout, observability, backup as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - The article distinguished `sqlite3.connect(timeout=5.0)` and `PRAGMA busy_timeout=5000` as mechanisms controlling how long a single SQL call waits for a lock, versus application retry as the policy for how many times to re-attempt the call itself. The production default is not lengthening just one, but setting `busy_timeout=2000–5000ms` alongside `max_attempts=3–5` to manage both delay ceiling and success probability.
 - **How do you automate slow-query logging, and how do you pick the threshold?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - `timed_query()` logs calls exceeding `SLOW_QUERY_THRESHOLD_MS`, `trace_query()` records `db.system=sqlite` and duration in spans, and the retry decorator's attempt increments reveal the BUSY rate. Viewing these three signals together identifies performance regressions, lock contention, and tracing gaps at different layers.
 - **How do you instrument SQLite calls with OpenTelemetry?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - The article established that `cp` cannot guarantee consistency of a file mid-transaction and should be banned for production backups. Instead, `Connection.backup()` preserves online consistency, and `restore_check()` verifying `PRAGMA integrity_check` plus key-table row counts is needed to confirm a backup is actually restorable.
 
 <!-- toc:begin -->
 ## In this series

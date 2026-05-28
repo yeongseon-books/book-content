@@ -310,11 +310,11 @@ Manual inspection through `echo` regresses easily. In tests, switch on `raiseloa
 ## Answering the Opening Questions
 
 - **What code, exactly, produces an N+1 query pattern?**
-  - The article treats Loading Strategies and the N+1 Problem: When to Pick lazy, joined, or selectin as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - After `users = session.scalars(select(User)).all()`, accessing `u.orders` inside a loop fires one `SELECT orders WHERE user_id = ?` per user on top of the initial user-list query. As the DTO serialization example showed, the service function looks fine but N+1 explodes during response assembly — a particularly common case.
 - **How do `lazy="select"` (the default), `joinedload`, and `selectinload` differ at the SQL level?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - `joinedload(User.orders)` attaches a `LEFT OUTER JOIN orders` to the parent SELECT and fetches everything at once, requiring `unique()` to deduplicate parent rows. `selectinload(User.orders)` runs the parent `SELECT users` first, then a second `WHERE user_id IN (...)` SELECT to pull child collections in one batch.
 - **Why is `selectinload` typically the safer default for collections (one-to-many, many-to-many)?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - For one-to-many and many-to-many collections, `joinedload` inflates row count by the parent×child product, increasing transfer volume. `selectinload` offers a better balance of query count and row count. The article used `selectinload` as the basis for list APIs, pagination, and query-budget tests for exactly this reason.
 
 <!-- toc:begin -->
 ## In this series

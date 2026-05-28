@@ -429,11 +429,11 @@ This part closes out the Azure Functions Deep Dive series. Part 1 covered host b
 ## Answering the Opening Questions
 
 - **Of host bootstrap, worker start, and JIT, which is the most expensive part of a Functions cold start?**
-  - The article treats Cold Start and Placeholder Mode — What Happens When a New Instance Is Born as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - Rather than lumping cold start into a single item, this article splits it into placeholder common preparation and post-specialization cost. The segment users feel most is inside `SpecializeHostCoreAsync` — re-reading the environment, specializing the worker, then waiting through `RestartHostAsync` and `DelayUntilHostReadyAsync`.
 - **What exactly does the Placeholder instance prepare in advance?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - A Placeholder instance is not an empty shell but a host with the `InitializedFromPlaceholder` marker, `WarmUp` function files, a specialization-detection timer, and a JIT warmup path all pre-built. It completes common bootstrap and warmup preparation after VM allocation, so that when a user app is assigned, only specialization needs to run on top.
 - **How does a Premium-plan always-ready instance differ from a placeholder?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - A placeholder has only common preparation done and will perform specialization later. Flex Consumption Always Ready and Premium pre-warmed instances are closer to keeping specialization-complete instances alive longer. So in Consumption you frequently pay the placeholder → specialization cost, while Always Ready and pre-warmed reduce how often you hit that path at all.
 
 <!-- toc:begin -->
 ## In this series

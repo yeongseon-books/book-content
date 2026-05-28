@@ -378,11 +378,11 @@ Together, these commands turn the big-picture diagram into an operator check: en
 ## Answering the Opening Questions
 
 - **What abstractions does ACA stack on top of which abstractions, exactly?**
-  - The article treats ACA architecture — what Microsoft layered on a hidden Kubernetes as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - ACA is not an entirely new runtime but a service that layers product surfaces — Environment, Revision, KEDA, Dapr, Envoy — on top of a Microsoft-managed Kubernetes substrate. So the settings visible in the portal are most accurately read not as a flat feature list but as translations into network boundary, immutable snapshot, scale control loop, sidecar runtime, and ingress routing layer respectively.
 - **Who owns and upgrades the managed components (KEDA, Dapr, Envoy) inside an environment?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - Microsoft hides cluster API endpoints, node access, control plane, and global add-ons — the Kubernetes operations side. Users still need to understand why a new Revision isn't receiving traffic, why KEDA-style scaling parks replicas at zero, and what signals to watch in the Dapr sidecar and Envoy paths.
 - **ACA runs on AKS under the hood — what obligations does that move to Microsoft, and what stays with you?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - Apps in the same Environment share a virtual network boundary, DNS context, Log Analytics destination, and Dapr component scope. So choosing an Environment is not a deployment convenience but an architecture decision about which workloads may share the same network, observability, and middleware boundary.
 
 <!-- toc:begin -->
 ## In this series

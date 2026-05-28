@@ -507,11 +507,11 @@ The ORM enters in the next post. Post 4 covers `DeclarativeBase` and `mapped_col
 ## Answering the Opening Questions
 
 - **The unified 2.x `select()` shape: `select(...)`, `where()`, `order_by()`, `limit()`, `offset()`, `group_by()`, `having()`?**
-  - The article treats SQLAlchemy Core - select, insert, update, delete in 2.x Style as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - Chaining clauses like `select(users.c.id, users.c.name).where(...).order_by(...).limit(...)` produces a new immutable statement each time, and `conn.execute(stmt)` returns a `Result`. You then choose between `Row`, `.scalar_one()`, `.scalars().all()`, or `.mappings().all()` — remembering that `Result` is single-use.
 - **The `Result` object and the meaning of `.all()`, `.first()`, `.one()`, `.one_or_none()`, `.scalars()`, `.mappings()`?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - Write operations default to `with engine.begin() as conn:` as the article showed, and results can be checked immediately via `insert(...).returning(...)` or `update(...).rowcount`. The article also proposed an application-level `safe_delete` helper because a WHERE-less `delete(users)` leads to full-table deletion.
 - **`insert(table).values(...)` and the `executemany`-style list-of-dicts form?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - Core expresses complex SQL within the same expression system using `join`, `subquery()`, `cte("recent")`, and `func.count(...).label("post_count")`. The article's `users`/`posts` JOIN, `%news%` subquery, and per-user post-count aggregation examples demonstrate that pattern.
 
 <!-- toc:begin -->
 ## In this series

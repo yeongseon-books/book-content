@@ -368,11 +368,11 @@ The next post covers **transactions and isolation levels** — the precise meani
 ## Answering the Opening Questions
 
 - **Why is building SQL with f-strings dangerous?**
-  - The article treats Parameter binding and SQL injection defense (sqlite3, PEP 249) as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - The article showed the flow where the SQL parser treats `?` exclusively as a value placeholder and the value binder then inserts user input as a string value, illustrated with a diagram. In `find_user_BAD()` the attack string merged into SQL syntax, but in `find_user_OK()` the same string was treated as a plain value — producing an empty result.
 - **When do you use `?` versus `:name` placeholders?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - The article explained in a table that sqlite3 supports both `qmark` and `named`, while other drivers may use `format` or `pyformat`. So you should know whether your current code uses `?` or `:name`, and before migration check `module.paramstyle` first to safely match the placeholder syntax.
 - **How does binding work with `executemany` for bulk inserts?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - For `IN (...)`, dynamically building the right number of placeholders while still separating actual values via `execute(sql, ids)` is safe. For `ORDER BY` direction, table names, and column names — which are not binding targets — only values that pass whitelist validation like `ALLOWED` and `ALLOWED_DIR` should be interpolated as strings.
 
 <!-- toc:begin -->
 ## In this series

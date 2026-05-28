@@ -424,11 +424,11 @@ The next post covers **error handling and the exception hierarchy** — the eigh
 ## Answering the Opening Questions
 
 - **How do you receive default tuple results as dict, dataclass, or Pydantic models?**
-  - The article treats Row factories and type adapters (sqlite3, PEP 249) as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - The article positioned `sqlite3.Row` as the lightest default — suitable when you need name-based access with good performance. Dict is for simple serialization, while dataclass and Pydantic suit API and domain layers where type validation and IDE support matter.
 - **What is `sqlite3.Row` and when is it enough?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - The article showed registering `sqlite3.register_adapter()` and `sqlite3.register_converter()` once at the connection-factory level, then enabling actual conversion with `detect_types=PARSE_DECLTYPES | PARSE_COLNAMES`. This keeps `Decimal` precision intact and prevents `Enum` and JSON from leaking as raw strings or bytes outside the repository.
 - **What does `detect_types` actually detect?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - Column-order problems are addressed by switching from `row[0]` to name-based row factories. Money stored as `REAL` should use a `Decimal` adapter with `TEXT` or `INTEGER` storage instead. For views and joins where declared types disappear, the article showed using `AS "x [type]"` aliases with `PARSE_COLNAMES` to force converters.
 
 <!-- toc:begin -->
 ## In this series

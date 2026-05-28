@@ -230,11 +230,11 @@ This series ends here. The next series, **alembic-101**, turns the migration pol
 ## Answering the Opening Questions
 
 - **The core connection pool options (`pool_size`, `max_overflow`, `pool_pre_ping`, `pool_recycle`)?**
-  - The article treats Production patterns: pools, observability, migrations, and deploys as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - The article said to consider average concurrent requests, per-request DB hold time, worker count, and the DB's `max_connections` together when setting `pool_size` and `max_overflow`. It also noted that SQLite's strong single-writer constraint makes a large `QueuePool` less practical than `StaticPool` or smaller pool settings.
 - **How to choose between `QueuePool`, `NullPool`, and `StaticPool`, especially for SQLite?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - `pool_pre_ping=True` checks whether a pooled connection is already dead with `SELECT 1`, reducing stale-connection 5xx errors during off-peak hours. `pool_recycle=1800` replaces connections that have been idle too long before reuse, mitigating collisions with DB or load-balancer timeouts. The article's production-default snippet always includes these two options for this reason.
 - **How to wire SQL queries into traces with OpenTelemetry?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - Engine events `before_cursor_execute` and `after_cursor_execute` log query count and latency as structured logs, and query-budget assertions in tests catch N+1 at CI time. In production, adding OpenTelemetry traces, pool-wait-time metrics, and P95/P99 SQL latency dashboards is the key to tracking which release introduced a bottleneck.
 
 <!-- toc:begin -->
 ## In this series

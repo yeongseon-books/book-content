@@ -409,11 +409,11 @@ This chapter intentionally separates ACA product facts from the hidden routing i
 ## Answering the Opening Questions
 
 - **Revisions are immutable — exactly which field changes spawn a new revision?**
-  - The article treats Revisions and traffic splitting — where Envoy weights come from as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - Revision-scope changes in the `template` — image, container settings, scale rules — create a new immutable Revision. Application-scope changes in `configuration` — ingress, traffic split, labels, secrets — change exposure policy while keeping the existing Revision set intact.
 - **Where in the ingress layer does traffic split happen, and can it be session-sticky?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - In single-revision mode, the main URL simply switches to the new Revision once readiness is confirmed, and the previous Revision is automatically cleaned up. In multiple-revision mode, multiple Revisions stay active simultaneously, and you directly manage routing policies — main-URL weight adjustment, 0%-active Revision preservation, canary, blue-green operations.
 - **Where does the cap on simultaneously active revisions come from, and why that number?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - Traffic weight distributes requests probabilistically on the main app URL — `orders-api--blue=90`, `orders-api--green=10`. Labels are stable direct URLs attached to specific Revisions, used to separate QA, smoke-test, and operator-confirmation paths from customer traffic — and they make clear that an active Revision can be at 0% on the main URL.
 
 <!-- toc:begin -->
 ## In this series

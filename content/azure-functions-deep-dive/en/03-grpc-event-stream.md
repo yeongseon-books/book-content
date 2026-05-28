@@ -313,11 +313,11 @@ This is part 3 of the Azure Functions Deep Dive series. Part 2 stopped at proces
 ## Answering the Opening Questions
 
 - **What kinds of messages does the host-to-worker gRPC stream carry, and how?**
-  - The article treats The gRPC Event Stream — What Do the Host and Worker Actually Exchange? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - Host and worker share a single `FunctionRpc.EventStream` and multiplex lifecycle, function-load, invocation, log, and status messages over it via `StreamingMessage.oneof`. Messages like `StartStream`, `WorkerInitRequest/Response`, `FunctionLoadRequest`, and `InvocationRequest/Response` all travel on the same bidirectional stream, distinguished by `request_id` and per-worker channel context.
 - **When the stream drops, what does the host assume, and what does the worker assume?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - On the host side, an outbound write failure or inbound reader termination is treated as a broken per-worker channel contract — the channel is closed and the host enters the reconnect-or-restart path. The key assumption is that the `EventStream` with that specific worker is no longer valid, regardless of whether the cause was a simple network blip.
 - **How do large payloads flow over the stream, and where are the hard limits?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - The default path carries data directly inside gRPC frames via `TypedData`, but when both host and worker advertise the capability, a shared-memory path sends only `RpcSharedMemory` location info. The limits therefore emerge not from the message type alone but from payload size, serialization cost, and whether the worker implementation actually supports shared memory.
 
 <!-- toc:begin -->
 ## In this series

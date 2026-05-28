@@ -300,11 +300,11 @@ This is part 4 of the Azure Functions Deep Dive series. Parts 1-3 established th
 ## Answering the Opening Questions
 
 - **Through what stages does the dispatcher split a single invocation?**
-  - The article treats Dispatcher and Invocation — How a Function Call Reaches the Worker as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - A single invocation starts with trigger detection, then `WorkerFunctionInvoker` creates a `ScriptInvocationContext`, the dispatcher serializes it into an `InvocationRequest` and sends it through the per-worker outbound channel. The worker response returns via the inbound channel, wakes the original `TaskCompletionSource` matched by `invocation_id`, and finally the SDK completes post-processing like queue deletion or HTTP response.
 - **Where is the invocation context born, and who tears it down?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - In the out-of-proc path, `WorkerFunctionInvoker` creates the invocation context containing function metadata, input data, trace context, cancellation token, and the `TaskCompletionSource` for awaiting the result. Teardown is not a separate mechanism — when the worker response matches by `invocation_id` and completes the `TaskCompletionSource`, the invocation lifecycle closes naturally.
 - **Where in the dispatcher do concurrency controls (maxConcurrentRequests, batchSize) take effect?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - `batchSize` changes how many work items the trigger listener reads at once on the front end, while `maxConcurrentRequests` caps concurrent HTTP request handling. Meanwhile, worker count and `WorkerChannelThrottleProvider` throttle parallelism just before invocations are dispatched to worker channels — so although they look like the same concurrency setting, they operate at different layers.
 
 <!-- toc:begin -->
 ## In this series

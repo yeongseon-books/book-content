@@ -336,11 +336,11 @@ A plain association table only fits clean many-to-many mappings. The moment you 
 ## Answering the Opening Questions
 
 - **What does `relationship()` actually do, and how does it relate to `ForeignKey`?**
-  - The article treats ORM Relationships: Connecting Both Sides Safely with relationship and back_populates as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - `ForeignKey("users.id")` tells the SQL level which column points to the parent; `relationship()` builds object navigation paths like `user.orders` and `order.user` on top. Both definitions together let the ORM understand the JOIN path, and `user.orders.append(order)` and `order.user = user` synchronize as the same relationship.
 - **What is the difference between `back_populates` and `backref`, and why is `back_populates` preferred?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - In this article's criterion, `back_populates` is the default choice because it exposes both sides' attributes in code and allows explicit type hints and options. `backref` is shorter but hides the reverse definition, making maintainability worse as options like `order_by`, `cascade`, and `lazy` grow complex.
 - **What happens when you append a new object to `User.orders`?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - Collection operations like `alice.orders.append(Order(amount=100))` don't fire SQL immediately — they record changes in the session and fire parent and child INSERTs in the correct order just before commit. With `cascade="all, delete-orphan"` enabled, removing an order from the collection also triggers a real DELETE, as shown in the article's orphan-deletion test.
 
 <!-- toc:begin -->
 ## In this series

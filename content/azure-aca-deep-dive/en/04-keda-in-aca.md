@@ -393,11 +393,11 @@ This is the quickest hands-on proof that scaling belongs to immutable revision s
 ## Answering the Opening Questions
 
 - **What is the same and what is restricted between ACA's KEDA and stock KEDA?**
-  - The article treats KEDA inside ACA — what a scale rule actually creates as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - ACA's scale rule is not the scaler object itself but a product setting that tells the platform to translate `minReplicas`, `maxReplicas`, trigger metadata, and auth into a KEDA-style autoscaling loop. The actual replica changes are most accurately read as the result of polling, activation, cooldown, HPA-like decisions, and the metrics answer path.
 - **Where is the boundary between triggers that scale to zero and triggers that cannot?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - Scale belongs to revision-scope because it is runtime behaviour behind a specific immutable Revision, not a main-URL policy. A canary Revision should be able to have a different concurrency threshold or max replica than the stable Revision, so scale-rule changes naturally spawning a new Revision makes structural sense.
 - **How do polling interval, cooldown, and max replicas trade cost against latency?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - When `minReplicas: 0` is allowed, scaling is no longer simple ratio adjustment but a wake-from-zero activation model. The 1→0 cooldown and the 0→1 initial startup delay carry separate operational meaning, so a KEDA-style event-driven mental model fits better than steady-state HPA.
 
 <!-- toc:begin -->
 ## In this series

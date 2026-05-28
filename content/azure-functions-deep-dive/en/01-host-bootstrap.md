@@ -200,11 +200,11 @@ az functionapp log tail -n my-func -g my-rg
 ## Answering the Opening Questions
 
 - **What process is the Functions Host exactly, and in what order does it bootstrap?**
-  - The article treats Host Bootstrap — Following `WebJobsScriptHostService` as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - The Functions Host is an ASP.NET Core process where `WebJobsScriptHostService` manages the lifecycle, and the inner `ScriptHost` handles the actual function app preparation. The order is: enter `WebJobsScriptHostService.StartAsync`, create `ScriptHost`, run `InitializeAsync` (loading settings and indexing metadata), then enter `base.StartAsyncCore()` to start listeners.
 - **Is host.json just a config file, or a runtime configuration that changes host behaviour?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - `host.json` is not a documentation file — it enters the `IConfiguration` tree via `HostJsonFileConfigurationSource` and is a real runtime input. Settings like `functionTimeout`, concurrency, and extension configuration map directly to options objects, and any app settings in the same tree can override final behaviour.
 - **Where do host startup failures get logged, and where do you start looking?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - The first diagnostic point is how far `WebJobsScriptHostService` progressed in bootstrap and whether `ScriptHost.InitializeAsync` completed. Immediate post-start exceptions, function metadata indexing failures, and pre-listener-start failures occur at different stages, so check logs around `WebJobsScriptHostService`, `FunctionMetadataManager`, and `StartAsyncCore` in order.
 
 <!-- toc:begin -->
 ## In this series

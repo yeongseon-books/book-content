@@ -396,11 +396,11 @@ Next, we move one layer up to **MetaData, Table, Column, and the type system**. 
 ## Answering the Opening Questions
 
 - **That SQLAlchemy is split into two layers, Core and ORM, and that Engine and Connection are the entry points to Core?**
-  - The article treats Getting Started with SQLAlchemy 2.x - Engine and Connection Demystified as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - `Engine` is a lazy factory holding dialect, URL, and pool settings; `Connection` is the actual conduit through which SQL flows. As the article showed, at `create_engine("sqlite:///app.db")` time no connection is open yet — the DBAPI `sqlite3.Connection` is actually created only when entering `engine.connect()` or `engine.begin()`.
 - **That `create_engine()` returns a factory bundling a dialect, the DB-API driver, a connection pool, and a parsed URL?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - 2.x removed `engine.execute(...)` and pushed all execution inside `Connection` and explicit transaction boundaries, surfacing mistakes like missing `commit()` after an INSERT. Being able to read the `BEGIN (implicit)` and `COMMIT` log lines shown in the article is how you immediately explain why data was persisted or rolled back.
 - **How the 1.x to 2.x transition changed defaults: `future=True` everywhere, unified `select()`, `Mapped[]` typing, native async?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - Read-only flows that need no commit suit `engine.connect()`. Writes mixed with DDL or PRAGMA application default to `engine.begin()`. As the article's table-creation and multi-row INSERT examples showed, `begin()` is safer when you want automatic rollback on exception.
 
 <!-- toc:begin -->
 ## In this series

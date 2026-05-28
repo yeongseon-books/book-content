@@ -353,11 +353,11 @@ The next post leaves the synchronous world and moves to `aiosqlite`. We will loo
 ## Answering the Opening Questions
 
 - **What are SQLite's three thread-safety modes (single, multi, serialized) and how do you check which one you have?**
-  - The article treats SQLite Connection Management: thread-safety, check_same_thread, and Pooling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - The article distinguished `sqlite3.threadsafety` (showing the SQLite C library's concurrency capability as a DB-API number) from `check_same_thread` (a Python-level guard allowing only same-thread usage). Sharing a connection with only `check_same_thread=False` is risky — if you cannot verify `threadsafety == 3`, avoiding connection sharing is the safe default.
 - **What does `sqlite3.connect(check_same_thread=True)` actually protect against, and what becomes risky when you flip it to False?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - The table set per-request open/close as the default, `threading.local` for traditional WSGI, shared connection for embedded single-worker setups, and a single-writer queue for write-bottleneck paths. The key criterion is not connection-creation cost but how clearly you can maintain the single-writer constraint and transaction boundaries.
 - **When is per-thread vs shared connection appropriate?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - The FastAPI example had `get_db()` open and close a new connection per request, aligning transaction boundaries exactly with request boundaries. Adding `BEGIN IMMEDIATE` on write paths prevents other requests from committing someone else's transaction or multiple writers tangling and hitting BUSY late — problems that arise from global connection sharing.
 
 <!-- toc:begin -->
 ## In this series

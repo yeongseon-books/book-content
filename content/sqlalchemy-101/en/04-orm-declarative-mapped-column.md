@@ -337,11 +337,11 @@ If you define a `User` ORM class and also create `Table("users", metadata, ...)`
 ## Answering the Opening Questions
 
 - **What is `DeclarativeBase`, and how does it relate to Core's `MetaData`?**
-  - The article treats ORM Basics: Defining Models with DeclarativeBase and mapped_column as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - `DeclarativeBase` is the common parent for ORM models and holds `Base.metadata`, so declaring a model class automatically registers an internal `Table` in the same catalog. That's why ORM-defined `User` and `Order` are also created by a single `Base.metadata.create_all(engine)`, and naming conventions are unified at this point too.
 - **What is the difference between `Mapped[int]` and `Mapped[str | None]`?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - `Mapped[int] = mapped_column(primary_key=True)` unites a Python type hint and SQL column definition on one line; including `None` as in `Mapped[str | None]` also expresses nullable intent. As the `email`, `nickname`, `String(255)` examples showed, an ORM model definition is effectively a more readable wrapper around Core's `Column(...)`.
 - **How does `mapped_column(...)` differ from Core's `Column(...)`?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - `__tablename__` is needed immediately when you want to pin the table name rather than relying on auto-inference. `__table_args__` becomes important when constraints like `UniqueConstraint`, `Index`, or `sqlite_autoincrement` need to be stated alongside the model. `__repr__` makes object logs instantly readable — `User(id=..., email=...)` — so its cost-benefit ratio jumps as Session usage and debugging increase.
 
 <!-- toc:begin -->
 ## In this series

@@ -314,11 +314,11 @@ If the same PK 1 user comes from two different sessions, `u1 is u2` is `False`. 
 ## Answering the Opening Questions
 
 - **How does a `Session` relate to connections and transactions?**
-  - The article treats Session in Depth: How Unit of Work and Identity Map Actually Work as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - `Session` manages not just a transaction context but also pending/dirty/deleted object states and the Identity Map. Calling `session.get(User, 1)` twice in the same session returns the same Python object for the same PK — and this is why per-request sessions are recommended.
 - **What is the Unit of Work, and when is SQL actually emitted?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - `session.add()` and attribute changes do not fire INSERT/UPDATE immediately — they accumulate in the session and are flushed as SQL together at `flush()`, autoflush, or just before `commit()`. The article's two-object INSERT and `user.email` change examples are the core of Unit of Work.
 - **How are `flush()` and `commit()` different?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - `flush()` sends SQL without ending the transaction, filling PKs. `commit()` flushes if needed, then issues `COMMIT` to close the transaction. The article showed using `flush()` first when `order.id` is needed immediately after creating an `Order`, and noted that with `expire_on_commit=True`, attribute access after commit triggers an additional SELECT.
 
 <!-- toc:begin -->
 ## In this series

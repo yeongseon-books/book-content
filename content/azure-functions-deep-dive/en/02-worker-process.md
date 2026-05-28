@@ -187,11 +187,11 @@ This is part 2 of the Azure Functions Deep Dive series. Part 1 covered host boot
 ## Answering the Opening Questions
 
 - **How does the worker process differ across languages, and what does that mean operationally?**
-  - The article treats Worker Processes — How One Host Hosts Many Languages as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - Language differences are expressed first in each worker package's `worker.config.json` rather than hard-coded branches in the host. Operationally, Node, Python, Java, and PowerShell all launch as separate child processes with different startup times, memory profiles, and failure patterns — so applying the same worker count or timeout universally produces different real-world experiences.
 - **Is the worker stateless? How far is in-process state safe?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - The worker is a child process outside the host, so it should be treated as a restartable execution unit. In-process memory caches or module state may persist briefly within the same process, but since a new worker and new channel can be created after an `Exited` detection, operationally meaningful state should be stored externally.
 - **When a worker OOMs or hangs, by what signal does the host detect it?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - Worker termination is detected directly via the `WorkerProcess` `Exited` event, and the associated `GrpcWorkerChannel` is disposed before entering the new-worker creation path. For hangs where the process doesn't die immediately, signals like channel readiness delay, status responses, and latency history surface first — so process liveness and channel readiness must be checked separately.
 
 <!-- toc:begin -->
 ## In this series

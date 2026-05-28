@@ -244,11 +244,11 @@ The next episode walks through `execute()`, `executemany()`, and the `fetchone()
 ## Answering the Opening Questions
 
 - **What are the distinct responsibilities of Connection vs Cursor?**
-  - The article treats Connection and Cursor Lifecycle as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - A connection is the communication channel to the database and the transaction context; a cursor is the execution unit that handles a single query and its result set within that channel. Examining `conn.in_transaction`, `cur.description`, and `cur.rowcount` separately shows that the two objects hold state at different levels.
 - **How does the `with` context manager protect connection and cursor resources?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - `with sqlite3.connect(...) as conn:` guarantees rollback on exception and commit on normal exit, safely closing the transaction boundary. However, in SQLite this does not close the connection itself, so a wrapper like the article's `open_db()` with `finally: conn.close()` is needed to prevent resource leaks.
 - **What is the trade-off between opening a new connection per call vs reusing one?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - Opening a new connection per call like `get_note()` is simple, but in environments with expensive handshakes like PostgreSQL it can add tens of milliseconds per request. Reusing connections like `NoteRepo` reduces that cost but introduces lifecycle responsibility — missing a close can lead to `Too many open files` or zombie connections visible in `pg_stat_activity`.
 
 <!-- toc:begin -->
 ## In this series

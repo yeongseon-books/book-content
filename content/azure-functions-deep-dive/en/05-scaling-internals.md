@@ -349,11 +349,11 @@ The model in this post stops at the boundary where an external component has alr
 ## Answering the Opening Questions
 
 - **Do the Consumption, Premium, and Dedicated plan scalers share the same decision tree?**
-  - The article treats Scaling Internals — Scale Controller, ScaleMonitor, and What Differs Across Plans as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - Even though they use the same host code, the plans do not share the same decision tree. Consumption, Flex Consumption, and Premium operate on top of the external Scale Controller layer, while Dedicated uses App Service Auto-Scale or manual scaling — so the same scale signal leads to different instance-change paths and operational implications.
 - **What signal makes the Scale Controller decide to add another instance?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - The host emits two main signals. `HostPerformanceManager.TryHandleHealthPingAsync` responds with `200` or `429` indicating whether the current instance can accept more, and the trigger extension's `ScaleMonitor` and `TargetScaler` write backlog metrics like queue length and batch size to storage for the external decision layer to read.
 - **Where does scale-out latency pile up most in burst traffic?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - Burst latency piles up most where in-instance worker saturation and external instance-provisioning delay overlap. Since the host only emits signals without creating new instances itself, the time between health-ping and trigger metrics being sent out and the external decision layer responding and new instances becoming ready is what users experience as scale-out latency.
 
 <!-- toc:begin -->
 ## In this series

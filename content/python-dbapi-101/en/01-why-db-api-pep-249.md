@@ -248,11 +248,11 @@ The next episode digs into the connection and cursor lifecycle and the context-m
 ## Answering the Opening Questions
 
 - **How was database access done in Python before PEP 249?**
-  - The article treats Why DB-API 2.0 - The Problem PEP 249 Solved as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - Before the standard, every driver had its own function names, argument order, and return types — `oracle.open()`, `oracle.run_sql()`, `mysql.connect()`, `db.send()`. Even the same `SELECT * FROM users` required separate code for Oracle and MySQL, making a database switch practically an application rewrite.
 - **What five things did DB-API 2.0 actually standardize?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - The five axes covered in this article are module-level constants, the connection object, the cursor object, type objects, and the exception hierarchy. Thanks to these, the core flow — `connect()`, `cursor()`, `execute()`, `fetchall()`, `commit()` — and exception categories like `OperationalError` and `IntegrityError` stay the same even when you swap drivers.
 - **Why does paramstyle differ across drivers, and how do you protect your code?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - When porting the SQLite example to psycopg, the only changes were `import`, the `connect()` arguments, and swapping `?` for `%s`. Application logic like `execute → fetchall → commit` remained untouched, so absorbing the `paramstyle` difference is enough to reuse most of the code.
 
 <!-- toc:begin -->
 ## In this series
