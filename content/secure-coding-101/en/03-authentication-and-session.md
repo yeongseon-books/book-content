@@ -178,13 +178,12 @@ Auth answers *who*. Next we answer *what may they do* — *authorization and per
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Authentication and Session?**
-  - The article treats Authentication and Session as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Authentication and Session?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Authentication and Session reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What distinguishes authentication from authorization?**
+  - Authentication (AuthN) is the procedure confirming "who are you," and authorization (AuthZ) is the procedure deciding "what can you do." In the article, password hashing and sessions belong to authentication, while the policy functions and resource ownership checks covered in chapter 4 belong to authorization.
+- **Why must password hashing use intentionally slow algorithms?**
+  - As the bcrypt vs Argon2 comparison table showed, fast hashes allow billions of attempts per second on GPU. Intentionally slow hashes (including memory-hard ones) make mass-guessing costs prohibitively high, making recovery difficult even after a breach.
+- **What are the tradeoffs between session cookies and JWT?**
+  - Session cookies have the server hold state enabling instant revocation but incur storage overhead. JWT is stateless making horizontal scaling easy, but revocation before expiry is difficult after theft. As the token renewal flow showed, the practical standard is combining short-lived tokens with refresh tokens to capture both advantages.
 <!-- toc:begin -->
 ## In this series
 

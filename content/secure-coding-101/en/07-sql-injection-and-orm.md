@@ -171,13 +171,12 @@ A safe DB removes the attacker's *biggest prize*. Next we cover the two browser-
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying SQL Injection and Safe ORM Usage?**
-  - The article treats SQL Injection and Safe ORM Usage as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for SQL Injection and Safe ORM Usage?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when SQL Injection and Safe ORM Usage reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How exactly does SQL injection alter SQL semantics?**
+  - When user input enters SQL built via string concatenation, closing quotes or inserting comments (`--`) can nullify the original query's conditions or append new SQL statements. As the Blind SQLi section showed, even without visible results, response time or true/false condition differences can extract data.
+- **Why is a parameterized query the most important fundamental?**
+  - Parameter binding separates SQL syntax from values at the grammar level. The database interprets the query first and fills values afterward, so no matter how malicious the input, it cannot alter SQL semantics. This single principle structurally blocks regular SQLi, Blind SQLi, and second-order injection.
+- **When can SQL injection occur even when using an ORM?**
+  - As the SQLAlchemy mistake patterns section showed, using f-strings inside `text()`, passing string conditions to `filter`, or directly accepting input values as sort columns causes injection even with an ORM. Use the ORM's query builder, but at any raw SQL point, always verify bind parameters.
 <!-- toc:begin -->
 ## In this series
 

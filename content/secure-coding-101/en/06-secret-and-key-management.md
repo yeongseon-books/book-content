@@ -171,13 +171,12 @@ Safe secrets keep *recovery cost* small. Next we tackle the oldest attack — *S
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Secret and Key Management?**
-  - The article treats Secret and Key Management as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Secret and Key Management?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Secret and Key Management reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What values should be treated as secrets?**
+  - The criterion defined in the article is "any value that becomes dangerous if known." DB passwords, API keys, signing keys, and tokens are typical, but internal service URLs or environment-specific config values should also be treated as secrets if exposure would widen the attack surface. As the dynamic credentials section showed, shorter-lived values reduce secret management burden.
+- **Why is a hardcoded secret fatal even if pushed to Git just once?**
+  - Git history leaves traces in forks, CI caches, and collaboration tools even after deletion. History rewriting alone does not fully recover, so blocking at commit time with pre-commit hooks and CI scans is essential, and if exposure is confirmed, immediate revocation and new value issuance is the only response.
+- **How does a secret manager differ from environment variables?**
+  - Environment variables are merely an injection channel with no answer for who read it, when to rotate, or how to revoke after exposure. A secret manager bundles access policy, audit logs, automatic rotation, dynamic issuance, and emergency revocation into an operational system. As the Vault configuration section showed, TTL, use-limit, and lease-based auto-expiry are impossible with environment variables alone.
 <!-- toc:begin -->
 ## In this series
 

@@ -354,13 +354,12 @@ With tmp_path, monkeypatch, and freezegun, you can isolate system resources for 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Testing Files, Environment Variables, and Time?**
-  - The article treats Testing Files, Environment Variables, and Time as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Testing Files, Environment Variables, and Time?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Testing Files, Environment Variables, and Time reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why should file tests use `tmp_path` instead of real paths?**
+  - `tmp_path` provides an independent directory per test with automatic cleanup afterward, preventing fixed-path collisions like `/tmp/report.log` and cleanup omissions. The key is enabling focus on file I/O itself, as shown by safely creating and reading `config.json`, `merged.csv`, and `report.log`.
+- **Why must environment variables be isolated per test?**
+  - Environment variables are global state, so one test changing a value can shake the next test's results. Using `monkeypatch.setenv` and `delenv` to explicitly fix values each time is necessary. Separating default-value branches and on/off branches like `DEBUG`, `DATABASE_URL`, and `FEATURE_NEW_CHECKOUT` makes reproducing the same results in local and CI easier.
+- **How do you stably verify logic that depends on current time?**
+  - Patching `billing.datetime` or using `@freeze_time("2025-05-01 09:30:00")` freezes time, enabling billing-date judgment and timestamp formatting verification regardless of date changes. Going further, injecting a time-provider function like `is_expired(expiry_str, now_fn)` pushes time dependency outside the test, simplifying structure.
 <!-- toc:begin -->
 ## In this series
 

@@ -283,13 +283,12 @@ Fixtures are pytest's core mechanism for managing test data. Understanding scope
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Understanding Fixtures?**
-  - The article treats Understanding Fixtures as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Understanding Fixtures?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Understanding Fixtures reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do fixtures differ from regular functions?**
+  - Fixtures look like regular functions returning values, but pytest manages the entire setup-and-teardown lifecycle around test execution. The `db_connection()` creating an SQLite in-memory DB before `yield` and calling `conn.close()` after, or `tmp_path` auto-cleaning temp files, demonstrate this difference.
+- **How are fixtures automatically injected into test functions?**
+  - When a test function's parameter name matches a fixture name, pytest automatically supplies `sample_user`, `sample_users`, or `api_client`. Fixtures can also depend on each other like `api_client(base_url, auth_headers)`, and placing them in `conftest.py` enables reuse across multiple files without explicit imports.
+- **When should you choose `function`, `module`, or `session` scope?**
+  - The default `function` scope is safest when test independence matters most; expensive immutable resources like `expensive_resource` can consider `module` or `session` scope. However, as the `shared_list` example shows, putting mutable state in wide scope causes test-order pollution, so you must first determine whether shared resources are safe to share.
 <!-- toc:begin -->
 ## In this series
 

@@ -251,13 +251,12 @@ Coverage objectively measures the scope of your tests. Measure with pytest-cov, 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Coverage and Test Quality?**
-  - The article treats Coverage and Test Quality as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Coverage and Test Quality?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Coverage and Test Quality reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What does code coverage measure exactly?**
+  - Coverage shows the ratio of lines tests actually executed to total lines. As the `validator.py` and `score.py` examples showed, its greatest value lies not in the number itself but in revealing which conditional branches and exception paths were never executed.
+- **How do line coverage and branch coverage differ?**
+  - Line coverage checks whether a code line was traversed at least once; branch coverage checks whether each `if/else` arm was actually taken. So for functions like `grade(score)` where A/B/C/D/F and range errors diverge, branch coverage must be checked alongside line coverage to not miss empty branches.
+- **How do you identify missing lines with `pytest-cov`?**
+  - Running `pytest --cov=src/myapp --cov-report=term-missing --cov-branch` shows `Missing` lines and branch gaps directly in the terminal. Adding `coverage html` and `--cov-fail-under=80` lets you view gaps in a browser and connect to PR quality gates in the same flow.
 <!-- toc:begin -->
 ## In this series
 

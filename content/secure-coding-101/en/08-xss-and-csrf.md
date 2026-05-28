@@ -176,13 +176,12 @@ Browser-side attacks are stopped by *fundamentals*. Next we tackle the code we *
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying XSS and CSRF Defense?**
-  - The article treats XSS and CSRF Defense as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for XSS and CSRF Defense?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when XSS and CSRF Defense reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What types does XSS divide into and where does each originate?**
+  - Reflected XSS occurs when URL/request input is immediately included in the response; stored XSS when a DB-saved value is later rendered; DOM-based when client JavaScript inserts input via APIs like `innerHTML`. As the Stored XSS section showed, stored XSS keeps executing without the attacker being present, making its impact scope widest.
+- **What roles do output escaping and CSP share?**
+  - Output escaping is the first defense line preventing input from being interpreted as code; CSP is the second defense line where the browser blocks unapproved script execution when escaping is missed. As the nonce section showed, generating an unpredictable value per request is required for CSP to be effective.
+- **Why can CSRF exploit a user's privileges directly?**
+  - Because browsers automatically attach cookies to cross-site requests. When an attacker site sends a request to our service, the session cookie travels along, making it indistinguishable from a legitimate user request on the server side. SameSite cookies and CSRF tokens (Double-Submit or custom headers) must verify request origin.
 <!-- toc:begin -->
 ## In this series
 

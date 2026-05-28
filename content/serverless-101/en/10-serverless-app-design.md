@@ -186,13 +186,12 @@ Congratulations on finishing the series. Take the next step: design a *small dis
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Designing a Serverless App?**
-  - The article treats Designing a Serverless App as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Designing a Serverless App?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Designing a Serverless App reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How should multiple small functions be woven into one application?**
+  - This article's answer is not multiplying function count but separating input, async processing, and follow-up notifications into different boundaries connected by queues. When `API receive → WorkQueue → WorkerFn → follow-up notification` leaves input, output, failure behavior, and observation metrics in a standard template, small functions unite under one operational contract.
+- **Why shouldn't upload, transform, and notification be crammed into one function?**
+  - The upload function should focus only on storage and ID return; transformation belongs to a queue-backed worker; notification to a separate function—so that response time and failure scope are isolated. As the image processing example showed, being able to restart per-stage when upload succeeded but transform or notification failed simplifies operational recovery.
+- **What roles do queues, idempotency keys, and DLQs play in design principles?**
+  - Queues surface time and responsibility boundaries; idempotency keys let `already_done(key)` safely skip duplicate messages; DLQs surface repeated failures rather than burying them silently. All three together enable accepting retries as default while clearly designing cost ceilings, failure recovery points, and operational metrics.
 <!-- toc:begin -->
 ## In this series
 

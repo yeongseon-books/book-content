@@ -175,13 +175,12 @@ Next, we cover *State Management*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Scaling?**
-  - The article treats Scaling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Scaling?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Scaling reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How should serverless concurrency be understood?**
+  - This article calculated concurrency as `rps * duration` to interpret it as the number of function instances that must be alive simultaneously. The key is looking not at instance count alone but at what pressure that parallelism places on database connection pools and external API limits.
+- **Why must burst and sustained traffic be viewed differently?**
+  - Bursts are short-duration shocks where queue buffering and initial scale-up speed matter; sustained traffic requires fundamental throughput and downstream capacity design. The article simulated `burst()`, queue backlogs, external API 429s, and database timeouts separately precisely because of this difference.
+- **What does reserved concurrency protect?**
+  - `ReservedConcurrentExecutions` is not an option for scaling up fast but a device placing a safe ceiling on the function and its downstream. As the worker example showed, without a ceiling, sudden inflows propagate directly to DynamoDB, payment systems, and external APIs, amplifying failures.
 <!-- toc:begin -->
 ## In this series
 

@@ -600,13 +600,12 @@ Using pytest well and writing testable code are not separate skills. Once you mo
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Writing Testable Code?**
-  - The article treats Writing Testable Code as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Writing Testable Code?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Writing Testable Code reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why do some functions need multiple patches and mocks for a single test?**
+  - When one function like `before_checkout.checkout()` calls `requests.post`, `datetime.now()`, `save_order_to_db`, and `send_email` all at once, the test must prepare that many patches. The four-patch example in the article signals not a testing-skill deficit but a design where business rules and side-effect boundaries are lumped together.
+- **At which points should dependency injection be applied to actually simplify tests?**
+  - Boundaries where time is `now_iso`, IDs come from `order_id_factory`, and external integrations are `gateway`, `repository`, `notifier`—injecting via arguments or constructors at these points shortens tests. So `create_checkout_payload()` and `plan_checkout()` need only verify pure dict inputs and outputs, locking core rules without time patches or network mocks.
+- **What roles should pure functions, Protocols, and Fake objects each take?**
+  - Pure functions handle computation and assembly rules like `calculate_order_totals`, `build_charge_request`, and `present_checkout_result`. Protocols expose collaborator contracts like `PaymentGateway`, `OrderRepository`, and `Notifier`. FakeGateway, FakeRepository, and FakeNotifier lightly mimic those contracts within tests, focusing on stored state and result values rather than mock call verification.
 <!-- toc:begin -->
 ## In this series
 

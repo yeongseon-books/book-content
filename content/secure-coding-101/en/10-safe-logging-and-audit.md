@@ -171,13 +171,12 @@ That closes *Secure Coding 101*: validation → auth → authz → storage → s
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Safe Logging and Audit?**
-  - The article treats Safe Logging and Audit as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Safe Logging and Audit?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Safe Logging and Audit reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What distinguishes application logs from audit logs?**
+  - Application logs serve debugging and operational observation with short retention. Audit logs are evidence of "who changed what resource," recorded in a dedicated schema (AuditEvent model) and preserved long-term in WORM storage. As the dedicated audit log model section showed, recording actor, action, resource, and result completely is required for investigation use.
+- **How far should the sensitive field masking policy reach?**
+  - As the PII filtering section showed, both key-based masking (password, token, etc.) and value-based pattern matching (email, phone, card numbers) must be applied together. Rather than relying on developer memory, embedding filters in the logging pipeline itself (structlog processor) ensures nothing is missed.
+- **Why are tamper detection and append-only storage important?**
+  - If attackers delete logs after intrusion, evidence disappears. WORM storage (S3 Object Lock Compliance mode) cannot be deleted even by root users, guaranteeing evidence preservation. Verifying integrity with hash chains also detects if logs were tampered with in between.
 <!-- toc:begin -->
 ## In this series
 

@@ -223,13 +223,12 @@ Tests are a safety net for code changes. pytest lets you write tests with a sing
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Why Write Tests??**
-  - The article treats Why Write Tests? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Why Write Tests??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Why Write Tests? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Are tests work that slows development, or an investment that speeds it up?**
+  - As the article's examples show, once you lock core logic like `add`, `divide`, and `calc_total` with tests, regressions like incorrect discount calculations or division by zero get caught immediately after a fix. The `pytest -v` output showing `test_calc_total_with_coupon` failing instantly demonstrates that tests reduce debugging time and ultimately speed up development.
+- **What distinguishes unit tests, integration tests, and E2E tests?**
+  - Unit tests verify a single function's rules at the level of `add(2, 3) == 5` or `shipping_fee("KR", 50000) == 0`. Integration and E2E tests bundle multiple components or entire user flows, but as the test pyramid emphasizes, the thickest layer should be fast, frequently-run unit tests.
+- **What difference do manual and automated tests make?**
+  - Manual tests require humans to check results visually with `print(add(1, 2))`, incurring repeated cost. Automated tests preserve failure conditions in code—like `pytest.raises(ValueError, match="Cannot divide by zero")` or `@pytest.mark.parametrize("bad", [-1, 24, 100])`—automatically re-checking the same problems on every change.
 <!-- toc:begin -->
 ## In this series
 

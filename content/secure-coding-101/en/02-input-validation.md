@@ -164,13 +164,12 @@ With validation, behavior becomes *predictable*. Next we look at *who is who* â€
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Input Validation?**
-  - The article treats Input Validation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Input Validation?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Input Validation reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What distinguishes allowlist from denylist?**
+  - As the USERNAME regex example showed, an allowlist declares "only this is permitted," keeping the attack surface small. A denylist requires continuously adding forbidden patterns, and as the encoding normalization attack demonstrated, the same character in a different representation bypasses it.
+- **What improves when using an input schema over ad-hoc validation?**
+  - As the Pydantic `CreateUser` example showed, a schema consolidates validation rules, API documentation, and error message formatting in one place. Scattering `if` statements across routes makes finding omissions difficult, but a single schema reveals the entire contract.
+- **Where exactly is the input boundary?**
+  - The single line `CreateUser(**payload)` in `handle_signup` is the boundary. Before it is adversarial external data; after it is a validated internal object. As the layer breakdown table showed, boundaries exist at multiple levels: network, framework, schema, domain, and storage.
 <!-- toc:begin -->
 ## In this series
 

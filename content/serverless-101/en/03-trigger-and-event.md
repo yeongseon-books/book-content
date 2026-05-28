@@ -333,13 +333,12 @@ The key pattern in this post is simple: accept quickly at the HTTP edge, move re
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Trigger and Event?**
-  - The article treats Trigger and Event as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Trigger and Event?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Trigger and Event reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do HTTP, queue, and schedule triggers differ in invocation semantics?**
+  - HTTP is a synchronous boundary returning responses like `202 Accepted` directly to users; queues are asynchronous boundaries deferring actual processing; schedules are invocations where re-entrancy and overlap prevention come first at fixed intervals. The article's table also separated each trigger's latency expectation, default retry behavior, and suitable workloads.
+- **Why is idempotency a baseline assumption for asynchronous consumers?**
+  - `queue_consumer_handler()` checks a `processed_messages` store when the same `idempotency_key` arrives again, skipping with `duplicate`. Queue redelivery and retries are normal paths, so without external records like `mark_processed()`, the same order gets processed multiple times with no way to prevent side effects.
+- **Why is a DLQ not just auxiliary but a core operational observation point?**
+  - The example sending `message_id`, `order_id`, `retry_count`, `error`, and `failed_at` to the DLQ on three failures is exactly the reason. This payload lets operators see what failed on which attempt and reprocess only needed messages without replaying the entire flow from scratch.
 <!-- toc:begin -->
 ## In this series
 

@@ -384,13 +384,12 @@ GitHub Actions is not just a way to run tests automatically. It is how a reposit
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Test Automation with GitHub Actions?**
-  - The article treats Test Automation with GitHub Actions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Test Automation with GitHub Actions?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Test Automation with GitHub Actions reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do you stop relying on the habit of manually running tests for every PR?**
+  - Setting both `push` and `pull_request` triggers in `.github/workflows/test.yml` and connecting this workflow as a required status check makes test execution a repository rule rather than personal habit. Then the same `pytest --cov --cov-fail-under=80` command runs automatically per PR, blocking merge until it passes.
+- **How do you assemble a GitHub Actions workflow as one final file rather than many fragments?**
+  - The article showed the complete `test.yml` first rather than fragmented YAML, then explained how checkout, `actions/setup-python`, `pip install -e ".[test]"`, pytest execution, and HTML coverage upload connect within it. In practice, reading from the final file makes trigger, install, test, and artifact stages visible as one flow.
+- **How do you verify Python 3.10, 3.11, and 3.12 simultaneously while maintaining feedback speed?**
+  - Running three versions in parallel via `matrix.python-version` with `fail-fast: false` to collect full results, and managing pip cache simply through `setup-python`'s built-in feature, is practical. Uploading the HTML coverage artifact only from the representative 3.12 run reduces logs and storage while preserving review-necessary information.
 <!-- toc:begin -->
 ## In this series
 

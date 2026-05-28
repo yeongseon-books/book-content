@@ -158,13 +158,12 @@ Once authorization is *explicit*, incidents stay *short*. Next we make the *reso
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Authorization and Permissions?**
-  - The article treats Authorization and Permissions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Authorization and Permissions?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Authorization and Permissions reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What distinguishes RBAC from ABAC?**
+  - RBAC grants permissions based on roles (admin, editor, viewer), while ABAC decides based on attributes (owner, department, time zone, region). As the OPA policy example showed, in practice the most common model is a hybrid combining role checks (RBAC) with ownership and team-attribute checks (ABAC).
+- **Why is IDOR a common yet dangerous authorization vulnerability?**
+  - As the IDOR reproduction code showed, changing just one ID in the URL accesses another user's resource. It passes functional testing while surfacing only in security testing, and occurs simply by omitting an ownership condition from the query.
+- **How should authorization decisions be split between route level and resource level?**
+  - Route level filters "can this role access this API" (vertical privilege escalation defense), while resource level verifies "can this user perform this action on this specific data" (horizontal privilege escalation defense). As multi-tenant isolation showed, both levels must operate independently so that if one layer is breached, the other still blocks.
 <!-- toc:begin -->
 ## In this series
 

@@ -244,13 +244,12 @@ Our first example was only a tiny HTTP order-ingest handler, but it already carr
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What is Serverless??**
-  - The article treats What is Serverless? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What is Serverless??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What is Serverless? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What exactly does serverless hand off to the platform as an execution model?**
+  - What gets handed off in this article is not the server itself but operational defaults like execution environment provisioning, basic scaling, and retries. In exchange, developers must directly design event contracts, state storage locations, timeout budgets, and tracing fields like `request_id`—as confirmed through the order intake handler and deployment contract table.
+- **What input and response contracts should a first serverless function start with?**
+  - The first function should validate `order_id` and `items` from `event["body"]` JSON, and return HTTP responses with `statusCode`, `headers`, and `body` even on failure. The example's `build_response()` and `handler()` locked this minimum contract by returning `next_step: "queued-for-fulfillment"` on success and `400` errors on failure.
+- **What minimum must be aligned between local invocation and actual deployment?**
+  - The local `sample_event`, `LocalContext`, and expected JSON output serve as a baseline for verifying the same input shape and tracing fields persist after deployment. Adding configuration contracts like `Timeout`, `MemorySize`, `ReservedConcurrentExecutions`, and DLQ enables quickly separating logic issues from deployment issues.
 <!-- toc:begin -->
 ## In this series
 

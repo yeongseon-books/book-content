@@ -267,13 +267,12 @@ Parametrize is the core tool for data-driven testing. A single test function cov
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Parametrization?**
-  - The article treats Parametrization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Parametrization?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Parametrization reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do you verify the same logic with multiple inputs without copying functions?**
+  - Instead of multiplying functions like `test_is_palindrome_radar` and `test_is_palindrome_hello`, add inputs and expectations as data to `@pytest.mark.parametrize`. As the `validate_username`, `discount`, and `parse_port` examples show, keeping verification logic as one function while expanding only cases makes tests shorter and more consistent.
+- **How should you read `@pytest.mark.parametrize`'s basic syntax?**
+  - `@pytest.mark.parametrize("a,b,expected", [(1, 2, 3), (0, 0, 0)])` means running one test function independently for each tuple. Separating normal cases from error cases with `pytest.raises(ValueError, match="out of range")` in a separate function makes it clear in output which combination validates which contract.
+- **How do you give each test case a readable name?**
+  - Using `pytest.param(..., id="min-length")` or `ids=["alice", "bob_01"]` makes failure logs print meaningful names instead of data blobs. So `FAILED test_username_invalid[space]` immediately shows which input was problematic, and adding regression inputs to the list remains easy to track.
 <!-- toc:begin -->
 ## In this series
 

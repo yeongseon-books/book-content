@@ -272,13 +272,12 @@ You've learned pytest's test discovery rules and project structure. The `test_` 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Writing Your First pytest Test?**
-  - The article treats Writing Your First pytest Test as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Writing Your First pytest Test?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Writing Your First pytest Test reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **By what rules does pytest auto-discover test files and functions?**
+  - pytest follows `test_*.py`, `*_test.py`, `test_*` functions, and `Test*` class conventions to collect tests. As `pytest --collect-only -q` and node IDs like `tests/test_string_utils.py::TestReverseString::test_basic` show, naming conventions must match for pytest to discover and selectively run desired tests.
+- **What directory structure best separates production code from test code?**
+  - The article used a `src/` layout with production code under `src/myapp/` and tests under `tests/` containing `test_string_utils.py` and `conftest.py`. This separation makes the deployment package boundary clear, and shared fixtures in `conftest.py` remain stable without disturbing import paths or test locations.
+- **Why is `pyproject.toml` necessary?**
+  - Settings like `testpaths = ["tests"]`, `pythonpath = ["src"]`, and `addopts = "-ra -q"` in `pyproject.toml` ensure local and CI use the same criteria for finding and running tests. Especially for stable package-based imports like `from myapp.service import build_query`, the `pythonpath` setting is effectively part of the structure.
 <!-- toc:begin -->
 ## In this series
 

@@ -170,13 +170,12 @@ Next, we cover *Queues* and *Event-driven Architecture*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying State Management?**
-  - The article treats State Management as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for State Management?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when State Management reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do stateless functions handle stateful business?**
+  - Stateless functions do not eliminate state but read and update sessions and processing history from external stores outside the function. `with_session()` retrieving state from an external cache and re-saving, and `use_token()` blocking already-processed requests, are the core of this flow.
+- **Where should sessions, caches, data stores, and workflow state be placed?**
+  - The article prescribed: short-lived session data in caches like Redis, persistent data in databases, and multi-step progress state in state machines or workflow engines. Splitting by access pattern, lifetime, and consistency requirements rather than cramming everything into one store is operationally advantageous.
+- **Why are TTL and idempotency tokens core to state management?**
+  - TTL controls the lifetime of dedup state like `expiresAt` in the idempotency key table, managing cost and consistency together. Without idempotency tokens, retries cause duplicate processing; without TTL, old tokens and state accumulate, degrading storage cost and collision judgment quality together.
 <!-- toc:begin -->
 ## In this series
 

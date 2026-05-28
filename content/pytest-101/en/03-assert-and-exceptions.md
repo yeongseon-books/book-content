@@ -274,13 +274,12 @@ pytest's assert is readable and provides detailed failure information. `pytest.r
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Assert and Exception Testing?**
-  - The article treats Assert and Exception Testing as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Assert and Exception Testing?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Assert and Exception Testing reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why does pytest's `assert` provide more readable failure messages?**
+  - pytest internally rewrites `assert` to show actual and expected values together, so when `assert calc_tax(10000, 0.1) == 1200` fails, `1000 == 1200` and the call expression appear immediately. This makes tracking which calculation went wrong easy from CI logs alone, without adding `print()` statements.
+- **How should collections, strings, and floating-point values be verified?**
+  - Dicts and sets compared directly with `assert` have pytest show key and element differences in detail; strings are best fixed directly like `render_title(" Alice ") == "[USER] Alice"`. Floating-point requires explicit tolerance—`0.1 + 0.2 == pytest.approx(0.3)` or `pytest.approx([0.3, 0.5], rel=1e-5)`—for stable tests.
+- **How do you verify exception type and message with `pytest.raises`?**
+  - `with pytest.raises(ValueError, match="between 0 and 1"):` verifies both type and message together, locking not just that it failed but that it failed for the right reason. For more detailed checks, `exc_info.value` and `exc_info.type` let you directly inspect whether `divide(10, 0)` or `parse_qty("0")` produced the expected exception object.
 <!-- toc:begin -->
 ## In this series
 

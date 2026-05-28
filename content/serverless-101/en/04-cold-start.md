@@ -192,13 +192,12 @@ Next, we look at *Scaling* and the *concurrency model*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Cold Start?**
-  - The article treats Cold Start as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Cold Start?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Cold Start reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why is a function's first invocation slow?**
+  - The first call is slow because creating a new execution environment, initializing the runtime, and loading code and dependencies all incur cost at once. The article's `INIT_MS` measurement code and `BOOT_TIME`, `load_model_once()` examples show this delay begins before business logic.
+- **What stages sum up to form a cold start?**
+  - The article described it as the sum of execution environment creation, runtime initialization, package and import loading, and handler-external initialization code. That is why responses—large dependency removal, global client reuse, provisioned concurrency selection—must also differ based on each stage's bottleneck.
+- **Why must you look at p99 rather than average?**
+  - When warm calls dominate, the average looks fine, but a few cold starts can greatly increase perceived latency on sensitive paths like login or payment. That is why the article placed a `p50`, `p95`, `cold p95` comparison table and emphasized viewing tail latency and provisioning cost together.
 <!-- toc:begin -->
 ## In this series
 

@@ -152,13 +152,12 @@ Other people's code is *our code*. The last post covers *safe logging and audit*
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Managing Dependency Vulnerabilities?**
-  - The article treats Managing Dependency Vulnerabilities as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Managing Dependency Vulnerabilities?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Managing Dependency Vulnerabilities reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What does SCA inspect exactly?**
+  - SCA cross-references a project's direct and transitive dependency lists against CVE databases (NVD, OSV, GitHub Advisory) to check for known vulnerabilities. As the Log4Shell section showed, combined with SBOM, you can determine within minutes whether a specific CVE affects your services.
+- **When does SBOM show its greatest practical power?**
+  - SBOM answers "which of our services are affected?" the instant a new CVE is published. In the Log4Shell case, teams with SBOMs confirmed impact scope in minutes while teams without had to manually search hundreds of services.
+- **Why is a lockfile mandatory rather than optional?**
+  - Without a lockfile, different versions can install at each build, making reproduction impossible. When responding to vulnerabilities, not knowing "the exact deployed version" makes it impossible to even judge whether a patch is needed. Including hash verification also blocks installation of tampered packages.
 <!-- toc:begin -->
 ## In this series
 

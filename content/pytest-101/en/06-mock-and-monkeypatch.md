@@ -309,13 +309,12 @@ Mock and monkeypatch remove external dependencies to make tests fast and stable.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Mock and Monkeypatch?**
-  - The article treats Mock and Monkeypatch as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Mock and Monkeypatch?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Mock and Monkeypatch reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What is the difference between mock and monkeypatch?**
+  - `patch()` and `MagicMock` excel at granularly verifying external call return values, call counts, and arguments, while `monkeypatch` is convenient for simply swapping environment variables or global attributes within test scope with automatic restoration. The article distinguished roles clearly by using mock for `payment.requests.post` call verification and monkeypatch for `APP_MODE` or `SERVICE_FEE` changes.
+- **What reference point should `patch()` target?**
+  - The patch path must target the module where the test subject actually references the object, not where the function was originally defined. So `weather.requests.get`, `payment.requests.post`, and `service.fetch_user` are correct, but simply patching `requests.post` in the same situation leaves actual network calls intact, breaking the test.
+- **How do you reproduce situations where external calls fail?**
+  - Setting `side_effect` to `requests.Timeout`, `requests.ConnectionError`, or `ValueError("Invalid JSON")` deterministically reproduces failure paths. Layering `pytest.raises(RuntimeError, match="payment failed")` on top locks which exception contract our code must uphold even when external services wobble.
 <!-- toc:begin -->
 ## In this series
 

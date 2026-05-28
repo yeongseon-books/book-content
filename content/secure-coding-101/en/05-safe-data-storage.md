@@ -153,13 +153,12 @@ Encrypted data is useless if the *keys leak*. Next we look at *secret and key ma
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Safe Data Storage?**
-  - The article treats Safe Data Storage as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Safe Data Storage?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Safe Data Storage reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What distinguishes encryption at rest from encryption in transit?**
+  - Encryption at rest protects data sitting on disk; encryption in transit protects data moving over the network. As the envelope encryption implementation showed, at-rest uses a DEK+KEK structure separating keys, while in-transit uses TLS to protect the segment. Both must be applied for the full chain to be safe.
+- **Why must classifying PII and sensitive data come first?**
+  - As the regulation mapping table showed, different data types require different protection levels and regulations. Encrypting everything uniformly without classification degrades performance from over-protection, or conversely creates legal risk by missing regulated targets. Step 1's SENSITIVE classification becomes the reference for all subsequent decisions.
+- **What roles do symmetric keys, asymmetric keys, and KMS each play?**
+  - In envelope encryption, data is encrypted fast with a symmetric key (AES-GCM), and that symmetric key is protected by a KEK managed by KMS. Asymmetric keys are used for key exchange or signing. KMS is the central service handling KEK storage, access control, rotation, and auditing.
 <!-- toc:begin -->
 ## In this series
 

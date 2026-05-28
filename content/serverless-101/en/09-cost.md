@@ -172,13 +172,12 @@ The final episode is *Designing a Serverless App*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Cost?**
-  - The article treats Cost as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Cost?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Cost reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What items sum up to determine serverless cost?**
+  - This article prescribed viewing cost as the sum of invocations, GB-seconds, data egress, API Gateway, DynamoDB, queues, and provisioning idle cost. That is why it separated calculations like `calls_cost()`, `gb_seconds()`, `egress_cost()`, and `total()` to read like a per-feature P&L statement.
+- **Why does memory configuration directly connect to both performance and cost?**
+  - Raising memory increases the GB-second unit price, but since CPU scales alongside, execution time can drop and total cost may actually decrease. The article's memory sweep and `512MB, 180ms → 1024MB, 110ms` comparison table show this judgment must be made by measurement, not intuition.
+- **Why are data transfer and associated service costs frequently overlooked?**
+  - Because per-invocation pricing is visually prominent, egress costs from image responses or API Gateway, DynamoDB, and retry costs often grow belatedly. The article separately calculated file-response services, async pipelines, and batch writes to emphasize that the most expensive item may not be the function itself.
 <!-- toc:begin -->
 ## In this series
 

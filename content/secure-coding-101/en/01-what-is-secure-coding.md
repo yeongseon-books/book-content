@@ -158,13 +158,12 @@ Secure coding is a *habit*. The next post goes deep on the place that leaks most
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Is Secure Coding??**
-  - The article treats What Is Secure Coding? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Is Secure Coding??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Is Secure Coding? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What does secure coding mean exactly?**
+  - As the article summarized, it means not bolting security on after feature development but designing input boundaries, permissions, storage, and logging together from the start as a development habit. When each of the 5 practice steps acts as a defense layer, the overall system stays in a predictable state.
+- **How do threat models and attack surfaces relate to code design?**
+  - The 6 threats classified in the STRIDE table are 6 questions to verify in code. As the attack-surface mapping code showed, automatically extracting routes, auth status, and input sources reveals what is exposed whenever new features are added.
+- **From what perspective should beginners read the OWASP Top 10?**
+  - As the mapping table organized, reading each item not as isolated knowledge but asking "which of A01–A10 does this code fall under?" is closer to practice. Connecting to automated checks like a CI security gate turns document knowledge into an actual defense line.
 <!-- toc:begin -->
 ## In this series
 

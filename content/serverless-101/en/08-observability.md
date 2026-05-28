@@ -188,13 +188,12 @@ Next, we cover *Cost*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Observability?**
-  - The article treats Observability as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Observability?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Observability reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How can you tell why a function was slow and where it was slow?**
+  - Attaching a `correlation_id` to each request and emitting structured logs, metrics, and spans together enables reconstructing which segment was the bottleneck. As the article's examples showed, leaving fields like `cold=true`, `duration_ms`, and `downstream=db` lets you quickly distinguish cold start from downstream latency.
+- **What roles do logs, metrics, and distributed tracing each serve?**
+  - Logs show context of individual events, metrics show trends like error rates and p95, and distributed tracing shows the request path through functions and queues. The article placed `log()`, `incr()`, and `span()` separately, explaining that connecting all three signals is required to answer failure questions within minutes.
+- **Why is a correlation ID nearly mandatory?**
+  - In serverless, one request crosses multiple functions and async consumers, so without a common identifier, the same user request cannot be assembled into a single flow. As the `x-correlation-id` example showed, passing the same key through logs, response headers, and tracing is required to immediately connect a user inquiry to internal events.
 <!-- toc:begin -->
 ## In this series
 

@@ -166,13 +166,12 @@ Next, we cover *Observability*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Queue and Event-driven Architecture?**
-  - The article treats Queue and Event-driven Architecture as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Queue and Event-driven Architecture?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Queue and Event-driven Architecture reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What is needed to connect services without direct calls?**
+  - This article's answer is placing a messaging boundary—queue or topic—between producers and consumers. When the order API publishes events instead of directly calling payment, email, and analytics, each consumer handles only its responsibility while managing failures and speed independently.
+- **How do queues and topics differ?**
+  - A queue has a consumer group share processing of one message—suited for buffering and work distribution; a topic fans out one event to multiple subscribers—suited for fanout. The article's `publish/consume` and `emit()` subscription examples show this difference in the smallest possible model.
+- **When is fanout advantageous and when does it require caution?**
+  - Fanout is advantageous when separating follow-up tasks like payment, email, and analytics independently, but growing it without idempotency, event schemas, and DLQ only adds complexity. The article therefore prescribed designing fanout together with operational devices like `retry()` and DLQ, FIFO keys, and `batchItemFailures`.
 <!-- toc:begin -->
 ## In this series
 

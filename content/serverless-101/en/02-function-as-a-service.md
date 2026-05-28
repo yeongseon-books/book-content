@@ -279,13 +279,12 @@ In the next post, we will move from packaging to delivery semantics and follow a
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Function as a Service?**
-  - The article treats Function as a Service as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Function as a Service?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Function as a Service reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How is the FaaS execution contract formed between handler, runtime, and package?**
+  - The execution contract requires the handler entry point like `app.handler`, the Python 3.12 runtime, and the actual file set inside the ZIP to all align. Even correct handler code with mismatched runtime version or package contents changes the invocation itself, so FaaS is a model that manages entire deployment units, not just code.
+- **What file structure and command sequence is best for verification before actual deployment?**
+  - Separating `app.py`, `smoke_test.py`, and `requirements.txt` then following `pip install -r requirements.txt -t package`, `cp app.py package/`, `zip -r ../function.zip .`, `python3 smoke_test.py` is the article's core flow. This sequence locks local success with the same event first, then narrows subsequent differences to package or runtime environment issues.
+- **Why do package size and dependency count directly affect execution time and cold starts?**
+  - Checking `function.zip` size and internal file lists matters because more code and libraries to load before initialization means more delay. Reducing unnecessary dependencies first and measuring again after keeping only essentials like `requests` is more effective than raising memory values.
 <!-- toc:begin -->
 ## In this series
 
