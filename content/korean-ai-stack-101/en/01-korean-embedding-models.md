@@ -436,12 +436,12 @@ The first post is really about comparison discipline, not model fandom. Once you
 
 ## Answering the Opening Questions
 
-- **Where do English-first embedding models usually fail on Korean-heavy data?**
-  - The article treats Korean embedding models compared — KoSimCSE, BGE-M3, Solar as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why is a separation gap between similar and unrelated pairs more useful than one pretty cosine score?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What should you test first when Korean text regularly mixes with English technical terms?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Where do English-centric embedding models most often break on Korean-heavy data?**
+  - They wobble first on short Korean sentence similarity and irrelevant-sentence separation. Spacing variants, short customer-inquiry phrasing, and semantically similar but surface-different Korean sentences narrow the gap between similar and unrelated pairs, making it hard to set a retrieval threshold. That's why this article compared similar pairs against unrelated pairs first.
+- **Why is the gap between similar-pair and unrelated-pair scores more useful than a single cosine number?**
+  - In production, what matters is how far apart the similar-pair mean and unrelated-pair mean are—not whether one score is high. A wide gap lets you set a threshold; a narrow gap means irrelevant sentences sneak into top candidates. That's why the table shows `gap(sim-unrel)` and minimum-score distributions together.
+- **When Korean text is frequently mixed with English technical terms, what should you test first?**
+  - Build a mixed-language pair set and check how stably Korean queries attach to sentences containing English terms. In this experiment KoSimCSE showed stronger Korean separation, while BGE-M3 and Solar showed more stable mixed-language durability. In other words, start from whether your corpus is Korean-dominant or Korean-English mixed, not from the model name.
 
 <!-- toc:begin -->
 ## In this series

@@ -198,13 +198,12 @@ Authentication and authorization are the two largest doors in security. Next we 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Authentication and Authorization?**
-  - The article treats Authentication and Authorization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Authentication and Authorization?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Authentication and Authorization reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What is the precise difference between authentication and authorization?**
+  - Clarify what log is produced and where failure is handled at each stage: password storage, login verification, session creation, and permission check.
+- **What security model underlies passwords, MFA, and biometrics?**
+  - Tracing where bcrypt hashing, TOTP generation, JWT tokens, and RBAC policies are processed—and where failures are logged—makes the security architecture clear.
+- **What distinguishes sessions from tokens, especially JWT?**
+  - Define login-failure thresholds, token renewal policies, and permission-change monitoring rules, then audit regularly for privilege leaks.
 <!-- toc:begin -->
 ## In this series
 

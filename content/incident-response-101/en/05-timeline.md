@@ -163,13 +163,12 @@ Next, we cover root cause analysis.
 
 ## Answering the Opening Questions
 
-- **Why should timeline work begin during the incident instead of after it?**
-  - The article treats Writing the Timeline as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which channels need to be collected besides the main response chat?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How do you separate recorded facts from later theories?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **After an incident ends, how do you reconstruct what happened and when?**
+  - Never rely on a single narrator's memory. Collect machine timestamps from monitoring alerts, chat (Slack/Teams), deployment pipelines, command logs, and ticket state changes, then align them on a single timeline. Use system-recorded times, not human-perceived times, so causal relationships between events stay intact.
+- **Why should you record events in real time during the incident?**
+  - Decisions happen every 1–2 minutes in the middle of an incident. If you don't drop a quick note in chat explaining "why we're trying this," intent becomes unrecoverable after the fact. When only outcomes survive and reasoning disappears, postmortems cannot surface recurring mistake patterns.
+- **Why scrape multiple channels instead of just one?**
+  - Alerts live in the monitoring system, decisions live in chat, actual commands live in shells and deploy tools, and external notices live on the status page. A single channel shows only one facet of detect-decide-execute-communicate; combining all channels is the only way to restore the full picture.
 <!-- toc:begin -->
 ## In this series
 

@@ -160,13 +160,12 @@ Next, we cover the postmortem.
 
 ## Answering the Opening Questions
 
-- **What makes rollback such a powerful mitigation tool?**
-  - The article treats Mitigation and Resolution as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **When should you scale out, throttle, or use a kill switch instead?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why is “impact reduced” not enough to declare resolution?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How is putting out the fire different from removing the cause?**
+  - Mitigation targets the short-term goal of "stop user harm right now." Resolution targets the permanent goal of "ensure this cause never recurs." Trying to accomplish both in one sitting delays mitigation and grows the blast radius. Stop the bleeding first, then invest time in the precise fix.
+- **Why is rollback the most powerful mitigation tool?**
+  - Most incidents start with a recent change (deploy, config, feature flag). Rollback undoes that change wholesale, returning to the known-safe state of "at least yesterday it worked." It can be used before diagnosis is complete—nearly the only first-response action that does not require full understanding of the cause.
+- **When should you use scale-out, throttle, or kill switch?**
+  - Scale-out: when traffic exceeds capacity and correct code fails only because resources are exhausted. Throttle: when excessive calls from some users/endpoints are collapsing the service for everyone else. Kill switch: when a specific feature is itself the source of the incident and must be turned off immediately. All three are mitigation tools, not resolution—each must be followed by a separate root-cause fix.
 <!-- toc:begin -->
 ## In this series
 

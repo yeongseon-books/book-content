@@ -203,13 +203,12 @@ Incident response is preparation made visible. This closes the Information Secur
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Incident Response?**
-  - The article treats Incident Response as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Incident Response?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Incident Response reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What should you do in the first minute after a security incident?**
+  - Clarify responsibilities at each stage: alert fired → severity classification → initial response → investigation start → finding documentation → recovery plan → execution → postmortem.
+- **What is the flow of the NIST IR cycle?**
+  - Understanding the damage-scale difference between 1-hour vs. 24-hour response times for a compromise indicator lets you set response priorities.
+- **How do you balance containment with evidence preservation?**
+  - Define regular incident-response drills, runbook validation and updates, and follow-up tracking from postmortem findings.
 <!-- toc:begin -->
 ## In this series
 

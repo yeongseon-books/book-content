@@ -446,12 +446,12 @@ A small evaluation set and a four-stage pipeline are the only two habits you rea
 
 ## Answering the Opening Questions
 
-- **What stages are non-negotiable in a minimal Korean RAG pipeline?**
-  - The article treats Assembling a Korean RAG pipeline as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which stage most often becomes the quality bottleneck — chunking, embedding, retrieval, or generation?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How should retrieved context be formatted before it reaches the LLM?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What stages are indispensable in a minimal Korean RAG pipeline?**
+  - Ingest, Index, Retrieve, Generate—four stages that cannot be removed even from the smallest setup. Chunk the documents, prepare embeddings and an index, find top chunks, and have the model answer using only those chunks. Only then can you call it RAG. This article separated each stage into its own function so you can see immediately which point broke.
+- **Where does the quality bottleneck usually appear first—chunking, embedding, retrieval, or generation?**
+  - From this article's perspective, chunking and retrieval surface bottlenecks first. If chunks are split at wrong semantic boundaries or retrieval Recall is low, the downstream LLM produces wrong answers no matter how fluent it sounds. That's why `hit_ids`, `hit_scores`, and unanswerable-question checks are logged together.
+- **What shape should retrieved context take before entering the LLM?**
+  - Format it as context blocks tagged with chunk IDs, separated by blank lines, accompanied by citation and no-speculation rules. This way the `[sources: ...]` at the end of the answer links back to actual retrieval candidates, and questions without context get an "I don't know" response. Context delivery is not text copy-paste—it's verifiable-evidence format design.
 
 <!-- toc:begin -->
 ## In this series

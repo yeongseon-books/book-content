@@ -202,13 +202,12 @@ Encryption and hashing do different jobs. Next we look at how these tools combin
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Cryptography and Hashing?**
-  - The article treats Cryptography and Hashing as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Cryptography and Hashing?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Cryptography and Hashing reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do symmetric-key and public-key encryption differ?**
+  - Make explicit where SHA-256 hashing, bcrypt password storage, and AES-256 encryption are each applied, verified, and where failures are recorded.
+- **Where does the line fall between hash and HMAC?**
+  - Same input → same hash; slightly different input → completely different hash. Encryption requires a key to decrypt, and without the key the computational cost must be high.
+- **Why is plain encryption insufficient and AEAD necessary?**
+  - Define and execute hash-algorithm migration procedures, encryption key rotation steps, and sensitive-data monitoring rules.
 <!-- toc:begin -->
 ## In this series
 

@@ -162,13 +162,12 @@ Next, we cover initial response.
 
 ## Answering the Opening Questions
 
-- **What separates SEV1, SEV2, and SEV3 in practice?**
-  - The article treats Severity Classification as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which axes matter most: users, scope, revenue, legal exposure, or duration?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How should severity affect paging and update cadence?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What is severity a language for?**
+  - SEV1 means company-wide disruption, SEV2 means a major feature is unavailable, SEV3 means partial impact. Each level determines paging and reporting rules.
+- **How should you draw the line between SEV1, SEV2, and SEV3?**
+  - Classify dynamically using affected user count, blast radius (total vs. partial), and estimated recovery time. Refine thresholds for edge cases by consulting senior responders.
+- **Why do you need impact axes like user count, scope, and financial loss?**
+  - These numbers replace subjective statements like "it's bad" with objective criteria like "5,000 users affected for 15+ minutes."
 <!-- toc:begin -->
 ## In this series
 

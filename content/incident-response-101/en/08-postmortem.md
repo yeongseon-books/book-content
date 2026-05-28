@@ -156,13 +156,12 @@ Next, we cover prevention.
 
 ## Answering the Opening Questions
 
-- **Why is a postmortem still necessary after the incident is already over?**
-  - The article treats Postmortem as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What does blameless analysis mean in practical terms?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why should the template stay stable across incidents?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why is a postmortem necessary after every incident close?**
+  - You've already paid a large cost for one incident. If you don't learn from it, the same cost recurs. A postmortem gathers information scattered across detection, mitigation, and recovery into one document that makes timeline, root cause, and action items explicit—turning experience into an organizational asset.
+- **How is blameless different from "no accountability"?**
+  - Blameless means "don't punish individuals," not "no one is responsible." Punishing people causes information hiding during the next incident, increasing recurrence. Find causes at the system/process level, but assign follow-up actions and owners clearly. That's how you honor both principles simultaneously.
+- **Why lock in a fixed template instead of inventing a new format each time?**
+  - When the format varies per incident, mandatory fields like timeline, impact, root cause, and action items are easily omitted, and cross-incident comparison becomes impossible. A fixed template reduces the author's cognitive load so more time goes to fact-gathering and analysis, and accumulated postmortems become a pattern-analyzable dataset.
 <!-- toc:begin -->
 ## In this series
 

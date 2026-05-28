@@ -259,12 +259,12 @@ The next article (episode 5) covers HyperCLOVA X and Solar API. We will look at 
 
 ## Answering the Opening Questions
 
-- **When you add OCR, should you inspect text accuracy first, or response structure first?**
-  - The article treats Document text extraction with CLOVA OCR API as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why do bounding boxes and `lineBreak` hints matter so much in post-processing?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why can you validate most of the OCR pipeline even without a real API key?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **When plugging in OCR, should you check text accuracy first or response structure first?**
+  - Check response structure first. Even if every token is read correctly, if `공급가액` and `45,000원` end up as separate lines or unrelated document fragments, retrieval and RAG break immediately. That's why post-processing that reassembles `fields` into line-level text matters as much as OCR accuracy itself.
+- **Why are bounding boxes and `lineBreak` hints so important in post-processing?**
+  - `lineBreak` tells you which tokens form a single line; bounding boxes provide the reference for reconstructing column or table-cell structures. On receipts and invoices, without these hints amounts, dates, and item names can mix across rows. The OCR response JSON is not plain text—it's raw material for rebuilding lines and layout.
+- **Why can you verify most of the OCR pipeline even without a real API key?**
+  - The part that breaks most often in production is post-processing logic, not authentication. With a mock payload alone you can deterministically test line reconstruction, amount regex validation, confidence aggregation, and corpus conversion—the core path. When a real key arrives, only the front end that fetches responses changes; the back-end logic is reused as-is.
 
 <!-- toc:begin -->
 ## In this series

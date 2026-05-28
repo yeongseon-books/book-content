@@ -189,13 +189,12 @@ This series wraps up here. Next, read the SRE 101 and Information Security 101 s
 
 ## Answering the Opening Questions
 
-- **Why does runbook quality show up most clearly at 3 a.m.?**
-  - The article treats Building an Incident Runbook as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How should severity policy connect to on-call ownership and templates?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why is runbooks-as-code better than keeping everything in a wiki?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why consolidate incident-response knowledge into a single runbook?**
+  - During an incident, people cannot think the way they normally do. If information is scattered across chat, wiki, code, and tickets, the first 30 minutes are consumed by information hunting. A runbook that bundles the severity table, on-call schedule, communication templates, and step-by-step checklists in one place reduces cognitive load and decisively speeds up response.
+- **How do the severity table and on-call schedule connect inside the runbook?**
+  - The severity table decides "given this signal, what level is it?"—which determines how quickly and whom to wake. The on-call schedule tells you "who is the person to wake at that level right now?" Keeping both in the same runbook means the flow from alert → severity classification → paging target is never interrupted.
+- **How should communication templates and response steps be managed together?**
+  - Pair each response phase (detect, mitigate, recover, close) with its matching internal-notice, status-page, and customer-notice template in the same runbook. That way an engineer mid-mitigation never has to reinvent "what channel gets what message at this phase." If the steps and templates live apart, one side updates while the other goes stale, and mismatched messages go out during the next incident.
 <!-- toc:begin -->
 ## In this series
 

@@ -280,12 +280,12 @@ The next article (episode 6, the final one) assembles a Korean RAG pipeline. We 
 
 ## Answering the Opening Questions
 
-- **What API contract should you lock down before you start prompt tuning?**
-  - The article treats Using HyperCLOVA X and Solar API as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What should you validate first when introducing Korean-first generation APIs such as HyperCLOVA X or Solar?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why does the runnable example use Groq `llama-3.1-8b-instant` as a stand-in?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What API contracts must you lock down before prompt tuning?**
+  - Lock the call contract, message contract, sampling contract, and response contract first: authentication and endpoint, system/user message structure, `temperature` and token ceiling, JSON validation and masking—bundled as one set. Only with this frame fixed can you read what actually changed quality when you revise prompt wording.
+- **When adopting a Korean generation API like HyperCLOVA X or Solar, what should you verify first?**
+  - Before Korean fluency, verify that authentication, timeout, retry, output format, refusal handling, and PII masking are stable. This article covered JSON enforcement, length validation, forbidden-phrase checks, and status-code-based retry policy first. In production, calls break more often from contract instability than from insufficient expressiveness.
+- **Why does the runnable example use Groq `llama-3.1-8b-instant` as a stand-in model?**
+  - So readers without HyperCLOVA X or Solar keys can immediately practice durable patterns—system messages, sampling, JSON response validation. The structure learned on Groq transfers to Solar with just a `base_url` change, and to HyperCLOVA X with header and endpoint swaps. The stand-in model is not a diluting detour but a device for building a provider-independent baseline.
 
 <!-- toc:begin -->
 ## In this series

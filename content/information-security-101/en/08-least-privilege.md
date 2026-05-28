@@ -200,13 +200,12 @@ Least privilege defines the cost of an incident. Next we look at what makes inci
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Least Privilege?**
-  - The article treats Least Privilege as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Least Privilege?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Least Privilege reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What exactly does the principle of least privilege mean?**
+  - Clarify which API endpoints the USER role can access, which it cannot, and where that enforcement is applied.
+- **How should you design allow and deny in IAM policies?**
+  - Documenting in policy form why service A can read B's data but C cannot write to it lets you respond to permission errors.
+- **When do RBAC, ABAC, and ReBAC diverge?**
+  - Define role and permission audit logs, permission-request approval processes, and periodic cleanup rules for unused permissions.
 <!-- toc:begin -->
 ## In this series
 

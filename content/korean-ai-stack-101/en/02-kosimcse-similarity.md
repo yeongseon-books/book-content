@@ -227,12 +227,12 @@ The next article (episode 3) covers BGE-M3. We will see where it surpasses KoSim
 
 ## Answering the Opening Questions
 
-- **Where does KoSimCSE usually pay off first in Korean retrieval work?**
-  - The article treats Building sentence similarity search with KoSimCSE as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why is indexing FAQ questions alone a clean first version of search?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **Where does KoSimCSE show its effect first in Korean retrieval tasks?**
+  - It shows up first on short Korean FAQ questions—password reset, missing order history—rephrased in different words. When same-intent sentences land at top-1 with a clear score gap to the second candidate (as in this article's examples), the model is ready to serve as a retrieval baseline. The first payoff comes in Korean sentence-similarity ranking, not flashy multilingual search.
+- **Why is indexing only the FAQ questions a clean first version?**
+  - When retrieval is wrong, you can immediately narrow the cause to question-meaning matching. If answers are mixed in, sentence length, explanation style, and extra context bleed into scores, making debugging harder. That's why the first version separates questions from answers by role.
 - **Why do normalized embeddings pair so well with `IndexFlatIP`?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - Inner product on normalized vectors equals cosine similarity, making score interpretation straightforward. Without normalization, longer sentences or specific length biases dominate scores and blur FAQ rankings. That's why this article always treats `normalize_embeddings=True` and `IndexFlatIP` as a single unit.
 
 <!-- toc:begin -->
 ## In this series

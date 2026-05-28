@@ -197,13 +197,12 @@ Both bugs stem from inconsistent input handling. Next we step away from code int
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying SQL Injection and XSS?**
-  - The article treats SQL Injection and XSS as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for SQL Injection and XSS?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when SQL Injection and XSS reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What mechanism exactly causes SQL injection?**
+  - Distinguishing prepared-statement construction in `SELECT * FROM users WHERE id = ?` from automatic escaping in HTML templates makes implementation clear.
+- **Does using an ORM truly make you safe?**
+  - Tracing how a payload is parsed and at which stage it's either rejected or executed gives you clear response criteria.
+- **Where do Reflected, Stored, and DOM-based XSS diverge?**
+  - Define suspicious-grammar inspection in query logs, XSS simulation tests, and escaping-rule change monitoring when updating external libraries.
 <!-- toc:begin -->
 ## In this series
 

@@ -203,13 +203,12 @@ The big arc of web security is origin and cookies. Next we look at the two famou
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Web Security Basics?**
-  - The article treats Web Security Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Web Security Basics?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Web Security Basics reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What exactly does the same-origin policy mean?**
+  - Clarify where validation happens and where logs are written at each step: form submission → route dispatch → query construction → response generation → cookie setting.
+- **What does CORS allow and what does it block?**
+  - Understanding GET vs. POST cookie transmission, why CORS preflight requests are needed, and how CSP headers defend against XSS reduces post-deploy confusion.
+- **Why is CSP important for reducing XSS damage?**
+  - Define security header settings (HSTS/X-Frame-Options/X-Content-Type-Options), cookie attribute audits, and regression tests for input-validation rule changes.
 <!-- toc:begin -->
 ## In this series
 

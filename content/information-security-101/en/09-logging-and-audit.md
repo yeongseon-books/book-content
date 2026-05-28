@@ -197,13 +197,12 @@ Logs are how incidents become visible. The final episode covers what to do once 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Logging and Audit?**
-  - The article treats Logging and Audit as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Logging and Audit?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Logging and Audit reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do operational logs and security logs differ?**
+  - Clarify which system records login failures, permission denials, and suspicious queries, in what format they're centralized, and what rules trigger alerts.
+- **What must you log and what must you never log?**
+  - At 1,000 events/second, storing everything is expensive and sampling risks missing critical events. Setting the rule between them enables effective monitoring.
+- **Why do audit logs need a separate store and immutability?**
+  - Define log format standardization, monitoring-rule validation (reducing false alarms), and log retention/deletion policies.
 <!-- toc:begin -->
 ## In this series
 

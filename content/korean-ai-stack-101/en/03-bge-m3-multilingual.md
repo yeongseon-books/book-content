@@ -242,12 +242,12 @@ The next article (episode 4) covers the CLOVA OCR API. We will reliably pull tex
 
 ## Answering the Opening Questions
 
-- **Where does BGE-M3 outperform KoSimCSE on a corpus mixing Korean and English?**
-  - The article treats BGE-M3 multilingual embedding in practice as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What does it mean for a single model to emit dense, sparse, and multi-vector representations at once?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why is the dense-only baseline often enough for the first version of multilingual search?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Where is BGE-M3 stronger than KoSimCSE on a Korean-English mixed corpus?**
+  - The advantage is clearest when a Korean query must find an English runbook or English product document. In this article's examples, a Korean question pulled an English rollback doc to top-1, and ko→en Recall was measured separately to confirm the gap. BGE-M3's first value is bridging Korean meaning into English document space reliably.
+- **What does it mean that one model produces dense, sparse, and multi-vector representations simultaneously?**
+  - The same backbone can emit a semantic vector (dense), token-weight-based signals (sparse), and per-token interaction representations (multi-vector) together. This article fixes only dense first to measure a multilingual baseline. The reason: when you later add sparse or rerank, you can isolate where the improvement came from.
+- **Why is dense alone often sufficient for a first multilingual retrieval version?**
+  - Dense alone already lets you compare Korean queries and English documents in the same vector space, so the initial improvement margin is large. Measuring Recall@5 first gives you a clear baseline before adding sparse or multi-vector. Not turning on complex signals all at once keeps quality gains and latency increases explainable.
 
 <!-- toc:begin -->
 ## In this series

@@ -166,12 +166,11 @@ Next, we cover severity classification.
 ## Answering the Opening Questions
 
 - **Which problems should count as an incident instead of a regular bug?**
-  - The article treats What is an Incident? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+  - Look at customer impact first. The people you page, the channel you open, and the notification cadence all follow from that single judgment.
 - **How is an alert different from an incident?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - An alert is an input signal meaning "something happened." An incident is a classification result meaning "response is required."
 - **What metrics make customer impact concrete enough to page people?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+  - Define thresholds using affected user count and outage duration. These are operational agreements, not technical laws, so they must be documented.
 <!-- toc:begin -->
 ## In this series
 

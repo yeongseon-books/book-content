@@ -159,13 +159,12 @@ Next is the capstone: Building an Incident Runbook.
 
 ## Answering the Opening Questions
 
-- **Why do incidents repeat even after strong postmortems?**
-  - The article treats Prevention as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which follow-up items deserve regression tests first?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How do guardrails differ from warnings or documentation?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why does the same incident recur even after a postmortem?**
+  - Even a well-written postmortem document is useless if its action items never enter someone's backlog—or enter but keep losing priority. Analysis only produces "understanding"; "change" comes exclusively from executing follow-up work.
+- **What goes wrong when action items aren't tracked?**
+  - Without tracking, no one knows who owns what or how far it's progressed. When the same class of incident fires again, the new postmortem can't even find evidence that the item existed before. Untracked learning accumulates into an organization that never improves. Every action item must be reduced to a ticket with an owner and a due date.
+- **Why are regression tests the core of recurrence prevention?**
+  - Hardening a once-failing scenario into an automated regression test (or monitoring synthetic, or chaos test) means the CI or alerting system blocks the same defect before a human notices it. Human memory and documents decay over time, but automated checks keep the same strength indefinitely.
 <!-- toc:begin -->
 ## In this series
 

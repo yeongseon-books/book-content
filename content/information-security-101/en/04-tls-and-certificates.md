@@ -196,13 +196,12 @@ TLS bundles secrecy, integrity, and origin. Next we look at security on top of t
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying TLS and Certificates?**
-  - The article treats TLS and Certificates as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for TLS and Certificates?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when TLS and Certificates reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What exactly does the browser padlock guarantee?**
+  - Understanding each step—reading the server certificate on an HTTPS request, client verifying via the CA chain, public-key handshake establishing the session—lets you respond to certificate errors.
+- **What stages does a TLS 1.3 handshake go through?**
+  - Distinguishing self-signed from CA-signed certificates and wildcard from SAN certificate validation reduces deployment failures.
+- **How is an X.509 certificate chain verified?**
+  - Define certificate expiration monitoring, renewal-script verification, certificate-pinning policy, and logging rules for certificate errors.
 <!-- toc:begin -->
 ## In this series
 

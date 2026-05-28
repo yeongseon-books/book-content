@@ -160,13 +160,12 @@ Next, we cover communication.
 
 ## Answering the Opening Questions
 
-- **What should happen first after a page is acknowledged?**
-  - The article treats Initial Response as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why is stabilization usually more urgent than diagnosis?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How much impact estimation is enough for the first update?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What should you do first in the five minutes after an alert fires?**
+  - Stabilize immediately. Customer impact is growing every second you wait.
+- **Why does stabilization come before diagnosis?**
+  - Confirm the blast radius first, then hunt for the cause. Reversing this order makes resolution take longer.
+- **What numbers should you use to express impact?**
+  - Affected customer count, customer-impact duration, and service recovery time—objective metrics, not feelings.
 <!-- toc:begin -->
 ## In this series
 

@@ -198,13 +198,12 @@ The starting point of information security is not control technology — it is t
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Is Information Security??**
-  - The article treats What Is Information Security? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Is Information Security??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Is Information Security? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What exactly does information security mean?**
+  - The asset → threat → risk → control flow shown in the diagram is the foundation of every security decision. At each stage you must decide "what," "why," and "by when."
+- **How do CIA, threats, vulnerabilities, and risks connect?**
+  - The step-by-step exercise (steps 1–5) is about building a one-page STRIDE threat model hands-on to experience this flow for yourself.
+- **Why is STRIDE a useful checklist even for beginners?**
+  - The goal is not perfect security. It's documenting the risk priorities your team agrees on and the controls mapped to each threat.
 <!-- toc:begin -->
 ## In this series
 

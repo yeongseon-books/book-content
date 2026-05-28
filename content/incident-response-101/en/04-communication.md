@@ -161,13 +161,12 @@ Next, we cover writing the timeline.
 
 ## Answering the Opening Questions
 
-- **Who needs updates during an incident, and what should each audience hear?**
-  - The article treats Communication as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why is a fast imperfect first update usually better than a delayed perfect one?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How should severity shape the update cadence?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **During an incident, who needs which message and when?**
+  - Decide channel → paging scope → reporting cadence first. Clear communication ground rules make collaboration predictable.
+- **Why separate internal-team, customer, and executive messages?**
+  - Focus on one channel at a time and make each channel's purpose (team/exec/customer) explicit.
+- **How polished does the first status update need to be?**
+  - Report at fixed intervals—5 min, 15 min, or 30 min—and state the current phase clearly each time.
 <!-- toc:begin -->
 ## In this series
 

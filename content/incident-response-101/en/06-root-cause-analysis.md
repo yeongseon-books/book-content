@@ -159,13 +159,12 @@ Next, we cover mitigation and resolution.
 
 ## Answering the Opening Questions
 
-- **How do you distinguish a trigger from a root cause?**
-  - The article treats Root Cause Analysis as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why does the Five Whys method still help even in modern systems?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Which contributing-factor axes are worth tracking explicitly?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do you find the real cause of an incident?**
+  - Don't stop at "the component that broke." Ask why that component behaved that way at that moment, stepping back one layer at a time. Usually the answer is not a single line of code but a system-level weakness—an untested assumption, a missing alarm, or an omitted operational procedure. You've reached the real root cause when no new answers emerge.
+- **Why is 5 Whys still useful?**
+  - The tool is simple enough that anyone can use it immediately. Repeating "why?" naturally shifts blame from people to systems and processes. Five is not a magic number, but stopping at two or three leaves you at the surface, while going too deep makes answers overly abstract—five is an empirically reasonable depth.
+- **Where does the line fall between trigger and root cause?**
+  - A trigger is the direct stimulus that fired the incident at that moment (a specific deploy, a traffic spike, a particular input). A root cause is the structural weakness that prevented the system from withstanding that trigger. The same trigger might not cause an incident in a different system, so blocking only the trigger leaves you vulnerable to the next variant.
 <!-- toc:begin -->
 ## In this series
 

@@ -197,13 +197,12 @@ Secret management is about lifetime, not location. Next we look at what the hold
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Secret Management?**
-  - The article treats Secret Management as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Secret Management?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Secret Management reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do static secrets and dynamic secrets differ?**
+  - Clarify where API keys, DB passwords, and OAuth tokens are stored, who can read them, and what logs are produced on access.
+- **How far does an environment variable's validity extend?**
+  - Understanding Vault secret renewal—existing secret's TTL, new secret's start time, rolling method—reduces deployment failures.
+- **What roles do Vault and KMS each play?**
+  - Define secret-access log analysis, secret-rotation script audits, and leaked-secret scan automation (git-secrets/truffleHog).
 <!-- toc:begin -->
 ## In this series
 
