@@ -244,12 +244,12 @@ This wraps up the Python 101 series. The functions, modules, classes, and standa
 
 ## Answering the Opening Questions
 
-- **How to handle dates and times with `datetime`?**
-  - The article treats Standard library tour: datetime, pathlib, json, collections, itertools as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How to treat file paths as objects with `pathlib.Path`?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How to convert between dicts and JSON strings using `json`?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Can you reduce external dependencies by checking the standard library first?**
+  - Categorize the problem into time, path, serialization, aggregation, or iteration. The article's log-summary tool traversed `logs/*.csv` with `pathlib`, counted levels with `Counter`, and wrote results with `json.dumps(..., ensure_ascii=False, indent=2)`—solving the requirement with zero external packages.
+- **Does shorter, familiar code speed up reviews because other Python developers know the same tools?**
+  - The evidence is concrete outputs: `Counter("banana")` gives `Counter({'a': 3, 'n': 2, 'b': 1})`; `Path("docs") / "intro.md"` produces `PosixPath('docs/intro.md')`; `json.loads(s) == data` is `True`. Shorter code preserves meaning when built on universally recognized primitives.
+- **Does matching the Python interpreter version guarantee identical behavior?**
+  - Not automatically. You must still avoid mixing naive `datetime.now()` with timezone-aware `ZoneInfo('Asia/Seoul')`, feeding unsorted input to `groupby`, or iterating an exhausted iterator twice. The stdlib-first principle simplifies dependency management, but each tool's preconditions must be respected for reproducible results.
 
 <!-- toc:begin -->
 ## In this series

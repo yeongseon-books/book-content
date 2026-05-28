@@ -320,12 +320,12 @@ The next chapter covers classes and objects. The functions and modules from earl
 
 ## Answering the Opening Questions
 
-- **Open and close files safely using `open()` together with the `with` statement?**
-  - The article treats File I/O and exception handling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Tell text mode (`"r"`, `"w"`, `"a"`) apart from binary mode (`"rb"`, `"wb"`) and pick the right one?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Describe the difference between `read`, `readline`, `readlines`, and iterating the file object in one sentence each?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why is `with` safer than calling `close()` directly in the open-read-close flow?**
+  - The article treats files as OS resources: whether the block exits normally or via exception, `__exit__` fires and releases the handle. `with open(..., encoding="utf-8") as f:` or `Path.read_text()` prevents handle leaks without manual `try`/`finally`/`close()`.
+- **When should you choose `read()`, `for line in f:`, `"rb"`, or `Path.read_text()`?**
+  - Small text files: `read()` or `Path.read_text(encoding="utf-8")`. Large files: `for line in f:` to conserve memory. Binary data (images, archives): `"rb"` mode so bytes pass through unaltered.
+- **What goes wrong if you swallow all exceptions with bare `except:` or write directly to the final file?**
+  - Bare `except:` hides permission errors and code bugs alongside the `FileNotFoundError` you intended to catch, making root-cause analysis impossible. Writing directly to the final path risks leaving a corrupted file on mid-write failure—the temp-file-then-replace pattern (`tmp.write_text(...); tmp.replace(final)`) prevents this.
 
 <!-- toc:begin -->
 ## In this series

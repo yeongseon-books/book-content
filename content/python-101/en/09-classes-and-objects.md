@@ -366,12 +366,12 @@ The next chapter is a tour of the standard library. Now that functions, modules,
 
 ## Answering the Opening Questions
 
-- **Define a class with the `class` statement and create instances from it?**
-  - The article treats Classes and objects: bundling data with behavior as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Explain the role of `__init__` in instance initialization?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Explain what `self` refers to and why it is the first parameter of a method?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What changes when you move user data from multiple dicts to a class or `@dataclass`?**
+  - The article consolidated scattered `{"name": ..., "email": ...}` dicts and helper functions into a single `User` class—and for simpler cases used `@dataclass` to auto-generate `__init__`, `__repr__`, and `__eq__`. Fields live in one place, `self.name` replaces `user['name']`, and static analysis plus autocomplete start working.
+- **How do `self`, `__repr__`, `__eq__`, and `super()` reveal how objects display, compare, and extend?**
+  - `obj.method(x)` internally becomes `Class.method(obj, x)`, so `self` anchors every method to its instance. `__repr__` like `User('Ada', 'a@x')` shows the object's identity; `__eq__` enables value-based comparison; `super().label()` demonstrates inheritance extension—each making object behavior visible.
+- **Why does putting a mutable object in a class attribute or stacking deep inheritance make debugging hard?**
+  - `class C: items = []` shares one list across all instances, making state-change origin untraceable. Deep inheritance forces `__mro__` traversal to find which parent owns a method. The article recommended composition and flat structures like `@dataclass` as safer defaults.
 
 <!-- toc:begin -->
 ## In this series

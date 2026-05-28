@@ -374,12 +374,12 @@ The next chapter covers control flow — `if`, `for`, `while` — and shows how 
 
 ## Answering the Opening Questions
 
-- **How to tell list, tuple, set, and dict apart along the axes of mutability, order, duplicates, and hashability?**
-  - The article treats list, tuple, set, dict as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **A first-cut decision rule for which collection to reach for?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Core methods like slicing, `append`/`extend`, `pop`, `update`?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Assigning a list with `=` then modifying one side changes both — alias bug?**
+  - `b = a` doesn't create a new list; both names point to the same object. Use `b = a.copy()` or `b = a[:]` for a shallow copy, or `copy.deepcopy(a)` for nested structures.
+- **Using `def f(items=[]):` as a default causes the list to grow across calls?**
+  - Default arguments are evaluated once at function definition time and shared across calls. The fix: `def f(items=None): items = items if items is not None else []`—creating a fresh container each invocation.
+- **Accessing a missing key with `d[key]` raises `KeyError`?**
+  - For uncertain lookups, use `d.get(key, default)` to supply a fallback. When auto-initialization is needed, use `collections.defaultdict`. If key absence carries business meaning, branch explicitly with `if key in d:`.
 
 <!-- toc:begin -->
 ## In this series

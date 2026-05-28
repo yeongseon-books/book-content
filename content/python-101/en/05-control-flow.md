@@ -386,12 +386,12 @@ The next chapter covers functions and arguments. We will pin down `def`, `*args`
 
 ## Answering the Opening Questions
 
-- **How to handle truthy and falsy values deliberately when writing `if`/`elif`/`else`?**
-  - The article treats Control flow: if, for, while, comprehension as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **A first-cut decision rule for choosing between `for` and `while`?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How to combine `range`, `enumerate`, and `zip` for loops that read well?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **When do `if value:` and `if value is None:` mean completely different things?**
+  - Truthy/falsy rules bundle `0`, `""`, `[]`, and `None` together as false. If you only want to detect "not provided at all" vs "provided but empty," you must use `if value is None:` rather than the broader `if value:`.
+- **How do `zip`, `enumerate`, and comprehensions make index-managed loops more readable?**
+  - The article replaced `while i < len(names)` with `zip(names, scores)` and a comprehension—expressing "pair two sequences and keep scores ≥ 60" in one line. `enumerate(zip(...), start=1)` eliminates manual index tracking, length calculation, and accumulator manipulation.
+- **What bugs should you watch first with `while True`, `zip(..., strict=True)`, and `continue`?**
+  - `while True` risks infinite loops if the exit condition is missing; default `zip` silently truncates to the shorter input, hiding length mismatches; `continue` can skip post-processing. Check termination conditions, length validation, and placement of follow-up operations together.
 
 <!-- toc:begin -->
 ## In this series

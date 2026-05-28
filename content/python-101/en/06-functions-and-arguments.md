@@ -363,12 +363,12 @@ The next chapter covers modules and packages — `import`, `__init__.py`, and `_
 
 ## Answering the Opening Questions
 
-- **How to define a function with `def` and control what `return` hands back?**
-  - The article treats Functions and arguments: def, args, kwargs, default, lambda as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The five argument forms — positional, keyword, default, `*args`, `**kwargs` — and how they bind at call time?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How positional-only (`/`) and keyword-only (`*`) markers shape an API?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How does switching from long positional calls to keyword-only signatures change the call site?**
+  - The article transformed `make_greeting("ada", "en", True, ">> ", "!")` into `make_greeting("ada", lang="en", formal=True, prefix=">> ", suffix="!")`. Placing parameters after `*` forces keyword-only usage, eliminating boolean-position confusion and making the signature self-documenting.
+- **How do `*args`, `**kwargs`, and unpacking bundle and spread in function calls and wrappers?**
+  - In `show(1, 2, x=10)`, extra positional args become tuple `args` and keyword args become dict `kwargs`. `add3(*nums)`, `add3(**kw)`, and `wrapper(*args, **kwargs)` demonstrate the same notation working symmetrically for both packing and forwarding.
+- **Why do mutable defaults, missing `return`, and overuse of `lambda` blur a function's contract?**
+  - `buggy(item, items=[])` shares one list across calls, violating the expectation of fresh output. A missing `return` silently sends `None` to callers. `lambda` suits single-expression transforms; longer logic belongs in a named `def` where contract and intent remain visible.
 
 <!-- toc:begin -->
 ## In this series

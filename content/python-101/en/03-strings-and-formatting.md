@@ -390,12 +390,12 @@ The next chapter compares the four core collections — list, tuple, set, dict �
 
 ## Answering the Opening Questions
 
-- **Why Python 3's `str` is a Unicode string and how it differs from `bytes`?**
-  - The article treats Strings and formatting as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **When to reach for single, double, triple, raw, or byte literals?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The core methods `split`, `join`, `strip`, `replace`, `find`, `startswith`?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Reading a file with Korean text fails with `UnicodeDecodeError`?**
+  - The file's encoding isn't UTF-8 (e.g., a Windows file saved as CP949). Always pass `encoding="utf-8"` (or the actual encoding) to `open()`. For external files of uncertain origin, `errors="replace"` accepts partial corruption gracefully.
+- **Repeating `+` concatenation in a loop wastes memory and time building a large log?**
+  - Strings are immutable, so each `+` creates a new object—O(N²) cost for N fragments. Collect pieces in a list and `"".join(parts)` once, or write directly to a file handle for large outputs.
+- **Trusting user input directly in SQL creates injection vulnerabilities?**
+  - String formatting in queries lets payloads like `' OR 1=1 --` execute as SQL syntax. Always pass user input through the DB driver's parameter binding (`cursor.execute("... WHERE id=?", (uid,))`) to separate data from code.
 
 <!-- toc:begin -->
 ## In this series

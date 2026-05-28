@@ -358,12 +358,12 @@ The next article covers variables, types, and operators: what dynamic typing rea
 
 ## Answering the Opening Questions
 
-- **Why "just installing Python" is risky, and why you must separate system Python from project Python?**
-  - The article treats Why Python, and how to install and use venv as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How to install Python 3.12 safely on macOS, Windows, and Linux?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What a venv (virtual environment) actually solves?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why separate system Python from a project `.venv`, and how do you verify the boundary?**
+  - Mixing system Python with project dependencies causes package conflicts and permission issues. After `python3.12 -m venv .venv`, confirm the boundary with `which python` (or `where python` on Windows)—the path must point inside the project, not to the system interpreter.
+- **How do you read `which python`, `sys.executable`, and `pip --version` to confirm activation really worked?**
+  - The `(.venv)` prompt prefix is only a hint. True verification requires all three commands to resolve inside `.venv`. The article checked `hello.py`'s `Interpreter path` output, `pip --version`, and `pip freeze > requirements.txt` together—confirming interpreter, package location, and reproducibility in one pass.
+- **Why do `sudo pip install`, versionless `python3 -m venv`, and committing `.venv/` break reproducibility?**
+  - `sudo pip install` pollutes system Python; an ambiguous interpreter version lets each team member's venv bind a different Python. `.venv/` contains machine-specific binaries and must never be committed—collaboration relies on `requirements.txt` and an explicit Python version.
 
 <!-- toc:begin -->
 ## In this series

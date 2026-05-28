@@ -371,12 +371,12 @@ The next chapter covers file I/O and exception handling, where the modules you j
 
 ## Answering the Opening Questions
 
-- **Treat any `.py` file as a module and pull it into another file with `import`?**
-  - The article treats Modules and packages: import, __init__, __name__ as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Turn a directory into a package by adding `__init__.py`, and group modules inside it?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Explain the difference between `import x`, `from x import y`, and `import x as alias`?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Same-name functions and variables collide?**
+  - Putting everything in one file makes name collisions easy. Splitting into modules gives namespace separation: `mod_a.process` vs `mod_b.process`. Using `import x` or explicit named imports instead of `from x import *` is the first line of defense.
+- **Hard to find where a function is defined?**
+  - A single bloated file makes definition tracking painful. Package structure (`mypkg/auth.py`, `mypkg/billing.py`) makes the import path itself tell you "where it lives." IDE go-to-definition also works properly only when module boundaries exist.
+- **Difficult to reuse the same code in another project?**
+  - A monolithic script resists reuse. Separating into modules/packages with a public API declared in `__init__.py` lets other projects `pip install` or sys.path-register and import directly. Adding an `if __name__ == "__main__":` guard lets the module serve both as importable library and standalone script.
 
 <!-- toc:begin -->
 ## In this series

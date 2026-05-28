@@ -307,12 +307,12 @@ The next chapter dives into strings: f-strings and format specs, the difference 
 
 ## Answering the Opening Questions
 
-- **Why is a Python variable a name tag attached to an object rather than a box that holds a value?**
-  - The article treats Variables, types, and operators as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What does each of the five primitive types — `int`, `float`, `str`, `bool`, `None` — actually guarantee?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Where does dynamic typing meet type hints, and how do hints make that freedom safer?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **`total = total + items` raises `TypeError` — adding a number to a string?**
+  - Python's dynamic typing surfaces type conflicts only at runtime. The safe pattern is explicit conversion (`int()`, `float()`) at input time, plus starting accumulators with a typed initial value like `0` to prevent strings from leaking into arithmetic.
+- **`if user.age == "18":` is forever `False`?**
+  - `==` checks both value *and* type. An integer `user.age` will never equal the string `"18"`. Either convert before comparison (`int(user.age) == 18`) or normalize to a single type at input.
+- **`0.1 + 0.2 == 0.3` is `False`, breaking payment validation?**
+  - Floating point is binary approximation—`0.1 + 0.2` evaluates to `0.30000000000000004`. For financial/accounting domains, use `Decimal` or operate in the smallest unit (cents/won) so all arithmetic stays in integers.
 
 <!-- toc:begin -->
 ## In this series
