@@ -321,13 +321,12 @@ The next post covers real team workflows: PR conventions, CI checks, and operati
 
 ## Answering the Opening Questions
 
-- **The difference between migration-first and code-first deploy ordering?**
-  - The article treats Deploy ordering and blue/green: synchronizing schema and application code safely as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why a blue/green deploy requires schema changes that are compatible with two app versions at once?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How to split a NOT NULL tightening into two phases via expand-contract?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do migration-first and code-first deploy ordering differ?**
+  - In the expand phase, migration-first is correct: adding a new column like `phone` as nullable first ensures both old and new code versions can coexist when the new code starts writing values.
+- **Why does blue/green deployment require a schema compatible with two app versions simultaneously?**
+  - As shown at `t2` in the article's timeline, blue (v1) and green (v2) are both live and must both read and write S2. The schema must therefore create an overlapping safety zone for both versions rather than satisfying only one.
+- **Why must NOT NULL enforcement be split into two steps?**
+  - Add with `nullable=True` first; tighten to `nullable=False` only after `SELECT COUNT(*) FROM users WHERE phone IS NULL` returns 0. Without this gate, cramming both into one revision breaks the blue/green switchover due to NULL rows from the old version.
 <!-- toc:begin -->
 ## In this series
 

@@ -275,13 +275,12 @@ If overlap exceeds 50%, duplicate information actually degrades retrieval qualit
 
 ## Answering the Opening Questions
 
-- **Why do Korean, English, and code consume the context window so differently?**
-  - The article treats Tokenization and Chunking Strategies as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **When should you stay with a general-purpose tokenizer and when should you train your own?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What trade-offs separate fixed-size, sentence-aware, recursive, and semantic chunking?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why does the same Korean sentence often consume more tokens than its English equivalent?**
+  - Running `count_tokens()` on equivalent English, Korean, and code strings shows that similar character counts produce different token counts. The article therefore insists on using actual `tiktoken` output—not character length—as the basis for cost and chunk-size decisions.
+- **On what basis should you choose between BPE, WordPiece, and SentencePiece?**
+  - The answer lies in corpus characteristics and operational constraints, not in names. The article's approach is to first measure actual token distributions, then verify whether a custom `Tokenizer(BPE(...))` reduces sequence length before committing.
+- **When is training a domain-specific tokenizer actually valuable?**
+  - It becomes valuable when—as with `custom-bpe-32k.json`—specialized terms and Korean content cause a measurable reduction in token count. If expanding the vocabulary only inflates the embedding matrix without shrinking sequences, maintaining a custom tokenizer is not justified.
 <!-- toc:begin -->
 ## In this series
 

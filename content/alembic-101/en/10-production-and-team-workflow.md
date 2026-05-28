@@ -335,13 +335,12 @@ This series ends here, but in real operations every item above must be automated
 
 ## Answering the Opening Questions
 
-- **The one-revision-per-PR rule and why it matters?**
-  - The article treats Production and team workflow: PR, CI, monitoring, and incident response as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How to compose an Alembic-aware PR template and the matching CI checks?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How to manage multiple environments where dev=SQLite and staging+prod=PostgreSQL?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why is the one-revision-per-PR principle important?**
+  - With one revision per PR, reviewers examine a single `upgrade()`/`downgrade()` pair, and failure blast radius is limited to that one revision. The article recommended splitting expand, migrate, and contract into per-phase PRs for the same reason.
+- **How should an Alembic-aware PR template and CI checks be structured?**
+  - At minimum include `alembic check`, `alembic upgrade head && alembic downgrade -1 && alembic upgrade head`, a single-head guard, `--sql` preview, and a fresh-DB smoke test. These checks collectively answer "is there model drift?", "does downgrade break?", and "can a new DB boot to head?"
+- **How do you manage a multi-environment strategy like dev=SQLite, staging+prod=PostgreSQL?**
+  - Use `render_as_batch=True` in dev to absorb SQLite limitations; in staging and prod enable `compare_type=True` and `compare_server_default=True` on PostgreSQL for validation under the same engine. Fast experimentation happens in dev; engine-specific issues are caught in staging.
 <!-- toc:begin -->
 ## In this series
 

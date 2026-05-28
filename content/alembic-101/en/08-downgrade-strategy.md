@@ -248,13 +248,12 @@ The next post covers deploy ordering between application code and schema changes
 
 ## Answering the Opening Questions
 
-- **When a production downgrade is possible and when it is effectively impossible?**
-  - The article treats Downgrade strategy: when to write it for real and when to forbid it as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The kinds of irreversible changes and how to handle them?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How the expand-contract pattern restores the ability to downgrade?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **When is downgrade possible in production and when is it effectively impossible?**
+  - Reversible changes like adding `sa.Column("nickname", ..., nullable=True)` can have a working `downgrade()`, but the moment data is destroyed—as in `op.drop_column("users", "legacy_token")`—the operation is effectively irreversible. The article therefore defaults production incidents to forward-fix rather than downgrade.
+- **Which kinds of changes are irreversible, and how should they be handled?**
+  - Column drops, meaningful data backfills, and length reductions cannot restore original values even if rolled back, so marking them with `raise NotImplementedError(...)` is safer. This is far better than an empty `pass`, which the article noted prevents false success.
+- **How does expand-contract restore downgrade viability?**
+  - Adding `display_name` first, then backfilling, then finally dropping `name` creates a long safety window before phase 4. The pattern's value is maintaining a reversible zone by not cramming a rename into a single revision.
 <!-- toc:begin -->
 ## In this series
 

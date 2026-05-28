@@ -300,13 +300,12 @@ The next chapter shifts from tool use to deployment, where these AI features hav
 
 ## Answering the Opening Questions
 
-- **What makes an agent different from a normal chatbot?**
-  - The article treats First steps with AI agents — making the model use tools as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How does function calling work as a contract?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How does the model ask for a function invocation?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What distinguishes a regular chatbot from an agent?**
+  - A regular chatbot generates text within its existing knowledge, while an agent invokes external tools like `get_weather`, `get_exchange_rate`, and `calculate` as needed to assemble answers. The article split "How's the weather in Seoul?" and "Convert $100 to KRW and subtract 10% fee" into separate examples precisely to show this difference. The agent's core is not producing more text but bringing necessary external actions into the loop.
+- **What contract governs Tool Use / Function Calling?**
+  - The contract is defined by the `name`, `description`, `parameters`, and `required` schema inside the `tools` array. The model produces `tool_calls` based on this specification; actual execution happens in the application after `json.loads(tool_call.function.arguments)` passes allowlist and type checks. The article emphasized that poor `description` or renamed schemas degrade call quality before they affect answer accuracy.
+- **How does the model request "please execute this function"?**
+  - The model does not execute functions directly—it places the function name and arguments in `response.choices[0].message.tool_calls`. The application then appends `{"role": "tool", ...}` with the result and calls `client.chat.completions.create(...)` again for the final answer. Loop bounds like `for _ in range(3)` or `for i in range(5)` exist to prevent this request-execute-re-judge cycle from running indefinitely.
 <!-- toc:begin -->
 ## In this series
 

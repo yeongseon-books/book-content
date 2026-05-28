@@ -295,13 +295,12 @@ Korean data has traps that English code misses.
 
 ## Answering the Opening Questions
 
-- **Why should PII handling be split into detection, classification, anonymization, and audit?**
-  - The article treats PII Detection and Anonymization for Training Data as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What does regex catch quickly, and where do you need NER or review queues?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **When should you redact, mask, pseudonymize, or synthesize instead?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why split the PII pipeline into detection, classification, anonymization, and audit?**
+  - `detect_regex()` and `detect_ner()` find entities; `redact()`, `mask()`, and `pseudonymize()` transform them; `anonymize_with_audit()` verifies the result. Separating stages lets you independently explain where a miss occurred and which method was applied.
+- **How do regex-detectable entities differ from those requiring NER?**
+  - Regex quickly catches structurally obvious values like `alice@example.com` or `010-1234-5678`, while NER catches names and locations embedded in sentences such as `John Smith` or `Seoul`. The test output distinguished `regex_types` from `ner_types` for exactly that reason.
+- **When does each of redact, mask, pseudonymize, and synthesize fit?**
+  - Use `redact()` when safety is paramount, `mask()` when partial visibility is needed, `pseudonymize()` when you must trace patterns for the same user, and `synthesize()` when you need distribution-preserving training data. The article showed all four side by side to emphasize choosing by purpose, not defaulting to one.
 <!-- toc:begin -->
 ## In this series
 

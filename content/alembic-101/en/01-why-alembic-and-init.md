@@ -224,13 +224,12 @@ The next episode opens up `env.py`. We will wire it to your model metadata, read
 
 ## Answering the Opening Questions
 
-- **What problem a "migration tool" actually solves?**
-  - The article treats Why Alembic, and getting to alembic init as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why `Base.metadata.create_all` is not enough for production?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Alembic's core concepts: revision, head, version table?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What problem does a migration tool actually solve?**
+  - What `alembic revision -m "add users.tier"` and `alembic upgrade head` solve is not executing a single SQL statement but maintaining change history, enabling code review, and synchronizing environments. Revision files become the change log, so you can reconstruct who deployed which schema change and when.
+- **Why can't `Base.metadata.create_all` alone survive a production environment?**
+  - `create_all` can create tables that are needed right now but cannot record the order of `ALTER TABLE` operations or provide a rollback path. In production you must incrementally modify an existing database, and the lack of an upgrade/downgrade chain is precisely that limitation.
+- **What roles do revision, head, and the `alembic_version` table each play?**
+  - A revision is an individual change unit; head is the current tip of the graph; and the `alembic_version` table records which revision the database has been upgraded to. `upgrade head` works because it compares the code-side head with the version row stored in the database.
 <!-- toc:begin -->
 ## In this series
 

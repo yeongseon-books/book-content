@@ -300,13 +300,12 @@ Next, we will look at the split discipline that must follow generation and augme
 
 ## Answering the Opening Questions
 
-- **How is augmentation different from synthetic generation?**
-  - The article treats Data Augmentation - From EDA to Back-Translation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What decision path should you follow for minority-class support and typo robustness?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **When should you choose EDA, back-translation, paraphrasing, or AST transforms?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How does augmentation differ from synthetic generation?**
+  - Augmentation in this article transforms existing labeled data while preserving `source_id`, `aug_method`, and `similarity` metadata to reinforce training. Unlike synthetic generation—which creates tasks from scratch—augmentation must continuously verify semantic preservation against the original sample.
+- **What decision path solves minority-class and typo-robustness problems?**
+  - The article uses paraphrase to expand scarce classes like `refund_delay`, and a separate `inject_typo()` slice for typo robustness. Keeping the two problems in distinct batches and tracking `refund_delay_recall` and `typo_slice_f1` separately reflects their different decision paths.
+- **When should you choose EDA, back-translation, paraphrase, or AST transform—and when should you stop?**
+  - For Korean text classification, start with paraphrase plus morpheme guardrails; stop when aggressive EDA drops `macro_f1` to 0.804. AST transforms apply only to code data. The final stop/go decision comes from deltas on the held-out set.
 <!-- toc:begin -->
 ## In this series
 

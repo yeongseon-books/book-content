@@ -253,13 +253,12 @@ The next post covers the branches that appear when several people generate revis
 
 ## Answering the Opening Questions
 
-- **What `alembic revision --autogenerate` actually compares under the hood?**
-  - The article treats autogenerate: the line between what it catches and what it misses as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which kinds of changes autogenerate handles well, and which it misses?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The `compare_type`, `compare_server_default`, `include_object`, and `include_name` options?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What does `alembic revision --autogenerate` compare internally?**
+  - The command reads the current database via `Inspector` through the connection created by `env.py`, compares the result against `target_metadata`, and renders `MigrationOps` into `op` calls. It serializes the diff between ground truth and desired state into a file.
+- **Which changes are caught reliably, and which are missed or require options?**
+  - New tables, new columns, and `nullable` changes are caught well, but renames are misread as `drop_column` + `add_column`, and data changes are invisible entirely. The `display_name` example showed why you must never commit the generated file as-is—human review is needed to restore intent.
+- **When are `compare_type`, `compare_server_default`, `include_object`, and `include_name` needed?**
+  - The first two are needed to detect changes from `String(50)` to `String(100)` or modified `server_default` values. Conversely, when externally owned tables like `legacy_` pollute the diff, `include_object` or `include_name` exclude them from comparison.
 <!-- toc:begin -->
 ## In this series
 

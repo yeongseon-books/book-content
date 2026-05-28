@@ -244,13 +244,12 @@ Ordering matters. Heuristics run first because they are fastest. Perplexity and 
 
 ## Answering the Opening Questions
 
-- **Which low-cost heuristics catch obvious junk before you spend model calls on it?**
-  - The article treats Quality Filtering - Heuristics and Classifiers as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What does language detection remove that simple length or symbol checks cannot?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How should perplexity and classifier scores sit behind the heuristic layer?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why are collected data and trainable data not the same set?**
+  - Collected data is only a starting point; the actual training set contains only samples that pass `passes_heuristic()`, `keep_languages()`, `PerplexityFilter.passes()`, and `quality_score()`. The article prioritized per-stage survivors and drop reasons over raw crawl volume for this reason.
+- **What do heuristic signals like length, symbol ratio, digit ratio, and repetition catch quickly?**
+  - These signals cheaply eliminate obvious junk—`too_short`, `symbol_heavy`, `digit_heavy`, `repetitive`—at the front of the pipeline. Placing them before classifiers or perplexity filters removes clear garbage with just a few lines of CPU computation.
+- **What kinds of contamination do language detection and perplexity filtering each remove?**
+  - `keep_languages(..., allowed={"ko", "en"})` removes out-of-domain language mixing, while `PerplexityFilter("wiki-en.binary")` catches broken encodings and abnormal boilerplate. One asks "what language is this?" and the other asks "does this look like normal text?".
 <!-- toc:begin -->
 ## In this series
 

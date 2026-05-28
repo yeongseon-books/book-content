@@ -365,13 +365,12 @@ Next, we will stay in the same late-series workflow arc and look at augmentation
 
 ## Answering the Opening Questions
 
-- **What should a real synthetic-data batch start with and end with?**
-  - The article treats Synthetic Data Generation - From Self-Instruct to Distillation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **When do you choose Self-Instruct, Evol-Instruct, RAG eval generation, or distillation?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Which validation gates must a generated JSON artifact pass before it becomes training data?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What input does a domain fine-tuning synthetic batch start from, and what artifact should it produce?**
+  - In this article's flow, batches start from `SEED_TASKS` and `FAQ_CHUNKS`, pass through `generate_batch()`, and must end as `accepted.jsonl` after passing `validate_batch()`. The final deliverable is a validated JSON artifact, not raw model output text.
+- **When should you choose Self-Instruct, Evol-Instruct, RAG eval, or distillation?**
+  - Use `self_instruct` to broaden coverage, `evol_instruct` to raise difficulty, `rag_eval` to separately measure grounding fidelity, and `distillation` only after a teacher-output reuse policy passes review. The `BRANCH_GUIDE` and `require_policy_review()` exist to codify those branching criteria.
+- **What validation gates must generated JSON artifacts pass before entering the real dataset?**
+  - `validate_item()` checks required keys, `evidence`, refusal phrases, and length; `validate_batch()` then enforces `accept_ratio`, `unique_ratio`, and `refusal_ratio`. A batch that fails these thresholds must end as `reject_batch` regardless of apparent volume.
 <!-- toc:begin -->
 ## In this series
 

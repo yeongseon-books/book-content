@@ -282,13 +282,12 @@ Start with SQLite under 50 datasets and migrate when your search needs grow. Pre
 
 ## Answering the Opening Questions
 
-- **What metadata must exist the moment a dataset lands on disk?**
-  - The article treats Source Data Collection and Cataloging as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How do public datasets, web scraping, and vendor feeds differ in operational risk?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why should collection and dataset-card creation happen in one transaction?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What must you record so that at re-training time you can immediately answer "where did this data come from"?**
+  - Store `source_type`, `source_url`, `snapshot_date`, `row_count`, and `sha256` in a `DatasetCard`, alongside the `fingerprint_file()` result. That way a single card explains which snapshot of which origin produced a given CSV.
+- **How do the risks of first-party, public-dataset, scraped, and vendor data differ?**
+  - First-party data centers on consent and retention; public datasets on license and redistribution scope; scraped data on `robots.txt` and rate-limit compliance; vendor data on contract boundaries and provenance tracking. The article checked `PoliteScraper`, license fields, and `USAGE_POLICY` separately for exactly this reason.
+- **What minimum fields must a DatasetCard contain to support operations and regulatory response?**
+  - At minimum: name, version, source info, license, snapshot timestamp, `sha256`, schema, and owner. Adding `pii_fields` and `retention_days` ensures the downstream anonymization stage and regulatory inquiries remain unbroken.
 <!-- toc:begin -->
 ## In this series
 

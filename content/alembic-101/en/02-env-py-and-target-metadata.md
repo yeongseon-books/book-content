@@ -269,13 +269,12 @@ The next episode writes the first meaningful revision by hand. We will compare h
 
 ## Answering the Opening Questions
 
-- **What `env.py` actually is and when it runs?**
-  - The article treats env.py and target_metadata: wiring models to migrations as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why `target_metadata` is mandatory (it is the basis for autogenerate)?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **A safe pattern for reading the DB URL from an environment variable?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What exactly is `env.py` and when does it execute?**
+  - `env.py` is the boot script that Alembic runs on every command—`upgrade`, `revision --autogenerate`, `--sql`, and so on. It is where `run_migrations_online()` and `run_migrations_offline()` diverge, and where the actual connection and configuration are assembled.
+- **Why is `target_metadata` mandatory rather than optional?**
+  - With `target_metadata = Base.metadata`, Alembic can compare the live database against model definitions to produce diffs like `op.add_column(...)`. As the article emphasized, setting `target_metadata = None` causes autogenerate to silently produce empty files.
+- **How do you safely read the DB URL from an environment variable?**
+  - Read with `db_url = os.environ.get("DATABASE_URL")` and override with `config.set_main_option("sqlalchemy.url", db_url)`. This keeps a local default in `alembic.ini` while keeping staging and production credentials outside of git.
 <!-- toc:begin -->
 ## In this series
 

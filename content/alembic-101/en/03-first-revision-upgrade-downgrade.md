@@ -257,13 +257,12 @@ The next post covers `--autogenerate` in earnest — the option that automates t
 
 ## Answering the Opening Questions
 
-- **The shape of the file that `alembic revision` generates?**
-  - The article treats Your first revision: writing upgrade and downgrade by hand as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The core operations: `op.create_table`, `op.add_column`, `op.drop_column`, `op.execute`?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Rules for keeping `upgrade()` and `downgrade()` symmetric?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What does the file structure created by `alembic revision` look like?**
+  - As the article showed, a revision file is read along four axes: `revision`, `down_revision`, and the `upgrade()` / `downgrade()` functions. It is a unit that encodes both "whose successor is this?" and "what to do on upgrade/downgrade."
+- **When do you use `op.create_table`, `op.add_column`, `op.drop_column`, and `op.execute`?**
+  - Use `op.create_table` for new structures, `op.add_column` to extend existing tables, `op.drop_column` to revert additions, and `op.execute` for SQL that DDL helpers cannot express. The article's sensibility is to reach for helpers first and drop to raw SQL only when truly necessary.
+- **How do you keep `upgrade()` and `downgrade()` symmetric?**
+  - Following the article's framing—`upgrade(): N → N+1`, `downgrade(): N+1 → N`—pair each addition in upgrade with a corresponding removal in downgrade. The `users.tier` example placed `op.add_column(...)` and `op.drop_column(...)` as mirror images for exactly this symmetry.
 <!-- toc:begin -->
 ## In this series
 

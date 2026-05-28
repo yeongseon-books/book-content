@@ -194,13 +194,12 @@ The final chapter focuses on what happens after deployment: how to measure respo
 
 ## Answering the Opening Questions
 
-- **Why is deployment more than uploading source code?**
-  - The article treats Deploying an AI web app — shipping to Vercel and Azure as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **When does Vercel fit better, and when does Azure App Service fit better?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What should you verify first in Vercel?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What does deployment actually prepare, beyond a simple upload?**
+  - Deployment is not uploading code files; it is locking `requirements.txt` and `package.json`, start commands, ports, environment variables, and verification scenarios against the execution environment. The article placed `python3 -m pytest tests`, `npm run lint`, `npm run build`, and `python3 scripts/check_env_required.py --env-file .env.production.example` as pre-deploy common checks. What matters more than uploading is deciding "what the server runs and how" in advance.
+- **Which platform should you deploy a Next.js app and a Python backend to first?**
+  - A UI-centric Next.js app fits Vercel naturally, while a Python API requiring runtime control (`gunicorn app.main:app -k uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000 --timeout 120`) fits Azure App Service. That is why `NEXT_PUBLIC_API_BASE_URL` and `AI_MODEL` appeared in the Vercel example while `OPENAI_API_KEY`, `LOG_LEVEL`, and the startup command appeared in the Azure example. Using both reflects the different operational characteristics of frontend and backend.
+- **What should you verify first on Vercel?**
+  - First verify that environment variables like `OPENAI_API_KEY` actually reached the deployment environment and that the build log shows no dependency or type errors. After deploy, go beyond checking that `[project].vercel.app` loads—confirm `Functions > app/api/chat/route.ts > maxDuration=30`, run `vercel env add OPENAI_API_KEY production`, and test the first request, a long request, and a failure request on the real user path. The 24-hour post-deploy checklist existed to lock that verification sequence.
 <!-- toc:begin -->
 ## In this series
 

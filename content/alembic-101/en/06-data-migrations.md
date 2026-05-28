@@ -273,13 +273,12 @@ The next post goes deep on `--sql` for offline DDL and the SQLite-specific batch
 
 ## Answering the Opening Questions
 
-- **How a "data migration" is different from a schema migration?**
-  - The article treats Data migrations: separating schema changes from data changes as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Two writing styles for `op.execute` — raw SQL and SQLAlchemy core?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **A pattern for splitting a large dataset into batches?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How does a data migration differ from a schema migration?**
+  - A schema migration changes structure with operations like `op.add_column()`, while a data migration changes existing row values with statements like `UPDATE users SET tier = 'free'`. The article recommended separating schema-add, backfill, and schema-tighten into distinct revisions for this reason.
+- **Can `op.execute` use raw SQL or SQLAlchemy Core style?**
+  - For simple one-liners raw SQL is faster, but writing `table("users", column("tier", String))` in SQLAlchemy Core style reduces dialect coupling and makes intent clearer. The article avoided importing live models and used inline table/column definitions to decouple past migrations from future model changes.
+- **What batch pattern should you use for large datasets?**
+  - The article's example used `LIMIT 1000` to process `id` chunks in a `while True` backfill loop. Splitting into batches—rather than updating 100M rows at once—reduces lock contention and transaction-log pressure.
 <!-- toc:begin -->
 ## In this series
 

@@ -234,13 +234,12 @@ Generate this report for every dataset version, diff against the previous versio
 
 ## Answering the Opening Questions
 
-- **When does data preparation create more lift than another round of model tuning?**
-  - The article treats Why Data Preparation Determines Model Quality as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which data failures make offline metrics look healthy while production quality degrades?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why is data preparation better treated as one pipeline than as a few disconnected preprocessing scripts?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **When does data preparation make a bigger difference than model architecture?**
+  - As the experiment in this article showed, changing only `clean()` while keeping `TfidfVectorizer` and `LogisticRegression` identical moved `accuracy_score`. Fixing duplicates, noise, and encoding issues in input data often provides greater leverage than swapping models.
+- **What is a classic data failure where apparent accuracy is high but real user experience suffers?**
+  - Omitting `train_test_split(..., stratify=y)` or leaving duplicates between train and eval inflates accuracy while the model crumbles on the real distribution. The duplicate-ratio and class-proportion checks exist precisely to prevent that illusion.
+- **Why should the stages from collection to splitting be viewed as a single pipeline?**
+  - `quick_quality_report()`, `load_and_validate()`, and `RunManifest` are chained because cleaning, PII handling, and splitting each alter the others' outcomes. Inspecting any one stage in isolation leaves you with an accidental version combination rather than a reproducible experiment.
 <!-- toc:begin -->
 ## In this series
 

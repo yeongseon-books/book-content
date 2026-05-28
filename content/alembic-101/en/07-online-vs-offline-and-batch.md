@@ -258,13 +258,12 @@ The next post is downgrade strategy: when to seriously write a downgrade and whe
 
 ## Answering the Opening Questions
 
-- **The two execution modes alembic offers — online and offline?**
-  - The article treats Online and offline modes: previewing DDL with --sql and handling SQLite batch as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How to preview the actual SQL with `--sql`?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **A workflow for producing SQL scripts that a DBA can review?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do Alembic's two execution modes—online and offline—differ?**
+  - Online mode (`alembic upgrade head`) connects to the database and executes SQL directly; offline mode (`alembic upgrade head --sql`) outputs SQL text only. One is for application and the other for review—that role distinction is the article's core point.
+- **How can you preview actual SQL with `--sql`?**
+  - Use `alembic upgrade <from>:<to> --sql > review.sql` with explicit range notation. The article emphasized the `<from>:<to>` syntax because using just `head` dumps already-applied ranges, blurring the review target.
+- **What workflow produces a DBA-review SQL script?**
+  - Attach `review.sql` at the PR stage for the DBA to read actual DDL; at deploy time still run `alembic upgrade head` in online mode. This keeps SQL preview and `alembic_version` updates in the same deployment unit.
 <!-- toc:begin -->
 ## In this series
 

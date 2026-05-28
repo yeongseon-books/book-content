@@ -270,13 +270,12 @@ The next post covers data migrations: changes that update the data itself rather
 
 ## Answering the Opening Questions
 
-- **When the alembic revision graph forks into branches?**
-  - The article treats branches and merges: combining revisions made in parallel as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The exact role of `branch_labels` and `depends_on`?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How to consolidate two heads with `alembic merge`?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **When does the Alembic revision graph branch?**
+  - The graph branches when two revisions share the same `down_revision`—like Alice's `D` and Bob's `E` created simultaneously—causing `alembic heads` to show two heads. The `Multiple head revisions are present` error arises from exactly this concurrent creation.
+- **What roles do `branch_labels` and `depends_on` each play?**
+  - `branch_labels = ("billing",)` names which branch a revision belongs to, while `depends_on = ("e7f8...")` declares that a specific revision from another branch must be applied first. Neither is commonly used in typical team development, but they provide clear markers when cross-branch dependencies need documentation.
+- **How do you merge two heads with `alembic merge`?**
+  - Running `alembic merge -m "merge billing and audit branches" d1e2... e7f8...` creates a single merge revision whose `down_revision` is a tuple. Even if its `upgrade()` and `downgrade()` are `pass`, the graph closes back to a single head.
 <!-- toc:begin -->
 ## In this series
 

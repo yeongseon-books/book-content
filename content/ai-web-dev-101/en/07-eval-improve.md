@@ -252,13 +252,12 @@ This closes the series. You have now walked through API calls, prompt design, br
 
 ## Answering the Opening Questions
 
-- **Why is evaluation part of operations rather than an optional extra?**
-  - The article treats Evaluating and improving an AI app — measuring quality over time as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which quality axes should you measure first?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How do you start with the smallest automatic evaluation?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why is evaluation an operational duty rather than an optional step in AI apps?**
+  - Changing any one of prompt, model, or RAG index can break questions that previously worked, so evaluation must run as a continuous operational routine after deployment. Cases like `pricing-01`, `support-01`, `billing-refund-001`, and `security-secret-002` were placed in a separate dataset precisely to catch regressions against the same question set. Evaluation is the mechanism that converts "looks good" into numbers and failure examples.
+- **Along what axes should you evaluate answer quality?**
+  - The article's fundamental axes are accuracy, relevance, and safety. For RAG systems, add retrieval-and-grounding axes like `retrieval_hit@k`, `faithfulness`, `citation_coverage`, and `no_answer_precision`; in production, include `total_tokens` and latency. The weekly report example compared `retrieval_hit@4` and average `total_tokens` alongside the composite score for this reason.
+- **How can you start the smallest possible automated evaluation?**
+  - The smallest starting point is a rule-based check with `expected_keywords` and a batch script like `run_batch(responder)`. Add `judge_answer(...)` or `llm_judge(...)` using `gpt-4o-mini` as a judge to produce 0–1 scores or `accuracy/relevance/safety` JSON when needed. The key is to first enable repeated execution of the same input set and gate deployments with a threshold like `check_eval_threshold.py --min-score 0.82`, before reaching for complex frameworks.
 <!-- toc:begin -->
 ## In this series
 

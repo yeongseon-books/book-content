@@ -251,13 +251,12 @@ The next chapter moves from prompt structure to a browser UI, where streaming an
 
 ## Answering the Opening Questions
 
-- **How is a prompt different from just asking a question?**
-  - The article treats Prompt engineering basics — getting the answer you actually want as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What responsibilities belong to `system` and `user` messages?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Which ingredients make prompts stable enough for application code?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How is a prompt different from a simple question?**
+  - A simple question leaves the model a blank to fill; a prompt is a work contract that includes role, context, output format, and constraints. The difference between the `bad` example ("write product copy") and the `better` example (with `target audience`, `emphasis`, `output format`) was exactly that contract gap. The article treats prompts as reproducible input structures, not matters of phrasing intuition.
+- **What responsibilities do the `system` and `user` roles each carry?**
+  - `system` fixes long-lived rules and prohibitions ("You are a customer-support FAQ generator"), while `user` delivers the current task ("Turn the password-reset policy into a 2-sentence FAQ"). In the `PROMPT_TEMPLATE` example, role, goal, constraints, and JSON output format were grouped as system-level, with only `draft` injected as an input variable. This separation lets you distinguish whether the prompt version or the request data changed.
+- **What information does a good prompt never omit?**
+  - A good prompt never omits role, domain context, output contract, and prohibition rules. The article fixed JSON keys to `title`, `summary`, `risk`, and in the RAG example specified a `source_ids` array and the rule "if no evidence exists, say so." The deployment checklist checking role sentence, length limit, prohibition rules, and fallback phrases is the same principle compressed for operations.
 <!-- toc:begin -->
 ## In this series
 

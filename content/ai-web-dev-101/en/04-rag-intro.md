@@ -255,13 +255,12 @@ The next chapter moves from evidence retrieval to tool use, where the model requ
 
 ## Answering the Opening Questions
 
-- **Why can a strong model still fail on company-specific or newly updated information?**
-  - The article treats RAG introduction — answering with your own data as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why is RAG often a better first step than fine-tuning?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What exactly do embeddings and vector search do?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why can't the model directly answer questions about company docs or recent news?**
+  - The model has no automatic knowledge of information after its training cutoff or our internal FAQ, so a bare question cannot draw on the latest refund policy or internal documents. The article therefore built `faq_chunks`, embedded them with `text-embedding-3-small`, and attached the closest sentences back into the prompt at query time. The core issue was not making answers smarter but fetching the necessary evidence at execution time.
+- **Why is RAG used before fine-tuning?**
+  - Fine-tuning excels at adjusting tone and habits, but reflecting frequently changing policy documents requires expensive re-training each time. RAG only needs document chunks and an index update, operable through pipelines like `build_chunks.py`, `build_embeddings.py`, and `reindex_vector_store.py`. The comparison table showed RAG's advantage in freshness reflection and failure-cause isolation.
+- **What roles do embeddings and vector search play?**
+  - Embeddings map sentences with different surface forms but similar meanings—like "I want my money back" and "refund policy"—into numeric vectors. Then `cosine_similarity(...)` and `retrieve(query, top_k=2)` pick the top evidence for the `<evidence>` block in `answer_with_rag()`. Embeddings provide the foundation for searchability; vector search decides which sentences to attach as answer evidence.
 <!-- toc:begin -->
 ## In this series
 

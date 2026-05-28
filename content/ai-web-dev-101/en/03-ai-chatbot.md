@@ -218,13 +218,12 @@ The next chapter moves from chat UI to retrieval, where your app answers from yo
 
 ## Answering the Opening Questions
 
-- **What changes when you move a terminal example into a browser UI?**
-  - The article treats Building an AI chatbot — real-time chat with Next.js and the Vercel AI SDK as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why is the Next.js plus Vercel AI SDK combination a strong beginner path?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What should `/api/chat` actually do?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What components are needed to move the terminal example to a browser UI?**
+  - The browser side needs `useChat()` and `useState` in `app/page.tsx`; the server side needs `app/api/chat/route.ts`. The user sends messages via `sendMessage({ text: input })`, the server relays via `convertToModelMessages(messages)` and `streamText(...)`, then returns via `toUIMessageStreamResponse()` or `toDataStreamResponse()`. The single terminal function call splits into state management, API boundary, and streaming response in the browser.
+- **Why is the Next.js + Vercel AI SDK combination well-suited for getting started?**
+  - This combination provides message list, `status`, and send flow out of the box via `useChat`, and `streamText` connects streaming responses immediately—so beginners do not have to assemble SSE manually. Locking input when `status === "submitted" || status === "streaming"` and showing "Assistant is writing..." were possible precisely because of that abstraction. Starting with the full boundary is far easier than hand-coding Fetch, state races, and a stream parser from scratch.
+- **What role should the `/api/chat` route fulfill?**
+  - `/api/chat` is a server boundary that hides the model key, converts browser messages to model messages, and wraps the model stream back into a UI stream. Operational settings like `runtime = "edge"`, `maxDuration = 30`, `temperature: 0.2`, and `maxTokens: 600` belong in this file. The article's point was that future additions—`request_id` headers, rate limiting, metrics collection—all attach at this same boundary.
 <!-- toc:begin -->
 ## In this series
 

@@ -235,13 +235,12 @@ This function covers nearly all production cases.
 
 ## Answering the Opening Questions
 
-- **When does a random split stop representing the production problem you actually care about?**
-  - The article treats Train/Eval/Test Splitting and Contamination Control as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How do stratified, group, and temporal splits protect against different leakage patterns?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why is contamination now a first-class evaluation problem for LLMs?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What is a representative case where a simple `train_test_split` misses real operating conditions?**
+  - The default `train_test_split(data, test_size=0.3)` assumes i.i.d., so it misses time ordering, user repetition, and minority-class issues. That is why the article separately introduced temporal split, `GroupShuffleSplit`, and `StratifiedShuffleSplit`.
+- **Why do class imbalance, user leakage, and time-series data each require a different split strategy?**
+  - If label ratios are the problem, use `stratify=y`; if the same `user_id` leaks, use group split; if future information bleeds in, split by `timestamp`. The three situations break for different reasons and cannot be solved simultaneously by a single split.
+- **How does LLM benchmark contamination differ from traditional data leakage, and why is it more dangerous?**
+  - Traditional leakage is direct overlap between train and eval, whereas contamination asks whether benchmark sentences already appeared in the pretraining corpus. The article therefore separately computed 13-gram overlap with `make_ngrams()` and `contamination_overlap()`, and enforced a decontamination step in the DAG after splitting.
 <!-- toc:begin -->
 ## In this series
 

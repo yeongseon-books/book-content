@@ -258,13 +258,12 @@ Dedup before cleaning lets whitespace-different copies survive as distinct. Cros
 
 ## Answering the Opening Questions
 
-- **Which text-cleaning transforms are worth keeping because they solve measurable problems?**
-  - The article treats Cleaning and Deduplication as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why is exact dedup not enough for web-scale corpora?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How should you tune MinHash thresholds without creating too many false positives?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why should a cleaning function be maintained as a composition of small transforms?**
+  - Splitting `clean_text()` into NFC normalization, HTML removal, and control-character stripping lets you immediately narrow down which step caused a spike in `char_reduction_pct`. A monolithic cleaner makes it impossible to explain how much data each rule removed.
+- **Why can't exact dedup alone solve web-corpus quality problems?**
+  - `exact_dedup()` catches whitespace and case differences, but pages differing by a single ad line or punctuation mark survive intact. That is why the article immediately follows with `MinHashLSH` and `near_dedup(docs, threshold=0.85)`.
+- **What errors arise from setting the MinHash threshold too low or too high?**
+  - A threshold that is too low treats distinct documents as duplicates (false positives increase); one that is too high misses near-duplicates (false negatives increase). The article therefore recommends starting around 0.85–0.9 and validating with hand-labeled pairs for both precision and recall.
 <!-- toc:begin -->
 ## In this series
 

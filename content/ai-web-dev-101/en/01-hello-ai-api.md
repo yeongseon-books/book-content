@@ -328,13 +328,12 @@ The next chapter builds directly on this. Once the request-response shape is cle
 
 ## Answering the Opening Questions
 
-- **What is different between using ChatGPT on the web and integrating an AI API into my own service?**
-  - The article treats AI API first steps — sending your first request with the OpenAI API as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What is the minimum setup for the OpenAI API?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What does the first request look like, and where do I read the response?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What is the difference between using the ChatGPT website and integrating an AI API?**
+  - The ChatGPT website is a finished product you use; API integration is development work where your code sends an `Authorization: Bearer $OPENAI_API_KEY` header and JSON body directly. That is why `401`, `404`, and `429` map to authentication, model-name, and rate-limit problems respectively. Reading `response.usage`, `response.model`, and `finish_reason` is what turns a call into an operationally viable request.
+- **What preparation is needed before calling the OpenAI API?**
+  - Minimum preparation: inject `OPENAI_API_KEY`, `pip install "openai>=2.0"`, and confirm Billing settings. The article verified the environment variable with `python3 - <<'PY' ... print("key loaded:", bool(...))` first, then added `timeout=20.0` and separate branches for `RateLimitError`, `APIConnectionError`, and `APIStatusError` in service code. Pre-call preparation is about fixing execution and failure boundaries, not just account creation.
+- **What format does the first request use, and where do you read the response?**
+  - Requests send JSON with `model="gpt-4o-mini"` and a `messages` array; responses are read from `response.choices[0].message.content`. You must also capture `response.model` and `response.usage.prompt_tokens`, `completion_tokens`, `total_tokens` to explain cost and latency later. The `curl https://api.openai.com/v1/chat/completions` example confirmed that this contract is HTTP + JSON.
 <!-- toc:begin -->
 ## In this series
 

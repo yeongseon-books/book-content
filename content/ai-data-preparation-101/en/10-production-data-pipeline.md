@@ -273,13 +273,12 @@ This concludes the series. We started from GIGO in Ep1 and ended at a production
 
 ## Answering the Opening Questions
 
-- **Which system properties turn a set of preprocessing scripts into a production pipeline?**
-  - The article treats Building a Production Data Pipeline as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How do versioning, fingerprints, and cache keys work together to preserve reproducibility?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What operational value do orchestrators such as Airflow add beyond a cron job?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What system properties are needed to unify multiple preparation stages into one production-ready pipeline?**
+  - A production-ready pipeline in this article has per-`Stage` inputs, outputs, parameters, and manifests, and logs statistics like `rows_in`, `rows_out`, and `drop_rate`. Even with many stages, clear contracts and observability make results explainable when re-run.
+- **How do DVC and stage fingerprints solve data versioning and idempotency together?**
+  - `dvc add data/02_clean.parquet` pins artifact versions, while `fingerprint()` lets stages with unchanged inputs and parameters show `[skip] cached`. This answers both "what was used?" and "why wasn't it re-run?" simultaneously.
+- **What operational value does an orchestrator like Airflow provide beyond simple scheduling?**
+  - Fixing flow as `t1 >> t2 >> ... >> t6` in a DAG gives you retry, lineage UI, and the ability to re-execute only the failed stage. Unlike cron, you can immediately see which stage broke and where to resume.
 <!-- toc:begin -->
 ## In this series
 
