@@ -182,12 +182,12 @@ The real difficulty of Python containers is *signals and healthcheck*. Next, we 
 
 ## Answering the Opening Questions
 
-- **Containerizing *FastAPI + uvicorn?**
-  - The article treats Containerizing a Python App as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Signal handling at PID 1* (SIGTERM)?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Adding a *healthcheck?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How should you containerize FastAPI with uvicorn?**
+  - Use `python:3.x-slim` as the base, `COPY requirements.txt` first then `pip install` to separate the dependency layer, copy app source, and `CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]` to run uvicorn as PID 1. This structure handles both dependency caching and signal handling.
+- **Why are PID 1 and SIGTERM important in container operations?**
+  - The first process in a container becomes PID 1, and `docker stop` sends SIGTERM to that process. Running uvicorn through a shell wrapper like `sh -c "..."` traps SIGTERM at the shell — the app never receives graceful shutdown signals. Using exec-form `CMD` ensures signals reach the app directly.
+- **How should you configure a healthcheck?**
+  - Add a lightweight endpoint like `/healthz` or `/livez` to the app, then declare `HEALTHCHECK CMD curl -fs http://localhost:8000/healthz` in the Dockerfile or a `healthcheck` block in Compose with interval, timeout, and retries. Without a healthcheck, the orchestrator cannot automatically detect "started but not actually working" and cut traffic or restart.
 
 <!-- toc:begin -->
 ## In this series

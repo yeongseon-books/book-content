@@ -189,12 +189,12 @@ A clean app-DB seam drops *team setup cost* toward *zero*. Next, *image optimiza
 
 ## Answering the Opening Questions
 
-- **Running *PostgreSQL with Compose?**
-  - The article treats Running with a Database as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Healthchecks* and *startup order?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Automating *Alembic migrations?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do you launch PostgreSQL alongside your app with Compose?**
+  - Place `db` (postgres image) and `api` (app image) under `services:`, attach a named volume to db so data survives restarts, and set `DATABASE_URL=postgresql://...@db:5432/...` as an environment variable using the service-name-based host. One `docker compose up` reproducing the entire stack is the core value.
+- **How should healthcheck and startup order connect?**
+  - A running db container doesn't mean it's immediately accepting connections. Adding `healthcheck: pg_isready -U ...` to the db service and `depends_on: db: condition: service_healthy` to the api service ensures the api starts only against a genuinely ready database.
+- **What's the best way to automate Alembic migrations?**
+  - Rather than embedding migrations in app boot, add a separate `migrate` service (or a one-shot container with `command: alembic upgrade head`) in Compose and have api depend on it. This separation ensures migration runs once in multi-instance deployments and makes the rollback path clear on failure.
 
 <!-- toc:begin -->
 ## In this series

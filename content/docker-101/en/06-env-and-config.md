@@ -162,12 +162,12 @@ Configuration discipline is half of *production stability*. Next, we turn a *Pyt
 
 ## Answering the Opening Questions
 
-- **The difference between *ENV* and *ARG?**
-  - The article treats Environment Variables and Configuration as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Splitting *env vars / config files / secrets?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Wiring *Compose* to *external secret tools?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How can a single image serve multiple environments?**
+  - Instead of baking environment-specific values (API endpoints, DB hosts) into the image, inject them as environment variables or external config files at container start. This lets dev, staging, and prod all use the same image with different settings — naturally following the 12-factor "image = code, environment = config" principle.
+- **What is the difference between `ENV` and `ARG`?**
+  - `ARG` lives only during build time and leaves no trace in the image; `ENV` is baked in and visible during container runtime. One-time values like build tokens belong in `ARG`; values the app reads at runtime belong in `ENV` — separating them prevents secrets from leaking into the image.
+- **How should you distinguish between environment variables, config files, and secrets?**
+  - Short, frequently-changed values suit environment variables. Long or structured values suit mounted config files. Sensitive data like tokens and keys belong in Docker secrets or an external vault — invisible in images, logs, and `docker inspect`. Choosing storage by "sensitivity + shape" maintains operational safety.
 
 <!-- toc:begin -->
 ## In this series

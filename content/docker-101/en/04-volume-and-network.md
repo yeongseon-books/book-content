@@ -154,12 +154,12 @@ Data and networking are the *pillars* of container ops. Next, *Docker Compose* r
 
 ## Answering the Opening Questions
 
-- **The difference between *volume / bind mount / tmpfs?**
-  - The article treats Volumes and Networks as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Bridge / host / none* network modes?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Communicating *by container name?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **When should you use volumes, bind mounts, vs tmpfs?**
+  - Named volumes are Docker-managed persistent storage suited for data decoupled from container lifetime (like DB data). Bind mounts connect a host path directly, ideal for hot-reload during development. tmpfs lives only in memory, appropriate for short-lived secrets or temporary caches.
+- **Why should container data be considered ephemeral by default?**
+  - A container's writable layer is designed to be discarded when the container is removed — a single `docker rm` wipes everything. Any data requiring persistence must be explicitly stored outside the container via volumes or bind mounts.
+- **How does a bridge network enable container-name-based communication?**
+  - Containers on the same user-defined bridge can discover each other by container or service name rather than IP, thanks to Docker's built-in DNS. Unlike the default `bridge`, automatic service discovery is enabled on user-defined bridges — which is why they are recommended.
 
 <!-- toc:begin -->
 ## In this series

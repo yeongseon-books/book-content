@@ -183,12 +183,12 @@ Compose is your team's *first piece of infrastructure as code*. Next, the patter
 
 ## Answering the Opening Questions
 
-- **Defining *services / networks / volumes?**
-  - The article treats Docker Compose as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **depends_on* and healthchecks?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **profiles* for *selective execution?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What do you need to reproducibly launch multiple containers at once?**
+  - Writing long `docker run` commands per container invites human error and environment drift. Compose declares services, networks, and volumes in a single `docker-compose.yml` file, letting `docker compose up` bring up the entire stack in one line — guaranteeing reproducibility.
+- **How are services, networks, and volumes defined in Compose?**
+  - Each container is listed as a service under `services:`, while shared networks and persistent storage go under top-level `networks:` and `volumes:` keys, then referenced inside services. This separation lets services on the same network communicate by name and volumes survive service restarts.
+- **How should `depends_on` and healthcheck relate to each other?**
+  - `depends_on` alone only guarantees "the DB container started" — not that it's actually accepting connections. Adding a healthcheck to the DB service and using `depends_on` with `condition: service_healthy` ensures the app service starts only when the DB is genuinely ready.
 
 <!-- toc:begin -->
 ## In this series

@@ -172,12 +172,12 @@ If you followed along, you can handle *95% of Docker* in the wild. From here, le
 
 ## Answering the Opening Questions
 
-- **An *image tag policy* (semver + sha)?**
-  - The article treats Production-Ready Docker as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Registries* and *signed images?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Runtime security* (read-only, capabilities)?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What image tag policy should you follow in production?**
+  - The `latest` tag cannot be traced to a specific point in time, making rollback and reproduction difficult. Use immutable version tags like git commit SHAs or `1.4.2`, and have production point to that fixed tag — so the same tag never points to a different image. Dual-tagging with semver + SHA is the common pattern.
+- **Why are registries and image signing part of supply-chain trust?**
+  - Pulling an image from a registry alone doesn't guarantee it was built by your CI. Signing images with cosign or Notation and enforcing signature verification via admission policy in the production cluster prevents man-in-the-middle attacks or malicious pushes.
+- **How should read-only, capability restrictions, and non-root combine?**
+  - Containers run as root by default — risky. Drop to non-root with `USER appuser` in the Dockerfile, then at runtime add `--read-only --cap-drop=ALL --security-opt=no-new-privileges`. All three together complete the state: "process is not root, cannot write files, and cannot gain new privileges."
 
 <!-- toc:begin -->
 ## In this series

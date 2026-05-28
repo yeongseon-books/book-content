@@ -167,12 +167,12 @@ Small images lift *team velocity* and *security* at once. Next, the full *produc
 
 ## Answering the Opening Questions
 
-- **Multi-stage builds* to split *build vs runtime?**
-  - The article treats Image Optimization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **BuildKit cache mounts* to *speed rebuilds?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Comparing *slim / alpine / distroless?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why does a multi-stage build separate build from runtime?**
+  - The first stage (`AS builder`) holds compilers, dev packages, and source code for building, then the second stage copies only the artifacts (binaries, wheels, dist folder) onto a lighter base via `COPY --from=builder`. Build tools never reach the final image — saving hundreds of MB and narrowing the attack surface significantly.
+- **How does BuildKit cache mount speed up rebuilds?**
+  - `RUN --mount=type=cache,target=/root/.cache/pip pip install ...` mounts the cache directory outside the layer, so even when layer cache breaks, pip/apt/go-mod download results are reused. The image stays clean while builds get faster — that's the point.
+- **What are the trade-offs between slim, alpine, and distroless?**
+  - `python:slim` uses glibc for maximum compatibility. `alpine` uses musl libc and apk for the smallest size but has some wheel compatibility issues. `distroless` removes even the shell and package manager for maximum security but makes debugging harder. It's a choice between "size reduction vs compatibility vs debugging convenience."
 
 <!-- toc:begin -->
 ## In this series

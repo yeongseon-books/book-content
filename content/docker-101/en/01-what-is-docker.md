@@ -151,12 +151,12 @@ Docker is the fastest way to kill *environment drift*. Next we look deeper into 
 
 ## Answering the Opening Questions
 
-- **The difference between *containers* and *virtual machines?**
-  - The article treats What Is Docker? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The *environment-drift* problem Docker solves?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The big picture of *image / container / registry?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What exactly does Docker do for you?**
+  - Docker packages an application and its runtime environment into a single image, reducing the "works on my machine" problem. Because build, deploy, and run all use the same unit (image/container), debugging costs from environment differences drop significantly.
+- **How does a container differ from a virtual machine?**
+  - As the comparison diagram showed, VMs virtualize an entire OS kernel — heavy and slow to start — while containers share the host kernel and add only process isolation. The result is tens of MB instead of hundreds, and millisecond startup instead of seconds. A trade-off of isolation strength for density and speed.
+- **How should you understand the relationship between image, container, and registry?**
+  - An image is a built static snapshot, a container is a running instance of that image, and a registry stores and distributes images. The flow `docker build` → registry `push` → `pull` elsewhere → `run` is exactly how these three objects collaborate.
 
 <!-- toc:begin -->
 ## In this series

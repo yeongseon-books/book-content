@@ -167,12 +167,12 @@ A good Dockerfile *saves your team time every day*. Next, *volumes and networks*
 
 ## Answering the Opening Questions
 
-- **What *FROM / RUN / COPY / CMD* mean?**
-  - The article treats Writing a Dockerfile as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **An *ordering strategy* for the *layer cache?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The importance of *.dockerignore?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What role does each of `FROM`, `RUN`, `COPY`, and `CMD` play?**
+  - `FROM` selects the base image, `RUN` executes once at build time to create a layer, `COPY` brings host files into the image, and `CMD` defines the default process at container runtime. The boundary between build-time and run-time is compressed into these four instructions.
+- **Why does Dockerfile instruction order heavily impact build speed?**
+  - Docker creates a layer per instruction and caches at the layer level, so placing infrequently-changing dependency installs first and frequently-changing source copies last prevents cache invalidation. For example, `COPY requirements.txt` → `RUN pip install` → `COPY .` dramatically improves cache hit rate.
+- **Why is `.dockerignore` important for security, not just performance?**
+  - Without `.dockerignore`, large directories like `.git`, `.env`, and `node_modules` get sent as build context — slowing builds — and secret keys or local credentials can end up in the image and leak externally. It's the first line of defence protecting both security and performance simultaneously.
 
 <!-- toc:begin -->
 ## In this series

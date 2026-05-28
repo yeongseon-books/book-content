@@ -156,12 +156,12 @@ Separating images and containers is the *fundamentals* of Docker. Next we *build
 
 ## Answering the Opening Questions
 
-- **The *lifecycle* of *images* and *containers?**
-  - The article treats Images and Containers as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Layers* and *copy-on-write?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The *ten commands* you actually use?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What exactly distinguishes an image from a container?**
+  - An image is a read-only filesystem snapshot produced by a build; a container is an instance that adds a writable layer on top and actually runs a process. The key benefit of this separation — shown in the article — is that multiple containers can run from the same image.
+- **Why are layers and copy-on-write important concepts?**
+  - Because images stack multiple layers and containers only add a writable layer, 100 containers on the same base share common layers, saving disk and memory. New blocks are copied only when changes occur (copy-on-write), keeping startup cost low.
+- **What is the lifecycle flow of a container?**
+  - The standard flow is `create` → `start` (running) → `stop` (exited) → `rm`, with `pause/unpause` and `restart` possible in between. Knowing that a stopped container still exists on disk but is not running makes the difference between `docker ps -a` and `docker ps` immediately clear.
 
 <!-- toc:begin -->
 ## In this series
