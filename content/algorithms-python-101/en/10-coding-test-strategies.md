@@ -334,13 +334,12 @@ The most important skill in coding tests is identifying the problem type quickly
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Coding Test Problem-Solving Strategies?**
-  - The article treats Coding Test Problem-Solving Strategies as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Coding Test Problem-Solving Strategies?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Coding Test Problem-Solving Strategies reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do you use input-size constraints to eliminate algorithms early?**
+  - First reverse-engineer the allowable complexity from the maximum input size and time limit, then immediately discard approaches that are slower. In the article's `N = 200,000` example, ruling out `O(N²)` double loops like `wrong_two_sum()` before implementing was the key judgment.
+- **How do you connect problem types to algorithms?**
+  - Ask whether it involves arrays, graphs, state storage, or post-sort two-pointer narrowing—these questions quickly link problem types to approaches. The article classified Two Sum as a sort + two-pointer problem and traced from `(value, original_index)` pair sorting to `solve_two_sum()`.
+- **How do you carry a problem through understand, plan, implement, and verify?**
+  - In the understand phase, read constraints and goals; in plan, set target complexity and data structures; after implementation, close the verification loop with sample, no-solution, duplicate, negative, and minimum-input cases. `verification_cases` and `defaultdict`, `Counter`, `heapq` examples turned problem-solving from a one-time hunch into a reproducible procedure.
 <!-- toc:begin -->
 ## In this series
 

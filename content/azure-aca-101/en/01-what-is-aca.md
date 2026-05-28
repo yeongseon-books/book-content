@@ -240,12 +240,12 @@ The next post zooms into ACA's operational model through three words: Environmen
 
 ## Answering the Opening Questions
 
-- **How Azure Container Apps (ACA) differs from the other Azure container services (App Service, AKS, Functions)?**
-  - The article treats What is Azure Container Apps? — running containers without Kubernetes as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The role of ACA's three core building blocks: Environment, Container App, and Revision?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Which workloads belong on ACA, and which workloads belong somewhere else?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How does Azure Container Apps (ACA) differ from other Azure container services (App Service, AKS, Functions)?**
+  - ACA connects a container image to a managed runtime with commands like `az containerapp up --name myapi --image ... --ingress external --target-port 8000`, but unlike AKS does not require you to operate a cluster. Conversely, it is more container-native than App Service and better suited to HTTP API + worker combinations than Functions. The article positioned ACA as filling "the gap between AKS and App Service."
+- **What roles do ACA's three core components—Environment, Container App, and Revision—each play?**
+  - `Environment` is the execution boundary sharing a VNet and Log Analytics; `Container App` is the logical service name like `orders-api`; `Revision` is an immutable execution snapshot with a fixed image and configuration. The Bicep example declared `Microsoft.App/managedEnvironments@2024-03-01` and `Microsoft.App/containerApps@2024-03-01` separately, confirming the runtime via `latestRevisionName` and ingress FQDN. These three terms denote network boundary, service identity, and deployment unit respectively.
+- **Which workloads fit ACA well, and which belong on other services?**
+  - HTTP APIs, workers, and microservices with repeated bursts and idle periods—where `minReplicas` tuning and revision splits matter—fit ACA. Workloads needing GPU, Operators, DaemonSets, or custom schedulers belong on AKS; zip/code-centric web apps are simpler on App Service. The article used three criteria to guide platform selection: low average + large bursts, high average + strict latency, and advanced scheduler/node control.
 
 <!-- toc:begin -->
 ## In this series

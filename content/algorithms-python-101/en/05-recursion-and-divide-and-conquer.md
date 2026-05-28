@@ -288,13 +288,12 @@ Recursion is a technique where a function calls itself; divide and conquer is a 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Recursion and Divide and Conquer?**
-  - The article treats Recursion and Divide and Conquer as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Recursion and Divide and Conquer?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Recursion and Divide and Conquer reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How does a recursive function work, and what shape does the call stack take?**
+  - A recursive function calls itself with smaller input and completes computation as results return upward after reaching the base case. As the `factorial_trace()` output showed, calls stack downward and results return upward—tracing the call stack makes execution flow visible.
+- **Why is the base case so critical?**
+  - Without a base case, recursion never stops even as input shrinks, ending in `RecursionError`. Fixing the smallest problem first—`n <= 1` in `factorial()`, `n == 1` in `hanoi()`, `exp == 0` in `power()`—is what makes the overall recursive structure safe.
+- **How do you distinguish the three stages of divide and conquer?**
+  - Divide and conquer separates into Divide (split the problem), Conquer (solve each piece), and Combine (merge partial answers). Fast exponentiation halves the exponent, `find_max()` computes left and right maxima and combines with `max()`, and merge sort follows the same pattern.
 <!-- toc:begin -->
 ## In this series
 

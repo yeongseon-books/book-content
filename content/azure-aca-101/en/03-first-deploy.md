@@ -271,12 +271,12 @@ The next post goes deep on ingress and traffic splitting. We create two Revision
 
 ## Answering the Opening Questions
 
-- **The full path from local FastAPI code to a live ACA Revision?**
-  - The article treats Your first deploy — Python/FastAPI as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **That ACA does not build images for you — and what that means for division of responsibility?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The four-step dependency chain: ACR → ACA Environment → Container App → Revision?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What is the full path from local FastAPI code to a live ACA Revision?**
+  - The path starts with writing `app/main.py` and a `Dockerfile`, builds an image with `az acr build --registry $ACR_NAME --image fastapi-hello:v1 .`, creates an Environment with `az containerapp env create`, then launches the first Revision with `az containerapp create --image $IMAGE`. Verification used `FQDN=$(az containerapp show ...)`, `curl https://$FQDN/healthz`, and `az containerapp revision list ... healthState`—not the portal. The path is: source → image → registry → Environment → Revision.
+- **What does it mean for responsibility that ACA does not build images itself?**
+  - ACA does not handle `source code → image build`; it only consumes existing image references. Build and push are the developer's or CI's responsibility, while ACA owns image pull, ingress, TLS, scale-to-zero, and restart. This clear responsibility split is why you fix `az acr build`, immutable image tags, and `github.sha`-based pipelines first.
+- **How does the four-stage dependency chain ACR → Environment → Container App → Revision connect?**
+  - `fastapi-hello:v1` must be in ACR before the Container App can pull it, and that Container App runs as a Revision exclusively within a specific `managedEnvironmentId`. The Bicep example showed `registries.server`, `managedEnvironmentId`, and `template.containers[].image` linked in one chain; on failure you check `ImagePull`, port mismatch, and `AcrPull` permission sequentially. The four stages are not loose concepts but the actual chain of deployment success conditions.
 
 <!-- toc:begin -->
 ## In this series

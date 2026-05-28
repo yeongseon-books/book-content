@@ -285,13 +285,12 @@ Dynamic programming eliminates redundant computation, turning exponential proble
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Dynamic Programming Basics?**
-  - The article treats Dynamic Programming Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Dynamic Programming Basics?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Dynamic Programming Basics reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What two conditions must hold for DP to apply?**
+  - DP applies when optimal substructure and overlapping subproblems coexist. The Fibonacci and stair-climbing examples showed that when the current answer is composed of previous states and the same computation repeats, adding storage reduces exponential time to linear.
+- **How do you implement top-down with memoization?**
+  - Top-down implementation first establishes the recursive recurrence, then returns cached values for previously computed inputs. `fib_top_down()` with `@lru_cache` and `fib_memo()` with a `memo` dictionary showed the same idea in two styles.
+- **How do you implement bottom-up with table filling?**
+  - Bottom-up fills a `dp` array or table starting from the smallest states. `fib_bottom_up()`'s `dp[i] = dp[i - 1] + dp[i - 2]`, `coin_change()`'s minimum-coin update, and `knapsack()`'s 2D table are canonical examples.
 <!-- toc:begin -->
 ## In this series
 

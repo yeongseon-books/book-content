@@ -259,12 +259,12 @@ The next post puts this model into your hands. We deploy a Python/FastAPI app to
 
 ## Answering the Opening Questions
 
-- **The exact responsibilities of ACA's three operational units — Environment, Container App, and Revision?**
-  - The article treats Environment, Container App, Revision — ACA in three words as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which changes create a new Revision and which do not?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The difference between Single Revision mode and Multiple Revision mode, and when each fits?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What responsibilities do ACA's three operational units—Environment, Container App, and Revision—carry exactly?**
+  - `Environment` is the broad boundary sharing VNet, Log Analytics, and Dapr components; `Container App` is the service identity maintained over time like `orders`, `payments`, `notifications`; `Revision` is an immutable snapshot (e.g., `orders-api--v2`, `orders-api--v3`) that becomes the traffic-weight and rollback target. The article used a building/office/seating analogy to separate the lifespan and responsibility of each level.
+- **Which changes create a new Revision, and which do not?**
+  - Image tag, environment variables, secrets, CPU/memory, `template.scale`, and Dapr settings create a new Revision. Traffic-weight adjustments via `az containerapp ingress traffic set` or active/inactive toggling do not—they change existing Revision state only. This distinction is why the article repeatedly emphasized understanding rollback as "weight reversion" rather than redeployment.
+- **What differs between Single Revision mode and Multiple Revision mode, and when does each fit?**
+  - Single mode shifts 100% traffic to the new Revision immediately on deployment—convenient for simple services or dev but incompatible with canary or blue-green. Multiple mode lets you keep two Revisions active simultaneously with `az containerapp ingress traffic set --revision-weight orders-api--v2=90 orders-api--v3=10`. Production APIs therefore typically default to `activeRevisionsMode=Multiple` with an observation window and rollback criteria.
 
 <!-- toc:begin -->
 ## In this series

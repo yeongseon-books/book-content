@@ -258,12 +258,12 @@ Natural next steps: compare the same approach across **Azure App Service 101**, 
 
 ## Answering the Opening Questions
 
-- **What three layers does ACA observability split into, and what does each layer own?**
-  - The article treats Monitoring and ops — Log Analytics and Application Insights as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What events does `ContainerAppConsoleLogs_CL` capture compared to `ContainerAppSystemLogs_CL`?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How do you write a KQL query that groups logs by Revision in Log Analytics?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What layer structure does ACA observability follow?**
+  - The article divided ACA observability into platform, application, and sidecar layers. The platform layer is auto-collected into Log Analytics `_CL` tables; the application layer requires OpenTelemetry instrumentation like `APPLICATIONINSIGHTS_CONNECTION_STRING` and `configure_azure_monitor()`; and the sidecar layer is Dapr telemetry. Distinguishing "which layer produced this signal" first is what speeds up diagnosis.
+- **What is the difference between `ContainerAppConsoleLogs_CL` and `ContainerAppSystemLogs_CL`?**
+  - `ContainerAppConsoleLogs_CL` holds container stdout/stderr for viewing app logs and business errors; `ContainerAppSystemLogs_CL` holds ACA platform events like scaling, revision changes, and probe failures. The KQL examples queried console logs with `Log_s contains "ERROR"` and system logs with `Log_s has_any ("scale", "replica", "probe")`. The difference is not storage location but who produced the log.
+- **How do you write a KQL query that groups logs by Revision?**
+  - The key grouping field is `RevisionName_s`. The article used `summarize ErrorCount=count() by RevisionName_s`, and for 15-minute error rates used `join` with `extend errorRate = todouble(err) / todouble(total)` to compute per-revision 5xx rates. ACA incident response must be revision-centric because both rollback and KQL alerts connect fastest through this field.
 
 <!-- toc:begin -->
 ## In this series

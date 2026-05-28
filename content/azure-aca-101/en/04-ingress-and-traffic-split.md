@@ -249,12 +249,12 @@ The next post covers KEDA-based scaling. We will configure 0-to-N scaling driven
 
 ## Answering the Opening Questions
 
-- **What ACA's managed Ingress owns (TLS, external/internal exposure, Revision routing) and what it does not?**
-  - The article treats Ingress and traffic splitting — revision-based deployment strategies as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The exact difference between `external`, `internal`, and `disabled` ingress modes?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How Single mode and Multiple mode change traffic distribution behavior?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What does ACA's managed Ingress take responsibility for (TLS, external/internal exposure, Revision routing), and what does it not?**
+  - Managed Ingress terminates TLS at `https://<app>...azurecontainerapps.io`, determines exposure scope as `external` or `internal`, and routes requests according to the active Revision weight table. However, it does not handle header/cookie-based routing or decide the application's internal port—you must match `--target-port 8000` to the port the container actually listens on. The article described Ingress as the front door and traffic split as the elevator dispatcher.
+- **What exactly distinguishes `external`, `internal`, and `disabled` ingress modes?**
+  - `external` opens an FQDN to the public internet; `internal` allows only service calls within the same Environment; `disabled` creates no HTTP entry point at all—for workers. The article placed `az containerapp ingress enable --type external --target-port 8000 --transport auto` and `--type internal --target-port 8080` as separate examples to show the difference at command level. Mode selection simultaneously determines URL exposure scope and attack surface.
+- **How do Single mode and Multiple mode change traffic-distribution behavior?**
+  - In Single mode, traffic shifts 100% to the new Revision instantly on deployment—canary is not possible. In Multiple mode, after `az containerapp revision set-mode --mode multiple`, you can directly control proportions like `--revision-weight $APP--v1=90 $APP--v2=10`, and rollback to `100/0` completes in seconds. The lab therefore bundled 90/10 → 50/50 → 0/100 and instant revert as a single operational scenario.
 
 <!-- toc:begin -->
 ## In this series

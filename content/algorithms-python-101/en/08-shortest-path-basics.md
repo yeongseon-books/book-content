@@ -323,13 +323,12 @@ Dijkstra's algorithm finds shortest paths in non-negative weighted graphs in O((
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Shortest Path Basics?**
-  - The article treats Shortest Path Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Shortest Path Basics?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Shortest Path Basics reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How is the shortest-path problem defined in a weighted graph?**
+  - The shortest-path problem in a weighted graph is finding the path from start to destination whose edge-weight sum is minimal among all possible paths. The article first noted that BFS only guarantees minimum edge count, and that once costs are involved, a `("neighbor", weight)` graph and a different algorithm are needed.
+- **What principle drives Dijkstra's algorithm?**
+  - Dijkstra extracts the candidate with the currently known shortest distance first, then updates distance estimates via relaxation when a shorter path is found. The `new_cost < dist.get(...)` condition and the stale-heap-entry skip in `dijkstra()` ensure correct shortest distances in non-negative-weight graphs.
+- **How do you implement a priority queue with Python's `heapq`?**
+  - Push `(distance, node)` or `(distance, node, path)` tuples onto the heap and `heappop()` the smallest-distance candidate first. The `dijkstra_with_path()` and `grid_shortest_path()` examples handled not only distance computation but also path reconstruction via `prev` and grid-problem extensions—all using the same priority-queue pattern.
 <!-- toc:begin -->
 ## In this series
 

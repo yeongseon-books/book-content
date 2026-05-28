@@ -219,12 +219,12 @@ Next post covers **Dapr integration** — how a sidecar gives you distributed-sy
 
 ## Answering the Opening Questions
 
-- **What signals does Azure Container Apps use to decide replica counts, and where is the decision made?**
-  - The article treats Scaling — KEDA scalers and zero-to-N as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **When should you reach for built-in HTTP/TCP rules versus custom KEDA scalers?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **When is `min-replicas 0` (scale-to-zero) safe, and when is it dangerous?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How does ACA determine replica count from declarative scaling signals?**
+  - The article's summary was `Signal → Rule → Bounds`. ACA observes signals like HTTP concurrent requests or Service Bus queue length, interprets them through rules like `--scale-rule-type http` or `azure-servicebus`, and decides replica count between `--min-replicas` and `--max-replicas`. Replica count is not a value you calculate manually but a result produced from declared signals and bounds.
+- **What is the difference between built-in HTTP/TCP rules and custom KEDA scalers?**
+  - HTTP/TCP rules are measured directly by ACA ingress, requiring only a value like `--scale-rule-http-concurrency 100` with no separate authentication. Custom KEDA rules poll external resources and therefore need `--scale-rule-auth connection=sb-connection` along with metadata like `queueName`, `namespace`, and `messageCount`. The article separated the public API and `queue-worker` examples specifically to show this input-boundary difference.
+- **When is `min-replicas 0` (scale-to-zero) safe, and when is it risky?**
+  - `min-replicas 0` nearly eliminates idle cost but introduces cold start on the first request—risky for user-facing APIs but safe for queue workers or overnight batches. The article therefore proposed baselines: `min=1, max=10` for a public REST API, `min=0, max=20` for an order-processing worker with Service Bus `messageCount=10`. CPU and memory scalers also require at least one existing replica to measure, so even as custom-category scalers they are not scale-to-zero candidates.
 
 <!-- toc:begin -->
 ## In this series

@@ -271,12 +271,12 @@ This is part 4 of the Azure Kubernetes Service 101 series. Part 3 used Pod, Depl
 
 ## Answering the Opening Questions
 
-- **How do Pod, ReplicaSet, and Deployment split responsibilities?**
-  - The article treats Pod, Deployment, Service — the three ways you express a workload as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How does a Service hide Pod IP churn and route traffic underneath?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How do rolling and blue/green deploys express themselves in a Deployment?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why are Pod and container not synonymous, and why does Kubernetes schedule at the Pod level?**
+  - Even though container settings like `containerPort: 8000` are specified, Kubernetes schedules at the Pod level. A Pod shares network namespace, volumes, and lifecycle—so even in a single-container example, the minimum unit of scheduling and recovery is the Pod, not the container.
+- **How does a Deployment differ from manually creating multiple Pods?**
+  - Declaring desired count and update strategy—`replicas: 3`, `strategy.rollingUpdate.maxSurge: 1`, `maxUnavailable: 0`—is the Deployment's role. Unlike manually spawning multiple Pods, a Deployment provides dead-Pod recovery, rolling updates, and operational paths like `kubectl rollout status deployment/fastapi-hello`.
+- **Why does a Service prevent direct use of Pod IPs?**
+  - Pod IPs can change on replacement, but a `Service` maintains a stable access point via `selector: app: fastapi-hello` and `targetPort: 8000`. Checking `kubectl get endpoints fastapi-hello` shows that even as the set of Ready Pods changes, clients can continue connecting through the `fastapi-hello` name.
 
 <!-- toc:begin -->
 ## In this series

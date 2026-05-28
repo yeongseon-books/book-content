@@ -284,13 +284,12 @@ Linear search is O(n); binary search is O(log n). Binary search only works on so
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Linear Search and Binary Search?**
-  - The article treats Linear Search and Binary Search as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Linear Search and Binary Search?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Linear Search and Binary Search reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How does linear search work, and what are its limitations?**
+  - Linear search compares values one by one from start to end—like `linear_search()`—and works immediately without requiring sorted data. The downside is that in the worst case every element must be checked, so `O(n)` cost becomes a direct burden on large inputs.
+- **What principle makes binary search work, and how is it implemented?**
+  - Binary search operates on sorted data by picking `mid` and keeping only the left or right half, narrowing the range each step. The `left`, `right`, `mid` updates and `while left <= right` condition in `binary_search()` are the core, yielding `O(log n)` time complexity.
+- **When is Python's `bisect` module useful?**
+  - `bisect` is especially useful when you want insertion positions, first-occurrence positions, or next-after-last positions without re-implementing binary search. The article's examples using `bisect_left`, `bisect_right`, and `insort` for counting duplicates and sorted-list insertion showed that range.
 <!-- toc:begin -->
 ## In this series
 

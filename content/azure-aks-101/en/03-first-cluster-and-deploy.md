@@ -384,12 +384,12 @@ This is part 3 of the Azure Kubernetes Service 101 series. The first two posts s
 
 ## Answering the Opening Questions
 
-- **What parameters absolutely must be decided when creating a minimal AKS cluster?**
-  - The article treats Your first cluster, your first deploy — Python/FastAPI as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Should you reach for `az aks create` or Bicep/Terraform for your first cluster?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What permission model wires ACR (Azure Container Registry) to AKS?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What minimum decisions are needed when creating a lab AKS cluster?**
+  - At minimum, decide `RESOURCE_GROUP`, `LOCATION`, `CLUSTER_NAME`, `USER_POOL`, and the starting node size with `az aks create --node-count 1`. Then settle `--generate-ssh-keys`, registry location, and whether to expose via `LoadBalancer` or `ClusterIP + Ingress` so the deployment flow does not wobble.
+- **Why is it better to add a user node pool separate from the default system pool?**
+  - Placing app Pods on the user pool with `nodeSelector: kubernetes.azure.com/mode: user`—as in the article example—separates roles from the system pool. Running `az aks nodepool add --mode User` first clarifies both where the `fastapi-hello` Deployment should be placed and what operational standards apply.
+- **After `az aks get-credentials`, what layer does `kubectl` actually talk to?**
+  - After `az aks get-credentials --resource-group $RESOURCE_GROUP --name $CLUSTER_NAME`, `kubectl` talks to the Kubernetes API—not the Azure CLI. So `kubectl apply -f fastapi-hello.yaml`, `kubectl get deployments`, and `kubectl get service fastapi-hello` verify desired state and actual placement results inside the cluster.
 
 <!-- toc:begin -->
 ## In this series

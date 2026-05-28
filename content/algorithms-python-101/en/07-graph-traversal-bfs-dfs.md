@@ -337,13 +337,12 @@ BFS explores nodes layer by layer and guarantees shortest paths on unweighted gr
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Graph Traversal — BFS and DFS?**
-  - The article treats Graph Traversal — BFS and DFS as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Graph Traversal — BFS and DFS?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Graph Traversal — BFS and DFS reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What are the basic concepts of a graph, and how is it represented in Python?**
+  - A graph is a set of nodes and edges, typically represented in Python as an adjacency-list dictionary like `{"A": ["B", "C"]}`. The article showed undirected, directed, and weighted graphs as examples, establishing that the neighbor-list structure is the foundation for traversal implementations.
+- **How does BFS work, and when should you use it?**
+  - BFS places the start node in a `deque` queue and visits nodes layer by layer, expanding outward from close to far. It is particularly well-suited for shortest paths in unweighted graphs and connected-component discovery, as `bfs_shortest_path()` demonstrated.
+- **How does DFS work, and when should you use it?**
+  - DFS goes as deep as possible along one path—via recursion or an explicit stack—before backtracking. The article implemented both `dfs_recursive()` and `dfs_iterative()`, showing DFS is more natural for problems requiring deep structural inspection like `has_cycle()`.
 <!-- toc:begin -->
 ## In this series
 

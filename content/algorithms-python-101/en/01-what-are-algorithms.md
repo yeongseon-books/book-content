@@ -279,13 +279,12 @@ An algorithm is a clear procedure for solving a problem, and efficiency is the k
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Are Algorithms??**
-  - The article treats What Are Algorithms? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Are Algorithms??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Are Algorithms? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What exactly is an algorithm, and what properties must it have?**
+  - In this article, an algorithm is a finite procedure that transforms input into desired output, described by five properties: input, output, definiteness, finiteness, and effectiveness. The `is_palindrome()` example concretely showed that clear termination conditions and comparison operations are what make a good algorithm.
+- **How can you express an algorithm in pseudocode or Python code?**
+  - As with the find-max and string-reverse examples, Python code expresses algorithms by making initialization, iteration range, and update conditions explicit line by line. The flow of maintaining `maximum` in `find_max()` and indexing back-to-front in `reverse_string()` is the basis of algorithm expression.
+- **Why can two algorithms solving the same problem differ greatly in efficiency?**
+  - Even for the same max-value problem, sorting then taking the last element is `O(n log n)` while a single scan is `O(n)`, so the gap widens as input grows. The duplicate-check comparison between brute-force `has_duplicate_brute()` and the `set`-based implementation confirmed this with measured execution times.
 <!-- toc:begin -->
 ## In this series
 

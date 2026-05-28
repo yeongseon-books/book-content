@@ -286,12 +286,12 @@ That is why the control-plane vs node-pool model matters operationally. It is no
 
 ## Answering the Opening Questions
 
-- **What does each control-plane component (API server, scheduler, controller manager, etcd) actually do?**
-  - The article treats Cluster architecture — control plane and node pools as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How does the kubelet, kube-proxy, and container runtime path on a node fit together?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Where do AKS managed identity and RBAC plug into the authn/authz flow?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What does each of API server, scheduler, controller manager, and etcd do?**
+  - `API server` is the gateway for declarations and queries; `etcd` stores that state; `scheduler` records `Pod -> Node` placement. `Controller loops` continuously converge objects like Deployments and Endpoints toward desired state—so all four components own different decisions within the Control Plane.
+- **Why is a Node Pool an important management unit beyond a simple VM grouping?**
+  - A Node Pool bundles `vmSize`, `count`, `osType`, and autoscaler range into a single execution layer. That is why `az aks nodepool list --query "[].{name:name, mode:mode, count:count, vmSize:vmSize, osType:osType}"` output directly reads as a cost, capacity, and placement strategy table.
+- **What is the practical reason for separating system and user node pools?**
+  - Separating the system pool (where `CoreDNS` and `metrics-server` Pods run) from the user pool (where application Pods run) shrinks the blast radius. Criteria like `CriticalAddonsOnly=true:NoSchedule` taint or `kubernetes.azure.com/mode: user` prevent user-workload surges from destabilizing the cluster's foundational layer.
 
 <!-- toc:begin -->
 ## In this series

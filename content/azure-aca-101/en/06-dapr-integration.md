@@ -244,12 +244,12 @@ Next post wraps up the series with **Monitoring and ops** — connecting Log Ana
 
 ## Answering the Opening Questions
 
-- **Where exactly does the Dapr sidecar attach inside an ACA pod, and what endpoint does the app call?**
-  - The article treats Dapr integration — what you get from a sidecar as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why are App-level `--enable-dapr` settings separated from Environment-level components?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What problems do Service invocation, Pub/Sub, State store, and Secret store each solve?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What is Dapr, and exactly where does its sidecar attach inside ACA?**
+  - Dapr is a sidecar runtime that attaches `daprd` beside the app container, abstracting service invocation, pub/sub, state, and secret calls behind `localhost:3500`. As the diagram showed, `Dapr sidecar :3500` sits next to `FastAPI :8000`, and app code calls `http://localhost:3500/v1.0/publish/...` or `/invoke/worker-app/method/process`. Dapr is not a separate external service but an execution component that moves with the app inside the same Container App.
+- **Why must app-level settings and Environment-level components be viewed separately?**
+  - `--enable-dapr true`, `--dapr-app-id api-app`, `--dapr-app-port 8000` are app-level settings that determine "will this app use a sidecar." Meanwhile, `az containerapp env dapr-component set --dapr-component-name orderpubsub --yaml pubsub.yaml` is an Environment-level setting defining what shared backend catalog the Environment provides. Separating the two lets you immediately narrow "sidecar is up but publish fails" to a missing component registration.
+- **What problems do the four core building blocks—service invocation, pub/sub, state store, and secret store—each solve?**
+  - Service invocation simplifies calls to other apps like `worker-app` via `app-id`; pub/sub hides the message system behind a standard API like `orderpubsub/orders`; state store abstracts key-value storage via `v1.0/state/orderstate`; and secret store connects vaults like Key Vault through a common interface. The article emphasized `scope`, `secretRef`, and component-name checks because these four are not convenience features but operational boundaries.
 
 <!-- toc:begin -->
 ## In this series

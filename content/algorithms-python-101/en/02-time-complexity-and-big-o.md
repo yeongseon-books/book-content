@@ -261,13 +261,12 @@ Time complexity and Big-O notation give you a precise way to compare algorithm p
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Time Complexity and Big-O?**
-  - The article treats Time Complexity and Big-O as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Time Complexity and Big-O?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Time Complexity and Big-O reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What is time complexity, and why is measuring actual execution time alone insufficient?**
+  - Time complexity describes the rate at which execution time grows as input size increases; actual execution times alone make it hard to separate hardware and measurement environment differences. The article measured `linear_sum()` and `all_pairs()` together to show why growth rate matters more than absolute time.
+- **How should you read and write Big-O notation?**
+  - Big-O drops constants and lower-order terms, keeping only the worst-case growth rate—so a single list traversal reads as `O(n)` and nested loops as `O(n²)`. Connecting `binary_search()` to `O(log n)` and `sorted()` to `O(n log n)` demonstrated how to attach notation to actual code.
+- **How do you distinguish representative complexities from `O(1)` to `O(n!)`?**
+  - Dictionary lookup that barely grows with input is `O(1)`, halving each step is `O(log n)`, scanning everything is `O(n)`, sorting is typically `O(n log n)`, and nested iteration is `O(n²)`. The article's table and measurements showed that series that look similar on small inputs diverge dramatically on large ones.
 <!-- toc:begin -->
 ## In this series
 

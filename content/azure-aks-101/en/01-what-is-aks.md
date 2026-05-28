@@ -239,12 +239,12 @@ The point is not to solve every failure from a single table. The point is to bui
 
 ## Answering the Opening Questions
 
-- **What does AKS take off your plate compared to self-managed Kubernetes, and what stays your job?**
-  - The article treats What is Azure Kubernetes Service? — what managed Kubernetes actually gives you as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Is the AKS control plane really free, and what SLA does it carry?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What is a node pool, and how do you split system and user pools?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What exactly does AKS operate on your behalf compared to self-managed Kubernetes?**
+  - AKS is a service where Azure manages the Control Plane containing `API server`, `scheduler`, and `etcd`. In return, Node Pool capacity visible via `kubectl get nodes -o wide`, workloads expressed as `Deployment`/`Service`/`Ingress`, and scaling and observability design remain your responsibility.
+- **Why must you still understand `kubectl`, YAML, Service, and Ingress even with managed Kubernetes?**
+  - Even with AKS, applications operate on the Kubernetes surface through commands like `kubectl get svc -A` and `kubectl get pods -n kube-system -o wide`. Azure hides the Control Plane but does not make workload-grammar decisions about `Service`, `Ingress`, YAML declarations, or probe quality on your behalf.
+- **Where do AKS costs originate, and why are nodes and surrounding resources more important than "cluster fees"?**
+  - As the article summarized, the cost center is node count and Node Pool VMs (`--node-count 1`), disks, `Load Balancer`, and `Public IP`. Adding `Azure Container Registry`, `Log Analytics`, `Container Insights`, and `Managed Prometheus` makes AKS closer to a service where you read surrounding-resource design rather than paying a cluster usage fee.
 
 <!-- toc:begin -->
 ## In this series

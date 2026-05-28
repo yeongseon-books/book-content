@@ -269,12 +269,12 @@ This is the final part of the Azure Kubernetes Service 101 series. The earlier p
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Monitoring and ops — Container Insights, logs, alerts?**
-  - The article treats Monitoring and ops — Container Insights, logs, alerts as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Monitoring and ops — Container Insights, logs, alerts?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Monitoring and ops — Container Insights, logs, alerts reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What does Container Insights show fastest in AKS operations?**
+  - Container Insights shows node, Pod, and container status on one screen, enabling the fastest identification of "where the cluster is struggling right now." It especially serves as the starting point for spotting restart patterns or instability signs in a specific Deployment before drilling down to `kubectl describe pod` or KQL.
+- **Why do logs and metrics answer different questions rather than being the same observability data?**
+  - `ContainerLogV2` and `KubeEvents` provide context—why something failed, what exception occurred at what time. Meanwhile, `kube-state-metrics` showing `desired replicas` vs `available replicas`, HPA status, and Node conditions reveal trends—how long and how broadly a problem persists.
+- **Which KQL tables and queries should you learn first from Log Analytics?**
+  - At the introductory stage, the most practical starting set is `ContainerLogV2`, `KubeEvents`, `KubePodInventory`, and `KubeNodeInventory`. Basic queries from the article—`PodNamespace == "default"` log lookups, `PodStatus == "Failed"` checks, and recent events with `take 50`—are enough to run the first triage loop.
 
 <!-- toc:begin -->
 ## In this series

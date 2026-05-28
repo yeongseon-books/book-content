@@ -310,12 +310,12 @@ This is part 6 of the Azure Kubernetes Service 101 series. Up to this point, the
 
 ## Answering the Opening Questions
 
-- **What does each of HPA, Cluster Autoscaler, and KEDA observe and scale?**
-  - The article treats Scaling — HPA, Cluster Autoscaler, KEDA as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **When does CPU/memory-based HPA fall short, and how does KEDA fill that gap?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Under what conditions can Cluster Autoscaler safely reschedule Pods when scaling nodes down?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What signal does each of HPA, Cluster Autoscaler, and KEDA watch, and what does each change?**
+  - `HorizontalPodAutoscaler` watches metrics like `averageUtilization: 60` and changes `fastapi-hello`'s replica count. Cluster Autoscaler adjusts Node Pool boundaries with `az aks nodepool update --min-count 2 --max-count 10`. KEDA translates external events—like `queueName: orders`, `messageCount: "5"` in a `ScaledObject`—into HPA-compatible scaling.
+- **When is CPU/memory-based HPA alone insufficient?**
+  - HPA alone falls short when the real demand signal is not CPU but queue backlog. The article showed that a `ScaledObject` with an `azure-servicebus` trigger and `minReplicaCount: 0`, `maxReplicaCount: 20` is needed precisely because the `orders` queue length is a more accurate pressure indicator than HTTP CPU utilization.
+- **Why doesn't response quality improve immediately after Pods scale up?**
+  - Even when HPA raises replica count, new Pods do not become `Ready` instantly. After `kubectl get hpa -w`, you may see `0/2 nodes are available`, `Insufficient cpu`, Pending Pods, node expansion, and probe passing in sequence—so there is always a time gap between Pod increase and response improvement.
 
 <!-- toc:begin -->
 ## In this series

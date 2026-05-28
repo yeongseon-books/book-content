@@ -266,12 +266,12 @@ This is part 5 of the Azure Kubernetes Service 101 series. The previous post foc
 
 ## Answering the Opening Questions
 
-- **How does pod IP assignment differ from external HTTP routing, and why keep them separate?**
-  - The article treats Networking and Ingress — the path in and out of the cluster as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **When does kubenet beat Azure CNI, and when does Azure CNI Overlay sidestep both tradeoffs?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What does an Ingress controller add that a plain Service cannot?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why should Pod IP assignment and external HTTP routing be treated as separate problems?**
+  - `--pod-cidr 10.244.0.0/16`, `--service-cidr 10.0.0.0/16`, and `--dns-service-ip 10.0.0.10` define the Pod and Service address scheme. Meanwhile, `ingressClassName: webapprouting.kubernetes.azure.com`, `host: api.example.com`, and `service.name: fastapi-hello` decide where external HTTP requests are routed—a different layer even within the same network.
+- **What operational trade-offs do kubenet, Azure CNI, and Azure CNI Overlay each carry?**
+  - `kubenet` made IP conservation easy but is hard to consider the new default; flat `Azure CNI` gives Pods direct VNet addresses, increasing IPAM pressure. `Azure CNI Overlay` separates the Pod CIDR from VNet, maintaining Azure integration while reducing VNet IP consumption.
+- **Why consider Azure CNI Overlay first for new AKS clusters?**
+  - Using `az aks create --network-plugin azure --network-plugin-mode overlay` mitigates the most common VNet address-exhaustion problem for new clusters. For greenfield deployments, unless there is a strong requirement to expose Pods as first-class VNet addresses, Overlay is the natural starting point.
 
 <!-- toc:begin -->
 ## In this series

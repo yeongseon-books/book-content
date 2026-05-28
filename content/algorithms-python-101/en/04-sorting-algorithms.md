@@ -366,13 +366,12 @@ The point of learning sorting is not memorizing every algorithm equally. It is u
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Sorting Algorithms?**
-  - The article treats Sorting Algorithms as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Sorting Algorithms?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Sorting Algorithms reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why should you prefer `sorted()` over implementing a sorting algorithm directly in practice?**
+  - The article's conclusion is that the practical default is `sorted(..., key=...)`, not re-implementing sorting algorithms. The `records` example—sorting by score and submission time, then verifying order within same-score groups—showed that sort criteria and stability matter more than implementation.
+- **How do the three `O(n²)` sorting algorithms work, and where do they belong as learning material?**
+  - Bubble sort sends large values to the back, selection sort brings the minimum forward, and insertion sort places each element in its correct position. All three are good for learning comparison and movement principles, but as the benchmark showed, `O(n²)` cost makes them study-versus-contrast material once input grows.
+- **How do merge sort and quicksort leverage divide and conquer?**
+  - Merge sort splits the list in half then merges the two sorted halves; quicksort separates values into less-than, equal, and greater-than the pivot and recurses. The `<=` in the merge step preserves stability, and quicksort's average `O(n log n)` versus worst-case `O(n²)` depends on pivot selection—both confirmed through code.
 <!-- toc:begin -->
 ## In this series
 

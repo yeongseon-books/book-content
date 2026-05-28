@@ -295,13 +295,12 @@ Greedy algorithms make the locally optimal choice at each step. They are efficie
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Greedy Algorithms?**
-  - The article treats Greedy Algorithms as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Greedy Algorithms?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Greedy Algorithms reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Under what conditions does a greedy algorithm produce an optimal solution?**
+  - A greedy algorithm needs both the greedy-choice property (each local optimum is part of a global optimum) and optimal substructure (global answers compose from subproblem optima). The rule of selecting the earliest-finishing activity in activity selection works precisely because these conditions hold.
+- **How do you solve coin change, activity selection, and fractional knapsack?**
+  - Coin change picks the largest denomination first; activity selection picks the earliest end time first; fractional knapsack picks the highest value/weight ratio first. The `coin_change_greedy()`, `activity_selection()`, and `fractional_knapsack()` examples all showed that a single sorting criterion determines the selection rule.
+- **How does greedy differ from dynamic programming?**
+  - Greedy commits a choice at each step immediately, while DP retains multiple possibilities as states to compute the global optimum. With `coins = [1, 3, 4], amount = 6`, greedy picks 3 coins but `coin_change_dp()` finds 2 coins (3+3), making the difference starkly clear.
 <!-- toc:begin -->
 ## In this series
 
