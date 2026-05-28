@@ -185,12 +185,12 @@ Resources define the shape of your API. The next episode turns to *what actions*
 
 ## Answering the Opening Questions
 
-- **How to draw resource boundaries?**
-  - The article treats Resource Design as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Rules for nouns, plurals, and hierarchy?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Modeling sub-resources?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How should you draw resource boundaries?**
+  - Ask "Can Y exist without X?" If independent, it's a top-level collection; if meaningless without its parent, it's a sub-resource. Additionally check: does deleting the parent delete the child? Can the child belong to multiple parents? These questions sharpen the boundary.
+- **What principles govern noun naming, pluralization, and hierarchy?**
+  - Collections use plural nouns; verbs belong to HTTP methods; URL hierarchy reflects domain ownership. Each resource gets one canonical URL, uses domain language, and hides implementation details (DB table names, PKs).
+- **When should you use sub-resources and how deep is too deep?**
+  - Use sub-resources when the child is deleted with the parent and never queried independently. Three levels is the practical limit; beyond that, flatten the structure and use query parameters—better for both client experience and cache efficiency.
 
 <!-- toc:begin -->
 ## In this series

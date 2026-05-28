@@ -190,12 +190,12 @@ Versioning reconciles *contracts* with *change*. The final episode turns to maki
 
 ## Answering the Opening Questions
 
-- **Distinguishing breaking from non-breaking changes?**
-  - The article treats API Versioning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **URL versioning vs header versioning?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Compatibility policy (semver, calver)?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do you distinguish breaking from non-breaking changes?**
+  - The test: "Can the client keep working without code changes?" Removing a response field, adding a required parameter, or changing a type is breaking. Adding new fields, new endpoints, or optional parameters is non-breaking. A compatibility policy document ensures the whole team judges consistently.
+- **What are the trade-offs of URL vs header versioning?**
+  - URL (`/v1/`) is intuitive and easy for cache/log separation but pollutes the URL. Header keeps URLs clean and aligns with content negotiation but complicates debugging and CDN config. External public APIs favor URL; internal APIs with frequent changes often use headers.
+- **How should you read semver, calver, and similar policies?**
+  - Semver: MAJOR = breaking, MINOR = feature addition, PATCH = fix. APIs typically expose only MAJOR externally. Calver uses dates as versions—suited to environments like Stripe's where change frequency is high and continuous history tracking is needed.
 
 <!-- toc:begin -->
 ## In this series

@@ -193,12 +193,12 @@ Schemas are the grammar of data. The next episode tackles a topic that no list e
 
 ## Answering the Opening Questions
 
-- **JSON and content types?**
-  - The article treats Request and Response Schemas as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Field naming conventions?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Where and how to validate?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do JSON and content type enter the contract?**
+  - The Content-Type header declares body format; the server validates it. Non-`application/json` requests get 415; the Accept header lets clients negotiate response format.
+- **How should field naming conventions be set?**
+  - Pick snake_case or camelCase and apply it consistently across the entire API. Include units in numeric field names (`timeout_ms`, `balance_cents`); prefix booleans with `is_`/`has_` for clarity.
+- **Where and how should validation happen?**
+  - At the boundary, before handler entry, using a schema library (Pydantic, marshmallow). Failures return 400/422. Never mix validation logic inside handlers. The schema serves simultaneously as documentation, validation, and type definition.
 
 <!-- toc:begin -->
 ## In this series

@@ -193,12 +193,12 @@ REST is the *sum of six constraints*. The next episode dives into the heart of t
 
 ## Answering the Opening Questions
 
-- **The definition and history of REST?**
-  - The article treats REST Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The six architectural constraints?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Resource-centric thinking?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Where did REST come from and what does it mean?**
+  - Roy Fielding formalized the web's scalability principles as an architectural style in his 2000 dissertation. It means "transferring state via representations of resources"—a set of constraints, not a protocol.
+- **What are the six architectural constraints that form REST?**
+  - Client-Server separation, Stateless, Cacheable, Uniform Interface, Layered System, and Code on Demand (optional). The first five are mandatory; applied together they produce web-scale scalability and predictability.
+- **How does resource-oriented thinking differ from RPC style?**
+  - RPC puts verbs ("what to do") in the URL; REST puts nouns ("what about") in the URL and delegates actions to HTTP methods. This makes REST cache-friendly, keeps endpoint patterns predictable, and lets new resources follow the same rules.
 
 <!-- toc:begin -->
 ## In this series

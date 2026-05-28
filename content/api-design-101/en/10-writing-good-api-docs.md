@@ -205,12 +205,12 @@ An API is the *sum* of its contracts, behaviors, and documentation. We started i
 
 ## Answering the Opening Questions
 
-- **The five axes of documentation?**
-  - The article treats Writing Good API Documentation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Reaching the first call in *under five minutes?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The weight of examples?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What five axes should API documentation cover?**
+  - Getting Started (first-call guide), Tutorial (scenario walkthrough), Reference (endpoint dictionary + examples), Changelog (change history), SDK/interactive environment. These five connect the user's learn → develop → maintain path without gaps.
+- **What's needed to get a user to their first successful call within 5 minutes?**
+  - Auth credential acquisition steps, a copy-paste-ready curl example, and the expected response—all on one page. The "5-minute rule" means success by following instructions without extra installs or prior knowledge.
+- **Why must examples be the center of documentation?**
+  - Developers copy examples before reading explanations. Working examples build trust; broken examples undermine the entire doc. Examples are not decoration but the trust foundation—and must be execution-verified in CI to retain their value.
 
 <!-- toc:begin -->
 ## In this series

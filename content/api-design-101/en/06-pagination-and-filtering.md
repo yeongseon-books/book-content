@@ -186,12 +186,12 @@ Pagination sits at the intersection of *performance and correctness*. The next e
 
 ## Answering the Opening Questions
 
-- **The limits of offset / limit pagination?**
-  - The article treats Pagination and Filtering as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Cursor-based pagination?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Sorting, filtering, and searching?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Where is offset/limit simple enough, and where do its limits appear?**
+  - For static lists under a few thousand rows with rare inserts/deletes, offset is simple and effective. Limits emerge on two axes: performance (DB reads and discards rows linearly as offset grows) and accuracy (inserts/deletes during paging cause duplicates or skips).
+- **What does cursor-based pagination solve, and what does it sacrifice?**
+  - Cursors solve deep-page performance degradation and data-mutation duplicates/skips. They sacrifice random page access ("jump to page 5") and require composite keys when the sort key isn't unique.
+- **What rules should separate sorting, filtering, and searching?**
+  - Filter = exact field conditions (WHERE equality/range); sort = result order (ORDER BY); search = free-text (full-text). They require different server-side execution stages and indexes, so separating them enables independent validation, optimization, and documentation.
 
 <!-- toc:begin -->
 ## In this series

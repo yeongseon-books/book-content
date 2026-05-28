@@ -203,12 +203,12 @@ OpenAPI is the API's *protocol, documentation, and code* in one. The next episod
 
 ## Answering the Opening Questions
 
-- **The structure of the OpenAPI 3 spec?**
-  - The article treats OpenAPI and Swagger as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Swagger UI and Redoc?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Code-first vs schema-first?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What structure does an OpenAPI 3 document follow?**
+  - Three blocks: `info` (metadata), `paths` (per-endpoint operations), `components` (reusable schemas/responses/parameters). `$ref` from paths into components eliminates duplication and maintains type consistency.
+- **What roles do Swagger UI and Redoc each serve?**
+  - Swagger UI offers "Try it out" for interactive API calls during development; Redoc provides a readable 3-panel documentation layout. Internal dev uses Swagger UI; external public docs suit Redoc.
+- **How do code-first and schema-first differ?**
+  - Code-first generates the spec from decorators/types—low drift but framework-coupled. Schema-first agrees on the spec first, then generates code and SDKs—better for contract-first review and multi-language support, but customization of generated code has a cost.
 
 <!-- toc:begin -->
 ## In this series

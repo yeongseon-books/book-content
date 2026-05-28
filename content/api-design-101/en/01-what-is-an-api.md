@@ -190,12 +190,12 @@ An API is a *contract*. The next post moves to its most common shape — REST ba
 
 ## Answering the Opening Questions
 
-- **The definition and kinds of APIs?**
-  - The article treats What Is an API? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Five conditions for a "good API"?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Library API vs web API?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What exactly is an API, and why call it an external contract?**
+  - An API is the interaction rules between software components. It's called an "external contract" because it exists independently of internal implementation and, once published, cannot be changed easily. Whether you swap the database or the language, as long as the contract holds, clients remain unaffected.
+- **What do library APIs and web APIs share, and where do they diverge?**
+  - Both are contracts specifying input/output shape. They differ in transport medium (memory vs network) and failure modes (immediate exception vs timeout/partial failure). Web APIs require additional design for retries, idempotency, and timeouts due to network uncertainty.
+- **What conditions must a "good API" satisfy?**
+  - Predictability, consistency, least surprise, evolvability, and self-descriptiveness. When these hold, a client developer learns one endpoint and can guess the rest—and the server can evolve without breaking existing code.
 
 <!-- toc:begin -->
 ## In this series

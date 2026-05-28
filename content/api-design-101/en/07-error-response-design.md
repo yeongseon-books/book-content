@@ -207,12 +207,12 @@ Error responses are the API's *second face*. The next episode brings every promi
 
 ## Answering the Opening Questions
 
-- **The four parts of an error response?**
-  - The article treats Designing Error Responses as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **RFC 7807 `application/problem+json`?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How to express validation errors?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What elements compose a good error response?**
+  - HTTP status code (broad category), machine-readable error code (fine-grained identifier), human-readable title/detail, per-field validation errors array, and trace_id. All five in a fixed envelope let clients parse every error with a single handler.
+- **Why is RFC 7807 `application/problem+json` useful?**
+  - Instead of each team inventing a format, a standardized schema (`type`, `title`, `status`, `detail`, `instance`) lets client libraries, doc tools, and monitoring systems understand errors without custom configuration. Extension fields (`code`, `errors[]`, `trace_id`) are also permitted.
+- **What shape should validation errors take?**
+  - An `errors[]` array with per-field entries containing `field` (JSON path), `code` (machine-readable), and `detail` (developer description). Return all failing fields at once so clients don't loop through "fix one, resubmit, discover next."
 
 <!-- toc:begin -->
 ## In this series

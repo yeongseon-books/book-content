@@ -210,12 +210,12 @@ Methods and status codes are a pair. The next episode looks at the data flowing 
 
 ## Answering the Opening Questions
 
-- **The meaning of GET / POST / PUT / PATCH / DELETE?**
-  - The article treats HTTP Methods and Status Codes as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Safe vs idempotent operations?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The 2xx / 3xx / 4xx / 5xx families?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What does each of GET, POST, PUT, PATCH, DELETE mean?**
+  - GET = retrieve (safe + idempotent); POST = create (non-safe, non-idempotent); PUT = full replace (idempotent); PATCH = partial update; DELETE = remove (idempotent). Because methods carry intent, URLs don't need verbs.
+- **How do safe and idempotent differ?**
+  - Safe means "doesn't change server state"; idempotent means "N calls produce the same result as one call." DELETE is not safe (state changes) but is idempotent (deleting what's already deleted gives the same outcome). This distinction drives client retry policies.
+- **How should you read the 2xx, 3xx, 4xx, 5xx families?**
+  - 2xx = success (proceed with next step); 4xx = client problem (retry is pointless); 5xx = server problem (retry may help). These three branches structure the client's error handler.
 
 <!-- toc:begin -->
 ## In this series
