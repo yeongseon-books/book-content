@@ -186,12 +186,12 @@ Config is solved. The next post covers persisting *state data* with *Volumes*.
 
 ## Answering the Opening Questions
 
-- **Splitting *ConfigMap* and *Secret?**
-  - The article treats ConfigMap and Secret as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Env vars* vs *file mounts?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The *base64* fact and the *encryption gap?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why does baking config and secrets into an image hurt operations?**
+  - Environment-specific values inside the image force a separate build per environment, and a single password rotation demands a full rebuild and redeploy. Extracting config into ConfigMap/Secret keeps images environment-agnostic and enables independent rotation.
+- **ConfigMap vs Secret — what separates them?**
+  - Both inject key-value data into Pods, but ConfigMap holds plaintext configuration while Secret holds base64-encoded sensitive data. Secrets require RBAC restrictions and etcd encryption. The first branch point: "Is it sensitive? → Secret. Otherwise → ConfigMap."
+- **When to choose env-var injection vs file mount?**
+  - Short values (`LOG_LEVEL`, single-line keys) suit env vars for simplicity. Long payloads (TLS certs, JSON config files) or data that needs hot-reload without container restart suit volume mounts. Env vars require a restart to reflect changes; mounted files are periodically synced by kubelet.
 
 <!-- toc:begin -->
 ## In this series

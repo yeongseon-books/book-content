@@ -179,12 +179,12 @@ State is solved. The next post covers *matching Pod count to load* with *HPA*.
 
 ## Answering the Opening Questions
 
-- **emptyDir* vs *PV/PVC?**
-  - The article treats Volume as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The role of *StorageClass?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Dynamic provisioning?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why does container filesystem vanish on Pod restart?**
+  - The writable layer atop a container image is discarded when the container dies—by design. Any file written there disappears on restart. Persisting data requires mounting a Volume that exists outside the Pod lifecycle, which is precisely what separates stateless from stateful workloads.
+- **When do `emptyDir` and PVC diverge?**
+  - `emptyDir` is created with the Pod and deleted with it—suitable for caches and temporary build artifacts. A PVC requests persistent storage decoupled from Pod lifetime, so data survives redeployment. Choose PVC when data must outlive the Pod (databases, uploaded files).
+- **What does StorageClass actually decide?**
+  - StorageClass bundles provisioner, disk type (SSD/HDD), replication policy, and `reclaimPolicy` into a single rule governing "how to create and destroy this PVC's backing storage." Whether `reclaimPolicy` is `Delete` or `Retain` determines if real data vanishes when the PVC is removed—critical for production data.
 
 <!-- toc:begin -->
 ## In this series

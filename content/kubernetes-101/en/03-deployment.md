@@ -180,12 +180,12 @@ Even with *Pods* up, *external access* needs an *address*. The next post covers 
 
 ## Answering the Opening Questions
 
-- **Deployment* and *ReplicaSet* relationship?**
-  - The article treats Deployment as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The meaning of *replicas?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The *RollingUpdate* strategy?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Deployment and ReplicaSet — what is the relationship?**
+  - The Deployment accepts user declarations; the ReplicaSet underneath maintains the actual Pod replica count. During a rolling update, the Deployment creates a new ReplicaSet and gradually scales down the old one.
+- **What does `replicas` really mean beyond a number?**
+  - `replicas` is not "run N right now" but "always maintain N." Even when Pods die or nodes disappear, the controller narrows the desired-vs-current gap continuously—making that number the baseline for both availability and cost.
+- **Why does an image change trigger a zero-downtime deploy?**
+  - Changing the image tag causes the Deployment to create a new ReplicaSet, gradually scale up new Pods (gated by readiness probes), and scale down old Pods. The probe-based traffic cutoff keeps user-visible availability unbroken throughout.
 
 <!-- toc:begin -->
 ## In this series

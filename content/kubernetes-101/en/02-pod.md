@@ -175,12 +175,12 @@ With *Pods* understood, the next step is the *Deployment*, which owns *restarts 
 
 ## Answering the Opening Questions
 
-- **The definition of a *Pod?**
-  - The article treats Pod as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How it differs from a *container?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The *sidecar* pattern?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Pod vs container — how do they differ?**
+  - A container is an isolated process, while a Pod is a group of one or more containers sharing the same network namespace and volumes, starting and stopping together. The YAML spec where `containers` is an array illustrates this directly.
+- **Why does Kubernetes use Pods instead of bare containers?**
+  - Log collectors, proxies, and secret-sync agents need the same lifecycle as the main process. Without a Pod boundary, you'd have to manually design the coupling and shared resources every time.
+- **When is the sidecar pattern needed?**
+  - When an auxiliary role (log collection, proxy, file sync) must start and stop at the same moment as the main container. The article also noted the coupling cost: putting both in one Pod ties their deploy and scaling unit together.
 
 <!-- toc:begin -->
 ## In this series

@@ -178,12 +178,12 @@ The *big picture* of orchestration is in place. The next post covers the *smalle
 
 ## Answering the Opening Questions
 
-- **The meaning of *orchestration?**
-  - The article treats What is Kubernetes? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Control plane* vs *worker nodes?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **The meaning of *orchestration*?**
+  - Orchestration replaces the manual cycle of running `docker run` on each server and restarting dead containers by hand. It moves placement, restart, and version-swap decisions into system-level rules. As the article showed, declaring the same configuration in YAML reproduces the exact state on any server without per-host intervention.
+- **Control plane vs worker nodes?**
+  - The control plane (API server, etcd, scheduler, controller-manager) decides *where and what* to run; worker nodes execute those decisions by actually running containers. The separation is clearest in the fact that `kubectl` never launches a container directly—it only tells the API server the desired state.
 - **The *desired state* model?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - Users declare a goal state in YAML and controllers continuously converge the current state toward that goal. This makes self-healing and reproducibility default behaviors, not bolt-on features. As the Deployment/Service/Ingress examples showed, watching the desired-vs-current gap becomes the starting point of operations.
 
 <!-- toc:begin -->
 ## In this series

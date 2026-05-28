@@ -177,12 +177,12 @@ Internal traffic is solved. The next post covers *Ingress*, which splits *extern
 
 ## Answering the Opening Questions
 
-- **The problem a *Service* solves?**
-  - The article treats Service as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **ClusterIP / NodePort / LoadBalancer?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How *selectors* match?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What problem does a Service solve?**
+  - Pod IPs change on every restart or reschedule. A Service places a stable virtual IP and DNS name in front of a selector-matched Pod set, so callers never need to know which specific Pod is handling traffic at any moment.
+- **When do ClusterIP, NodePort, and LoadBalancer diverge?**
+  - ClusterIP is for intra-cluster-only access; NodePort opens a specific port on every node for external reach; LoadBalancer integrates with a cloud LB for public traffic. The deciding question is *where the traffic originates*.
+- **Why must selector and labels match exactly?**
+  - A Service finds Pods via its selector and bundles the results into Endpoints for routing. A single-character mismatch empties the Endpoints, creating a black hole where traffic reaches nothing—hence the operational habit of checking `kubectl get endpoints`.
 
 <!-- toc:begin -->
 ## In this series

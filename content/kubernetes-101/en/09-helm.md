@@ -174,12 +174,12 @@ With a deploy unit in hand, the final piece is the *operations view*. Next post 
 
 ## Answering the Opening Questions
 
-- **the layout of a *Chart?**
-  - The article treats Helm as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **how *values.yaml* works?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **install / upgrade / rollback?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why does copying YAML per environment create drift?**
+  - Separate `dev/`, `staging/`, `prod/` directories with near-identical manifests inevitably diverge: a patch applied to one misses another, and direct edits become untrackable. Over time "same code behaves differently across environments" accumulates silently.
+- **What responsibilities do Chart and `values.yaml` split?**
+  - The Chart defines templates and structure (which objects, in what shape); `values.yaml` isolates environment-variable values (image tag, replica count, domain). This separation enables the pattern of keeping one Chart and swapping `-f values-prod.yaml` per environment.
+- **How do `install`, `upgrade`, and `rollback` flow together?**
+  - `install` creates a new release with its objects; `upgrade` adds a new revision to an existing release; `rollback` reverts to a previous revision in that history. A Helm release is not a single snapshot but a versioned change log—enabling fast recovery during incidents.
 
 <!-- toc:begin -->
 ## In this series

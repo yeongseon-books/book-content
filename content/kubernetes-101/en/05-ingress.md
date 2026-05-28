@@ -185,12 +185,12 @@ With routing in place, the next step is *separating config and secrets*. The nex
 
 ## Answering the Opening Questions
 
-- **Splitting *Ingress* and *IngressController?**
-  - The article treats Ingress as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Host / path* routing?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **TLS termination?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why must Ingress and IngressController be understood separately?**
+  - An Ingress is only a *declaration* of host/path routing rules. The IngressController is what actually reads those rules and configures a proxy (nginx, HAProxy, Envoy) to handle traffic. Without a Controller in the cluster, an Ingress object does nothing.
+- **How can multiple services share a single domain?**
+  - Using `host` and `path` rules, the same domain's `/api` can route to one Service while `/admin` routes to another—or subdomains can map to different Services. This consolidates external entry points into one L7 router instead of provisioning a LoadBalancer per service.
+- **What difference do `host`, `path`, and `pathType` make?**
+  - `host` determines which domain's traffic matches; `path` selects which URL subtree within that domain; `pathType` (`Prefix`, `Exact`, `ImplementationSpecific`) decides whether matching is prefix-based, exact, or controller-dependent. Leaving `pathType` unset risks controller-specific behavior that differs from intent.
 
 <!-- toc:begin -->
 ## In this series

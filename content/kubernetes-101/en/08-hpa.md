@@ -189,12 +189,12 @@ With autoscaling in place, you need a *repeatable deploy unit*. The next post is
 
 ## Answering the Opening Questions
 
-- **where *HPA* fits?**
-  - The article treats HPA as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **why *metrics-server* matters?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **CPU/memory* targets?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why is manual Pod scaling slow and expensive?**
+  - A human watching dashboards and running `kubectl scale` reacts in minutes, not seconds—and is absent on nights and weekends. The article showed how a 5-minute traffic spike degrades responses while no one is watching, or idle hours waste money on unnecessary replicas.
+- **What metrics does HPA use for scale-out and scale-in?**
+  - By default, CPU/memory utilization from metrics-server calculated as current usage ÷ requests. The article showed extending to RPS or queue length via `Resource`, `Pods`, `Object`, and `External` metric types. When the desired/current gap exceeds a threshold, replicas adjust; `behavior` settings add cooldown to prevent oscillation.
+- **Why does HPA fail without resource requests?**
+  - HPA computes utilization as "current usage ÷ requests." Without requests, the denominator is zero—target utilization becomes incalculable. Metrics show 0% or N/A, scaling never fires, and node resource reservation fails so scale-out itself breaks.
 
 <!-- toc:begin -->
 ## In this series

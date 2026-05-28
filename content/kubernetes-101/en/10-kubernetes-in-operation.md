@@ -186,12 +186,12 @@ That wraps the *Kubernetes 101* series. Next, the *Serverless* and *SRE* series 
 
 ## Answering the Opening Questions
 
-- **liveness/readiness/startup* probes?**
-  - The article treats Kubernetes in Operation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **RBAC* and *NetworkPolicy?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **metrics/logs/traces?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Liveness, readiness, startup probe — how do they split responsibilities?**
+  - Liveness asks "should this container be killed and restarted?"; readiness asks "can it receive traffic now?"; startup asks "has initial boot finished?" Using the same endpoint for all three causes slow-starting apps to be killed repeatedly or to receive traffic before warm-up completes.
+- **Why are RBAC and NetworkPolicy fundamental operational boundaries?**
+  - RBAC limits who can touch which API objects; NetworkPolicy limits which Pods can send traffic to which other Pods. Both default to "allow," so without explicit narrowing a single mistake can propagate cluster-wide. The operational baseline is "deny by default, permit only what's needed."
+- **Why must metrics, logs, and traces be viewed together?**
+  - Metrics show *what* is degraded and *how much*; logs show *what messages* appeared; traces show *which service span* is consuming time. Without correlating all three on the same timeline, a post-deploy 5xx spike leaves you stuck at "the cluster is slow" rather than isolating the exact service and call path responsible.
 
 <!-- toc:begin -->
 ## In this series
