@@ -36,17 +36,9 @@ This is the 7th post in the Compilers 101 series.
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying optimization basics?
-- Which signal should the example or diagram make visible for optimization basics?
-- What failure should be prevented first when optimization basics reaches a real system?
-
-## What You Will Learn
-
-- That "meaning preserving" is the absolute rule of optimization
-- Constant folding: computing at compile time
-- Dead code elimination: removing unreachable code
-- Intuition for common subexpression elimination (CSE)
-- How optimizations are applied as a pipeline of passes
+- What is the most absolute rule in optimization?
+- How does constant folding work?
+- What information does dead code elimination rely on?
 
 ## Why It Matters
 
@@ -226,12 +218,12 @@ Optimization is a series of meaning-preserving transformations on IR. The next p
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying optimization basics?**
-  - The article treats optimization basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for optimization basics?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when optimization basics reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What is the most absolute rule in optimization?**
+  - The absolute rule is: make it faster or smaller only within the range that preserves program meaning. Reducing `t1 = 2 * 3`, `t2 = 1 + t1`, `return t2` to `return 7` is justified only because the result stays the same.
+- **How does constant folding work?**
+  - `fold(code)` remembers constant values in a `consts` environment; when both operands of `+ - * /` resolve to constants, it computes in place and replaces with `LOAD`. So `("*", "t3", "t1", "t2")` becomes `("LOAD", "t3", 6, None)` when both inputs are constant.
+- **What information does dead code elimination rely on?**
+  - DCE relies on use information collected bottom-up — which values are actually read (similar to liveness). `dce(code)` starts from `RET`, fills a `used` set, then removes instructions whose results are never referenced in a second pass.
 
 <!-- toc:begin -->
 ## In this series

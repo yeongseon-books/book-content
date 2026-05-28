@@ -37,17 +37,9 @@ This is the final post in the Compilers 101 series.
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying Building a Tiny Interpreter?
-- Which signal should the example or diagram make visible for Building a Tiny Interpreter?
-- What failure should be prevented first when Building a Tiny Interpreter reaches a real system?
-
-## What You Will Learn
-
-- How to combine a lexer, parser, and evaluator into one file
-- A minimal recursive descent parser
-- How an interpreter walks an AST to produce values
-- How a REPL closes one execution cycle
-- Where to extend this code next
+- How do you combine a lexer, parser, and evaluator into one file?
+- What does the minimal implementation of a recursive descent parser look like?
+- How does an interpreter walk the AST to produce values?
 
 ## Why It Matters
 
@@ -269,12 +261,12 @@ We built a tiny interpreter in one file and used it to verify every stage from t
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Building a Tiny Interpreter?**
-  - The article treats Building a Tiny Interpreter as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Building a Tiny Interpreter?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Building a Tiny Interpreter reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do you combine a lexer, parser, and evaluator into one file?**
+  - Wire `tokenize(src) -> Parser(tokens).parse() -> evaluate(ast) -> print(result)` in sequence. `run(src)` joins the three stages in one line, and the REPL loop calls that function repeatedly to show the full flow.
+- **What does the minimal implementation of a recursive descent parser look like?**
+  - Five axes are enough: `peek`, `eat`, `expr`, `term`, `factor`. The `expr -> term`, `term -> factor` structure plus an `eat("EOF")` check handles precedence and input termination in one pass.
+- **How does an interpreter walk the AST to produce values?**
+  - `evaluate(node)` returns the value directly for `("Num", value)` and recursively computes children for `("BinOp", op, left, right)` before applying `+`, `-`, `*`, `/`. That is why `mini> 1 + 2 * 3` yields `7.0` and `(1 + 2) * 3` yields `9.0`.
 
 <!-- toc:begin -->
 ## In this series

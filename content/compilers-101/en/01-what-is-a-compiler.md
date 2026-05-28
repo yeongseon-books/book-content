@@ -37,17 +37,9 @@ This is the first post in the Compilers 101 series.
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying What Is a Compiler??
-- Which signal should the example or diagram make visible for What Is a Compiler??
-- What failure should be prevented first when What Is a Compiler? reaches a real system?
-
-## What You Will Learn
-
-- A one-line definition of a compiler
-- The six stages of the standard compiler pipeline
-- How interpreters and transpilers reuse those same stages
-- Why the "frontend vs backend" split matters
-- How to build one slice of a compiler in Python
+- How would you define a compiler in one line?
+- What stages make up the standard compiler pipeline?
+- How much of that pipeline do interpreters and transpilers share?
 
 ## Why It Matters
 
@@ -250,12 +242,12 @@ A compiler is a system that only makes sense once you decompose it into stages. 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Is a Compiler??**
-  - The article treats What Is a Compiler? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Is a Compiler??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Is a Compiler? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How would you define a compiler in one line?**
+  - A compiler is a staged translation system that turns source code into target code through tokens, AST, type information, and IR. The example where `2 + 3 * 4` passes through `lex → parse → check → IR → optimize → codegen` shows that definition in action.
+- **What stages make up the standard compiler pipeline?**
+  - Lexer, parser, semantic analyzer, intermediate representation, optimizer, and code generator — six stages in one flow. The `Token` list, `Num/BinOp` AST, `check(node)` type check, and `emit(node)` pseudo-assembly output concretely show each stage's input and output.
+- **How much of that pipeline do interpreters and transpilers share?**
+  - An interpreter shares the same front-end but executes the AST directly via `evaluate(node)` instead of emitting code. A transpiler also shares tokenization, parsing, and semantic checks but outputs another high-level language instead of machine code.
 
 <!-- toc:begin -->
 ## In this series

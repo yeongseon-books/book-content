@@ -36,17 +36,9 @@ This is the 5th post in the Compilers 101 series.
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying symbol table and scope?
-- Which signal should the example or diagram make visible for symbol table and scope?
-- What failure should be prevented first when symbol table and scope reaches a real system?
-
-## What You Will Learn
-
-- What a symbol table is and why it is the compiler's central data structure
-- Expressing scope as a stack or chained dictionary
-- The structure where shadowing and lookup follow naturally
-- The differences between function, block, and module scope
-- IDE features built on the symbol table (rename, go-to-definition)
+- What exactly is a symbol table, and why is it the compiler's core data structure?
+- How can scopes be represented as a stack or linked dictionaries?
+- Why do shadowing and lookup follow naturally?
 
 ## Why It Matters
 
@@ -239,12 +231,12 @@ The symbol table is the memory the compiler uses to answer "what is this name?" 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying symbol table and scope?**
-  - The article treats symbol table and scope as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for symbol table and scope?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when symbol table and scope reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What exactly is a symbol table, and why is it the compiler's core data structure?**
+  - A symbol table connects names to declaration info like `(kind, type, location)` — the compiler's memory. `Scope.define("x", "int")` and `Symbol(name, kind, ty, line, col)` store declaration info with position, enabling both name resolution and go-to-definition from the same structure.
+- **How can scopes be represented as a stack or linked dictionaries?**
+  - A single `Scope` with a `parent` pointer represents module, function, and block scopes. `Analyzer.enter()` and `exit()` push and pop `Scope(self.scopes[-1])`, so the current and outer scopes are naturally accessible while walking the AST.
+- **Why do shadowing and lookup follow naturally?**
+  - Because `resolve()` checks the current table first and walks up via `parent` if the name is missing. After `g.define("x", "int(global)")` and `f.define("x", "int(local)")`, `f.resolve("x")` returns local and `g.resolve("x")` returns global — no special rules needed.
 
 <!-- toc:begin -->
 ## In this series

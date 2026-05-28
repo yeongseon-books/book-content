@@ -37,17 +37,9 @@ This is the 2nd post in the Compilers 101 series.
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying lexical analysis?
-- Which signal should the example or diagram make visible for lexical analysis?
-- What failure should be prevented first when lexical analysis reaches a real system?
-
-## What You Will Learn
-
-- The definition of a token and the problem a lexer solves
-- Regex-based lexers and the longest-match rule
-- The standard trick for separating keywords from identifiers
-- How to keep position information (line, column) flowing
-- Looking at a real lexer using Python's built-in `tokenize` module
+- What exactly is a token, and what problem does a lexer solve?
+- How does a regex-based lexer work?
+- Why does the longest-match rule matter?
 
 ## Why It Matters
 
@@ -263,12 +255,14 @@ The lexer is the first transformation that turns text into meaningful units. The
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying lexical analysis?**
-  - The article treats lexical analysis as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for lexical analysis?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when lexical analysis reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What exactly is a token, and what problem does a lexer solve?**
+  - A token is `(kind, text, position)` — a unit that packages type, source text, and location so the next stage can read it easily. The `Token(kind, text, line, col)` structure and `lex('if x == 1
+  return "ok"
+')` output show how the lexer slices text while preserving error locations.
+- **How does a regex-based lexer work?**
+  - It tries the `SPEC` table patterns in order at the current position, turns the match into a token, and updates `line` and `col`. Post-processing then checks `KEYWORDS` to promote `ID` tokens like `if` and `while` to `KW` — the classic regex-based lexer structure.
+- **Why does the longest-match rule matter?**
+  - When tokens share prefixes (like `==` and `=`), failing to guarantee longest match splits the same input into completely different token streams. The `SPEC = [("EQ", r"=="), ("ASSIGN", r"=")]` example shows that reversing the order breaks `==` into two `=` tokens.
 
 <!-- toc:begin -->
 ## In this series

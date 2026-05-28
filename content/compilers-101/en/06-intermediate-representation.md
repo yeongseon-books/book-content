@@ -36,17 +36,9 @@ This is the 6th post in the Compilers 101 series.
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying intermediate representation?
-- Which signal should the example or diagram make visible for intermediate representation?
-- What failure should be prevented first when intermediate representation reaches a real system?
-
-## What You Will Learn
-
-- What an IR is and why it exists
-- The shape of three-address code (3AC)
-- The intuition for SSA (static single assignment)
-- The structure that lets one IR target many architectures
-- Writing AST → IR lowering by hand
+- What is IR and why is it needed?
+- What does three-address code look like?
+- Why does SSA simplify analysis?
 
 ## Why It Matters
 
@@ -276,12 +268,12 @@ The IR is the bridge that cleanly splits the compiler in half. The next post loo
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying intermediate representation?**
-  - The article treats intermediate representation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for intermediate representation?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when intermediate representation reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What is IR and why is it needed?**
+  - IR is the compiler's internal language between AST and machine code, separating front-end grammar complexity from back-end architecture dependencies. The example that flattens `Bin("+", ...)` into `LOAD`, `*`, `+`, `return` shows why IR is the common boundary for optimization and multiple back-ends.
+- **What does three-address code look like?**
+  - One operation and at most three operands per line: `t1 = a + b`. The `lower()` function turning `("BIN","+",...)` AST into `('LOAD', 't1', 1)`, `('*', 't4', 't2', 't3')`, `('+', 't5', 't1', 't4')` is the classic shape.
+- **Why does SSA simplify analysis?**
+  - SSA gives each assignment a new version (`x1`, `x2`, `x3`) so every name is defined exactly once. At branch join points, `x3 = phi(x1, x2)` makes surviving values explicit, so data-flow analysis and CSE become much simpler.
 
 <!-- toc:begin -->
 ## In this series

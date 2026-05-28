@@ -36,17 +36,9 @@ This is the 4th post in the Compilers 101 series.
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying semantic analysis?
-- Which signal should the example or diagram make visible for semantic analysis?
-- What failure should be prevented first when semantic analysis reaches a real system?
-
-## What You Will Learn
-
-- The difference between syntactic correctness and semantic correctness
-- Name resolution: where does this name point?
-- Type checking: are these two values the same type?
-- The pattern of walking the AST once and attaching meaning to it
-- The shape of a good error message at the semantic stage
+- How does syntactically correct differ from semantically correct?
+- What is name resolution, and where does an identifier point?
+- What rules drive type checking?
 
 ## Why It Matters
 
@@ -232,12 +224,12 @@ Semantic analysis answers the "does this make sense?" question that syntax canno
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying semantic analysis?**
-  - The article treats semantic analysis as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for semantic analysis?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when semantic analysis reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How does syntactically correct differ from semantically correct?**
+  - Syntactically correct means the parser accepted the sentence structure; semantically correct means it also satisfies the language rules. `Bin("+", Var("x"), Str("hello"))` parses fine, but an undeclared name or `int + str` is rejected at the semantic stage.
+- **What is name resolution, and where does an identifier point?**
+  - Name resolution uses `Env.declare()` and `Env.lookup()` to decide which declaration entry an identifier refers to. When `resolve(node)` hits a `Var` not in the environment, it immediately raises `NameError` — the simplest illustration of that binding.
+- **What rules drive type checking?**
+  - Type checking walks the AST bottom-up, computing each expression's type; at a `BIN` node it checks whether the left and right operand types match the rules. In `type_of()` and `annotate()`, `l != r` raises `TypeError`; otherwise the node gets a type annotation, producing an annotated AST.
 
 <!-- toc:begin -->
 ## In this series
