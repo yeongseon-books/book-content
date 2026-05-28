@@ -280,13 +280,12 @@ Next is the final article in this series — measuring and analyzing performance
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Parallelism and Multicore?**
-  - The article treats Parallelism and Multicore as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Parallelism and Multicore?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Parallelism and Multicore reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What is the difference between concurrency and parallelism?**
+  - Concurrency means multiple tasks progress logically overlapping (possible even on a single core via context switching); parallelism means physically simultaneous execution (requires multiple cores). Concurrency is a structural concern; parallelism is an execution concern.
+- **What new costs emerge with multicore?**
+  - Cache coherence maintenance (MESI protocol invalidate messages), bus traffic from atomic operations, fence instructions for memory ordering guarantees, and serialization cost under lock contention. The ping-pong pattern moves cache lines between cores on every access, causing tens-of-times performance degradation.
+- **Why are lock contention and false sharing dangerous?**
+  - Lock contention serializes the critical section, creating a scalability ceiling per Amdahl's Law. False sharing generates unnecessary coherence traffic when logically independent data shares a cache line. Both cause performance to stagnate or degrade despite adding cores.
 <!-- toc:begin -->
 ## In this series
 

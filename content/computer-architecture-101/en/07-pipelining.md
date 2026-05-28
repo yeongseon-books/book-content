@@ -263,13 +263,12 @@ Next we step outside the CPU, to I/O and devices: how slow components like disks
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Pipelining?**
-  - The article treats Pipelining as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Pipelining?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Pipelining reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How does pipelining increase throughput?**
+  - By dividing instruction execution into multiple stages and overlapping them. A 5-stage pipeline ideally provides 5× throughput improvement, completing one instruction per cycle. Superscalar designs place multiple pipelines in parallel to achieve IPC > 1.
+- **How do data hazards and control hazards differ?**
+  - Data hazards arise from data dependencies between instructions (RAW: previous result not yet available) and are mostly resolved by forwarding. Control hazards occur when the branch outcome is unknown, making the next fetch address undetermined—mitigated by branch prediction.
+- **What assumption does branch prediction operate on?**
+  - "Past patterns will repeat in the future." A 2-bit saturating counter learns consistently-taken branches and achieves 99%+ accuracy for loops. As shown in the deep-dive, prediction accuracy improving from 97% to 99% reduces CPI from 1.09 to 1.03.
 <!-- toc:begin -->
 ## In this series
 

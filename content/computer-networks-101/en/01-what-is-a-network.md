@@ -205,13 +205,12 @@ Next we move to the most basic addressing system on the Internet — IP and subn
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Is a Network??**
-  - The article treats What Is a Network? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Is a Network??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Is a Network? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How are a network and the internet different?**
+  - A network is a local unit of connected devices; the internet is a global federation of networks connected via the common IP protocol. An office LAN is a network—when it connects to other ASes through an ISP, it becomes part of the internet.
+- **Why is the packet treated as the fundamental unit of networking?**
+  - Because the internet adopted packet switching. Unlike circuit switching, resources are shared at the packet level, allowing other communications to use the same link during idle time and enabling rerouting around failures.
+- **Why would IP, TCP, DNS, and HTTP be hard to understand together without a layered model?**
+  - The layered model defines each protocol's responsibility boundary. IP handles routing, TCP handles reliability, DNS handles name resolution, and HTTP handles message semantics. Without this separation, all concepts blend into one mass, making it impossible to determine where to start investigating when failures occur.
 <!-- toc:begin -->
 ## In this series
 

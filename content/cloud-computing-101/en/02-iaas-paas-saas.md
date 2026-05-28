@@ -184,13 +184,12 @@ Once you pick a model, the next question is *where it runs*. The next post cover
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying IaaS, PaaS, SaaS?**
-  - The article treats IaaS, PaaS, SaaS as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for IaaS, PaaS, SaaS?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when IaaS, PaaS, SaaS reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why do EC2, Heroku, and Notion—all cloud services—feel so different?**
+  - EC2 is IaaS where you manage the virtual machine directly. Heroku is PaaS that automates deployment once you choose a language and runtime. Notion is SaaS where users consume a finished collaboration tool. Same cloud, but vastly different abstraction levels and operational responsibility.
+- **Where does user responsibility end and provider responsibility begin for IaaS, PaaS, and SaaS?**
+  - A small team building everything on IaaS slows deployment; forcing PaaS constraints costs adaptation time. The choice depends on development capability, regulatory requirements, and operations team size.
+- **How should you choose a model based on organization size and workload characteristics?**
+  - IaaS gives fine-grained control but heavy operational burden. PaaS offers fast deployment but platform constraints. SaaS is immediately usable but limited in customization. Understanding each model's tradeoffs and matching them to your team's situation is key.
 <!-- toc:begin -->
 ## In this series
 

@@ -246,13 +246,12 @@ In the final episode we close the series by looking at what to do when the netwo
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying WebSocket and Real-Time Communication?**
-  - The article treats WebSocket and Real-Time Communication as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for WebSocket and Real-Time Communication?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when WebSocket and Real-Time Communication reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How does a WebSocket connection upgrade from HTTP?**
+  - The client sends an HTTP GET with `Upgrade: websocket` and `Sec-WebSocket-Key` headers; the server responds with `101 Switching Protocols`. From that point the same TCP socket operates on the WebSocket frame protocol instead of HTTP—no additional TCP handshake needed.
+- **When should you choose WebSocket, SSE, or long-polling?**
+  - Bidirectional communication (chat, games, collaborative editors) requires WebSocket. Server-to-client unidirectional streaming is simpler with SSE, which includes built-in auto-reconnection. When update frequency is low (30s+) and infrastructure simplicity is the priority, polling suffices.
+- **Why are ping/pong, reconnection, and backpressure operationally critical?**
+  - Without ping/pong, broken connections from NAT timeouts or network failures go undetected and leak server resources. Without a reconnection strategy, transient network instability forces manual page refreshes. Without backpressure, a single slow client can exhaust server memory and bring down the entire service.
 <!-- toc:begin -->
 ## In this series
 

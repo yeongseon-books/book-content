@@ -198,13 +198,12 @@ Next we look at the message we actually send to the IP we found — HTTP and HTT
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying DNS?**
-  - The article treats DNS as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for DNS?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when DNS reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What does the DNS hierarchy look like?**
+  - Root (`.`) → TLD (`.com`) → authoritative (`example.com`) in a tree structure, with the recursive resolver following this delegation chain to find answers. You can observe this directly with `dig +trace`.
+- **What role do the recursive resolver and cache play?**
+  - The recursive resolver follows the chain from root to authoritative on the client's behalf, then caches results for the TTL duration. Most queries therefore never reach the authoritative server, but changes are not reflected until TTL expires—a fundamental tradeoff.
+- **Where are A, AAAA, CNAME, MX, and TXT records used?**
+  - A/AAAA map domain→IP, CNAME creates domain→domain aliases, MX handles mail routing, and TXT serves domain verification and mail security (SPF/DKIM/DMARC). Multiple record types can coexist for a single domain.
 <!-- toc:begin -->
 ## In this series
 

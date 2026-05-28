@@ -241,13 +241,12 @@ Next we look at the cache that sits between memory and the CPU, why it exists, w
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Memory Organization?**
-  - The article treats Memory Organization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Memory Organization?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Memory Organization reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What address model does RAM present?**
+  - From the program's perspective, RAM appears as a contiguous byte array starting at 0, but virtual-to-physical address translation occurs on every access. A 4-level page table maps 48-bit virtual addresses to physical frames, with the TLB caching these translations.
+- **How do virtual and physical addresses differ?**
+  - Virtual addresses provide each process an independent address space (0–2⁴⁸); physical addresses point to actual DRAM chip locations. Page tables handle the mapping, and as calculated in the article, a TLB miss incurs a ~400ns translation cost.
+- **How are text, data, heap, and stack arranged within a process?**
+  - From low addresses: text (code) → data (globals) → BSS → heap (growing up); from high addresses: stack (growing down). The mmap region in between maps shared libraries. Thanks to demand paging, mapped size and actual physical memory usage differ.
 <!-- toc:begin -->
 ## In this series
 

@@ -179,13 +179,12 @@ Compute moves data — and data has to live somewhere. The next post covers Stor
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Compute?**
-  - The article treats Compute as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Compute?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Compute reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **When should you choose VMs, containers, serverless, or bare metal?**
+  - VMs for long-running stable workloads, containers for microservice architectures, serverless for irregular traffic or event-driven tasks, and bare metal when extremely high performance is required.
+- **What does Auto Scaling actually automate, and what does it not?**
+  - Auto Scaling Groups automatically adjust instance count based on demand. However, instance type changes, storage resizing, and network policy changes still require manual intervention.
+- **How should you combine On-Demand, Reserved, and Spot instances?**
+  - On-Demand for unpredictable traffic, Reserved for predictable baseline capacity, and Spot for interruptible batch jobs. Most teams combine all three for cost efficiency.
 <!-- toc:begin -->
 ## In this series
 

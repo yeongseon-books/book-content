@@ -282,13 +282,12 @@ This concludes the Computer Architecture 101 series. The next series builds on i
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Understanding Performance?**
-  - The article treats Understanding Performance as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Understanding Performance?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Understanding Performance reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do latency and throughput differ?**
+  - Latency is the time from start to completion for one task; throughput is the number of tasks completed per unit time. Pipelining does not reduce latency but increases throughput. As the Roofline model shows, achievable throughput varies by arithmetic intensity even on identical hardware.
+- **How does the USE method find bottlenecks?**
+  - It systematically checks Utilization, Saturation, and Errors for every resource (CPU, memory, storage, network). The deep-dive checklist provides specific measurement commands and thresholds per resource for exhaustive diagnosis.
+- **How do sampling profiling and instrumentation differ?**
+  - Sampling periodically records execution location to statistically identify "where time is spent" (overhead ~1–5%). Instrumentation records every function call for exact counts and timing but incurs 10–100% overhead. Sampling suits production; instrumentation suits precision analysis.
 <!-- toc:begin -->
 ## In this series
 

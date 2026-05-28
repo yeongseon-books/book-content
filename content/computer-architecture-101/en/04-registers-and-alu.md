@@ -252,13 +252,12 @@ Next we zoom out to the larger landscape of memory: how RAM is addressed and how
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Registers and the ALU?**
-  - The article treats Registers and the ALU as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Registers and the ALU?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Registers and the ALU reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do registers differ from memory?**
+  - Registers are SRAM cells inside the CPU with ~0.3ns access time and only a few dozen entries. Memory (DRAM) has ~100ns access and gigabytes of capacity. The register file uses multi-porting to handle 2 reads + 1 write per cycle simultaneously, preventing it from becoming a pipeline bottleneck.
+- **How are general-purpose and special-purpose registers distinguished?**
+  - General-purpose registers (x86: RAX–R15, ARM: X0–X30) store arbitrary values; special registers (PC/IP, SP, FLAGS/CPSR) control CPU state. Calling conventions assign roles (argument passing, return value, callee-saved) to specific GPRs, but these are software agreements, not hardware constraints.
+- **What operations does the ALU actually perform?**
+  - Arithmetic (ADD, SUB, MUL), logic (AND, OR, XOR, NOT), shifts (SHL, SHR, SAR), and comparison (SUB with only FLAGS updated). Every operation updates FLAGS (CF, ZF, SF, OF) alongside the result, enabling subsequent conditional branches to reference them.
 <!-- toc:begin -->
 ## In this series
 

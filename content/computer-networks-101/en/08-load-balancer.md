@@ -243,13 +243,12 @@ Next we move from request/response to bidirectional streams — WebSocket and re
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Load Balancer?**
-  - The article treats Load Balancer as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Load Balancer?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Load Balancer reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do L4 and L7 load balancers differ?**
+  - L4 inspects only the TCP/UDP 4-tuple (src IP, src port, dst IP, dst port) and selects backends per connection. It forwards packets nearly unchanged—fast but unable to read HTTP headers or route by URL. L7 fully parses HTTP requests, enabling routing by Host header, URL path, or cookies, plus per-request retries and header manipulation.
+- **When are round-robin, least-connections, and hash algorithms used?**
+  - Round-robin when backends are homogeneous and request processing time is uniform. Least-connections when per-request processing time varies significantly (e.g., some API requests run long DB queries). Hash when the same key must always reach the same backend (e.g., cache server pools).
+- **Why are health checks and graceful drain the core of reliability?**
+  - Without health checks, traffic continues flowing to dead servers and users see errors. Without graceful drain, in-flight requests are severed on every deploy. Together they enable "users see no errors even during deployments." The prerequisites for zero-downtime deployment are health check + drain + new instance readiness.
 <!-- toc:begin -->
 ## In this series
 

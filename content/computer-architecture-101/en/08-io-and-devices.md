@@ -275,13 +275,12 @@ Next we cross beyond a single core, into parallelism and multicore. We will cove
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying I/O and Devices?**
-  - The article treats I/O and Devices as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for I/O and Devices?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when I/O and Devices reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How large is the speed gap between the CPU and devices?**
+  - Between CPU registers (0.3ns) and NVMe SSD (10μs) there is a 33,000× difference; with HDD (5ms) it reaches 16 million×. During one SSD read, the CPU can execute 33,000 instructions—making asynchronous I/O essential.
+- **How do polling and interrupts differ?**
+  - Polling has the CPU actively checking device status (low overhead per check but consumes CPU); interrupts have the device notify the CPU (higher overhead per event but frees the CPU). For high-frequency I/O (1M+ events/sec) polling wins; for low-frequency, interrupts are appropriate.
+- **Why does DMA free the CPU?**
+  - Programmed I/O requires CPU involvement for every byte transferred, while DMA uses the CPU only for setup (~1000 cycles) and completion notification (~500 cycles). For a 1MB transfer, CPU cycle consumption drops by over 99.9%.
 <!-- toc:begin -->
 ## In this series
 

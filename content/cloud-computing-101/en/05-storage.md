@@ -181,13 +181,12 @@ Once data sits somewhere, you have to *connect* to it. The next post covers Netw
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Storage?**
-  - The article treats Storage as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Storage?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Storage reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do object, block, file, and archive storage differ?**
+  - They differ fundamentally in access method (key-value vs block I/O vs POSIX filesystem vs long-term archival), latency, and scaling model. Choosing the type that matches your workload's I/O pattern is the key decision.
+- **Why are durability and availability not the same thing?**
+  - Durability is the probability that data is preserved without loss; availability is whether you can access it right now. Glacier has 99.999999999% durability but immediate reads are impossible.
+- **What problem do S3 lifecycle policies solve?**
+  - They automatically move data that decreases in access frequency over time to cheaper tiers, continuously reducing costs without manual cleanup.
 <!-- toc:begin -->
 ## In this series
 

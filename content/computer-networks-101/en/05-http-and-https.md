@@ -211,13 +211,12 @@ Next we open up the "S" — TLS basics.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying HTTP and HTTPS?**
-  - The article treats HTTP and HTTPS as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for HTTP and HTTPS?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when HTTP and HTTPS reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What shape does an HTTP message have?**
+  - "Start line + headers + blank line + body"—four parts. In requests the start line is `GET /path HTTP/1.1`; in responses it is `HTTP/1.1 200 OK`. From HTTP/2 onward it is binary frames, but the semantic structure remains identical.
+- **Why must methods and status codes preserve their intended semantics?**
+  - Browsers, CDNs, proxies, and monitoring tools all rely on HTTP semantics. Using GET to mutate data lets caches replicate unwanted changes; returning 200 for errors prevents retry logic from detecting failures.
+- **Why are headers like `Content-Type`, `Cache-Control`, and `Authorization` important?**
+  - Without `Content-Type` the client cannot parse the body; without `Cache-Control` CDN and browser caching strategies become unpredictable; without `Authorization` authenticated and unauthenticated requests are indistinguishable. Headers are half of the message—as important as the body.
 <!-- toc:begin -->
 ## In this series
 

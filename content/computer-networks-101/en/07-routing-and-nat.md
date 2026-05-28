@@ -206,13 +206,12 @@ Next we look at the device often sitting at the end of that route — the load b
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Routing and NAT?**
-  - The article treats Routing and NAT as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Routing and NAT?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Routing and NAT reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How should you read a routing table?**
+  - Each entry says "for packets matching this destination prefix, send them out this interface (dev), toward this next hop (via)." Read the four fields—destination, via, dev, metric—in `ip route` output. Use `ip route get <IP>` to see which rule actually applies to a specific destination.
+- **How do the default gateway and longest-prefix match work?**
+  - The default gateway is the `0.0.0.0/0` rule—the last resort for packets matching no other rule. Longest-prefix match selects the most specific (longest prefix) rule when multiple rules match. /24 beats /8, and /8 beats /0.
+- **How does NAT rewrite source IP and port?**
+  - SNAT (MASQUERADE) rewrites outgoing packets' source IP to the public IP and source port to a new port, recording this mapping in the conntrack table. When responses return, conntrack reverses the mapping back to the original private IP:port. This stateful tracking enables a single public IP to handle tens of thousands of simultaneous internal connections.
 <!-- toc:begin -->
 ## In this series
 

@@ -205,13 +205,12 @@ Next we follow how the TLS-protected packet actually moves across the Internet �
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying TLS Basics?**
-  - The article treats TLS Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for TLS Basics?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when TLS Basics reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What three guarantees does TLS provide?**
+  - Confidentiality (data encrypted with session key), integrity (tampering detected via AEAD), and authentication (server identity verified via CA-signed certificate).
+- **What order does the handshake follow?**
+  - TLS 1.3: ClientHello (supported ciphers + key share) → ServerHello + certificate + signature → Finished. Completes in 1 RTT; all subsequent data is encrypted with the negotiated symmetric key.
+- **What is the relationship between certificates, CAs, chains, and trust stores?**
+  - The server certificate (leaf) is signed by an intermediate CA, which is signed by a root CA. If the client's trust store contains the root CA, the entire chain is trusted. A missing intermediate certificate breaks the chain and fails verification.
 <!-- toc:begin -->
 ## In this series
 

@@ -203,13 +203,12 @@ Next we compare the two transport protocols that ride on top of IP — TCP and U
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying IP and Subnet?**
-  - The article treats IP and Subnet as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for IP and Subnet?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when IP and Subnet reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What differences exist between IPv4 and IPv6?**
+  - IPv4 is 32-bit (~4.3 billion addresses) making NAT essential due to address exhaustion; IPv6 is 128-bit with virtually unlimited addresses enabling end-to-end communication without NAT. IPv6 headers are also simpler (fixed 40 bytes) and use multicast instead of broadcast.
+- **What does a subnet mask or CIDR notation divide and show?**
+  - It divides the 32-bit IP address into "the part identifying the network" and "the part identifying the host within that network." /24 means the upper 24 bits are network and the lower 8 bits are host. Routers use this boundary to decide whether a packet stays local or must be forwarded.
+- **How do you calculate network address, broadcast address, and usable host count?**
+  - Set all host bits to 0 for the network address, all to 1 for the broadcast address. Usable hosts = 2^(host bits) − 2. For example, /24 has 8 host bits: 2⁸ − 2 = 254 hosts.
 <!-- toc:begin -->
 ## In this series
 

@@ -236,13 +236,12 @@ Next we look at how the human-readable domain name turns into an IP address — 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying TCP and UDP?**
-  - The article treats TCP and UDP as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for TCP and UDP?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when TCP and UDP reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What responsibilities does TCP take on?**
+  - Connection management (3-way handshake/4-way close), ordering (sequence numbers), reliability (ACK + retransmission), and flow/congestion control (window size adjustment). These four are TCP's core responsibilities, each carrying costs (RTT, buffers, bandwidth).
+- **Why does UDP intentionally omit some responsibilities?**
+  - For real-time workloads, retransmission delay is worse than loss. A video frame from 0.5 seconds ago is meaningless even if retransmitted. UDP removes unnecessary overhead for such workloads, letting applications selectively implement only the reliability they need.
+- **What is the flow of the 3-way handshake and connection teardown?**
+  - Connection setup: client SYN(seq=x) → server SYN-ACK(seq=y, ack=x+1) → client ACK(ack=y+1). Teardown: one side FIN → ACK → other side FIN → ACK. After close, TIME_WAIT (2×MSL) protects against delayed packets interfering with new connections.
 <!-- toc:begin -->
 ## In this series
 

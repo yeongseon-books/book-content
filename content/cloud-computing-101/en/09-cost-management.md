@@ -191,13 +191,12 @@ Operations, security, and cost are all in. Time to stitch the picture together. 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Cost Management?**
-  - The article treats Cost Management as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Cost Management?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Cost Management reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why do cloud bills so often come in higher than expected?**
+  - Lack of visibility. Without tags you cannot tell who is spending on what; without budget alerts you discover anomalies only after the fact. Idle resources silently accumulate charges.
+- **What role do tags play in cost allocation?**
+  - Tags are the only mechanism to categorize costs by team, service, and environment. Combined with Cost Allocation Reports, they enable tracking who spends how much and establish clear accountability.
+- **When should budget alerts be created?**
+  - At the same moment you create the first resource. Setting them when costs are small builds the habit, and when costs grow the detection system is already operational.
 <!-- toc:begin -->
 ## In this series
 

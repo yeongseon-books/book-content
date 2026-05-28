@@ -255,13 +255,12 @@ Next we look at the place where computation actually happens inside the CPU: reg
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying CPU and Instructions?**
-  - The article treats CPU and Instructions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for CPU and Instructions?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when CPU and Instructions reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What exactly does a CPU do in one cycle?**
+  - In a single-cycle CPU without pipelining, the entire fetch-decode-execute-memory-writeback sequence completes in one cycle. With pipelining, each stage takes one cycle but multiple instructions overlap. Modern superscalar CPUs issue multiple μops per cycle, achieving IPC > 1.
+- **What contract does the ISA promise?**
+  - The ISA is the interface contract between software and hardware, defining "if you input this bit pattern, this behavior is guaranteed." In RISC-V encoding, the opcode+funct3+funct7 combination specifies the operation while rd/rs1/rs2 specify operands.
+- **How is an instruction composed of opcode and operands?**
+  - Using RISC-V R-type as an example: 7-bit opcode identifies instruction type, funct3+funct7 specify the exact operation, rs1/rs2 are sources, rd is the destination. x86 uses variable-length prefix+opcode+ModR/M+SIB+displacement+immediate—more complex, but the core principle (what + from where + to where) is identical.
 <!-- toc:begin -->
 ## In this series
 

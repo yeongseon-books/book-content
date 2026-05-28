@@ -181,13 +181,12 @@ Now that you have a place, you need things to run there. The next post covers Co
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Region and Availability Zone?**
-  - The article treats Region and Availability Zone as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Region and Availability Zone?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Region and Availability Zone reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What do Region, Availability Zone, and Edge each mean?**
+  - A Region is a city- or continent-scale geographic location. An AZ is a physically separated data center cluster within a region. Multi-AZ is the default choice; Multi-Region is justified only in very limited circumstances.
+- **What exactly does Multi-AZ mean, and why should it be the default?**
+  - Multi-AZ distributes resources across at least two AZs so that a single AZ failure can be survived. This is the first step in high-availability architecture.
+- **When should you consider Multi-Region, and when is it overkill?**
+  - Multi-Region means replicating services across different geographic regions. Consider it only when data sovereignty, latency, or disaster recovery requirements are clearly established.
 <!-- toc:begin -->
 ## In this series
 

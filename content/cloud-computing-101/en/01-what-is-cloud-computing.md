@@ -177,13 +177,12 @@ Cloud is a *model*, not a technology. The next post draws the lines between IaaS
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What is Cloud Computing??**
-  - The article treats What is Cloud Computing? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What is Cloud Computing??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What is Cloud Computing? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why have so many teams moved from buying servers to renting resources over the internet?**
+  - Eliminating upfront investment accelerated experimentation and deployment cycles, letting teams focus on application design rather than hardware operations.
+- **What are the core characteristics of the cloud, and how do they differ from on-premises?**
+  - On-premises requires large capital expenditure and fixed costs, while the cloud offers pay-as-you-go billing and elastic scaling. The provider manages physical infrastructure and base services, significantly reducing the user team's operational burden.
+- **What role do providers like AWS, Azure, and Google Cloud actually play?**
+  - CSPs operate physical data centers, networks, and baseline security, then expose abstracted interfaces (VMs, storage, databases) to users. Users deploy their applications and data on top, handling access control, operational automation, and cost management.
 <!-- toc:begin -->
 ## In this series
 

@@ -187,13 +187,12 @@ Once visibility is in place, you have to control the bill. The next post covers 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Monitoring?**
-  - The article treats Monitoring as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Monitoring?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Monitoring reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What questions do metrics, logs, and traces each answer?**
+  - Metrics answer "is the current state abnormal," logs answer "what exactly happened," and traces answer "where did it slow down." Combining all three covers both detection and root-cause analysis.
+- **What baseline capabilities does CloudWatch provide?**
+  - Metric collection and time-series storage, log groups and Insights queries, alarms with SNS integration, and dashboard visualization. Custom metrics extend coverage to business KPIs.
+- **How are alarms connected to SNS notifications?**
+  - Specifying an SNS Topic ARN in the alarm's `AlarmActions` publishes a message to the topic on threshold violation, which then fans out to subscribed email, Lambda, Slack, or other endpoints.
 <!-- toc:begin -->
 ## In this series
 

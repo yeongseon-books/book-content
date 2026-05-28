@@ -231,13 +231,12 @@ That closes Computer Networks 101. From "what is a network" through IP, TCP, DNS
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Debugging Network Problems?**
-  - The article treats Debugging Network Problems as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Debugging Network Problems?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Debugging Network Problems reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How should you narrow down network problems layer by layer?**
+  - Check in order: link/route → DNS → TCP → TLS → HTTP. Once a layer is confirmed working, stop suspecting anything below it and move up. The key is establishing "everything up to here is normal" with evidence, which exponentially reduces candidate causes.
+- **What does each tool—`ping`, `dig`, `curl`, `ss`, `tcpdump`—tell you?**
+  - `ping` confirms the host is alive and the path works (ICMP); `dig` confirms name-to-IP resolution (DNS); `nc -vz` confirms the port is open (TCP); `openssl s_client` confirms the certificate is valid (TLS); `curl -v` confirms HTTP response correctness. `ss` shows which ports are listening server-side; `tcpdump` verifies packets are actually flowing.
+- **How can you distinguish timeout, reset, and DNS failure by their appearance?**
+  - Timeout: SYN sent with no response (firewall silently drops). Reset: RST packet returns immediately (host alive but port closed, or firewall explicitly rejects). DNS failure: "Could not resolve host" message—name resolution itself fails. Each demands a completely different next action, so reading the message precisely is the first step.
 <!-- toc:begin -->
 ## In this series
 

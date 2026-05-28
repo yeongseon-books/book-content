@@ -165,13 +165,12 @@ That closes out *Cloud Computing 101*. The next series — *Containers 101*, *Ku
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Cloud Architecture Basics?**
-  - The article treats Cloud Architecture Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Cloud Architecture Basics?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Cloud Architecture Basics reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What does each of the six Well-Architected pillars tell you to examine?**
+  - Operational Excellence looks at repeatability of change and response procedures; Security at least privilege and encryption; Reliability at failure response and recovery; Performance Efficiency at resource selection and scaling strategy; Cost Optimization at waste-reducing structure; Sustainability at minimizing environmental impact.
+- **What does a basic multi-tier web architecture look like?**
+  - CDN → ALB → Stateless App (Multi-AZ) → Cache/DB/Object Storage, with each tier independently scalable.
+- **Why must stateless and stateful layers be separated?**
+  - Stateless tiers can freely add or remove instances for horizontal scaling. Delegating state to dedicated tiers (DB, cache) is what makes Auto Scaling safe to operate.
 <!-- toc:begin -->
 ## In this series
 

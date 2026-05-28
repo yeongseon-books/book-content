@@ -294,13 +294,12 @@ Next we look at another device that speeds up the CPU itself — the pipeline. W
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Cache and Locality?**
-  - The article treats Cache and Locality as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Cache and Locality?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Cache and Locality reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Where does the cache sit in the memory hierarchy?**
+  - Between CPU registers (~0.3ns) and main memory (~100ns): L1 (~1ns, 32–64KB) → L2 (~4ns, 256KB–1MB) → L3 (~10ns, several to tens of MB). Each level trades increased capacity for increased access time.
+- **What distinguishes temporal locality from spatial locality?**
+  - Temporal locality means "recently accessed data will be accessed again soon" (exploited by keeping cache lines resident); spatial locality means "nearby addresses will be accessed soon" (exploited by the 64-byte cache line size). Sequential access achieves higher hit rates than strided access because of better spatial locality utilization.
+- **Why is the cache line the critical cost unit?**
+  - On a cache miss, even if only 1 byte is needed, the entire 64-byte line is fetched. Data layout therefore determines cache line utilization. As the false sharing example demonstrates, multiple cores modifying the same line can cause 40× performance degradation.
 <!-- toc:begin -->
 ## In this series
 

@@ -193,13 +193,12 @@ Once permissions are right, the next question is *what is actually happening*. T
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Identity and Security?**
-  - The article treats Identity and Security as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Identity and Security?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Identity and Security reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do IAM users, groups, roles, and policies differ?**
+  - A user has long-term credentials, a group bundles users, a role issues temporary credentials, and a policy is a JSON permission document attached to any of these.
+- **Why should least privilege be the default?**
+  - Excessive permissions expand incident blast radius to the entire account, make auditing difficult, and increase long-term operational costs. Starting narrow and widening when needed is always easier than the reverse.
+- **Why should MFA and key rotation be operational routines?**
+  - MFA blocks the impact of credential leaks, and key rotation limits the validity window of compromised keys. Both require periodic verification—not one-time setup—to remain effective.
 <!-- toc:begin -->
 ## In this series
 

@@ -238,13 +238,12 @@ Next we look at what acts on these bits: the CPU and the instruction set. We wil
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Data Representation — Bit, Byte, Integer, Floating Point?**
-  - The article treats Data Representation — Bit, Byte, Integer, Floating Point as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Data Representation — Bit, Byte, Integer, Floating Point?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Data Representation — Bit, Byte, Integer, Floating Point reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What are bits, bytes, and words?**
+  - A bit is a single 0 or 1; a byte is an 8-bit group and the minimum unit for representing one character; a word is the unit a CPU processes at once (8 bytes on modern 64-bit processors). These units form the fundamental boundaries for memory addressing, alignment, and endianness interpretation.
+- **Why are negative numbers stored in two's complement?**
+  - From the hardware perspective, a single adder can handle both addition and subtraction, and zero has only one representation, simplifying comparison logic. Sign-magnitude and ones' complement require extra circuitry and introduce the +0/-0 problem.
+- **What structure does IEEE 754 floating-point have?**
+  - Sign (1 bit) + exponent (8 bits, bias 127) + mantissa (23 bits, implicit leading 1). This structure is why decimal fractions like 0.1 cannot be represented exactly—the root cause of `0.1 + 0.2 ≠ 0.3`.
 <!-- toc:begin -->
 ## In this series
 

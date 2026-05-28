@@ -250,13 +250,12 @@ The next article starts at the bottom and works back up. We look at how computer
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Is Computer Architecture??**
-  - The article treats What Is Computer Architecture? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Is Computer Architecture??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Is Computer Architecture? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How would you define computer architecture in one sentence?**
+  - Computer architecture is the discipline covering the interface through which software directs hardware (ISA) and the microarchitecture design that implements that interface. As shown in the article, the ISA defines "what can be done" while the microarchitecture determines "how fast it can be done."
+- **How are the five components of the von Neumann model connected?**
+  - Data flows from input device → memory → CPU (control unit + ALU) → memory → output device, with the control unit repeating the fetch-decode-execute cycle. As the von Neumann bottleneck analysis demonstrated, instructions and data sharing the same memory creates bandwidth competition.
+- **What does the path look like from high-level Python code down to actual hardware?**
+  - Python source → bytecode → C runtime → machine code → micro-ops → gates → transistors—seven or eight abstraction layers. As the deep-dive section showed, NumPy achieves speed by bypassing interpreter overhead and operating directly at the SIMD instruction level.
 <!-- toc:begin -->
 ## In this series
 

@@ -186,13 +186,12 @@ Once the wires are in, the question becomes *who* may use them. The next post co
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Network?**
-  - The article treats Network as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Network?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Network reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What is the difference between a VPC and a subnet?**
+  - A VPC is a logically isolated network boundary; a subnet is a smaller IP range within it, divided by AZ. If the VPC is a building, subnets are floors.
+- **Why do Security Groups and NACLs exist separately?**
+  - Security Groups are stateful per-instance allow rules; NACLs are stateless per-subnet allow/deny rules. Since SGs cannot explicitly deny, NACLs are needed to block specific IPs at the subnet level.
+- **What is the common pattern for dividing public and private subnets?**
+  - Place only the ALB in the public subnet; keep app servers and databases in private subnets. This three-tier pattern minimizes external exposure, simplifies firewall rules, and narrows the attack surface.
 <!-- toc:begin -->
 ## In this series
 
