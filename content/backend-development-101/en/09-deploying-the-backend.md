@@ -192,12 +192,12 @@ Deployment is a *reproducibility* problem. In the final chapter, we tie all the 
 
 ## Answering the Opening Questions
 
-- **The pieces that make up a deployment environment?**
-  - The article treats Deploying the Backend as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How a Dockerfile creates a *reproducible environment?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How to manage env vars and secrets?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What elements compose a deployment environment?**
+  - A deployment environment combines code repository, container image, env vars and secrets, orchestrator, reverse proxy, and observability tooling into an execution system. Correct code can still fail if any layer's contract mismatches—all must align for production reproducibility.
+- **Why is the Dockerfile the key to a reproducible execution environment?**
+  - It pins runtime version, dependency install order, and entrypoint to produce identical images repeatedly. Designing multi-stage builds, layer caching, and `.dockerignore` together improves speed, stability, and security simultaneously.
+- **How should env vars and secrets be separated?**
+  - Config injects environment-specific behavior values; secrets come from a dedicated vault at runtime only. Validating required values at startup with `pydantic-settings` catches omissions early and stops deployment failures before traffic arrives.
 
 <!-- toc:begin -->
 ## In this series

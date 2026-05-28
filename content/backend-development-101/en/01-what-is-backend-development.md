@@ -193,12 +193,12 @@ The backend is a *set of responsibilities*. Next, we open up the lowest layer an
 
 ## Answering the Opening Questions
 
-- **The role and the boundaries of a backend?**
-  - The article treats What Is Backend Development? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The five layers that form a backend system?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The path of one request through that system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What role and boundaries define the backend layer?**
+  - The backend is the control layer that receives requests, applies rules, safely mutates data, and classifies failures into responses. The 5-layer model (HTTP handling, route contract, shared policy, business rules, storage access) enables fast root-cause isolation in production.
+- **How does a single request traverse HTTP server, router, service, and database?**
+  - In the `POST /orders` example: the server accepts the connection, the router selects a handler, middleware assigns request ID and timing, the service validates rules, and the repository persists. Failures differ by layer—distinguishing 422, 400, and 500 keeps alerting and response accurate.
+- **Why understand the backend as multiple layers rather than one monolith?**
+  - Layer separation enables testing rules with fake repositories, limits change scope when swapping storage, and reduces team ownership conflicts. Same functionality, but a layered structure dramatically reduces incident analysis time and regression bugs.
 
 <!-- toc:begin -->
 ## In this series

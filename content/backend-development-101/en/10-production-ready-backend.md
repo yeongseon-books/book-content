@@ -227,12 +227,12 @@ Thank you for staying with this series. The ability to *take a small backend and
 
 ## Answering the Opening Questions
 
-- **A *project directory layout* that hosts all nine layers?**
-  - The article treats A Production-Ready Backend Structure as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **A strategy for splitting config across dev/staging/prod?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The three pillars of observability on one page?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do you arrange all nine layers into one project structure?**
+  - API (`routers`) handles I/O contracts only; services own business rules; repositories own persistence access; `models/schemas` define data shapes. Fix the flow as `api → services → repositories → db` (one-way). `main.py` stays the assembly entry point only—otherwise test and operational boundaries collapse.
+- **How should dev, staging, and prod configurations be split?**
+  - Lock the settings schema with `pydantic-settings`; dev uses `.env`; staging/prod inject via CI and Vault-style secret managers. Code holds only defaults and types; sensitive and environment-specific values stay as runtime injections so deployment and configuration changes are decoupled.
+- **Where do the three pillars of observability sit inside the project?**
+  - Logs: request-context middleware enforces common fields. Metrics: HTTP middleware plus `/metrics` endpoint. Traces: start at the router boundary and propagate through service/repository calls. Observability isn't one `observability/` folder—it's a contract spanning the entire request path.
 
 <!-- toc:begin -->
 ## In this series

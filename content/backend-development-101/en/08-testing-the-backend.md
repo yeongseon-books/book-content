@@ -199,12 +199,12 @@ Tests are the *safety net for change*. Next, we deliver the code to real users �
 
 ## Answering the Opening Questions
 
-- **The difference between unit, integration, and E2E tests?**
-  - The article treats Testing the Backend as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How to test a service with pytest?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How to call endpoints with FastAPI's `TestClient`?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What does each of unit, integration, and E2E test verify?**
+  - Unit tests isolate service-layer decision rules; integration tests verify contracts hold with real HTTP and dependencies connected; E2E tests confirm critical user flows complete end-to-end on a deployed system. The three levels complement—not replace—each other, splitting cost and confidence.
+- **How do you test a service with pytest?**
+  - Replace repositories and external APIs with mocks/fakes, then assert outputs and side effects (save/rollback/exception) against inputs. Fixtures structure repeated setup; parametrize declaratively adds boundary values and failure cases to protect service rules quickly and stably.
+- **How does FastAPI's `TestClient` let you verify endpoints?**
+  - It runs the full request-response path without starting a separate server—verifying status codes, response shape, validation-failure format, and exception mapping. This layer catches "unit passes but client breaks" regressions before deployment.
 
 <!-- toc:begin -->
 ## In this series

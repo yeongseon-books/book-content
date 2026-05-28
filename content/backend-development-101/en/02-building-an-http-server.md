@@ -200,12 +200,12 @@ An HTTP server is a *text-protocol program*. Next, we add the layer that decides
 
 ## Answering the Opening Questions
 
-- **The actual shape of an HTTP request and response?**
-  - The article treats Building an HTTP Server as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How HTTP rides on top of TCP?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The meaning of status codes and headers?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What does an HTTP request and response actually look like as text?**
+  - Request line/status line, headers, blank line, body—with `\r\n` boundaries and `Content-Length` as parsing anchors. Human-readable text that machines interpret strictly.
+- **How does HTTP operate on top of TCP?**
+  - Open a TCP connection (connect), send request bytes, receive response bytes, close or reuse (keep-alive). In HTTP/1.1 connection reuse is default, so a wrong response boundary cascades errors into subsequent requests.
+- **Why are status codes and headers contracts, not decoration?**
+  - Status codes are branch conditions for retry, cache, and monitoring; headers are inputs for routing, auth, parsing, and security policy. Misusing them creates observability gaps—"monitoring says OK but users fail"—and delays incident response.
 
 <!-- toc:begin -->
 ## In this series

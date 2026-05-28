@@ -213,12 +213,12 @@ The service layer is the *home of business rules*. Next, we go a layer deeper to
 
 ## Answering the Opening Questions
 
-- **The role of the service layer?**
-  - The article treats The Service Layer as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How to split responsibility across controller, service, and repository?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Where to start a transaction?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why should business logic live in the service—not controller or repository?**
+  - Whether the entry point is REST, gRPC, CLI, or batch, the same use-case rules must execute in one place to maintain a single source of truth. In the controller, rules fragment per interface; in the repository, business judgment mixes with storage internals, sharply raising change cost.
+- **Where does each layer's responsibility end?**
+  - Controller: request/response translation. Service: rules, execution order, and transaction. Repository: persistence access. The litmus test "Would this logic mean the same thing without HTTP?" determines service responsibility and stabilizes boundaries.
+- **Which layer should own the transaction boundary?**
+  - The service, because it decides the success/failure of the entire use case. Only there can you atomically wrap multi-repository operations and prevent partial-commit accidents.
 
 <!-- toc:begin -->
 ## In this series

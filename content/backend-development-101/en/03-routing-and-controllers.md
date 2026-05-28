@@ -224,12 +224,12 @@ Routers are the *map*; controllers are the *front desk*. Next, we open the door 
 
 ## Answering the Opening Questions
 
-- **The difference between routers and controllers?**
-  - The article treats Routing and Controllers as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The difference between path, query, and body parameters?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How to design REST-style endpoints?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What should router and controller each be responsible for?**
+  - The router maps URL patterns without conflicts and declares shared dependencies (auth, context). The controller receives validated input, orchestrates service calls, and finalizes the response contract—remaining a thin orchestrator.
+- **When and how should path, query, and body parameters be separated?**
+  - Resource identifiers go in path; query conditions and sort/page options in query; creation/modification payloads and sensitive data in body. This separation directly affects cache-key composition, URL exposure surface, and 422 error observability.
+- **What criteria guide REST-style endpoint design?**
+  - URLs use plural-noun resources; action semantics come from HTTP methods. Idempotency, nesting depth, versioning strategy, and deprecation policy must be designed together for a predictable production API.
 
 <!-- toc:begin -->
 ## In this series

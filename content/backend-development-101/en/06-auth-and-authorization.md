@@ -199,12 +199,12 @@ Authentication is *identity*; authorization is *permission*. Next, we look at th
 
 ## Answering the Opening Questions
 
-- **The difference between authentication and authorization?**
-  - The article treats Authentication and Authorization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Minimum safe practices for password storage?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Sessions vs JWT — when to use which?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do authentication and authorization differ?**
+  - Authentication confirms *who* (deciding the 401 boundary); authorization confirms *what they can do* (deciding the 403 boundary). When logs and API responses separate these clearly, root-cause analysis becomes precise.
+- **What is the minimum safety standard for password storage?**
+  - Never store plaintext, MD5, or SHA-256. Use a dedicated KDF (bcrypt, argon2), tune verification latency to 100–300 ms, and include a re-hash strategy when parameters are upgraded.
+- **When is each of session vs JWT more natural?**
+  - Browser-centric web apps favor secure-cookie sessions (simple, strong). Multi-API/mobile architectures favor short-lived JWTs with rotating refresh tokens. The deciding criteria are revocation strategy, XSS/CSRF risk, and operational complexity—not trend.
 
 <!-- toc:begin -->
 ## In this series

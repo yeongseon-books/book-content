@@ -208,12 +208,12 @@ A repository is a *translator over the database*. Next, we look at *who can see 
 
 ## Answering the Opening Questions
 
-- **The role of the repository pattern?**
-  - The article treats The Database Layer as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why we use an ORM and where its *traps* live?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The flow of transactions, commits, and rollbacks?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why shouldn't the service write SQL directly?**
+  - To separate testability and query ownership. Services focus on domain rules; query optimization, index tuning, and storage swaps stay inside the repository where change cost is lowest.
+- **What boundary does the repository pattern create?**
+  - The service says *what* to fetch/store; the repository handles *how*. This boundary enables read-replica introduction, cache addition, and raw-SQL optimization without touching service code.
+- **Why does an ORM bring traps alongside convenience?**
+  - It provides model-centric development and productivity, but hides N+1 queries and excessive fetches when loading strategies are unconscious. An ORM is effective abstraction only when paired with explicit loading policies and query-log observation.
 
 <!-- toc:begin -->
 ## In this series

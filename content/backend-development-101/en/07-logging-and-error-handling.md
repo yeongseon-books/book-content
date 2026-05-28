@@ -212,12 +212,12 @@ Good logs and consistent error handling are the *eyes of operations*. Next, we m
 
 ## Answering the Opening Questions
 
-- **Why we use a logger instead of `print`?**
-  - The article treats Logging and Error Handling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The shape of a structured log?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How a global exception handler keeps responses consistent?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why use a logger instead of `print`?**
+  - In production, structured fields matter more than single-line messages. JSON logs with `request_id`, `user_id`, `endpoint`, `duration_ms` let you reconstruct incidents and automate alerts and dashboards.
+- **What shape must structured logs take to be useful in operations?**
+  - Single-line JSON with common fields: `timestamp`, `level`, `event`, `request_id`, `code`, `duration_ms`. This format enables search, aggregation, threshold alerting, and cross-service correlation.
+- **Why does global exception handling preserve response consistency?**
+  - Regardless of where an exception originates, it's translated at the controller boundary into `{error, code, detail, request_id}`. Clients handle errors reliably; operators trace `request_id` to internal logs immediately.
 
 <!-- toc:begin -->
 ## In this series
