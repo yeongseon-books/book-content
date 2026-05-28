@@ -411,12 +411,12 @@ In the next chapter we'll connect the local repo to a GitHub remote and walk thr
 
 ## Answering the Opening Questions
 
-- **When does a fast-forward merge happen, and when does Git create a three-way merge instead?**
-  - The article treats Merge and Conflict Resolution - Bringing Two Lines Back Together as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why does a merge commit have two parents?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Which side of a conflict marker (`<<<<<<<` / `=======` / `>>>>>>>`) belongs to which branch?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **When does a fast-forward merge happen?**
+  - When the current branch is an ancestor of the target branch. Git moves the pointer forward without creating a merge commit, and the CLI prints `Fast-forward`.
+- **Why does a three-way merge create a commit with two parents?**
+  - Because it's reuniting two diverged lines using their common ancestor as the base. The resulting merge commit has both "current branch tip" and "merged branch tip" as parents.
+- **How do you read the `HEAD` side vs the incoming branch side of a conflict marker?**
+  - Between `<<<<<<< HEAD` and `=======` is the current branch's content; between `=======` and `>>>>>>> <branch>` is the incoming branch's content. After removing markers, `git add` marks the resolution, then test and commit to complete the merge.
 
 <!-- toc:begin -->
 ## In this series

@@ -218,12 +218,12 @@ In the next post we start from an empty directory and build the first commit. `g
 
 ## Answering the Opening Questions
 
-- **The problem that a version control system (VCS) solves?**
-  - The article treats What is Git? Version control fundamentals as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why Git is a distributed VCS?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The "snapshot" model and how it differs from line-by-line tracking?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What problem does version control actually solve?**
+  - The core value is *change tracking*, not file storage. Recording who changed what, when, and why at commit granularity enables regression analysis and collaboration review. Commands like `log`, `show`, and `diff` let you narrow down problem points quickly.
+- **Why is Git called a *distributed* version control system?**
+  - Because `clone` copies the entire history locally, every developer's repository is an independently complete record. Commits are confirmed locally first; `push/fetch/pull` are a separate replication step—so local history browsing and committing work even on unreliable networks.
+- **How does Git's snapshot model differ from "store only changed lines"?**
+  - A commit points to a snapshot of the entire project state at that moment, not a list of line changes. The three areas (Working Directory, Staging Area, Repository) let you explicitly choose which changes enter the snapshot, and internal object reuse keeps storage efficient despite the snapshot model. Viewing Git as a system for selecting, confirming, and replicating changes connects `add`, `commit`, `push`, and `merge` into one coherent flow.
 
 <!-- toc:begin -->
 ## In this series

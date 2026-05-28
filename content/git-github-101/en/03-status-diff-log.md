@@ -365,12 +365,12 @@ The next post moves into branches: how to start a parallel line of work in the s
 
 ## Answering the Opening Questions
 
-- **How to read each line of `git status` output with confidence?**
-  - The article treats Reading change history - status, diff, log as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How to scan the same state quickly with `git status -s`?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Which area `git diff`, `git diff --cached`, and `git diff HEAD` each compare?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What do `git status` long and short output each show?**
+  - Long output shows your working location and next-action hints in sentences; `git status -s` shows per-file XY codes (e.g., `M `, `??`, `A `, ` M`) for a quick overview. The `-s` format is stable for scripts that parse state.
+- **Which areas do `git diff`, `git diff --cached`, and `git diff HEAD` compare?**
+  - `git diff` compares Working Directory vs Index (unstaged changes); `git diff --cached` compares Index vs HEAD (what will enter the next commit); `git diff HEAD` compares Working Directory + Index vs HEAD (all uncommitted changes). The three commands *are* Git's three-area model.
+- **When comparing two commits directly, which hash order?**
+  - Convention is `git diff <old> <new>`. That way `+` lines mean "added in the new commit" and `-` lines mean "removed from the old commit." Reversing the order flips the `+`/`-` semantics entirely.
 
 <!-- toc:begin -->
 ## In this series

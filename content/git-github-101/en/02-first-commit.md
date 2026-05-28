@@ -258,12 +258,12 @@ The next post takes a closer look at `git status` output and uses `git diff` and
 
 ## Answering the Opening Questions
 
-- **How to create an empty repository with `git init`?**
-  - The article treats Your first commit - init, status, add, commit as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How to read your current state with `git status`?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What `git add` actually means when it stages a change?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What does `git init` create in the current directory?**
+  - It creates a `.git/` folder containing `HEAD`, `objects/`, `refs/`, `config`, and other repository metadata. From that moment the folder is no longer a plain directory—it's a Git database.
+- **What words does `git status` use to show file state?**
+  - Key phrases: `Untracked files`, `Changes not staged for commit`, `Changes to be committed`. The same file can appear in two areas simultaneously depending on whether it was staged and then modified again—and that difference determines what enters the commit.
+- **Does `git add` simply "add a file," or is there a more precise meaning?**
+  - The precise meaning is "record the next snapshot candidate in the index." It's not a file-creation command but a commit-boundary design command. `git add -p` lets you select only the needed hunks from a single file, raising record quality.
 
 <!-- toc:begin -->
 ## In this series

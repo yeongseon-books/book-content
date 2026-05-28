@@ -326,12 +326,12 @@ This post closes the Git & GitHub 101 series. The natural next step is automatio
 
 ## Answering the Opening Questions
 
-- **How the commands from Episodes 1–9 fit together as one realistic workflow?**
-  - The article treats Building a real-world Git workflow: from issue to release in one cycle as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How to walk a single change through issue, branch, commit, PR, review, merge, tag, and close?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Which recovery commands to reach for when something goes wrong mid-flow?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why does GitHub Flow suit small teams especially well?**
+  - Few rules and direct alignment with PR-centric tooling make it easy to repeat the same rhythm from issue to merge/tag. Adding branch protection and required CI maintains a quality floor even for small teams.
+- **In what order do issue, branch, commit, PR, merge, and tag connect?**
+  - An issue defines work scope; atomic commits happen on a feature or hotfix branch; PR review and CI verification gate the merge into `main`; finally a Semantic Versioning tag marks the deploy reference point.
+- **If you commit to the wrong branch or push by mistake, which commands recover the situation?**
+  - Before push: `cherry-pick` and `reset`. After push: `revert` is the default. If history rewriting (force push) is needed, always use `--force-with-lease`, and codify the incident-response procedure in team conventions to prevent recurrence.
 
 <!-- toc:begin -->
 ## In this series

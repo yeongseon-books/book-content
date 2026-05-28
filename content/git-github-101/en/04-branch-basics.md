@@ -330,12 +330,12 @@ The next article picks up from a diverged history and walks through `git merge`,
 
 ## Answering the Opening Questions
 
-- **What a branch actually is (it is not a folder copy)?**
-  - The article treats Branch basics - create, switch, and compare as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How to list and create branches with `git branch`?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How to move between branches with `git switch` (and how it relates to `git checkout`)?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why is a branch a pointer, not a file copy?**
+  - A branch is just a name pointing to a specific commit hash. Creating `feature/login` doesn't copy the entire disk—it adds a single pointer to the existing commit (C3). As new commits accumulate, only that pointer moves forward.
+- **How do `git branch` and `git switch` differ in role?**
+  - `git branch` creates branches or lists them; `git switch` changes which branch you're working on. Separating the two avoids confusing "creation" with "navigation." To create and switch in one step, use `git switch -c`.
+- **What relationship does `HEAD` have with branches?**
+  - `HEAD` represents "the position I'm currently attached to." Normally it points to the current branch, but attaching directly to a commit hash produces a detached HEAD. That's why frequently checking `git status`, `git branch`, or `git log --decorate` is essential.
 
 <!-- toc:begin -->
 ## In this series

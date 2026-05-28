@@ -294,12 +294,12 @@ The next post stitches the tools from this series into one realistic workflow. W
 
 ## Answering the Opening Questions
 
-- **Why a good commit message is an asset that pays off as much as the code itself?**
-  - The article treats Writing Good Commit Messages: Conventional Commits and Useful Bodies as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How to structure a commit message with a subject, body, and footer?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How Conventional Commits (`feat`, `fix`, `docs`, etc.) signal the kind of change at a glance?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why is a good commit message an asset as valuable as code?**
+  - Good messages let the same context be reused across `git log`, `git blame`, and release notes. You can read intent before reopening a diff, reducing collaboration cost.
+- **What should subject, body, and footer each contain?**
+  - Subject: one-line summary. Body: the *why* and decision rationale. Footer: metadata like issue references and breaking changes. Maintaining this separation raises log readability.
+- **What do Conventional Commits types like `feat`, `fix`, `docs` solve?**
+  - Types provide a shared language for humans to read consistently and tools to classify automatically. The result: easier changelog generation, release risk assessment, and regression tracking.
 
 <!-- toc:begin -->
 ## In this series

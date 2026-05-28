@@ -340,12 +340,12 @@ Episode 7 picks up where this one leaves off: the most common collaboration unit
 
 ## Answering the Opening Questions
 
-- **What exactly is a `remote`, and why is the first one conventionally called `origin`?**
-  - The article treats Creating a GitHub repository - remote, push, and pull in one go as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which commands, in what order, connect an empty GitHub repository to your local one?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What two things does `git push -u origin main` do in a single shot?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What is a remote, and why is the first one usually called `origin`?**
+  - A remote is an alias for another Git repository's URL. Instead of typing a long URL, you reference `origin` (or another short name) for fetch/push targets. `origin` is the conventional default meaning "the source I first cloned from"—virtually all documentation assumes this name.
+- **What is the sequence for connecting an empty GitHub repo to a local repo?**
+  - Create an empty repo on GitHub, then locally run `git remote add origin <URL>` followed by `git push -u origin main` to upload and set the upstream simultaneously. After that, short commands like `git push` and `git pull` repeat the same flow.
+- **What two things does `git push -u origin main` set at once?**
+  - First, it uploads local `main` commits to `origin/main`. Second, it registers `origin/main` as the upstream for local `main`, fixing the default push/pull target for future commands.
 
 <!-- toc:begin -->
 ## In this series

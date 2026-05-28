@@ -300,12 +300,12 @@ The next article looks at something even shorter than a PR body: the commit mess
 
 ## Answering the Opening Questions
 
-- **What a GitHub Issue is, and how it differs from a commit or a Pull Request?**
-  - The article treats Tracking Work with Issues and Projects - How GitHub Records What's Next as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How to open an issue and attach labels, an assignee, and a milestone?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How a single line like `Closes #42` in a PR body auto-closes an issue on merge?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How does a GitHub Issue differ from a commit or PR?**
+  - An Issue is a planning unit holding context and completion criteria; a PR is a review unit realizing that work as code changes; a commit is the minimal unit recording a change fragment. Separating the three by role keeps tracking clear.
+- **When are labels, assignees, and milestones useful?**
+  - Labels enable classification and filtering; assignees assign responsibility; milestones represent schedule commitments. Using all three together connects backlog grooming, prioritization, and release planning on the same screen.
+- **Why is `Closes #42` in a PR body an important automation?**
+  - On merge it auto-closes the issue and can trigger Project board state transitions. A single linking phrase simultaneously creates completion records, release tracking, and retrospective metrics.
 
 <!-- toc:begin -->
 ## In this series

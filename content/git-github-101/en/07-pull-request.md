@@ -269,12 +269,12 @@ The next article zooms in on something you saw in the PR body: `Closes #42`. Tha
 
 ## Answering the Opening Questions
 
-- **What a Pull Request (PR) really is, and how it differs from a plain `git merge`?**
-  - The article treats Collaborating with Pull Requests - From Branch to Review to Main as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The order of operations: feature branch, commit, push, open PR?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How to respond to review comments by adding more commits to the same branch?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How does a Pull Request differ from plain `git merge`?**
+  - `git merge` is the integration action itself; a PR wraps that action in a collaboration process including description, review, approval, and CI verification.
+- **What is the sequence from branch creation to opening a PR?**
+  - Sync `main` → create feature branch → commit → push → open PR. The PR body states background, verification steps, and impact.
+- **Why respond to review comments by pushing more commits to the same branch?**
+  - So that review conversation and code change history remain in one place, making it possible to trace both the review context and the final outcome together.
 
 <!-- toc:begin -->
 ## In this series
