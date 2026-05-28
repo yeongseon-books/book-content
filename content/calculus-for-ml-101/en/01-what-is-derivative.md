@@ -149,13 +149,12 @@ Next post: *Functions and Slope*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Is a Derivative?**
-  - The article treats What Is a Derivative as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Is a Derivative?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Is a Derivative reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why is learning in machine learning directly connected to differentiation?**
+  - Learning is the process of repeatedly updating parameters in the direction that reduces loss. To know the "reducing direction," you need to know which way loss decreases at the current point—and that information is exactly the derivative (gradient). Without differentiation, you cannot determine the next step's direction, so learning itself cannot proceed.
+- **What's the difference between average rate of change and instantaneous rate of change, and why must we distinguish them?**
+  - Average rate of change summarizes the overall slope across a wide interval, while instantaneous rate of change reads the local slope at a single point by shrinking the interval width toward zero. Since curved functions have different slopes at different positions, the instantaneous rate is needed to determine the precise update direction at the current point.
+- **What's the most practical way to understand the relationship between tangent slope and derivative?**
+  - The tangent line approximates the function as a straight line near one point, and that line's slope is the derivative value at that point. The derivative organizes tangent slopes at all points into a single function—so understanding it as a "slope map of the function" naturally extends to the gradient concept.
 <!-- toc:begin -->
 ## In this series
 

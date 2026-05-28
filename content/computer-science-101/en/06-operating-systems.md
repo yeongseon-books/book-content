@@ -266,13 +266,12 @@ The next article moves beyond a single machine to how computers exchange data â€
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Operating Systems?**
-  - The article treats Operating Systems as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Operating Systems?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Operating Systems reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why does it appear that many programs run simultaneously on a single machine?**
+  - The CPU scheduler switches processes at millisecond granularity (context switch). Algorithms like Round Robin or CFS allocate time slices to each process and alternate so fast that humans can't perceive the switching, creating the illusion of simultaneous execution.
+- **How do processes and threads differ in terms of memory and isolation?**
+  - Processes have independent virtual address spaces and cannot directly access each other's memory. Threads within the same process share heap and code regions but have separate stacks. Shared memory makes inter-thread communication fast, but access without synchronization causes race conditions.
+- **Why is virtual memory a necessary abstraction?**
+  - It provides each process a contiguous address space to simplify programming and enables using more space than physical memory. Simultaneously, it isolates memory between processes so one process's bug doesn't corrupt another.
 <!-- toc:begin -->
 ## In this series
 

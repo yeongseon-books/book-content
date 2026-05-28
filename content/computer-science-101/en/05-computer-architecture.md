@@ -259,13 +259,12 @@ The next article covers how multiple programs coexist and share resources on thi
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Computer Architecture?**
-  - The article treats Computer Architecture as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Computer Architecture?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Computer Architecture reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why can actual execution time differ greatly even with the same Big-O?**
+  - Hardware factors—cache hit rate, branch prediction success, pipeline stalls, NUMA locality—can change the constant factor by tens of times. Big-O only expresses growth rate, so the same O(n) can differ vastly in practice depending on memory access patterns.
+- **What speed and role differences do CPU, registers, cache, and RAM have?**
+  - Registers take 1 cycle, L1 takes 3-4 cycles, RAM takes 150-300 cycles—as you go down the hierarchy, capacity grows while speed drops by hundreds of times. The CPU automatically promotes frequently used data to upper levels to reduce average access time.
+- **Why do row-major vs column-major traversal split cache performance?**
+  - Memory is laid out row-major and the CPU reads in 64-byte cache line units. Row-major traversal consecutively uses all elements in a fetched cache line, while column-major traversal skips N positions each time, wasting most of each cache line.
 <!-- toc:begin -->
 ## In this series
 

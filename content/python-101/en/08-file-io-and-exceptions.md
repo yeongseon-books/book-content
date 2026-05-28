@@ -321,12 +321,11 @@ The next chapter covers classes and objects. The functions and modules from earl
 ## Answering the Opening Questions
 
 - **Why is `with` safer than calling `close()` directly in the open-read-close flow?**
-  - The article treats files as OS resources: whether the block exits normally or via exception, `__exit__` fires and releases the handle. `with open(..., encoding="utf-8") as f:` or `Path.read_text()` prevents handle leaks without manual `try`/`finally`/`close()`.
-- **When should you choose `read()`, `for line in f:`, `"rb"`, or `Path.read_text()`?**
-  - Small text files: `read()` or `Path.read_text(encoding="utf-8")`. Large files: `for line in f:` to conserve memory. Binary data (images, archives): `"rb"` mode so bytes pass through unaltered.
-- **What goes wrong if you swallow all exceptions with bare `except:` or write directly to the final file?**
-  - Bare `except:` hides permission errors and code bugs alongside the `FileNotFoundError` you intended to catch, making root-cause analysis impossible. Writing directly to the final path risks leaving a corrupted file on mid-write failure—the temp-file-then-replace pattern (`tmp.write_text(...); tmp.replace(final)`) prevents this.
-
+  - This article views files as operating system resources, and defaults to `with` where `__exit__` executes when leaving the block whether through normal completion or exception. So using `with open(..., encoding="utf-8") as f:` or `Path.read_text()` prevents handle leaks without manually managing `close()` in `try`/`finally`.
+- **When should you choose `read()`, `for line in f:`, `"rb"`, or `Path.read_text()` respectively?**
+  - The article recommends reading small text files simply with `read()` or `Path.read_text(encoding="utf-8")`, iterating large files line-by-line with `for line in f:` to save memory, and using `"rb"` when raw bytes matter—like images or compressed files—to verify with binary output like `b'hell'`.
+- **What problems arise from swallowing all exceptions with `except:` or writing directly to the final file?**
+  - Bare `except:` hides permission errors and code bugs alongside the `FileNotFoundError` you actually wanted to handle, making root cause analysis difficult. Also, without using the temp-file-replace pattern shown in the practical anchor (`tmp.write_text(...); tmp.replace(final)`), you risk leaving a corrupted final file when a write fails midway.
 <!-- toc:begin -->
 ## In this series
 

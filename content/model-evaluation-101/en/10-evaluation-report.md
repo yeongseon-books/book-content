@@ -175,13 +175,12 @@ Across ten episodes you have a vocabulary for evaluation and the realistic traps
 
 ## Answering the Opening Questions
 
-- **The five sections of an evaluation report?**
-  - The article treats Building an Evaluation Report as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How it differs from a Model Card?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Reproducibility metadata?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What evaluation information should be gathered in one place before model deployment?**
+  - Per this article, you need overall metrics, slice scores, operational thresholds, reproducibility metadata, and known risks together. The example code also gathered `metrics`, `slices`, `meta`, `risks` into a single JSON then rendered to markdown to create the report's minimum skeleton.
+- **How does an evaluation report differ from a Model Card?**
+  - A Model Card is a broad document explaining a model's intent and limitations, while an evaluation report is a narrow, rigorous operational document backing a specific experiment and deployment decision. That's why this article demands not just score explanations but also reproducibility information like data hash, sklearn version, and threshold 0.5.
+- **Why are threshold, slices, and reproducibility information non-negotiable?**
+  - Even the same `F1 0.81` changes meaning without knowing which threshold produced it, and without slice information, weak segments stay hidden. Also, if metadata like `data_hash` and Python/scikit-learn versions are missing, you can't reproduce the same result later, weakening the evidence base for deployment decisions.
 <!-- toc:begin -->
 ## In this series
 

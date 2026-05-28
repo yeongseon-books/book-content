@@ -154,13 +154,12 @@ Next post: *Chain Rule*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Gradient?**
-  - The article treats Gradient as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Gradient?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Gradient reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What does it precisely mean to bundle multiple partial derivatives into a single gradient vector?**
+  - As seen in this article, the gradient is a vector collecting axis-wise partial derivatives in order—an execution unit that directly computes the update direction in one step, as in the `run_gd` example. So it's not a list of individual partial derivatives but a coordinate-system-based arrow that moves the entire current parameter state.
+- **What practical meaning do the gradient's direction and magnitude each carry?**
+  - Direction determines "which way is ascent/descent" from a directional derivative perspective, while magnitude becomes the indicator for "is the signal excessive or weak" in norm monitoring. The `total grad norm` log from the PyTorch debugging section is exactly this magnitude interpretation translated into an operational metric.
+- **Why does the gradient point in the direction of steepest loss increase?**
+  - Using the directional derivative formula `∇f · u`, you can verify the maximum over unit directions `u` occurs when `u = ∇f/||∇f||`. So the gradient direction is the steepest ascent direction, and gradient descent moving in the opposite direction selects the locally fastest descent path.
 <!-- toc:begin -->
 ## In this series
 

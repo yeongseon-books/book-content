@@ -273,13 +273,12 @@ Tools change; foundations stay. Thank you for reading the series.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying From CS to AI and Data Science?**
-  - The article treats From CS to AI and Data Science as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for From CS to AI and Data Science?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when From CS to AI and Data Science reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Where do the CS fundamentals learned so far directly apply in AI and data science?**
+  - Algorithm complexity maps to training time prediction, computer architecture to GPU parallelization understanding, OS to distributed training orchestration, networks to model serving latency analysis, and DB to feature store design.
+- **What fundamentally differentiates rule-based systems from machine learning systems?**
+  - Rule-based systems have humans explicitly coding input→output mappings. Machine learning automatically learns those mappings from data. Rules are interpretable but limited for complex patterns; ML excels at pattern discovery but pays the price of black-box behavior and data quality dependence.
+- **Why are training, inference, and data quality validation ultimately computation and systems problems?**
+  - Training is iterative optimization via gradient descent (billions of matrix operations); inference is a systems problem of returning results within latency bounds; data quality validation is a monitoring problem of detecting distribution shifts at each pipeline stage.
 <!-- toc:begin -->
 ## In this series
 

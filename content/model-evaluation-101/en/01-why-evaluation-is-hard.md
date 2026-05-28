@@ -148,13 +148,12 @@ Evaluation is the language of model selection. Next, we cover the roles of train
 
 ## Answering the Opening Questions
 
-- **Four reasons evaluation is hard?**
-  - The article treats Why Model Evaluation Is Hard as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why metrics are not business value?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The threat of distribution drift?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why is it dangerous to judge a model by accuracy alone?**
+  - In this article we saw that a dummy model predicting all zeros on 95-vs-5 data still achieves 95% accuracy. But the same code reveals recall is 0 and the confusion matrix catches zero positives—so looking at accuracy alone hides the actual cost of failure.
+- **How do data distribution and base rate distort evaluation?**
+  - When the base rate is skewed like 95-vs-5, simply following the majority class produces high scores. That's why this article explains you should check the base rate first, then verify with confusion matrix and recall how well the minority class is actually protected.
+- **Why does the same model's score change when the threshold changes?**
+  - As the `prob = np.linspace(0, 1, 100)` example shows, even with the same score distribution, predicted labels change depending on whether you set 0.3, 0.5, or 0.7 as the cutoff. Ultimately, a score isn't a model-fixed value but the result of an operational choice that includes threshold and cost structure.
 <!-- toc:begin -->
 ## In this series
 

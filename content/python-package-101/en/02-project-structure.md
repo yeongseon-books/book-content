@@ -271,12 +271,12 @@ The next post covers **dependency management** — venv, pip, uv, and requiremen
 
 ## Answering the Opening Questions
 
-- **What is the difference between flat layout and src layout?**
-  - The article treats Project Structure — src layout and pyproject.toml as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What's the difference between flat layout and src layout?**
+  - Flat layout places the package directory directly at the project root, making it importable without installation. Src layout puts the package under `src/`, making it unimportable without `pip install -e .`. This difference structurally prevents "works locally but fails in CI" problems.
 - **What is `pyproject.toml` and why does it replace `setup.py`?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+  - `pyproject.toml` is the PEP 518/621 standard that places both build system and metadata in a single declarative TOML file. `setup.py` could execute arbitrary Python code, creating security and reproducibility issues, while `pyproject.toml` enables static analysis and guarantees inter-tool interoperability.
 - **What goes in `[build-system]` and `[project]`?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - `[build-system]` declares the build tool (`requires`) and entry point (`build-backend`). pip reads this to build in an isolated environment. `[project]` contains metadata like package name, version, dependencies, and Python version requirements—the source of truth for information displayed on the PyPI page.
 
 <!-- toc:begin -->
 ## In this series

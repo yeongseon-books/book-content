@@ -221,12 +221,12 @@ The next post covers **publishing to PyPI** — from TestPyPI to production.
 
 ## Answering the Opening Questions
 
-- **What is the difference between wheel and sdist?**
-  - The article treats Building Packages — wheel and sdist as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What files does `python -m build` generate?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What is inside a `.whl` file?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What's the difference between sdist and wheel?**
+  - sdist is a source code archive requiring a build step during installation. Wheel is a pre-built binary distribution format where installation completes by simply extracting the archive. Upload both sdist and wheel to PyPI, but pip prefers wheel.
+- **What does `python -m build` do internally?**
+  - It creates an isolated temporary environment, installs the tools from `[build-system].requires`, then calls `build_sdist()` and `build_wheel()` functions from the module pointed to by `build-backend` in sequence. Results are generated as `.tar.gz` and `.whl` files in the `dist/` directory.
+- **How do you verify build artifacts are correct?**
+  - Use `twine check dist/*` to verify metadata and README rendering, then install the wheel in a clean venv to confirm import and version output work correctly. Separately verifying that the sdist also builds catches source distribution issues early.
 
 <!-- toc:begin -->
 ## In this series

@@ -156,13 +156,12 @@ Error analysis answers "why does it fail?" Next, the evaluation report ties ever
 
 ## Answering the Opening Questions
 
-- **Decomposing performance by slice?**
-  - The article treats Error Analysis as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Classifying error types (FP, FN, class confusion)?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Analyzing accuracy by confidence?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Where do two models with similar overall scores fail differently?**
+  - Even when overall averages are similar, models can collapse completely differently in specific slices, error types, or confidence ranges. That's why this article doesn't stop at a single score but exposes weaknesses through slices like `Xte[:, 0] > 0` and FP/FN separation.
+- **What weaknesses does slice analysis reveal?**
+  - Slice analysis shows per-segment performance degradation that overall F1 hides. As in the article's example, placing `slice +` and `slice -` scores side by side reveals which conditions make the model particularly weak, and those results become priorities for additional data collection or feature improvement.
+- **Why must you examine false positives and false negatives separately?**
+  - The two errors carry different operational costs and prescriptions. This article explains that FP connects to threshold adjustment or rule strengthening, while FN raises suspicion of miss costs, data insufficiency, or labeling issues—so merging them into one number blurs the direction for the next experiment.
 <!-- toc:begin -->
 ## In this series
 

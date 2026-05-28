@@ -262,13 +262,12 @@ The next article opens up the machine that actually runs these algorithms — CP
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Algorithms and Complexity?**
-  - The article treats Algorithms and Complexity as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Algorithms and Complexity?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Algorithms and Complexity reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do you determine which of two codes solving the same problem is faster?**
+  - Count how many times each code's core loop executes relative to input size n, and express it in Big-O. O(n) and O(n²) show no difference at n=10 but differ by thousands of times at n=1,000,000. Compare orders first, then verify constants and cache effects with actual measurements.
+- **What do time complexity and space complexity each mean?**
+  - Time complexity is the growth rate of operations as input grows; space complexity is the growth rate of additional memory. They're in a tradeoff: using a hashmap to reduce time increases space; sorting then using two pointers to reduce space increases time.
+- **Why does Big-O notation let you gauge performance without running code?**
+  - Big-O retains only the upper-bound growth rate as input approaches infinity, so it compares algorithms' intrinsic costs regardless of hardware, language, or constants. Counting nested loop orders without execution lets you predict bottlenecks at operational scale.
 <!-- toc:begin -->
 ## In this series
 

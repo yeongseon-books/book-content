@@ -293,12 +293,12 @@ The next post covers **type hints and static analysis** — mypy, py.typed, and 
 
 ## Answering the Opening Questions
 
-- **How do you create a command that runs directly in the terminal after `pip install`?**
-  - The article treats CLI Packages as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How does a `[project.scripts]` entry point work?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What is the difference between `argparse` and `click`?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do you create a command that's immediately runnable after `pip install`?**
+  - Register an entry point in `[project.scripts]` of `pyproject.toml` using the format `command-name = "package.module:function"`. During `pip install`, a wrapper script calling that function is automatically generated in the `bin/` directory, making it executable directly from the terminal.
+- **How does the `[project.scripts]` entry point work?**
+  - During installation, pip records the mapping in `site-packages`' `.dist-info/entry_points.txt` and creates a Python wrapper script in `bin/`. This script imports the specified module, calls the specified function, and passes the function's return value to `sys.exit()`.
+- **Which CLI framework should you choose?**
+  - Choose `argparse` to avoid external dependencies, `click` for a rich ecosystem and plugins, or `typer` for concise type-hint-based code. `typer` uses `click` internally, so all click features remain available.
 
 <!-- toc:begin -->
 ## In this series

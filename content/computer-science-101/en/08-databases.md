@@ -279,13 +279,12 @@ The next article looks at how we keep all of these systems reliable and maintain
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Databases?**
-  - The article treats Databases as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Databases?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Databases reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How does a database permanently store large amounts of data while safely handling concurrent reads and writes?**
+  - WAL (Write-Ahead Log) records changes first so recovery is possible even after power failure; ACID transactions and isolation levels guarantee data consistency during concurrent access. Physically, data is stored on disk in page units, with a buffer pool caching frequently used pages in memory.
+- **Why does an index dramatically change query speed?**
+  - A B+Tree index finds the desired row in just 3-4 disk accesses even among hundreds of millions of rows. Without an index, the entire table must be sequentially scanned—creating an O(n) vs O(log n) difference. At 1 million rows, this produces roughly a 1,900x speed difference.
+- **What difference exists between a single SQL line and the actual execution plan?**
+  - SQL declares "what you want"; the optimizer decides "how to execute it." The same SQL can execute as completely different plans—Seq Scan, Index Scan, Hash Join—depending on index presence, table size, and statistics.
 <!-- toc:begin -->
 ## In this series
 

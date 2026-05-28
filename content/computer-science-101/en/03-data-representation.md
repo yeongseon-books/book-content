@@ -266,13 +266,12 @@ The next article covers algorithms — how to process data efficiently — and c
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Data Representation?**
-  - The article treats Data Representation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Data Representation?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Data Representation reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How does a computer store numbers, characters, and images using only 0s and 1s?**
+  - All data is represented as bits (0/1), and encoding rules assign meaning to bit sequences. The same byte `0x41` becomes character 'A' under ASCII, integer 65 as a number, or a brightness value as a color channel. The convention (rule) determines data's meaning.
+- **How do ASCII and UTF-8 differ, and why do byte counts vary?**
+  - ASCII is a fixed-length encoding representing 128 English characters in 1 byte. UTF-8 represents all world characters in variable-length 1–4 bytes. English uses 1 byte, Korean uses 3 bytes, emoji uses 4 bytes. Variable length gives space efficiency for English-heavy text but creates the trap that `len(string) != len(bytes)`.
+- **Why are negative numbers represented using two's complement?**
+  - Two's complement lets a single addition circuit handle both positive and negative operations. No separate subtraction hardware is needed, and there's no dual +0/-0 representation problem. As verified in the example, -5 is `11111011`, and adding it to 5 (`00000101`) produces exactly 0 (`00000000`, ignoring overflow bit).
 <!-- toc:begin -->
 ## In this series
 

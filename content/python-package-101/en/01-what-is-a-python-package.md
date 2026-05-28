@@ -257,12 +257,12 @@ The next post covers **project structure** — src layout and pyproject.toml.
 
 ## Answering the Opening Questions
 
-- **What is the difference between a module and a package?**
-  - The article treats What Is a Python Package? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What happens when you run `import requests`?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What exactly is the difference between a module and a package?**
+  - A module is a single `.py` file, and a package is a directory with `__init__.py`. Packages group multiple modules into a single namespace to create hierarchical structure. `import json` brings in one module, while `import requests` brings in an entire package (directory).
+- **What happens internally when you run `import requests`?**
+  - Python first checks the `sys.modules` cache. If not found, finders in `sys.meta_path` search for the module in order, and `PathFinder` looks for a `requests/` directory in each path on `sys.path`. Upon finding the directory, it creates a module object, executes `__init__.py`, and binds the name `requests` in the caller's namespace.
 - **What does `pip install` actually install?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - `pip install` downloads a wheel (`.whl`) file from PyPI and extracts the package files into the `site-packages/` directory. It simultaneously creates a `.dist-info/` directory recording metadata, installed file lists, and dependency information. Since `site-packages/` is included in `sys.path`, the package becomes importable immediately.
 
 <!-- toc:begin -->
 ## In this series

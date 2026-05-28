@@ -192,13 +192,12 @@ Next post: the *Calculus in Deep Learning* capstone.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Backpropagation Intuition?**
-  - The article treats Backpropagation Intuition as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Backpropagation Intuition?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Backpropagation Intuition reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why can backpropagation compute gradients for numerous weights all at once?**
+  - Each node in the computation graph provides its local gradient, and when propagating gradient from output to input, the chain rule multiplies along each path then sums at shared parameters. So without running separate numerical differentiation per parameter, a single backward pass yields all gradients.
+- **From the computation graph perspective, what does forward pass leave behind versus backward pass?**
+  - Forward pass caches not just predictions but intermediate values needed for backward (`z`, activations, branch results). Backward uses that cache to compute `dL/dnode` and propagate to parent nodes, ultimately filling each parameter's `.grad` buffer.
+- **What does it actually mean to "store local derivatives"?**
+  - It means each operation node retains "the derivative of output with respect to input." For example, multiplication uses the counterpart's value as local gradient; ReLU uses a 0/1 mask based on input sign. Backward implements the chain rule by multiplying the upstream gradient by this local value.
 <!-- toc:begin -->
 ## In this series
 

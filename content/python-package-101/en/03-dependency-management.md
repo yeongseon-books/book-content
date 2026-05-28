@@ -250,12 +250,12 @@ The next post covers **building packages** — wheel and sdist.
 
 ## Answering the Opening Questions
 
-- **Why do we need virtual environments and how do they work?**
-  - The article treats Dependency Management — venv, pip, uv, requirements as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What is the relationship between `pip freeze` and `requirements.txt`?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How does `uv` differ from `pip`?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Where does `pip install` put packages?**
+  - `pip install` installs packages to the `site-packages/` directory of the currently active environment. Inside a venv, that's `.venv/lib/python3.11/site-packages/`; for system Python, it's `/usr/lib/python3.11/site-packages/`. You can verify with the Location field from `pip show <package>`.
+- **What does a virtual environment isolate, and why is it needed?**
+  - A virtual environment separates the `site-packages` path per project. When project A needs `requests==2.28` and project B needs `requests==2.32`, only one can be installed system-wide, but with venvs each project maintains an independent package set. This isolation works through nothing more than a `PATH` change.
+- **How do you resolve dependency version conflicts?**
+  - pip's backtracking resolver automatically searches for a combination satisfying all packages' version requirements simultaneously. When resolution is impossible, it outputs an error. Use `pipdeptree -r` to trace the conflict source, then adjust upper version bounds or find alternative packages.
 
 <!-- toc:begin -->
 ## In this series

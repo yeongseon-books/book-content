@@ -157,13 +157,12 @@ Next post: *Backpropagation Intuition*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Optimization?**
-  - The article treats Optimization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Optimization?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Optimization reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What weaknesses does plain gradient descent expose in actual deep learning training?**
+  - As confirmed in this article, plain GD cannot directly compensate for per-coordinate gradient scale differences, oscillations grow in narrow valleys, and it cannot reflect the step size changes needed at different training stages. That's why practice requires recipes combining momentum, adaptive scaling, and schedulers.
+- **Why is momentum most easily explained with the inertia analogy?**
+  - Momentum accumulates past gradients as an exponential moving average and reflects them in the current update direction. It trusts the "recent travel direction" more than a single noisy gradient, reducing zigzag while maintaining the main descent direction—so the physical inertia analogy most accurately conveys the operating principle.
+- **How do RMSProp and Adam mitigate per-coordinate gradient scale differences?**
+  - RMSProp creates a denominator from the per-coordinate moving average of `g^2`, reducing the step for large-gradient coordinates. Adam adds a first moment on top and applies bias correction to reduce early-stage distortion. The net effect is stable training of parameters with different scales under the same lr.
 <!-- toc:begin -->
 ## In this series
 

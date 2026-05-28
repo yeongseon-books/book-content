@@ -194,13 +194,12 @@ This post wraps the *Calculus for ML 101* series. When people say a deep learnin
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Calculus in Deep Learning?**
-  - The article treats Calculus in Deep Learning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Calculus in Deep Learning?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Calculus in Deep Learning reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What stages make up the deep learning training loop, and where does differentiation appear in each?**
+  - The training loop follows `forward -> loss -> backward -> update` order. Differentiation doesn't appear only in backward—the intermediate values saved in forward and the scalarization of loss must exist for reverse-mode to work. That is, differentiation is the connection rule of the entire loop.
+- **What do forward pass and loss computation prepare for backward?**
+  - Forward creates each operation node's values and graph connections; loss defines the final scalar objective. Only with these two stages ready can backward chain-multiply local gradients to compute each parameter's gradient.
+- **How do gradient computation and optimizer update connect?**
+  - The `dL/dtheta` produced by backward is the optimizer's input. The optimizer applies policies like lr, moments, variance estimates, and weight decay to convert gradients into actual parameter movements. Thus gradient quality and optimizer policy aren't separate problems but consecutive stages of the same learning path.
 <!-- toc:begin -->
 ## In this series
 

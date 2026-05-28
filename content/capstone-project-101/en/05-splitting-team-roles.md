@@ -153,13 +153,12 @@ Role splitting is a bottleneck-reduction design, not an org-chart exercise. Prim
 
 ## Answering the Opening Questions
 
-- **Why do overlapping roles slow decisions down?**
-  - The article treats Splitting Team Roles as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How should teams assign primary owners and backups?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How is a lead different from a code owner?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why do overlapping roles slow down decisions?**
+  - This article unpacks splitting team roles not as a simple definition but through concrete situations and decision processes encountered in practice. Follow the examples and checklists in each section to apply them to your own situation.
+- **What are the core roles commonly used in teams?**
+  - Referring to the example code and matrices presented in this article, you can concretely feel what good judgment criteria look like. Understanding "in what situation do you set such criteria" matters more than the numbers themselves.
+- **How should you designate a primary owner and backup?**
+  - The core message of this article is that regardless of what evaluation criteria you use, it never ends with a single judgment. Recording criteria in documents early on, so the same mistakes aren't repeated when looking back later—that process itself leads a project to success.
 <!-- toc:begin -->
 ## In this series
 

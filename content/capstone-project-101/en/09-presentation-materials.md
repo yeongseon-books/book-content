@@ -154,13 +154,12 @@ The job of presentation materials is not to show everything but to create unders
 
 ## Answering the Opening Questions
 
-- **Why do feature-list presentations lose attention quickly?**
-  - The article treats Building Presentation Materials as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What should survive on each slide?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why does the demo need a written script?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why do feature-list-centric presentations become boring?**
+  - This article unpacks creating presentation materials not as a simple definition but through concrete situations and decision processes encountered in practice. Follow the examples and checklists in each section to apply them to your own situation.
+- **Why does the problem-solution-result structure have high communication power?**
+  - Referring to the example code and matrices presented in this article, you can concretely feel what good judgment criteria look like. Understanding "in what situation do you set such criteria" matters more than the numbers themselves.
+- **How should slides be structured so each one has a clear message?**
+  - The core message of this article is that regardless of what evaluation criteria you use, it never ends with a single judgment. Recording criteria in documents early on, so the same mistakes aren't repeated when looking back later—that process itself leads a project to success.
 <!-- toc:begin -->
 ## In this series
 

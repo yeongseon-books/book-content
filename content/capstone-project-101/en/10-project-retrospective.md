@@ -153,13 +153,12 @@ A retrospective is both the final document of this project and the first documen
 
 ## Answering the Opening Questions
 
-- **What keeps a retrospective from turning into blame allocation?**
-  - The article treats Project Retrospective as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why does the KPT format work well for beginner teams?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How does data make retrospective discussion more stable?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What does it take to prevent a retrospective from devolving into blame games?**
+  - This article unpacks project retrospectives not as a simple definition but through concrete situations and decision processes encountered in practice. Follow the examples and checklists in each section to apply them to your own situation.
+- **Why is the KPT format especially useful for beginner teams?**
+  - Referring to the example code and matrices presented in this article, you can concretely feel what good judgment criteria look like. Understanding "in what situation do you set such criteria" matters more than the numbers themselves.
+- **What part of a retrospective does data make more solid?**
+  - The core message of this article is that regardless of what evaluation criteria you use, it never ends with a single judgment. Recording criteria in documents early on, so the same mistakes aren't repeated when looking back later—that process itself leads a project to success.
 <!-- toc:begin -->
 ## In this series
 

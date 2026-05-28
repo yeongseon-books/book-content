@@ -152,13 +152,12 @@ Next post: *Gradient Descent*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Loss Function?**
-  - The article treats Loss Function as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Loss Function?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Loss Function reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How does a loss function differ from a simple evaluation metric?**
+  - An evaluation metric reads results; a loss function creates `dL/dp` to drive parameter updates—it's the learning engine. As shown in the MSE/BCE derivations, loss provides not just error magnitude but the correction direction.
+- **Why is MSE commonly used for regression and cross entropy for classification?**
+  - MSE treats continuous errors with squared penalties that align well with regression objectives, while BCE connects to the likelihood perspective of probability prediction and strongly corrects classification confidence errors. So the problem structure and gradient signal shape each naturally align.
+- **Why is the loss function's gradient called a learning signal?**
+  - The gradient converts "how wrong" into "which direction and how far to move." Managing this signal quality—including loss landscape, custom loss terms, and numerical stability rules—is what keeps actual training stable.
 <!-- toc:begin -->
 ## In this series
 

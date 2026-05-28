@@ -271,12 +271,12 @@ The next post covers **documentation** — README, MkDocs, and API Reference.
 
 ## Answering the Opening Questions
 
-- **Why are type hints needed and do they affect runtime?**
-  - The article treats Type Hints and Static Analysis as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What kinds of errors does `mypy` catch?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why is the `py.typed` marker file needed?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why are type hints needed, and do they affect runtime?**
+  - Type hints make code intent explicit so tools like mypy can catch type mismatches, missing None checks, and wrong argument passes before execution. At runtime, type hints are ignored so they don't affect performance. However, `typing` module imports add slight startup time.
+- **What errors does `mypy` catch?**
+  - Return type mismatches, method calls on possibly-None values, wrong-type argument passing, access to nonexistent attributes, and missing required keys in TypedDict. Using `strict` mode also errors on untyped function definitions, ensuring type safety across the entire project.
+- **How do you provide type information to package users?**
+  - Add an empty `src/package/py.typed` file and include it in `pyproject.toml`'s package-data. This is the PEP 561 marker signaling that mypy and pyright should read type information from this package. Inline types are most convenient; for C extensions or legacy code, use `.pyi` stub files.
 
 <!-- toc:begin -->
 ## In this series

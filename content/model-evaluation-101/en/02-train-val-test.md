@@ -155,13 +155,12 @@ The split strategy is the prerequisite for every measurement. Next, we examine t
 
 ## Answering the Opening Questions
 
-- **The role of each dataset?**
-  - The article treats Train, Validation, and Test as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Different forms of data leakage?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Principles for splitting time-series data?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What role should train, validation, and test each serve?**
+  - Train is the segment where `LogisticRegression` learns parameters, validation is where you pick hyperparameters and thresholds, and test is where you confirm performance exactly once at the end. The article created `Xtr`, `Xva`, `Xte` separately because mixing each set's responsibility destroys score interpretation.
+- **Why shouldn't you use validation and test for the same purpose?**
+  - If you repeatedly peek at test to select models, that set is no longer final verification but tuning data. The article explains that you should finish selection with validation and lock test away, so the final score remains generalization performance on never-before-seen data.
+- **Through what paths does data leakage most commonly enter?**
+  - In the examples, fitting preprocessing on the full dataset like `StandardScaler().fit(X)` was the classic leakage case, along with random splits on time series and duplicate appearances of the same user group. That's why choosing a split method matching the data structure first—like `TimeSeriesSplit` or `GroupKFold`—is the key.
 <!-- toc:begin -->
 ## In this series
 

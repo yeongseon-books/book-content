@@ -162,13 +162,12 @@ Next post: *Loss Function*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Chain Rule?**
-  - The article treats Chain Rule as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Chain Rule?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Chain Rule reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **When a function is nested inside another function, why is the total derivative a product rather than a sum?**
+  - In composite functions, input changes pass through each stage sequentially, accumulating scale at each step. Just as `sin(x^2)` requires multiplying `cos(x^2)` by `2x` to get the correct total rate of change, stage-wise sensitivities must be connected by multiplication to preserve the actual amount transmitted.
+- **What's the most practical way to distinguish the outer function from the inner function?**
+  - Defining intermediate variables at the node level in the computation graph makes the distinction clear. Separating names like `u=x^2`, `h=sin(u)` and applying the rule that the outer derivative is always "evaluated at the intermediate value" greatly reduces implementation errors.
+- **In a multi-stage composite function, what order does the gradient propagate?**
+  - It propagates in reverse order of forward. Starting from the output, the upstream gradient is multiplied by each node's local derivative and sent to the previous node. From a Jacobian perspective, this process generalizes to a chain of matrix multiplications, and backpropagation is the efficient implementation of that computation.
 <!-- toc:begin -->
 ## In this series
 

@@ -282,12 +282,12 @@ The next post covers **production package template** — cookiecutter, copier, a
 
 ## Answering the Opening Questions
 
-- **What should a good README include?**
-  - The article treats Documentation — README, MkDocs, API Reference as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What is the difference between MkDocs and Sphinx?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How do you auto-generate an API Reference from docstrings?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What should a good README contain?**
+  - A one-line description that conveys the package's purpose within 30 seconds, copy-paste-ready install commands and Quick Start code, key feature list, and links to detailed docs are essential. Badges (CI status, version, Python support) show trustworthiness, and including contribution guidelines is a bonus.
+- **What's the difference between MkDocs and Sphinx?**
+  - MkDocs uses Markdown + YAML for simple setup and produces modern docs quickly with the Material theme. Sphinx is reStructuredText-based with rich features but complex configuration. For new Python projects, MkDocs + mkdocstrings is most productive; for large legacy projects, Sphinx is more suitable.
+- **How do you auto-generate API documentation?**
+  - The mkdocstrings plugin reads source code docstrings to auto-generate API docs. Writing Google-style docstrings with `Args`, `Returns`, `Raises`, `Example` produces structured API documentation. Auto-deploying to GitHub Pages with `mkdocs gh-deploy` in CI keeps docs updated automatically with code changes.
 
 <!-- toc:begin -->
 ## In this series

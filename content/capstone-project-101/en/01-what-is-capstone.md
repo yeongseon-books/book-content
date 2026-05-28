@@ -154,13 +154,15 @@ A capstone starts with a delivery frame, not a feature list. When problem defini
 
 ## Answering the Opening Questions
 
-- **How is a capstone project different from a regular class assignment?**
-  - The article treats What is a Capstone Project as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why do some teams build features but still finish with a weak project story?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What should you evaluate besides feature count?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How does a capstone project differ from a regular assignment?**
+  - Regular assignments have predetermined answers and grading criteria, but a capstone requires you to define your own standards from problem definition through to demo.
+  - This article unpacks what a capstone project is—not as a simple definition but through concrete situations and decision processes encountered in practice. Follow the examples and checklists in each section to apply them to your own situation.
+- **Why do many schools run capstone as a course right before graduation?**
+  - Because students need to experience the early project experience of industry while still in school. The experience of defining problems, producing results within time constraints, and explaining decisions repeats immediately after employment.
+  - Referring to the example code and matrices presented in this article, you can concretely feel what good judgment criteria look like. Understanding "in what situation do you set such criteria" matters more than the numbers themselves.
+- **What should a good capstone be evaluated on rather than feature count?**
+  - You should evaluate how clearly the problem was defined, how persuasively the demo was built, and how well the team's decision process was documented—not feature count.
+  - The core message of this article is that regardless of what evaluation criteria you use, it never ends with a single judgment. Recording criteria in documents early on, so the same mistakes aren't repeated when looking back later—that process itself leads a project to success.
 <!-- toc:begin -->
 ## In this series
 

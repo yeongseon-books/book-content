@@ -255,13 +255,12 @@ The next article ties everything together — how all of this CS foundation feed
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Software Engineering?**
-  - The article treats Software Engineering as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Software Engineering?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Software Engineering reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Where does the difference between coding and software engineering arise?**
+  - Coding is the act of one person writing code at one point in time; software engineering is the system by which multiple people maintain, change, and operate code over long periods. Tests, code review, CI/CD, and technical debt management compose that system.
+- **Why are tests the minimum device for making changes safe?**
+  - With tests, you can verify within seconds that existing behavior didn't break after modifying code. Without tests, you depend on manual verification, lengthening change cycles and accumulating regression bugs.
+- **What units and habits maintain Git-based collaboration flow?**
+  - One logical change becomes one commit/PR, passes automated CI checks, goes through review, then merges. Conventional Commits make change types explicit, and keeping feature branches short reduces conflicts.
 <!-- toc:begin -->
 ## In this series
 

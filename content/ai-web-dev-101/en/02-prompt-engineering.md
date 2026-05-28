@@ -252,11 +252,11 @@ The next chapter moves from prompt structure to a browser UI, where streaming an
 ## Answering the Opening Questions
 
 - **How is a prompt different from a simple question?**
-  - A simple question leaves the model a blank to fill; a prompt is a work contract that includes role, context, output format, and constraints. The difference between the `bad` example ("write product copy") and the `better` example (with `target audience`, `emphasis`, `output format`) was exactly that contract gap. The article treats prompts as reproducible input structures, not matters of phrasing intuition.
+  - A simple question leaves blanks for the model to fill, but a prompt is a work contract that includes role, context, output format, and constraints. The difference between the `bad` example's "write a product description" and the `better` example's specified `target audience`, `emphasis points`, and `output format` was exactly this contract difference. That's why this article treats prompts not as sentence intuition but as reproducible input structures.
 - **What responsibilities do the `system` and `user` roles each carry?**
-  - `system` fixes long-lived rules and prohibitions ("You are a customer-support FAQ generator"), while `user` delivers the current task ("Turn the password-reset policy into a 2-sentence FAQ"). In the `PROMPT_TEMPLATE` example, role, goal, constraints, and JSON output format were grouped as system-level, with only `draft` injected as an input variable. This separation lets you distinguish whether the prompt version or the request data changed.
-- **What information does a good prompt never omit?**
-  - A good prompt never omits role, domain context, output contract, and prohibition rules. The article fixed JSON keys to `title`, `summary`, `risk`, and in the RAG example specified a `source_ids` array and the rule "if no evidence exists, say so." The deployment checklist checking role sentence, length limit, prohibition rules, and fallback phrases is the same principle compressed for operations.
+  - `system` fixes long-term rules and prohibitions like "you are a customer support FAQ generator," while `user` delivers the current task like "turn the password reset policy into a FAQ of 2 sentences or fewer." In the `PROMPT_TEMPLATE` example too, role, goal, constraints, and JSON output format were grouped as system-level concerns, with only `draft` injected as an input variable. This separation is what lets you isolate whether the prompt version changed or the request data changed.
+- **What information does a good prompt never leave out?**
+  - A good prompt never omits at minimum: role, domain context, output contract, and prohibition rules. The article fixed JSON keys to `title`, `summary`, `risk`, and in the RAG example specified a `source_ids` array and the rule "if no evidence, say no evidence" for exactly this reason. The pre-deployment checklist asking you to verify role statement, length limit, prohibition rules, and fallback text together is ultimately the same principle compressed for operations.
 <!-- toc:begin -->
 ## In this series
 

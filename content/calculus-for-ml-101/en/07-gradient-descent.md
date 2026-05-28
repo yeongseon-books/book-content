@@ -161,13 +161,12 @@ Next post: *Optimization*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Gradient Descent?**
-  - The article treats Gradient Descent as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Gradient Descent?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Gradient Descent reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why does moving in the opposite direction of the gradient reduce loss?**
+  - The gradient is locally the steepest ascent direction, so its opposite is the steepest descent. The pure GD implementation and quadratic function simulation confirmed loss actually decreasing at each step along this path.
+- **What role does learning rate play beyond a simple multiplier?**
+  - Learning rate is the key control value converting an identical gradient into actual travel distance. As the lr sweep experiment shows, it simultaneously determines convergence speed, oscillation, and divergence risk—governing a substantial portion of optimizer performance.
+- **How can you distinguish convergence from divergence patterns in gradient descent?**
+  - Convergence is accompanied by decreasing loss and stabilizing grad norm; divergence manifests as loss spikes, oscillation, or abnormal norm growth. Interpreting batch method, momentum, and non-convex surface characteristics together lets you concretely determine which settings to adjust.
 <!-- toc:begin -->
 ## In this series
 

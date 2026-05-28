@@ -153,13 +153,12 @@ CV is the confidence of the estimate. Next, error analysis dissects the predicti
 
 ## Answering the Opening Questions
 
-- **The meaning and trade-offs of K-Fold?**
-  - The article treats Cross Validation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why stratified is the default?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **GroupKFold and time-series splits?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why is choosing a model based on a single test set score unstable?**
+  - A number from a single split can easily flip with even small data changes. That's why this article uses `cross_val_score` to look at the mean and standard deviation across multiple folds, explaining that the closer models are in performance, the more you need to read the variance too.
+- **What idea does K-Fold operate on?**
+  - The core idea is splitting data into k parts and testing the same model multiple times while rotating the validation piece. The code uses `StratifiedKFold(n_splits=5, shuffle=True, random_state=0)` precisely to obtain a bundle of scores rather than a single score.
+- **Why is stratified the default choice for classification problems?**
+  - In classification, if class proportions fluctuate heavily across folds, score variance unnecessarily increases. Stratified maintains the original proportions to make mean and standard deviation more stable to read—and for grouped data or time series, you should switch to `GroupKFold` or `TimeSeriesSplit` respectively.
 <!-- toc:begin -->
 ## In this series
 

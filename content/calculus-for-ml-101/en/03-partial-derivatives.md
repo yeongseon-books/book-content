@@ -150,13 +150,12 @@ Next post: *Gradient*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Partial Derivatives?**
-  - The article treats Partial Derivatives as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Partial Derivatives?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Partial Derivatives reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why must we look at slopes separately per variable in multi-input functions?**
+  - In multivariable functions, a single number cannot simultaneously express all variables' influences. Separating slopes by variable lets you individually assess how much each parameter contributes to loss, enabling appropriately sized and directed updates per parameter.
+- **What does "hold other variables fixed" actually mean in partial derivatives?**
+  - It means keeping other variables at their current values while varying only the variable of interest by a tiny amount. This convention ensures the measurement purely reflects one variable's effect. In code, this is implemented as `w_plus[i] += h`—perturbing only one element while leaving the rest unchanged.
+- **Why do different variables yield different derivative values for the same function?**
+  - Because each variable contributes to the function differently. In $f(x, y) = x^2 + 3y$, the partial derivative with respect to $x$ is $2x$ and with respect to $y$ is $3$. Since $x$ contributes nonlinearly and $y$ linearly, their sensitivities differ.
 <!-- toc:begin -->
 ## In this series
 

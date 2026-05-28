@@ -327,12 +327,12 @@ This concludes the Python Package 101 series. From the concept of a package thro
 
 ## Answering the Opening Questions
 
-- **How do you automate the repetitive setup that comes with every new package?**
-  - The article treats Production Package Template as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What is the difference between cookiecutter and copier?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **When should you use a GitHub Template Repository?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do you automate the repetitive setup for each new package?**
+  - Create project templates with cookiecutter or copier, parameterizing `pyproject.toml`, CI workflows, Makefile, pre-commit config, and test boilerplate. A single `copier copy` instantly generates a project matching team standards, ready for verification with `make ci`.
+- **What's the difference between `cookiecutter` and `copier`?**
+  - cookiecutter disconnects from the template after generation, but copier can 3-way merge template improvements into existing projects via `copier update`. If team templates are frequently improved, copier significantly reduces maintenance costs.
+- **When is a GitHub Template Repository a good fit?**
+  - GitHub Template clones a repository with the "Use this template" button. Since there's no variable substitution, you must manually replace project names etc. It's suitable for quick starts with simple project structures or environments where installing external tools is difficult.
 
 <!-- toc:begin -->
 ## In this series

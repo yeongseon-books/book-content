@@ -234,12 +234,12 @@ The next post covers **versioning and releases** — SemVer, Git tags, and CHANG
 
 ## Answering the Opening Questions
 
-- **What is the difference between PyPI and TestPyPI?**
-  - The article treats Publishing to PyPI — from TestPyPI to production as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What role does `twine` play?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How do you generate and manage API tokens?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What's the difference between PyPI and TestPyPI?**
+  - TestPyPI is a separate environment for validating upload flows—accounts and tokens are independent from PyPI. Packages uploaded to TestPyPI may be periodically deleted and cannot reference actual PyPI packages during dependency resolution. Use it as a rehearsal before real deployment.
+- **What exactly does `twine` do?**
+  - twine uploads built sdist/wheel to PyPI over HTTPS. Before uploading, `twine check` validates metadata, README rendering, and classifier accuracy. Unlike `setup.py upload`, it separates build from upload to ensure security and reproducibility.
+- **How do you create and manage API tokens?**
+  - Generate tokens with project scope in PyPI account settings. Locally use keyring; in CI use GitHub Secrets or Trusted Publisher. Trusted Publisher uses OIDC to eliminate the need for tokens entirely, fundamentally removing leak risk.
 
 <!-- toc:begin -->
 ## In this series

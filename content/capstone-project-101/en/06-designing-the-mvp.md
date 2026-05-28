@@ -157,13 +157,12 @@ An MVP is a small experiment, not a small product. When the core flow, cut list,
 
 ## Answering the Opening Questions
 
-- **Why is an MVP closer to a learning tool than a small product?**
-  - The article treats Designing the MVP as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What does picking one core flow force the team to remove?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why must the out-of-scope list be documented?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why is an MVP closer to a learning tool than a small finished product?**
+  - This article unpacks MVP design not as a simple definition but through concrete situations and decision processes encountered in practice. Follow the examples and checklists in each section to apply them to your own situation.
+- **What does "pick one core flow" mean in terms of what to keep and what to cut?**
+  - Referring to the example code and matrices presented in this article, you can concretely feel what good judgment criteria look like. Understanding "in what situation do you set such criteria" matters more than the numbers themselves.
+- **Why is documenting out-of-scope items important?**
+  - The core message of this article is that regardless of what evaluation criteria you use, it never ends with a single judgment. Recording criteria in documents early on, so the same mistakes aren't repeated when looking back later—that process itself leads a project to success.
 <!-- toc:begin -->
 ## In this series
 

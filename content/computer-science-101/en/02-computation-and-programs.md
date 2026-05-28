@@ -259,13 +259,12 @@ The next article looks at how computers represent data — binary, character enc
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Computation and Programs?**
-  - The article treats Computation and Programs as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Computation and Programs?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Computation and Programs reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What does it mean to say something is computable?**
+  - If a procedure (algorithm) exists that produces an answer in finite steps, it's computable. Problems simulatable by a Turing machine are computable problems. This definition matters because knowing "unsolvable problems" exist lets you choose practical approximations over perfect automation in practice.
+- **Why does the Turing machine remain the reference model for explaining today's computers?**
+  - As implemented in this article, the Turing machine expresses all computation with minimal components: tape (memory), head (access position), state (program counter), and rules (program). No more powerful computation model is known (Church-Turing thesis), so all programming languages have equivalent computational power.
+- **What does it mean that problems like the halting problem are fundamentally unsolvable?**
+  - Perfect static analyzers, perfect virus detectors, and tools determining whether two programs produce identical results are impossible in principle. That's why practice combines approximate approaches—timeouts, tests, heuristics—to achieve "good enough" verification.
 <!-- toc:begin -->
 ## In this series
 

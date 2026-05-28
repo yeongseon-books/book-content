@@ -268,13 +268,15 @@ The next article moves beyond the network to how we store data permanently and q
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Networks?**
-  - The article treats Networks as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Networks?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Networks reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **When you type a URL in the browser, what path does data take to reach your screen?**
+  - DNS lookup converts the domain to an IP, TCP 3-way handshake establishes the connection, then the HTTP request is sent. The server response is split into TCP segments, placed in IP packets, passes through routers to return, and the browser reassembles them for rendering.
+- **What role does each of IP, TCP, HTTP, and DNS play at which layer?**
+  - DNS converts names to IPs at the application layer; HTTP also defines request/response format at the application layer. TCP handles reliability (ordering, retransmission) at the transport layer; IP routes packets to their destination at the network layer.
+- **What form do HTTP requests and responses take on the wire?**
+  - Method, path, and headers form text lines with the body following a blank line. The structure consists of a start line like `GET /api/users HTTP/1.1
+`, key-value headers, a `
 
+` separator, and JSON/HTML body.
 <!-- toc:begin -->
 ## In this series
 

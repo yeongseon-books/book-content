@@ -150,13 +150,12 @@ Next post: *Partial Derivatives*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Functions and Slope?**
-  - The article treats Functions and Slope as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Functions and Slope?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Functions and Slope reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why should functions be understood as input-output contracts rather than mere formulas?**
+  - Each layer in a model is a function, and the input range and output range must match the next layer's expectations for training to proceed stably. Looking only at formulas hides this range contract, but viewing functions as "what comes in and what goes out" lets you catch inter-layer mismatches (scale differences, saturation) in advance.
+- **How do the slope of a linear function and the local slope of a nonlinear function differ?**
+  - Linear functions have the same slope everywhere, so gradients propagate uniformly. Nonlinear functions have slopes ranging from 0 to beyond 1 depending on position, so even with the same input, learning speed varies depending on which region inside the model you're in.
+- **How does the slope difference between ReLU and sigmoid affect the training process?**
+  - ReLU has slope exactly 1 in the positive region, so gradients propagate without attenuation. Sigmoid's maximum slope is 0.25, so gradients shrink at every layer, causing vanishing gradients in deep networks. This is the practical reason most modern models use ReLU-family activations in hidden layers.
 <!-- toc:begin -->
 ## In this series
 

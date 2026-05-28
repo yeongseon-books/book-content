@@ -280,13 +280,12 @@ The next article digs into the most basic CS question — "What is computation?"
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Is Computer Science??**
-  - The article treats What Is Computer Science? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Is Computer Science??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Is Computer Science? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How does computer science differ from programming, and what exactly does it study?**
+  - Programming is the skill of using tools; computer science studies the principles by which those tools work. CS covers "the principles, limits, and applications of computation"—including what is computable (theory), how to compute efficiently (algorithms), and what structures execution runs on (systems).
+- **Why does abstraction repeatedly appear as CS's most important tool?**
+  - Understanding complex systems all at once is impossible. Abstraction lets each layer hide lower-layer details and expose only an interface, enabling humans with finite cognitive capacity to design and operate massive systems. Just as the Stack example hid the internal list, OS abstracts hardware, frameworks abstract OS, and applications abstract frameworks.
+- **What layered relationship connects algorithms, systems, and application courses?**
+  - Theory (algorithms, complexity) provides foundations; systems (hardware, OS, networks, DB) create the execution environment; applications (AI, web, mobile) deliver value to users. Understanding lower-layer constraints makes upper-layer design realistic.
 <!-- toc:begin -->
 ## In this series
 

@@ -150,13 +150,12 @@ Calibration is the truth of the probability itself. Next, cross validation tackl
 
 ## Answering the Opening Questions
 
-- **The definition and purpose of calibration?**
-  - The article treats Calibration as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How to read a reliability diagram?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The meaning of Brier score?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why shouldn't you trust model-predicted probabilities at face value?**
+  - Good ranking performance doesn't mean the probability values themselves are honest. This article explains that even values like `0.8` or `0.9` from a random forest shouldn't be used directly for cost calculations or priority decisions until you compare the reliability curve against actual positive frequency.
+- **What does the reliability curve show?**
+  - The reliability curve shows how close the mean predicted value and actual positive rate are within each probability bin. The further the `calibration_curve(yte, proba, n_bins=10)` output strays from the diagonal, the more overconfident or underconfident bins exist.
+- **What kind of error does the Brier score summarize?**
+  - The Brier score averages the squared error between predicted probability and actual label across all samples. So as shown in this article, placing Brier scores of the original model, Platt scaling, and Isotonic calibration side by side lets you compare which method made probability interpretation more stable.
 <!-- toc:begin -->
 ## In this series
 

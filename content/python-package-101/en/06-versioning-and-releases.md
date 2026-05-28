@@ -228,12 +228,12 @@ The next post covers **CLI packages** — entry points and click.
 
 ## Answering the Opening Questions
 
-- **When do you bump each part of MAJOR.MINOR.PATCH in SemVer?**
-  - The article treats Versioning and Releases as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **When should you bump MAJOR.MINOR.PATCH in SemVer?**
+  - Bump MAJOR when existing user code breaks, MINOR for backward-compatible new features, PATCH for bug fixes. "Does user code break?" is the first question, with function deletion, parameter renaming, and return type changes as classic breaking changes.
 - **Where in the code should the version be recorded?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What is the relationship between Git tags and releases?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - The most recommended approach uses Git tags as the single source and extracts automatically at build time with `setuptools-scm` or `hatch-vcs`. If manual management is needed, reading `__version__` from `__init__.py` via `[tool.setuptools.dynamic]` in `pyproject.toml` prevents inconsistency between two locations.
+- **How should CHANGELOG be managed?**
+  - Use Keep a Changelog format with `Added`, `Changed`, `Fixed`, `Deprecated`, `Removed` categories. Following Conventional Commits enables auto-generation with tools like `git-cliff`. Add comparison links to each release so the change scope is visible at a glance.
 
 <!-- toc:begin -->
 ## In this series
