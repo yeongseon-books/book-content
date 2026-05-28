@@ -274,12 +274,12 @@ Post 2 covers dataset preparation. We compare three formats — instruction, cha
 
 ## Answering the Opening Questions
 
-- **How can we calculate why LoRA is so much lighter than full fine-tuning?**
-  - The article treats LLM Fine-tuning Primer as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How do we tell apart problems that need fine-tuning from those a prompt can solve?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What can we verify in post 1 without a GPU?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How can you calculate why LoRA is so much lighter than full fine-tuning?**
+  - The key is that you don't train the entire base model—you add low-rank matrices `A` and `B` per target linear layer. So when counting parameters, you compute `r * (in + out)` per layer instead of the full weight count. In this article, applying `r=8` to a GPT-2 small structure yielded ~1.5% precisely because of that formula.
+- **How do you distinguish problems solvable by prompting from those requiring fine-tuning?**
+  - Tone, output format, and domain expressions—problems requiring the model to learn the same behavior repeatedly—suit LoRA well. Conversely, injecting fresh facts or heavy external-document dependency fits prompting or RAG more naturally. That's why the article split the decision into three branches: style correction, knowledge freshness, and large capability changes.
+- **What can you verify in episode 1 even without a GPU?**
+  - Whether the parameter calculation is correct, whether doubling rank increases the trainable ratio roughly linearly, and whether your decision criteria for when to use LoRA are clear. Reading the small Trainer skeleton at the end means you'll separate data issues from training-loop issues faster in later episodes. Episode 1's verification target is computational intuition and selection criteria, not GPU performance.
 
 <!-- toc:begin -->
 ## In this series

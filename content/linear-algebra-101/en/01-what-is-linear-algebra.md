@@ -158,13 +158,12 @@ Linear algebra is the *language of space*. The next post explores *vector operat
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Is Linear Algebra??**
-  - The article treats What Is Linear Algebra? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Is Linear Algebra??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Is Linear Algebra? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What exactly does linear algebra study?**
+  - Linear algebra systematically handles space transformations through two fundamental objects—vectors and matrices—and their composition operation, matrix multiplication. This is why it appears repeatedly in machine learning, graphics, and signal processing.
+- **Why do vectors and matrices keep appearing in machine learning, graphics, and statistics?**
+  - All these fields deal with high-dimensional data or spatial transformations. Vectors represent individual data points; matrices compress rules and patterns. The same mathematical language solves different problems.
+- **Why should you read matrix multiplication as composition of transformations?**
+  - The product `AB` means apply `B` first, then apply `A` to the result. Order matters, and understanding what transformation each matrix represents makes the computation meaningful. Without this perspective, matrix multiplication is just a mechanical procedure.
 <!-- toc:begin -->
 ## In this series
 

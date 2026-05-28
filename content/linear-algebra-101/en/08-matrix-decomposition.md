@@ -161,13 +161,12 @@ Matrix decompositions are the *core of numerical linear algebra*. The next post 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Matrix Decomposition?**
-  - The article treats Matrix Decomposition as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Matrix Decomposition?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Matrix Decomposition reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why should you reach for decomposition before the inverse?**
+  - Splitting a problem into pieces matched to the question is more numerically stable and more interpretable than computing a raw inverse. The article used `LU`, `QR`, and `SVD` for equation solving and approximation rather than defaulting to `np.linalg.inv`.
+- **Where do LU, QR, eigendecomposition, and SVD each fit best?**
+  - `lu(A)` suits systems like `Ax=b`; `np.linalg.qr(A)` suits least squares; `np.linalg.eig(A)` suits interpreting transformation axes; `np.linalg.svd(A)` suits rectangular matrices and low-rank approximation. The same matrix calls for different decompositions depending on the question—that was the key point.
+- **Does every decomposition apply to every matrix?**
+  - No. SVD applies to nearly any matrix, but LU and eigendecomposition may not work directly depending on matrix properties. That's why the article combined reconstruction checks like `np.allclose(A_reconstructed, A)` with the habit of first reading whether the matrix is symmetric or rectangular.
 <!-- toc:begin -->
 ## In this series
 

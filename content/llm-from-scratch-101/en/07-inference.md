@@ -151,12 +151,12 @@ In the next post, we'll perform Supervised Fine-Tuning (SFT) by layering a small
 
 ## Answering the Opening Questions
 
-- **What does the autoregressive generation loop iterate over?**
-  - The article treats Sampling — Generating Text from a Trained Model as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How do temperature, top-k, and top-p each manipulate the logits?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why does greedy decoding produce monotonous text?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What exactly does the generation loop repeat?**
+  - Generation crops the current context with `idx_cond = idx[:, -self.config.block_size :]`, extracts the last-position logits, samples one new token, and appends it via `torch.cat((idx, idx_next), dim=1)`. It's not writing the entire sentence at once—it's an autoregressive loop that attaches one piece at a time from the next-token distribution.
+- **Why does greedy decoding often produce boring, repetitive output?**
+  - Greedy picks only the highest-probability token (`argmax`) at every step, so even slightly conservative models reinforce the same patterns. With a `ROMEO:` prompt, safe character sequences emerge fine but diversity vanishes and repetition grows.
+- **How does temperature reshape the logits distribution?**
+  - Dividing by temperature in `logits = logits[:, -1, :] / max(temperature, 1e-5)` before softmax makes large logits more dominant at `T < 1` and flattens the distribution at `T > 1`. Temperature is a knob that adjusts output conservatism/randomness without touching model weights.
 
 <!-- toc:begin -->
 ## In this series

@@ -157,13 +157,12 @@ A matrix is a *compressed transformation*. The next post covers *inner product a
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Matrices?**
-  - The article treats Matrices as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Matrices?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Matrices reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How is a matrix different from a plain number table?**
+  - A matrix is an `m × n` array of numbers, but in this article we read `A.shape` as the rule determining which vectors go in and which come out. So `A = np.array([[1.0, 2.0], [3.0, 4.0]])` is simultaneously a table of values and a linear transformation sending 2D vectors to other 2D vectors.
+- **Why should you read matrix multiplication as composition of transformations?**
+  - `A @ B` and `B @ A` gave different results (`[[19., 22.], [43., 50.]]` vs. `[[23., 34.], [31., 46.]]`) precisely because the composition order differs. Reading matrix products as "first `B`, then `A`" makes non-commutativity feel natural.
+- **What do transpose, identity matrix, and inverse each mean?**
+  - `A.T` swaps the roles of rows and columns. `np.eye(2)` produces `I` such that `A @ I = A`—a reference point that applies no transformation. `np.linalg.inv(A)` gives `A_inv` that brings `A @ A_inv` close to the identity, so the inverse restores the original transformation when it exists.
 <!-- toc:begin -->
 ## In this series
 

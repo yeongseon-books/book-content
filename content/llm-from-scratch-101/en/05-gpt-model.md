@@ -178,11 +178,11 @@ The model core is finished. In the next post, we'll implement the training loop�
 ## Answering the Opening Questions
 
 - **In what order does the GPT class call its components?**
-  - The article treats Assembly: Completing the GPT Model Class as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why does weight tying shrink parameters without hurting quality?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why does cross-entropy loss fit on one line?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  - Input `(B, T)` first adds `token_emb(idx)` and `pos_emb(pos)` to form residual stream `x`, then passes through `for block in self.blocks: x = block(x)`, and finally goes through `ln_f` and `lm_head` to produce logits. The skeleton of GPT's forward pass is: embedding → repeated blocks → final normalization → vocab projection.
+- **Why is weight tying between token embedding and LM head useful?**
+  - `self.lm_head.weight = self.token_emb.weight` makes input embedding and output projection share the same vector space, reducing parameter count and tightening training for small models. The savings look modest here, but as vocab size grows, this single line's effect scales significantly.
+- **Why can cross-entropy loss be computed with a single reshape?**
+  - From the language model's perspective, batch and sequence dimensions don't need separate treatment—only the collection of `(prediction, target)` pairs matters. So `(B, T, vocab_size)` logits become `logits.view(b * t, vocab_size)` and `(B, T)` targets become `targets.view(b * t)`, feeding directly into `F.cross_entropy`.
 
 <!-- toc:begin -->
 ## In this series

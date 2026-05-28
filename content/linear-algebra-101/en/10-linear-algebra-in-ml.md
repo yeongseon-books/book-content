@@ -175,13 +175,12 @@ Linear algebra is the *skeleton of ML*. I hope this series gave you the *eye to 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Linear Algebra in Machine Learning?**
-  - The article treats Linear Algebra in Machine Learning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Linear Algebra in Machine Learning?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Linear Algebra in Machine Learning reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Where in a machine-learning pipeline do vectors and matrices appear?**
+  - In this article, nearly every stage was written in matrices and vectors. Data is `X`, regression is `X @ w`, a hidden layer is `X @ W1 + b1`, embedding similarity is `emb_n @ emb_n.T`, PCA is `np.linalg.svd(Xc)`. The entire pipeline stands on linear algebra.
+- **How can linear regression and neural networks be read through a linear-algebra lens?**
+  - Linear regression is `np.linalg.lstsq(X, y, rcond=None)`—finding a weight vector via a single linear transformation. A neural network stacks nonlinearities like `np.maximum(0, X @ W1 + b1)` on top of that, layer by layer. The grammar is the same; a neural network is just a deeper chain of linear algebra.
+- **Why are embedding similarity and gradient computation linear-algebra problems?**
+  - Embedding comparison computes the inner-product matrix `sim = emb_n @ emb_n.T` of normalized vectors; learning computes parameter direction as `grad = 2 * X.T @ err / len(y)` using transpose and matrix multiplication. Both representation comparison and parameter updates share the same operation system, so calling both linear-algebra problems is precise.
 <!-- toc:begin -->
 ## In this series
 

@@ -205,12 +205,12 @@ Post 4 covers the training loop. We push real gradients through this adapter and
 
 ## Answering the Opening Questions
 
-- **Which `LoraConfig` fields actually need to be understood?**
-  - The article treats Configuring LoRA Adapters as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What goes wrong when `target_modules` is mis-specified?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **For a tiny GPT-2 class model, how low does the trainable parameter ratio go?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Which `LoraConfig` fields do you actually need to understand?**
+  - By this article's standard: `r`, `lora_alpha`, `lora_dropout`, `target_modules`, `bias`, and `task_type`. Among these, `target_modules` causes the most real-world incidents, and the `r`/`alpha` combination shifts the expressiveness-vs-cost balance the most. `LoraConfig` is not an option collection—it's a contract specifying wiring location and correction strength.
+- **What goes wrong if `target_modules` is set incorrectly?**
+  - The most common failure is `trainable params: 0` appearing without error—training pretends to run but learns nothing. Conversely, casting too wide catches unintended layers, inflating the adapter and muddying experiment comparisons. That's why the article first inspected actual module names via `named_modules()` before attaching LoRA to GPT-2's `c_attn` and `c_proj`.
+- **How low does the trainable parameter ratio drop on a small GPT-2 model?**
+  - In this article's tiny GPT-2 example, 1–3% is a natural range. Attaching `r=8` to `c_attn` and `c_proj` yielded a ~1% ratio, consistent with episode 1's back-of-envelope calculation. What matters is not the exact digit but confirming the ratio moves in the expected direction when you change settings.
 
 <!-- toc:begin -->
 ## In this series

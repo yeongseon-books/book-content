@@ -153,13 +153,12 @@ Inner product is *similarity*; distance is *dissimilarity*. The next post covers
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Inner Product and Distance?**
-  - The article treats Inner Product and Distance as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Inner Product and Distance?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Inner Product and Distance reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why does the inner product collapse to a single number?**
+  - The inner product computes `v @ w` by multiplying coordinates pairwise and summing everything into one scalar. In the example with `v = [1,2,3]` and `w = [4,5,6]`, the result was `32.0`—a single number summarizing how aligned the two vectors are.
+- **How does cosine similarity connect to the inner product?**
+  - Cosine similarity is `(v @ w) / (np.linalg.norm(v) * np.linalg.norm(w))`—the inner product divided by both vector lengths. It removes magnitude effects and leaves only direction. The example's ~`0.975` means the two vectors point in quite similar directions.
+- **What distinguishes Euclidean distance from Manhattan distance?**
+  - Euclidean distance `np.linalg.norm(v - w)` measures the straight-line length of the difference vector; Manhattan distance `np.sum(np.abs(v - w))` sums coordinate-wise travel. For the same `v, w` one gave ~`5.196` and the other `9.0`—two different definitions of "closeness."
 <!-- toc:begin -->
 ## In this series
 

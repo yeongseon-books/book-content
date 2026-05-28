@@ -321,12 +321,12 @@ The next article (episode 5) covers evaluation. We will use perplexity as a quic
 
 ## Answering the Opening Questions
 
-- **What is the minimum you must set in `TrainingArguments` for a single training step to run?**
-  - The article treats Training Loop and Hyperparameters as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why do `labels` and a data collator matter even in tiny experiments?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **When debugging a training loop, which output should you read first?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What do you minimally need to set in `TrainingArguments` to run a single training step?**
+  - The minimum baseline in this article is `output_dir`, `per_device_train_batch_size`, `max_steps`, `learning_rate`, `save_strategy`, and `report_to`. These must be paired with a dataset containing actual `labels` and a LoRA-attached model before a real update can occur. In other words, the input contract must be complete before the single line `Trainer.train()` means anything.
+- **Why do `labels` and the data collator matter even in small experiments?**
+  - Without `labels`, loss cannot be computed; without a collator, batching variable-length samples breaks training immediately. For causal LMs in particular, copying `input_ids` and masking the appropriate span is the starting point of loss calculation. Even with few samples, removing these two elements turns training verification into mere inference testing.
+- **Which output should you read first when debugging the training loop?**
+  - First check that `trainable params` is non-zero, that the first-step `train_loss` is a finite value, and that `global_step` actually increments. Then read the learning-rate log, eval perplexity, and checkpoint size to quickly narrow which layer is unstable. Fixing this order makes diagnosing NaN, OOM, and wiring errors much easier as a team.
 
 <!-- toc:begin -->
 ## In this series

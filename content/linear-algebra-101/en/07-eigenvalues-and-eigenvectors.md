@@ -162,13 +162,12 @@ Eigendecomposition reveals a transformation's *natural axes*. The next post cove
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Eigenvalues and Eigenvectors?**
-  - The article treats Eigenvalues and Eigenvectors as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Eigenvalues and Eigenvectors?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Eigenvalues and Eigenvectors reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why do certain directions survive when a matrix is applied repeatedly?**
+  - Some directions survive because the matrix doesn't deflect those vectors—it only scales them. In the article, repeated power iteration of `M @ v` showed the dominant direction persisting, which is exactly this phenomenon.
+- **What do eigenvectors and eigenvalues each represent?**
+  - An eigenvector is a special direction satisfying `A v = λ v`; the eigenvalue `λ` tells how much that direction stretches or shrinks. Computing with `np.linalg.eig(A)` then verifying `np.allclose(A @ v, lambda * v)` was the code equivalent of checking the definition.
+- **Why are results especially clean for symmetric matrices?**
+  - For the symmetric matrix `S = [[2,1],[1,2]]`, using `np.linalg.eigh(S)` produced eigenvectors that are mutually orthogonal with `svc.T @ svc ≈ I`. Axes separate cleanly, which is why problems like PCA that require orthogonal principal axes are especially convenient with symmetric matrices.
 <!-- toc:begin -->
 ## In this series
 

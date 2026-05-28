@@ -139,12 +139,12 @@ The building blocks are ready. In the next post, we will wrap embeddings, `N` bl
 
 ## Answering the Opening Questions
 
-- **Why is a 2-layer MLP enough for FeedForward?**
-  - The article treats The Transformer Block: A Unit of Depth as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How do residual connections rescue training?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What's the practical difference between pre-norm and post-norm?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why does FeedForward commonly use `Linear(C, 4C) → GELU → Linear(4C, C)`?**
+  - After attention mixes inter-token relationships, each position needs an MLP to further enrich its representation internally. `Linear(C, 4C) → GELU → Linear(4C, C)` briefly expands the dimension to create richer combinations, then returns to the residual stream size `C`.
+- **How does the residual connection stabilize training?**
+  - By keeping the original input path in `x = x + self.attn(self.ln1(x))` and `x = x + self.ffn(self.ln2(x))`, information and gradients don't vanish even in deep layers. Multiple stacked blocks can thus preserve prior representations while making incremental refinements.
+- **What practical difference do pre-norm and post-norm make?**
+  - The pre-norm used in this series applies `LayerNorm` before each sub-layer, keeping activations and gradients more stable in deep GPT models. It looks like a one-line difference in code, but the design choice of passing through `self.ln1(x)` and `self.ln2(x)` first significantly affects whether training succeeds at all.
 
 <!-- toc:begin -->
 ## In this series

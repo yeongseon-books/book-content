@@ -148,12 +148,14 @@ In the final post, we'll wrap this model in a FastAPI server so you can talk to 
 
 ## Answering the Opening Questions
 
-- **What separates pre-training, fine-tuning, and RLHF?**
-  - The article treats Adapting the Base Model to Specific Tasks as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What fields make up a single instruction-data row?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why does loss masking exclude the instruction portion from training?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What does each stage—pre-training, fine-tuning, RLHF—change?**
+  - Pre-training builds next-token prediction ability itself; SFT reshapes output habits into formats like `Q: ...
+A: ...`; RLHF layers human-preference signals on top to adjust the response policy. This article focused on the SFT segment—loading `ckpt.pt` and saving `ckpt_sft.pt`.
+- **What field structure is sufficient for one line of instruction data?**
+  - In this series, `{"instruction": ..., "response": ...}` with just two fields was enough. `build_example()` serializes them into `Q: {instruction}
+A: {response}` and `encode()` converts to integers, so a consistent template mattered more than a complex schema.
+- **Why can output habits change with just 50 data points?**
+  - The base model already knows character and sentence rhythms, so repeating 50 examples is enough to reinforce the pattern that questions follow `Q:` and answers follow `A:`. The base vs. SFT comparison showed Shakespeare-style continuation turning into `A: My lord, I serve thee...`-style responses—exactly that effect.
 
 <!-- toc:begin -->
 ## In this series

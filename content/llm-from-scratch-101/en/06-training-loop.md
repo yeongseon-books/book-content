@@ -305,12 +305,12 @@ In the next post, we will load `ckpt.pt` and turn the trained model into a gener
 
 ## Answering the Opening Questions
 
-- **What are the five lines at the heart of the training loop?**
-  - The article treats Learning via Gradients as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why is AdamW usually easier to work with than SGD for Transformers?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What do warmup and cosine decay do for stability?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What are the five core lines that drive the training loop?**
+  - The core loop in this article is `optimizer.zero_grad(set_to_none=True)`, `model(xb, yb)`, `loss.backward()`, `clip_grad_norm_`, and `optimizer.step()`. Everything else—`estimate_loss()`, lr schedule, `torch.save(...)`—wraps this repetition to make it more stable and reproducible.
+- **Why is AdamW easier to handle than SGD for transformer training?**
+  - AdamW automatically adjusts per-parameter update magnitudes and carries momentum-like properties, making even small GPT training far less sensitive than SGD. The article defaulting to `torch.optim.AdamW(..., lr=3e-4, weight_decay=0.1, betas=(0.9, 0.95))` reflects that practicality.
+- **How do warmup and cosine decay help training stability?**
+  - In `get_lr()`, the first 100 steps use linear warmup to ramp up the step size slowly, then a cosine curve reduces it again—mitigating both early-stage instability and late-stage oscillation. This prevents oversized initial steps and overfitting-driven wobble as loss descends from the 4.x range.
 
 <!-- toc:begin -->
 ## In this series

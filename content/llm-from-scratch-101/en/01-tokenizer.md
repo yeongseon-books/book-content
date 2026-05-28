@@ -183,12 +183,12 @@ We have our integer sequences ready. In the next post, we'll assign vector meani
 
 ## Answering the Opening Questions
 
-- **Why do models take integers instead of raw text?**
-  - The article treats Turning Text into Numbers as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What are the trade-offs between character, word, and subword tokenization?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How does BPE actually build a vocabulary step by step?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why must the model receive integer sequences instead of raw strings?**
+  - Neural networks operate as matrix-multiplication and tensor engines, so they cannot compute on strings directly—they need the integer array produced by `encode()` first. This article's `stoi`, `itos`, `train.bin`, and `val.bin` are exactly the result of converting human-readable text into a numeric contract the model can consume.
+- **What does each tokenization granularity—character, word, subword—gain and lose?**
+  - Character-level has a tiny vocab and easy `decode()` tracing but long sequences; word-level is short but suffers OOV and vocabulary explosion. Subword compromises between length and vocab size. This series chose char-level for transparency over performance.
+- **How does BPE actually grow its vocabulary incrementally?**
+  - BPE starts with character fragments then repeatedly merges frequently co-occurring pairs—`l + o`, `lo + w`—promoting them to new tokens. So a production tokenizer like `tiktoken.get_encoding("gpt2")` represents common patterns as shorter ID sequences.
 
 <!-- toc:begin -->
 ## In this series

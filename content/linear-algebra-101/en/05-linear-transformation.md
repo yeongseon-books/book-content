@@ -158,13 +158,12 @@ Linear transformations *reshape space*. The next post covers *basis and dimensio
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Linear Transformations?**
-  - The article treats Linear Transformations as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Linear Transformations?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Linear Transformations reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What does multiplying by a matrix actually do to a space?**
+  - Multiplying a matrix by a vector is not just computing a few coordinates—it reshapes points and the entire grid together. For example, multiplying rotation matrix `R` by `[1, 0]` yields roughly `[0.707, 0.707]`: direction changes while length is preserved.
+- **How do rotation, scaling, reflection, and shear show up in matrix form?**
+  - Rotation is `[[cosθ, -sinθ], [sinθ, cosθ]]`, scaling is `np.diag([2.0, 0.5])`, reflection is `[[1,0],[0,-1]]`, shear is `[[1,1],[0,1]]`. Diagonal entries reveal per-axis scale, sign flips reveal reflection, and off-diagonal entries reveal tilt.
+- **Why is composition of transformations expressed as matrix multiplication?**
+  - In the article, `M = R @ S` applied scaling first then rotation, bundled into a single matrix. Writing composition as matrix products means even multi-step transformations reduce to one `M @ v`, and the fact that changing the order changes the result is preserved automatically.
 <!-- toc:begin -->
 ## In this series
 

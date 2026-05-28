@@ -220,12 +220,12 @@ The next article (episode 6) covers serving. We will deploy the LoRA adapter sep
 
 ## Answering the Opening Questions
 
-- **How do you compute perplexity, the first quantitative signal to look at right after fine-tuning?**
-  - The article treats Model Evaluation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why is comparing perplexity before and after training not a complete quality evaluation?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why keep a separate evaluation loop even in a tiny model demo?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do you calculate perplexity—the first quantitative signal to check right after fine-tuning?**
+  - Collect per-batch loss on the evaluation dataset, average them, then compute `exp(mean loss)`. The article's `perplexity()` function gathered losses inside `model.eval()` and `torch.no_grad()`, applying `math.exp(...)` at the end. The key is not the absolute value but repeatedly comparing before-and-after on the same hold-out set.
+- **Why isn't a before/after perplexity comparison alone sufficient for evaluation?**
+  - Perplexity shows token-prediction unfamiliarity but cannot stand in for format compliance, factuality, safety, or user satisfaction. The article added golden-set scores, format pass rate, and safety criteria alongside, with decision rules for when metrics conflict. Perplexity is a fast regression-detection line, not the entire deployment conclusion.
+- **Why maintain a separate evaluation loop even on a tiny demo model?**
+  - A few generated samples can look good by chance, but without a separate eval loop there's no way to compare fairly against the next experiment. Automating hold-out perplexity and golden-set scoring even for small models connects directly to a deployment gate before episode 6's serving. The eval loop exists for reproducibility and rollback decisions regardless of model size.
 
 <!-- toc:begin -->
 ## In this series

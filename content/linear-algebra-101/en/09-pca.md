@@ -159,13 +159,12 @@ PCA is the *standard for dimensionality reduction*. The next post brings everyth
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying PCA?**
-  - The article treats PCA as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for PCA?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when PCA reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why can PCA claim to find the important directions?**
+  - PCA selects the axes of greatest variance from centered data `Xc` as the new basis, which is why it finds important directions. In the example, projecting with `X_2d = Xc @ Vt[:k].T` reduced `(100, 3)` data to `(100, 2)` while preserving large-scale structure.
+- **How do the covariance view and SVD view connect?**
+  - When `Xc = U S V^T`, the eigenvectors of covariance `C = Xc^T Xc / (n-1)` align with `V`, and eigenvalues correspond to `S^2/(n-1)`. So `np.linalg.svd(Xc, full_matrices=False)` alone yields both principal directions and explained-variance ratios.
+- **Why is centering non-negotiable?**
+  - Without `Xc = X - X.mean(axis=0)`, the mean position contaminates axis selection instead of the variance structure. PCA seeks spread directions around the origin; skip centering and the principal components reflect positional bias more than true variation.
 <!-- toc:begin -->
 ## In this series
 

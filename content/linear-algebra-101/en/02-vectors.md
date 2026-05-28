@@ -156,13 +156,12 @@ A vector is a *point/arrow in space* and *one row of your data*. The next post c
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Vectors?**
-  - The article treats Vectors as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Vectors?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Vectors reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How is a vector different from a plain list?**
+  - A vector is not a simple array—it's a geometric object with addition and scalar multiplication defined on it. This gives rise to vector space structure, letting you express problems of any dimension in the same language.
+- **What do vector addition and scalar multiplication mean geometrically?**
+  - Addition joins two arrows tip-to-tail; scalar multiplication adjusts a vector's length and direction. These two operations being closed is what makes a vector space.
+- **Why does a norm carry meaning beyond just length?**
+  - A norm quantifies a vector's magnitude. In normalization you keep only direction and standardize magnitude to 1, so direction-comparison problems use normalized vectors. For quantity data, the norm is information that must be preserved.
 <!-- toc:begin -->
 ## In this series
 

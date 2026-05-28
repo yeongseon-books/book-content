@@ -221,12 +221,12 @@ The next step is leaving the series and repeating this same flow on your own dom
 
 ## Answering the Opening Questions
 
-- **What is the minimum structure for wrapping a fine-tuned small model behind a FastAPI endpoint?**
-  - The article treats Model Serving as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **In serving code, where do you draw the line between training and inference?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How can you validate the endpoint without opening a browser?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What's the minimum structure for putting a fine-tuned small model behind a FastAPI endpoint?**
+  - The minimum is a FastAPI app with `/health` and `/generate`, a base model plus adapter loaded once at startup, and a Pydantic model validating request schemas. These three layers let the model sit behind an HTTP contract so the team can call it uniformly. The example is small precisely to make this minimum boundary visible.
+- **Where should you draw the line between training and inference in serving code?**
+  - Training ends at the stage that produces and saves the adapter; serving begins at the stage that loads the saved base model and adapter to run `generate()` per request. So serving code centers on model loading, request validation, generation options, error handling, and latency measurement—not `datasets` or Trainer. Importing training's batch mindset into serving code blurs operational boundaries.
+- **How can you verify the endpoint without opening a browser?**
+  - Use `TestClient` to call `/health` and `/generate` in-memory first. Then in a real process, two `curl` lines repeatedly verify status, request schema, and the basic generation path. This approach works well because CI can reuse the same commands to catch serving regressions quickly.
 
 <!-- toc:begin -->
 ## In this series

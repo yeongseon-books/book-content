@@ -289,12 +289,12 @@ In the next post, we will add FeedForward, residual connections, and LayerNorm t
 
 ## Answering the Opening Questions
 
-- **Why do Q, K, and V come from the same input but play different roles?**
-  - The article treats Deciding Which Tokens to Focus On as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why do attention scores use `Q · K^T / sqrt(d)`?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What breaks in autoregressive training if the causal mask is missing?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why do Q, K, and V come from the same input yet play different roles?**
+  - All three emerge from `(B, T, C)` input via linear layers, but `query` learns to represent "what am I looking for," `key` learns "what clue do I offer," and `value` learns "what content should be taken." So in code, starting from the same `x`, `self.query(x)`, `self.key(x)`, and `self.value(x)` serve distinct roles.
+- **Why is the attention score computed as `Q · K^T / sqrt(d)`?**
+  - `q @ k.transpose(-2, -1)` scores how well each token matches every other via dot product; `/ math.sqrt(k.size(-1))` prevents softmax from becoming too peaky as dimensions grow. The first part is similarity computation; the second is scale adjustment for training stability.
+- **What exactly breaks in autoregressive training without a causal mask?**
+  - Without `wei.masked_fill(self.tril[:t, :t] == 0, float("-inf"))`, the current position sees future tokens and gets the answer for free. Training loss drops easily, but at inference time there's no future answer available—producing a model that only works during training.
 
 <!-- toc:begin -->
 ## In this series

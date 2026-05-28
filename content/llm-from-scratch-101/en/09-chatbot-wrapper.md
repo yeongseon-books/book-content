@@ -196,12 +196,13 @@ For your next steps, I recommend exploring LoRA, vLLM, RoPE, RLHF, BPE tokenizat
 
 ## Answering the Opening Questions
 
-- **What does a chatbot need beyond the model itself?**
-  - The article treats Turning Your LLM into a Chatbot — FastAPI + Streaming as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why design the multi-turn prompt format yourself?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What do you gain by loading the model once via FastAPI lifespan?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What components does a chatbot need beyond the model?**
+  - This article's chatbot required not just the model but conversation-history serialization, a FastAPI endpoint, SSE streaming, and a browser UI to be complete. `build_prompt`, `/chat`, `/chat/stream`, and `EventSource` each handled a different piece of that system.
+- **Why must you design the multi-turn prompt format yourself?**
+  - The model doesn't remember conversation state on its own, so you must specify how to concatenate past utterances in `User: ...
+Bot: ...` format. Ending with `Bot:` as in the article's format is what makes it clear to the model where the current turn's answer should start.
+- **What improves when you load the model once via FastAPI lifespan?**
+  - Loading `ckpt_sft.pt` once in `lifespan` means you don't re-read the checkpoint per request, greatly reducing response latency and resource waste. Even with a small model, the structure of reusing `state["model"]` is what lets `/chat` and the streaming endpoint respond more immediately to users.
 
 <!-- toc:begin -->
 ## In this series

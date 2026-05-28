@@ -160,13 +160,12 @@ A basis is a *choice of axes*; dimension is *their count*. The next post covers 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Basis and Dimension?**
-  - The article treats Basis and Dimension as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Basis and Dimension?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Basis and Dimension reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What does it mean for a set of vectors to "fully describe" a space?**
+  - It means every vector in the space can be written as a linear combination of that set. For example, with `e1 = [1,0]` and `e2 = [0,1]`, any 2D plane vector can be expressed as `v = 3*e1 + 4*e2`, making them a standard basis.
+- **Why is linear independence the key condition for a basis?**
+  - A basis must be a minimal, non-redundant set of axes—not just any spanning set. When the matrix with columns `[[1,2],[2,4]]` has rank `1`, it means the two vectors point the same direction and add no new axis.
+- **How do dimension and rank connect?**
+  - Dimension is the number of independent directions describing a space; rank measures how many of those directions are actually alive inside a matrix. So `np.linalg.matrix_rank(A)` returning `2` means full 2D information is preserved, while `1` means only one information axis exists regardless of shape.
 <!-- toc:begin -->
 ## In this series
 

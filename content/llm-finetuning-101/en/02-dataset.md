@@ -224,12 +224,12 @@ Post 3 moves on to LoRA adapter configuration. We dissect `LoraConfig`'s `r`, `a
 
 ## Answering the Opening Questions
 
-- **How should we shape the three fields instruction / input / output?**
-  - The article treats Dataset Preparation and Preprocessing as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How do we read a small JSONL file directly with Hugging Face datasets?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What minimum verification points must we hit during preprocessing?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What shape should the `instruction / input / output` fields take?**
+  - Keep a raw structure easy for humans to review, while ensuring the response boundary the model must learn is unambiguous. This article separated `instruction`, optional `input`, and the learning-target `output`, with the final text making only the segment after `### Response:` the model's imitation zone. Appending EOS teaches the model where to stop.
+- **How can you read a small JSONL file directly with Hugging Face `datasets`?**
+  - Even for small experiments, create a JSONL file and read it with `load_dataset("json", data_files=..., split="train")`. This connects column names, sample count, and later `map()` for template application and tokenization into one flow. What matters is not the reading technique itself but the habit of seeing three layers: raw sample → template text → token tensor.
+- **What are the minimum verification points you must check during preprocessing?**
+  - Missing required fields, empty `output`, EOS presence, `pad_token` configuration, length distribution, and train/eval split must all be checked. If any one is missing, episode 4 will show ambiguously oscillating loss and episode 5 will be hard to interpret. That's why the article treated JSONL validation, length statistics, and label masking as the basic gates of the preprocessing stage.
 
 <!-- toc:begin -->
 ## In this series

@@ -185,12 +185,12 @@ In the next post, we'll move on to Attention. We'll enable each token to score a
 
 ## Answering the Opening Questions
 
-- **What operation does nn.Embedding actually perform?**
-  - The article treats From Integers to Vectors and Positions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why isn't token embedding alone enough?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How do sinusoidal and learned positional embeddings differ?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What operation does `nn.Embedding` actually perform?**
+  - `nn.Embedding(vocab_size, n_embd)` is less a complex calculator and more a learnable lookup that pulls the corresponding row from a `(vocab_size, n_embd)` table. The single line `return self.weight[idx]` in the article's `MiniEmbedding` showed that essence.
+- **Why is token embedding alone insufficient?**
+  - With only token embeddings, the same character looks identical whether it's at position 0 or position T—order is lost. That's why the GPT input stage builds `tok_emb + pos_emb`; only with that addition does the `(B, T, C)` tensor carry both token meaning and position.
+- **Why is it practical to handle positional information as a separate embedding?**
+  - Token meaning is reused across the entire vocab while position varies only within `block_size`, so separating the two into distinct tables simplifies implementation and debugging. The article's `position_embedding_table = nn.Embedding(config.block_size, config.n_embd)` managed learned positional embeddings separately for exactly this reason.
 
 <!-- toc:begin -->
 ## In this series
