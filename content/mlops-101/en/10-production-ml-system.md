@@ -187,13 +187,12 @@ This series gave you the basic circuitry of MLOps. Now go pick *one* component a
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Building a Production ML System?**
-  - The article treats Building a Production ML System as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Building a Production ML System?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Building a Production ML System reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do the nine components from previous articles connect in a real system?**
+  - This article showed that data versioning and feature stores create input consistency, DAG-based training and model registry manage artifacts, and deployment + monitoring + drift detection + retraining loop back to training—a closed structure. Each article's tool doesn't exist alone; it produces inputs and decision evidence for the next stage.
+- **Why doesn't knowing each tool individually make an operational system?**
+  - Even using MLflow, Feast, and Prometheus separately, without promotion criteria, rollback rules, checklists, and integration tests the system depends on human memory. The article's `scorecard`, `missing()`, and `next_step()` code exist to convert a tool list into operational checklists and priorities.
+- **How do runbooks, on-call, and SLI/SLO mesh with technical components?**
+  - Runbooks and on-call define who responds in what order when Prometheus alerts or drift notifications fire. SLI/SLO provide the criteria for why those alerts matter. So an operational ML system requires not just model-serving code but 5-minute rollback capability, dashboards, and postmortems together.
 <!-- toc:begin -->
 ## In this series
 

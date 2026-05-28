@@ -173,13 +173,12 @@ Data versioning is the precondition for reproduction. Next, the training pipelin
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Data Versioning?**
-  - The article treats Data Versioning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Data Versioning?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Data Versioning reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why can't code versioning alone reproduce training results?**
+  - Even with the same `train.py`, if `data.csv` contents change the hash changes—and a different model is produced. The reproducibility the article emphasized is only achieved when data state (`.dvc` pointers or `md5`) is fixed alongside the code commit.
+- **How should you understand the difference between DVC and git-LFS?**
+  - git-LFS is useful for storing large files outside the repo, but unlike DVC it doesn't connect `deps`, `outs`, and `dvc repro` for pipeline reproduction. So for hundreds-of-MB binaries git-LFS works, but for GB-scale training data with stage re-execution needs, DVC fits better.
+- **How do you maintain version consistency while keeping large data files outside git?**
+  - As the article's example showed: commit only pointers like `data.csv.dvc` and pipeline definitions to git, then `dvc push` the actual files to remote storage like S3. Other environments restore the same state with `git pull && dvc pull`, so code and data move as one release unit.
 <!-- toc:begin -->
 ## In this series
 

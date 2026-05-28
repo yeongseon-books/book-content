@@ -156,13 +156,12 @@ Next, we continue into probability, where counting becomes a way to reason about
 
 ## Answering the Opening Questions
 
-- **Why can we count accurately without enumerating every case?**
-  - The article treats Combinatorics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **When should you use the product rule versus the sum rule?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What is the practical difference between permutations and combinations?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How can you count exactly without listing every case?**
+  - Combinatorics decomposes selection structure instead of enumerating results. `multiplication_rule`, `addition_rule`, `npr`, `ncr` separate independent choices, exclusive choices, and order significance. For small inputs, `itertools.permutations` and `itertools.combinations` verify that formulas match enumeration.
+- **When do you use the multiplication rule versus the addition rule?**
+  - When consecutive independent choices accumulate (like password positions), use multiplication. When categories are mutually exclusive (like login failure being either wrong password or locked account), use addition. Getting this distinction right first keeps the counting model from wobbling.
+- **What's the difference between permutations and combinations?**
+  - Permutations `nPr(n, r)` count different orderings as different cases; combinations `nCr(n, r)` count only the chosen set. For team selection, feature picking, the birthday problem, and token-strength calculation, deciding whether to treat the scenario as an arrangement or a selection must come before choosing the formula.
 <!-- toc:begin -->
 ## In this series
 

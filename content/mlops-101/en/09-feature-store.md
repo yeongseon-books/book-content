@@ -173,13 +173,12 @@ A Feature Store is one piece. The final post stitches everything into a working 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Feature Store?**
-  - The article treats Feature Store as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Feature Store?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Feature Store reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why does training-serving skew keep recurring?**
+  - When the training notebook uses pandas aggregation and the serving code uses different SQL or real-time formulas, even the same feature name `age` or `purchase_cnt_7d` can have different actual values. The article framed the feature store as a definition-sharing layer (not just storage) precisely because of this recurring computation-path divergence.
+- **What's the role difference between online and offline stores?**
+  - The offline store handles bulk extraction and point-in-time joins for training via `get_historical_features()`; the online store returns the latest features at millisecond latency for real-time inference via `get_online_features()`. The article explained that both stores share the same definitions but manage latency and quality criteria differently.
+- **How should you understand entity and feature view in Feast?**
+  - An entity is the join key like `user_id` or `customer_id` that features attach to; a feature view declares which features to read from which source for that key. With TTL, schema, and source together in one place (like `user_behavior_v1`), training and serving use the same feature name with the same meaning.
 <!-- toc:begin -->
 ## In this series
 

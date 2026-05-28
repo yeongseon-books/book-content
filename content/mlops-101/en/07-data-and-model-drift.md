@@ -174,13 +174,12 @@ Once you see drift, the next question is what to do. The next post covers *retra
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Data Drift and Model Drift?**
-  - The article treats Data Drift and Model Drift as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Data Drift and Model Drift?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Data Drift and Model Drift reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do data drift and model drift differ?**
+  - Data drift is when input X's distribution changes between `base` and `live`; model drift is the resulting degradation in actual performance and prediction distribution. The article treated data drift as an early warning and model drift as the impact-confirmation signal—separately.
+- **Why does choosing the wrong baseline make drift invisible?**
+  - PSI and KS ultimately depend on what you compare current distributions against. If the baseline is recent days that drift together, changes cancel out. That's why the article insisted on fixing the training-time distribution or a validated reference period as the anchor.
+- **When are PSI and KS tests useful?**
+  - PSI is useful for seeing how much bin-level proportions have shifted; KS is strong for summarizing two continuous-feature distributions' difference as `stat` and `p_value`. Using both together (as in the article) makes it easy to connect them to `status()` or retraining conditions—turning simple statistics into operational alerts.
 <!-- toc:begin -->
 ## In this series
 

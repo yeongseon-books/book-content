@@ -154,13 +154,12 @@ Next, we move into calculus, where the focus becomes change, direction, and opti
 
 ## Answering the Opening Questions
 
-- **How do vectors and matrices represent data in a useful way?**
-  - The article treats Linear Algebra as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why is the dot product so central to similarity and scoring?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What is the difference between a matrix as a table and a matrix as a transform?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do vectors and matrices represent data?**
+  - This article described vectors as individual data objects and matrices as transformations that move them. The examples `A @ v`, rotation `rotation(theta) @ p`, PCA's `X_centered @ W`, and sparse `A_sparse @ x` showed that reading matrices as data-and-transformation contracts (not number tables) makes meaning clear.
+- **Why is the inner product the core operation for similarity computation?**
+  - The inner product summarizes how much two vectors point the same direction, making it the center of recommendation scores and embedding comparison. Especially with norm-division like `cosine_similarity` and `batch_cosine_similarity`, magnitude differences are removed, leaving only direction—ready for search and recommendation.
+- **How is matrix multiplication different from simple repeated calculation?**
+  - Matrix multiplication is not a shortcut for loops—it's a mathematical operation that composes transformations. `matmul(A, B)` and `A @ B` mean "apply one transformation then another," so `B @ A` can differ. Dimension, axis interpretation, and transpose must all be checked for a correct model.
 <!-- toc:begin -->
 ## In this series
 

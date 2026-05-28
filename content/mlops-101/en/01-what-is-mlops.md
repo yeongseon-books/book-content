@@ -167,13 +167,12 @@ MLOps is a system, not a single line of model code. Next, experiment tracking be
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Is MLOps??**
-  - The article treats What Is MLOps? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Is MLOps??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Is MLOps? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How is MLOps different from simply bolting DevOps onto ML?**
+  - In this article, MLOps is not just training automation—it's a system that ties data hashing, model registry, prediction logs, and retraining triggers into a single operational loop. While traditional CI/CD focuses on code deployment, MLOps includes drift detection and CT to keep models alive over time.
+- **Why do even highly accurate models quickly develop problems in production?**
+  - As shown in the article, input distributions shift enough to trigger KS tests, and prediction distributions and performance can keep wobbling in production. Without data versions, prediction logs, and retraining criteria, a model that scored well locally loses the evidence to explain why performance dropped after deployment.
+- **What does "managing data, code, and model together" actually mean in practice?**
+  - Even in a small example, we created data versions with `snap`, stored models in `registry/model_v1.pkl`, and recorded metrics and model version together in a `meta` dictionary. The point is leaving linkage—which data and which code produced which model—so you can reproduce results and trace problems later.
 <!-- toc:begin -->
 ## In this series
 

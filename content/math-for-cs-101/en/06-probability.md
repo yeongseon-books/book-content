@@ -154,13 +154,12 @@ Next, we move into linear algebra, where the focus shifts from uncertainty to re
 
 ## Answering the Opening Questions
 
-- **How do you turn uncertainty into a model instead of a vague guess?**
-  - The article treats Probability as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What is the difference between a sample space and an event?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why is conditional probability really about changing the denominator world?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do you handle uncertainty with numbers instead of gut feeling?**
+  - This article used basic probability `prob`, conditional probability `cond`, Bayesian updating `bayes`, and `expect`/`variance` to separate mean from spread—turning uncertainty into numbers. Adding threshold policies like `decide_action(p_risk, threshold)` connects vague feelings to comparable operational decisions.
+- **How do sample space and event differ?**
+  - The sample space is the set of all possible outcomes; an event is the subset you care about. In the disease-test example, all possible states form the sample space, and "positive AND actually sick" is the event—so the same number means entirely different things depending on what you put in the denominator.
+- **Why can conditional probability be called "probability with context attached"?**
+  - Conditional probability recalculates over only the world remaining after some information is given—that's why it's probability with context. As the `false_positive_scenario()` and Bayesian diagnosis examples showed, once the condition "alarm fired" is attached, the denominator changes and `P(failure | alarm)` becomes a completely different value from the base failure rate.
 <!-- toc:begin -->
 ## In this series
 

@@ -236,13 +236,12 @@ ID cards, business cards, and screen captures with email addresses are invisible
 
 ## Answering the Opening Questions
 
-- **Where do text-only LLM pipelines break first once real document and image input arrives?**
-  - The article treats Why Multimodal AI Matters as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which product problems genuinely improve with multimodal models, rather than just looking better in demos?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How should you think about early fusion, late fusion, and cross-attention without getting lost in paper terminology?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why do text-only LLMs hit limits so quickly on document QA, visual search, and screen understanding?**
+  - Text LLMs read only pre-cleaned strings, so they lose original signals when tables, figures, and layout matter. As the article's receipt analysis code showed, sending `image_url` together lets OCR, parsing, and structuring happen in one pass, and a shared embedding space (like CLIP) is needed to search images with text.
+- **What kinds of work make multimodal systems stronger than OCR + rule-based pipelines?**
+  - Tasks where humans look at the image first and add textual interpretation afterward. The article's examples—receipt item extraction, product image search, screenshot-based support, medical imaging combined with records—are problems where OCR strings alone lose context that VLMs and CLIP-based retrieval jointly recover.
+- **What distinguishes early fusion, late fusion, and hybrid fusion?**
+  - Early fusion feeds raw inputs together from the start—simple but loses per-modality characteristics. Late fusion combines only at the end—easy to implement but weak interactions. Hybrid fusion, as in the article's diagram, lets ViT-produced visual tokens be read by the LLM via cross-attention—forming the core architecture of CLIP, BLIP-2, LLaVA, and Flamingo families.
 <!-- toc:begin -->
 ## In this series
 

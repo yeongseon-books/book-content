@@ -213,13 +213,12 @@ Monitoring is the *prerequisite* for drift detection. The next post tackles *Dat
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Model Monitoring?**
-  - The article treats Model Monitoring as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Model Monitoring?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Model Monitoring reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why does watching only accuracy make you discover production problems too late?**
+  - In services where labels arrive late, latency, error rate, and prediction-class distribution may already be wobbling while you wait for accuracy to drop. That's why this article says to look at immediately-available signals like `predict_latency_seconds`, `predict_requests_total`, and prediction distribution counters first.
+- **How do metrics, logs, and traces differ?**
+  - Metrics are time-series numbers Prometheus scrapes from `/metrics`; logs are per-request context records like `request_id`, `feature_mean`, `prediction`; traces show the path one request took through multiple layers. Using all three together lets you break "it's slow" into number, event, and path.
+- **What roles do Prometheus and Grafana play in model operations?**
+  - Prometheus stores metrics exposed via `Counter` and `Histogram`, firing alerts like `HighLatency` or `ModelErrorRateHigh` with Alertmanager. Grafana bundles those metrics into latency, prediction-distribution, and error-rate panels so on-call can read system state within one minute.
 <!-- toc:begin -->
 ## In this series
 

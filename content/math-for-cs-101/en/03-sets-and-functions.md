@@ -152,13 +152,12 @@ Next, we broaden that structural view into graphs, where relationships between o
 
 ## Answering the Opening Questions
 
-- **Why are sets such a useful foundation for data structures and validation?**
-  - The article treats Sets and Functions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How do union, intersection, and difference show up in ordinary code?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What separates a function from a more general relation?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why are sets called the foundation of data structures and data models?**
+  - Sets directly express boundaries—what's allowed and what's excluded—making them the floor of data models. The `can_access(user_scopes, required_scopes)`, `validate_schema(required, optional, actual)`, and `power_set(features)` examples show that permissions, schemas, and configuration combinations can all be described in the language of membership.
+- **How do union, intersection, and difference look in code?**
+  - The article mapped them directly: `A | B`, `A & B`, `A - B`. In `resolve_permissions(allowed, requested, blocked)`, the final approved set was `(allowed & requested) - blocked`. In `validate_schema`, missing fields were `required - actual` and unexpected fields were `actual - (required | optional)`—set operations as validation rules.
+- **What distinguishes functions from relations?**
+  - A function maps each input to exactly one output deterministically, so it supports pipelines like `compose(trim, lower, remove_space)`. A relation—where one input yields multiple results, like a user having many bookmarks or `team_members(users, team)`—requires different contracts and test strategies.
 <!-- toc:begin -->
 ## In this series
 

@@ -179,13 +179,12 @@ Experiment tracking is the team's short-term memory. Next, data versioning provi
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Experiment Tracking?**
-  - The article treats Experiment Tracking as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Experiment Tracking?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Experiment Tracking reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why is reproducing even the same model difficult without experiment management?**
+  - Even the same logistic regression becomes unreproducible when run conditions like `C`, `max_iter`, `data_version`, and `git_sha` are missing. Without experiment tracking, only `model.pkl` and a single number remain, and the axes to explain why that metric occurred disappear.
+- **Which of parameters, metrics, artifacts, and environment must you always record?**
+  - The article bundled param, metric, and artifact in the same run as the minimum unit, adding `data_version` and `git_sha`. Because the MLflow example saved `model.pkl`, `acc.png`, and `val_acc` together, subsequent run comparison and promotion decisions became possible.
+- **How should you understand the relationship between experiment and run in MLflow?**
+  - An experiment is a container grouping related experiments like `fraud-detection-baseline`; a run is one actual training execution inside it. So nesting sweep runs under a parent or sorting multiple runs by `metrics.val_auc DESC` for comparison flows naturally.
 <!-- toc:begin -->
 ## In this series
 

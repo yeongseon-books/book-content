@@ -154,13 +154,12 @@ Next, we move into logic and proofs, where that abstract promise becomes a concr
 
 ## Answering the Opening Questions
 
-- **Why do you need math even if you can already write code?**
-  - The article treats Why Math for CS as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How do abstraction, proof, modeling, and analysis show up in day-to-day engineering work?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What changes when you can restate a problem mathematically instead of relying on intuition alone?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **If you can already write code, why do you still need math?**
+  - The moment you read intersections with `common(a, b)`, write invariants with `assert` in `invariant(items)`, or see cost-vs-input-size relationships with `linear(n)`, you can explain why code is correct and where it slows down. Passing tests confirms specific cases; math gives you universal correctness and performance bounds.
+- **What roles do abstraction, proof, modeling, and analysis play in real development?**
+  - Abstraction is compression like `common(a, b)` reading shared elements as an intersection. Proof is the procedure of separating assumptions from conclusions to eliminate counterexamples, like `proof_sketch(claim)`. Modeling turns reality into computable variable relationships like `model(rate, time) = rate * time`. Analysis judges how cost grows with input, like `linear(n)`.
+- **How does knowing math change the way you see problems?**
+  - Using this article's five-question set and the math-to-CS topic map, you learn to ask about input spaces, invariants, complexity, probabilistic error, and theoretical lower bounds before implementing. Instead of pushing intuition directly, you leave design decisions as reusable rules—like `weekly_plan`, `run_checks`, and boundary-case records.
 <!-- toc:begin -->
 ## In this series
 

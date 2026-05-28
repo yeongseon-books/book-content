@@ -247,13 +247,12 @@ Self-hosting still costs USD 1-3 per hour per GPU instance. Push queue length, G
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Audio Processing and Whisper STT?**
-  - The article treats Audio Processing and Whisper STT as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Audio Processing and Whisper STT?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Audio Processing and Whisper STT reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why has Whisper become the de facto default for open-source STT?**
+  - It handles 99 languages in one model, is open-weight for self-hosting, and achieves Korean WER competitive with cloud APIs. As the article's comparison showed, accelerating with `faster-whisper` brings per-minute cost and throughput to realistic levels, making it adoptable as a base STT layer even for small teams.
+- **How does Whisper's architecture convert 30 seconds of audio into text and timestamps?**
+  - Whisper converts 30s audio to an 80-channel log-Mel spectrogram, then an encoder-decoder transformer generates transcription alongside task tokens like `<|transcribe|>` and `<|ko|>`. The `word_timestamps=True` option or segment output attaches start/end times, enabling SRT subtitles, search indexes, and diarization alignment on the same time axis.
+- **When are local inference, faster-whisper, and OpenAI API calls each advantageous?**
+  - Base `openai-whisper` is good for structure understanding and experimentation. In production, `faster-whisper` with `vad_filter=True` is most practical for throughput and cost. When infrastructure burden is high or requests are short, the OpenAI API path (`client.audio.transcriptions.create(...)`) offers a fast start—and splitting routes by length and queue depth (as in `choose_stt_route()`) is also valid.
 <!-- toc:begin -->
 ## In this series
 

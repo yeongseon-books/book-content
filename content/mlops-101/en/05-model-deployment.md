@@ -219,13 +219,12 @@ Deployment is the start, not the end — *monitoring* is where real life begins.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Model Deployment?**
-  - The article treats Model Deployment as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Model Deployment?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Model Deployment reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do you connect a trained model file to user requests?**
+  - As the article showed: load `model.pkl` once at startup, then call `model.predict()` through a FastAPI `/predict` endpoint with Pydantic request validation. This way input validation, version response, and prediction logs live together around the model file.
+- **How should you understand the difference between online, batch, and streaming inference?**
+  - Online inference responds immediately per request like `/predict`; batch processes large data at once via Airflow or Cron; streaming continuously reads event flows like Kafka. As the article's table showed, the three differ in latency and throughput requirements, so the same model may need different operational forms.
+- **What roles do FastAPI and Docker play in model deployment?**
+  - FastAPI turns the model into an API contract callable by user requests; Docker bundles that API and its library environment into a reproducible deployment unit like `model-api:1.0.0`. This enables health checks, image tags, canary deploys, and rollbacks to operate on the same version basis.
 <!-- toc:begin -->
 ## In this series
 

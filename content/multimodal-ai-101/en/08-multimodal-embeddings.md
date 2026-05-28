@@ -231,13 +231,12 @@ Pretrained models assume a specific resize, crop, and normalization. ViT-B/32 ex
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Multimodal Embeddings and Cross-modal Search?**
-  - The article treats Multimodal Embeddings and Cross-modal Search as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Multimodal Embeddings and Cross-modal Search?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Multimodal Embeddings and Cross-modal Search reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do multimodal embeddings differ from text embeddings, and why are they the core of cross-modal search?**
+  - Text embeddings only compare sentences to sentences; multimodal embeddings align different inputs like images and text into the same coordinate system. With a shared space (as in the article's diagram of `a sleeping cat` and a cat photo), you can find images with text and find descriptions or audio assets with images—cross-modal search becomes possible.
+- **What do CLIP, SigLIP, and ImageBind share and how do they differ, and what criteria guide selection?**
+  - All three align cross-modality distances, but CLIP is the de facto baseline, SigLIP improves training stability with sigmoid loss for text-image, and ImageBind binds 6 modalities (including audio) into one space. So: English-centric search → CLIP; open-weight high-quality → OpenCLIP/SigLIP; audio in the same index → ImageBind—choose by purpose.
+- **Why are preprocessing and normalization contract-level important when extracting vectors with OpenCLIP?**
+  - The article's `embed_image()` and `embed_text()` both end with `feats / feats.norm(...)` because FAISS `IndexFlatIP` assumes normalized vectors for cosine similarity. Combined with the `preprocess` from `create_model_and_transforms()`, the same coordinate system is maintained—if resize/crop/normalization diverges, search score interpretation itself breaks.
 <!-- toc:begin -->
 ## In this series
 

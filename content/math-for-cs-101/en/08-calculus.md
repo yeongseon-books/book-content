@@ -157,13 +157,12 @@ Next, we move into information theory, where uncertainty gets measured in bits i
 
 ## Answering the Opening Questions
 
-- **Why can local slope tell you so much about a global optimization process?**
-  - The article treats Calculus as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How are limits and derivatives connected?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What changes when one variable becomes many variables?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why can a rate of change be summarized as the slope at a single point?**
+  - Differentiation reads how a function is about to change over a tiny interval, compressing local behavior into a slope. `deriv(f, x, h)` and `grad_f(x, h)` tell you which direction and how far to move to reduce loss—without memorizing the entire curve.
+- **What is the relationship between limits and derivatives?**
+  - A derivative is the value that the rate of change converges to as `h` goes to zero—so limits are its foundation. The central-difference `deriv(f, x, h)`, `chain_rule`, and `forward_and_backward()` backpropagation examples showed how the instantaneous rate of change defined by limits becomes the computation rule of actual learning algorithms.
+- **What's the difference between slope and gradient?**
+  - With one variable, slope is a single number. With multiple variables, you need a vector collecting each axis's rate of change—that's the gradient. As `numerical_gradient(loss, w)` returning `[6, 8]` at `(3, 2)` showed, the gradient gives the full direction of steepest increase, and gradient descent moves opposite to it.
 <!-- toc:begin -->
 ## In this series
 

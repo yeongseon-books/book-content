@@ -265,13 +265,12 @@ Across ten episodes we covered the models, data, and systems behind multimodal A
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Building a Production Multimodal Application?**
-  - The article treats Building a Production Multimodal Application as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Building a Production Multimodal Application?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Building a Production Multimodal Application reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What end-to-end components must a production multimodal app separate in its design?**
+  - API gateway, image preprocessing, caption/OCR/embedding extraction, VLM inference worker, vector search, cache, object storage, and observability must be separated to control failures and costs. As the article's system diagram showed, FastAPI handles orchestration while GPU inference runs on separate workers—making model swaps, queue control, and fallback design manageable.
+- **In what order is connecting FastAPI gateway, inference worker, cache, object storage, and observability most stable?**
+  - The article's base flow: receive and validate upload → save to object storage → check L1/L2/L3 cache → `asyncio.gather` for parallel caption/OCR/embedding extraction → search and VLM call → streaming response and metric recording. Fixing this order lets you bind `image_hash`, feature cache, and Prometheus metrics to the same request path, tracing latency and cost causes stage by stage.
+- **What criteria realistically divide the sync/async boundary?**
+  - Short, clearly-failing steps like authentication, input validation, and budget checks finish synchronously. Long or parallelizable work like OCR, captioning, and VLM goes to async workers. Adding the article's backpressure, per-stage timeouts, and degraded-response policies maintains the overall service in reduced mode even under request cancellation or worker overload.
 <!-- toc:begin -->
 ## In this series
 

@@ -267,13 +267,12 @@ Multimodal RAG must be evaluated on text queries, image-by-image search, and ima
 
 ## Answering the Opening Questions
 
-- **Which questions fail first under text-only RAG once screenshots, charts, and scanned documents enter the corpus?**
-  - The article treats Multimodal RAG: Searching Images and Text Together as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What are the trade-offs between image-only, text-only, and hybrid indexing strategies?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How should retrieval outputs be packaged before a VLM sees them?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why does text RAG immediately show performance limits on questions requiring images, tables, or layout?**
+  - Indexing only text chunks fails to retrieve visual evidence—numbers in a table corner, button positions, colors and shapes. The article explained that you must redesign from the retrieval stage, separating CLIP image index, caption+OCR text index, and VLM final reading.
+- **How do the three strategies—raw image embeddings, caption/OCR text, and dual index—differ for multimodal retrieval?**
+  - Image-embedding-only index is strong for visual-pattern search via CLIP but weak for numeric reasoning. Caption+OCR text index is strong for queries like `Q3 revenue dropped` but loses visual details like color and position. The hybrid strategy (as in the article's `HybridIndex` code) blends both scores with `alpha` to handle visual and numeric queries differently.
+- **What input combination is most practical when passing retrieval results to the VLM for final answering?**
+  - Rather than dumping all retrieval results, selecting top-3 key images plus needed OCR/caption evidence for the VLM is most realistic. As the article's `answer()` example showed, sending retrieved images inline with `citations` and `retrieval_scores` lets you trace what evidence supported the answer—essential for production quality.
 <!-- toc:begin -->
 ## In this series
 

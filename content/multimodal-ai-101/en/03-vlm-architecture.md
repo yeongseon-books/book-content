@@ -240,13 +240,12 @@ VLMs span a wide task spectrum: OCR, charts, diagrams, real-world photos, docume
 
 ## Answering the Opening Questions
 
-- **Where does a VLM actually spend its complexity: in the vision encoder, the adapter, or the LLM?**
-  - The article treats Vision-Language Model Architecture as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why do projection, Q-Former compression, and gated cross-attention lead to different serving trade-offs?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **When is the simplest adapter good enough, and when does token compression become mandatory?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What path does a VLM use to connect image encoder output to LLM input?**
+  - The common structure is `Vision Encoder → Adapter → LLM`, where the key stage converts visual features into a token contract the LLM can read. The article's `LLaVAProjector`, `QFormer`, and `GatedCrossAttention` each implemented that connection differently.
+- **Why does the Vision Encoder + Adapter + LLM skeleton repeat across most models?**
+  - Because leveraging a strong image encoder and a strong text LLM as-is while swapping only the adapter controls cost and length constraints. This separation lets you independently tune visual token count, frozen scope, and fine-tuning cost—and compare bottlenecks at the same level even as new models appear.
+- **What trade-offs did LLaVA, BLIP-2, and Flamingo each choose?**
+  - LLaVA uses MLP projection—simple and fast but 256–576 visual tokens consume context directly. BLIP-2 compresses to 32 tokens via Q-Former for efficiency. Flamingo adds cross-attention inside the LLM for natural multi-image and video support, but at higher structural complexity and training difficulty.
 <!-- toc:begin -->
 ## In this series
 

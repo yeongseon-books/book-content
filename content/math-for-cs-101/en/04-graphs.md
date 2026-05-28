@@ -162,13 +162,12 @@ Next, we turn to combinatorics, where the focus shifts from connection structure
 
 ## Answering the Opening Questions
 
-- **Why do relationship-heavy problems become clearer when modeled as graphs?**
-  - The article treats Graphs as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What do vertices and edges correspond to in real systems?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How do directed and undirected graphs change the meaning of a model?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why represent relational data as a graph?**
+  - Graphs expose connection structure that flat lists hide, using vertices and edges. Social ties, service calls, and build dependencies become `G = {"A": ["B", "C"] ...}` adjacency lists, unlocking BFS, DFS, shortest path, and topological sort as ready-made solutions.
+- **What do vertices and edges correspond to in real-world models?**
+  - As the article's application table showed: vertices are users, services, tasks, or locations; edges are friendships, call dependencies, precedence constraints, or road connections. So `topological_sort(build_deps)` computes task ordering and `dijkstra(network, "gateway")` computes cost paths—same grammar reused across domains.
+- **How do directed and undirected graphs differ?**
+  - Directed edges like `api -> auth` carry order and dependency meaning, enabling topological sort and cycle detection. Symmetric connections like friendships or two-way roads read naturally as undirected. Missing this distinction changes BFS distance, DAG determination, and failure-propagation analysis entirely.
 <!-- toc:begin -->
 ## In this series
 

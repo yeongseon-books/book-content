@@ -255,13 +255,12 @@ Feeding 224 inputs to a CLIP-336 model (or vice versa) breaks positional embeddi
 
 ## Answering the Opening Questions
 
-- **Why is the image encoder usually the first subsystem to debug when multimodal quality feels unstable?**
-  - The article treats Image Encoders: CLIP and ViT as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How does ViT turn an image into tokens, and why does that matter for retrieval and VLM design?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What exactly does CLIP align, and why does that enable zero-shot classification and cross-modal search?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why does understanding image encoders first give you the fastest grip on the whole multimodal structure?**
+  - Because retrieval, zero-shot classification, and VLM adapter inputs all start from the representation the image encoder produces. Understanding how images become vectors—like `cls_vec = out.last_hidden_state[:, 0, :]` or CLIP's `get_image_features()`—lets you evaluate retrieval quality and adapter design on the same basis.
+- **How does ViT turn an image into a token sequence, and how does it differ from a CNN?**
+  - ViT cuts a 224×224 image into 16×16 patches creating 196 tokens plus a CLS token, then feeds them to a transformer. Unlike CNNs that gradually expand receptive fields, ViT treats patches as a sequence from the start via patch embedding and positional embedding, using the final CLS vector as the image representation.
+- **How does CLIP align text and images into the same embedding space and enable zero-shot?**
+  - CLIP normalizes image/text embeddings, builds an N×N similarity matrix, and applies InfoNCE loss (as in the article's `clip_loss()` code) to push matching pairs close and mismatched pairs apart. This lets you use prompts like `a photo of a cat` as class vectors for zero-shot classification, or put normalized vectors into FAISS `IndexFlatIP` for text-to-image retrieval.
 <!-- toc:begin -->
 ## In this series
 

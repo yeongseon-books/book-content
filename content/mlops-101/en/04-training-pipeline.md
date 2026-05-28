@@ -183,13 +183,12 @@ Pipelines provide repeatability. Next, model deployment turns trained artifacts 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Model Training Pipeline?**
-  - The article treats Model Training Pipeline as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Model Training Pipeline?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Model Training Pipeline reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why split a single training script into a multi-stage pipeline?**
+  - Separating `ingest`, `preprocess`, `train`, `evaluate` lets you narrow failure points immediately and re-run only the segment with changed inputs. Especially, separating evaluation from training creates an operational boundary to block sub-threshold models before registry.
+- **How is a DAG different from a simple execution order?**
+  - A DAG is not just "run top to bottom"—it explicitly states dependencies between stages and re-execution scope. So Airflow's `validate_schema >> train >> evaluate >> register` reveals not just order but where to stop and where to restart.
+- **Where do orchestrators like Airflow, Prefect, and Kubeflow fit?**
+  - These tools don't design stage boundaries for you—they schedule, retry, and alert around already-separated stages. The article concluded that the core is having small stages, idempotency, caching, and failure logs first, not the orchestrator name.
 <!-- toc:begin -->
 ## In this series
 

@@ -176,13 +176,12 @@ Retraining is only clean if features are consistent across train and serve. The 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Retraining?**
-  - The article treats Retraining as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Retraining?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Retraining reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What signals tell you when to retrain?**
+  - The article examined `psi`, `accuracy`, `days_since_train`, and `new_rows` together, returning reasons like `drift`, `performance`, `schedule`, `data_volume` in code. The key: retraining timing is determined by documented operational rules and metric snapshots, not human intuition.
+- **How do schedule-based, drift-based, and performance-based triggers differ?**
+  - Schedule-based runs routinely at intervals like 30 days; drift-based reacts when PSI or input changes exceed a threshold; performance-based fires when AUC or accuracy drops below a floor. The article's point: mix all three but prioritize them to balance between too-frequent and too-late retraining.
+- **Why is a margin needed when comparing champion and challenger?**
+  - Without a minimum improvement threshold like `compare(challenger_acc, champion_acc, margin=0.01)`, a random 0.001 difference keeps swapping models. The margin isn't a device to slow automation—paired with shadow evaluation, it's a buffer protecting operational stability.
 <!-- toc:begin -->
 ## In this series
 

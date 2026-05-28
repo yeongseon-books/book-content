@@ -253,13 +253,12 @@ img = frame.to_image().resize((224, 224))  # shrink right away
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Video Understanding - From Frame Sampling to Video-LLaVA?**
-  - The article treats Video Understanding - From Frame Sampling to Video-LLaVA as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Video Understanding - From Frame Sampling to Video-LLaVA?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Video Understanding - From Frame Sampling to Video-LLaVA reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why is frame sampling the first critical variable to decide in video understanding?**
+  - A 10-minute 30fps video is ~18,000 frames; feeding them raw explodes to millions of tokens, overwhelming any model. As the article emphasized, uniform 8–32 frames, keyframes, or dense sampling isn't mere optimization—it's a product policy deciding which events to preserve and which to discard.
+- **When are PyAV uniform sampling and scene-change keyframe extraction each useful?**
+  - `sample_uniform_frames()` via PyAV suits Q&A and summarization that need a quick overview of the entire video. `extract_keyframes()` using histogram differences is more efficient for videos with clear scene transitions, but wrong thresholds or frame caps risk missing critical moments or generating excessive frames.
+- **What trade-offs do video encoders like VideoMAE, TimeSformer, and X-CLIP show?**
+  - TimeSformer's space-time attention excels at action recognition; VideoMAE's 16-frame feature extractor offers a good fine-tuning starting point; X-CLIP extends CLIP for zero-shot action recognition. Video-LLaVA compresses 8 frames into video tokens for Q&A, but long videos require the chunk-splitting and summary-merging design the article described.
 <!-- toc:begin -->
 ## In this series
 

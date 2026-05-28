@@ -155,13 +155,12 @@ Next, we close the series by tying these mathematical tools back into algorithm 
 
 ## Answering the Opening Questions
 
-- **What does it mean to measure information in bits?**
-  - The article treats Information Theory as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why is entropy called average information content?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why is cross entropy so common as an ML loss function?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What measures the quantity of information?**
+  - This article defined a single event's information as `-log2(p)`, measured in bits. In `info(p)`, lower-probability events yield larger values—capturing the intuition that rare events are more surprising, expressed as a number.
+- **Why is entropy called average information?**
+  - Entropy weights each event's information by its probability and sums—representing the distribution's average surprise. Comparing `entropy([0.5, 0.5])` vs. `entropy([0.9, 0.1])` for fair vs. biased coins, plus Huffman/zlib compression experiments, showed that entropy equals the lower bound on average code length.
+- **Why is cross-entropy so commonly used as a loss function?**
+  - Cross-entropy is the average extra cost of describing true distribution `p` using model distribution `q`—so cost grows as predictions worsen. The article's `H(p, q) = H(p) + KL(p||q)` relationship and `target`/`model_good`/`model_bad` examples explained that minimizing cross-entropy is ultimately reducing KL divergence to push the model distribution toward the true one.
 <!-- toc:begin -->
 ## In this series
 

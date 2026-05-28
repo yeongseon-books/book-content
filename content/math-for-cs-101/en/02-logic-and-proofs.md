@@ -154,13 +154,12 @@ Next, we move into sets and functions, where that logical precision starts shapi
 
 ## Answering the Opening Questions
 
-- **How is a proof different from running a handful of examples?**
-  - The article treats Logic and Proofs as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How do propositions, implication, and equivalence map to real code?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **When is a direct proof clearer than proof by contradiction?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How are tests different from proofs?**
+  - Tests run a few inputs to check; proofs cover all possible cases by connecting assumptions to conclusions in writing. The precondition of `even_sum(a, b)`, the loop invariant of `prefix_sum`, and the proof-by-contradiction of √2's irrationality show that passing examples and guaranteeing universal statements are different activities.
+- **How do propositions, implication, and equivalence connect to code?**
+  - This article translated implication `p → q` into `not p or q`, verified meaning-preserving refactoring with `equiv(p, q)` and De Morgan's law, and checked `Equivalent(Implies(p, q), (~p) | q)` via SymPy—showing that propositions, implication, and equivalence are the grammar for reasoning about code-condition correctness.
+- **When should you use direct proof versus proof by contradiction?**
+  - When assumptions are clear and the conclusion follows immediately, direct proof is shortest—like "even + even = even." When assuming the opposite reveals structure better (like proving √2 is irrational), contradiction works. For repetitive structures, induction pairs naturally with loop verification as in `sum_to(n)` and `prefix_sum`.
 <!-- toc:begin -->
 ## In this series
 

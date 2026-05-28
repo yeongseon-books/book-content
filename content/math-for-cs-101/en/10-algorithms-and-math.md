@@ -175,13 +175,12 @@ If this series did its job, the next time you approach an algorithmic problem yo
 
 ## Answering the Opening Questions
 
-- **How do the math topics from this series combine in algorithm design?**
-  - The article treats Algorithms and Math as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why does combinatorics matter so much for complexity analysis?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How does graph modeling change the solution strategy itself?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How does the math from this series come together in algorithm design?**
+  - This article unified `subsets(n)`, `shortest(G, s, t)`, `estimate_pi`, `minimize`, and `lower_bound_bits` into one flow, showing that combinatorics, graphs, probability, calculus, and information theory are different levers of algorithm design. The design-review template ensures problem model, correctness argument, complexity, approximation/randomization, and limits are written together—closing the series concepts into an actionable document format.
+- **Why does combinatorics connect to complexity analysis?**
+  - Without counting cases, you can't know when a search space explodes. `2 ** n` subsets, recurrence `T(n) = 2T(n/2) + O(n)`, the Master theorem table, and amortized-analysis cumulative costs all show that complexity claims ultimately stand on counting and structural analysis.
+- **How does graph modeling change the way you solve problems?**
+  - The moment you recast a problem as a graph, what looked like list processing becomes shortest-path, topological-sort, or cycle-detection—standard problems with known algorithms. This article re-modeled string similarity, caching, and compression to emphasize that changing the representation is itself the starting point that changes both algorithm choice and proof strategy.
 <!-- toc:begin -->
 ## In this series
 

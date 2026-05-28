@@ -240,13 +240,12 @@ A 30-step SDXL generation takes about 5 seconds on an RTX 4090. User-facing serv
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Text-to-Image with Diffusion?**
-  - The article treats Text-to-Image with Diffusion as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Text-to-Image with Diffusion?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Text-to-Image with Diffusion reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why did diffusion quickly displace GANs to become the default visual generation architecture?**
+  - It overcame GAN mode collapse and prompt-control limitations by providing stable training and free-text conditional generation together. With the open-weight ecosystem, CFG, ControlNet, and inpainting (as the article's Stable Diffusion and SDXL flows showed), not just generation quality but controllability became standard.
+- **What mental model makes forward and reverse processes most practical to understand?**
+  - In training, Gaussian noise is progressively added to `x_0` sending it to `x_T`; in inference, the model predicts `eps_theta(x_t, t, text)` to progressively remove that noise—a control loop. This perspective naturally connects why `num_inference_steps`, `guidance_scale`, `negative_prompt`, and schedulers heavily affect final quality and style.
+- **What roles do Stable Diffusion's text encoder, UNet, and VAE each play?**
+  - The text encoder turns prompts into embeddings; the UNet predicts noise at each step in latent space; the VAE converts between pixel images and smaller latents and back. Thanks to this latent diffusion structure (as the article's table showed), computation happens at 64×64×4 instead of 512×512 pixels—greatly reducing VRAM and time while supporting extensions like ControlNet and inpainting on the same skeleton.
 <!-- toc:begin -->
 ## In this series
 

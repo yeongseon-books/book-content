@@ -294,13 +294,12 @@ Card numbers on receipts, phone numbers on business cards, and ID numbers on pas
 
 ## Answering the Opening Questions
 
-- **Why does "extract the text and move on" fail on receipts, screenshots, and structured documents?**
-  - The article treats Image Captioning and OCR Pipelines as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **When should you use a lightweight captioner, and when does a full VLM call earn its cost?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How do Tesseract, PaddleOCR, and cloud document APIs differ in real operating terms?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why does the approach "just extract text from images" frequently fail for real document processing?**
+  - OCR gives strings but discards table structure, emphasis, and visual relationships—hitting limits immediately for document and screen understanding. As the article's hybrid flow showed, combining `Fast OCR → layout analysis → VLM reasoning` is needed to reliably recover totals, dates, and scene context together.
+- **Where do captioning models and VLM-based description generation each show strengths and limits?**
+  - BLIP-family captioners excel at cheap, fast, bulk object-level descriptions like `caption("samples/dog.jpg")`. But for chart trends or accessibility alt-text requiring context and reasoning, the `gpt-4o-mini` path via `rich_caption()` is more appropriate—at higher cost and latency.
+- **What criteria should guide choosing between Tesseract, PaddleOCR, and Document AI?**
+  - Tesseract offers quick start and low cost; PaddleOCR handles Korean and bbox-based layout processing; cloud Document AI excels at table and key-value structure extraction. Following the article's criteria—evaluating not just character accuracy but rotated images, confidence thresholds, PII masking, and per-page cost—makes engine selection safer.
 <!-- toc:begin -->
 ## In this series
 
