@@ -213,12 +213,12 @@ The next post covers **files and directories** — `ls`, `cd`, `mkdir`, `cp`, `m
 
 ## Answering the Opening Questions
 
-- **The exact difference between CLI, Shell, and Terminal?**
-  - The article treats What Is the CLI and Shell? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How to run your first commands in a Bash shell?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How to read command structure: command, option, argument?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What does it actually mean to operate a computer without a GUI?**
+  - It means typing commands like `echo "Hello, CLI!"`, `ls -la /home`, or `cd ~/Downloads` directly to tell the OS what to do. Terminal is the display; Shell is the interpreter. Because both work over text, the same workflow applies on servers or Docker containers that have no GUI.
+- **Terminal, Shell, CLI — what's different and where does confusion arise?**
+  - Terminal is the window showing input/output; Shell is the program that parses `command [options] [arguments]` and passes it to the OS; CLI is the overall interaction style. `echo $SHELL` reveals which shell is running, and switching between Bash and Zsh inside the same Terminal is the easiest proof they're separate layers.
+- **Why must developers learn CLI for real-world work?**
+  - CLI commands persist in history and scripts, enabling reproducibility and automation. Server inspection via SSH, log analysis with `journalctl | grep`, CI/CD execution, and task scripting all run on CLI foundations—immediately expanding practical reach.
 
 <!-- toc:begin -->
 ## In this series

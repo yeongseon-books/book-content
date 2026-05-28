@@ -253,12 +253,12 @@ This concludes the Linux CLI 101 series. You now have the CLI fundamentals to co
 
 ## Answering the Opening Questions
 
-- **The basic SSH connection flow and key-based authentication setup?**
-  - The article treats SSH and Remote Access as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Generating a key pair with `ssh-keygen` and registering it on a server?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Creating connection aliases with `~/.ssh/config`?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why did SSH replace Telnet as the default remote-access method?**
+  - SSH encrypts remote commands and file transfers inside a tunnel, making it far safer than Telnet's plaintext traffic. Server deployments, quick checks like `ssh prod-server 'df -h'`, and file transfers via `scp`/`rsync` all share the same secure channel—establishing it as the operational baseline.
+- **What difference does key-based vs password authentication make?**
+  - Password auth requires manual input each time and resists automation; key-based auth (`ssh-keygen -t ed25519` → `authorized_keys`) connects securely without a password. When `Permission denied (publickey)` appears, check `chmod 700 ~/.ssh`, `chmod 600 ~/.ssh/id_ed25519`, and `ssh -v prod-server` first.
+- **How does `~/.ssh/config` simplify connection workflows?**
+  - Pre-filling `Host`, `HostName`, `User`, `Port`, `IdentityFile` lets you type `ssh prod-server` instead of memorizing long connection strings. The article's `ProxyJump bastion` and `ServerAliveInterval 30` examples showed how team access policies and jump-host routes can be standardized in one config file.
 
 <!-- toc:begin -->
 ## In this series

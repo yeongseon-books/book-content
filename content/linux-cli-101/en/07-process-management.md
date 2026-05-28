@@ -222,12 +222,12 @@ The next post covers **environment variables and PATH** — how the Shell finds 
 
 ## Answering the Opening Questions
 
-- **Checking running processes with `ps` and `top`?**
-  - The article treats Process Management as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Terminating processes with `kill` and `kill -9`?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Switching between background and foreground with `&`, `bg`, `fg`, `jobs`?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What distinguishes a process from a program?**
+  - A program is code or an executable on disk; a process is a running instance of it in memory. The same Python app can exist as multiple processes with different PIDs, as `pgrep -af 'my-api|gunicorn|uvicorn'` reveals.
+- **In what order should you use `ps`, `top`, `pgrep`, `kill`?**
+  - First survey top resource consumers with `ps -eo ... --sort=-%cpu` or `top`; then pinpoint the exact process with `pgrep -af`; finally attempt graceful shutdown with `kill -TERM`. If it persists, wait briefly then escalate to `kill -KILL`.
+- **Why are background jobs and job control frequently needed in server operations?**
+  - Long-running batches and maintenance scripts must survive SSH disconnects. Mastering `sleep 100 &`, `jobs`, `fg`, `bg`, plus the `nohup ... > task.log 2>&1 &` and `disown` patterns lets you decouple work from the session for stable operations.
 
 <!-- toc:begin -->
 ## In this series

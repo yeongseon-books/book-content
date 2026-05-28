@@ -307,12 +307,12 @@ The next post covers **SSH and remote access** — key-based authentication, scp
 
 ## Answering the Opening Questions
 
-- **The basic flow of writing and running a shell script?**
-  - The article treats Shell Script Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Bash syntax for variables, `if/else`, and `for` loops?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Script arguments (`$1`, `$2`, `$#`) and exit codes (`$?`)?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What changes when you bundle commands into a script file instead of copy-pasting?**
+  - Sequences like `git pull`, `pip install -r requirements.txt`, `systemctl restart app` become fixed in a file so anyone can reproduce the exact procedure. Wrapping them with `set -e` catches missed steps that manual one-by-one execution would silently skip.
+- **Why must shebang, execution permission, and argument handling be learned together?**
+  - `#!/bin/bash` selects the interpreter; `chmod u+x hello.sh` enables execution; `$1`, `${1:-"World"}`, `${1:?"Usage: ..."}` control runtime input. Missing any one causes syntax errors, `Permission denied`, or a deployment running with wrong arguments—so the three form one flow.
+- **Where are variables and conditionals used most often in scripts?**
+  - File existence checks (`if [ -f "$FILE" ]`), version-format validation (`[[ ! "$version" =~ ... ]]`), and service-state inspection (`systemctl is-active --quiet`). The article's `check-file.sh`, dry-run patterns, and `check_service()` function showed that input validation and branching turn a command list into an operational tool.
 
 <!-- toc:begin -->
 ## In this series

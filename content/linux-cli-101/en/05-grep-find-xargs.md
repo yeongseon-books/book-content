@@ -246,12 +246,12 @@ The next post covers **pipes and redirection** — connecting commands and redir
 
 ## Answering the Opening Questions
 
-- **Searching for strings inside files with `grep`?**
-  - The article treats grep, find, xargs — The Search Trio as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Finding files by name, size, and modification time with `find`?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Passing search results as arguments to other commands with `xargs`?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why are content search and file-location search different problems?**
+  - `grep` finds text patterns (`TODO`, `ERROR`, `HTTP/1.1" 5[0-9]{2}`) *inside* files; `find` locates files themselves by name, type, or attributes (`*.py`, `-mtime -2`, `-type f`). Separating "where does this text appear" from "which files should I target" improves search precision.
+- **In what order should `grep`, `find`, and `xargs` connect?**
+  - Narrow the target set with `find` first, optionally apply content filters with `grep -R -n -E`, then chain follow-up commands via `xargs`. Example: `find ./images -type f -name '*.png' -print0 | xargs -0 -n 1 -P 4 optipng -quiet` cleanly separates target selection from processing.
+- **What risk should you consider first when piping search results into another command?**
+  - Filenames containing spaces, quotes, or newlines combined with destructive follow-up commands. That's why `find ... -print0 | xargs -0 rm -f` is the baseline pattern, and a dry-run with `-print` must always precede actual deletion.
 
 <!-- toc:begin -->
 ## In this series

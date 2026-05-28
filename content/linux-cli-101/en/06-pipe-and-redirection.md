@@ -247,12 +247,12 @@ The next post covers **process management** — `ps`, `top`, `kill`, and backgro
 
 ## Answering the Opening Questions
 
-- **Passing the output of one command as input to the next with pipe (`|`)?**
-  - The article treats Pipes and Redirection as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Saving output to a file with `>` (overwrite) and `>>` (append)?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The meaning of stdin (0), stdout (1), and stderr (2) file descriptors?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why are stdin, stdout, and stderr separated?**
+  - Keeping normal output and errors apart lets the next command consume only the data it needs reliably. Splitting with `python3 app.py > /tmp/app.out 2> /tmp/app.err` eases analysis and automation; merging back with `2>&1 | tee build.log` becomes an explicit choice.
+- **What flow does each of `|`, `>`, `>>`, `2>` create?**
+  - `|` passes left-side stdout to right-side stdin; `>` overwrites a file; `>>` appends; `2>` redirects only stderr. `awk '{print $1}' access.log | sort | uniq -c | sort -rn | head -3` and `ls /tmp /nonexistent > out.txt 2> err.txt` are canonical pipe and redirection examples.
+- **What improves when you chain commands without intermediate files?**
+  - Immediate results without disk waste or cleanup cost. A pipe chain that compresses access logs into a 5xx list lets each stage consume the previous stage's output directly in transformed form.
 
 <!-- toc:begin -->
 ## In this series

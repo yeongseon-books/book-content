@@ -235,12 +235,13 @@ The next post covers **shell scripting basics** — writing scripts to automate 
 
 ## Answering the Opening Questions
 
-- **Viewing and setting environment variables with `echo`, `env`, `export`?**
-  - The article treats Environment Variables and PATH as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How PATH drives command lookup?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Adding permanent settings to `.bashrc` and `.bash_profile`?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How are environment variables delivered to a process?**
+  - Variables are set as `key=value` in the current shell, and only `export`-ed values are inherited by child processes. The article's `MY_VAR="hello"` vs `bash -c 'echo $MY_VAR'` example showed different results before and after `export`—demonstrating this inheritance rule.
+- **What differs between `export` and a local shell variable?**
+  - A local shell variable is visible only in the current shell; `export DB_HOST="localhost"` makes it readable by child processes (Python, Docker, sub-Bash). That's why `set -a` + `source .env` for auto-export or systemd `EnvironmentFile` injection are common production patterns.
+- **What search order does `PATH` create for command execution?**
+  - PATH is a `:`-delimited list of directories searched left to right for executables. `echo $PATH | tr ':' '
+'`, `which http`, and `export PATH="$HOME/.local/bin:$PATH"` show how prepending a missing directory resolves "command not found" immediately.
 
 <!-- toc:begin -->
 ## In this series

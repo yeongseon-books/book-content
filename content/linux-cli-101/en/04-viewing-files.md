@@ -231,12 +231,12 @@ The next post covers **text search and file finding** — `grep`, `find`, `xargs
 
 ## Answering the Opening Questions
 
-- **Using `cat` to quickly view short files?**
-  - The article treats cat, less, head, tail — Viewing File Contents as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Using `less` to browse long files page by page?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Using `head` and `tail` to slice the beginning or end of a file?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **When should you view a file whole vs viewing only part of it?**
+  - Short files (dozens of lines like `data.csv`) suit `cat` or `cat -n`; large log files call for `less`, `head -n 40` for the beginning, or `tail -n 80` for the recent window. The article checked `ls -lh` and `stat` before opening a 142 MB log—same judgment principle.
+- **Why is `less` safer than raw output?**
+  - `less` doesn't load the entire file into memory; it navigates page by page, so opening a large file won't flood the terminal buffer. `/ERROR`, `n`, `g`, `G`, `q` give controlled search and movement—far safer for analysis than `cat access.log` dumping everything at once.
+- **How do `head` and `tail` serve different log-checking roles?**
+  - `head` checks file format, headers, or initialization logs at the start; `tail` shows recent errors and current state. `tail -f /var/log/my-app/app.log` in particular lets you reproduce a request while watching new log lines appear—a fundamental incident-response routine.
 
 <!-- toc:begin -->
 ## In this series

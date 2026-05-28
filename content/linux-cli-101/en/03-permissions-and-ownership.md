@@ -216,12 +216,12 @@ The next post covers **viewing file contents** — `cat`, `less`, `head`, `tail`
 
 ## Answering the Opening Questions
 
-- **The 3x3 structure of Linux file permissions (owner/group/others x read/write/execute)?**
-  - The article treats Permissions and Ownership as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How to read permission strings in `ls -l` output?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Two ways to change permissions with `chmod` (numeric and symbolic)?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do `r`, `w`, `x` permissions behave differently on files vs directories?**
+  - On files: `r` = read content, `w` = modify, `x` = execute. On directories: `r` = list entries, `w` = create/delete inside, `x` = enter (`cd`). Without `x` on a directory, you can't `cd` into it even if `r` shows the listing—so `namei -l` traces per-segment permissions to diagnose access failures.
+- **Why does the owner/group/others distinction matter?**
+  - `-rwxr-xr--` assigns different permissions to owner, group, and others, enabling policy separation over who can read, modify, or execute. The article set `app.env` to `640` and `start.sh` to `750` to open only what each role (service account vs team user) needs.
+- **What does each of `chmod` and `chown` change?**
+  - `chmod` changes permission bits (`644`, `755`, `u+x`); `chown` changes the file's owner and group (`deploy:deploy`). The deployment example ran `chown -R deploy:deploy` first, then applied different `chmod` values to directories and `*.sh` files—showing the role difference clearly.
 
 <!-- toc:begin -->
 ## In this series

@@ -222,12 +222,12 @@ The next post covers **permissions and ownership** — `chmod`, `chown`, and the
 
 ## Answering the Opening Questions
 
-- **The Linux file system hierarchy (`/`, `/home`, `/etc`, `/var`)?**
-  - The article treats Files and Directories as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Checking your current location and navigating with `pwd`, `cd`, `ls`?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Manipulating files and directories with `mkdir`, `touch`, `cp`, `mv`, `rm`?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **When do absolute and relative paths feel different?**
+  - An absolute path like `/opt/my-app/releases/prod-20260521` points to the same target regardless of where you run it; a relative path changes meaning based on your current location. High-stakes operations (deployments, backups) favor absolute paths; working within the current directory uses `./src` or `../config.yaml` for convenience.
+- **How do you read your current position with just `pwd`, `cd`, `ls`?**
+  - `pwd` confirms the reference point; `cd ~/practice/linux-cli` moves there; `ls -la` shows what actually exists. The article's production scenario ran `pwd` and `ls -la ./releases` before touching anything—preventing accidental work in the wrong directory.
+- **When is each of `cp`, `mv`, `rm` safe to use?**
+  - `cp` when the original must remain; `mv` for moves or renames; `rm` only when deletion is truly intended. The article showed previewing candidates with `find ... -print` first, then running `-print0 | xargs -0 rm -rf` only after verifying the list.
 
 <!-- toc:begin -->
 ## In this series
