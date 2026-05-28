@@ -148,13 +148,12 @@ Trees and forests are the workhorse of tabular ML. Next we explore unsupervised 
 
 ## Answering the Opening Questions
 
-- **How does a decision tree split the feature space?**
-  - The article treats Decision Tree and Random Forest as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What do Gini and entropy actually measure?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why does a single deep tree overfit so quickly?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **By what criterion does a decision tree split the feature space?**
+  - A decision tree repeatedly selects one feature and threshold to divide data in two, progressively partitioning the feature space. `DecisionTreeClassifier(max_depth=4)` stacks these splits within a limited depth to build prediction rules.
+- **What do Gini and entropy measure?**
+  - Gini and entropy measure how mixed the classes are within a node—impurity. The tree prefers splits that reduce this value most, so both metrics quantify "how much cleaner do labels become after one split."
+- **Why does a single tree overfit so easily?**
+  - Without depth limits, a single tree can create rules fine-grained enough to nearly memorize training data. That is why `max_depth` is emphasized as the most important knob, and `RandomForestClassifier(n_estimators=200)` averaging multiple trees typically produces more stable test scores.
 <!-- toc:begin -->
 ## In this series
 

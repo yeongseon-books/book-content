@@ -207,13 +207,12 @@ Queues and event sourcing are tools that handle time in distributed systems. Nex
 
 ## Answering the Opening Questions
 
-- **The decoupling and guarantees that a message queue provides?**
-  - The article treats Message Queues and Event Sourcing as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The meaning of at-most-once, at-least-once, and exactly-once?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The definition of event sourcing and its relationship to CQRS?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What decoupling and delivery guarantees does a message queue provide?**
+  - A message queue separates producer and consumer execution timing so one side's failure does not immediately propagate to the other. Delivery guarantees are not completed by broker settings alone—they must include ack timing, offset commit timing, and consumer idempotency, with consumer lag and DLQ serving as operational signals verifying guarantees hold in practice.
+- **What do at-most-once, at-least-once, and exactly-once each mean?**
+  - At-most-once accepts possible loss to reduce duplicates; at-least-once accepts possible duplicates to reduce loss. Exactly-once is not a single broker option but a property approximately achieved at the business level when transactional outbox, post-processing commit, and `event_id` idempotency store are designed together.
+- **What is event sourcing and how does it relate to CQRS?**
+  - Event sourcing defines current state as the sum of event history rather than the latest row; CQRS separates that history into purpose-built projections for read performance and model simplicity. The read model is a regenerable derivative, and the event store is the source of truth—this is the core of how the two patterns combine.
 <!-- toc:begin -->
 ## In this series
 

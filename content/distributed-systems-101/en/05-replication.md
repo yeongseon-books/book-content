@@ -192,13 +192,12 @@ Replication is the foundation of distributed data. Next we look at the algorithm
 
 ## Answering the Opening Questions
 
-- **Why we replicate, what kinds exist, and the tradeoffs?**
-  - The article treats Replication as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The leader-follower, multi-leader, and leaderless models?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Sync vs async replication and the risk of data loss?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why replicate data, and what replication models exist?**
+  - Replication's purpose is not simple backup but simultaneously achieving fault tolerance, read scaling, and geographic distribution. Leader-follower's strength is operational simplicity and a predictable write path; multi-leader suits environments needing multiple write points; leaderless secures availability and distributed writes via quorums. Combined with consistent hashing, rebalancing cost during node changes is also controlled.
+- **How do leader-follower, multi-leader, and leaderless differ?**
+  - Leader-follower uses a single leader as source of truth—simple conflict handling but leader failure response is critical. Multi-leader has multiple write points giving good regional independence but requires the application to own conflict resolution rules. Leaderless treats all nodes as equal, tuning read/write guarantees via R/W/N combinations, with quorum and read-repair policies at the core of freshness management.
+- **What data loss risk do synchronous and asynchronous replication create?**
+  - Synchronous replication waits for majority replica acknowledgment before responding—low loss risk after leader failure but added latency. Asynchronous gives fast responses but can lose recent writes if failure occurs before propagation. That is why synchronous/asynchronous should be split by domain, with Prometheus-based lag metrics and promotion thresholds operated together to manage actual loss risk.
 <!-- toc:begin -->
 ## In this series
 

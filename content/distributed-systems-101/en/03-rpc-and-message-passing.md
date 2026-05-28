@@ -203,13 +203,12 @@ RPC and message passing trade off sync/async, coupling, and resilience. Next we 
 
 ## Answering the Opening Questions
 
-- **The definitions and differences of RPC and message passing?**
-  - The article treats RPC and Message Passing as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Synchronous vs asynchronous, request/response vs publish/subscribe?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Strengths and weaknesses of each model and where each fits?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What are RPC and message passing, and how do they differ?**
+  - RPC is a synchronous contract where the caller waits for a response; message passing is an asynchronous contract where producers and consumers operate independently through a broker. RPC trades tight coupling for immediate results; messaging trades loose coupling for deferred processing.
+- **Where do synchronous vs asynchronous, and request-response vs pub-sub, diverge?**
+  - Paths where users need immediate results use synchronous RPC; subsequent processing and event propagation use async messaging. As the decision tree showed, chain depth and retry safety on failure are the divergence points.
+- **What are each model's strengths and weaknesses, and where do they fit?**
+  - RPC is simple and easy to debug but propagates latency and failures as chains deepen. Messaging is resilient and distributes load but introduces ordering and deduplication complexity. In practice, hybrid patterns combine both models' strengths.
 <!-- toc:begin -->
 ## In this series
 

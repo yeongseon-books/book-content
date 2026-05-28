@@ -208,13 +208,12 @@ Distributed transactions are not about imitating ACID — they are about designi
 
 ## Answering the Opening Questions
 
-- **The difference between a single-node and a distributed transaction?**
-  - The article treats Distributed Transactions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How 2-phase commit works and where it falls short?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The core of Saga — compensating transactions?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do single-node transactions and distributed transactions differ?**
+  - Single-node transactions complete commit/rollback within one DB log and lock system. Distributed transactions span service boundaries and complete as operational contracts including local commits, message delivery, retries, and compensations. "Immediate atomicity" gives way to "recoverable eventual consistency," making outbox and idempotency essential.
+- **How does 2-phase commit work and where is it weak?**
+  - 2PC operates in two stages: prepare collects unanimous agreement, then commit is propagated. Its strength is a clear atomicity model, but coordinator failure can leave participants locked in an in-doubt state, and prolonged prepare locks severely degrade availability and latency. Decision log durability, restart recovery logic, and in-doubt monitoring must all be designed together to survive production.
+- **What is the Saga's core concept of compensating transactions?**
+  - A compensating transaction is not a database rollback but a reverse command that offsets an already-occurred business result. In both orchestration and choreography, compensation failure retry policies, expiration time windows, and idempotency keys must be specified—this design determines whether a Saga succeeds.
 <!-- toc:begin -->
 ## In this series
 

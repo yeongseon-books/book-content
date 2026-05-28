@@ -182,13 +182,12 @@ When traces flow, *the flow becomes visible*. Next: *dashboard design*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Distributed Tracing Basics?**
-  - The article treats Distributed Tracing Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Distributed Tracing Basics?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Distributed Tracing Basics reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What are spans and traces?**
+  - A span records one work segment (function call, DB query, HTTP request); a trace is the tree of spans sharing the same trace_id. The root span starts the request; child spans are subordinate calls. The waterfall view in Jaeger or Tempo is this tree.
+- **Why is context propagation critical when requests cross multiple services?**
+  - Without context propagation, each service generates independent traces and a single request scatters into disconnected fragments. The W3C Trace Context `traceparent` header carries trace_id and parent_span_id, letting receiving services attach their spans to the same tree.
+- **Why is sampling the key to cost control?**
+  - Each trace costs tens to hundreds of KB in storage. At 10 million requests per day, 100% storage accumulates terabytes. Sampling normal traffic at 5% while preserving 100% of errors and high-latency traces cuts costs by over 90% while maintaining incident analysis quality.
 <!-- toc:begin -->
 ## In this series
 

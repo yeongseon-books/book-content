@@ -183,13 +183,12 @@ Good alerts *protect sleep*. Next: *SLI and SLO basics*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Alerts and On-Call?**
-  - The article treats Alerts and On-Call as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Alerts and On-Call?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Alerts and On-Call reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What conditions should an alert meet to justify waking someone at night?**
+  - All three must hold: (1) user impact is ongoing, (2) damage grows without immediate action, (3) auto-recovery is impossible. If any one is missing, downgrade to ticket severity.
+- **Why does alert fatigue develop and how can it be reduced?**
+  - Fatigue starts with low confidence—accumulated false alarms train people to ignore alerts. Solutions: reduce duplicates via grouping, inhibition, and silencing; filter momentary spikes with `for` duration; review weekly false-alarm ratios.
+- **How do symptom-based and cause-based alerts differ?**
+  - Symptom alerts detect "problems users experience" (5xx spike, latency rise). Cause alerts detect "internal system state" (CPU 95%, disk 90%). Night pages should center on symptom alerts; cause alerts are for drill-down and tickets.
 <!-- toc:begin -->
 ## In this series
 

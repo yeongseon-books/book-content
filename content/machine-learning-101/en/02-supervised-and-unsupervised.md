@@ -148,13 +148,12 @@ Picking the paradigm sets the ceiling on model performance. Next, we measure gen
 
 ## Answering the Opening Questions
 
-- **When labels are present versus absent, do we reach for the same algorithms?**
-  - The article treats Supervised and Unsupervised Learning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How do classification and regression differ if both are supervised learning?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why is clustering not just “classification without labels”?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Can you use the same algorithm with and without labels?**
+  - With labels, `LogisticRegression` or `LinearRegression` computes accuracy or R² from `(X, y)`. Without labels, you need structure-finding algorithms like `KMeans`, where `inertia_` has different meaning from accuracy and cannot be compared on the same basis.
+- **Classification and regression are both supervised—what differs?**
+  - Classification predicts discrete class labels (0, 1, 2) like the iris example; regression predicts continuous values like the California housing example. Same supervised learning, but loss functions, metrics, and interpretation all differ.
+- **Why is clustering treated as an entirely different problem from classification?**
+  - Clustering groups similar samples without ground-truth labels—the article read KMeans results through cohesion and interpretation, not accuracy. Cluster IDs should not be used directly as class labels; visualization and downstream validation must confirm whether groupings align with actual business distinctions.
 <!-- toc:begin -->
 ## In this series
 

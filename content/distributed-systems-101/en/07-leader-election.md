@@ -199,13 +199,12 @@ Leader election is the work of keeping the promise of "one leader at a time" wit
 
 ## Answering the Opening Questions
 
-- **Why leader election is needed and what its safety conditions are?**
-  - The article treats Leader Election as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The roles of lease and heartbeat?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How to use a fencing token to block an old leader?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why is leader election needed, and what safety conditions are required?**
+  - Leader election restricts write authority to one node at a time, preventing split-brain. The safety condition summarizes to "two leaders never write simultaneously"—as shown in the article, lease expiry boundaries, monotonically increasing fencing tokens, and resource server token rejection verification must all be present for this condition to actually hold.
+- **What role do lease and heartbeat each play?**
+  - A lease defines the validity period of leader authority—a safety boundary. A heartbeat extends that authority—a maintenance signal. Lease answers "when does authority end"; heartbeat answers "is the current leader still healthy." As in the Kubernetes Lease and stepdown examples, if heartbeats stop or dependency checks fail, the next candidate must be able to take over.
+- **Why is the fencing token the critical device blocking a previous leader?**
+  - The fencing token is the final safety mechanism connecting election results to resource server verification. Even if an old leader resumes after a GC pause, its smaller token is rejected—preventing data corruption. The FastAPI example and `fencing_reject_total` metric are the operational evidence confirming this protection actually works.
 <!-- toc:begin -->
 ## In this series
 

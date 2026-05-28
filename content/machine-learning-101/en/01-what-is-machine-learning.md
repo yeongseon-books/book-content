@@ -143,13 +143,12 @@ ML is *a function learned from data*. Next we cover *supervised vs unsupervised 
 
 ## Answering the Opening Questions
 
-- **What exactly is the model learning when we say “machine learning”?**
-  - The article treats What Is Machine Learning? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why is generalization different from scoring well on the training set?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Where does machine learning diverge from statistics and rule-based code?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What exactly does machine learning "learn"?**
+  - In this article, ML is the process of estimating a function from data to produce predictions on new inputs. The `load_iris`, `LogisticRegression`, `fit`, `predict` example makes clear that instead of hand-writing memorized rules, the model learns a decision boundary from `X` and `y`.
+- **Why is generalization a different concept from training performance?**
+  - `model.score(X, y)` shows training data score—how well the model fits samples it has already seen. Generalization asks whether that performance holds on unseen data, which is why separate holdout data and cross-validation must be used together.
+- **Where do statistics, rule-based code, and machine learning diverge?**
+  - Rule-based code has humans writing `if-else` rules directly; ML fills the same role with a function learned from data. Statistics excels at explaining distributions and relationships; ML connects that knowledge into a prediction pipeline that answers new inputs for recommendations, fraud detection, and demand forecasting.
 <!-- toc:begin -->
 ## In this series
 

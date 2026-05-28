@@ -147,13 +147,12 @@ Linear regression is the starting point for every regression task. Next, we move
 
 ## Answering the Opening Questions
 
-- **How does the linear regression equation produce a prediction?**
-  - The article treats Linear Regression as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What does least squares actually minimize?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What does `R^2` explain, and what does it hide?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How does the linear regression formula produce predictions?**
+  - Linear regression computes `y_hat = Xw + b`—multiplying each feature by weight `w` and adding intercept `b`. The NumPy example's `theta = np.linalg.inv(X_b.T @ X_b) @ X_b.T @ y` directly solves for coefficients that best fit the line to data.
+- **What do mean squared error and the least-squares solution minimize?**
+  - MSE squares the difference between actual `y` and predicted `y_hat` then averages—penalizing large errors more heavily. The least-squares solution finds `w` and `b` that minimize this MSE, which is why the warning about outliers heavily affecting scores accompanies it.
+- **What exactly does R-squared explain?**
+  - R² shows the proportion of target variance the model explains. A low `r2_score(yte, pred)` means more than just a bad score—it signals nonlinear patterns or missing features that a single line cannot capture.
 <!-- toc:begin -->
 ## In this series
 

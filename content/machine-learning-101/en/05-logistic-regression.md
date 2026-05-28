@@ -150,13 +150,12 @@ Logistic regression is the foundation of classification. Next, we cover decision
 
 ## Answering the Opening Questions
 
-- **If the output is 0 or 1, why is the model called regression?**
-  - The article treats Logistic Regression as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **The output is 0 or 1, so why is it called "regression"?**
+  - Logistic regression first computes a linear score before assigning class labels, then converts that score to a probability using a continuous function. The final purpose is classification, but internally it handles linear combination and probability estimation—hence "regression" remains in the name.
 - **How does the sigmoid turn a linear score into a probability?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why is `0.5` only a default threshold, not a law?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+  - The formula `σ(z) = 1 / (1 + e^{-z})` compresses any real number `z` to between 0 and 1. `predict_proba(Xte)` shows the model's linear score converted to class-1 probability, with predictions splitting around 0.5 near `z=0`.
+- **Why should 0.5 never be treated as the universal correct threshold?**
+  - As the threshold loop shows, the same probabilities yield different precision and recall depending on whether you cut at 0.3, 0.5, or 0.7. For fraud detection where misses are costly, a threshold below 0.5 may be more appropriate—the cutoff must be determined alongside domain costs.
 <!-- toc:begin -->
 ## In this series
 

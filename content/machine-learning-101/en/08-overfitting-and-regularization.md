@@ -154,13 +154,12 @@ Regularization is a core lever for generalization. Next, we cover proper model e
 
 ## Answering the Opening Questions
 
-- **Which signals separate overfitting from underfitting?**
-  - The article treats Overfitting and Regularization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What does the bias-variance trade-off actually mean in practice?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **What signals distinguish overfitting from underfitting?**
+  - Overfitting shows when training score is high but test score drops significantly; underfitting shows when both are low. As the article emphasized, the key signal is how the two curves diverge—not absolute score values but the gap between them.
+- **What does the bias-variance tradeoff mean?**
+  - Bias is structure the model misses because it is too simple; variance is how much the model fluctuates with data changes. Regularization and more data reduce variance; when underfitting, increasing model capacity or feature representation reduces bias.
 - **How do Ridge, Lasso, and ElasticNet differ?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+  - `Ridge(alpha=1.0)` smoothly shrinks all coefficients via L2 regularization; `Lasso(alpha=0.01)` drives some coefficients to zero, producing feature selection effects. ElasticNet mixes both—a more practical compromise when correlated features make Lasso selection unstable.
 <!-- toc:begin -->
 ## In this series
 

@@ -183,13 +183,12 @@ The failure model is the first design decision; it sets the algorithm and the op
 
 ## Answering the Opening Questions
 
-- **What a failure model is and why we model failure?**
-  - The article treats Failure Models as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The differences between crash, omission, timing, and Byzantine?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why network partition deserves its own category?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What is a failure model and why must failures be modeled?**
+  - A failure model is a contract specifying "how nodes can break." Without this contract, neither algorithm correctness nor cost can be discussed. Assuming only crashes requires 2f+1 nodes; assuming Byzantine requires 3f+1.
+- **How do crash, omission, timing, and Byzantine differ?**
+  - On the spectrum from left to right: crash only stops, omission drops messages, timing becomes arbitrarily slow, and Byzantine can lie. Each level includes the previous and costs escalate sharply.
+- **Why should network partitions be treated as a separate category?**
+  - A partition is a link failure, not a node failure. All nodes can be healthy yet unable to see each other, and independent decisions in this state lead to split-brain. This is exactly the core situation CAP theorem addresses.
 <!-- toc:begin -->
 ## In this series
 

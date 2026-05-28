@@ -191,13 +191,12 @@ Distributed systems differ from single-machine programs along three axes: latenc
 
 ## Answering the Opening Questions
 
-- **The definition of a distributed system and how it really differs from a single machine?**
-  - The article treats What Is a Distributed System? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The meaning of the three axes: latency, failure, and coordination?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Lessons from the eight fallacies of distributed computing?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What exactly is a distributed system and how does it differ from a single-machine program?**
+  - Independent nodes cooperating via messages, where three conditions—latency, partial failure, and clock disagreement—fundamentally differ from single-machine assumptions. The "instant, always available, single clock" assumptions of function calls all break.
+- **Why are latency, failure, and coordination the foundational vocabulary of distributed systems?**
+  - Latency looks like failure, failure detection requires coordination, and coordination adds latency—a circular structure. Without these three axes, no distributed system design decision can be explained.
+- **Why do the 8 fallacies of distributed computing still repeat today?**
+  - Single-machine experience builds intuition, and that intuition unconsciously assumes validity across network boundaries. The only way to break the fallacies is to experience actual failures—or inject them preemptively.
 <!-- toc:begin -->
 ## In this series
 

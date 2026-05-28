@@ -186,13 +186,12 @@ Once logs are *data*, *queries* begin. Next: *distributed tracing*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Structured Logging?**
-  - The article treats Structured Logging as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Structured Logging?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Structured Logging reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why do free-form logs quickly hit limits in operations?**
+  - Free-form logs cannot be parsed. `grep` cannot accurately filter by specific user, error code, or trace ID. Structuring as JSON fields enables index-based queries in Loki or Elasticsearch, gathering relevant logs within 5 minutes during incident response.
+- **What makes structured logs different?**
+  - Three key differences: (1) machine-parseable format, (2) context fields (trace_id, request_id, service) auto-injected, (3) filtering by log labels answers most operational questions without full-text search.
+- **By what criteria should log levels be divided?**
+  - Not by "importance" but by "operational action." ERROR triggers immediate inspection; WARNING triggers a review ticket; INFO serves as dashboard reference. Including level definitions in code review checklists ensures the entire team writes logs to the same standard.
 <!-- toc:begin -->
 ## In this series
 

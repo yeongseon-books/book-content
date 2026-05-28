@@ -176,13 +176,12 @@ SLOs are a *shared language*. Next: *cost and cardinality*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying SLI and SLO Basics?**
-  - The article treats SLI and SLO Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for SLI and SLO Basics?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when SLI and SLO Basics reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What does a service level indicator measure and how?**
+  - An SLI is user experience quantified. Availability is successful response ratio; latency is p99 response time; correctness is correct result ratio. As shown in the Prometheus recording rule, raw metrics must be aggregated into ratios to become meaningful indicators.
+- **What promise does a service level objective create?**
+  - An SLO is a measurable internal promise like "availability ≥ 99.9% over a 30-day rolling window." This promise converts to a concrete error budget number, enabling data-driven decisions between feature shipping and stabilization.
+- **Why does error budget become the balance point between feature development and stabilization?**
+  - As the scenario analysis showed, a 99.9% SLO on 10M monthly requests creates an allowance of 10,000 failures. Deploy while budget remains; freeze when exhausted. Numbers—not gut feeling—make the decision, reducing conflict between dev and ops teams.
 <!-- toc:begin -->
 ## In this series
 

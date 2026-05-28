@@ -147,13 +147,12 @@ A correct split is the prerequisite for every measurement that follows. Next, we
 
 ## Answering the Opening Questions
 
-- **What do the train, validation, and test sets each protect?**
-  - The article treats Train/Test Split as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why should `random_state` be fixed even in small experiments?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How does `stratify` help on imbalanced classes?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What role does each of training set, validation set, and test set play?**
+  - The training set learns model parameters via `fit(Xtr, ytr)`. The validation set tunes hyperparameters and thresholds as an intermediate checkpoint. The test set opens only once at the end to confirm generalization—the final holdout.
+- **Why should `random_state` always be fixed?**
+  - Fixing `train_test_split(..., random_state=42)` ensures the same data split is reproducible. Without a fixed seed, train/test composition changes each run, making it impossible to distinguish model improvement from accidental split variation.
+- **How does `stratify` help with class imbalance?**
+  - `stratify=y` maintains the original class ratios in both train and test splits. Especially for problems with rare positives, it prevents splits where positives nearly vanish from one side—making test scores better reflect actual operational distributions.
 <!-- toc:begin -->
 ## In this series
 

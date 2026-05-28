@@ -149,13 +149,12 @@ Clustering exposes hidden structure. Next, we examine overfitting and regulariza
 
 ## Answering the Opening Questions
 
-- **Without labels, how do you judge whether the clusters are any good?**
-  - The article treats Clustering as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **When should you prefer KMeans over DBSCAN?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How do you choose `K` without pretending the metric picks it for you?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Without ground-truth labels, how do you judge whether clusters are good?**
+  - The article used KMeans `inertia_` and `silhouette_score(X, km.labels_)` together without stopping at a single number. Since clustering has no ground truth, after checking cohesion and separation metrics, visualization and domain interpretation must confirm whether groupings carry real meaning.
+- **When should KMeans and DBSCAN be used differently?**
+  - KMeans requires specifying `n_clusters=3` upfront and groups samples near centroids—works well for roughly spherical clusters. DBSCAN examines density via `eps` and `min_samples`, labels outliers as `-1`, and handles irregular cluster shapes and noisy data more naturally.
+- **By what criteria should K be determined?**
+  - The article recommends not fixing K arbitrarily but examining both the Elbow curve and Silhouette scores. When they disagree, do not follow mathematical scores alone—also consider whether that cluster count can be explained as customer segments or operational policies.
 <!-- toc:begin -->
 ## In this series
 

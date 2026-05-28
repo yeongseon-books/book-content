@@ -155,13 +155,12 @@ Evaluation is the language of model selection. Next, we close the series with th
 
 ## Answering the Opening Questions
 
-- **Which metrics belong to classification versus regression?**
-  - The article treats Model Evaluation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What does each cell of the confusion matrix tell you operationally?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **When should PR outrank ROC in your analysis?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Which metrics should be used when in classification?**
+  - Classification should not end with accuracy alone—`classification_report`, `roc_auc_score`, and `average_precision_score` must be chosen by problem characteristics. When false positive cost is high, prioritize precision; when false negative cost is high, prioritize recall; with severe class imbalance, PR-AUC may be more honest than ROC-AUC.
+- **How should MAE, MSE, RMSE, and R-squared be read separately in regression?**
+  - MAE shows average absolute error magnitude; MSE and RMSE are more sensitive to large errors. R² is a proportion of explained variance rather than an error unit, so regression evaluation typically needs error metrics like MAE or RMSE alongside it for balance.
+- **What structure does a confusion matrix reveal?**
+  - A confusion matrix's four cells—TP, FP, FN, TN—immediately show what types of failures occurred and how many. Reading "are we missing more, or false-alarming more" first is what enables proper threshold and operational policy adjustment.
 <!-- toc:begin -->
 ## In this series
 

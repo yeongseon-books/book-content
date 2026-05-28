@@ -186,13 +186,12 @@ A small team's first stack must be *replaceable*. From here: *incident response*
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying A Production-Ready Observability Stack?**
-  - The article treats A Production-Ready Observability Stack as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for A Production-Ready Observability Stack?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when A Production-Ready Observability Stack reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What does a minimal observability stack look like for a small team to start immediately?**
+  - A single Docker Compose can run Prometheus + Loki + Tempo + Grafana + OTel Collector. Five components create an environment that collects all three signals—metrics, logs, traces—and enables correlated analysis.
+- **Why is placing the OpenTelemetry Collector at the center advisable?**
+  - Applications only need to export via one protocol: OTLP. The collector handles routing to backends (Prometheus, Loki, Tempo, Jaeger), so backend replacements require no application code changes. Sampling, filtering, and transformation can all be handled in collector configuration, increasing operational flexibility.
+- **What is needed to connect metrics, logs, and traces on a single screen?**
+  - In Grafana's Explore view, searching by trace ID surfaces the trace alongside associated logs and metrics from that timepoint. This requires inserting trace_id fields into logs and configuring Grafana data source connections—Loki→Tempo and Tempo→Prometheus via derived fields and exemplars.
 <!-- toc:begin -->
 ## In this series
 

@@ -182,13 +182,12 @@ Without cost awareness, *observability becomes the enemy*. Next: *a production-r
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Cost and Cardinality?**
-  - The article treats Cost and Cardinality as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Cost and Cardinality?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Cost and Cardinality reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why is cardinality directly linked to cost?**
+  - As confirmed in the cost estimation formula, time-series count is the primary cost variable. Adding one label that increases cardinality 100× also increases storage, query, and indexing costs 100×. Metrics are not free—label design is cost design.
+- **Why should retention periods be tiered?**
+  - Real-time debugging needs 15-second resolution, but trend analysis from 6 months ago needs only 1-hour resolution. Tiered retention maintains the same information while saving 90%+ storage. Recording rules and downsampling automatically build this layer structure.
+- **How do head sampling and tail sampling differ?**
+  - Head sampling decides probabilistically at request start—simple to implement but can miss important traces. Tail sampling decides after trace completion based on conditions like errors or latency—storing only high-value traces relative to cost. For cost optimization, tail sampling is more effective.
 <!-- toc:begin -->
 ## In this series
 

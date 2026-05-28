@@ -180,13 +180,12 @@ Question-driven dashboards change *decision speed*. Next: *alerts and on-call*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Dashboard Design?**
-  - The article treats Dashboard Design as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Dashboard Design?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Dashboard Design reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What distinguishes a good dashboard from wallpaper?**
+  - A good dashboard answers questions. "Is the service healthy right now?", "If it slowed down, where should I dig?", "Did something break after deploy?"—answerable within 30 seconds makes it good. Wallpaper has many numbers but drives no action.
+- **What questions do RED and USE patterns each answer?**
+  - RED answers "what quality are users experiencing?"—Rate, Errors, Duration. USE answers "what state are internal system resources in?"—Utilization, Saturation, Errors. First screen RED, second screen USE is the practical standard.
+- **Why should you view distributions instead of averages?**
+  - If a service averages 100ms but 1% of requests take 5 seconds, the average shows ~150ms while 1% of users suffer 5 seconds. Percentiles (p95/p99) and heatmaps catch these long tails that averages hide.
 <!-- toc:begin -->
 ## In this series
 

@@ -155,13 +155,12 @@ Congratulations — you finished Machine Learning 101. Continue with Model Evalu
 
 ## Answering the Opening Questions
 
-- **Why do so many ML projects fail even after promising offline scores?**
-  - The article treats The ML Project Workflow as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why should problem definition, data, modeling, deployment, and monitoring be treated as one loop?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How does `Pipeline` protect you from preprocessing leakage?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why do many ML projects fail at deployment even with high accuracy?**
+  - The article locates failure causes in stages before and after the model score. Even if `pipe.score(Xte, yte)` is high in a notebook, weak problem definition, unreproducible `model.joblib`, or ignoring post-deployment drift can all cause production collapse.
+- **Why must problem definition, data, model, deployment, and monitoring be viewed as a single loop?**
+  - The article explains seven stages from problem definition through monitoring not as a one-time line but as a repeating loop. Drift signals from the last stage change data collection and retraining criteria, so separating front-end from back-end prevents timely reversal of quality degradation during operations.
+- **Why is `Pipeline` the key tool for preventing preprocessing leakage?**
+  - `Pipeline([("scaler", StandardScaler()), ("clf", LogisticRegression(...))])` bundles preprocessing and model into one object, ensuring transformations used during training reproduce exactly during inference. This prevents leakage from scaling spread across notebook cells and makes the deployment path through `joblib.dump` and reload more stable.
 <!-- toc:begin -->
 ## In this series
 

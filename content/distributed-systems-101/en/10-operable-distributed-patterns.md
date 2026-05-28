@@ -207,13 +207,12 @@ Every tool in distributed systems eventually converges on operability. One sente
 
 ## Answering the Opening Questions
 
-- **How to isolate failure with bulkheads?**
-  - The article treats Patterns for Operable Distributed Systems as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How to break cascade failures with a circuit breaker?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How to safely refuse load with backpressure?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How can bulkheads isolate failures?**
+  - Separating connection pools or semaphores by domain ensures that when one dependency saturates, other dependencies' concurrency slots remain intact. Splitting `pool_payment` and `pool_search`, or semaphore-based bulkheads where `payment_bulk` filling up leaves `search_bulk` unaffected—isolation boundaries are resources, not code.
+- **How does a circuit breaker cut cascading failures?**
+  - When consecutive failures exceed a threshold, it transitions to OPEN state and fails subsequent calls immediately. This stops loading a slow upstream with additional requests and prevents caller threads from blocking. After cool-down, HALF_OPEN sends a few probe requests to confirm recovery before returning to CLOSED. As shown in the runbook, if auto-recovery fails, escalation to manual reset or degradation tier switching follows.
+- **When should backpressure safely reject load?**
+  - When queue depth exceeds MAX, or when token bucket tokens are exhausted—reject immediately. The "rejected" response and rate limiter's 429 response serve this purpose. The key insight: "fast rejection" is better for overall system stability than "silently slowing down." Combined with degradation policy, critical tier traffic is maintained while nice-to-have tier is shed first.
 <!-- toc:begin -->
 ## In this series
 

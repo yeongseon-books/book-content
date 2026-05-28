@@ -187,13 +187,12 @@ Observability is the discipline of *asking inside from outside*. Next we look de
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Is Observability??**
-  - The article treats What Is Observability? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Is Observability??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Is Observability? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do observability and monitoring differ?**
+  - Monitoring attaches alerts to pre-determined questions (Is CPU up? Any errors?). Observability is the ability to infer internal state from external signals even when facing a never-before-seen failure.
+- **What questions do metrics, logs, and traces each answer?**
+  - Metrics show trends, logs show specific event context, and traces show the full path a request traversed. Each answers a different question.
+- **Why must all three signals be viewed together?**
+  - Because any single signal is incomplete. Metrics alone cannot reveal causes; logs alone cannot show the full picture; without traces, you cannot follow paths across distributed systems.
 <!-- toc:begin -->
 ## In this series
 

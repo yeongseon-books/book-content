@@ -191,13 +191,12 @@ The three signals are tools with *different boundaries*. Next we look at *collec
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Metrics, Logs, and Traces?**
-  - The article treats Metrics, Logs, and Traces as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Metrics, Logs, and Traces?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Metrics, Logs, and Traces reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What questions do metrics, logs, and traces each answer?**
+  - Metrics answer trends, logs answer event context, and traces show the entire request path. A few metrics or a single log line remains incomplete.
+- **How do the data shapes of the three signals differ?**
+  - Metrics are numeric time-series only; logs carry contextual key-value data; traces maintain flow continuity across services. Each shape determines what questions can be asked.
+- **Where do cardinality and cost grow?**
+  - More labels create more metric series, and more series means higher processing cost. Longer retention also multiplies cost. Design with cost in mind from the start and keep label count minimal.
 <!-- toc:begin -->
 ## In this series
 

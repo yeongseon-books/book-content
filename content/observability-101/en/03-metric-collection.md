@@ -182,13 +182,12 @@ Once metrics flow, *the system speaks in graphs*. Next: *structured logging*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Collecting and Visualizing Metrics?**
-  - The article treats Collecting and Visualizing Metrics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Collecting and Visualizing Metrics?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Collecting and Visualizing Metrics reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How are metrics collected and turned into graphs?**
+  - Applications accumulate counter, gauge, and histogram values in memory; a collection agent or time-series DB pulls those values on a fixed interval, storing them with timestamps and labels. Querying stored timestamp-value-label tuples with PromQL produces dashboard graphs.
+- **How do pull and push approaches differ?**
+  - Pull has Prometheus periodically scraping `/metrics` endpoints—the collector controls scrape interval and service discovery. Push has the application sending values to StatsD, OTel Collector, or Pushgateway—suited for short-lived jobs or workloads beyond the network perimeter. The choice follows workload character: long-lived services vs short-lived tasks.
+- **What role does the `/metrics` endpoint play?**
+  - `/metrics` is the standard touchpoint where the application exposes current counter and gauge values in Prometheus exposition format. This endpoint lets collectors fetch metrics with a single HTTP GET without additional SDK integration—whether implemented as a sidecar or library, the same collection pipeline works.
 <!-- toc:begin -->
 ## In this series
 

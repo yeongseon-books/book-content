@@ -187,13 +187,12 @@ The consistency model is the most important tradeoff axis once data is distribut
 
 ## Answering the Opening Questions
 
-- **The many meanings of consistency (different from the C in transactions)?**
-  - The article treats Consistency and CAP as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The spectrum from linearizable to sequential to causal to eventual?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The CAP theorem and the misunderstandings around it?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What exactly is "consistency" here, and how does it differ from the C in transactions?**
+  - Here, consistency means "how alike are the values replicas show." ACID's C means "are invariants maintained before and after a transaction." The two concepts share only a name—the problems they address are different.
+- **What spectrum do linearizable, sequential, causal, and eventual form?**
+  - Moving left: stronger and more expensive. Linearizable makes the entire system appear to operate on a single timeline; eventual converges given sufficient time. Causal sits between them as a practical compromise preserving only causal relationships.
+- **What does CAP theorem say, and where is it commonly misunderstood?**
+  - CAP states "during a partition, you cannot simultaneously maintain perfect consistency and availability." The most common misunderstanding is "pick 2 of 3"—in reality P is not a choice but a fact, so it is a choice between C and A. This choice can also differ per endpoint, not system-wide.
 <!-- toc:begin -->
 ## In this series
 

@@ -192,13 +192,12 @@ Consensus is the hardest problem in distributed systems, and Raft is its human-f
 
 ## Answering the Opening Questions
 
-- **The definition of the consensus problem and its safety/liveness properties?**
-  - The article treats Consensus and Raft as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The three roles in Raft (leader, follower, candidate)?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The meaning of term, log, index, and commit?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What is the consensus problem, and what safety and liveness properties does it have?**
+  - Consensus is the problem of making multiple nodes share decisions in the same order despite partial failures and latency. Safety means committed logs never disappear and two leaders never simultaneously confirm writes. Liveness means if a majority is alive, a new leader is eventually elected and writes progress.
+- **How are Raft's three roles—leader, follower, candidate—distinguished?**
+  - Follower is the default state receiving heartbeats. When heartbeats stop, it transitions to candidate and starts an election. The candidate winning majority votes becomes leader, accepting and replicating all writes.
+- **What do term, log, index, and commit each mean?**
+  - Term is the leadership generation number; log is the ordered list of state-change entries; index is the log position number. Commit is the promise that majority replication has made an entry "undeletable"—only committed entries are applied to the state machine.
 <!-- toc:begin -->
 ## In this series
 
