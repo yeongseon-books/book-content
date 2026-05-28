@@ -159,13 +159,12 @@ Probability is the native language of ML. The next steps are Linear Algebra 101 
 
 ## Answering the Opening Questions
 
-- **Where probability is hiding inside common machine learning workflows?**
-  - The article treats Probability in Machine Learning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why cross-entropy and negative log-likelihood point to the same idea?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What a classifier score like 0.8 should mean before you trust it?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Where exactly is probability hidden in machine learning?**
+  - It hides in loss functions. Cross-entropy is negative log-likelihood, and MSE is MLE under Gaussian error assumptions. Regularization terms reflect prior distributions. Model output reads as conditional probability p(y|x), and generative models learn the data distribution itself. Probability is not ML's periphery but its skeleton.
+- **Why do cross-entropy and negative log-likelihood point in the same direction?**
+  - In binary classification, expanding cross-entropy `-[y log p + (1-y) log(1-p)]` yields exactly the negative log-likelihood of a Bernoulli distribution. Minimizing CE is equivalent to maximizing data likelihood. In multi-class settings, categorical NLL matches categorical CE as well.
+- **What does the 0.8 a classification model outputs mean?**
+  - It is an estimate of p(y=1|x)=0.8 in the model's learned conditional world. However, for this value to match actual 80% frequency, the model must be calibrated. An uncalibrated 0.8 can rank but is risky for cost-based decisions. Calibrating with Platt Scaling or Isotonic Regression before use is the practical standard.
 <!-- toc:begin -->
 ## In this series
 

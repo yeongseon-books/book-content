@@ -242,13 +242,12 @@ Static and dynamic are not better and worse — they are tradeoffs. In the final
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Static vs Dynamic Languages?**
-  - The article treats Static vs Dynamic Languages as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Static vs Dynamic Languages?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Static vs Dynamic Languages reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What is the shortest definition of static vs. dynamic?**
+  - Static is a model where type checking happens before execution; dynamic is a model where type issues surface during actual execution as values flow. The example where `mypy` blocks `add("1", "2")` beforehand versus `total([data])` failing only at runtime shows this difference most concisely.
+- **How is the same code verified differently under the two models?**
+  - Code with clear internal contracts like the `Item` dataclass and `total(items: list[Item])` becomes a static-checking target from the call site, but values from outside like JSON must pass runtime validation via `parse_item` to become safe internal types. In practice, narrowing dynamically at boundaries then inferring and refactoring statically inside follows naturally.
+- **What can mypy or pyright catch, and what can't they?**
+  - Checkers catch type contradictions visible in code: the difference between `add(1, 2)` and `add("1", "2")`, structural contracts like `Protocol`-satisfying `Book.price`, and public function signature mismatches. Conversely, actual values inside `dict[str, Any]` from `json.loads`, external data that bypassed boundary validation, and problems hidden behind excessive `Any` cannot be fully known before execution.
 <!-- toc:begin -->
 ## In this series
 

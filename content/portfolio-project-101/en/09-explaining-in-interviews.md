@@ -364,13 +364,12 @@ This reframes "I don't know" as "I haven't had that experience, but I know how t
 
 ## Answering the Opening Questions
 
-- **What do interviewers usually want to hear before they care about implementation detail?**
-  - The article treats Explaining in Interviews as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why is the STAR structure especially useful for short project answers?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How do numbers and trade-offs change the credibility of the answer?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What do interviewers want to hear more than code volume?**
+  - Interviewers want to hear what problem you understood and what criteria drove your decisions, not how much code you wrote. Answers where the judgment process is audible are strongest.
+- **Why is the STAR structure particularly powerful in short answers?**
+  - STAR arranges Situation-Task-Action-Result in order matching the interviewer's comprehension flow. Even finishing in two minutes, structure makes value transmit.
+- **How do numbers and tradeoffs change an answer's persuasiveness?**
+  - "Performance improved" is subjective, but "280ms down to 120ms" is evidence. Stating tradeoffs alongside signals "I truly understood and chose."
 <!-- toc:begin -->
 ## In this series
 

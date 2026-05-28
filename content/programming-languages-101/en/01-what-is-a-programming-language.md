@@ -202,13 +202,12 @@ A programming language is at once a way to instruct a machine and a frame that c
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Is a Programming Language??**
-  - The article treats What Is a Programming Language? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Is a Programming Language??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Is a Programming Language? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why do we use high-level languages instead of machine code?**
+  - The assembly example handled `mov`, `add`, and registers directly, while the Python example expressed the same calculation as `total = 3 + 4` using just names and operations. High-level languages, thanks to this abstraction, are tools that let you think about problem structure, state, and responsibility before machine instructions.
+- **What abstractions does a programming language provide exactly?**
+  - The abstractions shown in this article are: the variable name `total`, loops and conditionals, objects like `EvenDoubler.total()`, function composition like `reduce` and `filter`, and declarative queries like SQL's `SELECT SUM(n*2)`. Languages use these devices to hide detailed machine operations and let people re-express problems in human-manageable units.
+- **What changes when you solve the same problem imperatively, object-oriented, functionally, and declaratively?**
+  - The imperative example exposed procedure with `for` and `total += n * 2`; the OO example bundled data and computation responsibility inside `EvenDoubler`; the functional example foregrounded data flow with `filter` and `reduce`; and the declarative example stated only the desired result in SQL, leaving execution planning to the DBMS.
 <!-- toc:begin -->
 ## In this series
 

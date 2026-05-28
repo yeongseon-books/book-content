@@ -149,13 +149,18 @@ Random variables are the bridge from probability to numeric analysis. The next e
 
 ## Answering the Opening Questions
 
-- **Why random variables are more expressive than raw events?**
-  - The article treats Random Variables as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How discrete and continuous variables differ?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What PMF, PDF, and CDF each answer?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why are random variables one level more powerful than events?**
+  - Events alone only state "3 came up," but defining `X = die face` as a random variable lets you immediately ask numeric questions like mean 3.5, variance ~2.92, and `P(X≤4)`.
+  - Real-world observations like web server response time, user ratings, and A/B test conversion rates—when modeled as random variables—connect mean, variance, percentile, and confidence interval in a single language.
+  - Indicator random variables show the same power. In the birthday problem, introducing `I_ij` allowed computing the expected number of same-birthday pairs as `C(n,2) × 1/365`.
+- **What distinguishes discrete from continuous random variables?**
+  - Discrete variables take countable values like die faces or visitor counts, so probabilities are computed as PMF sums. In the Poisson example, `P(X=3)=0.2240` is a directly readable point probability.
+  - Continuous variables take values over intervals like height or response time, so the PDF is only a density. In the normal distribution example, `PDF at 170 = 0.0399` but `P(X=170)=0`, and actual probability was computed as an interval: `P(160≤X≤180)=0.6827`.
+  - The CDF gives `P(X≤x)` for both, but the shapes differ: step function for discrete, smooth curve for continuous.
+- **What question does each of PMF, PDF, and CDF answer?**
+  - PMF answers "what is the probability of exactly x?" In the Poisson distribution, `P(X=0)=0.0498` and `P(X=3)=0.2240` are examples.
+  - PDF shows "how densely are values concentrated around that point." The normal distribution's `pdf(170)` is density, and probability was computed as an interval: `cdf(180)-cdf(160)`.
+  - CDF answers "what is the probability of x or less?" `P(X≤3)=0.6472`, `P(-1≤X≤1)=F(1)-F(-1)`, and finding the 95th percentile via `ppf(0.95)` all operate around the CDF.
 <!-- toc:begin -->
 ## In this series
 

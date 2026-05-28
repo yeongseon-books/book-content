@@ -230,13 +230,12 @@ The memory model answers "who holds it, when do they let go?" Next we look at th
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Memory Management?**
-  - The article treats Memory Management as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Memory Management?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Memory Management reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do stack and heap differ?**
+  - The stack is a region where frames appear with function calls like `work()` and disappear at return time; the heap is where objects like `bytearray(1024)` reside and live as long as references remain. So a function ending alone does not automatically explain heap object lifetime—you must separately check who still holds a reference.
+- **When does Python's reference counting immediately free an object?**
+  - After references increase with `t = Tag(); ref = t`, when all references disappear via `del ref, t`, CPython can execute `__del__` immediately when the reference count hits 0. Combined with the explanation that `sys.getrefcount(t)` appears 1 higher due to the function argument, you get a sense of when immediate cleanup occurs.
+- **Why do circular references require a separate garbage collector?**
+  - Objects pointing only at each other like `a.peer = b` and `b.peer = a` never reach reference count 0 even after deleting external names, so reference counting alone cannot reclaim them. That is why a tracing collector like `gc.collect()` is needed, and the `cache[i] = b"x" * 1024` example shows that even with GC, objects stay alive as long as references remain.
 <!-- toc:begin -->
 ## In this series
 

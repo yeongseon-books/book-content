@@ -456,12 +456,12 @@ The advantage is that dependency versions, OS, and runtime differences are all i
 
 ## Answering the Opening Questions
 
-- **Why is a public URL close to mandatory for a portfolio project?**
-  - Without a URL, the reviewer cannot verify the project independently. A portfolio becomes evidence only when another person can inspect the result without the author present.
-- **What should you optimize for when choosing a hosting platform?**
-  - Simplicity, cost sustainability, and redeploy speed. A platform you can afford to keep running and update easily is better than one that sounds impressive but costs too much to maintain.
-- **Why should secrets and environment configuration live outside the codebase?**
-  - Public repositories are visible to everyone. Secrets in code are security incidents waiting to happen. Separation also enables distinct local/test/production configurations from the same codebase.
+- **Why is a public URL nearly essential for a portfolio project?**
+  - Code that only works locally is not evidence. A public URL lets reviewers verify directly, and only then does it read as a completed project.
+- **What criteria should guide hosting platform choice over flashiness?**
+  - Repeatability, low cost, and operational simplicity are the criteria. Whether you can redeploy with the same procedure matters more than fancy infrastructure.
+- **Why should secrets and environment variables be managed in the deployment environment, not in code?**
+  - Putting secrets in code exposes them when the repository goes public. Separating them into environment variables in the deployment environment secures both security and operational flexibility.
 <!-- toc:begin -->
 ## In this series
 

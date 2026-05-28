@@ -213,13 +213,12 @@ This series ends here. Suggested next reading paths: [compilers-101](../../compi
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Makes a Good Language Design??**
-  - The article treats What Makes a Good Language Design? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Makes a Good Language Design??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Makes a Good Language Design? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What axes should you evaluate when looking at language design?**
+  - This article proposed evaluating good language design across five axes: consistency, simplicity, expressiveness, safety, and performance. The section placing Python, Go, and Rust in one table comparing memory management, execution model, type system, object model, and function support is how these axes become practical evaluation tools.
+- **Why do consistency, simplicity, expressiveness, safety, and performance conflict with each other?**
+  - Python's list comprehensions boost expressiveness but can add rule burden for first-time readers; Rust's `Option<&i32>` increases safety but necessarily adds syntax and concepts that must be handled. The core point repeated throughout is that raising one axis brings cost to others, so good design honestly reveals priorities rather than pursuing balance.
+- **Why do Python, Go, and Rust give different answers to the same problem?**
+  - Even just the `total_len` example shows Python weights concise expressiveness, Go weights explicitness and operational simplicity, and Rust weights safety through types and ownership. The comparison table further shows Python choosing gradual typing with interpreter + bytecode, Go choosing simple static typing with AOT, and Rust choosing rich static typing with ownership—these are different design answers to the same problems.
 <!-- toc:begin -->
 ## In this series
 

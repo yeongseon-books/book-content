@@ -370,13 +370,12 @@ Misaligned messaging across channels confuses visitors. For example, if your res
 
 ## Answering the Opening Questions
 
-- **What are the most important areas to check before sharing a project publicly?**
-  - The article treats Portfolio Improvement Checklist as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why should README, demo, code, story, and publishing links be reviewed separately?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Where do the author's assumptions usually diverge most from a first-time visitor’s experience?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What key areas should you check last before publishing?**
+  - Start with README and demo. Code refactoring matters too, but if visitors cannot understand the project, they have no motivation to read the code.
+- **Why should README, demo, code, narrative, and public channels be reviewed separately?**
+  - Each area has different quality criteria. Demo checks functionality, code checks test status, narrative checks consistency. Reviewing everything at once misses things that become visible when separated by area.
+- **Where do the author's perspective and a first-time visitor's perspective diverge most?**
+  - Authors fill in gaps mentally because they know the context, but visitors see only what is visible. Outdated run commands in the README, broken demo links, and unexplained screenshots are typical examples. Showing a colleague for just 3 minutes reveals these immediately.
 <!-- toc:begin -->
 ## In this series
 

@@ -223,13 +223,12 @@ Scope is the region a name is visible in; binding is the act of attaching a valu
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Scope and Binding?**
-  - The article treats Scope and Binding as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Scope and Binding?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Scope and Binding reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What exactly differentiates scope from binding?**
+  - Binding is the act of connecting a name to a value; scope is the range determining where that connection is visible. The reason the same name `x` could bind to `"global"`, `"enclosing"`, and `"local"` in the example is that binding and scope work together.
+- **How do lexical scope and dynamic scope change the result?**
+  - Even when `show()` is called inside `caller()`, it printed the outer `y = "outer"` instead of `y = "inner"` because Python uses lexical scope—resolving names based on definition site. Under dynamic scope, it would follow the call path and read `caller()`'s `y`, producing different results from the same code.
+- **Why is shadowing—reusing a name in an inner scope—dangerous?**
+  - `sum = 0` shadows the built-in `sum(...)` making the original tool unusable within that function, and writing `print(x)` before `x = 2` in a function triggers `UnboundLocalError`. A single inner assignment changes name resolution for the entire function, making shadowing more dangerous in large code than short examples.
 <!-- toc:begin -->
 ## In this series
 

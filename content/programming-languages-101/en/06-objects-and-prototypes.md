@@ -217,13 +217,12 @@ Objects bundle state and behavior; the two models are different ways of building
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Objects and Prototypes?**
-  - The article treats Objects and Prototypes as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Objects and Prototypes?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Objects and Prototypes reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What is the simplest definition of an object?**
+  - In this article, an object is defined as state and behavior bundled into one unit. The `User` example holding `name`, `age`, `greet()` together, and the closure-based `make_user` bundling `name` and `greet`, show that the essence of objects lies in the bundling itself rather than the class keyword.
+- **How does method lookup differ between class-based and prototype-based models?**
+  - In the class-based model, `B().hi()` climbs `B.__mro__` order through parent classes to find `A.hi`, and `super()` also moves to the next MRO entry. In the prototype-based model, `lookup(inst, "hi")` delegates along the `__proto__` chain from object to object, so the lookup reference is individual objects rather than classes.
+- **What does it mean that in Python, classes themselves are objects?**
+  - As `type(A)` returning `<class 'type'>` shows, Python classes are not declarations that exist only as definition syntax but actual runtime objects. That is why you can attach attributes like `A.tag = "v1"` to classes or adjust behavior through metaprogramming.
 <!-- toc:begin -->
 ## In this series
 

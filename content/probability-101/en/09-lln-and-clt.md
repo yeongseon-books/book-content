@@ -160,13 +160,12 @@ The LLN gives convergence; the CLT gives shape. The final episode wraps everythi
 
 ## Answering the Opening Questions
 
-- **Why sample means stabilize as the sample grows?**
-  - The article treats Law of Large Numbers and CLT as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How the LLN and CLT answer different questions?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why standard error is not the same thing as standard deviation?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why does the sample mean stabilize as sample size grows?**
+  - The law of large numbers guarantees it. The mean of i.i.d. samples converges to the population mean μ as n grows. The standard error shrinks as 1/√n, making fluctuations progressively smaller.
+- **What differs between the law of large numbers and the central limit theorem?**
+  - LLN says "where it goes" (destination); CLT says "how it fluctuates" (shape of error). LLN describes convergence; CLT describes the probability distribution of the convergence process.
+- **How does standard error differ from standard deviation?**
+  - Standard deviation is the distance of individual data from the mean; standard error is the distance of the sample mean from the population mean. SE = σ/√n, so quadrupling n halves SE.
 <!-- toc:begin -->
 ## In this series
 

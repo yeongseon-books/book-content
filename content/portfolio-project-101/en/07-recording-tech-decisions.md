@@ -381,13 +381,12 @@ This approach keeps the history transparent. In interviews, you can show the ful
 
 ## Answering the Opening Questions
 
-- **Why do technical choices usually stay invisible if you only show code?**
-  - The article treats Recording Tech Decisions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How do alternatives and consequences make a project more persuasive?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How lightweight can an ADR be and still be useful?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why don't technology choice reasons show up sufficiently through code alone?**
+  - Code only shows "what was built." "Why this was chosen" disappears without decision records. Reviewers are more curious about the judgment process than the result.
+- **What persuasiveness do alternative comparisons and outcome records add?**
+  - Alternatives give weight to a choice. Saying "I just picked it" without comparison is unpersuasive, but showing two or three candidates alongside criteria reveals judgment ability.
+- **Can an ADR be meaningful even when started very lightly?**
+  - Context, alternatives, decision, and outcome—four lines are enough. Structure matters, not length. Even short, the very fact that you recognized tradeoffs is strong evidence.
 <!-- toc:begin -->
 ## In this series
 

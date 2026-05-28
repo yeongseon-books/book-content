@@ -452,13 +452,12 @@ The goal is simple: whether the reviewer clicks live, watches video, or opens GI
 
 ## Answering the Opening Questions
 
-- **Why is the first screen the most important part of a portfolio demo?**
-  - The article treats Building the Demo as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What do seed data and a shared demo account solve?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What role does a backup video play when the live demo is not enough?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why is the demo's first screen the most important evaluation point?**
+  - Visitors judge the project's value on the first screen. If the first screen is empty or behind a login wall, they leave without checking even brilliant internal logic. Seed data and guest accounts must make the core feature immediately experienceable.
+- **What problems do seed data and shared accounts solve?**
+  - Seed data solves the empty-screen problem, and shared accounts remove the login barrier. Both are tools for creating a state where visitors can see core functionality without any preparation.
+- **What is the role difference between a live demo and a backup video?**
+  - A live demo proves real-time interaction but carries outage risk. A backup video is stable but non-interactive. Using both ensures the demo is delivered regardless of circumstances.
 <!-- toc:begin -->
 ## In this series
 

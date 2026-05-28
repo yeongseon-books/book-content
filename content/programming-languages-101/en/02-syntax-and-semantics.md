@@ -246,13 +246,12 @@ Syntax is the question of legality. Semantics is the question of meaning. Splitt
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Syntax and Semantics?**
-  - The article treats Syntax and Semantics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Syntax and Semantics?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Syntax and Semantics reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Where exactly is the boundary between syntax and semantics?**
+  - Everything up to where `ast.parse("total = 3 +")` immediately raises a `SyntaxError` is the syntax stage; from where `divide(10, 0)` is syntactically legal but fails during execution, that is the semantics stage. The example of attaching `evaluate` and `evaluate_strange` to the same AST clearly separates the two layers.
+- **In what order do tokens, grammar, and AST connect?**
+  - `tokenize("3 + 4 * 2")` first produces a token list like `('NUM', '3')`, `('OP', '+')`, then the parser follows grammar rules `expr -> term -> factor` to build the tree `('+', 3, ('*', 4, 2))`. Only then does the evaluator read this AST to compute the actual value 11—tokenization and parsing are preparatory work for the syntax stage.
+- **Why can code that is syntactically legal still behave differently from intent?**
+  - Syntax correctness only guarantees sentence form, not that the code will be interpreted with our expected meaning. Applying the normal evaluator to `('+', 3, ('*', 4, 2))` gives 11, but `evaluate_strange` treating `+` as multiplication gives 24—the example shows this difference.
 <!-- toc:begin -->
 ## In this series
 

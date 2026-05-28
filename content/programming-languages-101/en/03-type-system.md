@@ -228,13 +228,12 @@ A type system gives you safety, documentation, and tooling at the same time. Not
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Type Systems?**
-  - The article treats Type Systems as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Type Systems?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Type Systems reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What role do types play exactly?**
+  - A signature like `discount(price: int, rate: float) -> float` writes the call contract into code, letting `mypy` block incorrect calls before execution. The `LineItem` and `parse_line_item` examples show that narrowing to more specific domain types inside boundaries provides both safe computation and tool support.
+- **What do static and dynamic types check and when?**
+  - Static typing catches incorrect calls like `discount("1000", 0.1)` before code runs via the checker; dynamic typing reveals errors only when the execution path reaches that point. However, since external input still needs runtime validation, the article showed a flow where `parse_line_item` verifies values first, then `subtotal` trusts the concrete type inside.
+- **Why are strong and weak typing a different axis?**
+  - Static/dynamic is about when checking occurs; strong/weak is about how much implicit conversion is allowed—they address different questions. A static language can be weak, and a dynamic language can be strong. The article organized this distinction separately from type inference, unions, and generics.
 <!-- toc:begin -->
 ## In this series
 

@@ -379,12 +379,12 @@ These metrics help you determine "is the title the problem, the content, or the 
 
 ## Answering the Opening Questions
 
-- **Why does a problem-first structure work better than a code-first structure in technical writing?**
-  - Code listing without context gives readers no reason to read. Presenting "what problem and why solved this way" first gives readers motivation to look at the code. Structure matches reader curiosity: they need to understand the problem before they can evaluate the solution.
-- **How should code excerpts and repository links divide responsibility?**
-  - The post body keeps only the critical code needed to support explanation. Full implementation lives in the repository link. This way the article's flow stays unbroken while readers can still access the complete code.
-- **Why do numbers make a blog post more persuasive?**
-  - "Performance improved" is subjective and forgettable. "280ms to 120ms" is concrete and verifiable. Metrics make results stick in memory and raise the post's credibility from opinion to evidence.
+- **Why does converting a project to a blog post require a problem-centric structure?**
+  - Code listings alone give readers no context. Presenting "what problem was solved and why this way" first gives readers a reason to look at the code.
+- **How should code excerpts and repository links divide their roles?**
+  - Keep only essential code needed for explanation in the post body, and export the full implementation to a repository link. This keeps the post's flow unbroken while letting readers access the complete code.
+- **Why does leaving results in numbers increase a post's persuasiveness?**
+  - "Performance improved" is subjective and forgettable. "280ms down to 120ms" conveys results concretely and raises the post's credibility.
 <!-- toc:begin -->
 ## In this series
 

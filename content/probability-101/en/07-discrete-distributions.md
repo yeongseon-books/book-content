@@ -145,13 +145,18 @@ Discrete distributions are the priors of count modeling. The next episode covers
 
 ## Answering the Opening Questions
 
-- **Why a single 0/1 trial starts with Bernoulli?**
-  - The article treats Discrete Distributions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **When repeated successes turn into Binomial?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why waiting for the first success leads to Geometric?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why does a single 0-or-1 experiment start with the Bernoulli distribution?**
+  - The Bernoulli distribution is the smallest probability model where the only possible outcomes are success and failure—0 and 1. The table shows that fixing a single parameter `p` immediately determines `E[X]=p` and `Var(X)=p(1-p)`.
+  - It directly represents a single 0/1 experiment like a click or conversion, becoming the building block for the binomial distribution. The article explained the binomial as repeated Bernoulli trials.
+  - An A/B test conversion rate viewed per user is a Bernoulli trial, and collecting those successes elevates to a binomial distribution.
+- **When does the count of successes across multiple trials become binomial?**
+  - When the number of trials `n` is fixed, each trial is independent, and each has the same success probability `p`, the success count follows a binomial distribution. The PMF `C(n,k)p^k(1-p)^(n-k)` encodes these conditions.
+  - "Number of 6s in 10 die rolls" and A/B test conversion counts are the article's representative examples. Calculations like `stats.binom.pmf(3, 10, 0.3)` compute exactly such probabilities.
+  - As the `n=100, p=0.5` example showed, when trials are sufficiently large and p is not extreme, the binomial approaches the normal distribution, enabling approximation.
+- **Why is the number of attempts until first success read as a geometric distribution?**
+  - Because the quantity of interest is not the success count but the waiting length until the first success. The PMF `(1-p)^(k-1)p` expresses k-1 preceding failures and one final success.
+  - The article's `stats.geom.pmf(5, 0.2)` example computed the probability of first success on the fifth attempt with success probability 0.2.
+  - In the retry policy case, with 90% success rate the expected attempts are `1/p = 1.11`, reading as "usually succeeds within one or two tries."
 <!-- toc:begin -->
 ## In this series
 

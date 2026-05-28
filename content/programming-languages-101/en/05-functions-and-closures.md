@@ -224,13 +224,12 @@ A closure is "function plus environment." It falls out naturally where lexical s
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Functions and Closures?**
-  - The article treats Functions and Closures as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Functions and Closures?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Functions and Closures reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What distinguishes first-class functions from higher-order functions?**
+  - First-class functions mean you can store functions in variables, pass them as arguments, and return them as values. Higher-order functions actually use that property by accepting or returning functions. `make_adder` and `memo` return and wrap functions, showing that higher-order functions stand on top of first-class functions.
+- **What exactly does a closure capture?**
+  - A closure captures the bindings and environment of the outer scope, not value copies. The example where `add10` and `add20` remember different `x` values, and where `get` and `inc` share the same `state` dictionary, clearly demonstrate this.
+- **Why do lambdas created inside a loop all output the same value?**
+  - `for i in range(3): fns.append(lambda: i)` leaves all three lambdas sharing the same `i` binding rather than copying values, so at call time they all read the final value 2. Using `lambda i=i: i` to fix the definition-time value via a default argument changes the result to `[0, 1, 2]`—precisely because of this late-binding difference.
 <!-- toc:begin -->
 ## In this series
 

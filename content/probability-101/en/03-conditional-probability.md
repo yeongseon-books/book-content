@@ -148,13 +148,17 @@ Conditional probability is the tool for handling context. The next episode reach
 
 ## Answering the Opening Questions
 
-- **Why conditional probability is fundamentally about changing the denominator?**
-  - The article treats Conditional Probability as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why P(A|B) and P(B|A) can be completely different?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How the multiplication rule follows from the definition?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why is conditional probability a problem of changing the denominator?**
+  - `P(A|B)` keeps only the cases where B occurred and recomputes the ratio within that subset. In the 2×2 contingency table, `P(positive|disease)` has 50 diseased people as its denominator, while `P(disease|positive)` has 50 positive-test people as its denominator.
+  - The spam filter example also shifts the reference group. Before seeing the word, `P(spam)=0.300`, but after observing "winner," `P(spam|"winner")=0.857`—recalculating within the emails containing "winner" rather than all emails.
+- **Why can `P(A|B)` and `P(B|A)` be completely different values?**
+  - The two expressions answer different questions. `P(positive|disease)` is test sensitivity while `P(disease|positive)` is positive predictive value—same table, different denominators and interpretations.
+  - In the weather-traffic tree, `P(congestion|rain)=0.8` yet `P(rain|congestion)=0.632`. One is the probability of congestion given rain; the other is the probability that rain caused the observed congestion.
+  - The base-rate fallacy simulation also shows this directional difference. Looking only at 99% sensitivity means seeing `P(positive|disease)`, while the actually relevant `P(disease|positive)` at 0.1% prevalence is far lower.
+- **In what situations does the multiplication rule naturally appear?**
+  - It appears immediately when calculating a single path through a tree. `P(rain ∩ congestion) = P(rain) × P(congestion|rain) = 0.3 × 0.8 = 0.240` computes the path probability as a product.
+  - It uses the same structure in sampling without replacement where conditions chain. Computing the probability of drawing 3 spades consecutively as `13/52 × 12/51 × 11/50` is a typical example.
+  - The multiplication rule is also fundamental when rewriting intersections as conditional probabilities. That is why the numerators and denominators in the law of total probability and Bayes' theorem all start from this formula.
 <!-- toc:begin -->
 ## In this series
 

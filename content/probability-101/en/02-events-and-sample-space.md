@@ -146,13 +146,12 @@ Sample spaces and events are the grammar of probability. The next episode covers
 
 ## Answering the Opening Questions
 
-- **Why the sample space must come before the probability?**
-  - The article treats Events and Sample Space as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How events become subsets once the setup is explicit?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What union, intersection, and complement mean in practice?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why must the sample space come before any probability calculation?**
+  - By listing all possible outcomes first, you define the domain, and events become subsets within that domain.
+- **What becomes easier when you express events as sets?**
+  - Representing events as sets lets you use union, intersection, and complement notation to combine and relate different events systematically.
+- **What do union, intersection, and complement events each mean?**
+  - Union events correspond to set union (A or B), intersection events to set intersection (A and B), and complement events to set complement (not A).
 <!-- toc:begin -->
 ## In this series
 

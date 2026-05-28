@@ -148,13 +148,18 @@ Bayes' theorem is the math of learning. The next episode introduces random varia
 
 ## Answering the Opening Questions
 
-- **What question Bayes' theorem actually answers?**
-  - The article treats Bayes' Theorem as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How priors, likelihoods, and posteriors play different roles?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why low base rates change the meaning of a positive result?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What question does Bayes' theorem answer?**
+  - Bayes' theorem answers "how should I update the probability of hypothesis A after observing data B?" The basic formula `P(A|B) = P(B|A) × P(A) / P(B)` is exactly that rule.
+  - In the medical screening example, it was used to find `P(disease|positive)` rather than `P(positive|disease)`—recalculating the actual disease probability after seeing the test result.
+  - As the sequential update example shows, this question does not end in one step. The first posterior becomes the next prior, updating beliefs continuously: `0.010 → 0.154 → 0.783 → 0.280`.
+- **What do prior, likelihood, and posterior each mean?**
+  - The prior is belief before seeing data. In the article's table, `P(disease)=0.01` and the rare-disease scenario's 0.1% prevalence are priors.
+  - Likelihood is how probable the data is assuming the hypothesis is true. In the diagnostic problem, sensitivity like `P(positive|disease)=0.99` plays the likelihood role.
+  - The posterior is the updated belief after seeing data. The table's `P(disease|positive)=0.168` and the rare-disease scenario's 9.0% are the final judgment values.
+- **Why does a small base rate change the meaning of a positive result?**
+  - When the base rate is small, false positives dominate the total positives. Even with 99% sensitivity and 99% specificity, at 0.1% prevalence the post-test probability was only 9.0%.
+  - The PPV table shows that at prevalence 0.0010, PPV is 0.019 so 98.1% of positives are false alarms, while at prevalence 0.1000, PPV rises to 0.688.
+  - Therefore, test performance numbers alone are insufficient—you must include the prior probability that creates `P(positive)` to read the actual meaning of a positive result.
 <!-- toc:begin -->
 ## In this series
 

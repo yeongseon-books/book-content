@@ -150,13 +150,12 @@ Continuous distributions are the priors of measurement. The next episode shows w
 
 ## Answering the Opening Questions
 
-- **What it means to model a continuous quantity probabilistically?**
-  - The article treats Continuous Distributions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why a density is not the same thing as a probability?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **When Uniform, Normal, Exponential, and Gamma distributions make sense?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What does it mean to model continuous values probabilistically?**
+  - Assigning probability to continuous values means defining a PDF and reading probability as the area under it over an interval. Since the probability at any single point is 0, you must always reframe questions as intervals.
+- **Why does the probability density function look like a probability but is not one?**
+  - PDF values can exceed 1 (e.g., a narrow uniform distribution). Probability is the area under the PDF—the integral value—and only that lies between 0 and 1.
+- **When are uniform, normal, exponential, and gamma distributions each used?**
+  - Uniform for initial assumptions with no prior information, normal for measurement errors and distributions of means, exponential for waiting times, and gamma for sums of multiple waiting times. Thinking about the data's generating process first guides the distribution choice.
 <!-- toc:begin -->
 ## In this series
 

@@ -249,13 +249,12 @@ Three things stand out. First, a separate `docs/` folder keeps architectural dec
 
 ## Answering the Opening Questions
 
-- **What is the difference between a portfolio project and a simple practice repository?**
-  - The article treats What is a Portfolio Project as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What do hiring managers or reviewers usually look for before they ever read the code?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What is the minimum structure that makes even a small project feel worth reviewing?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What distinguishes a portfolio project from a simple practice repository?**
+  - A portfolio project shows the problem, demo, README, and reasoning behind choices together. A practice repo has only implementation; a portfolio also leaves behind the judgment.
+- **What do hiring managers or reviewers check before the code?**
+  - They first check the problem statement and README. Then they look for a working demo link, and finally they look for an explanation of why certain choices were made.
+- **What is the minimum composition that makes even a small project read as a portfolio?**
+  - A one-line problem definition, a working demo or screenshot, a README with step-by-step explanation, and the rationale for technology choices—these four elements are sufficient.
 <!-- toc:begin -->
 ## In this series
 

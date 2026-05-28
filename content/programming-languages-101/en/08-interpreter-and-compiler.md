@@ -222,13 +222,12 @@ Interpreters, compilers, and JITs are not enemies; they are different answers to
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Interpreters and Compilers?**
-  - The article treats Interpreters and Compilers as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Interpreters and Compilers?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Interpreters and Compilers reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What is the shortest difference between interpreter and compiler?**
+  - By this article's framing, a compiler translates source code into another form before execution, and an interpreter processes that result or intermediate representation step by step at execution time. Python compiling `.py` to bytecode then running it via VM shows both strategies can coexist within one system.
+- **What execution path does Python actually follow?**
+  - The article directly presented `.py → tokenize → parse → AST → compile → .pyc bytecode → VM executes`, and confirmed bytecodes like `LOAD_FAST`, `BINARY_OP`, `RETURN_VALUE` via `dis.dis(add)`. The `compile(PY_SRC, "<inline>", "exec")` example also showed how the cost structure changes when reusing once-translated code multiple times.
+- **What exactly is a `.pyc` file?**
+  - A `.pyc` is not a standalone executable but a cached bytecode file containing a header and a serialized code object. At import time it reuses this result to reduce parsing and compilation cost, but actual execution is still handled by the Python virtual machine.
 <!-- toc:begin -->
 ## In this series
 

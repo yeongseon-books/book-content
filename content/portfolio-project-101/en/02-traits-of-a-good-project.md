@@ -293,13 +293,12 @@ Keep this in `scripts/benchmark.py` so it stays repeatable. Document the run com
 
 ## Answering the Opening Questions
 
-- **Why is a bigger project not automatically a better portfolio project?**
-  - The article treats Traits of a Good Project as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How do problem clarity, measurable results, maintainability, and reproducibility show up in practice?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What makes a small project still feel strong and credible?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why isn't a bigger project always a better portfolio piece?**
+  - As scope grows, finishing quality drops and the problem definition blurs. A small-scoped project polished to completion reads more clearly.
+- **How do problem definition, result metrics, maintainability, and reproducibility each show up?**
+  - Problem definition appears in the README's first paragraph, result metrics in a performance table, maintainability in tests and CI badges, and reproducibility in Docker and run guides.
+- **What makes a project with few features still read as strong?**
+  - Scale matters less than whether you can explain the "why." Even a small project demonstrates practical judgment when decision criteria are clear.
 <!-- toc:begin -->
 ## In this series
 

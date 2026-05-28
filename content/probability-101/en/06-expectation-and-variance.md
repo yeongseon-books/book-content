@@ -149,13 +149,18 @@ Expectation and variance are the two axes of a distribution. The next episode co
 
 ## Answering the Opening Questions
 
-- **Why expectation is called the center of a distribution?**
-  - The article treats Expectation and Variance as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What variance measures and why standard deviation is often easier to interpret?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How linearity of expectation simplifies many problems?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why is the expected value called the center of a distribution?**
+  - The expected value is a probability-weighted mean, summarizing the distribution's balance point. A fair die's `E[X]=3.5` never actually appears as an outcome yet best compresses the center of values 1 through 6.
+  - Linearity of expectation `E[aX+bY]=aE[X]+bE[Y]` lets you decompose even complex distributions' centers into sums. The portfolio expected return `w_A μ_A + w_B μ_B` uses the same structure.
+  - In simulation, the sample mean approaching the theoretical value also supports the interpretation that expected value is the long-run average of the entire distribution.
+- **What does variance measure and how much?**
+  - Variance measures how far values spread from the mean μ as the average of squared deviations `Var(X)=E[(X-μ)²]`. It distinguishes distributions with the same center but different spread.
+  - The die example computed the same spread faster using the shortcut formula `Var(X)=E[X²]-(E[X])²`. This is the computational formula the article emphasized.
+  - Chebyshev's inequality `P(|X-E[X]| ≥ kσ) ≤ 1/k²` shows variance also converts spread into probability bounds.
+- **How does standard deviation differ from variance?**
+  - Standard deviation is the square root of variance `√Var(X)`. Variance is in squared units making interpretation awkward, but standard deviation returns to the original variable's units.
+  - The die code output both `Var(X)` and `SD=np.sqrt(Var)` to immediately read the typical fluctuation size from the center.
+  - The portfolio example compared risk as `10.00%`, `9.85%`, `20.00%` because standard deviation shares units with actual returns, making it intuitive to read.
 <!-- toc:begin -->
 ## In this series
 

@@ -466,11 +466,11 @@ Also, keep the project count in your profile README to 3 or fewer. Listing 5+ me
 ## Answering the Opening Questions
 
 - **What information should a portfolio README show first?**
-  - A one-sentence problem definition. When "what does this solve" is clear, a visitor can judge whether the repository matches their interest.
-- **Why does the order pitch → demo → stack → run → next feel easy to scan?**
-  - It follows the visitor's natural question sequence: what is this, does it work, what is it made of, can I try it, and what is left. Each answer builds on the previous one.
-- **Why can a README still feel weak even when it contains many screenshots?**
-  - Screenshots without a live link or run path are one-directional proof. The visitor cannot verify, reproduce, or explore further. A README is strong when it enables action, not just observation.
+  - A one-sentence problem definition. Making "what does this solve" clear lets visitors judge whether this repository matches their interest.
+- **Why is the order of one-line intro, demo, stack, run instructions, and next steps easy to read?**
+  - A one-line description, demo or GIF, and step-by-step run instructions matter most. The README is an entry point, not a space to contain everything.
+- **Why can a README feel weak even with many screenshots?**
+  - Demos tend to show only success cases. Naturally showing edge cases like error handling, empty states, and loading states makes you look like a thoughtful developer.
 <!-- toc:begin -->
 ## In this series
 

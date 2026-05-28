@@ -479,12 +479,12 @@ The key is not "perfect testing" but "progressive verification culture." Even st
 
 ## Answering the Opening Questions
 
-- **What do unit tests, integration tests, and end-to-end checks each prove?**
-  - Unit tests prove individual logic units work correctly in isolation. Integration tests prove boundaries (API to DB, service to service) work together. E2E tests prove the critical user path completes successfully from start to finish.
-- **Why does even a small portfolio project benefit from automated verification?**
-  - Automation turns a one-time success into repeatable proof. A reviewer sees that verification is a default habit, not something done once before demo day. CI also prevents regressions when you update the project later.
-- **What kinds of docs make a repository easier to trust and adopt?**
-  - A testing.md that explains strategy, an architecture.md that maps the system, and a CHANGELOG that shows active maintenance. Together they lower the cost of understanding the project and signal that the author thinks about the next person, not just themselves.
+- **What does each of unit tests, integration tests, and end-to-end tests prove?**
+  - Unit tests prove one function's correctness, integration tests prove module connections, and end-to-end tests prove the entire user scenario. 30% coverage of core logic sends a stronger signal than 90% overall coverage.
+- **Why is automated verification an important criterion even for small portfolios?**
+  - Automated verification proves the project is a repeatedly validated artifact, not something that worked by accident. Just having a CI pipeline demonstrates operational awareness.
+- **What trust do API docs or changelogs add?**
+  - API docs show evidence of frontend collaboration, and changelogs show maintenance ability. Even for a small project, having a CHANGELOG gives the impression of "an actively improved project."
 <!-- toc:begin -->
 ## In this series
 

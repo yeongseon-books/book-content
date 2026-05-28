@@ -146,13 +146,12 @@ Probability is the language of uncertainty. The next episode defines events and 
 
 ## Answering the Opening Questions
 
-- **What probability is actually measuring?**
-  - The article treats What Is Probability? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why sample space and events come before any calculation?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How the frequentist and Bayesian views answer different questions?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What exactly does a probability number represent?**
+  - Probability is a way to express uncertainty as a number. Frequentism and Bayesianism read the same phenomenon differently.
+- **Why must you define the sample space and events first?**
+  - Defining the sample space clarifies which outcomes are possible, and only on that foundation can you define events and probabilities.
+- **How do frequentism and Bayesianism read the same phenomenon differently?**
+  - Frequentism emphasizes proportions across repetitions; Bayesianism emphasizes information updating. Both are simply different views of the same uncertainty.
 <!-- toc:begin -->
 ## In this series
 
