@@ -34,16 +34,9 @@ Pipelines help because they make execution order visible. Instead of nesting cal
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying Function Composition and Pipelines?
-- Which signal should the example or diagram make visible for Function Composition and Pipelines?
-- What failure should be prevented first when Function Composition and Pipelines reaches a real system?
-
-## What You Will Learn
-
-- The mathematical principle behind function composition and its Python implementation
-- The difference between pipe and compose
-- Type-safe pipeline construction
-- Designing real-world data transformation pipelines
+- What is function composition and why is it useful?
+- How do you build a data pipeline by composing small functions?
+- When does composition make code harder to read?
 
 ## Why It Matters
 
@@ -515,12 +508,12 @@ Function composition combines small functions into complex transformations. `pip
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Function Composition and Pipelines?**
-  - The article treats Function Composition and Pipelines as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Function Composition and Pipelines?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Function Composition and Pipelines reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What is function composition and why is it useful?**
+  - Function composition chains multiple functions into a single computation like `f(g(h(x)))`. This article implements `compose()` and `pipe()` directly to show that flow. The example chaining `add_one`, `double`, and `to_str` to produce the same result connects the mathematical definition to a Python implementation.
+- **How do you build a data pipeline by composing small functions?**
+  - `compose` reads right-to-left; `pipe` reads left-to-right. When execution order matches code order, as in `load_data → calculate_totals → filter_passing → sort_by_score → format_output`, intermediate steps are much easier to follow during review.
+- **When does composition make code harder to read?**
+  - In text processing, small functions like `strip_whitespace`, `normalize_spaces`, and `replace_special` can be combined to change slug rules step by step. In data processing, pipelines like the student-score pipeline and order-event settlement pipeline make each stage independently testable, so you can quickly narrow down which transformation changed a value.
 
 <!-- toc:begin -->
 ## In this series

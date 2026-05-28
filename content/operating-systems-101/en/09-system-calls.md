@@ -35,9 +35,9 @@ This is the 9th post in the Operating Systems 101 series. It explains the user/k
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying System Calls?
-- Which signal should the example or diagram make visible for System Calls?
-- What failure should be prevented first when System Calls reaches a real system?
+- What separates user space from kernel space?
+- What switching cost does a single system call carry?
+- Why is `strace` the fastest tool for diagnosing OS-level problems?
 
 ## Questions this article answers
 
@@ -45,13 +45,6 @@ This is the 9th post in the Operating Systems 101 series. It explains the user/k
 - What transition cost is paid for each system call?
 - Why is `strace` often the fastest tool for understanding OS-level problems?
 - How do buffering, batching, and `vDSO` reduce syscall overhead?
-
-## What You Will Learn
-
-- The split between user space and kernel space
-- How a system call is invoked and how it returns
-- Observing real syscalls with strace
-- Patterns that reduce syscall cost — buffering, batching, vDSO
 
 ## Why It Matters
 
@@ -223,12 +216,12 @@ The next article looks at how all of these fundamentals are reassembled inside a
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying System Calls?**
-  - The article treats System Calls as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for System Calls?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when System Calls reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What separates user space from kernel space?**
+  - User space is where programs run with limited privileges; kernel space directly controls core resources like filesystems, memory, and networking. Even a single `write(fd, buf, n)` crosses from user mode to kernel mode for argument validation and resource access, then returns — a clear privilege boundary.
+- **What switching cost does a single system call carry?**
+  - Each system call pays for mode switch, context save/restore, argument checks, and kernel-internal work, so system time grows quickly with call count. Comparing 100,000 one-byte `write` calls against `writev` or buffered I/O makes it clear why reducing call count is the first optimization.
+- **Why is `strace` the fastest tool for diagnosing OS-level problems?**
+  - `strace` shows what the program asked the kernel, how many times, and where time was spent — at system-call granularity. The `openat`-`read`-`close` example reads file paths instantly; the `socket`-`bind`-`epoll_wait`-`accept4` example reads an event-loop server structure — making it the fastest starting point for OS-boundary problems.
 
 <!-- toc:begin -->
 ## In this series

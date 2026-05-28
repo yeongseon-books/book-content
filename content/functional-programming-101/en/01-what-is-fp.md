@@ -36,16 +36,9 @@ This is the first post in the Functional Programming 101 series.
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying What Is Functional Programming??
-- Which signal should the example or diagram make visible for What Is Functional Programming??
-- What failure should be prevented first when What Is Functional Programming? reaches a real system?
-
-## What You Will Learn
-
-- The definition and core principles of functional programming
-- How it compares to imperative programming
-- How to apply functional style in Python
-- Situations where functional programming shines
+- What core idea defines functional programming?
+- How does FP differ from imperative programming?
+- Why are Python, Java, and JavaScript adopting FP features?
 
 ## Why It Matters
 
@@ -261,12 +254,12 @@ Functional programming is a paradigm that focuses on data transformation and fun
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Is Functional Programming??**
-  - The article treats What Is Functional Programming? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Is Functional Programming??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Is Functional Programming? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What core idea defines functional programming?**
+  - In this article, functional programming means flowing data through transformation steps instead of continuously mutating state. The comparison between building results with a `for` loop and `append()` versus combining `filter()` and `map()`, plus the example splitting `calculate_total()` from `print_receipt()`, shows the difference directly.
+- **How does FP differ from imperative programming?**
+  - In Python, first-class functions, `map()`, `filter()`, list comprehensions, and small function compositions are the basic tools. Patterns like `apply(add, 10, 3)`, `map(str.upper, words)`, and `pipeline(double, add_ten, to_string)` — passing and chaining functions as values — appear throughout the article.
+- **Why are Python, Java, and JavaScript adopting FP features?**
+  - Switching to function composition foregrounds transformation rules over loop control and temporary state. When each step handles one concern — like the filtering and sorting rules in the student-score example or the `double → add_ten → to_string` pipeline — you can quickly trace where values change.
 
 <!-- toc:begin -->
 ## In this series

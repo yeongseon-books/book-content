@@ -36,16 +36,9 @@ This is the 2nd post in the Functional Programming 101 series.
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying Pure Functions and Side Effects?
-- Which signal should the example or diagram make visible for Pure Functions and Side Effects?
-- What failure should be prevented first when Pure Functions and Side Effects reaches a real system?
-
-## What You Will Learn
-
-- The two conditions that define a pure function
-- Types of side effects and how to spot them
-- Patterns for separating pure logic from side effects
-- Why pure functions simplify testing
+- What makes a function "pure"?
+- What advantages does a pure function give to testing and reasoning?
+- When is a side effect unavoidable, and how do you isolate it?
 
 ## Why It Matters
 
@@ -316,12 +309,12 @@ Pure functions always return the same output for the same input and never modify
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Pure Functions and Side Effects?**
-  - The article treats Pure Functions and Side Effects as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Pure Functions and Side Effects?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Pure Functions and Side Effects reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What makes a function "pure"?**
+  - A pure function must always return the same output for the same input and must not change any state outside itself. The example refactoring `apply_discount()` from depending on a global `discount_rate` to taking it as an argument, and the referential-transparency example where substituting `square()` calls with their values preserves meaning, demonstrate this standard clearly.
+- **What advantages does a pure function give to testing and reasoning?**
+  - When `calculate_subtotal()`, `calculate_tax()`, `calculate_total()`, and `format_receipt()` are pure core and only `print_receipt()` handles output, tests only need to check computation results. Like the BMI example, you can use `assert` on inputs and outputs alone — no mocks or complex environment setup needed to verify core rules.
+- **When is a side effect unavoidable, and how do you isolate it?**
+  - This article identified hidden inputs like random numbers and current time, mutating `global counter`, file-write IO, and in-place argument modification like `items.append()` as side effects. If code cannot be explained by its inputs alone, or external values change after a call, suspect a side effect first.
 
 <!-- toc:begin -->
 ## In this series

@@ -34,9 +34,9 @@ This rewrite finishes that story. We will use ROC-AUC as a ranking-quality summa
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying ROC and AUC?
-- Which signal should the example or diagram make visible for ROC and AUC?
-- What failure should be prevented first when ROC and AUC reaches a real system?
+- What does the ROC curve show?
+- What does AUC measure and why is it useful?
+- When is AUC misleading?
 
 ## This post answers
 
@@ -196,12 +196,12 @@ ROC and AUC are useful because they summarize ranking quality before you lock a 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying ROC and AUC?**
-  - The article treats ROC and AUC as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for ROC and AUC?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when ROC and AUC reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **When `ROC-AUC 0.819` and `PR-AUC 0.463` appear together, what should you read differently?**
+  - ROC-AUC 0.819 means the model ranks positives above negatives reasonably well, but PR-AUC 0.463 signals that its ability to reliably surface positives in a low base-rate setting is weaker. This is why the article reads beyond the ROC curve impression and moves down to actual threshold selection after examining PR-AUC.
+- **Under an `FPR ≤ 0.05` constraint, what happens to the confusion matrix and cost when you pick threshold 0.141?**
+  - In the article's example, choosing 0.141 gives `FPR 0.049`, `precision 0.352`, `recall 0.507`, confusion matrix `[[1355, 70], [37, 38]]`. With cost assumptions `FP=1`, `FN=10`, the 70 false positives and 37 false negatives translate to a total cost of 440.
+- **Cost alone might favor threshold 0.10, so why must you revisit the policy choice around 0.141?**
+  - Threshold 0.10 shows a lower total cost of 426, but its `FPR 0.081` violates the `FPR ≤ 0.05` policy. The article's key point is that cost minimization and policy constraints must be satisfied simultaneously — and if the recall target is 60%, even 0.141 falls short, requiring model improvement or policy redesign.
 
 <!-- toc:begin -->
 ## In this series

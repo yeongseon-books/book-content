@@ -34,9 +34,9 @@ That is the structure of this rewrite. We will treat accuracy as the **last summ
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying The Limits of Accuracy?
-- Which signal should the example or diagram make visible for The Limits of Accuracy?
-- What failure should be prevented first when The Limits of Accuracy reaches a real system?
+- When does accuracy give a misleading picture of model performance?
+- What is the class imbalance problem?
+- Why do you need metrics beyond accuracy?
 
 ## This post answers
 
@@ -188,12 +188,12 @@ Accuracy is not a bad metric. It is a metric with an order of operations. On imb
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying The Limits of Accuracy?**
-  - The article treats The Limits of Accuracy as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for The Limits of Accuracy?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when The Limits of Accuracy reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why can't we call a model good just because its accuracy nearly matches the 95.36% dummy baseline?**
+  - With a positive rate of 4.68%, even `DummyClassifier(strategy="most_frequent")` — which learns nothing — already achieves 95.36% accuracy. The actual model's 96.08% is only 0.72 percentage points above the dummy, so this single number is not enough to conclude meaningful improvement.
+- **Why does the confusion matrix showing 47 missed positives out of 58 matter more than 96.08% accuracy?**
+  - The bottom row of the confusion matrix directly shows how many positives were recovered, and here only 11 out of 58 were correct, yielding a `minority recall` of just 0.1897. In problems like fraud detection or rare-event identification where the cost of missing is high, the fact that 47 positives were missed is a more important operational signal than high accuracy.
+- **When `minority recall` is 0.1897 and `balanced accuracy` is 0.5940, which number belongs on the first line of the report?**
+  - The article concludes that `minority recall=0.1897` and `balanced accuracy=0.5940` should appear before `accuracy=0.9608`. Keep accuracy as a supporting figure alongside the 0.72-point improvement over the dummy, and frame the key judgment as: this model carries a high risk of missing positives.
 
 <!-- toc:begin -->
 ## In this series

@@ -35,9 +35,9 @@ This is the 8th post in the Operating Systems 101 series. It explains inode look
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying File Systems?
-- Which signal should the example or diagram make visible for File Systems?
-- What failure should be prevented first when File Systems reaches a real system?
+- How do inodes and directory entries represent a file?
+- What does the page cache guarantee versus `fsync`?
+- What recovery does journaling enable after a crash?
 
 ## Questions this article answers
 
@@ -45,13 +45,6 @@ This is the 8th post in the Operating Systems 101 series. It explains inode look
 - What do the page cache and `fsync` each guarantee?
 - What kinds of recovery does journaling make possible after a crash?
 - Why is the atomic rename pattern so common when saving configuration files?
-
-## What You Will Learn
-
-- The structure of inodes and the directory tree
-- The roles of the page cache and fsync
-- How journaling provides crash safety
-- Concurrent writes and the atomic rename pattern
 
 ## Why It Matters
 
@@ -229,12 +222,12 @@ The next article moves on to the way your code actually invokes everything we ha
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying File Systems?**
-  - The article treats File Systems as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for File Systems?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when File Systems reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do inodes and directory entries represent a file?**
+  - A directory entry is a table linking a name to an inode number; the inode holds the actual file metadata (permissions, size, block pointers). Running `ln a.txt b.txt` then `ls -li` shows two names pointing to the same inode number — that is a hard link.
+- **What does the page cache guarantee versus `fsync`?**
+  - A normal `write` lands in the page cache only, so data can vanish on a power failure even after the call returns. `flush + os.fsync(f.fileno())` asks to push content to the storage device, and the atomic-save procedure continues with `os.replace` and directory `fsync(dirfd)` to also guarantee rename durability.
+- **What recovery does journaling enable after a crash?**
+  - A journaling filesystem restores metadata consistency after a crash, reducing the chance of the filesystem itself being corrupted. But it does not automatically guarantee that application records survive intact, so patterns like tmp file + atomic rename + checksum must be designed at the application level.
 
 <!-- toc:begin -->
 ## In this series

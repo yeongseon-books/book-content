@@ -35,9 +35,9 @@ This is the 4th post in the Operating Systems 101 series. It explains race condi
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying Concurrency and Race Conditions?
-- Which signal should the example or diagram make visible for Concurrency and Race Conditions?
-- What failure should be prevented first when Concurrency and Race Conditions reaches a real system?
+- When exactly can you say a race condition occurs?
+- How do atomicity, visibility, and ordering create different failures?
+- Why can't even a single line of code be considered safe?
 
 ## Questions this article answers
 
@@ -45,13 +45,6 @@ This is the 4th post in the Operating Systems 101 series. It explains race condi
 - How do atomicity, visibility, and ordering produce different kinds of failures?
 - Why is even a single line of code not automatically safe?
 - Besides locks, what design techniques reduce race conditions?
-
-## What You Will Learn
-
-- A precise definition of race conditions and why they are hard to reproduce
-- Three axes of concurrency violation — atomicity, visibility, ordering
-- How memory models relate to visibility
-- Design principles that reduce concurrency bugs
 
 ## Why It Matters
 
@@ -267,12 +260,12 @@ Next we look at the most common synchronization primitives in detail: locks (mut
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Concurrency and Race Conditions?**
-  - The article treats Concurrency and Race Conditions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Concurrency and Race Conditions?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Concurrency and Race Conditions reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **When exactly can you say a race condition occurs?**
+  - A race condition occurs when two or more threads share the same state, at least one writes, and the final result depends on interleaving order. Eight threads each running `count += 1` 100,000 times but getting less than 800,000 — and a different result each time — demonstrates the definition directly.
+- **How do atomicity, visibility, and ordering create different failures?**
+  - Broken atomicity lets another thread slip between read-add-write in `count += 1`, causing lost updates; broken visibility means a `stop = True` change may reach other threads late. Ordering problems on top of those mean the CPU-observed order can diverge from the code order, so locks or message passing must make execution order explicit.
+- **Why can't even a single line of code be considered safe?**
+  - Even one Python line decomposes into multiple bytecode steps. `dis.dis(add_one)` shows `LOAD_FAST`, `INPLACE_ADD`, `STORE_SUBSCR` separately, and the scheduler can insert another thread at any step — so judging atomicity by appearance is unsafe.
 
 <!-- toc:begin -->
 ## In this series

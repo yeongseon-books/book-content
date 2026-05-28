@@ -35,9 +35,9 @@ This is the first post in the Operating Systems 101 series. It sets up the menta
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying What Is an Operating System??
-- Which signal should the example or diagram make visible for What Is an Operating System??
-- What failure should be prevented first when What Is an Operating System? reaches a real system?
+- What problem does the operating system exist to solve?
+- Why are kernel mode and user mode separated?
+- What do abstractions like processes, files, and sockets actually hide?
 
 ## Questions this article answers
 
@@ -45,13 +45,6 @@ This is the first post in the Operating Systems 101 series. It sets up the menta
 - Why are kernel mode and user mode separated in the first place?
 - What do abstractions like processes, files, and sockets actually hide?
 - Why does understanding the operating system make production troubleshooting easier for developers?
-
-## What You Will Learn
-
-- A working definition of an operating system and its two main roles
-- The difference between user mode and kernel mode
-- The core abstractions an OS provides — process, virtual memory, file, socket
-- Why every developer benefits from understanding the OS
 
 ## Why It Matters
 
@@ -229,12 +222,12 @@ The next article zooms into the most fundamental abstraction: the process. We lo
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Is an Operating System??**
-  - The article treats What Is an Operating System? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Is an Operating System??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Is an Operating System? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What problem does the operating system exist to solve?**
+  - The OS is a layer that frees applications from directly handling CPU, memory, and disk while letting multiple programs safely share the same hardware. Behind `open()` and `read()`, inode lookups, disk I/O, buffer copies, and scheduling happen, and `/proc` and rlimit examples show how each process gets resource limits and an observation window.
+- **Why are kernel mode and user mode separated?**
+  - Letting user programs directly touch disk blocks or another process's memory would easily break the whole system. So operations like opening files or writing to stdout go through system calls to the kernel, paying the cost of `System time` and mode switches in return.
+- **What do abstractions like processes, files, and sockets actually hide?**
+  - Files hide disk blocks and inode structures, processes hide PID-memory map-open file sets, and sockets hide network devices and kernel buffers. Python's short `open(...).read()` actually unfolds into file descriptor return, kernel buffer copy, and terminal driver calls.
 
 <!-- toc:begin -->
 ## In this series

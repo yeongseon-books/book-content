@@ -35,9 +35,9 @@ This is the 6th post in the Operating Systems 101 series. It connects process me
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying Memory Management?
-- Which signal should the example or diagram make visible for Memory Management?
-- What failure should be prevented first when Memory Management reaches a real system?
+- What regions is process memory divided into?
+- What are `malloc`/`free` and garbage collection each responsible for?
+- How are memory leaks and fragmentation different problems?
 
 ## Questions this article answers
 
@@ -45,13 +45,6 @@ This is the 6th post in the Operating Systems 101 series. It connects process me
 - What do `malloc` and `free` handle, and what does garbage collection handle instead?
 - How are memory leaks and fragmentation different problems?
 - Inside container limits, how should you size caches and pools?
-
-## What You Will Learn
-
-- The process memory layout — text, data, heap, stack
-- The difference between malloc/free and garbage collection
-- How memory leaks and fragmentation are constructed
-- The two axes of OS memory management — partitioning and reclamation
 
 ## Why It Matters
 
@@ -240,12 +233,12 @@ The next article moves on to the trick that lets the OS make limited RAM look un
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Memory Management?**
-  - The article treats Memory Management as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Memory Management?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Memory Management reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What regions is process memory divided into?**
+  - Process memory splits into text, data/bss, heap, and stack, plus mmap regions and per-thread stacks in practice. The diagram and `/proc/<pid>/smaps` example provide criteria for telling whether the heap is growing or file mappings are expanding — region by region.
+- **What are `malloc`/`free` and garbage collection each responsible for?**
+  - `malloc`/`free` require the developer to pair allocation and deallocation manually; GC only reclaims objects whose references are completely gone. Replacing an unbounded dict cache with `lru_cache(maxsize=10_000)` or using `WeakValueDictionary` shows that without a reclamation policy, leaks persist even with GC.
+- **How are memory leaks and fragmentation different problems?**
+  - A leak means references keep holding dead objects so RSS keeps growing; fragmentation means total free memory exists but no large contiguous block is available. Allocating 1,000 1MB blocks then freeing half — "500MB free but no 1GB contiguous block" — illustrates the distinction precisely.
 
 <!-- toc:begin -->
 ## In this series

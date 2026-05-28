@@ -35,9 +35,9 @@ This is the 5th post in the Operating Systems 101 series. It breaks down mutexes
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying Locks, Mutexes, and Semaphores?
-- Which signal should the example or diagram make visible for Locks, Mutexes, and Semaphores?
-- What failure should be prevented first when Locks, Mutexes, and Semaphores reaches a real system?
+- How do mutex, reentrant lock, semaphore, and condition variable differ?
+- What conditions combine to create a deadlock?
+- Why does holding a lock too long hurt both throughput and latency?
 
 ## Questions this article answers
 
@@ -45,13 +45,6 @@ This is the 5th post in the Operating Systems 101 series. It breaks down mutexes
 - Under what conditions does deadlock form?
 - Why do throughput and latency both get worse when locks are held too long?
 - What alternatives can preserve safety while reducing the amount of locking?
-
-## What You Will Learn
-
-- The differences between mutex, RLock, semaphore, and condition variable
-- The four conditions that produce deadlock and how to break them
-- The cost of locks — context switches and cache effects
-- Lock-free synchronization alternatives — queues, immutability, atomics, RCU
 
 ## Why It Matters
 
@@ -273,12 +266,12 @@ The next article moves on to another OS fundamental — memory management. We wi
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Locks, Mutexes, and Semaphores?**
-  - The article treats Locks, Mutexes, and Semaphores as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Locks, Mutexes, and Semaphores?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Locks, Mutexes, and Semaphores reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do mutex, reentrant lock, semaphore, and condition variable differ?**
+  - A mutex admits one thread at a time; an RLock allows reentry by the same thread; `Semaphore(3)` allows up to N concurrent entries. A condition variable waits on a state change ("wait until stock >= 1"), so its purpose differs from simple mutual exclusion.
+- **What conditions combine to create a deadlock?**
+  - Deadlock arises when mutual exclusion, hold-and-wait, no preemption, and circular wait all hold simultaneously. `t1()` grabs `a` then `b` while `t2()` grabs `b` then `a` — both threads wait forever for the other's lock because all four conditions are met.
+- **Why does holding a lock too long hurt both throughput and latency?**
+  - Long operations like `time.sleep(0.5)` or I/O inside a lock block all other threads at the entrance, killing parallelism. Throughput drops and `futex` waits plus lock convoys grow, so tail latency worsens too.
 
 <!-- toc:begin -->
 ## In this series

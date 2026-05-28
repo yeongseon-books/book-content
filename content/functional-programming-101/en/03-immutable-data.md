@@ -36,16 +36,9 @@ This is the 3rd post in the Functional Programming 101 series.
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying Immutable Data?
-- Which signal should the example or diagram make visible for Immutable Data?
-- What failure should be prevented first when Immutable Data reaches a real system?
-
-## What You Will Learn
-
-- The distinction between mutable and immutable types in Python
-- Practical use of tuple, frozenset, and NamedTuple
-- Building immutable objects with frozen dataclasses
-- Why immutability simplifies debugging and parallel processing
+- What does "immutable" mean in practice?
+- How do you update data without mutation?
+- When does immutability cost more than it saves?
 
 ## Why It Matters
 
@@ -296,12 +289,12 @@ Immutable data eliminates unpredictable changes and increases code stability. Py
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Immutable Data?**
-  - The article treats Immutable Data as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Immutable Data?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Immutable Data reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What does "immutable" mean in practice?**
+  - This article distinguishes values like `tuple`, `frozenset`, and `str` that cannot be changed after creation from `list`, `dict`, and `set` that allow in-place modification. Comparing the version of `add_tag()` that mutates the original list with the version returning a new list makes clear that the distinction is about mutability potential, not syntax.
+- **How do you update data without mutation?**
+  - `tuple` fits ordered fixed values like coordinates and dict keys; `frozenset` suits sets that must not change, like permission sets. `NamedTuple` makes small value objects like `Point` readable, and `frozen dataclass` is especially useful for records like `User` or `AppState` that need safe updates via `replace()`.
+- **When does immutability cost more than it saves?**
+  - The key habit is returning new values instead of modifying in place. Patterns like `[*tags, tag]`, `{**config, **updates}`, and `dataclasses.replace()` let callers keep the original while receiving only the result, and make it easy to accumulate state changes in a `history` list.
 
 <!-- toc:begin -->
 ## In this series

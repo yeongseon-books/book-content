@@ -36,16 +36,9 @@ This is the 5th post in the Functional Programming 101 series.
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying map, filter, reduce?
-- Which signal should the example or diagram make visible for map, filter, reduce?
-- What failure should be prevented first when map, filter, reduce reaches a real system?
-
-## What You Will Learn
-
-- How map, filter, and reduce work
-- List comprehensions vs map/filter comparison
-- Implementing complex aggregations with reduce
-- Combining with itertools for efficient processing
+- How do map, filter, and reduce divide their responsibilities?
+- When should you choose a list comprehension over map/filter?
+- What mental model makes reduce easy to reason about?
 
 ## Why It Matters
 
@@ -306,12 +299,12 @@ map, filter, and reduce are the fundamental tools of functional data processing.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying map, filter, reduce?**
-  - The article treats map, filter, reduce as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for map, filter, reduce?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when map, filter, reduce reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do map, filter, and reduce divide their responsibilities?**
+  - `map` transforms every element to a different value, `filter` keeps only elements matching a condition, and `reduce` collapses multiple values into one. The Celsius-to-Fahrenheit `map`, even-number `filter`, and order-total and word-frequency `reduce` examples show each role in isolation.
+- **When should you choose a list comprehension over map/filter?**
+  - Simple transformations with conditions read more naturally as `[x ** 2 for x in numbers if x % 2 == 0]`. Conversely, when applying an existing function directly like `str.upper`, or when you want to maintain a lazy iterator flow, `map` and `filter` are more concise.
+- **What mental model makes reduce easy to reason about?**
+  - First separate which steps are selection, transformation, or aggregation, then assemble them in order. The example filtering prices with `filter(lambda p: p >= 3000)` then discounting with `map(lambda p: int(p * 0.9))`, and the order-data pipeline `with_total → expensive → grand_total`, are exactly that structure.
 
 <!-- toc:begin -->
 ## In this series

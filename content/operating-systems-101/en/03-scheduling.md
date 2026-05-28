@@ -35,9 +35,9 @@ This is the 3rd post in the Operating Systems 101 series. It introduces the sche
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying Scheduling?
-- Which signal should the example or diagram make visible for Scheduling?
-- What failure should be prevented first when Scheduling reaches a real system?
+- What goals does the scheduler balance?
+- What practical difference do preemption, time slice, and priority make?
+- Why is context switching costly even when invisible?
 
 ## Questions this article answers
 
@@ -45,13 +45,6 @@ This is the 3rd post in the Operating Systems 101 series. It introduces the sche
 - What practical differences do preemption, time slices, and priority actually create?
 - Why are context switches expensive even when you do not see them directly?
 - When should you tune `nice`, priority, or CPU affinity?
-
-## What You Will Learn
-
-- The scheduler's goals and the trade-offs between them
-- Major policies (FCFS, RR, Priority, MLFQ, CFS)
-- What a context switch is and what it costs
-- Knobs you can turn — `nice`, priority, CPU affinity
 
 ## Why It Matters
 
@@ -224,12 +217,12 @@ The next article looks at what happens when several flows touch the same data at
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Scheduling?**
-  - The article treats Scheduling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Scheduling?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Scheduling reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What goals does the scheduler balance?**
+  - The scheduler negotiates among responsiveness, throughput, fairness, and power consumption. The FCFS vs SRTF Gantt chart comparison shows how some policies reduce wait time for short tasks while others prioritize system-wide fairness.
+- **What practical difference do preemption, time slice, and priority make?**
+  - Preemption lets a higher-priority task interrupt the current one and seize the CPU; time slices prevent any task from monopolizing a core. The `nice -n 19`, `taskset`, and `chrt -r` examples show how adjusting priority, affinity, and policy changes CPU share and latency characteristics for the same code.
+- **Why is context switching costly even when invisible?**
+  - A context switch saves register state and restores another task's state, so the cumulative cost is significant. `/usr/bin/time -v` reports voluntary and involuntary context switches separately because the real bottleneck when adding threads may be switch explosion, not computation.
 
 <!-- toc:begin -->
 ## In this series

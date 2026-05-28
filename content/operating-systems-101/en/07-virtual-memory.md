@@ -35,9 +35,9 @@ This is the 7th post in the Operating Systems 101 series. It explains virtual ad
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying Virtual Memory?
-- Which signal should the example or diagram make visible for Virtual Memory?
-- What failure should be prevented first when Virtual Memory reaches a real system?
+- Why are virtual and physical addresses deliberately separated?
+- What roles do pages, page tables, and TLBs share?
+- How do minor and major faults differ in cost?
 
 ## Questions this article answers
 
@@ -45,13 +45,6 @@ This is the 7th post in the Operating Systems 101 series. It explains virtual ad
 - How do pages, page tables, and the TLB divide the work?
 - How does the cost of a minor fault differ from the cost of a major fault?
 - Why do `mmap` and copy-on-write show up so often in real systems?
-
-## What You Will Learn
-
-- The split between virtual addresses and physical addresses
-- The roles of pages, page tables, and the TLB
-- The cost that page faults and swap impose
-- How memory-mapped files (mmap) and copy-on-write are used in practice
 
 ## Why It Matters
 
@@ -236,12 +229,12 @@ The next article moves on to a resource the OS handles almost as often as memory
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Virtual Memory?**
-  - The article treats Virtual Memory as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Virtual Memory?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Virtual Memory reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why are virtual and physical addresses deliberately separated?**
+  - Separation lets each process see its own large, contiguous memory while real RAM is safely shared. Thanks to this split, the kernel can deliver `SIGSEGV` on bad access and optimize good access with copy-on-write sharing of physical pages.
+- **What roles do pages, page tables, and TLBs share?**
+  - A page is a fixed-size slice (e.g., 4KB) of virtual address space; the page table records which physical frame each slice maps to; the TLB caches translation results to skip page walks on every access. The `0x1234ABCD` decomposition example lets you trace the translation step by step.
+- **How do minor and major faults differ in cost?**
+  - A minor fault just wires a new page in RAM or updates permissions — relatively cheap. A major fault must pull a page from disk or swap, so latency is much higher. When `ps -o min_flt,maj_flt,rss` or `resource.getrusage()` shows major faults climbing, perceived performance can collapse even at the same RSS.
 
 <!-- toc:begin -->
 ## In this series

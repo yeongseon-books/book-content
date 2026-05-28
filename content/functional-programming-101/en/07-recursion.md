@@ -36,16 +36,9 @@ This is the 7th post in the Functional Programming 101 series.
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying Recursion and Tail Calls?
-- Which signal should the example or diagram make visible for Recursion and Tail Calls?
-- What failure should be prevented first when Recursion and Tail Calls reaches a real system?
-
-## What You Will Learn
-
-- The basic structure and mechanics of recursion
-- The importance of base cases and preventing stack overflow
-- Tail recursion and Python's limitations
-- Patterns for converting recursion to iteration
+- When does recursion express intent better than a loop?
+- What is tail recursion and why does it matter for stack depth?
+- How do you convert a recursive solution to an iterative one?
 
 ## Why It Matters
 
@@ -338,12 +331,12 @@ Recursion decomposes a problem into smaller versions of itself. Python lacks tai
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Recursion and Tail Calls?**
-  - The article treats Recursion and Tail Calls as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Recursion and Tail Calls?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Recursion and Tail Calls reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **When does recursion express intent better than a loop?**
+  - Safe recursion requires a clear stopping condition first, then each call must descend to a smaller version of the same problem. `factorial()`'s `if n <= 1`, `sum_recursive()` ending on an empty list, and `flatten_dict()` flattening nested dicts one level at a time all follow this structure.
+- **What is tail recursion and why does it matter for stack depth?**
+  - Even when the last operation is a recursive call as in `factorial_tail()`, Python's runtime does not optimize tail calls. So for inputs that can exceed `sys.getrecursionlimit()`, iterative versions with explicit stacks like `factorial_iterative()` or `total_size_iterative()` are safer.
+- **How do you convert a recursive solution to an iterative one?**
+  - Without a base case, calls never terminate and the stack keeps growing. In the factorial call flow, `factorial(1)` is the starting point of the return path, and in the Fibonacci example, `n <= 1` is required for memoization to converge on meaningful values.
 
 <!-- toc:begin -->
 ## In this series

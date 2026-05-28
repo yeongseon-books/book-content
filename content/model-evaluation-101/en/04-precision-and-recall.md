@@ -34,9 +34,9 @@ So this rewrite is structured as a threshold decision memo. Precision and recall
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying Precision and Recall?
-- Which signal should the example or diagram make visible for Precision and Recall?
-- What failure should be prevented first when Precision and Recall reaches a real system?
+- What do precision and recall each measure?
+- When should you prioritize precision over recall, and vice versa?
+- How does changing the decision threshold shift the precision-recall trade-off?
 
 ## This post answers
 
@@ -172,12 +172,12 @@ Precision and recall become valuable when they drive a threshold choice. The nex
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Precision and Recall?**
-  - The article treats Precision and Recall as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Precision and Recall?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Precision and Recall reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **When you raise the threshold from 0.20 to 0.70, what are you trading between 118 and 42 items in the review queue?**
+  - Raising the threshold makes alerts cleaner but causes more real fraudulent transactions to be missed. In the article's numbers, 0.20 gives `precision 0.610`, `recall 0.735`, queue 118; 0.70 gives `precision 0.952`, `recall 0.408`, queue 42 — revealing a trade-off between review burden and miss risk.
+- **Why does this article use 0.35 as the default operating-point candidate and compare it with 0.20 and 0.50?**
+  - 0.35 substantially raises precision above 0.20 while sacrificing less recall than 0.50. In practice it yields `precision 0.795`, `recall 0.633`, review queue 78 — a good default candidate for explaining both alert quality and operational burden together.
+- **If `AP 0.745` already summarizes model quality, why must you still document the deployment threshold separately?**
+  - AP 0.745 summarizes the overall quality of the precision-recall curve, but says nothing about how many items a specific threshold sends to the alert queue. Deployment decisions therefore still require an operational memo with confusion matrices and `flagged` counts for candidates like 0.20, 0.35, 0.50, and 0.70.
 
 <!-- toc:begin -->
 ## In this series

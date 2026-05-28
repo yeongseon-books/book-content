@@ -34,16 +34,9 @@ This is the 6th post in the Functional Programming 101 series.
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying Closures and Partial Application?
-- Which signal should the example or diagram make visible for Closures and Partial Application?
-- What failure should be prevented first when Closures and Partial Application reaches a real system?
-
-## What You Will Learn
-
-- The definition and mechanics of closures
-- The relationship between free variables and cell objects
-- Fixing function arguments with functools.partial
-- When to choose closures vs partial
+- What is a closure and what does it capture?
+- What problem does partial application solve?
+- When does a closure cause a subtle bug?
 
 ## Why It Matters
 
@@ -348,12 +341,12 @@ Closures let functions remember the environment where they were defined, and `pa
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Closures and Partial Application?**
-  - The article treats Closures and Partial Application as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Closures and Partial Application?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Closures and Partial Application reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What is a closure and what does it capture?**
+  - A closure remembers values because the inner function holds references to free variables, so they survive even after the outer function finishes. `make_counter()` accumulating `count` via `nonlocal` and `make_greeter()` maintaining different `greeting` values show the mechanism directly.
+- **What problem does partial application solve?**
+  - When you only need to fix some arguments of an existing function without remembering new state, `partial` is more appropriate than a closure. `square = partial(power, exponent=2)`, `api_get = partial(send_request, "GET", ...)`, and `record_audit = partial(publish_audit, policy.audit_channel)` make the fixed values visible in the code, which is more readable than a closure.
+- **When does a closure cause a subtle bug?**
+  - `co_freevars` and `__closure__[0].cell_contents` provide direct evidence when investigating why a closure returns unexpected values. Like the example checking which `greeting` `hello` and `bye` each captured, these are very useful for tracking loop-variable sharing or incorrect state capture.
 
 <!-- toc:begin -->
 ## In this series

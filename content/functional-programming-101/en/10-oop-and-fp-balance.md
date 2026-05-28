@@ -34,16 +34,9 @@ Python gives you a practical escape hatch because it does not force a single par
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying Balancing OOP and Functional Programming?
-- Which signal should the example or diagram make visible for Balancing OOP and Functional Programming?
-- What failure should be prevented first when Balancing OOP and Functional Programming reaches a real system?
-
-## What You Will Learn
-
-- Comparing the strengths and weaknesses of OOP and FP
-- Patterns for mixing both paradigms
-- Situation-specific design selection criteria
-- Practical hybrid design in Python
+- Where is the line between OOP and FP?
+- When should you prefer an FP style in an OOP codebase?
+- How do real projects blend both paradigms?
 
 ## Why It Matters
 
@@ -445,12 +438,12 @@ OOP and functional programming are not opposites — they complement each other.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Balancing OOP and Functional Programming?**
-  - The article treats Balancing OOP and Functional Programming as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Balancing OOP and Functional Programming?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Balancing OOP and Functional Programming reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Where is the line between OOP and FP?**
+  - This article concludes that long-lived state and framework interfaces fit OOP, while computations that take input and transform values fit FP. `ShoppingCart` and `AppServer` own state and lifecycle, while functions like `transform_prices()`, `validate_email()`, and `normalize_config()` own pure transformation rules — that division is the criterion.
+- **When should you prefer an FP style in an OOP codebase?**
+  - The most practical pattern combines immutable value objects with pure functions, adding class shells only when needed. Passing `Money` and `Percentage` to pure functions `apply_discount()` and `add_tax()`, or having a `DataPipeline` class provide the interface while executing actual steps as pure functions, are representative examples.
+- **How do real projects blend both paradigms?**
+  - In Python, put core rules like normalization and validation in pure functions such as `create_user_data()` or `validate_config()`, and push side effects like output and server startup into `handle_registration()` or `AppServer.start()`. The flow where `boot()` passes through `normalize_config()` and `validate_config()` before creating `AppServer` is exactly Functional Core, Imperative Shell in action.
 
 <!-- toc:begin -->
 ## In this series

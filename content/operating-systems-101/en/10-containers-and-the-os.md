@@ -35,9 +35,9 @@ This is the final post in the Operating Systems 101 series. It ties namespaces, 
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying Containers and the Operating System?
-- Which signal should the example or diagram make visible for Containers and the Operating System?
-- What failure should be prevented first when Containers and the Operating System reaches a real system?
+- How do containers and VMs differ in their isolation approach?
+- How do namespaces govern "what is visible" and cgroups govern "how much can be used"?
+- Why does overlayfs make container images feel lightweight?
 
 ## Questions this article answers
 
@@ -45,13 +45,6 @@ This is the final post in the Operating Systems 101 series. It ties namespaces, 
 - How do namespaces split "what is visible" from cgroups limiting "how much can be used"?
 - Why does overlayfs make container images feel lightweight?
 - If you understand the limits of container isolation, what extra protections should you design on top?
-
-## What You Will Learn
-
-- The difference between containers and virtual machines
-- Isolation built from namespaces — pid, net, mount, user, etc.
-- Resource limits built from cgroups — CPU, memory, I/O
-- Image layers and copy-on-write file systems via overlayfs
 
 ## Why It Matters
 
@@ -228,12 +221,12 @@ This series ends here. As a next step, follow the same OS concepts outward into 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Containers and the Operating System?**
-  - The article treats Containers and the Operating System as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Containers and the Operating System?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Containers and the Operating System reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do containers and VMs differ in their isolation approach?**
+  - A VM runs a full guest OS on a hypervisor for hardware-level isolation; a container shares the host kernel and isolates at the process level. Containers start fast and are lightweight, but they share kernel vulnerabilities and the syscall surface, so additional defenses like seccomp, capabilities, and rootless mode matter.
+- **How do namespaces govern "what is visible" and cgroups govern "how much can be used"?**
+  - Namespaces decide which world a process sees (PID, network, mounts); cgroups limit how much CPU and memory it can consume. Inside a container, `ps -ef` shows PID 1 as `sh`, but `memory.max` is fixed at 64MB and `--cpus=0.5` triggers quota throttling — the examples clearly show both roles.
+- **Why does overlayfs make container images feel lightweight?**
+  - Overlayfs lets multiple containers share read-only layers and stacks only the changes in a writable layer on top. Containers using the same base image avoid duplicate disk usage, and copy-on-write happens only at actual modification time — so images download fast and feel light.
 
 <!-- toc:begin -->
 ## In this series

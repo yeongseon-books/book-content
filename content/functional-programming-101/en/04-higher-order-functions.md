@@ -36,16 +36,9 @@ This is the 4th post in the Functional Programming 101 series.
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying Higher-Order Functions?
-- Which signal should the example or diagram make visible for Higher-Order Functions?
-- What failure should be prevented first when Higher-Order Functions reaches a real system?
-
-## What You Will Learn
-
-- The definition and mechanics of higher-order functions
-- Using higher-order functions with `sorted`, `map`, and `filter`
-- The factory pattern that returns functions
-- The higher-order function nature of decorators
+- What is a higher-order function?
+- Why does passing behavior as an argument simplify code?
+- How do `map`, `filter`, and `sorted` with `key=` demonstrate higher-order functions?
 
 ## Why It Matters
 
@@ -344,12 +337,12 @@ Higher-order functions abstract behavior by accepting or returning functions. Fa
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Higher-Order Functions?**
-  - The article treats Higher-Order Functions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Higher-Order Functions?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Higher-Order Functions reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What is a higher-order function?**
+  - Higher-order functions appear in two forms: accepting a function as an argument, or returning a function. `apply_operation()` and `filter_people()` receive behavior as arguments, while `make_multiplier()` and `make_validator()` return new functions with baked-in configuration — demonstrating both forms precisely.
+- **Why does passing behavior as an argument simplify code?**
+  - All three let the library handle the iteration structure while we supply only the sorting criterion or transformation rule as a function. Like `sorted(students, key=lambda s: s.score)`, exposing only *what to look at* makes intent immediately readable without rewriting loops.
+- **How do `map`, `filter`, and `sorted` with `key=` demonstrate higher-order functions?**
+  - Factory functions are especially powerful when the same computation template varies only by configuration. With `make_multiplier(2)`, `make_validator(0, 100)`, and `retry(max_attempts=3)`, rules defined once and wrapped in a function can be reused at call sites without reassembling conditions each time.
 
 <!-- toc:begin -->
 ## In this series

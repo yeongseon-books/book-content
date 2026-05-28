@@ -34,16 +34,9 @@ Lazy evaluation means deferring computation until a consumer actually asks for t
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying Lazy Evaluation and Generators?
-- Which signal should the example or diagram make visible for Lazy Evaluation and Generators?
-- What failure should be prevented first when Lazy Evaluation and Generators reaches a real system?
-
-## What You Will Learn
-
-- The difference between eager evaluation and lazy evaluation
-- Generator functions and generator expressions
-- Memory-efficient processing with itertools
-- Working with infinite sequences
+- What does lazy evaluation mean in practice?
+- When does laziness save memory or time?
+- What traps does lazy evaluation introduce?
 
 ## Why It Matters
 
@@ -342,12 +335,12 @@ Lazy evaluation defers computation to the moment values are needed, keeping memo
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Lazy Evaluation and Generators?**
-  - The article treats Lazy Evaluation and Generators as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Lazy Evaluation and Generators?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Lazy Evaluation and Generators reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What does lazy evaluation mean in practice?**
+  - Eager evaluation builds all values upfront like a list; lazy evaluation computes one at a time only when actually needed. The comparison of `get_squares(1_000_000)` as a list versus a `yield` version, and the size difference shown by `sys.getsizeof()`, make this contrast clear.
+- **When does laziness save memory or time?**
+  - `countdown()` suits a generator function when you need to `yield` multiple times while maintaining state; `sum(x ** 2 for x in range(...))` suits a generator expression for one-pass computations. Both execute only when the final consumer pulls values, saving memory even on large inputs.
+- **What traps does lazy evaluation introduce?**
+  - For infinite sequences, consume only the needed count with `islice(fibonacci(), 10)`. For large data, split processing into iterator stages like `read_lines() → parse_csv() → filter_by_score() → format_output()`. The scene at the end where `print(list(pipeline))` returns `[]` also confirms that a generator is exhausted after one consumption.
 
 <!-- toc:begin -->
 ## In this series

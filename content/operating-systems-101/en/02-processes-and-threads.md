@@ -35,9 +35,9 @@ This is the 2nd post in the Operating Systems 101 series. It explains what a pro
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying Processes and Threads?
-- Which signal should the example or diagram make visible for Processes and Threads?
-- What failure should be prevented first when Processes and Threads reaches a real system?
+- What resources does a process own?
+- What does a thread share and what does it keep separate?
+- Why are `fork` and `exec` split into two steps?
 
 ## Questions this article answers
 
@@ -45,13 +45,6 @@ This is the 2nd post in the Operating Systems 101 series. It explains what a pro
 - What do threads share, and what stays private to each thread?
 - Why are `fork` and `exec` split into two separate steps?
 - In CPU-bound and I/O-bound work, when should you choose processes and when should you choose threads?
-
-## What You Will Learn
-
-- The four resources a process owns (memory, fds, permissions, CPU state)
-- What threads share and what they keep private
-- The process creation model — `fork` and `exec`, and Windows `CreateProcess`
-- Trade-offs between multi-process and multi-threaded designs
 
 ## Why It Matters
 
@@ -253,12 +246,12 @@ The next article zooms into the OS function that decides which of these many pro
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Processes and Threads?**
-  - The article treats Processes and Threads as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Processes and Threads?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Processes and Threads reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What resources does a process own?**
+  - A process owns its own virtual address space, file descriptor table, signal handlers, permissions, and PID. In the `os.fork()` example, parent and child diverge from the same code but get different PIDs, and modifying list `x` in one does not change it in the other — demonstrating memory isolation.
+- **What does a thread share and what does it keep separate?**
+  - Threads within the same process share code, heap, globals, and file descriptors, but each keeps its own stack and register state. The `threading.Thread` example shows `99` appended to the same list `x`, but touching shared memory means synchronization like locks is required.
+- **Why are `fork` and `exec` split into two steps?**
+  - `fork` duplicates the parent's execution context to create a child, and `exec` replaces the child's memory image with a completely different program. The shell uses `fork` then `os.execvp("ls", ["ls", "-la"])` because it can inherit the parent's environment and fd state while naturally switching to a different executable.
 
 <!-- toc:begin -->
 ## In this series

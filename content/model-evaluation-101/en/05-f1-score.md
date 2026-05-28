@@ -34,9 +34,9 @@ This rewrite fixes that defect directly. F1 is still useful, but threshold selec
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying F1 Score?
-- Which signal should the example or diagram make visible for F1 Score?
-- What failure should be prevented first when F1 Score reaches a real system?
+- What problem does the F1 score solve?
+- How does F-beta generalize F1?
+- When is F1 not the right metric?
 
 ## This post answers
 
@@ -261,12 +261,12 @@ F1 is still a useful summary, but only after you make its hidden choices explici
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying F1 Score?**
-  - The article treats F1 Score as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for F1 Score?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when F1 Score reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **`micro 0.927`, `macro 0.881`, `weighted 0.925` — same predictions, but why do they lead to different conclusions?**
+  - The three scores summarize the same predictions with different questions. As shown in the article, micro and weighted reflect the majority class more heavily and score higher, while macro weights all classes equally, so the weakness of the third class `per class [0.952, 0.923, 0.768]` shows up more strongly.
+- **Why is the procedure of locking the best validation-set threshold (0.20) and evaluating it on the test set important?**
+  - This procedure prevents threshold selection and final evaluation from mixing, and verifies whether the policy chosen on the validation set holds on new data. In the actual example, applying the validation-set best 0.20 to the test set confirmed `F1 0.627`, `precision 0.527`, `recall 0.775`, avoiding an optimistic pattern.
+- **The test set makes 0.20 look good on F1 alone — why should the ops team also consider 0.50?**
+  - 0.20 gives recall 0.775 but precision of only 0.527, meaning nearly half the alerts could be false positives. Meanwhile 0.50 yields a lower `F1 0.490` but offers precision 0.717, making it a more realistic candidate for operations where the false-positive budget is tight.
 
 <!-- toc:begin -->
 ## In this series
