@@ -184,12 +184,12 @@ The earlier chapters established the mental model, triggers, and bindings; this 
 
 ## Answering the Opening Questions
 
-- **Why are the Functions Host and the language worker separate processes?**
-  - The article treats Host and Worker — Who Actually Runs Your Functions? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What message flow runs over the gRPC channel between Host and worker?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How many function instances does one worker run concurrently?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why are the Functions Host and language Worker separate processes rather than one?**
+  - Instead of the Host embedding `CPython`, `V8`, and `JVM` in a single process, Azure Functions separates Host and language Worker to reduce per-language runtime conflicts. So the Host handles triggers, bindings, and scale signals while actual user code executes in a separate process like `azure_functions_worker`.
+- **What message flow passes through the gRPC channel between Host and Worker?**
+  - After detecting a trigger, the Host sends the function name, input payload, and binding resolution results to the Worker via gRPC. The Worker executes that invocation and returns the result, exceptions, and log signals back to the Host—so the initialization messages and actual function calls visible in `func start --verbose` happen over this channel.
+- **How many function invocations can a single Worker process handle concurrently?**
+  - The Python Worker isn't simply "always one at a time." Synchronous `def` functions can overlap in the thread pool, `async def` functions share a single event loop, and when needed, settings like `FUNCTIONS_WORKER_PROCESS_COUNT` and `host.json`'s `maxConcurrentRequests` let you further tune intra-instance concurrency.
 
 <!-- toc:begin -->
 ## In this series

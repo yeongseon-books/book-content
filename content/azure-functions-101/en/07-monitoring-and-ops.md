@@ -221,12 +221,12 @@ If you want to go deeper into the implementation, continue with [Deep Dive — S
 
 ## Answering the Opening Questions
 
-- **How do Application Insights and Log Analytics divide responsibilities for Functions ops?**
-  - The article treats Monitoring and Operations Fundamentals as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which queries actually surface per-function latency, failure rate, and dependency calls?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **When does Live Metrics beat stream logs, and vice versa?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do Application Insights and Log Analytics divide their roles in Azure Functions operations?**
+  - Application Insights is the primary operational surface centered on `requests`, `exceptions`, `dependencies`, and `traces` that lets you immediately read function invocations and exception flows. When you need to extend anomalies found there into longer time-horizon queries and metrics, Log Analytics and KQL become the practical analysis tools.
+- **What queries should you have ready to see per-function latency, failure rate, and dependency calls?**
+  - The basic patterns shown in this article are sufficient. Looking at `Failed=countif(success == false)` and `percentile(duration, 95)` from `requests`, combined with `target`, `resultCode`, and `FailureRate` from `dependencies`, lets you quickly narrow down which functions are slow and which external systems are causing failures.
+- **When is Live Metrics more useful versus stream logs?**
+  - Live Metrics is best for seeing "what's happening right now" within 30 seconds—instance count, failure rate, response time. Conversely, stream logs via `az webapp log tail --name $APP --resource-group $RG` or `traces` queries are more useful when you need immediate cause context—like post-deployment indexing failures, Host startup issues, or specific function exceptions.
 
 <!-- toc:begin -->
 ## In this series

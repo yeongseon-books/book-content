@@ -169,12 +169,12 @@ crictl images | grep my-app
 
 ## Answering the Opening Questions
 
-- **On exactly what interval does the kubelet poll what, and how do you tune that interval?**
-  - The article treats kubelet and containerd — how a container actually starts on a node as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Once containerd replaced dockershim, why did docker commands vanish, and how did debugging shift?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Are image pulls cached per node, and who authenticates the pull?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What exactly does kubelet watch, and at what point does it call CRI?**
+  - kubelet watches the API server for Pods assigned to its node, prepares volumes/Secrets/Configs, then converges the node's desired state to actual state. It then calls CRI through the local Unix socket path, initiating the execution chain in order: `RunPodSandbox`, `PullImage`, `CreateContainer`, `StartContainer`. That is, kubelet delegates execution to the runtime layer from the moment binding completes and "this Pod must run on this node" is confirmed.
+- **Why did AKS node debugging change after dockershim was removed?**
+  - As emphasized in this article, the default execution path on AKS Linux nodes is now kubelet → CRI → containerd, not Docker. So rather than trying to see everything at once with `docker ps` instincts, the proper approach is to examine kubelet logs and CRI state together: `journalctl -u kubelet`, `crictl ps`, `crictl inspectp`, `crictl inspect`. After dockershim was removed, the debugging focus shifted from "which engine is visible" to "what did kubelet request from the runtime, and at which stage did it stop."
+- **Why are `RunPodSandbox`, `PullImage`, `CreateContainer`, `StartContainer` called in this specific order?**
+  - A Pod needs shared network and namespace context before individual containers, so `RunPodSandbox` comes first. On top of that, downloading the image, creating container configuration, and finally starting the process must happen in sequence so that `PullImage` failures and `StartContainer` failures can be isolated to different stages. The article emphasizes this order precisely so that registry auth issues, sandbox network problems, and entrypoint failures aren't lumped together as "Pod won't start."
 
 <!-- toc:begin -->
 ## In this series

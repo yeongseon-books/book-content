@@ -341,12 +341,12 @@ az webapp config appsettings list -n my-app -g my-rg \
 
 ## Answering the Opening Questions
 
-- **Inside what sandbox does the Worker process run, and what does that sandbox actually block?**
-  - The article treats Workers and the sandbox — where user code actually runs as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How do sandbox restrictions appear in file system, network, and process spawning?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **When a worker dies, who starts healing on what signal?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What execution boundary does an App Service worker actually represent?**
+  - A worker isn't just another name for the instance count shown in the portal—it's the boundary where user code actually runs and gets constrained. On Windows, that boundary is the process inside IIS and the App Service sandbox. On Linux, it's a container that respects the port binding and startup contract.
+- **What does the App Service sandbox allow and restrict in Windows code apps?**
+  - The sandbox allows normal web app execution but intentionally narrows OS feature access to protect multi-tenant quality. So while an app can run normally on top of IIS, libraries that assume registry write, graphics subsystem, or certain local communication paths will hit the boundary immediately when brought in the same way.
+- **Why do registry write and GDI/User32 constraints frequently cause issues in Windows App Service?**
+  - Many Windows libraries naturally assume registry, GDI, and User32 access as givens on local servers. But the App Service sandbox doesn't maintain those assumptions, so HTML-to-PDF, font rendering, `System.Drawing`, and browser automation code particularly often collide with the execution boundary.
 
 <!-- toc:begin -->
 ## In this series

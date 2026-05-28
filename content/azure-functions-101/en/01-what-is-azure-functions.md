@@ -202,12 +202,12 @@ The next concepts to internalize are **triggers and bindings**: what kinds of ev
 
 ## Answering the Opening Questions
 
-- **What model of serverless compute is Azure Functions, exactly?**
-  - The article treats What Is Azure Functions? — A World Where Events Call Your Code as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Does per-execution billing actually save money, and when does it backfire?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Where does Functions sit in an event-driven architecture?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What serverless compute model should Azure Functions be understood as?**
+  - Azure Functions is an execution model that wakes functions only when events arrive—HTTP requests like `@app.route(route="hello")` or queue messages like `@app.queue_trigger(queue_name="orders-incoming")`. Since instances can return to idle or be reclaimed after invocation ends, it's best understood as a platform where you think about events and execution lifecycle first, rather than an always-running server.
+- **When is execution-count and execution-time based billing advantageous, and when does it become unfavorable?**
+  - Lightweight HTTP functions like `hello` or workloads that only run when queue messages arrive like `order_received` fit execution-based billing well. Conversely, for services with consistently high 24/7 invocations or near-zero tolerance for first-request latency, the cost and operational simplicity of maintaining warm instances may matter more than Functions' advantages.
+- **What position does Azure Functions occupy in event-driven architecture?**
+  - As the examples in this series show, Azure Functions is a reaction layer that executes code when events occur—`orders-incoming` queue messages, Blob uploads, timers. So it fits most naturally in architectures structured around "when an event arrives, invoke a small function to produce downstream processing" rather than "an always-listening web server."
 
 <!-- toc:begin -->
 ## In this series

@@ -225,12 +225,12 @@ az functionapp plan create \
 
 ## Answering the Opening Questions
 
-- **What does each plan (Consumption, Premium, Dedicated) bill against?**
-  - The article treats Which Plan Should You Pick? — Consumption / Flex / Premium / Dedicated as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **When should cold-start tolerance drive the plan choice instead of price?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Which platform features (VNet integration, always-ready instances) lock you into Premium or Dedicated?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What exactly does each plan charge for, and what does it constrain?**
+  - `Consumption` and `Flex Consumption` center on execution-based pay-per-use, but Flex also incurs costs for warm capacity when `Always Ready` is enabled. `Premium` pays for minimum instances to secure warm capacity, and `Dedicated` charges based on App Service Plan SKU—so scale-to-zero availability and fixed-cost structure differ together across plans.
+- **When does cold start tolerance become more important than price in plan selection?**
+  - When first-request latency is business-unacceptable for an HTTP path, the warm baseline matters before the price sheet. In such cases, you should first check whether levers exist to reduce cold start—like `Premium`'s minimum instances or `Flex Consumption`'s `Always Ready`—then compare costs afterward.
+- **What plan choices do platform features like VNet integration and Always Ready effectively force?**
+  - If `VNet` integration is required, classic `Consumption` drops out immediately, narrowing options to `Flex`, `Premium`, or `Dedicated`. If Windows requirements or deployment slots are also needed, `Premium` or `Dedicated` become more natural. For Linux-based new serverless apps where `Always Ready` and per-function scaling are key, `Flex Consumption` becomes the default candidate.
 
 <!-- toc:begin -->
 ## In this series

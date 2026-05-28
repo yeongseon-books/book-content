@@ -205,12 +205,12 @@ If you want the implementation details behind those behaviors, pair this chapter
 
 ## Answering the Opening Questions
 
-- **What signals does the Functions scale controller use to add instances?**
-  - The article treats Scaling and Cold Starts — When Serverless Feels Fast and When It Doesn’t as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Where exactly does cold start happen, and what do you measure to see it?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How much cold start does Premium's always-ready instances actually erase?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What signals does the Functions scale controller watch to add instances?**
+  - The scale controller watches demand signals appropriate to the trigger type to increase instances. For HTTP, request pressure and per-instance concurrency matter most; for queue-type triggers, values like backlog, batch size, and prefetch count are more direct signals—so even within the same app, you need to first identify which trigger is creating the bottleneck.
+- **At exactly which stage does cold start occur, and what should you measure to observe it?**
+  - Cold start is the sum of new instance allocation, Host initialization, Worker startup, imports and global initialization, and first invocation processing. That's why you need to look at `InstanceCount`, `FunctionExecutionUnits`, App Insights latency distribution, alongside how much initialization paths like `create_cosmos_client()` inflate first-request time.
+- **How much does Premium's Always Ready or Flex's always-ready instances reduce cold start?**
+  - These settings front-load new instance and Host preparation costs to reduce first-invocation latency. However, even with `Always Ready` or always-ready instances, they don't eliminate large imports, slow global initialization, or first DB connection creation—so plan settings and code initialization must be addressed together.
 
 <!-- toc:begin -->
 ## In this series

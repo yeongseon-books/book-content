@@ -336,12 +336,12 @@ curl -s https://my-app.azurewebsites.net/diag/worker
 
 ## Answering the Opening Questions
 
-- **What does a Front-End node actually do, and where does ARR (Application Request Routing) sit inside it?**
-  - The article treats Front-End and ARR — how a request reaches a worker as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Is the ARR Affinity cookie just a sticky session, or more than that?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How do TLS termination and SNI handling flow through the Front End?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What kind of decisions does Front-End make first, beyond simple load balancing?**
+  - Front-End first interprets which app and which slot a request belongs to, using host name, custom domain, and slot context. Then ARR looks at currently valid worker candidates alongside the affinity cookie to determine the actual destination—so Front-End's first judgment is closer to app identification and routing context resolution than simple distribution.
+- **How does the ARR Affinity cookie differ from an application session cookie?**
+  - Session cookies carry business state like login status or shopping carts, but `ARRAffinity` is a platform cookie that pins the same browser to the same worker. That's why when only some users experience slowness or failures, you should check whether those users are pinned to a problematic worker before examining application logic.
+- **How do the stage of determining which app and slot a request belongs to differ from the stage of choosing a worker?**
+  - The front-stage question is "given this host and URL, is it production or staging, which app does it enter?" The back-stage question is "within that app context, which worker handles this particular request?" Separating these two lets you read slot swaps as routing transitions and explain partial outages as either custom domain issues or worker stickiness problems.
 
 <!-- toc:begin -->
 ## In this series

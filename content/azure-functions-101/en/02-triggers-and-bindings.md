@@ -195,12 +195,12 @@ The mental model from the opening chapter becomes much more concrete once you se
 
 ## Answering the Opening Questions
 
-- **What is fundamentally different about a trigger versus a binding, and why are they split?**
-  - The article treats Triggers and Bindings — Everything About Function I/O as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How much code do input/output bindings remove, and what flexibility do you give up?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Can multiple triggers attach to one function, and if not, why?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What fundamentally distinguishes triggers from bindings, and why are they separated?**
+  - `@app.queue_trigger(arg_name="msg", queue_name="orders-incoming")` is the execution cause that wakes the function, while `@app.cosmos_db_output(...)` is the data channel determining where the executed function's results go. Separating execution cause from I/O channels also makes it clearer which layer retry, failure recording, and idempotency decisions belong to.
+- **How much do input and output bindings reduce code, and what constraints do they introduce in return?**
+  - Output bindings like `invoice_out.set(func.Document.from_json(json.dumps(invoice)))` let you write the storage path concisely without creating a Cosmos DB client directly. However, bindings only reduce connection and serialization boilerplate—output failure reprocessing, partial failure policies, and idempotency guarantees still remain as function design and operational responsibilities.
+- **If you can't attach multiple triggers to a single function, what's the reason?**
+  - The reason for one trigger per function is to never make "what woke this function" ambiguous. When the execution cause is fixed as either HTTP or the `orders-incoming` queue, the input payload, retry model, and downstream operational paths like poison queues or DLQs all become clear together.
 
 <!-- toc:begin -->
 ## In this series

@@ -131,12 +131,12 @@ kubectl get hpa -n my-ns | grep keda
 
 ## Answering the Opening Questions
 
-- **How does KEDA synthesize HPA external metrics, and where does the adapter's responsibility end?**
-  - The article treats KEDA internals — how a ScaledObject builds an HPA as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What is the decisive difference between triggers that scale to zero and those that cannot?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How do ScaledObject and ScaledJob differ in intent, and who picks which?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How does KEDA convert a ScaledObject into a generated HPA, and what does it guarantee in the process?**
+  - The operator shown in this article, at the `scaledobject_controller.go` path, verifies the target exposes a `/scale` subresource, matches required labels, then creates or updates the generated HPA. So ScaledObject is the declaration, and the actual autoscaling artifact inside Kubernetes is the generated HPA. What operators should verify here is: "if the declaration is valid, does an HPA get created as a concrete artifact connected to the target workload?"
+- **What does the metrics adapter take responsibility for in the external metrics path?**
+  - The metrics adapter opens the `v1beta1.external.metrics.k8s.io` API surface, reads the `scaledobject.keda.sh/name` selector, queries the metrics service via gRPC, and returns values for the HPA to consume. Its core responsibility is translating external metrics into a Kubernetes API path consumable by HPA. It doesn't directly perform replica changes on the target workload—that step passes to the generated HPA and KEDA's `0 ↔ 1` control boundary.
+- **What questions does the scaler interface ask of the event source?**
+  - As summarized in this article, the scaler interface asks three things of the event source: whether this source is currently active, what metric spec to pass to the HPA, and what actual metric value the adapter should return. So the scaler isn't a simple number collector but a layer that handles both activation decisions and metric translation together.
 
 <!-- toc:begin -->
 ## In this series

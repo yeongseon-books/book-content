@@ -183,12 +183,12 @@ These checks make the placement contract visible: Pod-side constraints, node-sid
 
 ## Answering the Opening Questions
 
-- **Through which stages does kube-scheduler narrow down nodes for a single Pod?**
-  - The article treats Scheduler and Pod placement — who decides which node as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What intent originally drove nodeSelector, affinity, taints/tolerations, and topologySpreadConstraints?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **PriorityClass and preemption protect the SLO — who pays the side-effect bill?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What stages does kube-scheduler go through to narrow down node candidates for a single Pod?**
+  - The basic flow shown in this article splits into a scheduling cycle and a binding cycle. Within the scheduling cycle, Filter first removes impossible nodes, then Score ranks the remaining candidates. The binding cycle then records the selection result to the API server, and only then does kubelet's node-local execution path begin. In other words, the scheduler's output isn't a running Pod—it's a `Pod -> Node` decision.
+- **What different intentions do `nodeSelector`, affinity, taint/toleration, and topology spread express?**
+  - `nodeSelector` and affinity express which nodes can be candidates, but affinity can carry richer placement intent like zone or specific attribute requirements. Taints and tolerations are boundaries that protect specific node pools from arbitrary Pod placement. Topology spread controls how evenly Pods distribute across zones or hosts among feasible nodes. So all four are placement policies, but each focuses more strongly on candidate restriction, isolation, or distribution respectively.
+- **How do you distinguish between all nodes failing Filter versus feasible nodes existing but Binding failing?**
+  - When all nodes fail Filter, the failure reasons appear immediately in `FailedScheduling` events with messages like `0/12 nodes are available` along with memory insufficiency, affinity mismatch, or untolerated taint. Conversely, if feasible nodes existed but Binding failed, candidate selection completed but committing the result to the API server stumbled—so you need to separate the placement computation from the recording stage. Understanding this difference prevents blindly attributing all Pending states to kubelet or runtime issues.
 
 <!-- toc:begin -->
 ## In this series

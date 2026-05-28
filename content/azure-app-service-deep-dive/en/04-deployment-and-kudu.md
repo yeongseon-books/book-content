@@ -283,12 +283,12 @@ az webapp config appsettings list -n my-app -g my-rg --slot staging \
 
 ## Answering the Opening Questions
 
-- **Where does Kudu run, and through what stages does an App Service 'deployment' actually flow?**
-  - The article treats Deployment and Kudu — build, sync, release from the inside as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How are ZIP deploy, OneDeploy, GitHub Actions, and Run From Package fundamentally different?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **When you swap a Deployment Slot, what gets swapped and what does not?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What public surface does Kudu provide in App Service exactly?**
+  - Kudu isn't "somewhere deployments happen" but an actual SCM site exposing `zipdeploy`, `publish`, `vfs`, and `deployments`. So deployment history verification, `wwwroot` file placement checks, and specific deployment log tracking all flow through the Kudu API, and Kudu success should first be read as artifact receipt and orchestration completion.
+- **How does ZipDeploy differ from simply unzipping a file?**
+  - ZipDeploy is an entry point that receives a ZIP file and passes it to the deployment job—it's not always "extract and run." When `SCM_DO_BUILD_DURING_DEPLOYMENT` is enabled, a build stage enters; when run-from-package is enabled, the result becomes a read-only `wwwroot` mounted package rather than file copies.
+- **Where do the classic Kudu path for Windows code apps and the Oryx path for Linux code apps diverge?**
+  - Windows code apps follow a relatively straight path where Kudu receives artifacts and runs deployment scripts to place results in `wwwroot`. Linux code apps, however, have Oryx inserting detect-build-startup in between, so even if Kudu deployment itself succeeded, the startup script Oryx created can stall at the final readiness gate if it conflicts with the runtime contract.
 
 <!-- toc:begin -->
 ## In this series

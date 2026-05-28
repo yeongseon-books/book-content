@@ -359,12 +359,12 @@ az webapp show -n my-app -g my-rg \
 
 ## Answering the Opening Questions
 
-- **What layers really make up App Service's 'platform'?**
-  - The article treats App Service platform architecture — Front-End, Worker, File Server as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Is an App Service Plan just a price tag, or is it an isolation unit?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Who owns the Front-End pool and the Worker pool, and where exactly does your code run?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What boxes should you mentally divide the App Service "platform" into?**
+  - App Service is more accurately understood not as "a place to put a web app" but as a platform where Front-End, ARR, Worker, shared storage, and Kudu connect together. Separating these five boxes lets you immediately judge whether to read a partial-user-failure from routing, or a post-deployment startup failure from the Kudu-to-runtime boundary.
+- **What does the App Service Plan mean beyond a simple billing unit—in terms of isolation and capacity?**
+  - The App Service Plan is an execution unit holding worker capacity and isolation boundaries before it's a cost tag. Looking at `numberOfWorkers`, `serverFarmId`, and per-site scaling reveals that apps don't each get their own VM but rather consume capacity on the same plan, potentially sharing the same substrate.
+- **What responsibilities do Front-End, Worker, and shared storage each hold, and where do they connect?**
+  - Front-End decides which worker receives a request based on host and affinity. Worker actually executes that request in a process or container. Shared storage is the file reference point that lets multiple workers see the same `/home/site/wwwroot`, and since Kudu places artifacts here, the request path and deployment path meet at exactly this point.
 
 <!-- toc:begin -->
 ## In this series

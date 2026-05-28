@@ -333,12 +333,12 @@ az monitor metrics list \
 
 ## Answering the Opening Questions
 
-- **On what metric sources and what cadence does auto-scale evaluate rules?**
-  - The article treats Scaling internals — how Scale Out decisions become new workers as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Scale-out and scale-up are not the same decision tree — who decides what, and how?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **When should you turn per-site scaling on, and when is it dangerous?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What do scale-up and scale-out actually change in App Service?**
+  - Scale-up increases a single worker's CPU, memory, and SKU tier, while scale-out increases the number of workers the App Service Plan uses. That's why you shouldn't look at memory pressure and worker concurrency shortage through the same scaling button—instead, judge which resource hit its limit first and choose the appropriate axis.
+- **Why should autoscale rules be seen as attached to the App Service Plan rather than to an app?**
+  - Because the autoscale target resource is the plan, what actually changes is shared worker capacity—not a dedicated server for one app. So one app's burst can shake the capacity used by other apps on the same plan, and scale events are more accurately read from plan-level metrics and activity logs than from a single app's logs.
+- **What cadence and observation window does Azure Monitor autoscale use to evaluate rules?**
+  - Azure Monitor autoscale isn't a feature that sees a metric once and reacts immediately—it's an engine that evaluates rules periodically. Because `timeGrain`, `timeWindow`, `statistic`, and `cooldown` together shape reaction speed, the actual perceived scaling time should be understood as the accumulated result of observation window, evaluation cadence, cooldown, and readiness—not just a single threshold crossing.
 
 <!-- toc:begin -->
 ## In this series

@@ -195,12 +195,12 @@ az monitor diagnostic-settings list \
 
 ## Answering the Opening Questions
 
-- **What components make up the AKS control plane, and who exactly notices when each one fails?**
-  - The article treats Control plane anatomy — what AKS hides from you as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How far does the 'managed control plane' promise extend — etcd backup, upgrades, multi-zone availability?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Which scenarios surface API-server throttling first, and where does your workload create the pressure?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What exactly comprises the AKS control plane, and what can users directly observe?**
+  - The core components of the AKS control plane are `kube-apiserver`, `etcd`, `kube-controller-manager`, and `kube-scheduler`. However, what AKS users actually encounter isn't the control plane host itself but rather the API endpoint, object states, API signals like `readyz`, and logs collected through diagnostic settings. In other words, rather than managing internal processes directly, you read the state store and convergence loops behind the scenes through the API surface.
+- **What does the "managed control plane" promise cover, and where does operational responsibility still fall on the user?**
+  - The managed promise means Microsoft handles control plane patching, high-availability configuration, and core component lifecycle. Conversely, users remain responsible for private API access paths, RBAC and admission policies, audit log and diagnostic settings retention, and runbooks that distinguish control plane issues from node issues. That's why in AKS, "I don't operate the processes myself" and "I have no operational responsibility" should never be treated as the same statement.
+- **When reading the API server SLA, why should you look at the API surface before the internal implementation of etcd, scheduler, and controller-manager?**
+  - Because every path through which users actually communicate—`kubectl`, GitOps controllers, Terraform—goes through the API server, perceived control plane quality first manifests as API request success rate and latency. Even etcd delays or scheduler convergence issues are indirectly reflected through API surface anomalies like object state changes, watch delays, and `readyz` results. That's why in early-stage incidents, it's more accurate to first determine whether the API is down, slow, or whether the backend loops are backed up, rather than speculating about internal implementation.
 
 <!-- toc:begin -->
 ## In this series

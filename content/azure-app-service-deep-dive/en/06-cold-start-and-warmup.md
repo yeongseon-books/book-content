@@ -274,12 +274,12 @@ done | sort -k2 -n | tail -10
 
 ## Answering the Opening Questions
 
-- **What sequence of steps actually adds up to cold-start on App Service?**
-  - The article treats Cold start and warmup — why the first request is expensive as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How much does Always On reduce cold-start, and when does it not help at all?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What must a warm-up ping hit to be meaningful, and what would give false confidence?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What preparation stages does cold start cost actually comprise in App Service?**
+  - Cold start isn't a single bottleneck but the layered cost of worker allocation, process or container startup, framework bootstrap, dependency connections, cache/JIT priming, and readiness gate passage. The first request is slow because these preparation stages execute belatedly on the actual user request path rather than through staging or warm-up paths.
+- **What kind of coldness does Always On reduce, and what kind of startup cost does it barely help with?**
+  - Always On reduces idle coldness by periodically pinging to prevent the app from going cold during idle periods. However, it doesn't substitute for the startup readiness cost needed after redeploy, restart, new scale-out worker introduction, or container recycle—so post-deployment and post-scaling delays must be addressed separately through warm-up endpoints and slot strategies.
+- **How do Windows and Linux express warm-up readiness through different tools and settings?**
+  - Windows opens separate preparation paths through IIS `applicationInitialization` and Always On, while Linux defines readiness contracts more directly through `WEBSITE_WARMUP_PATH`, `WEBSITE_WARMUP_STATUSES`, and `WEBSITES_CONTAINER_START_TIME_LIMIT`. Especially on Linux, if accepted statuses are set too loosely, responses like 302 or 404 can be mistaken for warm state—so the warm-up endpoint and status contract must be designed together.
 
 <!-- toc:begin -->
 ## In this series

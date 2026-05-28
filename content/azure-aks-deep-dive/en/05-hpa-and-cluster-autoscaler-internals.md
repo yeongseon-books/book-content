@@ -127,12 +127,12 @@ kubectl get nodes -L agentpool,kubernetes.azure.com/scalesetpriority
 
 ## Answering the Opening Questions
 
-- **From what metric sources does HPA read on what cadence, and how does it decide?**
-  - The article treats HPA and Cluster Autoscaler internals — two control loops as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What signals tell the Cluster Autoscaler that new nodes are required?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **When HPA and CA move at the same time, how does the race appear and how do you tame it?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What metrics does HPA read, at what interval, and how does it calculate desired replicas?**
+  - Per this article, HPA reads metrics like CPU and memory at a default 15-second sync period and determines replica count through a ratio calculation close to `desiredReplicas = ceil(currentReplicas * (currentMetric / targetMetric))`. In practice, tolerance, missing metrics, and stabilization windows add complexity, but operationally it's a "fast loop that converts metric ratios to replica counts." That's why replica increases are often visible before node scaling when load rises.
+- **What signal does Cluster Autoscaler use to determine "a new node is needed"?**
+  - Unlike HPA, Cluster Autoscaler doesn't directly read metric ratios. Instead, it takes unschedulable Pods—those the scheduler couldn't place—as its primary input. It then runs a binpacking estimator against each node pool's template node to determine "if a new node appeared, could these Pods actually land on it?" before requesting node count adjustments. The article describes CA as a slow, conservative loop precisely because of this intermediate simulation and provisioning wait time.
+- **Why does a race window occur when HPA and Cluster Autoscaler move simultaneously?**
+  - The race window exists because HPA and CA operate on different inputs and time scales. HPA increases replicas first; if there's no free node capacity, the scheduler leaves new Pods as Pending; only then does CA notice those unschedulable Pods and start node provisioning. Therefore, the period where Pending Pods briefly accumulate isn't a design bug but rather a normal intermediate state where two control loops meet sequentially.
 
 <!-- toc:begin -->
 ## In this series

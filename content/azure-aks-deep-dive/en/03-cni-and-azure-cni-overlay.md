@@ -186,12 +186,12 @@ Use the Azure-side subnet view to verify address-planning assumptions, then use 
 
 ## Answering the Opening Questions
 
-- **How do kubenet, Azure CNI, and Azure CNI Overlay differ in IP consumption and routing?**
-  - The article treats CNI and Azure CNI Overlay — where Pod IPs come from as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What operational limits emerge when Pod IPs consume real VNet IPs directly?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **In Overlay mode, what is the SNAT path for outbound traffic?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do kubenet, Azure CNI Pod Subnet, Azure CNI Node Subnet, and Azure CNI Overlay differ in IP consumption and routing?**
+  - The article notes kubenet is hard to consider as a long-term default and focuses the practical comparison on Azure CNI Pod Subnet, Node Subnet, and Overlay. Pod Subnet gives Pods VNet-routable IPs from a dedicated pod subnet; Node Subnet has Pods and nodes sharing the same subnet addresses; Overlay gives Pods IPs from a separate overlay CIDR and they appear under the node IP when going external. Ultimately the difference comes down to whether Pod IPs directly consume VNet address space or stay within an overlay CIDR.
+- **When Pod IPs directly consume real VNet address space, what operational limit surfaces first?**
+  - In flat models, subnet headroom becomes the scarcest resource first. Especially with Azure CNI Node Subnet where Pods and nodes share the same subnet, Pod growth and node scaling both eat into the same address pool simultaneously, so IP exhaustion pressure appears quickly. That's why the article emphasizes sizing address plans not by "does it look sufficient now" but by whether it can absorb projected maximum Pod count and node growth.
+- **In Overlay mode, what SNAT path does traffic from a Pod take to reach external destinations?**
+  - In Overlay, even though Pods use overlay CIDR IPs, those addresses aren't visible when traffic leaves the cluster. As the diagram in the article shows, Pod traffic passes through the node and gets SNATed based on the node IP before heading toward VNet or Internet destinations. That's why in Overlay operations, NAT Gateway SNAT port utilization and outbound failure rates become more important observation points than VNet IP savings alone.
 
 <!-- toc:begin -->
 ## In this series

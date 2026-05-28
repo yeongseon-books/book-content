@@ -293,12 +293,12 @@ The earlier chapters covered triggers and bindings, then the Host and Worker spl
 
 ## Answering the Opening Questions
 
-- **Which parameters absolutely must be settled before the first Function App is created?**
-  - The article treats Deploy a Function App — From Localhost to Azure as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Should you start with zip deploy, GitHub Actions, or VS Code direct deploy?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How does the Function App bind to its associated Storage account, and why does it need one?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What parameters should you finalize before creating your first Function App?**
+  - You first need to decide `RG`, `LOC`, `SA`, `APP`—Resource Group, region, Storage Account, and Function App name. Adding `--runtime-version 3.11`, `--flexconsumption-location $LOC`, `--instance-memory 2048`, and `--maximum-instance-count 100` ensures consistent scale and runtime behavior after deployment.
+- **Among zip deploy, GitHub Actions, and VS Code direct deploy, which should you start with?**
+  - For the first flow, starting with CLI publish like `func azure functionapp publish $APP` is simplest. Walking this path once makes it clearer that `--build remote`, zip deploy, GitHub Actions, and VS Code automation are all the same Function App publishing process wrapped in different shells.
+- **Why does a Function App necessarily require a linked Storage Account?**
+  - The Storage Account used by a Function App isn't a business data store—it's essential infrastructure for Host operation. As explained in this article, trigger locks, invocation metadata, and Timer schedule state go here, so without `AzureWebJobsStorage` the app itself may fail to start properly.
 
 <!-- toc:begin -->
 ## In this series
