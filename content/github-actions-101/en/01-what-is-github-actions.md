@@ -165,13 +165,12 @@ GitHub Actions is *automation that lives next to your code*. The next post explo
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Is GitHub Actions??**
-  - The article treats What Is GitHub Actions? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Is GitHub Actions??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Is GitHub Actions? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What exactly is GitHub Actions and where does it fit in CI/CD?**
+  - GitHub Actions is a platform that runs workflows in response to repository events. Unlike Jenkins, there's no separate server to maintain — YAML files in `.github/workflows/` become your CI/CD pipeline. The core differentiator is integration density with the GitHub ecosystem, connecting PR checks, releases, and package deployments on a single platform.
+- **What hierarchy should you understand for Workflow, Job, and Step?**
+  - A Workflow is the outer frame of automation, a Job is the unit of parallel execution, and a Step is a command executed sequentially within a Job. Following these three layers narrows down "where did it fail." Jobs can be sequenced with `needs`, and Steps can be controlled with `if` conditions.
+- **What minimal configuration should a first workflow start with?**
+  - Open triggers with `on: [push, pull_request]`, use a single job with three steps: checkout, setup, test. Then add `cache`, `paths` filters, and `concurrency` one by one to naturally evolve toward production quality. Starting small and growing incrementally is more learning-efficient than building the perfect pipeline from scratch.
 <!-- toc:begin -->
 ## In this series
 

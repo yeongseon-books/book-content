@@ -278,13 +278,12 @@ Next, we examine the smallest unit of discrete math — the proposition — toge
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Is Discrete Mathematics??**
-  - The article treats What Is Discrete Mathematics? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Is Discrete Mathematics??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Is Discrete Mathematics? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do discrete and continuous mathematics differ?**
+  - The article showed with `continuous_sample` and `discrete_set` examples that continuous subjects can only be handled through approximate samples, while discrete subjects allow exact element counting. Since computer memory and bits are inherently discrete, structures like propositions, sets, and graphs — not real numbers — become the fundamental language of computer science.
+- **How do the five pillars of discrete math connect?**
+  - As the ASCII diagram showed, it starts with logic, descends through sets, functions, and relations, then passes through combinatorics, sequences, and graphs to reach algorithms and data structures. The binary search recurrence, set operation code, and graph neighbor lookup examples demonstrate these five pillars are a connected toolbox, not separate chapters.
+- **Why is discrete math mandatory in CS curricula?**
+  - Algorithm analysis needs recurrences like `T(n)=T(n/2)+1`, databases read as set operations like `A ∪ B` and `A ∩ B`, and networks and dependency management are modeled as graphs. So discrete math isn't a separate elective but the common foundation for understanding algorithms, databases, and networks.
 <!-- toc:begin -->
 ## In this series
 

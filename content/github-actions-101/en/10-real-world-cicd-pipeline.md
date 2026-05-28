@@ -220,13 +220,12 @@ If you followed along, you can handle *95% of real-world CI/CD*. From here, deep
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying A Real-World CI/CD Pipeline?**
-  - The article treats A Real-World CI/CD Pipeline as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for A Real-World CI/CD Pipeline?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when A Real-World CI/CD Pipeline reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why should PR, main, and tag be separated into different responsibilities?**
+  - PR validates "is this code safe," main push "builds verified code and deploys to staging," and tag push means "production release." Each stage needs different permissions, secrets, and execution scope, so separating workflow files clarifies responsibilities and strengthens security.
+- **What duplication do reusable workflows eliminate?**
+  - Common steps like Python setup, cache configuration, dependency installation, and Docker builds are defined once and called from multiple workflows. Updates propagate from a single source, preventing the drift of "why is this repo's setup different from that repo's." At org level, multiple repos' CI standards can be unified into one shared workflow.
+- **How far should a composite action bundle?**
+  - If a step combination always runs together and repeats across multiple jobs/workflows, it's a composite action candidate. Project setup (checkout + setup + install), notification sending, and cache restore + build are typical patterns. Bundling too many features makes inputs complex, so "describable in one sentence" is a good sizing criterion.
 <!-- toc:begin -->
 ## In this series
 

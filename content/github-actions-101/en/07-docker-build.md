@@ -181,13 +181,12 @@ Automating Docker builds is the *gateway to deployment automation*. Next: *Deplo
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Docker Build?**
-  - The article treats Docker Build as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Docker Build?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Docker Build reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why is Buildx used more often than the regular builder?**
+  - Buildx supports multi-platform builds, advanced cache backends (gha, registry), and parallel build stage execution. Regular `docker build` suffices for local builds, but when CI needs cache optimization and multi-architecture support, Buildx becomes essential. One line with `docker/setup-buildx-action` sets it up.
+- **How does GitHub Actions cache affect Docker layer build time?**
+  - Setting `cache-from: type=gha` reuses previous build layers, skipping unchanged layer rebuilds. When the dependency install layer is cached, build time drops from minutes to seconds. `mode=max` caches all stages for maximum effect in multi-stage builds.
+- **What permissions are needed when pushing to GHCR?**
+  - Set `permissions: packages: write` at job level and login via `docker/login-action` with `GITHUB_TOKEN`. Works without separate PATs; image names must be lowercase. On PRs, the typical pattern is build verification only without pushing.
 <!-- toc:begin -->
 ## In this series
 

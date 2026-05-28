@@ -161,13 +161,12 @@ Next post covers *Building a Learning Plan*.
 
 ## Answering the Opening Questions
 
-- **What actually differs across frontend, backend, data, SRE, ML, and mobile roles?**
-  - The article treats Understanding Roles as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why do responsibilities, tools, and metrics diverge so sharply under the same "developer" label?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How can you tell whether your current role fits you or whether a transition is worth exploring?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What actually differs between frontend, backend, data, SRE, ML, and mobile roles?**
+  - Each role handles different types of problems, uses different tools, and measures success by different metrics. Frontend prioritizes UI and performance, backend prioritizes features and reliability, data prioritizes accuracy and usability.
+- **Why do responsibilities, tools, and metrics differ completely under the same "developer" title?**
+  - The title may be the same but problem size, responsibility scope, and required communication styles differ. Explicitly understanding this clarifies your own strengths and weaknesses.
+- **How can you judge whether your current role fits you or whether you should consider a transition?**
+  - Define success metrics for your current role, distinguish what you do well from what's difficult, then use those criteria to decide transition timing and learning plans.
 <!-- toc:begin -->
 ## In this series
 

@@ -285,13 +285,12 @@ Next, we examine how to "rigorously prove" claims like these — direct, contrad
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Relations and Equivalence?**
-  - The article treats Relations and Equivalence as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Relations and Equivalence?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Relations and Equivalence reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do you define and represent binary relations?**
+  - A binary relation is a subset of `A × A`. The article represented the same relation in two ways using ordered pair sets like `friends` and an adjacency matrix example. Relations are thus not just abstract definitions but structures directly implementable as graphs, matrices, and adjacency lists.
+- **How do you distinguish reflexive, symmetric, transitive, and antisymmetric properties?**
+  - The `is_reflexive`, `is_symmetric`, `is_transitive`, `is_antisymmetric` functions showed the exact criteria for each property. The key point: symmetric means if `(a,b)` exists then `(b,a)` must too; antisymmetric means if both exist simultaneously then `a=b` must hold — mixing these intuitively leads to errors.
+- **Why do equivalence relations, equivalence classes, and partitions connect?**
+  - In the `mod_equivalent` example, grouping numbers with the same remainder creates equivalence classes `[0]`, `[1]`, `[2]`, which partition the entire set without overlap. So defining an equivalence relation is the same as defining a classification rule — by what criterion to treat data as "the same."
 <!-- toc:begin -->
 ## In this series
 

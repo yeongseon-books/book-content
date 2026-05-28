@@ -170,13 +170,12 @@ Artifacts are the *receipts of your build*. Next: *Docker build*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Build Artifacts?**
-  - The article treats Build Artifacts as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Build Artifacts?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Build Artifacts reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **When are `upload-artifact` and `download-artifact` each used?**
+  - `upload-artifact` stores job outputs (build artifacts, test reports, logs) in the workflow run. `download-artifact` retrieves artifacts from a previous job in the next job. The "build once, verify many times" pattern operates on these two actions.
+- **Why are artifacts useful for passing results between jobs?**
+  - Jobs run on different runners and don't share filesystems. `outputs` can only pass short strings; files like built wheels or test reports can only be passed via artifacts. Rebuilding in every job also risks environment-difference issues, so sharing one build result via artifacts is more stable.
+- **How does `retention-days` relate to cost?**
+  - Artifacts consume storage during retention — 500MB on Free, 2GB on Pro. Leaving retention at 90 days (default) quickly fills the limit with a few days of build artifacts. 1-3 days for CI purposes and attaching releases separately to GitHub Releases keeps costs reasonable.
 <!-- toc:begin -->
 ## In this series
 

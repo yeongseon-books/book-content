@@ -177,13 +177,12 @@ Next post covers *Mentoring and Networking*.
 
 ## Answering the Opening Questions
 
-- **What makes a side project compatible with a full-time job?**
-  - The article treats Side Projects and Learning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why does a small MVP beat a grand vision for long-term learning?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How do time boxes, public releases, and feedback loops keep the work sustainable?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What conditions should a good side project have to avoid conflicting with your main job?**
+  - A side project's value lies not in technology but in the experience of driving the entire cycle from requirements definition to deployment and maintenance.
+- **Why start with a small MVP instead of a too-large idea?**
+  - Even small projects that receive user feedback, fix bugs, and add features create practical growth.
+- **How do time-boxing, publishing, and feedback make side projects sustainable?**
+  - Side projects published on GitHub with thorough READMEs become powerful evidence during job changes or evaluations.
 <!-- toc:begin -->
 ## In this series
 

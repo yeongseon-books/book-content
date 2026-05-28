@@ -160,13 +160,12 @@ Next post covers *Resume and Portfolio*.
 
 ## Answering the Opening Questions
 
-- **What structure keeps learning sustainable during a busy quarter?**
-  - The article treats Building a Learning Plan as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How should quarterly goals and weekly time blocks connect to each other?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How do you choose books, courses, and codebases without drowning in input?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What structure is needed to sustain learning amid a busy routine?**
+  - A learning plan should consist of one weak competency, one new domain, and externally visible deliverables.
+- **How should quarterly goals and weekly routines connect?**
+  - Reading books or watching courses alone isn't enough — you must turn them into actual code or projects for learning to become real competency.
+- **What criteria should guide choosing books, courses, and codebases so inputs don't just pile up?**
+  - Set learning objectives, verify quarterly achievement, and record where unexpected time was spent — this makes the next quarter's plan far more realistic.
 <!-- toc:begin -->
 ## In this series
 

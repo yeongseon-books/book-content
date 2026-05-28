@@ -196,13 +196,12 @@ Deployment automation defines your *cost of change*. Next: *Secret management*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Deployment Automation?**
-  - The article treats Deployment Automation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Deployment Automation?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Deployment Automation reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do you separate staging auto-deploy from production approval gates?**
+  - The staging environment has no protection rules, deploying automatically on main push. The production environment has required reviewers, preventing deployment without approval. Forcing order with `needs: deploy-staging` embeds the rule "only code verified in staging becomes a production candidate" into the workflow.
+- **Why do GitHub Environments become the center of deployment policy?**
+  - Environments bundle secret isolation, approval gates, branch restrictions, and wait timers into one configuration. Placing different AWS account or GCP project secrets per environment structurally prevents deploying to production with staging secrets. Deployment history is also tracked per environment.
+- **How does OIDC replace long-lived cloud keys?**
+  - OIDC issues temporary credentials at workflow runtime. No long-lived keys in GitHub Secrets needed; tokens are valid only during job execution; IAM policies can restrict by repository/branch/environment. No key rotation needed, and even if leaked, tokens can't be reused — fundamentally strengthening security.
 <!-- toc:begin -->
 ## In this series
 

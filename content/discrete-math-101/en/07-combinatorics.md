@@ -277,13 +277,12 @@ The next article enters another major area of discrete math: graph theory.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Combinatorics?**
-  - The article treats Combinatorics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Combinatorics?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Combinatorics reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do you distinguish the product rule from the sum rule?**
+  - When independent choices combine simultaneously — like 5 shirts and 3 pants — use `5 × 3` (product rule). When choices are mutually exclusive — like 4 Korean dishes or 3 Japanese dishes — use `4 + 3` (sum rule). The article placed both examples side by side to emphasize that first determining "choosing together or choosing one of" reduces mistakes.
+- **When do permutations and combinations differ?**
+  - As the `P(5,3)` vs `C(5,3)` comparison showed, permutations apply when order matters, combinations when it doesn't. The reason a problem of ordering 3 presenters gives a different answer from selecting 3 committee members is precisely this order information.
+- **Why are binomial coefficients and Pascal's triangle important?**
+  - The article showed that `(x+y)^4`'s coefficients `1, 4, 6, 4, 1` exactly match `C(4,k)`, explaining that binomial coefficients bridge algebraic expansion and combinatorial counting. Pascal's triangle generates these values recursively, appearing frequently as a shared foundation for combinatorial formulas, dynamic programming, and probability calculations.
 <!-- toc:begin -->
 ## In this series
 

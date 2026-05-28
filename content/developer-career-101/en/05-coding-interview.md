@@ -162,13 +162,12 @@ Next post covers *System Design Interviews*.
 
 ## Answering the Opening Questions
 
-- **Why is raw problem count alone a weak preparation strategy?**
-  - The article treats Preparing for Coding Interviews as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How do recurring patterns reduce wasted time in unfamiliar questions?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why do communication, complexity analysis, and time management change the score so much?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why isn't solving many problems sufficient preparation for coding interviews?**
+  - Half of a coding interview is getting the right answer; the other half is understanding the problem and clarifying boundary conditions.
+- **How should you group frequently-appearing problem patterns to study efficiently?**
+  - You must specify whether to prioritize time or space complexity, and which part to implement first.
+- **Why do talking through solutions, explaining complexity, and time management significantly affect scores?**
+  - In interviews, explaining your thought process aloud and collaborating with the interviewer when stuck matters more than solving silently.
 <!-- toc:begin -->
 ## In this series
 

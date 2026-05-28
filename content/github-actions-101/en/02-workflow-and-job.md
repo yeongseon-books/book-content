@@ -186,13 +186,12 @@ The job graph is the *spine of your pipeline*. The next post covers *when it run
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Workflows and Jobs?**
-  - The article treats Workflows and Jobs as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Workflows and Jobs?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Workflows and Jobs reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What does each of Workflow, Job, and Step handle?**
+  - A Workflow is the outer frame defining "what starts on which event." A Job is the parallel execution unit — the boundary of failure isolation and parallelism. A Step is an individual command executed sequentially within a Job. When designing, draw Job boundaries by "can this work run independently" and Step order by "does this command depend on the previous result."
+- **Why is `needs` not just a simple option but a pipeline design tool?**
+  - `needs` creates a directed graph between jobs, expressing the business rule "what must succeed before the next starts" as code. Patterns like fan-out/fan-in, conditional deployment, and matrix gates all operate on `needs`. Poor design wastes time with unnecessary serialization; omitting it risks deploying on top of failed validation.
+- **When is `matrix` useful and when does it become a cost bomb?**
+  - Matrix is useful for compatibility testing (multiple Python versions, multiple OSes). It becomes a cost bomb when combinations multiply unchecked — 3 Python × 3 OS × 2 DB = 18 simultaneous jobs at 18× cost. The practical standard is minimal combinations on PRs, full combinations on main, with `fail-fast` and `include`/`exclude` to control scope.
 <!-- toc:begin -->
 ## In this series
 

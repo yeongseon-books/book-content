@@ -270,13 +270,12 @@ Next, we cover sequences and recurrences — induction's natural partner and an 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Proof Techniques?**
-  - The article treats Proof Techniques as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Proof Techniques?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Proof Techniques reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **When are direct proof and proof by contrapositive used?**
+  - Direct proof is most natural when calculation flows straight from assumption to conclusion, like "the square of an even number is even" from `n=2k`. Conversely, when the contrapositive is much easier — like "if n is odd then n² is odd" instead of "if n² is even then n is even" — proof by contrapositive is more appropriate.
+- **For which propositions is proof by contradiction especially powerful?**
+  - The article proved √2's irrationality by assuming the negation "can be written as reduced fraction p/q" then driving to the contradiction that both p and q are even. Proof by contradiction is strong for impossibility and non-existence propositions where "showing it cannot be so" is easier than direct construction.
+- **How do mathematical induction and strong induction work?**
+  - Induction fixes a base case first (like `1 + 2 + ... + n = n(n+1)/2`), then shows that if P(k) is true then P(k+1) is also true, connecting the whole chain. In algorithms, this structure extends to loop invariants and termination proofs — so the article's `binary_search` example can be proven correct using the same logic.
 <!-- toc:begin -->
 ## In this series
 

@@ -165,13 +165,12 @@ Triggers control *when* your workflow runs. Next up: *Python test automation*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Understanding Triggers?**
-  - The article treats Understanding Triggers as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Understanding Triggers?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Understanding Triggers reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What difference dictates how push and pull_request should be used?**
+  - `pull_request` is for code validation — runs when PRs open or update, and secrets are blocked from forks for safety. `push` suits post-merge follow-up (deployment, releases). Putting both events in the same workflow can cause duplicate runs at merge time, so separating files or using conditionals is better.
+- **Why must schedule be understood in UTC rather than local time?**
+  - GitHub Actions cron is fixed to UTC. To run at 2 AM KST, set UTC 17:00. Regions with daylight saving time see time shifts year-round. Since exact timing isn't guaranteed, if minute-level accuracy is needed, calling `workflow_dispatch` from an external scheduler is more stable.
+- **When is workflow_dispatch useful and what should be documented?**
+  - Useful for emergency deployments, rollbacks, and environment resets requiring human judgment. Document examples and constraints in input `description`, prevent mistakes with `choice` type and `dry-run` defaults, and share with the team that audit logs record who ran what and when.
 <!-- toc:begin -->
 ## In this series
 

@@ -299,13 +299,12 @@ The next article looks at the math of counting: combinatorics.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Sequences and Recurrence?**
-  - The article treats Sequences and Recurrence as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Sequences and Recurrence?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Sequences and Recurrence reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do sequences and closed forms connect?**
+  - A sequence lists values in order; a closed form computes `a_n` directly without going through previous terms. The article's comparison of computing `T(n)=T(n-1)+n` recursively then verifying against `T_closed(n)=n(n+1)/2` showed this connection most directly.
+- **What mathematical notation is a recurrence relation?**
+  - A recurrence defines the current value or cost in terms of smaller inputs — in algorithms, it's the recursive call structure translated to formula. So `fib(n)`'s `T(n)=T(n-1)+T(n-2)+O(1)` or merge sort's `T(n)=2T(n/2)+n` let you read code's performance structure directly.
+- **When are the substitution method and recursion tree method useful?**
+  - Substitution is useful for manually expanding `T(n)=2T(n/2)+n` to `4T(n/4)+2n`, `8T(n/8)+3n` to find patterns. The recursion tree method is powerful for summing per-level costs to see overall growth shape — explaining intuitively why merge sort is Θ(n log n) as the article demonstrated.
 <!-- toc:begin -->
 ## In this series
 

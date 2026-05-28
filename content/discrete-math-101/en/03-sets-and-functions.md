@@ -272,13 +272,12 @@ Next, we look at the most important structure built on top of sets — relations
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Sets and Functions?**
-  - The article treats Sets and Functions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Sets and Functions?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Sets and Functions reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How should you read set notation and basic operations?**
+  - Through `A = {1,2,3,4,5}`, set-builder notation `B`, and the `power_set` example, we established that sets are read via elements and containment, and power set size is computed as `2^n`. Then code like `A | B`, `A & B`, `A - B`, `U - A` directly mapped to union, intersection, difference, and complement.
+- **Where are union, intersection, difference, and Cartesian product used in practice?**
+  - The article explained database rows and permission combinations as Cartesian products with `permissions = set(product(users, roles))`, connecting why `JOIN` and `CROSS JOIN` read as set operation language. The before/after comparison of converting deduplication to `list(set(items))` also shows how set thinking immediately simplifies production code.
+- **What distinguishes domain, codomain, and range of a function?**
+  - Domain is the input set, codomain is the entire output set the function is declared to target, and range is the set of values actually produced. So as the `is_surjective(f1, codomain)` example shows, surjectivity isn't just how many values appeared but whether the actual output set covers the entire codomain.
 <!-- toc:begin -->
 ## In this series
 

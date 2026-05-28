@@ -375,13 +375,12 @@ The next article looks at the most important algorithms on graphs — trees, BFS
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Graph Theory Basics?**
-  - The article treats Graph Theory Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Graph Theory Basics?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Graph Theory Basics reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What are the definition and types of graphs?**
+  - A graph is written `G = (V, E)` where V is the vertex set and E is the edge set. The article used the `Graph` class with `K4` and bipartite graph examples to show how different conditions yield undirected graphs, complete graphs, bipartite graphs, and DAGs.
+- **How do adjacency lists and adjacency matrices differ?**
+  - Adjacency lists use O(V+E) space, favoring sparse graphs with fast neighbor traversal but edge existence checks proportional to degree. Conversely, as the `to_adjacency_matrix` example showed, adjacency matrices use O(V²) space but immediately check whether two vertices are connected — stronger for dense graphs.
+- **Why are degree, path, cycle, and connectivity important?**
+  - Degree gives basic identities like `Σdeg(v)=2|E|`; path and connectivity enable `has_path` and `connected_components` to determine reachability. Cycle presence directly determines whether topological sort is possible — structural information far more important than merely checking whether a graph is connected.
 <!-- toc:begin -->
 ## In this series
 

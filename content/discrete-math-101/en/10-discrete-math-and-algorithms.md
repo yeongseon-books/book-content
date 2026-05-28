@@ -353,13 +353,12 @@ After finishing this series the next steps are: (1) deeper into the data-structu
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Discrete Mathematics and Algorithms?**
-  - The article treats Discrete Mathematics and Algorithms as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Discrete Mathematics and Algorithms?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Discrete Mathematics and Algorithms reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do recurrences and the Master Theorem connect to time complexity?**
+  - Merge sort's `T(n)=2T(n/2)+n` directly translates the algorithm's structure — "two half-size subproblems plus linear merge" — into formula. The article placed `predicted_n_log_n` baseline alongside `merge_sort_count` experiments to show how the Master Theorem's O(n log n) prediction meshes with actual comparison count growth.
+- **How do induction and loop invariants guarantee algorithm correctness?**
+  - The `prefix_sum` example established the invariant that after each iteration `result[-1]` equals the cumulative sum so far, using the fact that this holds at every step to explain correctness. This approach transplants induction's base case and maintenance logic into the loop body, enabling correctness proofs separate from performance.
+- **What intuition should guide understanding P, NP, and NP-complete?**
+  - The article showed through `subset_sum` brute-force that in NP-complete problems, answer verification is easy but the search space `2^n` explodes rapidly. So understanding P, NP, and NP-complete is more practical as a criterion for judging when to abandon optimal solutions and switch to approximation, heuristics, or problem reduction — rather than memorizing definitions.
 <!-- toc:begin -->
 ## In this series
 

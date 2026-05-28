@@ -152,13 +152,12 @@ Next post covers *Preparing for Coding Interviews*.
 
 ## Answering the Opening Questions
 
-- **What structure lets a recruiter understand you quickly without guessing?**
-  - The article treats Resume and Portfolio as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How do you rewrite responsibilities into outcome-oriented bullets with evidence?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why are numbers and a compact STAR structure such strong hiring signals?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What structure should a resume have for hiring managers to understand you quickly?**
+  - A resume should record not past companies and technology lists, but the size of problems you handled at each company and what you learned solving them.
+- **What needs to change to write about results and impact rather than listing responsibilities?**
+  - A portfolio's value lies in clearly showing how you solved which problems, more than how sophisticated your technology is.
+- **Why are numbers and the STAR structure powerful persuasion tools?**
+  - Evaluators scan resumes in 3-5 minutes and in portfolios look at README and deployed links first.
 <!-- toc:begin -->
 ## In this series
 

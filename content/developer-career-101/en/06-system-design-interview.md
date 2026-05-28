@@ -157,13 +157,12 @@ Next post covers *Settling into the First Job*.
 
 ## Answering the Opening Questions
 
-- **What are interviewers truly evaluating in a system design round?**
-  - The article treats System Design Interviews as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **In what order should you move through requirements, estimates, high-level design, and deep dives?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why do trade-offs and bottlenecks separate shallow answers from senior ones?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What do interviewers actually evaluate in system design interviews?**
+  - System design has no single correct answer — what matters is confirming requirements, stating constraints, then explaining tradeoffs.
+- **In what order should requirements gathering, estimation, high-level design, and deep-dive proceed?**
+  - You need to decide what to prioritize among scalability, reliability, and cost, and how to maintain consistency between cache and database.
+- **Why do answers look shallow when tradeoffs and bottlenecks aren't articulated?**
+  - What's evaluated is the initiative to discover bottlenecks before the interviewer asks, explain why they exist, and propose solutions.
 <!-- toc:begin -->
 ## In this series
 

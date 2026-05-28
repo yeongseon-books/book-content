@@ -271,13 +271,12 @@ Next, together with logic we cover the other foundation of discrete math — set
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Propositions and Logic?**
-  - The article treats Propositions and Logic as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Propositions and Logic?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Propositions and Logic reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do you distinguish propositions from non-propositions?**
+  - The article treated only sentences with clearly determined truth values as propositions (like the `propositions` dictionary), separating questions and commands that lack truth values as non-propositions. All subsequent operators, truth tables, and proofs require this distinction to be precise.
+- **How do the five basic logical operators work?**
+  - The `NOT`, `AND`, `OR`, `IMPLIES`, `IFF` function examples showed each operator's meaning directly. Notably, implication was implemented as `(not p) or q`, revealing that when P is false the result is true. Combined with the De Morgan's law verification code, these operators are not rote memorization but rules for safely transforming conditionals.
+- **How do you verify logical equivalence using truth tables?**
+  - The `truth_table` and `equivalent` functions enumerate all possible input combinations to check whether two expressions produce identical results in every row. So transformations commonly used in code refactoring like `¬(P ∧ Q)` ≡ `¬P ∨ ¬Q` can be judged by exhaustive verification rather than intuition.
 <!-- toc:begin -->
 ## In this series
 

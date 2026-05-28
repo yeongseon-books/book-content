@@ -180,13 +180,12 @@ The next series is *Data Science Career 101*.
 
 ## Answering the Opening Questions
 
-- **What actually separates a senior engineer from a mid-level engineer?**
-  - The article treats The Path to Senior as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How do problem framing, judgment, influence, and mentoring show up in day-to-day work?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Which behaviors matter beyond technical depth as your scope expands?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What standard distinguishes senior engineers — not job title, but what?**
+  - The transition to senior is not about technology but about taking on new responsibilities: problem definition, tradeoff explanation, and team support.
+- **How do problem definition, judgment, impact, and mentoring demonstrate seniority?**
+  - Seniors need not just technical depth but problem recognition ability, ability to help team growth, and ability to think about architecture from a long-term perspective.
+- **Beyond technical depth, what behaviors determine growth in the later career?**
+  - In senior evaluations, what matters more than individual contribution is team growth, the impact of problems the team solved, and documentation and mentoring.
 <!-- toc:begin -->
 ## In this series
 

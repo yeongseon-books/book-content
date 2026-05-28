@@ -162,13 +162,12 @@ Quality gates *lighten the review load*. Next: *Build artifacts*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Lint and Type Check?**
-  - The article treats Lint and Type Check as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Lint and Type Check?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Lint and Type Check reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why is Ruff useful for consolidating multiple tools into one?**
+  - Ruff runs rules from 10+ tools (Flake8, isort, pycodestyle, pyflakes, flake8-bugbear, etc.) in a single Rust binary. CI config simplifies to `ruff check` and `ruff format`, running 10-100× faster than traditional tools. With `--output-format github`, inline annotations appear on PR diffs without separate reporter tools.
+- **At what point should Mypy be moved to strict mode?**
+  - Start new modules strict from the beginning; start legacy modules with `ignore_errors = true` and gradually add types. Applying strict immediately to an entire project creates hundreds of errors and team demotivation simultaneously. Use `per-file-ignores` and module overrides for the realistic strategy: "new code strict, legacy gradual."
+- **Why must pre-commit be paired with CI?**
+  - pre-commit gives fast local feedback; CI is the enforcement gate. Local hooks can be skipped with `--no-verify`, and some developers may not install them, so CI must run the same checks again to ensure "cannot merge without passing" is truly enforced.
 <!-- toc:begin -->
 ## In this series
 

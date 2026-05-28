@@ -161,13 +161,12 @@ Secret management prevents *most* security incidents. Next: a *real-world CI/CD 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Secret Management?**
-  - The article treats Secret Management as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Secret Management?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Secret Management reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do repository, environment, and organization secrets differ?**
+  - Repository secrets are accessible across the entire repo, environment secrets only in jobs configured with that specific environment, and organization secrets are shared across multiple repos in the org. Priority order: environment > repository > organization. Different DB credentials for staging vs production go in environment secrets; org-wide Slack webhooks go in organization secrets.
+- **Why should `GITHUB_TOKEN` permissions be narrowed as much as possible?**
+  - Wide default permissions mean a compromised lint job could push packages, approve PRs, or modify code. Setting repository defaults to `read` and specifying only needed permissions per job prevents one job's security incident from escalating to another job's permissions. Since permissions are explicit in YAML, code review naturally asks "why does this job need this permission."
+- **How does OIDC reduce the long-lived key problem?**
+  - OIDC issues temporary tokens at workflow runtime, eliminating the need for long-lived keys in Secrets. Tokens are valid for only 15 minutes to 1 hour and can't be reused. IAM policies can restrict tokens to specific repos/branches/environments, making the question "what's at risk if the key leaks" disappear entirely.
 <!-- toc:begin -->
 ## In this series
 

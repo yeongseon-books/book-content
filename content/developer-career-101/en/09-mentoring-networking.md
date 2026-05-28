@@ -176,13 +176,12 @@ Next post covers *The Path to Senior*.
 
 ## Answering the Opening Questions
 
-- **How do you find a good mentor without turning the first contact into a burden?**
-  - The article treats Mentoring and Networking as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What makes a question easy for another engineer to answer well?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
+- **How do you find a good mentor, and how should you approach them initially?**
+  - Mentoring isn't passively waiting for a relationship — define a specific topic you want to learn and what you've already learned, then proceed together.
+- **How should you prepare questions that get answers instead of vague concerns?**
+  - Networking isn't exchanging business cards — it's sharing experiences and getting feedback with people solving the same problems.
 - **How do communities, conferences, and public writing expand your network?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+  - Small community activities or technical blogging is the most effective way to naturally build good mentors and networks.
 <!-- toc:begin -->
 ## In this series
 

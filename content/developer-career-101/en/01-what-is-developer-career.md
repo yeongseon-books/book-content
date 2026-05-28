@@ -162,13 +162,12 @@ Next post covers *Understanding Roles*.
 
 ## Answering the Opening Questions
 
-- **Why is a developer career easier to manage when you treat it as a growth structure rather than a title ladder?**
-  - The article treats What Is a Developer Career as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What actually changes between junior, mid-level, senior, and staff-like expectations?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why do skill, influence, and written evidence matter together instead of separately?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why should you view a developer career as a growth structure rather than a sequence of job titles?**
+  - You need to look at three axes: role (what level of work you handle), competency (which of technical/collaboration/domain is weakest), and impact (who benefits from your work).
+- **What actually changes when stages like junior, mid, and senior are divided?**
+  - Execution following directions (junior), self-directed prioritization (mid), and judgment in defining problems and explaining tradeoffs (senior).
+- **Why are impact and documentation important alongside technical capability?**
+  - Technical skill alone limits what you can do solo, but documentation and automation extend your impact, and records serve evaluations and job transitions.
 <!-- toc:begin -->
 ## In this series
 

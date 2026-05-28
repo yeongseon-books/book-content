@@ -164,13 +164,12 @@ Test automation is the *heart of CI*. The next post covers *Lint and Type Check*
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Python Test Automation?**
-  - The article treats Python Test Automation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Python Test Automation?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Python Test Automation reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why must `setup-python` and pip cache be configured together?**
+  - `setup-python`'s `cache: "pip"` option preserves pip download cache between runs, reducing dependency install time by 50-80%. Linking the cache key to dependency file hashes via `cache-dependency-path` means fresh downloads only when dependencies change. This single setting's impact on total workflow time is large enough to always configure together.
+- **What's needed to surface `pytest` results as PR checks and reports?**
+  - Output results as XML with `--junitxml=report.xml`, then display on PR checks with actions like `mikepenz/action-junit-report`. The key is `if: always()` — without it, the report step is skipped on failure, losing information exactly when you need it most. Don't forget `permissions: checks: write` either.
+- **Why are trends and thresholds more important than the coverage number itself?**
+  - 80% means different things per project. What matters is "did this PR lower coverage" (diff coverage) and "which direction is coverage moving over time" (trend). Set a floor with `fail_under`, provide per-PR feedback with Codecov's diff coverage, and the team naturally maintains the habit of writing tests.
 <!-- toc:begin -->
 ## In this series
 

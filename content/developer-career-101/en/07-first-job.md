@@ -177,13 +177,12 @@ Next post covers *Side Projects and Learning*.
 
 ## Answering the Opening Questions
 
-- **What should a new developer focus on during the first ninety days?**
-  - The article treats Settling into the First Job as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why do questions, notes, and feedback loops matter more than pretending to know everything?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How can your first PR and your 1:1s build trust quickly?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What should you focus on during the first 90 days at your first developer job?**
+  - The most important thing at your first job is completing assigned work accurately and quickly learning the team's way of working.
+- **Why is asking questions and documenting more important than pretending to know a lot?**
+  - Code review culture, testing practices, deployment procedures, and tech stack decisions differ at every company — you need an attitude of respecting and learning these.
+- **How do first PRs and 1:1s become trust-building mechanisms?**
+  - If you can concretely express your growth and difficulties in a 1:1 with a senior after 3 months, your next steps become clear.
 <!-- toc:begin -->
 ## In this series
 

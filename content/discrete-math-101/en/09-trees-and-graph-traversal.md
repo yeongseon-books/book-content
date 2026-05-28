@@ -342,13 +342,12 @@ The next article ties everything together: how all the discrete-math topics cove
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Trees and Graph Traversal?**
-  - The article treats Trees and Graph Traversal as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Trees and Graph Traversal?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Trees and Graph Traversal reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What are the definition and properties of trees?**
+  - A tree is a connected, acyclic undirected graph — so with n vertices it has exactly n-1 edges. The article's `is_tree` function used exactly this edge count condition plus connectivity check to determine tree status.
+- **Why does BFS connect to shortest paths?**
+  - BFS uses a queue for level-by-level expansion at distances 0, 1, 2, so in graphs with uniform weights, the distance at first visit equals the shortest distance. The `distances from 1` example showing `2`, `3` at distance 1 and `4`, `5`, `6` at distance 2 demonstrates exactly this property.
+- **For which problems is DFS strong?**
+  - DFS goes deep along one branch then backtracks, making it suited for problems requiring deep structural understanding. The article compared recursive and iterative DFS visit orders, explaining how this sense naturally extends to cycle detection, topological sort, and subtree size computation.
 <!-- toc:begin -->
 ## In this series
 
