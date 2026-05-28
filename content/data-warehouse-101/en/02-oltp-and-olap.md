@@ -161,13 +161,12 @@ OLTP and OLAP optimize for opposite directions. Next we cover *facts and dimensi
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying OLTP and OLAP?**
-  - The article treats OLTP and OLAP as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for OLTP and OLAP?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when OLTP and OLAP reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What workloads do OLTP and OLAP handle differently?**
+  - OLTP targets "this one transaction right now"; OLAP targets "the entire historical dataset."
+- **Where does the difference between row storage and column storage become significant?**
+  - OLTP needs fast access to all columns of one row, favoring row storage; OLAP mass-scans specific columns, favoring columnar storage.
+- **Why is handling both requirements in a single engine problematic?**
+  - All optimizations — indexing, memory cache, query planner — conflict, making both workloads slower.
 <!-- toc:begin -->
 ## In this series
 

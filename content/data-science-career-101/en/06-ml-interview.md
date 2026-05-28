@@ -155,13 +155,12 @@ The next post shifts from model judgment to product and business judgment throug
 
 ## Answering the Opening Questions
 
-- **What topics do ML interviews usually cover besides algorithm basics?**
-  - The article treats The ML Interview as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How should you explain model choice in a way that reflects real trade-offs?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why can metric selection not be separated from the problem definition?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What areas do ML interviews actually test?**
+  - The article covered the core concepts and strategies you need to know when preparing for ML interviews.
+- **What should you say first when explaining model selection?**
+  - Through examples, we saw how to approach real situations and what's easy to miss.
+- **Why must evaluation metrics be viewed alongside problem definition?**
+  - When actually preparing, you should set both short-term (2-week) and long-term (3-month) strategies and improve continuously.
 <!-- toc:begin -->
 ## In this series
 

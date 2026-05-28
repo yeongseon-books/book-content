@@ -178,13 +178,12 @@ Splitting facts and dimensions is the *starting point* of analytical modeling. N
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Fact and Dimension?**
-  - The article treats Fact and Dimension as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Fact and Dimension?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Fact and Dimension reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do you distinguish Fact from Dimension?**
+  - Fact is "what happened" (event rows); Dimension is "from which perspective" (attribute collections).
+- **What problems arise when a Fact table grows too large?**
+  - Joins, indexing, and query performance all degrade, requiring partitioning or aggregate tables.
+- **How do you track changes in Dimension tables?**
+  - Choose an SCD (Slowly Changing Dimension) strategy: Type 1 (overwrite), Type 2 (versioning), or Type 3 (parallel columns).
 <!-- toc:begin -->
 ## In this series
 

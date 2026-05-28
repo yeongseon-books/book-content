@@ -156,13 +156,12 @@ The next post turns from interviews to the first 90 days after you land the job.
 
 ## Answering the Opening Questions
 
-- **What does a case interview actually test in a data candidate?**
-  - The article treats The Case Interview as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why should clarification come before analysis?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How do you choose a north star metric and supporting metrics?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What do case interviews actually evaluate?**
+  - The article covered the core concepts and strategies you need to know when preparing for case interviews.
+- **Why must you ask clarifying questions first when you hear the problem?**
+  - Through examples, we saw how to approach real situations and what's easy to miss.
+- **How should you choose a north star metric and supporting metrics?**
+  - When actually preparing, you should set both short-term (2-week) and long-term (3-month) strategies and improve continuously.
 <!-- toc:begin -->
 ## In this series
 

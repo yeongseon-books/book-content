@@ -171,13 +171,12 @@ BI is the *face of the warehouse*. Next we cover *data marts* — analytics scop
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying BI and Dashboard?**
-  - The article treats BI and Dashboard as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for BI and Dashboard?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when BI and Dashboard reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do you select which metrics to display on a dashboard?**
+  - Prioritize metrics directly tied to business goals and actionable.
+- **Where do you start checking when dashboard queries are slow?**
+  - Query performance first, then caching strategy, finally UI rendering order.
+- **What's the difference between real-time and batch dashboards?**
+  - Real-time is higher cost but current information; batch is lower cost but introduces delay.
 <!-- toc:begin -->
 ## In this series
 

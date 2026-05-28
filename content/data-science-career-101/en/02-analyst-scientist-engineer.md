@@ -160,13 +160,12 @@ The next post turns that role distinction into a concrete beginner learning path
 
 ## Answering the Opening Questions
 
-- **What goal sits at the center of analyst, scientist, and engineer work?**
-  - The article treats Analyst vs Scientist vs Engineer as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What deliverables most clearly reveal the difference between the three roles?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why do similar tools still lead to very different day-to-day jobs?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do analysts, scientists, and engineers each center on different purposes?**
+  - From a data career perspective, the three roles serve distinct purposes: analysts answer questions, scientists validate hypotheses, and engineers guarantee data flow — each using different tools.
+- **What representative deliverables does each role produce?**
+  - The fact that each role's representative deliverables differ means they also expect different answers and outcomes.
+- **Why do their primary tools and performance metrics differ?**
+  - Instead of looking at tools in isolation, examining "what deliverable does each role produce" lets you distinguish the roles in practice.
 <!-- toc:begin -->
 ## In this series
 

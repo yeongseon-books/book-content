@@ -258,13 +258,12 @@ Heaps efficiently manage minimum and maximum values, and Python's heapq module m
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Heaps and Priority Queues?**
-  - The article treats Heaps and Priority Queues as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Heaps and Priority Queues?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Heaps and Priority Queues reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What structure is needed to quickly extract the smallest or largest value?**
+  - A heap. Heaps always maintain the minimum (or maximum) at the root, allowing O(1) peek and O(log n) extraction. A sorted list can also peek at the minimum in O(1), but insertion is O(n). Heaps achieve O(log n) insertion too, making them superior for dynamic data.
+- **Why are heaps better suited for priority processing than full sorting?**
+  - Full sorting is O(n log n) and establishes order for all elements. But priority queues only need "the single most urgent item right now." Heaps maintain only partial order (parent ≤ children) without full ordering, so construction is O(n) fast and insert/extract finish in O(log n).
+- **Why does Python's `heapq` provide only a min-heap?**
+  - It's a design decision. With just a min-heap, you can simulate a max-heap by negating values, keeping code simple. Also, most algorithms (Dijkstra, task scheduling, merge k sorted lists) use min-heaps by default, so providing one achieves sufficient practical coverage.
 <!-- toc:begin -->
 ## In this series
 

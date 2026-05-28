@@ -180,13 +180,12 @@ Star schema is the *simplest analytical shape*. Next, we tackle *partitioning an
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Star Schema?**
-  - The article treats Star Schema as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Star Schema?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Star Schema reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why place the Fact table at the center in Star Schema?**
+  - With Fact at center, all analytical perspectives (Dimensions) are equidistant, keeping join structure simple.
+- **How does Snowflake Schema differ from Star Schema?**
+  - Snowflake further normalizes Dimensions to save storage space, but makes joins more complex.
+- **Why is denormalization necessary in Star Schema?**
+  - In analytics workloads prioritizing read performance, intentional redundancy reduces joins.
 <!-- toc:begin -->
 ## In this series
 

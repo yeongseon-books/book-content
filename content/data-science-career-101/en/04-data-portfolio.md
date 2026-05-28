@@ -162,13 +162,12 @@ The next post moves from portfolio evidence to interview execution by focusing o
 
 ## Answering the Opening Questions
 
-- **What mix of projects gives a beginner portfolio better signal?**
-  - The article treats The Data Portfolio as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why do code-only repositories usually feel weak in interviews?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What should a strong README explain first?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What project combination should a data portfolio consist of?**
+  - The article covered the core concepts and strategies you need to know when preparing a portfolio.
+- **Why does a code-only repository look weak?**
+  - Through examples, we saw how to approach real situations and what's easy to miss.
+- **What structure should a README have?**
+  - When actually preparing, you should set both short-term (2-week) and long-term (3-month) strategies and improve continuously.
 <!-- toc:begin -->
 ## In this series
 

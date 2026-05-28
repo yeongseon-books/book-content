@@ -150,13 +150,12 @@ The next post compares analyst, scientist, and engineer directly so you can see 
 
 ## Answering the Opening Questions
 
-- **What roles are usually grouped together when people say “data career”?**
-  - The article treats What Is a Data Career as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why is it safer to distinguish data jobs by responsibility and deliverable than by title alone?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What do analyst, scientist, engineer, ML engineer, and analytics engineer each optimize for?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What roles actually fall under "data jobs"?**
+  - The article distinguished five roles — analyst, scientist, engineer, ML engineer, and analytics engineer — and clarified what questions each answers and what deliverables each produces.
+- **Why should you distinguish roles by responsibilities and deliverables rather than job titles?**
+  - Job titles alone don't reveal the role. Even within the same company, definitions differ, so you must look at responsibilities and deliverables.
+- **What are the five core roles a beginner should distinguish first?**
+  - Mapping the five roles introduced in this article to their core tools helps beginners set a learning direction.
 <!-- toc:begin -->
 ## In this series
 

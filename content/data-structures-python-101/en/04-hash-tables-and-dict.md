@@ -265,13 +265,12 @@ Python `dict` is a hash-table-backed mapping whose performance depends on three 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Hash Tables and dict?**
-  - The article treats Hash Tables and dict as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Hash Tables and dict?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Hash Tables and dict reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How does `dict` find values so quickly among countless keys?**
+  - A hash function converts the key to an integer, which maps to an array index. Array index access is O(1), so lookup speed is constant regardless of key count. When collisions occur, probing searches the next slot, but keeping load factor low means average probe count is just 1-2.
+- **What role does each of hash, collision, probe, and resize play?**
+  - Hash is the function converting keys to integer indices, collision is when different keys receive the same index, probe is finding the next empty slot on collision, and resize is doubling the array and rehashing everything when load factor exceeds the threshold.
+- **Why can some objects be dict keys while others cannot?**
+  - Only hashable objects (immutable + `__hash__` implemented) can be keys. Mutable objects like list risk their hash value changing, making dict unable to locate the key again. That's why Python doesn't provide `__hash__` for mutable objects at all.
 <!-- toc:begin -->
 ## In this series
 

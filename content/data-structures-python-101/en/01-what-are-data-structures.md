@@ -218,13 +218,12 @@ Data structures are a fundamental concept for storing and accessing data efficie
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Are Data Structures??**
-  - The article treats What Are Data Structures? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Are Data Structures??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Are Data Structures? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What exactly are data structures and why learn them separately?**
+  - Data structures are organizational methods that determine how data is stored and the cost of access. Even implementing the same functionality, the choice of structure creates the difference between O(n) and O(1), which is why they must be studied separately from programming language syntax.
+- **Why does performance differ so dramatically for the same data depending on the data structure?**
+  - A list stores elements sequentially, requiring a full scan for search (O(n)). A set uses a hash table to compute position directly, searching in O(1). The storage method itself determines operation cost.
+- **What role does each of Python's built-in list, dict, set, and tuple fit?**
+  - list for ordered sequential data, dict for key-value mapping and fast lookup, set for deduplication and membership tests, tuple for immutable coordinates or composite keys. The key is choosing based on "what operation do I perform most frequently."
 <!-- toc:begin -->
 ## In this series
 

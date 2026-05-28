@@ -180,13 +180,12 @@ You can now see a warehouse *as one flow*, from *grain to dashboard*. The next s
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Warehouse Design Example?**
-  - The article treats Warehouse Design Example as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Warehouse Design Example?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Warehouse Design Example reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Where should you start when designing a warehouse for the first time?**
+  - Clarify current analytical requirements and data scale, then model the most important domain first.
+- **How do you handle existing queries and dashboards when the schema must change?**
+  - Create a compatibility layer (views, aliases) first to protect existing queries, then migrate incrementally.
+- **How do you validate that a designed model actually works?**
+  - Test early and thoroughly whether target metrics compute as expected and whether expected query performance is achieved.
 <!-- toc:begin -->
 ## In this series
 

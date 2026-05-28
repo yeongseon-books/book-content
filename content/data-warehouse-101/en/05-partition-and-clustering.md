@@ -178,13 +178,12 @@ Partition and clustering improve *cost and speed* together. Next, we look at *ET
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Partition and Clustering?**
-  - The article treats Partition and Clustering as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Partition and Clustering?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Partition and Clustering reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What problems arise when querying a large table without partitioning?**
+  - Unnecessary data must be fully scanned, causing query time and cost to grow linearly.
+- **What column should Clustering be based on?**
+  - Choose the most frequently filtered column or join key to minimize I/O.
+- **Does changing partition strategy require re-sorting the data?**
+  - Many data warehouses provide automatic repartitioning, but cost and time must be considered.
 <!-- toc:begin -->
 ## In this series
 

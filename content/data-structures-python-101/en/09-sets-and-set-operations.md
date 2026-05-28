@@ -259,13 +259,12 @@ Python `set` is a key-only hash table. That explains its fast membership checks,
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Sets and Set Operations?**
-  - The article treats Sets and Set Operations as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Sets and Set Operations?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Sets and Set Operations reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why is `set` strong at deduplication and membership testing?**
+  - set internally uses a hash table. When adding an element, it computes the slot via hash and ignores it if the same value already exists (automatic deduplication). Membership tests also find the slot directly via hash — O(1), in contrast to list's O(n) linear scan.
+- **What do collision and hashability mean in the context of sets?**
+  - Collision is when different elements map to the same slot, resolved by probing. Hashable means an object implements `__hash__()` and is immutable. Mutable objects like list risk hash value changes, so they cannot be set elements.
+- **Why can `frozenset` be a set element or dict key while plain `set` cannot?**
+  - frozenset is immutable, so its hash value never changes during the object's lifetime. Plain set can change contents via add/discard, risking hash value changes. Hash-based structures (set, dict) break consistency if key/element hashes change, so only immutable frozenset is allowed.
 <!-- toc:begin -->
 ## In this series
 

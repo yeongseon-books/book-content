@@ -295,13 +295,12 @@ Stacks operate on LIFO, queues on FIFO. In Python, stacks use list and queues us
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Stacks and Queues?**
-  - The article treats Stacks and Queues as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Stacks and Queues?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Stacks and Queues reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What ordering rule does each of stack and queue follow?**
+  - A stack is LIFO (Last In, First Out) — the most recently added element comes out first. A queue is FIFO (First In, First Out) — the earliest added element comes out first. This ordering rule is exactly why bracket validation uses a stack and BFS uses a queue.
+- **Why does Python typically use list for stacks and deque for queues?**
+  - list's `append()`/`pop()` are end operations — O(1). Since stacks operate on one end only, list is optimal. Queues use both ends (add at back, remove from front), and list's `pop(0)` is O(n). deque's `popleft()` is O(1), making deque the right choice for queues.
+- **Why is `list.pop(0)` unsuitable for queue implementation?**
+  - Since list is a contiguous array, removing the front element requires shifting all remaining elements forward by one position. As benchmarks confirmed, it's over 100x slower than deque at 10,000 elements, and the gap widens with more elements.
 <!-- toc:begin -->
 ## In this series
 

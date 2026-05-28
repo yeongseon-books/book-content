@@ -156,13 +156,12 @@ The next post closes the series by looking at what changes as you grow from juni
 
 ## Answering the Opening Questions
 
-- **Why does domain expertise change the quality of data work so much?**
-  - The article treats Building Domain Expertise as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How should you start learning the vocabulary and KPI structure of an industry?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why does field observation improve metric interpretation?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why is domain expertise important in data roles?**
+  - The article covered the core concepts and strategies you need to know for building domain expertise.
+- **How should you learn terminology and KPIs?**
+  - Through examples, we saw how to approach real situations and what's easy to miss.
+- **Why does field observation improve your ability to interpret numbers?**
+  - When actually preparing, you should set both short-term (2-week) and long-term (3-month) strategies and improve continuously.
 <!-- toc:begin -->
 ## In this series
 

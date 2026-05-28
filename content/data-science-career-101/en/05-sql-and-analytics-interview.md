@@ -166,13 +166,12 @@ The next post applies the same problem-first thinking to machine learning interv
 
 ## Answering the Opening Questions
 
-- **What do SQL and analytics interviews actually evaluate beyond syntax?**
-  - The article treats SQL and Analytics Interviews as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How should you break a business question into query steps?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What are the recurring patterns around JOINs, aggregation, windows, and funnels?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What do SQL and analytics interviews actually evaluate?**
+  - The article covered the core concepts and strategies you need to know when preparing for SQL interviews.
+- **How should you decompose a question and translate it into a query?**
+  - Through examples, we saw how to approach real situations and what's easy to miss.
+- **What are the representative patterns for JOINs, aggregations, window functions, and funnel analysis?**
+  - When actually preparing, you should set both short-term (2-week) and long-term (3-month) strategies and improve continuously.
 <!-- toc:begin -->
 ## In this series
 

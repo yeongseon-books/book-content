@@ -321,13 +321,12 @@ Graphs are general-purpose data structures for representing relationships. You r
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Graph Representations?**
-  - The article treats Graph Representations as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Graph Representations?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Graph Representations reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How can social networks, maps, and dependency relationships be represented in code?**
+  - With an adjacency list (dict[node, list[neighbor]]). Each vertex is a key, and its reachable neighbors are the value. Python's defaultdict(list) fits this pattern exactly.
+- **When is each of adjacency list vs. adjacency matrix advantageous?**
+  - Adjacency lists are superior in memory and neighbor traversal for sparse graphs (E << V²). Adjacency matrices are advantageous for dense graphs or when you need O(1) "is there an edge between these two vertices?" checks.
+- **How do BFS and DFS differ and where are they used?**
+  - BFS uses a queue to visit nearest nodes first — suited for shortest paths and level-order traversal. DFS uses a stack to explore one path to its end — suited for cycle detection, topological sort, and connected component discovery. Both have O(V + E) time complexity.
 <!-- toc:begin -->
 ## In this series
 

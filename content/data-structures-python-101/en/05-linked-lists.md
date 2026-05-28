@@ -321,13 +321,12 @@ Linked lists connect nodes with pointers to achieve O(1) insertion and deletion.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Linked Lists?**
-  - The article treats Linked Lists as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Linked Lists?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Linked Lists reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why learn linked lists separately when Python already has list?**
+  - list (dynamic array) excels at index access and memory efficiency, but mid-point insertion/deletion requires element shifting. Linked lists can insert/delete in O(1) given only a node reference. Problems like LRU caches, undo histories, and editor buffers — where "frequent insertion/deletion at specific positions" is key — reveal linked lists' structural advantage.
+- **How do singly and doubly linked lists differ?**
+  - Singly linked lists have only next pointers, allowing only forward traversal and requiring separate tracking of the previous node for deletion. Doubly linked lists have both prev/next, enabling bidirectional traversal and O(1) deletion. They use one extra pointer of memory per node, but doubly linked lists are more common in practice for implementation simplicity and operation efficiency.
+- **Why are linked lists strong for insertion/deletion but weak for index access?**
+  - Insertion/deletion only requires changing 2-4 pointers — O(1). But accessing the nth element requires following pointers from head n times — O(n). Nodes are scattered across the heap rather than in contiguous memory, making direct address calculation impossible.
 <!-- toc:begin -->
 ## In this series
 

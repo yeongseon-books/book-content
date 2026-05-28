@@ -260,13 +260,12 @@ Python `list` is a dynamic array with two different ideas of size: logical lengt
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Arrays and Lists?**
-  - The article treats Arrays and Lists as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Arrays and Lists?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Arrays and Lists reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Is Python's `list` an array or a linked list?**
+  - It's a dynamic array. Internally it stores object pointers in a contiguous memory block, making index access O(1). If it were a linked list, index access would be O(n) — but benchmarks prove list[500000] is accessed at the same speed as list[0].
+- **Why is `append()` generally fast even as the list keeps growing?**
+  - Because CPython uses an overallocation strategy. It pre-allocates more spare slots than the current length, so most appends just write a pointer to an already-prepared empty slot. Reallocation only happens when capacity is exceeded, and spreading that cost across all appends gives amortized O(1).
+- **Why are `insert(0, x)` and middle deletion expensive?**
+  - Since it's a contiguous array, all pointers after the insertion point must shift one position (or pull back for deletion). This copying is proportional to element count — O(n). The for loop in DynamicArray's insert method shows exactly this cost.
 <!-- toc:begin -->
 ## In this series
 

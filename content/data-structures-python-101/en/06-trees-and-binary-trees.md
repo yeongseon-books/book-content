@@ -304,13 +304,12 @@ Trees represent hierarchical structures, and BSTs search sorted data in O(log n)
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Trees and Binary Trees?**
-  - The article treats Trees and Binary Trees as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Trees and Binary Trees?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Trees and Binary Trees reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why are file systems, DOM, and org charts modeled as tree structures?**
+  - They all have relationships that "start from one root and branch hierarchically." No cycles exist, and every node has exactly one parent. This property matches the tree definition exactly, so modeling as a tree lets you directly apply search, insertion, and deletion algorithms.
+- **What do root, leaf, depth, and height each mean in a tree?**
+  - Root is the topmost node with no parent; leaf is a terminal node with no children. Depth is the number of edges from root to that node; height is the number of edges from that node to its farthest leaf. The tree's overall height equals the root's height.
+- **Why does binary tree traversal fit recursion so well?**
+  - Binary trees have a recursive structure: "node + left subtree + right subtree." Traversal logic naturally decomposes into "process current node + recurse left + recurse right." The recursive call stack automatically tracks the tree path, enabling depth-first search without separate data structures.
 <!-- toc:begin -->
 ## In this series
 

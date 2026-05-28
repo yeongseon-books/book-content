@@ -316,13 +316,12 @@ This series covered list, dict, set, deque, stacks, queues, linked lists, trees,
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Choosing the Right Data Structure?**
-  - The article treats Choosing the Right Data Structure as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Choosing the Right Data Structure?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Choosing the Right Data Structure reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What criteria determine choosing between list, dict, and set?**
+  - Judge by "what is the most frequent operation." If order and indexing matter, list; if key-based lookup is central, dict; if deduplication and membership tests dominate, set. No structure optimizes all operations simultaneously, so identify the one key operation and choose accordingly.
+- **What operation should you examine first when choosing a data structure?**
+  - Reads (lookup/search). In most systems, reads are far more frequent than writes. Whether the read pattern is "find by key," "access by index," or "check existence" naturally branches to dict, list, or set.
+- **How can you combine multiple structures to satisfy requirements simultaneously?**
+  - Maintain two structures simultaneously. Like the IndexedDict example using dict + list together, you can provide both O(1) key lookup and O(1) index access. LRU cache's OrderedDict and Counter's dict + heap combination follow the same principle. The cost is memory and synchronization complexity.
 <!-- toc:begin -->
 ## In this series
 

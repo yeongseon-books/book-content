@@ -154,13 +154,12 @@ The next post looks at domain expertise, which is often the hidden multiplier be
 
 ## Answering the Opening Questions
 
-- **How should you think about the first 30, 60, and 90 days in a data role?**
-  - The article treats Settling into the First Data Job as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What should you listen for and document before trying to move fast?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why is a data map one of the most useful early artifacts?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How should you divide the first 90 days into phases?**
+  - The article covered the core concepts and strategies you need to know when adapting to your first job.
+- **What should you listen for and document early on?**
+  - Through examples, we saw how to approach real situations and what's easy to miss.
+- **Why must you quickly map the data landscape and stakeholders?**
+  - When actually preparing, you should set both short-term (2-week) and long-term (3-month) strategies and improve continuously.
 <!-- toc:begin -->
 ## In this series
 

@@ -174,13 +174,12 @@ ELT is the shape of the *SQL era*. Next, we look at *BI and dashboards* — turn
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying ETL and ELT?**
-  - The article treats ETL and ELT as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for ETL and ELT?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when ETL and ELT reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Which is better, ETL or ELT?**
+  - There's no absolute answer — it depends on cost structure, change frequency, and the team's SQL proficiency.
+- **How do you recover when transformation logic goes wrong in ELT?**
+  - Since raw data remains intact in the warehouse, you can simply re-run the transformation.
+- **How do you implement incremental ETL/ELT?**
+  - Record the last successful timestamp and process only changes since then — the standard approach.
 <!-- toc:begin -->
 ## In this series
 

@@ -176,13 +176,12 @@ A mart is a *thin bridge* between the team and the data. Next, we cover *perform
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Data Mart?**
-  - The article treats Data Mart as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Data Mart?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Data Mart reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How does a Data Mart differ from a Warehouse?**
+  - A Warehouse is the enterprise-wide integrated store; a Data Mart is a specialized store for a specific team or use case.
+- **Won't data definitions diverge if each team builds their own Data Mart?**
+  - Fact and Dimension definitions are managed centrally; selection and combination happen at each Mart.
+- **What do you do when a Data Mart grows too large?**
+  - Either decompose further by purpose, or return to the Warehouse and redesign the structure.
 <!-- toc:begin -->
 ## In this series
 

@@ -153,13 +153,12 @@ Moving toward seniority means using those ingredients to create wider and more d
 
 ## Answering the Opening Questions
 
-- **What actually makes a senior data role feel different from a junior one?**
-  - The article treats The Path to Senior in Data as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why is problem definition such a strong signal of seniority?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How do measurement plans make proposals more credible?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What makes senior data roles different?**
+  - The article covered the core concepts and strategies you need to know for growing into a senior role.
+- **Why is problem-definition ability the core competency of seniors?**
+  - Through examples, we saw how to approach real situations and what's easy to miss.
+- **How should you plan impact measurement to build persuasiveness?**
+  - When actually preparing, you should set both short-term (2-week) and long-term (3-month) strategies and improve continuously.
 <!-- toc:begin -->
 ## In this series
 

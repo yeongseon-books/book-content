@@ -170,13 +170,12 @@ Performance starts with *measurement*. Next we walk through *designing a warehou
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Performance Optimization?**
-  - The article treats Performance Optimization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Performance Optimization?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Performance Optimization reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What's the best way to find slow queries?**
+  - Enabling slow query logs for automatic collection is the most objective approach.
+- **What happens to write performance when you create many indexes?**
+  - Reads speed up but write and maintenance costs increase — a tradeoff to consider.
+- **Should you optimize queries or tune the database first?**
+  - Start with queries. Bad queries cannot be saved by tuning alone.
 <!-- toc:begin -->
 ## In this series
 

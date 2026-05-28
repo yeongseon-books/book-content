@@ -172,13 +172,12 @@ A warehouse is a *separate store for analysis*. Next, we look at *OLTP vs OLAP* 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Is a Data Warehouse??**
-  - The article treats What Is a Data Warehouse? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Is a Data Warehouse??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Is a Data Warehouse? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What exactly is a Data Warehouse and why keep one separate?**
+  - A warehouse separates OLTP (operational) from OLAP (analytical) to optimize each independently.
+- **Where do limitations appear when the service DB handles analytics too?**
+  - Interference arises — lock contention from operational queries and long-running analytical queries blocking each other.
+- **How do OLTP and OLAP requirements differ?**
+  - OLTP optimizes for short, high-concurrency transactions; OLAP optimizes for wide-range bulk aggregation — opposite optimization directions.
 <!-- toc:begin -->
 ## In this series
 

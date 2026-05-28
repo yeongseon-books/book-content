@@ -163,13 +163,12 @@ The next post shows how those artifacts become a portfolio instead of a pile of 
 
 ## Answering the Opening Questions
 
-- **What should a beginner learn first, and what can wait?**
-  - The article treats Designing the Learning Path as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why is a 12-week roadmap a more useful frame than a loose reading list?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What outcomes should each four-week phase produce?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What should data career beginners learn and in what order?**
+  - The core structure is: 4-week foundation (Python, SQL, statistics), 4-week analysis (EDA, dashboards, A/B tests), 4-week modeling (simple models, evaluation), plus weekly retrospectives to close the loop.
+- **Why split the 12-week roadmap into foundation, analysis, and modeling phases?**
+  - Skipping the foundation phase causes problems later — when you skip stages, problems become harder to analyze and results harder to interpret.
+- **Why are weekly deliverables important?**
+  - Tracking visible progress and building habits at each stage makes it easier to move from one phase to the next.
 <!-- toc:begin -->
 ## In this series
 
