@@ -192,13 +192,12 @@ This concludes DevOps 101. Suggested learning paths next:
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying An Operable DevOps Flow?**
-  - The article treats An Operable DevOps Flow as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for An Operable DevOps Flow?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when An Operable DevOps Flow reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why is the whole team slow even though CI, CD, monitoring, and incident response each exist?**
+  - The article explains that even with tools in place, if `build -> deploy -> monitor -> incident -> postmortem` are not connected, the team just repeats local optimizations. When postmortem results do not flow back into code and procedures, automation exists but the learning loop never closes—keeping overall velocity slow.
+- **What picture is needed to see DevOps as one operational flow rather than a tool list?**
+  - The article proposes drawing a single-page flow: `PR -> CI -> staging -> prod -> alert -> on-call -> postmortem`, annotating each stage's owner and tool. Finally showing the structure extending to IDP, service catalog, and observability hub—where every stage's output becomes the next stage's input.
+- **What do the DORA four metrics measure and why must they be viewed together?**
+  - DORA measures deployment frequency, change lead time, change failure rate, and MTTR—reading velocity and stability together. High deployment frequency with high failure rate means an unstable team; low failure rate with long lead time means an overly slow team—all four metrics together reveal the actual bottleneck.
 <!-- toc:begin -->
 ## In this series
 

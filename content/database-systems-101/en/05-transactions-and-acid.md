@@ -230,13 +230,12 @@ A transaction is the "all or nothing" promise; ACID refines that promise across 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Transactions and ACID?**
-  - The article treats Transactions and ACID as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Transactions and ACID?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Transactions and ACID reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What exactly is a transaction and why is it needed?**
+  - A transaction bundles multiple SQL statements into one unit of work that either fully commits or fully rolls back. Like the transfer example with two `UPDATE accounts` after `BEGIN`—without this boundary, a mid-operation failure could leave money vanished.
+- **What do the four ACID letters actually guarantee?**
+  - Atomicity makes both account updates succeed or fail together; Consistency enforces constraints like `CHECK (balance >= 0)` to prevent broken states; Isolation prevents concurrent operations from overwriting each other; Durability (as in the `PRAGMA journal_mode=WAL` example) ensures committed changes survive crashes.
+- **How should `BEGIN`, `COMMIT`, and `ROLLBACK` be used?**
+  - `BEGIN` declares that the following changes protecting a business invariant belong in one boundary. `COMMIT` only when all validations pass. `ROLLBACK` on any exception or cancellation discards everything since `BEGIN`. Long-running operations like external API calls should be kept outside this boundary.
 <!-- toc:begin -->
 ## In this series
 

@@ -171,13 +171,12 @@ Monitoring is the *eyes*. In the next post we cover *logs*, the *ears*.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Monitoring and Alerting?**
-  - The article treats Monitoring and Alerting as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Monitoring and Alerting?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Monitoring and Alerting reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do the three monitoring signals—logs, metrics, traces—differ in role?**
+  - Metrics like `http_requests_total` and p95 latency detect anomalies quickly as numbers; logs narrow causes with error messages and context; traces show how a single request traversed multiple services. All three together are needed to connect symptoms and causes on the same timeline.
+- **How do Prometheus and Grafana work together?**
+  - The flow: FastAPI exposes `/metrics`, Prometheus scrapes according to `scrape_configs`, and Grafana visualizes with request rate, error rate, and p95 panels. Adding Alertmanager rules with `for: 5m` conditions ensures dashboard anomalies translate into actual response alerts.
+- **Why are metric patterns like RED and USE frequently mentioned in operations?**
+  - RED (Rate, Errors, Duration) gives a quick user-perspective service health read; USE (Utilization, Saturation, Errors) explains system bottlenecks. The article recommends viewing both together because they connect "there is a problem" with "why it is slow" within the same conversation.
 <!-- toc:begin -->
 ## In this series
 

@@ -220,13 +220,12 @@ Isolation level is the dial between concurrency safety and throughput. Knowing t
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Isolation Levels?**
-  - The article treats Isolation Levels as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Isolation Levels?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Isolation Levels reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What are the four classic concurrency anomalies?**
+  - Dirty Read, Non-repeatable Read, Phantom Read, and Lost Update. The `counter` example—where two sessions both read 0 and write 1, leaving the final value at 1 instead of 2—most directly demonstrates Lost Update.
+- **How do READ UNCOMMITTED, READ COMMITTED, REPEATABLE READ, and SERIALIZABLE differ?**
+  - Moving left to right blocks more anomalies but costs more throughput. READ COMMITTED is typically the default; REPEATABLE READ maintains the same snapshot within a transaction; SERIALIZABLE is safest but requires the application to handle `SQLSTATE 40001` retries on conflict.
+- **How does MVCC provide consistent reads without locking?**
+  - MVCC maintains multiple versions of each row so read transactions continue seeing their start-time snapshot. As shown in the PostgreSQL REPEATABLE READ example, another session's committed `INSERT` remains invisible to the current transaction—at the cost of long-running transactions holding onto uncleanable versions.
 <!-- toc:begin -->
 ## In this series
 

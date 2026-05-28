@@ -303,13 +303,12 @@ The next article moves on to graphs, the most general way to represent relations
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Heaps?**
-  - The article treats Heaps as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Heaps?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Heaps reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What is the relationship between the heap invariant and a complete binary tree?**
+  - A min-heap maintains the invariant that every parent is ≤ its children, while simultaneously being a complete binary tree (only the last level is partially filled, from the left). Both conditions together ensure the minimum is always at the root and tree height stays O(log n).
+- **Why can a heap be represented with just a single array?**
+  - A complete binary tree has no gaps, so nodes stored in level-order fill the array contiguously. Parent is at `(i - 1) // 2`, children at `2*i + 1` and `2*i + 2`—no pointers needed, as shown in the `MinHeap` implementation.
+- **How do insertion (sift up) and deletion (sift down) work?**
+  - Insertion appends the new value at the end then bubbles it up by comparing with its parent (sift up). Deletion moves the last value to the root then pushes it down by swapping with the smaller child (sift down). The priority queue example uses `heapq.heappush` and `heappop`—exactly these operations—to always pick the next task in O(log n).
 <!-- toc:begin -->
 ## In this series
 

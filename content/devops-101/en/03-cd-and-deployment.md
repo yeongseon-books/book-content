@@ -197,13 +197,12 @@ CD is *a stream of small, reversible changes*. In the next post we cover *config
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying CD and Deployment Strategies?**
-  - The article treats CD and Deployment Strategies as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for CD and Deployment Strategies?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when CD and Deployment Strategies reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What does CD share with CI and where do they differ?**
+  - Both CI and CD are automated flows, but CI validates code quality while CD delivers the result to staging and production. The example pipeline's `deploy-staging -> smoke tests -> canary -> promote/rollback` sequence is exactly the operational territory CD covers.
+- **What risk does each strategy—Rolling, Blue-Green, Canary—reduce?**
+  - Rolling replaces servers sequentially to reduce extra cost; Blue-Green maintains two environments enabling instant rollback via traffic switch; Canary limits blast radius with 10% traffic and 5-minute observation windows; Feature flags let you disable functionality post-deploy without pulling the entire image.
+- **Why should code deployment and feature activation be separated?**
+  - The article recommends deploying code first and controlling user exposure via flags like `FEATURE_NEW_CHECKOUT`. This way, problems can be mitigated by killing just the flag rather than rolling back the entire image, making canary observation and rollback decisions more flexible.
 <!-- toc:begin -->
 ## In this series
 

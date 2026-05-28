@@ -291,13 +291,12 @@ Next we look at the magic of finding a value by key instantly — the hash table
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Stacks and Queues?**
-  - The article treats Stacks and Queues as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Stacks and Queues?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Stacks and Queues reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What rules define the stack and queue ADTs?**
+  - A stack follows LIFO—`pop` after pushing 1, 2, 3 yields 3, 2, 1. A queue follows FIFO—`dequeue` after enqueueing A, B, C yields A, B, C in the same order.
+- **What Python data structures are most natural for implementing stacks and queues?**
+  - For stacks, Python's `list` is natural since only `append` and `pop` at one end are needed. For queues, `list.pop(0)` is O(n) making it unsuitable; `collections.deque` with O(1) operations at both ends is the standard choice.
+- **Why can systems like function calls, BFS, and message queues be understood through these two structures?**
+  - Bracket matching pushes opening brackets and pops on closing ones—a stack pattern that directly connects to parsers and call stacks. BFS uses `deque.popleft()` to process the earliest-enqueued node first, making it the foundational model for understanding message queues and task queues where order matters.
 <!-- toc:begin -->
 ## In this series
 

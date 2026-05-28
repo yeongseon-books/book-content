@@ -174,13 +174,12 @@ A container is *a frozen environment*. In the next post we cover how to *monitor
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Containers and Build?**
-  - The article treats Containers and Build as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Containers and Build?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Containers and Build reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do containers differ from VMs, and why are they advantageous for deployment reproducibility?**
+  - In this article, containers bundle application and dependencies into an image more lightly than VMs (which require a full OS). Since the execution environment itself is captured as code starting from `FROM python:3.12-slim`, the reproducibility problems caused by differing server installation states are greatly reduced.
+- **What basic Dockerfile commands must you understand?**
+  - The article covers `FROM`, `WORKDIR`, `COPY`, `RUN`, `CMD` as the basic axis, adding `USER` and `HEALTHCHECK` for production quality. Particularly, the order of COPYing `requirements.txt` first and switching to a non-root user are key points affecting both build cache and security simultaneously.
+- **What difference does multi-stage build make for image size and security?**
+  - Installing dependencies in a builder stage and copying only execution results (like `/root/.local`) to the runtime stage removes unnecessary build tools from the final image. As shown in the comparison table, image size drops 50–70% easily, and the accompanying packages and attack surface shrink too, producing cleaner security scan results.
 <!-- toc:begin -->
 ## In this series
 

@@ -175,13 +175,12 @@ A CI pipeline is *the encoded passing line*. In the next post we cover how to *d
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying CI Pipeline?**
-  - The article treats CI Pipeline as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for CI Pipeline?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when CI Pipeline reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How does a CI pipeline differ from simple test automation?**
+  - The CI in this article is not just running tests—it is a flow that bundles lint, mypy, pytest, and Trivy into a single merge gate. Including status checks and artifact concepts means the system consistently determines whether a PR meets team standards.
+- **Why must build, test, lint, and scan stages be unified into one flow?**
+  - As shown in the examples, lint must pass before test, and test before build—catching problems at the cheapest possible moment. This way required checks and stage dependencies (not reviewer memory) guard main branch quality.
+- **What order should a fast-feedback pipeline follow?**
+  - The article places the fastest checks (lint and format) first, then type checking and build, and finally slow parallel tests and security scans last. Combined with `matrix`, shard, and cache examples, fast failure and short wait time are the design criteria for good CI.
 <!-- toc:begin -->
 ## In this series
 

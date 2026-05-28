@@ -171,13 +171,12 @@ Logs are a *time-machine for your system*. In the next post we combine every sig
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Logging and Analysis?**
-  - The article treats Logging and Analysis as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Logging and Analysis?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Logging and Analysis reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do structured and unstructured logs differ in practice?**
+  - Unstructured logs rely on string searching like `print("user logged in", user_id)`, while structured logs using `structlog` and JSON fields let you query by `user_id`, `request_id`, and `level` directly. This makes narrowing down specific requests and user flows in Grafana or Kibana dramatically faster.
+- **Why must logs from multiple servers be collected in one place?**
+  - In distributed systems, requests pass through multiple instances, so SSH-ing into one server for `grep` quickly hits its limits. Application logs sent to stdout, collected by Promtail, and forwarded to Loki or ELK allow reconstructing service-wide events on a single screen.
+- **From what perspective should you compare Loki and ELK?**
+  - Per the comparison table: ELK has strong full-text indexing suited for complex search and aggregation but higher operational complexity and cost. Loki's label-based indexing is more cost-efficient and integrates naturally with Grafana, making it especially well-suited for operations that view metrics and logs together.
 <!-- toc:begin -->
 ## In this series
 

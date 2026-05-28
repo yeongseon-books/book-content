@@ -207,13 +207,12 @@ IaC is *reproducible infrastructure*. In the next post we cover *containers*, wh
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Infrastructure as Code?**
-  - The article treats Infrastructure as Code as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Infrastructure as Code?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Infrastructure as Code reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why is infrastructure created through console clicks hard to reproduce in other environments?**
+  - Console operations leave no code or history recording who changed what and when, and recreating the same configuration in another region or account easily introduces subtle differences. The article emphasizes drift and state because this is exactly where reproducibility breaks.
+- **How does IaC connect to the entire team's change quality rather than just operations convenience?**
+  - With IaC, infrastructure changes can be handled inside the same PR, plan review, policy checks, and approval flows as application code. The `terraform validate`, OPA tag policy, and remote state with locking examples are mechanisms that transform infrastructure changes from individual know-how into a team quality management concern.
+- **How should you understand Terraform's basic flow centered on plan and apply?**
+  - The basic flow is `init -> plan -> apply`, with the key habit being reviewing the change diff visually before apply. Adding S3 + DynamoDB remote backend, `plan -detailed-exitcode`, and module reuse turns a one-time execution into a continuously validated operational loop.
 <!-- toc:begin -->
 ## In this series
 

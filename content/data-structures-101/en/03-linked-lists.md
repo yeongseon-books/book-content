@@ -317,13 +317,12 @@ Next we look at two ADTs built on top of arrays or linked lists — stacks and q
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Linked Lists?**
-  - The article treats Linked Lists as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Linked Lists?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Linked Lists reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What is structurally different between singly and doubly linked lists?**
+  - A singly linked list has nodes with only `value` and `next`, allowing forward-only traversal. A doubly linked list adds `prev`, enabling bidirectional traversal and easier removal—the sentinel head/tail structure in the example demonstrates this difference clearly.
+- **Why are linked lists strong at end insertion/deletion but weak at index access?**
+  - `push_front` and `pop_front` only change the head pointer—O(1). But reaching a middle element requires following `cur = cur.next` node by node, so O(1) index access like `lst[mid]` in arrays is impossible.
+- **What mistakes should you watch for most when implementing pointer manipulation?**
+  - Forgetting `prev.next = cur.next` during deletion, or missing `node.next.prev = node.prev` updates in doubly linked lists, immediately breaks the structure. The article introduced sentinel nodes specifically to reduce boundary cases (empty list, first node, last node) and prevent these pointer mistakes.
 <!-- toc:begin -->
 ## In this series
 

@@ -288,13 +288,12 @@ Next we look at the most basic structure — the array. We compare fixed-size an
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Are Data Structures??**
-  - The article treats What Are Data Structures? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Are Data Structures??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Are Data Structures? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do data structures and abstract data types (ADTs) differ?**
+  - An ADT like the `Stack` abstract class only defines what `push` and `pop` should do—it is an interface. A data structure like `ListStack` or `LinkedStack` decides whether to implement that interface with an array or linked nodes—it is the actual memory strategy.
+- **Why does performance vary so dramatically depending on structure choice even for the same data?**
+  - Storing users in a list requires `for user in users` linear search, while indexing with a dict gives `users.get(target_id)` in one step. For priority event processing, calling `sort()` every time versus using `heapq.heappush()` differs in insertion cost from the start.
+- **How does structure choice create cost differences as input size grows?**
+  - As shown in the comparison table: array search is O(n), balanced tree search is O(log n), and hash table lookup averages O(1)—the gap becomes visibly dramatic at scale. Dynamic array append is occasionally expensive due to reallocation but maintains amortized O(1), so on hot paths these growth-rate differences translate directly into operational cost differences.
 <!-- toc:begin -->
 ## In this series
 

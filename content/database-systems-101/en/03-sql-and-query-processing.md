@@ -234,13 +234,12 @@ You write **what**; the DBMS decides **how**. Between text and rows live a parse
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying SQL and Query Processing?**
-  - The article treats SQL and Query Processing as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for SQL and Query Processing?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when SQL and Query Processing reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What consequences follow from SQL being a declarative language?**
+  - Declarative means the developer writes only the desired result like `SELECT * FROM orders WHERE user_id = 7`, and the DBMS decides the access path. The same SQL can switch from `SCAN orders` to `SEARCH orders USING INDEX idx_orders_user_id` after an index is added—that is the direct consequence.
+- **What four stages does a query pass through before execution?**
+  - SQL text passes through the parser for semantic interpretation, then the planner/optimizer compares candidate plans, and the selected plan tree goes to the executor to produce result rows: `SQL text → Parser → Planner/Optimizer → Executor`.
+- **How should you read the simplest `EXPLAIN` output?**
+  - First determine whether it is a full scan or index seek. Then read join order, the gap between `estimate` and `actual` row counts, and patterns where correlated subqueries versus `JOIN + DISTINCT` produce different plans—this lets you explain slowness with evidence.
 <!-- toc:begin -->
 ## In this series
 

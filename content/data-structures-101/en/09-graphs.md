@@ -311,13 +311,12 @@ The next article closes the series with a practical guide to choosing among the 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Graphs?**
-  - The article treats Graphs as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Graphs?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Graphs reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do you precisely use graph terms like vertex, edge, degree, and path?**
+  - Vertices are entities like `api-gateway` and `auth-service`; edges are the dependency relationships connecting them. Degree is the number of edges connected to a vertex. A path is a sequence of visited vertices following edges—like the BFS example's `api-gateway → catalog-service → inventory-service → warehouse-db`.
+- **What tradeoffs do adjacency lists and adjacency matrices have?**
+  - Adjacency lists use dict+list with O(V + E) memory, well-suited for sparse graphs like service dependencies. Adjacency matrices use O(V²) memory but answer `has_edge(u, v)` in O(1), advantageous when vertices are few and edges are dense.
+- **What distinguishes directed from undirected graphs, and weighted from unweighted?**
+  - Directed graphs treat `u → v` and `v → u` as different meanings, enabling precise cycle detection as shown in the dependency loop example. Weighted graphs carry cost or distance per edge, requiring algorithms like Dijkstra instead of simple hop-counting BFS.
 <!-- toc:begin -->
 ## In this series
 

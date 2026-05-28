@@ -177,13 +177,12 @@ Config management is the start of *environment independence*. In the next post w
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Environments and Configuration?**
-  - The article treats Environments and Configuration as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Environments and Configuration?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Environments and Configuration reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why separate dev, stage, and prod environments?**
+  - The article explains that dev, stage, and prod are not just servers with different names but execution contexts with different purposes, data policies, and failure tolerance. Keeping stage as similar to prod as possible catches configuration gaps and deployment verification failures before production.
+- **What must be extracted from code to deploy the same codebase to multiple environments?**
+  - Database URLs, external API keys, domains, and timeouts—values that differ per environment—must live outside code. The `pydantic-settings`, per-environment YAML, and `os.environ["DB_URL"]` examples exist to reuse the same build artifact across environments by changing only configuration.
+- **How do environment variables and secrets differ, and why manage them separately?**
+  - Environment variables are a mechanism for injecting runtime configuration; secrets are sensitive values like API keys and passwords requiring rotation, access control, and audit logs. Starting with `.env` locally is fine, but production must use dedicated paths like Vault, AWS Secrets Manager, or External Secrets.
 <!-- toc:begin -->
 ## In this series
 

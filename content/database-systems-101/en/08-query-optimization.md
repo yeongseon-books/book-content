@@ -215,13 +215,12 @@ The optimizer picks among possible plans using a statistics-based cost model, an
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Query Optimization?**
-  - The article treats Query Optimization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Query Optimization?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Query Optimization reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What big picture does the optimizer use to choose an execution plan?**
+  - The optimizer builds a logical plan from SQL, then uses statistics and a cost model to select the cheapest-looking physical plan among candidates. The same query can produce completely different node combinations—`Seq Scan`, `Index Scan`, `Hash Join`, `Nested Loop`.
+- **Why do statistics play such a decisive role?**
+  - The optimizer estimates row counts and selectivity from statistics before reading the actual table, so stale statistics lead to wrong plan choices from the start. The `status = 'FAILED'` example—where estimated rows=12450 but actual rows=182—shows exactly how statistics error becomes a tuning problem.
+- **How should you read EXPLAIN and EXPLAIN ANALYZE?**
+  - EXPLAIN shows the chosen plan's shape; EXPLAIN ANALYZE adds actual time and actual row counts to verify whether estimates were correct. Reading `actual rows` vs `estimated rows`, the bottleneck node's `actual time`, and patterns like `lower(email)` killing regular indexes together is what proper tuning requires.
 <!-- toc:begin -->
 ## In this series
 

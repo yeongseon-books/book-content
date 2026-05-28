@@ -222,13 +222,12 @@ An index is a sorted "value to row" structure that lets you answer a query in a 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Indexes?**
-  - The article treats Indexes as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Indexes?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Indexes reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What intuition helps you understand a B-tree index?**
+  - Think of it like a book's back-of-the-book index: you follow a short sorted path downward. As shown in the diagram with `customer_id = 377`, traversing root and internal nodes to reach only the relevant leaf range avoids reading the entire table end-to-end.
+- **How do single-column, composite, and covering indexes differ?**
+  - A single-column index like `idx_user ON orders(user_id)` quickly narrows one condition. A composite index like `(user_id, status)` depends critically on leading-column order. A covering index like `(user_id, price)` includes all needed columns inside the index itself, nearly eliminating table lookups.
+- **When does an index become effectively useless?**
+  - Low-selectivity columns like `status` with only two values often make full scans cheaper even with an index. Querying a composite index without the leading column, or using patterns like `LIKE '%foo%'` or `lower(email)`, dramatically reduces standard B-tree effectiveness.
 <!-- toc:begin -->
 ## In this series
 

@@ -201,13 +201,12 @@ Incident response is a combined *technical and organizational* skill. The final 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Incident Response and On-Call?**
-  - The article treats Incident Response and On-Call as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Incident Response and On-Call?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Incident Response and On-Call reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **When an alert fires at 3 AM, who should do what?**
+  - The primary on-call receives the alert first, opens the runbook, and performs initial mitigation. Following the first-15-minutes sequence: determine SEV level, open an incident channel, check recent deployments, and if needed execute `kubectl rollout undo deploy/api`—escalating to an IC if the situation grows.
+- **What criteria should severity (SEV) levels use so the team speaks the same language?**
+  - SEV1 is full outage of core company functionality; SEV2 is core function degradation; SEV3 is partial degradation; SEV4 is minor bugs—each with expected response times. Defining both impact scope and recovery expectations together prevents disagreements in Slack and enables consistent escalation.
+- **Why is on-call rotation an operational design rather than just a schedule?**
+  - The article's rotation includes `primary`, `secondary`, `escalation_timeout`, and weekly handoff—a system with backup paths and handover. Combining this with fatigue metrics like weekly page count and nighttime call ratio is what maintains sustainable response quality.
 <!-- toc:begin -->
 ## In this series
 

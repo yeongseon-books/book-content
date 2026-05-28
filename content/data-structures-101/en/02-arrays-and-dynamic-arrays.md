@@ -283,13 +283,12 @@ Next we look at linked lists — nodes joined by pointers. We compare how they s
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Arrays and Dynamic Arrays?**
-  - The article treats Arrays and Dynamic Arrays as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Arrays and Dynamic Arrays?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Arrays and Dynamic Arrays reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why is fixed-array indexing O(1)?**
+  - Fixed arrays store elements in contiguous memory, so `arr[i] = base_address + i × element_size` is a single calculation to reach any slot. That is why accessing `data[0]`, `data[5_000_000]`, or `data[-1]` all take similar time regardless of position.
+- **How does a dynamic array grow when space runs out, and why is append fast on average?**
+  - As shown in the `DynamicArray` implementation, when size reaches capacity, a larger block is allocated, existing values are copied, and capacity is typically doubled. Resizes are occasionally expensive, but most appends simply write to an empty slot, maintaining amortized O(1).
+- **What data structure is Python's `list` closest to internally?**
+  - Python's `list` exhibits O(n) for `insert(0, -1)` at the front, fast `append` at the end, and capacity growth—making it a textbook dynamic array. Its contiguous memory also gives better cache locality than dict during iteration.
 <!-- toc:begin -->
 ## In this series
 

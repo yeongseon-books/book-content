@@ -292,13 +292,12 @@ The next article looks at the heap, a data structure specialised for fast access
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Binary Search Trees?**
-  - The article treats Binary Search Trees as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Binary Search Trees?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Binary Search Trees reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What is the BST invariant, and how do search, insert, and delete work?**
+  - The BST invariant maintains `left.key < node.key < right.key` at all times. `insert` and `search` descend left or right based on comparison. Deletion is trickiest with two children—replacing with the in-order successor (minimum of the right subtree) preserves the sorted property.
+- **Why do average and worst-case time complexity differ?**
+  - With well-distributed input, each step discards half the tree—averaging O(log n). But sorted input like `0, 1, 2, ...` produces a skewed tree with height 30 (as shown in the `skewed_height` example), degrading search to O(n)—effectively a linked list.
+- **Why are balanced trees like AVL, Red-Black, and B-Tree necessary?**
+  - Balanced trees use rotations and rules to prevent skewing, preserving BST's sorting advantage and search efficiency. That is why database indexes use B-Tree/B+Tree and libraries like `TreeMap` use Red-Black trees—preventing worst-case performance collapse.
 <!-- toc:begin -->
 ## In this series
 

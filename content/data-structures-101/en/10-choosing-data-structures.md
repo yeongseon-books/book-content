@@ -278,13 +278,12 @@ The nine data structures covered in this series — array, linked list, stack, q
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Choosing Data Structures?**
-  - The article treats Choosing Data Structures as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Choosing Data Structures?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Choosing Data Structures reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What should you think about first when choosing a data structure for a new problem?**
+  - The starting point is not data shape but which operation occurs most frequently on the hot path. Priority tasks → `heapq`; double-ended operations → `deque`; key lookup → `dict/set`—narrowing candidates by operation, not intuition.
+- **What are the five questions that define a workload?**
+  - The article recommends writing down: most frequent operation, input size, whether ordering is needed, memory constraints, and concurrency/persistence requirements. Answering these lets you choose among `list`, `deque`, `dict`, balanced trees, and graphs based on evidence rather than gut feeling.
+- **Can data structure selection be systematized like a decision tree?**
+  - Yes. Like the `recommend_structure()` function: if `primary_op` is `key_lookup` → `dict/set`; `min_or_max` → heap; `graph_traversal` → adjacency list + BFS/DFS. Adding actual benchmarks (like `list.pop(0)` vs `deque.popleft()`) turns the decision tree from theory into an operational judgment framework.
 <!-- toc:begin -->
 ## In this series
 

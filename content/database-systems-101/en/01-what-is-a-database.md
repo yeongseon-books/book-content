@@ -239,13 +239,12 @@ A DBMS is not a place to put data — it is **software that solves concurrency, 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Is a Database System??**
-  - The article treats What Is a Database System? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Is a Database System??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Is a Database System? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What is the decisive difference between files and a DBMS?**
+  - With file storage, code reading and rewriting `accounts.json` must handle concurrency and mid-operation failures on its own. With the SQLite example, `with db:` transactions, locking, and WAL take on that responsibility—the application only expresses intent like `UPDATE accounts SET balance = balance + ?`.
+- **What four properties does a DBMS spend the most effort guaranteeing?**
+  - The recurring axes in this article are concurrency control, crash recovery and durability, integrity, and query processing. The `CHECK (price >= 0)` constraint, transaction rollback example, and `EXPLAIN ANALYZE` showing `Index Scan` each demonstrate where that effort is spent.
+- **Where is each model—relational, document, key-value—strongest?**
+  - Relational DBMSs excel at systems of record like orders and accounts where constraints and JOINs matter. Document stores handle flexibly-structured data like documents and trees well. Key-value stores like Redis are especially strong for simple lookups and caching.
 <!-- toc:begin -->
 ## In this series
 

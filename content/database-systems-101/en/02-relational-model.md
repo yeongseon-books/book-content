@@ -257,13 +257,12 @@ The relational model fits in three lines: a table is a set of like-shaped rows; 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying The Relational Model?**
-  - The article treats The Relational Model as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for The Relational Model?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when The Relational Model reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What do relation, tuple, and attribute each refer to in a table?**
+  - A table like `users` or `orders` is a relation; each row within it is a tuple; each column like `email` or `price` is an attribute. Reading data as a set of facts sharing the same attribute set—rather than just a spreadsheet shape—is the starting point of the relational model.
+- **What exactly do primary keys and foreign keys guarantee?**
+  - A primary key like `users.id` guarantees each row is uniquely identifiable; `UNIQUE` on `email` prevents duplicate users. A foreign key like `orders.user_id REFERENCES users(id)` rejects orders pointing to nonexistent users and blocks deletion of referenced users—enforcing referential integrity.
+- **What meaning do NULL and integrity constraints carry?**
+  - NULL does not mean "empty" but "value unknown or not yet determined"—allowing it habitually blurs model semantics. That is why `NOT NULL`, `CHECK (price >= 0)`, `UNIQUE`, and foreign keys should have the database reject invalid states before the application can.
 <!-- toc:begin -->
 ## In this series
 

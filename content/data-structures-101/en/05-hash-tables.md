@@ -301,13 +301,12 @@ Next we look at the structure that naturally expresses hierarchy — the tree. F
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Hash Tables?**
-  - The article treats Hash Tables as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Hash Tables?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Hash Tables reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What role does a hash function play, and what makes a good one different?**
+  - A hash function converts a key to an integer, then `hash(key) % capacity` determines the bucket index. A good hash function distributes keys evenly across slots, avoiding the `BadHash` scenario where all values pile into one bucket and average O(1) collapses.
+- **Why do collisions occur and how can they be resolved?**
+  - Since bucket count is finite, different keys inevitably map to the same index. The article demonstrated two approaches with code: chaining (linking `(key, value)` pairs in a list per bucket) and open addressing (probing forward until an empty slot is found).
+- **What is the relationship between load factor and rehashing?**
+  - `HashTable2` triggers rehashing when `(size + 1) / capacity > 0.75`, doubling the array and redistributing all keys. Rehashing is expensive once but infrequent, keeping average insertion cost low while preventing buckets from becoming so crowded that lookups slow down.
 <!-- toc:begin -->
 ## In this series
 

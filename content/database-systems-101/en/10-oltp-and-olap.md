@@ -240,13 +240,12 @@ OLTP and OLAP are two worlds handling the same data on different time scales and
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying OLTP and OLAP?**
-  - The article treats OLTP and OLAP as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for OLTP and OLAP?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when OLTP and OLAP reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What is the fundamental difference between OLTP and OLAP workloads?**
+  - OLTP centers on short index lookups and fast updates like `SELECT * FROM orders WHERE user_id=7`. OLAP centers on large scans and aggregations like `GROUP BY country`. The same order data demands entirely different storage methods and execution environments.
+- **What tradeoffs do row storage and column storage have?**
+  - Row storage is advantageous for reading and writing whole records (like one order)—the default for operational DBs. Column storage (as in DuckDB and Parquet examples) reads only needed columns like `country`, `status`, `total`, dramatically improving aggregation speed and compression—but is disadvantageous for single-row UPDATEs.
+- **Why are data warehouses and ETL/ELT necessary?**
+  - Running analytical queries directly on operational DBs lets long aggregations consume cache and resources, interfering with transactions like orders and payments. ETL/ELT moves operational data to a separate warehouse, where it is remodeled with star schemas or columnar storage optimized for analysis.
 <!-- toc:begin -->
 ## In this series
 

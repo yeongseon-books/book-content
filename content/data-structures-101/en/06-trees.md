@@ -290,13 +290,12 @@ Next we look at the binary search tree (BST), a sorted binary tree. It offers av
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Trees?**
-  - The article treats Trees as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Trees?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Trees reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do you precisely distinguish tree terms like root, leaf, depth, and height?**
+  - In the article's diagram, `A` is the root (no parent), and `D`, `E`, `F` with no children are leaves. Depth is the number of edges down from the root; height is the number of edges to the farthest leaf—which is why `height(root)` computed to 2 in the example.
+- **How do general trees and binary trees differ?**
+  - General trees use a `children` list with no limit on child count (like the CEO → CTO/CFO org chart). Binary trees have only `left` and `right` pointers—more constrained in representation but easier to standardize traversal and search algorithms.
+- **What distinguishes preorder, inorder, and postorder traversal, and where is each used?**
+  - The three traversals differ in when the root is visited: `preorder` yields `1 2 4 5 3`, `inorder` yields `4 2 5 1 3`, `postorder` yields `4 5 2 3 1`. Preorder suits copying/serialization, inorder gives sorted BST output, and postorder suits expression tree evaluation.
 <!-- toc:begin -->
 ## In this series
 

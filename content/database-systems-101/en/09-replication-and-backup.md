@@ -185,13 +185,12 @@ Replication owns availability across space, backup owns durability across time. 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Replication and Backup?**
-  - The article treats Replication and Backup as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Replication and Backup?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Replication and Backup reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How does Primary-Replica replication work, and what role does each node play?**
+  - The Primary accepts writes and generates WAL; the Replica, created via `pg_basebackup`, continuously replays that WAL stream. Replicas serve as read-distribution targets and failover candidates, with `pg_last_xact_replay_timestamp()` monitoring replication lag.
+- **What do synchronous and asynchronous replication trade off?**
+  - Synchronous replication (`synchronous_commit = on`) has COMMIT wait for the Replica's WAL receipt confirmation—reducing data loss risk. Asynchronous replication lets the Primary commit first for lower latency, but risks losing the last uncommitted changes during failure.
+- **How do full backups, incremental backups, and WAL-based PITR differ?**
+  - A full backup stores all data at a point in time as a baseline snapshot. Incremental backups store only changes since then, reducing storage cost and time. WAL-based PITR appends WAL archives to a baseline backup and replays to `recovery_target_time`, providing a recovery path to any arbitrary point—like just before an accidental `DELETE`.
 <!-- toc:begin -->
 ## In this series
 

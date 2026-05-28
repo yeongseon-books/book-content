@@ -233,13 +233,12 @@ Normalization splits the model along functional dependencies so that "each fact 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Normalization and Modeling?**
-  - The article treats Normalization and Modeling as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Normalization and Modeling?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Normalization and Modeling reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What intuition helps you understand functional dependencies?**
+  - A functional dependency means when one value is determined, another is determined with it. In the article's examples: if `user_id` is the same then `user_email` must be the same; if `product_id` is the same then `product_name` and `product_price` must be the same.
+- **What does each of 1NF, 2NF, and 3NF prohibit?**
+  - 1NF prohibits multiple values in one cell like `"P-1, P-2"` comma lists. 2NF prohibits partial dependencies—like `product_name` depending only on `product_id` in a `(order_id, product_id)` composite key. 3NF requires separating transitive dependencies like `order_id → user_id → user_email`.
+- **When is denormalization justified?**
+  - Denormalization is not a starting point but a subsequent optimization—applied when JOIN or analytical query costs on a normalized model repeatedly prove problematic. As the article explained, keeping the write model normalized while adding summary tables or materialized views for the read model is the safer approach.
 <!-- toc:begin -->
 ## In this series
 

@@ -178,13 +178,12 @@ DevOps is a *cultural shift*. In the next post we go deep on its first lever —
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Is DevOps??**
-  - The article treats What Is DevOps? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Is DevOps??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Is DevOps? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What is DevOps, and why did separating development and operations hit its limits?**
+  - In this article, DevOps is a practical approach that ties build, deployment, and operational signals after code writing into a single loop. As the comparison table shows, when dev and ops are separated, deployment cycles grow large and feedback loops stretch to weeks—but frequent small deploys let you find problems faster and roll back smaller.
+- **Why is DevOps called a culture rather than a tool?**
+  - The article explains DevOps through CALMS: Culture, Automation, Lean, Measurement, Sharing. Only when teams share the same repository, the same postmortem, and the same metrics do tools like GitHub Actions and deployment scripts gain the power to actually change how the team operates.
+- **What roles do terms like CI, CD, and SRE play within the DevOps flow?**
+  - CI is the front gate that automatically validates changes—like the `lint -> test -> build` GitHub Actions example. CD is the delivery path that moves validated code to real environments—the `deploy` stage. SRE connects operational signals to code and procedures via `/health` checks, metrics, and postmortems, keeping the loop unbroken.
 <!-- toc:begin -->
 ## In this series
 
