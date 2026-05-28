@@ -325,13 +325,12 @@ Inheritance is useful for code reuse and expressing hierarchical relationships, 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Inheritance?**
-  - The article treats Inheritance as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Inheritance?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Inheritance reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Inheritance can reduce code duplication, but why does it simultaneously create tight coupling?**
+  - Lifting `name` and `color` into `Shape` clearly reduced duplication in `Circle` and `Square`, but children become bound to the parent's initialization approach and public interface. The `Penguin(Bird)` example and `ReportDeliveryService` refactoring later in the article showed that choosing inheritance based solely on shared code quickly leads back to LSP violations or mixed responsibilities.
+- **How should overriding and `super()` be used together safely?**
+  - `ElectricVehicle.info()` calls the parent's `info()` via `super()` first and then appends battery information—a safe pattern that maintains the existing contract while extending it. Conversely, if a child bypasses parent initialization or default behavior entirely, issues like missing `super().__init__()`, duplicate overrides, and initialization order confusion arise. The article recommended reusing parent functionality and adding only additional responsibilities.
+- **Why are `isinstance()` and `issubclass()` important when reading inheritance relationships?**
+  - The example where `Dog` receives a `speak()` call from within an `Animal` list demonstrates why `isinstance()` is needed to verify at runtime whether an object satisfies the parent contract. Additionally, checking `issubclass(Dog, Animal)` and `Duck.__mro__` instills the practical sense of verifying type relationships and method resolution order in code rather than just trusting the hierarchy.
 <!-- toc:begin -->
 ## In this series
 

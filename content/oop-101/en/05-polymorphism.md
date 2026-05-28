@@ -307,13 +307,12 @@ Polymorphism increases code flexibility by calling different implementations thr
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Polymorphism?**
-  - The article treats Polymorphism as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Polymorphism?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Polymorphism reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why is polymorphism the most powerful tool for eliminating type-based branching?**
+  - The article started with a payment function that grew `if` branches for each `payment["type"]`, then replaced it with a single `payment.pay(amount)` call—eliminating caller modifications when new payment methods are added. The same flow repeated with `Shape.area()` and `describe()`, and with `CheckoutService` knowing only the `PaymentMethod` contract, concretely showing that polymorphism lowers extension cost far more than branching.
+- **What is the difference between inheritance-based polymorphism and duck typing?**
+  - `Circle`, `Rectangle`, and `Triangle` share the same `area()` contract by inheriting from `Shape`—a classic example of inheritance-based polymorphism. In contrast, `FileWriter`, `DatabaseWriter`, and `ApiWriter` fit into `save_data()` simply by matching `write()` with no common parent, confirming that duck typing in Python is looser and easier to layer onto existing code.
+- **How does `Protocol` reinforce duck typing at the static analysis level?**
+  - With a `Writable` Protocol, objects like `ConsoleWriter` and `NetworkWriter`—without any inheritance relationship—pass the type checker as long as they match the `write(self, data: str)` contract. In other words, `Protocol`'s practical value is maintaining runtime flexibility while catching method name mismatches or wrong signatures before deployment.
 <!-- toc:begin -->
 ## In this series
 

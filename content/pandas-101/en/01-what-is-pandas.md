@@ -167,13 +167,12 @@ Pandas is the *standard language for tabular data*. Next we go deep into the *in
 
 ## Answering the Opening Questions
 
-- **The *definition* of *Pandas* and where it sits?**
-  - The article treats What Is Pandas? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The intuition behind *Series* and *DataFrame?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The basic *load → inspect → summarize* workflow?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What problem does Pandas solve exactly?**
+  - Pandas lifts tabular data—arriving as CSV or Excel—into an in-memory DataFrame and lets you read, inspect, and transform it with concise code. The article's immediate flow from `pd.read_csv` to `shape`, `dtypes`, and `describe()` demonstrates that role.
+- **How should you understand the relationship between Series and DataFrame?**
+  - A Series is a one-dimensional structure with an index, and a DataFrame bundles multiple such columns into a single table. The examples built a Series with `pd.Series([10, 20, 30], index=["a", "b", "c"])` and then expanded to a DataFrame with `name` and `age` columns, showing this relationship.
+- **Why do so many analysis tasks start with Pandas?**
+  - Because most real-world data ultimately arrives in tabular form, and Pandas lets you check size, verify types, and filter by conditions all in one place. Examples like `df[df["age"] > 40]` and `sales.groupby("product")["quantity"].mean()` show that subsequent aggregation and preprocessing continue with the same syntax.
 <!-- toc:begin -->
 ## In this series
 

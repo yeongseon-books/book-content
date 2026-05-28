@@ -383,13 +383,12 @@ You should avoid OOP when classes add more ceremony than protection. In this rep
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying When to Avoid OOP?**
-  - The article treats When to Avoid OOP as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for When to Avoid OOP?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when When to Avoid OOP reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What signals indicate that class-based design is mostly ceremonial decoration?**
+  - If stateless single-method wrapper classes like `TitleCleaner`, `ScoreFilter`, and `CurrencyFormatter` keep multiplying and constructor dependencies accumulate, you are close to the over-engineering signals this article describes. Add to that a report app that reads as a transformation pipeline—`read_csv → normalize_row → filter_invalid → aggregate`—and functions become a more direct expression than classes.
+- **Which kinds of classes convert better to functions, `dataclass`, `NamedTuple`, or `TypedDict`?**
+  - Classes like `ReportRow` whose primary role is field storage are better reduced to `@dataclass(frozen=True)`, and shallow config bundles like `ReportConfig` are lighter as `TypedDict`. Conversely, stateless helpers for title cleaning or score filtering convert naturally to functions. The article specifically matched each class type to its more suitable alternative.
+- **When is a single callback sufficient instead of an entire strategy class?**
+  - In the `render_value(value, formatter)` and `build_report(..., money)` examples, when all the caller truly needs is a single `int -> str` conversion, passing a callable like `format_currency` or `format_points` is sufficient. However, as the article noted later, once a formatter starts carrying locale, cache, and shared settings, callbacks alone scatter the logic—and that is the threshold for reintroducing a class.
 <!-- toc:begin -->
 ## In this series
 

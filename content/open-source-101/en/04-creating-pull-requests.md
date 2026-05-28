@@ -175,13 +175,12 @@ Next, we will move into README quality. In a repository that expects contributor
 
 ## Answering the Opening Questions
 
-- **What does a pull request that maintainers welcome actually look like?**
-  - The article treats Creating Pull Requests as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why should fork, branch, commit, and PR each stay separate?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What roles do commit messages and the PR description play?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why shouldn't your first PR be a large feature addition?**
+  - Large changes take long to review, and rejection can be discouraging. Starting with a few small PRs to learn patterns and culture before gradually taking on bigger challenges is the right entry strategy.
+- **Why is review feedback a conversation improving the code, not a rejection of you?**
+  - In open-source communities, review is a collaborative process that raises **technical quality, consistency, and maintainability** together.
+- **What level of detail should a PR description have?**
+  - Write the **reason for the change, what changed, and how it was tested** clearly enough for the reviewer to understand within 10 seconds.
 <!-- toc:begin -->
 ## In this series
 

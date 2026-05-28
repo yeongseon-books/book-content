@@ -329,13 +329,12 @@ Encapsulation protects an object's internal state and provides a safe interface.
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Encapsulation?**
-  - The article treats Encapsulation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Encapsulation?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Encapsulation reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How should you interpret Python's public, `_protected`, and `__private` conventions?**
+  - In the `Employee` example, `name` is a public attribute, `_department` signals internal implementation, and `__salary` uses name mangling to make accidental access harder. Python's access control is closer to a contract marker than a security barrier—the article even showed that `_Employee__salary` remains accessible.
+- **What design advantage does `property` provide beyond simple getter/setter syntax?**
+  - `Circle.radius` reads and writes like an attribute but internally enforces positive-value validation and `area` recalculation rules, while `TemperatureSensor` hides a raw measurement array and exposes only average Celsius and Fahrenheit. So `property` is a means to separate internal representation from external interface without proliferating method names—that is the core takeaway of this article.
+- **Why does embedding validation in attribute access make object state management easier?**
+  - In `User`, every path that assigns `name`, `age`, or `email` passes through setters, so blank names, negative ages, and malformed emails never persist inside the object. `BankAccount` also opens `balance` as read-only and concentrates limit and balance checks in `deposit()` and `withdraw()`, practically demonstrating that fewer state-change paths mean easier bug tracking.
 <!-- toc:begin -->
 ## In this series
 

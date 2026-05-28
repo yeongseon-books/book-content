@@ -156,13 +156,12 @@ Next, we will move into licenses. The moment you use open source, you are not ma
 
 ## Answering the Opening Questions
 
-- **Why does the “free code” definition keep creating misunderstandings?**
-  - The article treats What Is Open Source as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How should you distinguish terms such as *free software*, *upstream*, *fork*, and *contributor*?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why do docs, translations, and reproducible bug reports count as real contribution?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why do misunderstandings persist when you think of open source as just free code?**
+  - Open source is an ecosystem that defines **rights and responsibilities**, not price. Without reading technical convenience and legal conditions together, licenses, contribution processes, and maintainer roles appear disconnected.
+- **How should you distinguish basic terms like free software, upstream, fork, and contributor?**
+  - Terms are easier to distinguish when you encounter them **within the flow of code moving through an actual repository** rather than memorizing them in isolation. Reading the license, fork list, and contributor roster together makes each term's place clear.
+- **Why do documentation, translation, and reproduction procedure write-ups all count as contributions beyond code?**
+  - Maintaining the open-source ecosystem requires **accessibility, stability, and sustainability** beyond code changes. Documentation and translation widen a project's entry point, and reproduction procedures help the next contributor start faster.
 <!-- toc:begin -->
 ## In this series
 

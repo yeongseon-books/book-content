@@ -163,13 +163,12 @@ Missing-value handling decides *analysis integrity*. Next we cover *groupby*.
 
 ## Answering the Opening Questions
 
-- **The meaning of *NaN* and its *dtype* impact?**
-  - The article treats Handling Missing Values as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How to use *isna / dropna / fillna?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The intuition behind *interpolate?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What do `NaN` and `pd.NA` represent?**
+  - Both indicate a missing value, but the key point is viewing missingness as a state to interpret rather than a simple error. The article created a DataFrame with `np.nan` and did not immediately delete it—instead treating it as the starting point for diagnosis, replacement, and interpolation.
+- **How should you diagnose missing values first?**
+  - Start with `isna()` and `isna().sum()` to see which columns have how many missing values. Then computing `missing_ratio = df.isna().sum() / len(df) * 100` gives you the basis for deciding between removal and imputation.
+- **When should you drop and when should you fill?**
+  - If missingness is sparse and information loss is small, `dropna()` is simple. But for time series where flow matters or values with group context, `fillna`, `ffill`, `bfill`, `interpolate()`, or group-mean imputation may be more appropriate. The article distinguished mean imputation's distribution distortion, `ffill`'s boundary limitation, and `interpolate()`'s time-series suitability for exactly this reason.
 <!-- toc:begin -->
 ## In this series
 

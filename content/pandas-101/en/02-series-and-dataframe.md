@@ -167,13 +167,12 @@ A DataFrame is *a collection of Series*. Next we cover *reading CSV and Excel fi
 
 ## Answering the Opening Questions
 
-- **The *internal structure* of a *Series?**
-  - The article treats Series and DataFrame as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Column-oriented* thinking with *DataFrame?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The role of the *Index?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What is a Series internally?**
+  - A Series is not just a value array—it is a one-dimensional structure carrying `values`, `index`, and `name` together. The article created `pd.Series([1.0, 2.0, 3.0], index=["a", "b", "c"], name="x")` and printed these attributes precisely to confirm this structure visually.
+- **What does it mean to view a DataFrame as column-centric?**
+  - Each column of a DataFrame is an independent Series, so extracting `df["x"]` immediately transitions to Series operation rules. That is why `df["x"]` returns a Series, and per-column type management and vectorized calculations naturally proceed column by column.
+- **Why is the index more than just row numbers?**
+  - Pandas aligns labels first and then computes, so the index is the computation reference itself. The `s1 + s2` example—where labels `a`, `b`, `c`, `d` are aligned and `NaN` appears where they do not overlap—clearly demonstrates this point.
 <!-- toc:begin -->
 ## In this series
 

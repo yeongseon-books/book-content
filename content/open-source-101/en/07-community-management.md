@@ -163,13 +163,12 @@ Next, we will look at the maintainer role. Once a community exists, someone stil
 
 ## Answering the Opening Questions
 
-- **Why does a project need a code of conduct?**
-  - The article treats Community Management as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What does a contribution guide do beyond listing steps?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why is it useful to separate issues from general discussion?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why does even a small project need a Code of Conduct?**
+  - A Code of Conduct signals "anyone who enters is safe here." Explicit standards prevent disputes preemptively and protect contributors.
+- **What is the most important quality for a community manager?**
+  - **Consistency.** Triaging issues by the same criteria, responding in the same tone, and reviewing at the same speed lets participants predict and trust.
+- **How does community management evolve as a project grows?**
+  - Beyond core maintainers, you divide roles into **co-maintainers, reviewers, and documentation leads**, documenting rules so newcomers can contribute consistently.
 <!-- toc:begin -->
 ## In this series
 

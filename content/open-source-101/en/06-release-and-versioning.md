@@ -168,13 +168,12 @@ Next, we will move into community management. Once the code is public and releas
 
 ## Answering the Opening Questions
 
-- **What do the three numbers in semantic versioning actually signal to users?**
-  - The article treats Release and Versioning as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **When should you use pre-release labels, and why does skipping them create risk?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How should changelogs and release notes work together?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What does Semantic Versioning (1.2.3) mean and why does it matter?**
+  - MAJOR.MINOR.PATCH states the **compatibility level** of a change. If upgrading to 1.2.0 breaks your code, trust breaks with it.
+- **How should versions be managed during development?**
+  - Pre-releases (0.1.0-alpha, 0.1.0-beta) let you **share changes early** and collect feedback before the official release.
+- **Why are release notes important?**
+  - Release notes carry **essential upgrade information, caveats, and migration guides**. Clear notes eliminate the developer's guesswork.
 <!-- toc:begin -->
 ## In this series
 

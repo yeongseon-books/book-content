@@ -159,13 +159,12 @@ Vectorization is the *essence of Pandas*. Next we cover a *real-world data analy
 
 ## Answering the Opening Questions
 
-- **The meaning of *vectorization?**
-  - The article treats Apply and Vectorization as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The difference between *apply / map / vectorize?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Interop* with *NumPy?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What exactly does vectorization mean?**
+  - Vectorization means computing an entire array or column at once without calling a Python function per row. A single line `df["c"] = df["a"] + df["b"]` applying to all one million rows is the most direct demonstration of this meaning.
+- **What are the differences between `apply`, `map`, and NumPy operations?**
+  - `apply` is a general-purpose tool that repeatedly applies an arbitrary function, `map` suits Series value substitution or one-to-one mapping, and NumPy operations handle conditional branching and numeric computation fast. That is why the article used `Series.map(mapping)` for code substitution and `np.where(df["a"] % 2 == 0, "even", "odd")` for even/odd branching.
+- **Why is `apply(axis=1)` particularly slow?**
+  - `axis=1` effectively extracts each row as a Python object and passes it to the function, bypassing nearly all internal optimization paths. The large speed difference when replacing `df.apply(lambda r: r["a"] + r["b"], axis=1)` with `df["a"] + df["b"]` exists precisely for this reason.
 <!-- toc:begin -->
 ## In this series
 

@@ -166,13 +166,12 @@ Good loading is the *start of good analysis*. Next we cover *filtering and selec
 
 ## Answering the Opening Questions
 
-- **The *core options* of *read_csv* and *read_excel?**
-  - The article treats Reading CSV and Excel as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Handling *encoding* and *separators?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The value of explicit *dtype?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What options should you look at first in `read_csv` and `read_excel`?**
+  - Start with encoding, delimiter, header position, sheet name, and structure-deciding options like `dtype` and `parse_dates`. The article also checked `shape` and `dtypes` right after `pd.read_csv("sales.csv")`, and specified `sheet_name="Q1", header=1` for Excel.
+- **Why do character encoding and delimiter frequently cause problems?**
+  - Even if the extension is CSV, actual storage formats vary—a single difference like `encoding="latin-1"`, `encoding="cp949"`, or `sep=";"` can garble characters or collapse columns into one. When structure breaks at the read stage, all downstream filtering and aggregation proceeds against a malformed table.
+- **What are the benefits of specifying data types explicitly?**
+  - Fixing types at read time with `dtype={"product_id": "string", "qty": "int32"}` reliably preserves identifiers with leading zeros and reduces memory. Adding `parse_dates=["date"]` lets you transition directly to time-series operations without a later conversion step.
 <!-- toc:begin -->
 ## In this series
 

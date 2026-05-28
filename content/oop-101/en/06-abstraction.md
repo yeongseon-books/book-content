@@ -388,13 +388,12 @@ Abstraction becomes useful when one workflow needs multiple implementations and 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Abstraction?**
-  - The article treats Abstraction as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Abstraction?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Abstraction reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **When does duck typing convention alone become insufficient?**
+  - When each implementation uses its own terminology—`CsvFeed.read_file()`, `WarehouseFeed.fetch_rows()`, `PartnerApiFeed.pull()`—the moment a caller expects `fetch_records()`, an `AttributeError` fires immediately. The article identifies this as precisely the point where duck typing conventions become insufficient and a team-level shared language becomes necessary.
+- **Which methods and properties should an abstract class enforce?**
+  - This article enforced `source_name` (a property for logs and metrics), `fetch_records()` (actual data retrieval), and `store()` (the pipeline persistence step) as abstract members. It also showed why keeping only the surface essential for maintaining common flow as abstract—while providing default behavior for `normalize()` and `is_valid()` in the parent—matters.
+- **How does the Template Method pattern help the parent maintain flow while children handle specifics?**
+  - `IngestionPipeline.run()` fixes the `fetch_records() → normalize() → is_valid() → store()` order in the parent, while `CsvCustomerPipeline` and `PartnerApiPipeline` implement only source-specific retrieval and storage. This keeps core rules like email normalization and invalid address filtering in one place, with child classes filling in only the parts that vary.
 <!-- toc:begin -->
 ## In this series
 

@@ -167,13 +167,12 @@ groupby is the *engine of analysis*. Next we cover *merge and join*.
 
 ## Answering the Opening Questions
 
-- **The *split-apply-combine* model?**
-  - The article treats Groupby and Aggregation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The difference between *agg / transform / filter?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Multi-key grouping?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What flow does `groupby` follow?**
+  - `groupby` works through the split-apply-combine flow: splitting data by a key, applying a computation to each group, then recombining results into a single table. `df.groupby("city")["sales"].sum()` is the most basic form—splitting by city, computing sums, and reassembling into a Series.
+- **Why are aggregation, transformation, and filtering different faces of the same operation?**
+  - Aggregation leaves one value per group, transformation returns group-computed results at the original length, and filtering decides whether to keep or discard entire groups. The article showed `agg(total=("sales", "sum"))`, `transform("sum")`, and `filter(lambda g: g["sales"].sum() > 200)` separately because result shape and usage differ.
+- **What is the best approach when computing multiple statistics at once?**
+  - Named aggregation with explicit result column names like `total`, `mean`, and `n` is most readable. The pattern `df.groupby("city").agg(total=("sales", "sum"), mean=("sales", "mean"), n=("sales", "count"))` computes multiple statistics while producing output ready for downstream joins and reports.
 <!-- toc:begin -->
 ## In this series
 

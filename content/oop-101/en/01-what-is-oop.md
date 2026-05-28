@@ -296,13 +296,12 @@ OOP bundles data and behavior into a single unit to make code structure clear. I
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Is Object-Oriented Programming??**
-  - The article treats What Is Object-Oriented Programming? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Is Object-Oriented Programming??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Is Object-Oriented Programming? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How does OOP differ from procedural programming, and why did it emerge?**
+  - This article first showed how data and functions scattered across a `users` list and standalone `create_user()`, `deactivate_user()` functions come together inside a `User` class. Then by refactoring `Order` to handle coupon application, state transitions, and total calculation through internal methods, we confirmed that OOP emerged not as syntactic decoration but as a way to gather change rules within a single boundary.
+- **How should you understand the relationship between classes, instances, attributes, and methods?**
+  - The `Dog("Buddy", "Golden Retriever")`, `Rectangle(5, 3)`, and `Counter()` examples help you understand a class as a blueprint and an instance as an individual object built from that blueprint. Attributes like `name`, `breed`, and `count` represent the state an object holds, while methods like `bark()`, `area()`, and `increment()` are operations that read or modify that state—a correspondence repeated throughout the article.
+- **When do objects feel more natural than plain functions in a small script?**
+  - For simple calculations like `area(rect)`, functions are sufficient. But the moment state transitions from `draft` to `placed` and coupon validation tags along—as with `Order`—objects become more natural. The `PaymentService` and `Invoice` examples later in the article also show that when related data and policies change together, drawing object boundaries makes testing and extension easier.
 <!-- toc:begin -->
 ## In this series
 

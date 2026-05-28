@@ -171,13 +171,12 @@ This series ends here. Your next move can be a first pull request or a first rel
 
 ## Answering the Opening Questions
 
-- **How large should a first open source project be?**
-  - The article treats My First Open Source Project as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What order works well for idea, scope, MVP, docs, and release?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why do docs and licensing become more important right before publication?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What if a similar project already exists and there seems to be no need to start fresh?**
+  - Rebuilding something has value too. If you aim for **a new approach, better documentation, or a more livable community**, differentiation emerges and there is much to learn.
+- **What is the most important thing when running your first open-source project?**
+  - **Response time to PRs and issues.** If you provide feedback within a week at most, contributors keep coming back.
+- **What should you do when you can no longer maintain the project?**
+  - Changing to Archived status, finding another maintainer, or posting a notice recommending forks is an honest and responsible response.
 <!-- toc:begin -->
 ## In this series
 

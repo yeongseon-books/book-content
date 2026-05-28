@@ -349,13 +349,12 @@ Composition provides loose coupling and runtime flexibility, making it more suit
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Composition vs Inheritance?**
-  - The article treats Composition vs Inheritance as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Composition vs Inheritance?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Composition vs Inheritance reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do you distinguish is-a from has-a relationships in practical design?**
+  - When it feels natural to receive a child as its parent type—like `HttpError` and `NotFoundError`—that is an is-a relationship where inheritance fits. Conversely, structures where `UserService` uses a `Logger` or `Car` contains an `Engine` and `GPS` are has-a relationships by role, and the article clearly stated these should be read as composition rather than inheritance.
+- **Why is composition often the safer default choice over inheritance?**
+  - Like the `Sorter` example swapping `BubbleSort` and `QuickSort` at runtime, composition lets you replace internal strategies without changing the outer object's type. Also, instead of an explosion of subclasses like `VipSeasonalCheckout`, injecting policies with `Checkout(discount, tax)` reduces both class count and coupling—the core point of the article.
+- **How do delegation and dependency injection maximize composition's advantages?**
+  - `MultiFunctionDevice` delegates printing, scanning, and faxing to internal objects while appearing as a single device externally, and `UserRepository` accepts `InMemoryDB` through its constructor to make test-double swapping easy. Delegation keeps interfaces simple, and dependency injection separates assembly from testing—together making composition's flexibility immediately usable in practice.
 <!-- toc:begin -->
 ## In this series
 

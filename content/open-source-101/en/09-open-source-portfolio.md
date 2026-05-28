@@ -157,13 +157,12 @@ Next, in the final post, we will walk through turning one small tool into your f
 
 ## Answering the Opening Questions
 
-- **How does open source contribution become a portfolio?**
-  - The article treats An Open Source Portfolio as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What should a profile README and pinned repositories each communicate?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Which pull requests are worth highlighting as representative work?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why is showing open-source contributions better than personal projects in a portfolio?**
+  - Open source exposes the entire process of **code review, feedback incorporation, and collaboration** publicly, letting hiring managers assess teamwork ability beyond technical skill.
+- **What should you watch out for when including a first open-source contribution in your portfolio?**
+  - Even a small contribution is sufficient if **the question, review feedback, and final outcome** are clearly recorded. The **collaboration process** matters more than polish.
+- **Is writing "contributed to X projects" enough?**
+  - No. Credibility rises when you specifically state **what problem the contribution solved, what review you received, and what you learned from the experience**.
 <!-- toc:begin -->
 ## In this series
 

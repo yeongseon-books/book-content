@@ -162,13 +162,12 @@ Joining is *half of analysis*. Next we cover *time series*.
 
 ## Answering the Opening Questions
 
-- **inner / left / right / outer / cross* joins?**
-  - The article treats Merge and Join as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The difference between *merge* and *join?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Options *suffixes / indicator / validate?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why does Pandas have both `merge` and `join`?**
+  - `merge` is central when you explicitly specify column-based relationships, while `join` provides simpler syntax for index-based attachment. The article used `users.merge(orders, on="uid")` to clearly expose the key column because in the beginning, being explicit about the join criterion is safer.
+- **How do inner, left, right, outer, and cross joins differ?**
+  - The difference lies in which keys remain in the result. `how="left"` preserved all `users` rows, while `how="outer", indicator=True` kept both sides' keys and used the `_merge` column to distinguish `both` from `left_only`.
+- **Why does row count suddenly increase with duplicate keys?**
+  - Joins create all possible combinations of matching keys, so if `uid=1` appears twice in `orders`, the single `users` row is replicated into multiple rows. That is why the article demonstrated triggering an exception with `validate="one_to_one"` and emphasized always checking row counts and key duplicates before and after merging.
 <!-- toc:begin -->
 ## In this series
 

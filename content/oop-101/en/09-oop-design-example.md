@@ -384,13 +384,12 @@ Real-world design applies multiple OOP principles together, not in isolation. St
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying OOP Design Example?**
-  - The article treats OOP Design Example as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for OOP Design Example?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when OOP Design Example reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do you derive classes from requirements and decide which responsibilities go where?**
+  - This article started by separating cart, discount, payment, and persistence into a collaboration structure for an online bookstore order system, then assigned `OrderService` to assembly and flow, `Cart` to item management, and `Money` to monetary operations. The subsequent ticket example with `TicketService`, `AssignmentPolicy`, and `NotificationPort` UML further clarified that the criteria for class derivation are domain terms and axes of change.
+- **How should value objects, entities, and service classes divide their roles?**
+  - `Money` is an immutable value object with `__add__` and `apply_discount()` that holds rules about amounts themselves, while `Book` is an entity identified by `book_id`. `OrderService` does not substitute for either—it orchestrates the checkout flow by wiring collaborators like `BulkDiscount`, `CardPayment`, and `InMemoryOrderRepo`, showing that a service class is closer to an orchestrator than a rule repository.
+- **How should frequently changing elements—discount policies, payment methods, repositories—be separated?**
+  - The article pushed `DiscountPolicy`, `PaymentGateway`, and `OrderRepository` behind Protocol boundaries, placing `PercentDiscount`, `BulkDiscount`, `CardPayment`, `BankTransfer`, and `InMemoryOrderRepo` as swappable implementations. This way, when a PG switch or discount experiment occurs, core domain objects like `Cart` and `Money` remain untouched—only the assembly code swaps implementations.
 <!-- toc:begin -->
 ## In this series
 

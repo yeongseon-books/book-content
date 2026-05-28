@@ -296,13 +296,12 @@ A class is composed of constructors, instance methods, class methods, static met
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Classes and Instances?**
-  - The article treats Classes and Instances as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Classes and Instances?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Classes and Instances reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How much should the constructor (`__init__`) be responsible for, and where does it become too much?**
+  - `Product` validates negative prices immediately, and `InventoryItem` locks `sku`, `quantity`, and `unit_price` invariants at creation time. However, once you start putting DB queries or external API calls—things beyond the object's core state—into the constructor, it becomes excessive. The article showed `Date.from_string()` class methods as an alternative constructor pattern for such cases.
+- **What criteria distinguish instance methods, class methods, and static methods?**
+  - `InventoryItem.increase()` and `decrease()` modify instance state, so they are instance methods. `Date.from_string()` and `today()` create the same type through different input paths, making them class methods. `MathUtils.factorial()`, which needs neither `self` nor `cls`, naturally fits as a static method. The article noted that when this distinction blurs, classes become heavy namespaces.
+- **Why are Python's dunder methods important for debugging and comparison operations?**
+  - The `Point` example showed that without `__repr__`, you only see `<__main__.Point object ...>` during debugging, and without `__eq__`, two points with identical coordinates compare as `False`. `Vector`'s `__add__`, `__mul__`, and `__abs__` demonstrated how objects integrate naturally with Python syntax, revealing that dunder methods are not mere decoration but directly affect usability and test accuracy.
 <!-- toc:begin -->
 ## In this series
 

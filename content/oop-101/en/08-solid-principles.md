@@ -496,13 +496,12 @@ SOLID becomes practical when you apply it to one brittle workflow instead of mem
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying SOLID Principles Basics?**
-  - The article treats SOLID Principles Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for SOLID Principles Basics?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when SOLID Principles Basics reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do you determine which principle connects to the symptoms you see?**
+  - This article started from failure signals rather than acronym memorization. When `OrderService` changes because of validation, price calculation, persistence, and receipt sending together—that is an SRP problem. When `if` blocks grow every time discount rules are added—that is an OCP problem. When you need real infrastructure just to test a policy—that is a DIP problem.
+- **What changes when you apply SRP, and what should stay the same?**
+  - Splitting responsibilities into `OrderValidator`, `OrderPricer`, `OrderRepository`, and `ReceiptNotifier` changes separation of change reasons and test scope. But the top-level flow where `CheckoutService.checkout()` receives an order and returns a total should remain—the article repeatedly confirmed what changed versus what stayed the same.
+- **How do OCP, LSP, ISP, and DIP connect on a single workflow rather than competing as separate rules?**
+  - Creating an extension point with `DiscountPolicy`, correcting `PickupOnlyDiscount` to `ConditionalDiscount` for LSP, splitting `OrderGateway` into `OrderWriter` and `ReceiptSender` for ISP, then injecting `FakeWriter` and `FakeSender` to complete DIP—this sequence appears directly in the article. The principles do not operate in isolation; each preceding abstraction becomes the safety net for the next step.
 <!-- toc:begin -->
 ## In this series
 

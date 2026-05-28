@@ -179,13 +179,12 @@ You have completed *Pandas 101*. Next stops: *Polars, Dask*, or *visualization (
 
 ## Answering the Opening Questions
 
-- **The standard *EDA workflow?**
-  - The article treats Real-World Data Analysis as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The value of *function-level separation?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Building *reproducible analysis?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **In what order should you process tabular data after reading it?**
+  - This article followed the flow of load, clean, add derived columns, compute KPIs, and visualize. The `load()`, `clean()`, `enrich()`, `kpi()` functions and `monthly["total"].plot(...)` example show how read data connects to result tables and charts.
+- **What improves when you split analysis code into function units?**
+  - Each step's responsibility becomes clear, making testing, re-execution, and debugging easier. For example, if `clean_data()` handles only missing-value removal and type conversion while `monthly_kpi()` handles only aggregation, you can quickly trace at which step results diverged.
+- **What should you pay attention to for reproducible aggregation results?**
+  - The same input, same version, and same transformation rules must reproduce the output at any time, so you need to preserve function structure, output files, and execution conditions together. The article bundled `monthly.to_csv("monthly_kpi.csv")`, `plt.savefig("monthly_sales.png")`, `parse_dates`, dtype optimization, and chunk processing because reproducibility and operability must be secured simultaneously.
 <!-- toc:begin -->
 ## In this series
 

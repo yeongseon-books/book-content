@@ -164,13 +164,12 @@ Next, we will look at release and versioning. Once people can start using your p
 
 ## Answering the Opening Questions
 
-- **What information does a first-time visitor look for first?**
-  - The article treats A Good README as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why are the title, one-line summary, installation, usage example, and license the core sections?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **When do badges and screenshots help, and when do they get in the way?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why does README structure differ across projects?**
+  - Because projects differ in purpose, complexity, and target audience. Still, **problem definition, installation examples, and contribution guidelines** belong in every README.
+- **How do you prioritize when there is too much to put in a README?**
+  - Place the information that lets someone decide within 5 minutes whether "this project solves my problem" first. Detailed configuration goes later.
+- **Does updating the README count as a contribution?**
+  - Yes. README improvements are as important as code changes. Typo fixes, outdated example updates, and installation method corrections all **lower the entry barrier for new users**.
 <!-- toc:begin -->
 ## In this series
 

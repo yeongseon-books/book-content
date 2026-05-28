@@ -163,13 +163,12 @@ Time series is *a Pandas strength*. Next we cover *apply and vectorization*.
 
 ## Answering the Opening Questions
 
-- **The intuition of *DatetimeIndex?**
-  - The article treats Time Series as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **resample* and *rolling?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Handling *time zones (tz)?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **What changes when you set a date column as the index?**
+  - Promoting dates to a `DatetimeIndex` connects time-range selection, resampling, and rolling calculations to Pandas' native syntax. The biggest change is that string slicing like `ts.loc["2026-01-03":"2026-01-06"]` alone is enough to cut a period.
+- **How does resampling differ from simple aggregation?**
+  - Resampling is not merely summing values—it changes the time axis's unit and re-groups accordingly. Converting daily data into 3-day or weekly units with `ts.resample("3D").sum()` or `df.resample("W")["value"].sum()` is what distinguishes it from regular aggregation.
+- **How do you perform window-based calculations like moving averages?**
+  - Create a rolling window and compute statistics per window with `rolling(window=3).mean()`. The article mentioned a 7-day moving average, boundary `NaN` values, and value interpretation after `shift()` together because window-based calculations smooth trends but boundary conditions must always be examined alongside.
 <!-- toc:begin -->
 ## In this series
 

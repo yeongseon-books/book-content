@@ -164,13 +164,12 @@ Selection is the *primitive operation of analysis*. Next we tackle *missing valu
 
 ## Answering the Opening Questions
 
-- **The difference between *loc* and *iloc?**
-  - The article treats Filtering and Selection as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **The intuition behind *boolean indexing?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **The readability of *query?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **When should you distinguish between `loc` and `iloc`?**
+  - Use `loc` when names are the reference and `iloc` when numeric positions are the reference. The article contrasted `df.loc[["a", "c"], "x"]` for readable label access with `df.iloc[0:2, 0]` for pure positional slicing.
+- **In what situations are boolean masks most natural?**
+  - Boolean masks are most direct when you need to select rows whose values satisfy a condition. Creating a boolean Series with `df[df["x"] > 1]` or `(df["x"] > 1) & (df["y"] < 30)` makes it immediately readable which rows survive.
+- **Why does `query` become more readable as expressions grow longer?**
+  - As conditions lengthen, brackets and parentheses pile up, but `df.query("x > 1 and y < 30")` lays them out like a sentence. Combined with `isin([1, 3])`, intent remains clearer than long OR chains.
 <!-- toc:begin -->
 ## In this series
 

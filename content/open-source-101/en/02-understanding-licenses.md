@@ -162,13 +162,12 @@ Next, we will move into issues. To contribute well, you need to know not only wh
 
 ## Answering the Opening Questions
 
-- **What is the practical difference between *permissive* and *copyleft* licenses?**
-  - The article treats Understanding Licenses as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How do MIT, Apache 2.0, and GPL v3 create different operational burdens?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why does an SPDX identifier matter for automation and compliance work?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **How do you understand that licenses are not purely a technical matter?**
+  - When you develop the habit of reading licenses from the moment of open-source adoption, company policy, legal review, and sustainability assessment connect naturally.
+- **Is there an absolute standard for which license to choose?**
+  - The correct order is to define the project's purpose, collaboration style, and redistribution policy first, then select a matching license—not the other way around.
+- **Why must companies scrutinize licenses when using open source?**
+  - License violations become **legal liability** rather than a technical problem, so careful judgment at the initial selection stage is essential.
 <!-- toc:begin -->
 ## In this series
 

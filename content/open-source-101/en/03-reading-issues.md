@@ -160,13 +160,12 @@ Next, we will turn that context into a pull request. The next step is learning h
 
 ## Answering the Opening Questions
 
-- **Why do contributions drift when you judge an issue by the title alone?**
-  - The article treats Reading Issues as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What roles do labels, reproduction steps, assignees, and comment threads each play?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **When is a `good first issue` still a poor first contribution choice?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why do people read issues differently even in the same project?**
+  - Beginners read issues like a Q&A board, contributors read them as entry paths, and maintainers read them as priority signals. Different perspectives reveal different information.
+- **Titles alone often don't tell you what to do—then what?**
+  - After the title, always check the first comment's **context, reproduction steps, and expected behavior**. This is the foundation of reading issues properly.
+- **What distinguishes a good issue report from a bad one?**
+  - A good issue clearly separates **problem situation, reproduction steps, expected result, and actual result**. The key is providing enough information for the maintainer to jump straight into debugging.
 <!-- toc:begin -->
 ## In this series
 

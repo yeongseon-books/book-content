@@ -161,13 +161,12 @@ Next, we will turn that experience back toward your own career and discuss how o
 
 ## Answering the Opening Questions
 
-- **What responsibilities does a maintainer really carry?**
-  - The article treats The Maintainer Role as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why should triage, review, and release be seen as one operating loop?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why are delegation and successor growth sustainability issues rather than optional extras?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
-
+- **Why do maintainers frequently burn out?**
+  - Maintainers often bear **all of code, issues, PR reviews, Q&A, and community conflict resolution alone**.
+- **Why is a single-person project risky?**
+  - When knowledge and decision-making concentrate on one maintainer, the project can vanish when that person leaves.
+- **How do you distribute the maintainer role?**
+  - **Invite frequent contributors as reviewers first, delegate small decisions, and gradually share responsibilities**—this is how you grow the next generation of maintainers.
 <!-- toc:begin -->
 ## In this series
 
