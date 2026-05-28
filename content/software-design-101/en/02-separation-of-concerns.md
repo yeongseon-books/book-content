@@ -222,12 +222,12 @@ Separation of concerns is the starting point of all design. Next: the unit of se
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Separation of Concerns?**
-  - The article treats Separation of Concerns as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Separation of Concerns?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Separation of Concerns reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What exactly is a "concern"?**
+  In this article, a concern is a single topic the system must care about. In the order-processing example, input parsing, domain rules, persistence, notification, and response transformation were each separate concerns. Even if they live in the same function, they're separation candidates when they change for different reasons.
+- **How can you tell when a module does too much?**
+  List the change reasons—pricing policy change, DB schema change, notification channel change. If three or more land in the same module, responsibilities are already mixed. Decomposing into `parse(req)`, `handle(cmd)`, `render(res)` (input/process/output) immediately reveals which part is bloated.
+- **How do coupling and cohesion relate to separation of concerns?**
+  Good separation increases cohesion (code serving the same purpose gathers in one place) and decreases coupling (code that changes for different reasons separates). Conversely, if a logging-policy change shakes domain rules, a cross-cutting concern has leaked inward.
 
 <!-- toc:begin -->
 ## In this series

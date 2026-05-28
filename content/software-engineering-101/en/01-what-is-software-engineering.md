@@ -217,12 +217,12 @@ Engineering is not just another word for code. Next up, where everything starts 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Is Software Engineering??**
-  - The article treats What Is Software Engineering? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Is Software Engineering??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Is Software Engineering? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What distinguishes writing code from software engineering?**
+  This article used the `need -> design -> code -> test -> operate -> change -> reflect -> repeat` loop to separate one-time coding from engineering long-running systems. The `sum_to` example progressively adds input validation, logging, tests, and a README because engineering takes responsibility for changeability and operability beyond the code itself.
+- **What areas beyond code must an engineer take responsibility for?**
+  The article grouped requirements document templates, design review checklists, Git workflows, tech-debt tracking items, and post-release inspection routines all within engineering responsibility. Inserting logs, metrics, and traces at design time and checking indicators at 10-minute, 1-hour, and 24-hour intervals post-deploy is what makes a system truly operable.
+- **How do "choosing the right thing to build" and "building it right" differ?**
+  Choosing the right thing means defining the problem, success criteria, exclusion scope, and rollback criteria first—like feature execution cards and requirements docs. Building it right means connecting those choices to reproducible mechanisms—tests, ADRs, dashboards, deploy notes—so the same quality holds over time.
 
 <!-- toc:begin -->
 ## In this series

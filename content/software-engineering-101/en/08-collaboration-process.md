@@ -210,12 +210,12 @@ Process gives time back to people. Next we look at what every long-lived system 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Collaboration Process?**
-  - The article treats Collaboration Process as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Collaboration Process?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Collaboration Process reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What structure makes an RFC sufficient?**
+  A sufficient RFC needs only: title, problem definition, proposal, alternatives, risks, open questions, and reviewers to start discussion. The extended template adding success criteria, rollout plan, and recovery strategy lets big changes (like order cancellation policy) be fully reviewed before any meeting.
+- **When should you discuss asynchronously, and when hold a short sync meeting?**
+  This article recommended gathering async comments on the RFC for about 3 days to surface issues broadly, then closing remaining choices in a decision meeting under 30 minutes. Explanation and opinion gathering happen in documents; approval and priority confirmation—moments needing simultaneous conclusion—stay short and synchronous.
+- **What patterns reduce meeting time without losing clarity?**
+  Designating approvers first with DACI or DRI, then always recording today's decisions, open questions, and next review point at meeting's end reduces reopening the same topic. Adding decision logs and handoff memos lets the next person pick up context without Slack searching, even across time zones.
 
 <!-- toc:begin -->
 ## In this series

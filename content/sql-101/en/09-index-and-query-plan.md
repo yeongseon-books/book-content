@@ -167,12 +167,12 @@ Tuning starts with *reading the plan*. Next: *practical analysis SQL*.
 
 ## Answering the Opening Questions
 
-- **What is the simplest mental model for a B-tree index?**
-  - The article treats Index and Query Plan as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How do EXPLAIN and EXPLAIN ANALYZE differ?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why can a database skip an index even when one exists?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How should you think about B-tree indexes?**
+  A B-tree index is a sorted lookup structure—like a book's index—that lets the engine jump directly to matching rows instead of scanning the entire table. It works best for equality and range conditions on the indexed columns.
+- **What's the difference between EXPLAIN and EXPLAIN ANALYZE?**
+  EXPLAIN shows the query plan the engine *would* use (estimated costs and row counts). EXPLAIN ANALYZE actually executes the query and shows real timing and row counts. Use EXPLAIN for quick checks; EXPLAIN ANALYZE for accurate performance diagnosis.
+- **Why might a sequential scan be chosen even when an index exists?**
+  When a large fraction of rows matches the filter, reading the entire table sequentially is cheaper than bouncing between index and heap. The optimizer estimates selectivity—if the index would touch most pages anyway, Seq Scan wins on I/O cost.
 
 <!-- toc:begin -->
 ## In this series

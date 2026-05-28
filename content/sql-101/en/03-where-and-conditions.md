@@ -147,12 +147,12 @@ WHERE is the *gatekeeper*. The next post is *JOIN*.
 
 ## Answering the Opening Questions
 
-- **How should you read comparison operators and predicates?**
-  - The article treats WHERE and Conditions as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why do AND and OR precedence mistakes keep showing up in production?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **When do IN, BETWEEN, and LIKE fit best?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How should you read comparison operators and conditional expressions?**
+  WHERE filters rows coming from FROM. Conditions here directly determine which rows survive—and whether an index can accelerate that filtering. Read each condition as "which rows do I keep?" not "what do I want."
+- **Why does AND/OR precedence frequently cause bugs?**
+  AND binds tighter than OR, so `A OR B AND C` means `A OR (B AND C)`, not `(A OR B) AND C`. Without explicit parentheses, you may silently select far more (or fewer) rows than intended—a common source of subtle data bugs.
+- **When do IN, BETWEEN, and LIKE each fit best?**
+  Use `IN` for discrete value lists, `BETWEEN` for continuous ranges (inclusive), and `LIKE` for simple pattern matching. Each can leverage indexes differently—`LIKE 'abc%'` uses a B-tree index, but `LIKE '%abc'` cannot.
 
 <!-- toc:begin -->
 ## In this series

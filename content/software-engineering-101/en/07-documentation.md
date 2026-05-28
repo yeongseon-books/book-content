@@ -214,12 +214,12 @@ Documentation frees people. Next, we look at how those people work together — 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Documentation?**
-  - The article treats Documentation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Documentation?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Documentation reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What blocks must a good README contain at minimum?**
+  This article proposed minimum README blocks: what it changes, why, a 60-second quick start, configuration, and further reading. The extended example added local run/test, deployment path, and frequent ops questions—making project value and entry path visible within the first 5 minutes.
+- **What does an ADR record, and how does it differ from code comments?**
+  An ADR records `Context, Decision, Alternatives, Consequences`—why a structure was chosen and which alternatives were rejected. Code comments and docstrings explain usage contracts for functions and classes; ADRs preserve decision background and impact scope outside the code.
+- **What role do docstrings and type hints play in documentation?**
+  Type hints like `compute_invoice(amount: int, tax_rate: float)` reveal the closest contract for expected input/output. When the docstring adds that `ValueError` is raised for negative input, users understand both happy and failure paths immediately upon opening the code.
 
 <!-- toc:begin -->
 ## In this series

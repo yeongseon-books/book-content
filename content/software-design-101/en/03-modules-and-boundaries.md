@@ -214,12 +214,12 @@ Good boundaries contain change. Next we look at another weapon a boundary carrie
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Modules and Boundaries?**
-  - The article treats Modules and Boundaries as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Modules and Boundaries?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Modules and Boundaries reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What conditions must a good module boundary satisfy?**
+  A good boundary has a small public surface and deep internal responsibility, hiding volatile decisions inside to block external change propagation. It requires limiting entry points with `__all__ = ["read_file"]`, shielding internal models via DTOs, and keeping dependencies unidirectional—all simultaneously.
+- **What's the difference between a deep module and a shallow module?**
+  A shallow module exposes internal steps to the caller—`open_file`, `read_chunk`, `close_file`. A deep module absorbs that complexity internally—`read_file(path)` handles everything. The one that lets callers know less while doing more is the deep module.
+- **How much should a public API expose?**
+  A public API should expose only the minimum contract the external caller actually needs. Once internal dict structures or cache implementation choices leak outward, DTOs and encapsulation break down, and even small internal changes cascade into caller modifications.
 
 <!-- toc:begin -->
 ## In this series

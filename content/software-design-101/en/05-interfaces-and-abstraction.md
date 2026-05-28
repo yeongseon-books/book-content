@@ -217,12 +217,12 @@ A good interface is a unit of freedom. Next up we look at how interfaces compose
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Interfaces and Abstraction?**
-  - The article treats Interfaces and Abstraction as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Interfaces and Abstraction?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Interfaces and Abstraction reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How can you judge whether one interface is better than another?**
+  A better interface reveals the caller's intent concisely rather than implementation procedures. `charge_user()` over `process_data()`, `notify(user, message)` over `send_bytes_over_tcp(...)` shows that naming and abstraction height must match the caller's language.
+- **What problems arise when abstraction is too low or too high?**
+  Too-low abstraction leaks sockets, buffers, and implementation jargon, forcing callers to absorb internal details. Too-high abstraction—where subtypes dodge contracts with `NotImplementedError`—breaks LSP and forces redesigning the supertype itself.
+- **How does polymorphism reduce branching?**
+  Code that branched across `notify("email")`, `notify("sms")`, `notify("push")` becomes a single `Notifier.send()` call. Adding a new channel becomes adding an implementation, not modifying existing branches. Same call shape hides multiple implementations, reducing caller blast radius.
 
 <!-- toc:begin -->
 ## In this series

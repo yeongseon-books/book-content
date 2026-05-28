@@ -216,12 +216,12 @@ Good design makes change unscary. Next up we look at the principles that compres
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Reducing Change Impact?**
-  - The article treats Reducing Change Impact as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Reducing Change Impact?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Reducing Change Impact reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How can you gauge how widely a single change propagates?**
+  First count how widely the same branch is spread—`git grep -n "kind =="`. If adding a new category shakes multiple `if-elif` chains simultaneously (like the pricing example), change impact is already broadly scattered.
+- **What does OCP look like in real code?**
+  The `PricingRule` / `PRICING[kind].apply(item)` structure expresses new rules as registration additions, not existing-branch modifications. OCP here isn't "never touch existing code" but rather "prepare extension points so new features don't shake the entire structure."
+- **Why not immediately delete the old path when adding a new one?**
+  Running `price_v1` and `price_v2` side-by-side with feature flags and drift logs lets you verify regression against production data. Skipping contract verification means deleting the old path without proof—expand first, contract only after validation.
 
 <!-- toc:begin -->
 ## In this series

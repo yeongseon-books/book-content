@@ -205,12 +205,12 @@ Design decides the cost of the next change. Next we start with the most fundamen
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Is Software Design??**
-  - The article treats What Is Software Design? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Is Software Design??**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Is Software Design? reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What's the difference between good coding and good design?**
+  Good coding focuses on function names, formatting, and local readability, while good design is about structural decisions that lower the cost of the next change. Signals like `files_touched`, dependency graphs, module responsibilities, and isolated testability evaluate structure, not code.
+- **What signals tell you whether a design is good?**
+  Simulate a change, count how many files need modification, check whether `A <-> B` circular dependencies exist, and see if each module can be explained in one sentence. Add `can_test_alone()` (domain verification without IO) and whether a new team member can read the structure within 30 minutes.
+- **How does design failure manifest in a codebase?**
+  When adding a single payment method requires opening every folder, a small fix forces reliance on the entire integration test suite, or a new team member cannot explain a module quickly—those are design failure signals. They usually mean responsibility boundaries are blurry and dependency directions are tangled.
 
 <!-- toc:begin -->
 ## In this series

@@ -155,11 +155,11 @@ SQL describes the *result*, not the steps. The next post takes a careful look at
 ## Answering the Opening Questions
 
 - **What kind of language is SQL, exactly?**
-  - The article treats What Is SQL? as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why is the relational model still the default foundation for analytical and application data?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What does it mean that SQL is declarative?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  SQL is a declarative, set-based language for managing data in relational databases. You must understand the relational model, declarative querying, and the database engine's role together to use it effectively.
+- **Why is the relational model still the foundation of data work today?**
+  The relational model structures data into rows and columns, with each table representing a clear set of facts. This clarity—one row = one fact, one table = one entity type—remains the most broadly useful abstraction for structured data.
+- **What does "declarative language" mean in practice?**
+  A declarative language means you state the desired result without specifying procedure. The engine builds the optimal execution plan, which is why the same SQL can perform differently depending on indexes, statistics, and data distribution.
 
 <!-- toc:begin -->
 ## In this series

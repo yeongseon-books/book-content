@@ -156,12 +156,12 @@ GROUP BY makes meaning by *shrinking rows*. Next: *Subquery*.
 
 ## Answering the Opening Questions
 
-- **When does GROUP BY run, and what exactly gets grouped?**
-  - The article treats GROUP BY and Aggregates as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How do SUM, COUNT, and AVG differ in practice?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What is the real split between WHERE and HAVING?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **When does GROUP BY execute, and what determines the grouping?**
+  GROUP BY runs after WHERE and before SELECT. It collapses rows sharing the same key values into groups, then aggregate functions (SUM, COUNT, AVG) compute one summary value per group.
+- **How do SUM, COUNT, and AVG differ in behavior?**
+  SUM totals numeric values, COUNT tallies rows (COUNT(*)) or non-NULL values (COUNT(col)), and AVG divides the sum by the non-NULL count. NULL handling is the key difference—aggregates silently skip NULLs except COUNT(*).
+- **How do WHERE and HAVING divide their roles?**
+  WHERE filters individual rows before grouping. HAVING filters groups after aggregation. Use WHERE to reduce input rows (better performance), HAVING to filter on aggregate results (e.g., `HAVING COUNT(*) > 5`).
 
 <!-- toc:begin -->
 ## In this series

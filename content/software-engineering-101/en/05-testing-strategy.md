@@ -221,12 +221,12 @@ Tests determine the cost of change. Next we look at how to ship tested code safe
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Testing Strategy?**
-  - The article treats Testing Strategy as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Testing Strategy?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Testing Strategy reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What role does each of unit, integration, and E2E testing serve?**
+  Unit tests protect the smallest computation units fast (like `add()`). Integration tests verify boundaries actually mesh (like `OrderService` with `FakeRepo`). E2E tests validate only a few critical user journeys end-to-end (`/cart` → `/checkout`) to confirm the full system connects.
+- **What's the difference between a test pyramid and an ice-cream cone?**
+  The pyramid stacks fast tests thick at the bottom (`unit 70%, integration 25%, E2E 5%`) so failure location narrows quickly. The ice-cream cone—mostly E2E—makes CI slow, raises flaky rates, and makes it hard to explain which file to open first when something fails.
+- **Why can a system with high coverage still feel unreliable?**
+  Coverage is code-execution ratio, not test-quality score. High numbers from E2E alone can't pinpoint failure locations. When flaky tests pass only on re-run, the team loses trust in red builds and the safety net weakens.
 
 <!-- toc:begin -->
 ## In this series

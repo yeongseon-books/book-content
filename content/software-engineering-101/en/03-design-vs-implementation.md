@@ -212,12 +212,12 @@ Design and implementation are different jobs done with different tools. Next we 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Design vs Implementation?**
-  - The article treats Design vs Implementation as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Design vs Implementation?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Design vs Implementation reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What's the difference between well-written code and a well-designed system?**
+  Well-written code means a single function or module is readable. A well-designed system means responsibility boundaries and swap points—like the `Notifier` protocol—are visible externally. Adding a new channel doesn't shake all callers, and observability (logs, metrics) attaches consistently within the same boundaries.
+- **What does "design decides 'what,' implementation decides 'how'" actually mean?**
+  Design decides system responsibility placement—which interface houses email and SMS, where failure propagation and observability live. Implementation concretizes those decisions into actual code and call flows like `EmailNotifier.send()` and log additions. Keeping them separate makes change cost readable.
+- **When should you write an ADR, and at what level of detail?**
+  The article's ADR example shows that a brief record suffices for decisions likely to be revisited—like `Notification channel abstraction`. Background, decision, alternatives, and consequences are enough to recover why you chose a protocol over `if/elif` and what operational cost you accepted.
 
 <!-- toc:begin -->
 ## In this series

@@ -204,12 +204,12 @@ Releases are the interface of trust. Next we capture that trust in writing — d
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Version Control and Release?**
-  - The article treats Version Control and Release as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Version Control and Release?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Version Control and Release reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **When is trunk-based right, and when is Git Flow right?**
+  This article explained that trunk-based works well when short branches merge frequently into main with canary verification. When release or hotfix stages separate for long periods, Git Flow can help—but the key is clear merge criteria (test pass, review approval, changelog entry) regardless of branch naming.
+- **What does a version number like 1.4.2 promise users?**
+  When SemVer rules hold—`feat -> MINOR`, `fix -> PATCH`, `BREAKING CHANGE -> MAJOR`—the version number becomes a compatibility promise. Users expect no major behavior change in PATCH and anticipate possible interface changes in MAJOR.
+- **How can you automate changelogs?**
+  Automation starts with consistently writing Conventional Commits like `feat(auth): ...`, `fix(billing): ...`. Adding `release-please-action` and tag-based deployment bundles release PRs, user-facing change records, and post-canary promotion into one repeatable pipeline.
 
 <!-- toc:begin -->
 ## In this series

@@ -217,12 +217,12 @@ Code review does defect detection and knowledge distribution at the same time. N
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Code Review?**
-  - The article treats Code Review as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Code Review?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Code Review reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Is code review more important for defect detection or knowledge sharing?**
+  This article described code review as a mechanism performing defect detection and knowledge distribution simultaneously. Catching bugs (like mapping `ExpiredTokenError` to 401) matters, but the long-term effect of the team understanding *why* through PR titles, bodies, and comment tags is greater.
+- **How do you create a PR that's easy to review?**
+  An easy-to-review PR has a title like `fix(auth): handle expired refresh token without 500` where intent is visible immediately, with What/Why/How/Test all in the body. Splitting data model, service logic, and routing into separate PRs lets reviewers focus on structural judgment and operational risk.
+- **What items does a reviewer actually check first?**
+  Per the checklist, reviewers should prioritize requirements alignment, exception-path tests, log/monitoring points, and follow-up debt handling over style. Formatting and type checks belong to CI (`ruff`, `pytest`, frontmatter checks)—humans judge how changes affect system boundaries and operability.
 
 <!-- toc:begin -->
 ## In this series

@@ -203,12 +203,12 @@ Good software is simple, measurable, and grows the people who maintain it. This 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying What Makes Good Software?**
-  - The article treats What Makes Good Software as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for What Makes Good Software?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when What Makes Good Software reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why aren't "good code" and "good software" the same thing?**
+  Good code means readable, well-separated responsibility at the class/function level. Good software means that code translates over time into low lead time, short MTTR, and fast onboarding. That's why this article emphasized looking at external signals—complexity, deployment lead time, new-hire first-PR time—beyond `It works`.
+- **Along which axes do quality attributes split, and why does balance matter?**
+  The article separated functional suitability, reliability, maintainability, and performance efficiency, while the quality criteria table also bundled changeability, operational stability, collaboration transparency, and learnability. Pushing one axis collapses another, so managing different quality targets simultaneously (availability 99.9%, p95 300ms, MTTR under 30 minutes) maintains balance.
+- **How should SOLID principles be read in practice?**
+  The SRP and DIP examples showed SOLID should be read as judgment tools for reducing change cost, not memorization subjects. The moment multiple change reasons pile into one class or it directly couples to concrete implementations, maintainability drops—principles serve as criteria for reading which boundaries are change-prone.
 
 <!-- toc:begin -->
 ## In this series

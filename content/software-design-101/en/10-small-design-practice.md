@@ -247,12 +247,12 @@ This is the end of the series. Put the domain in the center, surround it with po
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Practicing Design with a Small Project?**
-  - The article treats Practicing Design with a Small Project as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Practicing Design with a Small Project?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Practicing Design with a Small Project reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Where should a small project start its design?**
+  Like this article's URL shortener example, even small projects benefit from sketching the flow around domain and use cases first. Making `shorten_view()` thin, passing input to the use case, and pushing storage and key generation outward organizes structure in one step.
+- **Why is it better to write the domain first?**
+  Fixing long-lasting rules first—like URL format validation in `ShortLink.create()`—means the core judgment survives even when the web framework or storage changes. If URL validation tests require Flask, rules have already leaked out of the domain.
+- **How do you block infrastructure details like storage and key generation?**
+  Define `LinkRepo` and `KeyGen` ports in the use-case layer, attach implementations like `InMemoryLinkRepo` and `md5_key` as adapters. Wire them once in the composition root—after that, swapping to SQL storage or different key strategies barely touches `shorten_use_case()`.
 
 <!-- toc:begin -->
 ## In this series

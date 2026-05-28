@@ -165,12 +165,12 @@ Subqueries split a question into pieces. Next up: *Window functions*.
 
 ## Answering the Opening Questions
 
-- **When is a subquery enough, and when is a CTE the better fit?**
-  - The article treats Subquery as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **What is the difference between a scalar subquery and an inline view?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **How do IN and EXISTS differ in intent and behavior?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **When should you use a subquery, and when is a CTE better?**
+  Subqueries nest a query inside another. CTEs (`WITH` clause) define named result sets upfront. CTEs win for readability when the same intermediate result is referenced multiple times or when debugging step-by-step. Subqueries are fine for simple, one-off filters.
+- **What's the difference between a scalar subquery and an inline view?**
+  A scalar subquery returns exactly one value and can appear in SELECT or WHERE. An inline view (subquery in FROM) returns a result set treated as a temporary table. Using the wrong type causes runtime errors—scalar subqueries fail if they return more than one row.
+- **In what situations do IN and EXISTS differ?**
+  `IN` materializes the subquery result and checks membership. `EXISTS` short-circuits—it stops as soon as one matching row is found. EXISTS tends to outperform IN when the subquery returns many rows but the outer table is small, or when the subquery is correlated.
 
 <!-- toc:begin -->
 ## In this series

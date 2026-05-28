@@ -224,12 +224,12 @@ Once direction is right, the cost of change drops. Next up we look at the tools 
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Dependency Direction?**
-  - The article treats Dependency Direction as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Dependency Direction?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Dependency Direction reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why does dependency direction heavily influence change cost?**
+  When arrows point from stable domain code toward implementation details like `psycopg2`, a single storage technology change shakes core rules. Conversely, when the core only knows abstractions—like `charge(repo, user_id, amount)`—change impact stays confined to the adapter side.
+- **How do you distinguish stable modules from volatile ones?**
+  Domain rules persist over time; DB drivers and external SaaS change frequently. Draw import arrows—if lines go directly from domain to external libraries, stable code is being dragged along by volatile code.
+- **How do you keep the domain unaware of implementation details?**
+  Define ports like `WalletRepo` in the core, implement adapters like `PostgresWalletRepo` on the outside, and wire them only in a composition root like `main()`. If domain tests pass with `FakeRepo`, the direction is correct.
 
 <!-- toc:begin -->
 ## In this series

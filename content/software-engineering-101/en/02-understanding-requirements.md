@@ -210,12 +210,12 @@ Good requirements are measurable. Next we look at the step before code — desig
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Understanding Requirements?**
-  - The article treats Understanding Requirements as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Understanding Requirements?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Understanding Requirements reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What conditions must good requirements satisfy?**
+  Good requirements must be verifiable within a single statement—role, scope, input, sort criteria, performance conditions—like the search-feature example. The password-reset example similarly needed conditions like email delivery within 60 seconds, 30-minute expiration, and single-use tokens so that implementation and tests share the same standard.
+- **What roles do user stories and acceptance criteria each serve?**
+  User stories clarify the problem—`As a registered user...` states who gains what value. Acceptance criteria specify completion conditions with `Given/When/Then` or concrete rules (expired token, unregistered email response), directly becoming test cases and PR merge criteria.
+- **Why must functional and non-functional requirements be written separately?**
+  Functional requirements define what users can do; non-functional requirements define the quality at which those functions operate—p95 300ms, failure rate below 1%, audit logs. Separating them catches states like "login works but is slow" or "reset works but is insecure" early.
 
 <!-- toc:begin -->
 ## In this series

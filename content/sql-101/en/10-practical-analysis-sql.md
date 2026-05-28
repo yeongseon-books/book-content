@@ -193,12 +193,12 @@ Closing the series: *SQL is the shared language of reads, writes, and analytics*
 
 ## Answering the Opening Questions
 
-- **What do DAU, WAU, and MAU queries usually look like?**
-  - The article treats Practical Analysis SQL as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **How do you structure cohort and retention logic in layers?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What is the cleanest shape for a funnel query?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **How do you write DAU/WAU/MAU active-user queries?**
+  Count distinct users per time window—`COUNT(DISTINCT user_id)` grouped by date for DAU, by `date_trunc('week', ...)` for WAU, by month for MAU. CTEs help stage the date-spine and user-event tables before the final aggregation.
+- **What steps produce cohort retention?**
+  First identify each user's first-activity date (cohort assignment). Then for each subsequent period, check whether the user returned. Finally, divide returners by cohort size. CTEs named `cohort`, `activity`, `retention` make each step independently verifiable.
+- **How can you build a funnel analysis in a single query?**
+  Define each funnel step as a CTE filtering events by type and timestamp ordering. Count distinct users at each step and compute step-over-step conversion rates. Keeping one CTE per step makes it easy to verify where drop-off occurs.
 
 <!-- toc:begin -->
 ## In this series

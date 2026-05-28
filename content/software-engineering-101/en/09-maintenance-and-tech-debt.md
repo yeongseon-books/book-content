@@ -209,12 +209,12 @@ Debt is a cycle. Be aware, measure, pay down each quarter. The final episode tie
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Maintenance and Tech Debt?**
-  - The article treats Maintenance and Tech Debt as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Maintenance and Tech Debt?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Maintenance and Tech Debt reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **When is tech debt a tool, and when does it become an incident seed?**
+  Tech debt is a useful tool when it carries an owner, a due date, and a repayment plan as a deliberate choice. When only "we'll fix it all later" remains—disconnected from incidents, lead time, and repeated fix costs—it becomes an incident seed.
+- **How do Fowler's four tech-debt quadrants help in practice?**
+  The four quadrants distinguish whether current debt was deliberate, reckless, or a learnable mistake, making repayment conversations far more precise. The same duplicated billing logic carries different priority and accountability depending on whether it arose during an emergency response or was knowingly neglected.
+- **How should you prioritize debt repayment?**
+  This article proposed prioritizing by user-impact potential, operator-intervention frequency, new-feature delay, and repayment cost-effectiveness. Combining Strangler Fig, deprecation warnings, regression tests, and quarterly goal allocation keeps debt repayment as safe incremental replacement rather than explosive refactoring.
 
 <!-- toc:begin -->
 ## In this series

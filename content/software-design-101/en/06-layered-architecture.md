@@ -222,12 +222,12 @@ Layers absorb the shock of change. Next up we look at the data that moves betwee
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Layered Architecture?**
-  - The article treats Layered Architecture as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Layered Architecture?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Layered Architecture reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Why divide into layers, and what's the criterion?**
+  Layers exist because UI, use cases, domain rules, and infrastructure change at different speeds and for different reasons. Separating `charge_view()` from `charge_use_case()` in the example demonstrates that criterion clearly.
+- **What responsibility should each layer own?**
+  Presentation handles HTTP I/O, application orchestrates use cases, domain owns core rules like `Wallet.debit()`, and infrastructure handles storage details like `SqlWalletRepo`. External SaaS responses should pass through an anti-corruption layer like `to_domain_user()` before entering the domain.
+- **In which direction should dependencies flow?**
+  Outer layers (presentation, infrastructure) depend inward toward the domain, while the domain knows nothing about web frameworks or ORM details. When ORM decorators proliferate in domain models or routers absorb business rules, that direction is collapsing.
 
 <!-- toc:begin -->
 ## In this series

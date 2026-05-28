@@ -221,12 +221,12 @@ Once the flow is visible, change is no longer scary. Next up we look at the desi
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Data Flow Design?**
-  - The article treats Data Flow Design as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Data Flow Design?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Data Flow Design reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What does "designing data flow" concretely mean?**
+  It means specifying the data shape and transformation stages from input to output—like `payload(dict) -> SignupCommand -> User -> saved User -> notification event`. Making each stage's input/output explicit (`parse`, `validate`, `normalize`, `persist`, `notify`) is the core.
+- **Why should data flow in only one direction between input and output?**
+  When multiple functions mutate the same `req` dict, tracking where values went wrong is hard. A unidirectional pipeline narrows the problem stage immediately. Maintaining the flow from UI → command → domain → event keeps debugging and log interpretation simple.
+- **How should you separate transformation stages from side effects?**
+  Keep pure transformations like `to_user(validate(parse(payload)))` on the inside, and push side effects like `repo.save(user)` and `mailer.send(user.email)` to the edges. Using `@dataclass(frozen=True)` for immutable data further prevents sneaky mid-pipeline mutations.
 
 <!-- toc:begin -->
 ## In this series

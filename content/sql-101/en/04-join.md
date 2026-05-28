@@ -159,12 +159,12 @@ JOIN is the language of *sets*. Next up: *GROUP BY and aggregates*.
 
 ## Answering the Opening Questions
 
-- **How do INNER, LEFT, RIGHT, FULL, and CROSS JOIN differ?**
-  - The article treats JOIN as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why should you inspect join keys and cardinality before anything else?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why do row counts sometimes grow unexpectedly after a join?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What distinguishes INNER, LEFT, RIGHT, FULL, and CROSS JOIN?**
+  INNER keeps only matching rows from both sides. LEFT keeps all left-table rows (NULLs for no match on right). RIGHT is the mirror. FULL keeps all rows from both. CROSS produces the Cartesian product—every combination. The join type determines result size and NULL behavior.
+- **Why must you verify join keys and cardinality first?**
+  If a join key has duplicates on one side (1:N), the result multiplies. If duplicates exist on both sides (M:N), the result explodes. Checking cardinality before writing the JOIN prevents unexpected row multiplication that silently corrupts aggregates downstream.
+- **Why does the result sometimes grow unexpectedly large?**
+  Incorrect or missing join conditions create partial or full Cartesian products. Always verify the join produces the expected row count—especially when joining tables with different granularity or when composite keys are partially matched.
 
 <!-- toc:begin -->
 ## In this series

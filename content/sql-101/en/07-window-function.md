@@ -161,12 +161,12 @@ Windows are *aggregates that keep the rows*. Next: *INSERT/UPDATE/DELETE*.
 
 ## Answering the Opening Questions
 
-- **What does OVER (PARTITION BY ...) really mean?**
-  - The article treats Window Function as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
+- **What does OVER (PARTITION BY ...) mean?**
+  Window functions compute values across a set of rows related to the current row without collapsing them (unlike GROUP BY). PARTITION BY defines the window boundaries—each partition is calculated independently, and every original row is preserved in the output.
 - **How do ROW_NUMBER, RANK, and DENSE_RANK differ?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why are LAG and LEAD so common in time-series analysis?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+  ROW_NUMBER assigns unique sequential integers regardless of ties. RANK leaves gaps after ties (1,1,3). DENSE_RANK never leaves gaps (1,1,2). Choose based on whether ties should share a position and whether subsequent numbers should adjust.
+- **Why are LAG and LEAD frequently used in time-series analysis?**
+  LAG accesses the previous row's value; LEAD accesses the next. This enables period-over-period comparisons (today vs yesterday, this month vs last month) in a single query without self-joins—essential for trend detection and change calculation.
 
 <!-- toc:begin -->
 ## In this series

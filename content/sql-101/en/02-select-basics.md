@@ -148,12 +148,12 @@ SELECT is mostly about *sentence shape*. The next post is *WHERE and conditions*
 
 ## Answering the Opening Questions
 
-- **What is the safest way to read a SELECT statement?**
-  - The article treats SELECT Basics as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why is naming columns explicitly more than a style preference?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Where do aliases work, and where do they not?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **In what order should you read a SELECT statement?**
+  You write `SELECT ... FROM ... WHERE ... ORDER BY ... LIMIT`, but the engine processes `FROM → WHERE → SELECT → ORDER BY → LIMIT`. Understanding this logical order explains why aliases defined in SELECT aren't visible in WHERE.
+- **Why is the habit of naming columns explicitly important?**
+  Naming columns explicitly documents intent, prevents breakage when table schemas change, and avoids pulling unnecessary data over the network. `SELECT *` in production queries is a maintenance hazard hiding behind convenience.
+- **Where is an alias visible, and where is it not?**
+  A column alias defined in SELECT is visible in ORDER BY and outer queries, but not in WHERE or HAVING (which execute before SELECT in logical order). Use subqueries or CTEs when you need to filter by a computed value.
 
 <!-- toc:begin -->
 ## In this series

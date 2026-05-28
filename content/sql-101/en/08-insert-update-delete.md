@@ -156,12 +156,12 @@ DML is the craft of making the *irreversible* feel safe. Next: *Index and query 
 
 ## Answering the Opening Questions
 
-- **What are the basic shapes of INSERT, UPDATE, and DELETE?**
-  - The article treats INSERT, UPDATE, DELETE as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Why is a transaction the default safety net for data changes?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **Why is RETURNING so useful during verification?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **What are the basic forms of INSERT, UPDATE, and DELETE?**
+  INSERT adds rows (verify NOT NULL constraints and PRIMARY KEY uniqueness). UPDATE modifies existing rows matching a WHERE condition. DELETE removes rows matching a WHERE condition. All three are DML operations that modify table state.
+- **Why is a transaction the basic safety net for data changes?**
+  Wrapping changes in `BEGIN`/`COMMIT` (or `ROLLBACK`) ensures atomicity—either all changes apply or none do. Without transactions, a failed UPDATE can leave data in a half-modified state that's expensive to recover from manually.
+- **Why is RETURNING especially useful in practice?**
+  `RETURNING` lets you see the affected rows in the same statement—no need for a follow-up SELECT. This eliminates race conditions (another session could modify the row between your UPDATE and SELECT) and reduces round trips.
 
 <!-- toc:begin -->
 ## In this series

@@ -199,12 +199,12 @@ Principles are guides. In the final episode we apply every tool from this series
 
 ## Answering the Opening Questions
 
-- **What boundary should you inspect first when applying Design Principles?**
-  - The article treats Design Principles as a set of boundaries rather than one abstract idea, then separates input, processing, verification, and operational signals.
-- **Which signal should the example or diagram make visible for Design Principles?**
-  - The example and diagram should make visible what enters the system, where it changes, and which check decides pass or fail.
-- **What failure should be prevented first when Design Principles reaches a real system?**
-  - In production, keep that decision in checklists, logs, and tests so the same failure does not return after the next change.
+- **Are design principles rules to memorize, or diagnostic tools?**
+  This article concludes that design principles are closer to diagnostic tools for reading code smells than a memorization list. They tell you which question to pull out when you see bloated classes, branch chains, subtype exceptions, fat interfaces, or domain-to-DB imports.
+- **What smell does each of SRP, OCP, LSP, ISP, DIP react to?**
+  When `validation + storage + email + analytics` pile into one class → SRP. When `if-elif` chains grow → OCP. When subtypes throw exceptions → LSP. When read-only implementations awkwardly hold write → ISP. When domain directly knows DB → DIP. Mapping smells to principles in one line makes them usable in actual reviews.
+- **When do KISS and YAGNI keep structure simple?**
+  KISS and YAGNI serve as brakes when you're tempted to add excessive abstraction and layers to a small script. DRY works similarly—before merging similar-looking code, first confirm whether they truly change for the same reason.
 
 <!-- toc:begin -->
 ## In this series
