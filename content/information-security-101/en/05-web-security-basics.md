@@ -201,6 +201,114 @@ CSP is rolled out gradually with nonces or hashes. Authenticated APIs combine a 
 
 The big arc of web security is origin and cookies. Next we look at the two famous code-level vulnerabilities — SQL Injection and XSS.
 
+## Browser Boundary, TLS, and Session — Seeing Them Together
+
+Web security is complete only when browser policies (CORS/CSP) and transport-layer security (TLS) work in concert. Without HTTPS, the `Secure` cookie flag is meaningless and HSTS cannot apply. The starting line of web security is "all traffic over TLS."
+
+| Layer | Core Control | Representative Failure | Immediate Check |
+| --- | --- | --- | --- |
+| Transport | TLS 1.2+ / HSTS | Man-in-the-middle, cookie exposure | Redirect and header inspection |
+| Browser policy | SOP / CORS / CSP | Cross-origin abuse, XSS amplification | Minimize allowlists |
+| Session | HttpOnly / Secure / SameSite | CSRF / session hijacking | Cookie flag audit |
+
+## Security Headers Baseline
+
+The fastest way to raise the security floor is enforcing a header baseline in shared middleware:
+
+```python
+# security_headers.py
+from flask import Flask
+
+app = Flask(__name__)
+
+@app.after_request
+def add_security_headers(resp):
+    resp.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload"
+    resp.headers["X-Content-Type-Options"] = "nosniff"
+    resp.headers["X-Frame-Options"] = "DENY"
+    resp.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    resp.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self'; object-src 'none'"
+    return resp
+```
+
+Scattering headers across feature code leads to omissions. Centralize in a shared layer and catch regressions with automated tests.
+
+## CORS Policy Design Principles
+
+| Question | Wrong Approach | Recommended Approach |
+| --- | --- | --- |
+| Which origins to allow? | `*` for everything | Explicit allowlist |
+| Send credential cookies? | Allow unconditionally | Restrict to necessary APIs only |
+| Preflight failure response? | Temporary bypass | Per-cause policy cleanup |
+| Staging vs production? | Same policy | Per-environment origin separation |
+
+CORS is not a security shield — it is a contract the browser uses to decide whether to allow a request. It never replaces server-side authorization checks.
+
+## Certificate Chain Problems and Web Outages
+
+A point web teams frequently miss: certificate failures present as application failures.
+
+- **Certificate expiry** — Users see "site suddenly won't load."
+- **Missing intermediate certificate** — Only certain browser/OS combinations fail, delaying root-cause analysis.
+- **Domain/SAN mismatch** — Common when deploying new subdomains.
+
+Therefore, your web security checklist must include certificate expiry monitoring, automated renewal verification, and chain validation alongside CORS/CSP.
+
+## Subresource Integrity (SRI)
+
+When loading scripts or stylesheets from an external CDN, a compromised CDN can inject malicious code. SRI lets the browser verify the hash of downloaded resources and block tampered files:
+
+```html
+<!-- SRI example -->
+<script src="https://cdn.example.com/lib.js"
+  integrity="sha384-oqVuAfXRKap7fdgcCY5uykM6+R9GqQ8K/uxAh...="
+  crossorigin="anonymous"></script>
+```
+
+SRI protects clients from CDN supply-chain attacks. Since the hash must be updated whenever the resource changes, include hash regeneration in your deployment pipeline.
+
+## CSP Violation Reporting Endpoint
+
+When first introducing CSP, start with Report-Only instead of Enforce to avoid service disruption. Set up a reporting endpoint, analyze collected violations, then tighten the policy:
+
+```python
+# csp_report_endpoint.py
+from flask import Flask, request, jsonify
+import json
+
+app = Flask(__name__)
+
+@app.post("/csp-report")
+def csp_report():
+    report = request.get_json(force=True)
+    # Store violations as structured logs
+    print(json.dumps(report, indent=2))
+    return jsonify(status="received"), 204
+```
+
+After collecting reports, sort violations by frequency. Adjust allowlists or confirm that blocked scripts truly should be blocked. This iterative loop is the core of CSP adoption.
+
+## CSRF Defense Strategy Comparison
+
+| Strategy | Advantage | Disadvantage | Best Fit |
+| --- | --- | --- | --- |
+| Synchronizer Token | Strong server-side verification | Requires server state management | Session-based services |
+| Double Submit Cookie | Simple implementation | High dependency on cookie configuration | SPA + API combinations |
+| SameSite-centric | Easy configuration | Some flows require exceptions | Low-risk transactions |
+
+Rather than relying on a single strategy, combining two or more based on your service characteristics provides more stability.
+
+## Browser Policy Regression Test Design
+
+| Test | Purpose | Failure Meaning |
+| --- | --- | --- |
+| CSP violation report check | Verify unexpected script execution is blocked | New script path not added to policy |
+| CORS preflight check | Verify cross-origin allowance scope | Over-permissive or broken functionality |
+| SameSite cookie scenario | Balance CSRF defense with user flow | Possible checkout/login disruption |
+| Security header snapshot | Detect header loss during deploy | Middleware regression |
+
+Static checks alone are insufficient. Include E2E scenarios that reproduce actual browser behavior so the impact of policy changes becomes visible.
+
 ## Answering the Opening Questions
 
 - **What exactly does the same-origin policy mean?**

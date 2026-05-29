@@ -194,6 +194,158 @@ Let's Encrypt plus cert-manager renews 90-day certs automatically in Kubernetes.
 
 TLS bundles secrecy, integrity, and origin. Next we look at security on top of that protected web — web security basics.
 
+## Tracing the TLS 1.3 Handshake Step by Step
+
+TLS 1.3 reduced round trips, but the internal decisions became more precise. From an operational perspective, separate these five stages:
+
+1. **ClientHello** — The client presents supported versions, cipher suites, and its key share.
+2. **ServerHello** — The server returns its chosen cipher suite and key share.
+3. **Certificate** — The server provides its certificate chain.
+4. **CertificateVerify + Finished** — The server proves private-key possession and finalizes handshake integrity.
+5. **Client Finished** — The client confirms completion using the same transcript.
+
+The most common failure points are stage 3 (certificate chain issues) and stages 1–2 (incompatible cipher suites or TLS versions). When a TLS-related outage occurs, check TLS negotiation logs before application code.
+
+## Certificate Chain Verification Checklist
+
+| Verification Item | Failure Symptom | How to Confirm |
+| --- | --- | --- |
+| SAN includes requested domain | Browser name-mismatch warning | `openssl x509 -text` |
+| Not Before / Not After validity | Sudden connection failure | Expiry monitoring / alerts |
+| Intermediate certificate present | Only certain clients fail | Verify fullchain deployment |
+| Root trust store alignment | Errors in some environments only | Check OS/runtime trust store |
+| Revocation status (OCSP/CRL) | Security warning or block | Review OCSP/CRL policy |
+
+Understanding the chain lets you quickly narrow down "works on my machine but fails in production" problems.
+
+## Probing TLS Certificate Details in Python
+
+```python
+# tls_probe.py
+import socket
+import ssl
+from datetime import datetime
+
+
+def probe(host: str, port: int = 443) -> None:
+    ctx = ssl.create_default_context()
+    with socket.create_connection((host, port), timeout=5) as raw:
+        with ctx.wrap_socket(raw, server_hostname=host) as tls:
+            cert = tls.getpeercert()
+            print("version:", tls.version())
+            print("cipher:", tls.cipher())
+            print("subject:", cert.get("subject"))
+            print("issuer:", cert.get("issuer"))
+            print("notAfter:", cert.get("notAfter"))
+            if cert.get("notAfter"):
+                exp = datetime.strptime(cert["notAfter"], "%b %d %H:%M:%S %Y %Z")
+                print("days_left:", (exp - datetime.utcnow()).days)
+
+probe("example.com")
+```
+
+Run this probe periodically in health checks to catch impending expiry, version downgrade, or unexpected certificate changes early.
+
+## mTLS vs One-way TLS — Operational Comparison
+
+| Aspect | One-way TLS | mTLS |
+| --- | --- | --- |
+| Server identity verification | Required | Required |
+| Client identity verification | Usually none | Required |
+| Certificate issuance/rotation volume | Relatively low | Grows with service count |
+| Blast radius on compromise | Server key leak | Both server and client keys require management |
+
+Before adopting mTLS, prepare automated issuance and rotation (e.g., service mesh, cert-manager). Manual certificate operations fail at scale over time.
+
+## Certificate Transparency and CT Logs
+
+Certificate Transparency (CT) forces CAs to record every issued certificate in a public, append-only log. This is the primary mechanism for early detection of mis-issuance or rogue CAs.
+
+| Component | Role | Operational Meaning |
+| --- | --- | --- |
+| CT log server | Records issued certificates in append-only log | Evidence trail for forged certificates |
+| SCT (Signed Certificate Timestamp) | Proof that a certificate was logged | Browsers can reject certificates without SCT |
+| Monitoring service | Watches for new issuance on your domains | Early warning for phishing / shadow domains |
+
+CT monitoring is highly practical from a defensive standpoint. If someone issues a certificate for your domain, you get alerted — enabling early detection of domain hijacking or subdomain takeover.
+
+```bash
+# Query CT logs for certificate issuance history of a domain
+# Simple check via crt.sh
+curl -s "https://crt.sh/?q=%.example.com&output=json" | python3 -m json.tool | head -30
+```
+
+## TLS Cipher Suite Audit Script
+
+Periodically verify that production services meet your TLS baseline. This script extracts the negotiated cipher and flags weak configurations:
+
+```python
+# tls_cipher_audit.py
+import ssl
+import socket
+from typing import Final
+
+WEAK_CIPHERS: Final[set] = {"RC4", "3DES", "DES", "NULL", "EXPORT"}
+
+
+def audit_ciphers(host: str, port: int = 443) -> list[str]:
+    ctx = ssl.create_default_context()
+    warnings = []
+    with socket.create_connection((host, port), timeout=5) as raw:
+        with ctx.wrap_socket(raw, server_hostname=host) as tls:
+            cipher_name, protocol, bits = tls.cipher()
+            for weak in WEAK_CIPHERS:
+                if weak in cipher_name.upper():
+                    warnings.append(f"Weak cipher detected: {cipher_name}")
+            if bits < 128:
+                warnings.append(f"Insufficient key length: {bits}bit")
+            if "TLSv1.0" in protocol or "TLSv1.1" in protocol:
+                warnings.append(f"Legacy protocol: {protocol}")
+    return warnings
+
+
+issues = audit_ciphers("example.com")
+if issues:
+    for w in issues:
+        print(f"[WARN] {w}")
+else:
+    print("[OK] TLS configuration meets baseline")
+```
+
+Add this to your CI/CD pipeline to catch TLS configuration regressions at deploy time.
+
+## Firewall Rules and TLS Termination Points
+
+Deciding where to terminate TLS also means designing network rules. Minimum recommended rules:
+
+| Segment | Allowed Port | Source | Destination | Policy |
+| --- | --- | --- | --- | --- |
+| Internet → Edge LB | 443 | Any | LB | Allow |
+| Internet → App node | 80, 443 | Any | App | Deny |
+| LB → App service | 443 | LB subnet | App | Allow |
+| App → DB | 5432 | App subnet | DB | Allow |
+
+Even with TLS enabled, broad port exposure leaves a large attack surface. "Encrypted" and "access-controlled" are separate concerns — always review firewall rules alongside TLS configuration.
+
+## Certificate Incident Runbook Summary
+
+1. On expiry alert, confirm the list of affected domains.
+2. Before issuing a new certificate, verify fullchain composition.
+3. Validate handshake in staging, then roll out incrementally.
+4. After deployment, re-verify with `openssl s_client` and application health checks.
+5. In the post-incident review, tighten alert thresholds and close automation gaps.
+
+## TLS Configuration Baseline
+
+| Item | Recommended | Forbidden |
+| --- | --- | --- |
+| Protocol version | TLS 1.2, TLS 1.3 | TLS 1.0, TLS 1.1 |
+| Key exchange | ECDHE | Static RSA key exchange |
+| Symmetric cipher | AES-GCM, ChaCha20-Poly1305 | RC4, 3DES |
+| Certificate key length | RSA 2048+ or ECDSA P-256+ | RSA 1024 or less |
+
+Document the baseline so new services onboard with a known-good default. Per-service manual decisions lead to configuration drift.
+
 ## Answering the Opening Questions
 
 - **What exactly does the browser padlock guarantee?**
