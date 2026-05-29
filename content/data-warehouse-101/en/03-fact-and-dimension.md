@@ -35,9 +35,9 @@ In this post, we split measures from attributes on purpose. That separation is w
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying Fact and Dimension?
-- Which signal should the example or diagram make visible for Fact and Dimension?
-- What failure should be prevented first when Fact and Dimension reaches a real system?
+- What do fact tables and dimension tables each hold?
+- Why do you need to define the grain first in an analytical model?
+- What happens when you skip surrogate keys and rely on natural keys alone?
 
 ## Questions this article answers
 
@@ -139,6 +139,110 @@ ORDER BY 1, 2;
 - The *dimension carries meaningful attributes*.
 - Multiple facts *share* the same dimension.
 
+## Making the Design Concrete with DDL
+
+The reason for separating fact and dimension is not "normalization is good" — it is that *measures* and *context* change on different schedules. The order amount is fixed at event time, but user tier or product category evolves. Mixing them in one table makes historical replay expensive.
+
+Below is a minimal star schema DDL:
+
+```sql
+CREATE TABLE dim_customer (
+    customer_key BIGINT PRIMARY KEY,
+    customer_id BIGINT NOT NULL,
+    customer_name TEXT,
+    segment TEXT,
+    valid_from TIMESTAMP,
+    valid_to TIMESTAMP,
+    is_current BOOLEAN
+);
+
+CREATE TABLE dim_product (
+    product_key BIGINT PRIMARY KEY,
+    product_id BIGINT NOT NULL,
+    category TEXT,
+    brand TEXT,
+    unit_price NUMERIC(12, 2)
+);
+
+CREATE TABLE fact_sales (
+    sales_id BIGINT,
+    customer_key BIGINT,
+    product_key BIGINT,
+    order_date_key INT,
+    quantity INT,
+    amount NUMERIC(12, 2)
+);
+```
+
+The rule: fact holds only measures and foreign keys; human-readable attributes go into dimensions. This boundary keeps queries simple and change impact local.
+
+## Why Grain Comes First
+
+The first thing a model review should check is the grain declaration. For example: "fact_sales is one row per order-product line." Once that sentence exists, the next questions answer themselves:
+
+- Is `amount` the order total or the line amount?
+- Is `discount` per order or per line?
+- Are returns negative rows in the same grain?
+
+Without a grain declaration, different aggregations on the same table produce conflicting metrics.
+
+## SCD Strategy Decision Table
+
+Tracking dimension changes is not a bolt-on option — it is an initial design decision.
+
+| Strategy | Storage | Advantage | Disadvantage | Best for |
+| --- | --- | --- | --- | --- |
+| Type 1 | Overwrite current value | Simple, low storage cost | Historical state lost | Typo fixes, non-critical attributes |
+| Type 2 | Add versioned rows | Full historical replay | Join conditions grow complex | Customer tier, org changes |
+| Type 3 | Previous-value column | Easy recent comparison | Breaks on multiple changes | Limited before/after analysis |
+
+For e-commerce customer segment history, Type 2 is effectively the default. For product description typo fixes, Type 1 is enough.
+
+## Patterns for Consistent Analysis Queries
+
+Even a well-designed dimension model produces inconsistent results without query writing rules. Fix these as team conventions:
+
+1. Date axis always joins through `dim_date`.
+2. Metric formulas are defined once in the mart layer.
+3. Direct fact queries are allowed for exploration, but final reports use marts only.
+
+Following these rules largely eliminates the "same revenue, different numbers across dashboards" problem.
+
+## Fact/Dimension Quality Validation
+
+As the model grows, "definition correct but data wrong" problems increase. Running validation SQL on a schedule catches quality issues early:
+
+```sql
+-- Orphan foreign key check
+SELECT COUNT(*) AS orphan_rows
+FROM fact_sales f
+LEFT JOIN dim_customer c ON c.customer_key = f.customer_key
+WHERE c.customer_key IS NULL;
+
+-- Negative amount check
+SELECT COUNT(*) AS bad_amount_rows
+FROM fact_sales
+WHERE amount < 0;
+```
+
+These checks belong in the deployment pipeline as quality gates, not as one-off queries. The orphan key check, in particular, immediately exposes dimension load order errors.
+
+## Dimension Change Policy as Code
+
+```yaml
+dimension_change_policy:
+  dim_customer:
+    scd: type2
+    business_keys: [customer_id]
+    mutable_columns: [segment, tier]
+  dim_product:
+    scd: type1
+    business_keys: [product_id]
+    mutable_columns: [name, category]
+```
+
+When the policy is explicit, teams stop debating "which column changes should be tracked as history." Model reliability comes from consistency of change rules, not from the number of tables.
+
 ## Five Common Mistakes
 
 1. **Putting *string attributes* directly in the fact.** Storage explodes when rows reach *hundreds of millions*.
@@ -178,12 +282,12 @@ Splitting facts and dimensions is the *starting point* of analytical modeling. N
 
 ## Answering the Opening Questions
 
-- **How do you distinguish Fact from Dimension?**
-  - Fact is "what happened" (event rows); Dimension is "from which perspective" (attribute collections).
-- **What problems arise when a Fact table grows too large?**
-  - Joins, indexing, and query performance all degrade, requiring partitioning or aggregate tables.
-- **How do you track changes in Dimension tables?**
-  - Choose an SCD (Slowly Changing Dimension) strategy: Type 1 (overwrite), Type 2 (versioning), or Type 3 (parallel columns).
+- **What do fact tables and dimension tables each hold?**
+  - Fact tables hold measurable events (numbers); dimension tables hold the descriptive context (attributes) by which those numbers are sliced.
+- **Why do you need to define the grain first?**
+  - Without a grain declaration, the same table produces conflicting aggregations and teams lose trust in the numbers.
+- **What happens when you skip surrogate keys?**
+  - Upstream key changes propagate into every fact row, breaking historical consistency and complicating backfills.
 <!-- toc:begin -->
 ## In this series
 

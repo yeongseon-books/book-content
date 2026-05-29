@@ -35,9 +35,9 @@ In this post, we compare those workloads directly. The important question is not
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying OLTP and OLAP?
-- Which signal should the example or diagram make visible for OLTP and OLAP?
-- What failure should be prevented first when OLTP and OLAP reaches a real system?
+- How do OLTP and OLAP differ in the workloads they are built to handle?
+- Where does the gap between row storage and column storage become most visible?
+- Why does one engine become a bad compromise when you ask it to serve both workloads?
 
 ## Questions this article answers
 
@@ -121,6 +121,113 @@ SELECT date_trunc('day', created_at), COUNT(*) FROM fact_orders GROUP BY 1;
 - *Short queries* are fast on *row stores*.
 - *Big aggregations* are fast on *column stores*.
 - The *concurrency shape* is *completely different*.
+
+## Fixing the Workload Difference in a Table
+
+A common misconception is "OLTP is a small DB, OLAP is a big DB." The real distinction is the *shape* of the workload, not size. The table below clarifies why the two systems must coexist.
+
+| Aspect | OLTP | OLAP |
+| --- | --- | --- |
+| Basic unit | Single transaction | Multi-row aggregation |
+| Query pattern | `INSERT/UPDATE/SELECT by PK` | `JOIN/GROUP BY/WINDOW` |
+| Concurrency | Many short requests | Few long-running queries |
+| Storage optimization | Row-oriented | Column-oriented |
+| Indexing strategy | Point lookup first | Scan reduction, partition first |
+| SLA | Strict p95 latency | Report generation time |
+| Data freshness | Near-real-time | Batch or micro-batch |
+| Typical failure | Lock contention, deadlocks | Excessive scan, shuffle/spill |
+
+Once you look at the table, it becomes clear why trying to optimize both on a single engine rarely lasts. Optimizing one side becomes the other side's cost.
+
+## Row vs Column Storage in Practice
+
+Row storage keeps read-and-write cost low for single records. Column storage keeps bulk-read cost low for specific columns. The example below shows how the same business question maps to different optimal storage:
+
+```sql
+-- OLTP-friendly: check one order's status
+SELECT order_id, status, updated_at
+FROM orders
+WHERE order_id = 987654;
+
+-- OLAP-friendly: monthly revenue aggregation
+SELECT date_trunc('month', order_date) AS month,
+       SUM(amount) AS revenue
+FROM fact_orders
+GROUP BY 1
+ORDER BY 1;
+```
+
+The first query reads multiple columns of a single row — row storage wins. The second scans only `amount` and `date` across millions of rows — column storage wins. Storage layout is determined by the *shape of your questions*, not by technology preference.
+
+## Minimum Separation Policy
+
+When splitting systems, "how far do we separate?" is a common debate. The policy below is a practical minimum even small teams can adopt immediately:
+
+```yaml
+separation_policy:
+  oltp:
+    allowed_queries:
+      - point_lookup
+      - short_transaction
+    blocked_patterns:
+      - full_table_scan
+      - monthly_aggregation_on_prod
+  olap:
+    source:
+      - cdc_stream
+      - daily_snapshot
+    freshness_slo: "<= 15 minutes"
+  governance:
+    owner_oltp: "backend"
+    owner_olap: "data"
+    incident_channel: "#data-runtime"
+```
+
+Pairing this policy with code review rules prevents the common regression where heavy queries creep back onto the operational DB after separation. Operational habits make a bigger difference than technology choice in this zone.
+
+## When a Single Engine Fails — Typical Signals
+
+When these signals appear, deferring OLTP/OLAP separation becomes difficult:
+
+- API latency spikes repeat every month-end or week-end reporting window.
+- Adding read replicas does not resolve analytical query bottlenecks.
+- Each new index degrades write performance.
+- Priority conflicts between batch queries and online transactions grow.
+
+These are not performance problems — they are *architecture boundary* problems. Fixing one query does not help; workload separation must be designed.
+
+## Separation Scenario Example
+
+Consider a hypothetical e-commerce service. OLTP handles order creation, payment approval, and stock deduction. OLAP handles campaign analysis, monthly P&L, and channel conversion rates. When both paths share the same storage and cache, mutual interference peaks during traffic surges.
+
+```yaml
+traffic_profile:
+  oltp:
+    peak_rps: 1200
+    typical_query_ms: 20
+    write_ratio: 0.55
+  olap:
+    peak_concurrent_queries: 40
+    typical_query_seconds: 8
+    scan_size_gb: 12
+risk_if_shared:
+  - cache_eviction_conflict
+  - lock_wait_increase
+  - planner_instability
+```
+
+After separation, OLTP tunes for low latency and OLAP tunes for bulk reads independently. This split improves not just performance but operational resilience through fault isolation.
+
+## Turning the Comparison Table into a Design Checklist
+
+Do not just read the table and move on — convert it to system review questions for immediate practical use:
+
+- Is the most expensive query currently OLTP-shaped or OLAP-shaped?
+- Do incident reports show repeated analytical query interference?
+- Has the analytics freshness SLA been agreed in minutes?
+- Does the user communication plan reflect data delay post-separation?
+
+If you can answer these questions, the separation decision shifts from technology preference to operational evidence.
 
 ## Five Common Mistakes
 
