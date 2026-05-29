@@ -42,7 +42,7 @@ Here, we will frame Helm as a repeatable deployment unit that separates shared s
 
 ## Why It Matters
 
-*Per-environment copies* create *drift*. *Helm* lets you reuse the *same template* and only swap *values*.
+Per-environment YAML copies create drift silently. A patch applied to `prod/` is forgotten in `staging/`; a direct edit in one directory diverges from the others within days. Helm forces differences into a single axis—values files—while the chart itself is the shared contract. This separation makes environment promotion a values swap rather than a directory diff.
 
 ## Key Terms
 
@@ -69,6 +69,8 @@ def create(name):
     subprocess.run(["helm", "create", name], check=True)
 ```
 
+`helm create` scaffolds a chart with sane defaults, but the real work is deciding what goes into templates versus values. Anything that changes per environment (replica count, image tag, domain) belongs in `values.yaml`; structural decisions (which Kubernetes objects, resource relationships) stay in templates.
+
 ### Step 2 — values.yaml
 
 ```python
@@ -83,6 +85,8 @@ service:
 """
 ```
 
+Values hold environment-varying data; the chart structure stays constant. When you promote from dev to prod, only the `-f values-prod.yaml` flag changes—the chart itself is identical, eliminating an entire class of "works in dev, broken in prod" issues.
+
 ### Step 3 — install
 
 ```python
@@ -92,6 +96,8 @@ def install(release, chart, values):
         check=True,
     )
 ```
+
+A release is an installed instance of a chart—a name, a namespace, and a revision history. This makes Helm a deploy-management tool, not just a template engine: you can query what was deployed, when, and roll back to any previous state.
 
 ### Step 4 — upgrade
 
@@ -103,6 +109,8 @@ def upgrade(release, chart, values):
     )
 ```
 
+`--atomic` automatically rolls back if any resource in the upgrade fails to become healthy within the timeout. Without it, a broken upgrade leaves the release in a partial state that requires manual intervention—dangerous for unattended or night deploys.
+
 ### Step 5 — rollback
 
 ```python
@@ -112,6 +120,8 @@ def rollback(release, revision):
         check=True,
     )
 ```
+
+Rollback needs practice before incidents. Know your previous good revision number (`helm history`), test the rollback path in staging, and verify that dependent resources (ConfigMaps, Secrets, PVCs) remain compatible with the older chart revision.
 
 ## Verification workflow
 

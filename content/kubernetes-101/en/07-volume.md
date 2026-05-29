@@ -42,7 +42,7 @@ Here, we will connect Volumes, PersistentVolumeClaims, and StorageClasses into o
 
 ## Why It Matters
 
-A container's filesystem *vanishes* with the *Pod*. Stateful workloads *require* a *Volume*.
+A container's filesystem vanishes with the Pod—by design. Stateless apps benefit from this disposability: any replica can replace any other. But the moment your workload owns data that must survive restarts (a database, uploaded files, a write-ahead log), you need an explicit storage contract that decouples data lifetime from Pod lifetime. Without it, the next reschedule silently destroys state.
 
 ## Key Terms
 
@@ -74,6 +74,8 @@ spec:
 """
 ```
 
+A PVC is a request, not a disk. `storageClassName: gp3` tells the cluster which provisioner and disk type to use. If StorageClass is omitted, the cluster's default class applies—which may not match your IOPS or replication requirements.
+
 ### Step 2 — Use it in a Pod
 
 ```python
@@ -91,6 +93,8 @@ spec:
 """
 ```
 
+The container sees `/var/lib/postgresql/data` as a local path, but reads and writes flow through the PVC to an external disk. This indirection is what lets the Pod be deleted and recreated on a different node while data persists.
+
 ### Step 3 — Apply
 
 ```python
@@ -99,6 +103,8 @@ import subprocess
 def apply(path):
     subprocess.run(["kubectl", "apply", "-f", path], check=True)
 ```
+
+With dynamic provisioning, applying the PVC manifest triggers the StorageClass provisioner to create a PV automatically. You rarely need to create PV objects by hand in cloud environments—StorageClass handles the lifecycle.
 
 ### Step 4 — Inspect
 
@@ -111,12 +117,16 @@ def get_pvc():
     return res.stdout
 ```
 
+A PVC stuck in `Pending` means the provisioner cannot fulfill the request. Check StorageClass name spelling, available capacity in the zone, and whether the requested AccessMode is supported by the underlying driver before assuming an app-level bug.
+
 ### Step 5 — Cleanup (carefully)
 
 ```python
 def delete(name):
     subprocess.run(["kubectl", "delete", "pvc", name], check=True)
 ```
+
+PVC deletion is irreversible when `reclaimPolicy` is `Delete`—the backing disk is destroyed. Always verify the reclaim policy before removing a PVC in production, and prefer `Retain` for databases until you have a tested backup/restore pipeline.
 
 ## Verification workflow
 

@@ -42,7 +42,9 @@ Here, we will look at Service as the networking contract that hides changing Pod
 
 ## Why It Matters
 
-For *microservices* to call each other by *name*, a *Service* is mandatory.
+In a microservice world, applications call each other *by name*. But Pod IPs change on every restart or reschedule, so a direct-IP call breaks the moment a Pod moves. For internal communication to remain stable, something must hide changing Pod membership behind a fixed name.
+
+Service fills that role. Many beginners think of Service as purely an external-exposure feature, but in practice it matters more for *internal* traffic. Without understanding Service, Ingress, service discovery, and DNS-based calls all remain blurry.
 
 ## Key Terms
 
@@ -75,6 +77,8 @@ spec:
 """
 ```
 
+This manifest groups every Pod labeled `app: web` behind a Service named `web`. The single most important value here is `selector`—it is the glue between the Service and its backend Pods.
+
 ### Step 2 — Apply and read
 
 ```python
@@ -88,6 +92,8 @@ def apply_and_get(path):
     ).stdout
 ```
 
+Always inspect the Service immediately after applying. A Service can exist without any matching Pods, meaning it was created successfully but routes nowhere—a silent failure that only shows up when traffic hits a black hole.
+
 ### Step 3 — DNS check
 
 ```python
@@ -99,6 +105,8 @@ def dns_check(target):
     return res.stdout
 ```
 
+DNS is the key mental model for understanding Services. The moment internal traffic switches from IP-based to name-based calls, Service DNS becomes the integration contract that survives Pod turnover.
+
 ### Step 4 — Switch to NodePort
 
 ```python
@@ -109,12 +117,16 @@ def to_nodeport(svc):
     ], check=True)
 ```
 
+Switching the Service type changes the access path. NodePort is handy for local testing but rarely serves as the final external entry point in production—that role usually goes to LoadBalancer + Ingress.
+
 ### Step 5 — Cleanup
 
 ```python
 def delete(svc):
     subprocess.run(["kubectl", "delete", "svc", svc], check=True)
 ```
+
+When deleting a Service, the bigger concern is not the object itself but whether other applications are already calling it by name. In a name-based integration model, a Service name is effectively a contract.
 
 ## Verification workflow
 

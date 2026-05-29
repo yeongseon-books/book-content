@@ -42,7 +42,7 @@ Here, we will use ConfigMap and Secret to split environment-specific values from
 
 ## Why It Matters
 
-Pulling *environment differences* out of the image is what makes things *reproducible*. *Secrets* must be tracked *separately*.
+Pulling environment differences out of the image is what makes deployments reproducible. When dev, staging, and production all run the same artifact, promotions become a config swap rather than a rebuild. Secrets need stricter handling because a leaked DB password or API token in plaintext Git history is an incident, not a typo—so Kubernetes separates them into a resource type that supports RBAC restriction and etcd encryption independently of ordinary config.
 
 ## Key Terms
 
@@ -73,6 +73,8 @@ data:
 """
 ```
 
+Non-sensitive, environment-varying settings—log level, feature flags, pagination limits—belong in ConfigMap. Keeping them outside the image means a single `kubectl apply` changes behavior without a rebuild or redeploy cycle.
+
 ### Step 2 — Secret
 
 ```python
@@ -85,6 +87,8 @@ stringData:
   DB_PASSWORD: "s3cret"
 """
 ```
+
+`stringData` handles base64 encoding for you at apply time; the stored object is still base64. Remember: encoding is not encryption—anyone with `kubectl get secret -o yaml` access can decode the value instantly. Real protection comes from RBAC and etcd encryption at rest.
 
 ### Step 3 — Inject into a Pod
 
@@ -100,6 +104,8 @@ spec:
 """
 ```
 
+`envFrom` is the fastest injection path when your app already reads environment variables. The trade-off: every key in the referenced object becomes an env var, so keep ConfigMaps focused to avoid polluting the namespace with unrelated keys.
+
 ### Step 4 — Mount as files
 
 ```python
@@ -113,6 +119,8 @@ volumeMounts:
 """
 ```
 
+File mounts suit multi-line payloads (TLS certs, JSON config, `.properties` files) or libraries that expect a config path rather than individual env vars. Kubelet periodically syncs mounted ConfigMap data, enabling hot-reload patterns without a Pod restart—though your app must watch the file.
+
 ### Step 5 — Restart after change
 
 ```python
@@ -124,6 +132,8 @@ def restart(dep):
         check=True,
     )
 ```
+
+A ConfigMap or Secret update does not automatically restart Pods that consume it via env vars—the old value persists until the container is recreated. Mounted files are eventually synced by kubelet, but env-var injection requires an explicit `rollout restart` to pick up changes.
 
 ## Verification workflow
 

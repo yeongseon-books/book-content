@@ -42,7 +42,9 @@ Here, we will separate the declarative Ingress rule from the controller that enf
 
 ## Why It Matters
 
-A *LoadBalancer Service per app* explodes *cost*. *Ingress* collapses everything into a *single entry*.
+As long as you have only one or two services, a LoadBalancer per app seems manageable. Once services multiply, external IPs, certificates, routing rules, and security policies scatter everywhere. Cost and operational drift grow fast.
+
+Ingress consolidates all of this into a single entry point. The critical insight is that Ingress itself is *not* a proxy—it is a rule object. The IngressController is the proxy that enforces those rules. Understanding this split is what lets you debug "Ingress exists but traffic does not arrive."
 
 ## Key Terms
 
@@ -83,6 +85,8 @@ spec:
 """
 ```
 
+This example sends `example.com/api` to the `api` Service and all other `/` traffic to the `web` Service. The values to notice first are `host`, `path`, and `pathType`—they define the routing decision tree.
+
 ### Step 2 — Apply
 
 ```python
@@ -91,6 +95,8 @@ import subprocess
 def apply(path):
     subprocess.run(["kubectl", "apply", "-f", path], check=True)
 ```
+
+Applying an Ingress does not immediately route traffic. A running IngressController must be present in the cluster to translate these rules into actual proxy configuration.
 
 ### Step 3 — Create a TLS secret
 
@@ -101,6 +107,8 @@ def tls_secret(name, cert, key):
         "--cert", cert, "--key", key,
     ], check=True)
 ```
+
+TLS certificates are stored as Secrets. The certificate and private key must reside in the same namespace as the Ingress for HTTPS to bind correctly.
 
 ### Step 4 — Apply TLS
 
@@ -113,6 +121,8 @@ spec:
 """
 ```
 
+Adding this block lets the Ingress terminate HTTPS at the entry point—application containers no longer need their own certificates. From an operations perspective, this is a major simplification.
+
 ### Step 5 — Verify
 
 ```python
@@ -123,6 +133,8 @@ def curl(host, path):
     )
     return res.stdout
 ```
+
+Sending actual requests validates both path routing and TLS at the same time. Call `/api` and `/` separately and check that the responses differ—that is the most direct proof the rules work.
 
 ## Verification workflow
 

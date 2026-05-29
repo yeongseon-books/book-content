@@ -42,7 +42,7 @@ Here, we will treat HPA as a control loop that adjusts Deployment replica count 
 
 ## Why It Matters
 
-*Manual scaling* causes *lag* and *over-provisioning*. *Autoscaling* protects both *cost* and *availability*.
+Manual scaling causes lag and over-provisioning. A human watching dashboards reacts in minutes, not seconds—and is absent on nights and weekends. Autoscaling closes that gap, but only when the inputs are trustworthy: resource requests define the denominator HPA uses to compute utilization, and cluster capacity determines whether new replicas can actually land. Without both, autoscaling is a promise the cluster cannot keep.
 
 ## Key Terms
 
@@ -75,6 +75,8 @@ spec:
 """
 ```
 
+Resource requests are the foundation. HPA computes utilization as `current usage ÷ requests`. Without requests, the denominator is zero and utilization is incalculable—HPA will never fire. Set requests to reflect steady-state usage, not peak.
+
 ### Step 2 — HPA manifest
 
 ```python
@@ -97,6 +99,8 @@ spec:
 """
 ```
 
+A 60% CPU target keeps headroom for traffic bursts before new replicas finish starting. `minReplicas: 2` ensures availability even during quiet periods. `maxReplicas` is your cost ceiling—set it based on cluster node capacity and budget, not infinity.
+
 ### Step 3 — apply
 
 ```python
@@ -105,6 +109,8 @@ import subprocess
 def apply(path):
     subprocess.run(["kubectl", "apply", "-f", path], check=True)
 ```
+
+The HPA object existing does not mean it is working. Metrics-server must be healthy and reporting actual CPU/memory numbers. If `kubectl top pods` returns an error, fix metrics-server before tuning HPA thresholds.
 
 ### Step 4 — generate load
 
@@ -117,6 +123,8 @@ def load(target):
     ], check=False)
 ```
 
+Synthetic load validates your thresholds in a safe environment. If HPA does not scale under artificial pressure, it will not scale under real traffic. Watch whether new replicas actually become Ready—if they stay Pending, the bottleneck is node capacity, not HPA configuration.
+
 ### Step 5 — inspect HPA state
 
 ```python
@@ -127,6 +135,8 @@ def hpa_status(name):
     )
     return res.stdout
 ```
+
+The key columns in `get hpa -o wide` are TARGETS (current/target), MINPODS, MAXPODS, and REPLICAS. When current exceeds target but replicas stay flat, check events with `describe hpa` for capacity errors or stabilization-window cooldowns.
 
 ## Verification workflow
 

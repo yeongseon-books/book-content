@@ -42,7 +42,9 @@ Here, we will treat Deployment as the default stateless workload controller that
 
 ## Why It Matters
 
-*Zero-downtime deploy* and *self-healing* are the *biggest reasons* to adopt *Kubernetes*. The object that owns them is the *Deployment*.
+Two of the biggest reasons teams adopt Kubernetes are *zero-downtime deploy* and *self-healing*. But these are not magical cluster properties—they require a controller that keeps the desired Pod count stable, rolls out new versions gradually, and holds a rollback path when a release fails.
+
+That controller is the Deployment. Once you understand Deployments, HPA, Helm, and GitOps become much easier to read because they all build on the same desired-state reconciliation loop. Without it, Kubernetes operations look like manual container management with extra YAML.
 
 ## Key Terms
 
@@ -79,6 +81,8 @@ spec:
 """
 ```
 
+The key value to notice first is `replicas: 3`. This is not just a number—it declares the minimum running count the service requires. Even if one Pod dies, the controller will close the gap back to three, making it a statement of availability intent.
+
 ### Step 2 — Apply
 
 ```python
@@ -87,6 +91,8 @@ import subprocess
 def apply(path):
     subprocess.run(["kubectl", "apply", "-f", path], check=True)
 ```
+
+After applying, the Deployment and its ReplicaSet begin reconciling actual state toward desired state. You no longer need to count or restart Pods by hand—that is the controller's job from this point on.
 
 ### Step 3 — Update image
 
@@ -97,6 +103,8 @@ def set_image(dep, container, image):
         f"deployment/{dep}", f"{container}={image}",
     ], check=True)
 ```
+
+Changing only the image tag is enough to trigger a full deployment event. The Deployment does not kill all old Pods at once; it creates new Pods according to its strategy, waits for readiness, and removes old ones incrementally.
 
 ### Step 4 — Watch rollout
 
@@ -109,6 +117,8 @@ def rollout_status(dep):
     return res.stdout
 ```
 
+A deploy is not done when the command returns—it is done when new Pods actually pass readiness checks and can serve traffic. Watching rollout status is how you confirm that the new version is truly live.
+
 ### Step 5 — Rollback
 
 ```python
@@ -118,6 +128,8 @@ def rollback(dep):
         check=True,
     )
 ```
+
+Rollback is the final safety net. Even with strong CI/CD automation, knowing how to revert to the previous ReplicaSet manually is what separates a 2-minute recovery from a 30-minute scramble during a night-time incident.
 
 ## Verification workflow
 

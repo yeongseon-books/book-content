@@ -42,7 +42,7 @@ Here, we will connect probes, RBAC, network boundaries, observability, GitOps, a
 
 ## Why It Matters
 
-*Functionally working* and *staying up overnight without issues* are different. *Operability* is *service trust*.
+Functionally working and staying up overnight without paging are different things. A deployment can pass all health checks and still lack the operational scaffolding to detect degradation, limit blast radius, and recover without guesswork. Operability means probes define traffic contracts, RBAC limits who can break what, network policies contain lateral movement, telemetry catches problems before users do, and runbooks turn incident response from heroics into procedure.
 
 ## Key Terms
 
@@ -71,6 +71,8 @@ readinessProbe:
 """
 ```
 
+Liveness and readiness serve different contracts. Liveness failing triggers a restart—use it for deadlock detection, not slow queries. Readiness failing removes the Pod from Service endpoints—use it for warm-up and dependency checks. Mixing them causes either unnecessary restarts or premature traffic during boot.
+
 ### Step 2 — RBAC
 
 ```python
@@ -84,6 +86,8 @@ rules:
   verbs: ["get", "list"]
 """
 ```
+
+Start with the narrowest permissions that let the workload function. A service account that can `get pods` and `pods/log` covers most debugging needs without granting destructive access. Widen only when a specific automation requires it, and audit bindings quarterly.
 
 ### Step 3 — NetworkPolicy
 
@@ -100,6 +104,8 @@ spec:
 """
 ```
 
+Without a NetworkPolicy, every Pod can reach every other Pod—convenient for development, dangerous in production. A compromised container gains free lateral movement across the entire namespace. Default-deny plus explicit allow-lists limits blast radius to the declared communication paths.
+
 ### Step 4 — Collect observability data
 
 ```python
@@ -113,6 +119,8 @@ def top_pods(ns):
     return res.stdout
 ```
 
+Metrics are the fastest signal ("something is wrong"), but logs and traces are needed for root cause ("this specific request failed at this span"). Collecting all three on the same timeline—correlated by trace ID—turns a vague "cluster is slow" into an actionable "Service X, endpoint Y, database call Z took 3s."
+
 ### Step 5 — Runbook snippet
 
 ```python
@@ -123,6 +131,8 @@ def runbook_step(name):
         "actions": ["check probe", "rollout status", "rollback if needed"],
     }
 ```
+
+A runbook standardizes incident response: what to check first, when to escalate, when to rollback. Without one, night-time responders improvise under pressure—increasing time-to-resolution and the chance of making things worse. Write the runbook before the first incident, then refine it after each postmortem.
 
 ## Verification workflow
 
