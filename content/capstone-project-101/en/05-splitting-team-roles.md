@@ -74,11 +74,11 @@ Deployment check | Backend owner | Frontend owner | Must follow deployment check
 
 ## Key Terms
 
-- **lead**: *overall coordinator*.
-- **backend**: *server and API*.
-- **frontend**: *UI*.
-- **data**: *DB and analysis*.
-- **QA**: *quality verifier*.
+- **lead**: the overall coordinator who owns schedule alignment and final approval on scope changes.
+- **backend**: the server and API owner responsible for data flow and integration.
+- **frontend**: the UI owner responsible for user-facing screens and interactions.
+- **data**: the DB and analysis owner who manages data pipelines and sample data.
+- **QA**: the quality verifier who defines test criteria and confirms acceptance.
 
 ## Before/After
 
@@ -92,60 +92,145 @@ Deployment check | Backend owner | Frontend owner | Must follow deployment check
 
 List the team members clearly first, such as `A`, `B`, `C`, and `D`, so you can judge role overlap realistically.
 
+Assigning roles before listing people leads to fantasy org charts. Start from actual headcount and skill distribution.
+
 ### Step 2 — Map primary roles
 
 Map the primary roles explicitly, for example `A=lead`, `B=backend`, `C=frontend`, and `D=data`.
+
+Each person should have exactly one primary role. Dual-primary assignments create the very ambiguity this exercise aims to eliminate.
 
 ### Step 3 — Map backups
 
 Define the backup mapping early too, such as `backend=C`, `frontend=B`, and `data=A`.
 
+Backup does not mean "does double work." It means "can unblock the team within 24 hours if the primary is unavailable."
+
 ### Step 4 — Responsibility table
 
 For the responsibility table, concise pairings such as `deploy=(A, B)` and `test=(D, C)` are usually enough.
+
+The table answers one question: "When X is stuck, who decides?" If the table cannot answer that question for every workstream, it has gaps.
 
 ### Step 5 — Review cadence
 
 Set the review cadence explicitly; a weekly role review is usually enough to catch drift early.
 
+Roles evolve as the project moves through phases. A role that makes sense during requirements may need adjustment during integration. Reviewing weekly keeps assignments honest.
+
 ## What to Notice in This Code
 
-- A *primary* is *one person*.
-- A *backup* is *always* defined.
-- *RACI* is *concise*.
+- A *primary* is *one person* — shared ownership is no ownership.
+- A *backup* is *always* defined — single points of failure kill capstones.
+- *RACI* is *concise* — four columns maximum.
 
 ## Five Common Mistakes
 
-1. **Marking *everyone* as *co-owner*.**
-2. **No *backup*.**
-3. **The *lead* decides *everything*.**
-4. **Assigning *QA* at the *end*.**
-5. **Not *recording* role changes.**
+1. **Marking everyone as co-owner.** Shared responsibility becomes no responsibility.
+2. **No backup.** One sick team member stalls the entire project.
+3. **The lead decides everything.** Bottleneck by design.
+4. **Assigning QA at the end.** Quality criteria should exist before code is written.
+5. **Not recording role changes.** The team forgets who currently owns what.
 
 ## How This Shows Up in Production
 
-Company teams use *RACI* to clarify decision rights every week.
+Company teams use RACI matrices to clarify decision rights every sprint. The format is identical to what you build in a capstone — Responsible, Accountable, Consulted, Informed. Practicing it now means less ramp-up time in your first job.
 
 ## How a Senior Engineer Thinks
 
-- *Roles* are *written down*.
-- *Backups* are *required*.
-- *Decision rights* are *explicit*.
-- *Overlap* is *minimal*.
-- *Changes* are *announced*.
+- Roles are written down — verbal agreements vanish under pressure.
+- Backups are required — no single point of failure tolerated.
+- Decision rights are explicit — who proposes, who approves, who is informed.
+- Overlap is minimal — two owners means zero owners.
+- Changes are announced — silent role drift causes confusion.
 
 ## Checklist
 
-- [ ] *Primary* mapping.
-- [ ] *Backup* defined.
-- [ ] *RACI* table.
-- [ ] *Weekly* review.
+- [ ] Primary owner mapped for every workstream.
+- [ ] Backup defined for every primary owner.
+- [ ] RACI table completed and shared with the team.
+- [ ] Weekly review cadence scheduled.
 
 ## Practice Problems
 
 1. State what *RACI* means in one line.
 2. State the purpose of a *backup* in one line.
 3. State the *lead* responsibility in one line.
+
+## Deep Dive: Schedule Planning Table and Milestone Setup
+
+Once roles are set, the next challenge is placing them on a timeline. Many teams manage the role table and the schedule separately, which creates time slots that nobody actually owns. The role-assignment document should therefore include schedule planning and milestone criteria together.
+
+### 6-Week Schedule Planning Table
+
+| Week | Goal | Primary Role | Completion Criterion | Risk Signal |
+| --- | --- | --- | --- | --- |
+| Week 1 | Lock problem definition and requirements | Team lead | Must stories approved | 3+ requirement changes |
+| Week 2 | Secure core data / input path | Backend, Data | Sample input processed successfully | External data access delay |
+| Week 3 | Implement core flow | Frontend, Backend | Input → calculation → result connected | Repeated integration failure |
+| Week 4 | Test and fix defects | QA | Must test pass rate ≥ 90 % | Regression bug increase |
+| Week 5 | Demo rehearsal | Entire team | 60 s demo succeeds 3 times consecutively | 2+ demo failures |
+| Week 6 | Finalize presentation / retrospective | Team lead, QA | Slides and retro action log complete | Document gaps |
+
+### Milestone Definition Example
+
+| Milestone | Definition | Evidence Deliverable | Pass Condition |
+| --- | --- | --- | --- |
+| M1 Requirements Lock | Must scope confirmed | Requirements sheet v1 | Change-request hold rule agreed |
+| M2 MVP Connected | Core flow working | Demo video draft | 1 successful demonstration |
+| M3 Quality Stabilized | Defect risk reduced | Test report | Major defects = 0 |
+| M4 Presentation Ready | Delivery quality verified | Slides, demo script | Rehearsal time met |
+
+Milestones are not tools for recording "we were busy this week" — they are tools for judging "what is finished." If completion criteria are vague, even clear roles cannot prevent schedule blur.
+
+### Role-Schedule Sync Rules
+
+- The primary owner declares the weekly goal as a sentence.
+- The backup proposes an alternative plan within 24 hours when a blocker appears.
+- The team lead records the schedule-deviation cause in the weekly retro.
+- QA announces test criteria per milestone in advance.
+- No new features are added during the presentation week.
+
+### Schedule Adjustment Decision Frame
+
+```text
+Question 1: Does this change strengthen the core flow?
+Question 2: Does this change raise demo success probability?
+Question 3: Does this change increase Must test coverage?
+Question 4: Can the current team handle the increased scope?
+Conclusion: If 2+ answers are "No," defer to next week.
+```
+
+The quality of role assignment is ultimately measured by the team's ability to absorb schedule shocks. Operating the tables and rules above together lets the team speak the same language about "who finishes what by when" — and that shared language itself accelerates collaboration.
+
+## Practical Anchor: Role Assignment Standard and Branch Strategy
+
+Team roles are not about dividing people — they are about creating responsibility boundaries. When roles are ambiguous, nobody can confirm a decision when the schedule slips. The standard below is a minimal configuration directly applicable to small capstone teams.
+
+### RACI-Based Role Assignment Example
+
+| Task | Responsible (R) | Accountable (A) | Consulted (C) | Informed (I) |
+| --- | --- | --- | --- | --- |
+| Lock problem definition | PM | Team lead | Everyone | Advisor |
+| MVP implementation | Dev owner | Team lead | QA owner | Everyone |
+| Test / verification | QA owner | Team lead | Dev owner | Everyone |
+| Presentation materials | Presenter | PM | Everyone | Advisor |
+
+### Branch Collaboration Rules
+
+- Create a `feat/<owner>/<topic>` branch per feature unit.
+- Push to remote at least once per day to keep change history public.
+- Pin three items in every PR body: "Purpose / Changes / Verification."
+- Do not merge until the review checklist passes.
+
+```text
+PR Template
+- Purpose: what problem does this change solve
+- Changes: top 3 modifications
+- Verification: tests run and their results
+```
+
+Fixing roles and branch rules together reduces meeting time and speeds up decisions. Especially in the week before the presentation, confusion about who is finishing what drops significantly.
 
 ## Wrap-up and Next Steps
 

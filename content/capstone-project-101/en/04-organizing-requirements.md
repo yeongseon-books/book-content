@@ -75,11 +75,11 @@ Linked features: F-1 timetable input, F-2 conflict engine, F-3 results view
 
 ## Key Terms
 
-- **user story**: *user-perspective* request.
-- **acceptance**: *accept* criteria.
-- **non-functional**: *non functional* need.
-- **MoSCoW**: *priority* labels.
-- **traceability**: *trace links*.
+- **user story**: a request written from the user's perspective describing what they need and why.
+- **acceptance criteria**: concrete conditions that must be true for a story to count as done.
+- **non-functional**: quality attributes (performance, usability, security) that constrain the solution.
+- **MoSCoW**: a priority labeling system — Must, Should, Could, Won't.
+- **traceability**: explicit links from requirements to features, tests, and demo scenes.
 
 ## Before/After
 
@@ -93,68 +93,151 @@ Linked features: F-1 timetable input, F-2 conflict engine, F-3 results view
 
 Write the story in plain user language: as a student, I want instant conflict detection.
 
+A good story starts with a role ("as a …"), states the desire ("I want …"), and optionally explains the value ("so that …"). Keeping this structure forces you to stay in the user's world rather than the developer's.
+
 ### Step 2 — Acceptance criteria
 
 Summarize the acceptance criteria as a short checklist:
 
-- `input 5s`
-- `result 1s`
-- `error clear`
+- `input 5s` — user can complete input within 5 seconds
+- `result 1s` — system returns results within 1 second
+- `error clear` — any error message tells the user what to do next
+
+Each criterion must be observable. If you cannot demonstrate it live during the presentation, it is not acceptance criteria — it is a wish.
 
 ### Step 3 — Non-functional
 
 Keep the non-functional constraints separate as well:
 
-- `mobile`
-- `no_signup`
-- `korean_first`
+- `mobile` — layout works at 390 px width
+- `no_signup` — core flow usable without account creation
+- `korean_first` — all user-facing copy in Korean by default
+
+Non-functional items often get forgotten until the demo rehearsal reveals them. Writing them early prevents last-minute redesigns.
 
 ### Step 4 — Priority
 
 Record priority in one consistent format, for example `core=Must`, `share=Should`, and `ai=Could`.
 
+The MoSCoW rule keeps priority to four buckets maximum. More than four and the team starts gaming the labels. Fewer than three and everything becomes "high priority."
+
 ### Step 5 — Trace
 
 Write trace links directly, such as `ST-1 -> F-1, F-2`, so requirement IDs connect to implementation items.
 
+Traceability is what turns a requirements sheet into a living document. When a test fails, the trace tells you which user story is at risk. When a feature is cut, the trace shows which stories lose coverage.
+
 ## What to Notice in This Code
 
-- *Stories* start with *verbs*.
-- *Criteria* combine *numbers* and *readability*.
-- *Trace* uses *IDs*.
+- *Stories* start with *verbs* — they describe actions, not objects.
+- *Criteria* combine *numbers* and *readability* — measurable yet understandable.
+- *Trace* uses *IDs* — allowing cross-referencing without ambiguity.
 
 ## Five Common Mistakes
 
-1. **The *story* drifts into *feature description*.**
-2. **Forgetting *non-functional* needs.**
-3. ***Everything Must*.**
-4. **Subjective *criteria*.**
-5. **No *traceability*.**
+1. **The story drifts into feature description.** "Implement a conflict-detection module" is not a user story.
+2. **Forgetting non-functional needs.** Response time and mobile layout surprise the team during the demo.
+3. **Everything is Must.** When everything is highest priority, nothing is prioritized.
+4. **Subjective criteria.** "Works well" cannot be verified.
+5. **No traceability.** Disconnected requirements become invisible during testing.
 
 ## How This Shows Up in Production
 
-Startup PMs use *Must/Should/Could* labels every week.
+Startup PMs use Must/Should/Could labels every sprint planning. The practice is identical — requirements without priority labels produce infinite scope negotiation. Adding acceptance criteria to each ticket saves hours of back-and-forth between developers and product owners.
 
 ## How a Senior Engineer Thinks
 
-- *Stories* stay *short*.
-- *Criteria* are *measurable*.
-- *Priority* is *three or four buckets*.
-- *Non-functional* is *separate*.
-- *Trace* is *documented*.
+- Stories stay short — one sentence, one need.
+- Criteria are measurable — "within N seconds" beats "fast."
+- Priority is three or four buckets — never ten.
+- Non-functional lives separately — it is too easy to forget otherwise.
+- Trace is documented — orphan requirements rot silently.
 
 ## Checklist
 
-- [ ] *Five+ stories*.
-- [ ] *Acceptance criteria*.
-- [ ] *Non-functional* table.
-- [ ] *Priority* labels.
+- [ ] Five or more user stories written.
+- [ ] Each story has acceptance criteria with numbers.
+- [ ] Non-functional constraints in a separate table.
+- [ ] Priority labels (MoSCoW) assigned to every item.
 
 ## Practice Problems
 
 1. Define *user story* in one line.
 2. Define *acceptance criteria* in one line.
 3. State the meaning of *MoSCoW* in one line.
+
+## Deep Dive: Role Assignment Table and Collaboration Tool Comparison
+
+Once requirements are organized, the next thing you need is alignment between roles, tools, and decision flow. If you have a requirements document but no clarity on who owns each item's final decision, the document goes stale the moment a change request arrives. Requirements items must connect directly to team roles and collaboration tools.
+
+### Role Assignment Criteria Table
+
+| Area | Primary Owner | Backup | Deliverable | Approval Criterion |
+| --- | --- | --- | --- | --- |
+| Requirements maintenance | Team lead | QA owner | Requirements sheet, change log | Change reason and impact scope recorded |
+| API spec | Backend owner | Frontend owner | OpenAPI draft, sample request/response | Frontend confirms implementability |
+| Screen flow | Frontend owner | Team lead | Wireframes, screen state table | Core flow demonstrable in 60 seconds |
+| Test criteria | QA owner | Backend owner | Test scenarios, defect list | All Must features pass |
+| Schedule sync | Team lead | Everyone | Weekly plan, blocker log | Milestone delay detected early |
+
+The purpose of this table is not role rigidity — it is bottleneck elimination. When work is blocked, being able to immediately find "who decides" prevents requirements changes from cascading into schedule shocks.
+
+### Collaboration Tool Comparison
+
+| Tool | Strength | Weakness | Recommended Use |
+| --- | --- | --- | --- |
+| Notion | Easy document structuring and sharing | Low version-tracking granularity | Requirements drafts, meeting notes |
+| GitHub Issues | Strong change history and code linkage | Entry barrier for non-technical members | Implementation issues, bugs, action items |
+| Google Sheets | Fast table editing | Weak contextual linking | Priority tables, schedule tracking |
+| Figma | Easy screen flow sharing | Poor for requirements text tracking | UI flows, demo storyboards |
+| Slack/Discord | Instant communication | Decisions scattered across threads | Notifications, quick sync |
+
+The tool selection principle is "no single tool solves every problem." Separate your minimum toolset into a document-centric tool, a task-tracking tool, and a communication tool — that keeps operations simple.
+
+### Change Request Protocol
+
+```text
+1) Register the change proposal: write what and why in 3 sentences
+2) Impact analysis: link requirement ID, feature ID, test ID
+3) Role assignment: designate primary owner / backup / reviewer
+4) Approve or defer: judge against Must/Should criteria
+5) Record preservation: add date and reason to the change log
+```
+
+Applying this protocol lets you explain "the idea is good but we are not doing it now" with documented evidence. In team collaboration, conflict arises less from ideas themselves and more from priority misalignment — so a recordable process is essential.
+
+### Mistake Prevention Checklist
+
+- Does every requirement have an assigned owner and reviewer?
+- Have verbal agreements been reflected in the document?
+- Is duplicate entry across tools excessive?
+- Have Slack conversation decisions been promoted to issues or documents?
+- Is the change log reviewed at least once a week?
+
+When you design roles and tools alongside requirements, you drastically reduce the "documents exist but execution is slow" problem during MVP implementation.
+
+## Practical Anchor: Requirements Traceability Table and Demo Script Template
+
+The most frequent problem at the requirements stage is "documents exist but they do not connect to the presentation." To prevent this, track requirements, tests, and demo scenes in a single table.
+
+### Requirements Traceability Table
+
+| Requirement ID | User Story | Acceptance Criteria | Test Cases | Demo Scene |
+| --- | --- | --- | --- | --- |
+| RQ-01 | Enter timetable | Saved without input error | TC-01, TC-02 | Scene 1 |
+| RQ-02 | View conflicting courses | 100 % conflict detection | TC-03, TC-04 | Scene 2 |
+| RQ-03 | Share results | Share link generated | TC-05 | Scene 3 |
+
+### Presentation Demo Script Template
+
+```text
+Scene 1 (30 s): Introduce the problem situation
+Scene 2 (60 s): Input and verification flow
+Scene 3 (60 s): Result confirmation and value explanation
+Scene 4 (30 s): Limitations and next steps
+```
+
+Managing the script alongside the requirements document reduces last-minute scene changes before the presentation. It also immediately reveals which requirements are not actually demonstrated, making scope re-alignment easier.
 
 ## Wrap-up and Next Steps
 

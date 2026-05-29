@@ -130,6 +130,85 @@ Capture progress in numbers such as `done=12`, `todo=8`, and `blocked=2` so bloc
 
 Company teams use *two-week sprints* and *burndown* charts.
 
+## Practical Extension: Test Strategy Table and Integration Test Scenarios
+
+The most frequently underestimated task in schedule management is testing. When a team plans only implementation time and fails to reserve testing time separately, defects pile up in the final week and the entire plan crumbles. Therefore a test strategy must be explicitly included in the schedule document.
+
+### Test Strategy Table
+
+| Test Level | Purpose | Owner | Timing | Pass Criteria |
+| --- | --- | --- | --- | --- |
+| Unit tests | Verify core function logic | Backend / frontend devs | Immediately after feature dev | 90%+ pass rate on core functions |
+| Integration tests | Verify cross-component connections | QA + developers | Weekly | 100% pass on critical flows |
+| Regression tests | Confirm existing features unaffected | QA | Before deployment | 0 failures on key scenarios |
+| Demo rehearsal tests | Validate presentation environment | Entire team | Twice in the week before presentation | 60-second demo succeeds 3 consecutive times |
+
+### Integration Test Scenario Examples
+
+| Scenario ID | Input | Expected Result | Failure Response |
+| --- | --- | --- | --- |
+| IT-01 | Valid timetable input | "No conflict" message displayed | Check input parser logs |
+| IT-02 | Conflicting timetable input | Conflicting courses and time slots shown | Debug calculation module |
+| IT-03 | Empty input submitted | User-friendly error message | Add frontend validation |
+| IT-04 | Malformed CSV | Format error notice with re-upload prompt | Strengthen exception handling |
+| IT-05 | 20 repeated requests | Average response time meets threshold | Cache/computation optimization |
+
+### Schedule-Test Linkage Rules
+
+- Attach a separate test-pass criterion to each milestone.
+- Update related regression tests immediately when a new feature is added.
+- Prioritize blocker issues over feature issues.
+- During presentation week, share test failure count trends daily.
+- If the test pass rate drops below target, halt feature additions.
+
+### Weekly Test Report Format
+
+```text
+Week: 4
+Tests executed: 28
+Passed: 24
+Failed: 4
+Primary failure cause: missing input-format exception handling
+Next action: reinforce parser validation logic, add 3 regression cases
+```
+
+This report enables early schedule-risk detection without complex quality tools. In a capstone, the simpler the quality indicator, the faster the team shares it and converts it into action.
+
+### Pre-Presentation Stabilization Check
+
+- Fix the 5 core scenarios to demo.
+- Test in the same environment as the demo venue.
+- Prepare fallback demo material (video/screenshots) for network instability.
+- Separate defect priority into P1/P2 and triage accordingly.
+- Link the final rehearsal log to the retrospective document.
+
+The purpose of schedule management is not filling dates but surfacing failures early. Integrating the test strategy into the schedule document makes plan-vs-reality gaps visible faster and prevents the late-semester schedule collapse.
+
+## Practical Anchor: Gantt Chart Operation and Weekly Check Rules
+
+Schedule management is not about making a pretty timeline—it is about detecting deviation early. In a capstone, a one-week delay directly degrades presentation quality, so weekly reviews must follow a consistent format.
+
+### 8-Week Gantt Chart Example
+
+```text
+Week               1 2 3 4 5 6 7 8
+Problem/Requirements █ █
+MVP Implementation       █ █ █
+Integration Testing            █ █
+Presentation Prep                █ █
+Rehearsal & Fixes                  █ █
+```
+
+### Weekly Check Board Template
+
+| Item | Planned | Actual | Deviation | Action |
+| --- | --- | --- | --- | --- |
+| Implementation completion | 60% | 45% | -15% | Reduce scope |
+| Test pass rate | 90% | 82% | -8% | Add regression tests |
+| Rehearsal count | 2 | 1 | -1 | Reschedule time slot |
+
+When recording deviations, actions matter more than excuses. Write "why it was late" in one sentence, then decide "what to cut" immediately—that is what stabilizes the next week. The schedule is not a prediction tool; it is a priority-adjustment tool, and maintaining that mindset is essential.
+
 ## How a Senior Engineer Thinks
 
 - *Milestones* are *outcomes*.

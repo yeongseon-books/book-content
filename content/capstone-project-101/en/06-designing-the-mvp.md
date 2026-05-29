@@ -74,11 +74,11 @@ Feedback prompts: was the flow clear, was it fast enough, would you use it in re
 
 ## Key Terms
 
-- **MVP**: *Minimum Viable Product*.
-- **happy path**: the *normal flow*.
-- **out of scope**: outside the *scope*.
-- **demo**: a *live walkthrough*.
-- **feedback**: structured *responses*.
+- **MVP**: Minimum Viable Product — the smallest working version that tests your hypothesis.
+- **happy path**: the normal, expected user flow with no errors or edge cases.
+- **out of scope**: items explicitly deferred — documented so they do not creep back.
+- **demo**: a live walkthrough of the core flow in front of an audience.
+- **feedback**: structured responses collected from testers to guide the next iteration.
 
 ## Before/After
 
@@ -92,64 +92,171 @@ Feedback prompts: was the flow clear, was it fast enough, would you use it in re
 
 Reduce the core flow to one readable sentence, for example: register, upload, then share.
 
+If the sentence has more than three verbs, the scope is probably too wide. A single verb chain — "enter → process → display" — is the ideal granularity for a capstone MVP.
+
 ### Step 2 — Out of scope list
 
 Write the out-of-scope items down explicitly:
 
-- `payment`
-- `i18n`
-- `admin`
+- `payment` — revenue is not the semester goal
+- `i18n` — Korean-only is sufficient for the demo
+- `admin` — no admin panel needed for 3 test users
+
+Each item should have a one-line justification so the team does not revisit the same debate later.
 
 ### Step 3 — Demo scenario
 
 Write the demo sequence in the same order you will show it, such as `login_demo_user`, `upload_sample`, and `show_share_link`.
 
+The demo scenario doubles as a manual test script. If you can demo it, you can test it. If you cannot demo it, it is not in MVP scope.
+
 ### Step 4 — Success criteria
 
 Make the success criteria immediately checkable, such as `happy_path <= 60s` and `errors = 0`.
+
+Criteria should be observable during the presentation itself. A criterion you can only verify offline is a weak criterion.
 
 ### Step 5 — Feedback form
 
 Keep the feedback prompts short and repeatable, such as `clarity`, `speed`, and `value`.
 
+Three questions are enough. More than five and testers disengage. Fewer than two and you learn nothing actionable.
+
 ## What to Notice in This Code
 
-- The *flow* is one *sentence*.
-- *Out of scope* is *explicit*.
-- *Criteria* are *numbers*.
+- The *flow* is one *sentence* — simplicity forces focus.
+- *Out of scope* is *explicit* — invisible cuts come back as invisible scope creep.
+- *Criteria* are *numbers* — "works well" is not a criterion.
 
 ## Five Common Mistakes
 
-1. **Measuring *progress* by *feature count*.**
-2. **Trying to handle *every* exception.**
-3. **No *demo scenario*.**
-4. **No *feedback* form.**
-5. **Adding *external dependencies* that grow risk.**
+1. **Measuring progress by feature count.** Counting features instead of verifying the flow produces false confidence.
+2. **Trying to handle every exception.** Edge-case completeness belongs after the happy path works.
+3. **No demo scenario.** Without a scripted demo, presentation day becomes improvisation.
+4. **No feedback form.** Unstructured impressions are hard to act on.
+5. **Adding external dependencies that grow risk.** Each new API or service multiplies failure modes.
 
 ## How This Shows Up in Production
 
-Startups also start with a *one-line happy path*.
+Startups also start with a one-line happy path. The Y Combinator motto "do things that don't scale" is essentially an MVP contract — pick one flow, prove it works for one user, then expand. The discipline you build here transfers directly.
 
 ## How a Senior Engineer Thinks
 
-- An *MVP* is a *learning tool*.
-- The *flow* is *single*.
-- *Cutting* scope is *bold*.
-- The *demo* is *scripted*.
-- *Feedback* is *structured*.
+- An MVP is a learning tool — not a shrunken product.
+- The flow is single — one scenario, proven end-to-end.
+- Cutting scope is bold — saying "no" is the hardest and most valuable skill.
+- The demo is scripted — no improvisation during presentations.
+- Feedback is structured — specific questions yield specific improvements.
 
 ## Checklist
 
-- [ ] *Core flow* defined.
-- [ ] *Out-of-scope* list.
-- [ ] *Demo* scenario.
-- [ ] *Feedback* form.
+- [ ] Core flow defined in one sentence.
+- [ ] Out-of-scope list with at least 3 items documented.
+- [ ] Demo scenario scripted step by step.
+- [ ] Feedback form with 3 questions prepared.
 
 ## Practice Problems
 
 1. State what *MVP* means in one line.
 2. Define *happy path* in one line.
 3. State the meaning of *out of scope* in one line.
+
+## Deep Dive: Technical Design Document Structure and ADR Example
+
+After locking MVP scope, leave a minimal technical design document before coding starts. Teams without a design doc repeat the same debates, and when standards shift mid-implementation the schedule destabilizes. Teams that maintain short design docs and ADRs preserve decision context, so they adjust faster when changes arrive.
+
+### Technical Design Document Structure
+
+| Section | What to Include | Length Guide |
+| --- | --- | --- |
+| Background and goal | What problem are we solving? What is MVP scope? | 5–8 sentences |
+| Core scenario | User's happy path and failure path | 1 diagram + explanation |
+| System composition | Frontend / backend / data / deployment layout | 1 component table |
+| Data model | Input/output schemas, required fields | 1–2 tables |
+| API contract | Endpoints, request/response, error codes | Table or OpenAPI draft |
+| Quality criteria | Performance, error handling, test standards | Checklist |
+| Risks and alternatives | Expected risks, mitigations, alternative comparison | 5–10 sentences |
+
+### Component Responsibility Boundary Example
+
+| Component | Responsible For | NOT Responsible For |
+| --- | --- | --- |
+| Web UI | Input collection, result display | Data persistence logic |
+| API server | Validation, conflict calculation, response generation | Screen state management |
+| Data layer | Timetable data storage/retrieval | Business rule decisions |
+| Test module | Core scenario automated verification | Production monitoring |
+
+Clear boundaries reduce "whose job is this?" questions between team members. Boundaries blur easily during the MVP stage, which makes documentation even more important.
+
+### ADR Example
+
+```text
+ADR-003: Run conflict calculation engine on the server side
+
+Status: Accepted
+Date: 2026-05-21
+
+Context:
+- Placing calculation logic in both frontend and backend increases inconsistency risk.
+- Consistency of calculation results is critical during the demo presentation.
+
+Decision:
+- Conflict calculation runs in a single server-side module.
+- Frontend handles input validation and result display only.
+
+Alternatives:
+1) Client-side calculation: faster to implement but consistency management burden grows
+2) Server-side calculation: requires network round-trip but centralizes rules
+
+Consequences:
+- Test criteria can focus on server-side tests.
+- API latency monitoring criteria become additionally necessary.
+```
+
+### Design Review Questions
+
+- Does this design directly support the MVP core flow?
+- Is there a simpler alternative for the most complex part?
+- Are boundaries separated into testable units?
+- Are failure symptoms visible to the user defined?
+- Is this a design decision that can be demonstrated during the presentation?
+
+### Document Operation Principles
+
+A design document is not a document that must be perfect — it is a living reference. Rather than rewriting the whole thing every time a change occurs, accumulating decisions as ADRs is more efficient. During the MVP stage, recording "why we made this decision" matters especially. That record becomes the shared evidence base for schedule management, presentation Q&A, and the final retrospective.
+
+## Practical Anchor: MVP Acceptance Criteria Table and CI/CD Pipeline
+
+The core of MVP design is not feature count — it is "done criteria." Without done criteria, you cannot judge whether implementation is finished, and rehearsals become an endless edit loop.
+
+### MVP Acceptance Criteria Table
+
+| Feature | Done Condition | Failure Condition | Verification Method |
+| --- | --- | --- | --- |
+| Input processing | 5 sample inputs processed without error | Malfunction when required field missing | Unit test + manual demo |
+| Core calculation | Conflict detection accuracy 100 % | 1+ conflict missed | Test dataset verification |
+| Result screen | Key info visible within one scroll | Key info missing | Checklist review |
+
+### Minimal CI/CD Pipeline for Capstone
+
+```yaml
+stages:
+  - test
+  - build
+  - deploy
+
+test:
+  script:
+    - pytest -q
+build:
+  script:
+    - docker build -t capstone-app .
+deploy:
+  script:
+    - ./scripts/deploy_staging.sh
+```
+
+This configuration is not complex, but its effect is large. Because builds cannot proceed without passing tests, quality drops are caught early. Fixing a staging deployment also keeps the demo rehearsal environment stable.
 
 ## Wrap-up and Next Steps
 

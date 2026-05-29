@@ -126,6 +126,104 @@ Summarize the learning as short reusable lines such as `scope_first`, `ci_early`
 
 Companies run *sprint retrospectives* and *postmortems*.
 
+## Practical Extension: KPT Framework and Personal Growth Record
+
+For a retrospective document to become a team learning asset, separating team retrospective from individual retrospective is effective. The team retro focuses on system and process improvements; the individual retro focuses on skill growth and next learning plans. Mixing the two often creates blame dynamics or dilutes action items.
+
+### Expanded KPT Framework
+
+| Category | Question | Example Entry | Next Action Link |
+| --- | --- | --- | --- |
+| Keep | What worked well? | Requirement change log reduced schedule shock | Reuse same template |
+| Problem | What recurred? | Integration test failures clustered before demo | Move test cycle earlier |
+| Try | What experiment to run next? | Fix a weekly rehearsal slot | Calendar pre-emption |
+| Learn | What new principle was gained? | Scope-exclusion documentation raised quality | Reflect in MVP doc standard |
+| Stop | What habit to drop? | Verbal-only agreements in meetings | Mandate decision log |
+
+When expanding KPT, strengthening the link to action items matters more than adding categories. If an item has no "next action" attached, the retro ends as mere record.
+
+### Personal Growth Record Template
+
+```text
+[Basic Info]
+Name:
+Role:
+Period:
+
+[Achievements]
+Top 2 contributions this project:
+
+[Technical Growth]
+New skills/tools learned:
+How learned (docs, implementation, review, etc.):
+Items to reuse in the next project:
+
+[Collaboration Growth]
+Communication strengths:
+Lessons from conflict situations:
+Collaboration habits to improve next time:
+
+[Failures and Lessons]
+Biggest mistake (1):
+Cause:
+Prevention action:
+
+[Next 4-Week Plan]
+Learning goal 1:
+Execution plan:
+Measurement criteria:
+```
+
+### Team-Individual Retro Connection Rules
+
+- Cross-check team Problem items against individual failure entries.
+- Clearly assign ownership of personal actions from team Try items.
+- Verify that individual learning plans connect to the next project's preparation.
+- Version the retro document in the repository for future reference.
+- At the next project kickoff, read the top 5 sentences from the previous retro first.
+
+### Action Item Quality Criteria
+
+| Criterion | Bad Example | Good Example |
+| --- | --- | --- |
+| Specificity | "Test harder" | "Run 10 integration test cases every Tuesday" |
+| Accountability | "Team will check" | "QA owner reports results as an issue" |
+| Deadline | "Reflect next time" | "Apply by week 2 of next project" |
+| Measurability | "Improve quality" | "Keep defect reopen rate under 20%" |
+
+### The 48-Hour Rule
+
+If action items are not transferred to actual task-tracking tools within 48 hours after the retro, execution probability drops sharply. Therefore the following three steps are recommended immediately after the retro meeting ends:
+
+1. Register action items as issues.
+2. Confirm assignees and deadlines.
+3. Pre-empt the next review date on the calendar.
+
+The quality of a project retrospective is judged not by the eloquence of its sentences but by the execution rate of its next actions. Operating KPT alongside personal growth records converts the capstone from a one-off assignment into a long-term growth asset.
+
+## Practical Anchor: Retrospective Checklist and Handoff Document
+
+Retrospective quality is determined not by how long the reflection essay is, but by how many reusable rules it leaves for the next project. Therefore the retro document should not end with "went well / was tough" but must be converted into executable items.
+
+### Retrospective Checklist
+
+- Separate verified assumptions from failed assumptions in the original proposal.
+- Classify schedule delays into technical issues vs. decision-making delays.
+- Verify via git log whether the branch strategy was actually followed.
+- Record root causes for repeatedly failing CI/CD pipeline stages.
+- Reflect presentation slide and demo script improvement points in the next template.
+
+### Next-Project Handoff Document Template
+
+| Item | This Project Lesson | Next Project Rule |
+| --- | --- | --- |
+| Problem definition | Broad user scope caused early instability | Document excluded users by end of week 1 |
+| Schedule management | Insufficient test buffer | Fix 0.5 days/week for regression testing |
+| Collaboration method | Inconsistent PR review standards | Lock code-review checklist |
+| Presentation prep | Too few rehearsals | 2 rehearsals/week starting 2 weeks before |
+
+When the retrospective document reaches this level, the capstone transforms from a one-time assignment into the team's operational asset. That is the result this final chapter must secure.
+
 ## How a Senior Engineer Thinks
 
 - Start from *facts*.

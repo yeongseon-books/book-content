@@ -127,6 +127,76 @@ For a simple comparison, it is enough to subtract learning cost and ops burden f
 
 Companies record decisions in *ADRs*.
 
+## Practical Extension: Implementation Checklist and Code-Quality Criteria
+
+Selecting a stack is only the first half of the decision. The second half is confirming that the selected tools actually compose into a shippable flow. An implementation checklist and a shared quality table prevent "the stack works on my laptop" from becoming "the stack crashes in the demo."
+
+### Implementation Checklist
+
+Before declaring a stack decision final, the team should verify:
+
+- Local dev environment reproduces in under 10 minutes on a fresh machine.
+- A hello-world endpoint deploys to the target host without manual steps.
+- The CI pipeline finishes in under 10 minutes including dependency install.
+- Secrets injection works identically in local, CI, and production.
+- A rollback procedure is documented and tested at least once.
+
+### Code-Quality Criteria Table
+
+| Criterion | Target | Measurement | Responsible |
+| --- | --- | --- | --- |
+| Lint pass rate | 100% | CI linter job | All developers |
+| Unit-test coverage (core) | 80%+ | Coverage report | Backend lead |
+| PR review turnaround | Under 24 hours | Repo metrics | Team lead |
+| Build time | Under 10 minutes | CI log | DevOps owner |
+| Documented API routes | 100% of shipped routes | Endpoint list | Backend lead |
+
+### Review Process
+
+Code reviews in a capstone are not gatekeeping—they are knowledge transfer. Agree on these rules early:
+
+- Every PR gets at least one reviewer within 24 hours.
+- Reviewers focus on correctness and readability, not style preferences already covered by the linter.
+- Authors resolve comments or reply with a rationale—silent dismissals are not allowed.
+- The merge button belongs to the author after approval, not the reviewer.
+
+### Lightweight Quality Dashboard
+
+A complex monitoring stack is overkill for a capstone, but a simple text-based dashboard keeps quality visible:
+
+```text
+Week: 5
+Lint pass: 100%
+Test pass: 22/24 (2 flaky — filed as issues)
+PR turnaround: avg 18h
+Build time: 7m 20s
+Open blockers: 1 (auth token refresh)
+```
+
+Post this in the team channel weekly. The dashboard is not a report card—it is an early-warning system that prevents quality drift from going unnoticed until the demo.
+
+## Practical Anchor: Stack Decision Table and CI/CD Compatibility
+
+Once the team scores familiarity and cost, the decision should land in a concrete comparison table. This table becomes the reference that reviewers and advisors can point to during the final presentation.
+
+### Stack Decision Table
+
+| Layer | Candidates | Strengths | Risks | Decision |
+| --- | --- | --- | --- | --- |
+| Backend | FastAPI / Flask | High productivity | Team familiarity gap | FastAPI |
+| Frontend | React / HTMX | High expressiveness | Initial learning curve | React |
+| Data | SQLite / PostgreSQL | Simple setup | Scaling constraints | PostgreSQL |
+| Deployment | Render / Railway | Easy configuration | Free-tier limits | Render |
+
+### CI/CD Compatibility Checklist
+
+- Confirm the chosen runtime version matches the CI environment exactly.
+- Verify build artifact generation completes within 10 minutes.
+- Check that secret injection is consistent between local and deployment environments.
+- Document the rollback procedure and execute it at least once.
+
+Operating the stack decision table alongside the compatibility checklist greatly reduces the "the tech looked great but the demo was unstable" scenario.
+
 ## How a Senior Engineer Thinks
 
 - *Familiarity* is *speed*.

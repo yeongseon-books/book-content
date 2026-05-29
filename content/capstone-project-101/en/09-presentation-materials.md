@@ -127,6 +127,96 @@ Write time allocation in numbers, for example `talk=8`, `demo=5`, and `qna=7`, s
 
 Investor pitches also use the *problem solution result* arc.
 
+## Practical Extension: Slide Composition Table and Demo Script Example
+
+Presentation quality is determined more by message structure than slide design. In a capstone with limited time, you must show the problem, the choices made, and the results—so preparing a per-slide purpose table and a separate demo script is essential.
+
+### Slide Composition Table
+
+| Slide # | Title | Core Message | Visual Aid | Speaking Time |
+| --- | --- | --- | --- | --- |
+| 1 | Problem Background | Why this problem causes real inconvenience | User-situation image | 1 min |
+| 2 | Problem Definition | Whose specific pain are we solving | Problem-statement box | 1 min |
+| 3 | Solution Approach | Why this flow was chosen | System flow diagram | 1 min |
+| 4 | MVP Scope | What was included and excluded | Scope table | 1 min |
+| 5 | Demo | Does the core flow actually work | Live demonstration | 3 min |
+| 6 | Result Metrics | What was validated | Metrics table/graph | 1 min |
+| 7 | Limitations & Improvements | What remains and how to extend | Roadmap | 1 min |
+| 8 | Conclusion | What learning this project left behind | 3 summary sentences | 1 min |
+
+### Demo Script Example
+
+```text
+0:00-0:20  Introduce demo goal
+"I'll now demonstrate the timetable conflict checker's core flow in 60 seconds."
+
+0:20-0:50  Input stage
+"Paste a sample timetable and press the check button."
+
+0:50-1:20  Computation/result stage
+"Conflicting courses and time slots are displayed immediately."
+
+1:20-1:40  Value confirmation
+"Manual checking time is significantly reduced compared to before."
+
+1:40-2:00  Backup transition notice
+"If a network issue occurs, I'll continue with the same flow using a recorded video."
+```
+
+Preparing the script sentence-by-sentence reduces explanation gaps caused by stage nerves. Fixing the opening and closing sentences of the demo in particular stabilizes delivery.
+
+### Expected Q&A Preparation Table
+
+| Question Type | Expected Question | Answer Core | Evidence Document |
+| --- | --- | --- | --- |
+| Tech choice | Why did you pick this stack? | Low learning cost and ops burden | ADR document |
+| Scope adjustment | Why was a feature excluded? | High difficulty relative to demo impact | MVP scope table |
+| Testing | How did you verify reliability? | Integration test scenarios passed | Test report |
+| Extension plan | What is the next step? | Recommendations feature / mobile | Roadmap slide |
+
+### Rehearsal Operation Checklist
+
+- Mark speaker-switch points down to the second.
+- Practice the backup-transition sentence for demo failure.
+- Fix a "one-line conclusion" for each slide.
+- Pull 10 random questions and rehearse answers.
+- Pre-designate which slides to cut if time overruns.
+
+### Reducing Presentation Wobble
+
+Presentations require clear priority delivery over perfect information delivery. "Show less, repeat the key point" is more effective than "show everything." Operating the slide composition table and demo script together ensures the entire team delivers the same message, and evaluators can quickly understand the project's decision quality.
+
+## Practical Anchor: Slide Structure and Demo Script Template
+
+Presentation materials need structure before design. Even with many slides, if the message order is unclear, delivery power drops sharply. For capstone presentations, fixing a problem-solution-validation-retrospective sequence is the most stable approach.
+
+### 10-Slide Standard Structure
+
+| Slide # | Title | Core Message |
+| --- | --- | --- |
+| 1 | Problem Background | Why this problem matters |
+| 2 | User Definition | Who benefits from the solution |
+| 3 | Existing Approach Limits | Evidence of current inconvenience |
+| 4 | Proposed Solution | The core idea |
+| 5 | System Flow | Summary of how it works |
+| 6 | MVP Scope | What was built this semester |
+| 7 | Validation Results | Metrics and test outcomes |
+| 8 | Demo Scene | Actual usage flow |
+| 9 | Limitations & Risks | Remaining challenges |
+| 10 | Retrospective & Next Steps | Learning and extension plan |
+
+### Demo Script Template
+
+```text
+Opening (20s): Explain the user problem in one sentence
+Scene 1 (40s): Input and initial state
+Scene 2 (60s): Core processing
+Scene 3 (40s): Result and metrics confirmation
+Closing (20s): Limitations and next experiment
+```
+
+The script should be managed as a team document, not a personal presenter's note. That way, even if the presenter changes, the message order stays intact, and Q&A responses remain grounded in the same evidence.
+
 ## How a Senior Engineer Thinks
 
 - *Narrative* outranks *features*.
