@@ -51,117 +51,185 @@ This is the 9th post in the Data Science Career 101 series.
 
 Technical patterns are often portable. Domain judgment is what makes the same pattern useful in the right place.
 
-You cannot reliably interpret retention, fraud, churn, utilization, or margin if you do not understand the business model and the operating constraints behind those words.
+You cannot reliably interpret retention, fraud, churn, utilization, or margin if you do not understand the business model and the operating constraints behind those words. Domain expertise is what separates a person who knows how to run a query from a person who knows what question to ask.
 
-Domain expertise is what separates a person who knows how to run a query from a person who knows what question to ask. It grows faster if you read your company's business context, not just the code.
+## IC Staff vs Manager: Two Growth Paths
+
+Before diving into how to build domain expertise, it helps to understand which path you are building it for. Senior individual contributors and managers both need domain knowledge, but they apply it differently.
+
+| Dimension | IC Staff | Manager |
+| --- | --- | --- |
+| Mission | Solve the hardest technical problems in the domain | Enable the team to solve problems at scale |
+| Influence method | Technical depth and written artifacts | People development and process design |
+| Key deliverables | Architecture docs, models, reference implementations | Hiring plans, team roadmaps, stakeholder alignment |
+| Success metric | Quality and reuse of solutions | Team velocity and retention |
+| Daily work | Deep focus, code/analysis, design reviews | 1:1s, cross-team meetings, prioritization |
+| Primary risk | Isolation from business context | Distance from technical reality |
+
+Neither path is superior. The choice depends on what energizes you over a multi-year horizon.
+
+### IC vs Manager Self-Check
+
+| Question | IC Signal | Manager Signal |
+| --- | --- | --- |
+| What energizes me at the end of a long day? | Solving a hard technical puzzle | Watching someone on my team grow |
+| Where do I want influence to come from? | Depth of expertise and artifacts | People and process design |
+| What am I willing to sacrifice? | Broad organizational control | Hands-on technical depth |
+
+If your answers lean one way consistently, that is the path worth investing in. Domain expertise compounds on both paths, but the application differs.
+
 ## Key Terms
 
-- **domain**: An industry or business area.
-- **glossary**: A list of defined terms.
-- **KPI**: Key performance indicator.
-- **playbook**: Operational response guide.
-- **shadowing**: Job-shadow observation.
+- **domain**: An industry or business area with its own vocabulary, KPIs, regulations, and decision patterns.
+- **glossary**: A curated list of defined terms that prevents miscommunication across teams.
+- **KPI**: Key performance indicator—the metric a team uses to judge success.
+- **playbook**: An operational response guide that codifies domain-specific best practices.
+- **shadowing**: Spending time observing how another role (sales, ops, support) actually works day-to-day.
 
 ## Before/After
 
-**Before**: "I tweak dashboards without knowing the industry."
+**Before**: "I tweak dashboards without knowing why the business cares about this number."
 
-**After**: "I converse using KPIs and vocabulary."
+**After**: "I converse using KPIs and domain vocabulary, and my analysis connects to real decisions."
 
-## Hands-on: Five-Step Domain Study
+## Hands-on: Four-Week Domain Learning Project
 
-Pick one domain (marketing, finance, operations). Spend one month: read strategy docs, sit in one meeting, run one query, write one analysis, ask one industry expert.
+Rather than vaguely "studying the industry," structure domain learning as a time-boxed project with deliverables.
+
+| Week | Focus | Deliverable |
+| --- | --- | --- |
+| 1 | Vocabulary and glossary | 30-term glossary with definitions and examples |
+| 2 | KPI structure and metric formulas | 5-KPI reference sheet with owners and consumers |
+| 3 | Field observation and stakeholder interviews | Shadow notes + 3 questions surfaced |
+| 4 | Synthesis and presentation | One-page domain brief shared with team |
+
 ### Step 1 — Build a Glossary
 
 ```text
 - 30 words
-- definition + example
+- definition + example + common misuse
 ```
+
+Start with the terms your team uses in Slack and meetings that you cannot define precisely. Precision here prevents weeks of misalignment later.
 
 ### Step 2 — Five Key Metrics
 
 ```text
 - definition
-- formula
+- formula (numerator / denominator)
 - consuming team
+- decision it drives
 ```
+
+For each metric, ask: "If this number moves 10%, what action does the team take?" If nobody can answer, the metric may be vanity.
 
 ### Step 3 — Field Shadowing
 
 ```text
 - spend a day with sales or operations
-- notes and questions
+- notes: what surprised you
+- questions: what do they wish data could answer
 ```
+
+Field observation reveals what dashboards hide. The gap between "what we measure" and "what actually happens" is where the best analysis questions live.
 
 ### Step 4 — External Study
 
 ```text
-- one industry conference per quarter
-- industry news RSS
+- one industry conference or report per quarter
+- industry news RSS (2-3 sources)
+- one competitive teardown per half
 ```
 
 ### Step 5 — Quarterly Retro
 
 ```text
-- ten new words
-- three new metrics
+- ten new words mastered
+- three new metrics understood
+- one domain insight applied to analysis
 ```
+
+## Domain Expertise by Industry
+
+Domain knowledge is not generic. What matters varies sharply by sector.
+
+| Industry | Key Metrics | Common Misconception | Learning Method |
+| --- | --- | --- | --- |
+| E-commerce | GMV, conversion rate, return rate, LTV | "Revenue = success" (ignoring returns and CAC) | Shadow CS/ops, read refund logs, map the order lifecycle |
+| Fintech | AUM, default rate, compliance score, NIM | "More users = more revenue" (ignoring risk exposure) | Study regulatory filings, attend compliance reviews |
+| SaaS | MRR, churn, NRR, activation rate | "Low churn = healthy" (ignoring expansion revenue) | Join customer success calls, read cancellation surveys |
+
+The fastest way to build credibility in any domain: learn what veterans *assume everyone already knows*, and close that gap explicitly.
+
+## Expert Communication Template
+
+When presenting analysis to domain experts, structure your message to show you understand their world:
+
+```text
+1) Observation: "We see [metric] moving [direction] over [period]."
+2) Interpretation: "In the context of [domain factor], this likely means [hypothesis]."
+3) Limitations: "This does not account for [known gap or confound]."
+4) Proposal: "I recommend [action] and suggest we validate by [method]."
+```
+
+This four-line pattern signals domain awareness. It separates your analysis from generic dashboard commentary.
 
 ## What to Notice in This Code
 
-- Vocabulary is the entry point.
-- Metrics give direction.
-- The field reveals truth.
+- Vocabulary is the entry point to domain fluency.
+- Metrics give direction only when you understand what decisions they drive.
+- Field observation reveals the gap between measurement and operational reality.
 
 ## Five Common Mistakes
 
-1. **Going deep on tech only.**
-2. **No vocabulary.**
-3. **Vague metric definitions.**
-4. **Not knowing the field.**
-5. **Skipping external study.**
+1. **Going deep on tech only.** Technical skill without domain context produces impressive work that misses the point.
+2. **No vocabulary investment.** You cannot ask good questions in a language you do not speak.
+3. **Vague metric definitions.** If two people define the same KPI differently, every analysis built on it is suspect.
+4. **Never visiting the field.** Dashboards flatten reality. Observation restores the dimensions.
+5. **Skipping external study.** Your company's view of the market is one perspective. External sources provide the others.
 
 ## How This Shows Up in Production
 
 In domain-heavy industries such as fintech, healthcare, and gaming, the same metric can imply completely different actions depending on regulation, user behavior, and operating model.
 
-That is why senior data people are often the ones who can translate between numbers and business reality without reducing either side to vague summaries.
+That is why senior data people are often the ones who can translate between numbers and business reality without reducing either side to vague summaries. They have earned the vocabulary and context to make precise claims.
 
 ## How a Senior Engineer Thinks
 
-- Vocabulary first.
-- Define metrics.
-- Observe the field.
-- Study externally.
-- Sustain the loop.
+- Vocabulary first—you cannot reason about what you cannot name.
+- Define metrics until the formula is unambiguous and the consumer is clear.
+- Observe the field regularly—operational reality shifts faster than dashboards update.
+- Study externally to calibrate your company's assumptions against the market.
+- Sustain the loop: glossary → metrics → observation → synthesis → repeat.
 
 ## Checklist
 
-- [ ] 30 vocabulary terms.
-- [ ] Five KPIs.
-- [ ] One shadow day.
-- [ ] Quarterly retro.
+- [ ] Compiled a 30-term domain glossary with definitions and examples.
+- [ ] Documented five KPIs with formulas, owners, and the decisions they drive.
+- [ ] Completed at least one shadow day with a non-data team (sales, ops, support).
+- [ ] Scheduled a quarterly domain retro to measure vocabulary and metric growth.
 
 ## Practice Problems
 
-1. One line: define KPI.
-2. One line: example of a playbook.
-3. One line: criterion for domain study.
+1. Pick one KPI your team uses. Write its exact formula, name who consumes it, and state what action a 10% change triggers.
+2. Name one domain term you have been using loosely. Define it precisely in one sentence.
+3. Describe one insight you could only get from field observation, not from a dashboard.
 
 ## Wrap-up and Next Steps
 
-Domain expertise grows slowly, but it compounds hard. A stronger glossary leads to better questions, better questions lead to better metrics, and better metrics lead to more credible analysis.
+Domain expertise grows slowly, but it compounds hard. A stronger glossary leads to better questions, better questions lead to better metrics, and better metrics lead to more credible analysis. The investment pays off most visibly when your proposals stop needing translation—because you already speak the business language.
 
 The next post closes the series by looking at what changes as you grow from junior execution toward senior impact.
 
 ## Answering the Opening Questions
 
-- **Why is domain expertise important in data roles?**
-  - The article covered the core concepts and strategies you need to know for building domain expertise.
-- **How should you learn terminology and KPIs?**
-  - Through examples, we saw how to approach real situations and what's easy to miss.
-- **Why does field observation improve your ability to interpret numbers?**
-  - When actually preparing, you should set both short-term (2-week) and long-term (3-month) strategies and improve continuously.
+- **Why does domain expertise change the quality of data work so much?**
+  - Because the same technical skill applied to the wrong question produces zero value. Domain knowledge tells you which questions matter, which metrics drive decisions, and which interpretations are plausible given business constraints.
+- **How should you start learning the vocabulary and KPI structure of an industry?**
+  - Structure it as a four-week project: glossary first, then metric formulas with owners, then field observation, then a synthesis document. External study each quarter keeps the loop alive.
+- **Why does field observation improve metric interpretation?**
+  - Dashboards compress reality into numbers. Observation reveals the operational context—workarounds, edge cases, human decisions—that explains why a metric moves the way it does.
+
 <!-- toc:begin -->
 ## In this series
 

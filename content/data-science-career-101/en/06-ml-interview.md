@@ -39,14 +39,6 @@ This is the 6th post in the Data Science Career 101 series.
 - How should you explain model choice in a way that reflects real trade-offs?
 - Why can metric selection not be separated from the problem definition?
 
-## What You Will Learn
-
-- *Fundamentals* questions
-- *Model choice* logic
-- *Evaluation* metrics
-- *Production* traps
-- *ML system* design
-
 ## Why It Matters
 
 Memorizing models without a decision frame usually produces shallow answers.
@@ -54,6 +46,7 @@ Memorizing models without a decision frame usually produces shallow answers.
 Interviewers want to hear how you reason under constraints: data size, interpretability, latency, class imbalance, labeling quality, and post-deployment drift. The model matters, but the reasoning matters more.
 
 ML interview questions rarely have one right answer. Instead, they test whether you ask good clarifying questions, think about trade-offs, and know when to keep it simple.
+
 ## Key Terms
 
 - **bias-variance**: The balance between underfit and overfit.
@@ -71,11 +64,14 @@ ML interview questions rarely have one right answer. Instead, they test whether 
 ## Hands-on: Five Answer Patterns
 
 Practice building five core answers: classification problem, regression problem, unbalanced data, feature selection, and model evaluation. These five cover 70% of real interviews.
+
 ### Step 1 — Fundamentals
 
 ```text
 Explain bias-variance in one line.
 ```
+
+Good fundamentals answers are concise but show the trade-off structure. For bias-variance: "high bias misses the signal; high variance captures noise as if it were signal."
 
 ### Step 2 — Model Choice
 
@@ -84,11 +80,15 @@ Explain bias-variance in one line.
 - data size, interpretability
 ```
 
+When explaining model choice, never start with the model name. Start with the problem constraint. "We have 5K labeled rows, the stakeholder needs to audit individual predictions, and latency must stay under 50ms" immediately narrows the field without sounding like a memorized list.
+
 ### Step 3 — Evaluation
 
 ```python
 from sklearn.metrics import precision_score, recall_score, roc_auc_score
 ```
+
+Metric selection is inseparable from problem definition. If the cost of a false negative is 100x the cost of a false positive (fraud detection, cancer screening), optimizing accuracy is misleading. Always connect the metric back to the business cost structure.
 
 ### Step 4 — Production Traps
 
@@ -98,6 +98,14 @@ from sklearn.metrics import precision_score, recall_score, roc_auc_score
 - time leakage
 ```
 
+Interviewers often probe production traps because they separate textbook knowledge from deployment experience. Below is a table of the three most common traps and how to address them in an interview answer:
+
+| Trap | What Goes Wrong | Interview Answer Pattern |
+| --- | --- | --- |
+| Data leakage | Future information bleeds into training features | "I check whether any feature uses data unavailable at prediction time. Common sources: aggregating over future rows, joining on post-event labels." |
+| Class imbalance | Model predicts majority class and still scores high on accuracy | "I report precision-recall and calibration, not accuracy. I consider stratified splits, SMOTE only if justified, and threshold tuning." |
+| Post-deploy degradation | Distribution shifts after launch | "I define monitoring metrics (PSI for features, performance on recent labeled slice) and set an automated retraining trigger." |
+
 ### Step 5 — System Design
 
 ```text
@@ -105,6 +113,34 @@ from sklearn.metrics import precision_score, recall_score, roc_auc_score
 - retraining cadence
 - drift detection
 ```
+
+A complete ML system answer covers five stages: data ingestion, feature engineering, training, serving, and monitoring. When the interviewer asks about retraining, they want to hear a decision rule ("retrain when weekly AUC drops below 0.72 for two consecutive weeks") rather than a vague "we retrain periodically."
+
+## Domain-Specific ML Interviews
+
+ML interviews differ significantly by industry because the success metric, risk profile, and data characteristics change. The table below summarizes what interviewers prioritize in three common domains:
+
+| Domain | Representative Problems | Priority Metrics | Key Risks | Modeling Perspective |
+| --- | --- | --- | --- | --- |
+| Finance | Fraud detection, credit scoring, churn prediction | Precision at low FPR, expected loss | Regulatory audit, explainability requirements | Interpretable models preferred; ensemble only with SHAP |
+| Healthcare | Diagnosis support, readmission prediction | Sensitivity (recall), calibration | Patient safety, FDA/IRB compliance | Threshold conservatism; false negatives carry highest cost |
+| E-commerce | Recommendation, demand forecasting, dynamic pricing | Revenue lift, NDCG, MAPE | Cold-start users, seasonality, price elasticity | Real-time serving latency critical; A/B test everything |
+
+When preparing for a domain-specific interview, build one end-to-end example per domain: state the problem, choose the metric with a business justification, name one likely failure mode, and describe how you would monitor after launch.
+
+## Model Operations Checklist for Interview Answers
+
+Interviewers at companies with production ML systems often ask how you would operate a model after deployment. This checklist structures a strong answer:
+
+```text
+1. Monitoring: feature drift (PSI), prediction drift, latency p99
+2. Alerting: threshold breach → on-call notification → runbook
+3. Retraining trigger: scheduled (weekly) + conditional (metric drop)
+4. Rollback plan: shadow scoring against previous version
+5. Documentation: model card with training data, performance bounds, known limitations
+```
+
+Mentioning even three of these five items signals operational maturity and separates you from candidates who treat modeling as a notebook exercise.
 
 ## What to Notice in This Code
 
@@ -156,11 +192,11 @@ The next post shifts from model judgment to product and business judgment throug
 ## Answering the Opening Questions
 
 - **What areas do ML interviews actually test?**
-  - The article covered the core concepts and strategies you need to know when preparing for ML interviews.
+  - Beyond algorithm basics, interviews test metric justification tied to business costs, production trap awareness (leakage, drift, imbalance), and system design from training through monitoring.
 - **What should you say first when explaining model selection?**
-  - Through examples, we saw how to approach real situations and what's easy to miss.
+  - Start with the problem constraints—data size, interpretability needs, latency budget—then show how those constraints narrow the model class before naming specific algorithms.
 - **Why must evaluation metrics be viewed alongside problem definition?**
-  - When actually preparing, you should set both short-term (2-week) and long-term (3-month) strategies and improve continuously.
+  - Because the same model can look excellent or terrible depending on which metric you report; metric choice encodes the business cost structure, so choosing the wrong metric means optimizing for the wrong outcome.
 <!-- toc:begin -->
 ## In this series
 
