@@ -35,17 +35,9 @@ In this post, we look at data marts as the layer that translates common warehous
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying Data Mart?
-- Which signal should the example or diagram make visible for Data Mart?
-- What failure should be prevented first when Data Mart reaches a real system?
-
-## Questions this article answers
-
 - How is a data mart different from the warehouse itself?
 - Why separate organization-wide shared data from team-specific analytical space?
 - What gets better when you reflect domain vocabulary directly in the data model?
-- What role do conformed dimensions play across multiple marts?
-- Why do access boundaries and self-service analysis matter so much in mart design?
 
 ## What You Will Learn
 
@@ -60,8 +52,6 @@ In this post, we look at data marts as the layer that translates common warehous
 A warehouse holds *org-wide common data*. But *sales, finance, and ops* speak *different vocabularies*. A mart re-organizes data *in each team's words* — a *thin layer* on top of the warehouse.
 
 > *Common in the warehouse, domain in the mart.*
-
-This picture shows how a data mart fits between the central warehouse and specific teams. The key is not to memorize mart types, but to see how specialization coexists with centralized definitions.
 
 ## Key Terms
 
@@ -101,6 +91,18 @@ JOIN warehouse.dim_user u ON u.user_id = o.owner_id
 JOIN warehouse.dim_customer c ON c.customer_id = o.customer_id;
 ```
 
+## Data Mart Types
+
+Data marts can be classified into three types based on their creation method and data source.
+
+| Type | Data Source | Refresh Method | Best For | Characteristics |
+|---|---|---|---|---|
+| Dependent | Derived from Warehouse | Auto-reflects Warehouse changes | Large orgs, centralized | Shares conformed dims, high consistency |
+| Independent | Extracted directly from OLTP | Team-specific ETL pipeline | Small orgs, fast MVPs | Quick to build but high duplication, low consistency |
+| Hybrid | Warehouse + domain-specific sources | Common part from Warehouse, specialized part direct | Mid-size orgs | Balance of flexibility and consistency |
+
+A dependent mart uses the central warehouse's consistent definitions so numbers never diverge between teams. An independent mart is fast to build but hard to integrate later. Hybrid combines the strengths of both.
+
 ### Step 3 — Pre-aggregate
 
 ```sql
@@ -113,6 +115,44 @@ SELECT
 FROM sales_mart.fact_opportunity
 GROUP BY 1, 2;
 ```
+
+## SQL Example: Creating a Mart with CTAS
+
+Below is a CTAS (Create Table As Select) example that physically materializes a mart table.
+
+```sql
+CREATE TABLE sales_mart.monthly_pipeline AS
+SELECT
+    DATE_TRUNC('month', o.created_at) AS month,
+    u.region,
+    o.stage,
+    COUNT(*) AS opp_count,
+    SUM(o.amount) AS pipeline_amount,
+    AVG(o.amount) AS avg_deal_size
+FROM staging.opportunities o
+JOIN warehouse.dim_user u ON u.user_key = o.owner_key
+WHERE o.created_at >= '2025-01-01'
+GROUP BY 1, 2, 3;
+```
+
+This mart pre-computes a pipeline summary by month, region, and stage. Dashboards read directly from this table, so response times stay fast.
+
+```sql
+-- Mart refresh (daily schedule)
+TRUNCATE sales_mart.monthly_pipeline;
+INSERT INTO sales_mart.monthly_pipeline
+SELECT ...; -- re-run the query above
+```
+
+Physically storing the result makes reads fast but requires storage and an explicit refresh schedule. For comparison, here is the same logic as a view:
+
+```sql
+-- Same logic defined as a view
+CREATE OR REPLACE VIEW sales_mart.monthly_pipeline_view AS
+SELECT ...; -- same as above
+```
+
+A view has no refresh burden but recomputes on every query, which can be slow.
 
 ### Step 4 — Query the mart
 
@@ -137,6 +177,37 @@ GRANT SELECT ON SCHEMA finance_mart TO ROLE finance_readers;
 - The *team vocabulary* shows up in *column names*.
 - Permissions split by *domain*.
 
+## Mart vs View vs Materialized View
+
+Three implementation approaches, each with different trade-offs.
+
+### Table (CTAS)
+
+Physically stored, so reads are fast. Requires storage space and an explicit refresh schedule. Best when dashboards query frequently and data volumes are large.
+
+```sql
+CREATE TABLE marts.daily_summary AS SELECT ...;
+```
+
+### View
+
+Uses no storage and always returns the latest data. Recomputes on every query, so can be slow. Best when data volumes are small and real-time freshness matters.
+
+```sql
+CREATE OR REPLACE VIEW marts.daily_summary AS SELECT ...;
+```
+
+### Materialized View
+
+A middle ground that stores results physically while supporting automatic refresh. Supported by BigQuery, Snowflake, PostgreSQL, among others. The warehouse engine manages refresh timing.
+
+```sql
+CREATE MATERIALIZED VIEW marts.daily_summary AS SELECT ...;
+REFRESH MATERIALIZED VIEW marts.daily_summary;
+```
+
+Choose among the three based on data size, query frequency, real-time requirements, and cost constraints.
+
 ## Five Common Mistakes
 
 1. **Building *separate dims per mart*.** A common cause of *number conflicts*.
@@ -144,6 +215,105 @@ GRANT SELECT ON SCHEMA finance_mart TO ROLE finance_readers;
 3. **Pulling *every column* into the mart.** *Unnecessary cost*.
 4. **Skipping *permission splits*.** Risk of *sensitive data exposure*.
 5. **Unclear if a mart is a *live SQL* or *materialized copy*.** Document *refresh policy*.
+
+## Data Mart Operating Model
+
+A data mart is not a simple copy — it is a consumer-oriented reorganization layer. When deciding which marts to build, define domain boundaries, owners, and refresh cadence first.
+
+| Mart Type | Purpose | Data Sources | Refresh Cadence | Primary Owner |
+|---|---|---|---|---|
+| Sales Mart | Pipeline/revenue analysis | Orders, customers, channels | Hourly | Sales analytics |
+| Finance Mart | Settlement/P&L verification | Payments, refunds, accounting codes | Daily batch | Finance data team |
+| Product Mart | Feature usage analysis | Event logs, experiment data | 15 min–hourly | Product analytics |
+| Ops Mart | Operational monitoring | Logistics, SLA, incident events | 5 min–hourly | Operations team |
+
+Making purpose and ownership explicit like this prevents mart schemas from growing unnecessarily large.
+
+## Conformed Dimension Management Principles
+
+When building marts quickly, teams tend to create their own customer or product dimensions. Over time this causes metric conflicts, so a conformed dimension policy is essential.
+
+```yaml
+conformed_dimensions:
+  dim_customer:
+    steward: "data-governance"
+    required_keys: [customer_key, customer_id]
+    scd_type: 2
+  dim_product:
+    steward: "commerce-data"
+    required_keys: [product_key, product_id]
+    scd_type: 1
+  dim_date:
+    steward: "platform"
+    required_keys: [date_key, full_date]
+    scd_type: 0
+```
+
+The key principle: each mart freely composes its own views, but reference dimensions are managed centrally.
+
+## Mart Build SQL Pattern
+
+A common pattern when building the Sales Mart:
+
+```sql
+CREATE OR REPLACE TABLE sales_mart.fact_daily_revenue AS
+SELECT
+    d.full_date,
+    c.segment,
+    ch.channel_name,
+    SUM(f.amount) AS revenue,
+    COUNT(DISTINCT f.order_id) AS orders
+FROM warehouse.fact_orders f
+JOIN warehouse.dim_date d ON d.date_key = f.date_key
+JOIN warehouse.dim_customer c ON c.customer_key = f.customer_key
+JOIN warehouse.dim_channel ch ON ch.channel_key = f.channel_key
+GROUP BY 1, 2, 3;
+```
+
+This pattern provides consumer-level pre-aggregation that simplifies dashboard queries. However, over-aggregation reduces flexibility, so limit it to frequently-asked questions.
+
+## Mart Quality Verification Checks
+
+As marts multiply, automated verification becomes critical. At minimum, check these before deployment:
+
+1. No primary key duplicates
+2. Common metric definitions match central standards
+3. Refresh delay stays within SLA
+4. Permissions align with domain boundaries
+
+When these four hold steady, metric interpretation remains consistent even as marts proliferate.
+
+## Domain Mart Design Example
+
+A data mart reflects the team's question units in its model. For example, finance distinguishes "booked revenue" from "pending settlement," while the product team looks at "revenue per active user" over the same period. So even when sharing the same facts, mart expressions differ.
+
+```sql
+CREATE OR REPLACE VIEW finance_mart.v_revenue_settlement AS
+SELECT
+    d.full_date,
+    SUM(CASE WHEN f.status = 'paid' THEN f.amount ELSE 0 END) AS booked_revenue,
+    SUM(CASE WHEN f.status = 'pending' THEN f.amount ELSE 0 END) AS pending_revenue
+FROM warehouse.fact_orders f
+JOIN warehouse.dim_date d ON d.date_key = f.date_key
+GROUP BY d.full_date;
+```
+
+Safely translating the same data into team vocabulary is the essence of a mart.
+
+## Data Governance Policy
+
+| Policy Item | Description | Responsibility |
+|---|---|---|
+| Metric definition approval | Governance review required for common metric changes | Data governance |
+| Access permissions | Least-privilege based on domain roles | Security/Platform |
+| Lineage tracking | Track upstream lineage of mart columns | Data platform |
+| Change notification | Breaking changes require advance notice | Mart owner |
+
+Without these policies, metric trust erodes quickly as marts multiply.
+
+## Metadata Management
+
+Mart quality cannot be judged from table data alone. Column descriptions, owners, refresh cadence, and quality status must be managed as metadata so consumers can use the data confidently.
 
 ## How This Shows Up in Production
 
