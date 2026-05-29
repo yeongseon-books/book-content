@@ -69,6 +69,8 @@ Pick the wrong model and you waste both *cost* and *speed*. Each stage of an org
 
 **After**: you ship code, the platform handles the rest.
 
+The key insight is that as abstraction rises, operational burden drops—but so does fine-grained control. The right model depends on what you are willing to give up and what you gain in return.
+
 ## Hands-on: A PaaS Example with a Tiny Flask App
 
 ### Step 1 — App code
@@ -145,6 +147,135 @@ curl http://127.0.0.1:8000/
 - Do not reduce the choice to convenience. The real question is where operations responsibility stops.
 - SaaS evaluation should include export, SSO, and audit concerns, not just feature lists.
 
+## Where Serverless Fits
+
+FaaS is easiest to understand as a higher abstraction than PaaS. Users focus on function code and triggers while the platform handles infrastructure and scaling. However, cold starts, short execution limits, and statelessness constraints mean FaaS does not suit every workload.
+
+Event-driven tasks, intermittent execution, and batch processing are strong fits. Long-lived connections or applications that hold large in-memory state for extended periods are poor fits. So rather than viewing FaaS as "newer therefore better," treat it as a distinct execution model optimized for event-centric workloads.
+
+## IaaS Hands-on: Provisioning an EC2 Instance
+
+While PaaS deploys with a single Procfile line, IaaS requires creating infrastructure resources one by one. Below is a minimal AWS CLI example for launching an EC2 instance.
+
+```bash
+# 1. Check VPC and subnet (using default VPC)
+aws ec2 describe-vpcs --filters Name=isDefault,Values=true \
+  --query 'Vpcs[0].VpcId' --output text
+
+# 2. Create security group
+aws ec2 create-security-group \
+  --group-name demo-sg \
+  --description "Demo security group" \
+  --vpc-id vpc-0abc1234
+
+# 3. Allow SSH
+aws ec2 authorize-security-group-ingress \
+  --group-name demo-sg \
+  --protocol tcp --port 22 \
+  --cidr 203.0.113.0/32
+
+# 4. Launch instance
+aws ec2 run-instances \
+  --image-id ami-0c55b159cbfafe1f0 \
+  --instance-type t3.micro \
+  --key-name my-key \
+  --security-groups demo-sg \
+  --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=demo}]'
+```
+
+The contrast with PaaS is immediate. PaaS was `git push`; IaaS requires VPC verification, security group creation, port policy, and instance launch—four steps minimum. In exchange, you get direct control over networking and security.
+
+### Follow-up Tasks Easy to Miss on IaaS
+
+After the instance is running, these tasks remain:
+
+| Follow-up Task | Description | Risk if Skipped |
+| --- | --- | --- |
+| OS patching | Apply security updates | CVE exposure |
+| Log agent install | CloudWatch Agent or Fluentd | No logs during incidents |
+| Monitoring setup | CPU/memory/disk alerts | Unresponsive instance goes unnoticed |
+| Backup policy | Automated EBS snapshots | Data loss |
+| Tagging | Project, Owner, Environment | Cost tracking impossible |
+
+On PaaS, the platform handles most of these. If you choose IaaS, the team must accept these follow-up tasks as part of their operational scope.
+
+## SaaS Evaluation Framework
+
+Evaluating SaaS only by feature lists leads to lock-in and operational pain later. The framework below covers items that must be checked before adoption.
+
+| Evaluation Area | Check Item | Risk Signal |
+| --- | --- | --- |
+| Data Ownership | Export API availability | CSV-only, no automation possible |
+| Auth Integration | SSO/SAML/OIDC support | Only proprietary accounts |
+| SLA | Availability guarantee level | Below 99.9%, unclear compensation |
+| Audit Log | Admin action tracking | Log retention under 30 days |
+| Pricing Model | Per-seat or usage-based structure | Annual prepay only, no downgrade |
+| Regional Compliance | Data storage location | No region selection, stored outside EU |
+
+```yaml
+saas_evaluation:
+  product: "Notion"
+  export_api: true
+  sso_support: [SAML, OIDC]
+  sla_percent: 99.9
+  audit_log_retention_days: 90
+  data_region_selectable: false
+  contract_flexibility: annual_only
+  risk_level: medium
+  mitigation: "quarterly data export to S3"
+```
+
+Running this evaluation before adoption lets you predict costs and risks when you eventually need to switch providers or migrate data.
+
+## Cost Comparison: Same App on Three Models
+
+Compare cost structures when running the same web application on IaaS, PaaS, and FaaS. Baseline: 1 million requests/month, average response time 200ms.
+
+| Item | IaaS (EC2 t3.small) | PaaS (Heroku Standard-1X) | FaaS (Lambda) |
+| --- | --- | --- | --- |
+| Compute monthly cost | $15.18 (24/7) | $25.00 (dyno) | $2.08 (1M req x 200ms) |
+| Load balancer | $16.20 (ALB) | Included | Included (API Gateway $3.50) |
+| Logs/monitoring | $5-15 (CloudWatch) | Included (basic) | $3-5 (CloudWatch) |
+| OS patch/ops labor | High | None | None |
+| Total (infra only) | ~$36 + labor | $25 | ~$9 |
+| Best traffic pattern | Steady traffic | Steady + occasional peaks | Intermittent/event-driven |
+
+The key takeaway is not "cheapest wins." FaaS is dramatically cheaper for intermittent traffic but can become more expensive under sustained high load. IaaS infrastructure cost is predictable, but the comparison is incomplete without factoring in operations labor.
+
+### TCO Calculation Tips
+
+```python
+def monthly_tco(
+    compute_usd: float,
+    ops_hours: float,
+    hourly_rate: float = 50.0,
+    managed_services_usd: float = 0.0,
+) -> dict:
+    """Total Cost of Ownership = infra + ops labor + managed services."""
+    ops_cost = ops_hours * hourly_rate
+    total = compute_usd + ops_cost + managed_services_usd
+    return {"compute": compute_usd, "ops": ops_cost, "managed": managed_services_usd, "total": total}
+
+# IaaS: infra $36, 2 hours/week ops (8 hours/month)
+print(monthly_tco(36, ops_hours=8))  # total: $436
+# PaaS: infra $25, 0.5 hours/week ops (2 hours/month)
+print(monthly_tco(25, ops_hours=2))  # total: $125
+# FaaS: infra $9, nearly zero ops (0.5 hours/month)
+print(monthly_tco(9, ops_hours=0.5)) # total: $34
+```
+
+Once you include operations labor, the real cost of IaaS can exceed 10x its infrastructure price. This is why the intuition that "IaaS is cheapest" frequently inverts in practice.
+
+## Five Selection Criteria
+
+1. Does our team have the capacity and time to manage OS and networking directly?
+2. Is deployment speed or control more important right now?
+3. How much vendor lock-in can we tolerate?
+4. Is the workload event-driven or long-running?
+5. Do security and regulatory requirements demand fine-grained environment control?
+
+Early-stage startups usually prioritize speed, favoring PaaS or managed services. Larger platform teams move toward IaaS or container platforms for cost optimization and fine control. SaaS is strongest in domains where building in-house has no competitive advantage.
+
 ## Five Common Mistakes
 
 1. **Treating a PaaS like a VM.**
@@ -152,6 +283,8 @@ curl http://127.0.0.1:8000/
 3. **Ignoring data lock-in when adopting SaaS.**
 4. **Underestimating cold starts on FaaS.**
 5. **Mixing models without a clear responsibility boundary.**
+
+In practice, the fifth mistake causes the most damage. If auth is SaaS, the app is PaaS, and data processing is IaaS—but there is no responsibility document—tracing where a failure started during an incident becomes nearly impossible. If you cannot determine "is this a provider issue or our code issue?" within five minutes, your responsibility boundaries are unclear.
 
 ## How This Shows Up in Production
 
@@ -164,6 +297,85 @@ Early-stage startups run on PaaS like Heroku or Render. As they grow they move w
 - SaaS includes vendor risk in the price.
 - FaaS is great for event-driven workloads.
 - Abstraction = freedom *and* lock-in.
+
+To make this concrete: "self-host only what you do better" becomes clear with a database example. Installing PostgreSQL on EC2 means the team owns replicas, backups, failover, and version upgrades. Using RDS hands most of that to AWS. If you have no DBA, RDS is the realistic choice. If you have a dedicated DBA and need custom extensions or kernel tuning, self-hosting makes sense.
+
+"Abstraction = freedom and lock-in" means you should prepare an exit strategy alongside adoption. When using PaaS, structure your app for easy containerization so migrating to Kubernetes later costs less. When using SaaS, export data periodically to maintain the ability to switch tools.
+
+## Model Transition Scenarios
+
+Three transition scenarios commonly seen in practice:
+
+**Scenario 1: PaaS to Container Platform**
+
+- Trigger: Traffic growth pushes dyno costs above $500/month, and platform constraints make WebSocket support unstable.
+- Path: Heroku → Docker containerization → ECS/EKS or Cloud Run.
+- Prerequisite: 12-Factor App code structure, ability to write Dockerfiles.
+
+**Scenario 2: IaaS to Managed Service**
+
+- Trigger: Repeated incidents from self-managed DB failover, difficulty hiring a DBA.
+- Path: EC2 PostgreSQL → RDS PostgreSQL (pg_dump/pg_restore).
+- Prerequisite: No custom extension modules, compatible RDS version.
+
+**Scenario 3: SaaS to Self-hosted**
+
+- Trigger: SaaS vendor raises prices 30%+ annually, or API limitations block workflow automation.
+- Path: Notion → self-hosted wiki (e.g., Outline) + S3 + RDS.
+- Prerequisite: Export API enables data migration, team has operations capacity.
+
+Model transitions always cost money. The key is defining the trigger quantitatively in advance: "when monthly cost exceeds $X" or "when operational incidents exceed Y per month." Pre-set thresholds prevent emotional decision-making.
+
+## Making Selection Criteria Numeric
+
+Choosing IaaS, PaaS, or SaaS by gut feeling leads to inconsistent decisions across teams. In practice, fixing criteria in a scoring table works better. The table below quantifies common evaluation questions.
+
+| Evaluation Item | Question | IaaS Score Tendency | PaaS Score Tendency | SaaS Score Tendency |
+| --- | --- | --- | --- | --- |
+| Deployment Speed | Can we start today and deploy next week? | 2 | 4 | 5 |
+| Control | Do we need fine OS/network control? | 5 | 3 | 1 |
+| Ops Burden | Can we handle on-call and patching? | 1 | 3 | 5 |
+| Customization | Do we need kernel/runtime modifications? | 5 | 2 | 1 |
+| Regulatory Compliance | Do we need audit trails and isolation? | 4 | 3 | 2 |
+| Vendor Lock-in | Can we tolerate platform dependency? | 3 | 2 | 1 |
+
+Scores are relative comparison tools, not absolutes. For example, a small team weighting "Ops Burden" highly will find PaaS or SaaS the realistic choice.
+
+### Detailed Responsibility Matrix
+
+| Layer | User Responsibility on IaaS | User Responsibility on PaaS | User Responsibility on SaaS |
+| --- | --- | --- | --- |
+| Network | VPC/firewall/routing | App-level access policies | User access policies |
+| Compute | Instance/OS patching | App code/build artifacts | None |
+| Data | Encryption/backup/permissions | Data schema/permissions | Data classification/retention |
+| Observability | Agent install/collection | App logs/metrics | Audit log review |
+| Cost | Instance sizing/reservations | Usage tracking | License/seat management |
+
+This table is useful because it exposes responsibility gaps quickly. For example, if you chose PaaS but assumed the platform handles all backups automatically, you may fail to guarantee a viable recovery point objective (RPO) during an incident.
+
+### Hybrid Model Strategy
+
+Real organizations rarely pick one model exclusively. They mix:
+
+- Auth/collaboration: SaaS
+- Customer-facing API: PaaS or container platform
+- Data pipelines: IaaS + managed services
+
+Mixing is fine, but without a responsibility document per service, incident response boundaries collapse. Attach a responsibility table like the following next to every architecture diagram:
+
+```json
+{
+  "service": "customer-api",
+  "model": "PaaS",
+  "owner_team": "platform-app",
+  "shared_responsibility": {
+    "provider": ["runtime_patch", "base_network"],
+    "customer": ["app_security", "data_classification", "iam_policy"]
+  }
+}
+```
+
+With this document in place, audit responses, incident analysis, and team handoffs all improve simultaneously. The purpose of model selection is not adopting the latest technology—it is increasing operational predictability.
 
 ## Checklist
 

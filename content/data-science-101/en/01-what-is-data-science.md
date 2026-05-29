@@ -94,6 +94,8 @@ df = pd.read_csv("users.csv")
 print(df.shape, df.columns.tolist())
 ```
 
+The important thing here is not the syntax for reading a file—it is knowing which source produced this data and at what point in time. If you cannot reproduce the same analysis two months later, the result loses trust.
+
 ### Step 3 — Clean and EDA
 
 ```python
@@ -103,6 +105,8 @@ df["days_since_login"] = (
 ).dt.days
 print(df["days_since_login"].describe())
 ```
+
+Collected data is almost never ready to use directly. There are missing values, type mismatches, and distributions that need visual inspection first. EDA is not a formality before modeling—it is the time the data introduces itself to you.
 
 ### Step 4 — Model or rule
 
@@ -114,11 +118,15 @@ candidates = (
 )
 ```
 
+Not every problem requires a complex model. Sometimes a simple rule-based priority is enough to deliver value. The key is problem fit, not sophistication.
+
 ### Step 5 — Tie back to a decision
 
 ```text
 Email campaign for 100 users → measure conversion → adjust next week
 ```
+
+Without this last step, data work often stalls at the report stage. Results must close with "what will we do?" That way you can measure again next week, improve, and run the same loop.
 
 **Expected output:** a compact workflow note that connects the problem statement, the key data, and the final decision in one line of reasoning.
 
@@ -138,7 +146,7 @@ Email campaign for 100 users → measure conversion → adjust next week
 
 ## How This Shows Up in Production
 
-Startup data teams often look like a *mini-org* of analyst + scientist + engineer. They run on *topic-level OKRs*, and every week they tie *dashboards or models* back to *concrete decisions*.
+Startup data teams often look like a mini-org of analyst + scientist + engineer. They run on topic-level OKRs, and every week they tie dashboards or models back to concrete decisions. Roles may overlap, but all work converges on one question: "Which decision does this result change?" Data work without that question rarely survives long.
 
 ## How a Senior Engineer Thinks
 
@@ -147,6 +155,182 @@ Startup data teams often look like a *mini-org* of analyst + scientist + enginee
 - Always *close the loop* with a decision.
 - *Document* the boundaries between roles.
 - *Data quality* is everyone's job, not just the engineer's.
+
+## Practical Extension: Understanding the Data Science Process as Structure
+
+Once you have the definition and role boundaries from the previous sections, the next step is seeing how real projects are run stage by stage. Beginners tend to memorize tool lists first, but in practice the sequence and deliverables matter more than the tools. The same Python and the same pandas produce unreproducible results when the problem definition is fuzzy. Conversely, when stages and deliverables are explicit, quality holds even as the team grows. This section maps the iterative loop of data science through a CRISP-DM lens and compares which roles take the lead at each stage.
+
+### CRISP-DM: Six Stages and Key Deliverables
+
+| Stage | Core Question | Main Activities | Representative Deliverable | Failure Signal |
+| --- | --- | --- | --- | --- |
+| Business Understanding | What are we trying to improve? | Define goals, constraints, costs | Problem statement, KPI | Goal is abstract |
+| Data Understanding | What data exists? | Source audit, initial EDA | Data inventory, quality notes | Unknown-source data used |
+| Data Preparation | Is the data model-ready? | Clean, join, feature engineering | Cleaning script, feature set | Rules not documented |
+| Modeling | Which method fits? | Baseline, experiment | Experiment log, model candidates | No comparison to baseline |
+| Evaluation | Can it be deployed? | Metrics, cost, risk review | Evaluation report, go/no-go | Only accuracy considered |
+| Deployment/Operations | Does it drive action? | Monitoring, retraining plan | Dashboard, alert rules | No post-deploy tracking |
+
+A common thread runs through every stage: each must close as "question → activity → deliverable." If there is activity without a deliverable, the next stage cannot share context. Beginners benefit from measuring progress by "what did I produce?" rather than "what did I try?"
+
+### Role Comparison: Same Team, Different Responsibilities
+
+Role titles look similar, but their centers of gravity differ. The table below is organized around the friction points that commonly arise in team collaboration.
+
+| Role | Primary Question | Primary Deliverable | Collaboration Interface |
+| --- | --- | --- | --- |
+| Data Analyst | How do we describe the current state? | Metric definitions, dashboards, analysis memos | PM, marketing, ops |
+| Data Scientist | What predictions or optimizations are possible? | Experiment notebooks, model evaluation reports | Analyst, ML engineer |
+| ML Engineer | How do we serve the model reliably? | Serving pipeline, monitoring | Backend, platform |
+| Data Engineer | How do we supply trustworthy data? | ETL/ELT, warehouse models | All roles |
+
+The point is not hierarchy but boundaries. Clear boundaries make responsibilities clear, and clear responsibilities let you trace a quality issue to its root quickly.
+
+### Minimal Analysis Loop in Python
+
+The following code is not about complex modeling—it is the smallest possible check of a "problem → metric → action" loop.
+
+```python
+import pandas as pd
+
+orders = pd.read_csv("orders.csv")
+orders["order_date"] = pd.to_datetime(orders["order_date"])
+
+recent = orders[orders["order_date"] >= "2026-05-01"]
+summary = (
+    recent.groupby("channel", as_index=False)["revenue"]
+    .sum()
+    .sort_values("revenue", ascending=False)
+)
+
+print(summary)
+print("Decision: next week paid budget focuses on top-2 channels")
+```
+
+Simple as it is, this code embodies three principles. First, it states a time window explicitly. Second, it states the aggregation key explicitly. Third, it closes with an action sentence. Beginners should repeat small loops like this to build intuition for problem definition and decision closure.
+
+### Operational Checkpoints Before Starting a Project
+
+- Have you written the target metric in one sentence?
+- Are the comparison period and target cohort agreed upon?
+- Are data sources and extraction timestamps being logged?
+- Is there a baseline and a final judgment criterion?
+- Is the decision owner who will receive results identified?
+
+If these five items are blank, the project is likely to drag regardless of technical skill. Conversely, when they are filled, even rough tool skills can produce high-quality outcomes quickly.
+
+## Deep Dive: Turning Analysis Design Into a Repeatable Loop
+
+Connecting the concepts above to real team operations means moving beyond analysis notes into repeatable experiment loops. Three things are essential. First, feature creation rules must live in both code and documentation simultaneously. Second, visualizations must serve as decision-trigger checkpoints, not decorative illustrations. Third, model evaluation must include behavioral change, not just a single score line.
+
+### Building a Feature Table with NumPy and pandas
+
+```python
+import numpy as np
+import pandas as pd
+
+orders = pd.read_csv('orders.csv', parse_dates=['ordered_at'])
+users = pd.read_csv('users.csv', parse_dates=['signup_at'])
+
+base = orders.merge(users[['user_id', 'signup_at', 'country']], on='user_id', how='left')
+base['days_since_signup'] = (base['ordered_at'] - base['signup_at']).dt.days.clip(lower=0)
+base['is_weekend'] = base['ordered_at'].dt.dayofweek.isin([5, 6]).astype(int)
+base['amount_log1p'] = np.log1p(base['amount'].clip(lower=0))
+
+agg = (
+    base.groupby('user_id', as_index=False)
+    .agg(
+        order_count=('order_id', 'count'),
+        avg_amount=('amount', 'mean'),
+        recent_amount=('amount', 'last'),
+        signup_age=('days_since_signup', 'max'),
+        weekend_ratio=('is_weekend', 'mean'),
+    )
+)
+
+print(agg.head())
+```
+
+This example transforms raw tables into a user-level feature set tailored to the analysis goal. Transforms like `log1p` reduce distribution skew, and behavioral features like `weekend_ratio` often explain more than raw sums.
+
+### Checking Distributions and Segment Patterns with Matplotlib
+
+```python
+import matplotlib.pyplot as plt
+
+fig, ax = plt.subplots(1, 2, figsize=(12, 4))
+agg['avg_amount'].hist(bins=30, edgecolor='black', ax=ax[0])
+ax[0].set_title('Average Order Amount Distribution')
+ax[0].set_xlabel('avg_amount')
+
+agg.sort_values('signup_age').reset_index(drop=True)['order_count'].rolling(100).mean().plot(ax=ax[1])
+ax[1].set_title('Order Count Rolling Mean by Signup Age')
+ax[1].set_ylabel('rolling mean')
+
+plt.tight_layout()
+plt.show()
+```
+
+The purpose of visualization is not a pretty chart—it is fast anomaly detection. If a distribution is heavily skewed, consider a log transform. If a rolling average shows a sharp inflection, revisit your segmentation criteria. Each chart should trigger a next action.
+
+### Managing Preprocessing and Model in One sklearn Pipeline
+
+```python
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.impute import SimpleImputer
+from sklearn.linear_model import LogisticRegression
+
+num_cols = ['order_count', 'avg_amount', 'recent_amount', 'signup_age', 'weekend_ratio']
+cat_cols = ['country']
+
+numeric = Pipeline([
+    ('imputer', SimpleImputer(strategy='median')),
+    ('scaler', StandardScaler()),
+])
+
+categorical = Pipeline([
+    ('imputer', SimpleImputer(strategy='most_frequent')),
+    ('onehot', OneHotEncoder(handle_unknown='ignore')),
+])
+
+preprocess = ColumnTransformer([
+    ('num', numeric, num_cols),
+    ('cat', categorical, cat_cols),
+])
+
+model = Pipeline([
+    ('preprocess', preprocess),
+    ('clf', LogisticRegression(max_iter=1000, class_weight='balanced')),
+])
+```
+
+A pipeline ensures that training and inference follow the same path, eliminating "works in notebook but breaks in batch" problems. This is the most reliable way to keep preprocessing and model logic coupled.
+
+### A/B Test Design Template
+
+Experiment design is as important as modeling. The template below applies directly to scenarios like onboarding message optimization.
+
+| Item | Design Example |
+| --- | --- |
+| Hypothesis | Changing the new-user onboarding message increases 7-day return rate. |
+| Population | Users who signed up in the last 14 days (excluding internal accounts) |
+| Randomization | 50:50 split by user_id hash |
+| Primary Metric | 7-day return rate |
+| Guardrail Metrics | Support ticket rate, payment failure rate |
+| Duration | Minimum 2 weeks or until sample size reached |
+| Stopping Rule | Guardrail metric deterioration exceeds threshold |
+
+The most common mistake in A/B testing is declaring results too early. When you peek at intermediate results repeatedly, pre-registered stopping rules and analysis plans prevent mistaking random fluctuation for a real effect.
+
+### Operational Checkpoints
+
+- Record feature creation rules in both code and documentation.
+- For every EDA chart, write one line: "What decision does this chart inform?"
+- Evaluate models on cost, latency, and operational complexity alongside accuracy.
+- Fix hypothesis, sample size, and stopping rules before an A/B test starts.
+- Close every results document with "what we learned and what we change next week."
 
 ## Checklist
 
@@ -163,7 +347,7 @@ Startup data teams often look like a *mini-org* of analyst + scientist + enginee
 
 ## Wrap-up and Next Steps
 
-Data science is the *job of bridging* problems and data. Next, we will see how to *turn a problem* into a *data problem* you can actually work on.
+Data science is the job of bridging problems and data. It is not mastery of any single tool—it is the discipline of closing the loop from question to evidence to action. Once this perspective clicks, collection, cleaning, EDA, visualization, and modeling each find their place naturally. Next, we will see how to turn a vague problem into a data problem you can actually work on.
 
 ## Answering the Opening Questions
 
