@@ -201,6 +201,161 @@ Strong teams put thresholds on length, complexity, and naming into a code review
 
 Clean code is the sum of small, measurable principles. Next, we look at the single highest-leverage one — naming.
 
+## Measuring Code Quality With Numbers
+
+Good code can be felt intuitively, but team-level improvement requires numbers. Numbers reduce arguments and set priorities.
+
+| Metric | Recommended | Tool | Warning signal | Priority |
+| --- | --- | --- | --- | --- |
+| Function length | 20 lines or fewer | `radon`, manual review | Multiple 50+ line functions | High |
+| Cyclomatic complexity | 10 or fewer | `radon cc` | Functions with 15+ branches | High |
+| Argument count | 3 or fewer | Code review, linter | 5+ parameter signatures | Medium |
+| Duplication rate | Lower is better | `jscpd`-like tools, review | Same rule repeated across files | High |
+| Test coverage | Context-dependent, core logic first | `pytest --cov` | Critical paths unverified | High |
+| Change failure rate | Lower is better | Deployment metrics | Frequent incidents after trivial changes | Very high |
+
+Metrics are starting points for conversation, not absolute standards. A 30-line function with clear domain boundaries and solid tests may be fine. A 12-line function with a lying name and hidden side effects is structurally worse. The habit that matters is using metrics as evidence to verify design intent.
+
+## Calculating Technical Debt Cost
+
+"Fix it later" almost always makes debt more expensive. Here is a simple model that makes cost visible:
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class RefactorCost:
+    current_hours: float
+    monthly_growth_rate: float
+    delay_months: int
+    outage_risk_cost: float
+
+def estimate_total_cost(cost: RefactorCost) -> float:
+    # Assume fix time grows at compound rate with delay.
+    future_hours = cost.current_hours * ((1 + cost.monthly_growth_rate) ** cost.delay_months)
+    engineering_cost = future_hours * 150  # $150/hr assumption
+    return engineering_cost + cost.outage_risk_cost
+
+def compare_now_vs_later() -> tuple[float, float]:
+    now = RefactorCost(current_hours=18, monthly_growth_rate=0.12, delay_months=0, outage_risk_cost=5_000)
+    later = RefactorCost(current_hours=18, monthly_growth_rate=0.12, delay_months=6, outage_risk_cost=50_000)
+    return estimate_total_cost(now), estimate_total_cost(later)
+```
+
+The model is simplified, but useful for team decisions. When "fix now" costs ~$7,700 and "fix in 6 months" costs ~$55,000+, refactoring stops being "taste" and becomes a financial choice.
+
+## Code Smell Catalog and Prioritization
+
+Clean code improvement should prioritize "which change cost to reduce" over "what feels uncomfortable."
+
+| Smell | Observable signal | Risk | First fix | Second fix |
+| --- | --- | --- | --- | --- |
+| Long function | 40+ lines, 3+ nesting | Slower reviews | Extract guard clauses | Modularize by responsibility |
+| Vague name | `data`, `info`, `tmp` frequent | Misunderstanding bugs | Rename to reveal purpose | Align to domain glossary |
+| Duplicate branches | Same if/elif chain in multiple files | Policy inconsistency | Extract policy function | Promote to strategy object |
+| Unbounded exception handling | `except Exception` swallows all | Hides outages | Catch only at boundaries | Redesign exception hierarchy |
+| Hard to test | External deps mixed with pure logic | Regression risk | Dependency injection | Contract tests |
+
+The catalog's goal is not "perfect design" but "structure that makes the next change easier." Adding smell-removal items alongside feature items in sprint planning keeps tech debt from escaping the backlog.
+
+## Refactoring Demo: Function Extraction Before/After
+
+```python
+# before
+def process_signup(request, mailer, repo, logger):
+    email = request.get("email", "").strip().lower()
+    if not email or "@" not in email:
+        return {"ok": False, "reason": "invalid_email"}
+
+    if repo.exists_by_email(email):
+        return {"ok": False, "reason": "already_exists"}
+
+    user = {"email": email, "status": "pending"}
+    repo.save(user)
+    token = f"verify-{email}"
+    verify_link = f"https://example.com/verify?token={token}"
+    mailer.send(email, "verify", verify_link)
+    logger.info("signup-created", extra={"email": email})
+    return {"ok": True}
+
+# after
+def process_signup(request, mailer, repo, logger):
+    email = normalize_email(request)
+    validate_signup_preconditions(email, repo)
+
+    user = create_pending_user(email, repo)
+    send_verification_mail(user["email"], mailer)
+    logger.info("signup-created", extra={"email": user["email"]})
+    return {"ok": True}
+
+def normalize_email(request: dict) -> str:
+    return request.get("email", "").strip().lower()
+
+def validate_signup_preconditions(email: str, repo) -> None:
+    if not email or "@" not in email:
+        raise ValueError("invalid_email")
+    if repo.exists_by_email(email):
+        raise ValueError("already_exists")
+```
+
+After extraction, `process_signup` reads as flow while validation/creation/notification live in dedicated functions. This structure is the foundation for testable code.
+
+## Linter Configuration: Let Tools Enforce Rules
+
+```toml
+# pyproject.toml
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "B", "C90", "N", "I", "UP"]
+ignore = ["E501"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pep8-naming]
+classmethod-decorators = ["classmethod"]
+```
+
+Linter rules are automated agreement. When rules live only in docs, onboarding destabilizes standards. Once in the linter, code review shifts from "style policing" to "design judgment."
+
+## Rolling Out a Quality Baseline to a Team
+
+Clean code principles do not survive as personal habits alone. They must become team-level operating rules.
+
+| Week | Goal | Deliverable | Verification |
+| --- | --- | --- | --- |
+| 1 | Define quality baseline | Naming/function/branch rules doc | Team agreement meeting notes |
+| 2 | Connect automation | Linter + test gate in CI | CI pass rate |
+| 3 | Establish review norms | PR template, checklist | Review lead time |
+| 4 | Retrospective and adjust | Failure pattern list | Next sprint action items |
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class QualityBaseline:
+    max_function_lines: int = 30
+    max_cyclomatic_complexity: int = 10
+    max_arguments: int = 4
+    require_domain_terms: bool = True
+
+def evaluate_module_metrics(function_lines: int, complexity: int, arguments: int) -> list[str]:
+    issues: list[str] = []
+    baseline = QualityBaseline()
+    if function_lines > baseline.max_function_lines:
+        issues.append("function-too-long")
+    if complexity > baseline.max_cyclomatic_complexity:
+        issues.append("complexity-too-high")
+    if arguments > baseline.max_arguments:
+        issues.append("too-many-arguments")
+    return issues
+```
+
+In practice, a measurable baseline matters more than a perfect one. Without numbers for function length, complexity, and argument count, there is no way to set improvement priorities.
+
 ## Answering the Opening Questions
 
 - **What signals should you check first when judging Clean Code?**

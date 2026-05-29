@@ -27,7 +27,7 @@ Large functions rarely fail because of one dramatic bug. They fail because readi
 
 This is the 3rd post in the Clean Code 101 series.
 
-Here we will define what “small enough” really means, walk through a safe extraction sequence, and show how side effects and argument growth tell you when to stop.
+Here we will define what "small enough" really means, walk through a safe extraction sequence, and show how side effects and argument growth tell you when to stop.
 
 
 ![clean code 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/clean-code-101/03/03-01-concept-at-a-glance.en.png)
@@ -209,6 +209,92 @@ Strong teams gate function length, arg count, and cyclomatic complexity via lint
 ## Wrap-up and Next Steps
 
 Small functions enable names and tests. Next, the chief reason for big functions — conditionals.
+
+## Function Split Criteria: How Far Is Far Enough?
+
+Splitting functions is not about "making them short." The core goal is separating reasons to change.
+
+| Criterion | Split signal | Keep signal | Recommended action |
+| --- | --- | --- | --- |
+| Change reason | Multiple policies coexist | Single policy only | Extract per policy |
+| Input/output | Argument meanings are mixed | Argument meaning is singular | Consider Parameter Object |
+| Side effects | Save/log/notify mixed in | Computation only | Separate IO boundary |
+| Testability | Setup is excessive | Input-output verification is simple | Extract pure logic first |
+| Naming | Function name contains "and" | One verb explains it | Split into two functions |
+
+The principle focuses on responsibility boundaries, not line count. A 30-line function with a single responsibility can stay. A 10-line function with two responsibilities should split.
+
+## Full Checkout Refactoring: Before and After
+
+```python
+# before
+
+def checkout(order, user, mailer, repository):
+    if not order.items:
+        raise ValueError("empty order")
+
+    subtotal = 0
+    for item in order.items:
+        subtotal += item.price * item.quantity
+
+    if user.is_member:
+        subtotal = int(subtotal * 0.9)
+
+    if order.coupon_code:
+        subtotal -= 1000
+
+    repository.save(order.id, subtotal)
+    mailer.send(user.email, f"paid={subtotal}")
+    return subtotal
+```
+
+```python
+# after
+
+def calculate_subtotal(items) -> int:
+    return sum(item.price * item.quantity for item in items)
+
+def apply_membership_discount(amount: int, is_member: bool) -> int:
+    return int(amount * 0.9) if is_member else amount
+
+def apply_coupon(amount: int, coupon_code: str | None) -> int:
+    return amount - 1000 if coupon_code else amount
+
+def checkout(order, user, mailer, repository) -> int:
+    if not order.items:
+        raise ValueError("empty order")
+
+    subtotal = calculate_subtotal(order.items)
+    subtotal = apply_membership_discount(subtotal, user.is_member)
+    subtotal = apply_coupon(subtotal, order.coupon_code)
+
+    repository.save(order.id, subtotal)
+    mailer.send(user.email, f"paid={subtotal}")
+    return subtotal
+```
+
+In the refactored version, calculation rules and external side effects are separated. `calculate_subtotal`, `apply_membership_discount`, and `apply_coupon` become fast unit-test targets, while `checkout` narrows to an integration-boundary test.
+
+## Function Split Decision Helper
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class FunctionSplitDecision:
+    has_multiple_policies: bool
+    has_side_effects: bool
+    argument_count: int
+
+def should_split_function(decision: FunctionSplitDecision) -> bool:
+    if decision.has_multiple_policies:
+        return True
+    if decision.has_side_effects:
+        return True
+    return decision.argument_count >= 4
+```
+
+Even a simple rule like this sharpens review criteria. When explaining "why split," you can point to criteria rather than feelings.
 
 ## Answering the Opening Questions
 

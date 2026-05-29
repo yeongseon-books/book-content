@@ -204,6 +204,191 @@ Naming is the single highest-leverage readability tool. Next we shrink the unit 
 - **How do you bring domain terms naturally into code?**
   - Map user expressions to code terms 1:1 (as the domain-term table showed) and use the same words in tests and API schemas: `order_total_cents`, `payment_confirmed`, `discount_coupon`. Alignment cuts translation cost in meetings, PRs, and incident response, and makes rename scope obvious.
 
+## Applying Variable, Function, and Class Naming in Practice
+
+A name is not a style choice — it is a contract. The moment a caller reads the name, expectations lock in. The table below captures the rules used most often in production code.
+
+| Target | Good Pattern | Anti-pattern | Example |
+| --- | --- | --- | --- |
+| Variable | Reveal value meaning | `data`, `tmp`, `obj` | `invoice_total_cents` |
+| Boolean | Question/state prefix | Double negatives | `is_active`, `has_permission` |
+| Function | Verb + domain purpose | `do_stuff`, `handle_data` | `calculate_invoice_total` |
+| Class | Role-centered noun | Leaking implementation detail | `InvoiceRepository` |
+| Collection | Plural + element meaning | Singular form confusion | `active_users`, `line_items` |
+| Constant | UPPER_CASE with unit | Magic numbers without units | `DEFAULT_TIMEOUT_SECONDS` |
+
+The key is consistency. If the same domain concept gets different names in different files, searchability and collaboration speed collapse. Agree on a glossary first; then execute renames broadly in one pass.
+
+## Full Before/After: When Names Change Intent
+
+```python
+# before
+
+def p(u, o, c):
+    if u and o:
+        t = 0
+        for i in o:
+            t += i["p"] * i["q"]
+        if c:
+            t -= 1000
+        return t
+    return None
+
+# after
+from typing import Iterable
+
+def calculate_order_total(user_id: str, line_items: Iterable[dict], has_coupon: bool) -> int | None:
+    if not user_id or not line_items:
+        return None
+
+    subtotal_cents = 0
+    for line_item in line_items:
+        subtotal_cents += line_item["unit_price_cents"] * line_item["quantity"]
+
+    if has_coupon:
+        subtotal_cents -= 1000
+
+    return subtotal_cents
+```
+
+The logic is nearly identical, but the second version tells the caller what units to expect, what inputs mean, and under what conditions `None` returns. That difference shows up directly in debugging time and review speed.
+
+## Safe Rename Procedure
+
+A rename looks small but its blast radius is wide. Follow this sequence to reduce risk:
+
+1. Define the domain meaning of the candidate name first.
+2. Run a reference search to identify all affected files.
+3. Distinguish public API from internal implementation.
+4. Lock tests green before touching names.
+5. Rename one concept at a time and re-verify immediately.
+
+```python
+def normalize_variable_name(raw_name: str) -> str:
+    cleaned = raw_name.strip().lower().replace(" ", "_")
+    while "__" in cleaned:
+        cleaned = cleaned.replace("__", "_")
+    return cleaned
+```
+
+Tooling like this normalizer keeps large-scale renames consistent. Ultimately, name quality depends less on personal taste and more on team agreement and automation level.
+
+## Naming Standards: Locking Team Agreement Into Code
+
+Naming is a shared contract, not personal preference. Place this standard in your repo root doc and PR template so review criteria stabilize quickly.
+
+| Category | Recommended | Forbidden | Example |
+| --- | --- | --- | --- |
+| Boolean | `is_`, `has_`, `can_` prefix | `flag`, `status` alone | `has_payment_method` |
+| Numeric with units | Suffix the unit | Unitless number names | `retry_interval_seconds` |
+| Collection | Plural + element meaning | `list`, `arr`, `data` | `overdue_invoices` |
+| Derived value | Suffix showing computation | Reuse original name | `normalized_email` |
+| Temporary | Block-scoped purpose | `tmp`, `x`, `v2` | `next_status` |
+
+## Function Extraction + Rename Demo
+
+```python
+# before
+def run(a, b, c):
+    if a and b and c > 0:
+        return b * c * 0.9
+    return 0
+
+# after
+def calculate_discounted_total(has_membership: bool, item_price_cents: int, quantity: int) -> int:
+    if not is_discount_eligible(has_membership, item_price_cents, quantity):
+        return 0
+    return int(item_price_cents * quantity * 0.9)
+
+def is_discount_eligible(has_membership: bool, item_price_cents: int, quantity: int) -> bool:
+    return has_membership and item_price_cents > 0 and quantity > 0
+```
+
+The key insight is not the extraction itself but the contract the names create. Callers understand inputs without reading the body, and change impact is traceable.
+
+## Domain Term Table
+
+| User expression | Code term | Avoid |
+| --- | --- | --- |
+| Order total | `order_total_cents` | `sum`, `total_value` |
+| Payment complete | `payment_confirmed` | `done`, `ok` |
+| Ready to ship | `ready_for_shipment` | `prepared`, `state3` |
+| Discount coupon | `discount_coupon` | `dc`, `ticket` |
+
+Rather than keeping the glossary separate from code, put the same terms in tests and API schemas. When terms align across layers, incident reports get shorter too.
+
+## Enforcing Naming Rules With a Linter
+
+```toml
+# pyproject.toml
+[tool.ruff.lint]
+select = ["E", "F", "N", "B"]
+
+[tool.ruff.lint.pep8-naming]
+ignore-names = ["setUp", "tearDown"]
+```
+
+Once naming rules live in the linter, reviewers stop repeating "please rename" and focus on design decisions and risk assessment instead.
+
+## Rename Migration Plan for Large Codebases
+
+In a large repo, name improvements cannot finish in one shot. Prioritize by area and proceed incrementally.
+
+| Priority | Target | Criterion | Done when |
+| --- | --- | --- | --- |
+| 1 | Public API | External callers depend on it | Changelog + compat verified |
+| 2 | Core domain | Changes frequently | Glossary matches code |
+| 3 | Internal utils | Limited blast radius | Tests pass |
+
+```python
+RENAME_MAP = {
+    "calc": "calculate_invoice_total",
+    "usr": "user",
+    "amt": "amount_cents",
+    "dt": "created_at",
+}
+
+def suggest_renamed_identifier(identifier: str) -> str:
+    return RENAME_MAP.get(identifier, identifier)
+```
+
+Such a mapping doubles as input to automated substitution tools. But always follow automated renames with a semantic review — string replacement does not understand context.
+
+## Review Comment Style for Naming Issues
+
+- **Observation**: `result` is reused with three different meanings across stages.
+- **Risk**: Debugging becomes harder when value tracking is ambiguous.
+- **Suggestion**: Split into `validated_payload`, `persisted_order`, `response_body` to separate stage-level semantics.
+
+This approach avoids aggressive phrasing while making the reason for change clear. Review language is part of code quality.
+
+## Change Impact Scoring
+
+Before renaming, estimate propagation risk:
+
+- Count callers of the target function.
+- Separate whether input/output contracts change.
+- Record whether exception types or log event names shift.
+- Verify test cases cover both input boundaries and failure boundaries.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| Score range | Recommended strategy |
+| --- | --- |
+| 0–5 | Single PR |
+| 6–12 | Separate refactoring PR from feature PR |
+| 13+ | Staged deployment with rollback plan |
+
+Putting a number on impact moves review conversations from gut feeling to evidence.
+
 <!-- toc:begin -->
 ## In this series
 
