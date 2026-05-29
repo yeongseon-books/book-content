@@ -151,6 +151,248 @@ A tree is a connected graph with exactly `vertices - 1` edges. This single arith
 - A *tree* is a *subset* of graphs.
 - *Direction* is *explicit*.
 
+## Choosing a Representation: Adjacency List vs Adjacency Matrix
+
+Before solving a graph problem, choose the representation. The same algorithm can have vastly different time and memory costs depending on how the graph is stored.
+
+| Criterion | Adjacency list | Adjacency matrix |
+|---|---|---|
+| Memory | `O(V + E)` | `O(V^2)` |
+| Neighbor traversal | Fast | Requires full row scan |
+| Edge existence query | `O(deg(v))` or auxiliary structure | `O(1)` |
+| Sparse graphs | Favorable | Unfavorable |
+| Dense graphs | Acceptable | Can be favorable |
+
+Most service data is sparse, so the adjacency list is the default. When vertex count is small and edge-existence queries dominate, a matrix becomes practical.
+
+```python
+def to_adj_list(edges):
+    g = {}
+    for u, v in edges:
+        g.setdefault(u, []).append(v)
+        g.setdefault(v, [])
+    return g
+
+def to_adj_matrix(nodes, edges):
+    idx = {n: i for i, n in enumerate(nodes)}
+    n = len(nodes)
+    m = [[0] * n for _ in range(n)]
+    for u, v in edges:
+        m[idx[u]][idx[v]] = 1
+    return m
+```
+
+The adjacency matrix gives O(1) edge-existence checks but costs O(V^2) memory. The adjacency list makes traversal natural and costs O(V+E), which is why it dominates in practice.
+
+## BFS and DFS with a Unified Interface
+
+Comparing traversal strategies becomes structural when you unify the interface.
+
+```python
+from collections import deque
+
+def bfs_order(graph: dict[str, list[str]], start: str) -> list[str]:
+    q = deque([start])
+    seen = {start}
+    order = []
+    while q:
+        v = q.popleft()
+        order.append(v)
+        for nxt in graph.get(v, []):
+            if nxt not in seen:
+                seen.add(nxt)
+                q.append(nxt)
+    return order
+
+def dfs_order(graph: dict[str, list[str]], start: str) -> list[str]:
+    stack = [start]
+    seen = set()
+    order = []
+    while stack:
+        v = stack.pop()
+        if v in seen:
+            continue
+        seen.add(v)
+        order.append(v)
+        for nxt in reversed(graph.get(v, [])):
+            if nxt not in seen:
+                stack.append(nxt)
+    return order
+```
+
+BFS expands level by level; DFS explores paths. The difference shows directly in the code: a queue vs a stack. For quickly mapping the blast radius of a failure, BFS is intuitive. For detecting dependency cycles, DFS variants are better suited.
+
+## Validating Models with networkx
+
+During early design, `networkx` lets you quickly verify whether a relationship model is correct.
+
+```python
+import networkx as nx
+
+G = nx.DiGraph()
+G.add_edges_from([
+    ('auth', 'user-db'),
+    ('api', 'auth'),
+    ('api', 'cache'),
+    ('worker', 'queue'),
+    ('queue', 'api'),
+])
+
+is_dag = nx.is_directed_acyclic_graph(G)
+```
+
+Checking DAG status, connected component count, or shortest-path existence before implementation reduces model errors early. For batch pipelines and build dependencies, automating the DAG check alone prevents a significant class of failures.
+
+## Graph Application Map
+
+| Domain | Vertex | Edge | Representative question |
+|---|---|---|---|
+| Social | User | Follow/friendship | Who are the recommendation candidates? |
+| Infrastructure | Service | Call dependency | How far does a failure propagate? |
+| CI/CD | Task | Precedence | What is the next executable task? |
+| Maps | Location | Road | What is the minimum-cost route? |
+| Security | Asset | Access path | Does an attack path exist? |
+
+Using this table during modeling shifts thinking from "value-centric" to "relationship-centric."
+
+## Graph Design Checklist
+
+1. Is directionality explicitly specified?
+2. Are multi-edge/weight requirements defined?
+3. Does cycle-allowance match the requirements?
+4. Is there a policy for disconnected vertices?
+
+Anchoring these four items in the design document before reaching for algorithms increases design stability significantly.
+
+## Classifying Path Problems Quickly
+
+When facing a graph problem, start with these four questions to narrow algorithm selection:
+
+1. Are edges weighted?
+2. Are there negative-weight edges?
+3. Do you need full paths, or just reachability?
+4. Single source or multiple sources?
+
+```python
+def problem_type(weighted: bool, negative_edge: bool, reachability_only: bool) -> str:
+    if reachability_only:
+        return 'BFS/DFS'
+    if weighted and negative_edge:
+        return 'Bellman-Ford family'
+    if weighted:
+        return 'Dijkstra family'
+    return 'BFS shortest-edge-count'
+```
+
+This classification is not a complete answer but a safety net against early misjudgment. Running through these questions in a modeling meeting before implementation reduces rework significantly.
+
+## Dijkstra's Shortest Path
+
+Dijkstra's algorithm finds shortest paths in weighted graphs and appears in network routing, API gateway cost optimization, and map navigation.
+
+```python
+import heapq
+from typing import Dict, List, Tuple
+
+def dijkstra(graph: Dict[str, List[Tuple[str, int]]], start: str) -> Dict[str, int]:
+    """Compute shortest distances in a weighted graph."""
+    dist = {start: 0}
+    pq = [(0, start)]
+
+    while pq:
+        d, u = heapq.heappop(pq)
+        if d > dist.get(u, float('inf')):
+            continue
+        for v, w in graph.get(u, []):
+            new_dist = d + w
+            if new_dist < dist.get(v, float('inf')):
+                dist[v] = new_dist
+                heapq.heappush(pq, (new_dist, v))
+
+    return dist
+
+# Example: compute inter-service latency
+network = {
+    "gateway": [("auth", 2), ("cache", 1)],
+    "auth": [("db", 5), ("cache", 2)],
+    "cache": [("db", 3)],
+    "db": [],
+}
+print(dijkstra(network, "gateway"))
+# {'gateway': 0, 'cache': 1, 'auth': 2, 'db': 4}
+```
+
+The key constraint is that edge weights must be non-negative. If negative edges exist, use Bellman-Ford. In practice, latency, cost, and distance are all naturally non-negative, making Dijkstra the default choice.
+
+## Topological Sort for Dependency Ordering
+
+Build systems, package installation order, and data pipeline stage sequencing are all topological sort problems.
+
+```python
+from collections import deque
+
+def topological_sort(graph: Dict[str, List[str]]) -> List[str]:
+    """Kahn's algorithm for topological ordering."""
+    in_degree = {u: 0 for u in graph}
+    for u in graph:
+        for v in graph[u]:
+            in_degree[v] = in_degree.get(v, 0) + 1
+
+    queue = deque([u for u in in_degree if in_degree[u] == 0])
+    order = []
+
+    while queue:
+        u = queue.popleft()
+        order.append(u)
+        for v in graph[u]:
+            in_degree[v] -= 1
+            if in_degree[v] == 0:
+                queue.append(v)
+
+    if len(order) != len(graph):
+        raise ValueError("Cycle detected — topological sort impossible")
+    return order
+
+# Build dependency example
+build_deps = {
+    "app": ["lib", "config"],
+    "lib": ["utils"],
+    "config": [],
+    "utils": [],
+}
+print(topological_sort(build_deps))
+# ['config', 'utils', 'lib', 'app'] or equivalent valid ordering
+```
+
+When topological sort fails (cycle found), it signals that the build cannot proceed. Adding this check to CI catches circular dependencies the moment they are introduced.
+
+## Cycle Detection with 3-Color DFS
+
+In directed graphs, cycles cause deadlocks, infinite loops, and circular references.
+
+```python
+def has_cycle(graph: Dict[str, List[str]]) -> bool:
+    WHITE, GRAY, BLACK = 0, 1, 2
+    color = {u: WHITE for u in graph}
+
+    def visit(u):
+        color[u] = GRAY
+        for v in graph.get(u, []):
+            if color.get(v, WHITE) == GRAY:
+                return True
+            if color.get(v, WHITE) == WHITE and visit(v):
+                return True
+        color[u] = BLACK
+        return False
+
+    return any(color[u] == WHITE and visit(u) for u in graph)
+
+print(has_cycle({"a": ["b"], "b": ["c"], "c": ["a"]}))  # True
+print(has_cycle({"a": ["b"], "b": ["c"], "c": []}))      # False
+```
+
+3-color DFS is the standard cycle detection pattern. Encountering a GRAY node again means a back edge exists, which proves a cycle. This is essential for validating dependency graphs, import chains, and state machine transitions.
+
 ## Checklist
 
 - [ ] Decide *directed/undirected*.

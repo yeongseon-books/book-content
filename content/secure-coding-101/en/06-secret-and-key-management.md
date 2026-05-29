@@ -152,6 +152,341 @@ Most teams adopt *Vault*, *AWS Secrets Manager*, *Doppler*, or *1Password Connec
 - *Access is audited by default.*
 - *Logs are *masked by default*.*
 
+## Git Secret Scanning and Pre-Commit Blocking
+
+Once a secret is committed, the entire repository history is contaminated. Manual `git log -p` searches work for small repos, but large codebases need dedicated scanning tools.
+
+```bash
+# truffleHog — entropy-based + pattern-based scanning
+trufflehog git file://. --since-commit HEAD~100 --json
+
+# git-secrets — AWS pattern built-in, pre-commit hook
+git secrets --install
+git secrets --register-aws
+git secrets --scan
+
+# gitleaks — TOML rule-file based
+gitleaks detect --source . --report-format json --report-path leak-report.json
+```
+
+The most effective interception point is **pre-commit**. Blocking at commit time prevents secrets from ever reaching the remote.
+
+```yaml
+# .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.0
+    hooks:
+      - id: gitleaks
+```
+
+CI adds a second layer for PRs. If someone bypasses pre-commit (force push, GUI commit), the PR scan becomes the last defense.
+
+```yaml
+# GitHub Actions example
+- name: Secret scan
+  uses: gitleaks/gitleaks-action@v2
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+## HashiCorp Vault Configuration in Practice
+
+Vault provides dynamic credentials, policy-based access control, and audit logging beyond simple key-value storage. The first things to configure in production are policies and authentication methods.
+
+```hcl
+# policy: app-db-read.hcl
+path "secret/data/prod/db" {
+  capabilities = ["read"]
+}
+
+path "secret/data/prod/db" {
+  capabilities = ["update"]
+  required_parameters = ["rotation_id"]
+}
+```
+
+```bash
+# Register policy and issue token
+vault policy write app-db-read app-db-read.hcl
+vault token create -policy=app-db-read -ttl=1h -use-limit=10
+```
+
+Setting both TTL and use-limit narrows the damage window even if a token leaks. In Kubernetes environments, ServiceAccount authentication eliminates the need to embed tokens in code.
+
+```python
+import hvac
+
+client = hvac.Client(url="https://vault.internal:8200")
+# Kubernetes auth — automatic authentication via Pod's ServiceAccount
+client.auth.kubernetes.login(
+    role="app-db-reader",
+    jwt=open("/var/run/secrets/kubernetes.io/serviceaccount/token").read()
+)
+secret = client.secrets.kv.v2.read_secret_version(
+    mount_point="secret", path="prod/db"
+)
+db_password = secret["data"]["data"]["password"]
+```
+
+## Dynamic Credentials and Lease Management
+
+Vault's dynamic secrets generate temporary credentials on demand and automatically revoke them when the lease expires. This pattern eliminates long-lived passwords entirely.
+
+```bash
+# DB secret engine setup
+vault secrets enable database
+vault write database/config/mydb \
+  plugin_name=mysql-database-plugin \
+  connection_url="{{username}}:{{password}}@tcp(db.internal:3306)/" \
+  allowed_roles="app-role" \
+  username="vault-admin" \
+  password="vault-admin-pw"
+
+vault write database/roles/app-role \
+  db_name=mydb \
+  creation_statements="CREATE USER '{{name}}'@'%' IDENTIFIED BY '{{password}}'; \
+    GRANT SELECT, INSERT ON mydb.* TO '{{name}}'@'%';" \
+  default_ttl="1h" \
+  max_ttl="24h"
+```
+
+```python
+# Request dynamic credentials from the app
+creds = client.secrets.database.generate_credentials(name="app-role")
+db_user = creds["data"]["username"]  # v-app-role-abc123
+db_pass = creds["data"]["password"]  # temporary, auto-revoked after 1 hour
+lease_id = creds["lease_id"]
+
+# Renew lease if needed
+client.sys.renew_lease(lease_id=lease_id, increment=3600)
+```
+
+The advantage of dynamic credentials is that rotation becomes unnecessary. The value itself has a lifespan, so even if it leaks, it becomes useless after expiry.
+
+## Emergency Revocation Procedure
+
+When a secret leak is confirmed, **immediate revocation** must precede replacement. Revocation invalidates the existing value; replacement issues a new one. The order matters.
+
+```text
+Emergency Revocation Runbook
+
+1. Determine blast radius
+   - Which environments/services use the leaked secret
+   - Check recent access via secret manager audit logs
+
+2. Immediate revocation
+   - Vault: vault lease revoke -prefix secret/data/prod/
+   - AWS: aws secretsmanager delete-secret --secret-id <id> --force-delete
+   - GitHub: Settings > Secrets > Delete
+
+3. Issue new value and deploy
+   - Generate new secret (entirely unrelated to the old value)
+   - Restart services via deployment pipeline
+   - Verify connection pools, caches, and worker processes all refreshed
+
+4. Post-verification
+   - Attempt authentication with old value → confirm failure
+   - Verify revocation event in audit logs
+   - Write incident report
+```
+
+```python
+# Emergency bulk revocation — revoke all leases under a Vault prefix
+import hvac
+
+client = hvac.Client(url="https://vault.internal:8200", token=emergency_token)
+
+# Prefix-based bulk revocation
+client.sys.revoke_prefix("database/creds/app-role")
+
+# Destroy specific secret versions (unrecoverable)
+client.secrets.kv.v2.destroy_secret_versions(
+    path="prod/db",
+    versions=[1, 2, 3],
+    mount_point="secret"
+)
+```
+
+## Secret Scope Isolation Strategy
+
+The broader a single secret's reach, the higher the cost of a leak. Three patterns reduce scope in practice.
+
+| Isolation axis | Method | Effect |
+|---|---|---|
+| Per environment | Different values for dev/staging/prod | Dev leak does not affect production |
+| Per service | Dedicated secret per service | One service compromise does not spread |
+| Per lifetime | Short-lived tokens + dynamic issuance | Leaked value becomes useless after expiry |
+
+```python
+# Per-environment isolation — config loader example
+import os
+
+ENV = os.environ.get("APP_ENV", "dev")
+
+SECRET_PATHS = {
+    "dev": "secret/data/dev/db",
+    "staging": "secret/data/staging/db",
+    "prod": "secret/data/prod/db",
+}
+
+def get_db_secret(vault_client):
+    path = SECRET_PATHS[ENV]
+    return vault_client.secrets.kv.v2.read_secret_version(
+        mount_point="secret", path=path.replace("secret/data/", "")
+    )["data"]["data"]["password"]
+```
+
+## CI/CD Pipeline Secret Safety
+
+CI environments are high-risk points for secret exposure. Build logs may be public, PR builds from forks may access secrets, and caches can retain values.
+
+```yaml
+# GitHub Actions — secret masking and least privilege
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # for OIDC token issuance
+      contents: read
+    steps:
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::123456789:role/deploy-role
+          aws-region: ap-northeast-2
+          # OIDC for temporary credentials instead of long-lived keys
+
+      - name: Read secret
+        run: |
+          SECRET=$(aws secretsmanager get-secret-value \
+            --secret-id prod/api-key \
+            --query SecretString --output text)
+          echo "::add-mask::$SECRET"  # automatic log masking
+          echo "API_KEY=$SECRET" >> "$GITHUB_ENV"
+```
+
+Three principles:
+1. Use OIDC-based temporary credentials instead of long-lived keys.
+2. Use `::add-mask::` to block log output.
+3. Never pass secrets to PR builds from forks.
+
+## Secret Audit and Access Monitoring
+
+Even with a secret manager in place, failure to monitor who reads what delays leak detection.
+
+```bash
+# Enable Vault audit log
+vault audit enable file file_path=/var/log/vault/audit.log
+
+# Audit log format (JSON)
+# {
+#   "type": "response",
+#   "auth": {"token_type": "service", "policies": ["app-db-read"]},
+#   "request": {"path": "secret/data/prod/db", "operation": "read"},
+#   "response": {"data": {"data": "hmac-sha256:..."}},  # values are HMAC'd
+#   "time": "2026-05-15T09:23:41Z"
+# }
+```
+
+Forward audit logs to a SIEM (Splunk, Elastic, Datadog) and apply alert rules:
+
+```text
+Alert rule examples:
+- Secret read outside business hours → immediate notification
+- Same token reads 50+ times in 10 minutes → automatic token revocation
+- Unauthorized policy access attempt → incident creation
+- Read from a path never accessed before → review request
+```
+
+## In-Memory Secret Protection
+
+Secrets left in process memory are vulnerable to core dumps, heap analysis, and `/proc/<pid>/mem` access.
+
+```python
+import ctypes
+import os
+
+def secure_zero(buffer: bytearray):
+    """Safely wipe a secret from memory."""
+    ctypes.memset(
+        (ctypes.c_char * len(buffer)).from_buffer(buffer),
+        0,
+        len(buffer)
+    )
+
+# Usage
+secret_bytes = bytearray(get_secret_from_vault().encode())
+try:
+    authenticate(secret_bytes)
+finally:
+    secure_zero(secret_bytes)  # zero out immediately after use
+```
+
+Python strings are immutable, so you must use `bytearray` for zeroing. Go has `memguard`, Rust has the `secrecy` crate. This is not perfect, but it reduces the window during which a value remains in memory after the GC releases the reference.
+
+## Incident Response Timeline for Secret Leaks
+
+The most important metric in an actual incident is MTTC (Mean Time To Contain) — the time from detection to revocation. A recommended timeline:
+
+```text
+T+0m    Detection (secret scan alert, external report, anomalous access alarm)
+T+5m    Determine blast radius — which env, service, and data the secret reaches
+T+15m   Immediate revocation — invalidate the secret (Vault revoke, AWS delete, GitHub invalidate)
+T+30m   Issue new value and deploy — restart services, verify pool refresh
+T+60m   Post-verification — confirm old value fails auth, audit log clean
+T+24h   Incident report — root cause, prevention measures, process improvements
+```
+
+The most common failure point is T+5m to T+15m. If there is no documentation of where a secret is used, determining blast radius takes too long. If revocation is manual, finding the responsible person adds more delay.
+
+```python
+# Secret inventory — track which secret is used where
+SECRET_INVENTORY = {
+    "prod/db/password": {
+        "services": ["api-server", "batch-worker", "analytics"],
+        "environments": ["prod"],
+        "rotation_owner": "platform-team",
+        "last_rotated": "2026-04-20",
+        "emergency_contact": "#incident-channel",
+    },
+    "prod/stripe/api-key": {
+        "services": ["payment-service"],
+        "environments": ["prod"],
+        "rotation_owner": "payment-team",
+        "last_rotated": "2026-05-01",
+        "emergency_contact": "#payment-oncall",
+    },
+}
+
+def get_affected_services(secret_id: str) -> list[str]:
+    entry = SECRET_INVENTORY.get(secret_id, {})
+    return entry.get("services", ["unknown — inventory update needed"])
+```
+
+With this inventory, the question "where is this secret used?" gets an immediate answer during an incident. Vault policies and role mappings partially serve this purpose, but service-level mapping requires separate documentation.
+
+## Responding to a .env File Leak
+
+A `.env` file should be local-only, but accidental commits or backup inclusions happen. The response is not simply deleting the file.
+
+```bash
+# 1. Remove .env from Git history (BFG Repo-Cleaner)
+bfg --delete-files .env
+git reflog expire --expire=now --all
+git gc --prune=now --aggressive
+
+# 2. Treat ALL values in .env as compromised
+#    → immediate revocation + new value issuance for each
+
+# 3. Verify .gitignore contains .env (should already, but confirm)
+grep -q "^\.env$" .gitignore || echo ".env" >> .gitignore
+
+# 4. Notify the team — forks retain the old history
+```
+
+Even after BFG cleans the history, clones, forks, and CI caches still hold the old records. History cleanup is a secondary measure; the essential action is immediate revocation and replacement of every affected secret.
+
 ## Checklist
 
 - [ ] *git secret scanning* is on.

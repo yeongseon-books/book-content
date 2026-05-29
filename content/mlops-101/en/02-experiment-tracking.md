@@ -160,6 +160,222 @@ Hyperparameter sweeps and weekly reviews use MLflow or W&B as shared memory.
 - Default to a remote tracking server.
 - Run metadata is the entry point of debugging.
 
+## MLflow Tracking Patterns in Practice
+
+Experiment tracking does not end at "record"; it must reach "compare." For that, key names and experiment scope need standardization first.
+
+### Recommended Recording Schema
+
+| Category | Required keys (examples) | Purpose |
+|---|---|---|
+| Param | `model_type`, `learning_rate`, `seed`, `data_version` | Fix input conditions |
+| Metric | `val_auc`, `val_f1`, `train_time_sec` | Compare performance and cost |
+| Tag | `owner`, `ticket`, `purpose` | Link organizational context |
+| Artifact | `model.pkl`, `confusion_matrix.png`, `feature_importance.csv` | Enable result reuse |
+
+Standardizing keys makes a visible difference from the next quarter onward. Even when team members change, the same experiment table remains readable, and model reviews shift from "gut feeling" to "evidence-based."
+
+### Experiment Comparison Code
+
+```python
+import mlflow
+from mlflow.tracking import MlflowClient
+
+client = MlflowClient(tracking_uri="file:./mlruns")
+exp = client.get_experiment_by_name("demo-full")
+runs = client.search_runs(
+    experiment_ids=[exp.experiment_id],
+    order_by=["metrics.val_auc DESC"],
+)
+
+print("top runs")
+for r in runs[:5]:
+    print({
+        "run_id": r.info.run_id,
+        "val_auc": r.data.metrics.get("val_auc"),
+        "lr": r.data.params.get("learning_rate"),
+        "data": r.data.params.get("data_version"),
+    })
+```
+
+This comparison code is what makes retrospective meetings productive. "Which experiment won and why?" becomes a quick lookup instead of a memory exercise.
+
+### Run Comparison Table Template
+
+Use this format for weekly model reviews to make promotion decisions explicit.
+
+| run_id | data_version | val_auc | val_f1 | train_time_sec | Promotion candidate |
+|---|---|---:|---:|---:|---|
+| a1b2c3 | 2026-05-10 | 0.861 | 0.742 | 388 | Candidate |
+| d4e5f6 | 2026-05-10 | 0.854 | 0.739 | 220 | Hold |
+| g7h8i9 | 2026-05-03 | 0.847 | 0.733 | 190 | Rejected |
+
+Promoting a model based on score alone ignores training cost, data recency, and stability. Including all three in the review table reduces production regret.
+
+## Reproducible Experiment Wrapper
+
+```python
+import os
+import subprocess
+import mlflow
+
+def run_experiment(cfg_path: str, data_version: str) -> None:
+    mlflow.set_experiment("fraud-lr")
+    with mlflow.start_run():
+        mlflow.log_param("config", cfg_path)
+        mlflow.log_param("data_version", data_version)
+        mlflow.log_param("git_sha", os.getenv("GIT_SHA", "unknown"))
+
+        subprocess.run(["python", "train.py", "--config", cfg_path], check=True)
+        subprocess.run(["python", "evaluate.py", "--output", "metrics.json"], check=True)
+
+        mlflow.log_artifact("metrics.json")
+        mlflow.log_artifact("model.pkl")
+```
+
+The purpose of this wrapper is not to complicate the training script. It forces metadata at the experiment boundary so reproducibility gaps are caught early.
+
+## Operating Conventions
+
+- Never delete failed runs.
+- Runs missing `data_version` and `git_sha` are excluded from promotion candidates.
+- Promotion reviews include variance across the last 3 runs.
+- Define a review cadence and document the model selection process.
+
+With these conventions, experiment tracking evolves from a log store into an operational decision system.
+
+## MLflow Autolog and Nested Runs
+
+Manually calling `log_param` and `log_metric` is precise but repetitive. MLflow's `autolog` reduces this burden.
+
+### Using autolog
+
+```python
+import mlflow
+mlflow.autolog()
+
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+
+X, y = make_classification(n_samples=2000, n_features=20, random_state=42)
+X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2)
+
+with mlflow.start_run():
+    clf = RandomForestClassifier(n_estimators=100, max_depth=5, random_state=0)
+    clf.fit(X_train, y_train)
+    # autolog records params, metrics, and model automatically
+```
+
+With `autolog` enabled, calling `fit()` captures hyperparameters, training metrics, and the model artifact in one shot. However, data version and team tags are not automatic—those still require manual addition.
+
+### Structuring Sweeps with Nested Runs
+
+When all sweep runs sit at the same level, it becomes hard to tell which sweep produced which run later. Nested runs add parent-child structure.
+
+```python
+import mlflow
+from sklearn.linear_model import LogisticRegression
+from sklearn.datasets import make_classification
+
+X, y = make_classification(n_samples=1000, random_state=42)
+
+with mlflow.start_run(run_name="sweep-2026-05-12"):
+    mlflow.set_tag("sweep_type", "grid")
+    mlflow.set_tag("owner", "ml-team")
+
+    for C in [0.01, 0.1, 1.0, 10.0]:
+        for solver in ["lbfgs", "liblinear"]:
+            with mlflow.start_run(run_name=f"C={C}-{solver}", nested=True):
+                mlflow.log_param("C", C)
+                mlflow.log_param("solver", solver)
+                m = LogisticRegression(C=C, solver=solver, max_iter=1000).fit(X, y)
+                mlflow.log_metric("acc", m.score(X, y))
+```
+
+The parent run holds sweep metadata (date, purpose, owner); child runs hold individual combination results. This structure enables both sweep-level and run-level comparison.
+
+### Remote Tracking Server Setup
+
+Local `mlruns` is quick to start but unsuitable for team sharing. A remote server gives everyone the same experiment table.
+
+```bash
+# Start tracking server (PostgreSQL backend)
+mlflow server \
+    --backend-store-uri postgresql://user:pass@db:5432/mlflow \
+    --default-artifact-root s3://mlflow-artifacts/ \
+    --host 0.0.0.0 \
+    --port 5000
+```
+
+```python
+# Point client code to the remote server
+import mlflow
+mlflow.set_tracking_uri("http://mlflow-server:5000")
+```
+
+Defaulting to a remote server eliminates the "experiments trapped in one laptop" problem. Using PostgreSQL as the backend also improves search and filter performance.
+
+### Experiment Management Policy
+
+| Item | Recommended policy | Impact of violation |
+|---|---|---|
+| Key name standard | Defined in team wiki, checked during PR review | Comparison view becomes meaningless |
+| Data version required | CI fails if `data_version` param is missing | Reproduction impossible |
+| Failed run preservation | No deletion, attach `status=failed` tag | Exploration history lost |
+| Promotion criteria | Average val_auc over last 3 runs > threshold | Accidental peak deployed |
+| Cleanup cadence | Archive runs unreferenced for 90+ days | Storage cost increase |
+
+When this policy is part of team onboarding docs, new members record experiments consistently from day one.
+
+### MLflow UI Tips
+
+Launch the MLflow UI with `mlflow ui`. Default port is 5000.
+
+```bash
+mlflow ui --port 5000
+# Open http://localhost:5000 in browser
+```
+
+Three most-used features:
+
+1. **Compare view**: Select multiple runs and click Compare to see params and metrics side by side.
+2. **Chart view**: Place metrics on x/y axes for scatter plots. Visually identifies which parameter combinations affect performance.
+3. **Search filter**: Use queries like `params.C > 0.5 and metrics.val_auc > 0.85` to narrow runs of interest.
+
+### Exporting Experiment Data
+
+When sharing results in team meetings or documentation, exporting to a DataFrame is practical.
+
+```python
+import mlflow
+import pandas as pd
+
+client = mlflow.tracking.MlflowClient()
+exp = client.get_experiment_by_name("demo-full")
+runs = client.search_runs(
+    experiment_ids=[exp.experiment_id],
+    order_by=["metrics.val_auc DESC"],
+    max_results=50,
+)
+
+rows = []
+for r in runs:
+    rows.append({
+        "run_id": r.info.run_id[:8],
+        "C": r.data.params.get("C"),
+        "solver": r.data.params.get("solver"),
+        "val_auc": r.data.metrics.get("val_auc"),
+        "data_version": r.data.params.get("data_version"),
+    })
+
+df = pd.DataFrame(rows)
+df.to_csv("experiment_report.csv", index=False)
+print(df.head(10))
+```
+
+Sharing this CSV on a team wiki or Slack allows experiment review even without MLflow access.
+
 ## Checklist
 
 - [ ] All training is captured as runs.
