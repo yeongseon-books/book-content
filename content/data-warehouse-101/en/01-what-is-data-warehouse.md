@@ -170,6 +170,140 @@ Startups often start with a *Postgres replica* as the warehouse. As scale grows,
 
 A warehouse is a *separate store for analysis*. Next, we look at *OLTP vs OLAP* in more depth.
 
+## OLTP vs OLAP — Side-by-Side Comparison
+
+The first thing to do when understanding a data warehouse is to stop treating operational transactions and analytical transactions as the same problem. Operational systems handle the success or failure of a single record; analytical systems read patterns across many records.
+
+| Aspect | OLTP (Operational) | OLAP (Analytical) |
+| --- | --- | --- |
+| Core question | Can we process this order right now? | How did revenue change over the last 12 months? |
+| Data scope | Current state, recent data | Long-term history including past |
+| Query shape | Short point lookups, update/insert | Long scans, GROUP BY, multi-table joins |
+| Latency tolerance | Milliseconds to seconds | Seconds to minutes |
+| Failure impact | Direct customer experience damage | Decision-making delay |
+| Consistency focus | Strong transactional consistency | Analysis-point-in-time consistency |
+| Schema changes | Conservative, downtime-sensitive | Batch-based incremental changes possible |
+| Cost optimization | Write/concurrency-centric | Scan-bytes/aggregation-performance-centric |
+
+The key takeaway is not which side is more advanced, but that their failure costs are completely different. An operational DB failure causes payment failures; an analytical DB failure delays reports. Both matter, but since recovery approaches differ, separating storage is the rational choice.
+
+## Warehouse Architecture in Layers
+
+Rather than building a warehouse as a single monolithic feature, separating into layers with clear responsibilities is more stable:
+
+```yaml
+warehouse_layers:
+  - name: raw
+    purpose: "Preserve source data without modification"
+    retention: "180 days or more"
+    owner: "data-platform"
+  - name: staging
+    purpose: "Type cleanup, column standardization, basic cleansing"
+    retention: "rebuildable"
+    owner: "analytics-engineering"
+  - name: marts
+    purpose: "Domain-specific consumption models"
+    retention: "business defined"
+    owner: "domain analytics"
+serving:
+  bi_tools:
+    - looker
+    - tableau
+  refresh_policy:
+    batch: "hourly"
+    realtime: "not required for most metrics"
+```
+
+Three practical benefits: First, keeping raw enables point-in-time replay. Second, isolating staging absorbs schema-change shocks. Third, domain-specific marts let each team get the metrics they need quickly.
+
+## Why Separation Actually Reduces Cost
+
+Separating operational and analytical databases looks like doubling infrastructure. But when you include the cost of production incidents from query interference and wrong reports driving bad decisions, separation is often cheaper long-term. Running month-end aggregation directly on the operational DB typically triggers this cascade:
+
+1. Long-running aggregation queries pollute the buffer cache.
+2. Order/payment API responses slow down during the same window.
+3. Timeout retries increase traffic further.
+4. Eventually incident response consumes engineering time, plus root-cause analysis overhead.
+
+With a separated warehouse, the operational DB focuses on write-heavy workloads while the analytical DB applies read-optimized strategies. The core of separation is not following a technology trend — it is an architecture decision that shrinks the blast radius.
+
+## Architecture Contracts
+
+In practice, a data warehouse is not a single database but a combination of clearly bounded contracts:
+
+```yaml
+architecture_contracts:
+  ingest:
+    rule: "raw is append-only"
+    failure_policy: "retry with dead-letter"
+  transform:
+    rule: "explicit casting and test"
+    failure_policy: "stop downstream publish"
+  serve:
+    rule: "metrics are centrally defined"
+    failure_policy: "fallback to last successful snapshot"
+```
+
+When these contracts exist in both documentation and code, failures can be quickly narrowed to the responsible layer. Without contracts, as the pipeline grows, it becomes difficult to determine whether a number discrepancy is a source problem, a transform problem, or a serving problem.
+
+## Minimum Execution Sequence for Early Teams
+
+1. Start raw ingestion from the operational DB via CDC or snapshot.
+2. Model one core fact table and two or three shared dimensions first.
+3. Fix three metrics as marts and operate one dashboard.
+4. Review scan costs and metric mismatch counts weekly.
+
+This sequence creates a small but strong loop. Instead of building a complete model upfront, iterating through a measurable loop and expanding structure is more stable long-term.
+
+## Analytical Query Template — Segment × Period × Metric
+
+```sql
+-- Common analytical query template: period + segment + metric
+WITH scoped AS (
+    SELECT
+        f.date_key,
+        f.amount,
+        f.qty,
+        c.segment,
+        p.category
+    FROM fact_sales f
+    JOIN dim_customer c ON c.customer_key = f.customer_key
+    JOIN dim_product p ON p.product_key = f.product_key
+    WHERE f.date_key BETWEEN 20260101 AND 20260331
+)
+SELECT
+    segment,
+    category,
+    SUM(amount) AS revenue,
+    SUM(qty) AS units,
+    COUNT(*) AS order_lines,
+    ROUND(SUM(amount) / NULLIF(COUNT(*), 0), 2) AS avg_line_amount
+FROM scoped
+GROUP BY 1, 2
+ORDER BY revenue DESC;
+```
+
+## Pipeline Contract Example
+
+```yaml
+pipeline_contract:
+  schedule: "0 * * * *"
+  source:
+    type: cdc
+    lag_slo_minutes: 15
+  transform:
+    engine: dbt
+    model_layers: [stg, int, mart]
+  quality_tests:
+    - not_null
+    - unique
+    - relationships
+    - accepted_values
+  publish:
+    target: mart_sales_daily
+    strategy: merge
+```
+
 ## Answering the Opening Questions
 
 - **What exactly is a Data Warehouse and why keep one separate?**
