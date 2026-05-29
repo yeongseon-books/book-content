@@ -132,6 +132,65 @@ ORDER BY revenue DESC;
 - Three layers — *KPI → trend → drill-down*.
 - All numbers come from *one model*.
 
+
+## BI Tool Comparison
+
+Dashboard quality depends not just on screen design but also on the semantic model, permission policies, and cache strategies the tool provides. Below is a comparison of criteria commonly reviewed in practice.
+
+| Tool | Strength | Weakness | Best fit |
+| --- | --- | --- | --- |
+| Looker | Semantic layer, strong governance | Steep initial modeling curve | Orgs where metric-definition consistency is critical |
+| Tableau | High visual exploration freedom | Risk of scattered metric definitions | Analyst-driven exploration culture |
+| Power BI | M365 integration, easy deployment | Large-scale model complexity management | Microsoft-ecosystem orgs |
+| Metabase | Quick adoption, simple self-service | Governance limits at scale | Early-stage teams, lightweight reporting |
+
+No tool is the answer — the choice should match the team's question structure and operating model. If metric-definition conflicts are frequent, prioritize semantic-layer support.
+
+## Eight Dashboard Design Principles
+
+Good dashboards optimize for interpretation speed, not information density.
+
+1. Limit first-screen KPIs to about three.
+2. Always attach a comparison baseline to numbers (prior month, same month last year, target).
+3. Keep color meaning consistent across all pages.
+4. Design drill-down paths in one direction: top to bottom.
+5. State units (currency, %, count) near the title.
+6. Expose refresh cadence and last-updated timestamp.
+7. Set filter defaults to match real usage scenarios.
+8. Provide definition tooltips for metrics that require interpretation.
+
+These principles improve decision speed regardless of visual polish.
+
+## Managing the Semantic Layer as Code
+
+When metric definitions live only in documents, they drift across dashboards over time. The YAML below is a minimal example of managing metrics in code.
+
+```yaml
+metrics:
+  - name: monthly_revenue
+    expression: "SUM(amount)"
+    grain: "month"
+    owner: "finance-analytics"
+    filters:
+      - "status = 'paid'"
+  - name: active_buyers_30d
+    expression: "COUNT(DISTINCT user_key)"
+    grain: "day"
+    owner: "growth-analytics"
+    filters:
+      - "order_date >= CURRENT_DATE - 30"
+```
+
+Storing definitions in a repository enables review, history tracking, and deployment automation — and eliminates the "whose number is correct?" debate.
+
+## Dashboard Incident Response Criteria
+
+Dashboards look like read-only screens but are operational assets. A minimum response baseline is necessary.
+
+- When p95 render time exceeds the threshold, inspect the query plan first.
+- When a metric-mismatch report arrives, verify definition conflicts before editing SQL.
+- Before shortening cache-expiry policies, evaluate usage timing and cost together.
+- For low-usage dashboards, redefine the question before deleting — then rebuild.
 ## Five Common Mistakes
 
 1. **Too many charts.** *Three to five* per screen is the right balance.

@@ -135,6 +135,70 @@ INSERT INTO marts.fact_orders SELECT ...;
 - Transformation lives in *one SQL file*.
 - The rerun is *idempotent*.
 
+
+## ETL vs ELT: A Decision Table
+
+ETL and ELT are not a matter of tool preference — they are an operational decision about where transformation responsibility lives. The table below is designed for direct use in team discussions.
+
+| Aspect | ETL | ELT |
+| --- | --- | --- |
+| Transform location | External processing engine | In-warehouse SQL |
+| Initial load shape | Transform then load | Load raw first |
+| Reprocessing difficulty | Depends on raw-retention policy | Relatively straightforward |
+| Logic visibility | Python / workflow code | SQL models |
+| Scaling approach | Separate compute expansion | DW compute expansion |
+| Modern stack fit | Strong when specialized transforms needed | Favors general analytics pipelines |
+
+For most analytical workloads ELT is easier to maintain, but complex file parsing or heavy external-API integration still justifies an ETL stage.
+
+## Python ETL Pipeline Example
+
+The code below separates input validation, transformation, and load in a minimal ETL pattern.
+
+```python
+from datetime import datetime
+from decimal import Decimal
+
+
+def normalize_order(row: dict) -> dict:
+    amount = Decimal(str(row["amount"]))
+    if amount <= 0:
+        raise ValueError("amount must be positive")
+    return {
+        "order_id": int(row["order_id"]),
+        "user_id": int(row["user_id"]),
+        "amount": amount,
+        "created_at": datetime.fromisoformat(row["created_at"]),
+    }
+
+
+def transform(rows: list[dict]) -> list[dict]:
+    return [normalize_order(row) for row in rows]
+```
+
+ETL code like this is especially useful when external data quality is low or schemas break frequently. However, when transform logic hides deep inside application code, analyst collaboration suffers — so the strategy is to migrate toward SQL-centric transforms as data moves toward the mart layer.
+
+## ELT Operating Principles
+
+Stable ELT requires "raw preservation + layer separation + automated testing."
+
+```yaml
+elt_principles:
+  raw_layer:
+    immutable: true
+    load_mode: append
+  staging_layer:
+    casting: strict
+    null_policy: explicit
+  marts_layer:
+    metric_owner: domain_team
+    tests_required: true
+  orchestration:
+    retry_policy: "3 attempts"
+    alert_channel: "#data-pipeline"
+```
+
+Without principles, debugging time explodes as pipelines grow. With clear layer-level ownership, even failures stay contained to a narrow recovery scope.
 ## Five Common Mistakes
 
 1. **Overwriting the *raw source*.** *Point-in-time replay* becomes *impossible*.

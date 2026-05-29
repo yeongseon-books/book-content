@@ -131,6 +131,85 @@ JOIN dim_user d ON d.user_key = f.user_key;
 - Keep *partition pruning* alive.
 - Cache *frequent results* with materialized views.
 
+
+## Optimization Priority Table
+
+When a warehouse performance request arrives, many teams think of indexes first. But in column-oriented warehouses, scan range and data movement are the bigger bottlenecks.
+
+| Priority | Strategy | Expected benefit | Verification metric |
+| --- | --- | --- | --- |
+| 1 | Minimize column selection | Immediate drop in bytes scanned | bytes scanned/query |
+| 2 | Maintain partition pruning | Range-cut on large tables | partition hit ratio |
+| 3 | Fix join order and keys | Reduce shuffle | shuffle bytes |
+| 4 | Pre-aggregate / materialize | Accelerate repeated queries | dashboard latency |
+| 5 | Approximate functions | Cut cost on large distinct ops | query cost per run |
+
+The core principle: "never add hints without measuring first." Identify which stage is expensive before acting.
+
+## Query Optimization: Before and After
+
+```sql
+-- Before: unnecessary full-column scan
+SELECT *
+FROM marts.fact_orders
+WHERE order_date BETWEEN '2026-01-01' AND '2026-12-31';
+
+-- After: select only needed columns
+SELECT order_date, user_key, amount
+FROM marts.fact_orders
+WHERE order_date BETWEEN '2026-01-01' AND '2026-12-31';
+```
+
+This looks trivial, but in a columnar system the cost difference is massive. `SELECT *` often starts as "temporary debugging" and stays as a production query — catch it in code review.
+
+## Execution Plan Interpretation Checklist
+
+When reading an execution plan, check these items in order.
+
+1. Is there a large gap between estimated and actual bytes at the scan stage?
+2. Does one side of a join expand excessively?
+3. Does spill occur after shuffle?
+4. Is the same aggregation recomputed in multiple stages?
+
+Each item points to a different fix. Scan problems call for partition/column changes; shuffle problems call for join-key and data-distribution review.
+
+## Query Guardrails
+
+The YAML below shows an automated cost-anomaly watcher.
+
+```yaml
+query_guardrails:
+  max_bytes_scanned_gb: 50
+  max_runtime_seconds: 120
+  notify_channel: "#dw-cost-alert"
+  actions:
+    - warn_on_pr
+    - tag_heavy_query
+    - require_review_for_select_star
+```
+
+Guardrails remove dependence on individual habits and enforce cost control at the team level. Especially effective during new-analyst onboarding.
+
+## Weekly Query Review Routine
+
+To prevent optimization from becoming an ad-hoc event, establish a regular review cadence.
+
+```yaml
+weekly_query_review:
+  select_candidates:
+    - top_20_by_cost
+    - top_20_by_runtime
+  checks:
+    - select_star_usage
+    - partition_filter_presence
+    - repeated_heavy_aggregations
+  output:
+    - action_items
+    - owner_assignment
+    - due_date
+```
+
+A standing review turns performance from a one-off heroic effort into a sustainable team practice.
 ## Five Common Mistakes
 
 1. **Using `SELECT *` *out of habit*.** *Cost scales with column count*.

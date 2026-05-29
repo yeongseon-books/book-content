@@ -139,6 +139,90 @@ WHERE order_date BETWEEN '2026-05-01' AND '2026-05-31'
 - Wrapping in a *function* breaks pruning.
 - Clustering helps *inside* a partition.
 
+
+## Partitioning Strategy at a Glance
+
+Partitioning and clustering are not about reading faster — they are about refusing to read what is unnecessary. Choosing the wrong key at design time drastically limits optimization headroom.
+
+| Strategy | Key column | Expected benefit | Watch out for | Best when |
+| --- | --- | --- | --- | --- |
+| Daily partition | `order_date` | Range-scan cost drops sharply | Too fine = metadata bloat | High-traffic event tables |
+| Monthly partition | `order_month` | Simpler management | Day-level queries over-scan | Mid-size logs and aggregates |
+| 1 cluster key | `user_key` | Point-filter speedup | High cardinality = expensive re-sort | Frequent user-based lookups |
+| 2 cluster keys | `user_key, product_key` | Compound filter improvement | Too many keys = diminishing returns | Frequent drill-down analysis |
+
+The table makes the role division clear: partitions cut large ranges; clustering sorts within those ranges.
+
+## SQL Patterns That Preserve Pruning
+
+One line of SQL can make or break pruning.
+
+```sql
+-- Good: direct comparison against the partition key
+SELECT SUM(amount)
+FROM fact_orders
+WHERE order_date BETWEEN '2026-05-01' AND '2026-05-31';
+
+-- Bad: function wrapping can disable pruning
+SELECT SUM(amount)
+FROM fact_orders
+WHERE DATE_TRUNC('month', order_date) = DATE '2026-05-01';
+```
+
+The first query lets the engine compute partition boundaries directly, so the read range stays narrow. The second may fall back to a full scan depending on the engine.
+
+## Operational Observability Metrics
+
+To verify your key choices, watch operational metrics. Check at least these on a weekly basis.
+
+```yaml
+partition_observability:
+  - metric: bytes_scanned_per_query
+    target: "decreasing trend"
+  - metric: partition_pruning_ratio
+    target: ">= 0.8 for date-filtered workloads"
+  - metric: avg_query_latency
+    target: "stable under peak"
+  - metric: recluster_jobs_per_day
+    target: "controlled"
+```
+
+`partition_pruning_ratio` is an especially strong signal of model-design quality. If a date-filtered query shows a low ratio, revisit either the SQL patterns or the partition key itself.
+
+## Partition DDL in Practice
+
+Below is a DDL pattern common in production workloads.
+
+```sql
+CREATE TABLE marts.fact_orders (
+    order_id STRING,
+    user_key INT64,
+    product_key INT64,
+    order_date DATE,
+    amount NUMERIC,
+    quantity INT64,
+    created_at TIMESTAMP
+)
+PARTITION BY order_date
+CLUSTER BY user_key, product_key;
+```
+
+The key principle: align the partition key with the primary query axis. In most domains the time axis is the most stable choice; pick the second axis based on actual filter frequency.
+
+## Operations Check Table
+
+| Check item | Target | Warning signal |
+| --- | --- | --- |
+| Partition count growth rate | Predictable | Sudden spike |
+| Pruning ratio | Stays high | Low on filtered queries |
+| Recluster workload | Stable | Persistently excessive |
+| Query cost | Gradual | Specific dashboard spikes |
+
+Attaching this table to a weekly retrospective turns optimization from individual heroics into a team habit.
+
+## Cluster Key Selection Guide
+
+Choose cluster keys by the rule "frequently filtered, rarely mutated." Conversely, columns with high randomness or columns that are almost never used in WHERE clauses should be excluded from the candidate list.
 ## Five Common Mistakes
 
 1. **Wrapping the partition key in a *function*.** Falls back to *full scan*.
