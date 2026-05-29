@@ -72,6 +72,8 @@ def axes(users, region, money_loss):
     return {"users": users, "region": region, "money": money_loss}
 ```
 
+A company-wide outage and a minor user inconvenience demand different page scope, report cadence, and decision speed. Severity gives the team a shared language to connect impact magnitude to behavioral rules.
+
 ### Step 2 — Mapping
 
 ```python
@@ -83,12 +85,16 @@ def severity(a):
     return "SEV3"
 ```
 
+The mapping translates impact axes into a single label. Once the label exists, every downstream policy—who gets paged, how often updates go out, which executive is notified—can reference it unambiguously.
+
 ### Step 3 — Page policy
 
 ```python
 def page_policy(sev):
     return {"SEV1": "all", "SEV2": "primary", "SEV3": "next-day"}[sev]
 ```
+
+Page policy connects the severity label to a concrete action: page everyone, page primary on-call, or defer to next business day. Without this link, escalation depends on individual judgment.
 
 ### Step 4 — Report cadence
 
@@ -97,6 +103,8 @@ def report_every_min(sev):
     return {"SEV1": 15, "SEV2": 30, "SEV3": 60}[sev]
 ```
 
+Higher severity means more frequent updates. Fixing the cadence in advance prevents the chaos of ad-hoc, inconsistent communication during the incident.
+
 ### Step 5 — Auto routing
 
 ```python
@@ -104,6 +112,8 @@ def route(a):
     sev = severity(a)
     return {"sev": sev, "page": page_policy(sev), "every": report_every_min(sev)}
 ```
+
+Auto routing combines all the pieces: compute severity, look up page policy and cadence, return a single decision object. Removing manual steps here reduces classification error under pressure.
 
 ## What to Notice in This Code
 

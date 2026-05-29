@@ -72,12 +72,18 @@ def register(action):
     return {**action, "status": "open"}
 ```
 
+Registering action items as "open" is the first step that turns a postmortem conclusion into trackable work. Without this explicit state transition, follow-up tasks live only in meeting notes and disappear within days.
+
+
 ### Step 2 — Regression test
 
 ```python
 def test_regression(scenario, run):
     return run(scenario) == "ok"
 ```
+
+A regression test encodes the exact failure scenario so that CI catches the same defect if it is ever reintroduced. Human memory decays; an automated test does not.
+
 
 ### Step 3 — Guardrail
 
@@ -87,6 +93,9 @@ def guard(payload, limit=1000):
         raise ValueError("blocked")
 ```
 
+A guardrail blocks the dangerous input outright rather than logging a warning and hoping someone notices. The difference between a warning and a raise is the difference between "we knew it was bad" and "we stopped it from being bad."
+
+
 ### Step 4 — Chaos experiment
 
 ```python
@@ -94,12 +103,18 @@ def inject(failure):
     return {"injected": failure, "expected": "graceful"}
 ```
 
+Chaos experiments validate that the regression test and guardrail actually work under realistic failure conditions. Pairing every injection with an expected outcome turns the experiment into a pass/fail assertion rather than an open-ended exploration.
+
+
 ### Step 5 — Learning loop
 
 ```python
 def closed(action):
     return action["status"] == "done"
 ```
+
+The learning loop closes when every action item reaches "done." If the loop never completes—items stay open for months—the organization accumulates unresolved risk that compounds with each new incident.
+
 
 ## What to Notice in This Code
 

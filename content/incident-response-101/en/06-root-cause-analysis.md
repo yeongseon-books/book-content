@@ -75,12 +75,16 @@ def five_whys(start):
     return chain
 ```
 
+Five Whys is not about asking exactly five times—it is about refusing to stop at the first plausible answer. The chain preserves your reasoning depth and prevents the team from settling on the trigger alone.
+
 ### Step 2 — Collect contributing factors
 
 ```python
 def factors():
     return {"people": [], "process": [], "tooling": [], "system": []}
 ```
+
+Contributing factors rarely sit in one bucket. Splitting them into people, process, tooling, and system axes reveals where the organization’s defenses actually broke down.
 
 ### Step 3 — Trigger vs root cause
 
@@ -89,6 +93,8 @@ def classify(item, evidence):
     return "root" if evidence >= 3 else "trigger"
 ```
 
+A trigger is the final event that set off the incident; the root cause is the underlying condition that let the trigger succeed. Fixing only triggers leaves the system vulnerable to the next variant.
+
 ### Step 4 — Map to actions
 
 ```python
@@ -96,12 +102,16 @@ def actions(root):
     return [{"root": root, "action": f"fix {root}"}]
 ```
 
+Every root cause must map to a concrete action. Actions without clear verbs ("add", "fix", "remove", "test") tend to stay open forever because nobody knows what done looks like.
+
 ### Step 5 — Verifiable?
 
 ```python
 def is_actionable(action):
     return action["action"].startswith(("add ", "fix ", "remove ", "test "))
 ```
+
+An action is only useful if you can verify completion. Starting with a verb and containing a testable condition is the simplest filter for separating real work from vague intentions.
 
 ## What to Notice in This Code
 

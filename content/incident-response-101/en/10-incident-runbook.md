@@ -75,6 +75,9 @@ SEV = {
 }
 ```
 
+The SEV map eliminates debate during an incident. Instead of arguing whether this outage is "bad enough" to page, the team checks the table and acts. The `comms` field sets the maximum minutes before the first status update goes out.
+
+
 ### Step 2 — On-call lookup
 
 ```python
@@ -82,12 +85,18 @@ def on_call(schedule, now):
     return next(p for p in schedule if p["from"] <= now <= p["to"])
 ```
 
+On-call lookup answers "who do I wake up right now?" in one function call. Keeping the schedule in the same repository as the runbook means a single PR can update both the rotation and the procedures that reference it.
+
+
 ### Step 3 — Communication templates
 
 ```python
 def comms(audience, sev, summary):
     return {"to": audience, "sev": sev, "text": summary}
 ```
+
+Communication templates remove the cognitive cost of composing messages under pressure. When every audience (internal, customer, executive) has a pre-written structure, the responder fills in facts rather than inventing prose at 3 a.m.
+
 
 ### Step 4 — Response steps
 
@@ -99,12 +108,18 @@ def next_step(current):
     return STEPS[i + 1] if i + 1 < len(STEPS) else "done"
 ```
 
+Response steps as an ordered tuple make the flow explicit and auditable. A responder always knows what comes next, and the postmortem can verify whether any step was skipped.
+
+
 ### Step 5 — Postmortem template link
 
 ```python
 def link_postmortem(incident_id):
     return f"runbook/postmortems/{incident_id}.md"
 ```
+
+Linking the postmortem by incident ID ensures that every incident automatically gets a documentation path. The responder does not need to create a file or choose a location—the convention handles it.
+
 
 ### Step 6 — Integrated execution
 
@@ -120,6 +135,9 @@ def run_incident(sev, schedule, now, summary):
         "postmortem": link_postmortem("INC-001"),
     }
 ```
+
+The integrated function ties all pieces together: severity determines urgency, on-call determines ownership, templates determine messaging, and the postmortem link ensures the incident will be reviewed. This is the value of runbook-as-code—every decision is connected, versioned, and testable.
+
 
 ## What to Notice in This Code
 

@@ -71,12 +71,16 @@ The important idea is audience branching. One incident can require three communi
 AUDIENCES = ("internal", "external", "exec")
 ```
 
+Fix who you are speaking to before composing anything. A pre-defined audience list prevents reinventing the recipient list under pressure every time.
+
 ### Step 2 — Template function
 
 ```python
 def message(audience, sev, summary):
     return {"to": audience, "sev": sev, "text": summary}
 ```
+
+Structuring messages as data (audience, severity, summary) makes reuse and automation straightforward. The template is the reason you can send a first update in under two minutes.
 
 ### Step 3 — Cadence calculation
 
@@ -85,6 +89,8 @@ def cadence(sev):
     return {"SEV1": 15, "SEV2": 30, "SEV3": 60}.get(sev, 120)
 ```
 
+SEV1 means more frequent updates; SEV3 can breathe longer. Pre-setting cadence keeps communication consistent instead of erratic during the stress of an active incident.
+
 ### Step 4 — Statuspage draft
 
 ```python
@@ -92,12 +98,16 @@ def statuspage(component, state):
     return f"{component} is {state}"
 ```
 
+Customer-facing notices should be brief and clear: state and impact, not internal debug details. A short accurate draft ships faster than a perfect long one.
+
 ### Step 5 — Send queue
 
 ```python
 def queue(messages):
     return sorted(messages, key=lambda m: m["sev"])
 ```
+
+When multiple messages queue up, sorting by severity ensures the most critical updates go out first. Priority ordering is a small detail that prevents confusion at scale.
 
 ## What to Notice in This Code
 

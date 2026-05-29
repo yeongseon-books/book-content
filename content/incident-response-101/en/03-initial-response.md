@@ -72,12 +72,16 @@ def ack(alert_id, user):
     return {"alert": alert_id, "by": user, "at": "now"}
 ```
 
+Acknowledging is not just pressing a button—it is a declaration of ownership. From this moment, someone is responsible, and the timestamp becomes the official start of the response.
+
 ### Step 2 — Estimate impact
 
 ```python
 def estimate_impact(metrics):
     return metrics.get("err_ratio", 0) * 100
 ```
+
+In the first minutes, you do not need exact numbers. But expressing impact as a numeric estimate rather than a gut feeling gives the team a common reference point for severity calls.
 
 ### Step 3 — Open the channel
 
@@ -86,6 +90,8 @@ def open_channel(name):
     return f"#inc-{name}"
 ```
 
+Before discussion scatters across DMs and threads, open a dedicated incident channel. It is the cheapest device for holding collaboration structure together.
+
 ### Step 4 — Assign roles
 
 ```python
@@ -93,12 +99,16 @@ def assign(team):
     return {"IC": team[0], "ops": team[1], "comms": team[2]}
 ```
 
+Separating incident commander, operations lead, and communications lead stabilizes the response. When the IC starts doing hands-on work directly, coordination breaks down fast.
+
 ### Step 5 — Stabilize
 
 ```python
 def stabilize(actions):
     return [a for a in actions if a in ("rollback", "scale", "throttle")]
 ```
+
+In the opening minutes, full resolution is not the goal—fast mitigation is. Rollback, scale-out, and throttle are the standard first moves to stop the bleeding while investigation continues.
 
 ## What to Notice in This Code
 

@@ -72,12 +72,16 @@ def impact(users, minutes):
     return {"users": users, "minutes": minutes}
 ```
 
+First, bundle the minimum information needed to judge an event into one structure. Here we capture affected user count and duration—the two signals that most reliably separate noise from real incidents.
+
 ### Step 2 — Threshold
 
 ```python
 def is_incident(i, user_th=100, min_th=5):
     return i["users"] >= user_th or i["minutes"] >= min_th
 ```
+
+Next, fix in code where the line is between incident and non-incident. These numbers are not technical laws—they are operational agreements your team makes together. Without them, every on-call engineer judges differently.
 
 ### Step 3 — Classify
 
@@ -86,6 +90,8 @@ def classify(i):
     return "incident" if is_incident(i) else "bug"
 ```
 
+Now the threshold drives a label. Classification is both a technical implementation and an operational policy—it determines which workflow fires next.
+
 ### Step 4 — Page or not
 
 ```python
@@ -93,12 +99,16 @@ def page(i):
     return classify(i) == "incident"
 ```
 
+If it is an incident, wake someone up; otherwise route to the normal issue queue. On-call fatigue diverges sharply at this branch point.
+
 ### Step 5 — Route the channel
 
 ```python
 def channel(kind):
     return "#inc" if kind == "incident" else "#bugs"
 ```
+
+Finally, connect the classification to a communication channel. The event name becomes the collaboration path—everyone knows where to look without asking.
 
 ## What to Notice in This Code
 

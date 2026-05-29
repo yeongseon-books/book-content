@@ -72,6 +72,8 @@ def rollback(version):
     return {"action": "rollback", "to": version}
 ```
 
+Rollback is the fastest mitigation in most cases. Returning to the last known-good version buys investigation time without requiring you to understand the failure first.
+
 ### Step 2 — Scale out
 
 ```python
@@ -79,12 +81,16 @@ def scale_out(service, replicas):
     return {"service": service, "replicas": replicas}
 ```
 
+Scaling out adds capacity to absorb unexpected load. It does not fix the root cause, but it keeps the service alive while you investigate.
+
 ### Step 3 — Throttle
 
 ```python
 def throttle(endpoint, rps):
     return {"endpoint": endpoint, "rps": rps}
 ```
+
+Throttling limits inbound traffic to a rate the system can handle. It trades some user requests for overall service stability—a deliberate, temporary degradation.
 
 ### Step 4 — Kill switch
 
@@ -96,12 +102,16 @@ def kill(feature):
     return FLAGS[feature]
 ```
 
+A kill switch disables a feature instantly via a flag. If the flag already exists before the incident, mitigation is a one-line change rather than an emergency deployment.
+
 ### Step 5 — Verify recovery
 
 ```python
 def verify(metrics):
     return metrics.get("err_ratio", 1) < 0.01
 ```
+
+Recovery must be confirmed with numbers, not feelings. Checking that the error ratio dropped below threshold is the quantitative proof that your mitigation worked.
 
 ## What to Notice in This Code
 

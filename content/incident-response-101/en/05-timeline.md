@@ -72,6 +72,8 @@ def event(ts, source, text):
     return {"ts": ts, "src": source, "text": text}
 ```
 
+All events need a common shape to be useful together. Three fields—timestamp, source, text—are enough to unify heterogeneous signals into one sortable stream.
+
 ### Step 2 — Scrape a channel
 
 ```python
@@ -79,12 +81,16 @@ def scrape(channel):
     return [event(m["ts"], channel, m["text"]) for m in channel.get("messages", [])]
 ```
 
+A single channel only shows half the story. Scraping incident channels into the same event structure lets you merge information from multiple sources without losing provenance.
+
 ### Step 3 — Order events
 
 ```python
 def order(events):
     return sorted(events, key=lambda e: e["ts"])
 ```
+
+Events must be sorted by time before analysis. Without chronological order, you risk confusing causes with effects—a mistake that derails every RCA.
 
 ### Step 4 — Split fact and interpretation
 
@@ -95,6 +101,8 @@ def split(events):
     return facts, notes
 ```
 
+Facts belong in the timeline; speculation does not. Marking interpretive notes with a prefix keeps them visible but separated, so later reviewers know what was observed versus what was guessed.
+
 ### Step 5 — Mark anchors
 
 ```python
@@ -103,6 +111,8 @@ ANCHORS = ("detected", "acknowledged", "mitigated", "resolved")
 def mark(event):
     return event["text"].lower() in ANCHORS
 ```
+
+Anchor milestones—detected, acknowledged, mitigated, resolved—align the timeline with dashboards and postmortem documents. They are the reference points that make MTTR calculations meaningful.
 
 ## What to Notice in This Code
 

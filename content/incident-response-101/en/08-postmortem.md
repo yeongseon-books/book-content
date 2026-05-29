@@ -74,12 +74,16 @@ def new_doc():
     return {k: "" for k in TEMPLATE}
 ```
 
+A fixed template guarantees every postmortem covers the same sections. Teams that reinvent the format each time lose consistency and skip critical fields under pressure.
+
 ### Step 2 — Summary check
 
 ```python
 def is_short(text):
     return text.count(".") <= 3
 ```
+
+A good summary fits in three sentences. Keeping it short forces clarity—if you cannot summarize concisely, you probably have not identified the core issue yet.
 
 ### Step 3 — Quantify impact
 
@@ -88,6 +92,8 @@ def impact(users, minutes):
     return {"users": users, "minutes": minutes}
 ```
 
+Impact expressed as numbers (affected users, duration in minutes) removes ambiguity. "Many users were affected" is useless; "12,000 users for 23 minutes" drives the right priority.
+
 ### Step 4 — Register an action
 
 ```python
@@ -95,12 +101,16 @@ def action(text, owner, due):
     return {"text": text, "owner": owner, "due": due}
 ```
 
+Every action needs an owner and a deadline. Without both, follow-through drops to near zero and the same incident recurs.
+
 ### Step 5 — Track
 
 ```python
 def overdue(actions, today):
     return [a for a in actions if a["due"] < today]
 ```
+
+Tracking overdue actions closes the learning loop. If actions slip past their due date without notice, the postmortem was paperwork, not prevention.
 
 ## What to Notice in This Code
 
