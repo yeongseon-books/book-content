@@ -148,6 +148,178 @@ Performance work is mostly *slow-query log → EXPLAIN → index or query change
 - *Avoid functions and casts on indexed columns.*
 - *Always keep the *slow-query log* on.*
 
+## Index Type Comparison
+
+| Type | Structure | Best For | Limitations |
+| --- | --- | --- | --- |
+| **B-tree** | Balanced tree | Equality, range, ORDER BY | Default; handles most workloads |
+| **Hash** | Hash table | Equality only | No range queries, no sorting |
+| **GIN** | Inverted index | Full-text search, JSONB, arrays | Slower writes, larger size |
+| **GiST** | Generalized search tree | Geometric, range types, nearest-neighbor | Lossy for some types |
+
+## CREATE INDEX + EXPLAIN Before/After
+
+```sql
+-- Before: no index on email
+EXPLAIN ANALYZE
+SELECT * FROM users WHERE email = 'alice@example.com';
+```
+
+```text
+Seq Scan on users  (cost=0.00..1250.00 rows=1 width=48) (actual time=8.123..12.456 rows=1 loops=1)
+  Filter: (email = 'alice@example.com'::text)
+  Rows Removed by Filter: 49999
+Planning Time: 0.089 ms
+Execution Time: 12.501 ms
+```
+
+```sql
+-- Add index
+CREATE INDEX idx_users_email ON users (email);
+
+-- After: index used
+EXPLAIN ANALYZE
+SELECT * FROM users WHERE email = 'alice@example.com';
+```
+
+```text
+Index Scan using idx_users_email on users  (cost=0.28..8.30 rows=1 width=48) (actual time=0.045..0.047 rows=1 loops=1)
+  Index Cond: (email = 'alice@example.com'::text)
+Planning Time: 0.112 ms
+Execution Time: 0.068 ms
+```
+
+Execution time dropped from ~12 ms to ~0.07 ms — a 170x improvement.
+
+## When NOT to Index
+
+### 1. Low selectivity (most rows match)
+
+```sql
+-- 90% of orders are 'completed' — index barely helps
+CREATE INDEX idx_orders_status ON orders (status);
+SELECT * FROM orders WHERE status = 'completed';
+-- Planner chooses Seq Scan anyway
+```
+
+### 2. Very small tables
+
+Tables with a few hundred rows are faster to scan sequentially than to maintain index lookups.
+
+### 3. Write-heavy tables
+
+Log tables with thousands of INSERTs per second pay heavy index maintenance costs. If reads are rare, minimize indexes.
+
+### 4. Low cardinality columns
+
+```sql
+-- is_deleted has only true/false — minimal filtering benefit
+CREATE INDEX idx_is_deleted ON users (is_deleted); -- low value
+```
+
+Consider a partial index instead, or skip indexing entirely.
+
+## Reading EXPLAIN ANALYZE Output
+
+```sql
+EXPLAIN ANALYZE
+SELECT u.name, COUNT(o.id) AS order_count
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id
+GROUP BY u.id, u.name;
+```
+
+```text
+HashAggregate  (cost=2850.00..2950.00 rows=10000 width=40) (actual time=45.123..46.234 rows=10000 loops=1)
+  Group Key: u.id, u.name
+  ->  Hash Left Join  (cost=1200.00..2700.00 rows=50000 width=36) (actual time=12.345..38.567 rows=50000 loops=1)
+        Hash Cond: (u.id = o.user_id)
+        ->  Seq Scan on users u  (cost=0.00..450.00 rows=10000 width=32) (actual time=0.012..5.678 rows=10000 loops=1)
+        ->  Hash  (cost=850.00..850.00 rows=50000 width=8) (actual time=12.123..12.123 rows=50000 loops=1)
+              Buckets: 65536  Batches: 1  Memory Usage: 2048kB
+              ->  Seq Scan on orders o  (cost=0.00..850.00 rows=50000 width=8) (actual time=0.034..6.789 rows=50000 loops=1)
+Planning Time: 0.456 ms
+Execution Time: 46.789 ms
+```
+
+### Reading order
+
+1. Start from the most indented node (bottom-up)
+2. `actual time`: real execution time (ms)
+3. `rows`: compare estimated vs actual row counts
+4. `loops`: how many times the node executed
+
+### Key metrics to watch
+
+- **Estimated vs actual rows diverge** → run `ANALYZE` to update statistics
+- **High loops count** → nested loop may be inefficient
+- **Long Seq Scan** → candidate for index
+- **Hash Batches > 1** → insufficient `work_mem`
+
+## Tuning Troubleshooting Table
+
+| Symptom | Check First | Common Fix |
+| --- | --- | --- |
+| Seq Scan despite index existing | Selectivity; functions/casts on column | Rewrite condition or redesign index type |
+| Composite index underperforming | Are leftmost columns in the WHERE? | Reorder columns to match query pattern |
+| EXPLAIN looks good but actual time is high | Sort, join, actual row count | Review full plan, not just the filter node |
+
+## Practical Anchor: Index Design Priority
+
+Indexes consume write cost and storage. Design in this priority order:
+
+1. High-traffic queries' `WHERE` + `ORDER BY` columns
+2. JOIN keys
+3. High-selectivity conditions
+4. Everything else — add only after measurement
+
+```sql
+CREATE INDEX idx_orders_status_created_at
+    ON orders (status, created_at DESC);
+```
+
+## Practical Anchor: Plan Comparison Metrics
+
+```sql
+EXPLAIN (ANALYZE, BUFFERS)
+SELECT order_id, customer_id, total_amount
+FROM orders
+WHERE status = 'paid'
+  AND created_at >= CURRENT_DATE - INTERVAL '7 days'
+ORDER BY created_at DESC
+LIMIT 100;
+```
+
+Compare before/after index addition:
+
+- Actual execution time (`actual time`)
+- Blocks read (`shared read blocks`)
+- Rows scanned vs rows returned
+
+If these do not improve, the index is not helping.
+
+## Practical Anchor: Partial Index Strategy
+
+When a status value covers a small fraction of rows, a partial index is both smaller and faster:
+
+```sql
+CREATE INDEX idx_orders_paid_recent
+    ON orders (created_at DESC)
+WHERE status = 'paid';
+```
+
+Only `status='paid'` queries benefit, but the index is a fraction of the full table's size.
+
+## Practical Anchor: Tuning Record Template
+
+Performance work is hard to reproduce from memory. Record each tuning session:
+
+- Target query and call frequency
+- EXPLAIN ANALYZE before change
+- Index or query change applied
+- EXPLAIN ANALYZE after change
+- Write performance impact (INSERT/UPDATE TPS)
+
 ## Checklist
 
 - [ ] I can tell Seq from Index scans in EXPLAIN.

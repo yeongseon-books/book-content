@@ -142,6 +142,136 @@ FROM daily_revenue;
 - *LAG/LEAD is the basic *time comparison* tool.*
 - *Pull complex windows into a *CTE*.*
 
+## Five Practical Window Patterns
+
+### Pattern 1: Top-N per group
+
+```sql
+WITH ranked AS (
+    SELECT product_id, user_id, total,
+        ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY total DESC) AS rk
+    FROM orders
+)
+SELECT * FROM ranked WHERE rk <= 3;
+```
+
+Extracts the top 3 orders by amount for each product.
+
+### Pattern 2: Month-over-month growth rate
+
+```sql
+SELECT month,
+    revenue,
+    LAG(revenue) OVER (ORDER BY month) AS prev_revenue,
+    revenue - LAG(revenue) OVER (ORDER BY month) AS diff,
+    ROUND(
+        (revenue - LAG(revenue) OVER (ORDER BY month)) * 100.0
+        / NULLIF(LAG(revenue) OVER (ORDER BY month), 0),
+        2
+    ) AS growth_pct
+FROM monthly_revenue;
+```
+
+`NULLIF` prevents division by zero when the previous month has no revenue.
+
+### Pattern 3: Cumulative share (Pareto analysis)
+
+```sql
+SELECT product_id, revenue,
+    SUM(revenue) OVER (ORDER BY revenue DESC) AS running_total,
+    ROUND(
+        SUM(revenue) OVER (ORDER BY revenue DESC) * 100.0
+        / SUM(revenue) OVER (),
+        2
+    ) AS cumulative_pct
+FROM product_revenue;
+```
+
+Shows what percentage of total revenue is covered as you move down the ranked list.
+
+### Pattern 4: Row-to-row difference
+
+```sql
+SELECT day, active_users,
+    active_users - LAG(active_users) OVER (ORDER BY day) AS daily_change
+FROM daily_active_users;
+```
+
+### Pattern 5: Quartile by partition
+
+```sql
+SELECT country, user_id, revenue,
+    NTILE(4) OVER (PARTITION BY country ORDER BY revenue DESC) AS quartile
+FROM user_revenue;
+```
+
+Splits users within each country into revenue quartiles.
+
+## Using Window Results in UPDATE
+
+Window functions can only appear in SELECT. To use their results in UPDATE or DELETE, compute in a CTE and join:
+
+```sql
+WITH ranked AS (
+    SELECT id, ROW_NUMBER() OVER (ORDER BY created_at DESC) AS rk
+    FROM orders
+)
+UPDATE orders o
+SET is_recent = true
+FROM ranked r
+WHERE o.id = r.id AND r.rk <= 100;
+```
+
+## Practical Anchor: Window vs Aggregate Boundary
+
+Window functions keep rows; aggregate functions collapse them. Making this boundary explicit stabilizes analytical SQL.
+
+```sql
+SELECT
+    customer_id,
+    ordered_at,
+    total_amount,
+    SUM(total_amount) OVER (
+        PARTITION BY customer_id
+        ORDER BY ordered_at
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS running_revenue
+FROM orders;
+```
+
+## Practical Anchor: Frame Specification Mistakes
+
+Omitting the frame when `ORDER BY` is present can produce unexpected results, especially with duplicate sort keys. `RANGE` and `ROWS` behave differently with ties.
+
+```sql
+-- Explicit ROWS frame — unambiguous
+AVG(total_amount) OVER (
+    PARTITION BY customer_id
+    ORDER BY ordered_at, order_id
+    ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+) AS avg_7_orders
+```
+
+## Practical Anchor: Rank Tie-Breaking Comparison
+
+```sql
+SELECT
+    DATE(ordered_at) AS d,
+    customer_id,
+    SUM(total_amount) AS revenue,
+    ROW_NUMBER() OVER (PARTITION BY DATE(ordered_at) ORDER BY SUM(total_amount) DESC) AS rn,
+    RANK()       OVER (PARTITION BY DATE(ordered_at) ORDER BY SUM(total_amount) DESC) AS rnk,
+    DENSE_RANK() OVER (PARTITION BY DATE(ordered_at) ORDER BY SUM(total_amount) DESC) AS drnk
+FROM orders
+GROUP BY DATE(ordered_at), customer_id;
+```
+
+- `ROW_NUMBER`: always unique (1, 2, 3) — ties broken arbitrarily.
+- `RANK`: ties share a rank, next rank skips (1, 1, 3).
+- `DENSE_RANK`: ties share a rank, no gaps (1, 1, 2).
+
+Document the tie-breaking policy in your metric definitions to avoid interpretation conflicts.
+
 ## Checklist
 
 - [ ] I know what PARTITION BY does.

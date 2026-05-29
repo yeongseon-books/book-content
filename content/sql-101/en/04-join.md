@@ -73,6 +73,9 @@ FROM users u
 INNER JOIN orders o ON o.user_id = u.id;
 ```
 
+INNER JOIN returns only rows where both sides have a match. If a user has no orders, that user disappears from the result entirely.
+
+
 ### Step 2 — LEFT JOIN
 
 ```sql
@@ -80,6 +83,9 @@ SELECT u.name, o.id AS order_id
 FROM users u
 LEFT JOIN orders o ON o.user_id = u.id;
 ```
+
+LEFT JOIN keeps every row from the left table (`users`). When a user has no orders, the order columns come back as NULL — which is the signal "no match found," not a data error.
+
 
 ### Step 3 — Anti-join (users with no orders)
 
@@ -89,6 +95,9 @@ FROM users u
 LEFT JOIN orders o ON o.user_id = u.id
 WHERE o.id IS NULL;
 ```
+
+This anti-join pattern (`LEFT JOIN ... WHERE right.id IS NULL`) is one of the most common analytical patterns. It answers "who has never done X?" efficiently.
+
 
 **Expected output:**
 
@@ -104,6 +113,9 @@ FROM employees e
 LEFT JOIN employees m ON m.id = e.manager_id;
 ```
 
+A self-join treats the same table as if it were two separate tables. The alias difference (`e` for employee, `m` for manager) is what makes it readable.
+
+
 ### Step 5 — Multi-join
 
 ```sql
@@ -113,6 +125,9 @@ JOIN orders o ON o.user_id = u.id
 JOIN order_items oi ON oi.order_id = o.id
 JOIN products p ON p.id = oi.product_id;
 ```
+
+Multi-join queries read like a path through the data model: user → order → order_item → product. At each step, verify the join key is unique on one side to avoid row multiplication.
+
 
 ## What to Notice in This Code
 
@@ -139,6 +154,74 @@ Reports usually join *event + user + product* — three to five tables. The *fac
 - *Often you should aggregate *before* joining.*
 - *Multi-joins read better as *CTEs*.*
 - *Join keys must have *indexes* to be fast.*
+
+## JOIN type comparison
+
+| JOIN type | Result rows | Description |
+| --- | --- | --- |
+| `INNER JOIN` | Only rows matching on both sides | Intersection |
+| `LEFT JOIN` | All left rows + matching right (NULL if no match) | Left-complete |
+| `RIGHT JOIN` | All right rows + matching left (NULL if no match) | Right-complete |
+| `FULL OUTER JOIN` | All rows from both sides (NULLs where unmatched) | Union |
+| `CROSS JOIN` | Every combination (no condition) | Cartesian product |
+
+### Row count expectations
+
+- **INNER**: 0 to `min(left, right)` (depends on match rate)
+- **LEFT**: at least `left_count` (more if 1:N on right)
+- **CROSS**: exactly `left_count × right_count`
+
+`INNER` and `LEFT` cover 90%+ of production joins. `CROSS JOIN` almost always indicates a missing join condition.
+
+## Why totals inflate after joining
+
+If one order has two payment rows, joining `orders` to `payments` duplicates the order row. Summing `order.total` then counts it twice. Fix: aggregate the right side first, then join:
+
+```sql
+-- Safe: aggregate before joining
+SELECT o.id, o.total, agg.paid
+FROM orders o
+JOIN (
+    SELECT order_id, SUM(amount) AS paid
+    FROM payments
+    GROUP BY order_id
+) agg ON agg.order_id = o.id;
+```
+
+## LEFT JOIN turned into INNER by WHERE
+
+```sql
+-- Looks like LEFT JOIN but behaves as INNER:
+SELECT u.name, o.total
+FROM users u
+LEFT JOIN orders o ON o.user_id = u.id
+WHERE o.status = 'paid';  -- eliminates NULL rows!
+
+-- To preserve left rows, move the filter into ON:
+SELECT u.name, o.total
+FROM users u
+LEFT JOIN orders o ON o.user_id = u.id AND o.status = 'paid';
+```
+
+When you filter on the right table in WHERE, NULL rows from the LEFT JOIN get dropped. Move the condition into the ON clause if you want to keep unmatched left rows.
+
+## Concrete anchor: Verifying cardinality before aggregation
+
+Before summing anything across a join, verify row counts match expectations:
+
+```sql
+-- Step 1: count base rows
+SELECT COUNT(*) FROM orders WHERE customer_id = 42;
+
+-- Step 2: count after join
+SELECT COUNT(*)
+FROM orders o
+JOIN payments p ON p.order_id = o.id
+WHERE o.customer_id = 42;
+```
+
+If step 2 is larger than step 1, the join introduced duplication. Aggregate the right side first before joining.
+
 
 ## Checklist
 

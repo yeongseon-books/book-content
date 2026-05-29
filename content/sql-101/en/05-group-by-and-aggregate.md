@@ -137,6 +137,263 @@ GROUP BY country;
 - *For join + aggregate, *aggregate the small side first*.*
 - *Group keys must be *interpretable*.*
 
+## Aggregate Function Comparison
+
+Each aggregate function compresses multiple rows into a single value, but they differ in how they handle NULL.
+
+| Function | Role | NULL Handling | Notes |
+| --- | --- | --- | --- |
+| `COUNT(*)` | Total row count | Includes NULL | Most basic aggregate |
+| `COUNT(col)` | Non-NULL row count for a column | Excludes NULL | Different from `COUNT(*)` |
+| `SUM(col)` | Sum | Excludes NULL | Returns NULL if all values are NULL |
+| `AVG(col)` | Average | Excludes NULL | Does NOT treat NULL as 0 |
+| `MIN(col)` | Minimum | Excludes NULL | Works on strings and dates too |
+| `MAX(col)` | Maximum | Excludes NULL | Works on strings and dates too |
+
+### NULL Handling Example
+
+```sql
+CREATE TABLE sales (
+    id INT,
+    amount INT
+);
+
+INSERT INTO sales VALUES (1, 100), (2, NULL), (3, 200);
+
+SELECT
+    COUNT(*) AS total_rows,
+    COUNT(amount) AS non_null_count,
+    SUM(amount) AS total_amount,
+    AVG(amount) AS avg_amount
+FROM sales;
+```
+
+**Expected output:**
+
+| total_rows | non_null_count | total_amount | avg_amount |
+| --- | --- | --- | --- |
+| 3 | 2 | 300 | 150 |
+
+`COUNT(*)` returns 3, but `COUNT(amount)` excludes NULL and returns 2. `AVG(amount)` is 300 / 2 = 150, not 300 / 3 = 100.
+
+## GROUP BY + HAVING: Composite Examples
+
+### Users per country with filter
+
+```sql
+SELECT
+    country,
+    COUNT(*) AS user_count,
+    AVG(age) AS avg_age
+FROM users
+GROUP BY country
+HAVING COUNT(*) >= 10
+ORDER BY user_count DESC;
+```
+
+This groups users by country, keeps only countries with 10+ users, and sorts descending. HAVING applies after aggregation, so it can reference aggregate functions like `COUNT(*)`.
+
+### Order status summary
+
+```sql
+SELECT
+    status,
+    COUNT(*) AS order_count,
+    SUM(total) AS total_amount,
+    AVG(total) AS avg_amount,
+    MIN(total) AS min_amount,
+    MAX(total) AS max_amount
+FROM orders
+WHERE created_at >= '2026-01-01'
+GROUP BY status
+HAVING SUM(total) > 1000
+ORDER BY total_amount DESC;
+```
+
+This groups 2026+ orders by status and shows only groups whose total exceeds 1000. Combining multiple aggregate functions in one query gives a full statistical snapshot per group.
+
+### Multi-key grouping + HAVING
+
+```sql
+SELECT
+    country,
+    DATE_TRUNC('month', signup_at) AS month,
+    COUNT(*) AS new_users
+FROM users
+WHERE signup_at >= '2025-01-01'
+GROUP BY country, month
+HAVING COUNT(*) >= 5
+ORDER BY country, month;
+```
+
+Using country and month together as grouping keys gives per-country-per-month granularity. This pattern appears frequently in time-series analysis.
+
+### Join then aggregate + HAVING
+
+```sql
+SELECT
+    u.country,
+    COUNT(DISTINCT o.id) AS order_count,
+    SUM(o.total) AS total_revenue
+FROM users u
+JOIN orders o ON o.user_id = u.id
+WHERE o.status = 'completed'
+GROUP BY u.country
+HAVING COUNT(DISTINCT o.id) >= 100
+ORDER BY total_revenue DESC;
+```
+
+When aggregating after a join, watch cardinality carefully. One user can have many orders, so `COUNT(DISTINCT o.id)` is needed to get the correct order count without inflation.
+
+## GROUP BY vs Window Functions
+
+Aggregate functions compress rows; window functions keep every row while computing aggregate values alongside them. Understanding this distinction tells you when to use GROUP BY and when to reach for a window function.
+
+### GROUP BY aggregation (rows collapse)
+
+```sql
+SELECT
+    country,
+    COUNT(*) AS user_count
+FROM users
+GROUP BY country;
+```
+
+**Expected output:**
+
+| country | user_count |
+| --- | --- |
+| US | 5 |
+| UK | 3 |
+
+The result has one row per country. Individual user details disappear.
+
+### Window function aggregation (rows preserved)
+
+```sql
+SELECT
+    name,
+    country,
+    COUNT(*) OVER (PARTITION BY country) AS user_count
+FROM users;
+```
+
+**Expected output:**
+
+| name | country | user_count |
+| --- | --- | --- |
+| Ada | US | 5 |
+| Bob | US | 5 |
+| Grace | UK | 3 |
+
+Every row stays intact, and `user_count` shows the total for that row's country.
+
+### When to use which
+
+- **GROUP BY**: When you want one summary row per group.
+- **Window function**: When you want to keep individual rows but display group-level stats alongside each row.
+
+For example, if you only need country totals, use GROUP BY. If you want each order's amount alongside its country total (to compute ratios or ranks), use a window function:
+
+```sql
+-- Each order's amount alongside the country total
+SELECT
+    o.id AS order_id,
+    u.country,
+    o.total AS order_total,
+    SUM(o.total) OVER (PARTITION BY u.country) AS country_total
+FROM orders o
+JOIN users u ON u.id = o.user_id;
+```
+
+This keeps every order row and adds the country-level sum for ratio or rank calculations. Window functions are covered in detail in the next article; here it is enough to understand their relationship to GROUP BY.
+
+## Best Practices for Aggregate Queries
+
+```sql
+-- Good: explicit group keys, meaningful aliases, ordered output
+SELECT
+    country,
+    DATE_TRUNC('month', signup_at) AS signup_month,
+    COUNT(*) AS new_users,
+    AVG(age) AS avg_age
+FROM users
+WHERE signup_at >= '2025-01-01'
+GROUP BY country, signup_month
+HAVING COUNT(*) >= 10
+ORDER BY country, signup_month;
+
+-- Avoid: ambiguous keys, no aliases
+-- SELECT country, DATE_TRUNC('month', signup_at), COUNT(*), AVG(age)
+-- FROM users WHERE signup_at >= '2025-01-01'
+-- GROUP BY country, DATE_TRUNC('month', signup_at);
+```
+
+## Practical Anchor: Start by Defining the Grain
+
+Before writing any aggregate query, lock down the **grain** — the unit each output row represents. Is it per-order, per-order-line, or per-customer-per-day? Changing the grain changes the meaning of every metric.
+
+```sql
+-- Customer-day grain
+SELECT
+    customer_id,
+    DATE(ordered_at) AS order_date,
+    COUNT(*) AS order_count,
+    SUM(total_amount) AS gross_revenue
+FROM orders
+GROUP BY customer_id, DATE(ordered_at);
+```
+
+## Practical Anchor: Separate Cleaning Before Aggregation
+
+Aggregating before removing duplicates or cancelled orders produces dashboard numbers that drift. Isolate cleaning into a CTE so it is reviewable and reusable.
+
+```sql
+WITH cleaned_orders AS (
+    SELECT *
+    FROM orders
+    WHERE status = 'paid'
+      AND is_test = false
+)
+SELECT
+    DATE(ordered_at) AS d,
+    COUNT(*) AS paid_orders,
+    SUM(total_amount) AS revenue
+FROM cleaned_orders
+GROUP BY DATE(ordered_at)
+ORDER BY d;
+```
+
+## Practical Anchor: WHERE vs HAVING Separation Principle
+
+WHERE runs before grouping; HAVING runs after. Mixing them up is one of the most common review findings.
+
+```sql
+SELECT customer_id, COUNT(*) AS order_count
+FROM orders
+WHERE ordered_at >= CURRENT_DATE - INTERVAL '90 days'
+GROUP BY customer_id
+HAVING COUNT(*) >= 3;
+```
+
+## Practical Anchor: Role Division with Window Functions
+
+When you need both aggregation and ranking, forcing everything into GROUP BY loses the original rows. Split the responsibilities:
+
+```sql
+WITH daily AS (
+    SELECT DATE(ordered_at) AS d, customer_id, SUM(total_amount) AS revenue
+    FROM orders
+    GROUP BY DATE(ordered_at), customer_id
+)
+SELECT
+    d,
+    customer_id,
+    revenue,
+    DENSE_RANK() OVER (PARTITION BY d ORDER BY revenue DESC) AS rank_in_day
+FROM daily;
+```
+
 ## Checklist
 
 - [ ] I know the difference between WHERE and HAVING.

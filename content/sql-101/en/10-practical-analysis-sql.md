@@ -174,6 +174,76 @@ Analytics teams maintain a *pattern library* of these queries. With PR review an
 - *Build layers with windows and CTEs.*
 - *MoM/YoY uses NULLIF by default.*
 
+## Query Optimization Checklist
+
+Before tuning, walk through this checklist in order — fix the biggest bottleneck first.
+
+| # | Check | What to Look For |
+| --- | --- | --- |
+| 1 | Metric definition | Does the SQL match the documented business definition? |
+| 2 | Filter selectivity | Do WHERE conditions narrow rows enough for index use? |
+| 3 | Join order and keys | Are joins on indexed keys? Is cardinality as expected? |
+| 4 | Aggregation grain | Is the GROUP BY level correct for the question asked? |
+| 5 | Index coverage | Does a composite index cover WHERE + ORDER BY? |
+| 6 | Execution plan | Does EXPLAIN ANALYZE confirm the plan matches expectations? |
+
+## Slow Query Before/After Example
+
+### Before: no index on filter column
+
+```sql
+SELECT u.name, COUNT(o.id) AS order_count
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id
+WHERE u.created_at >= '2025-01-01'
+GROUP BY u.id, u.name
+ORDER BY order_count DESC;
+```
+
+```text
+Sort  (cost=3500.00..3550.00 rows=20000 width=40) (actual time=125.456..126.789 rows=20000 loops=1)
+  Sort Key: (count(o.id)) DESC
+  ->  HashAggregate  (cost=2800.00..2900.00 rows=20000 width=40) (actual time=98.123..102.456 rows=20000 loops=1)
+        Group Key: u.id, u.name
+        ->  Hash Left Join  (cost=1500.00..2600.00 rows=80000 width=36) (actual time=23.456..85.678 rows=80000 loops=1)
+              Hash Cond: (u.id = o.user_id)
+              ->  Seq Scan on users u  (cost=0.00..850.00 rows=20000 width=32) (actual time=0.023..15.678 rows=20000 loops=1)
+                    Filter: (created_at >= '2025-01-01')
+                    Rows Removed by Filter: 30000
+              ->  Hash  (cost=1000.00..1000.00 rows=80000 width=8) (actual time=23.123..23.123 rows=80000 loops=1)
+Planning Time: 1.234 ms
+Execution Time: 127.890 ms
+```
+
+Problems: Seq Scan on `users` removes 30,000 rows by filter. No index on `created_at`.
+
+### After: index added
+
+```sql
+CREATE INDEX idx_users_created_at ON users (created_at);
+```
+
+```text
+Sort  (cost=1800.00..1850.00 rows=20000 width=40) (actual time=42.123..43.456 rows=20000 loops=1)
+  Sort Key: (count(o.id)) DESC
+  ->  HashAggregate  (cost=1200.00..1300.00 rows=20000 width=40) (actual time=35.678..39.012 rows=20000 loops=1)
+        Group Key: u.id, u.name
+        ->  Hash Left Join  (cost=600.00..1000.00 rows=80000 width=36) (actual time=8.123..28.456 rows=80000 loops=1)
+              Hash Cond: (u.id = o.user_id)
+              ->  Index Scan using idx_users_created_at on users u  (cost=0.29..250.00 rows=20000 width=32) (actual time=0.012..3.456 rows=20000 loops=1)
+                    Index Cond: (created_at >= '2025-01-01')
+              ->  Hash  (cost=1000.00..1000.00 rows=80000 width=8) (actual time=8.012..8.012 rows=80000 loops=1)
+Planning Time: 0.890 ms
+Execution Time: 44.567 ms
+```
+
+Results:
+
+- Seq Scan → Index Scan (no rows removed by filter)
+- Execution time: 127 ms → 44 ms (65% reduction)
+
+One well-placed index made a major difference. Real queries may also need join reordering, subquery restructuring, or aggregation changes.
+
 ## Checklist
 
 - [ ] I can write DAU in one line.

@@ -146,6 +146,192 @@ ETL pipelines are mostly CTE-based *named transformations*. *Cohort analysis*, *
 - *For correlated subqueries, ask if a *join* would work.*
 - *Use EXISTS for cheap *existence checks*.*
 
+## VIEW vs CTE vs Subquery
+
+| Approach | Persistence | Reusability | Optimization | Best for |
+| --- | --- | --- | --- | --- |
+| **Subquery (inline view)** | Query-scoped | Single use | Inlined by planner | Simple one-off filters |
+| **CTE** | Query-scoped | Multiple references in same query | Inlined (PG 12+) or materialized | Multi-step logic, debugging |
+| **VIEW** | Schema object | Any query | Re-planned each call | Shared business definitions |
+| **Materialized View** | Schema object + stored data | Any query | Pre-computed, refreshed on demand | Expensive aggregations read often |
+
+### WITH RECURSIVE Example (Org Tree)
+
+```sql
+WITH RECURSIVE org_tree AS (
+    -- anchor: top-level managers
+    SELECT id, name, manager_id, 1 AS depth
+    FROM employees
+    WHERE manager_id IS NULL
+    UNION ALL
+    -- recursive: each level down
+    SELECT e.id, e.name, e.manager_id, t.depth + 1
+    FROM employees e
+    JOIN org_tree t ON t.id = e.manager_id
+)
+SELECT * FROM org_tree ORDER BY depth, name;
+```
+
+Recursive CTEs solve hierarchical problems (org charts, category trees, graph traversal) that flat SQL cannot express.
+
+## IN vs EXISTS: Performance Comparison
+
+```sql
+-- IN: materializes the subquery result, then checks membership
+SELECT c.customer_id
+FROM customers c
+WHERE c.customer_id IN (
+    SELECT o.customer_id
+    FROM orders o
+    WHERE o.status = 'paid'
+);
+
+-- EXISTS: stops at first match (short-circuit)
+SELECT c.customer_id
+FROM customers c
+WHERE EXISTS (
+    SELECT 1
+    FROM orders o
+    WHERE o.customer_id = c.customer_id
+      AND o.status = 'paid'
+);
+```
+
+Selection criteria:
+
+- Subquery result is small with no NULLs → `IN`
+- Outer table is large and subquery can match quickly → `EXISTS`
+- NULL safety matters → `EXISTS` (safer)
+
+In practice, write both and compare with `EXPLAIN ANALYZE`.
+
+## CTE Performance Considerations
+
+CTEs improve readability, but in PostgreSQL 11 and below they are always materialized, limiting optimization. PostgreSQL 12+ inlines most CTEs, but you can control the behavior explicitly:
+
+```sql
+-- Force materialization (useful when CTE is referenced multiple times)
+WITH big_orders AS MATERIALIZED (
+    SELECT user_id, SUM(total) AS spend
+    FROM orders GROUP BY user_id
+    HAVING SUM(total) > 1000
+)
+SELECT * FROM big_orders;
+
+-- Force inlining (let planner push predicates into CTE)
+WITH big_orders AS NOT MATERIALIZED (
+    SELECT user_id, SUM(total) AS spend
+    FROM orders GROUP BY user_id
+    HAVING SUM(total) > 1000
+)
+SELECT * FROM big_orders;
+```
+
+Default behavior is usually correct. Use `MATERIALIZED` explicitly when a CTE is referenced multiple times or when performance differs from expectations.
+
+## Subquery Anti-Patterns
+
+### Anti-pattern 1: Repeated correlated subqueries in SELECT
+
+```sql
+-- Bad: scans orders twice
+SELECT id, name,
+    (SELECT COUNT(*) FROM orders WHERE user_id = u.id) AS order_count,
+    (SELECT SUM(total) FROM orders WHERE user_id = u.id) AS total_spend
+FROM users u;
+```
+
+Better: aggregate once with a join.
+
+```sql
+-- Good: single scan
+SELECT u.id, u.name,
+    COUNT(o.id) AS order_count,
+    SUM(o.total) AS total_spend
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id
+GROUP BY u.id, u.name;
+```
+
+### Anti-pattern 2: Excessive nesting
+
+```sql
+-- Hard to read
+SELECT * FROM (
+    SELECT * FROM (
+        SELECT * FROM orders WHERE total > 100
+    ) AS t1 WHERE user_id > 10
+) AS t2 WHERE created_at > '2025-01-01';
+```
+
+Flatten with a CTE or combine conditions:
+
+```sql
+-- Clear
+WITH filtered_orders AS (
+    SELECT * FROM orders
+    WHERE total > 100
+      AND user_id > 10
+      AND created_at > '2025-01-01'
+)
+SELECT * FROM filtered_orders;
+```
+
+## Practical Anchor: Selection Criteria for Subquery vs CTE
+
+Both produce the same result, but choose based on reuse scope and review difficulty:
+
+- One-time use with short meaning → inline subquery
+- Referenced at multiple stages → CTE
+- Needs step-by-step debugging → CTE with descriptive names
+
+```sql
+WITH paid_orders AS (
+    SELECT *
+    FROM orders
+    WHERE status = 'paid'
+),
+customer_revenue AS (
+    SELECT customer_id, SUM(total_amount) AS revenue
+    FROM paid_orders
+    GROUP BY customer_id
+)
+SELECT *
+FROM customer_revenue
+WHERE revenue >= 100000;
+```
+
+## Practical Anchor: Replacing a Correlated Subquery
+
+Correlated subqueries are readable but may execute once per outer row.
+
+```sql
+-- Correlated subquery (expensive at scale)
+SELECT o.order_id,
+       (SELECT SUM(oi.quantity * oi.unit_price)
+        FROM order_items oi
+        WHERE oi.order_id = o.order_id) AS amount
+FROM orders o;
+```
+
+Pre-aggregate and JOIN instead:
+
+```sql
+WITH item_sum AS (
+    SELECT order_id, SUM(quantity * unit_price) AS amount
+    FROM order_items
+    GROUP BY order_id
+)
+SELECT o.order_id, i.amount
+FROM orders o
+LEFT JOIN item_sum i ON i.order_id = o.order_id;
+```
+
+## Practical Anchor: CTE Debugging Routine
+
+For complex analytical SQL, do not only look at the final result. Run each CTE independently and verify row counts. Check whether primary-key uniqueness holds at each stage — catching uniqueness violations early prevents downstream JOIN errors.
+
+
 ## Checklist
 
 - [ ] I know scalar vs inline vs CTE.

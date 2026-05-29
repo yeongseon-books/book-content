@@ -71,11 +71,17 @@ WHERE is evaluated before SELECT, which means column aliases from SELECT aren't 
 SELECT * FROM users WHERE age >= 18;
 ```
 
+Comparison operators work exactly as expected: `>=`, `<=`, `<>` (not equal). The key rule is to keep the column on the left, unmodified — this lets the optimizer use indexes.
+
+
 ### Step 2 — Range
 
 ```sql
 SELECT * FROM orders WHERE total BETWEEN 100 AND 500;
 ```
+
+`BETWEEN` is inclusive on both ends: `total >= 100 AND total <= 500`. It reads more naturally for range queries, especially on dates.
+
 
 ### Step 3 — Membership
 
@@ -83,17 +89,26 @@ SELECT * FROM orders WHERE total BETWEEN 100 AND 500;
 SELECT * FROM users WHERE country IN ('KR', 'JP', 'US');
 ```
 
+`IN` replaces a chain of OR conditions with a compact list. For small sets (3–10 values) it is ideal. For larger sets, join against a temporary table instead.
+
+
 ### Step 4 — Pattern
 
 ```sql
 SELECT * FROM users WHERE email LIKE '%@example.com';
 ```
 
+Leading wildcards (`%xxx`) force a full table scan because the engine cannot binary-search the index. Trailing wildcards (`xxx%`) can still use the index.
+
+
 ### Step 5 — NULL-safe
 
 ```sql
 SELECT * FROM users WHERE deleted_at IS NULL;
 ```
+
+`NULL` is not a value — it is an unknown state. The only operators that work with it are `IS NULL` and `IS NOT NULL`. Writing `= NULL` always evaluates to unknown and silently returns zero rows.
+
 
 **Expected output:**
 
@@ -127,6 +142,106 @@ Dashboard filters, *search boxes*, and *permission checks* all funnel into WHERE
 - *Look at the *selectivity* of each predicate.*
 - *Always parenthesize AND/OR.*
 - *Big OR lists belong in a *join or IN*.*
+
+## Operator precedence
+
+| Priority | Operator | Notes |
+| --- | --- | --- |
+| 1 | `()` | Parentheses — evaluated first |
+| 2 | `NOT` | Logical negation |
+| 3 | Comparison | `=`, `<>`, `>`, `<`, `>=`, `<=`, `BETWEEN`, `IN`, `LIKE`, `IS NULL` |
+| 4 | `AND` | Logical AND |
+| 5 | `OR` | Logical OR |
+
+`AND` binds tighter than `OR`. So `A OR B AND C` means `A OR (B AND C)`, not `(A OR B) AND C`. Always use parentheses when mixing AND and OR:
+
+```sql
+-- Without parentheses: meaning may surprise you
+SELECT * FROM users
+WHERE country = 'US' OR country = 'UK' AND age >= 18;
+
+-- Explicit intent
+SELECT * FROM users
+WHERE (country = 'US' OR country = 'UK') AND age >= 18;
+```
+
+## Indexes and WHERE conditions
+
+### Sargable conditions (index-friendly)
+
+```sql
+-- Index on user_id can be used directly
+SELECT * FROM orders WHERE user_id = 123;
+```
+
+The engine jumps straight to the matching rows via the index.
+
+### Non-sargable conditions (index-hostile)
+
+```sql
+-- Wrapping the column in a function blocks the index
+SELECT * FROM orders WHERE YEAR(order_date) = 2026;
+
+-- Rewrite as a range to restore index usage
+SELECT * FROM orders
+WHERE order_date >= '2026-01-01' AND order_date < '2027-01-01';
+```
+
+Rule: keep the column bare on the left side. Move transformations to the comparison value.
+
+### Type mismatches
+
+Comparing a numeric column against a string (`age = '18'`) causes an implicit cast that can defeat the index silently. Always match types exactly.
+
+## Concrete anchor: Rewriting conditions for index use
+
+Same semantics, very different execution plans:
+
+```sql
+-- Bad: function on column
+SELECT * FROM events
+WHERE DATE(created_at) = DATE '2026-05-01';
+
+-- Good: half-open range
+SELECT * FROM events
+WHERE created_at >= TIMESTAMP '2026-05-01 00:00:00'
+  AND created_at <  TIMESTAMP '2026-05-02 00:00:00';
+```
+
+The range form lets the optimizer use an index range scan instead of a full table scan.
+
+## Concrete anchor: OR splitting with UNION ALL
+
+When OR produces wide scans, splitting into UNION ALL can yield better plans:
+
+```sql
+-- Planner may choose a broad scan
+SELECT * FROM orders
+WHERE status = 'paid' OR status = 'refunded';
+
+-- Alternative: separate scans, each using an index
+SELECT * FROM orders WHERE status = 'paid'
+UNION ALL
+SELECT * FROM orders WHERE status = 'refunded';
+```
+
+When duplicates are impossible (each row has one status), `UNION ALL` avoids unnecessary sort/dedup overhead.
+
+## Concrete anchor: NULL safety with NOT EXISTS
+
+`NOT IN` behaves unexpectedly when the subquery returns NULLs — the entire expression evaluates to unknown and returns zero rows. `NOT EXISTS` is immune to this trap:
+
+```sql
+-- Safe regardless of NULLs in blacklist
+SELECT c.customer_id
+FROM customers c
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM blacklist b
+    WHERE b.customer_id = c.customer_id
+);
+```
+
 
 ## Checklist
 

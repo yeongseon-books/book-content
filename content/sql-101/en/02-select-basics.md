@@ -71,17 +71,26 @@ The logical flow is FROM (source) → WHERE (filter) → SELECT (shape) → ORDE
 SELECT id, name, signup_at FROM users;
 ```
 
+Explicit column names document what the query actually needs. When a table gains new columns later, this query keeps returning the same shape — no surprises for downstream consumers.
+
+
 ### Step 2 — Aliases for readability
 
 ```sql
 SELECT name AS user_name, signup_at AS joined_on FROM users;
 ```
 
+Aliases make results self-documenting. `user_name` and `joined_on` tell the reader (and the dashboard) what the columns mean without checking the schema.
+
+
 ### Step 3 — Sort
 
 ```sql
 SELECT id, name FROM users ORDER BY signup_at DESC;
 ```
+
+Sorting only matters when order matters. `DESC` shows newest first, which is the most common pattern for time-series exploration.
+
 
 ### Step 4 — Top N
 
@@ -97,11 +106,17 @@ SELECT id, name FROM users ORDER BY id LIMIT 10;
 | 2 | Linus |
 | 3 | Grace |
 
+
+When exploring a large table, always start with a bounded sample. `LIMIT` keeps the result manageable and prevents the UI from freezing on millions of rows.
+
 ### Step 5 — Drop duplicates
 
 ```sql
 SELECT DISTINCT country FROM users;
 ```
+
+`DISTINCT` removes duplicate rows, but it is not free — internally it requires a sort or hash. Before adding `DISTINCT`, ask why duplicates exist. If a join is producing them, fixing the join is better than masking the problem.
+
 
 ## What to Notice in This Code
 
@@ -128,6 +143,148 @@ Dashboards repeat the `SELECT cols + ORDER BY + LIMIT` pattern *hundreds of time
 - *Assume `LIMIT` should have a sane default.*
 - *If `DISTINCT` is hiding things, your *join* is suspicious.*
 - *Aliases follow a *team convention*.*
+
+## SELECT evaluation order
+
+The order you write clauses and the order the engine processes them are different. Understanding this explains alias visibility rules:
+
+| Step | Clause | Role |
+| --- | --- | --- |
+| 1 | `FROM` | Identify the source table(s) |
+| 2 | `WHERE` | Filter rows (before aggregation) |
+| 3 | `GROUP BY` | Group rows for aggregation |
+| 4 | `HAVING` | Filter groups |
+| 5 | `SELECT` | Choose columns, assign aliases |
+| 6 | `ORDER BY` | Sort the result |
+| 7 | `LIMIT` / `OFFSET` | Bound the output |
+
+Because `WHERE` runs before `SELECT`, aliases defined in SELECT are invisible to WHERE. Because `ORDER BY` runs after SELECT, it can use aliases. Once you memorize this table, alias errors stop being mysterious.
+
+## Additional DISTINCT, LIMIT, OFFSET patterns
+
+### LIMIT with explicit sort
+
+```sql
+SELECT name, signup_at FROM users ORDER BY signup_at LIMIT 5;
+```
+
+Always pair LIMIT with ORDER BY. Without an explicit sort, the database returns rows in an undefined order — your "top 5" could change between runs.
+
+### Cursor-based pagination vs OFFSET
+
+```sql
+-- OFFSET approach (cost grows with page number)
+SELECT order_id, ordered_at, total_amount
+FROM orders
+ORDER BY ordered_at DESC, order_id DESC
+LIMIT 50 OFFSET 50000;
+```
+
+`OFFSET` still scans past all skipped rows internally. For deep pages, cursor-based pagination performs much better:
+
+```sql
+-- Cursor approach (constant cost per page)
+SELECT order_id, ordered_at, total_amount
+FROM orders
+WHERE (ordered_at, order_id) < (TIMESTAMP '2026-05-10 09:00:00', 881020)
+ORDER BY ordered_at DESC, order_id DESC
+LIMIT 50;
+```
+
+This approach keeps response time stable regardless of how deep into the dataset the user scrolls.
+
+### DISTINCT vs GROUP BY
+
+```sql
+-- Deduplication only
+SELECT DISTINCT customer_id
+FROM orders
+WHERE ordered_at >= CURRENT_DATE - INTERVAL '30 days';
+
+-- Aggregation (gives you more information)
+SELECT customer_id, COUNT(*) AS order_count
+FROM orders
+WHERE ordered_at >= CURRENT_DATE - INTERVAL '30 days'
+GROUP BY customer_id;
+```
+
+When the goal is just unique values, `DISTINCT` reads naturally. When you also need counts or sums, `GROUP BY` is the right tool. Breaking the "always use DISTINCT" reflex improves both clarity and performance.
+
+## Alias patterns in depth
+
+### Computed columns need aliases
+
+```sql
+SELECT
+    name,
+    EXTRACT(YEAR FROM signup_at) AS signup_year,
+    CURRENT_DATE - signup_at AS days_since_signup
+FROM users;
+```
+
+Without aliases, computed columns show raw expressions as column names — unreadable for anyone consuming the output.
+
+### Table aliases shorten joins
+
+```sql
+SELECT u.name, u.email
+FROM users AS u
+WHERE u.signup_at >= '2026-01-01';
+```
+
+Short table aliases (`u`, `o`, `c`) save repetition, especially in multi-join queries. Pick consistent abbreviations across the team.
+
+### Aliases in ORDER BY
+
+```sql
+SELECT name, signup_at AS joined
+FROM users
+ORDER BY joined DESC;
+```
+
+`ORDER BY` executes after `SELECT`, so it can reference aliases. This avoids repeating the same expression.
+
+### Aliases are NOT visible in WHERE
+
+```sql
+-- This fails: WHERE runs before SELECT
+-- SELECT name, signup_at AS joined FROM users WHERE joined >= '2026-02-01';
+
+-- Correct: use the original column name
+SELECT name, signup_at AS joined
+FROM users
+WHERE signup_at >= '2026-02-01';
+```
+
+## Concrete anchor: Covering indexes and column selection
+
+Reducing `SELECT *` is not just about network savings. When you select only indexed columns, the engine can answer entirely from the index without touching the table:
+
+```sql
+-- Query pattern
+SELECT order_id, ordered_at, total_amount
+FROM orders
+WHERE customer_id = 1201
+ORDER BY ordered_at DESC
+LIMIT 20;
+
+-- Supporting index (INCLUDE avoids table lookup)
+CREATE INDEX idx_orders_customer_recent
+    ON orders (customer_id, ordered_at DESC)
+    INCLUDE (total_amount);
+```
+
+With this index, the query returns results without a single heap access — latency drops and stays stable under load.
+
+## Column selection design criteria
+
+Before writing any SELECT, run through these checks:
+
+- Only include columns the screen/report actually displays.
+- Give ambiguous columns aliases that match domain terminology.
+- Always specify ORDER BY when order matters to the consumer.
+- Do not mix aggregations and raw-row queries in one statement.
+
 
 ## Checklist
 
