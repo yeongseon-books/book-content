@@ -44,7 +44,9 @@ In this chapter, we separate the user-facing layer, lifecycle daemon, low-level 
 
 ## Why It Matters
 
-Since Kubernetes 1.24 removed `dockershim`, you cannot debug effectively without knowing the runtime layers.
+Since Kubernetes 1.24 removed `dockershim`, you cannot debug cluster node issues without knowing the runtime layers. When a Pod fails to start, the error might come from the CRI shim, containerd's image handling, or runc's process spawning—each requiring different diagnostic tools (`crictl`, `ctr`, journalctl). Treating Docker as the only layer leaves you blind on production nodes.
+
+Docker and containerd are daemons that manage images and storage. runc is the actual process executor. When Kubernetes 1.24 removed dockershim, it meant most clusters switch directly to containerd or another CRI-compatible runtime.
 
 Docker and containerd are daemons that manage images and storage. runc is the actual process executor. When Kubernetes 1.24 removed dockershim, it meant most clusters switch directly to containerd or another CRI-compatible runtime.
 
@@ -74,12 +76,16 @@ def ctr_version():
     return res.stdout
 ```
 
+`ctr version` confirms containerd is running and reachable. On production nodes where Docker is absent, this is the first diagnostic step—if containerd is down, no containers start.
+
 ### Step 2 — Pull
 
 ```python
 def ctr_pull(image):
     subprocess.run(["ctr", "image", "pull", image], check=True)
 ```
+
+Pulling via `ctr` bypasses Docker entirely. This demonstrates that containerd is a standalone daemon—Docker is just one of its clients, not a requirement.
 
 ### Step 3 — Run
 
@@ -91,6 +97,8 @@ def ctr_run(image, name):
     )
 ```
 
+Running via `ctr run` creates a container directly through containerd. The `-d` flag detaches it. Notice there is no port mapping or network setup—containerd is lower-level than Docker and does not manage networking.
+
 ### Step 4 — List
 
 ```python
@@ -99,6 +107,8 @@ def ctr_list():
     return res.stdout
 ```
 
+`containers ls` shows containerd's view of running containers. On a Kubernetes node, you would use `crictl ps` instead—same underlying containers, different management interface.
+
 ### Step 5 — Cleanup
 
 ```python
@@ -106,6 +116,8 @@ def ctr_kill(name):
     subprocess.run(["ctr", "task", "kill", name])
     subprocess.run(["ctr", "container", "rm", name])
 ```
+
+Cleanup in containerd is two steps: kill the task (the running process), then remove the container metadata. This separation reveals that containerd tracks process lifecycle (`task`) and container state independently.
 
 ## What to Notice in This Code
 

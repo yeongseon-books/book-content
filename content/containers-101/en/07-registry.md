@@ -44,7 +44,9 @@ In this chapter, we treat the registry as the center of deployment identity, cov
 
 ## Why It Matters
 
-A reproducible image is useless if there is *no place to fetch it from*. *Deployment starts at the registry.*
+A reproducible image is useless if there is no place to fetch it from reliably. Deployment starts at the registry—it is the handoff point between build and runtime. Without proper tagging strategy, digest pinning, and access control, you end up unable to prove what is actually running in production or to reproduce a deployment from six months ago.
+
+Tags are human-friendly labels; digests are content-based hashes. The same tag can point to different digests over time, but a digest always refers to the exact same bytes. Private registries add authentication and network isolation; public ones rely on image content and scanning.
 
 Tags are human-friendly labels; digests are content-based hashes. The same tag can point to different digests over time, but a digest always refers to the exact same bytes. Private registries add authentication and network isolation; public ones rely on image content and scanning.
 
@@ -76,6 +78,8 @@ def login(registry, user, password):
     )
 ```
 
+Authentication happens first. `--password-stdin` avoids the password appearing in shell history or process lists—a common secret-leak vector in CI pipelines.
+
 ### Step 2 — Tag
 
 ```python
@@ -83,12 +87,16 @@ def tag(local, remote):
     subprocess.run(["docker", "tag", local, remote], check=True)
 ```
 
+Tagging maps a local build to a remote repository path. The naming convention (`registry/org/image:tag`) determines where the image lands and who can pull it—get this wrong and deployments pull stale or wrong images.
+
 ### Step 3 — Push
 
 ```python
 def push(remote):
     subprocess.run(["docker", "push", remote], check=True)
 ```
+
+Push uploads only the layers that the registry does not already have. This deduplication is why layer ordering matters even for distribution—shared base layers transfer once.
 
 ### Step 4 — Read the digest
 
@@ -101,12 +109,16 @@ def digest(remote):
     return res.stdout.strip()
 ```
 
+The digest is the immutable identity. Record it in deployment manifests and CI logs so you can always answer "what exact bytes ran in production on date X?" without relying on mutable tags.
+
 ### Step 5 — Verify with pull
 
 ```python
 def verify_pull(remote_digest):
     subprocess.run(["docker", "pull", remote_digest], check=True)
 ```
+
+Pulling by digest proves the round-trip: push, record digest, pull by digest, verify identical content. This is the minimum reproducibility test before trusting a registry for production deployments.
 
 ## What to Notice in This Code
 

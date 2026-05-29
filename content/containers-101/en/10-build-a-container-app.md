@@ -44,7 +44,9 @@ In this chapter, we assemble a FastAPI app and Postgres into one stack with Dock
 
 ## Why It Matters
 
-Every concept above only sticks once you *integrate* it into *one running result*. That is the meaning of this *final post*.
+Every concept from the previous nine chapters only sticks once you integrate it into one running result. Isolation, layers, networking, volumes, security, and registry flow all meet here in a single stack that starts with one command, verifies itself, and tears down cleanly. This is the difference between knowing vocabulary and having an operational habit.
+
+A container app lives in three places: source code + Dockerfile in version control; built image in a registry (tagged for traceability); running instance in an orchestrator (with volumes, network policy, and logging attached). Each stage moves the same artifact forward.
 
 A container app lives in three places: source code + Dockerfile in version control; built image in a registry (tagged for traceability); running instance in an orchestrator (with volumes, network policy, and logging attached). Each stage moves the same artifact forward.
 
@@ -84,6 +86,8 @@ def users():
             return {"count": cur.fetchone()[0]}
 ```
 
+The application code is deliberately minimal—a health endpoint and one DB query. The goal is not the app logic but the operational scaffolding around it: how you containerize, connect, health-check, and observe.
+
 ### Step 2 — Dockerfile
 
 ```dockerfile
@@ -97,6 +101,8 @@ EXPOSE 8080
 HEALTHCHECK CMD curl -f http://localhost:8080/health || exit 1
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
 ```
+
+The Dockerfile applies every best practice from chapter 4: slim base, dependencies before code (cache optimization), non-root user, declared port, and a built-in health check. This is the template every production service should start from.
 
 ### Step 3 — docker-compose.yml
 
@@ -118,6 +124,8 @@ services:
       POSTGRES_PASSWORD: secret
       POSTGRES_DB: app
     healthcheck:
+
+`depends_on` with `condition: service_healthy` means the app container waits until Postgres passes its health check before starting. Without this, the app crashes on first boot because the DB is not ready—a common failure in naive Compose setups.
       test: ["CMD-SHELL", "pg_isready -U app"]
       interval: 5s
       timeout: 3s

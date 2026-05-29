@@ -44,7 +44,9 @@ In this chapter, we compare named volumes, bind mounts, and tmpfs by lifecycle a
 
 ## Why It Matters
 
-Containers are immutable, but the data they manage must survive. A bad volume design is a data-loss design.
+Containers are immutable, but the data they manage must survive. A bad volume design is a data-loss design hiding behind green health checks. The most common production incident in containerized workloads is not a crash—it is silent data loss when someone deletes a container that was storing state in its writable layer.
+
+Volumes are managed storage independent of container identity. Bind mounts let you connect a host path directly. tmpfs lives in memory and disappears when the container stops. Each has different persistence guarantees and performance trade-offs.
 
 Volumes are managed storage independent of container identity. Bind mounts let you connect a host path directly. tmpfs lives in memory and disappears when the container stops. Each has different persistence guarantees and performance trade-offs.
 
@@ -73,6 +75,8 @@ def create(name):
     subprocess.run(["docker", "volume", "create", name], check=True)
 ```
 
+`docker volume create` allocates managed storage on the host. Unlike bind mounts, you do not need to know the host path—Docker manages the location. This makes volumes portable across host configurations.
+
 ### Step 2 — Mount and run
 
 ```python
@@ -85,6 +89,8 @@ def run_db(volume):
     ], check=True)
 ```
 
+The `-v` flag connects the named volume to the container's data directory. When this container is deleted and recreated, the volume persists independently—the new container picks up exactly where the old one left off.
+
 ### Step 3 — Inspect
 
 ```python
@@ -95,6 +101,8 @@ def inspect(name):
     )
     return res.stdout
 ```
+
+`docker volume inspect` shows the mount point on the host, the driver in use, and creation metadata. In production, this is how you verify that a volume actually exists and is using the expected storage backend.
 
 ### Step 4 — Back up
 
@@ -108,12 +116,16 @@ def backup(volume, archive):
     ], check=True)
 ```
 
+The backup pattern mounts the volume read-only into a temporary container that archives it. This is the minimum viable backup—without it, volume data has no recovery path outside the single host.
+
 ### Step 5 — Remove
 
 ```python
 def remove(name):
     subprocess.run(["docker", "volume", "rm", name], check=True)
 ```
+
+`docker volume rm` is irreversible. Once removed, the data is gone unless you have a backup. In production, always verify backups exist and are restorable before removing any volume.
 
 ## What to Notice in This Code
 

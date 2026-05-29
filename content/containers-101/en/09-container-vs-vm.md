@@ -44,7 +44,9 @@ In this chapter, we compare shared-kernel isolation with hypervisor-based isolat
 
 ## Why It Matters
 
-Choosing *isolation that fits the workload* keeps both *cost* and *security* under control. The two are *complementary*, not competitors.
+Choosing isolation that fits the workload keeps both cost and security under control. Running everything as VMs wastes money on workloads that need speed and density; running everything as containers ignores workloads that need hard tenant boundaries. The two are complementary tools, not competitors—and hybrid options (microVMs, gVisor, Kata) exist precisely because real architectures need points between the extremes.
+
+VMs boot a full OS image (slow, GB memory per instance) but achieve strong isolation. Containers run processes directly on the host kernel (fast, MB per instance) but share more surface area. Containers are suited for microservices; VMs are needed when you require different OSes or complete tenant isolation.
 
 VMs boot a full OS image (slow, GB memory per instance) but achieve strong isolation. Containers run processes directly on the host kernel (fast, MB per instance) but share more surface area. Containers are suited for microservices; VMs are needed when you require different OSes or complete tenant isolation.
 
@@ -75,6 +77,8 @@ def run_container(image):
     return time.time() - t
 ```
 
+Container startup is measured in milliseconds to low seconds because there is no OS boot—the process starts directly on the existing kernel. This speed enables rapid scaling, fast CI jobs, and sub-second rollbacks.
+
 ### Step 2 — Run as a VM (concept)
 
 ```python
@@ -87,6 +91,8 @@ def run_vm(image_path):
     return time.time() - t
 ```
 
+VM startup includes BIOS/UEFI initialization, kernel boot, and service startup—typically 10-60 seconds. The trade-off is complete kernel independence: a kernel vulnerability in one VM cannot affect another.
+
 ### Step 3 — Compare memory
 
 ```python
@@ -98,6 +104,8 @@ def mem_usage(pid):
     return int(res.stdout.strip())
 ```
 
+Memory comparison shows the cost difference clearly. A container adds only the process RSS; a VM adds a full kernel + userspace (~256MB minimum even idle). At 100 instances, this difference is 25GB+ of wasted RAM.
+
 ### Step 4 — Compare startup time
 
 ```python
@@ -108,12 +116,16 @@ def compare(image, vm_image):
     }
 ```
 
+Timing the startup difference makes the trade-off concrete. Use this data to justify container adoption for workloads where boot speed matters (CI, autoscaling) versus VMs where isolation matters (multi-tenant SaaS, compliance).
+
 ### Step 5 — Report
 
 ```python
 def report(stats):
     print(f"container={stats['container_sec']:.2f}s vm={stats['vm_sec']:.2f}s")
 ```
+
+A report function closes the comparison loop. In practice, teams use this data in architecture decision records to justify when to use containers vs VMs for each workload category.
 
 ## What to Notice in This Code
 

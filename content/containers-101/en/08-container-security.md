@@ -44,7 +44,9 @@ In this chapter, we build a practical baseline around non-root users, capability
 
 ## Why It Matters
 
-A default container runs as *root* with *too many privileges* and easily becomes the *starting point* of a security incident.
+A default container runs as root with too many privileges and easily becomes the starting point of a security incident. Containers share the host kernel, so a privilege escalation inside a container can become host compromise. The security baseline is not one toggle but layers: non-root user, minimal capabilities, syscall filtering, image scanning, and runtime policies. Each layer independently reduces blast radius.
+
+Never run containers as root unless forced to. Use non-root users in Dockerfile. Scan images for known CVEs. Apply runtime policies (seccomp, SELinux, AppArmor) to restrict syscalls. Remember: containers share the host kernel, so kernel bugs can leak between containers.
 
 Never run containers as root unless forced to. Use non-root users in Dockerfile. Scan images for known CVEs. Apply runtime policies (seccomp, SELinux, AppArmor) to restrict syscalls. Remember: containers share the host kernel, so kernel bugs can leak between containers.
 
@@ -77,6 +79,8 @@ def scan(image):
     return res.returncode == 0
 ```
 
+Scanning before deployment catches known CVEs in base images and dependencies. A `HIGH` or `CRITICAL` finding that has a fix available is a blocker—ship it and you are knowingly deploying a vulnerability with a public exploit.
+
 ### Step 2 — Force non-root
 
 ```python
@@ -86,6 +90,8 @@ def run_nonroot(image):
         "--user", "1000:1000", image,
     ], check=True)
 ```
+
+`--user 1000:1000` forces the container process to run as a non-root UID regardless of what the Dockerfile says. Even if the image was built without a `USER` directive, this flag prevents root execution at runtime.
 
 ### Step 3 — Drop capabilities
 
@@ -97,6 +103,8 @@ def run_min_caps(image):
     ], check=True)
 ```
 
+`--cap-drop=ALL` removes every Linux capability, then `--cap-add` grants back only what the process needs. Most applications need zero capabilities; network-facing services may need `NET_BIND_SERVICE` for ports below 1024.
+
 ### Step 4 — Read-only filesystem
 
 ```python
@@ -107,6 +115,8 @@ def run_readonly(image):
     ], check=True)
 ```
 
+A read-only root filesystem prevents the container from writing anywhere except explicitly mounted volumes or tmpfs. If malware lands in the container, it cannot persist—a significant containment win for minimal operational cost.
+
 ### Step 5 — Mount a secret
 
 ```python
@@ -116,6 +126,8 @@ def run_with_secret(image, secret_path):
         "-v", f"{secret_path}:/run/secrets/db_pw:ro", image,
     ], check=True)
 ```
+
+Secrets mounted as read-only files at `/run/secrets/` are visible only inside the container and never appear in `docker inspect` or environment variable listings. This is safer than `-e DB_PASSWORD=...` which leaks into process listings and logs.
 
 ## What to Notice in This Code
 

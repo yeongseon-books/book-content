@@ -44,7 +44,9 @@ In this chapter, we unpack why images are split into layers, how OverlayFS makes
 
 ## Why It Matters
 
-Without layers, you cannot really optimize a Dockerfile. The difference between a 1-minute and a 30-second build comes from understanding this.
+Without layers, you cannot optimize a Dockerfile. The difference between a 1-minute and a 30-second build comes from understanding how layers cache, share, and transfer independently. More importantly, layers determine your image's attack surface: each unnecessary layer adds files that may contain vulnerabilities, grow pull time, and increase registry costs.
+
+Layers are read-only change sets. The bottom layers hold the base OS or runtime; upper layers add application dependencies. At runtime, an additional writable container layer is added on top so the base layers stay clean.
 
 Layers are read-only change sets. The bottom layers hold the base OS or runtime; upper layers add application dependencies. At runtime, an additional writable container layer is added on top so the base layers stay clean.
 
@@ -77,6 +79,8 @@ def inspect(image):
     return json.loads(res.stdout)
 ```
 
+`docker image inspect` reveals the full metadata including the ordered layer stack. Each layer hash in `RootFS.Layers` corresponds to one Dockerfile instruction that produced file changes.
+
 ### Step 2 — History
 
 ```python
@@ -88,6 +92,8 @@ def history(image):
     return res.stdout
 ```
 
+`docker history` traces the command behind each layer and its size contribution. This is how you identify which instruction bloated the image or broke the cache.
+
 ### Step 3 — Layer hashes
 
 ```python
@@ -96,6 +102,8 @@ def layer_sizes(image):
     return [layer for layer in data[0]["RootFS"]["Layers"]]
 ```
 
+The layer hash list is what Docker uses to decide cache hits. Two images sharing the same lower layers only transfer the differing upper layers during pull—the deduplication that makes container registries efficient.
+
 ### Step 4 — Digest
 
 ```python
@@ -103,12 +111,16 @@ def digest(image):
     return inspect(image)[0]["Id"]
 ```
 
+The digest (`sha256:...`) is the content-addressable identity. Unlike mutable tags (`latest`, `v1.0`), a digest guarantees byte-for-byte equality. Use digests in production deployments to prevent silent image mutation.
+
 ### Step 5 — Compare two builds
 
 ```python
 def diff(a, b):
     return set(layer_sizes(a)) ^ set(layer_sizes(b))
 ```
+
+Comparing layer sets between two builds instantly shows which instruction changed. If only the top layer differs, your cache strategy is working. If many layers differ, the Dockerfile ordering needs review.
 
 ## What to Notice in This Code
 

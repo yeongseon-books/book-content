@@ -44,7 +44,9 @@ In this chapter, we define a container as an isolated process tree sharing the h
 
 ## Why It Matters
 
-Since 2013, the container has been the default unit of deployment. Without it, modern DevOps is closed off to you.
+Since 2013, the container has been the default unit of deployment. Without understanding it, modern DevOps, CI/CD, and Kubernetes remain opaque. Many beginners remember containers as "lightweight VMs"—not entirely wrong, but operationally misleading. A container does not boot a guest OS. It shares the host kernel and isolates application processes via namespaces and cgroups. That is why startup is fast, density is high, and the same image reproduces the same behavior everywhere.
+
+A container is a process tree isolated by namespaces (PID, network, filesystem, IPC) and constrained by cgroups. They share the host kernel but not the OS image or process visibility.
 
 A container is a process tree isolated by namespaces (PID, network, filesystem, IPC) and constrained by cgroups. They share the host kernel but not the OS image or process visibility.
 
@@ -74,12 +76,16 @@ def docker_version():
     return res.stdout.strip()
 ```
 
+First verify Docker CLI is installed. In production, confirming tool version before debugging anything else is a habit that saves time.
+
 ### Step 2 — Pull image
 
 ```python
 def pull(image):
     subprocess.run(["docker", "pull", image], check=True)
 ```
+
+The image you pull (`nginx:latest`) is not the container itself—it is a static, read-only template. Remembering this distinction (template vs running instance) prevents confusion in every subsequent chapter.
 
 ### Step 3 — Run container
 
@@ -91,6 +97,8 @@ def run_nginx():
     )
 ```
 
+This is where a container is actually created: the image is the blueprint, the container is the running instance. Think class vs object.
+
 ### Step 4 — Inspect
 
 ```python
@@ -99,12 +107,16 @@ def ps():
     return res.stdout
 ```
 
+The output of `docker ps` looks like a simple list, but in operations it is the primary observation point: port mappings, names, status, and uptime are all here.
+
 ### Step 5 — Clean up
 
 ```python
 def cleanup(name):
     subprocess.run(["docker", "rm", "-f", name], check=True)
 ```
+
+Cleanup completes the exercise. The fact that containers can be created and destroyed in seconds is the core operational property—disposability enables reproducibility.
 
 ## What to Notice in This Code
 

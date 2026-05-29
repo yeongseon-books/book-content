@@ -44,7 +44,9 @@ In this chapter, we focus on cache-friendly instruction order, multi-stage build
 
 ## Why It Matters
 
-A Dockerfile directly drives team productivity and security. Get it right once and it pays back for years.
+A Dockerfile directly drives team productivity and security. A poorly ordered Dockerfile means every code change triggers a full dependency reinstall (minutes wasted per build, multiplied by every developer and CI run). A missing `USER` directive means every container runs as root—one exploit away from host compromise. Get it right once and it pays back for years.
+
+Each Dockerfile instruction creates one layer. Layers below are cached if their inputs match; changes above invalidate everything below. Multi-stage builds let you discard build artifacts before the final layer.
 
 Each Dockerfile instruction creates one layer. Layers below are cached if their inputs match; changes above invalidate everything below. Multi-stage builds let you discard build artifacts before the final layer.
 
@@ -74,6 +76,8 @@ def base_stage():
     ]
 ```
 
+The `FROM` instruction sets the base image and names the build stage. Choosing `python:3.12-slim` over the full image saves ~600MB and reduces CVE surface. The stage name (`AS builder`) enables multi-stage referencing later.
+
 ### Step 2 — Dependencies first
 
 ```python
@@ -84,6 +88,8 @@ def deps_stage():
     ]
 ```
 
+Copying `requirements.txt` before the application code is the single most impactful cache optimization. Since dependencies change rarely, this layer stays cached across most builds—only a requirements change triggers a reinstall.
+
 ### Step 3 — Code
 
 ```python
@@ -92,6 +98,8 @@ def code_stage():
         "COPY . .",
     ]
 ```
+
+`COPY . .` brings in the actual application code. Because it sits after the dependency layer, a code-only change rebuilds only this layer and below—not the expensive `pip install` step.
 
 ### Step 4 — Runtime stage
 
@@ -106,6 +114,8 @@ def runtime_stage():
     ]
 ```
 
+The runtime stage starts from a fresh slim image. `COPY --from=builder` pulls only the installed packages and app code, leaving behind compilers, headers, and build cache. This is what drops image size from 900MB to ~80MB.
+
 ### Step 5 — Non-root and run
 
 ```python
@@ -116,6 +126,8 @@ def finalize():
         "CMD [\"python\", \"main.py\"]",
     ]
 ```
+
+Creating a non-root user and switching to it with `USER app` means the container process cannot write to system paths even if compromised. This one line eliminates an entire class of container-escape vulnerabilities.
 
 ## What to Notice in This Code
 

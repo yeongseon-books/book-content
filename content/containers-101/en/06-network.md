@@ -44,7 +44,9 @@ In this chapter, we compare bridge, host, overlay, and none, then explain why us
 
 ## Why It Matters
 
-Both Compose and Kubernetes ride on top of these abstractions. Get the basics right and the rest is easy.
+Both Compose and Kubernetes ride on top of these abstractions. If you do not understand bridge isolation, DNS discovery, and publish vs expose, debugging connectivity issues in multi-container setups becomes guesswork. In production, the first question during an outage is often "can container A reach container B?"—and the answer lives in network configuration, not application code.
+
+bridge mode isolates containers on a virtual network. host mode runs the container with the host network stack (no isolation, higher performance). overlay spreads containers across multiple hosts. DNS lets containers find each other by service name.
 
 bridge mode isolates containers on a virtual network. host mode runs the container with the host network stack (no isolation, higher performance). overlay spreads containers across multiple hosts. DNS lets containers find each other by service name.
 
@@ -73,6 +75,8 @@ def create_net(name):
     subprocess.run(["docker", "network", "create", name], check=True)
 ```
 
+A user-defined network provides built-in DNS resolution between containers. Unlike the default bridge, containers on a user-defined network can reach each other by name—critical for stable service discovery.
+
 ### Step 2 — Run DB
 
 ```python
@@ -82,6 +86,8 @@ def run_db(net):
         "-e", "POSTGRES_PASSWORD=secret", "postgres:16",
     ], check=True)
 ```
+
+The database container does not publish any ports externally—it is only reachable from other containers on the same network. This is the network boundary in action: external traffic cannot reach the DB directly.
 
 ### Step 3 — Run app
 
@@ -95,6 +101,8 @@ def run_app(net):
     ], check=True)
 ```
 
+The app container uses `DB_HOST=db` to find the database by DNS name. If the DB container restarts with a new IP, DNS still resolves correctly. This is why name-based discovery beats hardcoded IPs.
+
 ### Step 4 — Inspect
 
 ```python
@@ -106,6 +114,8 @@ def inspect(net):
     return res.stdout
 ```
 
+`docker network inspect` shows which containers are attached, their assigned IPs, and the network driver. Use this to verify connectivity assumptions before debugging at the application level.
+
 ### Step 5 — Cleanup
 
 ```python
@@ -113,6 +123,8 @@ def cleanup(net):
     subprocess.run(["docker", "rm", "-f", "app", "db"])
     subprocess.run(["docker", "network", "rm", net])
 ```
+
+Always remove containers before the network—Docker refuses to remove a network with active endpoints. This ordering mirrors production teardown: drain traffic, stop services, then remove infrastructure.
 
 ## What to Notice in This Code
 
