@@ -16,46 +16,105 @@ tags:
   - Classification
   - scikit-learn
   - Beginner
-seo_description: How logistic regression turns linear scores into probabilities, why thresholds matter, and how precision and recall guide classification decisions
+seo_description: How logistic regression turns a linear score into a probability, threshold tuning, precision, recall, and why 0.5 is not always the right cutoff
 last_reviewed: '2026-05-15'
 ---
 
 # Machine Learning 101 (5/10): Logistic Regression
 
-Beginner confusion around logistic regression is healthy because the name really is misleading at first glance. It predicts classes in practice, but it does that by assigning probabilities first. The probability layer is where the useful operational decisions live.
+Predicting 0 or 1 — yet the name says "regression." This is one of the most common beginner confusions, and it is natural. Logistic regression looks like it directly outputs a class, but internally it first computes a continuous probability and then applies a threshold to produce a label. So it handles classification problems, but its internal mechanics are those of a probability model.
 
-This is the 5th post in the Machine Learning 101 series. Here we will treat logistic regression as a probability engine, then connect thresholds, precision, recall, and class imbalance back to the decisions a production system has to make.
-
+This is the 5th post in the Machine Learning 101 series. Here we cover the sigmoid function, thresholds, and precision/recall/F1 — together positioning logistic regression as the most fundamental classification baseline.
 
 ![machine learning 101 chapter 5 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/05/05-01-concept-at-a-glance.en.png)
 *machine learning 101 chapter 5 flow overview*
-> Logistic regression is linear regression that squashes its score into a probability, then lets you choose where to draw the line between two classes.
+> Logistic regression squeezes a linear score through a sigmoid to get a probability, then draws a boundary line between two classes based on a chosen threshold.
 
 ## Questions to Keep in Mind
 
-- If the output is 0 or 1, why is the model called regression?
+- If it predicts 0 or 1, why is it called regression?
 - How does the sigmoid turn a linear score into a probability?
-- Why is `0.5` only a default threshold, not a law?
+- Why should 0.5 not always be used as the threshold?
+
+## Sigmoid Function Intuition
+
+The core of logistic regression is the **sigmoid function**. It maps any real number into the range (0, 1).
+
+$$
+\sigma(z) = \frac{1}{1 + e^{-z}}
+$$
+
+### Why sigmoid?
+
+1. Linear regression `y_hat = Xw + b` can output anything from `-∞` to `+∞`.
+2. For classification we want a probability between 0 and 1.
+3. Sigmoid compresses any real number into `(0, 1)`, serving exactly this role.
+
+### Sigmoid characteristics
+
+- At `z = 0`, `σ(0) = 0.5`.
+- As `z` grows large, `σ(z) → 1`.
+- As `z` grows very negative, `σ(z) → 0`.
+- Smooth S-shaped curve.
+
+Logistic regression first computes a linear score, then wraps it in a sigmoid to produce a probability.
+
+## Python Example: Checking Probabilities with predict_proba
+
+```python
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+
+X, y = load_breast_cancer(return_X_y=True)
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, stratify=y, random_state=42)
+sc = StandardScaler().fit(Xtr)
+Xtr, Xte = sc.transform(Xtr), sc.transform(Xte)
+
+model = LogisticRegression(max_iter=1000).fit(Xtr, ytr)
+
+# Check probabilities
+proba = model.predict_proba(Xte)[:5]
+print("Class 0 | Class 1")
+for p0, p1 in proba:
+    print(f"{p0:.3f}   | {p1:.3f}")
+
+# Predicted labels
+print("Predicted:", model.predict(Xte)[:5])
+```
+
+`.predict()` returns 1 when probability exceeds 0.5, otherwise 0. `.predict_proba()` reveals the model's confidence level.
+
+## Logistic vs Linear Regression
+
+| Aspect | Logistic Regression | Linear Regression |
+|---|---|---|
+| Output | Probability between 0 and 1 | Continuous value |
+| Loss function | Log Loss (Cross-Entropy) | MSE |
+| Use case | Classification | Regression |
+
+The name is confusing because logistic regression outputs a probability. The final classification is determined only after applying a threshold.
 
 ## Why It Matters
 
-Logistic regression is the standard classification baseline. It is interpretable, fast, and stays competitive on imbalanced data when you tune the threshold.
+Logistic regression is the standard classification baseline. It is interpretable, fast, and — when you tune the threshold — surprisingly competitive even on imbalanced data.
 
 ## Key Terms
 
-- **Sigmoid**: maps any real number to (0, 1).
-- **Probability**: the model's belief in class 1.
-- **Threshold**: turns probability into a class label.
-- **Precision**: fraction of predicted positives that are actually positive.
-- **Recall**: fraction of actual positives that the model caught.
+- **Sigmoid**: Maps any real value into `(0, 1)`.
+- **Probability**: The model's belief that the sample belongs to class 1.
+- **Threshold**: The cutoff that converts probability into a class label.
+- **Precision**: Of predictions called positive, how many actually are.
+- **Recall**: Of actual positives, how many the model caught.
 
 ## Before/After
 
-**Before**: "95% accuracy" — meaningless on imbalanced data.
+**Before**: "95% accuracy" sounds great. On imbalanced data it is nearly meaningless.
 
-**After**: Report precision, recall, F1, and AUC together.
+**After**: Report precision, recall, F1, and AUC together, and tune the threshold.
 
-## Hands-on: 5 Steps of Classification
+## Hands-on: 5-Step Classification
 
 ### Step 1 — Data
 
@@ -88,7 +147,7 @@ from sklearn.metrics import classification_report
 print(classification_report(yte, model.predict(Xte)))
 ```
 
-### Step 5 — Tune the threshold
+### Step 5 — Threshold tuning
 
 ```python
 prob = model.predict_proba(Xte)[:, 1]
@@ -97,65 +156,68 @@ for t in [0.3, 0.5, 0.7]:
     print(t, (pred == yte).mean())
 ```
 
-**Expected output:** `classification_report` prints class-wise precision and recall, while the threshold loop shows that a different cutoff changes the downstream behavior even when the model weights stay the same. That is the core lesson: thresholding is part of modeling, not a display choice.
+**Expected output:** `classification_report` shows per-class precision and recall. The threshold loop demonstrates that the same model produces different outcomes at different cutoffs — threshold selection is a **modeling decision**, not a display option.
 
 ## What to Notice in This Code
 
-- `predict_proba` returns probabilities, not just labels.
-- The threshold is a precision-recall trade-off knob.
+- `predict_proba` returns probabilities, not labels.
+- The threshold is the knob that controls the precision-recall tradeoff.
 - `StandardScaler` helps the optimizer converge.
 
-## Read the first failure signal this way
+## Reading the First Failure Signals
 
-- If accuracy looks high but the expensive positive cases are still missed, inspect recall and the threshold before changing models.
-- If probabilities look overconfident, test calibration instead of assuming `predict_proba` is production-ready.
-- If coefficients drift wildly, verify scaling and class balance before arguing about solver choice.
+- If accuracy is high but important positives are missed, check **recall** and **threshold** before the model.
+- If probabilities look overly confident, verify **calibration** rather than trusting `predict_proba` at face value.
+- If coefficients are unstable, investigate **scaling** and **class imbalance** before blaming the solver.
 
 ## Five Common Mistakes
 
-1. Treating raw probabilities as calibrated.
-2. Always using 0.5 as the threshold.
-3. Reporting accuracy on imbalanced data.
-4. Forgetting to scale features.
-5. Using defaults on multiclass instead of explicit multinomial.
+1. **Assuming raw probabilities are already calibrated.**
+2. **Always using 0.5 as the threshold.**
+3. **Reporting only accuracy on imbalanced data.**
+4. **Forgetting feature scaling.**
+5. **Using default settings for multiclass without explicit multinomial configuration.**
 
 ## How This Shows Up in Production
 
-Spam filtering, fraud detection, and churn modeling all rely on probability outputs because downstream systems need to weigh costs.
+Spam filtering, fraud detection, churn prediction — wherever downstream systems need to **weigh costs**, probability output is essential. Logistic regression is not just a classifier; it becomes an input signal for operational decision-making.
 
 ## How a Senior Engineer Thinks
 
-- Business cost determines the threshold.
+- The threshold is decided by **business cost**.
 - Always plot the precision-recall curve.
-- Use class weights for imbalance.
-- Treat interpretability as leverage.
-- Validate calibration explicitly.
+- For imbalance, consider `class_weight`.
+- Interpretability is a valuable lever.
+- Probability calibration is verified separately.
 
 ## Checklist
 
 - [ ] I use `predict_proba` for downstream decisions.
 - [ ] I report precision and recall together.
-- [ ] I select thresholds based on cost.
+- [ ] I set the threshold based on cost.
 - [ ] I always scale features.
 
 ## Practice Problems
 
-1. Sweep thresholds from 0.1 to 0.9 and plot precision and recall.
-2. Compare results with `class_weight="balanced"`.
-3. Apply `multi_class="multinomial"` to a multiclass dataset.
+1. Sweep the threshold from 0.1 to 0.9 and plot precision and recall.
+2. Compare F1 scores with `class_weight="balanced"` vs default.
+3. Use `CalibratedClassifierCV` and compare reliability diagrams before and after.
 
-## Wrap-up and Next Steps
+## Summary
 
-Logistic regression is the foundation of classification. Next, we cover decision trees and random forests for nonlinear modeling.
+Logistic regression is a probability model disguised as a classifier. The sigmoid converts a linear score into a probability; the threshold converts probability into a label. Controlling that threshold — guided by business cost — is where most operational value lives.
+
+Next post: we move to decision trees and random forests, where nonlinearity comes from recursive feature-space splits.
 
 ## Answering the Opening Questions
 
-- **The output is 0 or 1, so why is it called "regression"?**
-  - Logistic regression first computes a linear score before assigning class labels, then converts that score to a probability using a continuous function. The final purpose is classification, but internally it handles linear combination and probability estimation—hence "regression" remains in the name.
+- **If it predicts 0 or 1, why is it called regression?**
+  - Internally it regresses onto a continuous probability via the sigmoid. The final class label is only produced after applying a threshold, which is a separate step from the model's core computation.
 - **How does the sigmoid turn a linear score into a probability?**
-  - The formula `σ(z) = 1 / (1 + e^{-z})` compresses any real number `z` to between 0 and 1. `predict_proba(Xte)` shows the model's linear score converted to class-1 probability, with predictions splitting around 0.5 near `z=0`.
-- **Why should 0.5 never be treated as the universal correct threshold?**
-  - As the threshold loop shows, the same probabilities yield different precision and recall depending on whether you cut at 0.3, 0.5, or 0.7. For fraud detection where misses are costly, a threshold below 0.5 may be more appropriate—the cutoff must be determined alongside domain costs.
+  - It compresses any value from `(-∞, +∞)` into `(0, 1)` via `1/(1+e^{-z})`. At `z=0` the output is 0.5; larger z → closer to 1, smaller z → closer to 0.
+- **Why should 0.5 not always be used as the threshold?**
+  - Because the optimal cutoff depends on the cost asymmetry of the problem. If missing a positive (FN) is far more expensive than a false alarm (FP), you lower the threshold. The threshold is a business decision, not a mathematical constant.
+
 <!-- toc:begin -->
 ## In this series
 
@@ -174,9 +236,9 @@ Logistic regression is the foundation of classification. Next, we cover decision
 
 ## References
 
-- [scikit-learn — Logistic Regression](https://scikit-learn.org/stable/modules/linear_model.html#logistic-regression)
-- [scikit-learn — Classification metrics](https://scikit-learn.org/stable/modules/model_evaluation.html#classification-metrics)
-- [Google — Classification thresholds](https://developers.google.com/machine-learning/crash-course/classification/thresholding)
-- [StatQuest — Logistic Regression](https://www.youtube.com/watch?v=yIYKR4sgzI8)
+- [scikit-learn — LogisticRegression](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html)
+- [Stanford CS229 — Logistic Regression](https://cs229.stanford.edu/notes2022fall/main_notes.pdf)
+- [Google — ML Crash Course: Classification](https://developers.google.com/machine-learning/crash-course/classification)
+- [Hands-On Machine Learning — Aurélien Géron, Ch. 4](https://www.oreilly.com/library/view/hands-on-machine-learning/9781098125967/)
 
 Tags: MachineLearning, LogisticRegression, Classification, scikit-learn, Beginner

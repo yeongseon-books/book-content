@@ -24,8 +24,7 @@ last_reviewed: '2026-05-15'
 
 A model can brag about 99% training accuracy and still be useless the moment it sees live traffic. That gap is not a minor detail. It is the core reason ML teams separate fitting from evaluation and guard the test set so aggressively.
 
-This is the 3rd post in the Machine Learning 101 series. Here we will use train/test splits, stratification, seeds, and cross-validation to turn “the model seems good” into an experiment that measures generalization.
-
+This is the 3rd post in the Machine Learning 101 series. Here we will use train/test splits, stratification, seeds, and cross-validation to turn "the model seems good" into an experiment that measures generalization.
 
 ![machine learning 101 chapter 3 flow overview](https://yeongseon-books.github.io/book-public-assets/assets/machine-learning-101/03/03-01-concept-at-a-glance.en.png)
 *machine learning 101 chapter 3 flow overview*
@@ -37,17 +36,28 @@ This is the 3rd post in the Machine Learning 101 series. Here we will use train/
 - Why should `random_state` be fixed even in small experiments?
 - How does `stratify` help on imbalanced classes?
 
+## Split Strategy Comparison
+
+| Strategy | Advantage | Disadvantage | Best For |
+|---|---|---|---|
+| Hold-out | Fast | Depends on a single split | Large datasets |
+| K-fold | Uses all data | Takes longer | Small sample sizes |
+| Stratified | Preserves class ratio | One more parameter | Imbalanced data |
+| Time-series split | Prevents temporal leakage | Reduces training data | Time-ordered problems |
+
+The choice of split strategy depends on data characteristics and problem type. Random splitting is not always the right answer.
+
 ## Why It Matters
 
-Without measuring generalization, you cannot select or compare models. Training scores are scores you cannot ship.
+Without measuring generalization, you cannot select or compare models. Training scores look good but they are not numbers you can ship. Which split strategy you use ultimately determines how model selection and MLOps gating work.
 
 ## Key Terms
 
-- **Train**: data used for fitting the model.
-- **Validation**: data used for tuning hyperparameters.
-- **Test**: held out, looked at exactly once.
-- **Stratify**: keep class proportions constant across splits.
-- **K-fold**: split into K parts and rotate the test fold.
+- **Train**: Data used for fitting the model.
+- **Validation**: Data used for tuning hyperparameters.
+- **Test**: Held out, looked at exactly once.
+- **Stratify**: Keep class proportions constant across splits.
+- **K-fold**: Split into K parts and rotate the test fold.
 
 ## Before/After
 
@@ -94,7 +104,49 @@ from sklearn.model_selection import cross_val_score
 print(cross_val_score(model, X, y, cv=5).mean())
 ```
 
-**Expected output:** the training score should usually come out a bit higher than the test score, and the cross-validation mean should land in the same neighborhood rather than wildly disagree. If those numbers diverge sharply, your split strategy deserves suspicion before the model does.
+**Expected output:** The training score should come out a bit higher than the test score, and the cross-validation mean should land in the same neighborhood. If those numbers diverge sharply, your split strategy deserves suspicion before the model does.
+
+## Data Leakage
+
+Data leakage occurs when information from the test set bleeds into training — one of the most dangerous errors in ML.
+
+### Common Leakage Sources
+
+1. **Preprocessing leakage**: Fitting a scaler on the entire dataset before splitting.
+2. **Target leakage**: Features contain target information directly.
+3. **Temporal leakage**: Using future information to predict the past.
+4. **Group leakage**: The same user or entity appears in both train and test.
+
+### Prevention
+
+- Perform the split **first**, before any preprocessing.
+- Fit transformers on training data only (`.fit()`) and apply `.transform()` to test data.
+- Remove columns that carry target information during feature selection.
+- For time-series problems, enforce strict temporal ordering.
+
+## Python Example: train_test_split + cross_val_score
+
+```python
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.linear_model import LogisticRegression
+
+X, y = load_iris(return_X_y=True)
+
+# Hold-out split
+Xtr, Xte, ytr, yte = train_test_split(
+    X, y, test_size=0.2, stratify=y, random_state=42
+)
+model = LogisticRegression(max_iter=1000).fit(Xtr, ytr)
+print("Train:", model.score(Xtr, ytr))
+print("Test:", model.score(Xte, yte))
+
+# Cross-validation
+scores = cross_val_score(model, X, y, cv=5)
+print("CV mean:", scores.mean(), "std:", scores.std())
+```
+
+Cross-validation reduces the randomness of a single split. It is especially valuable when sample sizes are small.
 
 ## What to Notice in This Code
 
@@ -102,19 +154,19 @@ print(cross_val_score(model, X, y, cv=5).mean())
 - A fixed `random_state` makes results reproducible.
 - `cross_val_score` repeats train and evaluate K times.
 
-## Read the first failure signal this way
+## Reading the First Failure Signals
 
 - If the test score jumps around every run, check whether the sample is too small or the seed was left floating.
-- If train and test both look suspiciously perfect, inspect preprocessing leakage before celebrating.
+- If train and test both look suspiciously perfect, inspect **preprocessing leakage** before celebrating.
 - If the problem is time-series or user-grouped data, random splitting is often the bug, not the metric.
 
 ## Five Common Mistakes
 
-1. Tuning on the test set, which leaks performance.
-2. Fitting a scaler on the entire dataset before splitting.
-3. Forgetting to set the random seed and chasing noise.
-4. Ignoring `stratify` on imbalanced data.
-5. Splitting time-series data randomly instead of by time.
+1. **Tuning on the test set, which leaks performance.**
+2. **Fitting a scaler on the entire dataset before splitting.**
+3. **Forgetting to set the random seed and chasing noise.**
+4. **Ignoring `stratify` on imbalanced data.**
+5. **Splitting time-series data randomly instead of by time.**
 
 ## How This Shows Up in Production
 
@@ -122,11 +174,11 @@ A/B experiments, model comparison, and MLOps gating all hinge on a sound split s
 
 ## How a Senior Engineer Thinks
 
-- Touch the test set exactly once.
+- Touch the test set **exactly once**.
 - Keep validation and test separate.
 - Split time-series chronologically.
 - Always suspect group leakage.
-- Preprocess after splitting, not before.
+- Preprocess **after** splitting, not before.
 
 ## Checklist
 
@@ -141,18 +193,23 @@ A/B experiments, model comparison, and MLOps gating all hinge on a sound split s
 2. Compare class ratios in train and test with `stratify=None`.
 3. Compare the variance of 5-fold and 10-fold scores.
 
-## Wrap-up and Next Steps
+## Summary
 
-A correct split is the prerequisite for every measurement that follows. Next, we cover linear regression as the foundation of supervised learning.
+A correct split is the prerequisite for every measurement that follows. Without it, training scores create illusions, leakage goes undetected, and model comparisons become meaningless.
+
+Three takeaways: First, split before preprocessing — never the other way around. Second, `stratify` and `random_state` are not optional luxuries; they are basic hygiene. Third, cross-validation smooths single-split variance so that decisions rest on stable numbers.
+
+Next post: we cover linear regression as the foundation of supervised learning.
 
 ## Answering the Opening Questions
 
 - **What role does each of training set, validation set, and test set play?**
-  - The training set learns model parameters via `fit(Xtr, ytr)`. The validation set tunes hyperparameters and thresholds as an intermediate checkpoint. The test set opens only once at the end to confirm generalization—the final holdout.
+  - The training set learns model parameters via `fit(Xtr, ytr)`. The validation set tunes hyperparameters and thresholds as an intermediate checkpoint. The test set opens only once at the end to confirm generalization — the final holdout.
 - **Why should `random_state` always be fixed?**
-  - Fixing `train_test_split(..., random_state=42)` ensures the same data split is reproducible. Without a fixed seed, train/test composition changes each run, making it impossible to distinguish model improvement from accidental split variation.
+  - Fixing `train_test_split(..., random_state=42)` ensures the same data split is reproducible. Without it, train/test composition changes each run, making it impossible to distinguish model improvement from accidental split variation.
 - **How does `stratify` help with class imbalance?**
-  - `stratify=y` maintains the original class ratios in both train and test splits. Especially for problems with rare positives, it prevents splits where positives nearly vanish from one side—making test scores better reflect actual operational distributions.
+  - `stratify=y` maintains the original class ratios in both train and test splits. For problems with rare positives, it prevents splits where positives nearly vanish from one side — making test scores better reflect actual operational distributions.
+
 <!-- toc:begin -->
 ## In this series
 
