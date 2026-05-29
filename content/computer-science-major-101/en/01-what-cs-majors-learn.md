@@ -141,6 +141,63 @@ Job listings are essentially a *combination* of *major courses*.
 2. Define *track* in one line.
 3. State the meaning of a *capstone* in one line.
 
+
+## How to Actually Read the Curriculum Map
+
+Reading the curriculum properly means moving beyond memorizing course names. The first step is to regroup courses by problem type: math courses teach modeling languages, programming courses teach converting problems into procedures, systems courses teach constraints below the code, data courses teach state design and query cost, and AI courses teach assumptions and generalization.
+
+| Category | Representative courses | Skill to build first | Directly feeds into |
+| --- | --- | --- | --- |
+| Math foundations | Calculus, Linear Algebra, Discrete Math, Probability | Interpret formulas and decompose assumptions | Algorithms, ML, Computer Graphics |
+| Programming foundations | Intro to Programming, OOP, Data Structures lab | Decompose problems into functions and modules | Systems programming, backend projects |
+| Systems core | Computer Architecture, OS, Compilers, Networking | Read execution paths and resource costs | Performance tuning, distributed systems |
+| Data core | Databases, SQL, Data Modeling | Design storage structures and query patterns | Data engineering, analytics platforms |
+| Intelligent applications | ML, Deep Learning, Data Mining | Define features, labels, and evaluation metrics | Recommendation, vision, NLP |
+| Integrated practice | Software Engineering, Capstone, Team projects | Convert requirements into schedules and deliverables | Job portfolio, graduate research |
+
+The key insight is not difficulty comparison but dependency understanding. For example, without programming fundamentals and data-structure intuition before OS, scheduling and memory management concepts cannot connect to code.
+
+## Course Dependency Graph in Prose
+
+When first building a curriculum map, writing dependencies as sentences is more effective than drawing diagrams.
+
+- Math foundations are shared prerequisites for algorithm correctness proofs and ML loss optimization.
+- Programming foundations are the shared execution platform for systems, data, and AI coursework.
+- The systems core provides debugging literacy: reproducing performance issues and narrowing causes.
+- The data core is the central axis for reliably storing service state and reducing query latency.
+- Intelligent applications reach reproducible quality only when earlier axes are stable.
+- Integrated practice is the final stage that verifies balance across all five axes.
+
+Applying this structure to semester planning clarifies elective priorities. The universally valid principle regardless of career target: "fix fundamentals first, extend applications later."
+
+## Registration Strategy Checkpoints
+
+Before each semester, writing answers to these four questions raises plan quality fast.
+
+1. Which of this semester's courses is a prerequisite for other courses?
+2. Which course feeds directly into a project, and does it need prerequisite reinforcement?
+3. Which axis can I own in a team assignment?
+4. What gap must I fill now for next semester's target course?
+
+When these have answers, a simple timetable becomes a curriculum-map-based study plan.
+
+## Reverse-Tracking Careers Through Course Combinations
+
+To use the curriculum map for real decisions, trace course combinations backward from your target career. A backend engineer needs data structures, OS, networking, databases, and software engineering as the baseline. A data role needs linear algebra, probability, databases, ML, and experiment design. A security role needs OS, networking, cryptography, systems programming, and log analysis. Career targets differ in emphasis but cannot skip foundational axes.
+
+A recommended semester ratio is "2 foundations + 1 application + 1 integration." Two foundation courses maintain the floor, one application course provides motivation, one integration course produces a deliverable.
+
+## Curriculum Dependency Table
+
+| Subject area | Prerequisite | Feeds directly into | Signal when missed |
+| --- | --- | --- | --- |
+| Discrete Math | Basic math | Data Structures, Algorithms | Frequent logic jumps in proof problems |
+| Programming fundamentals | None | Data Structures, Systems Programming | Fast implementation but high error rate |
+| Computer Architecture | Basic programming | Operating Systems | Explaining performance bottlenecks only by guessing |
+| Databases | Programming fundamentals | Backend projects | Can write SQL but cannot justify schema decisions |
+| Probability and Statistics | Calculus, Linear Algebra | Machine Learning | Repeated overconfidence or underestimation in metric interpretation |
+
+Course dependencies are more directly useful for setting study order than credit tables. Customizing this table to your situation before registration aligns course selection and weekly study plans in the same direction.
 ## Wrap-up and Next Steps
 
 Next post: *Understanding First Year Subjects*.

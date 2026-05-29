@@ -141,6 +141,61 @@ Root cause in incident reports is *usually* an *OS resource* limit.
 - [ ] *Syscall* cost noted.
 - [ ] *Timing* measurable.
 
+
+## Connecting Systems Courses Through the Execution Path
+
+Systems courses look broad, but the core question is singular: "What path does my code take through the CPU and what resources does it consume?" Whether you study OS, architecture, systems programming, or compilers separately, this question unifies the knowledge. For instance, you should be able to trace — in words — the sequence of process scheduling, context switch, memory allocation, syscall, network I/O, and file access when a single web request arrives.
+
+The table below maps OS core concepts to production debugging signals.
+
+| OS concept | Classroom content | Production signal | Check command / metric |
+| --- | --- | --- | --- |
+| Process / Thread | Scheduling, execution unit | CPU spike, response delay | `top`, `ps`, run-queue length |
+| Memory virtualization | Pages, cache, swap | OOM, GC stall, page fault | RSS, page-fault rate |
+| File system | inodes, buffer cache | Disk I/O bottleneck | iowait, latency |
+| Syscall | user / kernel boundary | Syscall storm, context-switch surge | strace, perf |
+| Synchronization | Locks, semaphores | Deadlock, throughput drop | lock-wait time |
+
+With this table, the symptom "it's slow" becomes more specific. Distinguishing CPU-bound from I/O-bound first changes the fix direction entirely.
+
+## Building Cost Intuition Through Syscall Examples
+
+Even a single line of high-level code can trigger many syscalls internally. File reads, socket sends, and process creation all cross the user–kernel boundary — functionally necessary but not free. Unnecessary file open/close in tight loops, frequent small network sends, and excessive process spawning hit performance immediately.
+
+Recommended observation points during lab exercises:
+
+- Compare batch I/O vs single-call I/O execution time for the same function
+- Confirm whether syscall frequency rather than string processing is the bottleneck
+- Before introducing threads, check lock-contention potential first
+- No optimization without measurement: record metrics before and after changes
+
+These four principles alone let systems-course concepts flow naturally into performance-improvement work.
+
+## Systems Learning Roadmap (Undergraduate)
+
+1. Explain process / thread / memory basics with diagrams.
+2. Run a simple server and trace the request-handling path.
+3. Create an I/O-bottleneck example and practice measurement tools.
+4. Connect compile / link steps to binary execution flow.
+5. In a project, reproduce at least one performance issue and record the improvement.
+
+At this point, systems courses transform from abstract memorization into "the skill of narrowing problems."
+
+## Systems Debugging Checklist
+
+When a systems issue is suspected, fix the observation order before modifying code: 1) confirm reproduction conditions, 2) classify bottleneck axis among CPU / memory / I/O, 3) align log timeline, 4) check syscall / network boundaries, 5) compare measurements before and after the change. Following this order reduces intuition-based guessing and narrows causes faster.
+
+## Connecting Systems Knowledge to Team Projects
+
+Systems courses lose most of their value if they end as exam subjects. They must connect to reading operational logs and measurement results.
+
+| Observed signal | Possible cause | Verification metric | Next action |
+| --- | --- | --- | --- |
+| Response latency spike | CPU contention, I/O wait | CPU usage, iowait | Decompose bottleneck segment, reproduce in experiment |
+| Memory growth | Leak, excessive cache | RSS, GC metrics | Inspect object lifecycle |
+| Intermittent timeout | Lock contention, network delay | p95/p99, lock wait | Separate retry policy from critical section |
+
+Using this table as a postmortem template in semester projects converts systems-course knowledge into documented assets.
 ## Practice Problems
 
 1. Define *operating system* in one line.

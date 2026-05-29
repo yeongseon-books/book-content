@@ -144,6 +144,56 @@ print(urllib.request.urlopen("http://example.com").status)
 2. Define *TCP* in one line.
 3. State the meaning of *HTTP* in one line.
 
+
+## Understanding Data and Network as a Single Request Path
+
+From a service perspective, databases and networks are not separate subjects but the front and back segments of one request. A client request arrives over the network, the application applies business rules, reads or updates state in the database, and the response returns over the network. Solving performance problems therefore requires looking at the entire request path, not just queries or packets alone.
+
+The table below combines network layers and application responsibilities in a practical summary.
+
+| Layer / component | Representative protocol | Core role | Common misconception |
+| --- | --- | --- | --- |
+| Application | HTTP, gRPC | API contract, status codes, serialization | Assuming HTTP guarantees transport reliability |
+| Transport | TCP, UDP | Connection / retransmission / flow control (or connectionless delivery) | Confusing TCP and HTTP role boundaries |
+| Network | IP | Route selection, address-based forwarding | Trying to fix routing problems in app logic |
+| Link | Ethernet, Wi-Fi | Physical / link delivery | Blaming link layer for upper-layer latency |
+
+On the database side, the key is alignment between storage structure and query patterns. Whether a service is read-heavy, write-heavy, or has strict consistency requirements changes index strategy and transaction boundaries.
+
+## Database Type Comparison and Normalization Intuition
+
+| Type | Strength | Weakness | Best fit |
+| --- | --- | --- | --- |
+| Relational (RDBMS) | Strong consistency, SQL ecosystem | Schema change cost | Transaction-centric services |
+| Key-value store | Extremely fast simple lookups | Complex queries difficult | Sessions, caches |
+| Document (NoSQL) | Flexible schema | Join / consistency design care needed | Rapid product iteration |
+| Graph DB | Relationship traversal strength | Operational / staffing cost | Recommendations, relationship analysis |
+
+Normalization is not an exam rule but a change-cost management tool. 1NF guarantees atomic values, 2NF removes partial functional dependencies, 3NF removes transitive dependencies — reducing redundancy and anomalies. In practice, intentional denormalization is sometimes introduced for query performance. The important thing is to understand the principle first, then document the tradeoff.
+
+## Practical Inspection Loop
+
+- Identify top 5 queries from slow-query logs first
+- Decompose API latency: network wait / application processing / DB processing
+- Record `EXPLAIN` comparison before and after index addition
+- Design timeout and retry policies separately from protocol responsibility
+
+Repeating this loop fuses database and network coursework into real service-operations capability.
+
+## Finding Bottlenecks Along the Request–Response Path
+
+In production problem-solving, you never judge "where it's slow" by gut feeling. First decompose user-perceived latency by segment: DNS lookup, TLS handshake, application processing, DB query, external API call, response transmission — and check metrics for each. Without this decomposition, you end up tuning the DB when the real bottleneck was network retries.
+
+## Request Path Decomposition Template
+
+| Segment | Normal baseline (example) | Warning signal | Check tool |
+| --- | --- | --- | --- |
+| DNS + connection | 20–80 ms | Intermittent spikes | traceroute, DNS logs |
+| Application processing | 30–150 ms | CPU spike | APM, profiler |
+| DB query | 10–120 ms | Slow-query increase | EXPLAIN, slow query log |
+| Response transmission | 5–50 ms | Many retransmissions | Network metrics |
+
+SQL tuning should also be done by comparison, not by feel. Recording `EXPLAIN` results, average latency, and p95 in the same table before and after index changes speeds up team decision-making.
 ## Wrap-up and Next Steps
 
 Next post: *AI and Data Science*.
