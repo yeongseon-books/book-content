@@ -77,12 +77,16 @@ Sets define *membership* and *boundaries*; functions map *inputs to outputs* sys
 A, B = {1, 2, 3}, {2, 3, 4}
 ```
 
+The core property of a set is membership, not order. Duplicates collapse to a single element—this is the first point where sets differ from lists. Whenever your data model treats duplicates as meaningless, set thinking is the more natural fit.
+
 ### Step 2 — Union, intersection, difference
 
 ```python
 def ops(A, B):
     return A | B, A & B, A - B
 ```
+
+A single operator expresses union, intersection, or difference. The code looks simple, yet it handles inclusion relationships in extremely compressed grammar. Permission intersections, allow-list minus block-list—production scenarios follow the same structure.
 
 ### Step 3 — A function
 
@@ -91,6 +95,8 @@ def square(x):
     return x * x
 ```
 
+A function maps each input to exactly one output. The guarantee that the same input always yields the same result directly connects to testability, cacheability, and reasoning ability.
+
 ### Step 4 — Injective check
 
 ```python
@@ -98,12 +104,16 @@ def is_injective(f, domain):
     return len({f(x) for x in domain}) == len(list(domain))
 ```
 
+Injectivity means distinct inputs always produce distinct outputs. If two different inputs can map to the same output, you lose the ability to reverse the mapping—a concern that shows up in hashing, encoding, and database key design.
+
 ### Step 5 — Composition
 
 ```python
 def compose(f, g):
     return lambda x: f(g(x))
 ```
+
+Composition chains two functions so the output of one feeds into the other. This is the algebraic version of piping—same idea as Unix pipes or middleware stacks, but with a precise rule about application order.
 
 ## What to Notice in This Code
 

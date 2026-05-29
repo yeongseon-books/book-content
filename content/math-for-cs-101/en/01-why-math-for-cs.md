@@ -78,6 +78,8 @@ def common(a, b):
     return [x for x in a if x in b]
 ```
 
+Finding common elements across two collections looks simple, but it is really an intersection expressed as code. Mathematical abstraction always starts this way: once you recognize the same structure in apparently different problems, both explanation and reuse become easier.
+
 ### Step 2 — Check the invariant
 
 ```python
@@ -86,12 +88,16 @@ def invariant(items):
     return True
 ```
 
+An invariant is a condition that must hold throughout execution. Whether you are reading a loop, inspecting a state transition, or reviewing concurrent code, having this single sentence written down dramatically changes debugging difficulty. Math trains you to write the condition explicitly rather than relying on gut feeling.
+
 ### Step 3 — Model
 
 ```python
 def model(rate, time):
     return rate * time
 ```
+
+Turning a real-world problem into variables and relationships is the moment computation begins. Multiplying rate by time to get distance is trivial, yet it captures the essence of modeling: you do not copy all of reality—you keep only the relationships you need right now.
 
 ### Step 4 — Measure complexity
 
@@ -100,12 +106,16 @@ def linear(n):
     return [i for i in range(n)]
 ```
 
+The moment you ask how cost grows as input size `n` increases, an implementation stops being just a code snippet and becomes an object of analysis. This is the point where you start distinguishing code that is fast now from code that stays fast at scale.
+
 ### Step 5 — Sketch a proof
 
 ```python
 def proof_sketch(claim):
     return f"assume {claim}; derive contradiction"
 ```
+
+Proof is not an exclusive tool for mathematicians. It is the habit of separating claims from assumptions, checking whether counterexamples are possible, and testing for contradictions. The same thinking applies when explaining API constraints, reviewing sorting logic, or arguing about safety in distributed systems.
 
 ## What to Notice in This Code
 
@@ -115,15 +125,25 @@ def proof_sketch(claim):
 
 ## Five Common Mistakes
 
-1. **Treating *math* as just *formulas*.**
-2. **Trusting *intuition* without a *proof*.**
-3. **Confusing the *model* with *reality*.**
-4. **Substituting a *benchmark* for a *complexity* analysis.**
-5. **Memorizing *symbols* without meaning.**
+1. **Treating math as just formulas.** You memorize names and symbols but lose sight of why the tool exists. When you see math as a thinking tool first, you ask about structure before you reach for a formula.
+2. **Trusting intuition without a proof.** Tests are necessary but only check specific cases. A proof targets all possible cases. The two are complementary, not competing.
+3. **Confusing the model with reality.** A model simplifies reality; it is not reality itself. The cleaner the model, the more deliberately you must acknowledge what it discards.
+4. **Substituting a benchmark for a complexity analysis.** Being fast once on your laptop is not the same as being structurally manageable when input grows by 10x.
+5. **Memorizing symbols without meaning.** Symbols without the underlying reasoning evaporate after a week. Understanding the question they answer makes them stick.
 
 ## How This Shows Up in Production
 
-*Recommenders* lean on *linear algebra*; *distributed systems* on *logic* and *probability*; *AI* on *calculus* and *information theory*. Math is the *shared language*.
+Recommender systems use linear algebra to navigate score spaces. Distributed systems rely on logic and probability for safety arguments. Search and compression connect to information theory. Algorithm design cannot escape combinatorics and complexity analysis. The domains differ, but the common questions are the same: what is the structure, why is it correct, where does it slow down, and what are the theoretical limits?
+
+| CS Domain | Core Math | Key Question | Signal in Production |
+| --- | --- | --- | --- |
+| Data structures | Invariants, asymptotics | Why is this structure correct and fast? | Insert/lookup cost growth |
+| Algorithms | Combinatorics, recurrences | Where does it explode as input grows? | Timeouts, memory blowups |
+| Databases | Sets, relations, selectivity | Why is this index beneficial? | Query plan changes |
+| Networking | Probability, queueing | How do you interpret congestion and loss? | Latency distribution, retransmit rate |
+| Distributed systems | Logic, proof by contradiction, probability | Is it safe under partial failure? | Leader election failure rate |
+| ML | Linear algebra, calculus, probability | Why does it update in this direction? | Loss curve shape |
+| Security | Discrete math, probability | Which assumption breaks the system? | Collision/retry patterns |
 
 ## How a Senior Engineer Thinks
 

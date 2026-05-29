@@ -77,6 +77,8 @@ Graphs consist of *nodes*, *edges*, and *properties* (directed, weighted, cyclic
 G = {"A": ["B", "C"], "B": ["D"], "C": ["D"], "D": []}
 ```
 
+An adjacency list is the most common representation for sparse graphs. It stores only which vertices connect to which, saving memory and fitting traversal algorithms naturally.
+
 ### Step 2 — Vertex and edge counts
 
 ```python
@@ -84,12 +86,16 @@ def stats(G):
     return len(G), sum(len(v) for v in G.values())
 ```
 
+Counting vertices and edges first gives you an immediate sense of scale and density. From there you can estimate algorithmic complexity before writing any traversal logic.
+
 ### Step 3 — Neighbors
 
 ```python
 def neighbors(G, v):
     return G.get(v, [])
 ```
+
+Fast neighbor lookup is the foundation of every graph algorithm. Whether you are finding recommendation candidates, next tasks, or next cities, the operation is structurally the same—query adjacency.
 
 ### Step 4 — BFS
 
@@ -107,6 +113,8 @@ def bfs(G, s):
     return seen
 ```
 
+BFS visits nodes layer by layer, guaranteeing shortest-path discovery in unweighted graphs. The queue enforces order; the seen set prevents revisits. This two-structure pattern recurs in scheduling, dependency resolution, and network discovery.
+
 ### Step 5 — Tree check
 
 ```python
@@ -114,6 +122,8 @@ def is_tree(G):
     edges = sum(len(v) for v in G.values())
     return edges == len(G) - 1
 ```
+
+A tree is a connected graph with exactly `vertices - 1` edges. This single arithmetic check distinguishes hierarchical structures from general graphs—useful when validating org charts, file systems, or DOM trees.
 
 ## What to Notice in This Code
 

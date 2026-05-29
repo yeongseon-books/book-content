@@ -78,12 +78,16 @@ def prob(favorable, total):
     return favorable / total
 ```
 
+The most basic form: favorable outcomes divided by total outcomes. Simple as it looks, choosing what counts as "total" is the decision that determines whether your calculation makes sense.
+
 ### Step 2 — Conditional
 
 ```python
 def cond(p_a_and_b, p_b):
     return p_a_and_b / p_b
 ```
+
+Conditional probability reflects the fact that knowing B already happened changes the sample space. Most real-world probability errors come from getting the denominator wrong, not the numerator.
 
 ### Step 3 — Bayes
 
@@ -92,12 +96,16 @@ def bayes(p_b_given_a, p_a, p_b):
     return p_b_given_a * p_a / p_b
 ```
 
+Bayes’ theorem updates a prior belief given new evidence. Spam filters, medical diagnostics, and ranking systems all follow this pattern: observe evidence, then revise your estimate of the cause.
+
 ### Step 4 — Expectation
 
 ```python
 def expect(values, probs):
     return sum(v * p for v, p in zip(values, probs))
 ```
+
+Expectation is the probability-weighted average outcome. It tells you what to expect on average over many trials—the number you plan around when a single run is uncertain.
 
 ### Step 5 — Variance
 
@@ -106,6 +114,8 @@ def variance(values, probs):
     mu = expect(values, probs)
     return sum(p * (v - mu) ** 2 for v, p in zip(values, probs))
 ```
+
+Variance quantifies spread around the expected value. Low variance means outcomes cluster tightly; high variance means surprises are common. Understanding this distinction drives capacity planning, risk budgets, and SLO design.
 
 ## What to Notice in This Code
 

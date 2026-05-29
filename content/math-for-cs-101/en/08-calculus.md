@@ -78,6 +78,8 @@ def deriv(f, x, h=1e-5):
     return (f(x + h) - f(x - h)) / (2 * h)
 ```
 
+Numerical differentiation approximates the rate of change when an analytical derivative is unavailable. Choosing `h` too large or too small both cause problems—connecting differentiation not just to formulas but to numerical stability concerns.
+
 ### Step 2 — Gradient
 
 ```python
@@ -87,6 +89,8 @@ def grad(f, x, h=1e-5):
             for j in range(len(x))]
 ```
 
+When there is more than one variable, you compute the rate of change along each axis and collect them into a vector. The gradient is not a single number—it carries directional information that tells you which way the function increases fastest.
+
 ### Step 3 — Chain Rule
 
 ```python
@@ -94,12 +98,16 @@ def chain(df_dy, dy_dx):
     return df_dy * dy_dx
 ```
 
+When functions are composed, change propagates through intermediate stages. The chain rule calculates that propagation. Backpropagation in neural networks is fundamentally this rule applied to a large computation graph.
+
 ### Step 4 — One Descent Step
 
 ```python
 def step(x, g, lr=0.1):
     return [xi - lr * gi for xi, gi in zip(x, g)]
 ```
+
+A single descent step moves each parameter in the direction opposite to its gradient component, scaled by a learning rate. This is the atomic operation inside every gradient-based optimizer.
 
 ### Step 5 — Mini Training Loop
 
@@ -109,6 +117,8 @@ def descend(f, x, lr=0.1, steps=100):
         x = step(x, grad(f, x), lr)
     return x
 ```
+
+Repeating the descent step iteratively is how optimization works in practice. The loop converges (or fails to converge) depending on learning rate, landscape curvature, and stopping criteria—all of which become visible only when you watch the loop run.
 
 ## What to Notice in This Code
 

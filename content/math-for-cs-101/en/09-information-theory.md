@@ -80,12 +80,16 @@ def info(p):
     return -math.log2(p)
 ```
 
+The less probable an event, the more information it carries—rare events are more surprising. Using `log2` gives units in bits, directly connecting to how many binary questions you need to identify the event.
+
 ### Step 2 — Entropy
 
 ```python
 def entropy(probs):
     return sum(-p * math.log2(p) for p in probs if p > 0)
 ```
+
+Entropy is the average information content across an entire distribution. It tells you how uncertain the distribution is overall—and sets the theoretical floor for how compactly you can encode messages from that source.
 
 ### Step 3 — Cross Entropy
 
@@ -94,6 +98,8 @@ def cross_entropy(p, q):
     return sum(-pi * math.log2(qi) for pi, qi in zip(p, q) if qi > 0)
 ```
 
+Cross entropy measures the cost of encoding events from distribution p using a code optimized for distribution q. In ML, it is the standard classification loss because it penalizes confident wrong predictions heavily.
+
 ### Step 4 — KL Divergence
 
 ```python
@@ -101,12 +107,16 @@ def kl(p, q):
     return cross_entropy(p, q) - entropy(p)
 ```
 
+KL divergence is the extra cost of using the wrong distribution. It is always non-negative and asymmetric—D(p||q) ≠ D(q||p). This asymmetry matters when choosing which direction to minimize in variational methods.
+
 ### Step 5 — Average Code Length
 
 ```python
 def avg_len(probs, lengths):
     return sum(p * L for p, L in zip(probs, lengths))
 ```
+
+Average code length connects theory to practice: given symbol probabilities and their assigned code lengths, this weighted sum tells you how many bits per symbol your encoding actually uses. Shannon’s theorem says you cannot beat entropy.
 
 ## What to Notice in This Code
 

@@ -81,12 +81,16 @@ def fact(n):
     return r
 ```
 
+Factorial is the most reused building block in combinatorics. Both permutation and combination formulas depend on it. Simple as it looks, it compresses the idea of shrinking choices into a single product.
+
 ### Step 2 — Permutations
 
 ```python
 def nPr(n, r):
     return fact(n) // fact(n - r)
 ```
+
+Permutations count arrangements where order matters. Password digit placement, task execution order, presentation sequence—whenever the arrangement itself carries meaning, you reach for this formula.
 
 ### Step 3 — Combinations
 
@@ -95,6 +99,8 @@ def nCr(n, r):
     return fact(n) // (fact(r) * fact(n - r))
 ```
 
+Combinations count selections where only membership matters, not order. Team composition, sample selection, feature subset choice—the quickest way to distinguish from permutations is to ask: does swapping two items produce a different case?
+
 ### Step 4 — Pigeonhole Check
 
 ```python
@@ -102,12 +108,16 @@ def pigeon(items, holes):
     return items > holes
 ```
 
+The pigeonhole principle says if you have more items than containers, at least one container must hold multiple items. This single inequality powers surprisingly many impossibility and collision arguments.
+
 ### Step 5 — Binomial Row
 
 ```python
 def row(n):
     return [nCr(n, k) for k in range(n + 1)]
 ```
+
+Pascal’s triangle row gives all binomial coefficients for a given n. It reveals symmetry (nCr = nC(n-r)) and provides a quick way to verify your combination calculations.
 
 ## What to Notice in This Code
 

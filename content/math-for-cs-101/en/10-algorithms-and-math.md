@@ -78,6 +78,8 @@ def subsets(n):
     return 2 ** n
 ```
 
+Knowing that subsets grow as `2**n` immediately signals that some problems become intractable even for modest input sizes. Combinatorics gives you this warning before you write a single line of search code.
+
 ### Step 2 — BFS Shortest Path
 
 ```python
@@ -96,6 +98,8 @@ def shortest(G, s, t):
     return -1
 ```
 
+The moment you model a problem as a graph, well-studied algorithms like BFS become available. Model choice determines solution strategy—algorithms often diverge at the representation step, not the implementation step.
+
 ### Step 3 — Randomized Estimate
 
 ```python
@@ -105,6 +109,8 @@ def estimate_pi(n=10000):
     inside = sum(1 for _ in range(n) if random.random() ** 2 + random.random() ** 2 < 1)
     return 4 * inside / n
 ```
+
+Monte Carlo methods trade exactness for feasibility. When the search space is too large for exhaustive enumeration, random sampling gives you a useful estimate with quantifiable confidence.
 
 ### Step 4 — Gradient Descent Min
 
@@ -116,6 +122,8 @@ def minimize(f, x, lr=0.1, steps=100, h=1e-5):
     return x
 ```
 
+Gradient descent is the universal optimizer for smooth functions. Combining numerical differentiation with iterative stepping, it finds minima without requiring a closed-form solution—the workhorse behind ML training loops.
+
 ### Step 5 — Entropy Lower Bound
 
 ```python
@@ -124,6 +132,8 @@ import math
 def lower_bound_bits(probs):
     return sum(-p * math.log2(p) for p in probs if p > 0)
 ```
+
+Entropy sets a theoretical floor on encoding cost. No lossless compression scheme can beat this bound on average. Knowing the lower bound tells you when to stop optimizing and when there is still room to improve.
 
 ## What to Notice in This Code
 

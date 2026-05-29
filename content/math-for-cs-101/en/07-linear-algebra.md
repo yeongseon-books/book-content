@@ -78,12 +78,16 @@ def vadd(a, b):
     return [x + y for x, y in zip(a, b)]
 ```
 
+The simplest operation, yet it builds the intuition that vectors are objects you manipulate position-by-position. Thinking of a vector as a single entity rather than a list of independent numbers is the starting point for everything that follows.
+
 ### Step 2 — Dot Product
 
 ```python
 def dot(a, b):
     return sum(x * y for x, y in zip(a, b))
 ```
+
+The dot product appears in recommendation scores, similarity measures, and projection calculations. It tells you how much two vectors point in the same direction—in practice it is felt more as a comparison grammar than a raw computation.
 
 ### Step 3 — Matrix-Vector
 
@@ -92,12 +96,16 @@ def matvec(M, v):
     return [dot(row, v) for row in M]
 ```
 
+Reading a matrix as a transformation device makes it click: feed in one vector, get a transformed vector out. A matrix is less a table of numbers and more a machine that recombines directions and magnitudes.
+
 ### Step 4 — Transpose
 
 ```python
 def transpose(M):
     return [list(col) for col in zip(*M)]
 ```
+
+Transpose swaps rows and columns. It shows up whenever you need to switch between row-oriented and column-oriented views—common when reshaping data for algorithms that expect a specific layout.
 
 ### Step 5 — Matrix-Matrix
 
@@ -106,6 +114,8 @@ def matmul(A, B):
     Bt = transpose(B)
     return [[dot(row, col) for col in Bt] for row in A]
 ```
+
+Matrix multiplication is a grid of dot products. Understanding this decomposition demystifies neural network layers, coordinate transforms, and any pipeline where transformations chain together.
 
 ## What to Notice in This Code
 

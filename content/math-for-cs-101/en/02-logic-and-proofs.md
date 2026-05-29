@@ -78,12 +78,16 @@ def truth_imply():
     return [(p, q, (not p) or q) for p in (False, True) for q in (False, True)]
 ```
 
+Implication `p → q` translates to `not p or q` in code. It may look like unfamiliar notation, but it is ultimately a boolean expression. Once you internalize this, reading when a conditional evaluates to true becomes much sharper.
+
 ### Step 2 — Equivalence
 
 ```python
 def equiv(p, q):
     return p == q
 ```
+
+Equivalence means two expressions always produce the same truth value. During refactoring, checking whether two conditions only look different or actually differ in meaning is exactly this operation.
 
 ### Step 3 — Direct proof sketch
 
@@ -93,6 +97,8 @@ def even_sum(a, b):
     return (a + b) % 2 == 0
 ```
 
+The sum of two even numbers being even is a textbook direct proof. The clearer your assumptions, the shorter the path to the conclusion. In code, this maps to the habit of making preconditions explicit.
+
 ### Step 4 — Contradiction sketch
 
 ```python
@@ -100,12 +106,16 @@ def assume_not(claim):
     return f"suppose not {claim}, derive contradiction"
 ```
 
+When a direct path is hard to see, assuming the opposite often reveals structure faster. Concurrency constraints, state invariants, and impossibility results frequently benefit from this approach—you surface the contradiction rather than leaving the “it can’t happen” feeling unexamined.
+
 ### Step 5 — Induction
 
 ```python
 def sum_to(n):
     return n * (n + 1) // 2
 ```
+
+Induction pairs naturally with repetitive structures. If the base case holds and you can step from n to n+1, the claim extends to all natural numbers. I find it most practical to view induction as a close relative of loop verification: if initialization is wrong, no amount of correct iteration saves you.
 
 ## What to Notice in This Code
 
