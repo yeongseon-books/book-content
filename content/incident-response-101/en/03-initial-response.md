@@ -149,7 +149,7 @@ A compact response log makes it easy to review whether the team established stru
 09:10 status page investigation notice published
 ```
 
-This kind of log is short, but it preserves the difference between “we were investigating” and “we had actually established command.”
+This kind of log is short, but it preserves the difference between "we were investigating" and "we had actually established command."
 
 ## Checklist
 
@@ -167,6 +167,112 @@ This kind of log is short, but it preserves the difference between “we were in
 ## Wrap-up and Next Steps
 
 Next, we cover communication.
+
+## First 10 Minutes — Time-Based Checklist
+
+Initial response quality hinges on how quickly you establish structure, not how accurately you diagnose. When information is scarce, fixing execution order matters more than competing hypotheses.
+
+| Time Window | Goal | Required Action | Output |
+| --- | --- | --- | --- |
+| 0–2 min | Establish ownership | Ack, open incident channel | Incident ID, channel link |
+| 2–5 min | Make impact visible | Check error rate / latency / affected path | First impact numbers |
+| 5–7 min | Assign roles | Designate IC, Ops, Comms | Responsibility assignment |
+| 7–10 min | Begin stabilization | Execute rollback / scale / throttle candidate | First mitigation status |
+
+The key insight: the 5–7 minute role assignment window determines how smoothly the next hour goes. When role separation is late, the technical responder and the comms lead waste time answering the same questions independently.
+
+## Role Assignment Table
+
+| Role | Responsibility | Forbidden Action |
+| --- | --- | --- |
+| Incident Commander | Priority decisions, stage transition approval | Diving into hands-on work |
+| Ops Lead | Execute mitigation, verify recovery | Writing external notices alone |
+| Comms Lead | Publish internal/external updates | Asserting unconfirmed root cause |
+| Scribe | Maintain timeline, log decisions | Making decisions on behalf of IC |
+
+Roles are momentary responsibilities, not job titles. Small teams can combine roles, but separating IC and Scribe noticeably improves retrospective quality.
+
+## First Notification Template
+
+The initial notice only needs three things: "we are aware," "scope of impact," and "next update time." Avoid speculating on root cause until confirmed.
+
+```text
+[initial-notice-template]
+- We are seeing elevated failure rates on the checkout path.
+- Some customers may experience payment failures.
+- The response team is executing mitigation. Next update in 30 minutes.
+```
+
+Short is fine. A timely three-line factual notice preserves trust far better than silence.
+
+## Response Automation Example
+
+```python
+def initial_response(alert_id: str, team: list[str]) -> dict:
+    return {
+        "ack": {"alert": alert_id, "status": "acknowledged"},
+        "roles": {
+            "IC": team[0],
+            "Ops": team[1],
+            "Comms": team[2],
+            "Scribe": team[3] if len(team) > 3 else team[0],
+        },
+        "next_update_minutes": 30,
+    }
+```
+
+Automation does not replace people — it standardizes the repeatable startup procedure. Consistent structure reduces quality variance during 3 AM incidents.
+
+## Operational Rules for Reducing Failure
+
+- If no stabilization candidate exists within 10 minutes, escalate immediately.
+- Label impact numbers as "estimated" and refresh periodically.
+- Log decisions in both the channel and the timeline.
+- Define the exit condition for initial response as "mitigation started."
+
+Following these rules reduces early-stage chaos and creates smooth transitions into the next phases (communication, timeline, RCA).
+
+## Handoff Message Template
+
+When initial response extends long enough to require shift handoff, standardize the handoff message:
+
+```text
+[handoff]
+- Current state: error rate 1.2% after mitigation, monitoring
+- Recent action: rollback complete, throttle at 20%
+- Open items: specific payment method failure root cause pending
+- Next action: re-check metrics in 15 min, decide on throttle removal
+```
+
+A standardized short handoff message reduces information loss at shift boundaries.
+
+## Internal/External First Update Templates
+
+```text
+[internal-first-update]
+- incident_id:
+- current_severity:
+- observed_impact:
+- mitigation_in_progress:
+- next_update_at:
+
+[external-first-update]
+- We are currently experiencing service errors affecting some users.
+- The response team is analyzing and mitigating the issue.
+- Next update at <UTC time>.
+```
+
+Even if the initial notice is brief, arriving on time matters more than arriving complete.
+
+## First 10 Minutes — Common Failure Patterns
+
+1. Channel not opened — conversations scatter across DMs.
+2. IC dives into command execution, creating a decision vacuum.
+3. First notice delayed — customer trust drops.
+4. Roles assigned without defining expected outputs — confusion persists.
+5. Mitigation attempted without defining verification metrics — risk of re-escalation.
+
+Reviewing these patterns in team rehearsals measurably improves first-10-minute quality during real incidents.
 
 ## Answering the Opening Questions
 
