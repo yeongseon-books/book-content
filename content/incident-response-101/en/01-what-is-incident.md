@@ -156,12 +156,146 @@ done
 
 You are not trying to prove the full root cause yet. You are gathering enough evidence to justify whether the incident process should start.
 
+## Incident decision matrix
+
+The hardest boundary in early triage is between "inconvenience" and "outage." Leaving that boundary to human intuition produces different conclusions for identical situations. Lock at least three axes: customer count, critical-path impact, and duration.
+
+| Category | Customers (est.) | Critical path impact | Duration | Default judgment |
+| --- | --- | --- | --- | --- |
+| A | 1–99 | None | Under 5 min | bug / alert |
+| B | 100–999 | Partial | 5–15 min | incident candidate |
+| C | 1,000–9,999 | Core feature degraded | 15–30 min | incident |
+| D | 10,000+ | Payment / login / primary API down | 30+ min | high-severity incident |
+
+The table is not a perfect classifier. Its purpose is to converge debate quickly. Real-world edge cases always appear — for example, few customers but a spike in checkout failure rate. Pre-documenting a rule like "critical-path impact gets higher weight" reduces judgment variance.
+
+## Response process flow
+
+After the incident/non-incident decision, confusion often persists because "what to do next" is not fixed. The sequence below works reliably across many teams:
+
+1. **Verify signal** — confirm the alert matches actual service state.
+2. **Provisional classification** — incident candidate or routine issue.
+3. **Claim ownership** — primary on-call acknowledges and opens the channel.
+4. **Measure impact** — record customer count, error rate, affected path as numbers.
+5. **Route** — incident goes to dedicated workflow; non-incident goes to backlog/bug queue.
+
+Technically simple, organizationally powerful. Skipping steps 3 and 4 means response appears to start, but without ownership and evidence the post-incident review loses reproducibility.
+
+## Triage question cards
+
+The first three minutes of on-call have incomplete information. Reading these questions out loud becomes a useful habit:
+
+- Is the failing function part of a critical user journey?
+- Is the failure ratio rising in both absolute value and trend?
+- Was there a recent deploy, config change, or upstream dependency shift?
+- Can customers work around the issue, or is their workflow blocked?
+- If the same state persists 10 more minutes, who else should be paged?
+
+Question cards level-set decision quality regardless of experience. A junior on-call can ask the same questions; a senior can quickly assess the quality of answers.
+
+## Simple decision automation
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class IncidentSignal:
+    users: int
+    minutes: int
+    core_path_impacted: bool
+    error_ratio: float
+
+def decide(signal: IncidentSignal) -> str:
+    if signal.core_path_impacted and signal.error_ratio >= 0.05:
+        return "incident"
+    if signal.users >= 1000 or signal.minutes >= 15:
+        return "incident"
+    return "bug"
+```
+
+The code is not meant to handle every edge case mechanically. Its value is making the team's agreed criteria explicit so that "why did we classify this as an incident?" always has a traceable answer.
+
+## Operational checkpoints
+
+- Are threshold change histories tracked in version control?
+- Does the classification result auto-connect to channel and paging policy?
+- When a new boundary case appears, is the definition doc updated immediately?
+- Does new on-call training include case-based classification exercises?
+
+When these four items are in place, the incident definition operates as a system, not just a document.
+
+## Incident triage template
+
+Hesitation time before declaring is more expensive than it looks. Teams do better with a fill-in template than a memorized sentence.
+
+```text
+[incident-triage-template]
+- detected_at_utc:
+- affected_journey: (login / payment / search / orders / ...)
+- estimated_impacted_users:
+- impact_duration_minutes:
+- current_error_rate:
+- current_latency_p95_ms:
+- current_severity_candidate: (SEV1 / SEV2 / SEV3 / bug)
+- immediate_action: (declare incident / monitor as bug)
+- owner_oncall:
+```
+
+Using the template shifts judgment from personal instinct to team criteria. More importantly, it feeds naturally into severity classification, communication, and timeline writing downstream.
+
+## On-call handoff rules
+
+Incidents do not respect shift boundaries. Poor handoffs cause the same event to be triaged twice.
+
+| Item | Minimum standard | Failure signal |
+| --- | --- | --- |
+| Handoff message | 4-line summary (impact / mitigation / unresolved / next action) | Repeated "where are we?" questions |
+| Handoff timing | Draft 10 min before shift end, finalize at transition | 15-min gap after transition |
+| Metric check | Incoming on-call re-verifies key metrics twice | Verbal-only briefing, immediate judgment |
+| Doc links | Incident channel, dashboard, runbook links included | Missing links, search time increases |
+
+Operational rules exist not to grow documentation but to make anyone who steps in reach the same decision speed. Incident response is a team sport with substitutions, not a solo performance.
+
+## Incident declaration record example
+
+```text
+[declare-incident]
+incident_id: INC-2026-05-21-001
+detected_at_utc: 2026-05-21T01:03:11Z
+detected_by: alert.checkout.error_ratio
+candidate_severity: SEV2
+affected_journey: checkout
+estimated_impacted_users: 4300
+error_ratio: 0.087
+latency_p95_ms: 1840
+decision: declare_incident
+owner: primary-oncall
+next_update_utc: 2026-05-21T01:30:00Z
+```
+
+## Team agreement rules
+
+1. A fast hypothesis beats a late correct answer — declare early.
+2. De-escalation after declaration is fine; delayed declaration loses time that cannot be recovered.
+3. Even incomplete impact numbers should be shared immediately with an "estimated" tag.
+4. Separate cause speculation from factual data; facts go to the timeline first.
+5. After every incident, review whether the declaration timing was appropriate.
+
+## Post-declaration review questions
+
+- What caused the declaration delay, if any?
+- Was role assignment complete within 5 minutes of declaration?
+- Did impact numbers appear in the first notification?
+- Where did the definition doc and the actual judgment diverge?
+- What friction can be reduced before the next incident?
+
 ## Checklist
 
-- [ ] Threshold agreed.
-- [ ] Classification code.
-- [ ] Alert routing.
-- [ ] Training material.
+- [ ] Incident threshold documented and agreed.
+- [ ] Classification logic reflected in code or automation.
+- [ ] Alert routing separates incident and bug channels.
+- [ ] Training material with real case examples exists for new on-call members.
+- [ ] Triage template linked in incident channel topic.
 
 ## Practice Problems
 
@@ -171,7 +305,9 @@ You are not trying to prove the full root cause yet. You are gathering enough ev
 
 ## Wrap-up and Next Steps
 
-Next, we cover severity classification.
+An incident is not "something weird happening." It is an event where customer impact crosses the team's agreed threshold. That threshold enables consistent decisions about who to page, which channel to open, and how often to communicate. On-call maturity starts with sharing judgment criteria.
+
+Next, we cover severity classification — the shared language for expressing how serious an incident is.
 
 ## Answering the Opening Questions
 
