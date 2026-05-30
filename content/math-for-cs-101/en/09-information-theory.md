@@ -17,7 +17,7 @@ tags:
   - Compression
   - Beginner
 seo_description: A beginner-friendly tour of bits, entropy, cross entropy, KL divergence, Shannon, and compression intuition for CS
-last_reviewed: '2026-05-04'
+last_reviewed: '2026-05-15'
 ---
 
 # Math for CS 101 (9/10): Information Theory
@@ -51,9 +51,9 @@ Information theory measures *entropy* (uncertainty), *mutual information* (share
 
 ## Before/After
 
-**Before**: "Compress this data as much as you can."
+**Before**: every message gets the *same length*.
 
-**After**: "The Shannon limit sets an absolute lower bound; anything better is impossible.
+**After**: *common* messages short, *rare* ones long.
 
 ## Key Terms
 
@@ -62,12 +62,6 @@ Information theory measures *entropy* (uncertainty), *mutual information* (share
 - **cross entropy**: cost of coding *truth* with *predictions*.
 - **KL divergence**: a *distance* between distributions.
 - **compression**: bounded *below* by entropy.
-
-## Before/After
-
-**Before**: every message gets the *same length*.
-
-**After**: *common* messages short, *rare* ones long.
 
 ## Hands-on: Mini Information Kit
 
@@ -116,7 +110,239 @@ def avg_len(probs, lengths):
     return sum(p * L for p, L in zip(probs, lengths))
 ```
 
-Average code length connects theory to practice: given symbol probabilities and their assigned code lengths, this weighted sum tells you how many bits per symbol your encoding actually uses. Shannon’s theorem says you cannot beat entropy.
+Average code length connects theory to practice: given symbol probabilities and their assigned code lengths, this weighted sum tells you how many bits per symbol your encoding actually uses. Shannon's theorem says you cannot beat entropy.
+
+## Entropy: Fair Coin vs Biased Coin
+
+```python
+import math
+
+def entropy(probs: list[float]) -> float:
+    return -sum(p * math.log2(p) for p in probs if p > 0)
+
+fair_coin = [0.5, 0.5]
+biased_coin = [0.9, 0.1]
+
+h_fair = entropy(fair_coin)      # 1.0 bit
+h_biased = entropy(biased_coin)  # 0.469 bits
+```
+
+The fair coin has higher entropy because its outcome is harder to predict. Entropy is closer to "prediction uncertainty" than to "disorder."
+
+## Decision Tree Information Gain
+
+Information gain is a direct application of information theory in machine learning.
+
+```python
+def information_gain(
+    parent_h: float, left_h: float, right_h: float,
+    left_ratio: float, right_ratio: float
+) -> float:
+    child_h = left_ratio * left_h + right_ratio * right_h
+    return parent_h - child_h
+```
+
+The feature that reduces entropy most after a split becomes the best split criterion. Decision trees select branches based on uncertainty reduction, not just classification accuracy.
+
+## Cross Entropy and KL Divergence Relationship
+
+Cross entropy decomposes as `H(p, q) = H(p) + KL(p||q)`:
+
+- `H(p)` is the data's inherent uncertainty — the model cannot change it.
+- `KL(p||q)` measures how far model distribution `q` is from true distribution `p` — training can reduce it.
+
+Minimizing cross entropy is therefore equivalent to minimizing KL divergence.
+
+## Compression Perspective Summary
+
+| Concept | Question | Interpretation |
+| --- | --- | --- |
+| Information content | How surprising is one event? | `-log2(p)` |
+| Entropy | How many bits on average? | Distribution uncertainty |
+| Cross entropy | Cost of coding with the wrong distribution? | Prediction quality |
+| KL divergence | Difference between two distributions? | Extra cost |
+
+The same perspective applies when examining compression algorithms: assigning shorter codewords to frequent patterns reduces average length.
+
+## Implementation Caveats
+
+1. Guard `log(0)` with epsilon
+2. Verify probabilities sum to 1 (normalize)
+3. Prevent unit confusion (bit vs nat)
+4. Always state KL direction (`p||q`)
+
+Missing any of these produces numbers that look correct but are interpreted wrong. Information theory code demands faithful adherence to definitions.
+
+## Perplexity and Entropy
+
+Perplexity, commonly used in language model evaluation, is the exponential form of entropy.
+
+```python
+import math
+
+def perplexity(cross_entropy_bits: float) -> float:
+    return 2 ** cross_entropy_bits
+```
+
+Lower perplexity means the model predicts the next-token distribution more accurately. Perplexity is not an independent metric — it is cross entropy rescaled to a more interpretable scale.
+
+## Huffman Coding
+
+Huffman coding assigns shorter codes to frequent symbols, reducing average bit length. It satisfies the prefix-code condition, making decoding unambiguous.
+
+```python
+import heapq
+
+def huffman_lengths(freqs):
+    heap = [[f, [s, ""]] for s, f in freqs.items()]
+    heapq.heapify(heap)
+    while len(heap) > 1:
+        lo = heapq.heappop(heap)
+        hi = heapq.heappop(heap)
+        for pair in lo[1:]:
+            pair[1] = '0' + pair[1]
+        for pair in hi[1:]:
+            pair[1] = '1' + pair[1]
+        heapq.heappush(heap, [lo[0] + hi[0]] + lo[1:] + hi[1:])
+    return {s: len(code) for s, code in heap[0][1:]}
+
+print(huffman_lengths({'A': 45, 'B': 13, 'C': 12, 'D': 16, 'E': 9, 'F': 5}))
+```
+
+Connecting information theory to a compression implementation makes it clear that entropy is not just an abstract metric — it is the actual lower bound on storage and transmission cost.
+
+## Mutual Information
+
+Mutual information (MI) measures how much information two random variables share about each other.
+
+`I(X;Y) = H(X) - H(X|Y) = H(Y) - H(Y|X) = H(X) + H(Y) - H(X,Y)`
+
+If knowing X reduces uncertainty about Y, MI is positive. If MI is zero, the variables are independent.
+
+```python
+import numpy as np
+from collections import Counter
+
+def mutual_information(x: list, y: list) -> float:
+    """Estimate mutual information for discrete random variables."""
+    n = len(x)
+    assert n == len(y)
+
+    px = Counter(x)
+    py = Counter(y)
+    pxy = Counter(zip(x, y))
+
+    mi = 0.0
+    for (xi, yi), count_xy in pxy.items():
+        p_xy = count_xy / n
+        p_x = px[xi] / n
+        p_y = py[yi] / n
+        mi += p_xy * np.log2(p_xy / (p_x * p_y))
+    return mi
+
+# Example: perfectly dependent vs independent
+labels = [0, 0, 1, 1, 2, 2, 0, 1, 2, 0]
+same = labels[:]
+rand = [1, 2, 0, 2, 1, 0, 2, 0, 1, 2]
+
+print(f"MI(X, X): {mutual_information(labels, same):.4f} bits")  # maximum
+print(f"MI(X, R): {mutual_information(labels, rand):.4f} bits")  # near 0
+```
+
+| Domain | Application | Description |
+| --- | --- | --- |
+| Feature selection | MI-based filter | Prioritize features with high MI to target |
+| Decision trees | Information gain | Select node splits that maximize MI increase |
+| Clustering | NMI metric | Evaluate cluster quality via Normalized MI |
+| Generative models | InfoGAN | Maximize MI between latent code and output |
+
+## Channel Capacity and Shannon Limit
+
+Even with noise, there exists a maximum transmission rate at which error rate can be made arbitrarily small. This is channel capacity.
+
+`C = max_{p(x)} I(X;Y)`
+
+For a binary symmetric channel (BSC) where bits flip with probability p:
+
+`C_BSC = 1 - H(p) = 1 - [-p*log2(p) - (1-p)*log2(1-p)]`
+
+```python
+import numpy as np
+
+def binary_entropy(p: float) -> float:
+    """Compute binary entropy function H(p)."""
+    if p == 0 or p == 1:
+        return 0.0
+    return -(p * np.log2(p) + (1 - p) * np.log2(1 - p))
+
+def bsc_capacity(p: float) -> float:
+    """Compute binary symmetric channel capacity."""
+    return 1.0 - binary_entropy(p)
+
+error_probs = [0.0, 0.01, 0.05, 0.1, 0.2, 0.3, 0.5]
+print("Error prob(p)  Capacity(C)  Note")
+print("-" * 50)
+for p in error_probs:
+    c = bsc_capacity(p)
+    note = "perfect channel" if p == 0 else "random channel" if p == 0.5 else ""
+    print(f"  {p:.2f}        {c:.4f}       {note}")
+```
+
+Shannon's channel coding theorem guarantees:
+
+- If rate R < C, proper coding can drive error rate to near zero.
+- If rate R > C, no coding can avoid errors.
+
+This result sets the design limits for 5G, Wi-Fi, and satellite communication. LDPC codes and Turbo codes are practical coding schemes that approach the Shannon limit closely.
+
+## Compression Efficiency Experiment
+
+Comparing theoretical entropy against real compression algorithms shows why entropy is a lower bound.
+
+```python
+import zlib
+import math
+import os
+from collections import Counter
+
+def entropy_bits(data: bytes) -> float:
+    """Compute entropy in bits/byte for a byte sequence."""
+    freq = Counter(data)
+    n = len(data)
+    return -sum((c / n) * math.log2(c / n) for c in freq.values())
+
+def compression_experiment(data: bytes, label: str):
+    """Compare entropy with actual compression results."""
+    h = entropy_bits(data)
+    compressed = zlib.compress(data, level=9)
+    ratio = len(compressed) / len(data)
+    theoretical_ratio = h / 8.0  # entropy / max entropy (8 bits)
+
+    print(f"\n[{label}]")
+    print(f"  Original size: {len(data):,} bytes")
+    print(f"  Entropy: {h:.3f} bits/byte (max 8.0)")
+    print(f"  Theoretical minimum ratio: {theoretical_ratio:.3f}")
+    print(f"  zlib compression ratio: {ratio:.3f}")
+    print(f"  Efficiency vs entropy: {theoretical_ratio / ratio * 100:.1f}%")
+
+# Experiment 1: biased data (low entropy)
+biased = bytes([0] * 800 + [1] * 150 + [2] * 50)
+compression_experiment(biased, "Biased data (low entropy)")
+
+# Experiment 2: uniform distribution (high entropy)
+uniform = os.urandom(1000)
+compression_experiment(uniform, "Random data (high entropy)")
+
+# Experiment 3: natural language text (medium entropy)
+text = ("Information theory is the foundation of communication and compression. " * 20).encode('utf-8')
+compression_experiment(text, "Repeated text (medium entropy)")
+```
+
+Key observations:
+
+1. Lower entropy means better compression ratio.
+2. Random data has maximum entropy (~8 bits/byte) and is nearly incompressible.
+3. Real compression algorithms always produce results slightly above the entropy lower bound (overhead).
 
 ## What to Notice in This Code
 
