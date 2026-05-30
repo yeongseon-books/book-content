@@ -23,7 +23,7 @@ last_reviewed: '2026-05-15'
 
 # Clean Code 101 (10/10): Good Code Review Standards
 
-A code review slows down when the reviewer must rediscover the author’s intent, rerun basic style checks by eye, and guess which comments are mandatory. Good reviews depend on design, but they also depend on process.
+A code review slows down when the reviewer must rediscover the author's intent, rerun basic style checks by eye, and guess which comments are mandatory. Good reviews depend on design, but they also depend on process.
 
 This is the final post in the Clean Code 101 series.
 
@@ -145,6 +145,174 @@ Labels make priority explicit.
 
 Refactor the review process itself.
 
+## Review Criteria Table
+
+A good review is risk management, not taste comparison. Pin this table to your review template and comment quality stabilizes quickly.
+
+| Perspective | Question | How to Verify |
+| --- | --- | --- |
+| Correctness | Does the change accurately reflect the requirement? | Review tests and sample inputs |
+| Readability | Are names and function boundaries clear? | Compare before/after code |
+| Stability | Are exception and boundary cases handled? | Walk through failure scenarios |
+| Extensibility | Is the modification scope small when a new policy is added? | Check from an OCP perspective |
+| Operability | Are logs, metrics, and rollback strategies present? | PR description checklist |
+
+## Splitting PRs: Before and After
+
+```text
+# before
+PR-1: payment policy change + function extraction + rename + test improvement
+
+# after
+PR-1: function extraction (behavior unchanged)
+PR-2: rename (behavior unchanged)
+PR-3: add payment policy (behavior changes)
+```
+
+When you split PR units this way, the reviewer can quickly judge "what changed" and "why it changed." Review speed and quality both improve.
+
+## Review Comment Template
+
+```markdown
+- Observation: `calculate_total` handles payment, discount, and logging together.
+- Risk: Multiple change reasons mean high regression probability.
+- Suggestion: Separating computation from side-effect functions narrows test scope.
+- Verification: After separation, request both existing tests and new boundary tests.
+```
+
+## Automation Gate Example
+
+```yaml
+name: review-gate
+on: [pull_request]
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install -r requirements-dev.txt
+      - run: ruff check .
+      - run: pytest -q
+```
+
+Automation frees reviewers from repetitive verification. The human eye belongs on design intent and risk trade-offs.
+
+## Connecting Review Comments to Action Plans
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class ReviewAction:
+    priority: str
+    message: str
+    follow_up_issue: str | None = None
+
+def build_review_actions() -> list[ReviewAction]:
+    return [
+        ReviewAction(
+            priority="MUST",
+            message="order_total branch depth is 4. Apply guard clauses.",
+            follow_up_issue=None,
+        ),
+        ReviewAction(
+            priority="SUGG",
+            message="Extract duplicated discount logic — tests become simpler.",
+            follow_up_issue="#123",
+        ),
+        ReviewAction(
+            priority="NIT",
+            message="Rename total to subtotal_cents for unit clarity.",
+            follow_up_issue=None,
+        ),
+    ]
+```
+
+When priority and follow-up issue are recorded together, review comments become execution plans rather than opinions.
+
+## Incremental Refactoring Backlog
+
+```python
+REFACTORING_BACKLOG = [
+    {"id": "CC-101", "task": "decompose order_total", "owner": "backend", "week": 1},
+    {"id": "CC-102", "task": "standardize exception hierarchy", "owner": "backend", "week": 2},
+    {"id": "CC-103", "task": "consolidate discount policy table", "owner": "backend", "week": 3},
+    {"id": "CC-104", "task": "strengthen review template", "owner": "platform", "week": 4},
+]
+
+def group_tasks_by_week(tasks: list[dict]) -> dict[int, list[str]]:
+    grouped: dict[int, list[str]] = {}
+    for task in tasks:
+        week = task["week"]
+        grouped.setdefault(week, []).append(task["task"])
+    return grouped
+```
+
+Review is not a merge-button event — it is an ongoing quality improvement loop. Separating "must-do in this PR" from "safe to do next sprint" keeps the conversation productive.
+
+## Legacy Code Improvement Strategy
+
+| Phase | Goal | Review Focus | Deliverable |
+| --- | --- | --- | --- |
+| 1 | Lock current behavior | Characterization tests exist? | Safety-net tests |
+| 2 | Simplify structure | Function length / branch depth decreased? | Refactoring PR |
+| 3 | Remove duplication | Policy source unified? | Shared module / table |
+| 4 | Clean error boundaries | Exception hierarchy and mapping clear? | Error handling guide |
+| 5 | Strengthen automation | Repeated feedback moved to tooling? | Lint / CI rules |
+
+Adding this table to your review template lets reviewers propose both short-term fixes and long-term plans in one pass.
+
+## Review Process Maturity Metrics
+
+| Metric | Description | Example Target |
+| --- | --- | --- |
+| First review response time | Time from PR creation to first comment | Under 4 hours |
+| Review rounds | Round-trips needed before approval | 2 or fewer |
+| Automation failure rate | Lint/test failure ratio | Under 10 % |
+| Post-merge regression rate | Defects within 7 days of merge | Under 2 % |
+
+```python
+def review_health_score(
+    first_response_hours: float, rounds: int, regression_rate: float
+) -> float:
+    score = 100.0
+    score -= max(0, first_response_hours - 4) * 2
+    score -= max(0, rounds - 2) * 5
+    score -= regression_rate * 100
+    return max(score, 0)
+```
+
+Metrics are a process improvement tool, not a personal evaluation tool. To avoid poisoning team culture, use them only as system improvement signals, never for individual comparison.
+
+## Change Impact Score
+
+Before approving a PR, estimate how far the change propagates:
+
+- Count callers of the modified function.
+- Determine whether the input/output contract changes.
+- Record whether exception types or log event names change.
+- Verify that tests cover both input boundaries and failure boundaries.
+
+```python
+def change_impact_score(
+    callers: int, contract_changed: bool, exception_changed: bool
+) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| Score Range | Recommended Strategy |
+| --- | --- |
+| 0–5 | Ship in a single PR |
+| 6–12 | Separate refactoring PR from feature PR |
+| 13+ | Stage deployment with rollback plan |
+
+Putting the score in writing shifts review conversations from gut feeling to evidence.
+
 ## How to Verify This in a Real Codebase
 
 ```bash
@@ -238,5 +406,4 @@ A good review is a mirror of clean code. Names, functions, branches, duplication
 - [Conventional Comments](https://conventionalcomments.org/)
 - [Best Kept Secrets of Peer Code Review (Smart Bear)](https://smartbear.com/resources/ebooks/best-kept-secrets-of-peer-code-review/)
 - [Microsoft Engineering Fundamentals — Code Review](https://microsoft.github.io/code-with-engineering-playbook/code-reviews/)
-- [Google engineering practices — code review](https://google.github.io/eng-practices/review/)
 Tags: Computer Science, CleanCode, CodeReview, PullRequest, Quality, Collaboration
