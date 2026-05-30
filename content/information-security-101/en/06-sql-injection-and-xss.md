@@ -150,6 +150,226 @@ document.body.appendChild(node);
 
 Use text-node APIs instead of `innerHTML`.
 
+### Step 6 — Safe vs Unsafe Query Comparison
+
+```python
+# 6_safe_vs_unsafe.py
+import sqlite3
+
+# Vulnerable — never do this
+def unsafe_query(name):
+    con = sqlite3.connect(":memory:")
+    con.execute("CREATE TABLE users (id int, name text)")
+    con.execute("INSERT INTO users VALUES (1, 'alice')")
+    cursor = con.execute(f"SELECT * FROM users WHERE name='{name}'")
+    return cursor.fetchall()
+
+# Safe — always do this
+def safe_query(name):
+    con = sqlite3.connect(":memory:")
+    con.execute("CREATE TABLE users (id int, name text)")
+    con.execute("INSERT INTO users VALUES (1, 'alice')")
+    cursor = con.execute("SELECT * FROM users WHERE name=?", (name,))
+    return cursor.fetchall()
+
+# Test
+attack_payload = "' OR '1'='1"
+print("Unsafe:", unsafe_query(attack_payload))  # returns all rows
+print("Safe:", safe_query(attack_payload))      # empty result
+```
+
+The vulnerable query interprets the attack payload as SQL syntax. The safe query treats the same value as plain string data. This one-line difference separates full database exfiltration from safe operation.
+
+## Input Validation Strategies
+
+Input validation is a secondary defense layer. The primary defense is parameter binding and output encoding. Still, input validation reduces the attack surface.
+
+### Allowlist Approach
+
+```python
+# allow_list.py
+ALLOWED_SORT_COLUMNS = {"name", "created_at", "id"}
+
+def get_users(sort_by: str):
+    if sort_by not in ALLOWED_SORT_COLUMNS:
+        raise ValueError(f"Invalid sort column: {sort_by}")
+    # Direct insertion is safe here (allowlist verified)
+    return f"SELECT * FROM users ORDER BY {sort_by}"
+```
+
+Allowlists work best when the set of valid values is small and predictable — column names, sort directions, table names.
+
+### Denylist Limitations
+
+```python
+# denylist.py — not recommended
+FORBIDDEN_PATTERNS = ["--", ";", "'", '"', "OR", "DROP"]
+
+def unsafe_filter(user_input: str):
+    for pattern in FORBIDDEN_PATTERNS:
+        if pattern.lower() in user_input.lower():
+            raise ValueError("Forbidden pattern detected")
+    return user_input
+
+# Bypass methods are endless:
+# 1. Case variations: oR, Or
+# 2. URL encoding: %4F%52 (OR)
+# 3. Comments: /**/ to insert spaces
+# 4. Unicode: fullwidth characters
+```
+
+Denylists have infinite bypass methods. Prefer allowlists combined with parameter binding.
+
+### Type-Based Validation
+
+```python
+# type_validation.py
+from pydantic import BaseModel, validator
+
+class UserQuery(BaseModel):
+    user_id: int
+    sort: str
+
+    @validator("sort")
+    def validate_sort(cls, v):
+        allowed = {"name", "created_at"}
+        if v not in allowed:
+            raise ValueError(f"Sort must be one of {allowed}")
+        return v
+```
+
+Framework-level type and value validation prevents bad input from reaching handlers. This approach unifies API contract validation and security validation.
+
+## OWASP Top 10 and SQLi/XSS
+
+| OWASP Top 10 Item | Connection to SQLi/XSS | Prevention Core |
+| --- | --- | --- |
+| A03 Injection | SQL/NoSQL/OS command injection | Parameterization, input boundary validation |
+| A03 Injection (includes XSS) | Script execution in browser | Context encoding, CSP |
+| A01 Broken Access Control | Privilege escalation after injection | Server-side authorization re-verification |
+| A09 Security Logging Failures | Detection delay | Attack signal logging and alerting |
+
+Input vulnerabilities are not standalone issues — they amplify through permissions, logging, and deployment pipelines.
+
+## Defense Code Patterns
+
+```python
+# vuln_defense_patterns.py
+import sqlite3
+from markupsafe import escape
+
+con = sqlite3.connect(":memory:")
+con.execute("CREATE TABLE users (id INTEGER, name TEXT)")
+
+
+def safe_lookup(name: str):
+    # SQL injection defense: parameter binding
+    return con.execute("SELECT id, name FROM users WHERE name = ?", (name,)).fetchall()
+
+
+def safe_html(name: str) -> str:
+    # XSS defense: escape at output time
+    return f"<p>{escape(name)}</p>"
+
+
+def validate_limit(limit: int) -> int:
+    # Input validation: enforce allowed range
+    if not 1 <= limit <= 100:
+        raise ValueError("limit out of range")
+    return limit
+```
+
+The critical insight: defense layers are different.
+
+- SQL defense: query construction stage
+- XSS defense: rendering stage
+- Input validation: business rules stage
+
+No single layer solves everything.
+
+## Security Regression Test Cases
+
+| Test Target | Malicious Input | Expected Result |
+| --- | --- | --- |
+| User lookup API | `' OR 1=1 --` | 400 or empty result |
+| Comment rendering | `<script>alert(1)</script>` | Script not executed, escaped output |
+| Sort parameter | `name; DROP TABLE users` | Non-allowlist value rejected |
+
+Combining SAST (static analysis) and DAST (dynamic testing) reduces leaks on both code and runtime sides.
+
+## Detection Signals to Always Log
+
+- Repeated SQL syntax errors in a short window
+- Abnormally long query parameters from a specific user/IP
+- Sudden spike in inputs containing HTML/JS special characters
+- Correlation between WAF block events and application error logs
+
+Without detection signals you cannot know whether defenses are working. Design defense and detection together.
+
+## WAF vs Application Defense
+
+WAF is a supplementary filter that reduces attack noise. The fundamental defense must live in application code.
+
+```text
+Request -> WAF first filter -> App input validation -> Bound query -> Output encoding -> Response
+```
+
+Relying solely on WAF without code-level defense leads to false positives on legitimate requests and repeated bypass attacks. Document defense responsibilities per layer.
+
+## Database Account Separation
+
+SQL injection defense is not just about query construction — it pairs with the DB permission model. If the app account has excessive privileges, a successful bypass causes maximum damage.
+
+| Account | Allowed Permissions | Forbidden Permissions |
+| --- | --- | --- |
+| Read-only API account | SELECT | INSERT/UPDATE/DELETE/DDL |
+| General write API account | SELECT/INSERT/UPDATE | DROP/ALTER/GRANT |
+| Migration account | DDL (time-limited) | Permanent use forbidden |
+
+## XSS Incident Response Steps
+
+- Block the vulnerable path immediately and purge cached malicious content.
+- Decide on session cookie rotation and forced logout.
+- Collect CSP violation reports to analyze recurrence paths.
+- Classify entry vectors (input forms, admin panels, external sync).
+
+Injection vulnerabilities do not end with a single patch. Strengthening all four boundaries — input, storage, rendering, and permissions — together is what brings the recurrence rate down.
+
+## Security Test Automation
+
+```python
+# test_injection_regression.py
+import requests
+
+BASE = "https://staging.example.com"
+
+def test_sql_injection_payload_rejected():
+    payload = "' OR 1=1 --"
+    r = requests.get(f"{BASE}/api/users", params={"name": payload}, timeout=5)
+    assert r.status_code in (200, 400)
+    assert "alice" not in r.text
+
+def test_xss_payload_escaped():
+    payload = "<script>alert(1)</script>"
+    r = requests.post(f"{BASE}/comments", json={"body": payload}, timeout=5)
+    assert r.status_code == 201
+    page = requests.get(f"{BASE}/comments/latest", timeout=5)
+    assert "<script>" not in page.text
+```
+
+Adding security tests to CI prevents vulnerabilities from regressing back in. Once a vulnerability is fixed, lock it with a test.
+
+## Injection Response Priority
+
+| Priority | Action | Completion Criteria |
+| --- | --- | --- |
+| 1 | Block vulnerable path temporarily | Reproduction payload blocked |
+| 2 | Code fix (binding/encoding) | Security test passes |
+| 3 | Log-based impact analysis | Affected user/data scope confirmed |
+| 4 | Add prevention rules | Static analysis/test gate added |
+
+Explicit priorities reduce argument time during incidents and speed up recovery.
+
 ## What to Notice in This Code
 
 - All SQL goes through parameter binding.
