@@ -36,27 +36,15 @@ Here we will separate the explanations that belong in naming and structure from 
 
 ## Questions to Keep in Mind
 
-- What boundary should you inspect first when applying Comments and Documentation?
-- Which signal should the example or diagram make visible for Comments and Documentation?
-- What failure should be prevented first when Comments and Documentation reaches a real system?
-
-## Questions this article answers
-
 - When is it better not to write a comment at all?
-- What is the difference between an intent comment and a warning comment?
-- What rules make Python docstrings effective?
-- How much of a public API should you document?
-- How should TODO and FIXME items be managed so they stay traceable?
-
-> Good comments explain only the "why" that code cannot show on its own. The "what" should stay visible in the code.
+- How do intent comments and warning comments differ?
+- What rules should Python docstrings follow?
 
 ## Why It Matters
 
-Comments tend to lie. Code changes; comments rarely follow.
+Comments tend to lie. Code changes; comments rarely follow. When something feels like it needs explaining, the first question should be whether better names and structure can eliminate the need for explanation altogether.
 
-> The best comment is the one you no longer need.
-
-If something needs explaining, fix the code first.
+That said, documentation is not useless. Public API contracts, quirky external-system behavior, and caller-safety warnings often cannot be expressed through code alone. The key is keeping comments narrow and purposeful.
 
 ## Key Terms
 
@@ -65,6 +53,20 @@ If something needs explaining, fix the code first.
 - **Docstring**: Usage information attached to a function or class.
 - **TODO/FIXME**: Markers for future work; must be traceable.
 - **API doc**: The contract of a public interface.
+
+## Comment vs Self-Documenting Code: When to Choose Which
+
+Good comments are few and precise. Better code needs almost none. The table below clarifies when to comment and when to improve code instead.
+
+| Situation | Improve Code First | Comment First | Reasoning |
+| --- | --- | --- | --- |
+| Ambiguous variable/function name | O | X | Renaming is the permanent fix |
+| Working around a complex external contract | X | O | "Why" is hard to express in code alone |
+| Performance optimization trick | X | O | Intent and constraints must be recorded for safety |
+| TODO/FIXME item | X | O | Needs a traceable work memo |
+| Public API input/return contract | X | O (docstring) | Caller contract requires documentation |
+
+If a comment merely restates what the code does, it is a deletion candidate. If it conveys an external constraint, historical context, or danger warning, it is worth keeping.
 
 ## Before/After
 
@@ -85,6 +87,29 @@ def get_active_users(): ...
 ```
 
 The name replaces the comment.
+
+## Good Comments vs Bad Comments
+
+```python
+# Bad comment: repeats what the code already says.
+
+def add_one(value: int) -> int:
+    # add 1 to value
+    return value + 1
+```
+
+```python
+# Good comment: explains WHY this implementation was chosen.
+
+def parse_gateway_status(response: dict) -> str:
+    # The payment gateway returns HTTP 200 even on failure.
+    # We ignore the status code and check the body value instead.
+    if response.get("error_code"):
+        return "FAILED"
+    return "PAID"
+```
+
+The difference shows up in maintenance. Bad comments age into lies; good comments preserve decision context.
 
 ## Hands-on: Five Steps to Useful Documentation
 
@@ -158,6 +183,99 @@ def retry_simple(): ...
 ```
 
 Every TODO needs a person and a date.
+
+## Python Docstring Practical Rules
+
+```python
+def calculate_refund_amount(total_cents: int, cancel_fee_rate: float) -> int:
+    """Calculate the refund amount in cents.
+
+    Args:
+        total_cents: Original payment amount in cents.
+        cancel_fee_rate: Cancellation fee rate in [0, 1].
+
+    Returns:
+        Refund amount after deducting the fee, in cents.
+
+    Raises:
+        ValueError: When fee rate is out of range.
+    """
+    if not 0 <= cancel_fee_rate <= 1:
+        raise ValueError("cancel_fee_rate must be in [0, 1]")
+
+    refund_cents = int(total_cents * (1 - cancel_fee_rate))
+    return max(refund_cents, 0)
+```
+
+A docstring is a contract document, not an implementation description. Record "what goes in, what comes out, what can break" — not "how it works internally."
+
+## Documentation Quality Check Routine
+
+1. Can you state the function's purpose within 10 seconds of reading the code alone?
+2. Does the comment explain "why"?
+3. Does the TODO have an owner, a deadline, and an issue link?
+4. Does the public API's docstring contract match its tests?
+
+```python
+def should_keep_comment(comment_text: str, explains_why: bool, duplicates_code: bool) -> bool:
+    if duplicates_code:
+        return False
+    return explains_why and len(comment_text.strip()) > 0
+```
+
+Adding this check to your code review template reduces noise comments and raises documentation quality.
+
+## Comment Quality Decision Table
+
+Comments add value when they record decisions that code cannot express — not when they restate what code already says.
+
+| Comment Type | Good Example | Bad Example |
+| --- | --- | --- |
+| Intent explanation | Why a specific constraint led to this implementation | Restating the code in prose |
+| Warning | Explicit transaction/performance/security risk | Vague "be careful" note |
+| TODO | Includes owner, deadline, and follow-up condition | Ownerless TODO accumulating silently |
+| Documentation link | Connects to ADR or issue number | Unsourced claim |
+
+## Before/After Demo: Names and Structure Over Comments
+
+```python
+# before
+def p(a, b):
+    # user can purchase
+    if a and b > 0:
+        return True
+    return False
+
+# after
+def can_purchase(is_active_user: bool, stock_quantity: int) -> bool:
+    return is_active_user and stock_quantity > 0
+```
+
+When names carry intent, comments become unnecessary. Comments should be the last resort.
+
+## Documentation Routine Example
+
+1. Use a fixed What/Why/How/Risk template in every PR description.
+2. When changing a public API, update the README and usage examples in the same PR.
+3. Include an ADR link for any change with operational impact.
+
+```markdown
+## Change Summary
+- What: Restructure order cancellation policy to state-based
+- Why: Eliminate branch duplication and prevent policy misinterpretation
+- How: Introduce strategy object; keep existing API signature
+- Risk: Legacy callers may have status-string typos
+```
+
+## Linter Example: Minimum Docstring Standards
+
+```toml
+[tool.ruff.lint]
+select = ["D", "E", "F", "B"]
+ignore = ["D203", "D213"]
+```
+
+Automating docstring rules catches missing function-level documentation early and keeps quality uniform across the team.
 
 ## How to Verify This in a Real Codebase
 
