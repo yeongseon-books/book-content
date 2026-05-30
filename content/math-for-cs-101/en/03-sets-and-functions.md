@@ -121,6 +121,229 @@ Composition chains two functions so the output of one feeds into the other. This
 - *Injective* is a *length* comparison.
 - *Composition* is a *lambda*.
 
+## Using Python Set Operations as a Modeling Language
+
+Set operations are not just syntax convenience—they define policies and data boundaries. For example, in access control you can check whether a user's scope set is a superset of the required scope set.
+
+```python
+def can_access(user_scopes: set[str], required_scopes: set[str]) -> bool:
+    return required_scopes.issubset(user_scopes)
+
+user = {'read:post', 'read:comment', 'write:comment'}
+required = {'read:post'}
+```
+
+The advantage: even as conditions grow, the core meaning stays intact. A list-based comparison introduces ordering and duplication issues. A set-based approach keeps the requirement expressed as a mathematical condition.
+
+## Operation Selection Table
+
+| Situation | Set Operation | Code | Checkpoint |
+| --- | --- | --- | --- |
+| Merging allow rules | Union | `A \| B` | Deduplicate meaning |
+| Simultaneous-satisfaction rules | Intersection | `A & B` | Handle empty intersection |
+| Exclusion rules | Difference | `A - B` | Block-list freshness |
+| Exact-match drift detection | Symmetric difference | `A ^ B` | Missing/extra items |
+
+Symmetric difference (`A ^ B`) is particularly useful in operations for detecting "policy drift"—it immediately reveals where the expected state and the actual state diverge.
+
+## Designing Data Pipelines with Function Composition
+
+Composing small transformation functions produces testable pipelines.
+
+```python
+def trim(s: str) -> str:
+    return s.strip()
+
+def lower(s: str) -> str:
+    return s.lower()
+
+def remove_space(s: str) -> str:
+    return s.replace(' ', '')
+
+def compose(*funcs):
+    def wrapped(x):
+        for f in funcs:
+            x = f(x)
+        return x
+    return wrapped
+
+normalize = compose(trim, lower, remove_space)
+```
+
+Composition separates each step's responsibility, making failure root-cause analysis straightforward. You can maintain per-step unit tests while adding an end-to-end pipeline test for regression safety.
+
+## Understanding Injective, Surjective, and Bijective Through Practical Mappings
+
+- **Injective**: distinct inputs always produce distinct outputs. Example: unique user ID generators.
+- **Surjective**: every value in the codomain is reached by at least one input. Example: a status-code mapping that covers all possible statuses.
+- **Bijective**: both injective and surjective—reversible mapping. Example: a 1:1 table between abbreviation codes and full text.
+
+```python
+def is_injective_map(mapping: dict[str, str]) -> bool:
+    return len(set(mapping.values())) == len(mapping)
+```
+
+If you miss the injectivity requirement during mapping design, collisions make reverse lookup impossible. This problem appears frequently in log key standardization, cache key generation, and URL slug creation.
+
+## Why Separate Functions from Relations
+
+A relation allows one input to map to multiple outputs; a function does not. This distinction directly affects API contracts. "One default shipping address per user" is a function model; "multiple bookmarks per user" is a relation model. Confusing the two at design time leads to unnecessarily complex schemas and interfaces.
+
+## Boundary Case Checklist
+
+1. Does the operation produce expected results on empty-set input?
+2. Is information loss acceptable when converting a duplicate-containing source to a set?
+3. Does swapping the order of composed functions change the meaning?
+4. Does the codomain definition match between documentation and implementation?
+
+Sets and functions are foundational concepts, but they keep getting reused all the way up to advanced design because they clarify boundaries and contracts.
+
+## Lowering Set/Function Models into API Contracts
+
+When you use set and function perspectives directly in API design docs, misunderstandings between implementation teams decrease. For example, `GET /users/{id}` is an `id -> user` function model, while `GET /users?team=x` is a subset query on the team set. Making this explicit naturally separates responsibilities for empty results, duplicates, and ordering across layers.
+
+```python
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class User:
+    user_id: str
+    team: str
+
+def team_members(users: set[User], team: str) -> set[User]:
+    return {u for u in users if u.team == team}
+```
+
+The key is writing what mathematical contract an API guarantees before describing how it enumerates values.
+
+## Resolving Permissions with Set Operations
+
+Set operations express data-boundary validation directly. Given an allowed set, a requested set, and a blocked set, computing the final approved set becomes a single expression.
+
+```python
+def resolve_permissions(allowed: set[str], requested: set[str], blocked: set[str]) -> set[str]:
+    return (allowed & requested) - blocked
+
+allowed = {"read", "write", "delete", "audit"}
+requested = {"read", "delete"}
+blocked = {"delete"}
+print(resolve_permissions(allowed, requested, blocked))  # {'read'}
+```
+
+The advantage: policy intent is visible at the operator level. A list-based filter chain shows procedure but can obscure the policy boundary.
+
+## Typed Function Composition
+
+Function composition is the core pattern for assembling small transformations into a larger pipeline.
+
+```python
+from typing import Callable
+
+def compose(f: Callable, g: Callable):
+    return lambda x: f(g(x))
+
+def strip_text(x: str) -> str:
+    return x.strip()
+
+def normalize_space(x: str) -> str:
+    return " ".join(x.split())
+
+def to_lower(x: str) -> str:
+    return x.lower()
+
+pipeline = compose(to_lower, compose(normalize_space, strip_text))
+print(pipeline("  Hello   CS Math  "))
+```
+
+The habit of reading composition order precisely matters for bug tracking. Especially in serialization/deserialization and validation/normalization chains, swapping one step changes the entire meaning.
+
+## Injective and Surjective Comparison
+
+| Property | Definition | Development Context | Watch Out |
+| --- | --- | --- | --- |
+| Injective | Distinct inputs map to distinct outputs | ID mapping, key generation | Collision means injectivity failure |
+| Surjective | Every codomain element is hit at least once | Classification labels covering all cases | Data bias can break surjectivity |
+| Bijective | Injective + surjective | Reversible transforms, lossless encoding | Incorrect codomain definition causes misjudgment |
+
+### Checking Injectivity and Surjectivity in Code
+
+```python
+def is_injective(mapping: dict) -> bool:
+    return len(set(mapping.values())) == len(mapping)
+
+def is_surjective(mapping: dict, codomain: set) -> bool:
+    return set(mapping.values()) == codomain
+
+m = {"a": 1, "b": 2, "c": 3}
+print(is_injective(m), is_surjective(m, {1, 2, 3}))
+```
+
+In practice, if you do not explicitly state the codomain, a surjectivity judgment is meaningless. Making the codomain explicit in function contracts is a necessary habit.
+
+## Set Operation Symbol Reference
+
+| Symbol | Name | Python | Meaning |
+| --- | --- | --- | --- |
+| A ∪ B | Union | `a \| b` | Elements in either set |
+| A ∩ B | Intersection | `a & b` | Elements in both sets |
+| A ∖ B | Difference | `a - b` | Elements in A but not B |
+| A ⊕ B | Symmetric difference | `a ^ b` | Elements in exactly one set |
+| A ⊆ B | Subset | `a <= b` | All elements of A are in B |
+| A ⊂ B | Proper subset | `a < b` | A ⊆ B and A ≠ B |
+| x ∈ A | Membership | `x in a` | x belongs to A |
+| \|A\| | Cardinality | `len(a)` | Number of elements in A |
+| ∅ | Empty set | `set()` | A set with no elements |
+| P(A) | Power set | See code below | Set of all subsets of A |
+
+## Power Set and Cardinality
+
+The power set P(A) is the set of all subsets of A. If |A| = n, then |P(A)| = 2ⁿ. This concept connects directly to combinatorics and appears whenever you need to calculate possible configuration combinations in a system.
+
+```python
+from itertools import combinations
+
+def power_set(s: set) -> list:
+    items = list(s)
+    result = []
+    for r in range(len(items) + 1):
+        for combo in combinations(items, r):
+            result.append(set(combo))
+    return result
+
+features = {"cache", "retry", "logging"}
+all_configs = power_set(features)
+print(f"feature flags: {len(features)} -> configurations: {len(all_configs)}")  # 3 -> 8
+```
+
+With 3 feature flags you get 8 combinations; with 10 you get 1,024. Understanding power-set cardinality growth lets you quantitatively explain how feature-flag explosion increases testing cost.
+
+## Building a Data Validation Pipeline with Set Operations
+
+Set operations show their greatest value in data validation scenarios.
+
+```python
+def validate_schema(required: set, optional: set, actual: set) -> dict:
+    missing = required - actual
+    unexpected = actual - (required | optional)
+    recognized = actual & (required | optional)
+    return {
+        "valid": len(missing) == 0 and len(unexpected) == 0,
+        "missing": missing,
+        "unexpected": unexpected,
+        "recognized": recognized,
+    }
+
+required_fields = {"id", "name", "email"}
+optional_fields = {"phone", "address"}
+actual_fields = {"id", "name", "email", "nickname"}
+
+result = validate_schema(required_fields, optional_fields, actual_fields)
+print(result)
+# {'valid': False, 'missing': set(), 'unexpected': {'nickname'}, 'recognized': {'id', 'name', 'email'}}
+```
+
+This pattern is reusable across API request validation, CSV column checking, and environment variable verification. Compared to list-based validation, the intent is clearer and performance benefits from O(1) lookups.
+
 ## Five Common Mistakes
 
 1. **Confusing *list* and *set*.**

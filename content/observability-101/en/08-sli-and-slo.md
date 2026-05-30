@@ -131,6 +131,293 @@ Expected output:
 - Monthly reviews use budget consumption to decide whether feature velocity should slow down.
 ```
 
+### Error Budget Policy
+
+An error budget is just a number. To operationalize it, you need a policy that maps consumption levels to concrete actions.
+
+**Policy 1: Budget consumed ≤ 70% (green zone)**
+
+- Maintain normal deploy velocity.
+- Continue new feature development.
+- Report budget consumption at the weekly review.
+
+**Policy 2: Budget consumed 70–90% (yellow zone)**
+
+- Hold high-risk deploys (e.g., database schema migrations).
+- Prioritize stability improvements for existing features.
+- Analyze root causes of recent failures at weekly review.
+
+**Policy 3: Budget consumed > 90% (red zone)**
+
+- Freeze all new-feature deploys.
+- Form a stabilization task force and focus exclusively on reliability.
+- Escalate to leadership.
+- Maintain the policy until budget consumption drops below 70%.
+
+This policy turns numbers into actions. When the rule "no feature deploys if budget is exhausted" is explicit, both engineering and business teams speak from the same reference point.
+
+### Distinguishing SLA from SLO from SLI
+
+In practice, teams often conflate SLI, SLO, and SLA. The three serve clearly different roles.
+
+**SLI (Service Level Indicator)**
+A measurable metric. It must be expressible as a precise number—success rate, latency, throughput. Example: `availability = (successful requests / total requests) * 100%`.
+
+**SLO (Service Level Objective)**
+An agreed-upon target the team commits to. Example: `maintain availability ≥ 99.9%`. Missing the target carries no legal penalty, but it is the internal operational standard.
+
+**SLA (Service Level Agreement)**
+A contract with customers. Example: `refund 10% of service fees if availability falls below 99.9%`. Because breach triggers financial or legal liability, SLAs are set more conservatively than SLOs.
+
+A common pattern: if your SLO is 99.9%, set the SLA at 99.5%. This buffer means you can miss your internal target without immediately breaking customer commitments.
+
+### Multi-SLO Priority
+
+When a service has multiple SLOs, you must define priority explicitly. Treating all SLOs with equal weight leaves the team unable to decide which breach to fix first.
+
+```python
+slo_priority = {
+    "availability": {
+        "target": 0.999,
+        "weight": 1.0,  # highest priority
+        "action": "freeze all deploys"
+    },
+    "latency_p95": {
+        "target": 500,  # ms
+        "weight": 0.8,
+        "action": "prioritize performance tuning"
+    },
+    "latency_p99": {
+        "target": 1000,  # ms
+        "weight": 0.6,
+        "action": "optimize long-tail latency"
+    }
+}
+
+def check_slo_breach(metrics, slo_priority):
+    breached = []
+    for name, config in sorted(
+        slo_priority.items(),
+        key=lambda x: x[1]["weight"],
+        reverse=True
+    ):
+        if metrics[name] < config["target"]:
+            breached.append((name, config))
+
+    if breached:
+        top = breached[0]
+        print(f"Critical SLO breach: {top[0]}")
+        print(f"Action required: {top[1]['action']}")
+```
+
+With explicit priority, when multiple SLOs breach simultaneously, the team knows which one to restore first.
+
+## SLI Calculation Code
+
+When the indicator definition lives only in a document, interpretation drifts during operations. Expressing calculation logic in code keeps the team aligned.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class SLIResult:
+    good: int
+    total: int
+
+    @property
+    def value(self) -> float:
+        return 0.0 if self.total == 0 else self.good / self.total
+
+def availability_sli(status_codes: list[int]) -> SLIResult:
+    total = len(status_codes)
+    good = sum(1 for code in status_codes if 200 <= code < 500)
+    return SLIResult(good=good, total=total)
+
+samples = [200, 200, 201, 502, 503, 200, 429, 200]
+result = availability_sli(samples)
+print(f"SLI={result.value:.4f} ({result.good}/{result.total})")
+```
+
+What counts as "good" depends on service context. An authentication service might treat 401 as a normal response, while a payment API might classify certain 4xx codes as failures. The key is to document the criteria and maintain a change log.
+
+## Error Budget Burn Formula
+
+The two most-used formulas in operations:
+
+```text
+allowed_error_rate = 1 - slo_target
+burn_rate = actual_error_rate / allowed_error_rate
+```
+
+For example, with a 99.9% SLO the allowed error rate is 0.1% (0.001). If the actual error rate is 0.5% (0.005), burn rate is 5.0—meaning you are consuming the budget five times faster than planned. This lets you interpret incident severity as a relative speed rather than an absolute number.
+
+## Multi-Window Alert Template
+
+Using both a short window and a long window catches both sudden spikes and gradual degradation.
+
+```yaml
+groups:
+  - name: slo-burn
+    rules:
+      - alert: SLOFastBurn
+        expr: (error_rate_5m > 14.4 * 0.001) and (error_rate_1h > 14.4 * 0.001)
+        for: 2m
+        labels:
+          severity: page
+        annotations:
+          summary: "SLO fast burn detected"
+
+      - alert: SLOSlowBurn
+        expr: (error_rate_30m > 6 * 0.001) and (error_rate_6h > 6 * 0.001)
+        for: 15m
+        labels:
+          severity: ticket
+        annotations:
+          summary: "SLO slow burn detected"
+```
+
+Fast burn triggers immediate response; slow burn triggers planned stabilization. Without this separation, teams either over-respond to everything or consistently respond too late.
+
+### SLO Dashboard — Grafana JSON Example
+
+A dashboard panel configuration that shows SLO status at a glance:
+
+```json
+{
+  "title": "SLO Status — checkout-service",
+  "type": "stat",
+  "datasource": "Prometheus",
+  "targets": [
+    {
+      "expr": "1 - (sum(rate(http_requests_total{service=\"checkout\", code=~\"5..\"}[30d])) / sum(rate(http_requests_total{service=\"checkout\"}[30d])))",
+      "legendFormat": "Availability (30d)"
+    }
+  ],
+  "fieldConfig": {
+    "defaults": {
+      "thresholds": {
+        "steps": [
+          { "value": 0, "color": "red" },
+          { "value": 0.995, "color": "yellow" },
+          { "value": 0.999, "color": "green" }
+        ]
+      },
+      "unit": "percentunit",
+      "decimals": 4
+    }
+  }
+}
+```
+
+This panel displays 30-day rolling-window availability as a percentage. The color changes based on threshold, so current SLO status is visible at a glance.
+
+Pair it with an error-budget-remaining gauge:
+
+```json
+{
+  "title": "Error Budget Remaining",
+  "type": "gauge",
+  "datasource": "Prometheus",
+  "targets": [
+    {
+      "expr": "1 - (sum(increase(http_requests_total{service=\"checkout\", code=~\"5..\"}[30d])) / (sum(increase(http_requests_total{service=\"checkout\"}[30d])) * 0.001))",
+      "legendFormat": "Budget Remaining"
+    }
+  ],
+  "fieldConfig": {
+    "defaults": {
+      "min": 0,
+      "max": 1,
+      "thresholds": {
+        "steps": [
+          { "value": 0, "color": "red" },
+          { "value": 0.25, "color": "orange" },
+          { "value": 0.5, "color": "green" }
+        ]
+      },
+      "unit": "percentunit"
+    }
+  }
+}
+```
+
+When budget drops below 25% the gauge turns orange; at 0% it turns red. At that point, freeze feature deploys and focus on stabilization.
+
+### Error Budget Scenario Analysis
+
+Consider a service handling 10 million monthly requests with a 99.9% SLO:
+
+| Scenario | Monthly Allowed Failures | Single-Incident Consumption | Remaining Budget | Action |
+|---------|--------------------------|---------------------------|-----------------|--------|
+| Normal operation | 10,000 | 0 | 100% | Allow feature deploys |
+| 5-min full outage (100 RPS) | 10,000 | 30,000 | -200% | Immediate freeze + RCA |
+| 1-hour partial outage (10% errors) | 10,000 | 3,600 | 64% | Watch closely |
+| Day-long intermittent (0.5% errors) | 10,000 | 4,320 | 56.8% | Begin root-cause analysis |
+| Week-long slow degradation (0.1% errors) | 10,000 | 6,048 | 39.5% | Prioritize in next sprint |
+
+The key insight: a brief total outage is dramatic, but a day-long 0.5% error rate consumes 43% of the entire budget. Slow burns are often more expensive than fast incidents.
+
+### SLO Rollout Roadmap
+
+When introducing SLOs to an organization, take a phased approach. Applying them to all services at once creates measurement burden and political resistance.
+
+**Phase 1 — Build measurement foundation (2–4 weeks)**
+
+```yaml
+actions:
+  - Select 3 critical services
+  - Build RED metrics collection pipeline
+  - Measure actual performance baseline (2 weeks)
+  - Write SLI definition doc (1 page per service)
+deliverables:
+  - SLI definition document
+  - Prometheus recording rules
+  - Grafana baseline dashboard
+```
+
+**Phase 2 — Set SLOs and observe (4–6 weeks)**
+
+```yaml
+actions:
+  - Set SLO targets based on baseline (realistic levels)
+  - Automate error budget calculation
+  - Configure burn-rate alerts (silent mode)
+  - Start weekly SLO review meetings
+deliverables:
+  - SLO document (targets + rationale)
+  - Burn-rate alert rules (silent observation)
+  - Weekly review template
+```
+
+**Phase 3 — Operational integration (4–8 weeks)**
+
+```yaml
+actions:
+  - Connect alerts to actual on-call rotation
+  - Formalize error budget policy (freeze criteria, unfreeze criteria)
+  - Reflect SLO status in sprint planning
+  - Add SLO to leadership reports
+deliverables:
+  - Error budget policy document
+  - On-call runbook SLO section
+  - Monthly reliability report
+```
+
+**Phase 4 — Expansion and maturity (ongoing)**
+
+```yaml
+actions:
+  - Expand to remaining services (3-5 per quarter)
+  - Introduce SLO-based capacity planning
+  - Link internal SLAs to SLOs
+  - Automate budget freeze/unfreeze pipeline
+deliverables:
+  - SLO status integrated into service catalog
+  - Automated freeze/unfreeze workflow
+```
+
+At each phase, the most important outcome is the team building the habit of using SLOs as a decision-making tool. Creating numbers matters less than acting on them.
+
 ## What to Notice in This Code
 
 - An *SLI* is always a *ratio*.
