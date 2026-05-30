@@ -149,9 +149,7 @@ curl -i http://127.0.0.1:9000/
 ### First failure modes to check
 
 - If the browser hangs, inspect `Content-Length` and whether the connection gets closed.
-- If the response parses oddly, confirm the line endings are `
-` rather than plain `
-`.
+- If the response parses oddly, confirm the line endings are `\r\n` rather than plain `\n`.
 - If the FastAPI example does not boot, re-check the import path in `uvicorn 2_fastapi:app --port 9000`.
 
 ## What to Notice in This Code
@@ -168,17 +166,268 @@ curl -i http://127.0.0.1:9000/
 4. **Sending a body with GET.** Caches and proxies will drop it.
 5. **Using only 200 and 500.** You lose the meaning of all the 4xx codes.
 
+## Status Code Decision Table
+
+Status codes are not documentation decoration. Caches, retry logic, alarms, dashboards, and SLA calculations all depend on them.
+
+| Family | Meaning | Typical client behavior |
+| --- | --- | --- |
+| 2xx | Request succeeded | Process success, no retry |
+| 3xx | Location/access changed | Follow redirect or apply policy |
+| 4xx | Client request problem | Fix input and retry |
+| 5xx | Server internal/transient failure | Backoff retry, trigger alarm |
+
+When you need a specific code, this decision table is practical:
+
+| Situation | Recommended code | Why |
+| --- | --- | --- |
+| New resource created | `201 Created` | States the creation explicitly |
+| Async job accepted | `202 Accepted` | Not complete — only accepted |
+| No body needed | `204 No Content` | Reduces parsing cost and ambiguity |
+| Auth token missing/invalid | `401 Unauthorized` | Signals "authenticate first" |
+| Insufficient permissions | `403 Forbidden` | Authenticated but forbidden |
+| Resource does not exist | `404 Not Found` | Recoverable lookup failure |
+| Input validation failed | `422 Unprocessable Entity` | Conveys field-level errors |
+| Internal exception | `500 Internal Server Error` | Declares server responsibility |
+| Temporary overload | `503 Service Unavailable` | Signals retry possibility |
+
+Wrong codes create invisible failures. Hiding 500 behind 200 silences error-rate alarms and delays response. Sending 400 as 500 triggers unnecessary client retries that amplify traffic. Returning 404 as 200 lets CDN/browser caches store the wrong page.
+
+## Headers That Cause Outages When Missing
+
+These are not "nice to have" — omitting them commonly leads to production failures.
+
+| Header | Controls | Typical failure when absent |
+| --- | --- | --- |
+| `Host` | Virtual host routing | Routed to wrong backend, or 400 |
+| `Content-Length` | Body boundary | Truncated response, client hangs |
+| `Content-Type` | Serialization/parsing | JSON treated as string, 415/422 |
+| `Authorization` | Auth context | User identification fails, 401 cascade |
+| `Accept` | Response representation | Unexpected format returned |
+| `X-Forwarded-For` | Original client IP | Rate limit / audit log corruption |
+| `X-Forwarded-Proto` | Original scheme (HTTP/HTTPS) | Redirect loop, secure cookie not set |
+| `Connection` | Per-hop connection policy | Keep-alive confusion between proxies |
+
+`Connection` is a hop-by-hop header — proxies must not forward it verbatim. Missing this causes subtle disconnects that only appear "behind the proxy."
+
+## Raw Socket → `http.server` → FastAPI
+
+The same HTTP protocol, but each layer automates more of the repetitive work.
+
+### Level 1: Raw Socket
+
+```python
+# Learning: observe request/response boundaries directly
+import socket
+
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind(("127.0.0.1", 9000))
+server.listen(5)
+
+while True:
+    conn, _ = server.accept()
+    data = conn.recv(4096)
+
+    # Demo: print only the first request line
+    first_line = data.split(b"\r\n", 1)[0]
+    print(first_line.decode("utf-8", errors="replace"))
+
+    body = b'{"ok":true}'
+    response = (
+        b"HTTP/1.1 200 OK\r\n"
+        b"Content-Type: application/json\r\n"
+        + f"Content-Length: {len(body)}\r\n".encode()
+        + b"Connection: close\r\n\r\n"
+        + body
+    )
+    conn.sendall(response)
+    conn.close()
+```
+
+When you build it yourself, the pain is obvious: request parsing, header normalization, exception handling, keep-alive, timeout, logging — all manual.
+
+### Level 2: stdlib `http.server`
+
+```python
+from http.server import BaseHTTPRequestHandler, HTTPServer
+
+class Handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        body = b'{"message":"hello"}'
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+HTTPServer(("127.0.0.1", 9000), Handler).serve_forever()
+```
+
+The stdlib handles request-line parsing and basic headers. Routing, input validation, dependency injection, and async are still limited.
+
+### Level 3: FastAPI
+
+```python
+from fastapi import FastAPI, HTTPException, Response
+
+app = FastAPI()
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+@app.get("/items/{item_id}")
+def get_item(item_id: int, response: Response):
+    if item_id < 0:
+        raise HTTPException(status_code=400, detail="item_id must be >= 0")
+
+    response.headers["Cache-Control"] = "no-store"
+    return {"item_id": item_id}
+```
+
+FastAPI automates routing, validation, documentation (OpenAPI), serialization, and exception mapping. The server's nature does not change — the safety nets increase.
+
+## HTTP/1.1 Keep-Alive and Connection Reuse
+
+HTTP/1.0 defaulted to closing after each response. HTTP/1.1 defaults to keep-alive. Modern environments assume "multiple requests over the same connection."
+
+| Aspect | HTTP/1.0 default | HTTP/1.1 default |
+| --- | --- | --- |
+| Connection policy | Close after request-response | Reuse connection |
+| Performance | Repeated handshake cost | Latency/CPU savings |
+| Failure mode | Disconnects are relatively clear | Boundary errors cascade |
+
+HTTP/1.1 pipelining theoretically allows sending multiple requests without waiting for responses, but head-of-line blocking and middlebox compatibility issues kept real-world adoption low. Today's production uses HTTP/1.1 keep-alive with multiple connections, or HTTP/2 multiplexing.
+
+The key point: keep-alive itself is not the problem. The problem is that incorrect boundary information (wrong `Content-Length`) corrupts subsequent requests on the same connection.
+
+## Operational Failure Patterns
+
+### 1) Response appears truncated: wrong `Content-Length`
+
+Symptom: intermittent JSON parse errors on mobile; occasional `net::ERR_CONTENT_LENGTH_MISMATCH` in browsers.
+
+Cause: body is 512 bytes but `Content-Length: 480` was sent.
+
+Fix: avoid manual length calculation — let the framework serialize. If a proxy handles gzip/brotli, clarify which layer owns the length.
+
+### 2) Auth breaks only behind a proxy: hop-by-hop header mishandling
+
+Symptom: local/direct calls work fine; sessions become unstable through the API Gateway.
+
+Cause: an intermediate proxy forwards or strips tokens declared in the `Connection` header, removing expected headers.
+
+Fix: distinguish end-to-end headers (`Authorization`, `X-Request-Id`) from hop-by-hop headers, and audit proxy rules.
+
+### 3) Client waits forever: missing close or missing boundary
+
+Symptom: some SDK calls hang until timeout.
+
+Cause: no `Content-Length`, no `Transfer-Encoding: chunked`, and the connection is never closed.
+
+Fix: satisfy at least one of: explicit length, chunked encoding, explicit connection close.
+
+### 4) Monitoring shows all 200 but user complaints rise
+
+Symptom: error dashboard at 0%; support tickets about failures increasing.
+
+Cause: business failures sent as `{ "ok": false }` inside a 200 response.
+
+Fix: use 4xx/5xx matching the failure type. Reserve 2xx for actual success. Align monitoring SLIs with the response contract.
+
+## Debugging Tools: How Deep to Go
+
+### 1) `curl -v`
+
+```bash
+curl -v -H "Accept: application/json" http://127.0.0.1:9000/items/1
+```
+
+- Shows request and response headers simultaneously.
+- Quick hints on TLS, redirects, and connection reuse.
+
+### 2) HTTPie
+
+```bash
+http --print=HhBb GET :9000/items/1 Authorization:"Bearer demo"
+```
+
+- Human-readable output separating headers from body.
+- Useful for regression checks on API contracts.
+
+### 3) tcpdump / Wireshark
+
+- Final ground truth when application logs and proxy logs disagree.
+- Packet capture is expensive — narrow down with `curl -v` and access logs first, then capture only the minimal segment.
+
+## Common Mistakes and Their Real Cost
+
+| Mistake | Why it happens | Actual cost |
+| --- | --- | --- |
+| Returning all failures as 200 | "Easier for the client to parse" misconception | Alarms silenced, incident detection delayed |
+| Omitting `Content-Type` | Assuming the framework will add it | Parsing mismatch across languages/SDKs |
+| Designing meaningful body on GET | Internal-only thinking | Proxy/cache/SDK compatibility collapse |
+| Undefined proxy trust boundary | Unclear infra/app team ownership | IP spoofing accepted, HTTPS detection fails |
+| Default timeout left unchanged | Hard to reproduce locally | Thread exhaustion, queue backlog, cascading failure |
+
+The common thread: verifying "it works now" without considering "how long this contract lives." HTTP contracts are not team-internal rules — they are a shared language interpreted by browsers, mobile SDKs, proxies, and monitoring systems together.
+
+## Verifying the Request-Response Contract
+
+Functional tests passing does not mean the HTTP contract is intact. Serialization library upgrades, proxy config changes, or compression toggles can alter the protocol surface. Stability requires a "protocol test" layer separate from business tests.
+
+A minimal routine a team can adopt immediately:
+
+1. **Capture a contract snapshot.** Use `curl -v` or HTTPie to record 5–10 representative requests. Save status code, headers, and body samples as a baseline.
+2. **Compare in the deploy pipeline.** Even if regression tests pass, flag a failure when a status code changes or `Cache-Control` disappears.
+3. **Verify through the proxy separately.** Compare direct-to-app results with gateway-routed results to catch hop-by-hop issues early.
+
+A table-based checklist reduces omissions:
+
+| Check item | Expected value | Impact on failure |
+| --- | --- | --- |
+| Create API status code | `201` | Client follow-up branch fails |
+| Validation failure status | `422` or `400` | Retry policy distortion |
+| Response `Content-Type` | `application/json` | SDK parsing failure |
+| Response `Cache-Control` | Matches endpoint policy | Over-cache or over-fetch |
+| `X-Request-Id` propagation | Consistent ingress→app→egress | Incident trace time increases |
+
+## Same Body, Different Headers — the Difference It Makes
+
+Even identical JSON bodies produce different client behavior depending on headers.
+
+```http
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 11
+
+{"ok":true}
+```
+
+Most clients parse this as JSON immediately. But without `Content-Type`:
+
+```http
+HTTP/1.1 200 OK
+Content-Length: 11
+
+{"ok":true}
+```
+
+Browser `fetch` may require a manual `JSON.parse` call, and some internal SDKs default to `text/plain` and throw a parse error. From the server's perspective "the body is the same," but from the consumer's perspective the contract is entirely different.
+
+`Cache-Control` works similarly. Omitting a cache-allow policy on a read API means every call reaches the origin server, creating a bottleneck at peak. Omitting `no-store` on sensitive-data responses lets information linger on shared terminals. Headers are operational parameters controlling both performance and security.
+
 ## How This Shows Up in Production
 
 In production, FastAPI handles the socket plumbing for you. But when an outage hits — responses missing, connections truncated — you still have to drop down to sockets and headers. tcpdump, Wireshark, and curl are the basic backend debugger trio.
 
 ## How a Senior Engineer Thinks
 
-- Status codes are a *contract*, not decoration.
-- Headers communicate intent — set them on purpose.
-- Timeouts and keep-alive are configured, not assumed.
-- Responses have a maximum size.
-- Reading raw HTTP regularly pays off when the real outage hits.
+A senior does not abandon frameworks to write socket code every day. The opposite: they use frameworks aggressively but design observation points so they can drop to protocol level during incidents. For example, they decide during feature development "which layer issues the request ID and how far it propagates" and "what rules classify 4xx/5xx for the dashboard."
+
+Status codes and headers are not implementation details — they are the surface of operational policy. A team that documents only 200/400/500 and a team that specifies 201/202/204/409/422/503 differ in incident recovery speed. The latter makes failures into classifiable events, so retry policies, user messages, and alert thresholds all align.
+
+In environments with growing network boundaries, "what the client actually received" matters more than "what my service sent." Load balancers, CDNs, and API Gateways can add, remove, or transform headers. Seniors trust end-to-end capture and log correlation over local success screens. Building an HTTP server means more than writing endpoint functions — it includes operational design that maintains the end-to-end contract.
 
 ## Checklist
 
