@@ -135,6 +135,210 @@ Expected output:
 - A deploy marker overlapping the change makes rollback or config review the next obvious step.
 ```
 
+## Five Signs of a Bad Dashboard
+
+Good dashboards are hard to define in the abstract. Bad dashboards are obvious. If you spot these patterns, redesign the entire screen.
+
+**1. More than 20 panels.** Nobody knows where to start. Limit the first screen to a health summary and push the rest into role-specific drilldowns.
+
+**2. Averages only.** Averages hide the long tail. If most requests take 100ms but 1% take 5 seconds, the average reads ~150ms while those users suffer 5 seconds. Show p95, p99, and distribution panels together.
+
+**3. Inconsistent colors.** When the same metric appears in different colors on different screens, confusion follows. Standardize time ranges, color palettes, and unit notation across the organization.
+
+**4. No thresholds.** Without baselines, "is this number good?" repeats endlessly. Showing SLO target lines, capacity warning lines, and historical average lines on each panel accelerates judgment.
+
+**5. Vague dashboard titles.** Titles like "Operations Status" or "System Monitoring" tell you nothing about what question the screen answers. "Checkout API Health" or "Worker Saturation" is far better.
+
+**Resolution**: Refactor or archive bad dashboards. Keeping stale screens around creates confusion about which one is the real operations view. Keep only dashboards people actually use; retire the rest based on access statistics.
+
+## Heatmaps for Distribution Over Time
+
+A heatmap shows how a distribution changes across time. Patterns invisible in averages or even p95 become obvious.
+
+For example, request latency is below 100ms for most traffic, but at 9 AM every day a band of 5-second requests appears. A heatmap renders this as a red stripe at that time slot. Use Grafana's "Histogram over time" panel type or visualize Prometheus histogram buckets directly.
+
+```promql
+sum by (le) (rate(http_duration_seconds_bucket[5m]))
+```
+
+This query shows how many requests fall into each bucket. Plotted over time, it becomes a heatmap that reveals time-of-day slowdowns far faster than a single percentile line.
+
+## Dashboard Set Composition
+
+For a single service, you typically build three dashboards. Merging all three into one defeats their purpose.
+
+**1. Service Overview**
+
+- Purpose: decide within 30 seconds whether the service is healthy
+- Panels: Latency p95/p99, Traffic, Errors 5xx, Saturation (4-6 panels)
+- Refresh: 10 seconds or real-time
+- Audience: on-call engineer, incident response team
+
+**2. Request Analysis**
+
+- Purpose: analyze performance patterns for specific endpoints
+- Panels: per-endpoint latency/throughput, method distribution, status distribution (10-15 panels)
+- Refresh: 1 minute
+- Audience: backend developers, performance tuning team
+
+**3. Infrastructure Health**
+
+- Purpose: check host, container, and database resource state
+- Panels: CPU, Memory, Disk, Network, DB connections (10-20 panels)
+- Refresh: 1 minute
+- Audience: SRE, infrastructure team
+
+Each dashboard answers a different question, so splitting by role is the correct design choice.
+
+## RED Method Practical Table
+
+| Signal | Question | Representative Query | Common Misconception |
+|---|---|---|---|
+| Rate | Has request volume changed? | `sum(rate(http_requests_total[1m]))` | Looking only at totals hides per-route variance. |
+| Errors | Are failures increasing? | `sum(rate(http_requests_total{status=~"5.."}[5m]))` | Excluding 4xx entirely can miss user-perceived errors. |
+| Duration | Is it getting slower? | `histogram_quantile(0.95, ...)` | Averages hide tail latency. |
+
+RED is the "user perspective." CPU, memory, and disk are useful for cause investigation but do not directly represent user quality. First screen RED, second screen USE is the stable production pattern.
+
+## Dashboard Anti-Patterns and Fixes
+
+| Anti-Pattern | Problem | Fix |
+|---|---|---|
+| 30 panels on one screen | Initial response path disappears | Shrink first screen to 4-6 summary panels |
+| Mixed units (ms, s, %) | Interpretation errors increase | Enforce panel units and templatize |
+| Different time ranges per panel | Comparison becomes impossible | Unify dashboard default time range |
+| Inconsistent color semantics | Risk signal recognition slows | Standardize threshold color policy |
+| No annotations | Deploy-impact assessment is delayed | Auto-inject deploy/incident annotations |
+
+An operations dashboard is a decision interface, not a design artifact. When a new panel request arrives, asking "what action does this panel change?" as a team standard prevents dashboards from becoming wallpaper.
+
+## Grafana Panel JSON Example
+
+For GitOps-style management, version-controlling dashboards as JSON is recommended. Below is a minimal latency p95 panel definition.
+
+```json
+{
+  "title": "Checkout Latency p95",
+  "type": "timeseries",
+  "datasource": {"type": "prometheus", "uid": "prom-main"},
+  "targets": [
+    {
+      "expr": "histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket{route=\"/checkout\"}[5m])))",
+      "legendFormat": "p95"
+    }
+  ],
+  "fieldConfig": {
+    "defaults": {
+      "unit": "s",
+      "thresholds": {
+        "mode": "absolute",
+        "steps": [
+          {"color": "green", "value": null},
+          {"color": "yellow", "value": 0.5},
+          {"color": "red", "value": 1.0}
+        ]
+      }
+    }
+  }
+}
+```
+
+Including thresholds in the panel definition prevents people from interpreting numbers by gut feel. During on-call situations, green/yellow/red baselines directly speed up decisions.
+
+## Grafana Dashboard Provisioning
+
+Grafana supports declaring dashboards in YAML and version-controlling them with Git.
+
+```yaml
+# /etc/grafana/provisioning/dashboards/default.yaml
+apiVersion: 1
+providers:
+  - name: "default"
+    orgId: 1
+    folder: "Operations"
+    type: file
+    disableDeletion: false
+    editable: true
+    updateIntervalSeconds: 30
+    options:
+      path: /var/lib/grafana/dashboards
+      foldersFromFilesStructure: true
+```
+
+With this config, placing JSON files in `/var/lib/grafana/dashboards/` automatically loads them. Deploy dashboard JSON from a CI/CD pipeline and the entire environment stays synchronized without manual clicks.
+
+## Complete 4-Panel Service Health Dashboard JSON
+
+Below is a full example of the first row (Service Health) composed of 4 panels.
+
+```json
+{
+  "title": "Service Health",
+  "panels": [
+    {
+      "title": "Request Rate",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 6, "x": 0, "y": 0},
+      "targets": [{"expr": "sum(rate(http_requests_total{service=\"$service\"}[1m]))", "legendFormat": "req/s"}],
+      "fieldConfig": {"defaults": {"unit": "reqps"}}
+    },
+    {
+      "title": "Error Rate",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 6, "x": 6, "y": 0},
+      "targets": [{"expr": "sum(rate(http_requests_total{service=\"$service\",status=~\"5..\"}[1m])) / sum(rate(http_requests_total{service=\"$service\"}[1m])) * 100", "legendFormat": "error %"}],
+      "fieldConfig": {"defaults": {"unit": "percent", "thresholds": {"steps": [{"color": "green", "value": null}, {"color": "red", "value": 1}]}}}
+    },
+    {
+      "title": "Latency p95",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 6, "x": 12, "y": 0},
+      "targets": [{"expr": "histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket{service=\"$service\"}[5m])))", "legendFormat": "p95"}],
+      "fieldConfig": {"defaults": {"unit": "s", "thresholds": {"steps": [{"color": "green", "value": null}, {"color": "yellow", "value": 0.5}, {"color": "red", "value": 1.0}]}}}
+    },
+    {
+      "title": "In-Flight Requests",
+      "type": "timeseries",
+      "gridPos": {"h": 8, "w": 6, "x": 18, "y": 0},
+      "targets": [{"expr": "sum(http_requests_in_flight{service=\"$service\"})", "legendFormat": "in-flight"}],
+      "fieldConfig": {"defaults": {"unit": "short", "thresholds": {"steps": [{"color": "green", "value": null}, {"color": "yellow", "value": 100}, {"color": "red", "value": 500}]}}}
+    }
+  ],
+  "templating": {
+    "list": [
+      {"name": "service", "type": "query", "query": "label_values(http_requests_total, service)"},
+      {"name": "env", "type": "custom", "query": "staging,production"}
+    ]
+  },
+  "annotations": {
+    "list": [{
+      "name": "Deployments",
+      "datasource": "prometheus",
+      "expr": "changes(build_info{service=\"$service\"}[1m]) > 0",
+      "tagKeys": "service",
+      "titleFormat": "Deploy"
+    }]
+  }
+}
+```
+
+Save this JSON to `/var/lib/grafana/dashboards/service-health.json` and Grafana auto-loads it. The `$service` and `$env` variables allow switching between services and environments without duplicating dashboards, and deploy annotations display automatically.
+
+## Dashboard Review Checklist
+
+When creating or refactoring a dashboard, check these items to prevent wallpaper syndrome.
+
+| # | Check Item | Pass Criteria |
+|---|---|---|
+| 1 | First-screen panel count <= 6 | Excess panels moved to drilldown |
+| 2 | Every panel has a unit label | s, ms, %, reqps, etc. explicitly set |
+| 3 | Threshold lines present | SLO target or capacity warning lines |
+| 4 | Deploy annotations wired | Deploy timestamps auto-displayed |
+| 5 | Variables for env/service switching | Dashboard reusable without duplication |
+| 6 | Dashboard title reads like a question | "Payment API Health" not "System Monitoring" |
+| 7 | Color policy consistency | Green=healthy, Yellow=caution, Red=danger |
+| 8 | Default time range unified | All panels show the same time period |
+
 ## What to Notice in This Code
 
 - *RED* is the *outside view*; *USE* is the *inside view*.
@@ -151,7 +355,9 @@ Expected output:
 
 ## How This Shows Up in Production
 
-The most consulted *Service Overview* dashboard collapses into 6 *RED + USE* panels. Deeper dashboards are *split by role*.
+The most consulted Service Overview dashboard collapses into about six panels. Request rate, error rate, latency, and saturation are all that remain on the first screen; everything else splits into role-specific drilldown views. Trying to solve everything on a single screen means nothing is readable.
+
+Senior engineers write dashboard titles like questions. "API Health," "Checkout Path Latency," "Worker Saturation" — the name alone should reveal what the screen answers.
 
 ## How a Senior Engineer Thinks
 
