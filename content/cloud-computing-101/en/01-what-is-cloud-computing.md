@@ -111,11 +111,15 @@ def upload(bucket: str, key: str, data: bytes):
 print(upload("my-test-bucket-2026", "hello.txt", b"hi cloud"))
 ```
 
+The code is short but reveals an important shift: you create storage via API calls, place data in managed storage instead of local disk, and infrastructure becomes part of the code. This is why cloud is called an operating model.
+
 ## What to Notice in This Code
 
 - Credentials live in environment variables, not source code.
 - Clients are reusable — create once, call many times.
 - Bucket names are globally unique across all of AWS.
+
+These three are more operational habits than syntax rules. Putting credentials in code invites leaks; ignoring region and naming conventions makes automation fragile.
 
 ## How to Verify This Example
 
@@ -138,6 +142,111 @@ aws s3 ls s3://my-test-bucket-2026
 - `AccessDenied` is often a credential or profile issue before it is a boto3 issue.
 - Cleanup matters: even tiny learning resources turn into long-lived cost when no one deletes them.
 
+### Cleanup Automation — Deleting Resources After Practice
+
+The most important habit at the beginner stage is immediately cleaning up resources when you finish practicing. The code below empties all objects in a bucket and then deletes the bucket itself.
+
+```python
+def cleanup_bucket(name: str):
+    """Delete all objects in a bucket, then remove the bucket."""
+    bucket = boto3.resource("s3").Bucket(name)
+    bucket.objects.all().delete()
+    bucket.delete()
+    print(f"Deleted: {name}")
+
+cleanup_bucket("my-test-bucket-2026")
+```
+
+```bash
+# Verify deletion
+aws s3 ls | grep my-test-bucket-2026
+# Empty output means success
+```
+
+Once you internalize this pattern, you can experiment safely in later exercises without cost leakage. In production, teams typically set Lifecycle Policies for automatic deletion.
+
+## Why the Shared Responsibility Model Matters
+
+The most common beginner misconception is about the responsibility boundary. Many teams assume "we put it on the cloud, so the provider handles security." In reality, the provider manages data centers, physical hardware, and hypervisors, but account permissions, data exposure scope, network access control, and application configuration usually remain the customer's responsibility.
+
+For example, if data leaks because a bucket is public, the problem is almost always a configuration mistake, not a flaw in S3 itself. Understanding the responsibility boundary early—alongside cost—keeps every subsequent decision more stable.
+
+## Service Models and Responsibility Boundary Summary
+
+The most practical lens for understanding cloud is "who operates what." Even when the same capability is provided, the service model determines incident response speed, security operations difficulty, and cost structure. The table below compares IaaS, PaaS, and SaaS from the perspective of operational responsibility and change velocity, not just features.
+
+| Aspect | IaaS | PaaS | SaaS |
+| --- | --- | --- | --- |
+| Examples | EC2, Compute Engine | App Engine, Heroku | Google Workspace, Notion |
+| Customer manages | OS, runtime, app, data | App, data | User settings, data entry |
+| Provider manages | Physical infra, virtualization | Infra, OS, runtime | Infra, platform, application |
+| Deploy speed | Medium | Fast | Very fast |
+| Control | High | Medium | Low |
+| Ops difficulty | High | Medium | Low |
+| Lock-in risk | Medium | Medium–High | High |
+
+If a team needs rapid experimentation, PaaS or SaaS may be more suitable. If security regulations are strict and OS-level control is required, IaaS fits better. The question is not "which is more modern" but "which matches our team's current responsibility capacity and regulatory requirements."
+
+### Responsibility Matrix
+
+The matrix below clarifies responsibility separation that beginner cloud teams frequently confuse.
+
+| Operations Item | On-Premises | IaaS | PaaS | SaaS |
+| --- | --- | --- | --- | --- |
+| Data center power/cooling | Customer | Provider | Provider | Provider |
+| Physical server maintenance | Customer | Provider | Provider | Provider |
+| Hypervisor | Customer | Provider | Provider | Provider |
+| OS patching | Customer | Customer | Provider | Provider |
+| Runtime/middleware | Customer | Customer | Provider | Provider |
+| Application code | Customer | Customer | Customer | Provider |
+| Data classification/access | Customer | Customer | Customer | Customer |
+| Account/permission design | Customer | Customer | Customer | Customer |
+
+The key insight is the last two rows. Regardless of the model, data classification and access control remain the customer's responsibility. Cloud adoption is not the elimination of security responsibility—it is the relocation of the responsibility boundary.
+
+## When Cost Structure Changes, Decision-Making Changes Too
+
+On-premises, buying a server once and using it until depreciation ends was rational. In the cloud, the opposite is true: shutting down unused resources quickly is rational. This difference reshapes a team's decision-making habits.
+
+```bash
+# Check current account's monthly cost estimate via AWS CLI
+aws ce get-cost-and-usage \
+  --time-period Start=2026-05-01,End=2026-05-21 \
+  --granularity MONTHLY \
+  --metrics BlendedCost \
+  --output table
+```
+
+This command is worth learning even at the beginner stage. When you check cost via CLI rather than console, extending to automated cost alerts or weekly report scripts becomes straightforward.
+
+### Building Cost Intuition with Simple Calculations
+
+```python
+def monthly_cost(hourly_price: float, hours_per_day: int = 24, days: int = 30) -> float:
+    """Estimate monthly cost for a single instance."""
+    return hourly_price * hours_per_day * days
+
+# t3.micro (~$0.0104/h) vs m5.large (~$0.096/h)
+print(f"t3.micro monthly: ${monthly_cost(0.0104):.2f}")
+print(f"m5.large monthly: ${monthly_cost(0.096):.2f}")
+print(f"m5.large business-hours only: ${monthly_cost(0.096, hours_per_day=10, days=22):.2f}")
+```
+
+The point is clear: keeping a dev instance running 24/7 versus business-hours-only produces very different bills. In the cloud, "turning things off" is part of cost management.
+
+### Major CSP Instance Comparison
+
+Even with the same specifications, each CSP uses different names and pricing. Here is a comparison of general-purpose instances commonly used at the beginner level.
+
+| Spec (2 vCPU, 8 GB RAM) | AWS | Azure | GCP |
+| --- | --- | --- | --- |
+| Instance type | m5.large | Standard_D2s_v3 | e2-standard-2 |
+| Hourly price (US East) | $0.096 | $0.096 | $0.067 |
+| Monthly cost (730h) | $70.08 | $70.08 | $48.91 |
+| 1-year reserved discount | ~40% | ~35% | ~37% (CUD) |
+
+Prices vary by region, payment option, and date, so these figures are directional references. The important point: cloud cost comparison does not end at hourly price. Network egress costs, storage IOPS charges, and managed-service pricing must be included for a realistic TCO (Total Cost of Ownership).
+
 ## Five Common Mistakes
 
 1. **Doing daily work as the root account.**
@@ -145,6 +254,37 @@ aws s3 ls s3://my-test-bucket-2026
 3. **Public bucket misconfiguration leading to data leaks.**
 4. **No tags — billing becomes impossible to attribute.**
 5. **Forgetting cleanup — costs accumulate silently.**
+
+These are not beginner-only problems. The busier a team gets, the easier it is to push basic principles like tagging, budget alerts, and least privilege to the back. Setting rules early—even small ones—is far safer.
+
+| Mistake | Immediate Fix | Preventive Automation |
+| --- | --- | --- |
+| Root account usage | Create IAM user, lock root | AWS Organizations SCP to block root API |
+| Region not specified | Set AWS_DEFAULT_REGION env var | Pin region in Terraform provider block |
+| Public bucket | Enable S3 Block Public Access | Account-level public-access block policy |
+| No tags | Bulk-tag existing resources | AWS Config rule to detect untagged resources |
+| Resources not deleted | Manual cleanup of non-prod resources | Lambda + EventBridge for nightly auto-stop |
+
+## Operational Baseline Example
+
+The example below shows how to manage a "minimum baseline" as code in real operations.
+
+```yaml
+cloud_baseline:
+  account:
+    root_mfa_required: true
+    break_glass_account: enabled
+  security:
+    default_public_access_block: true
+    iam_access_analyzer: enabled
+  cost:
+    monthly_budget_usd: 300
+    alert_threshold_percent: [50, 80, 100]
+  tagging:
+    required_keys: [Project, Owner, Environment, CostCenter]
+```
+
+Maintaining this baseline as configuration rather than documentation reduces the chance of repeating the same mistakes when a new project starts. The cloud's advantage is fast creation; its downside is fast cost leakage from fast creation. Baseline automation structurally reduces this downside.
 
 ## How This Shows Up in Production
 
@@ -158,12 +298,33 @@ Startups begin on AWS Free Tier, scale with Auto Scaling Groups when traffic gro
 - Cost is an architectural metric.
 - Apply least-privilege IAM from day one.
 
+## Team Operating Contract Example
+
+```yaml
+team_operating_contract:
+  deploy:
+    requires_review: true
+    rollback_plan_required: true
+  security:
+    least_privilege_default: true
+    mfa_for_privileged_actions: true
+  reliability:
+    monthly_recovery_drill: true
+    incident_postmortem_required: true
+  cost:
+    budget_alert_thresholds: [50, 80, 100]
+    untagged_resource_policy: deny
+```
+
+Making the operating contract explicit ensures quality standards persist when team members change. The core of cloud is not the ability to create resources quickly—it is the ability to create resources at the same quality level repeatedly.
+
 ## Checklist
 
 - [ ] Root account is locked down.
 - [ ] MFA is enabled.
 - [ ] Budget alarms are configured.
 - [ ] A resource-tagging policy exists.
+- [ ] Non-production resources have an auto-stop policy.
 
 ## Practice Problems
 
