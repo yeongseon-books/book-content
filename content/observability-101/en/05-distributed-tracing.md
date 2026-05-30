@@ -151,6 +151,189 @@ Expected output:
 4. **Losing context in *async* code.** Parent tracking fails.
 5. **Reading only traces and *ignoring metrics*.** You miss trend.
 
+## OpenTelemetry Python Instrumentation — Extended Example
+
+Auto-instrumentation alone often cannot express domain boundaries well enough. Business segments like payment, inventory, or coupon processing benefit from manual spans that make intent explicit.
+
+```python
+import time
+from opentelemetry import trace
+from opentelemetry.trace import Status, StatusCode
+
+tracer = trace.get_tracer("checkout-service")
+
+def checkout(order_id: str, amount: int) -> None:
+    with tracer.start_as_current_span("checkout") as root:
+        root.set_attribute("order.id", order_id)
+        root.set_attribute("order.amount", amount)
+
+        with tracer.start_as_current_span("validate_order"):
+            time.sleep(0.02)
+
+        with tracer.start_as_current_span("charge_payment") as span:
+            try:
+                time.sleep(0.35)
+                raise TimeoutError("gateway timeout")
+            except TimeoutError as exc:
+                span.record_exception(exc)
+                span.set_status(Status(StatusCode.ERROR, str(exc)))
+                span.set_attribute("payment.retry", 2)
+                raise
+```
+
+Span names become search keys later, so keep them short and consistent. Mixing `pay`, `payment_call`, and `charge_gateway` for the same operation degrades query quality across the team.
+
+## Context Propagation Patterns in Practice
+
+The most common context-loss points are non-HTTP boundaries: queues, batch jobs, and async workers. The example below covers both HTTP headers and message queues in one minimal pattern.
+
+```python
+from opentelemetry.propagate import inject, extract
+
+def build_http_headers() -> dict:
+    headers = {}
+    inject(headers)
+    return headers
+
+def publish_message(payload: dict) -> dict:
+    carrier = {}
+    inject(carrier)
+    return {
+        "payload": payload,
+        "trace_headers": carrier,
+    }
+
+def consume_message(message: dict):
+    ctx = extract(message["trace_headers"])
+    tracer = trace.get_tracer("worker")
+    with tracer.start_as_current_span("worker.handle", context=ctx):
+        # actual processing
+        pass
+```
+
+For message systems, fix the header field name convention in team documentation. Producers and consumers often use different languages, so if only one side knows the rules, traces break mid-stream.
+
+## Sampling Policy Design Guide
+
+| Policy | Advantage | Disadvantage | Recommended for |
+| --- | --- | --- | --- |
+| 100% storage | Maximum debug info | Cost grows fast | Dev / short experiments |
+| Head 10% | Simple, predictable | May miss rare errors | High-traffic normal paths |
+| Tail (error/latency first) | Preserves high-value traces | Configuration complexity | Production default |
+
+A practical starting point: "100% errors + 100% high-latency + 5% normal." This combination controls cost while retaining enough samples for incident analysis. Sampling is not a set-and-forget config — adjust monthly based on traffic patterns and incident frequency.
+
+## W3C Trace Context Standard in Detail
+
+Interoperability in distributed tracing is guaranteed by the W3C Trace Context standard, which defines two HTTP headers.
+
+| Header | Format | Example |
+| --- | --- | --- |
+| `traceparent` | `{version}-{trace-id}-{parent-id}-{trace-flags}` | `00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01` |
+| `tracestate` | Vendor key-value pairs | `congo=t61rcWkgMzE,rojo=00f067aa0ba902b7` |
+
+Fields in `traceparent`:
+
+- **version** (2 digits): currently fixed at `00`
+- **trace-id** (32 hex chars): 128-bit ID identifying the entire request
+- **parent-id** (16 hex chars): 64-bit ID of the immediate parent span
+- **trace-flags** (2 hex chars): `01` = sampled, `00` = not sampled
+
+`tracestate` carries vendor-specific metadata. Commercial tools like Datadog or Dynatrace use it to attach their own correlation IDs. As long as the standard is followed, services using different tracing backends still share a single trace_id without breaks.
+
+```python
+# traceparent header parsing example
+def parse_traceparent(header: str) -> dict:
+    parts = header.split("-")
+    return {
+        "version": parts[0],
+        "trace_id": parts[1],
+        "parent_id": parts[2],
+        "trace_flags": parts[3],
+        "sampled": parts[3] == "01",
+    }
+
+# example
+tp = parse_traceparent("00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01")
+# {"version": "00", "trace_id": "4bf92f...", "parent_id": "00f067...", "sampled": True}
+```
+
+## Async Context Propagation
+
+In Python's `asyncio` environment, `contextvars` automatically carries context across coroutines. But when dispatching to thread pools or process pools, you must copy context explicitly.
+
+```python
+import asyncio
+from concurrent.futures import ThreadPoolExecutor
+from opentelemetry import context, trace
+
+tracer = trace.get_tracer("async-service")
+
+async def handle_request():
+    with tracer.start_as_current_span("async_handler"):
+        # asyncio.create_task copies contextvars automatically
+        task = asyncio.create_task(fetch_data())
+        await task
+
+async def fetch_data():
+    # parent span is automatically connected
+    with tracer.start_as_current_span("fetch_data"):
+        await asyncio.sleep(0.1)
+
+def sync_work():
+    # explicit propagation needed when dispatched via ThreadPoolExecutor
+    with tracer.start_as_current_span("sync_work"):
+        pass
+
+async def dispatch_to_thread():
+    with tracer.start_as_current_span("dispatcher"):
+        ctx = context.get_current()
+        loop = asyncio.get_event_loop()
+        executor = ThreadPoolExecutor(max_workers=2)
+        # attach/detach to propagate context into thread
+        await loop.run_in_executor(
+            executor,
+            lambda: context.attach(ctx) or sync_work()
+        )
+```
+
+Key points:
+
+1. **asyncio.create_task**: copies `contextvars` automatically — no extra work needed.
+2. **ThreadPoolExecutor**: call `context.get_current()` and `context.attach()` inside the thread.
+3. **ProcessPoolExecutor**: context does not cross process boundaries. Serialize `traceparent` into the message payload.
+
+## Trace–Log–Metric Correlation
+
+Traces alone tell you "it was slow" but may miss "why it was slow." Connecting all three signals narrows the cause quickly.
+
+| Connection direction | Method | Effect |
+| --- | --- | --- |
+| Trace → Log | Include `trace_id` field in logs | Detailed context for slow spans |
+| Trace → Metric | Attach trace_id as an exemplar | Click from histogram to trace |
+| Metric → Trace | Grafana Tempo integration | Jump from metric dashboard to trace view |
+
+```python
+import structlog
+from opentelemetry import trace
+
+logger = structlog.get_logger()
+
+def process_order(order_id: str):
+    span = trace.get_current_span()
+    ctx = span.get_span_context()
+    # automatically include trace_id in every log line
+    log = logger.bind(
+        trace_id=format(ctx.trace_id, "032x"),
+        span_id=format(ctx.span_id, "016x"),
+    )
+    log.info("order_processing_start", order_id=order_id)
+    # ... business logic ...
+    log.info("order_processing_end", order_id=order_id)
+```
+
+In Grafana, registering Loki (logs) and Tempo (traces) as data sources lets you click a `trace_id` field in a log line and jump directly to the trace view. Without this link, correlating logs to traces requires manual copy-paste — adding minutes to every incident.
+
 ## How This Shows Up in Production
 
 OpenTelemetry → *Tempo / Jaeger / Honeycomb*, then Grafana shows *trace ↔ log ↔ metric* on *one screen*.
