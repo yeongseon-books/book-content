@@ -166,6 +166,184 @@ ruff check app/
 - The shared helper turns into a six-argument mini framework.
 - Coincidental similarity gets merged and couples unrelated change reasons.
 
+## Duplication Removal Techniques by Stage
+
+Removing duplication is not "abstract big all at once." Proceed in small steps while checking change reasons. The table below lists representative techniques and when to apply them.
+
+| Technique | When to Apply | Expected Benefit | Failure Signal |
+|---|---|---|---|
+| Extract Function | Logic identical and context similar | Reuse, simpler tests | Argument explosion |
+| Parameterize | Difference reducible to a few values | Fewer branches | Meaningless flag proliferation |
+| Template Method | Algorithm skeleton same, only certain steps differ | Fixed common flow | Inheritance hierarchy bloat |
+| Strategy | Policy swaps needed frequently | Easy extension | Excessive object count |
+| Data Table | Rules are effectively data | Lower change risk | Key consistency management failure |
+
+The core question in duplication removal is always the same: "Do these two really change for the same reason?"
+
+## Table-Driven Deduplication in Python
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class PricingRule:
+    name: str
+    multiplier: float
+
+PRICING_RULES = {
+    "kr": PricingRule(name="kr", multiplier=1.10),
+    "jp": PricingRule(name="jp", multiplier=1.08),
+    "us": PricingRule(name="us", multiplier=1.07),
+}
+
+def apply_tax(base_price: int, country_code: str) -> int:
+    rule = PRICING_RULES[country_code]
+    return int(base_price * rule.multiplier)
+```
+
+When three country-specific functions collapse into a single table, the modification point becomes singular. Testing also simplifies: per-country tests just vary input data against the same function.
+
+## Distinguishing Accidental Similarity from Essential Duplication
+
+Four criteria to evaluate:
+
+1. Do change issues always open together?
+2. Is the domain terminology identical?
+3. Is the failure impact scope the same?
+4. Does deploy timing move together?
+
+```python
+def is_essential_duplication(
+    same_change_issue: bool,
+    same_domain_term: bool,
+    same_failure_impact: bool,
+    same_release_timing: bool,
+) -> bool:
+    score = sum([same_change_issue, same_domain_term, same_failure_impact, same_release_timing])
+    return score >= 3
+```
+
+Defining a simple evaluation function like this as a team convention allows fast decisions on whether to deduplicate.
+
+## When to Undo a Wrong Abstraction
+
+Abstractions are easy to think of as permanent, but inlining is also an important refactoring. Consider rolling back when:
+
+- The shared function's argument count has grown to 5+
+- Most callers pass dummy values
+- Branch-handling code exceeds the shared logic
+- Every new requirement adds another exception flag
+
+Rolling back a wrong abstraction may temporarily look like duplication, but separating change reasons reduces long-term cost.
+
+## Duplication Type Classification
+
+The biggest mistake in deduplication is abstracting prematurely because shapes look similar. Classify whether duplication is semantic or coincidental first.
+
+| Type | Observation Point | Recommended Response | Caution |
+|---|---|---|---|
+| Text duplication | Identical code blocks copied | Extract function | Watch for argument explosion |
+| Algorithm duplication | Identical computation procedure | Common policy function | Preserve domain context |
+| Data duplication | Constants/mapping tables repeated | Move to config file | Check default value consistency |
+| Process duplication | Same deploy/verification steps repeated | Scriptify | Never skip steps |
+
+## Before/After Demo: Consolidating Duplicate Tax Logic
+
+```python
+# before
+def order_tax(amount_cents: int) -> int:
+    return int(amount_cents * 0.1)
+
+def refund_tax(amount_cents: int) -> int:
+    return int(amount_cents * 0.1)
+
+# after
+TAX_RATE = 0.1
+
+def calculate_tax(amount_cents: int, rate: float = TAX_RATE) -> int:
+    return int(amount_cents * rate)
+
+def order_tax(amount_cents: int) -> int:
+    return calculate_tax(amount_cents)
+
+def refund_tax(amount_cents: int) -> int:
+    return calculate_tax(amount_cents)
+```
+
+## Undoing a Wrong Abstraction Demo
+
+```python
+# Over-abstracted
+def process(user, a, b, c, d, e):
+    ...
+
+# After inlining back
+def process_order_payment(user, order_total_cents, coupon_code):
+    ...
+
+def process_subscription_payment(user, plan_id, billing_cycle):
+    ...
+```
+
+The goal of deduplication is not unification itself but reducing change cost. If argument count grows abnormally or call sites become more complex after merging, inlining back is the better choice.
+
+## Linter as an Early Warning System
+
+```toml
+[tool.ruff.lint]
+select = ["E", "F", "B", "SIM", "PLR"]
+
+[tool.ruff.lint.pylint]
+max-args = 5
+```
+
+An argument-count limit serves as early warning against over-abstraction. The moment a function tries to absorb every case, the linter fires and forces a structural re-evaluation.
+
+## Change Impact Score
+
+Before refactoring shared code, estimate propagation risk with a simple scoring model.
+
+```python
+def change_impact_score(callers: int, contract_changed: bool, exception_changed: bool) -> int:
+    score = callers * 2
+    if contract_changed:
+        score += 5
+    if exception_changed:
+        score += 3
+    return score
+```
+
+| Score Range | Recommended Strategy |
+|---|---|
+| 0-5 | Proceed in a single PR |
+| 6-12 | Separate refactoring PR from feature PR |
+| 13+ | Staged deploy with rollback plan |
+
+Putting a number on impact moves review conversations from gut feeling to evidence.
+
+## Deduplication Sprint Planning
+
+Deduplication succeeds more often when it is an explicit sprint goal rather than something squeezed between feature work. Do not eliminate all duplication at once; prioritize flows with frequent changes.
+
+| Sprint Item | Selection Criteria | Measurement |
+|---|---|---|
+| Payment calculation duplication | Top modified in last 4 weeks | PR conflict count reduction |
+| Validation logic duplication | Same root cause repeated in incident reports | Defect recurrence rate reduction |
+| API response format duplication | Response structure inconsistency | Consumer error rate reduction |
+
+```python
+def build_error_response(code: str, message: str) -> dict:
+    return {
+        "ok": False,
+        "error": {
+            "code": code,
+            "message": message,
+        },
+    }
+```
+
+Judge deduplication success by operational metric improvement, not abstraction elegance. If conflicts decrease and review time drops, the direction is correct.
+
 ## What to Notice in This Code
 
 - Only the changing parts become arguments.
@@ -241,5 +419,5 @@ DRY is about a single source of change. Next, we tidy up another rotting place: 
 - [Sandi Metz — The Wrong Abstraction](https://sandimetz.com/blog/2016/1/20/the-wrong-abstraction)
 - [Refactoring — Extract Function](https://refactoring.com/catalog/extractFunction.html)
 - [Refactoring — Inline Function](https://refactoring.com/catalog/inlineFunction.html)
-- [The wrong abstraction](https://sandimetz.com/blog/2016/1/20/the-wrong-abstraction)
+
 Tags: Computer Science, CleanCode, DRY, Duplication, Refactoring, Abstraction
