@@ -1,3 +1,0 @@
-- 2026-05-11: Commit `8314cdf7` mostly applies the intended blog conversion pattern: eBook-only scaffolding is usually removed, `왜 중요한가` becomes `이 글에서 다룰 문제`, `개념 한눈에 보기` becomes `전체 흐름`, and core structure like TOC/references/tags stays intact in sampled files.
-- 2026-05-11 (Round 4): Narrowing regex scope from `a-grade-[^>]+` restores technical code/checklist content in `rag-deep-dive`; comparing `8314cdf7` vs `57f24bd6` shows all 6 prior code-block losses are recovered.
-- 2026-05-11 (Round 4): The current regex still leaves inconsistent marker hygiene in `rag-deep-dive` (dangling `a-grade-example:end`) and retains 33 image removals, mostly `questions-this-post-answers` opening diagrams.

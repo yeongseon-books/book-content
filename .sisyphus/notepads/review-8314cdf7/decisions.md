@@ -1,3 +1,0 @@
-- 2026-05-11: Review verdict for commit `8314cdf7` is `NEEDS FIXES` because some transformations removed blog-required standalone/practical sections or technical example content, even though the majority of files were converted correctly.
-- 2026-05-11 (Round 4 / Oracle resume `ses_1ebad7d67ffevXnoqVHRyzBkr1`): Score stays below merge threshold (`92/100`), so verdict remains `NEEDS FIXES` for commit `57f24bd6`.
-- 2026-05-11 (Round 4): Approve only after image preservation is restored for the 33 affected files and `a-grade-example` markers are made consistent in all 6 `rag-deep-dive` posts.
