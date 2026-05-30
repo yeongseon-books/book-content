@@ -144,6 +144,201 @@ ax.legend()
 4. **Bar charts that don't start at *zero*.** They *exaggerate* differences.
 5. **Charts without *labels*.** Not reusable next week.
 
+## Message-to-Chart Selection Guide
+
+The same dataset serves different messages depending on the chart you pick. The table below turns "what do I want to say?" into "which chart says it best?"
+
+| Message goal | Recommended chart | Avoid | Why |
+| --- | --- | --- | --- |
+| Compare items | Horizontal / vertical bar | 3D pie | Length comparison is precise |
+| Show time trend | Line chart | Stacked area (early stage) | Direction and rate are clear |
+| Reveal distribution | Histogram, box plot | Showing mean only | Tails and outliers become visible |
+| Explore relationships | Scatter plot | Overcrowded line chart | Variable-pair patterns emerge |
+| Show composition | 100% stacked bar | Pie with too many slices | Category comparison stays easy |
+
+### Same data, different purpose — matplotlib / seaborn example
+
+```python
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+sales = pd.read_csv("sales.csv", parse_dates=["date"])
+
+# 1) Trend
+trend = sales.groupby("date", as_index=False)["revenue"].sum()
+plt.figure(figsize=(10, 4))
+plt.plot(trend["date"], trend["revenue"])
+plt.title("Daily Revenue Trend")
+plt.xlabel("Date")
+plt.ylabel("Revenue")
+plt.tight_layout()
+plt.show()
+
+# 2) Channel comparison
+channel = sales.groupby("channel", as_index=False)["revenue"].sum().sort_values("revenue")
+plt.figure(figsize=(8, 4))
+plt.barh(channel["channel"], channel["revenue"])
+plt.title("Revenue by Channel")
+plt.tight_layout()
+plt.show()
+```
+
+When the purpose changes from "show the trend" to "compare channels," the encoding must change too. A line chart for comparison forces the reader to decode endpoints; a bar chart makes the answer immediate.
+
+### Design Rules for Honest Charts
+
+- Bar charts start at zero by default.
+- Units and time range appear in the axis label.
+- Use one accent color for emphasis; keep the rest neutral.
+- Prefer direct labels over legends when possible.
+- Mark events (deploys, campaigns) with vertical annotation lines.
+
+### Chart Review Checklist
+
+- Can the question this chart answers be stated in one sentence?
+- Can the reader extract the key message within 5 seconds?
+- Is there any axis distortion or dual-axis confusion risk?
+- Can a colorblind viewer still distinguish categories?
+- Does the caption state "so what should we do?"
+
+### Caption Template for Reports
+
+"Mobile-channel revenue dropped 8% week-over-week over the last 4 weeks, while web-channel rose 2% over the same period. Next week's budget adjustment should prioritize a mobile retention campaign."
+
+When a caption closes with an action recommendation, the chart graduates from illustration to decision tool.
+
+## From Analysis to Operational Loop
+
+Connecting visualization to real team workflows requires going beyond analysis notebooks into repeatable experiment loops. Three principles: (1) feature-creation rules live in both code and documentation; (2) charts serve as decision-trigger checkpoints, not decoration; (3) model evaluation includes behavioral change, not just a score.
+
+### Building a Feature Table with NumPy and Pandas
+
+```python
+import numpy as np
+import pandas as pd
+
+orders = pd.read_csv('orders.csv', parse_dates=['ordered_at'])
+users = pd.read_csv('users.csv', parse_dates=['signup_at'])
+
+base = orders.merge(users[['user_id', 'signup_at', 'country']], on='user_id', how='left')
+base['days_since_signup'] = (base['ordered_at'] - base['signup_at']).dt.days.clip(lower=0)
+base['is_weekend'] = base['ordered_at'].dt.dayofweek.isin([5, 6]).astype(int)
+base['amount_log1p'] = np.log1p(base['amount'].clip(lower=0))
+
+agg = (
+    base.groupby('user_id', as_index=False)
+    .agg(
+        order_count=('order_id', 'count'),
+        avg_amount=('amount', 'mean'),
+        recent_amount=('amount', 'last'),
+        signup_age=('days_since_signup', 'max'),
+        weekend_ratio=('is_weekend', 'mean'),
+    )
+)
+
+print(agg.head())
+```
+
+This transforms raw tables into a user-level feature set designed for the analysis goal. `log1p` mitigates skew, and behavioral features like `weekend_ratio` often explain more variance than raw totals.
+
+### Checking Distribution and Segment Patterns with Matplotlib
+
+```python
+import matplotlib.pyplot as plt
+
+fig, ax = plt.subplots(1, 2, figsize=(12, 4))
+agg['avg_amount'].hist(bins=30, edgecolor='black', ax=ax[0])
+ax[0].set_title('Average Order Amount Distribution')
+ax[0].set_xlabel('avg_amount')
+
+agg.sort_values('signup_age').reset_index(drop=True)['order_count'].rolling(100).mean().plot(ax=ax[1])
+ax[1].set_title('Order Count Rolling Mean by Signup Age')
+ax[1].set_ylabel('rolling mean')
+
+plt.tight_layout()
+plt.show()
+```
+
+The goal is not a pretty chart but a fast anomaly signal. If the distribution is heavily skewed, consider a log transform. If the rolling mean jumps at a segment boundary, revisit your segmentation criteria.
+
+### Managing Preprocessing and Model in One sklearn Pipeline
+
+```python
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.impute import SimpleImputer
+from sklearn.linear_model import LogisticRegression
+
+num_cols = ['order_count', 'avg_amount', 'recent_amount', 'signup_age', 'weekend_ratio']
+cat_cols = ['country']
+
+numeric = Pipeline([
+    ('imputer', SimpleImputer(strategy='median')),
+    ('scaler', StandardScaler()),
+])
+
+categorical = Pipeline([
+    ('imputer', SimpleImputer(strategy='most_frequent')),
+    ('onehot', OneHotEncoder(handle_unknown='ignore')),
+])
+
+preprocess = ColumnTransformer([
+    ('num', numeric, num_cols),
+    ('cat', categorical, cat_cols),
+])
+
+model = Pipeline([
+    ('preprocess', preprocess),
+    ('clf', LogisticRegression(max_iter=1000, class_weight='balanced')),
+])
+```
+
+A pipeline guarantees that training and inference follow the same path. This eliminates the classic "works in the notebook, breaks in the batch job" failure mode.
+
+### A/B Test Design Template
+
+Experiment design matters as much as modeling. The template below applies directly to scenarios like onboarding-message improvements.
+
+| Item | Design example |
+| --- | --- |
+| Hypothesis | Changing the onboarding message increases 7-day return rate. |
+| Population | New users who signed up in the last 14 days (internal accounts excluded). |
+| Randomization | 50:50 split based on user_id hash. |
+| Primary metric | 7-day return rate. |
+| Guardrail metrics | Support ticket rate, payment failure rate. |
+| Duration | Minimum 2 weeks or until sample size is reached. |
+| Stop condition | Guardrail metric degradation exceeds threshold. |
+
+The most common A/B mistake is calling results too early. Without a pre-registered stopping rule and analysis plan, random fluctuations get mistaken for real effects.
+
+### Connecting Pipeline Scores to an Experiment
+
+```python
+import pandas as pd
+
+scored = pd.read_csv('scored_users.csv')
+scored = scored.sort_values('risk_score', ascending=False)
+
+eligible = scored.query('is_marketing_opt_in == 1 and recent_complaint == 0').copy()
+eligible['bucket'] = (eligible.index % 2).map({0: 'A', 1: 'B'})
+
+plan = eligible[['user_id', 'risk_score', 'bucket']].head(5000)
+print(plan['bucket'].value_counts())
+print(plan.head())
+```
+
+At this stage, rules matter more than scores. Fixing exclusion criteria, assignment rules, and experiment size before launch prevents interpretation conflicts after the experiment ends.
+
+### Operational Checkpoints
+
+- Record feature-creation rules in both code and documentation.
+- For every EDA chart, write one sentence: "Based on this chart, the decision is..."
+- Evaluate model scores alongside cost, latency, and operational complexity.
+- Lock hypothesis, sample size, and stopping rules before launching an A/B test.
+- Close every results document with "what we learned and what changes next week."
+
 ## How This Shows Up in Production
 
 Analysts mix *Tableau / Looker* dashboards with *Python* charts. A *dashboard* is the standard *unit of a weekly report*.
