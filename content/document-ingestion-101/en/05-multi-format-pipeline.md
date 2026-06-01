@@ -232,6 +232,173 @@ Early on, it is better to be strict about the handoff contract than ambitious ab
 
 It is also worth resisting the urge to treat every format as equally mature on day one. PDFs need text-layer verification first. Markdown needs structure preservation first. TXT often needs encoding and newline normalization first. The pipeline is shared, but the first good failure check is still format-specific.
 
+## Format-specific parser adapters and shared metadata contracts
+
+Multi-format ingestion is less about "reading files" and more about "handling format-specific failures under a unified contract." When PDF, Markdown, and HTML are processed together, text-extraction quality, structure preservation, and encoding issues collide.
+
+### Adapter pattern for swappable loaders
+
+Scattering format-specific loaders across functions makes testing and replacement difficult. An adapter interface limits the blast radius when swapping parsers.
+
+```python
+from __future__ import annotations
+
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Protocol
+
+from langchain_core.documents import Document
+
+class LoaderAdapter(Protocol):
+    def supports(self, path: Path) -> bool: ...
+    def load(self, path: Path) -> list[Document]: ...
+
+@dataclass
+class LoaderRegistry:
+    adapters: list[LoaderAdapter]
+
+    def load(self, path: Path) -> list[Document]:
+        for adapter in self.adapters:
+            if adapter.supports(path):
+                return adapter.load(path)
+        raise ValueError(f'unsupported format: {path.suffix.lower()}')
+```
+
+This structure pays off when adding DOCX or replacing an HTML parser. Separating routing logic from loading logic also lets test cases split cleanly by format.
+
+### Normalizing HTML and Markdown for a shared chunking policy
+
+HTML loses semantic boundaries when tags are stripped; Markdown needs headers preserved for search explainability. A normalization step that moves minimal structure info into metadata bridges both.
+
+```python
+def normalize_text_document(
+    doc: Document, *, source: str, fmt: str, section: str | None = None
+) -> Document:
+    cleaned = ' '.join(doc.page_content.split())
+    metadata = dict(doc.metadata)
+    metadata.update(
+        {
+            'source': source,
+            'format': fmt,
+            'section': section or 'body',
+            'content_kind': 'text',
+        }
+    )
+    return Document(page_content=cleaned, metadata=metadata)
+```
+
+Keep format-specific detail but always satisfy downstream stages' expected common keys.
+
+### Routing failures to format-specific retry queues
+
+```python
+def classify_failure(fmt: str, reason: str) -> str:
+    if fmt == 'pdf' and 'encrypted' in reason.lower():
+        return 'manual-review'
+    if fmt in {'md', 'html'} and 'encoding' in reason.lower():
+        return 'retry-with-utf8'
+    return 'generic-retry'
+```
+
+This classification routes failures to cause-specific queues instead of blanket retries. Multi-format pipeline stability depends more on failure-classification accuracy than on the success path.
+
+### Aligning the shared contract with VectorDB schema
+
+Normalized documents ultimately enter the VectorDB. Validate these fields are always populated before indexing:
+
+- `source`: original filename or URI
+- `format`: pdf, md, html, txt
+- `doc_type`: manual, policy, faq
+- `section`: heading or body segment
+- `version`: document version
+
+When this contract is stable, metadata filters and incremental indexing share the same key set — multi-format design becomes the foundation that lowers coupling cost across all downstream stages.
+
+## Format-specific quality thresholds and reprocessing policy
+
+Multi-format ingestion requires different quality thresholds per format. PDF uses text-extraction rate, Markdown uses header retention rate, HTML uses main-content extraction accuracy.
+
+```yaml
+quality_gate:
+  pdf:
+    min_chars_per_page: 80
+    max_ocr_ratio: 0.35
+  markdown:
+    min_heading_retention: 0.90
+  html:
+    min_main_content_ratio: 0.70
+```
+
+With thresholds in place, failures can be automatically routed: retry vs. human-review queue. For example, PDFs with OCR ratio above 60% are cheaper to send to manual review than to retry.
+
+Track per-format throughput and failure rate on the same dashboard but set alert thresholds separately by format. A single threshold for all formats produces either excessive alerts or missed signals.
+
+## Extended deployment checklist
+
+- Input file count within normal range.
+- Failed document ratio below threshold (e.g. 3%).
+- At least 3 sample documents traceable by source, page, chunk_id.
+- Zero missing required metadata fields (`source`, `format`, `doc_type`).
+- Smoke-test queries return expected sources in top results.
+
+```python
+def quick_health_report(stats: dict[str, int | float]) -> None:
+    print(f"files_total={stats['files_total']}")
+    print(f"failed_total={stats['failed_total']}")
+    print(f"chunks_total={stats['chunks_total']}")
+    print(f"metadata_missing={stats['metadata_missing']}")
+    print(f"smoke_passed={stats['smoke_passed']}")
+```
+
+## Incident response: stage-by-stage narrowing
+
+1. **Input boundary**: compare file lists between batches for abnormal changes.
+2. **Parsing boundary**: isolate empty-body, abnormal-length, OCR-spike documents.
+3. **Chunking boundary**: check tiny/oversized chunk ratios, missing IDs.
+4. **Indexing boundary**: verify upsert/delete counts and state-store consistency.
+5. **Search boundary**: run sample queries confirming expected source retrieval.
+
+```text
+incident_id=ingestion-2026-05-21-01
+step=input files_total=412 delta=+187
+step=parse ocr_ratio=0.62 alert=true
+step=chunk tiny_ratio=0.41 alert=true
+step=index upsert=9342 delete=0 state_commit=true
+step=search smoke_passed=false
+```
+
+Consistent log formats and consistent checking order reduce mean time to recovery.
+
+## Operational baseline metrics
+
+- Parsing quality: average character count, OCR ratio, reprocessing ratio
+- Chunking quality: average length, extreme-length ratio, policy version distribution
+- Metadata quality: required-field miss rate, normalization failure count
+- Retrieval verification: sample query recall@k, source hit rate
+
+## Format-specific embedding preprocessing and unification strategy
+
+PDF-extracted text has excessive line breaks, Markdown contains header markers, HTML may have tag residue. Without normalization before embedding, semantically identical sentences land in different vector-space regions depending on source format.
+
+```python
+from __future__ import annotations
+
+import re
+
+def clean_for_embedding(text: str, fmt: str) -> str:
+    if fmt == 'md':
+        text = re.sub(r'^#{1,6}\s+', '', text, flags=re.MULTILINE)
+    if fmt == 'html':
+        text = re.sub(r'<[^>]+>', ' ', text)
+    text = re.sub(r'\n{2,}', '\n', text)
+    text = re.sub(r'[ \t]+', ' ', text)
+    return text.strip()
+```
+
+Apply this function immediately before embedding, not after the loader. Loader output must retain structure information for chunking boundary detection. Structure preservation (for chunking) and text normalization (for embedding) operate at different pipeline stages.
+
+Ignoring format-specific normalization and embedding raw text produces "same content, different format, low similarity" artifacts. This problem cannot be solved by changing the embedding model — only the preprocessing layer can address it.
+
 ## Answering the Opening Questions
 
 - **What shared contract must come first when PDF, Markdown, and HTML enter one pipeline?**
