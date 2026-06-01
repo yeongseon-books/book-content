@@ -272,6 +272,98 @@ print(f"A satisfaction: {a.mean():.3f}, B: {b.mean():.3f}, p={p:.4f}")
 
 **Online traps**: novelty effect (new variants feel fresh at first), weekday/weekend cycles, user segmentation. Run for at least 1 week, ideally 2.
 
+### Guardrail Metrics and Experiment Stop Rules
+
+A high win rate means nothing if safety or cost regresses. Separate your primary metric (the one you want to improve) from guardrail metrics (the ones that must not degrade).
+
+```python
+def should_stop_experiment(metrics: dict) -> tuple[bool, str]:
+    # metrics keys:
+    # satisfaction_delta, safety_violation_delta, p95_latency_delta_ms, cost_delta_usd
+    if metrics["safety_violation_delta"] > 0.005:
+        return True, "stop: safety regression"
+    if metrics["p95_latency_delta_ms"] > 400:
+        return True, "stop: latency regression"
+    if metrics["cost_delta_usd"] > 0.02 and metrics["satisfaction_delta"] < 0.01:
+        return True, "stop: cost increase without meaningful quality gain"
+    return False, "continue"
+```
+
+```text
+Recommended stop policy
+- Safety violation rate increase: stop immediately
+- p95 latency spike: reduce traffic, investigate root cause
+- Cost increase + negligible quality gain: terminate experiment
+```
+
+### Connecting Offline and Online A/B
+
+In practice, the most efficient flow is to filter candidates offline before exposing them to live traffic.
+
+| Stage | Goal | Pass criteria |
+|---|---|---|
+| Offline pairwise | Eliminate clearly inferior candidates | win_rate >= 0.52, p<0.05 |
+| Shadow evaluation | Compare without user impact | 0 guardrail violations |
+| Online 5% canary | Validate real-user reactions | satisfaction up + no alerts |
+| Online 50% | Large-scale validation | 1-2 weeks stable |
+
+Following this ladder significantly reduces operational risk when promoting a new model or prompt.
+
+### Confidence Interval Visualization
+
+A/B results are more stable when you report confidence intervals alongside the point estimate of win rate.
+
+```python
+import math
+
+def wilson_interval(wins: int, total: int, z: float = 1.96) -> tuple[float, float]:
+    if total == 0:
+        return 0.0, 0.0
+    p = wins / total
+    denom = 1 + z**2 / total
+    center = (p + z**2 / (2 * total)) / denom
+    margin = z * math.sqrt((p * (1 - p) + z**2 / (4 * total)) / total) / denom
+    return center - margin, center + margin
+```
+
+When confidence intervals overlap substantially and the p-value is borderline, avoid premature model swaps.
+
+### Experiment Conclusion Template
+
+A fixed template turns the post-experiment review from subjective opinion into a deployment decision record.
+
+```text
+A/B Conclusion Template
+- Candidates: prompt-v3 (A) vs prompt-v2 (B)
+- Samples: n=820 (decisive=760, tie=60)
+- Win rate: A 57.9%, B 42.1%
+- p-value: 0.003
+- Effect size (Cohen's h): 0.32
+- Guardrails: safety/latency/cost all within bounds
+- Decision: adopt A, 10% canary then full rollout
+```
+
+### Segment-Level Win Rate
+
+An overall win rate can mask losses in specific user segments. Always break results down by at least: new vs returning users, short vs long queries, and content category.
+
+```python
+import pandas as pd
+
+def segment_win_rate(df: pd.DataFrame, segment_col: str) -> pd.DataFrame:
+    # df columns: segment_col, winner (A/B/Tie)
+    rows = []
+    for seg, group in df.groupby(segment_col):
+        decisive = group[group["winner"].isin(["A", "B"])]
+        if len(decisive) == 0:
+            continue
+        a_win = (decisive["winner"] == "A").mean()
+        b_win = (decisive["winner"] == "B").mean()
+        rows.append({"segment": seg, "a_win": a_win, "b_win": b_win, "n": len(decisive)})
+    return pd.DataFrame(rows)
+```
+
+If segment results diverge sharply, a gradual rollout or conditional routing is safer than a full swap.
 ---
 
 ## Common Mistakes
