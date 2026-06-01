@@ -215,6 +215,99 @@ def monthly_report(year: int, month: int) -> dict:
 
 Send the report monthly to security, compliance, and leadership. Anomalies show up before incidents do.
 
+---
+
+### Treating Audit Log Schema as a Contract
+
+Compliance report automation breaks when the schema drifts. Lock these mandatory fields:
+
+```json
+{
+  "request_id": "req_...",
+  "occurred_at": "2026-05-21T09:30:11Z",
+  "actor_type": "end_user",
+  "actor_id_hash": "a13f...",
+  "tenant_id": "team-42",
+  "endpoint": "/chat",
+  "model": "gpt-4o-mini",
+  "policy_version": "2026-05-21",
+  "guardrail_stage": "post-output.pii",
+  "decision": "blocked",
+  "reason_code": "pii_detected",
+  "input_tokens": 1280,
+  "output_tokens": 0,
+  "cost_usd": 0.00019,
+  "retention_class": "audit_7y"
+}
+```
+
+```python
+def verify_hash_chain(records: list[dict]) -> bool:
+    prev = "0" * 64
+    for rec in records:
+        expected = chain_hash(prev, {k: v for k, v in rec.items() if k != "self_hash"})
+        if rec.get("self_hash") != expected:
+            return False
+        prev = rec["self_hash"]
+    return True
+```
+
+Run this verification batch periodically to prove append-only integrity.
+
+### Regulatory Response Checklist
+
+| Regulation/audit | Fields extractable from logs |
+|---|---|
+| GDPR Art.30 | Processing purpose, actor, timestamp, retention policy |
+| SOC 2 | Access events, permission changes, block history |
+| Internal audit | Per-policy-version block rate, exception approvals |
+| Breach response | Affected request count, leak type, response time |
+
+```python
+def log_erasure(request_id: str, actor_hash: str, deleted_keys: list[str]):
+    audit_db.insert({
+        "type": "erasure_event",
+        "request_id": request_id,
+        "actor_hash": actor_hash,
+        "deleted_keys": deleted_keys,
+        "status": "completed",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    })
+```
+
+Deletion itself is an audit target. Missing erasure events is a major compliance finding.
+
+### Audit Log Access Control Model
+
+| Role | Access scope | Note |
+|---|---|---|
+| Service operator | Aggregate dashboard, de-identified logs | No raw access |
+| Security team | Raw audit events (hash-based) | Approval workflow required |
+| Compliance team | Retention/deletion/policy history | PII vault access restricted |
+| Dev team | Sampled anonymized data | No per-request raw access |
+
+```python
+def log_audit_access(actor: str, reason: str, query_scope: str):
+    audit_db.insert({
+        "type": "audit_access",
+        "actor": actor,
+        "reason": reason,
+        "query_scope": query_scope,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    })
+```
+
+Who queried the audit logs, and why, is itself an audit-worthy event.
+
+### Compliance Auto-Report Checklist
+
+- [ ] Per-policy-version block/allow statistics.
+- [ ] Erasure request SLA compliance rate.
+- [ ] Access event anomalies (e.g., bulk overnight queries).
+- [ ] Per-retention-class expiry/deletion fulfillment rate.
+
+Locking these four items into a monthly report significantly improves audit-response speed.
+
 ## Common Mistakes
 
 1. **Logging raw prompt and response in application logs.** PII ends up in seven years of logs and triggers GDPR violations. Hash in audit, encrypt in a separate store.
