@@ -213,6 +213,171 @@ This post fed identical embedding vectors into flat and IVF indexes and measured
 
 Episode 5 evaluates the **end-to-end RAG pipeline** with the retriever wired to an LLM, measuring not just retrieval but the answer itself.
 
+## Evaluating VectorDB candidates under equal conditions
+
+Performance numbers are meaningless if the operating conditions differ between candidates. Lock down the following variables before any comparison run.
+
+| Variable | Must be identical across candidates |
+| --- | --- |
+| Vector dimension | Same embedding model (e.g. 384d) |
+| Distance function | cosine or inner-product — pick one |
+| top-k | The value your product actually uses |
+| Filter clause | Same metadata `where` condition |
+| Hardware | vCPU, RAM, disk type all matched |
+
+If the distance function differs, result interpretation changes entirely — state it on the first line of every report.
+
+### Benchmark collection script
+
+The script below collects P50/P95 latency and recall@k for each candidate with minimal library dependencies.
+
+```python
+import numpy as np
+import time
+
+def benchmark_search(index, queries, exact_results, k=5):
+    latencies = []
+    recalls = []
+
+    for q_vec, exact_ids in zip(queries, exact_results):
+        t0 = time.perf_counter()
+        _, approx_ids = index.search(q_vec.reshape(1, -1), k)
+        latencies.append((time.perf_counter() - t0) * 1000)
+        recalls.append(len(set(approx_ids[0]) & set(exact_ids)) / k)
+
+    return {
+        "p50_ms": float(np.percentile(latencies, 50)),
+        "p95_ms": float(np.percentile(latencies, 95)),
+        "recall@k": float(np.mean(recalls)),
+    }
+```
+
+This function works with FAISS, HNSW wrappers, and server-backed VectorDB adapters because the output format is identical.
+
+### Why filtered search needs separate measurement
+
+RAG services frequently filter by date, product line, or customer. Measuring unfiltered performance alone diverges from production reality.
+
+| Scenario | Example filter | Observed metrics |
+| --- | --- | --- |
+| Baseline | None | recall@k, p95 |
+| Date filter | `year >= 2024` | recall@k, p95 |
+| Multi-condition | `team == "ml" AND severity >= 2` | recall@k, p95, error rate |
+
+Some engines see recall drop or latency spike under filters. Report filtered scenarios in a separate table.
+
+### Server-mode VectorDB configuration example
+
+In production, network and replication settings affect quality alongside index algorithm parameters.
+
+```yaml
+vectordb:
+  engine: qdrant
+  collection: rag_docs_v2
+  vector_size: 384
+  distance: cosine
+  hnsw:
+    m: 32
+    ef_construct: 128
+    ef_search: 64
+  replication:
+    factor: 2
+  write_consistency: majority
+  read_timeout_ms: 500
+```
+
+Store this configuration alongside benchmark results. When someone asks "why did the score change since last month," you can answer immediately.
+
+### Fault-condition performance matters too
+
+Normal-state measurements underestimate operational risk. Run at least these two additional scenarios:
+
+1. First 100 queries before index warm-up (cold-start latency)
+2. Queries during a rolling index rebuild (concurrent write load)
+
+If cold-start P95 exceeds your SLA threshold, you need a warm-up step in your deployment pipeline.
+
+## Appendix — standard fields for a VectorDB benchmark report
+
+Fixing report fields across teams makes retrospectives and reproduction straightforward.
+
+### JSON schema example
+
+```json
+{
+  "run_id": "20260521T021000-7d8e9f0",
+  "embedding_model": "all-MiniLM-L6-v2",
+  "vector_dim": 384,
+  "distance": "cosine",
+  "dataset_size": 100000,
+  "candidate": "faiss-ivf",
+  "params": {"nlist": 316, "nprobe": 8},
+  "metrics": {
+    "recall@5_vs_flat": 0.989,
+    "p50_ms": 7.4,
+    "p95_ms": 11.3,
+    "memory_mb": 386
+  }
+}
+```
+
+With a fixed schema, adding new candidates still lands on the same dashboard.
+
+### Filtered-scenario performance table (separate from baseline)
+
+| candidate | scenario | recall@5 | p95_ms |
+| --- | --- | ---: | ---: |
+| flat | no-filter | 1.00 | 24.7 |
+| ivf(nprobe=8) | no-filter | 0.99 | 11.3 |
+| ivf(nprobe=8) | year>=2024 | 0.98 | 14.8 |
+| hnsw(ef=64) | team=ml | 0.97 | 12.1 |
+
+Without a separated filter table, benchmark results and production experience diverge.
+
+### Recommended repetition counts
+
+- Corpus < 100k: 20 repetitions per query, report median
+- Corpus 100k-1M: 10 repetitions, report median + P95
+- Corpus > 1M: 200+ sample queries, measure per shard independently
+
+Too few repetitions lets transient cache effects masquerade as true performance.
+
+### Pre-production validation checklist
+
+1. Have you actually run a backup/restore test at least once?
+2. Can you complete an index rebuild within the maintenance window?
+3. Is a fallback search path (flat or previous index) ready for outages?
+4. Does monitoring separately track P95, error rate, and timeouts?
+
+VectorDB selection is not just a performance comparison — it is an operational-system choice. Keep that framing throughout.
+
+### Load-stage performance test example
+
+| QPS range | candidate | recall@5 | p95 (ms) | timeout rate |
+| --- | --- | ---: | ---: | ---: |
+| 10 | ivf(nprobe=8) | 0.99 | 10.9 | 0.0% |
+| 50 | ivf(nprobe=8) | 0.99 | 14.2 | 0.1% |
+| 100 | ivf(nprobe=8) | 0.98 | 28.6 | 0.9% |
+
+Static benchmarks alone cannot reveal operational limits. Run load-stage tests alongside recall measurements.
+
+Record the data fill ratio and index fragmentation level at measurement time. The same candidate can produce different latency and recall distributions depending on whether the index was freshly built or partially updated over time.
+
+When changing index parameters, keep the previous configuration running in A/B shadow mode for at least 24 hours. Traffic patterns vary by time of day, and a short benchmark window cannot capture real operational variance.
+
+### Sample benchmark results
+
+The table below was measured on 100k document vectors (384-dim), top-k=5, same hardware. Numbers vary by environment, but the interpretation method applies everywhere.
+
+| Candidate | Parameters | Recall@5 (vs Flat) | P50 latency (ms) | P95 latency (ms) | Memory (MB) |
+| --- | --- | ---: | ---: | ---: | ---: |
+| FAISS FlatIP | exact | 1.00 | 18.1 | 24.7 | 382 |
+| FAISS IVFFlat | nlist=316, nprobe=4 | 0.95 | 4.8 | 7.2 | 386 |
+| FAISS IVFFlat | nlist=316, nprobe=8 | 0.99 | 7.6 | 11.4 | 386 |
+| HNSW | M=32, efSearch=64 | 0.98 | 3.9 | 6.0 | 514 |
+
+This table is not for picking "the fastest candidate." It is for quickly filtering candidates that meet product requirements (e.g. recall >= 0.97 AND P95 <= 10 ms).
+
 ## Answering the Opening Questions
 
 - **Which operating conditions should compare VectorDBs beyond feature lists?**
