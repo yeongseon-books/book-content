@@ -22,11 +22,13 @@ seo_description: Define a reliable application contract using JSON mode and Pyda
 
 The first production problem in an LLM application is often not answer quality. It is output shape. A demo can render one paragraph of model text and stop there. A real service usually cannot. It needs fields that can be inserted into a database, validated against business rules, passed to another service, or used to drive control flow. At that point, pretty prose is secondary. The important question is whether the application can trust the response format.
 
+This is the first post in the LLM API Production 101 series.
+
 Teams often lose time here because the early version looks deceptively easy. The prompt says, "Return JSON," the code calls `json.loads()`, and the first few tests pass. Then the prompt grows, an edge case appears, the model adds a sentence before the payload, wraps the object in a code fence, or renames a key. The failure is not really about model intelligence. It is about the absence of a contract between text generation and application logic.
 
 This article turns that loose boundary into an explicit interface. We will use Groq's JSON mode with `response_format={"type": "json_object"}` and then validate the parsed object with a Pydantic model. Those two steps matter for different reasons. JSON mode narrows the syntactic shape of the output. Pydantic enforces semantic rules such as allowed values, ranges, and required fields. Together they give you a response path that can fail loudly instead of corrupting state quietly.
 
-This is the first post in the LLM API Production 101 series. Here we focus on building a structured-output contract with JSON mode and response schemas.
+Here we focus on building a structured-output contract with JSON mode and response schemas.
 
 ![Structured output: JSON mode and response schemas](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/01/01-01-structured-output-json-mode-and-response.en.png)
 *Structured output: JSON mode and response schemas*
@@ -38,55 +40,36 @@ This is the first post in the LLM API Production 101 series. Here we focus on bu
 - What does JSON mode guarantee, and what does schema validation still need to guarantee?
 - When the structured-output contract fails, where should the system stop and what should it log?
 
-## Runtime setup
+## Why this post matters
 
-To run the examples as written, start with Python 3.10 or later and install the two packages used in this article.
+Structured output is the gate that opens automation in an LLM application. If a human is reading the response, sentence quality matters most. If another piece of code is consuming the response immediately, format stability matters more. Classification, extraction, downstream API calls, and business rule application all operate safely only when the structure is dependable.
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install groq pydantic
-export GROQ_API_KEY="your-issued-key"
-```
+In practice, teams often try to survive this boundary with prompt tricks. They write progressively longer "answer in JSON" instructions and bolt on increasingly clever parsers when it fails. But that approach does not solve the problem. It scatters responsibility between the prompt and post-processing code. What production needs is not smarter string parsing but a clearer contract.
 
-All examples in this post assume `llama-3.1-8b-instant` and the official `groq` SDK.
-
----
+When JSON mode and schema validation work together, failures do not pass silently. A parse failure stops at the parse layer. A semantic violation stops at the validation layer. That explicitness is what makes retry policies, fallback paths, logging, and regression testing designable in the first place.
 
 ## Why plain-text parsing does not age well
 
 ![Failure path of plain-text parsing](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/01/01-01-why-plain-text-parsing-does-not-age-well.en.png)
 
 *Failure path of plain-text parsing*
-An early implementation often looks like this: ask the model to classify a support ticket, get a small text answer back, and split the string.
+
+An early implementation often looks clean and short. But that brevity means the contract is missing. If the model changes the output even slightly, the parser breaks immediately.
 
 ```python
 raw_text = "positive, confidence=0.91"
 label, confidence = raw_text.split(",")
 ```
 
-It feels fast because it is short. It is also fragile because nothing in that code defines a durable interface. If the model changes `positive` to `Positive`, inserts a short explanation, or emits `confidence: 0.91` instead of `confidence=0.91`, the parser breaks. Worse, the logs rarely make it obvious whether the problem came from prompt behavior, model variability, or parsing assumptions.
-
-Production systems usually need three guarantees at the same time:
-
-- field names should stay stable
-- value types should stay stable
-- invalid or missing data should fail immediately
-
-Imagine a ticket classifier. `category` should come from a finite set. `priority` should be an integer inside a specific range. `summary` should not be empty. If you rely on plain text plus custom parsing, those rules end up scattered across prompts, regexes, and post-processing code. JSON mode plus schema validation brings them back into one place.
-
----
+The problem is clear: field-name stability, value-type stability, and missing-data handling are all scattered outside the code. In production, you should not split these rules between prompts and string parsers. They belong in a single contract.
 
 ## What JSON mode guarantees and what it does not
 
 ![Responsibility split between JSON mode and validation](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/01/01-02-what-json-mode-guarantees-and-what-it-do.en.png)
 
 *Responsibility split between JSON mode and validation*
-Groq's `response_format={"type": "json_object"}` pushes the model toward returning a JSON object instead of free-form prose. That is useful because it creates a minimum syntactic contract. Your response is much more likely to be machine-readable without string surgery.
 
-Still, JSON mode is not the whole solution. It reduces formatting failures. It does not automatically guarantee business correctness.
-
-For example, this is valid JSON:
+Groq's `response_format={"type": "json_object"}` pushes the model strongly toward returning a JSON object. This makes it much more likely you get a machine-readable response without string surgery. However, valid JSON grammar does not mean valid business semantics.
 
 ```json
 {
@@ -95,20 +78,14 @@ For example, this is valid JSON:
 }
 ```
 
-The syntax is fine, but `confidence` is a string instead of the numeric value your application may expect. Or the object may omit a required field entirely. That is why it helps to separate the response path into two steps:
-
-1. make the model return a JSON object
-2. validate that object against an application schema
-
-If the first step is missing, parsing becomes unreliable. If the second step is missing, your code accepts structurally valid but semantically wrong data. Production stability needs both.
-
----
+The syntax is fine, but `confidence` is a string instead of a number. So the real path splits into two steps: first ensure you get a JSON object, then verify that object matches your application schema.
 
 ## Sending a JSON-mode request with the Groq SDK
 
 ![JSON mode request and parse flow](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/01/01-03-sending-a-json-mode-request-with-the-gro.en.png)
 
 *JSON mode request and parse flow*
+
 The example below extracts `category`, `priority`, and `summary` from a customer support message.
 
 ```python
@@ -152,22 +129,15 @@ payload = json.loads(content)
 print(payload)
 ```
 
-Three details matter here.
-
-First, the system prompt still says "exactly one JSON object." JSON mode is a provider-side constraint, but it is still helpful to make the contract legible in the prompt itself.
-
-Second, `temperature=0` reduces variation. For extraction work, consistency matters more than creativity.
-
-Third, `json.loads()` only answers one question: is this string parseable JSON? It does not answer whether the payload matches your domain rules. That is why validation comes next.
-
----
+Three details matter here. The system prompt still says "exactly one JSON object" so the contract is legible in the prompt itself. `temperature=0` reduces variation for extraction work. And `json.loads()` only confirms parseable JSON — it says nothing about domain correctness.
 
 ## Locking the response with Pydantic
 
 ![Relationship between model output and schema checks](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/01/01-04-locking-the-response-with-pydantic.en.png)
 
 *Relationship between model output and schema checks*
-This is where structured output becomes operationally useful. The code below parses the model output and validates it against a typed schema.
+
+This is where structured output becomes an actual operational boundary.
 
 ```python
 import json
@@ -230,26 +200,15 @@ except ValidationError as exc:
 print(ticket.model_dump())
 ```
 
-This gives you a much stronger application boundary. If the model returns an unknown category, an out-of-range priority, a missing field, or the wrong type, validation fails immediately. That is a good thing. In production, explicit failure is safer than silently storing bad data and discovering the damage later.
-
-There is also a downstream benefit. Once validation succeeds, the rest of your code gets real typed values. `ticket.priority` is already an integer. `ticket.category` is already a constrained enum. `ticket.customer_needs_followup` is already a boolean. The rest of the pipeline becomes simpler because defensive parsing logic is no longer spread everywhere.
-
----
+Once validation is attached, the response boundary becomes strong. Disallowed categories, wrong types, and missing fields all fail immediately. In production, loud failure is far safer than silent corruption.
 
 ## Thinking in failure layers
 
 ![Failure layers in structured output handling](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/01/01-05-thinking-in-failure-layers.en.png)
 
 *Failure layers in structured output handling*
-Structured output failures are easier to operate if you separate them into layers.
 
-The first layer is the **request layer**. Authentication problems, timeouts, and network failures belong here. These are normal API concerns and may be retryable.
-
-The second layer is the **JSON parsing layer**. Even with JSON mode, you should still assume that empty strings, truncated payloads, or malformed data are possible in edge cases. When parsing fails, keep the raw response for inspection.
-
-The third layer is the **schema validation layer**. This is often the most informative one. The payload is valid JSON, but it violates domain rules. Maybe `priority=7`, maybe `summary` is empty, maybe `category` is outside the enum.
-
-A layered implementation keeps logging precise:
+Separating failures into request layer, JSON parsing layer, and schema validation layer makes logs and recovery policies precise.
 
 ```python
 import json
@@ -309,42 +268,170 @@ except Exception:
     logger.exception("llm request failed")
 ```
 
-That split also leads to better recovery decisions. A transport failure may justify a retry. A JSON parse failure may justify a prompt adjustment or raw-response capture. A schema failure may justify tighter instructions, simpler field definitions, or a fallback path that asks the model again with narrower constraints.
+With this separation, a transport failure becomes a retry candidate, a JSON parse failure triggers raw-response capture and prompt review, and a schema failure points toward contract simplification or field definition hardening. Each layer maps to a different recovery action.
 
----
+## Deliberately reproducing validation failures
 
-## Contract first, prompt second
+Useful production tests do not end with one success case. You also need to verify what logs and exceptions appear when the contract breaks. The code below reproduces schema failures without calling the model at all.
 
-It is tempting to keep tuning prompt wording whenever structured output feels unstable. Prompt quality matters, but it should not be the first line of defense. In production, the order is better reversed: define the contract, validate the contract, then improve prompt quality inside that boundary.
+```python
+from enum import Enum
 
-Three practical rules help:
+from pydantic import BaseModel, Field, ValidationError
 
-- start with a small field set
-- encode enums and ranges in code, not only in prose
-- log the raw response when validation fails
+class Category(str, Enum):
+    billing = "billing"
+    account = "account"
+    bug = "bug"
+    shipping = "shipping"
 
-Trying to extract too many fields at once increases both model error surface and validation complexity. A smaller schema is easier to stabilize. Also, values such as `priority: 1..5` are much easier to enforce than vague instructions like "high priority when urgent." And when validation fails, the raw model output is usually the fastest way to see whether the schema is too ambitious or the prompt is too loose.
+class TicketClassification(BaseModel):
+    category: Category
+    priority: int = Field(ge=1, le=5)
+    summary: str = Field(min_length=8, max_length=120)
+    customer_needs_followup: bool
 
----
+invalid_payload = {
+    "category": "refund",
+    "priority": 9,
+    "summary": "short",
+    "customer_needs_followup": "later",
+}
 
-## Closing
+try:
+    TicketClassification.model_validate(invalid_payload)
+except ValidationError as exc:
+    print(exc)
+```
 
-In this first production-focused post, we turned model output into an application contract. `response_format={"type": "json_object"}` narrows the response shape to machine-readable JSON. Pydantic adds typed validation on top of that shape. Together they move you away from brittle string parsing and toward explicit, observable boundaries.
+This output matters because it gives you direct fault-classification data. Whether it is an enum violation, a range violation, or a string-length problem is immediately visible. That clarity means you can redirect toward contract hardening or prompt narrowing rather than blind retries. Regression test suites should always include deliberate failure payloads.
 
-If the earlier series taught the basic request and response loop, this is the point where that loop becomes safe to automate. The next step is to put function execution on top of the same contract and let the model choose tools without letting the surrounding system become ambiguous.
+## Validating tool-call arguments with the same schema layer
+
+A gap that structured-output discussions often miss: the model does not only produce direct user-facing answers. In the next step it produces function-call arguments. Validating `response_format` JSON and validating `tool_calls` arguments are not different techniques — they are the same principle applied to different outputs.
+
+The example below validates order-lookup function arguments with Pydantic. The topic here is structured output, but in production this boundary feeds directly into tool execution, so understanding both together is safer.
+
+```python
+import json
+from enum import Enum
+
+from pydantic import BaseModel, Field, ValidationError
+
+class Locale(str, Enum):
+    ko = "ko"
+    en = "en"
+
+class OrderLookupArgs(BaseModel):
+    order_id: str = Field(min_length=6, max_length=32)
+    include_history: bool = False
+    locale: Locale = Locale.ko
+
+raw_tool_arguments = '{"order_id":"ORD-1001","include_history":true,"locale":"ko"}'
+
+try:
+    args_dict = json.loads(raw_tool_arguments)
+    args = OrderLookupArgs.model_validate(args_dict)
+    print(args.model_dump())
+except json.JSONDecodeError as exc:
+    print("tool args json parse failed", exc)
+except ValidationError as exc:
+    print("tool args schema validation failed", exc)
+```
+
+The benefit is clear. The function body only receives validated types, so implementation stays simple. Failures stop consistently before execution. Structured-output contracts extend beyond "model answer parsing" into "execution-boundary validation."
+
+## Response contract versioning
+
+A common production event is field addition. When you add `root_cause` to a schema that previously only had `summary`, new code and old responses can mix in the same path. Instead of only changing the prompt, you should explicitly bump the contract version.
+
+```python
+from pydantic import BaseModel, Field
+
+class TicketClassificationV2(BaseModel):
+    schema_version: str = "v2"
+    category: str
+    priority: int = Field(ge=1, le=5)
+    summary: str = Field(min_length=8, max_length=120)
+    root_cause: str = Field(min_length=3, max_length=200)
+
+def build_contract_context() -> dict:
+    return {
+        "schema_version": "v2",
+        "allowed_categories": ["billing", "account", "bug", "shipping"],
+    }
+```
+
+The version field looks trivial but contributes significantly to reducing production incidents. Logs instantly show which contract produced a given response. Cache keys and test fixtures can be isolated per version. When structured output flows to multiple downstream services, this version field becomes the compatibility reference point.
+
+## Regression testing structured-output quality
+
+To keep production quality stable, you need to answer "did schema failure rate increase in this deployment?" with a number. Fixing a set of sample inputs and computing pass rate lets you catch prompt or model changes quickly.
+
+```python
+import json
+from dataclasses import dataclass
+
+from pydantic import BaseModel, Field, ValidationError
+
+class TicketClassification(BaseModel):
+    category: str
+    priority: int = Field(ge=1, le=5)
+    summary: str = Field(min_length=8, max_length=120)
+
+@dataclass
+class EvalCase:
+    name: str
+    raw_json: str
+
+cases = [
+    EvalCase("valid", '{"category":"bug","priority":4,"summary":"Password reset mail is missing"}'),
+    EvalCase("bad-priority", '{"category":"bug","priority":9,"summary":"Password reset mail is missing"}'),
+    EvalCase("bad-json", '{"category":"bug","priority":4,"summary":"oops"'),
+]
+
+passed = 0
+for case in cases:
+    try:
+        payload = json.loads(case.raw_json)
+        TicketClassification.model_validate(payload)
+        passed += 1
+    except (json.JSONDecodeError, ValidationError):
+        pass
+
+print({"total": len(cases), "passed": passed, "pass_rate": round(passed / len(cases), 2)})
+```
+
+This test does not replace model-quality evaluation, but it guards the lower bound of contract stability. Combined with tool calling in the next episode, it extends to "pre-execution schema pass rate" — a more direct operational metric.
+
+## Common misconceptions
+
+- Enabling JSON mode does not automatically enforce business rules.
+- `json.loads()` success is not the same as schema validation success.
+- Trying to fix structured-output failures by prompt wording alone obscures the root cause.
+- Enum, range, and required-field rules belong in code validation first, not only in prompt instructions.
+- Treating validation failures as "model quality issues" delays proper logging and recovery design.
 
 ## Operational checklist
 
 - [ ] Declared output shape with a Pydantic model or JSON Schema
-- [ ] Wired one retry plus a log path for schema violations
-- [ ] Wrote field descriptions detailed enough for the model to interpret
-- [ ] Marked required vs. optional fields and added enum/range constraints
-- [ ] Automated regression tests (sample input -> schema validation) for schema changes
+- [ ] Separated logging and retry criteria by failure layer (request / parse / schema)
+- [ ] Encoded enum, range, and required-field rules in code validation
+- [ ] Preserved raw response on validation failure for traceability
+- [ ] Ran sample-input regression tests to verify schema-change impact
+
+## Closing
+
+In this post, we treated structured output as a response contract rather than a prompt trick. `response_format={"type": "json_object"}` narrows the syntactic shape. Pydantic checks whether that shape satisfies application rules. Together they replace string-parsing hope with an operational data boundary.
+
+The important result is that failure is no longer ambiguous. Whether parsing failed, JSON was correct but the schema was wrong, or the request itself failed — each case surfaces at its own layer. That distinction is what makes retry policies, fallback design, and quality logging all take realistic shape.
+
+The next post in this series extends this contract to function execution requests. If structured output was about safely receiving data, tool calling is about safely connecting application capabilities on top of that data.
 
 ## Answering the Opening Questions
 
 - **Why does free-form text parsing break so quickly in production?**
-  Free-form text breaks because small variations—extra prose, code fences, renamed keys, or changed casing—can invalidate a parser that has no durable contract.
+  Free-form text breaks because small variations — extra prose, code fences, renamed keys, changed casing — invalidate parsers that have no durable contract.
 
 - **What does JSON mode guarantee, and what does schema validation still need to guarantee?**
   JSON mode pushes the model toward parseable JSON; schema validation enforces required fields, allowed values, and business meaning after parsing.
@@ -364,8 +451,6 @@ If the earlier series taught the basic request and response loop, this is the po
 
 <!-- toc:end -->
 
----
-
 ## References
 
 ### Official Docs
@@ -380,6 +465,8 @@ If the earlier series taught the basic request and response loop, this is the po
 
 ### Related Series
 
+- [Tool calling — connecting functions to the model](./02-tool-calling.md)
+- [LLM API Production 101 series](../)
 - [LLM App Foundations 101](../../llm-app-foundations-101/en/01-llm-api-first-call.md) — covers what comes before this series: first API call, tokens, and basic prompting. Step back to it when structured output or tool calling feels like it is built on top of message patterns you never solidified.
 
 Tags: LLM, OpenAI, Streaming, Python
