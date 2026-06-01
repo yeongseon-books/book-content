@@ -246,6 +246,100 @@ A GPT-4o judge call costs about $0.01-0.03. Evaluating 10K samples is $100-300. 
 - **Tier the pipeline**: fast deterministic metrics first, then LLM judge only on suspicious samples
 - **Cheaper judge**: simple PASS/FAIL works fine on GPT-4o-mini (10x cheaper)
 
+## Judge Prompt Template Version Control
+
+For reproducibility, version-control judge prompts like code. Rubric changes, output schema changes, and rule changes all shift result distributions.
+
+```yaml
+# eval/judge_prompts/v3.yaml
+name: support-judge-v3
+version: 3
+task: pairwise
+dimensions:
+  - correctness
+  - completeness
+  - policy_compliance
+output_schema:
+  winner: ["A", "B", "Tie"]
+  confidence: float
+  rationale: string
+rules:
+  - "Answer length is excluded from evaluation criteria."
+  - "Policy violations override other merits."
+```
+
+```python
+import yaml
+
+
+def load_judge_prompt(path: str) -> dict:
+    with open(path) as f:
+        return yaml.safe_load(f)
+
+
+prompt_cfg = load_judge_prompt("eval/judge_prompts/v3.yaml")
+assert prompt_cfg["version"] == 3
+```
+
+Explicit versioning lets you separate "the model changed so scores shifted" from "the judge criteria changed so scores shifted."
+
+## Automated Bias Audit Report
+
+Manual bias checklists are quickly neglected. Periodically output position/length/self-preference signals as a structured report.
+
+```python
+from statistics import mean
+
+
+def bias_audit(verdict_rows: list[dict]) -> dict:
+    return {
+        "position_bias_rate": mean(int(r["first_position_wins"]) for r in verdict_rows),
+        "length_bias_rate": mean(int(r["long_answer_wins"]) for r in verdict_rows),
+        "self_preference_rate": mean(int(r["same_family_preferred"]) for r in verdict_rows),
+    }
+```
+
+Operational thresholds:
+
+- `position_bias_rate > 0.58` → force swap evaluation and rewrite prompt
+- `length_bias_rate > 0.65` → strengthen "length-independent" rule
+- `self_preference_rate > 0.60` → consider switching the judge model family
+
+## Judge Calibration Sessions
+
+When human scorers and the judge disagree repeatedly on a dimension, run a calibration session to align criteria. Without this, kappa stagnates.
+
+```text
+Calibration session template (60 min)
+1) Select top 20 disagreement cases
+2) Compare human rationale vs. judge rationale side by side
+3) Revise anchor sentences in the rubric
+4) Re-state prohibition and priority rules
+5) Re-evaluate the same 20 cases and re-measure kappa
+```
+
+## Stabilizing LLM-as-Judge Output Schema
+
+Even a well-written prompt can produce unstable structured output. Adding schema validation catches breakage early.
+
+```python
+REQUIRED_KEYS = {"winner", "confidence", "reason"}
+
+
+def validate_judge_output(payload: dict) -> bool:
+    if set(payload.keys()) & REQUIRED_KEYS != REQUIRED_KEYS:
+        return False
+    if payload["winner"] not in {"A", "B", "Tie"}:
+        return False
+    if not (0.0 <= float(payload["confidence"]) <= 1.0):
+        return False
+    if len(str(payload["reason"]).strip()) == 0:
+        return False
+    return True
+```
+
+With this validation, a model output format change surfaces as an immediate failure rather than silent misbehavior. Track schema failure rate as a separate metric to monitor judge pipeline stability over time.
+
 ---
 
 ## Common Mistakes
