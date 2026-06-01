@@ -308,6 +308,105 @@ This is not glamorous infrastructure, but it gives you the first thing to compar
 
 ---
 
+## Swappable pipeline boundary via VectorStore protocol
+
+The key point of this final post is establishing a boundary that is not tied to any single library. Define the interface first, and moving from local FAISS to Chroma, Qdrant, or Pinecone leaves the upstream retrieval logic untouched.
+
+```python
+from typing import Protocol
+
+class VectorStore(Protocol):
+    def upsert(self, ids: list[str], vectors: list[list[float]], payloads: list[dict]) -> None:
+        ...
+
+    def search(self, query_vector: list[float], top_k: int) -> list[tuple[str, float, dict]]:
+        ...
+```
+
+When the pipeline is written against this interface, storage choice drops to an implementation detail.
+
+## Storage adapter examples
+
+```python
+# Chroma adapter (summary)
+class ChromaStore:
+    def __init__(self, collection):
+        self.collection = collection
+
+    def upsert(self, ids, vectors, payloads):
+        self.collection.upsert(ids=ids, embeddings=vectors, metadatas=payloads)
+
+    def search(self, query_vector, top_k):
+        out = self.collection.query(query_embeddings=[query_vector], n_results=top_k)
+        return list(zip(out["ids"][0], out["distances"][0], out["metadatas"][0]))
+```
+
+```python
+# Qdrant adapter (summary)
+class QdrantStore:
+    def __init__(self, client, collection_name):
+        self.client = client
+        self.collection_name = collection_name
+
+    def upsert(self, ids, vectors, payloads):
+        points = [{"id": i, "vector": v, "payload": p} for i, v, p in zip(ids, vectors, payloads)]
+        self.client.upsert(collection_name=self.collection_name, points=points)
+
+    def search(self, query_vector, top_k):
+        hits = self.client.search(collection_name=self.collection_name, query_vector=query_vector, limit=top_k)
+        return [(str(h.id), float(h.score), h.payload) for h in hits]
+```
+
+```python
+# Pinecone adapter (summary)
+class PineconeStore:
+    def __init__(self, index):
+        self.index = index
+
+    def upsert(self, ids, vectors, payloads):
+        self.index.upsert(vectors=[(i, v, p) for i, v, p in zip(ids, vectors, payloads)])
+
+    def search(self, query_vector, top_k):
+        out = self.index.query(vector=query_vector, top_k=top_k, include_metadata=True)
+        return [(m.id, float(m.score), m.metadata) for m in out.matches]
+```
+
+## Hybrid search alpha tuning loop
+
+Hybrid search is not a one-shot feature. You need to sweep `alpha` against an eval set and measure repeatedly.
+
+```python
+def evaluate_alpha(candidates, alpha_values):
+    rows = []
+    for alpha in alpha_values:
+        metrics = run_eval(candidates=candidates, alpha=alpha)
+        rows.append((alpha, metrics["recall@5"], metrics["mrr@10"], metrics["p95_ms"]))
+    return rows
+```
+
+| alpha (vector weight) | Recall@5 | MRR@10 | p95 (ms) |
+|---:|---:|---:|---:|
+| 0.2 | 0.81 | 0.63 | 38 |
+| 0.5 | 0.88 | 0.69 | 42 |
+| 0.7 | 0.90 | 0.71 | 44 |
+| 0.9 | 0.87 | 0.67 | 43 |
+
+From results like these, you might default to 0.7 and drop to 0.5 or below for identifier-heavy queries.
+
+## Production scaling patterns
+
+Common operational patterns for production vector search:
+
+- Separate the indexing pipeline as a batch job; keep serving nodes read-only
+- Run index versions blue/green for zero-downtime swaps
+- Extract failed queries from logs and fold them into the eval set periodically
+- When latency budget is exceeded, degrade gracefully: reduce top-k first, then lower ANN parameters, then disable reranker
+- On model changes, compare score distributions via shadow traffic before promoting to production
+
+One item that must ship from day one is an observability contract. At minimum, log `query_id`, `index_version`, `embedding_version`, `top_k`, `latency_ms`, and `result_doc_ids` as structured fields. Vector search failures often mix index, model, and hybrid-weight causes. Without these fields, root-cause isolation becomes nearly impossible.
+
+Pipeline maturity comes less from algorithmic choice and more from boundary design and operational instrumentation.
+
 ## Conclusion
 
 This post assembled the full vector search pipeline: load documents, chunk them with `RecursiveCharacterTextSplitter`, embed with `HuggingFaceEmbeddings`, index with FAISS, persist to disk, and retrieve with natural-language queries.
