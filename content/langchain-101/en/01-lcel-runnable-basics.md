@@ -301,6 +301,79 @@ results = chain.batch(topics, config={"max_concurrency": 2})
 - [ ] I can run the same chain with both `invoke()` and `batch()`
 - [ ] I understand when a plain Python function should be wrapped with `RunnableLambda`
 
+## Verifying the Runnable contract in code
+
+Once you move past the syntax, the contract matters more than the pipe operator. Splitting each step into a variable and calling `invoke`, `batch`, and `stream` on the same object demonstrates why Runnable is the central concept.
+
+```python
+import os
+
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_groq import ChatGroq
+
+prompt = ChatPromptTemplate.from_template("Summarize {topic} in one sentence.")
+llm = ChatGroq(model="llama-3.1-8b-instant", api_key=os.environ["GROQ_API_KEY"])
+parser = StrOutputParser()
+
+chain = prompt | llm | parser
+
+# 1) invoke
+single = chain.invoke({"topic": "Runnable interface"})
+print(f"invoke -> {single}")
+
+# 2) batch
+many = chain.batch([
+    {"topic": "LCEL"},
+    {"topic": "OutputParser"},
+], config={"max_concurrency": 2})
+print(f"batch count -> {len(many)}")
+
+# 3) stream
+print("stream -> ", end="")
+for chunk in chain.stream({"topic": "vector search"}):
+    print(chunk, end="", flush=True)
+print()
+```
+
+This code rarely goes into production directly, but it works well in team onboarding docs. Seeing one chain object reused across execution modes prevents the mental model from breaking when retrievers or tools appear later.
+
+## LCEL step-by-step type table
+
+The table below is what you check first when debugging `prompt | llm | parser`.
+
+| Step | Input type | Output type | What to check |
+|---|---|---|---|
+| `ChatPromptTemplate` | `dict` | `ChatPromptValue` | Missing template keys |
+| `ChatModel` (`ChatGroq`) | `PromptValue` or message list | `AIMessage` | Response metadata, content field |
+| `StrOutputParser` | `AIMessage` | `str` | Downstream type compatibility |
+
+Keeping this table in mind speeds up error interpretation. If the parser raises a type error, you can trace back to whether the model response was abnormal or whether the prompt step already emitted the wrong type.
+
+## Observing LCEL execution in LangSmith
+
+Once learning is done, you need to observe the chain in a real service path. Attaching LangSmith shows how a single `invoke` decomposes into internal runs.
+
+```text
+[trace] run_type=chain name=RunnableSequence latency_ms=842
+  [child] run_type=prompt name=ChatPromptTemplate latency_ms=2
+  [child] run_type=llm name=ChatGroq latency_ms=801 tokens_in=41 tokens_out=122
+  [child] run_type=parser name=StrOutputParser latency_ms=1
+```
+
+What matters here is that you can immediately separate "where is it slow" from "where did it fail". If the prompt and parser are fast but the LLM step is slow, look at the provider or network first. If only the parser fails repeatedly, tighten the output format constraint.
+
+## Common Runnable composition patterns
+
+| Pattern | LCEL form | Why use it | Watch out for |
+|---|---|---|---|
+| Basic query | `prompt \| llm \| StrOutputParser()` | Simplest text response | Weak for structured output |
+| Post-processing | `... \| RunnableLambda(fn)` | Format cleanup, length cap | Do not overload with business logic |
+| Multiple inputs | `chain.batch(inputs)` | Bulk processing | Needs concurrency / billing control |
+| Real-time response | `chain.stream(input)` | Reduces perceived latency | Must handle mid-stream failures |
+
+Standardizing on these patterns within a team makes code review faster — any deviation immediately prompts the question "why was this assembled differently?"
+
 ## Conclusion
 
 LCEL and the Runnable interface reduce LLM application plumbing to a sequence of composable components connected by `|`. Every component exposes `invoke`, `batch`, and `stream` consistently, so any component can replace any other component that accepts the same input type.
