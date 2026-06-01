@@ -333,6 +333,156 @@ def safe_divide(a: float, b: float) -> str:
 
 ---
 
+## Orchestration layer for safe tool calls
+
+### Tool input schema validation
+
+Agent autonomy is only safe when tool inputs are validated. Check the schema before each call so invalid arguments become an Observation the agent can retry from.
+
+```python
+from pydantic import BaseModel, ValidationError
+
+class UnitConvertArgs(BaseModel):
+    value: float
+    from_unit: str
+    to_unit: str
+
+def call_unit_convert_with_validation(raw_args: dict) -> str:
+    try:
+        args = UnitConvertArgs.model_validate(raw_args)
+    except ValidationError as exc:
+        return f"error: invalid arguments - {exc.errors()}"
+
+    return unit_convert.invoke({
+        'value': args.value,
+        'from_unit': args.from_unit,
+        'to_unit': args.to_unit,
+    })
+```
+
+This layer looks trivial but significantly improves operational stability. When the model stuffs `"100km"` into a numeric field, the error is logged immediately and the agent gets a chance to pick a different strategy.
+
+### FastAPI agent execution endpoint
+
+```python
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class AgentRequest(BaseModel):
+    question: str
+
+@app.post('/agent/run')
+def run_agent(req: AgentRequest):
+    result = agent_executor.invoke({'input': req.question})
+    steps = [
+        {
+            'tool': action.tool,
+            'tool_input': str(action.tool_input),
+            'observation': observation,
+        }
+        for action, observation in result['intermediate_steps']
+    ]
+    return {
+        'question': req.question,
+        'answer': result['output'],
+        'steps': steps,
+    }
+```
+
+This response shape is the core of agent observability. The caller can trace "why did it answer this way" step by step, and operators can accumulate failure cases as reproducible test fixtures.
+
+## Tool permission boundaries and timeouts
+
+In production, not every tool is exposed to every request. Limit the available tool set by user role, org policy, or request risk level.
+
+```python
+ROLE_TOOL_POLICY = {
+    'viewer': {'word_count', 'get_current_time'},
+    'support': {'word_count', 'get_current_time', 'search_policy'},
+    'analyst': {'word_count', 'get_current_time', 'calculate', 'unit_convert'},
+}
+
+def allowed_tools_for_role(role: str, all_tools: list):
+    allowed_names = ROLE_TOOL_POLICY.get(role, set())
+    return [t for t in all_tools if t.name in allowed_names]
+```
+
+### Timeout and circuit breaker
+
+When a tool calls an external API, a missing timeout blocks the entire agent loop. Separate timeout and retry policy per tool.
+
+```python
+import time
+
+def call_with_timeout(tool_fn, kwargs: dict, timeout_sec: float = 2.0):
+    start = time.time()
+    result = tool_fn(**kwargs)
+    elapsed = time.time() - start
+    if elapsed > timeout_sec:
+        return f"error: tool_timeout elapsed={elapsed:.2f}s"
+    return result
+```
+
+Without this layer, it becomes impossible to tell whether an agent failure stems from model reasoning or external tool latency.
+
+## Agent failure classification and playbook
+
+Classifying agent failures by type speeds up response time. Common failure types:
+
+- `tool_not_found`: model generated a disallowed tool name
+- `tool_argument_invalid`: input schema mismatch
+- `tool_runtime_error`: exception inside the tool
+- `max_iterations_exceeded`: loop cap reached
+
+```python
+def classify_agent_failure(result: dict) -> str:
+    if result.get('output'):
+        return 'success'
+
+    steps = result.get('intermediate_steps', [])
+    if not steps:
+        return 'no_action_generated'
+
+    last_obs = str(steps[-1][1]).lower()
+    if 'invalid arguments' in last_obs:
+        return 'tool_argument_invalid'
+    if 'timeout' in last_obs:
+        return 'tool_runtime_error'
+    return 'unknown_failure'
+```
+
+### Playbook
+
+```text
+if tool_argument_invalid -> strengthen schema hints + add few-shot examples
+if tool_runtime_error -> review timeout/retry policy
+if max_iterations_exceeded -> clarify termination conditions in prompt
+```
+
+This classification turns vague reports like "the agent is sometimes weird" into actionable improvement tasks.
+
+## System prompt minimum template
+
+Agent quality depends on constraint clarity more than prompt length. Short, fixed rules for tool selection stabilize the loop.
+
+```text
+You are a tool-based assistant.
+Rule 1) Generate an Action only for questions that need a tool.
+Rule 2) Tool arguments must follow the JSON schema.
+Rule 3) If the Observation is an error, explain the cause and retry at most once.
+Rule 4) When evidence is sufficient, write the Final Answer and stop.
+```
+
+Even brief rules significantly reduce repeated failures. An agent becomes more stable when told what NOT to do rather than given broad freedom.
+
+### Tool selection regression test
+
+Maintain a fixed set of at least 20 questions and verify that the first tool choice matches expectations. This test catches prompt edits that silently break tool routing.
+
+---
+
 ## Conclusion
 
 The agent pattern extends chain-based LLM apps into systems that can reason across multiple steps and tools. The docstring is the only signal the LLM has for tool selection — treat it as a contract, not a comment. Keep tools narrow and focused: one clear responsibility each, error messages instead of exceptions, and deterministic behavior for the same input.
