@@ -309,6 +309,155 @@ When the TaskSpec is the single source of truth, prompt, verifier, and evals sta
 
 ---
 
+## Writing Good Completion Criteria
+
+Good completion criteria satisfy three conditions.
+
+**1. Objective.** Decidable without subjective human judgment.
+- Bad: "The report should be well-organized"
+- Good: "The report contains all four sections (summary, revenue, cost, conclusion)"
+
+**2. Automatically verifiable.** Checkable by code.
+- Bad: "Relevant references are sufficiently cited"
+- Good: "Body contains at least 3 footnotes, each with a valid URL"
+
+**3. Measurable.** Pass/fail is unambiguous.
+- Bad: "Response should be fast"
+- Good: "Entire task completes within 60 seconds"
+
+Expressed in code:
+
+```python
+class TaskCandidate(BaseModel):
+    """Candidate task — incomplete spec."""
+    description: str
+    missing_fields: list[str] = []
+
+    def to_spec(self, **filled) -> TaskSpec | None:
+        """Convert to a TaskSpec. Returns None if fields are missing."""
+        if self.missing_fields:
+            return None
+        return TaskSpec(**filled)
+
+def request_to_tasks(request: str) -> list[TaskCandidate]:
+    """Convert a vague request into task candidates."""
+    return [
+        TaskCandidate(
+            description="Send a weekly retrospective summary",
+            missing_fields=["recipient", "data_source"],
+        ),
+        TaskCandidate(
+            description="Visualize the meeting load",
+            missing_fields=["chart_type", "time_range"],
+        ),
+    ]
+
+candidates = request_to_tasks("Do something about productivity")
+for c in candidates:
+    if c.missing_fields:
+        print(f"Need clarification: {c.description}")
+        print(f"  Missing fields: {c.missing_fields}")
+```
+
+Criteria defined this way connect directly to the Test Harness in Episode 6. Completion conditions become test cases.
+
+---
+
+## TaskSpec JSON Schema and Contract Testing
+
+When operating Task Harness across a team, fields that exist in documentation but are not enforced at runtime appear quickly. To prevent this, pin the TaskSpec to a JSON Schema and validate at the API input layer. The key principle: do not separate human-readable descriptions from machine-enforced contracts.
+
+```python
+from jsonschema import Draft202012Validator
+
+TASK_SPEC_SCHEMA = {
+    "type": "object",
+    "required": [
+        "task_id", "goal", "inputs", "outputs",
+        "completion_criteria", "constraints",
+    ],
+    "properties": {
+        "task_id": {"type": "string", "pattern": r"^task-[a-z0-9\-]{8,}$"},
+        "goal": {"type": "string", "minLength": 10, "maxLength": 300},
+        "inputs": {
+            "type": "object",
+            "required": ["source", "parameters"],
+            "properties": {
+                "source": {"type": "string"},
+                "parameters": {"type": "object"},
+            },
+            "additionalProperties": False,
+        },
+        "outputs": {
+            "type": "object",
+            "required": ["format", "destination", "schema"],
+            "properties": {
+                "format": {"enum": ["json", "markdown", "csv"]},
+                "destination": {"type": "string"},
+                "schema": {"type": "string"},
+            },
+            "additionalProperties": False,
+        },
+        "completion_criteria": {
+            "type": "array",
+            "minItems": 1,
+            "items": {"type": "string", "minLength": 8},
+        },
+        "constraints": {
+            "type": "object",
+            "required": ["max_tool_calls", "max_runtime_seconds", "approval_required"],
+            "properties": {
+                "max_tool_calls": {"type": "integer", "minimum": 1, "maximum": 20},
+                "max_runtime_seconds": {"type": "integer", "minimum": 5, "maximum": 300},
+                "approval_required": {"type": "boolean"},
+            },
+            "additionalProperties": False,
+        },
+    },
+    "additionalProperties": False,
+}
+
+validator = Draft202012Validator(TASK_SPEC_SCHEMA)
+
+def validate_task_spec(payload: dict) -> list[str]:
+    return [f"{e.json_path}: {e.message}" for e in validator.iter_errors(payload)]
+```
+
+Example valid payload:
+
+```json
+{
+  "task_id": "task-refund-20260512",
+  "goal": "Summarize pending-approval refund requests from the past 7 days into a report",
+  "inputs": {
+    "source": "postgres://ops/refunds",
+    "parameters": {
+      "from": "2026-05-05",
+      "to": "2026-05-12",
+      "status": "pending_approval"
+    }
+  },
+  "outputs": {
+    "format": "json",
+    "destination": "s3://ops-reports/refund-pending-2026-05-12.json",
+    "schema": "RefundPendingSummaryV1"
+  },
+  "completion_criteria": [
+    "Summary record count matches the source query result count",
+    "Each item contains request_id, amount, requested_at, and approver_group fields"
+  ],
+  "constraints": {
+    "max_tool_calls": 6,
+    "max_runtime_seconds": 90,
+    "approval_required": false
+  }
+}
+```
+
+With this pattern, Task Harness becomes a runtime contract rather than a documentation standard. The Test Harness can reuse this schema directly as a test fixture.
+
+---
+
 ## Common Mistakes
 
 **1. Using the Goal as the Task directly.**
