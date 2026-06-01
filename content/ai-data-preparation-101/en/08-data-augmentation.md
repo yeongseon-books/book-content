@@ -274,6 +274,163 @@ print(rename_vars(src))
 
 This branch is still important because it shows that for code corpora, AST-level changes preserve semantics far better than token edits. But it is a separate branch because the current scenario is about Korean text classification, not code generation.
 
+## Fixing the augmentation pipeline as a DAG
+
+As augmentation experiments grow, the first requirement is execution-order control, not technique selection. In production, you separate `select -> augment -> guardrail -> dedup -> eval -> approve` as a DAG.
+
+```python
+AUG_DAG = {
+    "select_train_slice": [],
+    "augment_candidates": ["select_train_slice"],
+    "apply_korean_guardrail": ["augment_candidates"],
+    "semantic_dedup": ["apply_korean_guardrail"],
+    "merge_train": ["semantic_dedup"],
+    "heldout_eval": ["merge_train"],
+    "approve_or_reject": ["heldout_eval"],
+}
+```
+
+With this structure, when a specific stage fails, the decision whether to discard the entire batch or retry from a certain stage becomes clear.
+
+## Augmented sample validation schema
+
+```python
+from pydantic import BaseModel, Field
+
+class AugmentedRow(BaseModel):
+    source_id: str
+    text: str
+    label: str
+    aug_method: str
+    similarity: float = Field(ge=0.0, le=1.0)
+    passed_guardrail: bool
+
+class AugmentBatchReport(BaseModel):
+    batch_id: str
+    n_candidates: int
+    n_kept: int
+    keep_ratio: float
+    macro_f1_delta: float
+    slice_metric_delta: dict
+```
+
+## Back-translation example with verification
+
+```python
+# pseudo-code
+def back_translate_ko(text: str, mt_ko_en, mt_en_ko):
+    mid = mt_ko_en(text)
+    out = mt_en_ko(mid)
+    return out
+
+def keep_bt_sample(src: str, cand: str, sim_fn) -> bool:
+    sim = sim_fn(src, cand)
+    if sim < 0.76 or sim > 0.98:
+        return False
+    if any(x in cand for x in ["개인정보", "계정 정지"]):
+        return False
+    return True
+```
+
+Augmentation ultimately must close with a metric improvement. Even if `keep_ratio` is high, a batch that shows no held-out gain should be discarded.
+
+## Before/after augmented sample
+
+```text
+Original: 환불이 지연되고 있는데 진행 상태를 확인하고 싶습니다.
+Augmented: 환불 처리가 늦어지고 있어 현재 진행 상황을 알고 싶습니다.
+```
+
+This level of variation expands expression diversity while preserving the label. Conversely, sentences where policy meaning shifts must be discarded even if similarity is high.
+
+## Augmentation inclusion ratio (cap) operating rules
+
+When augmented samples outnumber originals, the model can overfit to the transformed distribution. Setting a per-class inclusion cap is safer.
+
+```python
+AUG_CAP = {
+    "refund_delay": 0.8,   # augmented <= 80% of original class rows
+    "cancel_plan": 0.5,
+    "outage_question": 0.4,
+    "feature_request": 0.4,
+}
+
+def apply_cap(original_count: int, augmented_rows: list[dict], label: str) -> list[dict]:
+    cap = int(original_count * AUG_CAP[label])
+    return augmented_rows[:cap]
+```
+
+## Augmentation batch quality report
+
+```python
+def augment_report(rows: list[dict]) -> dict:
+    sims = [r["similarity"] for r in rows]
+    return {
+        "n_rows": len(rows),
+        "avg_similarity": sum(sims) / max(len(sims), 1),
+        "min_similarity": min(sims) if sims else 0.0,
+        "max_similarity": max(sims) if sims else 0.0,
+        "method_dist": {m: sum(r["aug_method"] == m for r in rows) for m in sorted(set(r["aug_method"] for r in rows))},
+    }
+```
+
+Looking at `avg_similarity` alone creates false confidence. You need `min/max` and method distribution together to prevent a single technique from dominating the batch.
+
+## Production defaults
+
+- First run: start with paraphrase as the sole technique.
+- If held-out improvement is confirmed, add a small amount of back-translation.
+- EDA is the last resort for Korean data.
+
+Following this order significantly reduces augmentation experiment failure cost.
+
+## Inspection questions for immediate ops use
+
+The questions below are actual check items used in pre-deployment reviews. Each question must be answerable with a file path or metric value, not just a document reference.
+
+1. Which dataset version is this batch from, and what is the sha256?
+2. How much has the duplicate/null/length distribution changed compared to the previous batch?
+3. Which rules caused sample removal, and what are the top rejection reasons?
+4. How much contamination risk remains at the train/eval/test boundary, in numeric terms?
+5. Which samples were human-reviewed in this batch, and what error types were found?
+
+```python
+def release_readiness(summary: dict) -> tuple[bool, list[str]]:
+    issues = []
+    if not summary.get("dataset_sha256"):
+        issues.append("missing_dataset_sha256")
+    if summary.get("duplicate_ratio", 1.0) > 0.10:
+        issues.append("duplicate_ratio_too_high")
+    if summary.get("null_ratio", 1.0) > 0.02:
+        issues.append("null_ratio_too_high")
+    if summary.get("contamination_ratio", 1.0) > 0.01:
+        issues.append("contamination_ratio_too_high")
+    if summary.get("human_reviewed_rows", 0) < 100:
+        issues.append("insufficient_human_review")
+    return len(issues) == 0, issues
+```
+
+Operations teams may not use this function verbatim, but the same concepts must be implemented as pipeline gates. The key principle is: never judge readiness by feel.
+
+## Production log example
+
+```text
+[release-check] dataset=v2.4.1 sha=4fb1...
+[release-check] duplicate_ratio=0.061 null_ratio=0.008
+[release-check] contamination_ratio=0.004 human_reviewed_rows=240
+[release-check] status=PASS
+```
+
+With this single log block, even when model performance wavers, you can quickly exclude or deep-dive the data preparation stage. Data preparation quality shows not in a single article's explanation but in repeatable verification logs like this.
+
+### Augmentation stop conditions
+
+If `macro_f1` does not improve in a new batch, or if a specific class precision drops for two consecutive runs, stop augmentation experiments immediately and switch to root-cause analysis.
+
+### Minimum items for release notes
+
+Changes at this stage must also appear in release notes. At minimum, include `changed rule`, `affected row count`, `key metric delta`, and `rollback path` so the same decision can be replicated in the next batch.
+
 ## Common points of confusion
 
 - **Augmenting validation makes evaluation more realistic**: no. That is leakage.
