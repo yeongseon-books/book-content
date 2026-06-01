@@ -229,6 +229,186 @@ Cleaning and dedup follow a strict order.
 
 Dedup before cleaning lets whitespace-different copies survive as distinct. Cross-dedup before splitting leaves you with no clean rule for which side to drop from.
 
+## Recording Before/After Samples with Quality Metrics
+
+The fastest way to break team consensus on cleaning rules is arguing about whether a rule "improved" things. Instead of debating, show before/after samples alongside hard numbers.
+
+```python
+import pandas as pd
+
+
+def summarize_before_after(raw_df: pd.DataFrame, clean_df: pd.DataFrame) -> dict:
+    raw_text = raw_df["text"].astype(str)
+    clean_text = clean_df["text"].astype(str)
+    return {
+        "raw_rows": len(raw_df),
+        "clean_rows": len(clean_df),
+        "row_drop_ratio": 1 - len(clean_df) / max(len(raw_df), 1),
+        "raw_dup_ratio": 1 - raw_text.nunique() / max(len(raw_text), 1),
+        "clean_dup_ratio": 1 - clean_text.nunique() / max(len(clean_text), 1),
+        "raw_avg_len": float(raw_text.str.len().mean()),
+        "clean_avg_len": float(clean_text.str.len().mean()),
+    }
+
+
+SAMPLE_BEFORE = "<div>Ad inquiry 010-1111-2222</div>\n\nSign up now for 50% off"
+SAMPLE_AFTER = "Sign up now for 50% off"
+```
+
+**Before/After example**
+
+```text
+before: <div>Ad inquiry 010-1111-2222</div>
+
+        Sign up now for 50% off
+after : Sign up now for 50% off
+```
+
+When you attach samples like this, objections like "the numbers look better but meaning got destroyed" become immediately verifiable rather than speculative.
+
+## MinHash Threshold Tuning Procedure
+
+Picking a MinHash threshold by gut feel causes false positives and false negatives to rise together. In practice, you fix the threshold using hand-labeled pair samples first.
+
+```python
+CANDIDATE_THRESHOLDS = [0.75, 0.80, 0.85, 0.90]
+
+
+# hand_labeled_pairs: List[(doc_a, doc_b, is_duplicate)]
+def evaluate_threshold(hand_labeled_pairs, near_dup_fn):
+    out = []
+    for th in CANDIDATE_THRESHOLDS:
+        tp = fp = fn = 0
+        for a, b, y in hand_labeled_pairs:
+            pred = near_dup_fn(a, b, threshold=th)
+            if pred and y:
+                tp += 1
+            elif pred and not y:
+                fp += 1
+            elif (not pred) and y:
+                fn += 1
+        precision = tp / max(tp + fp, 1)
+        recall = tp / max(tp + fn, 1)
+        out.append({"threshold": th, "precision": precision, "recall": recall})
+    return out
+```
+
+The operational default usually favors precision slightly over recall. Incorrectly removing a non-duplicate causes immediate information loss, while missing a true duplicate only inflates storage and slightly skews training distribution.
+
+## Versioning Dedup Results with DVC
+
+Cleaning and dedup produce large artifacts with frequent reruns—too heavy for Git alone. Pairing DVC with Git ties data versions to code commits.
+
+```bash
+dvc add data/clean/train_dedup.parquet
+git add data/clean/train_dedup.parquet.dvc dvc.lock dvc.yaml
+git commit -m "Add deduplicated train set v1.3"
+```
+
+```yaml
+stages:
+  clean_dedup:
+    cmd: python pipelines/clean_dedup.py --input data/raw/train.parquet --output data/clean/train_dedup.parquet
+    deps:
+      - pipelines/clean_dedup.py
+      - data/raw/train.parquet
+    outs:
+      - data/clean/train_dedup.parquet
+    metrics:
+      - reports/clean_dedup_metrics.json
+```
+
+With this setup, "why did row count drop 12% since yesterday?" becomes answerable by checking out the previous DVC version and diffing the metrics JSON.
+
+## Data Cleaning Validation Schema
+
+If you only save cleaning results as a free-form JSON, missing fields go unnoticed until something downstream breaks. A validation schema catches quality regressions early.
+
+```python
+from pydantic import BaseModel, Field
+
+
+class CleaningMetrics(BaseModel):
+    raw_rows: int = Field(ge=1)
+    clean_rows: int = Field(ge=1)
+    raw_dup_ratio: float = Field(ge=0.0, le=1.0)
+    clean_dup_ratio: float = Field(ge=0.0, le=1.0)
+    row_drop_ratio: float = Field(ge=0.0, le=1.0)
+    minhash_threshold: float = Field(ge=0.5, le=0.99)
+
+
+class CleaningGate(BaseModel):
+    max_row_drop_ratio: float = 0.30
+    max_clean_dup_ratio: float = 0.08
+
+
+def pass_gate(metrics: CleaningMetrics, gate: CleaningGate) -> bool:
+    return (
+        metrics.row_drop_ratio <= gate.max_row_drop_ratio
+        and metrics.clean_dup_ratio <= gate.max_clean_dup_ratio
+    )
+```
+
+## Duplicate-Rate Comparison Table
+
+| Stage | Dup Ratio | Notes |
+| --- | ---: | --- |
+| raw | 0.31 | Many footer copies from crawling |
+| clean + exact dedup | 0.14 | Whitespace/case differences removed |
+| + MinHash near dedup | 0.06 | Similar-doc clusters collapsed |
+| post-split train/eval cross-dedup | 0.00 (cross) | Evaluation contamination prevented |
+
+Reporting cross-duplicate rate as a separate line item is what lets you actually explain evaluation reliability to stakeholders.
+
+## Inspection Questions for Immediate Ops Use
+
+These questions come up in every pre-release review. The point is not to recite them—it is to answer each one with a file path or metric value on the spot.
+
+1. Which version did this dataset come from, and what is its sha256?
+2. How much did duplicate/null/length distributions shift compared to the last batch?
+3. Which samples were removed, by which rule, and what are the top removal reasons?
+4. What is the measured leakage rate at the train/eval/test boundary?
+5. How many samples did a human review this batch, and what error types were found?
+
+```python
+def release_readiness(summary: dict) -> tuple[bool, list[str]]:
+    issues = []
+    if not summary.get("dataset_sha256"):
+        issues.append("missing_dataset_sha256")
+    if summary.get("duplicate_ratio", 1.0) > 0.10:
+        issues.append("duplicate_ratio_too_high")
+    if summary.get("null_ratio", 1.0) > 0.02:
+        issues.append("null_ratio_too_high")
+    if summary.get("contamination_ratio", 1.0) > 0.01:
+        issues.append("contamination_ratio_too_high")
+    if summary.get("human_reviewed_rows", 0) < 100:
+        issues.append("insufficient_human_review")
+    return len(issues) == 0, issues
+```
+
+Even if your ops team does not use this exact function, they need the same concept implemented as a pipeline gate. The key principle: never judge readiness by feel.
+
+## Production Log Example
+
+```text
+[release-check] dataset=v2.4.1 sha=4fb1...
+[release-check] duplicate_ratio=0.061 null_ratio=0.008
+[release-check] contamination_ratio=0.004 human_reviewed_rows=240
+[release-check] status=PASS
+```
+
+When model performance wobbles, this single log block lets you quickly rule out (or zero in on) the data preparation stage. Data quality shows itself not in a single essay, but in repeatable verification logs like this.
+
+### Dedup Failure Recovery Rules
+
+If near-dedup over-fires and removes too many documents, roll back immediately to the previous DVC artifact and re-run with the threshold raised one step. Record both the rollback rationale and the re-run results in the same report so the decision history is preserved.
+
+### Minimum Items for Release Notes
+
+Every cleaning/dedup change must appear in release notes with at least four items: the changed rule, the number of affected rows, the key metric delta, and the rollback path. Without these, the next batch operator will repeat the same judgment from scratch.
+
+When threshold changes, always include a comparison table against the previous batch. Maintain weekly sample-based manual review to catch over-deletion regressions early. Re-evaluate cleaning criteria quarterly to keep up with domain drift.
+
 ## Common Mistakes
 
 1. **Cleaning function with too many transforms**: Past 10 regexes in one function, debugging is impossible. Split into small steps with per-stage logging.
