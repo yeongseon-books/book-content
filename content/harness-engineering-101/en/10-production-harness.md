@@ -203,6 +203,169 @@ def build_refund_agent() -> HarnessStack:
 
 Register this stack with `HarnessRouter`, deploy it 1% → 100% through `CanaryDeployer`, and you have a production-ready agent.
 
+---
+
+## Deployment Artifact Version Manifest
+
+The core principle of Production Harness is that "what is deployed" must be explainable in a single file. A code SHA alone is not enough. Prompts, tool registry, policy, and eval suite must be bundled together for rollback to be precise.
+
+```yaml
+# harness_release.yaml
+release_id: he101-2026-05-21-r3
+app_commit: 9f20d10
+prompt_bundle:
+  id: prompt-refund-v7
+  checksum: sha256:13f8...
+tool_registry:
+  id: tools-refund-v4
+  checksum: sha256:21ac...
+constraint_policy:
+  id: policy-refund-v3
+  checksum: sha256:9a70...
+approval_policy:
+  id: approval-refund-v2
+  checksum: sha256:6f1d...
+eval_suite:
+  id: eval-refund-v5
+  pass_threshold: 0.90
+  checksum: sha256:7ed2...
+```
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class ReleaseManifest:
+    release_id: str
+    app_commit: str
+    prompt_bundle_id: str
+    tool_registry_id: str
+    constraint_policy_id: str
+    approval_policy_id: str
+    eval_suite_id: str
+
+def assert_release_compatible(m: ReleaseManifest, loaded: dict) -> None:
+    if m.prompt_bundle_id != loaded["prompt_bundle_id"]:
+        raise RuntimeError("prompt bundle mismatch")
+    if m.tool_registry_id != loaded["tool_registry_id"]:
+        raise RuntimeError("tool registry mismatch")
+    if m.eval_suite_id != loaded["eval_suite_id"]:
+        raise RuntimeError("eval suite mismatch")
+```
+
+Running this check at startup catches combination errors like "new code but old eval suite" before deployment rather than after.
+
+---
+
+## Production Verification Gates
+
+If minimum automated verification does not pass before canary, do not deploy at all. These gates form the most practical baseline.
+
+```python
+@dataclass
+class PreflightResult:
+    structure_ok: bool
+    eval_ok: bool
+    policy_ok: bool
+    tracing_ok: bool
+
+def run_preflight_checks() -> PreflightResult:
+    structure_ok = run_article_structure_like_checks()
+    eval_ok = run_eval_suite("evals/refund/v5.jsonl", threshold=0.90)
+    policy_ok = run_policy_contract_tests()
+    tracing_ok = run_trace_contract_tests()
+    return PreflightResult(structure_ok, eval_ok, policy_ok, tracing_ok)
+
+def assert_preflight_passed(r: PreflightResult) -> None:
+    if not (r.structure_ok and r.eval_ok and r.policy_ok and r.tracing_ok):
+        raise RuntimeError(f"preflight failed: {r}")
+```
+
+The critical point: these test categories do not substitute for each other. Even if eval passes, broken tracing contracts mean you cannot replay incidents in production.
+
+---
+
+## Operational Transition Patterns: Shadow, Canary, Full
+
+In practice, jumping straight to canary is riskier than starting with shadow. Shadow duplicates real requests to the candidate version but does not return candidate results to users.
+
+```text
+Rollout stages
+1) Shadow  (0% user impact): only baseline response returned; candidate runs internally for comparison
+2) Canary  (1% -> 10% -> 50%): candidate results reach a subset of users
+3) Full    (100%): all traffic transitions
+```
+
+```python
+def shadow_compare(baseline_result: dict, candidate_result: dict) -> dict:
+    return {
+        "semantic_score": compare_semantics(baseline_result, candidate_result),
+        "policy_diff": diff_policy_violations(baseline_result, candidate_result),
+        "tool_call_diff": diff_tool_calls(baseline_result, candidate_result),
+    }
+```
+
+If the semantic score stays consistently low or policy diffs grow during shadow, do not promote to canary. This stage lets you collect failure patterns with zero user impact.
+
+---
+
+## Production Environment Configuration Example
+
+Production Harness is not complete with code structure alone. Environment variables, feature flags, and emergency kill switches must all be included for operators to maintain control.
+
+```yaml
+# prod_config.yaml
+agent_runtime:
+  model: gpt-4.1
+  temperature: 0.0
+  timeout_seconds: 45
+  max_attempts: 3
+
+feature_flags:
+  enable_reflection: true
+  enable_shadow_compare: true
+  enable_approval_gate: true
+  disable_issue_refund_tool: false
+
+safety_switches:
+  emergency_read_only_mode: false
+  block_external_send: false
+  force_human_approval_all: false
+```
+
+```python
+def apply_emergency_switches(config: dict, stack) -> None:
+    safety = config.get("safety_switches", {})
+    if safety.get("emergency_read_only_mode"):
+        stack.tools.disable_side_effect_tools()
+    if safety.get("block_external_send"):
+        stack.tools.disable_tools({"send_customer_email", "send_slack"})
+    if safety.get("force_human_approval_all"):
+        stack.approval.force_all_actions()
+```
+
+Emergency switches let you contain blast radius during incidents without deploying new code. Production Harness must cover not just steady-state quality but also emergency controllability.
+
+---
+
+## Operational Maturity Checkpoint
+
+Finally, criteria for determining whether a team is in an "operationally ready" state:
+
+1. Preflight and eval run automatically on every new release; deployment halts when thresholds are not met.
+2. Per-stage canary promotion criteria are documented; promote/rollback can happen without manual judgment.
+3. On-call can reconstruct input, tool calls, approval decisions, and cost from a single `trace_id` within five minutes.
+4. Emergency switch drills run quarterly, with results reflected in the runbook.
+5. Incident cases enter the regression suite and automatically block recurrence in the next release.
+
+When these five are in place, the Production Harness becomes an actual operating system rather than an architecture diagram.
+
+Include cost guardrails in deployment rules as well. Even if functional quality holds, per-request cost spiking above baseline makes the system unviable long-term. Add a cost ceiling to canary promotion conditions; on breach, auto-rollback or revert to shadow.
+
+The essence of Production Harness is change control. When you can explain what changed, immediately revert to the previous state if something breaks, and on-call can reproducibly follow that process—only then can you call it a production-ready agent.
+
+---
+
 ## Five Common Mistakes
 
 1. **Adopting all harnesses at once.** The operational burden lands all at once and no harness gets used properly. Start with Approval and Observability.
