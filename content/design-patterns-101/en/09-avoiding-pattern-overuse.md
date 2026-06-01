@@ -494,6 +494,12 @@ Patterns gain value when a problem repeats. When a problem appears once, solve i
 
 The best code is not code with many patterns — it is code where patterns exist only where they are needed.
 
+## Checklist
+
+- [ ] I can name at least three signs of pattern overuse.
+- [ ] I can state criteria to check before applying a pattern.
+- [ ] I can give an example where a simple solution beats a pattern.
+
 ## Answering the Opening Questions
 
 - **What signals indicate that a pattern is making code worse rather than better?**

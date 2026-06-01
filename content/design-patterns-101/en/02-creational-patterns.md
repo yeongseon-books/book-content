@@ -347,6 +347,12 @@ During code review, I ask these questions in order when deciding whether to intr
 
 Reaching question 5 is rare. Most creation problems resolve at 1 or 2.
 
+## Checklist
+
+- [ ] I can explain the difference between Singleton, Factory Method, and Abstract Factory.
+- [ ] I can give an example where Builder is needed.
+- [ ] I can state the common problem creational patterns solve.
+
 ## Answering the Opening Questions
 
 - **What exactly improves — and what gets worse — when object-creation code is separated out?**

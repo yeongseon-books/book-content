@@ -462,6 +462,12 @@ def bootstrap() -> OrderService:
 
 Second, add `self.repo.__class__.__name__` to the debugger watch list. It reveals which implementation was injected at runtime, instantly.
 
+## Checklist
+
+- [ ] I can explain the difference between Factory Method and Abstract Factory.
+- [ ] I can explain why DI makes testing easier.
+- [ ] I can implement DI in Python.
+
 ## Answering the Opening Questions
 
 - **Why does testing become painful when an object creates its own collaborators?**

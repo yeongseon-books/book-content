@@ -405,6 +405,12 @@ Observer is not free. Adopting it means losing the following.
 
 I apply this threshold for deciding whether the cost is worth it: **three or more downstream actions, likely to grow further, and failure in any downstream action must not abort the publisher's core responsibility.** When those conditions are not met, direct calls are better.
 
+## Checklist
+
+- [ ] I can list the components of the Observer pattern.
+- [ ] I can give an event-driven example using Observer.
+- [ ] I can implement Observer in Python.
+
 ## Answering the Opening Questions
 
 - **What coupling does Observer break, and what cost does it introduce instead?**

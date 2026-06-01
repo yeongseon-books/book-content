@@ -669,6 +669,12 @@ Django's `View`, `ModelAdmin`, and `Form` are designed for inheritance-based ext
 
 I summarize this judgment in one sentence: **"If expressing something as functions pushes state management onto callers, or makes object relationships invisible in the code, classes are the right tool."**
 
+## Checklist
+
+- [ ] I can name GoF patterns replaced by Python built-ins.
+- [ ] I can explain which patterns decorators and context managers replace.
+- [ ] I can describe the difference between Pythonic and traditional implementations.
+
 ## Answering the Opening Questions
 
 - **When implementing Singleton as a class in Python, what problems arise — and what new problems appear when replacing it with a module variable?**

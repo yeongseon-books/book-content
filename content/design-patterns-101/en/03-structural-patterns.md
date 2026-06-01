@@ -319,6 +319,12 @@ Patterns are not free. Knowing what is lost before introducing one matters.
 
 I recommend that whenever a team introduces a structural pattern, they write one sentence answering "is what this pattern costs less than the cost of the current problem?" If the sentence cannot be written, it is not yet time to introduce the pattern.
 
+## Checklist
+
+- [ ] I can explain the difference between Adapter and Facade.
+- [ ] I can describe when Composite is appropriate.
+- [ ] I can state the common problem structural patterns solve.
+
 ## Answering the Opening Questions
 
 - **What concretely changes when composition replaces inheritance?**

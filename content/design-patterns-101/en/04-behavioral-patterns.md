@@ -411,6 +411,12 @@ Visitor traverses an object structure (e.g., an AST, a file tree) and performs t
 | Memento | State restoration possible | Memory usage increase |
 | Visitor | Operations added without structure change | Every Visitor must update when a new node type is added |
 
+## Checklist
+
+- [ ] I can explain the difference between Strategy and State.
+- [ ] I can describe how Observer works.
+- [ ] I can state the common problem behavioral patterns solve.
+
 ## Answering the Opening Questions
 
 - **What makes Command different from a plain function call?**

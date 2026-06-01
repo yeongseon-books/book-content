@@ -449,6 +449,12 @@ class AggressiveDiscount:
         )
 ```
 
+## Checklist
+
+- [ ] I can list the components of the Strategy pattern.
+- [ ] I can explain when to replace if/else branches with Strategy.
+- [ ] I can implement Strategy in Python.
+
 ## Answering the Opening Questions
 
 - **Are all `if/elif` branches Strategy candidates, or must specific conditions be met?**

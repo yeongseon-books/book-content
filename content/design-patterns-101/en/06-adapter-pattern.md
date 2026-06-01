@@ -456,6 +456,12 @@ class StripeAdapterWithErrorTranslation:
 
 The domain only needs to know `PaymentError`. It checks the `retriable` flag to decide whether to retry, and Stripe's proprietary exception hierarchy never leaks past the Adapter.
 
+## Checklist
+
+- [ ] I can give an example where Adapter is needed.
+- [ ] I can explain the difference between class adapter and object adapter.
+- [ ] I can implement Adapter in Python.
+
 ## Answering the Opening Questions
 
 - **What dependency, exactly, does an Adapter cut?**

@@ -449,6 +449,12 @@ class AggressiveDiscount:
         )
 ```
 
+## 체크리스트
+
+- [ ] Strategy 패턴의 구성 요소를 나열할 수 있습니다.
+- [ ] if/else 분기를 Strategy로 바꾸는 기준을 설명할 수 있습니다.
+- [ ] Python에서 Strategy를 구현하는 방법을 보여줄 수 있습니다.
+
 ## 처음 질문으로 돌아가기
 
 - **모든 `if/elif` 분기가 Strategy 후보일까요, 아니면 특정 조건을 만족해야 할까요?**

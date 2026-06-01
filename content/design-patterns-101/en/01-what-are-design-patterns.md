@@ -158,6 +158,12 @@ If I had to pick a single thing to carry away from this chapter, it would be thi
 
 The next chapter covers Creational patterns, the first of the GoF families. Starting from the question "how are objects created, and who makes that decision," it begins with why Factory Method and Builder exist.
 
+## Checklist
+
+- [ ] I can define a design pattern in one sentence.
+- [ ] I can distinguish the roles of creational, structural, and behavioral categories.
+- [ ] I can explain why pattern overuse is risky.
+
 ## Answering the Opening Questions
 
 - **What does the term "design pattern" actually refer to?**
