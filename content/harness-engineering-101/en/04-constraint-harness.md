@@ -303,6 +303,65 @@ class ScopeViolation(Exception):
 
 Data-layer constraints contain the blast radius of any agent misbehavior. They are harder to bypass than application-layer checks, and their audit logs are more trustworthy.
 
+### Policy Configuration Files and Violation Code Taxonomy
+
+To operate a Constraint Harness as an extensible system, separate policy definitions from enforcement code. Declare policies in YAML and return structured violation codes at runtime — the same codes then flow into approval workflows, alert routing, and postmortem classification.
+
+```yaml
+# constraint_policy.yaml
+policy_id: policy-support-v3
+capability:
+  allowed_tools: [read_ticket, search_kb, summarize_case]
+  denied_tools: [send_email, write_db]
+resource:
+  max_prompt_tokens: 18000
+  max_completion_tokens: 2000
+  max_tool_calls: 8
+  max_runtime_seconds: 75
+behavioral:
+  deny_regex:
+    - '(?i)sk-[a-z0-9]{20,}'
+    - '(?i)password\s*[:=]'
+scope:
+  allowed_regions: [apac]
+  allowed_tables: [tickets, kb_articles]
+```
+
+```python
+from enum import Enum
+from dataclasses import dataclass
+
+class ViolationCode(Enum):
+    TOOL_NOT_ALLOWED = "tool_not_allowed"
+    TOKEN_BUDGET_EXCEEDED = "token_budget_exceeded"
+    TOOL_BUDGET_EXCEEDED = "tool_budget_exceeded"
+    OUTPUT_POLICY_VIOLATION = "output_policy_violation"
+    SCOPE_VIOLATION = "scope_violation"
+
+@dataclass
+class Violation:
+    code: ViolationCode
+    message: str
+    block: bool
+
+def enforce_tool_allowlist(tool_name: str, allowed: set[str]) -> Violation | None:
+    if tool_name not in allowed:
+        return Violation(
+            code=ViolationCode.TOOL_NOT_ALLOWED,
+            message=f"tool '{tool_name}' is not in allowlist",
+            block=True,
+        )
+    return None
+```
+
+The operational insight here is that violations must be codes, not free-text. When `scope_violation` spikes, you check data-access policies first; when `token_budget_exceeded` climbs, you revisit the Context Harness budget allocation. Structured codes make triage instant.
+
+Watch for drift after deployment. If `tool_not_allowed` violations suddenly drop to zero, it may not mean the system is safer — it may mean callers found a bypass route (direct API calls). Conversely, rising `output_policy_violation` counts usually point to input-data distribution shifts rather than prompt regressions. A Constraint Harness is only meaningful when policy definitions and enforcement logs are operated together.
+
+Policy exceptions also need explicit structure. If a high-risk maintenance window requires temporarily relaxing limits, record the exception's start/end timestamps and the approver. Without logged exceptions, post-incident analysis cannot distinguish "policy violation" from "approved override."
+
+Finally, constraint tests should lean heavily on failure cases. A test suite that only passes normal requests proves little. Negative tests — calling a denied tool, issuing out-of-scope SQL, producing PII-containing output — are what directly guarantee operational safety.
+
 ---
 
 ## Common Mistakes
