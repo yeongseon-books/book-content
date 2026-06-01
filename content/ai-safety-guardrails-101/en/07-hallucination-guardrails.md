@@ -209,6 +209,96 @@ Grounding checks have a sharp accuracy-cost tradeoff. Always measure on a regres
 
 Example targets: claim recall 0.90, precision 0.85, average latency under 800 ms.
 
+---
+
+### Claim-Level Verification Implementation Gaps
+
+Getting code to run is different from trusting the metrics. Always separate these three signals:
+
+- `citation_present`: Does the output contain a citation marker?
+- `source_exists`: Does the cited chunk actually exist in retrieval results?
+- `semantic_support`: Does the cited chunk genuinely support the claim?
+
+```python
+def verify_claim(claim: str, cited_chunk_ids: list[int], retrieved: dict[int, str]) -> dict:
+    missing = [cid for cid in cited_chunk_ids if cid not in retrieved]
+    if missing:
+        return {"ok": False, "stage": "source_exists", "missing": missing}
+    scores = {cid: entails(retrieved[cid], claim) for cid in cited_chunk_ids}
+    best_cid = max(scores, key=scores.get)
+    return {
+        "ok": scores[best_cid] >= 0.7,
+        "stage": "semantic_support",
+        "best_chunk": best_cid,
+        "score": scores[best_cid],
+    }
+```
+
+### Fake Citation Attack/Defense
+
+| Attack pattern | Example | Defense |
+|---|---|---|
+| Non-existent chunk reference | `[chunk-99]` | Source grounding failure → immediate block |
+| Distorted quote from another doc | Restates fact with opposite meaning | NLI entailment + judge |
+| Numeric manipulation | Alters dates/values only | Structured fact-check rules |
+
+```python
+import re
+
+NUM_RE = re.compile(r"\d+(?:\.\d+)?")
+
+def numeric_consistency(claim: str, evidence: str) -> bool:
+    claim_nums = set(NUM_RE.findall(claim))
+    ev_nums = set(NUM_RE.findall(evidence))
+    return claim_nums.issubset(ev_nums) if claim_nums else True
+```
+
+Even when the NLI score is high, flag if numeric consistency breaks.
+
+### Fallback Policy Standard
+
+| Failure stage | Default action | User experience |
+|---|---|---|
+| Citation failure | Regenerate once | "Re-verifying sources..." |
+| Semantic failure (partial claims) | Remove failed claims, deliver rest | "Some statements could not be verified" |
+| Semantic failure (core claim) | Block or human review | Safe alternative answer |
+
+Fixing these defaults prevents per-case ad-hoc operator decisions.
+
+### Grounding Verification Cost Optimization
+
+Claim-level verification is accurate but expensive. Applying the same check to every claim causes latency and cost spikes.
+
+| Stage | Low-cost check | High-cost check |
+|---|---|---|
+| Claim extraction | Rule-based splitting | LLM-based claim extraction |
+| Semantic verification | Bi-encoder similarity | Cross-encoder NLI |
+| Gray zone handling | Rule-based warning | LLM judge re-adjudication |
+
+```python
+def route_claim(score: float) -> str:
+    if score >= 0.85:
+        return "pass"
+    if score < 0.45:
+        return "fail"
+    return "judge"
+```
+
+This routing drastically reduces judge calls while maintaining recall.
+
+### Verification Failure Response Policy
+
+```python
+def grounding_fallback(level: str) -> str:
+    if level == "minor":
+        return "Some sources could not be confirmed. Summarizing only verified scope."
+    if level == "major":
+        return "Unable to confirm sources. Withholding answer."
+    return "Verifying sources..."
+```
+
+In high-risk domains, default `major` to block.
+
 ## Common Mistakes
 
 1. **Verifying at sentence level only.** When one sentence packs multiple claims, partial hallucinations slip through. Decompose into claims.
