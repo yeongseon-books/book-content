@@ -83,6 +83,8 @@ print(f"description: {add_numbers.description}")
 print(f"schema: {add_numbers.args_schema.model_json_schema()}")
 ```
 
+From an operational perspective, description quality matters most here. Whether the tool name is clever is far less important than making it unambiguous when the model should pick this tool. Overlapping descriptions increase wrong tool selection; thin descriptions cause the model to skip the tool entirely.
+
 ---
 
 ## Connecting tools with bind_tools()
@@ -122,6 +124,8 @@ response = llm_with_tools.invoke("What is 15 plus 27?")
 print(f"content: {response.content!r}")
 print(f"tool_calls: {response.tool_calls}")
 ```
+
+An empty `content` field here is not a bug. The model has not produced a final answer yet — it needs to call a tool first. In tool calling, **empty text plus a tool-call request is a normal intermediate state**.
 
 ---
 
@@ -205,6 +209,8 @@ for q in questions:
 ```
 
 The loop runs until the LLM produces a response with no tool calls. Each tool result is wrapped in a `ToolMessage` and appended to the conversation history. The system message matters too: it makes the success condition explicit, so a simple multiplication question is less likely to slip through as a plain text answer.
+
+From an operational perspective, logging is critical here. If you do not record which tool was called how many times for which question, tracking wrong tool selection and runaway loops later becomes very difficult.
 
 ---
 
@@ -334,6 +340,82 @@ def run_with_tools_safe(question: str) -> str:
             messages.append(ToolMessage(content=str(result), tool_call_id=tc["id"]))
     return "Max iterations reached."
 ```
+
+In production, add permission separation, an allowlist, timeouts, and audit logging on top of this. For tools that modify external systems, "the model requested it" is never sufficient justification to execute. Stabilize the loop with read-only tools first, then open write-capable tools with tight constraints.
+
+## Tool calling pattern comparison
+
+| Pattern | Description | Advantage | Operational risk |
+|---|---|---|---|
+| Single tool call | One tool call per question | Simple implementation | Weak on compound tasks |
+| Multi-tool chain | Sequential calls like add then multiply | Handles compound queries | Loop length grows |
+| Lookup + summarize | Model summarizes lookup results | User-friendly output | Lookup failure must propagate |
+
+Use this table to differentiate API policies. For example, allow multi-tool chains in production but with a lower iteration cap, while single-lookup tools get a more relaxed limit.
+
+## Forcing argument validation
+
+Without validation inside the tool, bad calls fail late. Checking ranges upfront catches model-generated invalid arguments early.
+
+```python
+from langchain_core.tools import tool
+
+@tool
+def safe_divide(a: float, b: float) -> float:
+    """Divide a by b. b must not be zero."""
+    if b == 0:
+        raise ValueError("b must not be zero")
+    return a / b
+
+@tool
+def top_k_items(items: list[str], k: int) -> list[str]:
+    """Return first k items. k must be 1..20."""
+    if not 1 <= k <= 20:
+        raise ValueError("k must be between 1 and 20")
+    return items[:k]
+```
+
+The premise is that models can be wrong. Tool calling leverages model judgment — it does not blindly trust it.
+
+## Viewing the tool loop in LangSmith
+
+When you trace a tool-calling chain, LLM runs and tool runs alternate:
+
+```text
+[trace] run_type=chain name=tool_loop
+  [child] run_type=llm name=ChatGroq tool_calls=2
+  [child] run_type=tool name=add_numbers latency_ms=1
+  [child] run_type=tool name=multiply_numbers latency_ms=1
+  [child] run_type=llm name=ChatGroq final_answer=true
+```
+
+This structure makes repeated calls easy to interpret. If the same tool appears five or more times, check whether the prompt instruction is ambiguous or the tool result format is hard for the model to parse.
+
+## ToolMessage format guide
+
+In production, keeping `ToolMessage.content` as a structured string rather than a free-form sentence is often safer.
+
+| Format | Example | Advantage | Downside |
+|---|---|---|---|
+| Free text | `"result is 42"` | Fast to implement | Unstable parsing |
+| JSON string | `"{\"result\":42}"` | Easy downstream parsing | Longer prompt input |
+| Summary + raw split | Summary sentence + internal log | User-friendly + traceable | Higher implementation complexity |
+
+For chains where tool output feeds back as tool input, JSON strings are especially advantageous. State passing remains stable when you later extend to LangGraph.
+
+## Standardizing tool-call policies
+
+When running tool calling at team scale, document the "callable tool policy" outside the code as well.
+
+| Policy item | Example |
+|---|---|
+| Allowlist | `add_numbers`, `multiply_numbers`, `get_office_hours` |
+| Blocked tools | External payment, deletion, permission-change families |
+| Iteration cap | Max 8 tool calls per request |
+| Timeout | 2 s per tool, 10 s total loop |
+| Audit log | `request_id`, `tool_name`, `args`, `result_preview` |
+
+With this standard in place, even when a model version change shifts tool-call tendencies, operational risk stays bounded.
 
 ---
 
