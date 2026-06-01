@@ -201,6 +201,129 @@ Retrying and replaying are different control paths, and collapsing them into one
 - [ ] You saved the FAISS index and loaded it back.
 - [ ] You verified retrieval against the reloaded index.
 
+## End-to-end pipeline operational conventions
+
+At the final stage, what matters is not "it ran once" but "it runs the same way every day." This requires stage orchestration, metadata contract verification, VectorDB quality checks, and run-report generation bound into a single batch convention.
+
+### Declaring inputs and outputs for each stage
+
+When each stage explicitly states which keys it reads and writes, contract violations surface early.
+
+```python
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class StageSpec:
+    name: str
+    requires: set[str]
+    provides: set[str]
+
+def validate_stage_contract(
+    context: dict[str, object], spec: StageSpec
+) -> None:
+    missing = sorted(spec.requires - set(context.keys()))
+    if missing:
+        raise RuntimeError(f'stage={spec.name} missing_inputs={missing}')
+```
+
+Running this validation before each stage catches issues like the chunking stage proceeding without `normalized_docs`.
+
+### Post-index sample queries as a quality gate
+
+Successful index storage alone is insufficient. Immediately after storage, verify that sample queries retrieve expected sources.
+
+```python
+def verify_post_index(
+    vectorstore, checks: list[tuple[str, str]], k: int = 5
+) -> None:
+    for query, expected_source in checks:
+        docs = vectorstore.similarity_search(query, k=k)
+        if not any(
+            doc.metadata.get('source') == expected_source for doc in docs
+        ):
+            raise RuntimeError(
+                f'post-index check failed query={query!r}'
+                f' expected_source={expected_source!r}'
+            )
+```
+
+This gate catches the scenario where the pipeline succeeded but search quality already collapsed.
+
+### Minimum run-report fields
+
+- Input file count, per-format success/failure counts
+- Total chunks, average length, undersized/oversized chunk counts
+- Embedding duration, index row count
+- Incremental application counts (added/updated/removed)
+- Sample search verification pass/fail
+
+```python
+import json
+
+def emit_run_report(report: dict[str, object]) -> None:
+    print(json.dumps(report, ensure_ascii=False))
+```
+
+### Fixing the pipeline completion definition as organizational policy
+
+If completion definitions vary across teams, batch success criteria waver. Lock down these conditions:
+
+1. Input discovery count is non-zero.
+2. Normalized document count and chunk count are non-zero.
+3. Failure rate stays below threshold (e.g. 3%).
+4. Post-index sample query verification passes.
+5. State store and index version share the same run_id.
+
+Enforcing these five conditions in code makes pipeline completion an executable policy rather than a judgment call.
+
+## Post-pipeline verification rehearsal
+
+Do not end an e2e batch by looking at success logs alone. Run a short rehearsal immediately after completion using queries common in production.
+
+```python
+smoke_queries = [
+    ('retention policy', 'policy.pdf'),
+    ('metadata filter', 'faq.md'),
+    ('nightly batch retry', 'ops.txt'),
+]
+
+verify_post_index(vectorstore, smoke_queries, k=5)
+```
+
+Only after this rehearsal passes should the batch status be promoted to "complete." On failure, roll back the index version to the previous batch and begin root-cause analysis.
+
+From an operations perspective, what matters is not that the batch finished but that the search contract was maintained. Bundle file count, chunk count, failure rate, and sample-query pass/fail into a single report for smoother on-call handoffs.
+
+## Extended deployment checklist
+
+- Input file count within normal range.
+- Failed document ratio below threshold (e.g. 3%).
+- At least 3 sample documents traceable by source, page, chunk_id.
+- Zero missing required metadata fields (`source`, `format`, `doc_type`).
+- Smoke-test queries return expected sources in top results.
+
+```python
+def quick_health_report(stats: dict[str, int | float]) -> None:
+    print(f"files_total={stats['files_total']}")
+    print(f"failed_total={stats['failed_total']}")
+    print(f"chunks_total={stats['chunks_total']}")
+    print(f"metadata_missing={stats['metadata_missing']}")
+    print(f"smoke_passed={stats['smoke_passed']}")
+```
+
+## Operational baseline metrics
+
+- Parsing quality: average character count, OCR ratio, reprocessing ratio
+- Chunking quality: average length, extreme-length ratio, policy version distribution
+- Metadata quality: required-field miss rate, normalization failure count
+- Retrieval verification: sample query recall@k, source hit rate
+
+## Series wrap-up: starting point for the next stage
+
+The six stages covered in this series form the minimum complete shape of a document ingestion pipeline. Adding LLM-based answer generation, user feedback loops, and A/B search experiments on top creates the full outline of a RAG system. But that expansion is only stable if the input-quality contracts and stage-verification gates built in this series are already in place.
+
 ## Answering the Opening Questions
 
 - **What stage-level verification checkpoints should a complete ingestion pipeline have?**
