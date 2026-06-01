@@ -319,6 +319,167 @@ The training loop can be validated in surprisingly small units. Once a single st
 
 The next article (episode 5) covers evaluation. We will use perplexity as a quick sanity check and combine it with golden-set qualitative and quantitative evaluation, all in code.
 
+## Trainer settings template: from small verification to production scale
+
+To grow a training loop stably, manage `TrainingArguments` in tiers.
+
+| Stage | Purpose | Key settings |
+| --- | --- | --- |
+| smoke | 1-step integrity check | `max_steps=1`, `save_strategy=no`, `report_to=[]` |
+| debug | Confirm loss curve shape | `max_steps=50–200`, `logging_steps=5` |
+| baseline | Establish a comparable reference | Fixed seed, fixed eval set, save checkpoints |
+| production-like | Actual deployment candidate training | Mixed precision, periodic eval, early stopping |
+
+Keeping this table in the team runbook lets everyone speak the same language about "which stage is this experiment?"
+
+## Hyperparameter sweep table: change only one axis at a time
+
+| Sweep axis | Fixed | Varied | Expected observation |
+| --- | --- | --- | --- |
+| Learning rate | Batch/data fixed | `1e-4`, `2e-4`, `5e-4` | Descent speed and stability |
+| Batch size | LR fixed | Effective batch 8/16/32 | Memory and convergence variance |
+| Rank | Data/LR fixed | `r=8`, `16`, `32` | Expressiveness vs overfitting |
+| Length | Model fixed | `max_length=256/384/512` | OOM risk and information loss |
+
+The rule is simple: if more than one axis moved, do not record a conclusion.
+
+## Loss curve interpretation: read shape, not just numbers
+
+```text
+step  1: loss=8.72
+step 10: loss=7.95
+step 20: loss=7.41
+step 30: loss=7.38
+step 40: loss=7.51
+step 50: loss=7.62
+```
+
+This example shows an initial descent followed by a rebound. Typically suspect excessive learning rate, insufficient data, or missing label masking. A gentle descent followed by stabilization is the normal pattern.
+
+## VRAM usage comparison: the effect of batch size and sequence length
+
+Below are commonly observed tendencies on the same model.
+
+| Setting | Peak VRAM (example) | Note |
+| --- | --- | --- |
+| batch=2, max_length=256 | 5.1 GB | Stable zone |
+| batch=2, max_length=512 | 7.8 GB | Length increase has large impact |
+| batch=4, max_length=256 | 8.4 GB | Batch increase has large impact |
+| batch=1, accum=4, max_length=256 | 5.4 GB | Same effective batch, lower memory |
+
+Teams that frequently hit OOM should reduce sequence length before reducing batch size.
+
+## Hugging Face Trainer log: fields that must be recorded
+
+| Field | Reason |
+| --- | --- |
+| `train_loss` | Basic training signal |
+| `learning_rate` | Verifies scheduler behavior |
+| `epoch` or `global_step` | Unifies comparison basis |
+| `train_runtime` | Experiment cost estimation |
+| `samples_per_second` | Bottleneck detection |
+
+These five fields alone, saved to CSV or experiment log, resolve 80% of regression analysis.
+
+## Extended training script example: including eval steps
+
+```python
+args = TrainingArguments(
+    output_dir="artifacts",
+    per_device_train_batch_size=2,
+    per_device_eval_batch_size=2,
+    gradient_accumulation_steps=4,
+    learning_rate=2e-4,
+    warmup_ratio=0.03,
+    max_steps=200,
+    evaluation_strategy="steps",
+    eval_steps=25,
+    logging_steps=5,
+    save_steps=50,
+    save_total_limit=2,
+    bf16=True,
+    report_to=[],
+)
+```
+
+The point of episode 4 is not these settings themselves, but the habit of logging why each value was chosen.
+
+## Before/after generation: verifying training steps worked meaningfully
+
+```text
+[Prompt]
+Show a Python exception handling pattern in 3 lines.
+
+[Before 1-step]
+Python exception handling is important and used in many places.
+
+[After 200-step]
+try:
+    value = int(user_input)
+except ValueError:
+    return {"error": "invalid input"}
+```
+
+This difference is not the end of evaluation but the beginning. Episode 5 verifies with metrics whether this change is coincidence or repeatable improvement.
+
+## Production training config example: QLoRA + Trainer combination
+
+After passing the small demo, teams usually move to a QLoRA config. Below is a commonly used production skeleton.
+
+```python
+from peft import LoraConfig, TaskType, get_peft_model
+from transformers import AutoModelForCausalLM, BitsAndBytesConfig
+
+bnb = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_use_double_quant=True,
+    bnb_4bit_compute_dtype="bfloat16",
+)
+
+base = AutoModelForCausalLM.from_pretrained(
+    "meta-llama/Llama-3-8B-Instruct",
+    quantization_config=bnb,
+    device_map="auto",
+)
+
+lora = LoraConfig(
+    task_type=TaskType.CAUSAL_LM,
+    r=16,
+    lora_alpha=32,
+    lora_dropout=0.05,
+    target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
+    bias="none",
+)
+
+model = get_peft_model(base, lora)
+model.print_trainable_parameters()
+```
+
+You do not need to run this combination in episode 4, but seeing what shape it takes helps you design more robust config file structures.
+
+## Training log reading guide: fix what to check first
+
+| Order | Check item | Expected state |
+| --- | --- | --- |
+| 1 | `trainable params` | Not 0% |
+| 2 | First 10 steps loss | Finite value, no explosion |
+| 3 | Learning rate log | Decreasing/increasing per schedule |
+| 4 | Eval perplexity | At least flat or descending |
+| 5 | Checkpoint size | Small when saving adapter only |
+
+Fixing this order makes debugging conversations within the team much shorter.
+
+## Batch/accumulation combination experiments
+
+```text
+exp_a: per_device=2, grad_accum=4 -> effective batch=8
+exp_b: per_device=1, grad_accum=8 -> effective batch=8
+exp_c: per_device=4, grad_accum=2 -> effective batch=8
+```
+
+Even with the same effective batch, loss curves are not identical due to padding ratios, kernel efficiency, and randomness. In comparison experiments, running at least 2–3 repetitions and averaging is safest.
+
 ## Answering the Opening Questions
 
 - **What do you minimally need to set in `TrainingArguments` to run a single training step?**

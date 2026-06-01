@@ -218,6 +218,261 @@ Evaluation is unglamorous, but it is the step that earns trust in a fine-tuning 
 
 The next article (episode 6) covers serving. We will deploy the LoRA adapter separated from the base model and reduce inference memory and latency in code.
 
+## Metric tiers: why perplexity alone is not enough
+
+Perplexity is fast and useful, but insufficient as a sole indicator. In practice, stacking metrics in tiers produces a more stable evaluation system.
+
+| Tier | Metric | Cadence | Purpose |
+| --- | --- | --- | --- |
+| Fast regression | perplexity, eval loss | every PR/commit | block failures immediately |
+| Task performance | exact match, F1, format pass rate | daily/nightly | track functional quality |
+| User experience | human eval, pairwise preference | weekly/pre-release | deployment decision |
+
+This structure naturally enforces the operational principle: "fast signals automated, slow signals focused."
+
+## Common pitfalls when computing perplexity
+
+| Pitfall | Wrong conclusion | Correction |
+| --- | --- | --- |
+| Train/eval data overlap | excessive optimism | enforce hold-out split |
+| Ignoring length distribution | false regression signal | compare within same-length buckets |
+| Evaluating with dropout active | reproducibility collapse | force `model.eval()` |
+| Too few samples | high variance | use at least dozens to hundreds |
+
+In evaluation automation, the important thing is not the number itself but ensuring it is always computed under identical conditions.
+
+## Golden set scoring format example
+
+Storing the eval set as JSONL makes it easy to share between CI and manual review.
+
+```json
+{"id": "fmt-001", "prompt": "FastAPI 400 error example", "must_include": ["HTTPException", "400"], "must_not_include": ["Django"]}
+{"id": "fmt-002", "prompt": "How to reverse a list", "must_include": ["[::-1]", "reverse"], "must_not_include": ["numpy"]}
+```
+
+A scoring function can start with simple keyword containment. What matters is having a system that "evaluates the same prompts with the same rules repeatedly."
+
+## Evaluation output example: a human-readable report
+
+```text
+run_id=2026-05-20-lora-r16
+eval_samples=320
+before_ppl=18.42
+after_ppl=16.95
+delta_pct=-7.98
+golden_pass_rate=0.81
+format_pass_rate=0.93
+blocked=0
+```
+
+This format is easy to read in a terminal and easy to export to CSV or a dashboard later.
+
+## Reading loss curve and perplexity together
+
+Checking the relationship below at evaluation time speeds up interpretation.
+
+1. Train loss falling + eval perplexity falling: likely genuine improvement
+2. Train loss falling + eval perplexity stagnant/rising: suspect overfitting or data leakage
+3. Train loss oscillating + eval perplexity oscillating: suspect excessive learning rate or batch instability
+
+A model whose "training loss alone improved" is not a deployment candidate. The evaluation metric direction must align.
+
+## Before/after generation comparison: anchoring quantitative metrics
+
+```text
+[Prompt]
+Explain the difference between HTTP 401 and 403 in two sentences.
+
+[Before]
+401 and 403 are authentication errors and related with forbidden access.
+
+[After]
+401 is returned when credentials are missing or invalid.
+403 is returned when the user is authenticated but lacks permission for the resource.
+```
+
+If quantitative metrics improved, before/after comparisons like this should show consistent quality gains.
+
+## Evaluation automation script skeleton
+
+```python
+def evaluate_run(model, tokenizer, eval_dataset, golden_set):
+    ppl = perplexity(model, eval_dataset)
+    golden_score = score_golden(model, tokenizer, golden_set)
+    return {
+        "perplexity": round(ppl, 4),
+        "golden_score": round(golden_score, 4),
+    }
+
+result = evaluate_run(peft_model, tokenizer, eval_dataset, golden)
+print(result)
+```
+
+You do not need a complex framework right away. A small function like this is enough to escape the "training without evaluation" state quickly.
+
+## End-to-end pattern: verifying data, LoRA config, and training inputs in one flow
+
+Fine-tuning quality is determined at the input contract before model architecture matters. Validate the dataset template, LoRA settings, and length statistics in the same pipeline to reduce debugging cost.
+
+```python
+from dataclasses import dataclass
+from typing import Iterable
+
+from peft import LoraConfig
+
+@dataclass
+class Sample:
+    instruction: str
+    input: str
+    output: str
+
+def render(sample: Sample) -> str:
+    return (
+        "### Instruction:\n" + sample.instruction + "\n\n"
+        "### Input:\n" + sample.input + "\n\n"
+        "### Response:\n" + sample.output
+    )
+
+def build_lora_config() -> LoraConfig:
+    return LoraConfig(
+        r=16,
+        lora_alpha=32,
+        lora_dropout=0.05,
+        target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
+        bias="none",
+        task_type="CAUSAL_LM",
+    )
+
+def length_stats(lengths: Iterable[int]) -> tuple[int, float, int]:
+    data = sorted(lengths)
+    if not data:
+        return 0, 0.0, 0
+    avg = sum(data) / len(data)
+    p95 = data[int(len(data) * 0.95) - 1]
+    return min(data), avg, p95
+```
+
+Operationally, `target_modules` and the data template must be managed together. When the template changes, the token length distribution changes, which directly affects batch size and training stability. Record the data version, LoRA config version, and evaluation metrics as a single experiment unit so you can quickly isolate whether a quality change comes from data or adapter configuration.
+
+## Eval set design: category-based regression detection
+
+Collecting golden-set items randomly makes it hard to explain the cause of a regression. Tagging items by category is far more useful.
+
+| Category | Example prompt count | Primary metric |
+| --- | --- | --- |
+| Format compliance | 30 | format pass rate |
+| Factuality | 40 | keyword + human check |
+| Domain terminology | 30 | exact/contains |
+| Safety | 20 | blocked response rate |
+
+In operations, review category-level scores weekly and focus review only on the segments that declined.
+
+## Standard evaluation result output format
+
+```text
+model=llama-3-8b + adapter:v3
+dataset=eval_2026_05
+perplexity=15.84
+golden_total=120
+golden_pass=98
+format_pass_rate=0.95
+safety_block_rate=0.99
+```
+
+Fixing this format means experiment notes, CI logs, and dashboards all speak the same language.
+
+## Before/after generation quality comparison: minimum examples for an eval report
+
+```text
+[Prompt]
+Show me a Flask 404 exception handling example.
+
+[Before]
+Flask has error handling and you can customize 404 pages.
+
+[After]
+@app.errorhandler(404)
+def handle_404(_):
+    return {"error": "not found"}, 404
+```
+
+Keeping 5-10 samples like this alongside quantitative metrics helps reach conclusions faster in release meetings.
+
+## Decision rules when perplexity and user metrics conflict
+
+| Situation | Recommended decision |
+| --- | --- |
+| Perplexity improved, golden score declined | hold deployment, inspect data/prompts |
+| Perplexity worsened, golden score improved | acceptable if small; watch long-term trend |
+| Both worsened | immediate rollback candidate |
+| Both improved | deployment candidate |
+
+The core of evaluation is not a single number but having decision rules defined in advance.
+
+## Evaluation execution example: minimum CLI report
+
+```bash
+python eval.py \
+  --base-model meta-llama/Llama-3-8B-Instruct \
+  --adapter artifacts/adapter-v3 \
+  --eval-jsonl data/eval.jsonl \
+  --golden-jsonl data/golden.jsonl
+```
+
+```text
+Pass  run_id=2026-05-21-v3
+Pass  perplexity=15.42 (baseline=16.10, delta=-4.22%)
+Pass  golden_pass_rate=0.84 (threshold=0.80)
+Pass  format_pass_rate=0.95 (threshold=0.92)
+Fail  safety_block_rate=0.97 (threshold=0.99)
+```
+
+This output can be used directly for release decisions. It shows clearly which metric failed and why.
+
+## Evaluation dataset leakage prevention checks
+
+| Check item | Method |
+| --- | --- |
+| Train/eval overlap | hash-based deduplication |
+| Template leakage | check ratio of identical prompt patterns |
+| Temporal leakage | verify recent data is not disproportionately in eval set |
+| Answer leakage | check if expected text appears directly in prompts |
+
+Leakage makes metrics look artificially good and leads to quality degradation after deployment.
+
+## Metric extension example: format compliance scoring function
+
+```python
+def format_pass_rate(outputs):
+    passed = 0
+    for text in outputs:
+        cond_1 = "```python" in text or "@app" in text
+        cond_2 = len(text.strip()) > 20
+        if cond_1 and cond_2:
+            passed += 1
+    return passed / len(outputs)
+```
+
+Expressing format rules as explicit functions like this lets the entire team share evaluation criteria through the same code.
+
+## Recommended evaluation result storage format
+
+```json
+{
+  "run_id": "2026-05-21-v3",
+  "model": "llama-3-8b + lora-v3",
+  "perplexity": 15.42,
+  "golden_pass_rate": 0.84,
+  "format_pass_rate": 0.95,
+  "safety_block_rate": 0.97,
+  "decision": "hold"
+}
+```
+
+Persisting result files like this connects directly to serving release automation in episode 6 as a deployment gate.
+
+The goal of evaluation automation is not to produce pretty scores but to detect regressions quickly and reduce deployment risk. Fixing this perspective as a team agreement greatly reduces metric interpretation conflicts.
+
 ## Answering the Opening Questions
 
 - **How do you calculate perplexity—the first quantitative signal to check right after fine-tuning?**

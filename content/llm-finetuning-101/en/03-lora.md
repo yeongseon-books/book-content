@@ -203,6 +203,246 @@ The point of LoRA configuration is **wiring verification**, not performance tuni
 
 Post 4 covers the training loop. We push real gradients through this adapter and watch how learning rate / batch size / gradient accumulation reshape the loss curve.
 
+## LoRA configuration profiles: practical starting points
+
+Adapter settings are largely determined by the combination of `target_modules` scope and `r`. The table below is ordered from easiest to debug.
+
+| Profile | `target_modules` | `r` | `alpha` | Purpose |
+| --- | --- | --- | --- | --- |
+| Conservative | `q_proj,v_proj` or GPT-2's `c_attn` | 8 | 16 | Fast verification at minimum cost |
+| Balanced | Full attention + `c_proj` | 16 | 32 | Stability and expressiveness balance |
+| Aggressive | Attention + some MLP | 32 | 64 | Performance push on hard tasks |
+
+Starting with Aggressive makes root-cause analysis difficult. Conservative or Balanced already converges for most format-correction tasks.
+
+## QLoRA connection point: why 4-bit base + LoRA are used together
+
+LoRA alone reduces memory, but the base model memory remains. For 7B+ models, QLoRA often becomes the production default.
+
+```python
+from transformers import AutoModelForCausalLM, BitsAndBytesConfig
+
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_use_double_quant=True,
+    bnb_4bit_compute_dtype="bfloat16",
+)
+
+base = AutoModelForCausalLM.from_pretrained(
+    "meta-llama/Llama-3-8B-Instruct",
+    quantization_config=bnb_config,
+    device_map="auto",
+)
+```
+
+Attaching episode 3's `LoraConfig` to this base completes the QLoRA loop. The key is logging quantization and adapter settings together.
+
+## Interpreting trainable parameter output
+
+`print_trainable_parameters()` packs more information than you might expect.
+
+```text
+trainable params: 9,437,184 || all params: 8,030,261,248 || trainable%: 0.1175
+```
+
+When reading this output, confirm:
+
+1. `trainable%` is not zero
+2. It falls within the expected range (typically 0.05–3%)
+3. Changing settings moves the ratio in the expected direction
+
+If direction is wrong, suspect `target_modules` mismatch or duplicate attachment first.
+
+## Loss curve patterns: well-attached vs poorly-attached adapters
+
+When LoRA is wired correctly, loss descends gently in the first few dozen steps. When wiring is wrong, two patterns commonly appear:
+
+- `trainable params: 0` state: loss curve stays nearly flat
+- Over-broad attachment (`r` large + wide MLP coverage): sharp initial drop then oscillation
+
+Before moving to episode 4, check "is the loss curve shape normal?" rather than "is the loss low?"
+
+## Saving base and adapter separately
+
+```python
+peft_model.save_pretrained("artifacts/lora_adapter")
+tokenizer.save_pretrained("artifacts/lora_adapter")
+
+# Merge when needed
+merged = peft_model.merge_and_unload()
+merged.save_pretrained("artifacts/merged_model")
+```
+
+Separate saving increases deployment agility; merged saving reduces inference complexity. Which is right depends on episode 6's serving requirements.
+
+## Generation example: confirming LoRA effect
+
+```text
+[Prompt]
+Write a FastAPI exception handling example in 4 lines.
+
+[Base]
+You can handle exception with try and except. Return message to user.
+
+[LoRA Adapter]
+@app.get("/items/{item_id}")
+def read_item(item_id: int):
+    if item_id < 0:
+        raise HTTPException(status_code=400, detail="invalid item_id")
+    return {"item_id": item_id}
+```
+
+This comparison does not replace evaluation metrics, but it is useful as a quick anchor to confirm the adapter moved in the right direction for the target format.
+
+## End-to-end pattern: data prep, LoRA config, and training input verification in one flow
+
+Fine-tuning quality is determined by input contracts before model architecture. Validate dataset templates, LoRA settings, and length statistics in the same pipeline to reduce debugging cost.
+
+```python
+from dataclasses import dataclass
+from typing import Iterable
+
+from peft import LoraConfig
+
+@dataclass
+class Sample:
+    instruction: str
+    input: str
+    output: str
+
+def render(sample: Sample) -> str:
+    return (
+        "### Instruction:\n" + sample.instruction + "\n\n"
+        "### Input:\n" + sample.input + "\n\n"
+        "### Response:\n" + sample.output
+    )
+
+def build_lora_config() -> LoraConfig:
+    return LoraConfig(
+        r=16,
+        lora_alpha=32,
+        lora_dropout=0.05,
+        target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
+        bias="none",
+        task_type="CAUSAL_LM",
+    )
+
+def length_stats(lengths: Iterable[int]) -> tuple[int, float, int]:
+    data = sorted(lengths)
+    if not data:
+        return 0, 0.0, 0
+    avg = sum(data) / len(data)
+    p95 = data[int(len(data) * 0.95) - 1]
+    return min(data), avg, p95
+```
+
+Operationally, `target_modules` and the data template must be managed together. When the template changes, token length distribution shifts, directly affecting batch size and training stability. Record data version, LoRA config version, and evaluation metrics as the same experiment unit.
+
+## Model-specific target_modules quick reference
+
+`target_modules` differs by model. Keeping this table in the team wiki saves significant early trial-and-error.
+
+| Model family | Conservative start | Expansion candidates |
+| --- | --- | --- |
+| GPT-2 family | `c_attn`, `c_proj` | Some MLP projections |
+| Llama family | `q_proj`, `v_proj` | `k_proj`, `o_proj`, MLP |
+| Mistral family | `q_proj`, `v_proj` | Full attention |
+| Qwen family | Attention projections | MLP gate/up/down |
+
+The key is not blindly trusting the table but always cross-checking against `named_modules()` output.
+
+## Why LoRA config and evaluation metrics must be logged together
+
+Adapter experiments have many settings, so result interpretation tangles easily. At minimum, save these fields in one line.
+
+```text
+run_id=2026-05-21-r16-qv
+base_model=llama-3-8b-instruct
+target_modules=q_proj,v_proj
+r=16 alpha=32 dropout=0.05
+trainable_pct=0.1182
+eval_ppl=16.72 golden_score=0.79
+```
+
+With this record, when regression appears in episode 5 evaluation, separating data problems from config problems becomes much faster.
+
+## Before/after generation with adapter training
+
+```text
+[Prompt]
+Show a Flask JSON response in 2 lines.
+
+[Before]
+Flask can return JSON using many methods. It is useful for web APIs.
+
+[After]
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+```
+
+Even small comparisons like this are worth collecting repeatedly. They catch format-quality changes that metrics alone easily miss.
+
+## Loss curve comparison when changing LoRA settings
+
+| Setting | First 50 steps pattern | Interpretation |
+| --- | --- | --- |
+| `r=8, alpha=16` | Gentle descent | Stable baseline |
+| `r=16, alpha=32` | Faster descent | Possible expressiveness gain |
+| `r=64, alpha=16` | Stagnation/oscillation | Suspect scale imbalance |
+| Attention+MLP broad | Sharp drop then instability | Overfitting/LR sensitivity |
+
+The setting with the lowest loss is not always the final winner. Always verify it reproduces on evaluation data.
+
+## Merged serving vs separate serving
+
+| Approach | Advantage | Disadvantage | Recommended when |
+| --- | --- | --- | --- |
+| Separate (base+adapter) | Fast updates, storage savings | Complex loading path | Multiple domain adapters in production |
+| Merged (single model) | Simple inference path, easy deployment | Large model file | Single-model fixed deployment |
+
+Once serving requirements crystallize in episode 6, use this table to pick the final deployment mode.
+
+## LoRA config verification routine: 5-minute pre-training check
+
+In production, always confirm these five items before launching training:
+
+1. `target_modules` exactly matches `named_modules()` output
+2. `trainable params` is not zero
+3. `requires_grad=True` is set only on `lora_A` and `lora_B`
+4. Adapter metadata (`adapter_config.json`) is generated at the save path
+5. Base model ID and tokenizer ID are recorded together in the experiment log
+
+Automating this routine blocks the "training finished but nothing changed" failure early.
+
+## LoRA parameter count comparison by setting
+
+| Setting | Trainable params (example) | trainable% |
+| --- | --- | --- |
+| `r=8`, partial attention | 1.4M | 1.17% |
+| `r=16`, partial attention | 2.9M | 2.34% |
+| `r=16`, full attention | 4.1M | 3.25% |
+| `r=32`, attention+partial MLP | 8.8M | ~6% |
+
+The table shows that increasing both `r` and target scope simultaneously causes rapid growth. At this point, training speed and memory cost degrade sharply, so stepwise expansion is usually safer.
+
+## Common QLoRA warnings and how to interpret them
+
+Using a quantized base increases warnings. Not all are errors.
+
+- dtype casting warning: Usually signals compute-dtype mixing, not imminent failure.
+- Unsupported module warning: Requires re-verifying that `target_modules` matches the actual architecture.
+- Memory fragmentation warning: Appears often when batch length variance is high; mitigated by dynamic padding/bucketing.
+
+Rather than ignoring all warnings or panicking at all of them, develop the habit of checking actual loss curves and evaluation metrics alongside.
+
+Finally, adapter experiments need naming conventions too. Names like `adapter-r16-qv-v3` that surface the config make tracking performance differences far cheaper later.
+
+Especially for experiments that change only `r` on the same dataset, the name should make them immediately distinguishable so comparison reports can be auto-generated.
+
+This single naming discipline visibly speeds up experiment reproduction.
+
 ## Answering the Opening Questions
 
 - **Which `LoraConfig` fields do you actually need to understand?**

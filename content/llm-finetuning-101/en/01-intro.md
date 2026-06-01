@@ -272,6 +272,129 @@ The point of post 1 is to stop treating fine-tuning as a mystical GPU ritual. Ju
 
 Post 2 covers dataset preparation. We compare three formats — instruction, chat, completion — and verify in code why label masking and `eos_token` handling are decisive for training stability.
 
+## Practical baseline: full fine-tuning vs LoRA vs QLoRA by the numbers
+
+The most common beginner question is "which method should I pick?" Answering by intuition alone makes every subsequent experiment shaky. Pin a baseline along three axes first: memory, trainable parameters, and artifact size.
+
+| Method | Trainable params | 7B single-GPU entry difficulty | Strength | Watch out |
+| --- | --- | --- | --- | --- |
+| Full fine-tuning | 100% | Very high | Maximum expressiveness | Optimizer state and checkpoints are large |
+| LoRA (fp16/bf16) | ~0.5–3% | Medium | Strong cost-to-performance ratio | Base model VRAM stays the same |
+| QLoRA (4-bit + LoRA) | ~0.5–3% | Low | Feasible on consumer GPUs | Quantization config sensitive, debugging harder |
+
+In practice this table is the starting point for a decision meeting. Unless you have evidence that updating 100% of parameters is required for your quality target, start with LoRA or QLoRA.
+
+## Minimum reproduction script: connecting Trainer and LoRA in one file
+
+We are not doing real training yet, but seeing the Trainer skeleton in episode 1 helps. When you change hyperparameters in episode 4, you will immediately know where each knob connects.
+
+```python
+from datasets import Dataset
+from peft import LoraConfig, TaskType, get_peft_model
+from transformers import (
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    DataCollatorForLanguageModeling,
+    Trainer,
+    TrainingArguments,
+)
+
+model_id = "sshleifer/tiny-gpt2"
+tokenizer = AutoTokenizer.from_pretrained(model_id)
+tokenizer.pad_token = tokenizer.eos_token
+
+base = AutoModelForCausalLM.from_pretrained(model_id)
+lora_config = LoraConfig(
+    task_type=TaskType.CAUSAL_LM,
+    r=8,
+    lora_alpha=16,
+    lora_dropout=0.05,
+    target_modules=["c_attn", "c_proj"],
+    bias="none",
+)
+model = get_peft_model(base, lora_config)
+
+texts = [
+    "Q: Reverse a Python list? A: Use slicing lst[::-1] or .reverse().",
+    "Q: HTTP 500 meaning? A: Internal server error.",
+]
+rows = []
+for text in texts:
+    enc = tokenizer(text, truncation=True, padding="max_length", max_length=96)
+    enc["labels"] = enc["input_ids"].copy()
+    rows.append(enc)
+
+dataset = Dataset.from_list(rows)
+
+args = TrainingArguments(
+    output_dir="artifacts",
+    max_steps=1,
+    learning_rate=5e-4,
+    per_device_train_batch_size=2,
+    save_strategy="no",
+    report_to=[],
+)
+
+trainer = Trainer(
+    model=model,
+    args=args,
+    train_dataset=dataset,
+    data_collator=DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False),
+)
+metrics = trainer.train().metrics
+print(metrics)
+```
+
+This script is for wiring verification, not performance comparison. Seeing this flow once in episode 1 means you can separate "data problem vs LoRA connection problem vs training loop problem" much faster in later episodes.
+
+## How to read VRAM budgets: look at components, not a single number
+
+Beginners often ask "will this model fit in 12 GB?" Answering with a single number is dangerous. VRAM is the sum of base weights, activations, optimizer state, and KV cache.
+
+| Component | Impact during training | Impact during inference | Change with LoRA |
+| --- | --- | --- | --- |
+| Base model weights | Large | Large | Nearly unchanged |
+| Trainable parameters | Very large | None | Greatly reduced |
+| Optimizer state | Very large | None | Greatly reduced |
+| Activation memory | Medium–large | Small | Depends on batch/length |
+| KV cache | None | Medium–large | Depends on generation length |
+
+LoRA reduces the "parts you train." The base model memory remains at inference time — locking this fact in during episode 1 prevents misunderstandings when you design serving in episode 6.
+
+## Before/after generation quality: minimum reading example
+
+Numbers alone are not enough — pairing them with text examples keeps your judgment balanced. Below is a representative sample showing a typical difference for the same prompt.
+
+```text
+[Prompt]
+Show a Flask endpoint example in 3 lines, matching Korean API doc style.
+
+[Before: base model]
+Here is an example endpoint. You can create route and return json.
+Use Flask. Add methods and run app.
+
+[After: LoRA adapter]
+@app.post("/users")
+def create_user():
+    return {"id": 1, "name": "kim"}, 201
+```
+
+This kind of example does not prove the model "got smarter." Instead it lets you confirm at the sentence level whether the fine-tuning goal is format alignment, knowledge injection, or safety correction.
+
+## Hyperparameter defaults to lock down before moving on
+
+Recording defaults before the next episode makes experiment logs far easier to read.
+
+| Parameter | Recommended starting value | Reason |
+| --- | --- | --- |
+| `r` | 8 or 16 | Cost-to-performance balance for small experiments |
+| `lora_alpha` | `2 * r` | Avoids excessive correction strength |
+| `lora_dropout` | 0.05 | Basic overfitting mitigation |
+| `learning_rate` | `2e-4`–`5e-4` | Commonly effective range for LoRA |
+| `max_length` | Data p95 | Prevents quality loss from truncation |
+
+The core principle: fix starting values and change only one at a time. Following this simple rule makes evaluation results in episode 5 much easier to interpret causally.
+
 ## Answering the Opening Questions
 
 - **How can you calculate why LoRA is so much lighter than full fine-tuning?**

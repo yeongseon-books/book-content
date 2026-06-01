@@ -219,6 +219,256 @@ The minimum end-to-end path of the fine-tuning series is now complete. You built
 
 The next step is leaving the series and repeating this same flow on your own domain data. 100-1000 examples, LoRA rank 8-16, 1 epoch, perplexity + golden-set evaluation, FastAPI serving — once this one-line recipe is in your hands, you can ship any small model into a service.
 
+## Serving architecture evolution: from single process to production
+
+The episode 6 example is intentionally simple. In real operations, you typically expand through the following stages.
+
+| Stage | Setup | Characteristics | Transition signal |
+| --- | --- | --- | --- |
+| local demo | FastAPI + single model process | fast to implement | internal team demo |
+| staging | FastAPI + separate model worker | easier fault isolation | concurrent requests growing |
+| production | API Gateway + model server (vLLM/TGI) + observability | scalability/visibility | SLA required |
+
+Rather than adopting the full production setup from the start, it is safer to transition incrementally as request volume and operational responsibility grow.
+
+## Request/response contract example: fix the schema first
+
+```json
+{
+  "prompt": "FastAPI exception handling example",
+  "max_new_tokens": 64,
+  "temperature": 0.2,
+  "top_p": 0.9,
+  "adapter": "customer-support-v1"
+}
+```
+
+```json
+{
+  "completion": "...",
+  "model": "llama-3-8b-base",
+  "adapter": "customer-support-v1",
+  "prompt_tokens": 28,
+  "completion_tokens": 54,
+  "latency_ms": 412
+}
+```
+
+In operations, it is not just the text that matters. Returning token counts and latency together is essential for tracking bottlenecks.
+
+## Adapter hot-swap pattern: serving multiple domains from one base
+
+```python
+from peft import PeftModel
+
+BASE_ID = "meta-llama/Llama-3-8B-Instruct"
+ADAPTERS = {
+    "customer-support-v1": "adapters/customer-support-v1",
+    "dev-docs-v2": "adapters/dev-docs-v2",
+}
+
+def load_adapter(base_model, adapter_name):
+    if adapter_name not in ADAPTERS:
+        raise ValueError(f"unknown adapter: {adapter_name}")
+    return PeftModel.from_pretrained(base_model, ADAPTERS[adapter_name])
+```
+
+This pattern provides significant memory and deployment speed benefits. However, you must strictly manage adapter-base version compatibility.
+
+## Latency measurement example: isolating causes at the token level
+
+| Experiment | `max_new_tokens` | Mean latency (ms) | p95 (ms) |
+| --- | --- | --- | --- |
+| A | 32 | 240 | 330 |
+| B | 64 | 410 | 560 |
+| C | 128 | 760 | 1020 |
+
+In most cases, latency growth is nearly linear with generation length. This is why a `max_new_tokens` ceiling is mandatory in serving policy.
+
+## VRAM operations memo: key items to watch during inference
+
+| Item | Observation point | Response |
+| --- | --- | --- |
+| Base model memory | right after process start | quantization / model downsizing |
+| KV cache growth | long generation requests | length limits, streaming |
+| Concurrent request peak | during load testing | dynamic batching, worker scaling |
+| OOM restart | log/metric alarms | request throttling, queue-based control |
+
+Unlike training, inference is heavily influenced by KV cache, so long-response request patterns must be monitored separately.
+
+## Before/after operations example: from experiment code to service contract
+
+```text
+[Before]
+model.generate() callable only from notebook
+No record of request latency, token counts, or failure rate
+
+[After]
+/generate API provides uniform contract for the entire team
+latency_ms, prompt_tokens, completion_tokens collected
+Golden prompts auto-called in CI for regression detection
+```
+
+The purpose of episode 6 is not to improve model performance but to establish this kind of "repeatable operational boundary."
+
+## Deployment checklist: must-verify items right before release
+
+1. `/health` and `/generate` separated with status code policy finalized
+2. `max_new_tokens`, `temperature`, `top_p` defaults documented
+3. Adapter version, base version, tokenizer version synchronized
+4. Request logs include token counts and latency
+5. Golden prompt regression test passing
+
+Once these five items are fixed, subsequent model updates can be repeated much more safely.
+
+## End-to-end pattern: verifying data, LoRA config, and training inputs in one flow
+
+Fine-tuning quality is determined at the input contract before model architecture matters. Validate the dataset template, LoRA settings, and length statistics in the same pipeline to reduce debugging cost.
+
+```python
+from dataclasses import dataclass
+from typing import Iterable
+
+from peft import LoraConfig
+
+@dataclass
+class Sample:
+    instruction: str
+    input: str
+    output: str
+
+def render(sample: Sample) -> str:
+    return (
+        "### Instruction:\n" + sample.instruction + "\n\n"
+        "### Input:\n" + sample.input + "\n\n"
+        "### Response:\n" + sample.output
+    )
+
+def build_lora_config() -> LoraConfig:
+    return LoraConfig(
+        r=16,
+        lora_alpha=32,
+        lora_dropout=0.05,
+        target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
+        bias="none",
+        task_type="CAUSAL_LM",
+    )
+
+def length_stats(lengths: Iterable[int]) -> tuple[int, float, int]:
+    data = sorted(lengths)
+    if not data:
+        return 0, 0.0, 0
+    avg = sum(data) / len(data)
+    p95 = data[int(len(data) * 0.95) - 1]
+    return min(data), avg, p95
+```
+
+Operationally, `target_modules` and the data template must be managed together. When the template changes, the token length distribution changes, which directly affects batch size and training stability. Record the data version, LoRA config version, and evaluation metrics as a single experiment unit so you can quickly isolate whether a quality change comes from data or adapter configuration.
+
+## FastAPI serving code pattern: separating validation, generation, and metrics
+
+```python
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
+import time
+
+app = FastAPI()
+
+class GenerateRequest(BaseModel):
+    prompt: str = Field(min_length=1)
+    max_new_tokens: int = Field(default=64, ge=1, le=256)
+    temperature: float = Field(default=0.2, ge=0.0, le=2.0)
+
+@app.post("/generate")
+def generate(req: GenerateRequest):
+    started = time.perf_counter()
+    try:
+        ids = tokenizer(req.prompt, return_tensors="pt").input_ids
+        out = model.generate(
+            ids,
+            max_new_tokens=req.max_new_tokens,
+            temperature=req.temperature,
+        )
+        text = tokenizer.decode(out[0], skip_special_tokens=True)
+        latency_ms = int((time.perf_counter() - started) * 1000)
+        return {
+            "completion": text,
+            "prompt_tokens": int(ids.shape[-1]),
+            "completion_tokens": int(out.shape[-1] - ids.shape[-1]),
+            "latency_ms": latency_ms,
+        }
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail="generation failed") from exc
+```
+
+The example is simple, but separating request validation and error boundaries up front makes operational incident response much easier.
+
+## Concurrency and throughput: quickly finding single-worker limits
+
+| Item | Single-process FastAPI | Model server (vLLM/TGI) |
+| --- | --- | --- |
+| Implementation difficulty | low | medium-high |
+| Concurrent request handling | limited | strong |
+| Dynamic batching | must implement yourself | built-in |
+| Operational visibility | must build yourself | many tools provided |
+
+As request volume grows, switching runtime architecture often has a bigger effect than code optimization.
+
+## Before/after serving response comparison
+
+```text
+[Prompt]
+Show me an input validation failure handling pattern in FastAPI.
+
+[Local generation right after training]
+You can validate input and return error.
+
+[Serving endpoint response]
+@app.post("/users")
+def create_user(req: UserCreate):
+    if len(req.name) < 2:
+        raise HTTPException(status_code=400, detail="name too short")
+    return {"ok": True}
+```
+
+At the serving stage, latency and error rate become criteria alongside text quality.
+
+## Operational alarm thresholds example
+
+| Metric | Warning threshold | Critical threshold |
+| --- | --- | --- |
+| p95 latency | >1200ms for 5min | >2000ms for 5min |
+| error rate | >1% | >3% |
+| OOM restart | 1/hour | 3/hour |
+| health check failure | 2 consecutive | 5 consecutive |
+
+These thresholds let you treat "it's getting slow" as an operational signal rather than a feeling.
+
+## Serving verification commands: a loop without a browser
+
+```bash
+# health
+curl -s http://localhost:8000/health
+
+# generation
+curl -s -X POST http://localhost:8000/generate \
+  -H "Content-Type: application/json" \
+  -d '{"prompt":"FastAPI 404 handling example","max_new_tokens":48}'
+```
+
+These two commands can be used as-is in a CI pipeline. They verify server boot, endpoint contract, and basic generation behavior at minimum cost.
+
+## Deployment mode comparison: single adapter vs multi-adapter
+
+| Mode | Advantage | Consideration |
+| --- | --- | --- |
+| Single adapter fixed | simple ops, easy debugging | slow domain expansion |
+| Multi-adapter routing | serve multiple services from same base | complex routing/auth/version management |
+
+Start with single-adapter mode for stability, then expand to multi-adapter once quality criteria are fixed. This order is the norm.
+
+In early operations, the most important thing is defining the failure recovery path before adding features. Documenting adapter rollback procedures and base model fallback procedures significantly speeds up actual incident response.
+
 ## Answering the Opening Questions
 
 - **What's the minimum structure for putting a fine-tuned small model behind a FastAPI endpoint?**

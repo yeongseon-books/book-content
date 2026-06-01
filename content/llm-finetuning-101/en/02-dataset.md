@@ -222,6 +222,253 @@ The point of dataset preparation is to make the input/output boundary the model 
 
 Post 3 moves on to LoRA adapter configuration. We dissect `LoraConfig`'s `r`, `alpha`, `target_modules`, and `dropout` line by line and see how each one shows up in training behavior.
 
+## Data format comparison: instruction, chat, and completion under one lens
+
+Format choice is not a matter of preference — it is a failure-cost decision. Pick wrong once and every subsequent training log is distorted.
+
+| Format | Example structure | Strength | Weakness | Best for |
+| --- | --- | --- | --- | --- |
+| instruction | `instruction/input/output` | Simple to implement and review | Weak at multi-turn | Single Q&A, format correction |
+| chat | `[{role, content}]` | Mirrors real conversation flow | Heavy template dependency | Chatbot, support UX |
+| completion | `prefix + continuation` | Closest to pretraining format | Instruction boundary is vague | Code completion, sentence continuation |
+
+Start with instruction format, then migrate to chat format if the product is multi-turn. This order is operationally stable.
+
+## Data quality gate: automated checks that catch failures before training
+
+These checks apply even to a small JSONL file.
+
+```python
+import json
+from pathlib import Path
+
+def validate_jsonl(path: Path) -> dict:
+    total = 0
+    missing = 0
+    empty_output = 0
+    long_samples = 0
+
+    with path.open("r", encoding="utf-8") as f:
+        for line in f:
+            total += 1
+            row = json.loads(line)
+            if "instruction" not in row or "output" not in row:
+                missing += 1
+                continue
+            if not row["output"].strip():
+                empty_output += 1
+            if len((row.get("instruction", "") + row.get("output", ""))) > 2000:
+                long_samples += 1
+
+    return {
+        "total": total,
+        "missing": missing,
+        "empty_output": empty_output,
+        "long_samples": long_samples,
+    }
+```
+
+Putting this check in CI prevents the "training finished but results look wrong" post-mortem.
+
+## Label masking example: applying loss only to the response span
+
+The single most important preprocessing technique is `labels` masking.
+
+```python
+def build_labels(input_ids, response_start_idx):
+    labels = input_ids.copy()
+    for i in range(response_start_idx):
+        labels[i] = -100
+    return labels
+```
+
+`-100` means "exclude from loss computation." Without this, the model spends loss budget copying the instruction itself, and actual generation quality becomes blurry.
+
+## Connecting length distribution to VRAM: do not pick max_length by gut feeling
+
+Input length is cost. Extracting the distribution as numbers lets you choose `max_length` rationally.
+
+| Metric | Value (example) | Interpretation |
+| --- | --- | --- |
+| Mean token length | 148 | Room for small batches |
+| p95 | 356 | Candidate for `max_length=384` |
+| p99 | 612 | Consider splitting long samples separately |
+| Max length | 1304 | Truncating wholesale loses significant information |
+
+In practice, set p95 as the default length and handle extremely long samples by splitting or routing to a separate task.
+
+## Preprocessed output sample: always verify with human eyes before training
+
+```text
+### Instruction:
+Write an email validation API in FastAPI.
+
+### Input:
+Return 400 on regex validation failure.
+
+### Response:
+@app.post("/validate-email")
+def validate_email(req: EmailRequest):
+    if not EMAIL_RE.match(req.email):
+        raise HTTPException(status_code=400, detail="invalid email")
+    return {"ok": True}<eos>
+```
+
+When the template looks this consistent, you can narrow subsequent failures to model/training problems.
+
+## Hyperparameter table: safe starting points by dataset size
+
+| Sample count | `max_length` | Batch strategy | Learning rate | Note |
+| --- | --- | --- | --- | --- |
+| 100–500 | 256–384 | Small fixed batch | `5e-4` | Pipeline verification first |
+| 500–5k | 384–512 | Gradient accumulation | `2e-4`–`5e-4` | Watch for overfitting |
+| 5k+ | 512+ | Dynamic padding recommended | `1e-4`–`3e-4` | Evaluation set split is mandatory |
+
+As dataset size grows, the first thing to change is length/batch policy, not rank. Maintaining this order keeps root-cause analysis possible.
+
+## End-to-end pattern: data prep, LoRA config, and training input verification in one flow
+
+Fine-tuning quality is determined by input contracts before model architecture. Validate dataset templates, LoRA settings, and length statistics in the same pipeline to reduce debugging cost.
+
+```python
+from dataclasses import dataclass
+from typing import Iterable
+
+from peft import LoraConfig
+
+@dataclass
+class Sample:
+    instruction: str
+    input: str
+    output: str
+
+def render(sample: Sample) -> str:
+    return (
+        "### Instruction:\n" + sample.instruction + "\n\n"
+        "### Input:\n" + sample.input + "\n\n"
+        "### Response:\n" + sample.output
+    )
+
+def build_lora_config() -> LoraConfig:
+    return LoraConfig(
+        r=16,
+        lora_alpha=32,
+        lora_dropout=0.05,
+        target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],
+        bias="none",
+        task_type="CAUSAL_LM",
+    )
+
+def length_stats(lengths: Iterable[int]) -> tuple[int, float, int]:
+    data = sorted(lengths)
+    if not data:
+        return 0, 0.0, 0
+    avg = sum(data) / len(data)
+    p95 = data[int(len(data) * 0.95) - 1]
+    return min(data), avg, p95
+```
+
+Operationally, `target_modules` and the data template must be managed together. When the template changes, token length distribution shifts, which directly affects batch size and training stability. Record data version, LoRA config version, and evaluation metrics as the same experiment unit. This is how you quickly separate whether a quality change came from data or adapter config.
+
+## Dataset versioning in production: manage by experiment unit, not single file
+
+In production, managing a single `train.jsonl` breaks reproducibility immediately. At minimum, bundle these three files as one version.
+
+| File | Role | Example |
+| --- | --- | --- |
+| `dataset.train.jsonl` | Training samples | instruction/input/output originals |
+| `dataset.eval.jsonl` | Evaluation samples | Hold-out golden candidates |
+| `dataset.meta.yaml` | Generation rules/policy | Field conventions, masking policy, creation date |
+
+Writing rules like "enforce `<eos>` at the end of every response" in `dataset.meta.yaml` keeps preprocessing results consistent even as team members change.
+
+Additionally, keep data generation scripts alongside validation scripts in the examples repository. If only the raw JSONL remains, the intent behind changes disappears; with scripts, you can trace why specific samples were removed.
+
+Document sample-level changes in the PR description. Unlike code, data diffs are hard to interpret by diff alone.
+
+In practice, attaching a before/after comparison of 5 samples to dataset-change PRs dramatically improves review quality.
+
+## Preprocessing pipeline example: filter → template → tokenize → validate
+
+```python
+def preprocess_pipeline(dataset, tokenizer, max_length=384):
+    def filter_invalid(example):
+        return bool(example.get("instruction")) and bool(example.get("output"))
+
+    filtered = dataset.filter(filter_invalid)
+
+    def render(example):
+        input_text = example.get("input", "").strip()
+        return {
+            "text": (
+                "### Instruction:\n" + example["instruction"].strip() + "\n\n"
+                + "### Input:\n" + input_text + "\n\n"
+                + "### Response:\n" + example["output"].strip() + "<eos>"
+            )
+        }
+
+    rendered = filtered.map(render)
+
+    def tokenize(example):
+        return tokenizer(
+            example["text"],
+            truncation=True,
+            max_length=max_length,
+            padding=False,
+        )
+
+    tokenized = rendered.map(tokenize)
+    return tokenized
+```
+
+This pipeline is simple, but because each stage's output is separated, you can pinpoint problems quickly.
+
+## Diagnosing data problems from loss curves
+
+Dataset issues leave signals in the loss curve after training starts.
+
+- Loss nearly flat from the beginning: template/masking problem or adapter connection issue
+- Sharp initial drop followed by explosive oscillation: excessive duplicates, length distribution imbalance
+- Training loss descends but evaluation metrics plateau: format overfitting, lack of semantic quality
+
+Recording these patterns lets you prioritize data refinement decisions quickly.
+
+## Data example expansion: bad sample vs good sample
+
+```text
+[Bad sample]
+instruction: "Python"
+output: "Yes"
+
+[Good sample]
+instruction: "Explain two ways to iterate a Python list in reverse."
+input: "Include a for-loop example."
+output: "1) Using reversed(lst) lets you iterate in reverse while keeping the original intact..."
+```
+
+A good sample is not one that is long — it is one where the pattern the model should learn is unambiguous.
+
+## Operational statistics output example
+
+```python
+def summarize_token_lengths(tokenized):
+    lengths = [len(x["input_ids"]) for x in tokenized]
+    lengths = sorted(lengths)
+    n = len(lengths)
+    p95 = lengths[int(n * 0.95) - 1]
+    p99 = lengths[int(n * 0.99) - 1]
+    return {
+        "count": n,
+        "min": lengths[0],
+        "mean": sum(lengths) / n,
+        "p95": p95,
+        "p99": p99,
+        "max": lengths[-1],
+    }
+```
+
+This output connects to episode 4's batch strategy decisions and episode 6's serving `max_new_tokens` policy.
+
 ## Answering the Opening Questions
 
 - **What shape should the `instruction / input / output` fields take?**
