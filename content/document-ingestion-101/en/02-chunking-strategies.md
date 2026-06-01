@@ -200,6 +200,168 @@ There is rarely a perfect preset on day one. The usual workflow is to set a star
 
 Just as important, do not confuse chunking failure with embedding-model failure too early. When search results look wrong, inspect chunk previews and warning counts before you swap the model.
 
+## Chunking algorithm selection and retrieval regression prevention
+
+Chunking strategy is not a set-once configuration. As document types grow, the same splitter produces different failure patterns. Production environments split algorithms by document family and maintain a numeric loop that detects retrieval regression.
+
+### Combining structure-based and length-based chunking
+
+Manual documents respect heading boundaries first; policy documents prioritize paragraph length. Running both algorithms in parallel improves stability.
+
+```python
+from __future__ import annotations
+
+from langchain_text_splitters import (
+    MarkdownHeaderTextSplitter,
+    RecursiveCharacterTextSplitter,
+)
+
+def chunk_manual(markdown_text: str) -> list[str]:
+    header_splitter = MarkdownHeaderTextSplitter(
+        headers_to_split_on=[('#', 'h1'), ('##', 'h2'), ('###', 'h3')]
+    )
+    docs = header_splitter.split_text(markdown_text)
+    body_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=280,
+        chunk_overlap=48,
+        separators=['\n\n', '\n', '. ', ' '],
+    )
+    chunks: list[str] = []
+    for doc in docs:
+        chunks.extend(body_splitter.split_text(doc.page_content))
+    return chunks
+
+def chunk_policy(long_text: str) -> list[str]:
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=360,
+        chunk_overlap=72,
+        separators=['\n\n', '; ', '. ', ' '],
+    )
+    return splitter.split_text(long_text)
+```
+
+The key insight: never funnel all documents through one splitter. Structure-rich documents need structure-first splitting; long policy documents need length-first splitting to preserve the context window each search query expects.
+
+### Offline evaluation loop for chunking regression
+
+After changing presets, verify retrieval quality with a fixed query set that tracks answer-source inclusion.
+
+```python
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class RetrievalCase:
+    query: str
+    expected_source: str
+
+def evaluate_chunk_regression(
+    retriever, cases: list[RetrievalCase], k: int = 5
+) -> None:
+    hit = 0
+    for case in cases:
+        docs = retriever.invoke(case.query)
+        topk = docs[:k]
+        if any(
+            doc.metadata.get('source') == case.expected_source for doc in topk
+        ):
+            hit += 1
+    recall_at_k = hit / len(cases) if cases else 0.0
+    print(f'recall_at_{k}={recall_at_k:.3f} cases={len(cases)}')
+```
+
+This score is not a perfect quality metric, but it catches whether a chunking change degraded retrieval. In production, gate deployments on `recall_at_k` staying above a threshold.
+
+### Aligning chunk metadata with VectorDB filters
+
+Storing `doc_type`, `section`, and `chunk_order` alongside each chunk makes search results explainable.
+
+```python
+chunk.metadata.update(
+    {
+        'doc_type': 'manual',
+        'section': 'deployment-checklist',
+        'chunk_order': 17,
+        'chunk_size_policy': 'manual-v2',
+    }
+)
+```
+
+This metadata becomes evidence for "why was this chunk selected." Without it, retrieval failures get misattributed to the embedding model.
+
+## Chunk policy versioning
+
+Chunking configuration is not a single code line — it is a retrieval-quality contract. Production teams version policies like `chunk-policy-v1`, `chunk-policy-v2` in metadata.
+
+```python
+chunk.metadata.update(
+    {
+        'chunk_policy_version': 'chunk-policy-v2',
+        'chunk_size': 240,
+        'chunk_overlap': 48,
+        'separator_profile': 'manual-headers-first',
+    }
+)
+```
+
+With this information, when retrieval regresses you can immediately narrow down which policy version produced the problematic chunks. Without it, you cannot tell whether the index contains chunks from mixed rules.
+
+After every policy change, run 20-50 fixed top queries comparing `recall@k` and source diversity. If chunk counts look clean but actual query recall drops, revert the change.
+
+## Extended deployment checklist
+
+This checklist is a 10-minute pre-deployment gate. Ingestion pipelines are stabilized by boundary verification, not feature additions.
+
+- Input file count is within normal range (no unexpected spike or drop).
+- Failed document ratio stays below threshold (e.g. 3%).
+- At least 3 sample documents have traceable source, page, and chunk_id.
+- Zero missing required metadata fields (`source`, `format`, `doc_type`).
+- Smoke-test queries return expected sources in top results.
+
+```python
+def quick_health_report(stats: dict[str, int | float]) -> None:
+    print(f"files_total={stats['files_total']}")
+    print(f"failed_total={stats['failed_total']}")
+    print(f"chunks_total={stats['chunks_total']}")
+    print(f"metadata_missing={stats['metadata_missing']}")
+    print(f"smoke_passed={stats['smoke_passed']}")
+```
+
+This level of automation distinguishes "it ran" from "it finished in a deployable state." Over time, accumulate these reports weekly to catch stage-level failure-rate trends early.
+
+## Operational baseline metrics
+
+Ingestion pipelines need baseline maintenance more than new features. Fix these four axes as weekly standards:
+
+- Parsing quality: average character count, OCR ratio, reprocessing ratio
+- Chunking quality: average length, extreme-length ratio, policy version distribution
+- Metadata quality: required-field miss rate, normalization failure count
+- Retrieval verification: sample query recall@k, source hit rate
+
+Tracking all four axes together reveals which boundary is degrading. Stable ingestion comes not from model selection but from continuously measuring input quality and stage contracts.
+
+## Embedding model token limits and chunk size
+
+When setting chunk size, consider the embedding model's maximum input token count. For example, `text-embedding-3-small` accepts up to 8191 tokens but often produces the most stable similarity scores below 512 tokens. Even when `chunk_size` is set in characters, add a verification step ensuring final chunk token counts stay within the model's sweet spot.
+
+```python
+from __future__ import annotations
+
+import tiktoken
+
+def estimate_tokens(text: str, model: str = 'cl100k_base') -> int:
+    enc = tiktoken.get_encoding(model)
+    return len(enc.encode(text))
+
+def flag_over_limit(chunks: list[str], max_tokens: int = 512) -> list[int]:
+    return [
+        i for i, chunk in enumerate(chunks) if estimate_tokens(chunk) > max_tokens
+    ]
+```
+
+Run this check before embedding calls. Over-limit chunks may be truncated or lose semantic coherence. A high over-limit ratio signals that `chunk_size` should be reduced or separators need finer granularity.
+
 ## Answering the Opening Questions
 
 - **Why does one chunk_size for every document type make retrieval quality unstable?**
