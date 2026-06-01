@@ -189,6 +189,178 @@ Before adopting Agents in production, ask these questions.
 
 Two or more "yes" answers means it is time to seriously evaluate Agents.
 
+---
+
+## Practical design reinforcement
+
+### Fix the execution contract in a document first
+
+Before writing any agent code, pin down the execution contract as a document. The contract does not need to be elaborate. Four elements matter: goal schema, allowed tools, stop conditions, and human-approval triggers. When these four are agreed on paper first, prompt and code align in the same direction.
+
+```json
+{
+  "goal_schema": {
+    "task": "string",
+    "constraints": ["string"],
+    "deadline": "ISO-8601"
+  },
+  "allowed_tools": ["search_docs", "lookup_ticket", "send_report"],
+  "stop_conditions": ["goal_achieved", "max_steps_exceeded", "safety_violation"],
+  "human_approval": {
+    "required_for": ["external_write", "billing_action"],
+    "channel": "slack:#ops-approval"
+  }
+}
+```
+
+With this contract in place, you can verify whether the system follows the right execution path before worrying about whether the model gives good answers. In production, that ordering matters. Prompt quality improves iteratively, but if the execution contract is ambiguous, failure logs themselves become uninterpretable.
+
+### Minimum log fields for a working agent
+
+Fixing a per-step log schema like the one below connects evaluation and operations from the start.
+
+```python
+from pydantic import BaseModel
+
+class StepLog(BaseModel):
+    run_id: str
+    step: int
+    thought_summary: str
+    tool_name: str | None = None
+    tool_args: dict | None = None
+    tool_latency_ms: int | None = None
+    observation_digest: str | None = None
+    stop_reason: str | None = None
+```
+
+Two design choices worth noting. First, store `thought_summary` instead of the full thought text. This reduces the risk of logging PII or sensitive policy content while keeping enough signal for debugging. Second, making `tool_latency_ms` a required field lets you separate quality problems from performance problems during incident triage.
+
+### OpenAI Responses API loop example
+
+```python
+from openai import OpenAI
+import json
+
+client = OpenAI()
+
+tools = [{
+    "type": "function",
+    "name": "get_weather",
+    "description": "Look up today's weather for a city.",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "city": {"type": "string"}
+        },
+        "required": ["city"],
+        "additionalProperties": False
+    }
+}]
+
+def run(goal: str) -> str:
+    messages = [{"role": "user", "content": goal}]
+    for _ in range(6):
+        res = client.responses.create(
+            model="gpt-4.1-mini", input=messages, tools=tools
+        )
+        item = res.output[0]
+        if item.type == "message":
+            return item.content[0].text
+        if item.type == "function_call" and item.name == "get_weather":
+            args = json.loads(item.arguments)
+            obs = {"city": args["city"], "condition": "rain", "temp": 18}
+            messages.append({
+                "type": "function_call_output",
+                "call_id": item.call_id,
+                "output": json.dumps(obs),
+            })
+    return "max_steps_exceeded"
+```
+
+This code is a minimal educational example, but production agents benefit from keeping the same shape. When the loop cap, tool schema, and call-result injection point are all explicit, reproducible failure analysis becomes possible.
+
+---
+
+## Deep operations notes
+
+### Failure classification template
+
+In production, you do not close a failure with "the model got it wrong." Splitting failures along multiple axes makes improvement priorities clear.
+
+| Failure axis | Diagnostic question | Example |
+|---|---|---|
+| Planning failure | Did the agent decompose the goal incorrectly? | Unnecessary 6-step repetition |
+| Execution failure | Did a tool call fail? | timeout, 429, schema mismatch |
+| Verification failure | Did the agent accept a bad observation? | Adopted incorrect tool output |
+| Policy failure | Did the agent cross a safety boundary? | Attempted to send sensitive data externally |
+
+Pin this table in the team runbook so on-call engineers classify incidents with the same vocabulary.
+
+### Prompt and tool version pinning
+
+Teams that struggle with change tracking usually manage prompts and tool schemas separately from code releases. Stable teams embed version fields in the request context:
+
+```json
+{
+  "run_id": "run_2026_05_21_001",
+  "model": "gpt-4.1-mini",
+  "prompt_version": "agent-101-en-v3",
+  "tool_schema_version": "tools-v5",
+  "policy_version": "policy-2026-05"
+}
+```
+
+Version fields alone accelerate regression analysis significantly. When quality degrades at a specific point in time, you can immediately narrow whether it was a model change, a prompt change, or a tool change.
+
+### Observability event example
+
+```python
+import json
+from datetime import datetime
+
+def emit_event(event_type: str, payload: dict):
+    record = {
+        "ts": datetime.utcnow().isoformat() + "Z",
+        "event_type": event_type,
+        "payload": payload,
+    }
+    print(json.dumps(record, ensure_ascii=False))
+
+emit_event("agent.step", {"step": 2, "tool": "search_docs", "latency_ms": 412})
+```
+
+Adopting structured logs first keeps migration cost low when you later move to OpenTelemetry, ELK, or Grafana.
+
+### Deployment checklist
+
+- Verify model API keys are separated into environment variables and a Secret Manager.
+- Confirm `max_steps`, `timeout_ms`, and `retry_budget` defaults match the production profile.
+- Check that fallback response messages do not give users false confidence during outages.
+- Keep alert thresholds (`error_rate`, `p95_latency`, `policy_violation_rate`) identical in documentation and code.
+
+These items get less attention than feature work, but they directly reduce incident frequency.
+
+### Cost control points
+
+| Parameter | Purpose | Recommended default |
+|---|---|---|
+| max_steps | Maximum loops per execution | 4-8 |
+| max_tool_calls | Tool call cap | 3-6 |
+| input_token_budget | Input token budget | Service-specific policy |
+| output_token_budget | Output token budget | Service-specific policy |
+
+Cost control is not a post-optimization add-on. Fixing execution budgets from the start keeps the service stable when traffic spikes.
+
+### CI quality gates
+
+```bash
+python3 scripts/eval_agent.py --dataset eval/agent_core.jsonl --min-success 0.82
+python3 scripts/check_tool_schema.py --strict
+python3 scripts/check_prompt_version.py --require-changelog
+```
+
+Automating minimum quality gates in the deployment pipeline prevents "accidentally good-looking builds" from reaching production.
+
 ## Checklist
 
 - [ ] I can state the chatbot vs Agent difference in one sentence
