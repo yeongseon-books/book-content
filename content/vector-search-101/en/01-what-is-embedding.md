@@ -248,6 +248,132 @@ This series uses `all-MiniLM-L6-v2` throughout for consistency.
 
 ---
 
+## Locking the embedding contract in code
+
+Once you understand the concept and are ready to wire embeddings into a service, the first step is to codify the embedding contract. By contract I mean explicitly declaring and enforcing the model name, dimensionality, normalization flag, input pre-processing, and output dtype. If this contract is loose, the same sentence can be embedded under different conditions across runs, scores drift unpredictably, and index reproducibility breaks.
+
+```python
+from dataclasses import dataclass
+
+import numpy as np
+from sentence_transformers import SentenceTransformer
+
+@dataclass(frozen=True)
+class EmbeddingSpec:
+    model_name: str
+    dimension: int
+    normalize: bool
+    dtype: str
+
+SPEC = EmbeddingSpec(
+    model_name="sentence-transformers/all-MiniLM-L6-v2",
+    dimension=384,
+    normalize=True,
+    dtype="float32",
+)
+
+_model = SentenceTransformer(SPEC.model_name)
+
+def embed_texts(texts: list[str]) -> np.ndarray:
+    vectors = _model.encode(texts, normalize_embeddings=SPEC.normalize)
+    vectors = np.asarray(vectors, dtype=np.float32)
+    if vectors.shape[1] != SPEC.dimension:
+        raise ValueError(f"dimension mismatch: got {vectors.shape[1]}, expected {SPEC.dimension}")
+    return vectors
+```
+
+The advantage is straightforward. When you later swap the storage layer — FAISS, Chroma, Qdrant, Pinecone — the embedding generation rules stay unchanged. Score semantics survive infrastructure changes.
+
+## Minimal wiring for common vector stores
+
+After you know what an embedding is, the natural follow-up is "where do I put them?" The examples below are concept-comparison code, stripped to the minimum.
+
+```python
+# Chroma
+from chromadb import PersistentClient
+
+client = PersistentClient(path="./chroma-data")
+collection = client.get_or_create_collection(name="docs-mini")
+collection.add(
+    ids=["d1", "d2"],
+    documents=["Vector search introduction", "ANN indexing basics"],
+    embeddings=embed_texts(["Vector search introduction", "ANN indexing basics"]).tolist(),
+)
+```
+
+```python
+# Qdrant
+from qdrant_client import QdrantClient
+from qdrant_client.models import Distance, PointStruct, VectorParams
+
+qdrant = QdrantClient(path="./qdrant-local")
+qdrant.recreate_collection(
+    collection_name="docs-mini",
+    vectors_config=VectorParams(size=SPEC.dimension, distance=Distance.COSINE),
+)
+vectors = embed_texts(["Vector search introduction", "ANN indexing basics"])
+qdrant.upsert(
+    collection_name="docs-mini",
+    points=[
+        PointStruct(id=1, vector=vectors[0].tolist(), payload={"text": "Vector search introduction"}),
+        PointStruct(id=2, vector=vectors[1].tolist(), payload={"text": "ANN indexing basics"}),
+    ],
+)
+```
+
+```python
+# Pinecone (managed service)
+from pinecone import Pinecone, ServerlessSpec
+
+pc = Pinecone(api_key="${PINECONE_API_KEY}")
+index_name = "docs-mini"
+if index_name not in [idx["name"] for idx in pc.list_indexes()]:
+    pc.create_index(
+        name=index_name,
+        dimension=SPEC.dimension,
+        metric="cosine",
+        spec=ServerlessSpec(cloud="aws", region="us-east-1"),
+    )
+index = pc.Index(index_name)
+vectors = embed_texts(["Vector search introduction", "ANN indexing basics"])
+index.upsert(
+    vectors=[
+        ("d1", vectors[0].tolist(), {"text": "Vector search introduction"}),
+        ("d2", vectors[1].tolist(), {"text": "ANN indexing basics"}),
+    ]
+)
+```
+
+All three stores have different API shapes but share one principle: `dimension`, `metric`, and `metadata schema` must align with the embedding contract.
+
+## HNSW vs IVF — first-encounter criteria
+
+ANN index algorithms look complex, but the early-stage decision criteria are simple.
+
+| Aspect | HNSW | IVF |
+|---|---|---|
+| Core idea | Traverse a graph toward nearest candidates | Find the closest cluster center, scan only that bucket |
+| Strength | High recall, relatively friendly to online updates | Memory efficient, predictable tuning at scale |
+| Weakness | Higher memory consumption | Recall drops sharply without nlist/nprobe tuning |
+| Key params | `M`, `efConstruction`, `efSearch` | `nlist`, `nprobe` |
+
+The important message here is: do not commit to an index type in post 1. Lock the embedding and score semantics first. When data grows large enough to need ANN, switching is straightforward because the contract layer above stays unchanged.
+
+## Why you need a baseline benchmark table early
+
+You do not need a complex evaluation pipeline on day one. But you must record at least two axes from the start.
+
+| Setup | top-5 recall (50 samples) | p95 latency (ms) |
+|---|---:|---:|
+| Brute force (NumPy) | 1.00 | 82 |
+| FAISS IndexFlatIP | 1.00 | 27 |
+| HNSW (efSearch=64) | 0.98 | 11 |
+| IVF (nlist=256, nprobe=16) | 0.95 | 8 |
+
+The numbers themselves matter less than having a fixed query set that lets you compare trends. Without this table, no one can prove whether a change made retrieval faster at the cost of quality or genuinely improved both.
+
+One more practical tip: document the embedding schema in your index metadata. For example, storing `embedding_model`, `dimension`, `normalized`, and `distance_metric` as index-level metadata means that when team members rotate or the deployment environment changes, anyone can immediately verify what assumptions the index was built on.
+
 ## Conclusion
 
 Embeddings convert text into numeric vectors where semantic similarity becomes spatial proximity. Cosine similarity measures that proximity and makes keyword-free retrieval possible. The intuition is simple: similar meaning, smaller distance.
