@@ -253,6 +253,147 @@ def register(conn, card: DatasetCard):
 
 Start with SQLite under 50 datasets and migrate when your search needs grow. Premature optimization hurts data catalogs too.
 
+## Label Studio collection-label integration design
+
+A catalog is not just a tool for managing raw files. The moment labeling begins, you must connect data lineage from source to annotation — otherwise the catalog is not a real operational asset. Teams using Label Studio should ensure that import-time source metadata and export-time annotation metadata stay linked.
+
+```xml
+<View>
+  <Header value="Customer inquiry classification"/>
+  <Text name="text" value="$text"/>
+  <Choices name="intent" toName="text" choice="single" showInLine="true">
+    <Choice value="refund_delay"/>
+    <Choice value="cancel_plan"/>
+    <Choice value="outage_question"/>
+    <Choice value="feature_request"/>
+  </Choices>
+  <TextArea name="rationale" toName="text"
+            placeholder="One-line reasoning for this label"
+            rows="2"/>
+</View>
+```
+
+Forcing a rationale field means you can audit why a label was assigned during quality reviews later. From the catalog perspective, at minimum store these fields alongside the annotation export:
+
+```python
+ANNOTATION_REQUIRED = [
+    "task_id",
+    "dataset_version",
+    "source_sha256",
+    "annotator_id",
+    "label",
+    "rationale",
+    "labeled_at",
+]
+```
+
+In practice, when source cards and label cards are separated, tracking costs explode quickly. A common pattern is to load source provenance and annotation provenance into a single record:
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class LabeledRecordCard:
+    dataset_name: str
+    dataset_version: str
+    source_url: str
+    source_sha256: str
+    row_id: str
+    text: str
+    label: str
+    annotator_id: str
+    label_confidence: float
+    rationale: str
+    label_studio_task_id: int
+    label_studio_project_id: int
+
+# Storage unit: one JSONL line = one source+label lineage record
+```
+
+Another critical point: record collection-time license separately from labeling output redistribution rights. Even public datasets can have annotation outputs restricted by contract. Omitting this field frequently leads to a state where the model is trained but the dataset cannot be shared externally.
+
+```python
+USAGE_POLICY = {
+    "raw_data_license": "CC-BY-NC-4.0",
+    "annotation_license": "internal-only",
+    "model_training_allowed": True,
+    "external_redistribution_allowed": False,
+}
+```
+
+A catalog is ultimately a system that answers questions. If you can answer "who applied which label to which source text, and on what basis?" within one minute, the collection design is solid.
+
+## Failure recovery strategy for collection pipelines
+
+Running a catalog over time reveals that recovery policy absence causes more damage than collection failures themselves. When re-collecting from the same source, compare `snapshot_date`, `etag`, and `sha256` to determine whether the data is genuinely new.
+
+```python
+import requests
+
+def fetch_with_cache_meta(url: str, etag: str | None = None):
+    headers = {"If-None-Match": etag} if etag else {}
+    r = requests.get(url, headers=headers, timeout=20)
+    if r.status_code == 304:
+        return {"status": "not_modified", "content": None, "etag": etag}
+    r.raise_for_status()
+    return {"status": "ok", "content": r.content, "etag": r.headers.get("ETag")}
+```
+
+This pattern avoids unnecessary re-collection and lets you version up only data that actually changed at a given collection point.
+
+## Provenance query API example
+
+```python
+# GET /catalog/datasets/{name}/{version}
+# Response includes raw source + annotation lineage + transform lineage
+EXAMPLE_RESPONSE = {
+  "name": "support_tickets",
+  "version": "2.1.0",
+  "source": {"type": "first-party", "snapshot_date": "2026-05-01"},
+  "annotations": {"project": "label-studio-12", "count": 48210},
+  "transforms": ["clean@a2f91c", "dedup@f80ab2", "pii@91ed10"]
+}
+```
+
+The catalog's value lies in query speed, not storage volume. If an operator cannot trace lineage within one minute, simplify the structure.
+
+## Inspection questions for immediate ops use
+
+These questions come up in real pre-deployment reviews. Each must be answerable with a file path or metric value — not a feeling.
+
+1. Which version did this dataset come from, and what is its sha256?
+2. How much did duplicate/null/length distributions change compared to the previous batch?
+3. Which removal rules dropped samples, and what are the top removal reasons?
+4. What is the numeric leakage risk at train/eval/test boundaries?
+5. How many samples did a human review this batch, and what error types were found?
+
+```python
+def release_readiness(summary: dict) -> tuple[bool, list[str]]:
+    issues = []
+    if not summary.get("dataset_sha256"):
+        issues.append("missing_dataset_sha256")
+    if summary.get("duplicate_ratio", 1.0) > 0.10:
+        issues.append("duplicate_ratio_too_high")
+    if summary.get("null_ratio", 1.0) > 0.02:
+        issues.append("null_ratio_too_high")
+    if summary.get("contamination_ratio", 1.0) > 0.01:
+        issues.append("contamination_ratio_too_high")
+    if summary.get("human_reviewed_rows", 0) < 100:
+        issues.append("insufficient_human_review")
+    return len(issues) == 0, issues
+```
+
+## Production log example
+
+```text
+[release-check] dataset=v2.4.1 sha=4fb1...
+[release-check] duplicate_ratio=0.061 null_ratio=0.008
+[release-check] contamination_ratio=0.004 human_reviewed_rows=240
+[release-check] status=PASS
+```
+
+With this log bundle, you can quickly rule out or zoom into the collection stage when model performance wobbles downstream.
+
 ## Common Mistakes
 
 1. **Collection separated from card creation**: Data lands but the card is missing. A few days later, no one can trace the source. Always do both in one function.
