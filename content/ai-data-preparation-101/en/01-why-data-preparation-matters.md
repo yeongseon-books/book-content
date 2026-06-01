@@ -206,6 +206,146 @@ That kind of jump is operationally actionable. It tells you to inspect the datas
 
 Generate this report for every dataset version, diff against the previous version, and you catch quality regressions before training even starts.
 
+## Design dataset versioning and quality gates together
+
+Saying "data preparation determines model quality" is abstract. In operations, that statement becomes concrete only when implemented as `version pinning + halt on gate failure`. The example below uses pandas and polars to compute schema validation, duplicate ratio, and length distribution, halting training when thresholds are exceeded.
+
+```python
+import pandas as pd
+import polars as pl
+
+RULES = {
+    "max_null_ratio": 0.02,
+    "max_duplicate_ratio": 0.10,
+    "max_p99_length": 2400,
+    "min_rows": 50_000,
+}
+
+def load_and_validate(path: str) -> dict:
+    pdf = pd.read_parquet(path)
+    required_cols = {"id", "text", "label", "source", "created_at"}
+    missing = sorted(required_cols - set(pdf.columns))
+    if missing:
+        raise ValueError({"error": "missing_columns", "columns": missing})
+
+    pldf = pl.from_pandas(pdf[["id", "text", "label", "source"]])
+    texts = pldf.select(pl.col("text").cast(pl.Utf8).fill_null(""))
+    lens = texts.select(pl.col("text").str.len_chars().alias("n")).to_series()
+
+    report = {
+        "rows": len(pdf),
+        "null_ratio": float(pdf["text"].isna().mean()),
+        "duplicate_ratio": float(1 - pdf["text"].astype(str).nunique() / max(len(pdf), 1)),
+        "p99_length": float(lens.quantile(0.99)),
+        "n_sources": int(pdf["source"].nunique()),
+    }
+
+    if report["rows"] < RULES["min_rows"]:
+        raise RuntimeError({"gate": "min_rows", "report": report})
+    if report["null_ratio"] > RULES["max_null_ratio"]:
+        raise RuntimeError({"gate": "null_ratio", "report": report})
+    if report["duplicate_ratio"] > RULES["max_duplicate_ratio"]:
+        raise RuntimeError({"gate": "duplicate_ratio", "report": report})
+    if report["p99_length"] > RULES["max_p99_length"]:
+        raise RuntimeError({"gate": "p99_length", "report": report})
+    return report
+```
+
+The report produced here must always share the same run ID with the experiment log. Before asking whether an experiment went well, you need to answer which dataset version it ran on — otherwise the result is not trustworthy.
+
+```python
+from dataclasses import dataclass
+from datetime import datetime, timezone
+import json
+
+@dataclass
+class RunManifest:
+    run_id: str
+    dataset_version: str
+    dataset_sha256: str
+    quality_report: dict
+    git_commit: str
+    created_at: str
+
+def write_manifest(path: str, manifest: RunManifest) -> None:
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(manifest.__dict__, f, ensure_ascii=False, indent=2)
+
+manifest = RunManifest(
+    run_id="exp-2026-05-14-01",
+    dataset_version="v1.4.2",
+    dataset_sha256="c2d2...",
+    quality_report={"duplicate_ratio": 0.041, "p99_length": 980},
+    git_commit="9e1fabc",
+    created_at=datetime.now(timezone.utc).isoformat(),
+)
+```
+
+The point is simple: data preparation must be a deployable contract, not an analysis notebook. When failure criteria are fixed in code, quality holds regardless of who runs the pipeline.
+
+## Pin operational signals to a dashboard
+
+To make data preparation a team norm rather than documentation, a dashboard must come before docs. In practice, compare these four signals on every batch:
+
+- `duplicate_ratio`: early detection of evaluation contamination
+- `null_ratio`: catch collection pipeline gaps
+- `p95/p99 token length`: detect cost spikes and context overflow
+- `label/source drift`: detect single-source concentration
+
+```python
+from scipy.spatial.distance import jensenshannon
+import numpy as np
+
+def js_drift(prev_dist: dict, curr_dist: dict) -> float:
+    keys = sorted(set(prev_dist) | set(curr_dist))
+    p = np.array([prev_dist.get(k, 0.0) for k in keys], dtype=float)
+    q = np.array([curr_dist.get(k, 0.0) for k in keys], dtype=float)
+    p = p / max(p.sum(), 1e-9)
+    q = q / max(q.sum(), 1e-9)
+    return float(jensenshannon(p, q))
+```
+
+When JS distance exceeds the threshold, stop training and investigate the distribution shift first. Resolving data distribution anomalies before continuing experiments is faster for overall development velocity than blindly running more GPU hours.
+
+## Inspection questions for immediate ops use
+
+The questions below are commonly used in pre-deployment reviews. Each question must be answerable with a file path or a metric value — not with "I think so."
+
+1. Which version did this dataset come from, and what is its sha256?
+2. How much did duplicate/null/length distributions change compared to the previous batch?
+3. Which removal rules dropped samples, and what are the top removal reasons?
+4. What is the numeric leakage risk at train/eval/test boundaries?
+5. How many samples did a human review this batch, and what error types were found?
+
+```python
+def release_readiness(summary: dict) -> tuple[bool, list[str]]:
+    issues = []
+    if not summary.get("dataset_sha256"):
+        issues.append("missing_dataset_sha256")
+    if summary.get("duplicate_ratio", 1.0) > 0.10:
+        issues.append("duplicate_ratio_too_high")
+    if summary.get("null_ratio", 1.0) > 0.02:
+        issues.append("null_ratio_too_high")
+    if summary.get("contamination_ratio", 1.0) > 0.01:
+        issues.append("contamination_ratio_too_high")
+    if summary.get("human_reviewed_rows", 0) < 100:
+        issues.append("insufficient_human_review")
+    return len(issues) == 0, issues
+```
+
+Operations teams may not use this function verbatim, but they must implement the same concept as a pipeline gate. The key principle: never judge readiness by feel.
+
+## Production log example
+
+```text
+[release-check] dataset=v2.4.1 sha=4fb1...
+[release-check] duplicate_ratio=0.061 null_ratio=0.008
+[release-check] contamination_ratio=0.004 human_reviewed_rows=240
+[release-check] status=PASS
+```
+
+With this log bundle, when model performance wobbles you can quickly either rule out or zoom into the data preparation stage. Data preparation quality reveals itself not in a single article's explanation but in these repeatable verification logs.
+
 ## Common Mistakes
 
 1. **"Just train and see what happens"**: Skipping data validation can burn days of GPU time. Run the quality report before kicking off training.
