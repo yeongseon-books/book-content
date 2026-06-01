@@ -291,6 +291,96 @@ def fp_rate(logs: list[ModerationLog], window_days: int = 7) -> float:
 
 If FP rate exceeds 5%, retune thresholds or revisit category coverage.
 
+### Separating Filter Policy into Code
+
+Output filtering breaks down when policy is scattered between code and documentation. In production, version categories and actions together:
+
+```yaml
+moderation_policy:
+  version: "2026-05-21"
+  categories:
+    self_harm_instructions:
+      threshold: 0.30
+      action: block
+    violence_graphic:
+      threshold: 0.45
+      action: block
+    sexual_minors:
+      threshold: 0.01
+      action: block
+    harassment:
+      threshold: 0.80
+      action: rewrite
+  fallback:
+    block_message: "Unable to process this request. Please rephrase."
+    rewrite_message: "Rephrasing in a safer tone."
+```
+
+```python
+def apply_policy(scores: dict, policy: dict) -> tuple[str, str | None]:
+    for cat, conf in policy["categories"].items():
+        if scores.get(cat, 0.0) >= conf["threshold"]:
+            return conf["action"], cat
+    return "allow", None
+```
+
+### Streaming Bypass Attack/Defense
+
+- **Attack**: Start with benign tokens, append harmful instructions in later chunks.
+- **Defense**: Buffer 30-80 tokens, run moderation on each buffer window + immediate block on high-risk keywords.
+- **Ops point**: Log `block_offset` (the token position where the block triggered) for reproducibility.
+
+```python
+def stream_guard(chunks):
+    buf = ""
+    sent = 0
+    for token in chunks:
+        buf += token
+        if len(buf) > 300:
+            verdict = moderate(buf)
+            if verdict["flagged"]:
+                return {"blocked": True, "offset": sent}
+            sent += len(buf)
+            buf = ""
+    return {"blocked": False}
+```
+
+### Safety vs UX Balance Table
+
+| Situation | Internal action | User message |
+|---|---|---|
+| High risk (self-harm instructions, violence assembly) | Immediate block + security alert | Generic block message + help resources |
+| Medium risk (profanity, insults) | Rewrite attempt then deliver | Response in softened tone |
+| Low risk (borderline expression) | Tag with warning, deliver | Normal response |
+
+Defining these tiers in advance reduces variance in operator judgment.
+
+### High-Risk Domain Response Templates
+
+For medical, financial, and legal domains, blocking alone is insufficient. Design safe alternative templates so users don't repeatedly attempt bypasses:
+
+```python
+SAFE_TEMPLATES = {
+    "medical": "Medical decisions require professional consultation. I can help you summarize symptoms and prepare a checklist for your appointment.",
+    "legal": "Legal advice requires an attorney. I can help organize your situation and prepare questions.",
+    "finance": "I cannot provide individual investment advice. I can outline risk-assessment items for you.",
+}
+
+def guarded_fallback(domain: str) -> str:
+    return SAFE_TEMPLATES.get(domain, "Unable to process this request. Please rephrase.")
+```
+
+### Moderation Quality Metrics
+
+| Metric | Target | Alert condition |
+|---|---|---|
+| Overall block rate | 2-8% | 2x spike in 24 hours |
+| Self-harm block rate | Domain-specific floor | Converges to 0 → rule review |
+| FP rate | Below 5% | 7-day average exceeds 5% |
+| Re-ask success rate | Above 60% | Below 40% → improve fallback |
+
+In operations, watch "are we blocking effectively" and "can users recover to a normal flow" together.
+
 ---
 
 ## Common Mistakes
