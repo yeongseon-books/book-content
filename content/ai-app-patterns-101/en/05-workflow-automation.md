@@ -332,6 +332,199 @@ print(f"\n=== final report ===\n{result['report']}")
 
 ---
 
+## Workflow orchestration and state transitions
+
+### Orchestrator with stage state
+
+When operating a multi-step chain, record success and failure of each stage in a structured log. The example below is a minimal orchestrator with state transition events.
+
+```python
+from dataclasses import dataclass, field
+from datetime import datetime
+
+@dataclass
+class StageEvent:
+    stage: str
+    status: str
+    timestamp: str
+    detail: str = ""
+
+@dataclass
+class WorkflowRun:
+    run_id: str
+    input_text: str
+    events: list[StageEvent] = field(default_factory=list)
+    outputs: dict = field(default_factory=dict)
+
+    def mark(self, stage: str, status: str, detail: str = ""):
+        self.events.append(StageEvent(
+            stage=stage,
+            status=status,
+            timestamp=datetime.utcnow().isoformat(),
+            detail=detail,
+        ))
+
+def run_workflow(text: str) -> WorkflowRun:
+    run = WorkflowRun(run_id='wf-001', input_text=text)
+
+    run.mark('classify', 'started')
+    category = 'TECHNICAL'
+    run.outputs['category'] = category
+    run.mark('classify', 'completed', detail=f'category={category}')
+
+    run.mark('summarize', 'started')
+    summary = f'Summary: {text[:100]}...'
+    run.outputs['summary'] = summary
+    run.mark('summarize', 'completed')
+
+    run.mark('response', 'started')
+    response = f'[{category}] {summary}'
+    run.outputs['response'] = response
+    run.mark('response', 'completed')
+
+    return run
+```
+
+With event logs, a failure no longer means "no final output and no clue." You can see exactly which stage succeeded, which failed, and restart from the correct point.
+
+### Operational check: retry and idempotency
+
+Workflow automation without retry design is incomplete. Ensure the same input arriving twice does not trigger duplicate delivery:
+
+- `idempotency_key`: external request ID or `(customer_id, request_ts)` hash
+- `retry_policy`: per-stage `max_retries`, backoff, timeout
+- `dead_letter_queue`: isolation store for repeatedly failing items
+
+Without these, automation during incidents causes duplicate execution instead of aiding recovery.
+
+## Separating workflow API from execution
+
+When a sequential chain runs only in a single process, failure recovery and scaling are difficult. Separate the trigger API from the execution worker.
+
+```python
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class WorkflowRequest(BaseModel):
+    request_id: str
+    text: str
+
+work_queue: list[dict] = []
+
+@app.post('/workflow/submit')
+def submit(req: WorkflowRequest):
+    work_queue.append({'request_id': req.request_id, 'text': req.text, 'status': 'queued'})
+    return {'request_id': req.request_id, 'status': 'queued'}
+```
+
+```python
+def worker_once():
+    if not work_queue:
+        return None
+
+    item = work_queue.pop(0)
+    run = run_workflow(item['text'])
+    return {
+        'request_id': item['request_id'],
+        'status': 'completed',
+        'outputs': run.outputs,
+        'events': [e.__dict__ for e in run.events],
+    }
+```
+
+### Approval gate states
+
+When the pipeline requires human approval, add explicit states:
+
+```text
+queued -> running -> waiting_approval -> approved -> completed
+queued -> running -> waiting_approval -> rejected
+queued -> running -> failed
+```
+
+These states let a dashboard answer "why is it stuck?" at a glance.
+
+### Operational metrics
+
+Track process metrics alongside model quality metrics:
+
+- `p95_stage_latency`: per-stage latency
+- `reprocess_rate`: fraction of items reprocessed
+- `approval_wait_time`: human approval queue time
+- `dead_letter_count`: repeatedly failing items
+
+These four together tell you whether automation is increasing efficiency or just adding complexity.
+
+## Extending to a LangGraph-style state machine
+
+As workflows grow, a state machine becomes easier to manage than sequential function calls. Separate responsibility per node and share a typed state object.
+
+```python
+from typing import TypedDict
+
+class FlowState(TypedDict):
+    request_id: str
+    inquiry: str
+    category: str
+    summary: str
+    answer: str
+    needs_approval: bool
+
+def node_classify(state: FlowState) -> FlowState:
+    state['category'] = 'BILLING'
+    state['needs_approval'] = state['category'] == 'BILLING'
+    return state
+
+def node_summarize(state: FlowState) -> FlowState:
+    state['summary'] = state['inquiry'][:120]
+    return state
+
+def node_answer(state: FlowState) -> FlowState:
+    state['answer'] = f"[{state['category']}] {state['summary']}"
+    return state
+```
+
+Why a state machine wins in operations:
+
+- Adding a stage reduces blast radius on existing code
+- Restart from the failed node without re-running earlier stages
+- Dashboards can display the current node directly
+
+## Failure recovery runbook: stage-level resume
+
+Default failure response should be stage-level resume, not full re-run. Save each stage's output artifact:
+
+```text
+artifact://run_id/classify.json
+artifact://run_id/summary.txt
+artifact://run_id/response.txt
+```
+
+```python
+def resume_from_stage(run_id: str, stage: str):
+    if stage == 'summarize':
+        classify = load_artifact(run_id, 'classify.json')
+        return rerun_summarize_and_after(run_id, classify)
+    if stage == 'response':
+        summary = load_artifact(run_id, 'summary.txt')
+        return rerun_response_only(run_id, summary)
+    raise ValueError('unsupported stage')
+```
+
+Limiting the re-execution unit to a single stage cuts incident response time and prevents secondary failures like duplicate delivery.
+
+### Per-stage timeout policy
+
+A single global timeout for a long workflow makes it hard to find the bottleneck stage. Set per-stage limits (e.g. classify 3s, summarize 8s, response 8s) to narrow latency causes quickly.
+
+### Pre-deployment dry run
+
+Before deploying workflow changes, run a dry run with 100 sample items and compare per-stage success rate and latency against the baseline. Deploying without a dry-run report makes it easy to underestimate impact.
+
+---
+
 ## Conclusion
 
 Keep each stage focused on one responsibility. A stage that does too much is hard to test, hard to debug, and hard to replace. When a stage's output is ambiguous — a free-form string where structured data was expected — the next stage often fails silently. Define the output format for every stage, validate it, and only then pass it forward.
