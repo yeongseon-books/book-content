@@ -286,6 +286,96 @@ This pattern switches automatically to the fallback model when the primary model
 - [ ] I know when `StrOutputParser` is enough and when structured parsing is worth the extra constraint
 - [ ] I understand why fallback chains must preserve the same output shape
 
+## Validating prompt contracts before execution
+
+The most common failure point in prompt chains is a missing variable. Checking input keys before calling the model turns runtime KeyErrors into clear pre-flight errors.
+
+```python
+from langchain_core.prompts import ChatPromptTemplate
+
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "You are reviewing {language} code."),
+    ("human", "Focus: {focus}\n\nCode:\n{code}"),
+])
+
+required = set(prompt.input_variables)
+incoming = {"language": "python", "focus": "error handling"}
+
+missing = required - set(incoming.keys())
+if missing:
+    raise ValueError(f"missing prompt variables: {sorted(missing)}")
+```
+
+This same pattern applies at API boundaries. Validate against the prompt's expected variables immediately after parsing the request body, and return a clear 4xx before any model call.
+
+## Output parser selection table
+
+| Situation | Recommended parser | Why | On failure |
+|---|---|---|---|
+| Blog paragraph generation | `StrOutputParser` | Downstream consumes strings | Retry with length constraint |
+| API response generation | `JsonOutputParser` | Code needs dict access | Strengthen schema instruction |
+| Strict field validation | `with_structured_output` | Type safety | Per-field fallback |
+
+Deciding the parser early prevents type confusion as the chain grows. In team settings, making "is this a string chain or a structured chain" visible at the top of the file saves review time.
+
+## Operational logging for prompt + parser chains
+
+Even minimal structured logs improve debugging quality significantly.
+
+```text
+request_id=req_20260521_1042
+prompt_template=review_v3
+input_keys=[language, review_focus, code]
+parser=JsonOutputParser
+llm_model=llama-3.1-8b-instant
+status=success latency_ms=1224
+```
+
+For failures, split by stage:
+
+```text
+status=fail
+error_stage=parser
+error_type=OutputParserException
+raw_preview="Sure, here is your JSON: {...}"
+```
+
+Logging the stage separates "model gave bad output" from "parser expectation was too strict" immediately.
+
+## Prompt reuse boundaries
+
+Treating `ChatPromptTemplate` as a reusable asset stabilizes chain quality. A useful split:
+
+| Layer | Example | Change frequency |
+|---|---|---|
+| Policy (system) | Tone, forbidden content, output language | Slow |
+| Task (human) | Summarize, review, classify | Medium |
+| Output constraint (parser instruction) | JSON keys, length cap | Fast |
+
+This separation connects to deployment strategy. Policy prompt changes should get low experiment traffic; output constraint changes can safely get higher traffic since risk is lower.
+
+## Prompt debugging order
+
+When a prompt chain breaks in production, this sequence narrows the cause fastest:
+
+1. **Input dict validation**: missing keys, empty strings, length overflow
+2. **Rendered message inspection**: actual system/human content
+3. **Raw model response**: `AIMessage.content` before parser
+4. **Parser failure analysis**: format issue vs schema mismatch
+
+```python
+rendered = prompt.invoke({
+    "language": "python",
+    "review_focus": "readability",
+    "code": "print('hello')",
+})
+
+for msg in rendered.messages:
+    print(f"[{msg.type}] {msg.content}")
+```
+
+Inspecting the rendered messages before calling the model separates template wording problems from model quality problems.
+
 ## Conclusion
 
 You can now build prompt templates with multiple variables, select the right output parser for the job, and pass inputs unchanged when a chain step needs earlier data.
