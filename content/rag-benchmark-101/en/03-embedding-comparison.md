@@ -203,6 +203,138 @@ This post kept the retriever fixed and varied only the embedding model, comparin
 
 Episode 4 applies the same thinking to vector DB selection: FAISS, Chroma, pgvector — same loop, different store.
 
+## Connecting embedding comparisons to operational decisions
+
+Model comparison experiments do not end at a results table. To drive an actual decision, quality, speed, and cost must land in a single scorecard.
+
+### Embedding cost formula
+
+When API-based embeddings are candidates, record per-request cost alongside quality.
+
+```text
+monthly_cost = (monthly_embedding_tokens / 1M) * price_per_1M_tokens
+reindex_cost = (corpus_total_tokens / 1M) * price_per_1M_tokens
+```
+
+For local models, convert to GPU/CPU time and memory cost instead.
+
+```text
+infra_cost_monthly = hourly_instance_cost * monthly_uptime_hours
+```
+
+Including these formulas in the report turns "MRR improved by 0.02" into "MRR improved by 0.02, monthly cost doubled."
+
+### Embedding model comparison report template
+
+| Model | dim | hit@5 | MRR | emb_ms/doc | query_ms | index_build_s | est_monthly_cost |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| all-MiniLM-L6-v2 | 384 | 0.90 | 0.79 | 3.1 | 5.4 | 94 | $42 |
+| bge-m3 | 1024 | 0.94 | 0.83 | 9.6 | 7.8 | 271 | $118 |
+| e5-large-v2 | 1024 | 0.95 | 0.84 | 11.2 | 8.1 | 305 | $131 |
+
+This is a requirements-fit table, not a ranking. If the SLA requires p95 < 800 ms and budget < $100/month, candidates narrow automatically.
+
+### Chunk strategy × embedding interaction
+
+Changing the embedding model interacts with chunk strategy. Run at least three chunk configurations together.
+
+| chunk_size / overlap | Expected effect | Risk |
+| --- | --- | --- |
+| 300 / 50 | Precise sentence matching | Context fragmentation |
+| 500 / 80 | Balanced | Moderate token cost |
+| 900 / 120 | Long context preserved | Noise inclusion, retrieval spread |
+
+```python
+CHUNK_SETUPS = [(300, 50), (500, 80), (900, 120)]
+MODELS = [
+    "sentence-transformers/all-MiniLM-L6-v2",
+    "BAAI/bge-m3",
+]
+
+for model_name in MODELS:
+    for chunk_size, overlap in CHUNK_SETUPS:
+        report = run_embedding_benchmark(model_name, chunk_size, overlap)
+        save_report(report)
+```
+
+Automating these combinations reveals patterns such as "Model A is strong at 300-token chunks while Model B wins at 700-token chunks."
+
+### Production embedding model rollout config
+
+Switching models in production is a reindexing operation, not just a code change. Pin the rollout policy in config.
+
+```yaml
+embedding_rollout:
+  model_from: sentence-transformers/all-MiniLM-L6-v2
+  model_to: BAAI/bge-m3
+  reindex_strategy: shadow-index
+  traffic_split:
+    phase1: 0.1
+    phase2: 0.5
+    phase3: 1.0
+  rollback_on:
+    mrr_drop: -0.03
+    p95_latency_increase_ms: 40
+```
+
+Maintain the existing index while building the new one in parallel; shift traffic incrementally. Documenting this process prevents model swaps from becoming tribal knowledge.
+
+## Automated experiment matrix
+
+### Matrix definition
+
+```yaml
+matrix:
+  embedding_model:
+    - sentence-transformers/all-MiniLM-L6-v2
+    - sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2
+    - BAAI/bge-m3
+  chunk_size: [300, 500, 900]
+  overlap: [50, 80]
+  top_k: [3, 5]
+```
+
+Even if you do not run every combination, declaring the matrix documents which combinations were skipped.
+
+### Composite scoring function
+
+| Factor | Weight | Description |
+| --- | ---: | --- |
+| MRR | 0.45 | Top-rank quality |
+| hit@k | 0.25 | Relevant doc recall |
+| p95 latency | 0.20 | User-perceived speed |
+| Monthly cost | 0.10 | Operational cost |
+
+```text
+score = 0.45*mrr_norm + 0.25*hit_norm + 0.20*latency_norm + 0.10*cost_norm
+```
+
+Weights adjust to team goals. The critical practice is locking the scoring rule before running the experiment.
+
+### Model swap approval checklist
+
+- New model improves hit@k without MRR regression relative to baseline?
+- P95 latency stays within SLA?
+- Reindexing time fits the maintenance window?
+- Cost increase within budget?
+- Top-20 failure queries manually reviewed?
+
+This checklist makes model swaps an auditable engineering decision rather than a judgment call.
+
+### Reproducibility metadata fields
+
+| Field | Example |
+| --- | --- |
+| model_revision | `BAAI/bge-m3@main` |
+| device | `cpu` or `cuda:0` |
+| batch_size | `32` |
+| corpus_sha256 | Corpus file hash |
+| query_set_sha256 | Query set hash |
+
+Without this metadata, reproducing results weeks later becomes impossible. Always record model commit hash or release tag alongside the model name — internal revisions change silently.
+
+---
+
 ## Answering the Opening Questions
 
 - **Why is it risky to choose an embedding model from leaderboard scores alone?**
