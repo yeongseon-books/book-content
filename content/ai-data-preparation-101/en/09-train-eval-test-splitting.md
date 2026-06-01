@@ -205,6 +205,204 @@ def production_split(df: pd.DataFrame, time_col: str, group_col: str | None = No
 
 This function covers nearly all production cases.
 
+## Embedding contamination checks into the batch pipeline
+
+No matter how good the split strategy is, if contamination checks run manually they will be skipped in production. It is safer to force a decontamination stage right after the split as part of the DAG.
+
+```python
+SPLIT_DAG = {
+    "build_raw_snapshot": [],
+    "split_temporal_group": ["build_raw_snapshot"],
+    "cross_dedup_train_eval": ["split_temporal_group"],
+    "ngram_contamination_scan": ["cross_dedup_train_eval"],
+    "publish_split_manifest": ["ngram_contamination_scan"],
+}
+```
+
+## Split result manifest
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class SplitManifest:
+    dataset_version: str
+    split_strategy: str
+    train_rows: int
+    val_rows: int
+    test_rows: int
+    time_cutoff: str
+    group_column: str | None
+    contamination_ratio_test: float
+    overlap_removed_train_rows: int
+
+manifest = SplitManifest(
+    dataset_version="v2.3.0",
+    split_strategy="temporal+group",
+    train_rows=420_000,
+    val_rows=72_000,
+    test_rows=88_000,
+    time_cutoff="2026-03-01",
+    group_column="user_id",
+    contamination_ratio_test=0.006,
+    overlap_removed_train_rows=5142,
+)
+```
+
+This manifest is essential for separating "model difference" from "evaluation condition difference" when comparing experiment results.
+
+## Contamination sample report
+
+```python
+def collect_contamination_examples(eval_docs, pretrain_docs, overlap_fn, top_k=20):
+    rows = []
+    for e in eval_docs:
+        score, matched = overlap_fn(e, pretrain_docs)
+        if score > 0.5:
+            rows.append({"eval": e[:160], "score": score, "matched": matched[:160]})
+    rows.sort(key=lambda x: x["score"], reverse=True)
+    return rows[:top_k]
+```
+
+Numbers alone can mislead. Having a human review the top contaminated samples makes threshold tuning far more accurate.
+
+## Before/after split samples
+
+```text
+[Bad split]
+train: includes 2026-04 data
+test : includes 2026-03 data
+
+[Improved split]
+train: <= 2026-02
+val  : partial 2026-02
+test : >= 2026-03
+```
+
+Aligning the time axis honestly may lower offline scores, but it reduces the gap between offline and post-deployment performance.
+
+## DVC stage for split reproducibility
+
+```yaml
+stages:
+  split_dataset:
+    cmd: python pipelines/split_dataset.py --strategy temporal_group --time-col timestamp --group-col user_id
+    deps:
+      - pipelines/split_dataset.py
+      - data/quality/train_filtered.parquet
+    outs:
+      - data/splits/train.parquet
+      - data/splits/val.parquet
+      - data/splits/test.parquet
+    metrics:
+      - reports/split_manifest.json
+      - reports/contamination_report.json
+```
+
+Splitting is not experiment preprocessing—it is an evaluation contract. Unless the contract is preserved in code and version control, subsequent model improvements cannot be trusted.
+
+## Split validation automation
+
+Even a good strategy falls apart without automated verification. Right after generating splits, all the following checks must pass before proceeding to the next stage.
+
+```python
+def validate_split(train_df, val_df, test_df, group_col=None):
+    checks = {}
+    checks["non_empty"] = len(train_df) > 0 and len(val_df) > 0 and len(test_df) > 0
+    checks["disjoint_index"] = (
+        set(train_df.index).isdisjoint(val_df.index) and
+        set(train_df.index).isdisjoint(test_df.index) and
+        set(val_df.index).isdisjoint(test_df.index)
+    )
+    if group_col:
+        checks["group_disjoint"] = (
+            set(train_df[group_col]).isdisjoint(val_df[group_col]) and
+            set(train_df[group_col]).isdisjoint(test_df[group_col]) and
+            set(val_df[group_col]).isdisjoint(test_df[group_col])
+        )
+    return checks
+```
+
+## Class distribution stability check
+
+```python
+def class_ratio(df, label_col):
+    vc = df[label_col].value_counts(normalize=True)
+    return {k: float(v) for k, v in vc.items()}
+
+def max_ratio_delta(a: dict, b: dict) -> float:
+    keys = set(a) | set(b)
+    return max(abs(a.get(k, 0.0) - b.get(k, 0.0)) for k in keys)
+```
+
+If the maximum distribution gap across train/val/test is excessive, revisit the split criteria. For minority classes, even a 1-2% difference can significantly affect production metrics.
+
+## Contamination response steps
+
+1. Extract samples where `ngram overlap > threshold`.
+2. Have humans review the top samples to remove false positives.
+3. Remove confirmed contaminated samples from train and record in the report.
+4. Compare performance before/after removal to confirm evaluation reliability change.
+
+Automating this loop dramatically reduces the state of "high scores that cannot be trusted."
+
+## Inspection questions for immediate ops use
+
+The questions below are actual check items used in pre-deployment reviews. Each question must be answerable with a file path or metric value, not just a document reference.
+
+1. Which dataset version is this batch from, and what is the sha256?
+2. How much has the duplicate/null/length distribution changed compared to the previous batch?
+3. Which rules caused sample removal, and what are the top rejection reasons?
+4. How much contamination risk remains at the train/eval/test boundary, in numeric terms?
+5. Which samples were human-reviewed in this batch, and what error types were found?
+
+```python
+def release_readiness(summary: dict) -> tuple[bool, list[str]]:
+    issues = []
+    if not summary.get("dataset_sha256"):
+        issues.append("missing_dataset_sha256")
+    if summary.get("duplicate_ratio", 1.0) > 0.10:
+        issues.append("duplicate_ratio_too_high")
+    if summary.get("null_ratio", 1.0) > 0.02:
+        issues.append("null_ratio_too_high")
+    if summary.get("contamination_ratio", 1.0) > 0.01:
+        issues.append("contamination_ratio_too_high")
+    if summary.get("human_reviewed_rows", 0) < 100:
+        issues.append("insufficient_human_review")
+    return len(issues) == 0, issues
+```
+
+Operations teams may not use this function verbatim, but the same concepts must be implemented as pipeline gates. The key principle is: never judge readiness by feel.
+
+## Production log example
+
+```text
+[release-check] dataset=v2.4.1 sha=4fb1...
+[release-check] duplicate_ratio=0.061 null_ratio=0.008
+[release-check] contamination_ratio=0.004 human_reviewed_rows=240
+[release-check] status=PASS
+```
+
+With this single log block, even when model performance wavers, you can quickly exclude or deep-dive the data preparation stage.
+
+### Test set access control
+
+The test set should be used only for final pre-deployment verification. Restrict access during iterative experimentation. Defining access paths via repository permissions and CI job separation significantly reduces unconscious test overfitting.
+
+### Minimum items for release notes
+
+Changes at this stage must also appear in release notes. At minimum, include `changed rule`, `affected row count`, `key metric delta`, and `rollback path` so the same decision can be replicated in the next batch.
+
+Split rule changes should always be recorded as independent experiments to separate their effect from model changes.
+
+For temporal splits, inspecting periods around service events (promotions, outage notices) as separate slices increases evaluation reliability.
+
+Keep split manifests alongside experiment logs so that score changes can be clearly attributed to either data boundary changes or model improvements. Without this, performance interpretation within teams frequently conflicts.
+
+Logging access to the evaluation set allows tracking unconscious leakage after the fact.
+
+Split results should be frozen after review approval.
+
 ## 5 common mistakes
 
 1. **Random split on time-series data**: leaks the future into training and inflates validation.
