@@ -228,6 +228,7 @@ Self-tests are valuable because they make those failure boundaries obvious.
 - A local self-test passing does not remove the need to verify secrets, networking, and timeout settings in deployment.
 - A container starting does not guarantee readiness. A real request still needs to pass.
 
+The most common misunderstanding is "it is async, so it should be fine." In reality, calling a synchronous SDK directly inside an async endpoint blocks the event loop and destroys concurrency. Similarly, passing only `/health` and stopping there leaves the model-call path unverified. Operational writing should always separate lightweight readiness checks from representative-request verification.
 ## Deployment verification order
 
 ```bash
@@ -245,6 +246,71 @@ curl --fail -H "Content-Type: application/json" -d '{"message":"Explain Python a
 ```
 
 The same order works well in CI because each step narrows the failure surface.
+
+## Design deployment patterns per environment
+
+The most common deployment mistake for LLM apps is treating development, staging, and production identically. Each environment has a different purpose, so the deployment pattern must differ. Development prioritizes fast feedback — single instance, loose limits. Staging validates production-like traffic paths — security guardrails, cost instrumentation, and evaluation hooks all active. Production prioritizes availability and rollback speed — zero-downtime deployment and gradual traffic shift are non-negotiable.
+
+The three patterns used most often in practice are blue/green, canary, and rolling. Blue/green is simple to switch and fast to roll back, but costs more infrastructure. Canary exposes risk gradually but requires mature observability. Rolling is cost-efficient but demands careful session and cache consistency.
+
+## Enforce self-checks as deployment gates
+
+Self-checks are not optional diagnostics — they are deployment gates. The gate must verify whether the server starts, whether the health endpoint responds, whether a real model call succeeds, and whether logs and cost records are written. LLM apps commonly pass `/health` while `/chat` silently fails, so a representative request check is mandatory.
+
+### Pre-deploy smoke-test script example
+
+```python
+import httpx
+
+def run_predeploy_smoke(base_url: str) -> dict:
+    report = {"health": False, "chat": False, "cost_log": False}
+
+    health = httpx.get(f"{base_url}/health", timeout=5.0)
+    report["health"] = health.status_code == 200
+
+    chat = httpx.post(
+        f"{base_url}/chat",
+        json={"message": "Deployment smoke-test request."},
+        timeout=20.0,
+    )
+    report["chat"] = chat.status_code == 200 and "answer" in chat.text
+
+    metrics = httpx.get(f"{base_url}/ops/last-record", timeout=5.0)
+    report["cost_log"] = metrics.status_code == 200 and "estimated_cost_usd" in metrics.text
+    return report
+```
+
+This level of verification catches the "deployed but operationally dead" state. Storing the report as a CI artifact also makes incident retrospectives easier — you can reconstruct state at deploy time.
+
+## Canary promotion based on production signals
+
+When using canary deployments, define abort criteria before traffic ratios. For example: at 5% traffic, roll back immediately if any of these fire — `p95 latency rises 30%+`, `cost per request rises 20%+`, or `evaluation failure rate doubles`.
+
+These criteria must live in both code and documentation. Especially for prompt-version changes, tag canary-window logs separately: record `prompt_version`, `deployment_id`, and `canary_group` so you can trace which deployment caused issues after promotion.
+
+## Checkpoints that reduce deployment failures
+
+Most deployment failures happen at boundary conditions, not in code: missing environment variables, insufficient model-key permissions, undertight timeouts, log-collector agent crashes. Release templates therefore need an ops checklist alongside the feature checklist.
+
+Recommended checkpoints: `environment variable validation`, `model connectivity test`, `cost record creation`, `evaluation hook activation`, `security rule version check`, `rollback path confirmation`. Automating these raises deployment reproducibility significantly. The essence of deployment strategy is not elegant architecture — it is whether you can execute the same procedure identically every time.
+
+## Make the post-deploy 30-minute window an ops rule
+
+The first 30 minutes after deployment produce the most signals. Letting that window pass unobserved means you lose root-cause clues when something breaks. Teams should make "30-minute post-deploy observation" an explicit rule.
+
+Observation items should stay simple: `error rate`, `latency p95`, `cost per request`, `evaluation failure rate`, `security block rate`. If any item swings sharply from baseline, halt promotion or trigger rollback immediately.
+
+The key during this window is responsibility assignment. Who watches the dashboard and who has authority to press the rollback button must be explicit. Ambiguous roles delay decisions even when signals are clear.
+
+Deploy notes should also record "prompt version / model / infra settings changed in this deploy." That way, if anomalies appear during observation, you can narrow the change surface quickly.
+
+## Rollback design principles for operational stability
+
+The completion of a deployment strategy is not a successful deploy — it is fast rollback capability. LLM apps can change model, prompt, and infrastructure simultaneously, making failure causes compound. Rollback therefore needs layered design, not a single button.
+
+First, traffic rollback: immediately shift routing ratios back to the previous version. Second, prompt rollback: keep the code deploy but revert `prompt_version` to its prior value. Third, model rollback: exclude the high-risk model from routing rules. Fourth, infrastructure rollback: revert image tag or config version.
+
+When these four layers are separated, you minimize blast radius during incidents and narrow causes faster. Without a prompt-rollback path in particular, you must wait for a full code redeploy, stretching response time.
 
 ## Checklist
 - [ ] Call `/health` automatically after startup
