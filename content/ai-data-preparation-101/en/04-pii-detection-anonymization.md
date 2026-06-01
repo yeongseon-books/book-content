@@ -265,6 +265,136 @@ Korean data has traps that English code misses.
 - **License plate**: patterns like `12가3456`.
 - **Names**: Korean names are mostly two to four characters, often missed by general NER. Use a Korean-specific NER model.
 
+## Validation Schema and Quality Metrics
+
+A PII pipeline cares more about what it missed than what it caught. Saving anonymization results as free-form JSON lets missing fields go unnoticed. A validation schema plus batch-level metrics catch regressions early.
+
+```python
+from pydantic import BaseModel, Field
+
+
+class PIIAuditRow(BaseModel):
+    row_id: str
+    pii_count: int = Field(ge=0)
+    pii_types: list[str]
+    char_reduction: int
+    detector_versions: dict
+
+
+class PIIBatchReport(BaseModel):
+    batch_id: str
+    rows_total: int
+    rows_with_pii: int
+    avg_pii_per_row: float
+    false_negative_sample_size: int
+    reviewer_ids: list[str]
+```
+
+```python
+def compute_pii_metrics(audit_rows: list[dict]) -> dict:
+    total = len(audit_rows)
+    with_pii = sum(r["pii_count"] > 0 for r in audit_rows)
+    total_pii = sum(r["pii_count"] for r in audit_rows)
+    return {
+        "rows_total": total,
+        "rows_with_pii_ratio": with_pii / max(total, 1),
+        "avg_pii_per_row": total_pii / max(total, 1),
+    }
+```
+
+The most operationally useful metric is a sudden jump in `rows_with_pii_ratio`. It fires earliest when a collection source changes or a regex pattern breaks silently.
+
+## Running a PII Review Queue with Label Studio
+
+When the detector's confidence is low, sending items to a review queue is safer than auto-replacing. Label Studio with span annotations lets operators fix false negatives quickly.
+
+```xml
+<View>
+  <Text name="text" value="$text"/>
+  <Labels name="pii" toName="text">
+    <Label value="PERSON" background="#ffb3ba"/>
+    <Label value="EMAIL" background="#ffdfba"/>
+    <Label value="PHONE" background="#ffffba"/>
+    <Label value="ADDRESS" background="#baffc9"/>
+  </Labels>
+  <TextArea name="note" toName="text" placeholder="FN/FP notes"/>
+</View>
+```
+
+This approach creates a natural model-improvement loop. The corrected spans collected during review become training data for the next detector version.
+
+## Before/After Anonymization Samples
+
+```text
+before: Kim Youngsoo, email is ys.kim@acme.co.kr, phone 010-1234-5678.
+after : [PERSON], email is [EMAIL_ADDRESS], phone [PHONE_NUMBER].
+```
+
+Including about 20 such samples in the batch report accelerates operational review. When storing originals in the report, always enforce access control and expiration policies.
+
+## Anonymization Technique Selection Matrix
+
+The same PII field may need different treatment depending on the use case. Use this table as the default decision matrix to reduce cross-team friction.
+
+| Purpose | Recommended Technique | Caveat |
+| --- | --- | --- |
+| Externally shared dataset | redact | High context loss |
+| Customer support log analysis | pseudonymize | Pepper/secret management required |
+| Payment log inspection | mask | Residual identifier risk |
+| Model training distribution preservation | synthesize | Synthetic quality verification needed |
+
+## Re-identification Risk Check
+
+```python
+# Quasi-identifier combination risk (simplified)
+def quasi_identifier_risk(rows, keys=("age_band", "region", "job_group")):
+    from collections import Counter
+    c = Counter(tuple(r.get(k) for k in keys) for r in rows)
+    unique_groups = sum(1 for v in c.values() if v == 1)
+    return {"group_count": len(c), "unique_group_ratio": unique_groups / max(len(c), 1)}
+```
+
+Even after anonymization, combining quasi-identifiers can re-identify individuals. Beyond the detect-replace-audit stages described above, running a batch-level re-identification risk check adds an important safety layer.
+
+## Inspection Questions for Immediate Ops Use
+
+These questions come up in every pre-release review. The point is not to recite them—it is to answer each one with a file path or metric value on the spot.
+
+1. Which version did this dataset come from, and what is its sha256?
+2. How much did duplicate/null/length distributions shift compared to the last batch?
+3. Which samples were removed, by which rule, and what are the top removal reasons?
+4. What is the measured leakage rate at the train/eval/test boundary?
+5. How many samples did a human review this batch, and what error types were found?
+
+```python
+def release_readiness(summary: dict) -> tuple[bool, list[str]]:
+    issues = []
+    if not summary.get("dataset_sha256"):
+        issues.append("missing_dataset_sha256")
+    if summary.get("duplicate_ratio", 1.0) > 0.10:
+        issues.append("duplicate_ratio_too_high")
+    if summary.get("null_ratio", 1.0) > 0.02:
+        issues.append("null_ratio_too_high")
+    if summary.get("contamination_ratio", 1.0) > 0.01:
+        issues.append("contamination_ratio_too_high")
+    if summary.get("human_reviewed_rows", 0) < 100:
+        issues.append("insufficient_human_review")
+    return len(issues) == 0, issues
+```
+
+Even if your ops team does not use this exact function, they need the same concept implemented as a pipeline gate. The key principle: never judge readiness by feel.
+
+## Production Log Example
+
+```text
+[release-check] dataset=v2.4.1 sha=4fb1...
+[release-check] duplicate_ratio=0.061 null_ratio=0.008
+[release-check] contamination_ratio=0.004 human_reviewed_rows=240
+[release-check] status=PASS
+```
+
+When model performance wobbles, this single log block lets you quickly rule out (or zero in on) the data preparation stage. Data quality shows itself not in a single essay, but in repeatable verification logs like this.
+
 ## Common Mistakes
 
 1. **Regex only**: misses natural-language PII (names, addresses). Add an NER stage.
