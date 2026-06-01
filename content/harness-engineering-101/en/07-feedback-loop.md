@@ -277,6 +277,133 @@ class FailureMemory:
 
 Inject failure memory warnings into the agent's first-attempt prompt and it starts away from past mistakes. Without learning, the system improves over time.
 
+### Failure Classification Table and Loop Routing Rules
+
+To operate a Feedback Loop reliably, fix failure classification in a table rather than prose descriptions. Map each error code to a next action so that per-service variance is minimized.
+
+```yaml
+# feedback_routing.yaml
+routing:
+  transient:
+    error_codes: [rate_limited, upstream_timeout, network_unreachable]
+    action: retry
+    max_retries: 2
+    backoff_seconds: [1, 3]
+  reasoning:
+    error_codes: [invalid_input, schema_mismatch, policy_violation]
+    action: reflect
+    max_reflects: 2
+  deterministic:
+    error_codes: [permission_denied, scope_violation, tool_not_allowed]
+    action: escalate
+```
+
+```python
+def next_action(error_code: str, table: dict) -> str:
+    for mode, cfg in table["routing"].items():
+        if error_code in cfg["error_codes"]:
+            return cfg["action"]
+    return "escalate"
+
+def assert_no_unrouted_codes(all_codes: set[str], table: dict) -> None:
+    routed = set()
+    for cfg in table["routing"].values():
+        routed.update(cfg["error_codes"])
+    missing = sorted(all_codes - routed)
+    if missing:
+        raise ValueError(f"unrouted error codes: {missing}")
+```
+
+Without this validation, every new error code silently defaults to retry — creating cost loops that repeat until budget exhaustion.
+
+### Feedback Quality Validation
+
+If reflect messages are too vague or too long, loop quality degrades immediately. Treat feedback itself as a test target.
+
+```python
+def validate_feedback_message(msg: ReflectMessage) -> None:
+    if len(msg.failure_reason) < 12:
+        raise AssertionError("failure_reason is too short")
+    if len(msg.suggested_change) < 12:
+        raise AssertionError("suggested_change is too short")
+    if msg.suggested_change.strip() in {"retry", "try again"}:
+        raise AssertionError("non-actionable suggestion")
+
+def test_feedback_is_actionable():
+    m = ReflectMessage(
+        attempt_number=2,
+        failed_action="called issue_refund without approval token",
+        failure_reason="approval token missing in step input",
+        suggested_change="call approval workflow first and inject approval_token",
+        constraint="issue_refund requires approval_token",
+    )
+    validate_feedback_message(m)
+```
+
+A Feedback Loop is ultimately the coupling of text quality and control logic. If either lacks automated validation, the loop repeats without improving.
+
+### Loop Telemetry and Stop Criteria
+
+The better a Feedback Loop works, the more often it runs — and without observing the loop itself, you grow cost rather than quality. Record at least these metrics per execution:
+
+- `attempts_used`: actual attempt count
+- `retry_count`: transient-error retries
+- `reflect_count`: reasoning-error reflection attempts
+- `repeated_failure_signature`: whether the same failure signature repeated
+- `loop_exit_reason`: completed, escalated, timed_out, budget_exhausted
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class LoopTelemetry:
+    attempts_used: int = 0
+    retry_count: int = 0
+    reflect_count: int = 0
+    repeated_failure_signature: bool = False
+    loop_exit_reason: str = "unknown"
+
+def update_telemetry(t: LoopTelemetry, action: str, failure_sig: str, recent_sigs: list[str]) -> None:
+    t.attempts_used += 1
+    if action == "retry":
+        t.retry_count += 1
+    elif action == "reflect":
+        t.reflect_count += 1
+    t.repeated_failure_signature = failure_sig in recent_sigs[-2:]
+
+def should_force_stop(t: LoopTelemetry) -> bool:
+    if t.reflect_count >= 3:
+        t.loop_exit_reason = "reflect_limit"
+        return True
+    if t.repeated_failure_signature and t.attempts_used >= 3:
+        t.loop_exit_reason = "repeated_failure"
+        return True
+    return False
+```
+
+Without these stop criteria, a loop can spin endlessly through "slightly different failures." Repeated-failure-signature detection is particularly effective.
+
+### Failure Signature Design
+
+To use failure memory effectively, failures must not be stored as human-readable sentences alone. You need to group the same root cause under the same key for statistics and automated response.
+
+```python
+import hashlib
+
+def build_failure_signature(error_code: str, tool_name: str, reason: str) -> str:
+    key = f"{error_code}|{tool_name}|{reason[:80]}"
+    return hashlib.sha1(key.encode()).hexdigest()[:12]
+
+def classify_for_memory(error) -> tuple[str, str]:
+    if isinstance(error, ToolError):
+        sig = build_failure_signature(error.code.value, getattr(error, "tool", "unknown"), error.why)
+        return sig, "tool_error"
+    sig = build_failure_signature("unknown", "unknown", str(error))
+    return sig, "unknown"
+```
+
+In practice, report the "top 5 repeated failures" daily based on these signatures. This surfaces tool-design flaws that need fixing before any model improvement.
+
 ---
 
 ## Common Mistakes
