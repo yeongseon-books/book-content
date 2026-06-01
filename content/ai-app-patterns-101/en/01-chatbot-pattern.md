@@ -317,6 +317,197 @@ print(f"session A history length: {len(sessions[session_a])}")
 
 ---
 
+## Wrapping the chatbot in a FastAPI endpoint
+
+### Session store and SSE streaming response
+
+In production the first boundary is HTTP, not a console function. The example below keeps per-session message history in FastAPI and streams model tokens via SSE. The key design choice: treat user-input recording and response recording as separate failure points rather than one transaction.
+
+```python
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class ChatRequest(BaseModel):
+    session_id: str
+    user_input: str
+
+session_store: dict[str, list[dict]] = {}
+
+SYSTEM_PROMPT = """
+You are a technical tutor.
+- Keep answers fact-based.
+- If unsure, say so.
+- Lead with the core point, skip filler.
+""".strip()
+
+def get_history(session_id: str) -> list[dict]:
+    if session_id not in session_store:
+        session_store[session_id] = [{"role": "system", "content": SYSTEM_PROMPT}]
+    return session_store[session_id]
+
+def fake_streaming_tokens(answer: str):
+    for token in answer.split(" "):
+        yield f"data: {token}\n\n"
+    yield "data: [DONE]\n\n"
+
+@app.post("/chat/stream")
+def chat_stream(req: ChatRequest):
+    history = get_history(req.session_id)
+    history.append({"role": "user", "content": req.user_input})
+
+    # In production, connect the real LLM streaming SDK here.
+    answer = f"Example response to '{req.user_input}'."
+    history.append({"role": "assistant", "content": answer})
+
+    return StreamingResponse(
+        fake_streaming_tokens(answer),
+        media_type="text/event-stream",
+    )
+
+@app.get("/chat/{session_id}/history")
+def get_session_history(session_id: str):
+    if session_id not in session_store:
+        raise HTTPException(status_code=404, detail="session not found")
+    return {"session_id": session_id, "messages": session_store[session_id]}
+```
+
+The `/history` endpoint exists for debugging. Being able to reproduce "why did the bot lose context?" from the stored messages is what makes incident analysis fast.
+
+### Operational checkpoint: history storage policy
+
+Session history connects directly to cost, latency, and data-retention liability. Decide these policies early:
+
+- Session TTL: e.g. auto-delete after 30 minutes of inactivity
+- Maximum message count: e.g. system + last 20 messages only
+- Summary trigger: auto-summarize when estimated tokens exceed a threshold
+- PII masking: strip email, phone, and card number patterns before storage
+
+Chatbot quality depends more on the **history-replay contract** than on model selection. Locking that contract in code and policy keeps regression scope narrow when you later swap models or improve prompts.
+
+## Prompt versioning and regression testing
+
+When chatbot quality drifts, the fastest way to narrow the cause is treating prompts as versioned artifacts. Hardcoding a string makes it impossible to trace when a rule was added or removed.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class PromptSpec:
+    version: str
+    role: str
+    instructions: str
+
+PROMPTS = {
+    'v1': PromptSpec(
+        version='v1',
+        role='python_tutor',
+        instructions=(
+            'You are a Python tutor. '
+            'Answer in six sentences or fewer with accurate examples.'
+        ),
+    ),
+    'v2': PromptSpec(
+        version='v2',
+        role='python_tutor',
+        instructions=(
+            'You are a Python tutor. '
+            'Always include: core concept, short code example, and one common pitfall.'
+        ),
+    ),
+}
+
+def render_system_prompt(prompt_version: str) -> str:
+    spec = PROMPTS[prompt_version]
+    return f"[role={spec.role}][version={spec.version}]\n{spec.instructions}"
+```
+
+Record `prompt_version` per session. When the same question yields a different tone or accuracy, you can immediately separate a model update from a prompt change.
+
+### Minimum regression cases
+
+```python
+REGRESSION_CASES = [
+    {
+        'name': 'name_recall',
+        'history': [
+            {'role': 'user', 'content': 'My name is Alice.'},
+            {'role': 'assistant', 'content': 'Nice to meet you, Alice.'},
+        ],
+        'question': 'What is my name?',
+        'must_include': ['Alice'],
+    },
+    {
+        'name': 'refuse_speculation',
+        'history': [],
+        'question': 'Tell me the exact Bitcoin price tomorrow.',
+        'must_include': ['cannot predict'],
+    },
+]
+```
+
+Even this minimal set catches basic contract violations before release. The chatbot pattern is less about flashy features and more about consistently honoring small contracts.
+
+## Production failure scenarios and recovery
+
+Moving the session store to Redis and scaling to multiple instances improves reliability, but introduces new failure modes. For example, if Redis write latency spikes, the user sees the bot losing context even though the model answered correctly. In that case, fix the storage layer before touching the prompt.
+
+```python
+def append_history_with_fallback(session_id: str, message: dict) -> bool:
+    try:
+        redis_client.rpush(f"chat:{session_id}", json.dumps(message))
+        redis_client.expire(f"chat:{session_id}", 1800)
+        return True
+    except Exception as exc:
+        logger.error("history_write_failed", extra={"session_id": session_id, "error": str(exc)})
+        # Keep the session alive with an in-memory fallback.
+        session_store.setdefault(session_id, []).append(message)
+        return False
+```
+
+This fallback is not a complete solution, but it prevents user experience from degrading sharply during a storage incident.
+
+### Streaming quality metrics
+
+- First token latency (`time_to_first_token`)
+- Total completion time (`time_to_last_token`)
+- Abort rate (`stream_abort_rate`)
+- History write failure rate (`history_write_failure_rate`)
+
+Tracking these four together lets you decompose a vague "responses are slow" user report into actionable categories.
+
+## Token budget and cost guardrails
+
+In a multi-turn chatbot, cost predictability matters as much as answer quality. Set a per-session token budget and switch to summarization or a warning path when it is exceeded.
+
+```python
+MAX_SESSION_TOKENS = 12000
+
+def should_compact_history(estimated_tokens: int) -> bool:
+    return estimated_tokens > MAX_SESSION_TOKENS
+
+def route_by_token_budget(estimated_tokens: int) -> str:
+    if estimated_tokens > 16000:
+        return 'reject_with_budget_notice'
+    if estimated_tokens > 12000:
+        return 'summarize_then_continue'
+    return 'normal_chat'
+```
+
+Show the policy to users transparently. A system message like "The conversation has grown long; recent context has been summarized" frames quality changes as policy behavior rather than a bug.
+
+### Session termination policy
+
+When a user logs out or remains inactive beyond the TTL, apply a termination policy: keep only the final summary and delete detailed history. This reduces data-retention liability and is often a compliance requirement rather than a UX choice.
+
+### Standard log fields for chatbot operations
+
+At minimum, log `session_id`, `prompt_version`, `input_tokens`, `output_tokens`, `latency_ms`, and `route` per request. With this field set you can quickly decide whether a quality issue belongs to the model, the prompt, or the session policy.
+
+---
+
 ## Conclusion
 
 The chatbot pattern is fundamentally a question of history management. Simple accumulation, windowing, and summarization each make sense in different situations depending on conversation length, how much old context matters, and token cost.
