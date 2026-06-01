@@ -265,6 +265,65 @@ The remaining nine episodes each take one guardrail category in depth:
 - **Ep9 Audit Logging and Compliance** — GDPR, SOC2, HIPAA traceability
 - **Ep10 Production Guardrail System** — wiring the above into a complete architecture
 
+### Realistic Attack/Defense Scenario
+
+In production, attacks chain across a single request. Here is a simplified sequence commonly seen in customer-support chatbots:
+
+| Step | Attacker action | Defense point | Expected outcome |
+|---|---|---|---|
+| 1 | Injects "ignore system instructions" | Pre-input injection detector | Block or route to low-trust path |
+| 2 | Disguises as legitimate question to elicit sensitive data | Policy judge + domain rules | Block legally/security-prohibited answers |
+| 3 | Sends long input to inflate cost | Token-based rate limiter | Response capped within cost budget |
+| 4 | Attempts to re-expose PII in output | Post-output PII re-scan | Mask or block before delivery |
+| 5 | Repeats bypass attempts | Audit correlation + account/IP scoring | Progressive sanctions |
+
+The key insight: no single layer blocks everything. Defense-in-depth reduces probability at each checkpoint.
+
+### Minimum Policy Code Skeleton
+
+Before adopting NeMo Guardrails or Guardrails AI, you can ship a minimal policy layer that makes rules explicit in code:
+
+```python
+RISK_POLICY = {
+    "prompt_injection": {"action": "block", "severity": "high"},
+    "pii_leak": {"action": "mask", "severity": "high"},
+    "toxicity": {"action": "block", "severity": "medium"},
+    "hallucination": {"action": "warn", "severity": "medium"},
+    "rate_limit": {"action": "throttle", "severity": "high"},
+}
+
+def decide_action(signal: str) -> str:
+    return RISK_POLICY.get(signal, {"action": "allow"})["action"]
+```
+
+When policy lives in code rather than buried in prompt text, operators can audit enforcement rules without reading model instructions.
+
+### Adoption Sequence Checklist
+
+- [ ] Separate input blocking, output blocking, and audit logging into distinct functions with distinct log keys.
+- [ ] Standardize block reason codes: `prompt_injection_pattern`, `pii_detected`, `cost_budget_exceeded`.
+- [ ] Generalize user-facing messages; keep precise reasons in internal logs.
+- [ ] Lock at least 20 red-team prompts as a regression set before first release.
+- [ ] Surface guardrail performance metrics (P95 latency, block rate, FP rate) on your dashboard.
+
+### Phased Rollout Example
+
+Deploying all layers at once overwhelms the team. A typical 4-week cadence:
+
+- **Week 1**: Input pattern blocking + basic rate limit + audit event schema.
+- **Week 2**: Output moderation + PII re-scan to reduce leak surface.
+- **Week 3**: Hallucination verification + fallback UX.
+- **Week 4**: Regression set wired into CI so policy changes show measurable impact.
+
+At each stage observe block rate, false-positive rate, and P95 latency together — this lets the team balance quality and safety simultaneously.
+
+### Operations Verification Questions
+
+- What is the worst user-facing outcome if this layer fails? — Document `fail-open` vs `fail-closed` policy per failure mode in the runbook.
+- Do progressive sanctions auto-escalate on repeated bypass attempts? — Specify thresholds for warning → mitigation → CAPTCHA → temporary suspension → permanent ban.
+- Is there enough evidence to let a human review a blocked request? — Log request ID, policy version, score, input hash, output hash, timestamp.
+- Can you measure what improved and what regressed after a policy change? — Compare block rate, FP rate, latency, cost over a 7-day window before/after.
+
 ---
 
 ## Common Mistakes
