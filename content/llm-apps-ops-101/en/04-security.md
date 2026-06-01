@@ -203,6 +203,8 @@ That output is enough to prove the boundary: normal prompts pass, obvious inject
 - Prompt-injection defense also depends on model choice, system prompts, and tool permissions.
 - Hiding email addresses is not enough if API keys, bearer tokens, or session values still flow through untouched.
 
+In practice, the assumption "output filtering alone is enough" surfaces often. But without input validation, dangerous strings have already passed through your system internals. Conversely, if you skip output filtering, the model can accidentally emit PII fragments or system-prompt leaks straight to users. The two layers are not substitutes — they are a division of labor.
+
 ## When the rejection rate rises, inspect it this way
 
 ```bash
@@ -217,6 +219,80 @@ python3 -m scripts.security_report --compare release-2026-05-10 release-2026-05-
 ```
 
 High block rate is not the diagnosis. The diagnosis is whether one rule spiked, whether legitimate prompts are being caught, or whether output leaks increased after a model or prompt change.
+
+## Separate guardrails into a policy framework
+
+LLM security is more stable when treated as a policy system rather than a single filter. The input policy blocks "things the model must not see" and the output policy blocks "things the user must not see." Because their purposes differ, their rule sets must be separate.
+
+Input policy targets prompt-injection patterns, system-instruction theft attempts, and direct sensitive-data entry. Output policy inspects for PII exposure, internal-identifier leaks, and forbidden-domain advice generation. Operationally, explainability matters as much as detection accuracy — you need a reason code for every block so you can reproduce and improve.
+
+### Policy-based guardrail code example
+
+```python
+INPUT_RULES = {
+    "prompt_injection": ["ignore previous instructions", "show system prompt"],
+    "secret_request": ["api key", "show password"],
+}
+
+OUTPUT_RULES = {
+    "pii_exposure": ["social security", "credit card"],
+    "internal_token": ["sk-", "AKIA"],
+}
+
+def scan_text(text: str, rules: dict[str, list[str]]) -> list[str]:
+    lowered = text.lower()
+    hits: list[str] = []
+    for reason, patterns in rules.items():
+        for p in patterns:
+            if p.lower() in lowered:
+                hits.append(reason)
+                break
+    return hits
+
+def apply_guardrails(user_prompt: str, model_answer: str) -> dict:
+    input_hits = scan_text(user_prompt, INPUT_RULES)
+    output_hits = scan_text(model_answer, OUTPUT_RULES)
+    return {
+        "input_allowed": len(input_hits) == 0,
+        "output_allowed": len(output_hits) == 0,
+        "input_reasons": input_hits,
+        "output_reasons": output_hits,
+    }
+```
+
+The rules themselves are simple, but the operational payoff is large. When `input_reasons` and `output_reasons` land in structured logs, you can spot which rule fires too aggressively and tune false positives with evidence rather than guesswork.
+
+## Dashboard metrics you must watch
+
+A security dashboard that only shows aggregate counts is weak. It should answer "where does risk enter and where is it stopped." The minimum metrics are `input block rate`, `output block rate`, `blocks per rule`, and `retry success rate after block`.
+
+A sudden rise in input block rate could mean increased external attack attempts or an overly aggressive recent rule deployment. If only output block rate rises, suspect model response template changes or context contamination. Therefore, always view block rate as a trend together with per-rule distribution — absolute numbers alone mislead.
+
+## Wire security checks into the deployment pipeline
+
+Running guardrails only at runtime is too late. You need a fixed attack-scenario set that runs in your pre-deployment test stage: for example, 20 prompt-injection attempts, 20 PII-detection probes, and 20 policy-violation generation prompts. Every new prompt version is compared against this same baseline.
+
+This turns security quality into a regression test. You no longer have to guess "why did block rate change after this deploy." Also, if your security event logs carry `prompt_version`, `model`, `route`, and `rule_reason`, incident responders can narrow the blast radius quickly.
+
+As an ops organization grows, security must live as executable rules — not documentation. Rules are code, block reasons are structured logs, and quality gates are deployment checks. That is what keeps the system maintainable long-term.
+
+## Incident response flow as an ops procedure
+
+Installing guardrails does not end security operations. When block events spike, you need a defined procedure for who checks what and which criteria trigger action. The basic flow is `detect → classify → isolate → mitigate → review`.
+
+Detection: confirm block-rate spike, single rule_reason spike, or single-tenant concentration. Classification: distinguish false positive from real attack. Isolation: restrict the offending prompt_version or API key. Mitigation: deploy rule adjustments or additional filters. Review: encode prevention rules into documentation and test sets.
+
+Automation requires minimum log fields: `event_time`, `request_id`, `tenant_id`, `rule_reason`, `policy_version`, `prompt_version`, `action`. Without these, root-cause analysis stalls.
+
+Security, unlike features, needs continuous drill even when nothing is wrong. Running a mock injection set monthly and tracking detection rate plus false-positive rate ensures your response speed is sharp when a real incident arrives.
+
+## Deploy security rule updates safely
+
+Updating security rules quickly is necessary, but deploying without verification can over-block legitimate requests. Rule updates therefore need staged rollout.
+
+First, deploy the new rule in "detect-only mode" for about a week, recording reason codes without blocking. Review false-positive samples, adjust patterns, then switch to partial blocking during low-traffic windows. Finally, promote to full blocking with an automatic rollback to the previous policy version if the false-positive rate exceeds a threshold.
+
+Keeping an explicit `policy_version` in logs lets you objectively explain "which rule caused which impact." Security quality, in the end, is a version-control and experiment-design problem.
 
 ## Checklist
 - [ ] Define common injection patterns in code first
