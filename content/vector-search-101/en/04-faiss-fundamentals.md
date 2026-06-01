@@ -263,6 +263,200 @@ Start with `IndexFlatIP`. When search latency becomes a problem, move to `IndexI
 
 ---
 
+## Scaling to HNSW and IVF
+
+Flat indexes set the baseline, but traffic growth hits their limits fast. The two most common next steps are HNSW and IVF.
+
+| Aspect | HNSW (`IndexHNSWFlat`) | IVF (`IndexIVFFlat`) |
+|---|---|---|
+| Search complexity | Graph traversal, very fast in practice | Coarse quantizer narrows candidates |
+| Build characteristics | Build time/memory increases with graph | Requires a `train()` step |
+| Online additions | Relatively natural | Possible, but distribution shift may require retraining |
+| Key parameters | `M`, `efConstruction`, `efSearch` | `nlist`, `nprobe` |
+
+HNSW gives more intuitive tuning feedback early on. IVF offers more predictable cost modeling at very large scale.
+
+## HNSW creation example
+
+```python
+import faiss
+import numpy as np
+
+dimension = 384
+vectors = np.random.rand(50000, dimension).astype(np.float32)
+faiss.normalize_L2(vectors)
+
+index_hnsw = faiss.IndexHNSWFlat(dimension, 32)  # M=32
+index_hnsw.hnsw.efConstruction = 200
+index_hnsw.hnsw.efSearch = 64
+index_hnsw.add(vectors)
+
+print(index_hnsw.ntotal)
+```
+
+Increasing `efSearch` improves recall but also increases latency. In production, it is common to vary `efSearch` by query type.
+
+## IVF creation example
+
+```python
+import faiss
+import numpy as np
+
+dimension = 384
+nlist = 1024
+vectors = np.random.rand(50000, dimension).astype(np.float32)
+faiss.normalize_L2(vectors)
+
+quantizer = faiss.IndexFlatIP(dimension)
+index_ivf = faiss.IndexIVFFlat(quantizer, dimension, nlist, faiss.METRIC_INNER_PRODUCT)
+index_ivf.train(vectors)
+index_ivf.add(vectors)
+index_ivf.nprobe = 24
+
+print(index_ivf.is_trained, index_ivf.ntotal)
+```
+
+IVF without `train()` cannot search. Training data must reflect the actual distribution. Random samples lead to noticeably lower recall.
+
+## Why tuning logs matter
+
+Recording tuning results in a table speeds up team decision-making.
+
+| Index | Parameters | Recall@10 | p95 (ms) | Memory (GB) |
+|---|---|---:|---:|---:|
+| FlatIP | - | 1.00 | 78 | 1.5 |
+| HNSW | M=32, efSearch=64 | 0.97 | 18 | 2.2 |
+| HNSW | M=32, efSearch=128 | 0.99 | 29 | 2.2 |
+| IVF | nlist=1024, nprobe=12 | 0.92 | 11 | 1.6 |
+| IVF | nlist=1024, nprobe=32 | 0.97 | 22 | 1.6 |
+
+With this record, tradeoff discussions ("accept lower recall for budget savings" vs "maintain accuracy at all costs") happen with numbers, not opinions.
+
+## Production scaling patterns
+
+When deploying FAISS to production, plan for these patterns:
+
+- Scale read traffic horizontally via index replicas
+- Separate index build from serving index; deploy via atomic swap
+- Log `index_version` and `embedding_version` together
+- Periodically evaluate whether batch rebuild is more stable than incremental adds
+
+These patterns reduce not only search latency but also incident recovery time.
+
+## IVF parameter tuning workflow
+
+For IVF in production, tune `nlist` and `nprobe` separately. `nlist` defines index structure; `nprobe` controls query-time search breadth.
+
+1. Choose ~3 `nlist` candidates based on data size.
+2. For each `nlist`, sweep `nprobe` upward measuring recall/latency.
+3. Adopt the minimum `nprobe` that meets the SLA.
+
+```python
+def sweep_nprobe(index_ivf, queries, truths, nprobe_values):
+    rows = []
+    for nprobe in nprobe_values:
+        index_ivf.nprobe = nprobe
+        recall, elapsed = benchmark(index_ivf, queries, truths, k=10)
+        rows.append((nprobe, recall, elapsed))
+    return rows
+```
+
+| nprobe | Recall@10 | p95 (ms) |
+|---:|---:|---:|
+| 4 | 0.83 | 7 |
+| 8 | 0.89 | 10 |
+| 16 | 0.94 | 16 |
+| 32 | 0.97 | 28 |
+
+The balance point is typically around 16 for most workloads.
+
+## HNSW parameter interpretation
+
+In HNSW, `M` controls graph connectivity and `efSearch` controls search-time candidate breadth. Higher `M` increases memory and build time; higher `efSearch` increases query latency.
+
+| M | efSearch | Recall@10 | p95 (ms) | Memory multiplier |
+|---:|---:|---:|---:|---:|
+| 16 | 32 | 0.90 | 8 | 1.0x |
+| 32 | 64 | 0.96 | 14 | 1.5x |
+| 48 | 96 | 0.98 | 23 | 2.0x |
+
+Decide first whether the service is more sensitive to memory or latency, then select parameters accordingly.
+
+## Delete and update strategy
+
+FAISS Flat indexes do not natively support frequent deletions. The standard workaround:
+
+- Maintain a tombstone table of deleted document IDs
+- Post-filter tombstone IDs from query results
+- Apply tombstones during periodic batch rebuilds
+
+```python
+def filter_deleted(results, deleted_ids: set[str]):
+    return [r for r in results if r["doc_id"] not in deleted_ids]
+```
+
+If updates and deletes are very frequent, managed vector databases (Qdrant, Pinecone) often reduce operational complexity.
+
+## Incident response playbook
+
+Common index-layer incidents and first-response actions:
+
+| Symptom | Common cause | First response |
+|---|---|---|
+| Scores uniformly low | Normalization mismatch, model swap | Compare manifests, check reindex status |
+| Latency spike | nprobe/efSearch increased, vector count grew | Roll back parameters, reduce top-k |
+| Quality drop | IVF train sample distribution mismatch | Retrain with fresh representative sample |
+
+Including this table in the runbook shortens on-call response time.
+
+## Building a search accuracy baseline
+
+The most important ANN tuning principle: always have a ground-truth baseline. Typically built with `IndexFlatIP` or `IndexFlatL2` exact search. All HNSW/IVF recall is measured against this.
+
+```python
+def build_ground_truth(flat_index, queries, k=10):
+    _, indices = flat_index.search(queries, k)
+    return indices
+```
+
+Keeping the baseline explicit means performance changes can be tracked quantitatively when data or parameters change.
+
+## Memory estimation
+
+Estimate memory requirements before selecting an instance:
+
+```text
+memory (bytes) ≈ n (vectors) × d (dimension) × 4 (float32)
+```
+
+Example: `n=3,000,000`, `d=384` → raw vectors alone ≈ 4.3 GB. HNSW graph overhead adds significantly more. Capacity planning with headroom is mandatory before instance selection.
+
+## Sharding and replication
+
+When data outgrows a single index, two patterns apply:
+
+- **Sharding**: partition indexes by document-ID hash or domain
+- **Replication**: copy each shard to multiple nodes for read throughput
+- **Aggregation**: collect per-shard top-k, re-rank globally
+
+This adds complexity but maintains latency and availability under heavy traffic.
+
+## Benchmark report template
+
+Standardize benchmark reporting for comparability:
+
+| Field | Example |
+|---|---|
+| Dataset version | `docs_2026_05_20` |
+| Embedding model | `all-MiniLM-L6-v2` |
+| Index type | `IndexHNSWFlat` |
+| Key parameters | `M=32, efSearch=64` |
+| Recall@10 | `0.968` |
+| p95 latency | `18ms` |
+| Memory | `2.2GB` |
+
+When recording benchmarks, prefer distributions (p50, p95, p99) over single averages. Tail latency affects user perception disproportionately — the same mean can hide dramatically different p99 values.
+
 ## Conclusion
 
 You can now build a FAISS index, run queries against it, and persist it to disk. The combination of `IndexFlatIP` with normalized vectors is the baseline for text retrieval.
