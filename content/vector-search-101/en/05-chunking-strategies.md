@@ -329,6 +329,78 @@ Start with a reasonable default, measure retrieval quality on your actual data, 
 
 ---
 
+## Chunking and ANN index interaction
+
+Chunking does not only change embedding quality — it directly changes index load. The same 1,000 documents produce twice as many vectors when you cut `chunk_size` from 500 to 200. More vectors mean more HNSW graph memory and longer IVF training time.
+
+| chunk_size / overlap | Avg chunks per doc | Total vectors | Indexing time (relative) |
+|---|---:|---:|---:|
+| 500 / 50 | 8 | 8,000 | 1.0x |
+| 300 / 30 | 13 | 13,000 | 1.6x |
+| 200 / 20 | 19 | 19,000 | 2.3x |
+
+Chunking tuning is therefore a joint concern between the retrieval-quality team and the infrastructure team. "Split finer" may help precision but can double operational cost.
+
+## Document-type-specific splitting rules
+
+In production, splitting rules often branch by document type.
+
+```python
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+
+def make_splitter(doc_type: str) -> RecursiveCharacterTextSplitter:
+    if doc_type == "api-reference":
+        return RecursiveCharacterTextSplitter(
+            chunk_size=220,
+            chunk_overlap=40,
+            separators=["\n## ", "\n### ", "\n", ". ", " ", ""],
+        )
+    if doc_type == "tutorial":
+        return RecursiveCharacterTextSplitter(
+            chunk_size=360,
+            chunk_overlap=50,
+            separators=["\n\n", "\n", ". ", " ", ""],
+        )
+    return RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=30)
+```
+
+API references need short, precise fragments. Tutorials carry longer narrative context, so larger chunks tend to work better.
+
+## Recall / latency comparison
+
+Chunking changes must be validated by measurement.
+
+| Configuration | Recall@5 | p95 latency (ms) | Avg context tokens |
+|---|---:|---:|---:|
+| 220 / 40 | 0.89 | 42 | 680 |
+| 300 / 30 | 0.92 | 39 | 760 |
+| 420 / 50 | 0.91 | 35 | 980 |
+
+From this table, 300/30 offers the best quality-to-latency balance for this dataset. The optimal point shifts when query length or domain changes.
+
+## Chunk design for hybrid search
+
+When you also run keyword search (BM25), text normalization inside chunks matters. Code blocks, option names, and error codes lose signal if over-normalized. Storing separate fields per retrieval path is safer:
+
+```python
+chunk_payload = {
+    "text_for_vector": chunk_text,
+    "text_for_lexical": chunk_text,
+    "source": source_path,
+    "section": section_title,
+    "line_start": line_start,
+    "line_end": line_end,
+}
+```
+
+Separating `text_for_vector` and `text_for_lexical` lets you apply different preprocessing per retrieval path when computing hybrid fusion scores later.
+
+For technical documents heavy on code, splitting code blocks into a separate chunk type helps. Cutting function signatures or CLI commands mid-line collapses lexical search recall. A common pattern tags each chunk with `chunk_type=paragraph|code|table` and applies different weights at query time depending on the query shape.
+
+Tables also deserve special treatment. Splitting a table like a normal paragraph disconnects column headers from values. Repeating the header into each row-chunk before embedding stabilizes both retrieval score and downstream citation.
+
+Chunking is ultimately the act of translating document structure into retrieval structure.
+
 ## Conclusion
 
 Chunking is often the biggest lever for retrieval quality in a vector search system. The embedding model and index type matter, but poor chunking limits what any model can do with the input.
