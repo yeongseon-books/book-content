@@ -243,6 +243,170 @@ This post lifted the hand-written metrics onto a real retriever and produced a s
 
 In Episode 3 we swap the embedding model on top of the same loop. The code change is a single line, but interpreting the result needs care.
 
+## Pinning the benchmark input file format
+
+The most common reproducibility failure in retrieval experiments is the question set changing between runs. Lock queries and gold document IDs in JSONL.
+
+```json
+{"query_id":"q-001","question":"What does MRR measure?","relevant_ids":["doc-mrr-01"]}
+{"query_id":"q-002","question":"Why does IVF need nprobe?","relevant_ids":["doc-ivf-02","doc-ivf-03"]}
+{"query_id":"q-003","question":"What happens with large chunk sizes in RAG?","relevant_ids":["doc-chunk-04"]}
+```
+
+At execution time, record the input file hash in the report.
+
+```python
+import hashlib
+from pathlib import Path
+
+def file_sha256(path: str) -> str:
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+meta = {
+    "gold_set_path": "data/gold_queries.jsonl",
+    "gold_set_sha256": file_sha256("data/gold_queries.jsonl"),
+}
+```
+
+Without this metadata, you cannot tell whether a score difference is caused by code changes or input changes.
+
+### Per-segment hit rate
+
+A single average hit rate hides domain-specific regressions. Tag each query with a `segment` and compute group-level metrics.
+
+| Segment | Example query | hit@3 | MRR | Interpretation |
+| --- | --- | ---: | ---: | --- |
+| Concept definition | "What is RAGAS faithfulness?" | 0.95 | 0.86 | Stable |
+| Operational config | "IVF nprobe tuning" | 0.78 | 0.62 | Config doc retrieval weak |
+| Incident response | "Search latency spike handling" | 0.64 | 0.49 | Runbook retrieval failing |
+
+This table lets product and ops teams derive action items from the same report.
+
+### Isolating latency measurement boundaries
+
+For latency numbers to be trustworthy, clearly delineate what is included.
+
+```text
+[Included]   retriever.invoke(question)
+[Excluded]   question loading, embedding model init, result serialization, log upload
+```
+
+When using a server-mode VectorDB, network RTT dominates. Record network context alongside latency.
+
+```yaml
+environment:
+  region: us-east-1
+  client_host: bench-runner-01
+  vectordb_endpoint: qdrant.internal:6333
+  transport: http
+  tls: false
+```
+
+### CI regression comparison script
+
+Compare the previous run to the current run and gate on key metrics.
+
+```python
+import json
+import sys
+
+THRESHOLDS = {
+    "hit_rate@3": -0.02,
+    "MRR": -0.03,
+    "p95_latency_ms": 8.0,
+}
+
+before = json.load(open("reports/baseline.json", "r", encoding="utf-8"))
+after = json.load(open("reports/current.json", "r", encoding="utf-8"))
+
+delta_hit = after["aggregate"]["hit_rate@3"] - before["aggregate"]["hit_rate@3"]
+delta_mrr = after["aggregate"]["MRR"] - before["aggregate"]["MRR"]
+delta_p95 = after["aggregate"]["p95_latency_ms"] - before["aggregate"]["p95_latency_ms"]
+
+if delta_hit < THRESHOLDS["hit_rate@3"] or delta_mrr < THRESHOLDS["MRR"] or delta_p95 > THRESHOLDS["p95_latency_ms"]:
+    print("FAIL: retrieval benchmark regression")
+    sys.exit(1)
+
+print("PASS: retrieval benchmark thresholds satisfied")
+```
+
+This turns the team conversation from "looks good" to "passed the gate."
+
+## Operational benchmark settings and log format
+
+Running retrieval benchmarks as a shared team pipeline requires standardized execution config and log format.
+
+### Execution config YAML
+
+```yaml
+benchmark:
+  top_k: 5
+  warmup_queries: 5
+  repeats_per_query: 3
+  sample_size: 120
+retriever:
+  type: faiss
+  embedding_model: sentence-transformers/all-MiniLM-L6-v2
+  search_kwargs:
+    k: 5
+latency:
+  percentile: [50, 95]
+  include_network_rtt: true
+report:
+  save_json: true
+  save_csv: true
+  out_dir: reports/retrieval
+```
+
+### Per-query log CSV columns
+
+| Column | Description |
+| --- | --- |
+| run_id | Run identifier |
+| query_id | Query ID |
+| question | Original question text |
+| ranked_ids | Top document IDs |
+| relevant_ids | Gold document IDs |
+| hit@k | Hit indicator |
+| rr | Reciprocal rank |
+| latency_ms | Retrieval latency |
+
+Saving CSV alongside JSON lets non-engineering teammates inspect results without Python.
+
+### Latency distribution summary
+
+Even without charts, a text summary enables trend analysis.
+
+```text
+latency summary (ms)
+  min: 3.1
+  p50: 5.4
+  p95: 12.8
+  p99: 19.2
+  max: 27.7
+```
+
+### Regression diagnosis sequence
+
+1. Start with queries where `Recall@k = 0`.
+2. Compare `ranked_ids` against `relevant_ids` for those queries.
+3. Group common failure topics (abbreviations, product names, version strings).
+4. Prioritize query expansion or metadata enrichment experiments.
+
+Following this sequence as a standard procedure keeps response time consistent when regressions appear.
+
+### Cross-run comparison table
+
+| run_id | retriever | top_k | hit@5 | MRR | p95 (ms) |
+| --- | --- | ---: | ---: | ---: | ---: |
+| r-20260521-a | bm25 | 5 | 0.81 | 0.63 | 21.4 |
+| r-20260521-b | faiss-flat | 5 | 0.90 | 0.77 | 34.8 |
+| r-20260521-c | hybrid | 5 | 0.93 | 0.80 | 39.2 |
+
+Accumulating this table on the same query set lets the team choose retrievers by whether the priority is quality or latency.
+
+---
+
 ## Answering the Opening Questions
 
 - **What must stay fixed to turn retrieval performance from a feeling into a benchmark loop?**
