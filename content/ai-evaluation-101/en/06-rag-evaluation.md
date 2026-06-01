@@ -288,6 +288,51 @@ print(result)
 
 If you do not have time to implement these yourself, start with RAGAS. For domain-specific scoring, custom code is more accurate.
 
+### Retrieval Quality Experiment: Comparing top-K and Reranker Together
+
+A common mistake in RAG optimization is increasing top-K alone. In practice, noise rises and precision collapses first. Compare top-K and reranker combinations in a table.
+
+| Configuration | Context Recall | Context Precision | Faithfulness | Conclusion |
+|---|---:|---:|---:|---|
+| K=3, no reranker | 0.74 | 0.81 | 0.90 | Some recall gaps, low noise |
+| K=8, no reranker | 0.88 | 0.52 | 0.79 | Noise overload, hallucination rises |
+| K=8, with reranker | 0.86 | 0.77 | 0.91 | Best balance |
+
+A table like this confirms whether retrieval-layer improvements actually stabilize the generation layer.
+
+### Regression Pattern: Faithfulness Drops First
+
+In production, problems often cascade in this order:
+
+1. Prompt change increases answer length
+2. General-knowledge sentences outside the context grow
+3. Faithfulness drops first
+4. Days later, thumbs-down rate rises
+
+Treat Faithfulness as a leading indicator rather than a lagging outcome metric.
+
+### RAG Evaluation Log Schema
+
+To reproduce RAG problems, store the question, retrieved results, and final answer together. Storing only the final answer makes root-cause analysis nearly impossible.
+
+```python
+RAG_EVAL_LOG_SCHEMA = {
+    "trace_id": "str",
+    "question": "str",
+    "retrieved_doc_ids": "list[str]",
+    "retrieved_contexts": "list[str]",
+    "answer": "str",
+    "metrics": {
+        "context_recall": "float",
+        "context_precision": "float",
+        "faithfulness": "float",
+        "answer_relevance": "float",
+    },
+}
+```
+
+With this schema, you can quickly determine whether a regression is a retrieval-layer problem or a generation-layer problem. Keeping `retrieved_doc_ids` lets you compare quality before and after an index rebuild at the document level. Retain these logs for at least two weeks to make distribution changes visible on a time axis.
+
 ---
 
 ## Common Mistakes
