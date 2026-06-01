@@ -218,6 +218,144 @@ Teams I have worked with tend to stabilize tool-calling agents once they documen
 
 ---
 
+## Treating ToolMessage as a state contract
+
+When the model emits a tool call, the runtime creates a `ToolMessage` that carries a `tool_call_id`. That ID is the only thing linking the model's request to the tool's response. If you lose it—or create a `ToolMessage` without matching the ID—the model cannot ground its next turn on the tool's output.
+
+In practice, raw tool output is rarely what you want to store verbatim. A normalization layer between tool execution and message creation keeps the state graph predictable:
+
+```python
+def normalize_tool_result(raw: dict, tool_call_id: str) -> ToolMessage:
+    """Enforce a stable contract between tool output and graph state."""
+    content = json.dumps({
+        "status": raw.get("status", "success"),
+        "payload": raw.get("data"),
+        "truncated": len(str(raw.get("data", ""))) > 4000,
+    })
+    return ToolMessage(content=content, tool_call_id=tool_call_id)
+```
+
+Why does this matter operationally? Three reasons.
+
+1. **Reproducibility.** When you serialize graph state for replay, a normalized `ToolMessage` always has the same shape. Raw tool output does not.
+2. **Token budget.** Large tool responses blow up the context window on subsequent turns. Normalizing lets you truncate or summarize without losing the `tool_call_id` link.
+3. **Observability.** Structured output means you can log `status`, alert on failures, and build dashboards without parsing free-form strings.
+
+The operational logging pattern follows directly:
+
+```python
+import structlog
+
+logger = structlog.get_logger()
+
+def log_tool_execution(tool_name: str, tool_call_id: str, result: ToolMessage):
+    payload = json.loads(result.content)
+    logger.info(
+        "tool_executed",
+        tool=tool_name,
+        call_id=tool_call_id,
+        status=payload["status"],
+        truncated=payload["truncated"],
+    )
+```
+
+If a tool call fails, the `ToolMessage` still gets created—with `status: "error"` and an error description in `payload`. The model sees the failure explicitly and can decide whether to retry or answer with what it has. Swallowing errors silently is the fastest path to unbounded loops.
+
+---
+
+## Visualizing the agent loop as a sequence
+
+A graph definition tells you topology but not temporal order. To debug a running agent, you need the sequence of messages as they actually flow:
+
+```text
+HumanMessage("What is the weather in Seoul?")
+  → agent node (LLM call)
+    → AIMessage(tool_calls=[{"name": "get_weather", ...}])
+      → tools node (execute get_weather)
+        → ToolMessage(status=success, payload={...})
+          → agent node (LLM call)
+            → AIMessage(content="The weather in Seoul is...")
+              → END
+```
+
+Each arrow is a state transition in the graph. The critical insight: the agent node runs *twice*. First to decide which tool to call, then to synthesize the tool's output into a final answer. If you instrument only the first call, you miss half the latency and half the token cost.
+
+Metrics to collect at each transition:
+
+| Metric | Where to capture | Why it matters |
+|--------|-----------------|----------------|
+| `agent_turn_count` | After each agent node exit | Detects unbounded loops before they hit recursion limits |
+| `tool_call_count` | After tools node | Tracks external API costs and rate-limit proximity |
+| `tool_latency_ms` | Around each tool execution | Surfaces slow tools that dominate end-to-end time |
+| `total_tokens` | After each LLM call | Budget tracking; alerts before cost spikes |
+| `loop_exit_reason` | At END node | Distinguishes clean exits from forced terminations |
+
+A two-tool call adds one more cycle: the agent sees the first `ToolMessage`, decides it needs another tool, emits a second `tool_calls`, and re-enters the tools node. The sequence grows linearly with tool calls, which is why `agent_turn_count` is your primary loop-health indicator.
+
+---
+
+## Designing failure recovery scenarios first
+
+Before adding a new tool to your agent, write down what happens when it fails. Not after—before. The failure contract determines retry logic, idempotency requirements, and user-facing error messages.
+
+Start by classifying tools into two failure categories:
+
+| Category | Example tools | Retry safe? | Requires idempotency key? |
+|----------|--------------|-------------|--------------------------|
+| Read-only / side-effect-free | `get_weather`, `search_docs`, `calculate` | Yes | No |
+| Side-effect / mutating | `send_email`, `create_order`, `update_record` | Conditional | Yes |
+
+The retry decision function:
+
+```python
+def should_retry_tool(
+    tool_name: str,
+    error: Exception,
+    attempt: int,
+    max_retries: int = 2,
+) -> bool:
+    """Decide whether a failed tool call should be retried."""
+    if attempt >= max_retries:
+        return False
+
+    # Transient errors: network timeout, rate limit, temporary unavailability
+    transient = (TimeoutError, ConnectionError, RateLimitError)
+    if isinstance(error, transient):
+        return True
+
+    # Permanent errors: invalid input, auth failure, resource not found
+    # Never retry these—the same input will produce the same failure
+    return False
+```
+
+For side-effect tools, retrying without an idempotency key means risking duplicate mutations. The pattern:
+
+```python
+import uuid
+
+def execute_with_idempotency(tool_func, tool_input: dict, tool_call_id: str):
+    """Wrap side-effect tools with idempotency protection."""
+    idempotency_key = f"{tool_call_id}-{hash(json.dumps(tool_input, sort_keys=True))}"
+    
+    # Check if this exact call already succeeded
+    if cached := idempotency_store.get(idempotency_key):
+        return cached
+    
+    result = tool_func(**tool_input)
+    idempotency_store.set(idempotency_key, result, ttl=3600)
+    return result
+```
+
+The `tool_call_id` from the model's request becomes part of the idempotency key. If the agent retries the same logical operation (same tool, same input, same call ID), the second execution returns the cached result instead of mutating state again.
+
+Three failure scenarios every tool-calling agent must handle explicitly:
+
+1. **Tool timeout with no response.** The `ToolMessage` must still be created (with error status) so the model can decide next steps. Silence causes the model to hallucinate a tool result or loop indefinitely.
+2. **Partial success.** A batch tool processes 8 of 10 items. The `ToolMessage` should report both what succeeded and what failed, so the model can retry only the failures.
+3. **Cascading failure.** Tool A depends on Tool B's output. If B fails, A should not execute at all. Model this as explicit dependencies in your tool execution layer, not as implicit ordering hopes.
+
+---
+
 ## First operating checklist
 
 Once a tool loop enters the graph, these stop being implementation details and become execution-stability checks.
