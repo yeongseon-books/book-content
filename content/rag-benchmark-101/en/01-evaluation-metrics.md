@@ -287,6 +287,124 @@ The next post moves to **measuring retrieval performance** — wrapping a real r
 
 ---
 
+## Locking down metric formulas and interpretation rules
+
+As the team grows, people interpret the same score differently. Pin the formulas and interpretation criteria in documentation alongside the code.
+
+```text
+Precision@k(q) = |Rel(q) ∩ TopK(q)| / k
+Recall@k(q)    = |Rel(q) ∩ TopK(q)| / |Rel(q)|
+RR(q)          = 1 / rank_first_relevant(q), 0 if none
+MRR            = (1 / |Q|) * Σ RR(q)
+```
+
+Where `Rel(q)` is the gold set for query `q` and `TopK(q)` is the top-k retrieval results. Keep this in both the team wiki and inline code comments so meaning stays stable even when implementation changes.
+
+### Why metrics shift by query type
+
+The same retriever reacts differently depending on the question shape.
+
+| Query type | Characteristics | Primary metric | Common failure |
+| --- | --- | --- | --- |
+| Fact-lookup | 1–2 relevant docs | MRR, Precision@k | Relevant doc pushed to rank 2–3, degrading perceived quality |
+| Procedural | Answer spans multiple chunks | Recall@k | Missing one step's doc leads to incomplete generation |
+| Comparison | Evidence needed from different doc clusters | Recall@k, per-query log | Only one side retrieved, answer becomes biased |
+
+Adding this breakdown lets you trace a 0.02 average-score change back to the specific query cluster responsible.
+
+### When to add nDCG
+
+Precision@k, Recall@k, and MRR are enough initially, but when you introduce graded relevance labels (e.g., `3=core`, `2=supporting`, `1=weak`, `0=irrelevant`), nDCG captures ranking quality more faithfully.
+
+```python
+import math
+
+def dcg_at_k(relevance: list[int], k: int) -> float:
+    gains = relevance[:k]
+    return sum((2 ** rel - 1) / math.log2(i + 2) for i, rel in enumerate(gains))
+
+def ndcg_at_k(relevance: list[int], k: int) -> float:
+    ideal = sorted(relevance, reverse=True)
+    dcg = dcg_at_k(relevance, k)
+    idcg = dcg_at_k(ideal, k)
+    return 0.0 if idcg == 0 else dcg / idcg
+```
+
+nDCG answers "are the *most important* relevant docs ranked highest?" — useful when your product generates multi-step summaries or comparative answers.
+
+### Retrieval quality report JSON schema
+
+Benchmark artifacts need both a human-readable table and a machine-diffable JSON. The following structure supports CI regression diffs and manual analysis simultaneously.
+
+```json
+{
+  "run_id": "20260521T014500-a1b2c3d",
+  "k": 5,
+  "aggregate": {
+    "precision@5": 0.62,
+    "recall@5": 0.81,
+    "mrr": 0.74
+  },
+  "per_query": [
+    {
+      "query_id": "q-017",
+      "question": "What is IVF nprobe?",
+      "retrieved_ids": ["doc-ivf-01", "doc-faiss-02", "doc-ann-03"],
+      "relevant_ids": ["doc-ivf-01"],
+      "precision@5": 0.2,
+      "recall@5": 1.0,
+      "mrr": 1.0
+    }
+  ]
+}
+```
+
+Locking this format early means experiments from episodes 2–6 accumulate in the same report shape.
+
+### Operational thresholds
+
+There is no universal threshold, but these starting points are common in early-stage production systems.
+
+| Metric | Warning threshold | Blocking threshold | Meaning |
+| --- | ---: | ---: | --- |
+| Recall@5 | −0.02 | −0.04 | Relevant docs being dropped |
+| MRR | −0.03 | −0.05 | First relevant doc slipping lower |
+| Precision@5 | −0.04 | −0.07 | Noise increasing in top slots |
+
+Tune thresholds after observing 2–3 weeks of baseline variance. For volatile domains, per-query-cluster thresholds are more practical than a single global value.
+
+## Appendix: per-query failure analysis template
+
+Scores need to lead to action. A structured failure template per query makes the transition from "score dropped" to "here is the fix" repeatable.
+
+| query_id | Precision@5 | Recall@5 | MRR | Failure class | Next action |
+| --- | ---: | ---: | ---: | --- | --- |
+| q-021 | 0.20 | 1.00 | 1.00 | Excess noise | Add reranker |
+| q-044 | 0.80 | 0.40 | 0.50 | Missed evidence | Revisit chunk/embedding |
+| q-057 | 0.00 | 0.00 | 0.00 | Total miss | Query expansion / synonym dict |
+
+Connect this table to the automated report from episode 2, and root-cause analysis starts immediately when scores regress.
+
+### Unit tests for metric calculations
+
+As evaluation code grows, the metric implementation itself can regress. Minimal unit tests prevent silent bugs.
+
+```python
+def test_mrr_when_first_hit_is_second_rank():
+    ranked = ["x", "a", "b"]
+    gold = {"a"}
+    assert reciprocal_rank_from_lists(ranked, gold) == 0.5
+
+def test_recall_zero_when_no_overlap():
+    ranked = ["x", "y", "z"]
+    gold = {"a", "b"}
+    assert recall_at_k_from_lists(ranked, gold, k=3) == 0.0
+```
+
+Trust in metric experiments starts with verifying the calculation itself, not the model.
+
+---
+
 ## Answering the Opening Questions
 
 - **When a RAG answer is wrong, how can retrieval failure be separated from generation failure?**
