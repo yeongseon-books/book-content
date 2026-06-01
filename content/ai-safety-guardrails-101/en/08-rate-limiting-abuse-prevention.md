@@ -197,6 +197,95 @@ A single Redis node is a single point of failure. With limiters across multiple 
 
 LLM APIs care about cost caps, so most teams pick strong consistency for cost dimensions and per-region local for RPS.
 
+---
+
+### Connecting Token/Cost Limits to the API Gateway
+
+Rate limiting in application code alone creates bypass paths. Split enforcement between gateway and service layer:
+
+| Layer | Role | Example |
+|---|---|---|
+| API Gateway | Primary RPS/IP limit | Burst prevention |
+| App Layer | User/key TPM, OPM limit | Model cost control |
+| Billing Guard | Dollar budget ceiling | Daily spend cap |
+
+```python
+from fastapi import FastAPI, Request, HTTPException
+
+app = FastAPI()
+
+@app.post('/chat')
+async def chat(req: Request, body: dict):
+    user_id = req.headers.get('x-user-id', 'anon')
+    api_key = req.headers.get('x-api-key', 'none')
+    ip = req.client.host
+    in_tokens = estimate_tokens(body.get('prompt', ''))
+
+    ok, reason = allow_request(user_id=user_id, ip=ip, api_key=api_key, input_tokens=in_tokens)
+    if not ok:
+        raise HTTPException(status_code=429, detail=f'rate limited: {reason}')
+
+    return await handle_llm(body, user_id)
+```
+
+### Abuse Patterns and Response Matrix
+
+| Pattern | Signal | Response |
+|---|---|---|
+| Low-RPS high-token attack | Request count low but tokens spike | TPM limit blocks first |
+| Key sharing abuse | Same key from multiple IPs | Key-level risk score elevated |
+| Streaming drain attack | Output tokens spike, latency grows | Real-time output budget deduction |
+| Bypass retry | 429 followed by retry on different account/key | Account-group sanction |
+
+```python
+def degradation_response(level: int) -> dict:
+    if level == 1:
+        return {"mode": "short_answer", "max_output_tokens": 120}
+    if level == 2:
+        return {"mode": "cheap_model", "model": "gpt-4o-mini"}
+    if level >= 3:
+        return {"mode": "block", "status": 429}
+    return {"mode": "normal"}
+```
+
+Repeated hard blocks drive away legitimate users. Degradation steps preserve product quality.
+
+### Monthly Cost Protection Checklist
+
+- [ ] Define budgets per user, team, API key, and project.
+- [ ] Set alerts at 70/85/95% budget thresholds.
+- [ ] Update `PRICING` table immediately on unit-cost changes; run regression tests.
+- [ ] Restrict high-cost models to allowlisted endpoints only.
+- [ ] Review top-1% user token consumption weekly.
+
+### Global/Regional Limiting Strategy
+
+| Resource | Recommended consistency | Reason |
+|---|---|---|
+| RPS | Region-local | Minimize latency |
+| Input/output tokens | Near-real-time sync | Prevent under-blocking |
+| Cost budget | Strong consistency | Prevent overspend |
+
+```python
+def reserve_global_budget(user_id: str, cents: int) -> bool:
+    return token_bucket(f"global:{user_id}:cost", capacity=5_000_000, refill_per_sec=5_000_000/86400, cost=cents)
+
+def consume_local_tokens(region: str, user_id: str, tok: int) -> bool:
+    return token_bucket(f"{region}:{user_id}:tok", capacity=80_000, refill_per_sec=80_000/60, cost=tok)
+```
+
+### Abuse Response Runbook
+
+1. **Detect**: z-score > 3 or cost growth > 200%.
+2. **Mitigate**: Force short-answer mode.
+3. **Sanction**: CAPTCHA / cooldown.
+4. **Block**: Suspend key.
+5. **Recover**: Confirm normal patterns, then release in stages.
+
+User-facing messages:
+- "Due to high request volume, response length is temporarily reduced."
+- "Please try again shortly. Normal access will restore automatically."
+
 ## Common Mistakes
 
 1. **Limiting only RPS.** A single request can spend 100K tokens, so cost still runs away. Limit token and dollar dimensions too.
