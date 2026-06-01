@@ -239,6 +239,60 @@ if __name__ == "__main__":
 - Adding cumulative call count and cost to `/health` makes state changes visible even in a tiny demo.
 - The structured `quality` payload can later be aligned with batch evaluation jobs and dashboards.
 
+The most important instinct this example builds is "do not break the signal chain of a single request." If input validation fails, the flow stops before the model call. If it passes, cost and quality are computed, and those results feed back into structured logs and health state. Without that link, an operator must cross-reference separate systems to explain one request's full lifecycle.
+
+## Establish the baseline for your integrated ops pipeline
+
+At the operations-completion stage, "connection" matters more than "existence" of each layer. Security, cost, evaluation, and logging can each work fine individually, but if they are not joined by `request_id`, incident response speed does not improve meaningfully. The baseline document must therefore be a data-flow contract, not a feature list.
+
+The first contract to lock is the set of common fields: `request_id`, `trace_id`, `user_tier`, `model`, `prompt_version`, `input_tokens`, `output_tokens`, `estimated_cost_usd`, `policy_decision`, `evaluation_status`. When all layers emit these fields consistently, cross-store joins become possible later.
+
+A gap teams commonly miss: different teams using the same field name with different semantics. For example, one team's `success` means HTTP 200, while another's `success` includes passing evaluation. The integrated pipeline must define such terms upfront and reflect them identically in docs and code.
+
+## Combine cost, quality, and security into one check report
+
+Metrics built across the series should converge into a single check report at the end. Instead of opening five dashboards during a morning review, read key metrics on one page and drill into anomalies from there.
+
+### Daily ops report example
+
+```python
+def build_daily_ops_report(rows: list[dict]) -> dict:
+    total = len(rows)
+    if total == 0:
+        return {"status": "no-traffic"}
+
+    blocked = sum(1 for r in rows if not r.get("input_allowed", True) or not r.get("output_allowed", True))
+    eval_fail = sum(1 for r in rows if r.get("evaluation_status") in {"fail-fast", "review"})
+    total_cost = sum(float(r.get("estimated_cost_usd", 0.0)) for r in rows)
+    p95_latency = sorted(r.get("latency_ms", 0) for r in rows)[max(0, int(total * 0.95) - 1)]
+
+    return {
+        "request_count": total,
+        "blocked_rate": round(blocked / total, 4),
+        "evaluation_attention_rate": round(eval_fail / total, 4),
+        "cost_total_usd": round(total_cost, 4),
+        "latency_p95_ms": p95_latency,
+    }
+```
+
+Keeping the report structure simple speeds up cross-team communication. When someone asks "why did cost rise today," evaluation failure rate, block rate, and latency are visible on the same table.
+
+## Track prompt version and deployment version together
+
+In LLM operations, code deployments and prompt deployments move at different speeds. The same code with a different prompt can produce wildly different operational outcomes. The final stage therefore requires tracking `deployment_id` and `prompt_version` together.
+
+The recommended approach: declare prompt version in deployment metadata and record both values in every request log. This lets you quickly narrow "quality is drifting but no code changed" to a prompt change. Conversely, when the prompt is unchanged but code differs, investigate infrastructure or library changes first.
+
+## Exit criteria for judging operational maturity
+
+The most important question when closing this series is: "what must be true for operations to be considered complete?" Practical exit criteria:
+
+- You can trace a single request through `security decision → model call → cost calculation → quality evaluation → log record`.
+- Within 30 minutes of an incident, you can present blast radius and cause hypothesis with data.
+- Before deploying a new prompt version, regression evaluation and security tests pass automatically.
+- Cost spikes, quality drops, and block-rate anomalies trigger threshold-based alerts automatically.
+
+When these four are met, operations no longer depend on "the experienced person's intuition." The team can produce the same quality with the same procedure regardless of personnel changes — and that is the practical meaning of LLM app operations completion.
 ## Where engineers get confused
 ![Deploy monitor evaluate optimize redeploy loop](https://yeongseon-books.github.io/book-public-assets/assets/llm-apps-ops-101/06/06-03-where-engineers-get-confused.en.png)
 
@@ -247,11 +301,30 @@ if __name__ == "__main__":
 - Inline evaluation improves visibility but can add latency. Production systems often split synchronous and asynchronous checks.
 - A simple cost formula is fine for the demo, but real billing models may require input/output separation and model-specific tables.
 
+The most common misconception at this stage is "all operational problems are now solved." The integrated pipeline is a starting point, not a finish line. What you gain now is a consistent signal that can feed into storage, alerts, and dashboards. On top of that you still need long-term retention, trend analysis, batch evaluation, and cost alerting to truly reach production operations maturity.
+
+## Clarify team operating model and responsibility boundaries
+
+Even when the integrated pipeline is technically complete, ambiguous responsibility boundaries slow real incident response. The final step is defining roles and decision boundaries.
+
+Recommended model: the application team owns prompts and evaluation criteria, the platform team owns deployment and observability infrastructure, and the security team owns policy rules and incident response procedures. However, the per-request log schema must be co-owned — if any one team changes fields unilaterally, the entire pipeline breaks.
+
+Operations meetings also need common metrics. If teams look at different numbers, they interpret the same incident differently. Fix a weekly-meeting template with `cost`, `quality`, `latency`, `security`, `deployment stability` items referencing the same data source.
+
+Ultimately, operations completion is not about adopting more tools. It is about reaching an organizational state where the same event is explained with the same data and acted on with the same rules. Once you reach that point, the LLM app transitions from an experimental service to a repeatable product operation.
 ## Checklist
 - [ ] Validate input before the model call
 - [ ] Compute total_tokens and cost_usd for every response
 - [ ] Log the quality report in structured form
 - [ ] Expose cumulative state in /health
+
+## Criteria for building a next-quarter ops roadmap
+
+After operations completion, "what to stabilize" matters more than "what to build." The next-quarter roadmap should be framed as operational-metric improvement targets rather than feature lists.
+
+For example: `evaluation failure rate down 30%`, `cost prediction error below 10%`, `security false-positive rate down 20%`, `deployment rollback time under 15 minutes`. Numeric targets keep the team moving in the same direction. Each goal must also name a responsible team and measurement cadence to create execution accountability.
+
+Teams with mature ops can also iterate on new model adoption and prompt experiments faster — because they detect failures early and roll back safely. Good operations is not a brake on innovation; it is a safety harness that enables faster experimentation.
 
 ## Summary
 At this point one request leaves a full operational trail. From here, the next step is persistence, alerting, and dashboards rather than new endpoint logic.
