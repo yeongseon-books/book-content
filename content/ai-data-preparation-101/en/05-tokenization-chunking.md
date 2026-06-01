@@ -246,6 +246,179 @@ Entities and references cut at chunk boundaries lose information. Overlap shares
 
 If overlap exceeds 50%, duplicate information actually degrades retrieval quality.
 
+## Token-Budget Chunking Experiment Design
+
+After choosing a tokenizer, chunking experiments need to close with numbers. In RAG especially, "tokens consumed per query" and "evidence recall" matter more than raw chunk size.
+
+```python
+from dataclasses import dataclass
+
+
+@dataclass
+class ChunkExperimentResult:
+    strategy: str
+    chunk_size: int
+    overlap: int
+    avg_prompt_tokens: float
+    p95_prompt_tokens: float
+    retrieval_recall_at_5: float
+    answer_f1: float
+
+
+def choose_strategy(results: list[ChunkExperimentResult]) -> ChunkExperimentResult:
+    # Apply hard constraints first
+    feasible = [r for r in results if r.p95_prompt_tokens <= 7000]
+    # Optimize recall first, then minimize cost
+    feasible.sort(key=lambda r: (r.retrieval_recall_at_5, -r.avg_prompt_tokens), reverse=True)
+    return feasible[0]
+```
+
+## Computing Token Statistics at Scale with Polars
+
+For large corpora, Polars often outperforms pandas. This pattern computes per-chunk token distributions and flags oversized chunks before they monopolize the retrieval budget.
+
+```python
+import polars as pl
+import tiktoken
+
+enc = tiktoken.encoding_for_model("gpt-4o")
+
+
+def tok_len(s: str) -> int:
+    return len(enc.encode(s))
+
+
+pl_df = pl.read_parquet("data/chunks.parquet")
+pl_df = pl_df.with_columns(
+    pl.col("chunk_text").map_elements(tok_len, return_dtype=pl.Int32).alias("n_tokens")
+)
+
+stats = pl_df.select([
+    pl.len().alias("rows"),
+    pl.col("n_tokens").mean().alias("avg_tokens"),
+    pl.col("n_tokens").quantile(0.95).alias("p95_tokens"),
+    pl.col("n_tokens").quantile(0.99).alias("p99_tokens"),
+]).to_dicts()[0]
+print(stats)
+```
+
+If `p99_tokens` is excessively large, some documents will monopolize the prompt budget and degrade answer quality. Adjust separator priority or add heading-based pre-splitting.
+
+## Before/After Chunk Sample Comparison
+
+```text
+[fixed-size]
+...plan changes can be made from the settings page... (mid-sentence cut)
+
+[recursive]
+### Plan Changes
+Plan changes can be requested from the settings page. The billing cycle recalculates immediately upon change.
+```
+
+The fewer mid-sentence splits, the better retrieval grounding becomes. In production, include samples like these in evaluation reports to document why a strategy change was made.
+
+## DVC Stage for Reproducibility
+
+```yaml
+stages:
+  chunk_corpus:
+    cmd: python pipelines/chunk_corpus.py --strategy recursive --max-tokens 700 --overlap 120
+    deps:
+      - pipelines/chunk_corpus.py
+      - data/clean/corpus.parquet
+    outs:
+      - data/chunks/chunks_recursive.parquet
+    metrics:
+      - reports/chunk_stats.json
+```
+
+Chunking is not experimental code—it is part of the data pipeline. Versions and metrics must be tracked together so the next iteration can reproduce the same results.
+
+## Retrieval-Quality Chunk Evaluation Metrics
+
+When changing chunking strategy, check retrieval-stage metrics before looking at generation scores. At minimum, compare these three:
+
+- `recall@k`: ratio of evidence chunks appearing in top-k results
+- `mrr`: how early the evidence chunk appears in the ranked list
+- `context_utilization`: ratio of evidence tokens to total prompt tokens
+
+```python
+def context_utilization(prompt_tokens: int, evidence_tokens: int) -> float:
+    return evidence_tokens / max(prompt_tokens, 1)
+
+
+def gating(metrics: dict) -> bool:
+    return (
+        metrics["recall_at_5"] >= 0.82 and
+        metrics["mrr"] >= 0.70 and
+        metrics["p95_prompt_tokens"] <= 7000
+    )
+```
+
+## Document-Structure Pre-Split
+
+For large documents, splitting by headings first stabilizes recursive chunk quality.
+
+```python
+import re
+
+
+def split_by_heading(md_text: str) -> list[str]:
+    parts = re.split(r"(?m)^#{1,3}\s+", md_text)
+    return [p.strip() for p in parts if p.strip()]
+```
+
+Adding this step reduces the rate of mixed-topic chunks and improves retrieval precision.
+
+## Inspection Questions for Immediate Ops Use
+
+These questions come up in every pre-release review. The point is not to recite them—it is to answer each one with a file path or metric value on the spot.
+
+1. Which version did this dataset come from, and what is its sha256?
+2. How much did duplicate/null/length distributions shift compared to the last batch?
+3. Which samples were removed, by which rule, and what are the top removal reasons?
+4. What is the measured leakage rate at the train/eval/test boundary?
+5. How many samples did a human review this batch, and what error types were found?
+
+```python
+def release_readiness(summary: dict) -> tuple[bool, list[str]]:
+    issues = []
+    if not summary.get("dataset_sha256"):
+        issues.append("missing_dataset_sha256")
+    if summary.get("duplicate_ratio", 1.0) > 0.10:
+        issues.append("duplicate_ratio_too_high")
+    if summary.get("null_ratio", 1.0) > 0.02:
+        issues.append("null_ratio_too_high")
+    if summary.get("contamination_ratio", 1.0) > 0.01:
+        issues.append("contamination_ratio_too_high")
+    if summary.get("human_reviewed_rows", 0) < 100:
+        issues.append("insufficient_human_review")
+    return len(issues) == 0, issues
+```
+
+Even if your ops team does not use this exact function, they need the same concept implemented as a pipeline gate. The key principle: never judge readiness by feel.
+
+## Production Log Example
+
+```text
+[release-check] dataset=v2.4.1 sha=4fb1...
+[release-check] duplicate_ratio=0.061 null_ratio=0.008
+[release-check] contamination_ratio=0.004 human_reviewed_rows=240
+[release-check] status=PASS
+```
+
+When model performance wobbles, this single log block lets you quickly rule out (or zero in on) the data preparation stage.
+
+### Token Budget SLA
+
+In production, set an explicit SLA like "p95 tokens per query must stay under 7k." If a chunking strategy change breaches the SLA, the pipeline should auto-fail—this prevents cost regressions from going unnoticed.
+
+### Minimum Items for Release Notes
+
+Every chunking change must appear in release notes with at least: the changed rule, affected row count, key metric delta, and rollback path. Re-measure token budgets immediately after model swaps—never reuse old estimates.
+
+After any chunking strategy change, re-run A/B evaluation on the same question set to confirm no regression. Even if the model's context window grows, larger chunks are not automatically better—smaller chunks often retrieve more precise evidence, so always compare cost and quality together.
+
 ## 5 common mistakes
 
 1. **Applying English BPE directly to Korean**: one Korean character explodes to 3-4 tokens. If your domain is Korean-heavy, train a ko-aware tokenizer or use a multilingual SentencePiece model.
