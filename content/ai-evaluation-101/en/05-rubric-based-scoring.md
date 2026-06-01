@@ -256,6 +256,88 @@ for dim in dimensions:
 
 When kappa varies by dimension, **rewrite the anchors of the weakest one** and iterate until every dimension exceeds 0.6.
 
+## Policy Violations as a Hard Gate, Not a Weight
+
+Safety and policy compliance must not be mixed into a weighted average — other high scores can dilute a violation. Separate them as a hard gate.
+
+```python
+def policy_hard_gate(scores: dict) -> str:
+    if scores["policy_compliance"] < 4:
+        return "FAIL_POLICY"
+
+    weighted, status = aggregate_weighted(scores)
+    if status == "FAIL":
+        return "FAIL_QUALITY"
+    if status == "REVIEW":
+        return "REVIEW"
+    return "PASS"
+```
+
+Operational rules:
+
+- `policy_compliance < 4` → immediate fail
+- `correctness < 3` → immediate fail
+- Remaining dimensions → weighted average ≥ 4.0 to pass
+
+This prevents "important but rare failures" from being buried in the average.
+
+## Rubric Design Review Questions
+
+After building a rubric, validate it with these checks:
+
+1. Can an evaluator form the same question just from the dimension name?
+2. Do the 1-point and 5-point examples resemble real production cases?
+3. Is inter-dimension correlation below 0.9?
+4. Is the deployment-blocking threshold explicitly stated?
+
+```python
+def rubric_health_check(corr: dict, kappa: dict) -> list[str]:
+    issues = []
+    for pair, value in corr.items():
+        if value > 0.9:
+            issues.append(f"suspected duplicate dimension: {pair} corr={value:.2f}")
+    for dim, score in kappa.items():
+        if score < 0.6:
+            issues.append(f"low agreement: {dim} kappa={score:.2f}")
+    return issues
+```
+
+## Rubric-Based Regression Detection
+
+Catch regressions by per-dimension drop magnitude rather than a single average.
+
+```python
+def detect_rubric_regression(current: dict, baseline: dict) -> list[str]:
+    alarms = []
+    for dim in ["correctness", "completeness", "clarity", "tone"]:
+        delta = current[dim] - baseline[dim]
+        if delta <= -0.3:
+            alarms.append(f"{dim} dropped: {delta:.2f}")
+    if current["correctness"] < 3.5:
+        alarms.append("correctness below absolute threshold")
+    return alarms
+```
+
+This rule catches "total looks similar but one dimension collapsed" regressions early.
+
+## Weekly Summary Message Generation
+
+When sharing rubric results with the team, auto-generate a one-line summary of dimension drops.
+
+```python
+def build_weekly_message(current: dict, baseline: dict) -> str:
+    drops = []
+    for dim in ["correctness", "completeness", "clarity", "tone"]:
+        delta = current[dim] - baseline[dim]
+        if delta < -0.2:
+            drops.append(f"{dim} {delta:.2f}")
+    if not drops:
+        return "No major rubric drops this week"
+    return "Dimensions that dropped this week: " + ", ".join(drops)
+```
+
+Pin this message to weekly standups so quality discussions start from the same facts.
+
 ---
 
 ## Common Mistakes
