@@ -292,6 +292,70 @@ With snapshots you can analyze "why did this output happen?" after the fact. Wit
 
 ---
 
+## Context Assembly YAML and Slot Validation
+
+When moving Context Harness to production, the first requirement is externalizing assembly rules. Hard-coding message order inside application code makes release-to-release diffs hard to track. A slot-based YAML with max-token and priority validation per slot is easier to maintain.
+
+```yaml
+# context_assembly.yaml
+context_policy:
+  version: 1
+  slots:
+    - name: system_prompt
+      max_tokens: 2000
+      required: true
+    - name: task_spec
+      max_tokens: 1200
+      required: true
+    - name: conversation_summary
+      max_tokens: 1800
+      required: false
+    - name: retrieved_context
+      max_tokens: 7000
+      required: true
+      rerank_top_k: 8
+      compression: extractive
+    - name: tool_schemas
+      max_tokens: 3000
+      required: true
+    - name: guardrail_notes
+      max_tokens: 800
+      required: false
+  response_buffer_tokens: 4000
+  hard_window_tokens: 32000
+```
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class Slot:
+    name: str
+    max_tokens: int
+    required: bool
+
+def validate_slots(
+    slots: list[Slot], response_buffer: int, hard_window: int
+) -> None:
+    total = sum(s.max_tokens for s in slots) + response_buffer
+    if total > hard_window:
+        raise ValueError(f"context budget overflow: {total} > {hard_window}")
+
+    names = [s.name for s in slots]
+    if len(names) != len(set(names)):
+        raise ValueError("duplicate slot name detected")
+
+    required_missing = [s.name for s in slots if s.required and s.max_tokens <= 0]
+    if required_missing:
+        raise ValueError(f"required slots misconfigured: {required_missing}")
+```
+
+Enforcing this validation at startup prevents incidents where an oversized `retrieved_context` slot eats the response buffer entirely.
+
+A practical operational tip: record per-slot quality metrics. Track hit-rate and overlap-rate for the retrieved_context slot, and summary compression ratio for the history slot. This lets you see numerically which slot degrades answer quality. Context Harness does not end at defining assembly rules—it stabilizes only when you observe per-slot performance continuously.
+
+---
+
 ## Common Mistakes
 
 **1. Filling the entire context window.**
