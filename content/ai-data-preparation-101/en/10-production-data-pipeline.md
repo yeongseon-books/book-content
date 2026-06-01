@@ -271,6 +271,96 @@ This concludes the series. We started from GIGO in Ep1 and ended at a production
 - [ ] Place PII handling close to ingest so raw identifiers do not spread downstream
 - [ ] Fail loudly on schema drift and support stage-level reruns from the orchestrator
 
+
+## Design principles for turning a pipeline into an operating system
+
+As a pipeline grows in stages, quality depends less on individual stage performance and more on the clarity of contracts between stages. For a data preparation pipeline, "it ran successfully once" matters far less than "it produces the same result every time." Operational design breaks down into five axes.
+
+### 1) Lock down input contracts first
+
+Document the file format, required columns, null policies, timezone conventions, and encoding for every input. For example, if `event_time` is ambiguous between UTC and local time, split boundaries shift daily and train/validation leakage happens silently. Batches that fail schema validation at the pipeline entry point should halt immediately — this is safer long-term than letting partial data propagate.
+
+### 2) Assign identifiers to per-stage artifacts
+
+When intermediate outputs follow a path like `raw -> normalized -> deduped -> pii-redacted -> filtered -> tokenized`, attach a data version identifier rather than relying on filenames alone. In production you must always be able to answer "why did yesterday's model differ?" At minimum, three pieces must be linked:
+
+- Data version ID
+- Pipeline code commit SHA
+- Config file hash at execution time
+
+With this linkage, reproducibility experiments, regression analysis, and rollback decisions finish quickly. Without it, you cannot recreate the same dataset, and incident recovery devolves into guesswork meetings.
+
+### 3) Decompose quality metrics per stage
+
+If you only watch trailing indicators like final token count or training loss, you are already too late. Watching removal rates and distribution shifts at each stage lets you narrow causes early. For example, if the quality filter stage normally removes 18% but today removes 43%, suspect an input distribution change or an overly sensitive rule before blaming the model.
+
+Minimum operational metrics in practice:
+
+- Schema validation failure count
+- Deduplication rate (document-level, sentence-level)
+- PII detection count (by type)
+- Quality filter removal rate (by rule)
+- Token length distribution (p50, p90, p99)
+
+### 4) Treat failure as the default path, not an exception
+
+Production batches will fail. The question is not whether, but what the team can know immediately when they do. Failure alerts must include which stage failed, which input batch triggered it, and what differs from the last successful run. Sending just "batch failed" forces the on-call engineer to re-read logs from scratch.
+
+### 5) State explicit success conditions for each batch
+
+Judging success by exit code alone misses quality degradation. Even if every stage exits cleanly, a final usable-sample count 30% below the threshold can severely harm training quality. Separate technical success (all stages completed) from data-quality success (output meets defined thresholds).
+
+## Incident response runbook example
+
+A production pipeline lives by its runbook, not its architecture doc. A runbook answers "what do I check at 2 AM and in what order?" rather than "how does this work?" Below is a minimal runbook directly applicable to a data preparation pipeline.
+
+### Step 1. Verify the input layer
+
+- Confirm new file count and total size are within normal range.
+- Confirm file encoding and compression format match previous runs.
+- Check that partition paths (date, region, customer) are not missing.
+
+### Step 2. Isolate the quality degradation cause
+
+- Dedup rate spike: check for upstream re-sends or dedup key changes.
+- PII detection spike: check whether regex/NER rules were updated.
+- Quality filter spike: check for language distribution shifts or over-aggressive HTML cleaning rules.
+
+### Step 3. Estimate training impact
+
+- Final sample count reduction rate
+- Mean token length change rate
+- Domain distribution shift (e.g., support 40% → 12%)
+
+These three items separate "rerun immediately" from "proceed conditionally." If impact is large, halt the batch, fix the root cause, and rerun.
+
+### Step 4. Rerun criteria
+
+A rerun is not a simple retry — it is a guarantee of identical conditions. Pin the input snapshot and config hash before rerunning. Otherwise what looks like "recovery succeeded" actually produced a different dataset.
+
+## Extension scenario: multi-domain data pipeline
+
+Once a single-domain pipeline stabilizes, the natural next step is feeding multiple domains (product docs, customer support conversations, code comments, policy documents) into the same system. The most common mistake at this point is merging quality criteria into a single threshold. Each domain differs in sentence length, structure, and acceptable noise levels, so filters and sampling strategies must stay separate.
+
+Strategies that work in practice:
+
+- Separate preprocessing rules per domain while maintaining a common interface.
+- Set quality metric thresholds independently per domain.
+- Apply domain-weighted sampling just before the final merge.
+- Run model evaluation on per-domain validation sets to track regressions.
+
+This structure keeps pipeline complexity under control as data volume grows, and prevents a failure in one domain from cascading into a full pipeline halt.
+
+## Role separation and responsibility boundaries for team operations
+
+When pipeline quality wobbles, the most frequently missed factor is not technology but responsibility boundaries. If the data engineer, ML engineer, and service owner are not watching the same metrics, even a detected problem is slow to resolve. Defining role-specific responsibilities from day one of operations is critical.
+
+- Data Engineer: input contracts, schema validation, intermediate artifact lineage management
+- ML Engineer: quality filter thresholds, training impact analysis, rerun criteria ownership
+- Service Owner: batch approve/halt decisions, incident communication, release criteria sign-off
+
+With this separation, when an incident occurs the first question is "what criteria trigger a halt?" rather than "who should fix this?" Recovery time drops and recurrence rates for the same failure mode decrease.
+
 ## Answering the Opening Questions
 
 - **What system properties are needed to unify multiple preparation stages into one production-ready pipeline?**
