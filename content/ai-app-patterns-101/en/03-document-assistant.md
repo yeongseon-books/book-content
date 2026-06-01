@@ -340,6 +340,158 @@ for text in texts:
 
 ---
 
+## Document processing API: running summarization, extraction, and classification in one service
+
+### Task-specific system prompt templates
+
+A document assistant is defined by task contracts, not by the model. Separating prompt templates per task keeps quality regressions narrow.
+
+```python
+SUMMARY_SYSTEM_PROMPT = """
+You are a technical document editor.
+- Keep only core claims, evidence, and conclusions.
+- Remove hype language.
+- Limit output to four sentences.
+""".strip()
+
+EXTRACTION_SYSTEM_PROMPT = """
+You extract structured fields from unstructured documents.
+- Return only the specified JSON schema.
+- Use null for missing values.
+- Never fill fields with speculation.
+""".strip()
+
+CLASSIFICATION_SYSTEM_PROMPT = """
+You are an operational routing classifier.
+- Never produce labels outside the allowed set.
+- Return confidence as a float between 0 and 1.
+""".strip()
+```
+
+Splitting templates this way prevents conflating summarization quality drops with extraction parsing failures. In operations, the ability to decompose a problem quickly is what ultimately reduces cost.
+
+### Flask endpoint example
+
+```python
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+@app.post('/documents/summarize')
+def summarize_document():
+    text = request.json['text']
+    style = request.json.get('style', 'technical')
+    # In production, call the LLM with SUMMARY_SYSTEM_PROMPT.
+    return jsonify({'summary': f'[{style}] Summary example: {text[:120]}...'})
+
+@app.post('/documents/extract')
+def extract_fields():
+    text = request.json['text']
+    schema = request.json['schema']
+    # In production, use EXTRACTION_SYSTEM_PROMPT + JSON parser.
+    return jsonify({'result': {'company': 'ABCTech', 'salary_range': None}, 'schema': schema})
+
+@app.post('/documents/classify')
+def classify_document():
+    text = request.json['text']
+    # In production, use CLASSIFICATION_SYSTEM_PROMPT.
+    return jsonify({'category': 'Technology/IT', 'confidence': 0.91, 'preview': text[:60]})
+```
+
+### Failure recovery unit in batch processing
+
+In document processing, never let a single failure abort an entire batch. Use per-document retry keys:
+
+```text
+job_id: batch-2026-05-21-001
+item_id: doc-00041
+status: failed
+failed_stage: extraction
+retry_count: 2
+last_error: invalid_json_output
+```
+
+Recording `failed_stage` lets the retry queue resume from the failed step. Without it, long batch jobs become expensive to reproduce.
+
+## Schema validation and partial failure tolerance
+
+Summarization can be treated loosely because it produces prose, but extraction and classification feed downstream systems and must be strict. A Pydantic validation layer catches model output drift early.
+
+```python
+from pydantic import BaseModel, Field, ValidationError
+
+class JobExtract(BaseModel):
+    company: str
+    position: str
+    location: str | None = None
+    salary_range: str | None = None
+    experience_years: int | None = Field(default=None, ge=0, le=40)
+
+def validate_extract(payload: dict) -> tuple[bool, str]:
+    try:
+        JobExtract.model_validate(payload)
+        return True, 'ok'
+    except ValidationError as exc:
+        return False, str(exc)
+```
+
+### Partial-failure batch loop
+
+```python
+def process_batch(items: list[dict]) -> dict:
+    results = []
+    failures = []
+
+    for item in items:
+        extracted = run_extraction(item['text'])
+        ok, reason = validate_extract(extracted)
+
+        if ok:
+            results.append({'id': item['id'], 'result': extracted})
+        else:
+            failures.append({'id': item['id'], 'reason': reason})
+
+    return {
+        'success_count': len(results),
+        'failure_count': len(failures),
+        'results': results,
+        'failures': failures,
+    }
+```
+
+The goal is to never escalate 2 failures in 100 items into 100 failures. Isolate and retry only the broken items.
+
+## Document length and execution strategy
+
+Operating cost for a document assistant depends heavily on document length distribution. Route by input length to avoid wasted tokens or parsing failures on long documents.
+
+```python
+def choose_strategy(char_len: int, task_type: str) -> str:
+    if task_type == 'summary' and char_len > 8000:
+        return 'map_reduce_summary'
+    if task_type == 'extraction' and char_len > 12000:
+        return 'sectioned_extraction'
+    if task_type == 'classification' and char_len > 20000:
+        return 'hierarchical_classification'
+    return 'single_pass'
+```
+
+This routing looks simple but has outsized impact. Processing every document with a single strategy leads to accumulated cost overruns or parsing failures.
+
+### Quality check sample sets
+
+Before operating a document assistant in production, maintain per-task evaluation sets:
+
+```text
+summary_set: 200 items, metric = key-phrase recall
+extraction_set: 300 items, metric = field match rate
+classification_set: 500 items, metric = macro_f1
+```
+
+A single aggregate score hides which task is broken. Separate per-task quality dashboards make maintenance practical.
+
+---
+
 ## Conclusion
 
 Summarization, extraction, and classification cover the majority of document processing use cases. Keep each chain focused on one task: mixing summarization with extraction in a single prompt reliably degrades output quality. For long documents, Map-Reduce is the standard approach — chunk, map independently, reduce once.
