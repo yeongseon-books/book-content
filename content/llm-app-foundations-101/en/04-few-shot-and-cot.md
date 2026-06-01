@@ -22,25 +22,14 @@ seo_description: Improve LLM performance on complex tasks using few-shot prompti
 
 Post 03 established the basic shape of prompt design: split policy into `system`, put the current request in `user`, and replay earlier answers as `assistant` when you need conversation state. Once that foundation is in place, the next practical question shows up immediately. Why does the same model sometimes follow the format you want very closely, while other times it gives something that feels almost right but not dependable enough to automate?
 
+This is the fourth post in the LLM App Foundations 101 series.
+
 In application work, two of the first steering tools you reach for are few-shot prompting and chain-of-thought prompting. Few-shot means showing the model one or more examples of the behavior you want. Chain-of-thought means nudging the model to solve the task in intermediate steps instead of jumping straight to the final answer. Neither technique retrains the model. Both are ways to make an already capable model behave more predictably on the request in front of it.
 
-This is the fourth post in the LLM App Foundations 101 series. Here, we use Groq's `llama-3.1-8b-instant` to cover both patterns in runnable Python. We will look at seven things:
-
-- what few-shot prompting is in message-array form
-- how zero-shot and few-shot differ on the same task
-- why example quality matters more than example count
-- why chain-of-thought often helps on multi-step tasks
-- how zero-shot CoT differs from few-shot CoT
-- how to combine few-shot and CoT in one prompt
-- where these techniques stop helping
-
-The operating idea is simple: better prompts are often less about clever wording and more about showing the model a clear pattern to follow.
-
----
+A common misunderstanding needs clearing up front: adding more examples does not automatically improve results, and appending "step by step" does not inject knowledge the model never had. The real skill is knowing which tasks need which type of steering.
 
 ![Few-shot and chain-of-thought: steering better answers](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/04/04-01-few-shot-and-chain-of-thought-steering-b.en.png)
 *Few-shot and chain-of-thought: steering better answers*
-> Few-shot stabilizes the answer shape; chain-of-thought stabilizes the path.
 
 ## Questions to Keep in Mind
 
@@ -48,11 +37,28 @@ The operating idea is simple: better prompts are often less about clever wording
 - When should you choose zero-shot, few-shot, or CoT?
 - Why can weak examples make the answer worse?
 
+## Why this post matters
+
+Early LLM applications usually reach "roughly correct" answers quickly. The trouble starts after that. The format drifts slightly across runs; classification labels vary in wording; multi-step calculations skip an intermediate check; policy decisions miss a condition in the middle. From that point, the model's general ability matters less than how clearly the input demonstrates the expected pattern.
+
+Few-shot and CoT are the most practical tools for closing that gap. Few-shot shows the model what the answer should look like. CoT slows down the model's path to the answer by making intermediate states visible. One stabilizes format; the other stabilizes multi-step reasoning.
+
+These two techniques also help with debugging, not just answer quality. When an output is wrong, you can distinguish whether the examples were bad, the reasoning order was off, or the task simply requires knowledge the model does not have. Good steering produces not only better answers but also more explainable failures.
+
+## The best way to think about better steering: showing patterns and check-orders, not forcing correct answers
+
+The essence of few-shot is "given this kind of question, answer in this shape." The essence of CoT is "do not jump — verify each intermediate step." Neither changes the model's weights, but both make the criteria for a good answer more explicit within the current request.
+
+This distinction matters because many teams confuse writing longer prompts with writing better prompts. Good steering comes from pattern clarity, not length. Two short, consistent examples often outperform six verbose ones, and a single step-by-step instruction often beats a paragraph of explanation.
+
+> Few-shot shows the answer shape; chain-of-thought shows the path to the answer. Good prompt design starts by picking which axis the task actually needs.
+
 ## Few-shot prompting teaches by example inside the messages array
 
 ![Example pairs steering the final answer](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/04/04-01-few-shot-prompting-teaches-by-example-in.en.png)
 
 *Example pairs steering the final answer*
+
 Few-shot prompting is the practice of placing one or more worked examples before the real question. In chat APIs, those examples are not stored in a separate training field. They live in the same `messages` array as everything else, usually as paired `user` and `assistant` turns.
 
 The basic pattern looks like this:
@@ -64,8 +70,6 @@ The basic pattern looks like this:
 5. add the real `user` request at the end
 
 From the model's point of view, this behaves like short in-context pattern learning. The weights do not change, but the request now contains a miniature demonstration of what counts as a good answer for this task. That is especially useful for formatting, label normalization, style control, and other short transformation jobs.
-
-This minimal script shows the core idea.
 
 ```python
 import os
@@ -115,18 +119,15 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
-Three things matter here. First, few-shot is just message-array design. Second, the example has to show the desired answer shape, not merely a related question. Third, every example consumes tokens, so compact representative examples are usually better than long ones.
-
----
+Examples must demonstrate the desired output pattern, not just a related topic. Few-shot is not a tool for adding common sense — it is a tool for stabilizing format and interpretation rhythm.
 
 ## Zero-shot versus few-shot on the same request
 
 ![Zero-shot and few-shot stability comparison](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/04/04-02-zero-shot-versus-few-shot-on-the-same-re.en.png)
 
 *Zero-shot and few-shot stability comparison*
-Zero-shot means you ask for the task directly with no examples. You rely on the model's general training and instruction-following ability. That often works surprisingly well, especially for simple classification or summarization tasks. The weakness is consistency. The model may understand the task but still vary the label wording, the answer structure, or the level of explanation.
 
-The script below sends the same support ticket twice: once as zero-shot and once with few-shot examples.
+Zero-shot means you ask for the task directly with no examples. You rely on the model's general training and instruction-following ability. That often works surprisingly well, especially for simple classification or summarization tasks. The weakness is consistency. The model may understand the task but still vary the label wording, the answer structure, or the level of explanation.
 
 ```python
 import os
@@ -188,27 +189,26 @@ print("[few-shot]")
 print(few_shot.choices[0].message.content)
 ```
 
-In many runs, zero-shot will still produce a reasonable answer. Few-shot usually improves a different dimension: repeatability. It tends to stabilize the label vocabulary, the line order, the explanation length, and the way ambiguous cases are interpreted.
-
-That difference matters because applications care less about one impressive answer than about hundreds of answers arriving in a shape the rest of the system can rely on.
-
----
+The value of few-shot shows up in repeatability more than raw accuracy. It tends to stabilize the label vocabulary, the line order, the explanation length, and the way ambiguous cases are interpreted. Applications care less about one impressive answer than about hundreds of answers arriving in a shape the rest of the system can rely on.
 
 ## Example quality can help or hurt
 
 ![Weak and strong example comparison](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/04/04-03-example-quality-can-help-or-hurt.en.png)
 
 *Weak and strong example comparison*
-Few-shot prompting is only as good as the examples you provide. That sounds obvious, but it is one of the most common failure modes in early LLM applications. Developers add examples expecting an automatic boost, and the outputs become less consistent instead of more consistent.
+
+Few-shot prompting is only as good as the examples you provide. Developers add examples expecting an automatic boost, and the outputs become less consistent instead of more consistent.
 
 Bad examples usually fail in one of four ways:
 
-- the labels are inconsistent
+- the labels are inconsistent across examples
 - the answer format changes from one example to the next
 - the examples are verbose and hide the actual pattern
 - the examples are too easy and do not resemble the real task
 
-This script compares poor examples with stronger ones.
+Good examples share these traits: short, mutually consistent, close to the real inputs you expect, and rich in edge-case signal rather than surface variety. Example count matters less than pattern clarity.
+
+Rather than checking example quality by eye, a small verification script makes the judgment repeatable.
 
 ```python
 import os
@@ -216,42 +216,6 @@ import os
 from groq import Groq
 
 client = Groq(api_key=os.environ["GROQ_API_KEY"])
-
-target_question = "The password reset email never arrives, so I cannot sign in."
-
-bad_examples = [
-    {"role": "user", "content": "The invoice amount looks wrong."},
-    {
-        "role": "assistant",
-        "content": "This might be billing or account related. Ask the customer more questions first.",
-    },
-    {"role": "user", "content": "I cannot log in."},
-    {
-        "role": "assistant",
-        "content": "The priority could be urgent, but it depends on the full situation.",
-    },
-]
-
-good_examples = [
-    {"role": "user", "content": "I think my card was charged twice."},
-    {
-        "role": "assistant",
-        "content": (
-            "category: billing\n"
-            "priority: high\n"
-            "reason: A possible duplicate charge creates direct financial risk for the customer."
-        ),
-    },
-    {"role": "user", "content": "The profile photo uploader returns a 500 error every time."},
-    {
-        "role": "assistant",
-        "content": (
-            "category: technical\n"
-            "priority: medium\n"
-            "reason: The feature is broken, but the user is not fully locked out of the account."
-        ),
-    },
-]
 
 system_prompt = (
     "You classify SaaS support tickets. "
@@ -261,53 +225,74 @@ system_prompt = (
     "reason: <one sentence>"
 )
 
-bad_run = client.chat.completions.create(
-    model="llama-3.1-8b-instant",
-    messages=[
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": "Use the examples below to classify the final ticket."},
-        *bad_examples,
-        {"role": "user", "content": target_question},
-    ],
-    temperature=0.2,
-)
+evaluation_tickets = [
+    "The API returns 500 whenever I upload an image.",
+    "My receipt never arrived after the payment completed.",
+    "I cannot access the account even after resetting the password.",
+]
 
-good_run = client.chat.completions.create(
-    model="llama-3.1-8b-instant",
-    messages=[
-        {"role": "system", "content": system_prompt},
-        *good_examples,
-        {"role": "user", "content": target_question},
-    ],
-    temperature=0.2,
-)
+few_shot_prefix = [
+    {"role": "system", "content": system_prompt},
+    {"role": "user", "content": "My refund still does not appear on my card statement."},
+    {
+        "role": "assistant",
+        "content": (
+            "category: billing\n"
+            "priority: medium\n"
+            "reason: The problem is part of payment reconciliation after the original charge."
+        ),
+    },
+]
 
-print("[bad examples]")
-print(bad_run.choices[0].message.content)
-print()
-print("[good examples]")
-print(good_run.choices[0].message.content)
+for ticket in evaluation_tickets:
+    completion = client.chat.completions.create(
+        model="llama-3.1-8b-instant",
+        messages=[*few_shot_prefix, {"role": "user", "content": ticket}],
+        temperature=0.2,
+    )
+    print("---")
+    print(ticket)
+    print(completion.choices[0].message.content)
 ```
 
-The stronger examples do more than show correct answers. They demonstrate a stable schema, a clear priority policy, and the expected sentence length. That is why example quality matters more than raw example count. Two clean examples often outperform six messy ones.
+Running this over a saved evaluation set lets you check whether label vocabulary and line order remain stable across inputs. In production, you keep this set pinned and re-run it after any example change as a regression check.
 
-In practice, good few-shot examples are usually:
+## Measuring few-shot quality with simple metrics
 
-- close to the real inputs you expect
-- consistent with each other
-- rich in edge-case signal rather than surface variety
-- short enough that the pattern stays obvious
+"Looks good" is not durable. To turn prompt tuning from intuition into engineering, measure format compliance and label consistency after every example change.
 
----
+```python
+from collections import Counter
+
+def parse_category(text: str) -> str:
+    for line in text.splitlines():
+        if line.startswith("category:"):
+            return line.split(":", 1)[1].strip()
+    return "unknown"
+
+def score_outputs(outputs: list[str]) -> dict[str, float]:
+    categories = [parse_category(output) for output in outputs]
+    valid_format = sum(
+        1
+        for output in outputs
+        if "category:" in output and "priority:" in output and "reason:" in output
+    )
+    counter = Counter(categories)
+    return {
+        "format_compliance": valid_format / len(outputs),
+        "unknown_ratio": counter["unknown"] / len(outputs),
+    }
+```
+
+Even this minimal metric catches regressions quickly. If you add a new example and `format_compliance` drops, the problem is example quality, not example count.
 
 ## Chain-of-thought helps the model decompose the task
 
 ![Stepwise reasoning path to final_answer](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/04/04-04-chain-of-thought-helps-the-model-decompo.en.png)
 
 *Stepwise reasoning path to final_answer*
-If few-shot is about answer patterns, chain-of-thought is about solution process. The familiar version is a phrase such as “Let's think step by step.” The reason this often works is not mystical. Multi-step tasks become easier when the model is nudged to compute or check intermediate states instead of leaping directly to the conclusion.
 
-That is useful for arithmetic, rule application, ordered constraints, and cases where the final answer depends on several earlier checks. The model is not gaining new facts. It is being guided to use its existing knowledge more methodically.
+If few-shot is about answer patterns, chain-of-thought is about solution process. Multi-step tasks become easier when the model is nudged to compute or check intermediate states instead of leaping directly to the conclusion. The model is not gaining new facts — it is being guided to use its existing knowledge more methodically.
 
 This is the simplest zero-shot CoT pattern.
 
@@ -344,17 +329,11 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
-This tends to reduce mistakes in ordering and intermediate arithmetic. It is especially handy when the task has words like “first,” “then,” “except,” or “only if,” because those are exactly the cases where skipping an intermediate check causes the answer to drift.
-
----
+This pattern is especially useful for tasks with words like "first," "then," "except," or "only if" — exactly the cases where skipping an intermediate check causes the answer to drift.
 
 ## Zero-shot CoT and few-shot CoT are different tools
 
-Zero-shot CoT tells the model to reason step by step but does not show an example of that reasoning. It is cheap in tokens and easy to try first. On many general reasoning tasks, that alone is enough.
-
-Few-shot CoT goes further. The examples do not only show the final answer format. They also show the reasoning rhythm the model should imitate.
-
-This small script demonstrates the pattern.
+Zero-shot CoT tells the model to reason step by step but does not show an example of that reasoning. It is cheap in tokens and easy to try first. Few-shot CoT goes further: the examples show not only the final answer format but also the reasoning rhythm the model should imitate.
 
 ```python
 import os
@@ -399,20 +378,11 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
-The difference is easy to summarize:
-
-- zero-shot CoT: ask for step-by-step reasoning
-- few-shot CoT: provide a step-by-step reasoning example first
-
 For most beginner projects, a good operating order is to start with zero-shot CoT and only pay for few-shot CoT when the reasoning structure keeps drifting.
-
----
 
 ## Combining few-shot and CoT fixes both the answer shape and the reasoning path
 
 In real applications, these two techniques are often strongest together. You may want the model to follow a stable output schema while also checking rules in a specific order. That combination shows up in policy decisions, operations triage, eligibility checks, and other business tasks where the route to the answer matters almost as much as the answer itself.
-
-The example below uses a refund policy. The few-shot part fixes the schema. The CoT part makes the model walk through the policy before deciding.
 
 ```python
 import os
@@ -480,46 +450,74 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
-This pattern is useful because it improves more than answer quality. It improves debuggability. If the output is wrong, you can inspect which policy check went wrong rather than treating the whole response as a black box.
+This pattern improves debuggability. If the output is wrong, you can inspect which policy check went wrong rather than treating the whole response as a black box.
 
----
+However, combined few-shot + CoT prompts consume significant tokens. Before shipping such a prompt, measure its cost.
+
+```python
+import tiktoken
+
+encoding = tiktoken.get_encoding("cl100k_base")
+
+messages = [
+    {"role": "system", "content": "You review refund requests carefully."},
+    {"role": "user", "content": "Example 1 input ..."},
+    {"role": "assistant", "content": "Example 1 reasoning ..."},
+    {"role": "user", "content": "Example 2 input ..."},
+    {"role": "assistant", "content": "Example 2 reasoning ..."},
+    {"role": "user", "content": "Real request ... Let's think step by step."},
+]
+
+serialized = "\n".join(f"{m['role']}: {m['content']}" for m in messages)
+estimated_tokens = len(encoding.encode(serialized))
+
+print(f"estimated_tokens={estimated_tokens}")
+if estimated_tokens > 2000:
+    print("Trim examples before shipping this prompt.")
+```
+
+## Controlling CoT exposure in production
+
+CoT is valuable for accuracy, but not all intermediate reasoning should reach the end user. In production, separate internal reasoning from external output.
+
+```python
+instruction = (
+    "Solve step by step internally. "
+    "Return only final output in this format:\n"
+    "decision: <approve|reject>\n"
+    "reason: <one sentence>"
+)
+```
+
+This pattern has two advantages. First, user-facing output stays concise. Second, the output contract that downstream systems parse remains stable regardless of how complex the internal reasoning becomes.
+
+## Reducing few-shot size under rate-limit pressure
+
+When traffic spikes, dynamically reducing example count keeps the system running. Quality drops slightly, but availability is preserved.
+
+| State | Example count | temperature | Purpose |
+|---|---:|---:|---|
+| Normal | 3 | 0.2 | Maximum format stability |
+| Caution | 2 | 0.2 | Begin token savings |
+| Warning (429 rising) | 1 | 0.1 | Survival mode |
+
+Few-shot and CoT are powerful but not free. Deciding in advance "when to use full steering and when to degrade" is part of operating these prompts in production.
+
+## Common misconceptions
+
+- Few-shot is not model retraining. It is in-context pattern demonstration within the current request.
+- More examples do not automatically improve output. Verbose examples can consume tokens while blurring the pattern.
+- CoT does not create new knowledge. It guides the model to use existing knowledge in a more ordered way.
+- CoT is not always beneficial. For strict JSON or CSV output, it can make the model overly verbose.
+- Combining few-shot and CoT is not always optimal. Context budget and latency cost rise together.
 
 ## Where these techniques stop helping
 
 ![When prompting should yield to other tools](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/04/04-05-where-these-techniques-stop-helping.en.png)
 
 *When prompting should yield to other tools*
-Few-shot and CoT are powerful, but they are not universal fixes.
 
-### When the model lacks the required knowledge
-
-Neither technique creates missing facts. If the task depends on current events, private company policy, or information outside the model's training, you need retrieval or tools, not just a more elaborate prompt.
-
-### When the context is already crowded
-
-Few-shot examples cost tokens. If you already have long conversation history or large retrieved passages, adding more examples may reduce headroom for the real task.
-
-### When the output must stay extremely strict
-
-Chain-of-thought often makes the model more verbose. That is not ideal when the target output is rigid JSON, SQL, CSV, or another tightly constrained format. In those cases, stronger format instructions often matter more than visible reasoning.
-
-### When the examples are not representative
-
-If your examples are easy but the real task is full of ambiguous edge cases, few-shot will not rescue the gap. It gives a local hint, not full task training.
-
-### When zero-shot is already enough
-
-Some tasks do not need extra steering. A short summary, a simple rewrite, or a clear classification request may already work well in zero-shot form. If so, few-shot and CoT can become unnecessary latency and token cost.
-
----
-
-## Closing thoughts
-
-Few-shot prompting teaches by example. Chain-of-thought prompting teaches by decomposition. The first is strong at stabilizing answer shape and style. The second is strong at reducing errors in multi-step reasoning. Used together, they can lock both the response schema and the path the model takes to get there.
-
-The practical lesson is still conservative. More examples do not automatically mean better results. “Let's think step by step” does not create knowledge the model never had. Most of the time, the best outcomes come from short clean examples, explicit output rules, low temperature for structured tasks, and careful token budgeting.
-
-The next post moves from static prompt design to dynamic conversation state. Few-shot examples are fixed context. Multi-turn chat memory is changing context, and that is where chatbot architecture starts to feel like application engineering instead of prompt tinkering.
+Neither technique creates missing facts. If the task depends on current events or private data, you need retrieval or tools, not a more elaborate prompt. If the context window is already crowded with conversation history or retrieved passages, adding more examples may reduce headroom for the real task. If the output must be rigid JSON or CSV, CoT verbosity can interfere with format compliance. If your examples are easy but the real task is full of ambiguous edge cases, few-shot will not rescue the gap.
 
 ## Operational checklist
 
@@ -528,6 +526,7 @@ The next post moves from static prompt design to dynamic conversation state. Few
 - [ ] You audited examples for ones that would steer the model wrong
 - [ ] Multi-step reasoning tasks include an explicit "think step by step" instruction
 - [ ] Combined few-shot + CoT calls fit inside the model's context window
+- [ ] Token budget is estimated before shipping combined prompts
 
 ## Answering the Opening Questions
 
@@ -538,7 +537,7 @@ The next post moves from static prompt design to dynamic conversation state. Few
   - Start with zero-shot, add few-shot when the answer shape drifts, and consider CoT when the task needs decomposition.
 
 - Why can weak examples make the answer worse?
-  - The model imitates example quality, so weak or unrepresentative examples can inject the wrong format and the wrong decision rule.
+  - The model imitates example quality, so weak or unrepresentative examples inject the wrong format and the wrong decision rule.
 
 <!-- toc:begin -->
 ## In this series
