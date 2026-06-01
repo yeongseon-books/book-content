@@ -186,6 +186,164 @@ When an answer looks wrong, source and scope metadata usually explain the failur
 - [ ] Field names stay consistent between document creation and retrieval.
 - [ ] You trimmed the schema to fields that are operationally useful.
 
+## VectorDB filter design and auditable schema
+
+Metadata filters are not simple search options — they are access-scope controls. In multi-tenant environments, a missing filter lets other organizations' documents leak into search candidates. Schema and query builder must be managed together.
+
+### Separating filterable fields from display-only fields
+
+Putting every metadata field into the filter index inflates indexing cost and query complexity. In production, split roles:
+
+- Filterable: `tenant`, `doc_type`, `category`, `quarter`, `language`, `version`
+- Display-only: `title`, `author`, `uploaded_by`, `summary`
+
+Filterable fields require value normalization. Display-only fields extend user experience. Without this separation, filter expressions grow unnecessarily complex and query performance becomes unpredictable.
+
+### Enforcing filter conditions at the application layer
+
+The example below is a filter compiler that always includes the tenant condition. Even if a client omits it, the server enforces it.
+
+```python
+from __future__ import annotations
+
+from typing import Any
+
+def compile_filter(
+    *, tenant: str, category: str | None, quarter: str | None
+) -> dict[str, Any]:
+    clauses: list[dict[str, str]] = [{'tenant': tenant.lower()}]
+    if category:
+        clauses.append({'category': category.lower()})
+    if quarter:
+        clauses.append({'quarter': quarter.upper().replace('-', '')})
+    return {'$and': clauses}
+
+def search_with_guard(
+    vectorstore: Any, query: str, tenant: str
+) -> list[Any]:
+    filter_query = compile_filter(
+        tenant=tenant, category='marketing', quarter='2024Q4'
+    )
+    return vectorstore.similarity_search(query, k=8, filter=filter_query)
+```
+
+The critical point: do not build filters only in the UI. The backend must enforce minimum security/scope conditions so that search boundaries hold even on exception paths.
+
+### Why metadata schema versioning matters
+
+Field structure changes over time. The moment you merge `department` into `category` or add `region`, old and new index entries can mix. A schema version field enables migration path separation.
+
+```json
+{
+  "source": "q4-report.pdf",
+  "tenant": "acme",
+  "category": "marketing",
+  "quarter": "2024Q4",
+  "language": "ko",
+  "version": "v3",
+  "schema_version": "metadata-v2"
+}
+```
+
+The search service can select compatible filters by `schema_version` or classify old-version documents as re-indexing targets. Without this mechanism, field name changes immediately become search outages.
+
+### Connecting audit logs to search logs
+
+Recording how metadata filters were actually used accelerates incident response.
+
+```python
+def emit_search_audit(
+    *, query: str, filter_query: dict[str, object],
+    user_id: str, request_id: str,
+) -> None:
+    print(
+        {
+            'event': 'vector_search',
+            'request_id': request_id,
+            'user_id': user_id,
+            'query': query,
+            'filter': filter_query,
+        }
+    )
+```
+
+This log is the minimum material for reproducing "why did this result appear." Filter design must consider auditability alongside search accuracy.
+
+## Metadata filters and permission boundaries
+
+Metadata filters protect not just relevance but permission boundaries. In B2B environments, omitting `tenant`, `workspace`, or `visibility` fields risks mixing other customers' documents into the candidate set.
+
+```python
+def build_access_filter(
+    *, tenant: str, workspace: str, visibility: str = 'internal'
+) -> dict[str, object]:
+    return {
+        '$and': [
+            {'tenant': tenant.lower()},
+            {'workspace': workspace.lower()},
+            {'visibility': visibility.lower()},
+        ]
+    }
+```
+
+This filter is not a "search option" — it is minimum access control. The application layer must always attach it, and audit logs must always record it.
+
+Also check filter-value cardinality early in operations. If `quarter` should have 5 distinct values but has grown to 27, normalization is broken. Metadata quality caught strictly at indexing time greatly improves subsequent search stability.
+
+## Extended deployment checklist
+
+- Input file count within normal range.
+- Failed document ratio below threshold (e.g. 3%).
+- At least 3 sample documents traceable by source, page, chunk_id.
+- Zero missing required metadata fields (`source`, `format`, `doc_type`).
+- Smoke-test queries return expected sources in top results.
+
+```python
+def quick_health_report(stats: dict[str, int | float]) -> None:
+    print(f"files_total={stats['files_total']}")
+    print(f"failed_total={stats['failed_total']}")
+    print(f"chunks_total={stats['chunks_total']}")
+    print(f"metadata_missing={stats['metadata_missing']}")
+    print(f"smoke_passed={stats['smoke_passed']}")
+```
+
+## Operational baseline metrics
+
+- Parsing quality: average character count, OCR ratio, reprocessing ratio
+- Chunking quality: average length, extreme-length ratio, policy version distribution
+- Metadata quality: required-field miss rate, normalization failure count
+- Retrieval verification: sample query recall@k, source hit rate
+
+Stable ingestion comes from continuously measuring input quality and stage contracts, not from model selection.
+
+## Combining filters and similarity scores in VectorDB queries
+
+After filters narrow the candidate set, adding a similarity-score threshold removes one more layer of noise. In practice, fixing `score_threshold` as a single constant is less stable than varying it by query type.
+
+```python
+from __future__ import annotations
+
+from typing import Any
+
+def search_with_threshold(
+    vectorstore: Any,
+    query: str,
+    filter_query: dict[str, Any],
+    score_threshold: float = 0.72,
+    k: int = 8,
+) -> list[Any]:
+    docs_and_scores = vectorstore.similarity_search_with_score(
+        query, k=k, filter=filter_query
+    )
+    return [
+        (doc, score)
+        for doc, score in docs_and_scores
+        if score >= score_threshold
+    ]
+```
+
+This prevents chunks that pass the filter but are semantically distant from contaminating final answers. Setting the threshold too high drops recall, so validate with a sample query set first.
+
 ## Answering the Opening Questions
 
 - **Why should metadata schema be designed during ingestion rather than after embedding?**
