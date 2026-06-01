@@ -218,6 +218,192 @@ def should_alert(metrics: AgentMetrics, baseline: AgentMetrics) -> str | None:
 2. **P95 latency spike**: more than 3x baseline
 3. **Per-run cost spike**: more than 5x baseline
 
+---
+
+## OpenTelemetry Attribute Standardization
+
+The most common reason observability breaks across teams is inconsistent attribute keys. One service uses `model`, another `llm_name`, a third `provider_model`. Shared dashboards and queries break immediately. Standardize a minimum attribute set.
+
+```yaml
+# tracing_conventions.yaml
+span_names:
+  root: agent.run
+  planning: llm.plan
+  synthesis: llm.synthesize
+  retrieval: rag.retrieve
+  tool: tool.invoke
+
+required_attributes:
+  - agent.version
+  - agent.task_id
+  - llm.model
+  - llm.prompt_tokens
+  - llm.completion_tokens
+  - cost.usd
+  - latency.ms
+  - user.request_id
+  - safety.approval_required
+```
+
+```python
+REQUIRED_ATTRS = {
+    "agent.version",
+    "agent.task_id",
+    "llm.model",
+    "llm.prompt_tokens",
+    "llm.completion_tokens",
+    "cost.usd",
+    "latency.ms",
+    "user.request_id",
+    "safety.approval_required",
+}
+
+def validate_span_attributes(span) -> None:
+    missing = sorted(REQUIRED_ATTRS - set(span.attributes.keys()))
+    if missing:
+        raise ValueError(
+            f"span missing required attrs ({span.name}): {missing}"
+        )
+```
+
+Add this validation to both CI and runtime sampling, so you can test observability quality itself.
+
+---
+
+## PII Minimization and Retention Policy
+
+The more detailed your traces, the higher the security risk. Storing raw prompts and tool inputs easily leaks personal information. An Observability Harness must pair increased recording with explicit retention policy.
+
+```python
+import re
+
+def redact_pii(text: str) -> str:
+    text = re.sub(r"[\w.+-]+@[\w-]+\.[\w.-]+", "[REDACTED_EMAIL]", text)
+    text = re.sub(r"\b\d{2,3}-\d{3,4}-\d{4}\b", "[REDACTED_PHONE]", text)
+    return text
+
+def sanitize_event_payload(event: dict) -> dict:
+    body = event.get("body")
+    if isinstance(body, str):
+        event["body"] = redact_pii(body)
+    return event
+```
+
+```yaml
+# retention_policy.yaml
+retention:
+  hot_trace_days: 14
+  warm_trace_days: 90
+  cold_archive_days: 365
+  delete_after_days: 365
+
+sampling:
+  default_rate: 0.2
+  error_rate: 1.0
+  high_risk_action_rate: 1.0
+```
+
+Without an explicit retention policy, cost and compliance problems surface simultaneously. Deleting too aggressively makes replay impossible. The practical default: sample normal traffic, retain 100% of failures and high-risk events.
+
+---
+
+## Auto-Generating Execution Replay Reports
+
+Storing traces and producing human-readable reports are separate problems. To accelerate incident response, auto-generate a summary from each trace.
+
+```python
+def build_incident_report(trace_id: str, store) -> dict:
+    spans = store.load_spans(trace_id)
+    root = next(s for s in spans if s.parent_id is None)
+    failed = [s for s in spans if s.status != "ok"]
+
+    return {
+        "trace_id": trace_id,
+        "agent_version": root.attributes.get("agent.version"),
+        "task_id": root.attributes.get("agent.task_id"),
+        "total_latency_ms": root.attributes.get("latency.ms"),
+        "total_cost_usd": root.attributes.get("cost.usd"),
+        "failed_spans": [
+            {
+                "name": s.name,
+                "status": s.status,
+                "error": s.attributes.get("error.message", ""),
+            }
+            for s in failed
+        ],
+    }
+```
+
+This report is the first thing on-call reads in the opening five minutes. Teams that debug well are not teams that read more logs—they are teams that structure their first screen so the next action is obvious.
+
+---
+
+## Trace ID Propagation in Distributed Execution
+
+When the agent runtime splits across queues, workers, and external tool services, traces break easily. Force trace_id propagation at the protocol level to maintain end-to-end replay.
+
+```python
+def inject_trace_headers(
+    headers: dict, trace_id: str, span_id: str
+) -> dict:
+    h = dict(headers)
+    h["x-trace-id"] = trace_id
+    h["x-parent-span-id"] = span_id
+    return h
+
+def extract_trace_headers(headers: dict) -> tuple[str | None, str | None]:
+    return headers.get("x-trace-id"), headers.get("x-parent-span-id")
+
+def enqueue_with_trace(
+    queue, message: dict, trace_id: str, span_id: str
+) -> None:
+    message = dict(message)
+    message["_trace"] = {"trace_id": trace_id, "parent_span_id": span_id}
+    queue.publish(message)
+```
+
+Without this rule, when tool-call latency spikes, you cannot link back to the root trace and root-cause analysis time grows significantly.
+
+---
+
+## Operational Dashboard Example Queries
+
+Collected data is useless if you cannot ask questions. These are the queries on-call engineers reach for most often.
+
+```text
+Q1. Which task_ids have the highest failure rate in the last 30 minutes?
+Q2. Were there approval bypass attempts on requests with approval_required=true?
+Q3. How much has cost.usd/run increased since the model version switch?
+Q4. Are policy_violations concentrated in a specific tool?
+Q5. What are the top 10 repeated_failure_signatures?
+```
+
+```python
+import collections
+
+def top_failed_tasks(spans, window_minutes: int = 30) -> list[tuple[str, int]]:
+    failures = collections.Counter()
+    for s in spans:
+        if s.name == "agent.run" and s.status != "ok":
+            task_id = s.attributes.get("agent.task_id", "unknown")
+            failures[task_id] += 1
+    return failures.most_common(10)
+
+def approval_bypass_attempts(spans) -> int:
+    return sum(
+        1 for s in spans
+        if s.attributes.get("safety.approval_bypass") is True
+    )
+```
+
+The point is not building a flashy dashboard—it is having queries ready that answer incident-response questions immediately.
+
+As operational cycles lengthen, metric definitions need versioning too. If the `cost.usd` formula changes due to model pricing updates, past and present comparisons become invalid. Recording a metric-definition version alongside the data lets you separate "the metric got worse" from "the formula changed."
+
+Track the top-20 most expensive traces weekly. Most cost comes not from the model itself but from unnecessary reflect iterations or excessive retrieval document counts.
+
+---
+
 ## Five Common Mistakes
 
 1. **Logging only outputs, not inputs.** Replay becomes impossible and you cannot trace incident causes. Always record prompts and retrieved context.
