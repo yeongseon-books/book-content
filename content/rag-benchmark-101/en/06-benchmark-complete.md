@@ -260,6 +260,230 @@ The recurring idea is **not a single fused number, but repeatable measurement un
 
 Natural follow-ups from here include longer corpora (100k+), hybrid retrievers (BM25 + vector), rerankers, and multi-turn conversation evaluation.
 
+## Locking the integrated benchmark into a production pipeline
+
+At the series finale, the task shifts from "experiment code" to "production pipeline." The key is standardizing execution procedures and output formats so anyone can run the same benchmark the same way.
+
+### Recommended directory structure
+
+```text
+rag-benchmark/
+  configs/
+    ci.yaml
+    nightly.yaml
+  data/
+    corpus.jsonl
+    gold_queries.jsonl
+  reports/
+    baseline.json
+    latest.json
+    history/
+  src/
+    run_benchmark.py
+    compare_reports.py
+    render_markdown.py
+```
+
+A fixed structure lets CI, local runs, and nightly batches share the same paths, reducing operational overhead.
+
+### Required fields in the run configuration
+
+```yaml
+run:
+  seed: 42
+  sample_size: 200
+  top_k: 5
+retrieval:
+  embedding_model: sentence-transformers/all-MiniLM-L6-v2
+  index_type: ivf
+  nprobe: 8
+generation:
+  llm_model: llama-3.1-8b-instant
+  temperature: 0
+evaluation:
+  metrics: [faithfulness, answer_relevancy]
+  max_workers: 1
+  timeout_sec: 300
+```
+
+Recording `seed` and `sample_size` preserves comparability even in sampling-based evaluation.
+
+### Integrated report JSON schema example
+
+```json
+{
+  "run_id": "20260521T020500-1a2b3c4",
+  "git_sha": "1a2b3c4d",
+  "config_hash": "f2fcbf...",
+  "retrieval": {
+    "hit_rate@5": 0.93,
+    "mrr": 0.79,
+    "avg_latency_ms": 58.4,
+    "p95_latency_ms": 91.2
+  },
+  "generation": {
+    "faithfulness": 0.88,
+    "answer_relevancy": 0.86
+  },
+  "cost": {
+    "prompt_tokens": 421991,
+    "completion_tokens": 109823,
+    "estimated_usd": 7.42
+  },
+  "per_question": []
+}
+```
+
+Adding `config_hash` lets you automatically detect whether two runs used the same conditions.
+
+### Layer-separated regression gates
+
+Judging regression with a single aggregate number is risky. Separate gates for retrieval and generation are necessary.
+
+| Layer | Metric | Block threshold example |
+| --- | --- | --- |
+| Retrieval | hit_rate@5 | Drops > 0.03 below baseline |
+| Retrieval | p95_latency_ms | Exceeds baseline by > 25 ms |
+| Generation | faithfulness | Drops > 0.04 below baseline |
+| Generation | answer_relevancy | Drops > 0.03 below baseline |
+
+These rules watch quality degradation and latency increase simultaneously. Monitoring only one side misses the other.
+
+### CI workflow example
+
+```yaml
+name: rag-benchmark-gate
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - run: python src/run_benchmark.py --config configs/ci.yaml --out reports/latest.json
+      - run: python src/compare_reports.py --baseline reports/baseline.json --current reports/latest.json
+```
+
+This is the minimal structure. Production environments typically add caching, artifact uploads, and failure-sample log attachments.
+
+### Generating a human-readable summary report
+
+JSON alone makes collaboration difficult. Auto-generating a Markdown summary alongside raw data is highly effective.
+
+```python
+def render_summary_md(report: dict) -> str:
+    return f"""
+# RAG Benchmark Report
+
+- run_id: {report['run_id']}
+- retrieval.hit_rate@5: {report['retrieval']['hit_rate@5']:.3f}
+- retrieval.mrr: {report['retrieval']['mrr']:.3f}
+- generation.faithfulness: {report['generation']['faithfulness']:.3f}
+- generation.answer_relevancy: {report['generation']['answer_relevancy']:.3f}
+""".strip()
+```
+
+Post this summary as an auto-comment on PRs so reviewers grasp key changes without opening the raw JSON.
+
+### Operational runbook items for the benchmark pipeline
+
+The benchmark pipeline is itself a production system and needs incident-response procedures.
+
+1. External LLM API timeout: check retry count and backoff policy
+2. VectorDB connection failure: verify fallback index availability
+3. Baseline file corruption: restore from last healthy run
+4. Evaluation cost spike: switch to automatic sample-size reduction mode
+
+Keep the runbook in the same repository as the benchmark code for fast on-call recovery.
+
+### Accumulating reports on quarterly/monthly cadence
+
+Single-run results cannot reveal trends. Store at least two axes to enable long-term quality management.
+
+| Axis | Stored items |
+| --- | --- |
+| Branch/PR | Delta vs baseline, failed question list |
+| Monthly trend | 7-day moving average, variance, regression frequency |
+
+With accumulated trend data, "quality has been declining" becomes a statement backed by actual numbers rather than gut feeling.
+
+## Appendix — integrated benchmark operational checkpoints
+
+Finally, here are operational checkpoints for maintaining the integrated pipeline across an organization.
+
+### Per-stage output conventions
+
+| Stage | Output | Storage path example |
+| --- | --- | --- |
+| Retrieval run | Per-question ranked_ids, latency | `reports/run_id/retrieval.jsonl` |
+| Generation run | Per-question answer, prompt tokens | `reports/run_id/generation.jsonl` |
+| Evaluation run | faithfulness, answer relevancy | `reports/run_id/eval.jsonl` |
+| Integrated report | Aggregate + delta + failure list | `reports/run_id/summary.json` |
+
+Output conventions enable re-running only the failed stage during incidents.
+
+### Including a reproduce command in every report
+
+Without the following information, reproducing a failed run is difficult.
+
+```text
+reproduce_command:
+python src/run_benchmark.py --config configs/ci.yaml --run-id 20260521T020500-1a2b3c4
+```
+
+A single-line command stored alongside results enables fast on-call reproduction.
+
+### Cost guardrails
+
+Teams often gate on quality regression but miss cost spikes. Add cost guardrails alongside quality gates.
+
+| Item | Warn threshold | Block threshold |
+| --- | ---: | ---: |
+| Cost per run (USD) | +20% | +35% |
+| Avg tokens per question | +15% | +25% |
+| Projected monthly cost | 90% of budget | Over budget |
+
+If these thresholds are crossed, even a quality improvement should trigger release re-review.
+
+### Pre-deployment approval summary template
+
+```text
+Release Candidate Benchmark Review
+- Retrieval: hit@5 0.93 (+0.01), MRR 0.80 (+0.02), p95 92ms (+4ms)
+- Generation: faithfulness 0.89 (+0.01), answer_relevancy 0.87 (+0.00)
+- Cost: +8.4% within budget
+- Decision: PASS (no blocking regression)
+```
+
+A fixed approval template keeps release meetings numbers-driven.
+
+### Common long-term maintenance issues
+
+1. Baseline becomes stale and no longer reflects current data distribution
+2. Evaluator model version changes make historical scores incomparable
+3. Corpus refresh cycle drifts out of sync with benchmark cycle
+4. Question sampling bias causes specific domain regressions to go undetected
+
+Preventing these requires separate documented policies for baseline refresh, evaluator versioning, and data synchronization.
+
+### Weekly operational checklist
+
+- Review 7-day moving averages for faithfulness, MRR, and P95 latency.
+- Classify common root causes across PRs blocked by regression gates.
+- Check whether the top-20 failure questions cluster in the same domain.
+- Verify evaluation cost is within budget norms.
+- Decide whether a baseline refresh is needed and record the decision.
+
+Performing this checklist regularly transforms the benchmark from a one-time event into a continuous quality management loop.
+
+Additionally, schedule a quarterly dataset representativeness review. As product features change, user question distributions shift. An outdated question set cannot catch recent regressions. This review is not about reducing benchmark maintenance cost — it is about reducing operational risk from false confidence.
+
 ## Answering the Opening Questions
 
 - **What turns a one-off benchmark script into a repeatable decision tool?**
