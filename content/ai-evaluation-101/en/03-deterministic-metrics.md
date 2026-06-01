@@ -250,6 +250,53 @@ This layered pattern matters more than the exact threshold. The goal is to spend
 | Very short reference | BLEU becomes unstable or near-zero | Exact Match + normalization or token F1 |
 | Structured output with optional wording | The model adds polite framing and gets penalized | Parse the structure, then score the fields |
 
+## A Two-Tier Gate: Deterministic + Semantic Metrics Together
+
+In practice, teams rarely block deployment on deterministic metrics alone. A common pattern sends ambiguous cases to an LLM-as-judge as a second tier — balancing cost and reliability.
+
+```python
+def two_stage_gate(task_type: str, pred: str, expected: str) -> dict:
+    em = exact_match_normalized(pred, expected)
+    f1 = token_f1(pred, expected)
+
+    if task_type in {"extractive_qa", "classification"}:
+        if em == 1:
+            return {"decision": "PASS", "reason": "exact_match"}
+        if f1 >= 0.8:
+            return {"decision": "PASS", "reason": "high_token_f1"}
+        return {"decision": "REVIEW", "reason": "low_deterministic_score"}
+
+    rouge_l = scorer.score(expected, pred)["rougeL"].fmeasure
+    if rouge_l >= 0.85:
+        return {"decision": "LIKELY_PASS", "reason": "high_rouge_l"}
+    if rouge_l <= 0.4:
+        return {"decision": "SEND_TO_JUDGE", "reason": "low_rouge_l"}
+    return {"decision": "HUMAN_SPOT_CHECK", "reason": "gray_zone"}
+```
+
+The numbers themselves matter less than the operational rule: fix which score combinations trigger which follow-up actions so the team does not re-interpret every run.
+
+## Visualization Pattern: Distribution and Tails Instead of a Single Average
+
+When putting deterministic metrics on a dashboard, showing only the mean is dangerous. The bottom 10% tail can silently collapse while the average holds steady.
+
+```python
+import pandas as pd
+
+
+def metric_distribution_report(rows: list[dict]) -> pd.DataFrame:
+    df = pd.DataFrame(rows)
+    return pd.DataFrame({
+        "metric": ["exact_match", "token_f1", "rougeL"],
+        "mean": [df.exact_match.mean(), df.token_f1.mean(), df.rougeL.mean()],
+        "p10": [df.exact_match.quantile(0.1), df.token_f1.quantile(0.1), df.rougeL.quantile(0.1)],
+        "p50": [df.exact_match.quantile(0.5), df.token_f1.quantile(0.5), df.rougeL.quantile(0.5)],
+        "p90": [df.exact_match.quantile(0.9), df.token_f1.quantile(0.9), df.rougeL.quantile(0.9)],
+    })
+```
+
+Viewing the distribution catches the "average held but worst-case degraded" regression pattern much earlier. Always include at least one example case alongside numbers — without it, diagnosing the cause of a drop takes much longer.
+
 ## Five Common Mistakes
 
 1. **Using BLEU on free-form answers.** Answers with right meaning but different wording all score zero, leading you to the wrong "the model is bad" conclusion.
