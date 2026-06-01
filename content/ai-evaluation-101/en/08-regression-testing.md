@@ -273,6 +273,114 @@ When a PR fails the regression eval:
    - **Intentional change**: update the threshold to the new baseline and document in the PR description.
    - **Bug**: fix the code or prompt and re-run.
 
+## Automated Golden Dataset Candidate Pipeline
+
+Manually editing the golden set quickly becomes unbalanced. A weekly batch that extracts candidates and applies promotion rules is more operationally stable.
+
+```python
+# regression/build_golden_candidates.py
+import json
+from collections import defaultdict
+
+
+def build_candidates(traces: list[dict]) -> list[dict]:
+    by_category: dict[str, list] = defaultdict(list)
+    for t in traces:
+        by_category[t["category"]].append(t)
+
+    candidates = []
+    for cat, rows in by_category.items():
+        rows = sorted(rows, key=lambda r: r.get("impact_score", 0), reverse=True)
+        candidates.extend(rows[:10])  # top-risk per category
+    return candidates
+
+
+def save_jsonl(rows: list[dict], path: str):
+    with open(path, "w") as f:
+        for r in rows:
+            f.write(json.dumps(r, ensure_ascii=False) + "\n")
+```
+
+Weekly ops rule: extract production failure candidates → check category balance → promotion review → merge into next week's PR gate.
+
+## Per-Metric Breakdown Report in CI
+
+When a PR fails, printing only the average score delays root-cause analysis. Output a per-case breakdown as an artifact.
+
+```python
+# regression/report_breakdown.py
+import json
+
+
+def write_breakdown(report: dict, out_path: str):
+    rows = []
+    for case in report.get("cases", []):
+        rows.append({
+            "case_id": case["case_id"],
+            "exact_match": case.get("exact_match"),
+            "judge_score": case.get("judge_score"),
+            "faithfulness": case.get("faithfulness"),
+            "regressed": case.get("regressed", False),
+        })
+    with open(out_path, "w") as f:
+        json.dump({"rows": rows}, f, ensure_ascii=False, indent=2)
+```
+
+Attach this file as a PR artifact so reviewers immediately see which cases broke.
+
+## Regression Pattern Classification
+
+Classify regression causes to prevent recurrence.
+
+| Pattern | Signal | Response |
+|---|---|---|
+| Prompt regression | judge_score drops, deterministic holds | Check instruction conflicts |
+| Retrieval regression | faithfulness + context precision drop | Inspect index/reranker |
+| Model regression | all categories drop simultaneously | Consider model version rollback |
+| Cost regression | quality holds + token spike | Reduce steps, reset max_tokens |
+
+## Nightly vs PR Evaluation — Role Separation
+
+Running the same dataset size for PR and nightly evaluations breaks both speed and budget. Separate their roles.
+
+| Trigger | Dataset size | Purpose |
+|---|---:|---|
+| PR | 20–50 | Block obvious regressions |
+| Nightly | 300–1000 | Detect distribution shifts and subtle trends |
+
+```yaml
+# .github/workflows/eval-nightly.yml
+name: Nightly Full Eval
+on:
+  schedule:
+    - cron: "0 18 * * *"
+jobs:
+  full-eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install -r requirements.txt
+      - run: python -m evals.full.run --dataset evals/full-v8.jsonl --output nightly-report.json
+```
+
+This keeps PR velocity high while not missing long-term quality trends.
+
+## Baseline Update Procedure
+
+As regression tests mature, document the baseline update process. Ad-hoc updates erode the reference line.
+
+```python
+def can_update_baseline(stats: dict) -> bool:
+    return (
+        stats["improved_for_weeks"] >= 2
+        and stats["guardrail_regression"] == 0
+        and stats["incident_increase"] is False
+        and stats["reviewer_approvals"] >= 2
+    )
+```
+
+Rules: two consecutive weeks of improvement, no guardrail metric degradation, no incident increase, and two reviewer approvals before updating the baseline file. Always attach both regressed and improved case examples in the baseline update PR.
+
 ---
 
 ## Common Mistakes
