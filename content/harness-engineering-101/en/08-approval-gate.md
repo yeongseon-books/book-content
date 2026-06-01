@@ -216,6 +216,211 @@ Expected approval log fragment
 - reason: "Would overdraw the account after refund"
 ```
 
+## Handling Timeout and Queue Congestion
+
+Approval systems break more often from timeouts than from explicit rejections. When no one responds, requests pile up in the queue, and the agent either waits indefinitely or resubmits the same request. A timeout policy is an operational stability rule, not a UX convenience.
+
+```python
+from datetime import datetime
+
+def resolve_timeout(
+    action_id: str, requested_at: datetime, now: datetime, timeout_sec: int = 600
+) -> dict:
+    elapsed = (now - requested_at).total_seconds()
+    if elapsed < timeout_sec:
+        return {"status": "waiting"}
+
+    return {
+        "status": "timed_out",
+        "decision": "reject",
+        "reason": "Approver did not respond within the allowed window.",
+        "next_action": "escalate_or_cancel",
+    }
+```
+
+Without this default behavior, the system drifts in two bad directions. First, risky requests linger in the queue and eventually get processed without context. Second, requesters hit retry, creating duplicate actions for the same operation.
+
+---
+
+## Approval Policy DSL and Role-Based Permissions
+
+As team size grows, maintaining approval rules in if-statements becomes unmanageable. Conditions multiply across amount thresholds, data sensitivity levels, environments (prod/staging), and actor roles. Extracting rules into a policy DSL makes change history and code review tractable.
+
+```yaml
+# approval_policy.yaml
+version: 1
+rules:
+  - name: high_amount_refund
+    when:
+      action_type: refund
+      amount_gte: 1000
+    requires:
+      approver_role: finance_manager
+      min_approvals: 1
+      max_wait_seconds: 900
+
+  - name: production_deploy
+    when:
+      action_type: deploy
+      environment: production
+    requires:
+      approver_role: sre_oncall
+      min_approvals: 2
+      max_wait_seconds: 600
+
+  - name: customer_broadcast
+    when:
+      action_type: send_email
+      recipients_gte: 500
+    requires:
+      approver_role: crm_owner
+      min_approvals: 1
+      max_wait_seconds: 1200
+```
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class ApprovalRequirement:
+    approver_role: str
+    min_approvals: int
+    max_wait_seconds: int
+
+def evaluate_requirement(
+    action: dict, rules: list[dict]
+) -> ApprovalRequirement | None:
+    for rule in rules:
+        cond = rule["when"]
+        if cond.get("action_type") and cond["action_type"] != action.get("action_type"):
+            continue
+        if "amount_gte" in cond and action.get("amount", 0) < cond["amount_gte"]:
+            continue
+        if "environment" in cond and action.get("environment") != cond["environment"]:
+            continue
+        if "recipients_gte" in cond and action.get("recipients", 0) < cond["recipients_gte"]:
+            continue
+        req = rule["requires"]
+        return ApprovalRequirement(
+            req["approver_role"], req["min_approvals"], req["max_wait_seconds"]
+        )
+    return None
+```
+
+The policy DSL advantage is clear: during operations, "why does this action require two approvers?" is answered by reading the policy file, not by tracing code.
+
+---
+
+## Approval Event Model and Audit Trail
+
+Storing only the final approval decision is not enough. You need the full state-transition timeline from request creation to final execution for audit and incident reconstruction.
+
+```python
+from dataclasses import dataclass
+from datetime import datetime, timezone
+
+@dataclass
+class ApprovalEvent:
+    action_id: str
+    event_type: str
+    actor: str
+    at: str
+    payload: dict
+
+def now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+def build_request_event(
+    action_id: str, requester: str, preview: dict
+) -> ApprovalEvent:
+    return ApprovalEvent(
+        action_id=action_id,
+        event_type="approval_requested",
+        actor=requester,
+        at=now_iso(),
+        payload={"preview": preview},
+    )
+
+def build_decision_event(
+    action_id: str, approver: str, decision: str, reason: str
+) -> ApprovalEvent:
+    return ApprovalEvent(
+        action_id=action_id,
+        event_type="approval_decided",
+        actor=approver,
+        at=now_iso(),
+        payload={"decision": decision, "reason": reason},
+    )
+
+def build_execution_event(
+    action_id: str, executor: str, result: dict
+) -> ApprovalEvent:
+    return ApprovalEvent(
+        action_id=action_id,
+        event_type="action_executed",
+        actor=executor,
+        at=now_iso(),
+        payload={"result": result},
+    )
+```
+
+An example timeline in JSON:
+
+```json
+{
+  "action_id": "act-20260514-001",
+  "timeline": [
+    {"event_type": "approval_requested", "actor": "agent-refund", "at": "2026-05-14T10:01:04Z"},
+    {"event_type": "approval_decided", "actor": "finance_manager_a", "at": "2026-05-14T10:02:11Z", "decision": "approve"},
+    {"event_type": "action_executed", "actor": "refund-service", "at": "2026-05-14T10:02:12Z"}
+  ]
+}
+```
+
+With this timeline, you can reconstruct "the approval existed, but who executed and when?" down to the minute during an incident. Approval Gate reliability is determined by this event system, not by the approval UI.
+
+---
+
+## Multi-Approval and Delegation
+
+In real organizations, approvers are not always online. A single-approver assumption creates an immediate bottleneck during nights and vacations. Design multi-approval and delegation rules together.
+
+```python
+@dataclass
+class ApprovalAssignment:
+    primary: str
+    delegates: list[str]
+    required_count: int
+
+def resolve_approvers(
+    primary: str, roster: dict[str, list[str]], required_count: int
+) -> ApprovalAssignment:
+    delegates = roster.get(primary, [])
+    return ApprovalAssignment(
+        primary=primary, delegates=delegates, required_count=required_count
+    )
+
+def is_quorum_reached(decisions: list, required_count: int) -> bool:
+    approved = [d for d in decisions if d.decision == "approve"]
+    return len(approved) >= required_count
+```
+
+```yaml
+# approval_delegation.yaml
+delegation:
+  finance_manager_a: [finance_manager_b, finance_manager_c]
+  sre_oncall_a: [sre_oncall_b]
+quorum:
+  deploy_production: 2
+  refund_over_1000: 1
+```
+
+With delegation in place, you can separate most timeouts into availability problems rather than policy violations. Teams operating Approval Gates must manage approval-time SLAs alongside approval accuracy.
+
+Approval UX is also an operational factor. When approvers can see a summary card with risk badges on mobile, response times drop noticeably. Conversely, a structure that requires multiple link hops to reach the approval screen creates approval delays that cascade into full pipeline delays.
+
+---
+
 ## Five Common Mistakes
 
 1. **Requiring approval for everything.** You lose the value of automation, and humans stop reading the requests carefully. Set explicit risk thresholds.
