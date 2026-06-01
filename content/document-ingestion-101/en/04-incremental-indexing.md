@@ -183,6 +183,173 @@ Past a certain scale, knowing which run produced which index version becomes as 
 - [ ] A later file edit resolves to updated.
 - [ ] You identified where deletion handling would plug in.
 
+## Incremental indexing orchestration and atomic state updates
+
+The core risk in incremental indexing is a half-success: the index changed but the state file did not. To reduce this, treat state updates as batch-level transactions and specify recovery paths for failures.
+
+### Freezing the change set per batch
+
+If files change between scan and application, classification results become unstable. Freeze a manifest first, then process only that set.
+
+```python
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class FileDelta:
+    source: str
+    action: str  # added | updated | removed
+    hash: str
+
+def freeze_manifest(deltas: list[FileDelta]) -> list[FileDelta]:
+    return sorted(deltas, key=lambda row: (row.action, row.source))
+```
+
+A frozen manifest means re-runs process the same input set. In production, store the manifest itself as a run artifact.
+
+### Separating index application from state commit
+
+The pattern below commits state only after successful index application.
+
+```python
+from __future__ import annotations
+
+from typing import Any
+
+def apply_incremental_batch(
+    *, vector_index: Any, deltas: list[FileDelta], state_store: Any
+) -> None:
+    pending_state_updates: list[tuple[str, str]] = []
+
+    for delta in deltas:
+        if delta.action == 'removed':
+            vector_index.delete(where={'source': delta.source})
+            pending_state_updates.append((delta.source, 'deleted'))
+            continue
+
+        chunks = build_chunks_for_source(delta.source)
+        vector_index.upsert(chunks)
+        pending_state_updates.append((delta.source, delta.hash))
+
+    # Commit state only after all index operations succeed.
+    for source, value in pending_state_updates:
+        state_store.set(source, value)
+    state_store.save()
+```
+
+State commit is the last step. If anything fails mid-batch, state remains untouched so the next run retries safely.
+
+### Deletion handling and orphan vector cleanup
+
+Detecting a document deletion but not removing its vectors creates orphans — search results pointing to non-existent documents.
+
+```python
+def prune_orphan_vectors(vector_index, live_sources: set[str]) -> int:
+    removed = 0
+    for source in vector_index.distinct_metadata_values('source'):
+        if source not in live_sources:
+            vector_index.delete(where={'source': source})
+            removed += 1
+    return removed
+```
+
+Run this cleanup periodically at batch end. In repositories with frequent file moves, this correction step absorbs missed deletion events.
+
+### Re-run-friendly state file structure
+
+```json
+{
+  "run_id": "2026-05-21T02:00:00",
+  "schema_version": "incremental-v1",
+  "sources": {
+    "docs/policy.pdf": {
+      "hash": "7b5d...",
+      "indexed_at": "2026-05-21T02:01:12",
+      "chunk_count": 42
+    }
+  }
+}
+```
+
+Storing `run_id`, `schema_version`, and `chunk_count` alongside hashes makes regression analysis straightforward.
+
+## Recovery scenarios for incremental batches
+
+Incremental indexing failures are normal. What matters is having prepared recovery paths. Fix these three scenarios in the runbook:
+
+1. Scan succeeded, index application failed: block state commit, re-run with the same manifest
+2. Partial document failures: move failed documents to a retry queue, keep state for successes
+3. State store corruption: restore from last healthy `run_id` snapshot, run full verification
+
+```text
+run_id=2026-05-21T02:00:00
+manifest_total=183
+applied_total=176
+failed_total=7
+replay_queue=7
+state_commit=false
+```
+
+This summary log accelerates incident response. The key is making "what needs to be redone" visible from logs alone.
+
+Once incremental batches enter long-term operation, run a full re-verification batch weekly to check for state drift. Incremental-only processing over extended periods can accumulate missed events.
+
+## Extended deployment checklist
+
+- Input file count within normal range.
+- Failed document ratio below threshold (e.g. 3%).
+- At least 3 sample documents traceable by source, page, chunk_id.
+- Zero missing required metadata fields (`source`, `format`, `doc_type`).
+- Smoke-test queries return expected sources in top results.
+
+```python
+def quick_health_report(stats: dict[str, int | float]) -> None:
+    print(f"files_total={stats['files_total']}")
+    print(f"failed_total={stats['failed_total']}")
+    print(f"chunks_total={stats['chunks_total']}")
+    print(f"metadata_missing={stats['metadata_missing']}")
+    print(f"smoke_passed={stats['smoke_passed']}")
+```
+
+## Incident response: stage-by-stage narrowing
+
+When ingestion fails, resist the urge to suspect all stages simultaneously. Narrow the cause in this order:
+
+1. **Input boundary**: compare this batch's file list to the previous batch for abnormal growth/shrinkage.
+2. **Parsing boundary**: isolate empty-body, abnormal-length, or OCR-ratio-spike documents.
+3. **Chunking boundary**: check tiny/oversized chunk ratios, missing chunk_ids, missing sections.
+4. **Indexing boundary**: verify upsert/delete counts and state-store run_id consistency.
+5. **Search boundary**: run sample queries to confirm expected sources are retrieved.
+
+```text
+incident_id=ingestion-2026-05-21-01
+step=input files_total=412 delta=+187
+step=parse ocr_ratio=0.62 alert=true
+step=chunk tiny_ratio=0.41 alert=true
+step=index upsert=9342 delete=0 state_commit=true
+step=search smoke_passed=false
+```
+
+When `state_commit=true` but `smoke_passed=false`, the issue is likely index content quality — check quality-gate logs before reverting state.
+
+The goal of incident response is reproducible narrowing, not perfect analysis. Consistent log formats and consistent checking order reduce mean time to recovery.
+
+## Operational baseline metrics
+
+- Parsing quality: average character count, OCR ratio, reprocessing ratio
+- Chunking quality: average length, extreme-length ratio, policy version distribution
+- Metadata quality: required-field miss rate, normalization failure count
+- Retrieval verification: sample query recall@k, source hit rate
+
+Stable ingestion comes from continuously measuring input quality and stage contracts.
+
+## Incremental indexing and embedding cost reduction
+
+The direct operational benefit of incremental indexing is embedding API cost reduction. Full rebuilds on 1000 documents incur the same embedding cost daily; incremental processing calls the API only for changed documents, typically reducing daily cost to 5-15% of the full-rebuild baseline.
+
+However, the cost savings from incremental processing introduce state-drift risk. Run a weekly full-verification batch to confirm index consistency, and include that cost in your total TCO calculation. Do not treat incremental and full-rebuild as either/or — use incremental as the default path with periodic full verification as a complementary safeguard.
+
 ## Answering the Opening Questions
 
 - **What cost appears when every small document change rebuilds the full index?**
