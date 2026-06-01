@@ -214,6 +214,177 @@ def quality_filter_pipeline(docs: list[str], pf: PerplexityFilter, clf) -> list[
 
 Ordering matters. Heuristics run first because they are fastest. Perplexity and classifiers call models, so they run last. Dropping obvious garbage early reduces cost.
 
+## Fixing Filter Results as Dashboard Metrics
+
+The success criterion for a filtering pipeline is not "filtered a lot" but "can explain why each sample was dropped." Saving per-stage drop statistics as a batch report lets you track threshold regressions over time.
+
+```python
+import pandas as pd
+
+
+def build_drop_report(rows: list[dict]) -> pd.DataFrame:
+    # rows: {doc_id, stage, decision, reason}
+    df = pd.DataFrame(rows)
+    report = (
+        df.groupby(["stage", "reason", "decision"], dropna=False)
+          .size()
+          .reset_index(name="count")
+          .sort_values(["stage", "count"], ascending=[True, False])
+    )
+    return report
+
+
+def acceptance_by_source(rows: list[dict]) -> pd.DataFrame:
+    df = pd.DataFrame(rows)
+    agg = df.groupby(["source", "decision"]).size().unstack(fill_value=0)
+    agg["accept_ratio"] = agg.get("keep", 0) / agg.sum(axis=1)
+    return agg.reset_index()
+```
+
+## Quality Score Model Verification
+
+If you attach a classifier, you must at minimum check its calibration. If a score of 0.9 does not correspond to roughly 90% actual high-quality samples, you cannot operate the threshold stably.
+
+```python
+from sklearn.calibration import calibration_curve
+
+
+# y_true: 1=good, 0=bad
+# y_prob: classifier probability for good
+def calibration_summary(y_true, y_prob):
+    frac_pos, mean_pred = calibration_curve(y_true, y_prob, n_bins=10)
+    return [{"bin_pred": float(p), "bin_true": float(t)} for p, t in zip(mean_pred, frac_pos)]
+```
+
+## Re-labeling Borderline Samples with Label Studio
+
+Samples in the 0.45-0.55 score range are where the model is most confused. Sending only this band for human re-labeling often produces the biggest accuracy lift in the next version.
+
+```xml
+<View>
+  <Text name="doc" value="$text"/>
+  <Choices name="quality" toName="doc" choice="single">
+    <Choice value="good"/>
+    <Choice value="bad"/>
+    <Choice value="borderline"/>
+  </Choices>
+  <TextArea name="reason" toName="doc" placeholder="Judgment reason"/>
+</View>
+```
+
+## Before/After Filter Samples
+
+```text
+[drop: repetitive]
+click now click now click now click now ...
+
+[keep]
+Refund delay inquiries have an average processing time of 24 hours, extending to 48 hours on weekends.
+```
+
+Including samples like these alongside statistics lets you quickly settle debates like "the filter is too aggressive" with data instead of opinion.
+
+## DVC Pipeline Stage
+
+```yaml
+stages:
+  quality_filter:
+    cmd: python pipelines/quality_filter.py --input data/clean/train.parquet --output data/quality/train_filtered.parquet
+    deps:
+      - pipelines/quality_filter.py
+      - data/clean/train.parquet
+    outs:
+      - data/quality/train_filtered.parquet
+    metrics:
+      - reports/quality_filter_metrics.json
+      - reports/quality_filter_drop_report.csv
+```
+
+Quality filtering is not a one-time rule. Distributions shift batch by batch, so report-based re-tuning must be the default operational loop.
+
+## Quality Score Drift Detection
+
+When operating a quality classifier, a point will come where the score distribution itself shifts. Usually the model has not broken—the input distribution changed.
+
+```python
+import numpy as np
+
+
+def psi(expected: np.ndarray, actual: np.ndarray, bins: int = 10) -> float:
+    eps = 1e-6
+    cuts = np.quantile(expected, np.linspace(0, 1, bins + 1))
+    e_hist, _ = np.histogram(expected, bins=cuts)
+    a_hist, _ = np.histogram(actual, bins=cuts)
+    e = e_hist / max(e_hist.sum(), 1) + eps
+    a = a_hist / max(a_hist.sum(), 1) + eps
+    return float(np.sum((a - e) * np.log(a / e)))
+```
+
+When PSI exceeds the threshold, either re-tune the score cutoff or split filters by source. Without automating this check, filter performance degrades silently over time.
+
+## Source-Specific Policy Separation
+
+Forcing the same threshold on all sources can over-delete certain domains. News, forums, and product docs have inherently different length and symbol distributions.
+
+```python
+SOURCE_THRESHOLDS = {
+    "news": {"max_symbol_ratio": 0.22, "max_perplexity": 420},
+    "forum": {"max_symbol_ratio": 0.28, "max_perplexity": 520},
+    "docs": {"max_symbol_ratio": 0.18, "max_perplexity": 380},
+}
+```
+
+Separating criteria by source reduces unnecessary data loss while keeping overall quality consistent.
+
+## Inspection Questions for Immediate Ops Use
+
+These questions come up in every pre-release review. The point is not to recite them—it is to answer each one with a file path or metric value on the spot.
+
+1. Which version did this dataset come from, and what is its sha256?
+2. How much did duplicate/null/length distributions shift compared to the last batch?
+3. Which samples were removed, by which rule, and what are the top removal reasons?
+4. What is the measured leakage rate at the train/eval/test boundary?
+5. How many samples did a human review this batch, and what error types were found?
+
+```python
+def release_readiness(summary: dict) -> tuple[bool, list[str]]:
+    issues = []
+    if not summary.get("dataset_sha256"):
+        issues.append("missing_dataset_sha256")
+    if summary.get("duplicate_ratio", 1.0) > 0.10:
+        issues.append("duplicate_ratio_too_high")
+    if summary.get("null_ratio", 1.0) > 0.02:
+        issues.append("null_ratio_too_high")
+    if summary.get("contamination_ratio", 1.0) > 0.01:
+        issues.append("contamination_ratio_too_high")
+    if summary.get("human_reviewed_rows", 0) < 100:
+        issues.append("insufficient_human_review")
+    return len(issues) == 0, issues
+```
+
+Even if your ops team does not use this exact function, they need the same concept implemented as a pipeline gate. The key principle: never judge readiness by feel.
+
+## Production Log Example
+
+```text
+[release-check] dataset=v2.4.1 sha=4fb1...
+[release-check] duplicate_ratio=0.061 null_ratio=0.008
+[release-check] contamination_ratio=0.004 human_reviewed_rows=240
+[release-check] status=PASS
+```
+
+When model performance wobbles, this single log block lets you quickly rule out (or zero in on) the data preparation stage.
+
+### Classifier Retraining Cadence
+
+Classifier-based filters should be reviewed for retraining at least once per quarter. When source domains change, existing negative samples become stale and borderline decisions shift quickly.
+
+### Minimum Items for Release Notes
+
+Every filtering change must appear in release notes with at least: the changed rule, affected row count, key metric delta, and rollback path. Monitor not only accuracy metrics but also the stability of drop-reason distributions.
+
+When source intake changes, make threshold re-verification a standard ops procedure. Before applying filter rule changes to production, run at least one day's batch as a shadow run first.
+
 ## 5 common mistakes
 
 1. **Hard-coding thresholds upfront**: distributions shift batch by batch. Plot histograms and use percentile-based cutoffs (e.g., drop the bottom 5%).
