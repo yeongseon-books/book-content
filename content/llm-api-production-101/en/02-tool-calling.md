@@ -22,15 +22,15 @@ seo_description: Implement a secure tool-calling loop that connects LLMs to appl
 
 Once structured output is working, the next request usually arrives quickly: the model should not stop at answering the user, it should connect to application functions. A customer asks about an order, and you want the model to trigger `get_order_status()`. Someone asks about exchange rates, and you want the model to call an internal lookup. A scheduling request should lead to a calendar action instead of a paragraph about calendars.
 
+This is the second post in the LLM API Production 101 series.
+
 At that point, many first implementations still rely on string conventions. The model is asked to emit a function name and some arguments in text, and the application maps that result with custom parsing or a pile of `if` statements. It works for a toy example, but it creates a loose execution boundary. Typos in function names, missing parameters, extra keys, and unsafe dispatch logic start accumulating quickly.
 
-Tool calling is a cleaner contract. The application publishes an explicit toolbox: allowed function names, descriptions, and argument schemas. The model does not execute code. It chooses from that toolbox and proposes arguments. The application still owns permission, validation, side effects, and the final decision to run anything.
+Tool calling matters not because the model executes code — it does not. It matters because the application publishes allowed function names, descriptions, and argument schemas explicitly, and the model selects from within that boundary. Execution authority, validation, and side-effect control remain with the application.
 
-In this post, we will build the full loop with Groq's `tools` parameter and the `tool_calls` response field. The model will decide when a tool is needed, the application will parse and execute the requested call, and the tool result will be fed back into the conversation so the model can produce a final answer.
+In this post, we will build the full loop with Groq's `tools` parameter and the `tool_calls` response field: model selection, argument validation, function execution, and result reinjection.
 
-This is the second post in the LLM API Production 101 series. Here we focus on connecting model responses to application functions through a controlled tool-calling loop.
-
-The main idea is straightforward: **tool calling is not model autonomy, it is an execution boundary designed by the application**.
+Here we focus on connecting model responses to application functions through a controlled tool-calling loop.
 
 ![Tool calling: connecting functions to the model](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/02/02-01-tool-calling-connecting-functions-to-the.en.png)
 *Tool calling: connecting functions to the model*
@@ -42,27 +42,21 @@ The main idea is straightforward: **tool calling is not model autonomy, it is an
 - What should you validate in the `tools` definition and the returned `tool_calls`?
 - What guardrails close the function-execution loop safely in production?
 
-## Runtime setup
+## Why this post matters
 
-If you want to run the examples end to end, start with Python 3.10 or later and install the required packages first.
+Tool calling is the first execution boundary where an LLM application meets the outside world. If structured output was about "how do we safely receive data," tool calling is about "what do we let the system execute based on that data." Making this boundary loose may let the model appear smart, but the system quickly becomes dangerous.
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install groq pydantic
-export GROQ_API_KEY="your-issued-key"
-```
+In practice, problems grow the moment read-only tools and state-changing tools are treated at the same trust level. Looking up an order status and cancelling an order look like the same tool-call mechanism, but their trust assumptions are entirely different. That is why tool calling should be seen not as a feature extension but as an execution interface with permissions and validation attached.
 
-This post uses the official `groq` SDK and Pydantic for argument validation.
-
----
+Tool calling is also a traceability concern. When a user asks "why did I get the wrong answer?", you need a timeline showing which tool was called with what arguments and what result came back. Without that explainability, operational quality degrades quickly.
 
 ## Why string-based dispatch does not scale
 
 ![Comparison between string dispatch and tool contracts](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/02/02-01-why-string-based-dispatch-does-not-scale.en.png)
 
 *Comparison between string dispatch and tool contracts*
-Early implementations often start with something like this:
+
+String-based routing is the easiest first pattern to try. But the contract ends up hidden between code and prompts.
 
 ```python
 if "shipping" in user_question:
@@ -71,26 +65,15 @@ elif "refund" in user_question:
     result = get_refund_policy()
 ```
 
-Or the model is told to emit text such as `{"function": "get_order_status", "order_id": "ORD-1001"}` and the application parses it manually.
-
-The problem is not that this is impossible. The problem is that the contract is hidden. Function names live partly in prompts, partly in code. Argument requirements are implied rather than enforced. If the model invents a new key or misses a required field, the error shows up late.
-
-Tool calling helps because it makes three things explicit:
-
-- the finite set of callable functions
-- the JSON-schema-like shape of each function's arguments
-- the structured response path that carries requested tool calls
-
-That makes the system easier to reason about. The model proposes. The application decides.
-
----
+Or the model is told to emit text such as `{"function": "get_order_status", "order_id": "ORD-1001"}` and the application parses it manually. Neither approach is impossible, but because the function set, argument requirements, and response structure are not explicitly surfaced, the operational boundary stays weak.
 
 ## What goes into the `tools` parameter
 
 ![Structure of a tool definition](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/02/02-02-what-goes-into-the-tools-parameter.en.png)
 
 *Structure of a tool definition*
-With Groq chat completions, tools are typically defined as function descriptors. Each tool includes a name, a description, and an argument schema. Here is a small order-status example.
+
+A tool definition is a function descriptor containing a name, description, and argument schema. The name is part of the allowlist, the description is the model's selection criterion, and the parameters are the call contract.
 
 ```python
 tools = [
@@ -115,16 +98,15 @@ tools = [
 ]
 ```
 
-This definition matters because it communicates function intent to the model without giving up execution control. The description tells the model when the tool is appropriate. The parameter schema tells it which arguments exist and which ones are required. `additionalProperties=False` is also worth including when you want to reduce noisy or invented parameters.
-
----
+Constraints like `additionalProperties=False` look minor but matter. They reduce invented keys and prevent arguments the application cannot understand from reaching the execution path.
 
 ## Sending the first tool-enabled request
 
 ![First tool-enabled request flow](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/02/02-03-sending-the-first-tool-enabled-request.en.png)
 
 *First tool-enabled request flow*
-The request itself is still a normal chat completion call. The difference is that the model now receives the `tools` list and may return `tool_calls` instead of a final natural-language answer.
+
+Now we let the model actually choose a tool.
 
 ```python
 import os
@@ -172,13 +154,11 @@ message = completion.choices[0].message
 print(message.tool_calls)
 ```
 
-`tool_choice="auto"` lets the model decide whether a tool is needed. In practice, the interesting case is when the assistant message contains one or more `tool_calls`. That means your application has more work to do before a final user-facing answer exists.
-
----
+`tool_choice="auto"` lets the model decide whether a tool is needed. At this point the response is not a final user answer — it is an execution request. The application still has one more step to complete.
 
 ## Parsing `tool_calls` and routing them safely
 
-A tool call usually includes a function name and a JSON string containing arguments. Before execution, two checks matter: is the function name in the allowlist, and do the arguments parse into the expected shape?
+Before execution, two checks are needed: is the function name in the allowlist, and do the arguments match the expected shape?
 
 ```python
 import json
@@ -246,25 +226,15 @@ for tool_call in message.tool_calls or []:
     print(function_name, arguments, result)
 ```
 
-At this stage, the model has not fully answered the user yet. It has only requested a tool. The application has executed that request. The final conversational answer comes after the tool result is fed back to the model.
-
----
+This stage is not the final answer yet. The model requested a tool, the application executed that request. Now the result must be fed back into the conversation to complete the user response.
 
 ## Building the full function-execution loop
 
 ![Round-trip tool execution loop](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/02/02-04-building-the-full-function-execution-loo.en.png)
 
 *Round-trip tool execution loop*
-The normal production pattern looks like this:
 
-1. send the user message and tool definitions
-2. receive one or more `tool_calls`
-3. execute the requested tools in application code
-4. append tool results to the conversation
-5. send the updated message list back to the model
-6. read the final user-facing answer
-
-Here is a complete version of that loop.
+The full loop follows the structure: "model chooses, application executes, model explains."
 
 ```python
 import json
@@ -360,51 +330,173 @@ final = client.chat.completions.create(
 print(final.choices[0].message.content)
 ```
 
-This loop is the important mental model. The model chooses a tool. The application performs the side-effect-free lookup. The tool output becomes another message in the conversation. Then the model turns that structured result into a user-facing answer.
+The advantage of this structure is role separation. The model proposes which tool is needed, the application handles actual execution and validation, and the final response is again composed by the model in natural language.
 
----
+## Returning structured failures from tool calls
 
-## What to guard in production
+Making only the success path clean leaves production half-done. When a tool times out or hits a permission error, the application should return a standardized error payload that the model can interpret, rather than exposing raw exception strings.
+
+```python
+import json
+
+from pydantic import BaseModel, ValidationError
+
+class OrderStatusArgs(BaseModel):
+    order_id: str
+
+def run_tool(function_name: str, raw_arguments: str) -> dict:
+    try:
+        arguments = json.loads(raw_arguments)
+        validated = OrderStatusArgs.model_validate(arguments)
+    except json.JSONDecodeError as exc:
+        return {
+            "ok": False,
+            "error_type": "invalid_json",
+            "message": str(exc),
+        }
+    except ValidationError as exc:
+        return {
+            "ok": False,
+            "error_type": "invalid_arguments",
+            "message": exc.errors()[0]["msg"],
+        }
+
+    if function_name != "get_order_status":
+        return {
+            "ok": False,
+            "error_type": "unknown_tool",
+            "message": f"unsupported tool: {function_name}",
+        }
+
+    return {
+        "ok": True,
+        "data": {
+            "order_id": validated.order_id,
+            "status": "in_transit",
+            "eta_days": 2,
+        },
+    }
+
+print(run_tool("get_order_status", '{"order_id": 1001}'))
+print(run_tool("cancel_order", '{"order_id": "ORD-1001"}'))
+```
+
+This pattern is practical because failures come back as contracted data rather than natural-language exceptions. The model sees `ok: false` and `error_type` and can produce explanations like "the order ID format was invalid." The application uses the same fields for metrics and alerting. For state-changing tools especially, this standardization naturally extends to audit logs and re-execution prevention policies.
+
+## Fixing the tool router as an explicit table
 
 ![Operational guardrails before tool execution](https://yeongseon-books.github.io/book-public-assets/assets/llm-api-production-101/02/02-05-what-to-guard-in-production.en.png)
 
 *Operational guardrails before tool execution*
-Tool calling makes a system more useful, but it also introduces new failure paths. A few controls are worth adding early.
 
-First, **never dispatch against arbitrary function names**. Do not let model output resolve against `globals()` or anything equivalent. Use an explicit allowlist.
+When you have two or three functions, a simple dictionary suffices. But in production, permissions, timeouts, and audit fields differ per function, so a routing table with metadata is safer.
 
-Second, **validate arguments before execution**. In the unsafe toy pattern, it is easy to go straight from `json.loads()` to `**arguments`, but real systems should usually validate arguments with Pydantic or another schema layer before invoking the function.
+```python
+import time
+from dataclasses import dataclass
+from typing import Callable
 
-Third, **separate read-only tools from state-changing tools**. Looking up an order and cancelling an order should not live behind the same trust assumptions. Side-effecting tools deserve stricter confirmation and often a human or policy gate.
+@dataclass
+class ToolSpec:
+    func: Callable
+    timeout_seconds: float
+    side_effect: bool
 
-Fourth, **log every tool request and result in a traceable form**. When a user says, "the assistant gave me the wrong status," you will want the tool name, arguments, raw tool result, and final answer in one timeline.
+def get_order_status(order_id: str) -> dict:
+    return {"order_id": order_id, "status": "in_transit"}
 
----
+def cancel_order(order_id: str, reason: str) -> dict:
+    return {"order_id": order_id, "cancelled": True, "reason": reason}
 
-## Closing
+TOOL_REGISTRY: dict[str, ToolSpec] = {
+    "get_order_status": ToolSpec(func=get_order_status, timeout_seconds=2.0, side_effect=False),
+    "cancel_order": ToolSpec(func=cancel_order, timeout_seconds=5.0, side_effect=True),
+}
 
-In this post, we used the `tools` parameter to expose a controlled function interface, parsed `tool_calls` from the model response, and completed the full execution loop that runs a Python function and feeds the result back into the conversation. The important design point is that the model chooses from a toolbox, but the application still owns validation, permissions, and execution.
+def run_registered_tool(name: str, **kwargs) -> dict:
+    spec = TOOL_REGISTRY.get(name)
+    if spec is None:
+        raise ValueError(f"unknown tool: {name}")
 
-Structured output gave us a contract for data. Tool calling extends that contract to function requests. The next topic applies the same production mindset to streamed responses, where the result arrives in pieces and error handling must account for partial output instead of one final string.
+    started = time.monotonic()
+    result = spec.func(**kwargs)
+    elapsed = time.monotonic() - started
+
+    return {
+        "ok": True,
+        "tool": name,
+        "side_effect": spec.side_effect,
+        "elapsed_ms": int(elapsed * 1000),
+        "data": result,
+    }
+```
+
+The benefits are clear. The callable tool set is defined in one place, dangerous tools are easy to classify separately, and log fields are standardized. When you later need approval workflows, user permissions, or maximum execution times, you extend the same table.
+
+## Idempotency keys for state-changing tools
+
+The most dangerous segment of tool calling is retries. A request that failed due to a network error may have already succeeded on the server side. Read-only tools can be safely re-called, but state-changing tools like cancel/create/charge can cause duplicate side effects without an idempotency key.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class ToolExecutionContext:
+    request_id: str
+    idempotency_key: str
+
+executed: dict[str, dict] = {}
+
+def cancel_order_with_idempotency(order_id: str, reason: str, ctx: ToolExecutionContext) -> dict:
+    if ctx.idempotency_key in executed:
+        return executed[ctx.idempotency_key]
+
+    result = {
+        "order_id": order_id,
+        "cancelled": True,
+        "reason": reason,
+        "request_id": ctx.request_id,
+    }
+    executed[ctx.idempotency_key] = result
+    return result
+```
+
+In production, this key should be stored in Redis or a database rather than in-memory. The core principle is that "a retry must produce the same effect exactly once," guaranteed at both code and storage levels. Once you have completed the tool-calling loop, idempotency is always the next step.
+
+## Common misconceptions
+
+- The model returning `tool_calls` does not mean it executed code itself.
+- Vague tool descriptions are usually a contract design issue, not a model quality issue.
+- Going straight from `json.loads()` to `**arguments` skips the validation layer entirely.
+- Read-only tools and state-changing tools should not share the same verification procedure.
+- The final user-facing answer is often produced after the second model call, not the first.
 
 ## Operational checklist
 
-- [ ] Wrote each tool's `description` so the trigger condition is explicit
-- [ ] Specified type, enum, and required flags on every parameter
+- [ ] Wrote each tool's name and description so the trigger condition is explicit
+- [ ] Specified type, required, and `additionalProperties: false` on parameter schemas
+- [ ] Validated function name against allowlist and arguments against schema before execution
 - [ ] Implemented the loop that posts tool output back as a `role: tool` message
-- [ ] Standardized error payloads so the model can explain failures to the user
-- [ ] Added a guard (max call count) against repeated or infinite tool calls
+- [ ] Added max call count and error standardization to prevent infinite loops and unclear failures
+
+## Closing
+
+In this post, we treated tool calling not as model autonomy but as an application-designed execution boundary. The `tools` parameter publishes allowed function sets and argument contracts, and `tool_calls` returns the model's structured execution requests. The application validates and executes those requests, then feeds results back to the model for a final response.
+
+The model has no execution authority. It proposes tools; the application owns execution responsibility. That separation of responsibility is what lets you attach lookups, searches, data access, and external API integrations while maintaining operational quality.
+
+The next post applies the same contract-first perspective to streaming. If tool calling dealt with function execution boundaries, streaming deals with how to reliably consume partial responses that arrive over time.
 
 ## Answering the Opening Questions
 
 - **Is tool calling model autonomy, or an execution boundary designed by the application?**
-  Tool calling is an application-defined execution boundary: the model can request only the tools and parameters the app exposes.
+  Tool calling is not model autonomy. It is a contract where the model can request only the tools and parameters the application explicitly exposes.
 
 - **What should you validate in the `tools` definition and the returned `tool_calls`?**
-  Validate tool names, descriptions, and parameter schemas on the input side, then validate the returned name and arguments before routing.
+  In `tools`, validate names, descriptions, and parameter schemas. In `tool_calls`, verify the selected name is in the allowlist and arguments match the expected shape.
 
 - **What guardrails close the function-execution loop safely in production?**
-  Use allowlists, input validation, timeouts, structured errors, and result reinjection so the loop ends safely.
+  Allowlists, input validation, timeouts, structured error responses, and result reinjection close the loop safely.
 
 <!-- toc:begin -->
 ## In this series
@@ -417,8 +509,6 @@ Structured output gave us a contract for data. Tool calling extends that contrac
 - LLM API Production 101 (6/6): Rate limit management — patterns for staying within limits (upcoming)
 
 <!-- toc:end -->
-
----
 
 ## References
 
