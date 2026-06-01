@@ -397,6 +397,78 @@ if __name__ == "__main__":
 
 ---
 
+## Adding a Tool Calling branch to the integrated chain
+
+In production, questions that need document retrieval and questions that need a calculation tool arrive on the same endpoint. Rather than forcing everything through one monolithic chain, add a routing branch so each path can fail and be debugged independently.
+
+```python
+from langchain_core.runnables import RunnableLambda
+
+def route_question(question: str) -> str:
+    keywords = ["add", "multiply", "calculate", "plus", "times"]
+    return "tool" if any(k in question.lower() for k in keywords) else "rag"
+
+router = RunnableLambda(route_question)
+
+def run_app(question: str) -> str:
+    branch = router.invoke(question)
+    if branch == "tool":
+        return run_with_tools(question)  # reuse tool loop from episode 4
+    return rag_chain.invoke(question)
+```
+
+With this split, a retrieval failure and a tool failure produce different stack traces. As the integrated app grows, this separation becomes the main reason you can still locate a bug in minutes rather than hours.
+
+## Integrated path comparison
+
+| Question type | Path | Advantage | Watch out |
+|---|---|---|---|
+| Knowledge query | `retriever -> prompt -> llm` | Evidence-grounded answer | Depends on index quality |
+| Calculation/conversion | `llm(tool-call) -> tool -> llm` | Precise computation | Needs a loop cap |
+| Mixed query | Router then combine both paths | Flexibility | Increased tracing complexity |
+
+The table reveals the core integration strategy: decide the execution path by question type first, rather than pushing every question through a single pipeline.
+
+## Observing the full pipeline with LangSmith
+
+An integrated app has many stages, and logs scatter quickly. Grouping one request into a single trace makes root-cause analysis significantly faster.
+
+```text
+trace_id=trc_06_full_013
+path=rag
+retriever.k=3
+retriever.latency_ms=64
+llm.latency_ms=921
+first_token_ms=355
+output_tokens=143
+status=success
+```
+
+For a tool path the run composition looks different:
+
+```text
+trace_id=trc_06_full_014
+path=tool
+tool_calls=[add_numbers, multiply_numbers]
+tool_total_ms=3
+llm_rounds=2
+status=success
+```
+
+The key insight is per-path metric separation. Slowness in the retrieval path and slowness in the tool path have different root causes, so dashboards should be split accordingly.
+
+## Pre-deployment minimum verification scenarios
+
+- **Knowledge query success**: Confirm evidence-grounded responses for 5 in-corpus questions
+- **Out-of-corpus question**: Verify the no-evidence response policy fires consistently
+- **Tool query success**: Confirm tool call logs for 5 arithmetic/conversion questions
+- **Streaming behavior**: Check first-token latency and completion event
+- **Restart stability**: Compare answer quality on the same questions after index reload
+
+Automating these scenarios means you catch quality regressions early whenever the model version or index version changes.
+
+---
+
 ## What to notice in this code
 
 - Separating the indexing pipeline from the query pipeline makes document preparation costs and request-time costs easier to reason about.
