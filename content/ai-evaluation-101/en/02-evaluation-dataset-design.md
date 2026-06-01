@@ -184,6 +184,158 @@ def load_eval_set(path: Path) -> list[EvalExample]:
 
 Pinning the version into the filename is a good habit: `evals/customer-support/v3.jsonl`. When you create a new version, do not delete the old one — bump the name.
 
+## Golden Dataset Promotion Rules
+
+Not every sample from production logs should be promoted to the regression golden set — that becomes unmaintainable. Define promotion rules based on "which cases must never regress."
+
+```python
+from dataclasses import dataclass
+
+
+@dataclass
+class EvalCandidate:
+    case_id: str
+    user_impact: str          # "low", "medium", "high"
+    reproducible: bool
+    category: str             # "faq", "billing", "policy", "safety"
+    observed_failures: int
+
+
+def should_promote_to_golden(c: EvalCandidate) -> bool:
+    if c.user_impact == "high" and c.reproducible:
+        return True
+    if c.observed_failures >= 3 and c.reproducible:
+        return True
+    if c.category == "safety" and c.reproducible:
+        return True
+    return False
+```
+
+Operational rules as plain text:
+
+- High impact + reproducible → immediate golden promotion
+- Same failure 3+ times → include in weekly regression set
+- Safety/policy violation → include regardless of impact
+
+With rules in code, dataset expansion becomes policy rather than intuition.
+
+## Labeling Quality Checklist
+
+As datasets grow, labeling inconsistency becomes the primary source of score fluctuation. Check these items periodically.
+
+| Check | Question | Failure signal |
+|---|---|---|
+| Label consistency | Do two evaluators score the same input similarly? | Excessive per-evaluator score variance |
+| Metadata completeness | Are category, source, and expected format all filled? | Many null rows at aggregation time |
+| PII safety | Does raw data still contain personal information? | Email/phone regex detections |
+| Temporal relevance | Are current user patterns represented? | Zero coverage of new categories |
+
+Without labeling quality management, you risk mistaking label drift for model improvement.
+
+## Golden Set Promotion Workflow
+
+```python
+def promote_pipeline(candidates: list[dict]) -> list[dict]:
+    promoted = []
+    for c in candidates:
+        if c.get("severity") == "critical" and c.get("reproducible"):
+            promoted.append(c)
+            continue
+        if c.get("user_reports", 0) >= 3 and c.get("reproducible"):
+            promoted.append(c)
+    return promoted
+
+
+def cap_by_category(rows: list[dict], max_per_category: int = 15) -> list[dict]:
+    out = []
+    counts: dict[str, int] = {}
+    for r in rows:
+        cat = r["category"]
+        counts.setdefault(cat, 0)
+        if counts[cat] >= max_per_category:
+            continue
+        out.append(r)
+        counts[cat] += 1
+    return out
+```
+
+Without the category cap, one category becomes over-represented and the overall score no longer reflects real-world distribution.
+
+## Eval Set Changelog Template
+
+```text
+Eval Set Changelog
+- version: v7 -> v8
+- added_cases: 14
+- removed_cases: 2
+- major_reason:
+  - production failure harvest (8)
+  - new product feature coverage (4)
+  - safety policy update (2)
+- expected impact:
+  - billing category difficulty up
+```
+
+This record is essential for interpreting whether a score drop is a model problem or a dataset difficulty increase.
+
+## Collection–Label–Review Role Separation
+
+Dataset quality improves more from role separation in the review process than from raw data collection. When one person collects, labels, and reviews, bias compounds.
+
+| Stage | Owner | Output |
+|---|---|---|
+| Collection | Ops / analytics | Candidate input list |
+| First-pass label | Domain expert | expected, category, severity |
+| Review | Different evaluator | Label approval/correction record |
+
+```python
+def dual_review_consensus(label_a: dict, label_b: dict) -> bool:
+    same_style = label_a.get("style") == label_b.get("style")
+    same_expected = label_a.get("expected") == label_b.get("expected")
+    return same_style and same_expected
+```
+
+Low consensus rate for a category signals that the labeling guideline needs anchor examples before more data is collected.
+
+## Dataset Aging Check
+
+As an eval set ages, it drifts from current user queries. Check similarity to recent traffic at least monthly.
+
+```python
+def aging_score(recent_ratio: float) -> str:
+    # recent_ratio: fraction of cases matching last-30-day input patterns
+    if recent_ratio >= 0.8:
+        return "fresh"
+    if recent_ratio >= 0.6:
+        return "watch"
+    return "stale"
+```
+
+Repeated "stale" results mean you need to increase the new-category collection rate. When a new feature ships, bucket its inputs separately and enforce minimum coverage.
+
+## Eval Set Documentation Minimums
+
+Storing dataset files without a companion README causes interpretation quality to plummet on team turnover. Maintain at least:
+
+```text
+Dataset README minimums
+- Data source (production logs / synthetic / manual)
+- Labeling rules and exceptions
+- Exclusion criteria (PII, duplicates, ambiguous queries)
+- Per-version change summary
+- Intended use (PR regression / nightly quality / model comparison)
+```
+
+```text
+Metadata example
+- created_at: 2026-05-01
+- last_reviewed_at: 2026-05-20
+- owner: eval-platform
+```
+
+This metadata anchors ownership and makes freshness checks trivial.
+
+
 ## Five Common Mistakes
 
 1. **The prompt author writes the eval set.** You collect only cases that flatter your prompt and end up with the wrong "it works" conclusion. Have a teammate or production source the cases.
