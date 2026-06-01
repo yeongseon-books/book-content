@@ -133,6 +133,8 @@ if __name__ == "__main__":
 - Returning `missing_keywords` makes failures actionable instead of mysterious.
 - Length thresholds should reflect the product, not an abstract best practice.
 
+The key insight this code demonstrates is that evaluation is not lumped into one pass/fail. It checks JSON parsing first, then length, then keyword presence. This separation means that when something fails, you know immediately whether it is a format problem, a length problem, or a content gap—not just "quality is low."
+
 ## What changes when you add JSON Schema
 
 If you want format validation to survive real team usage, do not stop at “the keys exist.” Add schema validation so the response contract becomes explicit.
@@ -213,6 +215,8 @@ print(json.dumps(run_batch(client), indent=2, ensure_ascii=False))
 
 That result is useful because the failure is replayable. The second case did not just “score badly.” It missed `await`, which points you directly toward prompt design, model choice, or task phrasing.
 
+The output is useful because failures become replayable questions. The second case is not just "scored badly"—it missed `await`, which points directly to whether the prompt needs adjustment, the model needs swapping, or the evaluation criteria need tuning.
+
 ## What comes after the rule layer
 
 In practice, the sequence usually looks like this:
@@ -233,6 +237,8 @@ The point is cost control as much as quality control. Cheap gates should protect
 - Even if you later add LLM-as-judge, rule-based checks remain a cheap first-pass guardrail.
 - If length thresholds are too rigid, they can reject useful answers for the wrong reason.
 
+A common misconception is that "without sophisticated semantic evaluation, evaluation is worthless." In practice the opposite is often true. If the format is wrong or a critical term is missing, the answer is already a failure. Catching these obvious failures cheaply improves operational quality significantly on its own.
+
 ## When failures rise, narrow them this way
 
 ```bash
@@ -248,6 +254,68 @@ python3 -m scripts.eval_report --compare prompt_v12 prompt_v13
 
 The core questions stay simple. Did failures rise because of format, because of length, or because one keyword family keeps disappearing?
 
+## Designing the evaluation framework in layers
+
+Effective evaluation in production separates a shallow layer that catches failures fast from a deep layer that interprets semantic quality. The outermost layer is format checking: JSON schema compliance, required keys, length bounds. The next layer is domain rules: banned words, required keywords, reference link presence. The innermost layer is semantic evaluation: LLM-as-judge, human sampling review, and regression benchmarks.
+
+The advantage of layered evaluation is cost control. Format checks and domain rules cost almost nothing computationally and produce explainable failures. Semantic evaluation is expensive and variable, so applying it only to responses that pass the outer layers is the safe pattern.
+
+### Evaluation pipeline example
+
+```python
+def evaluate_response(record: dict) -> dict:
+    checks = {
+        "schema_ok": bool(record.get("schema_ok")),
+        "length_ok": 80 <= len(record.get("answer", "")) <= 1200,
+        "keyword_ok": "evidence" in record.get("answer", ""),
+        "citation_ok": "http" in record.get("answer", ""),
+    }
+
+    fast_fail = [k for k, ok in checks.items() if not ok]
+    if fast_fail:
+        return {"status": "fail-fast", "failed_checks": fast_fail, "judge_score": None}
+
+    judge_score = record.get("judge_score", 0.0)
+    status = "pass" if judge_score >= 0.75 else "review"
+    return {"status": status, "failed_checks": [], "judge_score": judge_score}
+```
+
+This structure splits evaluation results into `fail-fast`, `review`, and `pass` states that map directly to operational actions. `fail-fast` items can be retried or blocked immediately; `review` items enter a sampling queue for human inspection.
+
+## Connecting evaluation reports to dashboard metrics
+
+Storing evaluation results only in files makes them hard for the operations team to act on. At minimum, the dashboard should expose `evaluation failure rate`, `failure type distribution`, `average score by prompt version`, and `retry rate by model`. The per-prompt-version average score is the most direct signal of whether a prompt change improved or degraded quality.
+
+A recommended operations routine: run batch evaluation daily, review a fixed 20 failure samples in a standard format, and confirm the regression test set passes before each deployment. Once this routine is established, "did this change actually improve things?" becomes a data answer rather than an opinion.
+
+## Operating regression test sets per prompt version
+
+Prompt version management and evaluation are inseparable. Even with the same model, changing the prompt template can dramatically alter output behavior. Regression test sets should therefore be version-controlled like code tests.
+
+In practice, maintain a fixed set of 100–300 inputs with explicit expected-format and required-information criteria for each. When a new prompt version arrives, evaluate it against the previous version on the same set and compare score differences and failure type changes. The critical point: do not look only at the average score. Decompose results to check whether failures concentrate in specific customer segments or specific languages—that level of granularity catches real operational problems before they reach users.
+
+As the evaluation framework matures, deployment approval criteria become explicit. For example: `fail-fast rate below 2%`, `judge average above 0.78`, `zero failures on top-priority scenarios`. These criteria lift release decisions from individual intuition to team-level agreements.
+
+## Wiring the evaluation framework as a deployment gate
+
+To make evaluation an operational tool rather than a reporting artifact, results must actually influence deployment decisions. Teams should codify the rule: "if evaluation is bad, deployment is blocked." Three gate levels are recommended:
+
+1. **Format gate**: if schema failure rate exceeds threshold, stop immediately.
+2. **Critical scenario gate**: if any failure occurs on high-priority user-journey test cases, stop.
+3. **Semantic quality gate**: check both judge score average and the lower quartile together.
+
+Looking only at averages creates a trap—the average may look fine while failures concentrate in one domain. Always decompose evaluation results by category and verify the bottom 10% segment.
+
+Even if the pre-deployment evaluation report passes, run real-time sample evaluation again during the canary period immediately after deployment. Offline datasets and live traffic distributions can differ.
+
+## Converting evaluation results into product improvement backlog
+
+Even a mature evaluation system stalls quality improvement if results never connect to the product backlog. Define mapping rules that automatically classify failure types into improvement items.
+
+For example: format failures map to prompt template improvements, keyword misses map to retrieval context strengthening, and semantic score drops map to model routing adjustments. With these mappings, operational metrics become development priorities directly.
+
+Additionally, categorizing evaluation failures into "fix immediately", "observe", and "needs experiment" helps team focus. Trying to fix all failures simultaneously diffuses effort. Reducing failures on critical scenarios with high user impact first is far more realistic.
+
 ## Checklist
 - [ ] Force JSON-only output
 - [ ] Define numeric length thresholds
@@ -256,7 +324,8 @@ The core questions stay simple. Did failures rise because of format, because of 
 - [ ] Store batch results with prompt and model versions
 
 ## Summary
-Evaluation becomes operationally useful when it fails fast on obvious mistakes before humans ever need to look.
+
+Evaluation becomes operationally useful when it fails fast on obvious mistakes before humans ever need to look. The layers—format, domain rules, semantic judgment—exist to control cost: cheap gates protect expensive ones.
 
 The next layer is not always a smarter judge. Often it is better reporting, better test cases, and better comparison discipline. In the next post, we will connect this quality layer to the security layer, where even well-formed output can still be operationally unsafe.
 
