@@ -14,29 +14,24 @@ tags:
 - OpenAI
 - Prompt Engineering
 - Python
-last_reviewed: '2026-05-01'
+last_reviewed: '2026-06-01'
 seo_description: Master the economics and limits of LLM applications by understanding tokens, context windows, and practical estimation using the tiktoken library.
 ---
 
 # LLM App Foundations 101 (2/6): Understanding tokens — cost, limits, and context windows
 
-> LLM App Foundations 101 (2/6)
+When people first connect an LLM API, they usually focus on answer quality. That makes sense at the demo stage. In real applications, though, the first hard constraints show up somewhere else: cost, latency, and length limits. A prompt gets a little longer, and the response slows down. A few more conversation turns are added, and token usage jumps. A large chunk of reference text is attached, and the model starts cutting answers short.
 
-The diagram below summarizes how raw text becomes tokens and then turns into model budget.
+This is the second post in the LLM App Foundations 101 series.
 
-When people first connect an LLM API, they usually focus on answer quality. That makes sense at the demo stage. In real applications, though, the first hard constraints show up somewhere else: cost, latency, and length limits. A prompt gets a little longer, and the response slows down. A few more messages are added, and token usage jumps. A large chunk of reference text is attached, and the model starts cutting answers short. The shared unit behind all of those behaviors is the token.
+These symptoms look like separate problems, but they share one underlying unit: the token. Models read and generate in token units, not in sentences or words. So an input that looks short in plain text can still be expensive, a block of code can consume more tokens than expected, and a Korean sentence can fragment differently from an English sentence.
 
-A token is the unit the model uses to read and generate text. Humans think in sentences, paragraphs, and words. Models do not. They process smaller pieces, and those pieces do not map cleanly to words. That is why developers new to LLM systems often misjudge size. A prompt that looks short in plain text can still be expensive. A block of code can consume more tokens than expected. A Korean sentence can fragment differently from an English sentence.
+From an operational standpoint, you need to internalize this difference early. Tokens are not just a theory term — they are the billing unit, the first explanation for latency, and the boundary of length limits. Once you have this sense, "why was this request heavy?" becomes a number you can read, not a guess you have to make.
 
-This is the second post in the LLM App Foundations 101 series. Here, we put token accounting in the center of the mental model.
-
-The central idea is simple: **LLM applications run on token budgets, not on raw strings**.
-
----
+Here we treat tokens not as a substring concept but as the operational unit that binds cost, speed, and limits together.
 
 ![Understanding tokens: cost, limits, and context windows](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/02/02-01-understanding-tokens-cost-limits-and-con.en.png)
 *Understanding tokens: cost, limits, and context windows*
-> Tokens are the budget line that connects cost, limits, and response shape.
 
 ## Questions to Keep in Mind
 
@@ -44,56 +39,55 @@ The central idea is simple: **LLM applications run on token budgets, not on raw 
 - What do `prompt_tokens`, `completion_tokens`, and `total_tokens` each tell you?
 - Where do the context window, `max_tokens`, and `finish_reason` collide?
 
-## What a token actually is
+## Why this post matters
+
+LLM applications send strings but actually run on token budgets. So whether you are explaining call cost, understanding response speed, or designing length limits, you always end up coming back to tokens. Without this reference point, it is hard to explain why the system suddenly got heavy when the prompt grew.
+
+Token problems also surface faster in production than in demos. A few one-off calls barely show the issue. But once conversation history accumulates, retrieved documents attach, and output-length control is loose, tokens push cost and latency up together. Understanding tokens early pays off more than optimizing them later.
+
+Most importantly, tokens turn problems into numbers. Instead of "the prompt seems too long," you can say `prompt_tokens=3050`. Instead of "the answer seems truncated," you can say `finish_reason=length`. That shift is what operational awareness looks like.
+
+## The best way to understand tokens: see them as the budget unit the model uses, not as text fragments
+
+Humans read sentences and words. Models do not. A model splits text into smaller pieces according to its tokenizer rules, and processes input and generates output based on the count of those pieces. So tokens are simultaneously a question of "how is text split?" and a question of "how much budget is consumed?"
+
+From this angle, cost, latency, and length limits connect into one picture. Longer input means more tokens to read. Longer output means more tokens to generate. The sum of both pushes against the context window. Tokens are not an implementation detail — they are the shared language that explains system behavior.
+
+> If you think of tokens as word substitutes, you will keep getting surprised. If you think of them as the budget unit the model uses, cost and limits become readable at once.
+
+## Core concepts
+
+A token is a text chunk from the model's perspective. That chunk does not map one-to-one to words. Common English combinations may merge into larger pieces, while rare expressions split into smaller ones. Korean, code, numbers, whitespace, and newlines all count toward the token total.
 
 ![Text split into model token pieces](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/02/02-01-what-a-token-actually-is.en.png)
 
 *Text split into model token pieces*
-A token is a chunk of text from the model's point of view. That chunk is not guaranteed to be a word. Sometimes a short common word becomes one token. Sometimes a longer word is split into several pieces. Korean text can split across stems, particles, and endings. Numbers, whitespace, newlines, punctuation, and code symbols all count too.
 
-These three inputs may feel similar to a human reader:
+For example, these three inputs may look similar to a human but can differ widely in token count:
 
 - `hello world`
 - `unbelievable`
 - `print(user_profile[0]["email"])`
 
-To a tokenizer, they can look very different. Common text fragments may be stored as larger reusable pieces. Rare combinations are broken into smaller ones. Code often inflates token count because brackets, quotes, dots, underscores, and indentation all matter.
-
-That leads to the basic idea behind BPE, short for Byte Pair Encoding. At a high level, BPE builds larger reusable units out of frequently appearing character sequences. The result is a vocabulary where common patterns are stored as bigger chunks and uncommon patterns are split more aggressively. So a word like `understanding` is not treated as a sacred unit. It is split according to the tokenizer's learned vocabulary.
-
-For application work, you do not need to master tokenizer theory. You do need one practical conclusion: **word count is a poor proxy for token count**. If you try to estimate LLM cost and limits by counting words, you will keep getting surprised.
-
----
-
-## Why tokens matter so much
+Behind that difference is the BPE (Byte Pair Encoding) principle. You do not need deep theory, but one practical conclusion is enough: **word count is a poor proxy for token count**.
 
 ![Similar inputs with uneven token cost](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/02/02-02-why-tokens-matter-so-much.en.png)
 
 *Similar inputs with uneven token cost*
-Tokens are not just an internal implementation detail. They drive the three things that shape application behavior most often: cost, speed, and limits.
 
-Start with cost. Most LLM APIs charge based on input tokens and output tokens. The exact pricing table varies by provider and model, but the structure stays familiar. A longer prompt costs more on the input side. A longer answer costs more on the output side. Adding a system prompt, a large conversation history, or multiple retrieved passages increases total token usage, even if the user only asked a short question.
+Tokens matter for three reasons. First, most LLM APIs charge based on input and output tokens. Second, the model reads and generates token-by-token, so longer input and output tend to increase latency. Third, every model has a maximum token count per request — the context window.
 
-Next comes latency. Generation happens token by token. More input tokens means more text for the model to read before it can answer. More output tokens means more text for the model to generate before the response is complete. Provider infrastructure and model speed matter too, but token count is still the most stable first explanation for why one request feels heavier than another.
+Reduced to operational rules:
 
-Then there are limits. Every model has a maximum number of tokens it can handle in a single request. That is the context window. It is safer to think of that window as a shared budget for input and output, not as an input-only number. If the prompt is already large, the model has less room left for the answer.
-
-In operational terms, three rules help:
-
-- cost questions are usually token questions
-- latency questions are often token questions first
-- length-limit failures are usually token budget failures
-
-Once you start looking at logs through that lens, many “mysterious” LLM behaviors become easier to explain.
-
----
-
-## Revisiting `usage.prompt_tokens`, `completion_tokens`, and `total_tokens`
+- Cost problems are usually token problems.
+- Slow responses should be suspected as token problems first.
+- Length-limit errors are almost always token budget management failures.
 
 ![Usage fields for input output and total](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/02/02-03-revisiting-usage-prompt-tokens-completio.en.png)
 
 *Usage fields for input output and total*
-Post 01 introduced the `usage` field. Now we need to read it like an operator, not like a curious beginner. Every code example in this post is written so you can copy and run it directly. The example below makes a real call with the Groq Python SDK and prints the usage numbers.
+
+In practice, you need to read `usage` as numbers:
 
 ```python
 import os
@@ -122,40 +116,17 @@ print(f"completion_tokens={usage.completion_tokens}")
 print(f"total_tokens={usage.total_tokens}")
 ```
 
-Each field tells you something different.
-
-### `prompt_tokens`
-
-This is the number of tokens in the request input. It includes the full `messages` array, not just the current user prompt. Once you add a system message, prior turns, or retrieved documents, this number can grow quickly.
-
-### `completion_tokens`
-
-This is the number of tokens the model generated in the answer. If the model responds at length, this number rises. Streaming and non-streaming responses eventually converge on the same idea here: how much output was produced.
-
-### `total_tokens`
-
-This is the sum of input and output. In logs, this is often the fastest number to watch because it tells you how heavy the request was overall.
-
-These numbers become more useful when you compare them. A large `prompt_tokens` value with a small `completion_tokens` value often points to prompt bloat. A small input with a very large output may point to weak answer-length control. Large values on both sides usually mean an expensive request with a lot of context and a long response.
-
-In production-style logging, it is worth storing `model`, `prompt_tokens`, `completion_tokens`, `total_tokens`, and `finish_reason` together. That gives you enough signal to explain cost increases and truncation problems later.
-
----
-
-## Estimating token count with `tiktoken`
+`prompt_tokens` is the total input length. `completion_tokens` is the generated output length. `total_tokens` is their sum. A large input with short output may signal prompt bloat. A short input with long output may signal loose length control.
 
 ![Token estimate path before API send](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/02/02-04-estimating-token-count-with-tiktoken.en.png)
 
 *Token estimate path before API send*
-Reading usage after the call is necessary, but it is not enough. You also want a preflight estimate before sending the request. That helps you decide whether to trim input, summarize older messages, or split one large job into multiple calls.
 
-Install `tiktoken` like this:
+In production, observing after the call is not enough. You need to measure approximate size before sending.
 
 ```bash
 pip install tiktoken
 ```
-
-The smallest useful example is to encode one string and inspect the result.
 
 ```python
 import tiktoken
@@ -169,11 +140,7 @@ print(tokens)
 print(f"token_count={len(tokens)}")
 ```
 
-There is one important caveat here. `cl100k_base` is a well-known encoding from the OpenAI ecosystem. It does not automatically mean that Groq's `llama-3.1-8b-instant` uses the exact same tokenizer internally. Because of that, treat this number as a **practical estimate**, not as the provider's billing source of truth. For billing and final accounting, the provider's `usage` field is authoritative.
-
-That does not make the estimate useless. In most applications, the first question is not “what is the exact invoice number for this one request?” The first question is “is this prompt short, large, or dangerously large?” An approximate count is often enough to trigger the right control flow.
-
-In real systems, you usually want to estimate the whole message bundle, not a single string. The exact formatting overhead differs by provider, but the pattern below is good enough for first-pass budgeting.
+For estimating a message bundle:
 
 ```python
 import tiktoken
@@ -195,39 +162,19 @@ print()
 print(f"estimated_prompt_tokens={estimated_prompt_tokens}")
 ```
 
-This is not a provider-exact calculation. It is a useful operational estimate. For a chatbot, you can run this just before the API call and start trimming or summarizing once the estimate crosses a threshold.
+One important caveat: `cl100k_base` is a practical estimation tool, not the billing ground truth for Groq. The authoritative accounting value is always the provider's `usage` field.
 
----
-
-## What a context window really means
-
-The context window is the maximum token range the model can work with in one request. It is often described like an input-size limit, but that wording causes confusion. In practice, it is better understood as a shared budget across what you send and what you expect back.
-
-For this series, the working model is `llama-3.1-8b-instant`, which supports a 128k context window. That sounds huge, and for small prompts it is generous. The problem is that LLM applications consume that budget faster than people expect.
-
-All of the following compete for the same budget:
-
-- the system prompt
-- the current user request
-- prior conversation turns
-- retrieved passages from search or RAG
-- the answer the model is about to generate
-
-That is why “128k context” should not be read as “the user can type 128k worth of input.” If conversation history already consumes 40k and retrieved documents consume 60k, the remaining room is smaller than it looks. Ask for a long answer on top of that, and truncation becomes more likely.
-
-The working equation is simple:
+The context window should be understood as a shared budget for input and output, not as an input-only limit. The working equation is one line:
 
 `input tokens + output tokens <= context window`
 
-In real systems, do not plan around the absolute theoretical edge. Leave headroom. Serialization overhead, prompt template changes, and user variability make token length move around from request to request. Designs that live right against the limit are fragile.
+So a long system prompt, long conversation history, retrieved documents, and a long answer all compete for the same window. Designs that push right up to the theoretical maximum are fragile. Always leave headroom.
 
----
+![Context overflow and length cutoff branches](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/02/02-05-detecting-long-prompt-problems-with-fini.en.png)
 
-## Controlling completion length with `max_tokens`
+*Context overflow and length cutoff branches*
 
-Managing input size is only half the job. You also need to control output size. The most direct parameter for that is `max_tokens`, which caps the number of tokens the model is allowed to generate.
-
-This block sends the same kind of question as before, but adds a low `max_tokens` value.
+Output length is controlled with `max_tokens`, and truncation is detected via `finish_reason`:
 
 ```python
 import os
@@ -253,24 +200,7 @@ print(f"completion_tokens={completion.usage.completion_tokens}")
 print(f"finish_reason={completion.choices[0].finish_reason}")
 ```
 
-`max_tokens` affects more than length alone.
-
-- a smaller value often produces shorter, faster, cheaper answers
-- a larger value allows more detail but raises cost and latency risk
-- a large value does not guarantee a long answer if the prompt already consumed too much context
-
-It is also important to remember what `max_tokens` is not. It is not a promise that the model will use exactly that many tokens. The model can stop earlier if it believes the answer is complete. That is why the real output length still needs to be observed through `completion_tokens` and `finish_reason`.
-
----
-
-## Detecting long-prompt problems with `finish_reason`
-
-![Context overflow and length cutoff branches](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/02/02-05-detecting-long-prompt-problems-with-fini.en.png)
-
-*Context overflow and length cutoff branches*
-Once prompts get longer, two failure modes show up often. The request itself may approach the context limit, or the answer may hit a generation cap and stop midstream. In both cases, you want explicit detection instead of guessing from the final text.
-
-The script below creates a long repeated input, estimates its token size with `tiktoken`, sends the request with a small `max_tokens`, and checks `finish_reason`.
+A monitoring pattern that handles long input with a small output cap together:
 
 ```python
 import os
@@ -317,70 +247,152 @@ if choice.finish_reason == "length":
     print("Warning: the response stopped because it hit a length limit.")
 ```
 
-Three things matter here.
+In practice, printing this much already gives you actionable signals. If `estimated_prompt_tokens` and actual `prompt_tokens` diverge heavily, your estimation method is too coarse. If `finish_reason=length` repeats, input trimming or `max_tokens` redesign comes first. Conversely, if input is short but `completion_tokens` keeps climbing, the output format request is probably too loose.
 
-First, the script estimates prompt size before the call. That estimate is useful for preflight control.
+A pre-call guard function makes long-input handling safer:
 
-Second, after the call, it reads the provider-reported `usage`. That is the final accounting source.
+```python
+def should_compress_prompt(
+    estimated_prompt_tokens: int,
+    reserved_output_tokens: int,
+    context_window: int,
+    safety_margin: int = 500,
+) -> bool:
+    usable_budget = context_window - reserved_output_tokens - safety_margin
+    return estimated_prompt_tokens > usable_budget
 
-Third, it checks `finish_reason == "length"`. When that happens, the answer may have stopped because of a generation cap rather than because the model finished naturally.
+context_window = 128_000
+reserved_output_tokens = 1_000
 
-Do not treat that signal as harmless. A length-truncated answer can end in the middle of a sentence, leave a list incomplete, or cut code off before the closing block. At minimum, log it. In some systems, you may also want to retry with a shorter prompt, a higher output cap, or a more compressed answer format.
+if should_compress_prompt(
+    estimated_prompt_tokens=3_050,
+    reserved_output_tokens=reserved_output_tokens,
+    context_window=context_window,
+):
+    print("Compress or trim the prompt before sending it.")
+else:
+    print("Prompt budget looks safe.")
+```
 
-Common responses include:
+This kind of pre-call guard is useful for preventing failures, but its more important role is fixing policy in code. It lets you codify decisions like how many search results to attach, how many conversation turns to keep, and how much output headroom to reserve.
 
-- shorten the prompt
-- reduce the number of retrieved passages
-- increase `max_tokens`
-- request a denser answer format
-- break one large request into multiple steps
+## Common misconceptions
 
-This becomes especially important in chatbots and RAG systems, where conversation history and retrieved context tend to grow together over time.
+- Treating tokens as roughly equivalent to words leads to constant errors whenever Korean, code, or symbols dominate the input.
+- It is easy to mistake `tiktoken` estimates for billing-accurate values, but the final authority is the provider's `usage` field.
+- The context window is not an input-only limit. Output shares the same window.
+- Setting `max_tokens` high feels like enough, but if input is already large, actual remaining output space may be much smaller.
+- Ignoring `finish_reason=length` as a mild warning is risky — it can mean mid-sentence truncation or lost code blocks.
 
----
+## Turning token budgets into operational policy
 
-## Practical habits for token-aware application design
+Once you understand tokens, the next step is fixing numbers into policy. The most practical starting point is a per-request-type budget table. Instead of "keep it short," explicitly stating input and output caps lets the team design prompts against the same standard.
 
-At this point, the important part is not tokenizer trivia. It is habit formation.
+| Request type | Input cap | Output cap | Safety margin | Notes |
+|---|---:|---:|---:|---|
+| General Q&A | 2,000 | 600 | 300 | Response speed priority |
+| Document summary | 5,000 | 900 | 500 | Long body allowed |
+| Policy decision | 3,500 | 500 | 400 | Format stability priority |
+| Code explanation | 4,500 | 1,000 | 500 | Code block headroom needed |
 
-First, when a request becomes expensive, look at `usage` before debating prompt wording. Numbers answer the first question faster than intuition does.
+Translating this table into code makes pre-call validation straightforward:
 
-Second, estimate token size before the call. `tiktoken.get_encoding("cl100k_base")` is not the provider's billing oracle for Groq, but it is still a good early-warning tool.
+```python
+from dataclasses import dataclass
 
-Third, treat the context window as a shared input-output budget. Large documents and long answers compete with each other.
+@dataclass
+class TokenBudget:
+    max_prompt: int
+    max_output: int
+    safety_margin: int
 
-Fourth, do not leave `max_tokens` arbitrarily high. Output length is also a cost control.
+BUDGETS = {
+    "qa": TokenBudget(max_prompt=2000, max_output=600, safety_margin=300),
+    "summary": TokenBudget(max_prompt=5000, max_output=900, safety_margin=500),
+    "policy": TokenBudget(max_prompt=3500, max_output=500, safety_margin=400),
+    "code": TokenBudget(max_prompt=4500, max_output=1000, safety_margin=500),
+}
 
-Fifth, log `finish_reason`. A quiet `length` truncation tends to come back later as a product bug.
+def assert_budget_ok(estimated_prompt_tokens: int, use_case: str, context_window: int) -> None:
+    budget = BUDGETS[use_case]
+    allowed_prompt = context_window - budget.max_output - budget.safety_margin
+    if estimated_prompt_tokens > allowed_prompt:
+        raise ValueError(
+            f"Prompt too long: estimated={estimated_prompt_tokens}, allowed={allowed_prompt}, use_case={use_case}"
+        )
+```
 
-Early in LLM development, prompt phrasing feels like the main craft. In production-minded work, token budgeting matters just as much. Short requests are easier to predict. Long requests can carry more context, but they need explicit management. Either way, tokens are the accounting unit that keeps the system understandable.
+### Token-based rate limit defense
 
----
+Rate limits are not just about request count. Many providers also enforce token-per-minute limits. If you design only around requests per second, long prompts can trigger repeated `429` errors.
 
-## Closing thoughts
+```python
+import time
 
-This post covered the reason tokens sit at the center of LLM application work. Tokens are not just another way to say words. They are the unit the model uses for reading, generation, billing, speed, and limits. Once you build the habit of reading `usage`, estimating size with `tiktoken`, and watching `max_tokens` together with `finish_reason`, the rest of the stack becomes easier to reason about.
+class TokenRateLimiter:
+    def __init__(self, tokens_per_minute: int):
+        self.tokens_per_minute = tokens_per_minute
+        self.window_started = time.time()
+        self.used_tokens = 0
 
-In the next post, we will stay with the same chat API and focus on message roles. Once `system`, `user`, and `assistant` are clearly separated, it becomes much easier to produce stable behavior from the same model.
+    def consume(self, estimated_tokens: int) -> None:
+        now = time.time()
+        if now - self.window_started >= 60:
+            self.window_started = now
+            self.used_tokens = 0
+
+        if self.used_tokens + estimated_tokens > self.tokens_per_minute:
+            sleep_s = 60 - (now - self.window_started)
+            if sleep_s > 0:
+                time.sleep(sleep_s)
+            self.window_started = time.time()
+            self.used_tokens = 0
+
+        self.used_tokens += estimated_tokens
+```
+
+This limiter is coarse but effective. It throttles before hitting the provider's limit when token-heavy requests cluster together, reducing `429` storms.
+
+### Quick monthly cost estimation
+
+For operational decisions, monthly totals matter more than per-call prices. A conservative table like this lets you check budget impact before adding features:
+
+| Daily calls | Avg total tokens | Monthly tokens (30d) | Price assumption (USD/1M) | Monthly cost estimate |
+|---:|---:|---:|---|---:|
+| 5,000 | 900 | 135,000,000 | 0.35 | 47.25 |
+| 20,000 | 1,200 | 720,000,000 | 0.35 | 252.00 |
+| 50,000 | 1,600 | 2,400,000,000 | 0.35 | 840.00 |
+
+Token cost is sensitive to model changes and prompt-length shifts. So when doing cost retrospectives, "average `prompt_tokens` grew by X" is a more accurate starting point than "the pricing table changed."
 
 ## Operational checklist
 
-- [ ] You have inspected the three `usage` fields from a real call
-- [ ] You have tokenized an input ahead of the call with `tiktoken.encoding_for_model()` or `get_encoding()`
-- [ ] You confirmed your model's context window limit in the official docs
-- [ ] You computed the dollar cost of one call as price × token count
-- [ ] Your code checks input length before requests that risk exceeding the window
+- [ ] You record `prompt_tokens`, `completion_tokens`, and `total_tokens` from every real call.
+- [ ] You estimate input length with `tiktoken` or equivalent before calls.
+- [ ] You confirmed the context window limit for your model in official documentation.
+- [ ] You do not leave `max_tokens` at its default — you set it as explicit output-length policy.
+- [ ] You log `finish_reason` and have defined follow-up actions for `length` occurrences.
+
+## Summary
+
+Tokens are the unit that matters more than sentences in LLM systems. The model reads in tokens, generates in tokens, the provider bills in tokens, and the context window is bounded in tokens. So explaining cost, speed, and limits in a single language requires a token-centric mental model.
+
+The practical instinct to take from this post is clear. After calls, read `usage`. Before calls, estimate with `tiktoken`. Control output with `max_tokens`. Detect truncation with `finish_reason`. When those four axes come together, length-related issues become far less mysterious.
+
+One more thing to remember: token optimization is not a cost-cutting technique that degrades model quality. It is a design technique for getting more stable results within the same budget. Trimming unnecessary repetition, selectively compressing history, and specifying output format can improve quality and cost simultaneously.
+
+The next post covers role-based prompt design on top of the same chat API. Now that you can read the token budget, it is time to design input structures that draw more stable behavior from the same model.
 
 ## Answering the Opening Questions
 
 - Why should you treat tokens as budget units instead of word-like pieces?
-  - Models process and bill around token units, so tokens are the practical budget for input, output, and limits.
+  - Because models process input and output in token units, and most costs and limits are also calculated in this unit.
 
 - What do `prompt_tokens`, `completion_tokens`, and `total_tokens` each tell you?
-  - `prompt_tokens` measures input, `completion_tokens` measures generated output, and `total_tokens` is the whole call budget.
+  - `prompt_tokens` shows the input cost you sent, `completion_tokens` shows the generated output cost, and `total_tokens` shows the full budget of one call.
 
 - Where do the context window, `max_tokens`, and `finish_reason` collide?
-  - Input and output share the context window. A large `max_tokens` does not help if the remaining window is too small, so `finish_reason` tells you when length ended the generation.
+  - Input and output share the context window together. Even if `max_tokens` is set high, when remaining window is insufficient, you need to check `finish_reason` to confirm a length problem.
 
 <!-- toc:begin -->
 ## In this series
