@@ -235,6 +235,121 @@ print(df.describe())
 - step_overhead 1.6 → 60% extra steps. Cost issue.
 - recovered 0.72 → 28% caves on failures. Needs work.
 
+## Trajectory Evaluation Without Pinning a Single Path
+
+Agent evaluation's key challenge: multiple paths can be valid. Step-level checks that require exact match produce false failures. Use allowed partial orderings instead.
+
+```python
+ALLOWED_PARTIAL_ORDER = [
+    {"read_calendar", "read_emails"},  # any order within stage
+    {"summarize"},
+    {"send_email"},
+]
+
+
+def partial_order_match(actual_tools: list[str]) -> bool:
+    idx = 0
+    for stage in ALLOWED_PARTIAL_ORDER:
+        found = False
+        while idx < len(actual_tools):
+            if actual_tools[idx] in stage:
+                found = True
+                idx += 1
+                break
+            idx += 1
+        if not found:
+            return False
+    return True
+```
+
+This avoids penalizing valid alternative paths that reach the correct outcome.
+
+## Schema-Based Tool Argument Validation
+
+Getting the tool name right but the arguments wrong is a production failure. Pin argument validation rules in code to catch subtle regressions after prompt changes.
+
+```python
+TOOL_ARG_SCHEMAS = {
+    "send_email": {
+        "required": ["to", "subject", "body"],
+        "validators": {
+            "to": lambda v: isinstance(v, str) and "@" in v,
+            "subject": lambda v: isinstance(v, str) and len(v) >= 3,
+            "body": lambda v: isinstance(v, str) and len(v) >= 10,
+        },
+    }
+}
+
+
+def validate_tool_args(tool: str, args: dict) -> bool:
+    schema = TOOL_ARG_SCHEMAS.get(tool)
+    if not schema:
+        return True
+    for key in schema["required"]:
+        if key not in args:
+            return False
+    for key, fn in schema["validators"].items():
+        if not fn(args.get(key)):
+            return False
+    return True
+```
+
+Argument schemas serve as both evaluation code and operational contracts. Without them, tool-call quality depends on team intuition.
+
+## Cost Alert Patterns
+
+Agents easily become verbose during quality improvement. Keep these alerts alongside quality metrics:
+
+- `step_overhead > 1.8` for 3 consecutive days → review prompt and tool descriptions
+- `total_tokens` p95 exceeds weekly baseline by +30% → auto-create analysis ticket
+- Recovery failure rate > 20% → add fault-injection scenarios
+
+## Agent Experiment Log: Minimum Fields
+
+To reproduce experiments, fix the minimum log fields.
+
+```python
+AGENT_TRACE_FIELDS = [
+    "trace_id",
+    "task_type",
+    "steps",              # [{tool, args, latency_ms, tokens, error}]
+    "final_output",
+    "task_success",
+    "step_overhead",
+    "recovery_status",
+]
+```
+
+Fixed log fields let you compare model/prompt changes on the same axes and simplify dashboard automation.
+
+## Failure Cause Code Classification
+
+Aggregating agent failures into a single failure rate makes prioritization hard. Classify by cause code to decide which layer to fix first.
+
+```python
+FAILURE_CODES = {
+    "TOOL_SELECTION": "wrong tool chosen",
+    "ARGUMENT_ERROR": "tool argument format/value error",
+    "LOOPING": "unnecessary repeated steps",
+    "RECOVERY_FAIL": "failed to recover after tool error",
+    "FINAL_MISMATCH": "final response does not match user intent",
+}
+
+
+def classify_failure(run: dict) -> str:
+    if run.get("loop_count", 0) > 2:
+        return "LOOPING"
+    if not run.get("tool_selection_ok", True):
+        return "TOOL_SELECTION"
+    if not run.get("arguments_ok", True):
+        return "ARGUMENT_ERROR"
+    if run.get("recovery_status") == "GAVE_UP":
+        return "RECOVERY_FAIL"
+    return "FINAL_MISMATCH"
+```
+
+Tracking these codes weekly reveals whether the bottleneck is in tool design, prompt quality, or recovery logic.
+
 ---
 
 ## Common Mistakes
