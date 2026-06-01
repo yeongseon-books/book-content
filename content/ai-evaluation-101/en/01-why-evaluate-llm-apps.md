@@ -233,6 +233,98 @@ The first evaluation loop usually fails for process reasons, not math reasons.
 
 The point of the first harness is not elegance. The point is to make regressions visible faster than user complaints.
 
+## A Minimal CI Evaluation Pipeline Your Team Can Adopt Today
+
+Evaluation that lives only in documentation collapses within a month. It must run automatically on every PR under the same conditions. Below is the smallest viable GitHub Actions pipeline.
+
+```yaml
+# .github/workflows/llm-eval-smoke.yml
+name: LLM Eval Smoke
+
+on:
+  pull_request:
+    paths:
+      - "src/**"
+      - "prompts/**"
+      - "evals/**"
+
+jobs:
+  smoke-eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - name: Run smoke evaluation
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python -m evals.smoke.run --input evals/smoke.jsonl --output evals/result.json
+      - name: Enforce gate
+        run: python -m evals.smoke.gate --report evals/result.json --min-pass-rate 0.8
+```
+
+```python
+# evals/smoke/gate.py
+import json
+import argparse
+import sys
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--report", required=True)
+    parser.add_argument("--min-pass-rate", type=float, required=True)
+    args = parser.parse_args()
+
+    with open(args.report) as f:
+        report = json.load(f)
+
+    pass_rate = report["pass_rate"]
+    if pass_rate < args.min_pass_rate:
+        print(f"FAIL: pass_rate={pass_rate:.2%} < {args.min_pass_rate:.2%}")
+        for case in report.get("failed_cases", []):
+            print(f"- {case['case_id']}: missing={case.get('missing', [])}")
+        sys.exit(1)
+
+    print(f"PASS: pass_rate={pass_rate:.2%}")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+The point is not a fancy dashboard. It is a baseline that automatically blocks quality regressions at the PR stage.
+
+## Four-Week Adoption Roadmap
+
+For teams introducing evaluation for the first time, adoption order matters more than tool choice. Limiting scope to four one-week increments avoids the "we built a harness but nobody runs it" trap.
+
+| Week | Goal | Deliverable |
+|---|---|---|
+| 1 | Build a 10–20 case smoke eval | `evals/smoke.jsonl`, pass/fail script |
+| 2 | Introduce per-dimension scores | Separate correctness/relevance report |
+| 3 | Wire PR auto-gate | GitHub Actions fail gate |
+| 4 | Start the failure feedback loop | Weekly failed-case addition rule |
+
+```python
+def weekly_eval_review(summary: dict) -> list[str]:
+    actions = []
+    if summary["pass_rate"] < 0.8:
+        actions.append("Review rollback of key prompt changes")
+    if summary.get("safety_failures", 0) > 0:
+        actions.append("Promote safety cases to golden set")
+    if summary.get("flaky_cases", 0) > 3:
+        actions.append("Isolate high-nondeterminism cases for separate analysis")
+    return actions
+```
+
+The purpose of this roadmap is repeatability, not completeness. Starting small but running every week builds evaluation capability fast.
+
+The best moment to introduce evaluation is not when everything is perfect — it is when changes start happening frequently. Even a small eval loop reduces quality incidents without slowing down the team's change velocity.
+
+
 ## Five Common Mistakes
 
 1. **"We will evaluate once production stabilizes."** Without evaluation, you cannot know whether it has stabilized. Start with ten cases on day one.
