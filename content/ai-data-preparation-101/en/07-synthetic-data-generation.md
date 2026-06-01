@@ -339,6 +339,30 @@ For this workflow, reasonable minimum thresholds could be:
 
 These numbers are not universal truths. They are practical gates for catching batches that look large but are operationally weak. For example, a `unique_ratio` of 0.62 is usually not a signal to generate more. It is a signal to redesign the prompt and seed set.
 
+## Dataset versioning and DAG perspective
+
+When a synthetic batch reaches production, version control and dependency graphs become more important than generation code. At minimum, the DAG should separate `seed -> generate -> validate -> approve -> publish` stages so that batch failures can be narrowed instantly.
+
+```python
+DAG = {
+    "seed_snapshot": [],
+    "generate_items": ["seed_snapshot"],
+    "validate_schema": ["generate_items"],
+    "validate_evidence": ["validate_schema"],
+    "human_review": ["validate_evidence"],
+    "publish_dataset": ["human_review"],
+}
+```
+
+Accepted batches should also be pinned with DVC or an equivalent data-versioning system.
+
+```bash
+dvc add datasets/ai-data-preparation-101/07-synthetic-data-generation/<run_id>/accepted.jsonl
+git add datasets/ai-data-preparation-101/07-synthetic-data-generation/<run_id>/accepted.jsonl.dvc
+git commit -m "Track synthetic batch <run_id>"
+```
+
+Without this record, you cannot later explain which prompt and which validation criteria produced a given dataset.
 ## Common points of confusion
 
 - **Synthetic data gets better if we simply generate more**: no. Without rejection logic, scale just multiplies noise.
