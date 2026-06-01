@@ -304,6 +304,76 @@ def harvest_failures_to_regression_set(failed_traces: list[dict], regression_pat
 
 Closing this loop turns production → regression set → next deploy → production into an automated cycle. Every failure becomes a permanent asset.
 
+### Operations Dashboard Layout
+
+For production evaluation to work in practice, you need a dashboard that on-call and product teams share — not a report only the model team reads. Four panels form the baseline:
+
+1. Quality panel: thumbs_down_rate, re_ask_rate, judge_score trend
+2. Reliability panel: safety_violation_rate, refusal_rate, escalation_rate
+3. Performance panel: p50/p95 latency, timeout_rate
+4. Cost panel: cost_per_request, judge_cost_ratio
+
+```python
+def build_ops_snapshot(metrics: dict) -> dict:
+    return {
+        "quality": {
+            "thumbs_down_rate": metrics["thumbs_down_rate"],
+            "re_ask_rate": metrics["re_ask_rate"],
+            "judge_score": metrics["judge_score"],
+        },
+        "reliability": {
+            "safety_violation_rate": metrics["safety_violation_rate"],
+            "refusal_rate": metrics["refusal_rate"],
+            "escalation_rate": metrics["escalation_rate"],
+        },
+        "performance": {
+            "p50_latency_ms": metrics["p50_latency_ms"],
+            "p95_latency_ms": metrics["p95_latency_ms"],
+            "timeout_rate": metrics["timeout_rate"],
+        },
+        "cost": {
+            "cost_per_request": metrics["cost_per_request"],
+            "judge_cost_ratio": metrics["judge_cost_ratio"],
+        },
+    }
+```
+
+### Incident-to-Eval Feedback Template
+
+Don't end an incident with just a retrospective — connect it to an evaluation system update so the same failure mode is caught automatically next time.
+
+```text
+Incident-to-Eval Template
+- Incident ID:
+- User impact:
+- Failure input pattern:
+- Reproducible: Yes/No
+- New regression case added: Yes/No
+- New guardrail metric needed: Yes/No
+- Threshold adjustment needed: Yes/No
+```
+
+Adding this template to the on-call close checklist ensures every production failure strengthens the next deployment's defenses.
+
+### Release Approval Gate
+
+Ultimately you need an approval rule that incorporates operational signals, not just offline eval scores.
+
+```python
+def release_gate(snapshot: dict) -> tuple[bool, str]:
+    if snapshot["quality"]["thumbs_down_rate"] > 0.06:
+        return False, "thumbs_down_rate too high"
+    if snapshot["reliability"]["safety_violation_rate"] > 0.002:
+        return False, "safety violation exceeds threshold"
+    if snapshot["performance"]["p95_latency_ms"] > 4000:
+        return False, "p95 latency too high"
+    if snapshot["cost"]["judge_cost_ratio"] > 0.10:
+        return False, "judge cost ratio budget exceeded"
+    return True, "release approved"
+```
+
+Codifying the release gate eliminates "feels okay" judgments and keeps operational standards consistent across deploys.
+
 ---
 
 ## Common Mistakes
