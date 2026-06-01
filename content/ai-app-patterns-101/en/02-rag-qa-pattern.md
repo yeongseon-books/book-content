@@ -402,6 +402,129 @@ When a RAG answer looks weak, inspect in this order:
 
 ---
 
+## FastAPI RAG API and evidence contract
+
+### Enforcing evidence in the Q&A endpoint
+
+When moving RAG to production, the critical difference is never returning just an answer string. The caller needs the answer together with source documents, scores, and fallback status. The example below shows the minimum contract.
+
+```python
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class QARequest(BaseModel):
+    question: str
+
+def retrieve(question: str) -> list[dict]:
+    # In production, return FAISS/PGVector results here.
+    return [
+        {"text": "Python was created by Guido van Rossum.", "score": 0.93, "source": "python_intro.txt"},
+        {"text": "Python 2 reached end of life in 2020.", "score": 0.88, "source": "python_history.txt"},
+    ]
+
+def generate_with_context(question: str, docs: list[dict]) -> str:
+    context = "\n".join(f"- {d['text']}" for d in docs)
+    system_prompt = f"""
+You are a document-based Q&A assistant.
+Do not speculate beyond the evidence documents below.
+If evidence is insufficient, respond 'Insufficient document evidence'.
+
+Evidence documents:
+{context}
+""".strip()
+    # In production, call the LLM here.
+    return f"Document-grounded example answer for '{question}'."
+
+@app.post('/rag/qa')
+def rag_qa(req: QARequest):
+    docs = retrieve(req.question)
+    if not docs or docs[0]['score'] < 0.80:
+        return {
+            'route': 'fallback_no_evidence',
+            'answer': 'Insufficient document evidence',
+            'sources': [],
+            'top_score': docs[0]['score'] if docs else None,
+        }
+
+    answer = generate_with_context(req.question, docs)
+    return {
+        'route': 'answer_from_documents',
+        'answer': answer,
+        'sources': [d['source'] for d in docs],
+        'top_score': docs[0]['score'],
+    }
+```
+
+With this contract, the frontend and the operations dashboard see the same facts. Instead of debugging "the answer was wrong" in the abstract, you can separate retrieval-score drops, missing evidence, and generation quality issues.
+
+## Retrieval quality metrics and re-indexing strategy
+
+To improve Q&A quality reliably, measure the retrieval stage rather than relying on subjective answer quality impressions. The minimum operational metrics:
+
+- `hit_at_k`: fraction of queries where the gold evidence document appears in the top-k
+- `mrr`: mean reciprocal rank — rewards higher positions for correct documents
+- `no_evidence_rate`: fraction of queries that hit the fallback path
+- `stale_chunk_rate`: fraction where an outdated chunk was selected as evidence
+
+```python
+def evaluate_retrieval(queries: list[dict], retriever) -> dict:
+    hit = 0
+    reciprocal_ranks = []
+
+    for q in queries:
+        docs = retriever(q['question'])
+        rank = None
+        for i, d in enumerate(docs, start=1):
+            if d['source'] == q['gold_source']:
+                rank = i
+                break
+        if rank:
+            hit += 1
+            reciprocal_ranks.append(1 / rank)
+        else:
+            reciprocal_ranks.append(0)
+
+    total = len(queries)
+    return {
+        'hit_at_k': hit / total,
+        'mrr': sum(reciprocal_ranks) / total,
+    }
+```
+
+### Re-indexing triggers
+
+In domains where documents change frequently, fix the re-indexing schedule as policy:
+
+```text
+trigger_1: document change count >= 500
+trigger_2: critical policy document updated
+trigger_3: hit_at_k drops 10pp below 7-day average
+action: incremental re-index affected sources only
+```
+
+Without these rules, RAG works well for a while then loses trust abruptly once index staleness diverges from document reality.
+
+## No-evidence UX handling
+
+In RAG, the fallback response is not just a safety mechanism — it is also a UX design surface. Rather than ending with a bare "I don't know", guide the user toward a next action to reduce drop-off.
+
+```json
+{
+  "route": "fallback_no_evidence",
+  "answer": "I could not find evidence in the indexed documents.",
+  "next_actions": [
+    "Try making your question more specific.",
+    "Include a document title or keyword with your question."
+  ]
+}
+```
+
+Treating the no-evidence path as a product UX concern addresses safety and usability at the same time.
+
+---
+
 ## Conclusion
 
 RAG Q&A is the most practical pattern for giving an LLM access to knowledge it was not trained on. The prompt instruction to say "I don't know" when information is absent is the simplest hallucination guard.
