@@ -275,6 +275,93 @@ Some risk does not yield to technical guardrails alone.
 - **Compliance review**: quarterly sampling of audit logs.
 - **Complaint handling**: first reply to a false-positive report within 24 hours.
 
+---
+
+### Framework Integration: Guardrails AI + NeMo Guardrails
+
+In production, combining frameworks by role is more realistic than solving everything with one tool:
+
+| Layer | Tool | Role |
+|---|---|---|
+| Conversation flow | NeMo Guardrails | Input/dialog state policy |
+| Output validation | Guardrails AI | Structure/policy validator execution |
+| Shared observability | OpenTelemetry + audit sink | request-id tracing |
+
+```python
+def production_chat(request: dict) -> dict:
+    pre = nemo_input_policy(request["prompt"])
+    if not pre.allowed:
+        return block("pre-input", pre.reason)
+
+    answer = call_llm_with_context(request)
+
+    post = guardrails_validate_output(answer)
+    if not post.allowed:
+        return block("post-output", post.reason)
+
+    audit_event(request, pre, post)
+    return {"answer": post.output}
+```
+
+### Latency Budget Contract
+
+```yaml
+latency_budget:
+  total_p95_ms: 2200
+  model_call_p95_ms: 1700
+  guardrail_overhead_p95_ms: 300
+  audit_write_p95_ms: 80
+  margin_ms: 120
+```
+
+Without this contract, you cannot immediately identify where latency grew when adding features.
+
+### Production Readiness Table
+
+| Item | Pass criteria |
+|---|---|
+| Policy version control | All guardrail policies mapped to Git tags |
+| Regression tests | Jailbreak/PII/moderation/grounding sets run automatically |
+| Failure modes | fail-open/fail-closed rehearsal completed |
+| Audit trail | Full-stage reconstruction via single request-id |
+| Cost control | Daily/monthly budget auto-enforcement |
+
+```bash
+python3 scripts/run_guardrail_regression.py --format table
+python3 scripts/verify_audit_chain.py --last-hours 24
+python3 scripts/check_guardrail_budget.py --p95-max 300
+```
+
+If any of these three fail, postpone the rollout.
+
+### Shadow-to-Full Rollout Checkpoints
+
+| Stage | Duration | Pass criteria |
+|---|---|---|
+| Shadow | 7 days | Predicted block rate recorded, FP rate estimated |
+| Canary 5% | 3 days | No SLO violations, no user complaint spike |
+| Canary 50% | 3 days | Guardrail latency P95 meets target |
+| Full | 7 days intensive | Zero incidents, regression metrics stable |
+
+```python
+def release_gate(metrics: dict) -> bool:
+    return all([
+        metrics["jailbreak_recall"] >= 0.95,
+        metrics["benign_fp"] <= 0.01,
+        metrics["pii_recall"] >= 0.98,
+        metrics["guardrail_p95_ms"] <= 300,
+    ])
+```
+
+### Architecture Review Questions
+
+- Can policy changes deploy without code release?
+- Does the fail-open/fail-closed path match documentation during outages?
+- Can all stages be reconstructed from a single request-id?
+- Is the cost ceiling linked to model selection policy?
+
+If you cannot answer these immediately, the system is not production-ready.
+
 ## Common Mistakes
 
 1. **Running every guardrail serially.** Latency explodes. Parallelize and order by cost.
