@@ -233,6 +233,83 @@ GDPR / privacy-law angle:
 
 Provider zero-data-retention options (OpenAI Enterprise, Azure OpenAI) reduce provider-side retention risk.
 
+### Multi-Layer PII Detection Accuracy
+
+In practice, regex + NER still leaves gaps. Adding format validation and context validation reduces false positives:
+
+```python
+def luhn_check(number: str) -> bool:
+    digits = [int(c) for c in number if c.isdigit()]
+    checksum = 0
+    parity = len(digits) % 2
+    for i, d in enumerate(digits):
+        if i % 2 == parity:
+            d *= 2
+            if d > 9:
+                d -= 9
+        checksum += d
+    return checksum % 10 == 0
+```
+
+If a card-number pattern matches but fails Luhn, downgrade from block to warning.
+
+### Outbound Leak Scenarios
+
+| Scenario | Leak path | Defense |
+|---|---|---|
+| Multi-tenant RAG context mixing | Another user's email quoted | Tenant boundary filter + output re-scan |
+| Support transcript summary | Phone number re-exposed verbatim | Reversible tokenization + restore restriction |
+| Debug response leak | Internal keys/tokens included | Credential pattern blocking |
+
+```python
+from guardrails import Guard
+from guardrails.hub import DetectPII
+
+pii_guard = Guard().use(DetectPII, entities=["EMAIL_ADDRESS", "PHONE_NUMBER"], on_fail="fix")
+
+def redact_before_send(text: str) -> str:
+    out = pii_guard.validate(text)
+    return out.validated_output
+```
+
+### Compliance Checklist
+
+| Item | Question | Review cadence |
+|---|---|---|
+| Minimum collection | Must the model see raw PII? | Every release |
+| Retention period | Does PII storage TTL match policy? | Weekly |
+| Right to delete | Can full deletion complete within N days? | Monthly |
+| Access control | Is PII store access role-based? | Monthly |
+| Cross-border notice | Are vendor/region notices current? | Quarterly |
+
+### Storage Separation Design
+
+The most common PII oversight is storage boundaries. Separating by role simplifies deletion requests and access control:
+
+| Store | Contents | Retention | Access |
+|---|---|---|---|
+| audit_log | Hash, decision code, timestamp | 1-7 years | Security/compliance |
+| pii_vault | Encrypted originals, token mapping | 30-90 days | Minimum staff |
+| analytics | Aggregated metrics (de-identified) | Long-term | Data team |
+
+```python
+from datetime import datetime, timedelta
+
+def expire_token_map(store, ttl_minutes: int = 30):
+    cutoff = datetime.utcnow() - timedelta(minutes=ttl_minutes)
+    store.delete_where(lambda r: r["created_at"] < cutoff)
+```
+
+Keeping per-request token mappings too long turns them into a sensitive data store. Enforce expiry in code.
+
+### Production Incident Patterns
+
+- Customer support agent reads phone number from ticket body and re-exposes in response.
+- Internal test logs record API keys in plaintext.
+- Deletion request processed but cache copy remains, causing re-exposure.
+
+All three stem from storage boundary and lifecycle management failures, not detector accuracy.
+
 ---
 
 ## Common Mistakes
