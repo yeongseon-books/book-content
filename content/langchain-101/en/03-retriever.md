@@ -90,6 +90,8 @@ vectorstore = FAISS.from_texts(
 print(f"index vector count: {vectorstore.index.ntotal}")
 ```
 
+The key distinction is between **indexing time** and **query time**. Converting documents into vectors and storing them is a cost you pay upfront. At request time, you only search the pre-built index. When this boundary blurs, demos work but production services suffer unnecessary latency.
+
 ---
 
 ## Creating a Retriever
@@ -126,6 +128,8 @@ retriever_mmr = vectorstore.as_retriever(
     search_kwargs={"k": 3, "fetch_k": 10, "lambda_mult": 0.5},
 )
 ```
+
+From an operational perspective, `k` and `search_type` are tuning points you should adjust before touching the prompt. When answers go off-track, many teams rewrite the prompt, but the real cause is often retrieval recall or context noise.
 
 ---
 
@@ -258,6 +262,154 @@ print(f"\nresult: {results[0].page_content}")
 ```
 
 ---
+
+## Checking retrieval quality with numbers
+
+A common RAG blind spot is relying on gut feeling — "the results look reasonable." At minimum, log a table per query so you can compare retrieval quality quantitatively before touching the prompt.
+
+| query | expected keyword | top-1 hit? | notes |
+|---|---|---|---|
+| `Who developed FAISS?` | `Facebook AI Research` | Pass | top-1 correct |
+| `What does RAG combine?` | `retrieved documents + LLM` | Pass | stable through top-2 |
+| `What is BM25?` | none (out-of-corpus) | Fail (intended) | absence response needed |
+
+Keep this table separate from model evaluation. If retrieval fails but you only look at model output, you end up tuning the prompt when the real problem is upstream.
+
+## Retriever implementation patterns compared
+
+There is more than one way to wire a Retriever. Three patterns dominate at the introductory level:
+
+| Pattern | LCEL shape | Advantage | Downside |
+|---|---|---|---|
+| Simple pipe | `retriever \| format_docs` | Easy to understand | Weak length control |
+| Score filter | `retriever_with_score \| filter \| format` | Reduces noise docs | More code |
+| Re-ranking | `retriever \| reranker \| format` | Higher precision possible | Added latency |
+
+In practice, start with the simple pipe and add score filtering or re-ranking only after quality issues are confirmed.
+
+## Score-based filtering example
+
+The code below uses `similarity_search_with_score` to drop low-relevance documents before they enter the prompt context.
+
+```python
+from langchain_core.runnables import RunnableLambda
+
+def retrieve_with_threshold(query: str, threshold: float = 0.9):
+    pairs = vectorstore.similarity_search_with_score(query, k=4)
+    # L2 distance: lower is more similar
+    filtered = [doc for doc, score in pairs if score <= threshold]
+    return filtered
+
+def docs_to_context(docs: list) -> str:
+    if not docs:
+        return "NO_CONTEXT_FOUND"
+    return "\n\n".join(d.page_content for d in docs)
+
+retrieval_branch = RunnableLambda(retrieve_with_threshold) | RunnableLambda(docs_to_context)
+```
+
+The point is to not trust Retriever output blindly — apply one more application-level filter. In noisy corpora this filtering step often matters more than prompt refinement.
+
+## Designing documents with metadata filters in mind
+
+Retriever quality is not solely about the embedding model. How you attach metadata at ingestion time matters just as much.
+
+```python
+from langchain_core.documents import Document
+
+docs = [
+    Document(
+        page_content="FAISS supports exact and approximate nearest-neighbor search.",
+        metadata={"source": "faiss-intro", "topic": "vector-search", "lang": "en"},
+    ),
+    Document(
+        page_content="RAG combines retrieval context with generation.",
+        metadata={"source": "rag-guide", "topic": "rag", "lang": "en"},
+    ),
+]
+```
+
+When you later want to search only `topic=rag`, missing metadata forces you to rely on text similarity across the entire corpus. Including at least `source`, `topic`, `lang`, and `updated_at` at ingestion gives you operational flexibility from day one.
+
+## Tracing the Retriever span in LangSmith
+
+When you view a Retriever-containing chain in LangSmith, the retrieval step appears as a separate run before the LLM step.
+
+```text
+[trace] run_type=chain name=rag_chain latency_ms=1198
+  [child] run_type=retriever name=VectorStoreRetriever latency_ms=71 k=3
+  [child] run_type=prompt name=ChatPromptTemplate latency_ms=2
+  [child] run_type=llm name=ChatGroq latency_ms=1089 tokens_in=522 tokens_out=118
+```
+
+This alone lets you isolate latency causes immediately. If retrieval is 70 ms but the total is 1.2 s, model output length — not search tuning — is the bottleneck. If retrieval exceeds 600 ms, inspect index structure and filter strategy first.
+
+## Retriever failure checklist
+
+- **Query log**: Are you storing both the raw user question and the normalized query separately?
+- **Hit log**: Do you record top-k document IDs, scores, and sources?
+- **Empty-hit rate**: Are you monitoring the percentage of queries that return no usable context?
+- **Index version**: Can you trace which index snapshot served a given request?
+- **Fallback path**: Is there a defined response policy when context is absent?
+
+These five items alone let you answer "Why did it answer yesterday but say 'I don't know' today?" with evidence.
+
+## Choosing between MMR and similarity
+
+A common question is when to use MMR. The decision rule is straightforward: if the query is narrow and specific, similarity wins; if the query is broad or the corpus has heavy duplication, MMR often helps.
+
+| Condition | Recommended search_type | Reason |
+|---|---|---|
+| Definition question (e.g. "What is FAISS?") | similarity | Focus on 1-2 correct docs |
+| Comparison question (e.g. "RAG vs keyword search") | mmr | Need diverse viewpoints |
+| Noisy corpus | similarity + threshold | Drop low-score results |
+
+```python
+retriever_similarity = vectorstore.as_retriever(
+    search_type="similarity",
+    search_kwargs={"k": 3},
+)
+
+retriever_mmr = vectorstore.as_retriever(
+    search_type="mmr",
+    search_kwargs={"k": 3, "fetch_k": 12, "lambda_mult": 0.4},
+)
+```
+
+In production, teams often assign a default search type per question category — FAQ-style questions use similarity, exploratory questions use MMR — which stabilizes average quality.
+
+## Retriever + prompt length control
+
+Even when retrieval quality is high, excessive context length increases input cost and latency. Placing a length-control function after the retriever is a pattern that matters in production.
+
+```python
+def trim_context(docs: list, max_chars: int = 1200) -> str:
+    buf = []
+    total = 0
+    for doc in docs:
+        text = doc.page_content.strip()
+        if total + len(text) > max_chars:
+            break
+        buf.append(text)
+        total += len(text)
+    return "\n\n".join(buf)
+
+context_chain = retriever | trim_context
+```
+
+With this function in place, even a large `k` keeps prompt input length bounded. This is especially effective for stabilizing first-token latency in streaming responses.
+
+## Turning search failures into user-friendly responses
+
+When retrieval returns nothing, simply answering "I don't know" breaks the user experience. A response policy that suggests next actions is essential.
+
+| Situation | Recommended response |
+|---|---|
+| No context found | "The current index has no information on this topic. Try rephrasing your question." |
+| Low scores | "Confidence is low for this answer. Try narrowing your question scope." |
+| Conflicting documents | "Sources disagree. Specify a preferred source and I can narrow the answer." |
+
+A Retriever looks like a simple technical component, but these policies complete the actual service quality.
 
 ## What to notice in this code
 
