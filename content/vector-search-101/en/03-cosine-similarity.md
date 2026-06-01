@@ -240,6 +240,184 @@ For text search, cosine similarity is the safe default. With normalized vectors,
 
 ---
 
+## ANN algorithms and the distance function connection
+
+The distance function looks like a math choice, but it connects directly to index algorithm selection. HNSW and IVF both support cosine/L2, but their internal optimization points differ.
+
+| Algorithm | Common pairing | Key tuning point | Distance function relationship |
+|---|---|---|---|
+| HNSW | cosine + normalized vectors | `M`, `efConstruction`, `efSearch` | Higher `efSearch` improves recall, increases latency |
+| IVF Flat | cosine or L2 | `nlist`, `nprobe` | Low `nprobe` misses candidates, recall drops |
+| Flat (exact) | cosine/IP/L2 | None | Used for ground-truth generation |
+
+In production, a Flat index generates the ground-truth result set, and HNSW/IVF recall is measured against it.
+
+## How HNSW and IVF parameters affect score interpretation
+
+The table below shows typical behavior when only search parameters change on the same dataset.
+
+| Setting | Recall@10 | p95 latency (ms) |
+|---|---:|---:|
+| HNSW `efSearch=32` | 0.91 | 7 |
+| HNSW `efSearch=96` | 0.97 | 15 |
+| IVF `nprobe=4` | 0.84 | 4 |
+| IVF `nprobe=24` | 0.95 | 10 |
+
+The point is simple: even with the same score function, varying how many candidates are examined changes final ranking. Operational dashboards must log `efSearch` and `nprobe` alongside score distributions.
+
+## Minimal benchmark code
+
+```python
+import time
+
+import faiss
+import numpy as np
+
+def recall_at_k(pred: np.ndarray, truth: np.ndarray, k: int) -> float:
+    hit = 0
+    total = pred.shape[0] * k
+    for i in range(pred.shape[0]):
+        hit += len(set(pred[i, :k]).intersection(set(truth[i, :k])))
+    return hit / total
+
+def benchmark(index: faiss.Index, queries: np.ndarray, truth: np.ndarray, k: int = 10) -> tuple[float, float]:
+    start = time.perf_counter()
+    _, pred = index.search(queries, k)
+    elapsed_ms = (time.perf_counter() - start) * 1000
+    return recall_at_k(pred, truth, k), elapsed_ms
+```
+
+This code is enough to answer "did the tuning reduce latency without sacrificing recall?" with numbers.
+
+## Hybrid score alignment
+
+Cosine scores and BM25 scores have different distributions. Adding them directly lets one dominate the other. Apply min-max or z-score normalization first.
+
+```python
+import numpy as np
+
+def min_max(arr: np.ndarray) -> np.ndarray:
+    lo, hi = float(arr.min()), float(arr.max())
+    if hi == lo:
+        return np.zeros_like(arr, dtype=np.float32)
+    return (arr - lo) / (hi - lo)
+
+def hybrid_score(cos_scores: np.ndarray, bm25_scores: np.ndarray, alpha: float) -> np.ndarray:
+    cos_norm = min_max(cos_scores)
+    bm25_norm = min_max(bm25_scores)
+    return alpha * cos_norm + (1 - alpha) * bm25_norm
+```
+
+Once hybrid scoring is in place, operational logs must include `alpha`, normalization method, and candidate count to enable experiment comparison.
+
+## Threshold-based search pitfalls
+
+Top-k search uses relative ranking. Threshold search uses an absolute score cutoff — for example, pass documents with cosine >= 0.62. This creates sensitivity to domain and query length.
+
+| Query type | Recommended approach |
+|---|---|
+| Short keyword queries | Set threshold higher |
+| Long descriptive queries | Lower threshold, expand top-k |
+| Error code / identifier queries | Prefer lexical augmentation over vector threshold |
+
+A single fixed threshold rarely works. Pair it with query-type classification for stability.
+
+## Distance function and reranker interaction
+
+Most systems run a fast first-stage retrieval followed by a precise second-stage reranker (e.g., cross-encoder). The distance function choice affects first-stage candidate diversity.
+
+- Cosine-based first stage is good at capturing semantically broad candidates.
+- L2-based first stage preserves coordinate distance but offers limited advantage for text search.
+- When a reranker is used, prioritize recall in the first stage and let precision come from the second stage.
+
+| First-stage candidates | Final Recall@5 | Final p95 (ms) |
+|---:|---:|---:|
+| 10 | 0.84 | 120 |
+| 30 | 0.91 | 170 |
+| 50 | 0.93 | 230 |
+
+The similarity function choice must be evaluated within the full latency budget that includes the reranker.
+
+## FAISS index similarity experiment sketch
+
+```python
+import faiss
+import numpy as np
+
+def build_flat_ip(vectors: np.ndarray) -> faiss.Index:
+    index = faiss.IndexFlatIP(vectors.shape[1])
+    index.add(vectors.astype(np.float32))
+    return index
+
+def build_flat_l2(vectors: np.ndarray) -> faiss.Index:
+    index = faiss.IndexFlatL2(vectors.shape[1])
+    index.add(vectors.astype(np.float32))
+    return index
+```
+
+Running the same query set against both indexes makes the impact of normalization on result interpretation visually clear.
+
+## Production monitoring metrics
+
+Once a distance function is live, collect these metrics as a baseline:
+
+- Top-1 score and top-5 mean score per query
+- No-answer rate (queries below threshold)
+- Success rate by query length bucket
+- Latency/recall trend by ANN parameter (`nprobe`, `efSearch`)
+
+These metrics let you separate "wrong score function" from "wrong chunking" from "under-tuned ANN" quickly.
+
+## Interpreting cosine score ranges
+
+A common question in production is "is 0.65 good?" The ranges below are not absolute rules but serve as initial interpretation guidelines.
+
+| Cosine score | Interpretation |
+|---:|---|
+| 0.80+ | Very close meaning or nearly identical context |
+| 0.60–0.80 | Highly relevant, strong candidate |
+| 0.40–0.60 | Partially relevant, needs reranker or additional filtering |
+| Below 0.40 | Likely noise |
+
+Actual thresholds shift depending on whether the domain is technical jargon-heavy or general prose. Always recalibrate against an internal evaluation set.
+
+## Query length and score distribution
+
+Short and long queries produce different score distributions. One-to-two-word queries compress meaning, resulting in small variance among top scores. Longer queries carry more context, making top candidates stand out clearly.
+
+```python
+def classify_query(query: str) -> str:
+    tokens = query.split()
+    if len(tokens) <= 2:
+        return "short"
+    if len(tokens) <= 8:
+        return "medium"
+    return "long"
+```
+
+In production, setting different thresholds per query-length bucket is a common and effective strategy.
+
+## Precision/Recall tradeoff example
+
+| Policy | Precision@5 | Recall@5 |
+|---|---:|---:|
+| threshold 0.70 | 0.91 | 0.62 |
+| threshold 0.55 | 0.84 | 0.79 |
+| threshold 0.45 | 0.73 | 0.88 |
+
+For a support chatbot where missing answers is unacceptable, lean toward recall. For a document search engine where result quality matters more, lean toward precision.
+
+## Distance function rollout checklist
+
+- Run existing and new function in parallel on the same evaluation set
+- Compute top-k result overlap ratio to detect distribution shifts
+- Measure p95 latency and cost alongside quality metrics
+- Have a human review failed-query samples and document the rationale for the change
+
+This process verifies whether a "mathematically better" function actually works better on real user queries.
+
+One final point: the score function alone does not determine quality. Actual results come from the combination of chunking, embedding model, ANN candidate count, and reranker policy. Distance function comparison experiments must run on identical pipeline settings, changing only one variable at a time, to isolate causation.
+
 ## Conclusion
 
 All three distance metrics are now implemented and compared. The normalization effect is visible: dot product matches cosine similarity only when vectors have unit magnitude. The brute-force search works correctly for small corpora but does not scale.
