@@ -14,25 +14,24 @@ tags:
 - OpenAI
 - Prompt Engineering
 - Python
-last_reviewed: '2026-05-15'
+last_reviewed: '2026-06-01'
 seo_description: Learn how to structure LLM prompts effectively by separating system, user, and assistant roles to ensure consistent, controllable model behavior.
 ---
 
 # LLM App Foundations 101 (3/6): Prompt engineering basics — system, user, and assistant roles
 
-Prompt engineering is often described as clever wording. In application work, that is too narrow. The real job is to separate instructions by role, decide which rules stay stable across requests, and shape how the model responds. The difference between a weak prompt and a dependable prompt is usually the structure of the `messages` array.
+Prompt engineering is often described as clever wording. In application work, that description is too weak. The real job is to separate instructions by role — deciding which constraints are shared policy, which content belongs to the current request only, and which history needs to carry into the next turn — and fix that separation as structure.
 
-That structure matters early. Without it, tone drifts, output format changes between calls, follow-up questions lose context, and parameter tuning feels random. Many “model reliability” problems are really input-structure problems.
+This is the third post in the LLM App Foundations 101 series.
 
-This is the third post in the LLM App Foundations 101 series. Here, we use Groq's `llama-3.1-8b-instant` to build the core mental model for prompt design with chat completions.
+The difference shows up early. When you push everything into a single string, tone drifts, output format varies between calls, prior conversation gets forgotten, and parameter tuning becomes guesswork. Many problems that feel like model instability actually start from a blurry message array structure.
 
-The main idea is simple: **good prompts start as structured message roles, not as one long user sentence**.
+In chat APIs, `system`, `user`, and `assistant` are not simple labels. They are the minimum separation unit for application policy, the current request, and accumulated history. Once you draw clear boundaries between those three layers, the same model produces far more predictable behavior.
 
----
+Here we treat the role-based message array as the fundamental unit of prompt design and build stable input structures on top of it.
 
 ![Prompt engineering basics: system, user, and assistant roles](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-01-prompt-engineering-basics-system-user-an.en.png)
 *Prompt engineering basics: system, user, and assistant roles*
-> Prompt engineering starts with role boundaries, not nicer wording.
 
 ## Questions to Keep in Mind
 
@@ -40,51 +39,41 @@ The main idea is simple: **good prompts start as structured message roles, not a
 - Why is a system message stronger than just writing one more first sentence?
 - How do temperature, top_p, and few-shot examples affect answer stability?
 
-## Why prompt engineering is more than wording
+## Why this post matters
 
-In Post 01, one `user` message was enough to make the first API call. Real applications move beyond that quickly. They need stable behavior across users, consistent output shape, and memory of earlier turns. Once those requirements appear, one free-form user string stops being enough.
+After the first API call succeeds, the immediate next problem is "why does the same model keep giving different answers?" The first answer to that question is not a model swap — it is an input structure audit. When shared policy, current-request constraints, and carry-over history are all mixed together, inconsistent results are natural.
 
-Chat-based LLM APIs solve this with role-tagged messages. That is not cosmetic syntax. It separates operating policy from the current request and from prior conversation state.
+Prompt engineering is also closer to operational maintainability than to literary style. Collecting shared policy in `system` gives you a single change point. Recording history as `assistant` messages makes multi-turn debugging easier. Writing output format requirements structurally creates a testable contract.
 
-- `system`: global behavior and boundaries
-- `user`: the current request
-- `assistant`: what the model said earlier in the conversation
+Ultimately, a good prompt is not "a well-worded request to the model." It is "an input design that the application can repeatedly reconstruct." That instinct is what leads naturally into few-shot, conversation state, and structured output.
 
-Once you think in those layers, prompt design becomes easier to maintain.
+## The best way to understand role-based prompts: see the message array as three layers — policy, current request, and history — not as one sentence
 
----
+The message array in a chat API is not a flat list. `system` holds policy that applies across nearly all requests. `user` holds the actual request for this turn. `assistant` re-injects the model's prior answer to restore context. Once you separate these three, it becomes much easier to explain how firmly the model should follow each instruction.
 
-## Understanding the three roles
+This perspective matters because many conversation-quality problems come from role confusion. Repeating shared rules inside `user` every time, failing to replay history, or combining high creative sampling with strict format expectations all produce unstable results.
+
+> The starting point of prompt engineering is not elegant phrasing — it is a message structure that specifies which instruction belongs to which role.
+
+## Core concepts
+
+To make chat prompts operationally maintainable, you first need to separate the three roles. `system` is overall policy. `user` is the current request. `assistant` is prior answers. Without this structure, the application ends up repeating the same rules in every request and implicitly expecting history that was never provided.
 
 ![Roles merged into one messages array](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-01-understanding-the-three-roles.en.png)
 
 *Roles merged into one messages array*
-Each role has a different purpose.
 
-### `system`
+In practical terms:
 
-The `system` message defines the model's default behavior. Put tone, response language, safety boundaries, output conventions, and high-level identity here.
+- `system`: language, tone, safety boundaries, output rules — shared policy
+- `user`: current task instruction, question, attached context
+- `assistant`: prior model answers to replay into the next turn
 
-The operational point is that `system` is not about the current task details. It is about **cross-request policy**. If a rule should apply almost every time your app calls the model, it probably belongs here.
-
-### `user`
-
-The `user` message holds the current request. The question, task description, attached context, and request-specific constraints belong here.
-
-### `assistant`
-
-The `assistant` role is used when you replay the model's earlier answer back into the next request. If you want the next turn to know what the model already said, your application needs to include that history explicitly.
-
-That means multi-turn conversation is not a hidden built-in memory feature. It is **application-managed reconstruction of the `messages` array**.
-
----
-
-## How a system message changes the answer
+The effect of a system message is easiest to see through direct comparison.
 
 ![Same question with and without system](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-02-how-a-system-message-changes-the-answer.en.png)
 
 *Same question with and without system*
-It is easier to understand `system` by comparing outputs directly. The script below sends the same user question twice. The first request has no system message. The second adds a system instruction that constrains language, audience, and output structure. The contrast is usually obvious.
 
 ```python
 import os
@@ -127,26 +116,15 @@ print("[with system]")
 print(with_system.choices[0].message.content)
 ```
 
-The facts may overlap, but the style usually does not. A good system message makes these parts more stable:
+What to look for in this comparison is not "which answer do I like better." It is how much more stable the output contract — language, length, bullet count, tone — becomes when a system message is present. If you want to treat prompts as operational assets, that reproducibility is what matters.
 
-- response language
-- tone and audience level
-- output structure
-- answer length tendencies
-- behavior under uncertainty
+The key point: `system` is not an absolute command, but it is the strongest steering input available.
 
-A system message is not a perfect hard lock. It is the strongest steering input, not an absolute guarantee.
-
----
-
-## Building multi-turn history with assistant messages
+Multi-turn history is not hidden model memory — it is application-reconstructed message arrays.
 
 ![Assistant reply replay in the next turn](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-03-building-multi-turn-history-with-assista.en.png)
 
 *Assistant reply replay in the next turn*
-In many application flows, the provider does not remember the full conversation for you. If the next request only includes the latest user message, the model only sees that latest message.
-
-To preserve context, the application has to replay the conversation, including the model's earlier answer as an `assistant` message.
 
 ```python
 import os
@@ -195,35 +173,13 @@ print("[assistant turn 2]")
 print(second.choices[0].message.content)
 ```
 
-That append step is the core of chatbot memory.
+That append step is the core of chatbot memory. Post 05 covers this in depth, but the key takeaway for now: conversation state is a data structure outside the model.
 
-This cannot grow forever. As Post 02 showed, conversation history consumes tokens. In practice, applications usually choose one of three strategies:
-
-- keep only the most recent turns
-- summarize older turns into a shorter memory
-- store key facts separately in structured state
-
-Post 05 will cover conversation state in more depth. For now, the key takeaway is simple: multi-turn chat is explicit message replay.
-
----
-
-## Temperature and top_p: consistency versus variety
+Sampling parameters are also part of prompt design.
 
 ![Low and high sampling control comparison](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-04-temperature-and-top-p-consistency-versus.en.png)
 
 *Low and high sampling control comparison*
-Prompt wording is only part of output control. Sampling parameters matter too. The first two to learn are `temperature` and `top_p`.
-
-### `temperature`
-
-`temperature` affects how broadly the model explores likely next-token choices. Lower values usually make the answer more conservative and repeatable. Higher values usually allow more variation in wording and structure.
-
-- values near `0.0` favor consistency
-- higher values such as `0.7` or `0.9` allow more variation
-- extraction, classification, and strict formatting usually start low
-- brainstorming or copy ideation can tolerate higher values
-
-This script compares `temperature=0.0` and `temperature=0.9` with the same prompt.
 
 ```python
 import os
@@ -252,30 +208,9 @@ for temperature in (0.0, 0.9):
     print()
 ```
 
-### `top_p`
+At the beginner stage, two principles are enough: start with low `temperature` when format stability matters, and do not make large changes to both `temperature` and `top_p` simultaneously.
 
-`top_p` constrains token selection by cumulative probability mass. Lower values keep the model inside a narrower band of likely continuations. Higher values admit a wider range.
-
-At the beginner stage, two habits are enough:
-
-- start by adjusting `temperature` first
-- avoid making large changes to both `temperature` and `top_p` at the same time unless you have a specific reason
-
-Both parameters influence output diversity, so changing both aggressively makes results harder to explain.
-
----
-
-## A practical prompt structure pattern
-
-The most reusable beginner-friendly pattern is **instruction + context + output format**. Instead of writing one long request blob, split the prompt into three explicit parts.
-
-```text
-Instruction: what the model should do
-Context: who the answer is for or what situation matters
-Output format: how the answer should be shaped
-```
-
-That pattern maps cleanly into chat messages.
+The most reusable prompt structure is the instruction + context + output format pattern:
 
 ```python
 import os
@@ -309,15 +244,38 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
-This works well because the task is explicit, the background stays visible, and the output shape becomes testable.
+To make role separation repeatable in code, use a message-building function:
 
----
+```python
+from typing import Iterable
 
-## Placing few-shot examples inside the messages array
+def build_messages(
+    system_prompt: str,
+    user_prompt: str,
+    history: Iterable[dict[str, str]],
+) -> list[dict[str, str]]:
+    messages: list[dict[str, str]] = [{"role": "system", "content": system_prompt}]
+    messages.extend(history)
+    messages.append({"role": "user", "content": user_prompt})
+    return messages
 
-Few-shot prompting means showing the model one or more examples of the behavior you want before asking for the real answer. Post 04 will go deeper, but the basic mechanism is straightforward: the examples also live inside the same `messages` array.
+history = [
+    {"role": "assistant", "content": "Lists are mutable, while tuples are immutable."},
+]
 
-One common pattern is to add paired `user` and `assistant` examples before the final user request.
+messages = build_messages(
+    system_prompt="You are a concise Python tutor.",
+    user_prompt="Add one short example that shows when a tuple is safer.",
+    history=history,
+)
+
+for message in messages:
+    print(message)
+```
+
+With this structure fixed, failure modes become faster to read. If shared policy drifts, look at `system`. If prior turns are forgotten, look at the `assistant` replay logic. If output format is inconsistent, look at the output rules in `user` together with `temperature`. A prompt that does not separate roles also mixes the causes of its problems.
+
+Few-shot examples also go inside the same `messages` array:
 
 ```python
 import os
@@ -353,71 +311,121 @@ completion = client.chat.completions.create(
 print(completion.choices[0].message.content)
 ```
 
-This can be very effective, but every example consumes tokens. Short, representative examples usually work better than long ones.
-
----
-
-## Common prompt design mistakes
-
 ![Prompt mistakes that destabilize output](https://yeongseon-books.github.io/book-public-assets/assets/llm-app-foundations-101/03/03-05-common-prompt-design-mistakes.en.png)
 
 *Prompt mistakes that destabilize output*
-These mistakes show up repeatedly in first-generation LLM apps.
 
-### Putting shared policy only in the user message
+## Common misconceptions
 
-If every request repeats “answer in English,” “be concise,” and “return bullet points,” the prompt becomes harder to manage. Shared policy belongs in `system` unless there is a strong reason not to.
+- Repeating shared policy in `user` every time seems fine, but it multiplies change points and reduces stability.
+- Multi-turn conversation feels like built-in model memory, but it is actually application logic that re-sends `assistant` messages.
+- Expecting strict format from high `temperature` creates a conflict that cannot be resolved by prompt wording alone.
+- Adding more few-shot examples always seems better, but long examples can spend tokens without sharpening the pattern.
+- Vague terms like "better," "in detail," or "nicely" feel like sufficient control, but specific constraints — paragraph count, bullet count, key names — are far stronger.
 
-### Mixing instructions and raw data into one blob
+## Reusable prompt template patterns
 
-If the task, background, input data, and output rules are all packed into one paragraph, the model has to infer priorities. Explicit structure usually improves repeatability before it improves brilliance.
+Managing prompts as text blobs makes change history tangled quickly. In practice, separating templates and slots — keeping policy, context, and output contract as distinct variables — is safer.
 
-### Expecting memory without replaying history
+```python
+from dataclasses import dataclass
 
-If you do not re-send the earlier turns, the model cannot reliably refer back to them. Multi-turn quality problems often start here.
+@dataclass
+class PromptTemplate:
+    system_policy: str
+    instruction: str
+    output_contract: str
 
-### Using high temperature while demanding strict formatting
+BASE_TEMPLATE = PromptTemplate(
+    system_policy=(
+        "You are a backend Python tutor. "
+        "Do not guess unknown facts. "
+        "If information is missing, say what is missing explicitly."
+    ),
+    instruction="",
+    output_contract=(
+        "Return exactly this structure:\n"
+        "summary: <2 sentences>\n"
+        "example: <code block>\n"
+        "pitfall: <1 sentence>"
+    ),
+)
 
-Creative sampling and rigid structure pull in different directions. If the task is extraction, classification, or stable formatting, start with a lower temperature.
+def build_user_prompt(task: str, context: str) -> str:
+    return (
+        f"Instruction: {task}\n"
+        f"Context: {context}\n"
+        f"Output format: {BASE_TEMPLATE.output_contract}"
+    )
+```
 
-### Overspending tokens on long few-shot examples
+The advantage of this structure is that policy updates are centralized. When you need to strengthen a "no guessing" rule, changing `system_policy` in one place updates every path simultaneously.
 
-Examples should be compact and pattern-rich. Verbose examples often waste context budget without adding much steering value.
+### Prompt regression testing patterns
 
-### Using vague terms such as “better,” “nicely,” or “in detail”
+Prompt changes create regressions just like code changes. Maintaining a minimal snapshot test catches the moment output format breaks.
 
-Vague adjectives are weak control surfaces. Concrete constraints such as paragraph count, bullet count, JSON keys, or line limits are easier to evaluate.
+```python
+EXPECTED_KEYS = ["summary:", "example:", "pitfall:"]
 
-### Over-trusting one good sample
+def assert_output_contract(text: str) -> None:
+    for key in EXPECTED_KEYS:
+        if key not in text:
+            raise AssertionError(f"Missing contract key: {key}")
 
-A prompt is not validated because it worked once. Test it against different question types, edge cases, and parameter settings. Otherwise you end up shipping a lucky demo instead of a reliable pattern.
+def assert_no_forbidden_phrase(text: str) -> None:
+    forbidden = ["I guess", "maybe", "not sure"]
+    lowered = text.lower()
+    for phrase in forbidden:
+        if phrase in lowered:
+            raise AssertionError(f"Forbidden uncertainty phrase found: {phrase}")
+```
 
----
+If prompt engineering is to remain more than guesswork, these small, solid contract checks are necessary.
 
-## Closing thoughts
+### Provider role-mapping considerations
 
-The starting point of prompt engineering is not elegant phrasing. It is role-aware structure. Use `system` for persistent policy, `user` for the current request, and `assistant` for the history you want the next turn to see. Add careful parameter choices on top of that, and the same model becomes much more predictable.
+Role names are similar across providers, but SDK surfaces differ. OpenAI has both `responses` and `chat.completions` paths; Anthropic centers on `messages`. So it is better to fix roles to an internal standard first with a team-shared interface.
 
-The next post goes deeper into few-shot prompting and chain-of-thought.
+```python
+def normalize_messages(system_text: str, history: list[dict[str, str]], user_text: str):
+    return [{"role": "system", "content": system_text}, *history, {"role": "user", "content": user_text}]
+```
+
+The part that breaks most often when switching providers is not model performance — it is the message serialization layer. Separating that layer early makes future expansion far simpler.
 
 ## Operational checklist
 
-- [ ] Your code always orders `messages` as `system` → `user` → `assistant`
-- [ ] You have compared one user input answered with vs. without a system message
-- [ ] Hardcoded system prompts are extracted to a constant or config file
-- [ ] You have a test that synthesizes a multi-turn history with hand-crafted assistant messages
-- [ ] Format requirements (JSON, table, max length) are written into the system message explicitly
+- [ ] `system` holds shared policy, `user` holds the current request, `assistant` holds replay history.
+- [ ] You compared the same question with and without a system message to confirm the output difference directly.
+- [ ] Reusable system prompts are extracted to a constant or config file.
+- [ ] Multi-turn tests verify that `assistant` messages are explicitly re-sent.
+- [ ] Format requirements use concrete constraints — paragraph count, bullet count, key structure — not vague adjectives.
+
+## Summary
+
+The starting point of prompt engineering is not elegant phrasing. It is a role-separated message array. `system` fixes policy, `user` carries the current request, `assistant` restores history needed for the next turn. With this base structure in place, the same model produces far more predictable behavior.
+
+Three things to remember from this post. Shared rules belong in `system`. Multi-turn memory is application-reconstructed. Parameter tuning must be read alongside prompt structure. Once these three are separated, "why did the answer drift?" becomes much easier to explain.
+
+In practice, adding one more layer greatly improves stability: treat prompts as versioned change assets, and include template versioning and regression tests in your operational workflow. The ability to trace why results changed from the same model is what keeps a system maintainable long-term.
+
+Longer prompts do not guarantee better quality. Prompts with clear structure and explicit contracts produce more stable results than prompts that are merely longer.
+
+In operations, this principle connects directly to cost reduction and fewer incidents. Short, clear structure wins.
+
+The next post covers few-shot and chain-of-thought. This post was about separating roles. The next is about layering examples and step-by-step reasoning on top to steer answer patterns more strongly.
 
 ## Answering the Opening Questions
 
 - What responsibility belongs to `system`, `user`, and `assistant` messages?
-  - `system` carries shared policy and role, `user` carries the current request, and `assistant` carries replayed prior answers.
+  - `system` carries shared policy and role, `user` carries the current request, and `assistant` carries prior answer history.
 
 - Why is a system message stronger than just writing one more first sentence?
-  - A system message is part of the higher-priority instruction frame for the request, so it is more stable than another sentence inside the user prompt.
+  - A system message enters as a higher-priority instruction frame that the model should follow first on each request, making it more stable than an ordinary sentence inside the user prompt.
 
 - How do temperature, top_p, and few-shot examples affect answer stability?
-  - Temperature and top_p control sampling variance, while few-shot examples stabilize the answer shape by showing the pattern to copy.
+  - Temperature and top_p control sampling variance, while few-shot examples lock in the desired answer shape by demonstrating the pattern to follow.
 
 <!-- toc:begin -->
 ## In this series
@@ -439,7 +447,7 @@ The next post goes deeper into few-shot prompting and chain-of-thought.
 
 - [Groq Docs: Text chat](https://console.groq.com/docs/text-chat)
 - [Groq Python SDK](https://github.com/groq/groq-python)
-- [OpenAI Platform Docs: Text generation and messages](https://platform.openai.com/docs/guides/text)
+- [OpenAI Platform Docs: Messages and roles](https://platform.openai.com/docs/guides/text)
 - [Anthropic Docs: Prompt engineering overview](https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview)
 
 ### Related series
