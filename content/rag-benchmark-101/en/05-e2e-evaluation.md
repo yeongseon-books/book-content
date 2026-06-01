@@ -213,6 +213,237 @@ This post built an end-to-end evaluation loop with RAGAS, scoring faithfulness a
 
 Episode 6 — the final episode — combines every measurement tool from Episodes 1–5 into a single benchmark report.
 
+## Extending the end-to-end evaluation report for production use
+
+The biggest failure in end-to-end evaluation is keeping only aggregate scores and discarding sample-level evidence. In production you must explain *why* a score dropped, so store three layers together:
+
+1. Aggregate scores: faithfulness, answer relevancy, retrieval metrics
+2. Per-sample scores: question-level detail
+3. Evidence data: contexts, answer text, reference document IDs
+
+### Merging RAGAS output with retrieval output
+
+```python
+def merge_eval_rows(retrieval_rows, ragas_df):
+    merged = []
+    for idx, r in enumerate(retrieval_rows):
+        merged.append({
+            "query_id": r["query_id"],
+            "question": r["question"],
+            "ranked_ids": r["ranked_ids"],
+            "hit@5": r["hit@5"],
+            "mrr": r["mrr"],
+            "answer": r["answer"],
+            "faithfulness": float(ragas_df.iloc[idx]["faithfulness"]),
+            "answer_relevancy": float(ragas_df.iloc[idx]["answer_relevancy"]),
+        })
+    return merged
+```
+
+With this structure you can immediately filter for "retrieval hit but faithfulness miss" queries.
+
+### Explicit decision rules
+
+Scores without decision rules delay action. Define rules like these so that interpretation is instant.
+
+| Condition | Verdict | Next action |
+| --- | --- | --- |
+| hit@5 low + faithfulness low | Retrieval-generation dual failure | Review index, embedding, and prompt together |
+| hit@5 high + faithfulness low | Generation grounding failure | Force citation prompt, constrain answer format |
+| hit@5 low + faithfulness high | Retrieval miss | Chunking, query expansion, reranker |
+| answer relevancy low | Question interpretation failure | Fix system prompt and query normalization |
+
+### Pinning evaluator prompt versions
+
+LLM-as-judge changes score distributions when the evaluation prompt changes. Pin the prompt version in every report.
+
+```yaml
+evaluator:
+  provider: groq
+  model: llama-3.1-8b-instant
+  temperature: 0
+  prompt_version: ragas-faithfulness-v3
+  max_workers: 1
+```
+
+Without a recorded prompt version, you cannot tell whether next month's score shift came from the model or from the evaluation criteria.
+
+### Linking to LangSmith traces
+
+To reproduce per-question failures quickly, connect each row to an execution trace.
+
+```python
+trace_row = {
+    "query_id": query_id,
+    "run_id": run_id,
+    "langsmith_trace_url": trace_url,
+    "faithfulness": faithfulness,
+    "answer_relevancy": answer_relevancy,
+}
+```
+
+When low-score rows link directly to traces, debugging time drops significantly.
+
+### Sample RAGAS text output
+
+```text
+RAGAS aggregate:
+  faithfulness: 0.872
+  answer_relevancy: 0.846
+
+Worst cases by faithfulness:
+  q-014: 0.41 (question: "What happens if IVF nprobe is set to 1?")
+  q-033: 0.45 (question: "Recommended chunk overlap value?")
+```
+
+This output is far more actionable than a single average. The team can open the two or three worst cases and start root-cause analysis immediately.
+
+### Production evaluation run policy
+
+| Run type | Sample size | Frequency | Purpose |
+| --- | ---: | --- | --- |
+| PR lightweight | 30-50 | Every PR | Fast regression detection |
+| Nightly standard | 200-400 | Daily | Trend monitoring |
+| Pre-release full | 500+ | Before release | Approval evidence |
+
+Documenting this policy creates organizational agreement on "when to trust which score."
+
+## Appendix — end-to-end evaluation thresholds and failure sample records
+
+End-to-end evaluation is not about hitting a score target — it is about managing risky questions. Keep threshold policies and sample retention policies together.
+
+### Threshold policy example
+
+| Metric | Warn | Block | Note |
+| --- | ---: | ---: | --- |
+| faithfulness | < 0.86 | < 0.82 | Hallucination risk rises |
+| answer relevancy | < 0.84 | < 0.80 | Off-topic answers increase |
+| retrieval hit@5 | < 0.90 | < 0.86 | Evidence document misses increase |
+
+Do not tighten the block threshold all at once. Observe baseline distributions for two or more weeks, then adjust incrementally.
+
+### Failure sample storage format
+
+```json
+{
+  "query_id": "q-108",
+  "question": "What tradeoffs appear when nprobe is reduced?",
+  "contexts": ["..."],
+  "answer": "...",
+  "scores": {
+    "faithfulness": 0.41,
+    "answer_relevancy": 0.79,
+    "hit@5": 1.0
+  },
+  "diagnosis": "retrieval-ok-generation-hallucination"
+}
+```
+
+Adding a `diagnosis` classification key lets you aggregate regression cases by type quickly.
+
+### Evaluation run stability configuration
+
+```python
+from ragas.run_config import RunConfig
+
+run_config = RunConfig(
+    timeout=300,
+    max_workers=1,
+    max_retries=2,
+    retry_wait=2,
+)
+```
+
+Evaluation pipelines depend heavily on external APIs. Without explicit timeout/retry settings, flaky failures multiply.
+
+### Summary table showing retrieval and generation quality together
+
+| Bucket | Questions | avg hit@5 | avg faithfulness | avg answer relevancy |
+| --- | ---: | ---: | ---: | ---: |
+| Easy | 80 | 0.97 | 0.92 | 0.90 |
+| Medium | 90 | 0.91 | 0.86 | 0.85 |
+| Hard | 40 | 0.82 | 0.76 | 0.79 |
+
+This table exposes quality gaps by difficulty, making improvement prioritization practical.
+
+### Failure case labeling scheme
+
+| Label | Meaning |
+| --- | --- |
+| retrieval-miss | Ground-truth document not retrieved |
+| grounded-but-offtopic | Evidence present but answer irrelevant to question |
+| hallucination-with-confidence | Confident answer with no supporting evidence |
+| citation-format-error | Source document citation format broken |
+
+Fixed labels let you track failure-rate changes in monthly quality reviews.
+
+Maintain the labeling scheme with at least weekly spot checks. Automated labeling rules can accumulate bias over time. Keeping a human-verified label sample as a baseline stabilizes the interpretation quality of the evaluation pipeline.
+
+When sharing evaluation reports, include improved cases alongside failures. If only failures accumulate, teams find causes but never reuse success patterns. Recording successes helps propagate effective prompt and retrieval configurations faster.
+
+### Batch RAGAS evaluation code extension
+
+In practice, outputting only averages makes debugging difficult. Store per-sample scores alongside input data so that regression analysis is possible.
+
+```python
+import pandas as pd
+
+result = evaluate(
+    dataset=dataset,
+    metrics=[Faithfulness(), AnswerRelevancy(strictness=1)],
+    llm=ragas_llm,
+    embeddings=ragas_emb,
+    run_config=RunConfig(timeout=300, max_workers=1),
+)
+
+score_df = result.to_pandas()
+full_df = pd.concat([dataset.to_pandas(), score_df], axis=1)
+full_df.to_csv("ragas_report.csv", index=False)
+
+print(full_df[["question", "faithfulness", "answer_relevancy"]].head(10))
+```
+
+Attach this file as a PR artifact. When scores drop, you can trace exactly which questions collapsed.
+
+### End-to-end test script example
+
+Deployment pipelines need a single script that runs retrieval + generation + evaluation and exits non-zero on failure.
+
+```python
+# !/usr/bin/env python3
+import json
+import sys
+
+from my_rag_eval import run_rag_eval  # returns dict with aggregate scores
+
+THRESHOLDS = {
+    "faithfulness": 0.85,
+    "answer_relevancy": 0.82,
+}
+
+def main() -> int:
+    report = run_rag_eval(sample_size=50)
+    print(json.dumps(report, ensure_ascii=False, indent=2))
+
+    for metric, minimum in THRESHOLDS.items():
+        score = report["aggregate"][metric]
+        if score < minimum:
+            print(f"FAIL: {metric}={score:.3f} < {minimum:.3f}")
+            return 1
+
+    print("PASS: e2e RAG evaluation thresholds satisfied")
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())
+```
+
+Running this nightly in CI catches the impact of index or prompt changes on actual answer quality early.
+
+### Evaluation cost and stability management
+
+RAGAS is useful but costs money, so separate run policies by context. Use 30-50 samples per PR for fast regression checks; run 300+ samples nightly for stable trend observation. Periodically re-evaluate the same fixed dataset to monitor evaluator model drift — this helps separate app-quality changes from judge-quality changes.
+
 ## Answering the Opening Questions
 
 - **If retrieval metrics improve but final answers are poor, which layer should be inspected next?**
