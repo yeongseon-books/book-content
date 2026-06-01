@@ -292,6 +292,62 @@ def execute_python_safely(code: str, timeout: float = 5.0) -> dict:
 
 Stronger isolation uses containers (gVisor, Firecracker) or WebAssembly runtimes. If a production agent exposes arbitrary code execution, container-grade isolation is the minimum.
 
+### Tool Registration Manifest and Contract Validation
+
+Once you have more than ten tools, understanding which tool is exposed in which environment from code alone becomes impractical. At this point, separate registration metadata into a manifest file and declare side-effect classification and approval requirements explicitly.
+
+```yaml
+# tools.yaml
+tools:
+  - name: lookup_order
+    version: v1
+    side_effect: none
+    idempotent: true
+    requires_approval: false
+    input_schema: LookupOrderInput
+  - name: issue_refund
+    version: v2
+    side_effect: write
+    idempotent: true
+    requires_approval: true
+    approval_rule: amount_ge_100
+    input_schema: IssueRefundInput
+  - name: send_customer_email
+    version: v1
+    side_effect: external_send
+    idempotent: false
+    requires_approval: true
+    approval_rule: always
+    input_schema: SendEmailInput
+```
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class ToolManifest:
+    name: str
+    version: str
+    side_effect: str
+    idempotent: bool
+    requires_approval: bool
+    input_schema: str
+
+def validate_manifest(m: ToolManifest) -> None:
+    if m.side_effect in {"write", "external_send"} and not m.requires_approval:
+        raise ValueError(f"dangerous tool must require approval: {m.name}")
+    if m.name.startswith("send_") and m.side_effect != "external_send":
+        raise ValueError(f"send_* tool must declare external_send side effect: {m.name}")
+```
+
+Run manifest validation at boot time. This catches the common mistake of adding a new send tool without wiring up an approval gate — before the code ever reaches production.
+
+Tool versioning strategy matters as well. When an input schema changes, run the old and new versions in parallel (`issue_refund_v1`, `issue_refund_v2`) rather than overwriting in place. Agent-learned call patterns do not update instantly, so run trajectory tests and shadow executions during the transition window to confirm compatibility.
+
+A deprecation policy is also essential. Keep the v1 tool in read-only mode for 30 days while emitting warning events. Track remaining call paths, then remove safely. Tool Harness maturity is measured not by how fast you add tools, but by how safely you retire old ones.
+
+Tool documentation directly affects operational quality. For each tool, maintain two input examples (success and failure), expected error codes, and retry eligibility in a consistent format. When the schema the agent reads matches the operational docs an engineer reads, incident response time drops significantly.
+
 ---
 
 ## Common Mistakes
