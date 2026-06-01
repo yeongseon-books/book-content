@@ -282,6 +282,112 @@ def test_classification_snapshot(deterministic_agent):
 
 Snapshot tests are weak against intentional changes. When you intentionally change the output, you must update the snapshot — and a human must judge whether the update is intent or mistake. Make this a key item in PR review.
 
+### Trajectory Testing and Tool-Call Contracts
+
+A commonly missed testing dimension is intermediate-path verification. If you only check the final output, you cannot distinguish between accidentally correct results and reliably correct ones. Trajectory tests verify which tools were called, in what order, and within what budget.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class ExpectedStep:
+    tool: str
+    max_calls: int
+
+def assert_trajectory(actual_calls: list[dict], expected: list[ExpectedStep]) -> None:
+    counts: dict[str, int] = {}
+    for call in actual_calls:
+        counts[call["tool"]] = counts.get(call["tool"], 0) + 1
+
+    for step in expected:
+        used = counts.get(step.tool, 0)
+        if used == 0:
+            raise AssertionError(f"required tool not called: {step.tool}")
+        if used > step.max_calls:
+            raise AssertionError(f"tool overused: {step.tool} ({used}>{step.max_calls})")
+
+def test_refund_trajectory(refund_agent):
+    result = refund_agent.run({"intent": "refund", "order_id": "ord_1001", "amount": 250})
+    assert result.status == "completed"
+    assert_trajectory(
+        actual_calls=result.tool_calls,
+        expected=[
+            ExpectedStep("lookup_order", 1),
+            ExpectedStep("calc_refund", 1),
+            ExpectedStep("issue_refund", 1),
+        ],
+    )
+```
+
+This test serves a different purpose than a functional test. Even if the output text is identical, trajectory tests catch regressions where unnecessary tool calls creep in.
+
+### Eval Metrics Design: Beyond Pass/Fail
+
+A single average score is insufficient for production deployments. At minimum, track pass rate, safety violation rate, cost, latency, and approval bypass rate together.
+
+```python
+@dataclass
+class EvalMetrics:
+    pass_rate: float
+    policy_violation_rate: float
+    approval_bypass_rate: float
+    avg_tool_calls: float
+    p95_latency_ms: float
+    avg_cost_usd: float
+
+def compute_metrics(rows: list[dict]) -> EvalMetrics:
+    n = len(rows)
+    lat = sorted(r["latency_ms"] for r in rows)
+    p95 = lat[int(max(0, n - 1) * 0.95)] if n else 0.0
+    return EvalMetrics(
+        pass_rate=sum(1 for r in rows if r["passed"]) / n if n else 0.0,
+        policy_violation_rate=sum(1 for r in rows if r["policy_violation"]) / n if n else 0.0,
+        approval_bypass_rate=sum(1 for r in rows if r["approval_bypass"]) / n if n else 0.0,
+        avg_tool_calls=sum(r["tool_calls"] for r in rows) / n if n else 0.0,
+        p95_latency_ms=p95,
+        avg_cost_usd=sum(r["cost_usd"] for r in rows) / n if n else 0.0,
+    )
+```
+
+Practical thresholds as a starting point: pass_rate ≥ 0.90, policy_violation_rate ≤ 0.01, approval_bypass_rate = 0, p95 latency ≤ 8 s, avg_cost_usd per run ≤ $0.05. Adjust numbers per service, but maintain the principle of watching multiple dimensions simultaneously.
+
+### Failure-to-Regression Loop
+
+Where a Test Harness truly raises team quality is in the speed of converting production failures into eval cases. If you defer a discovered failure to next week, the same failure repeats. The ideal flow: create a minimal reproduction case on the day of the incident, and include it in the regression suite starting with the next PR.
+
+```python
+@dataclass
+class RegressionCase:
+    case_id: str
+    source_trace_id: str
+    input_payload: dict
+    expected_constraints: dict
+    severity: str
+
+def build_regression_case_from_trace(trace: dict) -> RegressionCase:
+    return RegressionCase(
+        case_id=f"reg-{trace['trace_id']}",
+        source_trace_id=trace["trace_id"],
+        input_payload=trace["input"],
+        expected_constraints={
+            "no_policy_violation": True,
+            "max_tool_calls": 6,
+            "approval_bypass": False,
+        },
+        severity=trace.get("severity", "medium"),
+    )
+
+def test_regression_case(agent, case: RegressionCase):
+    result = agent.run(case.input_payload)
+    assert not result.policy_violation
+    assert len(result.tool_calls) <= case.expected_constraints["max_tool_calls"]
+    assert not result.approval_bypass
+```
+
+This structure links postmortem documents to test code. Keeping the `trace_id` in case metadata lets anyone trace back to "why does this test exist" immediately.
+
+The reusability across ops and dev teams is equally important. When a failure pattern from an incident review is pinned as a test name, improvement work is no longer "should get better" — it is confirmed by pass/fail in the next release.
+
 ---
 
 ## Common Mistakes
