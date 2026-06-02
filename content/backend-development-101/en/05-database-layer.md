@@ -178,16 +178,82 @@ Loading the children in *one shot* eliminates N+1.
 
 ## How This Shows Up in Production
 
-Most backends start with *PostgreSQL + ORM + Alembic + Repository*. As traffic grows you add read replicas, Redis, or Elasticsearch — and the service is untouched. Only the inside of the repository changes. That boundary is what lets the system *evolve*.
+Most backends start with *PostgreSQL + ORM + Alembic + Repository*. As traffic grows you add read replicas, Redis, or Elasticsearch—and the service is untouched. Only the inside of the repository changes.
+
+### N+1 Query Detection and Resolution
+
+N+1 means loading a parent list, then issuing one query per child. 50 orders with items = 51 queries instead of 2.
+
+| Strategy | Mechanism | Best for |
+| --- | --- | --- |
+| `selectinload` | Parent query + single IN query for children | General 1:N list APIs |
+| `joinedload` | Single JOIN, fewer round-trips | Small child count, immediate render |
+| Subquery-based | Manual control, flexible filtering | Complex filters + sorting |
+
+```python
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
+
+stmt = (
+    select(OrderModel)
+    .options(selectinload(OrderModel.items))
+    .order_by(OrderModel.created_at.desc())
+    .limit(50)
+)
+orders = session.scalars(stmt).all()
+```
+
+Detect N+1: enable SQLAlchemy `echo=True` in dev, track queries-per-request in APM (Datadog, New Relic).
+
+### Connection Pool Exhaustion
+
+Symptoms: `QueuePool limit reached`, cascading API timeouts.
+
+```sql
+-- Check active connections (PostgreSQL)
+SELECT state, count(*) AS cnt
+FROM pg_stat_activity
+WHERE datname = 'app'
+GROUP BY state ORDER BY cnt DESC;
+
+-- Find long-running transactions
+SELECT pid, now() - xact_start AS tx_age, state, query
+FROM pg_stat_activity
+WHERE xact_start IS NOT NULL
+ORDER BY tx_age DESC LIMIT 10;
+```
+
+Fixes: request-scoped session (`try/finally close`), separate pool for batch workers, align `max_connections` with app pool size, short statement timeouts.
+
+### Indexing: When Milliseconds Become Seconds
+
+"Fast locally, slow in prod" is usually a missing index hidden by small dev datasets.
+
+```sql
+EXPLAIN ANALYZE
+SELECT id, email FROM users WHERE email = 'alice@example.com';
+-- Seq Scan = index candidate
+-- After adding index: Index Scan or Bitmap Index Scan
+```
+
+Index candidates: columns in WHERE/JOIN/ORDER BY with high selectivity, pagination keys (`created_at`, `id`).
+
+### Four Production Scenarios
+
+| Scenario | Symptom | Root cause | Fix |
+| --- | --- | --- | --- |
+| Slow only in prod | p95 jumps 80ms → 1.8s | Missing composite index | Add via migration, verify with EXPLAIN |
+| Data mismatch after deploy | New code can't find column | Skipped migration step | Force migration in deploy pipeline |
+| Pool exhaustion under load | `QueuePool limit reached` | Leaked sessions + long txns | Shorten session life, split pools |
+| List API suddenly 10x slower | Pagination breaks at offset 50k | Sequential scan on large offset | Switch to keyset pagination |
 
 ## How a Senior Engineer Thinks
 
-- Every query is checked against an *index*.
-- Every migration writes a *down* path too.
-- Repository methods speak the *domain language* (`find_active_users`).
-- Transactions stay *as short as possible*.
-- The slow-query log is *always* on in production.
-
+- **Every query is checked against an index.** Before merging any new query, run `EXPLAIN ANALYZE` on production-scale data. An index that costs 5 minutes to add prevents hours of firefighting.
+- **Every migration writes a down path.** Rollback without a reverse migration means manual SQL at 3 AM. Even if you never use it, writing `downgrade()` forces you to verify reversibility.
+- **Repository methods speak the domain language.** `find_active_users()` not `get_by_status_true()`. Domain naming makes the service layer readable without knowing SQL details.
+- **Transactions stay as short as possible.** Long transactions hold locks, block other queries, and exhaust connection pools. Do computation outside the transaction; commit only the write.
+- **The slow-query log is always on in production.** It's your early warning system. Set threshold to 100ms, review weekly, create indexes proactively.
 ## Checklist
 
 - [ ] You can put SQL behind a repository.
