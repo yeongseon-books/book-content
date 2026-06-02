@@ -142,15 +142,70 @@ print("expected cost:", cost)
 
 ## How This Shows Up in Production
 
-Teams pair a *primary metric* with *guardrail metrics*. Example: primary = *recall*, guardrail = *precision >= 0.7*.
+Teams pair a *primary metric* with *guardrail metrics*. Example: primary = recall, guardrail = precision ≥ 0.7.
+
+### Metric Selection Guide
+
+| Metric | Question It Answers | Strength | Weakness | Best For |
+| --- | --- | --- | --- | --- |
+| Accuracy | Overall correct ratio? | Intuitive | Misleading with imbalance | Balanced classes |
+| Precision | Of positive predictions, how many correct? | Controls false alarms | Misses false negatives | Alert fatigue problems |
+| Recall | Of actual positives, how many caught? | Controls misses | May increase false positives | Detection / diagnosis |
+| F1 | Balance of precision and recall? | Single compromise number | Does not encode cost difference | Balanced decision |
+| ROC AUC | Discrimination across all thresholds? | Threshold-independent | Still need to pick a threshold | Model comparison |
+
+### Confusion Matrix Interpretation
+
+```python
+from sklearn.metrics import confusion_matrix, classification_report
+
+cm = confusion_matrix(y_test, y_pred)
+print(cm)
+print(classification_report(y_test, y_pred, digits=4))
+
+TN, FP, FN, TP = cm.ravel()
+print({"false_positive": int(FP), "false_negative": int(FN)})
+```
+
+The key is re-reading FP/FN through a cost lens. In medical screening, FN cost dwarfs FP cost, so a recall-first strategy is natural.
+
+### Threshold Tuning on Validation
+
+```python
+import numpy as np
+from sklearn.metrics import f1_score
+
+proba = model.predict_proba(X_valid)[:, 1]
+thresholds = np.linspace(0.1, 0.9, 17)
+records = []
+for t in thresholds:
+    pred = (proba >= t).astype(int)
+    records.append((t, f1_score(y_valid, pred)))
+
+best_t, best_f1 = max(records, key=lambda x: x[1])
+print("best_threshold:", round(best_t, 2), "best_f1:", round(best_f1, 4))
+```
+
+This step connects "model score" to "operational policy." Without a fixed threshold, the model outputs probabilities but no action is defined.
+
+### Evaluation Report Template
+
+- Data version: `churn_v2026_05`
+- Primary metric: Recall@threshold=0.35
+- Guardrail: Precision ≥ 0.70
+- Cost function: `5 * FN + 1 * FP`
+- Deploy decision: meets/does not meet criteria + reasoning
+
+Evaluation is not the end of an experiment — it is the starting point of operations.
 
 ## How a Senior Engineer Thinks
 
-- Pick the *metric with the problem*.
+- Pick the *metric that matches the problem*.
 - Document the *cost matrix* in writing.
 - Separate *primary* from *guardrails*.
 - Tune *thresholds on validation*, never on test.
 - Treat *metric changes* as *PR-worthy*.
+- Evaluation connects model scores to deployment decisions — without cost framing, scores are just numbers.
 
 ## Checklist
 
