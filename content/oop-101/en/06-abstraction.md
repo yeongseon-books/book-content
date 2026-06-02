@@ -386,6 +386,224 @@ In practice, many Python codebases mix both styles: ABC for internal team-owned 
 
 Abstraction becomes useful when one workflow needs multiple implementations and the caller can no longer tolerate private naming conventions. Use ABC when your team needs an explicit contract and shared workflow defaults. Use Protocol when compatibility matters more than inheritance. In the next article, we compare composition and inheritance so you can choose where behavior should live in the first place.
 
+## Abstraction Quality Is Measured by the Contract Left Behind, Not by What Was Hidden
+
+Good abstraction hides implementation details while leaving the rules callers depend on clearly visible.
+
+```text
+[OrderUseCase]
+  + execute(command)
+     |
+     +--> [OrderRepository] (abstract)
+     +--> [PaymentGateway] (abstract)
+
+Implementations
+OrderRepository <- SqlOrderRepository, InMemoryOrderRepository
+PaymentGateway  <- MockGateway, RealGateway
+```
+
+## Before and After: From Concrete Dependency to Port-Adapter Structure
+
+```python
+# before
+class OrderUseCase:
+    def execute(self, order_id: str, amount: int) -> str:
+        conn = sqlite3.connect('orders.db')
+        # storage, payment, and logging all mixed together
+        return 'ok'
+```
+
+```python
+# after
+from abc import ABC, abstractmethod
+
+class OrderRepository(ABC):
+    @abstractmethod
+    def save(self, order_id: str, amount: int) -> None:
+        pass
+
+class PaymentGateway(ABC):
+    @abstractmethod
+    def charge(self, order_id: str, amount: int) -> str:
+        pass
+
+class OrderUseCase:
+    def __init__(self, repo: OrderRepository, gateway: PaymentGateway) -> None:
+        self.repo = repo
+        self.gateway = gateway
+
+    def execute(self, order_id: str, amount: int) -> str:
+        if amount <= 0:
+            raise ValueError('amount must be positive')
+        self.repo.save(order_id, amount)
+        return self.gateway.charge(order_id, amount)
+```
+
+## Violation Cases
+
+| Violation | Symptom | Fix |
+|---|---|---|
+| Concrete SQL mixed into abstract class | Layer boundary collapse | Keep only contracts in ports |
+| Use case returns external SDK types directly | Upper layer pollution | Convert to domain DTO |
+| Over-granular abstraction | Implementation class explosion | Consolidate interfaces by change axis |
+
+## Comparison: Shallow Abstraction vs Over-Abstraction
+
+| Aspect | Shallow Abstraction | Over-Abstraction |
+|---|---|---|
+| Advantage | Easy to understand | High swap flexibility |
+| Disadvantage | Implementation leakage possible | High learning cost |
+| When to apply | Internal code with low change frequency | External dependencies, high replaceability |
+
+## Real-World Scenario: Building a Structure That Survives Requirement Changes
+
+In production, rule changes happen more often than feature additions. When evaluating class structures, "how many files must change for the next requirement" is a safer criterion than "does it work now."
+
+```python
+from dataclasses import dataclass
+from typing import Protocol
+
+
+@dataclass
+class LineItem:
+    name: str
+    quantity: int
+    unit_price: int
+
+    def subtotal(self) -> int:
+        return self.quantity * self.unit_price
+
+
+class DiscountPolicy(Protocol):
+    def apply(self, amount: int) -> int:
+        ...
+
+
+class NoDiscount:
+    def apply(self, amount: int) -> int:
+        return amount
+
+
+class PercentDiscount:
+    def __init__(self, percent: int) -> None:
+        if not 0 <= percent <= 100:
+            raise ValueError('percent must be 0..100')
+        self.percent = percent
+
+    def apply(self, amount: int) -> int:
+        return int(amount * (100 - self.percent) / 100)
+
+
+class Invoice:
+    def __init__(self, items: list[LineItem], policy: DiscountPolicy) -> None:
+        self.items = items
+        self.policy = policy
+
+    def total(self) -> int:
+        base = sum(i.subtotal() for i in self.items)
+        return self.policy.apply(base)
+```
+
+When the discount rule changes, `Invoice.total()` needs no modification. Extension stays closed through implementation class additions, while the core flow remains stable.
+
+## UML-Style Collaboration View
+
+```text
+[Invoice]
+  - items: list[LineItem]
+  - policy: DiscountPolicy
+  + total()
+
+[LineItem]
+  + subtotal()
+
+[DiscountPolicy] <<interface>>
+  + apply(amount)
+      ^
+      +-- [NoDiscount]
+      +-- [PercentDiscount]
+```
+
+Writing collaboration structures as text UML lets code reviews quickly align on "which axis is the policy axis and which is the domain axis."
+
+## Anti-Patterns and Correction Procedures
+
+| Anti-Pattern | Detection Signal | Correction Sequence |
+|---|---|---|
+| God Object | 20+ methods, scattered change history | Decompose by responsibility axis → derive collaboration interfaces |
+| Data-only empty class | Only getters/setters, no methods | Move rule methods in, or simplify to dataclass |
+| Inheritance tree bypass branching | Type-check branches on subclass types | Redefine polymorphic contract |
+| Infrastructure type leakage | Domain layer depends on SDK response objects | Add DTO conversion layer |
+
+## Before and After: Test Maintenance Cost
+
+| Item | Before Refactoring | After Refactoring |
+|---|---|---|
+| Test setup | Global state initialization required | Per-object state creation |
+| Failure root-cause tracing | Trace entire function chain | Per-method tracing |
+| Regression scope | Broad and unpredictable | Narrow and predictable |
+
+## Team Adoption Checklist
+
+- Verify that domain terms and class names match.
+- Confirm invariants are fully established at instance creation time.
+- Check that policy changes are possible through implementation additions, not existing code modifications.
+- In code reviews, agree on collaboration structure with 10-line UML text first.
+- Ensure test names describe business rules rather than method names.
+
+## Mini Case Study: Validating with One Rule Addition
+
+The example below is the minimal unit that adds a policy extension without modifying existing code.
+
+```python
+class WeekendPolicy:
+    def apply(self, amount: int, is_weekend: bool) -> int:
+        if is_weekend:
+            return int(amount * 0.95)
+        return amount
+
+
+def estimate(amount: int, is_weekend: bool) -> int:
+    policy = WeekendPolicy()
+    return policy.apply(amount, is_weekend)
+```
+
+The key point is that new policies enter without breaking call paths. Keeping change history confined to the policy class reduces regression risk.
+
+| Verification Question | Pass Criterion |
+|---|---|
+| Does adding a new policy require modifying existing functions? | No |
+| Does the exception policy share the same contract? | Yes |
+| Are tests separated per policy? | Yes |
+
+## Design Quality Verification Questions
+
+These questions are used repeatedly during post-implementation reviews.
+
+- Does the exception type and message match the caller's contract when this method fails?
+- Is the same rule duplicated in other classes or functions?
+- Does state mutation happen through exactly one method path?
+- Can the unit be tested without external dependencies?
+
+```python
+def review_signal(duplicate_rules: int, mutable_paths: int) -> str:
+    if duplicate_rules > 0:
+        return 'duplicate rule removal needed'
+    if mutable_paths > 1:
+        return 'consolidate state mutation paths'
+    return 'structure stable'
+```
+
+Applying these checks even to article-level examples helps readers understand OOP as a maintenance strategy rather than mere syntax.
+
+## One-Line Summary Extension
+
+OOP quality is judged not by class count but by how much change propagation has been reduced.
+
+## Supplementary Note
+
+Design choices are not about finding the "right answer"—they are decisions that lower change cost. Defining boundaries first simplifies both reviews and tests, even for the same functionality.
+
 ## Answering the Opening Questions
 
 - **When does duck typing convention alone become insufficient?**
