@@ -187,16 +187,70 @@ docker compose logs --tail=100
 
 ## How This Shows Up in Production
 
-*Local development* runs on *Compose*; *production* runs on *Kubernetes*; the *same image* is operated by *different orchestrators*.
+Local development runs on Compose; production runs on Kubernetes; the same image is operated by different orchestrators. The key insight: if your local Compose file and production manifest produce different behavior, one of them is wrong.
+
+### Production-Ready Compose Template
+
+```yaml
+services:
+  api:
+    build:
+      context: .
+      target: runtime
+    image: myorg/containers101-api:latest
+    environment:
+      - APP_ENV=production
+      - DB_HOST=db
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    read_only: true
+    cap_drop: ["ALL"]
+
+  db:
+    image: postgres:16
+    environment:
+      - POSTGRES_USER=app
+      - POSTGRES_PASSWORD=app
+      - POSTGRES_DB=app
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  pgdata:
+```
+
+### Pre-Deploy Verification Routine
+
+```bash
+docker compose config          # catch variable/syntax errors early
+docker compose up -d --build   # build and start
+docker compose ps              # confirm running state
+docker compose logs --tail=200 # check for startup errors
+curl -f http://127.0.0.1:8000/health  # end-to-end proof
+```
+
+Run `docker compose config` first — it catches substitution errors and YAML issues before containers start.
+
+### Series Conclusion
+
+Container proficiency is not about memorizing commands. It's about boundary design: images, runtime, networks, storage, security, and orchestration signals woven into one operational contract. When that contract lives in code and automation, your team operates reliably without depending on individual expertise.
 
 ## How a Senior Engineer Thinks
 
-- A *one-line bring-up* defines *onboarding cost*.
-- The *healthcheck* is the *signal for orchestration*.
-- *Env vars* should be the *only difference* across environments.
-- *Logs* go to *stdout*.
-- Even *teardown* is automated.
-
+- A one-line bring-up (`docker compose up`) defines onboarding cost.
+- The healthcheck is the signal that orchestration depends on.
+- Env vars should be the only difference across environments.
+- Logs go to stdout — always.
+- Even teardown is automated and documented.
+- If local Compose and production K8s manifest diverge, fix it immediately.
 ## Checklist
 
 - [ ] *Non-root* at runtime.
