@@ -189,6 +189,125 @@ Git shows up in real development environments in several recurring places.
 
 When you are first learning Git, the most useful exercise is not memorizing commands but picturing where each change currently sits — working directory, staging area, or repository.
 
+## Practical CLI Scenario
+
+The following example shows the most common workflow: work on a feature branch, then merge into main. The key operating principle is "keep work units small, check status frequently, and resolve conflicts quickly."
+
+```bash
+git switch main
+git pull --ff-only origin main
+git switch -c feature/auth-session
+git status
+git add app/auth.py tests/test_auth.py
+git commit -m "feat(auth): add session refresh flow"
+git push -u origin feature/auth-session
+```
+
+Placing `git pull --ff-only` at the beginning prevents branching off a stale local main that has diverged from the remote. Repeating `git status` just before committing catches unwanted files before they enter history.
+
+Here is why the commands follow this order:
+
+1. `git switch main`: sets the starting point to the latest main.
+2. `git pull --ff-only origin main`: synchronizes in a straight line without a merge commit.
+3. `git switch -c feature/...`: isolates the change purpose in the branch name.
+4. `git add ...` + `git commit ...`: locks in only the logically grouped changes.
+5. `git push -u ...`: sets the remote tracking relationship so that later push/pull commands are simpler.
+
+A few supplementary commands are also worth learning early:
+
+```bash
+# View the last 5 commits with graph decoration
+git log --oneline --decorate --graph -n 5
+
+# Inspect the most recent commit
+git show --stat
+
+# Compare unstaged vs staged changes separately
+git diff
+git diff --staged
+```
+
+Making `git diff --staged` a habit right before committing reduces both "unwanted files included" and "required files missing" at the same time.
+
+## Choosing a Branch Strategy
+
+In practice the strategy itself matters less than "what release cadence does the team follow?" The table below compares three strategies that entry-level teams most often evaluate.
+
+| Strategy | Characteristics | Best Fit | Watch Out |
+|---|---|---|---|
+| Trunk-based | Short-lived branches, fast merge | Teams with frequent deploys and strong test automation | Without a small-PR discipline, main becomes unstable |
+| GitHub Flow | main + feature branch + PR | SaaS / web services with continuous deployment | You must define environment-specific deploy policies separately |
+| Git Flow | Multiple long-lived branches (develop/release/hotfix) | Product organizations with fixed release windows | Many branches raise operational complexity |
+
+For beginners, starting with GitHub Flow is the safest choice. The rules are simple and it pairs well with Pull-Request-centric collaboration tools. When release requirements grow more complex later, you can extend by adding release branches.
+
+Operational rules that should be decided before the strategy itself:
+
+- Maximum PR size (e.g., around 300 lines)
+- Review SLA (e.g., 24 hours on business days)
+- Merge conditions (required checks, number of approvals)
+- Hotfix path (no direct push to main, at least one approval)
+
+Picking a branch strategy without filling in these operational rules leads to wide quality variance across teams even under the same strategy. Git is a tool; quality comes from rules.
+
+## Standardizing Conflict Resolution
+
+A conflict is not a failure — it is a natural signal of concurrent work. What matters is aligning the resolution sequence and verification procedure as a shared team standard.
+
+1. Identify the conflicting files and decide which change is correct according to domain rules.
+2. Remove the markers (`<<<<<<<`, `=======`, `>>>>>>>`) while leaving only the intended final code.
+3. Run unit tests and static analysis to verify no syntax or behavioral regression.
+4. Record the conflict resolution in a dedicated commit so reviewers can read the reasoning.
+
+```bash
+git fetch origin
+git switch feature/auth-session
+git merge origin/main
+# After resolving conflicts
+git add app/auth.py tests/test_auth.py
+git commit -m "merge: resolve auth-session conflicts with main"
+pytest -q
+git push
+```
+
+If your team uses `rebase` instead of `merge`, only the final history shape differs — the principle of resolving and verifying conflicts remains the same. Skipping tests right after a conflict resolution creates a state where "the merge succeeded but the behavior is broken," so always attach automated verification.
+
+Prevention rules that reduce conflicts:
+
+- Sync with main frequently instead of holding the same file for a long time.
+- Merge large-scale refactoring separately from feature changes, and merge it first.
+- Isolate mechanical changes (formatter adoption, import sorting) into a separate PR.
+
+You cannot reduce conflicts to zero, but you can ensure that "even when a conflict appears, its cause and resolution scope are obvious."
+
+## Raising Review Quality with Operational Tips
+
+- In a PR description, write "why this choice was made" before "what changed."
+- If the file count is large, split commits by functional unit so the reviewer can follow the logical flow.
+- Use `git range-diff` to clearly compare commits before and after review feedback is applied.
+- For urgent fixes (hotfixes), use a small PR instead of pushing directly to main to preserve history and approval records.
+
+Following these four points improves collaboration stability far more quickly than knowing many Git commands.
+
+A simple template that helps during the review stage:
+
+```text
+## Change Background
+- What user/operational problem does this change reduce?
+
+## Key Changes
+- What was changed, organized by file/module?
+
+## Verification
+- Local tests, static analysis, manual verification steps
+
+## Risk Factors
+- Metrics to monitor after deploy and rollback conditions
+```
+
+This template is not flashy, but it helps reviewers grasp "why this change is needed" first. The result is that both approval speed and quality improve simultaneously.
+
+
 ## Checklist
 
 - [ ] `git --version` prints a version.

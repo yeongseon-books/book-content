@@ -230,6 +230,87 @@ This same cycle shows up in real work in several recurring ways.
 - **Run `git status` often**: there is no penalty for running it. Aligning your mental picture with reality is the biggest time saver.
 - **Smaller commits make collaboration easier**: a giant single commit is hard to review and increases the size of merge conflicts. Small, frequent commits are safer.
 
+## Practical CLI Scenario
+
+The following example shows the most common workflow: work on a feature branch, then merge into main. The key operating principle is "keep work units small, check status frequently, and resolve conflicts quickly."
+
+```bash
+git switch main
+git pull --ff-only origin main
+git switch -c feature/auth-session
+git status
+git add app/auth.py tests/test_auth.py
+git commit -m "feat(auth): add session refresh flow"
+git push -u origin feature/auth-session
+```
+
+Placing `git pull --ff-only` at the beginning prevents branching off a stale local main that has diverged from the remote. Repeating `git status` just before committing catches unwanted files before they enter history.
+
+Connecting this back to the first-commit lesson: this scenario follows the same principle. Regardless of which branch you are on, the `edit → add → commit` structure is identical, and `status` tells you your current coordinates. The only difference is whether you are working locally alone or collaborating with a remote.
+
+Below is a "30-second pre-commit check" template frequently used in practice:
+
+```bash
+git status
+git diff --staged
+git log --oneline -5
+```
+
+These three lines let you quickly verify "current state," "what this commit contains," and "how it connects to recent history." A small routine, but it directly impacts PR quality.
+
+## Choosing a Branch Strategy
+
+In practice the strategy itself matters less than "what release cadence does the team follow?" The table below compares three strategies that entry-level teams most often evaluate.
+
+| Strategy | Characteristics | Best Fit | Watch Out |
+|---|---|---|---|
+| Trunk-based | Short-lived branches, fast merge | Teams with frequent deploys and strong test automation | Without a small-PR discipline, main becomes unstable |
+| GitHub Flow | main + feature branch + PR | SaaS / web services with continuous deployment | You must define environment-specific deploy policies separately |
+| Git Flow | Multiple long-lived branches (develop/release/hotfix) | Product organizations with fixed release windows | Many branches raise operational complexity |
+
+For beginners, starting with GitHub Flow is the safest choice. The rules are simple and it pairs well with Pull-Request-centric collaboration tools. When release requirements grow more complex later, you can extend by adding release branches.
+
+The reason this topic appears in a first-commit article is simple: a commit is a personal record, but the branch strategy determines how that record is consumed by the team. Even with the same commit quality, a different strategy changes review speed and deploy rhythm.
+
+For entry-level teams, fixing just two rules first delivers outsized results:
+
+- Never push directly to main; always go through a PR.
+- Each PR carries a single intent, and the commit message preserves that intent.
+
+When these two are maintained, "first-commit quality" naturally translates into "collaboration quality."
+
+## Standardizing Conflict Resolution
+
+A conflict is not a failure — it is a natural signal of concurrent work. What matters is aligning the resolution sequence and verification procedure as a shared team standard.
+
+1. Identify the conflicting files and decide which change is correct according to domain rules.
+2. Remove the markers (`<<<<<<<`, `=======`, `>>>>>>>`) while leaving only the intended final code.
+3. Run unit tests and static analysis to verify no syntax or behavioral regression.
+4. Record the conflict resolution in a dedicated commit so reviewers can read the reasoning.
+
+```bash
+git fetch origin
+git switch feature/auth-session
+git merge origin/main
+# After resolving conflicts
+git add app/auth.py tests/test_auth.py
+git commit -m "merge: resolve auth-session conflicts with main"
+pytest -q
+git push
+```
+
+If your team uses `rebase` instead of `merge`, only the final history shape differs — the principle of resolving and verifying conflicts remains the same. Skipping tests right after a conflict resolution creates a state where "the merge succeeded but the behavior is broken," so always attach automated verification.
+
+## Raising Review Quality with Operational Tips
+
+- In a PR description, write "why this choice was made" before "what changed."
+- If the file count is large, split commits by functional unit so the reviewer can follow the logical flow.
+- Use `git range-diff` to clearly compare commits before and after review feedback is applied.
+- For urgent fixes (hotfixes), use a small PR instead of pushing directly to main to preserve history and approval records.
+
+Following these four points improves collaboration stability far more quickly than knowing many Git commands.
+
+
 ## Checklist
 
 - [ ] You looked inside the `.git/` directory created by `git init`.

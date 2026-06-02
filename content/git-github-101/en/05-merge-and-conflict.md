@@ -383,6 +383,122 @@ nothing to commit, working tree clean
 - **Use `git mergetool` or your IDE**: VS Code, IntelliJ, and editors with `:diffsplit` show the three sides (base, ours, theirs) at once. The bigger the conflict, the more these tools help.
 - **PRs typically use `--no-ff`**: GitHub's "Create a merge commit" option is exactly `--no-ff`. The history then shows when each PR landed.
 
+## Practical CLI Scenario
+
+The following example shows the most common workflow: work on a feature branch, then merge into main. The key operating principle is "keep work units small, check status frequently, and resolve conflicts quickly."
+
+```bash
+git switch main
+git pull --ff-only origin main
+git switch -c feature/auth-session
+git status
+git add app/auth.py tests/test_auth.py
+git commit -m "feat(auth): add session refresh flow"
+git push -u origin feature/auth-session
+```
+
+Placing `git pull --ff-only` at the beginning prevents branching off a stale local main that has diverged from the remote. Repeating `git status` just before committing catches unwanted files before they enter history.
+
+## Choosing a Branch Strategy
+
+In practice the strategy itself matters less than "what release cadence does the team follow?" The table below compares three strategies that entry-level teams most often evaluate.
+
+| Strategy | Characteristics | Best Fit | Watch Out |
+|---|---|---|---|
+| Trunk-based | Short-lived branches, fast merge | Teams with frequent deploys and strong test automation | Without a small-PR discipline, main becomes unstable |
+| GitHub Flow | main + feature branch + PR | SaaS / web services with continuous deployment | You must define environment-specific deploy policies separately |
+| Git Flow | Multiple long-lived branches (develop/release/hotfix) | Product organizations with fixed release windows | Many branches raise operational complexity |
+
+For beginners, starting with GitHub Flow is the safest choice. The rules are simple and it pairs well with Pull-Request-centric collaboration tools. When release requirements grow more complex later, you can extend by adding release branches.
+
+## Quickly Distinguishing Merge Strategies
+
+Since Git 2.34 the default strategy for a normal two-branch merge is `ort`. If you see `Merge made by the 'ort' strategy.` in the output, that path was used.
+
+| Strategy | When to Use | Characteristics | Watch Out |
+|---|---|---|---|
+| `ort` | Default two-branch merge | Fast with stable conflict handling | Usually sufficient for all cases |
+| `octopus` | Merging 3+ branches at once | Convenient for bundled release integration | Fails on conflicts; unsuitable for manual resolution |
+| `ours` | Force current branch as result | Records the merge in history but keeps current content | Misuse silently discards all incoming changes |
+| `subtree` | Integrating a repo subdirectory | Useful for vendoring part of an external project | Incorrect path mapping makes tracking difficult |
+
+At the beginner level, learning to use the default `ort` reliably is more important than switching strategies. Introduce a different strategy only when the team has a clear need such as multi-repo integration or large-scale vendoring.
+
+## How to Choose Between Rebase and Merge
+
+Both are branch integration tools, but the resulting history differs.
+
+| Aspect | merge | rebase |
+|---|---|---|
+| History shape | Preserves branching and merging | Rewrites to a straight line |
+| Commit hashes | Preserves existing hashes | Replays commits with new hashes |
+| Collaboration safety | Safe on shared branches | Rebasing an already-shared branch is dangerous |
+| Conflict timing | Resolved once at merge time (or per file) | May repeat at each commit replay step |
+| Review perspective | Shows "which streams merged" | Easier to read "final linear flow" |
+
+A reasonable set of practical rules:
+
+- Local personal cleanup: use `rebase` to tidy commits.
+- Shared remote branches: prefer `merge` to avoid history rewriting.
+- If team policy is "main stays linear," unify the PR merge method to squash/rebase, but keep the rule that conflicts must be resolved and tests must pass locally before merging.
+
+## Standardizing Conflict Resolution
+
+A conflict is not a failure — it is a natural signal of concurrent work. What matters is aligning the resolution sequence and verification procedure as a shared team standard.
+
+1. Identify the conflicting files and decide which change is correct according to domain rules.
+2. Remove the markers (`<<<<<<<`, `=======`, `>>>>>>>`) while leaving only the intended final code.
+3. Run unit tests and static analysis to verify no syntax or behavioral regression.
+4. Record the conflict resolution in a dedicated commit so reviewers can read the reasoning.
+
+```bash
+git fetch origin
+git switch feature/auth-session
+git merge origin/main
+# After resolving conflicts
+git add app/auth.py tests/test_auth.py
+git commit -m "merge: resolve auth-session conflicts with main"
+pytest -q
+git push
+```
+
+If your team uses `rebase` instead of `merge`, only the final history shape differs — the principle of resolving and verifying conflicts remains the same. Skipping tests right after a conflict resolution creates a state where "the merge succeeded but the behavior is broken," so always attach automated verification.
+
+### Post-Conflict CLI Check Routine
+
+After fixing conflicts but before committing, running these four lines as a habit significantly reduces mistakes:
+
+```text
+$ git status
+On branch main
+All conflicts fixed but you are still merging.
+  (use "git commit" to conclude merge)
+
+Changes to be committed:
+        modified:   header.md
+
+$ git diff --staged
+diff --git a/header.md b/header.md
+index 2cb2a7f..2ee5ac1 100644
+--- a/header.md
++++ b/header.md
+@@ -1 +1 @@
+-# Awesome Project
++## Awesome Project
+```
+
+`git status` confirms "are all conflicts resolved?" while `git diff --staged` confirms "is the final code what I intended?" The most expensive mistake in conflict resolution is successfully removing markers but merging the code with the wrong semantics. That is why in team reviews, especially for conflict commits, the habit of explaining intent based on the staged diff matters.
+
+## Raising Review Quality with Operational Tips
+
+- In a PR description, write "why this choice was made" before "what changed."
+- If the file count is large, split commits by functional unit so the reviewer can follow the logical flow.
+- Use `git range-diff` to clearly compare commits before and after review feedback is applied.
+- For urgent fixes (hotfixes), use a small PR instead of pushing directly to main to preserve history and approval records.
+
+Following these four points improves collaboration stability far more quickly than knowing many Git commands.
+
+
 ## Checklist
 
 - [ ] Explain when a fast-forward happens and what Git prints when it does.

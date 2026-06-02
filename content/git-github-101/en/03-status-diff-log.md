@@ -337,6 +337,66 @@ index 6e85ca6..b7f5a1e 100644
 - **Aliases that stick**: a single line such as `git config --global alias.lg "log --oneline --graph --decorate"` saves a lot of typing.
 - **Colour output**: most environments enable it by default. If yours does not, run `git config --global color.ui auto`.
 
+## Practical CLI Scenario
+
+The following example shows the most common workflow: work on a feature branch, then merge into main. The key operating principle is "keep work units small, check status frequently, and resolve conflicts quickly."
+
+```bash
+git switch main
+git pull --ff-only origin main
+git switch -c feature/auth-session
+git status
+git add app/auth.py tests/test_auth.py
+git commit -m "feat(auth): add session refresh flow"
+git push -u origin feature/auth-session
+```
+
+Placing `git pull --ff-only` at the beginning prevents branching off a stale local main that has diverged from the remote. Repeating `git status` just before committing catches unwanted files before they enter history.
+
+## Choosing a Branch Strategy
+
+In practice the strategy itself matters less than "what release cadence does the team follow?" The table below compares three strategies that entry-level teams most often evaluate.
+
+| Strategy | Characteristics | Best Fit | Watch Out |
+|---|---|---|---|
+| Trunk-based | Short-lived branches, fast merge | Teams with frequent deploys and strong test automation | Without a small-PR discipline, main becomes unstable |
+| GitHub Flow | main + feature branch + PR | SaaS / web services with continuous deployment | You must define environment-specific deploy policies separately |
+| Git Flow | Multiple long-lived branches (develop/release/hotfix) | Product organizations with fixed release windows | Many branches raise operational complexity |
+
+For beginners, starting with GitHub Flow is the safest choice. The rules are simple and it pairs well with Pull-Request-centric collaboration tools. When release requirements grow more complex later, you can extend by adding release branches.
+
+## Standardizing Conflict Resolution
+
+A conflict is not a failure — it is a natural signal of concurrent work. What matters is aligning the resolution sequence and verification procedure as a shared team standard.
+
+1. Identify the conflicting files and decide which change is correct according to domain rules.
+2. Remove the markers (`<<<<<<<`, `=======`, `>>>>>>>`) while leaving only the intended final code.
+3. Run unit tests and static analysis to verify no syntax or behavioral regression.
+4. Record the conflict resolution in a dedicated commit so reviewers can read the reasoning.
+
+```bash
+git fetch origin
+git switch feature/auth-session
+git merge origin/main
+# After resolving conflicts
+git add app/auth.py tests/test_auth.py
+git commit -m "merge: resolve auth-session conflicts with main"
+pytest -q
+git push
+```
+
+If your team uses `rebase` instead of `merge`, only the final history shape differs — the principle of resolving and verifying conflicts remains the same. Skipping tests right after a conflict resolution creates a state where "the merge succeeded but the behavior is broken," so always attach automated verification.
+
+## Raising Review Quality with Operational Tips
+
+- In a PR description, write "why this choice was made" before "what changed."
+- If the file count is large, split commits by functional unit so the reviewer can follow the logical flow.
+- Use `git range-diff` to clearly compare commits before and after review feedback is applied.
+- For urgent fixes (hotfixes), use a small PR instead of pushing directly to main to preserve history and approval records.
+
+Following these four points improves collaboration stability far more quickly than knowing many Git commands.
+
+
 ## Checklist
 
 - [ ] You read both the long form and the `-s` short form of `git status`.

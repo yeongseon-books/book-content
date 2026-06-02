@@ -302,6 +302,157 @@ Deleted branch feature/sign-up (was f1e2d3c).
 - **Make `git log --graph --all` an alias**: Something like `git config --global alias.lga "log --oneline --graph --decorate --all"` makes it cheap to peek at the branch shape often.
 - **Polish branch names freely**: If a name reads awkwardly, `git branch -m` renames it cheaply. Good names line up with PR titles and the commit story stays tidy.
 
+## Practical Scenario 1: Handling Feature Work and an Urgent Bug Fix Simultaneously
+
+This is the situation you encounter most often in the real world. Assume you are building a login feature when a production bug report arrives.
+
+1) Working on the feature branch
+
+```text
+$ git switch feature/login
+$ git status -s
+ M login.md
+```
+
+2) An urgent fix is needed, so save current changes
+
+```text
+$ git add login.md
+$ git commit -m "WIP: draft login flow text"
+[feature/login 20ac3c1] WIP: draft login flow text
+ 1 file changed, 5 insertions(+)
+```
+
+3) Switch to `main` and create a hotfix branch
+
+```text
+$ git switch main
+Switched to branch 'main'
+
+$ git switch -c hotfix/header-null
+Switched to a new branch 'hotfix/header-null'
+```
+
+4) Fix and commit
+
+```text
+$ git add app.py
+$ git commit -m "fix: guard null header in auth middleware"
+[hotfix/header-null 5de82a4] fix: guard null header in auth middleware
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+```
+
+5) Compare the branches
+
+```text
+$ git branch
+  feature/login
+* hotfix/header-null
+  main
+
+$ git log --oneline --graph --decorate --all
+* 5de82a4 (HEAD -> hotfix/header-null) fix: guard null header in auth middleware
+| * 20ac3c1 (feature/login) WIP: draft login flow text
+|/
+* e7d2c1a (main) Add author line to README
+* 9b8c3e2 Add intro paragraph to notes
+* 4f1a2c0 Initial commit
+```
+
+The key takeaway is "one purpose at a time." When the feature branch and the hotfix branch are separate, review and deploy decisions become far clearer.
+
+## Practical Scenario 2: Comparing Two Approaches to the Same Feature via Experiment Branches
+
+Assume you want to test two copy variants (A and B) for the login screen simultaneously.
+
+```text
+$ git switch main
+$ git switch -c experiment/login-copy-a
+Switched to a new branch 'experiment/login-copy-a'
+
+$ git switch main
+$ git switch -c experiment/login-copy-b
+Switched to a new branch 'experiment/login-copy-b'
+```
+
+After committing independently on each branch, compare them:
+
+```text
+$ git log --oneline experiment/login-copy-a..experiment/login-copy-b
+8cb1d10 Update login CTA with urgency tone
+
+$ git diff experiment/login-copy-a experiment/login-copy-b
+diff --git a/login-copy.md b/login-copy.md
+index 4f13abc..8bc299a 100644
+--- a/login-copy.md
++++ b/login-copy.md
+@@ -1,3 +1,3 @@
+-Sign in now to keep managing your settings.
++Sign in now so you don't lose your settings.
+```
+
+This approach leaves experiment traces at the commit level. In team discussions you can verify "which copy changed and why" from history rather than gut feeling.
+
+## Practical CLI Scenario
+
+The following example shows the most common workflow: work on a feature branch, then merge into main. The key operating principle is "keep work units small, check status frequently, and resolve conflicts quickly."
+
+```bash
+git switch main
+git pull --ff-only origin main
+git switch -c feature/auth-session
+git status
+git add app/auth.py tests/test_auth.py
+git commit -m "feat(auth): add session refresh flow"
+git push -u origin feature/auth-session
+```
+
+Placing `git pull --ff-only` at the beginning prevents branching off a stale local main that has diverged from the remote. Repeating `git status` just before committing catches unwanted files before they enter history.
+
+## Choosing a Branch Strategy
+
+In practice the strategy itself matters less than "what release cadence does the team follow?" The table below compares three strategies that entry-level teams most often evaluate.
+
+| Strategy | Characteristics | Best Fit | Watch Out |
+|---|---|---|---|
+| Trunk-based | Short-lived branches, fast merge | Teams with frequent deploys and strong test automation | Without a small-PR discipline, main becomes unstable |
+| GitHub Flow | main + feature branch + PR | SaaS / web services with continuous deployment | You must define environment-specific deploy policies separately |
+| Git Flow | Multiple long-lived branches (develop/release/hotfix) | Product organizations with fixed release windows | Many branches raise operational complexity |
+
+For beginners, starting with GitHub Flow is the safest choice. The rules are simple and it pairs well with Pull-Request-centric collaboration tools. When release requirements grow more complex later, you can extend by adding release branches.
+
+## Standardizing Conflict Resolution
+
+A conflict is not a failure — it is a natural signal of concurrent work. What matters is aligning the resolution sequence and verification procedure as a shared team standard.
+
+1. Identify the conflicting files and decide which change is correct according to domain rules.
+2. Remove the markers (`<<<<<<<`, `=======`, `>>>>>>>`) while leaving only the intended final code.
+3. Run unit tests and static analysis to verify no syntax or behavioral regression.
+4. Record the conflict resolution in a dedicated commit so reviewers can read the reasoning.
+
+```bash
+git fetch origin
+git switch feature/auth-session
+git merge origin/main
+# After resolving conflicts
+git add app/auth.py tests/test_auth.py
+git commit -m "merge: resolve auth-session conflicts with main"
+pytest -q
+git push
+```
+
+If your team uses `rebase` instead of `merge`, only the final history shape differs — the principle of resolving and verifying conflicts remains the same. Skipping tests right after a conflict resolution creates a state where "the merge succeeded but the behavior is broken," so always attach automated verification.
+
+## Raising Review Quality with Operational Tips
+
+- In a PR description, write "why this choice was made" before "what changed."
+- If the file count is large, split commits by functional unit so the reviewer can follow the logical flow.
+- Use `git range-diff` to clearly compare commits before and after review feedback is applied.
+- For urgent fixes (hotfixes), use a small PR instead of pushing directly to main to preserve history and approval records.
+
+Following these four points improves collaboration stability far more quickly than knowing many Git commands.
+
+
 ## Checklist
 
 - [ ] You ran `git branch` and identified the current branch by the `*` marker.
