@@ -146,7 +146,52 @@ Owner: Growth team / Review: in 2 weeks
 
 ## How This Shows Up in Production
 
-Data teams write a *one-page project doc* (problem, metric, data, baseline, decision owner) and run it on *two-week sprints*. Models are wrapped in pipelines (*Airflow / dbt / MLflow*) for *reproducibility*, with *dashboards and alerts* watching for drift.
+Data teams write a one-page project doc (problem, metric, data, baseline, decision owner) and run it on two-week sprints. Models are wrapped in pipelines (Airflow / dbt / MLflow) for reproducibility, with dashboards and alerts watching for drift.
+
+### 10-Minute Presentation Structure
+
+| # | Section | Key Question | Required Deliverable |
+| --- | --- | --- | --- |
+| 1 | Problem definition | What decision are we improving? | Problem sentence, KPI |
+| 2 | Data / method | What data and method were used? | Data scope, model summary |
+| 3 | Results | How much improvement? | Metrics table vs baseline |
+| 4 | Impact | What’s the cost/revenue change? | Dollar-value scenario |
+| 5 | Execution plan | Who does what by when? | Owner, timeline, risks |
+
+### Business Impact Calculation
+
+```python
+active_users = 32000
+avg_mrr = 18.5
+baseline_churn = 0.082
+new_churn = 0.072
+
+retained_users = active_users * (baseline_churn - new_churn)
+impact_mrr = retained_users * avg_mrr
+
+print({
+    "retained_users": round(retained_users),
+    "monthly_mrr_impact": round(impact_mrr, 2),
+})
+```
+
+This is a first-order estimate for decision-making, not a complete financial model. State assumptions explicitly and present sensitivity analysis alongside.
+
+### Scenario-Based Impact Table
+
+| Scenario | Churn Improvement | Monthly Retained Users | Monthly MRR Impact |
+| --- | --- | --- | --- |
+| Conservative | 0.5pp | 160 | ~2,960 |
+| Baseline | 1.0pp | 320 | ~5,920 |
+| Optimistic | 1.5pp | 480 | ~8,880 |
+
+### Project Closure Checklist
+
+- [ ] Technical and business metrics reported together.
+- [ ] Improvement vs baseline is clearly stated.
+- [ ] Uncertainty and assumptions are documented.
+- [ ] Execution owner and review cadence are assigned.
+- [ ] Next experiment backlog is prioritized.
 
 ## How a Senior Engineer Thinks
 
@@ -155,6 +200,7 @@ Data teams write a *one-page project doc* (problem, metric, data, baseline, deci
 - *Always* write down the *owner*.
 - Design *monitoring* on *Day 1*.
 - Use *code* to guarantee *reproducibility*.
+- Closing a project means embedding results into the org’s repeatable decision loop.
 
 ## Checklist
 
