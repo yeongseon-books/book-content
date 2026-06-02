@@ -204,16 +204,74 @@ python -m pytest -q tests/test_pricing.py
 
 ## How This Shows Up in Production
 
-Pricing, authorization, and routing — anywhere branches resemble data — are great candidates for tables and strategies. Policy changes no longer require code edits.
+Pricing, authorization, and routing—anywhere branches resemble data—are great candidates for tables and strategies. Policy changes no longer require code edits.
+
+### Conditional Pattern Catalog
+
+| Pattern | Symptom | Recommended Refactoring |
+| --- | --- | --- |
+| Deep nested if | Indentation ≥ 3 levels | Guard clauses |
+| Type branching | `if type ==` repeated | Polymorphism / strategy |
+| Condition duplication | Same expression in multiple files | Extract predicate function |
+| Excessive negation | `if not ... and not ...` | Flip to positive-named function |
+| Hard-coded policy | Rules in local variables | Policy table extraction |
+
+### Before / After: Policy Table
+
+```python
+# before
+def shipping_fee(country: str, amount_cents: int) -> int:
+    if country == "KR":
+        return 0 if amount_cents >= 50000 else 3000
+    elif country == "JP":
+        return 0 if amount_cents >= 80000 else 5000
+    elif country == "US":
+        return 0 if amount_cents >= 100000 else 9000
+    return 15000
+
+# after
+FREE_SHIPPING_POLICY = {
+    "KR": (50000, 3000),
+    "JP": (80000, 5000),
+    "US": (100000, 9000),
+}
+
+def shipping_fee(country: str, amount_cents: int) -> int:
+    threshold, fee = FREE_SHIPPING_POLICY.get(country, (10**12, 15000))
+    return 0 if amount_cents >= threshold else fee
+```
+
+Adding a country means one dict entry—no `elif` modification.
+
+### Linter Guard: Prevent Branch Explosion
+
+```toml
+[tool.ruff.lint]
+select = ["C90", "PLR", "B", "E", "F"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 7
+```
+
+Low complexity limits surface branch explosions *before* feature merge. Prevention is cheaper than cleanup.
+
+### Refactoring Decision Table
+
+| Question | Example | Action |
+| --- | --- | --- |
+| Same condition repeated? | Country shipping logic in 3 files | Extract policy table |
+| Same post-processing per branch? | Logging/metric in every arm | Extract common wrapper |
+| Hard to add new policy? | `elif` addition touches many lines | Introduce strategy object |
 
 ## How a Senior Engineer Thinks
 
-- Depth above 3 is a design smell.
-- More than five if/elif arms hint at polymorphism.
-- Branches that change with external input belong in tables.
-- Flip negative conditions to positive in one pass.
-- Keep strategies stateless.
-
+- Depth above 3 is a design smell—flatten immediately.
+- More than five if/elif arms hint at polymorphism or a table.
+- Branches that change with external input belong in config/tables, not code.
+- Flip negative conditions to positive in one pass—cognitive load drops.
+- Keep strategies stateless so they're trivially testable.
+- Set linter complexity limits *before* the codebase grows—retrofitting is painful.
+- Every refactoring PR states whether behavior changed. Structural-only changes get separate PRs.
 ## Checklist
 
 - [ ] Function depth ≤ 3?
