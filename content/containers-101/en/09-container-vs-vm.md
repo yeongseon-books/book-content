@@ -159,16 +159,46 @@ A report function closes the comparison loop. In practice, teams use this data i
 
 ## How This Shows Up in Production
 
-*AWS Fargate and Lambda* layer *containers on Firecracker microVMs* and get *container speed* with *VM-level isolation* at the same time.
+AWS Fargate and Lambda layer containers on Firecracker microVMs — container speed with VM-level isolation. Most organizations run a hybrid: VMs as K8s nodes, containers as workload units.
+
+### Decision Framework
+
+| Priority | Choose |
+| --- | --- |
+| Fast deploy, high density, short-lived | Containers |
+| Strong tenant isolation, compliance, custom kernel | VMs or microVMs |
+| Both matter | K8s on VMs (hybrid) |
+
+This framework moves the conversation from tool preference to requirements-driven decisions.
+
+### Resource Limits Still Required
+
+```yaml
+services:
+  api:
+    image: myorg/api:latest
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 512M
+```
+
+Without declared resource limits, containers suffer noisy-neighbor problems just like VMs. The boundary declaration is mandatory regardless of isolation technology.
+
+### Hybrid Strategy in Practice
+
+- Stateful databases: VMs or managed services.
+- Stateless APIs and batch jobs: containers.
+- Observability: unified log/metric stack spanning both.
 
 ## How a Senior Engineer Thinks
 
-- *Isolation level* follows *business need*.
-- A *container* may live *inside a VM*.
-- *Boot time* shapes the *architecture*.
-- *Multi-tenant* is safer at the *VM boundary*.
-- *Hybrid* is the *modern default*.
-
+- Isolation level follows business need, not personal preference.
+- A container often lives inside a VM — they complement, not compete.
+- Boot time shapes architecture: sub-second scaling requires containers.
+- Multi-tenant workloads are safer at the VM boundary.
+- Hybrid is the modern default; pure-container or pure-VM is rare.
 ## Checklist
 
 - [ ] *Service isolation* with *containers*.
