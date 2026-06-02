@@ -255,6 +255,408 @@ At first, packaging feels like overhead. In reality, a single `pyproject.toml` i
 
 The next post covers **project structure** — src layout and pyproject.toml.
 
+## How the Import System Works Internally
+
+When you run `import requests`, the Python interpreter performs the following steps in order.
+
+### Step 1: Check the sys.modules Cache
+
+```python
+import sys
+
+# Modules already imported are stored in the cache.
+print("requests" in sys.modules)  # Before first import: False
+
+import requests
+print("requests" in sys.modules)  # After import: True
+
+# A second import returns immediately from the cache.
+import requests  # Does not re-read the file
+```
+
+Python looks in the `sys.modules` dictionary first. If the module is already there, it returns the cached module object without touching the file system. This is why top-level code in a module executes only once during the lifetime of the process.
+
+### Step 2: Finders and Loaders
+
+```python
+import sys
+
+for finder in sys.meta_path:
+    print(type(finder).__name__)
+# BuiltinImporter   - built-in modules (sys, builtins)
+# FrozenImporter    - frozen modules
+# PathFinder        - sys.path-based search
+```
+
+`sys.meta_path` finders are tried in order. `PathFinder` runs last, iterating over each entry in `sys.path` looking for `.py` files or package directories.
+
+### Step 3: Module Execution and Binding
+
+```python
+# Simplified view of what Python does internally:
+# 1. Create an empty module object
+# 2. Register it in sys.modules (prevents circular import loops)
+# 3. Execute the module file (top-level code in .py)
+# 4. Bind the name in the caller's namespace
+
+# What this means:
+import mylib          # 'mylib' name bound in current namespace
+from mylib import f   # only 'f' is bound; 'mylib' is not
+```
+
+### Full Import Flow Diagram
+
+```text
+import mylib
+    │
+    ▼
+In sys.modules? ──Yes──> Return cached object
+    │ No
+    ▼
+Iterate finders in sys.meta_path
+    │
+    ▼
+PathFinder: search each path in sys.path
+    │
+    ▼
+Found mylib/ directory (__init__.py exists)
+    │
+    ▼
+Create module object → register in sys.modules
+    │
+    ▼
+Execute __init__.py
+    │
+    ▼
+Bind 'mylib' in caller's namespace
+```
+
+## Namespace Packages vs Regular Packages
+
+Since Python 3.3, directories without `__init__.py` can be recognized as namespace packages. However, the two kinds behave differently.
+
+| Aspect | Regular Package | Namespace Package |
+|---|---|---|
+| `__init__.py` | Required | Absent |
+| `__path__` | Single directory | Multiple directories possible |
+| Initialization code | Written in `__init__.py` | Not possible |
+| Tool compatibility | All tools support it | Some tools lack support |
+| Use case | General packages | Plugins, distributed packages |
+
+```python
+# Regular package: mylib/__init__.py exists
+import mylib
+print(mylib.__file__)
+# /home/user/.local/lib/python3.11/site-packages/mylib/__init__.py
+
+# Namespace package: no __init__.py
+import google.cloud  # google is a namespace package
+print(google.__path__)
+# _NamespacePath(['/path/to/site-packages/google'])
+# Multiple distributions each install sub-packages under google/
+```
+
+The canonical real-world example of namespace packages is the `google-cloud-*` family. `google.cloud.storage` and `google.cloud.bigquery` are separate distributions that share the same `google.cloud` namespace.
+
+**Recommendation**: For most projects, use a Regular Package (with `__init__.py`). Choose Namespace Package only when multiple independent distributions need to share one top-level namespace.
+
+## `__init__.py` Usage Patterns
+
+`__init__.py` does more than just declare "this directory is a package."
+
+### Pattern 1: Define the Public API
+
+```python
+# mylib/__init__.py
+from .core import Engine
+from .config import Settings
+from .exceptions import MyLibError
+
+__all__ = ["Engine", "Settings", "MyLibError"]
+```
+
+Users can write `from mylib import Engine` directly, while internal implementation files (`core.py`, `config.py`) stay hidden. Specifying `__all__` controls which names are exposed by `from mylib import *`.
+
+### Pattern 2: Provide Version Info
+
+```python
+# mylib/__init__.py
+__version__ = "1.2.0"
+```
+
+```python
+import mylib
+print(mylib.__version__)  # "1.2.0"
+```
+
+### Pattern 3: Leave It Empty
+
+```python
+# mylib/__init__.py
+# (empty)
+```
+
+When a package has deep nesting and users import sub-modules directly, leaving `__init__.py` empty is the simplest approach. Django's `migrations/` package uses this pattern.
+
+### Pattern 4: Lazy Import
+
+```python
+# mylib/__init__.py
+def __getattr__(name):
+    if name == "HeavyModule":
+        from .heavy import HeavyModule
+        return HeavyModule
+    raise AttributeError(f"module 'mylib' has no attribute {name}")
+```
+
+This defers loading of sub-modules with heavy dependencies until they are actually accessed. `import mylib` alone does not execute `heavy.py`.
+
+## Wheel Internal Structure
+
+What `pip install` installs is almost always a wheel (`.whl`) file. A wheel is simply a ZIP file with a defined internal layout.
+
+```bash
+# Inspect a real wheel file
+pip download requests --no-deps -d /tmp/wheels
+unzip -l /tmp/wheels/requests-2.32.3-py3-none-any.whl | head -20
+```
+
+```text
+requests-2.32.3-py3-none-any.whl contents:
+├── requests/
+│   ├── __init__.py
+│   ├── api.py
+│   ├── sessions.py
+│   ├── models.py
+│   └── ...
+├── requests-2.32.3.dist-info/
+│   ├── METADATA        # Package metadata (name, version, dependencies)
+│   ├── WHEEL           # Wheel format info
+│   ├── RECORD          # Installed file list + hashes
+│   ├── top_level.txt   # Top-level package name
+│   └── LICENSE
+```
+
+### Wheel File Naming Convention
+
+```text
+{distribution}-{version}(-{build})?-{python}-{abi}-{platform}.whl
+
+Examples:
+requests-2.32.3-py3-none-any.whl
+├── distribution: requests
+├── version: 2.32.3
+├── python: py3 (Python 3)
+├── abi: none (pure Python)
+└── platform: any (all platforms)
+
+numpy-1.26.4-cp312-cp312-manylinux_2_17_x86_64.whl
+├── distribution: numpy
+├── version: 1.26.4
+├── python: cp312 (CPython 3.12)
+├── abi: cp312 (CPython 3.12 ABI)
+└── platform: manylinux_2_17_x86_64 (Linux x86_64)
+```
+
+Pure Python packages use `py3-none-any` and share a single wheel across all environments. Packages with C extensions need separate wheels per platform.
+
+## Editable Install Internals
+
+During development you use `pip install -e .` (editable install). In this mode, source code is not copied into `site-packages`; instead the original directory is referenced directly.
+
+```bash
+# Normal install: files copied to site-packages
+pip install .
+# site-packages/mylib/__init__.py (copy)
+
+# Editable install: a link to the original is created
+pip install -e .
+# site-packages/mylib.egg-link or
+# site-packages/__editable__.mylib-0.1.0.pth
+```
+
+```python
+# After editable install
+import mylib
+print(mylib.__file__)
+# /home/user/projects/mylib/src/mylib/__init__.py (the original!)
+```
+
+The key advantage is that source edits are reflected immediately without reinstalling. This speeds up the develop-test cycle.
+
+### Modern Editable Install (PEP 660)
+
+```toml
+# pyproject.toml
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+```
+
+```bash
+pip install -e .
+# setuptools >= 64 uses a .pth file approach for editable installs
+# Correctly recognizes src/ layout without import hooks
+```
+
+## Package Naming: Strategies to Avoid Collisions
+
+Over 500,000 packages are registered on PyPI. Choosing a name that avoids collisions while remaining discoverable is important.
+
+### Naming Rules
+
+| Rule | Example |
+|---|---|
+| Lowercase + hyphens (distribution name) | `my-utils` |
+| Lowercase + underscores (import name) | `my_utils` |
+| PyPI normalizes names | `my-utils` == `my_utils` == `My.Utils` |
+| 3+ characters recommended | `fileio` over `io` |
+
+### Internal Package Naming Pattern
+
+```text
+{company/org}-{domain}-{function}
+e.g.: acme-auth-client, acme-logging, acme-config
+```
+
+A consistent prefix lets you spot all internal packages at a glance with `pip list | grep acme-`.
+
+### Checking PyPI Name Availability
+
+```bash
+# Check if a name is available
+pip index versions my-desired-name
+# ERROR: No matching distribution found -> available
+
+# Or via the API
+curl -s https://pypi.org/pypi/my-desired-name/json | python -m json.tool
+# 404 -> available
+```
+
+## The Full pip install Flow
+
+Here is what actually happens when you run `pip install requests`.
+
+```text
+pip install requests
+    │
+    ▼
+1. Call PyPI API: GET https://pypi.org/simple/requests/
+    │
+    ▼
+2. Select compatible wheel (Python version, platform)
+    │
+    ▼
+3. Download wheel + verify hash
+    │
+    ▼
+4. Resolve dependencies (urllib3, certifi, charset-normalizer, idna)
+    │
+    ▼
+5. Install each dependency through the same process
+    │
+    ▼
+6. Extract wheel → place files in site-packages/
+    │
+    ▼
+7. Create .dist-info/ directory (METADATA, RECORD, etc.)
+```
+
+### The Dependency Resolver
+
+Since pip 20.3, a new dependency resolver runs by default. It finds a combination of versions that simultaneously satisfies all package version requirements.
+
+```bash
+# View the dependency tree
+pip install pipdeptree
+pipdeptree -p requests
+```
+
+```text
+requests==2.32.3
+├── certifi [required: >=2017.4.17, installed: 2024.7.4]
+├── charset-normalizer [required: >=2,<4, installed: 3.3.2]
+├── idna [required: >=2.5,<4, installed: 3.7]
+└── urllib3 [required: >=1.21.1,<3, installed: 2.2.2]
+```
+
+### Directory State After Installation
+
+```bash
+ls site-packages/ | grep -E "requests|urllib3"
+```
+
+```text
+requests/
+requests-2.32.3.dist-info/
+urllib3/
+urllib3-2.2.2.dist-info/
+```
+
+Each package produces two directories: one containing the actual code and another (`.dist-info/`) holding metadata.
+
+### The RECORD File: Installed File Manifest
+
+```bash
+head -5 site-packages/requests-2.32.3.dist-info/RECORD
+```
+
+```text
+requests/__init__.py,sha256=abc123...,4567
+requests/api.py,sha256=def456...,2345
+requests/sessions.py,sha256=ghi789...,12345
+requests/models.py,sha256=jkl012...,23456
+requests/adapters.py,sha256=mno345...,8901
+```
+
+When you run `pip uninstall requests`, pip reads this RECORD file and removes exactly the files that were installed.
+
+## Module Search Order Pitfalls
+
+`sys.path` order is an effective priority list. If you do not understand this order, an unintended module may get imported.
+
+```python
+import sys
+for i, path in enumerate(sys.path):
+    print(f"{i}: {path}")
+```
+
+```text
+0:                          # empty string = current directory (highest priority)
+1: /usr/lib/python3.11
+2: /usr/lib/python3.11/lib-dynload
+3: /home/user/.local/lib/python3.11/site-packages
+4: /usr/lib/python3.11/site-packages
+```
+
+### The Shadow Import Problem
+
+```bash
+# Create a random.py in the current directory:
+echo "print('This is NOT the stdlib random!')" > random.py
+python -c "import random; print(random.randint(1, 10))"
+# This is NOT the stdlib random!
+# AttributeError: module 'random' has no attribute 'randint'
+```
+
+The current directory (`sys.path[0]`) is searched before the standard library. Renaming the file fixes the problem immediately.
+
+### Recommended Verification Habit
+
+```python
+# Check which module was actually loaded
+import json
+print(json.__file__)  # /usr/lib/python3.11/json/__init__.py means correct
+
+# When in doubt, inspect the spec
+import importlib.util
+spec = importlib.util.find_spec("json")
+print(spec.origin)
+```
+
 ## Answering the Opening Questions
 
 - **What exactly is the difference between a module and a package?**
