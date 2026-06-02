@@ -359,6 +359,149 @@ This shape often stays similar as a project grows. You can start with a single `
 3. Add `tools/cli.py` so that `python -m tools.cli` runs it, and use the `__name__ == "__main__"` guard.
 4. Make a module that prints one line when imported, then import it twice in the same REPL session and confirm the body runs only once.
 
+## Practical Anchor: Import Paths, Package Structure, and Pre-Deployment Checks
+
+The core of the modules/packages chapter is knowing *where your code is loaded from*. These three lines narrow down most import problems:
+
+```python
+import sys
+import mypkg
+
+print(sys.path)
+print(mypkg.__file__)
+```
+
+If an unintended path sits at the front of `sys.path`, a same-named module can shadow the one you expect. A classic mistake is naming your file `random.py` or `json.py`:
+
+```text
+ImportError: cannot import name 'loads' from 'json' (/project/json.py)
+```
+
+This error means Python loaded your project file `json.py` instead of the standard library `json`.
+
+Start package structure from a minimal, tidy foundation:
+
+```text
+myapp/
+  pyproject.toml
+  src/
+    myapp/
+      __init__.py
+      cli.py
+      service.py
+```
+
+The `src/` layout reduces accidental relative-path imports during testing. It verifies behavior against the *installed* package, improving deployment reliability.
+
+A minimal `pyproject.toml`:
+
+```toml
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "myapp"
+version = "0.1.0"
+description = "python-101 example"
+requires-python = ">=3.11"
+```
+
+After installation, verify the import path through the entry point:
+
+```bash
+python -m pip install -e .
+python -m myapp.cli
+```
+
+The standard library `importlib` is also worth knowing for debugging dynamic loading:
+
+```python
+import importlib
+
+math_mod = importlib.import_module('math')
+print(math_mod.sqrt(16))
+```
+
+From a performance perspective, you can measure import cost:
+
+```python
+import timeit
+
+cold = timeit.timeit("import json", number=1000)
+print(cold)
+```
+
+Usually negligible, but in large CLIs it affects startup feel. Slow dependencies can be moved to function-level lazy imports.
+
+For debugging, `python -X importtime -c "import myapp"` is extremely useful—it shows which module imports are slow, layer by layer.
+
+The goal of the modules/packages chapter goes beyond code reuse: build a structure that loads identically regardless of execution environment.
+
+### Extra Exercise: Pre-Deployment Import Stability Checklist
+
+The "works locally, fails on server" problem almost always stems from path/installation differences. Lock in this procedure before deploying:
+
+```bash
+python -m pip uninstall -y myapp
+python -m pip install .
+python -c "import myapp, sys; print(myapp.__file__); print(sys.version)"
+```
+
+Test both editable install (`-e`) and regular install to catch path-dependent bugs early.
+
+Namespace collision prevention matters too. Avoid standard-library module names, and minimize side-effect imports in `__init__.py` to reduce initialization failures:
+
+```python
+# bad: heavy imports in __init__.py
+# good: expose only minimal public symbols
+from .service import run
+```
+
+Finally, make `python -m package.module` your execution habit to avoid relative import errors.
+
+### Appendix: Local Lab Log Template
+
+Record experiments as code + environment + output sets:
+
+```text
+[Environment]
+python: 3.12.x
+platform: macOS/Linux
+venv: .venv
+
+[Experiment]
+Goal: verify behavior or compare performance
+Input: 1,000 sample records
+Command: python script.py
+
+[Output]
+Success/Failure
+Key numbers (timeit, record count, exception message)
+```
+
+Debugging records:
+
+1. Symptom: which input failed
+2. Hypothesis: which conditional/data structure/path is the cause
+3. Verification: confirmed via `pdb`, `print`, `timeit`, or unit test
+4. Conclusion: what changed between before and after the fix
+
+### Reinforcement Note: Operational Habits That Reduce Mistakes
+
+When moving learning code into real projects: (1) input validation at function entry, (2) separate user-facing from log messages on failure, (3) benchmark-based performance judgments.
+
+```python
+def safe_run(fn, *args, **kwargs):
+    try:
+        return fn(*args, **kwargs)
+    except Exception as e:
+        raise RuntimeError(f'Execution failed: {fn.__name__}') from e
+```
+
+When reading stdlib docs: module overview → top 3 functions → exception types. Knowing which module to open matters more than memorizing every function.
+
+
 ## Summary and next chapter
 
 - A module is one `.py` file; a package is a directory that contains `__init__.py`.

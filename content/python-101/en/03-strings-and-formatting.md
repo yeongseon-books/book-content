@@ -378,6 +378,158 @@ Build a function that takes a CSV-like line and prints a tidy aligned row. We wi
    Write `extract_emails(text: str) -> list[str]` that returns every email address in the text. Use `re.findall` with a raw string.
    - Success criterion: `extract_emails("ada@example.com and bob@example.org")` returns `['ada@example.com', 'bob@example.org']`.
 
+## Practical Anchor: String Traps That Blow Up Immediately and Debugging Routines
+
+Strings look easy, but in real services encoding, whitespace, formatting, and performance tangle together. Repeatedly concatenating log messages with `+` quickly becomes a performance problem.
+
+```python
+import timeit
+
+join_t = timeit.timeit("' '.join(parts)", setup="parts=['python','is','simple']", number=2_000_000)
+plus_t = timeit.timeit("parts[0] + ' ' + parts[1] + ' ' + parts[2]", setup="parts=['python','is','simple']", number=2_000_000)
+print(join_t, plus_t)
+```
+
+Example output:
+
+```text
+0.152118
+0.244887
+```
+
+With a few short strings the difference seems small, but inside loops it accumulates noticeably. Default to collecting into a list and calling `join` at the end.
+
+For formatting, f-strings, `str.format`, and `%` coexist. For new code, make f-strings the default and reach for format specifiers when alignment/precision control is heavy:
+
+```python
+name = 'Kim'
+score = 92.3456
+print(f'{name:>10} | {score:06.2f}')
+```
+
+Output:
+
+```text
+       Kim | 092.35
+```
+
+The most common production issue is invisible whitespace. Observing via `repr` speeds up debugging:
+
+```pycon
+>>> raw = '  user@example.com\n'
+>>> raw
+'  user@example.com\n'
+>>> raw.strip()
+'user@example.com'
+>>> repr(raw)
+"'  user@example.com\\n'"
+```
+
+Distinguish `strip/lstrip/rstrip` clearly. For example, if a CSV parser must preserve leading spaces but remove trailing newlines, `rstrip('\n')` is the precise choice.
+
+Unicode normalization is mandatory when dealing with mixed-language data:
+
+```python
+import unicodedata
+
+s1 = '\u00e9'        # precomposed é
+s2 = 'e\u0301'       # decomposed e + combining accent
+print(s1 == s2)
+print(unicodedata.normalize('NFC', s1) == unicodedata.normalize('NFC', s2))
+```
+
+Output:
+
+```text
+False
+True
+```
+
+Visually identical characters can have different code points, causing comparison failures. Decide on a normalization policy before building search indexes, comparing user IDs, or generating cache keys.
+
+For debugging, attaching `pdb` to string processing code looks like this:
+
+```python
+import pdb
+
+def normalize_email(text):
+    pdb.set_trace()
+    return text.strip().lower()
+
+normalize_email('  Admin@Example.COM\n')
+```
+
+Run `p text`, `p repr(text)`, `n` in sequence and you see whitespace/newline/case changes precisely. String bugs often end quickly once you can *see* them.
+
+Finally, when working with template strings, the standard library's `string.Template` is worth knowing. Its simple syntax makes it safe for operational scripts that mix external input:
+
+```python
+from string import Template
+
+t = Template('Hello, $name. You have $count new orders today.')
+print(t.substitute(name='Alice', count=3))
+```
+
+### Extra Exercise: Log Formatting and Safe Text Processing
+
+Operational logs must satisfy both human readability and machine parsing. Interpolating raw user input can introduce log injection, so newline/tab normalization is necessary:
+
+```python
+def sanitize_log_text(text: str) -> str:
+    return text.replace('\n', '\\n').replace('\t', ' ')
+
+msg = sanitize_log_text('user=kim\nrole=admin')
+print(f'event=login {msg}')
+```
+
+For internationalization (i18n) messages, positional format specifiers stay stable when combined with translated text:
+
+```python
+name = 'Alice'
+count = 12
+print('{name}\'s new notifications: {count:03d}'.format(name=name, count=count))
+```
+
+Output:
+
+```text
+Alice's new notifications: 012
+```
+
+String preprocessing pipelines typically lock in a `strip → normalize → validate` order for maintainability.
+
+### Appendix: Local Lab Log Template
+
+The template below captures experiments during the learning phase. Key principle: record code + environment + output as a single set.
+
+```text
+[Environment]
+python: 3.12.x
+platform: macOS/Linux
+venv: .venv
+
+[Experiment]
+Goal: verify behavior or compare performance
+Input: 1,000 sample records
+Command: python script.py
+
+[Output]
+Success/Failure
+Key numbers (timeit, record count, exception message)
+```
+
+In code reviews people often share only results, but during learning, recording intermediate assumptions speeds up future decisions.
+
+Debugging records use the same format:
+
+1. Symptom: which input failed
+2. Hypothesis: which conditional/data structure/path is the cause
+3. Verification: confirmed via `pdb`, `print`, `timeit`, or unit test
+4. Conclusion: what changed between before and after the fix
+
+This habit may feel slow at first, but as project scale grows, accurate records become the fastest path forward.
+
+
 ## Summary and next chapter
 
 - Python 3's `str` is a sequence of Unicode code points; `bytes` is a sequence of integers in `0..255`.

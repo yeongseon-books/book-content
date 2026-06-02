@@ -351,6 +351,146 @@ Both patterns reappear in the next chapter, where modules and packages introduce
    Refactor `sorted(users, key=lambda u: (u["score"], u["name"]))` into an explicit function `def by_score_then_name(u): ...`, then call `sorted(users, key=by_score_then_name)`.
    - Success criterion: both calls produce the same result.
 
+## Practical Anchor: Function Boundary Design, Argument Contracts, and Debugging Flow
+
+A function is both a reuse unit and a bug-isolation unit. At the beginner stage, the critical skill is making "what it accepts and what it guarantees" explicit in code:
+
+```python
+def calculate_total(price: int, quantity: int, discount: float = 0.0) -> int:
+    if quantity < 0:
+        raise ValueError('quantity must be >= 0')
+    subtotal = price * quantity
+    return int(subtotal * (1 - discount))
+```
+
+This function shows type hints, defaults, and exception conditions together—callers understand the contract quickly.
+
+Variadic and keyword arguments appear frequently in logging/wrapper functions:
+
+```python
+def debug_call(name, *args, **kwargs):
+    print('call:', name)
+    print('args:', args)
+    print('kwargs:', kwargs)
+```
+
+Overusing `*args`/`**kwargs` blurs the interface. Prefer explicit argument names in public APIs and restrict variadics to wrapper layers.
+
+A quick performance observation:
+
+```python
+import timeit
+
+def f_pos(a, b, c):
+    return a + b + c
+
+def f_kw(*, a, b, c):
+    return a + b + c
+
+pos_t = timeit.timeit('f_pos(1,2,3)', globals=globals(), number=3_000_000)
+kw_t = timeit.timeit('f_kw(a=1,b=2,c=3)', globals=globals(), number=3_000_000)
+print(pos_t, kw_t)
+```
+
+Keyword passing may be slightly slower, but readability and mistake-prevention value make it worthwhile in production code.
+
+Closures and scope must be felt directly:
+
+```python
+def make_multiplier(factor):
+    def mul(x):
+        return x * factor
+    return mul
+
+mul3 = make_multiplier(3)
+print(mul3(10))
+```
+
+`factor` remains referenced by the inner function even after the outer function returns. This mechanism is the foundation of decorators.
+
+Debugging is fast with `pdb` for inspecting argument values:
+
+```python
+import pdb
+
+def parse_age(text):
+    pdb.set_trace()
+    return int(text.strip())
+
+parse_age(' 42 ')
+```
+
+Run `p text`, `p repr(text)`, `n` in sequence to see pre- and post-conversion clearly.
+
+Finally, from a packaging perspective: CLI entry points should handle only I/O and dispatch core logic to separate functions for testability:
+
+```python
+def run(argv):
+    # parse
+    # validate
+    return main_logic(argv)
+```
+
+This separation principle reuses directly in the modules/packages and test automation stages.
+
+### Extra Exercise: Preventing Misuse Through Function Signatures
+
+In early API design, using positional-only (`/`) and keyword-only (`*`) markers significantly reduces calling mistakes:
+
+```python
+def divide(a, b, /, *, ndigits=2):
+    return round(a / b, ndigits)
+
+print(divide(10, 3, ndigits=3))
+```
+
+This forces operand order via position and accepts rounding precision only by name. Intent is clear in team code.
+
+Documentation is most effective when the docstring briefly states inputs/outputs/exceptions:
+
+```python
+def parse_port(text: str) -> int:
+    """Convert a string port number to int.
+
+    Raises:
+        ValueError: if the port is outside 1–65535
+    """
+    port = int(text)
+    if not (1 <= port <= 65535):
+        raise ValueError('invalid port')
+    return port
+```
+
+When contracts are clear at the function level, debugging stays simple even across module boundaries.
+
+### Appendix: Local Lab Log Template
+
+Record experiments as code + environment + output sets:
+
+```text
+[Environment]
+python: 3.12.x
+platform: macOS/Linux
+venv: .venv
+
+[Experiment]
+Goal: verify behavior or compare performance
+Input: 1,000 sample records
+Command: python script.py
+
+[Output]
+Success/Failure
+Key numbers (timeit, record count, exception message)
+```
+
+Debugging records follow the same format:
+
+1. Symptom: which input failed
+2. Hypothesis: which conditional/data structure/path is the cause
+3. Verification: confirmed via `pdb`, `print`, `timeit`, or unit test
+4. Conclusion: what changed between before and after the fix
+
+
 ## Summary and next chapter
 
 - A function signature is the interface between caller and body. Combine positional, keyword, default, `*args`, and `**kwargs` deliberately.

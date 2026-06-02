@@ -308,6 +308,164 @@ The shape stays the same: close resources with `with`, catch exceptions narrowly
 3. Write `safe_copy(src, dst)` that reads `src` in binary mode and writes the same bytes to `dst`. Let `FileNotFoundError` propagate when `src` is missing.
 4. Using only `pathlib`, write a script that creates a `data/` directory, writes `hello.txt` inside it, and reads the file back. Make the directory creation safe to run more than once.
 
+## Practical Anchor: File Handling Reliability and Exception Design
+
+In file I/O, the failure path matters more than the happy path. Assume files may be missing, encoded differently, lack permissions, or the process may be interrupted mid-write.
+
+```python
+from pathlib import Path
+
+path = Path('data/input.txt')
+if not path.exists():
+    raise FileNotFoundError(path)
+
+text = path.read_text(encoding='utf-8')
+print(text[:40])
+```
+
+For writes, the temp-file-then-replace pattern ensures atomicity:
+
+```python
+from pathlib import Path
+
+final = Path('result.json')
+tmp = final.with_suffix('.tmp')
+tmp.write_text('{"ok": true}\n', encoding='utf-8')
+tmp.replace(final)
+```
+
+Even if a crash occurs mid-write, you won't leave a corrupted result file.
+
+In exception handling, avoid reaching for broad `except Exception:` first. Catch expected exceptions narrowly; let unrecoverable ones propagate:
+
+```python
+try:
+    value = int('42a')
+except ValueError as e:
+    print('number parsing failed:', e)
+```
+
+Exception chaining is essential:
+
+```python
+try:
+    raise ValueError('bad format')
+except ValueError as e:
+    raise RuntimeError('user input validation failed') from e
+```
+
+`from e` preserves the cause exception in the traceback, making production debugging easier.
+
+Tracing file-handling code with `pdb`:
+
+```python
+import pdb
+from pathlib import Path
+
+def load_config(path):
+    pdb.set_trace()
+    return Path(path).read_text(encoding='utf-8')
+```
+
+Run `p path`, `n`, `p Path(path).exists()` to find the failure point quickly.
+
+A quick performance measurement:
+
+```python
+import timeit
+
+line_t = timeit.timeit("sum(1 for _ in open('big.txt', encoding='utf-8'))", number=10)
+all_t = timeit.timeit("len(open('big.txt', encoding='utf-8').read().splitlines())", number=10)
+print(line_t, all_t)
+```
+
+For large files, streaming is better for memory stability.
+
+Standard library modules commonly combined in practice:
+
+- `pathlib`: readable path manipulation
+- `csv`: automated delimiter/quoting handling
+- `json`: API/config serialization
+- `tempfile`: safe temporary file creation
+
+Exception handling is not "the art of hiding all errors"—it is "the design of exposing errors predictably." This mindset reduces root-cause analysis time in production.
+
+### Extra Exercise: Exception Logging and Retry Boundaries
+
+When handling exceptions, distinguish recoverable errors from immediate-failure errors. File locks and transient network errors are retriable; data format errors are not:
+
+```python
+import time
+
+def retry_read(read_fn, retries=3):
+    for attempt in range(1, retries + 1):
+        try:
+            return read_fn()
+        except OSError as e:
+            if attempt == retries:
+                raise
+            time.sleep(0.2 * attempt)
+```
+
+Always include the traceback in logs for post-incident analysis:
+
+```python
+import logging
+
+logger = logging.getLogger(__name__)
+
+try:
+    1 / 0
+except ZeroDivisionError:
+    logger.exception('calculation failed')
+```
+
+`logger.exception` automatically attaches the current exception stack—invaluable for operational incident response.
+
+For text file processing, clarify the newline policy. CSV recommends `newline=''`; general text uses default newline normalization, but pin cross-platform results with tests.
+
+### Appendix: Local Lab Log Template
+
+Record experiments as code + environment + output sets:
+
+```text
+[Environment]
+python: 3.12.x
+platform: macOS/Linux
+venv: .venv
+
+[Experiment]
+Goal: verify behavior or compare performance
+Input: 1,000 sample records
+Command: python script.py
+
+[Output]
+Success/Failure
+Key numbers (timeit, record count, exception message)
+```
+
+Debugging records:
+
+1. Symptom: which input failed
+2. Hypothesis: which conditional/data structure/path is the cause
+3. Verification: confirmed via `pdb`, `print`, `timeit`, or unit test
+4. Conclusion: what changed between before and after the fix
+
+### Reinforcement Note: Operational Habits
+
+When moving code into production: (1) input validation at function entry, (2) separate user-facing from log messages, (3) benchmark-based performance judgments.
+
+```python
+def safe_run(fn, *args, **kwargs):
+    try:
+        return fn(*args, **kwargs)
+    except Exception as e:
+        raise RuntimeError(f'Execution failed: {fn.__name__}') from e
+```
+
+When reading stdlib docs: module overview → top 3 functions → exception types.
+
+
 ## Summary and next chapter
 
 - Files are operating system resources, so opening them inside a `with` block is the safer default for closing the handle.

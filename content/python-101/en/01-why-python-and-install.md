@@ -344,6 +344,126 @@ Newer tools like `uv` and `poetry` are faster and more powerful, but they are bu
    Run `python3 -c "import sys; print(sys.executable)"` once with no venv active and once after activating any venv.
    - Success criterion: deactivated state shows a system path (e.g., `/usr/bin/python3`); activated state shows a path under `.venv`.
 
+## Practical Anchor: Inspecting the Runtime Environment Right After Installation
+
+The most common beginner problem is not syntax—it is environment mismatch. When VS Code and the terminal produce different results, check the interpreter path before blaming your code. Add the following verification routine to your team onboarding doc and you will eliminate most early confusion.
+
+```bash
+python --version
+which python
+python -c "import sys; print(sys.executable)"
+python -c "import site; print(site.getsitepackages())"
+```
+
+Interpret actual output like this:
+
+```text
+$ python --version
+Python 3.12.4
+
+$ which python
+~/.pyenv/shims/python
+
+$ python -c "import sys; print(sys.executable)"
+~/.pyenv/versions/3.12.4/bin/python
+```
+
+The critical check is whether `which python` and `sys.executable` logically point to the same runtime. If they diverge, suspect shell aliases, IDE interpreter settings, or venv activation order.
+
+From the CPython perspective, verifying your installation goes beyond a version check. The following one-liner reveals the implementation and GIL information for your current runtime:
+
+```python
+import platform
+import sys
+
+print(platform.python_implementation())
+print(sys.version)
+print(sys.getswitchinterval())
+```
+
+If `platform.python_implementation()` returns `CPython`, the reference-counting memory model described throughout this series applies directly. `sys.getswitchinterval()` shows the thread-switch interval—a key clue for understanding why CPU-bound code does not scale linearly under the GIL.
+
+You can also experience the memory model briefly in the REPL:
+
+```pycon
+>>> import sys
+>>> a = []
+>>> sys.getrefcount(a)
+2
+>>> b = a
+>>> sys.getrefcount(a)
+3
+>>> del b
+>>> sys.getrefcount(a)
+2
+```
+
+`getrefcount` reports one more than expected because the function call itself creates a temporary reference. This small observation pays off later when you study argument passing, shallow/deep copy, and object lifecycle.
+
+Extending to package installation, a standard checklist looks like this:
+
+| Check Item | Command | Expected Result | If It Fails |
+|---|---|---|---|
+| Interpreter version | `python --version` | 3.11+ | Re-select pyenv/installed version |
+| pip linkage | `python -m pip --version` | Same python path | Lock in `python -m pip` pattern |
+| venv activated | `echo $VIRTUAL_ENV` | Path printed | `source .venv/bin/activate` |
+| Encoding | `python -c "import sys; print(sys.getdefaultencoding())"` | utf-8 | Check shell locale/terminal settings |
+
+Skipping this table at the beginner stage inflates every future debugging cost. Conversely, aligning once at the start lets you follow the later modules—packages, testing, deployment—on stable ground.
+
+### Extra Exercise: Five-Minute Environment Mismatch Checklist
+
+Run these commands right after installation, before starting any project, to prevent half of future errors:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install ipython
+python -c "import sys, platform; print(sys.executable); print(platform.platform())"
+```
+
+Three facts to confirm from the output: (1) the executable path points inside your project venv, (2) pip links to the same python, and (3) the OS/architecture info matches your team documentation.
+
+```text
+$ python -m pip --version
+pip 25.0 from /project/.venv/lib/python3.12/site-packages/pip (python 3.12)
+```
+
+Making this a routine eliminates the classic "why does it only break on my machine?" question.
+
+### Appendix: Local Lab Log Template
+
+The template below is useful for recording your own experiments during the learning phase. The key principle is capturing code + environment + output as a single set. Logs recorded this way become the most reliable reproduction evidence when problems resurface.
+
+```text
+[Environment]
+python: 3.12.x
+platform: macOS/Linux
+venv: .venv
+
+[Experiment]
+Goal: verify behavior or compare performance
+Input: 1,000 sample records
+Command: python script.py
+
+[Output]
+Success/Failure
+Key numbers (timeit, record count, exception message)
+```
+
+In code reviews people often share only the result numbers, but during the learning phase writing down intermediate assumptions is more effective. For example, recording whether "set membership is faster" was confirmed, or whether "f-strings are always more readable" aligns with team conventions, speeds up future decisions.
+
+Use the same format for debugging records:
+
+1. Symptom: which input failed
+2. Hypothesis: which conditional/data structure/path is the cause
+3. Verification: confirmed via `pdb`, `print`, `timeit`, or unit test
+4. Conclusion: what changed between before and after the fix
+
+This habit may feel slow at the beginner stage. But as project scale grows, "accurate records" become the fastest path. Separately from learning Python syntax, the ability to leave experiments in reproducible form determines your growth velocity as a developer.
+
+
 ## Summary
 
 - System Python belongs to the OS. Never `pip install` into it.

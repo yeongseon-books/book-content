@@ -354,6 +354,161 @@ Plenty of business logic is fine as plain functions. Classes earn their cost whe
 3. Rewrite `Point` using `@dataclass` and confirm in a REPL that the behavior matches.
 4. Define an `Animal` class and a `Dog(Animal)` subclass that overrides `speak()`. Have `Dog.speak` call `super().speak()` as part of its result.
 
+## Practical Anchor: Object Design Criteria, Memory Behavior, and Debugging Flow
+
+After learning class syntax, the real sticking point is "should this responsibility belong to an object?" The criterion is simple: when state and the operations that maintain that state move together, a class wins.
+
+```python
+class Cart:
+    def __init__(self):
+        self.items = []
+
+    def add(self, name, price):
+        self.items.append({'name': name, 'price': price})
+
+    def total(self):
+        return sum(x['price'] for x in self.items)
+```
+
+Exposing `items` for direct external mutation breaks invariants. Provide operations via methods to make boundaries explicit.
+
+`dataclasses` reduce boilerplate while expressing model intent clearly:
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class User:
+    id: int
+    name: str
+```
+
+Auto-generated `__repr__` and `__eq__` make debugging and testing easier.
+
+Object lifetime from the CPython perspective:
+
+```python
+import sys
+
+class A:
+    pass
+
+obj = A()
+print(sys.getrefcount(obj))
+alias = obj
+print(sys.getrefcount(obj))
+del alias
+print(sys.getrefcount(obj))
+```
+
+Reference count changes connect directly to object survival. Circular references prevent collection by refcount alone—the GC must intervene.
+
+Inheritance is a reuse tool, but excessive hierarchies increase comprehension cost. Default to composition; use inheritance only when the "is-a" relationship is unambiguous:
+
+```python
+class EmailSender:
+    def send(self, msg):
+        print('email:', msg)
+
+class Notifier:
+    def __init__(self, sender):
+        self.sender = sender
+
+    def notify(self, msg):
+        self.sender.send(msg)
+```
+
+Debugging: inspect method binding directly:
+
+```pycon
+>>> u = User(1, 'kim')
+>>> u.__class__
+<class '__main__.User'>
+>>> User.__mro__
+(<class '__main__.User'>, <class 'object'>)
+```
+
+`__mro__` is essential for explaining method resolution order in multiple inheritance.
+
+Performance: measure attribute access cost:
+
+```python
+import timeit
+
+class P:
+    def __init__(self):
+        self.x = 1
+
+p = P()
+attr_t = timeit.timeit('p.x', globals=globals(), number=20_000_000)
+local_t = timeit.timeit('x', setup='x=1', number=20_000_000)
+print(attr_t, local_t)
+```
+
+A small difference, but in hot loops structural design can affect performance.
+
+### Extra Exercise: Encapsulation and Test Boundaries
+
+As classes grow, separating public from internal methods keeps maintenance manageable. Minimize the external contract; keep internal implementation changeable:
+
+```python
+class Balance:
+    def __init__(self, amount=0):
+        self._amount = amount
+
+    @property
+    def amount(self):
+        return self._amount
+
+    def deposit(self, value):
+        if value <= 0:
+            raise ValueError('value must be > 0')
+        self._amount += value
+```
+
+`_amount` is internal by convention. External code mutates state only through method contracts like `deposit`, preserving business rules.
+
+Separating `__str__` and `__repr__` improves both logging and debugging quality:
+
+```python
+class Item:
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return f'Item(name={self.name!r})'
+```
+
+If your tests compare objects frequently, consider `dataclass(frozen=True)` for added stability.
+
+### Appendix: Local Lab Log Template
+
+Record experiments as code + environment + output sets:
+
+```text
+[Environment]
+python: 3.12.x
+platform: macOS/Linux
+venv: .venv
+
+[Experiment]
+Goal: verify behavior or compare performance
+Input: 1,000 sample records
+Command: python script.py
+
+[Output]
+Success/Failure
+Key numbers (timeit, record count, exception message)
+```
+
+Debugging records:
+
+1. Symptom: which input failed
+2. Hypothesis: which conditional/data structure/path is the cause
+3. Verification: confirmed via `pdb`, `print`, `timeit`, or unit test
+4. Conclusion: what changed between before and after the fix
+
+
 ## Summary and next chapter
 
 - A class bundles data and behavior so the caller can pass one object instead of a list of fields.

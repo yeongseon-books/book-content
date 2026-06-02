@@ -362,6 +362,180 @@ If you already know `Counter`, steps 2 and 3 collapse into a single line. After 
    Given `[("ada", "engineer"), ("bob", "designer"), ("charlie", "engineer")]`, write `group_by_role(rows)` returning a dict mapping each role to the list of names. Use `defaultdict(list)`.
    - Success criterion: the input above produces `{'engineer': ['ada', 'charlie'], 'designer': ['bob']}`.
 
+## Practical Anchor: Choosing Data Structures by Evidence, Not Intuition
+
+Lists, tuples, sets, and dicts are all common but serve different purposes. Keep this table as a decision template:
+
+| Structure | Order Preserved | Duplicates Allowed | Mutable | Primary Use |
+|---|---|---|---|---|
+| `list` | Yes | Yes | Yes | Sequential data, indexing |
+| `tuple` | Yes | Yes | No | Immutable records, hash-key components |
+| `set` | No | No | Yes | Fast membership tests, set operations |
+| `dict` | Yes (insertion order) | No duplicate keys | Yes | Key-value mapping, indexes |
+
+The most common beginner question is "why a set instead of a list here?" The answer is membership-test cost:
+
+```python
+import timeit
+
+list_t = timeit.timeit('99999 in data', setup='data=list(range(100000))', number=10000)
+set_t = timeit.timeit('99999 in data', setup='data=set(range(100000))', number=10000)
+print(list_t, set_t)
+```
+
+Example output:
+
+```text
+7.889102
+0.002614
+```
+
+Data structure choice changes algorithmic complexity—the numbers make that visceral. One experience like this transforms how you write subsequent code.
+
+The shared-reference trap is also mandatory. This code contains a classic 2D-array initialization bug:
+
+```python
+matrix = [[0] * 3] * 2
+matrix[0][1] = 9
+print(matrix)
+```
+
+Output:
+
+```text
+[[0, 9, 0], [0, 9, 0]]
+```
+
+The inner lists point to the same object. The safe approach is a comprehension:
+
+```python
+matrix = [[0] * 3 for _ in range(2)]
+```
+
+For dicts, developing intuition for when to use `get`, `setdefault`, or `defaultdict` matters:
+
+```python
+from collections import defaultdict
+
+words = ['py', 'py', 'code']
+counter = defaultdict(int)
+for w in words:
+    counter[w] += 1
+print(counter)
+```
+
+For readability and safety, make `defaultdict` the default candidate for accumulation/grouping patterns.
+
+Tuples are immutable and therefore safe—unless they contain mutable objects internally:
+
+```pycon
+>>> t = (1, [2, 3])
+>>> t[1].append(4)
+>>> t
+(1, [2, 3, 4])
+```
+
+This case corrects the misconception that "tuples are always safe."
+
+Debugging is fast in `pdb` when you check object IDs:
+
+```python
+import pdb
+
+a = [1, 2]
+b = a
+pdb.set_trace()
+```
+
+Run `p id(a)`, `p id(b)`, `p a is b` in sequence to instantly confirm shallow-copy vs shared-reference.
+
+Standard library modules to remember alongside this chapter:
+
+- `collections.deque`: efficient append/pop at both ends
+- `heapq`: priority queue
+- `bisect`: binary-search insertion into sorted lists
+
+Knowing these three transitions problem-solving from exercises to production code much more naturally.
+
+### Extra Exercise: Reviewing Data Structure Selection Mistakes
+
+A common production mistake: using a list as the default when order does not matter. If deduplication is needed, collect into a set from the start:
+
+```python
+emails = ['a@x.com', 'b@x.com', 'a@x.com']
+unique = set(emails)
+print(unique)
+```
+
+Dict merge syntax (Python 3.9+) shortens code noticeably:
+
+```python
+a = {'host': 'localhost', 'port': 5432}
+b = {'port': 5433, 'debug': True}
+merged = a | b
+print(merged)
+```
+
+Output:
+
+```text
+{'host': 'localhost', 'port': 5433, 'debug': True}
+```
+
+Tuples combined with unpacking improve readability:
+
+```python
+point = (10, 20)
+x, y = point
+print(x, y)
+```
+
+For sorted dict views, internalize the `sorted(d.items(), key=...)` pattern to speed up analytics code.
+
+### Appendix: Local Lab Log Template
+
+Record experiments as code + environment + output sets:
+
+```text
+[Environment]
+python: 3.12.x
+platform: macOS/Linux
+venv: .venv
+
+[Experiment]
+Goal: verify behavior or compare performance
+Input: 1,000 sample records
+Command: python script.py
+
+[Output]
+Success/Failure
+Key numbers (timeit, record count, exception message)
+```
+
+During learning, writing intermediate assumptions speeds up future decisions. Use the same format for debugging records:
+
+1. Symptom: which input failed
+2. Hypothesis: which conditional/data structure/path is the cause
+3. Verification: confirmed via `pdb`, `print`, `timeit`, or unit test
+4. Conclusion: what changed between before and after the fix
+
+### Reinforcement Note: Operational Habits That Reduce Mistakes
+
+When moving learning code into real projects, check three things: (1) input validation at function entry, (2) separate user-facing from log messages on failure, (3) base performance judgments on benchmarks not guesses.
+
+```python
+def safe_run(fn, *args, **kwargs):
+    try:
+        return fn(*args, **kwargs)
+    except Exception as e:
+        raise RuntimeError(f'Execution failed: {fn.__name__}') from e
+```
+
+When reading stdlib docs, scan: module overview → top 3 functions → exception types. Knowing which module to open matters more than memorizing every function.
+
+In practice: "pick the right data structure first, then simplify the implementation" is the correct order. When the structure is right, both code length and bug count drop together.
+
+
 ## Summary and next chapter
 
 - list and tuple are ordered bundles; set is an unordered collection of unique hashable elements; dict is a key→value mapping.

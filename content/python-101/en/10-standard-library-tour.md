@@ -214,6 +214,183 @@ Standard-library helpers show up in many small but recurring places.
 
 The more familiar you are with the standard library, the shorter your scripts get. Reviewers also share the same vocabulary, so the review goes faster.
 
+## Practical Anchor: Building Small Tools by Combining Standard Library Modules
+
+The real value of the standard library is not knowing each module individually but combining multiple modules to solve a complete problem. Here is a log-file summary tool as an example:
+
+```python
+from pathlib import Path
+from collections import Counter
+import csv
+import json
+
+root = Path('logs')
+counter = Counter()
+
+for file in root.glob('*.csv'):
+    with file.open(encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            counter[row['level']] += 1
+
+summary = {'total': sum(counter.values()), 'by_level': dict(counter)}
+Path('summary.json').write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding='utf-8')
+```
+
+`pathlib + csv + collections + json` alone produces a production-ready utility.
+
+For date/time, build the habit of using `datetime` with `zoneinfo` together:
+
+```python
+from datetime import datetime
+from zoneinfo import ZoneInfo
+
+now = datetime.now(ZoneInfo('Asia/Seoul'))
+print(now.isoformat())
+```
+
+Leaving naive datetimes (no timezone) makes log correlation analysis extremely difficult.
+
+Use regex with minimal safeguards:
+
+```python
+import re
+
+pat = re.compile(r'^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$')
+print(bool(pat.match('dev@example.com')))
+```
+
+When using `subprocess`, default to list arguments rather than shell string concatenation:
+
+```python
+import subprocess
+
+result = subprocess.run(['python', '--version'], capture_output=True, text=True, check=True)
+print(result.stdout.strip())
+```
+
+This is safer for both security and portability.
+
+A benchmark example:
+
+```python
+import timeit
+
+sort_t = timeit.timeit('sorted(data)', setup='import random; data=[random.randint(1,1000000) for _ in range(10000)]', number=300)
+heap_t = timeit.timeit('import heapq; h=data[:]; heapq.heapify(h); [heapq.heappop(h) for _ in range(10000)]', setup='import random; data=[random.randint(1,1000000) for _ in range(10000)]', number=300)
+print(sort_t, heap_t)
+```
+
+Whether you need a full sort or just the top K items determines the right choice—this makes that tangible.
+
+For packaging, an `argparse`-based CLI skeleton shows that the standard library alone can produce a distributable tool:
+
+```python
+import argparse
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input', required=True)
+    args = parser.parse_args()
+    print('input:', args.input)
+
+if __name__ == '__main__':
+    main()
+```
+
+Add a console script entry in `pyproject.toml` to run team utilities consistently:
+
+```toml
+[project.scripts]
+log-summary = "myapp.cli:main"
+```
+
+Standard library study is the experience of "how far can I get without external packages?" Carrying this intuition makes dependency choices far more conservative and stable.
+
+### Extra Exercise: Diagnostic CLI Using Only Standard Library
+
+You can build diagnostic tools without any external dependencies. For example, counting files and total bytes in a directory needs only `argparse` and `pathlib`:
+
+```python
+from pathlib import Path
+import argparse
+
+def scan(root: Path):
+    files = [p for p in root.rglob('*') if p.is_file()]
+    total = sum(p.stat().st_size for p in files)
+    return len(files), total
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('root')
+    args = parser.parse_args()
+    count, total = scan(Path(args.root))
+    print(f'files={count} bytes={total}')
+
+if __name__ == '__main__':
+    main()
+```
+
+Example output:
+
+```text
+files=128 bytes=4092312
+```
+
+For operational automation, `shutil`, `zipfile`, and `tempfile` are frequent companions:
+
+- `shutil.copytree`: directory copy
+- `zipfile.ZipFile`: compression/extraction
+- `tempfile.TemporaryDirectory`: temporary workspace management
+
+This combination applies directly to artifact cleanup, log bundling, and backup scripts.
+
+### Appendix: Local Lab Log Template
+
+Record experiments as code + environment + output sets:
+
+```text
+[Environment]
+python: 3.12.x
+platform: macOS/Linux
+venv: .venv
+
+[Experiment]
+Goal: verify behavior or compare performance
+Input: 1,000 sample records
+Command: python script.py
+
+[Output]
+Success/Failure
+Key numbers (timeit, record count, exception message)
+```
+
+Debugging records:
+
+1. Symptom: which input failed
+2. Hypothesis: which conditional/data structure/path is the cause
+3. Verification: confirmed via `pdb`, `print`, `timeit`, or unit test
+4. Conclusion: what changed between before and after the fix
+
+### Reinforcement Note: Operational Habits
+
+When moving code into production: (1) input validation at function entry, (2) separate user-facing from log messages, (3) benchmark-based performance judgments.
+
+```python
+def safe_run(fn, *args, **kwargs):
+    try:
+        return fn(*args, **kwargs)
+    except Exception as e:
+        raise RuntimeError(f'Execution failed: {fn.__name__}') from e
+```
+
+When reading stdlib docs: module overview → top 3 functions → exception types.
+
+The final standard for stdlib study: before adding a new dependency, check whether the standard library can solve the problem. This habit dramatically reduces long-term maintenance cost.
+
+Team tip: default to standard library for internal scripts; introduce external packages only when the need is clear—this reduces deployment, security, and upgrade burden.
+
+
 ## Checklist
 
 - [ ] You can express date arithmetic in one line using `datetime`, `date`, and `timedelta`.

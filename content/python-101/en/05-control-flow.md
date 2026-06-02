@@ -374,6 +374,155 @@ These two patterns reappear in the next chapter on function arguments and the ch
    - Hint: `zip(..., strict=True)`.
    - Success criterion: equal lengths produce a dict; unequal lengths raise `ValueError`.
 
+## Practical Anchor: Patterns and Traps for Safe Control Flow
+
+The core of conditionals and loops is boundary conditions, not syntax. When `if/elif/else` chains grow long, missing branches become hard to spot. A mapping table shrinks the bug surface:
+
+```python
+def fee(level):
+    table = {
+        'basic': 0,
+        'pro': 10000,
+        'enterprise': 50000,
+    }
+    return table.get(level, -1)
+```
+
+In loops, understanding `for-else` precisely matters. The `else` block runs only when the loop finishes *without* a `break`:
+
+```python
+nums = [2, 4, 6, 9]
+for n in nums:
+    if n % 2 == 1:
+        print('odd found:', n)
+        break
+else:
+    print('no odd numbers')
+```
+
+Newcomers easily confuse this with `if-else`, so in team code, make intent explicit via comments or function names.
+
+For infinite-loop prevention, combine both a time condition and a counter:
+
+```python
+import time
+
+start = time.time()
+retry = 0
+while True:
+    retry += 1
+    if retry >= 5:
+        break
+    if time.time() - start > 10:
+        break
+```
+
+On the performance side, experience the difference between list comprehensions and explicit loops:
+
+```python
+import timeit
+
+loop_t = timeit.timeit('out=[]\nfor x in range(10000):\n    out.append(x*x)', number=500)
+comp_t = timeit.timeit('[x*x for x in range(10000)]', number=500)
+print(loop_t, comp_t)
+```
+
+Example output:
+
+```text
+0.487201
+0.311778
+```
+
+Comprehensions are not always the answer, but for simple transforms they are often both more readable and faster.
+
+For debugging, branch tracing is effective:
+
+```python
+import pdb
+
+def classify(score):
+    pdb.set_trace()
+    if score >= 90:
+        return 'A'
+    if score >= 80:
+        return 'B'
+    return 'C'
+
+classify(85)
+```
+
+Step through with `n` one line at a time to verify condition evaluation and quickly find logic gaps.
+
+Another common trap: `continue` skipping important post-processing. File handle cleanup, counter increments, and logging should be managed outside the conditional branch—at the loop structure level.
+
+The goal of the control flow chapter is not syntax memorization but making code predictable even under exceptional conditions.
+
+### Extra Exercise: Preventing Branch Gaps with Testable Flow
+
+Control flow should move in lockstep with test case design. For example, a grading function needs boundary-value tests (89, 90, 79, 80) pinned down to prevent regressions:
+
+```python
+def grade(s):
+    if s >= 90:
+        return 'A'
+    if s >= 80:
+        return 'B'
+    return 'C'
+```
+
+Test-perspective inputs:
+
+```text
+89 -> B
+90 -> A
+79 -> C
+80 -> B
+```
+
+When using `match-case`, always include a default branch (`case _`) to avoid silent failure on unknown values:
+
+```python
+def action(cmd):
+    match cmd:
+        case 'start':
+            return 1
+        case 'stop':
+            return 2
+        case _:
+            raise ValueError(f'unknown cmd: {cmd}')
+```
+
+### Appendix: Local Lab Log Template
+
+Record experiments as code + environment + output sets:
+
+```text
+[Environment]
+python: 3.12.x
+platform: macOS/Linux
+venv: .venv
+
+[Experiment]
+Goal: verify behavior or compare performance
+Input: 1,000 sample records
+Command: python script.py
+
+[Output]
+Success/Failure
+Key numbers (timeit, record count, exception message)
+```
+
+During learning, writing intermediate assumptions speeds up future decisions. Debugging records use the same format:
+
+1. Symptom: which input failed
+2. Hypothesis: which conditional/data structure/path is the cause
+3. Verification: confirmed via `pdb`, `print`, `timeit`, or unit test
+4. Conclusion: what changed between before and after the fix
+
+This habit may feel slow at first, but as projects grow, accurate records become the fastest path.
+
+
 ## Summary and next chapter
 
 - Branching versus looping splits naturally on "single decision or repetition?", then on "do I have an iterable already?".

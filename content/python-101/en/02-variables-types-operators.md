@@ -295,6 +295,225 @@ Before moving to the next chapter, walk through these by hand at least once.
    Write `read_age() -> int` that calls `input("Age: ")`, converts to int, and re-prompts on negative numbers or non-numeric input.
    - Success criteria: `"25"` returns `25`; `"-1"` and `"abc"` both re-prompt without raising.
 
+## Practical Anchor: Seeing the Object Model, Reference Counts, and Operation Costs
+
+Hearing that variables are name bindings rather than boxes makes intuitive sense. But confusion returns the moment operators and type conversions mix. Let's lock in the object model with REPL output.
+
+```pycon
+>>> x = 10
+>>> y = x
+>>> id(x), id(y)
+(4381320848, 4381320848)
+>>> y += 1
+>>> x, y
+(10, 11)
+>>> id(x), id(y)
+(4381320848, 4381320880)
+```
+
+Integers are immutable, so `y += 1` does not mutate the existing object—it rebinds `y` to a new object. Mutable types behave differently:
+
+```pycon
+>>> a = [1, 2]
+>>> b = a
+>>> b.append(3)
+>>> a
+[1, 2, 3]
+```
+
+If you do not grasp this difference, bugs surface in function argument passing—especially combined with mutable default arguments:
+
+```python
+def add_item(item, bucket=[]):
+    bucket.append(item)
+    return bucket
+
+print(add_item('A'))
+print(add_item('B'))
+```
+
+Output:
+
+```text
+['A']
+['A', 'B']
+```
+
+It looks like each call should get a fresh list, but the default is evaluated only once at function definition time. The safe pattern uses a `None` sentinel:
+
+```python
+def add_item(item, bucket=None):
+    if bucket is None:
+        bucket = []
+    bucket.append(item)
+    return bucket
+```
+
+In the operators section, you must separate `==` and `is`. `==` tests value equality; `is` tests object identity.
+
+| Comparison | Meaning | When to Use |
+|---|---|---|
+| `a == b` | Are the values equal? | Numbers, strings, sequences |
+| `a is b` | Is it the same object? | `None` checks, singleton verification |
+
+Real example:
+
+```pycon
+>>> a = 256
+>>> b = 256
+>>> a is b
+True
+>>> c = 257
+>>> d = 257
+>>> c is d
+False
+```
+
+Never rely on the small-integer cache implementation detail to use `is` for value comparison.
+
+Building a basic performance intuition at this stage also helps:
+
+```python
+import timeit
+
+plus_cost = timeit.timeit('x + 1', setup='x = 10', number=5_000_000)
+inplace_cost = timeit.timeit('x += 1', setup='x = 10', number=5_000_000)
+print(plus_cost, inplace_cost)
+```
+
+Example output:
+
+```text
+0.129842851
+0.128991044
+```
+
+The exact numbers matter less than the comparison habit. Don't optimize by intuition—verify even small code with `timeit`. This habit pays off when choosing data structures (list vs set vs dict) later.
+
+One more look at CPython internals:
+
+```python
+import sys
+
+name = 'python'
+print(sys.getrefcount(name))
+alias = name
+print(sys.getrefcount(name))
+del alias
+print(sys.getrefcount(name))
+```
+
+This output makes it viscerally clear that variables hold references, not values. The core of the variables/types/operators chapter is anchoring this model—not memorizing syntax.
+
+### Extra Exercise: Floating-Point and Numeric Misconceptions
+
+The most common operator-section misconception is floating-point comparison. The following output looks surprising but is correct behavior:
+
+```pycon
+>>> 0.1 + 0.2 == 0.3
+False
+>>> 0.1 + 0.2
+0.30000000000000004
+```
+
+When you need precise comparison, use `math.isclose` as the default:
+
+```python
+import math
+print(math.isclose(0.1 + 0.2, 0.3, rel_tol=1e-9))
+```
+
+Remembering the inheritance relationship between int, float, and bool also helps reduce bugs:
+
+```pycon
+>>> isinstance(True, int)
+True
+>>> True + True
+2
+```
+
+If you don't know that `bool` is a subclass of `int`, you get unintended summations in aggregation logic.
+
+Bitwise operations appear frequently in production code:
+
+```python
+READ = 0b001
+WRITE = 0b010
+EXEC = 0b100
+perm = READ | WRITE
+print(bool(perm & READ), bool(perm & EXEC))
+```
+
+Output:
+
+```text
+True False
+```
+
+Finally, the `decimal` standard library is nearly mandatory for monetary calculations:
+
+```python
+from decimal import Decimal
+
+price = Decimal('19.90')
+qty = Decimal('3')
+print(price * qty)
+```
+
+Compare `float` and `Decimal` results in the REPL and you immediately feel why type choice matters.
+
+### Appendix: Local Lab Log Template
+
+The template below is useful for recording experiments during the learning phase. The key principle: capture code + environment + output as a single set. Such logs become the most reliable reproduction evidence when problems resurface.
+
+```text
+[Environment]
+python: 3.12.x
+platform: macOS/Linux
+venv: .venv
+
+[Experiment]
+Goal: verify behavior or compare performance
+Input: 1,000 sample records
+Command: python script.py
+
+[Output]
+Success/Failure
+Key numbers (timeit, record count, exception message)
+```
+
+In code reviews people often share only results, but during learning, writing intermediate assumptions is more effective—e.g., whether "set membership is faster" was confirmed, or whether "f-strings are always more readable" aligns with team conventions.
+
+Use the same format for debugging records:
+
+1. Symptom: which input failed
+2. Hypothesis: which conditional/data structure/path is the cause
+3. Verification: confirmed via `pdb`, `print`, `timeit`, or unit test
+4. Conclusion: what changed between before and after the fix
+
+### Reinforcement Note: Operational Habits That Reduce Mistakes
+
+When moving learning-stage code into real projects, check three things together. First, verify that input validation boundaries sit at function entry points. Second, separate user-facing messages from log messages on failure. Third, base performance judgments on `timeit` or sample benchmarks—not guesses.
+
+A simple template:
+
+```python
+def safe_run(fn, *args, **kwargs):
+    try:
+        return fn(*args, **kwargs)
+    except Exception as e:
+        raise RuntimeError(f'Execution failed: {fn.__name__}') from e
+```
+
+When reading standard library docs, adopt the habit of scanning in order: module overview → top 3 functions → exception types. Knowing *which module to open* for a given situation matters more than memorizing every function.
+
+In short: the core of the variables chapter is name binding, the core of types is mutable vs immutable, and the core of operators is not confusing `==` with `is`. Read code through these three lenses and you can quickly classify most beginner bugs.
+
+Extra tip: mixed float/int arithmetic, implicit bool conversion, and shared references to mutable objects are the three classic beginner traps. Add them to your code review checklist and regression bugs drop noticeably.
+
+One-line conclusion: distinguish values from objects, and most mistakes disappear.
+
+
 ## Summary and next chapter
 
 - A Python variable is a name tag attached to an object. `=` doesn't copy the value; it moves the tag.
