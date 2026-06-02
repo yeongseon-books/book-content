@@ -265,6 +265,288 @@ In practice, when a bug report arrives, the failing input gets added to a parame
 
 Parametrize is the core tool for data-driven testing. A single test function covers diverse inputs, eliminating code duplication. Next, we'll learn mock and monkeypatch for replacing external dependencies.
 
+## Parameter Design Deep Dive: Change Data, Keep Verification Logic
+
+The advantage of parametrize is expanding the input space without increasing the number of test functions.
+
+```python
+# validator.py
+
+def validate_username(name: str) -> bool:
+    if not 3 <= len(name) <= 20:
+        return False
+    return name.replace("_", "").isalnum()
+```
+
+```python
+# test_validator.py
+import pytest
+from validator import validate_username
+
+@pytest.mark.parametrize(
+    "name,expected",
+    [
+        pytest.param("abc", True, id="min-length"),
+        pytest.param("ab", False, id="too-short"),
+        pytest.param("user_name", True, id="underscore"),
+        pytest.param("bad name", False, id="space"),
+        pytest.param("x" * 21, False, id="too-long"),
+    ],
+)
+def test_validate_username(name, expected):
+    assert validate_username(name) is expected
+```
+
+## CLI Output Verification
+
+```bash
+pytest test_validator.py -v
+```
+
+```text
+test_validator.py::test_validate_username[min-length] PASSED
+test_validator.py::test_validate_username[too-short] PASSED
+...
+========================= 5 passed =========================
+```
+
+## Handling Happy and Error Cases in a Single Function
+
+```python
+# parser.py
+
+def parse_port(value: str) -> int:
+    port = int(value)
+    if not 1 <= port <= 65535:
+        raise ValueError("port out of range")
+    return port
+```
+
+```python
+# test_parser.py
+import pytest
+from parser import parse_port
+
+@pytest.mark.parametrize("value,expected", [("80", 80), ("443", 443)])
+def test_parse_port_ok(value, expected):
+    assert parse_port(value) == expected
+
+@pytest.mark.parametrize("value", ["0", "70000", "-1"])
+def test_parse_port_fail(value):
+    with pytest.raises(ValueError, match="out of range"):
+        parse_port(value)
+```
+
+## Controlling Combinatorial Explosion
+
+Nested parametrize is powerful but combinations grow fast.
+
+| Methods | Statuses | Generated Tests |
+|---|---|---|
+| 3 | 3 | 9 |
+| 5 | 6 | 30 |
+| 8 | 10 | 80 |
+
+Extract only the necessary boundaries to keep test execution time manageable.
+
+## Before and After: Refactoring
+
+```python
+# before
+
+def test_price_case1():
+    assert discount(10000, "VIP") == 9000
+
+def test_price_case2():
+    assert discount(10000, "NEW") == 9500
+
+def test_price_case3():
+    assert discount(10000, "NONE") == 10000
+```
+
+```python
+# after
+import pytest
+
+@pytest.mark.parametrize(
+    "price,tier,expected",
+    [
+        (10000, "VIP", 9000),
+        (10000, "NEW", 9500),
+        (10000, "NONE", 10000),
+    ],
+)
+def test_discount(price, tier, expected):
+    assert discount(price, tier) == expected
+```
+
+Adding tests becomes adding a data row, not copying functions.
+
+## Dataset Management Patterns
+
+When parameter lists grow long, test file readability suffers. Group by category.
+
+```python
+VALID_CASES = [
+    ("alice", True),
+    ("bob_01", True),
+]
+
+INVALID_CASES = [
+    ("ab", False),
+    ("bad name", False),
+    ("x" * 30, False),
+]
+```
+
+```python
+import pytest
+from validator import validate_username
+
+@pytest.mark.parametrize("name,expected", VALID_CASES, ids=["alice", "bob_01"])
+def test_username_valid(name, expected):
+    assert validate_username(name) is expected
+
+@pytest.mark.parametrize("name,expected", INVALID_CASES, ids=["short", "space", "long"])
+def test_username_invalid(name, expected):
+    assert validate_username(name) is expected
+```
+
+## Interpreting Failure Output
+
+```text
+FAILED test_username_invalid[space] - assert True is False
+```
+
+With IDs, you can immediately read which case failed.
+
+## Combining parametrize with raises
+
+```python
+import pytest
+
+def to_int(v: str) -> int:
+    if not v.strip().isdigit():
+        raise ValueError("not integer")
+    return int(v)
+
+@pytest.mark.parametrize("bad", ["", "a1", "-1", "1.2"])
+def test_to_int_invalid(bad):
+    with pytest.raises(ValueError):
+        to_int(bad)
+```
+
+## Refactoring Checklist
+
+- When you start copying test functions, consider switching to parametrize
+- Assign IDs to each case
+- Separate happy and error cases
+- Sample by category when combinations explode
+
+## Terminal Option Combinations
+
+| Command | Purpose |
+|---|---|
+| `pytest -q` | Quick pass/fail summary |
+| `pytest -v` | Per-case pass/fail detail |
+| `pytest -x` | Stop immediately on first failure |
+| `pytest -k "keyword"` | Run only matching subset |
+| `pytest --maxfail=3` | Limit maximum failure count |
+
+## Operational Regression Test Template
+
+```python
+import pytest
+
+BUG_CASES = [
+    ("", ValueError),
+    ("   ", ValueError),
+    (None, TypeError),
+]
+
+@pytest.mark.parametrize("raw,exc", BUG_CASES)
+def test_regression_cases(raw, exc):
+    with pytest.raises(exc):
+        require_non_empty(raw)
+```
+
+This template is the simplest form of permanently preserving bug tickets as test code.
+
+## Quality Check Questions
+
+- Can you infer the failure cause from the failure message alone?
+- Do tests depend on execution order?
+- Are boundary-value inputs included?
+- Are both happy and error paths verified?
+- Does adding a test case require only adding data, not copying functions?
+
+## Case Study: Common Improvement Points in PR Reviews
+
+### Code Example
+
+```python
+# app/discount.py
+
+def discount_price(price: int, rate: float) -> int:
+    if price < 0:
+        raise ValueError("price must be >= 0")
+    if not 0 <= rate <= 1:
+        raise ValueError("rate must be between 0 and 1")
+    return int(price * (1 - rate))
+```
+
+```python
+# tests/test_discount.py
+import pytest
+from app.discount import discount_price
+
+@pytest.mark.parametrize(
+    "price,rate,expected",
+    [
+        (10000, 0.0, 10000),
+        (10000, 0.1, 9000),
+        (10000, 1.0, 0),
+    ],
+)
+def test_discount_price(price, rate, expected):
+    assert discount_price(price, rate) == expected
+
+@pytest.mark.parametrize("price,rate", [(-1, 0.1), (1000, -0.1), (1000, 1.1)])
+def test_discount_price_invalid(price, rate):
+    with pytest.raises(ValueError):
+        discount_price(price, rate)
+```
+
+### Output Example
+
+```bash
+pytest tests/test_discount.py -v
+```
+
+```text
+tests/test_discount.py::test_discount_price[10000-0.0-10000] PASSED
+tests/test_discount.py::test_discount_price[10000-0.1-9000] PASSED
+tests/test_discount.py::test_discount_price[10000-1.0-0] PASSED
+tests/test_discount.py::test_discount_price_invalid[-1-0.1] PASSED
+tests/test_discount.py::test_discount_price_invalid[1000--0.1] PASSED
+tests/test_discount.py::test_discount_price_invalid[1000-1.1] PASSED
+========================= 6 passed =========================
+```
+
+### Review Points
+
+- Are boundary values (`0`, `1.0`) included?
+- Are exception types specific?
+- Can you identify the cause from the failure message?
+- Is the structure extensible by adding data alone, without copying functions?
+
+## Mini Checklist
+
+- Maintain at least 3 failure cases.
+- Include boundary values (min/max/empty).
+- Confirm failure messages are meaningful.
+- Verify the same command reproduces in CI.
+
 ## Answering the Opening Questions
 
 - **How do you verify the same logic with multiple inputs without copying functions?**
