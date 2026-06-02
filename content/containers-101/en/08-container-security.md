@@ -164,16 +164,63 @@ docker run --rm --read-only --tmpfs /tmp python:3.12-slim python -c "print("ok")
 
 ## How This Shows Up in Production
 
-*Kubernetes Pod Security* and *admission controllers* enforce *non-root, no privileged, signed only* policies at *runtime*.
+Kubernetes Pod Security Standards and admission controllers enforce non-root, no-privileged, signed-only policies at runtime. But even without K8s, you can enforce these defaults at the `docker run` level.
+
+### Minimum-Privilege Runtime Template
+
+```bash
+docker run --rm \
+  --read-only \
+  --cap-drop ALL \
+  --security-opt no-new-privileges \
+  --pids-limit 256 \
+  --memory 256m \
+  myorg/secure-app:latest
+```
+
+This combination prevents privilege escalation, process fork bombs, and memory exhaustion simultaneously.
+
+### Compose Security Configuration
+
+```yaml
+services:
+  api:
+    image: myorg/secure-app:latest
+    read_only: true
+    cap_drop: ["ALL"]
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp
+```
+
+Declarative security options make policy changes visible in code review and version history.
+
+### Scan as a Deployment Gate
+
+```bash
+trivy image --severity HIGH,CRITICAL --exit-code 1 myorg/secure-app:latest
+```
+
+A scan report that nobody acts on is theater. Wire the exit code into CI so HIGH/CRITICAL findings block deployment.
+
+### Defense Layers (not one layer)
+
+| Layer | Controls | Tool Example |
+| --- | --- | --- |
+| Image | Base image choice, package removal, scan | Trivy, Snyk |
+| Runtime | Non-root, cap-drop, read-only, seccomp | Docker flags, K8s PSS |
+| Network | Egress limits, internal-only networks | Network policies, firewall |
+| Observability | Audit logs, anomaly detection | Falco, auditd |
 
 ## How a Senior Engineer Thinks
 
-- *Defaults* are *dangerous*.
-- *Capabilities* are *added explicitly* only.
-- *Secrets* belong to a *dedicated system*.
-- *Scanning* is part of the *CI gate*.
-- *Signing* starts *supply-chain trust*.
-
+- Defaults are dangerous — every container starts with too much privilege.
+- Capabilities are added explicitly; `cap-drop=ALL` is the starting point.
+- Secrets belong to a dedicated system (Vault, K8s Secrets, cloud KMS) — never env vars.
+- Scanning is a CI gate, not a weekly report nobody reads.
+- Signing starts supply-chain trust from build to deploy.
+- Security is layers, not a single silver bullet.
 ## Checklist
 
 - [ ] *Non-root* user.
