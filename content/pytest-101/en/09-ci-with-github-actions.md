@@ -382,6 +382,178 @@ So the first win is not sophistication. It is a stable baseline: every push and 
 
 GitHub Actions is not just a way to run tests automatically. It is how a repository turns testing into an enforced merge rule. Once you anchor the workflow around one final file with clear triggers, matrix coverage, caching, and an artifact path, CI stops being a side feature and becomes the repository's default safety gate. Next, we'll look at how to write code that needs fewer mocks in the first place.
 
+## Failure Log Interpretation Patterns
+
+When operating CI, reading failure logs quickly matters more than the failures themselves. Below are common failure types in the pytest + coverage combination and how to interpret them.
+
+| Failure Type | Log Signal | First Check | Typical Action |
+| --- | --- | --- | --- |
+| Test failure | `FAILED tests/...` | Which case broke | Reproduce locally, fix code |
+| Coverage threshold miss | `Coverage failure: total of ...` | Missing lines and branches | Add tests for missing lines |
+| Import error | `ModuleNotFoundError` | Install method, `pythonpath` | `pip install -e ".[test]"`, check path config |
+| Dependency install failure | `Could not find a version` | Python version compatibility | Adjust version pins, replace package |
+
+When you see output like this, the blocker is the "quality gate" — not test logic:
+
+```text
+ERROR: Coverage failure: total of 78 is less than fail-under=80
+```
+
+The correct response is not adding more tests, but filling the exact empty branches.
+
+## Using conftest.py and Fixtures Stably in CI
+
+A common case where tests pass locally by coincidence but fail in CI involves fixture paths and environment dependencies. Patterns that directly open external resources in `conftest.py` significantly reduce CI stability.
+
+```python
+# tests/conftest.py
+import pytest
+
+@pytest.fixture
+def api_base_url(monkeypatch):
+    monkeypatch.setenv("API_BASE_URL", "https://api.test.local")
+    return "https://api.test.local"
+
+@pytest.fixture
+def sample_order_payload():
+    return {"item": "book", "qty": 1, "price": 10000}
+```
+
+This pattern has three advantages:
+
+- Environment variables are automatically isolated per test.
+- Contract verification is possible without external network.
+- Input state remains identical regardless of CI runner.
+
+## Separation Principle: parametrize and matrix Together
+
+`matrix` and `@pytest.mark.parametrize` both expand combinations, but serve different roles.
+
+- `matrix`: Runtime environment combinations (Python version, OS)
+- `parametrize`: Domain input combinations (permissions, amounts, status values)
+
+Expanding both carelessly causes execution time to spike. The following criteria are usually practical:
+
+1. Verify domain input combinations sufficiently within pytest.
+2. Limit environment combinations via matrix to minimum core versions.
+3. Separate heavy scenarios into a nightly workflow.
+
+For example, payment status tests run broadly inside pytest, while the Python version matrix stays at 3 versions.
+
+```python
+import pytest
+
+@pytest.mark.parametrize(
+    "amount,tier,expected",
+    [
+        (10000, "VIP", 9000),
+        (10000, "NEW", 9500),
+        (10000, "NONE", 10000),
+    ],
+)
+def test_discount_policy(amount, tier, expected):
+    assert discount(amount, tier) == expected
+```
+
+## Keeping monkeypatch-Based Tests Safe in CI
+
+Some CI failures arise from global state pollution. For example, if one test modifies an environment variable without restoring it, subsequent tests can break in cascade. Using `monkeypatch` structurally blocks this problem.
+
+```python
+def test_feature_flag_on(monkeypatch):
+    monkeypatch.setenv("FEATURE_NEW_CHECKOUT", "on")
+    assert use_new_checkout() is True
+
+def test_feature_flag_off(monkeypatch):
+    monkeypatch.setenv("FEATURE_NEW_CHECKOUT", "off")
+    assert use_new_checkout() is False
+```
+
+This code maintains the same result across local, PR, and retry runs.
+
+## Operational Routine: Connecting Coverage Artifacts to PR Review
+
+Even if you upload artifacts, utilization is low without connecting them to the review routine. Teams typically fix the following flow:
+
+1. Confirm CI failure on PR
+2. Download `coverage-html` artifact
+3. Check red lines in `htmlcov/index.html`
+4. Add tests targeting missing lines
+5. Confirm green transition in the same PR
+
+Example log:
+
+```text
+tests/test_checkout.py::test_apply_coupon PASSED
+tests/test_checkout.py::test_apply_coupon_invalid_code FAILED
+ERROR: Coverage failure: total of 79 is less than fail-under=80
+```
+
+This output signals "bug + empty coverage segment" simultaneously. Fix the failing test first, then fill missing branches to reduce recurrence probability together.
+
+## GitHub Actions YAML Snippets: timeout, concurrency, minimal permissions
+
+Adding these three elements to the base workflow increases operational stability.
+
+```yaml
+permissions:
+  contents: read
+
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pytest:
+    timeout-minutes: 15
+```
+
+- `permissions`: Minimizes security surface by reducing default permissions.
+- `concurrency`: Auto-cancels stale runs on the same branch, reducing queue.
+- `timeout-minutes`: Quickly blocks indefinite-hang failures.
+
+## Real PR Scenario: Locking Failures as Regression Tests Before Merge
+
+Assume a production bug where `coupon=None` input causes a 500 error.
+
+```python
+import pytest
+
+@pytest.mark.parametrize("coupon", [None, "", "INVALID"])
+def test_apply_coupon_handles_edge_values(coupon):
+    result = apply_coupon(10000, coupon)
+    assert result >= 0
+```
+
+CI output before fix:
+
+```text
+FAILED tests/test_checkout.py::test_apply_coupon_handles_edge_values[None]
+E   TypeError: 'NoneType' object has no attribute 'strip'
+```
+
+CI output after fix:
+
+```text
+tests/test_checkout.py::test_apply_coupon_handles_edge_values[None] PASSED
+tests/test_checkout.py::test_apply_coupon_handles_edge_values[] PASSED
+tests/test_checkout.py::test_apply_coupon_handles_edge_values[INVALID] PASSED
+========================= 3 passed =========================
+```
+
+The key is not the bugfix commit itself, but permanently locking those inputs as tests to prevent regression.
+
+## CI Pipeline Checkpoint
+
+- Are triggers connected to both `push` and `pull_request`?
+- Does the matrix version match the team's support policy?
+- Is the pytest command identical across local/documentation/CI?
+- Does coverage threshold miss actually fail the build?
+- Is the artifact consistently generated from the representative job?
+
+When these five items remain stable, CI functions beyond "working YAML" as "team quality rules."
+
+
 ## Answering the Opening Questions
 
 - **How do you stop relying on the habit of manually running tests for every PR?**
