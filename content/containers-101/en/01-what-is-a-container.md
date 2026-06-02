@@ -48,7 +48,6 @@ Since 2013, the container has been the default unit of deployment. Without under
 
 A container is a process tree isolated by namespaces (PID, network, filesystem, IPC) and constrained by cgroups. They share the host kernel but not the OS image or process visibility.
 
-A container is a process tree isolated by namespaces (PID, network, filesystem, IPC) and constrained by cgroups. They share the host kernel but not the OS image or process visibility.
 
 ## Key Terms
 
@@ -60,10 +59,28 @@ A container is a process tree isolated by namespaces (PID, network, filesystem, 
 
 ## Before/After
 
-**Before**: install directly on a server, then watch it break in production due to environment drift.
+**Before**: you install the application directly on each server. Python 3.9 on your laptop, Python 3.7 in production. A system library present locally is missing on the staging box. Each environment fails differently.
 
-**After**: one image runs the same way on any machine.
+```text
+Dev A local:   Ubuntu 22.04, Python 3.11, libpq 15
+Dev B local:   macOS 14, Python 3.10, libpq 14
+CI server:     Amazon Linux 2, Python 3.9, libpq 13
+Production:    Debian 11, Python 3.9, libpq 13
+→ Each environment can fail in a different way
+```
 
+**After**: one image bundles the Python version, system libraries, and application code. Every environment runs the identical bytes.
+
+```text
+Image: python:3.11-slim + requirements.txt + app code
+Dev A local:   docker run → same image
+Dev B local:   docker run → same image
+CI server:     docker run → same image
+Production:    docker run → same image
+→ Identical behavior everywhere
+```
+
+The real value of containers is reproducibility, not speed. Eliminating "works on my laptop" is the problem containers solve.
 ## Hands-on: Run Your First Container
 
 ### Step 1 — Version check
@@ -153,15 +170,29 @@ docker ps --filter name=web
 
 ## How This Shows Up in Production
 
-Developers build the same image on Docker Desktop. CI pushes that image to a registry. Production runs the same image under Kubernetes.
+Developers build the same image on Docker Desktop. CI pushes that image to a registry. Production runs the same image under Kubernetes. Every stage shares one artifact.
+
+```text
+Developer local  →  git push  →  CI (docker build + test)  →  Registry push
+                                                            ↓
+Production       ←  Kubernetes pull  ←  Registry (immutable tag)
+```
+
+The key insight: once an image is built, it passes through every environment without modification. The image your laptop produced and the image production runs are byte-for-byte identical, so you validate the image itself rather than debugging per-environment drift.
+
+A container is not a development convenience—it is a deployment contract. Without this perspective, containers remain a local experimentation toy.
 
 ## How a Senior Engineer Thinks
 
 - A container is a process, not a VM.
-- Images are *immutable*.
-- State lives on volumes, not inside containers.
-- Default to non-root.
+- Images are *immutable* artifacts.
+- State lives on volumes or external stores, never inside containers.
+- Default to non-root execution.
 - Reproducibility is the whole point.
+
+Senior engineers evaluate containers by "can I destroy this and spin up an identical replacement?" rather than "does it start correctly once?" What matters in production is repeatable deployment, not first-run success.
+
+Before writing a Dockerfile, a senior engineer answers three questions: Where does this service's state live? Can I discard this container and recreate it during an incident? If I pin the image tag, will I get the same result six months later? Without answers to these three, containerization itself becomes technical debt.
 
 ## Checklist
 
@@ -179,6 +210,76 @@ Developers build the same image on Docker Desktop. CI pushes that image to a reg
 ## Wrap-up and Next Steps
 
 If an image is a template, you have to understand its internals. The next post covers Image and Layer.
+
+## Deep Dive: Containers vs VMs — The Operational Comparison
+
+"Containers are lighter" is true but operationally useless. The real question is which isolation boundary to trust.
+
+| Dimension | Container | VM |
+| --- | --- | --- |
+| Isolation basis | Namespaces + cgroups | Hypervisor + guest OS |
+| Kernel | Shared | Independent |
+| Startup | ms to seconds | Seconds to minutes |
+| Density | High | Low |
+| Security boundary | Logical (kernel shared) | Strong (kernel separated) |
+| Best for | Microservices, CI, batch | Strong tenant isolation, custom OS |
+
+Architecture decisions follow boundary requirements, not tool preference.
+
+## Namespaces and Cgroups: The Two Isolation Axes
+
+**Namespaces** partition what a process *sees*: pid, net, mnt, uts, ipc, user. **Cgroups** limit what it *consumes*: cpu.max, memory.max, pids.max, io.max. Neither works without the other—a process with its own network namespace can still eat 100% CPU without cgroup limits.
+
+```bash
+docker run --rm -d --name cpu-test --cpus="0.5" alpine sh -c "while true; do :; done"
+docker inspect cpu-test --format '{{json .HostConfig.NanoCpus}}'
+# Verify: container is real process set with enforced constraints
+```
+
+## Operational Scenarios
+
+| Scenario | Choose | Why |
+| --- | --- | --- |
+| 40 internal services, fast iteration | Containers | Reproducibility, rolling updates, density |
+| Multi-tenant SaaS, strong isolation | VM / microVM | Kernel independence required |
+| CI build/test environments | Containers | Fast startup, easy cleanup |
+| Kernel-module-dependent workloads | VM | Host kernel sharing is a constraint |
+
+## Day-One Documentation Checklist
+
+Define these before the first production container ships:
+
+- Default resource limits (CPU, memory, pids).
+- Root prohibition policy.
+- Log collection path (stdout/stderr).
+- State externalization rule (volumes, DB, object storage).
+- Image tag and digest pinning policy.
+
+Without these, each team develops different habits and recovery speed drops during incidents.
+
+## Observing Isolation in Practice
+
+```bash
+# Namespace verification
+docker run --rm -d --name ns-demo nginx:1.27
+docker inspect -f '{{.State.Pid}}' ns-demo
+ls -l /proc/<PID>/ns  # different inodes = different views
+
+# Cgroup verification
+docker run --rm -d --name cg-demo --cpus 0.5 --memory 256m nginx:1.27
+docker stats --no-stream cg-demo
+```
+
+Declaring limits in Compose files rather than `docker run` flags makes isolation reviewable:
+
+```yaml
+services:
+  web:
+    image: nginx:1.27
+    cpus: 0.50
+    mem_limit: 256m
+    pids_limit: 256
+```
 
 ## Answering the Opening Questions
 
