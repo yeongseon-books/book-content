@@ -281,6 +281,304 @@ Scope selection follows the rule: "Is it safe for tests to share this data?" Imm
 
 Fixtures are pytest's core mechanism for managing test data. Understanding scope and yield lets you manage resources safely and efficiently. Next, we'll learn how parametrization lets a single test function verify multiple inputs.
 
+## Fixture Design Deep Dive: When to Break Setup Duplication
+
+When fixtures are used properly, test bodies read like requirement sentences.
+
+```python
+# app/users.py
+
+def filter_adults(users: list[dict]) -> list[str]:
+    return [u["name"] for u in users if u["age"] >= 20]
+```
+
+```python
+# tests/conftest.py
+import pytest
+
+@pytest.fixture
+def users_data():
+    return [
+        {"name": "Alice", "age": 30},
+        {"name": "Bob", "age": 19},
+        {"name": "Chris", "age": 25},
+    ]
+
+@pytest.fixture
+def empty_users_data():
+    return []
+```
+
+```python
+# tests/test_users.py
+from app.users import filter_adults
+
+def test_filter_adults(users_data):
+    assert filter_adults(users_data) == ["Alice", "Chris"]
+
+def test_filter_adults_empty(empty_users_data):
+    assert filter_adults(empty_users_data) == []
+```
+
+## Scope Comparison Table
+
+| Scope | Created | Destroyed | Recommended Use |
+|---|---|---|---|
+| function | Before each test | After each test | Default, independence first |
+| class | Class start | Class end | Class-level shared data |
+| module | File start | File end | Expensive initialization |
+| session | Test session start | Session end | External servers, test DB |
+
+## Yield-Based Teardown Pattern
+
+```python
+import sqlite3
+import pytest
+
+@pytest.fixture
+def db_conn():
+    conn = sqlite3.connect(":memory:")
+    conn.execute("CREATE TABLE logs (id INTEGER PRIMARY KEY, msg TEXT)")
+    yield conn
+    conn.close()
+```
+
+```python
+def test_insert_log(db_conn):
+    db_conn.execute("INSERT INTO logs (msg) VALUES ('ok')")
+    row = db_conn.execute("SELECT COUNT(*) FROM logs").fetchone()
+    assert row[0] == 1
+```
+
+## Fixture Factory Pattern
+
+When you need multiple variations of the same data structure, factory fixtures are convenient.
+
+```python
+import pytest
+
+@pytest.fixture
+def user_factory():
+    def _make(name="Alice", age=30, role="dev"):
+        return {"name": name, "age": age, "role": role}
+    return _make
+```
+
+```python
+def test_user_factory_defaults(user_factory):
+    user = user_factory()
+    assert user["name"] == "Alice"
+
+def test_user_factory_override(user_factory):
+    user = user_factory(name="Dana", age=22)
+    assert user == {"name": "Dana", "age": 22, "role": "dev"}
+```
+
+## Common Failure Scenarios
+
+```python
+# Problem: mutable default shared across tests
+@pytest.fixture(scope="module")
+def shared_list():
+    return []
+
+def test_a(shared_list):
+    shared_list.append(1)
+    assert shared_list == [1]
+
+def test_b(shared_list):
+    # May fail depending on execution order
+    assert shared_list == []
+```
+
+Fix: Lower to `function` scope, or use a copy in each test.
+
+## Fixture Operational Rules: Items Worth Agreeing on as a Team
+
+### Naming Conventions
+
+- Data fixtures: `sample_*`, `*_data`
+- Resource fixtures: `db_conn`, `api_client`, `tmp_workspace`
+- Factory fixtures: `*_factory`
+
+### Fixture Structure Example
+
+```python
+# tests/conftest.py
+import pytest
+
+@pytest.fixture
+def sample_order():
+    return {"id": 1, "amount": 10000, "status": "new"}
+
+@pytest.fixture
+def order_factory():
+    def _make(**kwargs):
+        base = {"id": 1, "amount": 10000, "status": "new"}
+        base.update(kwargs)
+        return base
+    return _make
+```
+
+```python
+# tests/test_orders.py
+
+def test_order_defaults(sample_order):
+    assert sample_order["status"] == "new"
+
+def test_order_override(order_factory):
+    order = order_factory(status="paid")
+    assert order["status"] == "paid"
+```
+
+## Scope Selection Mistakes and Fixes
+
+```python
+# Mistake: mutable state in session scope
+@pytest.fixture(scope="session")
+def mutable_cache():
+    return {}
+```
+
+This causes state contamination between tests.
+
+Fix: Keep the default function scope; return a copy when needed.
+
+```python
+@pytest.fixture
+def mutable_cache():
+    return {}
+```
+
+## Combining Fixtures with Parametrize
+
+```python
+import pytest
+
+@pytest.mark.parametrize("status", ["new", "paid", "cancelled"])
+def test_order_status(order_factory, status):
+    order = order_factory(status=status)
+    assert order["status"] == status
+```
+
+Fixtures handle setup; parametrize expands the input space.
+
+## Terminal Option Combinations
+
+| Command | Purpose |
+|---|---|
+| `pytest -q` | Quick pass/fail summary |
+| `pytest -v` | Per-case pass/fail detail |
+| `pytest -x` | Stop immediately on first failure |
+| `pytest -k "keyword"` | Run only matching subset |
+| `pytest --maxfail=3` | Limit maximum failure count |
+
+## Operational Regression Test Template
+
+```python
+import pytest
+
+BUG_CASES = [
+    ("", ValueError),
+    ("   ", ValueError),
+    (None, TypeError),
+]
+
+@pytest.mark.parametrize("raw,exc", BUG_CASES)
+def test_regression_cases(raw, exc):
+    with pytest.raises(exc):
+        require_non_empty(raw)
+```
+
+This template is the simplest form of permanently preserving bug tickets as test code.
+
+## Quality Check Questions
+
+- Can you infer the failure cause from the failure message alone?
+- Do tests depend on execution order?
+- Are boundary-value inputs included?
+- Are both happy and error paths verified?
+- Does adding a test case require only adding data, not copying functions?
+
+## Case Study: Common Improvement Points in PR Reviews
+
+### Code Example
+
+```python
+# app/discount.py
+
+def discount_price(price: int, rate: float) -> int:
+    if price < 0:
+        raise ValueError("price must be >= 0")
+    if not 0 <= rate <= 1:
+        raise ValueError("rate must be between 0 and 1")
+    return int(price * (1 - rate))
+```
+
+```python
+# tests/test_discount.py
+import pytest
+from app.discount import discount_price
+
+@pytest.mark.parametrize(
+    "price,rate,expected",
+    [
+        (10000, 0.0, 10000),
+        (10000, 0.1, 9000),
+        (10000, 1.0, 0),
+    ],
+)
+def test_discount_price(price, rate, expected):
+    assert discount_price(price, rate) == expected
+
+@pytest.mark.parametrize("price,rate", [(-1, 0.1), (1000, -0.1), (1000, 1.1)])
+def test_discount_price_invalid(price, rate):
+    with pytest.raises(ValueError):
+        discount_price(price, rate)
+```
+
+### Output Example
+
+```bash
+pytest tests/test_discount.py -v
+```
+
+```text
+tests/test_discount.py::test_discount_price[10000-0.0-10000] PASSED
+tests/test_discount.py::test_discount_price[10000-0.1-9000] PASSED
+tests/test_discount.py::test_discount_price[10000-1.0-0] PASSED
+tests/test_discount.py::test_discount_price_invalid[-1-0.1] PASSED
+tests/test_discount.py::test_discount_price_invalid[1000--0.1] PASSED
+tests/test_discount.py::test_discount_price_invalid[1000-1.1] PASSED
+========================= 6 passed =========================
+```
+
+### Review Points
+
+- Are boundary values (`0`, `1.0`) included?
+- Are exception types specific?
+- Can you identify the cause from the failure message?
+- Is the structure extensible by adding data alone, without copying functions?
+
+## Mini Checklist
+
+- Maintain at least 3 failure cases.
+- Include boundary values (min/max/empty).
+- Confirm failure messages are meaningful.
+- Verify the same command reproduces in CI.
+
+## Quick Verification
+
+```bash
+pytest -q
+```
+
+```text
+PASS
+```
+
+Tests must leave execution results and preserve failure inputs in reproducible form so the same problem never resurfaces in production.
+
 ## Answering the Opening Questions
 
 - **How do fixtures differ from regular functions?**
