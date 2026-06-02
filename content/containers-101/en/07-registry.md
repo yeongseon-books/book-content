@@ -154,16 +154,58 @@ docker inspect --format "{{index .RepoDigests 0}}" ghcr.io/example/myapp:1.0.0
 
 ## How This Shows Up in Production
 
-*GitHub Actions* builds and pushes to GHCR; *Argo CD* watches *digest changes* and rolls out automatically.
+GitHub Actions builds and pushes to GHCR; Argo CD watches digest changes and rolls out automatically. The entire flow depends on immutable digests — mutable tags are convenience aliases, not deployment identifiers.
+
+### Common Registry Failures and Prevention
+
+| Failure | Cause | Prevention |
+| --- | --- | --- |
+| Unknown deployed version | Multiple pipelines overwrite same tag | Immutable tag policy |
+| Intermittent pull failures | Expired token | Retry with backoff; rotate credentials on schedule |
+| Storage cost explosion | No retention policy | Monthly retention review; auto-delete untagged manifests |
+
+### Tag Promotion Workflow
+
+Stable release teams never rebuild — they promote:
+
+1. **Build**: `myapp:git-abc123`
+2. **After tests pass**: promote to `myapp:stg` or a release tag
+3. **Production deploy**: pin the promoted tag's digest in the manifest
+
+```bash
+docker pull ghcr.io/example/myapp:git-abc123
+docker tag ghcr.io/example/myapp:git-abc123 ghcr.io/example/myapp:1.4.3
+docker push ghcr.io/example/myapp:1.4.3
+```
+
+In production, the deployment manifest records the digest — not the `1.4.3` tag. This guarantees rollback to the exact bytes that previously worked.
+
+### Recommended Tag Scheme
+
+| Tag Pattern | Purpose |
+| --- | --- |
+| `:git-<sha>` | Change history tracking |
+| `:main` / `:edge` | Latest development branch |
+| `:vX.Y.Z` | Release version |
+| `@sha256:<digest>` | Reproducible execution identifier |
+
+### Digest-Pinned Compose
+
+```yaml
+services:
+  api:
+    image: ghcr.io/myorg/myapp@sha256:aaa...aaa
+```
+
+Digest pinning in Compose files prevents "tag reassignment" surprises where today's `:latest` differs from yesterday's.
 
 ## How a Senior Engineer Thinks
 
-- The *digest* is the truth.
-- A *tag* is only a name.
-- The *registry* needs backups too.
-- *Signing* protects the supply chain.
-- *Permission separation* is the start of security.
-
+- The digest is the truth; a tag is only a human-readable alias.
+- The registry needs backups and retention policies — it's infrastructure, not a file dump.
+- Signing (cosign/notation) protects the supply chain from build-to-deploy.
+- Push permission belongs to CI only — humans should never push production images manually.
+- Layer reuse directly impacts registry transfer cost and deploy speed.
 ## Checklist
 
 - [ ] Production pinned by *digest*.
