@@ -149,7 +149,49 @@ def health(): return {"status": "ok"}
 
 ## How This Shows Up in Production
 
-Successful teams start *small*. Auto tests on PRs -> auto deploy -> monitoring -> postmortem culture, settling in over *six months*.
+Successful teams start small. Auto tests on PRs → auto deploy → monitoring → postmortem culture, settling in over six months.
+
+### DevOps vs Traditional Operations
+
+| Aspect | Traditional Separation | DevOps Model | Practical Impact |
+| --- | --- | --- | --- |
+| Responsibility | Dev hands off to Ops | Shared ownership end-to-end | Fewer blame wars during incidents |
+| Deploy unit | Large batches, low frequency | Small changes, high frequency | Lower rollback cost |
+| Verification | Concentrated before release | Continuous from PR onward | Earlier defect detection |
+| Incident response | Ops team alone | Service team joint response | Shorter MTTR |
+| Improvement loop | Quarterly retro | Weekly / daily feedback | Faster learning |
+
+### CALMS Maturity Check
+
+| Axis | Diagnostic Question | Common Early State | Improvement Direction |
+| --- | --- | --- | --- |
+| Culture | Do we review incidents together? | Cross-team blame | Joint blameless postmortems |
+| Automation | Any manual deploys left? | Single-person deploy ritual | CI/CD pipeline steps |
+| Lean | Where is the longest wait? | Approval/review bottleneck | WIP limits, smaller PRs |
+| Measurement | Do we share common metrics? | Gut-feel decisions | DORA + SLO tracking |
+| Sharing | Is operational knowledge documented? | Individual know-how | Runbooks / checklists |
+
+### 2-Week DevOps Bootstrap
+
+```yaml
+week_1:
+  - pr_required_checks: [lint, test]
+  - deployment: "main merge -> stage auto deploy"
+  - observability: "health endpoint + basic error metric"
+week_2:
+  - runbook: "top 3 failure scenarios"
+  - postmortem_template: "blameless + action owner"
+  - weekly_review: "deploy count, failure count, lead time"
+```
+
+The key is loop length, not tool count. If verify → deploy → observe → review cycles once within a week, the team starts learning immediately.
+
+### Adoption Priority Rules
+
+1. Automate where incident cost is highest first.
+2. Reduce wait-time stages before deployment.
+3. Document every procedure performed from memory; register as automation candidate.
+4. Before adopting a new tool, check if existing tools can solve it.
 
 ## How a Senior Engineer Thinks
 
