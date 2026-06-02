@@ -347,6 +347,265 @@ The decision rule is simple: "Can a child object be used wherever a parent type 
 
 Composition provides loose coupling and runtime flexibility, making it more suitable than inheritance in most situations. Inheritance should be reserved for clear is-a relationships. In the next article, we explore SOLID principles — the fundamental guidelines for object-oriented design.
 
+## Decision Axes for Choosing Composition vs Inheritance
+
+The choice between composition and inheritance should be based on change direction and coupling, not preference.
+
+```text
+Inheritance
+[BaseDiscountPolicy]
+      ^
+      |
+[SeasonalPolicy] [VipPolicy]
+
+Composition
+[Checkout]
+  - discount_policy: DiscountPolicy
+  - tax_policy: TaxPolicy
+```
+
+## Before and After: From Inheritance Tree Explosion to Policy Composition
+
+```python
+# before
+class BaseCheckout:
+    def total(self, amount: int) -> int:
+        return amount
+
+class VipSeasonalCheckout(BaseCheckout):
+    def total(self, amount: int) -> int:
+        return int(amount * 0.8)
+
+class VipSeasonalTaxCheckout(BaseCheckout):
+    def total(self, amount: int) -> int:
+        return int(amount * 0.8 * 1.1)
+```
+
+```python
+# after
+from typing import Protocol
+
+class DiscountPolicy(Protocol):
+    def apply(self, amount: int) -> int:
+        ...
+
+class TaxPolicy(Protocol):
+    def apply(self, amount: int) -> int:
+        ...
+
+class TenPercentDiscount:
+    def apply(self, amount: int) -> int:
+        return int(amount * 0.9)
+
+class VatTenPercent:
+    def apply(self, amount: int) -> int:
+        return int(amount * 1.1)
+
+class Checkout:
+    def __init__(self, discount: DiscountPolicy, tax: TaxPolicy) -> None:
+        self.discount = discount
+        self.tax = tax
+
+    def total(self, amount: int) -> int:
+        return self.tax.apply(self.discount.apply(amount))
+```
+
+## Violation Scenarios
+
+| Violation | Signal | Correction |
+|---|---|---|
+| Creating a subclass for every feature combination | Class count explosion | Separate into strategy objects and compose |
+| Over-reliance on parent's protected state | Debugging difficulty in subclasses rises | Define explicit collaboration interfaces |
+| Forcing extension only through inheritance | Runtime replacement impossible | Switch to constructor injection |
+
+## Comparison: Operations Perspective
+
+| Question | Inheritance | Composition |
+|---|---|---|
+| Can a specific policy be A/B tested? | Difficult | Easy |
+| Can tests swap just one policy with a double? | Limited | Straightforward |
+| Does a new requirement require modifying existing classes? | Often | Usually not |
+
+## Real-World Scenario: Building a Structure That Survives Requirement Changes
+
+In production, rule changes happen more often than feature additions. When evaluating class structures, "how many files must change for the next requirement" is a safer criterion than "does it work now."
+
+```python
+from dataclasses import dataclass
+from typing import Protocol
+
+
+@dataclass
+class LineItem:
+    name: str
+    quantity: int
+    unit_price: int
+
+    def subtotal(self) -> int:
+        return self.quantity * self.unit_price
+
+
+class DiscountPolicy(Protocol):
+    def apply(self, amount: int) -> int:
+        ...
+
+
+class NoDiscount:
+    def apply(self, amount: int) -> int:
+        return amount
+
+
+class PercentDiscount:
+    def __init__(self, percent: int) -> None:
+        if not 0 <= percent <= 100:
+            raise ValueError('percent must be 0..100')
+        self.percent = percent
+
+    def apply(self, amount: int) -> int:
+        return int(amount * (100 - self.percent) / 100)
+
+
+class Invoice:
+    def __init__(self, items: list[LineItem], policy: DiscountPolicy) -> None:
+        self.items = items
+        self.policy = policy
+
+    def total(self) -> int:
+        base = sum(i.subtotal() for i in self.items)
+        return self.policy.apply(base)
+```
+
+When the discount rule changes, `Invoice.total()` needs no modification. Extension stays closed through implementation class additions, while the core flow remains stable.
+
+## UML-Style Collaboration View
+
+```text
+[Invoice]
+  - items: list[LineItem]
+  - policy: DiscountPolicy
+  + total()
+
+[LineItem]
+  + subtotal()
+
+[DiscountPolicy] <<interface>>
+  + apply(amount)
+      ^
+      +-- [NoDiscount]
+      +-- [PercentDiscount]
+```
+
+Writing collaboration structures as text UML lets code reviews quickly align on "which axis is the policy axis and which is the domain axis."
+
+## Anti-Patterns and Correction Procedures
+
+| Anti-Pattern | Detection Signal | Correction Sequence |
+|---|---|---|
+| God Object | 20+ methods, scattered change history | Decompose by responsibility axis → derive collaboration interfaces |
+| Data-only empty class | Only getters/setters, no methods | Move rule methods in, or simplify to dataclass |
+| Inheritance tree bypass branching | Type-check branches on subclass types | Redefine polymorphic contract |
+| Infrastructure type leakage | Domain layer depends on SDK response objects | Add DTO conversion layer |
+
+## Before and After: Test Maintenance Cost
+
+| Item | Before Refactoring | After Refactoring |
+|---|---|---|
+| Test setup | Global state initialization required | Per-object state creation |
+| Failure root-cause tracing | Trace entire function chain | Per-method tracing |
+| Regression scope | Broad and unpredictable | Narrow and predictable |
+
+## Team Adoption Checklist
+
+- Verify that domain terms and class names match.
+- Confirm invariants are fully established at instance creation time.
+- Check that policy changes are possible through implementation additions, not existing code modifications.
+- In code reviews, agree on collaboration structure with 10-line UML text first.
+- Ensure test names describe business rules rather than method names.
+
+## Mini Case Study: Validating with One Rule Addition
+
+The example below is the minimal unit that adds a policy extension without modifying existing code.
+
+```python
+class WeekendPolicy:
+    def apply(self, amount: int, is_weekend: bool) -> int:
+        if is_weekend:
+            return int(amount * 0.95)
+        return amount
+
+
+def estimate(amount: int, is_weekend: bool) -> int:
+    policy = WeekendPolicy()
+    return policy.apply(amount, is_weekend)
+```
+
+The key point is that new policies enter without breaking call paths. Keeping change history confined to the policy class reduces regression risk.
+
+| Verification Question | Pass Criterion |
+|---|---|
+| Does adding a new policy require modifying existing functions? | No |
+| Does the exception policy share the same contract? | Yes |
+| Are tests separated per policy? | Yes |
+
+## Refactoring Retrospective: Measuring Change Cost Numerically
+
+- If modified file count exceeds 5 per feature, review boundary design.
+- If type-branching if/elif accumulates 3+, migrate to polymorphism or strategy objects.
+- If regression test writing time exceeds implementation time, revisit responsibility placement.
+
+```python
+def complexity_signal(changed_files: int, branch_count: int) -> str:
+    if changed_files >= 5 or branch_count >= 3:
+        return 'refactor-needed'
+    return 'acceptable'
+```
+
+This is not a rigorous metric, but it helps teams discuss with criteria rather than gut feeling.
+
+## Design Quality Verification Questions
+
+These questions are used repeatedly during post-implementation reviews.
+
+- Does the exception type and message match the caller's contract when this method fails?
+- Is the same rule duplicated in other classes or functions?
+- Does state mutation happen through exactly one method path?
+- Can the unit be tested without external dependencies?
+
+```python
+def review_signal(duplicate_rules: int, mutable_paths: int) -> str:
+    if duplicate_rules > 0:
+        return 'duplicate rule removal needed'
+    if mutable_paths > 1:
+        return 'consolidate state mutation paths'
+    return 'structure stable'
+```
+
+Applying these checks even to article-level examples helps readers understand OOP as a maintenance strategy rather than mere syntax.
+
+## Change Request Response Time Comparison
+
+| Change Request | Weak Boundaries | Clear Boundaries |
+|---|---|---|
+| Add discount rule | Search branches then multi-edit | Add policy implementation |
+| Modify state transition | Simultaneous edits across functions | Modify domain method |
+| Strengthen tests | Integration-test-centric | Unit-test-first |
+
+This comparison matters from the perspective of reducing maintenance lead time, not performance numbers.
+
+## Supplementary Note
+
+Design choices are not about finding the "right answer"—they are decisions that lower change cost. Defining boundaries first simplifies both reviews and tests, even for the same functionality.
+
+## Quick Reminder
+
+When applying OOP, evaluate quality by "how many files must change for the next requirement" rather than "how many classes did I create."
+
+## Final Verification Statement
+
+Every example in this article is structured around boundary design that reduces change propagation.
+
+Maintaining design intent and test contracts together is the core principle.
+
 ## Answering the Opening Questions
 
 - **How do you distinguish is-a from has-a relationships in practical design?**
