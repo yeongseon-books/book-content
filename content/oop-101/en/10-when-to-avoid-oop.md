@@ -381,6 +381,226 @@ That is why many Python codebases start with functions, then upgrade only the ho
 
 You should avoid OOP when classes add more ceremony than protection. In this reporting workflow, stateless helpers became functions, data holders became lightweight structures, trivial strategies became callables, and the whole process became a direct pipeline. Just as important, you now have a concrete threshold for moving back to classes when state and invariants start traveling together.
 
+## Structural Overview: When to Avoid OOP
+
+Avoiding OOP is not anti-object-oriented. It is recognizing when the problem shape does not match a class-based solution.
+
+```text
+Input transformation pipeline
+[read_csv] -> [normalize_row] -> [filter_invalid] -> [aggregate] -> [write_report]
+
+Domain state model
+[Account]
+  + open()
+  + suspend()
+  + close()
+```
+
+The first shape maps naturally to function composition. The second maps naturally to a stateful object.
+
+## Before/After: From Over-Classification to Function-First
+
+```python
+# before
+class CsvReader:
+    def run(self, path: str) -> list[dict]:
+        ...
+
+class RowNormalizer:
+    def run(self, rows: list[dict]) -> list[dict]:
+        ...
+
+class InvalidFilter:
+    def run(self, rows: list[dict]) -> list[dict]:
+        ...
+```
+
+```python
+# after
+from collections.abc import Iterable
+
+
+def read_csv(path: str) -> list[dict]:
+    ...
+
+
+def normalize_row(row: dict) -> dict:
+    ...
+
+
+def filter_invalid(rows: Iterable[dict]) -> list[dict]:
+    return [r for r in rows if r.get('price', 0) > 0]
+
+
+def pipeline(path: str) -> list[dict]:
+    rows = read_csv(path)
+    normalized = [normalize_row(r) for r in rows]
+    return filter_invalid(normalized)
+```
+
+## Violation Perspective
+
+| Violation | Symptom | Fix |
+|---|---|---|
+| Class has no data, only static methods | Essentially a namespace wrapper | Simplify to a function module |
+| Constructor takes 8+ dependencies | Excessive assembly cost | Split use cases or switch to function pipeline |
+| Every small transformation creates one object | Cognitive load increases | Convert to pure functions |
+
+## Comparison: Functional vs Object-Oriented Approach
+
+| Question | Functional Approach Preferred | OOP Approach Preferred |
+|---|---|---|
+| Is state transition the core concern? | No | Yes |
+| Does input→output transformation repeat? | Yes | No |
+| Are rules tied to object lifecycle? | No | Yes |
+| Are tests written data-centrically? | Yes | Depends on context |
+
+## Mixed Strategy
+
+In practice, you rarely commit to one paradigm exclusively. Modeling domain state with objects while handling data transformations with pure functions is a mixed strategy that often minimizes maintenance cost.
+
+## Real Scenario: Building a Change-Resilient Structure
+
+In practice, rule changes happen more often than feature additions. When evaluating class structure, "how far does the next change reach?" is a safer criterion than "does it work now?"
+
+```python
+from dataclasses import dataclass
+from typing import Protocol
+
+
+@dataclass
+class LineItem:
+    name: str
+    quantity: int
+    unit_price: int
+
+    def subtotal(self) -> int:
+        return self.quantity * self.unit_price
+
+
+class DiscountPolicy(Protocol):
+    def apply(self, amount: int) -> int:
+        ...
+
+
+class NoDiscount:
+    def apply(self, amount: int) -> int:
+        return amount
+
+
+class PercentDiscount:
+    def __init__(self, percent: int) -> None:
+        if not 0 <= percent <= 100:
+            raise ValueError('percent must be 0..100')
+        self.percent = percent
+
+    def apply(self, amount: int) -> int:
+        return int(amount * (100 - self.percent) / 100)
+
+
+class Invoice:
+    def __init__(self, items: list[LineItem], policy: DiscountPolicy) -> None:
+        self.items = items
+        self.policy = policy
+
+    def total(self) -> int:
+        base = sum(i.subtotal() for i in self.items)
+        return self.policy.apply(base)
+```
+
+This code never needs to edit `Invoice.total()` when discount rules change. Extension is closed by adding implementation classes, and the core flow stays stable.
+
+## UML View of the Collaboration
+
+```text
+[Invoice]
+  - items: list[LineItem]
+  - policy: DiscountPolicy
+  + total()
+
+[LineItem]
+  + subtotal()
+
+[DiscountPolicy] <<interface>>
+  + apply(amount)
+      ^
+      +-- [NoDiscount]
+      +-- [PercentDiscount]
+```
+
+Writing collaboration structure in text UML lets code reviews quickly agree on "where is the policy axis and where is the domain axis."
+
+## Anti-Patterns and Correction Steps
+
+| Anti-Pattern | Detection Signal | Correction Sequence |
+|---|---|---|
+| God Object | 20+ methods, change history scattered | Decompose by responsibility axis → extract collaboration interfaces |
+| Data-only empty class | Only getters/setters, no methods | Move rule methods in, or simplify to dataclass |
+| Inheritance tree bypass branching | Type-checking branches for subclass types | Redefine polymorphic contract |
+| Infrastructure type leakage | Domain layer depends on SDK response objects | Add DTO translation layer |
+
+## Before/After: Test Maintenance Cost
+
+| Aspect | Before Refactoring | After Refactoring |
+|---|---|---|
+| Test setup | Requires global state initialization | Object-level state creation |
+| Failure root-cause tracing | Backtrack entire function chain | Trace at class method level |
+| Regression scope | Broad and unclear | Narrow and predictable |
+
+## Team Adoption Checklist
+
+- Verify that domain terms match class names.
+- Confirm that invariants are established at instance creation time.
+- Check that policy changes are possible via new implementations, not existing code edits.
+- In code review, agree on collaboration structure with 10 lines of UML text first.
+- Ensure test names describe business rules rather than method names.
+
+## Mini Case Study: Verify with One Rule Addition
+
+The following example demonstrates the smallest unit of policy extension that lands without touching existing code.
+
+```python
+class WeekendPolicy:
+    def apply(self, amount: int, is_weekend: bool) -> int:
+        if is_weekend:
+            return int(amount * 0.95)
+        return amount
+
+
+def estimate(amount: int, is_weekend: bool) -> int:
+    policy = WeekendPolicy()
+    return policy.apply(amount, is_weekend)
+```
+
+The key observation is that the new policy enters without breaking the existing call path. Keeping the change boundary at the policy class means regression risk stays low.
+
+| Verification Question | Pass Criterion |
+|---|---|
+| Does adding a new policy require editing existing functions? | No |
+| Does the exception policy match the existing contract? | Yes |
+| Are tests isolated per policy? | Yes |
+
+## Verification Notes: Questions for Reviewing Object Design Quality
+
+These questions are used repeatedly in post-implementation reviews.
+
+- Does the exception type and message match the caller's contract when this method fails?
+- Is the same rule duplicated in another class or function?
+- Does state mutation happen through exactly one method path?
+- Can unit tests run without external dependencies?
+
+```python
+def review_signal(duplicate_rules: int, mutable_paths: int) -> str:
+    if duplicate_rules > 0:
+        return 'duplicate rule removal needed'
+    if mutable_paths > 1:
+        return 'state mutation path consolidation needed'
+    return 'structure stable'
+```
+
+Applying these checks even to article-level examples helps understand OOP as a maintenance strategy rather than just syntax.
+
+
 ## Answering the Opening Questions
 
 - **What signals indicate that class-based design is mostly ceremonial decoration?**
