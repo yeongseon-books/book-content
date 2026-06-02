@@ -352,6 +352,272 @@ Files, environment variables, and time are "the world outside your code." If you
 
 With tmp_path, monkeypatch, and freezegun, you can isolate system resources for stable, reproducible tests. Next, we'll learn how to measure coverage and evaluate test quality.
 
+## Integrated Scenario: Files, Environment, and Time
+
+The code below records the report creation time along with the execution mode.
+
+```python
+# reporter.py
+from datetime import datetime
+from pathlib import Path
+import os
+
+def write_report(path: Path, message: str) -> None:
+    mode = os.getenv("APP_MODE", "dev")
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    path.write_text(f"[{mode}] {now} {message}\n", encoding="utf-8")
+```
+
+```python
+# test_reporter.py
+from datetime import datetime
+from unittest.mock import patch
+from reporter import write_report
+
+def test_write_report(tmp_path, monkeypatch):
+    monkeypatch.setenv("APP_MODE", "prod")
+    out = tmp_path / "report.log"
+
+    with patch("reporter.datetime") as mock_dt:
+        mock_dt.now.return_value = datetime(2025, 5, 1, 9, 30, 0)
+        write_report(out, "job-start")
+
+    text = out.read_text(encoding="utf-8")
+    assert "[prod]" in text
+    assert "2025-05-01 09:30:00" in text
+    assert "job-start" in text
+```
+
+## freezegun Version
+
+```python
+from freezegun import freeze_time
+from reporter import write_report
+
+@freeze_time("2025-05-01 09:30:00")
+def test_write_report_with_freezegun(tmp_path, monkeypatch):
+    monkeypatch.setenv("APP_MODE", "prod")
+    out = tmp_path / "report.log"
+    write_report(out, "job-start")
+    assert "2025-05-01 09:30:00" in out.read_text(encoding="utf-8")
+```
+
+## CLI Output Example
+
+```bash
+pytest test_reporter.py -v
+```
+
+```text
+test_reporter.py::test_write_report PASSED
+test_reporter.py::test_write_report_with_freezegun PASSED
+========================= 2 passed =========================
+```
+
+## Common Mistakes and Fixes
+
+| Mistake | Symptom | Fix |
+|---|---|---|
+| Hard-coded path `/tmp/report.log` | Test collision, permission failure | Use `tmp_path` |
+| Direct `os.environ[...] = ...` | Pollutes other tests | `monkeypatch.setenv/delenv` |
+| Comparing `datetime.now()` directly | Fails when date rolls over | patch or freezegun |
+| Assuming local timezone | Mismatch in CI | UTC or explicit policy |
+
+## Before and After: Refactoring for Testability
+
+```python
+# before
+
+def is_expired(expiry_str: str) -> bool:
+    from datetime import datetime
+    expiry = datetime.fromisoformat(expiry_str)
+    return datetime.now() > expiry
+```
+
+```python
+# after
+
+def is_expired(expiry_str: str, now_fn):
+    from datetime import datetime
+    expiry = datetime.fromisoformat(expiry_str)
+    return now_fn() > expiry
+```
+
+The second approach makes testing far simpler.
+
+```python
+from datetime import datetime
+
+def test_is_expired():
+    now = lambda: datetime(2025, 1, 10, 0, 0, 0)
+    assert is_expired("2025-01-09T00:00:00", now) is True
+```
+
+## Timezone and Boundary-Value Testing
+
+Time-dependent logic frequently fails at date boundaries.
+
+```python
+# scheduler.py
+from datetime import datetime
+
+def is_month_end(now: datetime) -> bool:
+    next_day = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    from datetime import timedelta
+    tomorrow = next_day + timedelta(days=1)
+    return tomorrow.month != now.month
+```
+
+```python
+from datetime import datetime
+import pytest
+from scheduler import is_month_end
+
+@pytest.mark.parametrize(
+    "now,expected",
+    [
+        (datetime(2025, 1, 31, 23, 0, 0), True),
+        (datetime(2025, 1, 30, 23, 0, 0), False),
+        (datetime(2024, 2, 29, 10, 0, 0), True),
+    ],
+)
+def test_is_month_end(now, expected):
+    assert is_month_end(now) is expected
+```
+
+## Environment Branch Integration Test
+
+```python
+# feature_flag.py
+import os
+
+def use_new_checkout() -> bool:
+    return os.getenv("FEATURE_NEW_CHECKOUT", "off") == "on"
+```
+
+```python
+from feature_flag import use_new_checkout
+
+def test_feature_off(monkeypatch):
+    monkeypatch.setenv("FEATURE_NEW_CHECKOUT", "off")
+    assert use_new_checkout() is False
+
+def test_feature_on(monkeypatch):
+    monkeypatch.setenv("FEATURE_NEW_CHECKOUT", "on")
+    assert use_new_checkout() is True
+```
+
+## File Test Stability Checklist
+
+- Encoding (`utf-8`) explicitly specified
+- Newline differences accounted for
+- No filename collisions between tests
+- No manual cleanup of temporary directories
+
+## Terminal Option Combinations
+
+| Command | Purpose |
+|---|---|
+| `pytest -q` | Quick pass/fail confirmation |
+| `pytest -v` | Per-case pass/fail detail |
+| `pytest -x` | Stop immediately on first failure |
+| `pytest -k "keyword"` | Run only matching subset |
+| `pytest --maxfail=3` | Limit maximum failure count |
+
+## Regression Test Template
+
+```python
+import pytest
+
+BUG_CASES = [
+    ("", ValueError),
+    ("   ", ValueError),
+    (None, TypeError),
+]
+
+@pytest.mark.parametrize("raw,exc", BUG_CASES)
+def test_regression_cases(raw, exc):
+    with pytest.raises(exc):
+        require_non_empty(raw)
+```
+
+This template is the simplest way to permanently preserve bug issues as test code.
+
+## Quality Check Questions
+
+- Can you infer the cause from the failure message alone?
+- Does the test depend on execution order?
+- Are boundary-value inputs included?
+- Are both happy and error paths verified?
+- Can you extend coverage by adding data rather than copying functions?
+
+## Case Study: Common Review Points in PRs
+
+### Code Example
+
+```python
+# app/discount.py
+
+def discount_price(price: int, rate: float) -> int:
+    if price < 0:
+        raise ValueError("price must be >= 0")
+    if not 0 <= rate <= 1:
+        raise ValueError("rate must be between 0 and 1")
+    return int(price * (1 - rate))
+```
+
+```python
+# tests/test_discount.py
+import pytest
+from app.discount import discount_price
+
+@pytest.mark.parametrize(
+    "price,rate,expected",
+    [
+        (10000, 0.0, 10000),
+        (10000, 0.1, 9000),
+        (10000, 1.0, 0),
+    ],
+)
+def test_discount_price(price, rate, expected):
+    assert discount_price(price, rate) == expected
+
+@pytest.mark.parametrize("price,rate", [(-1, 0.1), (1000, -0.1), (1000, 1.1)])
+def test_discount_price_invalid(price, rate):
+    with pytest.raises(ValueError):
+        discount_price(price, rate)
+```
+
+### Output Example
+
+```bash
+pytest tests/test_discount.py -v
+```
+
+```text
+tests/test_discount.py::test_discount_price[10000-0.0-10000] PASSED
+tests/test_discount.py::test_discount_price[10000-0.1-9000] PASSED
+tests/test_discount.py::test_discount_price[10000-1.0-0] PASSED
+tests/test_discount.py::test_discount_price_invalid[-1-0.1] PASSED
+tests/test_discount.py::test_discount_price_invalid[1000--0.1] PASSED
+tests/test_discount.py::test_discount_price_invalid[1000-1.1] PASSED
+========================= 6 passed =========================
+```
+
+### Review Points
+
+- Are boundary values (`0`, `1.0`) included?
+- Is the exception type specific?
+- Can you identify the cause from the failure message?
+- Is the structure extensible by adding data alone?
+
+## Mini Checklist
+
+- Maintain at least 3 failure cases.
+- Include boundary values (min/max/empty).
+- Verify that failure messages are meaningful.
+- Confirm reproducibility with the same command in CI.
+
 ## Answering the Opening Questions
 
 - **Why should file tests use `tmp_path` instead of real paths?**
