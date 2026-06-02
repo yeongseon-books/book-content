@@ -160,16 +160,62 @@ docker network inspect app-net
 
 ## How This Shows Up in Production
 
-Compose creates a per-project user-defined network. Kubernetes uses a CNI to give every Pod L3 connectivity.
+Compose creates a per-project user-defined network. Kubernetes uses a CNI to give every Pod L3 connectivity. In both cases, internal traffic stays on private networks while only entry-point services publish ports.
+
+### Compose Network Separation
+
+```yaml
+services:
+  web:
+    image: myorg/web:latest
+    ports:
+      - "8080:8080"
+    networks: [front, back]
+  api:
+    image: myorg/api:latest
+    networks: [back]
+  db:
+    image: postgres:16
+    networks: [back]
+networks:
+  front: {}
+  back: {}
+```
+
+Only `web` is externally reachable. `api` and `db` communicate on `back` without any port publishing. This pattern reduces attack surface and simplifies firewall rules.
+
+### DNS-Based Service Discovery
+
+```bash
+docker compose exec web getent hosts api
+docker compose exec web curl -s http://api:8000/health
+```
+
+Service names resolve to container IPs through Docker's embedded DNS. No IP hardcoding, no environment-variable hacks. If a container restarts and gets a new IP, DNS updates automatically.
+
+### Port Collision Prevention
+
+- Define a team-standard port range for local development (e.g., 8080-8099).
+- Internal services use `expose` or network-only — never `-p`.
+- Run `docker compose config` before deploy to verify final port mappings.
+
+### Debugging Network Boundaries
+
+```bash
+docker network inspect <network-name>   # shows which containers are attached
+ss -ltnp                                  # host-level listening ports
+docker compose exec web nslookup api      # verify DNS resolution
+```
+
+When a connection fails, these commands answer whether it's an app bug or a network boundary problem within 30 seconds.
 
 ## How a Senior Engineer Thinks
 
-- DNS is the foundation of connection.
-- External exposure is an explicit decision.
-- Mode choice has security consequences.
-- Networks are state — clean them up.
-- Compose and K8s abstract things, but the principles do not change.
-
+- DNS is the foundation of container-to-container connection.
+- External exposure is an explicit, auditable decision — not a default.
+- Network mode choice directly impacts security posture.
+- Networks are state — prune unused ones to reduce confusion.
+- Design network boundaries first, then open ports. Never the reverse.
 ## Checklist
 
 - [ ] User-defined networks in use.
