@@ -294,6 +294,277 @@ In practice, the question "Should this be a class?" comes up often. The answer u
 
 OOP bundles data and behavior into a single unit to make code structure clear. In the next article, we will explore classes and instances in greater depth.
 
+## Drawing Design Boundaries with Text UML
+
+In OOP, the sense you need to develop before class syntax is boundaries. When boundaries are clear, you can track which data changes where, and predict the scope of modifications when requirements change.
+
+```text
+[OrderService]
+  - place_order(cart, payment)
+  - cancel_order(order_id)
+        |
+        | uses
+        v
+[Order]
+  - id: str
+  - lines: list[OrderLine]
+  - status: OrderStatus
+  - total_amount()
+        |
+        | has many
+        v
+[OrderLine]
+  - product_id: str
+  - quantity: int
+  - unit_price: int
+```
+
+The key here is that `OrderService` coordinates flow while `Order` owns domain rules. If the service holds all calculations, rules scatter; if the entity knows external infrastructure, boundaries collapse.
+
+## Refactoring from Procedural to Object Boundaries
+
+The code below is easy to write quickly at first. The problem is that order amount calculation, coupon application, and state transition rules are mixed in one function.
+
+```python
+# before
+
+def checkout(order_dict: dict, coupon: dict | None) -> dict:
+    if order_dict['status'] != 'draft':
+        raise ValueError('invalid status')
+
+    total = 0
+    for line in order_dict['lines']:
+        total += line['quantity'] * line['unit_price']
+
+    if coupon and coupon['type'] == 'percent':
+        total = int(total * (100 - coupon['value']) / 100)
+
+    order_dict['total'] = total
+    order_dict['status'] = 'placed'
+    return order_dict
+```
+
+```python
+# after
+from dataclasses import dataclass
+from enum import Enum
+
+
+class OrderStatus(str, Enum):
+    DRAFT = 'draft'
+    PLACED = 'placed'
+
+
+@dataclass(frozen=True)
+class OrderLine:
+    product_id: str
+    quantity: int
+    unit_price: int
+
+    def amount(self) -> int:
+        return self.quantity * self.unit_price
+
+
+class Order:
+    def __init__(self, lines: list[OrderLine]) -> None:
+        self.lines = lines
+        self.status = OrderStatus.DRAFT
+        self._discount_rate = 0
+
+    def apply_percent_coupon(self, value: int) -> None:
+        if not 0 <= value <= 100:
+            raise ValueError('coupon percent must be 0..100')
+        self._discount_rate = value
+
+    def total_amount(self) -> int:
+        subtotal = sum(line.amount() for line in self.lines)
+        return int(subtotal * (100 - self._discount_rate) / 100)
+
+    def place(self) -> None:
+        if self.status != OrderStatus.DRAFT:
+            raise ValueError('only draft can be placed')
+        self.status = OrderStatus.PLACED
+```
+
+The biggest difference when moving from procedural to object-oriented code is not the calculation formulas but the location of rules. Coupon validation, state transition, and amount calculation gather inside `Order`, making the test unit clear.
+
+## Violation Signals and Correction Methods
+
+| Violation Signal | What Problem Arises | Correction Direction |
+|---|---|---|
+| Service function bloats beyond 200 lines | Must read entire function for policy changes | Move rules into domain classes |
+| Same key strings (`'status'`, `'total'`) duplicated across files | Typos hide until runtime | Replace with typed attributes |
+| Validation logic exists separately in API, service, and batch | Rule inconsistency causes incidents | Define single rule in object method |
+| Tests focus on assembling input dictionaries | Verify shape rather than meaning | Switch to method tests that verify behavior |
+
+## Comparison: Maintenance Cost of Function-Centric vs Object-Centric
+
+| Perspective | Function-Centric Code | Object-Centric Code |
+|---|---|---|
+| Rule discovery | Must trace multiple functions and global constants | Focused inspection within class methods |
+| Change impact | Must follow call graph broadly | Narrows to the object and its collaborators |
+| Type safety | Dictionary key typos discovered late | Revealed early through attribute/method contracts |
+| Onboarding | Understanding varies by file order | Learnable in domain-term units |
+
+## Practical Check: When to Introduce Objects
+
+- When the same data bundle changes together in three or more places, grouping into a class is advantageous.
+- When state transitions matter, making rules explicit with enum + methods is safer.
+- Separating I/O schema from domain rules reduces API changes propagating across the entire domain.
+- Separating reasons for change takes priority over increasing class count.
+
+## Real Scenario: Restructuring to Withstand Requirement Changes
+
+In production, rule changes happen more often than feature additions. Therefore, when evaluating class structure, it's safer to ask "how far must the next change reach?" rather than "does it work now?"
+
+```python
+from dataclasses import dataclass
+from typing import Protocol
+
+
+@dataclass
+class LineItem:
+    name: str
+    quantity: int
+    unit_price: int
+
+    def subtotal(self) -> int:
+        return self.quantity * self.unit_price
+
+
+class DiscountPolicy(Protocol):
+    def apply(self, amount: int) -> int:
+        ...
+
+
+class NoDiscount:
+    def apply(self, amount: int) -> int:
+        return amount
+
+
+class PercentDiscount:
+    def __init__(self, percent: int) -> None:
+        if not 0 <= percent <= 100:
+            raise ValueError('percent must be 0..100')
+        self.percent = percent
+
+    def apply(self, amount: int) -> int:
+        return int(amount * (100 - self.percent) / 100)
+
+
+class Invoice:
+    def __init__(self, items: list[LineItem], policy: DiscountPolicy) -> None:
+        self.items = items
+        self.policy = policy
+
+    def total(self) -> int:
+        base = sum(i.subtotal() for i in self.items)
+        return self.policy.apply(base)
+```
+
+This code requires no modification to `Invoice.total()` when discount rules change. Extension closes through adding implementation classes, while the core flow remains stable.
+
+## Collaboration in UML Style
+
+```text
+[Invoice]
+  - items: list[LineItem]
+  - policy: DiscountPolicy
+  + total()
+
+[LineItem]
+  + subtotal()
+
+[DiscountPolicy] <<interface>>
+  + apply(amount)
+      ^
+      +-- [NoDiscount]
+      +-- [PercentDiscount]
+```
+
+Writing collaboration structure in text like this lets you quickly align on "where is the policy axis and where is the domain axis" during code review.
+
+## Anti-Patterns and Correction Procedures
+
+| Anti-Pattern | Detection Signal | Correction Steps |
+|---|---|---|
+| God Object | 20+ methods, scattered change history | Decompose by responsibility axis → derive collaboration interfaces |
+| Data-only empty class | Only getters/setters, no methods | Move rule methods or simplify to dataclass |
+| Inheritance tree bypass branching | Type-check branching on subclasses | Redefine polymorphic contract |
+| Infrastructure type leakage | Domain layer depends on SDK response objects | Add DTO conversion layer |
+
+## Before and After: Test Maintenance Cost
+
+| Item | Before Refactoring | After Refactoring |
+|---|---|---|
+| Test setup | Global state initialization needed | Per-object state creation |
+| Failure root-cause tracing | Backtrack entire function chain | Trace per class method |
+| Regression scope | Broad and unclear | Narrow and predictable |
+
+## Team Application Checklist
+
+- Confirm domain terms and class names match.
+- Confirm invariants are complete at instance creation time.
+- Check whether policy changes are possible via implementation addition rather than existing code modification.
+- Agree on collaboration structure via 10-line UML text before code review.
+- Confirm test names describe business rules rather than method names.
+
+## Mini Case Study: Verifying with a Single Rule Addition
+
+The example below is the minimum unit for extending a policy without modifying existing code.
+
+```python
+class WeekendPolicy:
+    def apply(self, amount: int, is_weekend: bool) -> int:
+        if is_weekend:
+            return int(amount * 0.95)
+        return amount
+
+
+def estimate(amount: int, is_weekend: bool) -> int:
+    policy = WeekendPolicy()
+    return policy.apply(amount, is_weekend)
+```
+
+The key is that the new policy enters without breaking call paths. Keeping change history confined to policy classes reduces regression risk.
+
+| Verification Question | Pass Criteria |
+|---|---|
+| Does adding a new policy require modifying existing functions? | No |
+| Does the exception policy match the existing contract? | Yes |
+| Are tests separated per policy? | Yes |
+
+## Verification Note: Questions for Checking Object Design Quality
+
+These questions are criteria used repeatedly in post-implementation reviews.
+
+- Does the exception type and message match the caller's contract when this method fails?
+- Is the same rule not duplicated in other classes or functions?
+- Does state mutation occur through only one method path?
+- Is unit testing possible without external dependencies?
+
+```python
+def review_signal(duplicate_rules: int, mutable_paths: int) -> str:
+    if duplicate_rules > 0:
+        return 'duplicate rule removal needed'
+    if mutable_paths > 1:
+        return 'state mutation path consolidation needed'
+    return 'structure stable'
+```
+
+Applying these checks even to article-level examples helps understand OOP as a maintenance strategy rather than syntax.
+
+## Additional Comparison: Response Time to Change Requests
+
+| Change Request | Code with Weak Boundaries | Code with Clear Boundaries |
+|---|---|---|
+| Add discount rule | Search branches then multi-modify | Add policy implementation |
+| Modify state transition | Modify multiple functions simultaneously | Modify domain method |
+| Strengthen tests | Integration-test-centric | Unit-test-first |
+
+This comparison matters not for performance numbers but for reducing maintenance lead time.
+
+
 ## Answering the Opening Questions
 
 - **How does OOP differ from procedural programming, and why did it emerge?**
