@@ -238,6 +238,133 @@ A 30-step SDXL generation takes about 5 seconds on an RTX 4090. User-facing serv
 
 ---
 
+## Fixing Inference Parameters as Experiment Design
+
+Diffusion quality is more sensitive to experiment protocol than model name. Changing one prompt line and judging "good/bad" introduces heavy configuration bias. In production, build an experiment grid fixing at minimum `num_inference_steps`, `guidance_scale`, `scheduler`, and `seed` before comparing.
+
+```python
+from dataclasses import dataclass
+
+
+@dataclass
+class DiffusionRun:
+    steps: int
+    cfg: float
+    scheduler: str
+    seed: int
+
+
+grid = [
+    DiffusionRun(20, 6.5, "euler_a", 42),
+    DiffusionRun(30, 7.5, "dpmpp_2m", 42),
+    DiffusionRun(40, 8.0, "dpmpp_2m", 42),
+]
+```
+
+Evaluation with offline metrics like FID alone is insufficient. Real products need to record brand-guide compliance, text-insertion accuracy, human aesthetic scores, and safety-policy violation rates together. Text rendering quality in particular varies widely across model generations and needs a separate benchmark.
+
+## Generation Output Review: Vision API Double Safety Net
+
+Rather than returning generated images directly to users, running one more policy-violation check with GPT-4V or Claude reduces incidents. Using an image classifier alongside a VLM makes accuracy more stable.
+
+```python
+def moderation_prompt() -> str:
+    return (
+        "Inspect the generated image. Return JSON with fields: "
+        "nsfw, violence, personal_data, trademark_risk, confidence."
+    )
+```
+
+Review results should not end at a simple block/allow. Providing clear feedback about which item triggered the block enables faster prompt-rewriting loops for users.
+
+## Image Post-Processing and Storage Pipeline
+
+In generative services, the final storage step is part of quality. Storing raw PNGs increases size and transfer latency, so many teams default to quality-controlled WebP conversion.
+
+```python
+from PIL import Image
+
+
+def optimize_output(path_in: str, path_out: str) -> None:
+    img = Image.open(path_in).convert("RGB")
+    img.save(path_out, format="WEBP", quality=92, method=6)
+```
+
+Also store generation metadata (prompt, seed, steps, model version) alongside the image for reproducibility and audit. Without this metadata, regression-testing quality issues becomes difficult.
+
+## Prompt Templates and Version Control
+
+In text-to-image generation services, prompts effectively serve as code. Therefore, manage prompt templates with version control in the code repository and run sample-set regression tests on changes. Without template management, output style drifts significantly when team members change.
+
+```python
+PROMPT_TEMPLATE_V3 = (
+    "{subject}, {style}, {lighting}, high detail, clean composition, "
+    "no watermark, no text artifacts"
+)
+
+
+def build_prompt(subject: str, style: str, lighting: str) -> str:
+    return PROMPT_TEMPLATE_V3.format(subject=subject, style=style, lighting=lighting)
+```
+
+Including this version field in generation metadata lets you trace which prompt policy caused an issue when customer feedback arrives.
+
+## Generation Request Queue Design for Product Operations
+
+Generation requests have high user-perceived latency, making queue design critical. Allowing unlimited concurrent execution when requests spike can cause GPU OOM and destabilize the entire service. Fixing per-model concurrency slots and queuing overflow requests is the safe default.
+
+```python
+import asyncio
+
+
+class GenerationQueue:
+    def __init__(self, max_concurrency: int = 2):
+        self.sem = asyncio.Semaphore(max_concurrency)
+
+    async def run(self, coro):
+        async with self.sem:
+            return await coro
+```
+
+Adding request priority makes operations much smoother—for example, prioritizing paid-user requests and routing free-user requests to a background queue.
+
+Making this layer explicit means service quality stays predictable even when the model changes. For generative features, queue policy often changes perceived quality more than model performance.
+
+## A/B Testing: Verification Routine Before Model Swap
+
+Generation model swaps must proceed through A/B testing. Comparing outputs from two models using identical prompt sets and seed sets, then recording both internal evaluator scores and automated metrics, is the safe approach.
+
+```python
+AB_PROMPTS = [
+    "Product-photo-style ad banner",
+    "Natural-light portrait poster",
+    "Infographic with embedded text",
+]
+```
+
+Items that frequently break—text rendering and finger shapes in particular—need a dedicated checklist to catch regressions quickly.
+
+## Operational Review Loop: Fixing Weekly Checkpoints
+
+Multimodal systems that judge health solely by model accuracy react too late. Fixing a set of items reviewed in every weekly operations meeting is more effective. For example, recording request volume, average latency, P95 latency, error rate, retry rate, cache hit rate, and user complaint rate in the same format catches small anomalies early.
+
+Metrics should also be decomposed by stage. A single "success rate" number obscures which step is losing. Recording success rates separately for input validation, preprocessing, retrieval, and generation stages makes the bottleneck obvious. These decomposed metrics are especially useful for detecting regressions after model swaps or pipeline changes.
+
+```python
+weekly_health = {
+    "request_count": 0,
+    "avg_latency_ms": 0,
+    "p95_latency_ms": 0,
+    "error_rate": 0.0,
+    "retry_rate": 0.0,
+    "cache_hit_rate": 0.0,
+    "user_downvote_rate": 0.0,
+}
+```
+
+Fixing the operational loop also makes technology choices more grounded. When introducing a new model, you compare latency increase and cost increase on the same table instead of looking only at "accuracy improvement." Ultimately, production quality is maintained not by a single model upgrade but by a repeatable review loop.
+
+
 ## Answering the Opening Questions
 
 - **Why did diffusion quickly displace GANs to become the default visual generation architecture?**

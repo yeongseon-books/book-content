@@ -251,6 +251,111 @@ img = frame.to_image().resize((224, 224))  # shrink right away
 
 ---
 
+## Automatically Selecting the Frame Sampling Policy
+
+Optimal sampling differs with video length and question type. Applying a fixed frame count to every request causes excessive computation on short videos and missed events on long ones. A router that branches sampling strategy by duration and intent is necessary.
+
+```python
+def choose_sampling_policy(duration_sec: float, intent: str) -> dict:
+    if intent in {"event_detection", "safety_alert"}:
+        return {"mode": "dense", "fps": 2.0, "max_frames": 64}
+    if duration_sec > 900:
+        return {"mode": "keyframe", "max_frames": 48}
+    return {"mode": "uniform", "frames": 16}
+```
+
+Fixing this policy first maintains a comparison baseline even when swapping models. Conversely, changing sampling and model simultaneously makes it impossible to isolate which change affected quality.
+
+## Audio Transcription Integration: Whisper Timeline Alignment
+
+One of the most practical ways to raise video understanding quality is using audio transcription alongside frames. Aligning Whisper segments on the time axis and combining them with frame metadata enables querying scene descriptions and speech information simultaneously.
+
+```python
+def attach_transcript_to_frame(frame_ts: float, segments: list[dict], window: float = 1.5) -> str:
+    hits = [s["text"] for s in segments if abs((s["start"] + s["end"]) / 2 - frame_ts) <= window]
+    return " ".join(hits)
+```
+
+This combination is highly effective for recovering "what scene was shown when someone said X." It is especially useful in domains where narrative matters—education, meetings, sports analysis.
+
+## Video Q&A Evaluation Metrics
+
+Video QA quality cannot be judged by answer match rate alone. You must also check whether the temporal location was correct, whether wrong objects were mentioned, and whether evidence frames were provided.
+
+```python
+metrics = {
+    "answer_exact_match": 0.0,
+    "temporal_iou": 0.0,
+    "evidence_frame_recall_at_3": 0.0,
+}
+```
+
+In operations, separating these metrics on a dashboard is advisable. Models producing plausible answer sentences while missing temporal evidence happens more often than expected.
+
+## Long Video Processing: Chunk Splitting and Summary Merging
+
+Videos over 30 minutes are more stable when split into time chunks, summarized individually, then merged hierarchically. For example, create 3-minute chunk summaries first, then have a higher-level LLM integrate these summaries into a final report.
+
+```python
+def chunk_ranges(duration_sec: int, chunk_sec: int = 180):
+    ranges = []
+    s = 0
+    while s < duration_sec:
+        e = min(duration_sec, s + chunk_sec)
+        ranges.append((s, e))
+        s = e
+    return ranges
+```
+
+This approach avoids both memory and context limits while maintaining temporal order. It also simplifies failure recovery since individual chunks can be reprocessed independently.
+
+## Threshold Tuning Procedure for Event Detection
+
+Video action recognition precision and recall shift dramatically with threshold settings. Before deployment, define the domain goal first. Safety incident detection prioritizes recall; automatic tagging prioritizes precision—different goals require different thresholds.
+
+```python
+def classify_event(score: float, policy: str) -> str:
+    if policy == "recall":
+        return "event" if score >= 0.45 else "none"
+    return "event" if score >= 0.72 else "none"
+```
+
+Also avoid judging from a single frame score immediately—smoothing over a time window reduces instantaneous false positives from noise.
+
+Documenting this procedure enables same-criteria comparison after model swaps and aligns expectations between operations and product teams.
+
+## Frame Storage Policy and Storage Cost
+
+Video processing systems without a frame storage policy see storage costs grow rapidly. Specify a policy to retain only sampled frames and evidence frames rather than all frames.
+
+```python
+def keep_frame(is_evidence: bool, is_sampled: bool) -> bool:
+    return is_evidence or is_sampled
+```
+
+Keeping evidence frames simplifies later user inquiry responses and quality audits. Indiscriminate storage, on the other hand, increases both cost and privacy risk.
+
+## Operational Review Loop: Fixing Weekly Checkpoints
+
+Multimodal systems that judge health solely by model accuracy react too late. Fixing a set of items reviewed in every weekly operations meeting is more effective. For example, recording request volume, average latency, P95 latency, error rate, retry rate, cache hit rate, and user complaint rate in the same format catches small anomalies early.
+
+Metrics should also be decomposed by stage. A single "success rate" number obscures which step is losing. Recording success rates separately for input validation, preprocessing, retrieval, and generation stages makes the bottleneck obvious. These decomposed metrics are especially useful for detecting regressions after model swaps or pipeline changes.
+
+```python
+weekly_health = {
+    "request_count": 0,
+    "avg_latency_ms": 0,
+    "p95_latency_ms": 0,
+    "error_rate": 0.0,
+    "retry_rate": 0.0,
+    "cache_hit_rate": 0.0,
+    "user_downvote_rate": 0.0,
+}
+```
+
+Fixing the operational loop also makes technology choices more grounded. When introducing a new model, you compare latency increase and cost increase on the same table instead of looking only at "accuracy improvement." Ultimately, production quality is maintained not by a single model upgrade but by a repeatable review loop.
+
+
 ## Answering the Opening Questions
 
 - **Why is frame sampling the first critical variable to decide in video understanding?**

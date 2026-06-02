@@ -245,6 +245,146 @@ Self-hosting still costs USD 1-3 per hour per GPU instance. Push queue length, G
 
 ---
 
+## Managing Whisper Quality with Numbers
+
+Once Whisper is in production, saying "it mostly works" is nearly meaningless. You need to record at minimum WER (Word Error Rate), CER (Character Error Rate), segment latency, and silence-hallucination rate simultaneously to interpret quality trends. If your service handles both Korean call-center audio and English meeting transcripts, separating metrics by language is also mandatory.
+
+```python
+def wer(ref: list[str], hyp: list[str]) -> float:
+    n, m = len(ref), len(hyp)
+    dp = [[0] * (m + 1) for _ in range(n + 1)]
+    for i in range(n + 1):
+        dp[i][0] = i
+    for j in range(m + 1):
+        dp[0][j] = j
+    for i in range(1, n + 1):
+        for j in range(1, m + 1):
+            cost = 0 if ref[i - 1] == hyp[j - 1] else 1
+            dp[i][j] = min(
+                dp[i - 1][j] + 1,
+                dp[i][j - 1] + 1,
+                dp[i - 1][j - 1] + cost,
+            )
+    return dp[n][m] / max(1, n)
+```
+
+In domain-heavy environments, `initial_prompt` alone has limits. Adding dictionary-based post-correction is more practical—keeping a lookup table for medical terms, product SKUs, and person names, then correcting in post-processing, can meaningfully reduce WER.
+
+## Audio-Video Combined Pipeline
+
+For meetings and lectures, bundling audio transcription with frame extraction during storage dramatically improves downstream Q&A quality. Extracting frames at Whisper segment timestamps and indexing them together lets you instantly recover "the screen shown when this was said."
+
+```python
+import subprocess
+
+
+def extract_frame_at(video_path: str, sec: float, out_path: str) -> None:
+    subprocess.run([
+        "ffmpeg", "-y",
+        "-ss", f"{sec:.3f}",
+        "-i", video_path,
+        "-frames:v", "1",
+        out_path,
+    ], check=True)
+```
+
+Connecting this structure to episode 9's video processing means audio and visual data live on the same event timeline rather than separate logs. The combined index is reusable in multimodal RAG as well.
+
+## API Route Selection Criteria
+
+More teams now operate OpenAI API, self-hosted faster-whisper, and hybrid routing together. Sending long files to self-hosted and short real-time requests to the API enables cost optimization.
+
+```python
+def choose_stt_route(duration_sec: float, queue_depth: int) -> str:
+    if duration_sec > 600:
+        return "self_hosted"
+    if queue_depth > 120:
+        return "openai_api"
+    return "self_hosted"
+```
+
+This routing function looks simple but becomes the key lever controlling both monthly cost and P95 latency simultaneously.
+
+## Practical Points When Combining Speaker Diarization
+
+Whisper itself does not distinguish speakers, so meeting minutes and consultation logs need diarization attached separately. The most common issue is timestamp alignment error. When diarization segments and Whisper segments diverge at boundaries, sentences get attributed to the wrong speaker.
+
+```python
+def assign_speaker(seg_start: float, seg_end: float, speaker_turns: list[dict]) -> str:
+    center = (seg_start + seg_end) / 2
+    for t in speaker_turns:
+        if t["start"] <= center <= t["end"]:
+            return t["speaker"]
+    return "UNKNOWN"
+```
+
+To improve alignment quality, avoid merging segments too long—keep them in the 3–8 second range. Also manage name mapping in a separate post-processing step to minimize conflicts with privacy policies.
+
+## Long Call Log Operations: Segment Merging and Search Indexing
+
+For long audio like call-center recordings or meeting transcripts, storing raw transcription as a single text blob causes search quality to degrade quickly. Typically, merging 20–40 second segments by semantic unit and storing start/end times as metadata per merged chunk is effective.
+
+```python
+def merge_segments(segments: list[dict], max_window: float = 35.0) -> list[dict]:
+    merged = []
+    cur = None
+    for s in segments:
+        if cur is None:
+            cur = {"start": s["start"], "end": s["end"], "text": s["text"]}
+            continue
+        if s["end"] - cur["start"] <= max_window:
+            cur["end"] = s["end"]
+            cur["text"] += " " + s["text"]
+        else:
+            merged.append(cur)
+            cur = {"start": s["start"], "end": s["end"], "text": s["text"]}
+    if cur:
+        merged.append(cur)
+    return merged
+```
+
+Chunks stored this way are directly reusable in multimodal RAG later. When answering questions, you can present the original audio segment and video frame from that time range together, increasing explainability.
+
+## Audio Pre-Normalization for Transcription Quality
+
+Volume normalization and silence removal in audio preprocessing alone often stabilizes Whisper quality. The effect is especially large in environments with high input quality variance, like mobile recordings.
+
+```python
+import librosa
+import numpy as np
+
+
+def normalize_audio(path: str):
+    y, sr = librosa.load(path, sr=16000, mono=True)
+    y = y / (np.max(np.abs(y)) + 1e-8)
+    return y, sr
+```
+
+Keeping preprocessing logs enables joint analysis of original input characteristics and transcription errors when quality issues arise.
+
+## Operational Review Loop: Fixing Weekly Checkpoints
+
+Multimodal systems that judge health solely by model accuracy react too late. Fixing a set of items reviewed in every weekly operations meeting is more effective. For example, recording request volume, average latency, P95 latency, error rate, retry rate, cache hit rate, and user complaint rate in the same format catches small anomalies early.
+
+Metrics should also be decomposed by stage. A single "success rate" number obscures which step is losing. Recording success rates separately for input validation, preprocessing, retrieval, and generation stages makes the bottleneck obvious. These decomposed metrics are especially useful for detecting regressions after model swaps or pipeline changes.
+
+```python
+weekly_health = {
+    "request_count": 0,
+    "avg_latency_ms": 0,
+    "p95_latency_ms": 0,
+    "error_rate": 0.0,
+    "retry_rate": 0.0,
+    "cache_hit_rate": 0.0,
+    "user_downvote_rate": 0.0,
+}
+```
+
+Fixing the operational loop also makes technology choices more grounded. When introducing a new model, you compare latency increase and cost increase on the same table instead of looking only at "accuracy improvement." Ultimately, production quality is maintained not by a single model upgrade but by a repeatable review loop.
+
+Additionally, in audio pipelines you must monitor processing queue depth alongside transcription quality. Even with good accuracy, severe queue buildup quickly degrades user experience—making it essential to view quality metrics and operational metrics on the same dashboard.
+
+
 ## Answering the Opening Questions
 
 - **Why has Whisper become the de facto default for open-source STT?**

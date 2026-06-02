@@ -263,6 +263,131 @@ Across ten episodes we covered the models, data, and systems behind multimodal A
 
 ---
 
+## Multimodal Pipeline from a Failure-Response Perspective
+
+Production multimodal apps require more careful failure-path design than happy-path design. Image decoding failures, OCR timeouts, VLM overload, and vector DB delays can all occur simultaneously across modalities, so explicit fallbacks for each step are necessary. For example, if OCR fails, produce a reduced response via caption+VLM path; if VLM fails, return only search results and OCR summary in a degraded mode.
+
+```python
+class StepFailure(Exception):
+    pass
+
+
+def degrade_response(caption: str | None, ocr_text: str | None, docs: list[str]) -> str:
+    parts = []
+    if caption:
+        parts.append(f"Image summary: {caption}")
+    if ocr_text:
+        parts.append(f"Extracted text: {ocr_text[:400]}")
+    if docs:
+        parts.append("Related docs: " + ", ".join(docs[:3]))
+    return "\n".join(parts) if parts else "Advanced reasoning is delayed; providing basic results only."
+```
+
+Having this reduced-response path turns total failures into partial degradation—a critical difference for maintaining user trust.
+
+## Cost Guardrails: Per-Request Budget Policy
+
+Multimodal request costs fluctuate sharply with image count and resolution. A policy limiting maximum tokens, image count, and inference time per request is necessary.
+
+```python
+def enforce_budget(image_count: int, max_side: int, est_tokens: int) -> None:
+    if image_count > 4:
+        raise ValueError("Maximum 4 images per request.")
+    if max_side > 1600:
+        raise ValueError("Image longest side must be 1600px or less.")
+    if est_tokens > 12000:
+        raise ValueError("Query too long; exceeds processing budget.")
+```
+
+This policy is not a restriction that harms user experience—it is a safety mechanism protecting overall service stability. It is also the first layer that shields the system during request surges.
+
+## Quality Loop: Combining User Feedback and Automated Evaluation
+
+Once operations stabilize, automate the quality improvement loop. Bundling user feedback (thumbs up/down), retrieval evidence match rate, and hallucination detection signals into a weekly report clarifies model-swap priorities.
+
+```python
+weekly_report = {
+    "thumbs_up_rate": 0.0,
+    "avg_latency_ms": 0,
+    "cache_hit_rate": 0.0,
+    "hallucination_rate": 0.0,
+    "top_failure_modes": [],
+}
+```
+
+Ultimately, good multimodal operations converge on loop design rather than model selection. Only when the input-validation, execution, evaluation, and improvement loop is closed can the same team maintain better quality at lower cost.
+
+## Security Boundary: Upload Verification and Storage Isolation
+
+Multimodal services inherently involve file uploads, making security boundary design mandatory. Do not trust MIME type alone—perform magic-byte verification. Store original files in an isolated bucket accessible only via signed URLs. Skipping this step significantly increases malicious file upload risk.
+
+```python
+ALLOWED_MAGIC = {
+    b"\x89PNG\r\n\x1a\n": "image/png",
+    b"\xff\xd8\xff": "image/jpeg",
+}
+
+
+def sniff_content_type(blob: bytes) -> str | None:
+    for magic, ctype in ALLOWED_MAGIC.items():
+        if blob.startswith(magic):
+            return ctype
+    return None
+```
+
+Also, log only hashes and metadata instead of original images for safety. Satisfying both operational convenience and privacy protection requires including storage lifecycle policies in the design.
+
+## Backpressure and Job Cancellation Policy
+
+Multimodal services have high per-request computation, so without backpressure policy, queue buildup occurs easily. Limit concurrent jobs at the API gateway, and for requests exceeding wait-time thresholds, return clear error messages with retry guidance.
+
+```python
+MAX_INFLIGHT = 200
+
+
+def should_reject(current_inflight: int) -> bool:
+    return current_inflight >= MAX_INFLIGHT
+```
+
+Also, when users cancel requests, downstream worker tasks must terminate together to avoid wasting GPU time. Plumbing cancellation tokens through to workers early yields significant cost savings.
+
+Backpressure policy looks like a feature limitation but actually is the core mechanism guaranteeing stable response times for all users. It is one of the first safety measures to prepare in multimodal operations.
+
+## Per-Stage Timeout Design from an SLA Perspective
+
+In production, do not set only a total timeout—separate timeouts per stage. Setting upper time bounds for OCR, embedding, and VLM individually speeds up root-cause identification during incidents and simplifies partial-failure fallbacks.
+
+```python
+TIMEOUTS = {
+    "ocr_sec": 4.0,
+    "embed_sec": 2.0,
+    "vlm_sec": 18.0,
+}
+```
+
+Canceling requests that exceed these thresholds and switching to degraded responses prevents overall service latency from propagating.
+
+## Operational Review Loop: Fixing Weekly Checkpoints
+
+Multimodal systems that judge health solely by model accuracy react too late. Fixing a set of items reviewed in every weekly operations meeting is more effective. For example, recording request volume, average latency, P95 latency, error rate, retry rate, cache hit rate, and user complaint rate in the same format catches small anomalies early.
+
+Metrics should also be decomposed by stage. A single "success rate" number obscures which step is losing. Recording success rates separately for input validation, preprocessing, retrieval, and generation stages makes the bottleneck obvious. These decomposed metrics are especially useful for detecting regressions after model swaps or pipeline changes.
+
+```python
+weekly_health = {
+    "request_count": 0,
+    "avg_latency_ms": 0,
+    "p95_latency_ms": 0,
+    "error_rate": 0.0,
+    "retry_rate": 0.0,
+    "cache_hit_rate": 0.0,
+    "user_downvote_rate": 0.0,
+}
+```
+
+Fixing the operational loop also makes technology choices more grounded. When introducing a new model, you compare latency increase and cost increase on the same table instead of looking only at "accuracy improvement." Ultimately, production quality is maintained not by a single model upgrade but by a repeatable review loop.
+
+
 ## Answering the Opening Questions
 
 - **What end-to-end components must a production multimodal app separate in its design?**

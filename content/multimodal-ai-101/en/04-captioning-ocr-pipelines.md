@@ -292,6 +292,120 @@ Card numbers on receipts, phone numbers on business cards, and ID numbers on pas
 
 ---
 
+## Why Image Preprocessing Determines OCR Quality
+
+Most OCR performance issues originate from input quality rather than model capability. Rotation, shadows, low resolution, and compression noise cause significant error spikes even in high-performance engines, so treating preprocessing as an independent stage is the safer choice. Services that accept both document scans and mobile-captured images need deskew and contrast correction as mandatory steps.
+
+```python
+import cv2
+import numpy as np
+
+
+def preprocess_for_ocr(path: str) -> np.ndarray:
+    img = cv2.imread(path)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    denoised = cv2.fastNlMeansDenoising(gray, None, 12, 7, 21)
+    binarized = cv2.adaptiveThreshold(
+        denoised,
+        255,
+        cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+        cv2.THRESH_BINARY,
+        31,
+        11,
+    )
+    return binarized
+```
+
+Rather than feeding preprocessing output directly into OCR, measure both character-level CER (Character Error Rate) and field-level extraction accuracy on a sampled document set. What matters in production is not reading sentences plausibly but reducing errors on critical fields like totals, dates, and account numbers.
+
+## Cross-Validating Captioning + OCR Results with a Vision API
+
+When captioning and OCR results conflict, using GPT-4V or Claude as a referee reduces false positives. For example, if OCR reads "8" but the caption describes "3", a cross-query that includes the original image resolves the conflict.
+
+```python
+def build_validation_prompt(caption: str, ocr_text: str) -> str:
+    return (
+        "You are validating extracted information from a document image. "
+        "Compare the caption summary and OCR text. "
+        "Return a JSON object with fields: conflicts, corrected_values, confidence.\n\n"
+        f"caption:\n{caption}\n\nocr:\n{ocr_text}"
+    )
+```
+
+This cross-validation should not run on every document. Trigger it only on rules like "average OCR confidence below 0.7" or "amount/date field mismatch" to keep costs manageable.
+
+## Structured Post-Processing for Higher Field Extraction Quality
+
+Passing raw OCR output directly to an LLM causes output format instability even on identical documents. First structure field candidates using regex and coordinate information, then hand the structured result to the model. Fields with clear formats—amounts, dates, business registration numbers—are more reliably extracted by rules than by LLMs.
+
+```python
+import re
+
+amount_pattern = re.compile(r"\d{1,3}(?:,\d{3})*(?:\.\d{2})?")
+
+
+def extract_amount_candidates(lines: list[str]) -> list[str]:
+    out = []
+    for line in lines:
+        out.extend(amount_pattern.findall(line))
+    return out
+```
+
+Routing only "low-confidence fields" to the Vision API re-verification path significantly reduces overall cost. With this layer in place, swapping the OCR engine barely affects the upstream interface.
+
+## Document-Type Pipeline Routing Strategy
+
+Running OCR and captioning in the same order for every input wastes cost on many document types. Classifying the document type first enables more efficient pipeline operation. For example, receipts route to an OCR-first path, product photos to a caption-first path, and chart images to an OCR+VLM verification path.
+
+This routing can start with simple heuristics—resolution, text density, line-segment patterns—without a complex classifier. The key is logging the routing decision and its outcome so you can periodically tune which path wins on quality and cost.
+
+```python
+def route_document_path(text_density: float, has_table_lines: bool) -> str:
+    if has_table_lines:
+        return "ocr_plus_vlm"
+    if text_density > 0.35:
+        return "ocr_first"
+    return "caption_first"
+```
+
+In practice, this single routing policy alone can significantly reduce average latency while funneling hard documents into a separate path where quality-improvement loops run more easily.
+
+## Confidence-Based Reprocessing Queue
+
+The most practical production pattern is sending only low-confidence samples to a reprocessing queue. Routing every document through the high-performance path causes costs to spike, so use confidence combined with field importance as the threshold.
+
+```python
+def need_reprocess(avg_conf: float, has_amount: bool, has_date: bool) -> bool:
+    if avg_conf < 0.72:
+        return True
+    if (not has_amount) or (not has_date):
+        return True
+    return False
+```
+
+This reprocessing queue also connects easily to human review. Prioritizing documents with missing critical fields improves operational efficiency.
+
+## Operational Review Loop: Fixing Weekly Checkpoints
+
+Multimodal systems that judge health solely by model accuracy react too late. Fixing a set of items reviewed in every weekly operations meeting is more effective. For example, recording request volume, average latency, P95 latency, error rate, retry rate, cache hit rate, and user complaint rate in the same format catches small anomalies early.
+
+Metrics should also be decomposed by stage. A single "success rate" number obscures which step is losing. Recording success rates separately for input validation, preprocessing, retrieval, and generation stages makes the bottleneck obvious. These decomposed metrics are especially useful for detecting regressions after model swaps or pipeline changes.
+
+```python
+weekly_health = {
+    "request_count": 0,
+    "avg_latency_ms": 0,
+    "p95_latency_ms": 0,
+    "error_rate": 0.0,
+    "retry_rate": 0.0,
+    "cache_hit_rate": 0.0,
+    "user_downvote_rate": 0.0,
+}
+```
+
+Fixing the operational loop also makes technology choices more grounded. When introducing a new model, you compare latency increase and cost increase on the same table instead of looking only at "accuracy improvement." Ultimately, production quality is maintained not by a single model upgrade but by a repeatable review loop.
+
+
 ## Answering the Opening Questions
 
 - **Why does the approach "just extract text from images" frequently fail for real document processing?**

@@ -229,6 +229,120 @@ Pretrained models assume a specific resize, crop, and normalization. ViT-B/32 ex
 
 ---
 
+## Embedding Quality Checks: Separating Offline and Online Metrics
+
+Multimodal embedding offline scores and online satisfaction frequently diverge. Offline uses Recall@K, nDCG, and MRR; online requires click-through rate, save rate, and re-query rate together to properly interpret quality. Cross-modal search perceived quality varies greatly depending on how users consume results.
+
+```python
+from collections import defaultdict
+
+stats = defaultdict(int)
+
+
+def log_search_event(query_type: str, clicked: bool, reformulated: bool) -> None:
+    stats[f"{query_type}_total"] += 1
+    if clicked:
+        stats[f"{query_type}_clicked"] += 1
+    if reformulated:
+        stats[f"{query_type}_reformulated"] += 1
+```
+
+Separating these event logs by modality quickly reveals gaps—for instance, "text-to-image search" works well but "image-to-document search" is weak.
+
+## CLIP Embedding + Metadata Combined Reranking
+
+CLIP-only search is fast but struggles to reflect domain constraints. In e-commerce, for example, incorporating category, price range, and stock status alongside embeddings raises real-world quality.
+
+```python
+def rerank_with_metadata(base_score: float, category_match: bool, in_stock: bool) -> float:
+    score = base_score
+    if category_match:
+        score += 0.08
+    if in_stock:
+        score += 0.03
+    return score
+```
+
+This approach significantly improves quality without retraining the model. The key is not hardcoding weights permanently but periodically re-tuning them through A/B experiments.
+
+## Multilingual Query Correction Path
+
+Using English-centric CLIP directly can degrade Korean query performance. Either switch to a multilingual embedding model or add a dual path that translates queries to English before searching.
+
+```python
+def normalize_query_for_clip(q: str, lang: str) -> str:
+    if lang == "ko":
+        return f"Translate to concise English retrieval query: {q}"
+    return q
+```
+
+When introducing a translation path, store the original query alongside for auditability. Search quality issues often appear as a mixture of translation error and embedding error.
+
+## Embedding Regeneration Migration Procedure
+
+When swapping models, you often need to rebuild the entire vector index. For zero-downtime transition, use a dual-index strategy: build the new index in the background, route a percentage of traffic to it for quality verification, then fully switch over.
+
+```python
+class IndexRouter:
+    def __init__(self):
+        self.primary = "clip_v1"
+        self.shadow = "clip_v2"
+        self.shadow_ratio = 0.1
+```
+
+Transition criteria should include not just accuracy but latency, cache-hit changes, and user re-query rate. Otherwise you miss side effects introduced by the model swap.
+
+## Why Score Normalization Is Needed in Hybrid Search
+
+A common mistake in multimodal search is summing scores from different systems directly. CLIP cosine scores and BM25 scores—or text embedding scores—have different distributions, so naïve addition lets one channel dominate. A separate score normalization step is necessary.
+
+```python
+def minmax(x: float, lo: float, hi: float) -> float:
+    if hi <= lo:
+        return 0.0
+    return (x - lo) / (hi - lo)
+
+
+def fuse(clip_s: float, text_s: float, clip_rng: tuple[float, float], text_rng: tuple[float, float]) -> float:
+    a = minmax(clip_s, *clip_rng)
+    b = minmax(text_s, *text_rng)
+    return 0.6 * a + 0.4 * b
+```
+
+Score normalization looks like a small implementation detail but is highly effective at reducing search quality variance. When upgrading models, distributions shift, so normalization parameters must be updated together to maintain stable results.
+
+## Converting Search Failure Logs into Training Assets
+
+Search failures are not just errors—they are embedding improvement data. Storing cases where users re-queried, top results that were not clicked, and manually corrected results as hard-negative sets significantly improves next-model evaluation quality.
+
+```python
+def build_hard_negative(query: str, shown_ids: list[str], clicked_ids: list[str]) -> list[str]:
+    return [x for x in shown_ids if x not in clicked_ids]
+```
+
+This dataset is useful not only for model swaps but also for score calibration tuning. The habit of converting operational logs into quality assets builds long-term performance.
+
+## Operational Review Loop: Fixing Weekly Checkpoints
+
+Multimodal systems that judge health solely by model accuracy react too late. Fixing a set of items reviewed in every weekly operations meeting is more effective. For example, recording request volume, average latency, P95 latency, error rate, retry rate, cache hit rate, and user complaint rate in the same format catches small anomalies early.
+
+Metrics should also be decomposed by stage. A single "success rate" number obscures which step is losing. Recording success rates separately for input validation, preprocessing, retrieval, and generation stages makes the bottleneck obvious. These decomposed metrics are especially useful for detecting regressions after model swaps or pipeline changes.
+
+```python
+weekly_health = {
+    "request_count": 0,
+    "avg_latency_ms": 0,
+    "p95_latency_ms": 0,
+    "error_rate": 0.0,
+    "retry_rate": 0.0,
+    "cache_hit_rate": 0.0,
+    "user_downvote_rate": 0.0,
+}
+```
+
+Fixing the operational loop also makes technology choices more grounded. When introducing a new model, you compare latency increase and cost increase on the same table instead of looking only at "accuracy improvement." Ultimately, production quality is maintained not by a single model upgrade but by a repeatable review loop.
+
+
 ## Answering the Opening Questions
 
 - **How do multimodal embeddings differ from text embeddings, and why are they the core of cross-modal search?**

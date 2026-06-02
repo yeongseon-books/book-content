@@ -238,6 +238,115 @@ VLMs span a wide task spectrum: OCR, charts, diagrams, real-world photos, docume
 
 ---
 
+## Adapter Selection: Experiment Protocol
+
+When comparing VLM architectures, a single accuracy number is insufficient. Adapters directly affect token length, inference latency, and GPU memory, so you need at least four metrics together: (1) per-task accuracy (TextVQA, ChartQA, DocVQA), (2) average token usage, (3) P95 latency, and (4) cost per 1K requests. Viewing all four makes the choice between LLaVA, BLIP-2, and Flamingo families clear.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class EvalRow:
+    model: str
+    docvqa: float
+    chartqa: float
+    avg_input_tokens: int
+    p95_latency_ms: int
+    usd_per_1k_requests: float
+
+rows = [
+    EvalRow("llava-1.6-7b", 0.71, 0.58, 3900, 1820, 7.4),
+    EvalRow("blip2-flan-t5-xl", 0.69, 0.55, 1700, 1490, 5.2),
+    EvalRow("flamingo-style", 0.74, 0.60, 1500, 2410, 9.8),
+]
+for r in rows:
+    print(r)
+```
+
+During training experiments, separate stages cleanly. Mixing projection-only training with LLM unfreezing makes root-cause analysis difficult. From an operational standpoint, strongly managing "which layers changed" as change history is the safer approach.
+
+## Dual Validation Path Including Vision API
+
+When your internal VLM produces uncertain answers, routing to GPT-4V or Claude for re-verification stabilizes quality. This is especially effective in domains with high failure cost like table interpretation or small-number reading.
+
+```python
+def route_for_second_opinion(confidence: float, answer: str) -> str:
+    if confidence < 0.55:
+        return "gpt4v"
+    if "uncertain" in answer or "not clear" in answer:
+        return "claude"
+    return "accept"
+```
+
+Apply re-verification only to low-confidence requests to control cost. Confidence should be computed from model logprob plus auxiliary signals like length anomalies and OCR mismatch rates.
+
+## Routing Strategy: Document vs Chart vs General Image
+
+Processing all inputs through a single VLM simplifies operations but can degrade both cost and quality simultaneously. Sending document-OCR questions to a model strong at tables/numbers, and general scene questions to a lighter model, stabilizes overall performance. The input classifier can start rule-based rather than model-based.
+
+```python
+def route_model(question: str, has_table_like_text: bool, image_count: int) -> str:
+    if has_table_like_text:
+        return "gpt4v_doc"
+    if image_count > 3:
+        return "claude_long_context"
+    if "chart" in question or "graph" in question:
+        return "vlm_chart"
+    return "llava_fast"
+```
+
+This routing lowers average latency while sending hard cases to high-performance models. The key is periodically reviewing misrouted cases and updating rules.
+
+## Operational Design: Token Budget and Failure Mode Documentation
+
+VLM requests have more diverse failure modes than text requests. Image decoding failures, visual token overflows, OCR mismatches, and model hallucinations can appear simultaneously in a single request. Document a token budget table and failure-mode response table before going live.
+
+For example, record empirical rules like "1 input image ≈ 500 visual tokens" in a table, estimate total input tokens by adding question length, and reduce timeouts. When estimates exceed thresholds, automatically reduce image count or route to a high-performance model path.
+
+```python
+def estimate_total_tokens(text_tokens: int, image_count: int, visual_tokens_per_image: int = 500) -> int:
+    return text_tokens + image_count * visual_tokens_per_image
+
+def enforce_token_budget(estimated: int, budget: int = 6000) -> bool:
+    return estimated <= budget
+```
+
+Connecting this budget policy to logging quickly reveals which request types stress the system. Ultimately, the practical criterion for architecture selection is not just performance but how predictably you can handle failures.
+
+## Evaluation Dataset Structure
+
+For VLM architecture comparison, split datasets by input type. Mixing document images, charts, general scenes, and UI screenshots—then scoring each bucket separately—makes model bias more visible. This standard makes it easy to build team consensus on where each model excels.
+
+```python
+EVAL_SPLITS = {
+    "doc": 500,
+    "chart": 300,
+    "photo": 400,
+    "ui": 300,
+}
+```
+
+## Weekly Operational Review Loop
+
+Judging multimodal system health by model accuracy alone leads to late responses. Fix a set of items to review in every weekly operational meeting. For example, record request volume, average latency, P95 latency, error rate, retry rate, cache hit rate, and user downvote rate in the same format to catch small anomalies early.
+
+Metrics must also be decomposed by stage. A single "success rate" number hides which step is losing quality. Recording success rates separately for input validation, preprocessing, retrieval, and generation stages makes bottlenecks clear. These decomposed metrics are especially useful for detecting regressions after model swaps or pipeline changes.
+
+```python
+weekly_health = {
+    "request_count": 0,
+    "avg_latency_ms": 0,
+    "p95_latency_ms": 0,
+    "error_rate": 0.0,
+    "retry_rate": 0.0,
+    "cache_hit_rate": 0.0,
+    "user_downvote_rate": 0.0,
+}
+```
+
+Fixing the operational loop also makes technology choices more realistic. When introducing a new model, you compare latency increase and cost increase on the same table rather than looking only at "accuracy improvement." Ultimately, production quality is maintained not by one-time model upgrades but by repeatable review loops.
+
+
 ## Answering the Opening Questions
 
 - **What path does a VLM use to connect image encoder output to LLM input?**

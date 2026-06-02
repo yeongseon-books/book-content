@@ -265,6 +265,136 @@ Multimodal RAG must be evaluated on text queries, image-by-image search, and ima
 
 ---
 
+## Building a Multimodal RAG Evaluation Set
+
+Evaluating multimodal RAG with text-only questions overestimates real performance. When building an evaluation set, split query types explicitly. Include at least four categories: visual pattern questions, numeric/table questions, OCR error recovery questions, and image-text combined questions.
+
+```python
+from dataclasses import dataclass
+
+
+@dataclass
+class MMQuery:
+    query: str
+    answer: str
+    evidence_image_id: str
+    query_type: str  # visual | numeric | ocr_repair | mixed
+
+
+benchmark = [
+    MMQuery("Find the screen with the red warning icon", "settings_error_12", "img_104", "visual"),
+    MMQuery("Which graph shows the lowest Q3 revenue?", "slide_27", "img_342", "numeric"),
+]
+```
+
+Separating types this way immediately exposes weaknesses of specific indexing strategies. For example, image-embedding-only strategies often excel on visual questions but drop sharply on numeric ones.
+
+## Reranking Layer: CLIP Candidates + GPT-4V/Claude Judgment
+
+Splitting retrieval into two stages stabilizes quality. Stage 1 quickly pulls top-30 using CLIP and a text index; stage 2 re-judges the top-5 with GPT-4V or Claude.
+
+```python
+def fuse_scores(clip_score: float, text_score: float, beta: float = 0.55) -> float:
+    return beta * clip_score + (1 - beta) * text_score
+
+
+def should_rerank_with_vlm(query_type: str, top1_margin: float) -> bool:
+    if query_type in {"numeric", "mixed"}:
+        return True
+    return top1_margin < 0.08
+```
+
+Making the reranking trigger explicit prevents indiscriminate Vision API calls. Using `top1_margin` selects only uncertain situations where the score gap between candidates is small.
+
+## Preserving Evidence Tracking Fields at Generation Time
+
+Final answers should not return natural language alone—include which images and OCR blocks were used as evidence. Without this field, hallucination auditing and user disputes become impossible.
+
+```python
+response = {
+    "answer": "Q3 revenue is 0.9M, the lowest.",
+    "citations": [
+        {"image_id": "img_342", "bbox": [411, 298, 588, 346], "source": "ocr"},
+        {"image_id": "img_342", "source": "chart_bar_3"},
+    ],
+    "retrieval_scores": {"clip": 0.41, "text": 0.67, "fused": 0.54},
+}
+```
+
+Fixing this structure first enables consistent quality metric comparison even when you swap models.
+
+## Index Operations: Update Cadence and Re-indexing Policy
+
+A multimodal index is not a build-once asset. When images are added or the captioning model changes, re-indexing is needed. You need criteria for whether to do a full rebuild or an incremental update. In practice, "model version change" and "data addition" are managed separately.
+
+```python
+from dataclasses import dataclass
+
+
+@dataclass
+class IndexEvent:
+    kind: str  # add | delete | reembed
+    item_id: str
+    model_version: str
+```
+
+During operation, stale index detection matters. If recently uploaded assets rarely appear in search top-k, the incremental pipeline is likely delayed. Putting this metric on a dashboard catches retrieval quality degradation early.
+
+## Monitoring for Fast Detection of Retrieval Quality Drops
+
+In multimodal RAG, even if the generation model produces fluent language, answer reliability collapses when retrieval breaks. Operational metrics should therefore monitor retrieval signals before generation quality. Practical warning indicators include top-1 score drops, top-k diversity decreases, and latest-document recall degradation.
+
+```python
+def detect_retrieval_drift(avg_top1: float, latest_doc_hit_rate: float) -> bool:
+    if avg_top1 < 0.22:
+        return True
+    if latest_doc_hit_rate < 0.15:
+        return True
+    return False
+```
+
+Multimodal RAG is also heavily affected by image asset lifecycle. Expired image URLs, corrupted thumbnails, and missing OCR caches can abruptly destabilize retrieval accuracy. Monitoring data-layer health alongside model metrics is essential.
+
+From an operational perspective, a good system maintains stable "evidence recall" alongside model accuracy. Only when this value holds steady can you safely attempt swapping the upstream generation model.
+
+## Query Intent Classification and Automatic Weight Adjustment
+
+Classifying query intent and adjusting search weights accordingly stabilizes multimodal RAG performance. Visual-description queries should boost image scores; numeric/factual queries should boost OCR and text scores.
+
+```python
+def choose_alpha(intent: str) -> float:
+    if intent == "visual":
+        return 0.75
+    if intent == "numeric":
+        return 0.25
+    return 0.5
+```
+
+Starting small is sufficient. Rather than over-engineering intent classification, collecting wrong-answer logs and incrementally adding rules carries lower operational risk.
+
+## Operational Review Loop: Fixing Weekly Checkpoints
+
+Multimodal systems that judge health solely by model accuracy react too late. Fixing a set of items reviewed in every weekly operations meeting is more effective. For example, recording request volume, average latency, P95 latency, error rate, retry rate, cache hit rate, and user complaint rate in the same format catches small anomalies early.
+
+Metrics should also be decomposed by stage. A single "success rate" number obscures which step is losing. Recording success rates separately for input validation, preprocessing, retrieval, and generation stages makes the bottleneck obvious. These decomposed metrics are especially useful for detecting regressions after model swaps or pipeline changes.
+
+```python
+weekly_health = {
+    "request_count": 0,
+    "avg_latency_ms": 0,
+    "p95_latency_ms": 0,
+    "error_rate": 0.0,
+    "retry_rate": 0.0,
+    "cache_hit_rate": 0.0,
+    "user_downvote_rate": 0.0,
+}
+```
+
+Fixing the operational loop also makes technology choices more grounded. When introducing a new model, you compare latency increase and cost increase on the same table instead of looking only at "accuracy improvement." Ultimately, production quality is maintained not by a single model upgrade but by a repeatable review loop.
+
+In short, multimodal RAG quality is determined first by retrieval design and evidence management policies rather than generation model choice. Fix index quality metrics and evidence recall as weekly operational indicators.
+
+
 ## Answering the Opening Questions
 
 - **Why does text RAG immediately show performance limits on questions requiring images, tables, or layout?**
