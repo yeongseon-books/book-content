@@ -270,6 +270,328 @@ In practice, the `src/` layout is used to clearly separate production code from 
 
 You've learned pytest's test discovery rules and project structure. The `test_` prefix and `src/` layout are the foundation. Next, we'll cover `assert` patterns and exception testing in depth.
 
+## Practical Structure Design: Starting a Small Project in a Testable Shape
+
+The following structure is the least error-prone layout for beginners.
+
+```text
+myapp/
+├── pyproject.toml
+├── src/
+│   └── myapp/
+│       ├── __init__.py
+│       ├── parser.py
+│       └── service.py
+└── tests/
+    ├── conftest.py
+    ├── test_parser.py
+    └── test_service.py
+```
+
+Separating `parser.py` and `service.py` makes it easy to test pure logic independently from external dependencies.
+
+```python
+# src/myapp/parser.py
+
+def parse_limit(value: str) -> int:
+    num = int(value)
+    if num <= 0:
+        raise ValueError("limit must be positive")
+    return num
+```
+
+```python
+# src/myapp/service.py
+from myapp.parser import parse_limit
+
+def build_query(limit: str) -> str:
+    n = parse_limit(limit)
+    return f"SELECT * FROM users LIMIT {n}"
+```
+
+```python
+# tests/test_service.py
+import pytest
+from myapp.service import build_query
+
+def test_build_query():
+    assert build_query("10") == "SELECT * FROM users LIMIT 10"
+
+def test_build_query_rejects_non_positive():
+    with pytest.raises(ValueError, match="positive"):
+        build_query("0")
+```
+
+## pytest Run Patterns and Reading Output
+
+```bash
+pytest -q
+```
+
+```text
+..                                                                   [100%]
+2 passed in 0.03s
+```
+
+```bash
+pytest -v tests/test_service.py::test_build_query
+```
+
+```text
+tests/test_service.py::test_build_query PASSED
+========================= 1 passed =========================
+```
+
+Get comfortable with failure output as well.
+
+```python
+def test_build_query():
+    assert build_query("10") == "SELECT * FROM users LIMIT 20"
+```
+
+```text
+E       AssertionError: assert 'SELECT * FROM users LIMIT 10' == 'SELECT * FROM users LIMIT 20'
+```
+
+## Reproducing and Fixing Discovery Mistakes
+
+### Mistake 1: File Name Convention Violation
+
+A file named `tests/service_testcase.py` will be missed by default discovery rules.
+
+Fix: Use `test_service.py` or `service_test.py`.
+
+### Mistake 2: Class Name Convention Violation
+
+```python
+class ServiceTests:
+    def test_build_query(self):
+        ...
+```
+
+Fix: Use `class TestService:` format.
+
+### Mistake 3: Incorrect Import Path
+
+```python
+from src.myapp.service import build_query
+```
+
+This may accidentally pass locally but easily fails in CI.
+
+Fix: Set `pythonpath = ["src"]` and use `from myapp.service import ...`.
+
+## Common Setup with conftest.py
+
+```python
+# tests/conftest.py
+import pytest
+
+@pytest.fixture
+def sample_limits():
+    return ["1", "10", "100"]
+```
+
+```python
+# tests/test_parser.py
+from myapp.parser import parse_limit
+
+def test_parse_limit_values(sample_limits):
+    assert [parse_limit(x) for x in sample_limits] == [1, 10, 100]
+```
+
+Establishing this structure early means adding fixtures, parametrization, and mocks later won't break directory conventions.
+
+## Project Boot Check: A Solid pytest Setup from the Start
+
+If the initial setup is shaky, every exercise in subsequent articles becomes unreliable. Lock it down with this sequence.
+
+### pyproject.toml Example
+
+```toml
+[project]
+name = "myapp"
+version = "0.1.0"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-ra -q"
+```
+
+### Minimal Code and Test
+
+```python
+# src/myapp/math_ops.py
+
+def multiply(a: int, b: int) -> int:
+    return a * b
+```
+
+```python
+# tests/test_math_ops.py
+from myapp.math_ops import multiply
+
+def test_multiply_positive():
+    assert multiply(3, 4) == 12
+
+def test_multiply_zero():
+    assert multiply(3, 0) == 0
+```
+
+### Run Output
+
+```bash
+pytest -v
+```
+
+```text
+tests/test_math_ops.py::test_multiply_positive PASSED
+tests/test_math_ops.py::test_multiply_zero PASSED
+========================= 2 passed =========================
+```
+
+## Discovery Debugging Routine
+
+1. Run `pytest --collect-only -q` to see collected nodes.
+2. If expected files/functions are missing, check naming conventions first.
+3. Then verify the import path (`pythonpath`).
+
+```bash
+pytest --collect-only -q
+```
+
+```text
+tests/test_math_ops.py::test_multiply_positive
+tests/test_math_ops.py::test_multiply_zero
+```
+
+## Before and After: Structure Reorganization Example
+
+```text
+# before
+project/
+├── app.py
+├── util_test_final.py
+└── something.py
+```
+
+```text
+# after
+project/
+├── src/myapp/
+│   ├── __init__.py
+│   └── something.py
+└── tests/
+    └── test_something.py
+```
+
+This change simultaneously reduces discovery failures, import errors, and execution inconsistencies.
+
+## Team Rules Template
+
+- Test file name: `test_*.py`
+- Test function name: `test_*`
+- Feature change PRs: at least 1 test added
+- Bug fix PRs: reproduction test required
+
+## Terminal Option Combinations
+
+| Command | Purpose |
+|---|---|
+| `pytest -q` | Quick pass/fail summary |
+| `pytest -v` | Per-case pass/fail detail |
+| `pytest -x` | Stop immediately on first failure |
+| `pytest -k "keyword"` | Run only matching subset |
+| `pytest --maxfail=3` | Limit maximum failure count |
+
+## Operational Regression Test Template
+
+```python
+import pytest
+
+BUG_CASES = [
+    ("", ValueError),
+    ("   ", ValueError),
+    (None, TypeError),
+]
+
+@pytest.mark.parametrize("raw,exc", BUG_CASES)
+def test_regression_cases(raw, exc):
+    with pytest.raises(exc):
+        require_non_empty(raw)
+```
+
+This template is the simplest form of permanently preserving bug tickets as test code.
+
+## Quality Check Questions
+
+- Can you infer the failure cause from the failure message alone?
+- Do tests depend on execution order?
+- Are boundary-value inputs included?
+- Are both happy and error paths verified?
+- Does adding a test case require only adding data, not copying functions?
+
+## Case Study: Common Improvement Points in PR Reviews
+
+### Code Example
+
+```python
+# app/discount.py
+
+def discount_price(price: int, rate: float) -> int:
+    if price < 0:
+        raise ValueError("price must be >= 0")
+    if not 0 <= rate <= 1:
+        raise ValueError("rate must be between 0 and 1")
+    return int(price * (1 - rate))
+```
+
+```python
+# tests/test_discount.py
+import pytest
+from app.discount import discount_price
+
+@pytest.mark.parametrize(
+    "price,rate,expected",
+    [
+        (10000, 0.0, 10000),
+        (10000, 0.1, 9000),
+        (10000, 1.0, 0),
+    ],
+)
+def test_discount_price(price, rate, expected):
+    assert discount_price(price, rate) == expected
+
+@pytest.mark.parametrize("price,rate", [(-1, 0.1), (1000, -0.1), (1000, 1.1)])
+def test_discount_price_invalid(price, rate):
+    with pytest.raises(ValueError):
+        discount_price(price, rate)
+```
+
+### Output Example
+
+```bash
+pytest tests/test_discount.py -v
+```
+
+```text
+tests/test_discount.py::test_discount_price[10000-0.0-10000] PASSED
+tests/test_discount.py::test_discount_price[10000-0.1-9000] PASSED
+tests/test_discount.py::test_discount_price[10000-1.0-0] PASSED
+tests/test_discount.py::test_discount_price_invalid[-1-0.1] PASSED
+tests/test_discount.py::test_discount_price_invalid[1000--0.1] PASSED
+tests/test_discount.py::test_discount_price_invalid[1000-1.1] PASSED
+========================= 6 passed =========================
+```
+
+### Review Points
+
+- Are boundary values (`0`, `1.0`) included?
+- Are exception types specific?
+- Can you identify the cause from the failure message?
+- Is the structure extensible by adding data alone, without copying functions?
+
 ## Answering the Opening Questions
 
 - **By what rules does pytest auto-discover test files and functions?**
