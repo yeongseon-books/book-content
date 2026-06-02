@@ -294,6 +294,271 @@ Since Python 3.7, consider `dataclasses` first. They reduce boilerplate while st
 
 A class is composed of constructors, instance methods, class methods, static methods, and dunder methods. Understanding each component lets you design clean, Pythonic classes. In the next article, we explore encapsulation — protecting a class's internal state.
 
+## What to Look at First in Class Design: State Consistency
+
+When distinguishing classes and instances, the criterion more important than syntax is state consistency. What invariants the constructor guarantees and what rules the object state observes after method calls determine design quality.
+
+```text
+[InventoryItem]
+  - sku: str
+  - quantity: int
+  - unit_price: int
+  + increase(qty)
+  + decrease(qty)
+  + valuation()
+
+Relationship
+InventoryService --> InventoryItem (uses)
+```
+
+## Before and After: From Free-Input Constructor to Validation-Centric Object
+
+```python
+# before
+class InventoryItem:
+    def __init__(self, sku, quantity, unit_price):
+        self.sku = sku
+        self.quantity = quantity
+        self.unit_price = unit_price
+```
+
+```python
+# after
+class InventoryItem:
+    def __init__(self, sku: str, quantity: int, unit_price: int) -> None:
+        if not sku:
+            raise ValueError('sku is required')
+        if quantity < 0:
+            raise ValueError('quantity must be >= 0')
+        if unit_price <= 0:
+            raise ValueError('unit_price must be > 0')
+
+        self.sku = sku
+        self._quantity = quantity
+        self.unit_price = unit_price
+
+    @property
+    def quantity(self) -> int:
+        return self._quantity
+
+    def increase(self, qty: int) -> None:
+        if qty <= 0:
+            raise ValueError('qty must be positive')
+        self._quantity += qty
+
+    def decrease(self, qty: int) -> None:
+        if qty <= 0:
+            raise ValueError('qty must be positive')
+        if self._quantity - qty < 0:
+            raise ValueError('stock cannot be negative')
+        self._quantity -= qty
+
+    def valuation(self) -> int:
+        return self._quantity * self.unit_price
+```
+
+The key is restricting manipulation paths so that an instance maintains a valid state even after creation.
+
+## Class Variable Misuse and Correction
+
+| Violation Code | Problem | Fix |
+|---|---|---|
+| `items = []` declared as class variable | All instances share the same list | Declare `self.items = []` in `__init__` |
+| Using class variable for settings that differ per instance | Unexpected global side effects | Immutable settings as class variables, mutable state as instance variables |
+
+## Instance Lifecycle Table
+
+| Stage | Question | Recommended Design |
+|---|---|---|
+| Creation | What inputs should be rejected? | Validate immediately in constructor |
+| Usage | What state transitions are allowed? | Express transition intent through method names |
+| Query | What should be exposed externally? | Read-only property first |
+| Disposal | Is external resource cleanup needed? | Context manager or explicit close |
+
+## Classes and Instances from a Testing Perspective
+
+```python
+import pytest
+
+
+def test_inventory_item_invariants() -> None:
+    item = InventoryItem('A-100', 10, 3000)
+    item.decrease(4)
+    assert item.quantity == 6
+
+    with pytest.raises(ValueError):
+        item.decrease(7)
+```
+
+This test verifies not just numeric results but the contract that instance invariants remain unbroken.
+
+## Real Scenario: Restructuring to Withstand Requirement Changes
+
+In production, rule changes happen more often than feature additions. Therefore, when evaluating class structure, it's safer to ask "how far must the next change reach?" rather than "does it work now?"
+
+```python
+from dataclasses import dataclass
+from typing import Protocol
+
+
+@dataclass
+class LineItem:
+    name: str
+    quantity: int
+    unit_price: int
+
+    def subtotal(self) -> int:
+        return self.quantity * self.unit_price
+
+
+class DiscountPolicy(Protocol):
+    def apply(self, amount: int) -> int:
+        ...
+
+
+class NoDiscount:
+    def apply(self, amount: int) -> int:
+        return amount
+
+
+class PercentDiscount:
+    def __init__(self, percent: int) -> None:
+        if not 0 <= percent <= 100:
+            raise ValueError('percent must be 0..100')
+        self.percent = percent
+
+    def apply(self, amount: int) -> int:
+        return int(amount * (100 - self.percent) / 100)
+
+
+class Invoice:
+    def __init__(self, items: list[LineItem], policy: DiscountPolicy) -> None:
+        self.items = items
+        self.policy = policy
+
+    def total(self) -> int:
+        base = sum(i.subtotal() for i in self.items)
+        return self.policy.apply(base)
+```
+
+This code requires no modification to `Invoice.total()` when discount rules change. Extension closes through adding implementation classes, while the core flow remains stable.
+
+## Collaboration in UML Style
+
+```text
+[Invoice]
+  - items: list[LineItem]
+  - policy: DiscountPolicy
+  + total()
+
+[LineItem]
+  + subtotal()
+
+[DiscountPolicy] <<interface>>
+  + apply(amount)
+      ^
+      +-- [NoDiscount]
+      +-- [PercentDiscount]
+```
+
+Writing collaboration structure in text like this lets you quickly align on "where is the policy axis and where is the domain axis" during code review.
+
+## Anti-Patterns and Correction Procedures
+
+| Anti-Pattern | Detection Signal | Correction Steps |
+|---|---|---|
+| God Object | 20+ methods, scattered change history | Decompose by responsibility axis → derive collaboration interfaces |
+| Data-only empty class | Only getters/setters, no methods | Move rule methods or simplify to dataclass |
+| Inheritance tree bypass branching | Type-check branching on subclasses | Redefine polymorphic contract |
+| Infrastructure type leakage | Domain layer depends on SDK response objects | Add DTO conversion layer |
+
+## Before and After: Test Maintenance Cost
+
+| Item | Before Refactoring | After Refactoring |
+|---|---|---|
+| Test setup | Global state initialization needed | Per-object state creation |
+| Failure root-cause tracing | Backtrack entire function chain | Trace per class method |
+| Regression scope | Broad and unclear | Narrow and predictable |
+
+## Team Application Checklist
+
+- Confirm domain terms and class names match.
+- Confirm invariants are complete at instance creation time.
+- Check whether policy changes are possible via implementation addition rather than existing code modification.
+- Agree on collaboration structure via 10-line UML text before code review.
+- Confirm test names describe business rules rather than method names.
+
+## Mini Case Study: Verifying with a Single Rule Addition
+
+The example below is the minimum unit for extending a policy without modifying existing code.
+
+```python
+class WeekendPolicy:
+    def apply(self, amount: int, is_weekend: bool) -> int:
+        if is_weekend:
+            return int(amount * 0.95)
+        return amount
+
+
+def estimate(amount: int, is_weekend: bool) -> int:
+    policy = WeekendPolicy()
+    return policy.apply(amount, is_weekend)
+```
+
+The key is that the new policy enters without breaking call paths. Keeping change history confined to policy classes reduces regression risk.
+
+| Verification Question | Pass Criteria |
+|---|---|
+| Does adding a new policy require modifying existing functions? | No |
+| Does the exception policy match the existing contract? | Yes |
+| Are tests separated per policy? | Yes |
+
+## Refactoring Retrospective: Viewing Change Cost as Numbers
+
+- If modified file count exceeds 5 per feature, review boundary redesign.
+- If type-branch if/elif accumulates 3 or more, move to polymorphism or strategy objects.
+- If regression test writing time exceeds implementation time, review responsibility placement.
+
+```python
+def complexity_signal(changed_files: int, branch_count: int) -> str:
+    if changed_files >= 5 or branch_count >= 3:
+        return 'refactor-needed'
+    return 'acceptable'
+```
+
+This approach is not a rigorous metric, but it's useful for making teams discuss based on criteria rather than intuition.
+
+## Verification Note: Questions for Checking Object Design Quality
+
+These questions are criteria used repeatedly in post-implementation reviews.
+
+- Does the exception type and message match the caller's contract when this method fails?
+- Is the same rule not duplicated in other classes or functions?
+- Does state mutation occur through only one method path?
+- Is unit testing possible without external dependencies?
+
+```python
+def review_signal(duplicate_rules: int, mutable_paths: int) -> str:
+    if duplicate_rules > 0:
+        return 'duplicate rule removal needed'
+    if mutable_paths > 1:
+        return 'state mutation path consolidation needed'
+    return 'structure stable'
+```
+
+Applying these checks even to article-level examples helps understand OOP as a maintenance strategy rather than syntax.
+
+## Additional Comparison: Response Time to Change Requests
+
+| Change Request | Code with Weak Boundaries | Code with Clear Boundaries |
+|---|---|---|
+| Add discount rule | Search branches then multi-modify | Add policy implementation |
+| Modify state transition | Modify multiple functions simultaneously | Modify domain method |
+| Strengthen tests | Integration-test-centric | Unit-test-first |
+
+This comparison matters not for performance numbers but for reducing maintenance lead time.
+
+
 ## Answering the Opening Questions
 
 - **How much should the constructor (`__init__`) be responsible for, and where does it become too much?**
