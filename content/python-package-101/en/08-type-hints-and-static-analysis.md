@@ -269,6 +269,483 @@ For new projects, start with `strict = true` from day one. For existing projects
 
 The next post covers **documentation** — README, MkDocs, and API Reference.
 
+## Type Hints from Basics to Advanced
+
+### Basic type annotations
+
+```python
+# Basic types
+name: str = "acme"
+count: int = 42
+ratio: float = 3.14
+is_active: bool = True
+
+# Collection types (Python 3.9+)
+names: list[str] = ["alice", "bob"]
+scores: dict[str, int] = {"alice": 95, "bob": 87}
+unique_ids: set[int] = {1, 2, 3}
+coordinates: tuple[float, float] = (37.5, 127.0)
+```
+
+### Function signatures
+
+```python
+def greet(name: str, times: int = 1) -> str:
+    return f"Hello, {name}! " * times
+
+def process_items(items: list[dict[str, int]]) -> dict[str, int]:
+    result: dict[str, int] = {}
+    for item in items:
+        result.update(item)
+    return result
+```
+
+### Union and Optional
+
+```python
+from typing import Union
+
+# Python 3.10+ syntax
+def parse_value(value: str | int) -> str:
+    return str(value)
+
+# Optional is shorthand for X | None
+def find_user(user_id: int) -> dict[str, str] | None:
+    users = {"1": {"name": "Alice"}}
+    return users.get(str(user_id))
+```
+
+### TypedDict: Adding structure to dictionaries
+
+```python
+from typing import TypedDict, NotRequired
+
+class UserConfig(TypedDict):
+    name: str
+    email: str
+    age: NotRequired[int]  # Optional field
+
+def create_user(config: UserConfig) -> None:
+    print(f"Creating user: {config['name']}")
+
+# mypy catches incorrect keys or types
+create_user({"name": "Alice", "email": "a@b.com"})  # OK
+create_user({"name": 123, "email": "a@b.com"})      # mypy error!
+```
+
+### Protocol: Structural subtyping
+
+```python
+from typing import Protocol
+
+class Serializable(Protocol):
+    def to_dict(self) -> dict[str, str]: ...
+
+class User:
+    def to_dict(self) -> dict[str, str]:
+        return {"name": self.name}
+
+class Config:
+    def to_dict(self) -> dict[str, str]:
+        return {"key": self.key}
+
+def save(obj: Serializable) -> None:
+    data = obj.to_dict()
+    # Both User and Config are valid (they have to_dict method)
+```
+
+### Generic types
+
+```python
+from typing import TypeVar, Generic
+
+T = TypeVar("T")
+
+class Result(Generic[T]):
+    def __init__(self, value: T | None = None, error: str | None = None):
+        self.value = value
+        self.error = error
+
+    def is_ok(self) -> bool:
+        return self.error is None
+
+def fetch_data() -> Result[list[str]]:
+    try:
+        return Result(value=["data1", "data2"])
+    except Exception as e:
+        return Result(error=str(e))
+```
+
+## mypy Configuration and Practical Usage
+
+### mypy settings in pyproject.toml
+
+```toml
+[tool.mypy]
+python_version = "3.11"
+strict = true                    # Enable all strict options
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true     # Require types on all functions
+disallow_any_generics = true
+check_untyped_defs = true
+no_implicit_optional = true
+
+# Per-library overrides
+[[tool.mypy.overrides]]
+module = "httpx.*"
+ignore_missing_imports = false
+
+[[tool.mypy.overrides]]
+module = "legacy_module.*"
+ignore_errors = true             # Gradual migration for legacy code
+```
+
+### Common errors mypy catches
+
+```python
+# Error 1: Return type mismatch
+def get_name() -> str:
+    return None  # error: Incompatible return value type (got "None", expected "str")
+
+# Error 2: Wrong argument type
+def add(a: int, b: int) -> int:
+    return a + b
+
+add("1", "2")  # error: Argument 1 has incompatible type "str"; expected "int"
+
+# Error 3: Missing None check
+def process(value: str | None) -> str:
+    return value.upper()  # error: Item "None" has no attribute "upper"
+
+# Error 4: Incomplete dict type
+data: dict[str, int] = {}
+data["count"] = "five"  # error: Incompatible types in assignment
+```
+
+### Gradual type adoption strategy
+
+Adding types all at once to an existing project is impractical. Adopt gradually.
+
+```toml
+# Phase 1: Start with loose settings
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+# strict = false (default)
+
+# Phase 2: Apply strict only to new files
+[[tool.mypy.overrides]]
+module = "acme_utils.new_module.*"
+disallow_untyped_defs = true
+
+# Phase 3: Switch to full strict
+[tool.mypy]
+strict = true
+```
+
+## PEP 561: Distributing Type Information with Packages
+
+For users of your package to benefit from type checking, you need a PEP 561 marker.
+
+### py.typed marker file
+
+```bash
+# src/acme_utils/py.typed (empty file)
+touch src/acme_utils/py.typed
+```
+
+```toml
+# Include as package data in pyproject.toml
+[tool.setuptools.package-data]
+acme_utils = ["py.typed", "*.pyi"]
+```
+
+### Inline types vs stub files
+
+| Approach | File | Advantage | Disadvantage |
+|---|---|---|---|
+| Inline types | Directly in `.py` files | Types always in sync with code | Minor runtime import cost |
+| Stub files | `.pyi` files | Suitable for C extensions or legacy code | Requires sync management |
+
+### Stub file example
+
+```python
+# src/acme_utils/core.pyi
+from typing import overload
+
+class Engine:
+    def __init__(self, config: dict[str, str]) -> None: ...
+
+    @overload
+    def run(self, query: str) -> str: ...
+    @overload
+    def run(self, query: list[str]) -> list[str]: ...
+    def run(self, query: str | list[str]) -> str | list[str]: ...
+```
+
+### stubgen: Automatic stub generation
+
+```bash
+# mypy's stubgen tool
+pip install mypy
+stubgen src/acme_utils -o stubs/
+
+# Check generated stubs
+cat stubs/acme_utils/core.pyi
+```
+
+## Ruff: Ultra-Fast Linter and Formatter
+
+Ruff is a Python linter written in Rust that replaces flake8 + isort + pycodestyle in a single tool.
+
+```toml
+# pyproject.toml
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "SIM",  # flake8-simplify
+    "TCH",  # flake8-type-checking
+]
+ignore = ["E501"]  # line-too-long (formatter handles it)
+
+[tool.ruff.lint.isort]
+known-first-party = ["acme_utils"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+```
+
+```bash
+# Run linting
+ruff check .
+ruff check --fix .  # Auto-fix what can be fixed
+
+# Run formatting
+ruff format .
+ruff format --check .  # Verify-only for CI
+```
+
+### Ruff vs traditional tools speed comparison
+
+```text
+Project: 10,000 lines of Python code
+- flake8 + isort + black: ~5 seconds
+- ruff check + ruff format: ~0.1 seconds (50x faster)
+```
+
+## Integrating Type Checking and Linting in CI
+
+```yaml
+name: Quality
+on: [push, pull_request]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -e ".[dev]"
+
+      # Lint (fastest - run first)
+      - run: ruff check .
+      - run: ruff format --check .
+
+      # Type checking
+      - run: mypy src
+
+      # Tests
+      - run: pytest --cov=acme_utils
+```
+
+## pyright: An Alternative to mypy
+
+```toml
+# pyproject.toml
+[tool.pyright]
+pythonVersion = "3.11"
+typeCheckingMode = "strict"
+reportMissingImports = true
+reportMissingTypeStubs = true
+```
+
+```bash
+pip install pyright
+pyright src/
+```
+
+| Aspect | mypy | pyright |
+|---|---|---|
+| Language | Python | TypeScript (Node.js) |
+| Speed | Moderate | Fast |
+| IDE integration | Moderate | Optimized for VSCode (Pylance) |
+| Ecosystem | Broadest | Growing rapidly |
+| Config difficulty | Medium | Low |
+
+## Practical Type Hint Patterns
+
+### Callable types
+
+```python
+from typing import Callable
+
+# Function that takes a function as argument
+def retry(
+    func: Callable[[], str],
+    max_attempts: int = 3,
+) -> str:
+    for attempt in range(max_attempts):
+        try:
+            return func()
+        except Exception:
+            if attempt == max_attempts - 1:
+                raise
+    return ""  # unreachable, but makes mypy happy
+
+# Decorator type
+from typing import TypeVar, ParamSpec
+from functools import wraps
+
+P = ParamSpec("P")
+R = TypeVar("R")
+
+def log_calls(func: Callable[P, R]) -> Callable[P, R]:
+    @wraps(func)
+    def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        print(f"Calling {func.__name__}")
+        return func(*args, **kwargs)
+    return wrapper
+```
+
+### Literal types
+
+```python
+from typing import Literal
+
+def set_log_level(level: Literal["DEBUG", "INFO", "WARNING", "ERROR"]) -> None:
+    print(f"Setting level to {level}")
+
+set_log_level("INFO")     # OK
+set_log_level("VERBOSE")  # mypy error: not in Literal values
+```
+
+### Self type (Python 3.11+)
+
+```python
+from typing import Self
+
+class Builder:
+    def __init__(self) -> None:
+        self._name: str = ""
+        self._version: str = ""
+
+    def name(self, name: str) -> Self:
+        self._name = name
+        return self
+
+    def version(self, version: str) -> Self:
+        self._version = version
+        return self
+
+# Method chaining is type-safe
+builder = Builder().name("acme").version("1.0")
+```
+
+### Overload: Different return types based on input
+
+```python
+from typing import overload
+
+@overload
+def process(data: str) -> str: ...
+@overload
+def process(data: bytes) -> bytes: ...
+@overload
+def process(data: list[str]) -> list[str]: ...
+
+def process(data: str | bytes | list[str]) -> str | bytes | list[str]:
+    if isinstance(data, str):
+        return data.upper()
+    elif isinstance(data, bytes):
+        return data.upper()
+    else:
+        return [item.upper() for item in data]
+
+# mypy infers exact return types
+result: str = process("hello")        # OK
+result2: bytes = process(b"hello")    # OK
+result3: list[str] = process(["a"])   # OK
+```
+
+## Automatic Checks with pre-commit
+
+Running type checks and linting automatically before commits prevents basic issues from reaching PRs.
+
+```yaml
+# .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.5.5
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.11.0
+    hooks:
+      - id: mypy
+        additional_dependencies:
+          - types-requests
+          - pydantic>=2.5
+```
+
+```bash
+# Install pre-commit
+pip install pre-commit
+pre-commit install
+
+# Manual full run
+pre-commit run --all-files
+```
+
+## Measuring Type Check Coverage
+
+```bash
+# Generate mypy report
+mypy src --html-report reports/mypy
+
+# Or text summary
+mypy src --txt-report reports/mypy
+cat reports/mypy/index.txt
+```
+
+```text
+Module                Lines  Precise  Imprecise  Any
+acme_utils            450    420      20         10
+acme_utils.core       200    195      3          2
+acme_utils.config     120    118      2          0
+acme_utils.cli        130    107      15         8
+```
+
+Tracking type coverage in CI lets you gradually increase type safety.
+
+Modules with high `Any` ratios are gaps in type safety. Prioritize adding types to those modules first for the most efficient improvement in overall project type reliability. The goal is to maintain a `Precise` ratio above 90%.
+
+In practice, applying mypy strict mode only to new modules first while setting `ignore_errors = true` for legacy modules — then gradually reducing exceptions — is the realistic strategy.
+
 ## Answering the Opening Questions
 
 - **Why are type hints needed, and do they affect runtime?**
