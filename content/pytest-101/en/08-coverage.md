@@ -249,6 +249,223 @@ In practice, keeping new code coverage higher than existing code is an effective
 
 Coverage objectively measures the scope of your tests. Measure with pytest-cov, fill missing lines, and enforce thresholds in CI to maintain test quality. Next, we'll automate test execution with GitHub Actions.
 
+## Coverage Baseline Configuration Example
+
+```toml
+# pyproject.toml
+[tool.pytest.ini_options]
+addopts = "--cov=src/myapp --cov-report=term-missing --cov-fail-under=85"
+```
+
+This configuration blocks PRs that fall below the threshold immediately.
+
+## Line Coverage vs Branch Coverage
+
+| Aspect | Line Coverage | Branch Coverage |
+|---|---|---|
+| Meaning | Whether a code line was executed | Whether each conditional branch was executed |
+| Easily missed issue | Unexecuted `else` of an `if` | Relatively fewer |
+| Recommended use | Basic measurement | Apply alongside for core modules |
+
+## Common Misconceptions
+
+- Even at 100% coverage, quality can be low if assertions are weak.
+- Even at 70% coverage, practical value can be high if key boundaries are well-captured.
+- The nature of missing lines matters more than the number itself.
+
+## Before and After: Coverage-Driven Refactoring
+
+```python
+# before: single block with many branches
+
+def shipping_label(country: str, express: bool) -> str:
+    if country == "KR":
+        if express:
+            return "KR-EXP"
+        return "KR-STD"
+    if country == "US":
+        if express:
+            return "US-EXP"
+        return "US-STD"
+    return "INTL"
+```
+
+After locking branches with tests, you can simplify to a data map.
+
+```python
+# after
+MAP = {
+    ("KR", True): "KR-EXP",
+    ("KR", False): "KR-STD",
+    ("US", True): "US-EXP",
+    ("US", False): "US-STD",
+}
+
+def shipping_label(country: str, express: bool) -> str:
+    return MAP.get((country, express), "INTL")
+```
+
+This preserves behavior while improving both readability and test visibility.
+
+## Reading Coverage Reports: Priority Order
+
+1. Check `Missing` lines before looking at the TOTAL number.
+2. Distinguish whether missing lines are core logic or simple boilerplate.
+3. If core logic is missing, add tests first.
+4. For functions with many branches, review with `--cov-branch`.
+
+## Using HTML Reports
+
+```bash
+pytest --cov=src/myapp --cov-report=html
+```
+
+After running, open `htmlcov/index.html` and prioritize red lines (unexecuted).
+
+## Enforcing Failure Thresholds
+
+```bash
+pytest --cov=src/myapp --cov-fail-under=90
+```
+
+```text
+ERROR: Coverage failure: total of 84 is less than fail-under=90
+```
+
+This failure acts as a safety net preventing test quality regression.
+
+## Minimize Exclusion Rules
+
+```ini
+# .coveragerc
+[run]
+source = src/myapp
+
+[report]
+omit =
+    */__init__.py
+```
+
+Indiscriminate `omit` settings only make numbers look good while hiding real risks.
+
+## Operational Threshold Examples
+
+| Item | Threshold |
+|---|---|
+| New modules | 90%+ |
+| Core domain modules | 95%+ with branch |
+| Legacy modules | Gradual improvement |
+| PR quality gate | Apply fail-under |
+
+## Conclusion Pattern
+
+Coverage is not a pass/fail number — it's a missing-segment detection tool. Quality improves when you iterate the loop of filling missing lines with tests.
+
+## Terminal Option Combinations
+
+| Command | Purpose |
+|---|---|
+| `pytest -q` | Quick pass/fail confirmation |
+| `pytest -v` | Per-case pass/fail detail |
+| `pytest -x` | Stop immediately on first failure |
+| `pytest -k "keyword"` | Run only matching subset |
+| `pytest --maxfail=3` | Limit maximum failure count |
+
+## Regression Test Template
+
+```python
+import pytest
+
+BUG_CASES = [
+    ("", ValueError),
+    ("   ", ValueError),
+    (None, TypeError),
+]
+
+@pytest.mark.parametrize("raw,exc", BUG_CASES)
+def test_regression_cases(raw, exc):
+    with pytest.raises(exc):
+        require_non_empty(raw)
+```
+
+This template is the simplest way to permanently preserve bug issues as test code.
+
+## Quality Check Questions
+
+- Can you infer the cause from the failure message alone?
+- Does the test depend on execution order?
+- Are boundary-value inputs included?
+- Are both happy and error paths verified?
+- Can you extend coverage by adding data rather than copying functions?
+
+## Case Study: Common Review Points in PRs
+
+### Code Example
+
+```python
+# app/discount.py
+
+def discount_price(price: int, rate: float) -> int:
+    if price < 0:
+        raise ValueError("price must be >= 0")
+    if not 0 <= rate <= 1:
+        raise ValueError("rate must be between 0 and 1")
+    return int(price * (1 - rate))
+```
+
+```python
+# tests/test_discount.py
+import pytest
+from app.discount import discount_price
+
+@pytest.mark.parametrize(
+    "price,rate,expected",
+    [
+        (10000, 0.0, 10000),
+        (10000, 0.1, 9000),
+        (10000, 1.0, 0),
+    ],
+)
+def test_discount_price(price, rate, expected):
+    assert discount_price(price, rate) == expected
+
+@pytest.mark.parametrize("price,rate", [(-1, 0.1), (1000, -0.1), (1000, 1.1)])
+def test_discount_price_invalid(price, rate):
+    with pytest.raises(ValueError):
+        discount_price(price, rate)
+```
+
+### Output Example
+
+```bash
+pytest tests/test_discount.py -v
+```
+
+```text
+tests/test_discount.py::test_discount_price[10000-0.0-10000] PASSED
+tests/test_discount.py::test_discount_price[10000-0.1-9000] PASSED
+tests/test_discount.py::test_discount_price[10000-1.0-0] PASSED
+tests/test_discount.py::test_discount_price_invalid[-1-0.1] PASSED
+tests/test_discount.py::test_discount_price_invalid[1000--0.1] PASSED
+tests/test_discount.py::test_discount_price_invalid[1000-1.1] PASSED
+========================= 6 passed =========================
+```
+
+### Review Points
+
+- Are boundary values (`0`, `1.0`) included?
+- Is the exception type specific?
+- Can you identify the cause from the failure message?
+- Is the structure extensible by adding data alone?
+
+## Mini Checklist
+
+- Maintain at least 3 failure cases.
+- Include boundary values (min/max/empty).
+- Verify that failure messages are meaningful.
+- Confirm reproducibility with the same command in CI.
+
+
 ## Answering the Opening Questions
 
 - **What does code coverage measure exactly?**
