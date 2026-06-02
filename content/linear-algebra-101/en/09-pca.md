@@ -130,15 +130,71 @@ print("relative reconstruction error:", err)
 
 ## How This Shows Up in Production
 
-Image compression, denoising, *EDA visualization*, *feature compression*, *genomics analysis* — all are applications of *PCA*.
+Image compression, denoising, EDA visualization, feature compression, genomics analysis — all are applications of PCA.
+
+### Covariance Eigendecomposition ≡ SVD-based PCA
+
+For centered data `Xc = U S Vᵀ`, the covariance is `C = V (S²/(n-1)) Vᵀ`. So covariance eigenvectors = right singular vectors of `Xc`, and eigenvalues = `S²/(n-1)`. The two approaches are mathematically identical.
+
+### Step-by-Step PCA Implementation
+
+```python
+import numpy as np
+
+X = np.array([[1.0, 2000.0], [2.0, 3000.0], [3.0, 4000.0], [4.0, 5000.0]])
+
+# Step 1: Standardize
+X_std = (X - X.mean(axis=0)) / X.std(axis=0, ddof=1)
+
+# Step 2: Covariance matrix
+C = np.cov(X_std, rowvar=False)
+
+# Step 3: Eigendecomposition
+eigvals, eigvecs = np.linalg.eigh(C)
+idx = eigvals.argsort()[::-1]
+eigvals, eigvecs = eigvals[idx], eigvecs[:, idx]
+
+print('eigenvalues:', eigvals)
+print('explained ratio:', eigvals / eigvals.sum())
+
+# Step 4: Project
+k = 1
+X_pca = X_std @ eigvecs[:, :k]
+print('projected shape:', X_pca.shape)
+```
+
+These four steps—standardize, covariance, eigendecompose, project—are exactly what `sklearn.decomposition.PCA` does internally.
+
+### Decision Table
+
+| Question | What to Check | Action |
+| --- | --- | --- |
+| Large scale differences across features? | Feature variance spread | Standardize before PCA |
+| Strong nonlinear structure? | Residuals, scatter plots | Consider kernel PCA or UMAP |
+| Clear compression goal? | Target explained variance, error tolerance | Fix k by numeric criterion |
+
+### PCA vs t-SNE vs UMAP
+
+| Method | Goal | Preserves | Speed |
+| --- | --- | --- | --- |
+| PCA | Linear reduction | Global variance | Very fast |
+| t-SNE | Nonlinear visualization | Local neighbor relations | Slow |
+| UMAP | Nonlinear reduction | Local + global balance | Medium |
+
+Selection rules:
+- Fast exploration, interpretability needed → **PCA**
+- Cluster visualization, fine structure → **t-SNE**
+- Balance of global and local, reasonable speed → **UMAP**
+- Common pipeline: PCA first (compress to ~50D), then UMAP for 2D visualization.
 
 ## How a Senior Engineer Thinks
 
-- *Standardize before PCA* by default.
-- Pick *k* using *cumulative explained variance*.
-- Tries to *interpret PCs*.
-- Considers *t-SNE / UMAP* for *nonlinear* structure.
-- Validates with *reconstruction error*.
+- *Standardize before PCA* by default — unless all features are already on the same scale.
+- Pick *k* using cumulative explained variance (≥95% is a common starting point).
+- Interpret PCs when possible: which original features load heavily on each component?
+- Validate with reconstruction error: `||X - X_reconstructed|| / ||X||`.
+- For nonlinear manifolds, PCA is a preprocessing step, not the final answer.
+- Always check if rank < feature count — if so, PCA will naturally reveal it.
 
 ## Checklist
 
