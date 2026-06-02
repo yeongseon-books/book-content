@@ -113,15 +113,53 @@ print("plan dist (pop):",    users.plan.value_counts(normalize=True))
 
 ## How This Shows Up in Production
 
-A/B testing, surveys, quality inspections, pre-launch beta tests — in all of these, *sample design* determines *result quality*. Techniques like *stratified sampling* and *cluster sampling* show up often.
+A/B testing, surveys, quality inspections, pre-launch beta tests — in all of these, sample design determines result quality. Techniques like stratified sampling and cluster sampling show up often.
+
+### Sample Design Operational Checklist
+
+1. Fix the population definition in one sentence.
+2. Document the sampling frame (who *can* be selected).
+3. Define stratification criteria (plan, region, device) upfront.
+4. Record response rate AND non-responder characteristics together.
+5. State whether weighting correction was applied.
+
+### Stratified Sampling with Weight Correction
+
+```python
+import numpy as np, pandas as pd
+
+rng = np.random.default_rng(7)
+pop = pd.DataFrame({
+    'plan': rng.choice(['free', 'pro', 'enterprise'], size=30000, p=[0.78, 0.18, 0.04]),
+    'satisfaction': rng.normal(3.9, 0.6, 30000).clip(1, 5),
+})
+
+# Stratified sample: 500 per stratum
+sample = pop.groupby('plan', group_keys=False).apply(
+    lambda g: g.sample(n=500, random_state=42))
+
+# Simulate response bias: enterprise responds more
+resp_prob = sample['plan'].map({'free': 0.35, 'pro': 0.45, 'enterprise': 0.70})
+resp = sample[rng.random(len(sample)) < resp_prob.to_numpy()]
+
+# Naive vs weighted mean
+pop_dist = pop['plan'].value_counts(normalize=True)
+resp_dist = resp['plan'].value_counts(normalize=True)
+weights = resp['plan'].map((pop_dist / resp_dist).to_dict())
+
+print(f'naive mean: {resp["satisfaction"].mean():.3f}')
+print(f'weighted mean: {np.average(resp["satisfaction"], weights=weights):.3f}')
+```
+
+Weighting doesn't eliminate bias entirely, but it reduces sample-population distribution mismatch—especially when certain segments over-respond.
 
 ## How a Senior Engineer Thinks
 
-- Write the *population* in a sentence.
-- *Pin* the *random_state*.
-- *Report* response rate and segments.
-- *Name biases openly* instead of hiding them.
-- Set sample size *statistically*, not by feel.
+- Write the *population* definition in a sentence before touching data.
+- *Pin* the `random_state` — reproducibility is non-negotiable.
+- Report response rate and segment distributions together — low response rate is a bias signal, not just a progress metric.
+- *Name biases openly* (selection, survivorship, non-response) instead of hiding them.
+- Set sample size *statistically* (power analysis), not by gut feel — "N=30 is enough" is a myth.
 
 ## Checklist
 
