@@ -145,16 +145,55 @@ HEALTHCHECK CMD curl -f http://localhost:8000/health || exit 1
 
 ## How This Shows Up in Production
 
-Mature teams wire *distroless* + *SBOM generation* + *image signing (cosign)* + *vulnerability scans (Trivy)* into the *CI pipeline*.
+Mature teams wire *distroless* + *SBOM generation* + *image signing (cosign)* + *vulnerability scans (Trivy)* into the CI pipeline. But the production build system extends well beyond a single Dockerfile.
+
+### Orchestration Comparison
+
+| Aspect | Docker Compose | Kubernetes |
+| --- | --- | --- |
+| Goal | Local / small-scale multi-container | Large-scale production orchestration |
+| Recovery | Manual or simple restart | Auto-scheduling / self-healing |
+| Scaling | Limited | HPA / cluster autoscaler |
+| Networking | Simple service discovery | Service / Ingress policy-based |
+| Operational complexity | Low | High |
+
+### Image Quality Gate
+
+| Item | Recommended Standard |
+| --- | --- |
+| Tag | No `latest`; semver or SHA tag |
+| Size | Remove unnecessary build tools |
+| User | Non-root execution |
+| Vulnerabilities | Block HIGH/CRITICAL |
+| SBOM | Generate and store |
+
+### Security Scan Automation (GitHub Actions)
+
+```yaml
+- name: Trivy image scan
+  uses: aquasecurity/trivy-action@0.24.0
+  with:
+    image-ref: ghcr.io/example/api:${{ github.sha }}
+    severity: HIGH,CRITICAL
+    exit-code: "1"
+```
+
+### Operational Principles
+
+1. Treat build artifacts as *immutable*. Never patch a running container—deploy a new image.
+2. Image signing + admission policy blocks unsigned images from reaching prod.
+3. Track *build time*, *image size*, and *vulnerability count* as release metrics.
+4. Keep change units small, surface failure signals fast, and include rollback paths in deployment design.
 
 ## How a Senior Engineer Thinks
 
-- *Images are immutable*. Change = *new image*.
-- *Smaller is safer*. Prefer distroless.
+- *Images are immutable*. Change = new image, no runtime patches.
+- *Smaller is safer*. Prefer distroless; fewer packages = fewer CVEs.
 - *.dockerignore* matters as much as *.gitignore*.
-- *Build speed* is *development speed*. Defend the cache.
-- *Image signing* protects the *supply chain*.
-
+- *Build speed is development speed*. Defend the layer cache aggressively.
+- *Image signing* protects the supply chain—unsigned images never reach prod.
+- *Release metrics* include image size and scan results, not just test pass/fail.
+- *Compose for dev, Kubernetes for prod*—don't force one pattern on both contexts.
 ## Checklist
 
 - [ ] The *Dockerfile* ends as *non-root*.
