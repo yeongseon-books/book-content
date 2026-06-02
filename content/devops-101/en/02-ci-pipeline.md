@@ -146,7 +146,42 @@ steps:
 
 ## How This Shows Up in Production
 
-Large monorepos apply *impact analysis* to build and test only the *changed packages*. Bazel, Nx, and Turbo are common choices.
+Large monorepos apply impact analysis to build and test only the changed packages. Bazel, Nx, and Turbo are common choices.
+
+### Git Branch Strategy Comparison
+
+| Strategy | Characteristics | Pros | Watch Out | Best For |
+| --- | --- | --- | --- | --- |
+| Trunk-based | Short branches, fast merge | Minimal conflicts, fast release | Needs high test confidence | High-frequency deploy teams |
+| GitFlow | develop/release/hotfix separation | Clear role boundaries | Branch complexity grows | Orgs with long release cycles |
+| GitHub Flow | main + PR-centric | Simple, easy to learn | Needs separate env rules | Startups / small teams |
+
+From a CI perspective, Trunk-based or GitHub Flow wins. More branches = more pipeline combinations = larger test surface = higher ops burden.
+
+### CI Best Practices Scorecard
+
+| Item | Recommended | Anti-Pattern |
+| --- | --- | --- |
+| Feedback time | < 5 min for first result | 20+ min wait |
+| Stage separation | lint / type / test / scan | One giant script |
+| Reproducibility | Local and CI commands identical | CI-only shell scripts |
+| Failure logs | Root cause line immediately visible | Noisy verbose logs |
+| Merge policy | Required checks enforced | Manual exceptions everywhere |
+
+### Cache and Parallelization
+
+```yaml
+- uses: actions/cache@v4
+  with:
+    path: ~/.cache/pip
+    key: pip-${{ runner.os }}-${{ hashFiles('requirements-dev.txt') }}
+
+strategy:
+  matrix:
+    shard: [1, 2, 3, 4]
+```
+
+Cache reduces dependency install time; matrix sharding cuts perceived test wait. However, if flaky tests are common, parallelization increases debugging cost — stabilize first.
 
 ## How a Senior Engineer Thinks
 
@@ -155,6 +190,7 @@ Large monorepos apply *impact analysis* to build and test only the *changed pack
 - *Reproducibility* — CI must be *deterministic*.
 - *Secrets* are split *per environment*.
 - *The pipeline itself* is subject to *code review*.
+- CI is not a developer convenience — it is an operational risk-control layer.
 
 ## Checklist
 
