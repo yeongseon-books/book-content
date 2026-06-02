@@ -193,14 +193,75 @@ python -m pytest -q tests/test_http_adapter.py
 
 Strong teams use hexagonal / ports-and-adapters to keep the domain core away from IO. Thousands of unit tests still finish in under a second.
 
+### Testability Diagnostic Table
+
+| Diagnostic | Bad Signal | Fix Direction |
+| --- | --- | --- |
+| Time dependency | `datetime.now()` called directly | Inject clock object |
+| External calls | API/DB called inside function body | Extract adapter layer |
+| Randomness | Random result used inline | Inject seed or generator |
+| Mixed responsibilities | Validate + compute + save + notify in one function | Extract pure functions |
+
+### Before / After: Dependency Injection for Testability
+
+```python
+# before
+def issue_coupon(user_id):
+    from datetime import datetime
+    return f"CP-{user_id}-{int(datetime.now().timestamp())}"
+
+# after
+class Clock:
+    def now_ts(self) -> int:
+        raise NotImplementedError
+
+def issue_coupon(user_id: str, clock: Clock) -> str:
+    return f"CP-{user_id}-{clock.now_ts()}"
+```
+
+Now tests control time deterministically:
+
+```python
+class FakeClock(Clock):
+    def __init__(self, fixed_ts: int):
+        self.fixed_ts = fixed_ts
+    def now_ts(self) -> int:
+        return self.fixed_ts
+
+def test_coupon_format():
+    assert issue_coupon("u1", FakeClock(1000)) == "CP-u1-1000"
+```
+
+### Test Double Selection Guide
+
+| Situation | Recommended Double | Reason |
+| --- | --- | --- |
+| Fix query results | Stub | Simplifies input→output verification |
+| Verify call happened | Spy | Confirms interaction contract |
+| Reproduce failure scenarios | Fake | Production-like flow verification |
+
+### pytest + Linter Config
+
+```toml
+[tool.pytest.ini_options]
+addopts = "-q --maxfail=1"
+testpaths = ["tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "B", "PT"]
+```
+
+Testability is a *design goal*, not a byproduct. Review test isolation level alongside every feature PR.
+
 ## How a Senior Engineer Thinks
 
-- Starts with pure functions.
-- Receives dependencies as arguments.
-- Prefers fakes over mocks.
-- Pushes time, randomness, and IO to the edges.
-- Treats slow tests as a design smell.
-
+- Starts with pure functions—IO is pushed to the outermost shell.
+- Receives dependencies as arguments—constructor or function parameter.
+- Prefers fakes over mocks—fakes validate behavior, mocks validate calls.
+- Pushes time, randomness, and IO to the edges—core stays deterministic.
+- Treats slow tests as a design smell—if tests need real DB, boundaries are wrong.
+- Reviews test isolation in every PR—"how would I test this?" is a design question.
+- Measures test coverage *per boundary*, not just overall percentage.
 ## Checklist
 
 - [ ] Is the core logic pure?
