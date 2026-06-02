@@ -116,15 +116,48 @@ Decision: report the median, not the mean.
 
 ## How This Shows Up in Production
 
-Revenue, response time, ad cost — all of these tend to be *long-tail*, so *median / p95 / p99* are reported more often than *mean*. Dashboards usually show *three or four statistics* together.
+Revenue, response time, ad cost — all tend to be long-tail, so median / p95 / p99 are reported more often than the mean. Dashboards usually show three or four statistics together.
+
+### Representative Value Selection Rules
+
+| Distribution Shape | Recommended Summary | Why |
+| --- | --- | --- |
+| Symmetric, few outliers | Mean + std | Mean is a good center estimate |
+| Long-tail / high-value outliers | Median + IQR | Resistant to extreme pulls |
+| SLA / quality metrics | p95, p99 | User-perceived worst-case matters |
+| Executive reporting | Mean AND median together | Reveals skewness honestly |
+
+### Percentile-Based Summary Example
+
+```python
+import numpy as np, pandas as pd
+
+rng = np.random.default_rng(42)
+latency = np.r_[rng.normal(120, 18, 9500), rng.normal(600, 120, 500)]
+
+s = pd.Series(latency)
+print('mean:', f'{s.mean():.1f}')
+print('median:', f'{s.median():.1f}')
+print('p95:', f'{s.quantile(0.95):.1f}')
+print('p99:', f'{s.quantile(0.99):.1f}')
+print('IQR:', f'{s.quantile(0.75) - s.quantile(0.25):.1f}')
+```
+
+The mean is pulled by the tail, potentially understating user-perceived latency. Median and percentiles show what users actually experience.
+
+### Variance Interpretation Templates
+
+- **High variance**: user experiences vary widely even if the mean looks acceptable.
+- **Low variance**: tightly clustered around the mean → predictable behavior.
+- **Small IQR but large std**: a few extreme outliers inflate overall variability.
 
 ## How a Senior Engineer Thinks
 
-- *Plot the distribution* first.
-- Look at *median / p95* alongside the *mean*.
-- *Investigate the source* of outliers.
-- *Always* write the units.
-- Pick the *summary statistic that matches the question*.
+- *Plot the distribution* first — histograms catch bimodality that no single number reveals.
+- Look at *median / p95* alongside the *mean* — divergence signals skew.
+- *Investigate the source* of outliers — are they bugs, whales, or genuine variation?
+- *Always* write the units — is it dollars, seconds, or percentage?
+- Pick the *summary statistic that matches the question* — "typical user" ≠ "total revenue".
 
 ## Checklist
 
