@@ -114,15 +114,49 @@ skew=+2.3, kurt=+8 → long-tail. SLA = p95 = 900ms.
 
 ## How This Shows Up in Production
 
-Response-time SLAs, revenue, click-through, defect frequency — *most operational metrics* are *long-tail*. Tools like *Datadog, Grafana, Sentry* default to showing *p50 / p95 / p99*.
+Response-time SLAs, revenue, click-through, defect frequency — most operational metrics are long-tail. Tools like Datadog, Grafana, Sentry default to showing p50 / p95 / p99.
+
+### Distribution Diagnosis Sequence
+
+1. Histogram → rough shape (symmetric? skewed? bimodal?)
+2. Box plot → outliers and quartiles
+3. Log-scale histogram → tail structure
+4. Q-Q plot → normality approximation check
+5. Shapiro / D'Agostino test → numeric confirmation
+
+```python
+import numpy as np
+from scipy import stats
+
+rng = np.random.default_rng(0)
+x = np.r_[rng.lognormal(4.2, 0.6, 1800), rng.lognormal(6.0, 0.4, 200)]
+
+# Log transform improves normality
+k2, p = stats.normaltest(np.log(x))
+print(f'normality test p-value (log-transformed): {p:.4f}')
+print(f'skewness (raw): {stats.skew(x):.2f}')
+print(f'skewness (log): {stats.skew(np.log(x)):.2f}')
+```
+
+If log-transform makes the data approximately normal, mean-based estimation and linear models become more stable. Always show before/after side by side for team consensus.
+
+### When to Apply Which Distribution Model
+
+| Data type | Typical distribution | Key indicator |
+| --- | --- | --- |
+| Response time | Log-normal / Pareto | Long right tail, floor at 0 |
+| Count data (bugs, clicks) | Poisson / Negative binomial | Integer, floor at 0 |
+| Time between events | Exponential | Memoryless, single rate |
+| Proportions (CTR) | Beta / Binomial | Bounded [0, 1] |
+| Symmetric measurement error | Normal | Bell-shaped, thin tails |
 
 ## How a Senior Engineer Thinks
 
-- *Plot the distribution* first.
-- Do not casually *assume normality*.
-- For long-tails, read the *quantiles*.
-- Use *log scale* aggressively.
-- Make *shape* part of the *team's vocabulary*.
+- *Plot the distribution* first — never assume normality casually.
+- For long-tails, read *quantiles* (p50, p95, p99) rather than trusting the mean.
+- Use *log scale* aggressively to expose tail structure.
+- Make *shape vocabulary* (skewed, bimodal, heavy-tailed) part of team discussions.
+- Choose SLA thresholds on percentiles, not averages — p95 SLA protects real users.
 
 ## Checklist
 
