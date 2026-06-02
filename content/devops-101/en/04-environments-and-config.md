@@ -148,16 +148,75 @@ spec:
 
 ## How This Shows Up in Production
 
-Large teams keep secrets in *Vault* or *AWS Secrets Manager* and use the *External Secrets Operator* to auto-inject them into *Kubernetes*.
+Mature teams store secrets in *Vault* or *AWS Secrets Manager* and use the *External Secrets Operator* to auto-inject them into *Kubernetes*. But the operational layer goes deeper than tooling.
+
+### Environment Separation Criteria
+
+| Environment | Purpose | Data Policy | Change Tolerance | Failure Tolerance |
+| --- | --- | --- | --- | --- |
+| dev | Feature development / experiments | Sample data | High | High |
+| stage | Pre-deploy verification | Anonymized prod-like data | Medium | Medium |
+| prod | Real user traffic | Live operational data | Low | Very low |
+
+The key is *operational intent*, not the name. If stage diverges significantly from prod, you lose your ability to catch configuration gaps before they hit users.
+
+### Config Layer Separation
+
+| Layer | Examples | Storage |
+| --- | --- | --- |
+| Common | Log format, default timeouts | Code / version control |
+| Per-environment | DB host, endpoints | Environment values files |
+| Secrets | API keys, passwords | Secrets Manager / Vault |
+
+### Secret Operations Checklist
+
+| Item | Recommended Standard |
+| --- | --- |
+| Storage | Never in Git; dedicated secret store |
+| Access | Least-privilege IAM |
+| Rotation | Quarterly or semi-annual auto-rotation |
+| Audit | Access logs retained |
+| Leak prevention | Masked in logs and error messages |
+
+### Drift Prevention Patterns
+
+1. Express environment differences through *config*, never `if env == "prod"` code branches.
+2. Periodically diff environment keys: `python scripts/diff_env_keys.py --from stage --to prod`.
+3. Auto-deploy to stage on main merge to validate before prod.
+4. Hot-fixes follow the *same pipeline*—no exception habits.
+5. Unify key naming: `EXTERNAL_<SERVICE>_API_KEY` makes search, audit, and rotation trivial.
+
+### Config Change Deployment Flow
+
+```yaml
+config_change_flow:
+  - open_pr: "Diff per-environment values"
+  - validate: "Required keys exist, value format OK"
+  - deploy_stage: "Apply to stage + smoke test"
+  - deploy_prod: "Promote after observability gates pass"
+  - audit: "Record change history and approver"
+```
+
+Config changes cause more outages than code changes in many orgs. Treat them with the same review rigor.
+
+### Config PR Review Questions
+
+- Does this value change alter a traffic path?
+- Does a timeout/retry change increase load on an external dependency?
+- Can we roll back to the previous value instantly?
+- Are alert thresholds and runbooks updated alongside?
+
+Template these questions so config review quality doesn't depend on individual experience.
 
 ## How a Senior Engineer Thinks
 
-- *One codebase, N environments*. Build once.
-- *Secret rotation* must be *automatic*.
-- *Config changes* are subject to *PR and review*.
-- *Environment branching is config, not code*.
-- *Secret leaks are a matter of when*. Build early-detection.
-
+- *One codebase, N environments*. Build once, deploy everywhere.
+- *Secret rotation* must be automated—manual rotation means eventual exposure.
+- *Config changes* go through PR and review, same as code.
+- *Environment branching is config, not code*. No `if env` anti-patterns.
+- *Secret leaks are a matter of when, not if*. Build early-detection and fast-rotation.
+- *Validate at startup*. A missing env var discovered at 3 AM is a preventable incident.
+- *Drift is silent risk*. Schedule regular key-existence checks in CI.
 ## Checklist
 
 - [ ] *.env* is in *.gitignore*.
