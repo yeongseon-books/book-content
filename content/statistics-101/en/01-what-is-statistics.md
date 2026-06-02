@@ -119,15 +119,67 @@ Decision: p < 0.01 & lift +0.4pp → roll out the campaign to all users
 
 ## How This Shows Up in Production
 
-A/B testing, revenue forecasting, anomaly detection, quality control — *every data-driven decision* sits on a base of statistics. Even *one cell on a dashboard* is an *estimate*; reporting it *with its uncertainty* is what builds *trust*.
+A/B testing, revenue forecasting, anomaly detection, quality control — every data-driven decision sits on a base of statistics. Even one cell on a dashboard is an estimate; reporting it with its uncertainty is what builds trust.
+
+### End-to-End Analysis Workflow
+
+A production analysis document follows this structure:
+
+**Step 1 — Lock the question and success criterion.**
+- Question: Does the new checkout page improve conversion?
+- Success: relative lift ≥ 8%, 95% CI excludes zero.
+- Stop: lift < 2% and implementation cost is high.
+
+**Step 2 — Describe the current state with descriptive statistics.**
+
+```python
+import numpy as np, pandas as pd
+
+df = pd.DataFrame({
+    'group': ['A']*5000 + ['B']*5000,
+    'converted': np.r_[
+        np.random.binomial(1, 0.050, 5000),
+        np.random.binomial(1, 0.058, 5000)
+    ]
+})
+print(df.groupby('group')['converted'].agg(['mean', 'count']))
+```
+
+**Step 3 — Quantify uncertainty with inferential statistics.**
+
+```python
+from statsmodels.stats.proportion import proportions_ztest
+
+count = np.array([(df[df.group=='A'].converted==1).sum(),
+                  (df[df.group=='B'].converted==1).sum()])
+nobs = np.array([(df.group=='A').sum(), (df.group=='B').sum()])
+z, p = proportions_ztest(count=count, nobs=nobs, alternative='smaller')
+print(f'z={z:.3f}, p={p:.4f}')
+```
+
+**Step 4 — Close with a decision sentence.**
+
+```text
+Conversion lift: +0.8pp, 95% CI [+0.2, +1.4]pp
+Expected monthly gain: ~420 extra conversions
+Decision: ship to all users, re-measure in 2 weeks
+```
+
+### Statistical Thinking in Three Questions
+
+1. **Does this number represent the whole?** — Is the mean alone sufficient, or do you need the distribution?
+2. **Is this difference real or accidental?** — Two group means differ, but is it within sampling noise?
+3. **Can I act on this result?** — Given sample size, bias, and confidence interval, is the decision safe?
+
+Keep these three questions in mind, and you'll know when to trust your tools and when to pause.
 
 ## How a Senior Engineer Thinks
 
 - Read the *distribution* before the *mean*.
-- *Always* attach *uncertainty* to an estimate.
-- Shorten the *question → data → decision* loop.
-- Use *visualization* and *statistics* together.
-- Remember statistics is the *language of decisions*.
+- Always attach *uncertainty* to an estimate — bare point estimates invite overconfidence.
+- Shorten the *question → data → decision* loop — the longer the chain, the more drift accumulates.
+- Use visualization and statistics together — skewness and long tails hide in tables.
+- Frame reports as decisions, not number dumps: "lift +X%, CI [...], decision: ship / hold."
 
 ## Checklist
 
