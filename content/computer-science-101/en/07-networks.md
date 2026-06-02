@@ -244,6 +244,21 @@ When a senior engineer hears "it's slow," their first move is to separate where 
 
 They also write code assuming the network always fails. Timeouts, retries, circuit breakers, and idempotency are defaults, not options. "Network code that only handles the happy path explodes in production" is a saying earned the hard way.
 
+## Learning Roadmap: Connecting This Article to the Curriculum
+
+Rather than rushing through an intro to computer science, building interconnected concepts gradually produces better long-term learning efficiency. The core concepts in this article are not standalone knowledge — they are prerequisites that lead into databases, software engineering, and distributed systems.
+
+| Learning Axis | Checkpoint in This Article | Connection to Later Subjects |
+| --- | --- | --- |
+| Computation Model | Clearly define input-state-output relationships | Algorithm design, distributed system modeling |
+| Abstraction | Distinguish interfaces from hidden implementations | API design, module boundary design |
+| Resource Constraints | Consider time, memory, and I/O costs simultaneously | Performance tuning, infrastructure cost optimization |
+| Verifiability | Judge by measurement and counterexamples, not claims | Test strategy, experiment design |
+
+Unifying vocabulary across subjects is important. The same phenomenon might be called scheduling in OS, queueing in networking, and transaction waiting in databases. The names differ, but the essence — "allocating resources under contention" — is identical.
+
+For this article's networking topic, understand latency, throughput, and congestion control together with application-level retry policies to make practical operational decisions.
+
 ## Checklist
 
 - [ ] I can describe each TCP/IP layer in one sentence

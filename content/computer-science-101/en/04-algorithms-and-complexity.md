@@ -238,6 +238,25 @@ A senior engineer computes complexity in their head while reading code. When the
 
 They also know that theoretical Big-O and real performance can diverge. Cache friendliness, branch prediction, and allocation costs dominate the constant factor. So they follow the principle: "An optimization you have not measured is a guess."
 
+## Learning Roadmap: Connecting This Article to the Curriculum
+
+Rather than rushing through an intro to computer science, building interconnected concepts gradually produces better long-term learning efficiency. The core concepts in this article are not standalone knowledge — they are prerequisites that lead into operating systems, networks, databases, and software engineering.
+
+| Learning Axis | Checkpoint in This Article | Connection to Later Subjects |
+| --- | --- | --- |
+| Computation Model | Clearly define input-state-output relationships | Algorithm design, distributed system modeling |
+| Abstraction | Distinguish interfaces from hidden implementations | API design, module boundary design |
+| Resource Constraints | Consider time, memory, and I/O costs simultaneously | Performance tuning, infrastructure cost optimization |
+| Verifiability | Judge by measurement and counterexamples, not claims | Test strategy, experiment design |
+
+When doing connection learning, repeat the structure "define concept once + apply to two cases + check one counterexample." After learning time complexity, don't just memorize Big-O — record actual execution-time graphs as input size changes. When graphs deviate from expectations, hypothesize the cause and reason about cache locality or constant-factor effects.
+
+For this article's complexity topic, compare not only asymptotic notation but also constant-factor effects under real input distributions to improve algorithm selection accuracy.
+
+### Learning Tip: Turn Complexity Tables into Experiment Logs
+
+Complexity is a hypothesis, not an answer key. Grow input size by 10x, record execution time, and verify whether the graph slope matches expectations. If it is shallower or steeper than predicted, isolate factors like data structure choice, memory access pattern, or interpreter overhead and re-measure. This iteration converts algorithmic intuition into real judgment ability.
+
 ## Checklist
 
 - [ ] I can state the order of an algorithm in Big-O

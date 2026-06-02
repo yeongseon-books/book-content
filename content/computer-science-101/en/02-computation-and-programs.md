@@ -235,6 +235,201 @@ Senior engineers are not dogmatic about paradigms. They write imperative code wh
 
 Knowing the limits of computation theory matters in practice too. Once you accept that a "perfect static analyzer" or a "test suite that catches every bug" is impossible in principle, you can focus on building practical workarounds instead.
 
+## Simulating a Turing Machine in Python
+
+Let us build a minimal Turing machine that adds 1 to a binary number. This makes the abstract model tangible.
+
+```python
+class TuringMachine:
+    def __init__(self, tape: list[str], rules: dict, start_state: str, halt_states: set[str]):
+        self.tape = tape
+        self.rules = rules
+        self.state = start_state
+        self.halt_states = halt_states
+        self.head = 0
+        self.steps = 0
+
+    def step(self) -> bool:
+        if self.state in self.halt_states:
+            return False
+        symbol = self.tape[self.head] if self.head < len(self.tape) else "B"
+        key = (self.state, symbol)
+        if key not in self.rules:
+            return False
+        new_state, write, direction = self.rules[key]
+        if self.head >= len(self.tape):
+            self.tape.append("B")
+        self.tape[self.head] = write
+        self.head += 1 if direction == "R" else -1 if direction == "L" else 0
+        self.state = new_state
+        self.steps += 1
+        return True
+
+    def run(self, max_steps: int = 1000) -> str:
+        while self.step() and self.steps < max_steps:
+            pass
+        return "".join(self.tape).rstrip("B")
+
+# A Turing machine that adds 1 to a binary number
+# Input: "1011" (decimal 11) -> Output: "1100" (decimal 12)
+rules = {
+    # Move to rightmost digit
+    ("start", "0"): ("start", "0", "R"),
+    ("start", "1"): ("start", "1", "R"),
+    ("start", "B"): ("carry", "B", "L"),
+    # Carry propagation
+    ("carry", "0"): ("done", "1", "L"),
+    ("carry", "1"): ("carry", "0", "L"),
+    ("carry", "B"): ("done", "1", "S"),
+}
+
+tm = TuringMachine(
+    tape=list("1011"),
+    rules=rules,
+    start_state="start",
+    halt_states={"done"},
+)
+result = tm.run()
+print(f"1011 + 1 = {result}")  # 1100
+print(f"Steps taken: {tm.steps}")
+```
+
+The key insight: a Turing machine consists of a tape (memory), a head (current position), a state (program counter), and rules (program). Today's computers are the physical realization of this model. RAM is the tape, CPU registers are the head and state, and the instruction set is the rules.
+
+### Practical Implications of Computability Limits
+
+The fact that the halting problem is unsolvable is not just theoretical curiosity. Several real-world problems derive directly from this limitation.
+
+| Impossible in Theory | Practical Alternative |
+| --- | --- |
+| Decide termination of all programs | Timeouts, watchdogs |
+| Perfect virus detector | Signature-based + behavioral heuristics |
+| Perfect static analyzer | Approximate analysis + testing in parallel |
+| Decide equivalence of two programs | Same test suite passes |
+| Optimal compiler | Heuristic optimization passes |
+
+The message: "perfect automation" is impossible in principle for certain domains. Engineers therefore combine "good enough" approximations with safety mechanisms.
+
+## Comparing Programming Paradigms: Solving One Problem Three Ways
+
+Let us apply imperative, functional, and object-oriented paradigms to the same problem: "filter words of length 4 or more and convert them to uppercase."
+
+```python
+words = ["cat", "elephant", "dog", "butterfly", "ant", "whale"]
+
+# Imperative: step-by-step instructions on HOW to do it
+result_imperative = []
+for word in words:
+    if len(word) >= 4:
+        result_imperative.append(word.upper())
+print(f"Imperative: {result_imperative}")
+
+# Functional: declare WHAT you want
+result_functional = list(map(str.upper, filter(lambda w: len(w) >= 4, words)))
+print(f"Functional: {result_functional}")
+
+# List comprehension (Python's native declarative style)
+result_comprehension = [w.upper() for w in words if len(w) >= 4]
+print(f"Comprehension: {result_comprehension}")
+```
+
+All three approaches produce the same result. The difference is how they reveal intent.
+
+| Paradigm | Strengths | Weaknesses | Best For |
+| --- | --- | --- | --- |
+| Imperative | Execution flow is explicit, easy to debug | Intent gets buried in length | Logic where state mutation is central |
+| Functional | No side effects, high composability | Deep nesting hurts readability | Data transformation pipelines |
+| Object-oriented | Encapsulates state and behavior | Risk of over-engineering class hierarchies | Domain modeling, state management |
+
+### Compilation and Interpretation: A Deeper Look at Bytecode
+
+Let us look one level deeper at Python's execution process.
+
+```python
+import dis
+import sys
+
+def fibonacci(n: int) -> int:
+    if n <= 1:
+        return n
+    return fibonacci(n - 1) + fibonacci(n - 2)
+
+# Print bytecode
+print("=== fibonacci bytecode ===")
+dis.dis(fibonacci)
+
+# Inspect the code object's constants and variables
+code = fibonacci.__code__
+print(f"\nConstants (co_consts): {code.co_consts}")
+print(f"Local variables (co_varnames): {code.co_varnames}")
+print(f"Bytecode size: {len(code.co_code)} bytes")
+print(f"Python version: {sys.version}")
+```
+
+Being able to read bytecode provides two practical advantages. First, you can identify performance bottlenecks at the operation level rather than the code level. Second, you can verify whether differently-written code actually produces the same bytecode, avoiding unnecessary micro-optimizations.
+
+## Computation Models and Modern Systems
+
+The Turing machine was proposed in 1936, yet its core principles still apply to today's systems.
+
+| Turing Machine Component | Modern System Counterpart | Explanation |
+| --- | --- | --- |
+| Infinite tape | RAM + disk + cloud storage | Virtual memory extends capacity nearly infinitely |
+| Head movement | Memory address access | Pointers and indexes serve as the head |
+| State transition | CPU instruction execution | Program Counter tracks current state |
+| Transition rules | Program (instruction set) | Code is the rules |
+| Halt state | Program termination, return | Exit code returned |
+
+Distributed systems are an extension of this framework. Multiple Turing machines connected via a network exchanging messages. Consensus algorithms (Raft, Paxos) are methods for ensuring that distributed state machines execute the same state transitions.
+
+### Compilation Pipeline: Step-by-Step Transformation
+
+Let us trace the stages a source file goes through to become an executable, using C.
+
+```text
+[Source Code]  →  [Preprocessing]  →  [Compilation]  →  [Assembly]  →  [Linking]  →  [Executable]
+ hello.c           hello.i            hello.s          hello.o        a.out
+```
+
+```c
+// hello.c
+#include <stdio.h>
+#define MSG "Hello"
+int main(void) {
+    printf("%s\n", MSG);
+    return 0;
+}
+```
+
+**Preprocessing** (`gcc -E hello.c -o hello.i`): `#include` is replaced by header contents, and `MSG` is substituted with `"Hello"`. This stage is pure text substitution, corresponding to string rewriting systems in computation theory.
+
+**Compilation** (`gcc -S hello.i -o hello.s`): Tokenization → parsing → semantic analysis → intermediate representation (IR) → optimization → assembly generation. Optimizations like constant propagation, dead code elimination, and loop unrolling happen here.
+
+**Assembly** (`as hello.s -o hello.o`): Converts human-readable assembly into machine code bytes. At this point the symbol table is created, and external functions (`printf`) have unresolved addresses.
+
+**Linking** (`ld hello.o -lc -o a.out`): Resolves external symbols by finding addresses in libraries. Static linking copies library code into the binary; dynamic linking loads shared libraries at runtime.
+
+## Learning Roadmap: Connecting This Article to the Curriculum
+
+Rather than rushing through an intro to computer science, building interconnected concepts gradually produces better long-term learning efficiency. The core concepts in this article are not standalone knowledge — they are prerequisites that lead into operating systems, networks, databases, and software engineering. Use this article as a weekly anchor and perform the following connection exercises.
+
+| Learning Axis | Checkpoint in This Article | Connection to Later Subjects |
+| --- | --- | --- |
+| Computation Model | Clearly define input-state-output relationships | Algorithm design, distributed system modeling |
+| Abstraction | Distinguish interfaces from hidden implementations | API design, module boundary design |
+| Resource Constraints | Consider time, memory, and I/O costs simultaneously | Performance tuning, infrastructure cost optimization |
+| Verifiability | Judge by measurement and counterexamples, not claims | Test strategy, experiment design |
+
+When doing connection learning, repeat the structure "define concept once + apply to two cases + check one counterexample." For instance, after learning time complexity, don't just memorize Big-O — record actual execution-time graphs as input size changes. When the graph deviates from expectations, hypothesize the cause and reason about cache locality or constant-factor effects.
+
+Unifying vocabulary across subjects is important. The same phenomenon might be called scheduling in OS, queueing in networking, and transaction waiting in databases. The names differ, but the essence — "allocating resources under contention" — is identical. A terminology glossary with concept-equivalence mappings makes existing understanding reusable in new fields.
+
+For this article's computation models, expressing the same problem in imperative and functional styles side by side helps you feel the model differences viscerally. Express a problem three times through stepwise refinement: first in natural language, then pseudocode, then real code. At each stage, explicitly state the state changes, termination conditions, and failure conditions.
+
+### Connecting Computation Theory to System Design
+
+Understanding computation models is directly useful when designing distributed systems and data processing pipelines. When deciding where to perform an operation, build the habit of separating computation cost from communication cost. For example, when choosing whether to run an aggregation on the client or the server, compare how computation scales with input size against how much data must cross the network.
+
 ## Checklist
 
 - [ ] I can explain what a Turing machine is

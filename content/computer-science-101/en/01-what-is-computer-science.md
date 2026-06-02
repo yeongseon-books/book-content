@@ -256,6 +256,186 @@ A senior engineer is not rattled by new technology. The technology changes, but 
 
 Engineers with strong CS foundations understand problems at the root and design solutions at the right level of abstraction. They can give a principled answer to "Why did you pick this technology?"
 
+## Tracing Abstraction Layers in a Real System
+
+We said abstraction is CS's core tool. Let us trace it through a real system. From the moment you click a button in a web browser to the moment that event reaches a server, the journey passes through the following layers.
+
+| Layer | Responsibility | Service received from layer below |
+| --- | --- | --- |
+| Application | Handle user input, update UI | HTTP request/response |
+| Framework | Routing, state management, rendering | DOM API, fetch API |
+| Runtime | Execute JavaScript, event loop | OS system calls |
+| Operating System | Process management, socket communication | Hardware drivers |
+| Network Stack | TCP/IP packet transmission | NIC (network interface card) |
+| Hardware | Electrical signal delivery | Physical medium (copper, fiber) |
+
+Each layer is unaware of the details below it. JavaScript code does not need to know how packets are transmitted; the OS does not care what business logic the application runs. This separation allows each layer to be improved or replaced independently.
+
+### When Abstraction Breaks
+
+Abstraction is not infallible. Joel Spolsky's "Leaky Abstractions" — the moment an abstraction starts to leak — is something you will inevitably encounter in production. Here is a representative example.
+
+```python
+# Leaky abstraction example: the hidden cost behind an ORM query
+# A simple-looking query in Django ORM can generate
+# a three-way JOIN under the hood
+
+import sqlite3
+
+conn = sqlite3.connect(":memory:")
+cur = conn.cursor()
+cur.execute("CREATE TABLE posts (id INTEGER PRIMARY KEY, author_id INTEGER, title TEXT)")
+cur.execute("CREATE TABLE authors (id INTEGER PRIMARY KEY, name TEXT)")
+cur.execute("CREATE TABLE followers (id INTEGER PRIMARY KEY, target_id INTEGER)")
+
+# A join without indexes causes a full scan
+for row in cur.execute(
+    "EXPLAIN QUERY PLAN SELECT p.title FROM posts p JOIN authors a ON p.author_id = a.id"
+):
+    print(row)
+# Trust the abstraction, but verify with EXPLAIN
+```
+
+The lesson is clear. The ORM abstracts SQL away, but the execution cost beneath the abstraction still exists. Use abstractions, but be ready to look one layer down when performance issues arise.
+
+### Training Yourself to Move Between Abstraction Levels
+
+People who are good at CS do not stay in one layer. When a problem appears, they descend to a lower layer to find the cause, fix it, then return to the upper layer to clean up the interface. The best way to develop this ability is to express the same problem at multiple levels of abstraction.
+
+```python
+# The same "sort" task expressed at three abstraction levels
+
+# Level 1: Highest abstraction — one line
+data = [5, 2, 8, 1, 9, 3]
+result = sorted(data)
+print(f"Level 1 (built-in): {result}")
+
+# Level 2: Algorithm level — insertion sort implemented manually
+def insertion_sort(arr: list[int]) -> list[int]:
+    arr = arr[:]
+    for i in range(1, len(arr)):
+        key = arr[i]
+        j = i - 1
+        while j >= 0 and arr[j] > key:
+            arr[j + 1] = arr[j]
+            j -= 1
+        arr[j + 1] = key
+    return arr
+
+print(f"Level 2 (algorithm):  {insertion_sort(data)}")
+
+# Level 3: Comparison-operation level — counting comparisons while sorting
+def counted_sort(arr: list[int]) -> tuple[list[int], int]:
+    arr = arr[:]
+    comparisons = 0
+    for i in range(1, len(arr)):
+        key = arr[i]
+        j = i - 1
+        while j >= 0:
+            comparisons += 1
+            if arr[j] > key:
+                arr[j + 1] = arr[j]
+                j -= 1
+            else:
+                break
+        arr[j + 1] = key
+    return arr, comparisons
+
+sorted_data, count = counted_sort(data)
+print(f"Level 3 (comparison tracking): {sorted_data}, {count} comparisons")
+```
+
+Level 1 says only "what" to do. Level 2 shows "how" it is done. Level 3 measures "how expensive" it is. CS coursework develops the ability to move freely among these three levels.
+
+## The Essence of Computation Through Base Conversion
+
+We said computer science studies "computation." Base conversion is the most fundamental example. The process is simple, yet it captures the essence of computation — transforming input to output according to rules.
+
+```python
+# A general-purpose function to convert a decimal integer to any base
+def convert_base(n: int, base: int) -> str:
+    if n == 0:
+        return "0"
+    digits = "0123456789ABCDEF"
+    result = []
+    while n > 0:
+        result.append(digits[n % base])
+        n //= base
+    return "".join(reversed(result))
+
+# Conversion examples table
+print(f"{'Decimal':>8} {'Binary':>12} {'Octal':>8} {'Hex':>6}")
+print("-" * 40)
+for num in [0, 7, 10, 15, 16, 42, 127, 255, 256, 1024]:
+    print(f"{num:>8} {convert_base(num, 2):>12} {convert_base(num, 8):>8} {convert_base(num, 16):>6}")
+```
+
+This function is only ten lines, yet it contains several core CS ideas.
+
+| Observation | CS Concept |
+| --- | --- |
+| `n % base` gets the remainder | Division algorithm — foundation of all base conversions |
+| `while n > 0` loop | A finite loop with a guaranteed termination condition — definition of algorithm |
+| `reversed(result)` | Stack structure — last in, first out |
+| `digits` table lookup | Lookup table — branching via data instead of conditionals |
+
+### Hexadecimal in Practice
+
+Hexadecimal appears constantly in programming: color codes (`#FF5733`), memory addresses (`0x7fff5fbff8ac`), MAC addresses (`AA:BB:CC:DD:EE:FF`), UUIDs — all use hex.
+
+```python
+# Hex in real-world use
+color = 0xFF5733
+r = (color >> 16) & 0xFF   # upper 8 bits
+g = (color >> 8) & 0xFF    # middle 8 bits
+b = color & 0xFF           # lower 8 bits
+print(f"RGB({r}, {g}, {b})")  # RGB(255, 87, 51)
+
+# Print a memory address
+data = [1, 2, 3]
+print(f"List object id: {hex(id(data))}")
+
+# Display bytes as hex
+message = "Hello".encode("utf-8")
+hex_dump = " ".join(f"{byte:02X}" for byte in message)
+print(f"Hex dump of 'Hello': {hex_dump}")
+```
+
+## CS Subject Dependencies in Detail
+
+We said the subjects in this series are not standalone but interdependent. Here is a more concrete view of those dependencies.
+
+| Prerequisite | Successor | Connection |
+| --- | --- | --- |
+| Data Representation | Algorithms | Integer/float representation underlies sorting and comparison operations |
+| Data Representation | Networks | Byte order (endianness), serialization formats |
+| Algorithms | Databases | B-Tree indexes, hash joins, sort-merge |
+| Algorithms | Operating Systems | Scheduling algorithms, page replacement policies |
+| Computer Architecture | Operating Systems | Interrupts, virtual memory, cache coherence |
+| Operating Systems | Networks | Socket API, file descriptors, epoll |
+| Networks | Databases | Client-server protocols, replication |
+| Databases | Software Engineering | Migrations, schema design, testing |
+| Software Engineering | AI/DS | MLOps, experiment reproducibility, code quality |
+
+The key takeaway from this table is simple: **skip any one subject and you will inevitably circle back to it later.** Understanding networks requires OS sockets; understanding sockets requires file descriptors. Understanding database indexes requires B-Tree data structures.
+
+## Learning Roadmap: Connecting This Article to the Curriculum
+
+Rather than rushing through an intro to computer science, building interconnected concepts gradually produces better long-term learning efficiency. The core concepts in this article are not standalone knowledge — they are prerequisites that lead into operating systems, networks, databases, and software engineering. Use this article as a weekly anchor and perform the following connection exercises.
+
+| Learning Axis | Checkpoint in This Article | Connection to Later Subjects |
+| --- | --- | --- |
+| Computation Model | Clearly define input-state-output relationships | Algorithm design, distributed system modeling |
+| Abstraction | Distinguish interfaces from hidden implementations | API design, module boundary design |
+| Resource Constraints | Consider time, memory, and I/O costs simultaneously | Performance tuning, infrastructure cost optimization |
+| Verifiability | Judge by measurement and counterexamples, not claims | Test strategy, experiment design |
+
+When doing connection learning, repeat the structure "define concept once + apply to two cases + check one counterexample." For example, after learning time complexity, do not merely memorize Big-O notation — record actual execution-time graphs as input size changes. When the graph differs from expectation, hypothesize the cause and explain the effects of cache locality or constant factors. This practice transforms textbook knowledge into real-world decision-making criteria.
+
+Unifying vocabulary across subjects is also important. The same phenomenon might be called scheduling in OS, queueing in networking, and transaction waiting in databases. The names differ, but the essence — "allocating resources under contention" — is identical. Maintaining a terminology glossary with concept-equivalence mappings in your study notes makes it easier to reuse existing understanding when learning a new field.
+
+Finally, structure weekly reviews around questions rather than summaries. Answering "Why is this abstraction needed?", "Under what conditions does it break?", and "What is the cost of the alternative?" in one sentence each accelerates learning depth. The accumulated question-answer sets become thinking frameworks directly usable in interviews, design reviews, and code reviews.
+
 ## Checklist
 
 - [ ] I can describe computer science in my own words

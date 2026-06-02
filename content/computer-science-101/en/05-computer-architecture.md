@@ -235,6 +235,21 @@ Senior engineers first lower the algorithmic order, then suspect the memory acce
 
 They also know not every line of code needs cache optimization. Identify the hot path with a profiler and tune it precisely; for everything else, prioritize readability. The principle: "Fix what the profiler points at."
 
+## Learning Roadmap: Connecting This Article to the Curriculum
+
+Rather than rushing through an intro to computer science, building interconnected concepts gradually produces better long-term learning efficiency. The core concepts in this article are not standalone knowledge — they are prerequisites that lead into operating systems, networks, databases, and software engineering.
+
+| Learning Axis | Checkpoint in This Article | Connection to Later Subjects |
+| --- | --- | --- |
+| Computation Model | Clearly define input-state-output relationships | Algorithm design, distributed system modeling |
+| Abstraction | Distinguish interfaces from hidden implementations | API design, module boundary design |
+| Resource Constraints | Consider time, memory, and I/O costs simultaneously | Performance tuning, infrastructure cost optimization |
+| Verifiability | Judge by measurement and counterexamples, not claims | Test strategy, experiment design |
+
+Unifying vocabulary across subjects is important. The same phenomenon might be called scheduling in OS, queueing in networking, and transaction waiting in databases. The names differ, but the essence — "allocating resources under contention" — is identical.
+
+For this article's computer architecture topic, connect how cache hierarchy, branch prediction, and memory bandwidth govern software performance in practice.
+
 ## Checklist
 
 - [ ] I can roughly state the speed gap between CPU, memory, and cache

@@ -242,6 +242,21 @@ A senior engineer asks first: "Is the bottleneck CPU or I/O?" If CPU, they think
 
 They also know OS abstractions are *leaky abstractions*. Virtual memory looks unbounded, but real RAM and swap have limits. The file system looks like a tree, but inodes and mount points exist. Bugs grow at the edges of abstractions.
 
+## Learning Roadmap: Connecting This Article to the Curriculum
+
+Rather than rushing through an intro to computer science, building interconnected concepts gradually produces better long-term learning efficiency. The core concepts in this article are not standalone knowledge — they are prerequisites that lead into networks, databases, and software engineering.
+
+| Learning Axis | Checkpoint in This Article | Connection to Later Subjects |
+| --- | --- | --- |
+| Computation Model | Clearly define input-state-output relationships | Algorithm design, distributed system modeling |
+| Abstraction | Distinguish interfaces from hidden implementations | API design, module boundary design |
+| Resource Constraints | Consider time, memory, and I/O costs simultaneously | Performance tuning, infrastructure cost optimization |
+| Verifiability | Judge by measurement and counterexamples, not claims | Test strategy, experiment design |
+
+Unifying vocabulary across subjects is important. The same phenomenon might be called scheduling in OS, queueing in networking, and transaction waiting in databases. The names differ, but the essence — "allocating resources under contention" — is identical.
+
+For this article's operating systems topic, trace the differences between process/thread models, synchronization costs, and what system call boundaries mean from the perspective of code execution.
+
 ## Checklist
 
 - [ ] I can explain processes vs threads from a memory perspective

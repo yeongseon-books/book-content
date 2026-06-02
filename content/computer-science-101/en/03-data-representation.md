@@ -242,6 +242,247 @@ Senior engineers pick data types by *meaning and constraints*, not by storage si
 
 Encoding bugs come from not setting a standard early. A simple project-wide rule like "every string is UTF-8" prevents an enormous class of bugs.
 
+## Bit Operations and Masking: Practical Tools for Data Representation
+
+Bit-level operations are not just theoretical — they appear in permission systems, network protocols, and graphics programming.
+
+```python
+# Basic bit operations
+a = 0b1100  # 12
+b = 0b1010  # 10
+
+print(f"a & b (AND)  = {bin(a & b):>10}  ({a & b})")   # 1000 (8)
+print(f"a | b (OR)   = {bin(a | b):>10}  ({a | b})")   # 1110 (14)
+print(f"a ^ b (XOR)  = {bin(a ^ b):>10}  ({a ^ b})")   # 0110 (6)
+print(f"~a    (NOT)  = {bin(~a & 0xFF):>10}  ({~a & 0xFF})")  # 11110011 (243)
+print(f"a << 2 (LEFT)= {bin(a << 2):>10}  ({a << 2})") # 110000 (48)
+print(f"a >> 1 (RIGHT)= {bin(a >> 1):>10}  ({a >> 1})") # 110 (6)
+```
+
+### Permission Flags Example
+
+Unix file permissions and role management use bitmask patterns.
+
+```python
+# Managing permissions with bit flags
+READ = 0b100    # 4
+WRITE = 0b010   # 2
+EXECUTE = 0b001 # 1
+
+def describe_permissions(perm: int) -> str:
+    parts = []
+    if perm & READ:
+        parts.append("read")
+    if perm & WRITE:
+        parts.append("write")
+    if perm & EXECUTE:
+        parts.append("execute")
+    return ", ".join(parts) if parts else "none"
+
+# Combining permissions
+admin = READ | WRITE | EXECUTE  # 7 (rwx)
+viewer = READ                    # 4 (r--)
+editor = READ | WRITE            # 6 (rw-)
+
+print(f"admin:  {admin:03b} -> {describe_permissions(admin)}")
+print(f"viewer: {viewer:03b} -> {describe_permissions(viewer)}")
+print(f"editor: {editor:03b} -> {describe_permissions(editor)}")
+
+# Adding and removing permissions
+user_perm = READ
+user_perm |= WRITE       # Add write permission
+print(f"After add: {user_perm:03b} -> {describe_permissions(user_perm)}")
+user_perm &= ~WRITE      # Remove write permission
+print(f"After remove: {user_perm:03b} -> {describe_permissions(user_perm)}")
+```
+
+## Endianness and Network Byte Order
+
+The same integer can be stored in different byte orders in memory. This difference causes issues in network protocols and file formats.
+
+```python
+import struct
+
+number = 0x01020304  # 16909060
+
+# Little-endian (x86, ARM default): low byte at low address
+le_bytes = struct.pack("<I", number)
+print(f"Little-endian: {' '.join(f'{b:02X}' for b in le_bytes)}")  # 04 03 02 01
+
+# Big-endian (network byte order): high byte at low address
+be_bytes = struct.pack(">I", number)
+print(f"Big-endian:    {' '.join(f'{b:02X}' for b in be_bytes)}")  # 01 02 03 04
+
+# Network protocols always use big-endian
+import socket
+network_order = socket.htonl(number)  # host to network long
+print(f"Network order: {hex(network_order)}")
+```
+
+| Endianness | Used By | Characteristic |
+| --- | --- | --- |
+| Little-endian | x86, ARM (default), Windows | Stores low byte first |
+| Big-endian | Network protocols, Java class files | Stores high byte first |
+| Bi-endian | ARM (configurable) | Mode switchable |
+
+## Floating Point Deep Dive: IEEE 754 Internal Structure
+
+Why does `0.1 + 0.2 != 0.3`? Let us examine IEEE 754 internals.
+
+```python
+import struct
+
+def float_to_parts(f: float) -> dict:
+    """Decompose a 64-bit float into sign, exponent, and mantissa."""
+    raw = struct.pack("d", f)
+    bits = int.from_bytes(raw, byteorder="little")
+
+    sign = (bits >> 63) & 1
+    exponent_raw = (bits >> 52) & 0x7FF
+    mantissa = bits & 0x000FFFFFFFFFFFFF
+
+    exponent = exponent_raw - 1023  # remove bias
+    return {
+        "value": f,
+        "sign": sign,
+        "exponent_raw": exponent_raw,
+        "exponent_actual": exponent,
+        "mantissa_hex": f"{mantissa:013X}",
+        "bit_pattern": f"{bits:064b}",
+    }
+
+for val in [0.1, 0.2, 0.3, 0.1 + 0.2]:
+    parts = float_to_parts(val)
+    print(f"{parts['value']:.20f}")
+    print(f"  sign={parts['sign']} exp={parts['exponent_actual']} mantissa=0x{parts['mantissa_hex']}")
+    print()
+```
+
+Running this reveals that the mantissa bits of `0.1 + 0.2` differ slightly from `0.3`. In binary, `0.1` is a repeating fraction (`0.0001100110011...`), so truncating to 52 mantissa bits introduces error.
+
+### Floating-Point Strategies in Practice
+
+| Situation | Recommended Approach | Reason |
+| --- | --- | --- |
+| Financial calculations | `Decimal` or integers (cents) | Exact decimal arithmetic required |
+| Scientific computing | `float64` + tolerance | Range and speed take priority |
+| Comparisons | `math.isclose(rel_tol=1e-9)` | Never compare with `==` directly |
+| Cumulative sums | Kahan summation algorithm | Prevents error accumulation |
+| Serialization | String or integer conversion | Cross-platform consistency |
+
+```python
+# Kahan summation: reduces floating-point accumulation error
+def kahan_sum(values: list[float]) -> float:
+    total = 0.0
+    compensation = 0.0
+    for val in values:
+        y = val - compensation
+        t = total + y
+        compensation = (t - total) - y
+        total = t
+    return total
+
+# Compare summing 0.1 ten thousand times
+naive = sum([0.1] * 10000)
+kahan = kahan_sum([0.1] * 10000)
+print(f"Naive sum: {naive:.15f}")
+print(f"Kahan sum: {kahan:.15f}")
+print(f"Expected:  {1000.0:.15f}")
+```
+
+## Character Encoding in Practice: Recovering Broken Text
+
+The most common encoding problem in production is "garbled text." Here are the causes and fixes in code.
+
+```python
+# Common encoding mistake: UTF-8 bytes decoded as latin-1
+original = "\uc548\ub155\ud558\uc138\uc694"  # Korean greeting
+utf8_bytes = original.encode("utf-8")
+
+# Wrong decoding (produces mojibake)
+broken = utf8_bytes.decode("latin-1")
+print(f"Broken text: {broken}")
+
+# Recovery: reverse the wrong encoding
+recovered = broken.encode("latin-1").decode("utf-8")
+print(f"Recovered text: {recovered}")
+
+# Byte size comparison table by encoding
+test_strings = [
+    ("A", "English 1 char"),
+    ("\uac00", "Korean 1 char"),
+    ("\u4f60", "Chinese 1 char"),
+    ("\U0001f40d", "Emoji 1 char"),
+]
+
+print(f"\n{'Char':<6} {'Description':<14} {'UTF-8':>6} {'UTF-16':>7} {'UTF-32':>7}")
+print("-" * 45)
+for char, desc in test_strings:
+    u8 = len(char.encode("utf-8"))
+    u16 = len(char.encode("utf-16-le"))
+    u32 = len(char.encode("utf-32-le"))
+    print(f"{char:<6} {desc:<14} {u8:>4}B  {u16:>5}B  {u32:>5}B")
+```
+
+### Data Alignment and Padding
+
+CPUs read data from memory at natural boundaries. A 4-byte integer should start at an address divisible by 4 for a single memory access. Misaligned access requires two reads, degrading performance.
+
+```text
+struct Example {
+    char  a;    // 1 byte, offset 0
+    // 3 bytes padding (offset 1-3)
+    int   b;    // 4 bytes, offset 4
+    char  c;    // 1 byte, offset 8
+    // 7 bytes padding (offset 9-15)
+    double d;   // 8 bytes, offset 16
+};
+// sizeof(Example) = 24 bytes (14 bytes data + 10 bytes padding)
+```
+
+To reduce padding, arrange fields in descending size order.
+
+```text
+struct Optimized {
+    double d;   // 8 bytes, offset 0
+    int    b;   // 4 bytes, offset 8
+    char   a;   // 1 byte, offset 12
+    char   c;   // 1 byte, offset 13
+    // 2 bytes padding (offset 14-15)
+};
+// sizeof(Optimized) = 16 bytes (14 bytes data + 2 bytes padding)
+```
+
+Network protocols sometimes use `__attribute__((packed))` to eliminate padding. However, unaligned access causes hardware exceptions on some architectures (older ARM, SPARC), so caution is required.
+
+### Checksums and Error Detection
+
+Bit errors can occur during data storage or transmission. Several techniques detect them.
+
+| Technique | Principle | Detection Capability | Use Case |
+| --- | --- | --- | --- |
+| Parity bit | Match 1-count to even/odd | 1-bit error detection | Memory (ECC) |
+| CRC-32 | Remainder of polynomial division | Consecutive errors ≤32 bits | Ethernet, ZIP |
+| MD5/SHA | Hash function | Intentional tampering | File integrity |
+| Hamming code | Extra bits locate error position | 1-bit correction, 2-bit detection | ECC memory |
+
+## Learning Roadmap: Connecting This Article to the Curriculum
+
+Rather than rushing through an intro to computer science, building interconnected concepts gradually produces better long-term learning efficiency. The core concepts in this article are not standalone knowledge — they are prerequisites that lead into operating systems, networks, databases, and software engineering.
+
+| Learning Axis | Checkpoint in This Article | Connection to Later Subjects |
+| --- | --- | --- |
+| Computation Model | Clearly define input-state-output relationships | Algorithm design, distributed system modeling |
+| Abstraction | Distinguish interfaces from hidden implementations | API design, module boundary design |
+| Resource Constraints | Consider time, memory, and I/O costs simultaneously | Performance tuning, infrastructure cost optimization |
+| Verifiability | Judge by measurement and counterexamples, not claims | Test strategy, experiment design |
+
+Data representation concepts connect directly to serialization formats, network protocols, and storage engine design constraints. When the same value travels as a JSON API response, a binary message queue payload, and a database column (integer/string), tracking what losses and conversion costs arise at each step is essential.
+
+### Learning Tip: See Representation-Transmission-Storage as One Flow
+
+Data representation does not end at memory internals. When the same value moves across API responses (JSON), message queues (binary), and DB columns (integer/string), different losses and conversion costs appear. A practical exercise: serialize the same record into three formats and compare size, parsing time, and readability.
+
 ## Checklist
 
 - [ ] I can convert between binary and decimal

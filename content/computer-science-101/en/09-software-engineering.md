@@ -231,6 +231,23 @@ A senior engineer spends more time reading and polishing code than writing it. T
 
 They also value changeability over perfection. Rather than designing for every possible future, they ship something small and make it easy to fix quickly. Tests and reviews are the safety net that makes that fixing safe.
 
+## Learning Roadmap: Connecting This Article to the Curriculum
+
+Rather than rushing through an intro to computer science, building interconnected concepts gradually produces better long-term learning efficiency. The core concepts in this article are not standalone knowledge — they are prerequisites that lead into production operations, distributed systems, and AI/data science.
+
+| Learning Axis | Checkpoint in This Article | Connection to Later Subjects |
+| --- | --- | --- |
+| Computation Model | Clearly define input-state-output relationships | Algorithm design, distributed system modeling |
+| Abstraction | Distinguish interfaces from hidden implementations | API design, module boundary design |
+| Resource Constraints | Consider time, memory, and I/O costs simultaneously | Performance tuning, infrastructure cost optimization |
+| Verifiability | Judge by measurement and counterexamples, not claims | Test strategy, experiment design |
+
+Software engineering concepts look abstract at first glance, but decomposing them into measurable indicators makes them actionable. Track metrics like change lead time, deployment frequency, defect recovery time, and test reliability weekly — team bottlenecks will surface. Use metrics as priority-setting tools, not blame tools, for sustainable quality improvement.
+
+### Connecting Design Principles to Operational Stability
+
+Module boundaries and change management principles from software engineering directly affect operational stability. High-coupling structures make even small changes likely to cause widespread regressions, increasing deployment risk. Conversely, structures with clear interface contracts are easier to roll back and deploy incrementally, reducing failure propagation. Therefore, design reviews should include operational scenario checks.
+
 ## Checklist
 
 - [ ] I add a test whenever I add a new function

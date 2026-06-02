@@ -242,6 +242,21 @@ They also know that fundamentals matter more in the AI era, not less. Models cha
 | Databases (EP8) | Feature stores, vector databases |
 | Software Engineering (EP9) | MLOps, experiment reproducibility |
 
+## Learning Roadmap: Connecting This Article to the Curriculum
+
+Rather than rushing through an intro to computer science, building interconnected concepts gradually produces better long-term learning efficiency. The core concepts in this article are not standalone knowledge — they are prerequisites that tie the entire series together.
+
+| Learning Axis | Checkpoint in This Article | Connection to Later Subjects |
+| --- | --- | --- |
+| Computation Model | Clearly define input-state-output relationships | Algorithm design, distributed system modeling |
+| Abstraction | Distinguish interfaces from hidden implementations | API design, module boundary design |
+| Resource Constraints | Consider time, memory, and I/O costs simultaneously | Performance tuning, infrastructure cost optimization |
+| Verifiability | Judge by measurement and counterexamples, not claims | Test strategy, experiment design |
+
+Unifying vocabulary across subjects is important. The same phenomenon might be called scheduling in OS, queueing in networking, and transaction waiting in databases. The names differ, but the essence — "allocating resources under contention" — is identical.
+
+For this article's AI and data science topic, evaluate not only model performance metrics but also data quality, feature engineering cost, and post-deployment drift monitoring — assess across the full lifecycle.
+
 ## Checklist
 
 - [ ] I can explain in one sentence the difference between ML and rule-based systems

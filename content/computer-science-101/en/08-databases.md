@@ -255,6 +255,21 @@ When a senior engineer writes SQL, they always picture the execution plan. The S
 
 They also know the database is the most dangerous stateful piece of the system. A code deploy can be rolled back; a bad migration usually cannot. So they follow the rules: every schema change is backward-compatible, every transaction is short, and every operational SQL goes through `EXPLAIN` before it runs.
 
+## Learning Roadmap: Connecting This Article to the Curriculum
+
+Rather than rushing through an intro to computer science, building interconnected concepts gradually produces better long-term learning efficiency. The core concepts in this article are not standalone knowledge — they are prerequisites that lead into software engineering, distributed systems, and AI/data science.
+
+| Learning Axis | Checkpoint in This Article | Connection to Later Subjects |
+| --- | --- | --- |
+| Computation Model | Clearly define input-state-output relationships | Algorithm design, distributed system modeling |
+| Abstraction | Distinguish interfaces from hidden implementations | API design, module boundary design |
+| Resource Constraints | Consider time, memory, and I/O costs simultaneously | Performance tuning, infrastructure cost optimization |
+| Verifiability | Judge by measurement and counterexamples, not claims | Test strategy, experiment design |
+
+Unifying vocabulary across subjects is important. The same phenomenon might be called scheduling in OS, queueing in networking, and transaction waiting in databases. The names differ, but the essence — "allocating resources under contention" — is identical.
+
+For this article's database topic, examine trade-offs between index structures and transaction isolation levels through concrete cases to see how they affect query performance and data consistency.
+
 ## Checklist
 
 - [ ] I can explain the difference between a primary key and an index
