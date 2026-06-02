@@ -129,15 +129,103 @@ print("(R A) v:", (R @ A) @ v)
 
 ## How This Shows Up in Production
 
-Recommender systems, image processing, graphics, and every layer of deep learning — *matrix operations* are the *engine of computation*. *NumPy / PyTorch / TensorFlow* are essentially *linear algebra accelerators*.
+Recommender systems, image processing, graphics, and every layer of deep learning — matrix operations are the engine of computation. NumPy / PyTorch / TensorFlow are essentially linear algebra accelerators.
+
+### Why the Same Grammar Repeats Across Fields
+
+| Field | Vector | Matrix | Core question |
+| --- | --- | --- | --- |
+| Machine learning | Sample, embedding, gradient | Weights, covariance | Which axis matters most? |
+| Computer graphics | Point, normal vector | Rotation/translation/projection | How to transform space? |
+| Data science | Feature row | Design matrix | Does structure survive noise reduction? |
+
+Different problem descriptions, same computational grammar: input as vector, rule as matrix, multi-step as multiplication.
+
+### Computation Intuition: Mini Experiment
+
+```python
+import numpy as np
+
+v = np.array([2.0, -1.0])
+A = np.array([[1.5, 0.5],
+              [0.0, 2.0]])
+R = np.array([[0.0, -1.0],
+              [1.0,  0.0]])  # 90° rotation
+
+Av = A @ v
+RAv = R @ Av
+
+print('v =', v, '  ||v|| =', np.linalg.norm(v))
+print('A v =', Av)
+print('R(A v) =', RAv)
+print('det(A) =', np.linalg.det(A))  # area scale factor
+```
+
+`A` stretches axes non-uniformly; `R` rotates 90°. `det(A)` tells you the area scaling. Visualize the unit square deforming — that's the core intuition.
+
+### Reading Matrix Multiplication as Linear Combination
+
+```python
+import numpy as np
+
+A = np.array([[1.0, 2.0],
+              [3.0, 4.0]])
+x = np.array([5.0, 6.0])
+
+# A @ x == 5 * A[:, 0] + 6 * A[:, 1]
+result = A @ x
+manual = 5 * A[:, 0] + 6 * A[:, 1]
+print(np.allclose(result, manual))  # True
+```
+
+`Ax` is a weighted sum of `A`'s columns with `x`'s entries as coefficients. This interpretation connects directly to eigenvectors, basis change, and dimensionality reduction.
+
+### Why "Linear"?
+
+A transformation `T` is linear if `T(av + bw) = aT(v) + bT(w)`. This lets you decompose complex inputs into simple pieces, compute separately, then recombine. Neural network layers: linear transform + nonlinear activation — the linear part satisfies this property.
+
+### NumPy Verification Routine (Reusable Template)
+
+```python
+import numpy as np
+
+rng = np.random.default_rng(123)
+X = rng.normal(size=(6, 4))
+v = rng.normal(size=4)
+A = rng.normal(size=(4, 4))
+
+# 1) Shape check
+print('X @ v shape:', (X @ v).shape)  # (6,)
+
+# 2) Symmetric PSD structure: A.T @ A eigenvalues >= 0
+S = A.T @ A
+print('eigvals(S):', np.linalg.eigvalsh(S))
+
+# 3) SVD and rank approximation
+U, s, Vt = np.linalg.svd(X, full_matrices=False)
+X2 = U[:, :2] @ np.diag(s[:2]) @ Vt[:2, :]
+print('relative error(rank-2):', np.linalg.norm(X - X2) / np.linalg.norm(X))
+```
+
+Four checks to always perform: (1) shape preservation, (2) PSD eigenvalue non-negativity, (3) singular value decay rate, (4) relative reconstruction error.
+
+### Small Application Scenarios
+
+| Scenario | Linear algebra operation | Validation metric |
+| --- | --- | --- |
+| Feature compression | SVD/PCA low-rank projection | Cumulative variance, reconstruction error |
+| Similarity search | Normalized dot product / cosine | Top-k accuracy, scale sensitivity |
+| Regression | `lstsq` or gradient descent | Residual norm, condition number |
+| Transform pipeline | Matrix composition `A @ B @ x` | Intermediate shapes, order sensitivity |
 
 ## How a Senior Engineer Thinks
 
-- *Always print* the *shape*.
-- *Sketch* the *meaning of the transformation*.
-- Be aware of *order and non-commutativity*.
-- Combine *geometric intuition* with *algebraic computation*.
-- Care about *numerical stability*.
+- Always print the shape first.
+- Sketch the geometric meaning of a transformation before optimizing the code.
+- Be aware of order and non-commutativity (`AB ≠ BA`).
+- Combine geometric intuition with algebraic verification.
+- Care about numerical stability — prefer decompositions (`solve`, `lstsq`) over explicit inverse.
+- Translate every result into one sentence: what changed, what was preserved, and why.
 
 ## Checklist
 
