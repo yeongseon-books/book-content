@@ -133,15 +133,88 @@ print("steady state:", v / np.linalg.norm(v, 1))
 
 ## How This Shows Up in Production
 
-PCA (*eigendecomposition of the covariance matrix*), PageRank (*top eigenvector*), dynamical systems (*stability analysis*), quantum mechanics (*energy eigenstates*) — all are *eigendecompositions*.
+PCA (eigendecomposition of the covariance matrix), PageRank (top eigenvector), dynamical systems (stability analysis), quantum mechanics (energy eigenstates) — all are eigendecompositions.
+
+### Dominant Eigenvalue and Power Iteration
+
+Power iteration finds the dominant eigenvector direction:
+
+```python
+M = np.array([[0.95, 0.05],
+              [0.10, 0.90]])
+v = np.array([1.0, 0.0])
+
+for _ in range(30):
+    v = M @ v
+    v = v / np.linalg.norm(v)
+
+print('dominant direction:', v)
+```
+
+This intuition connects directly to PageRank, Markov chain stationary distributions, and iterative optimization analysis.
+
+### Interpretation Table
+
+| Signal | Meaning | Production Interpretation |
+| --- | --- | --- |
+| Large absolute eigenvalue | Strong amplification of that mode | Instability risk or dominant axis |
+| Near-zero eigenvalue | Flat/collapsed mode | Candidate for removal |
+| Orthogonal eigenvectors (symmetric) | Clean axis separation | Ideal for PCA, variance decomposition |
+
+### Geometric Meaning of Eigendecomposition
+
+When `A = V D V⁻¹`:
+
+1. **V⁻¹** — transforms from standard coordinates to eigenvector coordinates.
+2. **D** — scales each eigenvector direction by its eigenvalue.
+3. **V** — transforms back to standard coordinates.
+
+Complex transformations become simple scaling in the right coordinate system. For repeated application: `A^n = V D^n V⁻¹` — predict long-term behavior by inspecting eigenvalue magnitudes:
+- |λ| > 1 → that direction explodes.
+- |λ| < 1 → that direction decays.
+- λ < 0 → direction flips each iteration.
+
+### Covariance Matrix Analysis with NumPy
+
+Eigendecompose the covariance matrix to see where data spreads:
+
+```python
+import numpy as np
+
+rng = np.random.default_rng(42)
+X = rng.normal(size=(200, 3))
+X[:, 1] = X[:, 0] * 0.8 + rng.normal(scale=0.3, size=200)
+
+Xc = X - X.mean(axis=0)
+C = (Xc.T @ Xc) / (len(Xc) - 1)
+
+eigvals, eigvecs = np.linalg.eigh(C)
+idx = eigvals.argsort()[::-1]
+eigvals, eigvecs = eigvals[idx], eigvecs[:, idx]
+
+print('eigenvalues (variances):', eigvals)
+print('explained ratio:', eigvals / eigvals.sum())
+print('orthogonal:', np.allclose(eigvecs.T @ eigvecs, np.eye(3)))
+```
+
+Eigenvalues of the covariance matrix = variance along each principal component. Eigenvectors are orthogonal, so in the new coordinate system correlations vanish. This is the foundation of PCA.
+
+### Use-Case Comparison
+
+| Use Case | Role of Eigenvalues / Eigenvectors |
+| --- | --- |
+| PCA | Eigenvalues = variance; eigenvectors = principal directions |
+| PageRank | Dominant eigenvector of transition matrix = page importance |
+| Vibration analysis | Eigenvalues = natural frequencies; eigenvectors = mode shapes |
+| Stability analysis | |λ| > 1 → unstable; |λ| < 1 → convergent |
 
 ## How a Senior Engineer Thinks
 
-- Use *eigh* whenever the matrix is *symmetric*.
-- Reads the *condition number* for stability.
-- Interprets *complex eigenvalues* physically.
-- Tracks *eigenvector signs*.
-- Picks *power iteration* when appropriate.
+- Use `eigh` whenever the matrix is symmetric — guaranteed real eigenvalues, orthogonal eigenvectors, faster.
+- Read the condition number (`np.linalg.cond`) for numerical stability.
+- Interpret complex eigenvalues as oscillation (rotation + scaling).
+- Always verify: `np.allclose(A @ v, lam * v)` after computation.
+- For huge sparse matrices, use power iteration or `scipy.sparse.linalg.eigs` instead of full decomposition.
 
 ## Checklist
 
