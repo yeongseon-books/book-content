@@ -287,6 +287,95 @@ We also saw why causal masking and multi-head structure matter so much. The mask
 
 In the next post, we will add FeedForward, residual connections, and LayerNorm to turn this attention module into a full Transformer block.
 
+## Memory profile: the real cost of attention
+
+The most commonly missed reality when understanding attention is memory. Beyond computation, the moment `attention score` and `attention prob` tensors are created as `B x H x T x T`, memory usage spikes. That's why profiling before increasing block size is essential.
+
+```python
+import torch
+
+def estimate_attn_bytes(batch: int, n_head: int, t: int, dtype_bytes: int = 4) -> int:
+    # roughly sum score + prob tensors
+    return 2 * batch * n_head * t * t * dtype_bytes
+
+for t in [64, 128, 256, 512]:
+    mb = estimate_attn_bytes(batch=8, n_head=8, t=t) / (1024**2)
+    print(f"T={t:>3} -> attn tensors ~= {mb:8.2f} MB")
+```
+
+Expected output:
+
+```text
+T= 64 -> attn tensors ~=     2.00 MB
+T=128 -> attn tensors ~=     8.00 MB
+T=256 -> attn tensors ~=    32.00 MB
+T=512 -> attn tensors ~=   128.00 MB
+```
+
+Doubling `T` quadruples memory—visible right here. With this intuition, "why did I get OOM the moment I changed block_size to 512" becomes self-explanatory.
+
+### Checking per-head bottlenecks with PyTorch profiler
+
+A short profiling block reveals which operations consume time:
+
+```python
+with torch.profiler.profile(
+    activities=[torch.profiler.ProfilerActivity.CPU],
+    record_shapes=True,
+) as prof:
+    out = attn(x)
+
+print(
+    prof.key_averages()
+    .table(sort_by="self_cpu_time_total", row_limit=8)
+)
+```
+
+Typically `matmul`, `softmax`, and `transpose` appear at the top. Checking this table once makes it easy to set optimization priorities. For small models, adjusting `block_size` and batch tuning often outperform fancy optimizations.
+
+### Shape-tracking logs pinpoint bug causes immediately
+
+```python
+def forward(self, x: torch.Tensor):
+    b, t, c = x.shape
+    k = self.key(x).view(b, t, self.n_head, self.head_size).transpose(1, 2)
+    q = self.query(x).view(b, t, self.n_head, self.head_size).transpose(1, 2)
+    v = self.value(x).view(b, t, self.n_head, self.head_size).transpose(1, 2)
+    print("qkv", q.shape, k.shape, v.shape)  # (B,H,T,HS)
+
+    wei = q @ k.transpose(-2, -1)
+    print("wei", wei.shape)                  # (B,H,T,T)
+```
+
+When generation fails or training becomes unstable, these two log lines solve half the problem. If `wei` shape comes out as `(B, T, H, T)` instead of `(B, H, T, T)`, you immediately know the axis order is wrong.
+
+### Attention implementation comparison table
+
+| Implementation | Advantage | Disadvantage | Beginner suitability |
+| --- | --- | --- | --- |
+| Explicit `q @ k^T`, `softmax` | excellent for debugging/learning | no automatic optimization benefits | very high |
+| `scaled_dot_product_attention` API | leverages latest kernels | lower internal visibility | medium |
+| Flash Attention family | strong long-context performance | dependency/environment constraints | low (beginner) |
+
+This series uses the first approach. The reason is simple: the goal is tracing how attention works end-to-end, not maximizing absolute performance.
+
+## Attention debugging: why correct numbers can still produce wrong quality
+
+Attention implementation feels done once shapes match. But in reality, small misalignments in masking position, scaling, softmax dimension, or dropout placement silently corrupt model output. The lack of errors makes it more dangerous.
+
+### Debugging order
+
+First, log tensor shapes after each operation in the `B, T, C` flow. Second, unit-test that the causal mask completely blocks future tokens. Third, print attention score distribution on a single batch to check for extreme values. Fourth, compare per-head attention entropy early in training to detect dead heads.
+
+### Common failure patterns in practice
+
+- Filling mask with 0 instead of `float('-inf')`, letting future tokens leak
+- Applying softmax on wrong axis, corrupting meaning
+- Omitting scale (`1/sqrt(d_k)`), making logits excessively large
+- Forgetting train/eval mode switch, applying dropout during inference
+
+These four are frequently missed in code review. That's why for attention, "automating verification routines" matters more than "understanding theory."
+
 ## Answering the Opening Questions
 
 - **Why do Q, K, and V come from the same input yet play different roles?**

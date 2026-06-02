@@ -183,6 +183,157 @@ In the next post, we'll move on to Attention. We'll enable each token to score a
 
 <!-- a-grade-example:end -->
 
+## Common misconceptions
+
+- It is tempting to think embeddings already carry meaning like a dictionary, but initially they are just random parameters—meaning forms through training.
+- It feels like token embeddings alone should suffice, but without positional information you cannot recover order.
+- `nn.Embedding` looks like a complex layer, but its implementation essence is parameter-table indexing.
+- Sinusoidal seems more theoretical, so learned positional embedding is assumed inferior—but the GPT family widely uses the learned variant.
+- It is easy to miss why `x` and `y` are separate tensors, but in next-token prediction the one-position shift is the core contract.
+
+## Operations checklist
+
+- [ ] I can explain how `(B, T)` input becomes a `(B, T, C)` embedding tensor in terms of shapes.
+- [ ] I can summarize in one sentence why token embedding and positional embedding are separated.
+- [ ] I understand that learned positional embedding's maximum length is tied to `block_size`.
+- [ ] I have verified via print output that `x` and `y` in `get_batch()` are in a one-position-shifted relationship.
+- [ ] I have traced at the code level that embedding output is the common input to subsequent attention blocks.
+
+## Debugging outputs you must check
+
+The embedding stage has short code and is easy to skip, but mishandling shape or index range here silently breaks all subsequent training. Early on, it is safest to log `x.min()`, `x.max()`, `x.dtype`, `tok_emb.shape`, `pos_emb.shape`.
+
+In particular, a state like `x.max() >= vocab_size` must be treated as an immediate failure. Adding this guard early saves enormous time tracking mysterious `nan` values in the attention stage.
+
+## Practical pattern: leaving tensor shape annotations in code
+
+The embedding stage is short, tempting you to skip verification, but real bugs start silently here. The most practical defense is **leaving shape annotations right beside the code and verifying with asserts on every forward pass**.
+
+```python
+def forward(self, idx: torch.Tensor) -> torch.Tensor:
+    # idx: (B, T)
+    b, t = idx.shape
+    assert t <= self.config.block_size, "sequence too long"
+
+    pos = torch.arange(t, device=idx.device)           # (T,)
+    tok_emb = self.token_embedding_table(idx)          # (B, T, C)
+    pos_emb = self.position_embedding_table(pos)       # (T, C)
+    x = tok_emb + pos_emb                              # (B, T, C)
+
+    assert x.shape == (b, t, self.config.n_embd)
+    return x
+```
+
+This habit is especially powerful in collaboration. Because the shape agreement lives in code rather than docs, subsequent editors who mishandle `transpose` axes or `view` dimensions are caught immediately. For small models, these basic guards reduce debugging time dramatically.
+
+### Calculate embedding memory usage upfront to simplify configuration
+
+Embeddings tend to consume memory before computation. So estimating cost from `vocab_size`, `n_embd`, and `dtype` alone accelerates experiment design.
+
+```python
+def embedding_memory_bytes(vocab_size: int, n_embd: int, bytes_per_param: int = 4) -> int:
+    return vocab_size * n_embd * bytes_per_param
+
+for vocab, emb in [(65, 128), (8000, 256), (50000, 768)]:
+    mb = embedding_memory_bytes(vocab, emb) / (1024**2)
+    print(f"vocab={vocab:>6}, n_embd={emb:>4} -> {mb:7.2f} MB")
+```
+
+Example output:
+
+```text
+vocab=    65, n_embd= 128 ->    0.03 MB
+vocab=  8000, n_embd= 256 ->    7.81 MB
+vocab= 50000, n_embd= 768 ->  146.48 MB
+```
+
+The takeaway is immediate: char-level has such a small vocab that embedding cost is negligible. Conversely, large subword vocabs make the embedding table a significant memory chunk. Tokenizer choice and embedding dimension choice must always be considered together.
+
+### Positional embedding method comparison table
+
+| Method | Advantage | Limitation | This series |
+| --- | --- | --- | --- |
+| learned | simple implementation, high GPT-family alignment | weak generalization beyond `block_size` | used |
+| sinusoidal | intuitive length generalization | implementation/interpretation disconnect | not used |
+| rotary (RoPE) | strong long-context performance cases | higher implementation complexity | not used |
+
+At the introductory stage, learned positional embedding has the highest explainability. However, remember that once you start extending context length in practice, positional representation must be revisited.
+
+### Mini-probe for quick embedding quality checks
+
+Early in training, vector meanings are nearly random, but after a few thousand steps, distances between tokens sharing similar contexts shrink slightly. A simple cosine similarity probe confirms this.
+
+```python
+import torch.nn.functional as F
+
+def cosine(a: torch.Tensor, b: torch.Tensor) -> float:
+    return float(F.cosine_similarity(a[None], b[None]).item())
+
+e = model.token_embedding_table.weight.detach()
+id_space = stoi.get(" ")
+id_e = stoi.get("e")
+id_t = stoi.get("t")
+
+print("cos(space, e)=", cosine(e[id_space], e[id_e]))
+print("cos(e, t)=", cosine(e[id_e], e[id_t]))
+```
+
+The numbers themselves are not ground truth, but tracking before/after changes gives you a feel for whether embedding is actually learning. Watching representation-space changes alongside the loss curve reads model state more three-dimensionally.
+
+## Implementation details often missed in the embedding layer
+
+Embedding looks like a simple lookup on the surface, but several hidden decisions affect model quality and training stability. When building a small GPT from scratch, the following items govern "correctness" before performance.
+
+### Padding token strategy
+
+Batching sentences of different lengths requires padding. You must decide whether to train or freeze the padding token embedding. In small experiments the difference seems negligible, but when eval data length distributions differ, generation quality is affected. Typically, masking padding positions out of loss and minimizing embedding changes is the safe default.
+
+### Positional embedding range and context extension
+
+When increasing `block_size` from 256 to 512, it is tempting to think only the positional embedding table size needs to grow. But training data length distribution, batch memory, and learning rate schedule must all be co-adjusted for real gains. If instability grows after extending context, check warmup length and gradient clipping thresholds first.
+
+### Dropout placement semantics
+
+Dropout right after embedding summation reduces over-fitting of token representations. But too much slows early training; too little strengthens memorization on small datasets. On TinyShakespeare-like environments, rather than large dropout changes, fine-tune while watching eval loss trends.
+
+### Weight initialization and scale intuition
+
+If embedding vector initial variance is too large, the first attention computation becomes unstable; too small and signals are weak. When implementing from scratch, explicitly state initialization policy in code and build the habit of watching loss curves and gradient norms together for the first few hundred steps.
+
+## Simple diagnostics for embedding quality
+
+To see whether embeddings are forming properly in early-to-mid training, basic statistics beat complex analysis. Periodically record token embedding norm distribution, positional embedding norm distribution, and cosine similarity between a few key tokens. If the distribution collapses sharply or specific tokens grow disproportionately, suspect learning rate, initialization, or dropout settings first.
+
+Even a small diagnostic routine turns the feeling of "the model looks off" into numbers, enabling faster decisions.
+
+## Practice notes
+
+When problems arise at the embedding stage, the instinct is to suspect the entire model, but the actual cause is often a mismatch in input length policy and masking. Check batch composition and masking first, then adjust learning rate—this order speeds up resolution.
+
+Also, positional embedding extension experiments are more stable when done incrementally (256→384→512) rather than jumping in one step.
+
+## Frequently asked questions in practice
+
+### Should I follow this discipline even for small models?
+
+Yes—in fact, smaller models require stricter adherence to basic contracts. The smaller the model capacity, the more it is affected by input noise and implementation mismatches. Securing reproducible experiment units first improves quality improvement velocity even before scaling model size.
+
+### What do I do when experiment speed and quality control conflict?
+
+To increase speed, the goal is not more experiments but lower failure cost. Introducing config file pinning, log standardization, and checkpoint metadata storage first lets you run more "valid" experiments in the same time.
+
+### What's the single most useful thing to record?
+
+Record the reason for the change, expected effect, and actual observed result briefly. Especially recording "why this value was chosen" lets you reconstruct decision context even weeks later.
+
+## Summary
+
+This article covered the embedding stage that transforms token IDs into meaningful vector representations, and the positional embedding stage that preserves order. The key insight is understanding `nn.Embedding` as a learnable lookup table rather than an abstract concept.
+
+We also confirmed that the GPT input stage ultimately stands on the concise structure `token_emb + pos_emb`. Only with this single line can subsequent attention compute inter-token relationships and the model begin handling context that includes order.
+
+In the next article, these vectors will start seeing each other. That is, attention and the QKV structure—where each token decides how much to reference other tokens—will appear in full.
+
 ## Answering the Opening Questions
 
 - **What operation does `nn.Embedding` actually perform?**

@@ -175,6 +175,155 @@ The model core is finished. In the next post, we'll implement the training loop�
 
 <!-- a-grade-example:end -->
 
+## Common Misconceptions
+
+- It feels like the GPT class hides some complex new algorithm, but the core is just assembling the parts you already built.
+- Weight tying looks like an optional cosmetic, but it meaningfully saves parameters and can improve stability.
+- The flatten step for loss feels like a hack, but it is standard reshaping to match the class dimension expected by `cross_entropy`.
+- It seems safe to skip the `block_size` guard, but learned positional embeddings are bound to the maximum length.
+- A config dataclass looks like mere convenience, but it directly affects experiment reproducibility and checkpoint portability.
+
+## Operations Checklist
+
+- [ ] Can you narrate the forward pass in order: embedding → block loop → `ln_f` → `lm_head`?
+- [ ] Do you understand what `self.lm_head.weight = self.token_emb.weight` does?
+- [ ] Can you explain why logits and targets are flattened to `(B*T, ...)` shapes?
+- [ ] Have you verified the sanity check: random-init loss ≈ 4.17 (`-ln(1/65)`)?
+- [ ] Is the model fully controlled by a single `GPTConfig` (dimensions, context length, layers)?
+
+## Structure Verification Report After Assembly
+
+Once the `GPT` class is complete, print a structure report before running any training. Checking parameter counts, per-module proportions, and forward-shape consistency up front prevents many downstream surprises.
+
+```python
+def report_model(model: GPT) -> None:
+    total = sum(p.numel() for p in model.parameters())
+    emb = sum(p.numel() for n, p in model.named_parameters() if "token_emb" in n or "pos_emb" in n)
+    blocks = sum(p.numel() for n, p in model.named_parameters() if "blocks" in n)
+    head = sum(p.numel() for n, p in model.named_parameters() if "lm_head" in n)
+
+    print(f"total  : {total:,}")
+    print(f"emb    : {emb:,} ({emb/total:.2%})")
+    print(f"blocks : {blocks:,} ({blocks/total:.2%})")
+    print(f"head   : {head:,} ({head/total:.2%})")
+```
+
+Sample output for the series' default config:
+
+```text
+total  : 1,204,096
+emb    :   16,512 (1.37%)
+blocks : 1,185,792 (98.48%)
+head   :    8,320 (0.69%)
+```
+
+These numbers immediately tell you where optimization effort pays off. In a small char-level model, blocks dominate capacity, so structural experiments naturally focus on block parameters.
+
+### Separate the forward-contract test into a file
+
+```python
+def test_forward_contract() -> None:
+    cfg = GPTConfig(vocab_size=65, block_size=64, n_layer=2, n_head=2, n_embd=32)
+    model = GPT(cfg)
+
+    idx = torch.randint(0, cfg.vocab_size, (3, 16))
+    tgt = torch.randint(0, cfg.vocab_size, (3, 16))
+    logits, loss = model(idx, tgt)
+
+    assert logits.shape == (3, 16, cfg.vocab_size)
+    assert loss is not None and torch.isfinite(loss)
+```
+
+This single test catches most refactoring mistakes. It guards the `(logits, loss)` return contract early.
+
+### Weight Tying: Before vs After
+
+| Aspect | Without Tying | With Tying |
+| --- | --- | --- |
+| Parameter count | Higher | Lower |
+| Input/output representation sharing | None | Shared |
+| Small-model stability | Situation-dependent | Generally favorable |
+| Implementation complexity | Low | Very low (one line) |
+
+Weight tying is a single line, but it meaningfully affects parameter structure and generalization. Document *why* that line exists.
+
+### Logging Activation Norms Per Layer
+
+```python
+@torch.no_grad()
+def log_activation_norms(model: GPT, idx: torch.Tensor) -> None:
+    x = model.token_emb(idx) + model.pos_emb(torch.arange(idx.size(1), device=idx.device))
+    print("emb_norm", float(x.norm().item()))
+    for i, block in enumerate(model.blocks):
+        x = block(x)
+        print(f"block_{i}_norm", float(x.norm().item()))
+    x = model.ln_f(x)
+    print("ln_f_norm", float(x.norm().item()))
+```
+
+Comparing these logs before and after training gives intuition for how blocks cumulatively transform representations. If norms monotonically increase or drop sharply, check initialization, learning rate, and norm placement together.
+
+## Why Document Design Decisions at Assembly Time
+
+`GPT(nn.Module)` looks clean once finished, but in practice, if "why we assembled it this way" is not recorded, maintenance difficulty spikes fast. Especially as small projects grow, briefly documenting architectural decisions pays off in long-term cost.
+
+### Specify the input/output contract
+
+Record model forward input shape, dtype, allowed lengths, and optional-targets rules in a docstring or design note. When this contract is ambiguous, inference code and training code end up with different assumptions, and bugs pass tests only to surface in production.
+
+### Record weight-tying rationale
+
+Sharing embedding and LM head reduces parameters and can improve generalization. But in some experiments it constrains expressivity. The key is not "always use it" but leaving evidence of *why* you chose it for the current experiment.
+
+### Keep the loss computation path simple
+
+Whether loss lives inside the model or outside in the training loop varies by team. Educational/research code benefits from internal computation (readability), while production pipelines often externalize it for finer monitoring granularity. Either way, fix the convention once and keep it consistent across the series.
+
+### Include model metadata in checkpoints
+
+Beyond the bare state dict, checkpoints should carry minimal metadata:
+
+- Architecture hyperparameters (`n_layer`, `n_head`, `n_embd`, `block_size`)
+- Tokenizer version or hash
+- Training data version ID
+- Code commit SHA
+
+With this information, "same model" has a precise definition, and reproducibility and comparison experiment quality improve significantly.
+
+## Quick Verification Experiments After Assembly
+
+Right after completing the model class, short smoke tests come before full training. Run forward on random input several times to confirm shape and loss stability, then train on a tiny dataset for 200–500 steps to see that loss actually decreases. If both pass, the chance of architectural integration errors drops sharply.
+
+Also verify that re-running with the same seed produces a similar early loss curve—this catches reproducibility issues early.
+
+## Maintenance Perspective
+
+The GPT class should be designed for *iterative extension*, not "one-time completion." When hyperparameter additions, new head experiments, or context-length changes arrive, the interface should remain stable. This makes team-scale development significantly more productive.
+
+Simplicity at assembly time is not aesthetics—it is an operational strategy.
+
+## Practice FAQ
+
+### Should I follow these steps rigorously even for a tiny model?
+
+Yes—smaller models actually benefit more from strict contracts. Low capacity magnifies the impact of input noise and implementation inconsistencies. Establishing reproducible experiment units first accelerates quality improvements even before you scale model size.
+
+### What if experiment speed and quality management conflict?
+
+To go faster, reduce failure cost rather than increasing experiment count. Locking config files, standardizing logs, and storing checkpoint metadata let you run more *valid* experiments in the same time.
+
+### What single thing is most worth recording?
+
+The change rationale, expected effect, and observed result—briefly. Especially "why this value was chosen" lets you reconstruct decision context weeks later.
+
+## Summary
+
+This article assembled all prior components into a single `GPT(nn.Module)` class. Once input embedding, block loop, final normalization, LM head, and optional loss computation are wired together, the model has a complete forward pass.
+
+We also explored why implementation details like weight tying, flatten-based cross-entropy, and centralized `GPTConfig` matter. These details keep code short yet reproducible, and enable smooth extension to the next stage.
+
+Next, we attach a training loop: feeding mini-batches repeatedly, computing loss, and using backprop plus an optimizer step to actually update weights.
+
 ## Answering the Opening Questions
 
 - **In what order does the GPT class call its components?**

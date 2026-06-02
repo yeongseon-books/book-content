@@ -194,6 +194,180 @@ For your next steps, I recommend exploring LoRA, vLLM, RoPE, RLHF, BPE tokenizat
 
 <!-- a-grade-example:end -->
 
+## Common Misconceptions
+
+- It feels like a chatbot only needs a model, but without history serialization and an I/O protocol it cannot become a conversational system.
+- It seems fine to reload the checkpoint per request, but lifespan loading is far more efficient.
+- The difference between `/chat` and `/chat/stream` looks like a mere response-format change, but perceived speed differs dramatically for users.
+- SSE seems necessary only for giant models, but even small models benefit greatly from immediacy perception.
+- Unsupported character handling looks trivial, but in a char-level model it directly causes input loss and errors.
+
+## Operations Checklist
+
+- [ ] Have you defined exactly which text template serializes multi-turn history?
+- [ ] Is the model loaded once in FastAPI lifespan?
+- [ ] Have you confirmed what UX `/chat` and `/chat/stream` each provide?
+- [ ] Does the server return 400 when unsupported characters cause an empty input?
+- [ ] Have you verified that the browser `EventSource` correctly accumulates the token stream?
+
+## Stabilizing the Frontend via Explicit API Contracts
+
+The most practical improvement in a chatbot wrapper is fixing the API response contract. Including warnings, errors, and generation settings explicitly keeps UI and server loosely coupled yet stable:
+
+```json
+{
+  "response": "My lord, I serve thee with a faithful heart.",
+  "warning": "Dropped unsupported characters: \ud83d\ude0a",
+  "meta": {
+    "model": "ckpt_sft.pt",
+    "temperature": 0.8,
+    "top_k": 20,
+    "top_p": 0.9,
+    "max_new_tokens": 120
+  }
+}
+```
+
+With this structure, the client can separate text rendering from warning display, and generation-setting changes remain traceable in production.
+
+### Splitting SSE event types simplifies UI branching
+
+A single `data:` line works, but separating event types improves maintainability:
+
+```text
+event: token
+data: M
+
+event: token
+data: y
+
+event: warning
+data: Dropped unsupported characters: \ud83d\ude0a
+
+event: done
+data: {"tokens":120}
+```
+
+In the browser, `source.addEventListener("token", ...)` lets you handle character accumulation, warning UI, and completion logic without conflicts.
+
+### Server latency measurement example
+
+```python
+import time
+
+start = time.perf_counter()
+with torch.no_grad():
+    out = state["model"].generate(idx, body.max_new_tokens, 0.8, 20, 0.9)
+latency_ms = (time.perf_counter() - start) * 1000
+
+resp = decode(out[0].tolist())[len(ids):]
+print(f"latency_ms={latency_ms:.1f} chars={len(resp)}")
+```
+
+Sample log:
+
+```text
+latency_ms=184.2 chars=139
+latency_ms=201.7 chars=120
+```
+
+Accumulated, these let you compute p50/p95 latency and explain streaming's perceived improvement with numbers.
+
+### Architecture Comparison Table
+
+| Configuration | Pros | Cons | When to Use |
+| --- | --- | --- | --- |
+| Single `/chat` synchronous | Simple implementation | High perceived wait | Initial validation |
+| `/chat` + `/chat/stream` combined | UX improvement, backward compat | Two code paths to maintain | Demo/prototype |
+| Queue + worker async | Scalability | Operational complexity | High-load services |
+
+This series chose the second configuration—it offers the best perceived-UX improvement relative to implementation cost.
+
+### Minimum security/operations checks
+
+- Set an upper bound on input length (`prompt` max length, `history` max turns).
+- Enforce a per-request `max_new_tokens` cap.
+- Avoid logging raw prompt text in server logs.
+- Specify CORS policy and attach rate limiting for public deployment.
+
+Even for a small-model demo, following these four prevents expensive rework when scaling to a real service.
+
+## Operational Layers Needed When Deploying a Chatbot Wrapper
+
+Seeing streaming work locally is different from running a stable service. A chatbot wrapper needs API, session, and observability layers on top of model inference.
+
+### Session and context management
+
+Context length breaks first in conversational services. Naively accumulating long conversations exceeds model input limits quickly. Explicitly implement policies like keeping the most recent N turns, summary compression, or pinning important messages.
+
+### Streaming protocol stabilization
+
+SSE and WebSocket streams commonly experience mid-network disconnects. The server must safely terminate partial generation, and the client must avoid duplicate rendering on retry. Assigning sequence numbers to token events makes reconnection handling and debugging easier.
+
+### API boundary and security defaults
+
+Request body size limits, timeouts, concurrent request caps, and simple auth tokens should be defaults. Unlimited requests—even against a lightweight model—quickly degrade service quality.
+
+### Observability metrics and alerts
+
+The key in chatbot operations is discovering failures fast. Minimum metrics:
+
+- Streaming start success rate
+- Request completion rate (normal end / timeout / error)
+- Average response latency (first token, full completion)
+- Conversation length distribution and context truncation rate
+
+Bundling these into a dashboard lets you separate model issues from API issues.
+
+## Pre-Deployment Checklist
+
+Before deploying the chatbot wrapper, failure-scenario checks come before feature demos:
+
+- Does context truncation work as intended on long inputs?
+- Does the UI recover gracefully on network disconnection mid-stream?
+- Are timeout and queue policies consistent under concurrent request spikes?
+- Does the log avoid storing user-sensitive information?
+
+Passing these checks greatly reduces operational risk beyond model quality.
+
+## Final Operational Standard
+
+Chatbot wrapper quality is not judged by answer text alone. Response latency, failure recovery, session consistency, and observability must all be evaluated for true service quality.
+
+The goal at this final stage is not "working" but "operationally viable working."
+
+## Practice FAQ
+
+### Should I follow these steps rigorously even for a tiny model?
+
+Yes—smaller models benefit more from strict contracts. Low capacity magnifies input noise and implementation inconsistency. Establishing reproducible experiment units first accelerates quality improvements even before scaling.
+
+### What if experiment speed and quality management conflict?
+
+To go faster, reduce failure cost rather than increasing experiment count. Locking configs, standardizing logs, and storing checkpoint metadata let you run more *valid* experiments in the same time.
+
+### What single thing is most worth recording?
+
+The change rationale, expected effect, and observed result—briefly. Especially "why this value was chosen" lets you reconstruct decision context weeks later.
+
+## Conclusion Note
+
+Chatbot wrapper completeness is achieved only when model output and operational stability align simultaneously. At the final stage, polish failure recovery and observability before adding features.
+
+In the first week after deployment, set metric thresholds conservatively for early warnings.
+
+Periodically reviewing operational logs accumulates failure patterns as team knowledge.
+
+The key is observability.
+
+## Summary
+
+This article wrapped the fine-tuned small GPT into a FastAPI + SSE-based chatbot system. Connecting the model, conversation history, streaming response, and browser UI gave all the code we have built so far its first application form.
+
+We also confirmed that chatbot quality is not determined by model weights alone. System-level decisions—prompt format, lifespan loading, streaming method, unsupported character handling—directly affect user experience.
+
+This series traveled from tokenizer through embedding, attention, block, GPT class, training, sampling, fine-tuning, and chatbot wrapper. A small model, but we touched the entire LLM application flow end to end.
+
 ## Answering the Opening Questions
 
 - **What components does a chatbot need beyond the model?**

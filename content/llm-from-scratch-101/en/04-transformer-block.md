@@ -137,6 +137,183 @@ The building blocks are ready. In the next post, we will wrap embeddings, `N` bl
 
 <!-- a-grade-example:end -->
 
+## Common misconceptions
+
+- It is tempting to think attention alone completes the Transformer, but without FFN, per-position nonlinear transformation is weak.
+- Residual connections look like a convenience feature, but they are the core structure that makes deep model training viable.
+- LayerNorm placement seems like a minor style choice, but pre-norm and post-norm differ significantly in training stability.
+- Stacking more blocks feels like only attention cost grows, but in reality FFN accounts for a larger parameter share.
+- Block repetition feels like complex architecture expansion, but the implementation is just repeating the same `(B, T, C)` transform.
+
+### Debugging tip: test one block in isolation first
+
+Before stacking multiple blocks, the habit of isolating one and checking its input/output is important:
+
+```python
+import torch
+
+block = TransformerBlock(n_embd=128, n_head=4, block_size=64)
+x = torch.randn(2, 64, 128)
+out = block(x)
+assert out.shape == x.shape, f"shape mismatch: {out.shape}"
+print("block output shape:", out.shape)
+```
+
+Confirming output shape matches input `(B, T, C)` verifies residual paths and LayerNorm are properly connected in one shot. If shapes differ, check FFN output dimensions or projection matrix sizes first.
+
+## Operations checklist
+
+- [ ] I can explain the responsibility difference between attention and FFN in one sentence each.
+- [ ] I can draw the pre-norm residual flow as a diagram.
+- [ ] I have confirmed block input and output shapes always stay `(B, T, C)`.
+- [ ] I can roughly calculate parameter increase when increasing `n_layer`.
+- [ ] I understand that FFN holds a larger parameter share than attention.
+
+## Block-level performance checkpoints
+
+When Transformer training is slow or unstable, examining block by block is more effective than looking at the entire model at once. Checking these three items first quickly narrows the cause.
+
+### Activation range
+
+If each block output's mean and variance grow or shrink dramatically as layers deepen, suspect learning rate, initialization, or LayerNorm behavior. Even pre-norm structures can exhibit drift under certain settings.
+
+### Attention distribution
+
+If attention probabilities concentrate excessively on one token in some heads, or spread nearly uniformly, context utilization may be inefficient. Check head count, block size, and dropout together.
+
+### FFN contribution
+
+If the FFN path's contribution to block output change is too small, nonlinear transformation weakens; too large and it overwhelms the residual path. In practice, splitting gradient norm observation between attention/FFN makes balance easy to read.
+
+These checks are not just for large models. The same principles operate in small educational GPTs, so building block-level instrumentation habits early improves debugging intuition when scaling later.
+
+## Architecture comparison: Transformer block vs simple RNN stack
+
+To see the Transformer block's necessity more clearly, compare it against RNN-family architectures for the same character model. The goal is not concluding which is absolutely superior but confirming **why this series chose the block-repetition structure**.
+
+| Item | Simple RNN/LSTM stack | Transformer block |
+| --- | --- | --- |
+| Context combination | sequential update | parallel cross-reference across all positions (attention) |
+| Long-dependency handling | path length grows | path length relatively short |
+| Parallelization | low | high |
+| Implementation debugging points | hidden state passing | shape/mask/projection |
+| Series suitability | can explain principles | connects directly to modern LLM architecture |
+
+For char-level toy problems, both work. But using Transformer blocks provides structural continuity with real GPT-family code, maximizing learning transfer.
+
+### Mini hook for instrumenting tensor paths inside a block
+
+Observing residual paths and sub-layer outputs together makes it easy to read "which path contributes more."
+
+```python
+def block_probe(block: Block, x: torch.Tensor) -> None:
+    with torch.no_grad():
+        h1 = block.ln1(x)
+        a = block.attn(h1)
+        x1 = x + a
+        h2 = block.ln2(x1)
+        f = block.ffn(h2)
+        x2 = x1 + f
+
+    print("attn_delta_norm:", float(a.norm().item()))
+    print("ffn_delta_norm :", float(f.norm().item()))
+    print("out_norm       :", float(x2.norm().item()))
+```
+
+These values are not ground truth, but watching changes across early/mid/late training builds intuition for how blocks update representations. If `ffn_delta_norm` is pinned near 0 at a certain stage, that's evidence the FFN path may be dead.
+
+### Pre-norm vs Post-norm experiment log example
+
+Changing only the structure while keeping the same hyperparameters reveals stability differences numerically:
+
+```text
+[pre-norm]
+step 0    loss 4.17
+step 500  loss 2.26
+step 1500 loss 1.84
+
+[post-norm]
+step 0    loss 4.16
+step 500  loss 2.49
+step 1500 loss 2.31 (intermittent spikes)
+```
+
+This tendency is often observed even in small models. That's why pre-norm has become the de facto default in GPT-family production implementations.
+
+### Principles to fix first when increasing block repetitions
+
+Experimenting with more blocks is tempting but simultaneously makes comparisons harder. Fixing the items below first makes result interpretation easier:
+
+- Fix `tokenizer`, `vocab_size`, `block_size`.
+- Keep training step budget identical.
+- Log gradient norm alongside train/val loss.
+- Keep generation sample prompts identical.
+
+This way you can separate "did depth help, or was it another variable?" As the series progresses, this kind of experiment design habit becomes far more important.
+
+## Training stability issues when increasing block depth
+
+A Transformer block looks simple in isolation, but increasing depth from 2 to 8+ blocks means residual connection and normalization placement differences immediately translate to training stability differences. What matters at this stage is not more complex structures but rules for repeating the same structure stably.
+
+### Why Pre-Norm is preferred
+
+In from-scratch implementations, Pre-Norm structure has relatively stable gradient flow and good reproducibility in small experiments. Post-Norm also works but more frequently shows early training instability, especially with small batches and high learning rate combinations.
+
+### Separating the meaning of the residual path
+
+Residual is both a "preserve the original" path and an "add new transformation" path. So when evaluating block output quality, check whether residual dominates excessively rather than only looking at the transformation path's expressiveness. Simply comparing activation distributions before and after a block reveals scale collapse.
+
+### FeedForward expansion ratio selection
+
+`4 * n_embd` is standard, but small models sometimes need 2x or 3x due to memory and speed constraints. When adjusting, compare not just loss values but also generation text repetitiveness, sentence boundary handling, and long-context maintenance ability.
+
+### Value of per-block checkpointing
+
+Tracking problems in deep models requires more than epoch-level saves. Saving checkpoints with per-block activation statistics at regular step intervals makes it easy to trace back sudden collapses after a specific point. From an operations perspective, the debugging time savings far outweigh storage cost.
+
+## Block-level test checklist
+
+Verifying one block independently before stacking depth significantly reduces later debugging cost:
+
+- Input/output shapes are identical
+- No NaN occurs under masking conditions
+- Dropout behavior changes between train/eval modes
+- Loss trend difference between residual-on and residual-off experiments is reasonable
+
+Blocks that pass this checklist can be repeated with much more predictable model scaling.
+
+## Practice priorities
+
+When improving blocks, stability comes before novel structure experiments. That is, first ensure training converges with similar curves each time, reproduces without NaN, and eval loss doesn't spike. Once this baseline is established, subsequent architecture experiments become easier to interpret.
+
+Ultimately, the core of block design is not flashy variations but creating repeatable depth.
+
+## Frequently asked questions in practice
+
+### Should I follow this discipline even for small models?
+
+Yes—in fact, smaller models require stricter adherence to basic contracts. The smaller the model capacity, the more it is affected by input noise and implementation mismatches. Securing reproducible experiment units first improves quality improvement velocity even before scaling model size.
+
+### What do I do when experiment speed and quality control conflict?
+
+To increase speed, the goal is not more experiments but lower failure cost. Introducing config file pinning, log standardization, and checkpoint metadata storage first lets you run more "valid" experiments in the same time.
+
+### What's the single most useful thing to record?
+
+Record the reason for the change, expected effect, and actual observed result briefly. Especially recording "why this value was chosen" lets you reconstruct decision context even weeks later.
+
+## Conclusion note
+
+The value of block design is not adding complexity but stable repetition. When stacking the same block into multiple layers without training instability, subsequent experiment trust rises and improvement velocity accelerates.
+
+## Summary
+
+This article added FeedForward, residual connections, and LayerNorm on top of attention to complete one Transformer block. This block is a reusable depth unit that bundles inter-token information exchange, per-token internal transformation, and training stability.
+
+We also confirmed that GPT's depth comes not from special new structures but from repeating the same block. And the cost of that repetition is weighted more toward FFN than might be expected.
+
+In the next article, we will assemble all embeddings and blocks built so far into the complete `GPT(nn.Module)` class—a model shell that computes from input through logits and loss in a single forward pass.
+
 ## Answering the Opening Questions
 
 - **Why does FeedForward commonly use `Linear(C, 4C) → GELU → Linear(4C, C)`?**

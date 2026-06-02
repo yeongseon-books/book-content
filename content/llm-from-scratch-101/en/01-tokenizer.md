@@ -181,6 +181,159 @@ We have our integer sequences ready. In the next post, we'll assign vector meani
 
 <!-- a-grade-example:end -->
 
+## Common misconceptions
+
+- It is tempting to think token IDs carry meaning, but actual meaning is learned later in the embedding vectors.
+- Tokenizers are often seen as mere preprocessing outside the model, but because they govern checkpoint compatibility, they are effectively part of the model.
+- Character-level may seem outdated because it is simple, but it is extremely powerful for education and debugging.
+- BPE feels like complex magic, but it is closer to a statistical procedure that repeatedly merges frequently co-occurring fragments.
+- Ignoring out-of-vocab character handling seems harmless, but in production it leads directly to input loss and quality degradation.
+
+## Operations checklist
+
+- [ ] I can explain which tokenizer contract the current model was trained under.
+- [ ] I have documented the out-of-vocab handling policy (drop, unknown, byte fallback, etc.).
+- [ ] I have encoded the same sentence with char-level and BPE and compared the length difference.
+- [ ] I maintain both `encode()` and `decode()` so numeric-to-character round-trip is verifiable.
+- [ ] I have fixed the training dataset into reproducible artifacts like `train.bin` and `val.bin`.
+
+## Tokenizer pinning for experiment reproducibility
+
+One of the top reasons why the same code produces different results in LLM experiments is tokenizer mismatch. At a minimum, you should version the vocab file, special token definitions, and preprocessing rules together with each checkpoint.
+
+Pinning the tokenizer makes training curve comparisons honest. You can separate "the effect of changing model architecture" from "the effect of changing input decomposition."
+
+## What changes when you keep a tokenizer training script
+
+Even when using char-level as the default for education, in real projects it is safer to leave "how the vocabulary was built" as code. The most common choice is a BPE training script. The key is not a complex library but **fixing the reproducibility path so the same input always produces the same vocab/merge files**.
+
+```python
+from pathlib import Path
+
+from tokenizers import Tokenizer, models, normalizers, pre_tokenizers, trainers
+
+def train_bpe_tokenizer(corpus_path: str, out_dir: str, vocab_size: int = 8000) -> None:
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+
+    tokenizer = Tokenizer(models.BPE(unk_token="<unk>"))
+    tokenizer.normalizer = normalizers.Sequence([
+        normalizers.NFKC(),
+        normalizers.StripAccents(),
+    ])
+    tokenizer.pre_tokenizer = pre_tokenizers.ByteLevel(add_prefix_space=False)
+
+    trainer = trainers.BpeTrainer(
+        vocab_size=vocab_size,
+        min_frequency=2,
+        special_tokens=["<pad>", "<unk>", "<bos>", "<eos>"],
+    )
+    tokenizer.train([corpus_path], trainer)
+
+    tokenizer.model.save(str(out), "tokenizer")
+    tokenizer.save(str(out / "tokenizer.json"))
+
+train_bpe_tokenizer("data/tinyshakespeare.txt", "artifacts/tokenizer", vocab_size=2000)
+```
+
+This code is not an example for improving training performance — it is an example for ensuring tokenizer changes do not contaminate experiment results. In particular, changing `special_tokens` order shifts ID mappings, and from that moment the existing checkpoint becomes incompatible. So tokenizer artifacts should be treated as part of the same release unit as `ckpt.pt`.
+
+Recording "tokenizer metadata" alongside makes later regression analysis easier:
+
+```json
+{
+  "tokenizer_type": "char",
+  "vocab_size": 65,
+  "normalization": "none",
+  "special_tokens": [],
+  "train_corpus_sha256": "8d1f...",
+  "created_at": "2026-05-21T11:10:00Z"
+}
+```
+
+With this metadata, when you encounter "the model suddenly went wrong," you can check input contract changes before investigating model architecture. This is one of the habits that most dramatically reduces debugging time in practice.
+
+### Token length distribution reveals training bottlenecks early
+
+Tokenizer choice ultimately changes the sequence length distribution. Longer sequences increase attention computation as `T^2`, forcing smaller batch sizes on the same GPU memory. Printing length distribution at the tokenizer stage lets you set training parameters more rationally later.
+
+```python
+import numpy as np
+
+samples = [
+    "To be, or not to be, that is the question.",
+    "What light through yonder window breaks?",
+    "O Romeo, Romeo! wherefore art thou Romeo?",
+]
+
+lengths = [len(encode(s)) for s in samples]
+print("lengths:", lengths)
+print("mean:", float(np.mean(lengths)))
+print("p95:", float(np.percentile(lengths, 95)))
+```
+
+With char-level, average lengths are longer but debugging visibility is higher. Conversely, subword shortens lengths for training efficiency but makes encoding results harder for humans to read intuitively. You must verify this trade-off numerically to explain "why this tokenizer" end-to-end.
+
+| Choice | Advantage | Cost |
+| --- | --- | --- |
+| char-level | simple implementation/debugging, full visibility | long sequences, slower training |
+| BPE/subword | short sequences, practical efficiency | complex training pipeline, reduced visibility |
+| byte-level | OOV robustness | post-processing/readability burden |
+
+This is why the series fixes char-level early on. Securing the experience of visually tracking input contracts before pursuing absolute performance ensures your judgment stays stable when reading attention patterns and loss curves later.
+
+## Operational checkpoints when changing tokenizers
+
+A tokenizer change looks like a single-file code change, but in reality it simultaneously changes the interpretation rules for training data and model weights. Even small changes should be treated like a schema migration from an operational perspective. Checking the following four points in advance significantly reduces training restarts and inference mismatches.
+
+### Vocabulary size and special token policy
+
+`<pad>`, `<bos>`, `<eos>`, `<unk>` — their presence and ID assignment propagate throughout the model. Changing special token order mid-training makes checkpoint reuse difficult and immediately alters decoding results. Fix a special token table per tokenizer version as a permanent document.
+
+### Normalization rules and invertibility
+
+Lowercasing, whitespace cleanup, and Unicode normalization can create data loss. For example, excessive normalization on a Korean+English mixed corpus can break domain terminology. Before training, always create `encode -> decode` round-trip samples to verify that meaning loss is within acceptable bounds.
+
+### Tokenizer synchronization across training/inference paths
+
+If the training script and serving inference code reference different tokenizer files, the model interprets "inputs seen during training" and "real service inputs" differently. This problem manifests only as accuracy degradation, so discovery comes late. Storing the tokenizer file hash in checkpoint metadata catches this mismatch early.
+
+### Data distribution and token length monitoring
+
+After a tokenizer change, average token length and upper percentile lengths can shift significantly. Longer lengths reduce information capacity within the same context window and increase training cost. Conversely, excessively short lengths can fragment meaning units, making pattern learning harder for the model.
+
+## Quick validation with small experiments
+
+A tokenizer change can reduce failure probability with a small validation before rerunning full training. For example, fixing 100 sample sentences and comparing `token count`, `rare token ratio`, and `round-trip restoration rate` quickly characterizes the nature of the change. Automating this check at the PR stage makes it easy to block model quality degradation proactively.
+
+## One-line conclusion
+
+A tokenizer is not a preprocessing tool but the model's character system. The moment you pin it and version-control it, experiment quality in all subsequent stages stabilizes.
+
+## Frequently asked questions in practice
+
+### Should I follow this discipline even for small models?
+
+Yes — in fact, smaller models require stricter adherence to basic contracts. The smaller the model capacity, the more it is affected by input noise and implementation mismatches. Securing reproducible experiment units first improves quality improvement velocity even before scaling model size.
+
+### What do I do when experiment speed and quality control conflict?
+
+To increase speed, the goal is not more experiments but lower failure cost. Introducing config file pinning, log standardization, and checkpoint metadata storage first lets you run more "valid" experiments in the same time.
+
+### What's the single most useful thing to record?
+
+Record the reason for the change, expected effect, and actual observed result briefly. Especially recording "why this value was chosen" lets you reconstruct decision context even weeks later.
+
+Even short validations, when automated, significantly reduce tokenizer change risk.
+
+## Summary
+
+This article established the most important starting point: models do not read text directly but receive integer sequences produced by the tokenizer as input. This single perspective makes LLM internals feel far less mysterious.
+
+We also examined what character-level, word-level, and subword tokenization trade off against each other. Char-level is long but transparent; subword is efficient but structurally more complex. The series chose char-level precisely for this transparency.
+
+Moving to the next article, these integer IDs will receive vector meanings. That is, the number sequences produced by the tokenizer will pass through embeddings and enter the representation space the model can actually operate on.
+
 ## Answering the Opening Questions
 
 - **Why must the model receive integer sequences instead of raw strings?**

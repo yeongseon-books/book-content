@@ -303,6 +303,126 @@ We also saw that training is less mysterious than it sounds. The core is just re
 
 In the next post, we will load `ckpt.pt` and turn the trained model into a generator, producing Shakespeare-like text one token at a time.
 
+## Gradient Accumulation for Larger Effective Batches
+
+On memory-constrained hardware, large batch sizes are infeasible. Gradient accumulation solves this: accumulate gradients over several micro-batches, then perform a single optimizer step.
+
+```python
+accum_steps = 4
+
+for iter_num in range(max_iters + 1):
+    lr = get_lr(iter_num)
+    for pg in optimizer.param_groups:
+        pg["lr"] = lr
+
+    optimizer.zero_grad(set_to_none=True)
+    total_loss = 0.0
+
+    for micro in range(accum_steps):
+        xb, yb = get_batch("train")
+        _, loss = model(xb, yb)
+        (loss / accum_steps).backward()
+        total_loss += float(loss.item())
+
+    grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+    optimizer.step()
+
+    if iter_num % 100 == 0:
+        print(f"step {iter_num} loss {total_loss/accum_steps:.4f} grad_norm {float(grad_norm):.3f}")
+```
+
+This achieves a similar effect to larger batches while reducing memory pressure—practical for stabilizing training on small GPUs.
+
+### Log the loss curve to a file for regression detection
+
+```python
+import csv
+
+with open("train_log.csv", "w", newline="", encoding="utf-8") as f:
+    writer = csv.writer(f)
+    writer.writerow(["step", "train_loss", "val_loss", "lr", "grad_norm"])
+
+    for iter_num in range(max_iters + 1):
+        ...
+        if iter_num % eval_interval == 0:
+            losses = estimate_loss()
+            writer.writerow([iter_num, losses["train"], losses["val"], lr, float(grad_norm)])
+            f.flush()
+```
+
+With this log, you can compare curves numerically after any code change—replacing gut feeling with data when checking for regressions.
+
+### Memory profile output example
+
+When using GPU, track these two values together:
+
+```python
+if torch.cuda.is_available() and iter_num % 500 == 0:
+    alloc = torch.cuda.memory_allocated() / (1024**2)
+    peak = torch.cuda.max_memory_allocated() / (1024**2)
+    print(f"cuda_mem_mb alloc={alloc:.1f} peak={peak:.1f}")
+```
+
+Sample output:
+
+```text
+cuda_mem_mb alloc=742.6 peak=911.3
+cuda_mem_mb alloc=755.1 peak=928.4
+```
+
+If peak keeps rising every step, suspect a tensor reference leak. A stable plateau signals a healthy loop.
+
+### Training Stability Check Table
+
+| Check Item | Healthy Signal | Warning Signal |
+| --- | --- | --- |
+| Initial loss | Near `ln(vocab)` | Immediate `nan` or abnormally large |
+| Grad norm | Gentle fluctuation | Periodic spikes or stuck at 0 |
+| Train vs val | Both decrease, then plateau | Train drops, val stagnates or rises |
+| LR schedule | Warmup then smooth decay | Abrupt staircase or mis-applied |
+| Memory peak | Initial rise then stable | Continuous rise with steps |
+
+Reading training logs against this table makes it easier to separate model issues from loop issues.
+
+## Common Misconceptions
+
+- It feels like the training loop needs to be long and complex, but the core is five lines.
+- SGD works too, so AdamW seems trivial—but for small transformers, AdamW is far easier to tune.
+- Warmup and decay look like optional decoration, but they directly affect early instability and late-stage convergence.
+- It seems fine as long as train loss drops, but without val loss you miss overfitting and data bugs.
+- Saving just weights in a checkpoint feels sufficient, but without config, restoration and reproduction become difficult.
+
+## Operations Checklist
+
+- [ ] Can you explain the `zero_grad → forward → backward → clip → step` sequence without memorizing it?
+- [ ] Have you plotted `get_lr()` to confirm warmup then cosine decay?
+- [ ] Does `estimate_loss()` log both train and val together?
+- [ ] Have you verified the implementation path with a one-batch overfit test?
+- [ ] Does `ckpt.pt` store both model weights and config?
+
+## Transitioning from Experiment Script to Production Training Code
+
+A training loop starts as a short script but, as experiments accumulate, its character shifts toward production code. Missing this transition point creates a paradox: experiments multiply yet result comparison becomes harder.
+
+### Minimum production requirements
+
+- Lock run configuration to a file and assign a run ID.
+- Save train/val loss at the same interval.
+- Separate checkpoint policy into "latest" and "best-performing."
+- Make resume-after-interruption a first-class feature.
+
+### Quality judgment criteria
+
+Loss going down is not sufficient. You must also inspect generated samples for repetition loops, semantic collapse, and sentence-ending failures. Smaller models amplify the gap between numeric metrics and perceived quality, making simultaneous monitoring of both essential.
+
+## Summary
+
+This article built a minimal `train.py` that trains GPT end to end. Batch sampling, AdamW, LR scheduling, gradient clipping, periodic evaluation, and checkpointing all connect so the model begins learning patterns from data for the first time.
+
+The training loop's essence is not complex: repeatedly show good batches, compute gradients via loss, and nudge weights in that direction. Everything else is operational infrastructure to keep that process stable and reproducible.
+
+Next, we load `ckpt.pt` and attach a generation loop—producing Shakespeare-like text one character at a time from the weights we just trained.
+
 ## Answering the Opening Questions
 
 - **What are the five core lines that drive the training loop?**

@@ -146,6 +146,196 @@ In the final post, we'll wrap this model in a FastAPI server so you can talk to 
 
 <!-- a-grade-example:end -->
 
+## Common Misconceptions
+
+- It feels like fine-tuning equals large-scale knowledge injection, but in small SFT the output *format* change appears first.
+- It seems like the training objective changed, but it is still next-token prediction.
+- It feels natural to include loss on the question span too, but masking concentrates signal on the response span.
+- A small dataset seems meaningless, but it sends a surprisingly strong signal for changing output habits.
+- It feels like you should discard the base model and retrain from scratch, but SFT is an adaptation layer on top of existing representations.
+
+## Operations Checklist
+
+- [ ] Are instruction/response rows serialized with a consistent template?
+- [ ] Have you printed output to verify `y[: ...] = -100` masking boundary matches prompt length?
+- [ ] Are you loading the base checkpoint and fine-tuning at a lower learning rate?
+- [ ] Does `ckpt_sft.pt` store both post-SFT weights and config together?
+- [ ] Have you compared base vs SFT output on the same prompt to confirm format shift?
+
+## SFT Dataset Quality Check Script
+
+The first thing that breaks in fine-tuning is not the model—it is the data. If the Q/A template varies per row, responses are too short, or the character set doesn't match the tokenizer, training silently destabilizes. Print a dataset report before training:
+
+```python
+import json
+import statistics
+
+from data import encode
+
+rows = [json.loads(line) for line in open("instructions.jsonl", encoding="utf-8")]
+q_lens = [len(encode(r["instruction"])) for r in rows]
+a_lens = [len(encode(r["response"])) for r in rows]
+
+print("rows:", len(rows))
+print("q_len mean/p95:", round(statistics.mean(q_lens), 2), sorted(q_lens)[int(len(q_lens)*0.95)-1])
+print("a_len mean/p95:", round(statistics.mean(a_lens), 2), sorted(a_lens)[int(len(a_lens)*0.95)-1])
+print("empty responses:", sum(1 for r in rows if not r["response"].strip()))
+```
+
+This report lets you quickly separate "model problem" from "data problem" when SFT fails.
+
+### Visually verify loss masking boundaries
+
+The fastest way to check masking is printing one sample:
+
+```python
+x, y = build_example(rows[0], block_size=64)
+print("x_ids:", x.tolist()[:40])
+print("y_ids:", y.tolist()[:40])
+print("ignore_count:", int((y == -100).sum().item()))
+```
+
+If `ignore_count` is 0, the prompt span is included in loss. For SFT whose goal is response-format adaptation, this is usually undesirable.
+
+### Learning rate reduction principle vs base
+
+SFT should not heavily disturb base weights. Typical ranges:
+
+| Stage | Typical LR Range | Intent |
+| --- | --- | --- |
+| Pre-training | `1e-4 – 5e-4` | Broad pattern learning |
+| SFT | `1e-5 – 5e-5` | Output format/habit fine-tuning |
+| Further alignment (RLHF etc.) | More conservative | Policy stabilization |
+
+Using `3e-5` in this example follows the same logic: stable adaptation over large movement.
+
+### Fix the before/after evaluation prompt set
+
+```text
+Q: Who is Juliet?
+Q: Summarize Romeo in one sentence.
+Q: Give one short warning about jealousy.
+Q: Answer politely: What is loyalty?
+```
+
+Always use the same evaluation prompts so change interpretation is possible. If prompts vary each time, you cannot separate model improvement from input difference.
+
+### SFT Failure Modes and Responses
+
+| Symptom | Common Cause | First Response |
+| --- | --- | --- |
+| Copies question then stops | Masking boundary error | Check `-100` application range |
+| Style collapse | LR too high / too many steps | Lower lr, apply early stopping |
+| Responses too short | Length bias in training data | Rebalance response length distribution |
+| Many OOV warnings | Character set mismatch | Normalize/filter data |
+
+Including this table in your operations checklist significantly reduces failure cost across SFT iterations.
+
+## Fine-Tuning Experiment Card Template
+
+Once you run SFT multiple times, you quickly forget which settings produced which output. Record an experiment card per run:
+
+```text
+exp_id=sft-2026-05-21-a
+base_ckpt=ckpt.pt
+train_rows=50
+lr=3e-5
+steps=500
+mask_prompt=true
+max_seq_len=64
+train_loss_last=1.42
+eval_prompt_set=v1
+notes=Q/A format stabilization, factuality limited
+```
+
+This card makes quality discussions far more productive—you have evidence for what changed under which settings.
+
+### Check supervised ratio per sample
+
+```python
+def supervised_ratio(y: torch.Tensor) -> float:
+    total = y.numel()
+    active = int((y != -100).sum().item())
+    return active / max(total, 1)
+```
+
+When using masking, verify that the fraction of tokens actually contributing to loss is not too low. Long questions with short answers weaken the training signal.
+
+### Base Preservation vs Over-Adaptation Balance
+
+| Evaluation Axis | Expected Signal | Warning Signal |
+| --- | --- | --- |
+| Q/A format | Consistent answer after `A:` | Question copying, answer missing |
+| General generation | Base fluency maintained | Sudden collapse/repetition |
+| Style | Target format strengthened | Excessive boilerplate |
+
+Good SFT adds new habits without erasing existing capabilities. Check format-adaptation metrics and base generation quality together.
+
+## Improving SFT Dataset Quality: Practical Procedures
+
+SFT performance is often more sensitive to dataset composition quality than model size. In small models especially, a few bad samples can distort output habits entirely, so data cleaning deserves its own stage.
+
+### Per-sample inspection rules
+
+Verify that question/answer roles are not swapped, answers don't copy the question verbatim, and lengths don't exceed limits that would cause truncation. Excessive duplicate questions cause the model to over-learn specific expressions.
+
+### Format consistency
+
+If `Q:`/`A:` format, system-instruction inclusion, and newline policies are mixed, the model learns the format itself uncertainly. Lock the final string template in the preprocessing step and tolerate no exceptions.
+
+### Validation set design
+
+The validation set should not be a miniature of the training set but a separate collection reflecting actual usage scenarios. Mix samples by difficulty, length, and domain to catch regressions faster.
+
+### Reading overfitting signals
+
+If training loss keeps dropping but generation diversity plummets or fixed-phrase repetition increases, overfitting is likely. Rather than blindly increasing epochs, lower the learning rate and reset early-stopping criteria.
+
+## Fine-Tuning Experiment Record Template
+
+When experiments repeat, you quickly forget what worked. A minimal template matters:
+
+- Data version and sample count
+- Template format (`Q/A`, system prompt inclusion)
+- Learning rate, batch size, epoch count
+- Validation loss and representative generation examples
+
+Following just this template drastically reduces the chance of repeating the same mistakes.
+
+## Final Check
+
+Fine-tuning is not about "training longer"—it is about "a more precise data contract." Fix data format, split criteria, and evaluation scenarios first, and even small models can reliably deliver perceived quality improvements.
+
+Ultimately, SFT success is determined by data operations, not the model.
+
+## Practice FAQ
+
+### Should I follow these steps rigorously even for a tiny model?
+
+Yes—smaller models benefit more from strict contracts. Low capacity magnifies input noise and implementation inconsistency. Establishing reproducible experiment units first accelerates quality improvements even before scaling.
+
+### What if experiment speed and quality management conflict?
+
+To go faster, reduce failure cost rather than increasing experiment count. Locking configs, standardizing logs, and storing checkpoint metadata let you run more *valid* experiments in the same time.
+
+### What single thing is most worth recording?
+
+The change rationale, expected effect, and observed result—briefly. Especially "why this value was chosen" lets you reconstruct decision context weeks later.
+
+## Conclusion Note
+
+In fine-tuning, small data discipline makes a bigger difference than big techniques. Fix sample quality and evaluation criteria, and experiment results accumulate as reusable knowledge.
+
+Additionally, recording dataset change history and failure cases together accelerates quality improvement in the next round.
+
+## Summary
+
+This article performed supervised fine-tuning by layering a small instruction dataset on top of the base GPT. The key is not building the model from scratch but overlaying a new output habit—question-answer format—on top of already-learned character prediction ability.
+
+We also explored why loss masking excludes the instruction span and concentrates training signal on the response span. Thanks to this, the model moves toward filling the answer section rather than copying the prompt.
+
+Next, we wrap this fine-tuned model with a FastAPI server and browser UI—completing the LLM we built from scratch into a small chatbot system you can actually talk to.
+
 ## Answering the Opening Questions
 
 - **What does each stage—pre-training, fine-tuning, RLHF—change?**
