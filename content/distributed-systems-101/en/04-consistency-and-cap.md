@@ -157,15 +157,98 @@ Causal models only need to preserve happens-before. Concurrent events are free t
 
 ## How This Shows Up in Production
 
-Spanner, etcd, and ZooKeeper aim near linearizability (CP). DynamoDB, Cassandra, and Redis Cluster default close to eventual (AP). Even within one company, payment DBs go CP and recommendation caches go AP. PACELC adds the latency vs consistency view for the partition-free common case.
+### Consistency Model Decision Matrix
+
+| Data Type | Example | Recommended Model | Rationale |
+|-----------|---------|----|-----------|
+| Financial balance | Account balance, inventory | Linearizable | Prevent double-debit |
+| User session | Login state | Linearizable | UX correctness |
+| Social feed | Timeline | Causal | Order matters, staleness tolerable |
+| Recommendation cache | Personalization | Eventual | Refresh is harmless |
+| Logs / analytics | Click events | Eventual | Throughput first |
+| Config values | Feature flags | Causal | Change order matters |
+| Payment state | Charge / refund | Linearizable | Prevent double-charge |
+
+Use this matrix in design reviews so the team shares rationale for "why is this endpoint eventual?"
+
+### Conflict Resolution Strategies (AP Systems)
+
+After partition recovery, AP systems face write conflicts:
+
+| Strategy | Mechanism | Best For |
+|----|----|----|
+| Last Write Wins (LWW) | Timestamp picks winner | Session data, caches |
+| Version Vector | Detect concurrency, app resolves | Shopping carts, docs |
+| CRDT | Mathematically conflict-free structure | Counters, sets |
+| Application Merge | Domain logic reconciles | Orders, inventory |
+
+```python
+# CRDT G-Counter — conflict-free by construction
+from collections import defaultdict
+
+class GCounter:
+    def __init__(self, node_id: str):
+        self.node_id = node_id
+        self.counts: dict[str, int] = defaultdict(int)
+
+    def increment(self, amount: int = 1):
+        self.counts[self.node_id] += amount
+
+    def value(self) -> int:
+        return sum(self.counts.values())
+
+    def merge(self, other: "GCounter"):
+        for node, count in other.counts.items():
+            self.counts[node] = max(self.counts[node], count)
+
+counter_a = GCounter("node-A")
+counter_b = GCounter("node-B")
+counter_a.increment(3)
+counter_b.increment(2)
+counter_a.merge(counter_b)
+print(counter_a.value())  # 5 — no conflict
+```
+
+### Quorum Arithmetic for Linearizability
+
+The formula `W + R > N` guarantees read and write quorums overlap:
+
+| Config | W | R | Characteristic |
+|--------|---|---|----------------|
+| N=3, W=2, R=2 | 2 | 2 | Balanced — tolerates 1 node failure |
+| N=5, W=3, R=3 | 3 | 3 | High durability — tolerates 2 failures |
+| N=5, W=1, R=5 | 1 | 5 | Fast writes / slow reads |
+| N=5, W=5, R=1 | 5 | 1 | Slow writes / fast reads |
+
+Tune asymmetrically: read-heavy services use W=N, R=1; write-heavy services use W=1, R=N.
+
+### Partition Walkthrough
+
+```text
+[Before partition]
+  DC-A: [node-1, node-2, node-3]  ↔  DC-B: [node-4, node-5]
+  All healthy, leader = node-1
+
+[Partition occurs]
+  DC-A: quorum 3/5 → writes continue (CP choice)
+  DC-B: quorum 2/5 → writes rejected → 503 (CP choice)
+         or: local reads allowed + writes refused (hybrid)
+
+[Recovery]
+  Network restored → DC-B nodes reconnect to DC-A leader
+  → Log sync → ISR rejoin → normal operation resumes
+```
+
+CP systems sacrifice availability in the minority partition. AP systems accept writes on both sides and reconcile conflicts after recovery.
 
 ## How a Senior Engineer Thinks
 
-- They map models to screens, not to the whole system.
-- They implement read-your-writes explicitly (sticky sessions and so on).
-- They treat partition policy as an operational responsibility.
-- They measure "strong consistency is expensive" via SLOs.
-- They distrust docs that do not name the model.
+- Map consistency models to screens, not to the whole system.
+- Implement read-your-writes explicitly (sticky sessions, session-write cache).
+- Treat partition policy as an operational runbook item, not a theoretical exercise.
+- Measure "strong consistency is expensive" via tail-latency SLOs — quorum reads add P99 cost.
+- Monitor replication lag P99 to quantify how "eventual" your eventual consistency actually is.
+- Distrust docs that claim "consistent" without naming the exact model.
 
 ## Checklist
 
