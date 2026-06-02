@@ -382,6 +382,253 @@ Do not try to design everything perfectly from the start. Write simple working c
 
 Real-world design applies multiple OOP principles together, not in isolation. Start simple and improve incrementally when change demands it — this is the realistic approach. In the next article, we explore when you should not use object-oriented programming.
 
+## Anchoring the Design with Text UML Before Coding
+
+If you fix the collaboration structure in text UML before writing code, responsibility boundaries stay stable during refactoring.
+
+```text
+[TicketController]
+    |
+    v
+[TicketService]
+  + create_ticket()
+  + close_ticket()
+    |
+    +--> [TicketRepository]
+    +--> [AssignmentPolicy]
+    +--> [NotificationPort]
+
+[Ticket]
+  - id
+  - status
+  - assignee
+  + assign_to()
+  + close()
+```
+
+## Before/After: Decomposing a Monolithic Service Method
+
+```python
+# before
+
+def create_ticket(payload: dict, db, slack_client):
+    # parsing, validation, assignee selection, persistence, notification all mixed
+    ...
+```
+
+```python
+# after
+from dataclasses import dataclass
+
+@dataclass
+class Ticket:
+    id: str
+    title: str
+    status: str = 'open'
+    assignee: str | None = None
+
+    def assign_to(self, engineer: str) -> None:
+        if self.status != 'open':
+            raise ValueError('only open ticket can be assigned')
+        self.assignee = engineer
+
+    def close(self) -> None:
+        if self.status == 'closed':
+            raise ValueError('already closed')
+        self.status = 'closed'
+
+class RoundRobinAssignmentPolicy:
+    def __init__(self, members: list[str]) -> None:
+        self.members = members
+        self._index = 0
+
+    def pick(self) -> str:
+        engineer = self.members[self._index % len(self.members)]
+        self._index += 1
+        return engineer
+```
+
+## Violations and Corrections
+
+| Violation | Operational Problem | Correction |
+|---|---|---|
+| Controller directly modifies domain state transitions | Inconsistent rules across API endpoints | Unify state transitions through domain methods |
+| Policy hard-coded in service | Difficult to experiment or replace | Inject policy objects |
+| Notification failure coupled to transaction | Core functionality rolls back unnecessarily | Separate via outbox/async notification |
+
+## Comparison: Before vs After Refactoring
+
+| Aspect | Before Refactoring | After Refactoring |
+|---|---|---|
+| Code navigation | Tracing inside one function | Navigating by object boundaries |
+| Testing | Depends on integration tests | Domain-level unit tests possible |
+| Change response | Frequent merge conflicts | Reduced blast radius |
+
+## Real Scenario: Building a Change-Resilient Structure
+
+In practice, rule changes happen more often than feature additions. Therefore, when evaluating class structure, "how far does the next change reach?" is a safer criterion than "does it work now?"
+
+```python
+from dataclasses import dataclass
+from typing import Protocol
+
+
+@dataclass
+class LineItem:
+    name: str
+    quantity: int
+    unit_price: int
+
+    def subtotal(self) -> int:
+        return self.quantity * self.unit_price
+
+
+class DiscountPolicy(Protocol):
+    def apply(self, amount: int) -> int:
+        ...
+
+
+class NoDiscount:
+    def apply(self, amount: int) -> int:
+        return amount
+
+
+class PercentDiscount:
+    def __init__(self, percent: int) -> None:
+        if not 0 <= percent <= 100:
+            raise ValueError('percent must be 0..100')
+        self.percent = percent
+
+    def apply(self, amount: int) -> int:
+        return int(amount * (100 - self.percent) / 100)
+
+
+class Invoice:
+    def __init__(self, items: list[LineItem], policy: DiscountPolicy) -> None:
+        self.items = items
+        self.policy = policy
+
+    def total(self) -> int:
+        base = sum(i.subtotal() for i in self.items)
+        return self.policy.apply(base)
+```
+
+This code never needs to edit `Invoice.total()` when discount rules change. Extension is closed by adding implementation classes, and the core flow stays stable.
+
+## UML View of the Collaboration
+
+```text
+[Invoice]
+  - items: list[LineItem]
+  - policy: DiscountPolicy
+  + total()
+
+[LineItem]
+  + subtotal()
+
+[DiscountPolicy] <<interface>>
+  + apply(amount)
+      ^
+      +-- [NoDiscount]
+      +-- [PercentDiscount]
+```
+
+Writing the collaboration structure in text UML like this lets code reviews quickly agree on "where is the policy axis and where is the domain axis."
+
+## Anti-Patterns and Correction Steps
+
+| Anti-Pattern | Detection Signal | Correction Sequence |
+|---|---|---|
+| God Object | 20+ methods, change history scattered across concerns | Decompose by responsibility axis → extract collaboration interfaces |
+| Data-only empty class | Only getters/setters, no methods | Move rule methods in, or simplify to dataclass |
+| Inheritance tree bypass branching | Type-checking branches for subclass types | Redefine polymorphic contract |
+| Infrastructure type leakage | Domain layer depends on SDK response objects | Add DTO translation layer |
+
+## Before/After: Test Maintenance Cost
+
+| Aspect | Before Refactoring | After Refactoring |
+|---|---|---|
+| Test setup | Requires global state initialization | Object-level state creation |
+| Failure root-cause tracing | Backtrack entire function chain | Trace at class method level |
+| Regression scope | Broad and unclear | Narrow and predictable |
+
+## Team Adoption Checklist
+
+- Verify that domain terms match class names.
+- Confirm that invariants are established at instance creation time.
+- Check that policy changes are possible via new implementations, not existing code edits.
+- In code review, agree on collaboration structure with 10 lines of UML text first.
+- Ensure test names describe business rules rather than method names.
+
+## Mini Case Study: Verify with One Rule Addition
+
+The following example demonstrates the smallest unit of policy extension that lands without touching existing code.
+
+```python
+class WeekendPolicy:
+    def apply(self, amount: int, is_weekend: bool) -> int:
+        if is_weekend:
+            return int(amount * 0.95)
+        return amount
+
+
+def estimate(amount: int, is_weekend: bool) -> int:
+    policy = WeekendPolicy()
+    return policy.apply(amount, is_weekend)
+```
+
+The key observation is that the new policy enters without breaking the existing call path. Keeping the change boundary at the policy class means regression risk stays low.
+
+| Verification Question | Pass Criterion |
+|---|---|
+| Does adding a new policy require editing existing functions? | No |
+| Does the exception policy match the existing contract? | Yes |
+| Are tests isolated per policy? | Yes |
+
+## Refactoring Retrospective: Measuring Change Cost
+
+- If modified files exceed 5 per feature, review boundary design.
+- If type-branching `if/elif` accumulates to 3+, move to polymorphism or strategy objects.
+- If writing regression tests takes longer than the implementation, revisit responsibility placement.
+
+```python
+def complexity_signal(changed_files: int, branch_count: int) -> str:
+    if changed_files >= 5 or branch_count >= 3:
+        return 'refactor-needed'
+    return 'acceptable'
+```
+
+This is not a rigorous metric, but it helps teams discuss based on criteria rather than gut feel.
+
+## Verification Notes: Questions for Reviewing Object Design Quality
+
+These questions are used repeatedly in post-implementation reviews.
+
+- Does the exception type and message match the caller's contract when this method fails?
+- Is the same rule duplicated in another class or function?
+- Does state mutation happen through exactly one method path?
+- Can unit tests run without external dependencies?
+
+```python
+def review_signal(duplicate_rules: int, mutable_paths: int) -> str:
+    if duplicate_rules > 0:
+        return 'duplicate rule removal needed'
+    if mutable_paths > 1:
+        return 'state mutation path consolidation needed'
+    return 'structure stable'
+```
+
+Applying these checks even to article-level examples helps understand OOP as a maintenance strategy rather than just syntax.
+
+## One-Line Takeaway
+
+OOP quality is judged not by the number of classes, but by how much the blast radius of change has been reduced.
+
+## Design Note
+
+Design choices are not about finding the right answer—they are decisions that lower the cost of change. Even for the same feature, defining boundaries first simplifies reviews and tests.
+
+
 ## Answering the Opening Questions
 
 - **How do you derive classes from requirements and decide which responsibilities go where?**
