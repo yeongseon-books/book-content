@@ -170,16 +170,73 @@ kubectl describe hpa web
 
 ## How This Shows Up in Production
 
-The common pairing is *HPA + Cluster Autoscaler* so that *Pod growth* drives *node growth* in two coordinated layers.
+The common pairing is *HPA + Cluster Autoscaler*: HPA adds Pods when CPU/memory crosses the target, and Cluster Autoscaler adds nodes when pending Pods can't be scheduled. These two layers coordinate automatically—you don't wire them together manually.
+
+### HPA Manifest + Resource Requests (They're a Package)
+
+```yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: api
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: api
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 65
+```
+
+Without `resources.requests` on the Deployment, HPA cannot compute utilization percentage—it divides current usage by the request. Missing requests = HPA is blind.
+
+### Scaling Diagnosis Routine
+
+```bash
+kubectl get hpa api -n prod           # current vs target at a glance
+kubectl describe hpa api -n prod      # events: ScaledUp/ScaledDown timestamps
+kubectl top pod -n prod -l app=api    # actual CPU/memory per Pod
+```
+
+Compare scale events against traffic patterns. If replicas oscillate rapidly (flapping), widen the `stabilizationWindowSeconds` or adjust the target percentage.
+
+### Guardrails Against Over-Scaling
+
+| Guardrail | Why |
+| --- | --- |
+| `minReplicas >= 2` | Avoids single-Pod bottleneck during sudden spikes |
+| Conservative readiness probe | Prevents premature traffic to slow-starting Pods |
+| PodDisruptionBudget alongside HPA | Protects availability during scale-down |
+| `behavior.scaleDown.stabilizationWindowSeconds: 300` | Prevents cost churn from short traffic dips |
+| `maxReplicas` cap with alerts | Catches runaway scaling before budget blows |
+
+### Two-Layer Scaling Flow
+
+```text
+Traffic spike
+  → CPU rises above 65% target
+  → HPA adds Pods (say 3 → 6)
+  → If no node capacity for new Pods → Pods stay Pending
+  → Cluster Autoscaler detects unschedulable Pods
+  → Provisions new node
+  → Pending Pods scheduled on new node
+  → Traffic served
+```
 
 ## How a Senior Engineer Thinks
 
-- *Requests* are the *foundation* of all autoscaling.
-- *Metric trust* equals *autoscaler trust*.
-- *Custom metrics* come *after measurement*.
-- *Flapping* shows up as *cost*.
-- Always pair with *node-level automation*.
-
+- **Requests are the foundation of all autoscaling.** CPU target percentage is meaningless without a denominator. Setting requests accurately (P50 of last 7 days × 1.3) makes HPA decisions predictable.
+- **Metric trust equals autoscaler trust.** If your metrics pipeline drops samples during load, HPA under-counts and won't scale. Monitor metric freshness alongside the app.
+- **Custom metrics come after measurement, not before.** Start with CPU-based HPA. Only move to custom metrics (requests/sec, queue depth) when you've observed that CPU doesn't correlate with your actual bottleneck.
+- **Flapping shows up as cost.** Each scale-up that immediately scales back down wastes cloud spend and increases pod churn. The stabilization window is a cost control, not just a stability knob.
+- **Always pair with node-level automation.** HPA without Cluster Autoscaler means Pods go Pending during real spikes—you've automated half the problem.
 ## Checklist
 
 - [ ] *Requests* set.
