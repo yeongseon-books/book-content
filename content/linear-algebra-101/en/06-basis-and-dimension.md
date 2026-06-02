@@ -131,15 +131,118 @@ print("coords in {b1,b2}:", coords)
 
 ## How This Shows Up in Production
 
-PCA's *principal components* form a *new basis*. *Feature selection / dimensionality reduction* is a *basis change*. *Multicollinearity* equals *rank deficiency*.
+PCA's *principal components* form a *new basis*. Feature selection and dimensionality reduction are basis changes. Multicollinearity equals rank deficiency.
+
+Even when a dataset has many columns, the actual number of independent directions may be far fewer. A quick rank check reveals redundant axes:
+
+```python
+X = np.array([
+    [1.0, 2.0, 3.0],
+    [2.0, 4.0, 6.0],
+    [0.0, 1.0, 1.0],
+])
+
+print('rank(X) =', np.linalg.matrix_rank(X))  # likely < 3
+print('shape(X) =', X.shape)
+```
+
+If shape is `(3, 3)` but rank is lower, you face non-invertibility, multicollinearity, and unstable regression solutions.
+
+### Application Reference Table
+
+| Concept | Production Question | How to Check |
+| --- | --- | --- |
+| Linear independence | Are features redundant? | rank, condition number |
+| Basis change | Is there a more interpretable coordinate system? | Orthogonal basis vs PCA basis |
+| Dimension | How many real information axes exist? | Cumulative variance, low-rank approximation |
+
+### Concept Comparison Table
+
+| Concept | Definition | Test |
+| --- | --- | --- |
+| Span | All vectors reachable via linear combinations of a set | Can an arbitrary vector be expressed as a combination? |
+| Linear independence | No vector is a combination of the rest | Only the trivial (all-zero) combination yields zero |
+| Basis | A set that spans AND is independent | Both conditions hold simultaneously |
+| Dimension | Number of vectors in any basis | Maximum independent vector count = rank |
+| Rank | Number of independent columns (or rows) | `np.linalg.matrix_rank` or nullity theorem |
+
+## Computing Rank and Null Space with NumPy
+
+Checking rank and null space directly makes independence and dimension concrete:
+
+```python
+import numpy as np
+
+A = np.array([
+    [1.0, 2.0, 3.0],
+    [2.0, 4.0, 6.0],
+    [0.0, 1.0, 2.0],
+])
+
+rank = np.linalg.matrix_rank(A)
+print('rank(A):', rank)
+
+# Null space: solution space of Ax = 0
+U, S, Vt = np.linalg.svd(A)
+null_mask = S < 1e-10
+null_space = Vt[null_mask, :]
+
+print('null space dim:', null_space.shape[0])
+print('null space basis:\n', null_space)
+
+# Verify: A @ v should be zero
+if null_space.shape[0] > 0:
+    v = null_space[0]
+    print('A @ v:', A @ v)
+    print('close to zero:', np.allclose(A @ v, 0))
+```
+
+By the rank-nullity theorem: `rank + null space dimension = number of columns`. When rank is less than the column count, the null space is non-trivial—meaning some directions carry zero information.
+
+## The Mathematics of Dimensionality Reduction
+
+Dimensionality reduction is not merely "dropping features." It is a combination of basis change and information compression.
+
+High-dimensional data often lives near a low-dimensional subspace. For example, 1000-dimensional vectors might cluster around a 50-dimensional linear subspace. Finding the right basis lets you represent the structure with only 50 coordinates.
+
+The mathematical steps:
+
+1. **Basis search** — find orthogonal directions of maximum variance (PCA, SVD).
+2. **Projection** — project original vectors onto the top-k axes.
+3. **Reconstruction** — reverse-project k coordinates back to the original space.
+
+Information lost belongs to low-variance directions, so high cumulative explained variance means good compression quality.
+
+```python
+# 5D → 2D compression
+X = np.random.randn(100, 5)
+Xc = X - X.mean(axis=0)
+U, S, Vt = np.linalg.svd(Xc, full_matrices=False)
+
+k = 2
+X_compressed = Xc @ Vt[:k].T
+X_reconstructed = X_compressed @ Vt[:k]
+
+reconstruction_error = np.linalg.norm(Xc - X_reconstructed) / np.linalg.norm(Xc)
+print('relative reconstruction error:', reconstruction_error)
+```
+
+Dimensionality reduction is "choosing which basis directions to keep while managing information loss." This perspective applies to PCA, t-SNE, UMAP, and autoencoders alike.
 
 ## How a Senior Engineer Thinks
 
-- *Always check rank*.
-- Uses the *condition number* to detect *near-dependence*.
-- Uses *basis change* to *simplify problems*.
-- Uses *PCA / SVD* to find an *optimal basis*.
-- *Resolves multicollinearity* explicitly.
+| Scenario | Linear Algebra Action | Key Metric |
+| --- | --- | --- |
+| Feature compression | SVD/PCA low-rank projection | Cumulative variance, reconstruction error |
+| Similarity search | Normalize → dot product / cosine | top-k accuracy, scale sensitivity |
+| Regression training | `lstsq` or gradient descent | Residual norm, condition number |
+| Transform pipelines | Matrix composition `A @ B @ x` | Intermediate shapes, order sensitivity |
+
+Rules of thumb:
+- *Always check rank* before inverting or solving.
+- Use the *condition number* to detect near-dependence (`np.linalg.cond`).
+- Use *basis change* to simplify problems—sometimes a rotation makes everything diagonal.
+- *Resolve multicollinearity* explicitly: drop, combine, or regularize.
 
 ## Checklist
 
