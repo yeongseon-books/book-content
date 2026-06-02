@@ -132,15 +132,65 @@ print("close to A:", np.allclose(A_reconstructed, A))
 
 ## How This Shows Up in Production
 
-Linear systems (*LU*), least squares (*QR*), PCA (*SVD*), *recommender matrix factorization (MF)*, *image compression (low-rank SVD)* — all are *matrix decompositions*.
+Linear systems (LU), least squares (QR), PCA (SVD), recommender matrix factorization, image compression (low-rank SVD) — all are matrix decompositions.
+
+### When to Use Which Decomposition
+
+| Problem | First-choice | Why |
+| --- | --- | --- |
+| `Ax = b` repeated solves | LU | Triangular forward/back substitution is efficient |
+| Least squares `min \|\|Ax-b\|\|` | QR | Orthogonal structure → numerical stability |
+| Dimensionality reduction / compression | SVD | Directly yields low-rank approximation |
+| Symmetric matrix mode analysis | Eigendecomposition | Clear axis interpretation |
+
+### Decomposition Comparison Table
+
+| Decomposition | Matrix requirement | Primary use | Cost |
+| --- | --- | --- | --- |
+| LU | Square (pivoting generalizes) | Repeated linear system solves | O(n³) |
+| QR | Any m×n | Least squares, orthogonalization | O(mn²) |
+| SVD | Any m×n | Low-rank approximation, denoising | O(min(m²n, mn²)) |
+| Cholesky | Symmetric positive definite | Covariance sampling, normal equations | O(n³/3) |
+
+### Low-Rank Approximation via SVD
+
+Keep only the top-k singular values to compress data:
+
+```python
+import numpy as np
+
+rng = np.random.default_rng(77)
+img = rng.normal(size=(64, 64))  # simulated grayscale image
+
+U, S, Vt = np.linalg.svd(img, full_matrices=False)
+
+for k in [5, 10, 20]:
+    img_k = U[:, :k] @ np.diag(S[:k]) @ Vt[:k, :]
+    rel_error = np.linalg.norm(img - img_k) / np.linalg.norm(img)
+    storage = (64 * k + k + 64 * k) / (64 * 64)
+    print(f'k={k:2d}: rel_err={rel_error:.4f}, storage={storage:.1%}')
+```
+
+Natural images have low-frequency structure, so real photos compress much better than random matrices at the same rank.
+
+### SVD in Recommender Systems
+
+User-item rating matrix `R` decomposed as `R ≈ U[:,:k] @ diag(S[:k]) @ Vt[:k,:]`:
+
+- `U[:,:k]` = user latent vectors
+- `Vt[:k,:]` = item latent vectors
+- Missing ratings predicted via latent vector dot product
+
+In practice, sparse matrices use gradient-based matrix factorization (ALS, NMF) rather than full SVD, but the core intuition—extracting low-dimensional structure—is identical.
 
 ## How a Senior Engineer Thinks
 
-- Uses *decompositions* instead of explicit inverses.
-- Treats *SVD* as the *most general / powerful* tool.
-- Watches the *condition number* and *numerical stability*.
-- Uses *low-rank approximations* for *compression / denoising*.
-- Knows the *cost / benefit* of each decomposition.
+- **Never invert explicitly.** Use `np.linalg.solve`, `lstsq`, or decomposition-based routines.
+- Treat SVD as the universal fallback—it works on any shape, any rank.
+- Check condition number (`np.linalg.cond`) before trusting results.
+- Verify reconstruction: `np.allclose(A, reconstructed)` with problem-appropriate tolerance.
+- Know your matrix properties first (symmetric? sparse? positive definite?) — then choose decomposition.
+- For repeated solves with the same `A`, decompose once and reuse.
 
 ## Checklist
 
