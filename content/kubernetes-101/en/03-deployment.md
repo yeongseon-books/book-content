@@ -163,16 +163,53 @@ kubectl rollout history deployment/web
 
 ## How This Shows Up in Production
 
-*Argo CD / Flux* treat *Deployment YAML* in *Git* as the *source of truth* and *sync* the cluster.
+Argo CD / Flux treat Deployment YAML in Git as the source of truth and sync the cluster. The manifest in version control is the deployment — `kubectl apply` on a laptop is the exception, not the rule.
+
+### Deployment Verification Routine
+
+```bash
+kubectl diff -f k8s/ -n prod              # preview changes before applying
+kubectl apply -f k8s/ -n prod
+kubectl rollout status deploy/api -n prod # block until complete
+kubectl get endpoints api -n prod         # confirm endpoints populated
+kubectl top pod -n prod -l app=api        # verify resource usage
+```
+
+If you applied an emergency fix via `kubectl edit`, reflect it back into the manifest before end of day. Drift in declarative systems compounds into larger failures over time.
+
+### RollingUpdate Parameters Explained
+
+| Parameter | Default | Meaning |
+| --- | --- | --- |
+| `maxSurge` | 25% | Extra Pods allowed during rollout |
+| `maxUnavailable` | 25% | Pods that can be down during rollout |
+| `minReadySeconds` | 0 | Wait after ready before considering available |
+| `revisionHistoryLimit` | 10 | Old ReplicaSets kept for rollback |
+
+For latency-sensitive services, set `maxUnavailable: 0` and `maxSurge: 1` to guarantee capacity never drops below current. For batch workloads, higher `maxUnavailable` speeds up the rollout.
+
+### Observability and Security Baseline
+
+Common labels (`app`, `component`, `version`) on every workload enable dashboard filtering and alert routing. Minimum observability:
+
+```bash
+kubectl get events -n prod --sort-by=.metadata.creationTimestamp
+kubectl logs -n prod deploy/api --since=10m
+kubectl top pod -n prod -l app=api
+```
+
+Security baseline:
+- RBAC: namespace-scoped Role/RoleBinding by default; cluster-wide only with explicit approval.
+- NetworkPolicy: start with deny-all, open DNS + internal API + DB explicitly.
+- ServiceAccount: one per workload, never share the default account.
 
 ## How a Senior Engineer Thinks
 
-- *Deployment* is the *workload baseline*.
-- *RollingUpdate* options are the *risk-control core*.
-- *Readiness* is the real *zero-downtime* condition.
-- *Rollback* must be *practiced* to actually work.
-- *YAML lives in Git*.
-
+- Deployment is the workload baseline — bare Pods are never acceptable.
+- RollingUpdate parameters are risk controls, not defaults to ignore.
+- Readiness is the real zero-downtime mechanism (not the strategy alone).
+- Rollback must be practiced regularly — untested rollback is no rollback.
+- YAML lives in Git; `kubectl edit` is a temporary emergency measure.
 ## Checklist
 
 - [ ] *replicas ≥ 2*.
