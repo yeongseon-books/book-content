@@ -121,15 +121,64 @@ print(decision)
 
 ## How This Shows Up in Production
 
-Product experiments, pricing decisions, drug approvals, policy evaluations — *statistical thinking* underlies *every data-driven decision*. *Data science, ML, and business analytics* all share the same flow.
+Product experiments, pricing decisions, drug approvals, policy evaluations — statistical thinking underlies every data-driven decision.
+
+### End-to-End A/B Test Thinking
+
+A complete statistical thinking exercise, from hypothesis to documentation:
+
+```python
+import numpy as np
+from scipy import stats
+
+# Simulated experiment: checkout button redesign
+rng = np.random.default_rng(42)
+nA, nB = 5000, 5000
+xA = rng.binomial(1, 0.050, nA)  # control
+xB = rng.binomial(1, 0.058, nB)  # treatment
+
+pA, pB = xA.mean(), xB.mean()
+diff = pB - pA
+se = np.sqrt(pA*(1-pA)/nA + pB*(1-pB)/nB)
+
+z = diff / se
+p_value = 1 - stats.norm.cdf(z)
+ci_low, ci_high = diff - 1.96*se, diff + 1.96*se
+
+print(f'A: {pA:.4f}, B: {pB:.4f}, lift: {diff/pA*100:.1f}%')
+print(f'95% CI: [{ci_low:.4f}, {ci_high:.4f}], p={p_value:.4f}')
+```
+
+Decision template: `lift +X%, CI excludes 0, cost low → ship / hold / re-test`.
+
+### Simpson's Paradox Warning
+
+Aggregate data can reverse conclusions vs subgroup data:
+
+| Overall | Treatment A: 80% success | Treatment B: 75% success |
+| --- | --- | --- |
+| By severity (mild) | A: 87.5% | B: 50.0% |
+| By severity (severe) | A: 50.0% | B: 77.8% |
+
+A looks better overall only because it received mostly mild cases. Statistical thinking means *always* asking: "Is there a hidden confounder that reverses the direction?"
+
+### The Seven-Step Decision Flow
+
+1. **Question** — lock hypothesis + success criterion before looking at data.
+2. **Data** — check sample size, representativeness, biases.
+3. **Summary** — descriptive statistics + visualization.
+4. **Estimation** — point estimate + confidence interval.
+5. **Test** — hypothesis test, but never decide on p alone.
+6. **Effect size + cost** — is the effect large enough to justify action?
+7. **Document** — decision sentence, context, next steps.
 
 ## How a Senior Engineer Thinks
 
-- Knows the *question → data → decision* flow.
-- *Quantifies* uncertainty.
-- Decides on *effect size and cost*, not on *p*.
-- *Documents* the context.
-- Knows statistics is *both a toolkit and a mindset*.
+- Follows the *question → data → decision* flow — never data-first.
+- *Quantifies* uncertainty — point estimates without CI are incomplete.
+- Decides on *effect size and cost*, not on *p* alone — statistical significance ≠ practical significance.
+- *Documents* the context — same p-value means different things in different situations.
+- Knows statistics is both a toolkit and a mindset — the mindset matters more.
 
 ## Checklist
 
