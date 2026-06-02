@@ -172,15 +172,80 @@ Knowing common mistakes is half of the defense.
 
 ## How This Shows Up in Production
 
-TLS combines asymmetric (key exchange) + symmetric (data). Mobile secure storage (iOS Keychain, Android Keystore) and cloud KMS (AWS KMS, GCP KMS) handle key management. Database transparent encryption is mostly AES-GCM under the hood.
+### Algorithm Selection by Category
+
+| Category | Input/Output | Key needed | Primary use | Recommended |
+| --- | --- | --- | --- | --- |
+| Symmetric encryption | plaintext ↔ ciphertext | Same secret key | Bulk data encryption | AES-GCM, ChaCha20-Poly1305 |
+| Asymmetric encryption | plaintext ↔ ciphertext | Public/private pair | Key exchange, small data | RSA-OAEP, ECIES |
+| Hash | input → fixed-length digest | None | Integrity check, dedup | SHA-256, SHA-3 |
+| HMAC | input + secret → MAC | Secret key | API signatures, message auth | HMAC-SHA256 |
+
+One sentence: symmetric is fast, asymmetric enables trust exchange, hash is a one-way integrity tool.
+
+### Key Access Control (RBAC + ABAC Hybrid)
+
+| Model | Decision basis | Strength | Limit | Best fit |
+| --- | --- | --- | --- | --- |
+| RBAC | User/service role | Simple to understand and operate | Hard to handle fine-grained exceptions | Stable team structures |
+| ABAC | Tags, time, env attributes | Fine-grained policy possible | Policy complexity grows | Multi-tenant / large cloud |
+
+Start with RBAC for KMS key access. When you need conditions like "decrypt only from production network" or "no admin decrypt outside business hours," layer ABAC attributes on top.
+
+### Key Permission Matrix
+
+| Key type | Service read | Service write/encrypt | Admin decrypt | Note |
+| --- | --- | --- | --- | --- |
+| Payment data key | allow | allow | deny (default) | Break-glass only |
+| Log signing key | deny | allow | deny | Sign-only key |
+| Backup recovery key | deny | deny | allow (approval-based) | 2-person approval, time-limited |
+
+### Data-State Encryption Map
+
+| Data state | Threat | Recommended control |
+| --- | --- | --- |
+| At rest | Disk theft, backup exposure | Storage encryption + key separation |
+| In transit | Man-in-the-middle | TLS 1.2+ with cert validation |
+| In use | Memory dump, log leakage | Minimal logging, sensitive-value masking |
+
+Encryption at one point is not enough. Protection must chain across every boundary the same data crosses.
+
+### Key Lifecycle Policy
+
+| Key type | Recommended lifespan | Storage | Rotation trigger |
+| --- | --- | --- | --- |
+| Data Encryption Key (DEK) | 30–90 days | Encrypted by KEK in KMS | Scheduled rotation, suspected breach |
+| Key Encryption Key (KEK) | 180–365 days | HSM / KMS | Compliance, permission change |
+| Signing key | 90–180 days | Dedicated signing infra | Deployment chain change |
+
+### Supply-Chain Integrity via Signatures
+
+| Stage | Check | On failure |
+| --- | --- | --- |
+| Download | Identify publisher signing key | Re-verify trust store |
+| Verify | Signature/hash match | Halt deployment |
+| Deploy | Only verified artifacts proceed | No exceptions |
+| Record | Keep verification log | Maintain audit trail |
+
+### Post-Quantum Cryptography (PQC) Outlook
+
+| Category | Current standard | PQC alternative |
+| --- | --- | --- |
+| Key exchange | ECDH, DH | ML-KEM (Kyber) |
+| Digital signature | RSA, ECDSA | ML-DSA (Dilithium), SLH-DSA |
+| Hash | SHA-256 | SHA-256 (quantum-resistant as-is) |
+
+No need to switch today, but design new systems with crypto agility — algorithms configurable, not hard-coded.
 
 ## How a Senior Engineer Thinks
 
-- For new systems, only AES-GCM or ChaCha20-Poly1305 are considered.
-- Keys live in a KMS, not in code.
+- For new systems, only AEAD ciphers (AES-GCM, ChaCha20-Poly1305) are considered.
+- Keys live in a KMS, never in code or config files.
 - Key rotation strategy is decided before algorithm choice.
-- Self-implemented crypto is forbidden — use libraries.
-- The randomness source is verified explicitly.
+- Self-implemented crypto is forbidden — use audited libraries (`cryptography`, `libsodium`).
+- Randomness source is verified explicitly (`secrets` / OS CSPRNG, never `random`).
+- Nonce management is documented per key — reuse = key recovery.
+- Key compromise runbook exists: identify scope → issue new key → phase out old → analyze exposure window → harden access policy.
 
 ## Checklist
 
