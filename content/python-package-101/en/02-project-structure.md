@@ -269,6 +269,462 @@ For the build backend, `setuptools` is the most widely used, but `hatchling` and
 
 The next post covers **dependency management** — venv, pip, uv, and requirements.
 
+## Deep Dive into pyproject.toml
+
+`pyproject.toml` combines PEP 518 (build system declaration) and PEP 621 (project metadata). A single file manages build tools, metadata, and tool configuration.
+
+### Full Structure Map
+
+```toml
+# === Build System (PEP 518) ===
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+# === Project Metadata (PEP 621) ===
+[project]
+name = "acme-utils"
+version = "0.1.0"
+description = "Internal utility library for Acme Corp"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [
+    {name = "Platform Team", email = "platform@acme.dev"},
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Typing :: Typed",
+]
+dependencies = [
+    "httpx>=0.27,<0.29",
+    "pydantic>=2.5",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "ruff>=0.5",
+    "mypy>=1.10",
+    "build>=1.2",
+    "twine>=5.1",
+]
+docs = [
+    "mkdocs>=1.6",
+    "mkdocstrings[python]>=0.25",
+]
+
+[project.urls]
+Homepage = "https://github.com/acme/acme-utils"
+Documentation = "https://acme.github.io/acme-utils"
+Changelog = "https://github.com/acme/acme-utils/blob/main/CHANGELOG.md"
+
+[project.scripts]
+acme = "acme_utils.cli:main"
+
+# === Tool Configuration ===
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.mypy]
+strict = true
+```
+
+### `[build-system]` in Detail
+
+| Field | Role | Example |
+|---|---|---|
+| `requires` | Packages needed to build | `["setuptools>=68", "wheel"]` |
+| `build-backend` | Build entry point | `"setuptools.build_meta"` |
+| `backend-path` | Custom backend path (rare) | `["."]` |
+
+When you run `pip install .`, pip first creates an isolated environment, installs the packages listed in `requires`, then calls `build_wheel()` or `build_sdist()` from the module pointed to by `build-backend`.
+
+### `[project]` Required vs Optional Fields
+
+```text
+Required (for PyPI upload):
+├── name          # distribution name
+├── version       # semantic version
+Effectively required:
+├── description   # one-line summary
+├── requires-python
+Recommended:
+├── readme
+├── license
+├── authors
+├── classifiers
+├── dependencies
+Optional:
+├── optional-dependencies
+├── urls
+├── scripts / gui-scripts
+├── entry-points
+```
+
+### Build Backend Comparison
+
+| Backend | Pros | Cons |
+|---|---|---|
+| setuptools | Largest ecosystem, legacy compat | Can require verbose config |
+| hatchling | Fast builds, concise config | Relatively new |
+| flit-core | Extremely simple | Limited features (no C extensions) |
+| maturin | Rust extension builds | Rust-only |
+| pdm-backend | pdm ecosystem integration | Proprietary lock format |
+
+```toml
+# hatchling example
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/acme_utils"]
+```
+
+```toml
+# flit-core example
+[build-system]
+requires = ["flit_core>=3.9,<4"]
+build-backend = "flit_core.buildapi"
+```
+
+## How src Layout Prevents Import Illusions
+
+In a flat layout, tests can pass locally but fail after installation. Let's reproduce this scenario.
+
+```bash
+# flat layout structure
+myproject/
+├── mylib/
+│   ├── __init__.py
+│   └── core.py
+├── tests/
+│   └── test_core.py
+└── pyproject.toml
+```
+
+```bash
+# Running pytest from the project root
+cd myproject
+pytest tests/
+# PASSED - imports mylib/ directly from the current directory
+
+# Trying to import from a different directory (without installation)
+cd /tmp
+python -c "import mylib"
+# ModuleNotFoundError!
+```
+
+```bash
+# src layout structure
+myproject/
+├── src/
+│   └── mylib/
+│       ├── __init__.py
+│       └── core.py
+├── tests/
+│   └── test_core.py
+└── pyproject.toml
+```
+
+```bash
+# Running pytest from the project root (without installation)
+cd myproject
+pytest tests/
+# ModuleNotFoundError - src/mylib/ is not on sys.path!
+# -> You MUST run pip install -e . before testing
+```
+
+The src layout makes it structurally impossible to have "tests pass without installation." You always test under the same conditions as CI.
+
+## Complete Real-World Project Directory
+
+```text
+acme-utils/
+├── src/
+│   └── acme_utils/
+│       ├── __init__.py          # __version__, public API
+│       ├── py.typed             # PEP 561 marker
+│       ├── core.py              # core business logic
+│       ├── config.py            # configuration loading
+│       ├── exceptions.py        # custom exceptions
+│       └── _internal.py         # internal only (_prefix)
+├── tests/
+│   ├── conftest.py              # shared fixtures
+│   ├── test_core.py
+│   └── test_config.py
+├── docs/
+│   ├── index.md
+│   └── api.md
+├── pyproject.toml               # single config file
+├── README.md                    # rendered on PyPI
+├── CHANGELOG.md                 # release history
+├── LICENSE
+└── .github/
+    └── workflows/
+        └── ci.yml               # CI pipeline
+```
+
+### Role of Each File
+
+| File | Role |
+|---|---|
+| `py.typed` | Empty file. Declares this package provides type hints (PEP 561) |
+| `_internal.py` | `_` prefix signals this is not for external use |
+| `conftest.py` | Module auto-loaded by pytest for shared fixtures |
+| `CHANGELOG.md` | Per-version changes. Keep a Changelog format recommended |
+
+## Migrating from setup.py to pyproject.toml
+
+A step-by-step procedure for moving a legacy project to modern structure.
+
+### Before Migration (Legacy)
+
+```python
+# setup.py
+from setuptools import setup, find_packages
+
+setup(
+    name="acme-utils",
+    version="0.1.0",
+    packages=find_packages(),
+    install_requires=[
+        "httpx>=0.27",
+        "pydantic>=2.5",
+    ],
+    python_requires=">=3.10",
+)
+```
+
+### After Migration (Modern)
+
+```toml
+# pyproject.toml - content migrated from setup.py
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "acme-utils"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "httpx>=0.27",
+    "pydantic>=2.5",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+```
+
+### Migration Checklist
+
+```bash
+# 1. Create pyproject.toml
+# 2. Move source under src/
+mkdir -p src
+mv acme_utils src/
+
+# 3. Remove setup.py (or keep as shim for legacy tool compat)
+cat > setup.py << 'EOF'
+from setuptools import setup
+setup()
+EOF
+
+# 4. Verify editable install
+pip install -e .
+python -c "import acme_utils; print(acme_utils.__version__)"
+
+# 5. Verify tests pass
+pytest
+
+# 6. Verify build
+python -m build
+python -m twine check dist/*
+```
+
+## GitHub Actions CI Integration
+
+```yaml
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install -e ".[dev]"
+      - run: pytest --cov=acme_utils --cov-report=term-missing
+      - run: ruff check .
+      - run: mypy src
+      - run: python -m build
+      - run: python -m twine check dist/*
+```
+
+This workflow runs lint, type checking, tests, and build verification across three Python versions. `pip install -e ".[dev]"` installs all development dependencies in one command.
+
+## Dynamic Versioning in pyproject.toml
+
+Instead of hardcoding the version in `pyproject.toml`, production projects often pull it dynamically.
+
+### setuptools-scm: Extract Version from Git Tags
+
+```toml
+[build-system]
+requires = ["setuptools>=68", "setuptools-scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "acme-utils"
+dynamic = ["version"]
+
+[tool.setuptools_scm]
+write_to = "src/acme_utils/_version.py"
+```
+
+```bash
+git tag v0.1.0
+python -m build
+# Version 0.1.0 is automatically set at build time
+```
+
+### hatchling Dynamic Version
+
+```toml
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[project]
+name = "acme-utils"
+dynamic = ["version"]
+
+[tool.hatch.version]
+source = "vcs"
+```
+
+### Reading Version in __init__.py
+
+```python
+# src/acme_utils/__init__.py
+try:
+    from ._version import __version__
+except ImportError:
+    __version__ = "0.0.0+unknown"
+```
+
+With this pattern, the Git tag becomes the single source of truth for versioning. The version in `pyproject.toml`, `__init__.py`, and the Git tag always stay in sync.
+
+## Package Structure in a Monorepo
+
+Monorepo structures with multiple packages in a single repository are common in production.
+
+```text
+monorepo/
+├── packages/
+│   ├── acme-core/
+│   │   ├── src/acme_core/
+│   │   ├── tests/
+│   │   └── pyproject.toml
+│   ├── acme-auth/
+│   │   ├── src/acme_auth/
+│   │   ├── tests/
+│   │   └── pyproject.toml
+│   └── acme-cli/
+│       ├── src/acme_cli/
+│       ├── tests/
+│       └── pyproject.toml
+├── pyproject.toml              # root: dev tool config only
+└── Makefile
+```
+
+```toml
+# packages/acme-auth/pyproject.toml
+[project]
+name = "acme-auth"
+dependencies = [
+    "acme-core",  # reference another package in the same monorepo
+]
+```
+
+```bash
+# Install all packages as editable during development
+pip install -e packages/acme-core
+pip install -e packages/acme-auth
+pip install -e packages/acme-cli
+```
+
+## EditorConfig and Dev Tool Configuration
+
+Beyond `pyproject.toml`, the project root needs configuration files that keep the development experience consistent across team members.
+
+```text
+acme-utils/
+├── .editorconfig           # editor-agnostic settings
+├── .gitignore              # Git ignore patterns
+├── .pre-commit-config.yaml # automated checks before commit
+└── pyproject.toml          # all Python tool config unified
+```
+
+```ini
+# .editorconfig
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+charset = utf-8
+indent_style = space
+indent_size = 4
+
+[*.{yml,yaml,toml}]
+indent_size = 2
+```
+
+```yaml
+# .pre-commit-config.yaml
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.5.5
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+```
+
+These configurations reduce code style differences between team members and eliminate time spent on formatting issues during code review.
+
 ## Answering the Opening Questions
 
 - **What's the difference between flat layout and src layout?**
