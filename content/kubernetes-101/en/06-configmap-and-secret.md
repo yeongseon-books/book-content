@@ -167,16 +167,53 @@ kubectl exec deploy/web -- env | grep 'LOG_LEVEL\|DB_PASSWORD'
 
 ## How This Shows Up in Production
 
-The *External Secrets Operator* keeps *Vault / AWS Secrets Manager* as the *source of truth* and *syncs cluster Secrets* automatically.
+The External Secrets Operator keeps Vault / AWS Secrets Manager as the source of truth and syncs cluster Secrets automatically. ConfigMaps are typically managed in Git alongside Deployment manifests.
+
+### Secret Management Maturity Levels
+
+| Level | Practice | Risk |
+| --- | --- | --- |
+| 0 | Plain secrets in Git | One leak exposes everything |
+| 1 | Sealed Secrets (encrypted in Git) | Key rotation still manual |
+| 2 | External Secrets Operator + Vault | Centralized, auditable, auto-rotated |
+| 3 | Workload Identity + short-lived tokens | No static secrets at all |
+
+Most teams should target Level 2 minimum for production workloads.
+
+### ConfigMap Change and Restart Pattern
+
+```bash
+# After updating a ConfigMap, trigger a rollout restart
+kubectl rollout restart deployment/api -n prod
+kubectl rollout status deployment/api -n prod
+```
+
+Volume-mounted ConfigMaps auto-sync (kubelet sync period, ~60s), but env-var-based injection requires a Pod restart. Know which pattern your app uses.
+
+### RBAC for Secrets
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: secret-reader
+  namespace: prod
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get"]
+    resourceNames: ["db-credentials"]  # least privilege
+```
+
+Never grant blanket `secrets` access. Scope by namespace and `resourceNames`.
 
 ## How a Senior Engineer Thinks
 
-- *Secrets* are *base64*, not *encryption*.
-- The *external manager* is the *source of truth*.
-- *RBAC* is the *last line of defense*.
-- *Change means restart*.
-- *Per-environment ConfigMap* gives *reproducibility*.
-
+- Secrets are base64, not encryption — enable etcd encryption at rest.
+- The external manager (Vault, AWS SM) is the source of truth; cluster Secrets are synced copies.
+- RBAC on Secrets is the last line of defense — audit who can read them.
+- Config change means restart (for env vars); plan accordingly.
+- Per-environment ConfigMaps give reproducibility without per-env images.
 ## Checklist
 
 - [ ] No *plain Secrets* in *Git*.
