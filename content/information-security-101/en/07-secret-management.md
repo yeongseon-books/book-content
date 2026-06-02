@@ -167,15 +167,106 @@ Rotation must be automated.
 
 ## How This Shows Up in Production
 
-Kubernetes uses `Secret` plus External Secrets Operator (ESO) to sync from vault. CI/CD federates with OIDC to mint short-lived credentials and removes static keys. AWS issues per-instance short-lived credentials through IAM Roles and STS.
+### Secret Management Tools Compared
+
+| Criterion | HashiCorp Vault | AWS Secrets Manager |
+| --- | --- | --- |
+| Deployment | Self-hosted / HCP managed | AWS fully managed |
+| Strength | Dynamic secrets, fine-grained policy, multi-cloud | Native AWS integration, easy rotation automation |
+| Ops burden | Cluster ops/backup/upgrade required | Relatively low |
+| Best fit | Hybrid cloud, advanced policy needs | AWS-centric workloads |
+
+The real question is not "which is more secure" but "which can our team operate consistently."
+
+### Rotation Period Strategy
+
+| Secret type | Recommended rotation | Rationale |
+| --- | --- | --- |
+| API keys | 90 days | Large blast radius on leak |
+| Database passwords | 30 days | Core asset access |
+| TLS certificates | 90 days (Let's Encrypt default) | Automated renewal expected |
+| SSH keys | 180 days or per-use | Infrastructure access path |
+| OAuth refresh tokens | 7 days | Session continuity vs. security balance |
+
+Rotation period = f(sensitivity, blast radius, rotation cost). Shorter is safer but costlier to operate.
+
+### Automated Rotation (Python + Vault)
+
+```python
+# rotation_example.py
+import secrets, string
+import hvac
+
+def generate_strong_password(length: int = 32) -> str:
+    alphabet = string.ascii_letters + string.digits + string.punctuation
+    return ''.join(secrets.choice(alphabet) for _ in range(length))
+
+def rotate_db_password(vault: hvac.Client, db_conn, path: str):
+    new_pw = generate_strong_password()
+    db_conn.execute("ALTER USER app_user WITH PASSWORD %s", (new_pw,))
+    vault.secrets.kv.v2.create_or_update_secret(
+        path=path,
+        secret={"password": new_pw, "rotated_at": "2026-05-21T10:00:00Z"},
+    )
+    # Signal app reload (K8s rolling restart, Lambda env update, etc.)
+```
+
+Automated rotation must be code, not a runbook entry. Only automation is fast enough during a real incident.
+
+### Secret Leak Detection
+
+```python
+# secret_leak_monitor.py
+import re
+
+PATTERNS = [
+    r"AKIA[0-9A-Z]{16}",                    # AWS Access Key
+    r"eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}",  # JWT
+    r"password\s*[:=]\s*['\"][^'\"]{8,}",  # password= pattern
+]
+
+def scan_for_secrets(line: str) -> bool:
+    return any(re.search(p, line, re.IGNORECASE) for p in PATTERNS)
+```
+
+Integrate truffleHog / git-secrets / detect-secrets at both pre-commit and CI. Secrets in logs, Slack, git history, or exception trackers must trigger alerts automatically.
+
+### Vault Policy Example
+
+```hcl
+# vault-policy: app-read-db
+path "kv/data/myapp/db" {
+  capabilities = ["read"]
+}
+```
+
+```yaml
+# AppRole config
+approle:
+  role_name: myapp
+  token_ttl: 30m
+  token_max_ttl: 2h
+  secret_id_ttl: 24h
+```
+
+Policy grants minimal path-level access; tokens are short-lived by default.
+
+### Operational Checklist
+
+- Every secret has an owner field and rotation schedule.
+- Unused secrets are auto-detected and decommissioned.
+- Secret access events flow to SIEM.
+- Dev/staging/prod secrets are fully isolated.
+- Emergency rotation is validated via automation, not just documented.
 
 ## How a Senior Engineer Thinks
 
-- Every secret has an expiry.
-- Secret management is co-designed with identity (IAM).
-- `.env` is for local development only.
-- Time-to-rotate after an incident is an SLO (e.g., under one hour).
-- Secret scanners run at both pre-commit and CI.
+- Every secret has an expiry — no exceptions.
+- Secret management is co-designed with IAM (identity = the requester of secrets, not the holder).
+- `.env` is local-dev only; CI/CD uses OIDC-federated short-lived credentials.
+- Time-to-rotate after incident is an SLO (target: under 1 hour).
+- Secret scanners run at pre-commit and CI; findings block merge.
+- Good systems have no static secrets in code — identity requests secrets at runtime.
 
 ## Checklist
 
