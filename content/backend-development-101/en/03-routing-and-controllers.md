@@ -194,16 +194,48 @@ Controllers stay *thin* — validate, then delegate.
 
 ## How This Shows Up in Production
 
-Large backends have one router directory per domain (`routers/orders.py`, `routers/payments.py`). When a new feature lands, you only decide *which router* gains *which path*. That single rule extends the lifespan of a codebase by years.
+Large backends have one router directory per domain (`routers/orders.py`, `routers/payments.py`). When a new feature lands, you only decide *which router* gains *which path*.
+
+### Four Production Incident Scenarios
+
+**1. The 200-line handler.** Auth, parsing, validation, business logic, external calls, and error mapping all in one function. One change causes regression. Fix: extract service layer, leave controller as orchestration-only.
+
+**2. Auth applies to some routes but not others.** Global middleware forces awkward exceptions. Fix: separate routers with explicit dependencies:
+
+```python
+private_router = APIRouter(prefix="/users", dependencies=[Depends(get_current_user)])
+public_router = APIRouter(prefix="/users")  # no auth dependency
+```
+
+**3. URL collision across teams.** Two developers declare the same path independently. Code review alone won't catch it. Fix: maintain a router registration table, run OpenAPI spec diff in CI, keep a single `include_router` assembly file.
+
+**4. 422 log explosion from path type mismatch.** Clients send strings to `int` path params. Server correctly returns 422, but dashboards show an error spike. Fix: monitor 422 rate separately (it's a client contract violation, not server instability), and enforce client-side SDK validation.
+
+### Team Routing Convention Table
+
+| Aspect | Rule | Enforcement |
+| --- | --- | --- |
+| Resource naming | Plural nouns (`users`, `orders`) | Code review checklist |
+| Path parameters | Identifiers only (`{user_id}`) | Type hints + tests |
+| Query parameters | Filter/sort/page only | OpenAPI param inspection |
+| Create/update input | Body model required | Pydantic schema check |
+| Controller length | 30–50 lines max | Static analysis + review |
+| Router assembly | Single entry-point file | CI duplicate-path check |
+
+### Observability Implications of Routing Design
+
+- **Log cardinality**: Excessive path variables explode metric label cardinality.
+- **Cache efficiency**: Unbounded query combinations kill cache hit rates.
+- **Error classification**: Clean 4xx/5xx separation in controllers improves alert signal quality.
+- **Traceability**: Domain-router-level tags make OpenTelemetry span analysis straightforward.
 
 ## How a Senior Engineer Thinks
 
-- URLs are *nouns*; actions are HTTP *methods*.
-- A controller fits on one screen.
-- Inputs are *always* modeled with Pydantic.
-- Auth and logging middleware attach at the router level.
-- Before adding a new endpoint, ask whether an existing one can be extended.
-
+- **URLs are nouns; actions are HTTP methods.** `POST /orders` not `POST /createOrder`. This isn't pedantry—it's what keeps 50+ endpoints consistent across a team.
+- **A controller fits on one screen.** If you scroll, the handler is doing too much. Extract to service, test the service independently.
+- **Inputs are always modeled with Pydantic.** Untyped `dict` inputs produce meaningless OpenAPI docs and force consumers to guess. Type declarations ARE the contract.
+- **Auth and logging attach at the router level.** Not per-handler, not globally. Router-scoped dependencies make policy visible in the code structure.
+- **Before adding an endpoint, ask if an existing one can be extended.** Query params and body fields are cheaper than new endpoints. Fewer endpoints = fewer things to version, document, and monitor.
 ## Checklist
 
 - [ ] You can distinguish path, query, and body parameters.
