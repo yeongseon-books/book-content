@@ -152,7 +152,83 @@ print(meta)
 
 ## How This Shows Up in Production
 
-Data teams run collection scripts in *Airflow / dbt*. Every load adds *load_id, fetched_at, source* columns. The *data dictionary* lives in *Notion or Confluence* and updates with every PR.
+Data teams run collection scripts inside orchestrators like Airflow or dbt. Every load appends metadata columns — `load_id`, `fetched_at`, `source` — so any row can be traced back to its extraction run. The data dictionary lives in Notion or Confluence and updates with every PR.
+
+### Collection Channel Comparison
+
+| Channel | Strengths | Weaknesses | Best For | Watch Out |
+| --- | --- | --- | --- | --- |
+| CSV / Parquet | Quick start, portable | Version confusion, manual corruption | PoC, external handoff | Keep originals immutable; version filenames |
+| REST API | Fresh data on demand | Auth / quota / format drift | SaaS integration | Retry + backoff + schema validation |
+| Database | Flexible queries, high trust | Can overload prod | Structured aggregations | Use read replica; log every query |
+| Event log | Rich behavioral context | Schema drift is frequent | Funnel / session analysis | Enforce event-version column |
+
+### API Collection Pattern — Retry and Validate
+
+```python
+import requests
+import pandas as pd
+from time import sleep
+
+url = "https://api.example.com/v1/orders"
+rows = []
+for page in range(1, 6):
+    for attempt in range(3):
+        r = requests.get(url, params={"page": page}, timeout=10)
+        if r.status_code == 200:
+            rows.extend(r.json().get("items", []))
+            break
+        sleep(1.5 * (attempt + 1))
+
+df = pd.DataFrame(rows)
+required = {"order_id", "user_id", "amount", "created_at"}
+missing = required - set(df.columns)
+if missing:
+    raise ValueError(f"schema mismatch: {missing}")
+```
+
+The key is designing for failure, not success. Collection stability comes from retries, timeouts, and schema checks — not from hoping the endpoint always returns 200.
+
+### DB Collection Pattern — Query + Metadata Together
+
+```python
+from sqlalchemy import create_engine
+import pandas as pd
+import datetime as dt
+
+query = """
+SELECT user_id, plan, amount, paid_at
+FROM payments
+WHERE paid_at >= '2026-05-01' AND paid_at < '2026-06-01'
+"""
+
+engine = create_engine("postgresql://reader:***@replica/warehouse")
+df = pd.read_sql(query, engine)
+
+meta = {
+    "query_name": "payments_monthly_window",
+    "fetched_at": dt.datetime.utcnow().isoformat(),
+    "row_count": int(len(df)),
+}
+print(meta)
+```
+
+Saving just the result makes reproduction impossible later. Record *which query* and *which point in time* produced the result.
+
+### Event Log Defensive Strategies
+
+- Require an event-schema-version column on every record.
+- Route records missing `event_name` or `event_ts` to a quarantine table.
+- Set daily alerts on null rates for key columns (`user_id`, `session_id`).
+- Track missing-key rates on a dashboard rather than discovering them during analysis.
+
+### Operational Checklist
+
+- [ ] Original store and analysis store are separated.
+- [ ] Extraction queries and parameters are version-controlled.
+- [ ] API error rates and retry counts are logged.
+- [ ] Collection failures trigger alerts with a reprocessing path.
+- [ ] Sensitive-data masking rules are enforced before data leaves the pipeline.
 
 ## How a Senior Engineer Thinks
 
@@ -161,6 +237,7 @@ Data teams run collection scripts in *Airflow / dbt*. Every load adds *load_id, 
 - Catch *schema changes* with *alerts*.
 - Mask *sensitive data* before analysis.
 - The *data dictionary* is your best documentation.
+- Collection completeness is measured by reproducibility, not volume.
 
 ## Checklist
 
