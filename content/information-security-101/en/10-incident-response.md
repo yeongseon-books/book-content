@@ -173,15 +173,98 @@ Procedures that are not practiced do not work in the real thing.
 
 ## How This Shows Up in Production
 
-PagerDuty/Opsgenie auto-assigns the IC. Slack workflows create the incident channel automatically. AWS wires GuardDuty findings into an IR workflow (EventBridge -> Lambda -> isolate). Postmortems are standardized in Notion or Confluence templates.
+### Incident Response Maturity Model
+
+| Level | Characteristics | Limitation | Next goal |
+| --- | --- | --- | --- |
+| 1 — Initial | Ad-hoc response, unclear ownership | Detection/response delays, evidence destroyed | Draft runbooks, assign IC |
+| 2 — Managed | Runbooks for major scenarios, channel standardized | Lacks automation, depends on individuals | Partial alert-to-isolation automation |
+| 3 — Defined | Severity framework, drills, retro loop established | Cross-team bottlenecks in complex incidents | Joint exercises, metric improvement |
+| 4 — Optimized | Automation + learning loops + metric-driven improvement | Maintenance cost rises | Regular re-validation and simplification |
+
+The model’s purpose is investment prioritization, not scoring. A Level 1 org needs channel standardization and timeline habits before advanced forensic tooling.
+
+### Reporting Obligations
+
+| Audience | Trigger | Deadline | Basis |
+| --- | --- | --- | --- |
+| Executive team | SEV1 incident | Immediate | Internal policy |
+| Customers | Personal data breach | Within 72 hours | GDPR, local privacy law |
+| Regulator | Financial data breach | Immediate–72 h | PCI-DSS, financial authority |
+| Cyber center | Large-scale breach | Immediate | National cyber law |
+| Partners/vendors | Supply-chain compromise | Per contract | SLA terms |
+
+Obligations vary by industry and jurisdiction. External communication must go through legal review.
+
+### Response Automation Example
+
+```python
+# incident_automation.py
+from datetime import datetime, timezone
+
+def start_incident(severity: str, summary: str) -> dict:
+    inc_id = datetime.now(timezone.utc).strftime("INC-%Y%m%d-%H%M%S")
+    return {
+        "incident_id": inc_id,
+        "severity": severity,
+        "summary": summary,
+        "channel": f"#inc-{inc_id.lower()}",
+    }
+
+def containment_actions(user_id: str) -> list[str]:
+    return [
+        f"revoke_sessions:{user_id}",
+        f"rotate_credentials:{user_id}",
+        f"snapshot_logs:{user_id}:24h",
+    ]
+```
+
+Automation handles mechanical first-30-minute tasks so humans have time to think.
+
+### Comprehensive IR Checklist (YAML)
+
+```yaml
+prepare:
+  - incident_commander_assigned: true
+  - severity_matrix_documented: true
+  - runbooks_for_top5_scenarios: true
+  - legal_pr_contact_on_call: true
+detect:
+  - critical_alerts_tested_weekly: true
+  - mttd_slo_defined: true
+contain:
+  - session_revoke_automation: true
+  - network_isolation_playbook: true
+  - evidence_snapshot_procedure: true
+eradicate_recover:
+  - root_cause_template: true
+  - credential_rotation_automation: true
+  - mttr_slo_defined: true
+lessons:
+  - blameless_postmortem_template: true
+  - action_items_with_owner_and_due: true
+  - control_improvement_tracking: true
+```
+
+Review quarterly as Pass/Fail; Fail items become tickets with owners and deadlines.
+
+### Key Metrics
+
+- **MTTD** (Mean Time to Detect): anomaly onset → awareness
+- **MTTA** (Mean Time to Acknowledge): awareness → command structure activated
+- **MTTR** (Mean Time to Recover): containment → service restored
+- **Recurrence rate**: same root cause repeating
+
+Metrics are not report decoration — they’re input to next quarter’s control improvements.
 
 ## How a Senior Engineer Thinks
 
-- Write runbooks in peacetime; validate them with game days.
-- Automate the first 30 minutes (isolation, alerts).
+- Write runbooks in peacetime; validate with game days.
+- Automate the first 30 minutes (isolation, credential rotation, log snapshot).
 - Keep severity levels clear and the call tree current.
 - Protect people in postmortems; fix systems.
-- Action items have an owner and a due date.
+- Action items always have an owner and a due date — no orphan findings.
+- External comms flow through one channel with legal sign-off.
 
 ## Checklist
 
