@@ -272,6 +272,316 @@ When writing exception tests, think from the perspective: "This function *must* 
 
 pytest's assert is readable and provides detailed failure information. `pytest.raises` and `pytest.approx` are essential tools for exception and floating-point testing. Next, we'll learn about fixtures for managing test data.
 
+## Making Failure Messages an Asset: How to Write assert Statements
+
+An `assert` determines team productivity not when it passes, but when it fails. Writing assertions so that failure messages are immediately actionable is what matters.
+
+```python
+# tax.py
+
+def calc_tax(amount: int, rate: float) -> int:
+    if amount < 0:
+        raise ValueError("amount must be >= 0")
+    if not 0 <= rate <= 1:
+        raise ValueError("rate must be between 0 and 1")
+    return int(amount * rate)
+```
+
+```python
+# test_tax.py
+import pytest
+from tax import calc_tax
+
+@pytest.mark.parametrize(
+    "amount,rate,expected",
+    [
+        (10000, 0.1, 1000),
+        (0, 0.2, 0),
+        (5500, 0.08, 440),
+    ],
+)
+def test_calc_tax(amount, rate, expected):
+    assert calc_tax(amount, rate) == expected
+
+def test_calc_tax_rejects_negative_amount():
+    with pytest.raises(ValueError, match=r"amount must be >= 0"):
+        calc_tax(-1, 0.1)
+
+def test_calc_tax_rejects_bad_rate():
+    with pytest.raises(ValueError, match="between 0 and 1"):
+        calc_tax(1000, 1.5)
+```
+
+## Reading Causes from pytest Output
+
+```bash
+pytest test_tax.py -v
+```
+
+```text
+test_tax.py::test_calc_tax[10000-0.1-1000] PASSED
+...
+========================= 5 passed =========================
+```
+
+Intentionally introduce a failure to see how the output differs.
+
+```python
+def test_calc_tax():
+    assert calc_tax(10000, 0.1) == 1200
+```
+
+```text
+E       assert 1000 == 1200
+E        +  where 1000 = calc_tax(10000, 0.1)
+```
+
+## Frequently Missed Points in Exception Testing
+
+| Item | Bad Example | Good Example |
+|---|---|---|
+| Type verification | `with pytest.raises(Exception)` | `with pytest.raises(ValueError)` |
+| Message verification | Only check exception type | `match="between 0 and 1"` |
+| Scope | Block is too large | Place only the exception-raising line in the block |
+
+```python
+# Bad: block too large, other errors get mixed in
+with pytest.raises(ValueError):
+    x = calc_tax(1000, 0.1)
+    y = x / 0
+```
+
+```python
+# Good
+with pytest.raises(ValueError, match="between 0 and 1"):
+    calc_tax(1000, 1.5)
+```
+
+## Floating-Point Comparison Patterns in Practice
+
+```python
+import pytest
+
+def test_discount_ratio():
+    ratio = 1 - (90 / 100)
+    assert ratio == pytest.approx(0.1)
+
+def test_vector_ratios():
+    values = [1 / 3, 2 / 3]
+    assert values == pytest.approx([0.333333, 0.666667], rel=1e-5)
+```
+
+## Before and After: Strengthening assert Messages
+
+```python
+# before
+assert total > 0
+```
+
+```python
+# after
+assert total > 0, f"total must be positive, got={total}, items={items}"
+```
+
+The latter's failure message reduces reproduction time.
+
+## Patterns for Expressive Assertions
+
+### String Comparison
+
+```python
+
+def render_title(name: str) -> str:
+    return f"[USER] {name.strip()}"
+
+def test_render_title():
+    assert render_title(" Alice ") == "[USER] Alice"
+```
+
+### Collection Comparison
+
+```python
+
+def ids(users):
+    return [u["id"] for u in users]
+
+def test_ids():
+    data = [{"id": 1}, {"id": 2}]
+    assert ids(data) == [1, 2]
+```
+
+### Exception and Message Verification
+
+```python
+import pytest
+
+def parse_qty(value: str) -> int:
+    qty = int(value)
+    if qty <= 0:
+        raise ValueError("qty must be positive")
+    return qty
+
+def test_parse_qty_error_message():
+    with pytest.raises(ValueError, match="positive"):
+        parse_qty("0")
+```
+
+## Red/Green Output Example
+
+```bash
+pytest -v test_parse_qty.py
+```
+
+```text
+test_parse_qty.py::test_parse_qty_error_message PASSED
+```
+
+If the expected message is wrong, the test fails immediately.
+
+```text
+E   AssertionError: Regex pattern did not match.
+```
+
+## Before and After: Removing try/except
+
+```python
+# before
+try:
+    parse_qty("0")
+    assert False
+except ValueError:
+    pass
+```
+
+```python
+# after
+with pytest.raises(ValueError, match="positive"):
+    parse_qty("0")
+```
+
+## Practical Check Items
+
+- Did you verify the error type specifically?
+- Did you verify the message to lock in intent?
+- Did you use `pytest.approx` for floating-point comparisons?
+- Does the assert failure message preserve the inputs needed for reproduction?
+
+## Terminal Option Combinations
+
+| Command | Purpose |
+|---|---|
+| `pytest -q` | Quick pass/fail summary |
+| `pytest -v` | Per-case pass/fail detail |
+| `pytest -x` | Stop immediately on first failure |
+| `pytest -k "keyword"` | Run only matching subset |
+| `pytest --maxfail=3` | Limit maximum failure count |
+
+## Operational Regression Test Template
+
+```python
+import pytest
+
+BUG_CASES = [
+    ("", ValueError),
+    ("   ", ValueError),
+    (None, TypeError),
+]
+
+@pytest.mark.parametrize("raw,exc", BUG_CASES)
+def test_regression_cases(raw, exc):
+    with pytest.raises(exc):
+        require_non_empty(raw)
+```
+
+This template is the simplest form of permanently preserving bug tickets as test code.
+
+## Quality Check Questions
+
+- Can you infer the failure cause from the failure message alone?
+- Do tests depend on execution order?
+- Are boundary-value inputs included?
+- Are both happy and error paths verified?
+- Does adding a test case require only adding data, not copying functions?
+
+## Case Study: Common Improvement Points in PR Reviews
+
+### Code Example
+
+```python
+# app/discount.py
+
+def discount_price(price: int, rate: float) -> int:
+    if price < 0:
+        raise ValueError("price must be >= 0")
+    if not 0 <= rate <= 1:
+        raise ValueError("rate must be between 0 and 1")
+    return int(price * (1 - rate))
+```
+
+```python
+# tests/test_discount.py
+import pytest
+from app.discount import discount_price
+
+@pytest.mark.parametrize(
+    "price,rate,expected",
+    [
+        (10000, 0.0, 10000),
+        (10000, 0.1, 9000),
+        (10000, 1.0, 0),
+    ],
+)
+def test_discount_price(price, rate, expected):
+    assert discount_price(price, rate) == expected
+
+@pytest.mark.parametrize("price,rate", [(-1, 0.1), (1000, -0.1), (1000, 1.1)])
+def test_discount_price_invalid(price, rate):
+    with pytest.raises(ValueError):
+        discount_price(price, rate)
+```
+
+### Output Example
+
+```bash
+pytest tests/test_discount.py -v
+```
+
+```text
+tests/test_discount.py::test_discount_price[10000-0.0-10000] PASSED
+tests/test_discount.py::test_discount_price[10000-0.1-9000] PASSED
+tests/test_discount.py::test_discount_price[10000-1.0-0] PASSED
+tests/test_discount.py::test_discount_price_invalid[-1-0.1] PASSED
+tests/test_discount.py::test_discount_price_invalid[1000--0.1] PASSED
+tests/test_discount.py::test_discount_price_invalid[1000-1.1] PASSED
+========================= 6 passed =========================
+```
+
+### Review Points
+
+- Are boundary values (`0`, `1.0`) included?
+- Are exception types specific?
+- Can you identify the cause from the failure message?
+- Is the structure extensible by adding data alone, without copying functions?
+
+## Mini Checklist
+
+- Maintain at least 3 failure cases.
+- Include boundary values (min/max/empty).
+- Confirm failure messages are meaningful.
+- Verify the same command reproduces in CI.
+
+## Quick Verification
+
+```bash
+pytest -q
+```
+
+```text
+PASS
+```
+
+Tests must leave execution results and preserve failure inputs in reproducible form so the same problem never resurfaces in production.
+
 ## Answering the Opening Questions
 
 - **Why does pytest's `assert` provide more readable failure messages?**
