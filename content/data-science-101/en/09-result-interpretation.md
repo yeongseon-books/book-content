@@ -129,7 +129,42 @@ Decision: roll out to 100% paid desktop users; monitor for 2 more weeks.
 
 ## How This Shows Up in Production
 
-Data team weekly reviews follow a *number → context → confidence interval → decision* template. *Pre-registration* of hypotheses (writing them down before the analysis) protects against *cherry-picking*.
+Data team weekly reviews follow a *number → context → confidence interval → decision* template. Pre-registration of hypotheses (writing them down before the analysis) protects against cherry-picking.
+
+### Feature Importance → Decision Sentence Flow
+
+```python
+from sklearn.inspection import permutation_importance
+import pandas as pd
+
+result = permutation_importance(model, X_valid, y_valid, n_repeats=10, random_state=42)
+imp = pd.DataFrame({
+    "feature": X_valid.columns,
+    "importance": result.importances_mean,
+}).sort_values("importance", ascending=False)
+print(imp.head(10))
+```
+
+Importance scores alone do not produce decisions. Pair them with interpretation sentences:
+
+- **Observation**: "High-risk cohort shows steep drop in 14-day session count."
+- **Evidence**: "`days_since_last_login` has largest mean SHAP contribution."
+- **Limitation**: "Mobile new-user segment has small sample — high uncertainty."
+- **Decision**: "Re-engagement message targets web users in top cohort first."
+
+### Interpretation Quality Checklist
+
+- Effect size and uncertainty are written together.
+- Single-segment results are not generalized to the full population.
+- Counter-examples / edge cases are inspected separately.
+- Interpretation ends with an actionable recommendation.
+- Next validation experiment plan is included.
+
+### Pre-Share Final Check
+
+1. Result figure and reference period appear in the same sentence.
+2. Abbreviations that could mislead the reader are removed.
+3. Action owner and re-check date are stated explicitly.
 
 ## How a Senior Engineer Thinks
 
@@ -138,7 +173,7 @@ Data team weekly reviews follow a *number → context → confidence interval �
 - Watch *effect size* more than *p-value*.
 - *Split by segment* to expose variance.
 - Make the *review template* a *team asset*.
-
+- Good interpretation connects evidence, constraint, and action in one paragraph.
 ## Checklist
 
 - [ ] I can write a *confidence interval*.
