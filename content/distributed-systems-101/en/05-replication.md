@@ -162,15 +162,104 @@ Most DBs expose LSN/GTID/offset. Tracking lag as an SLO catches stale reads earl
 
 ## How This Shows Up in Production
 
-PostgreSQL and MySQL use leader-follower by default. Cassandra and DynamoDB are leaderless quorum systems. CRDT-based systems are multi-leader. Cloud multi-AZ DBs typically blend sync to one AZ with async to another.
+### Read Consistency as an API Contract
+
+Expose consistency level in the API so callers pick their own tradeoff:
+
+| Workload | Consistency | Rationale |
+|----------|-------------|-----------|
+| Payment balance | strong | Real-time accuracy required |
+| Dashboard list | bounded (2 s) | Slight delay acceptable, load balancing needed |
+| Recommendation feed | eventual | Multi-second staleness causes no complaints |
+| Admin audit log | strong | Must not miss recent events |
+
+```python
+# read_consistency.py
+from enum import Enum
+from fastapi import FastAPI, Query
+
+app = FastAPI()
+
+class ReadConsistency(str, Enum):
+    STRONG = "strong"       # read from leader only
+    BOUNDED = "bounded"     # max N seconds stale
+    EVENTUAL = "eventual"   # any healthy replica
+
+@app.get("/items/{key}")
+async def read_item(key: str, consistency: ReadConsistency = Query(default=ReadConsistency.BOUNDED)):
+    if consistency == ReadConsistency.STRONG:
+        return await read_from_leader(key)
+    elif consistency == ReadConsistency.BOUNDED:
+        follower = select_follower_within_lag(max_lag_seconds=2)
+        return await read_from_node(follower, key)
+    else:
+        return await read_from_node(select_any_healthy_follower(), key)
+```
+
+### Failover Promotion Policy
+
+```yaml
+failover_policy:
+  promotion:
+    require_sync_replica: true
+    max_allowed_lag_lsn: 200
+    max_allowed_apply_delay_seconds: 1
+  split_brain_guard:
+    fencing: required
+    method: disable_old_leader_write_via_stonith
+  recovery:
+    rejoin_old_leader_as_follower: true
+    full_resync_if_lag_lsn_gt: 50000
+```
+
+Four operational principles:
+
+1. **Fence first** — block old leader writes before opening new leader to prevent split-brain.
+2. **Promote freshest** — only candidates within lag threshold to minimize data regression.
+3. **Verify after promotion** — automated read-after-write and row-count checks.
+4. **Old leader rejoins as follower** — never re-promote immediately; resync first.
+
+### Chain Replication (Alternative Topology)
+
+```text
+Client Write -> [Head] -> [Middle] -> [Tail]
+                                        |
+                              ack after Tail persist
+Client Read  -> [Tail]
+```
+
+- Write order forced by chain order — simple conflict handling.
+- Tail-only reads eliminate stale-read risk structurally.
+- Node failure requires explicit chain reorganization (easy to automate in runbooks).
+- Downside: tail becomes read bottleneck; longer chains accumulate write latency.
+
+### Follower Health and Auto-Eviction
+
+Followers exceeding lag threshold must be removed from the read pool automatically:
+
+```python
+MAX_ACCEPTABLE_LAG = 3.0  # seconds
+
+def healthy_followers() -> list[str]:
+    return [name for name, s in STATUS.items() if s["lag_seconds"] <= MAX_ACCEPTABLE_LAG]
+
+def select_follower_within_lag(max_lag_seconds: float) -> str:
+    candidates = [n for n, s in STATUS.items() if s["lag_seconds"] <= max_lag_seconds]
+    if not candidates:
+        return "leader"  # fallback
+    return min(candidates, key=lambda n: STATUS[n]["lag_seconds"])
+```
+
+Monitor the leader-fallback rate — a spike signals replication infrastructure problems.
 
 ## How a Senior Engineer Thinks
 
-- They write replication settings down explicitly in docs.
-- They expose read-from-replica as a separate endpoint with a documented staleness limit.
-- They keep at least two sync replicas to avoid a single slow point.
-- They design application-level merge instead of relying on LWW.
-- They track lag with an SLO and alert on it.
+- Write replication settings explicitly in operational docs — never leave them to "defaults."
+- Expose read-from-replica as a separate endpoint with a documented staleness SLO.
+- Keep at least two sync replicas to avoid a single slow follower blocking writes.
+- Design application-level merge (not LWW) for multi-leader — LWW silently drops user input on clock drift.
+- Track replication lag with a Prometheus histogram and alert before bounded-staleness thresholds breach.
+- On failover, fence the old leader first, promote second — never the other way around.
 
 ## Checklist
 
