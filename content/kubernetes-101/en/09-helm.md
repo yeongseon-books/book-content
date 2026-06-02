@@ -155,16 +155,68 @@ helm history web
 
 ## How This Shows Up in Production
 
-Combined with *GitOps*, a *values change* alone drives *PR-based* deploys.
+Combined with *GitOps*, a values-file change drives PR-based deploys: merge the PR, let ArgoCD/Flux sync, Helm upgrade runs automatically. No `kubectl apply` by hand in production.
+
+### Pre-Deploy Verification Routine
+
+```bash
+helm lint charts/api
+helm template api charts/api -f values-prod.yaml > rendered.yaml
+kubectl apply --dry-run=server -f rendered.yaml   # catches schema errors
+helm upgrade --install api charts/api -n prod -f values-prod.yaml --atomic
+helm history api -n prod
+```
+
+`helm template` output should be human-reviewed before merge. Template conditionals silently omit fields in certain environments—dry-run catches what linting misses.
+
+### Values File Design
+
+```yaml
+# values-prod.yaml — only environment-specific overrides
+image:
+  repository: ghcr.io/example/api
+  tag: 1.4.0
+resources:
+  requests:
+    cpu: 200m
+    memory: 256Mi
+  limits:
+    cpu: 600m
+    memory: 512Mi
+ingress:
+  enabled: true
+  host: api.example.com
+```
+
+Keep values files thin: only what differs between environments. Defaults live in `values.yaml` inside the chart. If a value is the same everywhere, it's not a value—it's a chart default.
+
+### Rollback Strategy
+
+| Situation | Action |
+| --- | --- |
+| Bad deploy caught within minutes | `helm rollback api <revision> -n prod` |
+| Need to compare what changed | `helm get values api -n prod --revision N` vs `--revision N-1` |
+| Atomic deploy failed mid-way | Helm auto-reverts (that's what `--atomic` does) |
+| Secret was exposed in values | Rotate secret immediately, `--atomic` won't help |
+
+### Helm + GitOps Flow
+
+```text
+Developer changes values-prod.yaml
+  → Opens PR, CI runs helm lint + template + dry-run
+  → Reviewer checks rendered diff
+  → Merge → ArgoCD detects drift
+  → helm upgrade --atomic executes
+  → Rollout succeeds or auto-reverts
+```
 
 ## How a Senior Engineer Thinks
 
-- *Chart* is a *shared contract*.
-- *Values* should hold only *environment differences*.
-- *--atomic* is the *seatbelt* for *night deploys*.
-- *Rollback* needs *practice*.
-- Delegate *Secret* handling to an *external manager*.
-
+- **Chart is a shared contract.** Once multiple teams consume your chart, breaking changes need semver discipline. Treat chart versions like library versions.
+- **Values hold only environment differences.** If you're copying 200 lines between `values-staging.yaml` and `values-prod.yaml`, extract shared defaults into the chart's `values.yaml`.
+- **`--atomic` is the seatbelt for night deploys.** Without it, a failed Helm upgrade leaves a half-applied release that requires manual intervention—at 3 AM.
+- **Rollback needs practice.** `helm rollback` is fast but meaningless if you've never tested it. Include rollback in your deployment runbook and drill quarterly.
+- **Delegate secrets to an external manager.** Helm values are stored in release history (Kubernetes Secrets by default). Use External Secrets Operator or Sealed Secrets so plaintext never enters values files.
 ## Checklist
 
 - [ ] *Chart* and *values* separated.
