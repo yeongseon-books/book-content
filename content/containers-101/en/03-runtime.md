@@ -154,15 +154,31 @@ crictl info
 
 ## How This Shows Up in Production
 
-Kubernetes nodes run containerd. Operators reach for `crictl`. Local development still leans on Docker Desktop. Embedded systems often use `podman`.
+Kubernetes nodes run containerd directly via CRI — no Docker daemon. Operators reach for `crictl`. Local development still leans on Docker Desktop. The flow from user command to running process:
+
+```text
+User/Orchestrator  →  Docker CLI or CRI client  →  containerd  →  runc  →  isolated process
+```
+
+When debugging "container won't start," the layer determines the tool: `docker logs` for Docker layer, `ctr tasks ls` for containerd, `journalctl -u containerd` for daemon issues, `crictl ps -a` for CRI/Kubernetes.
 
 ## How a Senior Engineer Thinks
 
-- Knowing the runtime layers handles half of all incidents.
-- Docker is a user tool; containerd is an operations tool.
-- OCI is the secret sauce of compatibility.
-- Default to rootless when you can.
-- Runtime upgrades affect the whole cluster.
+- Knowing the runtime layers handles half of all container incidents.
+- Docker is a developer tool; containerd is an operations tool.
+- OCI compatibility is why you can swap runtimes without rewriting images.
+- Default to rootless when possible.
+- Runtime upgrades affect the entire cluster—coordinate carefully.
+
+PR review checklist for runtime-related configs:
+
+| Check | Failing Criteria |
+| --- | --- |
+| Runtime version pinned? | Only `latest` specified |
+| Rootless justified? | Root without documented reason |
+| seccomp/AppArmor | `--security-opt seccomp=unconfined` |
+| Resource limits set? | No CPU/memory limits |
+| Health check present? | No HEALTHCHECK or livenessProbe |
 
 ## Checklist
 
@@ -180,6 +196,40 @@ Kubernetes nodes run containerd. Operators reach for `crictl`. Local development
 ## Wrap-up and Next Steps
 
 To run an image, you must build one. The next post covers Dockerfile.
+
+## Deep Dive: Network Modes and the Runtime
+
+Container failures in production often combine process execution and network connectivity issues. Understanding network modes at the runtime level is essential for real debugging.
+
+| Mode | Isolation | Performance | Use Case | Risk |
+| --- | --- | --- | --- | --- |
+| bridge | Default, NAT | Normal | Single-host services | Port mapping required |
+| host | No network isolation | Low overhead | High-perf local agents | Port conflicts |
+| none | Network disabled | N/A | Security tests, offline | No external access |
+| overlay | Multi-host virtual network | Varies | Swarm/multi-node | Operational complexity |
+
+Network setup happens *before* the process starts: containerd configures the network namespace, then runc launches the process. "App starts but can't connect" means inspect the network layer, not the app.
+
+## Layer-by-Layer Troubleshooting Playbook
+
+| Layer | Common Failures | Commands |
+| --- | --- | --- |
+| Docker | Image tag typo, port conflict, env var missing | `docker ps -a`, `docker logs` |
+| containerd | Task creation failed, snapshot error | `ctr tasks ls`, `ctr containers ls` |
+| runc | Permission/namespace init failure | `journalctl -u containerd` |
+| CRI (K8s) | kubelet ↔ runtime socket mismatch | `crictl ps -a`, `crictl inspect` |
+
+Fix: identify which layer failed first, then apply layer-specific remediation. Never mix layers during debugging.
+
+## Runtime Configuration Consistency
+
+```toml
+[plugins."io.containerd.grpc.v1.cri".containerd]
+  snapshotter = "overlayfs"
+  default_runtime_name = "runc"
+```
+
+Configuration drift across nodes creates hard-to-reproduce failures. Pin runtime config in infrastructure-as-code and validate on every node bootstrap.
 
 ## Answering the Opening Questions
 
