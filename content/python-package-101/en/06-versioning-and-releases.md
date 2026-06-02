@@ -226,6 +226,518 @@ If managing versions in two places is tedious, use `setuptools-scm`. Just tag a 
 
 The next post covers **CLI packages** — entry points and click.
 
+## SemVer (Semantic Versioning) Detailed Rules
+
+SemVer uses `MAJOR.MINOR.PATCH` format, where each number communicates the nature of the change.
+
+### Version Bump Decision Criteria
+
+| Change Type | Which to Bump | Example |
+|---|---|---|
+| Breaks existing API compat | MAJOR | `1.2.3 → 2.0.0` |
+| New feature (backward compatible) | MINOR | `1.2.3 → 1.3.0` |
+| Bug fix | PATCH | `1.2.3 → 1.2.4` |
+
+### Decision Flowchart for Practice
+
+```text
+There is a change
+    │
+    ▼
+Does it break existing user code?
+    ├── Yes → Bump MAJOR
+    │         - Function/class deleted
+    │         - Parameter name changed
+    │         - Return type changed
+    │         - Exception type changed
+    │
+    └── No → Is it a new feature?
+              ├── Yes → Bump MINOR
+              │         - New function added
+              │         - New parameter (with default)
+              │         - New class added
+              │
+              └── No → Bump PATCH
+                        - Bug fix
+                        - Performance improvement
+                        - Internal refactoring
+```
+
+### PEP 440: Python's Version Rules
+
+Python packages must follow PEP 440 format. Similar to SemVer but with additional expressions.
+
+```text
+Final releases:    1.0.0, 1.2.3
+Pre-releases:      1.0.0a1 (alpha), 1.0.0b2 (beta), 1.0.0rc1 (release candidate)
+Post-releases:     1.0.0.post1 (documentation fixes, etc.)
+Dev versions:      1.0.0.dev1 (not yet released)
+
+# Version comparison order
+1.0.0.dev1 < 1.0.0a1 < 1.0.0b1 < 1.0.0rc1 < 1.0.0 < 1.0.0.post1
+```
+
+```python
+from packaging.version import Version
+
+v1 = Version("1.0.0a1")
+v2 = Version("1.0.0")
+print(v1 < v2)  # True
+print(v1.is_prerelease)  # True
+```
+
+## How to Record Version in Code
+
+### Method 1: Static in pyproject.toml
+
+```toml
+[project]
+version = "1.2.3"
+```
+
+```python
+# src/acme_utils/__init__.py
+__version__ = "1.2.3"  # must manually sync with pyproject.toml
+```
+
+**Drawback**: Two places must be updated simultaneously.
+
+### Method 2: Dynamic Version (Single Source of Truth)
+
+```toml
+[project]
+dynamic = ["version"]
+
+[tool.setuptools.dynamic]
+version = {attr = "acme_utils.__version__"}
+```
+
+```python
+# src/acme_utils/__init__.py
+__version__ = "1.2.3"  # this is the only version source
+```
+
+### Method 3: Auto-Extract from Git Tags (setuptools-scm)
+
+```toml
+[build-system]
+requires = ["setuptools>=68", "setuptools-scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+dynamic = ["version"]
+
+[tool.setuptools_scm]
+write_to = "src/acme_utils/_version.py"
+version_scheme = "guess-next-dev"
+```
+
+```bash
+git tag v1.2.3
+python -m build
+# _version.py auto-generated at build time: __version__ = "1.2.3"
+
+# If there are commits after the tag:
+# __version__ = "1.2.4.dev3+g1234567"
+```
+
+### Method 4: hatch-vcs
+
+```toml
+[build-system]
+requires = ["hatchling", "hatch-vcs"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/acme_utils/_version.py"
+```
+
+## CHANGELOG Management
+
+### Keep a Changelog Format
+
+```markdown
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+## [Unreleased]
+
+### Added
+- New `retry` decorator for HTTP calls
+
+### Fixed
+- Connection timeout handling in `Client.get()`
+
+## [1.2.0] - 2024-03-15
+
+### Added
+- `Client.stream()` method for large responses
+- Type stubs for all public APIs
+
+### Changed
+- Minimum Python version raised to 3.10
+
+### Deprecated
+- `Client.fetch()` - use `Client.get()` instead
+
+## [1.1.0] - 2024-02-01
+
+### Added
+- `Config.from_env()` class method
+
+[Unreleased]: https://github.com/acme/acme-utils/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/acme/acme-utils/compare/v1.1.0...v1.2.0
+[1.1.0]: https://github.com/acme/acme-utils/releases/tag/v1.1.0
+```
+
+### Automated CHANGELOG Generation
+
+```bash
+# git-cliff: generate CHANGELOG from commit messages
+pip install git-cliff
+git-cliff --output CHANGELOG.md
+
+# Easier automation when following Conventional Commits format
+# feat: add retry decorator
+# fix: handle connection timeout
+# BREAKING CHANGE: drop Python 3.9 support
+```
+
+## Release Branch Strategy
+
+### Simple Strategy (Small Projects)
+
+```text
+main ─────●─────●─────●─────●──── (always releasable)
+          v1.0  v1.1  v1.2  v2.0
+```
+
+### Release Branches (Large Projects)
+
+```text
+main ─────●─────●─────●─────●────
+          │           │
+          └── release/1.x ──●──●── (1.x hotfixes)
+                      │
+                      └── release/2.x ──●── (2.x hotfixes)
+```
+
+```bash
+# Release procedure
+git checkout main
+git pull
+# Update CHANGELOG, verify version
+git tag v1.3.0
+git push --tags
+# CI automatically deploys to PyPI
+```
+
+## Deprecation Policy
+
+You must provide users with adequate warning before removing an API.
+
+```python
+import warnings
+
+def old_function():
+    warnings.warn(
+        "old_function() is deprecated, use new_function() instead. "
+        "It will be removed in version 2.0.0.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return new_function()
+```
+
+### Deprecation Timeline Example
+
+```text
+v1.3.0: Add DeprecationWarning to old_function()
+v1.4.0: Remove old_function() from docs (code remains)
+v2.0.0: Completely remove old_function()
+```
+
+## CalVer: Date-Based Versioning
+
+Some projects use CalVer (Calendar Versioning) instead of SemVer.
+
+```text
+Format examples:
+YYYY.MM.DD  → 2024.03.15
+YYYY.MM     → 2024.3
+YY.MM       → 24.3
+
+Projects using CalVer:
+- pip: 24.0, 24.1
+- Ubuntu: 24.04
+- Black: 24.3.0
+```
+
+CalVer suits projects with regular release cycles where backward compatibility isn't guaranteed between releases. For libraries, SemVer gives users a clearer signal.
+
+## bump2version / bump-my-version Automation
+
+A tool that modifies multiple files simultaneously when bumping versions and automatically creates tags.
+
+### Configuration
+
+```toml
+# pyproject.toml
+[tool.bumpversion]
+current_version = "1.2.3"
+commit = true
+tag = true
+tag_name = "v{new_version}"
+
+[[tool.bumpversion.files]]
+filename = "src/acme_utils/__init__.py"
+search = '__version__ = "{current_version}"'
+replace = '__version__ = "{new_version}"'
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+search = 'version = "{current_version}"'
+replace = 'version = "{new_version}"'
+```
+
+### Usage
+
+```bash
+pip install bump-my-version
+
+# Bump patch: 1.2.3 → 1.2.4
+bump-my-version bump patch
+
+# Minor version: 1.2.3 → 1.3.0
+bump-my-version bump minor
+
+# Major version: 1.2.3 → 2.0.0
+bump-my-version bump major
+
+# Pre-release: 1.2.3 → 1.3.0a1
+bump-my-version bump minor --new-version 1.3.0a1
+```
+
+```bash
+# Execution result
+$ bump-my-version bump patch
+Bumping version from 1.2.3 to 1.2.4
+  Updated src/acme_utils/__init__.py
+  Updated pyproject.toml
+  Created commit: Bump version: 1.2.3 → 1.2.4
+  Created tag: v1.2.4
+```
+
+## GitHub Release Integration
+
+```yaml
+# .github/workflows/release.yml
+name: Release
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # full history needed (for CHANGELOG generation)
+      - name: Generate release notes
+        run: |
+          # Extract commits between previous and current tag
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^)
+          git log --pretty=format:"- %s" ${PREV_TAG}..HEAD > release_notes.md
+      - uses: softprops/action-gh-release@v2
+        with:
+          body_path: release_notes.md
+          generate_release_notes: true
+```
+
+## Version Compatibility Declaration and Support Policy
+
+### Python Version Support Policy
+
+```text
+NEP 29 (NumPy Enhancement Proposal 29) based recommendation:
+- Support latest 3 Python minor versions
+- Current (2024): 3.10, 3.11, 3.12
+
+When dropping support, bump MAJOR or MINOR:
+- "Drop Python 3.9 support" → MINOR (some projects)
+- "Drop Python 3.9 support" → MAJOR (strict projects)
+```
+
+```toml
+[project]
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+```
+
+### Version Matrix Testing in CI
+
+```yaml
+strategy:
+  matrix:
+    python-version: ["3.10", "3.11", "3.12"]
+    os: [ubuntu-latest, macos-latest, windows-latest]
+```
+
+## Real-World Release Scenarios
+
+### Scenario 1: Hotfix Release
+
+```bash
+# Bug found on main, immediate patch needed
+git checkout main
+git pull
+
+# After fixing
+git add .
+git commit -m "fix: handle null response in Client.get()"
+bump-my-version bump patch  # 1.2.3 → 1.2.4
+git push --tags
+# CI auto-deploys
+```
+
+### Scenario 2: Feature Release
+
+```bash
+# Feature branch merged to main
+git checkout main
+git merge feature/retry-decorator
+
+# Update CHANGELOG
+vim CHANGELOG.md  # Move [Unreleased] content to new version
+
+bump-my-version bump minor  # 1.2.4 → 1.3.0
+git push --tags
+```
+
+### Scenario 3: Pre-Release
+
+```bash
+# Test a big change before going stable
+bump-my-version bump major --new-version 2.0.0a1
+git push --tags
+# Users: pip install acme-utils==2.0.0a1
+
+# After incorporating feedback
+bump-my-version bump major --new-version 2.0.0b1
+git push --tags
+
+# After stabilization, final release
+bump-my-version bump major --new-version 2.0.0
+git push --tags
+```
+
+### Scenario 4: Hotfix for Older Version
+
+```bash
+# Patch for v1.x users (main is already at v2.x)
+git checkout -b release/1.x v1.5.0
+# Bug fix
+git cherry-pick <commit-hash>
+bump-my-version bump patch  # 1.5.0 → 1.5.1
+git push origin release/1.x --tags
+```
+
+## Dependency Version Ranges and Their Relationship to Releases
+
+How you set dependency version ranges when releasing directly affects user experience.
+
+### Too Narrow Range Problem
+
+```toml
+# Too narrow: high conflict probability in user environments
+dependencies = ["httpx==0.27.2"]
+```
+
+When only `0.27.2` is allowed, version conflicts become frequent when users install alongside other packages.
+
+### Too Wide Range Problem
+
+```toml
+# Too wide: runtime errors on incompatible versions
+dependencies = ["httpx"]
+```
+
+Allowing all versions without an upper bound means future major updates can break your code.
+
+### Recommended Range
+
+```toml
+# Appropriate range: flexible within current major
+dependencies = [
+    "httpx>=0.25,<1.0",
+    "pydantic>=2.0,<3.0",
+]
+```
+
+This approach automatically accepts patch and minor updates while blocking at major boundaries where breaking changes are expected.
+
+### Testing Dependency Ranges at Release Time
+
+```yaml
+# Test both ends of the dependency range in CI
+jobs:
+  test-min-versions:
+    steps:
+      - run: pip install "httpx==0.25" "pydantic==2.0"  # minimum supported
+      - run: pytest
+
+  test-latest:
+    steps:
+      - run: pip install "httpx" "pydantic"  # latest versions
+      - run: pytest
+```
+
+Tests must pass on both minimum and latest versions to be confident the dependency range is correct.
+
+## Post-Release Monitoring
+
+Deployment is not the end of a release. You must monitor user reactions.
+
+```text
+Checklist:
+□ No new bug reports on GitHub Issues
+□ PyPI download count increasing normally
+□ No error rate changes in internal services after upgrade
+□ Dependabot PRs not failing on this version
+```
+
+```bash
+# Check issues within 24 hours of release
+gh issue list --label bug --since "24 hours ago"
+```
+
+If problems are found, prepare an immediate patch release, or consider yanking in severe cases.
+
+### Rollback Strategy
+
+```bash
+# User-side rollback
+pip install acme-utils==1.2.3  # revert to previous stable version
+
+# Package maintainer side: yank + hotfix
+# 1. Yank the problematic version on PyPI
+# 2. Fix and release new patch version
+# 3. Notify users to upgrade
+```
+
+If issues are severe after a new release, yank immediately but prefer a hotfix release over complete deletion.
+
 ## Answering the Opening Questions
 
 - **When should you bump MAJOR.MINOR.PATCH in SemVer?**
