@@ -160,15 +160,64 @@ kubectl run dnscheck --rm -i --restart=Never --image=busybox -- nslookup web.def
 
 ## How This Shows Up in Production
 
-*ClusterIP* handles *internal* traffic, *LoadBalancer* the *external entry*, and *Ingress* the *L7 routing*.
+ClusterIP handles internal traffic, LoadBalancer the external entry, and Ingress the L7 routing layer on top.
+
+### Service Type Decision Matrix
+
+| Traffic Origin | Type | Notes |
+| --- | --- | --- |
+| Pod-to-Pod within cluster | ClusterIP | Default; no external exposure |
+| External, single port, no L7 | NodePort or LoadBalancer | NodePort for dev; LB for production |
+| External, HTTP path routing | ClusterIP + Ingress | Ingress controller handles L7 |
+| StatefulSet peer discovery | Headless (clusterIP: None) | Returns individual Pod IPs |
+
+### Endpoint Debugging Workflow
+
+```bash
+kubectl get svc api -n prod              # verify type and ports
+kubectl get endpoints api -n prod        # empty = selector mismatch
+kubectl describe svc api -n prod         # see selector and events
+kubectl run tmp --rm -it --image=busybox -- nslookup api.prod.svc.cluster.local
+```
+
+The most common production issue: empty Endpoints caused by a label typo. Always verify Endpoints after any Service or Deployment label change.
+
+### Cross-Namespace Service Calls
+
+Within the same namespace, `http://api:8080` works. Across namespaces, use the full DNS: `http://api.other-ns.svc.cluster.local:8080`. Dropping the namespace suffix is the #1 cause of cross-team service call failures.
 
 ## How a Senior Engineer Thinks
 
-- The *Service name* is an *API contract*.
-- *Internal* traffic uses *ClusterIP*.
-- *External* uses *LoadBalancer + Ingress*.
-- *Headless* is for *stateful* workloads.
-- *DNS TTL* is also a *variable*.
+- The Service name is an API contract — changing it breaks callers.
+- Internal traffic uses ClusterIP; external uses LoadBalancer + Ingress.
+- Headless is specifically for stateful workloads needing peer discovery.
+- DNS TTL affects failover speed — know your CoreDNS cache settings.
+- Always check Endpoints first when debugging connectivity.
+
+### NetworkPolicy and Service Boundaries
+
+By default, every Pod can reach every Service. NetworkPolicy restricts this:
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-api-to-db
+  namespace: prod
+spec:
+  podSelector:
+    matchLabels:
+      app: db
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: api
+      ports:
+        - port: 5432
+```
+
+Start with deny-all ingress, then whitelist known callers. This turns "everything talks to everything" into "only approved paths work."
 
 ## Checklist
 
