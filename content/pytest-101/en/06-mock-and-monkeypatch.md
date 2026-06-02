@@ -307,6 +307,317 @@ Monkeypatch fits simple substitutions like environment variables and config valu
 
 Mock and monkeypatch remove external dependencies to make tests fast and stable. Next, we'll explore concrete patterns for testing files, environment variables, and time-dependent code.
 
+## mock vs monkeypatch Comparison Criteria
+
+| Item | mock.patch | monkeypatch |
+|---|---|---|
+| Primary purpose | Call verification, return value/exception control | Temporary attribute/environment changes |
+| Strength | Rich call count and argument verification | Simple syntax, automatic restoration |
+| Common targets | HTTP clients, SDK methods | Environment variables, global constants, function replacement |
+| Common mistake | Wrong patch path | Misunderstanding scope of global state change |
+
+## Real-World Example: Isolating an External Payment API
+
+```python
+# payment.py
+import requests
+
+def charge(amount: int) -> str:
+    resp = requests.post("https://pay.example.com/charge", json={"amount": amount}, timeout=3)
+    data = resp.json()
+    if data.get("status") != "ok":
+        raise RuntimeError("payment failed")
+    return data["tx_id"]
+```
+
+```python
+# test_payment.py
+import pytest
+from unittest.mock import patch, MagicMock
+from payment import charge
+
+def test_charge_success():
+    fake = MagicMock()
+    fake.json.return_value = {"status": "ok", "tx_id": "tx-123"}
+    with patch("payment.requests.post", return_value=fake) as m:
+        tx_id = charge(1000)
+    assert tx_id == "tx-123"
+    m.assert_called_once()
+
+def test_charge_failure_status():
+    fake = MagicMock()
+    fake.json.return_value = {"status": "fail"}
+    with patch("payment.requests.post", return_value=fake):
+        with pytest.raises(RuntimeError, match="payment failed"):
+            charge(1000)
+```
+
+## Red/Green Output Example
+
+```bash
+pytest test_payment.py -v
+```
+
+```text
+test_payment.py::test_charge_success PASSED
+test_payment.py::test_charge_failure_status PASSED
+========================= 2 passed =========================
+```
+
+If you patch the wrong path, the test fails.
+
+```python
+with patch("requests.post", return_value=fake):
+    charge(1000)
+```
+
+```text
+E   requests.exceptions.ConnectionError: ...
+```
+
+Fix: Patch using the **consuming module's path**—`payment.requests.post`.
+
+## Testing Environment Branches with monkeypatch
+
+```python
+# mode.py
+import os
+
+def get_mode() -> str:
+    return os.getenv("APP_MODE", "dev")
+```
+
+```python
+# test_mode.py
+from mode import get_mode
+
+def test_default_mode(monkeypatch):
+    monkeypatch.delenv("APP_MODE", raising=False)
+    assert get_mode() == "dev"
+
+def test_prod_mode(monkeypatch):
+    monkeypatch.setenv("APP_MODE", "prod")
+    assert get_mode() == "prod"
+```
+
+## Before and After: Removing Manual try/except Verification
+
+```python
+# before
+try:
+    charge(1000)
+    assert False
+except RuntimeError:
+    pass
+```
+
+```python
+# after
+with pytest.raises(RuntimeError, match="payment failed"):
+    charge(1000)
+```
+
+Intent is clearer and failure messages are more precise.
+
+## External Dependency Test Strategy Table
+
+| Dependency | Recommended Technique | Verification Points |
+|---|---|---|
+| HTTP requests | patch + MagicMock | URL, payload, timeout, exception handling |
+| Environment variables | monkeypatch.setenv | Default value/exception branches |
+| Time functions | patch or freezegun | Date boundary values |
+| File paths | tmp_path + monkeypatch | Path branching |
+
+## side_effect in Practice
+
+```python
+import pytest
+from unittest.mock import patch
+import requests
+from payment import charge
+
+def test_charge_timeout():
+    with patch("payment.requests.post", side_effect=requests.Timeout):
+        with pytest.raises(requests.Timeout):
+            charge(500)
+```
+
+## Verifying Call Arguments
+
+```python
+from unittest.mock import patch, MagicMock
+from payment import charge
+
+def test_charge_payload():
+    fake = MagicMock()
+    fake.json.return_value = {"status": "ok", "tx_id": "tx-1"}
+    with patch("payment.requests.post", return_value=fake) as m:
+        charge(500)
+    _, kwargs = m.call_args
+    assert kwargs["json"] == {"amount": 500}
+    assert kwargs["timeout"] == 3
+```
+
+## Changing Global Constants with monkeypatch
+
+```python
+# fee.py
+SERVICE_FEE = 500
+
+def final_price(amount: int) -> int:
+    return amount + SERVICE_FEE
+```
+
+```python
+# test_fee.py
+import fee
+
+def test_final_price_with_patched_fee(monkeypatch):
+    monkeypatch.setattr(fee, "SERVICE_FEE", 1000)
+    assert fee.final_price(9000) == 10000
+```
+
+After the test ends, `SERVICE_FEE` is automatically restored.
+
+## Terminal Option Combinations
+
+| Command | Purpose |
+|---|---|
+| `pytest -q` | Quick pass/fail summary |
+| `pytest -v` | Per-case pass/fail detail |
+| `pytest -x` | Stop immediately on first failure |
+| `pytest -k "keyword"` | Run only matching subset |
+| `pytest --maxfail=3` | Limit maximum failure count |
+
+## Operational Regression Test Template
+
+```python
+import pytest
+
+BUG_CASES = [
+    ("", ValueError),
+    ("   ", ValueError),
+    (None, TypeError),
+]
+
+@pytest.mark.parametrize("raw,exc", BUG_CASES)
+def test_regression_cases(raw, exc):
+    with pytest.raises(exc):
+        require_non_empty(raw)
+```
+
+This template is the simplest form of permanently preserving bug tickets as test code.
+
+## Quality Check Questions
+
+- Can you infer the failure cause from the failure message alone?
+- Do tests depend on execution order?
+- Are boundary-value inputs included?
+- Are both happy and error paths verified?
+- Does adding a test case require only adding data, not copying functions?
+
+## Case Study: Common Improvement Points in PR Reviews
+
+### Code Example
+
+```python
+# app/discount.py
+
+def discount_price(price: int, rate: float) -> int:
+    if price < 0:
+        raise ValueError("price must be >= 0")
+    if not 0 <= rate <= 1:
+        raise ValueError("rate must be between 0 and 1")
+    return int(price * (1 - rate))
+```
+
+```python
+# tests/test_discount.py
+import pytest
+from app.discount import discount_price
+
+@pytest.mark.parametrize(
+    "price,rate,expected",
+    [
+        (10000, 0.0, 10000),
+        (10000, 0.1, 9000),
+        (10000, 1.0, 0),
+    ],
+)
+def test_discount_price(price, rate, expected):
+    assert discount_price(price, rate) == expected
+
+@pytest.mark.parametrize("price,rate", [(-1, 0.1), (1000, -0.1), (1000, 1.1)])
+def test_discount_price_invalid(price, rate):
+    with pytest.raises(ValueError):
+        discount_price(price, rate)
+```
+
+### Output Example
+
+```bash
+pytest tests/test_discount.py -v
+```
+
+```text
+tests/test_discount.py::test_discount_price[10000-0.0-10000] PASSED
+tests/test_discount.py::test_discount_price[10000-0.1-9000] PASSED
+tests/test_discount.py::test_discount_price[10000-1.0-0] PASSED
+tests/test_discount.py::test_discount_price_invalid[-1-0.1] PASSED
+tests/test_discount.py::test_discount_price_invalid[1000--0.1] PASSED
+tests/test_discount.py::test_discount_price_invalid[1000-1.1] PASSED
+========================= 6 passed =========================
+```
+
+### Review Points
+
+- Are boundary values (`0`, `1.0`) included?
+- Are exception types specific?
+- Can you identify the cause from the failure message?
+- Is the structure extensible by adding data alone, without copying functions?
+
+## Deep Dive: Reducing Coupling in Mock Design
+
+As mocks multiply, tests can become over-coupled to implementation details. Extracting external boundaries into thin adapter functions helps.
+
+```python
+# gateway.py
+import requests
+
+def fetch_user(user_id: int) -> dict:
+    resp = requests.get(f"https://api.example.com/users/{user_id}", timeout=3)
+    return resp.json()
+```
+
+```python
+# service.py
+from gateway import fetch_user
+
+def get_user_name(user_id: int) -> str:
+    data = fetch_user(user_id)
+    if "name" not in data:
+        raise ValueError("name missing")
+    return data["name"]
+```
+
+```python
+# test_service.py
+import pytest
+from unittest.mock import patch
+from service import get_user_name
+
+def test_get_user_name_ok():
+    with patch("service.fetch_user", return_value={"name": "Alice"}):
+        assert get_user_name(1) == "Alice"
+
+def test_get_user_name_missing_name():
+    with patch("service.fetch_user", return_value={"id": 1}):
+        with pytest.raises(ValueError, match="missing"):
+            get_user_name(1)
+```
+
+The advantage of this structure is that you can stably lock service contracts without verifying HTTP details directly.
+
 ## Answering the Opening Questions
 
 - **What is the difference between mock and monkeypatch?**
