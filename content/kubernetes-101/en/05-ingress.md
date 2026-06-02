@@ -168,16 +168,48 @@ curl -sk -H 'Host: example.com' https://<ingress-address>/api
 
 ## How This Shows Up in Production
 
-*nginx-ingress* or the *AWS ALB Controller* reflects *Ingress objects* into the *external LB*, while *cert-manager* issues *TLS* automatically.
+nginx-ingress or the AWS ALB Controller reflects Ingress objects into the external LB, while cert-manager issues TLS certificates automatically via Let's Encrypt.
+
+### Ingress Debugging Workflow
+
+```bash
+kubectl get ingress -n prod
+kubectl describe ingress api-ingress -n prod
+kubectl get events -n prod --field-selector involvedObject.kind=Ingress
+kubectl logs -n ingress-nginx deploy/ingress-nginx-controller --tail=50
+```
+
+Common failure patterns:
+- **No address assigned**: Controller not installed, or IngressClass missing.
+- **TLS handshake failure**: Secret not in the same namespace, or cert-manager order pending.
+- **404 on a path that should work**: `pathType` mismatch — `Exact` vs `Prefix`.
+
+### Cost Optimization: Consolidate Entry Points
+
+Each LoadBalancer Service provisions a cloud LB ($15-25/mo on most clouds). Ingress consolidates multiple services behind one LB:
+
+| Without Ingress | With Ingress |
+| --- | --- |
+| 5 services × 1 LB each = 5 LBs | 1 LB + path-based routing |
+| ~$100/mo in LB costs | ~$20/mo |
+| 5 DNS records to manage | 1 domain, path rules |
+
+### Gateway API (the future)
+
+Gateway API replaces Ingress with a richer, role-oriented model:
+- **GatewayClass**: cluster operator defines infrastructure.
+- **Gateway**: platform team exposes entry points.
+- **HTTPRoute**: app developers define their routing.
+
+If your cluster supports Gateway API, prefer it over Ingress for new services.
 
 ## How a Senior Engineer Thinks
 
-- *Ingress* is a *routing rule*.
-- *Controller* features *vary widely*.
-- *TLS* is delegated to *cert-manager*.
-- *Gateway API* is the *next standard*.
-- *Entry points* are kept *minimal*.
-
+- Ingress is a routing rule; the Controller is the runtime.
+- Controller features vary widely — read your specific controller's docs.
+- TLS is delegated to cert-manager; never manage certificates manually.
+- Gateway API is the next standard; invest in learning it now.
+- Entry points are kept minimal — fewer LBs = less cost and simpler DNS.
 ## Checklist
 
 - [ ] *Controller* installed.
