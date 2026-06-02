@@ -146,15 +146,80 @@ print("compressed:", X_2d.shape)
 
 ## How This Shows Up in Production
 
-Linear regression, logistic regression, *MLP / CNN / RNN / Transformer*, *embedding search*, *recommender systems* — all run on *linear algebra*.
+Linear regression, logistic regression, MLP / CNN / RNN / Transformer, embedding search, recommender systems — all run on linear algebra.
+
+### ML Algorithm → Linear Algebra Operation Map
+
+| ML Algorithm | Core Linear Algebra Operation |
+| --- | --- |
+| Linear regression | `X @ w`, `lstsq`, normal equations |
+| Logistic regression | `X @ w`, sigmoid, gradient `X.T @ (pred - y)` |
+| SVM | Kernel matrix `K`, dual QP |
+| Neural networks | Matrix multiply `X @ W`, backprop chain rule |
+| Recommender (MF) | Low-rank approximation `U @ V.T`, latent factor dot product |
+
+### Production Checkpoint Table
+
+| Stage | Common Problem | Linear Algebra Check |
+| --- | --- | --- |
+| Data preparation | Feature duplication / scale imbalance | Rank, standardization, correlation |
+| Model training | Divergence / slow convergence | Condition number, learning rate, gradient magnitude |
+| Embedding search | Similarity quality drop | Normalization, cosine vs L2 choice |
+| Compression / visualization | Excessive information loss | Cumulative explained variance, reconstruction error |
+
+### Backpropagation as Matrix Calculus
+
+A 2-layer MLP forward + backward in pure NumPy:
+
+```python
+import numpy as np
+
+rng = np.random.default_rng(123)
+X = rng.normal(size=(4, 3))  # 4 samples, 3 features
+y = np.array([0, 1, 0, 1])
+
+# Parameters
+W1 = rng.normal(scale=0.1, size=(3, 2))
+b1 = np.zeros(2)
+W2 = rng.normal(scale=0.1, size=(2, 1))
+b2 = np.zeros(1)
+
+# Forward
+z1 = X @ W1 + b1
+a1 = np.maximum(0, z1)  # ReLU
+z2 = a1 @ W2 + b2
+a2 = 1 / (1 + np.exp(-z2))  # Sigmoid
+
+# Backward
+da2 = (a2 - y.reshape(-1, 1)) / len(y)
+dW2 = a1.T @ da2          # shape matches W2: (2, 1)
+da1 = da2 @ W2.T           # shape matches a1: (4, 2)
+dz1 = da1 * (z1 > 0)      # ReLU derivative
+dW1 = X.T @ dz1            # shape matches W1: (3, 2)
+
+print('dW1 shape:', dW1.shape, 'dW2 shape:', dW2.shape)
+```
+
+The key pattern: `X.T @ downstream_gradient` gives you the parameter gradient with correct shape. Understand this, and you can manually verify any autograd result.
+
+### Why GPUs Excel at Deep Learning
+
+GPU cores execute matrix multiply `C = A @ B` in parallel—each `C[i,j]` is independent. Practical implications:
+
+- Larger batch sizes → better GPU utilization.
+- Align tensor dimensions to multiples of 32 for memory efficiency.
+- Minimize CPU↔GPU transfers (each `.cpu()` call is a bottleneck).
+- Transformers (attention = matrix multiply) parallelize better than RNNs (sequential dependency).
+
+This is why linear algebra literacy lets you reason about model *performance*, not just *correctness*.
 
 ## How a Senior Engineer Thinks
 
-- *Always print* the *shape*.
-- Uses *decompositions / normalization* for *numerical stability*.
-- Derives *gradient shapes* by hand.
-- Has *intuition for embedding spaces*.
-- Uses *PCA / SVD* to *understand data* quickly.
+- *Always print shape* — shape mismatches are the #1 bug source.
+- Use decompositions (`solve`, `lstsq`, `svd`) instead of explicit `inv`.
+- Derive gradient shapes by hand: if forward is `(n, d) @ (d, k) → (n, k)`, backward gradient of weights is `(d, n) @ (n, k) → (d, k)`.
+- Normalize embeddings before cosine similarity — unnormalized dot products conflate direction with magnitude.
+- Use PCA/SVD as a first-pass data understanding tool before any modeling.
 
 ## Checklist
 
