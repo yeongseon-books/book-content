@@ -204,14 +204,57 @@ python -m pytest -q tests/test_retry_idempotency.py
 
 In an API server the handler is the boundary. Domain logic raises typed exceptions; the handler maps them to HTTP responses. Only idempotent operations are auto-retried.
 
+### Error Handling Responsibility by Layer
+
+| Layer | Should Do | Should NOT Do |
+| --- | --- | --- |
+| Domain function | Raise meaningful exception types | Return HTTP status codes directly |
+| Application service | Map exceptions to business results | Compress all errors into one message |
+| API boundary | Convert to status code + error payload | Expose internal stack traces |
+| Infrastructure adapter | Wrap external errors as domain exceptions | Discard original context |
+
+### Before / After: Boundary Mapping
+
+```python
+# before
+def create_order(payload, repo):
+    try:
+        return repo.insert(payload)
+    except Exception:
+        return {"ok": False}
+
+# after
+class DuplicateOrderError(Exception): ...
+
+def create_order(payload, repo):
+    try:
+        return repo.insert(payload)
+    except repo.DuplicateKey as exc:
+        raise DuplicateOrderError("order already exists") from exc
+```
+
+Meaningful exception translation makes failure aggregation in logs trivial. "Duplicate order" drives faster decisions than generic "failed".
+
+### Retry Policy Rules
+
+| Condition | Retry? | Reason |
+| --- | --- | --- |
+| Network timeout | Yes | Transient; idempotent GET/read is safe |
+| 5xx from upstream | Maybe | Only if operation is idempotent |
+| Validation error (4xx) | No | Will fail again with same input |
+| Data integrity error | No | Retry duplicates side effects |
+
+Error *classification* must precede retry *policy*. Retrying a billing call without idempotency keys creates double charges.
+
 ## How a Senior Engineer Thinks
 
-- Validates at the entry point and never again.
-- Defines domain exception types.
-- Distinguishes recoverable from unrecoverable.
-- Pairs idempotency with retry.
-- Restricts broad catches to boundaries.
-
+- Validates at the entry point and never again—trust internal layers.
+- Defines domain exception types—never relies on message strings.
+- Distinguishes recoverable (retry) from unrecoverable (fail fast).
+- Pairs idempotency keys with retry—no key, no retry.
+- Restricts broad catches to boundaries—inner code stays precise.
+- Treats error handling design as an architecture decision, not an afterthought.
+- Reviews error paths with the same rigor as happy paths.
 ## Checklist
 
 - [ ] Is input validation at the top of the function?
