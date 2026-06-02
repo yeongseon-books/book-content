@@ -301,6 +301,309 @@ For projects where type safety matters, use `Protocol` extensively. It has zero 
 2. Implement a `Matrix` class with `__add__` and `__mul__` dunder methods.
 3. Use `singledispatch` to create a function that formats various data types into log output.
 
+## Practical Pattern: Verifying SOLID Boundaries in Code
+
+A common failure in OOP design is treating "more classes" as the goal. In reality, the goal is separating responsibilities and change directions. The example below organizes a payment domain respecting SRP and OCP, showing how composition replaces forced inheritance.
+
+```python
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Protocol
+
+
+@dataclass
+class PaymentRequest:
+    order_id: str
+    amount: int
+
+
+class PaymentGateway(Protocol):
+    def pay(self, req: PaymentRequest) -> str:
+        ...
+
+
+class CardGateway:
+    def pay(self, req: PaymentRequest) -> str:
+        return f"card:{req.order_id}:{req.amount}"
+
+
+class BankGateway:
+    def pay(self, req: PaymentRequest) -> str:
+        return f"bank:{req.order_id}:{req.amount}"
+
+
+class PaymentService:
+    def __init__(self, gateway: PaymentGateway) -> None:
+        self.gateway = gateway
+
+    def process(self, order_id: str, amount: int) -> str:
+        if amount <= 0:
+            raise ValueError("amount must be positive")
+        return self.gateway.pay(PaymentRequest(order_id=order_id, amount=amount))
+```
+
+Adding a new payment method requires no changes to `PaymentService`—just one more class implementing the `PaymentGateway` contract. This is OCP in action. By using Protocol + composition instead of forced inheritance, runtime swapping and test double injection become trivial. The purpose of OOP is not deepening hierarchies but reducing change propagation.
+
+## The Core of Polymorphism Is Collaboration Contracts, Not if/elif Elimination
+
+Polymorphism is not a technique for removing branching—it is a design where callers collaborate through a shared contract without knowing concrete types.
+
+```text
+[CheckoutService] --> [PaymentMethod]
+PaymentMethod (interface)
+  + pay(amount)
+      ^            ^            ^
+      |            |            |
+ [CardPay]     [BankPay]    [PointPay]
+```
+
+## Before and After: From Type Branching to Polymorphism
+
+```python
+# before
+
+def pay(method: str, amount: int) -> str:
+    if method == 'card':
+        return f'card:{amount}'
+    if method == 'bank':
+        return f'bank:{amount}'
+    if method == 'point':
+        return f'point:{amount}'
+    raise ValueError('unsupported method')
+```
+
+```python
+# after
+from typing import Protocol
+
+class PaymentMethod(Protocol):
+    def pay(self, amount: int) -> str:
+        ...
+
+class CardPay:
+    def pay(self, amount: int) -> str:
+        return f'card:{amount}'
+
+class BankPay:
+    def pay(self, amount: int) -> str:
+        return f'bank:{amount}'
+
+class PointPay:
+    def pay(self, amount: int) -> str:
+        return f'point:{amount}'
+
+class CheckoutService:
+    def __init__(self, method: PaymentMethod) -> None:
+        self.method = method
+
+    def checkout(self, amount: int) -> str:
+        if amount <= 0:
+            raise ValueError('amount must be positive')
+        return self.method.pay(amount)
+```
+
+## Principle Violations and Corrections
+
+| Violation | Consequence | Fix |
+|---|---|---|
+| `if method == ...` branches duplicated across modules | Multiple edits when adding a payment method | Contract interface + implementation classes |
+| Implementation class reads caller's internal state directly | Coupling increases | Pass only necessary data as parameters |
+| No common exception handling | Failure format varies per implementation | Separate common exception policy layer |
+
+## Comparison: Inheritance-Based Polymorphism vs Duck Typing Protocol
+
+| Criterion | Inheritance-Based | Protocol-Based |
+|---|---|---|
+| Applying to existing code | Requires base class modification | Just match methods on existing classes |
+| Framework dependency | Relatively high | Low |
+| Writing test doubles | Requires subclassing | A simple stub object suffices |
+
+## Refactoring Checklist
+
+- First check whether branch conditions use type-name strings.
+- Reduce the caller's concern to a single contract like `pay(amount)`.
+- Verify that adding a new type requires zero modifications to existing callers.
+
+## Real-World Scenario: Building a Structure That Survives Requirement Changes
+
+In production, rule changes happen more often than feature additions. When evaluating class structures, "how many files must change for the next requirement" is a safer criterion than "does it work now."
+
+```python
+from dataclasses import dataclass
+from typing import Protocol
+
+
+@dataclass
+class LineItem:
+    name: str
+    quantity: int
+    unit_price: int
+
+    def subtotal(self) -> int:
+        return self.quantity * self.unit_price
+
+
+class DiscountPolicy(Protocol):
+    def apply(self, amount: int) -> int:
+        ...
+
+
+class NoDiscount:
+    def apply(self, amount: int) -> int:
+        return amount
+
+
+class PercentDiscount:
+    def __init__(self, percent: int) -> None:
+        if not 0 <= percent <= 100:
+            raise ValueError('percent must be 0..100')
+        self.percent = percent
+
+    def apply(self, amount: int) -> int:
+        return int(amount * (100 - self.percent) / 100)
+
+
+class Invoice:
+    def __init__(self, items: list[LineItem], policy: DiscountPolicy) -> None:
+        self.items = items
+        self.policy = policy
+
+    def total(self) -> int:
+        base = sum(i.subtotal() for i in self.items)
+        return self.policy.apply(base)
+```
+
+When the discount rule changes, `Invoice.total()` needs no modification. Extension stays closed through implementation class additions, while the core flow remains stable.
+
+## UML-Style Collaboration View
+
+```text
+[Invoice]
+  - items: list[LineItem]
+  - policy: DiscountPolicy
+  + total()
+
+[LineItem]
+  + subtotal()
+
+[DiscountPolicy] <<interface>>
+  + apply(amount)
+      ^
+      +-- [NoDiscount]
+      +-- [PercentDiscount]
+```
+
+Writing collaboration structures as text UML lets code reviews quickly align on "which axis is the policy axis and which is the domain axis."
+
+## Anti-Patterns and Correction Procedures
+
+| Anti-Pattern | Detection Signal | Correction Sequence |
+|---|---|---|
+| God Object | 20+ methods, scattered change history | Decompose by responsibility axis → derive collaboration interfaces |
+| Data-only empty class | Only getters/setters, no methods | Move rule methods in, or simplify to dataclass |
+| Inheritance tree bypass branching | Type-check branches on subclass types | Redefine polymorphic contract |
+| Infrastructure type leakage | Domain layer depends on SDK response objects | Add DTO conversion layer |
+
+## Before and After: Test Maintenance Cost
+
+| Item | Before Refactoring | After Refactoring |
+|---|---|---|
+| Test setup | Global state initialization required | Per-object state creation |
+| Failure root-cause tracing | Trace entire function chain | Per-method tracing |
+| Regression scope | Broad and unpredictable | Narrow and predictable |
+
+## Team Adoption Checklist
+
+- Verify that domain terms and class names match.
+- Confirm invariants are fully established at instance creation time.
+- Check that policy changes are possible through implementation additions, not existing code modifications.
+- In code reviews, agree on collaboration structure with 10-line UML text first.
+- Ensure test names describe business rules rather than method names.
+
+## Mini Case Study: Validating with One Rule Addition
+
+The example below is the minimal unit that adds a policy extension without modifying existing code.
+
+```python
+class WeekendPolicy:
+    def apply(self, amount: int, is_weekend: bool) -> int:
+        if is_weekend:
+            return int(amount * 0.95)
+        return amount
+
+
+def estimate(amount: int, is_weekend: bool) -> int:
+    policy = WeekendPolicy()
+    return policy.apply(amount, is_weekend)
+```
+
+The key point is that new policies enter without breaking call paths. Keeping change history confined to the policy class reduces regression risk.
+
+| Verification Question | Pass Criterion |
+|---|---|
+| Does adding a new policy require modifying existing functions? | No |
+| Does the exception policy share the same contract? | Yes |
+| Are tests separated per policy? | Yes |
+
+## Refactoring Retrospective: Measuring Change Cost Numerically
+
+- If modified file count exceeds 5 per feature, review boundary design.
+- If type-branching if/elif accumulates 3+, migrate to polymorphism or strategy objects.
+- If regression test writing time exceeds implementation time, revisit responsibility placement.
+
+```python
+def complexity_signal(changed_files: int, branch_count: int) -> str:
+    if changed_files >= 5 or branch_count >= 3:
+        return 'refactor-needed'
+    return 'acceptable'
+```
+
+This is not a rigorous metric, but it helps teams discuss with criteria rather than gut feeling.
+
+## Design Quality Verification Questions
+
+These questions are used repeatedly during post-implementation reviews.
+
+- Does the exception type and message match the caller's contract when this method fails?
+- Is the same rule duplicated in other classes or functions?
+- Does state mutation happen through exactly one method path?
+- Can the unit be tested without external dependencies?
+
+```python
+def review_signal(duplicate_rules: int, mutable_paths: int) -> str:
+    if duplicate_rules > 0:
+        return 'duplicate rule removal needed'
+    if mutable_paths > 1:
+        return 'consolidate state mutation paths'
+    return 'structure stable'
+```
+
+Applying these checks even to article-level examples helps readers understand OOP as a maintenance strategy rather than mere syntax.
+
+## Change Request Response Time Comparison
+
+| Change Request | Weak Boundaries | Clear Boundaries |
+|---|---|---|
+| Add discount rule | Search branches then multi-edit | Add policy implementation |
+| Modify state transition | Simultaneous edits across functions | Modify domain method |
+| Strengthen tests | Integration-test-centric | Unit-test-first |
+
+This comparison matters from the perspective of reducing maintenance lead time, not performance numbers.
+
+## Supplementary Note
+
+Design choices are not about finding the "right answer"—they are decisions that lower change cost. Defining boundaries first simplifies both reviews and tests, even for the same functionality.
+
+## Quick Reminder
+
+When applying OOP, evaluate quality by "how many files must change for the next requirement" rather than "how many classes did I create."
+
+## Final Verification Statement
+
+Every example in this article is structured around boundary design that reduces change propagation.
+
+Maintaining design intent and test contracts together is the core principle.
 ## Summary and Next Steps
 
 Polymorphism increases code flexibility by calling different implementations through a single interface. Python supports polymorphism through duck typing, inheritance, and Protocol. In the next article, we explore abstraction — enforcing common interfaces through abstract base classes.
