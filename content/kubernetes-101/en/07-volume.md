@@ -160,15 +160,82 @@ kubectl get pv
 
 ## How This Shows Up in Production
 
-A *StatefulSet* automatically creates *one PVC per Pod*, and tools like *Velero* periodically *snapshot* volumes.
+A *StatefulSet* automatically creates one PVC per Pod via `volumeClaimTemplates`. When a StatefulSet scales from 3 to 5 replicas, two new PVCs appear automatically—each named deterministically (`data-api-3`, `data-api-4`). Scaling back down does NOT delete those PVCs; you must garbage-collect them manually or via policy.
+
+Tools like *Velero* snapshot PVCs on a schedule, but snapshots alone are not backups—you also need restore verification and cross-region copies for disaster recovery.
+
+### Volume Lifetime Decision Table
+
+| Type | Lifetime | Shared across Pods? | Use case |
+| --- | --- | --- | --- |
+| `emptyDir` | Dies with Pod | Same-Pod containers only | Scratch space, sidecar data exchange |
+| `hostPath` | Tied to node | No (node-local) | DaemonSet logs, node agents — avoid for apps |
+| PVC (RWO) | Independent of Pod | One node at a time | Databases, write-ahead logs |
+| PVC (RWX) | Independent of Pod | Yes (multi-node) | Shared uploads — verify CSI driver supports it |
+
+### StatefulSet + PVC Pattern
+
+```yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+spec:
+  serviceName: postgres
+  replicas: 3
+  volumeClaimTemplates:
+    - metadata:
+        name: pgdata
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: gp3
+        resources:
+          requests:
+            storage: 50Gi
+```
+
+Verify after deploy:
+
+```bash
+kubectl get pvc -l app=postgres
+# Expected: pgdata-postgres-0, pgdata-postgres-1, pgdata-postgres-2 all Bound
+kubectl get pv | grep pgdata
+# Confirm reclaimPolicy matches expectations (Retain for prod DBs)
+```
+
+### Backup/Restore Design Checklist
+
+| Decision | What to define |
+| --- | --- |
+| Snapshot frequency | RPO requirement → schedule (e.g. every 6h) |
+| Retention | How many snapshots to keep before rotation |
+| Restore test cadence | Monthly restore drill to non-prod namespace |
+| Cross-region copy | DR requirement → replicate snapshots to second region |
+| Migration ownership | Who runs `velero restore` during failover |
+
+### Failure Simulation (Volume-Specific)
+
+```bash
+# 1. Force PVC into Pending — wrong StorageClass name
+kubectl patch pvc data -p '{"spec":{"storageClassName":"nonexistent"}}'
+kubectl get pvc data  # STATUS: Pending
+
+# 2. Simulate data loss — delete PVC with reclaimPolicy: Delete
+kubectl delete pvc data
+kubectl get pv  # PV disappears → data gone
+
+# 3. Recovery: restore from Velero snapshot
+velero restore create --from-backup daily-backup-20260601
+kubectl get pvc data  # STATUS: Bound (restored)
+```
 
 ## How a Senior Engineer Thinks
 
-- *State* is safest *outside the cluster*.
-- *RWX* must justify *cost and performance*.
-- *Backups* are the real *recovery capability*.
-- *reclaimPolicy* is set explicitly.
-- *StatefulSet* is the start of *stateful patterns*.
+- **State belongs outside the cluster when possible.** A managed database (RDS, Cloud SQL) removes PVC complexity entirely. Use PVCs when managed services don't fit (latency, compliance, cost).
+- **RWX must justify its cost.** Multi-node read-write sounds convenient but adds CSI driver complexity, performance overhead, and failure modes. Default to RWO; escalate to RWX only with measured need.
+- **Backups are the actual recovery capability.** PVCs preserve data across Pod restarts but not against accidental deletion, corruption, or zone failure. Without tested restore, PVCs give false confidence.
+- **`reclaimPolicy` is always set explicitly.** The default (`Delete`) silently destroys data when PVCs are removed. Production databases use `Retain` until backup/restore is proven.
+- **Volume strategy is a team agreement, not an individual choice.** StandardizeStorageClass names, reclaim policies, and backup schedules across the team to prevent configuration drift.
 
 ## Checklist
 
