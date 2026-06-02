@@ -494,6 +494,124 @@ That is why a practical refactor often starts with SRP or DIP, then adds OCP onl
 
 SOLID becomes practical when you apply it to one brittle workflow instead of memorizing five slogans in isolation. In this checkout example, SRP split responsibilities, OCP made discount rules extensible, LSP kept the contract honest, ISP narrowed dependencies, and DIP made the policy testable. In the next article, we apply these ideas together in a fuller OOP design example.
 
+## SOLID at a Glance
+
+SOLID is not a subject to memorize five sentences. It is a set of design rules that reduce the cost of change.
+
+```text
+[OrderFacade]
+  + place_order()
+    |
+    +--> [Validator]      (SRP)
+    +--> [PricePolicy]    (OCP)
+    +--> [Notifier]       (DIP)
+
+[PricePolicy]
+  ^
+  +-- [DefaultPolicy]
+  +-- [CampaignPolicy]    (LSP)
+```
+
+## Before/After: Multi-Violation Cleanup
+
+```python
+# before
+class OrderManager:
+    def place(self, user, items, channel):
+        # validation, discount calculation, persistence, and notification all in one method
+        ...
+```
+
+```python
+# after
+class OrderValidator:
+    def validate(self, items: list[dict]) -> None:
+        if not items:
+            raise ValueError('items required')
+
+class PricePolicy:
+    def total(self, items: list[dict]) -> int:
+        return sum(x['qty'] * x['price'] for x in items)
+
+class Notifier:
+    def send(self, channel: str, text: str) -> None:
+        if channel not in {'email', 'slack'}:
+            raise ValueError('unsupported channel')
+
+class OrderManager:
+    def __init__(self, validator: OrderValidator, policy: PricePolicy, notifier: Notifier) -> None:
+        self.validator = validator
+        self.policy = policy
+        self.notifier = notifier
+
+    def place(self, items: list[dict], channel: str) -> int:
+        self.validator.validate(items)
+        amount = self.policy.total(items)
+        self.notifier.send(channel, f'ordered:{amount}')
+        return amount
+```
+
+## Principle-by-Principle Quick Reference
+
+| Principle | Violation Signal | Quick Correction |
+|---|---|---|
+| SRP | Class changes for 3+ unrelated reasons | Split into role-specific classes |
+| OCP | Every feature addition edits existing `if` branches | Add a new strategy implementation instead |
+| LSP | One subtype throws unexpected exceptions | Write contract tests to verify behavioral expectations |
+| ISP | Multiple interface methods go unused by clients | Split into smaller, caller-specific interfaces |
+| DIP | Upper layer depends directly on an SDK or driver | Inject an abstract port |
+
+## Real Boundaries of SOLID: Resolving Principle Conflicts
+
+In practice, pushing SRP hard multiplies the number of classes, while prioritizing simplicity bundles responsibilities together. The point is not to score 100 on all five principles simultaneously—it is to reduce the cost of change at the most expensive point first.
+
+```python
+class ShippingFeePolicy:
+    def fee(self, region: str, weight: float) -> int:
+        if region == 'KR':
+            return 3000 if weight < 3 else 5000
+        return 12000
+
+
+class FreeShippingPolicy(ShippingFeePolicy):
+    def fee(self, region: str, weight: float) -> int:
+        return 0
+```
+
+Even though OCP is satisfied above, if callers add subtype-specific exception handling, LSP breaks. Contract tests are needed so every policy honors the same input domain and exception rules.
+
+| Situation | Priority Principle | Reason |
+|---|---|---|
+| Urgent feature before deploy | OCP | Minimize edits to existing code |
+| Hard to trace root cause of failure | SRP | Separating responsibilities shortens debug paths |
+| Writing test doubles takes excessive effort | ISP | Smaller interfaces reduce coupling |
+| External SDK replacement planned | DIP | Stabilize the upper layer first |
+
+## Mini Case Study: Verify with One Rule Addition
+
+The following example demonstrates the smallest unit of policy extension that lands without touching existing code.
+
+```python
+class WeekendPolicy:
+    def apply(self, amount: int, is_weekend: bool) -> int:
+        if is_weekend:
+            return int(amount * 0.95)
+        return amount
+
+
+def estimate(amount: int, is_weekend: bool) -> int:
+    policy = WeekendPolicy()
+    return policy.apply(amount, is_weekend)
+```
+
+The key observation is that the new policy enters without breaking the existing call path. Keeping the change boundary at the policy class means regression risk stays low.
+
+| Verification Question | Pass Criterion |
+|---|---|
+| Does adding a new policy require editing existing functions? | No |
+| Does the exception policy match the existing contract? | Yes |
+| Are tests isolated per policy? | Yes |
+
 ## Answering the Opening Questions
 
 - **How do you determine which principle connects to the symptoms you see?**
