@@ -156,7 +156,59 @@ print(scores.mean(), "+/-", scores.std())
 
 ## How This Shows Up in Production
 
-Teams log experiments with *MLflow / Weights & Biases*. The *baseline* is always experiment #1. Feature changes go *one at a time*.
+Teams log experiments with MLflow or Weights & Biases. The baseline is always experiment #1. Feature changes go one at a time.
+
+### Model Selection Flowchart
+
+1. Determine whether the target is continuous or categorical.
+2. If data is small and interpretability matters → start with linear/logistic regression.
+3. If non-linear patterns are likely → add tree-based models to the candidate set.
+4. If class imbalance is severe → design class weights and threshold strategies together.
+5. If deployment latency is constrained → include inference speed in evaluation criteria.
+
+### Candidate Model Comparison (Entry-Level)
+
+| Model | Strengths | Weaknesses | When to Use |
+| --- | --- | --- | --- |
+| Logistic Regression | Fast, interpretable | Linear boundary only | Baseline, explainability required |
+| Random Forest | Robust, moderate tuning | Harder to interpret | General tabular data |
+| Gradient Boosting | High potential accuracy | Tuning/training cost | Score maximization needed |
+
+### Experiment Operation Rules
+
+- Fix the baseline score first.
+- Apply only one change at a time.
+- Separate primary metric from guardrail metrics.
+- Record data version, feature list, and parameters in the experiment log.
+- Reserve the test set for final validation only.
+
+### Reproducibility Package
+
+```python
+from pathlib import Path
+import json
+import datetime as dt
+
+meta = {
+    "run_at": dt.datetime.utcnow().isoformat(),
+    "dataset": "example_v1",
+    "assumptions": [
+        "trial users excluded",
+        "analysis window = last 30 days",
+        "threshold fixed before final test",
+    ],
+    "next_question": "Which segment shows largest variance next week?",
+}
+
+out = Path("artifacts")
+out.mkdir(exist_ok=True)
+(out / "run_meta.json").write_text(
+    json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8"
+)
+print("saved", out / "run_meta.json")
+```
+
+Small records like this compound into team-level learning velocity. A project is not about finding one right answer but iterating toward higher quality.
 
 ## How a Senior Engineer Thinks
 
@@ -165,6 +217,7 @@ Teams log experiments with *MLflow / Weights & Biases*. The *baseline* is always
 - Pin *random_state*.
 - Always look at *CV variance*.
 - One *change* per one *metric move*.
+- Modeling is closer to "repeatable verified experiments" than "finding a good algorithm".
 
 ## Checklist
 
