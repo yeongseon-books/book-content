@@ -278,6 +278,195 @@ The core idea is operating Korean generation APIs as a 4-layer contract — call
 
 The next article (episode 6, the final one) assembles a Korean RAG pipeline. We will combine BGE-M3 retrieval, CLOVA OCR text, and this post's LLM call into one flow that produces fact-grounded Korean responses — a minimum viable RAG, in code.
 
+## HyperCLOVA X REST Call Example
+
+The OpenAI-compatible interface is convenient for Solar and some providers, but HyperCLOVA X requires understanding NCP's proprietary REST contract for stable operation. Even when using an SDK wrapper, it is worth verifying the raw request/response format at least once.
+
+```python
+import os
+import requests
+
+def call_hyperclova_x(prompt: str) -> str:
+    host = os.environ['NCP_APIGW_HOST']
+    endpoint = '/testapp/v1/chat-completions/HCX-005'
+    url = f'https://{host}{endpoint}'
+
+    headers = {
+        'Content-Type': 'application/json; charset=utf-8',
+        'X-NCP-CLOVASTUDIO-API-KEY': os.environ['NCP_CLOVA_API_KEY'],
+        'X-NCP-APIGW-API-KEY': os.environ['NCP_APIGW_API_KEY'],
+        'X-NCP-CLOVASTUDIO-REQUEST-ID': 'korean-ai-stack-101-ep05',
+    }
+
+    payload = {
+        'messages': [
+            {'role': 'system', 'content': '당신은 한국어 기술 문서를 설명하는 시니어 개발자입니다.'},
+            {'role': 'user', 'content': prompt},
+        ],
+        'topP': 0.8,
+        'topK': 0,
+        'temperature': 0.3,
+        'maxTokens': 320,
+        'repeatPenalty': 1.1,
+        'includeAiFilters': True,
+    }
+
+    resp = requests.post(url, headers=headers, json=payload, timeout=12)
+    resp.raise_for_status()
+    data = resp.json()
+    return data['result']['message']['content']
+```
+
+The key point is the header contract, not the model name. A large portion of production issues start from key name typos, missing request IDs, or unset timeouts.
+
+## A Small Benchmark for Korean Response Quality
+
+To separate fluency from accuracy, you need an evaluation set — even a very small one. Here are the minimum metrics commonly used for Korean technical Q&A baselines.
+
+| Metric | Definition | Initial baseline example |
+| --- | --- | --- |
+| Format pass rate | Parse success ratio when JSON response is enforced | 0.98+ |
+| Refusal precision | Ratio of rule compliance on unanswerable questions | 0.95+ |
+| Citation presence rate | Ratio of responses containing a source line | 0.99+ |
+| Korean consistency | Ratio maintaining Korean style without English mixing | 0.97+ |
+
+A simple automated check function like this catches regressions quickly before deployment.
+
+```python
+import json
+import re
+
+def check_generation_contract(raw_text: str):
+    result = {
+        'len_ok': 20 <= len(raw_text) <= 2000,
+        'has_sources': '[sources:' in raw_text,
+        'no_ai_slop': not any(
+            bad in raw_text for bad in ['As an AI', 'I cannot', '저는 AI']
+        ),
+        'mostly_korean': bool(re.search(r'[가-힣]', raw_text)),
+    }
+    return result
+
+sample = '결제 동기화 지연을 먼저 확인하세요. [sources: 0,1]'
+print(json.dumps(check_generation_contract(sample), ensure_ascii=False))
+```
+
+## Production Config Example: Dual-Provider Routing
+
+For Korean-language services, it is safer to prepare a primary/fallback route in advance rather than locking in a single provider. This lets you reroute quickly during latency spikes or temporary outages.
+
+```yaml
+llm_router:
+  primary: solar-mini
+  fallback: hyperclova-x
+  timeout_ms: 10000
+  max_retries: 2
+
+providers:
+  solar:
+    base_url: https://api.upstage.ai/v1/solar
+    model: solar-mini
+    temperature: 0.3
+    max_tokens: 320
+
+  hyperclova:
+    host_env: NCP_APIGW_HOST
+    endpoint: /testapp/v1/chat-completions/HCX-005
+    temperature: 0.3
+    max_tokens: 320
+
+guardrails:
+  require_citation: true
+  reject_if_no_json_when_required: true
+  pii_mask_before_log: true
+```
+
+Keeping this configuration separate from code means a provider switch is a single PR, and temperature/length tuning history stays clear in version control.
+
+## Error Code Classification and Retry Policy
+
+Blindly retrying every API call failure can make things worse. It is better to define per-status-code responses up front.
+
+| Status code | Meaning | Recommended response |
+| --- | --- | --- |
+| 400 | Request format error | Fail immediately, no retry |
+| 401/403 | Auth/permission issue | Key rotation alert, no retry |
+| 429 | Rate limit | Exponential backoff, limited retries |
+| 500/502/503 | Transient server error | Short backoff retry, then fallback switch |
+| timeout | Network/latency | Prefer request reduction and fallback over increasing timeout |
+
+```python
+def should_retry(status_code: int) -> bool:
+    return status_code in (429, 500, 502, 503)
+```
+
+Embedding this rule at the router level keeps operational policy consistent even when per-model SDKs differ.
+
+## Korean System Prompt Template Example
+
+Prompt quality depends on the contract, not length. For Korean technical document answers, a template like this is usually sufficient.
+
+```text
+당신은 한국어 기술 문서를 설명하는 시니어 개발자입니다.
+규칙:
+1) 반드시 한국어로 답합니다.
+2) 제공된 문맥에 없는 내용은 추측하지 말고 '문맥에서 확인하지 못했습니다.'라고 답합니다.
+3) 답변 마지막 줄에 [sources: ...] 형식으로 출처 번호를 적습니다.
+4) 불필요한 사과문, 자기소개, 모델 언급을 하지 않습니다.
+```
+
+Fixing this template means style and safety rules persist even when you swap models — the product feels less shaky to users.
+
+## Operations Table: Managing Cost and Latency Together
+
+In LLM API operations, cost and latency matter as much as quality. Tracking per-request input/output tokens and p95 latency in a single table accelerates decision-making.
+
+| Profile | temperature | max_tokens | Avg input tokens | Avg output tokens | p95 latency (ms) | Cost per request (relative) |
+| --- | --- | --- | --- | --- | --- | --- |
+| concise-support | 0.2 | 180 | 420 | 120 | 820 | 1.0x |
+| default-explain | 0.3 | 320 | 530 | 210 | 1210 | 1.6x |
+| long-report | 0.4 | 700 | 760 | 520 | 2480 | 3.1x |
+
+The operations team should split profiles by product feature using this table. Applying the same token limit to every feature causes cost and latency to destabilize quickly.
+
+## Production Code Example: Provider Abstraction Interface
+
+To make provider swaps safe, wrap call code behind an interface.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class LLMRequest:
+    system: str
+    user: str
+    temperature: float = 0.3
+    max_tokens: int = 320
+
+class LLMProvider:
+    def generate(self, req: LLMRequest) -> str:
+        raise NotImplementedError
+
+class SolarProvider(LLMProvider):
+    def __init__(self, client, model='solar-mini'):
+        self.client = client
+        self.model = model
+
+    def generate(self, req: LLMRequest) -> str:
+        resp = self.client.chat.completions.create(
+            model=self.model,
+            temperature=req.temperature,
+            max_tokens=req.max_tokens,
+            messages=[
+                {'role': 'system', 'content': req.system},
+                {'role': 'user', 'content': req.user},
+            ],
+        )
+        return resp.choices[0].message.content
+```
+
+With this structure, you can use Solar during experimentation and swap to HyperCLOVA in environments requiring regulatory or contractual compliance — all through the same interface.
+
 ## Answering the Opening Questions
 
 - **What API contracts must you lock down before prompt tuning?**

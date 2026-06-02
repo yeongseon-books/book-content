@@ -225,6 +225,221 @@ The KoSimCSE example is valuable because it keeps the retrieval loop visible. Th
 
 The next article (episode 3) covers BGE-M3. We will see where it surpasses KoSimCSE on mixed Korean-English corpora, and what dense + sparse multi-vector retrieval means in code.
 
+## How Tokenizer Characteristics Affect Search Scores
+
+A frequently overlooked point when using KoSimCSE in production is the tokenizer. Even sentences with identical meaning produce different token fragments depending on spacing, particles, and loanword spelling—and these differences propagate into embedding distributions. In operations, record tokenizer characteristics alongside the model name.
+
+| Item | KoSimCSE (RoBERTa family) | BGE-M3 (XLM-R family) | Operational Implication |
+| --- | --- | --- | --- |
+| Base tokenizer | SentencePiece/BPE | SentencePiece multilingual | If Korean+English mix ratio is high, maintain a BGE-M3 baseline too |
+| Korean particle handling | Frequent splits at particle boundaries | Relatively smoother decomposition | KoSimCSE advantage may be stronger on short queries |
+| English abbreviation handling | High variance on abbreviations/version strings | More stable on abbreviations | If `API v2`, `SLA`, `OCR` are common, verify multilingual model |
+| Typo/spacing tolerance | Medium | Medium-high | Input normalization pipeline is mandatory |
+
+```python
+from transformers import AutoTokenizer
+
+samples = [
+    '결제는 됐는데 주문 내역이 보이지 않습니다.',
+    '결제는됬는데 주문내역이 안보여요',
+    'Payment succeeded but order history is missing',
+]
+
+tok_kosimcse = AutoTokenizer.from_pretrained('BM-K/KoSimCSE-roberta-multitask')
+tok_bgem3 = AutoTokenizer.from_pretrained('BAAI/bge-m3')
+
+for text in samples:
+    print('\n[TEXT]', text)
+    print('KoSimCSE:', tok_kosimcse.tokenize(text)[:18])
+    print('BGE-M3  :', tok_bgem3.tokenize(text)[:18])
+```
+
+The purpose of token comparison is not to dissect model internals. It is a diagnostic tool for quickly checking "how was the query decomposed" on days when scores fluctuate.
+
+## Measuring Recall and MRR Together with a Small Benchmark Set
+
+In practice, Recall@k alone cannot fully explain ranking quality. Even if the correct answer lands in the top-3, it being consistently third means low user-perceived quality. For a KoSimCSE baseline, measuring Recall@k and MRR (Mean Reciprocal Rank) together is better.
+
+```python
+def evaluate_retrieval_metrics(index, model, cases, top_k=3):
+    recall_hits = 0
+    reciprocal_ranks = []
+
+    for query, gold_idx in cases:
+        vec = model.encode([query], normalize_embeddings=True).astype('float32')
+        _, idx = index.search(vec, top_k)
+        ranked = idx[0].tolist()
+
+        if gold_idx in ranked:
+            recall_hits += 1
+            rank = ranked.index(gold_idx) + 1
+            reciprocal_ranks.append(1.0 / rank)
+        else:
+            reciprocal_ranks.append(0.0)
+
+    recall = recall_hits / len(cases)
+    mrr = sum(reciprocal_ranks) / len(cases)
+    return {'recall_at_k': round(recall, 3), 'mrr_at_k': round(mrr, 3)}
+
+benchmark_cases = [
+    ('패스워드 초기화 방법 알려 주세요', 0),
+    ('결제 후 주문 목록이 비어 있어요', 1),
+    ('배송 조회는 어디에서 하나요', 2),
+    ('송장 번호 확인하는 방법', 2),
+    ('주문이 사라졌어요', 1),
+]
+
+print(evaluate_retrieval_metrics(index, model, benchmark_cases, top_k=3))
+```
+
+**Expected output:**
+
+```text
+{'recall_at_k': 1.0, 'mrr_at_k': 0.9}
+```
+
+These numbers show "does it find the answer" and "does it rank the answer high" simultaneously. In Korean FAQ search, stable improvement in support-diversion rates typically appears when both metrics rise together.
+
+## Production Configuration Example: KoSimCSE Retrieval Service
+
+When moving to a production service, configuration drifts before code does. If model version, index file path, rebuild schedule, and timeout vary across environments, the same query can behave differently.
+
+```yaml
+service:
+  name: korean-faq-retriever
+  env: prod
+  host: 0.0.0.0
+  port: 8080
+
+embedding:
+  model_id: BM-K/KoSimCSE-roberta-multitask
+  normalize: true
+  batch_size: 128
+  cache_dir: /var/lib/app/embeddings
+
+index:
+  type: faiss-flat-ip
+  path: /var/lib/app/index/faqs.index
+  metadata_path: /var/lib/app/index/faqs.meta.json
+  rebuild_cron: '0 3 * * *'
+
+retrieval:
+  top_k: 3
+  min_score: 0.42
+  timeout_ms: 120
+
+observability:
+  log_level: INFO
+  metrics_enabled: true
+  trace_sample_ratio: 0.05
+```
+
+Configuration files look simple but greatly reduce operational incidents. Model swaps, threshold adjustments, and index rebuild schedule changes remain as recorded changes without code modifications.
+
+## Operational Logging from a Failure-Response Perspective
+
+Search failures often appear as "wrong answers" but the real cause is frequently a retrieval candidate miss. Logging the following per request is advisable.
+
+```python
+import json
+from datetime import datetime, timezone
+
+def log_retrieval_event(query, hits, model_name):
+    event = {
+        'ts': datetime.now(timezone.utc).isoformat(),
+        'model': model_name,
+        'query': query,
+        'top_hits': [
+            {
+                'idx': int(hit['idx']),
+                'score': round(float(hit['score']), 4),
+                'category': hit['category'],
+            }
+            for hit in hits
+        ],
+    }
+    print(json.dumps(event, ensure_ascii=False))
+```
+
+With this log, vague claims like "the model got worse" transform into actionable problems like "delivery-category query score tail dropped."
+
+## Data Cleanup Tips for Raising Korean Search Quality
+
+Corpus cleanup is as important as model selection. Korean FAQ has diverse spacing variants, honorific/informal forms, and abbreviations—same meaning appears in many surface forms.
+
+- When collecting question sentences, keep actual user expressions intact and add a normalized version in a separate field.
+- Manage proper nouns and domain terms in a dictionary to unify spelling variants.
+- For excessively long questions, store a summary version that preserves core intent alongside the original to improve retrieval stability.
+
+These cleanups accumulate value regardless of model changes. Whether using KoSimCSE or another embedding, data design raises the floor of retrieval-based quality.
+
+## Offline Regression Test Example for Korean FAQ Search
+
+Search quality can be largely caught by offline regression tests before deployment. The following pattern fixes a test set including query-expression variants and blocks deployment if performance drops below baseline.
+
+```python
+BASELINE = {
+    'recall_at_3': 0.94,
+    'mrr_at_3': 0.82,
+}
+
+def assert_regression_guard(metrics):
+    if metrics['recall_at_k'] < BASELINE['recall_at_3']:
+        raise AssertionError(
+            f"Recall regression: {metrics['recall_at_k']} < {BASELINE['recall_at_3']}"
+        )
+    if metrics['mrr_at_k'] < BASELINE['mrr_at_3']:
+        raise AssertionError(
+            f"MRR regression: {metrics['mrr_at_k']} < {BASELINE['mrr_at_3']}"
+        )
+
+metrics = evaluate_retrieval_metrics(index, model, benchmark_cases, top_k=3)
+assert_regression_guard(metrics)
+print('Pass regression guard:', metrics)
+```
+
+This regression guard is not a perfect quality guarantee, but it quickly blocks obvious drops after model changes or preprocessing modifications.
+
+## Korean Query Normalization Pipeline Example
+
+KoSimCSE is strong on short sentences, but if input fluctuates too much, the score distribution flattens quickly. Query normalization does not need to be overly clever—just ensuring consistency yields large effects.
+
+```python
+import re
+
+SPACE_RE = re.compile(r'\s+')
+
+REPLACE_RULES = {
+    '패스워드': '비밀번호',
+    '로그인 불가': '로그인 안 됨',
+    '주문내역': '주문 내역',
+    '환불요청': '환불 요청',
+}
+
+def normalize_query(text: str) -> str:
+    t = text.strip()
+    for src, dst in REPLACE_RULES.items():
+        t = t.replace(src, dst)
+    t = SPACE_RE.sub(' ', t)
+    return t
+```
+
+Normalization is not a trick to fool the model—it makes same-intent sentences arrive in the same form, making index search more stable.
+
+## Periodically Updating the Cosine Score Threshold
+
+Fixed thresholds go stale over time. As FAQs grow and sentence lengths change, score distributions shift. Recalculating the following statistics monthly and updating thresholds is safer.
+
+| Range | Recommended Calculation | Operational Use |
+| --- | --- | --- |
+| Similar distribution lower bound | Similar-pair score p10 | Below this → trigger retraining/normalization review |
+| Unrelated distribution upper bound | Unrelated-pair score p90 | Above this → false-positive risk alarm |
+| Safe threshold | `(similar_p10 + unrelated_p90) / 2` | Low-confidence search result branching |
+
+This approach is not an absolute answer, but it helps establish the principle that thresholds must move when operational data changes.
+
+Finally, do not just record threshold numbers in documentation—include the sample count and date used in calculation. This enables quick distinction between quality changes and data composition changes next quarter.
+
 ## Answering the Opening Questions
 
 - **Where does KoSimCSE show its effect first in Korean retrieval tasks?**

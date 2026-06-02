@@ -257,6 +257,219 @@ The value of the CLOVA OCR example is that it puts response-shape understanding 
 
 The next article (episode 5) covers HyperCLOVA X and Solar API. We will look at safe prompt patterns when handing OCR text or BGE-M3 retrieval results to a Korean LLM, with concrete API call code.
 
+## Separating the OCR Post-Processing Pipeline by Function Boundaries
+
+In practice, OCR quality issues arrive all at once — line reconstruction failures, number format errors, and column merge errors appear simultaneously, making root-cause analysis slow. Splitting by function boundary first lets you isolate failure points in logs.
+
+```python
+def extract_fields(payload):
+    for image in payload.get('images', []):
+        for field in image.get('fields', []):
+            yield {
+                'text': field.get('inferText', ''),
+                'confidence': float(field.get('inferConfidence', 0.0)),
+                'line_break': bool(field.get('lineBreak', False)),
+                'poly': field.get('boundingPoly', {}),
+            }
+
+def reconstruct_lines_from_fields(fields):
+    lines = []
+    cur_text, cur_conf = [], []
+    for f in fields:
+        cur_text.append(f['text'])
+        cur_conf.append(f['confidence'])
+        if f['line_break']:
+            lines.append({'text': ' '.join(cur_text), 'min_conf': min(cur_conf)})
+            cur_text, cur_conf = [], []
+    if cur_text:
+        lines.append({'text': ' '.join(cur_text), 'min_conf': min(cur_conf)})
+    return lines
+
+def validate_lines(lines):
+    errors = []
+    for i, line in enumerate(lines):
+        if len(line['text']) < 2:
+            errors.append((i, 'too_short'))
+        if '원' in line['text'] and not any(ch.isdigit() for ch in line['text']):
+            errors.append((i, 'amount_without_digits'))
+    return errors
+```
+
+With this separation, you can swap the API provider and still keep the post-processing core intact. This is especially effective when mixing General OCR, Template OCR, and other engines.
+
+## Defining Benchmark Metrics for Korean Documents
+
+Judging OCR quality by a single accuracy number often leads to operational failures. For Korean documents, it is better to track at least these metrics separately.
+
+| Metric | Definition | Recommended initial target | Notes |
+| --- | --- | --- | --- |
+| Line reconstruction accuracy | Ratio of lines matching human expectation | 0.93+ | Separate from token-level accuracy |
+| Amount format pass rate | Ratio passing currency regex | 0.98+ | Must document currency symbol/comma rules |
+| Date normalization pass rate | Ratio of successful date standardization | 0.95+ | Support both `2026.05.01` and `2026-05-01` |
+| Low-confidence review ratio | Ratio sent to human review queue | 0.05–0.15 | Too low = misses; too high = cost increase |
+
+Connecting this table to a dashboard lets you objectively measure the effect of OCR model version upgrades.
+
+## Production Config Example: OCR Ingestion Worker
+
+OCR is typically operated as an asynchronous batch. Processing time per request is long and there is external API dependency.
+
+```yaml
+worker:
+  name: ocr-ingestion-worker
+  concurrency: 8
+  queue: docs-ocr
+
+clova:
+  mode: real
+  endpoint: https://example.apigw.ntruss.com/custom/v1/12345/abcd/general
+  timeout_seconds: 15
+  max_retries: 3
+  retry_backoff_seconds: [1, 2, 4]
+
+postprocess:
+  line_min_conf_threshold: 0.82
+  amount_regex: '^[0-9,]+원$'
+  keep_raw_payload: true
+  raw_payload_bucket: s3://ocr-raw-prod
+
+output:
+  cleaned_bucket: s3://ocr-clean-prod
+  corpus_topic: rag-corpus-update
+
+monitoring:
+  error_rate_alert_threshold: 0.03
+  p95_latency_ms_alert_threshold: 12000
+```
+
+`keep_raw_payload` is worth the storage cost — it lets you reprocess without re-calling the API when quality issues surface later.
+
+## Making OCR Results Embedding-Friendly
+
+When passing results to BGE-M3 or KoSimCSE, attaching minimal metadata alongside line text is better for long-term operation than sending raw text alone.
+
+```python
+def to_embedding_records(doc_id, lines, source='clova-ocr'):
+    records = []
+    for i, line in enumerate(lines):
+        records.append({
+            'chunk_id': f'{doc_id}#L{i:03d}',
+            'text': line['text'],
+            'meta': {
+                'doc_id': doc_id,
+                'source': source,
+                'line_no': i,
+                'min_confidence': round(line['min_conf'], 4),
+            },
+        })
+    return records
+```
+
+This structure lets you show original line numbers directly in search results and easily build policies that filter out low-confidence lines.
+
+## Coordinate-Based Column Restoration Example
+
+For tax invoices and statements with 2+ columns, `lineBreak` alone may produce incomplete restoration. A minimal example using coordinates:
+
+```python
+def left_x(field):
+    vertices = field.get('boundingPoly', {}).get('vertices', [])
+    if not vertices:
+        return 0
+    return min(v.get('x', 0) for v in vertices)
+
+def split_two_columns(fields, boundary_x=540):
+    left_col, right_col = [], []
+    for f in fields:
+        if left_x(f) < boundary_x:
+            left_col.append(f)
+        else:
+            right_col.append(f)
+    return left_col, right_col
+```
+
+For services with fixed document layouts, this simple split alone significantly reduces line merge errors.
+
+## Building a Regression Test Set for OCR Quality
+
+OCR pipelines are sensitive to model version changes and preprocessing modifications. Fixing a small test set and attaching quantitative verification catches regressions quickly.
+
+```python
+EVAL_CASES = [
+    {
+        'name': 'receipt_simple',
+        'expected_lines': ['공급가액 45,000원', '부가세 4,500원', '합계 49,500원'],
+    },
+    {
+        'name': 'invoice_with_date',
+        'expected_lines': ['작성일자 2026-05-01', '청구 금액 120,000원'],
+    },
+]
+
+def line_exact_match_rate(pred_lines, expected_lines):
+    pred_set = set(pred_lines)
+    exp_set = set(expected_lines)
+    return len(pred_set & exp_set) / len(exp_set)
+```
+
+The exact-line-match metric is simple but powerful — especially for structured documents like receipts and invoices.
+
+## Amount/Date Normalization Utilities
+
+In Korean documents, number format normalization directly affects search quality. The same amount written as `45,000원`, `45000원`, or `45.000원` disperses search hits.
+
+```python
+import re
+
+AMOUNT_PATTERNS = [
+    re.compile(r'^(\d{1,3}(,\d{3})+)원$'),
+    re.compile(r'^(\d+)원$'),
+]
+
+DATE_PATTERNS = [
+    re.compile(r'^(\d{4})\.(\d{2})\.(\d{2})$'),
+    re.compile(r'^(\d{4})-(\d{2})-(\d{2})$'),
+]
+
+def normalize_amount(token: str) -> str:
+    clean = token.replace('.', '').replace(',', '')
+    if clean.endswith('원'):
+        num = clean[:-1]
+        if num.isdigit():
+            return f"{int(num):,}원"
+    return token
+
+def normalize_date(token: str) -> str:
+    for pat in DATE_PATTERNS:
+        m = pat.match(token)
+        if m:
+            y, mm, dd = m.groups()
+            return f'{y}-{mm}-{dd}'
+    return token
+```
+
+This normalization is not flashy, but it serves as the foundation for aligning same-meaning units to identical strings in the embedding corpus.
+
+## Failure Recovery Strategy for Operational Batches
+
+OCR calls frequently encounter network errors, capacity limits, and transient 5xx responses. In queue-based batches, defining failure reprocessing policy first stabilizes overall throughput.
+
+| Failure type | Retry policy | DLQ escalation threshold |
+| --- | --- | --- |
+| timeout | 1s, 2s, 4s backoff retry | 3 failures → DLQ |
+| 429 | Long backoff (5s+) + jitter | 5 failures → DLQ |
+| 5xx | Short backoff retry | 3 failures → DLQ |
+| payload parse error | No retry | Immediate DLQ |
+
+```python
+def next_retry_delay(attempt, reason):
+    if reason == 'rate_limit':
+        return min(30, 5 * (2 ** attempt))
+    return min(10, 1 * (2 ** attempt))
+```
+
+This level of policy alone significantly reduces worker stalls during bulk document processing.
+
 ## Answering the Opening Questions
 
 - **When plugging in OCR, should you check text accuracy first or response structure first?**

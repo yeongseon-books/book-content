@@ -240,6 +240,183 @@ The value of the BGE-M3 dense example is that it draws a clear baseline for mult
 
 The next article (episode 4) covers the CLOVA OCR API. We will reliably pull text out of Korean document images and shape the result into the form a BGE-M3 corpus expects, with code.
 
+## How to Build a Multilingual Benchmark Table
+
+What matters in multilingual search is not a single number but failure locations by case. Recording Korean-query-to-English-document cases and Korean-query-to-Korean-document cases separately reveals improvement directions.
+
+```python
+def evaluate_by_target_language(index, model, docs, eval_cases, top_k=5):
+    buckets = {
+        'ko_target': {'n': 0, 'hits': 0},
+        'en_target': {'n': 0, 'hits': 0},
+    }
+
+    for case in eval_cases:
+        q = case['query']
+        gold = case['gold_idx']
+        target_lang = docs[gold]['lang']
+
+        vec = model.encode([q], normalize_embeddings=True).astype('float32')
+        _, idx = index.search(vec, top_k)
+        retrieved = idx[0].tolist()
+
+        key = 'ko_target' if target_lang == 'ko' else 'en_target'
+        buckets[key]['n'] += 1
+        buckets[key]['hits'] += int(gold in retrieved)
+
+    for key, row in buckets.items():
+        recall = row['hits'] / row['n'] if row['n'] else 0.0
+        print(key, f"Recall@{top_k}={recall:.3f}")
+```
+
+**Expected output:**
+
+```text
+ko_target Recall@5=0.920
+en_target Recall@5=0.860
+```
+
+This level of separation is highly practical in operations. For example, if only English-target Recall drops, you can start checking whether corpus updates were skewed toward English documents or whether query preprocessing over-reduced Korean expressions.
+
+## Dense + Sparse + Rerank Extension Order
+
+With BGE-M3, the temptation is to use dense, sparse, and multi-vector all at once. But in practice, an order that enables root-cause tracing matters more.
+
+| Stage | Configuration | Metric | Criterion to advance |
+| --- | --- | --- | --- |
+| 1 | Dense only (`IndexFlatIP`) | Recall@5, MRR@5 | Korean-query/English-target Recall ≥ 0.8 |
+| 2 | Dense + BM25 (RRF) | Recall@5, NDCG@10 | False positive reduction on abbreviation/proper-noun queries |
+| 3 | Dense top-50 + Reranker | Recall@5, Precision@1 | Consistent top-1 accuracy improvement |
+| 4 | Sparse/multi-vector addition | Latency, Cost, Quality | Meaningful gain within latency budget |
+
+Following this order lets you explain "why it improved" and keeps rollback cost low when regressions occur.
+
+## Production Configuration Example: Multilingual Search API
+
+Multilingual search services depend on index operation policies as much as model performance. Below is an operational configuration example based on BGE-M3.
+
+```yaml
+service:
+  name: multilingual-retriever
+  env: prod
+  region: ap-northeast-2
+
+embedding:
+  model_id: BAAI/bge-m3
+  normalize: true
+  device: cuda
+  dtype: float16
+  batch_size: 96
+
+index:
+  backend: faiss
+  type: ivf-flat-ip
+  nlist: 4096
+  nprobe: 24
+  index_path: /data/index/docs.ivf
+  metadata_path: /data/index/docs.meta.parquet
+
+retrieval:
+  top_k: 5
+  min_score: 0.35
+  reranker_enabled: true
+  reranker_model: BAAI/bge-reranker-v2-m3
+
+runtime:
+  request_timeout_ms: 250
+  max_qps_per_pod: 35
+  warmup_queries:
+    - 쿠버네티스 롤백 절차
+    - 환불 SLA 정책
+```
+
+In operations, managing `nprobe` and `top_k` together is essential. Raising `nprobe` improves Recall but increases latency, so profiling by request characteristic is advisable.
+
+## Comparison Logs Useful During Incidents
+
+Multilingual search incidents often manifest in only one language. Logging query language, target language (in evaluation), and top-candidate language distribution per request speeds up root-cause isolation.
+
+```python
+import json
+
+def log_multilingual_retrieval(query, hits, query_lang='ko'):
+    event = {
+        'query': query,
+        'query_lang': query_lang,
+        'top_k': len(hits),
+        'scores': [round(float(h['score']), 4) for h in hits],
+        'langs': [h['lang'] for h in hits],
+        'doc_ids': [h['id'] for h in hits],
+    }
+    print(json.dumps(event, ensure_ascii=False))
+```
+
+For example, if Korean queries increasingly return only English documents in the top-5, suspect corpus supply imbalance or topic bias.
+
+## Tokenizer Length Statistics as Multilingual Input Health Indicator
+
+In BGE-M3, token length distributions can shift significantly when query language changes. Ignoring this shift can lead to mistaking latency increases for model problems. Aggregating query token lengths daily simplifies operational judgments.
+
+```python
+from transformers import AutoTokenizer
+import numpy as np
+
+tokenizer = AutoTokenizer.from_pretrained('BAAI/bge-m3')
+
+def token_length_stats(queries):
+    lengths = [len(tokenizer.encode(q, add_special_tokens=True)) for q in queries]
+    return {
+        'count': len(lengths),
+        'p50': int(np.percentile(lengths, 50)),
+        'p90': int(np.percentile(lengths, 90)),
+        'p99': int(np.percentile(lengths, 99)),
+        'max': max(lengths),
+    }
+```
+
+If token length p99 suddenly spikes, check first whether raw log text leaked into prompt input or OCR line breaks collapsed.
+
+## Bilingual Benchmark Example Results Table
+
+To aid interpretation of multilingual baselines, recording small-scale experiment results in documentation is helpful.
+
+| Model | ko→ko Recall@5 | ko→en Recall@5 | MRR@5 | p95 latency (ms) |
+| --- | --- | --- | --- | --- |
+| KoSimCSE | 0.94 | 0.51 | 0.73 | 34 |
+| BGE-M3 dense | 0.92 | 0.86 | 0.79 | 51 |
+| BGE-M3 dense + rerank | 0.95 | 0.89 | 0.84 | 89 |
+
+This table shows "what improvement was gained at what cost" rather than "which model is unconditionally superior." It effectively gets operations and product teams looking at the same picture.
+
+## Index Rebuild and Deployment Strategy
+
+Multilingual corpora grow quickly, so define an index rebuild strategy first. Typically both patterns are used together:
+
+1. **Weekly full rebuild**: Clears accumulated drift and omissions.
+2. **Hourly incremental updates**: Quickly makes new documents searchable.
+
+```python
+def should_trigger_full_rebuild(last_full_rebuild_hours, drift_ratio):
+    if last_full_rebuild_hours >= 24 * 7:
+        return True
+    if drift_ratio >= 0.12:
+        return True
+    return False
+```
+
+Here `drift_ratio` is the proportion of documents existing only in the incremental index but not in the main index. When this value grows, search results start skewing toward stale documents.
+
+## Team Operations Checkpoint: Reducing Multilingual Search Regressions
+
+Multilingual search wobbles more from operational procedures than model quality. Fixing a simple weekly review routine significantly reduces unnecessary regressions.
+
+1. **Corpus increment check**: Record per-language document growth rate versus last week.
+2. **Evaluation set re-run**: Re-measure ko→ko, ko→en Recall@5 with the same seed.
+3. **Latency budget check**: Confirm p95 latency and GPU memory usage together.
+4. **Top failure case logging**: Fix 10 failed queries into the next regression set.
+
+Documenting this procedure lets the entire team interpret results against the same criteria when experimenting with new models or index options.
+
 ## Answering the Opening Questions
 
 - **Where is BGE-M3 stronger than KoSimCSE on a Korean-English mixed corpus?**
