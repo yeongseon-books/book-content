@@ -162,16 +162,66 @@ The key is to *prove the new version is healthy* before traffic moves.
 
 ## How This Shows Up in Production
 
-Most teams use *Docker + GitHub Actions + an orchestrator (Kubernetes/ECS)*. A merged PR triggers CI: build the image, push it, deploy. Operators stop *running commands* and start *watching the system*.
+Most teams use Docker + GitHub Actions + an orchestrator (Kubernetes/ECS). A merged PR triggers CI: build → test → push image → deploy. Operators stop running commands and start watching the system.
+
+### Deploy Flow (Universal Pattern)
+
+```text
+1. main merge
+2. CI tests pass
+3. Image build + SHA tag
+4. Staging deploy
+5. Readiness/error-rate verification
+6. Production rolling update
+7. Post-deploy 10-min observation
+8. Auto or manual rollback if thresholds exceeded
+```
+
+### Post-Deploy 10-Minute Routine
+
+| Window | Metric | Decision criteria |
+| --- | --- | --- |
+| 0–2 min | Readiness pass rate | 100% per instance |
+| 2–5 min | 5xx rate, p95 latency | No spike vs previous deploy |
+| 5–10 min | DB connections, queue depth, retry rate | No background load increase |
+
+Watch *rate of change*, not averages. Normal avg latency + spiking p95 = bottleneck on a specific path.
+
+### Deploy Checklist Table
+
+| Item | Verification question | Risk if skipped |
+| --- | --- | --- |
+| Env vars | All required keys injected? | Boot failure or runtime exception |
+| Secrets | Nothing in image/logs? | Security incident, costly key rotation |
+| Migration | Schema matches this release? | Partial feature failure |
+| Health | liveness + readiness both pass? | Zero-downtime deploy fails |
+| Rollback | Can revert to last stable in < 2 min? | Extended outage |
+| Monitoring | Error/latency/resource alerts active? | Delayed detection |
+
+### Migration + Rollback Strategy (Expand-Deploy-Contract)
+
+1. **Expand**: add nullable columns, new indexes—backwards-compatible with current code
+2. **Deploy**: new code handles both old and new schema
+3. **Contract**: after observation, drop unused columns/paths
+
+This ensures app rollback doesn't conflict with data layer changes. Destructive migration bundled with code deploy = recovery time explosion.
+
+### Four Failure Patterns
+
+| Scenario | Symptom | Root cause | Fix |
+| --- | --- | --- | --- |
+| Works locally, fails in prod | `KeyError: DB_HOST` on boot | Missing env var | Startup config validation, fail-fast |
+| Deploy succeeds, container crashes | CrashLoopBackOff | Port mismatch (CMD/EXPOSE/service) | Unify port definition to single source |
+| Can't rollback | No previous image to revert to | Only `latest` tag used | Publish `service:semver` + `service:git-sha` |
+| DB migration skipped | Specific endpoints return 500 | Code/schema version mismatch | Migration step mandatory in pipeline, abort on failure |
 
 ## How a Senior Engineer Thinks
 
-- Every deploy must be *reversible*.
-- Secrets live only in a *secret manager*.
-- Smaller images mean faster builds and deploys.
-- Migrations are designed to be *backward compatible*.
-- A deploy that pages someone is, by definition, a *bad deploy*.
-
+- **Every deploy must be reversible.** If you can't `helm rollback` or redeploy the previous SHA within 2 minutes, the deploy process is incomplete.
+- **Secrets live only in a secret manager.** Not in `.env` committed to Git, not baked into images. Rotation must be possible without redeployment.
+- **Smaller images mean faster builds and deploys.** Multi-stage builds, `.dockerignore`, minimal base images. Every MB in the image is seconds in CI and cold-start.
+- **Migrations are backward-compatible by design.** Never drop a column in the same release that stops using it. Expand first, deploy, observe, then contract.
+- **A deploy that pages someone is a bad deploy.** Post-deploy observation is part of the deploy, not a separate concern. The engineer who deploys owns the next 10 minutes.
 ## Checklist
 
 - [ ] You can write a Dockerfile and build the image.
