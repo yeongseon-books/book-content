@@ -173,16 +173,70 @@ Most brokers offer at-least-once. The consumer absorbs duplicates with an idempo
 
 ## How This Shows Up in Production
 
-User paths that need an immediate answer go through RPC. Long work (sending email, generating receipts, analytics) goes through queues. Microservices commonly split modules within a company by RPC and domain boundaries by messages. Event sourcing and CQRS push the message model all the way.
+User paths that need an immediate answer go through RPC. Long work (sending email, generating receipts, analytics) goes through queues. Microservices commonly split by RPC for synchronous domains and messages for domain boundaries.
+
+### RPC Deep Dive: Deadline Propagation
+
+gRPC supports deadline propagation natively. The client's deadline flows to downstream services, preventing wasted work on already-timed-out requests.
+
+```python
+# deadline propagation example
+import grpc
+
+stub = PaymentServiceStub(channel)
+try:
+    response = stub.Charge(
+        ChargeRequest(idempotency_key="order-12345", amount_cents=5000),
+        timeout=2.0,  # propagates downstream
+    )
+except grpc.RpcError as e:
+    if e.code() == grpc.StatusCode.DEADLINE_EXCEEDED:
+        check_idempotency_key("order-12345")  # unknown state
+    elif e.code() == grpc.StatusCode.UNAVAILABLE:
+        retry_with_backoff()  # safe to retry
+```
+
+In chain A → B → C: if A sets 2s and B uses 1.5s, C gets only 0.5s. This prevents timed-out requests from consuming downstream resources.
+
+### Message Ordering and Partitioning
+
+Common misconception: "queues guarantee order." In reality, most distributed queues guarantee order *only within a partition*.
+
+```text
+Topic: order.events (4 partitions)
+Partition key: customer_id
+
+Partition 0: [cust-A order_created, cust-A payment_done, cust-A shipped]
+Partition 1: [cust-B order_created, cust-B payment_done]
+Partition 2: [cust-C order_created]
+Partition 3: (empty)
+```
+
+- Same-customer events: ordered (same partition).
+- Cross-customer events: no global order guaranteed.
+- Need global order? Single partition—but throughput tanks.
+
+### DLQ Operations
+
+Failed messages go to a Dead Letter Queue instead of infinite retry:
+
+| DLQ Field | Purpose |
+| --- | --- |
+| original_topic | Where it came from |
+| payload | Original message content |
+| error | Failure reason |
+| retry_count | How many attempts so far |
+| first/last_failed_at | Timing for alerting |
 
 ## How a Senior Engineer Thinks
 
-- They first ask, "do we really need a synchronous answer?"
-- They cap chain depth (for example, no more than three).
-- They embed idempotency keys from the first commit.
-- They assume brokers are at-least-once.
-- They treat DLQs and retry policy as operational responsibilities.
-
+- First asks: "do we really need a synchronous answer?"
+- Caps RPC chain depth (e.g., max 3 hops).
+- Embeds idempotency keys from the first commit—never retrofits.
+- Assumes brokers are at-least-once; designs consumers to be idempotent.
+- Treats DLQs and retry policy as operational responsibilities, not afterthoughts.
+- Chooses partition keys carefully—ordering scope = partition key scope.
+- Uses deadline propagation to prevent cascading timeouts.
 ## Checklist
 
 - [ ] Can you state the difference between RPC and message passing in one line?
