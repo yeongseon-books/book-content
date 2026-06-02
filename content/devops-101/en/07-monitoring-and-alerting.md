@@ -142,16 +142,68 @@ scrape_configs:
 
 ## How This Shows Up in Production
 
-Mature teams use *SLO-based alerting*. They define an *error budget* and only alert when the *budget burn rate* is fast.
+Mature teams use *SLO-based alerting*. They define an *error budget* and only alert when the *budget burn rate* is fast. But the monitoring system itself requires careful design.
+
+### Core Metric Classification
+
+| Category | Examples | Purpose |
+| --- | --- | --- |
+| Traffic | requests/sec | Load trend |
+| Errors | 5xx ratio | Quality degradation detection |
+| Latency | p95 latency | User-perceived performance |
+| Resources | CPU, memory, saturation | Capacity / bottleneck |
+| Business | checkout success rate | Service value observation |
+
+### Grafana Dashboard Layout
+
+| Panel Order | Content | Reason |
+| --- | --- | --- |
+| 1 | Request rate, error rate, latency | Service status in under 1 minute |
+| 2 | Infrastructure resource utilization | Bottleneck hypothesis evidence |
+| 3 | Recent deploy events | Correlate changes with anomalies |
+| 4 | Alert history | Noise pattern review |
+
+### Why RED + USE Together
+
+- RED shows user-request-perspective quality fast.
+- USE explains system-resource-perspective bottlenecks.
+- Together they connect *"there is a problem"* with *"why it is slow"* in one conversation.
+
+### Alertmanager Best Practices
+
+```yaml
+groups:
+  - name: api-alerts
+    rules:
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.01
+        for: 5m
+        labels:
+          severity: page
+        annotations:
+          summary: "API 5xx ratio > 1% for 5m"
+          runbook: "https://internal/wiki/runbook-api-errors"
+```
+
+Every alert includes a `runbook` link. An alert without a response guide is just noise.
+
+### Operational Rules
+
+1. Every alert *must* include a runbook link.
+2. Use `for` conditions to filter momentary spikes.
+3. Limit label cardinality to control storage cost and query speed.
+4. Monitor the monitoring system itself (scrape failures, disk usage).
+5. Meaningful signals only—actionable alerts only. That's how on-call quality is maintained.
 
 ## How a Senior Engineer Thinks
 
-- *Alerts demand action*. Informational signals belong on *dashboards*.
-- *Dashboards must answer in one minute*.
-- *Cardinality* is cost. Label carefully.
-- *SLOs* are an *agreement between team and business*.
-- *Monitoring is also a code-review subject*.
-
+- *Alerts demand action*. Informational signals belong on dashboards, not pagers.
+- *Dashboards must answer in one minute*. If it takes longer, restructure the panels.
+- *Cardinality is cost*. Label with care; never by user_id or request_id.
+- *SLOs* are an agreement between team and business—not just a number.
+- *Monitoring is also a code-review subject*. Alert rules get PRs.
+- *Start with RED + p95 + runbook links*. These three change response speed more than any tool migration.
+- *Design questions before metrics*. "What degrades → who acts → what action" defines the alert.
 ## Checklist
 
 - [ ] *RED metrics* exist for every service.
