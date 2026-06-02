@@ -169,16 +169,60 @@ FastAPI's `dependency_overrides` lets you test *without a real database*.
 
 ## How This Shows Up in Production
 
-CI (GitHub Actions and friends) runs `pytest` on every PR. Units take *seconds*, integration *tens of seconds*, E2E *minutes* — break that distribution and dev speed stalls. Seniors keep an eye on the *pyramid shape*.
+CI runs `pytest` on every PR. Units take seconds, integration tens of seconds, E2E minutes—break that distribution and dev speed stalls.
+
+### What to Test (Priority Order)
+
+1. **Business rules**: price calculation, permission decisions, state transitions
+2. **Contracts**: HTTP status codes, response schema, error format
+3. **Boundary behavior**: transactions, retries, timeouts, rollbacks
+4. **High-regression-risk bug paths**
+
+Avoid testing implementation internals (private method call counts, ORM query builder internals, internal function decomposition that changes on refactor).
+
+### Coverage: 80% Guideline
+
+```bash
+pytest --cov=app --cov-report=term-missing --cov-branch
+```
+
+80% line coverage = minimum safety net. But a senior checks *what's missing*, not the number. If auth failure, payment cancellation, and permission bypass branches are untested, 90% is still unsafe. 100% as a hard target creates meaningless assertions and refactoring resistance.
+
+### Four Production Failure Patterns
+
+| Scenario | Symptom | Root cause | Fix |
+| --- | --- | --- | --- |
+| Passes locally, fails in CI | Timezone, OS path, missing env var | Environment coupling | `.env.test`, fixture-pinned time/UUID, mock network |
+| Tests are slow | Suite takes 5+ minutes | Real I/O in every test | Unit=no I/O, integration=txn rollback, E2E=minimal critical paths |
+| Refactored, tests pass, prod breaks | Implementation-coupled mocks | No contract-level integration tests | Add status code + schema assertions per endpoint |
+| No error-path tests, 500 in prod | Only happy path verified | Missing exception mapping tests | Test `DomainError→400`, timeout→503 explicitly |
+
+### Test Organization Tips
+
+```python
+# conftest.py — shared fixtures, auto-discovered by pytest
+@pytest.fixture
+def db_session():
+    """Transaction-scoped session, rolled back after each test."""
+    ...
+
+# Markers for execution control
+@pytest.mark.integration
+def test_get_order_history(client):
+    response = client.get("/orders/history")
+    assert response.status_code == 200
+
+# Run fast tests only:
+# pytest -m "not integration"
+```
 
 ## How a Senior Engineer Thinks
 
-- A new feature ships *with its tests*.
-- Reproduce a bug with a *test* before fixing it.
-- Test names read like *sentences* (`test_user_with_zero_age_returns_422`).
-- Mock at the *external boundary*, not the internals.
-- Risk areas matter more than coverage numbers.
-
+- **A new feature ships with its tests.** Untested code is unfinished code. The PR includes the feature AND its verification—no follow-up "add tests later" ticket.
+- **Reproduce a bug with a test before fixing it.** The test proves the bug exists, the fix makes it pass, and regression is permanently blocked.
+- **Test names read like sentences.** `test_user_with_zero_age_returns_422` tells you what broke without reading the test body. Debugging starts from the test name in CI output.
+- **Mock at the external boundary, not the internals.** Mock the HTTP client, the database connection, the message queue—not your own service layer. Internal mocks couple tests to implementation.
+- **Risk areas matter more than coverage numbers.** One test on the payment retry path is worth ten tests on a CRUD getter. Allocate testing effort proportional to failure cost.
 ## Checklist
 
 - [ ] You can run a first pytest test.
