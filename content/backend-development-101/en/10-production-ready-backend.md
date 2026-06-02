@@ -188,16 +188,69 @@ Once written down, alerts and capacity planning *follow naturally*.
 
 ## How This Shows Up in Production
 
-Most companies maintain a *standard template* with layered directories, configuration layering, and the three observability pillars baked in. New services start by *cloning the template*. A senior engineer's job often includes *maintaining that template*.
+Most companies maintain a standard service template with layered directories, configuration layering, and the three observability pillars baked in. New services start by cloning the template.
+
+### Security Middleware Defaults
+
+| Setting | Blocks | Common misconfiguration |
+| --- | --- | --- |
+| CORS origin restriction | Arbitrary browser calls | `allow_origins=["*"]` + credentials |
+| `X-Frame-Options` | Clickjacking | Missing entirely |
+| HSTS | HTTPS downgrade | Disabled in prod by accident |
+| CSP | Script injection | Overly permissive `unsafe-inline` |
+
+### DI Wiring Pattern (main.py = wiring only)
+
+```python
+# app/api/deps.py
+from collections.abc import Generator
+from sqlalchemy.orm import Session
+from app.db.session import SessionLocal
+from app.repositories.user_repository import UserRepository
+from app.services.user_service import UserService
+
+def get_db() -> Generator[Session, None, None]:
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+def get_user_service(db: Session = Depends(get_db)) -> UserService:
+    return UserService(UserRepository(db))
+```
+
+This makes testing trivial: override `get_db` with an in-memory session, and the entire service chain follows.
+
+### Minimum Viable Observability (Three Metrics)
+
+```python
+from prometheus_client import Counter, Histogram
+
+REQUEST_COUNT = Counter(
+    "http_requests_total", "Total requests",
+    ["method", "path", "status"],
+)
+REQUEST_LATENCY = Histogram(
+    "http_request_duration_seconds", "Latency",
+    ["method", "path"],
+    buckets=(0.01, 0.05, 0.1, 0.3, 0.5, 1.0, 2.0, 5.0),
+)
+REQUEST_ERRORS = Counter(
+    "http_request_errors_total", "Failed requests",
+    ["method", "path", "status"],
+)
+```
+
+Start with latency (histogram), errors (counter), throughput (counter). Complex dashboards come later—these three answer "is the service healthy?" from day one.
 
 ## How a Senior Engineer Thinks
 
-- Pick the structure that is comfortable *six months from now*, not today.
-- Every new layer must have a *clear name and responsibility*.
-- "*Where should this code live?*" being unclear is a sign the structure is wrong.
-- Operating without observability is *driving with your eyes closed*.
-- Good structure is measured by *the speed of a new teammate's first PR*.
-
+- **Pick the structure comfortable six months from now, not today.** A flat file works for a weekend project. A layered directory (router/service/repository/schema) works for a team. Choose based on where the project is heading.
+- **Every new layer must have a clear name and responsibility.** If you can't explain what `utils.py` owns in one sentence, it's a dump drawer that will grow unbounded.
+- **"Where should this code live?" being unclear = structure is wrong.** Good architecture makes the answer obvious. If two seniors disagree on placement, the boundary is poorly defined.
+- **Operating without observability is driving with eyes closed.** Metrics, logs, and traces aren't nice-to-have—they're how you know the system works. Ship them with the first deploy, not after the first incident.
+- **Good structure is measured by a new teammate's first PR speed.** If onboarding takes weeks of tribal knowledge transfer, the codebase has implicit conventions that should be explicit structure.
 ## Checklist
 
 - [ ] All nine layers are *visible as directories*.
