@@ -163,14 +163,65 @@ Never decide ordering with a wall clock. Episode 6 (consensus) and episode 8 (me
 
 Every web backend is effectively a distributed system. An RDBMS with a replica plus failover is one. Redis Cluster, Kafka, and Cassandra obviously are. So are AZ-level redundancy in cloud, multi-region setups, and CDNs.
 
+### The 8 Fallacies of Distributed Computing
+
+Listed in 1991, these remain the most common traps for newcomers 30+ years later.
+
+| Fallacy | Reality |
+| --- | --- |
+| The network is reliable | Packet loss, delay, reordering are everyday |
+| Latency is zero | Even within a datacenter, hundreds of microseconds |
+| Bandwidth is infinite | Serialization size becomes a bottleneck |
+| The network is secure | MITM attacks and missing auth happen |
+| Topology doesn't change | Cloud IPs and routes shift constantly |
+| There is one administrator | Multiple teams, multiple cloud accounts |
+| Transport cost is zero | Serialization/deserialization consumes CPU |
+| The network is homogeneous | Cross-region RTT is 10-50x intra-AZ |
+
+Turn these into a code-review checklist:
+
+```text
+- [ ] All external calls have a timeout?
+- [ ] Retry policy designed with idempotency?
+- [ ] Serialization size measured?
+- [ ] TLS/auth applied?
+- [ ] Deploy scripts assume IP changes?
+```
+
+### Timeout Ambiguity — The "Unknown" State
+
+```python
+try:
+    r = requests.get("http://payment-service/charge", timeout=2.0)
+except requests.exceptions.ReadTimeout:
+    # Three possibilities — all indistinguishable from caller's view:
+    # 1. Server never received the request
+    # 2. Server processed it but response was lost
+    # 3. Server is still processing
+    pass
+```
+
+This ambiguity is the most fundamental difficulty. The *unknown* state is harder to handle than success or failure. Safe retry requires server-side idempotency.
+
+### Why Failure Detection Requires Coordination
+
+```text
+Node A: "B timed out → must be dead"
+Node C: "B just responded to me"
+→ Who is right? → Consensus needed
+```
+
+A single node declaring another dead causes split-brain. This is *why* consensus protocols (Episode 6) exist.
+
 ## How a Senior Engineer Thinks
 
-- They explicitly distrust single-machine intuition.
-- They design timeouts, retries, and idempotency from line one.
-- They include the "unknown" state in the system model.
-- They trust monotonic clocks and treat wall clocks as display only.
-- They recognize when distribution is not needed (a single machine suffices).
-
+- Explicitly distrusts single-machine intuition across network boundaries.
+- Designs timeouts, retries, and idempotency from line one—never bolts them on later.
+- Includes the "unknown" state in every system model.
+- Trusts monotonic clocks; treats wall clocks as display only.
+- Recognizes when distribution is *not* needed—a single machine suffices for many workloads.
+- Uses the 8 Fallacies as a review checklist, not a trivia list.
+- Knows that latency → looks like failure → needs coordination → adds latency (circular).
 ## Checklist
 
 - [ ] Can you define a distributed system in one sentence?
