@@ -280,6 +280,516 @@ MkDocs + Material theme is the de facto standard in the Python ecosystem today. 
 
 The next post covers **production package template** — cookiecutter, copier, and GitHub Template.
 
+## README Writing Guide
+
+The README is the first impression of your package and the first document users read. It appears on PyPI, GitHub, and documentation sites.
+
+### Required sections
+
+```markdown
+# acme-utils
+
+> Production-ready utility library for Acme microservices.
+
+[![PyPI version](https://img.shields.io/pypi/v/acme-utils.svg)](https://pypi.org/project/acme-utils/)
+[![Python versions](https://img.shields.io/pypi/pyversions/acme-utils.svg)](https://pypi.org/project/acme-utils/)
+[![CI](https://github.com/acme/acme-utils/actions/workflows/ci.yml/badge.svg)](https://github.com/acme/acme-utils/actions)
+
+## Installation
+
+```bash
+pip install acme-utils
+```
+
+## Quick Start
+
+```python
+from acme_utils import Engine, Settings
+
+settings = Settings.from_env()
+engine = Engine(settings)
+result = engine.run("SELECT * FROM users")
+```
+
+## Features
+
+- **Type-safe configuration** — Pydantic-based settings with env var support
+- **Retry logic** — Configurable retry with exponential backoff
+- **Structured logging** — JSON logging for production environments
+
+## Documentation
+
+Full documentation: https://acme.github.io/acme-utils
+
+## Development
+
+```bash
+git clone https://github.com/acme/acme-utils.git
+cd acme-utils
+pip install -e ".[dev]"
+pytest
+```
+
+## License
+
+MIT License. See [LICENSE](LICENSE) for details.
+```
+
+### README writing principles
+
+| Principle | Description |
+|---|---|
+| 30-second rule | Users must understand what the package does in 30 seconds |
+| Copy-paste-ready code | Quick Start must be runnable as-is |
+| Badges | Build status, version, and Python versions at a glance |
+| Links | Connect to detailed docs, changelog, and issue tracker |
+
+## Building a Documentation Site with MkDocs
+
+MkDocs is a Markdown-based static documentation site generator. Combined with the Material theme, you can build modern documentation quickly.
+
+### Initial setup
+
+```bash
+pip install mkdocs mkdocs-material mkdocstrings[python]
+mkdocs new docs
+```
+
+```yaml
+# mkdocs.yml
+site_name: Acme Utils
+site_url: https://acme.github.io/acme-utils
+repo_url: https://github.com/acme/acme-utils
+
+theme:
+  name: material
+  features:
+    - content.code.copy
+    - navigation.sections
+    - navigation.expand
+    - search.suggest
+  palette:
+    - scheme: default
+      primary: indigo
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            show_source: true
+            show_root_heading: true
+            docstring_style: google
+
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Installation: getting-started/installation.md
+    - Quick Start: getting-started/quickstart.md
+  - User Guide:
+    - Configuration: guide/configuration.md
+    - Retry Logic: guide/retry.md
+  - API Reference:
+    - Core: api/core.md
+    - Config: api/config.md
+  - Changelog: changelog.md
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - admonitions
+  - pymdownx.tabbed:
+      alternate_style: true
+```
+
+### Directory structure
+
+```text
+docs/
+├── index.md                    # Homepage
+├── getting-started/
+│   ├── installation.md
+│   └── quickstart.md
+├── guide/
+│   ├── configuration.md
+│   └── retry.md
+├── api/
+│   ├── core.md                 # Auto-generated API docs
+│   └── config.md
+└── changelog.md
+```
+
+### Auto-generating API Reference
+
+```markdown
+<!-- docs/api/core.md -->
+# Core Module
+
+::: acme_utils.core
+    options:
+      members:
+        - Engine
+        - Result
+      show_source: true
+```
+
+mkdocstrings reads docstrings from source code and generates API documentation automatically.
+
+### Local preview
+
+```bash
+mkdocs serve
+# INFO - Serving on http://127.0.0.1:8000/
+# Auto-reloads on file changes
+```
+
+## Docstring Writing Rules
+
+### Google style (recommended)
+
+```python
+def retry(
+    func: Callable[[], T],
+    max_attempts: int = 3,
+    delay: float = 1.0,
+    backoff: float = 2.0,
+) -> T:
+    """Retry a function with exponential backoff.
+
+    Executes the function up to the specified number of times,
+    increasing wait time exponentially after each failure.
+
+    Args:
+        func: Function to execute. Must be callable with no arguments.
+        max_attempts: Maximum number of attempts. Default 3.
+        delay: Wait time before first retry in seconds. Default 1.0.
+        backoff: Multiplier for wait time increase. Default 2.0.
+
+    Returns:
+        The function's return value.
+
+    Raises:
+        RetryError: When all attempts fail.
+
+    Example:
+        >>> result = retry(lambda: fetch_data(), max_attempts=5)
+    """
+```
+
+### NumPy style
+
+```python
+def calculate_mean(values: list[float]) -> float:
+    """
+    Calculate the arithmetic mean of given values.
+
+    Parameters
+    ----------
+    values : list[float]
+        List of numbers to average. Must not be empty.
+
+    Returns
+    -------
+    float
+        The arithmetic mean.
+
+    Raises
+    ------
+    ValueError
+        If values is empty.
+    """
+```
+
+## Automatic Deployment to GitHub Pages
+
+```yaml
+# .github/workflows/docs.yml
+name: Deploy docs
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install mkdocs-material mkdocstrings[python]
+      - run: mkdocs gh-deploy --force
+```
+
+```bash
+# Manual deployment
+mkdocs gh-deploy
+# Automatically deploys to GitHub Pages
+# https://acme.github.io/acme-utils/
+```
+
+## Sphinx vs MkDocs Comparison
+
+| Aspect | MkDocs | Sphinx |
+|---|---|---|
+| Syntax | Markdown | reStructuredText (default) |
+| Config | YAML | Python (conf.py) |
+| Theme | Material (modern) | Read the Docs (traditional) |
+| API auto-gen | mkdocstrings | autodoc (built-in) |
+| Build speed | Fast | Moderate |
+| Ecosystem | Growing | Very broad |
+| Best for | New projects, concise docs | Large-scale, academic, legacy |
+
+### Sphinx minimal setup (for reference)
+
+```python
+# docs/conf.py
+project = "acme-utils"
+extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.napoleon",  # Google/NumPy docstring support
+    "sphinx_rtd_theme",
+]
+html_theme = "sphinx_rtd_theme"
+```
+
+## Documentation Quality Management
+
+### Link verification
+
+```bash
+# mkdocs-linkcheck plugin
+pip install mkdocs-linkcheck
+# Add to mkdocs.yml:
+# plugins:
+#   - linkcheck
+```
+
+### Code example verification
+
+```bash
+# Use pytest's doctest feature
+pytest --doctest-modules src/acme_utils/
+
+# Or executable code blocks in mkdocs
+# pymdownx.superfences + pytest-examples combination
+```
+
+### Documentation coverage
+
+```bash
+# interrogate: measure docstring coverage
+pip install interrogate
+interrogate src/acme_utils/ -v
+```
+
+```text
+Name                              Stmts  Miss  Cover
+---------------------------------------------------
+src/acme_utils/__init__.py            5     0   100%
+src/acme_utils/core.py               45     3    93%
+src/acme_utils/config.py             20     5    75%
+---------------------------------------------------
+TOTAL                                70     8    89%
+```
+
+```toml
+# pyproject.toml
+[tool.interrogate]
+ignore-init-method = true
+ignore-init-module = true
+fail-under = 80
+```
+
+## Versioned Documentation
+
+```bash
+# mike: MkDocs version management tool
+pip install mike
+
+# Deploy per version
+mike deploy 1.0 latest --push
+mike deploy 1.1 latest --push --update-aliases
+
+# Users can select documentation version
+# https://acme.github.io/acme-utils/1.0/
+# https://acme.github.io/acme-utils/latest/
+```
+
+## CHANGELOG Documentation
+
+The CHANGELOG is both a release note and a contract with users.
+
+### Keep a Changelog format — practical example
+
+````markdown
+# Changelog
+
+All notable changes to this project will be documented in this file.
+The format is based on [Keep a Changelog](https://keepachangelog.com/).
+
+## [Unreleased]
+
+### Added
+- `Engine.stream()` method for large result sets (#45)
+
+### Fixed
+- Connection pool exhaustion under high concurrency (#42)
+
+## [1.3.0] - 2024-07-01
+
+### Added
+- Retry decorator with configurable backoff strategy
+- `Settings.from_toml()` class method
+
+### Changed
+- Default timeout increased from 5s to 30s
+
+### Deprecated
+- `Engine.execute()` - use `Engine.run()` instead
+
+## [1.2.0] - 2024-05-15
+
+### Added
+- Python 3.12 support
+- Type stubs for all public APIs
+
+### Removed
+- Python 3.9 support (EOL)
+
+[Unreleased]: https://github.com/acme/acme-utils/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/acme/acme-utils/compare/v1.2.0...v1.3.0
+[1.2.0]: https://github.com/acme/acme-utils/releases/tag/v1.2.0
+````
+
+### CHANGELOG auto-generation tools
+
+```bash
+# git-cliff: Generate CHANGELOG from Conventional Commits
+pip install git-cliff
+
+# cliff.toml configuration
+cat > cliff.toml << 'EOF'
+[changelog]
+header = "# Changelog\n"
+body = """
+{% for group, commits in commits | group_by(attribute="group") %}
+### {{ group | upper_first }}
+{% for commit in commits %}
+- {{ commit.message | upper_first }} ({{ commit.id | truncate(length=7, end="") }})
+{% endfor %}
+{% endfor %}
+"""
+
+[git]
+conventional_commits = true
+commit_parsers = [
+    { message = "^feat", group = "Added" },
+    { message = "^fix", group = "Fixed" },
+    { message = "^doc", group = "Documentation" },
+    { message = "^perf", group = "Performance" },
+    { message = "^refactor", group = "Changed" },
+]
+EOF
+
+# Run
+git-cliff --output CHANGELOG.md
+```
+
+## Search Optimization for Documentation Sites
+
+MkDocs Material's built-in search uses client-side indexing.
+
+```yaml
+# mkdocs.yml
+plugins:
+  - search:
+      lang: en
+      separator: '[\s\-\.]+' 
+  - tags:
+      tags_file: tags.md
+
+# Add metadata to each page
+# docs/guide/configuration.md top:
+# ---
+# tags:
+#   - configuration
+#   - settings
+#   - environment variables
+# ---
+```
+
+### SEO metadata
+
+```yaml
+# mkdocs.yml
+plugins:
+  - social  # Auto-generate Open Graph images
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/acme/acme-utils
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/acme-utils/
+```
+
+## Practical Documentation Workflow
+
+```text
+Code change
+    │
+    ▼
+Write/update docstrings
+    │
+    ▼
+Local preview with mkdocs serve
+    │
+    ▼
+Create PR → Review
+    │
+    ▼
+Merge to main → CI deploys automatically
+    │
+    ▼
+https://acme.github.io/acme-utils/ updated
+```
+
+### Documentation review checklist
+
+```text
+□ New public APIs have docstrings
+□ Code examples are runnable
+□ Internal links are not broken
+□ Screenshots/diagrams are up to date
+□ CHANGELOG has been updated
+```
+
+## Using Admonitions
+
+MkDocs Material admonitions (warning/info boxes) significantly improve documentation readability.
+
+````markdown
+!!! tip "Best Practice"
+    Read configuration from environment variables, but always provide defaults.
+
+!!! warning "Breaking Change"
+    `Engine.execute()` will be removed in v2.0. Use `Engine.run()` instead.
+
+!!! example "Usage Example"
+    ```python
+    from acme_utils import Engine
+    engine = Engine.from_env()
+    ```
+
+!!! note
+    This feature is only available on Python 3.11 and above.
+````
+
 ## Answering the Opening Questions
 
 - **What should a good README contain?**
