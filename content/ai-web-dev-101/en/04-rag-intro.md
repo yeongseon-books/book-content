@@ -242,6 +242,168 @@ The useful logging habit is to store the top retrieved chunks, their scores, and
 - [ ] My prompt treats retrieved documents as reference material, not commands.
 - [ ] My app has a defined behavior for “no supporting evidence found.”
 
+## Log Design for RAG Quality Inspection
+
+When operating RAG, storing only the answer text makes root-cause analysis nearly impossible. At minimum, keep these four bundles together.
+
+- Query original text and preprocessing result
+- Top-k document IDs, scores, and excerpt ranges
+- The context block of the final prompt
+- Model response and safety filter verdict
+
+With these four bundles you can determine on a single screen whether retrieval failed, whether retrieval was correct but generation wobbled, or whether safety rules over-blocked. Even for small services, fixing this structure early reduces debugging time dramatically as features grow.
+
+## Understanding the RAG Pipeline Through Minimal Implementation
+
+The best way to understand RAG is to build a small pipeline end-to-end. The core is three steps: first split documents into chunks and embed them, second embed the question and find the nearest chunks, third insert retrieved evidence into the prompt and generate.
+
+```python
+from openai import OpenAI
+import numpy as np
+
+client = OpenAI()
+
+def embed_text(text: str) -> list[float]:
+    res = client.embeddings.create(
+        model="text-embedding-3-small",
+        input=text,
+    )
+    return res.data[0].embedding
+
+def cosine(a: list[float], b: list[float]) -> float:
+    a_np, b_np = np.array(a), np.array(b)
+    return float(np.dot(a_np, b_np) / (np.linalg.norm(a_np) * np.linalg.norm(b_np)))
+```
+
+At the introductory stage, local files plus simple cosine similarity is sufficient for concept validation. What matters is not choosing a vector DB first, but measuring how retrieval results actually affect answer quality.
+
+## Chunk Strategy: Length, Boundaries, Overlap
+
+RAG quality often diverges more from chunk strategy than from model choice. Typically these parameters are experimented with first.
+
+- Chunk length: 300–800 tokens
+- Overlap: 50–120 tokens
+- Boundary criterion: paragraph/heading preferred
+- Metadata: include document ID, section, update timestamp
+
+Chunks that are too long reduce retrieval precision; too short breaks context and answer coherence collapses. To find this balance, run offline evaluation with at least 20 representative questions first.
+
+## Generation Prompt Template
+
+In RAG the prompt is the safety device that prevents "creation without evidence."
+
+```text
+Role: You are an internal document Q&A assistant.
+Rules:
+1) Answer only based on the document chunks below.
+2) If evidence is insufficient, say "Not confirmed in evidence documents."
+3) Include source_ids as a JSON array at the end of the answer.
+
+Question:
+{question}
+
+Document chunks:
+{context_chunks}
+```
+
+Without these rules the model will attempt to generate plausible sentences even when retrieval results are insufficient.
+
+## LangChain-Based RAG Example
+
+LangChain speeds up pipeline composition. However, the framework does not guarantee quality automatically — you must log retrieval results and final answers.
+
+```python
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI
+from langchain_community.vectorstores import FAISS
+from langchain_core.prompts import ChatPromptTemplate
+
+emb = OpenAIEmbeddings(model="text-embedding-3-small")
+vs = FAISS.from_texts(texts=docs, embedding=emb)
+retriever = vs.as_retriever(search_kwargs={"k": 4})
+
+prompt = ChatPromptTemplate.from_template("""
+Answer using only document evidence.
+Question: {question}
+Documents:
+{context}
+""")
+
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+
+def answer(question: str) -> str:
+    hits = retriever.invoke(question)
+    context = "\n\n".join([h.page_content for h in hits])
+    chain = prompt | llm
+    return chain.invoke({"question": question, "context": context}).content
+```
+
+## Operational Metrics and Failure Patterns
+
+When taking RAG to production, collect at minimum these metrics.
+
+- Retrieval hit rate: ratio of ground-truth evidence documents appearing in top-k
+- Citation rate: ratio of answers providing source_ids
+- Citation mismatch rate: ratio where cited documents contradict actual answer content
+- Retrieval latency vs. generation latency (separated)
+- Failure distribution by question type
+
+Pre-cataloging common failure patterns is also valuable.
+
+| Failure pattern | Cause | Response |
+| --- | --- | --- |
+| Wrong document cited | Poor chunk boundary | Regenerate with paragraph-based splitting |
+| Answer too generic | No retrieval score threshold | Return "no evidence" when score below minimum |
+| Outdated information | No document update metadata | Apply recency-weighted scoring |
+| Slow response | Unconditionally large top-k | Use dynamic k by question type |
+
+## Document Update Pipeline Basic Shape
+
+RAG quality heavily depends on index refresh frequency. For domains where documents change often, re-index in at least a daily batch. If change volume is low, event-driven is more efficient than periodic.
+
+```bash
+python3 scripts/build_chunks.py --series ai-web-dev-101
+python3 scripts/build_embeddings.py --model text-embedding-3-small
+python3 scripts/reindex_vector_store.py --target prod
+```
+
+Keep index versions so you can roll back immediately to the previous index if an update fails.
+
+## Retrieval Quality Debugging Log Example
+
+The most useful artifact for RAG incident response is a three-stage log: question → retrieval results → final answer. These three must appear on one screen to immediately separate retrieval problems from generation problems.
+
+```json
+{
+  "question": "Refund policy processing period",
+  "top_k": 4,
+  "hits": [
+    {"doc_id": "policy-2026-01", "score": 0.86},
+    {"doc_id": "faq-legacy", "score": 0.71}
+  ],
+  "answer": "Refunds take 3-5 business days.",
+  "sources": ["policy-2026-01"]
+}
+```
+
+Periodically sampling these logs for human review catches defects that automated metrics miss.
+
+## Hybrid Search Considerations
+
+In domains where vector search alone is insufficient, hybrid search combining keyword search (BM25) can be effective. This is especially powerful for queries where exact matching matters, like product codes or error numbers.
+
+Starting with simple weight combination rather than complex ranking models is usually sufficient. The key is confirming "which queries does which retriever win" with data.
+
+## Citation Format Standardization
+
+For RAG answers, how you show evidence matters as much as the content itself. Standardizing citation format increases user trust and speeds up internal review.
+
+For example, fix a format like `Source: DocumentName(section)` at the end of the body, or map `source_ids` arrays to UI links. The key requirement: users must be able to click through to the actual document and verify.
+
+### Operations Note
+
+If retrieval quality is inconsistent, inspect index quality and chunk boundaries before adjusting model parameters. Most early failures start at the retrieval stage, not generation.
+
+
 ## Summary
 
 RAG is not about teaching the model everything. It is about finding the right evidence and attaching it at answer time.

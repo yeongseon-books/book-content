@@ -287,6 +287,166 @@ The core rule is simple: never execute model-generated arguments blindly.
 - [ ] The loop has a maximum number of iterations.
 - [ ] High-risk tools have stricter permission boundaries.
 
+## Implementing the Tool Call Loop Explicitly
+
+The core of an agent is the repeated loop: "model decides, system executes, model summarizes again." Without making this loop explicit in code, root-cause analysis during incidents becomes nearly impossible. The example below is the smallest operational pattern for OpenAI tool calls.
+
+```python
+from openai import OpenAI
+import json
+
+client = OpenAI()
+
+TOOLS = [
+    {
+        "type": "function",
+        "function": {
+            "name": "get_weather",
+            "description": "Look up current weather by city name.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "city": {"type": "string"}
+                },
+                "required": ["city"]
+            }
+        }
+    }
+]
+
+def run_agent(question: str) -> str:
+    messages = [{"role": "user", "content": question}]
+    for _ in range(3):
+        resp = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=messages,
+            tools=TOOLS,
+            tool_choice="auto",
+        )
+        msg = resp.choices[0].message
+        messages.append(msg.model_dump())
+
+        if not msg.tool_calls:
+            return msg.content or ""
+
+        for tool_call in msg.tool_calls:
+            args = json.loads(tool_call.function.arguments)
+            if tool_call.function.name == "get_weather":
+                result = {"city": args["city"], "temperature": "22C", "condition": "clear"}
+            else:
+                result = {"error": "unknown tool"}
+
+            messages.append({
+                "role": "tool",
+                "tool_call_id": tool_call.id,
+                "content": json.dumps(result, ensure_ascii=False),
+            })
+
+    return "Tool call iteration limit exceeded."
+```
+
+The key is `for _ in range(3)` — an iteration cap. Without it, abnormal calls can spiral into infinite loops.
+
+## Prompt Template: Fixing Tool Use Policy in Text
+
+To prevent the model from abusing tools unnecessarily, state the policy explicitly in the prompt.
+
+```text
+You are a Korean work assistant.
+Tool use policy:
+- Call tools only when factual lookup is needed.
+- Prefer the calculation tool over internal reasoning for math.
+- If a tool result contains an error field, explain the cause to the user and offer retry options.
+Final answer format:
+1) Conclusion
+2) Evidence
+3) Next action
+```
+
+Without policy, variance in whether the model uses tools for the same question grows large.
+
+## Combining RAG and Agents
+
+In practice, a common flow is: the agent calls a search tool first, then additional tools as needed. For example, an "incident root cause analysis" question might sequentially need document search, log lookup, and status page check.
+
+```python
+TOOLS = [search_docs_tool, get_service_status_tool, summarize_incident_tool]
+```
+
+The important point: do not leave tool dependency ordering entirely to the model. Enforce minimal sequencing at the orchestration layer — for example, skip status page lookup if search results are empty.
+
+## LangChain AgentExecutor Example
+
+Frameworks reduce boilerplate for the iteration loop. However, as abstraction increases, log design becomes even more important.
+
+```python
+from langchain_openai import ChatOpenAI
+from langchain.agents import initialize_agent, AgentType
+
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+
+agent = initialize_agent(
+    tools=my_tools,
+    llm=llm,
+    agent=AgentType.OPENAI_FUNCTIONS,
+    verbose=True,
+)
+
+result = agent.invoke({"input": "Is it raining in Seoul today? If so, recommend an umbrella."})
+```
+
+Rather than using `verbose=True` logs directly in production, convert them to structured event logs for storage — this is better for later analysis.
+
+## Evaluation Metrics: Call Quality Before Accuracy
+
+Looking only at simple accuracy when evaluating agent quality misses important problems. Track these metrics together.
+
+- Tool selection accuracy: ratio of correctly choosing the needed tool
+- Tool argument accuracy: schema validation pass rate
+- Average call count: detecting excessive chaining
+- Call failure recovery rate: ratio of returning normal answers after tool errors
+- Response termination rate: ratio of normal completion before hitting loop cap
+
+Collecting these metrics lets you quickly identify "agents that get the right answer but at excessive cost."
+
+## Regression Testing on Tool Schema Changes
+
+Even small tool parameter changes can drastically destabilize agent behavior. For example, renaming `city` to `city_name` can cause the model to keep calling the old name. Therefore schema changes must always be accompanied by regression tests.
+
+```python
+TEST_QUESTIONS = [
+    "Tell me the weather in Seoul",
+    "What is the current temperature in Busan?",
+    "Tokyo weather and whether I need an umbrella",
+]
+```
+
+If tool call failure rate spikes in test results, update the tool description and example inputs in the prompt together.
+
+## Pre-Deployment Agent Simulation Scenarios
+
+Agents break more often on exception paths than normal paths. Before deployment, run these scenarios automatically.
+
+1. Tool returns a normal response
+2. Tool times out
+3. Tool returns a field not in the schema
+4. Model tries to call a non-existent tool
+
+```python
+def safe_tool_dispatch(name, args):
+    if name not in TOOL_REGISTRY:
+        return {"error": "tool_not_found", "name": name}
+    try:
+        return TOOL_REGISTRY[name](**args)
+    except TimeoutError:
+        return {"error": "tool_timeout"}
+    except Exception as exc:
+        return {"error": "tool_exception", "detail": str(exc)}
+```
+
+With this defensive code, even when the agent fails it can deliver an explainable error to the user.
+
+
 ## Summary
 
 An agent is not “the model doing everything by itself.” It is a controlled loop where the model requests external actions and the application remains the execution owner.

@@ -181,6 +181,189 @@ Even if hosting starts on a free tier, model calls can still create ongoing cost
 - [ ] I know where to read logs right after deployment.
 - [ ] I configured budget or usage alerts before opening the app widely.
 
+## First 24-Hour Post-Deployment Verification Scenario
+
+The most common oversight in initial deployment is checking only the "success screen" without verifying the actual usage flow end-to-end. The first 24 hours after deployment are safer spent focusing on operational signal verification rather than feature checks.
+
+### 1) User-path verification
+
+- Send prompts of different lengths (first request, second request, long request) and verify response time distribution.
+- Separate normal questions, edge-case questions, and failure-inducing questions to verify HTTP status codes and error message consistency.
+- If frontend and backend are separated, verify that CORS, timeout, and retry policies actually work.
+
+### 2) Log quality verification
+
+- Verify that request IDs pass through from frontend logs to backend logs.
+- Verify that on model call failure, users receive a safe message while internal logs record the cause code.
+- Reproduce operational errors (missing key, permission error, quota exceeded) and verify the alert path end-to-end.
+
+### 3) Cost safeguard verification
+
+- Estimate the slope of token usage growth as daily request count increases.
+- If per-model pricing differs, verify via sample logs that routing rules apply as intended.
+- Mock-test that budget threshold alerts actually reach the contact channel (email, messenger).
+
+This verification is not a process that slows development — it is a pre-investment that reduces future incident response time. AI apps in particular create incidents from data, model, and cost factors interleaving rather than pure code bugs, so establishing operational observation lines early is crucial.
+
+## Fixing the Pre-Deployment Checklist Alongside Code
+
+To repeat deployments reliably, store the checklist in the repository instead of relying on personal memory. AI apps have higher environment variable dependency than typical web apps — a single missing value can show users nothing but "no response."
+
+```bash
+# Common pre-deployment checks
+python3 -m pytest tests
+npm run lint
+npm run build
+python3 scripts/check_env_required.py --env-file .env.production.example
+```
+
+If verification scripts are not connected to the deployment pipeline, the process eventually reverts to manual checks and incident probability rises.
+
+## Vercel Frontend Deployment Configuration
+
+For Next.js-based chatbot frontends, deploying to Vercel first has the lowest barrier to entry. However, the frontend-backend URL contract must be clear to prevent cross-environment confusion.
+
+```json
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "env": {
+    "NEXT_PUBLIC_API_BASE_URL": "https://api.example.com",
+    "AI_MODEL": "gpt-4o-mini"
+  }
+}
+```
+
+Environment variable names must match the constant names in code exactly. Even small discrepancies often cause silent runtime failures.
+
+## Azure App Service Backend Deployment Example
+
+When deploying a Python API server to Azure App Service, fix the startup command and health check path first.
+
+```yaml
+# startup command example
+gunicorn app.main:app -k uvicorn.workers.UvicornWorker --bind=0.0.0.0:8000 --timeout 120
+```
+
+```bash
+az webapp config appsettings set \
+  --resource-group rg-ai-web-dev \
+  --name ai-web-dev-api \
+  --settings OPENAI_API_KEY="***" AI_MODEL="gpt-4o-mini" LOG_LEVEL="INFO"
+```
+
+The health check path (`/healthz`) should not include model calls — it should only quickly verify process and dependency connection state.
+
+## Operational Settings: Timeout, Retry, Circuit Breaker
+
+AI APIs are affected by network and provider state, so deployment environments must explicitly declare time limits and retry policies.
+
+```python
+CALL_TIMEOUT_SEC = 20
+MAX_RETRY = 2
+RETRY_BACKOFF_SEC = [0.5, 1.0]
+```
+
+Additionally, when failures accumulate beyond a threshold, the circuit breaker pattern temporarily stops calls and returns an outage notice to users — a pattern commonly used in practice.
+
+## Post-Deployment Verification Scenarios
+
+Ending at the deployment success message almost guarantees missed problems. Automate at minimum these scenarios.
+
+1. Normal query: response code 200, JSON schema passes
+2. Invalid input: 4xx and error message convention check
+3. Model failure simulation: 5xx response message check
+4. Timeout simulation: retry count and final error check
+5. Excessive token input: length limit behavior check
+
+## Dashboard Baseline Items for Evaluation Metrics
+
+During the first week after deployment, keep the dashboard simple.
+
+- Request count, error rate, p95 latency
+- Average prompt_tokens, completion_tokens
+- User feedback (helpful/not helpful)
+- Cost estimate per route
+- Performance comparison by deployment version
+
+These five items alone enable early detection of "performance degradation," "cost spikes," and "specific version regression."
+
+## Security Baseline: Key Management and Access Control
+
+The most dangerous mistake at the deployment stage is exposing API keys in code repositories or client bundles. Production keys must go in the platform secret store, with permission scope minimized.
+
+- Separate production keys from development keys.
+- Set key rotation cycle at monthly intervals.
+- Document a procedure for immediate revocation when anomalous traffic is detected.
+
+Additionally, admin pages and internal diagnostic APIs need IP restrictions or authentication gates to reduce unnecessary exposure.
+
+## Production Deployment Pipeline Example
+
+Deployments are more stable with declarative pipelines than manual clicks. Structuring like below clearly separates failure points.
+
+```yaml
+name: deploy-ai-web-app
+on:
+  push:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci && npm run build
+      - run: python3 -m pip install -r requirements.txt
+      - run: python3 -m pytest -q
+
+  deploy:
+    needs: verify
+    runs-on: ubuntu-latest
+    steps:
+      - run: ./scripts/deploy_vercel.sh
+      - run: ./scripts/deploy_azure_api.sh
+```
+
+Separating verification and deployment stages lets you quickly pinpoint the cause when problems occur.
+
+## Documenting Rollback Criteria in Advance
+
+Deciding rollback criteria ad-hoc when failure happens is too late. Agree on these thresholds beforehand.
+
+- 5-minute average error rate exceeds 5%
+- p95 latency increases 2x or more vs. baseline
+- Authentication errors occur consecutively
+
+With explicit criteria, even when responsibility transfers between team members the same judgment can be reproduced.
+
+## Automated Post-Deployment Health Check Commands
+
+Fixing health check commands as scripts to run within 10 minutes of deployment makes overnight incident response much easier.
+
+```bash
+curl -fsS https://api.example.com/healthz
+curl -fsS https://api.example.com/api/ask -H 'content-type: application/json' -d '{"question":"health check","user_id":"monitor"}'
+```
+
+The purpose of these commands is not full functional verification but quickly confirming "the service is available right now."
+
+## Cost Cap Guard
+
+AI apps can see cost spikes even during normal operation, so daily caps and alert thresholds are necessary.
+
+- Daily cost cap: $100
+- Alert when 1-hour moving average rises 2x vs. baseline
+- Auto-enable sampling logs when tokens spike on a specific endpoint
+
+This guard prevents quality issues from escalating into cost incidents.
+
+### Post-Deployment 24-Hour Observation
+
+During the first 24 hours, prioritize observation over feature additions. Verify that error rate, latency, and token usage enter a stable range before planning the next release — this is safer long-term.
+
+
 ## Summary
 
 Deployment is not the final coding step. It is the first real operating step.

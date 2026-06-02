@@ -205,6 +205,180 @@ The important habit is to debug across both layers. A browser chatbot problem is
 - [ ] The input is disabled while a request is still in flight.
 - [ ] The system prompt lives in one predictable place.
 
+## Chat Contracts to Enforce at the Server Boundary
+
+The most common mistake when building a real-time chat UI is handling model keys directly in browser code. The model provider API must always be called behind a server boundary, and the browser must only call your own `/api/chat`. Drawing this boundary clearly prevents key leaks, call volume explosions, and audit log gaps.
+
+```typescript
+// app/api/chat/route.ts
+import { streamText } from "ai"
+import { openai } from "@ai-sdk/openai"
+
+export const runtime = "edge"
+
+export async function POST(req: Request) {
+  const body = await req.json()
+  const messages = body.messages ?? []
+
+  const result = streamText({
+    model: openai("gpt-4o-mini"),
+    system: "You are a Korean development assistant.",
+    messages,
+    temperature: 0.2,
+    maxTokens: 600,
+  })
+
+  return result.toDataStreamResponse()
+}
+```
+
+This structure looks simple, but its real advantage is that model swaps, metric collection, and rate limiting can all happen at this single boundary.
+
+## Separating Prompt Templates from Session Memory
+
+The leading cause of chatbot quality drift is unbounded conversation accumulation. Appending all session messages drives costs up quickly and buries key context. Separate "system instructions," "recent turns," and "retrieval evidence" into distinct blocks.
+
+```typescript
+function buildPrompt(input: {
+  question: string
+  recentTurns: Array<{role: "user" | "assistant"; content: string}>
+  contextChunks: string[]
+}) {
+  return {
+    system: [
+      "You are a Korean technical support assistant.",
+      "If you have no evidence, say you do not know.",
+      "Write answers as: 1-sentence summary + 3 key points.",
+    ].join("\n"),
+    user: [
+      `Question: ${input.question}`,
+      "Recent conversation:",
+      ...input.recentTurns.map((t) => `- ${t.role}: ${t.content}`),
+      "Reference documents:",
+      ...input.contextChunks,
+    ].join("\n"),
+  }
+}
+```
+
+Using this pattern reduces conversation quality degradation even when you attach RAG later.
+
+## Connecting a RAG Pipeline to the Chatbot
+
+To make the chatbot answer from "my documents," you must carefully connect the retrieval pipeline to the chat route. Running retrieval unconditionally on every question can spike latency dramatically, so inserting a question classifier first is worthwhile.
+
+```python
+# Backend pseudocode
+if is_document_question(user_question):
+    query_embedding = embed(user_question)
+    chunks = vector_store.search(query_embedding, top_k=4)
+    context = "\n\n".join([c.text for c in chunks])
+else:
+    context = ""
+
+messages = build_messages(question=user_question, context=context)
+answer = call_openai(messages)
+```
+
+Separating question classification, retrieval, and generation makes it easy to observe which stage is the bottleneck.
+
+## Deployment Configuration Example
+
+Locally `.env.local` is convenient, but production requires platform-specific environment variable injection.
+
+```json
+{
+  "functions": {
+    "app/api/chat/route.ts": {
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "AI_MODEL": "gpt-4o-mini"
+  }
+}
+```
+
+```bash
+# Vercel CLI
+vercel env add OPENAI_API_KEY production
+vercel env add AI_MODEL production
+```
+
+What matters more than the configuration itself is cross-environment consistency. If the model name and token cap differ between development, staging, and production, debugging cost increases significantly.
+
+## Operational Metrics: Perceived Quality and Cost Together
+
+For chatbot operations, collect at minimum these metrics.
+
+- First Token Latency
+- Total response completion time
+- Total tokens per user message
+- Stream interruption rate
+- "Not helpful" feedback ratio
+
+These five metrics alone let you quickly classify whether the problem is frontend, model, or retrieval.
+
+## User Message Policy for Incident Response
+
+In real-time chat, error messages are part of the user experience. Rather than exposing technical details, provide messages that indicate retry availability and next actions.
+
+```text
+Responses are temporarily delayed.
+- Please try again in 10 seconds.
+- If the problem repeats, share the request_id with the support channel.
+```
+
+Setting this policy prevents the confusion of frontend and backend emitting different error messages.
+
+## Frontend Patterns for Maintaining Streaming Response Quality
+
+Streaming chat looks fast, but mid-stream interruptions and state races occur frequently. Especially when users press the send button consecutively, session state can become corrupted.
+
+```typescript
+const { messages, input, handleInputChange, handleSubmit, status, stop } = useChat({
+  api: "/api/chat",
+  onError(error) {
+    console.error("chat error", error)
+  },
+})
+
+const canSend = status !== "streaming" && input.trim().length > 0
+```
+
+A simple guard like `canSend` alone dramatically reduces duplicate requests. Also, providing a `stop()` action gives users perceived control over the response.
+
+## Conversation Storage Strategy
+
+When storing conversations, save searchable metadata alongside the full transcript.
+
+- `session_id`, `user_id`, `request_id`
+- User question summary
+- Model name and token usage
+- Response generation timestamp and latency
+
+This information is necessary to quickly reproduce quality issues for a specific session later.
+
+## Per-Request Tracking Key for Chatbot Quality
+
+The most useful key in operations is `request_id`. Linking browser events, API logs, and model call logs with the same ID dramatically reduces problem reproduction time.
+
+```typescript
+const requestId = crypto.randomUUID()
+await fetch("/api/chat", {
+  method: "POST",
+  headers: { "x-request-id": requestId },
+  body: JSON.stringify({ messages }),
+})
+```
+
+When receiving user inquiries, a single request_id lets you quickly trace the entire flow of that session.
+
+### Verification Questions
+
+Before deployment, confirm: "What does the user see when the response is slow?", "Is duplicate submission blocked?", "Is request ID traceable?" If these three pass, early operational stability improves significantly.
+
+
 ## Summary
 
 The heart of a browser chatbot is not the model call by itself. It is the connection between client state and a streaming server route.

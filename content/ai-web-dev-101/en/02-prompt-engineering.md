@@ -238,6 +238,189 @@ Strong prompts are rarely “written once.” They are revised as failure cases 
 - [ ] I know when to lower or raise `temperature`.
 - [ ] I treat prompt refinement as debugging, not as guesswork.
 
+## Building a Mini Evaluation Table for Operational Baselines
+
+To manage prompt quality as a team, you need a shared evaluation table instead of "looks good." Starting small — fixing just the minimum criteria per task type — is already effective.
+
+| Task type | Required criteria | Failure signal |
+| --- | --- | --- |
+| Customer inquiry summary | 2 sentences max, facts only | Exceeds sentence count, speculative additions |
+| Policy guidance | 3 bullets, excluded expressions omitted | Missing items, forbidden expressions present |
+| Classification | Result within allowed label set | Label typo, value outside set |
+
+The important point: the evaluation table is version-controlled alongside the prompt. Change the prompt, change the table, and leave test results in the PR — this makes regressions easy to find. This approach separates "what caused quality to change" even when model changes, parameter changes, and system prompt edits overlap.
+
+## Designing Reusable Prompt Templates
+
+If you approach prompt engineering as pure wordsmithing, team-level collaboration hits a wall immediately. In practice multiple people touch the same feature, so templates must be treated as explicit contracts. Separating input variables, output format, and forbidden rules makes review criteria clear.
+
+```python
+PROMPT_TEMPLATE = """
+Role: You are a Korean technical blog editing assistant.
+Goal: Refine the user's draft into professional prose.
+Constraints:
+- Do not speculate on unverified facts.
+- Lists must not exceed 5 items.
+Output format (JSON):
+{{
+  "summary": "one-sentence summary",
+  "issues": ["problems found"],
+  "rewrite": "improved body text"
+}}
+Input draft:
+{draft}
+"""
+```
+
+When role, goal, constraints, and output format are separated like this, quality variance shrinks even across model versions. It also enables fast root-cause tracing when incidents occur.
+
+## Enforcing the Output Contract via the OpenAI API
+
+Accepting only natural-language results is fast but leads to repeated parse instability when connecting to service APIs. Where possible, enforce structured output or a strict JSON contract.
+
+```python
+from openai import OpenAI
+import json
+
+client = OpenAI()
+
+def refine_draft(draft: str) -> dict:
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        temperature=0,
+        messages=[
+            {"role": "system", "content": "Always respond with a JSON object only."},
+            {"role": "user", "content": PROMPT_TEMPLATE.format(draft=draft)},
+        ],
+    )
+    raw = response.choices[0].message.content or "{}"
+    parsed = json.loads(raw)
+    return parsed
+```
+
+The critical point: do not bury JSON parse failures under a generic exception. Recording parse failure rate as a separate metric lets you detect prompt degradation early.
+
+## Prompt Boundaries When Combining with RAG
+
+Many teams find answer quality unstable after adding RAG because they blindly concatenate long retrieval results. The prompt must include retrieval results but also specify the criteria by which the model selects and cites documents.
+
+```text
+System instructions:
+- Use only the provided document chunks as evidence.
+- If the evidence documents do not contain the answer, respond with "no evidence."
+- Output source_ids as an array at the end of the answer.
+
+User question:
+{question}
+
+Retrieved documents:
+{retrieved_chunks}
+```
+
+This contract cannot eliminate hallucination entirely, but it at least secures traceability of evidence.
+
+## LangChain PromptTemplate Example
+
+The principle is the same when using a framework. Separating template from chain makes experiment automation easier later.
+
+```python
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_openai import ChatOpenAI
+
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "You are a Korean technical support assistant. Speculation without evidence is forbidden."),
+    ("human", "Question: {question}\n\nDocuments:\n{context}\n\nFormat: 1-sentence summary + 3 key points")
+])
+
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.1)
+chain = prompt | llm
+
+result = chain.invoke({
+    "question": "Tell me why token costs suddenly increased",
+    "context": "Since last week the full log text started being included in prompts"
+})
+```
+
+Even with LangChain, the quality of the template itself still determines the result.
+
+## Prompt Quality Evaluation Metrics
+
+When improving prompts, use measurable metrics instead of "looks better."
+
+- Accuracy: match rate against a ground-truth dataset
+- Format compliance: JSON parse success rate, required field missing rate
+- Length fitness: ratio of responses exceeding the specified token range
+- Safety: forbidden-topic response block rate
+- Cost: average total_tokens per request
+
+Even a simple regression test script like this prevents quality drops from prompt changes.
+
+```python
+CASES = [
+    {"q": "What is the refund policy?", "must_include": ["business days"], "must_not_include": ["not sure but"]},
+    {"q": "Give me a medical diagnosis", "must_include": ["cannot answer"], "must_not_include": ["dosage"]},
+]
+```
+
+## Prompt Version Control Rules
+
+Treating prompts like code requires version rules. For example, increment numbers like `answer_v1`, `answer_v2` and leave a one-line reason for each change — this is the simplest approach that works in practice.
+
+- `v1 -> v2`: Added `confidence` field to output JSON
+- `v2 -> v3`: Unified forbidden-topic response wording to match policy phrasing
+- `v3 -> v4`: Fixed RAG citation format to `source_ids` array
+
+This change history helps enormously when tracing quality score drops later. Most "quality dropped with no model change" incidents start from prompt changes.
+
+## A/B Prompt Comparison with Experiment Logs
+
+The most common trap in prompt improvement is impression-based evaluation: "this version looks better." In practice, run A/B on the same input set and compare format compliance and user feedback together.
+
+```python
+def run_prompt_ab(cases, prompt_a, prompt_b):
+    report = []
+    for case in cases:
+        out_a = call_model(prompt_a, case["question"])
+        out_b = call_model(prompt_b, case["question"])
+        report.append({
+            "id": case["id"],
+            "a_json_ok": is_valid_json(out_a),
+            "b_json_ok": is_valid_json(out_b),
+            "a_len": len(out_a),
+            "b_len": len(out_b),
+        })
+    return report
+```
+
+If JSON compliance goes up and response length variance drops, real user experience is likely to stabilize too. Conversely, if scores improve but token usage spikes, you must assess whether operational cost is manageable.
+
+## Recording Prompt Failure Cases
+
+Documenting specific failure cases like this dramatically accelerates team learning.
+
+- Case 1: Answered forbidden topic using circumlocution → Strengthened forbidden pattern dictionary
+- Case 2: Output in markdown instead of JSON → Re-stated "no output other than JSON" in system instructions
+- Case 3: Exceeded length limit → Added "5 sentences maximum" constraint
+
+These records are not just documentation — they become input data for the next experiment.
+
+## Pre-Deployment Prompt Checklist
+
+Before deployment, pass through this checklist.
+
+- Is the role statement clear in one line?
+- Does the output format match the parser requirements?
+- Are forbidden rules included without exception?
+- Are length limits and tone limits declared together?
+- Is a fallback message defined for failure cases?
+
+These five items look small, but they prevent the majority of operational incidents preemptively.
+
+### Practical Note
+
+The principles in this section become more important as features grow. Especially as team size increases, documented rules create a bigger quality difference than individual intuition. So do not stop at copying example code — redefine rules to fit your team's current incident patterns and operational constraints. A small checklist returns the largest long-term cost savings.
+
+
 ## Summary
 
 Prompt engineering is not about sounding clever. It is about designing a task contract the model can follow consistently.

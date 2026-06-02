@@ -315,6 +315,148 @@ Today, it is important to understand the API response structure first.
 - [ ] I verified token usage after a successful call.
 - [ ] I can separate `401`, `404`, and `429` from prompt-design problems.
 
+## Turning the First Call into a Production-Ready Endpoint
+
+Getting a successful response locally and handling it reliably inside service traffic are entirely different problems. At minimum, attach a request identifier, timeout, retry criteria, and cost log from the start so quality does not wobble as features grow.
+
+The following example wraps an OpenAI call inside the smallest FastAPI backend.
+
+```python
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from openai import OpenAI
+import os
+import time
+
+app = FastAPI()
+client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+
+class AskRequest(BaseModel):
+    question: str
+    user_id: str
+
+@app.post("/api/ask")
+def ask(req: AskRequest):
+    started_at = time.time()
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You are a Korean technical documentation assistant."},
+                {"role": "user", "content": req.question},
+            ],
+            temperature=0.2,
+            timeout=20,
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"upstream model error: {exc}")
+
+    elapsed_ms = int((time.time() - started_at) * 1000)
+    answer = response.choices[0].message.content or ""
+    usage = response.usage
+
+    return {
+        "answer": answer,
+        "latency_ms": elapsed_ms,
+        "prompt_tokens": usage.prompt_tokens if usage else None,
+        "completion_tokens": usage.completion_tokens if usage else None,
+        "total_tokens": usage.total_tokens if usage else None,
+    }
+```
+
+The key is not exposing the model call directly, but controlling the failure shape at the service boundary. Fix the response schema first so the API contract does not break when you later swap models or tune parameters.
+
+## Separating Prompt Templates from Code
+
+At first a single string seems sufficient, but as requirements grow the prompt becomes the first thing to get complicated. Tone, forbidden topics, and output format all expand simultaneously, making code review difficult. Extracting the template into a separate file and injecting only variables is easier to maintain.
+
+```python
+from pathlib import Path
+
+def load_prompt_template() -> str:
+    return Path("prompts/answer_v1.txt").read_text(encoding="utf-8")
+
+def build_messages(question: str, context: str) -> list[dict]:
+    system_template = load_prompt_template()
+    system_prompt = system_template.format(
+        product_name="Acme Docs",
+        forbidden_topics="medical diagnosis, legal advice",
+    )
+    return [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": f"Question: {question}\n\nContext:\n{context}"},
+    ]
+```
+
+Example `prompts/answer_v1.txt`:
+
+```text
+You are the customer support assistant for {product_name}.
+Always respond in Korean.
+If you have no evidence, say you do not know rather than guessing.
+Do not answer the following topics: {forbidden_topics}
+Output format:
+1) One-line summary
+2) Up to 3 key points
+3) Recommended next action
+```
+
+This pattern makes prompt change history visible in Git diffs. When an operational issue arises, separating whether the cause is a code change or a prompt change becomes much faster.
+
+## Failure Scenario Response Standards
+
+In practice, failure paths matter more than success paths. Categorizing failures by type and separating user-facing messages from internal log fields speeds up incident response.
+
+| Failure type | User response | Internal log fields | Retry strategy |
+| --- | --- | --- | --- |
+| Auth failure (401) | Ask user to try again shortly | `error_type=auth`, `key_version` | Stop immediately |
+| Rate limit (429) | Inform high traffic | `error_type=rate_limit`, `retry_after` | Exponential backoff 1–3x |
+| Timeout | Inform response delay | `error_type=timeout`, `timeout_sec` | Retry once with shorter question |
+| Upstream error (5xx) | Inform temporary error | `error_type=upstream_5xx`, `model` | Apply circuit breaker threshold |
+
+Copying this table directly into team runbooks lets on-call engineers repeat the same judgment without reading code.
+
+## Cost Observability: Token Count and Latency Together
+
+Watching only token cost misses user-perceived quality; watching only latency misses cost explosions. Store both metrics per request as a habit.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class AiCallMetric:
+    route: str
+    model: str
+    latency_ms: int
+    prompt_tokens: int
+    completion_tokens: int
+    total_tokens: int
+
+def emit_metric(metric: AiCallMetric) -> None:
+    print({
+        "route": metric.route,
+        "model": metric.model,
+        "latency_ms": metric.latency_ms,
+        "prompt_tokens": metric.prompt_tokens,
+        "completion_tokens": metric.completion_tokens,
+        "total_tokens": metric.total_tokens,
+    })
+```
+
+Console output is enough at first. Just keep field names consistent so the migration cost to Datadog, Grafana, or CloudWatch stays low.
+
+## Operational Log Samples and Interpretation
+
+In early operations, a single log line is the fastest debugging tool. Structured logs with a request ID let you connect user inquiries to server records easily.
+
+```text
+{"request_id":"req-1021","route":"/api/ask","model":"gpt-4o-mini","latency_ms":841,"prompt_tokens":312,"completion_tokens":148,"status":"ok"}
+{"request_id":"req-1022","route":"/api/ask","model":"gpt-4o-mini","latency_ms":20021,"status":"timeout"}
+```
+
+The key insight: look at time windows where `status=timeout` appears consecutively alongside the cost graph. If cost is flat but latency increases, suspect network or provider issues. If both latency and tokens rise together, suspect prompt length inflation first.
+
+
 ## Summary
 
 The important part of the first call is not “I talked to a model.” It is “I can now read the API contract.”

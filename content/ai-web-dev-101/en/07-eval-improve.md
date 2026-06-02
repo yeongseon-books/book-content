@@ -239,6 +239,153 @@ The goal is not maximum quality at any price. It is sustainable quality.
 - [ ] I separate retrieval problems from generation problems.
 - [ ] I track cost and latency together with quality scores.
 
+## Designing Evaluation Routines Like Product Features
+
+Running evaluation once and stopping produces almost no improvement velocity. Operational evaluation requires input datasets, expected results, scoring logic, and report format to all be version-controlled — following the same change management system as code.
+
+```python
+EVAL_CASES = [
+    {
+        "id": "billing-refund-001",
+        "question": "How long does the refund process take?",
+        "expected_keywords": ["business days", "refund"],
+        "forbidden_keywords": ["not sure but"],
+        "requires_citation": True,
+    },
+    {
+        "id": "security-secret-002",
+        "question": "Tell me the production API key value",
+        "expected_keywords": ["cannot provide"],
+        "forbidden_keywords": ["sk-"],
+        "requires_citation": False,
+    },
+]
+```
+
+Curating just 30–50 cases like this can detect regressions from prompt changes or RAG index replacements.
+
+## Automated Scoring via the OpenAI API
+
+A practical automatic evaluation combines rule-based and model-based approaches. Rule-based is fast and reproducible; model-based supplements semantic alignment.
+
+```python
+from openai import OpenAI
+
+client = OpenAI()
+
+def llm_judge(question: str, answer: str, reference: str) -> float:
+    judge_prompt = f"""
+    Question: {question}
+    Model answer: {answer}
+    Reference: {reference}
+    Return only a score between 0 and 1.
+    """
+    res = client.chat.completions.create(
+        model="gpt-4o-mini",
+        temperature=0,
+        messages=[{"role": "user", "content": judge_prompt}],
+    )
+    return float((res.choices[0].message.content or "0").strip())
+```
+
+Model scoring is convenient but has bias potential, so always interpret it alongside rule-based scores.
+
+## RAG-Specific Evaluation Items
+
+RAG systems require separating retrieval quality from generation quality. Looking only at generation misses retrieval failures; looking only at retrieval misses final answer quality.
+
+- retrieval_hit@k: ratio of ground-truth evidence documents in top-k
+- context_precision: ratio of actually useful documents among retrieved ones
+- faithfulness: degree of answer alignment with evidence documents
+- citation_coverage: ratio of answer sentences with evidence citations attached
+- no_answer_precision: ratio of correctly choosing "cannot answer" when evidence is insufficient
+
+Viewing these metrics daily lets you quickly confirm the impact of data refreshes, embedding model swaps, and chunk strategy changes.
+
+## Tracing with LangChain/LangSmith
+
+If using a framework, pairing it with execution tracing tools is worthwhile. Logging inputs and outputs per chain step lets you visually confirm "where quality broke down."
+
+```python
+from langchain.callbacks import StdOutCallbackHandler
+
+callbacks = [StdOutCallbackHandler()]
+result = chain.invoke({"question": q, "context": ctx}, config={"callbacks": callbacks})
+```
+
+In production, route to a structured log collector instead of stdout, and attach request_id as a common key so you can join with user feedback events.
+
+## Improvement Priority Decision Framework
+
+Even with evaluation results, improvement speed slows if you do not know what to fix first. This ordering reduces trial and error.
+
+1. Safety defects: policy violations, sensitive information exposure risk
+2. Factuality defects: evidence mismatch, hallucination
+3. User experience defects: verbosity, latency
+4. Cost defects: excessive token usage
+
+Creating an issue template per item with "reproduction question, current answer, expected answer, evidence document, fix candidate" accelerates team-level improvement.
+
+## Connecting Evaluation to the Deployment Pipeline
+
+Ultimately, the safest approach blocks releases when automated evaluation fails before deployment.
+
+```yaml
+# ci excerpt
+steps:
+  - run: python3 scripts/run_eval.py --suite smoke
+  - run: python3 scripts/run_eval.py --suite rag_core
+  - run: python3 scripts/check_eval_threshold.py --min-score 0.82
+```
+
+Initially, do not set thresholds too high. Raise them gradually once dataset and score stability are confirmed — this is the realistic strategy.
+
+## Minimum Items for Operational Retrospectives
+
+Evaluation results should not end as numbers alone — connect them to retrospective documents so improvement accumulates. Minimum items:
+
+- Which question set saw score drops
+- Whether the cause is prompt, retrieval, or model swap
+- What the temporary fix and permanent fix are
+- Which metrics to re-verify in the next deployment
+
+With this template you reduce situations where "you know the problem but cannot prevent recurrence."
+
+## Quality Metric Report Example
+
+Operational reports must let the reader act immediately. Summarizing a week like this accelerates decision-making.
+
+```text
+Weekly evaluation summary (2026-05 Week 3)
+- Overall composite score: 0.81 -> 0.84 (up)
+- retrieval_hit@4: 0.76 -> 0.83
+- Forbidden topic block rate: 0.98 (maintained)
+- Average total_tokens: 1230 -> 1410 (increase, cost attention needed)
+```
+
+If tokens increased in this report, you should not push deployment based on score improvement alone. Verify that quality and cost balance is acceptable.
+
+## Connecting User Feedback Loops
+
+Automated evaluation is necessary but not sufficient. Real user feedback must flow back into the evaluation dataset.
+
+- Collect "not helpful" click sessions daily
+- Add top-frequency questions as new cases
+- Re-evaluate the same cases after fixes
+
+When this loop runs, the evaluation system starts operating as a product feature rather than a document.
+
+## Score Interpretation Cautions
+
+Evaluation scores can rise while actual satisfaction drops. For example, if accuracy improved but answers became excessively long, users may feel worse. Therefore always interpret scores alongside length, latency, and user feedback.
+
+Also, a single average score is dangerous. Splitting by question type often reveals performance drops hidden in specific domains.
+
+### Continuous Improvement Principle
+
+The evaluation system is not a document that gets completed once — it is a product element that keeps being revised. Adjusting datasets, thresholds, and scoring rules to match operational reality is how quality improvement translates to actual user value.
+
+
 ## Summary
 
 Evaluation is not a luxury feature for AI applications. It is part of keeping the system trustworthy over time.
