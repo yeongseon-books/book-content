@@ -168,15 +168,99 @@ The simplest authorization — bind a permission set to a role. Enough for small
 
 ## How This Shows Up in Production
 
-Almost every web/mobile app uses OIDC (the identity standard on top of OAuth) and SSO. Cloud IAM mixes RBAC and ABAC. Large orgs standardize on SSO + MFA + short tokens + audit logs.
+### Authentication Methods Compared
+
+| Method | Strength | Weakness | Recommended use |
+| --- | --- | --- | --- |
+| Password only | Simple, low cost | Vulnerable to phishing/reuse/breach | Dev environments, low-risk internal tools only |
+| Password + MFA (TOTP/WebAuthn) | Raises takeover difficulty | Weak recovery flow can be bypassed | Default standard for user auth |
+| SSO (OIDC/SAML) | Central control, unified audit | IdP outage affects all services | Multi-service orgs |
+
+MFA has UX cost but directly lowers account takeover probability. SSO is an operational model, not a security feature — design account lifecycle, deactivation propagation, and audit trail together.
+
+### Password Storage Baseline (Python)
+
+```python
+# auth_password_store.py
+import bcrypt
+from typing import Final
+
+COST: Final[int] = 12
+
+def hash_password(raw: str) -> str:
+    return bcrypt.hashpw(raw.encode(), bcrypt.gensalt(rounds=COST)).decode()
+
+def verify_password(raw: str, hashed: str) -> bool:
+    return bcrypt.checkpw(raw.encode(), hashed.encode())
+
+stored = hash_password("CorrectHorseBatteryStaple!")
+assert verify_password("CorrectHorseBatteryStaple!", stored)
+assert not verify_password("wrong", stored)
+```
+
+Operational notes:
+- Review cost factor (rounds) periodically as hardware improves.
+- Without login-failure rate limiting + backoff, online guessing remains viable.
+- Hash upgrades (e.g., rounds 10→12) can happen progressively on successful login.
+
+### SSO Does Not Equal Authorization
+
+| Concern | SSO handles | Application handles |
+| --- | --- | --- |
+| Identity proof | User authn, MFA, lockout | Consuming token validation result |
+| Permission decision | Basic claims (groups/roles) | Resource-level authz policy |
+| Audit | Login events | Domain action events (e.g., refund approval) |
+
+"We added SSO so permissions are safe" is never true. Identity and authorization must remain separated end-to-end.
+
+### Permission Matrix (RBAC Baseline)
+
+| Resource / Action | viewer | editor | admin |
+| --- | --- | --- | --- |
+| View reports | allow | allow | allow |
+| Edit reports | deny | allow | allow |
+| Change user permissions | deny | deny | allow |
+| Approve refunds | deny | deny | allow |
+
+This matrix must be enforced in API tests — if `viewer` calls the edit endpoint, CI must assert 403.
+
+### Token Lifecycle Policy
+
+| Token type | Recommended TTL | Storage | Revocation strategy |
+| --- | --- | --- | --- |
+| Access token | 5–15 min | Memory / secure storage | Expires automatically |
+| Refresh token | 1–7 days | Server-tracked + secure storage | Rotation on reissue; immediate invalidation on theft |
+| One-time auth code | 30–180 sec | Server temp store | Single-use, then discard |
+
+The critical incident-response capability is "force logout" — tokens must be centrally revocable to contain a breach.
+
+### Auth Architecture Patterns
+
+| Pattern | Strength | Watch-out | Best fit |
+| --- | --- | --- | --- |
+| Session-based | Easy forced invalidation, strong server control | Needs session store for horizontal scale | Single product, back-office |
+| JWT-based | Stateless, easy cross-service propagation | Key leak = wide blast radius, hard to revoke | Microservice APIs |
+| OIDC + external IdP | SSO, centralized policy, unified audit | IdP outage propagates | Multi-product orgs |
+
+Choose based on incident response: "How fast can we force-block an account?" beats architecture aesthetics.
+
+### OAuth 2.1 Key Changes
+
+- **Implicit Flow removed** — no more tokens exposed in redirect URIs.
+- **PKCE mandatory** — all clients must use Proof Key for Code Exchange.
+- **ROPC removed** — no more passwords typed directly into clients.
+- **Refresh token rotation** — previous token invalidated on every reissue.
+
+New services should start from OAuth 2.1 baseline. Existing services should audit for Implicit/ROPC usage and plan migration.
 
 ## How a Senior Engineer Thinks
 
-- They do not roll their own auth (use auth0, Keycloak, Cognito).
-- Authorization is moved to a policy engine (e.g., OPA), separate from code.
-- MFA is the default.
-- Tokens expire quickly and recover via refresh.
-- Permission changes always land in audit logs.
+- They never roll their own auth — use Auth0, Keycloak, Cognito.
+- Authorization lives in a policy engine (OPA, Cedar), separate from application code.
+- MFA is the default; exceptions require documented risk acceptance with expiry.
+- Tokens expire quickly; refresh via rotation.
+- Every permission change lands in audit logs with actor, target, before/after, reason, and approver.
+- Auth failure detection is automated: 10 failures in 5 min → lock + alert + forced MFA re-enrollment.
 
 ## Checklist
 
