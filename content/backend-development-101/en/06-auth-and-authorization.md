@@ -169,16 +169,62 @@ def delete_user(uid: int, _: dict = Depends(require_role("admin"))):
 
 ## How This Shows Up in Production
 
-Most SaaS products start with *bcrypt + JWT + role-based access*. As they grow, they add OAuth2, MFA, and permission matrices, but the core stays the same — only code that *cleanly separates* authentication from authorization scales.
+Most SaaS products start with *bcrypt + JWT + role-based access*. As they grow, they add OAuth2, MFA, and permission matrices. Only code that cleanly separates authentication from authorization scales to that point.
+
+### Four Incident Scenarios
+
+**1. Token leaked in logs.** Debug logging printed the `Authorization` header verbatim.
+
+- Immediate: mask sensitive headers in log pipeline
+- Revoke all tokens issued during exposure window
+- Force re-authentication for affected sessions
+- Prevention: add logger filter tests to CI
+
+**2. New endpoint shipped without auth check.** Classic post-deploy discovery.
+
+- Structural fix: router-level `dependencies=[Depends(get_current_user)]` so endpoints are protected by default
+- PR checklist item: "sensitive resource auth verification"
+- CI scan: compare OpenAPI protected vs unprotected paths
+
+**3. Refresh token reuse detected.** A revoked token was presented again—strong indicator of theft.
+
+- Revoke entire token family (all refresh tokens for that lineage)
+- Fire high-severity event to SIEM
+- Notify user + show recent login history
+- Force password reset + MFA re-enrollment if needed
+
+**4. Plaintext passwords found in DB backup.** This is an incident, not a bug.
+
+- Block new registration / password-change APIs immediately
+- Force password reset for all users
+- Review legal notification obligations
+- Audit backup pipeline + data masking policy
+
+### Three Commonly Missed Vulnerabilities
+
+| Vulnerability | Risk | Prevention |
+| --- | --- | --- |
+| Timing attack on login | Reveals whether email exists via response time | Constant-time comparison, unified error message |
+| JWT `alg:none` confusion | Unsigned tokens accepted | Explicit algorithm allowlist in verification |
+| No login rate limit | Enables brute force despite strong passwords | Per-account + per-IP + device fingerprint throttling |
+
+### Production Auth Checklist
+
+- [ ] All auth traffic HTTPS-only
+- [ ] Browser tokens use `httpOnly`, `secure`, `sameSite`
+- [ ] Access tokens short-lived, refresh tokens rotated with reuse detection
+- [ ] Login/token-refresh/permission-denied events in audit log
+- [ ] Login endpoint rate-limited with account lockout
+- [ ] Signing keys in secret manager, never in source
+- [ ] 401 vs 403 distinguished in monitoring dashboards
 
 ## How a Senior Engineer Thinks
 
-- Auth code is *small* and uses *standard* libraries.
-- Secrets live in environment variables and a secret manager.
-- Tokens expire *quickly* and refresh tokens handle longevity.
-- Permissions are modeled as *roles* or *policies*.
-- Failed auth attempts are *monitored* — they signal brute force.
-
+- **Auth code is small and uses standard libraries.** Custom crypto is a liability. Use `passlib[bcrypt]` + `python-jose` and keep the auth module under 200 lines.
+- **Secrets live in environment variables and a secret manager.** Not in code, not in config files committed to Git. Rotation should be possible without redeployment.
+- **Tokens expire quickly; refresh tokens handle longevity.** Short access tokens (15 min) limit blast radius of theft. Refresh token rotation + reuse detection catches compromised credentials.
+- **Permissions are modeled as roles or policies, never ad-hoc string checks.** `if user.role == 'admin'` scattered across handlers becomes unmaintainable. Centralize in a policy function.
+- **Failed auth attempts are monitored—they signal brute force.** A spike in 401s is an early indicator. Alert on rate, not just individual failures.
 ## Checklist
 
 - [ ] You can hash and verify with bcrypt.
