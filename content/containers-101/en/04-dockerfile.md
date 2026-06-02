@@ -165,11 +165,19 @@ Multi-stage separates build tools. `.dockerignore` shrinks the build context. Di
 
 ## How a Senior Engineer Thinks
 
-- A Dockerfile deserves the same review as application code.
-- Cache-friendly order *is* productivity.
-- Secrets belong in build args or BuildKit secrets, not ENV.
-- The base image is small and verified.
-- Image scans are part of CI.
+- A Dockerfile deserves the same review rigor as application code.
+- Cache-friendly layer order *is* team productivity.
+- Secrets belong in BuildKit secret mounts, never in ENV or ARG.
+- The base image is small, verified, and digest-pinned.
+- Image scanning is a CI gate, not an optional step.
+
+**Dockerfile review questions seniors always ask:**
+
+1. **Cache**: how many layers rebuild when one line of code changes?
+2. **Size**: are build tools or test code in the final stage?
+3. **Security**: running as root? Secrets in ENV?
+4. **Reproducibility**: base image pinned by digest?
+5. **Observability**: HEALTHCHECK present? Logs to stdout?
 
 ## Checklist
 
@@ -187,6 +195,61 @@ Multi-stage separates build tools. `.dockerignore` shrinks the build context. Di
 ## Wrap-up and Next Steps
 
 Once images exist, the next question is *where to put state*. The next post covers Volume.
+
+## Deep Dive: Multi-Stage Dockerfile as a Team Standard
+
+The difference between teams that ship fast and teams that don't isn't Dockerfile syntax knowledge—it's whether they have a shared template.
+
+```dockerfile
+FROM python:3.12-slim AS builder
+WORKDIR /build
+COPY requirements.txt .
+RUN pip install --upgrade pip && pip wheel --wheel-dir /wheels -r requirements.txt
+COPY . .
+RUN pip wheel --wheel-dir /wheels .
+
+FROM python:3.12-slim
+WORKDIR /app
+COPY --from=builder /wheels /wheels
+RUN pip install --no-cache-dir /wheels/* && rm -rf /wheels
+COPY app ./app
+RUN useradd -m app && chown -R app:app /app
+USER app
+CMD ["python", "-m", "app.main"]
+```
+
+## Layer Caching Rules (Pin as Team Convention)
+
+| Rule | Why |
+| --- | --- |
+| Copy dependency file before source | One-line code change won't reinstall deps |
+| Push `COPY . .` as late as possible | Maximize cache hits |
+| Merge OS package install + cleanup in one RUN | Reduce layer size + scan noise |
+| Keep build tools out of final stage | Smaller image, smaller attack surface |
+
+```dockerfile
+# Good: single RUN, cleanup included
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+```
+
+## BuildKit Secrets: The Safe Way
+
+Never put tokens in ENV/ARG—they persist in image history.
+
+```bash
+DOCKER_BUILDKIT=1 docker build \
+  --secret id=pipconf,src=$HOME/.pip/pip.conf \
+  -t myapp:secure .
+```
+
+```dockerfile
+# In Dockerfile
+RUN --mount=type=secret,id=pipconf,target=/etc/pip.conf \
+    pip install -r requirements.txt
+```
+
+The secret is available only during that RUN instruction and never stored in any layer.
 
 ## Answering the Opening Questions
 
