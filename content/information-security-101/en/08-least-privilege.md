@@ -170,15 +170,96 @@ Treat policy as code; lint it.
 
 ## How This Shows Up in Production
 
-AWS layers SCP + IAM + Resource Policy + Permission Boundary. Kubernetes layers Namespace + RBAC + NetworkPolicy + PodSecurityAdmission. Human access flows through an IdP (Okta) with Just-In-Time issuance to remove standing privileges.
+### RBAC vs. ABAC for Privilege Models
+
+| Aspect | RBAC | ABAC |
+| --- | --- | --- |
+| Policy expression | Role-centric (`admin`, `viewer`) | Attribute-centric (dept, region, time, resource tag) |
+| Complexity | Low | Medium–High |
+| Exception handling | Role proliferation | Flexible condition expressions |
+| Audit trail | Clear per-role | Requires condition evaluation logs |
+
+Start with RBAC. When role explosion hits, layer ABAC conditions in specific areas.
+
+### Permission Matrix Example
+
+| API | guest | user | analyst | admin |
+| --- | --- | --- | --- | --- |
+| GET /reports | deny | allow(own) | allow(team) | allow(all) |
+| POST /reports | deny | deny | allow(team) | allow(all) |
+| POST /users/{id}/role | deny | deny | deny | allow |
+| DELETE /reports/{id} | deny | deny | deny | allow |
+
+This matrix must map to integration tests. `allow(own)` conditions need resource-ownership verification logic.
+
+### Unused Permission Detection
+
+```python
+# unused_permissions.py
+from datetime import datetime, timedelta
+
+def find_unused_permissions(user_id: str, days: int = 90):
+    cutoff = datetime.now() - timedelta(days=days)
+    granted = get_user_permissions(user_id)
+    used = get_audit_log_permissions(user_id, since=cutoff)
+    return granted - used  # candidates for revocation
+```
+
+Permissions unused for 90 days are revocation candidates. Without audit logs this analysis is impossible.
+
+### Temporary Permission Workflow
+
+```python
+# permission_request.py
+def request_permission(requester, resource, action, justification):
+    return {
+        "requester": requester,
+        "resource": resource,
+        "action": action,
+        "justification": justification,
+        "status": "pending",
+        "expires_at": datetime.now() + timedelta(hours=4),
+    }
+
+def approve(request_id, approver):
+    # grant_temporary_permission + audit_log("permission_granted")
+    ...
+```
+
+Replace standing privileges with request-approve-expire flows. Every request and approval must land in audit logs.
+
+### Auto-Expiry Enforcement
+
+```python
+# Runs every 10 minutes
+def revoke_expired_permissions():
+    for perm in get_permissions_expiring_before(datetime.now()):
+        revoke_permission(perm["user_id"], perm["resource"], perm["action"])
+        audit_log("permission_expired", perm)
+```
+
+Explicit expiry + automated revocation prevents privilege accretion.
+
+### Permission Change Audit Fields
+
+Every permission mutation must record:
+- `actor_id` — who changed it
+- `target_id` — whose permission changed
+- `before`/`after` — what changed
+- `reason` — why
+- `approved_by` — approver
+- `expires_at` — when temporary grants end
+
+Without these fields, post-incident root cause analysis cannot answer "who opened that door and why."
 
 ## How a Senior Engineer Thinks
 
-- Privileges are reviewed on a schedule (quarterly).
-- New grants ship with an expiry date.
-- Policies live in git and change via PR.
-- Every incident review revisits blast radius.
-- "Temporary" grants do not exist outside the official process.
+- Privileges are reviewed quarterly; findings become tickets.
+- New grants always ship with an expiry date.
+- Policies live in git and change via PR — no console clicks.
+- Every incident review revisits blast radius and tightens boundaries.
+- "Temporary" grants outside the official workflow do not exist.
+- Break-glass usage triggers immediate alerts to security channel + audit log entry.
 
 ## Checklist
 
