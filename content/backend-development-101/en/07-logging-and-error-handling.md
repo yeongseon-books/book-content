@@ -182,16 +182,80 @@ log.critical("database is down")
 
 ## How This Shows Up in Production
 
-In production logs flow into *collectors* (CloudWatch, Loki, Datadog). A field like `event=order_failed` becomes the basis of *dashboards and alerts*. Adopting structured logs early gets you monitoring almost for free.
+In production, logs flow into collectors (CloudWatch, Loki, Datadog). A field like `event=order_failed` becomes the basis of dashboards and alerts. Structured logs adopted early give you monitoring almost for free.
+
+### Error Response Standard Schema
+
+```json
+{
+  "error": "request_failed",
+  "code": "PAYMENT_PROVIDER_TIMEOUT",
+  "detail": "Temporary payment failure. Please retry.",
+  "request_id": "f9f99af8-2f0e-4b61-b66f-a7f1cd3cd9af"
+}
+```
+
+- `error`: top-level category (machine-readable, stable across versions)
+- `code`: specific error code for programmatic handling
+- `detail`: user/operator-facing explanation (never expose SQL, tokens, or stack traces)
+- `request_id`: correlation key for support ↔ engineering
+
+### Minimum Log Context Fields
+
+| Field | Purpose | Note |
+| --- | --- | --- |
+| `request_id` | Single-request tracing | Required |
+| `correlation_id` | Cross-service chain tracing | Required for microservices |
+| `user_id` | Scope of user impact | Nullable for anonymous |
+| `endpoint` | Where the error occurred | Use template form `/orders/{id}` |
+| `duration_ms` | Performance/timeout analysis | On every completion log |
+| `status_code` | Failure rate calculation | Required for HTTP servers |
+
+Automate context injection via middleware + structlog `contextvars`—manual insertion guarantees missed fields.
+
+### Four Production Failure Patterns
+
+| Scenario | Symptom | Root cause | Fix |
+| --- | --- | --- | --- |
+| 3 AM alert with no context | ERROR logs lack request/user/endpoint info | Missing structured fields | Force common fields via middleware |
+| Log volume kills ELK budget | Index lag, query timeouts, storage spike | DEBUG always on, payload dumping | Level policy, sampling, payload masking |
+| Sensitive data in error response | Client sees SQL/tokens/stack trace | Exception string passed raw to `detail` | Safe message + stable code externally, full detail internal-only |
+| Can't trace across microservices | Logs scattered, no event linkage | No correlation_id propagation | Generate at gateway, propagate in all outbound headers |
+
+### Domain vs Infrastructure Error Separation
+
+```python
+@app.post("/orders")
+async def create_order_endpoint(payload: dict, request: Request):
+    request_id = request.headers.get("X-Request-ID", "unknown")
+    try:
+        create_order(payload)
+        return {"result": "ok"}
+    except DomainError as exc:
+        return JSONResponse(
+            status_code=400,
+            content={"error": "request_failed", "code": exc.code,
+                     "detail": exc.detail, "request_id": request_id},
+        )
+    except InfrastructureError as exc:
+        log.error("infra_error", code=exc.code)
+        return JSONResponse(
+            status_code=503,
+            content={"error": "request_failed", "code": exc.code,
+                     "detail": "Temporary issue. Please retry.",
+                     "request_id": request_id},
+        )
+```
+
+Domain errors give the user actionable feedback (400). Infrastructure errors hide internal details and return a safe message (503).
 
 ## How a Senior Engineer Thinks
 
-- Logs are *aggregable data*.
-- The request_id is *always* echoed in the response header.
-- Domain errors and infra errors stay *separate*.
-- Logs that page someone are *actionable*.
-- "Why did this fail?" can be answered from the logs alone.
-
+- **Logs are aggregable data, not printf debugging.** If you can't `GROUP BY` on a field, it's not structured enough. Every log line should be parseable by a machine without regex.
+- **The request_id is always echoed in the response header.** When a user reports "something broke," support can find the exact request in seconds instead of guessing from timestamps.
+- **Domain errors and infra errors stay separate.** A validation failure (user's fault) and a database timeout (system's fault) need different response codes, different alert thresholds, and different escalation paths.
+- **Logs that page someone are actionable.** If the on-call engineer can't determine what to do from the alert + log, the log is decoration. Include: what failed, what was attempted, what to check next.
+- **"Why did this fail?" must be answerable from logs alone.** If answering requires SSH into a server or reproducing locally, your observability has a gap.
 ## Checklist
 
 - [ ] You can configure the standard logger.
