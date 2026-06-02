@@ -166,16 +166,67 @@ kubectl get networkpolicy -n web
 
 ## How This Shows Up in Production
 
-*GitOps* tools like *Argo CD* converge the *cluster* to the *Git* state, while *dashboards* and *runbooks* make *night-time response* feasible.
+*GitOps* tools like Argo CD converge the cluster to the Git state. Combined with dashboards, alerts, and runbooks, the team can respond to incidents at 3 AM without improvising.
+
+### Incident Response Playbook: Detect → Mitigate → Recover → Retrospect
+
+| Phase | Goal | Actions |
+| --- | --- | --- |
+| **Detect** | Quantify impact | Check alerts, `kubectl get events`, affected replica count |
+| **Mitigate** | Reduce blast radius NOW | Rollback, traffic shift, scale up |
+| **Recover** | Eliminate root cause | Fix manifest, push, let GitOps converge |
+| **Retrospect** | Prevent recurrence | Update runbook, add guard, share timeline |
+
+```bash
+# Mitigate immediately
+kubectl rollout undo deploy/api -n prod
+kubectl scale deploy/api -n prod --replicas=6
+# Verify recovery
+kubectl rollout status deploy/api -n prod
+kubectl get events -n prod --sort-by=.metadata.creationTimestamp | tail -10
+```
+
+### SLO → Manifest Field Mapping
+
+An SLO of 99.9% uptime means specific constraints in your manifests:
+
+| SLO requirement | Manifest field |
+| --- | --- |
+| Survive single-Pod failure | `replicas >= 2` + PodDisruptionBudget |
+| Detect unhealthy Pod fast | readiness/liveness probes with tight periods |
+| Limit resource contention | `resources.requests` and `limits` explicitly set |
+| Controlled rollout | `maxUnavailable: 0`, `maxSurge: 1` in strategy |
+| Startup grace period | `minReadySeconds: 10` |
+
+### On-Call Handoff Minimum Deliverables
+
+- Last 7 days incident timeline + resolution summary
+- Per-service "first 5 commands" to run
+- Rollback target version and forbidden-changes list
+- Secret rotation schedule and owner
+- Escalation path per failure type
+
+### GitOps Drift Prevention
+
+```text
+Developer pushes manifest change
+  → PR review (rendered diff via helm template)
+  → Merge to main
+  → Argo CD detects drift from desired state
+  → Sync applies change with --prune
+  → Post-sync hook verifies health
+  → If unhealthy → auto-rollback via Argo CD
+```
+
+Manual `kubectl edit` during incidents is acceptable, but MUST be reflected in Git within the same shift. Drift in declarative systems compounds into larger failures over time.
 
 ## How a Senior Engineer Thinks
 
-- *Probes* are *contracts*.
-- *Permissions* start *small*.
-- *Observability* stands on *three legs* (metrics, logs, traces).
-- When *Git* is the *source*, *drift disappears*.
-- *Runbooks* improve through *training*.
-
+- **Probes are contracts, not health checks.** A readiness probe that always returns 200 is worse than none—it hides failures from the Service load balancer. Define what "ready" actually means for each workload.
+- **Permissions start small and expand with evidence.** Default to namespace-scoped roles. Cluster-wide permissions require justification in the RBAC review.
+- **Observability stands on three legs.** Metrics show trends, logs show details, traces show causality across services. Missing any one leg means blind spots during incidents.
+- **When Git is the source, drift disappears.** Every manual change that doesn't flow through Git becomes an invisible landmine for the next deployment.
+- **Runbooks improve through training, not documentation sprints.** A runbook that's never been followed under pressure is fiction. Quarterly incident drills validate and improve them.
 ## Checklist
 
 - [ ] All three *probe* types reviewed.
