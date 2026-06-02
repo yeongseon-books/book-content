@@ -185,14 +185,72 @@ python -m pytest -q tests/test_legacy_characterization.py
 
 Strong teams require a refactoring PR to be merged before each feature PR. Feature PRs shrink and reviews speed up.
 
+### Refactoring Technique Catalog
+
+| Technique | Apply When | Precondition |
+| --- | --- | --- |
+| Rename | Meaning unclear, misleading call sites | Reference search, tests green |
+| Extract Function | Single function has multiple responsibilities | Characterization tests in place |
+| Move Function | Module boundary violated | Dependency direction confirmed |
+| Inline | Over-abstraction | Verify call-site simplification |
+| Introduce Parameter Object | Argument list too long | Data cohesion confirmed |
+
+### Before / After: Stepwise Extraction
+
+```python
+# before
+def make_report(users):
+    result = []
+    for u in users:
+        if u["active"] and u["last_login_days"] < 30:
+            result.append({"id": u["id"], "segment": "engaged"})
+    return result
+
+# after
+def make_report(users):
+    return [to_engaged_entry(u) for u in users if is_recent_active(u)]
+
+def is_recent_active(user: dict) -> bool:
+    return user["active"] and user["last_login_days"] < 30
+
+def to_engaged_entry(user: dict) -> dict:
+    return {"id": user["id"], "segment": "engaged"}
+```
+
+Each extraction is a single commit with tests green before and after.
+
+### Open-Closed via Protocol Injection
+
+```python
+from typing import Protocol
+
+class SegmentPolicy(Protocol):
+    def matches(self, user: dict) -> bool: ...
+
+def filter_users(users: list[dict], policy: SegmentPolicy) -> list[dict]:
+    return [user for user in users if policy.matches(user)]
+```
+
+Injecting policy objects means adding rules without modifying existing functions.
+
+### Linter / Quality Gate
+
+```toml
+[tool.ruff.lint]
+select = ["E", "F", "B", "C90", "N", "I"]
+```
+
+Refactoring PRs are *always* separate from feature PRs. Verification logs in PR body ensure traceability.
+
 ## How a Senior Engineer Thinks
 
-- Refactors only when the next change becomes easier.
-- Takes small steps with fast tests.
-- Keeps the two hats apart.
-- Starts legacy work with characterization tests.
-- Decomposes big changes via the Mikado graph.
-
+- Refactors only when the *next change* becomes easier—not for aesthetics.
+- Takes small steps with fast tests—each step is a revertible commit.
+- Keeps the two hats apart—structure changes and behavior changes never in the same PR.
+- Starts legacy work with characterization tests—pin behavior before touching structure.
+- Decomposes big changes via the Mikado graph—work leaf-to-root.
+- Measures "change cost reduction" alongside feature delivery in quarterly goals.
+- Treats every PR as an opportunity for one small improvement.
 ## Checklist
 
 - [ ] Are tests green before starting?
