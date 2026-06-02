@@ -168,15 +168,101 @@ Not every risk can be removed. Explicitly agreeing on what remains is the adult 
 
 ## How This Shows Up in Production
 
-OWASP threat modeling, ISO 27001 / SOC 2 risk assessments, AWS Well-Architected Security Pillar, and the Microsoft SDL all share the same skeleton (asset - threat - risk - control). The bigger the org, the more this single page is the starting point of decisions.
+### CIA Triad in Real Incidents
+
+| Scenario | Broken axis | Early signal | Business impact | Priority control |
+| --- | --- | --- | --- | --- |
+| Backup bucket left public | Confidentiality | External scanner access logs spike | Customer data exposure, compliance violation | Bucket policy block, key rotation, access audit |
+| Order amount tampered in request | Integrity | Payment vs. ledger mismatch | Settlement errors, financial loss | Request signing (HMAC), dual verification, audit log |
+| Login API flood | Availability | Error rate spike, latency increase | Revenue loss, SLA breach | Rate limit, WAF rules, auto-scaling |
+| Admin session hijack | Confidentiality + Integrity | Abnormal admin behavior pattern | Privilege abuse, config tampering | MFA enforcement, session re-auth, behavior detection |
+
+Framing threats by CIA axis replaces gut-feel arguments with a structured question: which axis of loss is unacceptable? A payment service prioritizes integrity and availability; a medical record store prioritizes confidentiality.
+
+### Security Frameworks at a Glance
+
+| Framework | Core question | Strength | Watch-out | Starting point |
+| --- | --- | --- | --- | --- |
+| NIST CSF 2.0 | Are we balancing identify/protect/detect/respond/recover? | Ops-centric language, engineer-friendly | Evidence system needs separate design | Map current controls, run gap analysis |
+| ISO 27001 | Does our ISMS operate repeatably? | Org-level process alignment | Low-quality docs risk becoming theater | Asset inventory → risk assessment → SoA |
+| CIS Controls | Are we prioritizing the highest-impact basics? | Clear execution priority | Without org context, over/under-control | Start from IG1, phase in |
+| SOC 2 | How do we prove control trust to customers? | External trust acquisition | Audit prep burden | Define service boundary and responsibility model |
+
+In practice teams combine: NIST CSF + CIS for operational improvement, ISO/SOC 2 for external trust and contract compliance. What matters is not which framework you pick but whether risk priorities and control execution are actually repeatable.
+
+### Quantifying Risk — Minimal Model
+
+```python
+# risk_register.py
+from dataclasses import dataclass
+
+@dataclass
+class RiskItem:
+    name: str
+    likelihood: int   # 1..5
+    impact: int       # 1..5
+
+    @property
+    def score(self) -> int:
+        return self.likelihood * self.impact
+
+items = [
+    RiskItem("admin session hijack", 3, 5),
+    RiskItem("public bucket exposure", 2, 5),
+    RiskItem("login endpoint DoS", 4, 4),
+]
+
+for i in sorted(items, key=lambda x: x.score, reverse=True):
+    print(i.name, i.score)
+```
+
+The score is a consensus tool, not ground truth. The habit of scoring with a shared scale and reassessing quarterly matters more than the number itself.
+
+### Risk Register Example
+
+| Risk ID | Scenario | Likelihood | Impact | Score | Treatment |
+| --- | --- | --- | --- | --- | --- |
+| R-01 | Admin session hijack | 3 | 5 | 15 | MFA enforcement, session re-auth |
+| R-02 | Public bucket exposure | 2 | 5 | 10 | Public-block policy, periodic scan |
+| R-03 | Login API overload | 4 | 4 | 16 | Rate limit, WAF, auto-scale |
+
+A risk register only reduces risk when it connects to the product backlog as tickets. Scores without tickets change nothing.
 
 ## How a Senior Engineer Thinks
 
-- They treat security as "deciding," not "blocking."
-- They put a one-page STRIDE into the PR template.
-- Residual risks become tickets and are reassessed quarterly.
-- Incident response runbooks come before stronger controls.
-- They speak about cost vs. effect in numbers.
+### Design Review Security Questions
+
+Paste these five questions into every feature design doc:
+
+1. What assets does this feature handle?
+2. Which CIA axis matters most for those assets?
+3. Which STRIDE threat has the highest likelihood × impact?
+4. What residual risk remains after current controls?
+5. Who accepts that residual risk, and when is the next review?
+
+Five questions in the design template turn security from a schedule-end checkbox into an in-flow decision.
+
+### Operational Review Loop
+
+| Cadence | Check | Output |
+| --- | --- | --- |
+| Daily | High-severity alerts, auth failure spikes, permission denial spikes | Daily security brief |
+| Weekly | Security impact of new deployments | Change review note |
+| Monthly | Expiring keys/tokens/certs, unused permissions, stale secrets | Monthly hygiene report |
+| Quarterly | Threat model re-assessment, runbook drill, control effectiveness | Quarterly security retro |
+
+Actionable documentation requires: named owner + backup, numeric failure/escalation criteria, results tracked as tickets, and exception approvals with expiry dates.
+
+### Converting Security Requirements to Product Work
+
+Abstract goals like "reduce account takeover" must decompose into implementation items:
+
+1. Lock account after 10 consecutive login failures.
+2. Force MFA re-verification on lock.
+3. Push lock event to security channel immediately.
+4. Review false-positive/false-negative ratio in monthly retro.
+
+This keeps security inside the feature development flow — product backlog, QA scenarios, and alerting rules all align on one thread.
 
 ## Checklist
 
