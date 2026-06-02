@@ -323,6 +323,247 @@ In practice, the trend favors composition over inheritance. Inheritance is mainl
 
 Inheritance is useful for code reuse and expressing hierarchical relationships, but overuse increases complexity. In the next article, we explore polymorphism — implementing different behaviors through a single interface.
 
+## LSP Violation Example and Correction
+
+```python
+class Bird:
+    def fly(self) -> str:
+        return 'flying'
+
+class Penguin(Bird):
+    def fly(self) -> str:
+        raise RuntimeError('cannot fly')
+```
+
+This structure violates LSP because the subtype breaks the supertype's contract.
+
+```python
+from typing import Protocol
+
+class Swimmable(Protocol):
+    def swim(self) -> str:
+        ...
+
+class Flyable(Protocol):
+    def fly(self) -> str:
+        ...
+```
+
+Separating into capability-based interfaces avoids forced inheritance.
+
+## Comparison: Inheritance vs Composition
+
+| Criterion | Inheritance | Composition |
+|---|---|---|
+| Runtime replacement | Difficult | Easy |
+| Coupling | Large hierarchy coupling | Interface coupling |
+| Change impact | Large parent-change propagation | Localized to composed objects |
+| Test substitution | Must prepare inheritance tree | Simple mock injection |
+
+## Real Scenario: Restructuring to Withstand Requirement Changes
+
+In production, rule changes happen more often than feature additions. Therefore, when evaluating class structure, it's safer to ask "how far must the next change reach?" rather than "does it work now?"
+
+```python
+from dataclasses import dataclass
+from typing import Protocol
+
+
+@dataclass
+class LineItem:
+    name: str
+    quantity: int
+    unit_price: int
+
+    def subtotal(self) -> int:
+        return self.quantity * self.unit_price
+
+
+class DiscountPolicy(Protocol):
+    def apply(self, amount: int) -> int:
+        ...
+
+
+class NoDiscount:
+    def apply(self, amount: int) -> int:
+        return amount
+
+
+class PercentDiscount:
+    def __init__(self, percent: int) -> None:
+        if not 0 <= percent <= 100:
+            raise ValueError('percent must be 0..100')
+        self.percent = percent
+
+    def apply(self, amount: int) -> int:
+        return int(amount * (100 - self.percent) / 100)
+
+
+class Invoice:
+    def __init__(self, items: list[LineItem], policy: DiscountPolicy) -> None:
+        self.items = items
+        self.policy = policy
+
+    def total(self) -> int:
+        base = sum(i.subtotal() for i in self.items)
+        return self.policy.apply(base)
+```
+
+This code requires no modification to `Invoice.total()` when discount rules change. Extension closes through adding implementation classes, while the core flow remains stable.
+
+## Collaboration in UML Style
+
+```text
+[Invoice]
+  - items: list[LineItem]
+  - policy: DiscountPolicy
+  + total()
+
+[LineItem]
+  + subtotal()
+
+[DiscountPolicy] <<interface>>
+  + apply(amount)
+      ^
+      +-- [NoDiscount]
+      +-- [PercentDiscount]
+```
+
+Writing collaboration structure in text like this lets you quickly align on "where is the policy axis and where is the domain axis" during code review.
+
+## Anti-Patterns and Correction Procedures
+
+| Anti-Pattern | Detection Signal | Correction Steps |
+|---|---|---|
+| God Object | 20+ methods, scattered change history | Decompose by responsibility axis → derive collaboration interfaces |
+| Data-only empty class | Only getters/setters, no methods | Move rule methods or simplify to dataclass |
+| Inheritance tree bypass branching | Type-check branching on subclasses | Redefine polymorphic contract |
+| Infrastructure type leakage | Domain layer depends on SDK response objects | Add DTO conversion layer |
+
+## Before and After: Test Maintenance Cost
+
+| Item | Before Refactoring | After Refactoring |
+|---|---|---|
+| Test setup | Global state initialization needed | Per-object state creation |
+| Failure root-cause tracing | Backtrack entire function chain | Trace per class method |
+| Regression scope | Broad and unclear | Narrow and predictable |
+
+## Team Application Checklist
+
+- Confirm domain terms and class names match.
+- Confirm invariants are complete at instance creation time.
+- Check whether policy changes are possible via implementation addition rather than existing code modification.
+- Agree on collaboration structure via 10-line UML text before code review.
+- Confirm test names describe business rules rather than method names.
+
+## Mini Case Study: Verifying with a Single Rule Addition
+
+The example below is the minimum unit for extending a policy without modifying existing code.
+
+```python
+class WeekendPolicy:
+    def apply(self, amount: int, is_weekend: bool) -> int:
+        if is_weekend:
+            return int(amount * 0.95)
+        return amount
+
+
+def estimate(amount: int, is_weekend: bool) -> int:
+    policy = WeekendPolicy()
+    return policy.apply(amount, is_weekend)
+```
+
+The key is that the new policy enters without breaking call paths. Keeping change history confined to policy classes reduces regression risk.
+
+| Verification Question | Pass Criteria |
+|---|---|
+| Does adding a new policy require modifying existing functions? | No |
+| Does the exception policy match the existing contract? | Yes |
+| Are tests separated per policy? | Yes |
+
+## Refactoring Retrospective: Viewing Change Cost as Numbers
+
+- If modified file count exceeds 5 per feature, review boundary redesign.
+- If type-branch if/elif accumulates 3 or more, move to polymorphism or strategy objects.
+- If regression test writing time exceeds implementation time, review responsibility placement.
+
+```python
+def complexity_signal(changed_files: int, branch_count: int) -> str:
+    if changed_files >= 5 or branch_count >= 3:
+        return 'refactor-needed'
+    return 'acceptable'
+```
+
+This approach is not a rigorous metric, but it's useful for making teams discuss based on criteria rather than intuition.
+
+## Additional Comparison: Design Decision Matrix
+
+| Situation | Recommended Structure | Choice to Avoid |
+|---|---|---|
+| Rules change frequently | Separate policy objects + injection | Accumulating hard-coded branches |
+| State transitions are core | Method-based transition model | External direct field modification |
+| Frequent external integrations | Port/adapter separation | Direct SDK calls from domain |
+| Team onboarding needed | Maintain UML text and term glossary | Relying on implicit rules |
+
+This matrix is not meant to fix "the right design." Its purpose is to unify judgment language within a team to reduce code review time.
+
+## Verification Note: Questions for Checking Object Design Quality
+
+These questions are criteria used repeatedly in post-implementation reviews.
+
+- Does the exception type and message match the caller's contract when this method fails?
+- Is the same rule not duplicated in other classes or functions?
+- Does state mutation occur through only one method path?
+- Is unit testing possible without external dependencies?
+
+```python
+def review_signal(duplicate_rules: int, mutable_paths: int) -> str:
+    if duplicate_rules > 0:
+        return 'duplicate rule removal needed'
+    if mutable_paths > 1:
+        return 'state mutation path consolidation needed'
+    return 'structure stable'
+```
+
+Applying these checks even to article-level examples helps understand OOP as a maintenance strategy rather than syntax.
+
+## Additional Comparison: Response Time to Change Requests
+
+| Change Request | Code with Weak Boundaries | Code with Clear Boundaries |
+|---|---|---|
+| Add discount rule | Search branches then multi-modify | Add policy implementation |
+| Modify state transition | Modify multiple functions simultaneously | Modify domain method |
+| Strengthen tests | Integration-test-centric | Unit-test-first |
+
+This comparison matters not for performance numbers but for reducing maintenance lead time.
+
+## Additional Code Example: Isolating Rule Changes in Methods
+
+```python
+class Membership:
+    def __init__(self, level: str) -> None:
+        self.level = level
+
+    def discount_rate(self) -> int:
+        if self.level == 'gold':
+            return 20
+        if self.level == 'silver':
+            return 10
+        return 0
+
+
+class PriceCalculator:
+    def __init__(self, membership: Membership) -> None:
+        self.membership = membership
+
+    def final_price(self, amount: int) -> int:
+        rate = self.membership.discount_rate()
+        return int(amount * (100 - rate) / 100)
+```
+
+In this structure, when membership policy changes, only the `Membership` implementation needs modification.
+
+
 ## Answering the Opening Questions
 
 - **Inheritance can reduce code duplication, but why does it simultaneously create tight coupling?**
