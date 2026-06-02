@@ -221,6 +221,277 @@ In practice, teams invest 20–30% of total development time in writing tests. T
 
 Tests are a safety net for code changes. pytest lets you write tests with a single `assert` statement. In the next article, we'll walk through writing your first pytest test from scratch.
 
+## Real-World Scenario: The Moment Tests Save Money
+
+Here is a cart discount calculation that transitions from manual verification to automated testing.
+
+```python
+# pricing.py
+from dataclasses import dataclass
+
+@dataclass
+class CartItem:
+    name: str
+    price: int
+    qty: int
+
+def calc_total(items: list[CartItem], coupon_rate: float = 0.0) -> int:
+    if not 0.0 <= coupon_rate <= 1.0:
+        raise ValueError("coupon_rate must be between 0 and 1")
+    subtotal = sum(i.price * i.qty for i in items)
+    discounted = int(subtotal * (1 - coupon_rate))
+    return max(0, discounted)
+```
+
+```python
+# test_pricing.py
+import pytest
+from pricing import CartItem, calc_total
+
+def test_calc_total_without_coupon():
+    items = [CartItem("book", 10000, 2), CartItem("pen", 1000, 3)]
+    assert calc_total(items) == 23000
+
+def test_calc_total_with_coupon():
+    items = [CartItem("book", 10000, 2), CartItem("pen", 1000, 3)]
+    assert calc_total(items, 0.1) == 20700
+
+@pytest.mark.parametrize("bad_rate", [-0.1, 1.1])
+def test_calc_total_rejects_bad_coupon_rate(bad_rate):
+    with pytest.raises(ValueError, match="between 0 and 1"):
+        calc_total([], bad_rate)
+```
+
+```bash
+pytest test_pricing.py -v
+```
+
+```text
+test_pricing.py::test_calc_total_without_coupon PASSED
+test_pricing.py::test_calc_total_with_coupon PASSED
+test_pricing.py::test_calc_total_rejects_bad_coupon_rate[-0.1] PASSED
+test_pricing.py::test_calc_total_rejects_bad_coupon_rate[1.1] PASSED
+========================= 4 passed =========================
+```
+
+Intentionally introduce a bug to see how tests catch it immediately.
+
+```python
+# Bug: wrong operator
+# discounted = int(subtotal * (1 + coupon_rate))
+```
+
+```bash
+pytest test_pricing.py -v
+```
+
+```text
+test_pricing.py::test_calc_total_without_coupon PASSED
+test_pricing.py::test_calc_total_with_coupon FAILED
+E       assert 25300 == 20700
+```
+
+That single failure line is the signal that prevents a production incident.
+
+## How to Prioritize What to Test
+
+When you don't know where to start writing tests, this priority table is practical.
+
+| Priority | Area | Reason | Example |
+|---|---|---|---|
+| 1 | Money, permissions, inventory | Failure cost is high | Payment total, admin access |
+| 2 | External integration boundaries | Failure propagates widely | API response mapping, DB writes |
+| 3 | Pure calculation functions | Fast, broad coverage possible | Parsing, formatting, validation |
+| 4 | Simple getters/setters | ROI may be low | Thin wrapper functions |
+
+The key is to automate critical boundaries first. Trying to test all code at the same density drives up maintenance costs before delivering value.
+
+## Common Objections and Responses
+
+| Objection | Real Problem | Response |
+|---|---|---|
+| "No time to write tests" | Debugging time grows larger | Start with bug-reproduction tests |
+| "UI changes too often" | Misunderstanding unit test scope | Separate domain logic and test that |
+| "We already have manual QA" | Slow regression detection | Add automated tests at PR stage |
+| "Coverage is too low to matter" | No measurement baseline exists | Set a baseline on core modules first |
+
+## Before and After Refactoring: Code Without Tests vs. Code With Tests
+
+```python
+# before_refactor.py
+def shipping_fee(country: str, total: int) -> int:
+    if country == "KR":
+        if total >= 50000:
+            return 0
+        return 3000
+    if country == "US":
+        if total >= 100:
+            return 0
+        return 10
+    return 999999
+```
+
+```python
+# test_shipping_fee.py
+import pytest
+from before_refactor import shipping_fee
+
+@pytest.mark.parametrize(
+    "country,total,expected",
+    [
+        ("KR", 10000, 3000),
+        ("KR", 50000, 0),
+        ("US", 50, 10),
+        ("US", 100, 0),
+        ("JP", 1, 999999),
+    ],
+)
+def test_shipping_fee(country, total, expected):
+    assert shipping_fee(country, total) == expected
+```
+
+Lock the tests first, then safely restructure the function internals.
+
+```python
+# after_refactor.py
+FEES = {
+    "KR": {"free_over": 50000, "fee": 3000},
+    "US": {"free_over": 100, "fee": 10},
+}
+
+def shipping_fee(country: str, total: int) -> int:
+    policy = FEES.get(country)
+    if policy is None:
+        return 999999
+    return 0 if total >= policy["free_over"] else policy["fee"]
+```
+
+Run the same tests—all pass—confirming the behavioral contract is preserved while the structure improves.
+
+## Team Adoption Roadmap: How to Actually Start a Testing Culture
+
+Even when a team agrees tests are necessary, execution stalls without a clear starting point. This sequence works for small teams.
+
+### Step 1: Bug-Reproduction Tests First
+
+Start by adding reproduction tests for any code that has caused a production incident.
+
+```python
+# bugfix_test_example.py
+
+def normalize_phone(raw: str) -> str:
+    digits = "".join(ch for ch in raw if ch.isdigit())
+    if len(digits) not in (10, 11):
+        raise ValueError("invalid phone length")
+    return digits
+```
+
+```python
+import pytest
+from bugfix_test_example import normalize_phone
+
+@pytest.mark.parametrize("bad", ["123", "abc", "010-1234-12345"])
+def test_normalize_phone_rejects_invalid_input(bad):
+    with pytest.raises(ValueError):
+        normalize_phone(bad)
+```
+
+### Step 2: Automate Critical Boundaries
+
+Add tests to input validation, payment amounts, and permission checks—boundaries where failure cost is highest.
+
+### Step 3: PR Ground Rules
+
+- Feature code changes must include at least one related test
+- Bug fixes must start with a reproduction test
+- CI blocks merge when `pytest -q` fails
+
+## Manual QA vs. Automated Tests: Role Separation
+
+| Aspect | Automated Tests | Manual QA |
+|---|---|---|
+| Purpose | Fast regression detection | User-perspective verification |
+| Frequency | Every PR | Before/after release |
+| Speed | Seconds to minutes | Minutes to hours |
+| Reproducibility | High | Relatively low |
+
+The two approaches are complementary, not interchangeable.
+
+## Turning Failure Output into Operational Knowledge
+
+Test failures are not individual developer events—they are team knowledge accumulation events.
+
+- Keep failed input values in parametrize lists permanently.
+- Make error messages specific to reduce reproduction time.
+- Link retrospective documents as comments in test code.
+
+```python
+# regression_cases.py
+import pytest
+
+def parse_currency(value: str) -> int:
+    cleaned = value.replace(",", "").strip()
+    if not cleaned.isdigit():
+        raise ValueError("invalid currency string")
+    return int(cleaned)
+
+@pytest.mark.parametrize(
+    "raw",
+    ["1,2,3", "12a00", "-100", ""],
+)
+def test_parse_currency_regressions(raw):
+    with pytest.raises(ValueError):
+        parse_currency(raw)
+```
+
+## Minimum Operational Metrics
+
+Once you start testing, track these monthly to clarify improvement direction.
+
+| Metric | Meaning | Target |
+|---|---|---|
+| Time to recovery after failure | Time to identify and fix test failure cause | Decreasing trend |
+| Regression bug count | Same-type recurrence count | Decrease per quarter |
+| PR test execution rate | Percentage of PRs that include tests | 90%+ |
+| Test execution time | Feedback delay | Maintain team-agreed threshold |
+
+## Terminal Option Combinations
+
+| Command | Purpose |
+|---|---|
+| `pytest -q` | Quick pass/fail summary |
+| `pytest -v` | Per-case pass/fail detail |
+| `pytest -x` | Stop immediately on first failure |
+| `pytest -k "keyword"` | Run only matching subset |
+| `pytest --maxfail=3` | Limit maximum failure count |
+
+## Operational Regression Test Template
+
+```python
+import pytest
+
+BUG_CASES = [
+    ("", ValueError),
+    ("   ", ValueError),
+    (None, TypeError),
+]
+
+@pytest.mark.parametrize("raw,exc", BUG_CASES)
+def test_regression_cases(raw, exc):
+    with pytest.raises(exc):
+        require_non_empty(raw)
+```
+
+This template is the simplest form of permanently preserving bug tickets as test code.
+
+## Quality Check Questions
+
+- Can you infer the failure cause from the failure message alone?
+- Do tests depend on execution order?
+- Are boundary-value inputs included?
+- Are both happy and error paths verified?
+- Does adding a test case require only adding data, not copying functions?
+
 ## Answering the Opening Questions
 
 - **Are tests work that slows development, or an investment that speeds it up?**
