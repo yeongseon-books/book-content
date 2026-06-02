@@ -157,15 +157,35 @@ docker inspect --format "{{index .RepoDigests 0}}" python:3.12-slim
 
 ## How This Shows Up in Production
 
-Multi-stage builds split build tools from runtime. `.dockerignore` keeps the build context tiny. Digest pins guarantee reproducibility.
+Multi-stage builds split build tools from runtime. `.dockerignore` keeps the build context tiny. Digest pins guarantee reproducibility across environments.
+
+```text
+Developer local  →  docker build  →  CI (multi-stage + BuildKit cache)  →  Registry
+                                                                         ↓
+Production       ←  Kubernetes pull (digest-pinned)  ←  Registry (immutable)
+```
+
+The contract: what CI built is byte-for-byte what production runs. Tags are human labels; digests are the actual identity.
 
 ## How a Senior Engineer Thinks
 
 - Stable instructions go on top, volatile ones at the bottom.
-- Multi-stage is the default pattern.
-- `latest` is a landmine.
+- Multi-stage is the default pattern, not an optimization.
+- `latest` is a landmine — always pin digests in production.
 - `.dockerignore` matters as much as the Dockerfile.
 - Image size equals attack surface.
+
+In a Dockerfile PR review, seniors check five things:
+
+```text
+1. Fast-changing layers below slow-changing ones?  → cache efficiency
+2. Build tools (gcc, make) in final stage?          → size + attack surface
+3. Secrets (.env, credentials) in any layer?        → layers are permanent history
+4. USER directive for non-root?                     → security default
+5. Digest recorded in build log?                    → reproducibility
+```
+
+Automating these checks makes image quality a team default, not individual skill.
 
 ## Checklist
 
@@ -183,6 +203,72 @@ Multi-stage builds split build tools from runtime. `.dockerignore` keeps the bui
 ## Wrap-up and Next Steps
 
 You can see how an image is built. Next, look at what runs it. The next post covers Runtime.
+
+## Deep Dive: Multi-Stage Builds and Layer Caching in Practice
+
+Image optimization is not about "make it small" — it is about controlling change cost. When dependency install and source copy layers are misordered, a one-line code change triggers a full reinstall.
+
+```dockerfile
+FROM python:3.12-slim AS builder
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --upgrade pip && pip wheel --wheel-dir /wheels -r requirements.txt
+COPY . .
+RUN pip wheel --wheel-dir /wheels .
+
+FROM python:3.12-slim AS runtime
+WORKDIR /app
+COPY --from=builder /wheels /wheels
+RUN pip install --no-cache-dir /wheels/* && rm -rf /wheels
+USER 1000
+CMD ["python", "-m", "app.main"]
+```
+
+Build tools stay in `builder`; runtime gets only results. Final image shrinks and attack surface shrinks with it.
+
+## Layer Caching Strategy
+
+| Pattern | Problem | Fix |
+| --- | --- | --- |
+| `COPY . .` early | One-line change reinstalls deps | Copy dependency file first |
+| Too many RUN statements | Layer explosion, complex cache | Merge by semantic unit |
+| Build artifacts in final image | Bloat + attack surface | Multi-stage, copy results only |
+| Missing `.dockerignore` | Huge build context | Exclude `.git`, `__pycache__`, `.venv`, `node_modules` |
+
+## OverlayFS: Why Deletes Don't Delete
+
+Layers are change deltas, not file bundles. OverlayFS merges lowerdir (read-only layers) with upperdir (writable container layer). File deletion creates a whiteout marker — the original bytes stay in history. This is why secrets committed to any layer are never truly removed.
+
+```bash
+# Layer debugging commands
+docker history --no-trunc myapp:dev
+docker image inspect myapp:dev --format '{{json .RootFS.Layers}}'
+docker inspect --format '{{index .RepoDigests 0}}' myapp:dev
+```
+
+## CI Build Time: BuildKit Remote Cache
+
+CI builds are slow because cache is ephemeral. BuildKit with registry-backed cache solves this:
+
+```bash
+DOCKER_BUILDKIT=1 docker build \
+  --cache-from type=registry,ref=ghcr.io/org/app:cache \
+  --cache-to type=registry,ref=ghcr.io/org/app:cache,mode=max \
+  -t ghcr.io/org/app:sha-$(git rev-parse --short HEAD) .
+```
+
+Only changed layers rebuild. Especially effective for Python/Node projects with heavy dependency installs.
+
+## Digest Pinning for Production
+
+Tags are human-readable aliases; digests are immutable identity. Always record both in release notes:
+
+```bash
+docker pull myorg/myapp@sha256:<digest>
+docker run --rm myorg/myapp@sha256:<digest>
+```
+
+When incident recovery requires "run exactly what was running before", only digest guarantees byte-for-byte reproduction.
 
 ## Answering the Opening Questions
 
