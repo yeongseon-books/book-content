@@ -47,9 +47,6 @@ In this chapter, we compare named volumes, bind mounts, and tmpfs by lifecycle a
 Containers are immutable, but the data they manage must survive. A bad volume design is a data-loss design hiding behind green health checks. The most common production incident in containerized workloads is not a crash—it is silent data loss when someone deletes a container that was storing state in its writable layer.
 
 Volumes are managed storage independent of container identity. Bind mounts let you connect a host path directly. tmpfs lives in memory and disappears when the container stops. Each has different persistence guarantees and performance trade-offs.
-
-Volumes are managed storage independent of container identity. Bind mounts let you connect a host path directly. tmpfs lives in memory and disappears when the container stops. Each has different persistence guarantees and performance trade-offs.
-
 ## Key Terms
 
 - **Volume**: a Docker-managed persistent store.
@@ -164,13 +161,67 @@ docker run -d --name pg -v pgdata:/var/lib/postgresql/data -e POSTGRES_PASSWORD=
 
 Developers use bind mounts for code hot-reload. Databases use named volumes. Sensitive scratch data lives on tmpfs. Production runs on EBS or NFS drivers.
 
+### Data Classification Table
+
+Before choosing a mount type, classify your data:
+
+| Data Type | Recommended Storage | Reason |
+| --- | --- | --- |
+| Persistent (DB, uploads, audit logs) | Named volume or managed DB | Survives container deletion |
+| Regenerable (cache, temp transforms) | Named volume or tmpfs | Loss is inconvenient, not catastrophic |
+| Sensitive ephemeral (tokens, sessions) | tmpfs + short TTL | Never hits disk |
+| Config files | Bind mount `:ro` | Version-controlled, read-only in container |
+
+This table belongs in your system design doc. It eliminates mount-type debates during code review.
+
+### Permission Model
+
+The most common bind mount failure is UID/GID mismatch between the container user and the host file owner.
+
+**Rules:**
+- Run the application as a non-root user.
+- Set mount path permissions explicitly in deploy scripts.
+- Separate data paths from log paths.
+
+```bash
+# Verify who owns the mounted path inside the container
+docker run --rm -v pgdata:/data alpine ls -la /data
+# If ownership is wrong:
+docker run --rm -v pgdata:/data alpine chown -R 1000:1000 /data
+```
+
+### Standardizing Backup and Restore
+
+Having a backup file is not the same as being able to restore. Both directions must be automated:
+
+```bash
+# Backup
+docker run --rm -v pgdata:/data:ro -v "$PWD/backups":/backup \
+  alpine tar czf /backup/pgdata.tgz -C /data .
+
+# Restore
+docker run --rm -v pgdata:/data -v "$PWD/backups":/backup \
+  alpine sh -c "cd /data && tar xzf /backup/pgdata.tgz"
+```
+
+A backup plan is incomplete until you test the restore path on a schedule.
+
+### Operations Checklist (Team Readiness)
+
+- [ ] Data classification table exists per service.
+- [ ] Volume policy documented for all persistent data.
+- [ ] Backup and restore scripts automated.
+- [ ] Restore rehearsal schedule defined (quarterly minimum).
+- [ ] Volume deletion requires explicit approval (no `docker volume prune` in prod).
+
 ## How a Senior Engineer Thinks
 
-- Separate state from containers.
-- Back up volumes on a schedule.
+- Separate state from containers — always.
+- Back up volumes on a schedule; test restores quarterly.
 - Permission models are intentional, never accidental.
-- Choose drivers on cost and performance.
-- Restore drills beat backups in importance.
+- Choose drivers based on cost, IOPS, and durability requirements.
+- Restore drills beat backup existence in importance.
+- Before any volume decision: "Can a new team member reproduce this setup from the runbook?"
 
 ## Checklist
 
