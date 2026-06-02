@@ -114,15 +114,48 @@ x̄ = 99.8 (n=64), SE = 2.4
 
 ## How This Shows Up in Production
 
-Conversion rate in A/B tests, monthly revenue averages, p95 latency — every *dashboard number* is an *estimate*. They are usually shown with *error bars* and *confidence intervals*.
+Conversion rate in A/B tests, monthly revenue averages, p95 latency — every dashboard number is an estimate. They are usually shown with error bars and confidence intervals.
+
+### Bootstrap for Estimator Stability
+
+When the distribution is skewed, compare mean and median confidence intervals via bootstrap:
+
+```python
+import numpy as np
+
+rng = np.random.default_rng(123)
+sample = rng.lognormal(mean=4.0, sigma=0.8, size=120)
+
+B = 8000
+mean_boot, median_boot = [], []
+for _ in range(B):
+    r = rng.choice(sample, size=len(sample), replace=True)
+    mean_boot.append(r.mean())
+    median_boot.append(np.median(r))
+
+mean_ci = np.percentile(mean_boot, [2.5, 97.5])
+median_ci = np.percentile(median_boot, [2.5, 97.5])
+
+print(f'mean 95% CI: [{mean_ci[0]:.1f}, {mean_ci[1]:.1f}]')
+print(f'median 95% CI: [{median_ci[0]:.1f}, {median_ci[1]:.1f}]')
+```
+
+On long-tailed data the median CI is often tighter, signaling more stable estimation. Always state *which* estimator you chose and *why* in the report.
+
+### Key Estimation Rules
+
+- SE = s / √n — quadrupling sample size halves the standard error.
+- Narrow CI means *precise*, not necessarily *accurate* — bias can shift the entire interval off-target.
+- Report format: `x̄ = 99.8 (n=64), SE = 2.4, 95% CI [95.1, 104.5]`.
+- For small samples (n < 30), use the t-distribution rather than z = 1.96.
 
 ## How a Senior Engineer Thinks
 
-- *Always* attach *SE* next to an estimate.
-- Set *N* with *statistical power analysis*.
-- Use the *t-distribution* on *small samples*.
-- *Inspect bias* first.
-- *Never hide* error in a report.
+- *Always* attach SE next to an estimate — bare point estimates invite overconfidence.
+- Set N with statistical power analysis, not gut feel.
+- Use the t-distribution on small samples — z-approximation underestimates uncertainty.
+- Inspect bias first — a precise estimate from a biased sample is precisely wrong.
+- Never hide error in a report — teams that see uncertainty make better decisions.
 
 ## Checklist
 
