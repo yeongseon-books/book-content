@@ -220,6 +220,216 @@ In practice, many teams use `ripgrep (rg)` which is faster than `grep`, and `fd`
 - If filenames with spaces break downstream commands, switch to `-print0` and `xargs -0` before doing anything destructive. This matters most when the next step is `rm`, `mv`, or `chmod`.
 - If grep output is noisy or slow, limit the target set with options like `--include="*.py"` or `--exclude-dir=.git`. In real codebases, controlling scope is usually the first optimization.
 
+## Shell Checkpoints for Automation Quality
+
+### Input Validation and Exit Code Contracts
+For a shell script to become a team tool, its failure modes must be predictable. Declaring argument validation and exit code contracts allows CI and operational scripts to integrate safely.
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  echo "usage: $0 <log_dir> <keyword>"
+}
+
+if [ "$#" -ne 2 ]; then
+  usage
+  exit 64
+fi
+
+log_dir="$1"
+keyword="$2"
+
+if [ ! -d "$log_dir" ]; then
+  echo "directory not found: $log_dir"
+  exit 66
+fi
+
+if grep -R --line-number "$keyword" "$log_dir" >/tmp/match.out; then
+  echo "match found"
+  exit 0
+else
+  echo "no match"
+  exit 1
+fi
+```
+
+Exit codes like `64` and `66` classify the failure cause for the caller. When human-readable messages and machine-readable codes are separated, branching logic in automation pipelines becomes straightforward.
+
+### Finding Pipeline Bottlenecks
+Complex pipelines are hard to diagnose by feel alone. Stamp timestamps before and after each stage, or split into temporary files to identify which stage is slow.
+
+```bash
+time grep -R "ERROR" /var/log/myapp > /tmp/step1.txt
+time cut -d' ' -f1-8 /tmp/step1.txt > /tmp/step2.txt
+time sort /tmp/step2.txt | uniq -c | sort -nr > /tmp/step3.txt
+```
+
+This approach is simple but effective. You can quickly tell whether a stage is CPU-bound or I/O-bound, and then decide on optimizations such as `awk` replacement, parallelization, or input reduction.
+
+### Reusable Function Snippets
+Even in long scripts, splitting functionality into functions makes testing and maintenance easier.
+
+```bash
+collect_pids() {
+  pgrep -f "$1" || true
+}
+
+kill_gracefully() {
+  local pid="$1"
+  kill -TERM "$pid"
+  sleep 2
+  kill -0 "$pid" 2>/dev/null && kill -KILL "$pid" || true
+}
+```
+
+Function-level decomposition enables scenario-by-scenario verification: whether the termination signal is handled correctly, whether zombie processes remain, whether restart logic runs twice.
+
+## Practical Scenario: Designing a Bulk File Processing Pipeline
+
+`grep`, `find`, and `xargs` form the core combination for "selecting only the needed targets from many files and processing them safely." In operations, you must treat these three tools as a pipeline, not individual commands.
+
+### Step 1: Validate Search Conditions First
+
+```bash
+find /var/log/my-app -type f -name '*.log' -mtime -2 -print
+
+# Expected output
+# /var/log/my-app/app.log
+# /var/log/my-app/worker.log
+# /var/log/my-app/batch.log
+```
+
+Never attach destructive actions like `-exec rm` from the start. Always begin by printing the candidate list.
+
+### Step 2: Reduce Noise with Regex
+
+```bash
+grep -R -n -E 'ERROR|CRITICAL|timeout|HTTP/1\.1" 5[0-9]{2}' /var/log/my-app
+
+# Partial expected output
+# /var/log/my-app/app.log:1203:... ERROR payment timeout
+# /var/log/my-app/access.log:9312:... "GET /api/pay" 502
+```
+
+The pattern `HTTP/1\.1" 5[0-9]{2}` is commonly used to extract 5xx responses from access logs.
+
+### Step 3: Parallel Processing with xargs
+
+```bash
+find ./images -type f -name '*.png' -print0 \
+  | xargs -0 -n 1 -P 4 optipng -quiet
+```
+
+`-P 4` runs 4 jobs in parallel. This reduces processing time for CPU-intensive tasks, but choose appropriate parallelism considering I/O contention and system load.
+
+### Filename Safety: Make -print0 / -0 Your Default
+
+```bash
+find ./reports -type f -name '*.csv' -print0 \
+  | xargs -0 -I {} sh -c 'wc -l "$1"' _ {}
+```
+
+This combination is essential for safely handling filenames containing spaces, quotes, or newlines.
+
+### Connect grep Results to Downstream Processing
+
+```bash
+grep -R -l -E 'TODO|FIXME|HACK' ./src \
+  | xargs -n 1 -I {} sh -c 'echo "--- {} ---"; sed -n "1,5p" "{}"'
+```
+
+`-l` outputs only file paths, making it ideal for combining with downstream pipelines.
+
+### Deletion Automation Example: Include a Dry-Run
+
+```bash
+# dry-run
+find /tmp/cache -type f -name '*.tmp' -mtime +3 -print
+
+# execute
+find /tmp/cache -type f -name '*.tmp' -mtime +3 -print0 \
+  | xargs -0 rm -f
+```
+
+Deleting without a dry-run carries high accident risk. Maintain the same stage separation in automation scripts.
+
+### Connect to a systemd Timer for Scheduled Execution
+
+```ini
+# /etc/systemd/system/cache-cleanup.service
+[Unit]
+Description=Cleanup old temp cache files
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/cache-cleanup.sh
+
+# /etc/systemd/system/cache-cleanup.timer
+[Unit]
+Description=Run cache cleanup daily
+
+[Timer]
+OnCalendar=*-*-* 03:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+```
+
+Linking `find/xargs` scripts to a timer eliminates manual work. However, always leave dry-run logs before the first deployment to confirm the impact scope.
+
+### Bash Inspection Script Example
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+target="/var/log/my-app"
+pattern='ERROR|CRITICAL|timeout'
+
+count=$(grep -R -E "$pattern" "$target" | wc -l)
+printf '[INFO] pattern_count=%s\n' "$count"
+
+if [ "$count" -gt 200 ]; then
+  printf '[WARN] high error volume detected\n'
+fi
+```
+
+Setting a threshold like this extends simple searching into operational alerting.
+
+## Practical Inspection Log Example
+
+The example below is an abbreviated version of inspection output frequently seen in real operations. What matters is not copying specific commands verbatim, but building the habit of connecting output to the next judgment.
+
+```bash
+# Collect service status + recent errors in one pass
+systemctl is-active my-api
+journalctl -u my-api --since '5 min ago' --no-pager \
+  | grep -E 'ERROR|CRITICAL|timeout|Failed' \
+  | tail -n 20
+
+# Expected output
+# active
+# 2026-05-21 15:31:10 ERROR timeout while calling payment API
+# 2026-05-21 15:31:12 CRITICAL worker exited unexpectedly
+```
+
+```bash
+# Process / port / file handle inspection
+ps -ef | grep -E 'my-api|gunicorn' | grep -v grep
+ss -lntp | grep -E ':8080|:80|:443'
+lsof -p "$(pgrep -f my-api | head -n 1)" | wc -l
+
+# Expected output example
+# deploy 18231 1  ... /opt/my-api/current/bin/start.sh
+# LISTEN 0 4096 0.0.0.0:8080 ... users:(("python3",pid=18231,fd=12))
+# 412
+```
+
+Saving these outputs as a time series makes comparison easy when issues recur, and quickly explains "how the current state differs from normal." Ultimately, practical CLI competence is the ability to reliably repeat an **evidence-based judgment routine**, not the commands themselves.
+
 ## Checklist
 
 - [ ] You can search for strings across a project with `grep -rn`

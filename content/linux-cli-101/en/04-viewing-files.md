@@ -205,6 +205,247 @@ The decision criterion for "which command to view a file with" is **file size an
 
 The most-used combination in production is `tail -f` + `grep`. Running `tail -f app.log | grep --line-buffered ERROR` shows errors the instant they occur. Without this combination during incident response, you fall into the inefficiency of "opening the log file in an editor and refreshing".
 
+## Shell Checkpoints for Automation Quality
+
+### Input Validation and Exit Code Contracts
+For a shell script to become a team tool, its failure modes must be predictable. Declaring argument validation and exit code contracts allows CI and operational scripts to integrate safely.
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  echo "usage: $0 <log_dir> <keyword>"
+}
+
+if [ "$#" -ne 2 ]; then
+  usage
+  exit 64
+fi
+
+log_dir="$1"
+keyword="$2"
+
+if [ ! -d "$log_dir" ]; then
+  echo "directory not found: $log_dir"
+  exit 66
+fi
+
+if grep -R --line-number "$keyword" "$log_dir" >/tmp/match.out; then
+  echo "match found"
+  exit 0
+else
+  echo "no match"
+  exit 1
+fi
+```
+
+Exit codes like `64` and `66` classify the failure cause for the caller. When human-readable messages and machine-readable codes are separated, branching logic in automation pipelines becomes straightforward.
+
+### Finding Pipeline Bottlenecks
+Complex pipelines are hard to diagnose by feel alone. Stamp timestamps before and after each stage, or split into temporary files to identify which stage is slow.
+
+```bash
+time grep -R "ERROR" /var/log/myapp > /tmp/step1.txt
+time cut -d' ' -f1-8 /tmp/step1.txt > /tmp/step2.txt
+time sort /tmp/step2.txt | uniq -c | sort -nr > /tmp/step3.txt
+```
+
+This approach is simple but effective. You can quickly tell whether a stage is CPU-bound or I/O-bound, and then decide on optimizations such as `awk` replacement, parallelization, or input reduction.
+
+### Reusable Function Snippets
+Even in long scripts, splitting functionality into functions makes testing and maintenance easier.
+
+```bash
+collect_pids() {
+  pgrep -f "$1" || true
+}
+
+kill_gracefully() {
+  local pid="$1"
+  kill -TERM "$pid"
+  sleep 2
+  kill -0 "$pid" 2>/dev/null && kill -KILL "$pid" || true
+}
+```
+
+Function-level decomposition enables scenario-by-scenario verification: whether the termination signal is handled correctly, whether zombie processes remain, whether restart logic runs twice.
+
+## Practical Scenario: Turning File Viewing into an Analysis Routine
+
+File viewing commands are not simply about reading content. In operations, they are the starting point of an analysis routine: "find the problem segment quickly, preserve evidence, and connect to the next action." That is why building a habit of combining the right viewing tools for the purpose is more valuable than repeating `cat` for everything.
+
+### Check Metadata Before Viewing the Full File
+
+```bash
+ls -lh /var/log/my-app/app.log
+stat /var/log/my-app/app.log
+
+# Partial expected output
+# -rw-r----- 1 deploy deploy 142M May 21 14:10 /var/log/my-app/app.log
+# Size: 148944001  Blocks: ...  Access: ...  Modify: 2026-05-21 14:10:03
+```
+
+Checking file size and modification time first lets you quickly judge "is the log I am looking at actually current?" This prevents the mistake of analyzing a stale file.
+
+### Save Time with Range-Based Viewing
+
+```bash
+# First 40 lines: check format, headers, initialization logs
+head -n 40 /var/log/my-app/app.log
+
+# Last 80 lines: check current failure symptoms
+tail -n 80 /var/log/my-app/app.log
+
+# Real-time tracking
+tail -f /var/log/my-app/app.log
+```
+
+For real-time tracking, the efficient approach is to reproduce requests in a separate terminal while keeping the log terminal focused on evidence collection.
+
+### Compress Failure Patterns with grep Regex
+
+```bash
+grep -E 'ERROR|CRITICAL|Exception|timeout|5[0-9]{2}' /var/log/my-app/app.log \
+  | tail -n 40
+
+# Expected output
+# 2026-05-21T14:12:03 ERROR Payment timeout after 3000ms
+# 2026-05-21T14:12:04 CRITICAL Worker crashed pid=18312
+```
+
+A pattern like `5[0-9]{2}` broadly catches HTTP 5xx responses. The habit of viewing text through patterns rather than reading line by line speeds up analysis.
+
+### Trace Root Causes with Context-Inclusive Viewing
+
+```bash
+grep -n -C 3 'Database connection pool exhausted' /var/log/my-app/app.log
+
+# Partial expected output
+# 12931-... INFO checkout connection
+# 12932-... WARN retrying request
+# 12933:... ERROR Database connection pool exhausted
+# 12934-... INFO queue depth=87
+```
+
+Including surrounding context with `-C 3` makes it easier to understand the causal flow than looking at a single error line.
+
+### Use less as an Analysis Tool
+
+```bash
+less /var/log/my-app/app.log
+# /ERROR      -> search
+# n / N       -> next/previous result
+# g / G       -> file beginning/end
+# q           -> quit
+```
+
+When dealing with large logs, `less` is not just a viewer but a navigator. It is especially powerful when comparing patterns by jumping back and forth between search results.
+
+### Build Daily Aggregates with Pipe Chains
+
+```bash
+grep -E 'ERROR|CRITICAL' /var/log/my-app/app.log \
+  | awk '{print $1}' \
+  | cut -d'T' -f1 \
+  | sort \
+  | uniq -c
+
+# Expected output
+#   18 2026-05-19
+#   24 2026-05-20
+#   41 2026-05-21
+```
+
+Quickly grasping error-count trends lets you immediately determine "is today an anomaly?"
+
+### Cross-Reference systemd Logs with File Logs
+
+```bash
+journalctl -u my-app --since '30 min ago' --no-pager \
+  | grep -E 'Started|Stopped|Failed|OOM|ERROR'
+```
+
+Viewing application file logs and system logs together gives a more accurate picture of restart timing, OOM occurrences, and service failure reasons.
+
+### Bash Snippet for Automating Inspection
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+log_file="/var/log/my-app/app.log"
+
+printf '[INFO] file=%s size=%s\n' "$log_file" "$(stat -c '%s' "$log_file")"
+
+grep -E 'ERROR|CRITICAL|timeout|5[0-9]{2}' "$log_file" \
+  | tail -n 60 \
+  | tee /tmp/my-app-errors-latest.txt
+
+printf '[INFO] saved=/tmp/my-app-errors-latest.txt\n'
+```
+
+The key is saving results to a file. Being able to reuse the same evidence in meetings or incident reports reduces communication overhead.
+
+## Practical Inspection Log Example
+
+The example below is an abbreviated version of inspection output frequently seen in real operations. What matters is not copying specific commands verbatim, but building the habit of connecting output to the next judgment.
+
+```bash
+# Collect service status + recent errors in one pass
+systemctl is-active my-api
+journalctl -u my-api --since '5 min ago' --no-pager \
+  | grep -E 'ERROR|CRITICAL|timeout|Failed' \
+  | tail -n 20
+
+# Expected output
+# active
+# 2026-05-21 15:31:10 ERROR timeout while calling payment API
+# 2026-05-21 15:31:12 CRITICAL worker exited unexpectedly
+```
+
+```bash
+# Process / port / file handle inspection
+ps -ef | grep -E 'my-api|gunicorn' | grep -v grep
+ss -lntp | grep -E ':8080|:80|:443'
+lsof -p "$(pgrep -f my-api | head -n 1)" | wc -l
+
+# Expected output example
+# deploy 18231 1  ... /opt/my-api/current/bin/start.sh
+# LISTEN 0 4096 0.0.0.0:8080 ... users:(("python3",pid=18231,fd=12))
+# 412
+```
+
+Saving these outputs as a time series makes comparison easy when issues recur, and quickly explains "how the current state differs from normal." Ultimately, practical CLI competence is the ability to reliably repeat an **evidence-based judgment routine**, not the commands themselves.
+
+### Operations Note: Recovery Order After Failure
+
+When a failure occurs, the sequence "check status → collect evidence → minimal action" is safer than "guess the cause → restart immediately."
+
+```bash
+systemctl status my-api --no-pager | sed -n '1,12p'
+journalctl -u my-api -n 50 --no-pager | grep -E 'ERROR|CRITICAL|timeout|Failed' || true
+```
+
+Preserving status and logs first means that even after a restart erases evidence, you can still proceed with retrospectives and prevention work.
+
+### Operations Note: Post-Change Verification Check
+
+After changing permissions, viewing settings, or environment values, perform system-level verification alongside functional tests.
+
+```bash
+whoami
+hostname
+systemctl is-active my-api
+journalctl -u my-api -n 20 --no-pager
+```
+
+Even a short verification routine, if recorded every time, allows fast reconstruction of "what was changed and when" during incidents.
+
+Storing these verification logs alongside issue numbers accelerates future incident response.
+
+This habit is what builds long-term operational quality.
+
 ## Checklist
 
 - [ ] You can distinguish the purposes of `cat`, `less`, `head`, and `tail`

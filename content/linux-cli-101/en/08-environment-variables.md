@@ -209,6 +209,244 @@ Environment variables are the standard method for managing "configuration outsid
 
 On the other hand, too many environment variables become hard to manage. At that point, you move to per-environment `.env` files or secrets management tools like AWS Parameter Store and HashiCorp Vault. But the starting point for all of this is understanding `export` and `$PATH`.
 
+## Shell Checkpoints for Automation Quality
+
+### Input Validation and Exit Code Contracts
+For a shell script to become a team tool, its failure modes must be predictable. Declaring argument validation and exit code contracts allows CI and operational scripts to integrate safely.
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  echo "usage: $0 <log_dir> <keyword>"
+}
+
+if [ "$#" -ne 2 ]; then
+  usage
+  exit 64
+fi
+
+log_dir="$1"
+keyword="$2"
+
+if [ ! -d "$log_dir" ]; then
+  echo "directory not found: $log_dir"
+  exit 66
+fi
+
+if grep -R --line-number "$keyword" "$log_dir" >/tmp/match.out; then
+  echo "match found"
+  exit 0
+else
+  echo "no match"
+  exit 1
+fi
+```
+
+Exit codes like `64` and `66` classify the failure cause for the caller. When human-readable messages and machine-readable codes are separated, branching logic in automation pipelines becomes straightforward.
+
+### Finding Pipeline Bottlenecks
+Complex pipelines are hard to diagnose by feel alone. Stamp timestamps before and after each stage, or split into temporary files to identify which stage is slow.
+
+```bash
+time grep -R "ERROR" /var/log/myapp > /tmp/step1.txt
+time cut -d' ' -f1-8 /tmp/step1.txt > /tmp/step2.txt
+time sort /tmp/step2.txt | uniq -c | sort -nr > /tmp/step3.txt
+```
+
+This approach is simple but effective. You can quickly tell whether a stage is CPU-bound or I/O-bound, and then decide on optimizations such as `awk` replacement, parallelization, or input reduction.
+
+### Reusable Function Snippets
+Even in long scripts, splitting functionality into functions makes testing and maintenance easier.
+
+```bash
+collect_pids() {
+  pgrep -f "$1" || true
+}
+
+kill_gracefully() {
+  local pid="$1"
+  kill -TERM "$pid"
+  sleep 2
+  kill -0 "$pid" 2>/dev/null && kill -KILL "$pid" || true
+}
+```
+
+Function-level decomposition enables scenario-by-scenario verification: whether the termination signal is handled correctly, whether zombie processes remain, whether restart logic runs twice.
+
+## Practical Scenario: Managing Environment Variables as Deployment Contracts
+
+Environment variables are not just "a technique for storing values" — they are deployment contracts. Clearly separating code from environment enables reusing the same binary across development, staging, and production. Conversely, loose environment variable management causes different behaviors per deployment, becoming a source of incidents.
+
+### Document the Required Variable List
+
+```bash
+cat > /opt/my-api/current/.env.example << 'EOF'
+APP_ENV=production
+APP_PORT=8080
+DB_HOST=127.0.0.1
+DB_PORT=5432
+LOG_LEVEL=INFO
+EOF
+```
+
+`.env.example` does not hold actual secrets; it serves as documentation sharing the required key list and format.
+
+### Check and Filter Current Shell Variables
+
+```bash
+env | sort | grep -E '^(APP_|DB_|LOG_)'
+
+# Expected output
+# APP_ENV=production
+# APP_PORT=8080
+# DB_HOST=10.0.2.7
+# DB_PORT=5432
+# LOG_LEVEL=INFO
+```
+
+Using a regex anchor (`^`) extracts variables safely by prefix.
+
+### Distinguish Temporary vs Permanent Settings
+
+```bash
+# Valid only in current session
+export APP_ENV=staging
+
+# Persists across new shells
+printf '\nexport APP_ENV=staging\n' >> ~/.bashrc
+source ~/.bashrc
+```
+
+In operational automation, prefer systemd `EnvironmentFile` or deployment-system variable injection over session-dependent settings.
+
+### Inject Environment Variables via systemd Units
+
+```ini
+# /etc/systemd/system/my-api.service
+[Service]
+Environment="APP_ENV=production"
+Environment="LOG_LEVEL=INFO"
+EnvironmentFile=/opt/my-api/current/conf/app.env
+ExecStart=/opt/my-api/current/bin/start.sh
+```
+
+```bash
+systemctl daemon-reload
+systemctl restart my-api
+systemctl show my-api --property=Environment
+```
+
+Setting variables at the service unit level maintains a consistent execution environment regardless of login shell state.
+
+### Prevent Secret Exposure
+
+```bash
+# Bad example: secret persists in history
+# export DB_PASSWORD=super-secret
+
+# Recommended: use secret stores / permission-restricted files / CI secrets
+chmod 600 /opt/my-api/current/conf/app.env
+```
+
+Environment variables are convenient, but they can be exposed in process listings and crash dumps. For sensitive information, design the injection path and permissions together.
+
+### Default and Required Value Handling in Bash
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+: "${APP_ENV:=development}"
+: "${APP_PORT:=8000}"
+: "${DB_HOST:?DB_HOST is required}"
+
+printf 'APP_ENV=%s APP_PORT=%s DB_HOST=%s\n' "$APP_ENV" "$APP_PORT" "$DB_HOST"
+```
+
+The `${VAR:?message}` pattern fails immediately on missing required variables, preventing silent misbehavior.
+
+### Trace Variable Problems in Logs
+
+```bash
+journalctl -u my-api -n 100 --no-pager \
+  | grep -E 'missing env|invalid config|DB_HOST|APP_PORT'
+```
+
+Environment variable problems usually leave hints in startup logs. This is the highest-value first check during deployment failure analysis.
+
+### Compare Per-Environment Templates
+
+```bash
+diff -u conf/app.env.staging conf/app.env.production
+
+# Partial expected output
+# -APP_ENV=staging
+# +APP_ENV=production
+# -LOG_LEVEL=DEBUG
+# +LOG_LEVEL=INFO
+```
+
+An explicit diff quickly shows "what is different that caused different behavior."
+
+## Practical Inspection Log Example
+
+The example below is an abbreviated version of inspection output frequently seen in real operations. What matters is not copying specific commands verbatim, but building the habit of connecting output to the next judgment.
+
+```bash
+# Collect service status + recent errors in one pass
+systemctl is-active my-api
+journalctl -u my-api --since '5 min ago' --no-pager \
+  | grep -E 'ERROR|CRITICAL|timeout|Failed' \
+  | tail -n 20
+
+# Expected output
+# active
+# 2026-05-21 15:31:10 ERROR timeout while calling payment API
+# 2026-05-21 15:31:12 CRITICAL worker exited unexpectedly
+```
+
+```bash
+# Process / port / file handle inspection
+ps -ef | grep -E 'my-api|gunicorn' | grep -v grep
+ss -lntp | grep -E ':8080|:80|:443'
+lsof -p "$(pgrep -f my-api | head -n 1)" | wc -l
+
+# Expected output example
+# deploy 18231 1  ... /opt/my-api/current/bin/start.sh
+# LISTEN 0 4096 0.0.0.0:8080 ... users:(("python3",pid=18231,fd=12))
+# 412
+```
+
+Saving these outputs as a time series makes comparison easy when issues recur, and quickly explains "how the current state differs from normal." Ultimately, practical CLI competence is the ability to reliably repeat an **evidence-based judgment routine**, not the commands themselves.
+
+### Operations Note: Recovery Order After Failure
+
+When a failure occurs, the sequence "check status → collect evidence → minimal action" is safer than "guess the cause → restart immediately."
+
+```bash
+systemctl status my-api --no-pager | sed -n '1,12p'
+journalctl -u my-api -n 50 --no-pager | grep -E 'ERROR|CRITICAL|timeout|Failed' || true
+```
+
+Preserving status and logs first means that even after a restart erases evidence, you can still proceed with retrospectives and prevention work.
+
+### Operations Note: Post-Change Verification Check
+
+After changing permissions, viewing settings, or environment values, perform system-level verification alongside functional tests.
+
+```bash
+whoami
+hostname
+systemctl is-active my-api
+journalctl -u my-api -n 20 --no-pager
+```
+
+Even a short verification routine, if recorded every time, allows fast reconstruction of "what was changed and when" during incidents.
+
+Storing these verification logs alongside issue numbers accelerates future incident response.
+
 ## Checklist
 
 - [ ] You can read the output of `echo $PATH` and explain the command search order

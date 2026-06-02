@@ -196,6 +196,237 @@ File manipulation commands look simple, but the key point is that **deletion is 
 
 Teams put safety guards on dangerous commands. Adding `alias rm='rm -i'` to `.bashrc` prompts for confirmation before every delete, or tools like `trash-cli` provide a recycle bin. On servers, a safer pattern is to `mv` files to a temporary folder instead of `rm`, then clean up after a set period.
 
+## Shell Checkpoints for Automation Quality
+
+### Input Validation and Exit Code Contracts
+For a shell script to become a team tool, its failure modes must be predictable. Declaring argument validation and exit code contracts allows CI and operational scripts to integrate safely.
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  echo "usage: $0 <log_dir> <keyword>"
+}
+
+if [ "$#" -ne 2 ]; then
+  usage
+  exit 64
+fi
+
+log_dir="$1"
+keyword="$2"
+
+if [ ! -d "$log_dir" ]; then
+  echo "directory not found: $log_dir"
+  exit 66
+fi
+
+if grep -R --line-number "$keyword" "$log_dir" >/tmp/match.out; then
+  echo "match found"
+  exit 0
+else
+  echo "no match"
+  exit 1
+fi
+```
+
+Exit codes like `64` and `66` classify the failure cause for the caller. When human-readable messages and machine-readable codes are separated, branching logic in automation pipelines becomes straightforward.
+
+### Finding Pipeline Bottlenecks
+Complex pipelines are hard to diagnose by feel alone. Stamp timestamps before and after each stage, or split into temporary files to identify which stage is slow.
+
+```bash
+time grep -R "ERROR" /var/log/myapp > /tmp/step1.txt
+time cut -d' ' -f1-8 /tmp/step1.txt > /tmp/step2.txt
+time sort /tmp/step2.txt | uniq -c | sort -nr > /tmp/step3.txt
+```
+
+This approach is simple but effective. You can quickly tell whether a stage is CPU-bound or I/O-bound, and then decide on optimizations such as `awk` replacement, parallelization, or input reduction.
+
+### Reusable Function Snippets
+Even in long scripts, splitting functionality into functions makes testing and maintenance easier.
+
+```bash
+collect_pids() {
+  pgrep -f "$1" || true
+}
+
+kill_gracefully() {
+  local pid="$1"
+  kill -TERM "$pid"
+  sleep 2
+  kill -0 "$pid" 2>/dev/null && kill -KILL "$pid" || true
+}
+```
+
+Function-level decomposition enables scenario-by-scenario verification: whether the termination signal is handled correctly, whether zombie processes remain, whether restart logic runs twice.
+
+## Practical Scenario: Safely Automating File Operations
+
+File and directory commands look simple, but a significant portion of production incidents start here. For example, one wrong path in a log cleanup job can delete needed files. That is why in practice, the three-step habit of "confirm before acting → print affected scope → execute" is standard.
+
+```bash
+# 1) Confirm current location and target
+pwd
+ls -la ./releases
+
+# Expected output
+# /opt/my-app
+# drwxr-xr-x  8 deploy deploy 4096 May 21 13:00 .
+# drwxr-xr-x  5 deploy deploy 4096 May 21 09:11 ..
+# drwxr-xr-x  2 deploy deploy 4096 May 14 10:00 20260514
+```
+
+### Establish Naming Conventions Before Creating
+
+Directory structure design matters most at the beginning. In operations, conventions that include dates and environment names make incident tracing easier.
+
+```bash
+env_name="prod"
+release_date="$(date +%Y%m%d)"
+base_dir="/opt/my-app/releases/${env_name}-${release_date}"
+
+mkdir -p "$base_dir"/{bin,conf,logs,tmp}
+find "$base_dir" -maxdepth 2 -type d | sort
+
+# Expected output
+# /opt/my-app/releases/prod-20260521
+# /opt/my-app/releases/prod-20260521/bin
+# /opt/my-app/releases/prod-20260521/conf
+# /opt/my-app/releases/prod-20260521/logs
+# /opt/my-app/releases/prod-20260521/tmp
+```
+
+### Copy and Move: Thinking in Terms of Atomicity
+
+`cp` leaves the original; `mv` relocates. In deployments, preparing in a temporary directory and then swapping a symlink is the safe pattern.
+
+```bash
+cp -a ./build/. "$base_dir/bin/"
+ln -sfn "$base_dir" /opt/my-app/current
+ls -la /opt/my-app/current
+
+# Expected output
+# lrwxrwxrwx 1 deploy deploy 34 May 21 13:12 /opt/my-app/current -> /opt/my-app/releases/prod-20260521
+```
+
+`ln -sfn` overwrites an existing link to make the switch brief. However, executing without verifying the link target can switch to the wrong release, so it is good practice to check file count and checksums before the switch.
+
+### Deletion Always Starts with Candidate Output
+
+Without safeguards, deletion carries high recovery costs.
+
+```bash
+# Preview deletion candidates
+find /opt/my-app/releases -maxdepth 1 -type d -name 'prod-*' -mtime +14 -print
+
+# Actual deletion
+find /opt/my-app/releases -maxdepth 1 -type d -name 'prod-*' -mtime +14 -print0 \
+  | xargs -0 rm -rf
+```
+
+The `-print0` and `xargs -0` combination handles spaces and special characters. This pattern is a fundamental safety mechanism for file operation automation.
+
+### Verifying Permissions and Ownership Together
+
+A file can exist but the service still fails if permissions are wrong.
+
+```bash
+chown -R deploy:deploy "$base_dir"
+find "$base_dir" -type d -exec chmod 755 {} \;
+find "$base_dir" -type f -name '*.sh' -exec chmod 750 {} \;
+
+# Inspect
+find "$base_dir" -maxdepth 2 -printf '%M %u:%g %p\n' | head -n 8
+```
+
+The key here is separating permissions for executables (`*.sh`) from regular files. Granting `chmod 777` to everything looks convenient but immediately becomes a problem from security and audit perspectives.
+
+### Combining Regex with File Pattern Extraction
+
+Cleanup tasks frequently require filename pattern filtering.
+
+```bash
+ls -1 /var/log/my-app \
+  | grep -E '^app-[0-9]{4}-[0-9]{2}-[0-9]{2}\.log(\.[0-9]+)?$' \
+  | sort
+
+# Expected output
+# app-2026-05-19.log
+# app-2026-05-20.log
+# app-2026-05-20.log.1
+```
+
+Writing explicit regex reduces the chance of touching unintended files.
+
+### Linking systemd Units to Directory Structure
+
+Aligning paths referenced by the service with the unit file stabilizes operations.
+
+```ini
+# /etc/systemd/system/my-app.service
+[Unit]
+Description=My App Service
+After=network.target
+
+[Service]
+Type=simple
+User=deploy
+WorkingDirectory=/opt/my-app/current
+ExecStart=/opt/my-app/current/bin/start.sh
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+```
+
+The benefit of this structure is clear: after preparing a new release, you only swap the `current` link without touching the unit file. The result is smaller deployment diffs and faster rollbacks.
+
+## Practical Inspection Log Example
+
+The example below is an abbreviated version of inspection output frequently seen in real operations. What matters is not copying specific commands verbatim, but building the habit of connecting output to the next judgment.
+
+```bash
+# Collect service status + recent errors in one pass
+systemctl is-active my-api
+journalctl -u my-api --since '5 min ago' --no-pager \
+  | grep -E 'ERROR|CRITICAL|timeout|Failed' \
+  | tail -n 20
+
+# Expected output
+# active
+# 2026-05-21 15:31:10 ERROR timeout while calling payment API
+# 2026-05-21 15:31:12 CRITICAL worker exited unexpectedly
+```
+
+```bash
+# Process / port / file handle inspection
+ps -ef | grep -E 'my-api|gunicorn' | grep -v grep
+ss -lntp | grep -E ':8080|:80|:443'
+lsof -p "$(pgrep -f my-api | head -n 1)" | wc -l
+
+# Expected output example
+# deploy 18231 1  ... /opt/my-api/current/bin/start.sh
+# LISTEN 0 4096 0.0.0.0:8080 ... users:(("python3",pid=18231,fd=12))
+# 412
+```
+
+Saving these outputs as a time series makes comparison easy when issues recur, and quickly explains "how the current state differs from normal." Ultimately, practical CLI competence is the ability to reliably repeat an **evidence-based judgment routine**, not the commands themselves.
+
+### Operations Note: Recovery Order After Failure
+
+When a failure occurs, "check state → collect evidence → minimal action" is safer than "guess cause → restart immediately."
+
+```bash
+systemctl status my-api --no-pager | sed -n '1,12p'
+journalctl -u my-api -n 50 --no-pager | grep -E 'ERROR|CRITICAL|timeout|Failed' || true
+```
+
+Capturing state and logs first means that even if evidence disappears after a restart, you can still proceed with the retrospective and recurrence prevention.
+
+
 ## Checklist
 
 - [ ] You can check your location with `pwd` and navigate with `cd`

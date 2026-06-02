@@ -196,6 +196,233 @@ Even during development, process awareness matters. Building the habit of asking
 - If `ps aux | grep python` gives too many lines, use `pgrep -af "python app.py"` or `ps -ef --forest` to narrow the search. Misidentifying the PID is more common than the process itself being weird.
 - If jobs die after SSH disconnects, assume they were launched in the foreground until proven otherwise. For anything long-running, make `nohup`, `tmux`, or a process manager part of the default plan.
 
+## Shell Checkpoints for Automation Quality
+
+### Input Validation and Exit Code Contracts
+For a shell script to become a team tool, its failure modes must be predictable. Declaring argument validation and exit code contracts allows CI and operational scripts to integrate safely.
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  echo "usage: $0 <log_dir> <keyword>"
+}
+
+if [ "$#" -ne 2 ]; then
+  usage
+  exit 64
+fi
+
+log_dir="$1"
+keyword="$2"
+
+if [ ! -d "$log_dir" ]; then
+  echo "directory not found: $log_dir"
+  exit 66
+fi
+
+if grep -R --line-number "$keyword" "$log_dir" >/tmp/match.out; then
+  echo "match found"
+  exit 0
+else
+  echo "no match"
+  exit 1
+fi
+```
+
+Exit codes like `64` and `66` classify the failure cause for the caller. When human-readable messages and machine-readable codes are separated, branching logic in automation pipelines becomes straightforward.
+
+### Finding Pipeline Bottlenecks
+Complex pipelines are hard to diagnose by feel alone. Stamp timestamps before and after each stage, or split into temporary files to identify which stage is slow.
+
+```bash
+time grep -R "ERROR" /var/log/myapp > /tmp/step1.txt
+time cut -d' ' -f1-8 /tmp/step1.txt > /tmp/step2.txt
+time sort /tmp/step2.txt | uniq -c | sort -nr > /tmp/step3.txt
+```
+
+This approach is simple but effective. You can quickly tell whether a stage is CPU-bound or I/O-bound, and then decide on optimizations such as `awk` replacement, parallelization, or input reduction.
+
+### Reusable Function Snippets
+Even in long scripts, splitting functionality into functions makes testing and maintenance easier.
+
+```bash
+collect_pids() {
+  pgrep -f "$1" || true
+}
+
+kill_gracefully() {
+  local pid="$1"
+  kill -TERM "$pid"
+  sleep 2
+  kill -0 "$pid" 2>/dev/null && kill -KILL "$pid" || true
+}
+```
+
+Function-level decomposition enables scenario-by-scenario verification: whether the termination signal is handled correctly, whether zombie processes remain, whether restart logic runs twice.
+
+## Practical Scenario: Process Management and Service Recovery Procedures
+
+Process management does not end at knowing the `kill` command. In practice, you must first understand "which process is consuming resources and why," then connect to a safe recovery procedure.
+
+### Basic Status Check Routine
+
+```bash
+ps -eo pid,ppid,user,%cpu,%mem,etime,cmd --sort=-%cpu | head -n 15
+
+# Partial expected output
+#   PID  PPID USER   %CPU %MEM     ELAPSED CMD
+# 18231     1 deploy 92.3 12.1     00:43:21 /usr/bin/python3 /opt/my-api/app.py
+```
+
+Viewing the top CPU/memory processes first lets you quickly form a bottleneck hypothesis.
+
+### Precise Query for a Specific Process
+
+```bash
+pgrep -af 'my-api|gunicorn|uvicorn'
+
+# Expected output
+# 18231 /usr/bin/python3 /opt/my-api/app.py
+# 18242 /usr/bin/python3 /opt/my-api/worker.py
+```
+
+`pgrep -af` shows PID and the full command line together, making it easy to distinguish similarly-named processes.
+
+### Signal-Based Termination Strategy
+
+```bash
+# 1) Request graceful termination
+kill -TERM 18231
+
+# 2) Wait, then force kill
+sleep 5
+kill -KILL 18231
+```
+
+The production default is `TERM`. Using `KILL` immediately skips cleanup work (file flush, connection closure), which can cause data inconsistencies.
+
+### Priority Adjustment (nice/renice)
+
+```bash
+nice -n 10 /opt/my-api/bin/heavy-batch.sh
+renice -n 5 -p 18242
+```
+
+A common strategy: lower batch job priority to protect API responsiveness.
+
+### Background Jobs and Session Detachment
+
+```bash
+nohup /opt/my-api/bin/report.sh > /tmp/report.out 2>&1 &
+disown
+jobs -l
+```
+
+Useful when a job must survive session disconnection. For long-term tasks, promoting to a systemd service/timer is more reliable.
+
+### systemd-Centric Operations Pattern
+
+```bash
+systemctl status my-api --no-pager
+systemctl restart my-api
+systemctl is-failed my-api && journalctl -u my-api -n 80 --no-pager
+```
+
+Managing via systemd units rather than running processes directly gives consistent restart policies and log collection.
+
+```ini
+# /etc/systemd/system/my-api.service
+[Unit]
+Description=My API Service
+After=network.target
+
+[Service]
+Type=simple
+User=deploy
+WorkingDirectory=/opt/my-api/current
+ExecStart=/opt/my-api/current/bin/start.sh
+Restart=on-failure
+RestartSec=2
+LimitNOFILE=65535
+
+[Install]
+WantedBy=multi-user.target
+```
+
+### Regex Filter for Detecting Process Leaks
+
+```bash
+ps -ef \
+  | grep -E 'python3 .*my-api|gunicorn .*my-api' \
+  | grep -v grep
+```
+
+Useful for checking whether previous-version processes remain after deployment.
+
+### Recovery Automation Bash Script
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+svc="my-api"
+
+if ! systemctl is-active --quiet "$svc"; then
+  echo "[WARN] $svc inactive, restarting"
+  systemctl restart "$svc"
+  sleep 2
+fi
+
+systemctl status "$svc" --no-pager | sed -n '1,12p'
+journalctl -u "$svc" -n 40 --no-pager | grep -E 'ERROR|CRITICAL|Failed' || true
+```
+
+The key is performing "automatic recovery + evidence output" together. Restarting alone makes recurrence analysis difficult.
+
+## Practical Inspection Log Example
+
+The example below is an abbreviated version of inspection output frequently seen in real operations. What matters is not copying specific commands verbatim, but building the habit of connecting output to the next judgment.
+
+```bash
+# Collect service status + recent errors in one pass
+systemctl is-active my-api
+journalctl -u my-api --since '5 min ago' --no-pager \
+  | grep -E 'ERROR|CRITICAL|timeout|Failed' \
+  | tail -n 20
+
+# Expected output
+# active
+# 2026-05-21 15:31:10 ERROR timeout while calling payment API
+# 2026-05-21 15:31:12 CRITICAL worker exited unexpectedly
+```
+
+```bash
+# Process / port / file handle inspection
+ps -ef | grep -E 'my-api|gunicorn' | grep -v grep
+ss -lntp | grep -E ':8080|:80|:443'
+lsof -p "$(pgrep -f my-api | head -n 1)" | wc -l
+
+# Expected output example
+# deploy 18231 1  ... /opt/my-api/current/bin/start.sh
+# LISTEN 0 4096 0.0.0.0:8080 ... users:(("python3",pid=18231,fd=12))
+# 412
+```
+
+Saving these outputs as a time series makes comparison easy when issues recur, and quickly explains "how the current state differs from normal." Ultimately, practical CLI competence is the ability to reliably repeat an **evidence-based judgment routine**, not the commands themselves.
+
+### Operations Note: Recovery Order After Failure
+
+When a failure occurs, the sequence "check status → collect evidence → minimal action" is safer than "guess the cause → restart immediately."
+
+```bash
+systemctl status my-api --no-pager | sed -n '1,12p'
+journalctl -u my-api -n 50 --no-pager | grep -E 'ERROR|CRITICAL|timeout|Failed' || true
+```
+
+Preserving status and logs first means that even after a restart erases evidence, you can still proceed with retrospectives and prevention work.
+
 ## Checklist
 
 - [ ] You can check all system processes with `ps aux`

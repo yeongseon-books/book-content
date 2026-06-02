@@ -221,6 +221,222 @@ On the other hand, when a pipe chain exceeds 5 stages, maintainability drops. At
 - If failure details never show up, verify whether stderr was redirected at all. For build and deploy logs, `2>&1 | tee build.log` is often the fastest way to keep both the screen view and the forensic record.
 - If you are unsure whether to overwrite or append, write to a temporary file first. Production logs and report files are expensive to recreate once `>` wipes them out.
 
+## Shell Checkpoints for Automation Quality
+
+### Input Validation and Exit Code Contracts
+For a shell script to become a team tool, its failure modes must be predictable. Declaring argument validation and exit code contracts allows CI and operational scripts to integrate safely.
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  echo "usage: $0 <log_dir> <keyword>"
+}
+
+if [ "$#" -ne 2 ]; then
+  usage
+  exit 64
+fi
+
+log_dir="$1"
+keyword="$2"
+
+if [ ! -d "$log_dir" ]; then
+  echo "directory not found: $log_dir"
+  exit 66
+fi
+
+if grep -R --line-number "$keyword" "$log_dir" >/tmp/match.out; then
+  echo "match found"
+  exit 0
+else
+  echo "no match"
+  exit 1
+fi
+```
+
+Exit codes like `64` and `66` classify the failure cause for the caller. When human-readable messages and machine-readable codes are separated, branching logic in automation pipelines becomes straightforward.
+
+### Finding Pipeline Bottlenecks
+Complex pipelines are hard to diagnose by feel alone. Stamp timestamps before and after each stage, or split into temporary files to identify which stage is slow.
+
+```bash
+time grep -R "ERROR" /var/log/myapp > /tmp/step1.txt
+time cut -d' ' -f1-8 /tmp/step1.txt > /tmp/step2.txt
+time sort /tmp/step2.txt | uniq -c | sort -nr > /tmp/step3.txt
+```
+
+This approach is simple but effective. You can quickly tell whether a stage is CPU-bound or I/O-bound, and then decide on optimizations such as `awk` replacement, parallelization, or input reduction.
+
+### Reusable Function Snippets
+Even in long scripts, splitting functionality into functions makes testing and maintenance easier.
+
+```bash
+collect_pids() {
+  pgrep -f "$1" || true
+}
+
+kill_gracefully() {
+  local pid="$1"
+  kill -TERM "$pid"
+  sleep 2
+  kill -0 "$pid" 2>/dev/null && kill -KILL "$pid" || true
+}
+```
+
+Function-level decomposition enables scenario-by-scenario verification: whether the termination signal is handled correctly, whether zombie processes remain, whether restart logic runs twice.
+
+## Practical Scenario: Fixing Analysis Flows with Pipes and Redirection
+
+Pipes and redirection are the core of CLI automation. The key is not making output pretty, but **transforming it into a form the next stage can consume**.
+
+### Understand Standard Streams by Separating Them First
+
+```bash
+python3 app.py > /tmp/app.out 2> /tmp/app.err
+
+# Expected result
+# /tmp/app.out : normal output
+# /tmp/app.err : error output
+```
+
+Separating stdout and stderr during problem analysis speeds up root cause tracing.
+
+### Use tee to Display and Save Simultaneously
+
+```bash
+journalctl -u my-api --since '20 min ago' \
+  | grep -E 'ERROR|CRITICAL|timeout' \
+  | tee /tmp/my-api-errors.txt
+```
+
+`tee` satisfies "see it now" + "reuse it later" simultaneously.
+
+### Pipe Chain Design Example: Access Log Summary
+
+```bash
+cat /var/log/nginx/access.log \
+  | awk '{print $1, $7, $9}' \
+  | grep -E ' 5[0-9]{2}$' \
+  | sort \
+  | uniq -c \
+  | sort -nr \
+  | head -n 20
+
+# Expected output
+#   87 10.10.1.2 /api/pay 502
+#   41 10.10.1.5 /api/order 504
+```
+
+This flow is a typical pattern for turning "raw log" into a "priority action list."
+
+### Generate Config Files with Here Documents and Redirection
+
+```bash
+cat > /tmp/my-api.env << 'EOF'
+APP_ENV=production
+LOG_LEVEL=INFO
+WORKER_COUNT=4
+EOF
+
+cat /tmp/my-api.env
+```
+
+Useful for creating config files in automation scripts, but secrets should never remain in plain text — use a dedicated secret management system.
+
+### stderr Merging and Separation Strategies
+
+```bash
+# stdout + stderr both to file
+./deploy.sh > /tmp/deploy.log 2>&1
+
+# stderr only to separate file
+./deploy.sh 2> /tmp/deploy.err
+```
+
+In operations, "viewing only failure logs" is important, so stderr file separation is used frequently.
+
+### Bulk Execution with xargs and Pipes
+
+```bash
+printf '%s\n' api worker scheduler \
+  | xargs -n 1 -I {} sh -c 'systemctl status my-{} --no-pager | sed -n "1,5p"'
+```
+
+Effective for quickly inspecting multiple services.
+
+### Combine systemd Logs with Redirection
+
+```bash
+journalctl -u my-api --since '1 hour ago' --no-pager \
+  > /tmp/my-api-journal.txt
+
+grep -E 'ERROR|CRITICAL|timeout|OOM' /tmp/my-api-journal.txt
+```
+
+Saving to a file instead of only viewing in real time enables team review and retrospective reuse.
+
+### Bash Pipeline Script Example
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+service="my-api"
+out="/tmp/${service}-incident-$(date +%Y%m%d-%H%M%S).log"
+
+journalctl -u "$service" --since '30 min ago' --no-pager \
+  | grep -E 'ERROR|CRITICAL|timeout|OOM' \
+  | tee "$out"
+
+printf '[INFO] saved=%s\n' "$out"
+```
+
+Scripts like this produce "the same result no matter who runs them" during incidents, stabilizing operational quality.
+
+## Practical Inspection Log Example
+
+The example below is an abbreviated version of inspection output frequently seen in real operations. What matters is not copying specific commands verbatim, but building the habit of connecting output to the next judgment.
+
+```bash
+# Collect service status + recent errors in one pass
+systemctl is-active my-api
+journalctl -u my-api --since '5 min ago' --no-pager \
+  | grep -E 'ERROR|CRITICAL|timeout|Failed' \
+  | tail -n 20
+
+# Expected output
+# active
+# 2026-05-21 15:31:10 ERROR timeout while calling payment API
+# 2026-05-21 15:31:12 CRITICAL worker exited unexpectedly
+```
+
+```bash
+# Process / port / file handle inspection
+ps -ef | grep -E 'my-api|gunicorn' | grep -v grep
+ss -lntp | grep -E ':8080|:80|:443'
+lsof -p "$(pgrep -f my-api | head -n 1)" | wc -l
+
+# Expected output example
+# deploy 18231 1  ... /opt/my-api/current/bin/start.sh
+# LISTEN 0 4096 0.0.0.0:8080 ... users:(("python3",pid=18231,fd=12))
+# 412
+```
+
+Saving these outputs as a time series makes comparison easy when issues recur, and quickly explains "how the current state differs from normal." Ultimately, practical CLI competence is the ability to reliably repeat an **evidence-based judgment routine**, not the commands themselves.
+
+### Operations Note: Recovery Order After Failure
+
+When a failure occurs, the sequence "check status → collect evidence → minimal action" is safer than "guess the cause → restart immediately."
+
+```bash
+systemctl status my-api --no-pager | sed -n '1,12p'
+journalctl -u my-api -n 50 --no-pager | grep -E 'ERROR|CRITICAL|timeout|Failed' || true
+```
+
+Preserving status and logs first means that even after a restart erases evidence, you can still proceed with retrospectives and prevention work.
+
 ## Checklist
 
 - [ ] You can connect two commands' output/input with `|`

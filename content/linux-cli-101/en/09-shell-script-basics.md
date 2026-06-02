@@ -281,6 +281,230 @@ On the other hand, complex logic — JSON parsing, API calls, error handling —
 - If files are "missing", check the working directory before changing the code. `pwd`, `dirname "$0"`, and `set -x` usually reveal relative-path mistakes much faster than manual guesswork.
 - If a deploy script keeps going after a failure, confirm that `set -e` and explicit exit handling exist. Silent mid-script failure is one of the most expensive automation mistakes.
 
+## Shell Checkpoints for Automation Quality
+
+### Input Validation and Exit Code Contracts
+For a shell script to become a team tool, its failure modes must be predictable. Declaring argument validation and exit code contracts allows CI and operational scripts to integrate safely.
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  echo "usage: $0 <log_dir> <keyword>"
+}
+
+if [ "$#" -ne 2 ]; then
+  usage
+  exit 64
+fi
+
+log_dir="$1"
+keyword="$2"
+
+if [ ! -d "$log_dir" ]; then
+  echo "directory not found: $log_dir"
+  exit 66
+fi
+
+if grep -R --line-number "$keyword" "$log_dir" >/tmp/match.out; then
+  echo "match found"
+  exit 0
+else
+  echo "no match"
+  exit 1
+fi
+```
+
+Exit codes like `64` and `66` classify the failure cause for the caller. When human-readable messages and machine-readable codes are separated, branching logic in automation pipelines becomes straightforward.
+
+### Finding Pipeline Bottlenecks
+Complex pipelines are hard to diagnose by feel alone. Stamp timestamps before and after each stage, or split into temporary files to identify which stage is slow.
+
+```bash
+time grep -R "ERROR" /var/log/myapp > /tmp/step1.txt
+time cut -d' ' -f1-8 /tmp/step1.txt > /tmp/step2.txt
+time sort /tmp/step2.txt | uniq -c | sort -nr > /tmp/step3.txt
+```
+
+This approach is simple but effective. You can quickly tell whether a stage is CPU-bound or I/O-bound, and then decide on optimizations such as `awk` replacement, parallelization, or input reduction.
+
+### Reusable Function Snippets
+Even in long scripts, splitting functionality into functions makes testing and maintenance easier.
+
+```bash
+collect_pids() {
+  pgrep -f "$1" || true
+}
+
+kill_gracefully() {
+  local pid="$1"
+  kill -TERM "$pid"
+  sleep 2
+  kill -0 "$pid" 2>/dev/null && kill -KILL "$pid" || true
+}
+```
+
+Function-level decomposition enables scenario-by-scenario verification: whether the termination signal is handled correctly, whether zombie processes remain, whether restart logic runs twice.
+
+## Practical Scenario: Growing Scripts into Operational Tools
+
+Shell scripts start as simple repetition automation, but in operations they become tools connecting deployment, inspection, and recovery. The key is not adding many features, but building a structure that surfaces failures clearly and provides safe defaults.
+
+### Safe Defaults: Strict Mode
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+```
+
+- `-e`: exit immediately on command failure
+- `-u`: fail on undefined variable usage
+- `pipefail`: detect failures in intermediate pipe stages
+
+### Argument Parsing and Usage Instructions
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  echo "Usage: $0 <service-name> [--dry-run]"
+}
+
+if [ "$#" -lt 1 ]; then
+  usage
+  exit 1
+fi
+
+service="$1"
+dry_run="false"
+if [ "${2:-}" = "--dry-run" ]; then
+  dry_run="true"
+fi
+```
+
+Scripts without argument validation easily produce unpredictable behavior in automation environments.
+
+### Function Separation and Unified Log Format
+
+```bash
+log() { printf '[%s] %s\n' "$(date +%H:%M:%S)" "$*"; }
+
+check_service() {
+  local svc="$1"
+  if systemctl is-active --quiet "$svc"; then
+    log "PASS service=$svc active"
+  else
+    log "FAIL service=$svc inactive"
+    return 1
+  fi
+}
+```
+
+Function separation increases reusability and makes it easier to test failure points.
+
+### Regex Validation Example
+
+```bash
+version="${APP_VERSION:-}"
+if [[ ! "$version" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  echo "Invalid APP_VERSION: $version" >&2
+  exit 1
+fi
+```
+
+Early regex validation of inputs like deployment version strings reduces operational accidents.
+
+### Pipe Chains and Error Propagation
+
+```bash
+journalctl -u my-api --since '15 min ago' --no-pager \
+  | grep -E 'ERROR|CRITICAL|timeout' \
+  | tee /tmp/my-api-errors.txt
+```
+
+With `pipefail` enabled, intermediate failures are detected, preventing the problem of silently appearing to succeed.
+
+### Deployment Script Example Integrating with systemd
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+svc="my-api"
+release_dir="/opt/my-api/releases/$1"
+
+[ -d "$release_dir" ] || { echo "release not found" >&2; exit 1; }
+
+ln -sfn "$release_dir" /opt/my-api/current
+systemctl daemon-reload
+systemctl restart "$svc"
+systemctl is-active --quiet "$svc"
+
+journalctl -u "$svc" -n 30 --no-pager | grep -E 'Started|ERROR|CRITICAL|Failed' || true
+```
+
+A deployment script that fixes the flow "symlink switch → restart → status check → log extraction" produces stable results regardless of which operator runs it.
+
+### Dry-Run Pattern
+
+```bash
+run() {
+  if [ "$dry_run" = "true" ]; then
+    echo "[DRY-RUN] $*"
+  else
+    eval "$@"
+  fi
+}
+
+run "systemctl restart my-api"
+run "systemctl status my-api --no-pager | sed -n '1,10p'"
+```
+
+For scripts with destructive actions, including a dry-run option guarantees a verification step.
+
+### Script Quality Check Routine
+
+```bash
+bash -n deploy.sh
+shellcheck deploy.sh
+./deploy.sh my-api --dry-run
+```
+
+Making static analysis and dry-run part of your pre-deployment routine significantly reduces real incidents.
+
+## Practical Inspection Log Example
+
+The example below is an abbreviated version of inspection output frequently seen in real operations. What matters is not copying specific commands verbatim, but building the habit of connecting output to the next judgment.
+
+```bash
+# Collect service status + recent errors in one pass
+systemctl is-active my-api
+journalctl -u my-api --since '5 min ago' --no-pager \
+  | grep -E 'ERROR|CRITICAL|timeout|Failed' \
+  | tail -n 20
+
+# Expected output
+# active
+# 2026-05-21 15:31:10 ERROR timeout while calling payment API
+# 2026-05-21 15:31:12 CRITICAL worker exited unexpectedly
+```
+
+```bash
+# Process / port / file handle inspection
+ps -ef | grep -E 'my-api|gunicorn' | grep -v grep
+ss -lntp | grep -E ':8080|:80|:443'
+lsof -p "$(pgrep -f my-api | head -n 1)" | wc -l
+
+# Expected output example
+# deploy 18231 1  ... /opt/my-api/current/bin/start.sh
+# LISTEN 0 4096 0.0.0.0:8080 ... users:(("python3",pid=18231,fd=12))
+# 412
+```
+
+Saving these outputs as a time series makes comparison easy when issues recur, and quickly explains "how the current state differs from normal." Ultimately, practical CLI competence is the ability to reliably repeat an **evidence-based judgment routine**, not the commands themselves.
+
 ## Checklist
 
 - [ ] You understand the purpose of a shebang (`#!/bin/bash`) and always include it

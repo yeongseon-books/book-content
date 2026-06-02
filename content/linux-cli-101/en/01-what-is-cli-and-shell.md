@@ -187,6 +187,210 @@ When someone asks "Why bother with the CLI when there is a GUI?", the answer is 
 
 That said, not everything should be done in the CLI. Code editing is more productive in a GUI editor like VS Code, and file comparison is more intuitive with a GUI diff tool. The decision criterion is: "What if I repeat this task 100 times?" The more repetitive the task, the higher the CLI's value.
 
+## Shell Checkpoints for Automation Quality
+
+### Input Validation and Exit Code Contracts
+For a shell script to become a team tool, its failure modes must be predictable. Declaring argument validation and exit code contracts allows CI and operational scripts to integrate safely.
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  echo "usage: $0 <log_dir> <keyword>"
+}
+
+if [ "$#" -ne 2 ]; then
+  usage
+  exit 64
+fi
+
+log_dir="$1"
+keyword="$2"
+
+if [ ! -d "$log_dir" ]; then
+  echo "directory not found: $log_dir"
+  exit 66
+fi
+
+if grep -R --line-number "$keyword" "$log_dir" >/tmp/match.out; then
+  echo "match found"
+  exit 0
+else
+  echo "no match"
+  exit 1
+fi
+```
+
+Exit codes like `64` and `66` classify the failure cause for the caller. When human-readable messages and machine-readable codes are separated, branching logic in automation pipelines becomes straightforward.
+
+### Finding Pipeline Bottlenecks
+Complex pipelines are hard to diagnose by feel alone. Stamp timestamps before and after each stage, or split into temporary files to identify which stage is slow.
+
+```bash
+time grep -R "ERROR" /var/log/myapp > /tmp/step1.txt
+time cut -d' ' -f1-8 /tmp/step1.txt > /tmp/step2.txt
+time sort /tmp/step2.txt | uniq -c | sort -nr > /tmp/step3.txt
+```
+
+This approach is simple but effective. You can quickly tell whether a stage is CPU-bound or I/O-bound, and then decide on optimizations such as `awk` replacement, parallelization, or input reduction.
+
+### Reusable Function Snippets
+Even in long scripts, splitting functionality into functions makes testing and maintenance easier.
+
+```bash
+collect_pids() {
+  pgrep -f "$1" || true
+}
+
+kill_gracefully() {
+  local pid="$1"
+  kill -TERM "$pid"
+  sleep 2
+  kill -0 "$pid" 2>/dev/null && kill -KILL "$pid" || true
+}
+```
+
+Function-level decomposition enables scenario-by-scenario verification: whether the termination signal is handled correctly, whether zombie processes remain, whether restart logic runs twice.
+
+## Practical Scenario: What CLI Means in Incident Response
+
+When first learning the CLI, small commands like `ls`, `cd`, `echo` are the typical learning units. But in production, **how you compose a diagnostic flow** matters more than any single command. For example, when a report arrives that the API server is slow, operators do not just stare at a GUI dashboard — they immediately SSH in and check processes, disk, and logs together. In this context the CLI is not just an input tool; it is an execution environment for forming and verifying hypotheses in a short time.
+
+```bash
+# 1) Verify which server and user context you are in
+whoami
+hostname
+pwd
+
+# Expected output
+# deploy
+# prod-api-01
+# /home/deploy
+```
+
+The reason for checking context first is simple: to prevent the incident of diagnosing or acting on the wrong server. Especially when production and development servers share similar prompts, a 30-second verification habit at the start reduces overall incident rate.
+
+```bash
+# 2) Summarize system state in one pass
+uptime
+free -h
+df -h /
+
+# Expected output
+# 14:31:02 up 17 days,  3:12,  2 users,  load average: 1.82, 1.20, 0.98
+#               total        used        free      shared  buff/cache   available
+# Mem:           7.6Gi       4.1Gi       1.2Gi       210Mi       2.3Gi       2.8Gi
+# Filesystem      Size  Used Avail Use% Mounted on
+# /dev/sda1        50G   29G   19G  61% /
+```
+
+These three commands show CPU load, memory pressure, and disk headroom respectively. If any value falls outside the normal range, you can branch between an application code problem and an infrastructure problem. CLI proficiency shows not in command memorization, but in the ability to make these branches quickly.
+
+### Reducing Noise with Pipe Chains
+
+Logs are voluminous; reading raw output delays judgment. In operations, pipe chains compress noise down to **actionable units**.
+
+```bash
+journalctl -u my-api --since '15 min ago' \
+  | grep -E 'ERROR|CRITICAL|Timeout' \
+  | sed -E 's/[0-9]{2}:[0-9]{2}:[0-9]{2}//' \
+  | sort \
+  | uniq -c \
+  | sort -nr
+
+# Expected output
+#    37  Timeout while calling payment provider
+#    12  ERROR Database connection pool exhausted
+#     4  CRITICAL Worker process exited unexpectedly
+```
+
+The key is the `grep -E` regex. An OR pattern like `ERROR|CRITICAL|Timeout` captures multiple failure types in one pass. Then `uniq -c` surfaces frequencies so the highest-priority item naturally rises to the top.
+
+### Understanding Shell Parsing Order Prevents Accidents
+
+A common beginner frustration is "the command is correct, but why does it behave differently?" The cause is overlooking the shell's parsing order: variable expansion, globbing (`*`), quote processing, and pipe splitting all happen before execution.
+
+```bash
+name='api server'
+echo $name
+# api server
+
+echo "$name"
+# api server
+
+echo '$name'
+# $name
+```
+
+This difference is not just syntax — it directly affects security and stability. In automation scripts, handling a path with spaces without double quotes can target the wrong file. That is why in practice, `"$var"` is the default when interpolating variables.
+
+### Distinguishing Processes from Service Units
+
+Even in a CLI beginner article, knowing this distinction early makes later learning easier. `ps` operates at the process level; `systemctl` manages at the service unit level.
+
+```bash
+ps -ef | grep my-api | grep -v grep
+systemctl status my-api --no-pager
+
+# Partial expected output
+# deploy   18231     1  1 14:10 ?  00:00:08 /usr/bin/python3 /opt/my-api/app.py
+# Active: active (running) since Thu 2026-05-21 14:09:52 KST; 21min ago
+```
+
+A process can be running while the service status is `failed`, and vice versa. Understanding this gap lets you connect to Episode 7 (processes) and systemd operational patterns more quickly.
+
+### Freezing Check Routines in a Mini Bash Script
+
+Repetitive checks are safer when frozen into a script.
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+svc="my-api"
+
+printf '[INFO] host=%s user=%s\n' "$(hostname)" "$(whoami)"
+systemctl is-active --quiet "$svc" && echo '[PASS] service active' || echo '[FAIL] service inactive'
+
+journalctl -u "$svc" --since '5 min ago' \
+  | grep -E 'ERROR|CRITICAL|Timeout' || true
+```
+
+Scripts like this let the entire team reproduce situations in the same way. Ultimately the goal of CLI proficiency goes beyond "making myself faster" to "standardizing the team's diagnostic quality."
+
+## Practical Inspection Log Example
+
+The example below is an abbreviated version of inspection output frequently seen in real operations. What matters is not copying specific commands verbatim, but building the habit of connecting output to the next judgment.
+
+```bash
+# Collect service status + recent errors in one pass
+systemctl is-active my-api
+journalctl -u my-api --since '5 min ago' --no-pager \
+  | grep -E 'ERROR|CRITICAL|timeout|Failed' \
+  | tail -n 20
+
+# Expected output
+# active
+# 2026-05-21 15:31:10 ERROR timeout while calling payment API
+# 2026-05-21 15:31:12 CRITICAL worker exited unexpectedly
+```
+
+```bash
+# Process / port / file handle inspection
+ps -ef | grep -E 'my-api|gunicorn' | grep -v grep
+ss -lntp | grep -E ':8080|:80|:443'
+lsof -p "$(pgrep -f my-api | head -n 1)" | wc -l
+
+# Expected output example
+# deploy 18231 1  ... /opt/my-api/current/bin/start.sh
+# LISTEN 0 4096 0.0.0.0:8080 ... users:(("python3",pid=18231,fd=12))
+# 412
+```
+
+Saving these outputs as a time series makes comparison easy when issues recur, and quickly explains "how the current state differs from normal." Ultimately, practical CLI competence is the ability to reliably repeat an **evidence-based judgment routine**, not the commands themselves.
+
+
 ## Checklist
 
 - [ ] You can explain Terminal, Shell, and CLI in one sentence each

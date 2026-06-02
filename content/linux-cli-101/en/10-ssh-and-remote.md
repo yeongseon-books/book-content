@@ -227,6 +227,227 @@ That said, you still need to know SSH. When CI/CD fails, when monitoring misses 
 - If `scp` or `rsync` fails, confirm the SSH user and port first. Many production hosts do not use port 22, and that often gets mistaken for a bad remote path.
 - If a remote command only half-runs, check whether shell init files or a `sudo` prompt interrupted non-interactive execution. In automation, break the flow into smaller remote steps until the failure point is obvious.
 
+## Shell Checkpoints for Automation Quality
+
+### Input Validation and Exit Code Contracts
+For a shell script to become a team tool, its failure modes must be predictable. Declaring argument validation and exit code contracts allows CI and operational scripts to integrate safely.
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  echo "usage: $0 <log_dir> <keyword>"
+}
+
+if [ "$#" -ne 2 ]; then
+  usage
+  exit 64
+fi
+
+log_dir="$1"
+keyword="$2"
+
+if [ ! -d "$log_dir" ]; then
+  echo "directory not found: $log_dir"
+  exit 66
+fi
+
+if grep -R --line-number "$keyword" "$log_dir" >/tmp/match.out; then
+  echo "match found"
+  exit 0
+else
+  echo "no match"
+  exit 1
+fi
+```
+
+Exit codes like `64` and `66` classify the failure cause for the caller. When human-readable messages and machine-readable codes are separated, branching logic in automation pipelines becomes straightforward.
+
+### Finding Pipeline Bottlenecks
+Complex pipelines are hard to diagnose by feel alone. Stamp timestamps before and after each stage, or split into temporary files to identify which stage is slow.
+
+```bash
+time grep -R "ERROR" /var/log/myapp > /tmp/step1.txt
+time cut -d' ' -f1-8 /tmp/step1.txt > /tmp/step2.txt
+time sort /tmp/step2.txt | uniq -c | sort -nr > /tmp/step3.txt
+```
+
+This approach is simple but effective. You can quickly tell whether a stage is CPU-bound or I/O-bound, and then decide on optimizations such as `awk` replacement, parallelization, or input reduction.
+
+### Reusable Function Snippets
+Even in long scripts, splitting functionality into functions makes testing and maintenance easier.
+
+```bash
+collect_pids() {
+  pgrep -f "$1" || true
+}
+
+kill_gracefully() {
+  local pid="$1"
+  kill -TERM "$pid"
+  sleep 2
+  kill -0 "$pid" 2>/dev/null && kill -KILL "$pid" || true
+}
+```
+
+Function-level decomposition enables scenario-by-scenario verification: whether the termination signal is handled correctly, whether zombie processes remain, whether restart logic runs twice.
+
+## Practical Scenario: SSH Operations Standards and Automation Integration
+
+If you understand SSH only as a "remote connection command," operations automation and security policy become disconnected. In practice, SSH must be viewed together as authentication, access control, file transfer, remote execution, and an auditable record system.
+
+### Pre-Connection Basic Checks
+
+```bash
+ssh -V
+ls -ld ~/.ssh
+ls -l ~/.ssh
+
+# Partial expected output
+# OpenSSH_9.6p1, OpenSSL 3.0.13
+# drwx------ 2 user user 4096 May 21 12:01 /home/user/.ssh
+# -rw------- 1 user user  411 May 21 12:01 id_ed25519
+```
+
+If permissions are loose, SSH refuses to use the key. Check file permissions before blaming the network for connection problems.
+
+### Connection Debugging: Using Verbose Logs
+
+```bash
+ssh -v prod-server
+
+# Points to check in output
+# debug1: Offering public key: /home/user/.ssh/id_ed25519
+# debug1: Server accepts key: /home/user/.ssh/id_ed25519
+# debug1: Authentication succeeded (publickey).
+```
+
+The fastest diagnostic method for `Permission denied (publickey)` situations.
+
+### Use ~/.ssh/config Like a Policy Document
+
+```sshconfig
+Host prod-server
+    HostName 10.0.1.50
+    User deploy
+    Port 2222
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes
+    ServerAliveInterval 30
+    ServerAliveCountMax 3
+
+Host bastion
+    HostName 203.0.113.10
+    User jump
+
+Host internal-api
+    HostName 10.10.2.15
+    User deploy
+    ProxyJump bastion
+```
+
+The config file goes beyond convenience — it serves as a document standardizing the team's connection methods.
+
+### Remote Commands and Pipe Chains
+
+```bash
+ssh prod-server "journalctl -u my-api --since '10 min ago' --no-pager" \
+  | grep -E 'ERROR|CRITICAL|timeout|5[0-9]{2}' \
+  | tee /tmp/prod-api-errors.txt
+```
+
+Remote output can be combined with local pipelines, making it easy to build centralized analysis scripts.
+
+### File Synchronization Strategy: scp vs rsync
+
+```bash
+# Single file transfer
+scp dist/app.tar.gz prod-server:/opt/releases/
+
+# Sync only changes
+rsync -avz --delete dist/ prod-server:/opt/my-api/current/
+```
+
+`--delete` cleans up unnecessary files on the remote to keep state aligned, but running it from the wrong path causes major accidents. Verify with dry-run (`--dry-run`) first.
+
+### Access Internal Services via SSH Tunnels
+
+```bash
+# Forward remote DB to local port 5432
+ssh -L 5432:127.0.0.1:5432 prod-server
+
+# Connect from another terminal
+psql -h 127.0.0.1 -p 5432 -U appuser appdb
+```
+
+Safely inspect production databases without exposing them directly.
+
+### Server-Side sshd Configuration Essentials
+
+```text
+# /etc/ssh/sshd_config key examples
+PasswordAuthentication no
+PubkeyAuthentication yes
+PermitRootLogin no
+AllowUsers deploy ops
+```
+
+After changing configuration, a service restart and log check are mandatory.
+
+```bash
+sudo systemctl restart sshd
+sudo systemctl status sshd --no-pager
+sudo journalctl -u sshd -n 40 --no-pager
+```
+
+### Remote Operations Script Example
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+host="prod-server"
+svc="my-api"
+
+ssh "$host" "systemctl is-active --quiet $svc"
+ssh "$host" "systemctl status $svc --no-pager | sed -n '1,10p'"
+ssh "$host" "journalctl -u $svc -n 50 --no-pager | grep -E 'ERROR|CRITICAL|Failed' || true"
+```
+
+This approach reduces the time spent manually SSH-ing in for checks and standardizes inspection result formats.
+
+## Practical Inspection Log Example
+
+The example below is an abbreviated version of inspection output frequently seen in real operations. What matters is not copying specific commands verbatim, but building the habit of connecting output to the next judgment.
+
+```bash
+# Collect service status + recent errors in one pass
+systemctl is-active my-api
+journalctl -u my-api --since '5 min ago' --no-pager \
+  | grep -E 'ERROR|CRITICAL|timeout|Failed' \
+  | tail -n 20
+
+# Expected output
+# active
+# 2026-05-21 15:31:10 ERROR timeout while calling payment API
+# 2026-05-21 15:31:12 CRITICAL worker exited unexpectedly
+```
+
+```bash
+# Process / port / file handle inspection
+ps -ef | grep -E 'my-api|gunicorn' | grep -v grep
+ss -lntp | grep -E ':8080|:80|:443'
+lsof -p "$(pgrep -f my-api | head -n 1)" | wc -l
+
+# Expected output example
+# deploy 18231 1  ... /opt/my-api/current/bin/start.sh
+# LISTEN 0 4096 0.0.0.0:8080 ... users:(("python3",pid=18231,fd=12))
+# 412
+```
+
+Saving these outputs as a time series makes comparison easy when issues recur, and quickly explains "how the current state differs from normal." Ultimately, practical CLI competence is the ability to reliably repeat an **evidence-based judgment routine**, not the commands themselves.
+
 ## Checklist
 
 - [ ] You can generate an SSH key pair and register the public key on a server

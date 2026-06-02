@@ -190,6 +190,241 @@ The guiding principle for permissions is the **Principle of Least Privilege**. G
 
 On the other hand, permissions that are too strict block team collaboration. A balanced approach is to open group permissions reasonably on dev servers while minimizing them on production. Tracking time lost to permission issues reveals which settings are appropriate.
 
+## Shell Checkpoints for Automation Quality
+
+### Input Validation and Exit Code Contracts
+For a shell script to become a team tool, its failure modes must be predictable. Declaring argument validation and exit code contracts allows CI and operational scripts to integrate safely.
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  echo "usage: $0 <log_dir> <keyword>"
+}
+
+if [ "$#" -ne 2 ]; then
+  usage
+  exit 64
+fi
+
+log_dir="$1"
+keyword="$2"
+
+if [ ! -d "$log_dir" ]; then
+  echo "directory not found: $log_dir"
+  exit 66
+fi
+
+if grep -R --line-number "$keyword" "$log_dir" >/tmp/match.out; then
+  echo "match found"
+  exit 0
+else
+  echo "no match"
+  exit 1
+fi
+```
+
+Exit codes like `64` and `66` classify the failure cause for the caller. When human-readable messages and machine-readable codes are separated, branching logic in automation pipelines becomes straightforward.
+
+### Finding Pipeline Bottlenecks
+Complex pipelines are hard to diagnose by feel alone. Stamp timestamps before and after each stage, or split into temporary files to identify which stage is slow.
+
+```bash
+time grep -R "ERROR" /var/log/myapp > /tmp/step1.txt
+time cut -d' ' -f1-8 /tmp/step1.txt > /tmp/step2.txt
+time sort /tmp/step2.txt | uniq -c | sort -nr > /tmp/step3.txt
+```
+
+This approach is simple but effective. You can quickly tell whether a stage is CPU-bound or I/O-bound, and then decide on optimizations such as `awk` replacement, parallelization, or input reduction.
+
+### Reusable Function Snippets
+Even in long scripts, splitting functionality into functions makes testing and maintenance easier.
+
+```bash
+collect_pids() {
+  pgrep -f "$1" || true
+}
+
+kill_gracefully() {
+  local pid="$1"
+  kill -TERM "$pid"
+  sleep 2
+  kill -0 "$pid" 2>/dev/null && kill -KILL "$pid" || true
+}
+```
+
+Function-level decomposition enables scenario-by-scenario verification: whether the termination signal is handled correctly, whether zombie processes remain, whether restart logic runs twice.
+
+## Practical Scenario: Operational Standards for Preventing Permission Incidents
+
+Permission issues do not stop at "the command did not work" — they escalate into service outages and security incidents. In practice, file access failures are often misdiagnosed as feature bugs. That is why operators verify the permission model before even looking at application logs.
+
+```bash
+namei -l /opt/my-app/current/conf/app.env
+
+# Expected output
+# f: /opt/my-app/current/conf/app.env
+# drwxr-xr-x root   root   /
+# drwxr-xr-x root   root   opt
+# drwxr-xr-x deploy deploy my-app
+# lrwxrwxrwx deploy deploy current -> /opt/my-app/releases/prod-20260521
+# drwxr-xr-x deploy deploy conf
+# -rw-r----- deploy deploy app.env
+```
+
+If even one path component lacks execute permission (`x`), the file is inaccessible. `namei -l` shows this breakdown step by step, making it extremely efficient for permission debugging.
+
+### Connecting Numeric Permissions to Meaning
+
+Rather than memorizing `chmod 640` or `750` mechanically, interpret as "who reads, who executes."
+
+```bash
+chmod 640 /opt/my-app/current/conf/app.env
+chmod 750 /opt/my-app/current/bin/start.sh
+ls -l /opt/my-app/current/conf/app.env /opt/my-app/current/bin/start.sh
+
+# Expected output
+# -rw-r----- 1 deploy deploy 512 May 21 13:22 /opt/my-app/current/conf/app.env
+# -rwxr-x--- 1 deploy deploy 824 May 21 13:20 /opt/my-app/current/bin/start.sh
+```
+
+This setting gives the owner execute/read permission and grants only the minimum needed to the group. Closing `others` reduces accidental exposure of sensitive information.
+
+### Understanding setuid/setgid/sticky Bit from an Operations Perspective
+
+Special bits are not exam questions — they tie directly to operational policy.
+
+```bash
+# Fix file group in a shared directory
+chmod 2775 /srv/shared
+
+# Protect a public directory like /tmp
+chmod 1777 /tmp
+
+ls -ld /srv/shared /tmp
+# drwxrwsr-x 2 deploy ops 4096 May 21 13:30 /srv/shared
+# drwxrwxrwt 20 root root 4096 May 21 12:00 /tmp
+```
+
+The `2` in `2775` is setgid: files created in that directory inherit the directory's group. Useful for maintaining group consistency in team collaboration.
+
+### Applying Least Privilege with ACLs
+
+When basic permission bits are insufficient, use ACLs.
+
+```bash
+setfacl -m u:jenkins:rX /opt/my-app/current/conf
+setfacl -m u:jenkins:r-- /opt/my-app/current/conf/app.env
+getfacl /opt/my-app/current/conf/app.env
+
+# Partial expected output
+# user::rw-
+# user:jenkins:r--
+# group::r--
+# mask::r--
+# other::---
+```
+
+Granting the CI account only the read permission it needs maintains deployment automation while reducing security exposure.
+
+### Permission Change Automation Script Example
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+target="/opt/my-app/releases/prod-20260521"
+
+chown -R deploy:deploy "$target"
+find "$target" -type d -exec chmod 755 {} \;
+find "$target" -type f -name '*.sh' -exec chmod 750 {} \;
+find "$target" -type f ! -name '*.sh' -exec chmod 640 {} \;
+
+# Secrets get stricter permissions
+chmod 600 "$target/conf/secrets.env"
+```
+
+The purpose of this script is not "setting permissions correctly" but **reproducing the same rules every time**. Reducing manual changes shrinks cross-environment drift and speeds up root-cause analysis.
+
+### Aligning systemd Service Accounts with Permissions
+
+If the user a service runs as does not match file permissions, it fails immediately after start.
+
+```ini
+# /etc/systemd/system/my-app.service
+[Service]
+User=deploy
+Group=deploy
+WorkingDirectory=/opt/my-app/current
+ExecStart=/opt/my-app/current/bin/start.sh
+EnvironmentFile=/opt/my-app/current/conf/app.env
+```
+
+After configuration, check logs:
+
+```bash
+systemctl daemon-reload
+systemctl restart my-app
+journalctl -u my-app -n 20 --no-pager
+```
+
+If `Permission denied` appears, check the permission model before looking at code.
+
+## Practical Inspection Log Example
+
+The example below is an abbreviated version of inspection output frequently seen in real operations. What matters is not copying specific commands verbatim, but building the habit of connecting output to the next judgment.
+
+```bash
+# Collect service status + recent errors in one pass
+systemctl is-active my-api
+journalctl -u my-api --since '5 min ago' --no-pager \
+  | grep -E 'ERROR|CRITICAL|timeout|Failed' \
+  | tail -n 20
+
+# Expected output
+# active
+# 2026-05-21 15:31:10 ERROR timeout while calling payment API
+# 2026-05-21 15:31:12 CRITICAL worker exited unexpectedly
+```
+
+```bash
+# Process / port / file handle inspection
+ps -ef | grep -E 'my-api|gunicorn' | grep -v grep
+ss -lntp | grep -E ':8080|:80|:443'
+lsof -p "$(pgrep -f my-api | head -n 1)" | wc -l
+
+# Expected output example
+# deploy 18231 1  ... /opt/my-api/current/bin/start.sh
+# LISTEN 0 4096 0.0.0.0:8080 ... users:(("python3",pid=18231,fd=12))
+# 412
+```
+
+Saving these outputs as a time series makes comparison easy when issues recur, and quickly explains "how the current state differs from normal." Ultimately, practical CLI competence is the ability to reliably repeat an **evidence-based judgment routine**, not the commands themselves.
+
+### Operations Note: Recovery Order After Failure
+
+When a failure occurs, "check state → collect evidence → minimal action" is safer than "guess cause → restart immediately."
+
+```bash
+systemctl status my-api --no-pager | sed -n '1,12p'
+journalctl -u my-api -n 50 --no-pager | grep -E 'ERROR|CRITICAL|timeout|Failed' || true
+```
+
+Capturing state and logs first means that even if evidence disappears after a restart, you can still proceed with the retrospective and recurrence prevention.
+
+### Operations Note: Post-Change Verification
+
+After modifying permissions, files, or environment values, perform system-level verification alongside functional tests.
+
+```bash
+whoami
+hostname
+systemctl is-active my-api
+journalctl -u my-api -n 20 --no-pager
+```
+
+
 ## Checklist
 
 - [ ] You can read `rwxr-xr--` and describe the owner/group/others permissions
