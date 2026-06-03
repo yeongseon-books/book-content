@@ -3,7 +3,7 @@ title: "LLM Apps Ops 101 (3/6): LLM 출력 품질 평가"
 series: llm-apps-ops-101
 episode: 3
 language: ko
-status: publish-ready
+status: published
 targets:
   tistory: true
   medium: false

@@ -3,7 +3,7 @@ title: "LLM Apps Ops 101 (4/6): LLM 앱 보안"
 series: llm-apps-ops-101
 episode: 4
 language: ko
-status: publish-ready
+status: published
 targets:
   tistory: true
   medium: false

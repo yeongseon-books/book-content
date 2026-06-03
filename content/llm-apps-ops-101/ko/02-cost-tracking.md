@@ -3,7 +3,7 @@ title: "LLM Apps Ops 101 (2/6): LLM 비용 추적과 최적화"
 series: llm-apps-ops-101
 episode: 2
 language: ko
-status: publish-ready
+status: published
 targets:
   tistory: true
   medium: false

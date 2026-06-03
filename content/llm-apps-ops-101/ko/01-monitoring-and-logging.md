@@ -3,7 +3,7 @@ title: "LLM Apps Ops 101 (1/6): LLM 앱 모니터링과 로깅"
 series: llm-apps-ops-101
 episode: 1
 language: ko
-status: publish-ready
+status: published
 targets:
   tistory: true
   medium: false

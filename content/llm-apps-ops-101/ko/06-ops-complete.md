@@ -3,7 +3,7 @@ title: "LLM Apps Ops 101 (6/6): LLM 앱 운영 완성"
 series: llm-apps-ops-101
 episode: 6
 language: ko
-status: publish-ready
+status: published
 targets:
   tistory: true
   medium: false

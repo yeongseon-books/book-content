@@ -3,7 +3,7 @@ title: "LLM Apps Ops 101 (5/6): LLM 앱 배포 전략"
 series: llm-apps-ops-101
 episode: 5
 language: ko
-status: publish-ready
+status: published
 targets:
   tistory: true
   medium: false
